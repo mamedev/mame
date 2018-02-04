@@ -122,6 +122,7 @@ public:
 
 	void draw_sprites(bitmap_ind16 &bitmap,const rectangle &cliprect,int pri);
 	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	void sengokmj(machine_config &config);
 };
 
 
@@ -394,7 +395,7 @@ static ADDRESS_MAP_START( sengokmj_map, AS_PROGRAM, 16, sengokmj_state )
 	AM_RANGE(0x0c800, 0x0cfff) AM_RAM_WRITE(seibucrtc_sc1vram_w) AM_SHARE("sc1_vram")
 	AM_RANGE(0x0d000, 0x0d7ff) AM_RAM_WRITE(seibucrtc_sc2vram_w) AM_SHARE("sc2_vram")
 	AM_RANGE(0x0d800, 0x0e7ff) AM_RAM_WRITE(seibucrtc_sc3vram_w) AM_SHARE("sc3_vram")
-	AM_RANGE(0x0e800, 0x0f7ff) AM_RAM_DEVWRITE("palette", palette_device, write) AM_SHARE("palette")
+	AM_RANGE(0x0e800, 0x0f7ff) AM_RAM_DEVWRITE("palette", palette_device, write16) AM_SHARE("palette")
 	AM_RANGE(0x0f800, 0x0ffff) AM_RAM AM_SHARE("sprite_ram")
 	AM_RANGE(0xc0000, 0xfffff) AM_ROM
 ADDRESS_MAP_END
@@ -566,7 +567,7 @@ WRITE16_MEMBER( sengokmj_state::layer_scroll_w )
 }
 
 
-static MACHINE_CONFIG_START( sengokmj )
+MACHINE_CONFIG_START(sengokmj_state::sengokmj)
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", V30, 16000000/2) /* V30-8 */

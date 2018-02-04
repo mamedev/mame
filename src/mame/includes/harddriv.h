@@ -31,8 +31,8 @@
 
 #include "screen.h"
 
-#define HARDDRIV_MASTER_CLOCK   XTAL_32MHz
-#define HARDDRIV_GSP_CLOCK      XTAL_48MHz
+#define HARDDRIV_MASTER_CLOCK   XTAL(32'000'000)
+#define HARDDRIV_GSP_CLOCK      XTAL(48'000'000)
 
 DECLARE_DEVICE_TYPE(HARDDRIV_BOARD,               harddriv_board_device_state)
 DECLARE_DEVICE_TYPE(HARDDRIVC_BOARD,              harddrivc_board_device_state)
@@ -254,6 +254,16 @@ public:
 	DECLARE_WRITE32_MEMBER(hdds3xdsp_serial_tx_callback);
 	DECLARE_READ32_MEMBER(hdds3xdsp_serial_rx_callback);
 
+
+	void driver_msp(machine_config &config);
+	void driver_nomsp(machine_config &config);
+	void multisync_msp(machine_config &config);
+	void multisync_nomsp(machine_config &config);
+	void dsk(machine_config &config);
+	void dsk2(machine_config &config);
+	void ds3(machine_config &config);
+	void multisync2(machine_config &config);
+	void adsp(machine_config &config);
 protected:
 	harddriv_state(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock);
 

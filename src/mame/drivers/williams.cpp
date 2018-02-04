@@ -503,14 +503,15 @@ Reference video: https://www.youtube.com/watch?v=R5OeC6Wc_yI
 #include "emu.h"
 #include "includes/williams.h"
 
+#include "machine/74157.h"
 #include "machine/nvram.h"
 #include "sound/dac.h"
 #include "sound/volt_reg.h"
 #include "speaker.h"
 
 
-#define MASTER_CLOCK        (XTAL_12MHz)
-#define SOUND_CLOCK         (XTAL_3_579545MHz)
+#define MASTER_CLOCK        (XTAL(12'000'000))
+#define SOUND_CLOCK         (XTAL(3'579'545))
 
 
 
@@ -622,9 +623,9 @@ ADDRESS_MAP_END
  *************************************/
 
 static ADDRESS_MAP_START( williams2_common_map, AS_PROGRAM, 8, williams2_state )
+	AM_RANGE(0x0000, 0xbfff) AM_RAM AM_SHARE("videoram")
 	AM_RANGE(0x0000, 0x7fff) AM_READ_BANK("bank1")
 	AM_RANGE(0x8000, 0x87ff) AM_DEVICE("bank8000", address_map_bank_device, amap8)
-	AM_RANGE(0x0000, 0xbfff) AM_RAM AM_SHARE("videoram")
 	AM_RANGE(0xc000, 0xc7ff) AM_RAM_WRITE(williams2_tileram_w) AM_SHARE("williams2_tile")
 	AM_RANGE(0xc800, 0xc87f) AM_WRITE(williams2_bank_select_w)
 	AM_RANGE(0xc880, 0xc887) AM_MIRROR(0x0078) AM_WRITE(williams_blitter_w)
@@ -924,13 +925,14 @@ INPUT_PORTS_END
 
 static INPUT_PORTS_START( joust )
 	PORT_START("IN0")
-	PORT_BIT( 0x0f, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_CUSTOM_MEMBER(DEVICE_SELF, williams_state,williams_mux_r, "INP2\0INP1")
+	// 0x0f muxed from INP1/INP2
 	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_START2 )
 	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_START1 )
-	PORT_BIT( 0xc0, IP_ACTIVE_HIGH, IPT_UNUSED )
+	// 0xc0 muxed from INP1A/INP2A
 
 	PORT_START("IN1")
-	PORT_BIT( 0xff, IP_ACTIVE_HIGH, IPT_UNUSED )
+	// 0x03 muxed from INP1A/INP2A
+	PORT_BIT( 0xfc, IP_ACTIVE_HIGH, IPT_UNUSED )
 
 	PORT_START("IN2")
 	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_OTHER ) PORT_NAME("Auto Up / Manual Down") PORT_TOGGLE PORT_CODE(KEYCODE_F1)
@@ -942,17 +944,23 @@ static INPUT_PORTS_START( joust )
 	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_TILT )
 	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_UNKNOWN )
 
-	PORT_START("INP2") /* muxed into IN0 */
+	PORT_START("INP2")
 	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_JOYSTICK_LEFT ) PORT_2WAY PORT_PLAYER(2)
 	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_JOYSTICK_RIGHT ) PORT_2WAY PORT_PLAYER(2)
 	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_BUTTON1 ) PORT_PLAYER(2)
 	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_UNUSED )
 
-	PORT_START("INP1") /* muxed into IN0 */
+	PORT_START("INP1")
 	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_JOYSTICK_LEFT ) PORT_2WAY PORT_PLAYER(1)
 	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_JOYSTICK_RIGHT ) PORT_2WAY PORT_PLAYER(1)
 	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_BUTTON1 ) PORT_PLAYER(1)
 	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_UNUSED )
+
+	PORT_START("INP2A")
+	PORT_BIT( 0x0f, IP_ACTIVE_HIGH, IPT_UNUSED )
+
+	PORT_START("INP1A")
+	PORT_BIT( 0x0f, IP_ACTIVE_HIGH, IPT_UNUSED )
 INPUT_PORTS_END
 
 
@@ -983,12 +991,13 @@ INPUT_PORTS_END
 
 static INPUT_PORTS_START( splat )
 	PORT_START("IN0")
+	// 0x0f muxed from INP1/INP2
 	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_START1 )
 	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_START2 )
-	PORT_BIT( 0xcf, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_CUSTOM_MEMBER(DEVICE_SELF, williams_state,williams_mux_r, "INP2\0INP1")
+	// 0xc0 muxed from INP1A/INP2A
 
 	PORT_START("IN1")
-	PORT_BIT( 0x03, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_CUSTOM_MEMBER(DEVICE_SELF, williams_state,williams_mux_r, "INP2A\0INP1A")
+	// 0x03 muxed from INP1A/INP2A
 	PORT_BIT( 0xfc, IP_ACTIVE_HIGH, IPT_UNKNOWN )
 
 	PORT_START("IN2")
@@ -1000,34 +1009,29 @@ static INPUT_PORTS_START( splat )
 	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_COIN2 )
 	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_TILT )
 
-	PORT_START("INP2") /* muxed into IN0 */
+	PORT_START("INP2")
 	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_JOYSTICKLEFT_UP ) PORT_8WAY PORT_PLAYER(2)
 	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_JOYSTICKLEFT_DOWN ) PORT_8WAY PORT_PLAYER(2)
 	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_JOYSTICKLEFT_LEFT ) PORT_8WAY PORT_PLAYER(2)
 	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_JOYSTICKLEFT_RIGHT ) PORT_8WAY PORT_PLAYER(2)
-	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_UNUSED )
-	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_UNUSED )
-	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_JOYSTICKRIGHT_UP ) PORT_8WAY PORT_PLAYER(2)
-	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_JOYSTICKRIGHT_DOWN ) PORT_8WAY PORT_PLAYER(2)
 
-	PORT_START("INP1") /* muxed into IN0 */
+	PORT_START("INP1")
 	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_JOYSTICKLEFT_UP ) PORT_8WAY PORT_PLAYER(1)
 	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_JOYSTICKLEFT_DOWN ) PORT_8WAY PORT_PLAYER(1)
 	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_JOYSTICKLEFT_LEFT ) PORT_8WAY PORT_PLAYER(1)
 	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_JOYSTICKLEFT_RIGHT ) PORT_8WAY PORT_PLAYER(1)
-	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_UNUSED )
-	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_UNUSED )
-	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_JOYSTICKRIGHT_UP ) PORT_8WAY PORT_PLAYER(1)
-	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_JOYSTICKRIGHT_DOWN ) PORT_8WAY PORT_PLAYER(1)
 
-	PORT_START("INP2A") /* muxed into IN1 */
-	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_JOYSTICKRIGHT_LEFT ) PORT_8WAY PORT_PLAYER(2)
-	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_JOYSTICKRIGHT_RIGHT ) PORT_8WAY PORT_PLAYER(2)
+	PORT_START("INP2A")
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_JOYSTICKRIGHT_UP ) PORT_8WAY PORT_PLAYER(2)
+	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_JOYSTICKRIGHT_DOWN ) PORT_8WAY PORT_PLAYER(2)
+	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_JOYSTICKRIGHT_LEFT ) PORT_8WAY PORT_PLAYER(2)
+	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_JOYSTICKRIGHT_RIGHT ) PORT_8WAY PORT_PLAYER(2)
 
-	PORT_START("INP1A") /* muxed into IN1 */
-	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_JOYSTICKRIGHT_LEFT ) PORT_8WAY PORT_PLAYER(1)
-	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_JOYSTICKRIGHT_RIGHT ) PORT_8WAY PORT_PLAYER(1)
-
+	PORT_START("INP1A")
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_JOYSTICKRIGHT_UP ) PORT_8WAY PORT_PLAYER(1)
+	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_JOYSTICKRIGHT_DOWN ) PORT_8WAY PORT_PLAYER(1)
+	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_JOYSTICKRIGHT_LEFT ) PORT_8WAY PORT_PLAYER(1)
+	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_JOYSTICKRIGHT_RIGHT ) PORT_8WAY PORT_PLAYER(1)
 INPUT_PORTS_END
 
 
@@ -1088,10 +1092,6 @@ static INPUT_PORTS_START( blaster )
 	/* pseudo analog joystick, see below */
 
 	PORT_START("IN1")
-	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_BUTTON2 )
-	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_BUTTON1 )
-	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_BUTTON3 )
-	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_UNKNOWN )
 	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_START1 )
 	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_START2 )
 	PORT_BIT( 0xc0, IP_ACTIVE_HIGH, IPT_UNKNOWN )
@@ -1105,6 +1105,18 @@ static INPUT_PORTS_START( blaster )
 	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_COIN2 )
 	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_TILT )
 	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_UNKNOWN )
+
+	PORT_START("IN3")
+	PORT_BIT( 0xff, IP_ACTIVE_HIGH, IPT_UNUSED )
+
+	PORT_START("INP1")
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_BUTTON2 )
+	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_BUTTON1 )
+	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_BUTTON3 )
+	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_UNUSED )
+
+	PORT_START("INP2")
+	PORT_BIT( 0x0f, IP_ACTIVE_HIGH, IPT_UNUSED )
 
 	PORT_START("49WAYX")    /* converted by williams_49way_port_0_r() */
 	PORT_BIT( 0xff, 0x38, IPT_AD_STICK_X ) PORT_MINMAX(0x00,0x6f) PORT_SENSITIVITY(100) PORT_KEYDELTA(10)
@@ -1200,12 +1212,14 @@ INPUT_PORTS_END
 
 static INPUT_PORTS_START( alienar )
 	PORT_START("IN0")
+	// 0x0f muxed from INP1/INP2
 	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_START1 )
 	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_START2 )
-	PORT_BIT( 0xcf, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_CUSTOM_MEMBER(DEVICE_SELF, williams_state,williams_mux_r, "INP2\0INP1")
+	// 0xc0 muxed from INP1A/INP2A
 
 	PORT_START("IN1")
-	PORT_BIT( 0xff, IP_ACTIVE_HIGH, IPT_UNUSED )
+	// 0x03 muxed from INP1A/INP2A
+	PORT_BIT( 0xfc, IP_ACTIVE_HIGH, IPT_UNUSED )
 
 	PORT_START("IN2")
 	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_OTHER ) PORT_NAME("Auto Up / Manual Down") PORT_TOGGLE PORT_CODE(KEYCODE_F1)
@@ -1217,25 +1231,25 @@ static INPUT_PORTS_START( alienar )
 	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_TILT )
 	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_UNKNOWN )
 
-	PORT_START("INP2")  /* muxed into IN0 */
+	PORT_START("INP2")
 	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_JOYSTICK_UP ) PORT_PLAYER(2)
 	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_JOYSTICK_DOWN ) PORT_PLAYER(2)
 	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_JOYSTICK_LEFT ) PORT_PLAYER(2)
 	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_JOYSTICK_RIGHT ) PORT_PLAYER(2)
-	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_UNUSED )
-	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_UNUSED )
-	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_BUTTON1 ) PORT_PLAYER(2)
-	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_BUTTON2 ) PORT_PLAYER(2)
 
-	PORT_START("INP1")   /* muxed into IN0 */
+	PORT_START("INP1")
 	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_JOYSTICK_UP ) PORT_PLAYER(1)
 	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_JOYSTICK_DOWN ) PORT_PLAYER(1)
 	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_JOYSTICK_LEFT ) PORT_PLAYER(1)
 	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_JOYSTICK_RIGHT ) PORT_PLAYER(1)
-	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_UNUSED )
-	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_UNUSED )
-	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_BUTTON1 ) PORT_PLAYER(1)
-	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_BUTTON2 ) PORT_PLAYER(1)
+
+	PORT_START("INP2A")
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_BUTTON1 ) PORT_PLAYER(2)
+	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_BUTTON2 ) PORT_PLAYER(2)
+
+	PORT_START("INP1A")
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_BUTTON1 ) PORT_PLAYER(1)
+	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_BUTTON2 ) PORT_PLAYER(1)
 INPUT_PORTS_END
 
 
@@ -1291,15 +1305,10 @@ INPUT_PORTS_END
 
 
 static INPUT_PORTS_START( tshoot )
-	PORT_START("IN0")
-	PORT_BIT( 0x3f, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_CUSTOM_MEMBER(DEVICE_SELF, williams_state,williams_mux_r, "INP1X\0INP1Y")
-	PORT_BIT( 0x40, IP_ACTIVE_LOW,  IPT_UNKNOWN )
-	PORT_BIT( 0x80, IP_ACTIVE_LOW,  IPT_BUTTON1 )
-
 	PORT_START("IN1")
-	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_BUTTON2 )
-	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_BUTTON3 )
-	PORT_BIT( 0x3C, IP_ACTIVE_HIGH, IPT_UNUSED ) /* 0011-1100 output */
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_BUTTON2 ) PORT_NAME("Grenade")
+	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_BUTTON3 ) PORT_NAME("Gobble")
+	PORT_BIT( 0x3c, IP_ACTIVE_HIGH, IPT_UNUSED ) /* 0011-1100 output */
 	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_START1 )
 	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_START2 )
 
@@ -1313,18 +1322,24 @@ static INPUT_PORTS_START( tshoot )
 	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_TILT )
 	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_UNUSED )
 
-	PORT_START("INP1X") /* muxed into IN0 */
-	PORT_BIT( 0x3F, 0x20, IPT_AD_STICK_Y ) PORT_MINMAX(0,0x3F) PORT_SENSITIVITY(25) PORT_KEYDELTA(10)
+	PORT_START("INP1")
+	PORT_BIT( 0x3f, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_CUSTOM_MEMBER(DEVICE_SELF, tshoot_state, gun_r, (uintptr_t)0)
+	PORT_BIT( 0x40, IP_ACTIVE_LOW,  IPT_UNUSED )
+	PORT_BIT( 0x80, IP_ACTIVE_LOW,  IPT_BUTTON1 ) PORT_NAME("Fire")
 
-	PORT_START("INP1Y") /* muxed into IN0 */
-	PORT_BIT( 0x3F, 0x20, IPT_AD_STICK_X ) PORT_MINMAX(0,0x3F) PORT_SENSITIVITY(25) PORT_KEYDELTA(10)
+	PORT_START("INP2")
+	PORT_BIT( 0x3f, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_CUSTOM_MEMBER(DEVICE_SELF, tshoot_state, gun_r, (uintptr_t)1)
+	PORT_BIT( 0xc0, IP_ACTIVE_LOW,  IPT_UNUSED )
+
+	PORT_START("GUNX")
+	PORT_BIT( 0x3f, 0x20, IPT_AD_STICK_Y ) PORT_MINMAX(0,0x3f) PORT_SENSITIVITY(25) PORT_KEYDELTA(10)
+
+	PORT_START("GUNY")
+	PORT_BIT( 0x3f, 0x20, IPT_AD_STICK_X ) PORT_MINMAX(0,0x3f) PORT_SENSITIVITY(25) PORT_KEYDELTA(10)
 INPUT_PORTS_END
 
 
 static INPUT_PORTS_START( inferno )
-	PORT_START("IN0")
-	PORT_BIT( 0xFF, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_CUSTOM_MEMBER(DEVICE_SELF, williams_state,williams_mux_r, "INP1\0INP2")
-
 	PORT_START("IN1")
 	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_BUTTON1 ) PORT_PLAYER(1)
 	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_BUTTON1 ) PORT_PLAYER(2)
@@ -1342,7 +1357,7 @@ static INPUT_PORTS_START( inferno )
 	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_TILT )
 	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_UNUSED )
 
-	PORT_START("INP1")  /* muxed into IN0 */
+	PORT_START("INP1")
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_JOYSTICKLEFT_UP ) PORT_PLAYER(1)
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_JOYSTICKLEFT_LEFT ) PORT_PLAYER(1)
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_JOYSTICKLEFT_RIGHT ) PORT_PLAYER(1)
@@ -1352,7 +1367,7 @@ static INPUT_PORTS_START( inferno )
 	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_JOYSTICKRIGHT_RIGHT ) PORT_PLAYER(1)
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_JOYSTICKRIGHT_DOWN ) PORT_PLAYER(1)
 
-	PORT_START("INP2")  /* muxed into IN0 */
+	PORT_START("INP2")
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_JOYSTICKLEFT_UP ) PORT_PLAYER(2)
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_JOYSTICKLEFT_LEFT ) PORT_PLAYER(2)
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_JOYSTICKLEFT_RIGHT ) PORT_PLAYER(2)
@@ -1366,9 +1381,9 @@ INPUT_PORTS_END
 
 static INPUT_PORTS_START( joust2 )
 	PORT_START("IN0")
-	PORT_BIT( 0x0f, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_CUSTOM_MEMBER(DEVICE_SELF, williams_state,williams_mux_r, "INP1\0INP2")
-	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_BUTTON2 ) PORT_PLAYER(2)
-	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_BUTTON2 ) PORT_PLAYER(1)
+	// 0x0f muxed from INP1/INP2
+	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_BUTTON2 ) PORT_NAME("P2 Start/Transform") PORT_PLAYER(2)
+	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_BUTTON2 ) PORT_NAME("P1 Start/Transform") PORT_PLAYER(1)
 	PORT_BIT( 0xc0, IP_ACTIVE_LOW, IPT_UNUSED )
 
 	PORT_START("IN1")
@@ -1384,16 +1399,16 @@ static INPUT_PORTS_START( joust2 )
 	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_TILT )
 	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_UNUSED )
 
-	PORT_START("INP1") /* muxed into IN0 */
+	PORT_START("INP1")
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_JOYSTICK_LEFT ) PORT_2WAY PORT_PLAYER(1)
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_JOYSTICK_RIGHT ) PORT_2WAY PORT_PLAYER(1)
-	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_PLAYER(1)
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_NAME("P1 Flap") PORT_PLAYER(1)
 	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_UNUSED )
 
-	PORT_START("INP2") /* muxed into IN0 */
+	PORT_START("INP2")
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_JOYSTICK_LEFT ) PORT_2WAY PORT_PLAYER(2)
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_JOYSTICK_RIGHT ) PORT_2WAY PORT_PLAYER(2)
-	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_PLAYER(2)
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_NAME("P2 Flap") PORT_PLAYER(2)
 	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_UNUSED )
 INPUT_PORTS_END
 
@@ -1433,10 +1448,10 @@ GFXDECODE_END
  *
  *************************************/
 
-static MACHINE_CONFIG_START( williams )
+MACHINE_CONFIG_START(williams_state::williams)
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", M6809, MASTER_CLOCK/3/4)
+	MCFG_CPU_ADD("maincpu", MC6809E, MASTER_CLOCK/3/4)
 	MCFG_CPU_PROGRAM_MAP(williams_map)
 
 	MCFG_CPU_ADD("soundcpu", M6808, SOUND_CLOCK) // internal clock divider of 4, effective frequency is 894.886kHz
@@ -1444,7 +1459,7 @@ static MACHINE_CONFIG_START( williams )
 
 	MCFG_MACHINE_START_OVERRIDE(williams_state,williams)
 	MCFG_MACHINE_RESET_OVERRIDE(williams_state,williams)
-	MCFG_NVRAM_ADD_0FILL("nvram")
+	MCFG_NVRAM_ADD_0FILL("nvram") // 5101 (Defender), 5114 or 6514 (later games) + battery
 
 	MCFG_TIMER_DRIVER_ADD("scan_timer", williams_state, williams_va11_callback)
 	MCFG_TIMER_DRIVER_ADD("240_timer", williams_state, williams_count240_callback)
@@ -1483,7 +1498,7 @@ static MACHINE_CONFIG_START( williams )
 MACHINE_CONFIG_END
 
 
-static MACHINE_CONFIG_DERIVED( defender, williams )
+MACHINE_CONFIG_DERIVED(williams_state::defender, williams)
 
 	/* basic machine hardware */
 
@@ -1496,8 +1511,8 @@ static MACHINE_CONFIG_DERIVED( defender, williams )
 	MCFG_DEVICE_ADD("bankc000", ADDRESS_MAP_BANK, 0)
 	MCFG_DEVICE_PROGRAM_MAP(defender_bankc000_map)
 	MCFG_ADDRESS_MAP_BANK_ENDIANNESS(ENDIANNESS_BIG)
-	MCFG_ADDRESS_MAP_BANK_DATABUS_WIDTH(8)
-	MCFG_ADDRESS_MAP_BANK_ADDRBUS_WIDTH(16)
+	MCFG_ADDRESS_MAP_BANK_DATA_WIDTH(8)
+	MCFG_ADDRESS_MAP_BANK_ADDR_WIDTH(16)
 	MCFG_ADDRESS_MAP_BANK_STRIDE(0x1000)
 
 	MCFG_MACHINE_START_OVERRIDE(williams_state,defender)
@@ -1508,24 +1523,38 @@ static MACHINE_CONFIG_DERIVED( defender, williams )
 MACHINE_CONFIG_END
 
 
-static MACHINE_CONFIG_DERIVED( jin, defender ) // needs a different screen size or the credit text is clipped
+MACHINE_CONFIG_DERIVED(williams_state::jin, defender) // needs a different screen size or the credit text is clipped
 	/* basic machine hardware */
 	MCFG_SCREEN_MODIFY("screen")
 	MCFG_SCREEN_VISIBLE_AREA(0, 315, 7, 247-1)
 MACHINE_CONFIG_END
 
 
-static MACHINE_CONFIG_DERIVED( williams_muxed, williams )
+MACHINE_CONFIG_DERIVED(williams_state::williams_muxed, williams)
 
 	/* basic machine hardware */
 
 	/* pia */
 	MCFG_DEVICE_MODIFY("pia_0")
-	MCFG_PIA_CB2_HANDLER(WRITELINE(williams_state, williams_port_select_w))
+	MCFG_PIA_READPA_HANDLER(IOPORT("IN0")) MCFG_DEVCB_MASK(0x30)
+	MCFG_DEVCB_CHAIN_INPUT(DEVREAD8("mux_0", ls157_device, output_r)) MCFG_DEVCB_MASK(0x0f)
+	MCFG_DEVCB_CHAIN_INPUT(DEVREAD8("mux_1", ls157_device, output_r)) MCFG_DEVCB_RSHIFT(-6) MCFG_DEVCB_MASK(0xc0)
+	MCFG_PIA_READPB_HANDLER(IOPORT("IN1")) MCFG_DEVCB_MASK(0xfc)
+	MCFG_DEVCB_CHAIN_INPUT(DEVREAD8("mux_1", ls157_device, output_r)) MCFG_DEVCB_RSHIFT(2) MCFG_DEVCB_MASK(0x03)
+	MCFG_PIA_CB2_HANDLER(DEVWRITELINE("mux_0", ls157_device, select_w))
+	MCFG_DEVCB_CHAIN_OUTPUT(DEVWRITELINE("mux_1", ls157_device, select_w))
+
+	MCFG_DEVICE_ADD("mux_0", LS157, 0) // IC3 on interface board (actually LS257 with OC tied low)
+	MCFG_74157_A_IN_CB(IOPORT("INP2"))
+	MCFG_74157_B_IN_CB(IOPORT("INP1"))
+
+	MCFG_DEVICE_ADD("mux_1", LS157, 0) // IC4 on interface board (actually LS257 with OC tied low)
+	MCFG_74157_A_IN_CB(IOPORT("INP2A"))
+	MCFG_74157_B_IN_CB(IOPORT("INP1A"))
 MACHINE_CONFIG_END
 
 
-static MACHINE_CONFIG_DERIVED( spdball, williams )
+MACHINE_CONFIG_DERIVED(williams_state::spdball, williams)
 
 	/* basic machine hardware */
 
@@ -1536,20 +1565,20 @@ static MACHINE_CONFIG_DERIVED( spdball, williams )
 MACHINE_CONFIG_END
 
 
-static MACHINE_CONFIG_DERIVED( lottofun, williams )
+MACHINE_CONFIG_DERIVED(williams_state::lottofun, williams)
 
 	/* basic machine hardware */
 
 	/* pia */
 	MCFG_DEVICE_MODIFY("pia_0")
-	MCFG_PIA_WRITEPB_HANDLER(DEVWRITE8("ticket", ticket_dispenser_device, write))
+	MCFG_PIA_WRITEPB_HANDLER(DEVWRITELINE("ticket", ticket_dispenser_device, motor_w)) MCFG_DEVCB_BIT(7)
 	MCFG_PIA_CA2_HANDLER(WRITELINE(williams_state, lottofun_coin_lock_w))
 
 	MCFG_TICKET_DISPENSER_ADD("ticket", attotime::from_msec(70), TICKET_MOTOR_ACTIVE_LOW, TICKET_STATUS_ACTIVE_HIGH)
 MACHINE_CONFIG_END
 
 
-static MACHINE_CONFIG_DERIVED( sinistar, williams )
+MACHINE_CONFIG_DERIVED(williams_state::sinistar, williams)
 
 	/* basic machine hardware */
 	MCFG_CPU_MODIFY("maincpu")
@@ -1569,7 +1598,7 @@ static MACHINE_CONFIG_DERIVED( sinistar, williams )
 MACHINE_CONFIG_END
 
 
-static MACHINE_CONFIG_DERIVED( playball, williams )
+MACHINE_CONFIG_DERIVED(williams_state::playball, williams)
 
 	/* basic machine hardware */
 
@@ -1591,7 +1620,7 @@ static MACHINE_CONFIG_DERIVED( playball, williams )
 MACHINE_CONFIG_END
 
 
-static MACHINE_CONFIG_DERIVED( blastkit, williams )
+MACHINE_CONFIG_DERIVED(blaster_state::blastkit, williams)
 
 	/* basic machine hardware */
 	MCFG_CPU_MODIFY("maincpu")
@@ -1607,12 +1636,18 @@ static MACHINE_CONFIG_DERIVED( blastkit, williams )
 
 	/* pia */
 	MCFG_DEVICE_MODIFY("pia_0")
-	MCFG_PIA_READPA_HANDLER(READ8(williams_state, williams_input_port_49way_0_5_r))
-	MCFG_PIA_CB2_HANDLER(WRITELINE(williams_state, williams_port_select_w))
+	MCFG_PIA_READPA_HANDLER(DEVREAD8("mux_a", ls157_x2_device, output_r))
+	MCFG_PIA_CB2_HANDLER(DEVWRITELINE("mux_a", ls157_x2_device, select_w))
+
+	// All multiplexers on Blaster interface board are really LS257 with OC tied to GND (which is equivalent to LS157)
+
+	MCFG_DEVICE_ADD("mux_a", LS157_X2, 0)
+	MCFG_74157_A_IN_CB(IOPORT("IN3"))
+	MCFG_74157_B_IN_CB(READ8(williams_state, williams_49way_port_0_r))
 MACHINE_CONFIG_END
 
 
-static MACHINE_CONFIG_DERIVED( blaster, blastkit )
+MACHINE_CONFIG_DERIVED(blaster_state::blaster, blastkit)
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("soundcpu_b", M6808, SOUND_CLOCK) // internal clock divider of 4, effective frequency is 894.886kHz
@@ -1620,7 +1655,18 @@ static MACHINE_CONFIG_DERIVED( blaster, blastkit )
 
 	/* pia */
 	MCFG_DEVICE_MODIFY("pia_0")
-	MCFG_PIA_READPA_HANDLER(READ8(williams_state, williams_49way_port_0_r))
+	MCFG_PIA_READPB_HANDLER(DEVREAD8("mux_b", ls157_device, output_r)) MCFG_DEVCB_MASK(0x0f)
+	MCFG_DEVCB_CHAIN_INPUT(IOPORT("IN1")) MCFG_DEVCB_MASK(0xf0)
+	MCFG_PIA_CB2_HANDLER(DEVWRITELINE("mux_a", ls157_x2_device, select_w))
+	MCFG_DEVCB_CHAIN_OUTPUT(DEVWRITELINE("mux_b", ls157_device, select_w))
+
+	MCFG_DEVICE_MODIFY("mux_a") // IC7 (for PA0-PA3) + IC5 (for PA4-PA7)
+	MCFG_74157_A_IN_CB(READ8(williams_state, williams_49way_port_0_r))
+	MCFG_74157_B_IN_CB(IOPORT("IN3"))
+
+	MCFG_DEVICE_ADD("mux_b", LS157, 0) // IC3
+	MCFG_74157_A_IN_CB(IOPORT("INP1"))
+	MCFG_74157_B_IN_CB(IOPORT("INP2"))
 
 	MCFG_DEVICE_MODIFY("pia_1")
 	MCFG_PIA_WRITEPB_HANDLER(WRITE8(blaster_state, blaster_snd_cmd_w))
@@ -1647,10 +1693,10 @@ static MACHINE_CONFIG_DERIVED( blaster, blastkit )
 MACHINE_CONFIG_END
 
 
-static MACHINE_CONFIG_START( williams2 )
+MACHINE_CONFIG_START(williams2_state::williams2)
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", M6809, MASTER_CLOCK/3/4)
+	MCFG_CPU_ADD("maincpu", MC6809E, MASTER_CLOCK/3/4)
 	MCFG_CPU_PROGRAM_MAP(williams2_d000_ram_map)
 
 	MCFG_CPU_ADD("soundcpu", M6808, MASTER_CLOCK/3) /* yes, this is different from the older games */
@@ -1659,13 +1705,13 @@ static MACHINE_CONFIG_START( williams2 )
 	MCFG_DEVICE_ADD("bank8000", ADDRESS_MAP_BANK, 0)
 	MCFG_DEVICE_PROGRAM_MAP(williams2_bank8000_map)
 	MCFG_ADDRESS_MAP_BANK_ENDIANNESS(ENDIANNESS_BIG)
-	MCFG_ADDRESS_MAP_BANK_DATABUS_WIDTH(8)
-	MCFG_ADDRESS_MAP_BANK_ADDRBUS_WIDTH(12)
+	MCFG_ADDRESS_MAP_BANK_DATA_WIDTH(8)
+	MCFG_ADDRESS_MAP_BANK_ADDR_WIDTH(12)
 	MCFG_ADDRESS_MAP_BANK_STRIDE(0x0800)
 
 	MCFG_MACHINE_START_OVERRIDE(williams2_state,williams2)
 	MCFG_MACHINE_RESET_OVERRIDE(williams2_state,williams2)
-	MCFG_NVRAM_ADD_0FILL("nvram")
+	MCFG_NVRAM_ADD_0FILL("nvram") // 5114 + battery
 
 	MCFG_TIMER_DRIVER_ADD("scan_timer", williams2_state, williams2_va11_callback)
 	MCFG_TIMER_DRIVER_ADD("254_timer", williams2_state, williams2_endscreen_callback)
@@ -1693,7 +1739,6 @@ static MACHINE_CONFIG_START( williams2 )
 	MCFG_DEVICE_ADD("pia_0", PIA6821, 0)
 	MCFG_PIA_READPA_HANDLER(IOPORT("IN0"))
 	MCFG_PIA_READPB_HANDLER(IOPORT("IN1"))
-	MCFG_PIA_CA2_HANDLER(WRITELINE(williams_state, williams_port_select_w))
 
 	MCFG_DEVICE_ADD("pia_1", PIA6821, 0)
 	MCFG_PIA_READPA_HANDLER(IOPORT("IN2"))
@@ -1711,13 +1756,23 @@ static MACHINE_CONFIG_START( williams2 )
 MACHINE_CONFIG_END
 
 
-static MACHINE_CONFIG_DERIVED( mysticm, williams2 )
+MACHINE_CONFIG_DERIVED(williams2_state::inferno, williams2)
+	MCFG_DEVICE_MODIFY("pia_0")
+	MCFG_PIA_READPA_HANDLER(DEVREAD8("mux", ls157_x2_device, output_r))
+	MCFG_PIA_CA2_HANDLER(DEVWRITELINE("mux", ls157_x2_device, select_w))
+
+	MCFG_DEVICE_ADD("mux", LS157_X2, 0) // IC45 (for PA4-PA7) + IC46 (for PA0-PA3) on CPU board
+	MCFG_74157_A_IN_CB(IOPORT("INP1"))
+	MCFG_74157_B_IN_CB(IOPORT("INP2"))
+MACHINE_CONFIG_END
+
+
+MACHINE_CONFIG_DERIVED(williams2_state::mysticm, williams2)
 
 	/* basic machine hardware */
 
 	/* pia */
 	MCFG_DEVICE_MODIFY("pia_0")
-	MCFG_PIA_CA2_HANDLER(NOOP)
 	MCFG_PIA_IRQA_HANDLER(WRITELINE(williams_state,williams_main_firq))
 	MCFG_PIA_IRQB_HANDLER(WRITELINE(williams2_state,mysticm_main_irq))
 
@@ -1727,7 +1782,7 @@ static MACHINE_CONFIG_DERIVED( mysticm, williams2 )
 MACHINE_CONFIG_END
 
 
-static MACHINE_CONFIG_DERIVED( tshoot, williams2 )
+MACHINE_CONFIG_DERIVED(tshoot_state::tshoot, williams2)
 
 	/* basic machine hardware */
 	MCFG_CPU_MODIFY("maincpu")
@@ -1735,8 +1790,9 @@ static MACHINE_CONFIG_DERIVED( tshoot, williams2 )
 
 	/* pia */
 	MCFG_DEVICE_MODIFY("pia_0")
-	MCFG_PIA_READPA_HANDLER(READ8(williams2_state,tshoot_input_port_0_3_r))
-	MCFG_PIA_WRITEPB_HANDLER(WRITE8(williams2_state,tshoot_lamp_w))
+	MCFG_PIA_READPA_HANDLER(DEVREAD8("mux", ls157_x2_device, output_r))
+	MCFG_PIA_WRITEPB_HANDLER(WRITE8(tshoot_state, lamp_w))
+	MCFG_PIA_CA2_HANDLER(DEVWRITELINE("mux", ls157_x2_device, select_w))
 	MCFG_PIA_IRQA_HANDLER(WRITELINE(williams2_state,tshoot_main_irq))
 	MCFG_PIA_IRQB_HANDLER(WRITELINE(williams2_state,tshoot_main_irq))
 
@@ -1745,11 +1801,15 @@ static MACHINE_CONFIG_DERIVED( tshoot, williams2 )
 	MCFG_PIA_IRQB_HANDLER(WRITELINE(williams2_state,tshoot_main_irq))
 
 	MCFG_DEVICE_MODIFY("pia_2")
-	MCFG_PIA_CB2_HANDLER(WRITELINE(williams2_state,tshoot_maxvol_w))
+	MCFG_PIA_CB2_HANDLER(WRITELINE(tshoot_state, maxvol_w))
+
+	MCFG_DEVICE_ADD("mux", LS157_X2, 0) // U2 + U3 on interface board
+	MCFG_74157_A_IN_CB(IOPORT("INP1"))
+	MCFG_74157_B_IN_CB(IOPORT("INP2"))
 MACHINE_CONFIG_END
 
 
-static MACHINE_CONFIG_DERIVED( joust2, williams2 )
+MACHINE_CONFIG_DERIVED(joust2_state::joust2, williams2)
 
 	/* basic machine hardware */
 	MCFG_CPU_MODIFY("maincpu")
@@ -1762,6 +1822,11 @@ static MACHINE_CONFIG_DERIVED( joust2, williams2 )
 	MCFG_MACHINE_RESET_OVERRIDE(joust2_state,joust2)
 
 	/* pia */
+	MCFG_DEVICE_MODIFY("pia_0")
+	MCFG_PIA_READPA_HANDLER(IOPORT("IN0")) MCFG_DEVCB_MASK(0xf0)
+	MCFG_DEVCB_CHAIN_INPUT(DEVREAD8("mux", ls157_device, output_r)) MCFG_DEVCB_MASK(0x0f)
+	MCFG_PIA_CA2_HANDLER(DEVWRITELINE("mux", ls157_device, select_w))
+
 	MCFG_DEVICE_MODIFY("pia_1")
 	MCFG_PIA_READPA_HANDLER(IOPORT("IN2"))
 	MCFG_PIA_WRITEPB_HANDLER(WRITE8(joust2_state,joust2_snd_cmd_w))
@@ -1769,6 +1834,10 @@ static MACHINE_CONFIG_DERIVED( joust2, williams2 )
 	MCFG_PIA_CB2_HANDLER(DEVWRITELINE("pia_2", pia6821_device, ca1_w))
 	MCFG_PIA_IRQA_HANDLER(WRITELINE(williams_state,williams_main_irq))
 	MCFG_PIA_IRQB_HANDLER(WRITELINE(williams_state,williams_main_irq))
+
+	MCFG_DEVICE_ADD("mux", LS157, 0)
+	MCFG_74157_A_IN_CB(IOPORT("INP1"))
+	MCFG_74157_B_IN_CB(IOPORT("INP2"))
 MACHINE_CONFIG_END
 
 
@@ -2003,6 +2072,36 @@ ROM_START( defence )
 	ROM_LOAD( "defcmnda.snd", 0xf800, 0x0800, CRC(f122d9c9) SHA1(70092fc354a2efbe7365be922fa36309b50d5c6f) )
 ROM_END
 
+// The dumps of ROMs 1, 2, 3 were bad, but the dumper observed that using the defenderb ROMs the emulation behaves identically to the PCB.
+// A redump is definitely needed:
+// 1.bin        [1/2]      wb01.bin     [1/2]      IDENTICAL
+// 2.bin        [1/2]      defeng02.bin [1/2]      IDENTICAL
+// 1.bin        [2/2]      wb01.bin     [1/2]      IDENTICAL
+// 2.bin        [2/2]      defeng02.bin [1/2]      IDENTICAL
+// 3ojo.bin     [2/2]      wb03.bin     [1/2]      IDENTICAL
+// 3ojo.bin     [1/2]      defend.11               2.197266%
+// For now we use the defenderb ones.
+// PCBs: FAMARESA 590-001, 590-002, 590-003, 590-004
+ROM_START( attackf )
+	ROM_REGION( 0x19000, "maincpu", 0 )
+	ROM_LOAD( "1.bin",    0x0d000, 0x1000, BAD_DUMP CRC(0ee1019d) SHA1(a76247e825b8267abfd195c12f96348fe10d4cbc) )
+	ROM_LOAD( "2.bin",    0x0e000, 0x1000, BAD_DUMP CRC(d184ab6b) SHA1(ed61a95b04f6162aedba8a72bc46005b77283955) )
+	ROM_LOAD( "3ojo.bin", 0x0f000, 0x1000, BAD_DUMP CRC(a732d649) SHA1(b681882c02c5870ad613edc77255969a5f796422) )
+	ROM_LOAD( "9.bin",    0x10000, 0x0800, CRC(f57caa62) SHA1(c8c91b96fd3bc98eddcc1503159050dae5755001) )
+	ROM_LOAD( "12.bin",   0x10800, 0x0800, CRC(eb73d8a1) SHA1(f26007839a9eff6c7f77768da150fa26b8c96643) )
+	ROM_LOAD( "8.bin",    0x11000, 0x0800, CRC(17f7abde) SHA1(6959ed471687174a3fdc3f980ca7bd993b23d54f) )
+	ROM_LOAD( "11.bin",   0x11800, 0x0800, CRC(5ca4e860) SHA1(031188c009b8fca92703a0cc0c2bb44976212ae9) )
+	ROM_LOAD( "7.bin",    0x12000, 0x0800, CRC(545c3326) SHA1(98199df5206c261061b0108c68ab9128fa0779eb) )
+	ROM_LOAD( "10.bin",   0x12800, 0x0800, CRC(3940d731) SHA1(c867efa48e3ed6a6c3ddcd519aba1fe0a1712400) )
+	ROM_LOAD( "6.bin",    0x16000, 0x0800, CRC(3af34c05) SHA1(71f3ced06a373fa4805c856bd9fc97760787a920) )
+
+	ROM_REGION( 0x10000, "soundcpu", 0 )
+	ROM_LOAD( "13.bin",   0xf800, 0x0800, CRC(fefd5b48) SHA1(ceb0d18483f0691978c604db94417e6941ad7ff2) )
+
+	ROM_REGION( 0x0200, "proms", 0 )
+	ROM_LOAD( "decoder.1",   0x0000, 0x0200, CRC(8dd98da5) SHA1(da979604f7a2aa8b5a6d4a5debd2e80f77569e35) ) // not dumped from this PCB, believed to match
+ROM_END
+
 ROM_START( mayday )
 	ROM_REGION( 0x19000, "maincpu", 0 )
 	ROM_LOAD( "ic03-3.bin",  0x0d000, 0x1000, CRC(a1ff6e62) SHA1(c3c60ce94c6bdc4b07e45f386eff9a4aa4816953) )
@@ -2050,8 +2149,6 @@ ROM_START( maydayb )
 	ROM_LOAD( "rom6a.bin",   0x1000, 0x0800, CRC(8e4e981f) SHA1(685c1fca9373f4129c7c6b86f18900a1bd324019) )
 	ROM_LOAD( "rom8-sos.bin",0x1800, 0x0800, CRC(6a9b383f) SHA1(10e71a3bb9492b6c34ff06760dd55c442611ca75) ) // FIXED BITS (xxxxxx1x)
 ROM_END
-
-
 
 ROM_START( batlzone )
 	ROM_REGION( 0x19000, "maincpu", 0 )
@@ -3019,7 +3116,7 @@ DRIVER_INIT_MEMBER(williams_state,defndjeu)
 
 	/* apply simple decryption by swapping bits 0 and 7 */
 	for (i = 0xd000; i < 0x19000; i++)
-		rom[i] = BITSWAP8(rom[i],0,6,5,4,3,2,1,7);
+		rom[i] = bitswap<8>(rom[i],0,6,5,4,3,2,1,7);
 }
 
 
@@ -3184,6 +3281,7 @@ GAME( 1980, zero2,      defender, defender,       defender, williams_state, defn
 GAME( 1980, defcmnd,    defender, defender,       defender, williams_state, defender, ROT0,   "bootleg", "Defense Command (Defender bootleg)", MACHINE_SUPPORTS_SAVE )
 GAME( 1981, defence,    defender, defender,       defender, williams_state, defender, ROT0,   "bootleg (Outer Limits)", "Defence Command (Defender bootleg)", MACHINE_SUPPORTS_SAVE )
 GAME( 1981, startrkd,   defender, defender,       defender, williams_state, defender, ROT0,   "bootleg", "Star Trek (Defender bootleg)", MACHINE_SUPPORTS_SAVE )
+GAME( 1980, attackf,    defender, defender,       defender, williams_state, defender, ROT0,   "bootleg (Famare SA)", "Attack (Defender bootleg)", MACHINE_SUPPORTS_SAVE )
 
 GAME( 1980, mayday,     0,        defender,       mayday,   williams_state, mayday,   ROT0,   "Hoei", "Mayday (set 1)", MACHINE_SUPPORTS_SAVE | MACHINE_UNEMULATED_PROTECTION ) // \  original by Hoei, which one of these 3 sets is bootleg/licensed/original is unknown
 GAME( 1980, maydaya,    mayday,   defender,       mayday,   williams_state, mayday,   ROT0,   "Hoei", "Mayday (set 2)", MACHINE_SUPPORTS_SAVE | MACHINE_UNEMULATED_PROTECTION ) //  > these games have an unemulated protection chip of some sort which is hacked around in /machine/williams.cpp "mayday_protection_r" function
@@ -3240,9 +3338,9 @@ GAME( 1987, lottofun,   0,        lottofun,       lottofun, williams_state, lott
 GAME( 1983, mysticm,    0,        mysticm,        mysticm, williams2_state, mysticm,  ROT0,   "Williams", "Mystic Marathon", MACHINE_WRONG_COLORS | MACHINE_SUPPORTS_SAVE)
 GAME( 1983, mysticmp,   mysticm,  mysticm,        mysticm, williams2_state, mysticm,  ROT0,   "Williams", "Mystic Marathon (prototype)", MACHINE_WRONG_COLORS | MACHINE_SUPPORTS_SAVE ) // newest roms are 'proto 6' ?
 
-GAME( 1984, tshoot,     0,        tshoot,         tshoot,  williams2_state, tshoot,   ROT0,   "Williams", "Turkey Shoot (prototype)", MACHINE_SUPPORTS_SAVE )
+GAME( 1984, tshoot,     0,        tshoot,         tshoot,  tshoot_state,    tshoot,   ROT0,   "Williams", "Turkey Shoot (prototype)", MACHINE_SUPPORTS_SAVE )
 
-GAME( 1984, inferno,    0,        williams2,      inferno, williams2_state, inferno,  ROT0,   "Williams", "Inferno (Williams)", MACHINE_SUPPORTS_SAVE )
+GAME( 1984, inferno,    0,        inferno,        inferno, williams2_state, inferno,  ROT0,   "Williams", "Inferno (Williams)", MACHINE_SUPPORTS_SAVE )
 
 GAME( 1986, joust2,     0,        joust2,         joust2,  joust2_state,    joust2,   ROT270, "Williams", "Joust 2 - Survival of the Fittest (revision 2)", MACHINE_SUPPORTS_SAVE )
 GAME( 1986, joust2r1,   joust2,   joust2,         joust2,  joust2_state,    joust2,   ROT270, "Williams", "Joust 2 - Survival of the Fittest (revision 1)", MACHINE_SUPPORTS_SAVE )

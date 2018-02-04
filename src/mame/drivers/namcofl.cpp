@@ -252,7 +252,7 @@ WRITE16_MEMBER(namcofl_state::mcu_shared_w)
 	// C75 BIOS has a very short window on the CPU sync signal, so immediately let the i960 at it
 	if ((offset == 0x6000/2) && (data & 0x80))
 	{
-		space.device().execute().yield();
+		m_mcu->yield();
 	}
 }
 
@@ -577,7 +577,7 @@ MACHINE_RESET_MEMBER(namcofl_state,namcofl)
 }
 
 
-static MACHINE_CONFIG_START( namcofl )
+MACHINE_CONFIG_START(namcofl_state::namcofl)
 	MCFG_CPU_ADD("maincpu", I960, 20000000) // i80960KA-20 == 20 MHz part
 	MCFG_CPU_PROGRAM_MAP(namcofl_mem)
 
@@ -809,7 +809,7 @@ DRIVER_INIT_MEMBER(namcofl_state,finalapr)
 	m_gametype = NAMCOFL_FINAL_LAP_R;
 }
 
-GAME ( 1995, speedrcr,         0, namcofl, speedrcr, namcofl_state, speedrcr, ROT0, "Namco", "Speed Racer", MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE )
-GAMEL( 1995, finalapr,         0, namcofl, finalapr, namcofl_state, finalapr, ROT0, "Namco", "Final Lap R (Rev. B)", MACHINE_SUPPORTS_SAVE, layout_namcofl )
-GAMEL( 1995, finalapro, finalapr, namcofl, finalapr, namcofl_state, finalapr, ROT0, "Namco", "Final Lap R", MACHINE_SUPPORTS_SAVE, layout_namcofl )
-GAMEL( 1995, finalaprj, finalapr, namcofl, finalapr, namcofl_state, finalapr, ROT0, "Namco", "Final Lap R (Japan Rev. C)", MACHINE_SUPPORTS_SAVE, layout_namcofl )
+GAME ( 1995, speedrcr,         0, namcofl, speedrcr, namcofl_state, speedrcr, ROT0, "Namco", "Speed Racer", MACHINE_IMPERFECT_GRAPHICS | MACHINE_NODEVICE_LAN | MACHINE_SUPPORTS_SAVE )
+GAMEL( 1995, finalapr,         0, namcofl, finalapr, namcofl_state, finalapr, ROT0, "Namco", "Final Lap R (Rev. B)", MACHINE_NODEVICE_LAN | MACHINE_SUPPORTS_SAVE, layout_namcofl )
+GAMEL( 1995, finalapro, finalapr, namcofl, finalapr, namcofl_state, finalapr, ROT0, "Namco", "Final Lap R", MACHINE_NODEVICE_LAN | MACHINE_SUPPORTS_SAVE, layout_namcofl )
+GAMEL( 1995, finalaprj, finalapr, namcofl, finalapr, namcofl_state, finalapr, ROT0, "Namco", "Final Lap R (Japan Rev. C)", MACHINE_NODEVICE_LAN | MACHINE_SUPPORTS_SAVE, layout_namcofl )

@@ -102,6 +102,8 @@ public:
 	DECLARE_WRITE8_MEMBER(magtouch_io_w);
 	DECLARE_WRITE8_MEMBER(dma8237_1_dack_w);
 	virtual void machine_start() override;
+	static void magtouch_sb_conf(device_t *device);
+	void magtouch(machine_config &config);
 };
 
 /*************************************
@@ -177,12 +179,13 @@ static DEVICE_INPUT_DEFAULTS_START( magtouch_sb_def )
 	DEVICE_INPUT_DEFAULTS("CONFIG", 0x03, 0x01)
 DEVICE_INPUT_DEFAULTS_END
 
-static MACHINE_CONFIG_START( magtouch_sb_conf )
-	MCFG_DEVICE_MODIFY("pc_joy")
+void magtouch_state::magtouch_sb_conf(device_t *device)
+{
+	device = device->subdevice("pc_joy");
 	MCFG_DEVICE_SLOT_INTERFACE(pc_joysticks, nullptr, true) // remove joystick
-MACHINE_CONFIG_END
+}
 
-static MACHINE_CONFIG_START( magtouch )
+MACHINE_CONFIG_START(magtouch_state::magtouch)
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", I386, 14318180*2)   /* I386 ?? Mhz */
 	MCFG_CPU_PROGRAM_MAP(magtouch_map)
@@ -194,7 +197,7 @@ static MACHINE_CONFIG_START( magtouch )
 	MCFG_DEVICE_REPLACE("vga", TVGA9000_VGA, 0)
 
 	MCFG_FRAGMENT_ADD( pcat_common )
-	MCFG_DEVICE_ADD( "ns16450_0", NS16450, XTAL_1_8432MHz )
+	MCFG_DEVICE_ADD( "ns16450_0", NS16450, XTAL(1'843'200) )
 	MCFG_INS8250_OUT_TX_CB(DEVWRITELINE("microtouch", microtouch_device, rx))
 	MCFG_INS8250_OUT_INT_CB(DEVWRITELINE("pic8259_1", pic8259_device, ir4_w))
 	MCFG_MICROTOUCH_ADD( "microtouch", 9600, DEVWRITELINE("ns16450_0", ins8250_uart_device, rx_w) )

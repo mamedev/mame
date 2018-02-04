@@ -57,7 +57,12 @@
 # include "asio/detail/old_win_sdk_compat.hpp"
 #else
 # include <sys/ioctl.h>
-# if !defined(__SYMBIAN32__)
+# if (defined(__MACH__) && defined(__APPLE__)) \
+   || defined(__FreeBSD__) || defined(__NetBSD__) \
+   || defined(__OpenBSD__) || defined(__linux__) \
+   || defined(__EMSCRIPTEN__)
+#  include <poll.h>
+# elif !defined(__SYMBIAN32__)
 #  include <sys/poll.h>
 # endif
 # include <sys/types.h>

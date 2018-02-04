@@ -112,6 +112,7 @@ public:
 
 	// video state
 	int m_vdp_nmi;
+	void adam(machine_config &config);
 };
 
 #endif

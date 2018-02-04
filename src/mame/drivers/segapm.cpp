@@ -23,6 +23,7 @@ public:
 	virtual void video_start() override;
 	uint32_t screen_update_segapm(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	required_device<cpu_device> m_maincpu;
+	void segapm(machine_config &config);
 };
 
 
@@ -52,7 +53,7 @@ INPUT_PORTS_END
 
 
 
-static MACHINE_CONFIG_START( segapm )
+MACHINE_CONFIG_START(segapm_state::segapm)
 
 	MCFG_CPU_ADD("maincpu", M68000, 8000000) // ??
 	MCFG_CPU_PROGRAM_MAP(segapm_map)

@@ -37,11 +37,11 @@ READ16_MEMBER( ata_flash_pccard_device::read_memory )
 	if(offset <= 7)
 	{
 		m_8bit_data_transfers = !ACCESSING_BITS_8_15; // HACK
-		return read_cs0(space, offset, mem_mask);
+		return read_cs0(offset, mem_mask);
 	}
 	else if(offset <= 15)
 	{
-		return read_cs1(space, offset & 7, mem_mask);
+		return read_cs1(offset & 7, mem_mask);
 	}
 	else
 	{
@@ -54,11 +54,11 @@ WRITE16_MEMBER( ata_flash_pccard_device::write_memory )
 	if(offset <= 7)
 	{
 		m_8bit_data_transfers = !ACCESSING_BITS_8_15; // HACK
-		write_cs0(space, offset, data, mem_mask);
+		write_cs0(offset, data, mem_mask);
 	}
 	else if( offset <= 15)
 	{
-		write_cs1(space, offset & 7, data, mem_mask);
+		write_cs1(offset & 7, data, mem_mask);
 	}
 }
 

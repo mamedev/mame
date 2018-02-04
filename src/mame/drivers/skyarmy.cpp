@@ -73,6 +73,7 @@ public:
 	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 
 	INTERRUPT_GEN_MEMBER(nmi_source);
+	void skyarmy(machine_config &config);
 };
 
 void skyarmy_state::machine_start()
@@ -93,7 +94,7 @@ WRITE_LINE_MEMBER(skyarmy_state::flip_screen_y_w)
 TILE_GET_INFO_MEMBER(skyarmy_state::get_tile_info)
 {
 	int code = m_videoram[tile_index];
-	int attr = BITSWAP8(m_colorram[tile_index], 7, 6, 5, 4, 3, 0, 1, 2) & 7;
+	int attr = bitswap<8>(m_colorram[tile_index], 7, 6, 5, 4, 3, 0, 1, 2) & 7;
 
 	SET_TILE_INFO_MEMBER(0, code, attr, 0);
 }
@@ -158,7 +159,7 @@ uint32_t skyarmy_state::screen_update(screen_device &screen, bitmap_ind16 &bitma
 
 	for (offs = 0 ; offs < 0x40; offs+=4)
 	{
-		pal = BITSWAP8(m_spriteram[offs+2], 7, 6, 5, 4, 3, 0, 1, 2) & 7;
+		pal = bitswap<8>(m_spriteram[offs+2], 7, 6, 5, 4, 3, 0, 1, 2) & 7;
 
 		sx = m_spriteram[offs+3];
 		sy = 240-(m_spriteram[offs]+1);
@@ -315,7 +316,7 @@ static GFXDECODE_START( skyarmy )
 	GFXDECODE_ENTRY( "gfx2", 0, spritelayout, 0, 8 )
 GFXDECODE_END
 
-static MACHINE_CONFIG_START( skyarmy )
+MACHINE_CONFIG_START(skyarmy_state::skyarmy)
 
 	MCFG_CPU_ADD("maincpu", Z80,4000000)
 	MCFG_CPU_PROGRAM_MAP(skyarmy_map)

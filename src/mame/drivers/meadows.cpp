@@ -128,7 +128,7 @@
 #include "gypsyjug.lh"
 #include "minferno.lh"
 
-#define MASTER_CLOCK XTAL_5MHz
+#define MASTER_CLOCK XTAL(5'000'000)
 
 
 
@@ -141,7 +141,7 @@
 READ8_MEMBER(meadows_state::hsync_chain_r)
 {
 	uint8_t val = m_screen->hpos();
-	return BITSWAP8(val,0,1,2,3,4,5,6,7);
+	return bitswap<8>(val,0,1,2,3,4,5,6,7);
 }
 
 
@@ -610,7 +610,7 @@ static const char *const bowl3d_sample_names[] =
  *
  *************************************/
 
-static MACHINE_CONFIG_START( meadows )
+MACHINE_CONFIG_START(meadows_state::meadows)
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", S2650, MASTER_CLOCK/8)  /* 5MHz / 8 = 625 kHz */
@@ -647,7 +647,7 @@ static MACHINE_CONFIG_START( meadows )
 MACHINE_CONFIG_END
 
 
-static MACHINE_CONFIG_START( minferno )
+MACHINE_CONFIG_START(meadows_state::minferno)
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", S2650, MASTER_CLOCK/24)     /* 5MHz / 8 / 3 = 208.33 kHz */
@@ -671,7 +671,7 @@ static MACHINE_CONFIG_START( minferno )
 MACHINE_CONFIG_END
 
 
-static MACHINE_CONFIG_START( bowl3d )
+MACHINE_CONFIG_START(meadows_state::bowl3d)
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", S2650, MASTER_CLOCK/8)  /* 5MHz / 8 = 625 kHz */

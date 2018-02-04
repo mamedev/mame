@@ -102,7 +102,7 @@ dumped by sayu
 #include "speaker.h"
 
 
-#define MAIN_CLOCK XTAL_18_432MHz
+#define MAIN_CLOCK XTAL(18'432'000)
 
 class jantotsu_state : public driver_device
 {
@@ -143,6 +143,7 @@ public:
 	required_device<cpu_device> m_maincpu;
 	required_device<msm5205_device> m_adpcm;
 	required_device<palette_device> m_palette;
+	void jantotsu(machine_config &config);
 };
 
 
@@ -494,7 +495,7 @@ void jantotsu_state::machine_reset()
 	m_adpcm_trigger = 0;
 }
 
-static MACHINE_CONFIG_START( jantotsu )
+MACHINE_CONFIG_START(jantotsu_state::jantotsu)
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", Z80,MAIN_CLOCK/4)
@@ -523,7 +524,7 @@ static MACHINE_CONFIG_START( jantotsu )
 	MCFG_SOUND_ADD("sn2", SN76489A, MAIN_CLOCK/4)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
 
-	MCFG_SOUND_ADD("adpcm", MSM5205, XTAL_384kHz)
+	MCFG_SOUND_ADD("adpcm", MSM5205, XTAL(384'000))
 	MCFG_MSM5205_VCLK_CB(WRITELINE(jantotsu_state, jan_adpcm_int))  /* interrupt function */
 	MCFG_MSM5205_PRESCALER_SELECTOR(S64_4B)  /* 6 KHz */
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.00)

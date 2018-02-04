@@ -293,7 +293,7 @@ MACHINE_RESET_MEMBER(quasar_state,quasar)
 	m_io_page = 8;
 }
 
-static MACHINE_CONFIG_START( quasar )
+MACHINE_CONFIG_START(quasar_state::quasar)
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", S2650, 14318000/4)  /* 14 mhz crystal divide by 4 on board */

@@ -56,6 +56,10 @@
 #include "emu.h"
 #include "debugger.h"
 #include "cop400.h"
+#include "cop410ds.h"
+#include "cop420ds.h"
+#include "cop424ds.h"
+#include "cop444ds.h"
 
 
 DEFINE_DEVICE_TYPE(COP401, cop401_cpu_device, "cop401", "COP401")
@@ -1064,7 +1068,7 @@ void cop400_cpu_device::device_start()
 {
 	/* find address spaces */
 	m_program = &space(AS_PROGRAM);
-	m_direct = &m_program->direct();
+	m_direct = m_program->direct<0>();
 	m_data = &space(AS_DATA);
 
 	/* find i/o handlers */
@@ -1117,9 +1121,10 @@ void cop400_cpu_device::device_start()
 	// setup debugger state display
 	offs_t pc_mask = m_program->addrmask();
 
+	using namespace std::placeholders;
 	state_add(STATE_GENPC, "GENPC", m_pc).mask(pc_mask).noshow();
 	state_add(STATE_GENPCBASE, "CURPC", m_prevpc).mask(pc_mask).noshow();
-	state_add(STATE_GENFLAGS, "GENFLAGS", m_flags).mask(0x7).callimport().callexport().noshow().formatstr("%3s");
+	state_add<uint8_t>(STATE_GENFLAGS, "GENFLAGS", std::bind(&cop400_cpu_device::get_flags, this), std::bind(&cop400_cpu_device::set_flags, this, _1)).mask(0x7).noshow().formatstr("%3s");
 	state_add(COP400_PC, "PC", m_pc).mask(pc_mask);
 	state_add(COP400_SA, "SA", m_sa).mask(pc_mask);
 	state_add(COP400_SB, "SB", m_sb).mask(pc_mask);
@@ -1127,7 +1132,7 @@ void cop400_cpu_device::device_start()
 		state_add(COP400_SC, "SC", m_sc).mask(pc_mask);
 	state_add(COP400_B, "B", m_b);
 	state_add(COP400_A, "A", m_a).mask(0xf);
-	state_add(COP400_M, "M", m_temp_m).mask(0xf).callimport().callexport();
+	state_add<uint8_t>(COP400_M, "M", std::bind(&cop400_cpu_device::get_m, this), std::bind(&cop400_cpu_device::set_m, this, _1)).mask(0xf);
 	state_add(COP400_G, "G", m_g).mask(0xf);
 	state_add(COP400_Q, "Q", m_q);
 	state_add(COP400_SIO, "SIO", m_sio).mask(0xf).formatstr("%4s");
@@ -1145,8 +1150,6 @@ void cop400_cpu_device::device_start()
 	m_sb = 0;
 	m_sc = 0;
 	m_sio = 0;
-	m_flags = 0;
-	m_temp_m = 0;
 	m_il = 0;
 	m_in[0] = m_in[1] = m_in[2] = m_in[3] = 0;
 	m_si = 0;
@@ -1309,36 +1312,28 @@ void cop400_cpu_device::execute_run()
     GENERAL CONTEXT ACCESS
 ***************************************************************************/
 
-void cop400_cpu_device::state_import(const device_state_entry &entry)
+uint8_t cop400_cpu_device::get_flags() const
 {
-	switch (entry.index())
-	{
-	case STATE_GENFLAGS:
-		m_skt_latch = BIT(m_flags, 2);
-		m_c = BIT(m_flags, 1);
-		m_skl = BIT(m_flags, 0);
-		break;
-
-	case COP400_M:
-		auto dis = machine().disable_side_effect();
-		RAM_W(B, m_temp_m);
-		break;
-	}
+	return (m_skt_latch ? 0x04 : 0x00) | (m_c ? 0x02 : 0x00) | (m_skl ? 0x01 : 0x00);
 }
 
-void cop400_cpu_device::state_export(const device_state_entry &entry)
+void cop400_cpu_device::set_flags(uint8_t flags)
 {
-	switch (entry.index())
-	{
-	case STATE_GENFLAGS:
-		m_flags = (m_skt_latch ? 0x04 : 0x00) | (m_c ? 0x02 : 0x00) | (m_skl ? 0x01 : 0x00);
-		break;
+	m_skt_latch = BIT(flags, 2);
+	m_c = BIT(flags, 1);
+	m_skl = BIT(flags, 0);
+}
 
-	case COP400_M:
-		auto dis = machine().disable_side_effect();
-		m_temp_m = RAM_R(B);
-		break;
-	}
+uint8_t cop400_cpu_device::get_m() const
+{
+	auto dis = machine().disable_side_effect();
+	return RAM_R(B);
+}
+
+void cop400_cpu_device::set_m(uint8_t m)
+{
+	auto dis = machine().disable_side_effect();
+	RAM_W(B, m);
 }
 
 void cop400_cpu_device::state_string_export(const device_state_entry &entry, std::string &str) const
@@ -1371,29 +1366,24 @@ void cop400_cpu_device::state_string_export(const device_state_entry &entry, std
 }
 
 
-offs_t cop400_cpu_device::disasm_disassemble(std::ostream &stream, offs_t pc, const uint8_t *oprom, const uint8_t *opram, uint32_t options)
+util::disasm_interface *cop400_cpu_device::create_disassembler()
 {
-	extern CPU_DISASSEMBLE( cop410 );
-	extern CPU_DISASSEMBLE( cop420 );
-	extern CPU_DISASSEMBLE( cop444 );
-	extern CPU_DISASSEMBLE( cop424 );
-
 	if ( m_featuremask & COP424C_FEATURE )
 	{
-		return CPU_DISASSEMBLE_NAME(cop424)(this, stream, pc, oprom, opram, options);
+		return new cop424_disassembler;
 	}
 
 	if ( m_featuremask & COP444L_FEATURE )
 	{
-		return CPU_DISASSEMBLE_NAME(cop444)(this, stream, pc, oprom, opram, options);
+		return new cop444_disassembler;
 	}
 
 	if ( m_featuremask & COP420_FEATURE )
 	{
-		return CPU_DISASSEMBLE_NAME(cop420)(this, stream, pc, oprom, opram, options);
+		return new cop420_disassembler;
 	}
 
-	return CPU_DISASSEMBLE_NAME(cop410)(this, stream, pc, oprom, opram, options);
+	return new cop410_disassembler;
 }
 
 READ8_MEMBER( cop400_cpu_device::microbus_rd )

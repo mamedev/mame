@@ -38,9 +38,9 @@ DEFINE_DEVICE_TYPE(C64_SWIFTLINK, c64_swiftlink_cartridge_device, "c64_swiftlink
 //  device_add_mconfig - add device configuration
 //-------------------------------------------------
 
-MACHINE_CONFIG_MEMBER( c64_swiftlink_cartridge_device::device_add_mconfig )
+MACHINE_CONFIG_START(c64_swiftlink_cartridge_device::device_add_mconfig)
 	MCFG_DEVICE_ADD(MOS6551_TAG, MOS6551, 0)
-	MCFG_MOS6551_XTAL(XTAL_3_6864MHz)
+	MCFG_MOS6551_XTAL(XTAL(3'686'400))
 	MCFG_MOS6551_IRQ_HANDLER(WRITELINE(c64_swiftlink_cartridge_device, acia_irq_w))
 	MCFG_MOS6551_TXD_HANDLER(DEVWRITELINE(RS232_TAG, rs232_port_device, write_txd))
 

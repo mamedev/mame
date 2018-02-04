@@ -181,7 +181,7 @@ static ADDRESS_MAP_START( main_map, AS_PROGRAM, 16, twin16_state )
 	AM_RANGE(0x040000, 0x043fff) AM_RAM AM_SHARE("comram")
 //  AM_RANGE(0x044000, 0x04ffff) AM_NOP             // miaj
 	AM_RANGE(0x060000, 0x063fff) AM_RAM
-	AM_RANGE(0x080000, 0x080fff) AM_DEVREADWRITE8("palette", palette_device, read, write, 0x00ff) AM_SHARE("palette")
+	AM_RANGE(0x080000, 0x080fff) AM_DEVREADWRITE8("palette", palette_device, read8, write8, 0x00ff) AM_SHARE("palette")
 	AM_RANGE(0x081000, 0x081fff) AM_WRITENOP
 	AM_RANGE(0x0a0000, 0x0a0001) AM_READ_PORT("SYSTEM") AM_WRITE(CPUA_register_w)
 	AM_RANGE(0x0a0002, 0x0a0003) AM_READ_PORT("P1")
@@ -220,7 +220,7 @@ static ADDRESS_MAP_START( fround_map, AS_PROGRAM, 16, fround_state )
 	AM_RANGE(0x000000, 0x03ffff) AM_ROM
 	AM_RANGE(0x040000, 0x043fff) AM_RAM AM_SHARE("comram")
 	AM_RANGE(0x060000, 0x063fff) AM_RAM
-	AM_RANGE(0x080000, 0x080fff) AM_DEVREADWRITE8("palette", palette_device, read, write, 0x00ff) AM_SHARE("palette")
+	AM_RANGE(0x080000, 0x080fff) AM_DEVREADWRITE8("palette", palette_device, read8, write8, 0x00ff) AM_SHARE("palette")
 	AM_RANGE(0x0a0000, 0x0a0001) AM_READ_PORT("SYSTEM") AM_WRITE(fround_CPU_register_w)
 	AM_RANGE(0x0a0002, 0x0a0003) AM_READ_PORT("P1")
 	AM_RANGE(0x0a0004, 0x0a0005) AM_READ_PORT("P2")
@@ -661,17 +661,17 @@ void twin16_state::machine_start()
 	save_item(NAME(m_CPUB_register));
 }
 
-static MACHINE_CONFIG_START( twin16 )
+MACHINE_CONFIG_START(twin16_state::twin16)
 	// basic machine hardware
-	MCFG_CPU_ADD("maincpu", M68000, XTAL_18_432MHz/2)
+	MCFG_CPU_ADD("maincpu", M68000, XTAL(18'432'000)/2)
 	MCFG_CPU_PROGRAM_MAP(main_map)
 	MCFG_CPU_VBLANK_INT_DRIVER("screen", twin16_state, CPUA_interrupt)
 
-	MCFG_CPU_ADD("sub", M68000, XTAL_18_432MHz/2)
+	MCFG_CPU_ADD("sub", M68000, XTAL(18'432'000)/2)
 	MCFG_CPU_PROGRAM_MAP(sub_map)
 	MCFG_CPU_VBLANK_INT_DRIVER("screen", twin16_state, CPUB_interrupt)
 
-	MCFG_CPU_ADD("audiocpu", Z80, XTAL_3_579545MHz)
+	MCFG_CPU_ADD("audiocpu", Z80, XTAL(3'579'545))
 	MCFG_CPU_PROGRAM_MAP(sound_map)
 
 	MCFG_QUANTUM_TIME(attotime::from_hz(6000))
@@ -682,7 +682,7 @@ static MACHINE_CONFIG_START( twin16 )
 	MCFG_BUFFERED_SPRITERAM16_ADD("spriteram")
 
 	MCFG_SCREEN_ADD("screen", RASTER)
-	MCFG_SCREEN_RAW_PARAMS(XTAL_18_432MHz/2, 576, 0, 40*8, 264, 2*8, 30*8)
+	MCFG_SCREEN_RAW_PARAMS(XTAL(18'432'000)/2, 576, 0, 40*8, 264, 2*8, 30*8)
 	MCFG_SCREEN_UPDATE_DRIVER(twin16_state, screen_update_twin16)
 	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE(twin16_state, screen_vblank_twin16))
 	MCFG_SCREEN_PALETTE("palette")
@@ -699,11 +699,11 @@ static MACHINE_CONFIG_START( twin16 )
 
 	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
 
-	MCFG_YM2151_ADD("ymsnd", XTAL_3_579545MHz)
+	MCFG_YM2151_ADD("ymsnd", XTAL(3'579'545))
 	MCFG_SOUND_ROUTE(0, "lspeaker", 1.0)
 	MCFG_SOUND_ROUTE(1, "rspeaker", 1.0)
 
-	MCFG_SOUND_ADD("k007232", K007232, XTAL_3_579545MHz)
+	MCFG_SOUND_ADD("k007232", K007232, XTAL(3'579'545))
 	MCFG_K007232_PORT_WRITE_HANDLER(WRITE8(twin16_state, volume_callback))
 	MCFG_SOUND_ROUTE(0, "lspeaker", 0.12) // estimated with gradius2 OST
 	MCFG_SOUND_ROUTE(0, "rspeaker", 0.12)
@@ -715,17 +715,17 @@ static MACHINE_CONFIG_START( twin16 )
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", 0.20)
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_DERIVED( devilw, twin16 )
+MACHINE_CONFIG_DERIVED(twin16_state::devilw, twin16)
 	MCFG_QUANTUM_TIME(attotime::from_hz(60000)) // watchdog reset otherwise
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_START( fround )
+MACHINE_CONFIG_START(fround_state::fround)
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", M68000, XTAL_18_432MHz/2)
+	MCFG_CPU_ADD("maincpu", M68000, XTAL(18'432'000)/2)
 	MCFG_CPU_PROGRAM_MAP(fround_map)
 	MCFG_CPU_VBLANK_INT_DRIVER("screen", twin16_state, CPUA_interrupt)
 
-	MCFG_CPU_ADD("audiocpu", Z80, XTAL_3_579545MHz)
+	MCFG_CPU_ADD("audiocpu", Z80, XTAL(3'579'545))
 	MCFG_CPU_PROGRAM_MAP(sound_map)
 
 	MCFG_QUANTUM_TIME(attotime::from_hz(6000))
@@ -736,7 +736,7 @@ static MACHINE_CONFIG_START( fround )
 	MCFG_BUFFERED_SPRITERAM16_ADD("spriteram")
 
 	MCFG_SCREEN_ADD("screen", RASTER)
-	MCFG_SCREEN_RAW_PARAMS(XTAL_18_432MHz/2, 576, 0, 40*8, 264, 2*8, 30*8)
+	MCFG_SCREEN_RAW_PARAMS(XTAL(18'432'000)/2, 576, 0, 40*8, 264, 2*8, 30*8)
 	MCFG_SCREEN_UPDATE_DRIVER(twin16_state, screen_update_twin16)
 	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE(twin16_state, screen_vblank_twin16))
 	MCFG_SCREEN_PALETTE("palette")
@@ -753,11 +753,11 @@ static MACHINE_CONFIG_START( fround )
 
 	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
 
-	MCFG_YM2151_ADD("ymsnd", XTAL_3_579545MHz)
+	MCFG_YM2151_ADD("ymsnd", XTAL(3'579'545))
 	MCFG_SOUND_ROUTE(0, "lspeaker", 1.0)
 	MCFG_SOUND_ROUTE(1, "rspeaker", 1.0)
 
-	MCFG_SOUND_ADD("k007232", K007232, XTAL_3_579545MHz)
+	MCFG_SOUND_ADD("k007232", K007232, XTAL(3'579'545))
 	MCFG_K007232_PORT_WRITE_HANDLER(WRITE8(twin16_state, volume_callback))
 	MCFG_SOUND_ROUTE(0, "lspeaker", 0.12)
 	MCFG_SOUND_ROUTE(0, "rspeaker", 0.12)
@@ -769,14 +769,14 @@ static MACHINE_CONFIG_START( fround )
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", 0.20)
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_DERIVED( miaj, twin16 )
+MACHINE_CONFIG_DERIVED(twin16_state::miaj, twin16)
 	MCFG_SCREEN_MODIFY("screen")
-	MCFG_SCREEN_RAW_PARAMS(XTAL_18_432MHz/2, 576, 1*8, 39*8, 264, 2*8, 30*8)
+	MCFG_SCREEN_RAW_PARAMS(XTAL(18'432'000)/2, 576, 1*8, 39*8, 264, 2*8, 30*8)
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_DERIVED( cuebrickj, twin16 )
+MACHINE_CONFIG_DERIVED(cuebrickj_state::cuebrickj, twin16)
 	MCFG_SCREEN_MODIFY("screen")
-	MCFG_SCREEN_RAW_PARAMS(XTAL_18_432MHz/2, 576, 1*8, 39*8, 264, 2*8, 30*8)
+	MCFG_SCREEN_RAW_PARAMS(XTAL(18'432'000)/2, 576, 1*8, 39*8, 264, 2*8, 30*8)
 	MCFG_NVRAM_ADD_0FILL("nvram")
 MACHINE_CONFIG_END
 

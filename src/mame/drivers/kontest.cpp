@@ -26,7 +26,7 @@
 #include "screen.h"
 #include "speaker.h"
 
-#define MAIN_CLOCK XTAL_24MHz
+#define MAIN_CLOCK XTAL(24'000'000)
 
 class kontest_state : public driver_device
 {
@@ -52,6 +52,7 @@ public:
 	// member functions
 	DECLARE_WRITE8_MEMBER(control_w);
 
+	void kontest(machine_config &config);
 protected:
 	// driver_device overrides
 	virtual void machine_start() override;
@@ -247,7 +248,7 @@ void kontest_state::machine_reset()
 	m_control = 0;
 }
 
-static MACHINE_CONFIG_START( kontest )
+MACHINE_CONFIG_START(kontest_state::kontest)
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", Z80,MAIN_CLOCK/8)

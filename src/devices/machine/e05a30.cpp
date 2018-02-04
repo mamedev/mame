@@ -164,7 +164,7 @@ WRITE_LINE_MEMBER( e05a30_device::centronics_input_strobe )
 
 WRITE8_MEMBER( e05a30_device::write )
 {
-	LOG("%s: e05a30_w([0xC0%02x]): %02x\n", space.machine().describe_context(), offset, data);
+	LOG("%s: e05a30_w([0xC0%02x]): %02x\n", machine().describe_context(), offset, data);
 
 	switch (offset) {
 	case 0x04:
@@ -194,7 +194,7 @@ READ8_MEMBER( e05a30_device::read )
 {
 	uint8_t result = 0;
 
-	LOG("%s: e05a30_r([0xC0%02x]): ", space.machine().describe_context(), offset);
+	LOG("%s: e05a30_r([0xC0%02x]): ", machine().describe_context(), offset);
 
 	switch (offset) {
 	case 0x02:

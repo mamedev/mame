@@ -187,7 +187,7 @@ static ADDRESS_MAP_START( mcatadv_map, AS_PROGRAM, 16, mcatadv_state )
 	AM_RANGE(0x400000, 0x401fff) AM_RAM_WRITE(mcatadv_videoram1_w) AM_SHARE("videoram1") // Tilemap 0
 	AM_RANGE(0x500000, 0x501fff) AM_RAM_WRITE(mcatadv_videoram2_w) AM_SHARE("videoram2") // Tilemap 1
 
-	AM_RANGE(0x600000, 0x601fff) AM_RAM_DEVWRITE("palette", palette_device, write) AM_SHARE("palette")
+	AM_RANGE(0x600000, 0x601fff) AM_RAM_DEVWRITE("palette", palette_device, write16) AM_SHARE("palette")
 	AM_RANGE(0x602000, 0x602fff) AM_RAM // Bigger than needs to be?
 
 	AM_RANGE(0x700000, 0x707fff) AM_RAM AM_SHARE("spriteram") // Sprites, two halves for double buffering
@@ -428,14 +428,14 @@ void mcatadv_state::machine_start()
 	save_item(NAME(m_palette_bank2));
 }
 
-static MACHINE_CONFIG_START( mcatadv )
+MACHINE_CONFIG_START(mcatadv_state::mcatadv)
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", M68000, XTAL_16MHz) /* verified on pcb */
+	MCFG_CPU_ADD("maincpu", M68000, XTAL(16'000'000)) /* verified on pcb */
 	MCFG_CPU_PROGRAM_MAP(mcatadv_map)
 	MCFG_CPU_VBLANK_INT_DRIVER("screen", mcatadv_state,  irq1_line_hold)
 
-	MCFG_CPU_ADD("soundcpu", Z80, XTAL_16MHz/4) /* verified on pcb */
+	MCFG_CPU_ADD("soundcpu", Z80, XTAL(16'000'000)/4) /* verified on pcb */
 	MCFG_CPU_PROGRAM_MAP(mcatadv_sound_map)
 	MCFG_CPU_IO_MAP(mcatadv_sound_io_map)
 
@@ -464,7 +464,7 @@ static MACHINE_CONFIG_START( mcatadv )
 	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
 	MCFG_GENERIC_LATCH_8_ADD("soundlatch2")
 
-	MCFG_SOUND_ADD("ymsnd", YM2610, XTAL_16MHz/2) /* verified on pcb */
+	MCFG_SOUND_ADD("ymsnd", YM2610, XTAL(16'000'000)/2) /* verified on pcb */
 	MCFG_YM2610_IRQ_HANDLER(INPUTLINE("soundcpu", 0))
 	MCFG_SOUND_ROUTE(0, "lspeaker",  0.32)
 	MCFG_SOUND_ROUTE(0, "rspeaker", 0.32)
@@ -472,7 +472,7 @@ static MACHINE_CONFIG_START( mcatadv )
 	MCFG_SOUND_ROUTE(2, "rspeaker", 0.5)
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_DERIVED( nost, mcatadv )
+MACHINE_CONFIG_DERIVED(mcatadv_state::nost, mcatadv)
 
 	MCFG_CPU_MODIFY("soundcpu")
 	MCFG_CPU_PROGRAM_MAP(nost_sound_map)
@@ -481,7 +481,7 @@ static MACHINE_CONFIG_DERIVED( nost, mcatadv )
 	MCFG_DEVICE_REMOVE("lspeaker")
 	MCFG_DEVICE_REMOVE("rspeaker")
 	MCFG_SPEAKER_STANDARD_MONO("mono")
-	MCFG_SOUND_REPLACE("ymsnd", YM2610, XTAL_16MHz/2) /* verified on pcb */
+	MCFG_SOUND_REPLACE("ymsnd", YM2610, XTAL(16'000'000)/2) /* verified on pcb */
 		MCFG_YM2610_IRQ_HANDLER(INPUTLINE("soundcpu", 0))
 		MCFG_SOUND_ROUTE(0, "mono", 0.2)
 		MCFG_SOUND_ROUTE(1, "mono", 0.5)

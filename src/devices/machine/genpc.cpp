@@ -164,6 +164,11 @@ WRITE_LINE_MEMBER(ibm5160_mb_device::pc_speaker_set_spkrdata)
 	m_speaker->level_w(m_pc_spkrdata & m_pit_out2);
 }
 
+WRITE_LINE_MEMBER(ibm5160_mb_device::pic_int_w)
+{
+	m_maincpu->set_input_line(0, state);
+}
+
 
 /*************************************************************
  *
@@ -400,16 +405,16 @@ DEFINE_DEVICE_TYPE(IBM5160_MOTHERBOARD, ibm5160_mb_device, "ibm5160_mb", "IBM 51
 //  device_add_mconfig - add device configuration
 //-------------------------------------------------
 
-MACHINE_CONFIG_MEMBER( ibm5160_mb_device::device_add_mconfig )
+MACHINE_CONFIG_START(ibm5160_mb_device::device_add_mconfig)
 	MCFG_DEVICE_ADD("pit8253", PIT8253, 0)
-	MCFG_PIT8253_CLK0(XTAL_14_31818MHz/12.0) /* heartbeat IRQ */
+	MCFG_PIT8253_CLK0(XTAL(14'318'181)/12.0) /* heartbeat IRQ */
 	MCFG_PIT8253_OUT0_HANDLER(DEVWRITELINE("pic8259", pic8259_device, ir0_w))
-	MCFG_PIT8253_CLK1(XTAL_14_31818MHz/12.0) /* dram refresh */
+	MCFG_PIT8253_CLK1(XTAL(14'318'181)/12.0) /* dram refresh */
 	MCFG_PIT8253_OUT1_HANDLER(WRITELINE(ibm5160_mb_device, pc_pit8253_out1_changed))
-	MCFG_PIT8253_CLK2(XTAL_14_31818MHz/12.0) /* pio port c pin 4, and speaker polling enough */
+	MCFG_PIT8253_CLK2(XTAL(14'318'181)/12.0) /* pio port c pin 4, and speaker polling enough */
 	MCFG_PIT8253_OUT2_HANDLER(WRITELINE(ibm5160_mb_device, pc_pit8253_out2_changed))
 
-	MCFG_DEVICE_ADD( "dma8237", AM9517A, XTAL_14_31818MHz/3.0 )
+	MCFG_DEVICE_ADD( "dma8237", AM9517A, XTAL(14'318'181)/3.0 )
 	MCFG_I8237_OUT_HREQ_CB(WRITELINE(ibm5160_mb_device, pc_dma_hrq_changed))
 	MCFG_I8237_OUT_EOP_CB(WRITELINE(ibm5160_mb_device, pc_dma8237_out_eop))
 	MCFG_I8237_IN_MEMR_CB(READ8(ibm5160_mb_device, pc_dma_read_byte))
@@ -427,7 +432,7 @@ MACHINE_CONFIG_MEMBER( ibm5160_mb_device::device_add_mconfig )
 	MCFG_I8237_OUT_DACK_3_CB(WRITELINE(ibm5160_mb_device, pc_dack3_w))
 
 	MCFG_DEVICE_ADD("pic8259", PIC8259, 0)
-	MCFG_PIC8259_OUT_INT_CB(INPUTLINE(":maincpu", 0))
+	MCFG_PIC8259_OUT_INT_CB(WRITELINE(ibm5160_mb_device, pic_int_w))
 
 	MCFG_DEVICE_ADD("ppi8255", I8255A, 0)
 	MCFG_I8255_IN_PORTA_CB(READ8(ibm5160_mb_device, pc_ppi_porta_r))
@@ -494,7 +499,7 @@ ioport_constructor ibm5160_mb_device::device_input_ports() const
 void ibm5160_mb_device::static_set_cputag(device_t &device, const char *tag)
 {
 	ibm5160_mb_device &board = downcast<ibm5160_mb_device &>(device);
-	board.m_cputag = tag;
+	board.m_maincpu.set_tag(tag);
 }
 
 //**************************************************************************
@@ -517,7 +522,7 @@ ibm5160_mb_device::ibm5160_mb_device(
 		device_t *owner,
 		uint32_t clock)
 	: device_t(mconfig, type, tag, owner, clock)
-	, m_maincpu(*owner, "maincpu")
+	, m_maincpu(*this, finder_base::DUMMY_TAG)
 	, m_pic8259(*this, "pic8259")
 	, m_pit8253(*this, "pit8253")
 	, m_dma8237(*this, "dma8237")
@@ -591,7 +596,7 @@ DEFINE_DEVICE_TYPE(IBM5150_MOTHERBOARD, ibm5150_mb_device, "ibm5150_mb", "IBM 51
 //  device_add_mconfig - add device configuration
 //-------------------------------------------------
 
-MACHINE_CONFIG_MEMBER( ibm5150_mb_device::device_add_mconfig )
+MACHINE_CONFIG_START(ibm5150_mb_device::device_add_mconfig)
 	ibm5160_mb_device::device_add_mconfig(config);
 
 	MCFG_DEVICE_MODIFY("pc_kbdc")
@@ -769,7 +774,7 @@ DEFINE_DEVICE_TYPE(EC1841_MOTHERBOARD, ec1841_mb_device, "ec1841_mb", "EC-1840 m
 //  device_add_mconfig - add device configuration
 //-------------------------------------------------
 
-MACHINE_CONFIG_MEMBER( ec1841_mb_device::device_add_mconfig )
+MACHINE_CONFIG_START(ec1841_mb_device::device_add_mconfig)
 	ibm5160_mb_device::device_add_mconfig(config);
 
 	MCFG_DEVICE_MODIFY("ppi8255")
@@ -896,7 +901,7 @@ pc_noppi_mb_device::pc_noppi_mb_device(const machine_config &mconfig, device_typ
 //  device_add_mconfig - add device configuration
 //-------------------------------------------------
 
-MACHINE_CONFIG_MEMBER( pc_noppi_mb_device::device_add_mconfig )
+MACHINE_CONFIG_START(pc_noppi_mb_device::device_add_mconfig)
 	ibm5160_mb_device::device_add_mconfig(config);
 
 	MCFG_DEVICE_REMOVE("pc_kbdc")

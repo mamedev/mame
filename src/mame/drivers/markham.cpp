@@ -177,7 +177,7 @@ static GFXDECODE_START( markham )
 GFXDECODE_END
 
 
-static MACHINE_CONFIG_START( markham )
+MACHINE_CONFIG_START(markham_state::markham)
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", Z80,8000000/2) /* 4.000MHz */

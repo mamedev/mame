@@ -59,7 +59,7 @@
 #include "screen.h"
 
 
-#define MASTER_CLOCK        XTAL_18_432MHz
+#define MASTER_CLOCK        XTAL(18'432'000)
 
 
 
@@ -228,10 +228,10 @@ GFXDECODE_END
  *
  *************************************/
 
-static MACHINE_CONFIG_START( m57 )
+MACHINE_CONFIG_START(m57_state::m57)
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", Z80, XTAL_18_432MHz/6)  /* verified on pcb */
+	MCFG_CPU_ADD("maincpu", Z80, XTAL(18'432'000)/6)  /* verified on pcb */
 	MCFG_CPU_PROGRAM_MAP(main_map)
 	MCFG_CPU_VBLANK_INT_DRIVER("screen", m57_state,  irq0_line_hold)
 

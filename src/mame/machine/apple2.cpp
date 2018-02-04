@@ -388,7 +388,7 @@ READ8_MEMBER(apple2_state::apple2_c080_r)
 		/* and if we can, read from the slot */
 		if (slotdevice != nullptr)
 		{
-			return slotdevice->read_c0nx(space, offset % 0x10);
+			return slotdevice->read_c0nx(offset % 0x10);
 		}
 	}
 
@@ -416,12 +416,12 @@ WRITE8_MEMBER(apple2_state::apple2_c080_w)
 	/* and if we can, write to the slot */
 	if (slotdevice != nullptr)
 	{
-		slotdevice->write_c0nx(space, offset % 0x10, data);
+		slotdevice->write_c0nx(offset % 0x10, data);
 	}
 }
 
 /* returns default CnXX slotram for a slot space */
-int8_t apple2_state::apple2_slotram_r(address_space &space, int slotnum, int offset)
+int8_t apple2_state::apple2_slotram_r(int slotnum, int offset)
 {
 	if (m_slot_ram)
 	{
@@ -456,11 +456,11 @@ READ8_MEMBER(apple2_state::apple2_c1xx_r )
 			apple2_update_memory();
 		}
 
-		return slotdevice->read_cnxx(space, offset&0xff);
+		return slotdevice->read_cnxx(offset&0xff);
 	}
 	else
 	{
-		return apple2_slotram_r(space, slotnum, offset);
+		return apple2_slotram_r(slotnum, offset);
 	}
 
 	// else fall through to floating bus
@@ -479,7 +479,7 @@ WRITE8_MEMBER(apple2_state::apple2_c1xx_w )
 
 	if (slotdevice != nullptr)
 	{
-		slotdevice->write_cnxx(space, offset&0xff, data);
+		slotdevice->write_cnxx(offset&0xff, data);
 	}
 	else
 	{
@@ -505,11 +505,11 @@ READ8_MEMBER(apple2_state::apple2_c3xx_r )
 			m_a2_cnxx_slot = slotnum;
 			apple2_update_memory();
 		}
-		return slotdevice->read_cnxx(space, offset&0xff);
+		return slotdevice->read_cnxx(offset&0xff);
 	}
 	else
 	{
-		return apple2_slotram_r(space, slotnum, offset);
+		return apple2_slotram_r(slotnum, offset);
 	}
 
 	// else fall through to floating bus
@@ -533,7 +533,7 @@ WRITE8_MEMBER(apple2_state::apple2_c3xx_w )
 			m_a2_cnxx_slot = slotnum;
 			apple2_update_memory();
 		}
-		slotdevice->write_cnxx(space, offset&0xff, data);
+		slotdevice->write_cnxx(offset&0xff, data);
 	}
 	else
 	{
@@ -558,11 +558,11 @@ READ8_MEMBER(apple2_state::apple2_c4xx_r )
 			m_a2_cnxx_slot = slotnum;
 			apple2_update_memory();
 		}
-		return slotdevice->read_cnxx(space, offset&0xff);
+		return slotdevice->read_cnxx(offset&0xff);
 	}
 	else
 	{
-		return apple2_slotram_r(space, slotnum, offset);
+		return apple2_slotram_r(slotnum, offset);
 	}
 
 	// else fall through to floating bus
@@ -586,7 +586,7 @@ WRITE8_MEMBER ( apple2_state::apple2_c4xx_w )
 			m_a2_cnxx_slot = slotnum;
 			apple2_update_memory();
 		}
-		slotdevice->write_cnxx(space, offset&0xff, data);
+		slotdevice->write_cnxx(offset&0xff, data);
 	}
 	else
 	{
@@ -626,7 +626,7 @@ READ8_MEMBER(apple2_state::apple2_c800_r )
 
 	if (slotdevice != nullptr)
 	{
-		return slotdevice->read_c800(space, offset&0xfff);
+		return slotdevice->read_c800(offset&0xfff);
 	}
 
 	return apple2_getfloatingbusvalue();
@@ -640,7 +640,7 @@ WRITE8_MEMBER(apple2_state::apple2_c800_w )
 
 	if (slotdevice != nullptr)
 	{
-		slotdevice->write_c800(space, offset&0xfff, data);
+		slotdevice->write_c800(offset&0xfff, data);
 	}
 }
 
@@ -652,7 +652,7 @@ READ8_MEMBER(apple2_state::apple2_ce00_r )
 
 	if (slotdevice != nullptr)
 	{
-		return slotdevice->read_c800(space, (offset&0xfff) + 0x600);
+		return slotdevice->read_c800((offset&0xfff) + 0x600);
 	}
 
 	return apple2_getfloatingbusvalue();
@@ -666,7 +666,7 @@ WRITE8_MEMBER(apple2_state::apple2_ce00_w )
 
 	if (slotdevice != nullptr)
 	{
-		slotdevice->write_c800(space, (offset&0xfff)+0x600, data);
+		slotdevice->write_c800((offset&0xfff)+0x600, data);
 	}
 }
 
@@ -678,7 +678,7 @@ READ8_MEMBER(apple2_state::apple2_inh_d000_r )
 
 	if (slotdevice != nullptr)
 	{
-		return slotdevice->read_inh_rom(space, offset & 0xfff);
+		return slotdevice->read_inh_rom(offset & 0xfff);
 	}
 
 	return apple2_getfloatingbusvalue();
@@ -692,7 +692,7 @@ WRITE8_MEMBER(apple2_state::apple2_inh_d000_w )
 
 	if (slotdevice != nullptr)
 	{
-		return slotdevice->write_inh_rom(space, offset & 0xfff, data);
+		return slotdevice->write_inh_rom(offset & 0xfff, data);
 	}
 }
 
@@ -704,7 +704,7 @@ READ8_MEMBER(apple2_state::apple2_inh_e000_r )
 
 	if (slotdevice != nullptr)
 	{
-		return slotdevice->read_inh_rom(space, (offset & 0x1fff) + 0x1000);
+		return slotdevice->read_inh_rom((offset & 0x1fff) + 0x1000);
 	}
 
 	return apple2_getfloatingbusvalue();
@@ -718,7 +718,7 @@ WRITE8_MEMBER(apple2_state::apple2_inh_e000_w )
 
 	if (slotdevice != nullptr)
 	{
-		slotdevice->write_inh_rom(space, (offset & 0x1fff) + 0x1000, data);
+		slotdevice->write_inh_rom((offset & 0x1fff) + 0x1000, data);
 	}
 }
 
@@ -1723,7 +1723,7 @@ READ8_MEMBER( apple2_state::apple2_c01x_r )
 			case 0x06:          result |= (m_flags & VAR_ALTZP)     ? 0x80 : 0x00;  break;
 			case 0x07:          result |= (m_flags & VAR_SLOTC3ROM) ? 0x80 : 0x00;  break;
 			case 0x08:          result |= (m_flags & VAR_80STORE)   ? 0x80 : 0x00;  break;
-			case 0x09:          result |= !space.machine().first_screen()->vblank()     ? 0x80 : 0x00;  break;
+			case 0x09:          result |= !machine().first_screen()->vblank()     ? 0x80 : 0x00;  break;
 			case 0x0A:          result |= (m_flags & VAR_TEXT)      ? 0x80 : 0x00;  break;
 			case 0x0B:          result |= (m_flags & VAR_MIXED)     ? 0x80 : 0x00;  break;
 			case 0x0C:          result |= (m_flags & VAR_PAGE2)     ? 0x80 : 0x00;  break;
@@ -1795,7 +1795,7 @@ READ8_MEMBER ( apple2_state::apple2_c03x_r )
 	{
 		if (!offset)
 		{
-			speaker_sound_device *speaker = space.machine().device<speaker_sound_device>("a2speaker");
+			speaker_sound_device *speaker = machine().device<speaker_sound_device>("a2speaker");
 
 			m_a2_speaker_state ^= 1;
 			speaker->level_w(m_a2_speaker_state);
@@ -1902,19 +1902,19 @@ READ8_MEMBER ( apple2_state::apple2_c06x_r )
 				break;
 			case 0x04:
 				/* X Joystick 1 axis */
-				result = space.machine().time().as_double() < m_joystick_x1_time;
+				result = machine().time().as_double() < m_joystick_x1_time;
 				break;
 			case 0x05:
 				/* Y Joystick 1 axis */
-				result = space.machine().time().as_double() < m_joystick_y1_time;
+				result = machine().time().as_double() < m_joystick_y1_time;
 				break;
 			case 0x06:
 				/* X Joystick 2 axis */
-				result = space.machine().time().as_double() < m_joystick_x2_time;
+				result = machine().time().as_double() < m_joystick_x2_time;
 				break;
 			case 0x07:
 				/* Y Joystick 2 axis */
-				result = space.machine().time().as_double() < m_joystick_y2_time;
+				result = machine().time().as_double() < m_joystick_y2_time;
 				break;
 			default:
 				/* c060 Empty Cassette head read

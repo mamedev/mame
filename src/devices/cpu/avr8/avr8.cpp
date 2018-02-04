@@ -59,6 +59,7 @@
 
 #include "emu.h"
 #include "avr8.h"
+#include "avr8dasm.h"
 #include "debugger.h"
 
 #define VERBOSE_LEVEL   (0)
@@ -911,36 +912,13 @@ void avr8_device::state_string_export(const device_state_entry &entry, std::stri
 
 
 //-------------------------------------------------
-//  disasm_min_opcode_bytes - return the length
-//  of the shortest instruction, in bytes
-//-------------------------------------------------
-
-uint32_t avr8_device::disasm_min_opcode_bytes() const
-{
-	return 2;
-}
-
-
-//-------------------------------------------------
-//  disasm_max_opcode_bytes - return the length
-//  of the longest instruction, in bytes
-//-------------------------------------------------
-
-uint32_t avr8_device::disasm_max_opcode_bytes() const
-{
-	return 4;
-}
-
-
-//-------------------------------------------------
-//  disasm_disassemble - call the disassembly
+//  disassemble - call the disassembly
 //  helper function
 //-------------------------------------------------
 
-offs_t avr8_device::disasm_disassemble(std::ostream &stream, offs_t pc, const uint8_t *oprom, const uint8_t *opram, uint32_t options)
+util::disasm_interface *avr8_device::create_disassembler()
 {
-	extern CPU_DISASSEMBLE( avr8 );
-	return CPU_DISASSEMBLE_NAME(avr8)(this, stream, pc, oprom, opram, options);
+	return new avr8_disassembler;
 }
 
 

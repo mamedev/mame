@@ -4,7 +4,7 @@
 
  Galaxian/Moon Cresta hardware
 
-NOTE:  Eventually to be merged into GALAXIAN.C
+NOTE:  Eventually to be merged into GALAXIAN.CPP
 
 Main clock: XTAL = 18.432 MHz
 Z80 Clock: XTAL/6 = 3.072 MHz
@@ -69,7 +69,7 @@ Stephh's notes (based on the games Z80 code and some tests) for other games :
   - IN0 bit 1 is supposed to be COIN2 (see coinage routine at 0x0288), but
     there is a test on it at 0x0082 (in NMI routine) which jumps to 0xc003
     (unmapped memory) if it pressed (HIGH).
-  - IN0 bit 7 is tested on startup (code at 0x0048) in combinaison with bits 0 and 1
+  - IN0 bit 7 is tested on startup (code at 0x0048) in combination with bits 0 and 1
     (which are supposed to be COIN1 and COIN2). If all of them are pressed (HIGH),
     the game displays a "CREDIT FAULT" message then jumps back to 0x0048.
   - IN0 bit 4 and IN1 bit 4 should have been IPT_JOYSTICK_DOWN (Upright and Cocktail)
@@ -117,7 +117,7 @@ Stephh's notes (based on the games Z80 code and some tests) for other games :
  *
  *************************************/
 
-#define MASTER_CLOCK        (XTAL_18_432MHz)
+#define MASTER_CLOCK        (XTAL(18'432'000))
 
 #define PIXEL_CLOCK         (MASTER_CLOCK/3)
 
@@ -135,7 +135,7 @@ Stephh's notes (based on the games Z80 code and some tests) for other games :
 /* Send sound data to the sound cpu and cause an nmi */
 READ8_MEMBER(galaxold_state::drivfrcg_port0_r)
 {
-	switch (space.device().safe_pc())
+	switch (m_maincpu->pc())
 	{
 		case 0x002e:
 		case 0x0297:
@@ -540,9 +540,9 @@ ADDRESS_MAP_END
 static ADDRESS_MAP_START( dkongjrmc_map, AS_PROGRAM, 8, galaxold_state )
 	AM_RANGE(0x0000, 0x5fff) AM_ROM
 	AM_RANGE(0x6000, 0x6fff) AM_RAM
+	AM_RANGE(0x7000, 0x73ff) AM_RAM_WRITE(galaxold_videoram_w)
 	AM_RANGE(0x7000, 0x70ff) AM_RAM_WRITE(galaxold_attributesram_w) AM_SHARE("attributesram")
 	AM_RANGE(0x7100, 0x71ff) AM_RAM AM_SHARE("spriteram")
-	AM_RANGE(0x7000, 0x73ff) AM_RAM_WRITE(galaxold_videoram_w)
 	AM_RANGE(0x7400, 0x77ff) AM_RAM_WRITE(galaxold_videoram_w) AM_SHARE("videoram")
 	AM_RANGE(0x7800, 0x7800) AM_READ_PORT("DSW")
 	AM_RANGE(0x7801, 0x7801) AM_WRITE(galaxold_nmi_enable_w)
@@ -649,9 +649,6 @@ static ADDRESS_MAP_START( hunchbkg, AS_PROGRAM, 8, galaxold_state )
 	AM_RANGE(0x1504, 0x1507) AM_MIRROR(0x6000) AM_DEVWRITE("cust", galaxian_sound_device, lfo_freq_w)
 	AM_RANGE(0x1580, 0x1580) AM_MIRROR(0x6000) AM_READ_PORT("IN1")
 	AM_RANGE(0x1580, 0x1587) AM_MIRROR(0x6000) AM_DEVWRITE("cust", galaxian_sound_device, sound_w)
-	AM_RANGE(0x1583, 0x1583) AM_MIRROR(0x6000) AM_DEVWRITE("cust", galaxian_sound_device, noise_enable_w)
-	AM_RANGE(0x1585, 0x1585) AM_MIRROR(0x6000) AM_DEVWRITE("cust", galaxian_sound_device, fire_enable_w)
-	AM_RANGE(0x1586, 0x1587) AM_MIRROR(0x6000) AM_DEVWRITE("cust", galaxian_sound_device, vol_w)
 	AM_RANGE(0x1600, 0x1600) AM_MIRROR(0x6000) AM_READ_PORT("DSW0")
 	AM_RANGE(0x1601, 0x1601) AM_MIRROR(0x6000) AM_WRITE(galaxold_nmi_enable_w)
 	AM_RANGE(0x1604, 0x1604) AM_MIRROR(0x6000) AM_WRITE(galaxold_stars_enable_w)
@@ -677,9 +674,6 @@ static ADDRESS_MAP_START( spcwarp, AS_PROGRAM, 8, galaxold_state )
 	AM_RANGE(0x1504, 0x1507) AM_MIRROR(0x6000) AM_DEVWRITE("cust", galaxian_sound_device, lfo_freq_w)
 	AM_RANGE(0x1580, 0x1580) AM_MIRROR(0x6000) AM_READ_PORT("IN1")
 	AM_RANGE(0x1580, 0x1587) AM_MIRROR(0x6000) AM_DEVWRITE("cust", galaxian_sound_device, sound_w)
-	AM_RANGE(0x1583, 0x1583) AM_MIRROR(0x6000) AM_DEVWRITE("cust", galaxian_sound_device, noise_enable_w)
-	AM_RANGE(0x1585, 0x1585) AM_MIRROR(0x6000) AM_DEVWRITE("cust", galaxian_sound_device, fire_enable_w)
-	AM_RANGE(0x1586, 0x1587) AM_MIRROR(0x6000) AM_DEVWRITE("cust", galaxian_sound_device, vol_w)
 	// everything else in the $16xx range is moved to $17xx
 	AM_RANGE(0x1680, 0x1680) AM_MIRROR(0x6000) AM_DEVREAD("watchdog", watchdog_timer_device, reset_r) AM_DEVWRITE("cust", galaxian_sound_device, pitch_w)
 	AM_RANGE(0x1700, 0x1700) AM_MIRROR(0x6000) AM_READ_PORT("DSW0")
@@ -757,7 +751,7 @@ ADDRESS_MAP_END
 
 READ8_MEMBER(galaxold_state::hexpoola_data_port_r)
 {
-	switch (space.device().safe_pc())
+	switch (m_maincpu->pc())
 	{
 		case 0x0022:
 			return 0;
@@ -780,7 +774,7 @@ ADDRESS_MAP_END
 
 READ8_MEMBER(galaxold_state::bullsdrtg_data_port_r)
 {
-	switch (space.device().safe_pc())
+	switch (m_maincpu->pc())
 	{
 		case 0x0083:
 		case 0x008c:
@@ -792,7 +786,7 @@ READ8_MEMBER(galaxold_state::bullsdrtg_data_port_r)
 		case 0x6b58:
 			return 1;
 		default:
-			logerror("Reading data port at PC=%04X\n", space.device().safe_pc());
+			logerror("Reading data port at PC=%04X\n", m_maincpu->pc());
 			break;
 	}
 
@@ -1352,9 +1346,9 @@ static INPUT_PORTS_START( scrambler )
 	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_BUTTON1 ) PORT_PLAYER(2) PORT_COCKTAIL
 	PORT_DIPNAME( 0xc0, 0x00, DEF_STR( Coinage ) )
 	PORT_DIPSETTING(    0x00, "A 1/1  B 1/6" )
-	PORT_DIPSETTING(    0x02, "A 2/1  B 1/3" )
-	PORT_DIPSETTING(    0x04, "A 1/2  B 1/6" )
-	PORT_DIPSETTING(    0x06, "A 2/2  B 1/3" )
+	PORT_DIPSETTING(    0x40, "A 2/1  B 1/3" )
+	PORT_DIPSETTING(    0x80, "A 1/2  B 1/6" )
+	PORT_DIPSETTING(    0xc0, "A 2/2  B 1/3" )
 
 	PORT_START("IN2")
 	PORT_DIPNAME( 0x03, 0x00, DEF_STR( Lives ) )
@@ -2219,7 +2213,7 @@ static GFXDECODE_START( _4in1 )
 GFXDECODE_END
 
 
-static MACHINE_CONFIG_START( galaxold_base )
+MACHINE_CONFIG_START(galaxold_state::galaxold_base)
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", Z80, PIXEL_CLOCK/2) /* 3.072 MHz */
@@ -2254,7 +2248,7 @@ static MACHINE_CONFIG_START( galaxold_base )
 MACHINE_CONFIG_END
 
 
-static MACHINE_CONFIG_DERIVED( galaxian, galaxold_base )
+MACHINE_CONFIG_DERIVED(galaxold_state::galaxian, galaxold_base)
 
 	/* basic machine hardware */
 
@@ -2263,7 +2257,7 @@ static MACHINE_CONFIG_DERIVED( galaxian, galaxold_base )
 MACHINE_CONFIG_END
 
 
-static MACHINE_CONFIG_DERIVED( mooncrst, galaxold_base )
+MACHINE_CONFIG_DERIVED(galaxold_state::mooncrst, galaxold_base)
 
 	/* basic machine hardware */
 	MCFG_CPU_MODIFY("maincpu")
@@ -2282,7 +2276,7 @@ MACHINE_CONFIG_END
 // but neither of the games we have (froggerv and hustlerb3) make use of either. There are a number
 // of unpopulated positions on the game board which presumably can be populated with code for the
 // 2nd Z80.
-static MACHINE_CONFIG_DERIVED( videotron, galaxian )
+MACHINE_CONFIG_DERIVED(galaxold_state::videotron, galaxian)
 
 	/* basic machine hardware */
 	MCFG_CPU_MODIFY("maincpu")
@@ -2293,14 +2287,14 @@ static MACHINE_CONFIG_DERIVED( videotron, galaxian )
 MACHINE_CONFIG_END
 
 
-static MACHINE_CONFIG_DERIVED( porter, mooncrst )
+MACHINE_CONFIG_DERIVED(galaxold_state::porter, mooncrst)
 
 	/* video hardware */
 	MCFG_VIDEO_START_OVERRIDE(galaxold_state, pisces)
 MACHINE_CONFIG_END
 
 
-static MACHINE_CONFIG_DERIVED( scramblb, galaxian )
+MACHINE_CONFIG_DERIVED(galaxold_state::scramblb, galaxian)
 
 	/* basic machine hardware */
 	MCFG_CPU_MODIFY("maincpu")
@@ -2315,7 +2309,7 @@ static MACHINE_CONFIG_DERIVED( scramblb, galaxian )
 MACHINE_CONFIG_END
 
 
-static MACHINE_CONFIG_DERIVED( scramb2, galaxian )
+MACHINE_CONFIG_DERIVED(galaxold_state::scramb2, galaxian)
 
 	/* basic machine hardware */
 	MCFG_CPU_MODIFY("maincpu")
@@ -2330,7 +2324,7 @@ static MACHINE_CONFIG_DERIVED( scramb2, galaxian )
 MACHINE_CONFIG_END
 
 
-static MACHINE_CONFIG_DERIVED( scrambler, galaxian )
+MACHINE_CONFIG_DERIVED(galaxold_state::scrambler, galaxian)
 
 	/* basic machine hardware */
 	MCFG_CPU_MODIFY("maincpu")
@@ -2345,7 +2339,7 @@ static MACHINE_CONFIG_DERIVED( scrambler, galaxian )
 MACHINE_CONFIG_END
 
 
-static MACHINE_CONFIG_DERIVED( guttang, galaxian )
+MACHINE_CONFIG_DERIVED(galaxold_state::guttang, galaxian)
 
 	/* basic machine hardware */
 	MCFG_CPU_MODIFY("maincpu")
@@ -2361,7 +2355,7 @@ static MACHINE_CONFIG_DERIVED( guttang, galaxian )
 MACHINE_CONFIG_END
 
 
-static MACHINE_CONFIG_DERIVED( 4in1, galaxian )
+MACHINE_CONFIG_DERIVED(galaxold_state::_4in1, galaxian)
 
 	/* basic machine hardware */
 	MCFG_CPU_MODIFY("maincpu")
@@ -2374,7 +2368,7 @@ static MACHINE_CONFIG_DERIVED( 4in1, galaxian )
 MACHINE_CONFIG_END
 
 
-static MACHINE_CONFIG_DERIVED( bagmanmc, mooncrst )
+MACHINE_CONFIG_DERIVED(galaxold_state::bagmanmc, mooncrst)
 
 	/* basic machine hardware */
 	MCFG_CPU_MODIFY("maincpu")
@@ -2387,7 +2381,7 @@ static MACHINE_CONFIG_DERIVED( bagmanmc, mooncrst )
 MACHINE_CONFIG_END
 
 
-static MACHINE_CONFIG_DERIVED( dkongjrm, mooncrst )
+MACHINE_CONFIG_DERIVED(galaxold_state::dkongjrm, mooncrst)
 
 	/* basic machine hardware */
 	MCFG_CPU_MODIFY("maincpu")
@@ -2398,7 +2392,7 @@ static MACHINE_CONFIG_DERIVED( dkongjrm, mooncrst )
 MACHINE_CONFIG_END
 
 
-static MACHINE_CONFIG_DERIVED( dkongjrmc, mooncrst )
+MACHINE_CONFIG_DERIVED(galaxold_state::dkongjrmc, mooncrst)
 	MCFG_CPU_MODIFY("maincpu")
 	MCFG_CPU_PROGRAM_MAP(dkongjrmc_map)
 
@@ -2406,7 +2400,7 @@ static MACHINE_CONFIG_DERIVED( dkongjrmc, mooncrst )
 MACHINE_CONFIG_END
 
 
-static MACHINE_CONFIG_DERIVED( rockclim, mooncrst )
+MACHINE_CONFIG_DERIVED(galaxold_state::rockclim, mooncrst)
 
 	/* basic machine hardware */
 	MCFG_CPU_MODIFY("maincpu")
@@ -2424,7 +2418,7 @@ static MACHINE_CONFIG_DERIVED( rockclim, mooncrst )
 MACHINE_CONFIG_END
 
 
-static MACHINE_CONFIG_DERIVED( ozon1, galaxold_base )
+MACHINE_CONFIG_DERIVED(galaxold_state::ozon1, galaxold_base)
 
 	/* basic machine hardware */
 	MCFG_CPU_MODIFY("maincpu")
@@ -2445,7 +2439,7 @@ static MACHINE_CONFIG_DERIVED( ozon1, galaxold_base )
 MACHINE_CONFIG_END
 
 
-static MACHINE_CONFIG_START( drivfrcg )
+MACHINE_CONFIG_START(galaxold_state::drivfrcg)
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", S2650, MASTER_CLOCK/6)
@@ -2477,7 +2471,7 @@ static MACHINE_CONFIG_START( drivfrcg )
 MACHINE_CONFIG_END
 
 
-static MACHINE_CONFIG_DERIVED( bongo, galaxold_base )
+MACHINE_CONFIG_DERIVED(galaxold_state::bongo, galaxold_base)
 
 	/* basic machine hardware */
 	MCFG_CPU_MODIFY("maincpu")
@@ -2496,7 +2490,7 @@ static MACHINE_CONFIG_DERIVED( bongo, galaxold_base )
 MACHINE_CONFIG_END
 
 
-static MACHINE_CONFIG_DERIVED( hunchbkg, galaxold_base )
+MACHINE_CONFIG_DERIVED(galaxold_state::hunchbkg, galaxold_base)
 
 	/* basic machine hardware */
 	MCFG_CPU_REPLACE("maincpu", S2650, PIXEL_CLOCK / 4)
@@ -2515,7 +2509,7 @@ static MACHINE_CONFIG_DERIVED( hunchbkg, galaxold_base )
 MACHINE_CONFIG_END
 
 
-static MACHINE_CONFIG_DERIVED( spcwarp, hunchbkg )
+MACHINE_CONFIG_DERIVED(galaxold_state::spcwarp, hunchbkg)
 	/* hunchbkg, but with a different memory map */
 	/* basic machine hardware */
 	MCFG_CPU_MODIFY("maincpu")
@@ -2523,7 +2517,7 @@ static MACHINE_CONFIG_DERIVED( spcwarp, hunchbkg )
 MACHINE_CONFIG_END
 
 
-static MACHINE_CONFIG_DERIVED( tazzmang, galaxian )
+MACHINE_CONFIG_DERIVED(galaxold_state::tazzmang, galaxian)
 
 	/* basic machine hardware */
 	MCFG_CPU_MODIFY("maincpu")
@@ -2531,7 +2525,7 @@ static MACHINE_CONFIG_DERIVED( tazzmang, galaxian )
 MACHINE_CONFIG_END
 
 
-static MACHINE_CONFIG_START( racknrol )
+MACHINE_CONFIG_START(galaxold_state::racknrol)
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", S2650, PIXEL_CLOCK/2)
@@ -2559,7 +2553,7 @@ static MACHINE_CONFIG_START( racknrol )
 MACHINE_CONFIG_END
 
 
-static MACHINE_CONFIG_START( hexpoola )
+MACHINE_CONFIG_START(galaxold_state::hexpoola)
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", S2650, PIXEL_CLOCK/2)
@@ -2587,7 +2581,7 @@ static MACHINE_CONFIG_START( hexpoola )
 MACHINE_CONFIG_END
 
 
-static MACHINE_CONFIG_DERIVED( ckongg, galaxian )
+MACHINE_CONFIG_DERIVED(galaxold_state::ckongg, galaxian)
 
 	/* basic machine hardware */
 	MCFG_CPU_MODIFY("maincpu")
@@ -2599,7 +2593,7 @@ static MACHINE_CONFIG_DERIVED( ckongg, galaxian )
 MACHINE_CONFIG_END
 
 
-static MACHINE_CONFIG_DERIVED( ckongmc, mooncrst )
+MACHINE_CONFIG_DERIVED(galaxold_state::ckongmc, mooncrst)
 
 	/* basic machine hardware */
 	MCFG_CPU_MODIFY("maincpu")
@@ -2611,7 +2605,7 @@ static MACHINE_CONFIG_DERIVED( ckongmc, mooncrst )
 MACHINE_CONFIG_END
 
 
-static MACHINE_CONFIG_DERIVED( bullsdrtg, hexpoola )
+MACHINE_CONFIG_DERIVED(galaxold_state::bullsdrtg, hexpoola)
 
 	MCFG_CPU_MODIFY("maincpu")
 	MCFG_CPU_DATA_MAP(bullsdrtg_data_map)
@@ -3300,6 +3294,35 @@ ROM_START( drivfrcg )
 	ROM_LOAD( "bot.clr",      0x0020, 0x0020, CRC(0f0782af) SHA1(32c0dd09ead5c70cee2657e9cb8cb9fcf54c5a6a) )
 ROM_END
 
+ROM_START( drivfrcsg ) // This PCB has a big epoxy block by Tanaka Enterprises marked E-0010, possibly providing ROM addressing
+	ROM_REGION( 0x8000, "maincpu", 0 )
+	ROM_LOAD( "6N-2-2764A.bin", 0x2800, 0x0400, CRC(85242241) SHA1(bad2609c7f6d83a15809b602a0c141793909ceb0) )
+	ROM_CONTINUE(               0x2c00, 0x0400 )
+	ROM_CONTINUE(               0x0000, 0x0400 )
+	ROM_CONTINUE(               0x0400, 0x0400 )
+	ROM_CONTINUE(               0x0800, 0x0400 )
+	ROM_CONTINUE(               0x0c00, 0x0400 )
+	ROM_CONTINUE(               0x2000, 0x0400 )
+	ROM_CONTINUE(               0x2400, 0x0400 )
+	ROM_LOAD( "6M-1-2764A.bin", 0x6800, 0x0400, CRC(42d99594) SHA1(1b03132279a3a6edd2281a2f55ef2d3133003a16) )
+	ROM_CONTINUE(               0x6c00, 0x0400 )
+	ROM_CONTINUE(               0x4000, 0x0400 )
+	ROM_CONTINUE(               0x4400, 0x0400 )
+	ROM_CONTINUE(               0x4800, 0x0400 )
+	ROM_CONTINUE(               0x4c00, 0x0400 )
+	ROM_CONTINUE(               0x6000, 0x0400 )
+	ROM_CONTINUE(               0x6400, 0x0400 )
+
+	ROM_REGION( 0x4000, "gfx1", 0 )
+	ROM_LOAD( "1J-2764A.bin", 0x0000, 0x2000, CRC(156e20bd) SHA1(8ec4020d179674856f43e543ce5e54730752568a) )
+	ROM_LOAD( "1L-2764A.bin", 0x2000, 0x2000, CRC(88d0f70b) SHA1(c91aa798f7450c0cf1a8db4225d4a4efa25555d8) )
+
+	/* piggy-backed colour proms */
+	ROM_REGION( 0x0040, "proms", 0 )
+	ROM_LOAD( "82s123-1.bin",      0x0000, 0x0020, CRC(3110ddae) SHA1(53b2e1cc07915592f6c868131ec296c63a407f04) )
+	ROM_LOAD( "82s123-2.bin",      0x0020, 0x0020, CRC(0f0782af) SHA1(32c0dd09ead5c70cee2657e9cb8cb9fcf54c5a6a) )
+ROM_END
+
 ROM_START( drivfrcb )
 	ROM_REGION( 0x8000, "maincpu", 0 )
 	ROM_LOAD( "dfp.bin",      0x2800, 0x0400, CRC(b5b2981d) SHA1(c9ff19791895bf05b569457b1e53dfa0aaeb8e95) )
@@ -3533,7 +3556,7 @@ GAME( 1982, ckongis,   ckong,    ckongg,    ckonggx,   galaxold_state, ckonggx, 
 GAME( 1981, scramblb,  scramble, scramblb,  scramblb,  galaxold_state, 0,        ROT90,  "bootleg", "Scramble (bootleg on Galaxian hardware)", MACHINE_NO_COCKTAIL | MACHINE_SUPPORTS_SAVE )
 GAME( 1981, scramb2,   scramble, scramb2,   scramb2,   galaxold_state, 0,        ROT90,  "bootleg", "Scramble (bootleg)", MACHINE_NO_COCKTAIL | MACHINE_SUPPORTS_SAVE )
 GAME( 1981, scrambler, scramble, scrambler, scrambler, galaxold_state, 0,        ROT90,  "bootleg (Reben S.A.)", "Scramble (Reben S.A. Spanish bootleg)", MACHINE_NO_COCKTAIL | MACHINE_SUPPORTS_SAVE )
-GAME( 1981, 4in1,      0,        4in1,      4in1,      galaxold_state, 4in1,     ROT90,  "Armenia / Food and Fun", "4 Fun in 1", MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
+GAME( 1981, 4in1,      0,        _4in1,     4in1,      galaxold_state, 4in1,     ROT90,  "Armenia / Food and Fun", "4 Fun in 1", MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
 GAME( 1982, bagmanmc,  bagman,   bagmanmc,  bagmanmc,  galaxold_state, 0,        ROT90,  "bootleg", "Bagman (bootleg on Moon Cresta hardware, set 1)", MACHINE_IMPERFECT_COLORS | MACHINE_NO_COCKTAIL | MACHINE_SUPPORTS_SAVE )
 GAME( 1984, bagmanm2,  bagman,   bagmanmc,  bagmanmc,  galaxold_state, 0,        ROT90,  "bootleg (GIB)", "Bagman (bootleg on Moon Cresta hardware, set 2)", MACHINE_IMPERFECT_COLORS | MACHINE_NO_COCKTAIL | MACHINE_SUPPORTS_SAVE )
 GAME( 1982, dkongjrm,  dkongjr,  dkongjrm,  dkongjrm,  galaxold_state, 0,        ROT90,  "bootleg", "Donkey Kong Jr. (bootleg on Moon Cresta hardware, set 1)", MACHINE_WRONG_COLORS | MACHINE_IMPERFECT_SOUND | MACHINE_NO_COCKTAIL | MACHINE_SUPPORTS_SAVE )
@@ -3556,6 +3579,7 @@ GAME( 1983, spcwarp,   0,        spcwarp,   hunchbkg,  galaxold_state, 0,       
 GAME( 1984, drivfrcg,  drivfrcp, drivfrcg,  drivfrcg,  galaxold_state, 0,         ROT90,  "Shinkai Inc. (Magic Electronics USA license)", "Driving Force (Galaxian conversion)", MACHINE_SUPPORTS_SAVE )
 GAME( 1984, drivfrct,  drivfrcp, drivfrcg,  drivfrcg,  galaxold_state, 0,         ROT90,  "bootleg (EMT Germany)", "Top Racer (bootleg of Driving Force)", MACHINE_SUPPORTS_SAVE ) // Video Klein PCB
 GAME( 1985, drivfrcb,  drivfrcp, drivfrcg,  drivfrcg,  galaxold_state, 0,         ROT90,  "bootleg (Elsys Software)", "Driving Force (Galaxian conversion bootleg)", MACHINE_SUPPORTS_SAVE )
+GAME( 1985, drivfrcsg, drivfrcp, drivfrcg,  drivfrcg,  galaxold_state, 0,         ROT90,  "Seatongrove UK", "Driving Force (Galaxian conversion, Seatongrove UK)", MACHINE_SUPPORTS_SAVE )
 GAME( 1986, racknrol,  0,        racknrol,  racknrol,  galaxold_state, 0,         ROT0,   "Senko Industries (Status license from Shinkai Inc.)", "Rack + Roll", MACHINE_SUPPORTS_SAVE )
 GAME( 1986, hexpool,   racknrol, racknrol,  racknrol,  galaxold_state, 0,         ROT90,  "Senko Industries (Shinkai Inc. license)", "Hex Pool (Shinkai)", MACHINE_SUPPORTS_SAVE ) // still has Senko logo in gfx rom
 GAME( 1985, hexpoola,  racknrol, hexpoola,  racknrol,  galaxold_state, 0,         ROT90,  "Senko Industries", "Hex Pool (Senko)", MACHINE_SUPPORTS_SAVE )

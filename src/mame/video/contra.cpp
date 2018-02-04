@@ -60,10 +60,10 @@ PALETTE_INIT_MEMBER(contra_state, contra)
 
 TILE_GET_INFO_MEMBER(contra_state::get_fg_tile_info)
 {
-	uint8_t ctrl_3 = m_k007121_1->ctrlram_r(generic_space(), 3);
-	uint8_t ctrl_4 = m_k007121_1->ctrlram_r(generic_space(), 4);
-	uint8_t ctrl_5 = m_k007121_1->ctrlram_r(generic_space(), 5);
-	uint8_t ctrl_6 = m_k007121_1->ctrlram_r(generic_space(), 6);
+	uint8_t ctrl_3 = m_k007121_1->ctrlram_r(3);
+	uint8_t ctrl_4 = m_k007121_1->ctrlram_r(4);
+	uint8_t ctrl_5 = m_k007121_1->ctrlram_r(5);
+	uint8_t ctrl_6 = m_k007121_1->ctrlram_r(6);
 	int attr = m_fg_cram[tile_index];
 	int bit0 = (ctrl_5 >> 0) & 0x03;
 	int bit1 = (ctrl_5 >> 2) & 0x03;
@@ -87,10 +87,10 @@ TILE_GET_INFO_MEMBER(contra_state::get_fg_tile_info)
 
 TILE_GET_INFO_MEMBER(contra_state::get_bg_tile_info)
 {
-	uint8_t ctrl_3 = m_k007121_2->ctrlram_r(generic_space(), 3);
-	uint8_t ctrl_4 = m_k007121_2->ctrlram_r(generic_space(), 4);
-	uint8_t ctrl_5 = m_k007121_2->ctrlram_r(generic_space(), 5);
-	uint8_t ctrl_6 = m_k007121_2->ctrlram_r(generic_space(), 6);
+	uint8_t ctrl_3 = m_k007121_2->ctrlram_r(3);
+	uint8_t ctrl_4 = m_k007121_2->ctrlram_r(4);
+	uint8_t ctrl_5 = m_k007121_2->ctrlram_r(5);
+	uint8_t ctrl_6 = m_k007121_2->ctrlram_r(6);
 	int attr = m_bg_cram[tile_index];
 	int bit0 = (ctrl_5 >> 0) & 0x03;
 	int bit1 = (ctrl_5 >> 2) & 0x03;
@@ -115,8 +115,8 @@ TILE_GET_INFO_MEMBER(contra_state::get_bg_tile_info)
 
 TILE_GET_INFO_MEMBER(contra_state::get_tx_tile_info)
 {
-	uint8_t ctrl_5 = m_k007121_1->ctrlram_r(generic_space(), 5);
-	uint8_t ctrl_6 = m_k007121_1->ctrlram_r(generic_space(), 6);
+	uint8_t ctrl_5 = m_k007121_1->ctrlram_r(5);
+	uint8_t ctrl_6 = m_k007121_1->ctrlram_r(6);
 	int attr = m_tx_cram[tile_index];
 	int bit0 = (ctrl_5 >> 0) & 0x03;
 	int bit1 = (ctrl_5 >> 2) & 0x03;
@@ -210,7 +210,7 @@ WRITE8_MEMBER(contra_state::contra_text_cram_w)
 
 WRITE8_MEMBER(contra_state::contra_K007121_ctrl_0_w)
 {
-	uint8_t ctrl_6 = m_k007121_1->ctrlram_r(space, 6);
+	uint8_t ctrl_6 = m_k007121_1->ctrlram_r(6);
 
 	if (offset == 3)
 	{
@@ -234,7 +234,7 @@ WRITE8_MEMBER(contra_state::contra_K007121_ctrl_0_w)
 
 WRITE8_MEMBER(contra_state::contra_K007121_ctrl_1_w)
 {
-	uint8_t ctrl_6 = m_k007121_2->ctrlram_r(space, 6);
+	uint8_t ctrl_6 = m_k007121_2->ctrlram_r(6);
 
 	if (offset == 3)
 	{
@@ -265,8 +265,7 @@ WRITE8_MEMBER(contra_state::contra_K007121_ctrl_1_w)
 void contra_state::draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprect, bitmap_ind8 &priority_bitmap, int bank )
 {
 	k007121_device *k007121 = bank ? m_k007121_2 : m_k007121_1;
-	address_space &space = machine().dummy_space();
-	int base_color = (k007121->ctrlram_r(space, 6) & 0x30) * 2;
+	int base_color = (k007121->ctrlram_r(6) & 0x30) * 2;
 	const uint8_t *source;
 
 	if (bank == 0)
@@ -279,11 +278,10 @@ void contra_state::draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprect,
 
 uint32_t contra_state::screen_update_contra(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
-	address_space &space = machine().dummy_space();
-	uint8_t ctrl_1_0 = m_k007121_1->ctrlram_r(space, 0);
-	uint8_t ctrl_1_2 = m_k007121_1->ctrlram_r(space, 2);
-	uint8_t ctrl_2_0 = m_k007121_2->ctrlram_r(space, 0);
-	uint8_t ctrl_2_2 = m_k007121_2->ctrlram_r(space, 2);
+	uint8_t ctrl_1_0 = m_k007121_1->ctrlram_r(0);
+	uint8_t ctrl_1_2 = m_k007121_1->ctrlram_r(2);
+	uint8_t ctrl_2_0 = m_k007121_2->ctrlram_r(0);
+	uint8_t ctrl_2_2 = m_k007121_2->ctrlram_r(2);
 	rectangle bg_finalclip = m_bg_clip;
 	rectangle fg_finalclip = m_fg_clip;
 	rectangle tx_finalclip = m_tx_clip;

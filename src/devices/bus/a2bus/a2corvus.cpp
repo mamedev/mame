@@ -71,7 +71,7 @@ ROM_END
 //  device_add_mconfig - add device configuration
 //-------------------------------------------------
 
-MACHINE_CONFIG_MEMBER(a2bus_corvus_device::device_add_mconfig)
+MACHINE_CONFIG_START(a2bus_corvus_device::device_add_mconfig)
 	MCFG_DEVICE_ADD(CORVUS_HD_TAG, CORVUS_HDC, 0)
 	MCFG_HARDDISK_ADD("harddisk1")
 	MCFG_HARDDISK_INTERFACE("corvus_hdd")
@@ -114,9 +114,6 @@ a2bus_corvus_device::a2bus_corvus_device(const machine_config &mconfig, const ch
 
 void a2bus_corvus_device::device_start()
 {
-	// set_a2bus_device makes m_slot valid
-	set_a2bus_device();
-
 	m_rom = device().machine().root_device().memregion(this->subtag(CORVUS_ROM_REGION).c_str())->base();
 }
 
@@ -129,18 +126,18 @@ void a2bus_corvus_device::device_reset()
     read_c0nx - called for reads from this card's c0nx space
 -------------------------------------------------*/
 
-uint8_t a2bus_corvus_device::read_c0nx(address_space &space, uint8_t offset)
+uint8_t a2bus_corvus_device::read_c0nx(uint8_t offset)
 {
 	switch (offset)
 	{
 		case 0:
-			return m_corvushd->read(space, 0);
+			return m_corvushd->read(machine().dummy_space(), 0);
 
 		case 1:
-			return m_corvushd->status_r(space, 0);
+			return m_corvushd->status_r(machine().dummy_space(), 0);
 
 		default:
-			logerror("Corvus: read unhandled c0n%x (PC=%x)\n", offset, space.device().safe_pc());
+			logerror("Corvus: read unhandled c0n%x (%s)\n", offset, machine().describe_context());
 			break;
 	}
 
@@ -152,11 +149,11 @@ uint8_t a2bus_corvus_device::read_c0nx(address_space &space, uint8_t offset)
     write_c0nx - called for writes to this card's c0nx space
 -------------------------------------------------*/
 
-void a2bus_corvus_device::write_c0nx(address_space &space, uint8_t offset, uint8_t data)
+void a2bus_corvus_device::write_c0nx(uint8_t offset, uint8_t data)
 {
 	if (offset == 0)
 	{
-		m_corvushd->write(space, 0, data);
+		m_corvushd->write(machine().dummy_space(), 0, data);
 	}
 }
 
@@ -164,7 +161,7 @@ void a2bus_corvus_device::write_c0nx(address_space &space, uint8_t offset, uint8
     read_cnxx - called for reads from this card's cnxx space
 -------------------------------------------------*/
 
-uint8_t a2bus_corvus_device::read_cnxx(address_space &space, uint8_t offset)
+uint8_t a2bus_corvus_device::read_cnxx(uint8_t offset)
 {
 	// one slot image at the end of the ROM, it appears
 	return m_rom[offset+0x700];
@@ -174,7 +171,7 @@ uint8_t a2bus_corvus_device::read_cnxx(address_space &space, uint8_t offset)
     read_c800 - called for reads from this card's c800 space
 -------------------------------------------------*/
 
-uint8_t a2bus_corvus_device::read_c800(address_space &space, uint16_t offset)
+uint8_t a2bus_corvus_device::read_c800(uint16_t offset)
 {
 	return m_rom[offset & 0x7ff];
 }

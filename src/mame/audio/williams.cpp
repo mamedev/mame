@@ -41,14 +41,14 @@
 #include "sound/volt_reg.h"
 
 
-#define NARC_MASTER_CLOCK       XTAL_8MHz
-#define NARC_FM_CLOCK           XTAL_3_579545MHz
+#define NARC_MASTER_CLOCK       XTAL(8'000'000)
+#define NARC_FM_CLOCK           XTAL(3'579'545)
 
-#define CVSD_MASTER_CLOCK       XTAL_8MHz
-#define CVSD_FM_CLOCK           XTAL_3_579545MHz
+#define CVSD_MASTER_CLOCK       XTAL(8'000'000)
+#define CVSD_FM_CLOCK           XTAL(3'579'545)
 
-#define ADPCM_MASTER_CLOCK      XTAL_8MHz
-#define ADPCM_FM_CLOCK          XTAL_3_579545MHz
+#define ADPCM_MASTER_CLOCK      XTAL(8'000'000)
+#define ADPCM_FM_CLOCK          XTAL(3'579'545)
 
 
 
@@ -174,8 +174,8 @@ ADDRESS_MAP_END
 // device_add_mconfig - add device configuration
 //-------------------------------------------------
 
-MACHINE_CONFIG_MEMBER( williams_cvsd_sound_device::device_add_mconfig )
-	MCFG_CPU_ADD("cpu", M6809E, CVSD_MASTER_CLOCK)
+MACHINE_CONFIG_START(williams_cvsd_sound_device::device_add_mconfig)
+	MCFG_CPU_ADD("cpu", MC6809E, CVSD_MASTER_CLOCK / 4)
 	MCFG_CPU_PROGRAM_MAP(williams_cvsd_map)
 
 	MCFG_DEVICE_ADD("pia", PIA6821, 0)
@@ -492,11 +492,11 @@ ADDRESS_MAP_END
 //-------------------------------------------------
 
 
-MACHINE_CONFIG_MEMBER( williams_narc_sound_device::device_add_mconfig )
-	MCFG_CPU_ADD("cpu0", M6809E, NARC_MASTER_CLOCK)
+MACHINE_CONFIG_START(williams_narc_sound_device::device_add_mconfig)
+	MCFG_CPU_ADD("cpu0", MC6809E, NARC_MASTER_CLOCK / 4)
 	MCFG_CPU_PROGRAM_MAP(williams_narc_master_map)
 
-	MCFG_CPU_ADD("cpu1", M6809E, NARC_MASTER_CLOCK)
+	MCFG_CPU_ADD("cpu1", MC6809E, NARC_MASTER_CLOCK / 4)
 	MCFG_CPU_PROGRAM_MAP(williams_narc_slave_map)
 
 	MCFG_YM2151_ADD("ym2151", NARC_FM_CLOCK)
@@ -745,21 +745,21 @@ ADDRESS_MAP_END
 // device_add_mconfig - add device configuration
 //-------------------------------------------------
 
-MACHINE_CONFIG_MEMBER( williams_adpcm_sound_device::device_add_mconfig )
-	MCFG_CPU_ADD("cpu", M6809E, ADPCM_MASTER_CLOCK)
+MACHINE_CONFIG_START(williams_adpcm_sound_device::device_add_mconfig)
+	MCFG_CPU_ADD("cpu", MC6809E, ADPCM_MASTER_CLOCK / 4)
 	MCFG_CPU_PROGRAM_MAP(williams_adpcm_map)
 
 	MCFG_YM2151_ADD("ym2151", ADPCM_FM_CLOCK)
 	MCFG_YM2151_IRQ_HANDLER(INPUTLINE("cpu", M6809_FIRQ_LINE))
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, DEVICE_SELF_OWNER, 0.10)
 
-	MCFG_SOUND_ADD("dac", AD7524, 0) MCFG_SOUND_ROUTE(ALL_OUTPUTS, DEVICE_SELF_OWNER, 0.5)
+	MCFG_SOUND_ADD("dac", AD7524, 0) MCFG_SOUND_ROUTE(ALL_OUTPUTS, DEVICE_SELF_OWNER, 0.10)
 	MCFG_DEVICE_ADD("vref", VOLTAGE_REGULATOR, 0) MCFG_VOLTAGE_REGULATOR_OUTPUT(5.0)
 	MCFG_SOUND_ROUTE_EX(0, "dac", 1.0, DAC_VREF_POS_INPUT) MCFG_SOUND_ROUTE_EX(0, "dac", -1.0, DAC_VREF_NEG_INPUT)
 
 	MCFG_OKIM6295_ADD("oki", ADPCM_MASTER_CLOCK/8, PIN7_HIGH) // clock frequency & pin 7 not verified
 	MCFG_DEVICE_ADDRESS_MAP(0, williams_adpcm_oki_map)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, DEVICE_SELF_OWNER, 0.5)
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, DEVICE_SELF_OWNER, 0.15)
 MACHINE_CONFIG_END
 
 

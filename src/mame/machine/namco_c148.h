@@ -109,6 +109,7 @@ protected:
 //  virtual void device_validity_check(validity_checker &valid) const;
 	virtual void device_start() override;
 	virtual void device_reset() override;
+	virtual void device_validity_check(validity_checker &valid) const override;
 private:
 	cpu_device *m_hostcpu;              /**< reference to the host cpu */
 	namco_c148_device *m_linked_c148;   /**< reference to linked master/slave c148 */

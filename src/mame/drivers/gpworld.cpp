@@ -92,6 +92,7 @@ public:
 	required_device<gfxdecode_device> m_gfxdecode;
 	required_device<palette_device> m_palette;
 
+	void gpworld(machine_config &config);
 protected:
 	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr) override;
 };
@@ -488,7 +489,7 @@ static GFXDECODE_START( gpworld )
 GFXDECODE_END
 
 /* DRIVER */
-static MACHINE_CONFIG_START( gpworld )
+MACHINE_CONFIG_START(gpworld_state::gpworld)
 
 	/* main cpu */
 	MCFG_CPU_ADD("maincpu", Z80, GUESSED_CLOCK)

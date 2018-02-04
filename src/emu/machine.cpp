@@ -107,8 +107,7 @@ osd_interface &running_machine::osd() const
 //-------------------------------------------------
 
 running_machine::running_machine(const machine_config &_config, machine_manager &manager)
-	: firstcpu(nullptr),
-		primary_screen(nullptr),
+	: primary_screen(nullptr),
 		m_side_effect_disabled(0),
 		debug_flags(0),
 		m_config(_config),
@@ -145,12 +144,6 @@ running_machine::running_machine(const machine_config &_config, machine_manager 
 		device.set_machine(*this);
 
 	// find devices
-	for (device_t &device : iter)
-		if (dynamic_cast<cpu_device *>(&device) != nullptr)
-		{
-			firstcpu = downcast<cpu_device *>(&device);
-			break;
-		}
 	primary_screen = screen_device_iterator(root_device()).first();
 
 	// fetch core options
@@ -372,7 +365,8 @@ int running_machine::run(bool quiet)
 
 		// save the NVRAM and configuration
 		sound().ui_mute(true);
-		nvram_save();
+		if (options().nvram_save())
+			nvram_save();
 		m_configuration->save_settings();
 	}
 	catch (emu_fatalerror &fatal)
@@ -683,6 +677,39 @@ void running_machine::immediate_load(const char *filename)
 
 
 //-------------------------------------------------
+//  rewind_capture - capture and append a new
+//  state to the rewind list
+//-------------------------------------------------
+
+bool running_machine::rewind_capture()
+{
+	return m_save.rewind()->capture();
+}
+
+
+//-------------------------------------------------
+//  rewind_step - a single step back through
+//  rewind states
+//-------------------------------------------------
+
+bool running_machine::rewind_step()
+{
+	return m_save.rewind()->step();
+}
+
+
+//-------------------------------------------------
+//  rewind_invalidate - mark all the future rewind
+//  states as invalid
+//-------------------------------------------------
+
+void running_machine::rewind_invalidate()
+{
+	m_save.rewind()->invalidate();
+}
+
+
+//-------------------------------------------------
 //  pause - pause the system
 //-------------------------------------------------
 
@@ -721,7 +748,10 @@ void running_machine::resume()
 void running_machine::toggle_pause()
 {
 	if (paused())
+	{
+		rewind_invalidate();
 		resume();
+	}
 	else
 		pause();
 }
@@ -921,6 +951,9 @@ void running_machine::handle_saveload()
 				if (saverr != STATERR_NONE && m_saveload_schedule == saveload_schedule::SAVE)
 					file.remove_on_close();
 			}
+			else if (openflags == OPEN_FLAG_READ && filerr == osd_file::error::NOT_FOUND)
+				// attempt to load a non-existent savestate, report empty slot
+				popmessage("Error: No savestate file to load.", opname);
 			else
 				popmessage("Error: Failed to open file for %s operation.", opname);
 		}
@@ -974,6 +1007,10 @@ void running_machine::logfile_callback(const char *buffer)
 
 void running_machine::start_all_devices()
 {
+	// resolve objects first to avoid messy start order dependencies
+	for (device_t &device : device_iterator(root_device()))
+		device.resolve_objects();
+
 	m_dummy_space.start();
 
 	// iterate through the devices
@@ -1240,6 +1277,7 @@ system_time::system_time(time_t t)
 
 void system_time::set(time_t t)
 {
+	// FIXME: this crashes if localtime or gmtime returns nullptr
 	time = t;
 	local_time.set(*localtime(&t));
 	utc_time.set(*gmtime(&t));

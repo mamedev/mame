@@ -508,7 +508,7 @@ READ8_MEMBER( hp1ll3_device::read )
 	case 0:
 		data = m_busy ? 1 : 0;
 		data |= 2;
-		data |= (m_screen->vblank() ? 8 : 0);
+		data |= (screen().vblank() ? 8 : 0);
 		break;
 
 	case 2:
@@ -551,6 +551,7 @@ WRITE8_MEMBER( hp1ll3_device::write )
 		switch (m_command)
 		{
 		case CONF:
+			assert((m_conf_ptr >> 1) < ARRAY_LENGTH(m_conf));
 			if (m_conf_ptr & 1) {
 				m_conf[m_conf_ptr >> 1] |= data;
 			} else {

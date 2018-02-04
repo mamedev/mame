@@ -54,6 +54,7 @@ public:
 		, m_maincpu(*this, "maincpu")
 	{ }
 
+	void ipc(machine_config &config);
 private:
 	virtual void machine_reset() override;
 	required_device<cpu_device> m_maincpu;
@@ -87,16 +88,16 @@ void ipc_state::machine_reset()
 }
 
 
-static MACHINE_CONFIG_START( ipc )
+MACHINE_CONFIG_START(ipc_state::ipc)
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu",I8085A, XTAL_19_6608MHz / 4)
+	MCFG_CPU_ADD("maincpu",I8085A, XTAL(19'660'800) / 4)
 	MCFG_CPU_PROGRAM_MAP(ipc_mem)
 	MCFG_CPU_IO_MAP(ipc_io)
 
 	MCFG_DEVICE_ADD("pit", PIT8253, 0)
-	MCFG_PIT8253_CLK0(XTAL_19_6608MHz / 16)
-	MCFG_PIT8253_CLK1(XTAL_19_6608MHz / 16)
-	MCFG_PIT8253_CLK2(XTAL_19_6608MHz / 16)
+	MCFG_PIT8253_CLK0(XTAL(19'660'800) / 16)
+	MCFG_PIT8253_CLK1(XTAL(19'660'800) / 16)
+	MCFG_PIT8253_CLK2(XTAL(19'660'800) / 16)
 	MCFG_PIT8253_OUT0_HANDLER(DEVWRITELINE("uart1", i8251_device, write_txc))
 	MCFG_DEVCB_CHAIN_OUTPUT(DEVWRITELINE("uart1", i8251_device, write_rxc))
 	MCFG_PIT8253_OUT1_HANDLER(DEVWRITELINE("uart2", i8251_device, write_txc))

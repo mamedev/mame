@@ -1071,7 +1071,7 @@ ROM_START( ti99_hfdc )
 ROM_END
 
 
-MACHINE_CONFIG_MEMBER( myarc_hfdc_device::device_add_mconfig )
+MACHINE_CONFIG_START(myarc_hfdc_device::device_add_mconfig)
 	MCFG_DEVICE_ADD(FDC_TAG, HDC9234, 0)
 	MCFG_HDC92X4_INTRQ_CALLBACK(WRITELINE(myarc_hfdc_device, intrq_w))
 	MCFG_HDC92X4_DIP_CALLBACK(WRITELINE(myarc_hfdc_device, dip_w))

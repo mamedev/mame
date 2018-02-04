@@ -91,6 +91,8 @@ public:
 
 	INTERRUPT_GEN_MEMBER(roldfrog_interrupt);
 	void roldfrog_update_irq(  );
+	void roldfrog(machine_config &config);
+	void splash(machine_config &config);
 };
 
 class funystrp_state : public splash_state
@@ -124,6 +126,7 @@ public:
 	uint32_t screen_update_funystrp(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	void funystrp_draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprect);
 
+	void funystrp(machine_config &config);
 private:
 	virtual void machine_start() override;
 

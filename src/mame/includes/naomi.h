@@ -41,9 +41,12 @@ class naomi_state : public dc_state
 	public:
 		naomi_state(const machine_config &mconfig, device_type type, const char *tag)
 		: dc_state(mconfig, type, tag),
-		m_eeprom(*this, "main_eeprom")  { }
+		m_eeprom(*this, "main_eeprom"),
+		m_rombase(*this, "rombase")
+		{ }
 
 	required_device<eeprom_serial_93cxx_device> m_eeprom;
+	optional_shared_ptr<uint64_t> m_rombase;
 
 	DECLARE_MACHINE_RESET(naomi);
 	DECLARE_DRIVER_INIT(naomigd);
@@ -76,6 +79,12 @@ class naomi_state : public dc_state
 	DECLARE_READ64_MEMBER( naomigd_ggxxrl_idle_skip_r );
 	DECLARE_READ64_MEMBER( naomigd_sfz3ugd_idle_skip_r );
 	DECLARE_READ64_MEMBER( hotd2_idle_skip_r );
+	void naomi_base(machine_config &config);
+	void naomim2(machine_config &config);
+	void naomi(machine_config &config);
+	void naomim1(machine_config &config);
+	void naomigd(machine_config &config);
+	void naomim4(machine_config &config);
 };
 
 class naomi2_state : public naomi_state
@@ -95,6 +104,10 @@ public:
 
 	DECLARE_DRIVER_INIT(naomi2);
 	DECLARE_WRITE32_MEMBER(both_pvr2_ta_w);
+	void naomi2_base(machine_config &config);
+	void naomi2m2(machine_config &config);
+	void naomi2gd(machine_config &config);
+	void naomi2m1(machine_config &config);
 };
 
 class atomiswave_state : public dc_state
@@ -119,10 +132,12 @@ public:
 
 	DECLARE_READ64_MEMBER( xtrmhnt2_hack_r );
 
+	void aw_base(machine_config &config);
+	void aw1c(machine_config &config);
+	void aw2c(machine_config &config);
 protected:
 	uint8_t aw_ctrl_type;
 	inline int decode_reg32_64(uint32_t offset, uint64_t mem_mask, uint64_t *shift);
 };
 
-MACHINE_CONFIG_EXTERN( naomi_aw_base );
 INPUT_PORTS_EXTERN( naomi_debug );

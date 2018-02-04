@@ -106,5 +106,5 @@ int main()
 	extern void simd_bench();
 	simd_bench();
 
-	return EXIT_SUCCESS;
+	return bx::kExitSuccess;
 }

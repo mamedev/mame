@@ -46,6 +46,7 @@ public:
 	DECLARE_WRITE8_MEMBER(lamp_w);
 	DECLARE_WRITE8_MEMBER(output_w);
 	DECLARE_WRITE8_MEMBER(oki_bank_w);
+	void ggconnie(machine_config &config);
 };
 
 WRITE8_MEMBER(ggconnie_state::lamp_w)
@@ -178,7 +179,7 @@ static INPUT_PORTS_START(ggconnie)
 	PORT_DIPSETTING(0x00, DEF_STR(On) )
 INPUT_PORTS_END
 
-static MACHINE_CONFIG_START( ggconnie )
+MACHINE_CONFIG_START(ggconnie_state::ggconnie)
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", H6280, PCE_MAIN_CLOCK/3)
 	MCFG_CPU_PROGRAM_MAP(sgx_mem)
@@ -215,7 +216,7 @@ static MACHINE_CONFIG_START( ggconnie )
 	MCFG_HUC6202_READ_1_CB(DEVREAD8("huc6270_1", huc6270_device, read))
 	MCFG_HUC6202_WRITE_1_CB(DEVWRITE8("huc6270_1", huc6270_device, write))
 
-	MCFG_DEVICE_ADD("rtc", MSM6242, XTAL_32_768kHz)
+	MCFG_DEVICE_ADD("rtc", MSM6242, XTAL(32'768))
 
 	MCFG_SPEAKER_STANDARD_STEREO("lspeaker","rspeaker")
 	MCFG_SOUND_ADD("c6280", C6280, PCE_MAIN_CLOCK/6)

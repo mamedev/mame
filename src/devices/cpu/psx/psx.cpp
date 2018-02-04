@@ -3,7 +3,7 @@
 /*
  * PlayStation CPU emulator
  *
- * Copyright 2003-2013 smf
+ * Copyright 2003-2017 smf
  *
  * Known chip id's
  *   CXD8530AQ
@@ -1818,7 +1818,7 @@ void psxcpu_device::device_start()
 {
 	// get our address spaces
 	m_program = &space( AS_PROGRAM );
-	m_direct = &m_program->direct();
+	m_direct = m_program->direct<0>();
 
 	save_item( NAME( m_op ) );
 	save_item( NAME( m_pc ) );
@@ -1837,6 +1837,10 @@ void psxcpu_device::device_start()
 	save_item( NAME( m_multiplier_operation ) );
 	save_item( NAME( m_multiplier_operand1 ) );
 	save_item( NAME( m_multiplier_operand2 ) );
+	save_item( NAME( m_exp_base ) );
+	save_item( NAME( m_exp_config ) );
+	save_item( NAME( m_ram_config ) );
+	save_item( NAME( m_rom_config ) );
 
 	state_add( STATE_GENPC, "GENPC", m_pc ).noshow();
 	state_add( STATE_GENPCBASE, "CURPC", m_pc ).noshow();
@@ -2023,6 +2027,8 @@ void psxcpu_device::device_post_load()
 	update_memory_handlers();
 	update_address_masks();
 	update_scratchpad();
+	update_ram_config();
+	update_rom_config();
 }
 
 
@@ -2067,13 +2073,13 @@ void psxcpu_device::state_string_export( const device_state_entry &entry, std::s
 
 
 //-------------------------------------------------
-//  disasm_disassemble - call the disassembly
+//  disassemble - call the disassembly
 //  helper function
 //-------------------------------------------------
 
-offs_t psxcpu_device::disasm_disassemble( std::ostream &stream, offs_t pc, const uint8_t *oprom, const uint8_t *opram, uint32_t options )
+util::disasm_interface *psxcpu_device::create_disassembler()
 {
-	return DasmPSXCPU( this, stream, pc, opram );
+	return new psxcpu_disassembler(this);
 }
 
 
@@ -3426,7 +3432,7 @@ device_memory_interface::space_config_vector psxcpu_device::memory_space_config(
 //  device_add_mconfig - add device configuration
 //-------------------------------------------------
 
-MACHINE_CONFIG_MEMBER( psxcpu_device::device_add_mconfig )
+MACHINE_CONFIG_START(psxcpu_device::device_add_mconfig)
 	MCFG_DEVICE_ADD( "irq", PSX_IRQ, 0 )
 	MCFG_PSX_IRQ_HANDLER( INPUTLINE( DEVICE_SELF, PSXCPU_IRQ0 ) )
 

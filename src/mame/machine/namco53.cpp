@@ -168,7 +168,7 @@ void namco_53xx_device::device_start()
 //  device_add_mconfig - add device configuration
 //-------------------------------------------------
 
-MACHINE_CONFIG_MEMBER( namco_53xx_device::device_add_mconfig )
+MACHINE_CONFIG_START(namco_53xx_device::device_add_mconfig)
 	MCFG_CPU_ADD("mcu", MB8843, DERIVED_CLOCK(1,1))     /* parent clock, internally divided by 6 */
 	MCFG_MB88XX_READ_K_CB(READ8(namco_53xx_device, K_r))
 	MCFG_MB88XX_WRITE_O_CB(WRITE8(namco_53xx_device, O_w))

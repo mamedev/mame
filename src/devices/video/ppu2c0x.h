@@ -158,6 +158,7 @@ public:
 		ppu2c0x_device &dev = downcast<ppu2c0x_device &>(device);
 		dev.m_use_sprite_write_limitation = false;
 	}
+	uint16_t get_vram_dest();
 
 protected:
 	// registers definition
@@ -218,6 +219,7 @@ protected:
 	uint8_t m_planebuf[2];
 	int                         m_scanline;         /* scanline count */
 	std::unique_ptr<uint8_t[]>  m_spriteram;           /* sprite ram */
+
 
 private:
 	static constexpr device_timer_id TIMER_HBLANK = 0;

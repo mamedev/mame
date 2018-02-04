@@ -81,6 +81,7 @@ public:
 	virtual void video_start() override;
 
 	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	void vroulet(machine_config &config);
 };
 
 
@@ -271,7 +272,7 @@ WRITE8_MEMBER(vroulet_state::ppi8255_c_w){}
 
 /* Machine Driver */
 
-static MACHINE_CONFIG_START( vroulet )
+MACHINE_CONFIG_START(vroulet_state::vroulet)
 	// basic machine hardware
 	MCFG_CPU_ADD("maincpu", Z80, 4000000)   //???
 	MCFG_CPU_PROGRAM_MAP(vroulet_map)

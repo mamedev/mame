@@ -61,9 +61,9 @@ Address   Description
 
 
 // Standard H19 used a 2.048 MHz clock
-#define H19_CLOCK (XTAL_12_288MHz / 6)
-#define MC6845_CLOCK (XTAL_12_288MHz /8)
-#define INS8250_CLOCK (XTAL_12_288MHz /4)
+#define H19_CLOCK (XTAL(12'288'000) / 6)
+#define MC6845_CLOCK (XTAL(12'288'000) /8)
+#define INS8250_CLOCK (XTAL(12'288'000) /4)
 
 // Capacitor value in pF
 #define H19_KEY_DEBOUNCE_CAPACITOR 5000
@@ -108,6 +108,7 @@ public:
 
 	MC6845_UPDATE_ROW(crtc_update_row);
 
+	void h19(machine_config &config);
 private:
 	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr) override;
 	virtual void machine_reset() override;
@@ -153,14 +154,14 @@ void h19_state::device_timer(emu_timer &timer, device_timer_id id, int param, vo
 
 
 
-static ADDRESS_MAP_START(h19_mem, AS_PROGRAM, 8, h19_state)
+static ADDRESS_MAP_START( mem_map, AS_PROGRAM, 8, h19_state )
 	ADDRESS_MAP_UNMAP_HIGH
 	AM_RANGE(0x0000, 0x1fff) AM_MIRROR(0x2000) AM_ROM
 	AM_RANGE(0x4000, 0x4100) AM_MIRROR(0x3e00) AM_RAM
 	AM_RANGE(0xc000, 0xc7ff) AM_MIRROR(0x3800) AM_RAM AM_SHARE("videoram")
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( h19_io, AS_IO, 8, h19_state)
+static ADDRESS_MAP_START( io_map, AS_IO, 8, h19_state )
 	ADDRESS_MAP_UNMAP_HIGH
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	AM_RANGE(0x00, 0x00) AM_MIRROR(0x1f) AM_READ_PORT("SW401")
@@ -512,11 +513,11 @@ static GFXDECODE_START( h19 )
 	GFXDECODE_ENTRY( "chargen", 0x0000, h19_charlayout, 0, 1 )
 GFXDECODE_END
 
-static MACHINE_CONFIG_START( h19 )
+MACHINE_CONFIG_START(h19_state::h19)
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", Z80, H19_CLOCK) // From schematics
-	MCFG_CPU_PROGRAM_MAP(h19_mem)
-	MCFG_CPU_IO_MAP(h19_io)
+	MCFG_CPU_PROGRAM_MAP(mem_map)
+	MCFG_CPU_IO_MAP(io_map)
 
 	/* video hardware */
 	// TODO: make configurable, Heath offered 3 different CRTs - White, Green, Amber.

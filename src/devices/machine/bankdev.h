@@ -9,11 +9,11 @@
 #define MCFG_ADDRESS_MAP_BANK_ENDIANNESS(_endianness) \
 	address_map_bank_device::set_endianness(*device, _endianness);
 
-#define MCFG_ADDRESS_MAP_BANK_DATABUS_WIDTH(_databus_width) \
-	address_map_bank_device::set_databus_width(*device, _databus_width);
+#define MCFG_ADDRESS_MAP_BANK_DATA_WIDTH(_data_width) \
+	address_map_bank_device::set_data_width(*device, _data_width);
 
-#define MCFG_ADDRESS_MAP_BANK_ADDRBUS_WIDTH(_addrbus_width) \
-	address_map_bank_device::set_addrbus_width(*device, _addrbus_width);
+#define MCFG_ADDRESS_MAP_BANK_ADDR_WIDTH(_addr_width) \
+	address_map_bank_device::set_addr_width(*device, _addr_width);
 
 #define MCFG_ADDRESS_MAP_BANK_STRIDE(_stride) \
 	address_map_bank_device::set_stride(*device, _stride);
@@ -28,8 +28,8 @@ public:
 
 	// static configuration helpers
 	static void set_endianness(device_t &device, endianness_t endianness) { downcast<address_map_bank_device &>(device).m_endianness = endianness; }
-	static void set_databus_width(device_t &device, uint8_t databus_width) { downcast<address_map_bank_device &>(device).m_databus_width = databus_width; }
-	static void set_addrbus_width(device_t &device, uint8_t addrbus_width) { downcast<address_map_bank_device &>(device).m_addrbus_width = addrbus_width; }
+	static void set_data_width(device_t &device, uint8_t data_width) { downcast<address_map_bank_device &>(device).m_data_width = data_width; }
+	static void set_addr_width(device_t &device, uint8_t addr_width) { downcast<address_map_bank_device &>(device).m_addr_width = addr_width; }
 	static void set_stride(device_t &device, uint32_t stride) { downcast<address_map_bank_device &>(device).m_stride = stride; }
 
 	DECLARE_ADDRESS_MAP(amap8, 8);
@@ -59,8 +59,8 @@ protected:
 private:
 	// internal state
 	endianness_t m_endianness;
-	uint8_t m_databus_width;
-	uint8_t m_addrbus_width;
+	uint8_t m_data_width;
+	uint8_t m_addr_width;
 	uint32_t m_stride;
 	address_space_config m_program_config;
 	address_space *m_program;

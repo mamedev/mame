@@ -48,6 +48,7 @@ public:
 	DECLARE_DRIVER_INIT(plan80);
 	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 
+	void plan80(machine_config &config);
 private:
 	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr) override;
 	uint8_t m_kbd_row;
@@ -224,7 +225,7 @@ static GFXDECODE_START( plan80 )
 GFXDECODE_END
 
 
-static MACHINE_CONFIG_START( plan80 )
+MACHINE_CONFIG_START(plan80_state::plan80)
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu",I8080, 2048000)
 	MCFG_CPU_PROGRAM_MAP(plan80_mem)

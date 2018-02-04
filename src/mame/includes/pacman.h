@@ -13,23 +13,24 @@ class pacman_state : public driver_device
 {
 public:
 	pacman_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag),
-		m_maincpu(*this, "maincpu"),
-		m_namco_sound(*this, "namco"),
-		m_watchdog(*this, "watchdog"),
-		m_spriteram(*this, "spriteram"),
-		m_spriteram2(*this, "spriteram2"),
-		m_s2650_spriteram(*this, "s2650_spriteram"),
-		m_videoram(*this, "videoram"),
-		m_colorram(*this, "colorram"),
-		m_s2650games_tileram(*this, "s2650_tileram"),
-		m_rocktrv2_prot_data(*this, "rocktrv2_prot"),
-		m_gfxdecode(*this, "gfxdecode"),
-		m_palette(*this, "palette"),
-		m_patched_opcodes(*this, "patched_opcodes")
+		: driver_device(mconfig, type, tag)
+		, m_maincpu(*this, "maincpu")
+		, m_namco_sound(*this, "namco")
+		, m_watchdog(*this, "watchdog")
+		, m_spriteram(*this, "spriteram")
+		, m_spriteram2(*this, "spriteram2")
+		, m_s2650_spriteram(*this, "s2650_spriteram")
+		, m_videoram(*this, "videoram")
+		, m_colorram(*this, "colorram")
+		, m_s2650games_tileram(*this, "s2650_tileram")
+		, m_rocktrv2_prot_data(*this, "rocktrv2_prot")
+		, m_gfxdecode(*this, "gfxdecode")
+		, m_palette(*this, "palette")
 	{ }
 
 	required_device<cpu_device> m_maincpu;
+
+private:
 	optional_device<namco_device> m_namco_sound;
 	required_device<watchdog_timer_device> m_watchdog;
 	optional_shared_ptr<uint8_t> m_spriteram;
@@ -41,7 +42,6 @@ public:
 	optional_shared_ptr<uint8_t> m_rocktrv2_prot_data;
 	required_device<gfxdecode_device> m_gfxdecode;
 	required_device<palette_device> m_palette;
-	optional_shared_ptr<uint8_t> m_patched_opcodes;
 
 	uint8_t m_cannonb_bit_to_read;
 	int m_mystery;
@@ -57,6 +57,11 @@ public:
 	uint8_t m_bgpriority;
 	int m_xoffsethack;
 	uint8_t m_inv_spr;
+	uint8_t m_maketrax_counter;
+	uint8_t m_maketrax_offset;
+	int m_maketrax_disable_protection;
+
+public:
 	uint8_t m_irq_mask;
 
 	DECLARE_WRITE8_MEMBER(pacman_interrupt_vector_w);
@@ -69,10 +74,10 @@ public:
 	DECLARE_WRITE8_MEMBER(alibaba_sound_w);
 	DECLARE_READ8_MEMBER(alibaba_mystery_1_r);
 	DECLARE_READ8_MEMBER(alibaba_mystery_2_r);
+	DECLARE_WRITE8_MEMBER(maketrax_protection_w);
+	DECLARE_READ8_MEMBER(mbrush_prot_r);
 	DECLARE_READ8_MEMBER(maketrax_special_port2_r);
 	DECLARE_READ8_MEMBER(maketrax_special_port3_r);
-	DECLARE_READ8_MEMBER(korosuke_special_port2_r);
-	DECLARE_READ8_MEMBER(korosuke_special_port3_r);
 	DECLARE_READ8_MEMBER(mschamp_kludge_r);
 	DECLARE_WRITE8_MEMBER(bigbucks_bank_w);
 	DECLARE_READ8_MEMBER(bigbucks_question_r);
@@ -125,7 +130,6 @@ public:
 	DECLARE_DRIVER_INIT(woodpek);
 	DECLARE_DRIVER_INIT(cannonbp);
 	DECLARE_DRIVER_INIT(jumpshot);
-	DECLARE_DRIVER_INIT(korosuke);
 	DECLARE_DRIVER_INIT(mspacii);
 	DECLARE_DRIVER_INIT(pacplus);
 	DECLARE_DRIVER_INIT(rocktrv2);
@@ -134,6 +138,7 @@ public:
 	DECLARE_DRIVER_INIT(porky);
 	DECLARE_DRIVER_INIT(mspacman);
 	DECLARE_DRIVER_INIT(mschamp);
+	DECLARE_DRIVER_INIT(mbrush);
 	TILEMAP_MAPPER_MEMBER(pacman_scan_rows);
 	TILE_GET_INFO_MEMBER(pacman_get_tile_info);
 	TILE_GET_INFO_MEMBER(s2650_get_tile_info);
@@ -145,6 +150,7 @@ public:
 	DECLARE_VIDEO_START(s2650games);
 	DECLARE_MACHINE_RESET(mschamp);
 	DECLARE_MACHINE_RESET(superabc);
+	DECLARE_MACHINE_RESET(maketrax);
 	DECLARE_VIDEO_START(pengo);
 	DECLARE_VIDEO_START(jrpacman);
 	uint32_t screen_update_pacman(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
@@ -152,13 +158,14 @@ public:
 	INTERRUPT_GEN_MEMBER(vblank_irq);
 	INTERRUPT_GEN_MEMBER(vblank_nmi);
 	INTERRUPT_GEN_MEMBER(s2650_interrupt);
+
+private:
 	void init_save_state();
 	void jrpacman_mark_tile_dirty( int offset );
-	void maketrax_rom_decode();
-	void korosuke_rom_decode();
 	void eyes_decode(uint8_t *data);
 	void mspacman_install_patches(uint8_t *ROM);
 
+public:
 	// epos.c
 	DECLARE_READ8_MEMBER(epos_decryption_w);
 	DECLARE_MACHINE_START(theglobp);
@@ -168,6 +175,34 @@ public:
 	DECLARE_MACHINE_START(acitya);
 	DECLARE_MACHINE_RESET(acitya);
 
+	void birdiy(machine_config &config);
+	void rocktrv2(machine_config &config);
+	void mspacman(machine_config &config);
+	void dremshpr(machine_config &config);
+	void mschamp(machine_config &config);
+	void acitya(machine_config &config);
+	void theglobp(machine_config &config);
+	void nmouse(machine_config &config);
+	void vanvan(machine_config &config);
+	void s2650games(machine_config &config);
+	void woodpek(machine_config &config);
+	void crushs(machine_config &config);
+	void eeekk(machine_config &config);
+	void superabc(machine_config &config);
+	void numcrash(machine_config &config);
+	void crush4(machine_config &config);
+	void bigbucks(machine_config &config);
+	void porky(machine_config &config);
+	void pacman(machine_config &config);
+	void _8bpm(machine_config &config);
+	void maketrax(machine_config &config);
+	void korosuke(machine_config &config);
+	void alibaba(machine_config &config);
+	void drivfrcp(machine_config &config);
+	void pengojpm(machine_config &config);
+	void piranha(machine_config &config);
+
+private:
 	// pacplus.c
 	uint8_t pacplus_decrypt(int addr, uint8_t e);
 	void pacplus_decode();

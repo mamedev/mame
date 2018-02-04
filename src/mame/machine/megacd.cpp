@@ -285,7 +285,7 @@ static GFXDECODE_START( segacd )
 GFXDECODE_END
 
 
-MACHINE_CONFIG_MEMBER( sega_segacd_device::device_add_mconfig )
+MACHINE_CONFIG_START(sega_segacd_device::device_add_mconfig)
 
 	MCFG_CPU_ADD("segacd_68k", M68000, SEGACD_CLOCK ) /* 12.5 MHz */
 	MCFG_CPU_PROGRAM_MAP(segacd_map)
@@ -842,13 +842,13 @@ READ16_MEMBER( sega_segacd_device::segacd_main_dataram_part1_r )
 			// used by Heart of the Alien
 
 			if(offset<0x30000/2)        /* 0x20000 - 0x2ffff */ // 512x256 bitmap. tiles
-				offset = BITSWAP24(offset,23,22,21,20,19,18,17,16,15,8,7,6,5,4,3,2,1,14,13,12,11,10,9,0);
+				offset = bitswap<24>(offset,23,22,21,20,19,18,17,16,15,8,7,6,5,4,3,2,1,14,13,12,11,10,9,0);
 			else if(offset<0x38000/2)   /* 0x30000 - 0x37fff */  // 512x128 bitmap. tiles
-				offset = BITSWAP24(offset,23,22,21,20,19,18,17,16,15,14,7,6,5,4,3,2,1,13,12,11,10,9,8,0);
+				offset = bitswap<24>(offset,23,22,21,20,19,18,17,16,15,14,7,6,5,4,3,2,1,13,12,11,10,9,8,0);
 			else if(offset<0x3c000/2)   /* 0x38000 - 0x3bfff */  // 512x64 bitmap. tiles
-				offset = BITSWAP24(offset,23,22,21,20,19,18,17,16,15,14,13,6,5,4,3,2,1,12,11,10,9,8,7,0);
+				offset = bitswap<24>(offset,23,22,21,20,19,18,17,16,15,14,13,6,5,4,3,2,1,12,11,10,9,8,7,0);
 			else  /* 0x3c000 - 0x3dfff and 0x3e000 - 0x3ffff */  // 512x32 bitmap (x2) -> tiles
-				offset = BITSWAP24(offset,23,22,21,20,19,18,17,16,15,14,13,12,5,4,3,2,1,11,10,9,8,7,6,0);
+				offset = bitswap<24>(offset,23,22,21,20,19,18,17,16,15,14,13,12,5,4,3,2,1,11,10,9,8,7,6,0);
 
 			offset &=0xffff;
 			// HOTA cares about this

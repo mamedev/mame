@@ -31,6 +31,8 @@
 ***************************************************************************/
 
 #include "emu.h"
+#include "coco_ssc.h"
+
 #include "sound/ay8910.h"
 #include "sound/sp0256.h"
 #include "machine/netlist.h"
@@ -150,16 +152,14 @@ DEFINE_DEVICE_TYPE(COCOSSC_SAC, cocossc_sac_device, "cocossc_sac", "CoCo SSC Sou
 //  MACHINE FRAGMENTS AND ADDRESS MAPS
 //**************************************************************************
 
-static ADDRESS_MAP_START(ssc_io_map, AS_IO, 8, coco_ssc_device)
-	AM_RANGE(TMS7000_PORTA, TMS7000_PORTA) AM_READ(ssc_port_a_r)
-	AM_RANGE(TMS7000_PORTB, TMS7000_PORTB) AM_WRITE(ssc_port_b_w)
-	AM_RANGE(TMS7000_PORTC, TMS7000_PORTC) AM_READWRITE(ssc_port_c_r, ssc_port_c_w)
-	AM_RANGE(TMS7000_PORTD, TMS7000_PORTD) AM_READWRITE(ssc_port_d_r, ssc_port_d_w)
-ADDRESS_MAP_END
-
-MACHINE_CONFIG_MEMBER(coco_ssc_device::device_add_mconfig)
-	MCFG_CPU_ADD(PIC_TAG, TMS7040, DERIVED_CLOCK(1, 2))
-	MCFG_CPU_IO_MAP(ssc_io_map)
+MACHINE_CONFIG_START(coco_ssc_device::device_add_mconfig)
+	MCFG_CPU_ADD(PIC_TAG, TMS7040, DERIVED_CLOCK(2, 1))
+	MCFG_TMS7000_IN_PORTA_CB(READ8(coco_ssc_device, ssc_port_a_r))
+	MCFG_TMS7000_OUT_PORTB_CB(WRITE8(coco_ssc_device, ssc_port_b_w))
+	MCFG_TMS7000_IN_PORTC_CB(READ8(coco_ssc_device, ssc_port_c_r))
+	MCFG_TMS7000_OUT_PORTC_CB(WRITE8(coco_ssc_device, ssc_port_c_w))
+	MCFG_TMS7000_IN_PORTD_CB(READ8(coco_ssc_device, ssc_port_d_r))
+	MCFG_TMS7000_OUT_PORTD_CB(WRITE8(coco_ssc_device, ssc_port_d_w))
 
 	MCFG_RAM_ADD("staticram")
 	MCFG_RAM_DEFAULT_SIZE("2K")
@@ -167,15 +167,15 @@ MACHINE_CONFIG_MEMBER(coco_ssc_device::device_add_mconfig)
 
 	MCFG_SPEAKER_STANDARD_MONO("ssc_audio")
 
-	MCFG_SOUND_ADD(SP0256_TAG, SP0256, XTAL_3_12MHz)
+	MCFG_SOUND_ADD(SP0256_TAG, SP0256, XTAL(3'120'000))
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "ssc_audio", SP0256_GAIN)
 	MCFG_SP0256_DATA_REQUEST_CB(INPUTLINE(PIC_TAG, TMS7000_INT1_LINE))
 
-	MCFG_SOUND_ADD(AY_TAG, AY8913, DERIVED_CLOCK(1, 2))
+	MCFG_SOUND_ADD(AY_TAG, AY8913, DERIVED_CLOCK(2, 1))
 	MCFG_AY8910_OUTPUT_TYPE(AY8910_SINGLE_OUTPUT)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "coco_sac_tag", AY8913_GAIN)
 
-	MCFG_DEVICE_ADD("coco_sac_tag", COCOSSC_SAC, DERIVED_CLOCK(1, 2))
+	MCFG_DEVICE_ADD("coco_sac_tag", COCOSSC_SAC, DERIVED_CLOCK(2, 1))
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "ssc_audio", 1.0)
 MACHINE_CONFIG_END
 

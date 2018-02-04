@@ -85,8 +85,6 @@ public:
 	DECLARE_READ16_MEMBER( bootleg_custom_io_r );
 	DECLARE_WRITE16_MEMBER( bootleg_custom_io_w );
 
-	DECLARE_READ16_MEMBER( fpointbla_2002e_r );
-
 	// sound CPU read/write handlers
 	DECLARE_WRITE8_MEMBER( upd7759_control_w );
 	DECLARE_READ8_MEMBER( upd7759_status_r );
@@ -113,7 +111,7 @@ public:
 	DECLARE_DRIVER_INIT(hwchamp_5521);
 	DECLARE_DRIVER_INIT(altbeas5_5521);
 	DECLARE_DRIVER_INIT(sdi_5358_small);
-	DECLARE_DRIVER_INIT(generic_5358_fpointbla);	
+	DECLARE_DRIVER_INIT(fpointbla);
 	DECLARE_DRIVER_INIT(altbeasj_5521);
 	DECLARE_DRIVER_INIT(ddux_5704);
 	DECLARE_DRIVER_INIT(snapper);
@@ -141,6 +139,23 @@ public:
 	// bootleg stuff
 	void tilemap_16b_fpointbl_fill_latch(int i, uint16_t* latched_pageselect, uint16_t* latched_yscroll, uint16_t* latched_xscroll, uint16_t* textram);
 
+	void rom_5797_fragment(machine_config &config);
+	void system16b_fd1094_5797(machine_config &config);
+	void fpointbla(machine_config &config);
+	void atomicp(machine_config &config);
+	void aceattacb_fd1094(machine_config &config);
+	void system16b_i8751(machine_config &config);
+	void system16c(machine_config &config);
+	void system16b_mc8123(machine_config &config);
+	void system16b_i8751_5797(machine_config &config);
+	void system16b_fd1089a(machine_config &config);
+	void system16b_5797(machine_config &config);
+	void system16b_split(machine_config &config);
+	void system16b_fd1089b(machine_config &config);
+	void system16b(machine_config &config);
+	void system16b_fd1094(machine_config &config);
+	void fpointbl(machine_config &config);
+	void lockonph(machine_config &config);
 protected:
 	// internal types
 	typedef delegate<void ()> i8751_sim_delegate;
@@ -243,6 +258,25 @@ protected:
 
 };
 
+class afighter_16b_analog_state : public segas16b_state
+{
+public:
+	// construction/destruction
+	afighter_16b_analog_state(const machine_config &mconfig, device_type type, const char *tag)
+		: segas16b_state(mconfig, type, tag),
+			m_accel(*this, "ACCEL"),
+			m_steer(*this, "STEER")
+	{ }
+
+	DECLARE_CUSTOM_INPUT_MEMBER(afighter_accel_r);
+	DECLARE_CUSTOM_INPUT_MEMBER(afighter_handl_left_r);
+	DECLARE_CUSTOM_INPUT_MEMBER(afighter_handl_right_r);
+
+	protected:
+	required_ioport     m_accel;
+	required_ioport     m_steer;
+};
+
 
 // ======================> isgsm_state
 
@@ -313,4 +347,5 @@ public:
 	uint8_t           m_rle_control_byte;
 	bool            m_rle_latched;
 	uint8_t           m_rle_byte;
+	void isgsm(machine_config &config);
 };

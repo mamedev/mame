@@ -51,7 +51,10 @@ function cheatfind.startplugin()
 
 	-- save data block
 	function cheat.save(space, start, size)
-		local data = { block = "", start = start, size = size, space = space }
+		local data = { block = "", start = start, size = size, space = space, shift = 0 }
+		if getmetatable(space).__name:match("addr_space") then
+			data.shift = space.shift
+		end
 		if getmetatable(space).__name:match("device_t") then
 			if space:shortname() == "ram" then
 				data.block = emu.item(space.items["0/m_pointer"]):read_block(start, size)
@@ -63,14 +66,30 @@ function cheatfind.startplugin()
 			local block = ""
 			local temp = {}
 			local j = 1
-			for i = start, start + size do
-				if j < 65536 then
-					temp[j] = string.pack("B", space:read_u8(i, true))
-					j = j + 1
-				else
-					block = block .. table.concat(temp) .. string.pack("B", space:read_u8(i, true))
-					temp = {}
-					j = 1
+			if data.shift >= 0 then -- region or byte wide space
+				for i = start, start + (size << data.shift), 1 << data.shift do
+					if j < 65536 then
+						temp[j] = string.pack("B", space:read_u8(i))
+						j = j + 1
+					else
+						block = block .. table.concat(temp) .. string.pack("B", space:read_u8(i))
+						temp = {}
+						j = 1
+					end
+				end
+			elseif data.shift < 0 then
+				local s = -data.shift
+				local read = (s == 1) and space.read_u16 or (s == 2) and space.read_u32 or (s == 3) and space.read_u64 or space.read_u8
+				local pack = (s == 1) and "<H" or (s == 2) and "<L" or (s == 3) and "<J" or "B"
+				for i = start, start + (size >> s) do
+					if j < 65536 then
+						temp[j] = string.pack(pack, read(space, i))
+						j = j + 1
+					else
+						block = block .. table.concat(temp) .. string.pack(pack, read(space, i))
+						temp = {}
+						j = 1
+					end
 				end
 			end
 			block = block .. table.concat(temp)
@@ -154,7 +173,12 @@ function cheatfind.startplugin()
 			if oldstat and newstat then
 				local oldc, newc = old, new
 				local comp = false
-				local addr = olddata.start + i - 1
+				local addr = i - 1
+				if olddata.shift ~= 0 then
+					local s = olddata.shift
+					addr = (s < 0) and addr >> -s or (s > 0) and addr << s
+				end
+				addr = addr + olddata.start
 				if not bcd or (check_bcd(old) and check_bcd(new)) then
 					if bcd then
 						oldc = frombcd(old)
@@ -275,6 +299,11 @@ function cheatfind.startplugin()
 				for num, entry in pairs(list.program.map) do
 					if entry.writetype == "ram" then
 						ram[#ram + 1] = { offset = entry.offset, size = entry.endoff - entry.offset }
+						if list.program.shift > 0 then
+							ram[#ram].size = ram[#ram].size >> list.program.shift
+						elseif list.program.shift < 0 then
+							ram[#ram].size = ram[#ram].size << -list.program.shift
+						end
 					end
 				end
 				if next(ram) then
@@ -389,17 +418,17 @@ function cheatfind.startplugin()
 						if file then
 							file:write(string.format(cheat_save.json, desc))
 							file:close()
-							if not devtable[devcur].space.shortname then -- no xml or simple for ram_device cheat
+							if not getmetatable(devtable[devcur].space).__name:match("device_t") then -- no xml or simple for ram_device cheat
 								file = io.open(filename .. ".xml", "w")
 								file:write(string.format(cheat_save.xml, desc))
 								file:close()
 								file = io.open(cheat_save.path .. "/cheat.simple", "a")
 								file:write(string.format(cheat_save.simple, desc))
 								file:close()
-								manager:machine():popmessage(string.format(_("Cheat written to %s and added to cheat.simple"), cheat_save.filename))
+								manager:machine():popmessage(string.format(_("Cheat written to %s and added to cheat.simple"), filename))
 							end
 							written = true
-						elseif not devtable[devcur].space.shortname then
+						elseif not getmetatable(devtable[devcur].space).__name:match("device_t") then
 							file = io.open(cheat_save.path .. "/cheat.simple", "a")
 							if file then
 								file:write(string.format(cheat_save.simple, desc))
@@ -680,12 +709,12 @@ function cheatfind.startplugin()
 					end
 
 
-					if dev.space.shortname then
+					if getmetatable(dev.space).__name:match("device_t") then
 						cheat.ram = { ram = dev.tag }
 						cheat.script.run = "ram:write(" .. match.addr .. "," .. match.newval .. ")"
 					else
 						cheat.space = { cpu = { tag = dev.tag, type = "program" } }
-						cheat.script.run = "cpu:write_" .. wid .. "(" .. match.addr .. "," .. match.newval .. ", true)"
+						cheat.script.run = "cpu:write_" .. wid .. "(" .. match.addr .. "," .. match.newval .. ")"
 					end
 					if match.mode == 1 then
 						if not _G.ce then
@@ -715,12 +744,12 @@ function cheatfind.startplugin()
 						cheat_save.json = json.stringify({[1] = cheat}, {indent = true})
 						cheat_save.xml = string.format("<mamecheat version=1>\n<cheat desc=\"%%s\">\n<script state=\"run\">\n<action>%s.pp%s@%X=%X</action>\n</script>\n</cheat>\n</mamecheat>", dev.tag:sub(2), widchar, match.addr, match.newval)
 						cheat_save.simple = string.format("%s,%s,%X,%s,%X,%%s\n", setname, dev.tag, match.addr, widchar, match.newval)
-						manager:machine():popmessage(_("Default name is ") .. cheat_save.name)
+						manager:machine():popmessage(string.format(_("Default name is %s"), cheat_save.name))
 						return true
 					else
 						local func = "return space:read"
 						local env = { space = devtable[devcur].space }
-						if not dev.space.shortname then
+						if not getmetatable(dev.space).__name:match("device_t") then
 							func = func .. "_" .. wid
 						end
 						func = func .. "(" .. match.addr .. ")"

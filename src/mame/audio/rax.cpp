@@ -130,7 +130,7 @@ WRITE16_MEMBER( acclaim_rax_device::adsp_control_w )
 					{
 						uint32_t src_dword = (adsp_rom[src_addr + 0] << 16) | (adsp_rom[src_addr + 1] << 8) | adsp_rom[src_addr + 2];
 
-						addr_space->write_dword(m_control_regs[BDMA_INT_ADDR_REG] * 4, src_dword);
+						addr_space->write_dword(m_control_regs[BDMA_INT_ADDR_REG], src_dword);
 
 						src_addr += 3;
 						++m_control_regs[BDMA_INT_ADDR_REG];
@@ -143,7 +143,7 @@ WRITE16_MEMBER( acclaim_rax_device::adsp_control_w )
 					{
 						uint16_t src_word = (adsp_rom[src_addr + 0] << 8) | adsp_rom[src_addr + 1];
 
-						addr_space->write_word(m_control_regs[BDMA_INT_ADDR_REG] * 2, src_word);
+						addr_space->write_word(m_control_regs[BDMA_INT_ADDR_REG], src_word);
 
 						src_addr += 2;
 						++m_control_regs[BDMA_INT_ADDR_REG];
@@ -158,7 +158,7 @@ WRITE16_MEMBER( acclaim_rax_device::adsp_control_w )
 					{
 						uint16_t src_word = adsp_rom[src_addr] << shift;
 
-						addr_space->write_word(m_control_regs[BDMA_INT_ADDR_REG] * 2, src_word);
+						addr_space->write_word(m_control_regs[BDMA_INT_ADDR_REG], src_word);
 
 						++src_addr;
 						++m_control_regs[BDMA_INT_ADDR_REG];
@@ -168,7 +168,9 @@ WRITE16_MEMBER( acclaim_rax_device::adsp_control_w )
 			}
 			else
 			{
-				fatalerror("DMA to byte memory!");
+				// TODO: last stage in Batman Forever!?
+				// page = 0, dir = 1, type = 1, src_addr = 0xfd
+				fatalerror("%s DMA to byte memory!",this->tag());
 			}
 
 			attotime word_period = attotime::from_hz(m_cpu->unscaled_clock());
@@ -225,7 +227,7 @@ TIMER_DEVICE_CALLBACK_MEMBER( acclaim_rax_device::dma_timer_callback )
 	if (m_control_regs[BDMA_CONTROL_REG] & 8)
 		m_cpu->set_input_line(INPUT_LINE_RESET, PULSE_LINE);
 	else
-		m_cpu->machine().driver_data()->generic_pulse_irq_line(*m_cpu, ADSP2181_BDMA, 1);
+		m_cpu->pulse_input_line(ADSP2181_BDMA, m_cpu->minimum_quantum_time());
 
 	timer.adjust(attotime::never);
 }
@@ -353,7 +355,7 @@ void acclaim_rax_device::adsp_irq(int which)
 
 	for (uint32_t i = 0; i < count; i++)
 	{
-		buffer[i] = m_data->read_word(reg * 2);
+		buffer[i] = m_data->read_word(reg);
 		reg += m_incs[which];
 	}
 
@@ -485,8 +487,8 @@ acclaim_rax_device::acclaim_rax_device(const machine_config &mconfig, const char
 // device_add_mconfig - add device configuration
 //-------------------------------------------------
 
-MACHINE_CONFIG_MEMBER( acclaim_rax_device::device_add_mconfig )
-	MCFG_CPU_ADD("adsp", ADSP2181, XTAL_16_67MHz)
+MACHINE_CONFIG_START(acclaim_rax_device::device_add_mconfig)
+	MCFG_CPU_ADD("adsp", ADSP2181, XTAL(16'670'000))
 	MCFG_ADSP21XX_SPORT_TX_CB(WRITE32(acclaim_rax_device, adsp_sound_tx_callback))      /* callback for serial transmit */
 	MCFG_ADSP21XX_DMOVLAY_CB(WRITE32(acclaim_rax_device, dmovlay_callback)) // callback for adsp 2181 dmovlay instruction
 	MCFG_CPU_PROGRAM_MAP(adsp_program_map)

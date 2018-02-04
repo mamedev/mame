@@ -53,6 +53,7 @@ public:
 	required_device<sc61860_device> m_maincpu;
 	required_device<ram_device> m_ram;
 
+	void pc1350(machine_config &config);
 protected:
 	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr) override;
 };

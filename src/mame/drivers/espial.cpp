@@ -137,13 +137,13 @@ static ADDRESS_MAP_START( netwars_map, AS_PROGRAM, 8, espial_state )
 	AM_RANGE(0x7000, 0x7000) AM_DEVREADWRITE("watchdog", watchdog_timer_device, reset_r, reset_w)
 	AM_RANGE(0x7100, 0x7100) AM_WRITE(espial_master_interrupt_mask_w)
 	AM_RANGE(0x7200, 0x7200) AM_WRITE(espial_flipscreen_w)
-	AM_RANGE(0x8000, 0x801f) AM_RAM AM_SHARE("spriteram_1")
 	AM_RANGE(0x8000, 0x87ff) AM_RAM_WRITE(espial_videoram_w) AM_SHARE("videoram")
-	AM_RANGE(0x8800, 0x880f) AM_RAM AM_SHARE("spriteram_3")
+	AM_RANGE(0x8000, 0x801f) AM_RAM AM_SHARE("spriteram_1")
 	AM_RANGE(0x8800, 0x8fff) AM_RAM_WRITE(espial_attributeram_w) AM_SHARE("attributeram")
+	AM_RANGE(0x8800, 0x880f) AM_RAM AM_SHARE("spriteram_3")
+	AM_RANGE(0x9000, 0x97ff) AM_RAM_WRITE(espial_colorram_w) AM_SHARE("colorram")
 	AM_RANGE(0x9000, 0x901f) AM_RAM AM_SHARE("spriteram_2")
 	AM_RANGE(0x9020, 0x903f) AM_RAM_WRITE(espial_scrollram_w) AM_SHARE("scrollram")
-	AM_RANGE(0x9000, 0x97ff) AM_RAM_WRITE(espial_colorram_w) AM_SHARE("colorram")
 ADDRESS_MAP_END
 
 
@@ -315,7 +315,7 @@ GFXDECODE_END
 
 
 
-static MACHINE_CONFIG_START( espial )
+MACHINE_CONFIG_START(espial_state::espial)
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", Z80, 3072000)   /* 3.072 MHz */
@@ -352,7 +352,7 @@ static MACHINE_CONFIG_START( espial )
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_DERIVED( netwars, espial )
+MACHINE_CONFIG_DERIVED(espial_state::netwars, espial)
 
 	/* basic machine hardware */
 

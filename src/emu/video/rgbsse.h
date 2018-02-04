@@ -41,6 +41,12 @@ public:
 	void set(const u32& rgba) { m_value = _mm_unpacklo_epi16(_mm_unpacklo_epi8(_mm_cvtsi32_si128(rgba), _mm_setzero_si128()), _mm_setzero_si128()); }
 	void set(s32 a, s32 r, s32 g, s32 b) { m_value = _mm_set_epi32(a, r, g, b); }
 	void set(const rgb_t& rgb) { set((const u32&) rgb); }
+	// This function sets all elements to the same val
+	void set_all(const s32& val) { m_value = _mm_set1_epi32(val); }
+	// This function zeros all elements
+	void zero() { m_value = _mm_xor_si128(m_value, m_value); }
+	// This function zeros only the alpha element
+	void zero_alpha() { m_value = _mm_and_si128(m_value, alpha_mask()); }
 
 	inline rgb_t to_rgba() const
 	{
@@ -52,6 +58,7 @@ public:
 		return _mm_cvtsi128_si32(_mm_packus_epi16(_mm_packs_epi32(m_value, _mm_setzero_si128()), _mm_setzero_si128()));
 	}
 
+	void set_a16(const s32 value) { m_value = _mm_insert_epi16(m_value, value, 6); }
 #ifdef __SSE4_1__
 	void set_a(const s32 value) { m_value = _mm_insert_epi32(m_value, value, 3); }
 	void set_r(const s32 value) { m_value = _mm_insert_epi32(m_value, value, 2); }
@@ -292,9 +299,9 @@ public:
 	// Leave this here in case Model3 blows up...
 	//inline void scale_imm_and_clamp(const s32 scale)
 	//{
-	//	mul_imm(scale);
-	//	sra_imm(8);
-	//	clamp_to_uint8();
+	//  mul_imm(scale);
+	//  sra_imm(8);
+	//  clamp_to_uint8();
 	//}
 
 	// This version needs values to be 12 bits or less
@@ -330,7 +337,10 @@ public:
 		m_value = _mm_slli_epi16(m_value, 4);
 		// Do the 16 bit multiply, bottom 64 bits will contain 16 bit truncated results
 		m_value = _mm_mulhi_epi16(m_value, tmp1);
-		// Unpack into 32 bit values
+		// Clamp to u8
+		m_value = _mm_packus_epi16(m_value, _mm_setzero_si128());
+		// Unpack up to s32
+		m_value = _mm_unpacklo_epi8(m_value, _mm_setzero_si128());
 		m_value = _mm_unpacklo_epi16(m_value, _mm_setzero_si128());
 		add(other);
 		clamp_to_uint8();
@@ -404,6 +414,11 @@ public:
 	{
 		m_value = _mm_srai_epi32(m_value, shift);
 		return *this;
+	}
+
+	inline void merge_alpha16(const rgbaint_t& alpha)
+	{
+		m_value = _mm_insert_epi16(m_value, _mm_extract_epi16(alpha.m_value, 6), 6);
 	}
 
 	inline void merge_alpha(const rgbaint_t& alpha)

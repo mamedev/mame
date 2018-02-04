@@ -4,7 +4,7 @@
 
 learnwin.cpp
 
-Learning-Window Teaching Computer by V-Tech /  Spiel Master by Yuvo (German)
+Learning-Window Teaching Computer by VTech / Spiel Master by Yuvo (German)
 
 Info from Kevin Horton (Kevtris):
 The -081 on the 'speech' cart board had that mystery sp0256 next to it with its markings ground off.
@@ -63,6 +63,7 @@ public:
 		bitmap.fill(rgb_t::black(), cliprect);
 		return 0;
 	}
+	void learnwin(machine_config &config);
 protected:
 	// driver_device overrides
 	virtual void machine_start() override;
@@ -137,7 +138,7 @@ void learnwin_state::machine_reset()
 }
 
 
-static MACHINE_CONFIG_START( learnwin )
+MACHINE_CONFIG_START(learnwin_state::learnwin)
 
 	/* video hardware */
 //  MCFG_SCREEN_ADD("screen", LCD)
@@ -201,8 +202,8 @@ ROM_START( spielmast )
 //  GAME DRIVERS
 //**************************************************************************
 
-COMP( 1986, learnwin,  0,        0, learnwin, learnwin, learnwin_state, 0, "V-Tech", "Learning-Window Teaching Machine (Rev 3)", MACHINE_IS_SKELETON )
-COMP( 1986, learnwin2, learnwin, 0, learnwin, learnwin, learnwin_state, 0, "V-Tech", "Learning-Window Teaching Machine (Rev 2)", MACHINE_IS_SKELETON )
-COMP( 1986, learnwin1, learnwin, 0, learnwin, learnwin, learnwin_state, 0, "V-Tech", "Learning-Window Teaching Machine (Rev 1)", MACHINE_IS_SKELETON )
-COMP( 1986, learnwinf, learnwin, 0, learnwin, learnwin, learnwin_state, 0, "V-Tech", "Learning-Window Teaching Machine (French)", MACHINE_IS_SKELETON )
+COMP( 1986, learnwin,  0,        0, learnwin, learnwin, learnwin_state, 0, "VTech", "Learning-Window Teaching Machine (Rev 3)", MACHINE_IS_SKELETON )
+COMP( 1986, learnwin2, learnwin, 0, learnwin, learnwin, learnwin_state, 0, "VTech", "Learning-Window Teaching Machine (Rev 2)", MACHINE_IS_SKELETON )
+COMP( 1986, learnwin1, learnwin, 0, learnwin, learnwin, learnwin_state, 0, "VTech", "Learning-Window Teaching Machine (Rev 1)", MACHINE_IS_SKELETON )
+COMP( 1986, learnwinf, learnwin, 0, learnwin, learnwin, learnwin_state, 0, "VTech", "Learning-Window Teaching Machine (French)", MACHINE_IS_SKELETON )
 COMP( 1986, spielmast, learnwin, 0, learnwin, learnwin, learnwin_state, 0, "Yuvo",   "Spiel Master (German)", MACHINE_IS_SKELETON )

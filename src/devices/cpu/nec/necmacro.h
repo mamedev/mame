@@ -55,8 +55,8 @@
 
 #define JMP(flag)                           \
 	int tmp;                                \
-	EMPTY_PREFETCH();                       \
-	tmp = (int)((int8_t)FETCH());             \
+	EMPTY_PREfetch();                       \
+	tmp = (int)((int8_t)fetch());             \
 	if (flag)                               \
 	{                                       \
 		static const uint8_t table[3]={3,10,10};  \
@@ -98,7 +98,7 @@
 	Breg(AL) &= 0x0F
 
 #define BITOP_BYTE                          \
-	ModRM = FETCH();                            \
+	ModRM = fetch();                            \
 	if (ModRM >= 0xc0) {                    \
 		tmp=Breg(Mod_RM.RM.b[ModRM]);   \
 	}                                       \
@@ -108,7 +108,7 @@
 	}
 
 #define BITOP_WORD                          \
-	ModRM = FETCH();                            \
+	ModRM = fetch();                            \
 	if (ModRM >= 0xc0) {                    \
 		tmp=Wreg(Mod_RM.RM.w[ModRM]);   \
 	}                                       \

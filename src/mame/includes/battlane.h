@@ -51,4 +51,5 @@ public:
 	INTERRUPT_GEN_MEMBER(battlane_cpu1_interrupt);
 	void draw_sprites( bitmap_ind16 &bitmap, const rectangle &cliprect );
 	void draw_fg_bitmap( bitmap_ind16 &bitmap );
+	void battlane(machine_config &config);
 };

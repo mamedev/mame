@@ -56,6 +56,7 @@ public:
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
 	void intel82439tx_init();
+	void voyager(machine_config &config);
 };
 
 
@@ -240,7 +241,7 @@ static ADDRESS_MAP_START( voyager_map, AS_PROGRAM, 32, voyager_state )
 	//AM_RANGE(0x000d0000, 0x000d0003) AM_RAM  // XYLINX - Sincronus serial communication
 	AM_RANGE(0x000d0008, 0x000d000b) AM_WRITENOP // ???
 	AM_RANGE(0x000d0800, 0x000d0fff) AM_ROM AM_REGION("nvram",0) //
-	AM_RANGE(0x000d0800, 0x000d0fff) AM_RAM  // GAME_CMOS
+//  AM_RANGE(0x000d0800, 0x000d0fff) AM_RAM  // GAME_CMOS
 
 	//GRULL AM_RANGE(0x000e0000, 0x000effff) AM_RAM
 	//GRULL-AM_RANGE(0x000f0000, 0x000fffff) AM_ROMBANK("bank1")
@@ -490,7 +491,7 @@ void voyager_state::machine_reset()
 	membank("bank1")->set_base(memregion("bios")->base());
 }
 
-static MACHINE_CONFIG_START( voyager )
+MACHINE_CONFIG_START(voyager_state::voyager)
 	MCFG_CPU_ADD("maincpu", PENTIUM3, 133000000) // actually AMD Duron CPU of unknown clock
 	MCFG_CPU_PROGRAM_MAP(voyager_map)
 	MCFG_CPU_IO_MAP(voyager_io)

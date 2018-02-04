@@ -9,21 +9,24 @@
  *****************************************************************************/
 
 #include "emu.h"
+#include "scmpdasm.h"
 
-#define OP(A)   oprom[(A) - PC]
-#define ARG(A)  opram[(A) - PC]
+u32 scmp_disassembler::opcode_alignment() const
+{
+	return 1;
+}
 
-CPU_DISASSEMBLE(scmp)
+offs_t scmp_disassembler::disassemble(std::ostream &stream, offs_t pc, const data_buffer &opcodes, const data_buffer &params)
 {
 	unsigned PC = pc;
-	uint8_t op = OP(pc++);
+	uint8_t op = opcodes.r8(pc++);
 	uint8_t ptr = op & 3;
 
 	if (BIT(op,7)) {
 		// two bytes instructions
 		char as[10];
 		char aspr[10];
-		uint8_t arg = ARG(pc); pc++;
+		uint8_t arg = params.r8(pc); pc++;
 		if (arg==0x80) {
 			sprintf(as,"E");
 		} else {

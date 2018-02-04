@@ -126,9 +126,7 @@ protected:
 	virtual void state_string_export(const device_state_entry &entry, std::string &str) const override;
 
 	// device_disasm_interface overrides
-	virtual uint32_t disasm_min_opcode_bytes() const override;
-	virtual uint32_t disasm_max_opcode_bytes() const override;
-	virtual offs_t disasm_disassemble(std::ostream &stream, offs_t pc, const uint8_t *oprom, const uint8_t *opram, uint32_t options) override;
+	virtual util::disasm_interface *create_disassembler() override;
 
 	// memory accessors
 	uint32_t ROPCODE(offs_t pc);
@@ -423,7 +421,7 @@ protected:
 	uint8_t           m_lastpins;
 	uint32_t          m_ppc;
 	address_space * m_program;
-	direct_read_data *m_direct;
+	direct_read_data<0> *m_direct;
 
 	devcb_write32 m_output_pins_changed;
 	// tables

@@ -22,7 +22,7 @@
 #include "sound/ay8910.h"
 #include "speaker.h"
 
-#define AD2083_TMS5110_CLOCK        XTAL_640kHz
+#define AD2083_TMS5110_CLOCK        XTAL(640'000)
 
 /* The timer clock in Scramble which feeds the upper 4 bits of          */
 /* AY-3-8910 port A is based on the same clock                          */
@@ -290,7 +290,7 @@ static ADDRESS_MAP_START( ad2083_sound_io_map, AS_IO, 8, scramble_state )
 	AM_RANGE(0x80, 0x80) AM_DEVWRITE("ay2", ay8910_device, address_w)
 ADDRESS_MAP_END
 
-MACHINE_CONFIG_START( ad2083_audio )
+MACHINE_CONFIG_START(scramble_state::ad2083_audio)
 
 	MCFG_CPU_ADD("audiocpu", Z80, 14318000/8)   /* 1.78975 MHz */
 	MCFG_CPU_PROGRAM_MAP(ad2083_sound_map)

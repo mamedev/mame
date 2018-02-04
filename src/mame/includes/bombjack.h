@@ -37,6 +37,7 @@ public:
 	TIMER_CALLBACK_MEMBER(soundlatch_callback);
 	void draw_sprites( bitmap_ind16 &bitmap, const rectangle &cliprect );
 
+	void bombjack(machine_config &config);
 private:
 	/* memory pointers */
 	required_shared_ptr<uint8_t> m_videoram;

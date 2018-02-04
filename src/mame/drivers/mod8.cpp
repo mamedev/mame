@@ -72,6 +72,7 @@ public:
 	void kbd_put(u8 data);
 	DECLARE_READ8_MEMBER(tty_r);
 	IRQ_CALLBACK_MEMBER(mod8_irq_callback);
+	void mod8(machine_config &config);
 private:
 	uint16_t m_tty_data;
 	uint8_t m_tty_key_data;
@@ -140,7 +141,7 @@ void mod8_state::kbd_put(u8 data)
 	m_maincpu->set_input_line(0, HOLD_LINE);
 }
 
-static MACHINE_CONFIG_START( mod8 )
+MACHINE_CONFIG_START(mod8_state::mod8)
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu",I8008, 800000)
 	MCFG_CPU_PROGRAM_MAP(mod8_mem)

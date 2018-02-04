@@ -12,76 +12,9 @@ Based on G65C816 CPU Emulator by Karl Stenerud
 #include "emu.h"
 #include "m7700ds.h"
 
-#ifdef SEC
-#undef SEC
-#endif
-
 #define ADDRESS_24BIT(A) ((A)&0xffffff)
 
-namespace {
-
-class m7700_opcode_struct
-{
-public:
-	bool is_call() const { return m_name == op::JSR; }
-	bool is_return() const { return (m_name == op::RTS) || (m_name == op::RTI); }
-	const char *name() const { return s_opnames[unsigned(m_name)]; }
-
-	static const m7700_opcode_struct &get(unsigned char ins) { return s_opcodes[ins]; }
-	static const m7700_opcode_struct &get_prefix42(unsigned char ins) { return s_opcodes_prefix42[ins]; }
-	static const m7700_opcode_struct &get_prefix89(unsigned char ins) { return s_opcodes_prefix89[ins]; }
-
-	unsigned char flag;
-	unsigned char ea;
-
-protected:
-	enum class op : unsigned
-	{
-		ADC ,  AND ,  ASL ,  BCC ,  BCS ,  BEQ ,  BIT ,  BMI ,  BNE ,  BPL ,  BRA ,
-		BRK ,  BRL ,  BVC ,  BVS ,  CLC ,  CLD ,  CLI ,  CLV ,  CMP ,  COP ,  CPX ,
-		CPY ,  DEA ,  DEC ,  DEX ,  DEY ,  EOR ,  INA ,  INC ,  INX ,  INY ,  JML ,
-		JMP ,  JSL ,  JSR ,  LDA ,  LDX ,  LDY ,  LSR ,  MVN ,  MVP ,  NOP ,  ORA ,
-		PEA ,  PEI ,  PER ,  PHA ,  PHT ,  PHD ,  PHK ,  PHP ,  PHX ,  PHY ,  PLA ,
-		PLB ,  PLD ,  PLP ,  PLX ,  PLY ,  CLP ,  ROL ,  ROR ,  RTI ,  RTL ,  RTS ,
-		SBC ,  SEC ,  SED ,  SEI ,  SEP ,  STA ,  STP ,  STX ,  STY ,  STZ ,  TAX ,
-		TAY ,  TCS ,  TCD ,  TDC ,  TRB ,  TSB ,  TSC ,  TSX ,  TXA ,  TXS ,  TXY ,
-		TYA ,  TYX ,  WAI ,  WDM ,  XBA ,  XCE ,  MPY ,  DIV ,  MPYS,  DIVS,  RLA ,
-		EXTS, EXTZ ,  LDT ,  LDM ,  UNK ,  SEB ,  SEM ,  CLM ,  STB ,  LDB ,  ADCB ,
-		SBCB, EORB ,  TBX ,  CMPB,  INB ,  DEB ,  TXB ,  TYB ,  LSRB,  ORB ,  CLB ,
-		BBC,   BBS,   TBY,   ANDB,  PUL ,  PSH ,  PLAB,  XAB ,  PHB
-	};
-
-	m7700_opcode_struct(op n, unsigned char f, unsigned char e)
-		: flag(f)
-		, ea(e)
-		, m_name(n)
-	{
-	}
-
-	op m_name;
-
-	static const char *const s_opnames[];
-	static const m7700_opcode_struct s_opcodes[256];
-	static const m7700_opcode_struct s_opcodes_prefix42[256];
-	static const m7700_opcode_struct s_opcodes_prefix89[256];
-};
-
-enum
-{
-	IMP , ACC , RELB, RELW, IMM , A   , AI  , AL  , ALX , AX  , AXI ,
-	AY  , D   , DI  , DIY , DLI , DLIY, DX  , DXI , DY  , S   , SIY ,
-	SIG , MVN , MVP , PEA , PEI , PER , LDM4, LDM5, LDM4X, LDM5X,
-	BBCD, BBCA, ACCB
-};
-
-enum
-{
-	I, /* ignore */
-	M, /* check m bit */
-	X  /* check x bit */
-};
-
-const char *const m7700_opcode_struct::s_opnames[] =
+const char *const m7700_disassembler::s_opnames[] =
 {
 	"ADC", "AND", "ASL", "BCC", "BCS", "BEQ", "BIT", "BMI", "BNE", "BPL", "BRA",
 	"BRK", "BRL", "BVC", "BVS", "CLC", "CLD", "CLI", "CLV", "CMP", "COP", "CPX",
@@ -97,7 +30,7 @@ const char *const m7700_opcode_struct::s_opnames[] =
 	"BBC", "BBS", "TBY", "ANDB","PUL", "PSH", "PLB", "XAB", "PHB",
 };
 
-const m7700_opcode_struct m7700_opcode_struct::s_opcodes[256] =
+const m7700_disassembler::m7700_opcode_struct m7700_disassembler::s_opcodes[256] =
 {
 	{op::BRK, I, SIG  }, {op::ORA, M, DXI }, {op::UNK, I, SIG }, {op::ORA, M, S    },
 	{op::SEB, M, LDM4 }, {op::ORA, M, D   }, {op::ASL, M, D   }, {op::ORA, M, DLI  },
@@ -180,7 +113,7 @@ const m7700_opcode_struct m7700_opcode_struct::s_opcodes[256] =
 	{op::JSR, I, AXI  }, {op::SBC, M, AX  }, {op::INC, M, AX  }, {op::SBC, M, ALX  }
 };
 
-const m7700_opcode_struct m7700_opcode_struct::s_opcodes_prefix42[256] =
+const m7700_disassembler::m7700_opcode_struct m7700_disassembler::s_opcodes_prefix42[256] =
 {
 	{op::BRK, I, SIG  }, {op::ORB, M, DXI }, {op::COP, I, SIG }, {op::ORB,  M, S   },
 	{op::TSB, M, D    }, {op::ORB, M, D   }, {op::ASL, M, D   }, {op::ORB,  M, DLI },
@@ -263,7 +196,7 @@ const m7700_opcode_struct m7700_opcode_struct::s_opcodes_prefix42[256] =
 	{op::JSR, I, AXI  }, {op::SBCB,M, AX  }, {op::INC, M, AX  }, {op::SBCB, M, ALX }
 };
 
-const m7700_opcode_struct m7700_opcode_struct::s_opcodes_prefix89[256] =
+const m7700_disassembler::m7700_opcode_struct m7700_disassembler::s_opcodes_prefix89[256] =
 {
 	{op::BRK, I, SIG  }, {op::MPY, M, DXI }, {op::COP, I, SIG }, {op::MPY, M, S    },
 	{op::TSB, M, D    }, {op::MPY, M, D   }, {op::ASL, M, D   }, {op::MPY, M, DLI  },
@@ -346,71 +279,54 @@ const m7700_opcode_struct m7700_opcode_struct::s_opcodes_prefix89[256] =
 	{op::JSR, I, AXI  }, {op::SBC, M, AX  }, {op::INC, M, AX  }, {op::SBC, M, ALX  }
 };
 
-} // anonymous namespace
-
-static inline unsigned int read_8(const uint8_t *oprom, unsigned int offset)
+inline std::string m7700_disassembler::int_8_str(unsigned int val)
 {
-	return oprom[offset];
-}
-
-static inline unsigned int read_16(const uint8_t *oprom, unsigned int offset)
-{
-	unsigned int val = read_8(oprom, offset);
-	return val | (read_8(oprom, offset+1)<<8);
-}
-
-static inline unsigned int read_24(const uint8_t *oprom, unsigned int offset)
-{
-	unsigned int val = read_8(oprom, offset);
-	val |= (read_8(oprom, offset+1)<<8);
-	return val | (read_8(oprom, offset+2)<<16);
-}
-
-static inline char* int_8_str(unsigned int val)
-{
-	static char str[20];
-
 	val &= 0xff;
 
 	if(val & 0x80)
-		sprintf(str, "-$%x", (0-val) & 0x7f);
+		return util::string_format("-$%x", (0-val) & 0xff);
 	else
-		sprintf(str, "$%x", val & 0x7f);
-
-	return str;
+		return util::string_format("$%x", val & 0xff);
 }
 
-static inline char* int_16_str(unsigned int val)
+inline std::string m7700_disassembler::int_16_str(unsigned int val)
 {
-	static char str[20];
-
 	val &= 0xffff;
 
 	if(val & 0x8000)
-		sprintf(str, "-$%x", (0-val) & 0x7fff);
+		return util::string_format("-$%x", (0-val) & 0xffff);
 	else
-		sprintf(str, "$%x", val & 0x7fff);
-
-	return str;
+		return util::string_format("$%x", val & 0xffff);
 }
 
+m7700_disassembler::m7700_disassembler(config *conf) : m_config(conf)
+{
+}
 
-int m7700_disassemble(std::ostream &stream, unsigned int pc, unsigned int pb, const uint8_t *oprom, int m_flag, int x_flag)
+u32 m7700_disassembler::opcode_alignment() const
+{
+	return 1;
+}
+
+offs_t m7700_disassembler::disassemble(std::ostream &stream, offs_t pc, const data_buffer &opcodes, const data_buffer &params)
 {
 	unsigned int instruction;
 	const m7700_opcode_struct *opcode;
 	int var;
 	signed char varS;
 	int length = 1;
-	unsigned int address;
 	//unsigned int start;
 	uint32_t flags = 0;
 
-	pb <<= 16;
+	offs_t address = pc;
+	u32 pb = pc & 0xffff0000;
+	pc &= 0xffff;
 	address = pc | pb;
-	//start = address;
 
-	instruction = read_8(oprom,0);
+	instruction = opcodes.r8(address);
+
+	int m_flag = m_config->get_m_flag();
+	int x_flag = m_config->get_x_flag();
 
 	// check for prefixes
 	switch (instruction)
@@ -418,16 +334,14 @@ int m7700_disassemble(std::ostream &stream, unsigned int pc, unsigned int pb, co
 	case 0x42:
 		address++;
 		length++;
-		oprom++;
-		instruction = read_8(oprom,0);
+		instruction = opcodes.r8(address);
 		opcode = &m7700_opcode_struct::get_prefix42(instruction);
 		break;
 
 	case 0x89:
 		address++;
 		length++;
-		oprom++;
-		instruction = read_8(oprom,0);
+		instruction = opcodes.r8(address);
 		opcode = &m7700_opcode_struct::get_prefix89(instruction);
 		break;
 
@@ -437,9 +351,9 @@ int m7700_disassemble(std::ostream &stream, unsigned int pc, unsigned int pb, co
 	}
 
 	if (opcode->is_call())
-		flags = DASMFLAG_STEP_OVER;
+		flags = STEP_OVER;
 	else if (opcode->is_return())
-		flags = DASMFLAG_STEP_OUT;
+		flags = STEP_OUT;
 
 	stream << opcode->name();
 
@@ -454,189 +368,184 @@ int m7700_disassemble(std::ostream &stream, unsigned int pc, unsigned int pb, co
 			util::stream_format(stream, " B");
 			break;
 		case RELB:
-			varS = read_8(oprom,1);
+			varS = opcodes.r8(address + 1);
 			length++;
 			util::stream_format(stream, " %06x (%s)", pb | ((pc + length + varS)&0xffff), int_8_str(varS));
 			break;
 		case RELW:
 		case PER :
-			var = read_16(oprom,1);
+			var = opcodes.r16(address + 1);
 			length += 2;
 			util::stream_format(stream, " %06x (%s)", pb | ((pc + length + var)&0xffff), int_16_str(var));
 			break;
 		case IMM :
 			if((opcode->flag == M && !m_flag) || (opcode->flag == X && !x_flag))
 			{
-				util::stream_format(stream, " #$%04x", read_16(oprom,1));
+				util::stream_format(stream, " #$%04x", opcodes.r16(address + 1));
 				length += 2;
 			}
 			else
 			{
-				util::stream_format(stream, " #$%02x", read_8(oprom,1));
+				util::stream_format(stream, " #$%02x", opcodes.r8(address + 1));
 				length++;
 			}
 			break;
 		case BBCD:
 			if((opcode->flag == M && !m_flag) || (opcode->flag == X && !x_flag))
 			{
-				varS = read_8(oprom,4);
+				varS = opcodes.r8(address + 4);
 				length += 4;
-				util::stream_format(stream, " #$%04x, $%02x, %06x (%s)", read_16(oprom,2), read_8(oprom,1), pb | ((pc + length + varS)&0xffff), int_8_str(varS));
+				util::stream_format(stream, " #$%04x, $%02x, %06x (%s)", opcodes.r16(address + 2), opcodes.r8(address + 1), pb | ((pc + length + varS)&0xffff), int_8_str(varS));
 			}
 			else
 			{
-				varS = read_8(oprom,3);
+				varS = opcodes.r8(address + 3);
 				length += 3;
-				util::stream_format(stream, " #$%02x, $%02x, %06x (%s)", read_8(oprom,2), read_8(oprom,1), pb | ((pc + length + varS)&0xffff), int_8_str(varS));
+				util::stream_format(stream, " #$%02x, $%02x, %06x (%s)", opcodes.r8(address + 2), opcodes.r8(address + 1), pb | ((pc + length + varS)&0xffff), int_8_str(varS));
 			}
 			break;
 		case BBCA:
 			if((opcode->flag == M && !m_flag) || (opcode->flag == X && !x_flag))
 			{
 				length += 5;
-				varS = read_8(oprom,5);
-				util::stream_format(stream, " #$%04x, $%04x, %06x (%s)", read_16(oprom,3), read_16(oprom,1), pb | ((pc + length + varS)&0xffff), int_8_str(varS));
+				varS = opcodes.r8(address + 5);
+				util::stream_format(stream, " #$%04x, $%04x, %06x (%s)", opcodes.r16(address + 3), opcodes.r16(address + 1), pb | ((pc + length + varS)&0xffff), int_8_str(varS));
 			}
 			else
 			{
 				length += 4;
-				varS = read_8(oprom,4);
-				util::stream_format(stream, " #$%02x, $%04x, %06x (%s)", read_8(oprom,3), read_16(oprom,1), pb | ((pc + length + varS)&0xffff), int_8_str(varS));
+				varS = opcodes.r8(address + 4);
+				util::stream_format(stream, " #$%02x, $%04x, %06x (%s)", opcodes.r8(address + 3), opcodes.r16(address + 1), pb | ((pc + length + varS)&0xffff), int_8_str(varS));
 			}
 			break;
 		case LDM4:
 			if((opcode->flag == M && !m_flag) || (opcode->flag == X && !x_flag))
 			{
-				util::stream_format(stream, " #$%04x, $%02x", read_16(oprom,2), read_8(oprom,1));
+				util::stream_format(stream, " #$%04x, $%02x", opcodes.r16(address + 2), opcodes.r8(address + 1));
 				length += 3;
 			}
 			else
 			{
-				util::stream_format(stream, " #$%02x, $%02x", read_8(oprom,2), read_8(oprom,1));
+				util::stream_format(stream, " #$%02x, $%02x", opcodes.r8(address + 2), opcodes.r8(address + 1));
 				length += 2;
 			}
 			break;
 		case LDM5:
 			if((opcode->flag == M && !m_flag) || (opcode->flag == X && !x_flag))
 			{
-				util::stream_format(stream, " #$%04x, $%04x", read_16(oprom,3), read_16(oprom,1));
+				util::stream_format(stream, " #$%04x, $%04x", opcodes.r16(address + 3), opcodes.r16(address + 1));
 				length += 4;
 			}
 			else
 			{
-				util::stream_format(stream, " #$%02x, $%04x", read_8(oprom,3), read_16(oprom,1));
+				util::stream_format(stream, " #$%02x, $%04x", opcodes.r8(address + 3), opcodes.r16(address + 1));
 				length += 3;
 			}
 			break;
 		case LDM4X:
 			if((opcode->flag == M && !m_flag) || (opcode->flag == X && !x_flag))
 			{
-				util::stream_format(stream, " #$%04x, $%02x, X", read_16(oprom,2), read_8(oprom,1));
+				util::stream_format(stream, " #$%04x, $%02x, X", opcodes.r16(address + 2), opcodes.r8(address + 1));
 				length += 3;
 			}
 			else
 			{
-				util::stream_format(stream, " #$%02x, $%02x, X", read_8(oprom,2), read_8(oprom,1));
+				util::stream_format(stream, " #$%02x, $%02x, X", opcodes.r8(address + 2), opcodes.r8(address + 1));
 				length += 2;
 			}
 			break;
 		case LDM5X:
 			if((opcode->flag == M && !m_flag) || (opcode->flag == X && !x_flag))
 			{
-				util::stream_format(stream, " #$%04x, $%04x, X", read_16(oprom,3), read_16(oprom,1));
+				util::stream_format(stream, " #$%04x, $%04x, X", opcodes.r16(address + 3), opcodes.r16(address + 1));
 				length += 4;
 			}
 			else
 			{
-				util::stream_format(stream, " #$%02x, $%04x, X", read_8(oprom,3), read_16(oprom,1));
+				util::stream_format(stream, " #$%02x, $%04x, X", opcodes.r8(address + 3), opcodes.r16(address + 1));
 				length += 3;
 			}
 			break;
 		case A   :
 		case PEA :
-			util::stream_format(stream, " $%04x", read_16(oprom,1));
+			util::stream_format(stream, " $%04x", opcodes.r16(address + 1));
 			length += 2;
 			break;
 		case AI  :
-			util::stream_format(stream, " ($%04x)", read_16(oprom,1));
+			util::stream_format(stream, " ($%04x)", opcodes.r16(address + 1));
 			length += 2;
 			break;
 		case AL  :
-			util::stream_format(stream, " $%06x", read_24(oprom,1));
+			util::stream_format(stream, " $%06x", opcodes.r32(address + 1) & 0xffffff);
 			length += 3;
 			break;
 		case ALX :
-			util::stream_format(stream, " $%06x,X", read_24(oprom,1));
+			util::stream_format(stream, " $%06x,X", opcodes.r32(address + 1) & 0xffffff);
 			length += 3;
 			break;
 		case AX  :
-			util::stream_format(stream, " $%04x,X", read_16(oprom,1));
+			util::stream_format(stream, " $%04x,X", opcodes.r16(address + 1));
 			length += 2;
 			break;
 		case AXI :
-			util::stream_format(stream, " ($%04x,X)", read_16(oprom,1));
+			util::stream_format(stream, " ($%04x,X)", opcodes.r16(address + 1));
 			length += 2;
 			break;
 		case AY  :
-			util::stream_format(stream, " $%04x,Y", read_16(oprom,1));
+			util::stream_format(stream, " $%04x,Y", opcodes.r16(address + 1));
 			length += 2;
 			break;
 		case D   :
-			util::stream_format(stream, " $%02x", read_8(oprom,1));
+			util::stream_format(stream, " $%02x", opcodes.r8(address + 1));
 			length++;
 			break;
 		case DI  :
 		case PEI :
-			util::stream_format(stream, " ($%02x)", read_8(oprom,1));
+			util::stream_format(stream, " ($%02x)", opcodes.r8(address + 1));
 			length++;
 			break;
 		case DIY :
-			util::stream_format(stream, " ($%02x),Y", read_8(oprom,1));
+			util::stream_format(stream, " ($%02x),Y", opcodes.r8(address + 1));
 			length++;
 			break;
 		case DLI :
-			util::stream_format(stream, " [$%02x]", read_8(oprom,1));
+			util::stream_format(stream, " [$%02x]", opcodes.r8(address + 1));
 			length++;
 			break;
 		case DLIY:
-			util::stream_format(stream, " [$%02x],Y", read_8(oprom,1));
+			util::stream_format(stream, " [$%02x],Y", opcodes.r8(address + 1));
 			length++;
 			break;
 		case DX  :
-			util::stream_format(stream, " $%02x,X", read_8(oprom,1));
+			util::stream_format(stream, " $%02x,X", opcodes.r8(address + 1));
 			length++;
 			break;
 		case DXI :
-			util::stream_format(stream, " ($%02x,X)", read_8(oprom,1));
+			util::stream_format(stream, " ($%02x,X)", opcodes.r8(address + 1));
 			length++;
 			break;
 		case DY  :
-			util::stream_format(stream, " $%02x,Y", read_8(oprom,1));
+			util::stream_format(stream, " $%02x,Y", opcodes.r8(address + 1));
 			length++;
 			break;
 		case S   :
-			util::stream_format(stream, " %s,S", int_8_str(read_8(oprom,1)));
+			util::stream_format(stream, " %s,S", int_8_str(opcodes.r8(address + 1)));
 			length++;
 			break;
 		case SIY :
-			util::stream_format(stream, " (%s,S),Y", int_8_str(read_8(oprom,1)));
+			util::stream_format(stream, " (%s,S),Y", int_8_str(opcodes.r8(address + 1)));
 			length++;
 			break;
 		case SIG :
-			util::stream_format(stream, " #$%02x", read_8(oprom,1));
+			util::stream_format(stream, " #$%02x", opcodes.r8(address + 1));
 			length++;
 			break;
 		case MVN :
 		case MVP :
-			util::stream_format(stream, " $%02x, $%02x", read_8(oprom,2), read_8(oprom,1));
+			util::stream_format(stream, " $%02x, $%02x", opcodes.r8(address + 2), opcodes.r8(address + 1));
 			length += 2;
 			break;
 	}
 
-	return length | flags | DASMFLAG_SUPPORTED;
-}
-
-CPU_DISASSEMBLE(m37710_generic)
-{
-	return m7700_disassemble(stream, (pc&0xffff), pc>>16, oprom, 0, 0);
+	return length | flags | SUPPORTED;
 }

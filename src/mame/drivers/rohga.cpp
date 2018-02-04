@@ -105,6 +105,9 @@
                 JN-00         : Fujitsu MB7116 PROM
                 VSync         : 58kHz
 
+    TODO:
+        nitrobal : blending, priority function wrong
+
 ***************************************************************************/
 
 #include "emu.h"
@@ -171,7 +174,7 @@ ADDRESS_MAP_END
 READ16_MEMBER( rohga_state::wf_protection_region_0_104_r )
 {
 	int real_address = 0 + (offset *2);
-	int deco146_addr = BITSWAP32(real_address, /* NC */31,30,29,28,27,26,25,24,23,22,21,20,19,18, 13,12,11,/**/      17,16,15,14,    10,9,8, 7,6,5,4, 3,2,1,0) & 0x7fff;
+	int deco146_addr = bitswap<32>(real_address, /* NC */31,30,29,28,27,26,25,24,23,22,21,20,19,18, 13,12,11,/**/      17,16,15,14,    10,9,8, 7,6,5,4, 3,2,1,0) & 0x7fff;
 	uint8_t cs = 0;
 	uint16_t data = m_deco104->read_data( deco146_addr, mem_mask, cs );
 	return data;
@@ -180,7 +183,7 @@ READ16_MEMBER( rohga_state::wf_protection_region_0_104_r )
 WRITE16_MEMBER( rohga_state::wf_protection_region_0_104_w )
 {
 	int real_address = 0 + (offset *2);
-	int deco146_addr = BITSWAP32(real_address, /* NC */31,30,29,28,27,26,25,24,23,22,21,20,19,18, 13,12,11,/**/      17,16,15,14,    10,9,8, 7,6,5,4, 3,2,1,0) & 0x7fff;
+	int deco146_addr = bitswap<32>(real_address, /* NC */31,30,29,28,27,26,25,24,23,22,21,20,19,18, 13,12,11,/**/      17,16,15,14,    10,9,8, 7,6,5,4, 3,2,1,0) & 0x7fff;
 	uint8_t cs = 0;
 	m_deco104->write_data( space, deco146_addr, data, mem_mask, cs );
 }
@@ -213,15 +216,15 @@ static ADDRESS_MAP_START( wizdfire_map, AS_PROGRAM, 16, rohga_state )
 	AM_RANGE(0x380000, 0x381fff) AM_RAM_DEVWRITE("deco_common", decocomn_device, buffered_palette_w) AM_SHARE("paletteram")
 	AM_RANGE(0x390008, 0x390009) AM_DEVWRITE("deco_common", decocomn_device, palette_dma_w)
 
-	AM_RANGE(0xfe4000, 0xfe7fff) AM_READWRITE(wf_protection_region_0_104_r,wf_protection_region_0_104_w) AM_SHARE("prot16ram") /* Protection device */
 	AM_RANGE(0xfdc000, 0xffffff) AM_RAM
+	AM_RANGE(0xfe4000, 0xfe7fff) AM_READWRITE(wf_protection_region_0_104_r,wf_protection_region_0_104_w) AM_SHARE("prot16ram") /* Protection device */
 ADDRESS_MAP_END
 
 
 READ16_MEMBER( rohga_state::nb_protection_region_0_146_r )
 {
 	int real_address = 0 + (offset *2);
-	int deco146_addr = BITSWAP32(real_address, /* NC */31,30,29,28,27,26,25,24,23,22,21,20,19,18, 13,12,11,/**/      17,16,15,14,    10,9,8, 7,6,5,4, 3,2,1,0) & 0x7fff;
+	int deco146_addr = bitswap<32>(real_address, /* NC */31,30,29,28,27,26,25,24,23,22,21,20,19,18, 13,12,11,/**/      17,16,15,14,    10,9,8, 7,6,5,4, 3,2,1,0) & 0x7fff;
 	uint8_t cs = 0;
 	uint16_t data = m_deco146->read_data( deco146_addr, mem_mask, cs );
 	return data;
@@ -230,7 +233,7 @@ READ16_MEMBER( rohga_state::nb_protection_region_0_146_r )
 WRITE16_MEMBER( rohga_state::nb_protection_region_0_146_w )
 {
 	int real_address = 0 + (offset *2);
-	int deco146_addr = BITSWAP32(real_address, /* NC */31,30,29,28,27,26,25,24,23,22,21,20,19,18, 13,12,11,/**/      17,16,15,14,    10,9,8, 7,6,5,4, 3,2,1,0) & 0x7fff;
+	int deco146_addr = bitswap<32>(real_address, /* NC */31,30,29,28,27,26,25,24,23,22,21,20,19,18, 13,12,11,/**/      17,16,15,14,    10,9,8, 7,6,5,4, 3,2,1,0) & 0x7fff;
 	uint8_t cs = 0;
 	m_deco146->write_data( space, deco146_addr, data, mem_mask, cs );
 }
@@ -318,7 +321,19 @@ static ADDRESS_MAP_START( rohga_sound_map, AS_PROGRAM, 8, rohga_state )
 	AM_RANGE(0x110000, 0x110001) AM_DEVREADWRITE("ymsnd", ym2151_device,read,write)
 	AM_RANGE(0x120000, 0x120001) AM_DEVREADWRITE("oki1", okim6295_device, read, write)
 	AM_RANGE(0x130000, 0x130001) AM_DEVREADWRITE("oki2", okim6295_device, read, write)
-	AM_RANGE(0x140000, 0x140001) AM_DEVREAD("soundlatch", generic_latch_8_device, read)
+	AM_RANGE(0x140000, 0x140000) AM_DEVREAD("ioprot104", deco104_device, soundlatch_r)
+	AM_RANGE(0x1f0000, 0x1f1fff) AM_RAMBANK("bank8")
+	AM_RANGE(0x1fec00, 0x1fec01) AM_DEVWRITE("audiocpu", h6280_device, timer_w)
+	AM_RANGE(0x1ff400, 0x1ff403) AM_DEVWRITE("audiocpu", h6280_device, irq_status_w)
+ADDRESS_MAP_END
+
+static ADDRESS_MAP_START( nitrobal_sound_map, AS_PROGRAM, 8, rohga_state )
+	AM_RANGE(0x000000, 0x00ffff) AM_ROM
+	AM_RANGE(0x100000, 0x100001) AM_NOP
+	AM_RANGE(0x110000, 0x110001) AM_DEVREADWRITE("ymsnd", ym2151_device,read,write)
+	AM_RANGE(0x120000, 0x120001) AM_DEVREADWRITE("oki1", okim6295_device, read, write)
+	AM_RANGE(0x130000, 0x130001) AM_DEVREADWRITE("oki2", okim6295_device, read, write)
+	AM_RANGE(0x140000, 0x140000) AM_DEVREAD("ioprot", deco146_device, soundlatch_r)
 	AM_RANGE(0x1f0000, 0x1f1fff) AM_RAMBANK("bank8")
 	AM_RANGE(0x1fec00, 0x1fec01) AM_DEVWRITE("audiocpu", h6280_device, timer_w)
 	AM_RANGE(0x1ff400, 0x1ff403) AM_DEVWRITE("audiocpu", h6280_device, irq_status_w)
@@ -840,11 +855,11 @@ static GFXDECODE_START( rohga )
 GFXDECODE_END
 
 static GFXDECODE_START( wizdfire )
-	GFXDECODE_ENTRY( "gfx1", 0, charlayout,        0, 32 )  /* Gfx chip 1 as 8x8 */
-	GFXDECODE_ENTRY( "gfx2", 0, tilelayout,        0, 32 )  /* Gfx chip 1 as 16x16 */
-	GFXDECODE_ENTRY( "gfx3", 0, tilelayout,      512, 32 )  /* Gfx chip 2 as 16x16 */
-	GFXDECODE_ENTRY( "gfx4", 0, spritelayout,   0, 32 ) /* Sprites 16x16 */
-	GFXDECODE_ENTRY( "gfx5", 0, spritelayout,   0, 32 )
+	GFXDECODE_ENTRY( "gfx1", 0, charlayout,           0, 32 )  /* Gfx chip 1 as 8x8 */
+	GFXDECODE_ENTRY( "gfx2", 0, tilelayout,           0, 32 )  /* Gfx chip 1 as 16x16 */
+	GFXDECODE_ENTRY( "gfx3", 0, tilelayout,         512, 32 )  /* Gfx chip 2 as 16x16 */
+	GFXDECODE_ENTRY( "gfx4", 0, spritelayout, 0/*1024*/, 128 ) /* Sprites 16x16 */
+	GFXDECODE_ENTRY( "gfx5", 0, spritelayout, 0/*1536*/, 128 )
 GFXDECODE_END
 
 static GFXDECODE_START( schmeisr )
@@ -896,7 +911,7 @@ DECOSPR_COLOUR_CB_MEMBER(rohga_state::schmeisr_col_callback)
 	return colour;
 }
 
-static MACHINE_CONFIG_START( rohga )
+MACHINE_CONFIG_START(rohga_state::rohga)
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", M68000, 14000000)
@@ -925,7 +940,8 @@ static MACHINE_CONFIG_START( rohga )
 
 	MCFG_DEVICE_ADD("tilegen1", DECO16IC, 0)
 	MCFG_DECO16IC_SPLIT(0)
-	MCFG_DECO16IC_WIDTH12(1|4)
+	MCFG_DECO16IC_PF1_SIZE(DECO_64x64)
+	MCFG_DECO16IC_PF2_SIZE(DECO_64x32)
 	MCFG_DECO16IC_PF1_TRANS_MASK(0x0f)
 	MCFG_DECO16IC_PF2_TRANS_MASK(0x0f)
 	MCFG_DECO16IC_PF1_COL_BANK(0x00)
@@ -940,7 +956,8 @@ static MACHINE_CONFIG_START( rohga )
 
 	MCFG_DEVICE_ADD("tilegen2", DECO16IC, 0)
 	MCFG_DECO16IC_SPLIT(0)
-	MCFG_DECO16IC_WIDTH12(1)
+	MCFG_DECO16IC_PF1_SIZE(DECO_64x32)
+	MCFG_DECO16IC_PF2_SIZE(DECO_64x32)
 	MCFG_DECO16IC_PF1_TRANS_MASK(0x0f)
 	MCFG_DECO16IC_PF2_TRANS_MASK(0x0f)
 	MCFG_DECO16IC_PF1_COL_BANK(0x00)
@@ -963,11 +980,10 @@ static MACHINE_CONFIG_START( rohga )
 	MCFG_DECO146_IN_PORTA_CB(IOPORT("INPUTS"))
 	MCFG_DECO146_IN_PORTB_CB(IOPORT("SYSTEM"))
 	MCFG_DECO146_IN_PORTC_CB(IOPORT("DSW"))
+	MCFG_DECO146_SOUNDLATCH_IRQ_CB(INPUTLINE("audiocpu", 0))
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
-
-	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
 
 	MCFG_YM2151_ADD("ymsnd", 32220000/9)
 	MCFG_YM2151_IRQ_HANDLER(INPUTLINE("audiocpu", 1))   /* IRQ 2 */
@@ -984,7 +1000,7 @@ static MACHINE_CONFIG_START( rohga )
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", 0.40)
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_START( wizdfire )
+MACHINE_CONFIG_START(rohga_state::wizdfire)
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", M68000, 14000000)
@@ -1013,7 +1029,8 @@ static MACHINE_CONFIG_START( wizdfire )
 
 	MCFG_DEVICE_ADD("tilegen1", DECO16IC, 0)
 	MCFG_DECO16IC_SPLIT(0)
-	MCFG_DECO16IC_WIDTH12(1)
+	MCFG_DECO16IC_PF1_SIZE(DECO_64x32)
+	MCFG_DECO16IC_PF2_SIZE(DECO_64x32)
 	MCFG_DECO16IC_PF1_TRANS_MASK(0x0f)
 	MCFG_DECO16IC_PF2_TRANS_MASK(0x0f)
 	MCFG_DECO16IC_PF1_COL_BANK(0x00)
@@ -1028,7 +1045,8 @@ static MACHINE_CONFIG_START( wizdfire )
 
 	MCFG_DEVICE_ADD("tilegen2", DECO16IC, 0)
 	MCFG_DECO16IC_SPLIT(0)
-	MCFG_DECO16IC_WIDTH12(1)
+	MCFG_DECO16IC_PF1_SIZE(DECO_64x32)
+	MCFG_DECO16IC_PF2_SIZE(DECO_64x32)
 	MCFG_DECO16IC_PF1_TRANS_MASK(0x0f)
 	MCFG_DECO16IC_PF2_TRANS_MASK(0x0f)
 	MCFG_DECO16IC_PF1_COL_BANK(0x00)
@@ -1053,14 +1071,13 @@ static MACHINE_CONFIG_START( wizdfire )
 	MCFG_DECO146_IN_PORTA_CB(IOPORT("INPUTS"))
 	MCFG_DECO146_IN_PORTB_CB(IOPORT("SYSTEM"))
 	MCFG_DECO146_IN_PORTC_CB(IOPORT("DSW"))
+	MCFG_DECO146_SOUNDLATCH_IRQ_CB(INPUTLINE("audiocpu", 0))
 	MCFG_DECO146_SET_INTERFACE_SCRAMBLE_REVERSE
 
 	MCFG_VIDEO_START_OVERRIDE(rohga_state, wizdfire)
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
-
-	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
 
 	MCFG_YM2151_ADD("ymsnd", 32220000/9)
 	MCFG_YM2151_IRQ_HANDLER(INPUTLINE("audiocpu", 1))   /* IRQ 2 */
@@ -1077,7 +1094,7 @@ static MACHINE_CONFIG_START( wizdfire )
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", 0.40)
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_START( nitrobal )
+MACHINE_CONFIG_START(rohga_state::nitrobal)
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", M68000, 14000000)
@@ -1085,7 +1102,7 @@ static MACHINE_CONFIG_START( nitrobal )
 	MCFG_CPU_VBLANK_INT_DRIVER("screen", rohga_state,  irq6_line_assert)
 
 	MCFG_CPU_ADD("audiocpu", H6280,32220000/4/3) /* verified on pcb (8.050Mhz is XIN on pin 10 of H6280 */
-	MCFG_CPU_PROGRAM_MAP(rohga_sound_map)
+	MCFG_CPU_PROGRAM_MAP(nitrobal_sound_map)
 
 	/* video hardware */
 	MCFG_BUFFERED_SPRITERAM16_ADD("spriteram")
@@ -1106,7 +1123,8 @@ static MACHINE_CONFIG_START( nitrobal )
 
 	MCFG_DEVICE_ADD("tilegen1", DECO16IC, 0)
 	MCFG_DECO16IC_SPLIT(0)
-	MCFG_DECO16IC_WIDTH12(0)
+	MCFG_DECO16IC_PF1_SIZE(DECO_64x32)
+	MCFG_DECO16IC_PF2_SIZE(DECO_32x32)
 	MCFG_DECO16IC_PF1_TRANS_MASK(0x0f)
 	MCFG_DECO16IC_PF2_TRANS_MASK(0x0f)
 	MCFG_DECO16IC_PF1_COL_BANK(0x00)
@@ -1121,7 +1139,8 @@ static MACHINE_CONFIG_START( nitrobal )
 
 	MCFG_DEVICE_ADD("tilegen2", DECO16IC, 0)
 	MCFG_DECO16IC_SPLIT(0)
-	MCFG_DECO16IC_WIDTH12(0)
+	MCFG_DECO16IC_PF1_SIZE(DECO_32x32)
+	MCFG_DECO16IC_PF2_SIZE(DECO_32x32)
 	MCFG_DECO16IC_PF1_TRANS_MASK(0x0f)
 	MCFG_DECO16IC_PF2_TRANS_MASK(0x0f)
 	MCFG_DECO16IC_PF1_COL_BANK(0)
@@ -1148,14 +1167,12 @@ static MACHINE_CONFIG_START( nitrobal )
 	MCFG_DECO146_IN_PORTA_CB(IOPORT("INPUTS"))
 	MCFG_DECO146_IN_PORTB_CB(IOPORT("SYSTEM"))
 	MCFG_DECO146_IN_PORTC_CB(IOPORT("DSW"))
+	MCFG_DECO146_SOUNDLATCH_IRQ_CB(INPUTLINE("audiocpu", 0))
 	MCFG_DECO146_SET_INTERFACE_SCRAMBLE_REVERSE
 	MCFG_DECO146_SET_USE_MAGIC_ADDRESS_XOR
 
-
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
-
-	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
 
 	MCFG_YM2151_ADD("ymsnd", 32220000/9)
 	MCFG_YM2151_IRQ_HANDLER(INPUTLINE("audiocpu", 1))   /* IRQ 2 */
@@ -1172,7 +1189,7 @@ static MACHINE_CONFIG_START( nitrobal )
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", 0.40)
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_START( schmeisr )
+MACHINE_CONFIG_START(rohga_state::schmeisr)
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", M68000, 14000000)
@@ -1201,7 +1218,8 @@ static MACHINE_CONFIG_START( schmeisr )
 
 	MCFG_DEVICE_ADD("tilegen1", DECO16IC, 0)
 	MCFG_DECO16IC_SPLIT(0)
-	MCFG_DECO16IC_WIDTH12(1|4)
+	MCFG_DECO16IC_PF1_SIZE(DECO_64x64)
+	MCFG_DECO16IC_PF2_SIZE(DECO_64x32)
 	MCFG_DECO16IC_PF1_TRANS_MASK(0x0f)
 	MCFG_DECO16IC_PF2_TRANS_MASK(0x0f)
 	MCFG_DECO16IC_PF1_COL_BANK(0x00)
@@ -1216,7 +1234,8 @@ static MACHINE_CONFIG_START( schmeisr )
 
 	MCFG_DEVICE_ADD("tilegen2", DECO16IC, 0)
 	MCFG_DECO16IC_SPLIT(0)
-	MCFG_DECO16IC_WIDTH12(1)
+	MCFG_DECO16IC_PF1_SIZE(DECO_64x32)
+	MCFG_DECO16IC_PF2_SIZE(DECO_64x32)
 	MCFG_DECO16IC_PF1_TRANS_MASK(0x0f)
 	MCFG_DECO16IC_PF2_TRANS_MASK(0x0f)
 	MCFG_DECO16IC_PF1_COL_BANK(0x00)
@@ -1239,11 +1258,10 @@ static MACHINE_CONFIG_START( schmeisr )
 	MCFG_DECO146_IN_PORTA_CB(IOPORT("INPUTS"))
 	MCFG_DECO146_IN_PORTB_CB(IOPORT("SYSTEM"))
 	MCFG_DECO146_IN_PORTC_CB(IOPORT("DSW"))
+	MCFG_DECO146_SOUNDLATCH_IRQ_CB(INPUTLINE("audiocpu", 0))
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
-
-	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
 
 	MCFG_YM2151_ADD("ymsnd", 32220000/9)
 	MCFG_YM2151_IRQ_HANDLER(INPUTLINE("audiocpu", 1))   /* IRQ 2 */
@@ -1262,7 +1280,7 @@ MACHINE_CONFIG_END
 
 
 
-static MACHINE_CONFIG_DERIVED( hangzo, schmeisr )
+MACHINE_CONFIG_DERIVED(rohga_state::hangzo, schmeisr)
 
 	/* basic machine hardware */
 	MCFG_CPU_MODIFY("maincpu")
@@ -1944,9 +1962,9 @@ GAME( 1992, wizdfire,  0,        wizdfire, wizdfire, rohga_state, wizdfire, ROT0
 GAME( 1992, wizdfireu, wizdfire, wizdfire, wizdfire, rohga_state, wizdfire, ROT0,   "Data East Corporation", "Wizard Fire (US v1.1)", MACHINE_SUPPORTS_SAVE )
 GAME( 1992, darkseal2, wizdfire, wizdfire, wizdfire, rohga_state, wizdfire, ROT0,   "Data East Corporation", "Dark Seal 2 (Japan v2.1)", MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
 
-GAME( 1992, nitrobal,  0,        nitrobal, nitrobal, rohga_state, nitrobal, ROT270, "Data East Corporation", "Nitro Ball (World, set 1)", MACHINE_SUPPORTS_SAVE )
-GAME( 1992, nitrobala, nitrobal, nitrobal, nitrobal, rohga_state, nitrobal, ROT270, "Data East Corporation", "Nitro Ball (World, set 2)", MACHINE_SUPPORTS_SAVE ) // was marked 'US' but doesn't seem to have a 'Winners Don't Use Drugs' screen, so unlikely
-GAME( 1992, gunball,   nitrobal, nitrobal, nitrobal, rohga_state, nitrobal, ROT270, "Data East Corporation", "Gun Ball (Japan)", MACHINE_SUPPORTS_SAVE )
+GAME( 1992, nitrobal,  0,        nitrobal, nitrobal, rohga_state, nitrobal, ROT270, "Data East Corporation", "Nitro Ball (World, set 1)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE )
+GAME( 1992, nitrobala, nitrobal, nitrobal, nitrobal, rohga_state, nitrobal, ROT270, "Data East Corporation", "Nitro Ball (World, set 2)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE ) // was marked 'US' but doesn't seem to have a 'Winners Don't Use Drugs' screen, so unlikely
+GAME( 1992, gunball,   nitrobal, nitrobal, nitrobal, rohga_state, nitrobal, ROT270, "Data East Corporation", "Gun Ball (Japan)",          MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE )
 
 GAME( 1993, schmeisr,  0,        schmeisr, schmeisr, rohga_state, schmeisr, ROT0,   "Hot-B",                 "Schmeiser Robo (Japan)", MACHINE_SUPPORTS_SAVE | MACHINE_NO_COCKTAIL )
 GAME( 1992, hangzo,    0,        hangzo,   hangzo,   rohga_state, hangzo,   ROT0,   "Hot-B",                 "Hangzo (Japan, prototype)", MACHINE_SUPPORTS_SAVE ) // ROM contains a '(c)1992 Data East Corporation' string, but other sources indicate the game is by Hot-B

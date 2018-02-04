@@ -130,6 +130,7 @@
 #include "emu.h"
 #include "debugger.h"
 #include "mcs51.h"
+#include "mcs51dasm.h"
 
 #define VERBOSE 0
 
@@ -2101,7 +2102,7 @@ uint8_t mcs51_cpu_device::sfr_read(size_t offset)
 void mcs51_cpu_device::device_start()
 {
 	m_program = &space(AS_PROGRAM);
-	m_direct = &m_program->direct();
+	m_direct = m_program->direct<0>();
 	m_data = &space(AS_DATA);
 	m_io = &space(AS_IO);
 
@@ -2137,9 +2138,14 @@ void mcs51_cpu_device::device_start()
 	state_add( MCS51_PSW, "PSW", PSW).formatstr("%02X");
 	state_add( MCS51_ACC, "A", ACC).formatstr("%02X");
 	state_add( MCS51_B,   "B", B).formatstr("%02X");
-	state_add( MCS51_DPH, "DPH", DPH).formatstr("%02X");
-	state_add( MCS51_DPL, "DPL", DPL).formatstr("%02X");
+	state_add<uint16_t>( MCS51_DPTR, "DPTR", [this](){ return DPTR; }, [this](uint16_t dp){ SET_DPTR(dp); }).formatstr("%04X");
+	state_add( MCS51_DPH, "DPH", DPH).noshow();
+	state_add( MCS51_DPL, "DPL", DPL).noshow();
 	state_add( MCS51_IE,  "IE", IE).formatstr("%02X");
+	state_add<uint8_t>( MCS51_P0,  "P0", [this](){ return P0; }, [this](uint8_t p){ SET_P0(p); }).formatstr("%02X");
+	state_add<uint8_t>( MCS51_P1,  "P1", [this](){ return P1; }, [this](uint8_t p){ SET_P1(p); }).formatstr("%02X");
+	state_add<uint8_t>( MCS51_P2,  "P2", [this](){ return P2; }, [this](uint8_t p){ SET_P2(p); }).formatstr("%02X");
+	state_add<uint8_t>( MCS51_P3,  "P3", [this](){ return P3; }, [this](uint8_t p){ SET_P3(p); }).formatstr("%02X");
 	state_add( MCS51_R0,  "R0", m_rtemp).callimport().callexport().formatstr("%02X");
 	state_add( MCS51_R1,  "R1", m_rtemp).callimport().callexport().formatstr("%02X");
 	state_add( MCS51_R2,  "R2", m_rtemp).callimport().callexport().formatstr("%02X");
@@ -2506,45 +2512,32 @@ void ds5002fp_device::nvram_write( emu_file &file )
 	file.write( m_sfr_ram, 0x80 );
 }
 
-
-
-offs_t mcs51_cpu_device::disasm_disassemble(std::ostream &stream, offs_t pc, const uint8_t *oprom, const uint8_t *opram, uint32_t options)
+util::disasm_interface *mcs51_cpu_device::create_disassembler()
 {
-	extern CPU_DISASSEMBLE( i8051 );
-	return CPU_DISASSEMBLE_NAME(i8051)(this, stream, pc, oprom, opram, options);
+	return new i8051_disassembler;
 }
 
-
-offs_t i8052_device::disasm_disassemble(std::ostream &stream, offs_t pc, const uint8_t *oprom, const uint8_t *opram, uint32_t options)
+util::disasm_interface *i8052_device::create_disassembler()
 {
-	extern CPU_DISASSEMBLE( i8052 );
-	return CPU_DISASSEMBLE_NAME(i8052)(this, stream, pc, oprom, opram, options);
+	return new i8052_disassembler;
 }
 
-
-offs_t i80c31_device::disasm_disassemble(std::ostream &stream, offs_t pc, const uint8_t *oprom, const uint8_t *opram, uint32_t options)
+util::disasm_interface *i80c31_device::create_disassembler()
 {
-	extern CPU_DISASSEMBLE( i80c51 );
-	return CPU_DISASSEMBLE_NAME(i80c51)(this, stream, pc, oprom, opram, options);
+	return new i80c51_disassembler;
 }
 
-
-offs_t i80c51_device::disasm_disassemble(std::ostream &stream, offs_t pc, const uint8_t *oprom, const uint8_t *opram, uint32_t options)
+util::disasm_interface *i80c51_device::create_disassembler()
 {
-	extern CPU_DISASSEMBLE( i80c51 );
-	return CPU_DISASSEMBLE_NAME(i80c51)(this, stream, pc, oprom, opram, options);
+	return new i80c51_disassembler;
 }
 
-
-offs_t i80c52_device::disasm_disassemble(std::ostream &stream, offs_t pc, const uint8_t *oprom, const uint8_t *opram, uint32_t options)
+util::disasm_interface *i80c52_device::create_disassembler()
 {
-	extern CPU_DISASSEMBLE( i80c52 );
-	return CPU_DISASSEMBLE_NAME(i80c52)(this, stream, pc, oprom, opram, options);
+	return new i80c52_disassembler;
 }
 
-
-offs_t ds5002fp_device::disasm_disassemble(std::ostream &stream, offs_t pc, const uint8_t *oprom, const uint8_t *opram, uint32_t options)
+util::disasm_interface *ds5002fp_device::create_disassembler()
 {
-	extern CPU_DISASSEMBLE( ds5002fp );
-	return CPU_DISASSEMBLE_NAME(ds5002fp)(this, stream, pc, oprom, opram, options);
+	return new ds5002fp_disassembler;
 }

@@ -51,6 +51,9 @@
 	MCFG_DEVICE_INPUT_DEFAULTS(_def_inp) \
 	device_a2bus_card_interface::static_set_a2bus_tag(*device, _nbtag, _tag);
 
+// 7M = XTAL(14'318'181) / 2 or XTAL(28'636'363) / 4 (for IIgs)
+static constexpr uint32_t A2BUS_7M_CLOCK = 7159090;
+
 //**************************************************************************
 //  TYPE DEFINITIONS
 //**************************************************************************
@@ -64,13 +67,13 @@ public:
 	// construction/destruction
 	a2bus_slot_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
-	// device-level overrides
-	virtual void device_start() override;
-
 	// inline configuration
 	static void static_set_a2bus_slot(device_t &device, const char *tag, const char *slottag);
 protected:
 	a2bus_slot_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock);
+
+	// device-level overrides
+	virtual void device_start() override;
 
 	// configuration
 	const char *m_a2bus_tag, *m_a2bus_slottag;
@@ -81,6 +84,7 @@ DECLARE_DEVICE_TYPE(A2BUS_SLOT, a2bus_slot_device)
 
 
 class device_a2bus_card_interface;
+
 // ======================> a2bus_device
 class a2bus_device : public device_t
 {
@@ -149,22 +153,20 @@ public:
 	// construction/destruction
 	virtual ~device_a2bus_card_interface();
 
-	virtual uint8_t read_c0nx(address_space &space, uint8_t offset) { m_device.logerror("a2bus: unhandled read at C0n%x\n", offset); return 0; }       // C0nX - /DEVSEL
-	virtual void write_c0nx(address_space &space, uint8_t offset, uint8_t data) { m_device.logerror("a2bus: unhandled write %02x to C0n%x\n", data, offset); }
-	virtual uint8_t read_cnxx(address_space &space, uint8_t offset) { return 0; }       // CnXX - /IOSEL
-	virtual void write_cnxx(address_space &space, uint8_t offset, uint8_t data) { m_device.logerror("a2bus: unhandled write %02x to Cn%02x\n", data, offset); }
-	virtual uint8_t read_c800(address_space &space, uint16_t offset) { return 0; }      // C800 - /IOSTB
-	virtual void write_c800(address_space &space, uint16_t offset, uint8_t data) {m_device.logerror("a2bus: unhandled write %02x to %04x\n", data, offset + 0xc800); }
+	virtual uint8_t read_c0nx(uint8_t offset) { m_device.logerror("a2bus: unhandled read at C0n%x\n", offset); return 0; }       // C0nX - /DEVSEL
+	virtual void write_c0nx(uint8_t offset, uint8_t data) { m_device.logerror("a2bus: unhandled write %02x to C0n%x\n", data, offset); }
+	virtual uint8_t read_cnxx(uint8_t offset) { return 0; }       // CnXX - /IOSEL
+	virtual void write_cnxx(uint8_t offset, uint8_t data) { m_device.logerror("a2bus: unhandled write %02x to Cn%02x\n", data, offset); }
+	virtual uint8_t read_c800(uint16_t offset) { return 0; }      // C800 - /IOSTB
+	virtual void write_c800(uint16_t offset, uint8_t data) {m_device.logerror("a2bus: unhandled write %02x to %04x\n", data, offset + 0xc800); }
 	virtual bool take_c800() { return true; }   // override and return false if your card doesn't take over the c800 space
-	virtual uint8_t read_inh_rom(address_space &space, uint16_t offset) { return 0; }
-	virtual void write_inh_rom(address_space &space, uint16_t offset, uint8_t data) { }
+	virtual uint8_t read_inh_rom(uint16_t offset) { return 0; }
+	virtual void write_inh_rom(uint16_t offset, uint8_t data) { }
 	virtual uint16_t inh_start() { return INH_START_INVALID; }
 	virtual uint16_t inh_end() { return INH_END_INVALID; }
 	virtual int inh_type() { return INH_NONE; }
 
 	device_a2bus_card_interface *next() const { return m_next; }
-
-	void set_a2bus_device();
 
 	uint32_t get_slotromspace() { return 0xc000 | (m_slot<<8); }      // return Cn00 address for this slot
 	uint32_t get_slotiospace() { return 0xc080 + (m_slot<<4); }       // return C0n0 address for this slot
@@ -191,6 +193,12 @@ public:
 protected:
 	device_a2bus_card_interface(const machine_config &mconfig, device_t &device);
 
+	virtual void interface_pre_start() override;
+
+	int slotno() const { assert(m_a2bus); return m_slot; }
+	a2bus_device &a2bus() { assert(m_a2bus); return *m_a2bus; }
+
+private:
 	a2bus_device  *m_a2bus;
 	const char *m_a2bus_tag, *m_a2bus_slottag;
 	int m_slot;

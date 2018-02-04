@@ -41,7 +41,7 @@
 
 #include "barata.lh"
 
-#define CPU_CLOCK       (XTAL_6MHz)         /* main cpu clock */
+#define CPU_CLOCK       (XTAL(6'000'000))         /* main cpu clock */
 
 class barata_state : public driver_device
 {
@@ -56,6 +56,7 @@ public:
 	void fpga_send(unsigned char cmd);
 
 	required_device<cpu_device> m_maincpu;
+	void barata(machine_config &config);
 private:
 	unsigned char row_selection;
 };
@@ -304,7 +305,7 @@ ADDRESS_MAP_END
 *    Machine Drivers    *
 ************************/
 
-static MACHINE_CONFIG_START( barata )
+MACHINE_CONFIG_START(barata_state::barata)
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", I8051, CPU_CLOCK)
 	MCFG_CPU_IO_MAP(i8051_io_port)

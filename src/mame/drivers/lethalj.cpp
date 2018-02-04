@@ -146,11 +146,11 @@ Pin #11(+) | | R               |
 #include "speaker.h"
 
 
-#define MASTER_CLOCK            XTAL_40MHz
-#define SOUND_CLOCK             XTAL_2MHz
+#define MASTER_CLOCK            XTAL(40'000'000)
+#define SOUND_CLOCK             XTAL(2'000'000)
 
-#define VIDEO_CLOCK             XTAL_11_289MHz
-#define VIDEO_CLOCK_LETHALJ     XTAL_11_0592MHz
+#define VIDEO_CLOCK             XTAL(11'289'000)
+#define VIDEO_CLOCK_LETHALJ     XTAL(11'059'200)
 
 
 
@@ -176,29 +176,29 @@ CUSTOM_INPUT_MEMBER(lethalj_state::cclownz_paddle)
 
 WRITE16_MEMBER(lethalj_state::ripribit_control_w)
 {
-	machine().bookkeeping().coin_counter_w(0, data & 1);
-	m_ticket->write(space, 0, ((data >> 1) & 1) << 7);
-	output().set_lamp_value(0, (data >> 2) & 1);
+	machine().bookkeeping().coin_counter_w(0, BIT(data, 0));
+	m_ticket->motor_w(BIT(data, 1));
+	output().set_lamp_value(0, BIT(data, 2));
 }
 
 
 WRITE16_MEMBER(lethalj_state::cfarm_control_w)
 {
-	m_ticket->write(space, 0, ((data >> 0) & 1) << 7);
-	output().set_lamp_value(0, (data >> 2) & 1);
-	output().set_lamp_value(1, (data >> 3) & 1);
-	output().set_lamp_value(2, (data >> 4) & 1);
-	machine().bookkeeping().coin_counter_w(0, (data >> 7) & 1);
+	m_ticket->motor_w(BIT(data, 0));
+	output().set_lamp_value(0, BIT(data, 2));
+	output().set_lamp_value(1, BIT(data, 3));
+	output().set_lamp_value(2, BIT(data, 4));
+	machine().bookkeeping().coin_counter_w(0, BIT(data, 7));
 }
 
 
 WRITE16_MEMBER(lethalj_state::cclownz_control_w)
 {
-	m_ticket->write(space, 0, ((data >> 0) & 1) << 7);
-	output().set_lamp_value(0, (data >> 2) & 1);
-	output().set_lamp_value(1, (data >> 4) & 1);
-	output().set_lamp_value(2, (data >> 5) & 1);
-	machine().bookkeeping().coin_counter_w(0, (data >> 6) & 1);
+	m_ticket->motor_w(BIT(data, 0));
+	output().set_lamp_value(0, BIT(data, 2));
+	output().set_lamp_value(1, BIT(data, 4));
+	output().set_lamp_value(2, BIT(data, 5));
+	machine().bookkeeping().coin_counter_w(0, BIT(data, 6));
 }
 
 
@@ -629,7 +629,7 @@ INPUT_PORTS_END
  *
  *************************************/
 
-static MACHINE_CONFIG_START( gameroom )
+MACHINE_CONFIG_START(lethalj_state::gameroom)
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", TMS34010, MASTER_CLOCK)
@@ -663,7 +663,7 @@ static MACHINE_CONFIG_START( gameroom )
 MACHINE_CONFIG_END
 
 
-static MACHINE_CONFIG_DERIVED( lethalj, gameroom )
+MACHINE_CONFIG_DERIVED(lethalj_state::lethalj, gameroom)
 
 	MCFG_CPU_MODIFY("maincpu")
 	MCFG_TMS340X0_PIXEL_CLOCK(VIDEO_CLOCK_LETHALJ) /* pixel clock */

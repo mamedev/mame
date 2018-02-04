@@ -25,6 +25,7 @@
 
 #include "emu.h"
 #include "bus/rs232/rs232.h"
+//#include "bus/s100/s100.h"
 #include "cpu/i8085/i8085.h"
 #include "machine/6850acia.h"
 #include "machine/clock.h"
@@ -42,6 +43,7 @@ public:
 
 	DECLARE_QUICKLOAD_LOAD_MEMBER(altair);
 
+	void altair(machine_config &config);
 private:
 	virtual void machine_reset() override;
 	required_device<cpu_device> m_maincpu;
@@ -50,19 +52,18 @@ private:
 
 
 
-static ADDRESS_MAP_START(altair_mem, AS_PROGRAM, 8, altair_state)
+static ADDRESS_MAP_START(mem_map, AS_PROGRAM, 8, altair_state)
 	ADDRESS_MAP_UNMAP_HIGH
 	AM_RANGE( 0x0000, 0xfcff ) AM_RAM AM_SHARE("ram")
 	AM_RANGE( 0xfd00, 0xfdff ) AM_ROM
 	AM_RANGE( 0xff00, 0xffff ) AM_ROM
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START(altair_io, AS_IO, 8, altair_state)
+static ADDRESS_MAP_START(io_map, AS_IO, 8, altair_state)
 	ADDRESS_MAP_UNMAP_HIGH
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	// TODO: Remove AM_MIRROR() and use SIO address S0-S7
-	AM_RANGE( 0x00, 0x00 ) AM_MIRROR(0x10) AM_DEVREADWRITE("acia", acia6850_device, status_r, control_w)
-	AM_RANGE( 0x01, 0x01 ) AM_MIRROR(0x10) AM_DEVREADWRITE("acia", acia6850_device, data_r, data_w)
+	AM_RANGE(0x00, 0x01) AM_MIRROR(0x10) AM_DEVREADWRITE("acia", acia6850_device, read, write)
 ADDRESS_MAP_END
 
 /* Input ports */
@@ -90,11 +91,11 @@ void altair_state::machine_reset()
 	m_maincpu->set_state_int(i8080_cpu_device::I8085_PC, 0xFD00);
 }
 
-static MACHINE_CONFIG_START( altair )
+MACHINE_CONFIG_START(altair_state::altair)
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", I8080, XTAL_2MHz)
-	MCFG_CPU_PROGRAM_MAP(altair_mem)
-	MCFG_CPU_IO_MAP(altair_io)
+	MCFG_CPU_ADD("maincpu", I8080, XTAL(2'000'000))
+	MCFG_CPU_PROGRAM_MAP(mem_map)
+	MCFG_CPU_IO_MAP(io_map)
 
 	/* video hardware */
 	MCFG_DEVICE_ADD("acia", ACIA6850, 0)

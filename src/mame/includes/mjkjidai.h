@@ -49,4 +49,5 @@ public:
 	uint32_t screen_update_mjkjidai(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	INTERRUPT_GEN_MEMBER(vblank_irq);
 	void draw_sprites(bitmap_ind16 &bitmap,const rectangle &cliprect);
+	void mjkjidai(machine_config &config);
 };

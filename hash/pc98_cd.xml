@@ -956,7 +956,7 @@
 
 	<software name="f117a">
 		<!--
-		Origin unknwon
+		Origin unknown
 		<rom name="f117mlti.iso" size="7340032" crc="cfc9cedf" sha1="2d10e10a050779900bae5e3ddfac0a331079c359"/>
 		-->
 		<description>F-117A Nighthawk - Stealth Fighter 2.0</description>
@@ -1246,7 +1246,7 @@
 
 	<software name="inhearth">
 		<!--
-		Origin unknwon
+		Origin unknown
 		<rom name="inherit.iso" size="14807040" crc="f2af7c90" sha1="75a88c457e5a316c4b8210681a36df105d707c1a"/>
 		-->
 		<description>Inherit the Earth - Arashi no Orb</description>
@@ -1417,7 +1417,7 @@
 
 	<software name="lodoss">
 		<!--
-		Origin unknwon
+		Origin unknown
 		<rom name="lodoss tosenki cd.bin" size="116000640" crc="390cc967" sha1="d3a81091464e6d2dfaa8b17a1a5c44e0bc54baf5"/>
 		<rom name="lodoss tosenki cd.cue" size="295" crc="aba72652" sha1="b859f337058a05c56d75a40a09b22d30de7a377a"/>
 		-->
@@ -2357,7 +2357,7 @@
 
 	<software name="shamhat">
 		<!--
-		Origin unknwon
+		Origin unknown
 		<rom name="shamhat the holy circlet (1994)(datewest).bin" size="242197200" crc="91d12ee2" sha1="30a9e0886155de2a5bbac037dffdd6095a245d4e"/>
 		<rom name="shamhat the holy circlet (1994)(datewest).cue" size="107" crc="6066636e" sha1="1973a6ca97cbe2984623ca93fd7c0c956279e047"/>
 		-->
@@ -2396,7 +2396,7 @@
 
 	<software name="srmp4f">
 		<!--
-		Origin unknwon
+		Origin unknown
 		<rom name="vhmd129.bin" size="11402496" crc="9e620c50" sha1="3062ce263881840fd8dd3feadff9b4107df8e536"/>
 		<rom name="vhmd129.cue" size="70" crc="37b31217" sha1="4fcac64bbd02a8be9e1887a439b80e3192aa5ee5"/>
 		-->
@@ -2701,7 +2701,7 @@
 
 	<software name="yumesei">
 		<!--
-		Origin unknwon
+		Origin unknown
 		<rom name="yume_no_sei.iso" size="13727744" crc="6cc53ec5" sha1="8da4ddb4b3085bdc0cf4257e57de6ec770f3794f"/>
 		-->
 		<description>Yume no Sei</description>

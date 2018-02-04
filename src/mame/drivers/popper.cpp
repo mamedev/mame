@@ -85,6 +85,7 @@ public:
 	DECLARE_READ8_MEMBER(watchdog_clear_r);
 	DECLARE_READ8_MEMBER(inputs_r);
 
+	void popper(machine_config &config);
 protected:
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
@@ -325,13 +326,13 @@ uint32_t popper_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap
 	// draw the sprites
 	for (int offs = 0; offs < 0x800; offs += 4)
 	{
-		// 0  76653210  Y coordinate
+		// 0  76543210  Y coordinate
 		// 1  76543210  Code
 		// 2  7-------  Flip Y
 		// 2  -6------  Flip X
 		// 2  --54----  Not used
 		// 2  ----3210  Color
-		// 3  76653210  X coordinate
+		// 3  76543210  X coordinate
 
 		int sx = m_sprite_ram[offs + 3];
 		int sy = m_sprite_ram[offs + 0];
@@ -526,18 +527,18 @@ void popper_state::machine_reset()
 //  MACHINE DEFINTIONS
 //**************************************************************************
 
-static MACHINE_CONFIG_START( popper )
-	MCFG_CPU_ADD("maincpu", Z80, XTAL_18_432MHz/3/2)
+MACHINE_CONFIG_START(popper_state::popper)
+	MCFG_CPU_ADD("maincpu", Z80, XTAL(18'432'000)/3/2)
 	MCFG_CPU_PROGRAM_MAP(main_map)
 
-	MCFG_CPU_ADD("subcpu", Z80, XTAL_18_432MHz/3/2)
+	MCFG_CPU_ADD("subcpu", Z80, XTAL(18'432'000)/3/2)
 	MCFG_CPU_PROGRAM_MAP(sub_map)
 
 	MCFG_QUANTUM_PERFECT_CPU("maincpu")
 
 	// video hardware
 	MCFG_SCREEN_ADD("screen", RASTER)
-	MCFG_SCREEN_RAW_PARAMS(XTAL_18_432MHz/3, 384, 48, 328, 264, 16, 240)
+	MCFG_SCREEN_RAW_PARAMS(XTAL(18'432'000)/3, 384, 48, 328, 264, 16, 240)
 	MCFG_SCREEN_UPDATE_DRIVER(popper_state, screen_update)
 	MCFG_SCREEN_PALETTE("palette")
 
@@ -549,10 +550,10 @@ static MACHINE_CONFIG_START( popper )
 	// audio hardware
 	MCFG_SPEAKER_STANDARD_MONO("mono")
 
-	MCFG_SOUND_ADD("ay1", AY8910, XTAL_18_432MHz/3/2/2)
+	MCFG_SOUND_ADD("ay1", AY8910, XTAL(18'432'000)/3/2/2)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
 
-	MCFG_SOUND_ADD("ay2", AY8910, XTAL_18_432MHz/3/2/2)
+	MCFG_SOUND_ADD("ay2", AY8910, XTAL(18'432'000)/3/2/2)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
 MACHINE_CONFIG_END
 

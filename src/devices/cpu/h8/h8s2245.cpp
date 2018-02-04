@@ -175,7 +175,7 @@ DEVICE_ADDRESS_MAP_START(map, 16, h8s2245_device)
 	AM_RANGE(0xfffff8, 0xfffffb) AM_DEVREADWRITE( "timer16:2", h8_timer16_channel_device, tgr_r,    tgr_w           )
 ADDRESS_MAP_END
 
-MACHINE_CONFIG_MEMBER(h8s2245_device::device_add_mconfig)
+MACHINE_CONFIG_START(h8s2245_device::device_add_mconfig)
 	MCFG_H8S_INTC_ADD("intc")
 	MCFG_H8_ADC_2245_ADD("adc", "intc", 28)
 	MCFG_H8_DTC_ADD("dtc", "intc", 24)

@@ -93,6 +93,13 @@ public:
 	CUSTOM_INPUT_MEMBER( bankmotor_pos_r );
 	TIMER_DEVICE_CALLBACK_MEMBER(bankmotor_update);
 
+	void shangon_fd1089b(machine_config &config);
+	void outrun_fd1094(machine_config &config);
+	void outrundx(machine_config &config);
+	void shangon(machine_config &config);
+	void outrun_fd1089a(machine_config &config);
+	void outrun(machine_config &config);
+	void outrun_base(machine_config &config);
 protected:
 	// timer IDs
 	enum

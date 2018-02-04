@@ -258,8 +258,8 @@ maybe some sprite placement issues
 #include "speaker.h"
 
 
-#define MAIN_CLOCK      XTAL_24MHz
-#define SOUND_CLOCK     XTAL_18_432MHz
+#define MAIN_CLOCK      XTAL(24'000'000)
+#define SOUND_CLOCK     XTAL(18'432'000)
 
 
 static const char *const gunnames[] = { "LIGHT0_X", "LIGHT0_Y", "LIGHT1_X", "LIGHT1_Y" };
@@ -343,6 +343,8 @@ READ8_MEMBER(lethal_state::gunsaux_r)
 static ADDRESS_MAP_START( le_main, AS_PROGRAM, 8, lethal_state )
 	AM_RANGE(0x0000, 0x1fff) AM_ROMBANK("bank1")
 	AM_RANGE(0x2000, 0x3fff) AM_RAM             // work RAM
+	AM_RANGE(0x4000, 0x7fff) AM_DEVICE("bank4000", address_map_bank_device, amap8)
+	AM_RANGE(0x4000, 0x43ff) AM_UNMAP // first 0x400 bytes of palette RAM are inaccessible
 	AM_RANGE(0x4000, 0x403f) AM_DEVWRITE("k056832", k056832_device, write)
 	AM_RANGE(0x4040, 0x404f) AM_DEVWRITE("k056832", k056832_device, b_w)
 	AM_RANGE(0x4080, 0x4080) AM_READNOP     // watchdog
@@ -355,8 +357,6 @@ static ADDRESS_MAP_START( le_main, AS_PROGRAM, 8, lethal_state )
 	AM_RANGE(0x40d9, 0x40d9) AM_READ_PORT("INPUTS")
 	AM_RANGE(0x40db, 0x40db) AM_READ(gunsaux_r)     // top X bit of guns
 	AM_RANGE(0x40dc, 0x40dc) AM_WRITE(le_bankswitch_w)
-	AM_RANGE(0x4000, 0x43ff) AM_UNMAP // first 0x400 bytes of palette RAM are inaccessible
-	AM_RANGE(0x4000, 0x7fff) AM_DEVICE("bank4000", address_map_bank_device, amap8)
 	AM_RANGE(0x8000, 0xffff) AM_ROM AM_REGION("maincpu", 0x38000)
 ADDRESS_MAP_END
 
@@ -377,7 +377,7 @@ static ADDRESS_MAP_START( bank4000_map, AS_PROGRAM, 8, lethal_state )
 	AM_RANGE(0xa000, 0xbfff) AM_MIRROR(0x4000) AM_UNMAP // AM_DEVREAD("k056832", k056832_device, rom_byte_r)
 
 	// CBNK = 1; partially overlaid when VRD = 1
-	AM_RANGE(0x4000, 0x7fff) AM_MIRROR(0x8000) AM_RAM_DEVWRITE("palette", palette_device, write) AM_SHARE("palette")
+	AM_RANGE(0x4000, 0x7fff) AM_MIRROR(0x8000) AM_RAM_DEVWRITE("palette", palette_device, write8) AM_SHARE("palette")
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( le_sound, AS_PROGRAM, 8, lethal_state )
@@ -486,7 +486,7 @@ void lethal_state::machine_reset()
 	m_bank4000->set_bank(0);
 }
 
-static MACHINE_CONFIG_START( lethalen )
+MACHINE_CONFIG_START(lethal_state::lethalen)
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", HD6309, MAIN_CLOCK/2)    /* verified on pcb */
@@ -499,8 +499,8 @@ static MACHINE_CONFIG_START( lethalen )
 	MCFG_DEVICE_ADD("bank4000", ADDRESS_MAP_BANK, 0)
 	MCFG_DEVICE_PROGRAM_MAP(bank4000_map)
 	MCFG_ADDRESS_MAP_BANK_ENDIANNESS(ENDIANNESS_BIG)
-	MCFG_ADDRESS_MAP_BANK_DATABUS_WIDTH(8)
-	MCFG_ADDRESS_MAP_BANK_ADDRBUS_WIDTH(16)
+	MCFG_ADDRESS_MAP_BANK_DATA_WIDTH(8)
+	MCFG_ADDRESS_MAP_BANK_ADDR_WIDTH(16)
 	MCFG_ADDRESS_MAP_BANK_STRIDE(0x4000)
 
 	MCFG_EEPROM_SERIAL_ER5911_8BIT_ADD("eeprom")
@@ -536,13 +536,13 @@ static MACHINE_CONFIG_START( lethalen )
 
 	MCFG_K054321_ADD("k054321", ":lspeaker", ":rspeaker")
 
-	MCFG_DEVICE_ADD("k054539", K054539, XTAL_18_432MHz)
+	MCFG_DEVICE_ADD("k054539", K054539, XTAL(18'432'000))
 	MCFG_K054539_TIMER_HANDLER(INPUTLINE("soundcpu", INPUT_LINE_NMI))
 	MCFG_SOUND_ROUTE(0, "lspeaker", 1.0)
 	MCFG_SOUND_ROUTE(1, "rspeaker", 1.0)
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_DERIVED( lethalej, lethalen )
+MACHINE_CONFIG_DERIVED(lethal_state::lethalej, lethalen)
 
 	MCFG_SCREEN_MODIFY("screen")
 	MCFG_SCREEN_VISIBLE_AREA(224, 512-1, 16, 240-1)

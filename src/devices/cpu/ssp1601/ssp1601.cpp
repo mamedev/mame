@@ -18,6 +18,7 @@
 
 #include "emu.h"
 #include "ssp1601.h"
+#include "ssp1601d.h"
 
 #include "debugger.h"
 
@@ -44,8 +45,8 @@
 
 #define PPC    m_ppc.w.h
 
-#define FETCH() m_direct->read_word(rPC++ << 1)
-#define PROGRAM_WORD(a) m_program->read_word((a) << 1)
+#define FETCH() m_direct->read_word(rPC++)
+#define PROGRAM_WORD(a) m_program->read_word(a)
 #define GET_PPC_OFFS() PPC
 
 #define REG_READ(r) (((r) <= 4) ? m_gr[r].w.h : (this->*reg_read_handlers[r])(r))
@@ -209,10 +210,9 @@ device_memory_interface::space_config_vector ssp1601_device::memory_space_config
 }
 
 
-offs_t ssp1601_device::disasm_disassemble(std::ostream &stream, offs_t pc, const uint8_t *oprom, const uint8_t *opram, uint32_t options)
+util::disasm_interface *ssp1601_device::create_disassembler()
 {
-	extern CPU_DISASSEMBLE( ssp1601 );
-	return CPU_DISASSEMBLE_NAME(ssp1601)(this, stream, pc, oprom, opram, options);
+	return new ssp1601_disassembler;
 }
 
 
@@ -522,7 +522,7 @@ void ssp1601_device::device_start()
 
 	m_gr[0].w.h = 0xffff; // constant reg
 	m_program = &space(AS_PROGRAM);
-	m_direct = &m_program->direct();
+	m_direct = m_program->direct<-1>();
 	m_io = &space(AS_IO);
 
 	state_add( SSP_R0,     "REG0",   m_gr[0].w.h).formatstr("%04X");

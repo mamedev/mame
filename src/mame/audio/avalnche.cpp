@@ -103,7 +103,7 @@ static DISCRETE_SOUND_START(avalnche)
 DISCRETE_SOUND_END
 
 
-MACHINE_CONFIG_START( avalnche_sound )
+MACHINE_CONFIG_START(avalnche_state::avalnche_sound)
 	MCFG_SPEAKER_STANDARD_MONO("mono")
 
 	MCFG_SOUND_ADD("discrete", DISCRETE, 0)
@@ -118,7 +118,7 @@ MACHINE_CONFIG_START( avalnche_sound )
 MACHINE_CONFIG_END
 
 
-MACHINE_CONFIG_START( catch_sound ) // just a stub here...
+MACHINE_CONFIG_START(avalnche_state::acatch_sound) // just a stub here...
 	MCFG_DEVICE_MODIFY("latch")
 	MCFG_ADDRESSABLE_LATCH_Q1_OUT_CB(NOOP) // It is attract_enable just like avalnche, but not hooked up yet.
 	MCFG_ADDRESSABLE_LATCH_Q4_OUT_CB(WRITELINE(avalnche_state, catch_aud0_w))

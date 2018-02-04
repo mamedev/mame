@@ -366,17 +366,17 @@ ADDRESS_MAP_END
 
 /***************************************************************************************/
 
-static MACHINE_CONFIG_START( chinhero )
+MACHINE_CONFIG_START(shangkid_state::chinhero)
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", Z80, XTAL_18_432MHz/6) /* verified on pcb */
+	MCFG_CPU_ADD("maincpu", Z80, XTAL(18'432'000)/6) /* verified on pcb */
 	MCFG_CPU_PROGRAM_MAP(chinhero_main_map)
 
-	MCFG_CPU_ADD("bbx", Z80, XTAL_18_432MHz/6) /* verified on pcb */
+	MCFG_CPU_ADD("bbx", Z80, XTAL(18'432'000)/6) /* verified on pcb */
 	MCFG_CPU_PROGRAM_MAP(chinhero_bbx_map)
 	MCFG_CPU_IO_MAP(chinhero_bbx_portmap)
 
-	MCFG_CPU_ADD("audiocpu", Z80, XTAL_18_432MHz/6) /* verified on pcb */
+	MCFG_CPU_ADD("audiocpu", Z80, XTAL(18'432'000)/6) /* verified on pcb */
 	MCFG_CPU_PROGRAM_MAP(chinhero_sound_map)
 	MCFG_CPU_IO_MAP(sound_portmap)
 
@@ -415,14 +415,14 @@ static MACHINE_CONFIG_START( chinhero )
 	MCFG_DEVICE_ADD("vref", VOLTAGE_REGULATOR, 0) MCFG_VOLTAGE_REGULATOR_OUTPUT(5.0)
 	MCFG_SOUND_ROUTE_EX(0, "dac", 1.0, DAC_VREF_POS_INPUT) MCFG_SOUND_ROUTE_EX(0, "dac", -1.0, DAC_VREF_NEG_INPUT)
 
-	MCFG_SOUND_ADD("aysnd", AY8910, XTAL_18_432MHz/12) /* verified on pcb */
+	MCFG_SOUND_ADD("aysnd", AY8910, XTAL(18'432'000)/12) /* verified on pcb */
 	MCFG_AY8910_PORT_A_WRITE_CB(WRITE8(shangkid_state, chinhero_ay8910_porta_w))
 	MCFG_AY8910_PORT_B_WRITE_CB(WRITE8(shangkid_state, ay8910_portb_w))
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 0.1)
 MACHINE_CONFIG_END
 
 
-static MACHINE_CONFIG_DERIVED( shangkid, chinhero )
+MACHINE_CONFIG_DERIVED(shangkid_state::shangkid, chinhero)
 
 	/* basic machine hardware */
 	MCFG_CPU_MODIFY("maincpu")
@@ -472,7 +472,7 @@ static ADDRESS_MAP_START( dynamski_portmap, AS_IO, 8, shangkid_state )
 	AM_RANGE(0x00, 0x01) AM_DEVWRITE("aysnd", ay8910_device, data_address_w)
 ADDRESS_MAP_END
 
-static MACHINE_CONFIG_START( dynamski )
+MACHINE_CONFIG_START(shangkid_state::dynamski)
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", Z80, 3000000) /* ? */

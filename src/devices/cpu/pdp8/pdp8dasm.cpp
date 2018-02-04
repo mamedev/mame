@@ -7,9 +7,16 @@
 */
 
 #include "emu.h"
+#include "pdp8dasm.h"
 
-static offs_t pdp8_dasm_one(std::ostream &stream, offs_t pc, uint16_t op)
+u32 pdp8_disassembler::opcode_alignment() const
 {
+	return 2;
+}
+
+offs_t pdp8_disassembler::disassemble(std::ostream &stream, offs_t pc, const data_buffer &opcodes, const data_buffer &params)
+{
+	uint16_t op = opcodes.r16(pc);
 	uint8_t opcode = (op >> 011) & 07;
 	uint16_t current_page = pc & 07600;
 	uint16_t zero_addr = op & 0177;
@@ -157,15 +164,5 @@ static offs_t pdp8_dasm_one(std::ostream &stream, offs_t pc, uint16_t op)
 		}
 	}
 
-	return 2 | DASMFLAG_SUPPORTED;
-}
-
-
-/*****************************************************************************/
-
-CPU_DISASSEMBLE( pdp8 )
-{
-	uint16_t op = (*(uint8_t *)(opram + 0) << 8) |
-				(*(uint8_t *)(opram + 1) << 0);
-	return pdp8_dasm_one(stream, pc, op);
+	return 2 | SUPPORTED;
 }

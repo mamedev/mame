@@ -1010,3 +1010,38 @@ if (VIDEOS["PPU2C0X"]~=null) then
 	}
 end
 
+--------------------------------------------------
+--
+--@src/devices/video/bt459.h,VIDEOS["BT459"] = true
+--------------------------------------------------
+
+if (VIDEOS["BT459"]~=null) then
+	files {
+		MAME_DIR .. "src/devices/video/bt459.cpp",
+		MAME_DIR .. "src/devices/video/bt459.h",
+	}
+end
+
+--------------------------------------------------
+--
+--@src/devices/video/imagetek_i4100.h,VIDEOS["I4100"] = true
+--------------------------------------------------
+
+if (VIDEOS["I4100"]~=null) then
+	files {
+		MAME_DIR .. "src/devices/video/imagetek_i4100.cpp",
+		MAME_DIR .. "src/devices/video/imagetek_i4100.h",
+	}
+end
+
+--------------------------------------------------
+--
+--@src/devices/video/dp8510.h,VIDEOS["DP8510"] = true
+--------------------------------------------------
+
+if (VIDEOS["DP8510"]~=null) then
+	files {
+		MAME_DIR .. "src/devices/video/dp8510.cpp",
+		MAME_DIR .. "src/devices/video/dp8510.h",
+	}
+end

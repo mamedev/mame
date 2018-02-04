@@ -35,7 +35,7 @@ WRITE8_MEMBER(spc1000_fdd_exp_device::i8255_c_w)
 
 READ8_MEMBER( spc1000_fdd_exp_device::tc_r )
 {
-	logerror("%s: tc_r\n", space.machine().describe_context());
+	logerror("%s: tc_r\n", machine().describe_context());
 
 	// toggle tc on read
 	m_fdc->tc_w(true);
@@ -46,7 +46,7 @@ READ8_MEMBER( spc1000_fdd_exp_device::tc_r )
 
 WRITE8_MEMBER( spc1000_fdd_exp_device::control_w )
 {
-	logerror("%s: control_w(%02x)\n", space.machine().describe_context(), data);
+	logerror("%s: control_w(%02x)\n", machine().describe_context(), data);
 
 	// bit 0, motor on signal
 	if (m_fd0)
@@ -77,10 +77,10 @@ SLOT_INTERFACE_END
 //  device_add_mconfig
 //-------------------------------------------------
 
-MACHINE_CONFIG_MEMBER( spc1000_fdd_exp_device::device_add_mconfig )
+MACHINE_CONFIG_START(spc1000_fdd_exp_device::device_add_mconfig)
 
 	// sub CPU (5 inch floppy drive)
-	MCFG_CPU_ADD("fdccpu", Z80, XTAL_4MHz)
+	MCFG_CPU_ADD("fdccpu", Z80, XTAL(4'000'000))
 	MCFG_CPU_PROGRAM_MAP(sd725_mem)
 	MCFG_CPU_IO_MAP(sd725_io)
 

@@ -80,6 +80,7 @@ public:
 	DECLARE_WRITE_LINE_MEMBER(printer_select_w);
 	DECLARE_INPUT_CHANGED_MEMBER(printer_type);
 
+	void zorba(machine_config &config);
 private:
 	required_ioport                     m_config_port;
 

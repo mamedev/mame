@@ -34,10 +34,10 @@ protected:
 	virtual void device_reset() override;
 
 	// overrides of standard a2bus slot functions
-	virtual uint8_t read_c0nx(address_space &space, uint8_t offset) override;
-	virtual void write_c0nx(address_space &space, uint8_t offset, uint8_t data) override;
-	virtual uint8_t read_inh_rom(address_space &space, uint16_t offset) override;
-	virtual void write_inh_rom(address_space &space, uint16_t offset, uint8_t data) override;
+	virtual uint8_t read_c0nx(uint8_t offset) override;
+	virtual void write_c0nx(uint8_t offset, uint8_t data) override;
+	virtual uint8_t read_inh_rom(uint16_t offset) override;
+	virtual void write_inh_rom(uint16_t offset, uint8_t data) override;
 	virtual uint16_t inh_start() override { return 0xd000; }
 	virtual uint16_t inh_end() override { return 0xffff; }
 	virtual int inh_type() override;

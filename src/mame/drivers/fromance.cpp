@@ -893,7 +893,7 @@ MACHINE_RESET_MEMBER(fromance_state,fromance)
 	m_flipscreen = 0;
 }
 
-static MACHINE_CONFIG_START( nekkyoku )
+MACHINE_CONFIG_START(fromance_state::nekkyoku)
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", Z80,12000000/2)     /* 6.00 Mhz ? */
@@ -939,14 +939,14 @@ static MACHINE_CONFIG_START( nekkyoku )
 MACHINE_CONFIG_END
 
 
-static MACHINE_CONFIG_START( idolmj )
+MACHINE_CONFIG_START(fromance_state::idolmj)
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", Z80, XTAL_12MHz / 2)     /* 6.00 Mhz ? */
+	MCFG_CPU_ADD("maincpu", Z80, XTAL(12'000'000) / 2)     /* 6.00 Mhz ? */
 	MCFG_CPU_PROGRAM_MAP(fromance_main_map)
 	MCFG_CPU_VBLANK_INT_DRIVER("screen", fromance_state,  irq0_line_hold)
 
-	MCFG_CPU_ADD("sub", Z80, XTAL_12MHz / 2)     /* 6.00 Mhz ? */
+	MCFG_CPU_ADD("sub", Z80, XTAL(12'000'000) / 2)     /* 6.00 Mhz ? */
 	MCFG_CPU_PROGRAM_MAP(fromance_sub_map)
 	MCFG_CPU_IO_MAP(idolmj_sub_io_map)
 
@@ -967,7 +967,7 @@ static MACHINE_CONFIG_START( idolmj )
 	MCFG_GFXDECODE_ADD("gfxdecode", "palette", fromance)
 	MCFG_PALETTE_ADD("palette", 2048)
 
-	MCFG_DEVICE_ADD("gga", VSYSTEM_GGA, XTAL_14_31818MHz / 2) // divider not verified
+	MCFG_DEVICE_ADD("gga", VSYSTEM_GGA, XTAL(14'318'181) / 2) // divider not verified
 	MCFG_VSYSTEM_GGA_REGISTER_WRITE_CB(WRITE8(fromance_state, fromance_gga_data_w))
 
 	MCFG_VIDEO_START_OVERRIDE(fromance_state,fromance)
@@ -975,7 +975,7 @@ static MACHINE_CONFIG_START( idolmj )
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
 
-	MCFG_SOUND_ADD("aysnd", YM2149, XTAL_12MHz / 6)
+	MCFG_SOUND_ADD("aysnd", YM2149, XTAL(12'000'000) / 6)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.15)
 
 	MCFG_SOUND_ADD("msm", MSM5205, 384000)
@@ -985,14 +985,14 @@ static MACHINE_CONFIG_START( idolmj )
 MACHINE_CONFIG_END
 
 
-static MACHINE_CONFIG_START( fromance )
+MACHINE_CONFIG_START(fromance_state::fromance)
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", Z80, XTAL_12MHz / 2)     /* 6.00 Mhz ? */
+	MCFG_CPU_ADD("maincpu", Z80, XTAL(12'000'000) / 2)     /* 6.00 Mhz ? */
 	MCFG_CPU_PROGRAM_MAP(fromance_main_map)
 	MCFG_CPU_VBLANK_INT_DRIVER("screen", fromance_state,  irq0_line_hold)
 
-	MCFG_CPU_ADD("sub", Z80, XTAL_12MHz / 2)     /* 6.00 Mhz ? */
+	MCFG_CPU_ADD("sub", Z80, XTAL(12'000'000) / 2)     /* 6.00 Mhz ? */
 	MCFG_CPU_PROGRAM_MAP(fromance_sub_map)
 	MCFG_CPU_IO_MAP(fromance_sub_io_map)
 
@@ -1013,7 +1013,7 @@ static MACHINE_CONFIG_START( fromance )
 	MCFG_GFXDECODE_ADD("gfxdecode", "palette", fromance)
 	MCFG_PALETTE_ADD("palette", 2048)
 
-	MCFG_DEVICE_ADD("gga", VSYSTEM_GGA, XTAL_14_31818MHz / 2) // divider not verified
+	MCFG_DEVICE_ADD("gga", VSYSTEM_GGA, XTAL(14'318'181) / 2) // divider not verified
 	MCFG_VSYSTEM_GGA_REGISTER_WRITE_CB(WRITE8(fromance_state, fromance_gga_data_w))
 
 	MCFG_VIDEO_START_OVERRIDE(fromance_state,fromance)

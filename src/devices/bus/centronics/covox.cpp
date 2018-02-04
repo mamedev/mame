@@ -38,7 +38,7 @@ centronics_covox_device::centronics_covox_device(const machine_config &mconfig, 
 //  device_add_mconfig - add device configuration
 //-------------------------------------------------
 
-MACHINE_CONFIG_MEMBER( centronics_covox_device::device_add_mconfig )
+MACHINE_CONFIG_START(centronics_covox_device::device_add_mconfig)
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("speaker")
 	MCFG_SOUND_ADD("dac", DAC_8BIT_R2R, 0) MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 0.5) // unknown DAC
@@ -87,7 +87,7 @@ centronics_covox_stereo_device::centronics_covox_stereo_device(const machine_con
 //  device_add_mconfig - add device configuration
 //-------------------------------------------------
 
-MACHINE_CONFIG_MEMBER( centronics_covox_stereo_device::device_add_mconfig )
+MACHINE_CONFIG_START(centronics_covox_stereo_device::device_add_mconfig)
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
 	MCFG_SOUND_ADD("ldac", DAC_8BIT_R2R, 0) MCFG_SOUND_ROUTE(ALL_OUTPUTS, "lspeaker", 0.5) // unknown DAC

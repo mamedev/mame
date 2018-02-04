@@ -134,7 +134,7 @@ WRITE8_MEMBER(hec2hrp_state::hector_switch_bank_w)
 							if (m_flag_clk ==1)
 							{
 								m_flag_clk=0;
-								m_maincpu->set_unscaled_clock(XTAL_5MHz);  /* increase CPU*/
+								m_maincpu->set_unscaled_clock(XTAL(5'000'000));  /* increase CPU*/
 							}
 						}
 	if (offset==0x04)   {   /* 0x804 => video page, BR*/
@@ -144,7 +144,7 @@ WRITE8_MEMBER(hec2hrp_state::hector_switch_bank_w)
 							if (m_flag_clk ==0)
 							{
 								m_flag_clk=1;
-								m_maincpu->set_unscaled_clock(XTAL_1_75MHz);  /* slowdown CPU*/
+								m_maincpu->set_unscaled_clock(XTAL(1'750'000));  /* slowdown CPU*/
 							}
 						}
 	if (offset==0x08)   {   /* 0x808 => base page, HR*/
@@ -153,7 +153,7 @@ WRITE8_MEMBER(hec2hrp_state::hector_switch_bank_w)
 							if (m_flag_clk ==1)
 							{
 								m_flag_clk=0;
-								m_maincpu->set_unscaled_clock(XTAL_5MHz);  /* increase CPU*/
+								m_maincpu->set_unscaled_clock(XTAL(5'000'000));  /* increase CPU*/
 							}
 
 						}
@@ -164,7 +164,7 @@ WRITE8_MEMBER(hec2hrp_state::hector_switch_bank_w)
 							if (m_flag_clk ==0)
 							{
 								m_flag_clk=1;
-								m_maincpu->set_unscaled_clock(XTAL_1_75MHz);  /* slowdown CPU*/
+								m_maincpu->set_unscaled_clock(XTAL(1'750'000));  /* slowdown CPU*/
 							}
 						}
 }
@@ -803,7 +803,7 @@ static DISCRETE_SOUND_START( hec2hrp )
 	DISCRETE_OUTPUT(NODE_01, 5000)
 DISCRETE_SOUND_END
 
-MACHINE_CONFIG_START( hector_audio )
+MACHINE_CONFIG_START(hec2hrp_state::hector_audio)
 	MCFG_SPEAKER_STANDARD_MONO("mono")
 	MCFG_SOUND_WAVE_ADD(WAVE_TAG, "cassette")
 	MCFG_SOUND_ROUTE(0, "mono", 0.25)  /* Sound level for cassette, as it is in mono => output channel=0*/

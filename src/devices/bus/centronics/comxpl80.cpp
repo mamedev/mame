@@ -98,7 +98,7 @@ ADDRESS_MAP_END
 //  device_add_mconfig - add device configuration
 //-------------------------------------------------
 
-MACHINE_CONFIG_MEMBER( comx_pl80_device::device_add_mconfig )
+MACHINE_CONFIG_START(comx_pl80_device::device_add_mconfig)
 	MCFG_CPU_ADD(CX005_TAG, M6805, 4000000) // CX005: some kind of MC6805/MC68HC05 clone
 	MCFG_CPU_PROGRAM_MAP(comxpl80_mem)
 	MCFG_CPU_IO_MAP(comxpl80_io)

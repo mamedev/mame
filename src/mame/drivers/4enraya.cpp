@@ -156,7 +156,7 @@
 #include "screen.h"
 #include "speaker.h"
 
-#define MAIN_CLOCK XTAL_8MHz
+#define MAIN_CLOCK XTAL(8'000'000)
 
 
 /***********************************
@@ -466,7 +466,7 @@ void _4enraya_state::machine_reset()
 *         Machine Drivers          *
 ***********************************/
 
-static MACHINE_CONFIG_START( 4enraya )
+MACHINE_CONFIG_START(_4enraya_state::_4enraya )
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", Z80, MAIN_CLOCK/2)
@@ -494,7 +494,7 @@ static MACHINE_CONFIG_START( 4enraya )
 MACHINE_CONFIG_END
 
 
-static MACHINE_CONFIG_DERIVED( unkpacg, 4enraya )
+MACHINE_CONFIG_DERIVED(_4enraya_state::unkpacg, _4enraya)
 
 	/* basic machine hardware */
 	MCFG_CPU_MODIFY("maincpu")
@@ -543,7 +543,7 @@ ROM_START( 4enrayaa )
 ROM_END
 
 
-/* 
+/*
   Unknown 'Pac-Man' gambling game.
 */
 ROM_START(unkpacg)
@@ -557,7 +557,7 @@ ROM_START(unkpacg)
 	ROM_LOAD( "5.u18",   0x0000, 0x2000, CRC(44f272d2) SHA1(b39cbc1f290d9fb2453396906e4da4a682c41ef4) )
 ROM_END
 
-/* 
+/*
   Unknown 'Space Invaders' gambling game.
   All roms are 0x8000 but only the last 0x2000 of each is used.
 */
@@ -587,7 +587,7 @@ ROM_START( unksig )
 	ROM_CONTINUE(      0x4000, 0x2000) // only data here matters
 ROM_END
 
-/* 
+/*
   Unknown 'Space Invaders' gambling game
   All roms are 0x10000 but with a lot of addressing issues
 
@@ -636,7 +636,7 @@ DRIVER_INIT_MEMBER(_4enraya_state, unkpacg)
 	// descramble rom
 	uint8_t *rom = memregion("maincpu")->base();
 	for (int i = 0x8000; i < 0xa000; i++)
-		rom[i] = BITSWAP8(rom[i], 7,6,5,4,3,2,0,1);
+		rom[i] = bitswap<8>(rom[i], 7,6,5,4,3,2,0,1);
 }
 
 
@@ -645,8 +645,8 @@ DRIVER_INIT_MEMBER(_4enraya_state, unkpacg)
 ***********************************/
 
 /*    YEAR  NAME      PARENT   MACHINE   INPUT    STATE           INIT     ROT    COMPANY      FULLNAME                                         FLAGS  */
-GAME( 1990, 4enraya,  0,       4enraya,  4enraya, _4enraya_state, 0,       ROT0, "IDSA",      "4 En Raya (set 1)",                              MACHINE_SUPPORTS_SAVE )
-GAME( 1990, 4enrayaa, 4enraya, 4enraya,  4enraya, _4enraya_state, 0,       ROT0, "IDSA",      "4 En Raya (set 2)",                              MACHINE_SUPPORTS_SAVE )
+GAME( 1990, 4enraya,  0,       _4enraya, 4enraya, _4enraya_state, 0,       ROT0, "IDSA",      "4 En Raya (set 1)",                              MACHINE_SUPPORTS_SAVE )
+GAME( 1990, 4enrayaa, 4enraya, _4enraya, 4enraya, _4enraya_state, 0,       ROT0, "IDSA",      "4 En Raya (set 2)",                              MACHINE_SUPPORTS_SAVE )
 GAME( 199?, unkpacg,  0,       unkpacg,  unkpacg, _4enraya_state, unkpacg, ROT0, "<unknown>", "unknown 'Pac-Man' gambling game",                MACHINE_SUPPORTS_SAVE )
 GAME( 199?, unksig,   0,       unkpacg,  unkfr,   _4enraya_state, unkpacg, ROT0, "<unknown>", "unknown 'Space Invaders' gambling game (set 1)", MACHINE_SUPPORTS_SAVE )
 GAME( 199?, unksiga,  unksig,  unkpacg,  unkfr,   _4enraya_state, unkpacg, ROT0, "<unknown>", "unknown 'Space Invaders' gambling game (set 2)", MACHINE_SUPPORTS_SAVE )

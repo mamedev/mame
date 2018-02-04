@@ -126,6 +126,7 @@ public:
 	TIMER_CALLBACK_MEMBER(ready_end_cb);
 	TIMER_CALLBACK_MEMBER(keyboard_strobe_cb);
 
+	void apple1(machine_config &config);
 private:
 	uint8_t *m_ram_ptr, *m_char_ptr;
 	int m_ram_size, m_char_size;
@@ -585,13 +586,13 @@ static SLOT_INTERFACE_START(apple1_cards)
 	SLOT_INTERFACE("cffa", A1BUS_CFFA)
 SLOT_INTERFACE_END
 
-static MACHINE_CONFIG_START( apple1 )
+MACHINE_CONFIG_START(apple1_state::apple1)
 	MCFG_CPU_ADD(A1_CPU_TAG, M6502, 960000)        // effective CPU speed
 	MCFG_CPU_PROGRAM_MAP(apple1_map)
 
 	// video timings are identical to the Apple II, unsurprisingly
 	MCFG_SCREEN_ADD("screen", RASTER)
-	MCFG_SCREEN_RAW_PARAMS(XTAL_14_31818MHz, (65*7)*2, 0, (40*7)*2, 262, 0, 192)
+	MCFG_SCREEN_RAW_PARAMS(XTAL(14'318'181), (65*7)*2, 0, (40*7)*2, 262, 0, 192)
 	MCFG_SCREEN_UPDATE_DRIVER(apple1_state, screen_update)
 	MCFG_SCREEN_PALETTE("palette")
 

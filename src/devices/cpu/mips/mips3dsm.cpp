@@ -9,11 +9,12 @@
 ***************************************************************************/
 
 #include "emu.h"
+#include "mips3dsm.h"
 
 #define USE_ABI_REG_NAMES (1)
 
 #if USE_ABI_REG_NAMES
-static const char *const reg[32] =
+const char *const mips3_disassembler::reg[32] =
 {
 	"$0",   "$at",  "$v0",  "$v1",  "$a0",  "$a1",  "$a2",  "$a3",
 	"$t0",  "$t1",  "$t2",  "$t3",  "$t4",  "$t5",  "$t6",  "$t7",
@@ -21,7 +22,7 @@ static const char *const reg[32] =
 	"$t8",  "$t9",  "$k0",  "$k1",  "$gp",  "$sp",  "$fp",  "$ra"
 };
 #else
-static const char *const reg[32] =
+const char *const mips3_disassembler::reg[32] =
 {
 	"r0",   "r1",   "r2",   "r3",   "r4",   "r5",   "r6",   "r7",
 	"r8",   "r9",   "r10",  "r11",  "r12",  "r13",  "r14",  "r15",
@@ -30,7 +31,7 @@ static const char *const reg[32] =
 };
 #endif
 
-static const char *const cacheop[32] =
+const char *const mips3_disassembler::cacheop[32] =
 {
 	"I_Invd", "D_WBInvd", "Unknown 2", "Unknown 3", "I_IndexLoadTag", "D_IndexLoadTag", "Unknown 6", "Unknown 7",
 	"I_IndexStoreTag", "D_IndexStoreTag", "Unknown 10", "Unknown 11", "Unknown 12", "D_CreateDirtyExcl", "Unknown 14", "Unknown 15",
@@ -39,7 +40,7 @@ static const char *const cacheop[32] =
 };
 
 
-static const char *const cpreg[4][32] =
+const char *const mips3_disassembler::cpreg[4][32] =
 {
 	{
 		"Index","Random","EntryLo0","EntryLo1","Context","PageMask","Wired","Error",
@@ -68,7 +69,7 @@ static const char *const cpreg[4][32] =
 };
 
 
-static const char *const ccreg[4][32] =
+const char *const mips3_disassembler::ccreg[4][32] =
 {
 	{
 		"ccr0", "ccr1", "ccr2", "ccr3", "ccr4", "ccr5", "ccr6", "ccr7",
@@ -101,17 +102,15 @@ static const char *const ccreg[4][32] =
     CODE CODE
 ***************************************************************************/
 
-static inline char *signed_16bit(int16_t val)
+inline std::string mips3_disassembler::signed_16bit(int16_t val)
 {
-	static char temp[10];
 	if (val < 0)
-		sprintf(temp, "-$%x", -val);
+		return util::string_format("-$%x", -val);
 	else
-		sprintf(temp, "$%x", val);
-	return temp;
+		return util::string_format("$%x", val);
 }
 
-static uint32_t dasm_cop0(uint32_t pc, uint32_t op, std::ostream &stream)
+uint32_t mips3_disassembler::dasm_cop0(uint32_t pc, uint32_t op, std::ostream &stream)
 {
 	int rt = (op >> 16) & 31;
 	int rd = (op >> 11) & 31;
@@ -157,7 +156,7 @@ static uint32_t dasm_cop0(uint32_t pc, uint32_t op, std::ostream &stream)
 				case 0x02:  util::stream_format(stream, "tlbwi");                                           break;
 				case 0x06:  util::stream_format(stream, "tlbwr");                                           break;
 				case 0x08:  util::stream_format(stream, "tlbp");                                            break;
-				case 0x10:  util::stream_format(stream, "rfe"); flags = DASMFLAG_STEP_OUT;                  break;
+				case 0x10:  util::stream_format(stream, "rfe"); flags = STEP_OUT;                  break;
 				case 0x18:  util::stream_format(stream, "eret [invalid]");                                  break;
 				default:    util::stream_format(stream, "cop0  $%07x", op & 0x01ffffff);                    break;
 			}
@@ -167,9 +166,9 @@ static uint32_t dasm_cop0(uint32_t pc, uint32_t op, std::ostream &stream)
 	return flags;
 }
 
-static uint32_t dasm_cop1(uint32_t pc, uint32_t op, std::ostream &stream)
+uint32_t mips3_disassembler::dasm_cop1(uint32_t pc, uint32_t op, std::ostream &stream)
 {
-	static const char *const format_table[] =
+	const char *const format_table[] =
 	{
 		"?","?","?","?","?","?","?","?","?","?","?","?","?","?","?","?",
 		"s","d","?","?","w","l","?","?","?","?","?","?","?","?","?","?"
@@ -195,8 +194,8 @@ static uint32_t dasm_cop1(uint32_t pc, uint32_t op, std::ostream &stream)
 			{
 				case 0x00:  util::stream_format(stream, "bc1f   $%08x,%d", pc + 4 + ((int16_t)op << 2), (op >> 18) & 7);      break;
 				case 0x01:  util::stream_format(stream, "bc1t   $%08x,%d", pc + 4 + ((int16_t)op << 2), (op >> 18) & 7);      break;
-				case 0x02:  util::stream_format(stream, "bc1fl  $%08x,%d", pc + 4 + ((int16_t)op << 2), (op >> 18) & 7); flags = DASMFLAG_STEP_OVER | DASMFLAG_STEP_OVER_EXTRA(1); break;
-				case 0x03:  util::stream_format(stream, "bc1tl  $%08x,%d", pc + 4 + ((int16_t)op << 2), (op >> 18) & 7); flags = DASMFLAG_STEP_OVER | DASMFLAG_STEP_OVER_EXTRA(1); break;
+				case 0x02:  util::stream_format(stream, "bc1fl  $%08x,%d", pc + 4 + ((int16_t)op << 2), (op >> 18) & 7); flags = STEP_OVER | step_over_extra(1); break;
+				case 0x03:  util::stream_format(stream, "bc1tl  $%08x,%d", pc + 4 + ((int16_t)op << 2), (op >> 18) & 7); flags = STEP_OVER | step_over_extra(1); break;
 			}
 			break;
 		default:    /* COP */
@@ -250,9 +249,9 @@ static uint32_t dasm_cop1(uint32_t pc, uint32_t op, std::ostream &stream)
 	return flags;
 }
 
-static uint32_t dasm_cop1x(uint32_t pc, uint32_t op, std::ostream &stream)
+uint32_t mips3_disassembler::dasm_cop1x(uint32_t pc, uint32_t op, std::ostream &stream)
 {
-	static const char *const format3_table[] =
+	const char *const format3_table[] =
 	{
 		"s","d","?","?","w","l","?","?"
 	};
@@ -310,7 +309,7 @@ static uint32_t dasm_cop1x(uint32_t pc, uint32_t op, std::ostream &stream)
 	return flags;
 }
 
-static uint32_t dasm_cop2(uint32_t pc, uint32_t op, std::ostream &stream)
+uint32_t mips3_disassembler::dasm_cop2(uint32_t pc, uint32_t op, std::ostream &stream)
 {
 	int rt = (op >> 16) & 31;
 	int rd = (op >> 11) & 31;
@@ -357,7 +356,12 @@ static uint32_t dasm_cop2(uint32_t pc, uint32_t op, std::ostream &stream)
 	return flags;
 }
 
-unsigned dasmmips3(std::ostream &stream, unsigned pc, uint32_t op)
+u32 mips3_disassembler::opcode_alignment() const
+{
+	return 4;
+}
+
+offs_t mips3_disassembler::dasm_one(std::ostream &stream, offs_t pc, u32 op)
 {
 	int rs = (op >> 21) & 31;
 	int rt = (op >> 16) & 31;
@@ -381,17 +385,17 @@ unsigned dasmmips3(std::ostream &stream, unsigned pc, uint32_t op)
 				case 0x04:  util::stream_format(stream, "sllv   %s,%s,%s", reg[rd], reg[rt], reg[rs]);          break;
 				case 0x06:  util::stream_format(stream, "srlv   %s,%s,%s", reg[rd], reg[rt], reg[rs]);          break;
 				case 0x07:  util::stream_format(stream, "srav   %s,%s,%s", reg[rd], reg[rt], reg[rs]);          break;
-				case 0x08:  util::stream_format(stream, "jr     %s", reg[rs]); if (rs == 31) flags = DASMFLAG_STEP_OUT; break;
+				case 0x08:  util::stream_format(stream, "jr     %s", reg[rs]); if (rs == 31) flags = STEP_OUT; break;
 				case 0x09:  if (rd == 31)
 							util::stream_format(stream, "jalr   %s", reg[rs]);
 							else
 							util::stream_format(stream, "jalr   %s,%s", reg[rs], reg[rd]);
-					flags = DASMFLAG_STEP_OVER | DASMFLAG_STEP_OVER_EXTRA(1);
+					flags = STEP_OVER | step_over_extra(1);
 					break;
 				case 0x0a:  util::stream_format(stream, "movz   %s,%s,%s", reg[rd], reg[rs], reg[rt]);          break;
 				case 0x0b:  util::stream_format(stream, "movn   %s,%s,%s", reg[rd], reg[rs], reg[rt]);          break;
-				case 0x0c:  util::stream_format(stream, "syscall"); flags = DASMFLAG_STEP_OVER;                 break;
-				case 0x0d:  util::stream_format(stream, "break"); flags = DASMFLAG_STEP_OVER;                   break;
+				case 0x0c:  util::stream_format(stream, "syscall"); flags = STEP_OVER;                 break;
+				case 0x0d:  util::stream_format(stream, "break"); flags = STEP_OVER;                   break;
 				case 0x0f:  util::stream_format(stream, "sync");                                                break;
 				case 0x10:  util::stream_format(stream, "mfhi   %s", reg[rd]);                                  break;
 				case 0x11:  util::stream_format(stream, "mthi   %s", reg[rs]);                                  break;
@@ -422,12 +426,12 @@ unsigned dasmmips3(std::ostream &stream, unsigned pc, uint32_t op)
 				case 0x2d:  util::stream_format(stream, "daddu  %s,%s,%s", reg[rd], reg[rs], reg[rt]);          break;
 				case 0x2e:  util::stream_format(stream, "dsub   %s,%s,%s", reg[rd], reg[rs], reg[rt]);          break;
 				case 0x2f:  util::stream_format(stream, "dsubu  %s,%s,%s", reg[rd], reg[rs], reg[rt]);          break;
-				case 0x30:  util::stream_format(stream, "tge    %s,%s", reg[rs], reg[rt]); flags = DASMFLAG_STEP_OVER; break;
-				case 0x31:  util::stream_format(stream, "tgeu   %s,%s", reg[rs], reg[rt]); flags = DASMFLAG_STEP_OVER; break;
-				case 0x32:  util::stream_format(stream, "tlt    %s,%s", reg[rs], reg[rt]); flags = DASMFLAG_STEP_OVER; break;
-				case 0x33:  util::stream_format(stream, "tltu   %s,%s", reg[rs], reg[rt]); flags = DASMFLAG_STEP_OVER; break;
-				case 0x34:  util::stream_format(stream, "teq    %s,%s", reg[rs], reg[rt]); flags = DASMFLAG_STEP_OVER; break;
-				case 0x36:  util::stream_format(stream, "tne    %s,%s", reg[rs], reg[rt]) ;flags = DASMFLAG_STEP_OVER; break;
+				case 0x30:  util::stream_format(stream, "tge    %s,%s", reg[rs], reg[rt]); flags = STEP_OVER; break;
+				case 0x31:  util::stream_format(stream, "tgeu   %s,%s", reg[rs], reg[rt]); flags = STEP_OVER; break;
+				case 0x32:  util::stream_format(stream, "tlt    %s,%s", reg[rs], reg[rt]); flags = STEP_OVER; break;
+				case 0x33:  util::stream_format(stream, "tltu   %s,%s", reg[rs], reg[rt]); flags = STEP_OVER; break;
+				case 0x34:  util::stream_format(stream, "teq    %s,%s", reg[rs], reg[rt]); flags = STEP_OVER; break;
+				case 0x36:  util::stream_format(stream, "tne    %s,%s", reg[rs], reg[rt]) ;flags = STEP_OVER; break;
 				case 0x38:  util::stream_format(stream, "dsll   %s,%s,%d", reg[rd], reg[rt], shift);            break;
 				case 0x3a:  util::stream_format(stream, "dsrl   %s,%s,%d", reg[rd], reg[rt], shift);            break;
 				case 0x3b:  util::stream_format(stream, "dsra   %s,%s,%d", reg[rd], reg[rt], shift);            break;
@@ -445,22 +449,22 @@ unsigned dasmmips3(std::ostream &stream, unsigned pc, uint32_t op)
 				case 0x01:  util::stream_format(stream, "bgez   %s,$%08x", reg[rs], pc + 4 + ((int16_t)op << 2)); break;
 				case 0x02:  util::stream_format(stream, "bltzl  %s,$%08x", reg[rs], pc + 4 + ((int16_t)op << 2)); break;
 				case 0x03:  util::stream_format(stream, "bgezl  %s,$%08x", reg[rs], pc + 4 + ((int16_t)op << 2)); break;
-				case 0x08:  util::stream_format(stream, "tgei   %s,%s", reg[rs], signed_16bit(op)); flags = DASMFLAG_STEP_OVER; break;
-				case 0x09:  util::stream_format(stream, "tgeiu  %s,%s", reg[rs], signed_16bit(op)); flags = DASMFLAG_STEP_OVER; break;
-				case 0x0a:  util::stream_format(stream, "tlti   %s,%s", reg[rs], signed_16bit(op)); flags = DASMFLAG_STEP_OVER; break;
-				case 0x0b:  util::stream_format(stream, "tltiu  %s,%s", reg[rs], signed_16bit(op)); flags = DASMFLAG_STEP_OVER; break;
-				case 0x0c:  util::stream_format(stream, "teqi   %s,%s", reg[rs], signed_16bit(op)); flags = DASMFLAG_STEP_OVER; break;
-				case 0x0e:  util::stream_format(stream, "tnei   %s,%s", reg[rs], signed_16bit(op)); flags = DASMFLAG_STEP_OVER; break;
-				case 0x10:  util::stream_format(stream, "bltzal %s,$%08x", reg[rs], pc + 4 + ((int16_t)op << 2)); flags = DASMFLAG_STEP_OVER | DASMFLAG_STEP_OVER_EXTRA(1); break;
-				case 0x11:  util::stream_format(stream, "bgezal %s,$%08x", reg[rs], pc + 4 + ((int16_t)op << 2)); flags = DASMFLAG_STEP_OVER | DASMFLAG_STEP_OVER_EXTRA(1); break;
-				case 0x12:  util::stream_format(stream, "bltzall %s,$%08x", reg[rs], pc + 4 + ((int16_t)op << 2)); flags = DASMFLAG_STEP_OVER | DASMFLAG_STEP_OVER_EXTRA(1); break;
-				case 0x13:  util::stream_format(stream, "bgezall %s,$%08x", reg[rs], pc + 4 + ((int16_t)op << 2)); flags = DASMFLAG_STEP_OVER | DASMFLAG_STEP_OVER_EXTRA(1); break;
+				case 0x08:  util::stream_format(stream, "tgei   %s,%s", reg[rs], signed_16bit(op)); flags = STEP_OVER; break;
+				case 0x09:  util::stream_format(stream, "tgeiu  %s,%s", reg[rs], signed_16bit(op)); flags = STEP_OVER; break;
+				case 0x0a:  util::stream_format(stream, "tlti   %s,%s", reg[rs], signed_16bit(op)); flags = STEP_OVER; break;
+				case 0x0b:  util::stream_format(stream, "tltiu  %s,%s", reg[rs], signed_16bit(op)); flags = STEP_OVER; break;
+				case 0x0c:  util::stream_format(stream, "teqi   %s,%s", reg[rs], signed_16bit(op)); flags = STEP_OVER; break;
+				case 0x0e:  util::stream_format(stream, "tnei   %s,%s", reg[rs], signed_16bit(op)); flags = STEP_OVER; break;
+				case 0x10:  util::stream_format(stream, "bltzal %s,$%08x", reg[rs], pc + 4 + ((int16_t)op << 2)); flags = STEP_OVER | step_over_extra(1); break;
+				case 0x11:  util::stream_format(stream, "bgezal %s,$%08x", reg[rs], pc + 4 + ((int16_t)op << 2)); flags = STEP_OVER | step_over_extra(1); break;
+				case 0x12:  util::stream_format(stream, "bltzall %s,$%08x", reg[rs], pc + 4 + ((int16_t)op << 2)); flags = STEP_OVER | step_over_extra(1); break;
+				case 0x13:  util::stream_format(stream, "bgezall %s,$%08x", reg[rs], pc + 4 + ((int16_t)op << 2)); flags = STEP_OVER | step_over_extra(1); break;
 				default:    util::stream_format(stream, "dc.l   $%08x [invalid]", op);                          break;
 			}
 			break;
 
 		case 0x02:  util::stream_format(stream, "j      $%08x", (pc & 0xf0000000) | ((op & 0x03ffffff) << 2));  break;
-		case 0x03:  util::stream_format(stream, "jal    $%08x", (pc & 0xf0000000) | ((op & 0x03ffffff) << 2)); flags = DASMFLAG_STEP_OVER | DASMFLAG_STEP_OVER_EXTRA(1); break;
+		case 0x03:  util::stream_format(stream, "jal    $%08x", (pc & 0xf0000000) | ((op & 0x03ffffff) << 2)); flags = STEP_OVER | step_over_extra(1); break;
 		case 0x04:  if (rs == 0 && rt == 0)
 					util::stream_format(stream, "b      $%08x", pc + 4 + ((int16_t)op << 2));
 					else
@@ -532,21 +536,11 @@ unsigned dasmmips3(std::ostream &stream, unsigned pc, uint32_t op)
 		case 0x3f:  util::stream_format(stream, "sd     %s,%s(%s)", reg[rt], signed_16bit(op), reg[rs]);        break;
 		default:    util::stream_format(stream, "dc.l   $%08x [invalid]", op);                                  break;
 	}
-	return 4 | flags | DASMFLAG_SUPPORTED;
+	return 4 | flags | SUPPORTED;
 }
 
-
-CPU_DISASSEMBLE( mips3be )
+offs_t mips3_disassembler::disassemble(std::ostream &stream, offs_t pc, const data_buffer &opcodes, const data_buffer &params)
 {
-	uint32_t op = *(uint32_t *)oprom;
-	op = big_endianize_int32(op);
-	return dasmmips3(stream, pc, op);
-}
-
-
-CPU_DISASSEMBLE( mips3le )
-{
-	uint32_t op = *(uint32_t *)oprom;
-	op = little_endianize_int32(op);
-	return dasmmips3(stream, pc, op);
+	u32 op = opcodes.r32(pc);
+	return dasm_one(stream, pc, op);
 }

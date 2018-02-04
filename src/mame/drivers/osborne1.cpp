@@ -98,7 +98,7 @@ TODO:
 #include "softlist.h"
 
 
-#define MAIN_CLOCK  XTAL_15_9744MHz
+static constexpr XTAL MAIN_CLOCK = 15.9744_MHz_XTAL;
 
 
 static ADDRESS_MAP_START( osborne1_mem, AS_PROGRAM, 8, osborne1_state )
@@ -279,7 +279,7 @@ static GFXDECODE_START( osborne1 )
 GFXDECODE_END
 
 
-static MACHINE_CONFIG_START( osborne1 )
+MACHINE_CONFIG_START(osborne1_state::osborne1)
 	MCFG_CPU_ADD("maincpu", Z80, MAIN_CLOCK/4)
 	MCFG_CPU_PROGRAM_MAP(osborne1_mem)
 	MCFG_CPU_DECRYPTED_OPCODES_MAP(osborne1_op)
@@ -338,7 +338,7 @@ static MACHINE_CONFIG_START( osborne1 )
 	MCFG_SOFTWARE_LIST_ADD("flop_list","osborne1")
 MACHINE_CONFIG_END
 
-MACHINE_CONFIG_DERIVED( osborne1nv, osborne1 )
+MACHINE_CONFIG_DERIVED(osborne1nv_state::osborne1nv, osborne1)
 	MCFG_CPU_MODIFY("maincpu")
 	MCFG_CPU_IO_MAP(osborne1nv_io)
 
@@ -346,7 +346,7 @@ MACHINE_CONFIG_DERIVED( osborne1nv, osborne1 )
 	MCFG_SCREEN_NO_PALETTE
 	MCFG_SCREEN_UPDATE_DEVICE("crtc", mc6845_device, screen_update)
 
-	MCFG_MC6845_ADD("crtc", SY6545_1, "screen", XTAL_12_288MHz/8)
+	MCFG_MC6845_ADD("crtc", SY6545_1, "screen", XTAL(12'288'000)/8)
 	MCFG_MC6845_SHOW_BORDER_AREA(false)
 	MCFG_MC6845_CHAR_WIDTH(8)
 	MCFG_MC6845_UPDATE_ROW_CB(osborne1nv_state, crtc_update_row)

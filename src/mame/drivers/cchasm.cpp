@@ -27,7 +27,7 @@
 #include "sound/volt_reg.h"
 #include "speaker.h"
 
-#define CCHASM_68K_CLOCK (XTAL_8MHz)
+#define CCHASM_68K_CLOCK (XTAL(8'000'000))
 
 /*************************************
  *
@@ -144,7 +144,7 @@ static const z80_daisy_config daisy_chain[] =
  *
  *************************************/
 
-static MACHINE_CONFIG_START( cchasm )
+MACHINE_CONFIG_START(cchasm_state::cchasm)
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", M68000, CCHASM_68K_CLOCK)    /* 8 MHz (from schematics) */
@@ -192,7 +192,7 @@ static MACHINE_CONFIG_START( cchasm )
 
 	/* 6840 PTM */
 	MCFG_DEVICE_ADD("6840ptm", PTM6840, CCHASM_68K_CLOCK/10)
-	MCFG_PTM6840_EXTERNAL_CLOCKS(0, CCHASM_68K_CLOCK / 10, 0)
+	MCFG_PTM6840_EXTERNAL_CLOCKS(0, (CCHASM_68K_CLOCK / 10).value(), 0)
 	MCFG_PTM6840_IRQ_CB(INPUTLINE("maincpu", 4))
 MACHINE_CONFIG_END
 

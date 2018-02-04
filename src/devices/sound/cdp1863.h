@@ -50,6 +50,7 @@ public:
 
 	// inline configuration helpers
 	static void static_set_clock2(device_t &device, int clock2);
+	static void static_set_clock2(device_t &device, const XTAL &xtal) { xtal.validate("selecting cdp1863 clock"); static_set_clock2(device, xtal.value()); }
 
 	DECLARE_WRITE8_MEMBER( str_w );
 	void str_w(uint8_t data);

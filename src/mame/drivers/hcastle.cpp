@@ -97,10 +97,10 @@ static INPUT_PORTS_START( hcastle )
 	KONAMI8_SYSTEM_UNK
 
 	PORT_START("P1")
-	KONAMI8_MONO_B12_UNK
+	KONAMI8_MONO_4WAY_B12_UNK
 
 	PORT_START("P2")
-	KONAMI8_COCKTAIL_B12_UNK
+	KONAMI8_COCKTAIL_4WAY_B12_UNK
 
 	PORT_START("DSW1")
 	KONAMI_COINAGE_LOC(DEF_STR( Free_Play ), "Invalid", SW1)
@@ -188,7 +188,7 @@ void hcastle_state::machine_reset()
 	m_old_pf2 = -1;
 }
 
-static MACHINE_CONFIG_START( hcastle )
+MACHINE_CONFIG_START(hcastle_state::hcastle)
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", KONAMI, 3000000)    /* Derived from 24 MHz clock */

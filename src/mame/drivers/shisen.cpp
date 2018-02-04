@@ -207,7 +207,7 @@ GFXDECODE_END
 
 
 
-static MACHINE_CONFIG_START( shisen )
+MACHINE_CONFIG_START(shisen_state::shisen)
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", Z80, 6000000)   /* 6 MHz ? */

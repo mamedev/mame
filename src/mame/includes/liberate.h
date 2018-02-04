@@ -86,4 +86,10 @@ public:
 	void prosport_draw_sprites( bitmap_ind16 &bitmap, const rectangle &cliprect );
 	void boomrang_draw_sprites( bitmap_ind16 &bitmap, const rectangle &cliprect, int pri );
 	void prosoccr_draw_sprites( bitmap_ind16 &bitmap, const rectangle &cliprect );
+	void liberate_base(machine_config &config);
+	void liberate(machine_config &config);
+	void liberatb(machine_config &config);
+	void boomrang(machine_config &config);
+	void prosoccr(machine_config &config);
+	void prosport(machine_config &config);
 };

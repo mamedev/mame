@@ -104,6 +104,7 @@ public:
 	uint32_t screen_update_olibochu(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	TIMER_DEVICE_CALLBACK_MEMBER(olibochu_scanline);
 	void draw_sprites( bitmap_ind16 &bitmap, const rectangle &cliprect );
+	void olibochu(machine_config &config);
 };
 
 
@@ -281,9 +282,9 @@ static ADDRESS_MAP_START( olibochu_map, AS_PROGRAM, 8, olibochu_state )
 	AM_RANGE(0xa005, 0xa005) AM_READ_PORT("DSW2")
 	AM_RANGE(0xa800, 0xa801) AM_WRITE(sound_command_w)
 	AM_RANGE(0xa802, 0xa802) AM_WRITE(olibochu_flipscreen_w)    /* bit 6 = enable sound? */
+	AM_RANGE(0xf000, 0xffff) AM_RAM
 	AM_RANGE(0xf400, 0xf41f) AM_RAM AM_SHARE("spriteram")
 	AM_RANGE(0xf440, 0xf47f) AM_RAM AM_SHARE("spriteram2")
-	AM_RANGE(0xf000, 0xffff) AM_RAM
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( olibochu_sound_map, AS_PROGRAM, 8, olibochu_state )
@@ -457,7 +458,7 @@ TIMER_DEVICE_CALLBACK_MEMBER(olibochu_state::olibochu_scanline)
 		m_maincpu->set_input_line_and_vector(0, HOLD_LINE, 0xcf);   /* RST 08h */
 }
 
-static MACHINE_CONFIG_START( olibochu )
+MACHINE_CONFIG_START(olibochu_state::olibochu)
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", Z80, 4000000)   /* 4 MHz ?? */

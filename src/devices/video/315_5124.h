@@ -67,7 +67,7 @@ public:
 
 	DECLARE_PALETTE_INIT( sega315_5124 );
 
-	void hcount_latch() { hcount_latch_at_hpos(m_screen->hpos()); };
+	void hcount_latch() { hcount_latch_at_hpos(screen().hpos()); };
 	void hcount_latch_at_hpos(int hpos);
 	void stop_timers();
 

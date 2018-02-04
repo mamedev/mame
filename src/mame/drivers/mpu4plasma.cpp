@@ -34,12 +34,9 @@ public:
 	{
 	}
 	uint32_t screen_update_mpu4plasma(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	void mpu4plasma(machine_config &config);
 };
 
-
-
-
-MACHINE_CONFIG_EXTERN( mod2 );
 INPUT_PORTS_EXTERN( mpu4 );
 
 static ADDRESS_MAP_START( mpu4plasma_map, AS_PROGRAM, 16, mpu4plasma_state )
@@ -87,7 +84,7 @@ uint32_t mpu4plasma_state::screen_update_mpu4plasma(screen_device &screen, bitma
 }
 
 
-MACHINE_CONFIG_DERIVED( mpu4plasma, mod2 )
+MACHINE_CONFIG_DERIVED(mpu4plasma_state::mpu4plasma, mod2)
 	MCFG_CPU_ADD("plasmacpu", M68000, 10000000)
 	MCFG_CPU_PROGRAM_MAP(mpu4plasma_map)
 	MCFG_CPU_VBLANK_INT_DRIVER("screen", mpu4plasma_state,  irq4_line_hold)

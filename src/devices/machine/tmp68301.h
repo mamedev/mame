@@ -5,16 +5,23 @@
 
 #pragma once
 
+#include "cpu/m68000/m68000.h"
+
 //**************************************************************************
 //  INTERFACE CONFIGURATION MACROS
 //**************************************************************************
 
 /* TODO: serial ports, frequency & hook it up with m68k */
+
+// FIXME: M68000 ought to be a parent class, not an external object
+#define MCFG_TMP68301_CPU(_tag) \
+	tmp68301_device::set_cpu_tag(*device, "^" _tag);
+
 #define MCFG_TMP68301_IN_PARALLEL_CB(cb) \
-		devcb = &tmp68301_device::set_in_parallel_callback(*device, (DEVCB_##cb));
+	devcb = &tmp68301_device::set_in_parallel_callback(*device, (DEVCB_##cb));
 
 #define MCFG_TMP68301_OUT_PARALLEL_CB(cb) \
-		devcb = &tmp68301_device::set_out_parallel_callback(*device, (DEVCB_##cb));
+	devcb = &tmp68301_device::set_out_parallel_callback(*device, (DEVCB_##cb));
 
 
 //**************************************************************************
@@ -29,6 +36,7 @@ class tmp68301_device : public device_t,
 public:
 	tmp68301_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
+	static void set_cpu_tag(device_t &device, const char *tag) { downcast<tmp68301_device &>(device).m_cpu.set_tag(tag); }
 	template <class Object> static devcb_base &set_in_parallel_callback(device_t &device, Object &&cb) { return downcast<tmp68301_device &>(device).m_in_parallel_cb.set_callback(std::forward<Object>(cb)); }
 	template <class Object> static devcb_base &set_out_parallel_callback(device_t &device, Object &&cb) { return downcast<tmp68301_device &>(device).m_out_parallel_cb.set_callback(std::forward<Object>(cb)); }
 
@@ -81,6 +89,8 @@ private:
 
 	inline uint16_t read_word(offs_t address);
 	inline void write_word(offs_t address, uint16_t data);
+
+	required_device<m68000_base_device> m_cpu;
 
 	devcb_read16         m_in_parallel_cb;
 	devcb_write16        m_out_parallel_cb;

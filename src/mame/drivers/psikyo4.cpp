@@ -629,9 +629,6 @@ void psikyo4_state::machine_start()
 	m_ymf_max_bank = YMFROM->bytes() / 0x100000;
 	for (int i = 0; i < 4; i++)
 	{
-		char banktag[16];
-		sprintf(banktag, "ymfbank%d", i);
-		m_ymf_bank[i] = membank(banktag);
 		m_ymf_bank[i]->configure_entries(0, m_ymf_max_bank, YMFROM->base(), 0x100000);
 		m_ymf_bank[i]->set_entry(i);
 	}
@@ -652,7 +649,7 @@ void psikyo4_state::machine_reset()
 	m_oldbrt2 = -1;
 }
 
-static MACHINE_CONFIG_START( ps4big )
+MACHINE_CONFIG_START(psikyo4_state::ps4big)
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", SH2, MASTER_CLOCK/2)
@@ -698,7 +695,7 @@ static MACHINE_CONFIG_START( ps4big )
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", 1.0)
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_DERIVED( ps4small, ps4big )
+MACHINE_CONFIG_DERIVED(psikyo4_state::ps4small, ps4big)
 
 	/* basic machine hardware */
 

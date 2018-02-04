@@ -3,8 +3,7 @@
 /* paint & puzzle */
 /* video is standard VGA */
 /*
-OK, here's a somewhat complete rundown of the PCB. There was 1 IC I didn't
-get a pin count of(oops).
+OK, here's a somewhat complete rundown of the PCB.
 
 Main PCB
 Reb B
@@ -12,70 +11,75 @@ Label:
 Board Num.
 90
 
-The PCB has no silkscreen or reference designators, so the numbers I am
-providing are made up.
+The PCB has no silkscreen or reference designators. All locations
+provided here are from the published schematics.
 
-U1 32 pin IC
+U1 64 pin IC
+MC68000P12
+OB26M8829
+
+U2 32 pin IC
 27C010A
 Label:
 Paint N Puzzle
 Ver. 1.09
 Odd
 
-U2 5 pin audio amp
-LM383T
-
-U3 40 pin IC
-8926S
-UM6522A
-
-U4 28 pin IC
-Mosel
-MS62256L-85PC
-8911 5D
-
-U5 18 pin IC
-PIC16C54-HS/P
-9344 CGA
-
-U6
-P8798
-L3372718E
-Intel
-Label:
-MicroTouch
-5603670 REV 1.0
-
-U7 28 pin IC
-MicroTouch Systems
-c 1992
-19-507 Rev 2
-ICS1578N 9334
-
-U8 28 pin IC
-Mosel
-MS62256L-85PC
-8911 5D
-
-U9 32 pin IC
+U3 32 pin IC
 27C010A
 Label:
 Paint N Puzzle
 Ver. 1.09
 Even
 
-U10 64 pin IC
-MC68000P12
-OB26M8829
+U4 & U5 28 pin ICs
+Mosel
+MS62256L-85PC
+8911 5D
 
-X1
-16.000MHz -connected to U5
+U14 28 pin IC
+MicroTouch Systems
+c 1992
+19-507 Rev 2
+ICS1578N 9334 (ASIC 1578 on schematic)
 
-X2
+U15 48 pin IC
+P8798 (8797 on schematic)
+L3372718E
+Intel
+Label:
+MicroTouch
+5603670 REV 1.0
+
+U17 8 pin IC
+National 8538A
+93C46N
+-connected to U15
+
+U35 18 pin IC
+PIC16C54-HS/P
+9344 CGA
+
+U36 5 pin audio amp
+LM383T
+
+U37 8 pin IC
+National 8538A
+93C46N
+-connected to U41
+
+U41 40 pin IC
+8926S
+UM6522A
+
+Y1
 ECS-120
 32-1
-China -connected to U7
-Other side is unreadable
+China -connected to U14
+Other side is unreadable (schematic reads 12.000MHz?)
+
+Y2
+16.000MHz -connected to U35
 
 CN1 JAMMA
 CN2 ISA? Video card slot
@@ -83,8 +87,19 @@ CN3 Touchscreen input (12 pins)
 CN4 2 pins, unused
 
 1 blue potentiometer connected to audio amp
-There doesnt seem to be any dedicated sound chip, and sounds are just bleeps
-really.
+
+There is no dedicated sound generator, and sounds are just bleeps
+really. The sounds come from a binary-weighted DAC attached to the
+PIC's RB outputs:
+
+R34 7.5K
+R33 15.4K
+R32 30.9K
+R31 61.8K
+R30 124K
+R29 249K
+R28 499K
+R27 1M
 
 -----------------------------------------------
 Video card (has proper silk screen and designators)
@@ -124,6 +139,8 @@ CN1 standard DB15 VGA connector (15KHz)
 
 #include "emu.h"
 #include "cpu/m68000/m68000.h"
+#include "cpu/mcs96/i8x9x.h"
+#include "machine/6522via.h"
 #include "machine/eepromser.h"
 #include "video/pc_vga.h"
 #include "screen.h"
@@ -135,10 +152,9 @@ public:
 	pntnpuzl_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag),
 		m_maincpu(*this,"maincpu"),
-		m_eeprom(*this, "eeprom")
+		m_via(*this, "via")
 	{ }
 
-	uint16_t m_eeprom_data;
 	uint16_t m_pntpzl_200000;
 	uint16_t m_serial;
 	uint16_t m_serial_out;
@@ -154,31 +170,10 @@ public:
 	DECLARE_READ16_MEMBER(irq2_ack_r);
 	DECLARE_READ16_MEMBER(irq4_ack_r);
 	DECLARE_INPUT_CHANGED_MEMBER(coin_inserted);
-	DECLARE_READ16_MEMBER(pntnpuzl_eeprom_r);
-	DECLARE_WRITE16_MEMBER(pntnpuzl_eeprom_w);
 	DECLARE_DRIVER_INIT(pip);
-	required_device<eeprom_serial_93cxx_device> m_eeprom;
+	required_device<via6522_device> m_via;
+	void pntnpuzl(machine_config &config);
 };
-
-
-READ16_MEMBER(pntnpuzl_state::pntnpuzl_eeprom_r)
-{
-	/* bit 11 is EEPROM data */
-	return (m_eeprom_data & 0xf4ff) | (m_eeprom->do_read()<<11) | (ioport("IN1")->read() & 0x0300);
-}
-
-WRITE16_MEMBER(pntnpuzl_state::pntnpuzl_eeprom_w)
-{
-	m_eeprom_data = data;
-
-	/* bit 12 is data */
-	/* bit 13 is clock (active high) */
-	/* bit 14 is cs (active high) */
-
-	m_eeprom->di_write((data & 0x1000) >> 12);
-	m_eeprom->cs_write((data & 0x4000) ? ASSERT_LINE : CLEAR_LINE);
-	m_eeprom->clk_write((data & 0x2000) ? ASSERT_LINE : CLEAR_LINE);
-}
 
 
 
@@ -220,10 +215,12 @@ WRITE16_MEMBER(pntnpuzl_state::pntnpuzl_200000_w)
 
 WRITE16_MEMBER(pntnpuzl_state::pntnpuzl_280018_w)
 {
-// logerror("%04x: 280018: %04x\n",space.device().safe_pc(),data);
+// logerror("%04x: 280018: %04x\n",m_maincpu->pc(),data);
 	m_serial >>= 1;
 	if (data & 0x2000)
 		m_serial |= 0x400;
+
+	m_via->write(space, 0x18/2, data >> 8);
 }
 
 READ16_MEMBER(pntnpuzl_state::pntnpuzl_280014_r)
@@ -231,13 +228,15 @@ READ16_MEMBER(pntnpuzl_state::pntnpuzl_280014_r)
 	static const int startup[3] = { 0x80, 0x0c, 0x00 };
 	int res;
 
+	(void)m_via->read(space, 0x14/2);
+
 	if (m_serial_out == 0x11)
 	{
 		if (ioport("IN0")->read() & 0x10)
 		{
 			m_touchscr[0] = 0x1b;
-			m_touchscr[2] = BITSWAP8(ioport("TOUCHX")->read(),0,1,2,3,4,5,6,7);
-			m_touchscr[4] = BITSWAP8(ioport("TOUCHY")->read(),0,1,2,3,4,5,6,7);
+			m_touchscr[2] = bitswap<8>(ioport("TOUCHX")->read(),0,1,2,3,4,5,6,7);
+			m_touchscr[4] = bitswap<8>(ioport("TOUCHY")->read(),0,1,2,3,4,5,6,7);
 		}
 		else
 			m_touchscr[0] = 0;
@@ -286,18 +285,10 @@ static ADDRESS_MAP_START( pntnpuzl_map, AS_PROGRAM, 16, pntnpuzl_state )
 	AM_RANGE(0x100000, 0x100001) AM_READ(irq2_ack_r)
 	AM_RANGE(0x180000, 0x180001) AM_READ(irq4_ack_r)
 	AM_RANGE(0x200000, 0x200001) AM_WRITE(pntnpuzl_200000_w)
-	AM_RANGE(0x280000, 0x280001) AM_READ(pntnpuzl_eeprom_r)
-	AM_RANGE(0x280002, 0x280003) AM_READ_PORT("IN2")
-	AM_RANGE(0x280000, 0x280001) AM_WRITE(pntnpuzl_eeprom_w)
-	AM_RANGE(0x280008, 0x280009) AM_WRITENOP
-	AM_RANGE(0x28000a, 0x28000b) AM_WRITENOP
-	AM_RANGE(0x280010, 0x280011) AM_WRITENOP
-	AM_RANGE(0x280012, 0x280013) AM_WRITENOP
+	AM_RANGE(0x280000, 0x28001f) AM_DEVREADWRITE8("via", via6522_device, read, write, 0xff00)
 	AM_RANGE(0x280014, 0x280015) AM_READ(pntnpuzl_280014_r)
-	AM_RANGE(0x280016, 0x280017) AM_WRITENOP
 	AM_RANGE(0x280018, 0x280019) AM_WRITE(pntnpuzl_280018_w)
 	AM_RANGE(0x28001a, 0x28001b) AM_READ(pntnpuzl_28001a_r)
-	AM_RANGE(0x28001a, 0x28001b) AM_WRITENOP
 
 	/* standard VGA */
 	AM_RANGE(0x3a0000, 0x3bffff) AM_DEVREADWRITE8("vga", vga_device, mem_r, mem_w, 0xffff)
@@ -308,12 +299,16 @@ static ADDRESS_MAP_START( pntnpuzl_map, AS_PROGRAM, 16, pntnpuzl_state )
 	AM_RANGE(0x400000, 0x407fff) AM_RAM
 ADDRESS_MAP_END
 
+static ADDRESS_MAP_START( mcu_map, AS_PROGRAM, 8, pntnpuzl_state )
+	AM_RANGE(0x2000, 0x3fff) AM_ROM AM_REGION("mcu", 0)
+ADDRESS_MAP_END
+
 
 INPUT_CHANGED_MEMBER(pntnpuzl_state::coin_inserted)
 {
 	/* TODO: change this! */
 	if(newval)
-		generic_pulse_irq_line(*m_maincpu, (uint8_t)(uintptr_t)param, 1);
+		m_maincpu->pulse_input_line((uint8_t)(uintptr_t)param, m_maincpu->minimum_quantum_time());
 }
 
 static INPUT_PORTS_START( pntnpuzl )
@@ -332,34 +327,60 @@ static INPUT_PORTS_START( pntnpuzl )
 	PORT_BIT( 0x7f, 0x40, IPT_LIGHTGUN_X ) PORT_CROSSHAIR(Y, -1.0, 0.0, 0) PORT_MINMAX(0,0x7f) PORT_SENSITIVITY(25) PORT_KEYDELTA(13)
 
 	PORT_START("IN1")
-	PORT_BIT( 0x0100, IP_ACTIVE_LOW, IPT_OTHER ) PORT_CODE(KEYCODE_S)
-	PORT_BIT( 0x0200, IP_ACTIVE_LOW, IPT_OTHER ) PORT_CODE(KEYCODE_A)
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_OTHER ) PORT_CODE(KEYCODE_S)
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_OTHER ) PORT_CODE(KEYCODE_A)
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_READ_LINE_DEVICE_MEMBER("eeprom", eeprom_serial_93cxx_device, do_read)
+	PORT_BIT( 0x70, IP_ACTIVE_LOW, IPT_UNUSED )
+	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_UNKNOWN )
 
 	PORT_START("IN2")
-	PORT_BIT( 0x0100, IP_ACTIVE_LOW, IPT_OTHER ) PORT_CODE(KEYCODE_B)
-	PORT_BIT( 0x0200, IP_ACTIVE_LOW, IPT_OTHER ) PORT_CODE(KEYCODE_V)
-	PORT_BIT( 0x0400, IP_ACTIVE_LOW, IPT_OTHER ) PORT_CODE(KEYCODE_C)
-	PORT_BIT( 0x0800, IP_ACTIVE_LOW, IPT_OTHER ) PORT_CODE(KEYCODE_X)
-	PORT_BIT( 0x1000, IP_ACTIVE_LOW, IPT_OTHER ) PORT_CODE(KEYCODE_Z)
-	PORT_BIT( 0x2000, IP_ACTIVE_LOW, IPT_OTHER ) PORT_CODE(KEYCODE_G)
-	PORT_BIT( 0x4000, IP_ACTIVE_LOW, IPT_OTHER ) PORT_CODE(KEYCODE_F)
-	PORT_BIT( 0x8000, IP_ACTIVE_LOW, IPT_OTHER ) PORT_CODE(KEYCODE_D)
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_OTHER ) PORT_CODE(KEYCODE_B)
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_OTHER ) PORT_CODE(KEYCODE_V)
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_OTHER ) PORT_CODE(KEYCODE_C)
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_OTHER ) PORT_CODE(KEYCODE_X)
+	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_OTHER ) PORT_CODE(KEYCODE_Z)
+	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_OTHER ) PORT_CODE(KEYCODE_G)
+	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_OTHER ) PORT_CODE(KEYCODE_F)
+	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_OTHER ) PORT_CODE(KEYCODE_D)
 INPUT_PORTS_END
 
-static MACHINE_CONFIG_START( pntnpuzl )
-	MCFG_CPU_ADD("maincpu", M68000, 12000000)//??
+MACHINE_CONFIG_START(pntnpuzl_state::pntnpuzl)
+	MCFG_CPU_ADD("maincpu", M68000, XTAL(12'000'000))
 	MCFG_CPU_PROGRAM_MAP(pntnpuzl_map)
 
 	MCFG_EEPROM_SERIAL_93C46_ADD("eeprom")
 
+	MCFG_DEVICE_ADD("via", VIA6522, XTAL(12'000'000) / 10)
+	MCFG_VIA6522_READPA_HANDLER(IOPORT("IN2"))
+	MCFG_VIA6522_READPB_HANDLER(IOPORT("IN1"))
+	MCFG_VIA6522_WRITEPB_HANDLER(DEVWRITELINE("eeprom", eeprom_serial_93cxx_device, di_write)) MCFG_DEVCB_BIT(4)
+	MCFG_DEVCB_CHAIN_OUTPUT(DEVWRITELINE("eeprom", eeprom_serial_93cxx_device, cs_write)) MCFG_DEVCB_BIT(6)
+	MCFG_DEVCB_CHAIN_OUTPUT(DEVWRITELINE("eeprom", eeprom_serial_93cxx_device, clk_write)) MCFG_DEVCB_BIT(5)
+	// CB2 used for serial communication with 8798
+
+	MCFG_CPU_ADD("mcu", P8098, XTAL(12'000'000))
+	MCFG_CPU_PROGRAM_MAP(mcu_map) // FIXME: this is all internal
+
 	/* video hardware */
-	MCFG_FRAGMENT_ADD( pcvideo_vga )
+	MCFG_SCREEN_ADD("screen", RASTER)
+	MCFG_SCREEN_RAW_PARAMS(XTAL(25'174'800),900,0,640,526,0,480)
+	MCFG_SCREEN_UPDATE_DEVICE("vga", vga_device, screen_update)
+
+	MCFG_PALETTE_ADD("palette", 0x100)
+	MCFG_DEVICE_ADD("vga", VGA, 0)
 MACHINE_CONFIG_END
 
 ROM_START( pntnpuzl )
 	ROM_REGION( 0x80000, "maincpu", 0 ) /* 68000 Code */
 	ROM_LOAD16_BYTE( "pntnpuzl.u2", 0x00001, 0x40000, CRC(dfda3f73) SHA1(cca8ccdd501a26cba07365b1238d7b434559bbc6) )
 	ROM_LOAD16_BYTE( "pntnpuzl.u3", 0x00000, 0x40000, CRC(4173f250) SHA1(516fe6f91b925f71c36b97532608b82e63bda436) )
+
+	ROM_REGION( 0x2000, "mcu", 0 )
+	ROM_LOAD( "pntnpzl8798.bin", 0x0000, 0x2000, CRC(3ff98e89) SHA1(c48665992cb5377b69902f2a352c9214602a0b84) )
+
+	ROM_REGION( 0x400, "pic", 0 )
+	ROM_LOAD( "16c54.bin", 0x000, 0x400, NO_DUMP )
 
 	/* for reference, probably not used in any way by the game */
 	ROM_REGION( 0x10000, "video_bios", 0 )
@@ -375,4 +396,4 @@ DRIVER_INIT_MEMBER(pntnpuzl_state,pip)
 
 }
 
-GAME( 199?, pntnpuzl,    0, pntnpuzl,    pntnpuzl, pntnpuzl_state,    pip, ROT90,  "Century?", "Paint & Puzzle",MACHINE_NO_SOUND|MACHINE_NOT_WORKING )
+GAME( 1993, pntnpuzl, 0, pntnpuzl, pntnpuzl, pntnpuzl_state, pip, ROT90, "Century Vending", "Paint 'N Puzzle", MACHINE_NO_SOUND | MACHINE_NOT_WORKING )

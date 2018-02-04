@@ -34,11 +34,11 @@ READ8_MEMBER( am53cf96_device::read )
 
 	if (offset == REG_FIFO)
 	{
-//      osd_printf_debug("53cf96: read FIFO PC=%x\n", space.device().safe_pc());
+//      logerror("53cf96: read FIFO %s\n", machine().describe_context());
 		return 0;
 	}
 
-//  logerror("53cf96: read reg %d = %x (PC=%x)\n", reg, rv>>shift, space.device().safe_pc());
+//  logerror("53cf96: read reg %d = %x %s\n", reg, rv>>shift, machine().describe_context());
 
 	if (offset == REG_IRQSTATE)
 	{
@@ -57,7 +57,7 @@ void am53cf96_device::device_timer(emu_timer &timer, device_timer_id tid, int pa
 
 WRITE8_MEMBER( am53cf96_device::write )
 {
-//  logerror("53cf96: w %x to reg %d (PC=%x)\n", data, offset, space.device().safe_pc());
+//  logerror("53cf96: w %x to reg %d %s\n", data, offset, machine().describe_context());
 
 	// if writing to the target ID, cache it off for later
 	if (offset == REG_STATUS)
@@ -95,7 +95,7 @@ WRITE8_MEMBER( am53cf96_device::write )
 			case 2: // reset am53cf96
 				scsi_regs[REG_IRQSTATE] = 8;    // indicate success
 
-				logerror("53cf96: reset  target ID = %d (PC = %x)\n", last_id, space.device().safe_pc());
+				logerror("53cf96: reset  target ID = %d %s\n", last_id, machine().describe_context());
 
 				xfer_state = 0;
 				break;
@@ -118,7 +118,7 @@ WRITE8_MEMBER( am53cf96_device::write )
 					scsi_regs[REG_INTSTATE] = 4;
 				}
 
-				logerror("53cf96: command %x exec.  target ID = %d (PC = %x)\n", fifo[1], last_id, space.device().safe_pc());
+				logerror("53cf96: command %x exec.  target ID = %d %s\n", fifo[1], last_id, machine().describe_context());
 
 				select(last_id);
 				send_command(&fifo[1], 12);

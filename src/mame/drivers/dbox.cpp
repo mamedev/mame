@@ -453,6 +453,8 @@ class dbox_state : public driver_device
 	DECLARE_WRITE8_MEMBER(sda5708_clk);
 	DECLARE_WRITE8_MEMBER(write_pa);
 
+	void dbox(machine_config &config);
+
 #if LOCALFLASH
 	DECLARE_READ16_MEMBER (sysflash_r);
 	DECLARE_WRITE16_MEMBER (sysflash_w);
@@ -503,7 +505,7 @@ WRITE8_MEMBER (dbox_state::write_pa){
 /* Lcoal emulation of the 29F800B 8Mbit flashes if the intelflsh bugs, relies on a complete command cycle is done per device, not in parallell */
 /* TODO: Make a flash device of this and support programming per sector and persistance, as settings etc may be stored in a 8Kb sector  */
 WRITE16_MEMBER (dbox_state::sysflash_w){
-	LOGFLASH("%s pc:%08x offset:%08x data:%08x mask:%08x\n", FUNCNAME, space.device().safe_pc(), offset, data, mem_mask);
+	LOGFLASH("%s pc:%08x offset:%08x data:%08x mask:%08x\n", FUNCNAME, m_maincpu->pc(), offset, data, mem_mask);
 
 	/*Data bits DQ15–DQ8 are don’t cares for unlock and command cycles.*/
 	m_sf_state = ((m_sf_state << 8) & 0xffffff00) | (data & 0xff);
@@ -595,9 +597,9 @@ ADDRESS_MAP_END
 static INPUT_PORTS_START( dbox )
 INPUT_PORTS_END
 
-static MACHINE_CONFIG_START( dbox )
+MACHINE_CONFIG_START(dbox_state::dbox)
 	MCFG_CPU_ADD("maincpu", M68340, 0)       // The 68340 has an internal VCO as clock source, hence need no CPU clock
-	MCFG_MC68340_ADD_CRYSTAL(XTAL_32_768kHz) // The dbox uses the VCO and has a crystal as VCO reference and to synthesize internal clocks from
+	MCFG_MC68340_ADD_CRYSTAL(XTAL(32'768)) // The dbox uses the VCO and has a crystal as VCO reference and to synthesize internal clocks from
 	MCFG_CPU_PROGRAM_MAP(dbox_map)
 	MCFG_MC68340_PA_OUTPUT_CB(WRITE8(dbox_state, write_pa))
 

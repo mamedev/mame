@@ -122,9 +122,6 @@ enum
 #define MB88_IRQ_LINE       0
 
 
-CPU_DISASSEMBLE( mb88 );
-
-
 class mb88_cpu_device : public cpu_device
 {
 public:
@@ -165,9 +162,7 @@ protected:
 	virtual void state_export(const device_state_entry &entry) override;
 
 	// device_disasm_interface overrides
-	virtual uint32_t disasm_min_opcode_bytes() const override { return 1; }
-	virtual uint32_t disasm_max_opcode_bytes() const override { return 2; }
-	virtual offs_t disasm_disassemble(std::ostream &stream, offs_t pc, const uint8_t *oprom, const uint8_t *opram, uint32_t options) override;
+	virtual util::disasm_interface *create_disassembler() override;
 
 private:
 	address_space_config m_program_config;
@@ -215,7 +210,7 @@ private:
 	uint8_t m_pending_interrupt;
 
 	address_space *m_program;
-	direct_read_data *m_direct;
+	direct_read_data<0> *m_direct;
 	address_space *m_data;
 	int m_icount;
 

@@ -103,10 +103,10 @@
 #define RS232_B_TAG "ser2"
 #define QIMI_TAG    "qimi"
 
-#define X1 XTAL_15MHz
-#define X2 XTAL_32_768kHz
+#define X1 XTAL(15'000'000)
+#define X2 XTAL(32'768)
 #define X3 XTAL_4_436MHz
-#define X4 XTAL_11MHz
+#define X4 XTAL(11'000'000)
 
 class ql_state : public driver_device
 {
@@ -194,6 +194,9 @@ public:
 	// QIMI
 	bool m_qimi_enabled;
 	int m_qimi_extint;
+	void ql_ntsc(machine_config &config);
+	void opd(machine_config &config);
+	void ql(machine_config &config);
 };
 
 
@@ -888,7 +891,7 @@ void ql_state::machine_reset()
 //  MACHINE_CONFIG( ql )
 //-------------------------------------------------
 
-static MACHINE_CONFIG_START( ql )
+MACHINE_CONFIG_START(ql_state::ql)
 	// basic machine hardware
 	MCFG_CPU_ADD(M68008_TAG, M68008, X1/2)
 	MCFG_CPU_PROGRAM_MAP(ql_mem)
@@ -972,7 +975,7 @@ MACHINE_CONFIG_END
 //  MACHINE_CONFIG( ql_ntsc )
 //-------------------------------------------------
 
-static MACHINE_CONFIG_DERIVED( ql_ntsc, ql )
+MACHINE_CONFIG_DERIVED(ql_state::ql_ntsc, ql)
 	// video hardware
 	MCFG_SCREEN_MODIFY(SCREEN_TAG)
 	MCFG_SCREEN_REFRESH_RATE(60)
@@ -985,7 +988,7 @@ MACHINE_CONFIG_END
 //  MACHINE_CONFIG( opd )
 //-------------------------------------------------
 
-static MACHINE_CONFIG_DERIVED( opd, ql )
+MACHINE_CONFIG_DERIVED(ql_state::opd, ql)
 	// internal ram
 	MCFG_RAM_MODIFY(RAM_TAG)
 	MCFG_RAM_DEFAULT_SIZE("128K")

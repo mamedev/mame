@@ -22,13 +22,21 @@
 #include "sound/3812intf.h"
 #include "sound/ym2151.h"
 #include "sound/okim6295.h"
-#include "audio/seibu.h"
 #include "video/seibu_crtc.h"
 #include "screen.h"
 #include "speaker.h"
 
 
 /***************************************************************************/
+
+READ8_MEMBER(dcon_state::sdgndmps_sound_comms_r)
+{
+	// Routine at 134C sends no sound commands if lowest bit is 0
+	if (offset == 5) // ($a000a)
+		return 1;
+
+	return m_seibu_sound->main_r(space, offset);
+}
 
 static ADDRESS_MAP_START( dcon_map, AS_PROGRAM, 16, dcon_state )
 	AM_RANGE(0x00000, 0x7ffff) AM_ROM
@@ -38,7 +46,7 @@ static ADDRESS_MAP_START( dcon_map, AS_PROGRAM, 16, dcon_state )
 	AM_RANGE(0x8c800, 0x8cfff) AM_RAM_WRITE(foreground_w) AM_SHARE("fore_data")
 	AM_RANGE(0x8d000, 0x8d7ff) AM_RAM_WRITE(midground_w) AM_SHARE("mid_data")
 	AM_RANGE(0x8d800, 0x8e7ff) AM_RAM_WRITE(text_w) AM_SHARE("textram")
-	AM_RANGE(0x8e800, 0x8f7ff) AM_RAM_DEVWRITE("palette", palette_device, write) AM_SHARE("palette")
+	AM_RANGE(0x8e800, 0x8f7ff) AM_RAM_DEVWRITE("palette", palette_device, write16) AM_SHARE("palette")
 	AM_RANGE(0x8f800, 0x8ffff) AM_RAM AM_SHARE("spriteram")
 	AM_RANGE(0x9d000, 0x9d7ff) AM_WRITE(gfxbank_w)
 
@@ -49,6 +57,11 @@ static ADDRESS_MAP_START( dcon_map, AS_PROGRAM, 16, dcon_state )
 	AM_RANGE(0xe0000, 0xe0001) AM_READ_PORT("DSW")
 	AM_RANGE(0xe0002, 0xe0003) AM_READ_PORT("P1_P2")
 	AM_RANGE(0xe0004, 0xe0005) AM_READ_PORT("SYSTEM")
+ADDRESS_MAP_END
+
+static ADDRESS_MAP_START( sdgndmps_map, AS_PROGRAM, 16, dcon_state )
+	AM_IMPORT_FROM(dcon_map)
+	AM_RANGE(0xa0000, 0xa000d) AM_READ8(sdgndmps_sound_comms_r, 0x00ff)
 ADDRESS_MAP_END
 
 /******************************************************************************/
@@ -260,7 +273,7 @@ WRITE16_MEMBER( dcon_state::layer_scroll_w )
 
 /******************************************************************************/
 
-static MACHINE_CONFIG_START( dcon )
+MACHINE_CONFIG_START(dcon_state::dcon)
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", M68000, 10000000)
@@ -304,14 +317,14 @@ static MACHINE_CONFIG_START( dcon )
 	MCFG_SEIBU_SOUND_YM_WRITE_CB(DEVWRITE8("ymsnd", ym3812_device, write))
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_START( sdgndmps ) /* PCB number is PB91008 */
+MACHINE_CONFIG_START(dcon_state::sdgndmps) /* PCB number is PB91008 */
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", M68000, XTAL_20MHz/2)
-	MCFG_CPU_PROGRAM_MAP(dcon_map)
+	MCFG_CPU_ADD("maincpu", M68000, XTAL(20'000'000)/2)
+	MCFG_CPU_PROGRAM_MAP(sdgndmps_map)
 	MCFG_CPU_VBLANK_INT_DRIVER("screen", dcon_state,  irq4_line_hold)
 
-	MCFG_CPU_ADD("audiocpu", Z80, XTAL_14_31818MHz/4)
+	MCFG_CPU_ADD("audiocpu", Z80, XTAL(14'318'181)/4)
 	MCFG_CPU_PROGRAM_MAP(seibu_sound_map)
 
 	/* video hardware */
@@ -334,12 +347,12 @@ static MACHINE_CONFIG_START( sdgndmps ) /* PCB number is PB91008 */
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
 
-	MCFG_YM2151_ADD("ymsnd", XTAL_14_31818MHz/4)
+	MCFG_YM2151_ADD("ymsnd", XTAL(14'318'181)/4)
 	MCFG_YM2151_IRQ_HANDLER(DEVWRITELINE("seibu_sound", seibu_sound_device, fm_irqhandler))
 	MCFG_SOUND_ROUTE(0, "mono", 0.50)
 	MCFG_SOUND_ROUTE(1, "mono", 0.50)
 
-	MCFG_OKIM6295_ADD("oki", XTAL_20MHz/16, PIN7_LOW) /* 1.25Mhz? unverified clock & divisor (was 1320000) */
+	MCFG_OKIM6295_ADD("oki", XTAL(20'000'000)/16, PIN7_LOW) /* 1.25Mhz? unverified clock & divisor (was 1320000) */
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.40)
 
 	MCFG_DEVICE_ADD("seibu_sound", SEIBU_SOUND, 0)
@@ -423,17 +436,6 @@ ROM_START( sdgndmps )
 ROM_END
 
 /***************************************************************************/
-DRIVER_INIT_MEMBER(dcon_state,sdgndmps)
-{
-	uint16_t *RAM = (uint16_t *)memregion("maincpu")->base();
-	RAM[0x1356/2] = 0x4e71; /* beq -> nop */
-	RAM[0x1358/2] = 0x4e71;
 
-	RAM[0x4de/2]  = 0x4245; /* ROM checksum */
-	RAM[0x4e0/2]  = 0x4e71;
-	RAM[0x4e2/2]  = 0x4e71;
-}
-
-
-GAME( 1991, sdgndmps, 0, sdgndmps, sdgndmps, dcon_state, sdgndmps, ROT0, "Banpresto / Bandai", "SD Gundam Psycho Salamander no Kyoui", MACHINE_NO_COCKTAIL | MACHINE_SUPPORTS_SAVE )
-GAME( 1992, dcon,     0, dcon,     dcon,     dcon_state, 0,        ROT0, "Success",            "D-Con",                                MACHINE_NO_COCKTAIL | MACHINE_SUPPORTS_SAVE )
+GAME( 1991, sdgndmps, 0, sdgndmps, sdgndmps, dcon_state, 0, ROT0, "Banpresto / Bandai", "SD Gundam Psycho Salamander no Kyoui", MACHINE_NO_COCKTAIL | MACHINE_SUPPORTS_SAVE )
+GAME( 1992, dcon,     0, dcon,     dcon,     dcon_state, 0, ROT0, "Success",            "D-Con",                                MACHINE_NO_COCKTAIL | MACHINE_SUPPORTS_SAVE )

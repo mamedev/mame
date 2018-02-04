@@ -125,7 +125,7 @@ static ADDRESS_MAP_START( gunbustr_map, AS_PROGRAM, 32, gunbustr_state )
 	AM_RANGE(0x500000, 0x500003) AM_READWRITE(gunbustr_gun_r, gunbustr_gun_w)                       /* gun coord read */
 	AM_RANGE(0x800000, 0x80ffff) AM_DEVREADWRITE("tc0480scp", tc0480scp_device, long_r, long_w)
 	AM_RANGE(0x830000, 0x83002f) AM_DEVREADWRITE("tc0480scp", tc0480scp_device, ctrl_long_r, ctrl_long_w)
-	AM_RANGE(0x900000, 0x901fff) AM_RAM_DEVWRITE("palette", palette_device, write) AM_SHARE("palette")
+	AM_RANGE(0x900000, 0x901fff) AM_RAM_DEVWRITE("palette", palette_device, write32) AM_SHARE("palette")
 	AM_RANGE(0xc00000, 0xc03fff) AM_RAM                                                             /* network ram ?? */
 ADDRESS_MAP_END
 
@@ -227,10 +227,10 @@ GFXDECODE_END
                  MACHINE DRIVERS
 ***********************************************************/
 
-static MACHINE_CONFIG_START( gunbustr )
+MACHINE_CONFIG_START(gunbustr_state::gunbustr)
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", M68EC020, XTAL_16MHz)
+	MCFG_CPU_ADD("maincpu", M68EC020, XTAL(16'000'000))
 	MCFG_CPU_PROGRAM_MAP(gunbustr_map)
 	MCFG_CPU_VBLANK_INT_DRIVER("screen", gunbustr_state,  gunbustr_interrupt) /* VBL */
 
@@ -377,8 +377,8 @@ ROM_END
 
 READ32_MEMBER(gunbustr_state::main_cycle_r)
 {
-	if (space.device().safe_pc()==0x55a && (m_ram[0x3acc/4]&0xff000000)==0)
-		space.device().execute().spin_until_interrupt();
+	if (m_maincpu->pc()==0x55a && (m_ram[0x3acc/4]&0xff000000)==0)
+		m_maincpu->spin_until_interrupt();
 
 	return m_ram[0x3acc/4];
 }

@@ -148,7 +148,7 @@ static ADDRESS_MAP_START( wrally_map, AS_PROGRAM, 16, wrally_state )
 	AM_RANGE(0x100000, 0x103fff) AM_RAM_WRITE(vram_w) AM_SHARE("videoram")   /* encrypted Video RAM */
 	AM_RANGE(0x108000, 0x108007) AM_RAM AM_SHARE("vregs")                                   /* Video Registers */
 	AM_RANGE(0x10800c, 0x10800d) AM_WRITENOP                                                /* CLR INT Video */
-	AM_RANGE(0x200000, 0x203fff) AM_RAM_DEVWRITE("palette", palette_device, write) AM_SHARE("palette")    /* Palette */
+	AM_RANGE(0x200000, 0x203fff) AM_RAM_DEVWRITE("palette", palette_device, write16) AM_SHARE("palette")    /* Palette */
 	AM_RANGE(0x440000, 0x440fff) AM_RAM AM_SHARE("spriteram")                               /* Sprite RAM */
 	AM_RANGE(0x700000, 0x700001) AM_READ_PORT("DSW")
 	AM_RANGE(0x700002, 0x700003) AM_READ_PORT("P1_P2")
@@ -259,13 +259,13 @@ static GFXDECODE_START( wrally )
 GFXDECODE_END
 
 
-static MACHINE_CONFIG_START( wrally )
+MACHINE_CONFIG_START(wrally_state::wrally)
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", M68000,XTAL_24MHz/2)        /* verified on pcb */
+	MCFG_CPU_ADD("maincpu", M68000,XTAL(24'000'000)/2)        /* verified on pcb */
 	MCFG_CPU_PROGRAM_MAP(wrally_map)
 	MCFG_CPU_VBLANK_INT_DRIVER("screen", wrally_state,  irq6_line_hold)
 
-	MCFG_DEVICE_ADD("gaelco_ds5002fp", GAELCO_DS5002FP, XTAL_24MHz / 2) /* verified on pcb */
+	MCFG_DEVICE_ADD("gaelco_ds5002fp", GAELCO_DS5002FP, XTAL(24'000'000) / 2) /* verified on pcb */
 	MCFG_DEVICE_ADDRESS_MAP(0, mcu_hostmem_map)
 
 	/* video hardware */
@@ -294,7 +294,7 @@ static MACHINE_CONFIG_START( wrally )
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
 
-	MCFG_OKIM6295_ADD("oki", XTAL_1MHz, PIN7_HIGH)                 /* verified on pcb */
+	MCFG_OKIM6295_ADD("oki", XTAL(1'000'000), PIN7_HIGH)                 /* verified on pcb */
 	MCFG_DEVICE_ADDRESS_MAP(0, oki_map)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 MACHINE_CONFIG_END

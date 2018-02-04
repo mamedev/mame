@@ -55,6 +55,7 @@ public:
 	virtual void machine_reset() override;
 	virtual void video_start() override;
 	uint32_t screen_update_dm7000(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
+	void dm7000(machine_config &config);
 };
 
 /* */

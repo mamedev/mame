@@ -76,6 +76,7 @@ public:
 	DECLARE_WRITE_LINE_MEMBER(write_centronics_busy);
 	DECLARE_WRITE_LINE_MEMBER(write_centronics_ack);
 	UPD3301_DRAW_CHARACTER_MEMBER( pc8001_display_pixels );
+	void pc8001(machine_config &config);
 };
 
 class pc8001mk2_state : public pc8001_state
@@ -89,6 +90,7 @@ public:
 	required_memory_region m_kanji_rom;
 
 	DECLARE_WRITE8_MEMBER( port31_w );
+	void pc8001mk2(machine_config &config);
 };
 
 #endif

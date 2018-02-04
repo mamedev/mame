@@ -55,8 +55,8 @@ TODO:
 #include "speaker.h"
 
 
-#define I86_CLOCK XTAL_24MHz
-#define Z80_CLOCK XTAL_16MHz
+#define I86_CLOCK XTAL(24'000'000)
+#define Z80_CLOCK XTAL(16'000'000)
 
 class molecula_state : public driver_device
 {
@@ -93,6 +93,7 @@ public:
 
 	DECLARE_PALETTE_INIT(molecula);
 
+	void molecula(machine_config &config);
 protected:
 	// driver_device overrides
 	virtual void machine_start() override;
@@ -284,7 +285,7 @@ PALETTE_INIT_MEMBER(molecula_state, molecula)
 {
 }
 
-static MACHINE_CONFIG_START( molecula )
+MACHINE_CONFIG_START(molecula_state::molecula)
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("filecpu",Z80,Z80_CLOCK/2)

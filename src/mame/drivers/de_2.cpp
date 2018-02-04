@@ -3,8 +3,8 @@
 /*
     DataEast/Sega Version 1 and 2
 
-    Main CPU: 6808 @ 4MHz
-    Audio CPU: 68B09E @ 8MHz (internally divided by 4)
+    Main CPU: 6808 @ 4MHz (internally divided by 4)
+    Audio CPU: 68B09E @ 2MHz
     Audio: YM2151 @ 3.58MHz, MSM5205 @ 384kHz
 */
 
@@ -34,7 +34,7 @@
 
 // 6808 CPU's input clock is 4MHz
 // but because it has an internal /4 divider, its E clock runs at 1/4 that frequency
-#define E_CLOCK (XTAL_4MHz/4)
+#define E_CLOCK (XTAL(4'000'000)/4)
 
 // Length of time in cycles between IRQs on the main 6808 CPU
 // This length is determined by the settings of the W14 and W15 jumpers
@@ -53,6 +53,11 @@ public:
 			m_sample_bank(*this, "sample_bank")
 	{ }
 
+	void de_bg_audio(machine_config &config);
+	void de_type2(machine_config &config);
+	void de_type1(machine_config &config);
+	void de_type2_alpha3(machine_config &config);
+	void de_type3(machine_config &config);
 protected:
 
 	// devices
@@ -288,7 +293,7 @@ WRITE8_MEMBER( de_2_state::dig1_w )
 	m_segment2 |= 0x30000;
 	if ((m_segment2 & 0x70000) == 0x30000)
 	{
-		output().set_digit_value(m_strobe+16, BITSWAP16(m_segment2, 11, 15, 12, 10, 8, 14, 13, 9, 7, 6, 5, 4, 3, 2, 1, 0));
+		output().set_digit_value(m_strobe+16, bitswap<16>(m_segment2, 11, 15, 12, 10, 8, 14, 13, 9, 7, 6, 5, 4, 3, 2, 1, 0));
 		m_segment2 |= 0x40000;
 	}
 }
@@ -299,7 +304,7 @@ WRITE8_MEMBER( de_2_state::type2alpha3_dig1_w )
 	m_segment2 |= 0x20000;
 	if ((m_segment2 & 0x70000) == 0x30000)
 	{
-		output().set_digit_value(m_strobe+16, BITSWAP16(m_segment2, 11, 15, 12, 10, 8, 14, 13, 9, 7, 6, 5, 4, 3, 2, 1, 0));
+		output().set_digit_value(m_strobe+16, bitswap<16>(m_segment2, 11, 15, 12, 10, 8, 14, 13, 9, 7, 6, 5, 4, 3, 2, 1, 0));
 		m_segment2 |= 0x40000;
 	}
 }
@@ -310,7 +315,7 @@ WRITE8_MEMBER( de_2_state::alpha3_dig1_w )
 	m_segment2 |= 0x20000;
 	if ((m_segment2 & 0x70000) == 0x30000)
 	{
-		output().set_digit_value(m_strobe+16, BITSWAP16(m_segment2, 7, 15, 12, 10, 8, 14, 13, 9, 11, 6, 5, 4, 3, 2, 1, 0));
+		output().set_digit_value(m_strobe+16, bitswap<16>(m_segment2, 7, 15, 12, 10, 8, 14, 13, 9, 11, 6, 5, 4, 3, 2, 1, 0));
 		m_segment2 |= 0x40000;
 	}
 }
@@ -332,7 +337,7 @@ WRITE8_MEMBER( de_2_state::pia2c_pa_w )
 	m_segment1 |= 0x10000;
 	if ((m_segment1 & 0x70000) == 0x30000)
 	{
-		output().set_digit_value(m_strobe, BITSWAP16(m_segment1, 7, 15, 12, 10, 8, 14, 13, 9, 11, 6, 5, 4, 3, 2, 1, 0));
+		output().set_digit_value(m_strobe, bitswap<16>(m_segment1, 7, 15, 12, 10, 8, 14, 13, 9, 11, 6, 5, 4, 3, 2, 1, 0));
 		m_segment1 |= 0x40000;
 	}
 }
@@ -343,7 +348,7 @@ WRITE8_MEMBER( de_2_state::pia2c_pb_w )
 	m_segment1 |= 0x20000;
 	if ((m_segment1 & 0x70000) == 0x30000)
 	{
-		output().set_digit_value(m_strobe, BITSWAP16(m_segment1, 7, 15, 12, 10, 8, 14, 13, 9, 11, 6, 5, 4, 3, 2, 1, 0));
+		output().set_digit_value(m_strobe, bitswap<16>(m_segment1, 7, 15, 12, 10, 8, 14, 13, 9, 11, 6, 5, 4, 3, 2, 1, 0));
 		m_segment1 |= 0x40000;
 	}
 }
@@ -383,7 +388,7 @@ WRITE8_MEMBER( de_2_state::type2alpha3_pia34_pa_w )
 	m_segment2 |= 0x10000;
 	if ((m_segment2 & 0x70000) == 0x30000)
 	{
-		output().set_digit_value(m_strobe+16, BITSWAP16(m_segment2, 7, 15, 12, 10, 8, 14, 13, 9, 11, 6, 5, 4, 3, 2, 1, 0));
+		output().set_digit_value(m_strobe+16, bitswap<16>(m_segment2, 7, 15, 12, 10, 8, 14, 13, 9, 11, 6, 5, 4, 3, 2, 1, 0));
 		m_segment2 |= 0x40000;
 	}
 }
@@ -394,7 +399,7 @@ WRITE8_MEMBER( de_2_state::alpha3_pia34_pa_w )
 	m_segment2 |= 0x10000;
 	if ((m_segment2 & 0x70000) == 0x30000)
 	{
-		output().set_digit_value(m_strobe+16, BITSWAP16(m_segment2, 11, 15, 12, 10, 8, 14, 13, 9, 7, 6, 5, 4, 3, 2, 1, 0));
+		output().set_digit_value(m_strobe+16, bitswap<16>(m_segment2, 11, 15, 12, 10, 8, 14, 13, 9, 7, 6, 5, 4, 3, 2, 1, 0));
 		m_segment2 |= 0x40000;
 	}
 }
@@ -518,9 +523,26 @@ WRITE8_MEMBER(de_2_state::lamps_w)
 }
 
 
-static MACHINE_CONFIG_START( de_type1 )
+MACHINE_CONFIG_START(de_2_state::de_bg_audio)
+	/* sound CPU */
+	MCFG_CPU_ADD("audiocpu", MC6809E, XTAL(8'000'000) / 4) // MC68B09E
+	MCFG_CPU_PROGRAM_MAP(de_2_audio_map)
+
+	MCFG_SPEAKER_STANDARD_MONO("bg")
+
+	MCFG_YM2151_ADD("ym2151", XTAL(3'579'545))
+	MCFG_YM2151_IRQ_HANDLER(WRITELINE(de_2_state, ym2151_irq_w))
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "bg", 0.50)
+
+	MCFG_SOUND_ADD("msm5205", MSM5205, XTAL(384'000))
+	MCFG_MSM5205_VCLK_CB(WRITELINE(de_2_state, msm5205_irq_w))
+	MCFG_MSM5205_PRESCALER_SELECTOR(S96_4B)
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "bg", 0.50)
+MACHINE_CONFIG_END
+
+MACHINE_CONFIG_START(de_2_state::de_type1)
 	/* basic machine hardware */
-	MCFG_DECOCPU_TYPE1_ADD("decocpu",XTAL_8MHz / 2, ":maincpu")
+	MCFG_DECOCPU_TYPE1_ADD("decocpu", XTAL(8'000'000) / 2, ":maincpu")
 	MCFG_DECOCPU_DISPLAY(READ8(de_2_state,display_r),WRITE8(de_2_state,display_w))
 	MCFG_DECOCPU_SOUNDLATCH(WRITE8(de_2_state,sound_w))
 	MCFG_DECOCPU_SWITCH(READ8(de_2_state,switch_r),WRITE8(de_2_state,switch_w))
@@ -530,25 +552,13 @@ static MACHINE_CONFIG_START( de_type1 )
 	/* Video */
 	MCFG_DEFAULT_LAYOUT(layout_de2)
 
-	MCFG_FRAGMENT_ADD( genpin_audio )
-
-	/* sound CPU */
-	MCFG_CPU_ADD("audiocpu", M6809E, 8000000) // MC68B09E
-	MCFG_CPU_PROGRAM_MAP(de_2_audio_map)
-
-	MCFG_SPEAKER_STANDARD_MONO("bg")
-	MCFG_YM2151_ADD("ym2151", 3580000)
-	MCFG_YM2151_IRQ_HANDLER(WRITELINE(de_2_state, ym2151_irq_w))
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "bg", 0.50)
-	MCFG_SOUND_ADD("msm5205", MSM5205, 384000)
-	MCFG_MSM5205_VCLK_CB(WRITELINE(de_2_state, msm5205_irq_w))
-	MCFG_MSM5205_PRESCALER_SELECTOR(S96_4B)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "bg", 0.50)
+	MCFG_FRAGMENT_ADD(genpin_audio)
+	MCFG_FRAGMENT_ADD(de_bg_audio)
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_START( de_type2 )
+MACHINE_CONFIG_START(de_2_state::de_type2)
 	/* basic machine hardware */
-	MCFG_DECOCPU_TYPE2_ADD("decocpu",XTAL_8MHz / 2, ":maincpu")
+	MCFG_DECOCPU_TYPE2_ADD("decocpu", XTAL(8'000'000) / 2, ":maincpu")
 	MCFG_DECOCPU_DISPLAY(READ8(de_2_state,display_r),WRITE8(de_2_state,display_w))
 	MCFG_DECOCPU_SOUNDLATCH(WRITE8(de_2_state,sound_w))
 	MCFG_DECOCPU_SWITCH(READ8(de_2_state,switch_r),WRITE8(de_2_state,switch_w))
@@ -558,25 +568,13 @@ static MACHINE_CONFIG_START( de_type2 )
 	/* Video */
 	MCFG_DEFAULT_LAYOUT(layout_de2)
 
-	MCFG_FRAGMENT_ADD( genpin_audio )
-
-	/* sound CPU */
-	MCFG_CPU_ADD("audiocpu", M6809E, 8000000) // MC68B09E
-	MCFG_CPU_PROGRAM_MAP(de_2_audio_map)
-
-	MCFG_SPEAKER_STANDARD_MONO("bg")
-	MCFG_YM2151_ADD("ym2151", 3580000)
-	MCFG_YM2151_IRQ_HANDLER(WRITELINE(de_2_state, ym2151_irq_w))
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "bg", 0.50)
-	MCFG_SOUND_ADD("msm5205", MSM5205, 384000)
-	MCFG_MSM5205_VCLK_CB(WRITELINE(de_2_state, msm5205_irq_w))
-	MCFG_MSM5205_PRESCALER_SELECTOR(S96_4B)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "bg", 0.50)
+	MCFG_FRAGMENT_ADD(genpin_audio)
+	MCFG_FRAGMENT_ADD(de_bg_audio)
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_START( de_type2_alpha3 )
+MACHINE_CONFIG_START(de_2_state::de_type2_alpha3)
 	/* basic machine hardware */
-	MCFG_DECOCPU_TYPE2_ADD("decocpu",XTAL_8MHz / 2, ":maincpu")
+	MCFG_DECOCPU_TYPE2_ADD("decocpu", XTAL(8'000'000) / 2, ":maincpu")
 	MCFG_DECOCPU_DISPLAY(READ8(de_2_state,display_r),WRITE8(de_2_state,type2alpha3_display_w))
 	MCFG_DECOCPU_SOUNDLATCH(WRITE8(de_2_state,sound_w))
 	MCFG_DECOCPU_SWITCH(READ8(de_2_state,switch_r),WRITE8(de_2_state,switch_w))
@@ -586,25 +584,13 @@ static MACHINE_CONFIG_START( de_type2_alpha3 )
 	/* Video */
 	MCFG_DEFAULT_LAYOUT(layout_de2a3)
 
-	MCFG_FRAGMENT_ADD( genpin_audio )
-
-	/* sound CPU */
-	MCFG_CPU_ADD("audiocpu", M6809E, 8000000) // MC68B09E
-	MCFG_CPU_PROGRAM_MAP(de_2_audio_map)
-
-	MCFG_SPEAKER_STANDARD_MONO("bg")
-	MCFG_YM2151_ADD("ym2151", 3580000)
-	MCFG_YM2151_IRQ_HANDLER(WRITELINE(de_2_state, ym2151_irq_w))
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "bg", 0.50)
-	MCFG_SOUND_ADD("msm5205", MSM5205, 384000)
-	MCFG_MSM5205_VCLK_CB(WRITELINE(de_2_state, msm5205_irq_w))
-	MCFG_MSM5205_PRESCALER_SELECTOR(S96_4B)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "bg", 0.50)
+	MCFG_FRAGMENT_ADD(genpin_audio)
+	MCFG_FRAGMENT_ADD(de_bg_audio)
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_START( de_type3 )
+MACHINE_CONFIG_START(de_2_state::de_type3)
 	/* basic machine hardware */
-	MCFG_DECOCPU_TYPE3_ADD("decocpu",XTAL_8MHz / 2, ":maincpu")
+	MCFG_DECOCPU_TYPE3_ADD("decocpu", XTAL(8'000'000) / 2, ":maincpu")
 	MCFG_DECOCPU_DISPLAY(READ8(de_2_state,display_r),WRITE8(de_2_state,alpha3_display_w))
 	MCFG_DECOCPU_SOUNDLATCH(WRITE8(de_2_state,sound_w))
 	MCFG_DECOCPU_SWITCH(READ8(de_2_state,switch_r),WRITE8(de_2_state,switch_w))
@@ -614,20 +600,8 @@ static MACHINE_CONFIG_START( de_type3 )
 	/* Video */
 	MCFG_DEFAULT_LAYOUT(layout_de2a3)
 
-	MCFG_FRAGMENT_ADD( genpin_audio )
-
-	/* sound CPU */
-	MCFG_CPU_ADD("audiocpu", M6809E, 8000000) // MC68B09E
-	MCFG_CPU_PROGRAM_MAP(de_2_audio_map)
-
-	MCFG_SPEAKER_STANDARD_MONO("bg")
-	MCFG_YM2151_ADD("ym2151", 3580000)
-	MCFG_YM2151_IRQ_HANDLER(WRITELINE(de_2_state, ym2151_irq_w))
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "bg", 0.50)
-	MCFG_SOUND_ADD("msm5205", MSM5205, 384000)
-	MCFG_MSM5205_VCLK_CB(WRITELINE(de_2_state, msm5205_irq_w))
-	MCFG_MSM5205_PRESCALER_SELECTOR(S96_4B)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "bg", 0.50)
+	MCFG_FRAGMENT_ADD(genpin_audio)
+	MCFG_FRAGMENT_ADD(de_bg_audio)
 MACHINE_CONFIG_END
 
 

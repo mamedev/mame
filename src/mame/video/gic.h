@@ -57,7 +57,6 @@ public:
 	gic_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
 	// static configuration helpers
-	static void set_screen_tag(device_t &device, const char *screen_tag) { downcast<gic_device &>(device).m_screen_tag = screen_tag; }
 	template <typename Obj> static void set_ram(device_t &device, Obj &&cb) { downcast<gic_device &>(device).m_ram.set_callback(std::forward<Obj>(cb)); }
 
 	DECLARE_PALETTE_INIT(gic);

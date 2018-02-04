@@ -182,6 +182,9 @@ void decospr_device::device_start()
 	m_alt_format = 0;
 	m_pixmask = 0xf;
 	m_raw_shift = 4; // set to 8 on tattass / nslashers for the custom mixing (because they have 5bpp sprites, and shifting by 4 isn't good enough)
+
+	m_flip_screen = false;
+	save_item(NAME(m_flip_screen));
 }
 
 void decospr_device::device_reset()
@@ -191,11 +194,11 @@ void decospr_device::device_reset()
 
 void decospr_device::alloc_sprite_bitmap()
 {
-	m_screen->register_screen_bitmap(m_sprite_bitmap);
+	screen().register_screen_bitmap(m_sprite_bitmap);
 }
 
 template<class _BitmapClass>
-void decospr_device::draw_sprites_common(_BitmapClass &bitmap, const rectangle &cliprect, uint16_t* spriteram, int sizewords, bool invert_flip )
+void decospr_device::draw_sprites_common(_BitmapClass &bitmap, const rectangle &cliprect, uint16_t* spriteram, int sizewords)
 {
 	//printf("cliprect %04x, %04x\n", cliprect.min_y, cliprect.max_y);
 
@@ -208,10 +211,7 @@ void decospr_device::draw_sprites_common(_BitmapClass &bitmap, const rectangle &
 
 	int offs, end, incr;
 
-	bool flipscreen = (machine().driver_data()->flip_screen() != 0);
-
-	if (invert_flip)
-		flipscreen = !flipscreen;
+	bool flipscreen = m_flip_screen;
 
 
 	if (!m_pri_cb.isnull())
@@ -248,7 +248,7 @@ void decospr_device::draw_sprites_common(_BitmapClass &bitmap, const rectangle &
 			w = y & 0x0800;
 
 
-			if (!(flash && (m_screen->frame_number() & 1)))
+			if (!(flash && (screen().frame_number() & 1)))
 			{
 				x = spriteram[offs + 2];
 
@@ -363,7 +363,7 @@ void decospr_device::draw_sprites_common(_BitmapClass &bitmap, const rectangle &
 											colour,
 											fx,fy,
 											x,ypos,
-											m_screen->priority(),pri,m_transpen);
+											screen().priority(),pri,m_transpen);
 									else
 										m_gfxdecode->gfx(m_gfxregion)->transpen(bitmap,cliprect,
 											sprite - multi * inc,
@@ -382,7 +382,7 @@ void decospr_device::draw_sprites_common(_BitmapClass &bitmap, const rectangle &
 												colour,
 												fx,fy,
 												!flipscreen ? x-16 : x+16,ypos,
-												m_screen->priority(),pri,m_transpen);
+												screen().priority(),pri,m_transpen);
 									else
 										m_gfxdecode->gfx(m_gfxregion)->transpen(bitmap,cliprect,
 												(sprite - multi * inc)-mult2,
@@ -432,7 +432,7 @@ void decospr_device::draw_sprites_common(_BitmapClass &bitmap, const rectangle &
 
 			x = spriteram[offs+1];
 
-			if (!((y&0x2000) && (m_screen->frame_number() & 1)))
+			if (!((y&0x2000) && (screen().frame_number() & 1)))
 			{
 				if (!m_sprite_bitmap.valid())
 					colour = (spriteram[offs+2] >>0) & 0x1f;
@@ -487,7 +487,7 @@ void decospr_device::draw_sprites_common(_BitmapClass &bitmap, const rectangle &
 											colour,
 											fx,fy,
 												x + mult * (w-xx),ypos,
-											m_screen->priority(),pri,m_transpen);
+											screen().priority(),pri,m_transpen);
 								}
 
 								ypos -= 512; // wrap-around y
@@ -499,7 +499,7 @@ void decospr_device::draw_sprites_common(_BitmapClass &bitmap, const rectangle &
 											colour,
 											fx,fy,
 											x + mult * (w-xx),ypos,
-											m_screen->priority(),pri,m_transpen);
+											screen().priority(),pri,m_transpen);
 								}
 
 							}
@@ -565,11 +565,11 @@ void decospr_device::draw_sprites_common(_BitmapClass &bitmap, const rectangle &
 	}
 }
 
-void decospr_device::draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprect, uint16_t* spriteram, int sizewords, bool invert_flip )
-{ draw_sprites_common(bitmap, cliprect, spriteram, sizewords, invert_flip); }
+void decospr_device::draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprect, uint16_t* spriteram, int sizewords)
+{ draw_sprites_common(bitmap, cliprect, spriteram, sizewords); }
 
-void decospr_device::draw_sprites(bitmap_rgb32 &bitmap, const rectangle &cliprect, uint16_t* spriteram, int sizewords, bool invert_flip )
-{ draw_sprites_common(bitmap, cliprect, spriteram, sizewords, invert_flip); }
+void decospr_device::draw_sprites(bitmap_rgb32 &bitmap, const rectangle &cliprect, uint16_t* spriteram, int sizewords)
+{ draw_sprites_common(bitmap, cliprect, spriteram, sizewords); }
 
 
 // inefficient, we should be able to mix in a single pass by comparing the existing priority bitmap from the tilemaps

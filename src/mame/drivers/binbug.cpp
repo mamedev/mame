@@ -88,6 +88,7 @@ public:
 	required_device<cpu_device> m_maincpu;
 	required_device<cassette_image_device> m_cass;
 
+	void binbug(machine_config &config);
 private:
 	uint8_t m_framecnt;
 	required_shared_ptr<uint8_t> m_p_videoram;
@@ -293,9 +294,9 @@ static DEVICE_INPUT_DEFAULTS_START( keyboard )
 	DEVICE_INPUT_DEFAULTS( "RS232_STOPBITS", 0xff, RS232_STOPBITS_1 )
 DEVICE_INPUT_DEFAULTS_END
 
-static MACHINE_CONFIG_START( binbug )
+MACHINE_CONFIG_START(binbug_state::binbug)
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu",S2650, XTAL_1MHz)
+	MCFG_CPU_ADD("maincpu",S2650, XTAL(1'000'000))
 	MCFG_CPU_PROGRAM_MAP(binbug_mem)
 	MCFG_CPU_DATA_MAP(binbug_data)
 	MCFG_S2650_SENSE_INPUT(READLINE(binbug_state, binbug_serial_r))
@@ -422,6 +423,7 @@ public:
 	TIMER_DEVICE_CALLBACK_MEMBER(time_tick);
 	TIMER_DEVICE_CALLBACK_MEMBER(uart_tick);
 
+	void dg680(machine_config &config);
 private:
 	uint8_t m_pio_b;
 	uint8_t m_term_data;
@@ -525,9 +527,9 @@ TIMER_DEVICE_CALLBACK_MEMBER(dg680_state::uart_tick)
 	m_ctc->trg3(0);
 }
 
-static MACHINE_CONFIG_START( dg680 )
+MACHINE_CONFIG_START(dg680_state::dg680)
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu",Z80, XTAL_8MHz / 4)
+	MCFG_CPU_ADD("maincpu",Z80, XTAL(8'000'000) / 4)
 	MCFG_CPU_PROGRAM_MAP(dg680_mem)
 	MCFG_CPU_IO_MAP(dg680_io)
 	MCFG_Z80_DAISY_CHAIN(dg680_daisy_chain)
@@ -555,11 +557,11 @@ static MACHINE_CONFIG_START( dg680 )
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
 
 	/* Devices */
-	MCFG_DEVICE_ADD("z80ctc", Z80CTC, XTAL_8MHz / 4)
+	MCFG_DEVICE_ADD("z80ctc", Z80CTC, XTAL(8'000'000) / 4)
 	MCFG_Z80CTC_INTR_CB(INPUTLINE("maincpu", INPUT_LINE_IRQ0))
 	MCFG_Z80CTC_ZC0_CB(DEVWRITELINE("z80ctc", z80ctc_device, trg1))
 
-	MCFG_DEVICE_ADD("z80pio", Z80PIO, XTAL_8MHz / 4)
+	MCFG_DEVICE_ADD("z80pio", Z80PIO, XTAL(8'000'000) / 4)
 	MCFG_Z80PIO_OUT_INT_CB(INPUTLINE("maincpu", INPUT_LINE_IRQ0))
 	MCFG_Z80PIO_IN_PA_CB(READ8(dg680_state, porta_r))
 	// OUT_ARDY - this activates to ask for kbd data but not known if actually used

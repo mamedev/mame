@@ -105,6 +105,7 @@ public:
 	DECLARE_WRITE_LINE_MEMBER (write_f14_clock){ write_acia_clocks(mc14411_device::TIMER_F14, state); }
 	DECLARE_WRITE_LINE_MEMBER (write_f15_clock){ write_acia_clocks(mc14411_device::TIMER_F15, state); }
 
+	void proteus3(machine_config &config);
 private:
 	uint8_t m_video_data;
 	uint8_t m_flashcnt;
@@ -138,10 +139,8 @@ static ADDRESS_MAP_START(proteus3_mem, AS_PROGRAM, 8, proteus3_state)
 	ADDRESS_MAP_UNMAP_HIGH
 	AM_RANGE(0x0000, 0x7fff) AM_RAM
 	AM_RANGE(0x8004, 0x8007) AM_DEVREADWRITE("pia", pia6821_device, read, write)
-	AM_RANGE(0x8008, 0x8008) AM_DEVREADWRITE("acia1", acia6850_device, status_r, control_w) // cassette
-	AM_RANGE(0x8009, 0x8009) AM_DEVREADWRITE("acia1", acia6850_device, data_r, data_w)
-	AM_RANGE(0x8010, 0x8010) AM_DEVREADWRITE("acia2", acia6850_device, status_r, control_w) // serial keyboard
-	AM_RANGE(0x8011, 0x8011) AM_DEVREADWRITE("acia2", acia6850_device, data_r, data_w) // never writes data
+	AM_RANGE(0x8008, 0x8009) AM_DEVREADWRITE("acia1", acia6850_device, read, write) // cassette
+	AM_RANGE(0x8010, 0x8011) AM_DEVREADWRITE("acia2", acia6850_device, read, write) // serial keyboard (never writes data)
 	AM_RANGE(0xc000, 0xffff) AM_ROM
 ADDRESS_MAP_END
 
@@ -376,9 +375,9 @@ void proteus3_state::machine_reset()
  Machine Drivers
 ******************************************************************************/
 
-static MACHINE_CONFIG_START( proteus3 )
+MACHINE_CONFIG_START(proteus3_state::proteus3)
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", M6800, XTAL_3_579545MHz)  /* Divided by 4 internally */
+	MCFG_CPU_ADD("maincpu", M6800, XTAL(3'579'545))  /* Divided by 4 internally */
 	MCFG_CPU_PROGRAM_MAP(proteus3_mem)
 
 	/* video hardware */
@@ -420,7 +419,7 @@ static MACHINE_CONFIG_START( proteus3 )
 	MCFG_RS232_CTS_HANDLER(DEVWRITELINE("acia2", acia6850_device, write_cts))
 
 	/* Bit Rate Generator */
-	MCFG_MC14411_ADD ("brg", XTAL_1_8432MHz) // crystal needs verification but is the likely one
+	MCFG_MC14411_ADD ("brg", XTAL(1'843'200)) // crystal needs verification but is the likely one
 	MCFG_MC14411_F1_CB(WRITELINE (proteus3_state, write_f1_clock))
 	MCFG_MC14411_F2_CB(WRITELINE (proteus3_state, write_f2_clock))
 	MCFG_MC14411_F3_CB(WRITELINE (proteus3_state, write_f3_clock))

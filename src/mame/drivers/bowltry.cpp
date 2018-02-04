@@ -52,6 +52,7 @@ public:
 	uint16_t m_hack[2];
 #endif
 
+void bowltry(machine_config &config);
 protected:
 	required_device<cpu_device> m_maincpu;
 public:
@@ -77,10 +78,10 @@ static ADDRESS_MAP_START( bowltry_map, AS_PROGRAM, 16, bowltry_state )
 	ADDRESS_MAP_UNMAP_HIGH
 	AM_RANGE( 0x000000, 0x07ffff ) AM_ROM AM_REGION("maincpu", 0)
 	AM_RANGE( 0x080000, 0x083fff ) AM_RAM
+	AM_RANGE( 0x600000, 0x60ffff ) AM_RAM
 #if HACK_ENABLED
 	AM_RANGE( 0x60e090, 0x60e093 ) AM_READWRITE(hack_r,hack_w)
 #endif
-	AM_RANGE( 0x600000, 0x60ffff ) AM_RAM
 
 ADDRESS_MAP_END
 
@@ -94,7 +95,7 @@ uint32_t bowltry_state::screen_update_bowltry(screen_device &screen, bitmap_rgb3
 
 
 
-static MACHINE_CONFIG_START( bowltry )
+MACHINE_CONFIG_START(bowltry_state::bowltry)
 	MCFG_CPU_ADD("maincpu", H83008, 16000000 )
 	MCFG_CPU_PROGRAM_MAP( bowltry_map )
 //  MCFG_CPU_VBLANK_INT_DRIVER("screen", bowltry_state,  irq0_line_hold) // uses vector $64, IMIAB according to the manual (timer/compare B, internal to the CPU)

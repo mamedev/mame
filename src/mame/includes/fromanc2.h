@@ -121,4 +121,7 @@ public:
 	inline void fromancr_vram_w(offs_t offset, uint16_t data, uint16_t mem_mask, int layer );
 	void fromancr_gfxbank_w( int data );
 	inline void fromanc4_vram_w( offs_t offset, uint16_t data, uint16_t mem_mask, int layer );
+	void fromanc2(machine_config &config);
+	void fromancr(machine_config &config);
+	void fromanc4(machine_config &config);
 };

@@ -189,6 +189,7 @@ public:
 	// inline configuration helpers
 	static void static_set_type(device_t &device, screen_type_enum type);
 	static void static_set_raw(device_t &device, u32 pixclock, u16 htotal, u16 hbend, u16 hbstart, u16 vtotal, u16 vbend, u16 vbstart);
+	static void static_set_raw(device_t &device, const XTAL &xtal, u16 htotal, u16 hbend, u16 hbstart, u16 vtotal, u16 vbend, u16 vbstart) { static_set_raw(device, xtal.value(), htotal, hbend, hbstart, vtotal, vbend, vbstart); }
 	static void static_set_refresh(device_t &device, attoseconds_t rate);
 	static void static_set_vblank_time(device_t &device, attoseconds_t time);
 	static void static_set_size(device_t &device, u16 width, u16 height);
@@ -239,7 +240,6 @@ public:
 	// additional helpers
 	void register_vblank_callback(vblank_state_delegate vblank_callback);
 	void register_screen_bitmap(bitmap_t &bitmap);
-	void resolve_palette();
 
 	// internal to the video system
 	bool update_quads();
@@ -263,6 +263,7 @@ private:
 
 	// device-level overrides
 	virtual void device_validity_check(validity_checker &valid) const override;
+	virtual void device_resolve_objects() override;
 	virtual void device_start() override;
 	virtual void device_reset() override;
 	virtual void device_stop() override;

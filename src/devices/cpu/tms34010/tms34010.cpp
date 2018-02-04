@@ -11,6 +11,7 @@
 
 #include "emu.h"
 #include "tms34010.h"
+#include "34010dsm.h"
 
 #include "debugger.h"
 #include "screen.h"
@@ -179,34 +180,34 @@ inline void tms340x0_device::RESET_ST()
 /* shortcuts for reading opcodes */
 inline uint32_t tms340x0_device::ROPCODE()
 {
-	uint32_t pc = TOBYTE(m_pc);
+	uint32_t pc = m_pc;
 	m_pc += 2 << 3;
 	return m_direct->read_word(pc);
 }
 
 inline int16_t tms340x0_device::PARAM_WORD()
 {
-	uint32_t pc = TOBYTE(m_pc);
+	uint32_t pc = m_pc;
 	m_pc += 2 << 3;
 	return m_direct->read_word(pc);
 }
 
 inline int32_t tms340x0_device::PARAM_LONG()
 {
-	uint32_t pc = TOBYTE(m_pc);
+	uint32_t pc = m_pc;
 	m_pc += 4 << 3;
-	return (uint16_t)m_direct->read_word(pc) | (m_direct->read_word(pc + 2) << 16);
+	return (uint16_t)m_direct->read_word(pc) | (m_direct->read_word(pc + 16) << 16);
 }
 
 inline int16_t tms340x0_device::PARAM_WORD_NO_INC()
 {
-	return m_direct->read_word(TOBYTE(m_pc));
+	return m_direct->read_word(m_pc);
 }
 
 inline int32_t tms340x0_device::PARAM_LONG_NO_INC()
 {
-	uint32_t pc = TOBYTE(m_pc);
-	return (uint16_t)m_direct->read_word(pc) | (m_direct->read_word(pc + 2) << 16);
+	uint32_t pc = m_pc;
+	return (uint16_t)m_direct->read_word(pc) | (m_direct->read_word(pc + 16) << 16);
 }
 
 /* read memory byte */
@@ -257,7 +258,7 @@ inline int32_t tms340x0_device::POP()
 
 #define RP(m1,m2)                                           \
 	/* TODO: Plane masking */                               \
-	return (TMS34010_RDMEM_WORD(TOBYTE(offset & 0xfffffff0)) >> (offset & m1)) & m2;
+	return (TMS34010_RDMEM_WORD(offset & 0xfffffff0) >> (offset & m1)) & m2;
 
 uint32_t tms340x0_device::read_pixel_1(offs_t offset) { RP(0x0f,0x01) }
 uint32_t tms340x0_device::read_pixel_2(offs_t offset) { RP(0x0e,0x03) }
@@ -266,12 +267,12 @@ uint32_t tms340x0_device::read_pixel_8(offs_t offset) { RP(0x08,0xff) }
 uint32_t tms340x0_device::read_pixel_16(offs_t offset)
 {
 	/* TODO: Plane masking */
-	return TMS34010_RDMEM_WORD(TOBYTE(offset & 0xfffffff0));
+	return TMS34010_RDMEM_WORD(offset & 0xfffffff0);
 }
 uint32_t tms340x0_device::read_pixel_32(offs_t offset)
 {
 	/* TODO: Plane masking */
-	return TMS34010_RDMEM_DWORD(TOBYTE(offset & 0xffffffe0));
+	return TMS34010_RDMEM_DWORD(offset & 0xffffffe0);
 }
 
 /* Shift register read */
@@ -292,9 +293,9 @@ uint32_t tms340x0_device::read_pixel_shiftreg(offs_t offset)
 
 /* No Raster Op + No Transparency */
 #define WP(m1,m2)                                                                           \
-	uint32_t a = TOBYTE(offset & 0xfffffff0);                                                 \
-	uint32_t pix = TMS34010_RDMEM_WORD(a);                                                    \
-	uint32_t shiftcount = offset & m1;                                                        \
+	uint32_t a = offset & 0xfffffff0;                                                       \
+	uint32_t pix = TMS34010_RDMEM_WORD(a);                                                  \
+	uint32_t shiftcount = offset & m1;                                                      \
 																							\
 	/* TODO: plane masking */                                                               \
 	data &= m2;                                                                             \
@@ -307,9 +308,9 @@ uint32_t tms340x0_device::read_pixel_shiftreg(offs_t offset)
 	data &= m2;                                                                             \
 	if (data)                                                                               \
 	{                                                                                       \
-		uint32_t a = TOBYTE(offset & 0xfffffff0);                                             \
-		uint32_t pix = TMS34010_RDMEM_WORD(a);                                                \
-		uint32_t shiftcount = offset & m1;                                                    \
+		uint32_t a = offset & 0xfffffff0;                                                   \
+		uint32_t pix = TMS34010_RDMEM_WORD(a);                                              \
+		uint32_t shiftcount = offset & m1;                                                  \
 																							\
 		/* TODO: plane masking */                                                           \
 		pix = (pix & ~(m2 << shiftcount)) | (data << shiftcount);                           \
@@ -317,9 +318,9 @@ uint32_t tms340x0_device::read_pixel_shiftreg(offs_t offset)
 	}
 /* Raster Op + No Transparency */
 #define WP_R(m1,m2)                                                                         \
-	uint32_t a = TOBYTE(offset & 0xfffffff0);                                                 \
-	uint32_t pix = TMS34010_RDMEM_WORD(a);                                                    \
-	uint32_t shiftcount = offset & m1;                                                        \
+	uint32_t a = offset & 0xfffffff0;                                                       \
+	uint32_t pix = TMS34010_RDMEM_WORD(a);                                                  \
+	uint32_t shiftcount = offset & m1;                                                      \
 																							\
 	/* TODO: plane masking */                                                               \
 	data = (this->*m_raster_op)(data & m2, (pix >> shiftcount) & m2) & m2;                  \
@@ -328,9 +329,9 @@ uint32_t tms340x0_device::read_pixel_shiftreg(offs_t offset)
 
 /* Raster Op + Transparency */
 #define WP_R_T(m1,m2)                                                                       \
-	uint32_t a = TOBYTE(offset & 0xfffffff0);                                                 \
-	uint32_t pix = TMS34010_RDMEM_WORD(a);                                                    \
-	uint32_t shiftcount = offset & m1;                                                        \
+	uint32_t a = offset & 0xfffffff0;                                                       \
+	uint32_t pix = TMS34010_RDMEM_WORD(a);                                                  \
+	uint32_t shiftcount = offset & m1;                                                      \
 																							\
 	/* TODO: plane masking */                                                               \
 	data = (this->*m_raster_op)(data & m2, (pix >> shiftcount) & m2) & m2;                  \
@@ -348,12 +349,12 @@ void tms340x0_device::write_pixel_8(offs_t offset, uint32_t data) { WP(0x08, 0xf
 void tms340x0_device::write_pixel_16(offs_t offset, uint32_t data)
 {
 	/* TODO: plane masking */
-	TMS34010_WRMEM_WORD(TOBYTE(offset & 0xfffffff0), data);
+	TMS34010_WRMEM_WORD(offset & 0xfffffff0, data);
 }
 void tms340x0_device::write_pixel_32(offs_t offset, uint32_t data)
 {
 	/* TODO: plane masking */
-	TMS34010_WRMEM_WORD(TOBYTE(offset & 0xffffffe0), data);
+	TMS34010_WRMEM_WORD(offset & 0xffffffe0, data);
 }
 
 /* No Raster Op + Transparency */
@@ -365,13 +366,13 @@ void tms340x0_device::write_pixel_t_16(offs_t offset, uint32_t data)
 {
 	/* TODO: plane masking */
 	if (data)
-		TMS34010_WRMEM_WORD(TOBYTE(offset & 0xfffffff0), data);
+		TMS34010_WRMEM_WORD(offset & 0xfffffff0, data);
 }
 void tms340x0_device::write_pixel_t_32(offs_t offset, uint32_t data)
 {
 	/* TODO: plane masking */
 	if (data)
-		TMS34010_WRMEM_DWORD(TOBYTE(offset & 0xffffffe0), data);
+		TMS34010_WRMEM_DWORD(offset & 0xffffffe0, data);
 }
 
 /* Raster Op + No Transparency */
@@ -382,13 +383,13 @@ void tms340x0_device::write_pixel_r_8(offs_t offset, uint32_t data) { WP_R(0x08,
 void tms340x0_device::write_pixel_r_16(offs_t offset, uint32_t data)
 {
 	/* TODO: plane masking */
-	uint32_t a = TOBYTE(offset & 0xfffffff0);
+	uint32_t a = offset & 0xfffffff0;
 	TMS34010_WRMEM_WORD(a, (this->*m_raster_op)(data, TMS34010_RDMEM_WORD(a)));
 }
 void tms340x0_device::write_pixel_r_32(offs_t offset, uint32_t data)
 {
 	/* TODO: plane masking */
-	uint32_t a = TOBYTE(offset & 0xffffffe0);
+	uint32_t a = offset & 0xffffffe0;
 	TMS34010_WRMEM_DWORD(a, (this->*m_raster_op)(data, TMS34010_RDMEM_DWORD(a)));
 }
 
@@ -400,7 +401,7 @@ void tms340x0_device::write_pixel_r_t_8(offs_t offset, uint32_t data) { WP_R_T(0
 void tms340x0_device::write_pixel_r_t_16(offs_t offset, uint32_t data)
 {
 	/* TODO: plane masking */
-	uint32_t a = TOBYTE(offset & 0xfffffff0);
+	uint32_t a = offset & 0xfffffff0;
 	data = (this->*m_raster_op)(data, TMS34010_RDMEM_WORD(a));
 
 	if (data)
@@ -409,7 +410,7 @@ void tms340x0_device::write_pixel_r_t_16(offs_t offset, uint32_t data)
 void tms340x0_device::write_pixel_r_t_32(offs_t offset, uint32_t data)
 {
 	/* TODO: plane masking */
-	uint32_t a = TOBYTE(offset & 0xffffffe0);
+	uint32_t a = offset & 0xffffffe0;
 	data = (this->*m_raster_op)(data, TMS34010_RDMEM_DWORD(a));
 
 	if (data)
@@ -587,7 +588,7 @@ void tms340x0_device::device_start()
 	m_external_host_access = false;
 
 	m_program = &space(AS_PROGRAM);
-	m_direct = &m_program->direct();
+	m_direct = m_program->direct<03>();
 
 	/* set up the state table */
 	{
@@ -848,7 +849,7 @@ TIMER_CALLBACK_MEMBER( tms340x0_device::scanline_callback )
 	int master;
 
 	/* fetch the core timing parameters */
-	const rectangle &current_visarea = m_screen->visible_area();
+	const rectangle &current_visarea = screen().visible_area();
 	enabled = SMART_IOREG(DPYCTL) & 0x8000;
 	master = (m_is_34020 || (SMART_IOREG(DPYCTL) & 0x2000));
 	vsblnk = SMART_IOREG(VSBLNK);
@@ -856,8 +857,8 @@ TIMER_CALLBACK_MEMBER( tms340x0_device::scanline_callback )
 	vtotal = SMART_IOREG(VTOTAL);
 	if (!master)
 	{
-		vtotal = std::min(m_screen->height() - 1, vtotal);
-		vcount = m_screen->vpos();
+		vtotal = std::min(screen().height() - 1, vtotal);
+		vcount = screen().vpos();
 	}
 
 	/* update the VCOUNT */
@@ -915,13 +916,13 @@ TIMER_CALLBACK_MEMBER( tms340x0_device::scanline_callback )
 					/* because many games play with the HEBLNK/HSBLNK for effects, we don't change
 					   if they are the only thing that has changed, unless they are stable for a couple
 					   of frames */
-					int current_width  = m_screen->width();
-					int current_height = m_screen->height();
+					int current_width  = screen().width();
+					int current_height = screen().height();
 
 					if (width != current_width || height != current_height || visarea.min_y != current_visarea.min_y || visarea.max_y != current_visarea.max_y ||
 						(m_hblank_stable > 2 && (visarea.min_x != current_visarea.min_x || visarea.max_x != current_visarea.max_x)))
 					{
-						m_screen->configure(width, height, visarea, refresh);
+						screen().configure(width, height, visarea, refresh);
 					}
 					m_hblank_stable++;
 				}
@@ -938,7 +939,7 @@ TIMER_CALLBACK_MEMBER( tms340x0_device::scanline_callback )
 
 	/* force a partial update within the visible area */
 	if (vcount >= current_visarea.min_y && vcount <= current_visarea.max_y && (!m_scanline_ind16_cb.isnull() || !m_scanline_rgb32_cb.isnull()))
-		m_screen->update_partial(vcount);
+		screen().update_partial(vcount);
 
 	/* if we are in the visible area, increment DPYADR by DUDATE */
 	if (vcount >= veblnk && vcount < vsblnk)
@@ -974,7 +975,7 @@ TIMER_CALLBACK_MEMBER( tms340x0_device::scanline_callback )
 
 	/* note that we add !master (0 or 1) as a attoseconds value; this makes no practical difference */
 	/* but helps ensure that masters are updated first before slaves */
-	m_scantimer->adjust(m_screen->time_until_pos(vcount) + attotime(0, !master), vcount);
+	m_scantimer->adjust(screen().time_until_pos(vcount) + attotime(0, !master), vcount);
 }
 
 
@@ -1118,7 +1119,7 @@ WRITE16_MEMBER( tms34010_device::io_register_w )
 			break;
 
 		case REG_PMASK:
-			if (data) logerror("Plane masking not supported. PC=%08X\n", space.device().safe_pc());
+			if (data) logerror("Plane masking not supported. %s\n", machine().describe_context());
 			break;
 
 		case REG_DPYCTL:
@@ -1209,7 +1210,7 @@ WRITE16_MEMBER( tms34010_device::io_register_w )
 			break;
 	}
 
-	LOGCONTROLREGS("%s: %s = %04X (%d)\n", machine().describe_context(), ioreg_name[offset], IOREG(offset), m_screen->vpos());
+	LOGCONTROLREGS("%s: %s = %04X (%d)\n", machine().describe_context(), ioreg_name[offset], IOREG(offset), screen().vpos());
 }
 
 
@@ -1244,7 +1245,7 @@ WRITE16_MEMBER( tms34020_device::io_register_w )
 	oldreg = IOREG(offset);
 	IOREG(offset) = data;
 
-	LOGCONTROLREGS("%s: %s = %04X (%d)\n", machine().describe_context(), ioreg020_name[offset], IOREG(offset), m_screen->vpos());
+	LOGCONTROLREGS("%s: %s = %04X (%d)\n", machine().describe_context(), ioreg020_name[offset], IOREG(offset), screen().vpos());
 
 	switch (offset)
 	{
@@ -1273,7 +1274,7 @@ WRITE16_MEMBER( tms34020_device::io_register_w )
 
 		case REG020_PMASKL:
 		case REG020_PMASKH:
-			if (data) logerror("Plane masking not supported. PC=%08X\n", space.device().safe_pc());
+			if (data) logerror("Plane masking not supported. %s\n", machine().describe_context());
 			break;
 
 		case REG020_DPYCTL:
@@ -1407,9 +1408,9 @@ READ16_MEMBER( tms34010_device::io_register_r )
 	{
 		case REG_HCOUNT:
 			/* scale the horizontal position from screen width to HTOTAL */
-			result = m_screen->hpos();
+			result = screen().hpos();
 			total = IOREG(REG_HTOTAL) + 1;
-			result = result * total / m_screen->width();
+			result = result * total / screen().width();
 
 			/* offset by the HBLANK end */
 			result += IOREG(REG_HEBLNK);
@@ -1448,9 +1449,9 @@ READ16_MEMBER( tms34020_device::io_register_r )
 	{
 		case REG020_HCOUNT:
 			/* scale the horizontal position from screen width to HTOTAL */
-			result = m_screen->hpos();
+			result = screen().hpos();
 			total = IOREG(REG020_HTOTAL) + 1;
-			result = result * total / m_screen->width();
+			result = result * total / screen().width();
 
 			/* offset by the HBLANK end */
 			result += IOREG(REG020_HEBLNK);
@@ -1511,7 +1512,7 @@ WRITE16_MEMBER( tms340x0_device::host_w )
 
 			/* write to the address */
 			addr = (IOREG(REG_HSTADRH) << 16) | IOREG(REG_HSTADRL);
-			TMS34010_WRMEM_WORD(TOBYTE(addr & 0xfffffff0), data);
+			TMS34010_WRMEM_WORD(addr & 0xfffffff0, data);
 
 			/* optional postincrement */
 			if (IOREG(REG_HSTCTLH) & 0x0800)
@@ -1570,7 +1571,7 @@ READ16_MEMBER( tms340x0_device::host_r )
 
 			/* read from the address */
 			addr = (IOREG(REG_HSTADRH) << 16) | IOREG(REG_HSTADRL);
-			result = TMS34010_RDMEM_WORD(TOBYTE(addr & 0xfffffff0));
+			result = TMS34010_RDMEM_WORD(addr & 0xfffffff0);
 
 			/* optional postincrement (it says preincrement, but data is preloaded, so it
 			   is effectively a postincrement */
@@ -1625,18 +1626,12 @@ void tms340x0_device::state_string_export(const device_state_entry &entry, std::
 	}
 }
 
-
-offs_t tms34010_device::disasm_disassemble(std::ostream &stream, offs_t pc, const uint8_t *oprom, const uint8_t *opram, uint32_t options)
+util::disasm_interface *tms34010_device::create_disassembler()
 {
-	extern CPU_DISASSEMBLE( tms34010 );
-
-	return CPU_DISASSEMBLE_NAME(tms34010)(this, stream, pc, oprom, opram, options);
+	return new tms34010_disassembler(false);
 }
 
-
-offs_t tms34020_device::disasm_disassemble(std::ostream &stream, offs_t pc, const uint8_t *oprom, const uint8_t *opram, uint32_t options)
+util::disasm_interface *tms34020_device::create_disassembler()
 {
-	extern CPU_DISASSEMBLE( tms34020 );
-
-	return CPU_DISASSEMBLE_NAME(tms34020)(this, stream, pc, oprom, opram, options);
+	return new tms34010_disassembler(true);
 }

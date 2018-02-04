@@ -580,11 +580,14 @@ void natural_keyboard::build_codes(ioport_manager &manager)
 		{
 			if (field.type() == IPT_KEYBOARD)
 			{
-				char32_t const code = field.keyboard_code(0);
-				if ((code >= UCHAR_SHIFT_BEGIN) && (code <= UCHAR_SHIFT_END))
+				std::vector<char32_t> const codes = field.keyboard_codes(0);
+				for (char32_t code : codes)
 				{
-					mask |= 1U << (code - UCHAR_SHIFT_BEGIN);
-					shift[code - UCHAR_SHIFT_BEGIN] = &field;
+					if ((code >= UCHAR_SHIFT_BEGIN) && (code <= UCHAR_SHIFT_END))
+					{
+						mask |= 1U << (code - UCHAR_SHIFT_BEGIN);
+						shift[code - UCHAR_SHIFT_BEGIN] = &field;
+					}
 				}
 			}
 		}
@@ -603,35 +606,38 @@ void natural_keyboard::build_codes(ioport_manager &manager)
 					if (!(curshift & ~mask))
 					{
 						// fetch the code, ignoring 0 and shiters
-						char32_t const code = field.keyboard_code(curshift);
-						if (((code < UCHAR_SHIFT_BEGIN) || (code > UCHAR_SHIFT_END)) && (code != 0))
+						std::vector<char32_t> const codes = field.keyboard_codes(curshift);
+						for (char32_t code : codes)
 						{
-							// prefer lowest shift state
-							keycode_map::iterator const found(m_keycode_map.find(code));
-							if ((m_keycode_map.end() == found) || (found->second.shift > curshift))
+							if (((code < UCHAR_SHIFT_BEGIN) || (code > UCHAR_SHIFT_END)) && (code != 0))
 							{
-								keycode_map_entry newcode;
-								std::fill(std::begin(newcode.field), std::end(newcode.field), nullptr);
-								newcode.shift = curshift;
-
-								unsigned fieldnum = 0;
-								for (unsigned i = 0, bits = curshift; (i < SHIFT_COUNT) && bits; ++i, bits >>= 1)
+								// prefer lowest shift state
+								keycode_map::iterator const found(m_keycode_map.find(code));
+								if ((m_keycode_map.end() == found) || (found->second.shift > curshift))
 								{
-									if (BIT(bits, 0))
-										newcode.field[fieldnum++] = shift[i];
-								}
+									keycode_map_entry newcode;
+									std::fill(std::begin(newcode.field), std::end(newcode.field), nullptr);
+									newcode.shift = curshift;
 
-								assert(fieldnum < ARRAY_LENGTH(newcode.field));
-								newcode.field[fieldnum] = &field;
-								if (m_keycode_map.end() == found)
-									m_keycode_map.emplace(code, newcode);
-								else
-									found->second = newcode;
+									unsigned fieldnum = 0;
+									for (unsigned i = 0, bits = curshift; (i < SHIFT_COUNT) && bits; ++i, bits >>= 1)
+									{
+										if (BIT(bits, 0))
+											newcode.field[fieldnum++] = shift[i];
+									}
 
-								if (LOG_NATURAL_KEYBOARD)
-								{
-									machine().logerror("natural_keyboard: code=%u (%s) port=%p field.name='%s'\n",
+									assert(fieldnum < ARRAY_LENGTH(newcode.field));
+									newcode.field[fieldnum] = &field;
+									if (m_keycode_map.end() == found)
+										m_keycode_map.emplace(code, newcode);
+									else
+										found->second = newcode;
+
+									if (LOG_NATURAL_KEYBOARD)
+									{
+										machine().logerror("natural_keyboard: code=%u (%s) port=%p field.name='%s'\n",
 											code, unicode_to_string(code), (void *)&port, field.name());
+									}
 								}
 							}
 						}

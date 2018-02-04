@@ -58,7 +58,7 @@ WRITE_LINE_MEMBER( c64_passport_midi_cartridge_device::write_acia_clock )
 //  device_add_mconfig - add device configuration
 //-------------------------------------------------
 
-MACHINE_CONFIG_MEMBER( c64_passport_midi_cartridge_device::device_add_mconfig )
+MACHINE_CONFIG_START(c64_passport_midi_cartridge_device::device_add_mconfig)
 	MCFG_DEVICE_ADD(MC6850_TAG, ACIA6850, 0)
 	MCFG_ACIA6850_TXD_HANDLER(DEVWRITELINE("mdout", midi_port_device, write_txd))
 	MCFG_ACIA6850_IRQ_HANDLER(WRITELINE(c64_passport_midi_cartridge_device, acia_irq_w))
@@ -135,12 +135,8 @@ uint8_t c64_passport_midi_cartridge_device::c64_cd_r(address_space &space, offs_
 			data = m_ptm->read(space, offset & 0x07);
 			break;
 
-		case 8:
-			data = m_acia->status_r(space, 0);
-			break;
-
-		case 9:
-			data = m_acia->data_r(space, 0);
+		case 8: case 9:
+			data = m_acia->read(space, offset & 0x01);
 			break;
 		}
 	}
@@ -164,12 +160,8 @@ void c64_passport_midi_cartridge_device::c64_cd_w(address_space &space, offs_t o
 			m_ptm->write(space, offset & 0x07, data);
 			break;
 
-		case 8:
-			m_acia->control_w(space, 0, data);
-			break;
-
-		case 9:
-			m_acia->data_w(space, 0, data);
+		case 8: case 9:
+			m_acia->write(space, offset & 0x01, data);
 			break;
 
 		case 0x30:

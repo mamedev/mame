@@ -221,7 +221,7 @@ void compgolf_state::machine_reset()
 	m_scrolly_hi = 0;
 }
 
-static MACHINE_CONFIG_START( compgolf )
+MACHINE_CONFIG_START(compgolf_state::compgolf)
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", M6809, 2000000)

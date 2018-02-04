@@ -15,8 +15,9 @@ Yasuhiro Ogawa. Thank you, Yasu.
 
 Supported games :
 ==================
- Syvalion                           (C) 1988 Taito
  Record Breaker / Go For The Gold   (C) 1988 Taito
+ Syvalion                           (C) 1988 Taito
+ Tetris                             (C) 1988 Taito
  Dynamite League                    (C) 1990 Taito
 
 
@@ -242,7 +243,7 @@ static ADDRESS_MAP_START( syvalion_map, AS_PROGRAM, 16, taitoh_state )
 	AM_RANGE(0x300000, 0x300001) AM_READNOP AM_DEVWRITE8("tc0140syt", tc0140syt_device, master_port_w, 0x00ff)
 	AM_RANGE(0x300002, 0x300003) AM_DEVREADWRITE8("tc0140syt", tc0140syt_device, master_comm_r, master_comm_w, 0x00ff)
 	AM_RANGE(0x400000, 0x420fff) AM_DEVREADWRITE("tc0080vco", tc0080vco_device, word_r, word_w)
-	AM_RANGE(0x500800, 0x500fff) AM_RAM_DEVWRITE("palette", palette_device, write) AM_SHARE("palette")
+	AM_RANGE(0x500800, 0x500fff) AM_RAM_DEVWRITE("palette", palette_device, write16) AM_SHARE("palette")
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( recordbr_map, AS_PROGRAM, 16, taitoh_state )
@@ -252,7 +253,7 @@ static ADDRESS_MAP_START( recordbr_map, AS_PROGRAM, 16, taitoh_state )
 	AM_RANGE(0x300000, 0x300001) AM_READNOP AM_DEVWRITE8("tc0140syt", tc0140syt_device, master_port_w, 0x00ff)
 	AM_RANGE(0x300002, 0x300003) AM_DEVREADWRITE8("tc0140syt", tc0140syt_device, master_comm_r, master_comm_w, 0x00ff)
 	AM_RANGE(0x400000, 0x420fff) AM_DEVREADWRITE("tc0080vco", tc0080vco_device, word_r, word_w)
-	AM_RANGE(0x500800, 0x500fff) AM_RAM_DEVWRITE("palette", palette_device, write) AM_SHARE("palette")
+	AM_RANGE(0x500800, 0x500fff) AM_RAM_DEVWRITE("palette", palette_device, write16) AM_SHARE("palette")
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( tetristh_map, AS_PROGRAM, 16, taitoh_state )
@@ -262,7 +263,7 @@ static ADDRESS_MAP_START( tetristh_map, AS_PROGRAM, 16, taitoh_state )
 	AM_RANGE(0x200002, 0x200003) AM_DEVREADWRITE8("tc0140syt", tc0140syt_device, master_comm_r, master_comm_w, 0x00ff)
 	AM_RANGE(0x300000, 0x300003) AM_DEVREADWRITE8("tc0040ioc", tc0040ioc_device, read, write, 0x00ff)
 	AM_RANGE(0x400000, 0x420fff) AM_DEVREADWRITE("tc0080vco", tc0080vco_device, word_r, word_w)
-	AM_RANGE(0x500800, 0x500fff) AM_RAM_DEVWRITE("palette", palette_device, write) AM_SHARE("palette")
+	AM_RANGE(0x500800, 0x500fff) AM_RAM_DEVWRITE("palette", palette_device, write16) AM_SHARE("palette")
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( dleague_map, AS_PROGRAM, 16, taitoh_state )
@@ -272,7 +273,7 @@ static ADDRESS_MAP_START( dleague_map, AS_PROGRAM, 16, taitoh_state )
 	AM_RANGE(0x300000, 0x300001) AM_READNOP AM_DEVWRITE8("tc0140syt", tc0140syt_device, master_port_w, 0x00ff)
 	AM_RANGE(0x300002, 0x300003) AM_DEVREADWRITE8("tc0140syt", tc0140syt_device, master_comm_r, master_comm_w, 0x00ff)
 	AM_RANGE(0x400000, 0x420fff) AM_DEVREADWRITE("tc0080vco", tc0080vco_device, word_r, word_w)
-	AM_RANGE(0x500800, 0x500fff) AM_RAM_DEVWRITE("palette", palette_device, write) AM_SHARE("palette")
+	AM_RANGE(0x500800, 0x500fff) AM_RAM_DEVWRITE("palette", palette_device, write16) AM_SHARE("palette")
 	AM_RANGE(0x600000, 0x600001) AM_WRITENOP    /* ?? writes zero once per frame */
 ADDRESS_MAP_END
 
@@ -634,14 +635,14 @@ void taitoh_state::machine_start()
 }
 
 
-static MACHINE_CONFIG_START( syvalion )
+MACHINE_CONFIG_START(taitoh_state::syvalion)
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", M68000, XTAL_24MHz / 2)     /* 12 MHz */
+	MCFG_CPU_ADD("maincpu", M68000, XTAL(24'000'000) / 2)     /* 12 MHz */
 	MCFG_CPU_PROGRAM_MAP(syvalion_map)
 	MCFG_CPU_VBLANK_INT_DRIVER("screen", taitoh_state,  irq2_line_hold)
 
-	MCFG_CPU_ADD("audiocpu", Z80, XTAL_8MHz / 2)        /* 4 MHz ??? */
+	MCFG_CPU_ADD("audiocpu", Z80, XTAL(8'000'000) / 2)        /* 4 MHz ??? */
 	MCFG_CPU_PROGRAM_MAP(sound_map)
 
 
@@ -678,7 +679,7 @@ static MACHINE_CONFIG_START( syvalion )
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
 
-	MCFG_SOUND_ADD("ymsnd", YM2610, XTAL_8MHz)
+	MCFG_SOUND_ADD("ymsnd", YM2610, XTAL(8'000'000))
 	MCFG_YM2610_IRQ_HANDLER(INPUTLINE("audiocpu", 0))
 	MCFG_SOUND_ROUTE(0, "mono", 0.25)
 	MCFG_SOUND_ROUTE(1, "mono", 1.0)
@@ -690,14 +691,14 @@ static MACHINE_CONFIG_START( syvalion )
 MACHINE_CONFIG_END
 
 
-static MACHINE_CONFIG_START( recordbr )
+MACHINE_CONFIG_START(taitoh_state::recordbr)
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", M68000, XTAL_24MHz / 2)     /* 12 MHz */
+	MCFG_CPU_ADD("maincpu", M68000, XTAL(24'000'000) / 2)     /* 12 MHz */
 	MCFG_CPU_PROGRAM_MAP(recordbr_map)
 	MCFG_CPU_VBLANK_INT_DRIVER("screen", taitoh_state,  irq2_line_hold)
 
-	MCFG_CPU_ADD("audiocpu", Z80, XTAL_8MHz / 2)        /* 4 MHz */
+	MCFG_CPU_ADD("audiocpu", Z80, XTAL(8'000'000) / 2)        /* 4 MHz */
 	MCFG_CPU_PROGRAM_MAP(sound_map)
 
 
@@ -734,7 +735,7 @@ static MACHINE_CONFIG_START( recordbr )
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
 
-	MCFG_SOUND_ADD("ymsnd", YM2610, XTAL_8MHz)
+	MCFG_SOUND_ADD("ymsnd", YM2610, XTAL(8'000'000))
 	MCFG_YM2610_IRQ_HANDLER(INPUTLINE("audiocpu", 0))
 	MCFG_SOUND_ROUTE(0, "mono", 0.25)
 	MCFG_SOUND_ROUTE(1, "mono", 1.0)
@@ -746,7 +747,7 @@ static MACHINE_CONFIG_START( recordbr )
 MACHINE_CONFIG_END
 
 
-static MACHINE_CONFIG_DERIVED( tetristh, recordbr )
+MACHINE_CONFIG_DERIVED(taitoh_state::tetristh, recordbr)
 
 	/* basic machine hardware */
 	MCFG_CPU_MODIFY("maincpu")
@@ -754,14 +755,14 @@ static MACHINE_CONFIG_DERIVED( tetristh, recordbr )
 MACHINE_CONFIG_END
 
 
-static MACHINE_CONFIG_START( dleague )
+MACHINE_CONFIG_START(taitoh_state::dleague)
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", M68000, XTAL_24MHz / 2)     /* 12 MHz */
+	MCFG_CPU_ADD("maincpu", M68000, XTAL(24'000'000) / 2)     /* 12 MHz */
 	MCFG_CPU_PROGRAM_MAP(dleague_map)
 	MCFG_CPU_VBLANK_INT_DRIVER("screen", taitoh_state,  irq1_line_hold)
 
-	MCFG_CPU_ADD("audiocpu", Z80, XTAL_8MHz / 2)        /* 4 MHz ??? */
+	MCFG_CPU_ADD("audiocpu", Z80, XTAL(8'000'000) / 2)        /* 4 MHz ??? */
 	MCFG_CPU_PROGRAM_MAP(sound_map)
 
 
@@ -798,7 +799,7 @@ static MACHINE_CONFIG_START( dleague )
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
 
-	MCFG_SOUND_ADD("ymsnd", YM2610, XTAL_8MHz)
+	MCFG_SOUND_ADD("ymsnd", YM2610, XTAL(8'000'000))
 	MCFG_YM2610_IRQ_HANDLER(INPUTLINE("audiocpu", 0))
 	MCFG_SOUND_ROUTE(0, "mono", 0.25)
 	MCFG_SOUND_ROUTE(1, "mono", 1.0)
@@ -967,7 +968,6 @@ ROM_START( syvalionp )
 ROM_END
 
 
-
 ROM_START( recordbr )
 	ROM_REGION( 0x80000, "maincpu", 0 )     /* main cpu */
 	ROM_LOAD16_BYTE( "b56-17.bin", 0x00000, 0x20000, CRC(3e0a9c35) SHA1(900a741b2abbbbe883b9d78162a88b4397af1a56) )
@@ -1028,7 +1028,10 @@ ROM_START( gogold )
 	ROM_LOAD( "b56-18.bin", 0x00000, 0x02000, CRC(c88f0bbe) SHA1(18c87c744fbeca35d13033e50f62e5383eb4ec2c) )
 ROM_END
 
-// Sega Tetris on a Taito H-System board, with some roms from ?Go For The Gold? still on the board.
+
+// Sega Tetris on a Taito H-System board, with some roms from Go For The Gold left in place on the board.
+//  These are required to produce proper sounds and music.  This was also done for the Tetris conversion
+//  of Nastar / Nastar Warrior / Rastan Saga 2 on Taito's B-System plaform (see taito_b.cpp)
 ROM_START( tetristh )
 	ROM_REGION( 0x40000, "maincpu", 0 )     /* main cpu */
 	ROM_LOAD16_BYTE( "c26-12-1.ic36", 0x00000, 0x20000, CRC(77e80c82) SHA1(840dc5a54a865b8cd2e0d03001a493987d66c23b) )
@@ -1056,6 +1059,7 @@ ROM_START( tetristh )
 	ROM_REGION( 0x02000, "user1", 0 ) /* zoom table / mixing? */
 	ROM_LOAD( "b56-18.bin", 0x00000, 0x02000, CRC(c88f0bbe) SHA1(18c87c744fbeca35d13033e50f62e5383eb4ec2c) )
 ROM_END
+
 
 ROM_START( dleague )
 	ROM_REGION( 0x60000, "maincpu", 0 )

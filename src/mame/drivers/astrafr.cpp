@@ -55,23 +55,19 @@ public:
 
 	DECLARE_READ8_MEMBER( astra_fgpa_r )
 	{
-		int pc = space.device().safe_pc();
-
 		if (offset==fgpa_first_read_addr)
 		{
 			return 0xff;
 		}
 		else
 		{
-			logerror("%08x astra_fgpa_r offset %02x\n", pc, offset);
+			logerror("%s astra_fgpa_r offset %02x\n", machine().describe_context(), offset);
 			return 0xff;
 		}
 	}
 
 	DECLARE_WRITE8_MEMBER( astra_fgpa_w )
 	{
-		int pc = space.device().safe_pc();
-
 		if (offset==fgpa_rom_write_addr)
 		{
 			// the games write most of the ROM data to a port
@@ -79,30 +75,26 @@ public:
 		}
 		else
 		{
-			logerror("%08x astra_fgpa_w offset %02x %02x\n", pc, offset, data);
+			logerror("%s astra_fgpa_w offset %02x %02x\n", machine().describe_context(), offset, data);
 		}
 	}
 
 	/* 2nd copy for the 2nd board (assume same addresses for now */
 	DECLARE_READ8_MEMBER( astra_fgpa_slave_r )
 	{
-		int pc = space.device().safe_pc();
-
 		if (offset==fgpa_first_read_addr)
 		{
 			return 0xff;
 		}
 		else
 		{
-			logerror("%08x astra_fgpa_slave_r offset %02x\n", pc, offset);
+			logerror("%s astra_fgpa_slave_r offset %02x\n", machine().describe_context(), offset);
 			return 0xff;
 		}
 	}
 
 	DECLARE_WRITE8_MEMBER( astra_fgpa_slave_w )
 	{
-		int pc = space.device().safe_pc();
-
 		if (offset==fgpa_rom_write_addr)
 		{
 			// the games write most of the ROM data to a port
@@ -110,7 +102,7 @@ public:
 		}
 		else
 		{
-			logerror("%08x astra_fgpa_slave_w offset %02x %02x\n", pc, offset, data);
+			logerror("%s astra_fgpa_slave_w offset %02x %02x\n", machine().describe_context(), offset, data);
 		}
 	}
 
@@ -126,13 +118,23 @@ public:
 	DECLARE_MACHINE_START(astra_2e);
 	DECLARE_MACHINE_START(astra_37);
 	DECLARE_MACHINE_START(astra_57);
+	void astra_single(machine_config &config);
+	void astra_single_alt(machine_config &config);
+	void astrafr_dual(machine_config &config);
+	void astrafr_dual_alt(machine_config &config);
+	void astrafr_dual_alt_37(machine_config &config);
+	void astra_single_2e(machine_config &config);
+	void astra_single_alt_37(machine_config &config);
+	void astra_single_alt_57(machine_config &config);
+	void astra_single_37(machine_config &config);
+	void astrafr_dual_2e(machine_config &config);
+	void astrafr_dual_37(machine_config &config);
 };
 
 
 
 READ32_MEMBER(astrafr_state::astrafr_mem_r)
 {
-	int pc = space.device().safe_pc();
 	int cs = m_maincpu->get_cs(offset * 4);
 
 	switch ( cs )
@@ -148,7 +150,7 @@ READ32_MEMBER(astrafr_state::astrafr_mem_r)
 			return m_mainram[offset];
 
 		default:
-			logerror("%08x maincpu read access offset %08x mem_mask %08x cs %d\n", pc, offset*4, mem_mask, cs);
+			logerror("%s maincpu read access offset %08x mem_mask %08x cs %d\n", machine().describe_context(), offset*4, mem_mask, cs);
 
 	}
 
@@ -159,7 +161,6 @@ READ32_MEMBER(astrafr_state::astrafr_mem_r)
 
 WRITE32_MEMBER(astrafr_state::astrafr_mem_w)
 {
-	int pc = space.device().safe_pc();
 	int address = offset * 4;
 	int cs = m_maincpu->get_cs(address);
 
@@ -182,14 +183,13 @@ WRITE32_MEMBER(astrafr_state::astrafr_mem_w)
 			break;
 
 		default:
-			logerror("%08x maincpu write access offset %08x data %08x mem_mask %08x cs %d\n", pc, address, data, mem_mask, cs);
+			logerror("%s maincpu write access offset %08x data %08x mem_mask %08x cs %d\n", machine().describe_context(), address, data, mem_mask, cs);
 
 	}
 }
 
 READ32_MEMBER(astrafr_state::astrafr_slave_mem_r)
 {
-	int pc = space.device().safe_pc();
 	int cs = m_slavecpu->get_cs(offset * 4);
 
 	switch ( cs )
@@ -205,7 +205,7 @@ READ32_MEMBER(astrafr_state::astrafr_slave_mem_r)
 			return m_slaveram[offset];
 
 		default:
-			logerror("%08x slavecpu read access offset %08x mem_mask %08x cs %d\n", pc, offset*4, mem_mask, cs);
+			logerror("%s slavecpu read access offset %08x mem_mask %08x cs %d\n", machine().describe_context(), offset*4, mem_mask, cs);
 
 	}
 
@@ -214,7 +214,6 @@ READ32_MEMBER(astrafr_state::astrafr_slave_mem_r)
 
 WRITE32_MEMBER(astrafr_state::astrafr_slave_mem_w)
 {
-	int pc = space.device().safe_pc();
 	int address = offset * 4;
 	int cs = m_slavecpu->get_cs(address);
 
@@ -237,7 +236,7 @@ WRITE32_MEMBER(astrafr_state::astrafr_slave_mem_w)
 			break;
 
 		default:
-			logerror("%08x slavecpu write access offset %08x data %08x mem_mask %08x cs %d\n", pc, address, data, mem_mask, cs);
+			logerror("%s slavecpu write access offset %08x data %08x mem_mask %08x cs %d\n", machine().describe_context(), address, data, mem_mask, cs);
 
 	}
 }
@@ -300,7 +299,7 @@ MACHINE_START_MEMBER(astrafr_state,astra_2e)
 }
 
 
-static MACHINE_CONFIG_START( astrafr_dual )
+MACHINE_CONFIG_START(astrafr_state::astrafr_dual)
 	MCFG_CPU_ADD("maincpu", M68340, 16000000)
 	MCFG_CPU_PROGRAM_MAP(astrafr_master_map)
 
@@ -310,15 +309,15 @@ static MACHINE_CONFIG_START( astrafr_dual )
 	MCFG_MACHINE_START_OVERRIDE(astrafr_state, astra_common )
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_DERIVED( astrafr_dual_2e, astrafr_dual )
+MACHINE_CONFIG_DERIVED(astrafr_state::astrafr_dual_2e, astrafr_dual)
 	MCFG_MACHINE_START_OVERRIDE(astrafr_state, astra_2e )
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_DERIVED( astrafr_dual_37, astrafr_dual )
+MACHINE_CONFIG_DERIVED(astrafr_state::astrafr_dual_37, astrafr_dual)
 	MCFG_MACHINE_START_OVERRIDE(astrafr_state, astra_37 )
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_START( astrafr_dual_alt )
+MACHINE_CONFIG_START(astrafr_state::astrafr_dual_alt)
 	MCFG_CPU_ADD("maincpu", M68340, 16000000)
 	MCFG_CPU_PROGRAM_MAP(astrafr_master_alt_map)
 
@@ -326,23 +325,23 @@ static MACHINE_CONFIG_START( astrafr_dual_alt )
 	MCFG_CPU_PROGRAM_MAP(astrafr_slave_map)
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_DERIVED( astrafr_dual_alt_37, astrafr_dual_alt )
+MACHINE_CONFIG_DERIVED(astrafr_state::astrafr_dual_alt_37, astrafr_dual_alt)
 	MCFG_MACHINE_START_OVERRIDE(astrafr_state, astra_37 )
 MACHINE_CONFIG_END
 
 
 
-static MACHINE_CONFIG_START( astra_single )
+MACHINE_CONFIG_START(astrafr_state::astra_single)
 	MCFG_CPU_ADD("maincpu", M68340, 16000000)
 	MCFG_CPU_PROGRAM_MAP(astra_map)
 	MCFG_MACHINE_START_OVERRIDE(astrafr_state, astra_common )
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_DERIVED( astra_single_37, astra_single )
+MACHINE_CONFIG_DERIVED(astrafr_state::astra_single_37, astra_single)
 	MCFG_MACHINE_START_OVERRIDE(astrafr_state, astra_37 )
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_DERIVED( astra_single_2e, astra_single )
+MACHINE_CONFIG_DERIVED(astrafr_state::astra_single_2e, astra_single)
 	MCFG_MACHINE_START_OVERRIDE(astrafr_state, astra_2e )
 MACHINE_CONFIG_END
 
@@ -355,17 +354,17 @@ MACHINE_START_MEMBER(astrafr_state,astra_57)
 }
 
 
-static MACHINE_CONFIG_START( astra_single_alt )
+MACHINE_CONFIG_START(astrafr_state::astra_single_alt)
 	MCFG_CPU_ADD("maincpu", M68340, 16000000)
 	MCFG_CPU_PROGRAM_MAP(astra_map)
 	MCFG_MACHINE_START_OVERRIDE(astrafr_state, astra_common )
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_DERIVED( astra_single_alt_57, astra_single_alt )
+MACHINE_CONFIG_DERIVED(astrafr_state::astra_single_alt_57, astra_single_alt)
 	MCFG_MACHINE_START_OVERRIDE(astrafr_state, astra_57 )
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_DERIVED( astra_single_alt_37, astra_single_alt )
+MACHINE_CONFIG_DERIVED(astrafr_state::astra_single_alt_37, astra_single_alt)
 	MCFG_MACHINE_START_OVERRIDE(astrafr_state, astra_37 )
 MACHINE_CONFIG_END
 

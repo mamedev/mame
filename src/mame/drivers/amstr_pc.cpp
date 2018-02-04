@@ -85,6 +85,11 @@ public:
 	uint8_t m_port65;
 
 	int m_dipstate;
+	static void cfg_com(device_t *device);
+	void pc200(machine_config &config);
+	void pc2086(machine_config &config);
+	void ppc640(machine_config &config);
+	void ppc512(machine_config &config);
 };
 
 static ADDRESS_MAP_START( ppc640_map, AS_PROGRAM, 16, amstrad_pc_state )
@@ -97,10 +102,10 @@ static ADDRESS_MAP_START( pc2086_map, AS_PROGRAM, 16, amstrad_pc_state )
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START(pc200_io, AS_IO, 16, amstrad_pc_state )
+	AM_RANGE(0x0000, 0x00ff) AM_DEVICE8("mb", pc_noppi_mb_device, map, 0xffff)
 	AM_RANGE(0x0060, 0x0065) AM_READWRITE8(pc1640_port60_r, pc1640_port60_w, 0xffff)
 	AM_RANGE(0x0078, 0x0079) AM_READWRITE8(pc1640_mouse_x_r, pc1640_mouse_x_w, 0xffff)
 	AM_RANGE(0x007a, 0x007b) AM_READWRITE8(pc1640_mouse_y_r, pc1640_mouse_y_w, 0xffff)
-	AM_RANGE(0x0000, 0x00ff) AM_DEVICE8("mb", pc_noppi_mb_device, map, 0xffff)
 	AM_RANGE(0x0200, 0x0207) AM_DEVREADWRITE8("pc_joy", pc_joy_device, joy_port_r, joy_port_w, 0xffff)
 	AM_RANGE(0x0278, 0x027b) AM_READ8(pc200_port278_r, 0xffff) AM_DEVWRITE8("lpt_2", pc_lpt_device, write, 0x00ff)
 	AM_RANGE(0x0378, 0x037b) AM_READ8(pc200_port378_r, 0xffff) AM_DEVWRITE8("lpt_1", pc_lpt_device, write, 0x00ff)
@@ -108,8 +113,8 @@ static ADDRESS_MAP_START(pc200_io, AS_IO, 16, amstrad_pc_state )
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START(ppc512_io, AS_IO, 16, amstrad_pc_state )
-	AM_RANGE(0x0070, 0x0071) AM_DEVREADWRITE8("rtc", mc146818_device, read, write, 0xffff)
 	AM_IMPORT_FROM(pc200_io)
+	AM_RANGE(0x0070, 0x0071) AM_DEVREADWRITE8("rtc", mc146818_device, read, write, 0xffff)
 ADDRESS_MAP_END
 
 /* pc20 (v2)
@@ -464,12 +469,13 @@ INPUT_PORTS_END
 // GFXDECODE_END
 
 // has it's own mouse
-static MACHINE_CONFIG_START( cfg_com )
-	MCFG_DEVICE_MODIFY("serport0")
+void amstrad_pc_state::cfg_com(device_t *device)
+{
+	device = device->subdevice("serport0");
 	MCFG_SLOT_DEFAULT_OPTION(nullptr)
-MACHINE_CONFIG_END
+}
 
-static MACHINE_CONFIG_START( pc200 )
+MACHINE_CONFIG_START(amstrad_pc_state::pc200)
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", I8086, 8000000)
 	MCFG_CPU_PROGRAM_MAP(ppc640_map)
@@ -506,12 +512,12 @@ static MACHINE_CONFIG_START( pc200 )
 	MCFG_RAM_EXTRA_OPTIONS("512K")
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_DERIVED( pc2086, pc200 )
+MACHINE_CONFIG_DERIVED(amstrad_pc_state::pc2086, pc200)
 	MCFG_CPU_MODIFY("maincpu")
 	MCFG_CPU_PROGRAM_MAP(pc2086_map)
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_DERIVED( ppc640, pc200 )
+MACHINE_CONFIG_DERIVED(amstrad_pc_state::ppc640, pc200)
 	MCFG_CPU_REPLACE("maincpu", V30, 8000000)
 	MCFG_CPU_PROGRAM_MAP(ppc640_map)
 	MCFG_CPU_IO_MAP(ppc512_io)
@@ -520,10 +526,10 @@ static MACHINE_CONFIG_DERIVED( ppc640, pc200 )
 	MCFG_DEVICE_REMOVE("isa1")
 	MCFG_DEVICE_REMOVE("isa2")
 
-	MCFG_MC146818_ADD( "rtc", XTAL_32_768kHz )
+	MCFG_MC146818_ADD( "rtc", XTAL(32'768) )
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_DERIVED( ppc512, ppc640 )
+MACHINE_CONFIG_DERIVED(amstrad_pc_state::ppc512, ppc640)
 	MCFG_DEVICE_MODIFY(RAM_TAG)
 	MCFG_RAM_DEFAULT_SIZE("512K")
 	MCFG_RAM_EXTRA_OPTIONS("640K")

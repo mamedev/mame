@@ -23,7 +23,6 @@
 #include "m4alpha.lh"
 #include "connect4.lh"
 
-MACHINE_CONFIG_EXTERN( mod2 );
 INPUT_PORTS_EXTERN( mpu4 );
 INPUT_PORTS_EXTERN( mpu4jackpot8tkn );
 

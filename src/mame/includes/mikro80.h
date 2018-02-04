@@ -61,6 +61,9 @@ public:
 	virtual void video_start() override;
 	uint32_t screen_update_mikro80(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 
+	void kristall(machine_config &config);
+	void radio99(machine_config &config);
+	void mikro80(machine_config &config);
 protected:
 	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr) override;
 	required_device<i8255_device> m_ppi8255;

@@ -13,7 +13,7 @@ public:
 
 	static void static_set_palette_tag(device_t &device, const char *tag);
 
-	DECLARE_READ8_MEMBER( ctrlram_r );
+	uint8_t ctrlram_r(int offset);
 	DECLARE_WRITE8_MEMBER( ctrl_w );
 
 	/* shall we move source in the interface? */

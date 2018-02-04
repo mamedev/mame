@@ -19,6 +19,10 @@ https://github.com/bkaradzic/bx
 [License (BSD 2-clause)](https://github.com/bkaradzic/bx/blob/master/LICENSE)
 -----------------------------------------------------------------------------
 
+<a href="http://opensource.org/licenses/BSD-2-Clause" target="_blank">
+<img align="right" src="http://opensource.org/trademarks/opensource/OSI-Approved-License-100x137.png">
+</a>
+
 	Copyright 2010-2017 Branimir Karadzic. All rights reserved.
 	
 	https://github.com/bkaradzic/bx

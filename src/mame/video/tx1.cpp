@@ -1499,7 +1499,7 @@ void tx1_state::buggyboy_get_roadpix(int screen, int ls161, uint8_t rva0_6, uint
 		*rc3 = d0 & d1;
 
 		if (rom_flip)
-			*rc3 = BITSWAP8(*rc3, 0, 1, 2, 3, 4, 5, 6, 7);
+			*rc3 = bitswap<8>(*rc3, 0, 1, 2, 3, 4, 5, 6, 7);
 	}
 	else
 		*rc3 = 0;

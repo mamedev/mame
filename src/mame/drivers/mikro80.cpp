@@ -25,7 +25,7 @@ static ADDRESS_MAP_START(mikro80_mem, AS_PROGRAM, 8, mikro80_state )
 	AM_RANGE( 0x0800, 0xdfff ) AM_RAM  // RAM
 	AM_RANGE( 0xe000, 0xe7ff ) AM_RAM  AM_SHARE("cursor_ram")// Video RAM
 	AM_RANGE( 0xe800, 0xefff ) AM_RAM  AM_SHARE("video_ram") // Video RAM
-	AM_RANGE( 0xd000, 0xf7ff ) AM_RAM  // RAM
+	AM_RANGE( 0xf000, 0xf7ff ) AM_RAM  // RAM
 	AM_RANGE( 0xf800, 0xffff ) AM_ROM  // System ROM
 ADDRESS_MAP_END
 
@@ -160,7 +160,7 @@ static GFXDECODE_START( mikro80 )
 	GFXDECODE_ENTRY( "gfx1", 0x0000, mikro80_charlayout, 0, 1 )
 GFXDECODE_END
 
-static MACHINE_CONFIG_START( mikro80 )
+MACHINE_CONFIG_START(mikro80_state::mikro80)
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu",I8080, 2000000)
 	MCFG_CPU_PROGRAM_MAP(mikro80_mem)
@@ -195,7 +195,7 @@ static MACHINE_CONFIG_START( mikro80 )
 	MCFG_SOFTWARE_LIST_ADD("cass_list", "mikro80")
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_DERIVED( radio99, mikro80 )
+MACHINE_CONFIG_DERIVED(mikro80_state::radio99, mikro80)
 
 	/* basic machine hardware */
 	MCFG_CPU_MODIFY("maincpu")
@@ -206,7 +206,7 @@ static MACHINE_CONFIG_DERIVED( radio99, mikro80 )
 	MCFG_SOUND_ROUTE_EX(0, "dac", 1.0, DAC_VREF_POS_INPUT)
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_DERIVED( kristall, mikro80 )
+MACHINE_CONFIG_DERIVED(mikro80_state::kristall, mikro80)
 	MCFG_CPU_MODIFY("maincpu")
 	MCFG_CPU_IO_MAP(kristall_io)
 MACHINE_CONFIG_END

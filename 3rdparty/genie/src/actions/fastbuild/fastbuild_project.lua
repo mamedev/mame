@@ -115,7 +115,9 @@ local function compile(indentlevel, prj, cfg, commonbasepath)
 		table.insert(compileroptions, '/TP')
 	end
 
-	if cfg.flags.ExtraWarnings then
+	if cfg.flags.PedanticWarnings
+	or cfg.flags.ExtraWarnings
+	then
 		table.insert(compileroptions, '/W4')
 	end
 

@@ -151,6 +151,9 @@ public:
 	void check_collision(int which);
 	void set_service_mode(int enable);
 	void draw_text(bitmap_ind16 &bitmap, const rectangle &cliprect, uint8_t *alpha_ram, int x, int count, int height);
+	void firetrk(machine_config &config);
+	void montecar(machine_config &config);
+	void superbug(machine_config &config);
 };
 
 

@@ -68,4 +68,7 @@ public:
 	DECLARE_VIDEO_START(atarigx2);
 	uint32_t screen_update_atarigx2(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	DECLARE_WRITE16_MEMBER( atarigx2_mo_control_w );
+	void atarigx2(machine_config &config);
+	void atarigx2_0x200(machine_config &config);
+	void atarigx2_0x400(machine_config &config);
 };

@@ -138,6 +138,7 @@ public:
 	DECLARE_WRITE8_MEMBER(io20_w);
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
+	void funkball(machine_config &config);
 };
 
 void funkball_state::video_start()
@@ -343,7 +344,7 @@ static ADDRESS_MAP_START(funkball_map, AS_PROGRAM, 32, funkball_state)
 //  AM_RANGE(0x08000000, 0x0fffffff) AM_NOP
 	AM_RANGE(0x40008000, 0x400080ff) AM_READWRITE(biu_ctrl_r, biu_ctrl_w)
 	AM_RANGE(0x40010e00, 0x40010eff) AM_RAM AM_SHARE("unk_ram")
-	AM_RANGE(0xff000000, 0xffffdfff) AM_DEVREADWRITE("voodoo_0", voodoo_device, voodoo_r, voodoo_w)
+	AM_RANGE(0xff000000, 0xfffdffff) AM_DEVREADWRITE("voodoo_0", voodoo_device, voodoo_r, voodoo_w)
 	AM_RANGE(0xfffe0000, 0xffffffff) AM_ROM AM_REGION("bios", 0)    /* System BIOS */
 ADDRESS_MAP_END
 
@@ -355,8 +356,8 @@ static ADDRESS_MAP_START( flashbank_map, AS_PROGRAM, 32, funkball_state )
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START(funkball_io, AS_IO, 32, funkball_state)
-	AM_RANGE(0x0020, 0x0023) AM_READWRITE8(io20_r, io20_w, 0xffff0000)
 	AM_IMPORT_FROM(pcat32_io_common)
+	AM_RANGE(0x0020, 0x0023) AM_READWRITE8(io20_r, io20_w, 0xffff0000)
 	AM_RANGE(0x00e8, 0x00ef) AM_NOP
 
 	AM_RANGE(0x01f0, 0x01f7) AM_DEVREADWRITE16("ide", ide_controller_device, read_cs0, write_cs0, 0xffffffff)
@@ -764,7 +765,7 @@ void funkball_state::machine_reset()
 	m_voodoo_pci_regs.base_addr = 0xff000000;
 }
 
-static MACHINE_CONFIG_START( funkball )
+MACHINE_CONFIG_START(funkball_state::funkball)
 	MCFG_CPU_ADD("maincpu", MEDIAGX, 66666666*3.5) // 66,6 MHz x 3.5
 	MCFG_CPU_PROGRAM_MAP(funkball_map)
 	MCFG_CPU_IO_MAP(funkball_io)
@@ -782,8 +783,8 @@ static MACHINE_CONFIG_START( funkball )
 	MCFG_DEVICE_ADD("flashbank", ADDRESS_MAP_BANK, 0)
 	MCFG_DEVICE_PROGRAM_MAP(flashbank_map)
 	MCFG_ADDRESS_MAP_BANK_ENDIANNESS(ENDIANNESS_LITTLE)
-	MCFG_ADDRESS_MAP_BANK_DATABUS_WIDTH(32)
-	MCFG_ADDRESS_MAP_BANK_ADDRBUS_WIDTH(32)
+	MCFG_ADDRESS_MAP_BANK_DATA_WIDTH(32)
+	MCFG_ADDRESS_MAP_BANK_ADDR_WIDTH(32)
 	MCFG_ADDRESS_MAP_BANK_STRIDE(0x10000)
 
 	/* video hardware */

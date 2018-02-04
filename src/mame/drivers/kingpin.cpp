@@ -56,6 +56,7 @@ public:
 	required_device<generic_latch_8_device> m_soundlatch;
 
 	DECLARE_WRITE8_MEMBER(sound_nmi_w);
+	void kingpin(machine_config &config);
 };
 
 
@@ -127,10 +128,10 @@ static INPUT_PORTS_START( kingpin )
 INPUT_PORTS_END
 
 
-static MACHINE_CONFIG_START( kingpin )
+MACHINE_CONFIG_START(kingpin_state::kingpin)
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", Z80, XTAL_3_579545MHz)
+	MCFG_CPU_ADD("maincpu", Z80, XTAL(3'579'545))
 	MCFG_CPU_PROGRAM_MAP(kingpin_program_map)
 	MCFG_CPU_IO_MAP(kingpin_io_map)
 
@@ -146,12 +147,12 @@ static MACHINE_CONFIG_START( kingpin )
 
 	MCFG_NVRAM_ADD_1FILL("nvram")
 
-	MCFG_CPU_ADD("audiocpu", Z80, XTAL_3_579545MHz)
+	MCFG_CPU_ADD("audiocpu", Z80, XTAL(3'579'545))
 	MCFG_CPU_PROGRAM_MAP(kingpin_sound_map)
 	MCFG_CPU_PERIODIC_INT_DRIVER(kingpin_state, irq0_line_hold,  1000) // unknown freq
 
 	/* video hardware */
-	MCFG_DEVICE_ADD( "tms9928a", TMS9928A, XTAL_10_738635MHz / 2 )
+	MCFG_DEVICE_ADD( "tms9928a", TMS9928A, XTAL(10'738'635) / 2 )
 	MCFG_TMS9928A_VRAM_SIZE(0x4000)
 	MCFG_TMS9928A_OUT_INT_LINE_CB(INPUTLINE("maincpu", 0))
 
@@ -163,7 +164,7 @@ static MACHINE_CONFIG_START( kingpin )
 
 	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
 
-	MCFG_SOUND_ADD("aysnd", AY8912, XTAL_3_579545MHz)
+	MCFG_SOUND_ADD("aysnd", AY8912, XTAL(3'579'545))
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
 MACHINE_CONFIG_END
 

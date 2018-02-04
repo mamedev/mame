@@ -91,6 +91,7 @@ public:
 	void kbd_put(u8 data);
 	uint8_t m_term_data;
 	uint16_t m_term_status;
+	void vax11(machine_config &config);
 };
 
 WRITE16_MEMBER(vax11_state::term_w)
@@ -137,9 +138,9 @@ void vax11_state::kbd_put(u8 data)
 	m_term_status = 0xffff;
 }
 
-static MACHINE_CONFIG_START( vax11 )
+MACHINE_CONFIG_START(vax11_state::vax11)
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu",T11, XTAL_4MHz) // Need proper CPU here
+	MCFG_CPU_ADD("maincpu",T11, XTAL(4'000'000)) // Need proper CPU here
 	MCFG_T11_INITIAL_MODE(0 << 13)
 	MCFG_CPU_PROGRAM_MAP(vax11_mem)
 

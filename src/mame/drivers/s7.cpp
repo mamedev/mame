@@ -116,6 +116,7 @@ public:
 	DECLARE_INPUT_CHANGED_MEMBER(diag_coin);
 	DECLARE_MACHINE_RESET(s7);
 	DECLARE_DRIVER_INIT(s7);
+	void s7(machine_config &config);
 private:
 	uint8_t m_sound_data;
 	uint8_t m_strobe;
@@ -422,7 +423,7 @@ DRIVER_INIT_MEMBER( s7_state, s7 )
 	m_irq_timer->adjust(attotime::from_ticks(980,3580000/4),1);
 }
 
-static MACHINE_CONFIG_START( s7 )
+MACHINE_CONFIG_START(s7_state::s7)
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", M6808, 3580000)
 	MCFG_CPU_PROGRAM_MAP(s7_main_map)

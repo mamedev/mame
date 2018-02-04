@@ -3,16 +3,13 @@
 /***************************************************************************
 
   BIG 10
-  ------
+  Success, 1985.
 
   Driver by Angelo Salese, Roberto Fresca & Tomasz Slanina.
-
 
 ****************************************************************************
 
   Dumper Notes:
-
-  Possibly some kind of gambling game.
 
   Z80A
   XTAL is 21.?727
@@ -21,7 +18,6 @@
   RAM 6264 x1
   RAM 41464 x4
   unknown SDIP64 chip with welded heatsink! Might be a video chip or MCU?
-
 
 ****************************************************************************
 
@@ -55,7 +51,7 @@
 ***************************************************************************/
 
 
-#define MASTER_CLOCK        XTAL_21_4772MHz     /* Dumper notes poorly refers to a 21.?727 Xtal. */
+#define MASTER_CLOCK        XTAL(21'477'272)     /* Dumper notes poorly refers to a 21.?727 Xtal. */
 
 
 #include "emu.h"
@@ -86,6 +82,7 @@ public:
 	required_device<cpu_device> m_maincpu;
 	required_device<ticket_dispenser_device> m_hopper;
 	required_ioport_array<6> m_in;
+	void big10(machine_config &config);
 };
 
 
@@ -101,7 +98,7 @@ public:
 WRITE8_MEMBER(big10_state::mux_w)
 {
 	m_mux_data = ~data;
-	m_hopper->write(space, 0, (data & 0x40) << 1);
+	m_hopper->motor_w(BIT(data, 6));
 	machine().output().set_lamp_value(1, BIT(~data, 7)); // maybe a coin counter?
 }
 
@@ -221,7 +218,7 @@ INPUT_PORTS_END
 *           Machine Driver            *
 **************************************/
 
-static MACHINE_CONFIG_START( big10 )
+MACHINE_CONFIG_START(big10_state::big10)
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", Z80, MASTER_CLOCK/6)    /* guess */
@@ -263,5 +260,5 @@ ROM_END
 *           Game Driver(s)            *
 **************************************/
 
-/*    YEAR  NAME      PARENT    MACHINE   INPUT     STATE          INIT      ROT      COMPANY      FULLNAME    FLAGS  */
-GAME( 198?, big10,    0,        big10,    big10,    big10_state,   0,        ROT0,   "<unknown>",  "Big 10",   0 )
+/*    YEAR  NAME      PARENT    MACHINE   INPUT     STATE          INIT    ROT      COMPANY     FULLNAME   FLAGS  */
+GAME( 1985, big10,    0,        big10,    big10,    big10_state,   0,      ROT0,   "Success",  "Big 10",   0 )

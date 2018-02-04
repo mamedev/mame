@@ -82,7 +82,7 @@ WRITE8_MEMBER(hexion_state::bankswitch_w)
 if (data & 0x30)
 	popmessage("bankswitch %02x",data&0xf0);
 
-//logerror("%04x: bankswitch_w %02x\n",space.device().safe_pc(),data);
+//logerror("%s: bankswitch_w %02x\n",m_maincpu->pc(),data);
 }
 
 READ8_MEMBER(hexion_state::bankedram_r)
@@ -101,7 +101,7 @@ READ8_MEMBER(hexion_state::bankedram_r)
 	}
 	else
 	{
-//logerror("%04x: bankedram_r offset %04x, bankctrl = %02x\n",space.device().safe_pc(),offset,m_bankctrl);
+//logerror("%s: bankedram_r offset %04x, bankctrl = %02x\n",m_maincpu->pc(),offset,m_bankctrl);
 		return 0;
 	}
 }
@@ -110,43 +110,43 @@ WRITE8_MEMBER(hexion_state::bankedram_w)
 {
 	if (m_bankctrl == 3 && offset == 0 && (data & 0xfe) == 0)
 	{
-//logerror("%04x: bankedram_w offset %04x, data %02x, bankctrl = %02x\n",space.device().safe_pc(),offset,data,m_bankctrl);
+//logerror("%s: bankedram_w offset %04x, data %02x, bankctrl = %02x\n",m_maincpu->pc(),offset,data,m_bankctrl);
 		m_rambank = data & 1;
 	}
 	else if (m_bankctrl == 0)
 	{
 		if (m_pmcbank)
 		{
-//logerror("%04x: bankedram_w offset %04x, data %02x, bankctrl = %02x\n",space.device().safe_pc(),offset,data,m_bankctrl);
+//logerror("%s: bankedram_w offset %04x, data %02x, bankctrl = %02x\n",m_maincpu->pc(),offset,data,m_bankctrl);
 			m_vram[m_rambank][offset] = data;
 			m_bg_tilemap[m_rambank]->mark_tile_dirty(offset/4);
 		}
 		else
-			logerror("%04x pmc internal ram %04x = %02x\n",space.device().safe_pc(),offset,data);
+			logerror("%04x pmc internal ram %04x = %02x\n",m_maincpu->pc(),offset,data);
 	}
 	else if (m_bankctrl == 2 && offset < 0x800)
 	{
 		if (m_pmcbank)
 		{
-//logerror("%04x: unkram_w offset %04x, data %02x, bankctrl = %02x\n",space.device().safe_pc(),offset,data,m_bankctrl);
+//logerror("%s: unkram_w offset %04x, data %02x, bankctrl = %02x\n",m_maincpu->pc(),offset,data,m_bankctrl);
 			m_unkram[offset] = data;
 		}
 		else
-			logerror("%04x pmc internal ram %04x = %02x\n",space.device().safe_pc(),offset,data);
+			logerror("%04x pmc internal ram %04x = %02x\n",m_maincpu->pc(),offset,data);
 	}
 	else
-logerror("%04x: bankedram_w offset %04x, data %02x, bankctrl = %02x\n",space.device().safe_pc(),offset,data,m_bankctrl);
+logerror("%s: bankedram_w offset %04x, data %02x, bankctrl = %02x\n",m_maincpu->pc(),offset,data,m_bankctrl);
 }
 
 WRITE8_MEMBER(hexion_state::bankctrl_w)
 {
-//logerror("%04x: bankctrl_w %02x\n",space.device().safe_pc(),data);
+//logerror("%s: bankctrl_w %02x\n",m_maincpu->pc(),data);
 	m_bankctrl = data;
 }
 
 WRITE8_MEMBER(hexion_state::gfxrom_select_w)
 {
-//logerror("%04x: gfxrom_select_w %02x\n",space.device().safe_pc(),data);
+//logerror("%s: gfxrom_select_w %02x\n",m_maincpu->pc(),data);
 	m_gfxrom_select = data;
 }
 

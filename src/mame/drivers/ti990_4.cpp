@@ -69,6 +69,8 @@ public:
 
 	DECLARE_MACHINE_RESET(ti990_4);
 
+	void ti990_4v(machine_config &config);
+	void ti990_4(machine_config &config);
 private:
 	void        hold_load();
 	void        device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr) override;
@@ -281,7 +283,7 @@ DRIVER_INIT_MEMBER(ti990_4_state, ti990_4)
 	m_nmi_timer = timer_alloc(NMI_TIMER_ID);
 }
 
-static MACHINE_CONFIG_START( ti990_4 )
+MACHINE_CONFIG_START(ti990_4_state::ti990_4)
 	/* basic machine hardware */
 	/* TMS9900 CPU @ 3.0(???) MHz */
 	MCFG_TMS99xx_ADD("maincpu", TMS9900, 3000000, memmap, cru_map)
@@ -302,7 +304,7 @@ static MACHINE_CONFIG_START( ti990_4 )
 //  MCFG_LEGACY_FLOPPY_4_DRIVES_ADD(ti990_4_floppy_interface)
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_START( ti990_4v )
+MACHINE_CONFIG_START(ti990_4_state::ti990_4v)
 	/* basic machine hardware */
 	/* TMS9900 CPU @ 3.0(???) MHz */
 	MCFG_TMS99xx_ADD("maincpu", TMS9900, 3000000, memmap, cru_map_v)

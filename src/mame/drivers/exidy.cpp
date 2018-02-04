@@ -148,7 +148,6 @@ Fax                  1982  6502   FXL, FLA
 #include "machine/6821pia.h"
 #include "audio/exidy.h"
 #include "includes/exidy.h"
-#include "audio/targ.h"
 
 
 /*************************************
@@ -219,32 +218,32 @@ ADDRESS_MAP_END
 
 
 static ADDRESS_MAP_START( sidetrac_map, AS_PROGRAM, 8, exidy_state )
+	AM_IMPORT_FROM(exidy_map)
 	AM_RANGE(0x0800, 0x3fff) AM_ROM
 	AM_RANGE(0x4800, 0x4fff) AM_ROM AM_SHARE("characterram")
 	AM_RANGE(0x5200, 0x5200) AM_WRITE(targ_audio_1_w)
 	AM_RANGE(0x5201, 0x5201) AM_WRITE(spectar_audio_2_w)
 	AM_RANGE(0xff00, 0xffff) AM_ROM AM_REGION("maincpu", 0x3f00)
-	AM_IMPORT_FROM(exidy_map)
 ADDRESS_MAP_END
 
 
 static ADDRESS_MAP_START( targ_map, AS_PROGRAM, 8, exidy_state )
+	AM_IMPORT_FROM(exidy_map)
 	AM_RANGE(0x0800, 0x3fff) AM_ROM
 	AM_RANGE(0x4800, 0x4fff) AM_RAM AM_SHARE("characterram")
 	AM_RANGE(0x5200, 0x5200) AM_WRITE(targ_audio_1_w)
 	AM_RANGE(0x5201, 0x5201) AM_WRITE(targ_audio_2_w)
 	AM_RANGE(0xff00, 0xffff) AM_ROM AM_REGION("maincpu", 0x3f00)
-	AM_IMPORT_FROM(exidy_map)
 ADDRESS_MAP_END
 
 
 static ADDRESS_MAP_START( spectar_map, AS_PROGRAM, 8, exidy_state )
+	AM_IMPORT_FROM(exidy_map)
 	AM_RANGE(0x0800, 0x3fff) AM_ROM
 	AM_RANGE(0x4800, 0x4fff) AM_RAM AM_SHARE("characterram")
 	AM_RANGE(0x5200, 0x5200) AM_WRITE(targ_audio_1_w)
 	AM_RANGE(0x5201, 0x5201) AM_WRITE(spectar_audio_2_w)
 	AM_RANGE(0xff00, 0xffff) AM_ROM AM_REGION("maincpu", 0x3f00)
-	AM_IMPORT_FROM(exidy_map)
 ADDRESS_MAP_END
 
 
@@ -271,23 +270,24 @@ ADDRESS_MAP_END
 
 
 static ADDRESS_MAP_START( venture_map, AS_PROGRAM, 8, exidy_state )
+	AM_IMPORT_FROM(exidy_map)
 	AM_RANGE(0x4800, 0x4fff) AM_RAM AM_SHARE("characterram")
 	AM_RANGE(0x5200, 0x520f) AM_DEVREADWRITE("pia0", pia6821_device, read, write)
 	AM_RANGE(0x8000, 0xffff) AM_ROM
-	AM_IMPORT_FROM(exidy_map)
 ADDRESS_MAP_END
 
 
 static ADDRESS_MAP_START( pepper2_map, AS_PROGRAM, 8, exidy_state )
+	AM_IMPORT_FROM(exidy_map)
 	AM_RANGE(0x4800, 0x4fff) AM_NOP
 	AM_RANGE(0x5200, 0x520f) AM_DEVREADWRITE("pia0", pia6821_device, read, write)
 	AM_RANGE(0x6000, 0x6fff) AM_RAM AM_SHARE("characterram")
 	AM_RANGE(0x8000, 0xffff) AM_ROM
-	AM_IMPORT_FROM(exidy_map)
 ADDRESS_MAP_END
 
 
 static ADDRESS_MAP_START( fax_map, AS_PROGRAM, 8, exidy_state )
+	AM_IMPORT_FROM(exidy_map)
 	AM_RANGE(0x0400, 0x07ff) AM_RAM
 	AM_RANGE(0x1a00, 0x1a00) AM_READ_PORT("IN4")
 	AM_RANGE(0x1c00, 0x1c00) AM_READ_PORT("IN3")
@@ -297,7 +297,6 @@ static ADDRESS_MAP_START( fax_map, AS_PROGRAM, 8, exidy_state )
 	AM_RANGE(0x5213, 0x5217) AM_WRITENOP        /* empty control lines on color/sound board */
 	AM_RANGE(0x6000, 0x6fff) AM_RAM AM_SHARE("characterram")
 	AM_RANGE(0x8000, 0xffff) AM_ROM
-	AM_IMPORT_FROM(exidy_map)
 ADDRESS_MAP_END
 
 
@@ -814,7 +813,7 @@ MACHINE_START_MEMBER(exidy_state,teetert)
  *
  *************************************/
 
-static MACHINE_CONFIG_START( base )
+MACHINE_CONFIG_START(exidy_state::base)
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", M6502, EXIDY_CPU_CLOCK)
@@ -833,7 +832,7 @@ static MACHINE_CONFIG_START( base )
 MACHINE_CONFIG_END
 
 
-static MACHINE_CONFIG_DERIVED( sidetrac, base )
+MACHINE_CONFIG_DERIVED(exidy_state::sidetrac, base)
 
 	/* basic machine hardware */
 	MCFG_CPU_MODIFY("maincpu")
@@ -844,7 +843,7 @@ static MACHINE_CONFIG_DERIVED( sidetrac, base )
 MACHINE_CONFIG_END
 
 
-static MACHINE_CONFIG_DERIVED( targ, base )
+MACHINE_CONFIG_DERIVED(exidy_state::targ, base)
 
 	/* basic machine hardware */
 	MCFG_CPU_MODIFY("maincpu")
@@ -855,7 +854,7 @@ static MACHINE_CONFIG_DERIVED( targ, base )
 MACHINE_CONFIG_END
 
 
-static MACHINE_CONFIG_DERIVED( spectar, base )
+MACHINE_CONFIG_DERIVED(exidy_state::spectar, base)
 
 	/* basic machine hardware */
 	MCFG_CPU_MODIFY("maincpu")
@@ -866,7 +865,7 @@ static MACHINE_CONFIG_DERIVED( spectar, base )
 MACHINE_CONFIG_END
 
 
-static MACHINE_CONFIG_DERIVED( rallys, spectar )
+MACHINE_CONFIG_DERIVED(exidy_state::rallys, spectar)
 
 	/* basic machine hardware */
 	MCFG_CPU_MODIFY("maincpu")
@@ -874,7 +873,7 @@ static MACHINE_CONFIG_DERIVED( rallys, spectar )
 MACHINE_CONFIG_END
 
 
-static MACHINE_CONFIG_DERIVED( venture, base )
+MACHINE_CONFIG_DERIVED(exidy_state::venture, base)
 
 	/* basic machine hardware */
 	MCFG_CPU_MODIFY("maincpu")
@@ -887,7 +886,7 @@ static MACHINE_CONFIG_DERIVED( venture, base )
 MACHINE_CONFIG_END
 
 
-static MACHINE_CONFIG_DERIVED( teetert, venture )
+MACHINE_CONFIG_DERIVED(exidy_state::teetert, venture)
 
 	/* basic machine hardware */
 	MCFG_CPU_MODIFY("maincpu")
@@ -898,7 +897,7 @@ static MACHINE_CONFIG_DERIVED( teetert, venture )
 MACHINE_CONFIG_END
 
 
-static MACHINE_CONFIG_DERIVED( mtrap, venture )
+MACHINE_CONFIG_DERIVED(exidy_state::mtrap, venture)
 
 	/* basic machine hardware */
 
@@ -909,7 +908,7 @@ static MACHINE_CONFIG_DERIVED( mtrap, venture )
 MACHINE_CONFIG_END
 
 
-static MACHINE_CONFIG_DERIVED( pepper2, venture )
+MACHINE_CONFIG_DERIVED(exidy_state::pepper2, venture)
 
 	/* basic machine hardware */
 	MCFG_CPU_MODIFY("maincpu")
@@ -917,7 +916,7 @@ static MACHINE_CONFIG_DERIVED( pepper2, venture )
 MACHINE_CONFIG_END
 
 
-static MACHINE_CONFIG_DERIVED( fax, pepper2 )
+MACHINE_CONFIG_DERIVED(exidy_state::fax, pepper2)
 
 	/* basic machine hardware */
 	MCFG_CPU_MODIFY("maincpu")

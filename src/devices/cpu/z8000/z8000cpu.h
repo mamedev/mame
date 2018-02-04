@@ -42,7 +42,7 @@
 #define RQ(n)   m_regs.Q[(n) >> 2]
 
 /* the register used as stack pointer */
-#define SP      (segmented_mode() ? 14 : 15)
+#define SP      (get_segmented_mode() ? 14 : 15)
 
 /* these vectors are based on m_psap */
 #define RST     (PSA_ADDR() + 0)  /* start up m_fcw and m_pc */

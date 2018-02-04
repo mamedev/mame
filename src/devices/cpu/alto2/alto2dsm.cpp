@@ -5,7 +5,7 @@
  *
  **********************************************************/
 #include "emu.h"
-#include "alto2cpu.h"
+#include "alto2dsm.h"
 
 #define loc_DASTART     0000420 // display list header
 #define loc_DVIBITS     0000421 // display vertical field interrupt bitword
@@ -68,7 +68,7 @@
 /**
  * @brief short names for the 16 tasks
  */
-static const char *taskname[16] = {
+const char *const alto2_disassembler::taskname[16] = {
 	"EMU",      // emulator task
 	"T01",
 	"T02",
@@ -90,7 +90,7 @@ static const char *taskname[16] = {
 /**
  * @brief names for the 32 R registers
  */
-static const char *regname[32] = {
+const char *const alto2_disassembler::regname[32] = {
 	"AC(3)",    // emulator accu 3
 	"AC(2)",    // emulator accu 2
 	"AC(1)",    // emulator accu 1
@@ -126,7 +126,7 @@ static const char *regname[32] = {
 };
 
 //! for ALUF which is the value loaded into T, if t flags is set
-static const char* t_bus_alu[16] = {
+const char *const alto2_disassembler::t_bus_alu[16] = {
 	"ALU",
 	"BUS",
 	"ALU",
@@ -148,7 +148,7 @@ static const char* t_bus_alu[16] = {
 /**
  * @brief copy of the constant PROM, which this disassembler may not have access to
  */
-static uint16_t const_prom[PROM_SIZE] = {
+uint16_t alto2_disassembler::const_prom[PROM_SIZE] = {
 	/* 0000 */  0x0000, 0x0001, 0x0002, 0xfffe, 0xffff, 0xffff, 0x000f, 0xffff,
 	/* 0008 */  0x0003, 0x0004, 0x0005, 0x0006, 0x0007, 0x0008, 0xfff8, 0xfff8,
 	/* 0010 */  0x0010, 0x001f, 0x0020, 0x003f, 0x0040, 0x007f, 0x0080, 0x0007,
@@ -187,34 +187,22 @@ static uint16_t const_prom[PROM_SIZE] = {
  * @brief print a symbolic name for an mpc address
  *
  * @param a microcode address (mpc)
- * @return pointer to const string with the address or symbolic name
+ * @return string with the address or symbolic name
  */
-static const char *addrname(int a)
+std::string alto2_disassembler::addrname(int a) const
 {
-	static char buffer[4][32];
-	static int which = 0;
-	char *dst;
-
-	which = (which + 1) % 4;
-	dst = buffer[which];
-
-	if (a < 020) {
+	if (a < 020)
 		// start value for mpc per task is the task number
-		snprintf(dst, sizeof(buffer[0]), "*%s", taskname[a]);
-	} else {
-		snprintf(dst, sizeof(buffer[0]), "%04o", a);
-	}
-	return dst;
+		return util::string_format("*%s", taskname[a]);
+	else
+		return util::string_format("%04o", a);
 }
 
-offs_t alto2_cpu_device::disasm_disassemble(std::ostream &main_stream, offs_t pc, const uint8_t *oprom, const uint8_t *opram, uint32_t options)
+offs_t alto2_disassembler::disassemble(std::ostream &main_stream, offs_t pc, const data_buffer &opcodes, const data_buffer &params)
 {
 	std::ostringstream stream;
 
-	uint32_t mir = (static_cast<uint32_t>(oprom[0]) << 24) |
-			(static_cast<uint32_t>(oprom[1]) << 16) |
-			(static_cast<uint32_t>(oprom[2]) << 8) |
-			(static_cast<uint32_t>(oprom[3]) << 0);
+	uint32_t mir = opcodes.r32(pc);
 	int rsel = (mir >> 27) & 31;
 	int aluf = (mir >> 23) & 15;
 	int bs = (mir >> 20) & 7;
@@ -223,17 +211,13 @@ offs_t alto2_cpu_device::disasm_disassemble(std::ostream &main_stream, offs_t pc
 	int t = (mir >> 11) & 1;
 	int l = (mir >> 10) & 1;
 	offs_t next = mir & 1023;
-	const uint8_t* src = oprom - 4 * pc + 4 * next;
-	uint32_t next2 =  (static_cast<uint32_t>(src[0]) << 24) |
-			(static_cast<uint32_t>(src[1]) << 16) |
-			(static_cast<uint32_t>(src[2]) << 8) |
-			(static_cast<uint32_t>(src[3]) << 0);
+	uint32_t next2 =  opcodes.r32(next);
 	uint16_t prefetch = next2 & 1023;
-	offs_t result = 1 | DASMFLAG_SUPPORTED;
+	offs_t result = 1 | SUPPORTED;
 	uint8_t pa;
 
 	if (next != pc + 1)
-		result |= DASMFLAG_STEP_OUT;
+		result |= STEP_OUT;
 
 	if (t)
 		util::stream_format(stream, "T<-%s ", t_bus_alu[aluf]);
@@ -394,4 +378,10 @@ offs_t alto2_cpu_device::disasm_disassemble(std::ostream &main_stream, offs_t pc
 	main_stream << output;
 
 	return result;
+}
+
+
+u32 alto2_disassembler::opcode_alignment() const
+{
+	return 1;
 }

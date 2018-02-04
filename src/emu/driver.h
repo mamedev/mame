@@ -24,28 +24,28 @@
 
 // core machine callbacks
 #define MCFG_MACHINE_START_OVERRIDE(_class, _func) \
-	driver_device::static_set_callback(config.root_device(), driver_device::CB_MACHINE_START, driver_callback_delegate(&_class::MACHINE_START_NAME(_func), downcast<_class *>(owner)));
+	driver_device::static_set_callback(config.root_device(), driver_device::CB_MACHINE_START, driver_callback_delegate(&_class::MACHINE_START_NAME(_func), this));
 
 #define MCFG_MACHINE_RESET_OVERRIDE(_class, _func) \
-	driver_device::static_set_callback(config.root_device(), driver_device::CB_MACHINE_RESET, driver_callback_delegate(&_class::MACHINE_RESET_NAME(_func), downcast<_class *>(owner)));
+	driver_device::static_set_callback(config.root_device(), driver_device::CB_MACHINE_RESET, driver_callback_delegate(&_class::MACHINE_RESET_NAME(_func), this));
 
 #define MCFG_MACHINE_RESET_REMOVE() \
 	driver_device::static_set_callback(config.root_device(), driver_device::CB_MACHINE_RESET, driver_callback_delegate());
 
 // core sound callbacks
 #define MCFG_SOUND_START_OVERRIDE(_class, _func) \
-	driver_device::static_set_callback(config.root_device(), driver_device::CB_SOUND_START, driver_callback_delegate(&_class::SOUND_START_NAME(_func), downcast<_class *>(owner)));
+	driver_device::static_set_callback(config.root_device(), driver_device::CB_SOUND_START, driver_callback_delegate(&_class::SOUND_START_NAME(_func), this));
 
 #define MCFG_SOUND_RESET_OVERRIDE(_class, _func) \
-	driver_device::static_set_callback(config.root_device(), driver_device::CB_SOUND_RESET, driver_callback_delegate(&_class::SOUND_RESET_NAME(_func), downcast<_class *>(owner)));
+	driver_device::static_set_callback(config.root_device(), driver_device::CB_SOUND_RESET, driver_callback_delegate(&_class::SOUND_RESET_NAME(_func), this));
 
 
 // core video callbacks
 #define MCFG_VIDEO_START_OVERRIDE(_class, _func) \
-	driver_device::static_set_callback(config.root_device(), driver_device::CB_VIDEO_START, driver_callback_delegate(&_class::VIDEO_START_NAME(_func), downcast<_class *>(owner)));
+	driver_device::static_set_callback(config.root_device(), driver_device::CB_VIDEO_START, driver_callback_delegate(&_class::VIDEO_START_NAME(_func), this));
 
 #define MCFG_VIDEO_RESET_OVERRIDE(_class, _func) \
-	driver_device::static_set_callback(config.root_device(), driver_device::CB_VIDEO_RESET, driver_callback_delegate(&_class::VIDEO_RESET_NAME(_func), downcast<_class *>(owner)));
+	driver_device::static_set_callback(config.root_device(), driver_device::CB_VIDEO_RESET, driver_callback_delegate(&_class::VIDEO_RESET_NAME(_func), this));
 
 
 
@@ -130,54 +130,33 @@ public:
 	// output heler
 	output_manager &output() const { return machine().output(); }
 
-	// generic interrupt generators
-	void generic_pulse_irq_line(device_execute_interface &exec, int irqline, int cycles);
-	void generic_pulse_irq_line_and_vector(device_execute_interface &exec, int irqline, int vector, int cycles);
-
 	INTERRUPT_GEN_MEMBER( nmi_line_pulse );
 	INTERRUPT_GEN_MEMBER( nmi_line_assert );
 
 	INTERRUPT_GEN_MEMBER( irq0_line_hold );
-	INTERRUPT_GEN_MEMBER( irq0_line_pulse );
 	INTERRUPT_GEN_MEMBER( irq0_line_assert );
 
 	INTERRUPT_GEN_MEMBER( irq1_line_hold );
-	INTERRUPT_GEN_MEMBER( irq1_line_pulse );
 	INTERRUPT_GEN_MEMBER( irq1_line_assert );
 
 	INTERRUPT_GEN_MEMBER( irq2_line_hold );
-	INTERRUPT_GEN_MEMBER( irq2_line_pulse );
 	INTERRUPT_GEN_MEMBER( irq2_line_assert );
 
 	INTERRUPT_GEN_MEMBER( irq3_line_hold );
-	INTERRUPT_GEN_MEMBER( irq3_line_pulse );
 	INTERRUPT_GEN_MEMBER( irq3_line_assert );
 
 	INTERRUPT_GEN_MEMBER( irq4_line_hold );
-	INTERRUPT_GEN_MEMBER( irq4_line_pulse );
 	INTERRUPT_GEN_MEMBER( irq4_line_assert );
 
 	INTERRUPT_GEN_MEMBER( irq5_line_hold );
-	INTERRUPT_GEN_MEMBER( irq5_line_pulse );
 	INTERRUPT_GEN_MEMBER( irq5_line_assert );
 
 	INTERRUPT_GEN_MEMBER( irq6_line_hold );
-	INTERRUPT_GEN_MEMBER( irq6_line_pulse );
 	INTERRUPT_GEN_MEMBER( irq6_line_assert );
 
 	INTERRUPT_GEN_MEMBER( irq7_line_hold );
-	INTERRUPT_GEN_MEMBER( irq7_line_pulse );
 	INTERRUPT_GEN_MEMBER( irq7_line_assert );
 
-
-	// generic video
-	void flip_screen_set(u32 on);
-	void flip_screen_set_no_update(u32 on);
-	void flip_screen_x_set(u32 on);
-	void flip_screen_y_set(u32 on);
-	u32 flip_screen() const { return m_flip_screen_x; }
-	u32 flip_screen_x() const { return m_flip_screen_x; }
-	u32 flip_screen_y() const { return m_flip_screen_y; }
 
 	// generic input port helpers
 	DECLARE_CUSTOM_INPUT_MEMBER( custom_port_read );
@@ -202,9 +181,16 @@ protected:
 	virtual void device_start() override;
 	virtual void device_reset_after_children() override;
 
+	// generic video
+	void flip_screen_set(u32 on);
+	void flip_screen_x_set(u32 on);
+	void flip_screen_y_set(u32 on);
+	u32 flip_screen() const { return m_flip_screen_x; }
+	u32 flip_screen_x() const { return m_flip_screen_x; }
+	u32 flip_screen_y() const { return m_flip_screen_y; }
+
 private:
 	// helpers
-	void irq_pulse_clear(void *ptr, s32 param);
 	void updateflip();
 
 	// internal state

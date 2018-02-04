@@ -47,6 +47,7 @@ public:
 	ptm6840_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
 	static void set_external_clocks(device_t &device, double clock0, double clock1, double clock2) { downcast<ptm6840_device &>(device).m_external_clock[0] = clock0; downcast<ptm6840_device &>(device).m_external_clock[1] = clock1; downcast<ptm6840_device &>(device).m_external_clock[2] = clock2; }
+	static void set_external_clocks(device_t &device, const XTAL &clock0, const XTAL &clock1, const XTAL &clock2) { set_external_clocks(device, clock0.dvalue(), clock1.dvalue(), clock2.dvalue()); }
 	template <class Object> static devcb_base &set_out_callback(device_t &device, int index, Object &&cb) { return downcast<ptm6840_device &>(device).m_out_cb[index].set_callback(std::forward<Object>(cb)); }
 	template <class Object> static devcb_base &set_irq_callback(device_t &device, Object &&cb) { return downcast<ptm6840_device &>(device).m_irq_cb.set_callback(std::forward<Object>(cb)); }
 

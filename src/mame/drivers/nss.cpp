@@ -350,6 +350,7 @@ public:
 	INTERRUPT_GEN_MEMBER(nss_vblank_irq);
 	DECLARE_READ8_MEMBER(spc_ram_100_r);
 	DECLARE_WRITE8_MEMBER(spc_ram_100_w);
+	void nss(machine_config &config);
 };
 
 
@@ -817,13 +818,14 @@ void nss_state::machine_reset()
 	m_joy_flag = 1;
 }
 
-static MACHINE_CONFIG_START( nss )
+MACHINE_CONFIG_START(nss_state::nss)
 
 	/* base snes hardware */
 	MCFG_CPU_ADD("maincpu", _5A22, MCLK_NTSC)   /* 2.68Mhz, also 3.58Mhz */
 	MCFG_CPU_PROGRAM_MAP(snes_map)
 
-	MCFG_CPU_ADD("soundcpu", SPC700, 2048000/2) /* 2.048 Mhz, but internal divider */
+	// runs at 24.576 MHz / 12 = 2.048 MHz
+	MCFG_CPU_ADD("soundcpu", SPC700, XTAL(24'576'000) / 12)
 	MCFG_CPU_PROGRAM_MAP(spc_mem)
 
 	MCFG_QUANTUM_PERFECT_CPU("maincpu")
@@ -1064,7 +1066,7 @@ DRIVER_INIT_MEMBER(nss_state,nss)
 	uint8_t *PROM = memregion("rp5h01")->base();
 
 	for (int i = 0; i < 0x10; i++)
-		PROM[i] = BITSWAP8(PROM[i],0,1,2,3,4,5,6,7) ^ 0xff;
+		PROM[i] = bitswap<8>(PROM[i],0,1,2,3,4,5,6,7) ^ 0xff;
 
 	DRIVER_INIT_CALL(snes);
 }

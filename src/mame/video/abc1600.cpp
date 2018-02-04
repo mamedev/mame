@@ -69,6 +69,7 @@ DEVICE_ADDRESS_MAP_START( iowr0_map, 8, abc1600_mover_device )
 ADDRESS_MAP_END
 
 DEVICE_ADDRESS_MAP_START( iowr1_map, 8, abc1600_mover_device )
+	AM_RANGE(0x00, 0x00) AM_MIRROR(0xff) AM_READNOP
 	AM_RANGE(0x00, 0x00) AM_MIRROR(0xf8) AM_WRITE(ldfx_hb_w)
 	AM_RANGE(0x01, 0x01) AM_MIRROR(0xf8) AM_WRITE(ldfx_lb_w)
 	AM_RANGE(0x02, 0x02) AM_MIRROR(0xf8) AM_WRITE(ldfy_hb_w)
@@ -78,6 +79,7 @@ DEVICE_ADDRESS_MAP_START( iowr1_map, 8, abc1600_mover_device )
 ADDRESS_MAP_END
 
 DEVICE_ADDRESS_MAP_START( iowr2_map, 8, abc1600_mover_device )
+	AM_RANGE(0x00, 0x00) AM_MIRROR(0xff) AM_READNOP
 	AM_RANGE(0x00, 0x00) AM_MIRROR(0xf8) AM_WRITE(wrmask_strobe_hb_w)
 	AM_RANGE(0x01, 0x01) AM_MIRROR(0xf8) AM_WRITE(wrmask_strobe_lb_w)
 	AM_RANGE(0x02, 0x02) AM_MIRROR(0xf8) AM_WRITE(enable_clocks_w)
@@ -191,16 +193,16 @@ MC6845_ON_UPDATE_ADDR_CHANGED( abc1600_mover_device::crtc_update )
 //  device_add_mconfig - add device configuration
 //-------------------------------------------------
 
-MACHINE_CONFIG_MEMBER( abc1600_mover_device::device_add_mconfig )
+MACHINE_CONFIG_START(abc1600_mover_device::device_add_mconfig)
 	MCFG_DEFAULT_LAYOUT(layout_abc1600)
 
 	MCFG_SCREEN_ADD_MONOCHROME(SCREEN_TAG, RASTER, rgb_t::green())
 	MCFG_SCREEN_UPDATE_DRIVER(abc1600_mover_device, screen_update)
-	MCFG_SCREEN_RAW_PARAMS(XTAL_64MHz, 0x3e0, 0, 0x300, 0x433, 0, 0x400)
+	MCFG_SCREEN_RAW_PARAMS(XTAL(64'000'000), 0x3e0, 0, 0x300, 0x433, 0, 0x400)
 
 	MCFG_PALETTE_ADD_MONOCHROME("palette")
 
-	MCFG_MC6845_ADD(SY6845E_TAG, SY6845E, SCREEN_TAG, XTAL_64MHz/32)
+	MCFG_MC6845_ADD(SY6845E_TAG, SY6845E, SCREEN_TAG, XTAL(64'000'000)/32)
 	MCFG_MC6845_SHOW_BORDER_AREA(true)
 	MCFG_MC6845_CHAR_WIDTH(32)
 	MCFG_MC6845_UPDATE_ROW_CB(abc1600_mover_device, crtc_update_row)

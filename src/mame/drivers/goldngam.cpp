@@ -237,8 +237,8 @@
 #include "speaker.h"
 
 
-#define MASTER_CLOCK    XTAL_8MHz   /* from CPU Board */
-#define SECONDARY_CLOCK XTAL_6MHz   /* from GFX Board */
+#define MASTER_CLOCK    XTAL(8'000'000)   /* from CPU Board */
+#define SECONDARY_CLOCK XTAL(6'000'000)   /* from GFX Board */
 
 
 class goldngam_state : public driver_device
@@ -255,6 +255,8 @@ public:
 	DECLARE_PALETTE_INIT(goldngam);
 	uint32_t screen_update_goldngam(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	required_device<cpu_device> m_maincpu;
+	void swisspkr(machine_config &config);
+	void moviecrd(machine_config &config);
 };
 
 
@@ -546,7 +548,7 @@ GFXDECODE_END
 *************************/
 
 
-static MACHINE_CONFIG_START( swisspkr )
+MACHINE_CONFIG_START(goldngam_state::swisspkr)
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", M68000, MASTER_CLOCK)
@@ -575,7 +577,7 @@ static MACHINE_CONFIG_START( swisspkr )
 MACHINE_CONFIG_END
 
 
-static MACHINE_CONFIG_DERIVED( moviecrd, swisspkr )
+MACHINE_CONFIG_DERIVED(goldngam_state::moviecrd, swisspkr)
 
 	/* basic machine hardware */
 	MCFG_CPU_MODIFY("maincpu")

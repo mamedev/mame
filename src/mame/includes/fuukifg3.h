@@ -5,9 +5,9 @@
 
 /* Define clocks based on actual OSC on the PCB */
 
-#define CPU_CLOCK       (XTAL_40MHz / 2)        /* clock for 68020 */
-#define SOUND_CPU_CLOCK     (XTAL_12MHz / 2)        /* clock for Z80 sound CPU */
-#define FM_SOUND_CLOCK      (XTAL_33_8688MHz / 2)       /* FM clock */
+#define CPU_CLOCK       (XTAL(40'000'000) / 2)        /* clock for 68020 */
+#define SOUND_CPU_CLOCK     (XTAL(12'000'000) / 2)        /* clock for Z80 sound CPU */
+#define FM_SOUND_CLOCK      (XTAL(33'868'800) / 2)       /* FM clock */
 
 /* NOTE: YMF278B_STD_CLOCK is defined in /src/emu/sound/ymf278b.h */
 
@@ -88,6 +88,7 @@ public:
 	inline void vram_w(offs_t offset, uint32_t data, uint32_t mem_mask, int _N_);
 	void draw_layer( screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect, int i, int flag, int pri );
 
+	void fuuki32(machine_config &config);
 protected:
 	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr) override;
 };

@@ -5,14 +5,12 @@ Undumped games:
 * Hyperdrome (Telegames 1999)
 
 Undumped Self-Published Titles:
-* Alpine Games (R. & J. Graf)
 * CGE 5th (Songbird Productions, CF30B2)
 * Championship Rally (Songbird Productions, CF2006)
 * Cyber Virus (Songbird Productions, CF2007)
 * Cyber Virus - CinciClassic Edition (Songbird Productions, CF20B1)
 * Lynx Othello (H. Dodgson)
 * PokerMania (MW Software)
-* Ponx (Songbird Productions, CF2002)
 * Remnant - Planar Wars 3D (Songbird Productions, CF2005)
 * SFX - The Ultimate Audio Tool (Songbird Productions, CF2001)
 * S.I.M.I.S. (B. Schick & M. Domin)
@@ -715,6 +713,18 @@ Known undumped prototypes:
 		</part>
 	</software>
 
+	<software name="ponx">
+		<description>Ponx</description>
+		<year>1999</year>
+		<publisher>Songbird Productions</publisher>
+		<info name="serial" value="CF2002" />
+		<part name="cart" interface="lynx_cart">
+			<dataarea name="rom" size="262144">
+				<rom name="ponx.bin" size="262144" crc="341c88e2" sha1="3254f5c3d347d444dc1bf4cdb07523cc0241d979" offset="000000" />
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="powfactr">
 		<description>Power Factor (Euro, USA)</description>
 		<year>1992</year>
@@ -1058,6 +1068,18 @@ Known undumped prototypes:
 		<part name="cart" interface="lynx_cart">
 			<dataarea name="rom" size="131072">
 				<rom name="zarlor mercenary (euro, usa).bin" size="131072" crc="cb27199d" sha1="7005cdfa0a2e4a9611266ce50493cbb32351e069" offset="000000" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="alpineg" supported="no"> <!-- Needs granularity set as 0x400 instead as 0x800 like the driver expects for 512k cartridges. Also will need eeprom support -->
+		<description>Alpine Games</description>
+		<year>2004</year>
+		<publisher>&lt;homebrew&gt;</publisher>
+		<info name="developer" value="R. &amp; J. Graf" />
+		<part name="cart" interface="lynx_cart">
+			<dataarea name="rom" size="524288">
+				<rom name="AlpineGames.bin" size="524288" crc="95a1ea09" sha1="fb71ad96f0730f88acd7d51eaa761e475a015d6c" offset="000000" />
 			</dataarea>
 		</part>
 	</software>

@@ -17,7 +17,7 @@
 #include "screen.h"
 
 /* TODO */
-#define ESRIPSYS_PIXEL_CLOCK    (XTAL_25MHz / 2)
+#define ESRIPSYS_PIXEL_CLOCK    (XTAL(25'000'000) / 2)
 #define ESRIPSYS_HTOTAL         (512 + 141 + 2)
 #define ESRIPSYS_HBLANK_START   (512)
 #define ESRIPSYS_HBLANK_END     (0)
@@ -126,6 +126,7 @@ public:
 	required_device<dac_word_interface> m_dac;
 	required_device<screen_device> m_screen;
 	ESRIP_DRAW(esripsys_draw);
+	void esripsys(machine_config &config);
 };
 
 #endif // _ESRIPSYS_H_

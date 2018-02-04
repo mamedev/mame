@@ -191,6 +191,7 @@ public:
 	DECLARE_READ8_MEMBER(cdsteljn_input_r);
 	DECLARE_WRITE8_MEMBER(cdsteljn_mux_w);
 	TIMER_DEVICE_CALLBACK_MEMBER(decocass_audio_nmi_gen);
+	void decocass(machine_config &config);
 private:
 	void draw_edge(bitmap_ind16 &bitmap, const rectangle &cliprect, int which, bool opaque);
 	void draw_special_priority(bitmap_ind16 &bitmap, bitmap_ind8 &priority, const rectangle &cliprect);
@@ -234,6 +235,23 @@ public:
 	DECLARE_MACHINE_RESET(cfboy0a1); /* 12 */
 	DECLARE_MACHINE_RESET(clocknchj); /* 11 */
 
+	void cprogolfj(machine_config &config);
+	void cfboy0a1(machine_config &config);
+	void cdsteljn(machine_config &config);
+	void csuperas(machine_config &config);
+	void clocknch(machine_config &config);
+	void cterrani(machine_config &config);
+	void chwy(machine_config &config);
+	void ctisland3(machine_config &config);
+	void cocean1a(machine_config &config);
+	void cluckypo(machine_config &config);
+	void cexplore(machine_config &config);
+	void cmanhat(machine_config &config);
+	void clocknchj(machine_config &config);
+	void cprogolf(machine_config &config);
+	void ctsttape(machine_config &config);
+	void castfant(machine_config &config);
+	void ctisland(machine_config &config);
 protected:
 
 	virtual void machine_start() override;
@@ -298,6 +316,20 @@ public:
 	DECLARE_MACHINE_RESET(cppicf);
 	DECLARE_MACHINE_RESET(cfghtice);
 
+	void csdtenis(machine_config &config);
+	void cburnrub(machine_config &config);
+	void cppicf(machine_config &config);
+	void cgraplop2(machine_config &config);
+	void cfghtice(machine_config &config);
+	void cpsoccer(machine_config &config);
+	void cnightst(machine_config &config);
+	void cprobowl(machine_config &config);
+	void cskater(machine_config &config);
+	void cbtime(machine_config &config);
+	void cgraplop(machine_config &config);
+	void clapapa(machine_config &config);
+	void cfishing(machine_config &config);
+	void czeroize(machine_config &config);
 protected:
 
 	virtual void machine_start() override;

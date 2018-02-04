@@ -162,14 +162,10 @@ protected:
 	virtual space_config_vector memory_space_config() const override;
 
 	// device_state_interface overrides
-	virtual void state_import(const device_state_entry &entry) override;
-	virtual void state_export(const device_state_entry &entry) override;
 	virtual void state_string_export(const device_state_entry &entry, std::string &str) const override;
 
 	// device_disasm_interface overrides
-	virtual uint32_t disasm_min_opcode_bytes() const override { return 1; }
-	virtual uint32_t disasm_max_opcode_bytes() const override { return 2; }
-	virtual offs_t disasm_disassemble(std::ostream &stream, offs_t pc, const uint8_t *oprom, const uint8_t *opram, uint32_t options) override;
+	virtual util::disasm_interface *create_disassembler() override;
 
 	address_space_config m_program_config;
 	address_space_config m_data_config;
@@ -209,7 +205,7 @@ protected:
 	bool m_has_inil;
 
 	address_space *m_program;
-	direct_read_data *m_direct;
+	direct_read_data<0> *m_direct;
 	address_space *m_data;
 
 	uint8_t m_featuremask;
@@ -226,8 +222,6 @@ protected:
 	uint16_t  m_sa, m_sb, m_sc; /* subroutine save registers */
 	uint8_t   m_sio;            /* 4-bit shift register and counter */
 	int     m_skl;            /* 1-bit latch for SK output */
-	uint8_t   m_flags;          // used for debugger state only
-	uint8_t   m_temp_m;         // 4-bit RAM at B (for debugger state only)
 
 	/* counter */
 	uint8_t   m_t;              /* 8-bit timer */
@@ -288,6 +282,11 @@ protected:
 
 	void skip();
 	void sk_update();
+
+	uint8_t get_flags() const;
+	void set_flags(uint8_t flags);
+	uint8_t get_m() const;
+	void set_m(uint8_t m);
 
 	void illegal(uint8_t operand);
 	void asc(uint8_t operand);

@@ -80,6 +80,9 @@ public:
 	DECLARE_WRITE8_MEMBER( mem64KBF_w );
 	DECLARE_WRITE8_MEMBER( mem64KRX_w );
 
+	void m5(machine_config &config);
+	void pal(machine_config &config);
+	void ntsc(machine_config &config);
 protected:
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
@@ -150,6 +153,7 @@ public:
 	DECLARE_SNAPSHOT_LOAD_MEMBER( brno );
 //  DECLARE_DEVICE_IMAGE_LOAD_MEMBER(m5_cart);
 
+void brno(machine_config &config);
 protected:
 	virtual void machine_start() override;
 	virtual void machine_reset() override;

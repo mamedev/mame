@@ -340,4 +340,11 @@ public:
 	int first_read;
 	uint16_t crypt_read_callback(uint32_t addr);
 
+	void model3_21_5881(machine_config &config);
+	void model3_20_5881(machine_config &config);
+	void model3_15(machine_config &config);
+	void model3_10(machine_config &config);
+	void model3_20(machine_config &config);
+	void model3_21(machine_config &config);
+	void scud(machine_config &config);
 };

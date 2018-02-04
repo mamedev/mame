@@ -56,6 +56,7 @@ public:
 	IRQ_CALLBACK_MEMBER(galaxygame_irq_callback);
 	required_device<cpu_device> m_maincpu;
 	required_device<palette_device> m_palette;
+	void galaxygame(machine_config &config);
 };
 
 /*************************************
@@ -318,7 +319,7 @@ void galaxygame_state::machine_reset()
 	m_interrupt = 0;
 }
 
-static MACHINE_CONFIG_START( galaxygame )
+MACHINE_CONFIG_START(galaxygame_state::galaxygame)
 
 	MCFG_CPU_ADD("maincpu", T11, 3000000 )
 	MCFG_CPU_PROGRAM_MAP(galaxygame_map)

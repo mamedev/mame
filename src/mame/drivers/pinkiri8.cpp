@@ -96,6 +96,7 @@ public:
 
 	void draw_background(bitmap_ind16 &bitmap, const rectangle &cliprect);
 	void draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprect);
+	void pinkiri8(machine_config &config);
 };
 
 
@@ -1087,8 +1088,8 @@ static GFXDECODE_START( pinkiri8 )
 	GFXDECODE_ENTRY( "gfx1", 0, charlayout,     0, 0x100 )
 GFXDECODE_END
 
-static MACHINE_CONFIG_START( pinkiri8 )
-	MCFG_CPU_ADD("maincpu",Z180,XTAL_32MHz/2)
+MACHINE_CONFIG_START(pinkiri8_state::pinkiri8)
+	MCFG_CPU_ADD("maincpu",Z180,XTAL(32'000'000)/2)
 	MCFG_CPU_PROGRAM_MAP(pinkiri8_map)
 	MCFG_CPU_IO_MAP(pinkiri8_io)
 	MCFG_CPU_VBLANK_INT_DRIVER("screen", pinkiri8_state, nmi_line_assert)

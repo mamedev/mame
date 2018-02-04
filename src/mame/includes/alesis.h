@@ -94,6 +94,9 @@ public:
 	DECLARE_WRITE8_MEMBER( sr16_lcd_w );
 	HD44780_PIXEL_UPDATE(sr16_pixel_update);
 
+	void mmt8(machine_config &config);
+	void hr16(machine_config &config);
+	void sr16(machine_config &config);
 private:
 	uint8_t       m_kb_matrix;
 	uint8_t       m_leds;

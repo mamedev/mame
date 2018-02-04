@@ -93,7 +93,8 @@ public:
 		m_oki(*this, "oki"),
 		m_gfxdecode(*this, "gfxdecode"),
 		m_screen(*this, "screen"),
-		m_palette(*this, "palette") { }
+		m_palette(*this, "palette"),
+		m_hopper(*this, "hopper") { }
 
 	layer_t m_layers[2];
 	uint8_t m_ss9601_byte_lo;
@@ -180,7 +181,16 @@ public:
 	required_device<gfxdecode_device> m_gfxdecode;
 	required_device<screen_device> m_screen;
 	required_device<palette_device> m_palette;
+	optional_device<ticket_dispenser_device> m_hopper;
 
+	void bishjan(machine_config &config);
+	void saklove(machine_config &config);
+	void mtrain(machine_config &config);
+	void humlan(machine_config &config);
+	void new2001(machine_config &config);
+	void expcard(machine_config &config);
+	void xplan(machine_config &config);
+	void xtrain(machine_config &config);
 private:
 	inline void ss9601_get_tile_info(layer_t *l, tile_data &tileinfo, tilemap_memory_index tile_index);
 };
@@ -873,7 +883,7 @@ READ16_MEMBER(subsino2_state::bishjan_input_r)
 
 	return  (res << 8) |                    // high byte
 			ioport("SYSTEM")->read() |      // low byte
-			(machine().device<ticket_dispenser_device>("hopper")->read(space, 0) ? 0x00 : 0x04) // bit 2: hopper sensor
+			(machine().device<ticket_dispenser_device>("hopper")->line_r() ? 0x00 : 0x04) // bit 2: hopper sensor
 	;
 }
 
@@ -886,9 +896,9 @@ WRITE16_MEMBER(subsino2_state::bishjan_outputs_w)
 		case 0:
 			if (ACCESSING_BITS_0_7)
 			{
-				// coin out         data & 0x01;
-				machine().device<ticket_dispenser_device>("hopper")->write(space, 0, (data & 0x0002) ? 0x80 : 0);   // hopper
-				machine().bookkeeping().coin_counter_w(0,    data & 0x0010 );
+				// coin out         BIT(data, 0)
+				m_hopper->motor_w(BIT(data, 1));   // hopper
+				machine().bookkeeping().coin_counter_w(0, BIT(data, 4));
 			}
 			break;
 	}
@@ -1039,8 +1049,8 @@ static ADDRESS_MAP_START( new2001_base_map, AS_PROGRAM, 16, subsino2_state )
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( new2001_map, AS_PROGRAM, 16, subsino2_state )
-	AM_RANGE( 0xc00008, 0xc00009 ) AM_WRITE(new2001_outputs_w ) AM_SHARE("outputs16")
 	AM_IMPORT_FROM(new2001_base_map)
+	AM_RANGE( 0xc00008, 0xc00009 ) AM_WRITE(new2001_outputs_w ) AM_SHARE("outputs16")
 ADDRESS_MAP_END
 
 /***************************************************************************
@@ -1075,8 +1085,8 @@ WRITE16_MEMBER(subsino2_state::humlan_outputs_w)
 }
 
 static ADDRESS_MAP_START( humlan_map, AS_PROGRAM, 16, subsino2_state )
-	AM_RANGE( 0xc00008, 0xc00009 ) AM_WRITE(humlan_outputs_w ) AM_SHARE("outputs16")
 	AM_IMPORT_FROM(new2001_base_map)
+	AM_RANGE( 0xc00008, 0xc00009 ) AM_WRITE(humlan_outputs_w ) AM_SHARE("outputs16")
 ADDRESS_MAP_END
 
 /***************************************************************************
@@ -1470,17 +1480,17 @@ WRITE8_MEMBER(subsino2_state::xtrain_outputs_w)
 }
 
 static ADDRESS_MAP_START( expcard_io, AS_IO, 8, subsino2_state )
+	AM_IMPORT_FROM( xplan_io )
+
 	// 306 = d, 307 = c, 308 = b, 309 = a
 	AM_RANGE(0x0306, 0x0309) AM_WRITE(expcard_outputs_w ) AM_SHARE("outputs")
-
-	AM_IMPORT_FROM( xplan_io )
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( xtrain_io, AS_IO, 8, subsino2_state )
+	AM_IMPORT_FROM( xplan_io )
+
 	// 306 = d, 307 = c, 308 = b, 309 = a
 	AM_RANGE(0x0306, 0x0309) AM_WRITE(xtrain_outputs_w ) AM_SHARE("outputs")
-
-	AM_IMPORT_FROM( xplan_io )
 ADDRESS_MAP_END
 
 
@@ -2330,8 +2340,8 @@ INPUT_PORTS_END
                                 Bishou Jan
 ***************************************************************************/
 
-static MACHINE_CONFIG_START( bishjan )
-	MCFG_CPU_ADD("maincpu", H83044, XTAL_44_1MHz / 3)
+MACHINE_CONFIG_START(subsino2_state::bishjan)
+	MCFG_CPU_ADD("maincpu", H83044, XTAL(44'100'000) / 3)
 	MCFG_CPU_PROGRAM_MAP( bishjan_map )
 	MCFG_CPU_VBLANK_INT_DRIVER("screen", subsino2_state, irq0_line_hold)
 
@@ -2357,7 +2367,7 @@ static MACHINE_CONFIG_START( bishjan )
 	// SS9904
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_DERIVED( new2001, bishjan )
+MACHINE_CONFIG_DERIVED(subsino2_state::new2001, bishjan)
 	MCFG_CPU_MODIFY("maincpu")
 	MCFG_CPU_PROGRAM_MAP( new2001_map )
 
@@ -2366,8 +2376,8 @@ static MACHINE_CONFIG_DERIVED( new2001, bishjan )
 	MCFG_SCREEN_VISIBLE_AREA( 0, 640-1, 0, 256-16-1 )
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_DERIVED( humlan, bishjan )
-	MCFG_CPU_REPLACE("maincpu", H83044, XTAL_48MHz / 3)
+MACHINE_CONFIG_DERIVED(subsino2_state::humlan, bishjan)
+	MCFG_CPU_REPLACE("maincpu", H83044, XTAL(48'000'000) / 3)
 	MCFG_CPU_PROGRAM_MAP( humlan_map )
 	MCFG_CPU_VBLANK_INT_DRIVER("screen", subsino2_state, irq0_line_hold)
 
@@ -2379,8 +2389,8 @@ MACHINE_CONFIG_END
                                 Magic Train
 ***************************************************************************/
 
-static MACHINE_CONFIG_START( mtrain )
-	MCFG_CPU_ADD("maincpu", Z180, XTAL_12MHz / 8)   /* Unknown clock */
+MACHINE_CONFIG_START(subsino2_state::mtrain)
+	MCFG_CPU_ADD("maincpu", Z180, XTAL(12'000'000) / 8)   /* Unknown clock */
 	MCFG_CPU_PROGRAM_MAP( mtrain_map )
 	MCFG_CPU_IO_MAP( mtrain_io )
 
@@ -2405,7 +2415,7 @@ static MACHINE_CONFIG_START( mtrain )
 	// sound hardware
 	MCFG_SPEAKER_STANDARD_MONO("mono")
 
-	MCFG_OKIM6295_ADD("oki", XTAL_8_4672MHz / 8, PIN7_HIGH)    // probably
+	MCFG_OKIM6295_ADD("oki", XTAL(8'467'200) / 8, PIN7_HIGH)    // probably
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 MACHINE_CONFIG_END
 
@@ -2413,8 +2423,8 @@ MACHINE_CONFIG_END
                           Sakura Love - Ying Hua Lian
 ***************************************************************************/
 
-static MACHINE_CONFIG_START( saklove )
-	MCFG_CPU_ADD("maincpu", I80188, XTAL_20MHz*2 )    // !! AMD AM188-EM !!
+MACHINE_CONFIG_START(subsino2_state::saklove)
+	MCFG_CPU_ADD("maincpu", I80188, XTAL(20'000'000)*2 )    // !! AMD AM188-EM !!
 	MCFG_CPU_PROGRAM_MAP( saklove_map )
 	MCFG_CPU_IO_MAP( saklove_io )
 
@@ -2439,10 +2449,10 @@ static MACHINE_CONFIG_START( saklove )
 	// sound hardware
 	MCFG_SPEAKER_STANDARD_MONO("mono")
 
-	MCFG_OKIM6295_ADD("oki", XTAL_8_4672MHz / 8, PIN7_HIGH)
+	MCFG_OKIM6295_ADD("oki", XTAL(8'467'200) / 8, PIN7_HIGH)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.80)
 
-	MCFG_SOUND_ADD("ymsnd", YM3812, XTAL_12MHz / 4) // ? chip and clock unknown
+	MCFG_SOUND_ADD("ymsnd", YM3812, XTAL(12'000'000) / 4) // ? chip and clock unknown
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.80)
 MACHINE_CONFIG_END
 
@@ -2450,8 +2460,8 @@ MACHINE_CONFIG_END
                                 X-Plan
 ***************************************************************************/
 
-static MACHINE_CONFIG_START( xplan )
-	MCFG_CPU_ADD("maincpu", I80188, XTAL_20MHz*2 )    // !! AMD AM188-EM !!
+MACHINE_CONFIG_START(subsino2_state::xplan)
+	MCFG_CPU_ADD("maincpu", I80188, XTAL(20'000'000)*2 )    // !! AMD AM188-EM !!
 	MCFG_CPU_PROGRAM_MAP( xplan_map )
 	MCFG_CPU_IO_MAP( xplan_io )
 	MCFG_CPU_VBLANK_INT_DRIVER("screen", subsino2_state, am188em_int0_irq)
@@ -2477,16 +2487,16 @@ static MACHINE_CONFIG_START( xplan )
 	// sound hardware
 	MCFG_SPEAKER_STANDARD_MONO("mono")
 
-	MCFG_OKIM6295_ADD("oki", XTAL_8_4672MHz / 8, PIN7_HIGH)    // probably
+	MCFG_OKIM6295_ADD("oki", XTAL(8'467'200) / 8, PIN7_HIGH)    // probably
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_DERIVED( xtrain, xplan )
+MACHINE_CONFIG_DERIVED(subsino2_state::xtrain, xplan)
 	MCFG_CPU_MODIFY("maincpu")
 	MCFG_CPU_IO_MAP(xtrain_io)
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_DERIVED( expcard, xplan )
+MACHINE_CONFIG_DERIVED(subsino2_state::expcard, xplan)
 	MCFG_CPU_MODIFY("maincpu")
 	MCFG_CPU_IO_MAP(expcard_io)
 MACHINE_CONFIG_END

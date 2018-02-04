@@ -450,7 +450,7 @@ void hd61830_device::draw_char(bitmap_ind16 &bitmap, const rectangle &cliprect, 
 					pixel = m_cursor ? 1 : 0;
 			}
 
-			if (sy < m_screen->height() && sx < m_screen->width())
+			if (sy < screen().height() && sx < screen().width())
 				bitmap.pix16(sy, sx) = pixel;
 		}
 	}

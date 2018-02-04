@@ -215,9 +215,9 @@ static ADDRESS_MAP_START( sidepckt_map, AS_PROGRAM, 8, sidepckt_state )
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( sidepcktb_map, AS_PROGRAM, 8, sidepckt_state )
+	AM_IMPORT_FROM( sidepckt_map )
 	AM_RANGE(0x3014, 0x3014) AM_READNOP
 	AM_RANGE(0x3018, 0x3018) AM_WRITENOP
-	AM_IMPORT_FROM( sidepckt_map )
 ADDRESS_MAP_END
 
 
@@ -366,7 +366,7 @@ void sidepckt_state::machine_reset()
 	m_scroll_y      = 0;
 }
 
-static MACHINE_CONFIG_START( sidepckt )
+MACHINE_CONFIG_START(sidepckt_state::sidepckt)
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", M6809, 2000000) /* 2 MHz */
@@ -403,7 +403,7 @@ static MACHINE_CONFIG_START( sidepckt )
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_DERIVED( sidepcktb, sidepckt )
+MACHINE_CONFIG_DERIVED(sidepckt_state::sidepcktb, sidepckt)
 
 	/* basic machine hardware */
 	MCFG_CPU_MODIFY("maincpu")

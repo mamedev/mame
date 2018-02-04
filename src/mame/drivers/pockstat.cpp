@@ -154,6 +154,7 @@ public:
 	uint32_t ps_intc_get_interrupt_line(uint32_t line);
 	void ps_intc_set_interrupt_line(uint32_t line, int state);
 	void ps_timer_start(int index);
+	void pockstat(machine_config &config);
 };
 
 
@@ -972,7 +973,7 @@ DEVICE_IMAGE_LOAD_MEMBER( pockstat_state, pockstat_flash )
 	return image_init_result::PASS;
 }
 
-static MACHINE_CONFIG_START( pockstat )
+MACHINE_CONFIG_START(pockstat_state::pockstat)
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", ARM7, DEFAULT_CLOCK)
 	MCFG_CPU_PROGRAM_MAP(pockstat_mem)

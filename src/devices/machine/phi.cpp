@@ -1246,7 +1246,7 @@ bool phi_device::if_cmd_received(uint8_t byte)
 					}
 				} else {
 					// command is a secondary address
-					if (m_t_state == PHI_T_ID1 && my_addr) {
+					if (m_t_state == PHI_T_ID1 && (m_l_state == PHI_L_LADS) == !!lon_msg() && my_addr) {
 						// Start IDENTIFY sequence
 						m_t_state = PHI_T_ID2;
 					} else if (m_t_state >= PHI_T_ID2 && m_t_state <= PHI_T_ID6 && !my_addr) {

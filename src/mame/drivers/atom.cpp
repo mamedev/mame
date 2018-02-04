@@ -704,7 +704,7 @@ FLOPPY_FORMATS_END0
     MACHINE_DRIVER( atom )
 -------------------------------------------------*/
 
-static MACHINE_CONFIG_START( atom )
+MACHINE_CONFIG_START(atom_state::atom)
 	/* basic machine hardware */
 	MCFG_CPU_ADD(SY6502_TAG, M6502, X2/4)
 	MCFG_CPU_PROGRAM_MAP(atom_mem)
@@ -712,7 +712,7 @@ static MACHINE_CONFIG_START( atom )
 	/* video hardware */
 	MCFG_SCREEN_MC6847_PAL_ADD(SCREEN_TAG, MC6847_TAG)
 
-	MCFG_DEVICE_ADD(MC6847_TAG, MC6847_PAL, XTAL_4_433619MHz)
+	MCFG_DEVICE_ADD(MC6847_TAG, MC6847_PAL, XTAL(4'433'619))
 	MCFG_MC6847_INPUT_CALLBACK(READ8(atom_state, vdg_videoram_r))
 
 	/* sound hardware */
@@ -781,7 +781,7 @@ MACHINE_CONFIG_END
 	MCFG_GENERIC_EXTENSIONS("bin,rom") \
 	MCFG_GENERIC_LOAD(atomeb_state, _load)
 
-static MACHINE_CONFIG_DERIVED( atomeb, atom )
+MACHINE_CONFIG_DERIVED(atomeb_state::atomeb, atom)
 	MCFG_CPU_MODIFY(SY6502_TAG)
 	MCFG_CPU_PROGRAM_MAP(atomeb_mem)
 
@@ -813,7 +813,7 @@ MACHINE_CONFIG_END
     MACHINE_DRIVER( atombb )
 -------------------------------------------------*/
 
-static MACHINE_CONFIG_START( atombb )
+MACHINE_CONFIG_START(atom_state::atombb)
 	/* basic machine hardware */
 	MCFG_CPU_ADD(SY6502_TAG, M6502, X2/4)
 	MCFG_CPU_PROGRAM_MAP(atombb_mem)
@@ -821,7 +821,7 @@ static MACHINE_CONFIG_START( atombb )
 	/* video hardware */
 	MCFG_SCREEN_MC6847_PAL_ADD(SCREEN_TAG, MC6847_TAG)
 
-	MCFG_DEVICE_ADD(MC6847_TAG, MC6847_PAL, XTAL_4_433619MHz)
+	MCFG_DEVICE_ADD(MC6847_TAG, MC6847_PAL, XTAL(4'433'619))
 	MCFG_MC6847_INPUT_CALLBACK(READ8(atom_state, vdg_videoram_r))
 
 	/* sound hardware */

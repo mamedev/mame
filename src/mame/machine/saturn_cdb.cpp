@@ -34,7 +34,7 @@ static ADDRESS_MAP_START( saturn_cdb_map, AS_PROGRAM, 32, saturn_cdb_device )
 	AM_RANGE(0x07000000, 0x07000fff) AM_RAM // unknown, internal RAM?
 ADDRESS_MAP_END
 
-MACHINE_CONFIG_MEMBER( saturn_cdb_device::device_add_mconfig )
+MACHINE_CONFIG_START(saturn_cdb_device::device_add_mconfig)
 	MCFG_CPU_ADD("cdbcpu", SH1, DERIVED_CLOCK(1, 1))
 	MCFG_CPU_PROGRAM_MAP(saturn_cdb_map)
 	MCFG_DEVICE_DISABLE() // we're not actually using the CD Block ROM for now

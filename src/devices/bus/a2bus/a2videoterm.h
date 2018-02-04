@@ -33,12 +33,12 @@ protected:
 	virtual void device_add_mconfig(machine_config &config) override;
 
 	// overrides of standard a2bus slot functions
-	virtual uint8_t read_c0nx(address_space &space, uint8_t offset) override;
-	virtual void write_c0nx(address_space &space, uint8_t offset, uint8_t data) override;
-	virtual uint8_t read_cnxx(address_space &space, uint8_t offset) override;
-	virtual void write_cnxx(address_space &space, uint8_t offset, uint8_t data) override;
-	virtual uint8_t read_c800(address_space &space, uint16_t offset) override;
-	virtual void write_c800(address_space &space, uint16_t offset, uint8_t data) override;
+	virtual uint8_t read_c0nx(uint8_t offset) override;
+	virtual void write_c0nx(uint8_t offset, uint8_t data) override;
+	virtual uint8_t read_cnxx(uint8_t offset) override;
+	virtual void write_cnxx(uint8_t offset, uint8_t data) override;
+	virtual uint8_t read_c800(uint16_t offset) override;
+	virtual void write_c800(uint16_t offset, uint8_t data) override;
 
 	uint8_t *m_rom, *m_chrrom;
 	uint8_t m_ram[512*4];
@@ -70,7 +70,7 @@ public:
 	virtual const tiny_rom_entry *device_rom_region() const override;
 
 protected:
-	virtual uint8_t read_cnxx(address_space &space, uint8_t offset) override;
+	virtual uint8_t read_cnxx(uint8_t offset) override;
 };
 
 
@@ -82,7 +82,7 @@ public:
 	virtual const tiny_rom_entry *device_rom_region() const override;
 
 protected:
-	virtual uint8_t read_cnxx(address_space &space, uint8_t offset) override;
+	virtual uint8_t read_cnxx(uint8_t offset) override;
 };
 
 class a2bus_vtc1_device : public a2bus_videx80_device

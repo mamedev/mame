@@ -60,6 +60,7 @@ public:
 		TIMER_ACEFRUIT_REFRESH
 	};
 
+	void acefruit(machine_config &config);
 protected:
 	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr) override;
 };
@@ -604,7 +605,7 @@ static GFXDECODE_START( acefruit )
 	GFXDECODE_ENTRY( "gfx1", 0x1800, charlayout, 8, 4 )
 GFXDECODE_END
 
-static MACHINE_CONFIG_START( acefruit )
+MACHINE_CONFIG_START(acefruit_state::acefruit)
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", Z80, 2500000) /* 2.5MHz */

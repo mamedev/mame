@@ -83,6 +83,9 @@ public:
 	DECLARE_WRITE_LINE_MEMBER(screen_vblank);
 
 	void mcu_init();
+	void twc94(machine_config &config);
+	void gstriker(machine_config &config);
+	void vgoal(machine_config &config);
 };
 
 #endif

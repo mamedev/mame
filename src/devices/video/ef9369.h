@@ -39,7 +39,7 @@
 	MCFG_DEVICE_ADD(_tag, EF9369, 0) \
 
 #define MCFG_EF9369_COLOR_UPDATE_CB(_class, _method) \
-	ef9369_device::set_color_update_callback(*device, ef9369_device::color_update_delegate(&_class::_method, #_class "::" #_method, downcast<_class *>(owner)));
+	ef9369_device::set_color_update_callback(*device, ef9369_device::color_update_delegate(&_class::_method, #_class "::" #_method, this));
 
 
 //**************************************************************************

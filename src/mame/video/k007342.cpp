@@ -162,7 +162,7 @@ WRITE8_MEMBER( k007342_device::vreg_w )
 			break;
 		case 0x01:  /* used for banking in Rock'n'Rage */
 			if (data != m_regs[1])
-				space.machine().tilemap().mark_all_dirty();
+				machine().tilemap().mark_all_dirty();
 		case 0x02:
 			m_scrollx[0] = (m_scrollx[0] & 0xff) | ((data & 0x01) << 8);
 			m_scrollx[1] = (m_scrollx[1] & 0xff) | ((data & 0x02) << 7);

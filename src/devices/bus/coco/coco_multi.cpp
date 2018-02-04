@@ -54,7 +54,16 @@
 ***************************************************************************/
 
 #include "emu.h"
+#include "coco_multi.h"
+
 #include "cococart.h"
+#include "coco_dcmodem.h"
+#include "coco_fdc.h"
+#include "coco_gmc.h"
+#include "coco_orch90.h"
+#include "coco_pak.h"
+#include "coco_rs232.h"
+#include "coco_ssc.h"
 
 #define SLOT1_TAG           "slot1"
 #define SLOT2_TAG           "slot2"
@@ -157,7 +166,7 @@ static SLOT_INTERFACE_START(coco_cart_slot4)
 SLOT_INTERFACE_END
 
 
-MACHINE_CONFIG_MEMBER(coco_multipak_device::device_add_mconfig)
+MACHINE_CONFIG_START(coco_multipak_device::device_add_mconfig)
 	MCFG_COCO_CARTRIDGE_ADD(SLOT1_TAG, coco_cart_slot1_3, nullptr)
 	MCFG_COCO_CARTRIDGE_CART_CB(DEVWRITELINE(DEVICE_SELF, coco_multipak_device, multi_slot1_cart_w))
 	MCFG_COCO_CARTRIDGE_NMI_CB(DEVWRITELINE(DEVICE_SELF, coco_multipak_device, multi_slot1_nmi_w))

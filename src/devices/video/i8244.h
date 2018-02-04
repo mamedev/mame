@@ -50,7 +50,6 @@ public:
 	i8244_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
 	// static configuration helpers
-	static void set_screen_tag(device_t &device, const char *screen_tag) { downcast<i8244_device &>(device).m_screen_tag = screen_tag; }
 	template <class Object> static devcb_base &set_irq_cb(device_t &device, Object &&cb) { return downcast<i8244_device &>(device).m_irq_func.set_callback(std::forward<Object>(cb)); }
 	template <class Object> static devcb_base &set_postprocess_cb(device_t &device, Object &&cb) { return downcast<i8244_device &>(device).m_postprocess_func.set_callback(std::forward<Object>(cb)); }
 

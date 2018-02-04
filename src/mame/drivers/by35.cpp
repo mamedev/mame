@@ -138,6 +138,10 @@ public:
 	TIMER_DEVICE_CALLBACK_MEMBER(timer_d_pulse);
 	TIMER_DEVICE_CALLBACK_MEMBER(timer_s);
 	TIMER_DEVICE_CALLBACK_MEMBER(timer_as2888);
+	void by35(machine_config &config);
+	void nuovo(machine_config &config);
+	void as2888(machine_config &config);
+	void as2888_audio(machine_config &config);
 private:
 	uint8_t m_u10a;
 	uint8_t m_u10b;
@@ -188,10 +192,10 @@ static ADDRESS_MAP_START( by35_map, AS_PROGRAM, 8, by35_state )
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( nuovo_map, AS_PROGRAM, 8, by35_state )
+	AM_RANGE(0x0000, 0x07ff) AM_RAM AM_SHARE("nvram")
 //  AM_RANGE(0x0000, 0x007f) AM_RAM     // Schematics infer that the M6802 internal RAM is disabled.
 	AM_RANGE(0x0088, 0x008b) AM_DEVREADWRITE("pia_u10", pia6821_device, read, write)
 	AM_RANGE(0x0090, 0x0093) AM_DEVREADWRITE("pia_u11", pia6821_device, read, write)
-	AM_RANGE(0x0000, 0x07ff) AM_RAM AM_SHARE("nvram")
 	AM_RANGE(0x1000, 0xffff) AM_ROM
 ADDRESS_MAP_END
 
@@ -885,7 +889,7 @@ TIMER_DEVICE_CALLBACK_MEMBER( by35_state::timer_as2888 )
 	{
 		m_snd_sel = m_snd_prom[offs];
 //      logerror("SndSel read %02x from PROM addr %02x\n",m_snd_sel, offs );
-		m_snd_sel = BITSWAP8(m_snd_sel,0,1,2,3,4,5,6,7);
+		m_snd_sel = bitswap<8>(m_snd_sel,0,1,2,3,4,5,6,7);
 
 		m_snd_tone_gen = m_snd_sel;
 //      logerror("SndSel=%02x, Tone=%02x, Div=%02x\n",m_snd_sel, m_snd_tone_gen, m_snd_div);
@@ -1075,7 +1079,7 @@ DISCRETE_SOUND_END
 
 
 
-static MACHINE_CONFIG_START( by35 )
+MACHINE_CONFIG_START(by35_state::by35)
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", M6800, 530000) // No xtal, just 2 chips forming a multivibrator oscillator around 530KHz
 	MCFG_CPU_PROGRAM_MAP(by35_map)
@@ -1119,7 +1123,7 @@ static MACHINE_CONFIG_START( by35 )
 	MCFG_TIMER_DRIVER_ADD("timer_d_pulse", by35_state, timer_d_pulse)                             // 555 Active pulse length
 MACHINE_CONFIG_END
 
-MACHINE_CONFIG_START( as2888_audio )
+MACHINE_CONFIG_START(by35_state::as2888_audio)
 
 	MCFG_MACHINE_START_OVERRIDE( by35_state, as2888 )
 
@@ -1137,13 +1141,13 @@ MACHINE_CONFIG_START( as2888_audio )
 MACHINE_CONFIG_END
 
 
-static MACHINE_CONFIG_DERIVED( as2888, by35 )
+MACHINE_CONFIG_DERIVED(by35_state::as2888, by35)
 
 	MCFG_FRAGMENT_ADD( as2888_audio  )
 MACHINE_CONFIG_END
 
 
-static MACHINE_CONFIG_DERIVED( nuovo, by35 )
+MACHINE_CONFIG_DERIVED(by35_state::nuovo, by35)
 
 	MCFG_CPU_REPLACE("maincpu", M6802, 2000000) // ? MHz ?  Large crystal next to CPU, schematics don't indicate speed.
 	MCFG_CPU_PROGRAM_MAP(nuovo_map)
@@ -2115,10 +2119,21 @@ ROM_END
 /*--------------------------------
 / 301/Bulls Eye
 /-------------------------------*/
-ROM_START(bullseye)
+ROM_START(bullseye)                     // Has darts 301 based scoring
 	ROM_REGION(0x8000, "maincpu", 0)    // Actually seems to have an address mask of 0x3fff
 	ROM_LOAD("bull.u2", 0x2000, 0x1000, CRC(a2951aa2) SHA1(f9c0826c5d1d6d904286678ed90de3850a13b5f4))
 	ROM_LOAD("bull.u6", 0x3000, 0x1000, CRC(64d4b9c4) SHA1(bf4d0671372fd3a445c4c7330b9849171ca8048c))
+	ROM_RELOAD( 0x7000, 0x1000)
+	ROM_REGION(0x10000, "cpu2", 0)
+	ROM_LOAD("bull.snd", 0x8000, 0x0800, CRC(c0482a2f) SHA1(a6aa698ad517cdc078129d702ee936af576260ed))
+	ROM_RELOAD(0x8800, 0x0800)
+	ROM_RELOAD(0xf800, 0x0800)
+ROM_END
+
+ROM_START(bullseyn)                     // Later version dumbed down with traditional Pinball scoring
+	ROM_REGION(0x8000, "maincpu", 0)    // Actually seems to have an address mask of 0x3fff
+	ROM_LOAD("301NEW_normalscoring.U2", 0x2000, 0x1000, CRC(febebc63) SHA1(9221b02bc5952203f5b2527e4c40d17d5986abdf))
+	ROM_LOAD("301NEW_normalscoring.U6", 0x3000, 0x1000, CRC(1357cd6a) SHA1(4e02c96b141dab6cdea1a15539214976eb052838))
 	ROM_RELOAD( 0x7000, 0x1000)
 	ROM_REGION(0x10000, "cpu2", 0)
 	ROM_LOAD("bull.snd", 0x8000, 0x0800, CRC(c0482a2f) SHA1(a6aa698ad517cdc078129d702ee936af576260ed))
@@ -2468,7 +2483,8 @@ GAME( 1987, futrquen,   0,        nuovo, by35, by35_state, by35_7, ROT0, "Nuova 
 GAME( 1987, f1gpp,      0,        nuovo, by35, by35_state, by35_7, ROT0, "Nuova Bell Games",   "F1 Grand Prix",                 MACHINE_IS_SKELETON_MECHANICAL)
 GAME( 1988, toppin,     0,        nuovo, by35, by35_state, by35_7, ROT0, "Nuova Bell Games",   "Top Pin",                       MACHINE_IS_SKELETON_MECHANICAL)
 GAME( 1988, uboat65,    0,        nuovo, by35, by35_state, by35_7, ROT0, "Nuova Bell Games",   "U-boat 65",                     MACHINE_IS_SKELETON_MECHANICAL)
-GAME( 1986, bullseye,   0,        by35,  by35, by35_state, by35_7, ROT0, "Grand Products",     "301/Bullseye",                  MACHINE_IS_SKELETON_MECHANICAL)
+GAME( 1986, bullseye,   0,        by35,  by35, by35_state, by35_7, ROT0, "Grand Products",     "301/Bullseye (301 Darts Scoring)",   MACHINE_IS_SKELETON_MECHANICAL)
+GAME( 1986, bullseyn,   bullseye, by35,  by35, by35_state, by35_7, ROT0, "Grand Products",     "301/Bullseye (Traditional Scoring)", MACHINE_IS_SKELETON_MECHANICAL)
 GAME( 1988, bbbowlin,   0,        by35,  by35, by35_state, by35_7, ROT0, "United",             "Big Ball Bowling (Bowler)",     MACHINE_IS_SKELETON_MECHANICAL)
 GAME( 1988, monrobwl,   0,        by35,  by35, by35_state, by35_7, ROT0, "Monroe Bowling Co.", "Stars & Strikes (Bowler)",      MACHINE_IS_SKELETON_MECHANICAL)
 GAME( 1984, bigbat,     0,        by35,  by35, by35_state, by35_7, ROT0, "Bally Midway",       "Big Bat (Bat game)",            MACHINE_IS_SKELETON_MECHANICAL)

@@ -38,7 +38,7 @@
 #include "screen.h"
 #include "speaker.h"
 
-#define MAIN_CLOCK XTAL_8MHz
+#define MAIN_CLOCK XTAL(8'000'000)
 
 class mz3500_state : public driver_device
 {
@@ -103,6 +103,7 @@ public:
 	UPD7220_DISPLAY_PIXELS_MEMBER( hgdc_display_pixels );
 	UPD7220_DRAW_TEXT_LINE_MEMBER( hgdc_draw_text );
 
+	void mz3500(machine_config &config);
 protected:
 	// driver_device overrides
 	virtual void machine_start() override;
@@ -800,7 +801,7 @@ static SLOT_INTERFACE_START( mz3500_floppies )
 SLOT_INTERFACE_END
 
 /* TODO: clocks */
-static MACHINE_CONFIG_START( mz3500 )
+MACHINE_CONFIG_START(mz3500_state::mz3500)
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("master",Z80,MAIN_CLOCK/2)

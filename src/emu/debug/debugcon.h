@@ -104,7 +104,7 @@ public:
 		vprintf_wrap(wrapcol, util::make_format_argument_pack(std::forward<Format>(fmt), std::forward<Params>(args)...));
 	}
 
-	static const char * cmderr_to_string(CMDERR error);
+	static std::string cmderr_to_string(CMDERR error);
 
 private:
 	void exit();

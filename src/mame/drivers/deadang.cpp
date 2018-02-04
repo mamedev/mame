@@ -75,7 +75,7 @@ static ADDRESS_MAP_START( main_map, AS_PROGRAM, 16, deadang_state )
 	AM_RANGE(0x08800, 0x0bfff) AM_WRITEONLY
 	AM_RANGE(0x0a000, 0x0a001) AM_READ_PORT("P1_P2")
 	AM_RANGE(0x0a002, 0x0a003) AM_READ_PORT("DSW")
-	AM_RANGE(0x0c000, 0x0cfff) AM_DEVWRITE("palette", palette_device, write) AM_SHARE("palette")
+	AM_RANGE(0x0c000, 0x0cfff) AM_DEVWRITE("palette", palette_device, write16) AM_SHARE("palette")
 	AM_RANGE(0x0d000, 0x0dfff) AM_WRITEONLY
 	AM_RANGE(0x0e000, 0x0e0ff) AM_WRITEONLY AM_SHARE("scroll_ram")
 	AM_RANGE(0x0e100, 0x0ffff) AM_WRITEONLY
@@ -265,18 +265,18 @@ TIMER_DEVICE_CALLBACK_MEMBER(deadang_state::sub_scanline)
 
 /* Machine Drivers */
 
-static MACHINE_CONFIG_START( deadang )
+MACHINE_CONFIG_START(deadang_state::deadang)
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", V30,XTAL_16MHz/2) /* Sony 8623h9 CXQ70116D-8 (V30 compatible) */
+	MCFG_CPU_ADD("maincpu", V30,XTAL(16'000'000)/2) /* Sony 8623h9 CXQ70116D-8 (V30 compatible) */
 	MCFG_CPU_PROGRAM_MAP(main_map)
 	MCFG_TIMER_DRIVER_ADD_SCANLINE("scantimer1", deadang_state, main_scanline, "screen", 0, 1)
 
-	MCFG_CPU_ADD("sub", V30,XTAL_16MHz/2) /* Sony 8623h9 CXQ70116D-8 (V30 compatible) */
+	MCFG_CPU_ADD("sub", V30,XTAL(16'000'000)/2) /* Sony 8623h9 CXQ70116D-8 (V30 compatible) */
 	MCFG_CPU_PROGRAM_MAP(sub_map)
 	MCFG_TIMER_DRIVER_ADD_SCANLINE("scantimer2", deadang_state, sub_scanline, "screen", 0, 1)
 
-	MCFG_CPU_ADD("audiocpu", Z80, XTAL_14_31818MHz/4)
+	MCFG_CPU_ADD("audiocpu", Z80, XTAL(14'318'181)/4)
 	MCFG_CPU_PROGRAM_MAP(sound_map)
 	MCFG_CPU_DECRYPTED_OPCODES_MAP(sound_decrypted_opcodes_map)
 
@@ -309,11 +309,11 @@ static MACHINE_CONFIG_START( deadang )
 	MCFG_SEIBU_SOUND_YM_READ_CB(DEVREAD8("ym1", ym2203_device, read))
 	MCFG_SEIBU_SOUND_YM_WRITE_CB(DEVWRITE8("ym1", ym2203_device, write))
 
-	MCFG_SOUND_ADD("ym1", YM2203, XTAL_14_31818MHz/4)
+	MCFG_SOUND_ADD("ym1", YM2203, XTAL(14'318'181)/4)
 	MCFG_YM2203_IRQ_HANDLER(DEVWRITELINE("seibu_sound", seibu_sound_device, fm_irqhandler))
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.15)
 
-	MCFG_SOUND_ADD("ym2", YM2203, XTAL_14_31818MHz/4)
+	MCFG_SOUND_ADD("ym2", YM2203, XTAL(14'318'181)/4)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.15)
 
 	MCFG_SOUND_ADD("adpcm1", SEIBU_ADPCM, 8000)

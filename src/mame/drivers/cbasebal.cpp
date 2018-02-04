@@ -35,7 +35,7 @@
 WRITE8_MEMBER(cbasebal_state::cbasebal_bankswitch_w)
 {
 	/* bits 0-4 select ROM bank */
-	//logerror("%04x: bankswitch %02x\n", space.device().safe_pc(), data);
+	//logerror("%04x: bankswitch %02x\n", m_maincpu->pc(), data);
 	membank("bank1")->set_entry(data & 0x1f);
 	membank("bank1d")->set_entry(data & 0x1f);
 
@@ -71,7 +71,7 @@ WRITE8_MEMBER(cbasebal_state::bankedram_w)
 		break;
 	case 1:
 		if (offset < 0x800)
-			m_palette->write(space, offset, data);
+			m_palette->write8(space, offset, data);
 		break;
 	default:
 		cbasebal_scrollram_w(space, offset, data);
@@ -258,7 +258,7 @@ void cbasebal_state::machine_reset()
 	m_scroll_y[1] = 0;
 }
 
-static MACHINE_CONFIG_START( cbasebal )
+MACHINE_CONFIG_START(cbasebal_state::cbasebal)
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", Z80, 6000000)   /* ??? */

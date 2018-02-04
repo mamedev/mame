@@ -60,27 +60,19 @@ electron_fbjoy_device::electron_fbjoy_device(const machine_config &mconfig, cons
 
 void electron_fbjoy_device::device_start()
 {
-	address_space& space = machine().device("maincpu")->memory().space(AS_PROGRAM);
-	m_slot = dynamic_cast<electron_expansion_slot_device *>(owner());
-
-	space.install_read_handler(0xfcc0, 0xfcc0, READ8_DELEGATE(electron_fbjoy_device, joystick_r));
 }
 
 
 //-------------------------------------------------
-//  device_reset - device-specific reset
+//  expbus_r - expansion data read
 //-------------------------------------------------
 
-void electron_fbjoy_device::device_reset()
+uint8_t electron_fbjoy_device::expbus_r(address_space &space, offs_t offset, uint8_t data)
 {
-}
+	if (offset == 0xfcc0)
+	{
+		data = m_joy->read() | 0xe0;
+	}
 
-
-//**************************************************************************
-//  IMPLEMENTATION
-//**************************************************************************
-
-READ8_MEMBER(electron_fbjoy_device::joystick_r)
-{
-	return m_joy->read() | 0xe0;
+	return data;
 }

@@ -583,7 +583,7 @@ uint32_t legionna_state::screen_update_legionna(screen_device &screen, bitmap_in
 		draw_sprites(screen,bitmap,cliprect);
 
 	//if (machine().input().code_pressed_once(KEYCODE_Z))
-	//	if (m_raiden2cop) m_raiden2cop->dump_table();
+	//  if (m_raiden2cop) m_raiden2cop->dump_table();
 
 	return 0;
 }
@@ -604,7 +604,7 @@ uint32_t legionna_state::screen_update_heatbrl(screen_device &screen, bitmap_ind
 		draw_sprites(screen,bitmap,cliprect);
 
 	//if (machine().input().code_pressed_once(KEYCODE_Z))
-	//	if (m_raiden2cop) m_raiden2cop->dump_table();
+	//  if (m_raiden2cop) m_raiden2cop->dump_table();
 
 	return 0;
 }
@@ -625,7 +625,7 @@ uint32_t legionna_state::screen_update_godzilla(screen_device &screen, bitmap_in
 		draw_sprites(screen,bitmap,cliprect);
 
 	//if (machine().input().code_pressed_once(KEYCODE_Z))
-	//	if (m_raiden2cop) m_raiden2cop->dump_table();
+	//  if (m_raiden2cop) m_raiden2cop->dump_table();
 
 
 	return 0;
@@ -652,7 +652,7 @@ uint32_t legionna_state::screen_update_grainbow(screen_device &screen, bitmap_in
 		draw_sprites(screen,bitmap,cliprect);
 
 	//if (machine().input().code_pressed_once(KEYCODE_Z))
-	//	if (m_raiden2cop) m_raiden2cop->dump_table();
+	//  if (m_raiden2cop) m_raiden2cop->dump_table();
 
 	return 0;
 }

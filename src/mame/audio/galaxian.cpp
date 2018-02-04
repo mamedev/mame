@@ -25,6 +25,7 @@ TODO:
 #include "emu.h"
 #include "audio/galaxian.h"
 #include "includes/galaxian.h"
+#include "includes/galaxold.h"
 
 /*************************************
  *
@@ -277,7 +278,7 @@ static DISCRETE_SOUND_START(galaxian)
 		/* since only a sample of the LFSR is latched @V2 we let the lfsr
 		 * run at a lower speed
 		 */
-		DISCRETE_LFSR_NOISE(NODE_150, 1, 1, RNG_RATE/100, 1.0, 0, 0.5, &galaxian_lfsr)
+		DISCRETE_LFSR_NOISE(NODE_150, 1, 1, RNG_RATE.dvalue()/100, 1.0, 0, 0.5, &galaxian_lfsr)
 		DISCRETE_SQUAREWFIX(NODE_151,1,60*264/2,1.0,50,0.5,0)  /* 2V signal */
 		DISCRETE_LOGIC_DFLIPFLOP(NODE_152,1,1,NODE_151,NODE_150)
 	DISCRETE_TASK_END()
@@ -314,7 +315,7 @@ static DISCRETE_SOUND_START(galaxian)
 		 * DISCRETE_COUNTER(NODE_132, 1, 0, NODE_130, 0, 15, DISC_COUNT_UP, 0, DISC_CLK_IS_FREQ)
 		 * but there is a native choice:
 		 */
-		DISCRETE_NOTE(NODE_132, 1, SOUND_CLOCK, GAL_INP_PITCH, 255, 15,  DISC_CLK_IS_FREQ)
+		DISCRETE_NOTE(NODE_132, 1, SOUND_CLOCK.dvalue(), GAL_INP_PITCH, 255, 15,  DISC_CLK_IS_FREQ)
 
 		/* from the 74393 (counter 2 above) only QA, QC, QD are used.
 		 * We decode three here and use SUB_NODE(133,x) below to access.
@@ -386,7 +387,7 @@ static DISCRETE_SOUND_START(mooncrst)
 	DISCRETE_MIXER7(NODE_280, 1, NODE_133_00, NODE_133_02, NODE_133_02,NODE_133_03, NODE_120, NODE_157, NODE_182, &mooncrst_mixer_desc)
 DISCRETE_SOUND_END
 
-DEFINE_DEVICE_TYPE(GALAXIAN, galaxian_sound_device, "galaxian_sound", "Galaxian Audio Custom")
+DEFINE_DEVICE_TYPE(GALAXIAN, galaxian_sound_device, "galaxian_sound", "Galaxian Custom Sound")
 
 galaxian_sound_device::galaxian_sound_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
 	: device_t(mconfig, GALAXIAN, tag, owner, clock)
@@ -495,7 +496,7 @@ void galaxian_sound_device::sound_stream_update(sound_stream &stream, stream_sam
  *
  *************************************/
 
-MACHINE_CONFIG_START( galaxian_audio )
+MACHINE_CONFIG_START(galaxold_state::galaxian_audio)
 
 	MCFG_SOUND_ADD("cust", GALAXIAN, 0)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 0.4)
@@ -505,7 +506,28 @@ MACHINE_CONFIG_START( galaxian_audio )
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 1.0)
 MACHINE_CONFIG_END
 
-MACHINE_CONFIG_START( mooncrst_audio )
+MACHINE_CONFIG_START(galaxold_state::mooncrst_audio)
+
+	MCFG_SOUND_ADD("cust", GALAXIAN, 0)
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 0.4)
+
+	MCFG_SOUND_ADD(GAL_AUDIO, DISCRETE, 0)
+	MCFG_DISCRETE_INTF(mooncrst)
+
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 1.0)
+MACHINE_CONFIG_END
+
+MACHINE_CONFIG_START(galaxian_state::galaxian_audio)
+
+	MCFG_SOUND_ADD("cust", GALAXIAN, 0)
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 0.4)
+
+	MCFG_SOUND_ADD(GAL_AUDIO, DISCRETE, 0)
+	MCFG_DISCRETE_INTF(galaxian)
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 1.0)
+MACHINE_CONFIG_END
+
+MACHINE_CONFIG_START(galaxian_state::mooncrst_audio)
 
 	MCFG_SOUND_ADD("cust", GALAXIAN, 0)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 0.4)

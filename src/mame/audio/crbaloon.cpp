@@ -120,7 +120,7 @@ static DISCRETE_SOUND_START(crbaloon)
 	* linear ramp.
 	************************************************/
 	/* TO BE FIXED - needs proper modulation */
-	DISCRETE_NOTE(NODE_20, 1, CRBALOON_16H / 2, CRBALOON_MUSIC_DATA, 255, 7, DISC_CLK_IS_FREQ)
+	DISCRETE_NOTE(NODE_20, 1, CRBALOON_16H.dvalue() / 2, CRBALOON_MUSIC_DATA, 255, 7, DISC_CLK_IS_FREQ)
 	DISCRETE_DAC_R1(NODE_21, NODE_20, DEFAULT_TTL_V_LOGIC_1, &desc_crbaloon_music_dac)
 	DISCRETE_ONOFF(NODE_22, CRBALOON_MUSIC_EN, NODE_21)
 //  DISCRETE_RAMP(NODE_21, 1, RAMP, GRAD, MIN, MAX, CLAMP)
@@ -138,7 +138,7 @@ static DISCRETE_SOUND_START(crbaloon)
 DISCRETE_SOUND_END
 
 
-MACHINE_CONFIG_START( crbaloon_audio )
+MACHINE_CONFIG_START(crbaloon_state::crbaloon_audio)
 
 	MCFG_SPEAKER_STANDARD_MONO("mono")
 

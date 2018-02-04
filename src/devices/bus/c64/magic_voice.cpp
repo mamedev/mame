@@ -219,7 +219,7 @@ WRITE_LINE_MEMBER( c64_magic_voice_cartridge_device::apd_w )
 //  device_add_mconfig - add device configuration
 //-------------------------------------------------
 
-MACHINE_CONFIG_MEMBER( c64_magic_voice_cartridge_device::device_add_mconfig )
+MACHINE_CONFIG_START(c64_magic_voice_cartridge_device::device_add_mconfig)
 	MCFG_DEVICE_ADD(MOS6525_TAG, TPI6525, 0)
 	MCFG_TPI6525_OUT_IRQ_CB(WRITELINE(c64_magic_voice_cartridge_device, tpi_irq_w))
 	MCFG_TPI6525_IN_PA_CB(READ8(c64_magic_voice_cartridge_device, tpi_pa_r))
@@ -233,7 +233,7 @@ MACHINE_CONFIG_MEMBER( c64_magic_voice_cartridge_device::device_add_mconfig )
 	MCFG_40105_DATA_IN_READY_CB(DEVWRITELINE(MOS6525_TAG, tpi6525_device, i3_w))
 
 	MCFG_SPEAKER_STANDARD_MONO("mono")
-	MCFG_SOUND_ADD(T6721A_TAG, T6721A, XTAL_640kHz)
+	MCFG_SOUND_ADD(T6721A_TAG, T6721A, XTAL(640'000))
 	MCFG_T6721A_EOS_HANDLER(DEVWRITELINE(MOS6525_TAG, tpi6525_device, i2_w))
 	MCFG_T6721A_PHI2_HANDLER(DEVWRITELINE(DEVICE_SELF, c64_magic_voice_cartridge_device, phi2_w))
 	MCFG_T6721A_DTRD_HANDLER(DEVWRITELINE(DEVICE_SELF, c64_magic_voice_cartridge_device, dtrd_w))

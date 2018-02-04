@@ -35,22 +35,21 @@ READ8_MEMBER(citycon_state::citycon_irq_ack_r)
 static ADDRESS_MAP_START( citycon_map, AS_PROGRAM, 8, citycon_state )
 	AM_RANGE(0x0000, 0x0fff) AM_RAM
 	AM_RANGE(0x1000, 0x1fff) AM_RAM_WRITE(citycon_videoram_w) AM_SHARE("videoram")
-	AM_RANGE(0x2000, 0x20ff) AM_RAM_WRITE(citycon_linecolor_w) AM_SHARE("linecolor")
-	AM_RANGE(0x2800, 0x28ff) AM_RAM AM_SHARE("spriteram")
-	AM_RANGE(0x2800, 0x2fff) AM_NOP //0x2900-0x2fff cleared at post but unused
+	AM_RANGE(0x2000, 0x20ff) AM_RAM_WRITE(citycon_linecolor_w) AM_SHARE("linecolor") AM_MIRROR(0x0700)
+	AM_RANGE(0x2800, 0x28ff) AM_RAM AM_SHARE("spriteram") AM_MIRROR(0x0700) //0x2900-0x2fff cleared at post but unused
 	AM_RANGE(0x3000, 0x3000) AM_READ(citycon_in_r) AM_WRITE(citycon_background_w)   /* player 1 & 2 inputs multiplexed */
 	AM_RANGE(0x3001, 0x3001) AM_READ_PORT("DSW1") AM_DEVWRITE("soundlatch", generic_latch_8_device, write)
 	AM_RANGE(0x3002, 0x3002) AM_READ_PORT("DSW2") AM_DEVWRITE("soundlatch2", generic_latch_8_device, write)
 	AM_RANGE(0x3004, 0x3005) AM_READNOP AM_WRITEONLY AM_SHARE("scroll")
 	AM_RANGE(0x3007, 0x3007) AM_READ(citycon_irq_ack_r)
-	AM_RANGE(0x3800, 0x3cff) AM_RAM_DEVWRITE("palette", palette_device, write) AM_SHARE("palette")
+	AM_RANGE(0x3800, 0x3cff) AM_RAM_DEVWRITE("palette", palette_device, write8) AM_SHARE("palette")
 	AM_RANGE(0x4000, 0xffff) AM_ROM
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( sound_map, AS_PROGRAM, 8, citycon_state )
 	AM_RANGE(0x0000, 0x0fff) AM_RAM
 	AM_RANGE(0x4000, 0x4001) AM_DEVWRITE("aysnd", ay8910_device, address_data_w)
-//  AM_RANGE(0x4002, 0x4002) AM_DEVREAD("aysnd", ay8910_device, data_r)  /* ?? */
+	AM_RANGE(0x4002, 0x4002) AM_DEVREAD("aysnd", ay8910_device, data_r)
 	AM_RANGE(0x6000, 0x6001) AM_DEVREADWRITE("ymsnd", ym2203_device, read, write)
 	AM_RANGE(0x8000, 0xffff) AM_ROM
 ADDRESS_MAP_END
@@ -186,17 +185,16 @@ void citycon_state::machine_reset()
 }
 
 
-static MACHINE_CONFIG_START( citycon )
+MACHINE_CONFIG_START(citycon_state::citycon)
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", M6809, 2048000)        /* 2.048 MHz ??? */
+	MCFG_CPU_ADD("maincpu", MC6809, XTAL(8'000'000)) // HD68B09P
 	MCFG_CPU_PROGRAM_MAP(citycon_map)
 	MCFG_CPU_VBLANK_INT_DRIVER("screen", citycon_state,  irq0_line_assert)
 
-	MCFG_CPU_ADD("audiocpu", M6809, 640000)       /* 0.640 MHz ??? */
+	MCFG_CPU_ADD("audiocpu", MC6809E, XTAL(20'000'000) / 32) // schematics allow for either a 6809 or 6809E; HD68A09EP found on one actual PCB
 	MCFG_CPU_PROGRAM_MAP(sound_map)
 	MCFG_CPU_VBLANK_INT_DRIVER("screen", citycon_state,  irq0_line_hold) //actually unused, probably it was during development
-
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
@@ -217,10 +215,10 @@ static MACHINE_CONFIG_START( citycon )
 	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
 	MCFG_GENERIC_LATCH_8_ADD("soundlatch2")
 
-	MCFG_SOUND_ADD("aysnd", AY8910, 1250000)
+	MCFG_SOUND_ADD("aysnd", AY8910, XTAL(20'000'000) / 16) // schematics consistently specify AY-3-8910, though YM2149 found on one actual PCB
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.40)
 
-	MCFG_SOUND_ADD("ymsnd", YM2203, 1250000)
+	MCFG_SOUND_ADD("ymsnd", YM2203, XTAL(20'000'000) / 16)
 	MCFG_AY8910_PORT_A_READ_CB(DEVREAD8("soundlatch", generic_latch_8_device, read))
 	MCFG_AY8910_PORT_B_READ_CB(DEVREAD8("soundlatch2", generic_latch_8_device, read))
 	MCFG_SOUND_ROUTE(0, "mono", 0.40)

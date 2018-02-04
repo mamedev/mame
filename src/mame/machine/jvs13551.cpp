@@ -49,7 +49,7 @@ void sega_837_13551_device::static_set_port_tag(device_t &device, int port, cons
 	ctrl.port_tag[port] = tag;
 }
 
-MACHINE_CONFIG_MEMBER(sega_837_13551_device::device_add_mconfig)
+MACHINE_CONFIG_START(sega_837_13551_device::device_add_mconfig)
 	MCFG_CPU_ADD("iomcu", TMP90PH44, 10000000) // unknown clock
 MACHINE_CONFIG_END
 

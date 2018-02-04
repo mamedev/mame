@@ -315,7 +315,7 @@ WRITE8_MEMBER(asteroid_state::asteroid_noise_reset_w)
 }
 
 
-MACHINE_CONFIG_START(asteroid_sound)
+MACHINE_CONFIG_START(asteroid_state::asteroid_sound)
 	MCFG_SPEAKER_STANDARD_MONO("mono")
 
 	MCFG_SOUND_ADD("discrete", DISCRETE, 0)
@@ -332,7 +332,7 @@ MACHINE_CONFIG_START(asteroid_sound)
 MACHINE_CONFIG_END
 
 
-MACHINE_CONFIG_START(astdelux_sound)
+MACHINE_CONFIG_START(asteroid_state::astdelux_sound)
 	MCFG_SPEAKER_STANDARD_MONO("mono")
 
 	MCFG_SOUND_ADD("discrete", DISCRETE, 0)

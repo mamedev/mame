@@ -39,7 +39,7 @@ DEFINE_DEVICE_TYPE(A2BUS_AESMS,  a2bus_aesms_device,  "a2aesms",  "Applied Engin
 //  device_add_mconfig - add device configuration
 //-------------------------------------------------
 
-MACHINE_CONFIG_MEMBER( a2bus_sn76489_device::device_add_mconfig )
+MACHINE_CONFIG_START(a2bus_sn76489_device::device_add_mconfig)
 	MCFG_SPEAKER_STANDARD_STEREO("alf_l", "alf_r")
 
 	MCFG_SOUND_ADD(SN1_TAG, SN76489, 1020484)
@@ -51,7 +51,7 @@ MACHINE_CONFIG_MEMBER( a2bus_sn76489_device::device_add_mconfig )
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "alf_r", 0.50)
 MACHINE_CONFIG_END
 
-MACHINE_CONFIG_MEMBER( a2bus_aesms_device::device_add_mconfig )
+MACHINE_CONFIG_START(a2bus_aesms_device::device_add_mconfig)
 	MCFG_SPEAKER_STANDARD_STEREO("alf_l", "alf_r")
 
 	MCFG_SOUND_ADD(SN1_TAG, SN76489, 1020484)
@@ -101,8 +101,6 @@ a2bus_aesms_device::a2bus_aesms_device(const machine_config &mconfig, const char
 
 void a2bus_sn76489_device::device_start()
 {
-	// set_a2bus_device makes m_slot valid
-	set_a2bus_device();
 	m_latch0 = m_latch1 = m_latch2 = m_latch3 = 0;
 
 	save_item(NAME(m_latch0));
@@ -116,7 +114,7 @@ void a2bus_sn76489_device::device_reset()
 	m_latch0 = m_latch1 = m_latch2 = m_latch3 = 0;
 }
 
-uint8_t a2bus_sn76489_device::read_c0nx(address_space &space, uint8_t offset)
+uint8_t a2bus_sn76489_device::read_c0nx(uint8_t offset)
 {
 	// SN76489 can't be read, it appears from the schematics this is what happens
 	switch (offset)
@@ -137,29 +135,29 @@ uint8_t a2bus_sn76489_device::read_c0nx(address_space &space, uint8_t offset)
 	return 0xff;
 }
 
-void a2bus_sn76489_device::write_c0nx(address_space &space, uint8_t offset, uint8_t data)
+void a2bus_sn76489_device::write_c0nx(uint8_t offset, uint8_t data)
 {
 	switch (offset)
 	{
 		case 0:
-			m_sn1->write(space, 0, data);
+			m_sn1->write(data);
 			m_latch0 = data;
 			break;
 
 		case 1:
-			m_sn2->write(space, 0, data);
+			m_sn2->write(data);
 			m_latch1 = data;
 			break;
 
 		case 2:
-			m_sn3->write(space, 0, data);
+			m_sn3->write(data);
 			m_latch2 = data;
 			break;
 
 		case 3:
 			if (m_has4thsn)
 			{
-				m_sn4->write(space, 0, data);
+				m_sn4->write(data);
 				m_latch3 = data;
 			}
 			break;

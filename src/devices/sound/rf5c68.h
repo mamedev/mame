@@ -20,7 +20,7 @@
 	MCFG_DEVICE_REPLACE(_tag, RF5C68, _clock)
 
 #define MCFG_RF5C68_SAMPLE_END_CB(_class, _method) \
-	rf5c68_device::set_end_callback(*device, rf5c68_device::sample_end_cb_delegate(&_class::_method, #_class "::" #_method, downcast<_class *>(owner)));
+	rf5c68_device::set_end_callback(*device, rf5c68_device::sample_end_cb_delegate(&_class::_method, #_class "::" #_method, this));
 
 //**************************************************************************
 //  TYPE DEFINITIONS

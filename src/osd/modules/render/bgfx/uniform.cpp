@@ -23,7 +23,7 @@ bgfx_uniform::bgfx_uniform(std::string name, bgfx::UniformType::Enum type)
 
 bgfx_uniform::~bgfx_uniform()
 {
-	bgfx::destroyUniform(m_handle);
+	bgfx::destroy(m_handle);
 	delete [] m_data;
 }
 

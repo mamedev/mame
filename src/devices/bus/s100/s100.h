@@ -68,22 +68,11 @@
 
 
 //**************************************************************************
-//  CONSTANTS
-//**************************************************************************
-
-#define S100_TAG        "s100"
-
-
-
-//**************************************************************************
 //  INTERFACE CONFIGURATION MACROS
 //**************************************************************************
 
-#define MCFG_S100_BUS_ADD() \
-	MCFG_DEVICE_ADD(S100_TAG, S100_BUS, 0)
-
 #define MCFG_S100_SLOT_ADD(_tag, _slot_intf, _def_slot) \
-	MCFG_DEVICE_ADD(_tag, S100_SLOT, 0) \
+	MCFG_DEVICE_ADD(_tag, S100_SLOT, DERIVED_CLOCK(1, 1)) \
 	MCFG_DEVICE_SLOT_INTERFACE(_slot_intf, _def_slot, false)
 
 
@@ -296,7 +285,7 @@ public:
 	virtual void device_start() override;
 
 private:
-	s100_bus_device  *m_bus;
+	required_device<s100_bus_device> m_bus;
 };
 
 

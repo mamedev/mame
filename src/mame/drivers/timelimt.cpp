@@ -218,7 +218,7 @@ INTERRUPT_GEN_MEMBER(timelimt_state::irq)
 
 /***************************************************************************/
 
-static MACHINE_CONFIG_START( timelimt )
+MACHINE_CONFIG_START(timelimt_state::timelimt)
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", Z80, 5000000)   /* 5.000 MHz */

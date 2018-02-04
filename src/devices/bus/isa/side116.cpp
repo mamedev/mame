@@ -22,7 +22,7 @@ DEFINE_DEVICE_TYPE(ISA8_SIDE116, side116_device, "side116", "Acculogic sIDE-1/16
 //  device_add_mconfig - add device configuration
 //-------------------------------------------------
 
-MACHINE_CONFIG_MEMBER( side116_device::device_add_mconfig )
+MACHINE_CONFIG_START(side116_device::device_add_mconfig)
 	MCFG_ATA_INTERFACE_ADD("ata", ata_devices, "hdd", nullptr, false)
 	MCFG_ATA_INTERFACE_IRQ_HANDLER(WRITELINE(side116_device, ide_interrupt))
 MACHINE_CONFIG_END
@@ -134,13 +134,13 @@ READ8_MEMBER( side116_device::read )
 
 	if (offset == 0)
 	{
-		uint16_t ide_data = m_ata->read_cs0(space, 0, 0xffff);
+		uint16_t ide_data = m_ata->read_cs0(0);
 		data = ide_data & 0xff;
 		m_latch = ide_data >> 8;
 	}
 	else if (offset < 8)
 	{
-		data = m_ata->read_cs0(space, offset & 7, 0xff);
+		data = m_ata->read_cs0(offset & 7, 0xff);
 	}
 	else if (offset == 8)
 	{
@@ -148,7 +148,7 @@ READ8_MEMBER( side116_device::read )
 	}
 	else
 	{
-		data = m_ata->read_cs1(space, offset & 7, 0xff);
+		data = m_ata->read_cs1(offset & 7, 0xff);
 	}
 
 	return data;
@@ -159,11 +159,11 @@ WRITE8_MEMBER( side116_device::write )
 	if (offset == 0)
 	{
 		uint16_t ide_data = (m_latch << 8) | data;
-		m_ata->write_cs0(space, 0, ide_data, 0xffff);
+		m_ata->write_cs0(0, ide_data);
 	}
 	else if (offset < 8)
 	{
-		m_ata->write_cs0(space, offset & 7, data, 0xff);
+		m_ata->write_cs0(offset & 7, data, 0xff);
 	}
 	else if (offset == 8)
 	{
@@ -171,7 +171,7 @@ WRITE8_MEMBER( side116_device::write )
 	}
 	else
 	{
-		m_ata->write_cs1(space, offset & 7, data, 0xff);
+		m_ata->write_cs1(offset & 7, data, 0xff);
 	}
 }
 

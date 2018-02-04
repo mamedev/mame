@@ -138,6 +138,8 @@ public:
 	required_device<i860_cpu_device> m_vid_0;
 	optional_device<i860_cpu_device> m_vid_1;
 	required_device<dac_word_interface> m_dac;
+	void shadfgtr(machine_config &config);
+	void vcombat(machine_config &config);
 };
 
 uint32_t vcombat_state::update_screen(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect, int index)
@@ -543,21 +545,21 @@ WRITE_LINE_MEMBER(vcombat_state::sound_update)
 	m_soundcpu->set_input_line(M68K_IRQ_1, state ? ASSERT_LINE : CLEAR_LINE);
 }
 
-static MACHINE_CONFIG_START( vcombat )
-	MCFG_CPU_ADD("maincpu", M68000, XTAL_12MHz)
+MACHINE_CONFIG_START(vcombat_state::vcombat)
+	MCFG_CPU_ADD("maincpu", M68000, XTAL(12'000'000))
 	MCFG_CPU_PROGRAM_MAP(main_map)
 	MCFG_CPU_VBLANK_INT_DRIVER("screen", vcombat_state,  irq1_line_assert)
 
 	/* The middle board i860 */
-	MCFG_CPU_ADD("vid_0", I860, XTAL_20MHz)
+	MCFG_CPU_ADD("vid_0", I860, XTAL(20'000'000))
 	MCFG_CPU_PROGRAM_MAP(vid_0_map)
 
 	/* The top board i860 */
-	MCFG_CPU_ADD("vid_1", I860, XTAL_20MHz)
+	MCFG_CPU_ADD("vid_1", I860, XTAL(20'000'000))
 	MCFG_CPU_PROGRAM_MAP(vid_1_map)
 
 	/* Sound CPU */
-	MCFG_CPU_ADD("soundcpu", M68000, XTAL_12MHz)
+	MCFG_CPU_ADD("soundcpu", M68000, XTAL(12'000'000))
 	MCFG_CPU_PROGRAM_MAP(sound_map)
 	MCFG_CPU_PERIODIC_INT_DRIVER(vcombat_state, irq1_line_hold,  15000) /* Remove this if MC6845 is enabled */
 
@@ -577,11 +579,11 @@ static MACHINE_CONFIG_START( vcombat )
 	MCFG_DEFAULT_LAYOUT(layout_dualhsxs)
 
 	MCFG_SCREEN_ADD("screen", RASTER)
-	MCFG_SCREEN_RAW_PARAMS(XTAL_12MHz / 2, 400, 0, 256, 291, 0, 208)
+	MCFG_SCREEN_RAW_PARAMS(XTAL(12'000'000) / 2, 400, 0, 256, 291, 0, 208)
 	MCFG_SCREEN_UPDATE_DRIVER(vcombat_state, screen_update_vcombat_main)
 
 	MCFG_SCREEN_ADD("aux", RASTER)
-	MCFG_SCREEN_RAW_PARAMS(XTAL_12MHz / 2, 400, 0, 256, 291, 0, 208)
+	MCFG_SCREEN_RAW_PARAMS(XTAL(12'000'000) / 2, 400, 0, 256, 291, 0, 208)
 	MCFG_SCREEN_UPDATE_DRIVER(vcombat_state, screen_update_vcombat_aux)
 
 	MCFG_SPEAKER_STANDARD_MONO("speaker")
@@ -591,17 +593,17 @@ static MACHINE_CONFIG_START( vcombat )
 MACHINE_CONFIG_END
 
 
-static MACHINE_CONFIG_START( shadfgtr )
-	MCFG_CPU_ADD("maincpu", M68000, XTAL_12MHz)
+MACHINE_CONFIG_START(vcombat_state::shadfgtr)
+	MCFG_CPU_ADD("maincpu", M68000, XTAL(12'000'000))
 	MCFG_CPU_PROGRAM_MAP(main_map)
 	MCFG_CPU_VBLANK_INT_DRIVER("screen", vcombat_state,  irq1_line_assert)
 
 	/* The middle board i860 */
-	MCFG_CPU_ADD("vid_0", I860, XTAL_20MHz)
+	MCFG_CPU_ADD("vid_0", I860, XTAL(20'000'000))
 	MCFG_CPU_PROGRAM_MAP(vid_0_map)
 
 	/* Sound CPU */
-	MCFG_CPU_ADD("soundcpu", M68000, XTAL_12MHz)
+	MCFG_CPU_ADD("soundcpu", M68000, XTAL(12'000'000))
 	MCFG_CPU_PROGRAM_MAP(sound_map)
 
 	MCFG_NVRAM_ADD_0FILL("nvram")
@@ -609,13 +611,13 @@ static MACHINE_CONFIG_START( shadfgtr )
 
 	MCFG_TLC34076_ADD("tlc34076", TLC34076_6_BIT)
 
-	MCFG_MC6845_ADD("crtc", MC6845, "screen", XTAL_20MHz / 4 / 16)
+	MCFG_MC6845_ADD("crtc", MC6845, "screen", XTAL(20'000'000) / 4 / 16)
 	MCFG_MC6845_SHOW_BORDER_AREA(false)
 	MCFG_MC6845_CHAR_WIDTH(16)
 	MCFG_MC6845_OUT_HSYNC_CB(WRITELINE(vcombat_state, sound_update))
 
 	MCFG_SCREEN_ADD("screen", RASTER)
-	MCFG_SCREEN_RAW_PARAMS(XTAL_20MHz / 4, 320, 0, 256, 277, 0, 224)
+	MCFG_SCREEN_RAW_PARAMS(XTAL(20'000'000) / 4, 320, 0, 256, 277, 0, 224)
 	MCFG_SCREEN_UPDATE_DRIVER(vcombat_state, screen_update_vcombat_main)
 
 	MCFG_SPEAKER_STANDARD_MONO("speaker")

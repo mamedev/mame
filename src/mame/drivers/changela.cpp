@@ -352,7 +352,7 @@ TIMER_DEVICE_CALLBACK_MEMBER(changela_state::changela_scanline)
 
 INTERRUPT_GEN_MEMBER(changela_state::chl_mcu_irq)
 {
-	generic_pulse_irq_line(*m_mcu, 0, 1);
+	m_mcu->pulse_input_line(0, m_mcu->minimum_quantum_time());
 }
 
 void changela_state::machine_start()
@@ -415,7 +415,7 @@ void changela_state::machine_reset()
 	m_dir_31 = 0;
 }
 
-static MACHINE_CONFIG_START( changela )
+MACHINE_CONFIG_START(changela_state::changela)
 
 	MCFG_CPU_ADD("maincpu", Z80,5000000)
 	MCFG_CPU_PROGRAM_MAP(changela_map)

@@ -376,13 +376,15 @@ WRITE16_MEMBER(sslam_state::powerbls_sound_w)
 /* these will need verifying .. the game writes all over the place ... */
 
 static ADDRESS_MAP_START( sslam_program_map, AS_PROGRAM, 16, sslam_state )
+	AM_RANGE(0x000000, 0xffffff) AM_ROM   /* I don't honestly know where the rom is mirrored .. so all unmapped reads / writes go to rom */
+
 	AM_RANGE(0x000400, 0x07ffff) AM_RAM
 	AM_RANGE(0x100000, 0x103fff) AM_RAM_WRITE(sslam_bg_tileram_w) AM_SHARE("bg_tileram")
 	AM_RANGE(0x104000, 0x107fff) AM_RAM_WRITE(sslam_md_tileram_w) AM_SHARE("md_tileram")
 	AM_RANGE(0x108000, 0x10ffff) AM_RAM_WRITE(sslam_tx_tileram_w) AM_SHARE("tx_tileram")
 	AM_RANGE(0x110000, 0x11000d) AM_RAM AM_SHARE("regs")
 	AM_RANGE(0x200000, 0x200001) AM_WRITENOP
-	AM_RANGE(0x280000, 0x280fff) AM_RAM_DEVWRITE("palette", palette_device, write) AM_SHARE("palette")
+	AM_RANGE(0x280000, 0x280fff) AM_RAM_DEVWRITE("palette", palette_device, write16) AM_SHARE("palette")
 	AM_RANGE(0x201000, 0x201fff) AM_RAM AM_SHARE("spriteram")
 	AM_RANGE(0x304000, 0x304001) AM_WRITENOP
 	AM_RANGE(0x300010, 0x300011) AM_READ_PORT("IN0")
@@ -394,8 +396,6 @@ static ADDRESS_MAP_START( sslam_program_map, AS_PROGRAM, 16, sslam_state )
 	AM_RANGE(0x30001c, 0x30001d) AM_READ_PORT("DSW1")
 	AM_RANGE(0x30001e, 0x30001f) AM_WRITE8(sslam_snd_w, 0x00ff)
 	AM_RANGE(0xf00000, 0xffffff) AM_RAM   /* Main RAM */
-
-	AM_RANGE(0x000000, 0xffffff) AM_ROM   /* I don't honestly know where the rom is mirrored .. so all unmapped reads / writes go to rom */
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( powerbls_map, AS_PROGRAM, 16, sslam_state )
@@ -405,7 +405,7 @@ static ADDRESS_MAP_START( powerbls_map, AS_PROGRAM, 16, sslam_state )
 	AM_RANGE(0x110000, 0x11000d) AM_RAM AM_SHARE("regs")
 	AM_RANGE(0x200000, 0x200001) AM_WRITENOP
 	AM_RANGE(0x201000, 0x201fff) AM_RAM AM_SHARE("spriteram")
-	AM_RANGE(0x280000, 0x2803ff) AM_RAM_DEVWRITE("palette", palette_device, write) AM_SHARE("palette")
+	AM_RANGE(0x280000, 0x2803ff) AM_RAM_DEVWRITE("palette", palette_device, write16) AM_SHARE("palette")
 	AM_RANGE(0x300010, 0x300011) AM_READ_PORT("IN0")
 	AM_RANGE(0x300012, 0x300013) AM_READ_PORT("IN1")
 	AM_RANGE(0x300014, 0x300015) AM_READ_PORT("IN2")
@@ -694,7 +694,7 @@ GFXDECODE_END
 
 /* Machine Driver */
 
-static MACHINE_CONFIG_START( sslam )
+MACHINE_CONFIG_START(sslam_state::sslam)
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", M68000, 12000000)   /* 12 MHz */
@@ -726,7 +726,7 @@ static MACHINE_CONFIG_START( sslam )
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.80)
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_START( powerbls )
+MACHINE_CONFIG_START(sslam_state::powerbls)
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", M68000, 12000000)   /* 12 MHz */

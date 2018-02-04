@@ -144,7 +144,7 @@
 #include "miniboy7.lh"
 
 
-#define MASTER_CLOCK    XTAL_12_4725MHz    /* 12.4725 MHz */
+#define MASTER_CLOCK    XTAL(12'472'500)    /* 12.4725 MHz */
 
 
 class miniboy7_state : public driver_device
@@ -189,6 +189,7 @@ public:
 	MC6845_UPDATE_ROW(crtc_update_row);
 	DECLARE_PALETTE_INIT(miniboy7);
 
+	void miniboy7(machine_config &config);
 private:
 	uint8_t m_ay_pb;
 	int m_gpri;
@@ -501,7 +502,7 @@ GFXDECODE_END
 *         Machine Drivers          *
 ***********************************/
 
-static MACHINE_CONFIG_START( miniboy7 )
+MACHINE_CONFIG_START(miniboy7_state::miniboy7)
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", M6502, MASTER_CLOCK / 16) /* guess */

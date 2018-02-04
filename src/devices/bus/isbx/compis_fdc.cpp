@@ -53,7 +53,7 @@ SLOT_INTERFACE_END
 //  device_add_mconfig - add device configuration
 //-------------------------------------------------
 
-MACHINE_CONFIG_MEMBER( compis_fdc_device::device_add_mconfig )
+MACHINE_CONFIG_START(compis_fdc_device::device_add_mconfig)
 	MCFG_I8272A_ADD(I8272_TAG, true)
 	MCFG_UPD765_INTRQ_CALLBACK(WRITELINE(compis_fdc_device, fdc_irq))
 	MCFG_UPD765_DRQ_CALLBACK(WRITELINE(compis_fdc_device, fdc_drq))

@@ -160,10 +160,10 @@ READ8_MEMBER(dpc_device::read)
 				data = m_df[data_fetcher].flag ? display_data : 0x00;
 				break;
 			case 0x18:          // display data AND'd w/flag, nibbles swapped
-				data = m_df[data_fetcher].flag ? BITSWAP8(display_data,3,2,1,0,7,6,5,4) : 0x00;
+				data = m_df[data_fetcher].flag ? bitswap<8>(display_data,3,2,1,0,7,6,5,4) : 0x00;
 				break;
 			case 0x20:          // display data AND'd w/flag, byte reversed
-				data = m_df[data_fetcher].flag ? BITSWAP8(display_data,0,1,2,3,4,5,6,7) : 0x00;
+				data = m_df[data_fetcher].flag ? bitswap<8>(display_data,0,1,2,3,4,5,6,7) : 0x00;
 				break;
 			case 0x28:          // display data AND'd w/flag, rotated right
 				data = m_df[data_fetcher].flag ? (display_data >> 1) : 0x00;
@@ -266,7 +266,7 @@ void a26_rom_dpc_device::setup_addon_ptr(uint8_t *ptr)
 }
 
 
-MACHINE_CONFIG_MEMBER( a26_rom_dpc_device::device_add_mconfig )
+MACHINE_CONFIG_START(a26_rom_dpc_device::device_add_mconfig)
 	MCFG_DEVICE_ADD("dpc", ATARI_DPC, 0)
 MACHINE_CONFIG_END
 

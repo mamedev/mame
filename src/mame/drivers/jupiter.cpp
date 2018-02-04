@@ -55,6 +55,7 @@ public:
 
 	DECLARE_DRIVER_INIT(jupiter2);
 
+	void jupiter2(machine_config &config);
 private:
 	virtual void machine_start() override;
 	required_device<cpu_device> m_maincpu;
@@ -80,6 +81,7 @@ public:
 	DECLARE_READ8_MEMBER(key_r);
 	DECLARE_READ8_MEMBER(ff_r);
 
+	void jupiter3(machine_config &config);
 private:
 	virtual void machine_reset() override;
 	uint8_t m_term_data;
@@ -110,10 +112,8 @@ static ADDRESS_MAP_START( jupiter2_mem, AS_PROGRAM, 8, jupiter2_state )
 //  AM_RANGE(0xff90, 0xff93) Hytype Parallel Printer PIA
 //  AM_RANGE(0xffa0, 0xffa7) Persci Floppy Disk Controller
 //  AM_RANGE(0xffb0, 0xffb3) Video PIA
-	AM_RANGE(0xffc0, 0xffc0) AM_DEVREADWRITE("acia0", acia6850_device, status_r, control_w) // Serial Port 0 ACIA
-	AM_RANGE(0xffc1, 0xffc1) AM_DEVREADWRITE("acia0", acia6850_device, data_r, data_w)
-	AM_RANGE(0xffc4, 0xffc4) AM_DEVREADWRITE("acia1", acia6850_device, status_r, control_w) // Serial Port 1 ACIA
-	AM_RANGE(0xffc5, 0xffc5) AM_DEVREADWRITE("acia1", acia6850_device, data_r, data_w)
+	AM_RANGE(0xffc0, 0xffc1) AM_DEVREADWRITE("acia0", acia6850_device, read, write) // Serial Port 0 ACIA
+	AM_RANGE(0xffc4, 0xffc5) AM_DEVREADWRITE("acia1", acia6850_device, read, write) // Serial Port 1 ACIA
 //  AM_RANGE(0xffc8, 0xffc9) Serial Port 2 ACIA
 //  AM_RANGE(0xffcc, 0xffcd) Serial Port 3 ACIA
 //  AM_RANGE(0xffd0, 0xffd1) Serial Port 4 ACIA / Cassette
@@ -269,7 +269,7 @@ void jupiter3_state::machine_reset()
 //  MACHINE_CONFIG( jupiter )
 //-------------------------------------------------
 
-static MACHINE_CONFIG_START( jupiter2 )
+MACHINE_CONFIG_START(jupiter2_state::jupiter2)
 	// basic machine hardware
 	MCFG_CPU_ADD(MCM6571AP_TAG, M6800, 2000000)
 	MCFG_CPU_PROGRAM_MAP(jupiter2_mem)
@@ -279,7 +279,7 @@ static MACHINE_CONFIG_START( jupiter2 )
 	MCFG_FLOPPY_DRIVE_ADD(INS1771N1_TAG":0", jupiter_floppies, "525ssdd", floppy_image_device::default_floppy_formats)
 	MCFG_FLOPPY_DRIVE_ADD(INS1771N1_TAG":1", jupiter_floppies, nullptr, floppy_image_device::default_floppy_formats)
 
-	MCFG_DEVICE_ADD("acia0", ACIA6850, XTAL_2MHz) // unknown frequency
+	MCFG_DEVICE_ADD("acia0", ACIA6850, XTAL(2'000'000)) // unknown frequency
 	MCFG_ACIA6850_TXD_HANDLER(DEVWRITELINE("serial0", rs232_port_device, write_txd))
 	MCFG_ACIA6850_RTS_HANDLER(DEVWRITELINE("serial0", rs232_port_device, write_rts))
 
@@ -287,7 +287,7 @@ static MACHINE_CONFIG_START( jupiter2 )
 	MCFG_RS232_RXD_HANDLER(DEVWRITELINE("acia0", acia6850_device, write_rxd))
 	MCFG_RS232_CTS_HANDLER(DEVWRITELINE("acia0", acia6850_device, write_cts))
 
-	MCFG_DEVICE_ADD("acia1", ACIA6850, XTAL_2MHz) // unknown frequency
+	MCFG_DEVICE_ADD("acia1", ACIA6850, XTAL(2'000'000)) // unknown frequency
 	MCFG_ACIA6850_TXD_HANDLER(DEVWRITELINE("serial1", rs232_port_device, write_txd))
 	MCFG_ACIA6850_RTS_HANDLER(DEVWRITELINE("serial1", rs232_port_device, write_rts))
 
@@ -305,7 +305,7 @@ MACHINE_CONFIG_END
 //  MACHINE_CONFIG( jupiter3 )
 //-------------------------------------------------
 
-static MACHINE_CONFIG_START( jupiter3 )
+MACHINE_CONFIG_START(jupiter3_state::jupiter3)
 	// basic machine hardware
 	MCFG_CPU_ADD(Z80_TAG, Z80, 4000000)
 	MCFG_CPU_PROGRAM_MAP(jupiter3_mem)

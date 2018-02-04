@@ -1140,7 +1140,7 @@ INPUT_PORTS_START( ti_rs232 )
 		PORT_CONFSETTING(    0x02, "5-20" )
 INPUT_PORTS_END
 
-MACHINE_CONFIG_MEMBER( ti_rs232_pio_device::device_add_mconfig )
+MACHINE_CONFIG_START(ti_rs232_pio_device::device_add_mconfig)
 	MCFG_DEVICE_ADD("tms9902_0", TMS9902, 3000000)
 	MCFG_TMS9902_INT_CB(WRITELINE(ti_rs232_pio_device, int0_callback))            /* called when interrupt pin state changes */
 	MCFG_TMS9902_RCV_CB(WRITELINE(ti_rs232_pio_device, rcv0_callback))            /* called when a character is received */

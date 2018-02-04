@@ -1,12 +1,16 @@
 // license:BSD-3-Clause
 // copyright-holders:Frank Palazzolo
 #include "emu.h"
-#include "debugger.h"
-#include "cp1610.h"
+#include "1610dasm.h"
 
-CPU_DISASSEMBLE(cp1610)
+u32 cp1610_disassembler::opcode_alignment() const
 {
-	uint16_t oprom16[4]={ static_cast<uint16_t>((oprom[0] << 8) | oprom[1]), static_cast<uint16_t>((oprom[2] << 8) | oprom[3]), static_cast<uint16_t>((oprom[4] << 8) | oprom[5]), static_cast<uint16_t>((oprom[6] << 8) | oprom[7]) };
+	return 1;
+}
+
+offs_t cp1610_disassembler::disassemble(std::ostream &stream, offs_t pc, const data_buffer &opcodes, const data_buffer &params)
+{
+	uint16_t oprom16[4]={ opcodes.r16(pc), opcodes.r16(pc+1), opcodes.r16(pc+2), opcodes.r16(pc+3) };
 	uint16_t op = oprom16[0]; uint16_t subop;
 	uint16_t ea, ea1, ea2;
 	unsigned size = 1;

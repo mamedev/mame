@@ -7,8 +7,6 @@
 
 #include "machine/gen_latch.h"
 
-typedef device_delegate<void (address_space &space, uint16_t data, uint16_t mem_mask)> deco146_port_write_cb;
-
 
 #define MCFG_DECO146_IN_PORTA_CB(_devcb) \
 	devcb = &deco_146_base_device::set_port_a_cb(*device, DEVCB_##_devcb);
@@ -19,9 +17,8 @@ typedef device_delegate<void (address_space &space, uint16_t data, uint16_t mem_
 #define MCFG_DECO146_IN_PORTC_CB(_devcb) \
 	devcb = &deco_146_base_device::set_port_c_cb(*device, DEVCB_##_devcb);
 
-#define MCFG_DECO146_SET_SOUNDLATCH_CALLBACK( _class, _method) \
-	deco_146_base_device::set_soundlatch_cb(*device, deco146_port_write_cb(&_class::_method, #_class "::" #_method, nullptr, (_class *)nullptr));
-
+#define MCFG_DECO146_SOUNDLATCH_IRQ_CB(_devcb) \
+	devcb = &deco_146_base_device::set_soundlatch_irq_callback(*device, DEVCB_##_devcb);
 
 // there are some standard ways the chip gets hooked up, so have them here ready to use
 #define MCFG_DECO146_SET_INTERFACE_SCRAMBLE( a9,a8,a7,a6,a5,a4,a3,a2,a1,a0 ) \
@@ -88,20 +85,17 @@ public:
 	template<class Object> static devcb_base &set_port_a_cb(device_t &device, Object &&object) { return downcast<deco_146_base_device &>(device).m_port_a_r.set_callback(std::forward<Object>(object)); }
 	template<class Object> static devcb_base &set_port_b_cb(device_t &device, Object &&object) { return downcast<deco_146_base_device &>(device).m_port_b_r.set_callback(std::forward<Object>(object)); }
 	template<class Object> static devcb_base &set_port_c_cb(device_t &device, Object &&object) { return downcast<deco_146_base_device &>(device).m_port_c_r.set_callback(std::forward<Object>(object)); }
-	static void set_soundlatch_cb(device_t &device,deco146_port_write_cb port_cb);
 	static void set_interface_scramble(device_t &device,uint8_t a9, uint8_t a8, uint8_t a7, uint8_t a6, uint8_t a5, uint8_t a4, uint8_t a3,uint8_t a2,uint8_t a1,uint8_t a0);
 	static void set_use_magic_read_address_xor(device_t &device, int use_xor);
 
+	template <class Object> static devcb_base &set_soundlatch_irq_callback(device_t &device, Object &&cb)
+		{ return downcast<deco_146_base_device &>(device).m_soundlatch_irq_cb.set_callback(std::forward<Object>(cb)); }
 
-
-
+	DECLARE_READ8_MEMBER( soundlatch_r );
 
 	devcb_read16 m_port_a_r;
 	devcb_read16 m_port_b_r;
 	devcb_read16 m_port_c_r;
-	deco146_port_write_cb m_soundlatch_w;
-
-	void soundlatch_default(address_space &space, uint16_t data, uint16_t mem_mask);
 
 	uint8_t m_bankswitch_swap_read_address;
 	uint16_t m_magic_read_address_xor;
@@ -109,7 +103,6 @@ public:
 	uint8_t m_xor_port;
 	uint8_t m_mask_port;
 	uint8_t m_soundlatch_port;
-
 
 	uint8_t m_external_addrswap[10];
 
@@ -130,7 +123,6 @@ protected:
 
 	int m_current_rambank;
 
-
 	uint16_t m_nand;
 	uint16_t m_xor;
 
@@ -139,10 +131,12 @@ protected:
 
 	uint8_t m_configregion; // which value of upper 4 address lines accesses the config region
 	int m_latchflag;
+
 private:
 	uint8_t region_selects[6];
-	optional_device<generic_latch_8_device> m_sound_latch;
 
+	uint8_t m_soundlatch;
+	devcb_write_line m_soundlatch_irq_cb;
 };
 
 class deco146_device : public deco_146_base_device

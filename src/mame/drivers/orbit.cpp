@@ -28,7 +28,7 @@ Atari Orbit Driver
 #include "speaker.h"
 
 
-#define MASTER_CLOCK        XTAL_12_096MHz
+#define MASTER_CLOCK        XTAL(12'096'000)
 
 /*************************************
  *
@@ -275,7 +275,7 @@ void orbit_state::machine_reset()
  *
  *************************************/
 
-static MACHINE_CONFIG_START( orbit )
+MACHINE_CONFIG_START(orbit_state::orbit)
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", M6800, MASTER_CLOCK / 16)

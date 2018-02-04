@@ -100,7 +100,7 @@ Graphics: CY37256P160-83AC x 2 (Ultra37000 CPLD family - 160 pin TQFP, 256 Macro
  *
  *************************************/
 
-#define MASTER_CLOCK        (XTAL_73_728MHz)
+#define MASTER_CLOCK        (XTAL(73'728'000))
 #define MAIN_CPU_CLOCK      (MASTER_CLOCK / 4)  /* divider is either 3 or 4 */
 #define NAMCO_AUDIO_CLOCK   (MASTER_CLOCK / 4 /  6 / 32)
 
@@ -187,6 +187,8 @@ WRITE8_MEMBER(_20pacgal_state::sprite_lookup_w)
 // likewise the sound table.. is it being uploaded in a different format at 0x0c000?
 // we also need the palette data because there is only a single rom on this pcb?
 static ADDRESS_MAP_START( 25pacman_map, AS_PROGRAM, 8, _25pacman_state )
+	AM_RANGE(0x00000, 0x3ffff) AM_DEVREADWRITE("flash", amd_29lv200t_device, read, write )  // (always fall through if nothing else is mapped?)
+
 	AM_RANGE(0x04000, 0x047ff) AM_RAM AM_SHARE("video_ram")
 	AM_RANGE(0x04800, 0x05fff) AM_RAM
 	AM_RANGE(0x06000, 0x06fff) AM_WRITEONLY AM_SHARE("char_gfx_ram")
@@ -197,8 +199,6 @@ static ADDRESS_MAP_START( 25pacman_map, AS_PROGRAM, 8, _25pacman_state )
 	AM_RANGE(0x0c000, 0x0dfff) AM_WRITENOP // is this the sound waveforms in a different format?
 	AM_RANGE(0x0e000, 0x0ffff) AM_WRITENOP
 	AM_RANGE(0x1c000, 0x1ffff) AM_WRITENOP
-	AM_RANGE(0x00000, 0x3ffff) AM_DEVREADWRITE("flash", amd_29lv200t_device, read, write )  // (always fall through if nothing else is mapped?)
-
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( 20pacgal_map, AS_PROGRAM, 8, _20pacgal_state )
@@ -208,8 +208,8 @@ static ADDRESS_MAP_START( 20pacgal_map, AS_PROGRAM, 8, _20pacgal_state )
 	AM_RANGE(0x0a000, 0x0ffff) AM_MIRROR(0x40000) AM_ROM
 	AM_RANGE(0x10000, 0x3ffff) AM_ROM
 	AM_RANGE(0x44000, 0x447ff) AM_RAM AM_SHARE("video_ram")
-	AM_RANGE(0x45040, 0x4505f) AM_DEVWRITE("namco", namco_cus30_device, pacman_sound_w)
 	AM_RANGE(0x44800, 0x45eff) AM_RAM
+	AM_RANGE(0x45040, 0x4505f) AM_DEVWRITE("namco", namco_cus30_device, pacman_sound_w)
 	AM_RANGE(0x45f00, 0x45fff) AM_DEVWRITE("namco", namco_cus30_device, namcos1_cus30_w)
 	AM_RANGE(0x46000, 0x46fff) AM_WRITEONLY AM_SHARE("char_gfx_ram")
 	AM_RANGE(0x47100, 0x47100) AM_RAM   /* leftover from original Galaga code */
@@ -389,7 +389,7 @@ INTERRUPT_GEN_MEMBER(_20pacgal_state::vblank_irq)
 		device.execute().set_input_line(0, HOLD_LINE); // TODO: assert breaks the inputs in 25pacman test mode
 }
 
-static MACHINE_CONFIG_START( 20pacgal )
+MACHINE_CONFIG_START(_20pacgal_state::_20pacgal)
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", Z180, MAIN_CPU_CLOCK)
@@ -402,7 +402,7 @@ static MACHINE_CONFIG_START( 20pacgal )
 	MCFG_WATCHDOG_ADD("watchdog")
 
 	/* video hardware */
-	MCFG_FRAGMENT_ADD(20pacgal_video)
+	MCFG_FRAGMENT_ADD(_20pacgal_video)
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("speaker")
@@ -417,7 +417,7 @@ static MACHINE_CONFIG_START( 20pacgal )
 MACHINE_CONFIG_END
 
 
-static MACHINE_CONFIG_DERIVED( 25pacman, 20pacgal )
+MACHINE_CONFIG_DERIVED(_25pacman_state::_25pacman, _20pacgal)
 
 	/* basic machine hardware */
 	MCFG_CPU_MODIFY("maincpu")
@@ -534,12 +534,12 @@ DRIVER_INIT_MEMBER(_20pacgal_state,25pacman)
  *
  *************************************/
 
-GAME( 2006, 25pacman,   0,        25pacman, 25pacman,  _25pacman_state, 25pacman, ROT90, "Namco / Cosmodog", "Pac-Man - 25th Anniversary Edition (Rev 3.00)",                       MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE | MACHINE_NOT_WORKING )
-GAME( 2005, 25pacmano,  25pacman, 20pacgal, 25pacmano, _20pacgal_state, 25pacman, ROT90, "Namco / Cosmodog", "Pac-Man - 25th Anniversary Edition (Rev 2.00)",                       MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE)
+GAME( 2006, 25pacman,   0,        _25pacman, 25pacman,  _25pacman_state, 25pacman, ROT90, "Namco / Cosmodog", "Pac-Man - 25th Anniversary Edition (Rev 3.00)",                       MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE | MACHINE_NOT_WORKING )
+GAME( 2005, 25pacmano,  25pacman, _20pacgal, 25pacmano, _20pacgal_state, 25pacman, ROT90, "Namco / Cosmodog", "Pac-Man - 25th Anniversary Edition (Rev 2.00)",                       MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE)
 
-GAME( 2000, 20pacgal,   0,        20pacgal, 20pacgal,  _20pacgal_state, 20pacgal, ROT90, "Namco / Cosmodog", "Ms. Pac-Man/Galaga - 20th Anniversary Class of 1981 Reunion (V1.08)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE)
-GAME( 2000, 20pacgalr4, 20pacgal, 20pacgal, 20pacgal,  _20pacgal_state, 20pacgal, ROT90, "Namco / Cosmodog", "Ms. Pac-Man/Galaga - 20th Anniversary Class of 1981 Reunion (V1.04)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE)
-GAME( 2000, 20pacgalr3, 20pacgal, 20pacgal, 20pacgal,  _20pacgal_state, 20pacgal, ROT90, "Namco / Cosmodog", "Ms. Pac-Man/Galaga - 20th Anniversary Class of 1981 Reunion (V1.03)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE)
-GAME( 2000, 20pacgalr2, 20pacgal, 20pacgal, 20pacgal,  _20pacgal_state, 20pacgal, ROT90, "Namco / Cosmodog", "Ms. Pac-Man/Galaga - 20th Anniversary Class of 1981 Reunion (V1.02)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE)
-GAME( 2000, 20pacgalr1, 20pacgal, 20pacgal, 20pacgal,  _20pacgal_state, 20pacgal, ROT90, "Namco / Cosmodog", "Ms. Pac-Man/Galaga - 20th Anniversary Class of 1981 Reunion (V1.01)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE)
-GAME( 2000, 20pacgalr0, 20pacgal, 20pacgal, 20pacgal,  _20pacgal_state, 20pacgal, ROT90, "Namco / Cosmodog", "Ms. Pac-Man/Galaga - 20th Anniversary Class of 1981 Reunion (V1.00)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE)
+GAME( 2000, 20pacgal,   0,        _20pacgal, 20pacgal,  _20pacgal_state, 20pacgal, ROT90, "Namco / Cosmodog", "Ms. Pac-Man/Galaga - 20th Anniversary Class of 1981 Reunion (V1.08)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE)
+GAME( 2000, 20pacgalr4, 20pacgal, _20pacgal, 20pacgal,  _20pacgal_state, 20pacgal, ROT90, "Namco / Cosmodog", "Ms. Pac-Man/Galaga - 20th Anniversary Class of 1981 Reunion (V1.04)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE)
+GAME( 2000, 20pacgalr3, 20pacgal, _20pacgal, 20pacgal,  _20pacgal_state, 20pacgal, ROT90, "Namco / Cosmodog", "Ms. Pac-Man/Galaga - 20th Anniversary Class of 1981 Reunion (V1.03)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE)
+GAME( 2000, 20pacgalr2, 20pacgal, _20pacgal, 20pacgal,  _20pacgal_state, 20pacgal, ROT90, "Namco / Cosmodog", "Ms. Pac-Man/Galaga - 20th Anniversary Class of 1981 Reunion (V1.02)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE)
+GAME( 2000, 20pacgalr1, 20pacgal, _20pacgal, 20pacgal,  _20pacgal_state, 20pacgal, ROT90, "Namco / Cosmodog", "Ms. Pac-Man/Galaga - 20th Anniversary Class of 1981 Reunion (V1.01)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE)
+GAME( 2000, 20pacgalr0, 20pacgal, _20pacgal, 20pacgal,  _20pacgal_state, 20pacgal, ROT90, "Namco / Cosmodog", "Ms. Pac-Man/Galaga - 20th Anniversary Class of 1981 Reunion (V1.00)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE)

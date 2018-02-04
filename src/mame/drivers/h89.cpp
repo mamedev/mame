@@ -43,6 +43,7 @@ public:
 	uint8_t m_port_f2;
 	virtual void machine_reset() override;
 	TIMER_DEVICE_CALLBACK_MEMBER(h89_irq_timer);
+	void h89(machine_config &config);
 };
 
 
@@ -178,13 +179,13 @@ static DEVICE_INPUT_DEFAULTS_START( terminal )
 DEVICE_INPUT_DEFAULTS_END
 
 
-static MACHINE_CONFIG_START( h89 )
+MACHINE_CONFIG_START(h89_state::h89)
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu",Z80, XTAL_12_288MHz / 6)
+	MCFG_CPU_ADD("maincpu",Z80, XTAL(12'288'000) / 6)
 	MCFG_CPU_PROGRAM_MAP(h89_mem)
 	MCFG_CPU_IO_MAP(h89_io)
 
-	MCFG_DEVICE_ADD( "ins8250", INS8250, XTAL_1_8432MHz )
+	MCFG_DEVICE_ADD( "ins8250", INS8250, XTAL(1'843'200) )
 	MCFG_INS8250_OUT_TX_CB(DEVWRITELINE(RS232_TAG, rs232_port_device, write_txd))
 
 	MCFG_RS232_PORT_ADD(RS232_TAG, default_rs232_devices, "terminal")

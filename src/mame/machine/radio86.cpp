@@ -130,7 +130,7 @@ void radio86_state::device_timer(emu_timer &timer, device_timer_id id, int param
 READ8_MEMBER(radio86_state::radio_cpu_state_r)
 {
 	// FIXME: the driver should handler the status callback rather than accessing this through the state interface
-	return space.device().state().state_int(i8080_cpu_device::I8085_STATUS);
+	return m_maincpu->state_int(i8080_cpu_device::I8085_STATUS);
 }
 
 READ8_MEMBER(radio86_state::radio_io_r)

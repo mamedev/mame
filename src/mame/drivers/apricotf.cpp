@@ -35,7 +35,7 @@
 #include "machine/input_merger.h"
 #include "machine/wd_fdc.h"
 #include "machine/z80ctc.h"
-#include "machine/z80dart.h"
+#include "machine/z80sio.h"
 #include "screen.h"
 
 
@@ -82,7 +82,7 @@ public:
 
 	required_device<cpu_device> m_maincpu;
 	required_device<z80ctc_device> m_ctc;
-	required_device<z80sio2_device> m_sio;
+	required_device<z80sio_device> m_sio;
 	required_device<wd2797_device> m_fdc;
 	required_device<floppy_connector> m_floppy0;
 	required_device<floppy_connector> m_floppy1;
@@ -103,6 +103,7 @@ public:
 
 	int m_40_80;
 	int m_200_256;
+	void act_f1(machine_config &config);
 };
 
 
@@ -266,7 +267,7 @@ static ADDRESS_MAP_START( act_f1_io, AS_IO, 16, f1_state )
 	ADDRESS_MAP_UNMAP_HIGH
 	AM_RANGE(0x0000, 0x000f) AM_WRITE8(system_w, 0xffff)
 	AM_RANGE(0x0010, 0x0017) AM_DEVREADWRITE8(Z80CTC_TAG, z80ctc_device, read, write, 0x00ff)
-	AM_RANGE(0x0020, 0x0027) AM_DEVREADWRITE8(Z80SIO2_TAG, z80sio2_device, ba_cd_r, ba_cd_w, 0x00ff)
+	AM_RANGE(0x0020, 0x0027) AM_DEVREADWRITE8(Z80SIO2_TAG, z80sio_device, ba_cd_r, ba_cd_w, 0x00ff)
 //  AM_RANGE(0x0030, 0x0031) AM_WRITE8(ctc_ack_w, 0x00ff)
 	AM_RANGE(0x0040, 0x0047) AM_DEVREADWRITE8(WD2797_TAG, wd2797_device, read, write, 0x00ff)
 //  AM_RANGE(0x01e0, 0x01ff) winchester
@@ -329,9 +330,9 @@ SLOT_INTERFACE_END
 //  MACHINE_CONFIG( act_f1 )
 //-------------------------------------------------
 
-static MACHINE_CONFIG_START( act_f1 )
+MACHINE_CONFIG_START(f1_state::act_f1)
 	/* basic machine hardware */
-	MCFG_CPU_ADD(I8086_TAG, I8086, XTAL_14MHz/4)
+	MCFG_CPU_ADD(I8086_TAG, I8086, XTAL(14'000'000)/4)
 	MCFG_CPU_PROGRAM_MAP(act_f1_mem)
 	MCFG_CPU_IO_MAP(act_f1_io)
 
@@ -353,8 +354,8 @@ static MACHINE_CONFIG_START( act_f1 )
 	/* Devices */
 	MCFG_DEVICE_ADD(APRICOT_KEYBOARD_TAG, APRICOT_KEYBOARD, 0)
 
-	MCFG_DEVICE_ADD(Z80SIO2_TAG, Z80SIO2, 2500000)
-	MCFG_Z80DART_OUT_INT_CB(DEVWRITELINE("irqs", input_merger_device, in_w<0>))
+	MCFG_DEVICE_ADD(Z80SIO2_TAG, Z80SIO, 2500000)
+	MCFG_Z80SIO_OUT_INT_CB(DEVWRITELINE("irqs", input_merger_device, in_w<0>))
 
 	MCFG_DEVICE_ADD(Z80CTC_TAG, Z80CTC, 2500000)
 	MCFG_Z80CTC_INTR_CB(DEVWRITELINE("irqs", input_merger_device, in_w<1>))
@@ -362,12 +363,12 @@ static MACHINE_CONFIG_START( act_f1 )
 	MCFG_Z80CTC_ZC2_CB(WRITELINE(f1_state, ctc_z2_w))
 
 	MCFG_CENTRONICS_ADD("centronics", centronics_devices, "printer")
-	MCFG_CENTRONICS_BUSY_HANDLER(DEVWRITELINE(Z80SIO2_TAG, z80dart_device, ctsa_w))
+	MCFG_CENTRONICS_BUSY_HANDLER(DEVWRITELINE(Z80SIO2_TAG, z80sio_device, ctsa_w))
 
 	MCFG_CENTRONICS_OUTPUT_LATCH_ADD("cent_data_out", CENTRONICS_TAG)
 
 	// floppy
-	MCFG_WD2797_ADD(WD2797_TAG, XTAL_4MHz / 2 /* ? */)
+	MCFG_WD2797_ADD(WD2797_TAG, XTAL(4'000'000) / 2 /* ? */)
 	MCFG_WD_FDC_INTRQ_CALLBACK(INPUTLINE(I8086_TAG, INPUT_LINE_NMI))
 	MCFG_WD_FDC_DRQ_CALLBACK(INPUTLINE(I8086_TAG, INPUT_LINE_TEST))
 

@@ -225,10 +225,10 @@
 #include "speaker.h"
 
 
-#define CPU_CLOCK   XTAL_14_7456MHz
-#define MACH_CLOCK  XTAL_50MHz      // 50.35
-#define COM_CLOCK   XTAL_20MHz
-#define SND_CLOCK   XTAL_16_9344MHz
+#define CPU_CLOCK   XTAL(14'745'600)
+#define MACH_CLOCK  XTAL(50'000'000)      // 50.35
+#define COM_CLOCK   XTAL(20'000'000)
+#define SND_CLOCK   XTAL(16'934'400)
 
 
 class coinmvga_state : public driver_device
@@ -253,6 +253,7 @@ public:
 	required_device<palette_device> m_palette;
 	required_device<palette_device> m_palette2;
 
+	void coinmvga(machine_config &config);
 };
 
 
@@ -626,7 +627,7 @@ static ADDRESS_MAP_START( ramdac2_map, 0, 8, coinmvga_state )
 ADDRESS_MAP_END
 
 
-static MACHINE_CONFIG_START( coinmvga )
+MACHINE_CONFIG_START(coinmvga_state::coinmvga)
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", H83007, CPU_CLOCK)  /* xtal */

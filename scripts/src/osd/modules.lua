@@ -207,6 +207,7 @@ function osdmodulesbuild()
 		MAME_DIR .. "src/osd/modules/render/bgfx/uniformreader.cpp",
 		MAME_DIR .. "src/osd/modules/render/bgfx/valueuniform.cpp",
 		MAME_DIR .. "src/osd/modules/render/bgfx/valueuniformreader.cpp",
+		MAME_DIR .. "src/osd/modules/render/bgfx/view.cpp",
 		MAME_DIR .. "src/osd/modules/render/bgfx/writereader.cpp",
 	}
 	includedirs {
@@ -410,7 +411,6 @@ function osdmodulestargetconf()
 				"-L$(shell qmake -query QT_INSTALL_LIBS)",
 			}
 			links {
-				"qtmain",
 				"Qt5Core.dll",
 				"Qt5Gui.dll",
 				"Qt5Widgets.dll",

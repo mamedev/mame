@@ -134,6 +134,14 @@ public:
 #endif
 	}
 
+	void hp9k370(machine_config &config);
+	void hp9k330(machine_config &config);
+	void hp9k382(machine_config &config);
+	void hp9k310(machine_config &config);
+	void hp9k340(machine_config &config);
+	void hp9k380(machine_config &config);
+	void hp9k320(machine_config &config);
+	void hp9k332(machine_config &config);
 private:
 	bool m_in_buserr;
 	bool m_hil_read;
@@ -192,64 +200,63 @@ static ADDRESS_MAP_START(hp9k310_map, AS_PROGRAM, 16, hp9k3xx_state)
 	AM_RANGE(0x5c0000, 0x5c0003) AM_READWRITE(buserror16_r, buserror16_w)   // no add-on FP coprocessor
 
 	AM_RANGE(0x5f8000, 0x5f800f) AM_DEVREADWRITE8(PTM6840_TAG, ptm6840_device, read, write, 0x00ff)
-	AM_RANGE(0x600000, 0x7ffffd) AM_READWRITE(buserror16_r, buserror16_w)   // prevent reading invalid DIO slots
-	AM_RANGE(0x700000, 0x7fffff) AM_READWRITE(buserror16_r, buserror16_w)
+	AM_RANGE(0x600000, 0x7fffff) AM_READWRITE(buserror16_r, buserror16_w)   // prevent reading invalid DIO slots
 	AM_RANGE(0x800000, 0xffffff) AM_RAM
 ADDRESS_MAP_END
 
 // 9000/320
 static ADDRESS_MAP_START(hp9k320_map, AS_PROGRAM, 32, hp9k3xx_state)
+	AM_IMPORT_FROM(hp9k3xx_common)
+
 	AM_RANGE(0xffe00000, 0xffefffff) AM_READWRITE(buserror_r, buserror_w)
 	AM_RANGE(0xfff00000, 0xffffffff) AM_RAM
-
-	AM_IMPORT_FROM(hp9k3xx_common)
 ADDRESS_MAP_END
 
 // 9000/330 and 9000/340
 static ADDRESS_MAP_START(hp9k330_map, AS_PROGRAM, 32, hp9k3xx_state)
+	AM_IMPORT_FROM(hp9k3xx_common)
+
 	AM_RANGE(0xffb00000, 0xffbfffff) AM_READWRITE(buserror_r, buserror_w)
 	AM_RANGE(0xffc00000, 0xffffffff) AM_RAM
-
-	AM_IMPORT_FROM(hp9k3xx_common)
 ADDRESS_MAP_END
 
 // 9000/332, with built-in medium-res video
 static ADDRESS_MAP_START(hp9k332_map, AS_PROGRAM, 32, hp9k3xx_state)
+	AM_IMPORT_FROM(hp9k3xx_common)
+
 	AM_RANGE(0x00200000, 0x002fffff) AM_RAM AM_SHARE("vram")    // 98544 mono framebuffer
 	AM_RANGE(0x00560000, 0x00563fff) AM_ROM AM_REGION("graphics", 0x0000)   // 98544 mono ROM
 
 	AM_RANGE(0xffb00000, 0xffbfffff) AM_READWRITE(buserror_r, buserror_w)
 	AM_RANGE(0xffc00000, 0xffffffff) AM_RAM
-
-	AM_IMPORT_FROM(hp9k3xx_common)
 ADDRESS_MAP_END
 
 // 9000/370 - 8 MB RAM standard
 static ADDRESS_MAP_START(hp9k370_map, AS_PROGRAM, 32, hp9k3xx_state)
+	AM_IMPORT_FROM(hp9k3xx_common)
+
 	AM_RANGE(0xff700000, 0xff7fffff) AM_READWRITE(buserror_r, buserror_w)
 	AM_RANGE(0xff800000, 0xffffffff) AM_RAM
-
-	AM_IMPORT_FROM(hp9k3xx_common)
 ADDRESS_MAP_END
 
 // 9000/380 - '040
 static ADDRESS_MAP_START(hp9k380_map, AS_PROGRAM, 32, hp9k3xx_state)
+	AM_IMPORT_FROM(hp9k3xx_common)
+
 	AM_RANGE(0x0051a000, 0x0051afff) AM_READWRITE(buserror_r, buserror_w)   // no "Alpha display"
 
 	AM_RANGE(0xc0000000, 0xff7fffff) AM_READWRITE(buserror_r, buserror_w)
 	AM_RANGE(0xff800000, 0xffffffff) AM_RAM
-
-	AM_IMPORT_FROM(hp9k3xx_common)
 ADDRESS_MAP_END
 
 // 9000/382 - onboard VGA compatible video (where?)
 static ADDRESS_MAP_START(hp9k382_map, AS_PROGRAM, 32, hp9k3xx_state)
+	AM_IMPORT_FROM(hp9k3xx_common)
+
 	AM_RANGE(0xffb00000, 0xffbfffff) AM_READWRITE(buserror_r, buserror_w)
 	AM_RANGE(0xffc00000, 0xffffffff) AM_RAM
 
 	AM_RANGE(0x0051a000, 0x0051afff) AM_READWRITE(buserror_r, buserror_w)   // no "Alpha display"
-
-	AM_IMPORT_FROM(hp9k3xx_common)
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START(iocpu_map, AS_PROGRAM, 8, hp9k3xx_state)
@@ -360,7 +367,7 @@ static SLOT_INTERFACE_START(dio16_cards)
 	SLOT_INTERFACE("98603", HPDIO_98603) /* 98603 ROM BASIC */
 SLOT_INTERFACE_END
 
-static MACHINE_CONFIG_START( hp9k310 )
+MACHINE_CONFIG_START(hp9k3xx_state::hp9k310)
 	/* basic machine hardware */
 	MCFG_CPU_ADD(MAINCPU_TAG, M68010, 10000000)
 	MCFG_CPU_PROGRAM_MAP(hp9k310_map)
@@ -372,7 +379,7 @@ static MACHINE_CONFIG_START( hp9k310 )
 	MCFG_MCS48_PORT_P1_IN_CB(READ8(hp9k3xx_state, iocpu_port1_r))
 	MCFG_MCS48_PORT_T0_IN_CB(READ8(hp9k3xx_state, iocpu_test0_r))
 
-	MCFG_DEVICE_ADD(MLC_TAG, HP_HIL_MLC, XTAL_15_92MHz/2)
+	MCFG_DEVICE_ADD(MLC_TAG, HP_HIL_MLC, XTAL(15'920'000)/2)
 	MCFG_HP_HIL_SLOT_ADD(MLC_TAG, "hil1", hp_hil_devices, "hp_ipc_kbd")
 
 	MCFG_DEVICE_ADD(PTM6840_TAG, PTM6840, 250000) // from oscillator module next to the 6840
@@ -389,7 +396,7 @@ static MACHINE_CONFIG_START( hp9k310 )
 	MCFG_DIO16_SLOT_ADD("diobus", "sl3", dio16_cards, nullptr, false)
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_START( hp9k320 )
+MACHINE_CONFIG_START(hp9k3xx_state::hp9k320)
 	/* basic machine hardware */
 	MCFG_CPU_ADD(MAINCPU_TAG, M68020FPU, 16670000)
 	MCFG_CPU_PROGRAM_MAP(hp9k320_map)
@@ -401,7 +408,7 @@ static MACHINE_CONFIG_START( hp9k320 )
 	MCFG_MCS48_PORT_P1_IN_CB(READ8(hp9k3xx_state, iocpu_port1_r))
 	MCFG_MCS48_PORT_T0_IN_CB(READ8(hp9k3xx_state, iocpu_test0_r))
 
-	MCFG_DEVICE_ADD(MLC_TAG, HP_HIL_MLC, XTAL_15_92MHz/2)
+	MCFG_DEVICE_ADD(MLC_TAG, HP_HIL_MLC, XTAL(15'920'000)/2)
 	MCFG_HP_HIL_SLOT_ADD(MLC_TAG, "hil1", hp_hil_devices, "hp_ipc_kbd")
 
 	MCFG_DEVICE_ADD(PTM6840_TAG, PTM6840, 250000) // from oscillator module next to the 6840
@@ -418,13 +425,13 @@ static MACHINE_CONFIG_START( hp9k320 )
 	MCFG_DIO32_SLOT_ADD("diobus", "sl3", dio16_cards, nullptr, false)
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_DERIVED( hp9k330, hp9k320 )
+MACHINE_CONFIG_DERIVED(hp9k3xx_state::hp9k330, hp9k320)
 	/* basic machine hardware */
 	MCFG_CPU_REPLACE(MAINCPU_TAG, M68020PMMU, 16670000)
 	MCFG_CPU_PROGRAM_MAP(hp9k330_map)
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_START( hp9k332 )
+MACHINE_CONFIG_START(hp9k3xx_state::hp9k332)
 	/* basic machine hardware */
 	MCFG_CPU_ADD(MAINCPU_TAG, M68020PMMU, 16670000)
 	MCFG_CPU_PROGRAM_MAP(hp9k332_map)
@@ -436,7 +443,7 @@ static MACHINE_CONFIG_START( hp9k332 )
 	MCFG_MCS48_PORT_P1_IN_CB(READ8(hp9k3xx_state, iocpu_port1_r))
 	MCFG_MCS48_PORT_T0_IN_CB(READ8(hp9k3xx_state, iocpu_test0_r))
 
-	MCFG_DEVICE_ADD(MLC_TAG, HP_HIL_MLC, XTAL_15_92MHz/2)
+	MCFG_DEVICE_ADD(MLC_TAG, HP_HIL_MLC, XTAL(15'920'000)/2)
 	MCFG_HP_HIL_SLOT_ADD(MLC_TAG, "hil1", hp_hil_devices, "hp_ipc_kbd")
 
 	MCFG_DEVICE_ADD(PTM6840_TAG, PTM6840, 250000) // from oscillator module next to the 6840
@@ -453,25 +460,25 @@ static MACHINE_CONFIG_START( hp9k332 )
 	MCFG_SCREEN_REFRESH_RATE(70)
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_DERIVED( hp9k340, hp9k320 )
+MACHINE_CONFIG_DERIVED(hp9k3xx_state::hp9k340, hp9k320)
 	/* basic machine hardware */
 	MCFG_CPU_REPLACE(MAINCPU_TAG, M68030, 16670000)
 	MCFG_CPU_PROGRAM_MAP(hp9k330_map)
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_DERIVED( hp9k370, hp9k320 )
+MACHINE_CONFIG_DERIVED(hp9k3xx_state::hp9k370, hp9k320)
 	/* basic machine hardware */
 	MCFG_CPU_REPLACE(MAINCPU_TAG, M68030, 33000000)
 	MCFG_CPU_PROGRAM_MAP(hp9k370_map)
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_DERIVED( hp9k380, hp9k320 )
+MACHINE_CONFIG_DERIVED(hp9k3xx_state::hp9k380, hp9k320)
 	/* basic machine hardware */
 	MCFG_CPU_REPLACE(MAINCPU_TAG, M68040, 25000000)
 	MCFG_CPU_PROGRAM_MAP(hp9k380_map)
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_DERIVED( hp9k382, hp9k320 )
+MACHINE_CONFIG_DERIVED(hp9k3xx_state::hp9k382, hp9k320)
 	/* basic machine hardware */
 	MCFG_CPU_REPLACE(MAINCPU_TAG, M68040, 25000000)
 	MCFG_CPU_PROGRAM_MAP(hp9k382_map)

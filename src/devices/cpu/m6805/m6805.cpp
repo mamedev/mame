@@ -35,6 +35,7 @@
 #include "emu.h"
 #include "m6805.h"
 #include "m6805defs.h"
+#include "6805dasm.h"
 
 #include "debugger.h"
 
@@ -262,7 +263,7 @@ m6805_base_device::m6805_base_device(
 void m6805_base_device::device_start()
 {
 	m_program = &space(AS_PROGRAM);
-	m_direct = &m_program->direct();
+	m_direct = m_program->direct<0>();
 
 	// set our instruction counter
 	m_icountptr = &m_icount;
@@ -302,9 +303,6 @@ void m6805_base_device::device_reset()
 	m_pending_interrupts = 0;
 
 	m_nmi_state = 0;
-
-	m_program = &space(AS_PROGRAM);
-	m_direct = &m_program->direct();
 
 	/* IRQ disabled */
 	SEI;
@@ -409,35 +407,13 @@ void m6805_base_device::interrupt()
 
 
 //-------------------------------------------------
-//  disasm_min_opcode_bytes - return the length
-//  of the shortest instruction, in bytes
-//-------------------------------------------------
-
-uint32_t m6805_base_device::disasm_min_opcode_bytes() const
-{
-	return 1;
-}
-
-
-//-------------------------------------------------
-//  disasm_max_opcode_bytes - return the length
-//  of the longest instruction, in bytes
-//-------------------------------------------------
-
-uint32_t m6805_base_device::disasm_max_opcode_bytes() const
-{
-	return 3;
-}
-
-
-//-------------------------------------------------
-//  disasm_disassemble - call the disassembly
+//  disassemble - call the disassembly
 //  helper function
 //-------------------------------------------------
 
-offs_t m6805_base_device::disasm_disassemble(std::ostream &stream, offs_t pc, const uint8_t *oprom, const uint8_t *opram, uint32_t options)
+util::disasm_interface *m6805_base_device::create_disassembler()
 {
-	return CPU_DISASSEMBLE_NAME(m6805)(this, stream, pc, oprom, opram, options);
+	return new m6805_disassembler;
 }
 
 

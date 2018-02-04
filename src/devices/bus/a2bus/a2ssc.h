@@ -35,10 +35,10 @@ protected:
 	virtual const tiny_rom_entry *device_rom_region() const override;
 	virtual ioport_constructor device_input_ports() const override;
 
-	virtual uint8_t read_c0nx(address_space &space, uint8_t offset) override;
-	virtual void write_c0nx(address_space &space, uint8_t offset, uint8_t data) override;
-	virtual uint8_t read_cnxx(address_space &space, uint8_t offset) override;
-	virtual uint8_t read_c800(address_space &space, uint16_t offset) override;
+	virtual uint8_t read_c0nx(uint8_t offset) override;
+	virtual void write_c0nx(uint8_t offset, uint8_t data) override;
+	virtual uint8_t read_cnxx(uint8_t offset) override;
+	virtual uint8_t read_c800(uint16_t offset) override;
 
 	required_ioport m_dsw1, m_dsw2;
 

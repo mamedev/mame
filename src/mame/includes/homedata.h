@@ -152,4 +152,10 @@ public:
 	inline void lemnangl_info( tile_data &tileinfo, int tile_index, int page, int layer, int gfxset, int gfxbank );
 	inline void mirderby_info0( tile_data &tileinfo, int tile_index, int page, int gfxbank );
 	inline void mirderby_info1( tile_data &tileinfo, int tile_index, int page, int gfxbank );
+	void reikaids(machine_config &config);
+	void mrokumei(machine_config &config);
+	void mirderby(machine_config &config);
+	void pteacher(machine_config &config);
+	void lemnangl(machine_config &config);
+	void mjkinjas(machine_config &config);
 };

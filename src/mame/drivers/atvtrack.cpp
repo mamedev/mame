@@ -144,6 +144,7 @@ public:
 	u16 gpu_irq_mask;
 	void gpu_irq_test();
 	void gpu_irq_set(int);
+	void atvtrack(machine_config &config);
 protected:
 	bool m_slaverun;
 };
@@ -157,6 +158,7 @@ public:
 
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
+	void smashdrv(machine_config &config);
 };
 
 void atvtrack_state::logbinary(uint32_t data,int high=31,int low=0)
@@ -438,7 +440,7 @@ void get_altera10ke_eab(u8* dst, u8 *pof, int eab)
 
 	for (u32 bit = 0; bit < 4096; bit++)
 	{
-		u32 tbit = BITSWAP16(bit, 15, 14, 13, 12,
+		u32 tbit = bitswap<16>(bit, 15, 14, 13, 12,
 			9, 8, 7, 6, 5, 4, 3,
 			11, 10,
 			2, 1, 0);
@@ -471,8 +473,8 @@ void atvtrack_state::machine_reset()
 	{
 		u16 lword = tdata[i * 2 + 512] | (tdata[i * 2 + 513] << 8);
 		u16 hword = tdata[i * 2] | (tdata[i * 2 + 1] << 8);
-		lword = BITSWAP16(lword, 7, 9, 0, 10, 3, 11, 4, 12, 2, 15, 1, 13, 6, 8, 5, 14);
-		hword = BITSWAP16(hword, 5, 10, 7, 9, 6, 13, 3, 15, 2, 11, 1, 8, 0, 12, 4, 14);
+		lword = bitswap<16>(lword, 7, 9, 0, 10, 3, 11, 4, 12, 2, 15, 1, 13, 6, 8, 5, 14);
+		hword = bitswap<16>(hword, 5, 10, 7, 9, 6, 13, 3, 15, 2, 11, 1, 8, 0, 12, 4, 14);
 		dst[i * 4 + 0] = lword & 0xff;
 		dst[i * 4 + 1] = lword >> 8;
 		dst[i * 4 + 2] = hword & 0xff;
@@ -548,9 +550,9 @@ ADDRESS_MAP_END
 static INPUT_PORTS_START( atvtrack )
 INPUT_PORTS_END
 
-#define ATV_CPU_CLOCK XTAL_33MHz*6
+#define ATV_CPU_CLOCK XTAL(33'000'000)*6
 
-static MACHINE_CONFIG_START( atvtrack )
+MACHINE_CONFIG_START(atvtrack_state::atvtrack)
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", SH4LE, ATV_CPU_CLOCK)
 	MCFG_SH4_MD0(1)
@@ -565,6 +567,7 @@ static MACHINE_CONFIG_START( atvtrack )
 	MCFG_SH4_CLOCK(ATV_CPU_CLOCK)
 	MCFG_CPU_PROGRAM_MAP(atvtrack_main_map)
 	MCFG_CPU_IO_MAP(atvtrack_main_port)
+	MCFG_CPU_FORCE_NO_DRC()
 
 	MCFG_CPU_ADD("subcpu", SH4LE, ATV_CPU_CLOCK)
 	MCFG_SH4_MD0(1)
@@ -579,6 +582,7 @@ static MACHINE_CONFIG_START( atvtrack )
 	MCFG_SH4_CLOCK(ATV_CPU_CLOCK)
 	MCFG_CPU_PROGRAM_MAP(atvtrack_sub_map)
 	MCFG_CPU_IO_MAP(atvtrack_sub_port)
+	MCFG_CPU_FORCE_NO_DRC()
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
@@ -591,7 +595,7 @@ static MACHINE_CONFIG_START( atvtrack )
 	MCFG_PALETTE_ADD("palette", 0x1000)
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_DERIVED( smashdrv, atvtrack )
+MACHINE_CONFIG_DERIVED(smashdrv_state::smashdrv, atvtrack)
 	MCFG_CPU_MODIFY("maincpu")
 	MCFG_CPU_PROGRAM_MAP(smashdrv_main_map)
 	MCFG_CPU_IO_MAP(smashdrv_main_port)

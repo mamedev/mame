@@ -10,9 +10,9 @@ No known undumped carts
 
 	<software name="excitem2">
 		<description>Excite Mahjong 2</description>
-		<info name="serial" value="GPB-110"/>
 		<year>1983</year>
 		<publisher>Casio</publisher>
+		<info name="serial" value="GPB-110"/>
 		<part name="cart" interface="pv2000_cart">
 			<feature name="pcb" value="P115-1A"/>
 			<dataarea name="rom" size="16384">
@@ -79,9 +79,9 @@ No known undumped carts
 
 	<software name="rakugaki">
 		<description>Rakugaki Special</description>
-		<info name="serial" value="GPB-109"/>
 		<year>1983</year>
 		<publisher>Casio</publisher>
+		<info name="serial" value="GPB-109"/>
 		<part name="cart" interface="pv2000_cart">
 			<feature name="pcb" value="P115-1A"/>
 			<dataarea name="rom" size="16384">
@@ -126,10 +126,10 @@ No known undumped carts
 
 	<software name="exjockey">
 		<description>Exciting Jockey</description>
-		<info name="serial" value="GPB-111"/>
-		<info name="alt_title" value="大障害競馬"/>
 		<year>1984</year>
 		<publisher>Casio</publisher>
+		<info name="serial" value="GPB-111"/>
+		<info name="alt_title" value="大障害競馬"/>
 		<part name="cart" interface="pv2000_cart">
 			<feature name="pcb" value="P109-1A"/>
 			<dataarea name="rom" size="16384">
@@ -140,9 +140,9 @@ No known undumped carts
 
 	<software name="basic">
 		<description>Real Number Basic</description>
-		<info name="alt_title" value="実数Basic"/>
 		<year>198?</year>
 		<publisher>Casio</publisher>
+		<info name="alt_title" value="実数Basic"/>
 		<part name="cart" interface="pv2000_cart">
 			<feature name="pcb" value="P115-1A"/>
 			<dataarea name="rom" size="16384">

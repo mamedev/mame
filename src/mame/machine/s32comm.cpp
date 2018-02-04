@@ -84,7 +84,7 @@ DEFINE_DEVICE_TYPE(S32COMM, s32comm_device, "s32comm", "System 32 Communication 
 //  device_add_mconfig - add device configuration
 //-------------------------------------------------
 
-MACHINE_CONFIG_MEMBER( s32comm_device::device_add_mconfig )
+MACHINE_CONFIG_START(s32comm_device::device_add_mconfig)
 MACHINE_CONFIG_END
 
 //**************************************************************************

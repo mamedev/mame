@@ -145,7 +145,7 @@ READ8_MEMBER( namco_06xx_device::ctrl_r )
 
 WRITE8_MEMBER( namco_06xx_device::ctrl_w )
 {
-	LOG("%s: 06XX '%s' control %02x\n",space.machine().describe_context(),tag(),data);
+	LOG("%s: 06XX '%s' control %02x\n",machine().describe_context(),tag(),data);
 
 	m_control = data;
 

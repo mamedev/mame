@@ -1517,7 +1517,7 @@ WRITE64_MEMBER(model3_state::model3_ctrl_w)
 						}
 						break;
 					default:
-						//osd_printf_debug("Lightgun: Unknown command %02X at %08X\n", (uint32_t)(data >> 24), space.device().safe_pc());
+						//osd_printf_debug("Lightgun: Unknown command %02X %s\n", (uint32_t)(data >> 24), machine().describe_context());
 						break;
 				}
 			}
@@ -1544,7 +1544,7 @@ WRITE64_MEMBER(model3_state::model3_ctrl_w)
 
 READ64_MEMBER(model3_state::model3_sys_r)
 {
-//  printf("model3_sys_r: mask %llx @ %x (PC %x)\n", mem_mask, offset, space.device().safe_pc());
+//  printf("model3_sys_r: mask %llx @ %x %s\n", mem_mask, offset, machine().describe_context());
 
 	switch (offset)
 	{
@@ -1569,7 +1569,7 @@ READ64_MEMBER(model3_state::model3_sys_r)
 			else logerror("m3_sys: Unk sys_r @ 0x10: mask = %x\n", (uint32_t)mem_mask);
 			break;
 		case 0x18/8:
-//          printf("read irq_state %x (PC %x)\n", m_irq_state, space.device().safe_pc());
+//          printf("read irq_state %x %s\n", m_irq_state, machine().describe_context());
 			return (uint64_t)m_irq_state<<56 | 0xff000000;
 	}
 
@@ -1884,8 +1884,43 @@ static INPUT_PORTS_START( model3 )
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_JOYSTICK_LEFT ) PORT_8WAY PORT_PLAYER(1)
 
 	PORT_START("IN3")
-	PORT_BIT( 0xff, IP_ACTIVE_LOW, IPT_UNUSED )
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_PLAYER(2)
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_BUTTON2 ) PORT_PLAYER(2)
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_BUTTON3 ) PORT_PLAYER(2)
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_BUTTON4 ) PORT_PLAYER(2)
+	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_JOYSTICK_DOWN ) PORT_8WAY PORT_PLAYER(2)
+	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_JOYSTICK_UP ) PORT_8WAY PORT_PLAYER(2)
+	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_JOYSTICK_RIGHT ) PORT_8WAY PORT_PLAYER(2)
+	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_JOYSTICK_LEFT ) PORT_8WAY PORT_PLAYER(2)
 
+	PORT_START("DSW")
+	PORT_BIT( 0xff, IP_ACTIVE_LOW, IPT_UNUSED )     /* Dip switches */
+INPUT_PORTS_END
+
+static INPUT_PORTS_START( von2 )
+	PORT_INCLUDE( common )
+
+	PORT_START("IN2")
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_NAME("Left Lever Shot Trigger")
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_BUTTON2 ) PORT_NAME("Left Lever Turbo Button")
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_UNUSED )
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_UNUSED )
+	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_JOYSTICKLEFT_DOWN ) PORT_8WAY
+	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_JOYSTICKLEFT_UP ) PORT_8WAY
+	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_JOYSTICKLEFT_RIGHT ) PORT_8WAY
+	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_JOYSTICKLEFT_LEFT ) PORT_8WAY
+
+	PORT_START("IN3")
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_BUTTON3 ) PORT_NAME("Right Lever Shot Trigger")
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_BUTTON4 ) PORT_NAME("Right Lever Turbo Button")
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_UNUSED )
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_UNUSED )
+	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_JOYSTICKRIGHT_DOWN ) PORT_8WAY
+	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_JOYSTICKRIGHT_UP ) PORT_8WAY
+	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_JOYSTICKRIGHT_RIGHT ) PORT_8WAY
+	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_JOYSTICKRIGHT_LEFT ) PORT_8WAY
+
+	// TODO: not here
 	PORT_START("DSW")
 	PORT_BIT( 0xff, IP_ACTIVE_LOW, IPT_UNUSED )     /* Dip switches */
 INPUT_PORTS_END
@@ -5765,7 +5800,7 @@ TIMER_DEVICE_CALLBACK_MEMBER(model3_state::model3_interrupt)
 	}
 }
 
-static MACHINE_CONFIG_START( model3_10 )
+MACHINE_CONFIG_START(model3_state::model3_10)
 	MCFG_CPU_ADD("maincpu", PPC603E, 66000000)
 	MCFG_PPC_BUS_FREQUENCY(66000000)   /* Multiplier 1, Bus = 66MHz, Core = 66MHz */
 	MCFG_CPU_PROGRAM_MAP(model3_10_mem)
@@ -5781,7 +5816,7 @@ static MACHINE_CONFIG_START( model3_10 )
 
 	MCFG_EEPROM_SERIAL_93C46_ADD("eeprom")
 	MCFG_NVRAM_ADD_1FILL("backup")
-	MCFG_DEVICE_ADD("rtc", RTC72421, XTAL_32_768kHz) // internal oscillator
+	MCFG_DEVICE_ADD("rtc", RTC72421, XTAL(32'768)) // internal oscillator
 
 
 	MCFG_SCREEN_ADD("screen", RASTER)
@@ -5813,7 +5848,7 @@ static MACHINE_CONFIG_START( model3_10 )
 	MCFG_LEGACY_SCSI_PORT("scsi")
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_START( model3_15 )
+MACHINE_CONFIG_START(model3_state::model3_15)
 	MCFG_CPU_ADD("maincpu", PPC603E, 100000000)
 	MCFG_PPC_BUS_FREQUENCY(66000000)       /* Multiplier 1.5, Bus = 66MHz, Core = 100MHz */
 	MCFG_CPU_PROGRAM_MAP(model3_mem)
@@ -5827,7 +5862,7 @@ static MACHINE_CONFIG_START( model3_15 )
 
 	MCFG_EEPROM_SERIAL_93C46_ADD("eeprom")
 	MCFG_NVRAM_ADD_1FILL("backup")
-	MCFG_DEVICE_ADD("rtc", RTC72421, XTAL_32_768kHz) // internal oscillator
+	MCFG_DEVICE_ADD("rtc", RTC72421, XTAL(32'768)) // internal oscillator
 
 
 	MCFG_SCREEN_ADD("screen", RASTER)
@@ -5861,7 +5896,7 @@ static MACHINE_CONFIG_START( model3_15 )
 	MCFG_M3COMM_ADD("comm_board")
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_DERIVED(scud, model3_15)
+MACHINE_CONFIG_DERIVED(model3_state::scud, model3_15)
 	MCFG_DSBZ80_ADD(DSBZ80_TAG)
 	MCFG_SOUND_ROUTE(0, "lspeaker", 1.0)
 	MCFG_SOUND_ROUTE(1, "rspeaker", 1.0)
@@ -5874,7 +5909,7 @@ static MACHINE_CONFIG_DERIVED(scud, model3_15)
 	MCFG_DEVCB_CHAIN_OUTPUT(DEVWRITELINE("uart", i8251_device, write_rxc))
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_START(model3_20)
+MACHINE_CONFIG_START(model3_state::model3_20)
 	MCFG_CPU_ADD("maincpu", PPC603R, 166000000)
 	MCFG_PPC_BUS_FREQUENCY(66000000)    /* Multiplier 2.5, Bus = 66MHz, Core = 166MHz */
 	MCFG_CPU_PROGRAM_MAP(model3_mem)
@@ -5888,7 +5923,7 @@ static MACHINE_CONFIG_START(model3_20)
 
 	MCFG_EEPROM_SERIAL_93C46_ADD("eeprom")
 	MCFG_NVRAM_ADD_1FILL("backup")
-	MCFG_DEVICE_ADD("rtc", RTC72421, XTAL_32_768kHz) // internal oscillator
+	MCFG_DEVICE_ADD("rtc", RTC72421, XTAL(32'768)) // internal oscillator
 
 
 	MCFG_SCREEN_ADD("screen", RASTER)
@@ -5914,12 +5949,12 @@ static MACHINE_CONFIG_START(model3_20)
 	MCFG_M3COMM_ADD("comm_board")
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_DERIVED(model3_20_5881, model3_20)
+MACHINE_CONFIG_DERIVED(model3_state::model3_20_5881, model3_20)
 	MCFG_DEVICE_ADD("315_5881", SEGA315_5881_CRYPT, 0)
 	MCFG_SET_READ_CALLBACK(model3_state, crypt_read_callback)
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_START(model3_21)
+MACHINE_CONFIG_START(model3_state::model3_21)
 	MCFG_CPU_ADD("maincpu", PPC603R, 166000000)
 	MCFG_PPC_BUS_FREQUENCY(66000000)    /* Multiplier 2.5, Bus = 66MHz, Core = 166MHz */
 	MCFG_CPU_PROGRAM_MAP(model3_mem)
@@ -5933,7 +5968,7 @@ static MACHINE_CONFIG_START(model3_21)
 
 	MCFG_EEPROM_SERIAL_93C46_ADD("eeprom")
 	MCFG_NVRAM_ADD_1FILL("backup")
-	MCFG_DEVICE_ADD("rtc", RTC72421, XTAL_32_768kHz) // internal oscillator
+	MCFG_DEVICE_ADD("rtc", RTC72421, XTAL(32'768)) // internal oscillator
 
 
 	MCFG_SCREEN_ADD("screen", RASTER)
@@ -5974,7 +6009,7 @@ uint16_t model3_state::crypt_read_callback(uint32_t addr)
 	return dat;
 }
 
-static MACHINE_CONFIG_DERIVED( model3_21_5881, model3_21 )
+MACHINE_CONFIG_DERIVED(model3_state::model3_21_5881, model3_21)
 	MCFG_DEVICE_ADD("315_5881", SEGA315_5881_CRYPT, 0)
 	MCFG_SET_READ_CALLBACK(model3_state, crypt_read_callback)
 MACHINE_CONFIG_END
@@ -6393,7 +6428,7 @@ GAME( 1997, vs215,        vs2, model3_15, model3,   model3_state,    vs215, ROT0
 GAME( 1997, vs215o,       vs2, model3_15, model3,   model3_state,    vs215, ROT0, "Sega", "Virtua Striker 2 (Step 1.5, older)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND )
 GAME( 1997, lemans24,       0, model3_15, scud,     model3_state, lemans24, ROT0, "Sega", "Le Mans 24 (Revision B)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND )
 GAME( 1998, vs29815,    vs298, model3_15, model3,   model3_state,  vs29815, ROT0, "Sega", "Virtua Striker 2 '98 (Step 1.5)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND )
-GAME( 1999, vs29915,  vs2v991, model3_15, model3,   model3_state,    vs215, ROT0, "Sega", "Virtua Striker 2 '99 (Step 1.5)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND )
+GAME( 1998, vs29915,  vs2v991, model3_15, model3,   model3_state,    vs215, ROT0, "Sega", "Virtua Striker 2 '99 (Step 1.5)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND )
 
 /* Model 3 Step 2.0 */
 GAME( 1997, vs2,            0, model3_20,      model3,   model3_state,      vs2, ROT0, "Sega", "Virtua Striker 2 (Step 2.0)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND )
@@ -6404,15 +6439,15 @@ GAME( 1998, oceanhun,       0, model3_20_5881, model3,   model3_state, oceanhun,
 GAME( 1998, skichamp,       0, model3_20,      skichamp, model3_state, skichamp, ROT0, "Sega", "Ski Champ (Japan)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND )
 GAME( 1998, srally2,        0, model3_20,      scud,     model3_state,  srally2, ROT0, "Sega", "Sega Rally 2", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND )
 GAME( 1998, srally2x,       0, model3_20,      scud,     model3_state,  srally2, ROT0, "Sega", "Sega Rally 2 DX", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND )
-GAME( 1998, von2,           0, model3_20_5881, model3,   model3_state,     von2, ROT0, "Sega", "Virtual On 2: Oratorio Tangram (Revision B)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND )
-GAME( 1998, von2a,       von2, model3_20_5881, model3,   model3_state,     von2, ROT0, "Sega", "Virtual On 2: Oratorio Tangram (Revision A)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND )
-GAME( 1998, von254g,     von2, model3_20_5881, model3,   model3_state,     von2, ROT0, "Sega", "Virtual On 2: Oratorio Tangram (ver 5.4g)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND )
+GAME( 1998, von2,           0, model3_20_5881, von2,     model3_state,     von2, ROT0, "Sega", "Virtual On 2: Oratorio Tangram (Revision B)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND )
+GAME( 1998, von2a,       von2, model3_20_5881, von2,     model3_state,     von2, ROT0, "Sega", "Virtual On 2: Oratorio Tangram (Revision A)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND )
+GAME( 1998, von254g,     von2, model3_20_5881, von2,     model3_state,     von2, ROT0, "Sega", "Virtual On 2: Oratorio Tangram (ver 5.4g)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND )
 GAME( 1998, fvipers2,       0, model3_20_5881, model3,   model3_state,    vs299, ROT0, "Sega", "Fighting Vipers 2 (Japan, Revision A)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND )
 GAME( 1998, vs298,          0, model3_20_5881, model3,   model3_state,    vs298, ROT0, "Sega", "Virtua Striker 2 '98 (Step 2.0)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND )
-GAME( 1999, vs2v991,        0, model3_20_5881, model3,   model3_state,    vs299, ROT0, "Sega", "Virtua Striker 2 '99.1 (Revision B)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND )
-GAME( 1999, vs299b,   vs2v991, model3_20_5881, model3,   model3_state,    vs299, ROT0, "Sega", "Virtua Striker 2 '99 (Revision B)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND )
-GAME( 1999, vs299a,   vs2v991, model3_20_5881, model3,   model3_state,    vs299, ROT0, "Sega", "Virtua Striker 2 '99 (Revision A)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND )
-GAME( 1999, vs299,    vs2v991, model3_20_5881, model3,   model3_state,    vs299, ROT0, "Sega", "Virtua Striker 2 '99", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND )
+GAME( 1998, vs2v991,        0, model3_20_5881, model3,   model3_state,    vs299, ROT0, "Sega", "Virtua Striker 2 '99.1 (Revision B)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND )
+GAME( 1998, vs299b,   vs2v991, model3_20_5881, model3,   model3_state,    vs299, ROT0, "Sega", "Virtua Striker 2 '99 (Revision B)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND )
+GAME( 1998, vs299a,   vs2v991, model3_20_5881, model3,   model3_state,    vs299, ROT0, "Sega", "Virtua Striker 2 '99 (Revision A)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND )
+GAME( 1998, vs299,    vs2v991, model3_20_5881, model3,   model3_state,    vs299, ROT0, "Sega", "Virtua Striker 2 '99", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND )
 
 /* Model 3 Step 2.1 */
 GAME( 1998, daytona2,         0, model3_21_5881, daytona2, model3_state, daytona2, ROT0, "Sega", "Daytona USA 2 (Revision A)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND )
@@ -6423,7 +6458,7 @@ GAME( 1998, dirtdvlsj, dirtdvls, model3_21_5881, scud,     model3_state, dirtdvl
 GAME( 1998, swtrilgy,         0, model3_21_5881, swtrilgy, model3_state, swtrilgy, ROT0, "Sega / LucasArts", "Star Wars Trilogy Arcade (Revision A)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND )
 GAME( 1998, swtrilgya, swtrilgy, model3_21_5881, swtrilgy, model3_state, swtrilga, ROT0, "Sega / LucasArts", "Star Wars Trilogy Arcade", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND )
 GAME( 1998, spikeout,         0, model3_21_5881, model3,   model3_state, spikeout, ROT0, "Sega", "Spikeout (Revision C)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND )
-GAME( 1998, spikeofe,         0, model3_21_5881, model3,   model3_state, spikeofe, ROT0, "Sega", "Spikeout Final Edition", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND )
+GAME( 1999, spikeofe,         0, model3_21_5881, model3,   model3_state, spikeofe, ROT0, "Sega", "Spikeout Final Edition", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND )
 GAME( 1998, magtruck,         0, model3_21_5881, eca,      model3_state, magtruck, ROT0, "Sega", "Magical Truck Adventure (Japan)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND )
 GAME( 1999, eca,              0, model3_21_5881, eca,      model3_state, eca,      ROT0, "Sega", "Emergency Call Ambulance (Export)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND )
 GAME( 1999, ecau,           eca, model3_21_5881, eca,      model3_state, eca,      ROT0, "Sega", "Emergency Call Ambulance (USA)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND )

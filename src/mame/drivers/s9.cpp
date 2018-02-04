@@ -78,6 +78,7 @@ public:
 	DECLARE_INPUT_CHANGED_MEMBER(audio_nmi);
 	DECLARE_MACHINE_RESET(s9);
 	DECLARE_DRIVER_INIT(s9);
+	void s9(machine_config &config);
 private:
 	uint8_t m_sound_data;
 	uint8_t m_strobe;
@@ -310,9 +311,9 @@ DRIVER_INIT_MEMBER( s9_state, s9 )
 	m_irq_timer->adjust(attotime::from_ticks(980,1e6),1);
 }
 
-static MACHINE_CONFIG_START( s9 )
+MACHINE_CONFIG_START(s9_state::s9)
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", M6808, XTAL_4MHz)
+	MCFG_CPU_ADD("maincpu", M6808, XTAL(4'000'000))
 	MCFG_CPU_PROGRAM_MAP(s9_main_map)
 	MCFG_MACHINE_RESET_OVERRIDE(s9_state, s9)
 
@@ -357,7 +358,7 @@ static MACHINE_CONFIG_START( s9 )
 	MCFG_NVRAM_ADD_0FILL("nvram")
 
 	/* Add the soundcard */
-	MCFG_CPU_ADD("audiocpu", M6808, XTAL_4MHz)
+	MCFG_CPU_ADD("audiocpu", M6808, XTAL(4'000'000))
 	MCFG_CPU_PROGRAM_MAP(s9_audio_map)
 
 	MCFG_SPEAKER_STANDARD_MONO("speaker")

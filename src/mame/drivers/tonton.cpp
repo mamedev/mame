@@ -2,7 +2,7 @@
 // copyright-holders:Angelo Salese, Roberto Fresca
 /**************************************************************************
 
-  Waku Waku Doubutsu Land TonTon (c) 199? Success.
+  Waku Waku Doubutsu Land TonTon (c) 1987 Success.
 
   HW based off MSX2
 
@@ -43,15 +43,17 @@ public:
 
 	required_device<v9938_device> m_v9938;
 	DECLARE_WRITE8_MEMBER(tonton_outport_w);
+	DECLARE_WRITE8_MEMBER(hopper_w);
 	DECLARE_WRITE8_MEMBER(ay_aout_w);
 	DECLARE_WRITE8_MEMBER(ay_bout_w);
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
 	required_device<cpu_device> m_maincpu;
 	required_device<ticket_dispenser_device> m_hopper;
+	void tonton(machine_config &config);
 };
 
-#define MAIN_CLOCK      XTAL_21_4772MHz
+#define MAIN_CLOCK      XTAL(21'477'272)
 #define CPU_CLOCK       MAIN_CLOCK/6
 #define YM2149_CLOCK    MAIN_CLOCK/6/2  // '/SEL' pin tied to GND, so internal divisor x2 is active
 
@@ -67,12 +69,16 @@ WRITE8_MEMBER(tonton_state::tonton_outport_w)
 {
 	machine().bookkeeping().coin_counter_w(offset, data & 0x01);
 	machine().bookkeeping().coin_lockout_global_w(data & 0x02);  /* Coin Lock */
-	m_hopper->write(space, 0, (data & 0x02));    /* Hopper Motor */
 
 //  if(data & 0xfe)
 //      logerror("%02x %02x\n",data,offset);
 	if (data)
-		logerror("tonton_outport_w %02X @ %04X\n", data, space.device().safe_pc());
+		logerror("tonton_outport_w %02X @ %04X\n", data, m_maincpu->pc());
+}
+
+WRITE8_MEMBER(tonton_state::hopper_w)
+{
+	m_hopper->motor_w(BIT(data, 1));
 }
 
 
@@ -91,7 +97,7 @@ static ADDRESS_MAP_START( tonton_io, AS_IO, 8, tonton_state )
 	AM_RANGE(0x00, 0x00) AM_READ_PORT("IN0")
 	AM_RANGE(0x00, 0x00) AM_WRITE(tonton_outport_w)
 	AM_RANGE(0x01, 0x01) AM_READ_PORT("IN1")
-	AM_RANGE(0x01, 0x01) AM_WRITENOP    // write the same to outport 00h
+	AM_RANGE(0x01, 0x01) AM_WRITE(hopper_w)
 	AM_RANGE(0x02, 0x02) AM_READ_PORT("DSW1")
 	AM_RANGE(0x03, 0x03) AM_READ_PORT("DSW2")
 	AM_RANGE(0x88, 0x8b) AM_DEVREADWRITE( "v9938", v9938_device, read, write )
@@ -210,7 +216,7 @@ WRITE8_MEMBER(tonton_state::ay_bout_w)
 *                 Machine Driver                 *
 *************************************************/
 
-static MACHINE_CONFIG_START( tonton )
+MACHINE_CONFIG_START(tonton_state::tonton)
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu",Z80, CPU_CLOCK)  /* Guess. According to other MSX2 based gambling games */
@@ -225,7 +231,7 @@ static MACHINE_CONFIG_START( tonton )
 	MCFG_V99X8_INTERRUPT_CALLBACK(INPUTLINE("maincpu", 0))
 	MCFG_V99X8_SCREEN_ADD_NTSC("screen", "v9938", MAIN_CLOCK)
 
-	MCFG_TICKET_DISPENSER_ADD("hopper", attotime::from_msec(HOPPER_PULSE), TICKET_MOTOR_ACTIVE_LOW, TICKET_STATUS_ACTIVE_LOW )
+	MCFG_TICKET_DISPENSER_ADD("hopper", attotime::from_msec(HOPPER_PULSE), TICKET_MOTOR_ACTIVE_HIGH, TICKET_STATUS_ACTIVE_LOW )
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
@@ -256,5 +262,5 @@ ROM_START( tonton )
 ROM_END
 
 
-//    YEAR  NAME     PARENT  MACHINE  INPUT   STATE         INIT  ROT   COMPANY                   FULLNAME                                  FLAGS
-GAME( 199?, tonton,  0,      tonton,  tonton, tonton_state, 0,    ROT0, "Success / Taiyo Jidoki", "Waku Waku Doubutsu Land TonTon (Japan)", 0 )
+//    YEAR  NAME     PARENT  MACHINE  INPUT   STATE         INIT  ROT    COMPANY                   FULLNAME                                 FLAGS
+GAME( 1987, tonton,  0,      tonton,  tonton, tonton_state, 0,    ROT0, "Success / Taiyo Jidoki", "Waku Waku Doubutsu Land TonTon (Japan)", 0 )

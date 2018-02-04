@@ -48,7 +48,7 @@
 
 
 
-DEFINE_DEVICE_TYPE(PHOENIX, phoenix_sound_device, "phoenix_sound", "Phoenix Audio Custom")
+DEFINE_DEVICE_TYPE(PHOENIX, phoenix_sound_device, "phoenix_sound", "Phoenix Custom Sound")
 
 phoenix_sound_device::phoenix_sound_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
 	: device_t(mconfig, PHOENIX, tag, owner, clock)

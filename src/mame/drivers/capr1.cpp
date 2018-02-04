@@ -20,7 +20,11 @@ TODO:
   * unknown reads and writes
   * should have a rombank somewhere
   * what causes the nmi?
-  * where's adpcm hooked up?
+  * what kind of device lives at C008-C009 and C00C-C00D? looks like a
+    Mitsubishi M66300 Parallel-In Serial-Out Data Buffer with FIFO
+    (each is initialized with 80 to control port, then operated by writing
+    0A, 08, 00 to control port and transferring five bytes from memory to
+    the data port, finishing by writing 01 to the control port)
   * 2 players, 1 7seg led on each cpanel, 3 7seg leds on cranes
 - get more dumps, find out technical differences between games and document them
 - the rest can come later
@@ -46,6 +50,7 @@ public:
 	DECLARE_WRITE8_MEMBER(output_w);
 
 	required_device<cpu_device> m_maincpu;
+	void cspin2(machine_config &config);
 };
 
 WRITE8_MEMBER(capr1_state::output_w)
@@ -63,11 +68,11 @@ WRITE8_MEMBER(capr1_state::output_w)
 static ADDRESS_MAP_START( cspin2_map, AS_PROGRAM, 8, capr1_state )
 	AM_RANGE(0x0000, 0x7fff) AM_ROM
 	AM_RANGE(0x8000, 0x9fff) AM_RAM
-	AM_RANGE(0xa000, 0xa01f) AM_DEVREADWRITE("te7750", te7750_device, read, write)
+	AM_RANGE(0xa000, 0xa00f) AM_DEVREADWRITE("te7750", te7750_device, read, write)
 	AM_RANGE(0xc000, 0xc001) AM_DEVREADWRITE("ym", ym2203_device, read, write)
 	AM_RANGE(0xc004, 0xc004) AM_DEVREADWRITE("oki", okim6295_device, read, write)
-//  AM_RANGE(0xc008, 0xc009) AM_WRITENOP
-//  AM_RANGE(0xc00c, 0xc00d) AM_WRITENOP
+//  AM_RANGE(0xc008, 0xc009) AM_DEVWRITE("fifo1", m66300_device, write)
+//  AM_RANGE(0xc00c, 0xc00d) AM_DEVWRITE("fifo2", m66300_device, write)
 //  AM_RANGE(0xe000, 0xe001) AM_WRITENOP
 //  AM_RANGE(0xe002, 0xe004) AM_WRITENOP
 ADDRESS_MAP_END
@@ -191,7 +196,7 @@ INPUT_PORTS_END
 
 ***************************************************************************/
 
-static MACHINE_CONFIG_START( cspin2 )
+MACHINE_CONFIG_START(capr1_state::cspin2)
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", Z80, 4000000) // clock frequency unknown

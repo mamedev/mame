@@ -296,7 +296,7 @@ INPUT_PORTS_START( segasp )
 
 INPUT_PORTS_END
 
-static MACHINE_CONFIG_DERIVED( segasp, naomi_aw_base )
+MACHINE_CONFIG_DERIVED(segasp_state::segasp, naomi_aw_base)
 	MCFG_CPU_MODIFY("maincpu")
 	MCFG_CPU_PROGRAM_MAP(segasp_map)
 	MCFG_CPU_IO_MAP(onchip_port)
@@ -324,7 +324,7 @@ MACHINE_CONFIG_END
 	ROM_LOAD16_WORD( "mb_serial.ic57", 0x0000, 0x0080, CRC(e1e3c009) SHA1(66bc636c527389c3338f631d78c788b4bd4e93be) )
 
 // net_firm_119.ic72 - Network/Media Board firmware VER 1.19(VxWorks), 1st half contain original 1.10 version
-// fpr-24407.ic72 - version 1.25 
+// fpr-24407.ic72 - version 1.25
 #define SEGASP_NETFIRM \
 	ROM_REGION( 0x200000, "netcpu", 0) \
 	ROM_LOAD( "net_eeprom.ic74s",  0x00000000,    0x200, CRC(77cc5a6c) SHA1(cbfba546256b70bce6c6fd0030d7e2e410a25526) ) \

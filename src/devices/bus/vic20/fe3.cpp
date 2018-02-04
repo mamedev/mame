@@ -86,7 +86,7 @@ const tiny_rom_entry *vic20_final_expansion_3_device::device_rom_region() const
 //  device_add_mconfig - add device configuration
 //-------------------------------------------------
 
-MACHINE_CONFIG_MEMBER( vic20_final_expansion_3_device::device_add_mconfig )
+MACHINE_CONFIG_START(vic20_final_expansion_3_device::device_add_mconfig)
 	MCFG_AMD_29F040_ADD(AM29F040_TAG)
 MACHINE_CONFIG_END
 

@@ -120,6 +120,7 @@ public:
 
 	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	void draw_circles(bitmap_ind16 &bitmap);
+	void warpspeed(machine_config &config);
 };
 
 WRITE8_MEMBER(warpspeed_state::hardware_w)
@@ -315,10 +316,10 @@ PALETTE_INIT_MEMBER(warpspeed_state, warpspeed)
 	}
 }
 
-static MACHINE_CONFIG_START( warpspeed )
+MACHINE_CONFIG_START(warpspeed_state::warpspeed)
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", Z80, XTAL_5MHz/2)
+	MCFG_CPU_ADD("maincpu", Z80, XTAL(5'000'000)/2)
 	MCFG_CPU_PROGRAM_MAP(warpspeed_map)
 	MCFG_CPU_IO_MAP(warpspeed_io_map)
 	MCFG_CPU_VBLANK_INT_DRIVER("screen", warpspeed_state,  irq0_line_hold)

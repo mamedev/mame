@@ -14,8 +14,8 @@ TK80 (Training Kit 80) considered to be Japan's first home computer.
 It consisted of 25 keys and 8 LED digits, and was programmed in hex.
 The Mikrolab is a Russian clone which appears to be almost completely identical.
 
-TK85 seems to be the same as TK80, except is has a larger ROM. No
-schematics etc are available. Thanks to 'Nama' who dumped the rom.
+TK85 seems to be the same as TK80, except it has a 8085 and a larger ROM.
+No schematics etc are available. Thanks to 'Nama' who dumped the rom.
 It has 25 keys, so a few aren't defined yet.
 
 ND-80Z : http://www.alles.or.jp/~thisida/nd80z3syokai.html (newer version)
@@ -75,6 +75,11 @@ public:
 	uint8_t m_shift_press_flag;
 	uint8_t m_ppi_portc;
 	required_device<cpu_device> m_maincpu;
+	void ics8080(machine_config &config);
+	void tk80(machine_config &config);
+	void mikrolab(machine_config &config);
+	void nd80z(machine_config &config);
+	void tk85(machine_config &config);
 };
 
 
@@ -248,9 +253,9 @@ WRITE8_MEMBER( tk80_state::mikrolab_serial_w )
 	m_ppi_portc = data;
 }
 
-static MACHINE_CONFIG_START( tk80 )
+MACHINE_CONFIG_START(tk80_state::tk80)
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu",I8080, XTAL_1MHz) // 18.432 / 9
+	MCFG_CPU_ADD("maincpu", I8080A, XTAL(18'432'000) / 9)
 	MCFG_CPU_PROGRAM_MAP(tk80_mem)
 	MCFG_CPU_IO_MAP(tk80_io)
 
@@ -264,7 +269,7 @@ static MACHINE_CONFIG_START( tk80 )
 	MCFG_I8255_OUT_PORTC_CB(WRITE8(tk80_state, serial_w))
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_DERIVED( mikrolab, tk80 )
+MACHINE_CONFIG_DERIVED(tk80_state::mikrolab, tk80)
 	MCFG_CPU_MODIFY("maincpu")
 	MCFG_CPU_PROGRAM_MAP(tk85_mem)
 	MCFG_CPU_IO_MAP(mikrolab_io)
@@ -277,8 +282,8 @@ static MACHINE_CONFIG_DERIVED( mikrolab, tk80 )
 	MCFG_I8255_OUT_PORTC_CB(WRITE8(tk80_state, mikrolab_serial_w))
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_START( nd80z )
-	MCFG_CPU_ADD("maincpu", Z80, XTAL_1MHz) // Sharp LH0080A, can't see writing on xtal
+MACHINE_CONFIG_START(tk80_state::nd80z)
+	MCFG_CPU_ADD("maincpu", Z80, XTAL(1'000'000)) // Sharp LH0080A, can't see writing on xtal
 	MCFG_CPU_PROGRAM_MAP(tk85_mem)
 	MCFG_CPU_IO_MAP(nd80z_io)
 
@@ -292,12 +297,13 @@ static MACHINE_CONFIG_START( nd80z )
 	MCFG_I8255_OUT_PORTC_CB(WRITE8(tk80_state, mikrolab_serial_w))
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_DERIVED( tk85, tk80 )
-	MCFG_CPU_MODIFY("maincpu")
+MACHINE_CONFIG_DERIVED(tk80_state::tk85, tk80)
+	MCFG_CPU_REPLACE("maincpu", I8085A, XTAL(4'915'200))
 	MCFG_CPU_PROGRAM_MAP(tk85_mem)
+	MCFG_CPU_IO_MAP(tk80_io)
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_DERIVED( ics8080, tk80 )
+MACHINE_CONFIG_DERIVED(tk80_state::ics8080, tk80)
 	MCFG_CPU_MODIFY("maincpu")
 	MCFG_CPU_PROGRAM_MAP(ics8080_mem)
 MACHINE_CONFIG_END

@@ -108,6 +108,8 @@ WRITE8_MEMBER(ssozumo_state::scroll_w)
 WRITE8_MEMBER(ssozumo_state::flipscreen_w)
 {
 	flip_screen_set(data & 0x80);
+	m_color_bank = data & 3;
+	m_fg_tilemap->mark_all_dirty();
 }
 
 TILE_GET_INFO_MEMBER(ssozumo_state::get_bg_tile_info)
@@ -122,9 +124,8 @@ TILE_GET_INFO_MEMBER(ssozumo_state::get_bg_tile_info)
 TILE_GET_INFO_MEMBER(ssozumo_state::get_fg_tile_info)
 {
 	int code = m_videoram2[tile_index] + 256 * (m_colorram2[tile_index] & 0x07);
-	int color = (m_colorram2[tile_index] & 0x30) >> 4;
 
-	SET_TILE_INFO_MEMBER(0, code, color, 0);
+	SET_TILE_INFO_MEMBER(0, code, m_color_bank, 0);
 }
 
 void ssozumo_state::video_start()

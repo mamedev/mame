@@ -106,6 +106,8 @@ public:
 	void lorddgun_calc_gun_scr(int i);
 	void lordgun_update_gun(int i);
 	void draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprect);
+	void aliencha(machine_config &config);
+	void lordgun(machine_config &config);
 };
 
 /*----------- defined in video/lordgun.c -----------*/

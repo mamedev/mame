@@ -156,6 +156,7 @@ public:
 	required_device<palette_device> m_palette;
 	UPD7220_DISPLAY_PIXELS_MEMBER( hgdc_display_pixels );
 	UPD7220_DRAW_TEXT_LINE_MEMBER( hgdc_draw_text );
+	void qx10(machine_config &config);
 };
 
 UPD7220_DISPLAY_PIXELS_MEMBER( qx10_state::hgdc_display_pixels )
@@ -665,7 +666,7 @@ static SLOT_INTERFACE_START(keyboard)
 	SLOT_INTERFACE("qx10", QX10_KEYBOARD)
 SLOT_INTERFACE_END
 
-static MACHINE_CONFIG_START( qx10 )
+MACHINE_CONFIG_START(qx10_state::qx10)
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu",Z80, MAIN_CLK / 4)
 	MCFG_CPU_PROGRAM_MAP(qx10_mem)
@@ -751,7 +752,7 @@ static MACHINE_CONFIG_START( qx10 )
 	MCFG_UPD7220_DRAW_TEXT_CALLBACK_OWNER(qx10_state, hgdc_draw_text)
 	MCFG_VIDEO_SET_SCREEN("screen")
 
-	MCFG_MC146818_ADD( "rtc", XTAL_32_768kHz )
+	MCFG_MC146818_ADD( "rtc", XTAL(32'768) )
 	MCFG_MC146818_IRQ_HANDLER(DEVWRITELINE("pic8259_slave", pic8259_device, ir2_w))
 	MCFG_UPD765A_ADD("upd765", true, true)
 	MCFG_UPD765_INTRQ_CALLBACK(WRITELINE(qx10_state, qx10_upd765_interrupt))

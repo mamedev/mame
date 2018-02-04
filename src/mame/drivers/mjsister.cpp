@@ -91,6 +91,7 @@ public:
 	void plot0( int offset, uint8_t data );
 	void plot1( int offset, uint8_t data );
 
+	void mjsister(machine_config &config);
 protected:
 	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr) override;
 
@@ -327,8 +328,8 @@ static ADDRESS_MAP_START( mjsister_io_map, AS_IO, 8, mjsister_state )
 	AM_RANGE(0x12, 0x12) AM_DEVWRITE("aysnd", ay8910_device, data_w)
 	AM_RANGE(0x20, 0x20) AM_READ(keys_r)
 	AM_RANGE(0x21, 0x21) AM_READ_PORT("IN0")
-	AM_RANGE(0x30, 0x30) AM_DEVWRITE("mainlatch1", ls259_device, write_nibble)
-	AM_RANGE(0x31, 0x31) AM_DEVWRITE("mainlatch2", ls259_device, write_nibble)
+	AM_RANGE(0x30, 0x30) AM_DEVWRITE("mainlatch1", ls259_device, write_nibble_d0)
+	AM_RANGE(0x31, 0x31) AM_DEVWRITE("mainlatch2", ls259_device, write_nibble_d0)
 	AM_RANGE(0x32, 0x32) AM_WRITE(input_sel1_w)
 	AM_RANGE(0x33, 0x33) AM_WRITE(input_sel2_w)
 	AM_RANGE(0x34, 0x34) AM_WRITE(dac_adr_s_w)
@@ -484,7 +485,7 @@ INTERRUPT_GEN_MEMBER(mjsister_state::interrupt)
 		m_maincpu->set_input_line(0, ASSERT_LINE);
 }
 
-static MACHINE_CONFIG_START( mjsister )
+MACHINE_CONFIG_START(mjsister_state::mjsister)
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", Z80, MCLK/2) /* 6.000 MHz */

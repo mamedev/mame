@@ -80,6 +80,7 @@ public:
 	TIMER_DEVICE_CALLBACK_MEMBER(kongambl_vblank);
 	K056832_CB_MEMBER(tile_callback);
 	K053246_CB_MEMBER(sprite_callback);
+	void kongambl(machine_config &config);
 };
 
 
@@ -186,13 +187,13 @@ WRITE8_MEMBER(kongambl_state::eeprom_w)
 
 READ32_MEMBER(kongambl_state::test_r)
 {
-	return -1;//space.machine().rand();
+	return -1;//machine().rand();
 }
 
 /*
  READ32_MEMBER(kongambl_state::rng_r)
 {
-    return space.machine().rand();
+    return machine().rand();
 }
 */
 
@@ -220,15 +221,15 @@ static ADDRESS_MAP_START( kongambl_map, AS_PROGRAM, 32, kongambl_state )
 
 	//0x400000 0x400001 "13M" even addresses
 	//0x400002,0x400003 "13J" odd addresses
-	AM_RANGE(0x400000, 0x401fff) AM_DEVREAD("k056832", k056832_device, rom_long_r)
-	AM_RANGE(0x420000, 0x43ffff) AM_DEVREADWRITE("k056832", k056832_device, unpaged_ram_long_r, unpaged_ram_long_w)
+//  AM_RANGE(0x400000, 0x401fff) AM_DEVREAD("k056832", k056832_device, rom_long_r)
+//  AM_RANGE(0x420000, 0x43ffff) AM_DEVREADWRITE("k056832", k056832_device, unpaged_ram_long_r, unpaged_ram_long_w)
 	AM_RANGE(0x480000, 0x48003f) AM_DEVWRITE("k056832", k056832_device, long_w)
 
 
 
 	AM_RANGE(0x440000, 0x443fff) AM_RAM // OBJ RAM
 
-	AM_RANGE(0x460000, 0x47ffff) AM_RAM_DEVWRITE("palette", palette_device, write) AM_SHARE("palette")
+	AM_RANGE(0x460000, 0x47ffff) AM_RAM_DEVWRITE("palette", palette_device, write32) AM_SHARE("palette")
 
 	AM_RANGE(0x4b0000, 0x4b001f) AM_DEVREADWRITE8("k053252", k053252_device, read, write, 0xff00ff00)
 
@@ -242,11 +243,11 @@ static ADDRESS_MAP_START( kongambl_map, AS_PROGRAM, 32, kongambl_state )
 
 	AM_RANGE(0x4d0000, 0x4d0003) AM_WRITE8(kongambl_ff_w,0xff000000)
 
-	AM_RANGE(0x500380, 0x500383) AM_READ(test_r)
 	AM_RANGE(0x500000, 0x5007ff) AM_RAM
-	AM_RANGE(0x500400, 0x500403) AM_NOP //dual port?
-	AM_RANGE(0x500420, 0x500423) AM_NOP //dual port?
-	AM_RANGE(0x500500, 0x500503) AM_NOP // reads sound ROM in here, polled from m68k?
+	AM_RANGE(0x500380, 0x500383) AM_READ(test_r)
+//	AM_RANGE(0x500400, 0x500403) AM_NOP //dual port?
+//	AM_RANGE(0x500420, 0x500423) AM_NOP //dual port?
+//	AM_RANGE(0x500500, 0x500503) AM_NOP // reads sound ROM in here, polled from m68k?
 	AM_RANGE(0x580000, 0x580007) AM_READ(test_r)
 
 	AM_RANGE(0x600000, 0x60000f) AM_READ(test_r)
@@ -634,7 +635,7 @@ TIMER_DEVICE_CALLBACK_MEMBER(kongambl_state::kongambl_vblank)
 
 }
 
-static MACHINE_CONFIG_START( kongambl )
+MACHINE_CONFIG_START(kongambl_state::kongambl)
 	MCFG_CPU_ADD("maincpu", M68EC020, 25000000)
 	MCFG_CPU_PROGRAM_MAP(kongambl_map)
 	MCFG_TIMER_DRIVER_ADD_SCANLINE("scantimer", kongambl_state, kongambl_vblank, "screen", 0, 1)

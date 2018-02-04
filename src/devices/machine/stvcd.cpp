@@ -100,7 +100,7 @@ int saturn_state::get_track_index(uint32_t fad)
 
 int saturn_state::sega_cdrom_get_adr_control(cdrom_file *file, int track)
 {
-	return BITSWAP8(cdrom_get_adr_control(file, cur_track),3,2,1,0,7,6,5,4);
+	return bitswap<8>(cdrom_get_adr_control(file, cur_track),3,2,1,0,7,6,5,4);
 }
 
 void saturn_state::cr_standard_return(uint16_t cur_status)
@@ -608,9 +608,9 @@ void saturn_state::cd_exec_command( void )
 				}
 				else
 				{
-					if (parm < 0x24)
+					if (parm < MAX_FILTERS)
 					{
-						cddevice = &filters[(cr3>>8)];
+						cddevice = &filters[parm];
 					}
 				}
 
@@ -1229,7 +1229,7 @@ void saturn_state::cd_exec_command( void )
 
 //          read_dir = ((cr3&0xff)<<16)|cr4;
 
-			if((cr3 >> 8) < 0x24)
+			if((cr3 >> 8) < MAX_FILTERS)
 				cddevice = &filters[cr3 >> 8];
 			else
 				cddevice = (filterT *)nullptr;
@@ -1324,7 +1324,7 @@ void saturn_state::cd_exec_command( void )
 			cd_stat = CD_STAT_PLAY|0x80;    // set "cd-rom" bit
 			cd_curfad = (curdir[file_id].firstfad + file_offset);
 			fadstoplay = file_size;
-			if(file_filter < 0x24)
+			if(file_filter < MAX_FILTERS)
 				cddevice = &filters[file_filter];
 			else
 				cddevice = (filterT *)nullptr;
@@ -1383,7 +1383,7 @@ void saturn_state::cd_exec_command( void )
 			if(cr2 == 0x0001) // MPEG card
 				cr2 = 0x2;
 			else
-				cr2 = 0x4;    // 0 = No CD, 1 = Audio CD, 2 Regular Data disk (not Saturn), 3 pirate disc, 4 Saturn disc 
+				cr2 = 0x4;    // 0 = No CD, 1 = Audio CD, 2 Regular Data disk (not Saturn), 3 pirate disc, 4 Saturn disc
 			cr3 = 0;
 			cr4 = 0;
 			hirqreg |= (CMOK);
@@ -1410,19 +1410,19 @@ void saturn_state::cd_exec_command( void )
 			cr4 = 0;
 			hirqreg |= (CMOK);
 			break;
-			
+
 		// MPEG init
 		case 0x93:
 			hirqreg |= (CMOK|MPED);
 			if(cr2 == 0x0001)
 				hirqreg |= (MPCM);
-			
+
 			cr1 = cd_stat;
 			cr2 = 0;
 			cr3 = 0;
 			cr4 = 0;
 			break;
-			
+
 		default:
 			CDROM_LOG(("CD: Unknown command %04x\n", cr1>>8))
 			popmessage("CD Block unknown command %02x, contact MAMEdev",cr1>>8);
@@ -1520,9 +1520,9 @@ void saturn_state::stvcd_reset( void )
 	}
 
 	// open device
-	if (cdrom)
+	//if (cdrom)
 	{
-		cdrom_close(cdrom);
+		//cdrom_close(cdrom);
 		cdrom = (cdrom_file *)nullptr;
 	}
 
@@ -2720,6 +2720,7 @@ void saturn_state::stvcd_set_tray_close( void )
 		return;
 
 	hirqreg |= DCHG;
+	cdrom = (cdrom_file *)nullptr;
 
 	cdrom_image_device *cddevice = machine().device<cdrom_image_device>("cdrom");
 	if (cddevice!=nullptr)

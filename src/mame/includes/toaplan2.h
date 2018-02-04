@@ -153,4 +153,26 @@ public:
 	DECLARE_WRITE8_MEMBER(pwrkick_coin_lockout_w);
 
 	DECLARE_WRITE_LINE_MEMBER(toaplan2_reset);
+	void dogyuun(machine_config &config);
+	void othldrby(machine_config &config);
+	void snowbro2(machine_config &config);
+	void bgareggabl(machine_config &config);
+	void pwrkick(machine_config &config);
+	void mahoudai(machine_config &config);
+	void tekipaki(machine_config &config);
+	void bbakraid(machine_config &config);
+	void fixeightbl(machine_config &config);
+	void fixeight(machine_config &config);
+	void ghox(machine_config &config);
+	void bgaregga(machine_config &config);
+	void batrider(machine_config &config);
+	void shippumd(machine_config &config);
+	void kbash(machine_config &config);
+	void pipibibs(machine_config &config);
+	void pipibibsbl(machine_config &config);
+	void batsugun(machine_config &config);
+	void enmadaio(machine_config &config);
+	void truxton2(machine_config &config);
+	void vfive(machine_config &config);
+	void kbash2(machine_config &config);
 };

@@ -30,6 +30,8 @@ public:
 			m_maincpu(*this, "maincpu")
 	{ }
 
+	void jpmsru(machine_config &config);
+	void jpmsru_4(machine_config &config);
 protected:
 
 	// devices
@@ -63,11 +65,11 @@ ADDRESS_MAP_END
 static INPUT_PORTS_START( jpmsru )
 INPUT_PORTS_END
 
-static MACHINE_CONFIG_START( jpmsru )
+MACHINE_CONFIG_START(jpmsru_state::jpmsru)
 	MCFG_TMS99xx_ADD("maincpu", TMS9980A, MAIN_CLOCK, jpmsru_map, jpmsru_io)
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_START( jpmsru_4 )
+MACHINE_CONFIG_START(jpmsru_state::jpmsru_4)
 	MCFG_TMS99xx_ADD("maincpu", TMS9980A, MAIN_CLOCK, jpmsru_4_map, jpmsru_io)
 MACHINE_CONFIG_END
 

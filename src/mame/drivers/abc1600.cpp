@@ -35,12 +35,34 @@
     TODO:
 
     - starting from MAME 0.151, the Z80 DMA reads 0x08 as the 257th byte to transfer from disk t0s14 thus failing a comparison @ 37cfa, leading to a watchdog reset
-      changing z80dma.cpp:477 to "done = (m_count == 0);" fixes this but isn't the real reason
-    - abcenix boot stuck in a loop @ 37cfa
+      changing z80dma.cpp:480 to "done = (m_count == 0);" fixes this but isn't the real reason
     - segment/page RAM addresses are not correctly decoded, "sas/format/format" after abcenix is booted can't find the SASI interface because of this
         [:mac] ':3f' (08A98) MAC 7e4a2:0004a2 (SEGA 02f SEGD 09 PGA 09c PGD 8000 NONX 1 WP 0)
             should be
         [:mac] ':3f' (089A8) MAC 7e4a2:1fe4a2 (SEGA 00f SEGD 0f PGA 0fc PGD 43fc NONX 0 WP 1)
+
+        [:mac] ':3f' (100082) SEGMENT 80eeb:27 (SEGA 000 SEGD 27)
+        [:mac] ':3f' (100084) PAGE 80ee8:02 (SEGA 000 SEGD 27 PGA 271 PGD 0283)
+        [:mac] ':3f' (100084) PAGE 80ee9:83 (SEGA 000 SEGD 27 PGA 271 PGD 0283)
+        [:mac] ':3f' (100082) SEGMENT 806eb:27 (SEGA 000 SEGD 27)
+        [:mac] ':3f' (100084) PAGE 806e8:02 (SEGA 000 SEGD 27 PGA 270 PGD 0282)
+        [:mac] ':3f' (100084) PAGE 806e9:82 (SEGA 000 SEGD 27 PGA 270 PGD 0282)
+        [:mac] ':3f' (100082) MAC 7feea:1b8eea (SEGA 00f SEGD 36 PGA 36f PGD 0371 NONX 0 WP 0)
+        [:mac] ':3f' (100082): unmapped program memory write to 1B8EEA = 00 & FF
+        [:mac] ':3f' (100082) MAC 7feeb:1b8eeb (SEGA 00f SEGD 36 PGA 36f PGD 0371 NONX 0 WP 0)
+        [:mac] ':3f' (100082): unmapped program memory write to 1B8EEB = 27 & FF
+        [:mac] ':3f' (100084) MAC 7fee8:1b8ee8 (SEGA 00f SEGD 36 PGA 36f PGD 0371 NONX 0 WP 0)
+        [:mac] ':3f' (100084): unmapped program memory write to 1B8EE8 = 02 & FF
+        [:mac] ':3f' (100084) MAC 7fee9:1b8ee9 (SEGA 00f SEGD 36 PGA 36f PGD 0371 NONX 0 WP 0)
+        [:mac] ':3f' (100084): unmapped program memory write to 1B8EE9 = 81 & FF
+        [:mac] ':3f' (100082) MAC 7f6ea:1b86ea (SEGA 00f SEGD 36 PGA 36e PGD 0370 NONX 0 WP 0)
+        [:mac] ':3f' (100082): unmapped program memory write to 1B86EA = 00 & FF
+        [:mac] ':3f' (100082) MAC 7f6eb:1b86eb (SEGA 00f SEGD 36 PGA 36e PGD 0370 NONX 0 WP 0)
+        [:mac] ':3f' (100082): unmapped program memory write to 1B86EB = 27 & FF
+        [:mac] ':3f' (100084) MAC 7f6e8:1b86e8 (SEGA 00f SEGD 36 PGA 36e PGD 0370 NONX 0 WP 0)
+        [:mac] ':3f' (100084): unmapped program memory write to 1B86E8 = 02 & FF
+        [:mac] ':3f' (100084) MAC 7f6e9:1b86e9 (SEGA 00f SEGD 36 PGA 36e PGD 0370 NONX 0 WP 0)
+        [:mac] ':3f' (100084): unmapped program memory write to 1B86E9 = 80 & FF
 
     - short/long reset (RSTBUT)
     - CIO
@@ -410,6 +432,8 @@ WRITE8_MEMBER( abc1600_state::fw1_w )
 WRITE8_MEMBER( abc1600_state::spec_contr_reg_w )
 {
 	int state = BIT(data, 3);
+
+	if (LOG) logerror("%s SPEC CONTR REG %u:%u\n", machine().describe_context(), data & 0x07, state);
 
 	switch (data & 0x07)
 	{
@@ -849,9 +873,9 @@ void abc1600_state::machine_reset()
 //  MACHINE_CONFIG( abc1600 )
 //-------------------------------------------------
 
-static MACHINE_CONFIG_START( abc1600 )
+MACHINE_CONFIG_START(abc1600_state::abc1600)
 	// basic machine hardware
-	MCFG_CPU_ADD(MC68008P8_TAG, M68008, XTAL_64MHz/8)
+	MCFG_CPU_ADD(MC68008P8_TAG, M68008, XTAL(64'000'000)/8)
 	MCFG_CPU_PROGRAM_MAP(abc1600_mem)
 	MCFG_CPU_IRQ_ACKNOWLEDGE_DRIVER(abc1600_state,abc1600_int_ack)
 
@@ -861,7 +885,7 @@ static MACHINE_CONFIG_START( abc1600 )
 	// devices
 	MCFG_ABC1600_MAC_ADD(MC68008P8_TAG, mac_mem)
 
-	MCFG_DEVICE_ADD(Z8410AB1_0_TAG, Z80DMA, XTAL_64MHz/16)
+	MCFG_DEVICE_ADD(Z8410AB1_0_TAG, Z80DMA, XTAL(64'000'000)/16)
 	MCFG_Z80DMA_OUT_BUSREQ_CB(WRITELINE(abc1600_state, dbrq_w))
 	MCFG_Z80DMA_OUT_BAO_CB(DEVWRITELINE(Z8410AB1_1_TAG, z80dma_device, bai_w))
 	MCFG_Z80DMA_IN_MREQ_CB(DEVREAD8(ABC1600_MAC_TAG, abc1600_mac_device, dma0_mreq_r))
@@ -869,7 +893,7 @@ static MACHINE_CONFIG_START( abc1600 )
 	MCFG_Z80DMA_IN_IORQ_CB(DEVREAD8(ABC1600_MAC_TAG, abc1600_mac_device, dma0_iorq_r))
 	MCFG_Z80DMA_OUT_IORQ_CB(DEVWRITE8(ABC1600_MAC_TAG, abc1600_mac_device, dma0_iorq_w))
 
-	MCFG_DEVICE_ADD(Z8410AB1_1_TAG, Z80DMA, XTAL_64MHz/16)
+	MCFG_DEVICE_ADD(Z8410AB1_1_TAG, Z80DMA, XTAL(64'000'000)/16)
 	MCFG_Z80DMA_OUT_BUSREQ_CB(WRITELINE(abc1600_state, dbrq_w))
 	MCFG_Z80DMA_OUT_BAO_CB(DEVWRITELINE(Z8410AB1_2_TAG, z80dma_device, bai_w))
 	MCFG_Z80DMA_IN_MREQ_CB(DEVREAD8(ABC1600_MAC_TAG, abc1600_mac_device, dma1_mreq_r))
@@ -877,24 +901,24 @@ static MACHINE_CONFIG_START( abc1600 )
 	MCFG_Z80DMA_IN_IORQ_CB(DEVREAD8(ABC1600_MAC_TAG, abc1600_mac_device, dma1_iorq_r))
 	MCFG_Z80DMA_OUT_IORQ_CB(DEVWRITE8(ABC1600_MAC_TAG, abc1600_mac_device, dma1_iorq_w))
 
-	MCFG_DEVICE_ADD(Z8410AB1_2_TAG, Z80DMA, XTAL_64MHz/16)
+	MCFG_DEVICE_ADD(Z8410AB1_2_TAG, Z80DMA, XTAL(64'000'000)/16)
 	MCFG_Z80DMA_OUT_BUSREQ_CB(WRITELINE(abc1600_state, dbrq_w))
 	MCFG_Z80DMA_IN_MREQ_CB(DEVREAD8(ABC1600_MAC_TAG, abc1600_mac_device, dma2_mreq_r))
 	MCFG_Z80DMA_OUT_MREQ_CB(DEVWRITE8(ABC1600_MAC_TAG, abc1600_mac_device, dma2_mreq_w))
 	MCFG_Z80DMA_IN_IORQ_CB(DEVREAD8(ABC1600_MAC_TAG, abc1600_mac_device, dma2_iorq_r))
 	MCFG_Z80DMA_OUT_IORQ_CB(DEVWRITE8(ABC1600_MAC_TAG, abc1600_mac_device, dma2_iorq_w))
 
-	MCFG_DEVICE_ADD(Z8470AB1_TAG, Z80DART, XTAL_64MHz/16)
+	MCFG_DEVICE_ADD(Z8470AB1_TAG, Z80DART, XTAL(64'000'000)/16)
 	MCFG_Z80DART_OUT_TXDA_CB(DEVWRITELINE(RS232_B_TAG, rs232_port_device, write_txd))
 	MCFG_Z80DART_OUT_DTRA_CB(DEVWRITELINE(RS232_B_TAG, rs232_port_device, write_dtr))
 	MCFG_Z80DART_OUT_RTSA_CB(DEVWRITELINE(RS232_B_TAG, rs232_port_device, write_rts))
 	MCFG_Z80DART_OUT_TXDB_CB(DEVWRITELINE(ABC_KEYBOARD_PORT_TAG, abc_keyboard_port_device, txd_w))
 	MCFG_Z80DART_OUT_INT_CB(INPUTLINE(MC68008P8_TAG, M68K_IRQ_5))    // shared with SCC
 
-	MCFG_DEVICE_ADD(Z8530B1_TAG, SCC8530, XTAL_64MHz/16)
+	MCFG_DEVICE_ADD(Z8530B1_TAG, SCC8530, XTAL(64'000'000)/16)
 	MCFG_Z8530_INTRQ_CALLBACK(INPUTLINE(MC68008P8_TAG, M68K_IRQ_5))
 
-	MCFG_DEVICE_ADD(Z8536B1_TAG, Z8536, XTAL_64MHz/16)
+	MCFG_DEVICE_ADD(Z8536B1_TAG, Z8536, XTAL(64'000'000)/16)
 	MCFG_Z8536_IRQ_CALLBACK(INPUTLINE(MC68008P8_TAG, M68K_IRQ_2))
 	MCFG_Z8536_PA_IN_CALLBACK(READ8(abc1600_state, cio_pa_r))
 	MCFG_Z8536_PB_IN_CALLBACK(READ8(abc1600_state, cio_pb_r))
@@ -904,9 +928,9 @@ static MACHINE_CONFIG_START( abc1600 )
 
 	MCFG_NMC9306_ADD(NMC9306_TAG)
 
-	MCFG_E0516_ADD(E050_C16PC_TAG, XTAL_32_768kHz)
+	MCFG_E0516_ADD(E050_C16PC_TAG, XTAL(32'768))
 
-	MCFG_FD1797_ADD(SAB1797_02P_TAG, XTAL_64MHz/64)
+	MCFG_FD1797_ADD(SAB1797_02P_TAG, XTAL(64'000'000)/64)
 	MCFG_WD_FDC_INTRQ_CALLBACK(DEVWRITELINE(Z8536B1_TAG, z8536_device, pb7_w))
 	MCFG_WD_FDC_DRQ_CALLBACK(WRITELINE(abc1600_state, fdc_drq_w))
 

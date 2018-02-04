@@ -14,7 +14,7 @@
              0V   7   8  NIRQ
              0V   9  10  NPGFC
              0V  11  12  NPGFD
-             0V  13  14  RST
+             0V  13  14  NRST
              0V  15  16  Analog In
              0V  17  18  D0
              D1  19  20  D2
@@ -128,11 +128,13 @@ public:
 	template <class Object> static devcb_base &set_nmi_handler(device_t &device, Object &&cb)
 	{ return downcast<bbc_1mhzbus_slot_device &>(device).m_nmi_handler.set_callback(std::forward<Object>(cb)); }
 
+	DECLARE_WRITE_LINE_MEMBER( rst_w );
 	DECLARE_WRITE_LINE_MEMBER( irq_w ) { m_irq_handler(state); }
 	DECLARE_WRITE_LINE_MEMBER( nmi_w ) { m_nmi_handler(state); }
 
 protected:
 	// device-level overrides
+	virtual void device_validity_check(validity_checker &valid) const override;
 	virtual void device_start() override;
 	virtual void device_reset() override;
 
@@ -151,6 +153,8 @@ class device_bbc_1mhzbus_interface : public device_slot_card_interface
 public:
 	// construction/destruction
 	virtual ~device_bbc_1mhzbus_interface();
+
+	virtual DECLARE_WRITE_LINE_MEMBER(rst_w) { }
 
 protected:
 	device_bbc_1mhzbus_interface(const machine_config &mconfig, device_t &device);

@@ -21,19 +21,19 @@ class codata_state : public driver_device
 {
 public:
 	codata_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag),
-		m_p_base(*this, "rambase"),
-		m_maincpu(*this, "maincpu")
-	{
-	}
+		: driver_device(mconfig, type, tag)
+		, m_p_base(*this, "rambase")
+		, m_maincpu(*this, "maincpu")
+	{ }
 
+	void codata(machine_config &config);
 private:
 	virtual void machine_reset() override;
 	required_shared_ptr<uint16_t> m_p_base;
 	required_device<cpu_device> m_maincpu;
 };
 
-static ADDRESS_MAP_START(codata_mem, AS_PROGRAM, 16, codata_state)
+static ADDRESS_MAP_START(mem_map, AS_PROGRAM, 16, codata_state)
 	ADDRESS_MAP_UNMAP_HIGH
 	AM_RANGE(0x000000, 0x1fffff) AM_RAM AM_SHARE("rambase")
 	AM_RANGE(0x200000, 0x203fff) AM_ROM AM_REGION("user1", 0);
@@ -60,24 +60,19 @@ void codata_state::machine_reset()
 	m_maincpu->reset();
 }
 
-static DEVICE_INPUT_DEFAULTS_START( terminal )
-	DEVICE_INPUT_DEFAULTS( "RS232_RXBAUD", 0xff, RS232_BAUD_9615 )
-	DEVICE_INPUT_DEFAULTS( "RS232_TXBAUD", 0xff, RS232_BAUD_9615 )
-DEVICE_INPUT_DEFAULTS_END
-
-static MACHINE_CONFIG_START( codata )
+MACHINE_CONFIG_START(codata_state::codata)
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu",M68000, XTAL_16MHz / 2)
-	MCFG_CPU_PROGRAM_MAP(codata_mem)
+	MCFG_CPU_ADD("maincpu",M68000, XTAL(16'000'000) / 2)
+	MCFG_CPU_PROGRAM_MAP(mem_map)
 
-	MCFG_DEVICE_ADD("uart", UPD7201_NEW, XTAL_16MHz / 4)
+	MCFG_DEVICE_ADD("uart", UPD7201_NEW, XTAL(16'000'000) / 4)
 	MCFG_Z80SIO_OUT_TXDA_CB(DEVWRITELINE("rs423a", rs232_port_device, write_txd))
 	MCFG_Z80SIO_OUT_DTRA_CB(DEVWRITELINE("rs423a", rs232_port_device, write_dtr))
 	MCFG_Z80SIO_OUT_RTSA_CB(DEVWRITELINE("rs423a", rs232_port_device, write_rts))
 	MCFG_Z80SIO_OUT_TXDB_CB(DEVWRITELINE("rs423b", rs232_port_device, write_txd))
 	MCFG_Z80SIO_OUT_INT_CB(INPUTLINE("maincpu", M68K_IRQ_5))
 
-	MCFG_DEVICE_ADD("timer", AM9513A, XTAL_16MHz / 4)
+	MCFG_DEVICE_ADD("timer", AM9513A, XTAL(16'000'000) / 4)
 	MCFG_AM9513_OUT1_CALLBACK(NOOP) // Timer 1 = "Abort/Reset" (watchdog)
 	MCFG_AM9513_OUT2_CALLBACK(INPUTLINE("maincpu", M68K_IRQ_6)) // Timer 2
 	MCFG_AM9513_OUT3_CALLBACK(INPUTLINE("maincpu", M68K_IRQ_7)) // Refresh
@@ -90,7 +85,6 @@ static MACHINE_CONFIG_START( codata )
 	MCFG_RS232_RXD_HANDLER(DEVWRITELINE("uart", upd7201_new_device, rxa_w))
 	MCFG_RS232_DSR_HANDLER(DEVWRITELINE("uart", upd7201_new_device, dcda_w))
 	MCFG_RS232_CTS_HANDLER(DEVWRITELINE("uart", upd7201_new_device, ctsa_w))
-	MCFG_DEVICE_CARD_DEVICE_INPUT_DEFAULTS("terminal", terminal)
 
 	MCFG_RS232_PORT_ADD("rs423b", default_rs232_devices, nullptr)
 	MCFG_RS232_RXD_HANDLER(DEVWRITELINE("uart", upd7201_new_device, rxb_w))

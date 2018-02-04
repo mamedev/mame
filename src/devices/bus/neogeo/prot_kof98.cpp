@@ -112,17 +112,17 @@ WRITE16_MEMBER( kof98_prot_device::protection_w )
 	switch (data)
 	{
 	case 0x0090:
-		logerror ("%06x kof98 - protection 0x0090x\n", space.device().safe_pc());
+		logerror ("%s kof98 - protection 0x0090x\n", machine().describe_context());
 		m_prot_state = 1;
 		break;
 
 	case 0x00f0:
-		logerror ("%06x kof98 - protection 0x00f0x\n", space.device().safe_pc());
+		logerror ("%s kof98 - protection 0x00f0x\n", machine().describe_context());
 		m_prot_state = 2;
 		break;
 
 	default: // 00aa is written, but not needed?
-		logerror ("%06x kof98 - unknown protection write %04x\n", space.device().safe_pc(), data);
+		logerror ("%s kof98 - unknown protection write %04x\n", machine().describe_context(), data);
 		break;
 	}
 }

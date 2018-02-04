@@ -13,7 +13,7 @@
 * Euro XT: conventional desktop, specs like Euro PC II, two ISA slots on a riser card, 102 key seperate keyboard, internal XT-IDE 20MB harddisk, connector for FD360 and FD720 was retained
 *
 * Only BIOS versions >2.06 are supported so far because of changes in the memory management, according to https://www.forum64.de/index.php?thread/43066-schneider-euro-pc-i-ii-xt-welche-bios-version-habt-ihr/
-* BIOS version 2.04 has been encountered, but is not available online
+* Versions 2.04 and 2.05 only show a single dash on the top left of the screen.
 *
 * To get rid of the BIOS error messages when you first start the system, enter the BIOS with Ctrl-Alt-Esc, match the RAM size to your settings in MAME, set the CPU speed to 9.54MHz
 * and the graphics adapter to Color/Graphics 80, internal graphics off
@@ -24,6 +24,7 @@
 *        * The PC 2 and XT have 768K of memory that can be configured from the BIOS setup as 640K, 640K+128K EMS and 512K+256K EMS. The EMS options are not visible in our emulation and loading the EMS driver fails.
 *          See http://forum.classic-computing.de/index.php?page=Thread&threadID=8380 for screenshots.
 *        * use correct AT style keyboard for XT
+*        * make BIOS versions v2.04 and v2.05 work
 *
 *****************************************************************************************************/
 
@@ -83,6 +84,10 @@ public:
 	{
 		TIMER_RTC
 	};
+	static void cfg_builtin_720K(device_t *device);
+	void europc(machine_config &config);
+	void europc2(machine_config &config);
+	void euroxt(machine_config &config);
 };
 
 /*
@@ -496,24 +501,22 @@ ADDRESS_MAP_END
 
 static ADDRESS_MAP_START(europc_io, AS_IO, 8, europc_pc_state )
 	ADDRESS_MAP_UNMAP_HIGH
-	AM_RANGE(0x0060, 0x0063) AM_READWRITE(europc_pio_r, europc_pio_w)
 	AM_RANGE(0x0000, 0x00ff) AM_DEVICE("mb", pc_noppi_mb_device, map)
+	AM_RANGE(0x0060, 0x0063) AM_READWRITE(europc_pio_r, europc_pio_w)
 	AM_RANGE(0x0250, 0x025f) AM_READWRITE(europc_jim_r, europc_jim_w)
 	AM_RANGE(0x02e0, 0x02e0) AM_READ(europc_jim2_r)
 ADDRESS_MAP_END
 
 /* single built-in 3.5" 720K drive, connector for optional external 3.5" or 5.25" drive */
-static MACHINE_CONFIG_START( cfg_builtin_720K )
-	MCFG_DEVICE_MODIFY("fdc:0")
-	MCFG_SLOT_DEFAULT_OPTION("35dd")
-	MCFG_SLOT_FIXED(true)
-
-	MCFG_DEVICE_MODIFY("fdc:1")
-	MCFG_SLOT_DEFAULT_OPTION("")
-MACHINE_CONFIG_END
+void europc_pc_state::cfg_builtin_720K(device_t *device)
+{
+	device_slot_interface::static_set_default_option(*device->subdevice("fdc:0"), "35dd");
+	device_slot_interface::static_set_fixed(*device->subdevice("fdc:0"), true);
+	device_slot_interface::static_set_default_option(*device->subdevice("fdc:1"), "");
+}
 
 //Euro PC
-static MACHINE_CONFIG_START( europc )
+MACHINE_CONFIG_START(europc_pc_state::europc)
 	MCFG_CPU_ADD("maincpu", I8088, 4772720*2)
 	MCFG_CPU_PROGRAM_MAP(europc_map)
 	MCFG_CPU_IO_MAP(europc_io)
@@ -543,13 +546,13 @@ static MACHINE_CONFIG_START( europc )
 MACHINE_CONFIG_END
 
 //Euro PC II
-static MACHINE_CONFIG_DERIVED ( europc2, europc )
+MACHINE_CONFIG_DERIVED(europc_pc_state::europc2, europc)
 	MCFG_DEVICE_MODIFY(RAM_TAG)
 	MCFG_RAM_DEFAULT_SIZE("768K") // could be configured by the BIOS as 640K, 640K+128K EMS or 512K+256K EMS
 MACHINE_CONFIG_END
 
 //Euro XT
-static MACHINE_CONFIG_DERIVED ( euroxt, europc )
+MACHINE_CONFIG_DERIVED(europc_pc_state::euroxt, europc)
 	MCFG_DEVICE_MODIFY(RAM_TAG)
 	MCFG_RAM_DEFAULT_SIZE("768K")
 	MCFG_DEVICE_MODIFY("isa2")
@@ -573,9 +576,13 @@ ROM_START( europc )
 	ROMX_LOAD("bios_v2.08.bin", 0x8000, 0x8000, CRC(a7048349) SHA1(c2a0af7276c2ff6925abe5a5edef09c5a84106f2), ROM_BIOS(4))
 	ROM_SYSTEM_BIOS( 4, "v2.08a", "EuroPC v2.08a" )
 	ROMX_LOAD("bios_v2.08a.bin", 0x8000, 0x8000, CRC(872520b7) SHA1(9c94d33c0d454fab7bcd0c4516b50f1c3c6a30b8), ROM_BIOS(5))
-	// ROM_SYSTEM_BIOS( 5, "v2.05", "EuroPC v2.05" )
-	// ROMX_LOAD("bios_2.05.bin", 0x8000, 0x8000, CRC(372ceed6) SHA1(bb3d3957a22422f98be2225bdc47705bcab96f56), ROM_BIOS(6)) // does not work, see comment section
-ROM_END
+	ROM_SYSTEM_BIOS( 5, "v2.08b", "EuroPC v2.08b" )
+	ROMX_LOAD("bios_v2.08b.bin", 0x8000, 0x8000, CRC(668c0d19) SHA1(69412e58e0ed1d141e633f094af91ec5f7ae064b), ROM_BIOS(6))
+	ROM_SYSTEM_BIOS( 6, "v2.04", "EuroPC v2.04" )
+	ROMX_LOAD("bios_v2.04.bin", 0x8000, 0x8000, CRC(e623967c) SHA1(5196b14018da1f3198e2950af0e6eab41425f556), ROM_BIOS(7))
+	ROM_SYSTEM_BIOS( 7, "v2.05", "EuroPC v2.05" )
+	ROMX_LOAD("bios_2.05.bin", 0x8000, 0x8000, CRC(372ceed6) SHA1(bb3d3957a22422f98be2225bdc47705bcab96f56), ROM_BIOS(8)) // v2.04 and v2.05 don't work yet, , see comment section
+ ROM_END
 
 ROM_START( europc2 )
 	ROM_REGION(0x10000,"bios", 0)

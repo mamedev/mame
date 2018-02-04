@@ -126,4 +126,10 @@ public:
 	DECLARE_PALETTE_DECODER(RRRRGGGGBBBBIIII);
 
 	static const atari_motion_objects_config s_mob_config;
+	void atarisy2(machine_config &config);
+	void apb(machine_config &config);
+	void paperboy(machine_config &config);
+	void ssprint(machine_config &config);
+	void _720(machine_config &config);
+	void csprint(machine_config &config);
 };

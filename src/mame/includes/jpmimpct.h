@@ -149,4 +149,6 @@ public:
 	optional_device<stepper_device> m_reel4;
 	optional_device<stepper_device> m_reel5;
 	required_device<meters_device> m_meters;
+	void impctawp(machine_config &config);
+	void jpmimpct(machine_config &config);
 };

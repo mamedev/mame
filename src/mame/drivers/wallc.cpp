@@ -84,6 +84,8 @@ public:
 	DECLARE_DRIVER_INIT(sidam);
 	DECLARE_DRIVER_INIT(unkitpkr);
 
+	void unkitpkr(machine_config &config);
+	void wallc(machine_config &config);
 protected:
 	virtual void video_start() override;
 
@@ -438,7 +440,7 @@ DRIVER_INIT_MEMBER(wallc_state, wallc)
 	for (i=0; i<0x2000*2; i++)
 	{
 		c = ROM[ i ] ^ 0x55 ^ 0xff; /* NOTE: this can be shortened but now it fully reflects what the bigger module really does */
-		c = BITSWAP8(c, 4,2,6,0,7,1,3,5); /* also swapped inside of the bigger module */
+		c = bitswap<8>(c, 4,2,6,0,7,1,3,5); /* also swapped inside of the bigger module */
 		ROM[ i ] = c;
 	}
 }
@@ -455,12 +457,12 @@ DRIVER_INIT_MEMBER(wallc_state, wallca)
 		if(i & 0x100)
 		{
 			c = ROM[ i ] ^ 0x4a;
-			c = BITSWAP8(c, 4,7,1,3,2,0,5,6);
+			c = bitswap<8>(c, 4,7,1,3,2,0,5,6);
 		}
 		else
 		{
 			c = ROM[ i ] ^ 0xa5;
-			c = BITSWAP8(c, 0,2,3,6,1,5,7,4);
+			c = bitswap<8>(c, 0,2,3,6,1,5,7,4);
 		}
 
 		ROM[ i ] = c;
@@ -468,7 +470,7 @@ DRIVER_INIT_MEMBER(wallc_state, wallca)
 }
 
 
-static MACHINE_CONFIG_START( wallc )
+MACHINE_CONFIG_START(wallc_state::wallc)
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", Z80, 12288000 / 4)  /* 3.072 MHz ? */
 	MCFG_CPU_PROGRAM_MAP(wallc_map)
@@ -494,7 +496,7 @@ static MACHINE_CONFIG_START( wallc )
 MACHINE_CONFIG_END
 
 
-static MACHINE_CONFIG_DERIVED( unkitpkr, wallc )
+MACHINE_CONFIG_DERIVED(wallc_state::unkitpkr, wallc)
 
 	MCFG_CPU_MODIFY("maincpu")
 	MCFG_CPU_PROGRAM_MAP(unkitpkr_map)

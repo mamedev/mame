@@ -67,6 +67,8 @@ public:
 	DECLARE_READ8_MEMBER( read );
 	DECLARE_WRITE8_MEMBER( write );
 
+	uint8_t do_r() { return m_data; }
+
 protected:
 	// device-level overrides
 	virtual void device_start() override;

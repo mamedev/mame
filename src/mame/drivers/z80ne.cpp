@@ -410,7 +410,7 @@ static SLOT_INTERFACE_START( z80ne_floppies )
 	SLOT_INTERFACE("sssd", FLOPPY_525_SSSD)
 SLOT_INTERFACE_END
 
-static MACHINE_CONFIG_START( z80ne )
+MACHINE_CONFIG_START(z80ne_state::z80ne)
 	/* basic machine hardware */
 	MCFG_CPU_ADD("z80ne", Z80, Z80NE_CPU_SPEED_HZ)
 	MCFG_CPU_PROGRAM_MAP(z80ne_mem)
@@ -441,7 +441,7 @@ static MACHINE_CONFIG_START( z80ne )
 	//MCFG_SOFTWARE_LIST_ADD("cass_list","z80ne_cass")
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_DERIVED( z80net, z80ne )
+MACHINE_CONFIG_DERIVED(z80ne_state::z80net, z80ne)
 
 	MCFG_CPU_MODIFY("z80ne")
 	MCFG_CPU_PROGRAM_MAP(z80net_mem)
@@ -455,7 +455,7 @@ static MACHINE_CONFIG_DERIVED( z80net, z80ne )
 	/* video hardware */
 	MCFG_SCREEN_MC6847_PAL_ADD("lx388", "mc6847")
 
-	MCFG_DEVICE_ADD("mc6847", MC6847_PAL, XTAL_4_433619MHz)
+	MCFG_DEVICE_ADD("mc6847", MC6847_PAL, XTAL(4'433'619))
 	MCFG_MC6847_INPUT_CALLBACK(READ8(z80ne_state, lx388_mc6847_videoram_r))
 	// AG = GND, GM2 = GND, GM1 = GND, GM0 = GND, CSS = GND
 	// other lines not connected
@@ -470,7 +470,7 @@ static MACHINE_CONFIG_DERIVED( z80net, z80ne )
 	MCFG_SOFTWARE_LIST_ADD("cass_list","z80ne_cass")
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_START( z80netb )
+MACHINE_CONFIG_START(z80ne_state::z80netb)
 	/* basic machine hardware */
 	MCFG_CPU_ADD("z80ne", Z80, Z80NE_CPU_SPEED_HZ)
 	MCFG_CPU_PROGRAM_MAP(z80netb_mem)
@@ -496,7 +496,7 @@ static MACHINE_CONFIG_START( z80netb )
 	/* video hardware */
 	MCFG_SCREEN_MC6847_PAL_ADD("lx388", "mc6847")
 
-	MCFG_DEVICE_ADD("mc6847", MC6847_PAL, XTAL_4_433619MHz)
+	MCFG_DEVICE_ADD("mc6847", MC6847_PAL, XTAL(4'433'619))
 	MCFG_MC6847_INPUT_CALLBACK(READ8(z80ne_state, lx388_mc6847_videoram_r))
 	// AG = GND, GM2 = GND, GM1 = GND, GM0 = GND, CSS = GND
 	// other lines not connected
@@ -511,7 +511,7 @@ static MACHINE_CONFIG_START( z80netb )
 	MCFG_SOFTWARE_LIST_ADD("cass_list","z80ne_cass")
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_START( z80netf )
+MACHINE_CONFIG_START(z80ne_state::z80netf)
 	/* basic machine hardware */
 	MCFG_CPU_ADD("z80ne", Z80, Z80NE_CPU_SPEED_HZ)
 	MCFG_CPU_PROGRAM_MAP(z80netf_mem)
@@ -537,12 +537,12 @@ static MACHINE_CONFIG_START( z80netf )
 	/* video hardware */
 	MCFG_SCREEN_MC6847_PAL_ADD("lx388", "mc6847")
 
-	MCFG_DEVICE_ADD("mc6847", MC6847_PAL, XTAL_4_433619MHz)
+	MCFG_DEVICE_ADD("mc6847", MC6847_PAL, XTAL(4'433'619))
 	MCFG_MC6847_INPUT_CALLBACK(READ8(z80ne_state, lx388_mc6847_videoram_r))
 	// AG = GND, GM2 = GND, GM1 = GND, GM0 = GND, CSS = GND
 	// other lines not connected
 
-	MCFG_FD1771_ADD("wd1771", XTAL_2MHz / 2)
+	MCFG_FD1771_ADD("wd1771", XTAL(2'000'000) / 2)
 	MCFG_FLOPPY_DRIVE_ADD("wd1771:0", z80ne_floppies, "sssd", z80ne_state::floppy_formats)
 	MCFG_FLOPPY_DRIVE_ADD("wd1771:1", z80ne_floppies, "sssd", z80ne_state::floppy_formats)
 	MCFG_FLOPPY_DRIVE_ADD("wd1771:2", z80ne_floppies, nullptr,   z80ne_state::floppy_formats)

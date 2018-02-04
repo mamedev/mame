@@ -358,7 +358,7 @@ GFXDECODE_END
  *
  *************************************/
 
-static MACHINE_CONFIG_START( videopin )
+MACHINE_CONFIG_START(videopin_state::videopin)
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", M6502, 12096000 / 16)

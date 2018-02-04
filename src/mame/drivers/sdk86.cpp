@@ -2,7 +2,7 @@
 // copyright-holders:Miodrag Milanovic, Jonathan Gevaryahu, Robbbert
 /***************************************************************************
 
-        Intel SDK-86
+        Intel MCS-86 System Design Kit (SDK-86)
 
         12/05/2009 Skeleton driver by Micko
         29/11/2009 Some fleshing out by Lord Nightmare
@@ -31,6 +31,7 @@ ToDo:
 #include "cpu/i86/i86.h"
 #include "machine/clock.h"
 #include "machine/i8251.h"
+#include "machine/i8255.h"
 #include "machine/i8279.h"
 #include "sdk86.lh"
 
@@ -50,6 +51,7 @@ public:
 	DECLARE_WRITE8_MEMBER(digit_w);
 	DECLARE_READ8_MEMBER(kbd_r);
 
+	void sdk86(machine_config &config);
 private:
 	uint8_t m_digit;
 	required_device<cpu_device> m_maincpu;
@@ -65,8 +67,8 @@ static ADDRESS_MAP_START(sdk86_io, AS_IO, 16, sdk86_state)
 	AM_RANGE(0xfff0, 0xfff1) AM_MIRROR(4) AM_DEVREADWRITE8(I8251_TAG, i8251_device, data_r, data_w, 0xff)
 	AM_RANGE(0xfff2, 0xfff3) AM_MIRROR(4) AM_DEVREADWRITE8(I8251_TAG, i8251_device, status_r, control_w, 0xff)
 	AM_RANGE(0xffe8, 0xffeb) AM_MIRROR(4) AM_DEVREADWRITE8("i8279", i8279_device, read, write, 0xff)
-	// FFF8-FFFF = 2 x 8255A i/o chips. chip 1 uses the odd addresses, chip 2 uses the even addresses.
-	//             ports are A,B,C,control in that order.
+	AM_RANGE(0xfff8, 0xffff) AM_DEVREADWRITE8("port1", i8255_device, read, write, 0xff00)
+	AM_RANGE(0xfff8, 0xffff) AM_DEVREADWRITE8("port2", i8255_device, read, write, 0x00ff)
 ADDRESS_MAP_END
 
 /* Input ports */
@@ -135,9 +137,9 @@ static DEVICE_INPUT_DEFAULTS_START( terminal )
 	DEVICE_INPUT_DEFAULTS( "RS232_STOPBITS", 0xff, RS232_STOPBITS_2 )
 DEVICE_INPUT_DEFAULTS_END
 
-static MACHINE_CONFIG_START( sdk86 )
+MACHINE_CONFIG_START(sdk86_state::sdk86)
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", I8086, XTAL_14_7456MHz/3) /* divided down by i8284 clock generator; jumper selection allows it to be slowed to 2.5MHz, hence changing divider from 3 to 6 */
+	MCFG_CPU_ADD("maincpu", I8086, XTAL(14'745'600)/3) /* divided down by i8284 clock generator; jumper selection allows it to be slowed to 2.5MHz, hence changing divider from 3 to 6 */
 	MCFG_CPU_PROGRAM_MAP(sdk86_mem)
 	MCFG_CPU_IO_MAP(sdk86_io)
 
@@ -155,7 +157,7 @@ static MACHINE_CONFIG_START( sdk86 )
 	MCFG_RS232_DSR_HANDLER(DEVWRITELINE(I8251_TAG, i8251_device, write_dsr))
 	MCFG_DEVICE_CARD_DEVICE_INPUT_DEFAULTS("terminal", terminal)
 
-	MCFG_DEVICE_ADD("usart_clock", CLOCK, 307200)
+	MCFG_DEVICE_ADD("usart_clock", CLOCK, XTAL(14'745'600)/3/16)
 	MCFG_CLOCK_SIGNAL_HANDLER(DEVWRITELINE(I8251_TAG, i8251_device, write_txc))
 	MCFG_DEVCB_CHAIN_OUTPUT(DEVWRITELINE(I8251_TAG, i8251_device, write_rxc))
 
@@ -166,6 +168,8 @@ static MACHINE_CONFIG_START( sdk86 )
 	MCFG_I8279_IN_SHIFT_CB(GND)                                     // Shift key
 	MCFG_I8279_IN_CTRL_CB(GND)
 
+	MCFG_DEVICE_ADD("port1", I8255A, 0)
+	MCFG_DEVICE_ADD("port2", I8255A, 0)
 MACHINE_CONFIG_END
 
 /* ROM definition */
@@ -209,4 +213,4 @@ ROM_END
 /* Driver */
 
 /*    YEAR  NAME    PARENT  COMPAT  MACHINE  INPUT  STATE        INIT  COMPANY   FULLNAME  FLAGS */
-COMP( 1979, sdk86,  0,      0,      sdk86,   sdk86, sdk86_state, 0,    "Intel",  "SDK-86", MACHINE_NO_SOUND_HW)
+COMP( 1979, sdk86,  0,      0,      sdk86,   sdk86, sdk86_state, 0,    "Intel",  "MCS-86 System Design Kit", MACHINE_NO_SOUND_HW)

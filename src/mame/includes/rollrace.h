@@ -60,4 +60,6 @@ public:
 
 	INTERRUPT_GEN_MEMBER(vblank_irq);
 	INTERRUPT_GEN_MEMBER(sound_timer_irq);
+	void rollace2(machine_config &config);
+	void rollrace(machine_config &config);
 };

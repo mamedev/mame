@@ -260,14 +260,14 @@ TIMER_DEVICE_CALLBACK_MEMBER(m92_state::m92_scanline_interrupt)
 READ16_MEMBER(m92_state::m92_eeprom_r)
 {
 	uint8_t *RAM = memregion("eeprom")->base();
-//  logerror("%05x: EEPROM RE %04x\n",space.device().safe_pc(),offset);
+//  logerror("%05x: EEPROM RE %04x\n",m_maincpu->pc(),offset);
 	return RAM[offset] | 0xff00;
 }
 
 WRITE16_MEMBER(m92_state::m92_eeprom_w)
 {
 	uint8_t *RAM = memregion("eeprom")->base();
-//  logerror("%05x: EEPROM WR %04x\n",space.device().safe_pc(),offset);
+//  logerror("%05x: EEPROM WR %04x\n",m_maincpu->pc(),offset);
 	if (ACCESSING_BITS_0_7)
 		RAM[offset] = data;
 }
@@ -290,7 +290,7 @@ WRITE16_MEMBER(m92_state::m92_bankswitch_w)
 	{
 		membank("bank1")->set_entry((data & 0x06) >> 1);
 		if (data & 0xf9)
-			logerror("%05x: bankswitch %04x\n", space.device().safe_pc(), data);
+			logerror("%05x: bankswitch %04x\n", m_maincpu->pc(), data);
 	}
 }
 
@@ -311,7 +311,7 @@ WRITE16_MEMBER(m92_state::m92_soundlatch_w)
 
 READ16_MEMBER(m92_state::m92_sound_status_r)
 {
-//logerror("%06x: read sound status\n",space.device().safe_pc());
+//logerror("%06x: read sound status\n",m_maincpu->pc());
 	m_upd71059c->ir3_w(0);
 	return m_sound_status;
 }
@@ -927,15 +927,15 @@ GFXDECODE_END
 
 /***************************************************************************/
 
-static MACHINE_CONFIG_START( m92 )
+MACHINE_CONFIG_START(m92_state::m92)
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu",V33,XTAL_18MHz/2)
+	MCFG_CPU_ADD("maincpu",V33,XTAL(18'000'000)/2)
 	MCFG_CPU_PROGRAM_MAP(m92_map)
 	MCFG_CPU_IO_MAP(m92_portmap)
 	MCFG_CPU_IRQ_ACKNOWLEDGE_DEVICE("upd71059c", pic8259_device, inta_cb)
 
-	MCFG_CPU_ADD("soundcpu" ,V35, XTAL_14_31818MHz)
+	MCFG_CPU_ADD("soundcpu" ,V35, XTAL(14'318'181))
 	MCFG_CPU_PROGRAM_MAP(sound_map)
 
 	MCFG_DEVICE_ADD("upd71059c", PIC8259, 0)
@@ -968,54 +968,54 @@ static MACHINE_CONFIG_START( m92 )
 
 	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
 
-	MCFG_YM2151_ADD("ymsnd", XTAL_14_31818MHz/4)
+	MCFG_YM2151_ADD("ymsnd", XTAL(14'318'181)/4)
 	MCFG_YM2151_IRQ_HANDLER(INPUTLINE("soundcpu", NEC_INPUT_LINE_INTP0))
 	MCFG_SOUND_ROUTE(0, "mono", 0.40)
 	MCFG_SOUND_ROUTE(1, "mono", 0.40)
 
-	MCFG_IREMGA20_ADD("irem", XTAL_14_31818MHz/4)
+	MCFG_IREMGA20_ADD("irem", XTAL(14'318'181)/4)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 MACHINE_CONFIG_END
 
 
-static MACHINE_CONFIG_DERIVED( gunforce, m92 )
+MACHINE_CONFIG_DERIVED(m92_state::gunforce, m92)
 	MCFG_CPU_MODIFY("soundcpu")
 	MCFG_V25_CONFIG(gunforce_decryption_table)
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_DERIVED( bmaster, m92 )
+MACHINE_CONFIG_DERIVED(m92_state::bmaster, m92)
 	MCFG_CPU_MODIFY("soundcpu")
 	MCFG_V25_CONFIG(bomberman_decryption_table)
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_DERIVED( lethalth, m92 )
+MACHINE_CONFIG_DERIVED(m92_state::lethalth, m92)
 	MCFG_CPU_MODIFY("maincpu")
 	MCFG_CPU_PROGRAM_MAP(lethalth_map)
 	MCFG_CPU_MODIFY("soundcpu")
 	MCFG_V25_CONFIG(lethalth_decryption_table)
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_DERIVED( uccops, m92 )
+MACHINE_CONFIG_DERIVED(m92_state::uccops, m92)
 	MCFG_CPU_MODIFY("soundcpu")
 	MCFG_V25_CONFIG(dynablaster_decryption_table)
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_DERIVED( mysticri, m92 )
+MACHINE_CONFIG_DERIVED(m92_state::mysticri, m92)
 	MCFG_CPU_MODIFY("soundcpu")
 	MCFG_V25_CONFIG(mysticri_decryption_table)
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_DERIVED( majtitl2, m92 )
+MACHINE_CONFIG_DERIVED(m92_state::majtitl2, m92)
 	MCFG_CPU_MODIFY("soundcpu")
 	MCFG_V25_CONFIG(majtitl2_decryption_table)
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_DERIVED( hook, m92 )
+MACHINE_CONFIG_DERIVED(m92_state::hook, m92)
 	MCFG_CPU_MODIFY("soundcpu")
 	MCFG_V25_CONFIG(hook_decryption_table)
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_DERIVED( ppan, m92 )
+MACHINE_CONFIG_DERIVED(m92_state::ppan, m92)
 	MCFG_CPU_MODIFY("maincpu")
 	MCFG_CPU_IO_MAP(ppan_portmap)
 
@@ -1033,24 +1033,24 @@ static MACHINE_CONFIG_DERIVED( ppan, m92 )
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_DERIVED( rtypeleo, m92 )
+MACHINE_CONFIG_DERIVED(m92_state::rtypeleo, m92)
 	MCFG_CPU_MODIFY("soundcpu")
 	MCFG_V25_CONFIG(rtypeleo_decryption_table)
 MACHINE_CONFIG_END
 
 
-static MACHINE_CONFIG_DERIVED( inthunt, m92 )
+MACHINE_CONFIG_DERIVED(m92_state::inthunt, m92)
 	MCFG_CPU_MODIFY("soundcpu")
 	MCFG_V25_CONFIG(inthunt_decryption_table)
 MACHINE_CONFIG_END
 
 
-static MACHINE_CONFIG_DERIVED( nbbatman, m92 )
+MACHINE_CONFIG_DERIVED(m92_state::nbbatman, m92)
 	MCFG_CPU_MODIFY("soundcpu")
 	MCFG_V25_CONFIG(leagueman_decryption_table)
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_DERIVED( nbbatman2bl, m92 )
+MACHINE_CONFIG_DERIVED(m92_state::nbbatman2bl, m92)
 	MCFG_DEVICE_REMOVE("soundcpu")
 	MCFG_DEVICE_REMOVE("ymsnd")
 	MCFG_DEVICE_REMOVE("irem")
@@ -1062,21 +1062,21 @@ static MACHINE_CONFIG_DERIVED( nbbatman2bl, m92 )
 
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_DERIVED( psoldier, m92 )
+MACHINE_CONFIG_DERIVED(m92_state::psoldier, m92)
 	MCFG_CPU_MODIFY("soundcpu")
 	MCFG_V25_CONFIG(psoldier_decryption_table)
 	/* video hardware */
 	MCFG_GFXDECODE_MODIFY("gfxdecode", psoldier)
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_DERIVED( dsoccr94j, m92 )
+MACHINE_CONFIG_DERIVED(m92_state::dsoccr94j, m92)
 	MCFG_CPU_MODIFY("soundcpu")
 	MCFG_V25_CONFIG(dsoccr94_decryption_table)
 	/* video hardware */
 	MCFG_GFXDECODE_MODIFY("gfxdecode", psoldier)
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_DERIVED( gunforc2, m92 )
+MACHINE_CONFIG_DERIVED(m92_state::gunforc2, m92)
 	MCFG_CPU_MODIFY("soundcpu")
 	MCFG_V25_CONFIG(lethalth_decryption_table)
 MACHINE_CONFIG_END

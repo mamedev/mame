@@ -96,6 +96,9 @@ public:
 	template<class Obj> static devcb_base &set_irqa_handler(device_t &device, Obj &&object) { return downcast<pia6821_device &>(device).m_irqa_handler.set_callback(std::forward<Obj>(object)); }
 	template<class Obj> static devcb_base &set_irqb_handler(device_t &device, Obj &&object) { return downcast<pia6821_device &>(device).m_irqb_handler.set_callback(std::forward<Obj>(object)); }
 
+	uint8_t reg_r(uint8_t offset);
+	void reg_w(uint8_t offset, uint8_t data);
+
 	DECLARE_READ8_MEMBER( read ) { return reg_r(offset); }
 	DECLARE_WRITE8_MEMBER( write ) { reg_w(offset, data); }
 	DECLARE_READ8_MEMBER( read_alt ) { return reg_r(((offset << 1) & 0x02) | ((offset >> 1) & 0x01)); }
@@ -134,8 +137,6 @@ protected:
 	virtual void device_reset() override;
 
 private:
-	uint8_t reg_r(uint8_t offset);
-	void reg_w(uint8_t offset, uint8_t data);
 
 	void update_interrupts();
 

@@ -297,7 +297,7 @@ READ16_MEMBER(gaelco3d_state::eeprom_data_r)
 READ16_MEMBER(gaelco3d_state::sound_status_r)
 {
 	if (LOG)
-		logerror("%06X:sound_status_r(%02X) = %02X\n", space.device().safe_pc(), offset, m_sound_status);
+		logerror("%s:sound_status_r(%02X) = %02X\n", machine().describe_context(), offset, m_sound_status);
 	if (ACCESSING_BITS_0_7)
 		return m_sound_status;
 	return 0xffff;
@@ -366,7 +366,7 @@ WRITE_LINE_MEMBER(gaelco3d_state::fp_analog_clock_w)
 		if (m_fp_clock == 28)
 		{
 			m_fp_clock = 0;
-			for (auto i = 0; i < 2; i++)
+			for (int i = 0; i < 2; i++)
 			{
 				u32 ay = m_analog[i * 2].read_safe(0);
 				u32 ax = m_analog[i * 2 + 1].read_safe(0);
@@ -391,7 +391,7 @@ WRITE_LINE_MEMBER(gaelco3d_state::fp_analog_clock_w)
 
 READ32_MEMBER(gaelco3d_state::tms_m68k_ram_r)
 {
-//  logerror("%06X:tms_m68k_ram_r(%04X) = %08X\n", space.device().safe_pc(), offset, !(offset & 1) ? ((int32_t)m_m68k_ram_base[offset/2] >> 16) : (int)(int16_t)m_m68k_ram_base[offset/2]);
+//  logerror("%s:tms_m68k_ram_r(%04X) = %08X\n", machine().describe_context(), offset, !(offset & 1) ? ((int32_t)m_m68k_ram_base[offset/2] >> 16) : (int)(int16_t)m_m68k_ram_base[offset/2]);
 	return (int32_t)(int16_t)m_m68k_ram_base[offset ^ m_tms_offset_xor];
 }
 
@@ -448,7 +448,7 @@ WRITE16_MEMBER(gaelco3d_state::tms_comm_w)
 {
 	COMBINE_DATA(&m_tms_comm_base[offset ^ m_tms_offset_xor]);
 	if (LOG)
-		logerror("%06X:tms_comm_w(%02X) = %08X & %08X\n", space.device().safe_pc(), offset*2, data, mem_mask);
+		logerror("%s:tms_comm_w(%02X) = %08X & %08X\n", machine().describe_context(), offset*2, data, mem_mask);
 }
 
 
@@ -561,7 +561,7 @@ TIMER_DEVICE_CALLBACK_MEMBER(gaelco3d_state::adsp_autobuffer_irq)
 		reg = m_adsp_ireg_base;
 
 		/* generate the (internal, thats why the pulse) irq */
-		generic_pulse_irq_line(*m_adsp, ADSP2105_IRQ1, 1);
+		m_adsp->pulse_input_line(ADSP2105_IRQ1, m_adsp->minimum_quantum_time());
 	}
 
 	/* store it */
@@ -684,8 +684,8 @@ static ADDRESS_MAP_START( main_map, AS_PROGRAM, 16, gaelco3d_state )
 	AM_RANGE(0x510102, 0x510103) AM_SELECT(0x000038) AM_DEVWRITE8_MOD("mainlatch", ls259_device, write_d0, rshift<2>, 0x00ff)
 	AM_RANGE(0x510104, 0x510105) AM_DEVWRITE8("serial", gaelco_serial_device, data_w, 0x00ff)
 	AM_RANGE(0x510106, 0x510107) AM_SELECT(0x000070) AM_DEVWRITE8_MOD("outlatch", ls259_device, write_d0, rshift<3>, 0x00ff)
-	AM_RANGE(0xfe7f80, 0xfe7fff) AM_WRITE(tms_comm_w) AM_SHARE("tms_comm_base")
 	AM_RANGE(0xfe0000, 0xfeffff) AM_RAM AM_SHARE("m68k_ram_base")
+	AM_RANGE(0xfe7f80, 0xfe7fff) AM_WRITE(tms_comm_w) AM_SHARE("tms_comm_base")
 ADDRESS_MAP_END
 
 
@@ -703,8 +703,8 @@ static ADDRESS_MAP_START( main020_map, AS_PROGRAM, 32, gaelco3d_state )
 	AM_RANGE(0x510100, 0x510103) AM_SELECT(0x000038) AM_DEVWRITE8_MOD("mainlatch", ls259_device, write_d0, rshift<1>, 0x000000ff)
 	AM_RANGE(0x510104, 0x510107) AM_DEVWRITE8("serial", gaelco_serial_device, data_w, 0x00ff0000)
 	AM_RANGE(0x510104, 0x510107) AM_SELECT(0x000070) AM_DEVWRITE8_MOD("outlatch", ls259_device, write_d0, rshift<2>, 0x000000ff)
-	AM_RANGE(0xfe7f80, 0xfe7fff) AM_WRITE16(tms_comm_w, 0xffffffff) AM_SHARE("tms_comm_base")
 	AM_RANGE(0xfe0000, 0xfeffff) AM_RAM AM_SHARE("m68k_ram_base")
+	AM_RANGE(0xfe7f80, 0xfe7fff) AM_WRITE16(tms_comm_w, 0xffffffff) AM_SHARE("tms_comm_base")
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( tms_map, AS_PROGRAM, 32, gaelco3d_state )
@@ -906,7 +906,7 @@ INPUT_PORTS_END
  *
  *************************************/
 
-static MACHINE_CONFIG_START( gaelco3d )
+MACHINE_CONFIG_START(gaelco3d_state::gaelco3d)
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", M68000, 15000000)
@@ -983,7 +983,7 @@ static MACHINE_CONFIG_START( gaelco3d )
 MACHINE_CONFIG_END
 
 
-static MACHINE_CONFIG_DERIVED( gaelco3d2, gaelco3d )
+MACHINE_CONFIG_DERIVED(gaelco3d_state::gaelco3d2, gaelco3d)
 
 	/* basic machine hardware */
 	MCFG_CPU_REPLACE("maincpu", M68EC020, 25000000)
@@ -996,7 +996,7 @@ static MACHINE_CONFIG_DERIVED( gaelco3d2, gaelco3d )
 	MCFG_MACHINE_RESET_OVERRIDE(gaelco3d_state,gaelco3d2)
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_DERIVED( footbpow, gaelco3d2 )
+MACHINE_CONFIG_DERIVED(gaelco3d_state::footbpow, gaelco3d2)
 	MCFG_DEVICE_MODIFY("outlatch")
 	MCFG_ADDRESSABLE_LATCH_Q5_OUT_CB(WRITELINE(gaelco3d_state, fp_analog_clock_w))
 MACHINE_CONFIG_END

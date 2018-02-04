@@ -84,4 +84,9 @@ public:
 	void wwjgtin_set_last_four_colors();
 	void draw_sprites( bitmap_ind16 &bitmap, const rectangle &cliprect, int reverse );
 	void draw_lasso( bitmap_ind16 &bitmap, const rectangle &cliprect );
+	void base(machine_config &config);
+	void wwjgtin(machine_config &config);
+	void lasso(machine_config &config);
+	void chameleo(machine_config &config);
+	void pinbo(machine_config &config);
 };

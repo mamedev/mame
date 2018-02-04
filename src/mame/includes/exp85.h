@@ -42,6 +42,7 @@ public:
 
 	/* cassette state */
 	int m_tape_control;
+	void exp85(machine_config &config);
 };
 
 #endif // MAME_INCLUDES_EXP85_H

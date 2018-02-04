@@ -147,7 +147,7 @@ Updates by Bryan McPhail, 12/12/2004:
 #include "speaker.h"
 
 
-#define MASTER_CLOCK        XTAL_12MHz
+#define MASTER_CLOCK        XTAL(12'000'000)
 #define CPU_CLOCK           MASTER_CLOCK / 8
 #define MCU_CLOCK           MASTER_CLOCK / 4
 #define PIXEL_CLOCK         MASTER_CLOCK / 2
@@ -301,8 +301,8 @@ static ADDRESS_MAP_START( bootleg_map, AS_PROGRAM, 8, xain_state )
 	AM_RANGE(0x3a09, 0x3a0c) AM_WRITE(main_irq_w)
 	AM_RANGE(0x3a0d, 0x3a0d) AM_WRITE(flipscreen_w)
 	AM_RANGE(0x3a0f, 0x3a0f) AM_WRITE(cpuA_bankswitch_w)
-	AM_RANGE(0x3c00, 0x3dff) AM_DEVWRITE("palette", palette_device, write) AM_SHARE("palette")
-	AM_RANGE(0x3e00, 0x3fff) AM_DEVWRITE("palette", palette_device, write_ext) AM_SHARE("palette_ext")
+	AM_RANGE(0x3c00, 0x3dff) AM_DEVWRITE("palette", palette_device, write8) AM_SHARE("palette")
+	AM_RANGE(0x3e00, 0x3fff) AM_DEVWRITE("palette", palette_device, write8_ext) AM_SHARE("palette_ext")
 	AM_RANGE(0x4000, 0x7fff) AM_ROMBANK("bank1")
 	AM_RANGE(0x8000, 0xffff) AM_ROM
 ADDRESS_MAP_END
@@ -448,17 +448,17 @@ void xain_state::machine_start()
 	save_item(NAME(m_vblank));
 }
 
-static MACHINE_CONFIG_START( xsleena )
+MACHINE_CONFIG_START(xain_state::xsleena)
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", M6809, CPU_CLOCK)
+	MCFG_CPU_ADD("maincpu", MC6809E, CPU_CLOCK) // 68B09E
 	MCFG_CPU_PROGRAM_MAP(main_map)
 	MCFG_TIMER_DRIVER_ADD_SCANLINE("scantimer", xain_state, scanline, "screen", 0, 1)
 
-	MCFG_CPU_ADD("sub", M6809, CPU_CLOCK)
+	MCFG_CPU_ADD("sub", MC6809E, CPU_CLOCK) // 68B09E
 	MCFG_CPU_PROGRAM_MAP(cpu_map_B)
 
-	MCFG_CPU_ADD("audiocpu", M6809, CPU_CLOCK)
+	MCFG_CPU_ADD("audiocpu", MC6809, PIXEL_CLOCK) // 68A09
 	MCFG_CPU_PROGRAM_MAP(sound_map)
 
 	MCFG_DEVICE_ADD("mcu", TAITO68705_MCU, MCU_CLOCK)
@@ -496,7 +496,7 @@ static MACHINE_CONFIG_START( xsleena )
 MACHINE_CONFIG_END
 
 
-static MACHINE_CONFIG_DERIVED( xsleenab, xsleena )
+MACHINE_CONFIG_DERIVED(xain_state::xsleenab, xsleena)
 	MCFG_CPU_MODIFY("maincpu")
 	MCFG_CPU_PROGRAM_MAP(bootleg_map)
 

@@ -151,6 +151,21 @@ private:
 // netlist_mame_cpu_device
 // ----------------------------------------------------------------------------------------
 
+class netlist_mame_cpu_device;
+
+class netlist_disassembler : public util::disasm_interface
+{
+public:
+	netlist_disassembler(netlist_mame_cpu_device *dev);
+	virtual ~netlist_disassembler() = default;
+
+	virtual u32 opcode_alignment() const override;
+	virtual offs_t disassemble(std::ostream &stream, offs_t pc, const data_buffer &opcodes, const data_buffer &params) override;
+
+private:
+	netlist_mame_cpu_device *m_dev;
+};
+
 class netlist_mame_cpu_device : public netlist_mame_device,
 								public device_execute_interface,
 								public device_state_interface,
@@ -160,6 +175,8 @@ class netlist_mame_cpu_device : public netlist_mame_device,
 public:
 	// construction/destruction
 	netlist_mame_cpu_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+
+	offs_t genPC() const { return m_genPC; }
 
 protected:
 	// netlist_mame_device
@@ -175,9 +192,7 @@ protected:
 	ATTR_HOT virtual void execute_run() override;
 
 	// device_disasm_interface overrides
-	ATTR_COLD virtual uint32_t disasm_min_opcode_bytes() const override { return 1; }
-	ATTR_COLD virtual uint32_t disasm_max_opcode_bytes() const override { return 1; }
-	ATTR_COLD virtual offs_t disasm_disassemble(std::ostream &stream, offs_t pc, const uint8_t *oprom, const uint8_t *opram, uint32_t options) override;
+	virtual util::disasm_interface *create_disassembler() override;
 
 	// device_memory_interface overrides
 	virtual space_config_vector memory_space_config() const override;
@@ -188,7 +203,7 @@ protected:
 	address_space_config m_program_config;
 
 private:
-	int m_genPC;
+	offs_t m_genPC;
 };
 
 // ----------------------------------------------------------------------------------------

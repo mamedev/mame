@@ -137,7 +137,7 @@ WRITE8_MEMBER( tms9928a_device::write )
 		register_write(space, 0, data);
 }
 
-READ8_MEMBER( tms9928a_device::vram_read )
+u8 tms9928a_device::vram_read()
 {
 	// prevent debugger from changing the address base
 	if (machine().side_effect_disabled()) return 0;
@@ -151,8 +151,12 @@ READ8_MEMBER( tms9928a_device::vram_read )
 	return data;
 }
 
+READ8_MEMBER( tms9928a_device::vram_read )
+{
+	return vram_read();
+}
 
-WRITE8_MEMBER( tms9928a_device::vram_write )
+void tms9928a_device::vram_write(u8 data)
 {
 	// prevent debugger from changing the address base
 	if (machine().side_effect_disabled()) return;
@@ -163,8 +167,12 @@ WRITE8_MEMBER( tms9928a_device::vram_write )
 	m_latch = 0;
 }
 
+WRITE8_MEMBER( tms9928a_device::vram_write )
+{
+	vram_write(data);
+}
 
-READ8_MEMBER( tms9928a_device::register_read )
+u8 tms9928a_device::register_read()
 {
 	// prevent debugger from changing the internal state
 	if (machine().side_effect_disabled()) return 0;
@@ -178,6 +186,10 @@ READ8_MEMBER( tms9928a_device::register_read )
 	return data;
 }
 
+READ8_MEMBER( tms9928a_device::register_read )
+{
+	return register_read();
+}
 
 void tms9928a_device::check_interrupt()
 {
@@ -292,7 +304,7 @@ void tms9928a_device::change_register(uint8_t reg, uint8_t val)
 }
 
 
-WRITE8_MEMBER( tms9928a_device::register_write )
+void tms9928a_device::register_write(u8 data)
 {
 	// prevent debugger from changing the internal state
 	if (machine().side_effect_disabled()) return;
@@ -312,7 +324,7 @@ WRITE8_MEMBER( tms9928a_device::register_write )
 			if ( !(data & 0x40) )
 			{
 				/* read ahead */
-				vram_read(space, 0);
+				vram_read();
 			}
 		}
 		m_latch = 0;
@@ -325,6 +337,10 @@ WRITE8_MEMBER( tms9928a_device::register_write )
 	}
 }
 
+WRITE8_MEMBER( tms9928a_device::register_write )
+{
+	register_write(data);
+}
 
 void tms9928a_device::device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr)
 {
@@ -337,8 +353,8 @@ void tms9928a_device::device_timer(emu_timer &timer, device_timer_id id, int par
 		return;
 	}
 
-	int raw_vpos = m_screen->vpos();
-	int vpos = raw_vpos * m_vertical_size / m_screen->height();
+	int raw_vpos = screen().vpos();
+	int vpos = raw_vpos * m_vertical_size / screen().height();
 	uint16_t BackColour = m_Regs[7] & 15;
 	uint32_t *p = &m_tmpbmp.pix32(vpos);
 
@@ -631,7 +647,7 @@ void tms9928a_device::device_timer(emu_timer &timer, device_timer_id id, int par
 	}
 
 	/* Schedule next callback */
-	m_line_timer->adjust( m_screen->time_until_pos( ( raw_vpos + 1 ) % m_screen->height() , HORZ_DISPLAY_START ) );
+	m_line_timer->adjust( screen().time_until_pos( ( raw_vpos + 1 ) % screen().height() , HORZ_DISPLAY_START ) );
 }
 
 
@@ -764,7 +780,7 @@ void tms9928a_device::device_reset()
 	m_latch = 0;
 	m_mode = 0;
 
-	m_line_timer->adjust( m_screen->time_until_pos( 0, HORZ_DISPLAY_START ) );
+	m_line_timer->adjust( screen().time_until_pos( 0, HORZ_DISPLAY_START ) );
 
 	// TODO: Check clock freq settings in all drivers
 	if (!m_out_gromclk_cb.isnull() && m_99) m_gromclk_timer->adjust(attotime::zero, 0, attotime::from_hz(clock()/12));

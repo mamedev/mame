@@ -241,7 +241,7 @@ DEVICE_IMAGE_LOAD_MEMBER( ti990_hdc_device, ti990_hd )
 */
 DEVICE_IMAGE_UNLOAD_MEMBER( ti990_hdc_device, ti990_hd )
 {
-	int id = get_id_from_device( image );
+	int id = get_id_from_device(&image.device());
 	hd_unit_t *d;
 
 	d = &m_d[id];
@@ -1002,7 +1002,7 @@ void ti990_hdc_device::device_start()
 //  device_add_mconfig - add device configuration
 //-------------------------------------------------
 
-MACHINE_CONFIG_MEMBER( ti990_hdc_device::device_add_mconfig )
+MACHINE_CONFIG_START(ti990_hdc_device::device_add_mconfig)
 	MCFG_HARDDISK_ADD( "harddisk1" )
 	MCFG_HARDDISK_LOAD(ti990_hdc_device, ti990_hd)
 	MCFG_HARDDISK_UNLOAD(ti990_hdc_device, ti990_hd)

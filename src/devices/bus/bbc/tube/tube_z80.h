@@ -33,8 +33,7 @@ public:
 
 	DECLARE_READ8_MEMBER( mem_r );
 	DECLARE_WRITE8_MEMBER( mem_w );
-	DECLARE_READ8_MEMBER( io_r );
-	DECLARE_WRITE8_MEMBER( io_w );
+	DECLARE_READ8_MEMBER( opcode_r );
 
 protected:
 	// device-level overrides
@@ -58,7 +57,6 @@ private:
 	required_memory_region m_rom;
 
 	bool m_rom_enabled;
-	//int m_nmiserv;
 };
 
 

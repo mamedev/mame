@@ -53,7 +53,7 @@ PALETTE_INIT_MEMBER(irobot_state, irobot)
 		int g = 28 * ((color_prom[i] >> 4) & 0x03) * intensity;
 		int b = 28 * ((color_prom[i] >> 2) & 0x03) * intensity;
 
-		int swapped_i = BITSWAP8(i,7,6,5,4,3,0,1,2);
+		int swapped_i = bitswap<8>(i,7,6,5,4,3,0,1,2);
 
 		palette.set_pen_color(swapped_i + 64, rgb_t(r, g, b));
 	}

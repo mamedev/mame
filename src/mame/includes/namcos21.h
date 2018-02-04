@@ -102,7 +102,7 @@ public:
 	DECLARE_WRITE16_MEMBER(dspcuskey_w);
 	DECLARE_READ16_MEMBER(dspcuskey_r);
 	DECLARE_READ16_MEMBER(dspram16_r);
-	DECLARE_WRITE16_MEMBER(dspram16_w);
+	template<bool maincpu> DECLARE_WRITE16_MEMBER(dspram16_w);
 	DECLARE_READ16_MEMBER(dsp_port0_r);
 	DECLARE_WRITE16_MEMBER(dsp_port0_w);
 	DECLARE_READ16_MEMBER(dsp_port1_r);
@@ -192,4 +192,8 @@ public:
 	void render_slave_output(uint16_t data);
 	void winrun_flush_poly();
 	void init(int game_type);
+	void configure_c148_standard(machine_config &config);
+	void driveyes(machine_config &config);
+	void winrun(machine_config &config);
+	void namcos21(machine_config &config);
 };

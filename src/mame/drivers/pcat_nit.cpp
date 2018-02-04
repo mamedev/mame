@@ -107,6 +107,8 @@ public:
 	DECLARE_READ8_MEMBER(pcat_nit_io_r);
 	DECLARE_DRIVER_INIT(pcat_nit);
 	virtual void machine_start() override;
+	void bonanza(machine_config &config);
+	void pcat_nit(machine_config &config);
 };
 
 /*************************************
@@ -117,12 +119,13 @@ public:
 
 WRITE8_MEMBER(pcat_nit_state::pcat_nit_rombank_w)
 {
-	//logerror( "rom bank #%02x at PC=%08X\n", data, space.device().safe_pc() );
+	auto &mspace = m_maincpu->space(AS_PROGRAM);
+	//logerror( "rom bank #%02x at PC=%08X\n", data, m_maincpu->pc() );
 	if ( data & 0x40 )
 	{
 		// rom bank
-		space.install_read_bank(0x000d8000, 0x000dffff, "rombank" );
-		space.unmap_write(0x000d8000, 0x000dffff);
+		mspace.install_read_bank(0x000d8000, 0x000dffff, "rombank" );
+		mspace.unmap_write(0x000d8000, 0x000dffff);
 
 		if ( data & 0x80 )
 		{
@@ -136,9 +139,9 @@ WRITE8_MEMBER(pcat_nit_state::pcat_nit_rombank_w)
 	else
 	{
 		// nvram bank
-		space.unmap_readwrite(0x000d8000, 0x000dffff);
+		mspace.unmap_readwrite(0x000d8000, 0x000dffff);
 
-		space.install_readwrite_bank(0x000d8000, 0x000d9fff, "nvrambank" );
+		mspace.install_readwrite_bank(0x000d8000, 0x000d9fff, "nvrambank" );
 
 		membank("nvrambank")->set_base(m_banked_nvram.get());
 
@@ -217,7 +220,7 @@ void pcat_nit_state::machine_start()
 	membank("rombank")->set_entry(0);
 }
 
-static MACHINE_CONFIG_START( pcat_nit )
+MACHINE_CONFIG_START(pcat_nit_state::pcat_nit)
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", I386, 14318180*2)   /* I386 ?? Mhz */
 	MCFG_CPU_PROGRAM_MAP(pcat_map)
@@ -228,7 +231,7 @@ static MACHINE_CONFIG_START( pcat_nit )
 	MCFG_FRAGMENT_ADD( pcvideo_vga )
 
 	MCFG_FRAGMENT_ADD( pcat_common )
-	MCFG_DEVICE_ADD( "ns16450_0", NS16450, XTAL_1_8432MHz )
+	MCFG_DEVICE_ADD( "ns16450_0", NS16450, XTAL(1'843'200) )
 	MCFG_INS8250_OUT_TX_CB(DEVWRITELINE("microtouch", microtouch_device, rx))
 	MCFG_INS8250_OUT_INT_CB(DEVWRITELINE("pic8259_1", pic8259_device, ir4_w))
 	MCFG_MICROTOUCH_ADD( "microtouch", 9600, DEVWRITELINE("ns16450_0", ins8250_uart_device, rx_w) ) // rate?
@@ -236,7 +239,7 @@ static MACHINE_CONFIG_START( pcat_nit )
 	MCFG_NVRAM_ADD_0FILL("nvram")
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_START( bonanza )
+MACHINE_CONFIG_START(pcat_nit_state::bonanza)
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", I386, 14318180*2)   /* I386 ?? Mhz */
 	MCFG_CPU_PROGRAM_MAP(bonanza_map)
@@ -247,7 +250,7 @@ static MACHINE_CONFIG_START( bonanza )
 	MCFG_FRAGMENT_ADD( pcvideo_cirrus_gd5428 )
 
 	MCFG_FRAGMENT_ADD( pcat_common )
-	MCFG_DEVICE_ADD( "ns16450_0", NS16450, XTAL_1_8432MHz )
+	MCFG_DEVICE_ADD( "ns16450_0", NS16450, XTAL(1'843'200) )
 	MCFG_INS8250_OUT_TX_CB(DEVWRITELINE("microtouch", microtouch_device, rx))
 	MCFG_INS8250_OUT_INT_CB(DEVWRITELINE("pic8259_1", pic8259_device, ir4_w))
 	MCFG_MICROTOUCH_ADD( "microtouch", 9600, DEVWRITELINE("ns16450_0", ins8250_uart_device, rx_w) ) // rate?

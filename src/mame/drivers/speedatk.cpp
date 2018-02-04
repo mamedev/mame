@@ -85,7 +85,7 @@ PS / PD :  key matrix
 #include "speaker.h"
 
 
-#define MASTER_CLOCK XTAL_12MHz
+#define MASTER_CLOCK XTAL(12'000'000)
 
 void speedatk_state::machine_start()
 {
@@ -304,7 +304,7 @@ WRITE8_MEMBER(speedatk_state::output_w)
 		logerror("%02x\n",data);
 }
 
-static MACHINE_CONFIG_START( speedatk )
+MACHINE_CONFIG_START(speedatk_state::speedatk)
 
 	MCFG_CPU_ADD("maincpu", Z80,MASTER_CLOCK/2) //divider is unknown
 	MCFG_CPU_PROGRAM_MAP(speedatk_mem)

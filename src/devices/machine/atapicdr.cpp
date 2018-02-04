@@ -30,7 +30,7 @@ atapi_fixed_cdrom_device::atapi_fixed_cdrom_device(const machine_config &mconfig
 //  device_add_mconfig - add device configuration
 //-------------------------------------------------
 
-MACHINE_CONFIG_MEMBER( atapi_cdrom_device::device_add_mconfig )
+MACHINE_CONFIG_START(atapi_cdrom_device::device_add_mconfig)
 	MCFG_CDROM_ADD("image")
 	MCFG_CDROM_INTERFACE("cdrom")
 	MCFG_SOUND_ADD("cdda", CDDA, 0)

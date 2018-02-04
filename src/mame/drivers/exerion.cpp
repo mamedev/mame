@@ -177,7 +177,7 @@ WRITE8_MEMBER(exerion_state::exerion_portb_w)
 
 READ8_MEMBER(exerion_state::exerion_protection_r)
 {
-	if (space.device().safe_pc() == 0x4143)
+	if (m_maincpu->pc() == 0x4143)
 		return memregion("maincpu")->base()[0x33c0 + (m_main_ram[0xd] << 2) + offset];
 	else
 		return m_main_ram[0x8 + offset];
@@ -193,11 +193,11 @@ READ8_MEMBER(exerion_state::exerion_protection_r)
 
 static ADDRESS_MAP_START( main_map, AS_PROGRAM, 8, exerion_state )
 	AM_RANGE(0x0000, 0x5fff) AM_ROM
-	AM_RANGE(0x6008, 0x600b) AM_READ(exerion_protection_r)
 	AM_RANGE(0x6000, 0x67ff) AM_RAM AM_SHARE("main_ram")
+	AM_RANGE(0x6008, 0x600b) AM_READ(exerion_protection_r)
 	AM_RANGE(0x8000, 0x87ff) AM_RAM AM_SHARE("videoram")
 	AM_RANGE(0x8800, 0x887f) AM_RAM AM_SHARE("spriteram")
-	AM_RANGE(0x8800, 0x8bff) AM_RAM
+	AM_RANGE(0x8880, 0x8bff) AM_RAM
 	AM_RANGE(0xa000, 0xa000) AM_READ_PORT("IN0")
 	AM_RANGE(0xa800, 0xa800) AM_READ_PORT("DSW0")
 	AM_RANGE(0xb000, 0xb000) AM_READ_PORT("DSW1")
@@ -370,7 +370,7 @@ void exerion_state::machine_reset()
 		m_background_latches[i] = 0;
 }
 
-static MACHINE_CONFIG_START( exerion )
+MACHINE_CONFIG_START(exerion_state::exerion)
 
 	MCFG_CPU_ADD("maincpu", Z80, EXERION_CPU_CLOCK)
 	MCFG_CPU_PROGRAM_MAP(main_map)

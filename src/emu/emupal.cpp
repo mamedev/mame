@@ -133,35 +133,35 @@ inline void palette_device::update_for_write(offs_t byte_offset, int bytes_modif
 //  write - write a byte to the base paletteram
 //-------------------------------------------------
 
-WRITE8_MEMBER(palette_device::write)
+WRITE8_MEMBER(palette_device::write8)
 {
 	m_paletteram.write8(offset, data);
 	update_for_write(offset, 1);
 }
 
-WRITE16_MEMBER(palette_device::write)
+WRITE16_MEMBER(palette_device::write16)
 {
 	m_paletteram.write16(offset, data, mem_mask);
 	update_for_write(offset * 2, 2);
 }
 
-WRITE32_MEMBER(palette_device::write)
+WRITE32_MEMBER(palette_device::write32)
 {
 	m_paletteram.write32(offset, data, mem_mask);
 	update_for_write(offset * 4, 4);
 }
 
-READ8_MEMBER(palette_device::read)
+READ8_MEMBER(palette_device::read8)
 {
 	return m_paletteram.read8(offset);
 }
 
-READ16_MEMBER(palette_device::read)
+READ16_MEMBER(palette_device::read16)
 {
 	return m_paletteram.read16(offset);
 }
 
-READ32_MEMBER(palette_device::read)
+READ32_MEMBER(palette_device::read32)
 {
 	return m_paletteram.read32(offset);
 }
@@ -172,14 +172,14 @@ READ32_MEMBER(palette_device::read)
 //  paletteram
 //-------------------------------------------------
 
-WRITE8_MEMBER(palette_device::write_ext)
+WRITE8_MEMBER(palette_device::write8_ext)
 {
 	m_paletteram_ext.write8(offset, data);
 	update_for_write(offset, 1);
 }
 
 
-WRITE16_MEMBER(palette_device::write_ext)
+WRITE16_MEMBER(palette_device::write16_ext)
 {
 	m_paletteram_ext.write16(offset, data, mem_mask);
 	update_for_write(offset * 2, 2);

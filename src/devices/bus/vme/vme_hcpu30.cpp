@@ -42,7 +42,7 @@
 #endif
 
 
-#define DUSCC_CLOCK XTAL_14_7456MHz /* XXX Unverified */
+#define DUSCC_CLOCK XTAL(14'745'600) /* XXX Unverified */
 #define RS232P1_TAG      "rs232p1"
 #define RS232P2_TAG      "rs232p2"
 
@@ -54,8 +54,8 @@
 DEFINE_DEVICE_TYPE(VME_HCPU30, vme_hcpu30_card_device, "hcpu30", "Besta HCPU30 CPU board")
 
 static ADDRESS_MAP_START(hcpu30_mem, AS_PROGRAM, 32, vme_hcpu30_card_device)
-	AM_RANGE(0x00000000, 0x00000007) AM_ROM AM_READ(bootvect_r)   /* ROM mirror just during reset */
 	AM_RANGE(0x00000000, 0x00000007) AM_RAM AM_WRITE(bootvect_w)   /* After first write we act as RAM */
+	AM_RANGE(0x00000000, 0x00000007) AM_ROM AM_READ(bootvect_r)   /* ROM mirror just during reset */
 	AM_RANGE(0x00000008, 0x001fffff) AM_RAM // local bus DRAM, 4MB
 	AM_RANGE(0x00200000, 0x00201fff) AM_RAM // AM_SHARE("iocpu")
 	AM_RANGE(0xff000000, 0xff007fff) AM_ROM AM_MIRROR(0x8000) AM_REGION("user1", 0)
@@ -121,7 +121,7 @@ ioport_constructor vme_hcpu30_card_device::device_input_ports() const
 //  device_add_mconfig - add device configuration
 //-------------------------------------------------
 
-MACHINE_CONFIG_MEMBER(vme_hcpu30_card_device::device_add_mconfig)
+MACHINE_CONFIG_START(vme_hcpu30_card_device::device_add_mconfig)
 	MCFG_CPU_ADD("maincpu", M68030, 2*16670000)
 	MCFG_CPU_PROGRAM_MAP(hcpu30_mem)
 
@@ -132,7 +132,7 @@ MACHINE_CONFIG_MEMBER(vme_hcpu30_card_device::device_add_mconfig)
 	MCFG_DUSCC_OUT_TXDB_CB(DEVWRITELINE(RS232P2_TAG, rs232_port_device, write_txd))
 	MCFG_DUSCC_OUT_DTRB_CB(DEVWRITELINE(RS232P2_TAG, rs232_port_device, write_dtr))
 	MCFG_DUSCC_OUT_RTSB_CB(DEVWRITELINE(RS232P2_TAG, rs232_port_device, write_rts))
-//	MCFG_DUSCC_OUT_INT_CB(DEVWRITELINE()
+//  MCFG_DUSCC_OUT_INT_CB(DEVWRITELINE()
 
 	MCFG_RS232_PORT_ADD (RS232P1_TAG, default_rs232_devices, "terminal")
 	MCFG_RS232_RXD_HANDLER (DEVWRITELINE ("duscc", duscc68562_device, rxa_w))
@@ -153,9 +153,9 @@ READ32_MEMBER(vme_hcpu30_card_device::bootvect_r)
 WRITE32_MEMBER(vme_hcpu30_card_device::bootvect_w)
 {
 	LOG("%s\n", FUNCNAME);
-	m_sysram[offset % sizeof(m_sysram)] &= ~mem_mask;
-	m_sysram[offset % sizeof(m_sysram)] |= (data & mem_mask);
-	m_sysrom = &m_sysram[0]; // redirect all upcomming accesses to masking RAM until reset.
+	m_sysram[offset % ARRAY_LENGTH(m_sysram)] &= ~mem_mask;
+	m_sysram[offset % ARRAY_LENGTH(m_sysram)] |= (data & mem_mask);
+	m_sysrom = &m_sysram[0]; // redirect all upcoming accesses to masking RAM until reset.
 }
 
 vme_hcpu30_card_device::vme_hcpu30_card_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock)

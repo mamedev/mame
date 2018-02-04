@@ -50,7 +50,7 @@ Notes:
 DEFINE_DEVICE_TYPE(SMS_SPORTS_PAD, sms_sports_pad_device, "sms_sports_pad", "Sega SMS Sports Pad (US)")
 
 // time interval not verified
-#define SPORTS_PAD_INTERVAL attotime::from_hz(XTAL_10_738635MHz/3/512)
+#define SPORTS_PAD_INTERVAL attotime::from_hz(XTAL(10'738'635)/3/512)
 
 
 void sms_sports_pad_device::device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr)

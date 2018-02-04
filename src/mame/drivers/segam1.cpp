@@ -74,6 +74,8 @@ public:
 	required_device<segas24_tile_device> m_tile;
 	required_device<segas24_mixer_device> m_mixer;
 	required_device<ym3438_device> m_ymsnd;
+	void unkm1(machine_config &config);
+	void segam1(machine_config &config);
 };
 
 void segam1_state::machine_start()
@@ -205,8 +207,8 @@ static ADDRESS_MAP_START( segam1_sound_map, AS_PROGRAM, 8, segam1_state )
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( unkm1_sound_map, AS_PROGRAM, 8, segam1_state )
-	AM_RANGE(0xe000, 0xefff) AM_RAM
 	AM_IMPORT_FROM(segam1_sound_map)
+	AM_RANGE(0xe000, 0xefff) AM_RAM
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( segam1_sound_io_map, AS_IO, 8, segam1_state )
@@ -334,9 +336,9 @@ INPUT_PORTS_END
 
 
 
-static MACHINE_CONFIG_START( segam1 )
+MACHINE_CONFIG_START(segam1_state::segam1)
 
-	MCFG_CPU_ADD("maincpu", M68000, XTAL_20MHz/2)
+	MCFG_CPU_ADD("maincpu", M68000, XTAL(20'000'000)/2)
 	MCFG_CPU_PROGRAM_MAP(segam1_map)
 	MCFG_CPU_VBLANK_INT_DRIVER("screen", segam1_state, irq4_line_hold)
 
@@ -386,7 +388,7 @@ static MACHINE_CONFIG_START( segam1 )
 	//MCFG_YM2612_IRQ_HANDLER(WRITELINE(segam1_state, ym3438_irq_handler))
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_DERIVED( unkm1, segam1 )
+MACHINE_CONFIG_DERIVED(segam1_state::unkm1, segam1)
 	MCFG_CPU_MODIFY("audiocpu")
 	MCFG_CPU_PROGRAM_MAP(unkm1_sound_map)
 
@@ -426,4 +428,4 @@ ROM_START( unkm1 ) // 1992.01.31 string
 ROM_END
 
 GAME( 1994, bingpty,    0,        segam1,    segam1, segam1_state,    0, ROT0,  "Sega", "Bingo Party Multicart (Rev B) (M1 Satellite board)", MACHINE_NOT_WORKING )
-GAME( 1992, unkm1,      0,        unkm1,     segam1, segam1_state,    0, ROT0,  "Sega", "Unknown Sega gambling game (M1 Satellite board)", MACHINE_NOT_WORKING | MACHINE_NO_SOUND )
+GAME( 1992, unkm1,      0,        unkm1,     segam1, segam1_state,    0, ROT0,  "Sega", "unknown Sega gambling game (M1 Satellite board)", MACHINE_NOT_WORKING | MACHINE_NO_SOUND )

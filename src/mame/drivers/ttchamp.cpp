@@ -141,6 +141,7 @@ public:
 	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 
 	INTERRUPT_GEN_MEMBER(irq);
+	void ttchamp(machine_config &config);
 };
 
 ALLOW_SAVE_TYPE(ttchamp_state::picmode);
@@ -279,7 +280,7 @@ WRITE16_MEMBER(ttchamp_state::paldat_w)
 
 READ16_MEMBER(ttchamp_state::pic_r)
 {
-//  printf("%06x: read from PIC (%04x)\n", space.device().safe_pc(),mem_mask);
+//  printf("%06x: read from PIC (%04x)\n", m_maincpu->pc(),mem_mask);
 	if (m_picmodex == picmode::SET_READLATCH)
 	{
 //      printf("read data %02x from %02x\n", m_pic_latched, m_pic_readaddr);
@@ -294,7 +295,7 @@ READ16_MEMBER(ttchamp_state::pic_r)
 
 WRITE16_MEMBER(ttchamp_state::pic_w)
 {
-//  printf("%06x: write to PIC %04x (%04x) (%d)\n", space.device().safe_pc(),data,mem_mask, m_picmodex);
+//  printf("%06x: write to PIC %04x (%04x) (%d)\n", m_maincpu->pc(),data,mem_mask, m_picmodex);
 	if (m_picmodex == picmode::IDLE)
 	{
 		if (data == 0x11)
@@ -406,7 +407,7 @@ WRITE16_MEMBER(ttchamp_state::mem_w)
 
 	if (m_spritesinit == 1)
 	{
-	//  printf("%06x: spider_blitter_w %08x %04x %04x (init?) (base?)\n", space.device().safe_pc(), offset * 2, data, mem_mask);
+	//  printf("%06x: spider_blitter_w %08x %04x %04x (init?) (base?)\n", m_maincpu->pc(), offset * 2, data, mem_mask);
 
 		m_spritesinit = 2;
 		m_spritesaddr = offset;
@@ -414,7 +415,7 @@ WRITE16_MEMBER(ttchamp_state::mem_w)
 	}
 	else if (m_spritesinit == 2)
 	{
-	//  printf("%06x: spider_blitter_w %08x %04x %04x (init2) (width?)\n", space.device().safe_pc(), offset * 2, data, mem_mask);
+	//  printf("%06x: spider_blitter_w %08x %04x %04x (init2) (width?)\n", m_maincpu->pc(), offset * 2, data, mem_mask);
 		m_spriteswidth = offset & 0xff;
 		//printf("%08x\n",(offset*2) & 0xfff00);
 
@@ -448,7 +449,7 @@ WRITE16_MEMBER(ttchamp_state::mem_w)
 			if (m_rombank)
 				src += 0x100000;
 
-		//  printf("%06x: spider_blitter_w %08x %04x %04x (previous data width %d address %08x)\n", space.device().safe_pc(), offset * 2, data, mem_mask, m_spriteswidth, m_spritesaddr);
+		//  printf("%06x: spider_blitter_w %08x %04x %04x (previous data width %d address %08x)\n", m_maincpu->pc(), offset * 2, data, mem_mask, m_spriteswidth, m_spritesaddr);
 			offset &= 0x7fff;
 
 			for (int i = 0; i < m_spriteswidth; i++)
@@ -492,7 +493,7 @@ WRITE16_MEMBER(ttchamp_state::mem_w)
 		else
 		{
 			// sometimes happens, why? special meanings? wrong interpretation of something else?
-			printf("%06x: spider_blitter_w unhandled RAM access %08x %04x %04x\n", space.device().safe_pc(), offset * 2, data, mem_mask);
+			printf("%06x: spider_blitter_w unhandled RAM access %08x %04x %04x\n", m_maincpu->pc(), offset * 2, data, mem_mask);
 		}
 	}
 }
@@ -530,14 +531,14 @@ WRITE16_MEMBER(ttchamp_state::port10_w)
 /* selects upper bank for the blitter */
 WRITE16_MEMBER(ttchamp_state::port20_w)
 {
-	//printf("%06x: port20_w %04x %04x\n", space.device().safe_pc(), data, mem_mask);
+	//printf("%06x: port20_w %04x %04x\n", m_maincpu->pc(), data, mem_mask);
 	m_rombank = 1;
 }
 
 /* selects lower bank for the blitter */
 WRITE16_MEMBER(ttchamp_state::port62_w)
 {
-	//printf("%06x: port62_w %04x %04x\n", space.device().safe_pc(), data, mem_mask);
+	//printf("%06x: port62_w %04x %04x\n", m_maincpu->pc(), data, mem_mask);
 	m_rombank = 0;
 }
 
@@ -637,7 +638,7 @@ INTERRUPT_GEN_MEMBER(ttchamp_state::irq)/* right? */
 	device.execute().set_input_line(INPUT_LINE_NMI, PULSE_LINE);
 }
 
-static MACHINE_CONFIG_START( ttchamp )
+MACHINE_CONFIG_START(ttchamp_state::ttchamp)
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", V30, 8000000)
 	MCFG_CPU_PROGRAM_MAP(ttchamp_map)

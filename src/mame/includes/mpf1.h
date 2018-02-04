@@ -75,6 +75,9 @@ public:
 	DECLARE_DRIVER_INIT(mpf1);
 	TIMER_CALLBACK_MEMBER(led_refresh);
 	TIMER_DEVICE_CALLBACK_MEMBER(check_halt_callback);
+	void mpf1p(machine_config &config);
+	void mpf1b(machine_config &config);
+	void mpf1(machine_config &config);
 };
 
 #endif // MAME_INCLUDES_MPF1_H

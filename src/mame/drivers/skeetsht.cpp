@@ -60,6 +60,7 @@ public:
 	required_device<cpu_device> m_68hc11;
 	required_device<ay8910_device> m_ay;
 	required_device<tms34010_device> m_tms;
+	void skeetsht(machine_config &config);
 };
 
 
@@ -185,10 +186,10 @@ WRITE8_MEMBER(skeetsht_state::ay8910_w)
  *************************************/
 
 static ADDRESS_MAP_START( hc11_pgm_map, AS_PROGRAM, 8, skeetsht_state )
-	AM_RANGE(0x2800, 0x2807) AM_READWRITE(tms_r, tms_w)
-	AM_RANGE(0x1800, 0x1800) AM_WRITE(ay8910_w)
-	AM_RANGE(0xb600, 0xbdff) AM_RAM //internal EEPROM
 	AM_RANGE(0x0000, 0xffff) AM_ROM AM_REGION("68hc11", 0)
+	AM_RANGE(0x1800, 0x1800) AM_WRITE(ay8910_w)
+	AM_RANGE(0x2800, 0x2807) AM_READWRITE(tms_r, tms_w)
+	AM_RANGE(0xb600, 0xbdff) AM_RAM //internal EEPROM
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( hc11_io_map, AS_IO, 8, skeetsht_state )
@@ -203,9 +204,9 @@ ADDRESS_MAP_END
  *************************************/
 
 static ADDRESS_MAP_START( tms_program_map, AS_PROGRAM, 16, skeetsht_state )
-	AM_RANGE(0xc0000000, 0xc00001ff) AM_DEVREADWRITE("tms", tms34010_device, io_register_r, io_register_w)
 	AM_RANGE(0x00000000, 0x003fffff) AM_RAM AM_SHARE("tms_vram")
 	AM_RANGE(0x00440000, 0x004fffff) AM_READWRITE(ramdac_r, ramdac_w)
+	AM_RANGE(0xc0000000, 0xc00001ff) AM_DEVREADWRITE("tms", tms34010_device, io_register_r, io_register_w)
 	AM_RANGE(0xff800000, 0xffbfffff) AM_ROM AM_MIRROR(0x00400000) AM_REGION("tms", 0)
 ADDRESS_MAP_END
 
@@ -227,7 +228,7 @@ INPUT_PORTS_END
  *
  *************************************/
 
-static MACHINE_CONFIG_START( skeetsht )
+MACHINE_CONFIG_START(skeetsht_state::skeetsht)
 
 	MCFG_CPU_ADD("68hc11", MC68HC11, 4000000) // ?
 	MCFG_CPU_PROGRAM_MAP(hc11_pgm_map)

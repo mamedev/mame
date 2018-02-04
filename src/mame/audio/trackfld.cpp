@@ -58,7 +58,7 @@ void trackfld_audio_device::device_reset()
 
 READ8_MEMBER( trackfld_audio_device::trackfld_sh_timer_r )
 {
-	uint32_t clock = space.machine().device<cpu_device>("audiocpu")->total_cycles() / TIMER_RATE;
+	uint32_t clock = machine().device<cpu_device>("audiocpu")->total_cycles() / TIMER_RATE;
 
 	return clock & 0xF;
 }

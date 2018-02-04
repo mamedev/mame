@@ -99,6 +99,7 @@ public:
 	DECLARE_DRIVER_INIT(rx78);
 	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 
+	void rx78(machine_config &config);
 private:
 	uint8_t m_vram_read_bank;
 	uint8_t m_vram_write_bank;
@@ -114,7 +115,7 @@ private:
 };
 
 
-#define MASTER_CLOCK XTAL_28_63636MHz
+#define MASTER_CLOCK XTAL(28'636'363)
 
 
 WRITE8_MEMBER( rx78_state::cass_w )
@@ -462,7 +463,7 @@ static GFXDECODE_START( rx78 )
 GFXDECODE_END
 
 
-static MACHINE_CONFIG_START( rx78 )
+MACHINE_CONFIG_START(rx78_state::rx78)
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu",Z80, MASTER_CLOCK/7) // unknown divider
 	MCFG_CPU_PROGRAM_MAP(rx78_mem)
@@ -471,12 +472,12 @@ static MACHINE_CONFIG_START( rx78 )
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
-//	MCFG_SCREEN_REFRESH_RATE(60)
-//	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500)) /* not accurate */
-//	MCFG_SCREEN_SIZE(192, 184)
-//	MCFG_SCREEN_VISIBLE_AREA(0, 192-1, 0, 184-1)
+//  MCFG_SCREEN_REFRESH_RATE(60)
+//  MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500)) /* not accurate */
+//  MCFG_SCREEN_SIZE(192, 184)
+//  MCFG_SCREEN_VISIBLE_AREA(0, 192-1, 0, 184-1)
 	/* guess: generic NTSC video timing at 256x224, system runs at 192x184, suppose with some border area to compensate */
-	MCFG_SCREEN_RAW_PARAMS(MASTER_CLOCK/4, 442, 0, 256, 263, 0, 224) 
+	MCFG_SCREEN_RAW_PARAMS(MASTER_CLOCK/4, 442, 0, 256, 263, 0, 224)
 	MCFG_SCREEN_UPDATE_DRIVER(rx78_state, screen_update)
 
 	MCFG_SCREEN_PALETTE("palette")
@@ -499,7 +500,7 @@ static MACHINE_CONFIG_START( rx78 )
 	MCFG_SOUND_WAVE_ADD(WAVE_TAG, "cassette")
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
 
-	MCFG_SOUND_ADD("sn1", SN76489A, XTAL_28_63636MHz/8) // unknown divider
+	MCFG_SOUND_ADD("sn1", SN76489A, XTAL(28'636'363)/8) // unknown divider
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
 
 	/* Software lists */

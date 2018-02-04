@@ -484,6 +484,10 @@ WRITE8_MEMBER(hp9895_device::phi_dio_w)
 WRITE_LINE_MEMBER(hp9895_device::phi_int_w)
 {
 	m_cpu->set_input_line(INPUT_LINE_NMI , state);
+	if (state) {
+		// Ensure the event queue is emptied before executing any other instruction
+		m_cpu->yield();
+	}
 }
 
 READ8_MEMBER(hp9895_device::phi_reg_r)
@@ -878,7 +882,7 @@ const tiny_rom_entry *hp9895_device::device_rom_region() const
 	return ROM_NAME(hp9895);
 }
 
-MACHINE_CONFIG_MEMBER(hp9895_device::device_add_mconfig)
+MACHINE_CONFIG_START(hp9895_device::device_add_mconfig)
 	MCFG_CPU_ADD("cpu" , Z80 , 4000000)
 	MCFG_CPU_PROGRAM_MAP(z80_program_map)
 	MCFG_CPU_IO_MAP(z80_io_map)

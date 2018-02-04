@@ -131,4 +131,14 @@ public:
 							uint8_t sprite_y_adjust, uint8_t sprite_y_adjust_flip_screen,
 							uint8_t *sprite_ram, offs_t interleave );
 
+							void lnc(machine_config &config);
+							void disco(machine_config &config);
+							void mmonkey(machine_config &config);
+							void bnj(machine_config &config);
+							void cookrace(machine_config &config);
+							void wtennis(machine_config &config);
+							void sdtennis(machine_config &config);
+							void tisland(machine_config &config);
+							void zoar(machine_config &config);
+							void btime(machine_config &config);
 };

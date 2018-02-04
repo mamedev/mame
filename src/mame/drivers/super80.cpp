@@ -226,7 +226,7 @@ ToDo:
 #include "super80.lh"
 
 
-#define MASTER_CLOCK    (XTAL_12MHz)
+#define MASTER_CLOCK    (XTAL(12'000'000))
 #define PIXEL_CLOCK (MASTER_CLOCK/2)
 #define HTOTAL      (384)
 #define HBEND       (0)
@@ -692,7 +692,7 @@ static const char *const relay_sample_names[] =
 };
 
 
-static MACHINE_CONFIG_START( super80 )
+MACHINE_CONFIG_START(super80_state::super80)
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", Z80, MASTER_CLOCK/6)        /* 2 MHz */
 	MCFG_CPU_PROGRAM_MAP(super80_map)
@@ -753,13 +753,13 @@ static MACHINE_CONFIG_START( super80 )
 	MCFG_SOFTWARE_LIST_ADD("cass_list", "super80_cass")
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_DERIVED( super80d, super80 )
+MACHINE_CONFIG_DERIVED(super80_state::super80d, super80)
 	MCFG_GFXDECODE_MODIFY("gfxdecode", super80d)
 	MCFG_SCREEN_MODIFY("screen")
 	MCFG_SCREEN_UPDATE_DRIVER(super80_state, screen_update_super80d)
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_DERIVED( super80e, super80 )
+MACHINE_CONFIG_DERIVED(super80_state::super80e, super80)
 	MCFG_CPU_MODIFY("maincpu")
 	MCFG_CPU_IO_MAP(super80e_io)
 	MCFG_GFXDECODE_MODIFY("gfxdecode", super80e)
@@ -767,7 +767,7 @@ static MACHINE_CONFIG_DERIVED( super80e, super80 )
 	MCFG_SCREEN_UPDATE_DRIVER(super80_state, screen_update_super80e)
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_DERIVED( super80m, super80 )
+MACHINE_CONFIG_DERIVED(super80_state::super80m, super80)
 	MCFG_CPU_MODIFY("maincpu")
 	MCFG_CPU_PROGRAM_MAP(super80m_map)
 
@@ -778,7 +778,7 @@ static MACHINE_CONFIG_DERIVED( super80m, super80 )
 	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE(super80_state, screen_vblank_super80m))
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_START( super80v )
+MACHINE_CONFIG_START(super80_state::super80v)
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", Z80, MASTER_CLOCK/6)        /* 2 MHz */
 	MCFG_CPU_PROGRAM_MAP(super80v_map)
@@ -839,7 +839,7 @@ static MACHINE_CONFIG_START( super80v )
 	MCFG_TIMER_DRIVER_ADD_PERIODIC("timer_k", super80_state, timer_k, attotime::from_hz(300)) // keyb scan
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_DERIVED( super80r, super80v )
+MACHINE_CONFIG_DERIVED(super80_state::super80r, super80v)
 	MCFG_CPU_MODIFY("maincpu")
 	MCFG_CPU_IO_MAP(super80r_io)
 
@@ -852,7 +852,7 @@ static MACHINE_CONFIG_DERIVED( super80r, super80v )
 	MCFG_Z80DMA_IN_IORQ_CB(READ8(super80_state, io_read_byte))
 	MCFG_Z80DMA_OUT_IORQ_CB(WRITE8(super80_state, io_write_byte))
 
-	MCFG_WD2793_ADD("fdc", XTAL_2MHz)
+	MCFG_WD2793_ADD("fdc", XTAL(2'000'000))
 	MCFG_WD_FDC_DRQ_CALLBACK(DEVWRITELINE("dma", z80dma_device, rdy_w))
 	MCFG_FLOPPY_DRIVE_ADD("fdc:0", super80_floppies, "525dd", floppy_image_device::default_floppy_formats)
 	MCFG_FLOPPY_DRIVE_SOUND(true)

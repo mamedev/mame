@@ -66,6 +66,10 @@ public:
 	void appoooh_draw_sprites( bitmap_ind16 &dest_bmp, const rectangle &cliprect, gfx_element *gfx, uint8_t *sprite );
 	void robowres_draw_sprites( bitmap_ind16 &dest_bmp, const rectangle &cliprect, gfx_element *gfx, uint8_t *sprite );
 	DECLARE_WRITE_LINE_MEMBER(adpcm_int);
+	void robowrese(machine_config &config);
+	void robowres(machine_config &config);
+	void appoooh(machine_config &config);
+	void appoooh_common(machine_config &config);
 };
 
 #define CHR1_OFST   0x00  /* palette page of char set #1 */

@@ -1,2 +1,0 @@
-..\..\..\..\dismips.exe: dismips.cpp psxdasm.cpp ..\mips\r3kdasm.cpp ..\mips\mips3dsm.cpp ../../../lib/util/corestr.cpp
-	g++ -O3 -x c++ -Wall -Wno-sign-compare -I../.. -I../../../emu -I../../../osd -I../../../lib/util -I../../../lib/expat -DINLINE="static __inline__" -DSTANDALONE -DLSB_FIRST dismips.cpp psxdasm.cpp ..\mips\r3kdasm.cpp ..\mips\mips3dsm.cpp ../../../lib/util/corestr.cpp -o../../../../dismips

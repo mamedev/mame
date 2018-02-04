@@ -287,7 +287,7 @@ WRITE16_MEMBER( namcos2_state::rozram_word_w )
 {
 	COMBINE_DATA(&m_rozram[offset]);
 	m_tilemap_roz->mark_tile_dirty(offset);
-	//if( space.machine().input().code_pressed(KEYCODE_Q) )
+	//if( machine().input().code_pressed(KEYCODE_Q) )
 	//{
 	//  machine().debug_break();
 	//}

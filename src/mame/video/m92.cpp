@@ -91,9 +91,9 @@ WRITE16_MEMBER(m92_state::m92_spritecontrol_w)
 
 		/* Pixel clock is 26.6666MHz (some boards 27MHz??), we have 0x800 bytes, or 0x400 words to copy from
 		spriteram to the buffer.  It seems safe to assume 1 word can be copied per clock. */
-		m_spritebuffer_timer->adjust(attotime::from_hz(XTAL_26_66666MHz) * 0x400);
+		m_spritebuffer_timer->adjust(attotime::from_hz(XTAL(26'666'666)) * 0x400);
 	}
-//  logerror("%04x: m92_spritecontrol_w %08x %08x\n",space.device().safe_pc(),offset,data);
+//  logerror("%s: m92_spritecontrol_w %08x %08x\n",m_maincpu->pc(),offset,data);
 }
 
 WRITE16_MEMBER(m92_state::m92_videocontrol_w)
@@ -130,7 +130,7 @@ WRITE16_MEMBER(m92_state::m92_videocontrol_w)
 	/* Access to upper palette bank */
 	m_palette_bank = (m_videocontrol >> 1) & 1;
 
-//  logerror("%04x: m92_videocontrol_w %d = %02x\n",space.device().safe_pc(),offset,data);
+//  logerror("%s: m92_videocontrol_w %d = %02x\n",m_maincpu->pc(),offset,data);
 }
 
 READ16_MEMBER(m92_state::m92_paletteram_r)
@@ -140,7 +140,7 @@ READ16_MEMBER(m92_state::m92_paletteram_r)
 
 WRITE16_MEMBER(m92_state::m92_paletteram_w)
 {
-	m_palette->write(space, offset + 0x400 * m_palette_bank, data, mem_mask);
+	m_palette->write16(space, offset + 0x400 * m_palette_bank, data, mem_mask);
 }
 
 /*****************************************************************************/

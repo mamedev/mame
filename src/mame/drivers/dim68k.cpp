@@ -72,6 +72,7 @@ public:
 	void kbd_put(u8 data);
 	MC6845_UPDATE_ROW(crtc_update_row);
 
+	void dim68k(machine_config &config);
 private:
 	bool m_speaker_bit;
 	u8 m_video_control;
@@ -148,13 +149,13 @@ WRITE16_MEMBER( dim68k_state::dim68k_video_control_w )
 
 	switch (data & 0x18)
 	{
-		case 0x00: m_crtc->set_clock(XTAL_14MHz);
+		case 0x00: m_crtc->set_clock(XTAL(14'000'000));
 					break;
-		case 0x08: m_crtc->set_clock(XTAL_3_579545MHz);
+		case 0x08: m_crtc->set_clock(XTAL(3'579'545));
 					break;
-		case 0x10: m_crtc->set_clock(XTAL_14MHz / 2);
+		case 0x10: m_crtc->set_clock(XTAL(14'000'000) / 2);
 					break;
-		case 0x18: m_crtc->set_clock(XTAL_3_579545MHz / 2);
+		case 0x18: m_crtc->set_clock(XTAL(3'579'545) / 2);
 					break;
 	}
 }
@@ -303,9 +304,9 @@ void dim68k_state::kbd_put(u8 data)
 	m_term_data = data;
 }
 
-static MACHINE_CONFIG_START( dim68k )
+MACHINE_CONFIG_START(dim68k_state::dim68k)
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", M68000, XTAL_10MHz)
+	MCFG_CPU_ADD("maincpu", M68000, XTAL(10'000'000))
 	MCFG_CPU_PROGRAM_MAP(dim68k_mem)
 
 	/* video hardware */

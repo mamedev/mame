@@ -36,6 +36,31 @@ READ8_MEMBER(mtx_state::mtx_strobe_r)
 }
 
 /*-------------------------------------------------
+    mtx_subpage_w - rom2 subpages
+-------------------------------------------------*/
+
+/*
+    The original ROM card supported 4 8KB ROM chips. These appeared in
+    ROM slot 2 in subpages 0 to 3. The subpage register starts as 0, but
+    is changed by attempting to write to 0x0000-0x1fff whilst in RELCPMH=0
+    mode (ie. attempting to write to the OS ROM). Videowalls could use a
+    later ROM card with 4 32KB ROMs. These also appeared in ROM slot 2
+    in subpages 0 to 15.
+*/
+
+WRITE8_MEMBER(mtx_state::mtx_subpage_w)
+{
+	if (m_extrom->exists())
+	{
+		if ((data * 0x2000) < m_extrom->get_rom_size())
+			membank("rommap_bank1")->configure_entry(2, m_extrom->get_rom_base() + 0x2000 * data);
+		else
+			membank("rommap_bank1")->configure_entry(2, memregion("user2")->base() + 0x4000);
+		membank("rommap_bank1")->set_entry(2);
+	}
+}
+
+/*-------------------------------------------------
     mtx_bankswitch_w - bankswitch
 -------------------------------------------------*/
 
@@ -73,33 +98,74 @@ void mtx_state::bankswitch(uint8_t data)
 
 	*/
 	address_space &program = m_maincpu->space(AS_PROGRAM);
-	ram_device *messram = m_ram;
 
-//  uint8_t cbm_mode = data >> 7 & 0x01;
-	uint8_t rom_page = data >> 4 & 0x07;
-	uint8_t ram_page = data >> 0 & 0x0f;
+	uint8_t cbm_mode = (data >> 7) & 0x01;
+	uint8_t rom_page = (data >> 4) & 0x07;
+	uint8_t ram_page = (data >> 0) & 0x0f;
 
-	/* set rom bank (switches between basic and assembler rom or cartridges) */
-	membank("bank2")->set_entry(rom_page);
-
-	/* set ram bank, for invalid pages a nop-handler will be installed */
-	if (ram_page >= messram->size()/0x8000)
+	if (cbm_mode)
 	{
-		program.nop_readwrite(0x4000, 0x7fff);
-		program.nop_readwrite(0x8000, 0xbfff);
-	}
-	else if (ram_page + 1 == messram->size()/0x8000)
-	{
-		program.nop_readwrite(0x4000, 0x7fff);
-		program.install_readwrite_bank(0x8000, 0xbfff, "bank4");
-		membank("bank4")->set_entry(ram_page);
+		/* ram based memory map */
+		program.install_readwrite_bank(0x0000, 0x3fff, "rammap_bank1");
+		program.install_readwrite_bank(0x4000, 0x7fff, "rammap_bank2");
+		program.install_readwrite_bank(0x8000, 0xbfff, "rammap_bank3");
+
+		/* set ram bank, for invalid pages a nop-handler will be installed */
+		switch (ram_page)
+		{
+		case 0:
+			if (ram_page * 0xc000 + 0x10000 <= m_ram->size())
+				membank("rammap_bank1")->set_entry(ram_page);
+			else
+				program.nop_readwrite(0x0000, 0x3fff);
+			if (ram_page * 0xc000 + 0xc000 <= m_ram->size())
+				membank("rammap_bank2")->set_entry(ram_page);
+			else
+				program.nop_readwrite(0x4000, 0x7fff);
+			if (ram_page * 0xc000 + 0x8000 <= m_ram->size())
+				membank("rammap_bank3")->set_entry(ram_page);
+			else
+				program.nop_readwrite(0x8000, 0xbfff);
+			break;
+
+		default:
+			if (ram_page * 0xc000 + 0x8000 <= m_ram->size())
+				membank("rammap_bank1")->set_entry(ram_page);
+			else
+				program.nop_readwrite(0x0000, 0x3fff);
+			if (ram_page * 0xc000 + 0xc000 <= m_ram->size())
+				membank("rammap_bank2")->set_entry(ram_page);
+			else
+				program.nop_readwrite(0x4000, 0x7fff);
+			if (ram_page * 0xc000 + 0x10000 <= m_ram->size())
+				membank("rammap_bank3")->set_entry(ram_page);
+			else
+				program.nop_readwrite(0x8000, 0xbfff);
+			break;
+		}
 	}
 	else
 	{
-		program.install_readwrite_bank(0x4000, 0x7fff, "bank3");
-		program.install_readwrite_bank(0x8000, 0xbfff, "bank4");
-		membank("bank3")->set_entry(ram_page);
-		membank("bank4")->set_entry(ram_page);
+		/* rom based memory map */
+		program.install_rom(0x0000, 0x1fff, memregion("user1")->base());
+		program.install_write_handler(0x0000, 0x1fff, write8_delegate(FUNC(mtx_state::mtx_subpage_w), this));
+		program.install_read_bank(0x2000, 0x3fff, "rommap_bank1");
+		program.unmap_write(0x2000, 0x3fff);
+		program.install_readwrite_bank(0x4000, 0x7fff, "rommap_bank2");
+		program.install_readwrite_bank(0x8000, 0xbfff, "rommap_bank3");
+
+		/* set rom bank (switches between basic and assembler rom or cartridges) */
+		membank("rommap_bank1")->set_entry(rom_page);
+
+		/* set ram bank, for invalid pages a nop-handler will be installed */
+		if (ram_page * 0x8000 + 0xc000 <= m_ram->size())
+			membank("rommap_bank2")->set_entry(ram_page);
+		else
+			program.nop_readwrite(0x4000, 0x7fff);
+		if (ram_page * 0x8000 + 0x8000 <= m_ram->size())
+			membank("rommap_bank3")->set_entry(ram_page);
+		else
+			program.nop_readwrite(0x8000, 0xbfff);
 	}
 }
 
@@ -134,6 +200,15 @@ WRITE8_MEMBER(mtx_state::mtx_sound_latch_w)
 WRITE8_MEMBER(mtx_state::mtx_cst_w)
 {
 	m_cassette->output( BIT(data, 0) ? -1 : 1);
+}
+
+/*-------------------------------------------------
+    mtx_cst_motor_w - cassette motor
+-------------------------------------------------*/
+
+WRITE8_MEMBER(mtx_state::mtx_cst_motor_w)
+{
+	m_cassette->change_state(data ? CASSETTE_MOTOR_ENABLED : CASSETTE_MOTOR_DISABLED, CASSETTE_MASK_MOTOR);
 }
 
 /*-------------------------------------------------
@@ -330,6 +405,46 @@ WRITE8_MEMBER(mtx_state::hrx_attr_w)
 }
 
 /***************************************************************************
+    EXTENSION BOARD ROMS
+***************************************************************************/
+
+DEVICE_IMAGE_LOAD_MEMBER( mtx_state, extrom_load )
+{
+	uint32_t size = m_extrom->common_get_size("rom");
+
+	if (size > 0x80000)
+	{
+		image.seterror(IMAGE_ERROR_UNSPECIFIED, "Unsupported rom size");
+		return image_init_result::FAIL;
+	}
+
+	m_extrom->rom_alloc(size, GENERIC_ROM8_WIDTH, ENDIANNESS_LITTLE);
+	m_extrom->common_load_rom(m_extrom->get_rom_base(), size, "rom");
+
+	return image_init_result::PASS;
+}
+
+/***************************************************************************
+    ROMPAK ROMS
+***************************************************************************/
+
+DEVICE_IMAGE_LOAD_MEMBER( mtx_state, rompak_load )
+{
+	uint32_t size = m_rompak->common_get_size("rom");
+
+	if (size > 0x2000)
+	{
+		image.seterror(IMAGE_ERROR_UNSPECIFIED, "Unsupported cartridge size");
+		return image_init_result::FAIL;
+	}
+
+	m_rompak->rom_alloc(size, GENERIC_ROM8_WIDTH, ENDIANNESS_LITTLE);
+	m_rompak->common_load_rom(m_rompak->get_rom_base(), size, "rom");
+
+	return image_init_result::PASS;
+}
+
+/***************************************************************************
     SNAPSHOT
 ***************************************************************************/
 
@@ -396,18 +511,40 @@ SNAPSHOT_LOAD_MEMBER( mtx_state, mtx )
     MACHINE_START( mtx512 )
 -------------------------------------------------*/
 
-MACHINE_START_MEMBER(mtx_state,mtx512)
+MACHINE_START_MEMBER(mtx_state, mtx512)
 {
-	ram_device *messram = m_ram;
+	address_space &program = m_maincpu->space(AS_PROGRAM);
 
-	/* configure memory */
-	membank("bank1")->set_base(memregion("user1")->base());
-	membank("bank2")->configure_entries(0, 8, memregion("user2")->base(), 0x2000);
-	membank("bank3")->configure_entries(0, messram->size()/0x4000/2, messram->pointer(), 0x4000);
-	membank("bank4")->configure_entries(0, messram->size()/0x4000/2, messram->pointer() + messram->size()/2, 0x4000);
+	/* setup banks for rom based memory map */
+	program.install_read_bank(0x2000, 0x3fff, "rommap_bank1");
+	program.install_readwrite_bank(0x4000, 0x7fff, "rommap_bank2");
+	program.install_readwrite_bank(0x8000, 0xbfff, "rommap_bank3");
+
+	membank("rommap_bank1")->configure_entries(0, 8, memregion("user2")->base(), 0x2000);
+	if (m_extrom->exists())
+		membank("rommap_bank1")->configure_entry(2, m_extrom->get_rom_base());
+	if (m_rompak->exists())
+		membank("rommap_bank1")->configure_entry(7, m_rompak->get_rom_base());
+	membank("rommap_bank2")->configure_entries(0, 16, m_ram->pointer() + 0x8000, 0x8000);
+	membank("rommap_bank3")->configure_entries(0, 16, m_ram->pointer() + 0x4000, 0x8000);
+
+	/* setup banks for ram based memory map */
+	program.install_readwrite_bank(0x0000, 0x3fff, "rammap_bank1");
+	program.install_readwrite_bank(0x4000, 0x7fff, "rammap_bank2");
+	program.install_readwrite_bank(0x8000, 0xbfff, "rammap_bank3");
+
+	membank("rammap_bank1")->configure_entry(0, m_ram->pointer() + 0xc000);
+	membank("rammap_bank1")->configure_entries(1, 15, m_ram->pointer() + 0x10000, 0xc000);
+	membank("rammap_bank2")->configure_entry(0, m_ram->pointer() + 0x8000);
+	membank("rammap_bank2")->configure_entries(1, 15, m_ram->pointer() + 0x14000, 0xc000);
+	membank("rammap_bank3")->configure_entry(0, m_ram->pointer() + 0x4000);
+	membank("rammap_bank3")->configure_entries(1, 15, m_ram->pointer() + 0x18000, 0xc000);
+
+	/* install 4000h bytes common block */
+	program.install_ram(0xc000, 0xffff, m_ram->pointer());
 }
 
-MACHINE_RESET_MEMBER(mtx_state,mtx512)
+MACHINE_RESET_MEMBER(mtx_state, mtx512)
 {
 	/* bank switching */
 	bankswitch(0);

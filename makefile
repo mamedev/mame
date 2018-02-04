@@ -40,7 +40,7 @@
 
 # DEBUG = 1
 # PROFILER = 1
-# SANITIZE = 1
+# SANITIZE = 
 
 # PTR64 = 1
 # BIGENDIAN = 1
@@ -780,6 +780,10 @@ endif
 
 ifdef WEBASSEMBLY
 PARAMS += --WEBASSEMBLY='$(WEBASSEMBLY)'
+endif
+
+ifdef SANITIZE
+PARAMS += --SANITIZE='$(SANITIZE)'
 endif
 #-------------------------------------------------
 # All scripts
@@ -1547,14 +1551,14 @@ endif
 
 ifeq (posix,$(SHELLTYPE))
 $(GENDIR)/version.cpp: $(GENDIR)/git_desc | $(GEN_FOLDERS)
-	@echo '#define BARE_BUILD_VERSION "0.190"' > $@
+	@echo '#define BARE_BUILD_VERSION "0.194"' > $@
 	@echo 'extern const char bare_build_version[];' >> $@
 	@echo 'extern const char build_version[];' >> $@
 	@echo 'const char bare_build_version[] = BARE_BUILD_VERSION;' >> $@
 	@echo 'const char build_version[] = BARE_BUILD_VERSION " ($(NEW_GIT_VERSION))";' >> $@
 else
 $(GENDIR)/version.cpp: $(GENDIR)/git_desc
-	@echo #define BARE_BUILD_VERSION "0.190" > $@
+	@echo #define BARE_BUILD_VERSION "0.194" > $@
 	@echo extern const char bare_build_version[]; >> $@
 	@echo extern const char build_version[]; >> $@
 	@echo const char bare_build_version[] = BARE_BUILD_VERSION; >> $@

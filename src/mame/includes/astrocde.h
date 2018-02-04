@@ -13,7 +13,7 @@
 #include "sound/votrax.h"
 #include "screen.h"
 
-#define ASTROCADE_CLOCK     (XTAL_14_31818MHz/2)
+#define ASTROCADE_CLOCK     (XTAL(14'318'181)/2)
 
 #define AC_SOUND_PRESENT    (0x01)
 #define AC_LIGHTPEN_INTS    (0x02)
@@ -189,13 +189,26 @@ public:
 	void astrocade_trigger_lightpen(uint8_t vfeedback, uint8_t hfeedback);
 	inline void increment_source(uint8_t curwidth, uint8_t *u13ff);
 	inline void increment_dest(uint8_t curwidth);
-	void execute_blit(address_space &space);
+	void execute_blit();
 	void init_sparklestar();
 	virtual void machine_start() override;
 
 	DECLARE_READ8_MEMBER( votrax_speech_r );
 	CUSTOM_INPUT_MEMBER( votrax_speech_status_r );
 
+	void astrocade_base(machine_config &config);
+	void astrocade_16color_base(machine_config &config);
+	void astrocade_mono_sound(machine_config &config);
+	void astrocade_stereo_sound(machine_config &config);
+	void spacezap(machine_config &config);
+	void gorf(machine_config &config);
+	void seawolf2(machine_config &config);
+	void profpac(machine_config &config);
+	void robby(machine_config &config);
+	void ebases(machine_config &config);
+	void wow(machine_config &config);
+	void tenpindx(machine_config &config);
+	void demndrgn(machine_config &config);
 protected:
 	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr) override;
 };

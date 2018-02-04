@@ -34,4 +34,6 @@ public:
 	void arcadecl_bitmap_render(bitmap_ind16 &bitmap, const rectangle &cliprect);
 
 	static const atari_motion_objects_config s_mob_config;
+	void sparkz(machine_config &config);
+	void arcadecl(machine_config &config);
 };

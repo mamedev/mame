@@ -74,7 +74,7 @@ public:
 
 	// specific implementation
 	cassette_state get_state() { return m_state; }
-	void set_state(cassette_state state) { change_state(m_state, (cassette_state)(~0)); }
+	void set_state(cassette_state state) { change_state(state, (cassette_state)(~0)); }
 	void change_state(cassette_state state, cassette_state mask);
 
 	double input();

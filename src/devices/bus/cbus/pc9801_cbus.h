@@ -58,13 +58,16 @@ public:
 	// construction/destruction
 	pc9801_slot_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
+	address_space &io_space() const { return m_cpu->space(AS_IO); }
+
 protected:
 	// device-level overrides
 	virtual void device_start() override;
 	virtual void device_config_complete() override;
-//private:
-//  device_pc9801_slot_card_interface *m_card;
 
+private:
+//  device_pc9801_slot_card_interface *m_card;
+	required_device<cpu_device> m_cpu;
 };
 
 

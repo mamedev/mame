@@ -189,7 +189,7 @@ void cthd_prot_device::ct2k3sp_sx_decrypt( uint8_t* fixedrom, uint32_t fixedrom_
 
 	for (int i = 0; i < rom_size; i++)
 	{
-		int ofst = BITSWAP24((i & 0x1ffff), 23, 22, 21, 20, 19, 18, 17,  3,
+		int ofst = bitswap<24>((i & 0x1ffff), 23, 22, 21, 20, 19, 18, 17,  3,
 											0,  1,  4,  2, 13, 14, 16, 15,
 											5,  6, 11, 10,  9,  8,  7, 12 );
 		ofst += (i >> 17) << 17;
@@ -275,7 +275,7 @@ void cthd_prot_device::patch_ct2k3sa(uint8_t* cpurom, uint32_t cpurom_size)
 
 
 /* Matrimelee / Shin Gouketsuji Ichizoku Toukon (bootleg) */
-#define MATRIMBLZ80(i) (i ^ (BITSWAP8(i & 0x3,4,3,1,2,0,7,6,5) << 8))
+#define MATRIMBLZ80(i) (i ^ (bitswap<8>(i & 0x3,4,3,1,2,0,7,6,5) << 8))
 
 void cthd_prot_device::matrimbl_decrypt(uint8_t* sprrom, uint32_t sprrom_size, uint8_t* audiorom, uint32_t audiorom_size)
 {

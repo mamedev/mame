@@ -295,7 +295,7 @@ GFXDECODE_END
  *
  *************************************/
 
-static MACHINE_CONFIG_START( matmania )
+MACHINE_CONFIG_START(matmania_state::matmania)
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", M6502, 1500000) /* 1.5 MHz ???? */
@@ -338,7 +338,7 @@ static MACHINE_CONFIG_START( matmania )
 MACHINE_CONFIG_END
 
 
-static MACHINE_CONFIG_START( maniach )
+MACHINE_CONFIG_START(matmania_state::maniach)
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", M6502, 1500000) /* 1.5 MHz ???? */

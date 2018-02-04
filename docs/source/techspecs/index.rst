@@ -8,6 +8,7 @@ This section covers technical specifications useful to programmers working on MA
 
 	device_memory_interface
 	device_rom_interface
+	device_disasm_interface
 	floppy
 	nscsi
 	luaengine

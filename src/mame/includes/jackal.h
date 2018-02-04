@@ -2,8 +2,8 @@
 // copyright-holders:Curt Coder
 // thanks-to:Kenneth Lin (original driver author)
 
-#define MASTER_CLOCK         XTAL_18_432MHz
-#define SOUND_CLOCK          XTAL_3_579545MHz
+#define MASTER_CLOCK         XTAL(18'432'000)
+#define SOUND_CLOCK          XTAL(3'579'545)
 
 
 
@@ -58,4 +58,5 @@ public:
 	void draw_background( screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect );
 	void draw_sprites_region( bitmap_ind16 &bitmap, const rectangle &cliprect, const uint8_t *sram, int length, int bank );
 	void draw_sprites( bitmap_ind16 &bitmap, const rectangle &cliprect );
+	void jackal(machine_config &config);
 };

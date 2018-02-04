@@ -6,6 +6,11 @@
 
     Driver file for Elektronika MS 1502
 
+    To do:
+    - fix video errors caused by 465caf8038a120b4c1ffad9df67a1dc7474e5bb1
+      "cga: treat as fixed sync monitor (nw)"
+    - debug video init in BIOS 7.2
+
 ***************************************************************************/
 
 #include "emu.h"
@@ -241,8 +246,8 @@ static INPUT_PORTS_START( mc1502 )
 	PORT_INCLUDE( mc7007_3_keyboard )
 INPUT_PORTS_END
 
-static MACHINE_CONFIG_START( mc1502 )
-	MCFG_CPU_ADD("maincpu", I8088, XTAL_16MHz/3)
+MACHINE_CONFIG_START(mc1502_state::mc1502)
+	MCFG_CPU_ADD("maincpu", I8088, XTAL(16'000'000)/3)
 	MCFG_CPU_PROGRAM_MAP(mc1502_map)
 	MCFG_CPU_IO_MAP(mc1502_io)
 	MCFG_CPU_IRQ_ACKNOWLEDGE_DEVICE("pic8259", pic8259_device, inta_cb)
@@ -251,11 +256,11 @@ static MACHINE_CONFIG_START( mc1502 )
 	MCFG_MACHINE_RESET_OVERRIDE( mc1502_state, mc1502 )
 
 	MCFG_DEVICE_ADD("pit8253", PIT8253, 0)
-	MCFG_PIT8253_CLK0(XTAL_16MHz/12) /* heartbeat IRQ */
+	MCFG_PIT8253_CLK0(XTAL(16'000'000)/12) /* heartbeat IRQ */
 	MCFG_PIT8253_OUT0_HANDLER(DEVWRITELINE("pic8259", pic8259_device, ir0_w))
-	MCFG_PIT8253_CLK1(XTAL_16MHz/12) /* serial port */
+	MCFG_PIT8253_CLK1(XTAL(16'000'000)/12) /* serial port */
 	MCFG_PIT8253_OUT1_HANDLER(WRITELINE(mc1502_state, mc1502_pit8253_out1_changed))
-	MCFG_PIT8253_CLK2(XTAL_16MHz/12) /* pio port c pin 4, and speaker polling enough */
+	MCFG_PIT8253_CLK2(XTAL(16'000'000)/12) /* pio port c pin 4, and speaker polling enough */
 	MCFG_PIT8253_OUT2_HANDLER(WRITELINE(mc1502_state, mc1502_pit8253_out2_changed))
 
 	MCFG_DEVICE_ADD("pic8259", PIC8259, 0)
@@ -373,6 +378,10 @@ ROM_START( mc1502 )
 	ROM_SYSTEM_BIOS(9, "v52_91", "v5.2 10/11/91")
 	ROMX_LOAD( "msv5~2b0.pgm", 0xc000, 0x2000, CRC(f7f370e9) SHA1(e069a35005581a02856853b57dd511ab8e10054b),ROM_BIOS(10))
 	ROMX_LOAD( "msv5~2b1.pgm", 0xe000, 0x2000, CRC(d50e1c43) SHA1(22724dec0052ee9e52f44f5914f2f5f3fae14612),ROM_BIOS(10))
+
+	// 7.2
+	ROM_SYSTEM_BIOS(10, "v72", "v7.2 01/21/96")
+	ROMX_LOAD( "7.2_1.bin", 0xe000, 0x2000, CRC(80912ad4) SHA1(cc54b77b2db4cc5d614efafd04367d2f06400fc8),ROM_BIOS(11))
 
 	ROM_REGION(0x2000,"gfx1", ROMREGION_ERASE00)
 	ROM_LOAD( "symgen.rom", 0x0000, 0x2000, CRC(b2747a52) SHA1(6766d275467672436e91ac2997ac6b77700eba1e))

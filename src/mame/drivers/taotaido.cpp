@@ -102,7 +102,7 @@ static ADDRESS_MAP_START( main_map, AS_PROGRAM, 16, taotaido_state )
 	AM_RANGE(0xa00000, 0xa01fff) AM_RAM AM_SHARE("spriteram")       // sprite ram
 	AM_RANGE(0xc00000, 0xc0ffff) AM_RAM AM_SHARE("spriteram2")      // sprite tile lookup ram
 	AM_RANGE(0xfe0000, 0xfeffff) AM_RAM                                     // main ram
-	AM_RANGE(0xffc000, 0xffcfff) AM_RAM_DEVWRITE("palette", palette_device, write) AM_SHARE("palette")    // palette ram
+	AM_RANGE(0xffc000, 0xffcfff) AM_RAM_DEVWRITE("palette", palette_device, write16) AM_SHARE("palette")    // palette ram
 	AM_RANGE(0xffe000, 0xffe3ff) AM_RAM AM_SHARE("scrollram")       // rowscroll / rowselect / scroll ram
 	AM_RANGE(0xffff80, 0xffff9f) AM_DEVREADWRITE8("io1", vs9209_device, read, write, 0x00ff)
 	AM_RANGE(0xffffa0, 0xffffbf) AM_DEVREADWRITE8("io2", vs9209_device, read, write, 0x00ff)
@@ -344,7 +344,7 @@ GFXDECODE_END
 
 
 
-static MACHINE_CONFIG_START( taotaido )
+MACHINE_CONFIG_START(taotaido_state::taotaido)
 	MCFG_CPU_ADD("maincpu", M68000, 32000000/2)
 	MCFG_CPU_PROGRAM_MAP(main_map)
 	MCFG_CPU_VBLANK_INT_DRIVER("screen", taotaido_state,  irq1_line_hold)

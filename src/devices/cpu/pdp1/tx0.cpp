@@ -12,6 +12,7 @@
 
 #include "emu.h"
 #include "tx0.h"
+#include "tx0dasm.h"
 #include "debugger.h"
 
 #define LOG 0
@@ -1075,15 +1076,12 @@ void tx0_device::io_complete()
 }
 
 
-offs_t tx0_8kw_device::disasm_disassemble(std::ostream &stream, offs_t pc, const uint8_t *oprom, const uint8_t *opram, uint32_t options)
+util::disasm_interface *tx0_8kw_device::create_disassembler()
 {
-	extern CPU_DISASSEMBLE( tx0_8kw );
-	return CPU_DISASSEMBLE_NAME(tx0_8kw)(this, stream, pc, oprom, opram, options);
+	return new tx0_8kw_disassembler;
 }
 
-
-offs_t tx0_64kw_device::disasm_disassemble(std::ostream &stream, offs_t pc, const uint8_t *oprom, const uint8_t *opram, uint32_t options)
+util::disasm_interface *tx0_64kw_device::create_disassembler()
 {
-	extern CPU_DISASSEMBLE( tx0_64kw );
-	return CPU_DISASSEMBLE_NAME(tx0_64kw)(this, stream, pc, oprom, opram, options);
+	return new tx0_64kw_disassembler;
 }

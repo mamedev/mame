@@ -317,14 +317,14 @@ static SLOT_INTERFACE_START( dgnbeta_floppies )
 	SLOT_INTERFACE("dd", FLOPPY_35_DD)
 SLOT_INTERFACE_END
 
-static MACHINE_CONFIG_START( dgnbeta )
+MACHINE_CONFIG_START(dgn_beta_state::dgnbeta)
 	/* basic machine hardware */
-	MCFG_CPU_ADD(MAINCPU_TAG, M6809E, DGNBETA_CPU_SPEED_HZ)        /* 2 MHz */
+	MCFG_CPU_ADD(MAINCPU_TAG, MC6809E, DGNBETA_CPU_SPEED_HZ)        /* 2 MHz */
 	MCFG_CPU_PROGRAM_MAP(dgnbeta_map)
 	MCFG_CPU_DISASSEMBLE_OVERRIDE(dgn_beta_state, dgnbeta_dasm_override)
 
 	/* both cpus in the beta share the same address/data buses */
-	MCFG_CPU_ADD(DMACPU_TAG, M6809E, DGNBETA_CPU_SPEED_HZ)        /* 2 MHz */
+	MCFG_CPU_ADD(DMACPU_TAG, MC6809E, DGNBETA_CPU_SPEED_HZ)        /* 2 MHz */
 	MCFG_CPU_PROGRAM_MAP(dgnbeta_map)
 
 	/* video hardware */
@@ -370,7 +370,7 @@ static MACHINE_CONFIG_START( dgnbeta )
 	MCFG_PIA_IRQA_HANDLER(WRITELINE(dgn_beta_state, d_pia2_irq_a))
 	MCFG_PIA_IRQB_HANDLER(WRITELINE(dgn_beta_state, d_pia2_irq_b))
 
-	MCFG_WD2797_ADD(FDC_TAG, XTAL_1MHz)
+	MCFG_WD2797_ADD(FDC_TAG, XTAL(1'000'000))
 	MCFG_WD_FDC_INTRQ_CALLBACK(WRITELINE(dgn_beta_state, dgnbeta_fdc_intrq_w))
 	MCFG_WD_FDC_DRQ_CALLBACK(WRITELINE(dgn_beta_state, dgnbeta_fdc_drq_w))
 
@@ -383,7 +383,7 @@ static MACHINE_CONFIG_START( dgnbeta )
 	MCFG_FLOPPY_DRIVE_ADD(FDC_TAG ":3", dgnbeta_floppies, nullptr, dgn_beta_state::floppy_formats)
 	MCFG_FLOPPY_DRIVE_SOUND(true)
 
-	MCFG_MC6845_ADD("crtc", HD6845, "screen", XTAL_12_288MHz / 16)    //XTAL is guessed
+	MCFG_MC6845_ADD("crtc", HD6845, "screen", XTAL(12'288'000) / 16)    //XTAL is guessed
 	MCFG_MC6845_SHOW_BORDER_AREA(false)
 	MCFG_MC6845_CHAR_WIDTH(16) /*?*/
 	MCFG_MC6845_UPDATE_ROW_CB(dgn_beta_state, crtc_update_row)

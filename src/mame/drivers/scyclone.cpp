@@ -88,6 +88,7 @@ public:
 
 	CUSTOM_INPUT_MEMBER(collision_r);
 
+	void scyclone(machine_config &config);
 protected:
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
@@ -595,7 +596,7 @@ INTERRUPT_GEN_MEMBER(scyclone_state::irq)
 }
 
 
-static MACHINE_CONFIG_START( scyclone )
+MACHINE_CONFIG_START(scyclone_state::scyclone)
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", Z80, 5000000/2) // MOSTEK Z80-CPU   ? MHz  (there's also a 9.987MHz XTAL)  intermissions seem driven directly by CPU speed for reference

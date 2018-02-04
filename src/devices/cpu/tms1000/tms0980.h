@@ -24,14 +24,12 @@ protected:
 
 	// overrides
 	virtual u32 decode_fixed(u16 op);
-	virtual u32 decode_micro(u8 sel);
+	virtual u32 decode_micro(u8 sel) override;
 	virtual void device_reset() override;
 
 	virtual void device_add_mconfig(machine_config &config) override;
 
-	virtual u32 disasm_min_opcode_bytes() const override { return 2; }
-	virtual u32 disasm_max_opcode_bytes() const override { return 2; }
-	virtual offs_t disasm_disassemble(std::ostream &stream, offs_t pc, const u8 *oprom, const u8 *opram, u32 options) override;
+	virtual util::disasm_interface *create_disassembler() override;
 
 	virtual u8 read_k_input() override;
 	virtual void set_cki_bus() override;

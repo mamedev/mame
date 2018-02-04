@@ -120,6 +120,7 @@ public:
 	DECLARE_DRIVER_INIT(splus);
 	required_device<cpu_device> m_maincpu;
 	required_device<i2cmem_device> m_i2cmem;
+	void splus(machine_config &config);
 };
 
 /* Static Variables */
@@ -139,7 +140,7 @@ static const uint8_t optics[200] = {
 	0x07, 0x07, 0x00, 0x07, 0x07, 0x07, 0x07, 0x07, 0x07, 0x07, 0x07, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
 	0x07, 0x07, 0x00, 0x07, 0x07, 0x07, 0x07, 0x07, 0x07, 0x07, 0x07, 0x00, 0x07, 0x07, 0x07, 0x07, 0x07, 0x07, 0x07 };
 
-#define MASTER_CLOCK        XTAL_20MHz
+#define MASTER_CLOCK        XTAL(20'000'000)
 #define CPU_CLOCK           ((MASTER_CLOCK)/2)      /* divided by 2 - 7474 */
 #define SOUND_CLOCK         ((MASTER_CLOCK)/12)
 
@@ -682,7 +683,7 @@ INPUT_PORTS_END
 *     Machine Driver     *
 *************************/
 
-static MACHINE_CONFIG_START( splus )   // basic machine hardware
+MACHINE_CONFIG_START(splus_state::splus)   // basic machine hardware
 	MCFG_CPU_ADD("maincpu", I80C32, CPU_CLOCK)
 	MCFG_CPU_PROGRAM_MAP(splus_map)
 	MCFG_CPU_IO_MAP(splus_iomap)

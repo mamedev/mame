@@ -67,6 +67,7 @@ public:
 	DECLARE_WRITE8_MEMBER(i8255_port_c_w);
 	DECLARE_WRITE_LINE_MEMBER(write_centronics_ack);
 
+	void elwro800(machine_config &config);
 protected:
 	required_device<i8251_device> m_i8251;
 	required_device<i8255_device> m_i8255;
@@ -129,7 +130,7 @@ void elwro800_state::elwro800jr_mmu_w(uint8_t data)
 	uint8_t cs;
 	uint8_t ls175;
 
-	ls175 = BITSWAP8(data, 7, 6, 5, 4, 4, 5, 7, 6) & 0x0f;
+	ls175 = bitswap<8>(data, 7, 6, 5, 4, 4, 5, 7, 6) & 0x0f;
 
 	cs = prom[((0x0000 >> 10) | (ls175 << 6)) & 0x1ff];
 	if (!BIT(cs,0))
@@ -374,8 +375,8 @@ static ADDRESS_MAP_START(elwro800_io, AS_IO, 8, elwro800_state)
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START(elwro800_m1, AS_OPCODES, 8, elwro800_state)
-	AM_RANGE(0x0066, 0x0066) AM_READ(nmi_r)
 	AM_RANGE(0x0000, 0x1fff) AM_DEVICE("bank1", address_map_bank_device, amap8)
+	AM_RANGE(0x0066, 0x0066) AM_READ(nmi_r)
 	AM_RANGE(0x2000, 0x3fff) AM_DEVICE("bank2", address_map_bank_device, amap8)
 	AM_RANGE(0x4000, 0xffff) AM_RAMBANK("rambank3")
 ADDRESS_MAP_END
@@ -554,7 +555,7 @@ static GFXDECODE_START( elwro800 )
 GFXDECODE_END
 
 
-static MACHINE_CONFIG_START( elwro800 )
+MACHINE_CONFIG_START(elwro800_state::elwro800)
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu",Z80, 3500000)    /* 3.5 MHz */
@@ -620,12 +621,12 @@ static MACHINE_CONFIG_START( elwro800 )
 
 	MCFG_DEVICE_ADD("bank1", ADDRESS_MAP_BANK, 0)
 	MCFG_DEVICE_PROGRAM_MAP(elwro800_bank1)
-	MCFG_ADDRESS_MAP_BANK_DATABUS_WIDTH(8)
+	MCFG_ADDRESS_MAP_BANK_DATA_WIDTH(8)
 	MCFG_ADDRESS_MAP_BANK_STRIDE(0x2000)
 
 	MCFG_DEVICE_ADD("bank2", ADDRESS_MAP_BANK, 0)
 	MCFG_DEVICE_PROGRAM_MAP(elwro800_bank2)
-	MCFG_ADDRESS_MAP_BANK_DATABUS_WIDTH(8)
+	MCFG_ADDRESS_MAP_BANK_DATA_WIDTH(8)
 	MCFG_ADDRESS_MAP_BANK_STRIDE(0x2000)
 MACHINE_CONFIG_END
 

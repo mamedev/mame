@@ -135,6 +135,9 @@ namespace spv {
         const unsigned typeStart = idPos(id);
         const spv::Op  opCode    = asOpCode(typeStart);
 
+        if (errorLatch)
+            return 0;
+
         switch (opCode) {
         case spv::OpTypeInt:   // fall through...
         case spv::OpTypeFloat: return (spv[typeStart+2]+31)/32;
@@ -148,8 +151,10 @@ namespace spv {
     unsigned spirvbin_t::idTypeSizeInWords(spv::Id id) const
     {
         const auto tid_it = idTypeSizeMap.find(id);
-        if (tid_it == idTypeSizeMap.end())
+        if (tid_it == idTypeSizeMap.end()) {
             error("type size for ID not found");
+            return 0;
+        }
 
         return tid_it->second;
     }
@@ -215,14 +220,19 @@ namespace spv {
     bool spirvbin_t::isConstOp(spv::Op opCode) const
     {
         switch (opCode) {
-        case spv::OpConstantNull:       error("unimplemented constant type");
-        case spv::OpConstantSampler:    error("unimplemented constant type");
+        case spv::OpConstantNull:
+        case spv::OpConstantSampler:
+            error("unimplemented constant type");
+            return true;
 
         case spv::OpConstantTrue:
         case spv::OpConstantFalse:
         case spv::OpConstantComposite:
-        case spv::OpConstant:         return true;
-        default:                      return false;
+        case spv::OpConstant:
+            return true;
+
+        default:
+            return false;
         }
     }
 
@@ -248,19 +258,31 @@ namespace spv {
     {
         assert(id != spv::NoResult && newId != spv::NoResult);
 
+        if (id > bound()) {
+            error(std::string("ID out of range: ") + std::to_string(id));
+            return spirvbin_t::unused;
+        }
+
         if (id >= idMapL.size())
             idMapL.resize(id+1, unused);
 
         if (newId != unmapped && newId != unused) {
-            if (isOldIdUnused(id))
+            if (isOldIdUnused(id)) {
                 error(std::string("ID unused in module: ") + std::to_string(id));
+                return spirvbin_t::unused;
+            }
 
-            if (!isOldIdUnmapped(id))
+            if (!isOldIdUnmapped(id)) {
                 error(std::string("ID already mapped: ") + std::to_string(id) + " -> "
-                + std::to_string(localId(id)));
+                        + std::to_string(localId(id)));
 
-            if (isNewIdMapped(newId))
+                return spirvbin_t::unused;
+            }
+
+            if (isNewIdMapped(newId)) {
                 error(std::string("ID already used in module: ") + std::to_string(newId));
+                return spirvbin_t::unused;
+            }
 
             msg(4, 4, std::string("map: ") + std::to_string(id) + " -> " + std::to_string(newId));
             setMapped(newId);
@@ -294,6 +316,10 @@ namespace spv {
         process(inst_fn_nop, // ignore instructions
             [this](spv::Id& id) {
                 id = localId(id);
+
+                if (errorLatch)
+                    return;
+
                 assert(id != unused && id != unmapped);
             }
         );
@@ -312,14 +338,22 @@ namespace spv {
                 continue;
 
             // Find a new mapping for any used but unmapped IDs
-            if (isOldIdUnmapped(id))
+            if (isOldIdUnmapped(id)) {
                 localId(id, unusedId = nextUnusedId(unusedId));
+                if (errorLatch)
+                    return;
+            }
 
-            if (isOldIdUnmapped(id))
+            if (isOldIdUnmapped(id)) {
                 error(std::string("old ID not mapped: ") + std::to_string(id));
+                return;
+            }
 
             // Track max bound
             maxBound = std::max(maxBound, localId(id) + 1);
+
+            if (errorLatch)
+                return;
         }
 
         bound(maxBound); // reset header ID bound to as big as it now needs to be
@@ -401,6 +435,9 @@ namespace spv {
                     if (typeId != spv::NoResult) {
                         const unsigned idTypeSize = typeSizeInWords(typeId);
 
+                        if (errorLatch)
+                            return false;
+
                         if (idTypeSize != 0)
                             idTypeSizeMap[resultId] = idTypeSize;
                     }
@@ -416,17 +453,26 @@ namespace spv {
                 } else if (opCode == spv::Op::OpEntryPoint) {
                     entryPoint = asId(start + 2);
                 } else if (opCode == spv::Op::OpFunction) {
-                    if (fnStart != 0)
+                    if (fnStart != 0) {
                         error("nested function found");
+                        return false;
+                    }
+
                     fnStart = start;
                     fnRes   = asId(start + 2);
                 } else if (opCode == spv::Op::OpFunctionEnd) {
                     assert(fnRes != spv::NoResult);
-                    if (fnStart == 0)
+                    if (fnStart == 0) {
                         error("function end without function start");
+                        return false;
+                    }
+
                     fnPos[fnRes] = range_t(fnStart, start + asWordCount(start));
                     fnStart = 0;
                 } else if (isConstOp(opCode)) {
+                    if (errorLatch)
+                        return false;
+
                     assert(asId(start + 2) != spv::NoResult);
                     typeConstPos.insert(start);
                 } else if (isTypeOp(opCode)) {
@@ -446,29 +492,37 @@ namespace spv {
     {
         msg(2, 2, std::string("validating: "));
 
-        if (spv.size() < header_size)
+        if (spv.size() < header_size) {
             error("file too short: ");
+            return;
+        }
 
-        if (magic() != spv::MagicNumber)
+        if (magic() != spv::MagicNumber) {
             error("bad magic number");
+            return;
+        }
 
         // field 1 = version
         // field 2 = generator magic
         // field 3 = result <id> bound
 
-        if (schemaNum() != 0)
+        if (schemaNum() != 0) {
             error("bad schema, must be 0");
+            return;
+        }
     }
 
     int spirvbin_t::processInstruction(unsigned word, instfn_t instFn, idfn_t idFn)
     {
         const auto     instructionStart = word;
         const unsigned wordCount = asWordCount(instructionStart);
-        const spv::Op  opCode    = asOpCode(instructionStart);
         const int      nextInst  = word++ + wordCount;
+        spv::Op  opCode    = asOpCode(instructionStart);
 
-        if (nextInst > int(spv.size()))
+        if (nextInst > int(spv.size())) {
             error("spir instruction terminated too early");
+            return -1;
+        }
 
         // Base for computing number of operands; will be updated as more is learned
         unsigned numOperands = wordCount - 1;
@@ -506,6 +560,18 @@ namespace spv {
 
         // Store IDs from instruction in our map
         for (int op = 0; numOperands > 0; ++op, --numOperands) {
+            // SpecConstantOp is special: it includes the operands of another opcode which is
+            // given as a literal in the 3rd word.  We will switch over to pretending that the
+            // opcode being processed is the literal opcode value of the SpecConstantOp.  See the
+            // SPIRV spec for details.  This way we will handle IDs and literals as appropriate for
+            // the embedded op.
+            if (opCode == spv::OpSpecConstantOp) {
+                if (op == 0) {
+                    opCode = asOpCode(word++);  // this is the opcode embedded in the SpecConstantOp.
+                    --numOperands;
+                }
+            }
+
             switch (spv::InstructionDesc[opCode].operands.getClass(op)) {
             case spv::OperandId:
             case spv::OperandScope:
@@ -537,6 +603,9 @@ namespace spv {
                     const unsigned literalSizePos = (idBufferPos+idBufferSize-2) % idBufferSize;
                     const unsigned literalSize = idTypeSizeInWords(idBuffer[literalSizePos]);
                     const unsigned numLiteralIdPairs = (nextInst-word) / (1+literalSize);
+
+                    if (errorLatch)
+                        return -1;
 
                     for (unsigned arg=0; arg<numLiteralIdPairs; ++arg) {
                         word += literalSize;  // literal
@@ -614,8 +683,12 @@ namespace spv {
         // basic parsing and InstructionDesc table borrowed from SpvDisassemble.cpp...
         unsigned nextInst = unsigned(spv.size());
 
-        for (unsigned word = begin; word < end; word = nextInst)
+        for (unsigned word = begin; word < end; word = nextInst) {
             nextInst = processInstruction(word, instFn, idFn);
+
+            if (errorLatch)
+                return *this;
+        }
 
         return *this;
     }
@@ -631,8 +704,11 @@ namespace spv {
             for (const char c : name.first)
                 hashval = hashval * 1009 + c;
 
-            if (isOldIdUnmapped(name.second))
+            if (isOldIdUnmapped(name.second)) {
                 localId(name.second, nextUnusedId(hashval % softTypeIdLimit + firstMappedID));
+                if (errorLatch)
+                    return;
+            }
         }
     }
 
@@ -653,6 +729,9 @@ namespace spv {
         process(
             [&](spv::Op, unsigned start) { instPos.push_back(start); return true; },
             op_fn_nop);
+
+        if (errorLatch)
+            return;
 
         // Window size for context-sensitive canonicalization values
         // Empirical best size from a single data set.  TODO: Would be a good tunable.
@@ -689,8 +768,12 @@ namespace spv {
                         hashval = hashval * 30103 + asOpCodeHash(instPos[i]); // 30103 = semiarbitrary prime
                     }
 
-                    if (isOldIdUnmapped(resId))
+                    if (isOldIdUnmapped(resId)) {
                         localId(resId, nextUnusedId(hashval % softTypeIdLimit + firstMappedID));
+                        if (errorLatch)
+                            return;
+                    }
+
                 }
             }
         }
@@ -783,6 +866,9 @@ namespace spv {
             [&](spv::Id& id) { if (idMap.find(id) != idMap.end()) id = idMap[id]; }
         );
 
+        if (errorLatch)
+            return;
+
         // EXPERIMENTAL: Implicit output stores
         fnLocalVars.clear();
         idMap.clear();
@@ -803,10 +889,16 @@ namespace spv {
             },
             op_fn_nop);
 
+        if (errorLatch)
+            return;
+
         process(
             inst_fn_nop,
             [&](spv::Id& id) { if (idMap.find(id) != idMap.end()) id = idMap[id]; }
         );
+
+        if (errorLatch)
+            return;
 
         strip();          // strip out data we decided to eliminate
     }
@@ -907,6 +999,9 @@ namespace spv {
             }
         );
 
+        if (errorLatch)
+            return;
+
         process(
             [&](spv::Op opCode, unsigned start) {
                 if (opCode == spv::OpLoad && fnLocalVars.count(asId(start+3)) > 0)
@@ -914,6 +1009,9 @@ namespace spv {
                 return false;
             },
             op_fn_nop);
+
+        if (errorLatch)
+            return;
 
         // Chase replacements to their origins, in case there is a chain such as:
         //   2 = store 1
@@ -947,6 +1045,9 @@ namespace spv {
                 if (idMap.find(id) != idMap.end()) id = idMap[id];
             }
         );
+
+        if (errorLatch)
+            return;
 
         strip();          // strip out data we decided to eliminate
     }
@@ -991,6 +1092,9 @@ namespace spv {
                         fn->second.first,
                         fn->second.second);
 
+                    if (errorLatch)
+                        return;
+
                     fn = fnPos.erase(fn);
                 } else ++fn;
             }
@@ -1022,6 +1126,9 @@ namespace spv {
 
             [&](spv::Id& id) { if (varUseCount[id]) ++varUseCount[id]; }
         );
+
+        if (errorLatch)
+            return;
 
         // Remove single-use function variables + associated decorations and names
         process(
@@ -1064,6 +1171,9 @@ namespace spv {
                     [&](spv::Id& id) { if (isType[id]) ++typeUseCount[id]; }
                     );
 
+            if (errorLatch)
+                return;
+
             // Remove single reference types
             for (const auto typeStart : typeConstPos) {
                 const spv::Id typeId = asTypeConstId(typeStart);
@@ -1073,6 +1183,9 @@ namespace spv {
                     stripInst(typeStart);
                 }
             }
+
+            if (errorLatch)
+                return;
         }
     }
 
@@ -1151,8 +1264,10 @@ namespace spv {
     unsigned spirvbin_t::idPos(spv::Id id) const
     {
         const auto tid_it = idPosR.find(id);
-        if (tid_it == idPosR.end())
+        if (tid_it == idPosR.end()) {
             error("ID not found");
+            return 0;
+        }
 
         return tid_it->second;
     }
@@ -1251,8 +1366,14 @@ namespace spv {
             const spv::Id       resId     = asTypeConstId(typeStart);
             const std::uint32_t hashval   = hashType(typeStart);
 
-            if (isOldIdUnmapped(resId))
+            if (errorLatch)
+                return;
+
+            if (isOldIdUnmapped(resId)) {
                 localId(resId, nextUnusedId(hashval % softTypeIdLimit + firstMappedID));
+                if (errorLatch)
+                    return;
+            }
         }
     }
 
@@ -1271,7 +1392,7 @@ namespace spv {
 
         int strippedPos = 0;
         for (unsigned word = 0; word < unsigned(spv.size()); ++word) {
-            if (strip_it != stripRange.end() && word >= strip_it->second)
+            while (strip_it != stripRange.end() && word >= strip_it->second)
                 ++strip_it;
 
             if (strip_it == stripRange.end() || word < strip_it->first || word >= strip_it->second)
@@ -1298,24 +1419,49 @@ namespace spv {
         msg(3, 4, std::string("ID bound: ") + std::to_string(bound()));
 
         if (options & STRIP)         stripDebug();
+        if (errorLatch) return;
+
         strip();        // strip out data we decided to eliminate
+        if (errorLatch) return;
+
         if (options & OPT_LOADSTORE) optLoadStore();
+        if (errorLatch) return;
+
         if (options & OPT_FWD_LS)    forwardLoadStores();
+        if (errorLatch) return;
+
         if (options & DCE_FUNCS)     dceFuncs();
+        if (errorLatch) return;
+
         if (options & DCE_VARS)      dceVars();
+        if (errorLatch) return;
+
         if (options & DCE_TYPES)     dceTypes();
+        if (errorLatch) return;
 
         strip();         // strip out data we decided to eliminate
+        if (errorLatch) return;
+
         stripDeadRefs(); // remove references to things we DCEed
+        if (errorLatch) return;
+
         // after the last strip, we must clean any debug info referring to now-deleted data
 
         if (options & MAP_TYPES)     mapTypeConst();
+        if (errorLatch) return;
+
         if (options & MAP_NAMES)     mapNames();
+        if (errorLatch) return;
+
         if (options & MAP_FUNCS)     mapFnBodies();
+        if (errorLatch) return;
 
         if (options & MAP_ALL) {
             mapRemainder(); // map any unmapped IDs
+            if (errorLatch) return;
+
             applyMap();     // Now remap each shader to the new IDs we've come up with
+            if (errorLatch) return;
         }
     }
 

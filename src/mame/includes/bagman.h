@@ -80,11 +80,17 @@ public:
 	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	void draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprect);
 	void update_pal();
+	void botanic(machine_config &config);
+	void squaitsa(machine_config &config);
+	void sbagman(machine_config &config);
+	void bagman(machine_config &config);
+	void pickin(machine_config &config);
+	void sbagmani(machine_config &config);
 };
 
 /*----------- timings -----------*/
 
-#define BAGMAN_MAIN_CLOCK   XTAL_18_432MHz
+#define BAGMAN_MAIN_CLOCK   XTAL(18'432'000)
 #define BAGMAN_HCLK         (BAGMAN_MAIN_CLOCK / 3)
 #define BAGMAN_H0           (BAGMAN_HCLK / 2)
 #define BAGMAN_H1           (BAGMAN_H0   / 2)

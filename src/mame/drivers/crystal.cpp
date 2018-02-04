@@ -335,6 +335,10 @@ public:
 	void PatchReset(  );
 	uint16_t GetVidReg( address_space &space, uint16_t reg );
 	void SetVidReg( address_space &space, uint16_t reg, uint16_t val );
+	void crospuzl(machine_config &config);
+	void crystal(machine_config &config);
+	void crzyddz2(machine_config &config);
+	void trivrus(machine_config &config);
 };
 
 void crystal_state::IntReq( int num )
@@ -649,6 +653,8 @@ static ADDRESS_MAP_START( crystal_mem, AS_PROGRAM, 32, crystal_state )
 	AM_RANGE(0x01280000, 0x01280003) AM_WRITE(Banksw_w)
 	AM_RANGE(0x01400000, 0x0140ffff) AM_RAM AM_SHARE("nvram")
 
+	AM_RANGE(0x01800000, 0x0180ffff) AM_RAM AM_SHARE("sysregs")
+
 	AM_RANGE(0x01800800, 0x01800803) AM_READWRITE(DMA0_r, DMA0_w)
 	AM_RANGE(0x01800810, 0x01800813) AM_READWRITE(DMA1_r, DMA1_w)
 
@@ -660,18 +666,16 @@ static ADDRESS_MAP_START( crystal_mem, AS_PROGRAM, 32, crystal_state )
 	AM_RANGE(0x01801418, 0x0180141b) AM_READWRITE(Timer3_r, Timer3_w)
 	AM_RANGE(0x01802004, 0x01802007) AM_READWRITE(PIO_r, PIO_w)
 
-	AM_RANGE(0x01800000, 0x0180ffff) AM_RAM AM_SHARE("sysregs")
 	AM_RANGE(0x02000000, 0x027fffff) AM_RAM AM_SHARE("workram")
 
-	AM_RANGE(0x030000a4, 0x030000a7) AM_READWRITE(FlipCount_r, FlipCount_w)
-
 	AM_RANGE(0x03000000, 0x0300ffff) AM_RAM AM_SHARE("vidregs")
+	AM_RANGE(0x030000a4, 0x030000a7) AM_READWRITE(FlipCount_r, FlipCount_w)
 	AM_RANGE(0x03800000, 0x03ffffff) AM_RAM AM_SHARE("textureram")
 	AM_RANGE(0x04000000, 0x047fffff) AM_RAM AM_SHARE("frameram")
 	AM_RANGE(0x04800000, 0x04800fff) AM_DEVREADWRITE("vrender", vrender0_device, vr0_snd_read, vr0_snd_write)
 
-	AM_RANGE(0x05000000, 0x05000003) AM_READWRITE(FlashCmd_r, FlashCmd_w)
 	AM_RANGE(0x05000000, 0x05ffffff) AM_ROMBANK("bank1")
+	AM_RANGE(0x05000000, 0x05000003) AM_READWRITE(FlashCmd_r, FlashCmd_w)
 
 	AM_RANGE(0x44414F4C, 0x44414F7F) AM_RAM AM_SHARE("reset_patch")
 ADDRESS_MAP_END
@@ -713,6 +717,8 @@ static ADDRESS_MAP_START( trivrus_mem, AS_PROGRAM, 32, crystal_state )
 //  0x0150001c & 0x000000ff = year - 2000
 	AM_RANGE(0x01600000, 0x01607fff) AM_RAM AM_SHARE("nvram")
 
+	AM_RANGE(0x01800000, 0x0180ffff) AM_RAM AM_SHARE("sysregs")
+
 	AM_RANGE(0x01800800, 0x01800803) AM_READWRITE(DMA0_r, DMA0_w)
 	AM_RANGE(0x01800810, 0x01800813) AM_READWRITE(DMA1_r, DMA1_w)
 
@@ -724,31 +730,30 @@ static ADDRESS_MAP_START( trivrus_mem, AS_PROGRAM, 32, crystal_state )
 	AM_RANGE(0x01801418, 0x0180141b) AM_READWRITE(Timer3_r, Timer3_w)
 	AM_RANGE(0x01802004, 0x01802007) AM_READWRITE(PIO_r, PIO_w)
 
-	AM_RANGE(0x01800000, 0x0180ffff) AM_RAM AM_SHARE("sysregs")
 	AM_RANGE(0x02000000, 0x027fffff) AM_RAM AM_SHARE("workram")
 
-	AM_RANGE(0x030000a4, 0x030000a7) AM_READWRITE(FlipCount_r, FlipCount_w)
 
 	AM_RANGE(0x03000000, 0x0300ffff) AM_RAM AM_SHARE("vidregs")
+	AM_RANGE(0x030000a4, 0x030000a7) AM_READWRITE(FlipCount_r, FlipCount_w)
 	AM_RANGE(0x03800000, 0x03ffffff) AM_RAM AM_SHARE("textureram")
 	AM_RANGE(0x04000000, 0x047fffff) AM_RAM AM_SHARE("frameram")
 	AM_RANGE(0x04800000, 0x04800fff) AM_DEVREADWRITE("vrender", vrender0_device, vr0_snd_read, vr0_snd_write)
 
-	AM_RANGE(0x05000000, 0x05000003) AM_READWRITE(FlashCmd_r, FlashCmd_w)
 	AM_RANGE(0x05000000, 0x05ffffff) AM_ROMBANK("bank1")
+	AM_RANGE(0x05000000, 0x05000003) AM_READWRITE(FlashCmd_r, FlashCmd_w)
 
 //  AM_RANGE(0x44414F4C, 0x44414F7F) AM_RAM AM_SHARE("reset_patch")
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( crospuzl_mem, AS_PROGRAM, 32, crystal_state )
+	AM_IMPORT_FROM( trivrus_mem )
+
 	AM_RANGE(0x01500000, 0x01500003) AM_READ(FlashCmd_r)
 	AM_RANGE(0x01500100, 0x01500103) AM_WRITE(FlashCmd_w)
 	AM_RANGE(0x01510000, 0x01510003) AM_READ_PORT("IN0")
 	AM_RANGE(0x01511000, 0x01511003) AM_READ_PORT("IN1")
 	AM_RANGE(0x01512000, 0x01512003) AM_READ_PORT("IN2")
 	AM_RANGE(0x01513000, 0x01513003) AM_READ_PORT("IN3")
-	AM_IMPORT_FROM( trivrus_mem )
-
 ADDRESS_MAP_END
 
 // Crazy Dou Di Zhu II
@@ -800,6 +805,8 @@ static ADDRESS_MAP_START( crzyddz2_mem, AS_PROGRAM, 32, crystal_state )
 	AM_RANGE(0x01500000, 0x01500003) AM_READ_PORT("P1_P2")
 	AM_RANGE(0x01500004, 0x01500007) AM_READ(crzyddz2_key_r)
 
+	AM_RANGE(0x01800000, 0x0180ffff) AM_RAM AM_SHARE("sysregs")
+
 	AM_RANGE(0x01800800, 0x01800803) AM_READWRITE(DMA0_r, DMA0_w)
 	AM_RANGE(0x01800810, 0x01800813) AM_READWRITE(DMA1_r, DMA1_w)
 
@@ -811,18 +818,17 @@ static ADDRESS_MAP_START( crzyddz2_mem, AS_PROGRAM, 32, crystal_state )
 	AM_RANGE(0x01801418, 0x0180141b) AM_READWRITE(Timer3_r, Timer3_w)
 	AM_RANGE(0x01802004, 0x01802007) AM_READWRITE(PIO_r, crzyddz2_PIO_w)
 
-	AM_RANGE(0x01800000, 0x0180ffff) AM_RAM AM_SHARE("sysregs")
 	AM_RANGE(0x02000000, 0x027fffff) AM_RAM AM_SHARE("workram")
 
-	AM_RANGE(0x030000a4, 0x030000a7) AM_READWRITE(FlipCount_r, FlipCount_w)
 
 	AM_RANGE(0x03000000, 0x0300ffff) AM_RAM AM_SHARE("vidregs")
+	AM_RANGE(0x030000a4, 0x030000a7) AM_READWRITE(FlipCount_r, FlipCount_w)
 	AM_RANGE(0x03800000, 0x03ffffff) AM_RAM AM_SHARE("textureram")
 	AM_RANGE(0x04000000, 0x047fffff) AM_RAM AM_SHARE("frameram")
 	AM_RANGE(0x04800000, 0x04800fff) AM_DEVREADWRITE("vrender", vrender0_device, vr0_snd_read, vr0_snd_write)
 
-	AM_RANGE(0x05000000, 0x05000003) AM_READWRITE(FlashCmd_r, FlashCmd_w)
 	AM_RANGE(0x05000000, 0x05ffffff) AM_ROMBANK("bank1")
+	AM_RANGE(0x05000000, 0x05000003) AM_READWRITE(FlashCmd_r, FlashCmd_w)
 
 //  AM_RANGE(0x44414F4C, 0x44414F7F) AM_RAM AM_SHARE("reset_patch")
 ADDRESS_MAP_END
@@ -1471,7 +1477,7 @@ static INPUT_PORTS_START(crzyddz2)
 INPUT_PORTS_END
 
 
-static MACHINE_CONFIG_START( crystal )
+MACHINE_CONFIG_START(crystal_state::crystal)
 
 	MCFG_CPU_ADD("maincpu", SE3208, 43000000)
 	MCFG_CPU_PROGRAM_MAP(crystal_mem)
@@ -1494,7 +1500,7 @@ static MACHINE_CONFIG_START( crystal )
 
 	MCFG_PALETTE_ADD_RRRRRGGGGGGBBBBB("palette")
 
-	MCFG_DS1302_ADD("rtc", XTAL_32_768kHz)
+	MCFG_DS1302_ADD("rtc", XTAL(32'768))
 
 	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
 
@@ -1505,17 +1511,17 @@ static MACHINE_CONFIG_START( crystal )
 MACHINE_CONFIG_END
 
 
-static MACHINE_CONFIG_DERIVED( trivrus, crystal )
+MACHINE_CONFIG_DERIVED(crystal_state::trivrus, crystal)
 	MCFG_CPU_MODIFY("maincpu")
 	MCFG_CPU_PROGRAM_MAP(trivrus_mem)
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_DERIVED( crospuzl, crystal )
+MACHINE_CONFIG_DERIVED(crystal_state::crospuzl, crystal)
 	MCFG_CPU_MODIFY("maincpu")
 	MCFG_CPU_PROGRAM_MAP(crospuzl_mem)
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_DERIVED( crzyddz2, crystal )
+MACHINE_CONFIG_DERIVED(crystal_state::crzyddz2, crystal)
 	MCFG_CPU_MODIFY("maincpu")
 	MCFG_CPU_PROGRAM_MAP(crzyddz2_mem)
 MACHINE_CONFIG_END
@@ -1607,11 +1613,7 @@ ROM_START( trivrus )
 	ROM_REGION( 0x1000000, "user2", ROMREGION_ERASEFF ) // Unmapped flash
 ROM_END
 
-/*
-  uses ADC 'Amazon-LF' SoC, EISC CPU core - similar to crystal system?
-*/
-
-ROM_START( crospuzl )
+ROM_START( crospuzl ) /* This PCB uses ADC 'Amazon-LF' SoC, EISC CPU core - However PCBs have been see with a standard VRenderZERO+ MagicEyes EISC chip */
 	ROM_REGION( 0x80010, "maincpu", 0 )
 	ROM_LOAD("en29lv040a.u5",  0x000000, 0x80010, CRC(d50e8500) SHA1(d681cd18cd0e48854c24291d417d2d6d28fe35c1) )
 

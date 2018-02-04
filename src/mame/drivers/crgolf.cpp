@@ -180,7 +180,7 @@ WRITE8_MEMBER(crgolf_state::switch_input_select_w)
 
 WRITE8_MEMBER(crgolf_state::unknown_w)
 {
-	logerror("%04X:unknown_w = %02X\n", space.device().safe_pc(), data);
+	logerror("%04X:unknown_w = %02X\n", m_audiocpu->pc(), data);
 }
 
 
@@ -373,6 +373,7 @@ ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( mastrglf_map, AS_PROGRAM, 8, crgolf_state )
 	AM_RANGE(0x0000, 0x3fff) AM_ROM
+	AM_RANGE(0x4000, 0x5fff) AM_ROMBANK("bank1")
 	AM_RANGE(0x6000, 0x8fff) AM_RAM // maybe RAM and ROM here?
 	AM_RANGE(0x9000, 0x9fff) AM_RAM
 	AM_RANGE(0xa000, 0xffff) AM_DEVICE("vrambank", address_map_bank_device, amap8)
@@ -383,7 +384,7 @@ ADDRESS_MAP_END
 static ADDRESS_MAP_START( mastrglf_io, AS_IO, 8, crgolf_state )
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	AM_RANGE(0x00, 0x07) AM_DEVWRITE("mainlatch", ls259_device, write_d0)
-//  AM_RANGE(0x20, 0x20) AM_WRITE( main_to_sound_w )
+//  AM_RANGE(0x20, 0x20) AM_WRITE(rom_bank_select_w)
 	AM_RANGE(0x40, 0x40) AM_WRITE( main_to_sound_w )
 	AM_RANGE(0xa0, 0xa0) AM_READ( sound_to_main_r )
 ADDRESS_MAP_END
@@ -418,13 +419,14 @@ WRITE8_MEMBER(crgolf_state::unk_sub_0c_w)
 
 static ADDRESS_MAP_START( mastrglf_subio, AS_IO, 8, crgolf_state )
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
-	AM_RANGE(0x00, 0x00) AM_WRITE(sound_to_main_w)
+	AM_RANGE(0x00, 0x00) AM_READ(main_to_sound_r) AM_WRITENOP
 	AM_RANGE(0x02, 0x02) AM_READ(unk_sub_02_r )
 	AM_RANGE(0x05, 0x05) AM_READ(unk_sub_05_r )
+	AM_RANGE(0x06, 0x06) AM_READNOP
 	AM_RANGE(0x07, 0x07) AM_READ(unk_sub_07_r )
-
+	AM_RANGE(0x08, 0x08) AM_WRITE(sound_to_main_w)
 	AM_RANGE(0x0c, 0x0c) AM_WRITE(unk_sub_0c_w)
-	AM_RANGE(0x06, 0x06) AM_READ(main_to_sound_r)
+	AM_RANGE(0x10, 0x11) AM_DEVWRITE("aysnd", ay8910_device, address_data_w)
 ADDRESS_MAP_END
 
 
@@ -511,7 +513,7 @@ INPUT_PORTS_END
  *
  *************************************/
 
-static MACHINE_CONFIG_START( crgolf )
+MACHINE_CONFIG_START(crgolf_state::crgolf)
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", Z80,MASTER_CLOCK/3/2)
@@ -534,8 +536,8 @@ static MACHINE_CONFIG_START( crgolf )
 	MCFG_DEVICE_ADD("vrambank", ADDRESS_MAP_BANK, 0)
 	MCFG_DEVICE_PROGRAM_MAP(vrambank_map)
 	MCFG_ADDRESS_MAP_BANK_ENDIANNESS(ENDIANNESS_LITTLE)
-	MCFG_ADDRESS_MAP_BANK_DATABUS_WIDTH(8)
-	MCFG_ADDRESS_MAP_BANK_ADDRBUS_WIDTH(16)
+	MCFG_ADDRESS_MAP_BANK_DATA_WIDTH(8)
+	MCFG_ADDRESS_MAP_BANK_ADDR_WIDTH(16)
 	MCFG_ADDRESS_MAP_BANK_STRIDE(0x8000) /* technically 0x6000, but powers of 2 makes the memory map / address masking cleaner. */
 
 	MCFG_PALETTE_ADD("palette", 0x20)
@@ -557,7 +559,7 @@ static MACHINE_CONFIG_START( crgolf )
 MACHINE_CONFIG_END
 
 
-static MACHINE_CONFIG_DERIVED( crgolfhi, crgolf )
+MACHINE_CONFIG_DERIVED(crgolf_state::crgolfhi, crgolf)
 
 	MCFG_SOUND_ADD("msm", MSM5205, 384000)
 	MCFG_MSM5205_VCLK_CB(WRITELINE(crgolf_state, vck_callback))
@@ -566,7 +568,7 @@ static MACHINE_CONFIG_DERIVED( crgolfhi, crgolf )
 MACHINE_CONFIG_END
 
 
-static MACHINE_CONFIG_DERIVED( mastrglf, crgolfhi )
+MACHINE_CONFIG_DERIVED(crgolf_state::mastrglf, crgolfhi)
 
 	/* basic machine hardware */
 	MCFG_CPU_MODIFY("maincpu")
@@ -829,4 +831,4 @@ GAME( 1984, crgolfc,  crgolf, crgolf,   crgolf, crgolf_state, 0,        ROT0, "N
 GAME( 1984, crgolfbt, crgolf, crgolf,   crgolf, crgolf_state, 0,        ROT0, "bootleg",     "Champion Golf (bootleg)",   MACHINE_SUPPORTS_SAVE )
 GAME( 1985, crgolfhi, 0,      crgolfhi, crgolf, crgolf_state, crgolfhi, ROT0, "Nasco Japan", "Crowns Golf in Hawaii",     MACHINE_SUPPORTS_SAVE )
 
-GAME( 198?, mastrglf, 0,      mastrglf, crgolf, crgolf_state, 0,        ROT0, "Nasco",       "Master's Golf",             MACHINE_NOT_WORKING | MACHINE_UNEMULATED_PROTECTION )
+GAME( 1985, mastrglf, 0,      mastrglf, crgolf, crgolf_state, 0,        ROT0, "Nasco",       "Master's Golf",             MACHINE_NOT_WORKING | MACHINE_UNEMULATED_PROTECTION )

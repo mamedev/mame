@@ -100,15 +100,7 @@ static ADDRESS_MAP_START( nimbus_iocpu_io , AS_IO, 8, rmnimbus_state )
 	AM_RANGE(0x20000, 0x20004) AM_READWRITE(nimbus_pc8031_port_r, nimbus_pc8031_port_w)
 ADDRESS_MAP_END
 
-static const uint16_t def_config[16] =
-{
-	0x0280, 0x017F, 0xE824, 0x8129,
-	0x0329, 0x0000, 0x0000, 0x0000,
-	0x0000, 0x0000, 0x0000, 0x0000,
-	0x0000, 0x8893, 0x2025, 0xB9E6
-};
-
-static MACHINE_CONFIG_START( nimbus )
+MACHINE_CONFIG_START(rmnimbus_state::nimbus)
 	/* basic machine hardware */
 	MCFG_CPU_ADD(MAINCPU_TAG, I80186, 16000000) // the cpu is a 10Mhz part but the serial clocks are wrong unless it runs at 8Mhz
 	MCFG_CPU_PROGRAM_MAP(nimbus_mem)
@@ -123,7 +115,7 @@ static MACHINE_CONFIG_START( nimbus )
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
-	MCFG_SCREEN_RAW_PARAMS( XTAL_4_433619MHz*2,650,0,640,260,0,250)
+	MCFG_SCREEN_RAW_PARAMS( XTAL(4'433'619)*2,650,0,640,260,0,250)
 	MCFG_SCREEN_UPDATE_DRIVER(rmnimbus_state, screen_update_nimbus)
 	//MCFG_SCREEN_VIDEO_ATTRIBUTES(VIDEO_UPDATE_SCANLINE)
 	MCFG_SCREEN_PALETTE("palette")
@@ -180,7 +172,6 @@ static MACHINE_CONFIG_START( nimbus )
 	MCFG_RS232_CTS_HANDLER(DEVWRITELINE(Z80SIO_TAG, z80dart_device, ctsb_w))
 
 	MCFG_EEPROM_SERIAL_93C06_ADD(ER59256_TAG)
-	MCFG_EEPROM_DATA(def_config,sizeof(def_config))
 
 	MCFG_DEVICE_ADD(VIA_TAG, VIA6522, 1000000)
 	MCFG_VIA6522_WRITEPA_HANDLER(DEVWRITE8("cent_data_out", output_latch_device, write))
@@ -227,6 +218,9 @@ ROM_START( nimbus )
 
 	ROM_REGION( 0x4000, IOCPU_TAG, 0 )
 	ROM_LOAD("hexec-v1.02u-13488-1985-10-29.rom", 0x0000, 0x1000, CRC(75c6adfd) SHA1(0f11e0b7386c6368d20e1fc7a6196d670f924825))
+
+	ROM_REGION16_LE( 0x20, ER59256_TAG, 0 ) // default eeprom data
+	ROM_LOAD("er59256", 0x00, 0x20, CRC(1a39de76) SHA1(0b6607f008dd92d6ab9af62b0b042fc3f5f4461c))
 ROM_END
 
 //    YEAR  NAME        PARENT  COMPAT  MACHINE  INPUT   STATE           INIT  COMPANY              FULLNAME  FLAGS

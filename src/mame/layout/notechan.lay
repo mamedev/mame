@@ -2,15 +2,15 @@
 <mamelayout version="2">
 
 <!--
-		Test panel for Note Chance.
-		Written by Roberto Fresca.
+        Test panel for Note Chance.
+        Written by Roberto Fresca.
 
-		4 rows of 8 lines.
-		From D7 to D0.
+        4 rows of 8 lines.
+        From D7 to D0.
 -->
 
 <!--
-	****** Elements ******
+    ****** Elements ******
 -->
 
 	<element name="L0" defstate="0">
@@ -436,14 +436,14 @@
 
 
 <!--
-	****** Screen & Position ******
+    ****** Screen & Position ******
 -->
 
 	<view name="Button Lamps">
 			<bounds left="0" top="0" right="4" bottom="4" />
 
 <!--
-	****** 1st row ******
+    ****** 1st row ******
 -->
 
 		<bezel name="lamp0" element="L0">
@@ -472,7 +472,7 @@
 		</bezel>
 
 <!--
-	****** 2nd row ******
+    ****** 2nd row ******
 -->
 
 		<bezel name="lamp8" element="L8">
@@ -501,7 +501,7 @@
 		</bezel>
 
 <!--
-	****** 3rd row ******
+    ****** 3rd row ******
 -->
 
 		<bezel name="lamp16" element="L16">
@@ -530,7 +530,7 @@
 		</bezel>
 
 <!--
-	****** 4th row ******
+    ****** 4th row ******
 -->
 
 		<bezel name="lamp24" element="L24">

@@ -272,7 +272,7 @@ static GFXDECODE_START( crzrally )
 GFXDECODE_END
 
 
-static MACHINE_CONFIG_START( holeland )
+MACHINE_CONFIG_START(holeland_state::holeland)
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", Z80, 3355700) /* measured 298ns on PCB */
@@ -353,7 +353,7 @@ Notes:
 
 */
 
-static MACHINE_CONFIG_START( crzrally )
+MACHINE_CONFIG_START(holeland_state::crzrally)
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", Z80, 20000000/4)        /* 5 MHz */

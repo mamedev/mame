@@ -84,24 +84,47 @@ READ8_MEMBER(asteroid_state::asteroid_IN1_r)
 
 READ8_MEMBER(asteroid_state::asteroid_DSW1_r)
 {
-	int res;
-	int res1;
+	// 765432--  not used
+	// ------1-  ls253 dsw selector 2y
+	// -------0  ls253 dsw selector 1y
 
-	res1 = ioport("DSW1")->read();
+	uint8_t val = m_dsw1->read();
 
-	res = 0xfc | ((res1 >> (2 * (3 - (offset & 0x3)))) & 0x3);
-	return res;
+	m_dsw_sel->i3a_w(BIT(val, 0));
+	m_dsw_sel->i3b_w(BIT(val, 1));
+	m_dsw_sel->i2a_w(BIT(val, 2));
+	m_dsw_sel->i2b_w(BIT(val, 3));
+	m_dsw_sel->i1a_w(BIT(val, 4));
+	m_dsw_sel->i1b_w(BIT(val, 5));
+	m_dsw_sel->i0a_w(BIT(val, 6));
+	m_dsw_sel->i0b_w(BIT(val, 7));
+
+	m_dsw_sel->s_w(space, 0, offset & 0x03);
+
+	return 0xfc | (m_dsw_sel->zb_r() << 1) | m_dsw_sel->za_r();
 }
 
 
 WRITE8_MEMBER(asteroid_state::asteroid_bank_switch_w)
 {
+	// 76------  not used
+	// --5-----  coin counter right coin
+	// ---4----  coin counter center coin
+	// ----3---  coin counter left coin
+	// -----2--  ramsel
+	// ------1-  start2 led
+	// -------0  start1 led
+
+	start1_led_w(BIT(data, 0));
+	start2_led_w(BIT(data, 1));
+
 	int bank = BIT(data, 2);
 	m_ram1->set_entry(bank);
 	m_ram2->set_entry(bank);
 
-	output().set_led_value(0, ~data & 0x02);
-	output().set_led_value(1, ~data & 0x01);
+	machine().bookkeeping().coin_counter_w(0, BIT(data, 3));
+	machine().bookkeeping().coin_counter_w(1, BIT(data, 4));
+	machine().bookkeeping().coin_counter_w(2, BIT(data, 5));
 }
 
 

@@ -251,7 +251,7 @@ void c80_state::machine_start()
 
 /* Machine Driver */
 
-static MACHINE_CONFIG_START( c80 )
+MACHINE_CONFIG_START(c80_state::c80)
 	/* basic machine hardware */
 	MCFG_CPU_ADD(Z80_TAG, Z80, 2500000) /* U880D */
 	MCFG_CPU_PROGRAM_MAP(c80_mem)

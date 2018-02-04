@@ -217,7 +217,7 @@ void exedexes_state::machine_reset()
 	m_sc2on = 0;
 }
 
-static MACHINE_CONFIG_START( exedexes )
+MACHINE_CONFIG_START(exedexes_state::exedexes)
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", Z80, 4000000)   /* 4 MHz (?) */

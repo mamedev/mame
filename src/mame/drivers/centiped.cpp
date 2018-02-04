@@ -594,7 +594,7 @@ WRITE8_MEMBER(centiped_state::mazeinv_input_select_w)
 
 READ8_MEMBER(centiped_state::bullsdrt_data_port_r)
 {
-	switch (space.device().safe_pc())
+	switch (m_maincpu->pc())
 	{
 		case 0x0033:
 		case 0x6b19:
@@ -1693,7 +1693,7 @@ GFXDECODE_END
  *
  *************************************/
 
-static MACHINE_CONFIG_START( centiped_base )
+MACHINE_CONFIG_START(centiped_state::centiped_base)
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", M6502, 12096000/8)  /* 1.512 MHz (slows down to 0.75MHz while accessing playfield RAM) */
@@ -1730,7 +1730,7 @@ static MACHINE_CONFIG_START( centiped_base )
 
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_DERIVED( centiped, centiped_base )
+MACHINE_CONFIG_DERIVED(centiped_state::centiped, centiped_base)
 	MCFG_CPU_MODIFY("maincpu")
 	MCFG_CPU_PROGRAM_MAP(centiped_map)
 
@@ -1747,7 +1747,7 @@ static MACHINE_CONFIG_DERIVED( centiped, centiped_base )
 MACHINE_CONFIG_END
 
 
-static MACHINE_CONFIG_DERIVED( caterplr, centiped_base )
+MACHINE_CONFIG_DERIVED(centiped_state::caterplr, centiped_base)
 
 	/* basic machine hardware */
 	MCFG_CPU_MODIFY("maincpu")
@@ -1765,7 +1765,7 @@ static MACHINE_CONFIG_DERIVED( caterplr, centiped_base )
 MACHINE_CONFIG_END
 
 
-static MACHINE_CONFIG_DERIVED( centipdb, centiped_base )
+MACHINE_CONFIG_DERIVED(centiped_state::centipdb, centiped_base)
 
 	/* basic machine hardware */
 	MCFG_CPU_MODIFY("maincpu")
@@ -1783,7 +1783,7 @@ static MACHINE_CONFIG_DERIVED( centipdb, centiped_base )
 MACHINE_CONFIG_END
 
 
-static MACHINE_CONFIG_DERIVED( magworm, centiped_base )
+MACHINE_CONFIG_DERIVED(centiped_state::magworm, centiped_base)
 
 	/* basic machine hardware */
 	MCFG_CPU_MODIFY("maincpu")
@@ -1802,7 +1802,7 @@ static MACHINE_CONFIG_DERIVED( magworm, centiped_base )
 MACHINE_CONFIG_END
 
 
-static MACHINE_CONFIG_DERIVED( milliped, centiped_base )
+MACHINE_CONFIG_DERIVED(centiped_state::milliped, centiped_base)
 
 	/* basic machine hardware */
 	MCFG_CPU_MODIFY("maincpu")
@@ -1835,7 +1835,7 @@ static MACHINE_CONFIG_DERIVED( milliped, centiped_base )
 MACHINE_CONFIG_END
 
 
-static MACHINE_CONFIG_DERIVED( multiped, milliped )
+MACHINE_CONFIG_DERIVED(centiped_state::multiped, milliped)
 
 	/* basic machine hardware */
 	MCFG_CPU_MODIFY("maincpu")
@@ -1846,7 +1846,7 @@ static MACHINE_CONFIG_DERIVED( multiped, milliped )
 MACHINE_CONFIG_END
 
 
-static MACHINE_CONFIG_DERIVED( warlords, centiped_base )
+MACHINE_CONFIG_DERIVED(centiped_state::warlords, centiped_base)
 
 	/* basic machine hardware */
 	MCFG_CPU_MODIFY("maincpu")
@@ -1879,7 +1879,7 @@ static MACHINE_CONFIG_DERIVED( warlords, centiped_base )
 MACHINE_CONFIG_END
 
 
-static MACHINE_CONFIG_DERIVED( mazeinv, milliped )
+MACHINE_CONFIG_DERIVED(centiped_state::mazeinv, milliped)
 
 	/* basic machine hardware */
 	MCFG_CPU_MODIFY("maincpu")
@@ -1893,7 +1893,7 @@ static MACHINE_CONFIG_DERIVED( mazeinv, milliped )
 MACHINE_CONFIG_END
 
 
-static MACHINE_CONFIG_START( bullsdrt )
+MACHINE_CONFIG_START(centiped_state::bullsdrt)
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", S2650, 12096000/8)
@@ -2233,7 +2233,7 @@ DRIVER_INIT_MEMBER(centiped_state,multiped)
 
 	// descramble rom and put in maincpu region
 	for (int i = 0; i < 0x10000; i++)
-		dest[0x10000 + (i ^ (~i << 4 & 0x1000) ^ (~i >> 3 & 0x400))] = BITSWAP8(src[BITSWAP16(i,15,14,13,1,8,11,4,7,10,5,6,9,12,0,3,2)],0,2,1,3,4,5,6,7);
+		dest[0x10000 + (i ^ (~i << 4 & 0x1000) ^ (~i >> 3 & 0x400))] = bitswap<8>(src[bitswap<16>(i,15,14,13,1,8,11,4,7,10,5,6,9,12,0,3,2)],0,2,1,3,4,5,6,7);
 
 	// (this can be removed when prg bankswitch is implemented)
 	memmove(dest+0x0000, dest+0x10000, 0x8000);

@@ -114,6 +114,7 @@ public:
 	TIMER_DEVICE_CALLBACK_MEMBER(mekd2_c);
 	TIMER_DEVICE_CALLBACK_MEMBER(mekd2_p);
 
+	void mekd2(machine_config &config);
 private:
 	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr) override;
 	uint8_t m_cass_data[4];
@@ -140,8 +141,7 @@ private:
 static ADDRESS_MAP_START( mekd2_mem , AS_PROGRAM, 8, mekd2_state)
 	AM_RANGE(0x0000, 0x00ff) AM_RAM // user ram
 	AM_RANGE(0x8004, 0x8007) AM_DEVREADWRITE("pia_u", pia6821_device, read, write)
-	AM_RANGE(0x8008, 0x8008) AM_DEVREADWRITE("acia", acia6850_device, status_r, control_w)
-	AM_RANGE(0x8009, 0x8009) AM_DEVREADWRITE("acia", acia6850_device, data_r, data_w)
+	AM_RANGE(0x8008, 0x8009) AM_DEVREADWRITE("acia", acia6850_device, read, write)
 	AM_RANGE(0x8020, 0x8023) AM_DEVREADWRITE("pia_s", pia6821_device, read, write)
 	AM_RANGE(0xa000, 0xa07f) AM_RAM // system ram
 	AM_RANGE(0xe000, 0xe3ff) AM_ROM AM_MIRROR(0x1c00)   /* JBUG ROM */
@@ -363,7 +363,7 @@ TIMER_DEVICE_CALLBACK_MEMBER(mekd2_state::mekd2_p)
 
 ************************************************************/
 
-static MACHINE_CONFIG_START( mekd2 )
+MACHINE_CONFIG_START(mekd2_state::mekd2)
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", M6800, XTAL_MEKD2 / 2)        /* 614.4 kHz */
 	MCFG_CPU_PROGRAM_MAP(mekd2_mem)

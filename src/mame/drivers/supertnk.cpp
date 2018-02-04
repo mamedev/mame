@@ -135,6 +135,7 @@ public:
 	uint32_t screen_update_supertnk(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 	INTERRUPT_GEN_MEMBER(supertnk_interrupt);
 	required_device<cpu_device> m_maincpu;
+	void supertnk(machine_config &config);
 };
 
 
@@ -422,7 +423,7 @@ INPUT_PORTS_END
  *
  *************************************/
 
-static MACHINE_CONFIG_START( supertnk )
+MACHINE_CONFIG_START(supertnk_state::supertnk)
 
 	// CPU TMS9980A; no line connections
 	MCFG_TMS99xx_ADD("maincpu", TMS9980A, 2598750, supertnk_map, supertnk_io_map)
@@ -489,7 +490,7 @@ DRIVER_INIT_MEMBER(supertnk_state,supertnk)
 
 	for (offs = 0; offs < len; offs++)
 	{
-		rom[offs] = BITSWAP8(rom[offs],0,1,2,3,4,5,6,7);
+		rom[offs] = bitswap<8>(rom[offs],0,1,2,3,4,5,6,7);
 	}
 }
 

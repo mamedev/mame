@@ -172,4 +172,16 @@ public:
 	void rodland_gfx_unmangle(const char *region);
 	void jitsupro_gfx_unmangle(const char *region);
 	void stdragona_gfx_unmangle(const char *region);
+	void system_A_soldam(machine_config &config);
+	void system_B_monkelf(machine_config &config);
+	void system_A_iganinju(machine_config &config);
+	void system_A_hachoo(machine_config &config);
+	void kickoffb(machine_config &config);
+	void system_D(machine_config &config);
+	void system_C(machine_config &config);
+	void system_Bbl(machine_config &config);
+	void system_A(machine_config &config);
+	void system_B(machine_config &config);
+	void system_B_hayaosi1(machine_config &config);
+	void system_Z(machine_config &config);
 };

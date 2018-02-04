@@ -203,7 +203,7 @@ uint32_t abc802_state::screen_update(screen_device &screen, bitmap_rgb32 &bitmap
 //  MACHINE_CONFIG_START( abc802_video )
 //-------------------------------------------------
 
-MACHINE_CONFIG_START( abc802_video )
+MACHINE_CONFIG_START(abc802_state::abc802_video)
 	MCFG_MC6845_ADD(MC6845_TAG, MC6845, SCREEN_TAG, ABC800_CCLK)
 	MCFG_MC6845_SHOW_BORDER_AREA(true)
 	MCFG_MC6845_CHAR_WIDTH(ABC800_CHAR_WIDTH)
@@ -212,7 +212,7 @@ MACHINE_CONFIG_START( abc802_video )
 
 	MCFG_SCREEN_ADD_MONOCHROME(SCREEN_TAG, RASTER, rgb_t::amber())
 	MCFG_SCREEN_UPDATE_DRIVER(abc802_state, screen_update)
-	MCFG_SCREEN_RAW_PARAMS(XTAL_12MHz, 0x300, 0, 0x1e0, 0x13a, 0, 0xf0)
+	MCFG_SCREEN_RAW_PARAMS(XTAL(12'000'000), 0x300, 0, 0x1e0, 0x13a, 0, 0xf0)
 
 	MCFG_PALETTE_ADD_MONOCHROME("palette")
 MACHINE_CONFIG_END

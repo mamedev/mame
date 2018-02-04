@@ -96,9 +96,9 @@ ioport_constructor a2bus_ssc_device::device_input_ports() const
 //  device_add_mconfig - add device configuration
 //-------------------------------------------------
 
-MACHINE_CONFIG_MEMBER( a2bus_ssc_device::device_add_mconfig )
+MACHINE_CONFIG_START(a2bus_ssc_device::device_add_mconfig)
 	MCFG_DEVICE_ADD(SSC_ACIA_TAG, MOS6551, 0)
-	MCFG_MOS6551_XTAL(XTAL_1_8432MHz)
+	MCFG_MOS6551_XTAL(XTAL(1'843'200))
 	MCFG_MOS6551_IRQ_HANDLER(WRITELINE(a2bus_ssc_device, acia_irq_w))
 	MCFG_MOS6551_TXD_HANDLER(DEVWRITELINE(SSC_RS232_TAG, rs232_port_device, write_txd))
 
@@ -143,10 +143,7 @@ a2bus_ssc_device::a2bus_ssc_device(const machine_config &mconfig, device_type ty
 
 void a2bus_ssc_device::device_start()
 {
-	// set_a2bus_device makes m_slot valid
-	set_a2bus_device();
-
-	m_rom = device().machine().root_device().memregion(this->subtag(SSC_ROM_REGION).c_str())->base();
+	m_rom = machine().root_device().memregion(this->subtag(SSC_ROM_REGION).c_str())->base();
 }
 
 void a2bus_ssc_device::device_reset()
@@ -158,7 +155,7 @@ void a2bus_ssc_device::device_reset()
     read_cnxx - called for reads from this card's cnxx space
 -------------------------------------------------*/
 
-uint8_t a2bus_ssc_device::read_cnxx(address_space &space, uint8_t offset)
+uint8_t a2bus_ssc_device::read_cnxx(uint8_t offset)
 {
 	return m_rom[(offset&0xff)+0x700];
 }
@@ -167,7 +164,7 @@ uint8_t a2bus_ssc_device::read_cnxx(address_space &space, uint8_t offset)
     read_c800 - called for reads from this card's c800 space
 -------------------------------------------------*/
 
-uint8_t a2bus_ssc_device::read_c800(address_space &space, uint16_t offset)
+uint8_t a2bus_ssc_device::read_c800(uint16_t offset)
 {
 	return m_rom[offset];
 }
@@ -176,7 +173,7 @@ uint8_t a2bus_ssc_device::read_c800(address_space &space, uint16_t offset)
     read_c0nx - called for reads from this card's c0nx space
 -------------------------------------------------*/
 
-uint8_t a2bus_ssc_device::read_c0nx(address_space &space, uint8_t offset)
+uint8_t a2bus_ssc_device::read_c0nx(uint8_t offset)
 {
 	// dips at C0n1/C0n2, ACIA at C0n8/9/A/B
 
@@ -191,7 +188,7 @@ uint8_t a2bus_ssc_device::read_c0nx(address_space &space, uint8_t offset)
 		case 9:
 		case 0xa:
 		case 0xb:
-			return m_acia->read(space, offset-8);
+			return m_acia->read(machine().dummy_space(), offset-8);
 
 	}
 
@@ -202,7 +199,7 @@ uint8_t a2bus_ssc_device::read_c0nx(address_space &space, uint8_t offset)
     write_c0nx - called for writes to this card's c0nx space
 -------------------------------------------------*/
 
-void a2bus_ssc_device::write_c0nx(address_space &space, uint8_t offset, uint8_t data)
+void a2bus_ssc_device::write_c0nx(uint8_t offset, uint8_t data)
 {
 	switch (offset)
 	{
@@ -210,7 +207,7 @@ void a2bus_ssc_device::write_c0nx(address_space &space, uint8_t offset, uint8_t 
 		case 9:
 		case 0xa:
 		case 0xb:
-			m_acia->write(space, offset-8, data);
+			m_acia->write(machine().dummy_space(), offset-8, data);
 			break;
 	}
 }

@@ -78,4 +78,8 @@ public:
 	void draw_sprites( bitmap_ind16 &bitmap, const rectangle &cliprect );
 
 	INTERRUPT_GEN_MEMBER(interrupt);
+	void timeplt(machine_config &config);
+	void chkun(machine_config &config);
+	void psurge(machine_config &config);
+	void bikkuric(machine_config &config);
 };

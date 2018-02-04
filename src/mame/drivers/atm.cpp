@@ -35,6 +35,8 @@ public:
 	DECLARE_READ8_MEMBER(beta_disable_r);
 	DECLARE_MACHINE_RESET(atm);
 
+	void atm(machine_config &config);
+	void atmtb2(machine_config &config);
 protected:
 	required_memory_bank m_bank1;
 	required_memory_bank m_bank2;
@@ -127,8 +129,8 @@ static ADDRESS_MAP_START (atm_io, AS_IO, 8, atm_state )
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START (atm_switch, AS_OPCODES, 8, atm_state)
-	AM_RANGE(0x3d00, 0x3dff) AM_READ(beta_enable_r)
 	AM_RANGE(0x0000, 0x3fff) AM_READ(beta_neutral_r) // Overlap with previous because we want real addresses on the 3e00-3fff range
+	AM_RANGE(0x3d00, 0x3dff) AM_READ(beta_enable_r)
 	AM_RANGE(0x4000, 0xffff) AM_READ(beta_disable_r)
 ADDRESS_MAP_END
 
@@ -178,7 +180,7 @@ static GFXDECODE_START( atmtb2 )
 GFXDECODE_END
 
 
-static MACHINE_CONFIG_DERIVED( atm, spectrum_128 )
+MACHINE_CONFIG_DERIVED(atm_state::atm, spectrum_128)
 	MCFG_CPU_MODIFY("maincpu")
 	MCFG_CPU_PROGRAM_MAP(atm_mem)
 	MCFG_CPU_IO_MAP(atm_io)
@@ -192,7 +194,7 @@ static MACHINE_CONFIG_DERIVED( atm, spectrum_128 )
 	MCFG_DEVICE_REMOVE("exp")
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_DERIVED( atmtb2, atm )
+MACHINE_CONFIG_DERIVED(atm_state::atmtb2, atm)
 	MCFG_GFXDECODE_MODIFY("gfxdecode", atmtb2)
 MACHINE_CONFIG_END
 

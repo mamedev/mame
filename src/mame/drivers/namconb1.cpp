@@ -281,7 +281,7 @@ GFX:                Custom 145     ( 80 pin PQFP)
 #include "speaker.h"
 
 
-#define MASTER_CLOCK    XTAL_48_384MHz
+#define MASTER_CLOCK    XTAL(48'384'000)
 
 #define ENABLE_LOGGING (0)
 
@@ -428,7 +428,7 @@ WRITE8_MEMBER(namconb1_state::namconb1_cpureg_w)
 
 		default:
 			if (ENABLE_LOGGING)
-				logerror("Unhandled CPU reg write to [0x%.2x] with 0x%.2x (PC=0x%x)\n", offset, data, space.device().safe_pc());
+				logerror("Unhandled CPU reg write to [0x%.2x] with 0x%.2x (PC=0x%x)\n", offset, data, m_maincpu->pc());
 	}
 }
 
@@ -516,7 +516,7 @@ WRITE8_MEMBER(namconb1_state::namconb2_cpureg_w)
 
 		default:
 			if (ENABLE_LOGGING)
-				logerror("Unhandled CPU reg write to [0x%.2x] with 0x%.2x (PC=0x%x)\n", offset, data, space.device().safe_pc());
+				logerror("Unhandled CPU reg write to [0x%.2x] with 0x%.2x (PC=0x%x)\n", offset, data, m_maincpu->pc());
 	}
 }
 
@@ -527,7 +527,7 @@ READ8_MEMBER(namconb1_state::namconb1_cpureg_r)
 	if (ENABLE_LOGGING)
 	{
 		if (offset != 0x16)
-			logerror("Unhandled CPU reg read from [0x%.2x] (PC=0x%x)\n", offset, space.device().safe_pc());
+			logerror("Unhandled CPU reg read from [0x%.2x] (PC=0x%x)\n", offset, m_maincpu->pc());
 	}
 
 	return 0xff;
@@ -540,7 +540,7 @@ READ8_MEMBER(namconb1_state::namconb2_cpureg_r)
 	if (ENABLE_LOGGING)
 	{
 		if (offset != 0x14)
-			logerror("Unhandled CPU reg read from [0x%.2x] (PC=0x%x)\n", offset, space.device().safe_pc());
+			logerror("Unhandled CPU reg read from [0x%.2x] (PC=0x%x)\n", offset, m_maincpu->pc());
 	}
 
 	return 0xff;
@@ -643,7 +643,7 @@ READ32_MEMBER(namconb1_state::custom_key_r)
 		break; /* no protection? */
 	}
 	if (ENABLE_LOGGING)
-		logerror( "custom_key_r(%d); pc=%08x\n", offset, space.device().safe_pc() );
+		logerror( "custom_key_r(%d); pc=%08x\n", offset, m_maincpu->pc() );
 	return 0;
 } /* custom_key_r */
 
@@ -728,7 +728,7 @@ static ADDRESS_MAP_START( namconb2_am, AS_PROGRAM, 32, namconb1_state )
 	AM_RANGE(0x980000, 0x98000f) AM_READWRITE16(c169_roz_bank_r,c169_roz_bank_w,0xffffffff)
 	AM_RANGE(0xa00000, 0xa007ff) AM_DEVREADWRITE8("eeprom", eeprom_parallel_28xx_device, read, write, 0xffffffff)
 	AM_RANGE(0xc00000, 0xc0001f) AM_READ(custom_key_r) AM_WRITENOP
-	AM_RANGE(0xf00000, 0xf0001f) AM_READWRITE8(namconb1_cpureg_r, namconb2_cpureg_w, 0xffffffff)
+	AM_RANGE(0xf00000, 0xf0001f) AM_READWRITE8(namconb2_cpureg_r, namconb2_cpureg_w, 0xffffffff)
 ADDRESS_MAP_END
 
 WRITE16_MEMBER(namconb1_state::mcu_shared_w)
@@ -748,7 +748,7 @@ WRITE16_MEMBER(namconb1_state::mcu_shared_w)
 	// C74 BIOS has a very short window on the CPU sync signal, so immediately let the '020 at it
 	if ((offset == 0x6000/2) && (data & 0x80))
 	{
-		space.device().execute().spin_until_time(downcast<cpu_device *>(&space.device())->cycles_to_attotime(300)); // was 300
+		m_mcu->spin_until_time(m_mcu->cycles_to_attotime(300)); // was 300
 	}
 }
 
@@ -1064,7 +1064,7 @@ MACHINE_RESET_MEMBER(namconb1_state, namconb)
 
 /***************************************************************/
 
-static MACHINE_CONFIG_START( namconb1 )
+MACHINE_CONFIG_START(namconb1_state::namconb1)
 	MCFG_CPU_ADD("maincpu", M68EC020, MASTER_CLOCK/2)
 	MCFG_CPU_PROGRAM_MAP(namconb1_am)
 
@@ -1106,7 +1106,7 @@ static MACHINE_CONFIG_START( namconb1 )
 	//MCFG_SOUND_ROUTE(3, "rspeaker", 1.00)
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_START( namconb2 )
+MACHINE_CONFIG_START(namconb1_state::namconb2)
 	MCFG_CPU_ADD("maincpu", M68EC020, MASTER_CLOCK/2)
 	MCFG_CPU_PROGRAM_MAP(namconb2_am)
 

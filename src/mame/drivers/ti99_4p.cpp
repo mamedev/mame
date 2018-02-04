@@ -184,6 +184,7 @@ public:
 
 	DECLARE_WRITE_LINE_MEMBER(video_interrupt_in);
 
+	void ti99_4p_60hz(machine_config &config);
 private:
 	void    datamux_clock_in(int clock);
 
@@ -286,11 +287,11 @@ static ADDRESS_MAP_START(memmap, AS_PROGRAM, 16, ti99_4p_state)
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START(cru_map, AS_IO, 8, ti99_4p_state)
-	AM_RANGE(0x0000, 0x003f) AM_DEVREAD(TI_TMS9901_TAG, tms9901_device, read)
 	AM_RANGE(0x0000, 0x01ff) AM_READ( cruread )
+	AM_RANGE(0x0000, 0x003f) AM_DEVREAD(TI_TMS9901_TAG, tms9901_device, read)
 
-	AM_RANGE(0x0000, 0x01ff) AM_DEVWRITE(TI_TMS9901_TAG, tms9901_device, write)
 	AM_RANGE(0x0000, 0x0fff) AM_WRITE( cruwrite )
+	AM_RANGE(0x0000, 0x01ff) AM_DEVWRITE(TI_TMS9901_TAG, tms9901_device, write)
 ADDRESS_MAP_END
 
 /*
@@ -989,7 +990,7 @@ MACHINE_RESET_MEMBER(ti99_4p_state,ti99_4p)
 /*
     Machine description.
 */
-static MACHINE_CONFIG_START( ti99_4p_60hz )
+MACHINE_CONFIG_START(ti99_4p_state::ti99_4p_60hz)
 	/* basic machine hardware */
 	/* TMS9900 CPU @ 3.0 MHz */
 	MCFG_TMS99xx_ADD("maincpu", TMS9900, 3000000, memmap, cru_map)

@@ -24,6 +24,7 @@
 
 #include "emu.h"
 #include "hd61700.h"
+#include "hd61700d.h"
 
 #include "debugger.h"
 
@@ -296,17 +297,14 @@ void hd61700_cpu_device::state_string_export(const device_state_entry &entry, st
 
 
 //-------------------------------------------------
-//  disasm_disassemble - call the disassembly
+//  disassemble - call the disassembly
 //  helper function
 //-------------------------------------------------
 
-offs_t hd61700_cpu_device::disasm_disassemble(std::ostream &stream, offs_t pc, const uint8_t *oprom, const uint8_t *opram, uint32_t options)
+util::disasm_interface *hd61700_cpu_device::create_disassembler()
 {
-	extern CPU_DISASSEMBLE( hd61700 );
-	return CPU_DISASSEMBLE_NAME(hd61700)(this, stream, pc, oprom, opram, options);
+	return new hd61700_disassembler;
 }
-
-
 
 //-------------------------------------------------
 //  check_irqs - check if need interrupts
@@ -2756,7 +2754,7 @@ inline uint8_t hd61700_cpu_device::read_op()
 
 	if (m_pc <= INT_ROM)
 	{
-		data = m_program->read_word(addr18<<1);
+		data = m_program->read_word(addr18);
 
 		if (!(m_fetch_addr&1))
 			data = (data>>8) ;
@@ -2764,9 +2762,9 @@ inline uint8_t hd61700_cpu_device::read_op()
 	else
 	{
 		if (m_fetch_addr&1)
-			data = m_program->read_word((addr18+1)<<1);
+			data = m_program->read_word(addr18 + 1);
 		else
-			data = m_program->read_word((addr18+0)<<1);
+			data = m_program->read_word(addr18 + 0);
 	}
 
 	m_fetch_addr += ((m_pc > INT_ROM) ? 2 : 1);
@@ -2782,12 +2780,12 @@ inline uint8_t hd61700_cpu_device::read_op()
 
 inline uint8_t hd61700_cpu_device::mem_readbyte(uint8_t segment, uint16_t offset)
 {
-	return m_program->read_word(make_18bit_addr(segment, offset)<<1) & 0xff;
+	return m_program->read_word(make_18bit_addr(segment, offset)) & 0xff;
 }
 
 inline void hd61700_cpu_device::mem_writebyte(uint8_t segment, uint16_t offset, uint8_t data)
 {
-	m_program->write_word(make_18bit_addr(segment, offset)<<1, data);
+	m_program->write_word(make_18bit_addr(segment, offset), data);
 }
 
 inline uint32_t hd61700_cpu_device::make_18bit_addr(uint8_t segment, uint16_t offset)

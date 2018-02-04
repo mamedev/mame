@@ -9,9 +9,9 @@
 ***************************************************************************/
 
 #include "emu.h"
+#include "r3kdasm.h"
 
-
-static const char *const reg[32] =
+const char *const r3000_disassembler::reg[32] =
 {
 	"0",    "r1",   "r2",   "r3",   "r4",   "r5",   "r6",   "r7",
 	"r8",   "r9",   "r10",  "r11",  "r12",  "r13",  "r14",  "r15",
@@ -20,7 +20,7 @@ static const char *const reg[32] =
 };
 
 
-static const char *const cpreg[4][32] =
+const char *const r3000_disassembler::cpreg[4][32] =
 {
 	{
 		"Index","Random","EntryLo","cpr3",  "Context",  "cpr5", "cpr6", "cpr7",
@@ -49,7 +49,7 @@ static const char *const cpreg[4][32] =
 };
 
 
-static const char *const ccreg[4][32] =
+const char *const r3000_disassembler::ccreg[4][32] =
 {
 	{
 		"ccr0", "ccr1", "ccr2", "ccr3", "ccr4", "ccr5", "ccr6", "ccr7",
@@ -82,17 +82,15 @@ static const char *const ccreg[4][32] =
     CODE CODE
 ***************************************************************************/
 
-static inline char *signed_16bit(int16_t val)
+std::string r3000_disassembler::signed_16bit(int16_t val)
 {
-	static char temp[10];
 	if (val < 0)
-		sprintf(temp, "-$%x", -val);
+		return util::string_format("-$%x", -val);
 	else
-		sprintf(temp, "$%x", val);
-	return temp;
+		return util::string_format("$%x", val);
 }
 
-static uint32_t dasm_cop(uint32_t pc, int cop, uint32_t op, std::ostream &stream)
+uint32_t r3000_disassembler::dasm_cop(uint32_t pc, int cop, uint32_t op, std::ostream &stream)
 {
 	int rt = (op >> 16) & 31;
 	int rd = (op >> 11) & 31;
@@ -152,7 +150,7 @@ static uint32_t dasm_cop(uint32_t pc, int cop, uint32_t op, std::ostream &stream
 	return flags;
 }
 
-static uint32_t dasm_cop1(uint32_t pc, uint32_t op, std::ostream &stream)
+uint32_t r3000_disassembler::dasm_cop1(uint32_t pc, uint32_t op, std::ostream &stream)
 {
 	static const char *const format_table[] =
 	{
@@ -180,8 +178,8 @@ static uint32_t dasm_cop1(uint32_t pc, uint32_t op, std::ostream &stream)
 			{
 				case 0x00:  util::stream_format(stream, "bc1f   $%08x,%d", pc + 4 + ((int16_t)op << 2), (op >> 18) & 7);      break;
 				case 0x01:  util::stream_format(stream, "bc1t   $%08x,%d", pc + 4 + ((int16_t)op << 2), (op >> 18) & 7);      break;
-				case 0x02:  util::stream_format(stream, "bc1fl  $%08x,%d", pc + 4 + ((int16_t)op << 2), (op >> 18) & 7); flags = DASMFLAG_STEP_OVER | DASMFLAG_STEP_OVER_EXTRA(1); break;
-				case 0x03:  util::stream_format(stream, "bc1tl  $%08x,%d", pc + 4 + ((int16_t)op << 2), (op >> 18) & 7); flags = DASMFLAG_STEP_OVER | DASMFLAG_STEP_OVER_EXTRA(1); break;
+				case 0x02:  util::stream_format(stream, "bc1fl  $%08x,%d", pc + 4 + ((int16_t)op << 2), (op >> 18) & 7); flags = STEP_OVER | step_over_extra(1); break;
+				case 0x03:  util::stream_format(stream, "bc1tl  $%08x,%d", pc + 4 + ((int16_t)op << 2), (op >> 18) & 7); flags = STEP_OVER | step_over_extra(1); break;
 			}
 			break;
 		default:    /* COP */
@@ -235,8 +233,9 @@ static uint32_t dasm_cop1(uint32_t pc, uint32_t op, std::ostream &stream)
 	return flags;
 }
 
-static unsigned dasmr3k(std::ostream &stream, unsigned pc, uint32_t op)
+offs_t r3000_disassembler::disassemble(std::ostream &stream, offs_t pc, const data_buffer &opcodes, const data_buffer &params)
 {
+	uint32_t op = opcodes.r32(pc);
 	int rs = (op >> 21) & 31;
 	int rt = (op >> 16) & 31;
 	int rd = (op >> 11) & 31;
@@ -258,15 +257,15 @@ static unsigned dasmr3k(std::ostream &stream, unsigned pc, uint32_t op)
 				case 0x04:  util::stream_format(stream, "sllv   %s,%s,%s", reg[rd], reg[rt], reg[rs]);          break;
 				case 0x06:  util::stream_format(stream, "srlv   %s,%s,%s", reg[rd], reg[rt], reg[rs]);          break;
 				case 0x07:  util::stream_format(stream, "srav   %s,%s,%s", reg[rd], reg[rt], reg[rs]);          break;
-				case 0x08:  util::stream_format(stream, "jr     %s", reg[rs]); if (rs == 31) flags = DASMFLAG_STEP_OUT; break;
+				case 0x08:  util::stream_format(stream, "jr     %s", reg[rs]); if (rs == 31) flags = STEP_OUT; break;
 				case 0x09:  if (rd == 31)
 							util::stream_format(stream, "jalr   %s", reg[rs]);
 							else
 							util::stream_format(stream, "jalr   %s,%s", reg[rs], reg[rd]);
-					flags = DASMFLAG_STEP_OVER | DASMFLAG_STEP_OVER_EXTRA(1);
+					flags = STEP_OVER | step_over_extra(1);
 					break;
-				case 0x0c:  util::stream_format(stream, "syscall"); flags = DASMFLAG_STEP_OVER;                 break;
-				case 0x0d:  util::stream_format(stream, "break"); flags = DASMFLAG_STEP_OVER;                   break;
+				case 0x0c:  util::stream_format(stream, "syscall"); flags = STEP_OVER;                 break;
+				case 0x0d:  util::stream_format(stream, "break"); flags = STEP_OVER;                   break;
 				case 0x0f:  util::stream_format(stream, "sync [invalid]");                                      break;
 				case 0x10:  util::stream_format(stream, "mfhi   %s", reg[rd]);                                  break;
 				case 0x11:  util::stream_format(stream, "mthi   %s", reg[rs]);                                  break;
@@ -309,8 +308,8 @@ static unsigned dasmr3k(std::ostream &stream, unsigned pc, uint32_t op)
 				case 0x0b:  util::stream_format(stream, "tltiu [invalid]");                                     break;
 				case 0x0c:  util::stream_format(stream, "teqi [invalid]");                                      break;
 				case 0x0e:  util::stream_format(stream, "tnei [invalid]");                                      break;
-				case 0x10:  util::stream_format(stream, "bltzal %s,$%08x", reg[rs], pc + 4 + ((int16_t)op << 2)); flags = DASMFLAG_STEP_OVER | DASMFLAG_STEP_OVER_EXTRA(1); break;
-				case 0x11:  util::stream_format(stream, "bgezal %s,$%08x", reg[rs], pc + 4 + ((int16_t)op << 2)); flags = DASMFLAG_STEP_OVER | DASMFLAG_STEP_OVER_EXTRA(1); break;
+				case 0x10:  util::stream_format(stream, "bltzal %s,$%08x", reg[rs], pc + 4 + ((int16_t)op << 2)); flags = STEP_OVER | step_over_extra(1); break;
+				case 0x11:  util::stream_format(stream, "bgezal %s,$%08x", reg[rs], pc + 4 + ((int16_t)op << 2)); flags = STEP_OVER | step_over_extra(1); break;
 				case 0x12:  util::stream_format(stream, "bltzall [invalid]");                                   break;
 				case 0x13:  util::stream_format(stream, "bgezall [invalid]");                                   break;
 				default:    util::stream_format(stream, "dc.l   $%08x [invalid]", op);                          break;
@@ -318,7 +317,7 @@ static unsigned dasmr3k(std::ostream &stream, unsigned pc, uint32_t op)
 			break;
 
 		case 0x02:  util::stream_format(stream, "j      $%08x", (pc & 0xf0000000) | ((op & 0x0fffffff) << 2));  break;
-		case 0x03:  util::stream_format(stream, "jal    $%08x", (pc & 0xf0000000) | ((op & 0x0fffffff) << 2)); flags = DASMFLAG_STEP_OVER | DASMFLAG_STEP_OVER_EXTRA(1); break;
+		case 0x03:  util::stream_format(stream, "jal    $%08x", (pc & 0xf0000000) | ((op & 0x0fffffff) << 2)); flags = STEP_OVER | step_over_extra(1); break;
 		case 0x04:  if (rs == 0 && rt == 0)
 					util::stream_format(stream, "b      $%08x", pc + 4 + ((int16_t)op << 2));
 					else
@@ -374,21 +373,10 @@ static unsigned dasmr3k(std::ostream &stream, unsigned pc, uint32_t op)
 		case 0x3f:  util::stream_format(stream, "sdc3 [invalid]");                                              break;
 		default:    util::stream_format(stream, "dc.l   $%08x [invalid]", op);                                  break;
 	}
-	return 4 | flags | DASMFLAG_SUPPORTED;
+	return 4 | flags | SUPPORTED;
 }
 
-
-CPU_DISASSEMBLE( r3000be )
+uint32_t r3000_disassembler::opcode_alignment() const
 {
-	uint32_t op = *(uint32_t *)oprom;
-	op = big_endianize_int32(op);
-	return dasmr3k(stream, pc, op);
-}
-
-
-CPU_DISASSEMBLE( r3000le )
-{
-	uint32_t op = *(uint32_t *)oprom;
-	op = little_endianize_int32(op);
-	return dasmr3k(stream, pc, op);
+	return 4;
 }
