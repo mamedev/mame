@@ -137,7 +137,7 @@ uint32_t konmedal68k_state::screen_update_konmedal68k(screen_device &screen, bit
 		pri[i] = m_k055555->K055555_read_register(K55_PRIINP_0 + i * 3);
 	}
 
-	for (i = 0; i < NUM_LAYERS + 1; i++)
+	for (i = 0; i < NUM_LAYERS; i++)
 	{
 		order[i] = i;
 	}
