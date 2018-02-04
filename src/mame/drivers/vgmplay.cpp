@@ -18,6 +18,7 @@
 #include "sound/c352.h"
 #include "sound/c6280.h"
 #include "sound/gb.h"
+#include "sound/k051649.h"
 #include "sound/k053260.h"
 #include "sound/k054539.h"
 #include "sound/multipcm.h"
@@ -83,7 +84,8 @@ public:
 		A_YM2608     = 0x00013060,
 		A_K054539A   = 0x00014000,
 		A_K054539B   = 0x00014400,
-		A_QSOUND     = 0x00013070
+		A_QSOUND     = 0x00013070,
+		A_K051649    = 0x00013080
 	};
 
 	enum io16_t
@@ -188,6 +190,7 @@ public:
 
 	template<int Chip> DECLARE_WRITE8_MEMBER(okim6295_clock_w);
 	template<int Chip> DECLARE_WRITE8_MEMBER(okim6295_pin7_w);
+	DECLARE_WRITE8_MEMBER(scc_w);
 
 	void vgmplay(machine_config &config);
 private:
@@ -218,9 +221,11 @@ private:
 	required_device<ymz280b_device> m_ymz280b;
 	required_device<ym2608_device> m_ym2608;
 	required_device<qsound_device> m_qsound;
+	required_device<k051649_device> m_k051649;
 
 	uint32_t m_okim6295_clock[2];
 	uint32_t m_okim6295_pin7[2];
+	uint8_t m_scc_reg;
 
 	uint32_t r32(int offset) const;
 	uint8_t r8(int offset) const;
@@ -571,6 +576,15 @@ void vgmplay_device::execute_run()
 				uint8_t offset = m_file->read_byte(m_pc+1);
 				m_io->write_byte(A_YMF271 + (offset & 7) * 2, m_file->read_byte(m_pc+2));
 				m_io->write_byte(A_YMF271 + (offset & 7) * 2 + 1, m_file->read_byte(m_pc+3));
+				m_pc += 4;
+				break;
+			}
+
+			case 0xd2:
+			{
+				uint32_t offset = m_file->read_byte(m_pc+1) << 1;
+				m_io->write_byte(A_K051649 + (offset | 0), m_file->read_byte(m_pc+2));
+				m_io->write_byte(A_K051649 + (offset | 1), m_file->read_byte(m_pc+3));
 				m_pc += 4;
 				break;
 			}
@@ -1078,6 +1092,7 @@ vgmplay_state::vgmplay_state(const machine_config &mconfig, device_type type, co
 	, m_ymz280b(*this, "ymz280b")
 	, m_ym2608(*this, "ym2608")
 	, m_qsound(*this, "qsound")
+	, m_k051649(*this, "k051649")
 {
 }
 
@@ -1302,6 +1317,9 @@ void vgmplay_state::machine_start()
 					m_okim6295[1]->set_unscaled_clock(m_okim6295_clock[1]);
 				}
 			}
+			if(version >= 0x161 && r32(0x9c)) {
+				m_k051649->set_unscaled_clock(r32(0x9c));
+			}
 			if(version >= 0x161 && r32(0xa0)) {
 				uint32_t clock = r32(0xa0);
 				m_k054539[0]->set_unscaled_clock(clock & ~0x40000000);
@@ -1420,6 +1438,39 @@ WRITE8_MEMBER(vgmplay_device::okim6295_nmk112_bank_w)
 	}
 }
 
+WRITE8_MEMBER(vgmplay_state::scc_w)
+{
+	switch(offset & 1)
+	{
+	case 0x00:
+		m_scc_reg = data;
+		break;
+	case 0x01:
+		switch(offset >> 1)
+		{
+		case 0x00:
+			m_k051649->k051649_waveform_w(space, m_scc_reg, data);
+			break;
+		case 0x01:
+			m_k051649->k051649_frequency_w(space, m_scc_reg, data);
+			break;
+		case 0x02:
+			m_k051649->k051649_volume_w(space, m_scc_reg, data);
+			break;
+		case 0x03:
+			m_k051649->k051649_keyonoff_w(space, m_scc_reg, data);
+			break;
+		case 0x04:
+			m_k051649->k052539_waveform_w(space, m_scc_reg, data);
+			break;
+		case 0x05:
+			m_k051649->k051649_test_w(space, m_scc_reg, data);
+			break;
+		}
+		break;
+	}
+}
+
 static INPUT_PORTS_START( vgmplay )
 INPUT_PORTS_END
 
@@ -1479,6 +1530,7 @@ static ADDRESS_MAP_START( soundchips_map, AS_IO, 8, vgmplay_state )
 	AM_RANGE(vgmplay_device::A_K054539A,       vgmplay_device::A_K054539A+0x22f) AM_DEVWRITE    ("k054539a",      k054539_device, write)
 	AM_RANGE(vgmplay_device::A_K054539B,       vgmplay_device::A_K054539B+0x22f) AM_DEVWRITE    ("k054539b",      k054539_device, write)
 	AM_RANGE(vgmplay_device::A_QSOUND,         vgmplay_device::A_QSOUND+0x2)     AM_DEVWRITE    ("qsound",        qsound_device, qsound_w)
+	AM_RANGE(vgmplay_device::A_K051649,        vgmplay_device::A_K051649+0xf)    AM_WRITE       (scc_w)
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( segapcm_map, 0, 8, vgmplay_state )
@@ -1680,6 +1732,10 @@ MACHINE_CONFIG_START(vgmplay_state::vgmplay)
 	MCFG_DEVICE_ADDRESS_MAP(0, qsound_map)
 	MCFG_SOUND_ROUTE(0, "lspeaker", 1)
 	MCFG_SOUND_ROUTE(1, "rspeaker", 1)
+
+	MCFG_K051649_ADD("k051649", 3579545)
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "lspeaker", 0.33)
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", 0.33)
 MACHINE_CONFIG_END
 
 ROM_START( vgmplay )

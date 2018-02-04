@@ -63,6 +63,7 @@ uint32_t darkseal_state::screen_update(screen_device &screen, bitmap_ind16 &bitm
 	address_space &space = machine().dummy_space();
 	uint16_t flip = m_deco_tilegen2->pf_control_r(space, 0, 0xffff);
 	flip_screen_set(!BIT(flip, 7));
+	m_sprgen->set_flip_screen(!BIT(flip, 7));
 
 	bitmap.fill(m_palette->black_pen(), cliprect);
 
