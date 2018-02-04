@@ -128,7 +128,8 @@ void deco_mxc06_device::draw_sprites( bitmap_ind16 &bitmap, const rectangle &cli
 
 			code &= ~(h - 1);
 
-			if (flipy)
+			// not affected by flipscreen
+			if (sy & 0x4000)
 				incy = -1;
 			else
 			{
