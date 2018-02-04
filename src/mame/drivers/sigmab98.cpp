@@ -666,7 +666,7 @@ READ8_MEMBER(sigmab98_state::d013_r)
 {
 	// bit 5 must go 0->1 (vblank?)
 	// bit 2 must be set (sprite buffered? triggered by pulsing bit 3 of port C6?)
-//	return (m_screen->vblank() ? 0x20 : 0x00) | 0x04;
+//  return (m_screen->vblank() ? 0x20 : 0x00) | 0x04;
 	return (m_screen->vblank() ? 0x20 : 0x01) | 0x04;
 //  return machine().rand();
 }
@@ -792,10 +792,11 @@ static ADDRESS_MAP_START( dodghero_mem_map, AS_PROGRAM, 8, sigmab98_state )
 
 	AM_RANGE( 0xd001, 0xd07f ) AM_RAM AM_SHARE("vtable")
 
+	AM_RANGE( 0xd800, 0xdfff ) AM_RAMBANK("rambank")    // not used, where is it mapped?
+
+	AM_RANGE( 0xd800, 0xd821 ) AM_READWRITE(vregs_r, vregs_w) AM_SHARE("vregs")
 	AM_RANGE( 0xd813, 0xd813 ) AM_READ(d013_r)
 	AM_RANGE( 0xd821, 0xd821 ) AM_READ(d021_r)
-	AM_RANGE( 0xd800, 0xd821 ) AM_READWRITE(vregs_r, vregs_w) AM_SHARE("vregs")
-	AM_RANGE( 0xd800, 0xdfff ) AM_RAMBANK("rambank")    // not used, where is it mapped?
 
 	AM_RANGE( 0xe000, 0xefff ) AM_RAM AM_SHARE("nvram") // battery backed RAM
 
@@ -987,9 +988,9 @@ static ADDRESS_MAP_START( gegege_mem_map, AS_PROGRAM, 8, sigmab98_state )
 
 	AM_RANGE( 0xc800, 0xc87f ) AM_RAM AM_SHARE("vtable")
 
+	AM_RANGE( 0xd000, 0xd021 ) AM_READWRITE(vregs_r, vregs_w) AM_SHARE("vregs")
 	AM_RANGE( 0xd013, 0xd013 ) AM_READ(d013_r)
 	AM_RANGE( 0xd021, 0xd021 ) AM_READ(d021_r)
-	AM_RANGE( 0xd000, 0xd021 ) AM_READWRITE(vregs_r, vregs_w) AM_SHARE("vregs")
 
 	AM_RANGE( 0xd800, 0xdfff ) AM_RAMBANK("rambank")
 
@@ -1164,7 +1165,7 @@ WRITE8_MEMBER(lufykzku_state::lufykzku_watchdog_w)
 WRITE8_MEMBER(lufykzku_state::lufykzku_c4_w)
 {
 	machine().bookkeeping().coin_lockout_w(1, (~data) & 0x20); // 100 yen lockout
-//	machine().bookkeeping().coin_lockout_w(2, (~data) & 0x40); // (unused coin lockout)
+//  machine().bookkeeping().coin_lockout_w(2, (~data) & 0x40); // (unused coin lockout)
 	machine().bookkeeping().coin_lockout_w(0, (~data) & 0x80); // medal lockout
 
 	m_c4 = data;
@@ -1175,13 +1176,13 @@ WRITE8_MEMBER(lufykzku_state::lufykzku_c4_w)
 WRITE8_MEMBER(lufykzku_state::lufykzku_c6_w)
 {
 	machine().bookkeeping().coin_counter_w(1, data & 0x01); // 100 yen in
-//	machine().bookkeeping().coin_counter_w(2, data & 0x02); // (unused coin in)
+//  machine().bookkeeping().coin_counter_w(2, data & 0x02); // (unused coin in)
 	machine().bookkeeping().coin_counter_w(0, data & 0x04); // medal in
 	machine().bookkeeping().coin_counter_w(3, data & 0x08); // medal out
 	output().set_led_value(0,                 data & 0x10); // button led
-//	output().set_led_value(1,                 data & 0x20); // (unused button led)
-//	output().set_led_value(2,                 data & 0x40); // (unused button led)
-//	output().set_led_value(3,                 data & 0x80); // (unused button led)
+//  output().set_led_value(1,                 data & 0x20); // (unused button led)
+//  output().set_led_value(2,                 data & 0x40); // (unused button led)
+//  output().set_led_value(3,                 data & 0x80); // (unused button led)
 
 	m_c6 = data;
 	show_outputs();
@@ -1216,9 +1217,9 @@ static ADDRESS_MAP_START( lufykzku_mem_map, AS_PROGRAM, 8, lufykzku_state )
 
 	AM_RANGE( 0xd000, 0xefff ) AM_RAM_DEVWRITE("palette", palette_device, write8) AM_SHARE("palette") // more palette entries
 
+	AM_RANGE( 0xf000, 0xf021 ) AM_READWRITE(vregs_r, vregs_w) AM_SHARE("vregs")
 	AM_RANGE( 0xf013, 0xf013 ) AM_READ(d013_r)
 	AM_RANGE( 0xf021, 0xf021 ) AM_READ(d021_r)
-	AM_RANGE( 0xf000, 0xf021 ) AM_READWRITE(vregs_r, vregs_w) AM_SHARE("vregs")
 
 	AM_RANGE( 0xf400, 0xf47f ) AM_RAM AM_SHARE("vtable")
 
@@ -1459,9 +1460,9 @@ static ADDRESS_MAP_START( animalc_map, AS_PROGRAM, 8, sigmab98_state )
 	AM_RANGE( 0xd000, 0xd1ff ) AM_RAM_DEVWRITE("palette", palette_device, write8) AM_SHARE("palette")
 	AM_RANGE( 0xd800, 0xd87f ) AM_RAM AM_SHARE("vtable")
 
+	AM_RANGE( 0xe000, 0xe021 ) AM_READWRITE(vregs_r, vregs_w) AM_SHARE("vregs")
 	AM_RANGE( 0xe011, 0xe011 ) AM_WRITENOP  // IRQ Enable? Screen disable?
 	AM_RANGE( 0xe013, 0xe013 ) AM_READWRITE(vblank_r, vblank_w )    // IRQ Ack?
-	AM_RANGE( 0xe000, 0xe021 ) AM_READWRITE(vregs_r, vregs_w) AM_SHARE("vregs")
 
 	AM_RANGE( 0xfe00, 0xffff ) AM_RAM   // High speed internal RAM
 ADDRESS_MAP_END
@@ -2246,9 +2247,9 @@ static ADDRESS_MAP_START( itazuram_map, AS_PROGRAM, 8, sigmab98_state )
 	AM_RANGE( 0x5800, 0x59ff ) AM_READWRITE(itazuram_palette_r, itazuram_palette_w )
 	AM_RANGE( 0x6000, 0x607f ) AM_RAM AM_SHARE("vtable")
 
+	AM_RANGE( 0x6800, 0x6821 ) AM_READWRITE(vregs_r, vregs_w) AM_SHARE("vregs")
 	AM_RANGE( 0x6811, 0x6811 ) AM_WRITENOP  // IRQ Enable? Screen disable?
 	AM_RANGE( 0x6813, 0x6813 ) AM_WRITENOP  // IRQ Ack?
-	AM_RANGE( 0x6800, 0x6821 ) AM_READWRITE(vregs_r, vregs_w) AM_SHARE("vregs")
 	AM_RANGE( 0xdc00, 0xfdff ) AM_READ_BANK( "palbank" ) AM_WRITE(itazuram_nvram_palette_w ) AM_SHARE( "nvram" )    // nvram | paletteram
 
 	AM_RANGE( 0xfe00, 0xffff ) AM_RAM   // High speed internal RAM
@@ -2276,8 +2277,8 @@ ADDRESS_MAP_END
 ***************************************************************************/
 
 static ADDRESS_MAP_START( pyenaget_io, AS_IO, 8, sigmab98_state )
-	AM_RANGE( 0x31, 0x31 ) AM_READWRITE(sammymdl_coin_counter_r, sammymdl_coin_counter_w )
 	AM_IMPORT_FROM( haekaka_io )
+	AM_RANGE( 0x31, 0x31 ) AM_READWRITE(sammymdl_coin_counter_r, sammymdl_coin_counter_w )
 ADDRESS_MAP_END
 
 /***************************************************************************
@@ -2913,7 +2914,7 @@ MACHINE_CONFIG_START(lufykzku_state::lufykzku)
 	MCFG_PALETTE_FORMAT(xRRRRRGGGGGBBBBB)
 	MCFG_PALETTE_ENDIANNESS(ENDIANNESS_BIG)
 
-//	MCFG_BUFFERED_SPRITERAM8_ADD("spriteram") // same as sammymdl?
+//  MCFG_BUFFERED_SPRITERAM8_ADD("spriteram") // same as sammymdl?
 
 	// sound hardware
 	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
@@ -3476,7 +3477,7 @@ DRIVER_INIT_MEMBER(lufykzku_state,lufykzku)
 
     Xilinx XC9536 VM1212F01 (@U5) - In-System Programmable CPLD
     MX29F0??C (@U3) - Empty 32 Pin ROM Socket
-	M5295A (@U8) - Watchdog Timer (Near CUT-DEBUG MODE Jumper)
+    M5295A (@U8) - Watchdog Timer (Near CUT-DEBUG MODE Jumper)
     M93C46MN6T (@U11?) - Serial EEPROM
     Cell Battery (@BAT)
     25 Pin Edge Connector

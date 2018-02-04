@@ -221,8 +221,8 @@ static ADDRESS_MAP_START( kongambl_map, AS_PROGRAM, 32, kongambl_state )
 
 	//0x400000 0x400001 "13M" even addresses
 	//0x400002,0x400003 "13J" odd addresses
-	AM_RANGE(0x400000, 0x401fff) AM_DEVREAD("k056832", k056832_device, rom_long_r)
-	AM_RANGE(0x420000, 0x43ffff) AM_DEVREADWRITE("k056832", k056832_device, unpaged_ram_long_r, unpaged_ram_long_w)
+//  AM_RANGE(0x400000, 0x401fff) AM_DEVREAD("k056832", k056832_device, rom_long_r)
+//  AM_RANGE(0x420000, 0x43ffff) AM_DEVREADWRITE("k056832", k056832_device, unpaged_ram_long_r, unpaged_ram_long_w)
 	AM_RANGE(0x480000, 0x48003f) AM_DEVWRITE("k056832", k056832_device, long_w)
 
 
@@ -243,11 +243,11 @@ static ADDRESS_MAP_START( kongambl_map, AS_PROGRAM, 32, kongambl_state )
 
 	AM_RANGE(0x4d0000, 0x4d0003) AM_WRITE8(kongambl_ff_w,0xff000000)
 
-	AM_RANGE(0x500380, 0x500383) AM_READ(test_r)
 	AM_RANGE(0x500000, 0x5007ff) AM_RAM
-	AM_RANGE(0x500400, 0x500403) AM_NOP //dual port?
-	AM_RANGE(0x500420, 0x500423) AM_NOP //dual port?
-	AM_RANGE(0x500500, 0x500503) AM_NOP // reads sound ROM in here, polled from m68k?
+	AM_RANGE(0x500380, 0x500383) AM_READ(test_r)
+//	AM_RANGE(0x500400, 0x500403) AM_NOP //dual port?
+//	AM_RANGE(0x500420, 0x500423) AM_NOP //dual port?
+//	AM_RANGE(0x500500, 0x500503) AM_NOP // reads sound ROM in here, polled from m68k?
 	AM_RANGE(0x580000, 0x580007) AM_READ(test_r)
 
 	AM_RANGE(0x600000, 0x60000f) AM_READ(test_r)

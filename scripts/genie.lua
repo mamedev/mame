@@ -955,7 +955,7 @@ end
 	buildoptions_cpp {
 		"-Woverloaded-virtual",
 	}
-	
+
 if _OPTIONS["SANITIZE"] then
 	buildoptions {
 		"-fsanitize=".. _OPTIONS["SANITIZE"]
@@ -1073,6 +1073,9 @@ configuration { "asmjs" }
 	buildoptions_cpp {
 		"-x c++",
 		"-std=c++14",
+	}
+	linkoptions {
+		"-Wl,--start-group",
 	}
 	archivesplit_size "20"
 

@@ -137,7 +137,9 @@ READ8_MEMBER( towns_state::towns_gfx_high_r )
 
 WRITE8_MEMBER( towns_state::towns_gfx_high_w )
 {
-	m_towns_gfxvram[offset] = data;
+	u8 mask = m_vram_mask[offset & 3];
+	u8 mem = m_towns_gfxvram[offset];
+	m_towns_gfxvram[offset] = (mem & ~mask) | (data & mask);
 }
 
 READ8_MEMBER( towns_state::towns_gfx_r )
@@ -414,6 +416,14 @@ READ8_MEMBER(towns_state::towns_video_440_r)
 		case 0x12:
 			if(LOG_VID) logerror("SPR: reading register %i (0x452) [%02x]\n",m_video.towns_sprite_sel,m_video.towns_sprite_reg[m_video.towns_sprite_sel]);
 			return m_video.towns_sprite_reg[m_video.towns_sprite_sel];
+		case 0x18:
+			return m_vram_mask_addr;
+		case 0x1a:
+		case 0x1b:
+		{
+			int idx = (m_vram_mask_addr << 1) + offset - 0x1a;
+			return m_vram_mask[idx];
+		}
 		//default:
 			//if(LOG_VID) logerror("VID: read port %04x\n",offset+0x440);
 	}
@@ -453,6 +463,16 @@ WRITE8_MEMBER(towns_state::towns_video_440_w)
 			logerror("SPR: writing register %i (0x452) [%02x]\n",m_video.towns_sprite_sel,data);
 			m_video.towns_sprite_reg[m_video.towns_sprite_sel] = data;
 			break;
+		case 0x18:
+			m_vram_mask_addr = data & 1;
+			break;
+		case 0x1a:
+		case 0x1b:
+		{
+			int idx = (m_vram_mask_addr << 1) + offset - 0x1a;
+			m_vram_mask[idx] = data;
+			break;
+		}
 		default:
 			if(LOG_VID) logerror("VID: wrote 0x%02x to port %04x\n",data,offset+0x440);
 	}
@@ -1042,7 +1062,7 @@ void towns_state::towns_crtc_draw_scan_layer_hicolour(bitmap_rgb32 &bitmap,const
 	}
 	else
 		linesize = m_video.towns_crtc_reg[20] * 8;
-	
+
 	if(m_video.towns_display_page_sel != 0)
 	{
 		off = 0x20000;
@@ -1121,7 +1141,7 @@ void towns_state::towns_crtc_draw_scan_layer_256(bitmap_rgb32 &bitmap,const rect
 	}
 
 	linesize = m_video.towns_crtc_reg[20] * 8;
-	
+
 	if(!(m_video.towns_crtc_reg[28] & 0x20))
 		off += m_video.towns_crtc_reg[17] << 3;  // initial offset
 	else

@@ -644,8 +644,8 @@ static ADDRESS_MAP_START( h6280_sound_map, AS_PROGRAM, 8, deco32_state )
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( h6280_sound_custom_latch_map, AS_PROGRAM, 8, deco32_state )
-	AM_RANGE(0x140000, 0x140000) AM_DEVREAD("soundlatch", generic_latch_8_device, read)
 	AM_IMPORT_FROM(h6280_sound_map)
+	AM_RANGE(0x140000, 0x140000) AM_DEVREAD("soundlatch", generic_latch_8_device, read)
 ADDRESS_MAP_END
 
 // Z80 based sound
@@ -2290,7 +2290,7 @@ MACHINE_CONFIG_START(nslasher_state::tattass)
 	MCFG_SCREEN_ADD("screen", RASTER)
 	MCFG_SCREEN_RAW_PARAMS(XTAL(28'000'000) / 4, 442, 0, 320, 274, 8, 248)
 	MCFG_SCREEN_UPDATE_DRIVER(nslasher_state, screen_update_nslasher)
-	
+
 	MCFG_DECO_ACE_ADD("deco_ace")
 	MCFG_DECO_ACE_PALETTE("palette")
 

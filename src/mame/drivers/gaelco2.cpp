@@ -83,8 +83,8 @@ ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( maniacsq_map, AS_PROGRAM, 16, gaelco2_state )
 	AM_RANGE(0x000000, 0x03ffff) AM_ROM                                                                     /* ROM */
-	AM_RANGE(0x202890, 0x2028ff) AM_DEVREADWRITE("gaelco", gaelco_gae1_device, gaelcosnd_r, gaelcosnd_w)    /* Sound Registers */
 	AM_RANGE(0x200000, 0x20ffff) AM_RAM_WRITE(gaelco2_vram_w) AM_SHARE("spriteram")                         /* Video RAM */
+	AM_RANGE(0x202890, 0x2028ff) AM_DEVREADWRITE("gaelco", gaelco_gae1_device, gaelcosnd_r, gaelcosnd_w)    /* Sound Registers */
 	AM_RANGE(0x210000, 0x211fff) AM_RAM_WRITE(gaelco2_palette_w) AM_SHARE("paletteram")                     /* Palette */
 	AM_RANGE(0x218004, 0x218009) AM_RAM AM_SHARE("vregs")                                                   /* Video Registers */
 	AM_RANGE(0x300000, 0x300001) AM_READ_PORT("IN0")                                                        /* DSW #1 + Input 1P */
@@ -321,24 +321,23 @@ PCB Layout:
 REF: 960419/1
 Part No.: E193
 ------------------------------------------------------------------------------
-|                                   KM428C256J-6                             |
-|                                   KM428C256J-6                             |
+|                                                                            |
+|                                               KM428C256J-6                 |
 |                POT1                                                        |
-|---                                                                         |
+|---                                            KM428C256J-6                 |
    |         SW2                                                   IC43*     |
    |                   30.000MHz          |----------|                       |
 |---        93C66                         |          |             IC44      |
 |                                         |  CG-1V   |                       |
-| J                            6264       |   427    |             IC45*     |
-|                              6264       |          |                       |
-| A                                       |----------|             IC46*     |
-|                                                                            |
+| J                                       |   427    |             IC45*     |
+|                                         |          |                       |
+| A                            6264       |----------|             IC46*     |
+|                              6264                                          |
 | M                                                                IC47      |
 |                                                                            |
 | M                                                                  62256   |
 |                                                                    62256   |
-| A                                                                  62256   |
-|                                            |----------|                    |
+| A                                          |----------|            62256   |
 |                                24.000MHz   | Lattice  |                    |
 |---                                         | IspLSI   |                    |
    |                                         |   1016   |          MS1.IC53  |
@@ -366,7 +365,7 @@ Part No.: E192
 
 * Denotes unpopulated sockets
 
-Although this version of Maniac Square use the same PCB as Snow Board Championship, there are some minor 
+Although this version of Maniac Square use the same PCB as Snow Board Championship, there are some minor
 omponent changes:
 
  Slower OSC clocks
@@ -483,8 +482,8 @@ static ADDRESS_MAP_START( play2000_map, AS_PROGRAM, 16, gaelco2_state )
 	AM_RANGE(0x000000, 0x03ffff) AM_ROM                                                                     /* ROM */
 	AM_RANGE(0x100000, 0x100001) AM_READ_PORT("IN0")                                                        /* Coins + other buttons? */
 	// AM_RANGE(0x110000, 0x110001) ?
-	AM_RANGE(0x202890, 0x2028ff) AM_DEVREADWRITE("gaelco", gaelco_gae1_device, gaelcosnd_r, gaelcosnd_w)    /* Sound Registers */
 	AM_RANGE(0x200000, 0x20ffff) AM_RAM_WRITE(gaelco2_vram_w) AM_SHARE("spriteram")                         /* Video RAM */
+	AM_RANGE(0x202890, 0x2028ff) AM_DEVREADWRITE("gaelco", gaelco_gae1_device, gaelcosnd_r, gaelcosnd_w)    /* Sound Registers */
 	AM_RANGE(0x214000, 0x214fff) AM_RAM_WRITE(gaelco2_palette_w) AM_SHARE("paletteram")                     /* Palette */
 	AM_RANGE(0x215000, 0x217fff) AM_RAM                                                                     /* Written to, but unused? */
 	AM_RANGE(0x218000, 0x218003) AM_RAM                                                                     /* Written to, but unused? */
@@ -640,8 +639,8 @@ READ16_MEMBER(bang_state::p2_gun_y){return (m_light1_y->read() * 240 / 0x100) - 
 
 static ADDRESS_MAP_START( bang_map, AS_PROGRAM, 16, bang_state )
 	AM_RANGE(0x000000, 0x0fffff) AM_ROM                                                                     /* ROM */
-	AM_RANGE(0x202890, 0x2028ff) AM_DEVREADWRITE("gaelco", gaelco_cg1v_device, gaelcosnd_r, gaelcosnd_w)    /* Sound Registers */
 	AM_RANGE(0x200000, 0x20ffff) AM_RAM_WRITE(gaelco2_vram_w) AM_SHARE("spriteram")                         /* Video RAM */
+	AM_RANGE(0x202890, 0x2028ff) AM_DEVREADWRITE("gaelco", gaelco_cg1v_device, gaelcosnd_r, gaelcosnd_w)    /* Sound Registers */
 	AM_RANGE(0x210000, 0x211fff) AM_RAM_WRITE(gaelco2_palette_w) AM_SHARE("paletteram")                     /* Palette */
 	AM_RANGE(0x218004, 0x218009) AM_READONLY                                                                /* Video Registers */
 	AM_RANGE(0x218004, 0x218007) AM_WRITEONLY AM_SHARE("vregs")                                             /* Video Registers */
@@ -843,8 +842,8 @@ ROM_END
 
 static ADDRESS_MAP_START( alighunt_map, AS_PROGRAM, 16, gaelco2_state )
 	AM_RANGE(0x000000, 0x0fffff) AM_ROM                                                                         /* ROM */
-	AM_RANGE(0x202890, 0x2028ff) AM_DEVREADWRITE("gaelco", gaelco_gae1_device, gaelcosnd_r, gaelcosnd_w)        /* Sound Registers */
 	AM_RANGE(0x200000, 0x20ffff) AM_RAM_WRITE(gaelco2_vram_w) AM_SHARE("spriteram")                             /* Video RAM */
+	AM_RANGE(0x202890, 0x2028ff) AM_DEVREADWRITE("gaelco", gaelco_gae1_device, gaelcosnd_r, gaelcosnd_w)        /* Sound Registers */
 	AM_RANGE(0x210000, 0x211fff) AM_RAM_WRITE(gaelco2_palette_w) AM_SHARE("paletteram")                         /* Palette */
 	AM_RANGE(0x218004, 0x218009) AM_RAM AM_SHARE("vregs")                                                       /* Video Registers */
 	AM_RANGE(0x300000, 0x300001) AM_READ_PORT("IN0")                                                            /* DSW #1 + Input 1P */
@@ -1109,8 +1108,8 @@ ROM_END
 
 static ADDRESS_MAP_START( touchgo_map, AS_PROGRAM, 16, gaelco2_state )
 	AM_RANGE(0x000000, 0x0fffff) AM_ROM                                                                         /* ROM */
-	AM_RANGE(0x202890, 0x2028ff) AM_DEVREADWRITE("gaelco", gaelco_gae1_device, gaelcosnd_r, gaelcosnd_w)        /* Sound Registers */
 	AM_RANGE(0x200000, 0x20ffff) AM_RAM_WRITE(gaelco2_vram_w) AM_SHARE("spriteram")                             /* Video RAM */
+	AM_RANGE(0x202890, 0x2028ff) AM_DEVREADWRITE("gaelco", gaelco_gae1_device, gaelcosnd_r, gaelcosnd_w)        /* Sound Registers */
 	AM_RANGE(0x210000, 0x211fff) AM_RAM_WRITE(gaelco2_palette_w) AM_SHARE("paletteram")                         /* Palette */
 	AM_RANGE(0x218004, 0x218009) AM_RAM AM_SHARE("vregs")                                                       /* Video Registers */
 	AM_RANGE(0x300000, 0x300001) AM_READ_PORT("IN0")                                                            /* DSW #1 + Input 1P */
@@ -1430,8 +1429,8 @@ ROM_END
 
 static ADDRESS_MAP_START( snowboar_map, AS_PROGRAM, 16, gaelco2_state )
 	AM_RANGE(0x000000, 0x0fffff) AM_ROM                                                                         /* ROM */
-	AM_RANGE(0x202890, 0x2028ff) AM_DEVREADWRITE("gaelco", gaelco_cg1v_device, gaelcosnd_r, gaelcosnd_w)        /* Sound Registers */
 	AM_RANGE(0x200000, 0x20ffff) AM_RAM_WRITE(gaelco2_vram_w) AM_SHARE("spriteram")                             /* Video RAM */
+	AM_RANGE(0x202890, 0x2028ff) AM_DEVREADWRITE("gaelco", gaelco_cg1v_device, gaelcosnd_r, gaelcosnd_w)        /* Sound Registers */
 	AM_RANGE(0x210000, 0x211fff) AM_RAM_WRITE(gaelco2_palette_w) AM_SHARE("paletteram")                         /* Palette */
 	AM_RANGE(0x212000, 0x213fff) AM_RAM                                                                         /* Extra RAM */
 	AM_RANGE(0x218004, 0x218009) AM_RAM AM_SHARE("vregs")                                                       /* Video Registers */
@@ -1566,24 +1565,23 @@ PCB Layout:
 
 REF: 960419/1
 ------------------------------------------------------------------------------
-|                                   KM428C256J-6 (x2)                        |
 |                                                                            |
+|                                               KM428C256J-6                 |
 |                POT1                                                        |
-|---                                                                         |
-   |         SW1                                                   IC43      |
+|---                                            KM428C256J-6                 |
+   |         SW2                                                   IC43      |
    |                   34.000MHz          |----------|                       |
 |---        93C66                         |          |             IC44      |
 |                                         |  CG-1V   |                       |
-| J                            6264       |   366    |             IC45      |
-|                              6264       |          |                       |
-| A                                       |----------|             IC46      |
+| J                                       |   366    |             IC45      |
+|                                         |          |                       |
+| A                            6264       |----------|             IC46      |
+|                              6264                                          |
+| M                                                                IC47*     |
 |                                                                            |
-| M                                                                          |
-|                                                                            |
-| M                         62256                                    62256   |
+| M                                                                  62256   |
 |                                                                    62256   |
-| A                         62256                                    62256   |
-|                                            |----------|                    |
+| A                                          |----------|            62256   |
 |                                30.000MHz   | Lattice  |                    |
 |---                                         | IspLSI   |                    |
    |                                         |   1016   |          SB53      |
@@ -1594,22 +1592,26 @@ REF: 960419/1
 |                                           |    FN16    |                   |
 |                                           |------------|                   |
 -----------------------------------------------------------------------------|
+
+* Denotes unpopulated socket
+
+PCB sets with rom board attached to the underside of the main PCB use CG-1V 0797 instead
 */
 
 ROM_START( snowboara ) // REF 960419/1
 	ROM_REGION( 0x100000, "maincpu", 0 )    /* 68000 code */
-	ROM_LOAD16_BYTE(    "sb53", 0x000000, 0x080000, CRC(e4eaefd4) SHA1(c7de2ae3a4a919fbe16d4997e3f9e2303b8c96b1) ) /* Version 2.0 program roms */
-	ROM_LOAD16_BYTE(    "sb55", 0x000001, 0x080000, CRC(e2476994) SHA1(2ad18652a1fc6ac058c8399373fb77e7a81d5bbd) ) /* Version 2.0 program roms */
+	ROM_LOAD16_BYTE( "sb_53.ic53", 0x000000, 0x080000, CRC(e4eaefd4) SHA1(c7de2ae3a4a919fbe16d4997e3f9e2303b8c96b1) ) /* Version 2.0 program roms */
+	ROM_LOAD16_BYTE( "sb_55.ic55", 0x000001, 0x080000, CRC(e2476994) SHA1(2ad18652a1fc6ac058c8399373fb77e7a81d5bbd) ) /* Version 2.0 program roms */
 
 	ROM_REGION( 0x1400000, "gfx1", 0 )  /* GFX + Sound */
 	/* 0x0000000-0x0ffffff filled in in the DRIVER_INIT */
-	ROM_LOAD( "sb43",       0x1000000, 0x0200000, CRC(afce54ed) SHA1(1d2933d64790612918adbaabcd2a82dad79953c9) )    /* GFX only */
-	ROM_FILL(               0x1200000, 0x0200000, 0x00 )         /* Empty */
+	ROM_LOAD( "sb_ic43.ic43", 0x1000000, 0x0200000, CRC(afce54ed) SHA1(1d2933d64790612918adbaabcd2a82dad79953c9) )    /* GFX only */
+	ROM_FILL(                 0x1200000, 0x0200000, 0x00 )         /* Empty */
 
 	ROM_REGION( 0x0c00000, "gfx2", 0 ) /* Temporary storage */
-	ROM_LOAD( "sb44",       0x0000000, 0x0400000, CRC(1bbe88bc) SHA1(15bce9ada2b742ba4d537fa8efc0f29f661bff00) )    /* GFX only */
-	ROM_LOAD( "sb45",       0x0400000, 0x0400000, CRC(373983d9) SHA1(05e35a8b27cab469885f0ec2a5df200a366b50a1) )    /* Sound only */
-	ROM_LOAD( "sb46",       0x0800000, 0x0400000, CRC(22e7c648) SHA1(baddb9bc13accd83bea61533d7286cf61cd89279) )    /* GFX only */
+	ROM_LOAD( "sb_ic44.ic44", 0x0000000, 0x0400000, CRC(1bbe88bc) SHA1(15bce9ada2b742ba4d537fa8efc0f29f661bff00) )    /* GFX only */
+	ROM_LOAD( "sb_ic45.ic45", 0x0400000, 0x0400000, CRC(373983d9) SHA1(05e35a8b27cab469885f0ec2a5df200a366b50a1) )    /* Sound only */
+	ROM_LOAD( "sb_ic46.ic46", 0x0800000, 0x0400000, CRC(22e7c648) SHA1(baddb9bc13accd83bea61533d7286cf61cd89279) )    /* GFX only */
 ROM_END
 
 ROM_START( snowboar )
@@ -1655,8 +1657,8 @@ ROM_END
 
 static ADDRESS_MAP_START( wrally2_map, AS_PROGRAM, 16, wrally2_state )
 	AM_RANGE(0x000000, 0x0fffff) AM_ROM                                                                     /* ROM */
-	AM_RANGE(0x202890, 0x2028ff) AM_DEVREADWRITE("gaelco", gaelco_gae1_device, gaelcosnd_r, gaelcosnd_w)    /* Sound Registers */
 	AM_RANGE(0x200000, 0x20ffff) AM_RAM_WRITE(gaelco2_vram_w) AM_SHARE("spriteram")                         /* Video RAM */
+	AM_RANGE(0x202890, 0x2028ff) AM_DEVREADWRITE("gaelco", gaelco_gae1_device, gaelcosnd_r, gaelcosnd_w)    /* Sound Registers */
 	AM_RANGE(0x210000, 0x211fff) AM_RAM_WRITE(gaelco2_palette_w) AM_SHARE("paletteram")                     /* Palette */
 	AM_RANGE(0x212000, 0x213fff) AM_RAM                                                                     /* Extra RAM */
 	AM_RANGE(0x218004, 0x218009) AM_RAM AM_SHARE("vregs")                                                   /* Video Registers */

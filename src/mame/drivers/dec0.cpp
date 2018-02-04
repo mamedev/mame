@@ -646,11 +646,10 @@ static ADDRESS_MAP_START( midres_map, AS_PROGRAM, 16, dec0_state )
 	AM_RANGE(0x320000, 0x321fff) AM_DEVREADWRITE("tilegen1", deco_bac06_device, pf_data_r, pf_data_w)
 	AM_RANGE(0x340000, 0x34007f) AM_DEVREADWRITE("tilegen1", deco_bac06_device, pf_colscroll_r, pf_colscroll_w)
 	AM_RANGE(0x340400, 0x3407ff) AM_DEVREADWRITE("tilegen1", deco_bac06_device, pf_rowscroll_r, pf_rowscroll_w)
-
-	AM_RANGE(0x320000, 0x321fff) AM_RAM
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( midresb_map, AS_PROGRAM, 16, dec0_state )
+	AM_IMPORT_FROM( midres_map )
 	AM_RANGE(0x160010, 0x160011) AM_WRITE(dec0_priority_w)
 	AM_RANGE(0x180000, 0x18000f) AM_READ(dec0_controls_r)
 	AM_RANGE(0x180012, 0x180013) AM_NOP
@@ -658,7 +657,6 @@ static ADDRESS_MAP_START( midresb_map, AS_PROGRAM, 16, dec0_state )
 	AM_RANGE(0x180018, 0x180019) AM_NOP
 	AM_RANGE(0x1a0000, 0x1a0001) AM_READ_PORT("AN0")
 	AM_RANGE(0x1a0008, 0x1a0009) AM_READ_PORT("AN1")
-	AM_IMPORT_FROM( midres_map )
 ADDRESS_MAP_END
 
 /******************************************************************************/

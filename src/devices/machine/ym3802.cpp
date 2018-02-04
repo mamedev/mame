@@ -260,7 +260,7 @@ WRITE8_MEMBER(ym3802_device::write)
 				{
 					if((data & 0x07) == 2)
 					{
-						const XTAL rate = (m_reg[REG_CCR] & 0x02) ? m_clkm_rate / 4 : m_clkm_rate / 8;
+						const double rate = (m_reg[REG_CCR] & 0x02) ? m_clkm_rate / 4 : m_clkm_rate / 8;
 
 						// start message to click counter
 						m_midi_counter_timer->adjust(attotime::from_hz(rate),0,attotime::from_hz(rate));

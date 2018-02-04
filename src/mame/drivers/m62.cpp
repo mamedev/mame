@@ -247,8 +247,8 @@ static ADDRESS_MAP_START( ldrun3_map, AS_PROGRAM, 8, m62_state )
 	AM_RANGE(0xcc00, 0xcc00) AM_READ(ldrun3_prot_7_r)
 	AM_RANGE(0xcfff, 0xcfff) AM_READ(ldrun3_prot_7_r)
 	AM_RANGE(0xc000, 0xc0ff) AM_WRITEONLY AM_SHARE("spriteram")
-	AM_RANGE(0xd000, 0xdfff) AM_RAM_WRITE(m62_tileram_w) AM_SHARE("m62_tileram")
 	AM_RANGE(0xd000, 0xefff) AM_RAM
+	AM_RANGE(0xd000, 0xdfff) AM_RAM_WRITE(m62_tileram_w) AM_SHARE("m62_tileram")
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( ldrun3_io_map, AS_IO, 8, m62_state )

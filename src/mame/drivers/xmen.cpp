@@ -92,8 +92,8 @@ static ADDRESS_MAP_START( main_map, AS_PROGRAM, 16, xmen_state )
 	AM_RANGE(0x10a004, 0x10a005) AM_READ_PORT("EEPROM")
 	AM_RANGE(0x10a00c, 0x10a00d) AM_DEVREAD("k053246", k053247_device, k053246_word_r)
 	AM_RANGE(0x110000, 0x113fff) AM_RAM     /* main RAM */
-	AM_RANGE(0x18fa00, 0x18fa01) AM_WRITE(xmen_18fa00_w)
 	AM_RANGE(0x18c000, 0x197fff) AM_DEVREADWRITE("k052109", k052109_device, lsb_r, lsb_w)
+	AM_RANGE(0x18fa00, 0x18fa01) AM_WRITE(xmen_18fa00_w)
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( sound_map, AS_PROGRAM, 8, xmen_state )
@@ -125,9 +125,9 @@ static ADDRESS_MAP_START( 6p_main_map, AS_PROGRAM, 16, xmen_state )
 	AM_RANGE(0x10a006, 0x10a007) AM_READ_PORT("P5_P6")
 	AM_RANGE(0x10a00c, 0x10a00d) AM_DEVREAD("k053246", k053247_device, k053246_word_r) /* sprites */
 	AM_RANGE(0x110000, 0x113fff) AM_RAM     /* main RAM */
-	AM_RANGE(0x18fa00, 0x18fa01) AM_WRITE(xmen_18fa00_w)
 /*  AM_RANGE(0x18c000, 0x197fff) AM_DEVWRITE("k052109", k052109_device, lsb_w) AM_SHARE("tilemapleft") */
 	AM_RANGE(0x18c000, 0x197fff) AM_RAM AM_SHARE("tilemapleft") /* left tilemap (p1,p2,p3 counters) */
+	AM_RANGE(0x18fa00, 0x18fa01) AM_WRITE(xmen_18fa00_w)
 /*
     AM_RANGE(0x1ac000, 0x1af7ff) AM_READONLY
     AM_RANGE(0x1ac000, 0x1af7ff) AM_WRITEONLY

@@ -84,8 +84,8 @@ void deco156_state::video_start()
 
 uint32_t deco156_state::screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
 {
-	//FIXME: flip_screen_x should not be written!
-	flip_screen_set_no_update(1);
+	// sprites are flipped relative to tilemaps
+	m_sprgen->set_flip_screen(true);
 
 	screen.priority().fill(0);
 	bitmap.fill(0);

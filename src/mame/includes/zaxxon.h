@@ -49,6 +49,7 @@ public:
 	uint8_t m_bg_color;
 	uint16_t m_bg_position;
 	uint8_t m_fg_color;
+	bool m_flip_screen;
 
 	uint8_t m_congo_fg_bank;
 	uint8_t m_congo_color_bank;

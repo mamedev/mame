@@ -129,9 +129,6 @@ a2bus_hsscsi_device::a2bus_hsscsi_device(const machine_config &mconfig, const ch
 
 void a2bus_hsscsi_device::device_start()
 {
-	// set_a2bus_device makes m_slot valid
-	set_a2bus_device();
-
 	m_rom = machine().root_device().memregion(this->subtag(SCSI_ROM_REGION).c_str())->base();
 
 	memset(m_ram, 0, 8192);

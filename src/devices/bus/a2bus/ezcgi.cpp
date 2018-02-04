@@ -120,8 +120,6 @@ a2bus_ezcgi_9958_device::a2bus_ezcgi_9958_device(const machine_config &mconfig, 
 
 void a2bus_ezcgi_device::device_start()
 {
-	// set_a2bus_device makes m_slot valid
-	set_a2bus_device();
 }
 
 void a2bus_ezcgi_device::device_reset()
@@ -130,8 +128,6 @@ void a2bus_ezcgi_device::device_reset()
 
 void a2bus_ezcgi_9938_device::device_start()
 {
-	// set_a2bus_device makes m_slot valid
-	set_a2bus_device();
 }
 
 void a2bus_ezcgi_9938_device::device_reset()
@@ -140,8 +136,6 @@ void a2bus_ezcgi_9938_device::device_reset()
 
 void a2bus_ezcgi_9958_device::device_start()
 {
-	// set_a2bus_device makes m_slot valid
-	set_a2bus_device();
 }
 
 void a2bus_ezcgi_9958_device::device_reset()

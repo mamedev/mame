@@ -376,7 +376,6 @@ Kid Pix Companion                                             Fujitsu Parex     
 Kid Pix Jr.                                                   Fujitsu                           1993/3     CD
 Kikai Jikake no Marian                                        Janis                             1994/8     CD
 Kikou Shidan 2                                                Artdink                           1993/3     SET(CD+FD)
-Kindan no Ketsuzoku                                           C's Ware                          1994/7     CD
 Kitty Town no Nakama-tachi: Tanoshii Seikatsuka               Fujitsu Parex                     1995/10    CD
 Komaki Naomi                                                  Janis                             1994/2     CD
 Kotoba Asobi CDVIEW Hip catch                                 CRC Sougou Kenkyuusho             1992/3     CD
@@ -394,7 +393,6 @@ Let's go 1-1                                                  DynEd Japan       
 Let's go 1-2                                                  DynEd Japan                       1995/7     SET(CD+FD)
 Let's go 2-1                                                  DynEd Japan                       1995/7     SET(CD+FD)
 Let's go 2-2                                                  DynEd Japan                       1995/7     SET(CD+FD)
-* Lettuce Cooking 1: 365-nichi, Kyou no Ippin                 SS Communications                 1989/11    SET(CD+FD)
 Lettuce Cooking 2: Tanoshiku Tsukureru Obentou                SS Communications                 1990/8     SET(CD+FD)
 Lipstick Adventure 3                                          Fairytale                         1993/5     CD
 Little Big Adventure                                          Electronic Arts Victor            1995/12    CD
@@ -884,7 +882,8 @@ User/save disks that can be created from the game itself are not included.
 		</part>
 	</software>
 
-	<software name="linuxje3">
+	<!-- Fails to boot -->
+	<software name="linuxje3" supported="no">
 		<!--
 		 Origin: Neo Kobe Collection
 		 <rom name="[OS] Linux + JE3.mdf" size="760707360" crc="2c93db2b" sha1="992b0e991a6bde293edf059e529ee2321ab6469b"/>
@@ -904,7 +903,8 @@ User/save disks that can be created from the game itself are not included.
 		</part>
 	</software>
 
-	<software name="linuxje4">
+	<!-- Fails to boot -->
+	<software name="linuxje4" supported="no">
 		<!--
 		 Origin: Neo Kobe Collection
 		 <rom name="[OS] Linux + JE4 1995-12 (Disc 1).ccd" size="772" crc="e683c1d6" sha1="ee1ee6058d7142db90e8cd589ea0e99c2fea5008"/>
@@ -1071,7 +1071,7 @@ User/save disks that can be created from the game itself are not included.
 	</software>
 
 	<!-- Missing a floppy disk -->
-	<software name="win31l11">
+	<software name="win31l11" supported="no">
 		<!--
 		 Origin: Neo Kobe Collection
 		 <rom name="[OS] Windows 3.1 L11 (Track 1).bin" size="210974400" crc="f1c0baee" sha1="b6b3a75c06dda9f2c7df10703b2640871db84d34"/>
@@ -1145,7 +1145,8 @@ User/save disks that can be created from the game itself are not included.
 <!-- Game (& Utility) Disks -->
 
 
-	<software name="100isshu">
+	<!-- Hangs after selecting a card -->
+	<software name="100isshu" supported="no">
 		<!--
 		 Origin: Neo Kobe Collection
 		 <rom name="Towns Hyakunin Isshu.ccd" size="768" crc="c78291fe" sha1="fb1ba0eff32b21ae3d2d8c62b9606261c533742c"/>
@@ -1268,7 +1269,8 @@ User/save disks that can be created from the game itself are not included.
 		</part>
 	</software>
 
-	<software name="dualtarg">
+	<!-- Invisible menus -->
+	<software name="dualtarg" supported="no">
 		<!--
 		Origin: Neo Kobe Collection
 		<rom name="The 4th Unit 3 - Dual Targets.ccd" size="2660" crc="c418053d" sha1="e05dad8651923707c27da766604627e31ddd250c"/>
@@ -1344,7 +1346,8 @@ User/save disks that can be created from the game itself are not included.
 		</part>
 	</software>
 
-	<software name="wyatt">
+	<!-- Hangs after some scenes -->
+	<software name="wyatt" supported="no">
 		<!--
 		Origin: Neo Kobe Collection
 		<rom name="The 4th Unit 7 - Wyatt.ccd" size="1918" crc="3f8f70ba" sha1="0e23516693f3ed1165e6819367604e5a6ac50f8e"/>
@@ -1469,7 +1472,8 @@ User/save disks that can be created from the game itself are not included.
 		</part>
 	</software>
 
-	<software name="abel">
+	<!-- Runs too fast -->
+	<software name="abel" supported="partial">
 		<!--
 		Origin: Neo Kobe Collection
 		<rom name="Abel.ccd" size="4674" crc="d29bcd2e" sha1="1198a235c5463ca6ab1ef72bc89e2f307c9bc48f"/>
@@ -1488,7 +1492,8 @@ User/save disks that can be created from the game itself are not included.
 		</part>
 	</software>
 
-	<software name="adtennis">
+	<!-- Sound issues -->
+	<software name="adtennis" supported="partial">
 		<!--
 		Origin: Neo Kobe Collection
 		<rom name="Advantage Tennis.ccd" size="2666" crc="dea6a4bf" sha1="d4eaf822278f20273a67afab833a6c4eb3f80ea4"/>
@@ -1507,7 +1512,8 @@ User/save disks that can be created from the game itself are not included.
 		</part>
 	</software>
 
-	<software name="aeternam">
+	<!-- Runs too fast -->
+	<software name="aeternam" supported="partial">
 		<!--
 		Origin: Neo Kobe Collection
 		<rom name="Aeternam.ccd" size="3451" crc="1a58a6d3" sha1="634ca1536a8a2af4da514eb49c9a1bdcbe3bdf9c"/>
@@ -1526,7 +1532,8 @@ User/save disks that can be created from the game itself are not included.
 		</part>
 	</software>
 
-	<software name="aburner">
+	<!-- Runs too fast -->
+	<software name="aburner" supported="partial">
 		<!--
 		Origin: Neo Kobe Collection
 		<rom name="After Burner.ccd" size="2145" crc="c88c38a9" sha1="88f2a8ff8f7c8f27b43e7b2ac2e92e856e97def2"/>
@@ -1609,7 +1616,7 @@ User/save disks that can be created from the game itself are not included.
 	</software>
 
 	<!-- Seems to be missing a floppy disk -->
-	<software name="airwar">
+	<software name="airwar" supported="no">
 		<!--
 		Origin: Neo Kobe Collection
 		<rom name="Fujitsu Air Warrior v1.1.ccd" size="903" crc="a5a83861" sha1="d8ded0b27ee1dfa2eada1f60433a8018d55fea36"/>
@@ -1668,7 +1675,7 @@ User/save disks that can be created from the game itself are not included.
 	<!-- probably a bad dump: the image seems to have been created from the game files instead of being an actual dump of
 	 the original disc (it has a Joliet filesystem and the directories have creation dates in 2003) so it probably needs
 	 to be replaced with a proper dump. -->
-	<software name="alice3">
+	<software name="alice3" supported="no">
 		<!--
 		Origin: Neo Kobe Collection
 		<rom name="Alice no Yakata III.iso" size="20756480" crc="d594012b" sha1="001f86551065e146be22d0d81d7063e1873360c6"/>
@@ -1803,7 +1810,8 @@ User/save disks that can be created from the game itself are not included.
 		</part>
 	</software>
 
-	<software name="angel">
+	<!-- Asks for a save disk, but doesn't accept a blank one -->
+	<software name="angel" supported="no">
 		<!--
 		Origin: Neo Kobe Collection
 		<rom name="Angel.ccd" size="2812" crc="5269b2c9" sha1="4fff4210e42536faa001b659721aeaaffe1f5d5c"/>
@@ -1966,7 +1974,8 @@ User/save disks that can be created from the game itself are not included.
 		</part>
 	</software>
 
-	<software name="asu120ex">
+	<!-- Some graphics issues -->
+	<software name="asu120ex" supported="partial">
 		<!--
 		Origin: Neo Kobe Collection
 		<rom name="Asuka 120% Burning Fest. Excellent.bin" size="317884560" crc="2f0a5f53" sha1="3e28df9c09aa9cc814c936864b1ca79166fa00f4"/>
@@ -2051,7 +2060,8 @@ User/save disks that can be created from the game itself are not included.
 		</part>
 	</software>
 
-	<software name="ayayo123">
+	<!-- Some graphics issues -->
+	<software name="ayayo123" supported="partial">
 		<!--
 		Origin: Neo Kobe Collection
 		<rom name="Hatchake Ayayo-san 1-2-3.mdf" size="21664800" crc="db34463b" sha1="bd9465fa4853c8c69311a4dab6a16765100a3d15"/>
@@ -2115,7 +2125,8 @@ User/save disks that can be created from the game itself are not included.
 		</part>
 	</software>
 
-	<software name="azure">
+	<!-- Runs too fast? -->
+	<software name="azure" supported="partial">
 		<!--
 		Origin: Neo Kobe Collection
 		<rom name="Azure.ccd" size="2720" crc="abba1a9c" sha1="dfc2b8b4e7f907b7f03314df3ce7e5b8e4fb5d79"/>
@@ -2274,7 +2285,8 @@ User/save disks that can be created from the game itself are not included.
 		</part>
 	</software>
 
-	<software name="blandia">
+	<!-- Visible area is cut off -->
+	<software name="blandia" supported="partial">
 		<!--
 		Origin: Neo Kobe Collection
 		<rom name="Blandia Plus.bin" size="494609136" crc="5aa2c330" sha1="e9b4f2785bb05f0ded19734851faac39f97594c8"/>
@@ -2346,7 +2358,8 @@ User/save disks that can be created from the game itself are not included.
 		</part>
 	</software>
 
-	<software name="branmark">
+	<!-- Hangs when playing voices - can be skipped to advance -->
+	<software name="branmark" supported="partial">
 		<!--
 		Origin: Neo Kobe Collection
 		<rom name="Branmarker.ccd" size="768" crc="a0dc5e2e" sha1="3bbbf9ae17ea1a1781d6b228a3c70fdd3b1f8b1b"/>
@@ -2365,7 +2378,8 @@ User/save disks that can be created from the game itself are not included.
 		</part>
 	</software>
 
-	<software name="branmar2">
+	<!-- Hangs when playing voices - can be skipped to advance -->
+	<software name="branmar2" supported="partial">
 		<!--
 		Origin: Neo Kobe Collection
 		<rom name="Branmarker 2 (Game disc).ccd" size="1152" crc="5a5c5567" sha1="9201413c9a0109f0ebe03a99e35e01d18c9a09a5"/>
@@ -2593,7 +2607,8 @@ User/save disks that can be created from the game itself are not included.
 		</part>
 	</software>
 
-	<software name="condor">
+	<!-- Black screen on boot -->
+	<software name="condor" supported="no">
 		<!--
 		Origin: Neo Kobe Collection
 		<rom name="The Case of the Cautious Condor.ccd" size="785" crc="97871285" sha1="c727c4224df1e672fc85c63dd6d3015bfd66e45d"/>
@@ -2611,7 +2626,8 @@ User/save disks that can be created from the game itself are not included.
 		</part>
 	</software>
 
-	<software name="crystalr">
+	<!-- Hangs when playing voices - can be skipped to advance -->
+	<software name="crystalr" supported="partial">
 		<!--
 		Origin: Neo Kobe Collection
 		<rom name="Crystal Rinal.ccd" size="4493" crc="f5c45a4a" sha1="8355ecfcc6f7474de451783582200ecbba475b6a"/>
@@ -2678,7 +2694,8 @@ User/save disks that can be created from the game itself are not included.
 		</part>
 	</software>
 
-	<software name="cyberia">
+	<!-- Hangs at Interplay logo -->
+	<software name="cyberia" supported="no">
 		<!--
 		Origin: Neo Kobe Collection
 		<rom name="Cyberia.ccd" size="772" crc="a4dc53ce" sha1="bf2f85696f9485834d782b6360a2824d9a2f30c3"/>
@@ -3156,7 +3173,8 @@ User/save disks that can be created from the game itself are not included.
 		</part>
 	</software>
 
-	<software name="dorse93">
+	<!-- Hangs when playing voices - can be skipped to advance -->
+	<software name="dorse93" supported="partial">
 		<!--
 		Origin: Neo Kobe Collection
 		<rom name="DOR Special Edition &apos;93 (Track 1).bin" size="317167200" crc="e4cc8ac3" sha1="e8e32b1a959f69b4bdd0fef124d72ce2e64c747d"/>
@@ -3175,7 +3193,8 @@ User/save disks that can be created from the game itself are not included.
 		</part>
 	</software>
 
-	<software name="dorse93a">
+	<!-- Hangs when playing voices - can be skipped to advance -->
+	<software name="dorse93a" supported="partial">
 		<!--
 		Origin: redump.org
 		<rom name="DOR - Special Edition &apos;93 (Japan) (Alt) (Track 1).bin" size="310421664" crc="752f9bdd" sha1="ae19d158d5cc4c094d216b593ff383bd7ee33abb"/>
@@ -3433,7 +3452,8 @@ User/save disks that can be created from the game itself are not included.
 		</part>
 	</software>
 
-	<software name="elfish">
+	<!-- Restarts TownsOS -->
+	<software name="elfish" supported="no">
 		<!--
 		Origin: Neo Kobe Collection
 		<rom name="Elfish.ccd" size="769" crc="3990aa0a" sha1="a34bc28fd4c9074206e28db7b1226f645afc4602"/>
@@ -3453,7 +3473,8 @@ User/save disks that can be created from the game itself are not included.
 		</part>
 	</software>
 
-	<software name="elfishlt">
+	<!-- Black screen on boot -->
+	<software name="elfishlt" supported="no">
 		<!--
 		Origin: Neo Kobe Collection
 		<rom name="Elfish Lite.ccd" size="751" crc="ea2bdac2" sha1="62a9f7f9d82e1084e35e01212a84464b5c1838bb"/>
@@ -3599,7 +3620,8 @@ User/save disks that can be created from the game itself are not included.
 		</part>
 	</software>
 
-	<software name="excel10">
+	<!-- Runs too fast -->
+	<software name="excel10" supported="partial">
 		<!--
 		Origin: Neo Kobe Collection
 		<rom name="Excellent 10.bin" size="714718704" crc="d3db47a4" sha1="1fa667afbf0eddabaf79cd6e307acae352ecbec4"/>
@@ -3691,7 +3713,8 @@ User/save disks that can be created from the game itself are not included.
 		</part>
 	</software>
 
-	<software name="f29ret">
+	<!-- Some graphics issues -->
+	<software name="f29ret" supported="partial">
 		<!--
 		Origin: Neo Kobe Collection
 		<rom name="F29 Retaliator.ccd" size="1393" crc="6c22f526" sha1="5b2ba6d41fba1afc5cf3ac10523d48581c612ef0"/>
@@ -3783,7 +3806,8 @@ User/save disks that can be created from the game itself are not included.
 		</part>
 	</software>
 
-	<software name="fractal">
+	<!-- Hangs while playing FMV -->
+	<software name="fractal" supported="no">
 		<!--
 		Origin: Neo Kobe Collection
 		<rom name="Fractal Engine Demo.ccd" size="751" crc="0dec1ac7" sha1="b0777df3b73b305181bcf3544104ebcb4dcd23d6"/>
@@ -3820,7 +3844,8 @@ User/save disks that can be created from the game itself are not included.
 		</part>
 	</software>
 
-	<software name="frogfstd">
+	<!-- Severe graphics issues -->
+	<software name="frogfstd" supported="no">
 		<!--
 		Origin: Neo Kobe Collection
 		<rom name="Frog Feast Demo.iso" size="952320" crc="ed3e8b42" sha1="82b60aefb5061bc7d1761183fe77548d1a23b4a3"/>
@@ -4437,7 +4462,8 @@ User/save disks that can be created from the game itself are not included.
 		</part>
 	</software>
 
-	<software name="gunship">
+	<!-- Some graphics issues -->
+	<software name="gunship" supported="partial">
 		<!--
 		Origin: Neo Kobe Collection
 		<rom name="Gunship - The Helicopter Simulation.cue" size="370" crc="258b11b0" sha1="146fb88fc218b94c5b04c8eb08fd04d4523dde44"/>
@@ -4454,7 +4480,8 @@ User/save disks that can be created from the game itself are not included.
 		</part>
 	</software>
 
-	<software name="hanakiok">
+	<!-- Hangs on some scenarios -->
+	<software name="hanakiok" supported="no">
 		<!--
 		Origin: Neo Kobe Collection
 		<rom name="Hana no Kioku.ccd" size="1536" crc="fb0735ea" sha1="8cbab4ded5211a62e586e46c91494819a9e11107"/>
@@ -4651,7 +4678,8 @@ User/save disks that can be created from the game itself are not included.
 		</part>
 	</software>
 
-	<software name="hoshisn3">
+	<!-- Hangs shortly after starting -->
+	<software name="hoshisn3" supported="no">
 		<!--
 		Origin: Neo Kobe Collection
 		<rom name="Hoshi no Suna Monogatari 3.ccd" size="3455" crc="ad50647d" sha1="68ff4745927e47067532944526ac7bf8e8833ba9"/>
@@ -5030,7 +5058,8 @@ User/save disks that can be created from the game itself are not included.
 		</part>
 	</software>
 
-	<software name="jangou4">
+	<!-- Hangs during the intro -->
+	<software name="jangou4" supported="no">
 		<!--
 		Origin: Neo Kobe Collection
 		<rom name="Jango 4.ccd" size="4391" crc="b3b19065" sha1="979d0ce4e7efbf691433a7b275ba60710d339793"/>
@@ -5160,7 +5189,8 @@ User/save disks that can be created from the game itself are not included.
 		</part>
 	</software>
 
-	<software name="kindanke">
+	<!-- Hangs when playing voices - can be skipped to advance -->
+	<software name="kindanke" supported="partial">
 		<!--
 		Origin: Neo Kobe Collection
 		<rom name="Kindan no Ketsuzoku.ccd" size="2823" crc="0eb0eeae" sha1="0c2bdf0b806b1264c57468c1e0461a2f30502b88"/>
@@ -5198,7 +5228,8 @@ User/save disks that can be created from the game itself are not included.
 		</part>
 	</software>
 
-	<software name="kingqst5">
+	<!-- Hangs on the title screen -->
+	<software name="kingqst5" supported="no">
 		<!--
 		Origin: Neo Kobe Collection
 		<rom name="King&apos;s Quest V.mdf" size="287461440" crc="0171b747" sha1="b1b7a2dfbe361cc2b5c71ddfaca2b1790d77532d"/>
@@ -5257,7 +5288,8 @@ User/save disks that can be created from the game itself are not included.
 		</part>
 	</software>
 
-	<software name="kokoraku">
+	<!-- Hangs when playing sound effects -->
+	<software name="kokoraku" supported="no">
 		<!--
 		Origin: Neo Kobe Collection
 		<rom name="Koko wa Rakuensou.ccd" size="771" crc="c947821b" sha1="64d7ff9b4bb361413ef535edd08ccf23d9c5f297"/>
@@ -5276,7 +5308,8 @@ User/save disks that can be created from the game itself are not included.
 		</part>
 	</software>
 
-	<software name="kokorak2">
+	<!-- Hangs when playing sound effects -->
+	<software name="kokorak2" supported="no">
 		<!--
 		Origin: Neo Kobe Collection
 		<rom name="Koko wa Rakuensou 2.bin" size="163745792" crc="750dc712" sha1="07ce9185b8448e18f20906127e4603c62b670b9d"/>
@@ -5332,7 +5365,8 @@ User/save disks that can be created from the game itself are not included.
 		</part>
 	</software>
 
-	<software name="kyrandia">
+	<!-- Fails to boot, doesn't seem to recognize the CD -->
+	<software name="kyrandia" supported="no">
 		<!--
 		Origin: Neo Kobe Collection
 		<rom name="The Legend of Kyrandia.ccd" size="4894" crc="3a8bbbfb" sha1="132f7535d204a731423b497729d3b7e01f35eefd"/>
@@ -5373,7 +5407,8 @@ User/save disks that can be created from the game itself are not included.
 		</part>
 	</software>
 
-	<software name="ktiger">
+	<!-- Doesn't boot -->
+	<software name="ktiger" supported="no">
 		<!--
 		Origin: Tokugawa Corporate Forums (wushu)
 		<rom name="Tiger.bin" size="757692096" crc="131e7221" sha1="e300709315d53e06fdc64eed31159da25d68e357"/>
@@ -5411,7 +5446,8 @@ User/save disks that can be created from the game itself are not included.
 		</part>
 	</software>
 
-	<software name="lastarmg">
+	<!-- Runs too fast -->
+	<software name="lastarmg" supported="partial">
 		<!--
 		Origin: Neo Kobe Collection
 		<rom name="Last Armageddon CD Special (Disc A).ccd" size="11707" crc="b17278f6" sha1="e086fc5d958b79b9c67bac10cd16c6e47d15f61c"/>
@@ -5450,7 +5486,8 @@ User/save disks that can be created from the game itself are not included.
 		</part>
 	</software>
 
-	<software name="lastsurv">
+	<!-- Hangs after the main menu -->
+	<software name="lastsurv" supported="no">
 		<!--
 		Origin: Neo Kobe Collection
 		<rom name="Last Survivor.ccd" size="2083" crc="dd87d31e" sha1="8453a35a485de1b0343da937e5a2236e799032fe"/>
@@ -5513,7 +5550,8 @@ User/save disks that can be created from the game itself are not included.
 		</part>
 	</software>
 
-	<software name="lemming2">
+	<!-- Some graphics issues -->
+	<software name="lemming2" supported="partial">
 		<!--
 		Origin: Neo Kobe Collection
 		<rom name="Lemmings 2 - The Tribes.ccd" size="3624" crc="3f79d6d8" sha1="b074947b2f522f1e1c1b3f8208eb616f68e42beb"/>
@@ -5551,7 +5589,6 @@ User/save disks that can be created from the game itself are not included.
 		</part>
 	</software>
 
-	<!-- The floppy image seems to have 19712 extra bytes filled with 0xE5 - bad dump? -->
 	<software name="lettuce">
 		<!--
 		Origin: Neo Kobe Collection
@@ -5564,8 +5601,8 @@ User/save disks that can be created from the game itself are not included.
 		<year>1989</year>
 		<publisher>Seibu Time</publisher>
 		<part name="flop1" interface="floppy_3_5">
-			<dataarea name="flop" size="1281280">
-				<rom name="lettuce cooking.bin" size="1281280" crc="0644e504" sha1="808144356f94b03a495a5824ecd47255a5475b47" offset="000000" />
+			<dataarea name="flop" size="1261568">
+				<rom name="lettuce cooking.bin" size="1261568" crc="76845bb0" sha1="9d7227621f94375c105e3ee8f2cc7d5ebdd60147" offset="000000" />
 			</dataarea>
 		</part>
 		<part name="cdrom" interface="fmt_cdrom">
@@ -5594,7 +5631,8 @@ User/save disks that can be created from the game itself are not included.
 		</part>
 	</software>
 
-	<software name="lifendth">
+	<!-- Restarts TownsOS -->
+	<software name="lifendth" supported="no">
 		<!--
 		Origin: Neo Kobe Collection
 		<rom name="Life &amp; Death.ccd" size="1514" crc="998ab894" sha1="f8671fe509d7efac0e3d15c914ae636146258cdc"/>
@@ -5769,7 +5807,8 @@ User/save disks that can be created from the game itself are not included.
 		</part>
 	</software>
 
-	<software name="lvalour">
+	<!-- No sound -->
+	<software name="lvalour" supported="partial">
 		<!--
 		Origin: Neo Kobe Collection
 		<rom name="Legends of Valour.mdf" size="100943136" crc="1e0de6c4" sha1="be3a4399d64f704584da0728d2ac4cc20dc50bff"/>
@@ -5811,7 +5850,8 @@ User/save disks that can be created from the game itself are not included.
 		</part>
 	</software>
 
-	<software name="madstalk">
+	<!-- Black screen on boot -->
+	<software name="madstalk" supported="no">
 		<!--
 		Origin: Neo Kobe Collection
 		<rom name="Mad Stalker.ccd" size="3432" crc="d59dff39" sha1="876ab6b804a0f3da6fd1cbeb1a7d2230e2adfcc3"/>
@@ -5830,7 +5870,8 @@ User/save disks that can be created from the game itself are not included.
 		</part>
 	</software>
 
-	<software name="madogakr">
+	<!-- Black screen on boot -->
+	<software name="madogakr" supported="no">
 		<!--
 		Origin: Neo Kobe Collection
 		<rom name="Madou Gakuin R.ccd" size="769" crc="f0c13e0c" sha1="47128d65376f140f43de7d1890709d41104c2bc8"/>
@@ -6029,7 +6070,8 @@ User/save disks that can be created from the game itself are not included.
 		</part>
 	</software>
 
-	<software name="menzober">
+	<!-- Some graphics issues -->
+	<software name="menzober" supported="partial">
 		<!--
 		Origin: Neo Kobe Collection
 		<rom name="Menzoberranzan.mdf" size="385295616" crc="452d6d6a" sha1="83eceac9677e92b5909782acee8092b80bb5a6a9"/>
@@ -6219,7 +6261,8 @@ User/save disks that can be created from the game itself are not included.
 		</part>
 	</software>
 
-	<software name="mightmg5">
+	<!-- Hangs on the intro, but it can be skipped -->
+	<software name="mightmg5" supported="partial">
 		<!--
 		Origin: Neo Kobe Collection
 		<rom name="Might and Magic V - Darkside of Xeen.mdf" size="36691200" crc="c1bf597c" sha1="f0c3c649a77242223076ccafc608a702ede112db"/>
@@ -6236,7 +6279,8 @@ User/save disks that can be created from the game itself are not included.
 		</part>
 	</software>
 
-	<software name="mmorph">
+	<!-- Hangs while playing FMV -->
+	<software name="mmorph" supported="no">
 		<!--
 		Origin: Neo Kobe Collection
 		<rom name="Megamorph.ccd" size="784" crc="b10bc2c6" sha1="8760ed5e880d3466fdbd2c538d62959e7f581f92"/>
@@ -6375,7 +6419,8 @@ User/save disks that can be created from the game itself are not included.
 		</part>
 	</software>
 
-	<software name="msdet1">
+	<!-- Some sound issues -->
+	<software name="msdet1" supported="partial">
 		<!--
 		Origin: Neo Kobe Collection
 		<rom name="Ms. Detective File #1 (Disc 1).ccd" size="772" crc="92ccce73" sha1="717957cf8f02b585c5845347035cafca1be9613c"/>
@@ -6405,7 +6450,7 @@ User/save disks that can be created from the game itself are not included.
 	</software>
 
 	<!-- Missing a floppy disk that seems to be necessary to boot the game -->
-	<software name="msdet2">
+	<software name="msdet2" supported="no">
 		<!--
 		Origin: Neo Kobe Collection
 		<rom name="Ms. Detective File #2.ccd" size="1206" crc="f516d92c" sha1="54cdebd7e17ee8861affd996bdb8857b2bff3cc7"/>
@@ -6424,7 +6469,8 @@ User/save disks that can be created from the game itself are not included.
 		</part>
 	</software>
 
-	<software name="mspectre">
+	<!-- Fails to play the intro, otherwise works -->
+	<software name="mspectre" supported="partial">
 		<!--
 		Origin: Neo Kobe Collection
 		<rom name="Megaspectre.ccd" size="1707" crc="9921c076" sha1="a6b491d6fdafec7f868b2d61dc05c959f6eda2b3"/>
@@ -6482,7 +6528,8 @@ User/save disks that can be created from the game itself are not included.
 		</part>
 	</software>
 
-	<software name="mumgoose">
+	<!-- Hangs shortly after starting -->
+	<software name="mumgoose" supported="no">
 		<!--
 		Origin: Neo Kobe Collection
 		<rom name="Mixed-Up Mother Goose.ccd" size="770" crc="fff2375f" sha1="aed6dfb7d9cbd5a744a72e1045151a6de6ce2f5c"/>
@@ -6860,7 +6907,8 @@ User/save disks that can be created from the game itself are not included.
 		</part>
 	</software>
 
-	<software name="okuhoso">
+	<!-- Some sound issues -->
+	<software name="okuhoso" supported="partial">
 		<!--
 		Origin: P2P
 		<rom name="okuhoso.ccd" size="11116" crc="26688b0b" sha1="1071eaacf599a5f5fbb1d1bad7d975497288a4f0"/>
@@ -6916,7 +6964,8 @@ User/save disks that can be created from the game itself are not included.
 		</part>
 	</software>
 
-	<software name="oshacook">
+	<!-- Hangs on the title screen -->
+	<software name="oshacook" supported="no">
 		<!--
 		Origin: Neo Kobe Collection
 		<rom name="Oshare Cooking.ccd" size="4746" crc="d0a44b7f" sha1="28a145333fc404047066f95a99824c09def8e545"/>
@@ -6951,6 +7000,7 @@ User/save disks that can be created from the game itself are not included.
 		</part>
 	</software>
 
+	<!-- Requires mouse on port 1 -->
 	<software name="ougonras">
 		<!--
 		Origin: Neo Kobe Collection
@@ -6968,7 +7018,8 @@ User/save disks that can be created from the game itself are not included.
 		</part>
 	</software>
 
-	<software name="kikoshid">
+	<!-- It doesn't seem to be possible to get past the intro -->
+	<software name="kikoshid" supported="no">
 		<!--
 		Origin: Neo Kobe Collection
 		<rom name="Panzer Division [Kikou Shidan].ccd" size="9806" crc="44bd3c10" sha1="59f646b254cbddb62ca62f5da94486c5b3c7a6d7"/>
@@ -7258,7 +7309,8 @@ User/save disks that can be created from the game itself are not included.
 		</part>
 	</software>
 
-	<software name="provvdnz">
+	<!-- Runs too fast -->
+	<software name="provvdnz" supported="partial">
 		<!--
 		Origin: Neo Kobe Collection
 		<rom name="Provvidenza.ccd" size="1179" crc="f0a1a16b" sha1="a7ef5529bf6c6532223ed683d41c4207833d8d56"/>
@@ -7330,7 +7382,8 @@ User/save disks that can be created from the game itself are not included.
 		</part>
 	</software>
 
-	<software name="psydet3">
+	<!-- Hangs shortly after starting -->
+	<software name="psydet3" supported="no">
 		<!--
 		Origin: Neo Kobe Collection
 		<rom name="Psychic Detective Series Vol. 3 - Aya (Track 1).bin" size="158407200" crc="476a9efa" sha1="419edde4eef471df10e6756d7936aca1eeccaa04"/>
@@ -7597,7 +7650,8 @@ User/save disks that can be created from the game itself are not included.
 		</part>
 	</software>
 
-	<software name="raidy">
+	<!-- Hangs when playing voices - can be skipped to advance -->
+	<software name="raidy" supported="partial">
 		<!--
 		Origin: Neo Kobe Collection
 		<rom name="Ikazuchi no Senshi Raidy.ccd" size="3636" crc="f35a60da" sha1="7c0a1ca01cdf442d09f5c94ae288f71a56136c7f"/>
@@ -7615,7 +7669,8 @@ User/save disks that can be created from the game itself are not included.
 		</part>
 	</software>
 
-	<software name="raidy2">
+	<!-- Hangs when playing voices - can be skipped to advance -->
+	<software name="raidy2" supported="partial">
 		<!--
 		Origin: Neo Kobe Collection
 		<rom name="Ikazuchi no Senshi Raidy II.ccd" size="2298" crc="1062dae1" sha1="80718cfb56b6a7551f0360c618db42a39df3db7d"/>
@@ -7747,7 +7802,8 @@ User/save disks that can be created from the game itself are not included.
 		</part>
 	</software>
 
-	<software name="ravnloft">
+	<!-- Some graphics issues -->
+	<software name="ravnloft" supported="partial">
 		<!--
 		Origin: Neo Kobe Collection
 		<rom name="Ravenloft.ccd" size="770" crc="858e0052" sha1="2d92be1ed3f46893d857d3d5f8932d8bc430fc6a"/>
@@ -7870,7 +7926,8 @@ User/save disks that can be created from the game itself are not included.
 		</part>
 	</software>
 
-	<software name="ringout">
+	<!-- Hangs when playing voices - can be skipped to advance -->
+	<software name="ringout" supported="partial">
 		<!--
 		Origin: Neo Kobe Collection
 		<rom name="Ring Out!!.ccd" size="2486" crc="1ba43240" sha1="5d105ef08eb749c775b410c251088e151d15cb8e"/>
@@ -7948,7 +8005,8 @@ User/save disks that can be created from the game itself are not included.
 		</part>
 	</software>
 
-	<software name="sangoku3">
+	<!-- Hangs after the intro -->
+	<software name="sangoku3" supported="no">
 		<!--
 		Origin: P2P
 		<rom name="三国志III.cue" size="1286" crc="9f5389d1" sha1="61f888904698ec3a83f66b109c91420d0d1f1e93"/>
@@ -8003,7 +8061,8 @@ User/save disks that can be created from the game itself are not included.
 		</part>
 	</software>
 
-	<software name="scav4d" cloneof="scav4">
+	<!-- Hangs while playing FMV -->
+	<software name="scav4d" cloneof="scav4" supported="no">
 		<!--
 		Origin: Neo Kobe Collection
 		<rom name="Scavenger 4 (Demo Disc).bin" size="57859200" crc="aad41023" sha1="f716dea73a68170b495cdae4d82a4690bbf3d7ba"/>
@@ -8019,7 +8078,8 @@ User/save disks that can be created from the game itself are not included.
 		</part>
 	</software>
 
-	<software name="scav4">
+	<!-- Hangs while playing FMV -->
+	<software name="scav4" supported="no">
 		<!--
 		Origin: Neo Kobe Collection
 		<rom name="Scavenger 4.ccd" size="752" crc="c591ef5f" sha1="2a1ad6e3dc43411c861457e88302642dd23fbb90"/>
@@ -8038,7 +8098,8 @@ User/save disks that can be created from the game itself are not included.
 		</part>
 	</software>
 
-	<software name="scholar">
+	<!-- Some sound issues -->
+	<software name="scholar" supported="partial">
 		<!--
 		Origin: Neo Kobe Collection
 		<rom name="Scholar Movie Magazine.ccd" size="771" crc="43f604ad" sha1="afc766ade7cb05fbd26e703baa1873ea043b346d"/>
@@ -8257,7 +8318,8 @@ User/save disks that can be created from the game itself are not included.
 		</part>
 	</software>
 
-	<software name="simearth">
+	<!-- Severe graphics issues -->
+	<software name="simearth" supported="no">
 		<!--
 		Origin: Neo Kobe Collection
 		<rom name="SimEarth.ccd" size="6113" crc="4f860edf" sha1="198af871373683d7af8eb221ae81cae78762d398"/>
@@ -8435,7 +8497,8 @@ User/save disks that can be created from the game itself are not included.
 		</part>
 	</software>
 
-	<software name="beast">
+	<!-- Some graphics issues -->
+	<software name="beast" supported="partial">
 		<!--
 		Origin: Neo Kobe Collection
 		<rom name="Shadow of the Beast.bin" size="496152048" crc="c641b3e1" sha1="2d89c60f9890bad31de4fa7b99a9717ef50700d9"/>
@@ -8452,7 +8515,8 @@ User/save disks that can be created from the game itself are not included.
 		</part>
 	</software>
 
-	<software name="beast2">
+	<!-- Some graphics issues -->
+	<software name="beast2" supported="partial">
 		<!--
 		Origin: redump.org
 		<rom name="shadow of the beast ii - juushin no jubaku (japan) (track 01).bin" size="73735200" crc="153631da" sha1="f3f3109f0c5e95d549de3c63efe9e21baff638cb"/>
@@ -8940,7 +9004,8 @@ User/save disks that can be created from the game itself are not included.
 		</part>
 	</software>
 
-	<software name="horde">
+	<!-- Sound issues with FMV playback -->
+	<software name="horde" supported="partial">
 		<!--
 		Origin: Neo Kobe Collection
 		<rom name="The Horde.ccd" size="3063" crc="72d2dad6" sha1="4cce603c4e734e24bdf1c92c69e77e4d9e67f869"/>
@@ -8960,7 +9025,8 @@ User/save disks that can be created from the game itself are not included.
 		</part>
 	</software>
 
-	<software name="titan">
+	<!-- Hangs after the title screen -->
+	<software name="titan" supported="no">
 		<!--
 		Origin: Neo Kobe Collection
 		<rom name="Titan.mdf" size="219824976" crc="2ade491f" sha1="cd0bf80ccaa1ba8956b4da84266c6769a2abeeb7"/>
@@ -9007,7 +9073,8 @@ User/save disks that can be created from the game itself are not included.
 		</part>
 	</software>
 
-	<software name="tokio">
+	<!-- Mouse doesn't work, but can be played with a controller -->
+	<software name="tokio" supported="partial">
 		<!--
 		Origin: Neo Kobe Collection
 		<rom name="Tokio.ccd" size="3068" crc="ee1b902c" sha1="49352ac299c92a2011884b5cc2978b414c0da49d"/>
@@ -9032,6 +9099,7 @@ User/save disks that can be created from the game itself are not included.
 		</part>
 	</software>
 
+	<!-- Black screen on boot -->
 	<software name="toshin2">
 		<!--
 		Origin: P2P
@@ -9072,7 +9140,8 @@ User/save disks that can be created from the game itself are not included.
 		</part>
 	</software>
 
-	<software name="tqod">
+	<!-- Graphics/sound issues; hangs when starting a fight -->
+	<software name="tqod" supported="no">
 		<!--
 		Origin: Neo Kobe Collection
 		<rom name="The Queen Of Duellist.cue" size="479" crc="d249b1cd" sha1="56ff832f3bcdf066f3022fae3b40a7d66deddd72"/>
@@ -9233,7 +9302,8 @@ User/save disks that can be created from the game itself are not included.
 		</part>
 	</software>
 
-	<software name="trigger">
+	<!-- Hangs after initial menu -->
+	<software name="trigger" supported="no">
 		<!--
 		Origin: Neo Kobe Collection
 		<rom name="Trigger.ccd" size="1335" crc="ce397f34" sha1="4c862a13fb30162b64b56558ac91cafba82f03fd"/>
@@ -9321,7 +9391,8 @@ User/save disks that can be created from the game itself are not included.
 		</part>
 	</software>
 
-	<software name="ultima6">
+	<!-- Hangs when playing voices -->
+	<software name="ultima6" supported="no">
 		<!--
 		Origin: Neo Kobe Collection
 		<rom name="Ultima VI - The False Prophet.ccd" size="788" crc="412311ab" sha1="66855cb375a7d84284eba0f87c4e487ea50b16fc"/>
@@ -9424,7 +9495,8 @@ User/save disks that can be created from the game itself are not included.
 		</part>
 	</software>
 
-	<software name="vaindrem">
+	<!-- Screen shaking, CDDA desync -->
+	<software name="vaindrem" supported="partial">
 		<!--
 		Origin: Neo Kobe Collection
 		<rom name="Vain Dream.ccd" size="5336" crc="6ca23780" sha1="efd21c5faccd975ccb17de97704a062caab45dc6"/>
@@ -9449,7 +9521,8 @@ User/save disks that can be created from the game itself are not included.
 		</part>
 	</software>
 
-	<software name="vaindrm2">
+	<!-- Screen shaking, CDDA desync -->
+	<software name="vaindrm2" supported="partial">
 		<!--
 		Origin: Neo Kobe Collection
 		<rom name="Vain Dream II.ccd" size="3637" crc="faca527c" sha1="f4823c89008482c16534f18fb7de43b84e0200bd"/>
@@ -9474,7 +9547,8 @@ User/save disks that can be created from the game itself are not included.
 		</part>
 	</software>
 
-	<software name="vastness">
+	<!-- CDDA desync -->
+	<software name="vastness" supported="partial">
 		<!--
 		Origin: Neo Kobe Collection
 		<rom name="Vastness.ccd" size="1525" crc="41bb06da" sha1="764c09836fc45e09f6efe47ed2b9da4c49a97e7f"/>
@@ -9493,7 +9567,8 @@ User/save disks that can be created from the game itself are not included.
 		</part>
 	</software>
 
-	<software name="veildark">
+	<!-- Some graphics issues -->
+	<software name="veildark" supported="partial">
 		<!--
 		Origin: Neo Kobe Collection
 		<rom name="Veil of Darkness.mdf" size="10648800" crc="a6a3495a" sha1="94c27245b4212049ae4114c0bd9e32614d80a807"/>
@@ -9514,7 +9589,7 @@ User/save disks that can be created from the game itself are not included.
 		</part>
 	</software>
 
-	<software name="vkoubou">
+	<software name="vkoubou" supported="partial">
 		<!--
 		Origin: Private dump (r09)
 		<rom name="video koubou v1.3l10 (japan).bin" size="53272800" crc="e8aceb55" sha1="36c76b398063e20985ae317e913332cdc2228e58"/>
@@ -9696,7 +9771,7 @@ User/save disks that can be created from the game itself are not included.
 		<year>1995</year>
 		<publisher>エレクトロニック・アーツ・ビクター (Electronic Arts Victor)</publisher>
 		<info name="release" value="199507xx" />
-		<info name="usage" value="Requires HDD installation"/>
+		<info name="usage" value="Requires HDD installation and 8 MB of RAM"/>
 		<part name="cdrom" interface="fmt_cdrom">
 			<diskarea name="cdrom">
 				<disk name="wing commander armada" sha1="fa9ff6997c774c59bf3a97b710049a22b3348e32" />
@@ -9704,7 +9779,8 @@ User/save disks that can be created from the game itself are not included.
 		</part>
 	</software>
 
-	<software name="wingcomm">
+	<!-- Some sound issues -->
+	<software name="wingcomm" supported="partial">
 		<!--
 		Origin: Neo Kobe Collection
 		<rom name="Wing Commander.ccd" size="8792" crc="7d3209e5" sha1="23441501ac6bcd70520b904987c05dc72dd0d2e2"/>
@@ -9723,7 +9799,8 @@ User/save disks that can be created from the game itself are not included.
 		</part>
 	</software>
 
-	<software name="wingscrt">
+	<!-- Requires the original Wing Commander CD to install, but doesn't recognize it -->
+	<software name="wingscrt" supported="no">
 		<!--
 		Origin: Neo Kobe Collection
 		<rom name="Wing Commander - Secret Missions.mdf" size="10231200" crc="f75ba7a5" sha1="63b8d24b3f376edef3ca0363aa9cfec0d0908d6a"/>
@@ -9741,7 +9818,8 @@ User/save disks that can be created from the game itself are not included.
 		</part>
 	</software>
 
-	<software name="wingcom2">
+	<!-- Restarts TownsOS -->
+	<software name="wingcom2" supported="no">
 		<!--
 		Origin: Neo Kobe Collection
 		<rom name="Wing Commander II and Special Operations.mdf" size="549478944" crc="34dc8d03" sha1="d2b2df03e86db28bd0e9c3be20824a4d97a9a5f4"/>
@@ -9806,7 +9884,8 @@ User/save disks that can be created from the game itself are not included.
 		</part>
 	</software>
 
-	<software name="wizardr7">
+	<!-- CD not recognized after install -->
+	<software name="wizardr7" supported="no">
 		<!--
 		Origin: Neo Kobe Collection
 		<rom name="Wizardry VII - Crusaders of the Dark Savant.mdf" size="45689952" crc="5146397e" sha1="cf1d06bbdf340de84ae3dd41af7f6ebf0919e4f4"/>
@@ -9878,7 +9957,8 @@ User/save disks that can be created from the game itself are not included.
 		</part>
 	</software>
 
-	<software name="carmnwld">
+	<!-- Some sound issues -->
+	<software name="carmnwld" supported="partial">
 		<!--
 		Origin: Neo Kobe Collection
 		<rom name="Where in the World is Carmen Sandiego.ccd" size="770" crc="f0949d02" sha1="fbffe498730e20f16f9073c9bf9e9517c7787734"/>

@@ -95,9 +95,6 @@ a2bus_ramfactor_device::a2bus_ramfactor_device(const machine_config &mconfig, co
 
 void a2bus_memexp_device::device_start()
 {
-	// set_a2bus_device makes m_slot valid
-	set_a2bus_device();
-
 	m_rom = device().machine().root_device().memregion(this->subtag(MEMEXP_ROM_REGION).c_str())->base();
 
 	memset(m_ram, 0xff, 1024*1024*sizeof(uint8_t));
@@ -193,15 +190,13 @@ void a2bus_memexp_device::write_c0nx(uint8_t offset, uint8_t data)
 
 uint8_t a2bus_memexp_device::read_cnxx(uint8_t offset)
 {
-	int slotimg = m_slot * 0x100;
+	int const slotimg = slotno() * 0x100;
 
 	// first 0x400 of ROM contains a CnXX image for each of slots 1-7, last 0x400 is c800 image
 	if ((m_isramfactor) && (m_regs[0xf] & 0x01))
-	{
 		return m_rom[offset+slotimg+0x1000];
-	}
-
-	return m_rom[offset+slotimg];
+	else
+		return m_rom[offset+slotimg];
 }
 
 /*-------------------------------------------------
@@ -212,9 +207,7 @@ uint8_t a2bus_memexp_device::read_c800(uint16_t offset)
 {
 	// c70a diags confirm: bit 1 of cn0F banks in the second half of the ROM
 	if ((m_isramfactor) && (m_regs[0xf] & 0x01))
-	{
 		return m_rom[offset+0x1800];
-	}
-
-	return m_rom[offset+0x800];
+	else
+		return m_rom[offset+0x800];
 }

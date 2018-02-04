@@ -202,7 +202,7 @@ void ppu_vt03_device::device_reset()
 	// todo: what are the actual defaults for these?
 	for (int i = 0;i < 0x20;i++)
 		set_201x_reg(i, 0x00);
-	
+
 	init_palette(*m_palette, 0);
 	
 	m_read_bg4_bg3 = 0;

@@ -163,7 +163,7 @@ Notes:
 #include "speaker.h"
 
 
-static constexpr XTAL MASTER_CLOCK  = 20.0_MHz_XTAL;
+static constexpr XTAL MASTER_CLOCK  = 20_MHz_XTAL;
 static constexpr XTAL CPU_CLOCK     = MASTER_CLOCK / 2;
 static constexpr XTAL PIXEL_CLOCK   = MASTER_CLOCK / 4;
 

@@ -192,7 +192,7 @@ READ8_MEMBER(electron_state::electron_paged_r)
 	case 10:
 	case 11:
 		/* BASIC */
-		data = memregion("basic")->base()[offset & 0x3fff];
+		data = m_region_basic->base()[offset & 0x3fff];
 		break;
 
 	default:
@@ -210,9 +210,9 @@ WRITE8_MEMBER(electron_state::electron_paged_w)
 
 READ8_MEMBER(electron_state::electron_fred_r)
 {
-	/* The Issue 4 ULA returns data from OS ROM, whereas Issue 6 ULA will return 0xfc */
+	/* The Issue 4 ULA returns data from OS ROM, whereas Issue 6 ULA will return 0xff */
 	//logerror("FRED: read fc%02x\n", offset);
-	return m_exp->expbus_r(space, 0xfc00 + offset, 0xfc);
+	return m_exp->expbus_r(space, 0xfc00 + offset, 0xff);
 }
 
 WRITE8_MEMBER(electron_state::electron_fred_w)
@@ -223,9 +223,9 @@ WRITE8_MEMBER(electron_state::electron_fred_w)
 
 READ8_MEMBER(electron_state::electron_jim_r)
 {
-	/* The Issue 4 ULA returns data from OS ROM, whereas Issue 6 ULA will return 0xfd */
+	/* The Issue 4 ULA returns data from OS ROM, whereas Issue 6 ULA will return 0xff */
 	//logerror("JIM: read fd%02x\n", offset);
-	return m_exp->expbus_r(space, 0xfd00 + offset, 0xfd);
+	return m_exp->expbus_r(space, 0xfd00 + offset, 0xff);
 }
 
 WRITE8_MEMBER(electron_state::electron_jim_w)
@@ -237,7 +237,7 @@ WRITE8_MEMBER(electron_state::electron_jim_w)
 READ8_MEMBER(electron_state::electron_sheila_r)
 {
 	/* The Issue 4 ULA returns data from OS ROM, whereas Issue 6 ULA will return 0xfe */
-	uint8_t data = 0xfe;
+	uint8_t data = 0xff;
 
 	switch ( offset & 0x0f )
 	{

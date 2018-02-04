@@ -10,8 +10,9 @@ class deco_karnovsprites_device : public device_t
 {
 public:
 	deco_karnovsprites_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
-	void set_gfxregion(int region) { m_gfxregion = region; };
-	void draw_sprites( bitmap_ind16 &bitmap, const rectangle &cliprect, uint16_t* spriteram, int size, int priority );
+	void set_gfxregion(int region) { m_gfxregion = region; }
+	void draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprect, uint16_t* spriteram, int size, int priority);
+	void set_flip_screen(bool flip) { m_flip_screen = flip; }
 
 	// static configuration
 	static void static_set_gfxdecode_tag(device_t &device, const char *tag);
@@ -22,6 +23,7 @@ protected:
 	virtual void device_reset() override;
 
 	uint8_t m_gfxregion;
+	bool m_flip_screen;
 private:
 	required_device<gfxdecode_device> m_gfxdecode;
 };

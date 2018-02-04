@@ -573,8 +573,8 @@ ADDRESS_MAP_END
 
 static ADDRESS_MAP_START(ibmpcjx_io, AS_IO, 8, pcjr_state)
 	ADDRESS_MAP_UNMAP_HIGH
-	AM_RANGE(0x01ff, 0x01ff) AM_READWRITE(pcjx_port_1ff_r, pcjx_port_1ff_w)
 	AM_IMPORT_FROM( ibmpcjr_io )
+	AM_RANGE(0x01ff, 0x01ff) AM_READWRITE(pcjx_port_1ff_r, pcjx_port_1ff_w)
 ADDRESS_MAP_END
 
 MACHINE_CONFIG_START(pcjr_state::ibmpcjr)

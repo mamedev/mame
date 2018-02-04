@@ -57,7 +57,7 @@ inline void pgm2_state::draw_sprite_chunk(const rectangle &cliprect, int &palett
 
 				palette_offset += palette_inc;
 				palette_offset &= m_sprites_colour_mask;
-		
+
 				if (xzoombit) realxdraw += realdraw_inc;
 
 			}
@@ -179,10 +179,10 @@ void pgm2_state::draw_sprites(screen_device &screen, const rectangle &cliprect, 
 			int unk0 = (spriteram[i + 0] & 0x30000000) >> 0;
 
 			// kov3 uses this in places (eg. horsemen special move heads) and shops when it can only possibly mean 'disable'
-		    // it is also used in places on kov2nl and orleg2, often the 'power up' effects surrounding your character to create an on/off flicker each frame
+			// it is also used in places on kov2nl and orleg2, often the 'power up' effects surrounding your character to create an on/off flicker each frame
 			int disable = (spriteram[i + 0] & 0x40000000) >> 30;
 			if (disable) continue;
-			
+
 			int sizex = (spriteram[i + 1] & 0x0000003f) >> 0;
 			int sizey = (spriteram[i + 1] & 0x00007fc0) >> 6;
 			int flipx = (spriteram[i + 1] & 0x00800000) >> 23;
@@ -198,7 +198,7 @@ void pgm2_state::draw_sprites(screen_device &screen, const rectangle &cliprect, 
 
 			int mask_offset = (spriteram[i + 2] << 1);
 			int palette_offset = (spriteram[i + 3]);
-			
+
 			// use all the bits of zoom to lookup, probably why the table is copied 4x in RAM
 			uint32_t zoomy_bits = m_sp_zoom[zoomy];
 			uint32_t zoomx_bits = m_sp_zoom[zoomx];
@@ -228,7 +228,7 @@ void pgm2_state::draw_sprites(screen_device &screen, const rectangle &cliprect, 
 				// store these for when we need to draw a line twice
 				uint32_t pre_palette_offset = palette_offset;
 				uint32_t pre_mask_offset = mask_offset;
-			
+
 				if (yrepeats != 0) // grow
 				{
 					for (int i = 0; i < yrepeats; i++)

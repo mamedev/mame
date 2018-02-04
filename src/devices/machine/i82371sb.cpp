@@ -15,6 +15,7 @@
 DEFINE_DEVICE_TYPE(I82371SB_ISA, i82371sb_isa_device, "i82371sb_isa", "Intel 82371 southbridge ISA bridge")
 
 DEVICE_ADDRESS_MAP_START(config_map, 32, i82371sb_isa_device)
+	AM_INHERIT_FROM(pci_device::config_map)
 	AM_RANGE(0x4c, 0x4f) AM_READWRITE8 (iort_r,    iort_w,    0x000000ff)
 	AM_RANGE(0x4c, 0x4f) AM_READWRITE16(xbcs_r,    xbcs_w,    0xffff0000)
 	AM_RANGE(0x60, 0x63) AM_READWRITE8 (pirqrc_r,  pirqrc_w,  0xffffffff)
@@ -30,8 +31,6 @@ DEVICE_ADDRESS_MAP_START(config_map, 32, i82371sb_isa_device)
 	AM_RANGE(0xa8, 0xab) AM_READWRITE16(smireq_r,  smireq_w,  0xffff0000)
 	AM_RANGE(0xac, 0xaf) AM_READWRITE8 (ctltmr_r,  ctltmr_w,  0x000000ff)
 	AM_RANGE(0xac, 0xaf) AM_READWRITE8 (cthtmr_r,  cthtmr_w,  0x00ff0000)
-
-	AM_INHERIT_FROM(pci_device::config_map)
 ADDRESS_MAP_END
 
 DEVICE_ADDRESS_MAP_START(internal_io_map, 32, i82371sb_isa_device)

@@ -898,7 +898,7 @@ void saturn_state::drawpixel_4bpp_trans(int x, int y, int patterndata, int offse
 void saturn_state::drawpixel_generic(int x, int y, int patterndata, int offsetcnt)
 {
 	int pix,transmask, spd = stv2_current_sprite.CMDPMOD & 0x40;
-//	int mode;
+//  int mode;
 	int mesh = stv2_current_sprite.CMDPMOD & 0x100;
 	int pix2;
 
@@ -966,7 +966,7 @@ void saturn_state::drawpixel_generic(int x, int y, int patterndata, int offsetcn
 				//mode = 2;
 				pix = pix+(stv2_current_sprite.CMDCOLR&0xffc0);
 				transmask = 0x3f;
-				
+
 				// Scud: the disposable assassin wants transparent pen on 0
 				if ( !spd )
 				{
@@ -1018,7 +1018,7 @@ void saturn_state::drawpixel_generic(int x, int y, int patterndata, int offsetcn
 	pix |= stv2_current_sprite.CMDPMOD & 0x8000;
 	/*
 	TODO: from docs:
-	"Except for the color calculation of replace and shadow, color calculation can only be performed when the color code of the original picture is RGB code. 
+	"Except for the color calculation of replace and shadow, color calculation can only be performed when the color code of the original picture is RGB code.
 	Color calculation can be executed when the color code is color bank code, but the results are not guaranteed."
 	Currently no idea about the "result not guaranteed" part, let's disable this branch for the time being ...
 	*/
@@ -1063,7 +1063,7 @@ void saturn_state::drawpixel_generic(int x, int y, int patterndata, int offsetcn
 					m_vdp1.framebuffer_draw_lines[y][x] = stv_vdp1_apply_gouraud_shading( x, y, pix );
 					break;
 				default:
-				    // TODO: mode 5: prohibited, mode 6: gouraud shading + half-luminance, mode 7: gouraud-shading + half-transparent
+					// TODO: mode 5: prohibited, mode 6: gouraud shading + half-luminance, mode 7: gouraud-shading + half-transparent
 					popmessage("VDP1 PMOD = %02x, contact MAMEdev",stv2_current_sprite.CMDPMOD & 0x7);
 					m_vdp1.framebuffer_draw_lines[y][x] = pix;
 					break;

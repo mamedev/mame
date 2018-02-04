@@ -346,9 +346,9 @@ static ADDRESS_MAP_START( vandykeb_map, AS_PROGRAM, 16, nmk16_state )
 	AM_RANGE(0x080008, 0x080009) AM_READ_PORT("DSW1")
 	AM_RANGE(0x08000a, 0x08000b) AM_READ_PORT("DSW2")
 //  AM_RANGE(0x08000e, 0x08000f) AM_DEVREAD8("nmk004", nmk004_device, read, 0x00ff)
+	AM_RANGE(0x080010, 0x08001d) AM_WRITE(vandykeb_scroll_w) /* 10, 12, 1a, 1c */
 	AM_RANGE(0x080016, 0x080017) AM_WRITENOP    /* IRQ enable? */
 	AM_RANGE(0x080018, 0x080019) AM_WRITE(nmk_tilebank_w)
-	AM_RANGE(0x080010, 0x08001d) AM_WRITE(vandykeb_scroll_w) /* 10, 12, 1a, 1c */
 //  AM_RANGE(0x08001e, 0x08001f) AM_DEVWRITE8("nmk004", nmk004_device, write, 0x00ff)
 	AM_RANGE(0x088000, 0x0887ff) AM_RAM_DEVWRITE("palette", palette_device, write16) AM_SHARE("palette")
 	AM_RANGE(0x08c000, 0x08c007) AM_WRITENOP    /* just in case... */
@@ -1054,9 +1054,9 @@ static ADDRESS_MAP_START( macross2_map, AS_PROGRAM, 16, nmk16_state )
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( tdragon3h_map, AS_PROGRAM, 16, nmk16_state ) // bootleg has these 2 swapped
+	AM_IMPORT_FROM(macross2_map)
 	AM_RANGE(0x10000e, 0x10000f) AM_READ_PORT("DSW2")
 	AM_RANGE(0x10000a, 0x10000b) AM_DEVREAD8("soundlatch2", generic_latch_8_device, read, 0x00ff)    /* from Z80 */
-	AM_IMPORT_FROM(macross2_map)
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( raphero_map, AS_PROGRAM, 16, nmk16_state )
@@ -5024,7 +5024,7 @@ WRITE16_MEMBER(nmk16_state::afega_scroll1_w)
 */
 
 
-static ADDRESS_MAP_START( afega, AS_PROGRAM, 16, nmk16_state )
+static ADDRESS_MAP_START( afega_map, AS_PROGRAM, 16, nmk16_state )
 	ADDRESS_MAP_GLOBAL_MASK(0xfffff)
 	AM_RANGE(0x000000, 0x07ffff) AM_ROM
 	AM_RANGE(0x080000, 0x080001) AM_READ_PORT("IN0")            // Buttons
@@ -5102,11 +5102,11 @@ ADDRESS_MAP_END
 static ADDRESS_MAP_START( firehawk_sound_cpu, AS_PROGRAM, 8, nmk16_state )
 	AM_RANGE(0x0000, 0xefff) AM_ROM
 	AM_RANGE(0xf000, 0xf7ff) AM_RAM
+	AM_RANGE(0xf800, 0xffff) AM_RAM // not used, only tested
 	AM_RANGE(0xfff0, 0xfff0) AM_DEVREAD("soundlatch", generic_latch_8_device, read)
 	AM_RANGE(0xfff2, 0xfff2) AM_WRITE(spec2k_oki1_banking_w )
 	AM_RANGE(0xfff8, 0xfff8) AM_DEVREADWRITE("oki2", okim6295_device, read, write)
 	AM_RANGE(0xfffa, 0xfffa) AM_DEVREADWRITE("oki1", okim6295_device, read, write)
-	AM_RANGE(0xf800, 0xffff) AM_RAM // not used, only tested
 ADDRESS_MAP_END
 
 
@@ -5212,7 +5212,7 @@ MACHINE_CONFIG_START(nmk16_state::stagger1)
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", M68000,XTAL(12'000'000)) /* 68000p10 running at 12mhz, verified on pcb */
-	MCFG_CPU_PROGRAM_MAP(afega)
+	MCFG_CPU_PROGRAM_MAP(afega_map)
 	NMK_HACKY_INTERRUPT_TIMING
 
 	MCFG_CPU_ADD("audiocpu", Z80, XTAL(4'000'000)) /* verified on pcb */
@@ -5327,7 +5327,7 @@ MACHINE_CONFIG_END
 
 MACHINE_CONFIG_DERIVED(nmk16_state::spec2k, firehawk)
 	MCFG_CPU_MODIFY("maincpu")
-	MCFG_CPU_PROGRAM_MAP(afega)
+	MCFG_CPU_PROGRAM_MAP(afega_map)
 MACHINE_CONFIG_END
 
 

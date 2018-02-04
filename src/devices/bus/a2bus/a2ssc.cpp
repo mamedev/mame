@@ -143,9 +143,6 @@ a2bus_ssc_device::a2bus_ssc_device(const machine_config &mconfig, device_type ty
 
 void a2bus_ssc_device::device_start()
 {
-	// set_a2bus_device makes m_slot valid
-	set_a2bus_device();
-
 	m_rom = machine().root_device().memregion(this->subtag(SSC_ROM_REGION).c_str())->base();
 }
 

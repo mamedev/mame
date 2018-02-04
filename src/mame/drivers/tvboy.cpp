@@ -21,52 +21,32 @@ TODO:
 class tvboy_state : public a2600_state
 {
 public:
-  tvboy_state(const machine_config &mconfig, device_type type, const char *tag)
-    : a2600_state(mconfig, type, tag)
-    , m_crom(*this, "crom")
-		, m_bank0(*this, "bank0")
+	tvboy_state(const machine_config &mconfig, device_type type, const char *tag)
+		: a2600_state(mconfig, type, tag)
+		, m_crom(*this, "crom")
 		, m_rom(*this, "mainrom") {};
-  
-  DECLARE_WRITE8_MEMBER(bank_write);
 
-  void tvboyii(machine_config &config);
-  void supertvboy(machine_config &config);
+	DECLARE_WRITE8_MEMBER(bank_write);
+
+	void tvboyii(machine_config &config);
+	void supertvboy(machine_config &config);
 
 private:
-  required_device<address_map_bank_device> m_crom;
-  required_memory_bank m_bank0;
-  
-  required_region_ptr<uint8_t> m_rom;
-  
-  virtual void machine_start() override;
-  virtual void machine_start_tvboyii();
-  virtual void machine_start_supertvboy();
+	required_device<address_map_bank_device> m_crom;
+	required_region_ptr<uint8_t> m_rom;
 
-  virtual void machine_reset() override;
+	virtual void machine_reset() override;
 };
 
-void tvboy_state::machine_start_tvboyii() {
-  machine_start();
-}
-
-void tvboy_state::machine_start_supertvboy() {
-  machine_start();
-}
-
-void tvboy_state::machine_start() {
-  m_crom->set_bank(0);
-  m_bank0->configure_entries(0, 128, &m_rom[0x00000], 0x1000);
-}
-
 void tvboy_state::machine_reset() {
-  m_bank0->set_entry(0);
-  a2600_state::machine_reset();
+	m_crom->set_bank(0);
+	a2600_state::machine_reset();
 }
 
 WRITE8_MEMBER(tvboy_state::bank_write) {
-  logerror("banking (?) write %04x, %02x\n", offset, data);
-  if((offset & 0xFF00) == 0x0800)
-    m_bank0->set_entry(data);
+	logerror("banking (?) write %04x, %02x\n", offset, data);
+	if ((offset & 0xFF00) == 0x0800)
+		m_crom->set_bank(data);
 }
 
 static ADDRESS_MAP_START(tvboy_mem, AS_PROGRAM, 8, tvboy_state ) // 6507 has 13-bit address space, 0x0000 - 0x1fff
@@ -77,39 +57,34 @@ static ADDRESS_MAP_START(tvboy_mem, AS_PROGRAM, 8, tvboy_state ) // 6507 has 13-
 #else
 	AM_RANGE(0x0280, 0x029f) AM_MIRROR(0x0d00) AM_DEVREADWRITE("riot", riot6532_device, read, write)
 #endif
-  AM_RANGE(0x1000, 0x1fff) AM_WRITE(bank_write)
+	AM_RANGE(0x1000, 0x1fff) AM_WRITE(bank_write)
 	AM_RANGE(0x1000, 0x1fff) AM_DEVICE("crom", address_map_bank_device, amap8)
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( rom_map, AS_PROGRAM, 8, tvboy_state )
-	AM_RANGE(0x0000, 0x0fff) AM_ROMBANK("bank0")
+	AM_RANGE(0x00000, 0x7ffff) AM_ROM AM_REGION("mainrom", 0)
 ADDRESS_MAP_END
 
 #define MASTER_CLOCK_PAL    3546894
-
 
 MACHINE_CONFIG_START(tvboy_state::tvboyii)
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", M6507, MASTER_CLOCK_PAL / 3)
 	MCFG_CPU_PROGRAM_MAP(tvboy_mem)
+	MCFG_M6502_DISABLE_DIRECT()
 
-  MCFG_DEVICE_ADD("crom", ADDRESS_MAP_BANK, 0)
+	MCFG_DEVICE_ADD("crom", ADDRESS_MAP_BANK, 0)
 	MCFG_DEVICE_PROGRAM_MAP(rom_map)
 	MCFG_ADDRESS_MAP_BANK_ENDIANNESS(ENDIANNESS_LITTLE)
 	MCFG_ADDRESS_MAP_BANK_DATA_WIDTH(8)
-	MCFG_ADDRESS_MAP_BANK_ADDR_WIDTH(12)
+	MCFG_ADDRESS_MAP_BANK_ADDR_WIDTH(19)
 	MCFG_ADDRESS_MAP_BANK_STRIDE(0x1000)
-  
-	MCFG_M6502_DISABLE_DIRECT()
-
-	MCFG_MACHINE_START_OVERRIDE(tvboy_state, tvboyii)
 
 	/* video hardware */
 	MCFG_DEVICE_ADD("tia_video", TIA_PAL_VIDEO, 0)
 	MCFG_TIA_READ_INPUT_PORT_CB(READ16(tvboy_state, a2600_read_input_port))
 	MCFG_TIA_DATABUS_CONTENTS_CB(READ8(tvboy_state, a2600_get_databus_contents))
 	MCFG_TIA_VSYNC_CB(WRITE16(tvboy_state, a2600_tia_vsync_callback_pal))
-
 
 	MCFG_SCREEN_ADD("screen", RASTER)
 	MCFG_SCREEN_RAW_PARAMS( MASTER_CLOCK_PAL, 228, 26, 26 + 160 + 16, 312, 32, 32 + 228 + 31 )
@@ -140,7 +115,6 @@ MACHINE_CONFIG_START(tvboy_state::tvboyii)
 
 	MCFG_VCS_CONTROL_PORT_ADD(CONTROL1_TAG, vcs_control_port_devices, "joy")
 	MCFG_VCS_CONTROL_PORT_ADD(CONTROL2_TAG, vcs_control_port_devices, nullptr)
-  
 MACHINE_CONFIG_END
 
 MACHINE_CONFIG_DERIVED(tvboy_state::supertvboy, tvboyii)
@@ -165,21 +139,21 @@ static INPUT_PORTS_START( tvboyii )
 INPUT_PORTS_END
 
 ROM_START( tvboyii )
-  ROM_REGION( 0x2000, "maincpu", ROMREGION_ERASEFF )
+	ROM_REGION( 0x2000, "maincpu", ROMREGION_ERASEFF )
 
 	ROM_REGION( 0x80000, "mainrom", 0 )
-  ROM_LOAD( "HY23400P.bin", 0x00000, 0x80000, CRC(f8485173) SHA1(cafbaa0c5437f192cb4fb49f9a672846aa038870) )
+	ROM_LOAD( "HY23400P.bin", 0x00000, 0x80000, CRC(f8485173) SHA1(cafbaa0c5437f192cb4fb49f9a672846aa038870) )
 ROM_END
 
 
-ROM_START( supertvboy )
-  ROM_REGION( 0x2000, "maincpu", ROMREGION_ERASEFF )
+ROM_START( stvboy )
+	ROM_REGION( 0x2000, "maincpu", ROMREGION_ERASEFF )
 
 	ROM_REGION( 0x80000, "mainrom", 0 )
-  ROM_LOAD( "supertvboy.bin", 0x00000, 0x80000, CRC(af2e73e8) SHA1(04b9ddc3b30b0e5b81b9f868d455e902a0151491) )
+	ROM_LOAD( "supertvboy.bin", 0x00000, 0x80000, CRC(af2e73e8) SHA1(04b9ddc3b30b0e5b81b9f868d455e902a0151491) )
 ROM_END
 
 
 /*    YEAR  NAME    PARENT  COMPAT  MACHINE INPUT  STATE        INIT    COMPANY     FULLNAME */
-CONS( 199?, tvboyii,    a2600,      0, tvboyii,  tvboyii, tvboy_state, 0, "Systema", "TV Boy II (PAL)" , MACHINE_SUPPORTS_SAVE )
-CONS( 1995, supertvboy, a2600,      0, supertvboy,  tvboyii, tvboy_state, 0, "Akor", "Super TV Boy" , MACHINE_SUPPORTS_SAVE )
+CONS( 199?, tvboyii,    0,      0, tvboyii,     tvboyii, tvboy_state, 0, "Systema", "TV Boy II (PAL)" ,    MACHINE_SUPPORTS_SAVE )
+CONS( 1995, stvboy,     0,      0, supertvboy,  tvboyii, tvboy_state, 0, "Akor",    "Super TV Boy (PAL)" , MACHINE_SUPPORTS_SAVE )

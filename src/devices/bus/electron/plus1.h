@@ -14,8 +14,7 @@
 #include "softlist.h"
 #include "machine/adc0844.h"
 #include "bus/centronics/ctronics.h"
-#include "bus/generic/slot.h"
-#include "bus/generic/carts.h"
+#include "bus/electron/cart/slot.h"
 
 //**************************************************************************
 //  TYPE DEFINITIONS
@@ -45,14 +44,12 @@ private:
 	DECLARE_READ8_MEMBER(status_r);
 	DECLARE_WRITE_LINE_MEMBER(busy_w);
 	DECLARE_WRITE_LINE_MEMBER(ready_w);
-
-	image_init_result load_cart(device_image_interface &image, generic_slot_device *slot);
-	DECLARE_DEVICE_IMAGE_LOAD_MEMBER(electron_cart_sk1) { return load_cart(image, m_cart_sk1); }
-	DECLARE_DEVICE_IMAGE_LOAD_MEMBER(electron_cart_sk2) { return load_cart(image, m_cart_sk2); }
+	DECLARE_WRITE_LINE_MEMBER(irq_w);
+	DECLARE_WRITE_LINE_MEMBER(nmi_w);
 
 	required_memory_region m_exp_rom;
-	required_device<generic_slot_device> m_cart_sk1;
-	required_device<generic_slot_device> m_cart_sk2;
+	required_device<electron_cartslot_device> m_cart_sk1;
+	required_device<electron_cartslot_device> m_cart_sk2;
 	required_device<centronics_device> m_centronics;
 	required_device<output_latch_device> m_cent_data_out;
 	required_device<adc0844_device> m_adc;

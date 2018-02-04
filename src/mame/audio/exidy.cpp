@@ -687,7 +687,7 @@ void venture_sound_device::device_start()
 	m_cvsd = machine().device<hc55516_device>("cvsd");
 
 	/* 8253 */
-	m_freq_to_step = ((1 << 24) / SH8253_CLOCK).dvalue();
+	m_freq_to_step = (1 << 24) / SH8253_CLOCK;
 
 	save_item(NAME(m_riot_irq_state));
 	sh8253_register_state_globals();
@@ -937,7 +937,7 @@ void victory_sound_device::device_start()
 	m_cvsd = machine().device<hc55516_device>("cvsd");
 
 	/* 8253 */
-	m_freq_to_step = ((1 << 24) / SH8253_CLOCK).dvalue();
+	m_freq_to_step = (1 << 24) / SH8253_CLOCK;
 
 	save_item(NAME(m_riot_irq_state));
 	sh8253_register_state_globals();

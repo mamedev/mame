@@ -24,7 +24,7 @@ function portname.startplugin()
 		end
 		return filename
 	end
-	
+
 	emu.register_start(function()
 		local reclevel = 0
 		local function parse_names(names)

@@ -1964,8 +1964,8 @@ WRITE8_MEMBER( ygv608_device::screen_ctrl_10_w )
 	// check mosaic
 	m_mosaic_bplane = (data & 0xc) >> 2;
 	m_mosaic_aplane = data & 3;
-//	if(m_mosaic_aplane || m_mosaic_bplane)
-//		popmessage("Mosaic effect %02x %02x",m_mosaic_aplane,m_mosaic_bplane);
+//  if(m_mosaic_aplane || m_mosaic_bplane)
+//      popmessage("Mosaic effect %02x %02x",m_mosaic_aplane,m_mosaic_bplane);
 }
 
 // R#11R - screen control 11

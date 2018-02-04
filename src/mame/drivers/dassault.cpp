@@ -205,7 +205,7 @@ Stephh's notes (based on the games M68000 code and some tests) :
 Dip locations verified with US conversion kit manual.
 
 TODO:
-	Blend function aren't fully emulated.
+    Blend function aren't fully emulated.
 
 ***************************************************************************/
 
@@ -547,7 +547,7 @@ MACHINE_CONFIG_START(dassault_state::dassault)
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
-	MCFG_SCREEN_RAW_PARAMS(XTAL(28'000'000) / 4, 442, 0, 320, 274, 8, 248)	// same as robocop2(cninja.cpp)? verify this from real pcb.
+	MCFG_SCREEN_RAW_PARAMS(XTAL(28'000'000) / 4, 442, 0, 320, 274, 8, 248)  // same as robocop2(cninja.cpp)? verify this from real pcb.
 	MCFG_SCREEN_UPDATE_DRIVER(dassault_state, screen_update_dassault)
 
 	MCFG_GFXDECODE_ADD("gfxdecode", "palette", dassault)

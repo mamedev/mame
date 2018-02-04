@@ -497,7 +497,7 @@ protected:
 	// device-level overrides
 	virtual void device_resolve_objects() override;
 	virtual void device_start() override;
-	virtual void device_reset() override;
+	virtual void device_reset_after_children() override;
 	virtual void device_add_mconfig(machine_config &config) override;
 
 	// device_z80daisy_interface overrides

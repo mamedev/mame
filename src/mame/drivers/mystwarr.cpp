@@ -914,11 +914,12 @@ MACHINE_RESET_MEMBER(mystwarr_state,metamrph)
 MACHINE_RESET_MEMBER(mystwarr_state,martchmp)
 {
 	int i;
+	k054539_device *k054539 = subdevice<k054539_device>("k054539");
 
-	m_k054539_1->init_flags(k054539_device::REVERSE_STEREO);
+	k054539->init_flags(k054539_device::REVERSE_STEREO);
 
 	// boost voice(chip 0 channel 4-7)
-	for (i=4; i<=7; i++) m_k054539_1->set_gain(i, 1.4);
+	for (i=4; i<=7; i++) k054539->set_gain(i, 1.4);
 }
 
 MACHINE_RESET_MEMBER(mystwarr_state,gaiapols)
@@ -1142,7 +1143,7 @@ MACHINE_CONFIG_DERIVED(mystwarr_state::martchmp, mystwarr)
 	MCFG_CPU_PROGRAM_MAP(martchmp_map)
 	MCFG_TIMER_MODIFY("scantimer")
 	MCFG_TIMER_DRIVER_CALLBACK(mystwarr_state, mchamp_interrupt)
-	
+
 	MCFG_CPU_MODIFY("soundcpu")
 	MCFG_CPU_PROGRAM_MAP(martchmp_sound_map)
 
@@ -1169,7 +1170,7 @@ MACHINE_CONFIG_DERIVED(mystwarr_state::martchmp, mystwarr)
 	MCFG_DEVICE_MODIFY("k055673")
 	MCFG_K055673_CB(mystwarr_state, martchmp_sprite_callback)
 	MCFG_K055673_CONFIG("gfx2", K055673_LAYOUT_GX, -58, -23)
-	
+
 	MCFG_DEVICE_REMOVE("k054539_1")
 	MCFG_DEVICE_REMOVE("k054539_2")
 

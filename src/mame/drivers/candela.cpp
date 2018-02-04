@@ -5,7 +5,7 @@
  * History of Candela Data AB
  *---------------------------
  * The Candela computer was designed to be the big breakthough and developed by Candela Data AB, "a Didact Company".
- * The Candela system was based around a main unit that could run OS-9 or Flex and a terminal unit that had a 
+ * The Candela system was based around a main unit that could run OS-9 or Flex and a terminal unit that had a
  * propietary software including CDBASIC. The Candela system lost the battle of the swedish schools to
  * the Compis computer by TeleNova which was based on CP/M initially.  Later both lost to IBM PC as we know.
  * Candela Data continued to sell their system to the swedish industry without major successes despite great
@@ -632,6 +632,7 @@ static ADDRESS_MAP_START( can09_map, AS_PROGRAM, 8, can09_state )
 */
 //  AM_RANGE(0x0000, 0x7fff) AM_RAM
 	AM_RANGE(0x0000, 0x7fff) AM_RAM AM_RAMBANK("bank1")
+	AM_RANGE(0xe000, 0xffff) AM_ROM AM_REGION("roms", 0)
 	AM_RANGE(0xe020, 0xe020) AM_DEVWRITE("crtc", h46505_device, address_w)
 	AM_RANGE(0xe021, 0xe021) AM_DEVWRITE("crtc", h46505_device, register_w)
 	AM_RANGE(0xe034, 0xe037) AM_DEVREADWRITE(PIA1_TAG, pia6821_device, read, write)
@@ -644,7 +645,6 @@ static ADDRESS_MAP_START( can09_map, AS_PROGRAM, 8, can09_state )
 	AM_RANGE(0xb200, 0xc1ff) AM_ROM AM_REGION("roms", 0x3200)
 	AM_RANGE(0xc200, 0xdfff) AM_RAM /* Needed for BASIC etc */
 #endif
-	AM_RANGE(0xe000, 0xffff) AM_ROM AM_REGION("roms", 0)
 ADDRESS_MAP_END
 
 #ifdef UNUSED_VARIABLE

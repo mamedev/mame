@@ -905,6 +905,8 @@ WRITE8_MEMBER(aristmk5_state::bill_acceptor_lamps_w)
 static ADDRESS_MAP_START( aristmk5_map, AS_PROGRAM, 32, aristmk5_state )
 	AM_RANGE(0x02000000, 0x02ffffff) AM_RAM AM_SHARE("physicalram") /* physical RAM - 16 MB for now, should be 512k for the A310 */
 
+	AM_RANGE(0x03000000, 0x0331ffff) AM_READWRITE(archimedes_ioc_r, archimedes_ioc_w)
+
 	/* MK-5 overrides */
 	AM_RANGE(0x03010420, 0x03010423) AM_WRITE8(sram_banksel_w, 0x000000ff) // SRAM bank select write
 
@@ -924,7 +926,6 @@ static ADDRESS_MAP_START( aristmk5_map, AS_PROGRAM, 32, aristmk5_state )
 	AM_RANGE(0x03250050, 0x03250053) AM_READ(Ns5r50)  //IOEB ID register
 	AM_RANGE(0x03250058, 0x0325005b) AM_READ(Ns5x58)  //IOEB interrupt Latch
 
-	AM_RANGE(0x03000000, 0x0331ffff) AM_READWRITE(archimedes_ioc_r, archimedes_ioc_w)
 	AM_RANGE(0x03320000, 0x0333ffff) AM_READWRITE8(sram_r, sram_w, 0x000000ff)
 
 	AM_RANGE(0x03400000, 0x035fffff) AM_WRITE(archimedes_vidc_w)
@@ -936,6 +937,8 @@ ADDRESS_MAP_END
 
 /* U.S games have no dram emulator enabled */
 static ADDRESS_MAP_START( aristmk5_usa_map, AS_PROGRAM, 32, aristmk5_state )
+	AM_IMPORT_FROM(aristmk5_map)
+
 	AM_RANGE(0x00000000, 0x01ffffff) AM_READWRITE(archimedes_memc_logical_r, archimedes_memc_logical_w)
 
 	AM_RANGE(0x03010440, 0x03010443) AM_WRITE8(rtc_usa_w, 0x000000ff)
@@ -959,12 +962,12 @@ static ADDRESS_MAP_START( aristmk5_usa_map, AS_PROGRAM, 32, aristmk5_state )
 	AM_RANGE(0x03012140, 0x0301215f) AM_DEVREADWRITE8("uart_2b", ins8250_uart_device, ins8250_r, ins8250_w, 0x000000ff)
 	AM_RANGE(0x03012300, 0x0301231f) AM_DEVREADWRITE8("uart_3a", ins8250_uart_device, ins8250_r, ins8250_w, 0x000000ff)
 	AM_RANGE(0x03012340, 0x0301235f) AM_DEVREADWRITE8("uart_3b", ins8250_uart_device, ins8250_r, ins8250_w, 0x000000ff)
-
-	AM_IMPORT_FROM(aristmk5_map)
 ADDRESS_MAP_END
 
 /* with dram emulator enabled */
 static ADDRESS_MAP_START( aristmk5_drame_map, AS_PROGRAM, 32, aristmk5_state )
+	AM_IMPORT_FROM(aristmk5_map)
+
 	AM_RANGE(0x00000000, 0x01ffffff) AM_READWRITE(aristmk5_drame_memc_logical_r, archimedes_memc_logical_w)
 
 	AM_RANGE(0x03010430, 0x03010433) AM_WRITE8(hopper_w, 0x000000ff)
@@ -978,8 +981,6 @@ static ADDRESS_MAP_START( aristmk5_drame_map, AS_PROGRAM, 32, aristmk5_state )
 
 	AM_RANGE(0x03014000, 0x0301401f) AM_DEVREADWRITE8("uart_2a", ins8250_uart_device, ins8250_r, ins8250_w, 0x000000ff)
 	AM_RANGE(0x03014020, 0x0301403f) AM_DEVREADWRITE8("uart_2b", ins8250_uart_device, ins8250_r, ins8250_w, 0x000000ff)
-
-	AM_IMPORT_FROM(aristmk5_map)
 ADDRESS_MAP_END
 
 
@@ -3863,7 +3864,7 @@ ROM_END
 // Green Lizard [Reel Game] / Export / A - 05/01/01
 // Requires set chip version: 4.04.xx
 // Variation (% and NO):
-// Doesn't requires touch screen 
+// Doesn't requires touch screen
 ROM_START( glizrdce )
 	ARISTOCRAT_MK5_BIOS
 	/*
@@ -4493,7 +4494,7 @@ ROM_END
 // Keep Your Hat On / Export / B - 08/05/2000
 // Requires set chips 4.01.xx
 // Variation (% and NO)
-// Requires touch screen 
+// Requires touch screen
 ROM_START( kyhatonu )
 	ARISTOCRAT_MK5_BIOS
 	/*

@@ -348,12 +348,6 @@ address_map::address_map(device_t &device, int spacenum)
 	if (spaceconfig == nullptr)
 		throw emu_fatalerror("No memory address space configuration found for device '%s', space %d\n", m_device->tag(), spacenum);
 
-	// construct the internal device map (first so it takes priority)
-	if (spaceconfig->m_internal_map != nullptr)
-		(*spaceconfig->m_internal_map)(*this);
-	if (!spaceconfig->m_internal_map_delegate.isnull())
-		spaceconfig->m_internal_map_delegate(*this);
-
 	// append the map provided by the owner
 	if (memintf->address_map(spacenum) != nullptr)
 	{
@@ -369,6 +363,12 @@ address_map::address_map(device_t &device, int spacenum)
 		if (!spaceconfig->m_default_map_delegate.isnull())
 			spaceconfig->m_default_map_delegate(*this);
 	}
+
+	// construct the internal device map (last so it takes priority)
+	if (spaceconfig->m_internal_map != nullptr)
+		(*spaceconfig->m_internal_map)(*this);
+	if (!spaceconfig->m_internal_map_delegate.isnull())
+		spaceconfig->m_internal_map_delegate(*this);
 }
 
 

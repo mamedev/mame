@@ -2,152 +2,151 @@
 // copyright-holders:David Haywood, R.Belmont
 
 /*
-	Radica Games 6502 based 'TV Game' hardware
+    Radica Games 6502 based 'TV Game' hardware
 
-	These use a 6502 derived CPU under a glob
-	The CPU die is marked 'ELAN EU3A05'
+    These use a 6502 derived CPU under a glob
+    The CPU die is marked 'ELAN EU3A05'
 
-	There is a second glob surrounded by TSOP48 pads
-	this contains the ROM
+    There is a second glob surrounded by TSOP48 pads
+    this contains the ROM
 
-	Space Invaders uses a 3rd glob marked
-	AMIC (C) (M) 1998-1 AM3122A
-	this is presumably for the bitmap layer on Qix
+    Space Invaders uses a 3rd glob marked
+    AMIC (C) (M) 1998-1 AM3122A
+    this is presumably for the bitmap layer on Qix
 
-	--
-	Known games on this hardare
+    --
+    Known games on this hardare
 
-	Tetris
-	Space Invaders
+    Tetris
+    Space Invaders
 
-	---
-	Other games that might be on this hardware
+    ---
+    Other games that might be on this hardware
 
-	Skateboarding
-	+ some of the earlier PlayTV games (not Soccer, that's XaviX, see xavix.cpp)
+    Skateboarding
+    + some of the earlier PlayTV games (not Soccer, that's XaviX, see xavix.cpp)
 
-	---
-	The XaviX ones seem to have a XaviX logo on the external packaging while the
-	ones for this driver don't seem to have any specific marking.
-
-
-	Notes:
-
-	To access internal test on Tetris hold P1 Down + P1 Anticlockwise (Button 2) on boot
-	There appears to be a similar mode for Invaders but I don't know if it's accessible
+    ---
+    The XaviX ones seem to have a XaviX logo on the external packaging while the
+    ones for this driver don't seem to have any specific marking.
 
 
-	RAM 0xa0 and 0xa1 contain the ACD0 and AD1 values and player 2 controls if between
-	certain values? probably read via serial??
-
-	Custom Interrupt purposes
-
-	TETRIS
-
-	ffb0
-	nothing of note?
-
-	ffb4
-	stuff with 500e, 500c and 500d
-
-	ffb8
-	stuff with 50a4 / 50a5 / 50a6  and memory address e2
-
-	ffbc
-	stuff with 50a4 / 50a5 / 50a6  and memory address e2 (similar to above, different bits)
-
-	ffc0 - doesn't exist
-	ffc4 - doesn't exist
-	ffc8 - doesn't exist
-	ffd0 - doesn't exist
-
-	ffd4
-	main irq?
-
-	ffd8
-	jumps straight to an rti
-
-	ffdc
-	accesses 501d / 501b
-
-	SPACE INVADERS
-
-	ffb0
-	rti
-
-	ffb4
-	rti
-
-	ffb8
-	rti
-
-	ffbc
-	decreases 301  bit 02
-	stuff wit 50a5
-
-	ffc0
-	decreases 302
-	stuff with 50a5 bit 04
-
-	ffc4
-	decreases 303
-	stuff with 50a5  bit 08
-
-	ffc8
-	decreases 304  
-	stuff with 50a5  bit 10
-
-	ffcc
-	uses 307
-	stuff with 50a5  bit 20
-
-	ffd0
-	dead loop
-
-	ffd4
-	main interrupt
-
-	ffd8
-	dead loop
-
-	ffdc
-	dead loop
-
-	ffe0
-	dead loop
-
-	ffe4
-	rti
-
-	ffe8
-	dead loop
-
-	ffec
-	dead loop
+    Notes:
+    To access internal test on Tetris hold P1 Down + P1 Anticlockwise (Button 2) on boot
+    There appears to be a similar mode for Invaders but I don't know if it's accessible
 
 
-	Flaws (NOT emulation bugs, happen on hardware):
-	--
+    RAM 0xa0 and 0xa1 contain the ACD0 and AD1 values and player 2 controls if between
+    certain values? probably read via serial??
 
-	In QIX the sprites lag behind the line drawing, so you see the line infront of your player until you stop moving
-	
-	In Space Invaders the UFO can sometimes glitch for a frame when appearing, and wraps around at the edges
-	  (even if the hardware supports having higher priority tiles to prevent this, as used by Lunar Rescue, it isn't
-	   used here)
+    Custom Interrupt purposes
 
-	Colony 7 has a typo in the instructions
+    TETRIS
 
-	The fake 'colour band' effect does not apply to the thruster (and several other elements) in Lunar Rescue
+    ffb0
+    nothing of note?
 
-	Enemies in Phoenix are rendered above the score panel
+    ffb4
+    stuff with 500e, 500c and 500d
 
-	The 200pt right facing bird on the Phoenix score table is corrupt
+    ffb8
+    stuff with 50a4 / 50a5 / 50a6  and memory address e2
 
-	Uncertain (to check)
+    ffbc
+    stuff with 50a4 / 50a5 / 50a6  and memory address e2 (similar to above, different bits)
 
-	Space Invaders seems to be using a darker than expected palette, there are lighter colours in the palette but
-	they don't seem to be used.  It's difficult to judge from hardware videos, although it definitely isn't as
-	white as the menu, so this might also be a non-bug.
+    ffc0 - doesn't exist
+    ffc4 - doesn't exist
+    ffc8 - doesn't exist
+    ffd0 - doesn't exist
+
+    ffd4
+    main irq?
+
+    ffd8
+    jumps straight to an rti
+
+    ffdc
+    accesses 501d / 501b
+
+    SPACE INVADERS
+
+    ffb0
+    rti
+
+    ffb4
+    rti
+
+    ffb8
+    rti
+
+    ffbc
+    decreases 301  bit 02
+    stuff wit 50a5
+
+    ffc0
+    decreases 302
+    stuff with 50a5 bit 04
+
+    ffc4
+    decreases 303
+    stuff with 50a5  bit 08
+
+    ffc8
+    decreases 304
+    stuff with 50a5  bit 10
+
+    ffcc
+    uses 307
+    stuff with 50a5  bit 20
+
+    ffd0
+    dead loop
+
+    ffd4
+    main interrupt
+
+    ffd8
+    dead loop
+
+    ffdc
+    dead loop
+
+    ffe0
+    dead loop
+
+    ffe4
+    rti
+
+    ffe8
+    dead loop
+
+    ffec
+    dead loop
+
+
+    Flaws (NOT emulation bugs, happen on hardware):
+    --
+
+    In QIX the sprites lag behind the line drawing, so you see the line infront of your player until you stop moving
+
+    In Space Invaders the UFO can sometimes glitch for a frame when appearing, and wraps around at the edges
+      (even if the hardware supports having higher priority tiles to prevent this, as used by Lunar Rescue, it isn't
+       used here)
+
+    Colony 7 has a typo in the instructions
+
+    The fake 'colour band' effect does not apply to the thruster (and several other elements) in Lunar Rescue
+
+    Enemies in Phoenix are rendered above the score panel
+
+    The 200pt right facing bird on the Phoenix score table is corrupt
+
+    Uncertain (to check)
+
+    Space Invaders seems to be using a darker than expected palette, there are lighter colours in the palette but
+    they don't seem to be used.  It's difficult to judge from hardware videos, although it definitely isn't as
+    white as the menu, so this might also be a non-bug.
 
 
 */
@@ -179,7 +178,7 @@ public:
 
 	// screen updates
 	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
-	
+
 	// system
 	DECLARE_READ8_MEMBER(radicasi_5003_r);
 	DECLARE_READ8_MEMBER(radicasi_pal_ntsc_r);
@@ -217,7 +216,7 @@ public:
 	DECLARE_WRITE8_MEMBER(radicasi_sprite_gfxbase_hi_w);
 	DECLARE_READ8_MEMBER(radicasi_sprite_gfxbase_lo_r);
 	DECLARE_READ8_MEMBER(radicasi_sprite_gfxbase_hi_r);
-	
+
 	DECLARE_WRITE8_MEMBER(radicasi_vidctrl_w);
 
 	DECLARE_READ8_MEMBER(radicasi_sprite_bg_scroll_r);
@@ -301,24 +300,24 @@ void radica_eu3a05_state::draw_sprites(screen_device &screen, bitmap_ind16 &bitm
 	address_space& fullbankspace = m_bank->space(AS_PROGRAM);
 
 	/*
-		Sprites
-		AA yy xx cc XX YY aa bb
+	    Sprites
+	    AA yy xx cc XX YY aa bb
 
-		yy = y position
-		xx = x position
-		XX = texture x start
-		YY = texture y start
-		aa = same as unk2 on tiles
-		bb = sometimes set in invaders
-		cc = same as attr on tiles (colour / priority?)
+	    yy = y position
+	    xx = x position
+	    XX = texture x start
+	    YY = texture y start
+	    aa = same as unk2 on tiles
+	    bb = sometimes set in invaders
+	    cc = same as attr on tiles (colour / priority?)
 
-		AA = attributes
-		e--- fFsS
-		e = enable
-		S = SizeX
-		s = SizeY
-		F = FlipX
-		f = FlipY (assumed, not seen)
+	    AA = attributes
+	    e--- fFsS
+	    e = enable
+	    S = SizeX
+	    s = SizeY
+	    F = FlipX
+	    f = FlipY (assumed, not seen)
 
 	*/
 
@@ -437,7 +436,7 @@ double hue2rgb(double p, double q, double t)
 bool radica_eu3a05_state::get_tile_data(int base, int drawpri, int& tile, int &attr, int &unk2)
 {
 	tile = m_vram[base * 4] + (m_vram[(base * 4) + 1] << 8);
-	
+
 	// these seem to be the basically the same as attr/unk2 in the sprites, which also make
 	// very little sense.
 	attr = m_vram[(base * 4) + 2];
@@ -481,14 +480,14 @@ void radica_eu3a05_state::draw_tilemaps(screen_device &screen, bitmap_ind16 &bit
 					realstartrow -= 28;
 
 				int base = (((realstartrow + y) & 0x1f) * 8) + x;
-				
+
 				int tile,attr,unk2;
 
 				if (!get_tile_data(base, drawpri, tile,attr,unk2))
 					continue;
 
 				int colour = attr & 0xf0;
-		
+
 				if (m_vidctrl & 0x20) // 4bpp mode
 				{
 					tile = (tile & 0xf) + ((tile & ~0xf) * 16);
@@ -552,7 +551,7 @@ void radica_eu3a05_state::draw_tilemaps(screen_device &screen, bitmap_ind16 &bit
 					realstartrow -= 56;
 
 				int base = (((realstartrow) & 0x3f) * 32) + x;
-				
+
 				int tile,attr,unk2;
 
 				if (!get_tile_data(base, drawpri, tile,attr,unk2))
@@ -596,7 +595,7 @@ uint32_t radica_eu3a05_state::screen_update(screen_device &screen, bitmap_ind16 
 		uint16_t dat = m_palram[offs++] << 8;
 		dat |= m_palram[offs++];
 
-		// llll lsss ---h hhhh
+		// llll lsss ---h hhhh
 		int l_raw = (dat & 0xf800) >> 11;
 		int sl_raw = (dat & 0x0700) >> 8;
 		int h_raw = (dat & 0x001f) >> 0;
@@ -605,7 +604,7 @@ uint32_t radica_eu3a05_state::screen_update(screen_device &screen, bitmap_ind16 
 		double s = (double)sl_raw / 7.0f;
 		double h = (double)h_raw / 24.0f;
 
-	    double r, g, b;
+		double r, g, b;
 
 		if (s == 0) {
 			r = g = b = l; // greyscale
@@ -622,7 +621,7 @@ uint32_t radica_eu3a05_state::screen_update(screen_device &screen, bitmap_ind16 
 		int b_real = b * 255.0f;
 
 		m_palette->set_pen_color(index, r_real, g_real, b_real);
-	}	
+	}
 
 
 	draw_tilemaps(screen,bitmap,cliprect,0);
@@ -666,13 +665,13 @@ READ8_MEMBER(radica_eu3a05_state::radicasi_pal_ntsc_r)
 READ8_MEMBER(radica_eu3a05_state::radicasi_5003_r)
 {
 	/* masked with 0x0f, 0x01 or 0x03 depending on situation..
-	
+
 	  I think it might just be an RNG because if you return 0x00
 	  your shots can never hit the stage 3 enemies in Phoenix and
 	  if you return 0xff they always hit.  On the real hardware it
 	  seems to be random.  Could also just be a crude frame counter
 	  used for the same purpose.
-	
+
 	*/
 
 	logerror("%s: radicasi_5003_r (RNG?)\n", machine().describe_context());
@@ -751,10 +750,10 @@ WRITE8_MEMBER(radica_eu3a05_state::radicasi_vidctrl_w)
 {
 	logerror("%s: radicasi_vidctrl_w %02x (video control?)\n", machine().describe_context(), data);
 	/*
-		c3  8bpp 16x16         1100 0011
-		e3  4bpp 16x16         1110 0011
-		83  8bpp 8x8           1000 0011
-		02  8bpp 8x8 (phoenix) 0000 0010
+	    c3  8bpp 16x16         1100 0011
+	    e3  4bpp 16x16         1110 0011
+	    83  8bpp 8x8           1000 0011
+	    02  8bpp 8x8 (phoenix) 0000 0010
 	*/
 	m_vidctrl = data;
 }
@@ -910,7 +909,7 @@ static ADDRESS_MAP_START( radicasi_map, AS_PROGRAM, 8, radica_eu3a05_state )
 	AM_RANGE(0x4800, 0x49ff) AM_RAM AM_SHARE("palram")
 
 	// 500x system regs?
-	AM_RANGE(0x5003, 0x5003) AM_READ(radicasi_5003_r) 
+	AM_RANGE(0x5003, 0x5003) AM_READ(radicasi_5003_r)
 	AM_RANGE(0x500b, 0x500b) AM_READ(radicasi_pal_ntsc_r) // PAL / NTSC flag at least
 	AM_RANGE(0x500c, 0x500c) AM_WRITE(radicasi_rombank_hi_w)
 	AM_RANGE(0x500d, 0x500d) AM_READWRITE(radicasi_rombank_lo_r, radicasi_rombank_lo_w)
@@ -962,20 +961,18 @@ static ADDRESS_MAP_START( radicasi_map, AS_PROGRAM, 8, radica_eu3a05_state )
 
 	AM_RANGE(0x6000, 0xdfff) AM_DEVICE("bank", address_map_bank_device, amap8)
 
-	// not sure how these work,, might be a modified 6502 core instead.
+	AM_RANGE(0xe000, 0xffff) AM_ROM AM_REGION("maincpu", 0x3f8000)
+	// not sure how these work, might be a modified 6502 core instead.
 	AM_RANGE(0xfffa, 0xfffb) AM_READ(radicasi_nmi_vector_r)
 	AM_RANGE(0xfffe, 0xffff) AM_READ(radicasi_irq_vector_r)
-
-	AM_RANGE(0xe000, 0xffff) AM_ROM AM_REGION("maincpu", 0x3f8000)
 ADDRESS_MAP_END
 
 
-static ADDRESS_MAP_START( radicasi_bank_map, AS_PROGRAM, 8, radica_eu3a05_state )          
+static ADDRESS_MAP_START( radicasi_bank_map, AS_PROGRAM, 8, radica_eu3a05_state )
+	AM_RANGE(0x000000, 0xffffff) AM_NOP // shut up any logging when video params are invalid
 	AM_RANGE(0x000000, 0x3fffff) AM_ROM AM_REGION("maincpu", 0)
 	AM_RANGE(0x400000, 0x40ffff) AM_RAM // ?? only ever cleared maybe a mirror of below?
 	AM_RANGE(0x800000, 0x80ffff) AM_RAM AM_SHARE("pixram") // Qix writes here and sets the tile base here instead of ROM so it can have a pixel layer
-
-	AM_RANGE(0x000000, 0xffffff) AM_NOP // shut up any logging when video params are invalid
 ADDRESS_MAP_END
 
 static INPUT_PORTS_START( rad_sinv )
@@ -1008,10 +1005,10 @@ static INPUT_PORTS_START( rad_tetr )
 INPUT_PORTS_END
 
 /* both NMI and IRQ vectors just point to RTI
-	there is a table of jumps just before that, those appear to be the real interrupt functions?
+    there is a table of jumps just before that, those appear to be the real interrupt functions?
 
-	patch the main IRQ to be the one that decreases an address the code is waiting for
-	the others look like they might be timer service routines
+    patch the main IRQ to be the one that decreases an address the code is waiting for
+    the others look like they might be timer service routines
 */
 
 READ8_MEMBER(radica_eu3a05_state::radicasi_nmi_vector_r)
@@ -1147,7 +1144,7 @@ INTERRUPT_GEN_MEMBER(radica_eu3a05_state::interrupt)
 
 MACHINE_CONFIG_START(radica_eu3a05_state::radicasi)
 
-	/* basic machine hardware */	
+	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu",M6502,XTAL(21'281'370)/2) // Tetris has a XTAL(21'281'370), not confirmed on Space Invaders, actual CPU clock unknown.
 	MCFG_CPU_PROGRAM_MAP(radicasi_map)
 	MCFG_CPU_VBLANK_INT_DRIVER("screen", radica_eu3a05_state,  interrupt)

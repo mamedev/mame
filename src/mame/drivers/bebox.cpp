@@ -83,9 +83,9 @@ READ64_MEMBER(bebox_state::bb_slave_64be_r)
 }
 
 static ADDRESS_MAP_START( bebox_slave_mem, AS_PROGRAM, 64, bebox_state )
+	AM_IMPORT_FROM(bebox_mem)
 	AM_RANGE(0x80000cf8, 0x80000cff) AM_READ(bb_slave_64be_r)
 	AM_RANGE(0x80000cf8, 0x80000cff) AM_DEVWRITE("pcibus", pci_bus_device, write_64be )
-	AM_IMPORT_FROM(bebox_mem)
 ADDRESS_MAP_END
 
 #define BYTE_REVERSE32(x)       (((x >> 24) & 0xff) | \
@@ -190,7 +190,7 @@ MACHINE_CONFIG_START(bebox_state::bebox)
 	MCFG_SCREEN_ADD("screen", RASTER)
 	MCFG_SCREEN_RAW_PARAMS(XTAL(25'174'800),900,0,640,526,0,480)
 	MCFG_SCREEN_UPDATE_DEVICE("vga", cirrus_gd5428_device, screen_update)
-	
+
 	MCFG_PALETTE_ADD("palette", 0x100)
 	MCFG_DEVICE_ADD("vga", CIRRUS_GD5428, 0)
 

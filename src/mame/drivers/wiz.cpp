@@ -338,18 +338,18 @@ static ADDRESS_MAP_START( decrypted_opcodes_map, AS_OPCODES, 8, wiz_state )
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( wiz_main_map, AS_PROGRAM, 8, wiz_state )
+	AM_IMPORT_FROM( kungfut_main_map )
 	AM_RANGE(0xc800, 0xc801) AM_WRITE(wiz_coin_counter_w)
 	AM_RANGE(0xd400, 0xd400) AM_READ(wiz_protection_r)
 	AM_RANGE(0xf000, 0xf000) AM_WRITE(wiz_sprite_bank_w)
-	AM_IMPORT_FROM( kungfut_main_map )
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( stinger_main_map, AS_PROGRAM, 8, wiz_state )
+	AM_IMPORT_FROM( kungfut_main_map )
 //  AM_RANGE(0xf008, 0xf00f) AM_WRITENOP // ?
 	AM_RANGE(0xf800, 0xf800) AM_DEVREAD("watchdog", watchdog_timer_device, reset_r)
 	AM_RANGE(0xf808, 0xf808) AM_WRITE(stinger_explosion_w)
 	AM_RANGE(0xf80a, 0xf80a) AM_WRITE(stinger_shot_w)
-	AM_IMPORT_FROM( kungfut_main_map )
 ADDRESS_MAP_END
 
 

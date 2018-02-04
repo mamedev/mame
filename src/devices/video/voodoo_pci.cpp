@@ -39,8 +39,8 @@ MACHINE_CONFIG_END
 DEFINE_DEVICE_TYPE(VOODOO_PCI, voodoo_pci_device, "voodoo_pci", "Voodoo PCI")
 
 DEVICE_ADDRESS_MAP_START(config_map, 32, voodoo_pci_device)
-	AM_RANGE(0x40, 0x5f) AM_READWRITE  (pcictrl_r,  pcictrl_w)
 	AM_INHERIT_FROM(pci_device::config_map)
+	AM_RANGE(0x40, 0x5f) AM_READWRITE  (pcictrl_r,  pcictrl_w)
 ADDRESS_MAP_END
 
 // VOODOO_1 & VOODOO_2 map

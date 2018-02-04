@@ -420,8 +420,8 @@ ADDRESS_MAP_END
 
 static ADDRESS_MAP_START(pc16_io, AS_IO, 16, pc_state )
 	ADDRESS_MAP_UNMAP_HIGH
-	AM_RANGE(0x0070, 0x007f) AM_RAM // needed for Poisk-2
 	AM_RANGE(0x0000, 0x00ff) AM_DEVICE8("mb", ibm5160_mb_device, map, 0xffff)
+	AM_RANGE(0x0070, 0x007f) AM_RAM // needed for Poisk-2
 ADDRESS_MAP_END
 
 READ8_MEMBER(pc_state::unk_r)
@@ -431,15 +431,15 @@ READ8_MEMBER(pc_state::unk_r)
 
 static ADDRESS_MAP_START(ibm5550_io, AS_IO, 16, pc_state )
 	ADDRESS_MAP_UNMAP_HIGH
-	AM_RANGE(0x00a0, 0x00a1) AM_READ8(unk_r, 0x00ff )
 	AM_RANGE(0x0000, 0x00ff) AM_DEVICE8("mb", ibm5160_mb_device, map, 0xffff)
+	AM_RANGE(0x00a0, 0x00a1) AM_READ8(unk_r, 0x00ff )
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START(epc_io, AS_IO, 8, pc_state)
 	ADDRESS_MAP_UNMAP_HIGH
+	AM_RANGE(0x0000, 0x00ff) AM_DEVICE("mb", ibm5160_mb_device, map)
 	AM_RANGE(0x0070, 0x0070) AM_DEVREADWRITE("i8251", i8251_device, data_r, data_w)
 	AM_RANGE(0x0071, 0x0071) AM_DEVREADWRITE("i8251", i8251_device, status_r, control_w)
-	AM_RANGE(0x0000, 0x00ff) AM_DEVICE("mb", ibm5160_mb_device, map)
 ADDRESS_MAP_END
 
 INPUT_CHANGED_MEMBER(pc_state::pc_turbo_callback)

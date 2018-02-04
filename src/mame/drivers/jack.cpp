@@ -200,9 +200,9 @@ static ADDRESS_MAP_START( decrypted_opcodes_map, AS_OPCODES, 8, jack_state )
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( striv_map, AS_PROGRAM, 8, jack_state )
+	AM_IMPORT_FROM( jack_map )
 	AM_RANGE(0xb000, 0xb0ff) AM_WRITENOP
 	AM_RANGE(0xc000, 0xcfff) AM_READ(striv_question_r)
-	AM_IMPORT_FROM( jack_map )
 ADDRESS_MAP_END
 
 
@@ -224,8 +224,8 @@ static ADDRESS_MAP_START( joinem_map, AS_PROGRAM, 8, jack_state )
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( unclepoo_map, AS_PROGRAM, 8, jack_state )
-	AM_RANGE(0x9000, 0x97ff) AM_RAM
 	AM_IMPORT_FROM( joinem_map )
+	AM_RANGE(0x9000, 0x97ff) AM_RAM
 ADDRESS_MAP_END
 
 

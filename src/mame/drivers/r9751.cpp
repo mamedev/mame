@@ -59,6 +59,8 @@
 #include "machine/smioc.h"
 #include "softlist.h"
 
+#include <queue>
+
 #define TERMINAL_TAG "terminal"
 
 /* Log defines */
@@ -70,6 +72,16 @@
 #define TRACE_DMA 0
 
 #define TRACE_DEVICE 0x0
+
+#define ENABLE_TRACE_SMIOC 0
+
+#if ENABLE_TRACE_SMIOC
+#define TRACE_SMIOC_READ(address, data, reg, text) UnifiedTrace((address),(data)," Read", "SMIOC", (reg), (text))
+#define TRACE_SMIOC_WRITE(address, data, reg, text) UnifiedTrace((address),(data),"Write", "SMIOC", (reg), (text))
+#else
+#define TRACE_SMIOC_READ(address, data, reg, text) do {} while (0)
+#define TRACE_SMIOC_WRITE(address, data, reg, text) do {} while (0)
+#endif
 
 class r9751_state : public driver_device
 {
@@ -124,9 +136,10 @@ private:
 	uint32_t smioc_dma_r_length;
 	uint32_t fdd_dma_bank;
 	attotime timer_32khz_last;
-	uint8_t m_term_data;
-	uint16_t m_serial_status;
 	uint16_t m_serial_status2;
+	std::queue<uint8_t> kbd_queue;
+	std::queue<uint16_t> serial_status_queue;
+	bool serial_input;
 	// End registers
 
 	address_space *m_mem;
@@ -136,13 +149,23 @@ private:
 	uint32_t debug_a6();
 	uint32_t debug_a5();
 	uint32_t debug_a5_20();
+	void UnifiedTrace(u32 address, u32 data, const char* operation="Read", const char* Device="SMIOC", const char* RegisterName=nullptr, const char* extraText=nullptr);
 
 	virtual void machine_reset() override;
 };
 
 void r9751_state::kbd_put(u8 data)
 {
-	m_term_data = data;
+	if(serial_input)
+	{
+		m_maincpu->space(AS_PROGRAM).write_byte(smioc_in_addr,data);
+		serial_status_queue.push(0x5440);
+		serial_input = false;
+	}
+	else
+	{
+		kbd_queue.push(data);
+	}
 }
 
 uint32_t r9751_state::swap_uint32( uint32_t val )
@@ -164,6 +187,27 @@ uint32_t r9751_state::debug_a5()
 uint32_t r9751_state::debug_a5_20()
 {
 	return m_maincpu->space(AS_PROGRAM).read_dword(ptr_m68000->state_int(M68K_A5) + 0x20);
+}
+
+void r9751_state::UnifiedTrace(u32 address, u32 data, const char* operation, const char* Device, const char* RegisterName, const char* extraText)
+{
+	u32 stacktrace[4];
+	u32 basepointer[2];
+	u32 reg_a6 = ptr_m68000->state_int(M68K_A6);
+
+	for(int i=0; i<4; i++)
+		stacktrace[i] = 0;
+	for(int i=0; i<2; i++)
+		basepointer[i] = 0;
+
+	stacktrace[0] = m_maincpu->pc();
+	if(reg_a6 + 4 < 0xFFFFFF) stacktrace[1] = m_maincpu->space(AS_PROGRAM).read_dword(reg_a6 + 4);
+	if(reg_a6 < 0xFFFFFF && reg_a6 != 0) basepointer[0] = m_maincpu->space(AS_PROGRAM).read_dword(reg_a6);
+	if(basepointer[0] + 4 < 0xFFFFFF && basepointer[0] != 0) stacktrace[2] = m_maincpu->space(AS_PROGRAM).read_dword(basepointer[0] + 4);
+	if(basepointer[0] < 0xFFFFFF && basepointer[0] != 0) basepointer[1] = m_maincpu->space(AS_PROGRAM).read_dword(basepointer[0]);
+	if(basepointer[1] + 4 < 0xFFFFFF && basepointer[1] != 0) stacktrace[3] = m_maincpu->space(AS_PROGRAM).read_dword(basepointer[1] + 4);
+
+	logerror("%s[%08X] => %08X (%s:%s) %s (%08X, %08X, %08X, %08X)\n", operation, address, data, Device, RegisterName==nullptr?"":RegisterName, extraText==nullptr?"":extraText, stacktrace[0], stacktrace[1], stacktrace[2], stacktrace[3]);
 }
 
 READ8_MEMBER(r9751_state::pdc_dma_r)
@@ -242,10 +286,21 @@ READ32_MEMBER( r9751_state::r9751_mmio_5ff_r )
 			return data;
 		/* SMIOC region (0x98, device 26) */
 		case 0x0898: /* Serial status or DMA status */
-			if(TRACE_SMIOC) logerror("m_serial_status = %04X \n", m_serial_status | 0x8);
-			return m_serial_status | 0x8;
+			if(!serial_status_queue.empty())
+			{
+				data = serial_status_queue.front();
+				serial_status_queue.pop();
+			}
+			else
+			{
+				data = 0;
+			}
+			if(TRACE_SMIOC) logerror("serial_status_queue = %04X \n", data | 0x8);
+			TRACE_SMIOC_READ(offset << 2 | 0x5FF00000, data | 0x8, "Serial Status 1",  nullptr);
+			return data | 0x8;
 		case 0x0870: /* Serial status or DMA status 2 */
-			if(TRACE_SMIOC) logerror("m_serial_status2 = %04X \n", m_serial_status);
+			if(TRACE_SMIOC) logerror("m_serial_status2 = %04X \n", m_serial_status2);
+			TRACE_SMIOC_READ(offset << 2 | 0x5FF00000, m_serial_status2, "Serial Status 2", nullptr);
 			return m_serial_status2;
 		/* SMIOC region (0x9C, device 27) */
 
@@ -261,6 +316,7 @@ READ32_MEMBER( r9751_state::r9751_mmio_5ff_r )
 			return data;
 		default:
 			if(TRACE_FDC || TRACE_HDC || TRACE_SMIOC) logerror("Unknown read address: %08X PC: %08X\n", offset << 2 | 0x5FF00000, m_maincpu->pc());
+			if(((offset << 2) & 0xFF) == 0x26 * 4 || ((offset << 2) & 0xFF) == 0x27 * 4) TRACE_SMIOC_READ(offset << 2 | 0x5FF00000, 0, "Unknown", nullptr);
 			return 0;
 	}
 }
@@ -293,19 +349,22 @@ WRITE32_MEMBER( r9751_state::r9751_mmio_5ff_w )
 			break;
 		/* SMIOC region (0x98, device 26) - Output */
 		case 0x0298:
-			m_serial_status = data;
+			if(!serial_status_queue.empty())
+				serial_status_queue.pop();
 			if(TRACE_SMIOC) logerror("Serial status: %08X PC: %08X\n", data, m_maincpu->pc());
+			TRACE_SMIOC_WRITE(offset << 2 | 0x5FF00000, data, "Serial Status 1", nullptr);
 			break;
 		case 0x0270:
 			m_serial_status2 = data;
 			if(TRACE_SMIOC) logerror("Serial status2: %08X PC: %08X\n", data, m_maincpu->pc());
+			TRACE_SMIOC_WRITE(offset << 2 | 0x5FF00000, data, "Serial Status 2", nullptr);
 			break;
 		case 0x4090:
 		case 0x4098: /* Serial DMA Command */
 			switch(data)
 			{
 				case 0x1000:
-					m_serial_status = 0x0140;
+					serial_status_queue.push(0x0140);
 					m_serial_status2 = 0x0140;
 					if(TRACE_SMIOC) logerror("Serial DMA command 0x1000 PC: %08X\n", m_maincpu->pc());
 					break;
@@ -315,37 +374,51 @@ WRITE32_MEMBER( r9751_state::r9751_mmio_5ff_w )
 						if(TRACE_SMIOC) logerror("Serial byte: %02X PC: %08X\n", m_mem->read_word(smioc_out_addr+i*2), m_maincpu->pc());
 						m_terminal->write(space,0,m_mem->read_word(smioc_out_addr+i*2));
 					}
-					m_serial_status = 0x4140;
+					serial_status_queue.push(0x5140);
 					break;
-				case 0x4200: /* Write XON into serial DMA input register (0x5FF0809C) memory location */
-					m_maincpu->space(AS_PROGRAM).write_byte(smioc_in_addr,0x11);
-					if(TRACE_SMIOC) logerror("Serial DMA command 0x4200 (XON) PC: %08X\n", m_maincpu->pc());
-					m_serial_status = 0x4440;
+				case 0x4200: /* Serial input */
+					if(kbd_queue.empty())
+					{
+						serial_input = true;
+						break;
+					}
+
+					for(int i = 0; i < smioc_dma_r_length && !kbd_queue.empty(); i++)
+					{
+						m_maincpu->space(AS_PROGRAM).write_byte(smioc_in_addr+i,kbd_queue.front());
+						kbd_queue.pop();
+					}
+
+					serial_status_queue.push(0xE440);
 					break;
 				default:
 					if(TRACE_SMIOC) logerror("Unknown serial DMA command: %X\n", data);
-					m_serial_status = 0x40;
+					serial_status_queue.push(0x40);
 			}
+			TRACE_SMIOC_WRITE(offset << 2 | 0x5FF00000, data, "Serial Command", nullptr);
 			break;
 		case 0xC098: /* Serial DMA output address */
-			//smioc_out_addr = data * 2;
 			smioc_out_addr = (smioc_dma_bank & 0x7FFFF800) | ((data&0x3FF)<<1);
 			if(TRACE_SMIOC) logerror("Serial output address: %08X PC: %08X\n", smioc_out_addr, m_maincpu->pc());
+			TRACE_SMIOC_WRITE(offset << 2 | 0x5FF00000, data, "Serial Out Address", nullptr);
 			break;
 		/* SMIOC region (0x9C, device 27) - Input */
 		case 0x409C: /* Serial DMA write length */
 			smioc_dma_w_length = (~data+1) & 0xFFFF;
 			if(TRACE_SMIOC) logerror("Serial DMA write length: %08X PC: %08X\n", smioc_dma_w_length, m_maincpu->pc());
 			if(smioc_dma_w_length > 0x400) smioc_dma_w_length = 0x400;
+			TRACE_SMIOC_WRITE(offset << 2 | 0x5FF00000, data, "Serial Write Length", nullptr);
 			break;
 		case 0x809C: /* Serial DMA input address */
 			smioc_in_addr = (smioc_dma_bank & 0x7FFFF800) | ((data&0x3FF)<<1);
 			if(TRACE_SMIOC) logerror("Serial input address: %08X PC: %08X\n", smioc_out_addr, m_maincpu->pc());
+			TRACE_SMIOC_WRITE(offset << 2 | 0x5FF00000, data, "Serial In Address", nullptr);
 			break;
 		case 0xC09C: /* Serial DMA read length */
 			smioc_dma_r_length = (~data+1) & 0xFFFF;
 			if(TRACE_SMIOC) logerror("Serial DMA read length: %08X PC: %08X\n", smioc_dma_r_length, m_maincpu->pc());
 			if(smioc_dma_r_length > 0x400) smioc_dma_r_length = 0x400;
+			TRACE_SMIOC_WRITE(offset << 2 | 0x5FF00000, data, "Serial Read Length", nullptr);
 			break;
 		/* PDC FDD region (0xB0, device 44 */
 		case 0x01B0: /* FDD SCSI read command */
@@ -424,6 +497,7 @@ WRITE32_MEMBER( r9751_state::r9751_mmio_5ff_w )
 
 		default:
 			if(TRACE_FDC || TRACE_HDC || TRACE_SMIOC) logerror("Unknown write address: %08X Data: %08X PC: %08X\n", offset << 2 | 0x5FF00000, data, m_maincpu->pc());
+			if(((offset << 2) & 0xFF) == 0x26 * 4 || ((offset << 2) & 0xFF) == 0x27 * 4) TRACE_SMIOC_WRITE(offset << 2 | 0x5FF00000, data, "Unknown", nullptr);
 	}
 }
 
@@ -432,12 +506,9 @@ WRITE32_MEMBER( r9751_state::r9751_mmio_5ff_w )
 ******************************************************************************/
 READ32_MEMBER( r9751_state::r9751_mmio_ff01_r )
 {
-	//uint32_t data;
-
 	switch(offset << 2)
 	{
 		default:
-			//return data;
 			return 0;
 	}
 }
@@ -586,10 +657,8 @@ MACHINE_CONFIG_START(r9751_state::r9751)
 	MCFG_PDC_R_CB(READ8(r9751_state, pdc_dma_r))
 	MCFG_PDC_W_CB(WRITE8(r9751_state, pdc_dma_w))
 	MCFG_DEVICE_ADD("scsi", SCSI_PORT, 0)
-	//MCFG_SCSIDEV_ADD("scsi:" SCSI_PORT_DEVICE1, "cdrom", SCSICD, SCSI_ID_1)
 	MCFG_DEVICE_ADD("wd33c93", WD33C93, 0)
 	MCFG_LEGACY_SCSI_PORT("scsi")
-	//MCFG_WD33C93_IRQ_CB(WRITELINE(r9751_state,scsi_irq))
 
 	/* software list */
 	MCFG_SOFTWARE_LIST_ADD("flop_list","r9751")

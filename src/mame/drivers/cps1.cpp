@@ -557,11 +557,11 @@ ADDRESS_MAP_END
 /* The memory mapping is handled by PAL LWIO */
 
 static ADDRESS_MAP_START( forgottn_map, AS_PROGRAM, 16, cps_state )
+	AM_IMPORT_FROM(main_map)
 	AM_RANGE(0x800040, 0x800041) AM_DEVWRITE8("upd4701", upd4701_device, reset_x, 0x00ff)
 	AM_RANGE(0x800048, 0x800049) AM_DEVWRITE8("upd4701", upd4701_device, reset_y, 0x00ff)
 	AM_RANGE(0x800052, 0x800055) AM_DEVREAD8("upd4701", upd4701_device, read_x, 0x00ff)
 	AM_RANGE(0x80005a, 0x80005d) AM_DEVREAD8("upd4701", upd4701_device, read_y, 0x00ff)
-	AM_IMPORT_FROM(main_map)
 ADDRESS_MAP_END
 
 /*

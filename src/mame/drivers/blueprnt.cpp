@@ -116,8 +116,8 @@ static ADDRESS_MAP_START( blueprnt_map, AS_PROGRAM, 8, blueprnt_state )
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( grasspin_map, AS_PROGRAM, 8, blueprnt_state )
-	AM_RANGE(0xc003, 0xc003) AM_READ(grasspin_sh_dipsw_r)
 	AM_IMPORT_FROM( blueprnt_map )
+	AM_RANGE(0xc003, 0xc003) AM_READ(grasspin_sh_dipsw_r)
 ADDRESS_MAP_END
 
 

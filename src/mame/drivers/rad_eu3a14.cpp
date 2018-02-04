@@ -2,24 +2,24 @@
 // copyright-holders:David Haywood, R.Belmont
 
 /*
-	These use a 6502 derived CPU under a glob
-	The CPU die is marked 'ELAN EU3A14'
+    These use a 6502 derived CPU under a glob
+    The CPU die is marked 'ELAN EU3A14'
 
-	There is a second glob surrounded by TSOP48 pads
-	this contains the ROM
+    There is a second glob surrounded by TSOP48 pads
+    this contains the ROM
 
-	Known to be on this hardware
+    Known to be on this hardware
 
-	Golden Tee Golf Home Edition (developed by FarSight Studios)
+    Golden Tee Golf Home Edition (developed by FarSight Studios)
 
-	Maybe on this hardware
+    Maybe on this hardware
 
-	PlayTV Real Swing Golf (also developed by FarSight, looks similar but with different controls)
+    PlayTV Real Swing Golf (also developed by FarSight, looks similar but with different controls)
 
 
-	In many ways this is similar to the rad_eu3a05.cpp hardware
-	but the video system has changed, here the sprites are more traditional non-tile based, rather
-	than coming from 'pages'
+    In many ways this is similar to the rad_eu3a05.cpp hardware
+    but the video system has changed, here the sprites are more traditional non-tile based, rather
+    than coming from 'pages'
 
 */
 
@@ -80,7 +80,7 @@ public:
 
 	// screen updates
 	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
-	
+
 	void radica_eu3a14(machine_config &config);
 
 	int m_custom_irq;
@@ -157,7 +157,7 @@ void radica_eu3a14_state::handle_palette(screen_device &screen, bitmap_ind16 &bi
 		uint16_t dat = m_palram[offs++] << 8;
 		dat |= m_palram[offs++];
 
-		// llll lsss ---h hhhh
+		// llll lsss ---h hhhh
 		int l_raw = (dat & 0xf800) >> 11;
 		int sl_raw = (dat & 0x0700) >> 8;
 		int h_raw = (dat & 0x001f) >> 0;
@@ -227,12 +227,12 @@ void radica_eu3a14_state::draw_background(screen_device &screen, bitmap_ind16 &b
 	draw_page(screen,bitmap,cliprect,1, 512+256-xscroll, 0-yscroll);
 	draw_page(screen,bitmap,cliprect,2, 512+0-xscroll, 224-yscroll);
 	draw_page(screen,bitmap,cliprect,3, 512+256-xscroll, 224-yscroll);
-	
+
 	draw_page(screen,bitmap,cliprect,0, 0-xscroll, 448+0-yscroll);
 	draw_page(screen,bitmap,cliprect,1, 256-xscroll, 448+0-yscroll);
 	draw_page(screen,bitmap,cliprect,2, 0-xscroll, 448+224-yscroll);
 	draw_page(screen,bitmap,cliprect,3, 256-xscroll, 448+224-yscroll);
-	
+
 	draw_page(screen,bitmap,cliprect,0, 512+0-xscroll, 448+0-yscroll);
 	draw_page(screen,bitmap,cliprect,1, 512+256-xscroll, 448+0-yscroll);
 	draw_page(screen,bitmap,cliprect,2, 512+0-xscroll, 448+224-yscroll);
@@ -299,13 +299,13 @@ void radica_eu3a14_state::draw_sprites(screen_device &screen, bitmap_ind16 &bitm
 		x -= 8;
 		y -= 4;
 
-		//	int base = 0x18000;
+		//  int base = 0x18000;
 		int offset = ((m_mainram[i + 5] << 8) + (m_mainram[i + 4] << 0));
 		int extra = m_mainram[i + 6];
 		gfx_element *gfx;
 		gfx = m_gfxdecode->gfx(1);
 
-#if 0	
+#if 0
 		static int test = 0x0000;
 		if (machine().input().code_pressed_once(KEYCODE_W))
 		{
@@ -317,7 +317,7 @@ void radica_eu3a14_state::draw_sprites(screen_device &screen, bitmap_ind16 &bitm
 			test -= 0x2000;
 			popmessage("%02x", test);
 		}
-#endif		
+#endif
 
 		// this probably comes from somewhere else, base register
 		offset += 0x8000;
@@ -406,7 +406,7 @@ READ8_MEMBER(radica_eu3a14_state::irq_vector_r)
 	}
 }
 
-/* 
+/*
    code at 0000 maps to e000
    code at 1000 maps to f000
 
@@ -455,7 +455,7 @@ READ8_MEMBER(radica_eu3a14_state::radicasi_pal_ntsc_r)
 	//return 0x00; // PAL
 }
 
-static ADDRESS_MAP_START( bank_map, AS_PROGRAM, 8, radica_eu3a14_state )          
+static ADDRESS_MAP_START( bank_map, AS_PROGRAM, 8, radica_eu3a14_state )
 	AM_RANGE(0x000000, 0x3fffff) AM_ROM AM_REGION("maincpu", 0)
 ADDRESS_MAP_END
 
@@ -477,7 +477,7 @@ static ADDRESS_MAP_START( radica_eu3a14_map, AS_PROGRAM, 8, radica_eu3a14_state 
 	AM_RANGE(0x500d, 0x500d) AM_READWRITE(radicasi_rombank_lo_r, radicasi_rombank_lo_w)
 
 	// DMA is similar to, but not the same as eu3a05
-	AM_RANGE(0x500f, 0x5017) AM_RAM AM_SHARE("dmaparams") 
+	AM_RANGE(0x500f, 0x5017) AM_RAM AM_SHARE("dmaparams")
 	AM_RANGE(0x5018, 0x5018) AM_READWRITE(dma_trigger_r, dma_trigger_w)
 
 	// probably GPIO like eu3a05, although it access 47/48 as unknown instead of 48/49/4a
@@ -516,9 +516,9 @@ static ADDRESS_MAP_START( radica_eu3a14_map, AS_PROGRAM, 8, radica_eu3a14_state 
 
 	AM_RANGE(0x6000, 0xdfff) AM_DEVICE("bank", address_map_bank_device, amap8)
 
-	AM_RANGE(0xfffe, 0xffff) AM_READ(irq_vector_r)
-
 	AM_RANGE(0xe000, 0xffff) AM_ROM AM_REGION("maincpu", 0x0000)
+
+	AM_RANGE(0xfffe, 0xffff) AM_READ(irq_vector_r)
 ADDRESS_MAP_END
 
 READ8_MEMBER(radica_eu3a14_state::dma_trigger_r)
@@ -537,7 +537,7 @@ WRITE8_MEMBER(radica_eu3a14_state::dma_trigger_w)
 
 	address_space& fullbankspace = m_bank->space(AS_PROGRAM);
 	address_space& destspace = m_maincpu->space(AS_PROGRAM);
-	
+
 	if (data == 0x08)
 	{
 		for (int i = 0; i < dmalen; i++)
@@ -679,7 +679,7 @@ GFXDECODE_END
 
 
 MACHINE_CONFIG_START(radica_eu3a14_state::radica_eu3a14)
-	/* basic machine hardware */	
+	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu",M6502,XTAL(21'477'272)/2) // marked as 21'477'270
 	MCFG_CPU_PROGRAM_MAP(radica_eu3a14_map)
 	MCFG_CPU_VBLANK_INT_DRIVER("screen", radica_eu3a14_state,  interrupt)
