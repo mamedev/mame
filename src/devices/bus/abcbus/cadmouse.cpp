@@ -7,7 +7,7 @@ Official designation unknown.
 
 A proto-mouse in the form or a flat box with a handle sticking
 out. The handle can be manipulated in one direction by turning it
-around it's internal pivot point left and right. The other dimension
+around its internal pivot point left and right. The other dimension
 in handled by pulling and pushing the handle. One button is available
 on the top of the handle.
 
@@ -21,23 +21,31 @@ PCB Layout
 
   
 |-|   CN1    |------------------------------|
-|                 CN2   CN3  CN4            |
-|              Z80                          |
-|                                           |
-|                                           |
-|                                           |
-|                               PROM0       |
-|                               PROM1       |
-|                                4801       |
-|              CR1                          |
+|       4164      CN2   CN3  CN4       PROM5|
+|       4164    Z80                    PROM6|
+|       4164                           PROM7|
+|       4164  PROM3 PROM4                   |
+|       4164                                |
+|       4164                    EPROM0      |
+|       4164                    EPROM1      |
+|       4416                     4801       |
+| PROM2        CR1                          |
 |-------------------------------------------|
 
 Notes:
     Relevant IC's shown.
 
     4801    - Mostek MK4801AN-2  1KiB SRAM 150ns
-    PROM0   - Intel 2764-25  8KiB EPROM "D"
-    PROM1   - Intel 2764-25  8KiB EPROM "E"
+    4164    - TI TMS4164-15NL    8KiB DRAM
+    4416    - TI TMS4416-15NL    16k x 4bit DRAM (= 8KiB)
+    EPROM0  - Intel 2764-25      8KiB EPROM "D"
+    EPROM1  - Intel 2764-25      8KiB EPROM "E"
+    PROM2   - TI TBP18S030       256b  PROM "TBP18S030"
+    PROM3   - Harris HM7602      256b  PROM "M3-7603-5 1"
+    PROM4   - Signetics N82S129N 1024b PROM "N82S129N 1"
+    PROM5   - Harris HM7602      256b  PROM "M3-7603-5 2"
+    PROM6   - Signetics N82S129N 1024b PROM "N82S129N 2"
+    PROM7   - Signetics N82S129N 1024b PROM "N82S129N 3"
     Z80     - Z80 CPU "Z 80/1C"
     CN1     - ABCBUS connector
     CN2     - ABC80 power/AV connector passthrough?
