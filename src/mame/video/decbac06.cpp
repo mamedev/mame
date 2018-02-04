@@ -142,6 +142,19 @@ void deco_bac06_device::set_gfx_region_wide(device_t &device, int region8x8, int
 	dev.m_wide = wide;
 }
 
+void deco_bac06_device::set_flip_screen(bool flip)
+{
+	if (m_flip_screen != flip)
+	{
+		m_flip_screen = flip;
+		for (int i = 0; i < 3; i++)
+		{
+			m_pf8x8_tilemap[i]->set_flip(flip ? (TILEMAP_FLIPY | TILEMAP_FLIPX) : 0);
+			m_pf16x16_tilemap[i]->set_flip(flip ? (TILEMAP_FLIPY | TILEMAP_FLIPX) : 0);
+		}
+	}
+}
+
 TILEMAP_MAPPER_MEMBER(deco_bac06_device::tile_shape0_scan)
 {
 	return (col & 0xf) + ((row & 0xf) << 4) + ((col & 0x1f0) << 4);
