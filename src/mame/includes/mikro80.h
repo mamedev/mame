@@ -84,4 +84,4 @@ protected:
 	required_device<cpu_device> m_maincpu;
 };
 
-#endif /* UT88_H_ */
+#endif // MAME_INCLUDES_MIKRO80_H

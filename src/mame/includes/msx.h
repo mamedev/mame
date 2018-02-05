@@ -520,4 +520,4 @@ private:
 };
 
 
-#endif /* __MSX_H__ */
+#endif // MAME_INCLUDES_MSX_H

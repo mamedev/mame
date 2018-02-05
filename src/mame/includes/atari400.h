@@ -52,4 +52,4 @@ protected:
 	optional_ioport m_fake;
 };
 
-#endif /* ATARI_H */
+#endif // MAME_INCLUDES_ATARI_H

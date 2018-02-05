@@ -84,4 +84,4 @@ protected:
 	int m_cas_tx;
 };
 
-#endif /* POLY88_H_ */
+#endif // MAME_INCLUDES_POLY88_H

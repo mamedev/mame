@@ -146,4 +146,4 @@ public:
 	void mario_audio(machine_config &config);
 };
 
-#endif /*MARIO_H_*/
+#endif // MAME_INCLUDES_MARIO_H

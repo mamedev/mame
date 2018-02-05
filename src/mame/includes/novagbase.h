@@ -80,4 +80,4 @@ protected:
 INPUT_PORTS_EXTERN( novag_cb_buttons );
 INPUT_PORTS_EXTERN( novag_cb_magnets );
 
-#endif // DRIVERS_NOVAGBASE_H
+#endif // MAME_INCLUDES_NOVAGBASE_H

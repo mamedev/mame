@@ -39,4 +39,4 @@ public:
 extern const gfx_layout kramermc_charlayout;
 
 
-#endif /* KRAMERMC_h_ */
+#endif // MAME_INCLUDES_KRAMERMC_H

@@ -134,4 +134,4 @@ public:
 INPUT_PORTS_EXTERN( radio86 );
 INPUT_PORTS_EXTERN( ms7007 );
 
-#endif /* radio86_H_ */
+#endif // MAME_INCLUDES_RADIO86_H

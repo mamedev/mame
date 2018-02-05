@@ -24,4 +24,4 @@ public:
 	void pocketc(machine_config &config);
 };
 
-#endif /* POCKETC_H_ */
+#endif // MAME_INCLUDES_POCKETC_H

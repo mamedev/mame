@@ -93,4 +93,4 @@ protected:
 };
 
 
-#endif /* AIM65_H_ */
+#endif // MAME_INCLUDES_AIM65_H

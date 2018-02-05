@@ -148,4 +148,4 @@ class imds2_state : public driver_device
 	uint8_t m_device_status_byte;
 };
 
-#endif /* _IMDS2_H_ */
+#endif // MAME_INCLUDES_IMDS2_H

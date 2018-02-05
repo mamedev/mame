@@ -30,4 +30,4 @@ public:
 	void comquest(machine_config &config);
 };
 
-#endif /* COMQUEST_H_ */
+#endif // MAME_INCLUDES_COMQUEST_H

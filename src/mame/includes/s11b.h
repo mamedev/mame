@@ -44,4 +44,4 @@ private:
 
 };
 
-#endif /* S11B_H_ */
+#endif // MAME_INCLUDES_S11B_H

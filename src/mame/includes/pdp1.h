@@ -332,4 +332,5 @@ private:
 	required_ioport m_lightx;
 	required_ioport m_lighty;
 };
-#endif /* PDP1_H_ */
+
+#endif // MAME_INCLUDES_PDP1_H

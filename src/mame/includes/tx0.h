@@ -327,4 +327,4 @@ enum
 };
 
 
-#endif /* TX0_H_ */
+#endif // MAME_INCLUDES_TX0_H

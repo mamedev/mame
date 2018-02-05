@@ -74,4 +74,4 @@ protected:
 	ioport_port *io_port[8];
 };
 
-#endif  // _PC4_H_
+#endif // MAME_INCLUDES_PC4_H

@@ -161,4 +161,4 @@ public:
 	void mac_driver_init(model_t model);
 };
 
-#endif /* PCIMAC_H_ */
+#endif // MAME_INCLUDES_MACPCI_H

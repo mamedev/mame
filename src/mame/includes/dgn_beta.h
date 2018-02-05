@@ -238,4 +238,4 @@ private:
 	void execute_beta_dat_log(int ref, const std::vector<std::string> &params);
 };
 
-#endif /* DGN_BETA_H_ */
+#endif // MAME_INCLUDES_DGN_BETA_H

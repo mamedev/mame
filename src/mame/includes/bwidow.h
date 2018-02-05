@@ -38,4 +38,4 @@ public:
 	void gravitar_audio(machine_config &config);
 };
 
-#endif /* BWIDOW_H_ */
+#endif // MAME_INCLUDES_BWIDOW_H

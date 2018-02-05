@@ -123,4 +123,4 @@ protected:
 };
 
 
-#endif /* ELECTRON_H_ */
+#endif // MAME_INCLUDES_ELECTRON_H

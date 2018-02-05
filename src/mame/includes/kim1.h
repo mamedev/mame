@@ -65,4 +65,4 @@ protected:
 	required_ioport m_special;
 };
 
-#endif /* KIM1_H */
+#endif // MAME_INCLUDES_KIM1_H

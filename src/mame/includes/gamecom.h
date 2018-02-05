@@ -298,4 +298,4 @@ private:
 	required_ioport_array<13> m_io_grid;
 };
 
-#endif /* GAMECOM_H_ */
+#endif // MAME_INCLUDES_GAMECOM_H

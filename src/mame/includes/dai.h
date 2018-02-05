@@ -79,4 +79,4 @@ protected:
 extern const unsigned char dai_palette[16*3];
 
 
-#endif /* DAI_H_ */
+#endif // MAME_INCLUDES_DAI_H

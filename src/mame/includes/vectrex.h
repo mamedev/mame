@@ -149,4 +149,4 @@ protected:
 	void vectrex_add_point_stereo(int x, int y, rgb_t color, int intensity);
 };
 
-#endif /* VECTREX_H_ */
+#endif // MAME_INCLUDES_VECTREX_H

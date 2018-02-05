@@ -30,4 +30,4 @@ private:
 };
 
 
-#endif /* S11C_H_ */
+#endif // MAME_INCLUDES_S11C_H

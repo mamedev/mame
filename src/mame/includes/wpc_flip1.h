@@ -21,4 +21,4 @@ public:
 	void wpc_flip1(machine_config &config);
 };
 
-#endif /* WPC_FLIP1_H_ */
+#endif // MAME_INCLUDES_WPC_FLIP1_H

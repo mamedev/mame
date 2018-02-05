@@ -556,4 +556,4 @@ public:
 	offs_t mac_dasm_override(std::ostream &stream, offs_t pc, const util::disasm_interface::data_buffer &opcodes, const util::disasm_interface::data_buffer &params);
 };
 
-#endif /* MAC_H_ */
+#endif // MAME_INCLUDES_MAC_H

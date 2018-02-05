@@ -96,4 +96,4 @@ private:
 extern const gfx_layout ut88_charlayout;
 
 
-#endif /* UT88_H_ */
+#endif // MAME_INCLUDES_UT88_H

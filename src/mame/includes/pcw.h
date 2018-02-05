@@ -145,4 +145,4 @@ public:
 	void pcw9512(machine_config &config);
 };
 
-#endif /* PCW_H_ */
+#endif // MAME_INCLUDES_PCW_H

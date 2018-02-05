@@ -152,4 +152,4 @@ protected:
 	bool m_prt_irl;
 };
 
-#endif /* _HP9845_H_ */
+#endif // MAME_INCLUDES_HP9845_H

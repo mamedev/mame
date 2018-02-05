@@ -81,4 +81,4 @@ private:
 	emu_timer* m_irq_timer;
 };
 
-#endif /* WPC_DOT_H_ */
+#endif // MAME_INCLUDES_WPC_DOT_H

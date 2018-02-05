@@ -150,5 +150,4 @@ public: // HACK FOR MC6845
 };
 
 
-
-#endif /* NC_H_ */
+#endif // MAME_INCLUDES_NC_H

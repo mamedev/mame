@@ -140,4 +140,4 @@ public:
 
 #define ENABLE_UART_PRINTING (0)
 
-#endif // _INCLUDES_CDI_H_
+#endif // MAME_INCLUDES_CDI_H

@@ -55,4 +55,4 @@ public:
 	void channlf2(machine_config &config);
 };
 
-#endif /* CHANNELF_H_ */
+#endif // MAME_INCLUDES_CHANNELF_H

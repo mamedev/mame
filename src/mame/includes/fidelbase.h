@@ -85,4 +85,4 @@ protected:
 INPUT_PORTS_EXTERN( fidel_cb_buttons );
 INPUT_PORTS_EXTERN( fidel_cb_magnets );
 
-#endif // DRIVERS_FIDELBASE_H
+#endif // MAME_INCLUDES_FIDELBASE_H

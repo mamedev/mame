@@ -144,4 +144,4 @@ public:
 	void pcw16(machine_config &config);
 };
 
-#endif /* PCW16_H_ */
+#endif // MAME_INCLUDES_PCW16_H

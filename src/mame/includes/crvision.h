@@ -113,4 +113,4 @@ protected:
 	virtual void machine_start() override;
 };
 
-#endif // __CRVISION__
+#endif // MAME_INCLUDES_CRVISION_H

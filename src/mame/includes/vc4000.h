@@ -163,4 +163,4 @@ protected:
 	inline void vc4000_draw_grid(uint8_t *collision);
 };
 
-#endif /* VC4000_H_ */
+#endif // MAME_INCLUDES_VC4000_H

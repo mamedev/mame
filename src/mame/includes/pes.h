@@ -52,4 +52,4 @@ public:
 };
 
 
-#endif  // _PES_H_
+#endif // MAME_INCLUDES_PES_H

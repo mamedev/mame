@@ -133,4 +133,4 @@ protected:
 uint32_t scsi53c810_pci_read(device_t *busdevice, device_t *device, int function, int offset, uint32_t mem_mask);
 void scsi53c810_pci_write(device_t *busdevice, device_t *device, int function, int offset, uint32_t data, uint32_t mem_mask);
 
-#endif /* BEBOX_H_ */
+#endif // MAME_INCLUDES_BEBOX_H

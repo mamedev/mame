@@ -92,6 +92,4 @@ protected:
 };
 
 
-#endif /* MAME_INCLUDES_A2600H */
-
-
+#endif // MAME_INCLUDES_A2600_H

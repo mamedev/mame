@@ -101,4 +101,4 @@ protected:
 	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr) override;
 };
 
-#endif /* MICROTAN_H_ */
+#endif // MAME_INCLUDES_MICROTAN_H

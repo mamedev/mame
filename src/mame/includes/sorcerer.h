@@ -111,4 +111,4 @@ private:
 	required_ioport_array<16> m_iop_x;
 };
 
-#endif /* SORCERER_H_ */
+#endif // MAME_INCLUDES_SORCERER_H

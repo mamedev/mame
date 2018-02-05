@@ -82,4 +82,4 @@ private:
 };
 
 
-#endif /* SSYSTEM3_H_ */
+#endif // MAME_INCLUDES_SSYSTEM3_H

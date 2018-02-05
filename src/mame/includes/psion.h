@@ -110,4 +110,4 @@ public:
 	void psion1(machine_config &config);
 };
 
-#endif  // _PSION_H_
+#endif // MAME_INCLUDES_PSION_H

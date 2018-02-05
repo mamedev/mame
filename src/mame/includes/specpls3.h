@@ -11,4 +11,4 @@
 
 INPUT_PORTS_EXTERN( spec_plus );
 
-#endif /* __SPECPLS3_H__ */
+#endif // MAME_INCLUDES_SPECPLS3_H

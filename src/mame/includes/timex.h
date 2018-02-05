@@ -30,5 +30,4 @@ enum
 };
 
 
-
-#endif /* __TIMEX_H__ */
+#endif // MAME_INCLUDES_TIMEX_H

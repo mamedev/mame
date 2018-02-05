@@ -47,4 +47,4 @@ private:
 /*----------- defined in video/ac1.c -----------*/
 extern const gfx_layout ac1_charlayout;
 
-#endif /* AC1_h_ */
+#endif // MAME_INCLUDES_AC1_H

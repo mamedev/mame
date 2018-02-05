@@ -272,4 +272,4 @@ public:
 	void apple2gsr1(machine_config &config);
 };
 
-#endif /* APPLE2GS_H_ */
+#endif // MAME_INCLUDES_APPLE2GS_H

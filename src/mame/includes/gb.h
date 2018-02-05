@@ -152,4 +152,4 @@ public:
 
 
 
-#endif /* GB_H_ */
+#endif // MAME_INCLUDES_GB_H

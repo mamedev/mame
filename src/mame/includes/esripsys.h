@@ -129,4 +129,4 @@ public:
 	void esripsys(machine_config &config);
 };
 
-#endif // _ESRIPSYS_H_
+#endif // MAME_INCLUDES_ESRIPSYS_H

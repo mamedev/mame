@@ -52,4 +52,4 @@ private:
 
 extern const gfx_layout galeb_charlayout;
 
-#endif /* GALEB_H_ */
+#endif // MAME_INCLUDES_GALEB_H

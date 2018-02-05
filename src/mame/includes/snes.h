@@ -462,4 +462,4 @@ enum
 	HAS_UNK
 };
 
-#endif /* _SNES_H_ */
+#endif // MAME_INCLUDES_SNES_H

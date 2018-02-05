@@ -102,4 +102,4 @@ protected:
 };
 
 
-#endif /* WSWAN_H_ */
+#endif // MAME_INCLUDES_WSWAN_H

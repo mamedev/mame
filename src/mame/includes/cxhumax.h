@@ -280,4 +280,4 @@ public:
 #define DRM_BCKGND_REG                  3
 #define DRM_OSD_PTR_REG                 32
 
-#endif /* CXHUMAX_H_ */
+#endif // MAME_INCLUDES_CXHUMAX_H

@@ -122,4 +122,4 @@ private:
 	bool m_irq_active;
 };
 
-#endif /* S11_H_ */
+#endif // MAME_INCLUDES_S11_H

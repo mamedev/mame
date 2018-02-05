@@ -51,4 +51,4 @@ public:
 	void bk0010fd(machine_config &config);
 };
 
-#endif /* BK_H_ */
+#endif // MAME_INCLUDES_BK_H

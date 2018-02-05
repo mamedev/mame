@@ -57,4 +57,4 @@ protected:
 };
 
 
-#endif /* GALAXY_H_ */
+#endif // MAME_INCLUDES_GALAXY_H

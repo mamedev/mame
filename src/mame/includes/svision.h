@@ -95,4 +95,4 @@ protected:
 	memory_bank *m_bank2;
 };
 
-#endif /* SVISION_H_ */
+#endif // MAME_INCLUDES_SVISION_H

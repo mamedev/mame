@@ -82,4 +82,4 @@ public:
 	void sgx(machine_config &config);
 };
 
-#endif /* PCE_H_ */
+#endif // MAME_INCLUDES_PCE_H

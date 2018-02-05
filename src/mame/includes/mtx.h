@@ -110,4 +110,4 @@ public:
 	void mtx512(machine_config &config);
 };
 
-#endif /* __MTX_H__ */
+#endif // MAME_INCLUDES_MTX_H

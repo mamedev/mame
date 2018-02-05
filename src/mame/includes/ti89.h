@@ -92,4 +92,4 @@ public:
 	void ti89t(machine_config &config);
 };
 
-#endif // TI89_H_
+#endif // MAME_INCLUDES_TI89_H

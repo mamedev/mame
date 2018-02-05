@@ -169,4 +169,4 @@ private:
 	int m_smoothscr;
 };
 
-#endif /* APPLE3_H_ */
+#endif // MAME_INCLUDES_APPLE3_H
