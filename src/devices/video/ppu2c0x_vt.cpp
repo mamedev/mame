@@ -24,6 +24,8 @@ ppu_vt03_device::ppu_vt03_device(const machine_config &mconfig, const char *tag,
 	m_read_bg(*this),
 	m_read_sp(*this)
 {
+	for(int i = 0; i < 6; i++)
+		m_2012_2017_descramble[i] = 2 + i;
 }
 
 READ8_MEMBER(ppu_vt03_device::palette_read)
@@ -422,28 +424,28 @@ WRITE8_MEMBER(ppu_vt03_device::write)
 			break;
 
 		case 0x12:
-			m_201x_regs[0x2] = data;
+			m_201x_regs[m_2012_2017_descramble[0]] = data;
 			break;
 
 		case 0x13:
-			m_201x_regs[0x3] = data;
+			m_201x_regs[m_2012_2017_descramble[1]] = data;
 			break;
 
 		case 0x14:
-			m_201x_regs[0x4] = data;
+			m_201x_regs[m_2012_2017_descramble[2]] = data;
 			break;
 
 		case 0x15:
-			m_201x_regs[0x5] = data;
+			m_201x_regs[m_2012_2017_descramble[3]] = data;
 			break;
 
 		case 0x16:
-			m_201x_regs[0x6] = data;
+			m_201x_regs[m_2012_2017_descramble[4]] = data;
 			break;
 
 		case 0x17:
 			logerror("set reg 7 %02x\n", data);
-			m_201x_regs[0x7] = data;
+			m_201x_regs[m_2012_2017_descramble[5]] = data;
 			break;
 
 		case 0x18:
