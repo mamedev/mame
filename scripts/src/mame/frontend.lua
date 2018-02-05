@@ -36,11 +36,11 @@ includedirs {
 }
 
 includedirs {
+	ext_includedir("asio"),
 	ext_includedir("expat"),
 	ext_includedir("lua"),
 	ext_includedir("zlib"),
 	ext_includedir("flac"),
-	MAME_DIR .. "3rdparty/asio/include",
 }
 
 configuration { }

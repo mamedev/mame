@@ -116,7 +116,7 @@ function osdmodulesbuild()
 		MAME_DIR .. "src/osd/modules/monitor/monitor_sdl.cpp",
 	}
 	includedirs {
-		MAME_DIR .. "3rdparty/asio/include",
+		ext_includedir("asio"),
 	}
 
 	if _OPTIONS["targetos"]=="windows" then

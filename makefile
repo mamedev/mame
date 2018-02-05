@@ -55,6 +55,7 @@
 # OPT_FLAGS =
 # LDOPTS =
 
+# USE_SYSTEM_LIB_ASIO = 1
 # USE_SYSTEM_LIB_EXPAT = 1
 # USE_SYSTEM_LIB_ZLIB = 1
 # USE_SYSTEM_LIB_JPEG = 1
@@ -429,6 +430,10 @@ endif
 # which 3rdparty library to build;
 #  link against system (common) library otherwise
 #-------------------------------------------------
+ifdef USE_SYSTEM_LIB_ASIO
+PARAMS += --with-system-asio='$(USE_SYSTEM_LIB_ASIO)'
+endif
+
 ifdef USE_SYSTEM_LIB_EXPAT
 PARAMS += --with-system-expat='$(USE_SYSTEM_LIB_EXPAT)'
 endif

@@ -6,6 +6,7 @@ local extlibs = {
 --      3rdparty       system        3rdparty
 --      lib name:      lib name,     include dir
 --
+	asio       = { "asio",      "3rdparty/asio/include" },	
 	expat      = { "expat",     "3rdparty/expat/lib" },
 	zlib       = { "z",         "3rdparty/zlib" },
 	jpeg       = { "jpeg",      "3rdparty/libjpeg" },
@@ -18,6 +19,11 @@ local extlibs = {
 }
 
 -- system lib options
+newoption {
+	trigger = 'with-system-asio',
+	description = 'Use system Asio library',
+}
+
 newoption {
 	trigger = 'with-system-expat',
 	description = 'Use system Expat library',
