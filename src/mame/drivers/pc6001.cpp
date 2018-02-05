@@ -18,6 +18,8 @@
     - PC-6001SR: get it to boot, also implement MK-2 compatibility mode (it changes 
 	  the memory map to behave like the older versions)
     - Hookup MC6847 for vanilla PC-6001 and fix video bugs for that device;
+	- voice speech device doesn't work properly, is it even a uPD7752? 
+	  Chrith game is a good test case, it's supposed to talk before title screen;
 
     TODO (game specific):
     - (several AX* games, namely Galaxy Mission Part 1/2 and others): inputs doesn't work;
@@ -147,8 +149,7 @@ inline void pc6001_state::cassette_latch_control(bool new_state)
 		m_cas_switch = 0;
 		//m_cassette->change_state(CASSETTE_MOTOR_DISABLED,CASSETTE_MASK_MOTOR);
 		//m_cassette->change_state(CASSETTE_STOPPED,CASSETTE_MASK_UISTATE);
-		//m_irq_vector = 0x00;
-		//m_maincpu->set_input_line(0, ASSERT_LINE);
+		//set_maincpu_irq_line(0x00);
 	}
 }
 
@@ -173,6 +174,12 @@ inline void pc6001_state::ppi_control_hack_w(uint8_t data)
 	#endif
 	
 	m_port_c_8255 |= 0xa8;
+}
+
+inline void pc6001_state::set_maincpu_irq_line(uint8_t vector_num)
+{
+	m_irq_vector = vector_num;
+	m_maincpu->set_input_line(0, ASSERT_LINE);
 }
 
 WRITE8_MEMBER(pc6001_state::system_latch_w)
@@ -563,29 +570,14 @@ WRITE8_MEMBER(pc6001mk2_state::necmk2_ppi8255_w)
 
 void pc6001mk2_state::vram_bank_change(uint8_t vram_bank)
 {
-	uint8_t *work_ram = m_region_maincpu->base();
+	uint32_t bank_base_values[8] = { 0x8000, 0xc000, 0xc000, 0xe000, 0x0000, 0x8000, 0x4000, 0xa000 };
+	uint8_t vram_bank_index = ((vram_bank & 0x60) >> 4) | ((vram_bank & 2) >> 1);
+//	uint8_t *work_ram = m_region_maincpu->base();
+
+//	bit 2 of vram_bank sets up 4 color mode
+	set_videoram_bank(0x28000 + bank_base_values[vram_bank_index]);
 
 //  popmessage("%02x",vram_bank);
-
-	switch(vram_bank & 0x66)
-	{
-		case 0x00: m_video_ram = work_ram + 0x8000 + 0x28000; break; //4 color mode
-		case 0x02: m_video_ram = work_ram + 0xc000 + 0x28000; break;
-		case 0x04: m_video_ram = work_ram + 0x8000 + 0x28000; break;
-		case 0x06: m_video_ram = work_ram + 0xc000 + 0x28000; break;
-		case 0x20: m_video_ram = work_ram + 0xc000 + 0x28000; break; //4 color mode
-		case 0x22: m_video_ram = work_ram + 0xe000 + 0x28000; break;
-		case 0x24: m_video_ram = work_ram + 0xc000 + 0x28000; break;
-		case 0x26: m_video_ram = work_ram + 0xe000 + 0x28000; break;
-		case 0x40: m_video_ram = work_ram + 0x0000 + 0x28000; break; //4 color mode
-		case 0x42: m_video_ram = work_ram + 0x8000 + 0x28000; break;
-		case 0x44: m_video_ram = work_ram + 0x0000 + 0x28000; break;
-		case 0x46: m_video_ram = work_ram + 0x8000 + 0x28000; break;
-		case 0x60: m_video_ram = work_ram + 0x4000 + 0x28000; break; //4 color mode
-		case 0x62: m_video_ram = work_ram + 0xa000 + 0x28000; break;
-		case 0x64: m_video_ram = work_ram + 0x4000 + 0x28000; break;
-		case 0x66: m_video_ram = work_ram + 0xa000 + 0x28000; break;
-	}
 }
 
 WRITE8_MEMBER(pc6001mk2_state::mk2_system_latch_w)
@@ -599,6 +591,18 @@ WRITE8_MEMBER(pc6001mk2_state::mk2_system_latch_w)
 	//printf("%02x B0\n",data);
 }
 
+inline void pc6001mk2_state::refresh_crtc_params()
+{
+	/* Apparently bitmap modes changes the screen res to 320 x 200 */
+	rectangle visarea = m_screen->visible_area();
+	int y_height;
+
+	y_height = (m_exgfx_bitmap_mode || m_exgfx_2bpp_mode) ? 200 : 240;
+	
+	visarea.set(0, (320) - 1, 0, (y_height) - 1);
+
+	m_screen->configure(m_screen->width(), m_screen->height(), visarea, m_screen->frame_period().attoseconds());
+}
 
 WRITE8_MEMBER(pc6001mk2_state::mk2_vram_bank_w)
 {
@@ -613,19 +617,7 @@ WRITE8_MEMBER(pc6001mk2_state::mk2_vram_bank_w)
 	m_exgfx_bitmap_mode = (data & 8);
 	m_exgfx_2bpp_mode = ((data & 6) == 0);
 
-	{
-		/* Apparently bitmap modes changes the screen res to 320 x 200 */
-		{
-			rectangle visarea = machine().first_screen()->visible_area();
-			int y_height;
-
-			y_height = (m_exgfx_bitmap_mode || m_exgfx_2bpp_mode) ? 200 : 240;
-
-			visarea.set(0, (320) - 1, 0, (y_height) - 1);
-
-			machine().first_screen()->configure(320, 240, visarea, machine().first_screen()->frame_period().attoseconds());
-		}
-	}
+	refresh_crtc_params();
 
 //  popmessage("%02x",data);
 
@@ -653,11 +645,16 @@ WRITE8_MEMBER(pc6001mk2_state::mk2_0xf3_w)
 	m_timer_irq_mask2 = data & 4;
 }
 
-WRITE8_MEMBER(pc6001mk2_state::mk2_timer_adj_w)
+inline void pc6001_state::set_timer_divider(uint8_t data)
 {
 	m_timer_hz_div = data;
 	attotime period = attotime::from_hz((487.5*4)/(m_timer_hz_div+1));
 	m_timer_irq_timer->adjust(period,  0, period);
+}
+
+WRITE8_MEMBER(pc6001mk2_state::mk2_timer_adj_w)
+{
+	set_timer_divider(data);
 }
 
 WRITE8_MEMBER(pc6001mk2_state::mk2_timer_irqv_w)
@@ -844,9 +841,7 @@ WRITE8_MEMBER(pc6001sr_state::sr_mode_w)
 
 WRITE8_MEMBER(pc6001sr_state::sr_vram_bank_w)
 {
-	uint8_t *work_ram = m_region_maincpu->base();
-
-	m_video_ram = work_ram + 0x70000 + ((data & 0x0f)*0x1000);
+	set_videoram_bank(0x70000 + ((data & 0x0f)*0x1000));
 }
 
 WRITE8_MEMBER(pc6001sr_state::sr_system_latch_w)
@@ -998,10 +993,10 @@ static INPUT_PORTS_START( pc6001 )
 	PORT_BIT(0x02000000,IP_ACTIVE_HIGH,IPT_UNUSED) //0x19 cancel
 	PORT_BIT(0x04000000,IP_ACTIVE_HIGH,IPT_UNUSED) //0x1a em
 	PORT_BIT(0x08000000,IP_ACTIVE_HIGH,IPT_UNUSED) //0x1b sub
-	PORT_BIT(0x10000000,IP_ACTIVE_HIGH,IPT_KEYBOARD) PORT_NAME("ESC") PORT_CODE(KEYCODE_TILDE) PORT_CHAR(27)
-	PORT_BIT(0x20000000,IP_ACTIVE_HIGH,IPT_UNUSED) //0x1d fs
-	PORT_BIT(0x40000000,IP_ACTIVE_HIGH,IPT_UNUSED) //0x1e gs
-	PORT_BIT(0x80000000,IP_ACTIVE_HIGH,IPT_UNUSED) //0x1f us
+	PORT_BIT(0x10000000,IP_ACTIVE_HIGH,IPT_KEYBOARD) PORT_NAME("RIGHT") PORT_CODE(KEYCODE_RIGHT) PORT_CHAR(UCHAR_MAMEKEY(RIGHT))
+	PORT_BIT(0x20000000,IP_ACTIVE_HIGH,IPT_KEYBOARD) PORT_NAME("LEFT") PORT_CODE(KEYCODE_LEFT) PORT_CHAR(UCHAR_MAMEKEY(LEFT))
+	PORT_BIT(0x40000000,IP_ACTIVE_HIGH,IPT_KEYBOARD) PORT_NAME("UP") PORT_CODE(KEYCODE_UP) PORT_CHAR(UCHAR_MAMEKEY(UP))
+	PORT_BIT(0x80000000,IP_ACTIVE_HIGH,IPT_KEYBOARD) PORT_NAME("DOWN") PORT_CODE(KEYCODE_DOWN) PORT_CHAR(UCHAR_MAMEKEY(DOWN))
 
 	PORT_START("key2") //0x20-0x3f
 	PORT_BIT(0x00000001,IP_ACTIVE_HIGH,IPT_KEYBOARD) PORT_NAME("Space") PORT_CODE(KEYCODE_SPACE) PORT_CHAR(' ')
@@ -1086,8 +1081,7 @@ TIMER_CALLBACK_MEMBER(pc6001_state::audio_callback)
 	if(m_cas_switch == 0 && ((m_timer_irq_mask == 0) || (m_timer_irq_mask2 == 0)))
 	{
 		if(IRQ_LOG) printf("Timer IRQ called %02x\n",m_timer_irq_vector);
-		m_irq_vector = m_timer_irq_vector;
-		m_maincpu->set_input_line(0, ASSERT_LINE);
+		set_maincpu_irq_line(m_timer_irq_vector);
 	}
 }
 
@@ -1095,8 +1089,7 @@ INTERRUPT_GEN_MEMBER(pc6001_state::vrtc_irq)
 {
 	m_cur_keycode = check_joy_press();
 	if(IRQ_LOG) printf("VRTC IRQ called 0x16\n"); // was "stick" IRQ?
-	m_irq_vector = 0x16;
-	device.execute().set_input_line(0, ASSERT_LINE);
+	set_maincpu_irq_line(0x16);
 }
 
 INTERRUPT_GEN_MEMBER(pc6001sr_state::sr_vrtc_irq)
@@ -1105,8 +1098,7 @@ INTERRUPT_GEN_MEMBER(pc6001sr_state::sr_vrtc_irq)
 
 	m_cur_keycode = check_joy_press();
 	if(IRQ_LOG) printf("VRTC IRQ called 0x16\n");
-	m_irq_vector = (m_kludge) ? 0x22 : 0x16;
-	device.execute().set_input_line(0, ASSERT_LINE);
+	set_maincpu_irq_line((m_kludge) ? 0x22 : 0x16);
 }
 
 IRQ_CALLBACK_MEMBER(pc6001_state::irq_callback)
@@ -1242,8 +1234,7 @@ TIMER_DEVICE_CALLBACK_MEMBER(pc6001_state::cassette_callback)
 				m_cur_keycode = cas_data_poll;
 				cas_data_i = 0x80;
 				/* data ready, poll irq */
-				m_irq_vector = 0x08;
-				m_maincpu->set_input_line(0, ASSERT_LINE);
+				set_maincpu_irq_line(0x08);
 			}
 			else
 				cas_data_i>>=1;
@@ -1256,14 +1247,12 @@ TIMER_DEVICE_CALLBACK_MEMBER(pc6001_state::cassette_callback)
 				m_cas_offset = 0;
 				m_cas_switch = 0;
 				if(IRQ_LOG) printf("Tape-E IRQ 0x12\n");
-				m_irq_vector = 0x12;
-				m_maincpu->set_input_line(0, ASSERT_LINE);
+				set_maincpu_irq_line(0x12);
 			}
 			else
 			{
 				if(IRQ_LOG) printf("Tape-D IRQ 0x08\n");
-				m_irq_vector = 0x08;
-				m_maincpu->set_input_line(0, ASSERT_LINE);
+				set_maincpu_irq_line(0x08);
 			}
 		#endif
 	}
@@ -1277,13 +1266,12 @@ TIMER_DEVICE_CALLBACK_MEMBER(pc6001_state::keyboard_callback)
 //  uint8_t p1_key = m_io_p1->read();
 
 	if(m_cas_switch == 0)
-	{
+	{	
 		if((key1 != m_old_key1) || (key2 != m_old_key2) || (key3 != m_old_key3))
 		{
 			m_cur_keycode = check_keyboard_press();
 			if(IRQ_LOG) printf("KEY IRQ 0x02\n");
-			m_irq_vector = 0x02;
-			m_maincpu->set_input_line(0, ASSERT_LINE);
+			set_maincpu_irq_line(0x02);
 			m_old_key1 = key1;
 			m_old_key2 = key2;
 			m_old_key3 = key3;
@@ -1293,10 +1281,7 @@ TIMER_DEVICE_CALLBACK_MEMBER(pc6001_state::keyboard_callback)
 		{
 			m_cur_keycode = check_joy_press();
 			if(m_cur_keycode)
-			{
-				m_irq_vector = 0x16;
-				m_maincpu->set_input_line(0, ASSERT_LINE);
-			}
+				set_maincpu_irq_line(0x16);
 		}
 		#endif
 	}
@@ -1304,18 +1289,18 @@ TIMER_DEVICE_CALLBACK_MEMBER(pc6001_state::keyboard_callback)
 
 void pc6001_state::machine_start()
 {
-	m_timer_hz_div = 3;
-	{
-		attotime period = attotime::from_hz((487.5*4)/(m_timer_hz_div+1));
-		m_timer_irq_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(pc6001_state::audio_callback),this));
-		m_timer_irq_timer->adjust(period,  0, period);
-	}
+	m_timer_irq_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(pc6001_state::audio_callback),this));
+}
+
+inline void pc6001_state::set_videoram_bank(uint32_t offs)
+{
+	m_video_ram = m_region_maincpu->base() + offs;
 }
 
 void pc6001_state::machine_reset()
 {
-	m_video_ram = m_region_maincpu->base() + 0xc000;
-
+	set_videoram_bank(0xc000);
+	
 	if (m_cart->exists())
 		m_maincpu->space(AS_PROGRAM).install_read_handler(0x4000, 0x5fff, read8_delegate(FUNC(generic_slot_device::read_rom),(generic_slot_device*)m_cart));
 
@@ -1329,25 +1314,21 @@ void pc6001_state::machine_reset()
 	m_cas_maxsize = (m_cas_hack->exists()) ? m_cas_hack->get_rom_size() : 0;
 	m_timer_irq_mask = 1;
 	m_timer_irq_mask2 = 1;
-	m_timer_irq_vector = 0x06; // actually vector is fixed in plain PC-6001
-	m_timer_hz_div = 3;
+	// timer irq vector is fixed in plain PC-6001
+	m_timer_irq_vector = 0x06; 
+	set_timer_divider(3);
 }
 
-MACHINE_RESET_MEMBER(pc6001mk2_state,pc6001mk2)
+void pc6001mk2_state::machine_reset()
 {
-	m_video_ram = m_region_maincpu->base() + 0xc000 + 0x28000;
+	pc6001_state::machine_reset();
+	set_videoram_bank(0xc000 + 0x28000);
 
 	std::string region_tag;
 	m_cart_rom = memregion(region_tag.assign(m_cart->tag()).append(GENERIC_ROM_REGION_TAG).c_str());
-	// hackish way to simplify bankswitch handling
+	// TODO: hackish way to simplify bankswitch handling
 	if (m_cart_rom)
 		memcpy(m_region_maincpu->base() + 0x48000, m_cart_rom->base(), 0x4000);
-
-	m_port_c_8255=0;
-
-	m_cas_switch = 0;
-	m_cas_offset = 0;
-	m_cas_maxsize = (m_cas_hack->exists()) ? m_cas_hack->get_rom_size() : 0;
 
 	/* set default bankswitch */
 	{
@@ -1367,24 +1348,17 @@ MACHINE_RESET_MEMBER(pc6001mk2_state,pc6001mk2)
 		m_gfx_bank_on = 0;
 	}
 
-	m_timer_irq_mask = 1;
-	m_timer_irq_mask2 = 1;
-	m_timer_irq_vector = 0x06;
+//	refresh_crtc_params();
 }
 
-MACHINE_RESET_MEMBER(pc6001sr_state,pc6001sr)
+void pc6001sr_state::machine_reset()
 {
-	m_video_ram = m_region_maincpu->base() + 0x70000;
+	pc6001_state::machine_reset();
+	set_videoram_bank(0x70000);
 
 	std::string region_tag;
 	m_cart_rom = memregion(region_tag.assign(m_cart->tag()).append(GENERIC_ROM_REGION_TAG).c_str());
 	// should this be mirrored into the EXROM regions? hard to tell without an actual cart dump...
-
-	m_port_c_8255=0;
-
-	m_cas_switch = 0;
-	m_cas_offset = 0;
-	m_cas_maxsize = (m_cas_hack->exists()) ? m_cas_hack->get_rom_size() : 0;
 
 	/* set default bankswitch */
 	{
@@ -1409,12 +1383,8 @@ MACHINE_RESET_MEMBER(pc6001sr_state,pc6001sr)
 		m_sr_bank_w[6] = 0x0c;
 		m_sr_bank_w[7] = 0x0e;
 
-		m_gfx_bank_on = 0;
+//		m_gfx_bank_on = 0;
 	}
-
-	m_timer_irq_mask = 1;
-	m_timer_irq_mask2 = 1;
-	m_timer_irq_vector = 0x06;
 }
 
 
@@ -1520,7 +1490,7 @@ MACHINE_CONFIG_DERIVED(pc6001mk2_state::pc6001mk2, pc6001)
 	MCFG_CPU_PROGRAM_MAP(pc6001mk2_map)
 	MCFG_CPU_IO_MAP(pc6001mk2_io)
 	
-	MCFG_MACHINE_RESET_OVERRIDE(pc6001mk2_state,pc6001mk2)
+//	MCFG_MACHINE_RESET_OVERRIDE(pc6001mk2_state,pc6001mk2)
 
 	MCFG_SCREEN_MODIFY("screen")
 	MCFG_SCREEN_UPDATE_DRIVER(pc6001mk2_state, screen_update_pc6001mk2)
@@ -1556,7 +1526,7 @@ MACHINE_CONFIG_DERIVED(pc6001sr_state::pc6001sr, pc6001mk2)
 	MCFG_CPU_VBLANK_INT_DRIVER("screen", pc6001sr_state,  sr_vrtc_irq)
 	MCFG_CPU_IRQ_ACKNOWLEDGE_DRIVER(pc6001_state, irq_callback)
 
-	MCFG_MACHINE_RESET_OVERRIDE(pc6001sr_state,pc6001sr)
+//	MCFG_MACHINE_RESET_OVERRIDE(pc6001sr_state,pc6001sr)
 
 	MCFG_SCREEN_MODIFY("screen")
 	MCFG_SCREEN_UPDATE_DRIVER(pc6001sr_state, screen_update_pc6001sr)

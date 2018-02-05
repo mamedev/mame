@@ -6,8 +6,6 @@
 #ifndef MAME_INCLUDES_PC6001_H
 #define MAME_INCLUDES_PC6001_H
 
-#include "emu.h"
-
 #include "cpu/z80/z80.h"
 #include "imagedev/cassette.h"
 #include "machine/i8251.h"
@@ -22,6 +20,7 @@
 #include "bus/generic/carts.h"
 
 #include "speaker.h"
+#include "screen.h"
 
 #include "formats/p6001_cas.h"
 
@@ -33,6 +32,7 @@ public:
 		m_ppi(*this, "ppi8255"),
 		m_ram(*this, "ram"),
 		m_maincpu(*this, "maincpu"),
+		m_screen(*this, "screen"),
 		m_cassette(*this, "cassette"),
 		m_cas_hack(*this, "cas_hack"),
 		m_cart(*this, "cartslot"),
@@ -73,6 +73,7 @@ protected:
 	required_device<i8255_device> m_ppi;
 	optional_shared_ptr<uint8_t> m_ram;
 	required_device<cpu_device> m_maincpu;
+	required_device<screen_device> m_screen;
 	optional_device<cassette_image_device> m_cassette;
 	optional_device<generic_slot_device> m_cas_hack;
 	required_device<generic_slot_device> m_cart;
@@ -99,6 +100,9 @@ protected:
 	uint8_t check_keyboard_press();
 	inline void cassette_latch_control(bool new_state);
 	inline void ppi_control_hack_w(uint8_t data);
+	inline void set_timer_divider(uint8_t data);
+	inline void set_videoram_bank(uint32_t offs);
+	inline void set_maincpu_irq_line(uint8_t vector_num);
 	
 	// video functions
 	void draw_gfx_mode4(bitmap_ind16 &bitmap,const rectangle &cliprect,int attr);
@@ -115,7 +119,6 @@ protected:
 	uint8_t m_sys_latch;
 	uint32_t m_cas_offset;
 	uint32_t m_cas_maxsize;
-	uint8_t m_gfx_bank_on;
 	uint8_t m_bank_opt;
 	uint8_t m_timer_irq_mask;
 	uint8_t m_timer_irq_mask2;
@@ -167,7 +170,6 @@ public:
 	DECLARE_WRITE8_MEMBER(mk2_timer_adj_w);
 	DECLARE_WRITE8_MEMBER(mk2_timer_irqv_w);
 
-	DECLARE_MACHINE_RESET(pc6001mk2);
 	DECLARE_PALETTE_INIT(pc6001mk2);
 	void pc6001mk2(machine_config &config);
 
@@ -175,6 +177,7 @@ public:
 
 protected:
 	uint8_t m_bgcol_bank;
+	uint8_t m_gfx_bank_on;
 	required_memory_bank m_bank2;
 	required_memory_bank m_bank3;
 	required_memory_bank m_bank4;
@@ -182,6 +185,9 @@ protected:
 	required_memory_bank m_bank6;
 	required_memory_bank m_bank7;
 	required_memory_bank m_bank8;
+	inline void refresh_crtc_params();
+	
+	virtual void machine_reset() override;
 	
 private:
 	uint8_t m_bank_r0;
@@ -240,7 +246,10 @@ public:
 	uint32_t screen_update_pc6001sr(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 
 	void pc6001sr(machine_config &config);
-	
+
+protected:	
+	virtual void machine_reset() override;
+
 private:
 	uint8_t m_sr_bank_r[8];
 	uint8_t m_sr_bank_w[8];
