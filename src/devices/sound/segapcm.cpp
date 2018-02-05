@@ -35,20 +35,12 @@ void segapcm_device::device_start()
 {
 	m_stream = stream_alloc(0, 2, clock() / 128);
 	
-	m_ram = make_unique_clear<uint8_t[]>(0x800);
+	m_ram = std::make_unique<uint8_t[]>(0x800);
+	
+	std::fill(&m_ram[0], &m_ram[0x800], 0xff);
 
 	save_item(NAME(m_low));
 	save_pointer(NAME(m_ram.get()), 0x800);
-}
-
-
-//-------------------------------------------------
-//  device_reset - device-specific reset
-//-------------------------------------------------
-
-void segapcm_device::device_reset()
-{
-	std::fill(&m_ram[0], &m_ram[0x800], 0xff);
 }
 
 
