@@ -49,9 +49,9 @@ do
 symlist
 -------
 
-|  **symlist [<CPU>]**
+|  **symlist [<cpu>]**
 | 
-| Lists registered symbols. If <CPU> is not specified, then symbols in the global symbol table are displayed; otherwise, the symbols for <CPU>'s specific CPU are displayed. Symbols are listed alphabetically. Read-only symbols are flagged with an asterisk.
+| Lists registered symbols. If <cpu> is not specified, then symbols in the global symbol table are displayed; otherwise, the symbols for <cpu>'s specific CPU are displayed. Symbols are listed alphabetically. Read-only symbols are flagged with an asterisk.
 |
 | Examples:
 |
@@ -223,7 +223,7 @@ tracesym
 trackpc
 -------
 
-|  **trackpc [<bool>,<CPU>,<bool>]**
+|  **trackpc [<bool>,<cpu>,<bool>]**
 |
 | The trackpc command displays which program counters have already been visited in all disassembler windows. The first boolean argument toggles the process on and off. The second argument is a CPU selector; if no CPU is specified, the current CPU is automatically selected. The third argument is a boolean denoting if the existing data should be cleared or not.
 |
@@ -245,7 +245,7 @@ trackpc
 trackmem
 --------
 
-|  **trackmem [<bool>,<CPU>,<bool>]**
+|  **trackmem [<bool>,<cpu>,<bool>]**
 |
 | The trackmem command logs the PC at each time a memory address is written to. The first boolean argument toggles the process on and off. The second argument is a CPU selector; if no CPU is specified, the current CPU is automatically selected. The third argument is a boolean denoting if the existing data should be cleared or not. Please refer to the pcatmem command for information on how to retrieve this data. Also, right clicking in a memory window will display the logged PC for the given address.
 |
@@ -267,11 +267,11 @@ trackmem
 pcatmem
 -------
 
-|  **pcatmem(p/d/i) <address>[,<CPU>]**
+|  **pcatmem(p/d/i) <address>[,<cpu>]**
 |
-| **pcatmemp <address>[,<CPU>]** -- query which PC wrote to a given program memory address for the current CPU
-| **pcatmemd <address>[,<CPU>]** -- query which PC wrote to a given data memory address for the current CPU
-| **pcatmemi <address>[,<CPU>]** -- query which PC wrote to a given I/O memory address for the current CPU (you can also query this info by right clicking in a memory window)
+| **pcatmemp <address>[,<cpu>]** -- query which PC wrote to a given program memory address for the current CPU
+| **pcatmemd <address>[,<cpu>]** -- query which PC wrote to a given data memory address for the current CPU
+| **pcatmemi <address>[,<cpu>]** -- query which PC wrote to a given I/O memory address for the current CPU (you can also query this info by right clicking in a memory window)
 |
 | The pcatmem command returns which PC wrote to a given memory address for the current CPU. The first argument is the requested address. The second argument is a CPU selector; if no CPU is specified, the current CPU is automatically selected. Right clicking in a memory window will also display the logged PC for the given address.
 |

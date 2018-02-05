@@ -18,7 +18,7 @@ You can also type **help <command>** for further details on each command in the 
 cheatinit
 ---------
 
-|  **cheatinit [<sign><width><swap>,[<address>,<length>[,<CPU>]]]**
+|  **cheatinit [<sign><width><swap>,[<address>,<length>[,<cpu>]]]**
 |
 | The cheatinit command initializes the cheat search to the selected memory area.
 |

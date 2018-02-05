@@ -14,9 +14,9 @@ You can also type **help <command>** for further details on each command in the 
 | :ref:`debugger-command-gtime` -- resumes execution until the given delay has elapsed
 | :ref:`debugger-command-gvblank` -- resumes execution, setting temp breakpoint on the next VBLANK (F8)
 | :ref:`debugger-command-next` -- executes until the next CPU switch (F6)
-| :ref:`debugger-command-focus` -- focuses debugger only on <CPU>
-| :ref:`debugger-command-ignore` -- stops debugging on <CPU>
-| :ref:`debugger-command-observe` -- resumes debugging on <CPU>
+| :ref:`debugger-command-focus` -- focuses debugger only on <cpu>
+| :ref:`debugger-command-ignore` -- stops debugging on <cpu>
+| :ref:`debugger-command-observe` -- resumes debugging on <cpu>
 | :ref:`debugger-command-trace` -- trace the given CPU to a file (defaults to active CPU)
 | :ref:`debugger-command-traceover` -- trace the given CPU to a file, but skip subroutines (defaults to active CPU)
 | :ref:`debugger-command-traceflush` -- flushes all open trace files.
@@ -185,9 +185,9 @@ next
 focus
 -----
 
-|  **focus <CPU>**
+|  **focus <cpu>**
 | 
-| Sets the debugger focus exclusively to the given <CPU>. This is equivalent to specifying 'ignore' on all other CPUs.
+| Sets the debugger focus exclusively to the given <cpu>. This is equivalent to specifying 'ignore' on all other CPUs.
 |
 | Example:
 |
@@ -203,9 +203,9 @@ focus
 ignore
 ------
 
-|  **ignore [<CPU>[,<CPU>[,...]]]**
+|  **ignore [<cpu>[,<cpu>[,...]]]**
 |
-| Ignores the specified <CPU> in the debugger. This means that you won't ever see execution on that CPU, nor will you be able to set breakpoints on that CPU. To undo this change use the 'observe' command. You can specify multiple <CPU>s in a single command. Note also that you are not permitted to ignore all CPUs; at least one must be active at all times.
+| Ignores the specified <cpu> in the debugger. This means that you won't ever see execution on that CPU, nor will you be able to set breakpoints on that CPU. To undo this change use the 'observe' command. You can specify multiple <cpu>s in a single command. Note also that you are not permitted to ignore all CPUs; at least one must be active at all times.
 |
 | Examples:
 |
@@ -229,9 +229,9 @@ ignore
 observe
 -------
 
-|  **observe [<CPU>[,<CPU>[,...]]]**
+|  **observe [<cpu>[,<cpu>[,...]]]**
 |
-| Re-enables interaction with the specified <CPU> in the debugger. This command undoes the effects of the 'ignore' command. You can specify multiple <CPU>s in a single command.
+| Re-enables interaction with the specified <cpu> in the debugger. This command undoes the effects of the 'ignore' command. You can specify multiple <cpu>s in a single command.
 |
 | Examples:
 |
@@ -255,9 +255,9 @@ observe
 trace
 -----
 
-|  **trace {<filename>|OFF}[,<CPU>[,[noloop|logerror][,<action>]]]**
+|  **trace {<filename>|OFF}[,<cpu>[,[noloop|logerror][,<action>]]]**
 |
-| Starts or stops tracing of the execution of the specified <CPU>. If <CPU> is omitted, the currently active CPU is specified. 
+| Starts or stops tracing of the execution of the specified <cpu>. If <cpu> is omitted, the currently active CPU is specified. 
 |
 | When enabling tracing, specify the filename in the <filename> parameter. To disable tracing, substitute the keyword 'off' for <filename>.
 |
@@ -310,14 +310,14 @@ trace
 traceover
 ---------
 
-|  **traceover {<filename>|OFF}[,<CPU>[,<detectloops>[,<action>]]]**
+|  **traceover {<filename>|OFF}[,<cpu>[,<detectloops>[,<action>]]]**
 |
-| Starts or stops tracing of the execution of the specified <CPU>.
+| Starts or stops tracing of the execution of the specified <cpu>.
 |
 | When tracing reaches a subroutine or call, tracing will skip over the subroutine. The same algorithm is used as is used in the step over command. This means that traceover will not work properly when calls are recursive or the return address is not immediately following the call instruction. 
 |
 | <detectloops> should be either true or false. If <detectloops> is *true or omitted*, the trace will have loops detected and condensed to a single line. If it is false, the trace will contain every opcode as it is executed. 
-| If <CPU> is omitted, the currently active CPU is specified.
+| If <cpu> is omitted, the currently active CPU is specified.
 | When enabling tracing, specify the filename in the <filename> parameter.
 | To disable tracing, substitute the keyword 'off' for <filename>.
 | If you wish to log additional information on each trace, you can append an <action> parameter which is a command that is executed before each trace is logged. Generally, this is used to include a 'tracelog' command. Note that you may need to embed the action within braces { } in order to prevent commas and semicolons from being interpreted as applying to the trace command itself.
