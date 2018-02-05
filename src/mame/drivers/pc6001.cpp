@@ -18,7 +18,7 @@
     - PC-6001SR: get it to boot, also implement MK-2 compatibility mode (it changes 
 	  the memory map to behave like the older versions)
     - Hookup MC6847 for vanilla PC-6001 and fix video bugs for that device;
-	- voice speech device doesn't work properly, is it even a uPD7752? 
+	- upd7752 voice speech device needs to be properly emulated (device is currently a skeleton),
 	  Chrith game is a good test case, it's supposed to talk before title screen;
 
     TODO (game specific):
