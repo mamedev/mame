@@ -2751,6 +2751,30 @@ ROM_START( sf2b )
 	ROM_RELOAD(            0x10000, 0x20000 )
 ROM_END
 
+// this PCB has stickers in Spanish. It's extremely similar to sf2b, but audiocpu ROM is identical to sf2mdt and 11.bin is slightly different.
+ROM_START( sf2b2 )
+	ROM_REGION( CODE_SIZE, "maincpu", 0 )      /* 68000 code */
+	ROM_LOAD16_BYTE( "2.bin",   0x000000, 0x80000, CRC(42809e5a) SHA1(ee91ecfce29bc50cf3f492ff646109c60bf65551) )
+	ROM_LOAD16_BYTE( "1.bin",   0x000001, 0x80000, CRC(e58db26c) SHA1(da1a4e063fa770257fd3df5fdb3785c1856511a5) )
+
+	ROM_REGION( 0x600000, "gfx", 0 ) /* rearranged in init */
+	ROMX_LOAD( "5.bin",    0x000000, 0x80000, CRC(47fab9ed) SHA1(1709becbe189b21f2c1920acef96f9412eb954e2) , ROM_GROUPWORD | ROM_SKIP(6) )
+	ROMX_LOAD( "8.bin",    0x000002, 0x80000, CRC(b8c39d56) SHA1(ee2939f42e95c926bdd88adf326eee02cba3f37a) , ROM_GROUPWORD | ROM_SKIP(6) )
+	ROMX_LOAD( "11.bin",   0x000004, 0x80000, CRC(6e8c98d8) SHA1(fbd7d788349fd418c48aedd906c40960e41c20f1) , ROM_GROUPWORD | ROM_SKIP(6) )
+	ROMX_LOAD( "14.bin",   0x000006, 0x80000, CRC(672d4f85) SHA1(511a8878d14d3fd39c9a22efb983550098ea8760) , ROM_GROUPWORD | ROM_SKIP(6) )
+	ROMX_LOAD( "4.bin",    0x200000, 0x80000, CRC(69d7b06b) SHA1(b428a0b5dfdee20d4d198673fe3b0147cad2d5bd) , ROM_GROUPWORD | ROM_SKIP(6) )
+	ROMX_LOAD( "7.bin",    0x200002, 0x80000, CRC(ded88f5f) SHA1(71c63fed5a15f6ce1df878dca7aa5d53868e68ee) , ROM_GROUPWORD | ROM_SKIP(6) )
+	ROMX_LOAD( "10.bin",   0x200004, 0x80000, CRC(8c2fca3c) SHA1(a84399e91dbf5790c3fe003385f6d9f4bc9d3366) , ROM_GROUPWORD | ROM_SKIP(6) )
+	ROMX_LOAD( "13.bin",   0x200006, 0x80000, CRC(26f09d38) SHA1(3babc4f502ea9e07f79306b1abc9c94f484f9cc1) , ROM_GROUPWORD | ROM_SKIP(6) )
+	ROMX_LOAD( "6.bin",    0x400000, 0x80000, CRC(b6215991) SHA1(5e20632e1a2d6eebe3b5d314cf2549bb74d7118e) , ROM_GROUPWORD | ROM_SKIP(6) )
+	ROMX_LOAD( "9.bin",    0x400002, 0x80000, CRC(b6a71ed7) SHA1(1850b4b4aa4b5cafc594b174322afefbdf215221) , ROM_GROUPWORD | ROM_SKIP(6) )
+	ROMX_LOAD( "12.bin",   0x400004, 0x80000, CRC(971903fa) SHA1(849ee7200815ef73f75456e656f061f1e852af59) , ROM_GROUPWORD | ROM_SKIP(6) )
+	ROMX_LOAD( "15.bin",   0x400006, 0x80000, CRC(00983914) SHA1(4ead6bbce6ca8c4cc884d55c1f821242d0e67fae) , ROM_GROUPWORD | ROM_SKIP(6) )
+
+	ROM_REGION( 0x30000, "audiocpu", 0 ) /* Sound program + samples  */
+	ROM_LOAD( "3.bin",    0x00000, 0x20000, CRC(17d5ba8a) SHA1(6ff3b8860d7e1fdee3561846f645eb4d3a8965ec) )
+	ROM_RELOAD(            0x10000, 0x20000 )
+ROM_END
 
 ROM_START( sf2m9 )
 	ROM_REGION( CODE_SIZE, "maincpu", 0 )      /* 68000 code */
@@ -3093,6 +3117,7 @@ GAME( 1992, sf2mdta,   sf2ce,    sf2mdt,    sf2mdt,   cps_state, sf2mdta,  ROT0,
 GAME( 1992, sf2mdtb,   sf2ce,    sf2mdt,    sf2mdtb,  cps_state, sf2mdtb,  ROT0,   "bootleg", "Street Fighter II': Magic Delta Turbo (bootleg, set 3)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE )   // 920313 - based on World version
 
 GAME( 1992, sf2b,      sf2,      sf2b,      sf2mdt,   cps_state, sf2b,     ROT0,   "bootleg", "Street Fighter II: The World Warrior (bootleg)",  MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE ) //910204 - based on World version
+GAME( 1992, sf2b2,     sf2,      sf2b,      sf2mdt,   cps_state, sf2mdtb,  ROT0,   "bootleg", "Street Fighter II: The World Warrior (bootleg, set 2)",  MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE ) //910204 - based on World version
 
 GAME( 1992, sf2m9,     sf2ce,    sf2m1,     sf2,      cps_state, sf2m1,    ROT0,   "bootleg", "Street Fighter II': Champion Edition (M9, bootleg)",  MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE ) // 920313 ETC
 
