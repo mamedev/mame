@@ -58,82 +58,56 @@ void ppu_vt03_device::set_new_pen(int i)
 			uint8_t blue  = (rgbval & 0xf00) >> 4;
 			m_palette->set_pen_color(i & 0x7f, rgb_t(red, green, blue));
 		} else {
-			// TODO: should this be tidied up?
+			// Credit to NewRisingSun
 			uint16_t palval = (m_newpal[i&0x7f] & 0x3f) | ((m_newpal[(i&0x7f)+0x80] & 0x3f)<<6);
-			
-			uint8_t rhue = palval & 0x0F;
-			uint8_t rlum = (palval >> 4) & 0x0F;
-			uint8_t rsat = (palval >> 8) & 0x0F;
-			//See http://wiki.nesdev.com/w/index.php/VT03%2B_Enhanced_Palette#Inverted_extended_color_numbers
-			bool inverted = (rlum < ((rsat + 1) >> 1) || rlum > (15 - (rsat >>1)));
-			if(inverted && (m_pal_mode != PAL_MODE_NEW_VG)) {
-				rsat = 16 - rsat;
-				rlum = (rlum - 8) & 0x0F;
-				uint8_t hue_lut[16] = {0xD, 0x7, 0x8, 0x9, 0xA, 0xB, 0xC, 0x1, 0x2, 0x3, 0x4, 0x5, 0x6, 0x0, 0xE, 0xF};
-				rhue = hue_lut[rhue];
+			int nPhase  = (palval >>0) &0xF;
+			int nLuma   = (palval >>4) &0xF;
+			int nChroma = (palval >>8) &0xF;
+			float phaseOffset = -11.0;
+			//bool inverted = false;
+			if ((nLuma < (nChroma+1) >>1 || nLuma > 15 -(nChroma >>1)) && (m_pal_mode != PAL_MODE_NEW_VG)) {
+				//inverted = true;
+				// Strange color number wrap-around. Is this for protection reasons, or a bug of the original hardware?
+				// The VT03 data sheet advises programmers that 4 <= nLuma*2 +nChroma <= 0x1F, which does not correspond exactly to this condition.
+				static const unsigned char altPhases[16] = {  13,  7,  8,  9, 10, 11, 12,  1,  2,  3,  4,  5,  6,  0, 14, 15};
+				static const float    altPhaseOffset[16] = {  -5, -5, -5, -5, -5, -5, -5, -5, -5, -5, -5, -5,  0, -5, -5, -5}; // Slight tweak in phase 6 for Z-Dog
+				phaseOffset += altPhaseOffset[nPhase]; // These "alternative" colors seem to be slightly shifted in addition to being wrapped-around, at least in EmuVT.
+				nPhase = altPhases[nPhase];
+				nChroma = 16 -nChroma;
+				nLuma = (nLuma -8) &0xF;
 			}
-			
-			// Get base color
-			double hue = 287.0;
-
-			double Kr = 0.2989;
-			double Kb = 0.1145;
-			double Ku = 2.029;
-			double Kv = 1.140;
-			
-			double sat;
-			double y, u, v;
-			double rad;
-			int R, G, B;
-			switch (rhue)
-			{
-			case 0:
-				sat = 0; rad = 0;
-				y = 1.0;
-				break;
-
-			case 13:
-				sat = 0; rad = 0;
-				y = 0.77;
-				break;
-
-			case 14:
-			case 15:
-				sat = 0; rad = 0; y = 0;
-				break;
-
-			default:
-				sat = (m_pal_mode == PAL_MODE_NEW_VG) ? 0.5 : 0.7;
-				rad = M_PI * ((rhue * 30 + hue) / 180.0);
-				y = (m_pal_mode == PAL_MODE_NEW_VG) ? 0.4 : 0.9;
-				break;
+			float fLuma   = (nLuma-4) /9.625;     // Value determined from matching saturation =0 phases 1-12
+			float fChroma = nChroma /18.975;      // Value determined from matching phases 0 and 13 across all luminance and saturation levels
+			float fPhase  = ((nPhase-2) *30.0 +phaseOffset) *M_PI /180.0;
+			if(m_pal_mode == PAL_MODE_NEW_VG) {
+				if(fPhase > 0 && fPhase < 13) {
+					fLuma /= 1.5;
+					fChroma /= 2;
+				}
 			}
+			float Y = fLuma;
+			float C = fChroma;
+			if (nPhase == 0 || nPhase >12) C =0.0;// Phases 0 and 13-15 are grays
+			if (nPhase == 0) Y += fChroma;        // Phase 0 is the upper bound of the waveform
+			if (nPhase ==13) Y -= fChroma;        // Phase 13 is the lower bound of the waveform
+			if (nPhase >=14) Y = 0.0;             // Phases 14 and 15 always black
 			
-			sat *= (rsat / 15.0);
-			y *= (rlum / 15.0);
-			u = sat * cos(rad);
-			v = sat * sin(rad);
-
-			/* Transform to RGB */
-			R = (y + Kv * v) * 255.0;
-			G = (y - (Kb * Ku * u + Kr * Kv * v) / (1 - Kb - Kr)) * 255.0;
-			B = (y + Ku * u) * 255.0;
-
-			/* Clipping, in case of saturation */
-			if (R < 0)
-				R = 0;
-			if (R > 255)
-				R = 255;
-			if (G < 0)
-				G = 0;
-			if (G > 255)
-				G = 255;
-			if (B < 0)
-				B = 0;
-			if (B > 255)
-				B = 255;
+			float V = sin(fPhase) *C *1.05; // 1.05 needed to get closer to EmuVT palette's color levels in phases 1-12
+			float U = cos(fPhase) *C *1.05;
+			float R = Y + 1.1400*V + 0.0000*U;
+			float G = Y - 0.5807*V - 0.3940*U;
+			float B = Y - 0.0000*V + 2.0290*U;
+			if (R <0.0) R =0.0;
+			if (R >1.0) R =1.0;
+			if (G <0.0) G =0.0;
+			if (G >1.0) G =1.0;
+			if (B <0.0) B =0.0;
+			if (B >1.0) B =1.0;
+			int RV = R *255.0;
+			int GV = G *255.0;
+			int BV = B *255.0;
 			
-			m_palette->set_pen_color(i & 0x7f, rgb_t(R, G ,B));
+			m_palette->set_pen_color(i & 0x7f, rgb_t(RV, GV ,BV));
 		}
 	}
 	

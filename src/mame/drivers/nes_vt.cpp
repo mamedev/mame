@@ -1140,7 +1140,7 @@ WRITE8_MEMBER(nes_vt_state::vt03_4034_w)
 }
 
 static ADDRESS_MAP_START( nes_vt_map, AS_PROGRAM, 8, nes_vt_state )
-	AM_RANGE(0x0000, 0x1fff) AM_MASK(0x07FF) AM_RAM
+	AM_RANGE(0x0000, 0x07ff) AM_RAM
 	AM_RANGE(0x2000, 0x3fff) AM_MASK(0x001F) AM_DEVREADWRITE("ppu", ppu2c0x_device, read, write)        /* PPU registers */
 
 	AM_RANGE(0x4000, 0x4013) AM_DEVREADWRITE("apu", nesapu_device, read, write)
@@ -1157,6 +1157,14 @@ static ADDRESS_MAP_START( nes_vt_map, AS_PROGRAM, 8, nes_vt_state )
 	AM_RANGE(0x8000, 0xffff) AM_WRITE(vt03_8000_w)
 	AM_RANGE(0x6000, 0x7fff) AM_RAM
 ADDRESS_MAP_END
+
+
+/* Some later VT models have more RAM */
+static ADDRESS_MAP_START( nes_vt_xx_map, AS_PROGRAM, 8, nes_vt_state )
+	AM_IMPORT_FROM(nes_vt_map)
+	AM_RANGE(0x0800, 0x0fff) AM_RAM
+ADDRESS_MAP_END
+
 
 static ADDRESS_MAP_START( nes_vt_hum_map, AS_PROGRAM, 8, nes_vt_state )
 AM_IMPORT_FROM(nes_vt_map)
@@ -1176,12 +1184,6 @@ AM_RANGE(0x4100, 0x410b) AM_WRITE(vt03_410x_sp69_w)
 AM_RANGE(0x8000, 0xffff) AM_WRITE(vt03_8000_sp69_w)
 ADDRESS_MAP_END
 
-
-/* Some later VT models have more RAM */
-static ADDRESS_MAP_START( nes_vt_xx_map, AS_PROGRAM, 8, nes_vt_state )
-	AM_IMPORT_FROM(nes_vt_map)
-	AM_RANGE(0x0800, 0x0fff) AM_RAM
-ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( nes_vt_cy_map, AS_PROGRAM, 8, nes_vt_state )
 	AM_IMPORT_FROM(nes_vt_xx_map)
