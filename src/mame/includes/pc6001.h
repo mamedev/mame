@@ -13,6 +13,7 @@
 #include "machine/timer.h"
 #include "sound/ay8910.h"
 #include "sound/upd7752.h"
+//#include "sound/2203intf.h"
 #include "sound/wave.h"
 #include "video/mc6847.h"
 
@@ -187,6 +188,7 @@ protected:
 	required_memory_bank m_bank8;
 	inline void refresh_crtc_params();
 	
+	virtual void video_start() override; 
 	virtual void machine_reset() override;
 	
 private:
@@ -219,9 +221,11 @@ class pc6001sr_state : public pc6601_state
 {
 public:
 	pc6001sr_state(const machine_config &mconfig, device_type type, const char *tag)
-		: pc6601_state(mconfig, type, tag)
+		: pc6601_state(mconfig, type, tag),
+		m_sr_irq_vectors(*this, "irq_vectors")
 	{};
 
+	DECLARE_READ8_MEMBER(hw_rev_r);
 	DECLARE_READ8_MEMBER(sr_bank_rn_r);
 	DECLARE_WRITE8_MEMBER(sr_bank_rn_w);
 	DECLARE_READ8_MEMBER(sr_bank_wn_r);
@@ -238,24 +242,40 @@ public:
 	DECLARE_WRITE8_MEMBER(sr_vram_bank_w);
 	DECLARE_WRITE8_MEMBER(sr_system_latch_w);
 	DECLARE_WRITE8_MEMBER(necsr_ppi8255_w);
-
+	DECLARE_WRITE8_MEMBER(sr_bitmap_yoffs_w);
+	DECLARE_WRITE8_MEMBER(sr_bitmap_xoffs_w);
+	
 	INTERRUPT_GEN_MEMBER(sr_vrtc_irq);
-
-	DECLARE_MACHINE_RESET(pc6001sr);
 
 	uint32_t screen_update_pc6001sr(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 
 	void pc6001sr(machine_config &config);
 
-protected:	
+protected:
+	virtual void video_start() override; 
 	virtual void machine_reset() override;
 
 private:
 	uint8_t m_sr_bank_r[8];
 	uint8_t m_sr_bank_w[8];
 	uint8_t m_kludge;
-	uint8_t m_sr_video_mode;
-
+	bool m_sr_text_mode;
+	uint8_t m_sr_text_rows;
+	uint8_t *m_gvram;
+	uint8_t m_bitmap_yoffs,m_bitmap_xoffs;
+	
+	enum{
+		SUB_CPU_IRQ = 0,
+		JOYSTICK_IRQ,
+		TIMER_IRQ,
+		VOICE_IRQ,
+		VRTC_IRQ,
+		RS232_IRQ,
+		PRINTER_IRQ,
+		EXT_IRQ
+	};
+	
+	required_shared_ptr<uint8_t> m_sr_irq_vectors;
 };
 
 #endif

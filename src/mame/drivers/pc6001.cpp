@@ -794,8 +794,8 @@ WRITE8_MEMBER(pc6001sr_state::sr_bank_rn_w)
 		case 0xf0: bank[offset]->set_base(&ROM[SR_SYSROM_1(bank_num)]); break;
 		case 0xe0: bank[offset]->set_base(&ROM[SR_SYSROM_2(bank_num)]); break;
 		case 0xd0: bank[offset]->set_base(&ROM[SR_CGROM1(bank_num)]); break;
-		case 0xc0: bank[offset]->set_base(&ROM[SR_EXROM0(bank_num)]); break;
-		case 0xb0: bank[offset]->set_base(&ROM[SR_EXROM1(bank_num)]); break;
+		case 0xc0: bank[offset]->set_base(&ROM[SR_EXROM1(bank_num)]); break;
+		case 0xb0: bank[offset]->set_base(&ROM[SR_EXROM0(bank_num)]); break;
 		case 0x20: bank[offset]->set_base(&ROM[SR_EXRAM0(bank_num)]); break;
 		case 0x00: bank[offset]->set_base(&ROM[SR_WRAM0(bank_num)]); break;
 		default:   bank[offset]->set_base(&ROM[SR_NULL(bank_num)]); break;
@@ -812,17 +812,41 @@ WRITE8_MEMBER(pc6001sr_state::sr_bank_wn_w)
 	m_sr_bank_w[offset] = data;
 }
 
+WRITE8_MEMBER(pc6001sr_state::sr_bitmap_yoffs_w)
+{
+	m_bitmap_yoffs = data;
+}
+
+WRITE8_MEMBER(pc6001sr_state::sr_bitmap_xoffs_w)
+{
+	m_bitmap_xoffs = data;
+}
+
 #define SR_WRAM_BANK_W(_v_) \
 { \
 	uint8_t *ROM = m_region_maincpu->base(); \
 	uint8_t bank_num; \
-	bank_num = m_sr_bank_w[_v_] & 0x0f; \
-	if((m_sr_bank_w[_v_] & 0xf0) != 0x20) \
+	bank_num = m_sr_bank_w[_v_] & 0x0e; \
+	if((m_sr_bank_w[_v_] & 0xf0) == 0x00) \
 		ROM[offset+(SR_WRAM0(bank_num))] = data; \
-	else \
+	else if((m_sr_bank_w[_v_] & 0xf0) == 0x20) \
 		ROM[offset+(SR_EXRAM0(bank_num))] = data; \
 }
-WRITE8_MEMBER(pc6001sr_state::sr_work_ram0_w){ SR_WRAM_BANK_W(0); }
+
+WRITE8_MEMBER(pc6001sr_state::sr_work_ram0_w)
+{
+	// TODO: not entirely correct
+	if(m_sr_text_mode == false && m_sr_bank_w[0] == 0)
+	{
+		uint32_t real_offs = (m_bitmap_xoffs*16+m_bitmap_yoffs)*256;
+		real_offs += offset;
+		
+		m_gvram[real_offs] = data;
+		return;
+	}
+
+	SR_WRAM_BANK_W(0); 
+}
 WRITE8_MEMBER(pc6001sr_state::sr_work_ram1_w){ SR_WRAM_BANK_W(1); }
 WRITE8_MEMBER(pc6001sr_state::sr_work_ram2_w){ SR_WRAM_BANK_W(2); }
 WRITE8_MEMBER(pc6001sr_state::sr_work_ram3_w){ SR_WRAM_BANK_W(3); }
@@ -833,8 +857,11 @@ WRITE8_MEMBER(pc6001sr_state::sr_work_ram7_w){ SR_WRAM_BANK_W(7); }
 
 WRITE8_MEMBER(pc6001sr_state::sr_mode_w)
 {
-	m_sr_video_mode = data;
-
+	// if 1 text mode else bitmap mode
+	m_sr_text_mode = bool(BIT(data,3));
+	m_sr_text_rows = data & 4 ? 20 : 25;
+	// bit 1: bus request
+	
 	if(data & 1)
 		assert("PC-6001SR in Mk-2 compatibility mode not yet supported!\n");
 }
@@ -875,6 +902,11 @@ WRITE8_MEMBER(pc6001sr_state::necsr_ppi8255_w)
 	m_ppi->write(space,offset,data);
 }
 
+READ8_MEMBER(pc6001sr_state::hw_rev_r)
+{
+	// bit 1 is active for pc6601sr, causes a direct jump to "video telopper" for pc6001mk2sr
+	return 0;
+}
 
 static ADDRESS_MAP_START(pc6001sr_map, AS_PROGRAM, 8, pc6001sr_state )
 	ADDRESS_MAP_UNMAP_HIGH
@@ -891,6 +923,7 @@ ADDRESS_MAP_END
 static ADDRESS_MAP_START( pc6001sr_io , AS_IO, 8, pc6001sr_state )
 	ADDRESS_MAP_UNMAP_HIGH
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
+//  0x40-0x43 palette indexes
 	AM_RANGE(0x60, 0x67) AM_READWRITE(sr_bank_rn_r, sr_bank_rn_w)
 	AM_RANGE(0x68, 0x6f) AM_READWRITE(sr_bank_wn_r, sr_bank_wn_w)
 	AM_RANGE(0x80, 0x80) AM_DEVREADWRITE("uart", i8251_device, data_r, data_w)
@@ -906,16 +939,19 @@ static ADDRESS_MAP_START( pc6001sr_io , AS_IO, 8, pc6001sr_state )
 	AM_RANGE(0xb0, 0xb0) AM_WRITE(sr_system_latch_w)
 	/* these are disk related */
 //  AM_RANGE(0xb1
-//  AM_RANGE(0xb2
+	AM_RANGE(0xb2, 0xb2) AM_READ(hw_rev_r)
 //  AM_RANGE(0xb3
 
+	AM_RANGE(0xb8, 0xbf) AM_RAM AM_SHARE("irq_vectors")
 //  AM_RANGE(0xc0, 0xc0) AM_WRITE(mk2_col_bank_w)
 //  AM_RANGE(0xc1, 0xc1) AM_WRITE(mk2_vram_bank_w)
 //  AM_RANGE(0xc2, 0xc2) AM_WRITE(opt_bank_w)
 
 	AM_RANGE(0xc8, 0xc8) AM_WRITE(sr_mode_w)
 	AM_RANGE(0xc9, 0xc9) AM_WRITE(sr_vram_bank_w)
-
+	AM_RANGE(0xce, 0xce) AM_WRITE(sr_bitmap_yoffs_w)
+	AM_RANGE(0xcf, 0xcf) AM_WRITE(sr_bitmap_xoffs_w)
+	
 	AM_RANGE(0xd0, 0xdf) AM_READWRITE(fdc_r,fdc_w) // disk device
 
 	AM_RANGE(0xe0, 0xe3) AM_MIRROR(0x0c) AM_DEVREADWRITE("upd7752", upd7752_device, read, write)
@@ -1088,17 +1124,25 @@ TIMER_CALLBACK_MEMBER(pc6001_state::audio_callback)
 INTERRUPT_GEN_MEMBER(pc6001_state::vrtc_irq)
 {
 	m_cur_keycode = check_joy_press();
-	if(IRQ_LOG) printf("VRTC IRQ called 0x16\n"); // was "stick" IRQ?
+	if(IRQ_LOG) printf("Joystick IRQ called 0x16\n");
 	set_maincpu_irq_line(0x16);
 }
 
 INTERRUPT_GEN_MEMBER(pc6001sr_state::sr_vrtc_irq)
 {
 	m_kludge ^= 1;
-
-	m_cur_keycode = check_joy_press();
-	if(IRQ_LOG) printf("VRTC IRQ called 0x16\n");
-	set_maincpu_irq_line((m_kludge) ? 0x22 : 0x16);
+	
+	// TODO: it is unclear who is responsible of the "Joystick IRQ" vs VRTC
+	if(m_kludge)
+	{
+		m_cur_keycode = check_joy_press();
+		if(IRQ_LOG) printf("Joystick IRQ called 0x16\n");
+		set_maincpu_irq_line(0x16);
+	}
+	else
+	{
+		set_maincpu_irq_line(m_sr_irq_vectors[VRTC_IRQ]);
+	}
 }
 
 IRQ_CALLBACK_MEMBER(pc6001_state::irq_callback)
@@ -1356,6 +1400,10 @@ void pc6001sr_state::machine_reset()
 	pc6001_state::machine_reset();
 	set_videoram_bank(0x70000);
 
+	// default to bitmap mode
+	m_sr_text_mode = false;
+	m_sr_text_rows = 20;
+
 	std::string region_tag;
 	m_cart_rom = memregion(region_tag.assign(m_cart->tag()).append(GENERIC_ROM_REGION_TAG).c_str());
 	// should this be mirrored into the EXROM regions? hard to tell without an actual cart dump...
@@ -1365,8 +1413,8 @@ void pc6001sr_state::machine_reset()
 		uint8_t *ROM = m_region_maincpu->base();
 		m_sr_bank_r[0] = 0xf8; m_bank1->set_base(&ROM[SR_SYSROM_1(0x08)]);
 		m_sr_bank_r[1] = 0xfa; m_bank2->set_base(&ROM[SR_SYSROM_1(0x0a)]);
-		m_sr_bank_r[2] = 0xb0; m_bank3->set_base(&ROM[SR_EXROM1(0x00)]);
-		m_sr_bank_r[3] = 0xc0; m_bank4->set_base(&ROM[SR_EXROM0(0x00)]);
+		m_sr_bank_r[2] = 0xc0; m_bank3->set_base(&ROM[SR_EXROM1(0x00)]);
+		m_sr_bank_r[3] = 0xb0; m_bank4->set_base(&ROM[SR_EXROM0(0x00)]);
 		m_sr_bank_r[4] = 0x08; m_bank5->set_base(&ROM[SR_WRAM0(0x08)]);
 		m_sr_bank_r[5] = 0x0a; m_bank6->set_base(&ROM[SR_WRAM0(0x0a)]);
 		m_sr_bank_r[6] = 0x0c; m_bank7->set_base(&ROM[SR_WRAM0(0x0c)]);
@@ -1627,4 +1675,4 @@ COMP( 1981, pc6001,   0,       0,     pc6001,    pc6001, pc6001_state,    0,    
 COMP( 1981, pc6001a,  pc6001,  0,     pc6001,    pc6001, pc6001_state,    0,      "NEC",   "PC-6001A (US)",         MACHINE_NOT_WORKING ) // This version is also known as the NEC Trek
 COMP( 1983, pc6001mk2,pc6001,  0,     pc6001mk2, pc6001, pc6001mk2_state, 0,      "NEC",   "PC-6001mkII (Japan)",   MACHINE_NOT_WORKING )
 COMP( 1983, pc6601,   pc6001,  0,     pc6601,    pc6001, pc6601_state,    0,      "NEC",   "PC-6601 (Japan)",       MACHINE_NOT_WORKING )
-COMP( 1984, pc6001sr, pc6001,  0,     pc6001sr,  pc6001, pc6001sr_state,    0,      "NEC",   "PC-6001mkIISR (Japan)", MACHINE_NOT_WORKING )
+COMP( 1984, pc6001sr, pc6001,  0,     pc6001sr,  pc6001, pc6001sr_state,  0,      "NEC",   "PC-6001mkIISR (Japan)", MACHINE_NOT_WORKING )
