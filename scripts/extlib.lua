@@ -17,6 +17,7 @@ local extlibs = {
 	lua        = { "lua",       "3rdparty/lua/src" },
 	utf8proc   = { "utf8proc",  "3rdparty/utf8proc" },
 	glm        = { "glm",       "3rdparty/glm" },
+	rapidjson  = { "rapidjson", "3rdparty/rapidjson/include" },
 }
 
 -- system lib options
@@ -73,6 +74,11 @@ newoption {
 newoption {
 	trigger = "with-system-glm",
 	description = "Use system glm library",
+}
+
+newoption {
+	trigger = "with-system-rapidjson",
+	description = "Use system rapidjson library",
 }
 
 -- build helpers

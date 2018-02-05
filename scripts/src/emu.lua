@@ -34,6 +34,7 @@ includedirs {
 	ext_includedir("zlib"),
 	ext_includedir("flac"),
 	ext_includedir("jpeg"),
+	ext_includedir("rapidjson"),
 }
 
 files {
