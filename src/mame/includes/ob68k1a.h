@@ -2,8 +2,8 @@
 // copyright-holders:Curt Coder
 #pragma once
 
-#ifndef __OB68K1A__
-#define __OB68K1A__
+#ifndef MAME_INCLUDES_OB68K1A_H
+#define MAME_INCLUDES_OB68K1A_H
 
 #include "bus/rs232/rs232.h"
 #include "cpu/m68000/m68000.h"

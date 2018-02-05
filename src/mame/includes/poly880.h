@@ -2,8 +2,8 @@
 // copyright-holders:Curt Coder
 #pragma once
 
-#ifndef __POLY880__
-#define __POLY880__
+#ifndef MAME_INCLUDES_POLY880_H
+#define MAME_INCLUDES_POLY880_H
 
 
 #include "cpu/z80/z80.h"

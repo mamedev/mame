@@ -2,8 +2,8 @@
 // copyright-holders:Curt Coder
 #pragma once
 
-#ifndef __VIP__
-#define __VIP__
+#ifndef MAME_INCLUDES_VIP_H
+#define MAME_INCLUDES_VIP_H
 
 #include "bus/vip/byteio.h"
 #include "bus/vip/exp.h"

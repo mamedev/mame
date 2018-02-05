@@ -2,8 +2,8 @@
 // copyright-holders:Curt Coder,Dirk Best
 #pragma once
 
-#ifndef __PX8__
-#define __PX8__
+#ifndef MAME_INCLUDES_PX8_H
+#define MAME_INCLUDES_PX8_H
 
 
 #include "cpu/z80/z80.h"

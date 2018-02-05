@@ -6,8 +6,8 @@
  *
  ****************************************************************************/
 
-#ifndef COMQUEST_H_
-#define COMQUEST_H_
+#ifndef MAME_INCLUDES_COMQUEST_H
+#define MAME_INCLUDES_COMQUEST_H
 
 
 class comquest_state : public driver_device
@@ -30,4 +30,4 @@ public:
 	void comquest(machine_config &config);
 };
 
-#endif /* COMQUEST_H_ */
+#endif // MAME_INCLUDES_COMQUEST_H

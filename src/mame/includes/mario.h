@@ -1,7 +1,8 @@
 // license:BSD-3-Clause
 // copyright-holders:Mirko Buffoni
-#ifndef MARIO_H_
-#define MARIO_H_
+
+#ifndef MAME_INCLUDES_MARIO_H
+#define MAME_INCLUDES_MARIO_H
 
 #include "machine/gen_latch.h"
 #include "machine/z80dma.h"
@@ -145,4 +146,4 @@ public:
 	void mario_audio(machine_config &config);
 };
 
-#endif /*MARIO_H_*/
+#endif // MAME_INCLUDES_MARIO_H

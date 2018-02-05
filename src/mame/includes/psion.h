@@ -8,8 +8,8 @@
 
 #pragma once
 
-#ifndef _PSION_H_
-#define _PSION_H_
+#ifndef MAME_INCLUDES_PSION_H
+#define MAME_INCLUDES_PSION_H
 
 #include "cpu/m6800/m6801.h"
 #include "machine/nvram.h"
@@ -110,4 +110,4 @@ public:
 	void psion1(machine_config &config);
 };
 
-#endif  // _PSION_H_
+#endif // MAME_INCLUDES_PSION_H

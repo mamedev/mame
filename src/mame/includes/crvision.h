@@ -1,9 +1,8 @@
 // license:BSD-3-Clause
 // copyright-holders:Wilbert Pol, Curt Coder
 
-#ifndef __CRVISION__
-#define __CRVISION__
-
+#ifndef MAME_INCLUDES_CRVISION_H
+#define MAME_INCLUDES_CRVISION_H
 
 #include "cpu/m6502/m6502.h"
 #include "imagedev/cassette.h"
@@ -114,4 +113,4 @@ protected:
 	virtual void machine_start() override;
 };
 
-#endif // __CRVISION__
+#endif // MAME_INCLUDES_CRVISION_H

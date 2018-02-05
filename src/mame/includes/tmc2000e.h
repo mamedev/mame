@@ -2,8 +2,8 @@
 // copyright-holders:Curt Coder
 #pragma once
 
-#ifndef __TMC2000E__
-#define __TMC2000E__
+#ifndef MAME_INCLUDES_TMC2000E_H
+#define MAME_INCLUDES_TMC2000E_H
 
 
 #include "cpu/cosmac/cosmac.h"

@@ -6,8 +6,8 @@
  *
  ****************************************************************************/
 
-#ifndef SSYSTEM3_H_
-#define SSYSTEM3_H_
+#ifndef MAME_INCLUDES_SSYSTEM3_H
+#define MAME_INCLUDES_SSYSTEM3_H
 
 #include "machine/6522via.h"
 
@@ -82,4 +82,4 @@ private:
 };
 
 
-#endif /* SSYSTEM3_H_ */
+#endif // MAME_INCLUDES_SSYSTEM3_H

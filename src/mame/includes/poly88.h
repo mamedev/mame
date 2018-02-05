@@ -6,8 +6,8 @@
  *
  ****************************************************************************/
 
-#ifndef POLY88_H_
-#define POLY88_H_
+#ifndef MAME_INCLUDES_POLY88_H
+#define MAME_INCLUDES_POLY88_H
 
 #include "machine/i8251.h"
 #include "imagedev/cassette.h"
@@ -84,4 +84,4 @@ protected:
 	int m_cas_tx;
 };
 
-#endif /* POLY88_H_ */
+#endif // MAME_INCLUDES_POLY88_H

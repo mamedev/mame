@@ -8,8 +8,8 @@
 
 #pragma once
 
-#ifndef _PC4_H_
-#define _PC4_H_
+#ifndef MAME_INCLUDES_PC4_H
+#define MAME_INCLUDES_PC4_H
 
 
 #include "sound/beep.h"
@@ -74,4 +74,4 @@ protected:
 	ioport_port *io_port[8];
 };
 
-#endif  // _PC4_H_
+#endif // MAME_INCLUDES_PC4_H

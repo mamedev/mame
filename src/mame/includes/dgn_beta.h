@@ -6,8 +6,8 @@
  *
  ****************************************************************************/
 
-#ifndef DGN_BETA_H_
-#define DGN_BETA_H_
+#ifndef MAME_INCLUDES_DGN_BETA_H
+#define MAME_INCLUDES_DGN_BETA_H
 
 #include "video/mc6845.h"
 #include "machine/wd_fdc.h"
@@ -238,4 +238,4 @@ private:
 	void execute_beta_dat_log(int ref, const std::vector<std::string> &params);
 };
 
-#endif /* DGN_BETA_H_ */
+#endif // MAME_INCLUDES_DGN_BETA_H

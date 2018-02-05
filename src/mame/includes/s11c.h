@@ -6,8 +6,8 @@
  *  Created on: 1/01/2013
  */
 
-#ifndef S11C_H_
-#define S11C_H_
+#ifndef MAME_INCLUDES_S11C_H
+#define MAME_INCLUDES_S11C_H
 
 #include "includes/s11b.h"
 
@@ -30,4 +30,4 @@ private:
 };
 
 
-#endif /* S11C_H_ */
+#endif // MAME_INCLUDES_S11C_H

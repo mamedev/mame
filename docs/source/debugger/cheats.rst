@@ -22,7 +22,7 @@ cheatinit
 |
 | The cheatinit command initializes the cheat search to the selected memory area.
 |
-| If no parameter is specified the cheat search is initialized to all changeable memory of the main cpu.
+| If no parameter is specified the cheat search is initialized to all changeable memory of the main CPU.
 |
 | <sign> can be s(signed) or u(unsigned)
 | <width> can be b(8 bit), w(16 bit), d(32 bit) or q(64 bit)

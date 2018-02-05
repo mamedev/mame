@@ -3573,7 +3573,13 @@ ROM_START( patocar )
 ROM_END
 
 ROM_START( sackids )
-	STV_BIOS
+//	STV_BIOS
+
+	// wants it's own specific bios, marked "CKBP1.13J0001024" at 0x800
+	// PC=06004150 is where it compares this
+	// it also looks like it has a specific I/O board for the lightpen
+	ROM_REGION32_BE( 0x080000, "bios", 0 ) /* SH2 code */
+	ROM_LOAD16_WORD_SWAP( "epr-20091.ic8",   0x000000, 0x080000, BAD_DUMP CRC(59ed40f4) SHA1(eff0f54c70bce05ff3a289bf30b1027e1c8cd117) )
 
 	ROM_REGION32_BE( 0x3000000, "cart", ROMREGION_ERASE00 ) /* SH2 code */
     ROM_LOAD16_WORD_SWAP( "ic22.bin",     0x0200000, 0x200000, CRC(4d9d1870) SHA1(c702964af2767b0db4ca1d6c7d07356e675d5efd) )
@@ -3585,8 +3591,7 @@ ROM_START( sackids )
     ROM_LOAD16_WORD_SWAP( "ic34.bin",     0x0e00000, 0x200000, CRC(0f3622c8) SHA1(69337114d6902675018371101f0fba01902de54a) )
     ROM_LOAD16_WORD_SWAP( "ic36.bin",     0x1000000, 0x200000, CRC(9a4109e5) SHA1(ba59caac5f5a80fc52c507d8a47f322a380aa9a1) ) // empty / FF filled
 	
-	ROM_REGION16_BE( 0x80, "eeprom", 0 ) // preconfigured to 1 player
-	ROM_LOAD( "sackids.nv", 0x0000, 0x0080,  CRC(93804bf5) SHA1(c3df2a9b60d6f8db83177f6d5e69756a7f0d4024) )
+	ROM_REGION32_BE( 0x3000000, "abus", ROMREGION_ERASE00 ) /* SH2 code */
 ROM_END
 
 

@@ -8,8 +8,8 @@
  *
  ****************************************************************************/
 
-#ifndef PCE_H_
-#define PCE_H_
+#ifndef MAME_INCLUDES_PCE_H
+#define MAME_INCLUDES_PCE_H
 
 #include "cdrom.h"
 #include "cpu/h6280/h6280.h"
@@ -82,4 +82,4 @@ public:
 	void sgx(machine_config &config);
 };
 
-#endif /* PCE_H_ */
+#endif // MAME_INCLUDES_PCE_H

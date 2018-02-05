@@ -1,7 +1,8 @@
 // license:BSD-3-Clause
 // copyright-holders:Ryan Holtz
-#ifndef _INCLUDES_CDI_H_
-#define _INCLUDES_CDI_H_
+
+#ifndef MAME_INCLUDES_CDI_H
+#define MAME_INCLUDES_CDI_H
 
 #include "machine/cdi070.h"
 #include "machine/cdislave.h"
@@ -139,4 +140,4 @@ public:
 
 #define ENABLE_UART_PRINTING (0)
 
-#endif // _INCLUDES_CDI_H_
+#endif // MAME_INCLUDES_CDI_H

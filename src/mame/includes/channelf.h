@@ -6,8 +6,8 @@
  *
  ****************************************************************************/
 
-#ifndef CHANNELF_H_
-#define CHANNELF_H_
+#ifndef MAME_INCLUDES_CHANNELF_H
+#define MAME_INCLUDES_CHANNELF_H
 
 #include "cpu/f8/f8.h"
 #include "audio/channelf.h"
@@ -55,4 +55,4 @@ public:
 	void channlf2(machine_config &config);
 };
 
-#endif /* CHANNELF_H_ */
+#endif // MAME_INCLUDES_CHANNELF_H

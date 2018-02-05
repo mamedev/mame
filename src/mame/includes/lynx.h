@@ -6,8 +6,8 @@
  *
  ****************************************************************************/
 
-#ifndef LYNX_H_
-#define LYNX_H_
+#ifndef MAME_INCLUDES_LYNX_H
+#define MAME_INCLUDES_LYNX_H
 
 #include "audio/lynx.h"
 #include "imagedev/snapquik.h"
@@ -293,4 +293,4 @@ protected:
 #define SCB_STRETCH 0x0F    //  L H H/V Size Adder
 #define SCB_TILT        0x11    //  L,H H Position Adder
 
-#endif /* LYNX_H_ */
+#endif // MAME_INCLUDES_LYNX_H

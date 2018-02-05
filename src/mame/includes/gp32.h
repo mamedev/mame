@@ -1,7 +1,8 @@
 // license:BSD-3-Clause
 // copyright-holders:Tim Schuerewegen
-#ifndef _GP32_H_
-#define _GP32_H_
+
+#ifndef MAME_INCLUDES_GP32_H
+#define MAME_INCLUDES_GP32_H
 
 #include "machine/smartmed.h"
 #include "sound/dac.h"

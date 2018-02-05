@@ -6,8 +6,8 @@
  *
  ****************************************************************************/
 
-#ifndef SORCERER_H_
-#define SORCERER_H_
+#ifndef MAME_INCLUDES_SORCERER_H
+#define MAME_INCLUDES_SORCERER_H
 
 #include "cpu/z80/z80.h"
 #include "sound/wave.h"
@@ -111,4 +111,4 @@ private:
 	required_ioport_array<16> m_iop_x;
 };
 
-#endif /* SORCERER_H_ */
+#endif // MAME_INCLUDES_SORCERER_H

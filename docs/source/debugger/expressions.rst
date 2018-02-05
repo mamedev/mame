@@ -42,7 +42,7 @@ Differences from C Behaviors
 
   - Similarly, **w@** and **w!** refer to a *word* in memory, **d@** and **d!** refer to a *dword* in memory, and **q@** and **q!** refer to a *qword* in memory.
 
-    The memory operators can be used as both lvalues and rvalues, so you can write b\@100 = ff to store a byte in memory. By default these operators read from the program memory space, but you can override that by prefixing them with a 'd' or an 'i'.
+    The memory operators can be used as both lvalues and rvalues, so you can write **b\@100 = ff** to store a byte in memory. By default these operators read from the program memory space, but you can override that by prefixing them with a 'd' or an 'i'.
 
     As such, **dw\@300** refers to data memory word at address 300 and **id\@400** refers to an I/O memory dword at address 400.
 

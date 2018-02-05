@@ -6,8 +6,8 @@
  *
  ****************************************************************************/
 
-#ifndef NC_H_
-#define NC_H_
+#ifndef MAME_INCLUDES_NC_H
+#define MAME_INCLUDES_NC_H
 
 #include "bus/centronics/ctronics.h"
 #include "machine/i8251.h"
@@ -150,5 +150,4 @@ public: // HACK FOR MC6845
 };
 
 
-
-#endif /* NC_H_ */
+#endif // MAME_INCLUDES_NC_H

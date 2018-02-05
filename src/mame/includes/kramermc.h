@@ -6,8 +6,8 @@
  *
  ****************************************************************************/
 
-#ifndef KRAMERMC_H_
-#define KRAMERMC_H_
+#ifndef MAME_INCLUDES_KRAMERMC_H
+#define MAME_INCLUDES_KRAMERMC_H
 
 #include "machine/z80pio.h"
 
@@ -39,4 +39,4 @@ public:
 extern const gfx_layout kramermc_charlayout;
 
 
-#endif /* KRAMERMC_h_ */
+#endif // MAME_INCLUDES_KRAMERMC_H

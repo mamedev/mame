@@ -2,8 +2,8 @@
 // copyright-holders:Mike Balfour, Ben Bruscella, Sean Young
 #pragma once
 
-#ifndef __COLECO__
-#define __COLECO__
+#ifndef MAME_INCLUDES_COLECO_H
+#define MAME_INCLUDES_COLECO_H
 
 
 #include "cpu/z80/z80.h"

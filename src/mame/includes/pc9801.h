@@ -3,8 +3,8 @@
 
 #pragma once
 
-#ifndef __PC9801__
-#define __PC9801__
+#ifndef MAME_INCLUDES_PC9801_H
+#define MAME_INCLUDES_PC9801_H
 
 #include "cpu/i386/i386.h"
 #include "cpu/i86/i286.h"

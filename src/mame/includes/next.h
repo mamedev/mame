@@ -2,8 +2,8 @@
 // copyright-holders:Olivier Galibert
 #pragma once
 
-#ifndef __NEXT__
-#define __NEXT__
+#ifndef MAME_INCLUDES_NEXT_H
+#define MAME_INCLUDES_NEXT_H
 
 #include "cpu/m68000/m68000.h"
 #include "machine/nscsi_bus.h"

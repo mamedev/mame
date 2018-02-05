@@ -1,7 +1,8 @@
 // license:BSD-3-Clause
 // copyright-holders:Curt Coder
-#ifndef __HUEBLER__
-#define __HUEBLER__
+
+#ifndef MAME_INCLUDES_HUEBLER_H
+#define MAME_INCLUDES_HUEBLER_H
 
 #define SCREEN_TAG      "screen"
 #define Z80_TAG         "z80"

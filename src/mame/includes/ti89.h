@@ -6,8 +6,8 @@
  *
  ****************************************************************************/
 
-#ifndef TI89_H_
-#define TI89_H_
+#ifndef MAME_INCLUDES_TI89_H
+#define MAME_INCLUDES_TI89_H
 
 #include "machine/intelfsh.h"
 #include "machine/timer.h"
@@ -92,4 +92,4 @@ public:
 	void ti89t(machine_config &config);
 };
 
-#endif // TI89_H_
+#endif // MAME_INCLUDES_TI89_H

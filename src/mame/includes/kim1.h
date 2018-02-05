@@ -8,8 +8,8 @@
 
 #pragma once
 
-#ifndef __KIM1__
-#define __KIM1__
+#ifndef MAME_INCLUDES_KIM1_H
+#define MAME_INCLUDES_KIM1_H
 
 #include "softlist.h"
 #include "cpu/m6502/m6502.h"
@@ -65,4 +65,4 @@ protected:
 	required_ioport m_special;
 };
 
-#endif /* KIM1_H */
+#endif // MAME_INCLUDES_KIM1_H

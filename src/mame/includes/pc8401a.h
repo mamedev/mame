@@ -2,8 +2,8 @@
 // copyright-holders:Curt Coder
 #pragma once
 
-#ifndef __PC8401A__
-#define __PC8401A__
+#ifndef MAME_INCLUDES_PC8401A_H
+#define MAME_INCLUDES_PC8401A_H
 
 
 #include "cpu/z80/z80.h"

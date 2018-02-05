@@ -1,7 +1,8 @@
 // license:BSD-3-Clause
 // copyright-holders:Curt Coder
-#ifndef __BW12__
-#define __BW12__
+
+#ifndef MAME_INCLUDES_BW12_H
+#define MAME_INCLUDES_BW12_H
 
 #include "cpu/z80/z80.h"
 #include "machine/ram.h"

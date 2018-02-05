@@ -2,8 +2,8 @@
 // copyright-holders:Miodrag Milanovic, Robbbert
 #pragma once
 
-#ifndef __VCS80__
-#define __VCS80__
+#ifndef MAME_INCLUDES_VCS80_H
+#define MAME_INCLUDES_VCS80_H
 
 
 #include "cpu/z80/z80.h"
