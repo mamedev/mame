@@ -6,8 +6,8 @@
  *  Created on: 1/01/2013
  */
 
-#ifndef S11_H_
-#define S11_H_
+#ifndef MAME_INCLUDES_S11_H
+#define MAME_INCLUDES_S11_H
 
 #include "audio/s11c_bg.h"
 #include "machine/6821pia.h"

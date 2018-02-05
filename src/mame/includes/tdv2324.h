@@ -2,8 +2,8 @@
 // copyright-holders:Curt Coder,Jonathan Gevaryahu
 #pragma once
 
-#ifndef __TDV2324__
-#define __TDV2324__
+#ifndef MAME_INCLUDES_TDV2324_H
+#define MAME_INCLUDES_TDV2324_H
 
 
 #include "cpu/i8085/i8085.h"

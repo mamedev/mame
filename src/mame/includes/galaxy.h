@@ -5,9 +5,9 @@
  * includes/galaxy.h
  *
  ****************************************************************************/
-
-#ifndef GALAXY_H_
-#define GALAXY_H_
+ 
+#ifndef MAME_INCLUDES_GALAXY_H
+#define MAME_INCLUDES_GALAXY_H
 
 #include "imagedev/snapquik.h"
 #include "imagedev/cassette.h"

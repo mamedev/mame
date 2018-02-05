@@ -6,8 +6,8 @@
  *
  ****************************************************************************/
 
-#ifndef PMD85_H_
-#define PMD85_H_
+#ifndef MAME_INCLUDES_PMD85_H
+#define MAME_INCLUDES_PMD85_H
 
 #include "machine/i8251.h"
 #include "machine/pit8253.h"

@@ -14,8 +14,8 @@
  *
  ******************************************************************************/
 
-#ifndef MICROTAN_H_
-#define MICROTAN_H_
+#ifndef MAME_INCLUDES_MICROTAN_H
+#define MAME_INCLUDES_MICROTAN_H
 
 #include "imagedev/snapquik.h"
 #include "machine/6522via.h"

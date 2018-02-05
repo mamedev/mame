@@ -2,8 +2,8 @@
 // copyright-holders:Curt Coder
 #pragma once
 
-#ifndef __VIDBRAIN__
-#define __VIDBRAIN__
+#ifndef MAME_INCLUDES_VIDBRAIN_H
+#define MAME_INCLUDES_VIDBRAIN_H
 
 #include "bus/vidbrain/exp.h"
 #include "cpu/f8/f8.h"

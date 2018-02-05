@@ -8,8 +8,8 @@
 
 #pragma once
 
-#ifndef _PES_H_
-#define _PES_H_
+#ifndef MAME_INCLUDES_PES_H
+#define MAME_INCLUDES_PES_H
 
 #include "machine/terminal.h"
 #include "sound/tms5220.h"

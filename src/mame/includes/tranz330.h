@@ -1,7 +1,8 @@
 // license:BSD-3-Clause
 // copyright-holders:Ryan Holtz
-#ifndef VERIFONE_TRANZ330_H
-#define VERIFONE_TRANZ330_H
+
+#ifndef MAME_INCLUDES_TRANZ330_H
+#define MAME_INCLUDES_TRANZ330_H
 
 #pragma once
 

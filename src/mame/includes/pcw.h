@@ -6,8 +6,8 @@
  *
  ****************************************************************************/
 
-#ifndef PCW_H_
-#define PCW_H_
+#ifndef MAME_INCLUDES_PCW_H
+#define MAME_INCLUDES_PCW_H
 
 #include "machine/upd765.h"
 #include "machine/ram.h"

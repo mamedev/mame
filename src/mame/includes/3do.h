@@ -6,8 +6,8 @@
  *
  ****************************************************************************/
 
-#ifndef _3DO_H_
-#define _3DO_H_
+#ifndef MAME_INCLUDES_3DO_H
+#define MAME_INCLUDES_3DO_H
 
 #include "machine/nvram.h"
 #include "machine/timer.h"

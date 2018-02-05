@@ -6,8 +6,8 @@
  *
  ****************************************************************************/
 
-#ifndef VECTREX_H_
-#define VECTREX_H_
+#ifndef MAME_INCLUDES_VECTREX_H
+#define MAME_INCLUDES_VECTREX_H
 
 #include "machine/6522via.h"
 #include "sound/dac.h"

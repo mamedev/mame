@@ -2,8 +2,8 @@
 // copyright-holders:Curt Coder
 #pragma once
 
-#ifndef __NEWBRAIN__
-#define __NEWBRAIN__
+#ifndef MAME_INCLUDES_NEWBRAIN_H
+#define MAME_INCLUDES_NEWBRAIN_H
 
 
 #include "bus/newbrain/exp.h"

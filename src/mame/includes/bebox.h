@@ -8,8 +8,8 @@
  *
  ****************************************************************************/
 
-#ifndef BEBOX_H_
-#define BEBOX_H_
+#ifndef MAME_INCLUDES_BEBOX_H
+#define MAME_INCLUDES_BEBOX_H
 
 #include "machine/53c810.h"
 #include "machine/am9517a.h"

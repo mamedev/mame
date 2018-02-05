@@ -1,8 +1,8 @@
 // license:BSD-3-Clause
 // copyright-holders:Farfetch'd, David Haywood
 
-#ifndef __GSTRIKER_H
-#define __GSTRIKER_H
+#ifndef MAME_INCLUDES_GSTRIKER_H
+#define MAME_INCLUDES_GSTRIKER_H
 
 #include "machine/6850acia.h"
 #include "machine/gen_latch.h"

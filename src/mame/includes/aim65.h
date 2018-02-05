@@ -8,8 +8,8 @@
  *
  ****************************************************************************/
 
-#ifndef AIM65_H_
-#define AIM65_H_
+#ifndef MAME_INCLUDES_AIM65_H
+#define MAME_INCLUDES_AIM65_H
 
 #include "cpu/m6502/m6502.h"
 #include "video/dl1416.h"

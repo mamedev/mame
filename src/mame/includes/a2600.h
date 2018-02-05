@@ -8,8 +8,8 @@
 
  ****************************************************************************/
 
-#ifndef MAME_INCLUDES_A2600H
-#define MAME_INCLUDES_A2600H
+#ifndef MAME_INCLUDES_A2600_H
+#define MAME_INCLUDES_A2600_H
 
 #pragma once
 

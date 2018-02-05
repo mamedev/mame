@@ -6,8 +6,8 @@
  *
  ****************************************************************************/
 
-#ifndef MIKRO80_H_
-#define MIKRO80_H_
+#ifndef MAME_INCLUDES_MIKRO80_H
+#define MAME_INCLUDES_MIKRO80_H
 
 #include "machine/i8255.h"
 #include "imagedev/cassette.h"

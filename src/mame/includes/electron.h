@@ -10,8 +10,8 @@
  *
  ****************************************************************************/
 
-#ifndef ELECTRON_H_
-#define ELECTRON_H_
+#ifndef MAME_INCLUDES_ELECTRON_H
+#define MAME_INCLUDES_ELECTRON_H
 
 #include "machine/ram.h"
 #include "imagedev/cassette.h"

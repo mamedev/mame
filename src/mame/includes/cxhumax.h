@@ -1,7 +1,8 @@
 // license:BSD-3-Clause
 // copyright-holders:Lukasz Markowski
-#ifndef CXHUMAX_H_
-#define CXHUMAX_H_
+
+#ifndef MAME_INCLUDES_CXHUMAX_H
+#define MAME_INCLUDES_CXHUMAX_H
 
 #include "cpu/arm7/arm7.h"
 #include "cpu/arm7/arm7core.h"

@@ -2,8 +2,8 @@
 // copyright-holders:Curt Coder
 #pragma once
 
-#ifndef __MIKROMIKKO__
-#define __MIKROMIKKO__
+#ifndef MAME_INCLUDES_MIKROMIKKO_H
+#define MAME_INCLUDES_MIKROMIKKO_H
 
 #include "bus/rs232/rs232.h"
 #include "cpu/i8085/i8085.h"

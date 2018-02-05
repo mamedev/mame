@@ -6,8 +6,8 @@
 
 ***************************************************************************/
 
-#ifndef __KANEKO16_H__
-#define __KANEKO16_H__
+#ifndef MAME_INCLUDES_KANEKO16_H
+#define MAME_INCLUDES_KANEKO16_H
 
 #include "machine/gen_latch.h"
 #include "machine/nvram.h"

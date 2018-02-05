@@ -9,8 +9,8 @@
 
 #pragma once
 
-#ifndef DRIVERS_NOVAGBASE_H
-#define DRIVERS_NOVAGBASE_H
+#ifndef MAME_INCLUDES_NOVAGBASE_H
+#define MAME_INCLUDES_NOVAGBASE_H
 
 #include "machine/timer.h"
 #include "sound/dac.h"

@@ -6,8 +6,8 @@
  *
  ****************************************************************************/
 
-#ifndef AC1_H_
-#define AC1_H_
+#ifndef MAME_INCLUDES_AC1_H
+#define MAME_INCLUDES_AC1_H
 
 #include "machine/z80pio.h"
 #include "imagedev/cassette.h"

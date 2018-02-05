@@ -2,8 +2,8 @@
 // copyright-holders:Curt Coder
 #pragma once
 
-#ifndef __ABC800__
-#define __ABC800__
+#ifndef MAME_INCLUDES_ABC800_H
+#define MAME_INCLUDES_ABC800_H
 
 #include "bus/abcbus/abcbus.h"
 #include "bus/rs232/rs232.h"

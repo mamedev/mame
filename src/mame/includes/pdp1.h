@@ -6,8 +6,8 @@
  *
  ****************************************************************************/
 
-#ifndef PDP1_H_
-#define PDP1_H_
+#ifndef MAME_INCLUDES_PDP1_H
+#define MAME_INCLUDES_PDP1_H
 
 #include "cpu/pdp1/pdp1.h"
 #include "video/crt.h"

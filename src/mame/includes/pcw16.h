@@ -6,8 +6,8 @@
  *
  ****************************************************************************/
 
-#ifndef PCW16_H_
-#define PCW16_H_
+#ifndef MAME_INCLUDES_PCW16_H
+#define MAME_INCLUDES_PCW16_H
 
 #include "cpu/z80/z80.h"
 #include "machine/upd765.h"     /* FDC superio */

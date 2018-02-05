@@ -6,8 +6,8 @@
  *
  ****************************************************************************/
 
-#ifndef __SPECPLS3_H__
-#define __SPECPLS3_H__
+#ifndef MAME_INCLUDES_SPECPLS3_H
+#define MAME_INCLUDES_SPECPLS3_H
 
 INPUT_PORTS_EXTERN( spec_plus );
 

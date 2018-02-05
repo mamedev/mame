@@ -6,8 +6,8 @@
  *
  ****************************************************************************/
 
-#ifndef KRAMERMC_H_
-#define KRAMERMC_H_
+#ifndef MAME_INCLUDES_KRAMERMC_H
+#define MAME_INCLUDES_KRAMERMC_H
 
 #include "machine/z80pio.h"
 

@@ -6,8 +6,8 @@
  *
  ****************************************************************************/
 
-#ifndef TX0_H_
-#define TX0_H_
+#ifndef MAME_INCLUDES_TX0_H
+#define MAME_INCLUDES_TX0_H
 
 #include "video/crt.h"
 #include "cpu/pdp1/tx0.h"

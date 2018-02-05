@@ -6,8 +6,8 @@
 
 *************************************************************************/
 
-#ifndef __MTX__
-#define __MTX__
+#ifndef MAME_INCLUDES_MTX_H
+#define MAME_INCLUDES_MTX_H
 
 #include "imagedev/snapquik.h"
 #include "imagedev/cassette.h"

@@ -6,8 +6,8 @@
  *
  ****************************************************************************/
 
-#ifndef LYNX_H_
-#define LYNX_H_
+#ifndef MAME_INCLUDES_LYNX_H
+#define MAME_INCLUDES_LYNX_H
 
 #include "audio/lynx.h"
 #include "imagedev/snapquik.h"

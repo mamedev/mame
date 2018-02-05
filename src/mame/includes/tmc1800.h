@@ -2,8 +2,8 @@
 // copyright-holders:Curt Coder
 #pragma once
 
-#ifndef __TMC1800__
-#define __TMC1800__
+#ifndef MAME_INCLUDES_TMC1800_H
+#define MAME_INCLUDES_TMC1800_H
 
 
 #include "cpu/cosmac/cosmac.h"

@@ -6,8 +6,8 @@
  *
  ****************************************************************************/
 
-#ifndef TI89_H_
-#define TI89_H_
+#ifndef MAME_INCLUDES_TI89_H
+#define MAME_INCLUDES_TI89_H
 
 #include "machine/intelfsh.h"
 #include "machine/timer.h"

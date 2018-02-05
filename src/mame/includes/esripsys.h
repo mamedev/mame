@@ -6,8 +6,8 @@
 
 *************************************************************************/
 
-#ifndef _ESRIPSYS_H_
-#define _ESRIPSYS_H_
+#ifndef MAME_INCLUDES_ESRIPSYS_H
+#define MAME_INCLUDES_ESRIPSYS_H
 
 #pragma once
 

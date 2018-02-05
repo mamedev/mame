@@ -6,8 +6,8 @@
  *
  ****************************************************************************/
 
-#ifndef UT88_H_
-#define UT88_H_
+#ifndef MAME_INCLUDES_UT88_H
+#define MAME_INCLUDES_UT88_H
 
 #include "cpu/i8085/i8085.h"
 #include "sound/dac.h"

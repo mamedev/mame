@@ -10,8 +10,8 @@
  *
  ****************************************************************************/
 
-#ifndef GAMECOM_H_
-#define GAMECOM_H_
+#ifndef MAME_INCLUDES_GAMECOM_H
+#define MAME_INCLUDES_GAMECOM_H
 
 #include "cpu/sm8500/sm8500.h"
 #include "sound/dac.h"

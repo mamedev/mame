@@ -6,8 +6,8 @@
  *
  ****************************************************************************/
 
-#ifndef __MSX_H__
-#define __MSX_H__
+#ifndef MAME_INCLUDES_MSX_H
+#define MAME_INCLUDES_MSX_H
 
 #include "cpu/z80/z80.h"
 #include "machine/i8255.h"

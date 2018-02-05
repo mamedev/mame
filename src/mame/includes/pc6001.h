@@ -3,8 +3,8 @@
 
 #pragma once
 
-#ifndef __PC6001__
-#define __PC6001__
+#ifndef MAME_INCLUDES_PC6001_H
+#define MAME_INCLUDES_PC6001_H
 
 #include "emu.h"
 

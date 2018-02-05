@@ -6,8 +6,8 @@
  *
  *****************************************************************************/
 
-#ifndef _ARCHIMEDES_H_
-#define _ARCHIMEDES_H_
+#ifndef MAME_INCLUDES_ARCHIMEDES_H
+#define MAME_INCLUDES_ARCHIMEDES_H
 
 #include "machine/aakart.h"
 #include "sound/dac.h"

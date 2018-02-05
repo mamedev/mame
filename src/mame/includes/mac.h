@@ -8,8 +8,8 @@
  *
  ****************************************************************************/
 
-#ifndef MAC_H_
-#define MAC_H_
+#ifndef MAME_INCLUDES_MAC_H
+#define MAME_INCLUDES_MAC_H
 
 #include "machine/8530scc.h"
 #include "machine/6522via.h"

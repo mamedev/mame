@@ -6,8 +6,8 @@
  *
  ****************************************************************************/
 
-#ifndef DGN_BETA_H_
-#define DGN_BETA_H_
+#ifndef MAME_INCLUDES_DGN_BETA_H
+#define MAME_INCLUDES_DGN_BETA_H
 
 #include "video/mc6845.h"
 #include "machine/wd_fdc.h"

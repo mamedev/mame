@@ -2,8 +2,8 @@
 // copyright-holders:Curt Coder
 #pragma once
 
-#ifndef __TMC600__
-#define __TMC600__
+#ifndef MAME_INCLUDES_TMC600_H
+#define MAME_INCLUDES_TMC600_H
 
 #include "cpu/cosmac/cosmac.h"
 #include "imagedev/cassette.h"

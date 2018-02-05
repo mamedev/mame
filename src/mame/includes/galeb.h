@@ -6,8 +6,8 @@
  *
  ****************************************************************************/
 
-#ifndef GALEB_H_
-#define GALEB_H_
+#ifndef MAME_INCLUDES_GALEB_H
+#define MAME_INCLUDES_GALEB_H
 
 #include "sound/dac.h"
 

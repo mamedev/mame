@@ -5,8 +5,8 @@
  *
  */
 
-#ifndef WPC_FLIP1_H_
-#define WPC_FLIP1_H_
+#ifndef MAME_INCLUDES_WPC_FLIP1_H
+#define MAME_INCLUDES_WPC_FLIP1_H
 
 #include "includes/wpc_dot.h"
 

@@ -6,8 +6,8 @@
  *
  ****************************************************************************/
 
-#ifndef AMSTRAD_H_
-#define AMSTRAD_H_
+#ifndef MAME_INCLUDES_AMSTRAD_H
+#define MAME_INCLUDES_AMSTRAD_H
 
 #include "cpu/z80/z80.h"
 #include "sound/ay8910.h"

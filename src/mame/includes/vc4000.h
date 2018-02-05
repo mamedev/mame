@@ -7,8 +7,8 @@
  *
  ****************************************************************************/
 
-#ifndef VC4000_H_
-#define VC4000_H_
+#ifndef MAME_INCLUDES_VC4000_H
+#define MAME_INCLUDES_VC4000_H
 
 #include "audio/vc4000.h"
 #include "cpu/s2650/s2650.h"

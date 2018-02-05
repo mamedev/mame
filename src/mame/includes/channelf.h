@@ -6,8 +6,8 @@
  *
  ****************************************************************************/
 
-#ifndef CHANNELF_H_
-#define CHANNELF_H_
+#ifndef MAME_INCLUDES_CHANNELF_H
+#define MAME_INCLUDES_CHANNELF_H
 
 #include "cpu/f8/f8.h"
 #include "audio/channelf.h"

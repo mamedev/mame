@@ -6,8 +6,8 @@
  *
  ****************************************************************************/
 
-#ifndef SVISION_H_
-#define SVISION_H_
+#ifndef MAME_INCLUDES_SVISION_H
+#define MAME_INCLUDES_SVISION_H
 
 #include "cpu/m6502/m65c02.h"
 #include "machine/timer.h"

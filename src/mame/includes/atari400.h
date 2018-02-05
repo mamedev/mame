@@ -11,8 +11,8 @@
 
 ******************************************************************************/
 
-#ifndef ATARI_H
-#define ATARI_H
+#ifndef MAME_INCLUDES_ATARI_H
+#define MAME_INCLUDES_ATARI_H
 
 #include "machine/6821pia.h"
 #include "sound/pokey.h"

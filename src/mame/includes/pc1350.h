@@ -8,8 +8,8 @@
  *
  ****************************************************************************/
 
-#ifndef PC1350_H_
-#define PC1350_H_
+#ifndef MAME_INCLUDES_PC1350_H
+#define MAME_INCLUDES_PC1350_H
 
 #include "pocketc.h"
 #include "cpu/sc61860/sc61860.h"

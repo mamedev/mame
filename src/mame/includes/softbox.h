@@ -2,8 +2,8 @@
 // copyright-holders:Curt Coder, Mike Naberezny
 #pragma once
 
-#ifndef __SOFTBOX__
-#define __SOFTBOX__
+#ifndef MAME_INCLUDES_SOFTBOX_H
+#define MAME_INCLUDES_SOFTBOX_H
 
 #include "bus/ieee488/ieee488.h"
 #include "bus/imi7000/imi7000.h"

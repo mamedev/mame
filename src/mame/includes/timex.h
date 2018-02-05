@@ -6,8 +6,8 @@
  *
  ****************************************************************************/
 
-#ifndef __TIMEX_H__
-#define __TIMEX_H__
+#ifndef MAME_INCLUDES_TIMEX_H
+#define MAME_INCLUDES_TIMEX_H
 
 /* Border sizes for TS2068. These are guesses based on the number of cycles
    available per frame. */

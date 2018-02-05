@@ -2,8 +2,8 @@
 // copyright-holders:F. Ulivi
 // Driver for Intel Intellec MDS series-II
 
-#ifndef _IMDS2_H_
-#define _IMDS2_H_
+#ifndef MAME_INCLUDES_IMDS2_H
+#define MAME_INCLUDES_IMDS2_H
 
 #include "cpu/i8085/i8085.h"
 #include "cpu/mcs48/mcs48.h"

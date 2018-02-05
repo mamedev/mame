@@ -1,7 +1,8 @@
 // license:BSD-3-Clause
 // copyright-holders:Angelo Salese, R. Belmont, Anthony Kruize, Fabio Priuli, Ryan Holtz
-#ifndef _SNES_H_
-#define _SNES_H_
+
+#ifndef MAME_INCLUDES_SNES_H
+#define MAME_INCLUDES_SNES_H
 
 #include "cpu/spc700/spc700.h"
 #include "cpu/g65816/g65816.h"

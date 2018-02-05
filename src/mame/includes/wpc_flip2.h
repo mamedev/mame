@@ -5,8 +5,8 @@
  *
  */
 
-#ifndef WPC_FLIP2_H_
-#define WPC_FLIP2_H_
+#ifndef MAME_INCLUDES_WPC_FLIP2_H
+#define MAME_INCLUDES_WPC_FLIP2_H
 
 #include "includes/wpc_flip1.h"
 
