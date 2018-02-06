@@ -97,6 +97,16 @@ protected:
 	virtual void video_start() override;
 
 private:
+	uint8_t m_xavix_7981_data;
+	uint8_t m_xavix_7982_data;
+	uint8_t m_xavix_7983_data;
+
+	uint8_t m_xavix_7984_data;
+	uint8_t m_xavix_7985_data;
+
+	uint8_t m_xavix_7986_data;
+	uint8_t m_xavix_7987_data;
+
 };
 
 void xavix_state::video_start()
@@ -117,36 +127,49 @@ WRITE8_MEMBER(xavix_state::xavix_7980_w)
 WRITE8_MEMBER(xavix_state::xavix_7981_w)
 {
 	logerror("%s: xavix_7981_w %02x (79xx unk triplet byte 1)\n", machine().describe_context(), data);
+	m_xavix_7981_data = data;
 }
 
 WRITE8_MEMBER(xavix_state::xavix_7982_w)
 {
 	logerror("%s: xavix_7982_w %02x (79xx unk triplet byte 2)\n", machine().describe_context(), data);
+	m_xavix_7982_data = data;
 }
 
 WRITE8_MEMBER(xavix_state::xavix_7983_w)
 {
 	logerror("%s: xavix_7983_w %02x (79xx unk triplet byte 3)\n", machine().describe_context(), data);
+	m_xavix_7983_data = data;
+	// this would mean Taito Nostalgia relies on mirroring tho, as it has the high bits set... so could just be wrong
+	logerror("  (possible DMA ROM source of %02x%02x%02x)\n", m_xavix_7983_data, m_xavix_7982_data, m_xavix_7981_data);
 }
 
 WRITE8_MEMBER(xavix_state::xavix_7984_w)
 {
 	logerror("%s: xavix_7984_w %02x (79xx unk pair 1 byte 1)\n", machine().describe_context(), data);
+	m_xavix_7984_data = data;
 }
 
 WRITE8_MEMBER(xavix_state::xavix_7985_w)
 {
-	logerror("%s: xavix_7984_w %02x (79xx unk pair 1 byte 2)\n", machine().describe_context(), data);
+	logerror("%s: xavix_7985_w %02x (79xx unk pair 1 byte 2)\n", machine().describe_context(), data);
+	m_xavix_7985_data = data;
+
+	logerror("  (possible DMA dest of %02x%02x)\n", m_xavix_7985_data, m_xavix_7984_data);
 }
 
 WRITE8_MEMBER(xavix_state::xavix_7986_w)
 {
 	logerror("%s: xavix_7986_w %02x (79xx unk pair 2 byte 1)\n", machine().describe_context(), data);
+	m_xavix_7986_data = data;
 }
 
 WRITE8_MEMBER(xavix_state::xavix_7987_w)
 {
 	logerror("%s: xavix_7987_w %02x (79xx unk pair 2 byte 2)\n", machine().describe_context(), data);
+	m_xavix_7987_data = data;
+
+	logerror("  (possible DMA len of %02x%02x)\n", m_xavix_7987_data, m_xavix_7986_data);
 }
 
 READ8_MEMBER(xavix_state::xavix_7980_r)
@@ -334,6 +357,15 @@ void xavix_state::machine_start()
 
 void xavix_state::machine_reset()
 {
+	m_xavix_7981_data = 0;
+	m_xavix_7982_data = 0;
+	m_xavix_7983_data = 0;
+
+	m_xavix_7984_data = 0;
+	m_xavix_7985_data = 0;
+
+	m_xavix_7986_data = 0;
+	m_xavix_7987_data = 0;
 }
 
 
