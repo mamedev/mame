@@ -68,12 +68,35 @@ public:
 	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 
 	void xavix(machine_config &config);
+
+	DECLARE_WRITE8_MEMBER(xavix_7900_w);
+
+	DECLARE_WRITE8_MEMBER(xavix_7980_w);
+	DECLARE_WRITE8_MEMBER(xavix_7981_w);
+	DECLARE_WRITE8_MEMBER(xavix_7982_w);
+	DECLARE_WRITE8_MEMBER(xavix_7983_w);
+	DECLARE_WRITE8_MEMBER(xavix_7984_w);
+	DECLARE_WRITE8_MEMBER(xavix_7985_w);
+	DECLARE_WRITE8_MEMBER(xavix_7986_w);
+	DECLARE_WRITE8_MEMBER(xavix_7987_w);
+	DECLARE_READ8_MEMBER(xavix_7980_r);
+
+
+	DECLARE_WRITE8_MEMBER(xavix_7ff9_w);
+	DECLARE_WRITE8_MEMBER(xavix_7ffa_w);
+	DECLARE_WRITE8_MEMBER(xavix_7ffb_w);
+	DECLARE_WRITE8_MEMBER(xavix_7ffe_w);
+	DECLARE_WRITE8_MEMBER(xavix_7fff_w);
+
+
 protected:
 	// driver_device overrides
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
 
 	virtual void video_start() override;
+
+private:
 };
 
 void xavix_state::video_start()
@@ -85,8 +108,150 @@ uint32_t xavix_state::screen_update( screen_device &screen, bitmap_ind16 &bitmap
 	return 0;
 }
 
+
+WRITE8_MEMBER(xavix_state::xavix_7980_w)
+{
+	logerror("%s: xavix_7980_w %02x (79xx unk trigger for 7981-7987?)\n", machine().describe_context(), data);
+}
+
+WRITE8_MEMBER(xavix_state::xavix_7981_w)
+{
+	logerror("%s: xavix_7981_w %02x (79xx unk triplet byte 1)\n", machine().describe_context(), data);
+}
+
+WRITE8_MEMBER(xavix_state::xavix_7982_w)
+{
+	logerror("%s: xavix_7982_w %02x (79xx unk triplet byte 2)\n", machine().describe_context(), data);
+}
+
+WRITE8_MEMBER(xavix_state::xavix_7983_w)
+{
+	logerror("%s: xavix_7983_w %02x (79xx unk triplet byte 3)\n", machine().describe_context(), data);
+}
+
+WRITE8_MEMBER(xavix_state::xavix_7984_w)
+{
+	logerror("%s: xavix_7984_w %02x (79xx unk pair 1 byte 1)\n", machine().describe_context(), data);
+}
+
+WRITE8_MEMBER(xavix_state::xavix_7985_w)
+{
+	logerror("%s: xavix_7984_w %02x (79xx unk pair 1 byte 2)\n", machine().describe_context(), data);
+}
+
+WRITE8_MEMBER(xavix_state::xavix_7986_w)
+{
+	logerror("%s: xavix_7986_w %02x (79xx unk pair 2 byte 1)\n", machine().describe_context(), data);
+}
+
+WRITE8_MEMBER(xavix_state::xavix_7987_w)
+{
+	logerror("%s: xavix_7987_w %02x (79xx unk pair 2 byte 2)\n", machine().describe_context(), data);
+}
+
+READ8_MEMBER(xavix_state::xavix_7980_r)
+{
+	logerror("%s: xavix_7980_r (79xx unk operation status?)\n", machine().describe_context());
+	return 0x00;
+}
+
+
+
+WRITE8_MEMBER(xavix_state::xavix_7ff9_w)
+{
+	logerror("%s: xavix_7ff9_w %02x (trigger for 7ffx region?)\n", machine().describe_context(), data);
+}
+
+WRITE8_MEMBER(xavix_state::xavix_7ffa_w)
+{
+	logerror("%s: xavix_7ffa_w %02x (7ffx pair 1, byte 1?)\n", machine().describe_context(), data);
+}
+
+WRITE8_MEMBER(xavix_state::xavix_7ffb_w)
+{
+	logerror("%s: xavix_7ffb_w %02x (7ffx pair 1, byte 2?)\n", machine().describe_context(), data);
+}
+
+WRITE8_MEMBER(xavix_state::xavix_7ffe_w)
+{
+	logerror("%s: xavix_7ffe_w %02x (7ffx pair 2, byte 1?)\n", machine().describe_context(), data);
+}
+
+WRITE8_MEMBER(xavix_state::xavix_7fff_w)
+{
+	logerror("%s: xavix_7fff_w %02x (7ffx pair 2, byte 2?)\n", machine().describe_context(), data);
+}
+
+
+WRITE8_MEMBER(xavix_state::xavix_7900_w)
+{
+	logerror("%s: xavix_7900_w %02x (---FIRST WRITE ON STARTUP---)\n", machine().describe_context(), data);
+}
+
+
+
+
 static ADDRESS_MAP_START( xavix_map, AS_PROGRAM, 8, xavix_state )
 	AM_RANGE(0x000000, 0x0001ff) AM_RAM
+	AM_RANGE(0x000200, 0x003fff) AM_RAM // ends up jumping to code here? must be a DMA?
+
+	AM_RANGE(0x006200, 0x0062ff) AM_RAM // cleared to 0x80
+
+	AM_RANGE(0x006900, 0x006900) AM_WRITENOP // startup (taitons1)
+
+	AM_RANGE(0x006fc0, 0x006fc0) AM_WRITENOP // startup
+
+	AM_RANGE(0x006fd8, 0x006fd8) AM_WRITENOP // startup (taitons1)
+
+	AM_RANGE(0x006fe9, 0x006fe9) AM_WRITENOP // startup
+
+	AM_RANGE(0x006ff1, 0x006ff1) AM_WRITENOP // startup (taitons1)
+
+	AM_RANGE(0x006ff8, 0x006ff8) AM_READNOP AM_WRITENOP // startup
+
+	// taitons1 after 75f7/75f8
+	//AM_RANGE(0x0075f6, 0x0075f6) AM_WRITE(xavix_75f6_w)
+	// taitons1 written as a pair
+	//AM_RANGE(0x0075f7, 0x0075f7) AM_WRITE(xavix_75f7_w)
+	//AM_RANGE(0x0075f8, 0x0075f8) AM_WRITE(xavix_75f8_w)
+	// taitons1 written after 75f6, then read
+	//AM_RANGE(0x0075f9, 0x0075f9) AM_READWRITE(xavix_75f9_r, xavix_75f9_w)
+	// taitons1 written other 75xx operations
+	//AM_RANGE(0x0075ff, 0x0075ff) AM_WRITE(xavix_75ff_w)
+
+	AM_RANGE(0x007810, 0x007810) AM_WRITENOP // startup
+
+	AM_RANGE(0x007900, 0x007900) AM_WRITE(xavix_7900_w) // startup
+	AM_RANGE(0x007902, 0x007902) AM_WRITENOP // startup
+
+	// possible trigger for below (written after the others) waits on status of bit 1 in a loop
+	AM_RANGE(0x007980, 0x007980) AM_READWRITE(xavix_7980_r, xavix_7980_w)
+	// seem to be a triplet?
+	AM_RANGE(0x007981, 0x007981) AM_WRITE(xavix_7981_w)
+	AM_RANGE(0x007982, 0x007982) AM_WRITE(xavix_7982_w)
+	AM_RANGE(0x007983, 0x007983) AM_WRITE(xavix_7983_w)
+	// seem to be a pair
+	AM_RANGE(0x007984, 0x007984) AM_WRITE(xavix_7984_w)
+	AM_RANGE(0x007985, 0x007985) AM_WRITE(xavix_7985_w)
+	// seem to be a pair
+	AM_RANGE(0x007986, 0x007986) AM_WRITE(xavix_7986_w)
+	AM_RANGE(0x007987, 0x007987) AM_WRITE(xavix_7987_w)
+
+	AM_RANGE(0x007a00, 0x007a00) AM_READNOP // startup (taitons1)
+	AM_RANGE(0x007a01, 0x007a01) AM_READNOP // startup (taitons1)
+
+	AM_RANGE(0x007a03, 0x007a03) AM_READNOP AM_WRITENOP // startup
+
+	// again possible trigger for below, written after them
+	AM_RANGE(0x007ff9, 0x007ff9) AM_WRITE(xavix_7ff9_w)
+	// also seems to be a pair
+	AM_RANGE(0x007ffa, 0x007ffa) AM_WRITE(xavix_7ffa_w)
+	AM_RANGE(0x007ffb, 0x007ffb) AM_WRITE(xavix_7ffb_w)
+
+	// also seems to be a pair
+	AM_RANGE(0x007ffe, 0x007ffe) AM_WRITE(xavix_7ffe_w)
+	AM_RANGE(0x007fff, 0x007fff) AM_WRITE(xavix_7fff_w)
+
 	AM_RANGE(0x008000, 0x1fffff) AM_ROM AM_REGION("bios", 0x008000)
 ADDRESS_MAP_END
 
@@ -209,6 +374,11 @@ ROM_START( taitons1 )
 	ROM_LOAD( "taitonostalgia1.u3", 0x000000, 0x200000, CRC(25bd8c67) SHA1(a109cd2da6aa4596e3ca3abd1afce2d0001a473f) )
 ROM_END
 
+ROM_START( rad_ping )
+	ROM_REGION( 0x200000, "bios", ROMREGION_ERASE00 )
+	ROM_LOAD( "pingpong.bin", 0x000000, 0x100000, CRC(629f7f47) SHA1(2bb19fd202f1e6c319d2f7d18adbfed8a7669235) )
+ROM_END
+
 ROM_START( xavtenni )
 	ROM_REGION( 0x800000, "bios", ROMREGION_ERASE00 )
 	ROM_LOAD( "xavixtennis.bin", 0x000000, 0x800000, CRC(23a1d918) SHA1(2241c59e8ea8328013e55952ebf9060ea0a4675b) )
@@ -217,14 +387,23 @@ ROM_END
 /* The 'XaviXPORT' isn't a real console, more of a TV adapter, all the actual hardware (CPU including video hw, sound hw) is in the cartridges and controllers
    and can vary between games, see notes at top of driver.
 
-   XaviX Tennis should be a standard XaviX CPU, but at the very least makes significantly more use of custom opcodes than Taito Nostalgia 1 which only appears
-   to use the call far / return far for extended memory space.  It also seems to require some regular 6502 opcodes to be replaced with custom ones, yet Taito
-   Nostalgia appears to use them in their normal form; either there's some kind of mode switch, or XaviX Tennis is a different CPU type.
+   According to sources XaviX Tennis should be a standard XaviX CPU, but at the very least makes significantly more use of custom opcodes than Taito Nostalgia
+   and Radica Ping Pong which only appears to use the call far / return far for extended memory space.
    
+   Furthermore it also seems to require some regular 6502 opcodes to be replaced with custom ones, yet the other games expect these to act normally.  This
+   leads me to believe that XaviX Tennis is more likely to be a Super XaviX title.
+
    The CPU die on XaviX Tennis is internally marked as NEC 85054-611
 
 */
 CONS( 2004, xavtenni,  0,   0,  xavix,  xavix, xavix_state, 0, "SSD Company LTD", "XaviX Tennis (XaviXPORT)", MACHINE_IS_SKELETON )
 
-// standalone TV games
+/* Standalone TV Games 
+
+  These all have jumps to the 3xxx region, which appears to be RAM (or possibly a banked space?) hopefully it's just missing some kind of DMA transfer and
+  isn't some additional internal ROM.
+
+*/
 CONS( 2006, taitons1,  0,   0,  xavix,  xavix, xavix_state, 0, "Bandai / SSD Company LTD / Taito", "Let's! TV Play Classic - Taito Nostalgia 1", MACHINE_IS_SKELETON )
+
+CONS( 2000, rad_ping,  0,   0,  xavix,  xavix, xavix_state, 0, "Radica / SSD Company LTD / Simmer Technology", "Play TV Ping Pong", MACHINE_IS_SKELETON ) // "Simmer Technology" is also known as "Hummer Technology Co., Ltd"
