@@ -617,6 +617,7 @@ selz80.cpp
 sg1000.cpp
 sh4robot.cpp
 sitcom.cpp
+sk1.cpp
 slc1.cpp
 slicer.cpp
 sm1800.cpp
