@@ -122,6 +122,25 @@ uint32_t xavix_state::screen_update( screen_device &screen, bitmap_ind16 &bitmap
 WRITE8_MEMBER(xavix_state::xavix_7980_w)
 {
 	logerror("%s: xavix_7980_w %02x (79xx unk trigger for 7981-7987?)\n", machine().describe_context(), data);
+
+	uint32_t source = (m_xavix_7983_data << 16) | (m_xavix_7982_data<<8) | m_xavix_7981_data;
+	uint16_t dest = (m_xavix_7985_data<<8) | m_xavix_7984_data;
+	uint16_t len = (m_xavix_7987_data<<8) | m_xavix_7986_data;
+
+	// TODO: don't do tag lookups here once satisfied this is correct
+	const uint32_t rgnlen = memregion("bios")->bytes();
+	uint8_t *rgn = memregion("bios")->base();
+	
+	source &= rgnlen-1;
+	logerror("  (possible DMA op SRC %08x DST %04x LEN %04x)\n", source, dest, len);
+
+	address_space& destspace = m_maincpu->space(AS_PROGRAM);
+
+	for (int i = 0; i < len; i++)
+	{
+		uint8_t dat = rgn[(source + i) & (rgnlen-1)];
+		destspace.write_byte(dest + i, dat);
+	}
 }
 
 WRITE8_MEMBER(xavix_state::xavix_7981_w)
