@@ -2130,6 +2130,32 @@ ADDRESS_MAP_END
 
 #define VIDEO_CLOCK         XTAL(32'000'000)
 
+MACHINE_CONFIG_START(model2_state::model2_timers)
+	MCFG_TIMER_DRIVER_ADD("timer0", model2_state, model2_timer_cb)
+	MCFG_TIMER_PTR((uintptr_t)0)
+	MCFG_TIMER_DRIVER_ADD("timer1", model2_state, model2_timer_cb)
+	MCFG_TIMER_PTR((uintptr_t)1)
+	MCFG_TIMER_DRIVER_ADD("timer2", model2_state, model2_timer_cb)
+	MCFG_TIMER_PTR((uintptr_t)2)
+	MCFG_TIMER_DRIVER_ADD("timer3", model2_state, model2_timer_cb)
+	MCFG_TIMER_PTR((uintptr_t)3)
+MACHINE_CONFIG_END
+
+MACHINE_CONFIG_START(model2_state::model2_screen)
+	MCFG_S24TILE_DEVICE_ADD("tile", 0x3fff)
+	MCFG_S24TILE_DEVICE_PALETTE("palette")
+
+	MCFG_SCREEN_ADD("screen", RASTER)
+	MCFG_SCREEN_VIDEO_ATTRIBUTES(VIDEO_UPDATE_AFTER_VBLANK)
+	// TODO: from System 24, might not be accurate for Model 2
+	MCFG_SCREEN_RAW_PARAMS(VIDEO_CLOCK/2, 656, 0/*+69*/, 496/*+69*/, 424, 0/*+25*/, 384/*+25*/)
+	MCFG_SCREEN_UPDATE_DRIVER(model2_state, screen_update_model2)
+	
+	MCFG_PALETTE_ADD("palette", 8192)
+	
+	MCFG_VIDEO_START_OVERRIDE(model2_state,model2)
+MACHINE_CONFIG_END
+
 /* original Model 2 */
 MACHINE_CONFIG_START(model2_state::model2o)
 	MCFG_CPU_ADD("maincpu", I960, 25000000)
@@ -2150,26 +2176,8 @@ MACHINE_CONFIG_START(model2_state::model2o)
 	MCFG_NVRAM_ADD_1FILL("backup1")
 	MCFG_NVRAM_ADD_1FILL("backup2")
 
-	MCFG_TIMER_DRIVER_ADD("timer0", model2_state, model2_timer_cb)
-	MCFG_TIMER_PTR((uintptr_t)0)
-	MCFG_TIMER_DRIVER_ADD("timer1", model2_state, model2_timer_cb)
-	MCFG_TIMER_PTR((uintptr_t)1)
-	MCFG_TIMER_DRIVER_ADD("timer2", model2_state, model2_timer_cb)
-	MCFG_TIMER_PTR((uintptr_t)2)
-	MCFG_TIMER_DRIVER_ADD("timer3", model2_state, model2_timer_cb)
-	MCFG_TIMER_PTR((uintptr_t)3)
-
-	MCFG_S24TILE_DEVICE_ADD("tile", 0x3fff)
-	MCFG_S24TILE_DEVICE_PALETTE("palette")
-
-	MCFG_SCREEN_ADD("screen", RASTER)
-	MCFG_SCREEN_VIDEO_ATTRIBUTES(VIDEO_UPDATE_AFTER_VBLANK)
-	MCFG_SCREEN_RAW_PARAMS(VIDEO_CLOCK/2, 656, 0/*+69*/, 496/*+69*/, 424, 0/*+25*/, 384/*+25*/) // TODO: from System 24, might not be accurate for Model 2
-	MCFG_SCREEN_UPDATE_DRIVER(model2_state, screen_update_model2)
-
-	MCFG_PALETTE_ADD("palette", 8192)
-
-	MCFG_VIDEO_START_OVERRIDE(model2_state,model2)
+	MCFG_FRAGMENT_ADD( model2_timers )
+	MCFG_FRAGMENT_ADD( model2_screen )
 
 	MCFG_SEGAM1AUDIO_ADD(M1AUDIO_TAG)
 	MCFG_SEGAM1AUDIO_RXD_HANDLER(DEVWRITELINE("uart", i8251_device, write_rxd))
@@ -2255,26 +2263,8 @@ MACHINE_CONFIG_START(model2_state::model2a)
 	MCFG_EEPROM_SERIAL_93C46_ADD("eeprom")
 	MCFG_NVRAM_ADD_1FILL("backup1")
 
-	MCFG_TIMER_DRIVER_ADD("timer0", model2_state, model2_timer_cb)
-	MCFG_TIMER_PTR((uintptr_t)0)
-	MCFG_TIMER_DRIVER_ADD("timer1", model2_state, model2_timer_cb)
-	MCFG_TIMER_PTR((uintptr_t)1)
-	MCFG_TIMER_DRIVER_ADD("timer2", model2_state, model2_timer_cb)
-	MCFG_TIMER_PTR((uintptr_t)2)
-	MCFG_TIMER_DRIVER_ADD("timer3", model2_state, model2_timer_cb)
-	MCFG_TIMER_PTR((uintptr_t)3)
-
-	MCFG_S24TILE_DEVICE_ADD("tile", 0x3fff)
-	MCFG_S24TILE_DEVICE_PALETTE("palette")
-
-	MCFG_SCREEN_ADD("screen", RASTER)
-	MCFG_SCREEN_VIDEO_ATTRIBUTES(VIDEO_UPDATE_AFTER_VBLANK )
-	MCFG_SCREEN_RAW_PARAMS(VIDEO_CLOCK/2, 656, 0/*+69*/, 496/*+69*/, 424, 0/*+25*/, 384/*+25*/) // TODO: from System 24, might not be accurate for Model 2
-	MCFG_SCREEN_UPDATE_DRIVER(model2_state, screen_update_model2)
-
-	MCFG_PALETTE_ADD("palette", 8192)
-
-	MCFG_VIDEO_START_OVERRIDE(model2_state,model2)
+	MCFG_FRAGMENT_ADD( model2_timers )
+	MCFG_FRAGMENT_ADD( model2_screen )
 
 	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
 
@@ -2350,26 +2340,8 @@ MACHINE_CONFIG_START(model2_state::model2b)
 	MCFG_EEPROM_SERIAL_93C46_ADD("eeprom")
 	MCFG_NVRAM_ADD_1FILL("backup1")
 
-	MCFG_TIMER_DRIVER_ADD("timer0", model2_state, model2_timer_cb)
-	MCFG_TIMER_PTR((uintptr_t)0)
-	MCFG_TIMER_DRIVER_ADD("timer1", model2_state, model2_timer_cb)
-	MCFG_TIMER_PTR((uintptr_t)1)
-	MCFG_TIMER_DRIVER_ADD("timer2", model2_state, model2_timer_cb)
-	MCFG_TIMER_PTR((uintptr_t)2)
-	MCFG_TIMER_DRIVER_ADD("timer3", model2_state, model2_timer_cb)
-	MCFG_TIMER_PTR((uintptr_t)3)
-
-	MCFG_S24TILE_DEVICE_ADD("tile", 0x3fff)
-	MCFG_S24TILE_DEVICE_PALETTE("palette")
-
-	MCFG_SCREEN_ADD("screen", RASTER)
-	MCFG_SCREEN_VIDEO_ATTRIBUTES(VIDEO_UPDATE_AFTER_VBLANK )
-	MCFG_SCREEN_RAW_PARAMS(VIDEO_CLOCK/2, 656, 0/*+69*/, 496/*+69*/, 424, 0/*+25*/, 384/*+25*/) // TODO: from System 24, might not be accurate for Model 2
-	MCFG_SCREEN_UPDATE_DRIVER(model2_state, screen_update_model2)
-
-	MCFG_PALETTE_ADD("palette", 8192)
-
-	MCFG_VIDEO_START_OVERRIDE(model2_state,model2)
+	MCFG_FRAGMENT_ADD( model2_timers )
+	MCFG_FRAGMENT_ADD( model2_screen )
 
 	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
 
@@ -2444,26 +2416,8 @@ MACHINE_CONFIG_START(model2_state::model2c)
 	MCFG_EEPROM_SERIAL_93C46_ADD("eeprom")
 	MCFG_NVRAM_ADD_1FILL("backup1")
 
-	MCFG_TIMER_DRIVER_ADD("timer0", model2_state, model2_timer_cb)
-	MCFG_TIMER_PTR((uintptr_t)0)
-	MCFG_TIMER_DRIVER_ADD("timer1", model2_state, model2_timer_cb)
-	MCFG_TIMER_PTR((uintptr_t)1)
-	MCFG_TIMER_DRIVER_ADD("timer2", model2_state, model2_timer_cb)
-	MCFG_TIMER_PTR((uintptr_t)2)
-	MCFG_TIMER_DRIVER_ADD("timer3", model2_state, model2_timer_cb)
-	MCFG_TIMER_PTR((uintptr_t)3)
-
-	MCFG_S24TILE_DEVICE_ADD("tile", 0x3fff)
-	MCFG_S24TILE_DEVICE_PALETTE("palette")
-
-	MCFG_SCREEN_ADD("screen", RASTER)
-	MCFG_SCREEN_VIDEO_ATTRIBUTES(VIDEO_UPDATE_AFTER_VBLANK )
-	MCFG_SCREEN_RAW_PARAMS(VIDEO_CLOCK/2, 656, 0/*+69*/, 496/*+69*/, 424, 0/*+25*/, 384/*+25*/) // TODO: from System 24, might not be accurate for Model 2
-	MCFG_SCREEN_UPDATE_DRIVER(model2_state, screen_update_model2)
-
-	MCFG_PALETTE_ADD("palette", 8192)
-
-	MCFG_VIDEO_START_OVERRIDE(model2_state,model2)
+	MCFG_FRAGMENT_ADD( model2_timers )
+	MCFG_FRAGMENT_ADD( model2_screen )
 
 	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
 

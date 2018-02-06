@@ -230,6 +230,7 @@ public:
 	DECLARE_MACHINE_RESET(model2_common);
 	DECLARE_MACHINE_RESET(model2_scsp);
 	uint32_t screen_update_model2(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
+	DECLARE_WRITE_LINE_MEMBER(screen_vblank_model2);
 	TIMER_DEVICE_CALLBACK_MEMBER(model2_timer_cb);
 	TIMER_DEVICE_CALLBACK_MEMBER(model2_interrupt);
 	TIMER_DEVICE_CALLBACK_MEMBER(model2c_interrupt);
@@ -249,6 +250,8 @@ public:
 
 	void model2_3d_frame_end( bitmap_rgb32 &bitmap, const rectangle &cliprect );
 
+	void model2_timers(machine_config &config);
+	void model2_screen(machine_config &config);
 	void daytona(machine_config &config);
 	void indy500(machine_config &config);
 	void manxtt(machine_config &config);
