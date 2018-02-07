@@ -1331,7 +1331,6 @@ end
 --@src/devices/cpu/m6502/m740.h,CPUS["M6502"] = true
 --@src/devices/cpu/m6502/m3745x.h,CPUS["M6502"] = true
 --@src/devices/cpu/m6502/m5074x.h,CPUS["M6502"] = true
---@src/devices/cpu/m6502/m6502_vtscr.h,CPUS["M6502"] = true
 --@src/devices/cpu/m6502/xavix.h,CPUS["XAVIX"] = true
 
 --------------------------------------------------
@@ -1374,8 +1373,6 @@ if (CPUS["M6502"]~=null) then
 		MAME_DIR .. "src/devices/cpu/m6502/m3745x.h",
 		MAME_DIR .. "src/devices/cpu/m6502/m5074x.cpp",
 		MAME_DIR .. "src/devices/cpu/m6502/m5074x.h",
-		MAME_DIR .. "src/devices/cpu/m6502/m6502_vtscr.h",
-		MAME_DIR .. "src/devices/cpu/m6502/m6502_vtscr.cpp",
 		MAME_DIR .. "src/devices/cpu/m6502/xavix.cpp",
 		MAME_DIR .. "src/devices/cpu/m6502/xavix.h",
 	}

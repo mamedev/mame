@@ -136,8 +136,8 @@ protected:
 	uint8_t read_arg(uint16_t adr) { return mintf->read_arg(adr); }
 	uint8_t read_pc() { return mintf->read_arg(PC++); }
 	uint8_t read_pc_noinc() { return mintf->read_arg(PC); }
-	virtual void prefetch();
-	virtual void prefetch_noirq();
+	void prefetch();
+	void prefetch_noirq();
 	void set_nz(uint8_t v);
 
 	virtual void do_exec_full();

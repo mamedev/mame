@@ -73,7 +73,7 @@
 #include "cpu/m6502/n2a03.h"
 #include "machine/bankdev.h"
 #include "video/ppu2c0x_vt.h"
-#include "cpu/m6502/m6502_vtscr.h"
+#include "machine/m6502_vtscr.h"
 #include "screen.h"
 #include "speaker.h"
 
