@@ -48,9 +48,16 @@ Let's first run MAME in a terminal to reach the LUA console:
 ::
 
     $ mame -console YOUR_ROM
-    M.A.M.E. v0.158 (Feb  5 2015) - Multiple Arcade Machine Emulator
-    Copyright Nicola Salmoria and the MAME team
-    Lua 5.3.0  Copyright (C) 1994-2015 Lua.org, PUC-Rio
+         _/      _/    _/_/    _/      _/  _/_/_/_/
+       _/_/  _/_/  _/    _/  _/_/  _/_/  _/
+      _/  _/  _/  _/_/_/_/  _/  _/  _/  _/_/_/
+     _/      _/  _/    _/  _/      _/  _/
+    _/      _/  _/    _/  _/      _/  _/_/_/_/
+    mame v0.195
+    Copyright (C) Nicola Salmoria and the MAME team
+    
+    Lua 5.3
+    Copyright (C) Lua.org, PUC-Rio
 
     > 
 
@@ -70,7 +77,7 @@ You can check at runtime which version of MAME you are running, with:
 ::
 
     > print(emu.app_name() .. " " .. emu.app_version())
-    mame 0.158
+    mame 0.195
 
 We now start exploring screen related methods. First, let's enumerate available screens:
 
