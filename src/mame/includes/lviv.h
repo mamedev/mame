@@ -68,4 +68,4 @@ public:
 extern const unsigned char lviv_palette[8*3];
 
 
-#endif /* MAME_INCLUDES_LVIV_H */
+#endif // MAME_INCLUDES_LVIV_H

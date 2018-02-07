@@ -3,8 +3,9 @@
 // *******************************
 // Driver for HP 9845B/C/T systems
 // *******************************
-#ifndef _HP9845_H_
-#define _HP9845_H_
+
+#ifndef MAME_INCLUDES_HP9845_H
+#define MAME_INCLUDES_HP9845_H
 
 #include "cpu/hphybrid/hphybrid.h"
 #include "machine/hp_taco.h"
@@ -151,4 +152,4 @@ protected:
 	bool m_prt_irl;
 };
 
-#endif /* _HP9845_H_ */
+#endif // MAME_INCLUDES_HP9845_H

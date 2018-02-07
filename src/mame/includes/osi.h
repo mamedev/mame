@@ -2,8 +2,8 @@
 // copyright-holders:Curt Coder, Robbbert, Wilbert Pol
 #pragma once
 
-#ifndef __OSI__
-#define __OSI__
+#ifndef MAME_INCLUDES_OSI_H
+#define MAME_INCLUDES_OSI_H
 
 
 #include "cpu/m6502/m6502.h"

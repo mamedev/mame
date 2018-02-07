@@ -6,8 +6,8 @@
 
 *************************************************************************/
 
-#ifndef _ESRIPSYS_H_
-#define _ESRIPSYS_H_
+#ifndef MAME_INCLUDES_ESRIPSYS_H
+#define MAME_INCLUDES_ESRIPSYS_H
 
 #pragma once
 
@@ -129,4 +129,4 @@ public:
 	void esripsys(machine_config &config);
 };
 
-#endif // _ESRIPSYS_H_
+#endif // MAME_INCLUDES_ESRIPSYS_H

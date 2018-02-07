@@ -2,8 +2,8 @@
 // copyright-holders:Curt Coder
 #pragma once
 
-#ifndef __ETI660__
-#define __ETI660__
+#ifndef MAME_INCLUDES_ETI660_H
+#define MAME_INCLUDES_ETI660_H
 
 #include "cpu/cosmac/cosmac.h"
 #include "imagedev/cassette.h"

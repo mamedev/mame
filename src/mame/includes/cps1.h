@@ -6,8 +6,8 @@
 
 ***************************************************************************/
 
-#ifndef _CPS1_H_
-#define _CPS1_H_
+#ifndef MAME_INCLUDES_CPS1_H
+#define MAME_INCLUDES_CPS1_H
 
 #include "sound/msm5205.h"
 #include "sound/qsound.h"

@@ -2,8 +2,8 @@
 // copyright-holders:Curt Coder
 #pragma once
 
-#ifndef __PROF80__
-#define __PROF80__
+#ifndef MAME_INCLUDES_PROF80_H
+#define MAME_INCLUDES_PROF80_H
 
 #include "bus/ecbbus/ecbbus.h"
 #include "bus/rs232/rs232.h"

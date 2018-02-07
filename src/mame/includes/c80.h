@@ -1,8 +1,8 @@
 // license:BSD-3-Clause
 // copyright-holders:Curt Coder
-#ifndef __C80__
-#define __C80__
 
+#ifndef MAME_INCLUDES_C80_H
+#define MAME_INCLUDES_C80_H
 
 #include "cpu/z80/z80.h"
 #include "cpu/z80/z80daisy.h"

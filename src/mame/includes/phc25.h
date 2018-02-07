@@ -2,8 +2,8 @@
 // copyright-holders:Curt Coder, Robbbert
 #pragma once
 
-#ifndef __PHC25__
-#define __PHC25__
+#ifndef MAME_INCLUDES_PHC25_H
+#define MAME_INCLUDES_PHC25_H
 
 
 #include "cpu/z80/z80.h"

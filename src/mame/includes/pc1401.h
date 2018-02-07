@@ -8,8 +8,8 @@
  *
  ****************************************************************************/
 
-#ifndef PC1401_H_
-#define PC1401_H_
+#ifndef MAME_INCLUDES_PC1401_H
+#define MAME_INCLUDES_PC1401_H
 
 #include "pocketc.h"
 #include "cpu/sc61860/sc61860.h"
@@ -59,4 +59,4 @@ protected:
 	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr) override;
 };
 
-#endif /* PC1401_H_ */
+#endif // MAME_INCLUDES_PC1401_H

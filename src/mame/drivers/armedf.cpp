@@ -534,11 +534,11 @@ static ADDRESS_MAP_START( armedf_map, AS_PROGRAM, 16, armedf_state )
 	AM_RANGE(0x068000, 0x069fff) AM_READWRITE8(armedf_text_videoram_r,armedf_text_videoram_w,0x00ff)
 	AM_RANGE(0x06a000, 0x06afff) AM_RAM_DEVWRITE("palette", palette_device, write16) AM_SHARE("palette")
 	AM_RANGE(0x06b000, 0x06bfff) AM_RAM AM_SHARE("spr_pal_clut")
+	AM_RANGE(0x06c000, 0x06c7ff) AM_RAM
 	AM_RANGE(0x06c000, 0x06c001) AM_READ_PORT("P1")
 	AM_RANGE(0x06c002, 0x06c003) AM_READ_PORT("P2")
 	AM_RANGE(0x06c004, 0x06c005) AM_READ_PORT("DSW1")
 	AM_RANGE(0x06c006, 0x06c007) AM_READ_PORT("DSW2")
-	AM_RANGE(0x06c000, 0x06c7ff) AM_RAM
 	AM_RANGE(0x06d000, 0x06d001) AM_WRITE(terraf_io_w)
 	AM_RANGE(0x06d002, 0x06d003) AM_WRITE(armedf_bg_scrollx_w)
 	AM_RANGE(0x06d004, 0x06d005) AM_WRITE(armedf_bg_scrolly_w)

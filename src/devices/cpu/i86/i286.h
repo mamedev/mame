@@ -95,7 +95,6 @@ protected:
 	virtual void write_port_word(uint16_t port, uint16_t data) override;
 
 	// Executing instructions
-	virtual uint8_t fetch_op() override;
 	virtual uint8_t fetch() override;
 	virtual uint32_t calc_addr(int seg, uint16_t offset, int size, int op, bool override = true) override;
 

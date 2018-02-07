@@ -1,8 +1,9 @@
 // license:BSD-3-Clause
 // copyright-holders:Ryan Holtz, R. Belmont
 #pragma once
-#ifndef INCLUDES_NDS_H
-#define INCLUDES_NDS_H
+
+#ifndef MAME_INCLUDES_NDS_H
+#define MAME_INCLUDES_NDS_H
 
 #include "cpu/arm7/arm7.h"
 #include "cpu/arm7/arm7core.h"

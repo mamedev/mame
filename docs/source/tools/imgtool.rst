@@ -3,9 +3,9 @@ Imgtool - *A generic image manipulation tool for MAME*
 
 
 
-Imgtool is a tool for the maintenance and manipulation of disk and other types of images that MAME users need to deal with.  Functions include retrieving and storing files and CRC checking/validation.
+Imgtool is a tool for the maintenance and manipulation of disk and other types of images that MAME users need to deal with. Functions include retrieving and storing files and CRC checking/validation.
 
-Imgtool is part of the MAME project.  It shares large portions of code with MAME, and its existence would not be if it were not for MAME.  As such, the distribution terms are the same as MAME.  Please read the MAME license thoroughly.
+Imgtool is part of the MAME project. It shares large portions of code with MAME, and its existence would not be if it were not for MAME. As such, the distribution terms are the same as MAME. Please read the MAME license thoroughly.
 
 **Some portions of Imgtool are Copyright (c) 1989, 1993 The Regents of the University of California.  All rights reserved.**
 
@@ -462,7 +462,7 @@ Image specific file options (usable on the 'put' command):
 Option           Allowed values                 Description
 ---------------- ------------------------------ -------------------------------------------------------------
 --ftype          basic/data/binary/assembler    File type
---ascii          ascii/binary                   Ascii flag
+--ascii          ascii/binary                   ASCII flag
 ================ ============================== =============================================================
 
 Image specific creation options (usable on the 'create' command):
@@ -512,7 +512,7 @@ Image specific file options (usable on the 'put' command):
 Option           Allowed values                 Description
 ---------------- ------------------------------ -------------------------------------------------------------
 --ftype          basic/data/binary/assembler    File type
---ascii          ascii/binary                   Ascii flag
+--ascii          ascii/binary                   ASCII flag
 ================ ============================== =============================================================
 
 Image specific creation options (usable on the 'create' command):
@@ -582,7 +582,7 @@ Image specific file options (usable on the 'put' command):
 Option           Allowed values                 Description
 ---------------- ------------------------------ -------------------------------------------------------------
 --ftype          basic/data/binary/assembler    File type
---ascii          ascii/binary                   Ascii flag
+--ascii          ascii/binary                   ASCII flag
 ================ ============================== =============================================================
 
 
@@ -622,7 +622,7 @@ Image specific file options (usable on the 'put' command):
 Option           Allowed values                 Description
 ---------------- ------------------------------ -------------------------------------------------------------
 --ftype          basic/data/binary/assembler    File type
---ascii          ascii/binary                   Ascii flag
+--ascii          ascii/binary                   ASCII flag
 ================ ============================== =============================================================
 
 No image specific creation options
@@ -706,7 +706,7 @@ Image specific file options (usable on the 'put' command):
 Option           Allowed values                 Description
 ---------------- ------------------------------ -------------------------------------------------------------
 --ftype          basic/data/binary/assembler    File type
---ascii          ascii/binary                   Ascii flag
+--ascii          ascii/binary                   ASCII flag
 ================ ============================== =============================================================
 
 No image specific creation options
@@ -769,7 +769,7 @@ Image specific file options (usable on the 'put' command):
 Option           Allowed values                 Description
 ---------------- ------------------------------ -------------------------------------------------------------
 --ftype          basic/data/binary/assembler    File type
---ascii          ascii/binary                   Ascii flag
+--ascii          ascii/binary                   ASCII flag
 ================ ============================== =============================================================
 
 No image specific creation options
@@ -853,7 +853,7 @@ Image specific file options (usable on the 'put' command):
 Option           Allowed values                 Description
 ---------------- ------------------------------ -------------------------------------------------------------
 --ftype          basic/data/binary/assembler    File type
---ascii          ascii/binary                   Ascii flag
+--ascii          ascii/binary                   ASCII flag
 ================ ============================== =============================================================
 
 No image specific creation options
@@ -889,7 +889,7 @@ Image specific file options (usable on the 'put' command):
 Option           Allowed values                 Description
 ---------------- ------------------------------ -------------------------------------------------------------
 --ftype          basic/data/binary/assembler    File type
---ascii          ascii/binary                   Ascii flag
+--ascii          ascii/binary                   ASCII flag
 ================ ============================== =============================================================
 
 No image specific creation options
@@ -973,7 +973,7 @@ Image specific file options (usable on the 'put' command):
 Option           Allowed values                 Description
 ---------------- ------------------------------ -------------------------------------------------------------
 --ftype          basic/data/binary/assembler    File type
---ascii          ascii/binary                   Ascii flag
+--ascii          ascii/binary                   ASCII flag
 ================ ============================== =============================================================
 
 No image specific creation options
@@ -1009,7 +1009,7 @@ Image specific file options (usable on the 'put' command):
 Option           Allowed values                 Description
 ---------------- ------------------------------ -------------------------------------------------------------
 --ftype          basic/data/binary/assembler    File type
---ascii          ascii/binary                   Ascii flag
+--ascii          ascii/binary                   ASCII flag
 ================ ============================== =============================================================
 
 No image specific creation options
@@ -1093,7 +1093,7 @@ Image specific file options (usable on the 'put' command):
 Option           Allowed values                 Description
 ---------------- ------------------------------ -------------------------------------------------------------
 --ftype          basic/data/binary/assembler    File type
---ascii          ascii/binary                   Ascii flag
+--ascii          ascii/binary                   ASCII flag
 ================ ============================== =============================================================
 
 No image specific creation options
@@ -1146,7 +1146,7 @@ Image specific file options (usable on the 'put' command):
 Option           Allowed values                 Description
 ---------------- ------------------------------ -------------------------------------------------------------
 --ftype          basic/data/binary/assembler    File type
---ascii          ascii/binary                   Ascii flag
+--ascii          ascii/binary                   ASCII flag
 ================ ============================== =============================================================
 
 No image specific creation options
@@ -1230,7 +1230,7 @@ Image specific file options (usable on the 'put' command):
 Option           Allowed values                 Description
 ---------------- ------------------------------ -------------------------------------------------------------
 --ftype          basic/data/binary/assembler    File type
---ascii          ascii/binary                   Ascii flag
+--ascii          ascii/binary                   ASCII flag
 ================ ============================== =============================================================
 
 No image specific creation options
@@ -1376,7 +1376,7 @@ Image specific file options (usable on the 'put' command):
 Option           Allowed values                 Description
 ---------------- ------------------------------ -------------------------------------------------------------
 --ftype          basic/data/binary/assembler    File type
---ascii          ascii/binary                   Ascii flag
+--ascii          ascii/binary                   ASCII flag
 ================ ============================== =============================================================
 
 
@@ -1461,7 +1461,7 @@ Image specific file options (usable on the 'put' command):
 Option           Allowed values                 Description
 ---------------- ------------------------------ -------------------------------------------------------------
 --ftype          basic/data/binary/assembler    File type
---ascii          ascii/binary                   Ascii flag
+--ascii          ascii/binary                   ASCII flag
 ================ ============================== =============================================================
 
 No image specific creation options

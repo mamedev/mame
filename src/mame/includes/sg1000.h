@@ -1,7 +1,8 @@
 // license:BSD-3-Clause
 // copyright-holders:Curt Coder
-#ifndef __SG1000__
-#define __SG1000__
+
+#ifndef MAME_INCLUDES_SG1000_H
+#define MAME_INCLUDES_SG1000_H
 
 #include "cpu/z80/z80.h"
 #include "formats/sf7000_dsk.h"

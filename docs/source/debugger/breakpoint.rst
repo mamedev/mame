@@ -34,7 +34,7 @@ bpset
 |
 | Set a breakpoint that will halt execution whenever the PC is equal to 23456 AND the expression (a0 == 0 && a1 == 0) is true.
 |
-|  bp 3456,1,{printf "A0=%08X\n",a0; g}
+|  bp 3456,1,{printf "A0=%08X\\n",a0; g}
 |
 | Set a breakpoint that will halt execution whenever the PC is equal to 3456. When this happens, print A0=<a0val> and continue executing.
 |

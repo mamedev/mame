@@ -10185,6 +10185,7 @@ sf2rb2                          // hack
 sf2rb3                          // hack
 sf2red                          // hack
 sf2rk                           // bootleg
+sf2rules                        // bootleg
 sf2stt                          // bootleg
 sf2thndr                        // hack
 sf2ua                           // 06/02/1991 (c) 1991 (USA)
@@ -12590,6 +12591,7 @@ punipic                         // bootleg
 punipic2                        // bootleg
 punipic3                        // bootleg
 sf2b                            // bootleg
+sf2b2                           // bootleg
 sf2m1                           // hack
 sf2m9                           // bootleg
 sf2mdt                          // bootleg
@@ -13760,6 +13762,7 @@ pcvga                           // 198? PC-XT (VGA, MF2 Keyboard)
 
 @source:ggconnie.cpp
 ggconnie                        // (c) ???? Capcom
+smf                             // (c) 1997 Capcom
 
 @source:ghosteo.cpp
 bballoon                        // (c) 2003 Eolith
@@ -30269,6 +30272,7 @@ paclandj                        // (c) 1984
 paclandjo                       // (c) 1984
 paclandjo2                      // (c) 1984
 paclandm                        // (c) 1984 Midway
+paclandm2                       // (c) 1984 Bally-Midway
 
 @source:pacman.cpp
 8bpm                            // (c) 1985 Seatongrove Ltd (Magic Eletronics USA license)
@@ -32458,6 +32462,7 @@ r9751                           // ROLM 9751 phone system
 
 @source:rabbit.cpp
 rabbit                          // (c) 1997 Electronic Arts
+rabbitjt                        // (c) 1996 Electronic Arts
 
 @source:rad_eu3a14.cpp
 rad_gtg
@@ -34678,6 +34683,9 @@ simpsons4pa                     // GX072 (c) 1991
 sitcom                          //
 sitcomtmr                       //
 
+@source:sk1.cpp
+sk1                             //
+
 @source:skeetsht.cpp
 popshot                         // (c) 1991 (prototype)
 skeetsht                        // (c) 1991
@@ -35506,7 +35514,7 @@ puyosun                         // 1996.12 Puyo Puyo SUN (Compile)
 rsgun                           // 1998.05 Radient Silver Gun (Treasure)
 sandor                          // 1995.11 Nido Aru Koto wa Sando-R
 sanjeon                         // 1999.04 Sanjun Sujun (Sega / Deniam)
-sackids							// 2000.10 Soreyuke Anpanman Crayon Kids
+sackids                         // 2000.10 Soreyuke Anpanman Crayon Kids
 sasissu                         // 1998.02 Taisen Tanto-R Sasissu!!
 seabass                         // 1998.02 Sea Bass Fishing (A wave Inc (Able License))
 sfish2                          // 1995.11 Sports Fishing 2 (Export)
@@ -35524,7 +35532,7 @@ techbowl                        // 1997.12 Technical Bowling
 thunt                           // 1997.09 Puzzle & Action Treasure Hunt (Deniam license)
 thuntk                          // 1997.01 Puzzle & Action BoMulEul Chajara (Deniam license)
 twcup98                         // 1998.04 Tecmo World Cup '98 (Tecmo)
-twsoc98							// 1998.04 Tecmo World Soccer '98 (Tecmo)
+twsoc98                         // 1998.04 Tecmo World Soccer '98 (Tecmo)
 vfkids                          // 1996.03 Virtua Fighter Kids
 vfremix                         // 1995.06 Virtua Fighter Remix
 vmahjong                        // 1997.02 Virtual Mahjong (Micronet)
@@ -37817,8 +37825,8 @@ vsmilef                         //
 vsmileg                         //
 walle                           //
 wirels60                        // Wireless 60
-wlsair60						// Wireless Air 60
-zone40							// Zone 40
+wlsair60                        // Wireless Air 60
+zone40                          // Zone 40
 zone60                          // Zone 60
 rad_skat                        //
 rad_skatp                       //
@@ -38922,6 +38930,8 @@ xsleenaj                        // TA-0019 (c) 1986
 
 @source:xavix.cpp
 taitons1                        //
+xavtenni                        //
+rad_ping						//
 
 @source:xbox.cpp
 xbox                            //

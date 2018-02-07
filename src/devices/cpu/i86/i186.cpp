@@ -164,13 +164,6 @@ device_memory_interface::space_config_vector i80186_cpu_device::memory_space_con
 		};
 }
 
-uint8_t i80186_cpu_device::fetch_op()
-{
-	uint8_t data = m_direct_opcodes->read_byte(update_pc(), m_fetch_xor);
-	m_ip++;
-	return data;
-}
-
 uint8_t i80186_cpu_device::fetch()
 {
 	uint8_t data = m_direct_opcodes->read_byte(update_pc(), m_fetch_xor);

@@ -6,8 +6,9 @@
  *
  ****************************************************************************/
 
-#ifndef BK_H_
-#define BK_H_
+#ifndef MAME_INCLUDES_BK_H
+#define MAME_INCLUDES_BK_H
+
 #include "imagedev/cassette.h"
 
 class bk_state : public driver_device
@@ -50,4 +51,4 @@ public:
 	void bk0010fd(machine_config &config);
 };
 
-#endif /* BK_H_ */
+#endif // MAME_INCLUDES_BK_H

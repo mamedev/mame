@@ -6,8 +6,8 @@
 
 *****************************************************************************/
 
-#ifndef __MICRONIC__
-#define __MICRONIC__
+#ifndef MAME_INCLUDES_MICRONIC_H
+#define MAME_INCLUDES_MICRONIC_H
 
 #include "cpu/z80/z80.h"
 #include "video/hd61830.h"

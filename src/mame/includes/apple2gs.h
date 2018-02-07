@@ -8,8 +8,8 @@
  *
  ****************************************************************************/
 
-#ifndef APPLE2GS_H_
-#define APPLE2GS_H_
+#ifndef MAME_INCLUDES_APPLE2GS_H
+#define MAME_INCLUDES_APPLE2GS_H
 
 #define RUN_ADB_MICRO (0)
 
@@ -272,4 +272,4 @@ public:
 	void apple2gsr1(machine_config &config);
 };
 
-#endif /* APPLE2GS_H_ */
+#endif // MAME_INCLUDES_APPLE2GS_H

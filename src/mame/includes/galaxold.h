@@ -12,8 +12,8 @@
 
 ***************************************************************************/
 
-#ifndef __GALAXOLD_H__
-#define __GALAXOLD_H__
+#ifndef MAME_INCLUDES_GALAXOLD_H
+#define MAME_INCLUDES_GALAXOLD_H
 
 #include "machine/7474.h"
 #include "machine/timer.h"

@@ -183,9 +183,8 @@ void MODEL2_FUNC_NAME(int32_t scanline, const extent_t& extent, const m2_poly_ex
 #endif
 		luma = lumaram[BYTE_XOR_LE(lumabase + (t << 3))];
 
-		// Virtua Striker sets up a luma of 0x40 for flags, fix here.
-		if(luma > 0x3f)
-			luma = 0x3f;
+		// Virtua Striker sets up a luma of 0x40 for national flags on bleachers, fix here.
+		luma = std::min((int)luma,0x3f);
 
 		/* we have the 6 bits of luma information along with 5 bits per color component */
 		/* now build and index into the master color lookup table and extract the raw RGB values */

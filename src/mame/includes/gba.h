@@ -1,7 +1,8 @@
 // license:BSD-3-Clause
 // copyright-holders:R. Belmont,Ryan Holtz
-#ifndef _GBA_H_
-#define _GBA_H_
+
+#ifndef MAME_INCLUDES_GBA_H
+#define MAME_INCLUDES_GBA_H
 
 #include "sound/gb.h"
 #include "machine/intelfsh.h"

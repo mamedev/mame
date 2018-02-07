@@ -2,8 +2,8 @@
 // copyright-holders:Curt Coder
 #pragma once
 
-#ifndef __INCLUDES_ELF__
-#define __INCLUDES_ELF__
+#ifndef MAME_INCLUDES_ELF_H
+#define MAME_INCLUDES_ELF_H
 
 
 #include "cpu/cosmac/cosmac.h"

@@ -1987,7 +1987,7 @@ void debugger_commands::execute_dump(int ref, const std::vector<std::string> &pa
 						break;
 					}
 					for (unsigned int b = 0; b != width; b++) {
-						u8 byte = data >> (8 * (be ? (width-i-b) : b));
+						u8 byte = data >> (8 * (be ? (width-1-b) : b));
 						util::stream_format(output, "%c", (byte >= 32 && byte < 127) ? byte : '.');
 					}
 				}

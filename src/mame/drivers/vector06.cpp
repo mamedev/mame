@@ -36,9 +36,9 @@ TODO:
 
 /* Address maps */
 static ADDRESS_MAP_START(vector06_mem, AS_PROGRAM, 8, vector06_state)
+	AM_RANGE(0x0000, 0xffff) AM_READWRITE_BANK("bank1")
 	AM_RANGE(0x0000, 0x7fff) AM_READ_BANK("bank2")
 	AM_RANGE(0xa000, 0xdfff) AM_READWRITE_BANK("bank3")
-	AM_RANGE(0x0000, 0xffff) AM_READWRITE_BANK("bank1")
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START(vector06_io, AS_IO, 8, vector06_state)

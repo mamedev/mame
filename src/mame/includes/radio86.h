@@ -6,8 +6,8 @@
  *
  ****************************************************************************/
 
-#ifndef radio86_H_
-#define radio86_H_
+#ifndef MAME_INCLUDES_RADIO86_H
+#define MAME_INCLUDES_RADIO86_H
 
 #include "machine/i8255.h"
 #include "machine/i8257.h"
@@ -134,4 +134,4 @@ public:
 INPUT_PORTS_EXTERN( radio86 );
 INPUT_PORTS_EXTERN( ms7007 );
 
-#endif /* radio86_H_ */
+#endif // MAME_INCLUDES_RADIO86_H

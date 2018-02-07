@@ -2,8 +2,8 @@
 // copyright-holders:Curt Coder
 #pragma once
 
-#ifndef __COMX35__
-#define __COMX35__
+#ifndef MAME_INCLUDES_COMX35_H
+#define MAME_INCLUDES_COMX35_H
 
 #include "bus/comx35/exp.h"
 #include "cpu/cosmac/cosmac.h"

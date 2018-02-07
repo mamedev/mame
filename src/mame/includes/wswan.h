@@ -6,8 +6,8 @@
  *
  ****************************************************************************/
 
-#ifndef WSWAN_H_
-#define WSWAN_H_
+#ifndef MAME_INCLUDES_WSWAN_H
+#define MAME_INCLUDES_WSWAN_H
 
 #define WSWAN_TYPE_MONO 0
 #define WSWAN_TYPE_COLOR 1
@@ -102,4 +102,4 @@ protected:
 };
 
 
-#endif /* WSWAN_H_ */
+#endif // MAME_INCLUDES_WSWAN_H

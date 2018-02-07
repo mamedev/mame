@@ -8,8 +8,8 @@
  *
  ****************************************************************************/
 
-#ifndef APPLE3_H_
-#define APPLE3_H_
+#ifndef MAME_INCLUDES_APPLE3_H
+#define MAME_INCLUDES_APPLE3_H
 
 #include "cpu/m6502/m6502.h"
 #include "includes/apple2.h"
@@ -169,4 +169,4 @@ private:
 	int m_smoothscr;
 };
 
-#endif /* APPLE3_H_ */
+#endif // MAME_INCLUDES_APPLE3_H

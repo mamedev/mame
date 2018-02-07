@@ -6,8 +6,8 @@
  *
  ****************************************************************************/
 
-#ifndef GB_H_
-#define GB_H_
+#ifndef MAME_INCLUDES_GB_H
+#define MAME_INCLUDES_GB_H
 
 #include "sound/gb.h"
 #include "cpu/lr35902/lr35902.h"
@@ -152,4 +152,4 @@ public:
 
 
 
-#endif /* GB_H_ */
+#endif // MAME_INCLUDES_GB_H

@@ -6,8 +6,8 @@
  *
  ****************************************************************************/
 
-#ifndef __ADVISION__
-#define __ADVISION__
+#ifndef MAME_INCLUDES_ADVISION_H
+#define MAME_INCLUDES_ADVISION_H
 
 #include "sound/dac.h"
 #include "bus/generic/slot.h"

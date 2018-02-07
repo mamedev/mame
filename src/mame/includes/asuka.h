@@ -5,6 +5,7 @@
     Asuka & Asuka  (+ Taito/Visco games on similar hardware)
 
 *************************************************************************/
+
 #ifndef MAME_INCLUDES_ASUKA_H
 #define MAME_INCLUDES_ASUKA_H
 
