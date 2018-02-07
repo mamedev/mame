@@ -134,7 +134,13 @@ WRITE8_MEMBER(ppu_vt03_device::palette_write)
 
 READ8_MEMBER( ppu_vt03_device::read )
 {
-	 return ppu2c0x_device::read(space,offset);
+	 if(offset <= 0xf) {
+		 return ppu2c0x_device::read(space,offset);
+	 } else if(offset <= 0x1f) {
+		 return get_201x_reg(offset & 0x0f);
+	 } else {
+		 return 0;
+	 }
 }
 
 void ppu_vt03_device::init_palette(palette_device &palette, int first_entry)
@@ -218,6 +224,7 @@ void ppu_vt03_device::make_sprite_pixel_data(uint8_t &pixel_data, int flipx)
 	ppu2c0x_device::make_sprite_pixel_data(pixel_data, flipx);
 
 	int is4bpp = get_201x_reg(0x0) & 0x04;
+	int is16pix = get_201x_reg(0x0) & 0x01;
 
 	if (is4bpp)
 	{
@@ -227,6 +234,12 @@ void ppu_vt03_device::make_sprite_pixel_data(uint8_t &pixel_data, int flipx)
 			pixel_data |= (((m_extplanebuf[0] & 1) << 5) | ((m_extplanebuf[1] & 1) << 6));
 			m_extplanebuf[0] = m_extplanebuf[0] >> 1;
 			m_extplanebuf[1] = m_extplanebuf[1] >> 1;
+			
+			if(is16pix) {
+				uint8_t pix0 = pixel_data & 0x03;
+				uint8_t pix1 = (pixel_data >> 5) & 0x03;
+				pixel_data = pix1 | (pix0 << 5);
+			}
 		}
 		else
 		{
@@ -253,7 +266,12 @@ void ppu_vt03_device::draw_sprite_pixel(int sprite_xpos, int color, int pixel, u
 			/* this mode makes use of the extra planes to increase sprite width instead
 			   we probably need to split them out again and draw them at xpos+8 with a
 			   cliprect - not seen used yet */
-			bitmap.pix16(m_scanline, sprite_xpos + pixel) = pixel_data + (machine().rand()&3);
+			if((pixel_data & 0x03) != 0)
+				bitmap.pix16(m_scanline, sprite_xpos + pixel) = (pixel_data & 0x03) + (4 * color);
+			if(((pixel_data >> 5) & 0x03) != 0)
+				bitmap.pix16(m_scanline, sprite_xpos + pixel + 8) = ((pixel_data >> 5) & 0x03) + (4 * color);
+			//ppu2c0x_device::draw_sprite_pixel(sprite_xpos, color, pixel, pixel_data & 0x03, bitmap);
+			//ppu2c0x_device::draw_sprite_pixel(sprite_xpos, color, pixel + 8, (pixel_data >> 5) & 0x03, bitmap);
 		}
 	}
 	else

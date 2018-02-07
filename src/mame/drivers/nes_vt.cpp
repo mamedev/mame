@@ -20,13 +20,22 @@
 
   VT16 - ?
   VT18 - ?
-
-	VT3x - used in SY889
+	
+	VT33 (?) - used in FC Pocket, dgun2573
+	 	Adds scrambled opcodes (XORed with 0xA1) and RGB444 palette mode,
+		and more advanced PCM modes (CPU and video working, sound NYI)
+	
+	VT368 (?) - used in DGUN2561, lexcyber
+		Various enhancements not yet emulated. Different banking, possibly an ALU,
+		larger palette space
+	
+	VT36x (?) - used in SY889
 		Uses SQI rather than parallel flash
 		Vaguely OneBus compatible but some registers different ($411C in particular)
 		Uses RGB format for palettes
 		Credit to NewRisingSun2 for much of the reverse engineering
-
+				 same chipset used in Mogis M320, but uses more advanced feature set.
+				
   (more)
 
   VT1682 - NOT compatible with NES, different video system, sound CPU (4x
@@ -113,6 +122,8 @@ public:
 
 	/* VT03 extension handling */
 	DECLARE_WRITE8_MEMBER(vt03_410x_w);
+	DECLARE_READ8_MEMBER(vt03_410x_r);
+
 	DECLARE_WRITE8_MEMBER(vt03_410x_pjoy_w);
 	DECLARE_WRITE8_MEMBER(vt03_410x_hum_w);
 	DECLARE_WRITE8_MEMBER(vt03_410x_sp69_w);
@@ -295,6 +306,12 @@ WRITE8_MEMBER(nes_vt_state::vt03_410x_w)
 {
 	scrambled_410x_w(offset, data, vt_scramble_mode::NO_SCRAMBLE);
 }
+
+READ8_MEMBER(nes_vt_state::vt03_410x_r)
+{
+	return m_410x[offset];
+}
+
 WRITE8_MEMBER(nes_vt_state::vt03_410x_hum_w)
 {
 	scrambled_410x_w(offset, data, vt_scramble_mode::HUMMER);
@@ -333,6 +350,7 @@ void nes_vt_state::scrambled_410x_w(uint16_t offset, uint8_t data, vt_scramble_m
 		break;
 
 	case 0x2:
+		//logerror("vt03_4102_w %02x\n", data);
 		// load latched value and start counting
 		m_410x[0x2] = data; // value doesn't matter?
 		m_timer_val = m_410x[0x1];
@@ -340,12 +358,15 @@ void nes_vt_state::scrambled_410x_w(uint16_t offset, uint8_t data, vt_scramble_m
 		break;
 
 	case 0x3:
+		//logerror("vt03_4103_w %02x\n", data);
+		m_maincpu->set_input_line(M6502_IRQ_LINE, CLEAR_LINE);
 		// disable timer irq
 		m_410x[0x3] = data; // value doesn't matter?
 		m_timer_irq_enabled = 0;
 		break;
 
 	case 0x4:
+		//logerror("vt03_4104_w %02x\n", data);
 		// enable timer irq
 		m_410x[0x4] = data; // value doesn't matter?
 		m_timer_irq_enabled = 1;
@@ -625,7 +646,7 @@ void nes_vt_state::video_irq(bool hblank, int scanline, int vblank, int blanked)
 
 			if (m_timer_val < 0)
 			{
-				if (m_timer_irq_enabled)
+				if (m_timer_irq_enabled && !blanked)
 				{
 					logerror("scanline_irq %d\n", scanline);
 					irqstate = 1;
@@ -635,8 +656,8 @@ void nes_vt_state::video_irq(bool hblank, int scanline, int vblank, int blanked)
 
 		if (irqstate)
 			m_maincpu->set_input_line(M6502_IRQ_LINE, ASSERT_LINE);
-		else
-			m_maincpu->set_input_line(M6502_IRQ_LINE, CLEAR_LINE);
+		//else
+		//	m_maincpu->set_input_line(M6502_IRQ_LINE, CLEAR_LINE);
 	}
 
 }
@@ -969,6 +990,8 @@ void nes_vt_state::scrambled_8000_w(address_space &space, uint16_t offset, uint8
 		m_410x[0x8] = ((data & 0x0F) << 1) + 1;
 		update_banks();
 	} else {
+		//logerror("vtxx_mmc3_8000_w (%04x) %02x\n", offset+0x8000, data );
+
 		//MMC3 compat
 		if((addr < 0xA000) && !(addr & 0x01)) {
 			// Bank select
@@ -977,7 +1000,7 @@ void nes_vt_state::scrambled_8000_w(address_space &space, uint16_t offset, uint8
 			m_410x[0x05] = data & ~(1 << 5);
 			update_banks();
 		} else if((addr < 0xA000) && (addr & 0x01)) {
-			switch(m_8000_addr_latch) {
+			switch(m_410x[0x05] & 0x07) {
 				case 0x00:
 					m_ppu->set_201x_reg(descram_8000_mmc3[(int)scram][0], data);
 					break;
@@ -1151,7 +1174,7 @@ static ADDRESS_MAP_START( nes_vt_map, AS_PROGRAM, 8, nes_vt_state )
 
 	AM_RANGE(0x4034, 0x4034) AM_WRITE(vt03_4034_w)
 
-	AM_RANGE(0x4100, 0x410b) AM_WRITE(vt03_410x_w)
+	AM_RANGE(0x4100, 0x410b) AM_READ(vt03_410x_r) AM_WRITE(vt03_410x_w) 
 
 	AM_RANGE(0x8000, 0xffff) AM_DEVICE("prg", address_map_bank_device, amap8)
 	AM_RANGE(0x8000, 0xffff) AM_WRITE(vt03_8000_w)
@@ -1210,7 +1233,7 @@ static ADDRESS_MAP_START( nes_vt_hh_map, AS_PROGRAM, 8, nes_vt_state )
 	AM_RANGE(0x4016, 0x4016) AM_READWRITE(nes_in0_r, nes_in0_w)
 	AM_RANGE(0x4017, 0x4017) AM_READ(nes_in1_r) AM_WRITE(psg1_4017_w)
 
-	AM_RANGE(0x4100, 0x410b) AM_WRITE(vt03_410x_w)
+	AM_RANGE(0x4100, 0x410b) AM_READ(vt03_410x_r) AM_WRITE(vt03_410x_w)
 
 	AM_RANGE(0x8000, 0xffff) AM_DEVICE("prg", address_map_bank_device, amap8)
 	AM_RANGE(0x8000, 0xffff) AM_WRITE(vt03_8000_w)
@@ -1233,7 +1256,7 @@ static ADDRESS_MAP_START( nes_vt_dg_map, AS_PROGRAM, 8, nes_vt_state )
 	AM_RANGE(0x4016, 0x4016) AM_READWRITE(nes_in0_r, nes_in0_w)
 	AM_RANGE(0x4017, 0x4017) AM_READ(nes_in1_r) AM_WRITE(psg1_4017_w)
 
-	AM_RANGE(0x4100, 0x410b) AM_WRITE(vt03_410x_w)
+	AM_RANGE(0x4100, 0x410b) AM_READ(vt03_410x_r) AM_WRITE(vt03_410x_w)
 
 	AM_RANGE(0x411c, 0x411c) AM_WRITE(vt03_411c_w)
 
@@ -1719,7 +1742,7 @@ ROM_END
 
 ROM_START( cbrs8 )
 	ROM_REGION( 0x1000000, "mainrom", 0 )
-	ROM_LOAD( "RS-8.bin", 0x00000, 0x1000000, CRC(10b2bed0) SHA1(0453a1e6769818ccf25dcf22b2c6198a5688a1d4) )
+	ROM_LOAD( "RS-8.bin", 0x00000, 0x1000000, BAD_DUMP CRC(10b2bed0) SHA1(0453a1e6769818ccf25dcf22b2c6198a5688a1d4) )
 ROM_END
 
 ROM_START( mc_tv200 )
@@ -1794,17 +1817,17 @@ CONS( 200?, mc_sp69,    0,        0,  nes_vt_sp69,    nes_vt, nes_vt_state,  0, 
 
 // Hummer systems, scrambled bank register
 CONS( 200?, mc_sam60,   0,        0,  nes_vt_hum,    nes_vt, nes_vt_state,  0, "Hummer Technology Co., Ltd.", "Samuri (60 in 1)", MACHINE_IMPERFECT_GRAPHICS  | MACHINE_IMPERFECT_SOUND )
-CONS( 200?, zdog,   		0,        0,  nes_vt_hum,    nes_vt, nes_vt_state,  0, "Hummer Technology Co., Ltd.", "ZDog (44 in 1)", MACHINE_NOT_WORKING )
+CONS( 200?, zdog,   		0,        0,  nes_vt_hum,    nes_vt, nes_vt_state,  0, "Hummer Technology Co., Ltd.", "ZDog (44 in 1)", MACHINE_IMPERFECT_GRAPHICS  | MACHINE_IMPERFECT_SOUND )
 
 // titles below don't seem to use the enhanced modes, so probably VT01 / VT02 or plain standalone famiclones?
 
 // very plain menus
-CONS( 200?, pjoyn50,    0,        0,  nes_vt,    nes_vt, nes_vt_state,  0, "<unknown>", "PowerJoy Navigator 50 in 1", MACHINE_NOT_WORKING )
+CONS( 200?, pjoyn50,    0,        0,  nes_vt,    nes_vt, nes_vt_state,  0, "<unknown>", "PowerJoy Navigator 50 in 1", MACHINE_IMPERFECT_GRAPHICS )
 CONS( 200?, pjoys30,    0,        0,  nes_vt_pjoy,    nes_vt, nes_vt_state,  0, "<unknown>", "PowerJoy Supermax 30 in 1", MACHINE_IMPERFECT_GRAPHICS )
 CONS( 200?, pjoys60,    0,        0,  nes_vt_pjoy,    nes_vt, nes_vt_state,  0, "<unknown>", "PowerJoy Supermax 60 in 1", MACHINE_IMPERFECT_GRAPHICS )
 // has a non-enhanced version of 'Octopus' as game 30
-CONS( 200?, sarc110,    0,        0,  nes_vt,    nes_vt, nes_vt_state,  0, "<unknown>", "Super Arcade 110 (set 1)", MACHINE_NOT_WORKING )
-CONS( 200?, sarc110a,   sarc110,  0,  nes_vt,    nes_vt, nes_vt_state,  0, "<unknown>", "Super Arcade 110 (set 2)", MACHINE_NOT_WORKING )
+CONS( 200?, sarc110,    0,        0,  nes_vt,    nes_vt, nes_vt_state,  0, "<unknown>", "Super Arcade 110 (set 1)", MACHINE_IMPERFECT_GRAPHICS )
+CONS( 200?, sarc110a,   sarc110,  0,  nes_vt,    nes_vt, nes_vt_state,  0, "<unknown>", "Super Arcade 110 (set 2)", MACHINE_IMPERFECT_GRAPHICS )
 // both offer chinese or english menus
 CONS( 200?, mc_110cb,   0,        0,  nes_vt,    nes_vt, nes_vt_state,  0, "CoolBoy", "110 in 1 CoolBaby (CoolBoy RS-1S)", MACHINE_IMPERFECT_GRAPHICS )
 CONS( 200?, mc_138cb,   0,        0,  nes_vt,    nes_vt, nes_vt_state,  0, "CoolBoy", "138 in 1 CoolBaby (CoolBoy RS-5, PCB060-10009011V1.3)", MACHINE_IMPERFECT_GRAPHICS )
@@ -1816,11 +1839,11 @@ CONS( 200?, gprnrs1,   0,        0,  nes_vt,    nes_vt, nes_vt_state,  0, "<unkn
 CONS( 200?, gprnrs16,  0,        0,  nes_vt,    nes_vt, nes_vt_state,  0, "<unknown>", "Game Prince RS-16", MACHINE_IMPERFECT_GRAPHICS )
 // unsorted, these were all in nes.xml listed as ONE BUS systems
 CONS( 200?, mc_dg101,   0,        0,  nes_vt,    nes_vt, nes_vt_state,  0, "dreamGEAR", "dreamGEAR 101 in 1", MACHINE_IMPERFECT_GRAPHICS ) // dreamGear, but no enhanced games?
-CONS( 200?, mc_aa2,     0,        0,  nes_vt,    nes_vt, nes_vt_state,  0, "<unknown>", "100 in 1 Arcade Action II (AT-103)", MACHINE_NOT_WORKING )
+CONS( 200?, mc_aa2,     0,        0,  nes_vt,    nes_vt, nes_vt_state,  0, "<unknown>", "100 in 1 Arcade Action II (AT-103)", MACHINE_IMPERFECT_GRAPHICS )
 CONS( 200?, mc_105te,   0,        0,  nes_vt,    nes_vt, nes_vt_state,  0, "<unknown>", "2011 Super HiK 105 in 1 Turbo Edition", MACHINE_NOT_WORKING )
-CONS( 200?, mc_8x6cb,   0,        0,  nes_vt,    nes_vt, nes_vt_state,  0, "CoolBoy",   "888888 in 1 (Coolboy AEF-390)", MACHINE_NOT_WORKING )
-CONS( 200?, mc_9x6ss,   0,        0,  nes_vt,    nes_vt, nes_vt_state,  0, "<unknown>", "999999 in 1 (PXP2 Slim Station)", MACHINE_NOT_WORKING )
-CONS( 200?, mc_9x6sa,   mc_9x6ss, 0,  nes_vt,    nes_vt, nes_vt_state,  0, "<unknown>", "999999 in 1 (8 bit Slim Station, NEWPXP-DVT22-A PCB)", MACHINE_NOT_WORKING )
+CONS( 200?, mc_8x6cb,   0,        0,  nes_vt,    nes_vt, nes_vt_state,  0, "CoolBoy",   "888888 in 1 (Coolboy AEF-390)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND )
+CONS( 200?, mc_9x6ss,   0,        0,  nes_vt,    nes_vt, nes_vt_state,  0, "<unknown>", "999999 in 1 (PXP2 Slim Station)", MACHINE_IMPERFECT_GRAPHICS )
+CONS( 200?, mc_9x6sa,   mc_9x6ss, 0,  nes_vt,    nes_vt, nes_vt_state,  0, "<unknown>", "999999 in 1 (8 bit Slim Station, NEWPXP-DVT22-A PCB)", MACHINE_IMPERFECT_GRAPHICS )
 CONS( 200?, mc_7x6ss,   0,        0,  nes_vt,    nes_vt, nes_vt_state,  0, "<unknown>", "777777 in 1 (8 bit Slim Station, NEWPXP-DVT22-A PCB)", MACHINE_IMPERFECT_GRAPHICS )
 CONS( 200?, mc_8x6ss,   0,        0,  nes_vt,    nes_vt, nes_vt_state,  0, "<unknown>", "888888 in 1 (8 bit Slim Station, NEWPXP-DVT22-A PCB)", MACHINE_IMPERFECT_GRAPHICS )
 CONS( 2004, mc_dcat8,   0,        0,  nes_vt,    nes_vt, nes_vt_state,  0, "<unknown>", "100 in 1 (D-CAT8 8bit Console, set 1) (v5.01.11-frd, BL 20041217)", MACHINE_IMPERFECT_GRAPHICS )
@@ -1834,7 +1857,7 @@ CONS( 2016, sy888b,  		0, 				0,  nes_vt_hh, nes_vt, nes_vt_state,  0, "SY Corp"
 CONS( 201?, mc_cb280,  	0, 				0,  nes_vt_hh, nes_vt, nes_vt_state,  0, "CoolBoy", 	"Coolboy RS-18 (280 in 1)", MACHINE_IMPERFECT_GRAPHICS )
 
 // Runs well, only issues in SMB3 which crashes
-CONS( 2017, bittboy,  	0, 				0,  nes_vt_bt,    nes_vt, nes_vt_state,  0, "BittBoy", 	"BittBoy Mini FC 300 in 1", MACHINE_NOT_WORKING )
+CONS( 2017, bittboy,  	0, 				0,  nes_vt_bt,    nes_vt, nes_vt_state,  0, "BittBoy", 	"BittBoy Mini FC 300 in 1", MACHINE_IMPERFECT_GRAPHICS )
 // Runs well, all games seem to work
 CONS( 201?, mc_89in1,  	0, 				0,  nes_vt,    nes_vt, nes_vt_state,  0, "<unknown>", 	"89 in 1 Mini Game Console (060-92023011V1.0)", MACHINE_IMPERFECT_GRAPHICS )
 // Broken GFX, investigate
