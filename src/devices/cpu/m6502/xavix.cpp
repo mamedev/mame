@@ -39,6 +39,9 @@ void xavix_device::device_start()
 	else
 		mintf = std::make_unique<mi_xavix_normal>(this);
 
+	// bind delegates
+	m_vector_callback.bind_relative_to(*owner());
+
 	init();
 
 	state_add(STATE_GENPC, "GENPC", XPC).callexport().noshow();

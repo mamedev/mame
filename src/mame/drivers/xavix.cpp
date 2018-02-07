@@ -46,7 +46,7 @@
 
 #include "emu.h"
 #include "cpu/m6502/xavix.h"
-//#include "sound/ay8910.h"
+#include "machine/timer.h"
 #include "screen.h"
 #include "speaker.h"
 
@@ -88,6 +88,8 @@ public:
 	DECLARE_WRITE8_MEMBER(xavix_7ffe_w);
 	DECLARE_WRITE8_MEMBER(xavix_7fff_w);
 
+	INTERRUPT_GEN_MEMBER(interrupt);
+	TIMER_DEVICE_CALLBACK_MEMBER(scanline_cb);
 
 protected:
 	// driver_device overrides
@@ -106,6 +108,14 @@ private:
 
 	uint8_t m_xavix_7986_data;
 	uint8_t m_xavix_7987_data;
+
+	uint8_t m_xavix_7ff9_data;
+	uint8_t m_xavix_7ffa_data;
+	uint8_t m_xavix_7ffb_data;
+	uint8_t m_xavix_7ffe_data;
+	uint8_t m_xavix_7fff_data;
+	
+	uint8_t get_vectors(int which, int half);
 
 };
 
@@ -202,32 +212,53 @@ READ8_MEMBER(xavix_state::xavix_7980_r)
 WRITE8_MEMBER(xavix_state::xavix_7ff9_w)
 {
 	logerror("%s: xavix_7ff9_w %02x (trigger for 7ffx region?)\n", machine().describe_context(), data);
+	m_xavix_7ff9_data = data;
 }
 
 WRITE8_MEMBER(xavix_state::xavix_7ffa_w)
 {
 	logerror("%s: xavix_7ffa_w %02x (7ffx pair 1, byte 1?)\n", machine().describe_context(), data);
+	m_xavix_7ffa_data = data;
 }
 
 WRITE8_MEMBER(xavix_state::xavix_7ffb_w)
 {
 	logerror("%s: xavix_7ffb_w %02x (7ffx pair 1, byte 2?)\n", machine().describe_context(), data);
+	m_xavix_7ffb_data = data;
 }
 
 WRITE8_MEMBER(xavix_state::xavix_7ffe_w)
 {
 	logerror("%s: xavix_7ffe_w %02x (7ffx pair 2, byte 1?)\n", machine().describe_context(), data);
+	m_xavix_7ffe_data = data;
 }
 
 WRITE8_MEMBER(xavix_state::xavix_7fff_w)
 {
 	logerror("%s: xavix_7fff_w %02x (7ffx pair 2, byte 2?)\n", machine().describe_context(), data);
+	m_xavix_7fff_data = data;
 }
 
 
 WRITE8_MEMBER(xavix_state::xavix_7900_w)
 {
 	logerror("%s: xavix_7900_w %02x (---FIRST WRITE ON STARTUP---)\n", machine().describe_context(), data);
+}
+
+
+
+TIMER_DEVICE_CALLBACK_MEMBER(xavix_state::scanline_cb)
+{
+//	int scanline = param;
+}
+
+INTERRUPT_GEN_MEMBER(xavix_state::interrupt)
+{
+//	if (m_xavix_7ff9_data != 0)
+//		m_maincpu->set_input_line(INPUT_LINE_IRQ0,HOLD_LINE);
+
+	if (m_xavix_7ff9_data != 0)
+		m_maincpu->set_input_line(INPUT_LINE_NMI,PULSE_LINE);
 }
 
 
@@ -266,16 +297,16 @@ static ADDRESS_MAP_START( xavix_map, AS_PROGRAM, 8, xavix_state )
 	AM_RANGE(0x007900, 0x007900) AM_WRITE(xavix_7900_w) // startup
 	AM_RANGE(0x007902, 0x007902) AM_WRITENOP // startup
 
-	// possible trigger for below (written after the others) waits on status of bit 1 in a loop
+	// DMA trigger for below (written after the others) waits on status of bit 1 in a loop
 	AM_RANGE(0x007980, 0x007980) AM_READWRITE(xavix_7980_r, xavix_7980_w)
-	// seem to be a triplet?
+	// DMA source
 	AM_RANGE(0x007981, 0x007981) AM_WRITE(xavix_7981_w)
 	AM_RANGE(0x007982, 0x007982) AM_WRITE(xavix_7982_w)
 	AM_RANGE(0x007983, 0x007983) AM_WRITE(xavix_7983_w)
-	// seem to be a pair
+	// DMA dest
 	AM_RANGE(0x007984, 0x007984) AM_WRITE(xavix_7984_w)
 	AM_RANGE(0x007985, 0x007985) AM_WRITE(xavix_7985_w)
-	// seem to be a pair
+	// DMA length
 	AM_RANGE(0x007986, 0x007986) AM_WRITE(xavix_7986_w)
 	AM_RANGE(0x007987, 0x007987) AM_WRITE(xavix_7987_w)
 
@@ -284,13 +315,12 @@ static ADDRESS_MAP_START( xavix_map, AS_PROGRAM, 8, xavix_state )
 
 	AM_RANGE(0x007a03, 0x007a03) AM_READNOP AM_WRITENOP // startup
 
-	// again possible trigger for below, written after them
+	// maybe irq enable, written after below
 	AM_RANGE(0x007ff9, 0x007ff9) AM_WRITE(xavix_7ff9_w)
-	// also seems to be a pair
+	// an IRQ vector (nmi?)
 	AM_RANGE(0x007ffa, 0x007ffa) AM_WRITE(xavix_7ffa_w)
 	AM_RANGE(0x007ffb, 0x007ffb) AM_WRITE(xavix_7ffb_w)
-
-	// also seems to be a pair
+	// an IRQ vector (irq?)
 	AM_RANGE(0x007ffe, 0x007ffe) AM_WRITE(xavix_7ffe_w)
 	AM_RANGE(0x007fff, 0x007fff) AM_WRITE(xavix_7fff_w)
 
@@ -385,14 +415,46 @@ void xavix_state::machine_reset()
 
 	m_xavix_7986_data = 0;
 	m_xavix_7987_data = 0;
+
+	m_xavix_7ff9_data = 0;
+	m_xavix_7ffa_data = 0;
+	m_xavix_7ffb_data = 0;
+	m_xavix_7ffe_data = 0;
+	m_xavix_7fff_data = 0;
 }
 
+typedef device_delegate<uint8_t (int which, int half)> xavix_interrupt_vector_delegate;
+
+uint8_t xavix_state::get_vectors(int which, int half)
+{
+//	logerror("get_vectors %d %d\n", which, half);
+
+	if (which == 0) // NMI
+	{
+		if (half == 0)
+			return m_xavix_7ffb_data;
+		else
+			return m_xavix_7ffa_data;
+	}
+	else
+	{
+		if (half == 0)
+			return m_xavix_7fff_data;
+		else
+			return m_xavix_7ffe_data;
+	}
+}
 
 MACHINE_CONFIG_START(xavix_state::xavix)
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu",XAVIX,MAIN_CLOCK)
 	MCFG_CPU_PROGRAM_MAP(xavix_map)
+	MCFG_CPU_VBLANK_INT_DRIVER("screen", xavix_state,  interrupt)
+	MCFG_XAVIX_VECTOR_CALLBACK(xavix_state, get_vectors)
+
+	MCFG_TIMER_DRIVER_ADD_SCANLINE("scantimer", xavix_state, scanline_cb, "screen", 0, 1)
+
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)

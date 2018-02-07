@@ -28,3 +28,50 @@ retf_imp
 	PC = set_h(PC, read(SP));
 	m_farbank = TMP2;
 	prefetch();
+
+brk_xav_imp
+	// The 6502 bug when a nmi occurs in a brk is reproduced (case !irq_taken && nmi_state)
+	if(irq_taken) {
+		read_pc_noinc();
+	} else {
+		read_pc();
+	}
+	write(SP, PC >> 8);
+	dec_SP();
+	write(SP, PC);
+	dec_SP();
+	write(SP, irq_taken ? P & ~F_B : P);
+	dec_SP();
+	if(nmi_state) {
+		if (m_vector_callback.isnull())
+		{
+			PC = read_arg(0xfffa);
+			PC = set_h(PC, read_arg(0xfffb));
+		}
+		else
+		{
+			PC = m_vector_callback(0,1);
+			PC = set_h(PC, m_vector_callback(0,0));
+		}
+
+		nmi_state = false;
+		standard_irq_callback(NMI_LINE);
+	} else {
+		if (m_vector_callback.isnull())
+		{
+			PC = read_arg(0xfffe);
+			PC = set_h(PC, read_arg(0xffff));
+		}
+		else
+		{
+			PC = m_vector_callback(1,1);
+			PC = set_h(PC, m_vector_callback(1,0));
+		}
+
+		if(irq_taken)
+			standard_irq_callback(IRQ_LINE);
+	}
+	irq_taken = false;
+	P |= F_I; // Do *not* move after the prefetch
+	prefetch();
+	inst_state = -1;
