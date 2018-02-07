@@ -240,6 +240,8 @@ uint32_t model2_state::copro_fifoout_pop(address_space &space,uint32_t offset, u
 		m_maincpu->i960_stall();
 
 		/* spin the main cpu and let the TGP catch up */
+		// TODO: Daytona needs a much shorter spin time (like 25 usecs), but that breaks other games even moreso
+		// @seealso http://www.mameworld.info/ubbthreads/showflat.php?Cat=&Number=358069&page=&view=&sb=5&o=&vc=1
 		m_maincpu->spin_until_time(attotime::from_usec(100));
 
 		return 0;
