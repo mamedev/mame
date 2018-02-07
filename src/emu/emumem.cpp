@@ -2342,7 +2342,7 @@ void address_space::allocate_memory()
 	int tail = blocklist.size();
 	for (address_map_entry &entry : m_map->m_entrylist)
 		if (entry.m_memory != nullptr)
-			blocklist.insert(blocklist.begin(), std::make_unique<memory_block>(*this, entry.m_addrstart, entry.m_addrend, entry.m_memory));
+			blocklist.insert(blocklist.begin() + tail, std::make_unique<memory_block>(*this, entry.m_addrstart, entry.m_addrend, entry.m_memory));
 
 	// loop over all blocks just allocated and assign pointers from them
 	address_map_entry *unassigned = nullptr;
