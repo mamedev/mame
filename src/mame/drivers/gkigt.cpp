@@ -86,6 +86,7 @@ More chips (from eBay auction):
 #include "emu.h"
 #include "cpu/i960/i960.h"
 #include "machine/nvram.h"
+#include "video/ramdac.h"
 #include "sound/ymz280b.h"
 #include "screen.h"
 #include "speaker.h"
@@ -119,46 +120,21 @@ public:
 
 	DECLARE_READ32_MEMBER(uart_status_r);
 	DECLARE_WRITE32_MEMBER(uart_w);
-	DECLARE_WRITE32_MEMBER(clut_w);
-	DECLARE_WRITE32_MEMBER(clut_mask_w);
 
 	void igt_gameking(machine_config &config);
 private:
-	int m_offset, m_r, m_g, m_b, m_state;
 	bool m_bToggle;
-	u8 m_clut_mask;
 };
 
-static INPUT_PORTS_START( igt_gameking )
-INPUT_PORTS_END
-
-WRITE32_MEMBER(igt_gameking_state::clut_w)
+void igt_gameking_state::video_start()
 {
-	if (mem_mask == 0x000000ff)
-	{
-		m_offset = data & 0xff;
-		m_state = 0;
-	}
-	else if (mem_mask == 0x00ff0000)
-	{
-		switch (m_state)
-		{
-			case 0: m_r = (data>>16) & 0xff; m_state++; break;
-			case 1: m_g = (data>>16) & 0xff; m_state++; break;
-			case 2:
-				m_b = (data>>16) & 0xff;
-				//printf("CLUT: color %d = R %d G %d B %d\n", m_offset, m_r, m_g, m_b);
-				m_palette->set_pen_color(m_offset, m_r<<18 | m_g<<10 | m_b<<2);
-				m_state = 0;
-				break;
-		}
-	}
 }
 
-WRITE32_MEMBER(igt_gameking_state::clut_mask_w)
+uint32_t igt_gameking_state::screen_update_igt_gameking(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
-	m_clut_mask = data & 0xff;
+	return 0;
 }
+
 
 READ32_MEMBER(igt_gameking_state::uart_status_r)
 {
@@ -177,17 +153,6 @@ void igt_gameking_state::machine_start()
 void igt_gameking_state::machine_reset()
 {
 	m_bToggle = false;
-	m_offset = m_state = m_r = m_g = m_b = 0;
-	m_clut_mask = 0xff;
-}
-
-void igt_gameking_state::video_start()
-{
-}
-
-uint32_t igt_gameking_state::screen_update_igt_gameking(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
-{
-	return 0;
 }
 
 
@@ -210,12 +175,16 @@ static ADDRESS_MAP_START( igt_gameking_mem, AS_PROGRAM, 32, igt_gameking_state )
 	AM_RANGE(0x28030000, 0x28030003) AM_READ(igt_gk_28030000_r)
 	AM_RANGE(0x28040000, 0x2804ffff) AM_RAM
 	AM_RANGE(0x28050000, 0x28050003) AM_DEVREADWRITE8("ymz", ymz280b_device, read, write, 0x00ff00ff)
-	AM_RANGE(0x28060000, 0x28060003) AM_WRITE(clut_w)
-	AM_RANGE(0x28060004, 0x28060007) AM_WRITE(clut_mask_w)
+	AM_RANGE(0x28060000, 0x28060003) AM_DEVWRITE8("ramdac",ramdac_device, index_w, 0x000000ff )
+	AM_RANGE(0x28060000, 0x28060003) AM_DEVWRITE8("ramdac",ramdac_device, pal_w, 0x00ff0000 )
+	AM_RANGE(0x28060004, 0x28060007) AM_DEVWRITE8("ramdac",ramdac_device, mask_w, 0x000000ff )
 
 	AM_RANGE(0xa1000000, 0xa1011fff) AM_RAM // used by gkkey for restart IAC
 
 ADDRESS_MAP_END
+
+static INPUT_PORTS_START( igt_gameking )
+INPUT_PORTS_END
 
 static const gfx_layout igt_gameking_layout =
 {
@@ -233,7 +202,9 @@ static GFXDECODE_START( igt_gameking )
 	GFXDECODE_ENTRY( "cg", 0, igt_gameking_layout,   0x0, 1  )
 GFXDECODE_END
 
-
+static ADDRESS_MAP_START( ramdac_map, 0, 8, igt_gameking_state )
+	AM_RANGE(0x000, 0x3ff) AM_DEVREADWRITE("ramdac",ramdac_device,ramdac_pal_r,ramdac_rgb666_w)
+ADDRESS_MAP_END
 
 MACHINE_CONFIG_START(igt_gameking_state::igt_gameking)
 
@@ -253,8 +224,9 @@ MACHINE_CONFIG_START(igt_gameking_state::igt_gameking)
 	MCFG_SCREEN_PALETTE("palette")
 	// Xilinx used as video chip XTAL(26'666'666) on board
 
-	MCFG_PALETTE_ADD("palette", 0x200)
-	MCFG_PALETTE_FORMAT(xRRRRRGGGGGBBBBB)
+	MCFG_PALETTE_ADD("palette", 0x100)
+
+	MCFG_RAMDAC_ADD("ramdac", ramdac_map, "palette")
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
