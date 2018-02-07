@@ -165,13 +165,10 @@ class ddenlovr_state : public dynax_state
 public:
 	ddenlovr_state(const machine_config &mconfig, device_type type, const char *tag)
 		: dynax_state(mconfig, type, tag),
-		m_dsw_sel16(*this, "dsw_sel16"),
 		m_protection1(*this, "protection1"),
 		m_protection2(*this, "protection2"),
 		m_soundlatch(*this, "soundlatch") { }
 
-
-	optional_shared_ptr<uint16_t> m_dsw_sel16;
 	optional_shared_ptr<uint16_t> m_protection1;
 	optional_shared_ptr<uint16_t> m_protection2;
 
@@ -379,6 +376,8 @@ public:
 	DECLARE_READ16_MEMBER(akamaru_protection1_r);
 	DECLARE_WRITE16_MEMBER(akamaru_protection1_w);
 	DECLARE_READ16_MEMBER(akamaru_protection2_r);
+	DECLARE_WRITE_LINE_MEMBER(akamaru_dsw1_sel_w);
+	DECLARE_WRITE_LINE_MEMBER(akamaru_dsw2_sel_w);
 	DECLARE_READ16_MEMBER(akamaru_dsw_r);
 	DECLARE_READ16_MEMBER(akamaru_blitter_r);
 	DECLARE_READ16_MEMBER(akamaru_e0010d_r);
@@ -1948,9 +1947,9 @@ ADDRESS_MAP_END
 READ16_MEMBER(ddenlovr_state::ddenlovj_dsw_r)
 {
 	uint16_t dsw = 0;
-	if ((~*m_dsw_sel16) & 0x01) dsw |= ioport("DSW1")->read();
-	if ((~*m_dsw_sel16) & 0x02) dsw |= ioport("DSW2")->read();
-	if ((~*m_dsw_sel16) & 0x04) dsw |= ioport("DSW3")->read();
+	if (~m_dsw_sel & 0x01) dsw |= ioport("DSW1")->read();
+	if (~m_dsw_sel & 0x02) dsw |= ioport("DSW2")->read();
+	if (~m_dsw_sel & 0x04) dsw |= ioport("DSW3")->read();
 	return dsw;
 }
 
@@ -1990,7 +1989,7 @@ static ADDRESS_MAP_START( ddenlovj_map, AS_PROGRAM, 16, ddenlovr_state )
 	AM_RANGE(0x300184, 0x300185) AM_READ_PORT("SYSTEM")
 	AM_RANGE(0x300186, 0x300187) AM_READ(ddenlovj_dsw_r)                                // DSW
 	AM_RANGE(0x300188, 0x300189) AM_WRITE8(ddenlovj_coincounter_w, 0x00ff)
-	AM_RANGE(0x30018a, 0x30018b) AM_WRITEONLY AM_SHARE("dsw_sel16")         // DSW select
+	AM_RANGE(0x30018a, 0x30018b) AM_WRITE8(ddenlovr_select_w, 0x00ff)                   // DSW select
 	AM_RANGE(0x30018c, 0x30018d) AM_WRITE8(ddenlovr_oki_bank_w, 0x00ff)
 	AM_RANGE(0x3001c0, 0x3001cf) AM_DEVWRITE8("mainlatch", ls259_device, write_d0, 0x00ff)
 	AM_RANGE(0x300240, 0x300241) AM_DEVREADWRITE8("oki", okim6295_device, read, write, 0x00ff)// Sound
@@ -3651,12 +3650,22 @@ READ16_MEMBER(ddenlovr_state::akamaru_protection2_r)
 	return 0x55;
 }
 
+WRITE_LINE_MEMBER(ddenlovr_state::akamaru_dsw1_sel_w)
+{
+	m_dsw_sel = (m_dsw_sel & 2) | state;
+}
+
+WRITE_LINE_MEMBER(ddenlovr_state::akamaru_dsw2_sel_w)
+{
+	m_dsw_sel = (m_dsw_sel & 1) | (state << 1);
+}
+
 READ16_MEMBER(ddenlovr_state::akamaru_dsw_r)
 {
 	uint16_t dsw = 0;
 
-	if (m_dsw_sel16[1] == 0xff) dsw |= ioport("DSW1")->read();
-	if (m_dsw_sel16[0] == 0xff) dsw |= ioport("DSW2")->read();
+	if (BIT(m_dsw_sel, 0)) dsw |= ioport("DSW1")->read();
+	if (BIT(m_dsw_sel, 1)) dsw |= ioport("DSW2")->read();
 	return dsw;
 }
 
@@ -3677,7 +3686,8 @@ static ADDRESS_MAP_START( akamaru_map, AS_PROGRAM, 16, ddenlovr_state )
 	AM_RANGE(0x624680, 0x624681) AM_READ(akamaru_protection1_r)
 
 	AM_RANGE(0xd00000, 0xd003ff) AM_WRITE8(rongrong_palette_w, 0x00ff)
-//  AM_RANGE(0xd01000, 0xd017ff) AM_WRITEONLY                                          // 0
+	AM_RANGE(0xd00e00, 0xd00e09) AM_WRITENOP
+	AM_RANGE(0xd01000, 0xd017ff) AM_WRITENOP                                          // 0
 
 	AM_RANGE(0xe00040, 0xe00047) AM_WRITE8(ddenlovr_palette_base_w, 0x00ff)
 	AM_RANGE(0xe00048, 0xe0004f) AM_WRITE8(ddenlovr_palette_mask_w, 0x00ff)
@@ -3702,9 +3712,7 @@ static ADDRESS_MAP_START( akamaru_map, AS_PROGRAM, 16, ddenlovr_state )
 
 	AM_RANGE(0xe00204, 0xe00205) AM_READ(akamaru_blitter_r)                                 // Blitter Busy & IRQ
 
-	AM_RANGE(0xe00304, 0xe00307) AM_WRITEONLY AM_SHARE("dsw_sel16")             // DSW select
-
-	AM_RANGE(0xe00300, 0xe0030f) AM_DEVWRITE8("mainlatch", ls259_device, write_d0, 0x00ff)
+	AM_RANGE(0xe00300, 0xe0030f) AM_DEVWRITE8("mainlatch", ls259_device, write_d0, 0x00ff) AM_READNOP
 	AM_RANGE(0xe00400, 0xe00403) AM_DEVWRITE8("ym2413", ym2413_device, write, 0x00ff)
 	AM_RANGE(0xe00500, 0xe0051f) AM_DEVREADWRITE8("rtc", msm6242_device, read, write, 0x00ff)
 	AM_RANGE(0xe00600, 0xe00603) AM_DEVWRITE8("aysnd", ay8910_device, address_data_w, 0x00ff)
@@ -9710,6 +9718,10 @@ MACHINE_CONFIG_DERIVED(ddenlovr_state::akamaru, ddenlovr)
 	/* basic machine hardware */
 	MCFG_CPU_MODIFY("maincpu")
 	MCFG_CPU_PROGRAM_MAP(akamaru_map)
+
+	MCFG_DEVICE_MODIFY("mainlatch")
+	MCFG_ADDRESSABLE_LATCH_Q2_OUT_CB(WRITELINE(ddenlovr_state, akamaru_dsw2_sel_w))
+	MCFG_ADDRESSABLE_LATCH_Q3_OUT_CB(WRITELINE(ddenlovr_state, akamaru_dsw1_sel_w))
 MACHINE_CONFIG_END
 
 MACHINE_CONFIG_DERIVED(ddenlovr_state::quiz365, ddenlovj)
