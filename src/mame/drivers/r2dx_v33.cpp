@@ -82,11 +82,17 @@ class r2dx_v33_state : public raiden2_state
 public:
 	r2dx_v33_state(const machine_config &mconfig, device_type type, const char *tag)
 		: raiden2_state(mconfig, type, tag),
+		m_gamebank(*this, "gamebank"),
+		m_okibank(*this, "okibank"),
 		m_r2dxbank(0),
 		m_r2dxgameselect(0),
+		m_mcu_prog(nullptr),
 		m_eeprom(*this, "eeprom"),
 		m_math(*this, "math")
 	{ }
+	
+	optional_memory_bank m_gamebank;
+	optional_memory_bank m_okibank;
 
 	DECLARE_WRITE16_MEMBER(r2dx_angle_w);
 	DECLARE_WRITE16_MEMBER(r2dx_dx_w);
@@ -117,9 +123,7 @@ public:
 	DECLARE_WRITE16_MEMBER(r2dx_tilemapdma_w);
 	DECLARE_WRITE16_MEMBER(r2dx_paldma_w);
 	DECLARE_READ16_MEMBER(r2dx_debug_r);
-
-	INTERRUPT_GEN_MEMBER(rdx_v33_interrupt);
-
+	
 	DECLARE_MACHINE_RESET(r2dx_v33);
 	DECLARE_MACHINE_RESET(nzeroteam);
 
@@ -137,7 +141,7 @@ private:
 
 	uint16_t m_r2dx_i_dx, m_r2dx_i_dy, m_r2dx_i_angle;
 	uint32_t m_r2dx_i_sdist;
-	uint16_t m_mcu_prog[0x800];
+	std::unique_ptr<uint16_t[]> m_mcu_prog;
 	int m_mcu_prog_offs;
 	uint16_t m_mcu_xval, m_mcu_yval;
 	uint16_t m_mcu_data[9];
@@ -150,13 +154,15 @@ void r2dx_v33_state::machine_start()
 {
 	raiden2_state::machine_start();
 
+	m_mcu_prog = make_unique_clear<uint16_t[]>(0x800);
+
 	save_item(NAME(m_r2dxbank));
 	save_item(NAME(m_r2dxgameselect));
 	save_item(NAME(m_r2dx_i_dx));
 	save_item(NAME(m_r2dx_i_dy));
 	save_item(NAME(m_r2dx_i_angle));
 	save_item(NAME(m_r2dx_i_sdist));
-	save_item(NAME(m_mcu_prog));
+	save_pointer(NAME(m_mcu_prog.get()), 0x800);
 	save_item(NAME(m_mcu_prog_offs));
 	save_item(NAME(m_mcu_xval));
 	save_item(NAME(m_mcu_yval));
@@ -168,29 +174,29 @@ WRITE16_MEMBER(r2dx_v33_state::tile_bank_w)
 	if(ACCESSING_BITS_0_7) {
 		int new_bank;
 		new_bank = ((data & 0x10)>>4);
-		if(new_bank != bg_bank) {
-			bg_bank = new_bank;
-			background_layer->mark_all_dirty();
+		if(new_bank != m_bg_bank) {
+			m_bg_bank = new_bank;
+			m_background_layer->mark_all_dirty();
 		}
 
 		new_bank = 2 + ((data & 0x20)>>5);
-		if(new_bank != mid_bank) {
-			mid_bank = new_bank;
-			midground_layer->mark_all_dirty();
+		if(new_bank != m_mid_bank) {
+			m_mid_bank = new_bank;
+			m_midground_layer->mark_all_dirty();
 		}
 
 		new_bank = 4 | (data & 3);
-		if(new_bank != fg_bank) {
-			fg_bank = new_bank;
-			foreground_layer->mark_all_dirty();
+		if(new_bank != m_fg_bank) {
+			m_fg_bank = new_bank;
+			m_foreground_layer->mark_all_dirty();
 		}
 	}
 }
 
 void r2dx_v33_state::r2dx_setbanking(void)
 {
-	membank("bank1")->set_entry(m_r2dxgameselect*0x20 + m_r2dxbank + 16);
-	membank("bank3")->set_entry(m_r2dxgameselect);
+	m_mainbank->set_entry(m_r2dxgameselect*0x10 + m_r2dxbank);
+	m_gamebank->set_entry(m_r2dxgameselect);
 }
 
 WRITE16_MEMBER(r2dx_v33_state::rdx_v33_eeprom_w)
@@ -208,12 +214,12 @@ WRITE16_MEMBER(r2dx_v33_state::rdx_v33_eeprom_w)
 		// the bit gets set if it reads RAIDENDX from the EEPROM
 		m_r2dxgameselect = (data & 0x04) >> 2;
 
-		tx_bank = m_r2dxgameselect;
-		text_layer->mark_all_dirty();
+		m_tx_bank = m_r2dxgameselect;
+		m_text_layer->mark_all_dirty();
 
 		r2dx_setbanking();
 
-		membank("okibank")->set_entry(data&3);
+		m_okibank->set_entry(data&3);
 
 	}
 	else
@@ -243,7 +249,7 @@ WRITE16_MEMBER(r2dx_v33_state::mcu_prog_w2)
 		fp=fopen(tmp, "w+b");
 		if (fp)
 		{
-			fwrite(m_mcu_prog, 0x400, 2, fp);
+			fwrite(m_mcu_prog.get(), 0x400, 2, fp);
 			fclose(fp);
 		}
 	}
@@ -378,15 +384,11 @@ READ16_MEMBER(r2dx_v33_state::r2dx_debug_r)
 	return 0xffff;
 }
 
-static ADDRESS_MAP_START( rdx_v33_map, AS_PROGRAM, 16, r2dx_v33_state )
+static ADDRESS_MAP_START( rdx_v33_common_map, AS_PROGRAM, 16, r2dx_v33_state )
 	AM_RANGE(0x00000, 0x003ff) AM_RAM // vectors copied here
 
 	AM_RANGE(0x00400, 0x00401) AM_WRITE(r2dx_tilemapdma_w) // tilemaps to private buffer
 	AM_RANGE(0x00402, 0x00403) AM_WRITE(r2dx_paldma_w)  // palettes to private buffer
-
-
-	AM_RANGE(0x00404, 0x00405) AM_WRITE(r2dx_rom_bank_w)
-	AM_RANGE(0x00406, 0x00407) AM_WRITE(tile_bank_w)
 
 	AM_RANGE(0x00420, 0x00421) AM_WRITE(r2dx_dx_w)
 	AM_RANGE(0x00422, 0x00423) AM_WRITE(r2dx_dy_w)
@@ -398,16 +400,38 @@ static ADDRESS_MAP_START( rdx_v33_map, AS_PROGRAM, 16, r2dx_v33_state )
 	AM_RANGE(0x00432, 0x00433) AM_READ(r2dx_dist_r)
 	AM_RANGE(0x00434, 0x00435) AM_READ(r2dx_sin_r)
 	AM_RANGE(0x00436, 0x00437) AM_READ(r2dx_cos_r)
-
+	
 	AM_RANGE(0x00600, 0x0063f) AM_DEVREADWRITE("crtc", seibu_crtc_device, read, write)
 	//AM_RANGE(0x00640, 0x006bf) AM_DEVREADWRITE("obj", seibu_encrypted_sprite_device, read, write)
 	AM_RANGE(0x0068e, 0x0068f) AM_WRITENOP // sprite buffering
-	AM_RANGE(0x006b0, 0x006b1) AM_WRITE(mcu_prog_w) // could be encryption key uploads just like raiden2.cpp ?
+	AM_RANGE(0x006b0, 0x006b1) AM_WRITE(mcu_prog_w)
 	AM_RANGE(0x006b2, 0x006b3) AM_WRITE(mcu_prog_w2)
 //  AM_RANGE(0x006b4, 0x006b5) AM_WRITENOP
 //  AM_RANGE(0x006b6, 0x006b7) AM_WRITENOP
 	AM_RANGE(0x006bc, 0x006bd) AM_WRITE(mcu_prog_offs_w)
-//  AM_RANGE(0x006be, 0x006bf) AM_WRITENOP
+//  AM_RANGE(0x006d8, 0x006d9) AM_WRITE(bbbbll_w) // scroll?
+//  AM_RANGE(0x006dc, 0x006dd) AM_READ(nzerotea_unknown_r)
+//  AM_RANGE(0x006de, 0x006df) AM_WRITE(mcu_unkaa_w) // mcu command related?
+
+	AM_RANGE(0x00800, 0x00fff) AM_RAM // copies eeprom here?
+	AM_RANGE(0x01000, 0x0bfff) AM_RAM
+
+	AM_RANGE(0x0c000, 0x0c7ff) AM_RAM AM_SHARE("spriteram")
+	AM_RANGE(0x0c800, 0x0cfff) AM_RAM
+	AM_RANGE(0x0d000, 0x0d7ff) AM_RAM //_WRITE(raiden2_background_w) AM_SHARE("back_data")
+	AM_RANGE(0x0d800, 0x0dfff) AM_RAM //_WRITE(raiden2_foreground_w) AM_SHARE("fore_data")
+	AM_RANGE(0x0e000, 0x0e7ff) AM_RAM //_WRITE(raiden2_midground_w)  AM_SHARE("mid_data")
+	AM_RANGE(0x0e800, 0x0f7ff) AM_RAM //_WRITE(raiden2_text_w) AM_SHARE("text_data")
+	AM_RANGE(0x0f800, 0x0ffff) AM_RAM /* Stack area */
+	AM_RANGE(0x10000, 0x1efff) AM_RAM
+	AM_RANGE(0x1f000, 0x1ffff) AM_RAM //_DEVWRITE("palette", palette_device, write) AM_SHARE("palette")
+ADDRESS_MAP_END
+
+static ADDRESS_MAP_START( rdx_v33_map, AS_PROGRAM, 16, r2dx_v33_state )
+	AM_IMPORT_FROM( rdx_v33_common_map )
+
+	AM_RANGE(0x00404, 0x00405) AM_WRITE(r2dx_rom_bank_w)
+	AM_RANGE(0x00406, 0x00407) AM_WRITE(tile_bank_w)
 
 	// sprite protection not 100% verified as the same
 	AM_RANGE(0x006c0, 0x006c1) AM_READWRITE(sprite_prot_off_r, sprite_prot_off_w)
@@ -428,74 +452,19 @@ static ADDRESS_MAP_START( rdx_v33_map, AS_PROGRAM, 16, r2dx_v33_state )
 
 	AM_RANGE(0x00780, 0x00781) AM_DEVREADWRITE8("oki", okim6295_device, read, write, 0x00ff) // single OKI chip on this version
 
-	AM_RANGE(0x00800, 0x00fff) AM_RAM // copies eeprom here?
-	AM_RANGE(0x01000, 0x0bfff) AM_RAM
-
-	AM_RANGE(0x0c000, 0x0c7ff) AM_RAM AM_SHARE("sprites")
-	AM_RANGE(0x0c800, 0x0cfff) AM_RAM
-	AM_RANGE(0x0d000, 0x0d7ff) AM_RAM //_WRITE(raiden2_background_w) AM_SHARE("back_data")
-	AM_RANGE(0x0d800, 0x0dfff) AM_RAM //_WRITE(raiden2_foreground_w) AM_SHARE("fore_data")
-	AM_RANGE(0x0e000, 0x0e7ff) AM_RAM //_WRITE(raiden2_midground_w)  AM_SHARE("mid_data")
-	AM_RANGE(0x0e800, 0x0f7ff) AM_RAM //_WRITE(raiden2_text_w) AM_SHARE("text_data")
-	AM_RANGE(0x0f800, 0x0ffff) AM_RAM /* Stack area */
-	AM_RANGE(0x10000, 0x1efff) AM_RAM
-	AM_RANGE(0x1f000, 0x1ffff) AM_RAM //_DEVWRITE("palette", palette_device, write) AM_SHARE("palette")
-
-	AM_RANGE(0x20000, 0x2ffff) AM_ROMBANK("bank1") AM_WRITENOP
-	AM_RANGE(0x30000, 0xfffff) AM_ROMBANK("bank3") AM_WRITENOP
+	AM_RANGE(0x20000, 0x2ffff) AM_ROMBANK("mainbank") AM_WRITENOP
+	AM_RANGE(0x30000, 0xfffff) AM_ROMBANK("gamebank") AM_WRITENOP
 ADDRESS_MAP_END
 
 
 static ADDRESS_MAP_START( nzeroteam_base_map, AS_PROGRAM, 16, r2dx_v33_state )
-	AM_RANGE(0x00000, 0x003ff) AM_RAM //stack area
-
-	AM_RANGE(0x00400, 0x00401) AM_WRITE(r2dx_tilemapdma_w) // tilemaps to private buffer
-	AM_RANGE(0x00402, 0x00403) AM_WRITE(r2dx_paldma_w)  // palettes to private buffer
-	// 0x404 is bank on r2dx, this doesn't need it
-	// AM_RANGE(0x00406, 0x00407) AM_WRITE(tile_bank_w) // not the same?
+	AM_IMPORT_FROM( rdx_v33_common_map )
 
 	AM_RANGE(0x00406, 0x00407) AM_NOP // always 6022, supposed to be the tile bank but ignores the actual value???
-
-	AM_RANGE(0x00420, 0x00421) AM_WRITE(r2dx_dx_w)
-	AM_RANGE(0x00422, 0x00423) AM_WRITE(r2dx_dy_w)
-	AM_RANGE(0x00424, 0x00425) AM_WRITE(r2dx_sdistl_w)
-	AM_RANGE(0x00426, 0x00427) AM_WRITE(r2dx_sdisth_w)
-	AM_RANGE(0x00428, 0x00429) AM_WRITE(r2dx_angle_w)
-
-	AM_RANGE(0x00430, 0x00431) AM_READ(r2dx_angle_r)
-	AM_RANGE(0x00432, 0x00433) AM_READ(r2dx_dist_r)
-	AM_RANGE(0x00434, 0x00435) AM_READ(r2dx_sin_r)
-	AM_RANGE(0x00436, 0x00437) AM_READ(r2dx_cos_r)
-
-	AM_RANGE(0x00600, 0x0063f) AM_DEVREADWRITE("crtc", seibu_crtc_device, read, write)
-	//AM_RANGE(0x00640, 0x006bf) AM_DEVREADWRITE("obj", seibu_encrypted_sprite_device, read, write)
-	AM_RANGE(0x0068e, 0x0068f) AM_WRITENOP // sprite buffering
-	AM_RANGE(0x006b0, 0x006b1) AM_WRITE(mcu_prog_w)
-	AM_RANGE(0x006b2, 0x006b3) AM_WRITE(mcu_prog_w2)
-//  AM_RANGE(0x006b4, 0x006b5) AM_WRITENOP
-//  AM_RANGE(0x006b6, 0x006b7) AM_WRITENOP
-	AM_RANGE(0x006bc, 0x006bd) AM_WRITE(mcu_prog_offs_w)
-//  AM_RANGE(0x006d8, 0x006d9) AM_WRITE(bbbbll_w) // scroll?
-//  AM_RANGE(0x006dc, 0x006dd) AM_READ(nzerotea_unknown_r)
-//  AM_RANGE(0x006de, 0x006df) AM_WRITE(mcu_unkaa_w) // mcu command related?
-	//AM_RANGE(0x00700, 0x00701) AM_WRITE(rdx_v33_eeprom_w)
 
 //  AM_RANGE(0x00762, 0x00763) AM_READ(nzerotea_unknown_r)
 
 	AM_RANGE(0x00780, 0x0079f) AM_DEVREADWRITE8_MOD("seibu_sound", seibu_sound_device, main_r, main_w, rshift<1>, 0x00ff)
-
-	AM_RANGE(0x00800, 0x00fff) AM_RAM
-	AM_RANGE(0x01000, 0x0bfff) AM_RAM
-
-	AM_RANGE(0x0c000, 0x0c7ff) AM_RAM AM_SHARE("sprites")
-	AM_RANGE(0x0c800, 0x0cfff) AM_RAM
-	AM_RANGE(0x0d000, 0x0d7ff) AM_RAM //_WRITE(raiden2_background_w) AM_SHARE("back_data")
-	AM_RANGE(0x0d800, 0x0dfff) AM_RAM //_WRITE(raiden2_foreground_w) AM_SHARE("fore_data")
-	AM_RANGE(0x0e000, 0x0e7ff) AM_RAM //_WRITE(raiden2_midground_w)  AM_SHARE("mid_data")
-	AM_RANGE(0x0e800, 0x0f7ff) AM_RAM //_WRITE(raiden2_text_w) AM_SHARE("text_data")
-	AM_RANGE(0x0f800, 0x0ffff) AM_RAM /* Stack area */
-	AM_RANGE(0x10000, 0x1efff) AM_RAM
-	AM_RANGE(0x1f000, 0x1ffff) AM_RAM //_DEVWRITE("palette", palette_device, write) AM_SHARE("palette")
 
 	AM_RANGE(0x20000, 0xfffff) AM_ROM AM_REGION("maincpu", 0x20000 )
 ADDRESS_MAP_END
@@ -520,61 +489,10 @@ static ADDRESS_MAP_START( zerotm2k_map, AS_PROGRAM, 16, r2dx_v33_state )
 	AM_IMPORT_FROM( nzeroteam_base_map )
 	AM_RANGE(0x00740, 0x00741) AM_READ_PORT("P3_P4")
 	AM_RANGE(0x00744, 0x00745) AM_READ_PORT("INPUT")
-	AM_RANGE(0x0074c, 0x0074d) AM_READ_PORT("SYSTEM")
 	AM_RANGE(0x00748, 0x00749) AM_WRITE(zerotm2k_eeprom_w)
+	AM_RANGE(0x0074c, 0x0074d) AM_READ_PORT("SYSTEM")
 ADDRESS_MAP_END
 
-
-
-INTERRUPT_GEN_MEMBER(r2dx_v33_state::rdx_v33_interrupt)
-{
-	device.execute().set_input_line_and_vector(0, HOLD_LINE, 0xc0/4);   /* VBL */
-}
-
-static const gfx_layout rdx_v33_charlayout =
-{
-	8,8,
-	RGN_FRAC(1,1),
-	4,
-	{ 8,12,0,4 },
-	{ 3,2,1,0,19,18,17,16 },
-	{ STEP8(0,32) },
-	32*8
-};
-
-
-static const gfx_layout rdx_v33_tilelayout =
-{
-	16,16,
-	RGN_FRAC(1,1),
-	4,
-	{ 8,12,0,4 },
-	{
-		3,2,1,0,
-		19,18,17,16,
-		3+64*8, 2+64*8, 1+64*8, 0+64*8,
-		19+64*8,18+64*8,17+64*8,16+64*8,
-	},
-	{ STEP16(0,32) },
-	128*8
-};
-
-static const gfx_layout rdx_v33_spritelayout =
-{
-	16, 16,
-	RGN_FRAC(1,1),
-	4,
-	{ STEP4(0,1) },
-	{ 4, 0, 12, 8, 20, 16, 28, 24, 36, 32, 44, 40, 52, 48, 60, 56 },
-	{ STEP16(0,64) },
-	16*16*4
-};
-
-static GFXDECODE_START( rdx_v33 )
-	GFXDECODE_ENTRY( "gfx1", 0x00000, rdx_v33_charlayout,   0x700, 128 )
-	GFXDECODE_ENTRY( "gfx2", 0x00000, rdx_v33_tilelayout,   0x400, 128 )
-	GFXDECODE_ENTRY( "gfx3", 0x00000, rdx_v33_spritelayout, 0x000, 4096 )
-GFXDECODE_END
 
 static INPUT_PORTS_START( rdx_v33 )
 	PORT_START("SYSTEM")
@@ -752,16 +670,12 @@ INPUT_PORTS_END
 
 MACHINE_RESET_MEMBER(r2dx_v33_state,r2dx_v33)
 {
-	common_reset();
+	common_reset(0,2,6,0);
 }
 
 MACHINE_RESET_MEMBER(r2dx_v33_state,nzeroteam)
 {
-	common_reset();
-
-	bg_bank = 0;
-	fg_bank = 2;
-	mid_bank = 1;
+	common_reset(0,1,2,0);
 }
 
 static ADDRESS_MAP_START( r2dx_oki_map, 0, 8, r2dx_v33_state )
@@ -773,7 +687,7 @@ MACHINE_CONFIG_START(r2dx_v33_state::rdx_v33)
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", V33, 32000000/2 ) // ?
 	MCFG_CPU_PROGRAM_MAP(rdx_v33_map)
-	MCFG_CPU_VBLANK_INT_DRIVER("screen", r2dx_v33_state,  rdx_v33_interrupt)
+	MCFG_CPU_VBLANK_INT_DRIVER("screen", raiden2_state,  raiden2_interrupt)
 
 	MCFG_MACHINE_RESET_OVERRIDE(r2dx_v33_state,r2dx_v33)
 
@@ -785,9 +699,9 @@ MACHINE_CONFIG_START(r2dx_v33_state::rdx_v33)
 	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(500) /* not accurate */)
 	MCFG_SCREEN_SIZE(44*8, 34*8)
 	MCFG_SCREEN_VISIBLE_AREA(0*8, 40*8-1, 0, 30*8-1)
-	MCFG_SCREEN_UPDATE_DRIVER(raiden2_state, screen_update_raiden2)
+	MCFG_SCREEN_UPDATE_DRIVER(raiden2_state, screen_update)
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", rdx_v33)
+	MCFG_GFXDECODE_ADD("gfxdecode", "palette", raiden2)
 	MCFG_PALETTE_ADD("palette", 2048)
 	//MCFG_PALETTE_FORMAT(xBBBBBGGGGGRRRRR)
 
@@ -810,7 +724,7 @@ MACHINE_CONFIG_START(r2dx_v33_state::nzerotea)
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", V33,XTAL(32'000'000)/2) /* verified on pcb */
 	MCFG_CPU_PROGRAM_MAP(nzerotea_map)
-	MCFG_CPU_VBLANK_INT_DRIVER("screen", r2dx_v33_state,  rdx_v33_interrupt)
+	MCFG_CPU_VBLANK_INT_DRIVER("screen", raiden2_state,  raiden2_interrupt)
 
 	MCFG_MACHINE_RESET_OVERRIDE(r2dx_v33_state,nzeroteam)
 
@@ -823,9 +737,9 @@ MACHINE_CONFIG_START(r2dx_v33_state::nzerotea)
 	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(500) /* not accurate */)
 	MCFG_SCREEN_SIZE(44*8, 34*8)
 	MCFG_SCREEN_VISIBLE_AREA(0*8, 40*8-1, 0, 32*8-1)
-	MCFG_SCREEN_UPDATE_DRIVER(raiden2_state, screen_update_raiden2)
+	MCFG_SCREEN_UPDATE_DRIVER(raiden2_state, screen_update)
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", rdx_v33)
+	MCFG_GFXDECODE_ADD("gfxdecode", "palette", raiden2)
 	MCFG_PALETTE_ADD("palette", 2048)
 	//MCFG_PALETTE_FORMAT(xBBBBBGGGGGRRRRR)
 
@@ -863,23 +777,22 @@ DRIVER_INIT_MEMBER(r2dx_v33_state,rdx_v33)
 {
 	init_blending(raiden_blended_colors);
 	static const int spri[5] = { 0, 1, 2, 3, -1 };
-	cur_spri = spri;
+	m_cur_spri = spri;
+	
+	m_mainbank->configure_entries(0,  16, memregion("maincpu")->base()+0x100000,  0x10000); // 0x20000 - 0x2ffff bank for Raiden 2
+	m_mainbank->configure_entries(16, 16, memregion("maincpu")->base()+0x300000,  0x10000); // 0x20000 - 0x2ffff bank for Raiden DX
 
-	membank("bank1")->configure_entries(0, 0x40, memregion("maincpu")->base(), 0x10000);
-
-	membank("bank3")->configure_entry(0, memregion("maincpu")->base()+0x030000); // 0x30000 - 0xfffff bank for Raiden 2
-	membank("bank3")->configure_entry(1, memregion("maincpu")->base()+0x230000); // 0x30000 - 0xfffff bank for Raiden DX
-
+	m_gamebank->configure_entries(0,  2,  memregion("maincpu")->base()+0x030000, 0x200000);
 
 	raiden2_decrypt_sprites(machine());
 
 //  sensible defaults if booting as R2
-	membank("bank1")->set_entry(0);
-	membank("bank3")->set_entry(0);
+	m_mainbank->set_entry(0);
+	m_gamebank->set_entry(0);
 
 
-	membank("okibank")->configure_entries(0, 4, memregion("oki")->base(), 0x40000);
-	membank("okibank")->set_entry(0);
+	m_okibank->configure_entries(0, 4, memregion("oki")->base(), 0x40000);
+	m_okibank->set_entry(0);
 
 }
 
@@ -887,7 +800,7 @@ DRIVER_INIT_MEMBER(r2dx_v33_state,nzerotea)
 {
 	init_blending(zeroteam_blended_colors);
 	static const int spri[5] = { -1, 0, 1, 2, 3 };
-	cur_spri = spri;
+	m_cur_spri = spri;
 
 	zeroteam_decrypt_sprites(machine());
 }
@@ -896,7 +809,7 @@ DRIVER_INIT_MEMBER(r2dx_v33_state,zerotm2k)
 {
 	init_blending(zeroteam_blended_colors);
 	static const int spri[5] = { -1, 0, 1, 2, 3 };
-	cur_spri = spri;
+	m_cur_spri = spri;
 
 	// no sprite encryption(!)
 
@@ -908,7 +821,7 @@ DRIVER_INIT_MEMBER(r2dx_v33_state,zerotm2k)
 	int i;
 	for (i = 0; i < len; i ++)
 		buffer[i] = src[bitswap<32>(i,31,30,29,28,27,26,25,24,23,22,21,20,19,18,17,16,15,14,13,12,11,10,9,8,7,5,6,4,3,2,1,0)];
-	memcpy(src, &buffer[0], len);
+	std::copy(buffer.begin(), buffer.end(), &src[0]);
 }
 
 /*
@@ -1043,15 +956,15 @@ ROM_START( nzeroteam ) /* V33 SYSTEM TYPE_B hardware, uses SEI333 (AKA COPX-D3) 
 	ROM_LOAD16_BYTE( "SEIBU_5.U0616", 0x000000, 0x010000, CRC(ce68ba3c) SHA1(52830533711ec906bf4fe9d06e065ec80b25b4da) )
 	ROM_LOAD16_BYTE( "SEIBU_6.U0617", 0x000001, 0x010000, CRC(cf44aea7) SHA1(e8d622fd5c10133fa563402daf0690fdff297f94) )
 
-	ROM_REGION( 0x400000, "gfx2", 0 ) /* background gfx */
+	ROM_REGION( 0x180000, "gfx2", 0 ) /* background gfx */
 	ROM_LOAD( "back-1", 0x000000, 0x100000, CRC(8b7f9219) SHA1(3412b6f8a4fe245e521ddcf185a53f2f4520eb57) ) /* Same as "MUSHA BACK-1" of other Zero Team sets */
 	ROM_LOAD( "back-2", 0x100000, 0x080000, CRC(ce61c952) SHA1(52a843c8ba428b121fab933dd3b313b2894d80ac) ) /* Same as "MUSHA BACK-2" of other Zero Team sets */
 
-	ROM_REGION32_LE( 0x800000, "gfx3", 0 ) /* sprite gfx (encrypted) */
+	ROM_REGION32_LE( 0x400000, "gfx3", 0 ) /* sprite gfx (encrypted) */
 	ROM_LOAD32_WORD( "obj-1", 0x000000, 0x200000, CRC(45be8029) SHA1(adc164f9dede9a86b96a4d709e9cba7d2ad0e564) ) /* Same as "MUSHA OBJ-1" of other Zero Team sets */
 	ROM_LOAD32_WORD( "obj-2", 0x000002, 0x200000, CRC(cb61c19d) SHA1(151a2ce9c32f3321a974819e9b165dddc31c8153) ) /* Same as "MUSHA OBJ-2" of other Zero Team sets */
 
-	ROM_REGION( 0x100000, "oki", 0 ) /* ADPCM samples */
+	ROM_REGION( 0x40000, "oki", 0 ) /* ADPCM samples */
 	ROM_LOAD( "SEIBU_4.U099", 0x00000, 0x40000, CRC(48be32b1) SHA1(969d2191a3c46871ee8bf93088b3cecce3eccf0c) ) /* Same as other Zero Team sets */
 
 	ROM_REGION( 0x200, "pld", 0 ) /* PLDs */
@@ -1076,15 +989,15 @@ ROM_START( nzeroteama ) /* V33 SYSTEM TYPE_B hardware, uses SEI333 (AKA COPX-D3)
 	ROM_LOAD16_BYTE( "fix1", 0x000000, 0x010000, CRC(0c4895b0) SHA1(f595dbe5a19edb8a06ea60105ee26b95db4a2619) )
 	ROM_LOAD16_BYTE( "fix2", 0x000001, 0x010000, CRC(07d8e387) SHA1(52f54a6a4830592784cdf643a5f255aa3db53e50) )
 
-	ROM_REGION( 0x400000, "gfx2", 0 ) /* background gfx */
+	ROM_REGION( 0x180000, "gfx2", 0 ) /* background gfx */
 	ROM_LOAD( "back-1", 0x000000, 0x100000, CRC(8b7f9219) SHA1(3412b6f8a4fe245e521ddcf185a53f2f4520eb57) ) /* Same as "MUSHA BACK-1" of other Zero Team sets */
 	ROM_LOAD( "back-2", 0x100000, 0x080000, CRC(ce61c952) SHA1(52a843c8ba428b121fab933dd3b313b2894d80ac) ) /* Same as "MUSHA BACK-2" of other Zero Team sets */
 
-	ROM_REGION32_LE( 0x800000, "gfx3", 0 ) /* sprite gfx (encrypted) */
+	ROM_REGION32_LE( 0x400000, "gfx3", 0 ) /* sprite gfx (encrypted) */
 	ROM_LOAD32_WORD( "obj-1", 0x000000, 0x200000, CRC(45be8029) SHA1(adc164f9dede9a86b96a4d709e9cba7d2ad0e564) ) /* Same as "MUSHA OBJ-1" of other Zero Team sets */
 	ROM_LOAD32_WORD( "obj-2", 0x000002, 0x200000, CRC(cb61c19d) SHA1(151a2ce9c32f3321a974819e9b165dddc31c8153) ) /* Same as "MUSHA OBJ-2" of other Zero Team sets */
 
-	ROM_REGION( 0x100000, "oki", 0 ) /* ADPCM samples */
+	ROM_REGION( 0x40000, "oki", 0 ) /* ADPCM samples */
 	ROM_LOAD( "6.pcm", 0x00000, 0x40000, CRC(48be32b1) SHA1(969d2191a3c46871ee8bf93088b3cecce3eccf0c) ) /* Same as other Zero Team sets */
 
 	ROM_REGION( 0x200, "pld", 0 ) /* PLDs */
@@ -1111,17 +1024,17 @@ ROM_START( zerotm2k ) /* V33 SYSTEM TYPE_C VER2 hardware, uses SEI333 (AKA COPX-
 	ROM_LOAD16_BYTE( "syz-04.u0616", 0x000000, 0x010000, CRC(3515a45f) SHA1(a25a7e23a5d9cf5a95a0d0e828848a8d223bdf51) ) /* PCB silkscreened FIX E */
 	ROM_LOAD16_BYTE( "syz-03.u0617", 0x000001, 0x010000, CRC(02fbf9d7) SHA1(6eb4db1f89c9b003e7eed7bf39e6065b1c99447f) ) /* PCB silkscreened FIX O */
 
-	ROM_REGION( 0x400000, "gfx2", 0 ) /* background gfx */
+	ROM_REGION( 0x180000, "gfx2", 0 ) /* background gfx */
 	ROM_LOAD( "szy-05.u0614",     0x000000, 0x100000, CRC(8b7f9219) SHA1(3412b6f8a4fe245e521ddcf185a53f2f4520eb57) ) /* PCB silkscreened BG12, Same as "MUSHA BACK-1" */
 	ROM_LOAD( "mt28f400b1.u0619", 0x100000, 0x080000, CRC(266acee6) SHA1(2a9da66c313a7536c7fb393134b9df0bb122cb2b) ) /* SMT rom, PCB silkscreened BG3 */
 	/* PCB has an unpopulated socket rom space for a LH535A00D at u0615 for alt BG3 location */
 
-	ROM_REGION32_LE( 0x800000, "gfx3", 0 ) /* sprite gfx (NOT encrypted) */
+	ROM_REGION32_LE( 0x400000, "gfx3", 0 ) /* sprite gfx (NOT encrypted) */
 	ROM_LOAD32_WORD( "musha_obj-1a.u0729", 0x000000, 0x200000, CRC(9b2cf68c) SHA1(cd8cb277091bfa125fd0f68410de39f72f1c7047) ) /* PCB silkscreened OBJ1 */
 	ROM_LOAD32_WORD( "musha_obj-2a.u0730", 0x000002, 0x200000, CRC(fcabee05) SHA1(b2220c0311b3bd2fd44fb56fff7c27bed0816fe9) ) /* PCB silkscreened OBJ2 */
 	/* PCB has unpopulated rom space for two SMT roms at u0734 & u0736 for alt OBJ1 & OBJ2 locations) */
 
-	ROM_REGION( 0x100000, "oki", 0 ) /* ADPCM samples */
+	ROM_REGION( 0x40000, "oki", 0 ) /* ADPCM samples */
 	ROM_LOAD( "szy-01.u099", 0x00000, 0x40000,  CRC(48be32b1) SHA1(969d2191a3c46871ee8bf93088b3cecce3eccf0c) ) /* PCB silkscreened PCM, Same as other Zero Team sets */
 ROM_END
 
