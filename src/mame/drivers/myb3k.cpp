@@ -1046,8 +1046,8 @@ ROM_END
 
 ROM_START( jb3000 )
 	ROM_REGION( 0x10000, "ipl", ROMREGION_ERASEFF )
-	ROM_LOAD( "jb3000chrg-v2.07.bin", 0xc000, 0x2000, NO_DUMP)
-	ROM_LOAD( "jb3000bios-v2.07.bin", 0xe000, 0x2000, NO_DUMP)
+	ROM_LOAD( "jb3000chrg-v2.07.bin", 0xc000, 0x2000, CRC(efffe4cb) SHA1(1305d1fb0bc39b6464f4e2f000a584f9e67f784a))
+	ROM_LOAD( "jb3000bios-v2.07.bin", 0xe000, 0x2000, CRC(c4c46cc5) SHA1(a3e186513fbe9ad0e369b481999393a3506db39e))
 ROM_END
 
 ROM_START( stepone )
@@ -1058,5 +1058,5 @@ ROM_END
 
 //    YEAR  NAME     PARENT  COMPAT   MACHINE    INPUT  STATE           INIT   COMPANY        FULLNAME        FLAGS
 COMP( 1982, myb3k,   0,      0,       myb3k,     myb3k, myb3k_state,    0,     "Matsushita",  "MyBrain 3000", 0)
-COMP( 1982, jb3000,  myb3k,  0,       jb3000,    myb3k, myb3k_state,    0,     "Panasonic",   "JB-3000",      MACHINE_NOT_WORKING) // No rom dump available
+COMP( 1982, jb3000,  myb3k,  0,       jb3000,    myb3k, myb3k_state,    0,     "Panasonic",   "JB-3000",      0)
 COMP( 1984, stepone, myb3k,  0,       stepone,   myb3k, myb3k_state,    0,     "Ericsson",    "Step/One",     0)
