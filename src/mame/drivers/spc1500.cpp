@@ -679,9 +679,9 @@ READ8_MEMBER( spc1500_state::io_r)
 
 static ADDRESS_MAP_START( spc1500_double_io , AS_IO, 8, spc1500_state )
 	ADDRESS_MAP_UNMAP_HIGH
-	AM_RANGE(0x0000, 0xffff) AM_READWRITE(io_r, double_w)
 	AM_RANGE(0x2000, 0xffff) AM_RAM AM_SHARE("videoram")
 	AM_RANGE(0x0000, 0x17ff) AM_RAM AM_SHARE("pcgram")
+	AM_RANGE(0x0000, 0xffff) AM_READWRITE(io_r, double_w)
 ADDRESS_MAP_END
 
 /* Input ports */

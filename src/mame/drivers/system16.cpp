@@ -314,8 +314,8 @@ static ADDRESS_MAP_START( wb3bbl_map, AS_PROGRAM, 16, segas1x_bootleg_state )
 	AM_RANGE(0x000000, 0x03ffff) AM_ROM
 	AM_RANGE(0x3f0000, 0x3fffff) AM_WRITE(sys16_tilebank_w)
 	AM_RANGE(0x400000, 0x407fff) AM_RAM // tilemap ram on the original, used as a buffer on the bootlegs
-	AM_RANGE(0x408000, 0x409fff) AM_RAM AM_SHARE("bg0_tileram")
-	AM_RANGE(0x40a000, 0x40bfff) AM_RAM AM_SHARE("bg1_tileram")
+	AM_RANGE(0x409000, 0x409fff) AM_RAM AM_SHARE("bg0_tileram")
+	AM_RANGE(0x40a000, 0x40afff) AM_RAM AM_SHARE("bg1_tileram")
 	AM_RANGE(0x410000, 0x410fff) AM_RAM AM_SHARE("textram")
 	AM_RANGE(0x440000, 0x440fff) AM_RAM AM_SHARE("sprites")
 	AM_RANGE(0x840000, 0x840fff) AM_RAM_WRITE(paletteram_w) AM_SHARE("paletteram")
