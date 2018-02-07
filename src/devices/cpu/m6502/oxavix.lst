@@ -3,30 +3,38 @@
 # xavix opcodes
 
 callf_xa3
+	read(SP);
+	if (PC & 0x8000) // if top bit of PC isn't set we're in the non-banked RAM area, don't store farbank?
+	{
+		write(SP, m_farbank);
+		dec_SP();
+	}
 	TMP2 = read_pc();
 	TMP = read_pc();
-	TMP |= (read_pc()<<8);
-	read(SP);
+	//read(SP);
 	write(SP, PC>>8);
 	dec_SP();
 	write(SP, PC);
 	dec_SP();
-	write(SP, m_farbank);
-	dec_SP();
-	m_farbank=TMP2;
+	TMP = set_h(TMP, read_pc());
 	PC = TMP;
+	m_farbank=TMP2;
 	prefetch();
 
 retf_imp
 	read_pc_noinc();
 	read(SP);
 	inc_SP();
-	TMP2 = read(SP);
-	inc_SP();
 	PC = read(SP);
 	inc_SP();
 	PC = set_h(PC, read(SP));
-	m_farbank = TMP2;
+	if (PC & 0x8000) // if top bit of PC is set then we're jumping back to a banked ROM area, so get farbank? (see 0fdae in rad_ping)
+	{
+		inc_SP();
+		TMP2 = read(SP);
+		m_farbank = TMP2;
+	}
+	read_pc();
 	prefetch();
 
 brk_xav_imp

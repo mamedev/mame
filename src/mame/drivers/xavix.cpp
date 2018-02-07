@@ -71,22 +71,30 @@ public:
 
 	DECLARE_WRITE8_MEMBER(xavix_7900_w);
 
-	DECLARE_WRITE8_MEMBER(xavix_7980_w);
-	DECLARE_WRITE8_MEMBER(xavix_7981_w);
-	DECLARE_WRITE8_MEMBER(xavix_7982_w);
-	DECLARE_WRITE8_MEMBER(xavix_7983_w);
-	DECLARE_WRITE8_MEMBER(xavix_7984_w);
-	DECLARE_WRITE8_MEMBER(xavix_7985_w);
-	DECLARE_WRITE8_MEMBER(xavix_7986_w);
-	DECLARE_WRITE8_MEMBER(xavix_7987_w);
-	DECLARE_READ8_MEMBER(xavix_7980_r);
+	DECLARE_WRITE8_MEMBER(dma_trigger_w);
+	DECLARE_WRITE8_MEMBER(dmasrc_lo_w);
+	DECLARE_WRITE8_MEMBER(dmasrc_md_w);
+	DECLARE_WRITE8_MEMBER(dmasrc_hi_w);
+	DECLARE_WRITE8_MEMBER(dmadst_lo_w);
+	DECLARE_WRITE8_MEMBER(dmadst_hi_w);
+	DECLARE_WRITE8_MEMBER(dmalen_lo_w);
+	DECLARE_WRITE8_MEMBER(dmalen_hi_w);
+	DECLARE_READ8_MEMBER(dma_trigger_r);
 
+	DECLARE_READ8_MEMBER(xavix_7a01_r);
 
-	DECLARE_WRITE8_MEMBER(xavix_7ff9_w);
-	DECLARE_WRITE8_MEMBER(xavix_7ffa_w);
-	DECLARE_WRITE8_MEMBER(xavix_7ffb_w);
-	DECLARE_WRITE8_MEMBER(xavix_7ffe_w);
-	DECLARE_WRITE8_MEMBER(xavix_7fff_w);
+	DECLARE_WRITE8_MEMBER(irq_enable_w);
+	DECLARE_WRITE8_MEMBER(irq_vector0_lo_w);
+	DECLARE_WRITE8_MEMBER(irq_vector0_hi_w);
+	DECLARE_WRITE8_MEMBER(irq_vector1_lo_w);
+	DECLARE_WRITE8_MEMBER(irq_vector1_hi_w);
+
+	DECLARE_WRITE8_MEMBER(xavix_75f6_w);
+	DECLARE_WRITE8_MEMBER(xavix_75f7_w);
+	DECLARE_WRITE8_MEMBER(xavix_75f8_w);
+	DECLARE_WRITE8_MEMBER(xavix_75f9_w);
+	DECLARE_WRITE8_MEMBER(xavix_75ff_w);
+	DECLARE_READ8_MEMBER(xavix_75f9_r);
 
 	INTERRUPT_GEN_MEMBER(interrupt);
 	TIMER_DEVICE_CALLBACK_MEMBER(scanline_cb);
@@ -99,21 +107,21 @@ protected:
 	virtual void video_start() override;
 
 private:
-	uint8_t m_xavix_7981_data;
-	uint8_t m_xavix_7982_data;
-	uint8_t m_xavix_7983_data;
+	uint8_t m_dmasrc_lo_data;
+	uint8_t m_dmasrc_md_data;
+	uint8_t m_dmasrc_hi_data;
 
-	uint8_t m_xavix_7984_data;
-	uint8_t m_xavix_7985_data;
+	uint8_t m_dmadst_lo_data;
+	uint8_t m_dmadst_hi_data;
 
-	uint8_t m_xavix_7986_data;
-	uint8_t m_xavix_7987_data;
+	uint8_t m_dmalen_lo_data;
+	uint8_t m_dmalen_hi_data;
 
-	uint8_t m_xavix_7ff9_data;
-	uint8_t m_xavix_7ffa_data;
-	uint8_t m_xavix_7ffb_data;
-	uint8_t m_xavix_7ffe_data;
-	uint8_t m_xavix_7fff_data;
+	uint8_t m_irq_enable_data;
+	uint8_t m_irq_vector0_lo_data;
+	uint8_t m_irq_vector0_hi_data;
+	uint8_t m_irq_vector1_lo_data;
+	uint8_t m_irq_vector1_hi_data;
 	
 	uint8_t get_vectors(int which, int half);
 
@@ -129,13 +137,13 @@ uint32_t xavix_state::screen_update( screen_device &screen, bitmap_ind16 &bitmap
 }
 
 
-WRITE8_MEMBER(xavix_state::xavix_7980_w)
+WRITE8_MEMBER(xavix_state::dma_trigger_w)
 {
-	logerror("%s: xavix_7980_w %02x (79xx unk trigger for 7981-7987?)\n", machine().describe_context(), data);
+	logerror("%s: dma_trigger_w %02x\n", machine().describe_context(), data);
 
-	uint32_t source = (m_xavix_7983_data << 16) | (m_xavix_7982_data<<8) | m_xavix_7981_data;
-	uint16_t dest = (m_xavix_7985_data<<8) | m_xavix_7984_data;
-	uint16_t len = (m_xavix_7987_data<<8) | m_xavix_7986_data;
+	uint32_t source = (m_dmasrc_hi_data << 16) | (m_dmasrc_md_data<<8) | m_dmasrc_lo_data;
+	uint16_t dest = (m_dmadst_hi_data<<8) | m_dmadst_lo_data;
+	uint16_t len = (m_dmalen_hi_data<<8) | m_dmalen_lo_data;
 
 	// TODO: don't do tag lookups here once satisfied this is correct
 	const uint32_t rgnlen = memregion("bios")->bytes();
@@ -153,90 +161,90 @@ WRITE8_MEMBER(xavix_state::xavix_7980_w)
 	}
 }
 
-WRITE8_MEMBER(xavix_state::xavix_7981_w)
+WRITE8_MEMBER(xavix_state::dmasrc_lo_w)
 {
-	logerror("%s: xavix_7981_w %02x (79xx unk triplet byte 1)\n", machine().describe_context(), data);
-	m_xavix_7981_data = data;
+	logerror("%s: dmasrc_lo_w %02x\n", machine().describe_context(), data);
+	m_dmasrc_lo_data = data;
 }
 
-WRITE8_MEMBER(xavix_state::xavix_7982_w)
+WRITE8_MEMBER(xavix_state::dmasrc_md_w)
 {
-	logerror("%s: xavix_7982_w %02x (79xx unk triplet byte 2)\n", machine().describe_context(), data);
-	m_xavix_7982_data = data;
+	logerror("%s: dmasrc_md_w %02x\n", machine().describe_context(), data);
+	m_dmasrc_md_data = data;
 }
 
-WRITE8_MEMBER(xavix_state::xavix_7983_w)
+WRITE8_MEMBER(xavix_state::dmasrc_hi_w)
 {
-	logerror("%s: xavix_7983_w %02x (79xx unk triplet byte 3)\n", machine().describe_context(), data);
-	m_xavix_7983_data = data;
+	logerror("%s: dmasrc_hi_w %02x\n", machine().describe_context(), data);
+	m_dmasrc_hi_data = data;
 	// this would mean Taito Nostalgia relies on mirroring tho, as it has the high bits set... so could just be wrong
-	logerror("  (possible DMA ROM source of %02x%02x%02x)\n", m_xavix_7983_data, m_xavix_7982_data, m_xavix_7981_data);
+	logerror("  (DMA ROM source of %02x%02x%02x)\n", m_dmasrc_hi_data, m_dmasrc_md_data, m_dmasrc_lo_data);
 }
 
-WRITE8_MEMBER(xavix_state::xavix_7984_w)
+WRITE8_MEMBER(xavix_state::dmadst_lo_w)
 {
-	logerror("%s: xavix_7984_w %02x (79xx unk pair 1 byte 1)\n", machine().describe_context(), data);
-	m_xavix_7984_data = data;
+	logerror("%s: dmadst_lo_w %02x\n", machine().describe_context(), data);
+	m_dmadst_lo_data = data;
 }
 
-WRITE8_MEMBER(xavix_state::xavix_7985_w)
+WRITE8_MEMBER(xavix_state::dmadst_hi_w)
 {
-	logerror("%s: xavix_7985_w %02x (79xx unk pair 1 byte 2)\n", machine().describe_context(), data);
-	m_xavix_7985_data = data;
+	logerror("%s: dmadst_hi_w %02x\n", machine().describe_context(), data);
+	m_dmadst_hi_data = data;
 
-	logerror("  (possible DMA dest of %02x%02x)\n", m_xavix_7985_data, m_xavix_7984_data);
+	logerror("  (DMA dest of %02x%02x)\n", m_dmadst_hi_data, m_dmadst_lo_data);
 }
 
-WRITE8_MEMBER(xavix_state::xavix_7986_w)
+WRITE8_MEMBER(xavix_state::dmalen_lo_w)
 {
-	logerror("%s: xavix_7986_w %02x (79xx unk pair 2 byte 1)\n", machine().describe_context(), data);
-	m_xavix_7986_data = data;
+	logerror("%s: dmalen_lo_w %02x\n", machine().describe_context(), data);
+	m_dmalen_lo_data = data;
 }
 
-WRITE8_MEMBER(xavix_state::xavix_7987_w)
+WRITE8_MEMBER(xavix_state::dmalen_hi_w)
 {
-	logerror("%s: xavix_7987_w %02x (79xx unk pair 2 byte 2)\n", machine().describe_context(), data);
-	m_xavix_7987_data = data;
+	logerror("%s: dmalen_hi_w %02x\n", machine().describe_context(), data);
+	m_dmalen_hi_data = data;
 
-	logerror("  (possible DMA len of %02x%02x)\n", m_xavix_7987_data, m_xavix_7986_data);
+	logerror("  (DMA len of %02x%02x)\n", m_dmalen_hi_data, m_dmalen_lo_data);
 }
 
-READ8_MEMBER(xavix_state::xavix_7980_r)
+READ8_MEMBER(xavix_state::dma_trigger_r)
 {
-	logerror("%s: xavix_7980_r (79xx unk operation status?)\n", machine().describe_context());
+	logerror("%s: dma_trigger_r (operation status?)\n", machine().describe_context());
 	return 0x00;
 }
 
 
 
-WRITE8_MEMBER(xavix_state::xavix_7ff9_w)
+WRITE8_MEMBER(xavix_state::irq_enable_w)
 {
-	logerror("%s: xavix_7ff9_w %02x (trigger for 7ffx region?)\n", machine().describe_context(), data);
-	m_xavix_7ff9_data = data;
+	logerror("%s: irq_enable_w %02x\n", machine().describe_context(), data);
+	m_irq_enable_data = data;
 }
 
-WRITE8_MEMBER(xavix_state::xavix_7ffa_w)
+WRITE8_MEMBER(xavix_state::irq_vector0_lo_w)
 {
-	logerror("%s: xavix_7ffa_w %02x (7ffx pair 1, byte 1?)\n", machine().describe_context(), data);
-	m_xavix_7ffa_data = data;
+	logerror("%s: irq_vector0_lo_w %02x\n", machine().describe_context(), data);
+	m_irq_vector0_lo_data = data;
 }
 
-WRITE8_MEMBER(xavix_state::xavix_7ffb_w)
+WRITE8_MEMBER(xavix_state::irq_vector0_hi_w)
 {
-	logerror("%s: xavix_7ffb_w %02x (7ffx pair 1, byte 2?)\n", machine().describe_context(), data);
-	m_xavix_7ffb_data = data;
+	logerror("%s: irq_vector0_hi_w %02x\n", machine().describe_context(), data);
+	m_irq_vector0_hi_data = data;
 }
 
-WRITE8_MEMBER(xavix_state::xavix_7ffe_w)
+WRITE8_MEMBER(xavix_state::irq_vector1_lo_w)
 {
-	logerror("%s: xavix_7ffe_w %02x (7ffx pair 2, byte 1?)\n", machine().describe_context(), data);
-	m_xavix_7ffe_data = data;
+	logerror("%s: irq_vector1_lo_w %02x\n", machine().describe_context(), data);
+	m_irq_vector1_lo_data = data;
 }
 
-WRITE8_MEMBER(xavix_state::xavix_7fff_w)
+WRITE8_MEMBER(xavix_state::irq_vector1_hi_w)
 {
-	logerror("%s: xavix_7fff_w %02x (7ffx pair 2, byte 2?)\n", machine().describe_context(), data);
-	m_xavix_7fff_data = data;
+	logerror("%s: irq_vector1_hi_w %02x\n", machine().describe_context(), data);
+	m_irq_vector1_hi_data = data;
 }
 
 
@@ -249,48 +257,128 @@ WRITE8_MEMBER(xavix_state::xavix_7900_w)
 
 TIMER_DEVICE_CALLBACK_MEMBER(xavix_state::scanline_cb)
 {
-//	int scanline = param;
+/*
+	int scanline = param;
+
+	if (scanline == 200)
+	{
+		if (m_irq_enable_data != 0)
+			m_maincpu->set_input_line(INPUT_LINE_IRQ0,HOLD_LINE);
+	}
+*/
 }
 
 INTERRUPT_GEN_MEMBER(xavix_state::interrupt)
 {
-//	if (m_xavix_7ff9_data != 0)
-//		m_maincpu->set_input_line(INPUT_LINE_IRQ0,HOLD_LINE);
+	if (m_irq_enable_data != 0)
+		m_maincpu->set_input_line(INPUT_LINE_IRQ0,HOLD_LINE);
 
-	if (m_xavix_7ff9_data != 0)
-		m_maincpu->set_input_line(INPUT_LINE_NMI,PULSE_LINE);
+//	if (m_irq_enable_data != 0)
+//		m_maincpu->set_input_line(INPUT_LINE_NMI,PULSE_LINE);
+}
+
+WRITE8_MEMBER(xavix_state::xavix_75f6_w)
+{
+	logerror("%s: xavix_75f6_w %02x\n", machine().describe_context(), data);
+}
+
+WRITE8_MEMBER(xavix_state::xavix_75f7_w)
+{
+	logerror("%s: xavix_75f7_w %02x\n", machine().describe_context(), data);
+}
+
+WRITE8_MEMBER(xavix_state::xavix_75f8_w)
+{
+	logerror("%s: xavix_75f8_w %02x\n", machine().describe_context(), data);
+}
+
+WRITE8_MEMBER(xavix_state::xavix_75f9_w)
+{
+	logerror("%s: xavix_75f9_w %02x\n", machine().describe_context(), data);
+}
+
+WRITE8_MEMBER(xavix_state::xavix_75ff_w)
+{
+	logerror("%s: xavix_75ff_w %02x\n", machine().describe_context(), data);
+}
+
+READ8_MEMBER(xavix_state::xavix_75f9_r)
+{
+	logerror("%s: xavix_75f9_r\n", machine().describe_context());
+	return 0x00;
 }
 
 
-
+READ8_MEMBER(xavix_state::xavix_7a01_r)
+{
+	logerror("%s: xavix_7a01_r (random status?)\n", machine().describe_context());
+	return machine().rand();
+}
 
 static ADDRESS_MAP_START( xavix_map, AS_PROGRAM, 8, xavix_state )
 	AM_RANGE(0x000000, 0x0001ff) AM_RAM
-	AM_RANGE(0x000200, 0x003fff) AM_RAM // ends up jumping to code here? must be a DMA?
+	AM_RANGE(0x000200, 0x003fff) AM_RAM
 
-	AM_RANGE(0x006200, 0x0062ff) AM_RAM // cleared to 0x80
+	// 6xxx ranges could be the video controller
 
-	AM_RANGE(0x006900, 0x006900) AM_WRITENOP // startup (taitons1)
+	AM_RANGE(0x006000, 0x0061ff) AM_RAM // taitons1 writes to other areas here, but might already be off the rails
+	AM_RANGE(0x006200, 0x0062ff) AM_RAM // cleared to 0x80 by both games
+	AM_RANGE(0x006300, 0x0067ff) AM_RAM // taitons1 writes to other areas here, but might already be off the rails
+	
+	// could be palettes?
+	AM_RANGE(0x006800, 0x00680f) AM_RAM // written with 6900
+	AM_RANGE(0x006900, 0x00690f) AM_RAM // startup (taitons1)
+
+	AM_RANGE(0x006a00, 0x006a00) AM_WRITENOP
+	AM_RANGE(0x006a01, 0x006a01) AM_WRITENOP
 
 	AM_RANGE(0x006fc0, 0x006fc0) AM_WRITENOP // startup
 
+	AM_RANGE(0x006fc8, 0x006fc8) AM_WRITENOP
+	AM_RANGE(0x006fc9, 0x006fc9) AM_WRITENOP
+	AM_RANGE(0x006fca, 0x006fca) AM_WRITENOP
+	AM_RANGE(0x006fcb, 0x006fcb) AM_WRITENOP
+	AM_RANGE(0x006fcc, 0x006fcc) AM_WRITENOP
+	AM_RANGE(0x006fcd, 0x006fcd) AM_WRITENOP
+	AM_RANGE(0x006fce, 0x006fce) AM_WRITENOP
+	AM_RANGE(0x006fcf, 0x006fcf) AM_WRITENOP
+
+	AM_RANGE(0x006fd7, 0x006fd7) AM_READNOP AM_WRITENOP
 	AM_RANGE(0x006fd8, 0x006fd8) AM_WRITENOP // startup (taitons1)
 
+	AM_RANGE(0x006fe0, 0x006fe0) AM_READNOP AM_WRITENOP
+	AM_RANGE(0x006fe1, 0x006fe1) AM_WRITENOP
+	AM_RANGE(0x006fe2, 0x006fe2) AM_WRITENOP
+	AM_RANGE(0x006fe5, 0x006fe5) AM_WRITENOP
+	AM_RANGE(0x006fe6, 0x006fe6) AM_WRITENOP
+	AM_RANGE(0x006fe8, 0x006fe8) AM_WRITENOP
 	AM_RANGE(0x006fe9, 0x006fe9) AM_WRITENOP // startup
+	AM_RANGE(0x006fea, 0x006fea) AM_WRITENOP
 
+	AM_RANGE(0x006ff0, 0x006ff0) AM_WRITENOP
 	AM_RANGE(0x006ff1, 0x006ff1) AM_WRITENOP // startup (taitons1)
+	AM_RANGE(0x006ff2, 0x006ff2) AM_WRITENOP
 
 	AM_RANGE(0x006ff8, 0x006ff8) AM_READNOP AM_WRITENOP // startup
+	AM_RANGE(0x006ff9, 0x006ff9) AM_READNOP
+
+	AM_RANGE(0x0075f0, 0x0075f0) AM_RAM // read/written 8 times in a row
+	AM_RANGE(0x0075f1, 0x0075f1) AM_RAM // read/written 8 times in a row
+
+	// 7xxx ranges system controller?
 
 	// taitons1 after 75f7/75f8
-	//AM_RANGE(0x0075f6, 0x0075f6) AM_WRITE(xavix_75f6_w)
+	AM_RANGE(0x0075f6, 0x0075f6) AM_WRITE(xavix_75f6_w)
 	// taitons1 written as a pair
-	//AM_RANGE(0x0075f7, 0x0075f7) AM_WRITE(xavix_75f7_w)
-	//AM_RANGE(0x0075f8, 0x0075f8) AM_WRITE(xavix_75f8_w)
+	AM_RANGE(0x0075f7, 0x0075f7) AM_WRITE(xavix_75f7_w)
+	AM_RANGE(0x0075f8, 0x0075f8) AM_WRITE(xavix_75f8_w)
 	// taitons1 written after 75f6, then read
-	//AM_RANGE(0x0075f9, 0x0075f9) AM_READWRITE(xavix_75f9_r, xavix_75f9_w)
+	AM_RANGE(0x0075f9, 0x0075f9) AM_READWRITE(xavix_75f9_r, xavix_75f9_w)
+	// at another time
+	AM_RANGE(0x0075fd, 0x0075fd) AM_WRITENOP
+	AM_RANGE(0x0075fe, 0x0075fe) AM_WRITENOP
 	// taitons1 written other 75xx operations
-	//AM_RANGE(0x0075ff, 0x0075ff) AM_WRITE(xavix_75ff_w)
+	AM_RANGE(0x0075ff, 0x0075ff) AM_WRITE(xavix_75ff_w)
 
 	AM_RANGE(0x007810, 0x007810) AM_WRITENOP // startup
 
@@ -298,31 +386,45 @@ static ADDRESS_MAP_START( xavix_map, AS_PROGRAM, 8, xavix_state )
 	AM_RANGE(0x007902, 0x007902) AM_WRITENOP // startup
 
 	// DMA trigger for below (written after the others) waits on status of bit 1 in a loop
-	AM_RANGE(0x007980, 0x007980) AM_READWRITE(xavix_7980_r, xavix_7980_w)
+	AM_RANGE(0x007980, 0x007980) AM_READWRITE(dma_trigger_r, dma_trigger_w)
 	// DMA source
-	AM_RANGE(0x007981, 0x007981) AM_WRITE(xavix_7981_w)
-	AM_RANGE(0x007982, 0x007982) AM_WRITE(xavix_7982_w)
-	AM_RANGE(0x007983, 0x007983) AM_WRITE(xavix_7983_w)
+	AM_RANGE(0x007981, 0x007981) AM_WRITE(dmasrc_lo_w)
+	AM_RANGE(0x007982, 0x007982) AM_WRITE(dmasrc_md_w)
+	AM_RANGE(0x007983, 0x007983) AM_WRITE(dmasrc_hi_w)
 	// DMA dest
-	AM_RANGE(0x007984, 0x007984) AM_WRITE(xavix_7984_w)
-	AM_RANGE(0x007985, 0x007985) AM_WRITE(xavix_7985_w)
+	AM_RANGE(0x007984, 0x007984) AM_WRITE(dmadst_lo_w)
+	AM_RANGE(0x007985, 0x007985) AM_WRITE(dmadst_hi_w)
 	// DMA length
-	AM_RANGE(0x007986, 0x007986) AM_WRITE(xavix_7986_w)
-	AM_RANGE(0x007987, 0x007987) AM_WRITE(xavix_7987_w)
+	AM_RANGE(0x007986, 0x007986) AM_WRITE(dmalen_lo_w)
+	AM_RANGE(0x007987, 0x007987) AM_WRITE(dmalen_hi_w)
 
 	AM_RANGE(0x007a00, 0x007a00) AM_READNOP // startup (taitons1)
-	AM_RANGE(0x007a01, 0x007a01) AM_READNOP // startup (taitons1)
+	AM_RANGE(0x007a01, 0x007a01) AM_READ(xavix_7a01_r) AM_WRITENOP // startup (taitons1)
 
 	AM_RANGE(0x007a03, 0x007a03) AM_READNOP AM_WRITENOP // startup
 
+	AM_RANGE(0x007a80, 0x007a80) AM_WRITENOP
+
+	AM_RANGE(0x007b80, 0x007b80) AM_READNOP
+	AM_RANGE(0x007b81, 0x007b81) AM_WRITENOP
+	AM_RANGE(0x007b82, 0x007b82) AM_WRITENOP
+
+	AM_RANGE(0x007c02, 0x007c02) AM_WRITENOP // once
+
+	AM_RANGE(0x007ff2, 0x007ff2) AM_WRITENOP
+	AM_RANGE(0x007ff3, 0x007ff3) AM_WRITENOP
+	AM_RANGE(0x007ff4, 0x007ff4) AM_WRITENOP
+	AM_RANGE(0x007ff5, 0x007ff5) AM_READNOP
+	AM_RANGE(0x007ff6, 0x007ff6) AM_READNOP
+	
 	// maybe irq enable, written after below
-	AM_RANGE(0x007ff9, 0x007ff9) AM_WRITE(xavix_7ff9_w)
+	AM_RANGE(0x007ff9, 0x007ff9) AM_WRITE(irq_enable_w)
 	// an IRQ vector (nmi?)
-	AM_RANGE(0x007ffa, 0x007ffa) AM_WRITE(xavix_7ffa_w)
-	AM_RANGE(0x007ffb, 0x007ffb) AM_WRITE(xavix_7ffb_w)
+	AM_RANGE(0x007ffa, 0x007ffa) AM_WRITE(irq_vector0_lo_w)
+	AM_RANGE(0x007ffb, 0x007ffb) AM_WRITE(irq_vector0_hi_w)
 	// an IRQ vector (irq?)
-	AM_RANGE(0x007ffe, 0x007ffe) AM_WRITE(xavix_7ffe_w)
-	AM_RANGE(0x007fff, 0x007fff) AM_WRITE(xavix_7fff_w)
+	AM_RANGE(0x007ffe, 0x007ffe) AM_WRITE(irq_vector1_lo_w)
+	AM_RANGE(0x007fff, 0x007fff) AM_WRITE(irq_vector1_hi_w)
 
 	AM_RANGE(0x008000, 0x1fffff) AM_ROM AM_REGION("bios", 0x008000)
 ADDRESS_MAP_END
@@ -406,21 +508,21 @@ void xavix_state::machine_start()
 
 void xavix_state::machine_reset()
 {
-	m_xavix_7981_data = 0;
-	m_xavix_7982_data = 0;
-	m_xavix_7983_data = 0;
+	m_dmasrc_lo_data = 0;
+	m_dmasrc_md_data = 0;
+	m_dmasrc_hi_data = 0;
 
-	m_xavix_7984_data = 0;
-	m_xavix_7985_data = 0;
+	m_dmadst_lo_data = 0;
+	m_dmadst_hi_data = 0;
 
-	m_xavix_7986_data = 0;
-	m_xavix_7987_data = 0;
+	m_dmalen_lo_data = 0;
+	m_dmalen_hi_data = 0;
 
-	m_xavix_7ff9_data = 0;
-	m_xavix_7ffa_data = 0;
-	m_xavix_7ffb_data = 0;
-	m_xavix_7ffe_data = 0;
-	m_xavix_7fff_data = 0;
+	m_irq_enable_data = 0;
+	m_irq_vector0_lo_data = 0;
+	m_irq_vector0_hi_data = 0;
+	m_irq_vector1_lo_data = 0;
+	m_irq_vector1_hi_data = 0;
 }
 
 typedef device_delegate<uint8_t (int which, int half)> xavix_interrupt_vector_delegate;
@@ -429,19 +531,19 @@ uint8_t xavix_state::get_vectors(int which, int half)
 {
 //	logerror("get_vectors %d %d\n", which, half);
 
-	if (which == 0) // NMI
+	if (which == 1) // irq?
 	{
 		if (half == 0)
-			return m_xavix_7ffb_data;
+			return m_irq_vector0_hi_data;
 		else
-			return m_xavix_7ffa_data;
+			return m_irq_vector0_lo_data;
 	}
 	else
 	{
 		if (half == 0)
-			return m_xavix_7fff_data;
+			return m_irq_vector1_hi_data;
 		else
-			return m_xavix_7ffe_data;
+			return m_irq_vector1_lo_data;
 	}
 }
 
