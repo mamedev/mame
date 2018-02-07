@@ -32,6 +32,11 @@ util::disasm_interface *xavix_device::create_disassembler()
 }
 
 
+offs_t xavix_device::pc_to_external(u16 pc)
+{
+	return adr_with_bank(pc);
+}
+
 void xavix_device::device_start()
 {
 	if(direct_disabled)
@@ -43,26 +48,11 @@ void xavix_device::device_start()
 	m_vector_callback.bind_relative_to(*owner());
 
 	init();
-
-	state_add(STATE_GENPC, "GENPC", XPC).callexport().noshow();
-	state_add(STATE_GENPCBASE, "CURPC", XPC).callexport().noshow();
 }
-
-void xavix_device::state_export(const device_state_entry &entry)
-{
-	switch(entry.index()) {
-	case STATE_GENPC:
-	case STATE_GENPCBASE:
-		XPC = adr_with_bank(NPC);
-		break;
-	}
-}
-
 
 void xavix_device::device_reset()
 {
 	m_farbank = 0;
-	XPC = 0;
 	m6502_device::device_reset();
 }
 

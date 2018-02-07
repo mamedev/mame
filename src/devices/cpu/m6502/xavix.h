@@ -70,7 +70,7 @@ protected:
 
 	virtual void device_start() override;
 	virtual void device_reset() override;
-	virtual void state_export(const device_state_entry &entry) override;
+	virtual offs_t pc_to_external(u16 pc) override;
 
 private:
 	xavix_interrupt_vector_delegate m_vector_callback;
