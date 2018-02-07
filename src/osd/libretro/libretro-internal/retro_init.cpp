@@ -214,7 +214,7 @@ static int getGameInfo(char* gameName, int* rotation, int* driverIndex,bool *Arc
    int num = driver_list::find(gameName);
 
    if (log_cb)
-      log_cb(RETRO_LOG_DEBUG, "Searching for driver %s\n",gameName);
+        log_cb(RETRO_LOG_DEBUG, "Searching for driver %s\n",gameName);
 
    if (num != -1)
    {
@@ -697,7 +697,10 @@ if (log_cb)log_cb(RETRO_LOG_INFO,"ARGUV[0]=%s\n",ARGUV[0]);
       {
          Add_Option((char*)"-rp");
          Add_Option((char*)g_rom_dir);
-         if(!arcade)
+         log_cb(RETRO_LOG_DEBUG, "System: %s, game: %s\n", MsystemName, MgameName);
+         int num = driver_list::find(MsystemName);
+
+         if(!arcade && (num != -1) && (strcmp(MsystemName, MgameName) != 0))
             Add_Option(MsystemName);
          Add_Option(MgameName);
       }
@@ -805,5 +808,3 @@ int mmain2(int argc, const char *argv)
    
    return result/*==0?0:1*/;
 }
-
-
