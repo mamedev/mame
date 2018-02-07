@@ -44,15 +44,14 @@
 
   todo (VT03):
 
-    Super Mario Bros 3 crashes after title screen, some kind of memory map issue
-    possibly with MMC3 emulation mode
-
   APU refactoring to allow for mostly doubled up functionality + PCM channel
   *more*
 
   todo (newer VTxx):
 
-  everything
+  new PCM audio in FC Pocket and DGUN-2573
+	add support for VT368 (?) in DGUN-2561 and lexcyber
+	add support for the VT369 (?) featurs used by the MOGIS M320
 
   todo (general)
 
@@ -951,10 +950,8 @@ int nes_vt_state::calculate_real_video_address(int addr, int extended, int readt
 /*
    nes_vt_state::vt03_8000_w notes
 
-   this is used by
-   VT03dogA.bin
-   at least, but even in EmuVT the sprite graphics there are corrupt
-   so I'm not sure if it's just an incomplete demo, or there is more to this
+	 used for MMC3/other mapper compatibility
+	 some consoles have scrambled registers for crude copy protection
 */
 
 static const uint8_t descram_8000_mmc3[5][8] = {
@@ -1877,5 +1874,5 @@ CONS( 2016, fcpocket,  	0,        0,  nes_vt_fp,    nes_vt_fp, nes_vt_state,  0,
 // (which can also be overriden by GPIO)
 CONS( 2017, fapocket,  	0,        0,  nes_vt_fa,    nes_vt_fa, nes_vt_state,  0, "<unknown>", 	"Family Pocket 638 in 1", MACHINE_IMPERFECT_GRAPHICS )
 
-// Plays intro music but then crashes. New platform which makes some odd accesses.
+// Plays intro music but then crashes. same hardware as SY-88x but uses more features
 CONS( 2016, mog_m320,  	0, 				0,  nes_vt_hh,    nes_vt, nes_vt_state,  0, "MOGIS", 	"MOGIS M320 246 in 1 Handheld", MACHINE_NOT_WORKING )
