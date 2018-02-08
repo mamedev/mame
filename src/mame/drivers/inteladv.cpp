@@ -4,6 +4,17 @@
 
  inteladv.cpp: VTech Intelligence Advance E/R Lerncomputer
 
+ CPU is a Rockwell R65C02 (the dead-end bit-twiddling 65C02, as opposed to
+ the WDC version that the 65816 is back-compatible with) with some customizations:
+
+ JMP (ZP) accepts a 3rd ZP location after the 16-bit address to jump to which
+ contains a bank value for the ROM window at 0x4000.  I believe it's in 0x4000
+ byte segments, as the first long jump uses a value of 4 and that leads to
+ the correct start of a subroutine at 0x10000 + the offset.
+
+ JSR / RTS may also push and pop an additional byte for the bank offset but
+ this is not proven yet.
+
 ***************************************************************************/
 
 #include "emu.h"
