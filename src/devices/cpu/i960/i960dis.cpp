@@ -163,7 +163,7 @@ offs_t i960_disassembler::disassemble(std::ostream &stream, offs_t pc, const dat
 	u32 iCode = opcodes.r32(IP);
 	u8 op = (unsigned char) (iCode >> 24);
 	u8 op2 = (unsigned char) (iCode >> 7)&0xf;
-	u8 opc = 0;
+	u16 opc = 0;
 	u32 i = 0;
 
 	u8 model = (unsigned char) (iCode >> 10) &0x3;
@@ -262,7 +262,7 @@ offs_t i960_disassembler::disassemble(std::ostream &stream, offs_t pc, const dat
 		}
 
 		if (mnem_reg[i].type == opc) util::stream_format(stream, "%-8s%s", mnem_reg[i].mnem,dis_decode_reg(iCode,0));
-		else util::stream_format(stream, "%s %02x:%01x %08lx %1x %1x",mnemonic[op].mnem,op,op2,iCode, modeh, model);
+		else util::stream_format(stream, "%s %02x:%01x %08lx %1x %1x",mnemonic[op].mnem,op,op2,opc,iCode, modeh, model);
 		break;
 
 	case 6: // bitpos and branch type
