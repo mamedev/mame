@@ -58,7 +58,10 @@ class xavix_state : public driver_device
 public:
 	xavix_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag),
-			m_maincpu(*this, "maincpu")
+		m_maincpu(*this, "maincpu"),
+		m_palram1(*this, "palram1"),
+		m_palram2(*this, "palram2"),
+		m_palette(*this, "palette")
 	{ }
 
 	// devices
@@ -89,6 +92,8 @@ public:
 	DECLARE_WRITE8_MEMBER(irq_vector1_lo_w);
 	DECLARE_WRITE8_MEMBER(irq_vector1_hi_w);
 
+	DECLARE_READ8_MEMBER(xavix_75f4_r);
+	DECLARE_READ8_MEMBER(xavix_75f5_r);
 	DECLARE_WRITE8_MEMBER(xavix_75f6_w);
 	DECLARE_WRITE8_MEMBER(xavix_75f7_w);
 	DECLARE_WRITE8_MEMBER(xavix_75f8_w);
@@ -122,17 +127,50 @@ private:
 	uint8_t m_irq_vector0_hi_data;
 	uint8_t m_irq_vector1_lo_data;
 	uint8_t m_irq_vector1_hi_data;
-	
+
 	uint8_t get_vectors(int which, int half);
 
+	required_shared_ptr<uint8_t> m_palram1;
+	required_shared_ptr<uint8_t> m_palram2;
+	required_device<palette_device> m_palette;
+
+	void handle_palette(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 };
 
 void xavix_state::video_start()
 {
 }
 
+
+
+void xavix_state::handle_palette(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
+{
+	// Palette (WRONG! it's probably more like the rad_eu3a14.cpp etc. ones)
+	int offs = 0;
+	for (int index = 0; index < 256; index++)
+	{
+		uint16_t dat = m_palram1[offs];
+		dat |= m_palram2[offs]<<8;
+		offs++;
+
+		int r = (dat & 0x000f) >> 0;
+		int g = (dat & 0x00f0) >> 4;
+		int b = (dat & 0x0f00) >> 8;
+		int i = (dat & 0xf000) >> 12;
+		i+=1;
+
+		r = (r * i)-1;
+		g = (g * i)-1;
+		b = (b * i)-1;
+
+		m_palette->set_pen_color(index, r, g, b);
+	}
+}
+
+
 uint32_t xavix_state::screen_update( screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect )
 {
+	handle_palette(screen, bitmap, cliprect);
 	return 0;
 }
 
@@ -270,11 +308,11 @@ TIMER_DEVICE_CALLBACK_MEMBER(xavix_state::scanline_cb)
 
 INTERRUPT_GEN_MEMBER(xavix_state::interrupt)
 {
-	if (m_irq_enable_data != 0)
-		m_maincpu->set_input_line(INPUT_LINE_IRQ0,HOLD_LINE);
-
 //	if (m_irq_enable_data != 0)
-//		m_maincpu->set_input_line(INPUT_LINE_NMI,PULSE_LINE);
+//		m_maincpu->set_input_line(INPUT_LINE_IRQ0,HOLD_LINE);
+
+	if (m_irq_enable_data != 0)
+		m_maincpu->set_input_line(INPUT_LINE_NMI,PULSE_LINE);
 }
 
 WRITE8_MEMBER(xavix_state::xavix_75f6_w)
@@ -311,8 +349,65 @@ READ8_MEMBER(xavix_state::xavix_75f9_r)
 
 READ8_MEMBER(xavix_state::xavix_7a01_r)
 {
-	logerror("%s: xavix_7a01_r (random status?)\n", machine().describe_context());
-	return machine().rand();
+	//logerror("%s: xavix_7a01_r (random status?)\n", machine().describe_context());
+	/*	
+
+	rad_mtrk checks for 0x40 at 
+
+	008f02: lda $7a01 -- ??
+	008f05: and #$40
+	008f07: beq $8f17
+	(code that leads to a far call screen fade function with a 'jump to self' at the end, no obvious way out)
+	008f17 - normal flow?
+
+	opposite condition to above
+	018ac5: lda $7a01 -- ??
+	018ac8: and #$40
+	018aca: bne $18ac5
+
+	there's a write with 0x80 before the 'jump to self'
+	018aea: lda #$80
+	018aec: sta $7a01
+	018aef: jmp $18aef
+
+
+	and 0x02 elsewhere
+
+	near end of interrupt function will conditionally change the value stored at 0x33 to 00 or ff depending on this bit
+
+	008f24: lda $7a01
+	008f27: and #$02
+	008f29: bne $8f3c
+	(skips over code to store 0x00 at $33)
+
+	008f31: lda $7a01
+	008f34: and #$02
+	008f36: beq $8f3c
+	(skips over code to store 0xff at $33)
+
+	there's a similar check fo 0x02 that results in a far call
+	008099: lda $7a01
+	00809c: and #$02
+	00809e: beq $80ab
+
+	writes 00 04 and 80
+
+	*/
+
+	
+	return 0x02;
+}
+
+READ8_MEMBER(xavix_state::xavix_75f4_r)
+{
+	// used with 75f0
+	return 0xff;
+}
+
+READ8_MEMBER(xavix_state::xavix_75f5_r)
+{
+	// used with 75f1
+	return 0xff;
 }
 
 static ADDRESS_MAP_START( xavix_map, AS_PROGRAM, 8, xavix_state )
@@ -326,8 +421,8 @@ static ADDRESS_MAP_START( xavix_map, AS_PROGRAM, 8, xavix_state )
 	AM_RANGE(0x006300, 0x0067ff) AM_RAM // taitons1 writes to other areas here, but might already be off the rails
 	
 	// could be palettes?
-	AM_RANGE(0x006800, 0x00680f) AM_RAM // written with 6900
-	AM_RANGE(0x006900, 0x00690f) AM_RAM // startup (taitons1)
+	AM_RANGE(0x006800, 0x0068ff) AM_RAM AM_SHARE("palram1") // written with 6900
+	AM_RANGE(0x006900, 0x0069ff) AM_RAM AM_SHARE("palram2") // startup (taitons1)
 
 	AM_RANGE(0x006a00, 0x006a00) AM_WRITENOP
 	AM_RANGE(0x006a01, 0x006a01) AM_WRITENOP
@@ -343,10 +438,10 @@ static ADDRESS_MAP_START( xavix_map, AS_PROGRAM, 8, xavix_state )
 	AM_RANGE(0x006fce, 0x006fce) AM_WRITENOP
 	AM_RANGE(0x006fcf, 0x006fcf) AM_WRITENOP
 
-	AM_RANGE(0x006fd7, 0x006fd7) AM_READNOP AM_WRITENOP
+	//AM_RANGE(0x006fd7, 0x006fd7) AM_READNOP AM_WRITENOP
 	AM_RANGE(0x006fd8, 0x006fd8) AM_WRITENOP // startup (taitons1)
 
-	AM_RANGE(0x006fe0, 0x006fe0) AM_READNOP AM_WRITENOP
+	//AM_RANGE(0x006fe0, 0x006fe0) AM_READNOP AM_WRITENOP
 	AM_RANGE(0x006fe1, 0x006fe1) AM_WRITENOP
 	AM_RANGE(0x006fe2, 0x006fe2) AM_WRITENOP
 	AM_RANGE(0x006fe5, 0x006fe5) AM_WRITENOP
@@ -359,13 +454,15 @@ static ADDRESS_MAP_START( xavix_map, AS_PROGRAM, 8, xavix_state )
 	AM_RANGE(0x006ff1, 0x006ff1) AM_WRITENOP // startup (taitons1)
 	AM_RANGE(0x006ff2, 0x006ff2) AM_WRITENOP
 
-	AM_RANGE(0x006ff8, 0x006ff8) AM_READNOP AM_WRITENOP // startup
-	AM_RANGE(0x006ff9, 0x006ff9) AM_READNOP
+	AM_RANGE(0x006ff8, 0x006ff8) AM_RAM // always seems to be a read/store or read/modify/store
+	//AM_RANGE(0x006ff9, 0x006ff9) AM_READNOP
+
+	// 7xxx ranges system controller?
 
 	AM_RANGE(0x0075f0, 0x0075f0) AM_RAM // read/written 8 times in a row
 	AM_RANGE(0x0075f1, 0x0075f1) AM_RAM // read/written 8 times in a row
-
-	// 7xxx ranges system controller?
+	AM_RANGE(0x0075f4, 0x0075f4) AM_READ(xavix_75f4_r) // related to 75f0 (read after writing there - rad_mtrk)
+	AM_RANGE(0x0075f5, 0x0075f5) AM_READ(xavix_75f5_r) // related to 75f1 (read after writing there - rad_mtrk)
 
 	// taitons1 after 75f7/75f8
 	AM_RANGE(0x0075f6, 0x0075f6) AM_WRITE(xavix_75f6_w)
@@ -373,7 +470,7 @@ static ADDRESS_MAP_START( xavix_map, AS_PROGRAM, 8, xavix_state )
 	AM_RANGE(0x0075f7, 0x0075f7) AM_WRITE(xavix_75f7_w)
 	AM_RANGE(0x0075f8, 0x0075f8) AM_WRITE(xavix_75f8_w)
 	// taitons1 written after 75f6, then read
-	AM_RANGE(0x0075f9, 0x0075f9) AM_READWRITE(xavix_75f9_r, xavix_75f9_w)
+	//AM_RANGE(0x0075f9, 0x0075f9) AM_READWRITE(xavix_75f9_r, xavix_75f9_w)
 	// at another time
 	AM_RANGE(0x0075fd, 0x0075fd) AM_WRITENOP
 	AM_RANGE(0x0075fe, 0x0075fe) AM_WRITENOP
@@ -398,14 +495,15 @@ static ADDRESS_MAP_START( xavix_map, AS_PROGRAM, 8, xavix_state )
 	AM_RANGE(0x007986, 0x007986) AM_WRITE(dmalen_lo_w)
 	AM_RANGE(0x007987, 0x007987) AM_WRITE(dmalen_hi_w)
 
-	AM_RANGE(0x007a00, 0x007a00) AM_READNOP // startup (taitons1)
+	//AM_RANGE(0x007a00, 0x007a00) AM_READNOP // startup (taitons1)
 	AM_RANGE(0x007a01, 0x007a01) AM_READ(xavix_7a01_r) AM_WRITENOP // startup (taitons1)
 
-	AM_RANGE(0x007a03, 0x007a03) AM_READNOP AM_WRITENOP // startup
+	//AM_RANGE(0x007a02, 0x007a02) AM_WRITENOP // startup, gets set to 20, 7a00 is then also written with 20 
+	//AM_RANGE(0x007a03, 0x007a03) AM_READNOP AM_WRITENOP // startup (gets set to 84 which is the same as the bits checked on 7a01, possible port direction register?)
 
 	AM_RANGE(0x007a80, 0x007a80) AM_WRITENOP
 
-	AM_RANGE(0x007b80, 0x007b80) AM_READNOP
+	//AM_RANGE(0x007b80, 0x007b80) AM_READNOP
 	AM_RANGE(0x007b81, 0x007b81) AM_WRITENOP
 	AM_RANGE(0x007b82, 0x007b82) AM_WRITENOP
 
@@ -414,8 +512,8 @@ static ADDRESS_MAP_START( xavix_map, AS_PROGRAM, 8, xavix_state )
 	AM_RANGE(0x007ff2, 0x007ff2) AM_WRITENOP
 	AM_RANGE(0x007ff3, 0x007ff3) AM_WRITENOP
 	AM_RANGE(0x007ff4, 0x007ff4) AM_WRITENOP
-	AM_RANGE(0x007ff5, 0x007ff5) AM_READNOP
-	AM_RANGE(0x007ff6, 0x007ff6) AM_READNOP
+	//AM_RANGE(0x007ff5, 0x007ff5) AM_READNOP
+	//AM_RANGE(0x007ff6, 0x007ff6) AM_READNOP
 	
 	// maybe irq enable, written after below
 	AM_RANGE(0x007ff9, 0x007ff9) AM_WRITE(irq_enable_w)
@@ -497,8 +595,33 @@ static const gfx_layout charlayout =
 	8*8*4
 };
 
+static const gfx_layout char16layout =
+{
+	16,16,
+	RGN_FRAC(1,1),
+	4,
+	{ STEP4(0,1) },
+	{ 1*4,0*4,3*4,2*4,5*4,4*4,7*4,6*4, 9*4,8*4,11*4,10*4,13*4,12*4,15*4,14*4   },
+	{ STEP16(0,4*16) },
+	16*16*4
+};
+
+static const gfx_layout charlayout8bpp =
+{
+	8,8,
+	RGN_FRAC(1,1),
+	8,
+	{ STEP8(0,1) },
+	{ STEP8(0,8) },
+	{ STEP8(0,8*8) },
+	8*8*8
+};
+
+
 static GFXDECODE_START( xavix )
-	GFXDECODE_ENTRY( "bios", 0, charlayout,     0, 1 )
+	GFXDECODE_ENTRY( "bios", 0, charlayout,   0, 1 )
+	GFXDECODE_ENTRY( "bios", 0, char16layout, 0, 1 )
+	GFXDECODE_ENTRY( "bios", 0, charlayout8bpp, 0, 1 )
 GFXDECODE_END
 
 
@@ -531,7 +654,7 @@ uint8_t xavix_state::get_vectors(int which, int half)
 {
 //	logerror("get_vectors %d %d\n", which, half);
 
-	if (which == 1) // irq?
+	if (which == 0) // irq?
 	{
 		if (half == 0)
 			return m_irq_vector0_hi_data;
@@ -569,7 +692,7 @@ MACHINE_CONFIG_START(xavix_state::xavix)
 
 	MCFG_GFXDECODE_ADD("gfxdecode", "palette", xavix)
 
-	MCFG_PALETTE_ADD("palette", 16)
+	MCFG_PALETTE_ADD("palette", 256)
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
