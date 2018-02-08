@@ -685,7 +685,7 @@ ADDRESS_MAP_END
 MACHINE_CONFIG_START(r2dx_v33_state::rdx_v33)
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", V33, RAIDEN2_XTAL1/2 ) // ?
+	MCFG_CPU_ADD("maincpu", V33, MAIN_CLOCK) // ?
 	MCFG_CPU_PROGRAM_MAP(rdx_v33_map)
 	MCFG_CPU_VBLANK_INT_DRIVER("screen", raiden2_state,  raiden2_interrupt)
 
@@ -712,7 +712,7 @@ MACHINE_CONFIG_START(r2dx_v33_state::rdx_v33)
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
 
-	MCFG_OKIM6295_ADD("oki", RAIDEN2_XTAL2/28, PIN7_HIGH) // clock frequency & pin 7 not verified
+	MCFG_OKIM6295_ADD("oki", OKI_CLOCK, PIN7_HIGH) // clock frequency & pin 7 not verified
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.5)
 	MCFG_DEVICE_ADDRESS_MAP(0, r2dx_oki_map)
 MACHINE_CONFIG_END
@@ -720,7 +720,7 @@ MACHINE_CONFIG_END
 MACHINE_CONFIG_START(r2dx_v33_state::nzerotea)
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", V33,RAIDEN2_XTAL1/2) /* verified on pcb */
+	MCFG_CPU_ADD("maincpu", V33, MAIN_CLOCK) /* verified on pcb */
 	MCFG_CPU_PROGRAM_MAP(nzerotea_map)
 	MCFG_CPU_VBLANK_INT_DRIVER("screen", raiden2_state,  raiden2_interrupt)
 
