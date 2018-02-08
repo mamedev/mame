@@ -16,7 +16,8 @@ inder_vid_device::inder_vid_device(const machine_config &mconfig, const char *ta
 /*  device_video_interface(mconfig, *this, false), */
 		m_vram(*this, "vram"),
 		m_palette(*this, "palette"),
-		m_tms(*this, "tms")
+		m_tms(*this, "tms"),
+		m_bpp_mode(8)
 {
 }
 
@@ -43,13 +44,30 @@ TMS340X0_SCANLINE_RGB32_CB_MEMBER(inder_vid_device::scanline)
 	int coladdr = params->coladdr;
 	int x;
 
-	for (x = params->heblnk; x < params->hsblnk; x += 2)
+	if (m_bpp_mode == 8)
 	{
-		uint16_t pixels = vram[coladdr++ & 0xff];
-		dest[x + 0] = paldata[pixels & 0xff];
-		dest[x + 1] = paldata[pixels >> 8];
+		for (x = params->heblnk; x < params->hsblnk; x += 2)
+		{
+			uint16_t pixels = vram[coladdr++ & 0xff];
+			dest[x + 0] = paldata[pixels & 0xff];
+			dest[x + 1] = paldata[pixels >> 8];
+		}
 	}
-
+	else if (m_bpp_mode == 4)
+	{
+		for (x = params->heblnk; x < params->hsblnk; x += 4)
+		{
+			uint16_t pixels = vram[coladdr++ & 0xff];
+			dest[x + 3] = paldata[((pixels & 0xf000) >> 12)];
+			dest[x + 2] = paldata[((pixels & 0x0f00) >> 8)];
+			dest[x + 1] = paldata[((pixels & 0x00f0) >> 4)];
+			dest[x + 0] = paldata[((pixels & 0x000f) >> 0)];
+		}
+	}
+	else
+	{
+		fatalerror("inder_vid_device unsupported mode, not 4bpp or 8bpp");
+	}
 }
 
 
