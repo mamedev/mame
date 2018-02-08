@@ -1066,6 +1066,7 @@ void towns_state::towns_crtc_draw_scan_layer_hicolour(bitmap_rgb32 &bitmap,const
 	uint32_t scroll;
 	int pixel;
 	int page = 0;
+	bool sphscroll = !(m_video.towns_crtc_reg[28] & (layer ? 0x20 : 0x10));
 
 	if(m_video.towns_video_reg[0] & 0x10)
 	{
@@ -1090,7 +1091,7 @@ void towns_state::towns_crtc_draw_scan_layer_hicolour(bitmap_rgb32 &bitmap,const
 	{
 		if(!(m_video.towns_video_reg[0] & 0x10))
 			return;
-		if(!(m_video.towns_crtc_reg[28] & 0x10))
+		if(!sphscroll)
 			off += (m_video.towns_crtc_reg[21]) << 2;  // initial offset
 		else
 		{
@@ -1102,7 +1103,7 @@ void towns_state::towns_crtc_draw_scan_layer_hicolour(bitmap_rgb32 &bitmap,const
 	}
 	else
 	{
-		if(!(m_video.towns_crtc_reg[28] & 0x20))
+		if(!sphscroll)
 			off += (m_video.towns_crtc_reg[17]) << 2;  // initial offset
 		else
 		{
@@ -1132,7 +1133,7 @@ void towns_state::towns_crtc_draw_scan_layer_hicolour(bitmap_rgb32 &bitmap,const
 					| ((colour & 0x03e0) << 14);
 		}
 		off+=2;
-		if ((off - (page * 0x20000)) % linesize == 0)
+		if ((off - (page * 0x20000)) % linesize == 0 && sphscroll)
 			off -= linesize;
 	}
 }
@@ -1147,6 +1148,7 @@ void towns_state::towns_crtc_draw_scan_layer_256(bitmap_rgb32 &bitmap,const rect
 	uint32_t scroll;
 	int pixel;
 	int page = 0;
+	bool sphscroll = !(m_video.towns_crtc_reg[28] & 0x10);
 
 	if(m_video.towns_display_page_sel != 0)
 	{
@@ -1156,7 +1158,7 @@ void towns_state::towns_crtc_draw_scan_layer_256(bitmap_rgb32 &bitmap,const rect
 
 	linesize = m_video.towns_crtc_reg[20] * 4;
 
-	if(!(m_video.towns_crtc_reg[28] & 0x20))
+	if(!sphscroll)
 		off += m_video.towns_crtc_reg[17] << 2;  // initial offset
 	else
 	{
@@ -1182,7 +1184,7 @@ void towns_state::towns_crtc_draw_scan_layer_256(bitmap_rgb32 &bitmap,const rect
 			off += 4;
 			subpix = 0;
 		}
-		if ((off - (page * 0x20000)) % linesize == 0 && subpix == 0)
+		if ((off - (page * 0x20000)) % linesize == 0 && subpix == 0 && sphscroll)
 			off -= linesize;
 	}
 }
@@ -1198,6 +1200,7 @@ void towns_state::towns_crtc_draw_scan_layer_16(bitmap_rgb32 &bitmap,const recta
 	int pixel;
 	int page = 0;
 	palette_device* pal = (layer == 0) ? m_palette16_0 : m_palette16_1;
+	bool sphscroll = !(m_video.towns_crtc_reg[28] & (layer ? 0x20 : 0x10));
 
 	if(m_video.towns_display_page_sel != 0)
 	{
@@ -1219,7 +1222,7 @@ void towns_state::towns_crtc_draw_scan_layer_16(bitmap_rgb32 &bitmap,const recta
 	{
 		if(!(m_video.towns_video_reg[0] & 0x10))
 			return;
-		if(!(m_video.towns_crtc_reg[28] & 0x10))
+		if(!sphscroll)
 			off += m_video.towns_crtc_reg[21] << 2;  // initial offset
 		else
 		{
@@ -1231,7 +1234,7 @@ void towns_state::towns_crtc_draw_scan_layer_16(bitmap_rgb32 &bitmap,const recta
 	}
 	else
 	{
-		if(!(m_video.towns_crtc_reg[28] & 0x20))
+		if(!sphscroll)
 			off += m_video.towns_crtc_reg[17] << 2;  // initial offset
 		else
 		{
@@ -1263,7 +1266,7 @@ void towns_state::towns_crtc_draw_scan_layer_16(bitmap_rgb32 &bitmap,const recta
 				bitmap.pix32(scanline, x+pixel) = pal->pen(colour);
 		}
 		off++;
-		if ((off - (page * 0x20000)) % linesize == 0)
+		if ((off - (page * 0x20000)) % linesize == 0 && sphscroll)
 			off -= linesize;
 	}
 }
