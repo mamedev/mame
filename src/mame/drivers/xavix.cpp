@@ -426,7 +426,7 @@ static ADDRESS_MAP_START( xavix_map, AS_PROGRAM, 8, xavix_state )
 	AM_RANGE(0x007ffe, 0x007ffe) AM_WRITE(irq_vector1_lo_w)
 	AM_RANGE(0x007fff, 0x007fff) AM_WRITE(irq_vector1_hi_w)
 
-	AM_RANGE(0x008000, 0x1fffff) AM_ROM AM_REGION("bios", 0x008000)
+	AM_RANGE(0x008000, 0x1fffff) AM_ROM AM_REGION("bios", 0x008000) AM_MIRROR(0x800000) // rad_mtrk relies on rom mirroring
 ADDRESS_MAP_END
 
 static INPUT_PORTS_START( xavix )
@@ -594,6 +594,11 @@ ROM_START( rad_ping )
 	ROM_LOAD( "pingpong.bin", 0x000000, 0x100000, CRC(629f7f47) SHA1(2bb19fd202f1e6c319d2f7d18adbfed8a7669235) )
 ROM_END
 
+ROM_START( rad_mtrk )
+	ROM_REGION( 0x400000, "bios", ROMREGION_ERASE00 )
+	ROM_LOAD( "monstertruck.bin", 0x000000, 0x400000, CRC(dccda0a7) SHA1(7953cf29643672f8367639555b797c20bb533eab) )
+ROM_END
+
 ROM_START( xavtenni )
 	ROM_REGION( 0x800000, "bios", ROMREGION_ERASE00 )
 	ROM_LOAD( "xavixtennis.bin", 0x000000, 0x800000, CRC(23a1d918) SHA1(2241c59e8ea8328013e55952ebf9060ea0a4675b) )
@@ -613,12 +618,9 @@ ROM_END
 */
 CONS( 2004, xavtenni,  0,   0,  xavix,  xavix, xavix_state, 0, "SSD Company LTD", "XaviX Tennis (XaviXPORT)", MACHINE_IS_SKELETON )
 
-/* Standalone TV Games 
+/* Standalone TV Games */
 
-  These all have jumps to the 3xxx region, which appears to be RAM (or possibly a banked space?) hopefully it's just missing some kind of DMA transfer and
-  isn't some additional internal ROM.
-
-*/
 CONS( 2006, taitons1,  0,   0,  xavix,  xavix, xavix_state, 0, "Bandai / SSD Company LTD / Taito", "Let's! TV Play Classic - Taito Nostalgia 1", MACHINE_IS_SKELETON )
 
 CONS( 2000, rad_ping,  0,   0,  xavix,  xavix, xavix_state, 0, "Radica / SSD Company LTD / Simmer Technology", "Play TV Ping Pong", MACHINE_IS_SKELETON ) // "Simmer Technology" is also known as "Hummer Technology Co., Ltd"
+CONS( 2003, rad_mtrk,  0,   0,  xavix,  xavix, xavix_state, 0, "Radica / SSD Company LTD",                     "Play TV Monster Truck", MACHINE_IS_SKELETON )
