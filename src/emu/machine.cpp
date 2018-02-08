@@ -84,8 +84,8 @@
 #include "network.h"
 #include "ui/uimain.h"
 #include <time.h>
-#include "rapidjson/include/rapidjson/writer.h"
-#include "rapidjson/include/rapidjson/stringbuffer.h"
+#include <rapidjson/writer.h>
+#include <rapidjson/stringbuffer.h>
 
 #if defined(EMSCRIPTEN)
 #include <emscripten.h>
