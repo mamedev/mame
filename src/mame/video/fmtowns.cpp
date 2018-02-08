@@ -142,6 +142,20 @@ WRITE8_MEMBER( towns_state::towns_gfx_high_w )
 	m_towns_gfxvram[offset] = (mem & ~mask) | (data & mask);
 }
 
+READ8_MEMBER( towns_state::towns_gfx_packed_r )
+{
+	return m_towns_gfxvram[bitswap<19>(offset,2,18,17,16,15,14,13,12,11,10,9,8,7,6,5,4,3,1,0)];
+}
+
+WRITE8_MEMBER( towns_state::towns_gfx_packed_w )
+{
+	u8 mask = m_vram_mask[offset & 3];
+	offset = bitswap<19>(offset,2,18,17,16,15,14,13,12,11,10,9,8,7,6,5,4,3,1,0);
+	u8 mem = m_towns_gfxvram[offset];
+	m_towns_gfxvram[offset] = (mem & ~mask) | (data & mask);
+}
+
+
 READ8_MEMBER( towns_state::towns_gfx_r )
 {
 	uint8_t ret = 0;
@@ -1140,28 +1154,35 @@ void towns_state::towns_crtc_draw_scan_layer_256(bitmap_rgb32 &bitmap,const rect
 		page = 1;
 	}
 
-	linesize = m_video.towns_crtc_reg[20] * 8;
+	linesize = m_video.towns_crtc_reg[20] * 4;
 
 	if(!(m_video.towns_crtc_reg[28] & 0x20))
-		off += m_video.towns_crtc_reg[17] << 3;  // initial offset
+		off += m_video.towns_crtc_reg[17] << 2;  // initial offset
 	else
 	{
-		scroll = ((m_video.towns_crtc_reg[17] & 0xfc00) << 3) | (((m_video.towns_crtc_reg[17] & 0x3ff) << 3));
+		scroll = ((m_video.towns_crtc_reg[17] & 0xfc00) << 2) | (((m_video.towns_crtc_reg[17] & 0x3ff) << 2));
 		off += scroll;
 	}
 	hzoom = (m_video.towns_crtc_reg[27] & 0x000f) + 1;
-	off += (m_video.towns_crtc_reg[9] - m_video.towns_crtc_reg[18]) / hzoom;
+	int subpix = (m_video.towns_crtc_reg[9] - m_video.towns_crtc_reg[18]) / hzoom;
 
 	off += line * linesize;
+	off += (subpix >> 1) & ~3;
+	subpix = subpix & 7;
 
 	for(x=rect->min_x;x<rect->max_x;x+=hzoom)
 	{
-		off &= 0x7ffff;  // 256 color mode is single-layer only
-		colour = m_towns_gfxvram[off];
+		off &= 0x3ffff;
+		colour = m_towns_gfxvram[off+(subpix >= 4 ? (subpix & 3)+0x40000 : subpix)];
 		for (pixel = 0; pixel < hzoom; pixel++)
 			bitmap.pix32(scanline, x+pixel) = m_palette->pen(colour);
-		off++;
-		if ((off - (page * 0x20000)) % linesize == 0)
+		subpix++;
+		if(subpix == 8)
+		{
+			off += 4;
+			subpix = 0;
+		}
+		if ((off - (page * 0x20000)) % linesize == 0 && subpix == 0)
 			off -= linesize;
 	}
 }
