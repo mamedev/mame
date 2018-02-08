@@ -3400,6 +3400,7 @@ files {
 	MAME_DIR .. "src/mame/drivers/socrates.cpp",
 	MAME_DIR .. "src/mame/audio/socrates.cpp",
 	MAME_DIR .. "src/mame/audio/socrates.h",
+	MAME_DIR .. "src/mame/drivers/inteladv.cpp",
 }
 
 createMESSProjects(_target, _subtarget, "wang")

@@ -15345,6 +15345,9 @@ instantm                        //
 @source:instruct.cpp
 instruct                        //
 
+@source:inteladv.cpp
+inteladv
+
 @source:intellec4.cpp
 intlc44                         //
 intlc440                        //
