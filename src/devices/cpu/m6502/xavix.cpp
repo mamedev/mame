@@ -67,7 +67,10 @@ uint8_t xavix_device::mi_xavix_normal::read(uint16_t adr)
 	if (adr < 0x8000)
 		return program->read_byte(adr);
 	else
-		return program->read_byte(base->adr_with_bank(adr));
+	{
+		uint8_t data_bank = program->read_byte(0xff);
+		return program->read_byte((data_bank << 16) | adr);
+	}
 }
 
 uint8_t xavix_device::mi_xavix_normal::read_sync(uint16_t adr)
@@ -91,7 +94,10 @@ void xavix_device::mi_xavix_normal::write(uint16_t adr, uint8_t val)
 	if (adr < 0x8000)
 		program->write_byte(adr, val);
 	else
-		program->write_byte(base->adr_with_bank(adr), val);
+	{
+		uint8_t data_bank = program->read_byte(0xff);
+		program->write_byte((data_bank << 16) | adr, val);
+	}
 }
 
 xavix_device::mi_xavix_nd::mi_xavix_nd(xavix_device *_base) : mi_xavix_normal(_base)

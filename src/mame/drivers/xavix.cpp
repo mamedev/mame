@@ -352,7 +352,7 @@ READ8_MEMBER(xavix_state::xavix_7a01_r)
 	//logerror("%s: xavix_7a01_r (random status?)\n", machine().describe_context());
 	/*	
 
-	rad_mtrk checks for 0x40 at 
+	rad_mtrk checks for 0x40 at (interrupt code)
 
 	008f02: lda $7a01 -- ??
 	008f05: and #$40
@@ -410,6 +410,8 @@ READ8_MEMBER(xavix_state::xavix_75f5_r)
 	return 0xff;
 }
 
+// DATA reads from 0x8000-0xffff are banked by byte 0xff of 'ram'
+
 static ADDRESS_MAP_START( xavix_map, AS_PROGRAM, 8, xavix_state )
 	AM_RANGE(0x000000, 0x0001ff) AM_RAM
 	AM_RANGE(0x000200, 0x003fff) AM_RAM
@@ -441,18 +443,20 @@ static ADDRESS_MAP_START( xavix_map, AS_PROGRAM, 8, xavix_state )
 	//AM_RANGE(0x006fd7, 0x006fd7) AM_READNOP AM_WRITENOP
 	AM_RANGE(0x006fd8, 0x006fd8) AM_WRITENOP // startup (taitons1)
 
-	//AM_RANGE(0x006fe0, 0x006fe0) AM_READNOP AM_WRITENOP
+	//AM_RANGE(0x006fe0, 0x006fe0) AM_READNOP AM_WRITENOP // after writing to 6fe1/6fe2 and 6fe5/6fe6 rad_mtrk writes 0x43/0x44 here then polls on 0x40   (see function call at c273) write values are hardcoded, similar code at 18401
 	AM_RANGE(0x006fe1, 0x006fe1) AM_WRITENOP
 	AM_RANGE(0x006fe2, 0x006fe2) AM_WRITENOP
 	AM_RANGE(0x006fe5, 0x006fe5) AM_WRITENOP
 	AM_RANGE(0x006fe6, 0x006fe6) AM_WRITENOP
-	AM_RANGE(0x006fe8, 0x006fe8) AM_WRITENOP
-	AM_RANGE(0x006fe9, 0x006fe9) AM_WRITENOP // startup
-	AM_RANGE(0x006fea, 0x006fea) AM_WRITENOP
 
-	AM_RANGE(0x006ff0, 0x006ff0) AM_WRITENOP
-	AM_RANGE(0x006ff1, 0x006ff1) AM_WRITENOP // startup (taitons1)
-	AM_RANGE(0x006ff2, 0x006ff2) AM_WRITENOP
+	// function in rad_mtrk at 0184b7 uses this
+	AM_RANGE(0x006fe8, 0x006fe8) AM_WRITENOP // cleared in interrupt 0
+	AM_RANGE(0x006fe9, 0x006fe9) AM_WRITENOP // startup - cleared in interrupt 0
+	AM_RANGE(0x006fea, 0x006fea) AM_WRITENOP 
+
+	AM_RANGE(0x006ff0, 0x006ff0) AM_WRITENOP // cleared in interrupt 0
+	AM_RANGE(0x006ff1, 0x006ff1) AM_WRITENOP // startup - cleared in interrupt 0
+	AM_RANGE(0x006ff2, 0x006ff2) AM_WRITENOP // set to 07 after clearing above things in interrupt 0
 
 	AM_RANGE(0x006ff8, 0x006ff8) AM_RAM // always seems to be a read/store or read/modify/store
 	//AM_RANGE(0x006ff9, 0x006ff9) AM_READNOP
@@ -524,7 +528,7 @@ static ADDRESS_MAP_START( xavix_map, AS_PROGRAM, 8, xavix_state )
 	AM_RANGE(0x007ffe, 0x007ffe) AM_WRITE(irq_vector1_lo_w)
 	AM_RANGE(0x007fff, 0x007fff) AM_WRITE(irq_vector1_hi_w)
 
-	AM_RANGE(0x008000, 0x1fffff) AM_ROM AM_REGION("bios", 0x008000) AM_MIRROR(0x800000) // rad_mtrk relies on rom mirroring
+	AM_RANGE(0x008000, 0x7fffff) AM_ROM AM_REGION("bios", 0x008000) AM_MIRROR(0x800000) // rad_mtrk relies on rom mirroring
 ADDRESS_MAP_END
 
 static INPUT_PORTS_START( xavix )
@@ -708,18 +712,29 @@ MACHINE_CONFIG_END
 ***************************************************************************/
 
 ROM_START( taitons1 )
-	ROM_REGION( 0x200000, "bios", ROMREGION_ERASE00 )
+	ROM_REGION( 0x800000, "bios", ROMREGION_ERASE00 )
 	ROM_LOAD( "taitonostalgia1.u3", 0x000000, 0x200000, CRC(25bd8c67) SHA1(a109cd2da6aa4596e3ca3abd1afce2d0001a473f) )
+	ROM_RELOAD(0x200000,0x200000)
+	ROM_RELOAD(0x400000,0x200000)
+	ROM_RELOAD(0x600000,0x200000)
 ROM_END
 
 ROM_START( rad_ping )
-	ROM_REGION( 0x200000, "bios", ROMREGION_ERASE00 )
+	ROM_REGION( 0x800000, "bios", ROMREGION_ERASE00 )
 	ROM_LOAD( "pingpong.bin", 0x000000, 0x100000, CRC(629f7f47) SHA1(2bb19fd202f1e6c319d2f7d18adbfed8a7669235) )
+	ROM_RELOAD(0x100000,0x100000)
+	ROM_RELOAD(0x200000,0x100000)
+	ROM_RELOAD(0x300000,0x100000)
+	ROM_RELOAD(0x400000,0x100000)
+	ROM_RELOAD(0x500000,0x100000)
+	ROM_RELOAD(0x600000,0x100000)
+	ROM_RELOAD(0x700000,0x100000)
 ROM_END
 
 ROM_START( rad_mtrk )
-	ROM_REGION( 0x400000, "bios", ROMREGION_ERASE00 )
+	ROM_REGION( 0x800000, "bios", ROMREGION_ERASE00 )
 	ROM_LOAD( "monstertruck.bin", 0x000000, 0x400000, CRC(dccda0a7) SHA1(7953cf29643672f8367639555b797c20bb533eab) )
+	ROM_RELOAD(0x400000,0x400000)
 ROM_END
 
 ROM_START( xavtenni )
