@@ -1004,19 +1004,19 @@ GFXDECODE_END
 MACHINE_CONFIG_START(raiden2_state::raiden2)
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", V30,XTAL(32'000'000)/2) /* verified on pcb */
+	MCFG_CPU_ADD("maincpu", V30,RAIDEN2_XTAL1/2) /* verified on pcb */
 	MCFG_CPU_PROGRAM_MAP(raiden2_mem)
 	MCFG_CPU_VBLANK_INT_DRIVER("screen", raiden2_state,  raiden2_interrupt)
 
 	MCFG_MACHINE_RESET_OVERRIDE(raiden2_state,raiden2)
 
-	MCFG_CPU_ADD("audiocpu", Z80, XTAL(28'636'363)/8)
+	MCFG_CPU_ADD("audiocpu", Z80, RAIDEN2_XTAL2/8)
 	MCFG_CPU_PROGRAM_MAP(raiden2_sound_map)
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
 	MCFG_SCREEN_VIDEO_ATTRIBUTES(VIDEO_UPDATE_BEFORE_VBLANK)
-	MCFG_SCREEN_RAW_PARAMS(XTAL(32'000'000)/4,512,0,40*8,282,0,30*8) /* hand-tuned to match ~55.47 */
+	MCFG_SCREEN_RAW_PARAMS(PIXEL_CLOCK,HTOTAL,HBEND,HBSTART,VTOTAL,VBEND,VBSTART)
 	MCFG_SCREEN_UPDATE_DRIVER(raiden2_state, screen_update)
 
 	MCFG_GFXDECODE_ADD("gfxdecode", "palette", raiden2)
@@ -1035,15 +1035,15 @@ MACHINE_CONFIG_START(raiden2_state::raiden2)
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
 
-	MCFG_YM2151_ADD("ymsnd", XTAL(28'636'363)/8)
+	MCFG_YM2151_ADD("ymsnd", RAIDEN2_XTAL2/8)
 	MCFG_YM2151_IRQ_HANDLER(DEVWRITELINE("seibu_sound", seibu_sound_device, fm_irqhandler))
 	MCFG_SOUND_ROUTE(0, "mono", 0.50)
 	MCFG_SOUND_ROUTE(1, "mono", 0.50)
 
-	MCFG_OKIM6295_ADD("oki1", XTAL(28'636'363)/28, PIN7_HIGH)
+	MCFG_OKIM6295_ADD("oki1", RAIDEN2_XTAL2/28, PIN7_HIGH)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.40)
 
-	MCFG_OKIM6295_ADD("oki2", XTAL(28'636'363)/28, PIN7_HIGH)
+	MCFG_OKIM6295_ADD("oki2", RAIDEN2_XTAL2/28, PIN7_HIGH)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.40)
 
 	MCFG_DEVICE_ADD("seibu_sound", SEIBU_SOUND, 0)
@@ -1061,23 +1061,43 @@ MACHINE_CONFIG_DERIVED(raiden2_state::raidendx, raiden2)
 MACHINE_CONFIG_END
 
 
+MACHINE_CONFIG_START(raiden2_state::zeroteam_sound)
+
+	/* basic machine hardware */
+	MCFG_CPU_ADD("audiocpu", Z80, RAIDEN2_XTAL2/8)
+	MCFG_CPU_PROGRAM_MAP(zeroteam_sound_map)
+
+	/* sound hardware */
+	MCFG_SPEAKER_STANDARD_MONO("mono")
+
+	MCFG_SOUND_ADD("ymsnd", YM3812, RAIDEN2_XTAL2/8)
+	MCFG_YM3812_IRQ_HANDLER(DEVWRITELINE("seibu_sound", seibu_sound_device, fm_irqhandler))
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
+
+	MCFG_OKIM6295_ADD("oki", RAIDEN2_XTAL2/28, PIN7_HIGH)
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.40)
+
+	MCFG_DEVICE_ADD("seibu_sound", SEIBU_SOUND, 0)
+	MCFG_SEIBU_SOUND_CPU("audiocpu")
+	MCFG_SEIBU_SOUND_ROMBANK("seibu_bank1")
+	MCFG_SEIBU_SOUND_YM_READ_CB(DEVREAD8("ymsnd", ym3812_device, read))
+	MCFG_SEIBU_SOUND_YM_WRITE_CB(DEVWRITE8("ymsnd", ym3812_device, write))
+MACHINE_CONFIG_END
+
 MACHINE_CONFIG_START(raiden2_state::zeroteam)
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", V30,XTAL(32'000'000)/2) /* verified on pcb */
+	MCFG_CPU_ADD("maincpu", V30,RAIDEN2_XTAL1/2) /* verified on pcb */
 	MCFG_CPU_PROGRAM_MAP(zeroteam_mem)
 	MCFG_CPU_VBLANK_INT_DRIVER("screen", raiden2_state,  raiden2_interrupt)
 
 	MCFG_MACHINE_RESET_OVERRIDE(raiden2_state,zeroteam)
 
-	MCFG_CPU_ADD("audiocpu", Z80, XTAL(28'636'363)/8)
-	MCFG_CPU_PROGRAM_MAP(zeroteam_sound_map)
-
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
 	MCFG_SCREEN_VIDEO_ATTRIBUTES(VIDEO_UPDATE_AFTER_VBLANK)
 //  MCFG_SCREEN_REFRESH_RATE(55.47)    /* verified on pcb */
-	MCFG_SCREEN_RAW_PARAMS(XTAL(32'000'000)/4,512,0,40*8,282,0,32*8) /* hand-tuned to match ~55.47 */
+	MCFG_SCREEN_RAW_PARAMS(PIXEL_CLOCK,HTOTAL,HBEND,HBSTART,VTOTAL,VBEND,VBSTART+16)
 	MCFG_SCREEN_UPDATE_DRIVER(raiden2_state, screen_update)
 
 	MCFG_GFXDECODE_ADD("gfxdecode", "palette", raiden2)
@@ -1094,20 +1114,7 @@ MACHINE_CONFIG_START(raiden2_state::zeroteam)
 	MCFG_VIDEO_START_OVERRIDE(raiden2_state,raiden2)
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_MONO("mono")
-
-	MCFG_SOUND_ADD("ymsnd", YM3812, XTAL(28'636'363)/8)
-	MCFG_YM3812_IRQ_HANDLER(DEVWRITELINE("seibu_sound", seibu_sound_device, fm_irqhandler))
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
-
-	MCFG_OKIM6295_ADD("oki", XTAL(28'636'363)/28, PIN7_HIGH)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.40)
-
-	MCFG_DEVICE_ADD("seibu_sound", SEIBU_SOUND, 0)
-	MCFG_SEIBU_SOUND_CPU("audiocpu")
-	MCFG_SEIBU_SOUND_ROMBANK("seibu_bank1")
-	MCFG_SEIBU_SOUND_YM_READ_CB(DEVREAD8("ymsnd", ym3812_device, read))
-	MCFG_SEIBU_SOUND_YM_WRITE_CB(DEVWRITE8("ymsnd", ym3812_device, write))
+	MCFG_FRAGMENT_ADD(zeroteam_sound)
 MACHINE_CONFIG_END
 
 MACHINE_CONFIG_DERIVED(raiden2_state::xsedae, zeroteam)
@@ -1120,7 +1127,7 @@ MACHINE_CONFIG_DERIVED(raiden2_state::xsedae, zeroteam)
 	MCFG_SCREEN_VIDEO_ATTRIBUTES(VIDEO_UPDATE_BEFORE_VBLANK)
 
 	MCFG_DEVICE_REMOVE("ymsnd")
-	MCFG_YM2151_ADD("ymsnd", XTAL(28'636'363)/8)	// xsedae has ym2151 instead ym3812
+	MCFG_YM2151_ADD("ymsnd", RAIDEN2_XTAL2/8)	// xsedae has ym2151 instead ym3812
 	MCFG_YM2151_IRQ_HANDLER(DEVWRITELINE("seibu_sound", seibu_sound_device, fm_irqhandler))
 	MCFG_SOUND_ROUTE(0, "mono", 0.50)
 	MCFG_SOUND_ROUTE(1, "mono", 0.50)

@@ -8,6 +8,20 @@
 ADDRESS_MAP_EXTERN(zeroteam_sound_map, 8);
 GFXDECODE_EXTERN( raiden2 );
 
+#define RAIDEN2_XTAL1	32_MHz_XTAL
+#define RAIDEN2_XTAL2	28.636363_MHz_XTAL
+
+#define PIXEL_CLOCK  (RAIDEN2_XTAL2/4)
+
+ /* hand-tuned to match ~55.47 */
+#define HTOTAL   (456)
+#define HBEND    (0)
+#define HBSTART  (320)
+
+#define VTOTAL   (283)
+#define VBEND    (0)
+#define VBSTART  (240) // 256 at zeroteam
+
 class raiden2_state : public driver_device
 {
 public:
@@ -146,6 +160,7 @@ public:
 
 	void raidendx(machine_config &config);
 	void xsedae(machine_config &config);
+	void zeroteam_sound(machine_config &config);
 	void zeroteam(machine_config &config);
 	void raiden2(machine_config &config);
 protected:
