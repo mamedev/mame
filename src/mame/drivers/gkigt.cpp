@@ -231,7 +231,14 @@ static ADDRESS_MAP_START( igt_gameking_map, AS_PROGRAM, 32, igt_gameking_state )
 
 	AM_RANGE(0x18000000, 0x181fffff) AM_RAM AM_SHARE("vram") // igtsc writes from 18000000 to 1817ffff, ms3 all the way to 181fffff.
 
-	// 28010000-2801007f: first 28C94 QUART
+	// 28000000: MEZ2 SEL, also connected to ymz chip select?
+	// 28010000: first 28C94 QUART (QRT1 SEL)
+	// 28020000: SENET SEL
+	// 28030000: WCHDOG SEL
+	// 28040000: second 28C94 QUART (QRT2 SEL)
+	// 28050000: SOUND SEL
+	// 28060000: COLOR SEL
+	// 28070000: OUT SEL
 //	AM_RANGE(0x28010000, 0x2801007f) AM_READ(igt_gk_28010008_r) AM_WRITENOP
 	AM_RANGE(0x28010008, 0x2801000b) AM_READ(uart_status_r)
 	AM_RANGE(0x2801001c, 0x2801001f) AM_WRITENOP
