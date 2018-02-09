@@ -133,6 +133,8 @@ protected:
 	int m_latchflag;
 
 private:
+	TIMER_CALLBACK_MEMBER(write_soundlatch);
+
 	uint8_t region_selects[6];
 
 	uint8_t m_soundlatch;

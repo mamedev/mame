@@ -481,7 +481,7 @@ static ADDRESS_MAP_START( nzeroteam_base_map, AS_PROGRAM, 16, r2dx_v33_state )
 
 	AM_RANGE(0x00780, 0x0079f) AM_DEVREADWRITE8_MOD("seibu_sound", seibu_sound_device, main_r, main_w, rshift<1>, 0x00ff)
 	
-	//AM_RANGE(0x20000, 0x2ffff) AM_ROMBANK("mainbank") AM_WRITENOP
+//	AM_RANGE(0x20000, 0x2ffff) AM_ROMBANK("mainbank") AM_WRITENOP
 	AM_RANGE(0x20000, 0xfffff) AM_ROM AM_REGION("maincpu", 0x20000 )
 ADDRESS_MAP_END
 

@@ -5,7 +5,7 @@ brk_xav_imp ora_idx     kil_non     slo_idx     nop_zpg     ora_zpg     asl_zpg 
 bpl_rel     ora_idy     kil_non     slo_idy     nop_zpx     ora_zpx     asl_zpx     slo_zpx     clc_imp     ora_aby     nop_imp     slo_aby     nop_abx     ora_abx     asl_abx     slo_abx
 jsr_adr     and_idx     callf_xa3   rla_idx     bit_zpg     and_zpg     rol_zpg     rla_zpg     plp_imp     and_imm     rol_acc     anc_imm     bit_aba     and_aba     rol_aba     rla_aba
 bmi_rel     and_idy     kil_non     rla_idy     nop_zpx     and_zpx     rol_zpx     rla_zpx     sec_imp     and_aby     nop_imp     rla_aby     nop_abx     and_abx     rol_abx     rla_abx
-rti_imp     eor_idx     kil_non     sre_idx     nop_zpg     eor_zpg     lsr_zpg     sre_zpg     pha_imp     eor_imm     lsr_acc     asr_imm     jmp_adr     eor_aba     lsr_aba     sre_aba
+rti_xav_imp eor_idx     kil_non     sre_idx     nop_zpg     eor_zpg     lsr_zpg     sre_zpg     pha_imp     eor_imm     lsr_acc     asr_imm     jmp_adr     eor_aba     lsr_aba     sre_aba
 bvc_rel     eor_idy     kil_non     sre_idy     nop_zpx     eor_zpx     lsr_zpx     sre_zpx     cli_imp     eor_aby     nop_imp     sre_aby     nop_abx     eor_abx     lsr_abx     sre_abx
 rts_imp     adc_idx     kil_non     rra_idx     nop_zpg     adc_zpg     ror_zpg     rra_zpg     pla_imp     adc_imm     ror_acc     arr_imm     jmp_ind     adc_aba     ror_aba     rra_aba
 bvs_rel     adc_idy     kil_non     rra_idy     nop_zpx     adc_zpx     ror_zpx     rra_zpx     sei_imp     adc_aby     nop_imp     rra_aby     nop_abx     adc_abx     ror_abx     rra_abx

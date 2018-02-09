@@ -3156,6 +3156,11 @@ files {
 }
 
 createMAMEProjects(_target, _subtarget, "sega")
+
+includedirs {
+	ext_includedir("glm"),
+}
+
 files {
 	MAME_DIR .. "src/mame/drivers/angelkds.cpp",
 	MAME_DIR .. "src/mame/includes/angelkds.h",

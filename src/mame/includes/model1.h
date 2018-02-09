@@ -17,7 +17,7 @@
 
 #include "screen.h"
 
-#include <glm/glm/vec3.hpp>
+#include <glm/vec3.hpp>
 
 #include <functional>
 

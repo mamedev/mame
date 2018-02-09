@@ -29,6 +29,7 @@ public:
 	O(callf_xa3);
 	O(retf_imp);
 	O(brk_xav_imp);
+	O(rti_xav_imp);
 
 	typedef device_delegate<uint8_t (int which, int half)> xavix_interrupt_vector_delegate;
 
