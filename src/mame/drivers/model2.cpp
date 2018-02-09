@@ -1458,12 +1458,12 @@ static ADDRESS_MAP_START( model2_base_mem, AS_PROGRAM, 32, model2_state )
 
 	AM_RANGE(0x00f00000, 0x00f0000f) AM_READWRITE(timers_r, timers_w)
 
-	AM_RANGE(0x01000000, 0x0100ffff) AM_DEVREADWRITE("tile", segas24_tile_device, tile32_r, tile32_w) AM_MIRROR(0x110000)
+	AM_RANGE(0x01000000, 0x0100ffff) AM_DEVREADWRITE16("tile", segas24_tile_device, tile_r, tile_w,0xffffffff) AM_MIRROR(0x110000)
 	AM_RANGE(0x01020000, 0x01020003) AM_WRITENOP AM_MIRROR(0x100000)        // Unknown, always 0
 	AM_RANGE(0x01040000, 0x01040003) AM_WRITENOP AM_MIRROR(0x100000)        // Horizontal synchronization register
 	AM_RANGE(0x01060000, 0x01060003) AM_WRITENOP AM_MIRROR(0x100000)        // Vertical synchronization register
 	AM_RANGE(0x01070000, 0x01070003) AM_WRITENOP AM_MIRROR(0x100000)        // Video synchronization switch
-	AM_RANGE(0x01080000, 0x010fffff) AM_DEVREADWRITE("tile", segas24_tile_device, char32_r, char32_w) AM_MIRROR(0x100000)
+	AM_RANGE(0x01080000, 0x010fffff) AM_DEVREADWRITE16("tile", segas24_tile_device, char_r, char_w,0xffffffff) AM_MIRROR(0x100000)
 
 	AM_RANGE(0x01800000, 0x01803fff) AM_READWRITE16(model2_palette_r,model2_palette_w,0xffffffff)
 	AM_RANGE(0x01810000, 0x0181bfff) AM_RAM AM_SHARE("colorxlat")

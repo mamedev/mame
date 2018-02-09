@@ -39,11 +39,6 @@ public:
 	DECLARE_READ16_MEMBER(char_r);
 	DECLARE_WRITE16_MEMBER(char_w);
 
-	DECLARE_READ32_MEMBER(tile32_r);
-	DECLARE_WRITE32_MEMBER(tile32_w);
-	DECLARE_READ32_MEMBER(char32_r);
-	DECLARE_WRITE32_MEMBER(char32_w);
-
 	void draw(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect, int layer, int pri, int flags);
 	void draw(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect, int layer, int pri, int flags);
 
