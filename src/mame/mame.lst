@@ -10625,6 +10625,7 @@ wizzard                         //
 @source:crystal.cpp
 crysbios                        //
 crysking                        // 2001 Brezzasoft. Crystal of the kings
+crzclass                        // 200? TJF
 crzyddz2                        // 2006 Sealy
 ddz                             // 200?
 donghaer                        //
@@ -38937,9 +38938,9 @@ xsleenaj                        // TA-0019 (c) 1986
 @source:xavix.cpp
 taitons1                        //
 xavtenni                        //
-rad_ping						//
-rad_mtrk						//
-rad_bb2							//
+rad_ping                        //
+rad_mtrk                        //
+rad_bb2                         //
 
 @source:xbox.cpp
 xbox                            //
