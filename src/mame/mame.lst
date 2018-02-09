@@ -38938,6 +38938,7 @@ taitons1                        //
 xavtenni                        //
 rad_ping						//
 rad_mtrk						//
+rad_bb2							//
 
 @source:xbox.cpp
 xbox                            //

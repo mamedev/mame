@@ -737,16 +737,32 @@ ROM_START( rad_mtrk )
 	ROM_RELOAD(0x400000,0x400000)
 ROM_END
 
+ROM_START( rad_bb2 )
+	ROM_REGION( 0x800000, "bios", ROMREGION_ERASE00 )
+	ROM_LOAD( "baseball2.bin", 0x000000, 0x200000, CRC(bdbf6202) SHA1(18d5cc2d77cbb734629a7a5b6e0f419d21beedbd) )
+	ROM_RELOAD(0x200000,0x200000)
+	ROM_RELOAD(0x400000,0x200000)
+	ROM_RELOAD(0x600000,0x200000)
+ROM_END
+
 ROM_START( xavtenni )
 	ROM_REGION( 0x800000, "bios", ROMREGION_ERASE00 )
 	ROM_LOAD( "xavixtennis.bin", 0x000000, 0x800000, CRC(23a1d918) SHA1(2241c59e8ea8328013e55952ebf9060ea0a4675b) )
 ROM_END
 
+/* Standalone TV Games */
+
+CONS( 2006, taitons1,  0,   0,  xavix,  xavix, xavix_state, 0, "Bandai / SSD Company LTD / Taito", "Let's! TV Play Classic - Taito Nostalgia 1", MACHINE_IS_SKELETON )
+
+CONS( 2000, rad_ping,  0,   0,  xavix,  xavix, xavix_state, 0, "Radica / SSD Company LTD / Simmer Technology", "Play TV Ping Pong", MACHINE_IS_SKELETON ) // "Simmer Technology" is also known as "Hummer Technology Co., Ltd"
+CONS( 2003, rad_mtrk,  0,   0,  xavix,  xavix, xavix_state, 0, "Radica / SSD Company LTD",                     "Play TV Monster Truck", MACHINE_IS_SKELETON )
+CONS( 2002, rad_bb2,   0,   0,  xavix,  xavix, xavix_state, 0, "Radica / SSD Company LTD",                     "Play TV Baseball 2", MACHINE_IS_SKELETON ) // contains string "Radica RBB2 V1.0"
+
 /* The 'XaviXPORT' isn't a real console, more of a TV adapter, all the actual hardware (CPU including video hw, sound hw) is in the cartridges and controllers
    and can vary between games, see notes at top of driver.
 
-   According to sources XaviX Tennis should be a standard XaviX CPU, but at the very least makes significantly more use of custom opcodes than Taito Nostalgia
-   and Radica Ping Pong which only appears to use the call far / return far for extended memory space.
+   According to sources XaviX Tennis should be a standard XaviX CPU, but at the very least makes significantly more use of custom opcodes than all the other
+   games which only use the call far / return far for extended memory space.
    
    Furthermore it also seems to require some regular 6502 opcodes to be replaced with custom ones, yet the other games expect these to act normally.  This
    leads me to believe that XaviX Tennis is more likely to be a Super XaviX title.
@@ -756,9 +772,4 @@ ROM_END
 */
 CONS( 2004, xavtenni,  0,   0,  xavix,  xavix, xavix_state, 0, "SSD Company LTD", "XaviX Tennis (XaviXPORT)", MACHINE_IS_SKELETON )
 
-/* Standalone TV Games */
 
-CONS( 2006, taitons1,  0,   0,  xavix,  xavix, xavix_state, 0, "Bandai / SSD Company LTD / Taito", "Let's! TV Play Classic - Taito Nostalgia 1", MACHINE_IS_SKELETON )
-
-CONS( 2000, rad_ping,  0,   0,  xavix,  xavix, xavix_state, 0, "Radica / SSD Company LTD / Simmer Technology", "Play TV Ping Pong", MACHINE_IS_SKELETON ) // "Simmer Technology" is also known as "Hummer Technology Co., Ltd"
-CONS( 2003, rad_mtrk,  0,   0,  xavix,  xavix, xavix_state, 0, "Radica / SSD Company LTD",                     "Play TV Monster Truck", MACHINE_IS_SKELETON )
