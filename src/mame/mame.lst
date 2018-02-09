@@ -14681,9 +14681,9 @@ ctstein                         // Castle Toy
 einvaderc                       // Entex
 funjacks                        // Mattel
 funrlgl                         // Mattel
-h2hbaskb                        // Coleco
-h2hhockey                       // Coleco
-h2hsoccer                       // Coleco
+h2hbaskbc                       // Coleco
+h2hhockeyc                      // Coleco
+h2hsoccerc                      // Coleco
 lchicken                        // LJN
 lightfgt                        // Milton Bradley
 mdallas                         // Mattel
@@ -14843,6 +14843,7 @@ gpoker                          // Gakken
 h2hbaseb                        // Coleco
 h2hboxing                       // Coleco
 h2hfootb                        // Coleco
+h2hhockey                       // Coleco
 horseran                        // Mattel
 lostreas                        // Parker Bros
 matchnum                        // A-One LSI
