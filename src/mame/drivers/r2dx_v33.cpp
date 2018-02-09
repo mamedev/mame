@@ -77,6 +77,14 @@ Then it puts settings at 0x9e08 and 0x9e0a (bp 91acb)
 #include "speaker.h"
 
 
+#define XTAL1           32_MHz_XTAL
+#define XTAL2           28.636363_MHz_XTAL
+
+//#define PIXEL_CLOCK     XTAL2/4
+#define MAIN_CLOCK      XTAL1/2
+#define OKI_CLOCK       XTAL2/28
+
+
 class r2dx_v33_state : public raiden2_state
 {
 public:
@@ -171,6 +179,7 @@ void r2dx_v33_state::machine_start()
 
 WRITE16_MEMBER(r2dx_v33_state::tile_bank_w)
 {
+	// TODO : nzerotea* is using this functions but high byte of data is unknown/unverified
 	if(ACCESSING_BITS_0_7) {
 		int new_bank;
 		new_bank = ((data & 0x10)>>4);
@@ -191,12 +200,17 @@ WRITE16_MEMBER(r2dx_v33_state::tile_bank_w)
 			m_foreground_layer->mark_all_dirty();
 		}
 	}
+	else
+	{
+		logerror("unknown value %02x at high bytes\n", ((data >> 8) & 0xff));
+	}
 }
 
 void r2dx_v33_state::r2dx_setbanking(void)
 {
 	m_mainbank->set_entry(m_r2dxgameselect*0x10 + m_r2dxbank);
-	m_gamebank->set_entry(m_r2dxgameselect);
+	if (m_gamebank.found())
+		m_gamebank->set_entry(m_r2dxgameselect);
 }
 
 WRITE16_MEMBER(r2dx_v33_state::rdx_v33_eeprom_w)
@@ -389,7 +403,7 @@ static ADDRESS_MAP_START( rdx_v33_common_map, AS_PROGRAM, 16, r2dx_v33_state )
 
 	AM_RANGE(0x00400, 0x00401) AM_WRITE(r2dx_tilemapdma_w) // tilemaps to private buffer
 	AM_RANGE(0x00402, 0x00403) AM_WRITE(r2dx_paldma_w)  // palettes to private buffer
-
+	
 	AM_RANGE(0x00420, 0x00421) AM_WRITE(r2dx_dx_w)
 	AM_RANGE(0x00422, 0x00423) AM_WRITE(r2dx_dy_w)
 	AM_RANGE(0x00424, 0x00425) AM_WRITE(r2dx_sdistl_w)
@@ -404,7 +418,7 @@ static ADDRESS_MAP_START( rdx_v33_common_map, AS_PROGRAM, 16, r2dx_v33_state )
 	AM_RANGE(0x00600, 0x0063f) AM_DEVREADWRITE("crtc", seibu_crtc_device, read, write)
 	//AM_RANGE(0x00640, 0x006bf) AM_DEVREADWRITE("obj", seibu_encrypted_sprite_device, read, write)
 	AM_RANGE(0x0068e, 0x0068f) AM_WRITENOP // sprite buffering
-	AM_RANGE(0x006b0, 0x006b1) AM_WRITE(mcu_prog_w)
+	AM_RANGE(0x006b0, 0x006b1) AM_WRITE(mcu_prog_w) // could be encryption key uploads just like raiden2.cpp ?
 	AM_RANGE(0x006b2, 0x006b3) AM_WRITE(mcu_prog_w2)
 //  AM_RANGE(0x006b4, 0x006b5) AM_WRITENOP
 //  AM_RANGE(0x006b6, 0x006b7) AM_WRITENOP
@@ -413,7 +427,7 @@ static ADDRESS_MAP_START( rdx_v33_common_map, AS_PROGRAM, 16, r2dx_v33_state )
 //  AM_RANGE(0x006dc, 0x006dd) AM_READ(nzerotea_unknown_r)
 //  AM_RANGE(0x006de, 0x006df) AM_WRITE(mcu_unkaa_w) // mcu command related?
 
-	AM_RANGE(0x00800, 0x00fff) AM_RAM // copies eeprom here?
+	AM_RANGE(0x00800, 0x00fff) AM_RAM // r2dx_v33 : copies eeprom here?
 	AM_RANGE(0x01000, 0x0bfff) AM_RAM
 
 	AM_RANGE(0x0c000, 0x0c7ff) AM_RAM AM_SHARE("spriteram")
@@ -429,7 +443,7 @@ ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( rdx_v33_map, AS_PROGRAM, 16, r2dx_v33_state )
 	AM_IMPORT_FROM( rdx_v33_common_map )
-
+	
 	AM_RANGE(0x00404, 0x00405) AM_WRITE(r2dx_rom_bank_w)
 	AM_RANGE(0x00406, 0x00407) AM_WRITE(tile_bank_w)
 
@@ -459,13 +473,15 @@ ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( nzeroteam_base_map, AS_PROGRAM, 16, r2dx_v33_state )
 	AM_IMPORT_FROM( rdx_v33_common_map )
-
+	
+	AM_RANGE(0x00404, 0x00405) AM_NOP //_WRITE(r2dx_rom_bank_w) maincpu rom is actually bankswitched but always 2
 	AM_RANGE(0x00406, 0x00407) AM_NOP // always 6022, supposed to be the tile bank but ignores the actual value???
 
 //  AM_RANGE(0x00762, 0x00763) AM_READ(nzerotea_unknown_r)
 
 	AM_RANGE(0x00780, 0x0079f) AM_DEVREADWRITE8_MOD("seibu_sound", seibu_sound_device, main_r, main_w, rshift<1>, 0x00ff)
-
+	
+	//AM_RANGE(0x20000, 0x2ffff) AM_ROMBANK("mainbank") AM_WRITENOP
 	AM_RANGE(0x20000, 0xfffff) AM_ROM AM_REGION("maincpu", 0x20000 )
 ADDRESS_MAP_END
 
@@ -696,7 +712,7 @@ MACHINE_CONFIG_START(r2dx_v33_state::rdx_v33)
 	MCFG_SCREEN_ADD("screen", RASTER)
 	MCFG_SCREEN_VIDEO_ATTRIBUTES(VIDEO_UPDATE_AFTER_VBLANK)
 //	MCFG_SCREEN_REFRESH_RATE(55.47)    /* verified on pcb */
-	MCFG_SCREEN_RAW_PARAMS(PIXEL_CLOCK,HTOTAL,HBEND,HBSTART,VTOTAL,VBEND,VBSTART)
+	MCFG_SCREEN_RAW_PARAMS(XTAL1/4 /* PIXEL_CLOCK */,512,0,40*8,282,0,30*8) /* hand-tuned to match ~55.47; same as V30HL PCB versions? */
 	MCFG_SCREEN_UPDATE_DRIVER(raiden2_state, screen_update)
 
 	MCFG_GFXDECODE_ADD("gfxdecode", "palette", raiden2)
@@ -729,7 +745,7 @@ MACHINE_CONFIG_START(r2dx_v33_state::nzerotea)
 	MCFG_SCREEN_ADD("screen", RASTER)
 	MCFG_SCREEN_VIDEO_ATTRIBUTES(VIDEO_UPDATE_AFTER_VBLANK)
 //	MCFG_SCREEN_REFRESH_RATE(55.47)    /* verified on pcb */
-	MCFG_SCREEN_RAW_PARAMS(PIXEL_CLOCK,HTOTAL,HBEND,HBSTART,VTOTAL,VBEND,VBSTART+16)
+	MCFG_SCREEN_RAW_PARAMS(XTAL1/4 /* PIXEL_CLOCK */,512,0,40*8,282,0,32*8) /* hand-tuned to match ~55.47; same as V30HL PCB versions? */
 	MCFG_SCREEN_UPDATE_DRIVER(raiden2_state, screen_update)
 
 	MCFG_GFXDECODE_ADD("gfxdecode", "palette", raiden2)
@@ -781,8 +797,11 @@ DRIVER_INIT_MEMBER(r2dx_v33_state,nzerotea)
 	init_blending(zeroteam_blended_colors);
 	static const int spri[5] = { -1, 0, 1, 2, 3 };
 	m_cur_spri = spri;
-
+	
+	//m_mainbank->configure_entries(0, 16, memregion("maincpu")->base(), 0x10000); // Actually bankswitched but always 0002
 	zeroteam_decrypt_sprites(machine());
+
+	//m_mainbank->set_entry(2);
 }
 
 DRIVER_INIT_MEMBER(r2dx_v33_state,zerotm2k)
@@ -790,8 +809,11 @@ DRIVER_INIT_MEMBER(r2dx_v33_state,zerotm2k)
 	init_blending(zeroteam_blended_colors);
 	static const int spri[5] = { -1, 0, 1, 2, 3 };
 	m_cur_spri = spri;
-
+	
+	//m_mainbank->configure_entries(0, 16, memregion("maincpu")->base(), 0x10000); // Actually bankswitched but always 0002
 	// no sprite encryption(!)
+
+	//m_mainbank->set_entry(2);
 
 	// BG tile rom has 2 lines swapped
 	uint8_t *src = memregion("gfx2")->base()+0x100000;

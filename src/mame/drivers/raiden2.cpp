@@ -183,6 +183,13 @@ Protection Notes:
 #include "screen.h"
 #include "speaker.h"
 
+#define XTAL1           32_MHz_XTAL
+#define XTAL2           28.636363_MHz_XTAL
+
+//#define PIXEL_CLOCK     XTAL2/4
+#define MAIN_CLOCK      XTAL1/2
+#define SOUND_CLOCK     XTAL2/8
+#define OKI_CLOCK       XTAL2/28
 
 void raiden2_state::machine_start()
 {
@@ -1016,7 +1023,7 @@ MACHINE_CONFIG_START(raiden2_state::raiden2)
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
 	MCFG_SCREEN_VIDEO_ATTRIBUTES(VIDEO_UPDATE_BEFORE_VBLANK)
-	MCFG_SCREEN_RAW_PARAMS(PIXEL_CLOCK,HTOTAL,HBEND,HBSTART,VTOTAL,VBEND,VBSTART)
+	MCFG_SCREEN_RAW_PARAMS(XTAL1/4 /* PIXEL_CLOCK */,512,0,40*8,282,0,30*8) /* hand-tuned to match ~55.47 */
 	MCFG_SCREEN_UPDATE_DRIVER(raiden2_state, screen_update)
 
 	MCFG_GFXDECODE_ADD("gfxdecode", "palette", raiden2)
@@ -1097,7 +1104,7 @@ MACHINE_CONFIG_START(raiden2_state::zeroteam)
 	MCFG_SCREEN_ADD("screen", RASTER)
 	MCFG_SCREEN_VIDEO_ATTRIBUTES(VIDEO_UPDATE_AFTER_VBLANK)
 //  MCFG_SCREEN_REFRESH_RATE(55.47)    /* verified on pcb */
-	MCFG_SCREEN_RAW_PARAMS(PIXEL_CLOCK,HTOTAL,HBEND,HBSTART,VTOTAL,VBEND,VBSTART+16)
+	MCFG_SCREEN_RAW_PARAMS(XTAL1/4 /* PIXEL_CLOCK */,512,0,40*8,282,0,32*8) /* hand-tuned to match ~55.47 */
 	MCFG_SCREEN_UPDATE_DRIVER(raiden2_state, screen_update)
 
 	MCFG_GFXDECODE_ADD("gfxdecode", "palette", raiden2)
@@ -2754,7 +2761,7 @@ DRIVER_INIT_MEMBER(raiden2_state,raidendx)
 	init_blending(raiden_blended_colors);
 	static const int spri[5] = { 0, 1, 2, 3, -1 };
 	m_cur_spri = spri;
-	m_mainbank->configure_entries(0, 16, memregion("maincpu")->base() + 0x100000, 0x10000);
+	m_mainbank->configure_entries(0, 16, memregion("maincpu")->base() + 0x100000, 0x10000); // ROM 0x00000-0x2ffff area are used? or just garbage and unused?
 	raiden2_decrypt_sprites(machine());
 }
 
