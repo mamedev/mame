@@ -45,6 +45,7 @@ Links: http://tkc8800.com/post/compaq-portable-ii-restoration , https://www.seas
 Form factor: Luggable
 CPU: 80286-8
 RAM: 256K or 640K on board, 512kB and 2048kB ISA memory cards and 512kB and 1536kB memory boards that attached to the back of the motherboard, 4.2M max.
+Display: Green-screen CRT
 Mass storage: one or two 5.25" floppy drives, 10MB or 20MB mfm harddisk connected via an MFM=>IDE bridgeboard
 Bus: two 8bit and two 16bit ISA slots
 On board: Serial, parallel
