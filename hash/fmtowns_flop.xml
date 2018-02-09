@@ -537,6 +537,7 @@ Zurukamashi Ver 2.0                                           Nikkonren Kikaku  
 		<year>1994</year>
 		<publisher>電波新聞社 (Dempa Shinbunsha)</publisher>
 		<info name="release" value="199411xx" />
+		<info name="alt_title" value="キャメルトライ" />
 		<part name="flop1" interface="floppy_3_5">
 			<dataarea name="flop" size="3599768">
 				<rom name="cameltry.mfm" size="3599768" crc="cc2a33a3" sha1="7cdcc7cc20f3ceeaad14e4b56c285c8d2657f95a" offset="0" />
@@ -707,6 +708,7 @@ Zurukamashi Ver 2.0                                           Nikkonren Kikaku  
 		<year>1990</year>
 		<publisher>日本ファルコム (Nihon Falcom)</publisher>
 		<info name="release" value="199006xx" />
+		<info name="alt_title" value="ドラゴンスレイヤー 英雄伝説" />
 		<part name="flop1" interface="floppy_3_5">
 			<feature name="part_id" value="Event Disk" />
 			<dataarea name="flop" size="3577270">
