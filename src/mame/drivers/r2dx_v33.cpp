@@ -202,7 +202,7 @@ WRITE16_MEMBER(r2dx_v33_state::tile_bank_w)
 	}
 	else
 	{
-		logerror("unknown value %02x at high bytes\n", ((data >> 8) & 0xff));
+		logerror("tile_bank_w MSB used %04x",data);
 	}
 }
 
