@@ -103,4 +103,5 @@ ROM_START( inteladv )
 	ROM_LOAD( "vtechinteladv.bin", 0x000000, 0x800000, CRC(e24dbbcb) SHA1(7cb7f25f5eb123ae4c46cd4529aafd95508b2210) )
 ROM_END
 
-GAME( 1995, inteladv,    0, inteladv, inteladv,  inteladv_state, 0, ROT0, "VTech", "Intelligence Advance E/R Lerncomputer", MACHINE_NOT_WORKING )
+//    YEAR  NAME         PARENT  COMPAT  MACHINE   INPUT      STATE         INIT  COMPANY  FULLNAME                                FLAGS
+COMP( 1995, inteladv,    0,      0,      inteladv, inteladv,  inteladv_state, 0, "VTech", "Intelligence Advance E/R Lerncomputer", MACHINE_NOT_WORKING )
