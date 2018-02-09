@@ -25,10 +25,8 @@ public:
 		: driver_device(mconfig, type, tag),
 		m_workram(*this, "workram"),
 		m_bufferram(*this, "bufferram"),
-		m_colorxlat(*this, "colorxlat"),
 		m_textureram0(*this, "textureram0"),
 		m_textureram1(*this, "textureram1"),
-		m_lumaram(*this, "lumaram"),
 		m_fbvram1(*this, "fbvram1"),
 		m_fbvram2(*this, "fbvram2"),
 		m_soundram(*this, "soundram"),
@@ -62,10 +60,10 @@ public:
 	required_shared_ptr<uint32_t> m_workram;
 	required_shared_ptr<uint32_t> m_bufferram;
 	std::unique_ptr<uint16_t[]> m_palram;
-	required_shared_ptr<uint32_t> m_colorxlat;
+	std::unique_ptr<uint16_t[]> m_colorxlat;
 	required_shared_ptr<uint32_t> m_textureram0;
 	required_shared_ptr<uint32_t> m_textureram1;
-	required_shared_ptr<uint32_t> m_lumaram;
+	std::unique_ptr<uint16_t[]> m_lumaram;
 	required_shared_ptr<uint32_t> m_fbvram1;
 	required_shared_ptr<uint32_t> m_fbvram2;
 	optional_shared_ptr<uint16_t> m_soundram;
@@ -151,8 +149,10 @@ public:
 	DECLARE_CUSTOM_INPUT_MEMBER(rchase2_devices_r);
 	DECLARE_READ32_MEMBER(timers_r);
 	DECLARE_WRITE32_MEMBER(timers_w);
-	DECLARE_READ16_MEMBER(model2_palette_r);
-	DECLARE_WRITE16_MEMBER(model2_palette_w);
+	DECLARE_READ16_MEMBER(palette_r);
+	DECLARE_WRITE16_MEMBER(palette_w);
+	DECLARE_READ16_MEMBER(colorxlat_r);
+	DECLARE_WRITE16_MEMBER(colorxlat_w);
 	DECLARE_WRITE32_MEMBER(ctrl0_w);
 	DECLARE_WRITE32_MEMBER(analog_2b_w);
 	DECLARE_READ32_MEMBER(fifoctl_r);
@@ -193,7 +193,8 @@ public:
 	DECLARE_WRITE32_MEMBER(mode_w);
 	DECLARE_WRITE32_MEMBER(model2o_tex_w0);
 	DECLARE_WRITE32_MEMBER(model2o_tex_w1);
-	DECLARE_WRITE32_MEMBER(model2o_luma_w);
+	DECLARE_READ16_MEMBER(lumaram_r);
+	DECLARE_WRITE16_MEMBER(lumaram_w);
 	DECLARE_WRITE32_MEMBER(model2_3d_zclip_w);
 	DECLARE_WRITE16_MEMBER(model2snd_ctrl);
 	DECLARE_READ32_MEMBER(copro_sharc_input_fifo_r);
