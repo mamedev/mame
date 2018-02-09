@@ -92,9 +92,11 @@ More chips (from eBay auction):
 
 #include "emu.h"
 #include "cpu/i960/i960.h"
+#include "machine/mc68681.h"
 #include "machine/nvram.h"
 #include "video/ramdac.h"
 #include "sound/ymz280b.h"
+#include "bus/rs232/rs232.h"
 #include "screen.h"
 #include "speaker.h"
 
@@ -107,7 +109,8 @@ public:
 		m_maincpu(*this, "maincpu"),
 		m_palette(*this, "palette"),
 		m_screen(*this, "screen"),
-		m_vram(*this, "vram")
+		m_vram(*this, "vram"),
+		m_quart1(*this, "quart1")
 	{ }
 
 
@@ -133,7 +136,7 @@ public:
 
 	DECLARE_READ8_MEMBER(timer_r);
 	DECLARE_READ16_MEMBER(version_r);
-	
+
 	void igt_gameking(machine_config &config);
 	void igt_ms72c(machine_config &config);
 private:
@@ -141,6 +144,7 @@ private:
 	required_device<palette_device> m_palette;
 	required_device<screen_device> m_screen;
 	required_shared_ptr<uint32_t> m_vram;
+	required_device<sc28c94_device> m_quart1;
 
 	uint8_t m_irq_enable;
 	uint8_t m_irq_pend;
@@ -174,7 +178,7 @@ uint32_t igt_gameking_state::screen_update_igt_gameking(screen_device &screen, b
 		}
 	}
 
-	
+
 	return 0;
 }
 
@@ -224,10 +228,10 @@ static ADDRESS_MAP_START( igt_gameking_map, AS_PROGRAM, 32, igt_gameking_state )
 	AM_RANGE(0x08000000, 0x081fffff) AM_ROM AM_REGION("game", 0)
 	AM_RANGE(0x08200000, 0x083fffff) AM_ROM AM_REGION("plx", 0)
 
-	
+
 	// it's unclear how much of this is saved and how much total RAM there is.
 	AM_RANGE(0x10000000, 0x1001ffff) AM_RAM AM_SHARE("nvram")
-	AM_RANGE(0x10020000, 0x17ffffff) AM_RAM 
+	AM_RANGE(0x10020000, 0x17ffffff) AM_RAM
 
 	AM_RANGE(0x18000000, 0x181fffff) AM_RAM AM_SHARE("vram") // igtsc writes from 18000000 to 1817ffff, ms3 all the way to 181fffff.
 
@@ -239,7 +243,7 @@ static ADDRESS_MAP_START( igt_gameking_map, AS_PROGRAM, 32, igt_gameking_state )
 	// 28050000: SOUND SEL
 	// 28060000: COLOR SEL
 	// 28070000: OUT SEL
-//	AM_RANGE(0x28010000, 0x2801007f) AM_READ(igt_gk_28010008_r) AM_WRITENOP
+//	AM_RANGE(0x28010000, 0x2801007f) AM_DEVREADWRITE8("quart1", sc28c94_device, read, write, 0x00ff00ff)
 	AM_RANGE(0x28010008, 0x2801000b) AM_READ(uart_status_r)
 	AM_RANGE(0x2801001c, 0x2801001f) AM_WRITENOP
 	AM_RANGE(0x28010030, 0x28010033) AM_READ(uart_status_r) // channel D
@@ -247,7 +251,7 @@ static ADDRESS_MAP_START( igt_gameking_map, AS_PROGRAM, 32, igt_gameking_state )
 	AM_RANGE(0x28020000, 0x280205ff) AM_RAM // CMOS?
 //	AM_RANGE(0x28020000, 0x2802007f) AM_READ(igt_gk_28010008_r) AM_WRITENOP
 	AM_RANGE(0x28030000, 0x28030003) AM_READ_PORT("IN0")
-	// 28040000-2804007f: second 28C94 QUART
+//	AM_RANGE(0x28040000, 0x2804007f) AM_DEVREADWRITE8("quart2", sc28c94_device, read, write, 0x00ff00ff)
 	AM_RANGE(0x28040008, 0x2804000b) AM_WRITE8(unk_w,0x00ff0000)
 	AM_RANGE(0x28040008, 0x2804000b) AM_READWRITE8(irq_vector_r,irq_enable_w,0x000000ff)
 	AM_RANGE(0x28040018, 0x2804001b) AM_READ_PORT("IN1") AM_WRITENOP
@@ -259,7 +263,7 @@ static ADDRESS_MAP_START( igt_gameking_map, AS_PROGRAM, 32, igt_gameking_state )
 	AM_RANGE(0x28040050, 0x28040053) AM_READ8(frame_number_r,0x000000ff)
 	AM_RANGE(0x28040054, 0x28040057) AM_WRITENOP
 //	AM_RANGE(0x28040054, 0x28040057) AM_WRITE8(irq_ack_w,0x000000ff)
-	
+
 	AM_RANGE(0x28050000, 0x28050003) AM_DEVREADWRITE8("ymz", ymz280b_device, read, write, 0x00ff00ff)
 	AM_RANGE(0x28060000, 0x28060003) AM_DEVWRITE8("ramdac",ramdac_device, index_w, 0x000000ff )
 	AM_RANGE(0x28060000, 0x28060003) AM_DEVWRITE8("ramdac",ramdac_device, pal_w, 0x00ff0000 )
@@ -278,7 +282,7 @@ READ16_MEMBER(igt_gameking_state::version_r)
 
 READ8_MEMBER(igt_gameking_state::timer_r)
 {
-	// TODO: ms72c 8011ab0 "init_io" check, gets printed as "New security latch value = %x"	
+	// TODO: ms72c 8011ab0 "init_io" check, gets printed as "New security latch value = %x"
 	return m_timer_count++;
 }
 
@@ -314,22 +318,22 @@ static INPUT_PORTS_START( igt_gameking )
 	PORT_DIPNAME( 0x80, 0x80, DEF_STR( Unknown ) )
 	PORT_DIPSETTING(    0x80, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x010000, 0x010000, "IN0-1" ) 
+	PORT_DIPNAME( 0x010000, 0x010000, "IN0-1" )
 	PORT_DIPSETTING(    0x010000, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x000000, DEF_STR( On ) )
-	PORT_DIPNAME( 0x020000, 0x020000, DEF_STR( Unknown ) ) 
+	PORT_DIPNAME( 0x020000, 0x020000, DEF_STR( Unknown ) )
 	PORT_DIPSETTING(    0x020000, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x000000, DEF_STR( On ) )
-	PORT_DIPNAME( 0x040000, 0x040000, DEF_STR( Unknown ) ) 
+	PORT_DIPNAME( 0x040000, 0x040000, DEF_STR( Unknown ) )
 	PORT_DIPSETTING(    0x040000, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x000000, DEF_STR( On ) )
 	PORT_DIPNAME( 0x080000, 0x080000, DEF_STR( Unknown ) )
 	PORT_DIPSETTING(    0x080000, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x000000, DEF_STR( On ) )
-	PORT_DIPNAME( 0x100000, 0x100000, DEF_STR( Unknown ) ) 
+	PORT_DIPNAME( 0x100000, 0x100000, DEF_STR( Unknown ) )
 	PORT_DIPSETTING(    0x100000, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x000000, DEF_STR( On ) )
-	PORT_DIPNAME( 0x200000, 0x200000, DEF_STR( Unknown ) ) 
+	PORT_DIPNAME( 0x200000, 0x200000, DEF_STR( Unknown ) )
 	PORT_DIPSETTING(    0x200000, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x000000, DEF_STR( On ) )
 	PORT_DIPNAME( 0x400000, 0x400000, DEF_STR( Unknown ) )
@@ -365,22 +369,22 @@ static INPUT_PORTS_START( igt_gameking )
 	PORT_DIPNAME( 0x80, 0x80, DEF_STR( Unknown ) )
 	PORT_DIPSETTING(    0x80, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x010000, 0x010000, "IN1-1" ) 
+	PORT_DIPNAME( 0x010000, 0x010000, "IN1-1" )
 	PORT_DIPSETTING(    0x010000, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x000000, DEF_STR( On ) )
-	PORT_DIPNAME( 0x020000, 0x020000, DEF_STR( Unknown ) ) 
+	PORT_DIPNAME( 0x020000, 0x020000, DEF_STR( Unknown ) )
 	PORT_DIPSETTING(    0x020000, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x000000, DEF_STR( On ) )
-	PORT_DIPNAME( 0x040000, 0x040000, DEF_STR( Unknown ) ) 
+	PORT_DIPNAME( 0x040000, 0x040000, DEF_STR( Unknown ) )
 	PORT_DIPSETTING(    0x040000, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x000000, DEF_STR( On ) )
 	PORT_DIPNAME( 0x080000, 0x080000, DEF_STR( Unknown ) )
 	PORT_DIPSETTING(    0x080000, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x000000, DEF_STR( On ) )
-	PORT_DIPNAME( 0x100000, 0x100000, DEF_STR( Unknown ) ) 
+	PORT_DIPNAME( 0x100000, 0x100000, DEF_STR( Unknown ) )
 	PORT_DIPSETTING(    0x100000, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x000000, DEF_STR( On ) )
-	PORT_DIPNAME( 0x200000, 0x200000, DEF_STR( Unknown ) ) 
+	PORT_DIPNAME( 0x200000, 0x200000, DEF_STR( Unknown ) )
 	PORT_DIPSETTING(    0x200000, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x000000, DEF_STR( On ) )
 	PORT_DIPNAME( 0x400000, 0x400000, DEF_STR( Unknown ) )
@@ -390,7 +394,7 @@ static INPUT_PORTS_START( igt_gameking )
 	PORT_DIPSETTING(    0x800000, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x000000, DEF_STR( On ) )
 	PORT_BIT( 0xff00ff00, IP_ACTIVE_LOW, IPT_UNKNOWN )
-	
+
 	PORT_START("IN2")
 	PORT_DIPNAME( 0x01, 0x01, "IN2" )
 	PORT_DIPSETTING(    0x01, DEF_STR( Off ) )
@@ -467,22 +471,22 @@ static INPUT_PORTS_START( igt_gameking )
 	PORT_DIPNAME( 0x80, 0x80, DEF_STR( Unknown ) )
 	PORT_DIPSETTING(    0x80, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x010000, 0x010000, "IN3-1" ) 
+	PORT_DIPNAME( 0x010000, 0x010000, "IN3-1" )
 	PORT_DIPSETTING(    0x010000, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x000000, DEF_STR( On ) )
-	PORT_DIPNAME( 0x020000, 0x020000, DEF_STR( Unknown ) ) 
+	PORT_DIPNAME( 0x020000, 0x020000, DEF_STR( Unknown ) )
 	PORT_DIPSETTING(    0x020000, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x000000, DEF_STR( On ) )
-	PORT_DIPNAME( 0x040000, 0x040000, DEF_STR( Unknown ) ) 
+	PORT_DIPNAME( 0x040000, 0x040000, DEF_STR( Unknown ) )
 	PORT_DIPSETTING(    0x040000, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x000000, DEF_STR( On ) )
 	PORT_DIPNAME( 0x080000, 0x080000, DEF_STR( Unknown ) )
 	PORT_DIPSETTING(    0x080000, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x000000, DEF_STR( On ) )
-	PORT_DIPNAME( 0x100000, 0x100000, DEF_STR( Unknown ) ) 
+	PORT_DIPNAME( 0x100000, 0x100000, DEF_STR( Unknown ) )
 	PORT_DIPSETTING(    0x100000, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x000000, DEF_STR( On ) )
-	PORT_DIPNAME( 0x200000, 0x200000, DEF_STR( Unknown ) ) 
+	PORT_DIPNAME( 0x200000, 0x200000, DEF_STR( Unknown ) )
 	PORT_DIPSETTING(    0x200000, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x000000, DEF_STR( On ) )
 	PORT_DIPNAME( 0x400000, 0x400000, DEF_STR( Unknown ) )
@@ -518,22 +522,22 @@ static INPUT_PORTS_START( igt_gameking )
 	PORT_DIPNAME( 0x80, 0x80, DEF_STR( Unknown ) )
 	PORT_DIPSETTING(    0x80, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x010000, 0x010000, "IN4-1" ) 
+	PORT_DIPNAME( 0x010000, 0x010000, "IN4-1" )
 	PORT_DIPSETTING(    0x010000, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x000000, DEF_STR( On ) )
-	PORT_DIPNAME( 0x020000, 0x020000, DEF_STR( Unknown ) ) 
+	PORT_DIPNAME( 0x020000, 0x020000, DEF_STR( Unknown ) )
 	PORT_DIPSETTING(    0x020000, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x000000, DEF_STR( On ) )
-	PORT_DIPNAME( 0x040000, 0x040000, DEF_STR( Unknown ) ) 
+	PORT_DIPNAME( 0x040000, 0x040000, DEF_STR( Unknown ) )
 	PORT_DIPSETTING(    0x040000, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x000000, DEF_STR( On ) )
 	PORT_DIPNAME( 0x080000, 0x080000, DEF_STR( Unknown ) )
 	PORT_DIPSETTING(    0x080000, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x000000, DEF_STR( On ) )
-	PORT_DIPNAME( 0x100000, 0x100000, DEF_STR( Unknown ) ) 
+	PORT_DIPNAME( 0x100000, 0x100000, DEF_STR( Unknown ) )
 	PORT_DIPSETTING(    0x100000, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x000000, DEF_STR( On ) )
-	PORT_DIPNAME( 0x200000, 0x200000, DEF_STR( Unknown ) ) 
+	PORT_DIPNAME( 0x200000, 0x200000, DEF_STR( Unknown ) )
 	PORT_DIPSETTING(    0x200000, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x000000, DEF_STR( On ) )
 	PORT_DIPNAME( 0x400000, 0x400000, DEF_STR( Unknown ) )
@@ -573,6 +577,7 @@ void igt_gameking_state::machine_start()
 void igt_gameking_state::machine_reset()
 {
 	m_timer_count = 0;
+	m_quart1->ip2_w(1); // needs to be high
 }
 
 INTERRUPT_GEN_MEMBER(igt_gameking_state::vblank_irq)
@@ -585,7 +590,14 @@ INTERRUPT_GEN_MEMBER(igt_gameking_state::vblank_irq)
 	}
 }
 
-
+static DEVICE_INPUT_DEFAULTS_START( terminal )
+	DEVICE_INPUT_DEFAULTS( "RS232_TXBAUD", 0xff, RS232_BAUD_38400 )
+	DEVICE_INPUT_DEFAULTS( "RS232_RXBAUD", 0xff, RS232_BAUD_38400 )
+	DEVICE_INPUT_DEFAULTS( "RS232_STARTBITS", 0xff, RS232_STARTBITS_1 )
+	DEVICE_INPUT_DEFAULTS( "RS232_DATABITS", 0xff, RS232_DATABITS_8 )
+	DEVICE_INPUT_DEFAULTS( "RS232_PARITY", 0xff, RS232_PARITY_NONE )
+	DEVICE_INPUT_DEFAULTS( "RS232_STOPBITS", 0xff, RS232_STOPBITS_1 )
+DEVICE_INPUT_DEFAULTS_END
 
 MACHINE_CONFIG_START(igt_gameking_state::igt_gameking)
 
@@ -593,6 +605,16 @@ MACHINE_CONFIG_START(igt_gameking_state::igt_gameking)
 	MCFG_CPU_ADD("maincpu", I960, XTAL(24'000'000))
 	MCFG_CPU_PROGRAM_MAP(igt_gameking_map)
 	MCFG_CPU_VBLANK_INT_DRIVER("screen", igt_gameking_state,  vblank_irq)
+
+	MCFG_SC28C94_ADD("quart1", XTAL(24'000'000) / 6)
+	MCFG_SC28C94_D_TX_CALLBACK(DEVWRITELINE("diag", rs232_port_device, write_txd))
+
+	MCFG_SC28C94_ADD("quart2", XTAL(24'000'000) / 6)
+	MCFG_MC68681_IRQ_CALLBACK(INPUTLINE("maincpu", I960_IRQ0))
+
+	MCFG_RS232_PORT_ADD("diag", default_rs232_devices, nullptr)
+	MCFG_RS232_RXD_HANDLER(DEVWRITELINE("quart1", sc28c94_device, rx_d_w))
+	MCFG_DEVICE_CARD_DEVICE_INPUT_DEFAULTS("terminal", terminal)
 
 	MCFG_GFXDECODE_ADD("gfxdecode", "palette", igt_gameking)
 
