@@ -42,7 +42,6 @@ Aska Base                                                     Algo              
 Aska Word                                                     Algo                              1991/1     SET(CD+FD)
 Band-kun                                                      Koei                              1991/1     SET(CD+FD)
 Battle                                                        GAM                               1992/10    CD
-Battle Chess                                                  Fujitsu                           1991/9     CD
 Bell's Avenue Vol. 3                                          Wendy Magazine                    1995/4     CD
 Bible Master 2: Aglia no Jashin                               Glodia                            1995/1     SET(CD+FD)
 Big Honour                                                    Artdink                           1992/9     CD
@@ -182,8 +181,6 @@ Eigo de Eigo ni Tsuyoku Naru 9                                Infortech         
 Eikan wa Kimi ni 2: Koukou Yakyuu Zenkoku Taikai              Artdink                           1991/8     CD
 Eikan wa Kimi ni 3: Koukou Yakyuu Zenkoku Taikai              Artdink                           1993/8     SET(CD+FD)
 Ei-wa-doku-ro Denki Jutsugo Daijiten                          Ohmsha                            1990/4     CD
-Emit Vol. 1: Toki no Maigo                                    Koei                              1994/3     SET(CD+FD)
-Emit Vol. 2: Inochigake no Tabi                               Koei                              1994/7     SET(CD+FD)
 Emit Vol. 3: Watashi ni Sayonara wo                           Koei                              1994/9     SET(CD+FD)
 Engage Errands 2: Kouki wo Niau Mono                          Ponytail Soft                     1995/5     CD
 Engage Errands: Miwaku no Shito-tachi                         Ponytail Soft                     1995/4     CD
@@ -382,7 +379,6 @@ Koujien Daisanban CD-ROM                                      Fujitsu           
 Koujien Daiyonban CD-ROM                                      Fujitsu                           1993/3     CD
 Kouryuuki                                                     Koei                              1993/10    SET(CD+FD)
 Kousoku Choujin                                               Foster                            1996/8     CD
-Ku^2++                                                        Panther Software                  1993/11    CD
 Kusuriyubi no Kyoukasho                                       Active                            1996/4     CD
 Kyouko no Ijiwaru!! Hachamecha Daishingeki                    Ponytail Soft                     1994/10    CD
 Leading Company                                               Koei                              1992/4     SET(CD+FD)
@@ -2195,6 +2191,45 @@ User/save disks that can be created from the game itself are not included.
 		</part>
 	</software>
 
+	<software name="batchess">
+		<!--
+		Origin: redump.org
+		<rom name="Battle Chess (Japan) (En,Ja).cue" size="2711" crc="990dafd7" sha1="870b4574afeef42b0a0c4b58021c27ec75e72f1f"/>
+		<rom name="Battle Chess (Japan) (En,Ja) (Track 01).bin" size="52038000" crc="f120a9a5" sha1="789d19facee66da91a619799bd4ea902af12050a"/>
+		<rom name="Battle Chess (Japan) (En,Ja) (Track 02).bin" size="160702752" crc="2a8c7147" sha1="27aad576f603d55ea8e762aab44e896fbec2b2c0"/>
+		<rom name="Battle Chess (Japan) (En,Ja) (Track 03).bin" size="22160544" crc="253f669b" sha1="ec097ad141d8be24c24f46e3528a3d80f10ecd1c"/>
+		<rom name="Battle Chess (Japan) (En,Ja) (Track 04).bin" size="28320432" crc="730800a6" sha1="42fe6d8f6e40e9c50da33dbf98fea32e5ec659ea"/>
+		<rom name="Battle Chess (Japan) (En,Ja) (Track 05).bin" size="29785728" crc="f96c9d0f" sha1="d7e904620d731d1f361db8546beeab8d9b9a5729"/>
+		<rom name="Battle Chess (Japan) (En,Ja) (Track 06).bin" size="29277696" crc="4f0e4085" sha1="41615b562a3238f7971c5a63790b6f4f0365a170"/>
+		<rom name="Battle Chess (Japan) (En,Ja) (Track 07).bin" size="29748096" crc="171b2ba5" sha1="b0f1ab7a99be2a459dc5cac517f729cee10049cb"/>
+		<rom name="Battle Chess (Japan) (En,Ja) (Track 08).bin" size="29291808" crc="5bf64bb6" sha1="7c9a5a7a8e30da487a8549a0654dae417168f999"/>
+		<rom name="Battle Chess (Japan) (En,Ja) (Track 09).bin" size="3789072" crc="3edc18fa" sha1="2c5e747a22160b26b8e25be50962b3ae9e4c73f7"/>
+		<rom name="Battle Chess (Japan) (En,Ja) (Track 10).bin" size="3916080" crc="2dbd4230" sha1="751bb51c36ef95d53e24908c2c541e9734b22671"/>
+		<rom name="Battle Chess (Japan) (En,Ja) (Track 11).bin" size="4038384" crc="8d77e34f" sha1="d134ca6a91a492ad6a8d2cac1771013289a2838f"/>
+		<rom name="Battle Chess (Japan) (En,Ja) (Track 12).bin" size="3711456" crc="bb5593a2" sha1="a4b1d84a33b3e5b68bd29db9b243994dbd91302b"/>
+		<rom name="Battle Chess (Japan) (En,Ja) (Track 13).bin" size="3796128" crc="77c50f28" sha1="0c0e8d3b10f69eb02a67bff10eb57b8b632d2887"/>
+		<rom name="Battle Chess (Japan) (En,Ja) (Track 14).bin" size="3845520" crc="06055f6c" sha1="6a016acb05d3c940a6f7958370bd647d865cb336"/>
+		<rom name="Battle Chess (Japan) (En,Ja) (Track 15).bin" size="3847872" crc="b1e83660" sha1="f456d11fab38743561722191452d8f4bb5d18cd2"/>
+		<rom name="Battle Chess (Japan) (En,Ja) (Track 16).bin" size="3911376" crc="64d85973" sha1="d06fbc8a5ff7bd70f371d9e18af9a207959c0780"/>
+		<rom name="Battle Chess (Japan) (En,Ja) (Track 17).bin" size="3337488" crc="43f387c9" sha1="8e49bb1f30f16f9d2ada8327dfcff6ffcf54c421"/>
+		<rom name="Battle Chess (Japan) (En,Ja) (Track 18).bin" size="4377072" crc="ed4aed97" sha1="559f10457b31bdf206bca84ea0a38e57211bd7fa"/>
+		<rom name="Battle Chess (Japan) (En,Ja) (Track 19).bin" size="3669120" crc="4c19f9d9" sha1="dabcc461eafb13fbc78edd0fd9b49c1d8bc18d05"/>
+		<rom name="Battle Chess (Japan) (En,Ja) (Track 20).bin" size="4353552" crc="a57e29c9" sha1="8a82b620cdce3d28eb300cc04dbebfd668f70ecc"/>
+		<rom name="Battle Chess (Japan) (En,Ja) (Track 21).bin" size="18841872" crc="15fc36b7" sha1="9e26abdfb6423bc8d245d233ae4872300169ecfb"/>
+		<rom name="Battle Chess (Japan) (En,Ja) (Track 22).bin" size="284326224" crc="62d2dd00" sha1="4f70592502f9a3f6af48dee67f38f86d60bbfebf"/>
+		-->
+		<description>Battle Chess</description>
+		<year>1991</year>
+		<publisher>富士通 (Fujitsu)</publisher>
+		<info name="alt_title" value="バトル・チェス" />
+		<info name="release" value="199109xx" />
+		<part name="cdrom" interface="fmt_cdrom">
+			<diskarea name="cdrom">
+				<disk name="battle chess (japan) (en,ja)" sha1="0697976fd0d3c5a8a1282d3bf3a319d50d525036" />
+			</diskarea>
+		</part>
+	</software>
+
 	<software name="beast3">
 		<!--
 		Origin: Neo Kobe Collection
@@ -3541,6 +3576,67 @@ User/save disks that can be created from the game itself are not included.
 		</part>
 	</software>
 
+	<!-- The spoken dialogue (CDDA) seems to start playing at the wrong point and doesn't match what's being said on each scene -->
+	<software name="emit1" supported="partial">
+		<!--
+		Origin: redump.org
+		<rom name="Emit Vol. 1 - Toki no Maigo (Japan) (En,Ja).cue" size="1078" crc="4ed341d2" sha1="7d5c07157bd438cab5d0d84dd1024b369cfd9db6"/>
+		<rom name="Emit Vol. 1 - Toki no Maigo (Japan) (En,Ja) (Track 1).bin" size="20281296" crc="4b15bc51" sha1="02433dd33ba55bf686349d1332a5d72914f418c2"/>
+		<rom name="Emit Vol. 1 - Toki no Maigo (Japan) (En,Ja) (Track 2).bin" size="42766416" crc="cddb61dc" sha1="f40ae55a596258434672d7975388b2bdbfc08125"/>
+		<rom name="Emit Vol. 1 - Toki no Maigo (Japan) (En,Ja) (Track 3).bin" size="151908624" crc="0480ad92" sha1="e62722a8e8c0e54b11a8a293950a55410d1e7086"/>
+		<rom name="Emit Vol. 1 - Toki no Maigo (Japan) (En,Ja) (Track 4).bin" size="159395040" crc="3e561925" sha1="c0f4058a6678439d128648e8d48e8344e828bca8"/>
+		<rom name="Emit Vol. 1 - Toki no Maigo (Japan) (En,Ja) (Track 5).bin" size="72077040" crc="0c366937" sha1="77f71ca8d795a8c2e6ed0e286750fea7becc1abb"/>
+		<rom name="Emit Vol. 1 - Toki no Maigo (Japan) (En,Ja) (Track 6).bin" size="114714096" crc="3422fc41" sha1="57197a1ccb5c7d2a02a84ee6929fcd2d958e7eb7"/>
+		<rom name="Emit Vol. 1 - Toki no Maigo (Japan) (En,Ja) (Track 7).bin" size="6837264" crc="a8bb630c" sha1="34c54fa85a566a00e3c9ba4572a347a15d718170"/>
+		<rom name="Emit Vol. 1 - Toki no Maigo (Japan) (En,Ja) (Track 8).bin" size="70376544" crc="a9597842" sha1="07b706406105d4f4d99038aad84a2c9408692ee6"/>
+		-->
+		<description>Emit Vol. 1 - Toki no Maigo</description>
+		<year>1994</year>
+		<publisher>光栄 (Koei)</publisher>
+		<info name="release" value="199403xx" />
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size="1261568">
+				<rom name="emit1.hdm" size="1261568" crc="660198bd" sha1="f84e0ede2de479d61de72c59e64a5c6829ae9cb7" offset="000000" />
+			</dataarea>
+		</part>
+		<part name="cdrom" interface="fmt_cdrom">
+			<diskarea name="cdrom">
+				<disk name="emit vol. 1 - toki no maigo (japan) (en,ja)" sha1="038ddc530689da76a82b225a8deefd713b0b059e" />
+			</diskarea>
+		</part>
+	</software>
+
+	<!-- The spoken dialogue (CDDA) seems to start playing at the wrong point and doesn't match what's being said on each scene -->
+	<software name="emit2" supported="partial">
+		<!--
+		Origin: redump.org
+		<rom name="Emit Vol. 2 - Inochigake no Tabi (Japan) (En,Ja).cue" size="1260" crc="92e3280f" sha1="f86c316920455ad3be2769edee7a33cdc890fb65"/>
+		<rom name="Emit Vol. 2 - Inochigake no Tabi (Japan) (En,Ja) (Track 1).bin" size="20815200" crc="0ae40089" sha1="6b7c70f4c14602f9866e2c125491d39ae80dfdfe"/>
+		<rom name="Emit Vol. 2 - Inochigake no Tabi (Japan) (En,Ja) (Track 2).bin" size="69595680" crc="346a3abd" sha1="ee7325fea4ecd2bb5a63356f511566284669efd0"/>
+		<rom name="Emit Vol. 2 - Inochigake no Tabi (Japan) (En,Ja) (Track 3).bin" size="147070560" crc="67ca5cca" sha1="74ffd1b5a5401f03aa388a50259e748f3fdd8241"/>
+		<rom name="Emit Vol. 2 - Inochigake no Tabi (Japan) (En,Ja) (Track 4).bin" size="156419760" crc="68fe96cd" sha1="8c388642e46f5743e8dc565f61367ccc78679c82"/>
+		<rom name="Emit Vol. 2 - Inochigake no Tabi (Japan) (En,Ja) (Track 5).bin" size="47256384" crc="2a47da59" sha1="0347296eb5d4bf61c297088c5b906bb5cd3f5f54"/>
+		<rom name="Emit Vol. 2 - Inochigake no Tabi (Japan) (En,Ja) (Track 6).bin" size="117936336" crc="38c90df5" sha1="b3012938f2992be2645d6b8bb1b67f7caa89742a"/>
+		<rom name="Emit Vol. 2 - Inochigake no Tabi (Japan) (En,Ja) (Track 7).bin" size="6738480" crc="1f2dbaa5" sha1="2e1b29fb2597477ac45e471c14865f13614263c4"/>
+		<rom name="Emit Vol. 2 - Inochigake no Tabi (Japan) (En,Ja) (Track 8).bin" size="43175664" crc="3134c4b6" sha1="39899d98d01020a589e67674300a7fbae74b2f5d"/>
+		<rom name="Emit Vol. 2 - Inochigake no Tabi (Japan) (En,Ja) (Track 9).bin" size="2598960" crc="c08c050d" sha1="5464a05ade770fe4fbc211b1789b8d13d1444301"/>
+		-->
+		<description>Emit Vol. 2 - Inochigake no Tabi</description>
+		<year>1994</year>
+		<publisher>光栄 (Koei)</publisher>
+		<info name="release" value="199407xx" />
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size="1261568">
+				<rom name="emit2.hdm" size="1261568" crc="b0e599e6" sha1="a7ba288dd17aa136e3fad5d5d070d5c87c61d5b6" offset="000000" />
+			</dataarea>
+		</part>
+		<part name="cdrom" interface="fmt_cdrom">
+			<diskarea name="cdrom">
+				<disk name="emit vol. 2 - inochigake no tabi (japan) (en,ja)" sha1="ae0de13b275b8f7ce5082008002aa4c275d011db" />
+			</diskarea>
+		</part>
+	</software>
+
 	<software name="enkaio2">
 		<!--
 		Origin: P2P
@@ -3717,8 +3813,7 @@ User/save disks that can be created from the game itself are not included.
 		</part>
 	</software>
 
-	<!-- Some graphics issues -->
-	<software name="f29ret" supported="partial">
+	<software name="f29ret">
 		<!--
 		Origin: Neo Kobe Collection
 		<rom name="F29 Retaliator.ccd" size="1393" crc="6c22f526" sha1="5b2ba6d41fba1afc5cf3ac10523d48581c612ef0"/>
@@ -5424,6 +5519,25 @@ User/save disks that can be created from the game itself are not included.
 		</part>
 	</software>
 
+	<software name="ku2pp">
+		<!--
+		Origin: Tokugawa Corporate Forums (DamienD)
+		<rom name="KU²++.ccd" size="5176" crc="1e5aa465" sha1="9569466d627ebb8f004d3ffd44cd48096829ff63"/>
+		<rom name="KU²++.cue" size="981" crc="02e50d19" sha1="97a5444839919629278980b9df44196e505af7da"/>
+		<rom name="KU²++.img" size="600514992" crc="50a05b7f" sha1="08ac4b3cb8755b25a93ac20a3a0b5364bb127b4f"/>
+		<rom name="KU²++.sub" size="24510816" crc="2eeb7669" sha1="2dba78cc9b1c8a7961109fcdd31ca7f5f68f2f73"/>
+		-->
+		<description>Ku²++</description>
+		<year>1993</year>
+		<publisher>パンサーソフトウェア (Panther Software)</publisher>
+		<info name="release" value="199311xx" />
+		<part name="cdrom" interface="fmt_cdrom">
+			<diskarea name="cdrom">
+				<disk name="ku2++" sha1="89f36240314f15dcb45526b03beb84e417296a97" />
+			</diskarea>
+		</part>
+	</software>
+
 	<software name="landlore">
 		<!--
 		Origin: Neo Kobe Collection
@@ -6069,8 +6183,7 @@ User/save disks that can be created from the game itself are not included.
 		</part>
 	</software>
 
-	<!-- Some graphics issues -->
-	<software name="menzober" supported="partial">
+	<software name="menzober">
 		<!--
 		Origin: Neo Kobe Collection
 		<rom name="Menzoberranzan.mdf" size="385295616" crc="452d6d6a" sha1="83eceac9677e92b5909782acee8092b80bb5a6a9"/>
@@ -7817,8 +7930,7 @@ User/save disks that can be created from the game itself are not included.
 		</part>
 	</software>
 
-	<!-- Some graphics issues -->
-	<software name="ravnloft" supported="partial">
+	<software name="ravnloft">
 		<!--
 		Origin: Neo Kobe Collection
 		<rom name="Ravenloft.ccd" size="770" crc="858e0052" sha1="2d92be1ed3f46893d857d3d5f8932d8bc430fc6a"/>
@@ -8371,8 +8483,7 @@ User/save disks that can be created from the game itself are not included.
 		</part>
 	</software>
 
-	<!-- Severe graphics issues -->
-	<software name="simearth" supported="no">
+	<software name="simearth">
 		<!--
 		Origin: Neo Kobe Collection
 		<rom name="SimEarth.ccd" size="6113" crc="4f860edf" sha1="198af871373683d7af8eb221ae81cae78762d398"/>
@@ -9618,8 +9729,7 @@ User/save disks that can be created from the game itself are not included.
 		</part>
 	</software>
 
-	<!-- Some graphics issues -->
-	<software name="veildark" supported="partial">
+	<software name="veildark">
 		<!--
 		Origin: Neo Kobe Collection
 		<rom name="Veil of Darkness.mdf" size="10648800" crc="a6a3495a" sha1="94c27245b4212049ae4114c0bd9e32614d80a807"/>
