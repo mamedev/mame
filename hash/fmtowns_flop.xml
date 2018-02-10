@@ -532,7 +532,7 @@ Zurukamashi Ver 2.0                                           Nikkonren Kikaku  
 	</software>
 
 	<!-- Hangs after the title screen - might be related to the copy protection -->
-	<software name="cameltry">
+	<software name="cameltry" supported="no">
 		<description>Cameltry</description>
 		<year>1994</year>
 		<publisher>電波新聞社 (Dempa Shinbunsha)</publisher>
