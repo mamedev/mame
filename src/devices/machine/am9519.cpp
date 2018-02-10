@@ -1,6 +1,8 @@
 // license:BSD-3-Clause
 // copyright-holders:Wilbert Pol,Carl
 
+//TODO: rotating priority, cascade
+
 #include "emu.h"
 #include "machine/am9519.h"
 
@@ -19,20 +21,18 @@ void am9519_device::device_timer(emu_timer &timer, device_timer_id id, int param
 	{
 		u8 mask = 1 << irq;
 
-		/* is this IRQ in service and not cascading and sfnm? */
+		/* is this IRQ in service */
 		if(m_isr & mask)
 		{
-			LOG("am9519_timerproc(): PIC IRQ #%d still in service\n", irq);
+			LOG("am9519_timerproc(): UIC IRQ #%d still in service\n", irq);
 			break;
 		}
 
-		bool active = !(BIT(m_mode, 4) ^ BIT(m_irr, irq));
-
 		/* is this IRQ pending and enabled? */
-		if(active && !(m_imr & mask))
+		if((m_irr & mask) && !(m_imr & mask))
 		{
-			LOG("am9519_timerproc(): PIC triggering IRQ #%d\n", irq);
-			if(BIT(m_mode, 4))
+			LOG("am9519_timerproc(): UIC triggering IRQ #%d\n", irq);
+			if(!BIT(m_mode, 2))
 				m_out_int_func(1);
 			return;
 		}
@@ -44,11 +44,12 @@ void am9519_device::device_timer(emu_timer &timer, device_timer_id id, int param
 void am9519_device::set_irq_line(int irq, int state)
 {
 	u8 mask = (1 << irq);
+	bool active = !((state == ASSERT_LINE ? 1 : 0) ^ BIT(m_mode, 4));
 
-	if(state)
+	if(active)
 	{
 		/* setting IRQ line */
-		LOG("am9519_set_irq_line(): PIC set IRQ line #%d\n", irq);
+		LOG("am9519_set_irq_line(): UIC set IRQ line #%d\n", irq);
 
 		if(!(m_irq_lines & mask)) // edge trig only
 			m_irr |= mask;
@@ -57,7 +58,7 @@ void am9519_device::set_irq_line(int irq, int state)
 	else
 	{
 		/* clearing IRQ line */
-		LOG("am9519_device::set_irq_line(): PIC cleared IRQ line #%d\n", irq);
+		LOG("am9519_device::set_irq_line(): UIC cleared IRQ line #%d\n", irq);
 
 		m_irq_lines &= ~mask;
 		m_irr &= ~mask;
@@ -75,11 +76,12 @@ u32 am9519_device::acknowledge()
 		/* is this IRQ pending and enabled? */
 		if((m_irr & mask) && !(m_imr & mask))
 		{
-			LOG("am9519_acknowledge(): PIC acknowledge IRQ #%d\n", irq);
+			LOG("am9519_acknowledge(): UIC acknowledge IRQ #%d\n", irq);
 
 			if(!(mask & m_aclear))
 				m_isr |= mask;
 
+			m_irr &= ~mask;
 			set_timer();
 
 			u32 ret = 0;
