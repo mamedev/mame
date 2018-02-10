@@ -248,7 +248,6 @@ inline void i8257_device::advance()
 	if(tc)
 	{
 		m_status |= 1 << m_current_channel;
-		m_request &= ~(1 << m_current_channel); // docs imply this isn't right but pc-8001 works better with it
 		set_tc(1);
 
 		if(al)
