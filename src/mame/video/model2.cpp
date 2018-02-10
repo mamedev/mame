@@ -884,9 +884,9 @@ static void model2_3d_project( triangle *tri )
 }
 
 /* 3D Rasterizer frame start: Resets frame variables */
-static void model2_3d_frame_start( model2_state *state )
+void model2_state::model2_3d_frame_start( void )
 {
-	raster_state *raster = state->m_raster;
+	raster_state *raster = m_raster;
 
 	/* reset the triangle list index */
 	raster->tri_list_index = 0;
@@ -2550,13 +2550,13 @@ static uint32_t * geo_process_command( geo_state *geo, uint32_t opcode, uint32_t
 	return input;
 }
 
-static void geo_parse( model2_state *state )
+void model2_state::geo_parse( void )
 {
-	uint32_t  address = (state->m_geo_read_start_address/4);
-	uint32_t *input = &state->m_bufferram[address];
+	uint32_t  address = (m_geo_read_start_address & 0x7ffff)/4;
+	uint32_t *input = &m_bufferram[address];
 	uint32_t  opcode;
 
-	while( input != nullptr && (input - state->m_bufferram) < 0x20000  )
+	while( input != nullptr && (input - m_bufferram) < 0x20000  )
 	{
 		/* read in the opcode */
 		opcode = *input++;
@@ -2568,14 +2568,14 @@ static void geo_parse( model2_state *state )
 			address = (opcode & 0x7FFFF) / 4;
 
 			/* update our pointer */
-			input = &state->m_bufferram[address];
+			input = &m_bufferram[address];
 
 			/* go again */
 			continue;
 		}
 
 		/* process it */
-		input = geo_process_command( state->m_geo, opcode, input );
+		input = geo_process_command( m_geo, opcode, input );
 	}
 }
 
@@ -2620,10 +2620,10 @@ uint32_t model2_state::screen_update_model2(screen_device &screen, bitmap_rgb32 
 	copybitmap_trans(bitmap, m_sys24_bitmap, 0, 0, 0, 0, cliprect, 0);
 
 	/* tell the rasterizer we're starting a frame */
-	model2_3d_frame_start(this);
+	model2_3d_frame_start();
 
 	/* let the geometry engine do it's thing */ /* TODO: don't do it here! */
-	geo_parse(this);
+	geo_parse();
 
 	/* have the rasterizer output the frame */
 	model2_3d_frame_end( bitmap, cliprect );

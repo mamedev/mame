@@ -249,6 +249,8 @@ public:
 	uint32_t copro_fifoout_pop(address_space &space, uint32_t offset, uint32_t mem_mask);
 	void copro_fifoout_push(device_t *device, uint32_t data,uint32_t offset,uint32_t mem_mask);
 
+	void model2_3d_frame_start( void );
+	void geo_parse( void );
 	void model2_3d_frame_end( bitmap_rgb32 &bitmap, const rectangle &cliprect );
 
 	void model2_timers(machine_config &config);
