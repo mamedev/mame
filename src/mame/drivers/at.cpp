@@ -428,6 +428,8 @@ MACHINE_CONFIG_DERIVED(at_state::ews286, ibm5170)
 	MCFG_DEVICE_MODIFY("isa2")
 	MCFG_SLOT_OPTION_MACHINE_CONFIG("fdc", cfg_single_1200K) // From pictures but also with a 3.5" as second floppy
 
+	MCFG_SOFTWARE_LIST_ADD("ews286_disk_list","ews286_flop")
+
 	MCFG_RAM_MODIFY(RAM_TAG)
 	MCFG_RAM_DEFAULT_SIZE("640K")
 MACHINE_CONFIG_END
