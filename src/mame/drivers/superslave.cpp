@@ -25,8 +25,8 @@ Oxx,yy          = Out port
 //#include "bus/s100/s100.h"
 #include "cpu/z80/z80.h"
 #include "cpu/z80/z80daisy.h"
+#include "machine/am9519.h"
 #include "machine/com8116.h"
-#include "machine/pic8259.h"
 #include "machine/ram.h"
 #include "machine/z80dart.h"
 #include "machine/z80pio.h"
@@ -268,7 +268,8 @@ static ADDRESS_MAP_START( superslave_io, AS_IO, 8, superslave_state )
 	AM_RANGE(0x0c, 0x0f) AM_DEVREADWRITE(Z80DART_1_TAG, z80dart_device, ba_cd_r, ba_cd_w)
 	AM_RANGE(0x10, 0x10) AM_MIRROR(0x03) AM_WRITE(baud_w)
 	AM_RANGE(0x14, 0x17) AM_DEVREADWRITE(Z80PIO_TAG, z80pio_device, read_alt, write_alt)
-	AM_RANGE(0x18, 0x1c) AM_DEVREADWRITE(AM9519_TAG, pic8259_device, read, write)
+	AM_RANGE(0x18, 0x18) AM_MIRROR(0x02) AM_DEVREADWRITE(AM9519_TAG, am9519_device, data_r, data_w)
+	AM_RANGE(0x19, 0x19) AM_MIRROR(0x02) AM_DEVREADWRITE(AM9519_TAG, am9519_device, stat_r, cmd_w)
 	AM_RANGE(0x1d, 0x1d) AM_WRITE(memctrl_w)
 	AM_RANGE(0x1e, 0x1e) AM_NOP // master communications
 	AM_RANGE(0x1f, 0x1f) AM_READWRITE(status_r, cmd_w)
@@ -380,8 +381,8 @@ MACHINE_CONFIG_START(superslave_state::superslave)
 	MCFG_Z80_DAISY_CHAIN(superslave_daisy_chain)
 
 	// devices
-	MCFG_DEVICE_ADD(AM9519_TAG, PIC8259, 0)
-	MCFG_PIC8259_OUT_INT_CB(INPUTLINE(Z80_TAG, INPUT_LINE_IRQ0))
+	MCFG_DEVICE_ADD(AM9519_TAG, AM9519, 0)
+	MCFG_AM9519_OUT_INT_CB(INPUTLINE(Z80_TAG, INPUT_LINE_IRQ0))
 
 	MCFG_DEVICE_ADD(Z80PIO_TAG, Z80PIO, XTAL(8'000'000)/2)
 	MCFG_Z80PIO_OUT_INT_CB(INPUTLINE(Z80_TAG, INPUT_LINE_IRQ0))
