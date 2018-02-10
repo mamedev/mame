@@ -27,9 +27,6 @@ public:
 	// construction/destruction
 	inder_sb_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
-	required_device<cpu_device> m_audiocpu;
-	required_device<z80ctc_device> m_ctc;
-
 	DECLARE_READ8_MEMBER(megaphx_sound_sent_r);
 	DECLARE_READ8_MEMBER(megaphx_sound_cmd_r);
 	DECLARE_WRITE8_MEMBER(megaphx_sound_to_68k_w);
@@ -39,16 +36,12 @@ public:
 	DECLARE_WRITE8_MEMBER(dac2_rombank_write);
 	DECLARE_WRITE8_MEMBER(dac3_rombank_write);
 
-	DECLARE_READ8_MEMBER(megaphx_02cc_hack_r);
-	DECLARE_READ8_MEMBER(megaphx_02e6_hack_r);
-	DECLARE_READ8_MEMBER(megaphx_0309_hack_r);
-	DECLARE_READ8_MEMBER(megaphx_0323_hack_r);
+	DECLARE_READ8_MEMBER(vec_bankswitch_r);
 
 
 	DECLARE_READ16_MEMBER(megaphx_0x050002_r);
 	DECLARE_WRITE16_MEMBER(megaphx_0x050000_w);
 
-	void install_sound_hacks(void);
 	void update_sound_irqs(void);
 
 protected:
@@ -57,6 +50,11 @@ protected:
 	virtual void device_reset() override;
 
 private:
+	required_device<cpu_device> m_audiocpu;
+	required_device<z80ctc_device> m_ctc;
+	required_region_ptr<uint8_t> m_audiocpu_rom;
+	required_memory_bank m_sounddata_bank;
+
 	uint8_t m_soundbank[4];
 
 	int m_soundsent;

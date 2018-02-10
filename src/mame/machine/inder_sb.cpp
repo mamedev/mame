@@ -18,16 +18,20 @@ inder_sb_device::inder_sb_device(const machine_config &mconfig, const char *tag,
 	, device_mixer_interface(mconfig, *this, 2)
 	, m_audiocpu(*this, "audiocpu")
 	, m_ctc(*this, "ctc")
+	, m_audiocpu_rom(*this, "audiocpu")
+	, m_sounddata_bank(*this, "snddata")
 {
 }
 
 
 
 // hacks for test purposes, these are installed over the program rom so we know when irqs are actually taken
-READ8_MEMBER(inder_sb_device::megaphx_02cc_hack_r)  { /*logerror("%04x audicpu IRQ hack 0x02cc\n", machine().device("audiocpu")->safe_pc());*/  int bank = m_soundbank[0] & 7;  membank("snddata")->set_entry(bank); return memregion("audiocpu")->base()[0x02cc]; }
-READ8_MEMBER(inder_sb_device::megaphx_02e6_hack_r)  { /*logerror("%04x audicpu IRQ hack 0x02e6\n", machine().device("audiocpu")->safe_pc());*/  int bank = m_soundbank[1] & 7;  membank("snddata")->set_entry(bank); return memregion("audiocpu")->base()[0x02e6]; }
-READ8_MEMBER(inder_sb_device::megaphx_0309_hack_r)  { /*logerror("%04x audicpu IRQ hack 0x0309\n", machine().device("audiocpu")->safe_pc());*/  int bank = m_soundbank[2] & 7;  membank("snddata")->set_entry(bank); return memregion("audiocpu")->base()[0x0309]; }
-READ8_MEMBER(inder_sb_device::megaphx_0323_hack_r)  { /*logerror("%04x audicpu IRQ hack 0x0323\n", machine().device("audiocpu")->safe_pc());*/  int bank = m_soundbank[3] & 7;  membank("snddata")->set_entry(bank); return memregion("audiocpu")->base()[0x0323]; }
+READ8_MEMBER(inder_sb_device::vec_bankswitch_r)
+{
+	if (!machine().side_effect_disabled())
+		m_sounddata_bank->set_entry(m_soundbank[(offset & 6) >> 1] & 7);
+	return m_audiocpu_rom[offset + 0x0020];
+}
 
 
 
@@ -50,15 +54,6 @@ WRITE16_MEMBER(inder_sb_device::megaphx_0x050000_w)
 	m_soundsent = 0xff;
 	m_sounddata = data;
 
-}
-
-void inder_sb_device::install_sound_hacks(void)
-{
-	address_space &space = m_audiocpu->space(AS_PROGRAM);
-	space.install_read_handler(0x02cc, 0x02cc, read8_delegate(FUNC(inder_sb_device::megaphx_02cc_hack_r), this));
-	space.install_read_handler(0x02e6, 0x02e6, read8_delegate(FUNC(inder_sb_device::megaphx_02e6_hack_r), this));
-	space.install_read_handler(0x0309, 0x0309, read8_delegate(FUNC(inder_sb_device::megaphx_0309_hack_r), this));
-	space.install_read_handler(0x0323, 0x0323, read8_delegate(FUNC(inder_sb_device::megaphx_0323_hack_r), this));
 }
 
 void inder_sb_device::update_sound_irqs(void)
@@ -124,6 +119,7 @@ static const z80_daisy_config daisy_chain[] =
 
 static ADDRESS_MAP_START( sound_map, AS_PROGRAM, 8, inder_sb_device )
 	AM_RANGE(0x0000, 0x1fff) AM_ROM
+	AM_RANGE(0x0020, 0x0020) AM_SELECT(0x0006) AM_READ(vec_bankswitch_r)
 	AM_RANGE(0x4000, 0x7fff) AM_RAM
 	AM_RANGE(0x8000, 0xffff) AM_ROMBANK("snddata")
 ADDRESS_MAP_END
@@ -239,10 +235,8 @@ MACHINE_CONFIG_END
 
 void inder_sb_device::device_start()
 {
-	membank("snddata")->configure_entries(0, 8, memregion("user2")->base(), 0x8000);
-	membank("snddata")->set_entry(0);
-
-	install_sound_hacks();
+	m_sounddata_bank->configure_entries(0, 8, memregion("user2")->base(), 0x8000);
+	m_sounddata_bank->set_entry(0);
 }
 
 void inder_sb_device::device_reset()
