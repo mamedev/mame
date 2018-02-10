@@ -40,7 +40,7 @@ READ16_MEMBER(inder_sb_device::megaphx_0x050002_r)
 	machine().scheduler().synchronize();
 //  int pc = machine().device("maincpu")->safe_pc();
 	int ret = m_soundback;
-	m_soundback = 0;
+	//m_soundback = 0;
 	//logerror("(%06x) megaphx_0x050002_r (from z80?) %04x\n", pc, mem_mask);
 	return ret;
 }
