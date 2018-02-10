@@ -1233,6 +1233,12 @@ uint16_t deco_146_base_device::read_protport(uint16_t address, uint16_t mem_mask
 	return realret;
 }
 
+TIMER_CALLBACK_MEMBER(deco_146_base_device::write_soundlatch)
+{
+	m_soundlatch = param;
+	m_soundlatch_irq_cb(ASSERT_LINE);
+}
+
 void deco_146_base_device::write_protport(address_space &space, uint16_t address, uint16_t data, uint16_t mem_mask)
 {
 	m_latchaddr = address;
@@ -1241,19 +1247,18 @@ void deco_146_base_device::write_protport(address_space &space, uint16_t address
 
 	if ((address&0xff) == m_xor_port)
 	{
-			logerror("LOAD XOR REGISTER %04x %04x\n", data, mem_mask);
-			COMBINE_DATA(&m_xor);
+		logerror("LOAD XOR REGISTER %04x %04x\n", data, mem_mask);
+		COMBINE_DATA(&m_xor);
 	}
 	else if ((address&0xff) == m_mask_port)
 	{
 //          logerror("LOAD NAND REGISTER %04x %04x\n", data, mem_mask);
-			COMBINE_DATA(&m_nand);
+		COMBINE_DATA(&m_nand);
 	}
 	else if ((address&0xff) == m_soundlatch_port)
 	{
-			logerror("LOAD SOUND LATCH: %04x\n", data);
-			m_soundlatch = data & 0xff;
-			m_soundlatch_irq_cb(ASSERT_LINE);
+		logerror("LOAD SOUND LATCH: %04x\n", data);
+		machine().scheduler().synchronize(timer_expired_delegate(FUNC(deco_146_base_device::write_soundlatch), this), data & 0xff);
 	}
 
 	// always store

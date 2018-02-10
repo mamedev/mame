@@ -425,11 +425,12 @@ static ADDRESS_MAP_START( cubo_mem, AS_PROGRAM, 32, cubo_state )
 	AM_RANGE(0x000000, 0x1fffff) AM_DEVICE("overlay", address_map_bank_device, amap32)
 	AM_RANGE(0x800000, 0x800003) AM_READ_PORT("DIPSW1")
 	AM_RANGE(0x800010, 0x800013) AM_READ_PORT("DIPSW2")
+	AM_RANGE(0xa80000, 0xb7ffff) AM_NOP
 	AM_RANGE(0xb80000, 0xb8003f) AM_DEVREADWRITE("akiko", akiko_device, read, write)
 	AM_RANGE(0xbf0000, 0xbfffff) AM_READWRITE16(cia_r, gayle_cia_w, 0xffffffff)
 	AM_RANGE(0xc00000, 0xdfffff) AM_READWRITE16(custom_chip_r, custom_chip_w, 0xffffffff)
 	AM_RANGE(0xe00000, 0xe7ffff) AM_ROM AM_REGION("kickstart", 0x80000)
-	AM_RANGE(0xa00000, 0xf7ffff) AM_NOP
+	AM_RANGE(0xe80000, 0xf7ffff) AM_NOP
 	AM_RANGE(0xf80000, 0xffffff) AM_ROM AM_REGION("kickstart", 0)
 ADDRESS_MAP_END
 

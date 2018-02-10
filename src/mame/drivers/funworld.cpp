@@ -302,7 +302,7 @@
   The game resolution seems to change 'on the fly' when entering the input test mode.
   There aren't any writes to the m6845 registers to manage these changes.
 
-  Regarding the CPU, it seems to be a custom one, or a daughterboard with a 65c02 + PLDs/TTLs.
+  Regarding the CPU, it's a Mexican Rockwell R65C02 with some mods respect the regular/stock 65C02.
   Some CPU instructions seems to be changed. The following piece of code at $C1A8 is very clear:
 
   C1A8: A0 00         ldy  #$00       ; clear Y register to use as counter.

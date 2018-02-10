@@ -13,7 +13,7 @@ List of games, initially taken from http://videogamesdensetsu.tumblr.com/post/14
   *RX108 Picno de 1 2 3 / ピクノで123
   *RX109 Picno Art Puzzle / ピクノアートパズル
   *RX110 Real Montage / リアルモンタージュ
-   RX111 Kiiroi Kyōryū-kun Parasa no Obake Taiji / きいろい恐竜くん パラサのオバケ退治
+  *RX111 Kiiroi Kyōryū-kun Parasa no Obake Taiji / きいろい恐竜くん パラサのオバケ退治
    RX112 Anime Box / アニメボックス
    RX113 Picno de Nihon Chizu / ピクノでにほんちず
    RX114 ???
@@ -55,6 +55,19 @@ List of games, initially taken from http://videogamesdensetsu.tumblr.com/post/14
 			<feature name="pcb" value="R0-028" />
 			<dataarea name="rom" size="524288">
 				<rom name="rx116.bin" size="524288" crc="78b6eb10" sha1="dae38fbeeb0b411e849a800fe12ad1d1d42f9a99" offset="00000" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="kiiroi" supported="no">
+		<description>Kiiroi Kyōryū-kun Parasa no Obake Taiji</description>
+		<year>1994</year>
+		<publisher>Konami</publisher>
+		<info name="serial" value="RX111"/>
+		<info name="alt_title" value="きいろい恐竜くん パラサのオバケ退治"/>
+		<part name="cart" interface="picno_cart">
+			<dataarea name="rom" size="524288">
+				<rom name="rx111.bin" size="524288" crc="c2b1a5ab" sha1="3af4124d16fbd66805d26b7ddf9b6bcc8f5d07f5" offset="00000" />
 			</dataarea>
 		</part>
 	</software>

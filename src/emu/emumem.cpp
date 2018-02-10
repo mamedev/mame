@@ -2237,12 +2237,12 @@ void address_space::populate_from_map(address_map *map)
 		return;
 
 	// install the handlers, using the original, unadjusted memory map
-	for (const address_map_entry *entry = map->m_entrylist.first(); entry; entry = entry->next())
+	for (const address_map_entry &entry : map->m_entrylist)
 	{
 		// map both read and write halves
-		populate_map_entry(*entry, read_or_write::READ);
-		populate_map_entry(*entry, read_or_write::WRITE);
-		populate_map_entry_setoffset(*entry);
+		populate_map_entry(entry, read_or_write::READ);
+		populate_map_entry(entry, read_or_write::WRITE);
+		populate_map_entry_setoffset(entry);
 	}
 }
 
@@ -2338,10 +2338,11 @@ void address_space::allocate_memory()
 
 	// make a first pass over the memory map and track blocks with hardcoded pointers
 	// we do this to make sure they are found by space_find_backing_memory first
+	// do it back-to-front so that overrides work correctly
 	int tail = blocklist.size();
 	for (address_map_entry &entry : m_map->m_entrylist)
 		if (entry.m_memory != nullptr)
-			blocklist.push_back(std::make_unique<memory_block>(*this, entry.m_addrstart, entry.m_addrend, entry.m_memory));
+			blocklist.insert(blocklist.begin() + tail, std::make_unique<memory_block>(*this, entry.m_addrstart, entry.m_addrend, entry.m_memory));
 
 	// loop over all blocks just allocated and assign pointers from them
 	address_map_entry *unassigned = nullptr;
@@ -2909,15 +2910,18 @@ void *address_space::find_backing_memory(offs_t addrstart, offs_t addrend)
 	if (m_map == nullptr)
 		return nullptr;
 
-	// look in the address map first
+	// look in the address map first, last winning for overrides
+	void *result = nullptr;
 	for (address_map_entry &entry : m_map->m_entrylist)
 	{
 		if (entry.m_memory != nullptr && addrstart >= entry.m_addrstart && addrend <= entry.m_addrend)
 		{
 			VPRINTF(("found in entry %08X-%08X [%p]\n", entry.m_addrstart, entry.m_addrend, (u8 *)entry.m_memory + address_to_byte(addrstart - entry.m_addrstart)));
-			return (u8 *)entry.m_memory + address_to_byte(addrstart - entry.m_addrstart);
+			result = (u8 *)entry.m_memory + address_to_byte(addrstart - entry.m_addrstart);
 		}
 	}
+	if (result)
+		return result;
 
 	// if not found there, look in the allocated blocks
 	for (auto &block : m_manager.m_blocklist)

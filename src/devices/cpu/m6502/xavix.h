@@ -12,6 +12,9 @@
 
 #include "m6502.h"
 
+#define MCFG_XAVIX_VECTOR_CALLBACK(_class, _method) \
+	xavix_device::set_vector_callback(*device, xavix_device::xavix_interrupt_vector_delegate(&_class::_method, #_class "::" #_method, this));
+
 class xavix_device : public m6502_device {
 public:
 	xavix_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
@@ -25,6 +28,13 @@ public:
 	// xaviv opcodes
 	O(callf_xa3);
 	O(retf_imp);
+	O(brk_xav_imp);
+	O(rti_xav_imp);
+
+	typedef device_delegate<uint8_t (int which, int half)> xavix_interrupt_vector_delegate;
+
+	static void set_vector_callback(device_t &device, xavix_interrupt_vector_delegate &&cb) { downcast<xavix_device &>(device).m_vector_callback = std::move(cb); }
+
 
 #undef O
 
@@ -61,7 +71,10 @@ protected:
 
 	virtual void device_start() override;
 	virtual void device_reset() override;
-	virtual void state_export(const device_state_entry &entry) override;
+	virtual offs_t pc_to_external(u16 pc) override;
+
+private:
+	xavix_interrupt_vector_delegate m_vector_callback;
 
 };
 

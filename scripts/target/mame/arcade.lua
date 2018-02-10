@@ -3158,7 +3158,6 @@ files {
 }
 
 createMAMEProjects(_target, _subtarget, "sega")
-
 files {
 	MAME_DIR .. "src/mame/drivers/angelkds.cpp",
 	MAME_DIR .. "src/mame/includes/angelkds.h",
@@ -4413,7 +4412,6 @@ files {
 --------------------------------------------------
 
 createMAMEProjects(_target, _subtarget, "misc")
-
 files {
 	MAME_DIR .. "src/mame/drivers/39in1.cpp",
 	MAME_DIR .. "src/mame/machine/pxa255.h",

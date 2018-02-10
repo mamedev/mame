@@ -240,6 +240,8 @@ uint32_t model2_state::copro_fifoout_pop(address_space &space,uint32_t offset, u
 		m_maincpu->i960_stall();
 
 		/* spin the main cpu and let the TGP catch up */
+		// TODO: Daytona needs a much shorter spin time (like 25 usecs), but that breaks other games even moreso
+		// @seealso http://www.mameworld.info/ubbthreads/showflat.php?Cat=&Number=358069&page=&view=&sb=5&o=&vc=1
 		m_maincpu->spin_until_time(attotime::from_usec(100));
 
 		return 0;
@@ -493,15 +495,25 @@ static void chcolor(palette_device &palette, pen_t color, uint16_t data)
 	palette.set_pen_color(color, pal5bit(data >> 0), pal5bit(data >> 5), pal5bit(data >> 10));
 }
 
-WRITE16_MEMBER(model2_state::model2_palette_w)
+WRITE16_MEMBER(model2_state::palette_w)
 {
 	COMBINE_DATA(&m_palram[offset]);
 	chcolor(*m_palette, offset, m_palram[offset]);
 }
 
-READ16_MEMBER(model2_state::model2_palette_r)
+READ16_MEMBER(model2_state::palette_r)
 {
 	return m_palram[offset];
+}
+
+WRITE16_MEMBER(model2_state::colorxlat_w)
+{
+	COMBINE_DATA(&m_colorxlat[offset]);
+}
+
+READ16_MEMBER(model2_state::colorxlat_r)
+{
+	return m_colorxlat[offset];
 }
 
 WRITE32_MEMBER(model2_state::ctrl0_w)
@@ -1404,18 +1416,14 @@ WRITE32_MEMBER(model2_state::model2o_tex_w1)
 	}
 }
 
-WRITE32_MEMBER(model2_state::model2o_luma_w)
+READ16_MEMBER(model2_state::lumaram_r)
 {
-	if ( (offset & 1) == 0 )
-	{
-		m_lumaram[offset>>1] &= 0xffff0000;
-		m_lumaram[offset>>1] |= data & 0xffff;
-	}
-	else
-	{
-		m_lumaram[offset>>1] &= 0x0000ffff;
-		m_lumaram[offset>>1] |= (data & 0xffff) << 16;
-	}
+	return m_lumaram[offset];
+}
+
+WRITE16_MEMBER(model2_state::lumaram_w)
+{
+	COMBINE_DATA(&m_lumaram[offset]);
 }
 
 /* Top Skater reads here and discards the result */
@@ -1456,15 +1464,15 @@ static ADDRESS_MAP_START( model2_base_mem, AS_PROGRAM, 32, model2_state )
 
 	AM_RANGE(0x00f00000, 0x00f0000f) AM_READWRITE(timers_r, timers_w)
 
-	AM_RANGE(0x01000000, 0x0100ffff) AM_DEVREADWRITE("tile", segas24_tile_device, tile32_r, tile32_w) AM_MIRROR(0x110000)
+	AM_RANGE(0x01000000, 0x0100ffff) AM_DEVREADWRITE16("tile", segas24_tile_device, tile_r, tile_w,0xffffffff) AM_MIRROR(0x110000)
 	AM_RANGE(0x01020000, 0x01020003) AM_WRITENOP AM_MIRROR(0x100000)        // Unknown, always 0
 	AM_RANGE(0x01040000, 0x01040003) AM_WRITENOP AM_MIRROR(0x100000)        // Horizontal synchronization register
 	AM_RANGE(0x01060000, 0x01060003) AM_WRITENOP AM_MIRROR(0x100000)        // Vertical synchronization register
 	AM_RANGE(0x01070000, 0x01070003) AM_WRITENOP AM_MIRROR(0x100000)        // Video synchronization switch
-	AM_RANGE(0x01080000, 0x010fffff) AM_DEVREADWRITE("tile", segas24_tile_device, char32_r, char32_w) AM_MIRROR(0x100000)
+	AM_RANGE(0x01080000, 0x010fffff) AM_DEVREADWRITE16("tile", segas24_tile_device, char_r, char_w,0xffffffff) AM_MIRROR(0x100000)
 
-	AM_RANGE(0x01800000, 0x01803fff) AM_READWRITE16(model2_palette_r,model2_palette_w,0xffffffff)
-	AM_RANGE(0x01810000, 0x0181bfff) AM_RAM AM_SHARE("colorxlat")
+	AM_RANGE(0x01800000, 0x01803fff) AM_READWRITE16(palette_r,  palette_w,0xffffffff)
+	AM_RANGE(0x01810000, 0x0181bfff) AM_READWRITE16(colorxlat_r,colorxlat_w,0xffffffff)
 	AM_RANGE(0x0181c000, 0x0181c003) AM_WRITE(model2_3d_zclip_w)
 	AM_RANGE(0x01a10000, 0x01a13fff) AM_DEVREADWRITE8("m2comm", m2comm_device, share_r, share_w, 0xffffffff)
 	AM_RANGE(0x01a14000, 0x01a14003) AM_DEVREADWRITE8("m2comm", m2comm_device, cn_r, cn_w, 0x000000ff)
@@ -1481,6 +1489,8 @@ static ADDRESS_MAP_START( model2_base_mem, AS_PROGRAM, 32, model2_state )
 	// format is xGGGGGBBBBBRRRRR (512x400)
 	AM_RANGE(0x11600000, 0x1167ffff) AM_RAM AM_SHARE("fbvram1") // framebuffer A (last bronx title screen)
 	AM_RANGE(0x11680000, 0x116fffff) AM_RAM AM_SHARE("fbvram2") // framebuffer B
+	
+	AM_RANGE(0x12800000, 0x1281ffff) AM_READWRITE16(lumaram_r,lumaram_w,0x0000ffff) // polygon "luma" RAM
 ADDRESS_MAP_END
 
 READ8_MEMBER(model2_state::virtuacop_lightgun_r)
@@ -1553,7 +1563,6 @@ static ADDRESS_MAP_START( model2o_mem, AS_PROGRAM, 32, model2_state )
 
 	AM_RANGE(0x12000000, 0x121fffff) AM_RAM_WRITE(model2o_tex_w0) AM_MIRROR(0x200000) AM_SHARE("textureram0")   // texture RAM 0
 	AM_RANGE(0x12400000, 0x125fffff) AM_RAM_WRITE(model2o_tex_w1) AM_MIRROR(0x200000) AM_SHARE("textureram1")   // texture RAM 1
-	AM_RANGE(0x12800000, 0x1281ffff) AM_RAM_WRITE(model2o_luma_w) AM_SHARE("lumaram") // polygon "luma" RAM
 
 	AM_RANGE(0x01c00000, 0x01c0001f) AM_READ8(model2o_in_r, 0x00ff00ff)
 	AM_RANGE(0x01c00040, 0x01c00043) AM_READ(daytona_unk_r)
@@ -1589,7 +1598,6 @@ static ADDRESS_MAP_START( model2a_crx_mem, AS_PROGRAM, 32, model2_state )
 
 	AM_RANGE(0x12000000, 0x121fffff) AM_RAM_WRITE(model2o_tex_w0) AM_MIRROR(0x200000) AM_SHARE("textureram0")   // texture RAM 0
 	AM_RANGE(0x12400000, 0x125fffff) AM_RAM_WRITE(model2o_tex_w1) AM_MIRROR(0x200000) AM_SHARE("textureram1")   // texture RAM 1
-	AM_RANGE(0x12800000, 0x1281ffff) AM_RAM_WRITE(model2o_luma_w) AM_SHARE("lumaram") // polygon "luma" RAM
 
 	AM_RANGE(0x01c00000, 0x01c0001f) AM_READ8(model2_crx_in_r, 0x00ff00ff)
 	AM_RANGE(0x01c00000, 0x01c00003) AM_WRITE(ctrl0_w)
@@ -1626,8 +1634,8 @@ static ADDRESS_MAP_START( model2b_crx_mem, AS_PROGRAM, 32, model2_state )
 	AM_RANGE(0x11100000, 0x111fffff) AM_RAM AM_SHARE("textureram0") // texture RAM 0 (2b/2c)
 	AM_RANGE(0x11200000, 0x112fffff) AM_RAM AM_SHARE("textureram1") // texture RAM 1 (2b/2c)
 	AM_RANGE(0x11300000, 0x113fffff) AM_RAM AM_SHARE("textureram1") // texture RAM 1 (2b/2c)
-	AM_RANGE(0x11400000, 0x1140ffff) AM_RAM AM_SHARE("lumaram")     // polygon "luma" RAM (2b/2c)
-	AM_RANGE(0x12800000, 0x1281ffff) AM_RAM AM_SHARE("lumaram") // polygon "luma" RAM
+	AM_RANGE(0x11400000, 0x1140ffff) AM_READWRITE16(lumaram_r,lumaram_w,0xffffffff)    // polygon "luma" RAM (2b/2c)
+	AM_RANGE(0x12800000, 0x1281ffff) AM_READWRITE16(lumaram_r,lumaram_w,0x0000ffff) // polygon "luma" RAM
 
 	AM_RANGE(0x01c00000, 0x01c0001f) AM_READ8(model2_crx_in_r, 0x00ff00ff)
 	AM_RANGE(0x01c00000, 0x01c00003) AM_WRITE(ctrl0_w)
@@ -1655,8 +1663,9 @@ static ADDRESS_MAP_START( model2c_crx_mem, AS_PROGRAM, 32, model2_state )
 
 	AM_RANGE(0x11000000, 0x111fffff) AM_RAM AM_SHARE("textureram0") // texture RAM 0 (2b/2c)
 	AM_RANGE(0x11200000, 0x113fffff) AM_RAM AM_SHARE("textureram1") // texture RAM 1 (2b/2c)
-	AM_RANGE(0x11400000, 0x1140ffff) AM_RAM AM_SHARE("lumaram")     // polygon "luma" RAM (2b/2c)
-
+	AM_RANGE(0x11400000, 0x1140ffff) AM_READWRITE16(lumaram_r,lumaram_w,0xffffffff)    // polygon "luma" RAM (2b/2c)
+	AM_RANGE(0x12800000, 0x1281ffff) AM_READWRITE16(lumaram_r,lumaram_w,0x0000ffff) // polygon "luma" RAM
+	
 	AM_RANGE(0x01c00000, 0x01c0001f) AM_READ8(model2_crx_in_r, 0x00ff00ff)
 	AM_RANGE(0x01c00000, 0x01c00003) AM_WRITE(ctrl0_w)
 	AM_RANGE(0x01c00014, 0x01c00017) AM_WRITE(hotd_lightgun_w)
@@ -2130,6 +2139,32 @@ ADDRESS_MAP_END
 
 #define VIDEO_CLOCK         XTAL(32'000'000)
 
+MACHINE_CONFIG_START(model2_state::model2_timers)
+	MCFG_TIMER_DRIVER_ADD("timer0", model2_state, model2_timer_cb)
+	MCFG_TIMER_PTR((uintptr_t)0)
+	MCFG_TIMER_DRIVER_ADD("timer1", model2_state, model2_timer_cb)
+	MCFG_TIMER_PTR((uintptr_t)1)
+	MCFG_TIMER_DRIVER_ADD("timer2", model2_state, model2_timer_cb)
+	MCFG_TIMER_PTR((uintptr_t)2)
+	MCFG_TIMER_DRIVER_ADD("timer3", model2_state, model2_timer_cb)
+	MCFG_TIMER_PTR((uintptr_t)3)
+MACHINE_CONFIG_END
+
+MACHINE_CONFIG_START(model2_state::model2_screen)
+	MCFG_S24TILE_DEVICE_ADD("tile", 0x3fff)
+	MCFG_S24TILE_DEVICE_PALETTE("palette")
+
+	MCFG_SCREEN_ADD("screen", RASTER)
+	MCFG_SCREEN_VIDEO_ATTRIBUTES(VIDEO_UPDATE_AFTER_VBLANK)
+	// TODO: from System 24, might not be accurate for Model 2
+	MCFG_SCREEN_RAW_PARAMS(VIDEO_CLOCK/2, 656, 0/*+69*/, 496/*+69*/, 424, 0/*+25*/, 384/*+25*/)
+	MCFG_SCREEN_UPDATE_DRIVER(model2_state, screen_update_model2)
+	
+	MCFG_PALETTE_ADD("palette", 8192)
+	
+	MCFG_VIDEO_START_OVERRIDE(model2_state,model2)
+MACHINE_CONFIG_END
+
 /* original Model 2 */
 MACHINE_CONFIG_START(model2_state::model2o)
 	MCFG_CPU_ADD("maincpu", I960, 25000000)
@@ -2150,26 +2185,8 @@ MACHINE_CONFIG_START(model2_state::model2o)
 	MCFG_NVRAM_ADD_1FILL("backup1")
 	MCFG_NVRAM_ADD_1FILL("backup2")
 
-	MCFG_TIMER_DRIVER_ADD("timer0", model2_state, model2_timer_cb)
-	MCFG_TIMER_PTR((uintptr_t)0)
-	MCFG_TIMER_DRIVER_ADD("timer1", model2_state, model2_timer_cb)
-	MCFG_TIMER_PTR((uintptr_t)1)
-	MCFG_TIMER_DRIVER_ADD("timer2", model2_state, model2_timer_cb)
-	MCFG_TIMER_PTR((uintptr_t)2)
-	MCFG_TIMER_DRIVER_ADD("timer3", model2_state, model2_timer_cb)
-	MCFG_TIMER_PTR((uintptr_t)3)
-
-	MCFG_S24TILE_DEVICE_ADD("tile", 0x3fff)
-	MCFG_S24TILE_DEVICE_PALETTE("palette")
-
-	MCFG_SCREEN_ADD("screen", RASTER)
-	MCFG_SCREEN_VIDEO_ATTRIBUTES(VIDEO_UPDATE_AFTER_VBLANK)
-	MCFG_SCREEN_RAW_PARAMS(VIDEO_CLOCK/2, 656, 0/*+69*/, 496/*+69*/, 424, 0/*+25*/, 384/*+25*/) // TODO: from System 24, might not be accurate for Model 2
-	MCFG_SCREEN_UPDATE_DRIVER(model2_state, screen_update_model2)
-
-	MCFG_PALETTE_ADD("palette", 8192)
-
-	MCFG_VIDEO_START_OVERRIDE(model2_state,model2)
+	MCFG_FRAGMENT_ADD( model2_timers )
+	MCFG_FRAGMENT_ADD( model2_screen )
 
 	MCFG_SEGAM1AUDIO_ADD(M1AUDIO_TAG)
 	MCFG_SEGAM1AUDIO_RXD_HANDLER(DEVWRITELINE("uart", i8251_device, write_rxd))
@@ -2255,26 +2272,8 @@ MACHINE_CONFIG_START(model2_state::model2a)
 	MCFG_EEPROM_SERIAL_93C46_ADD("eeprom")
 	MCFG_NVRAM_ADD_1FILL("backup1")
 
-	MCFG_TIMER_DRIVER_ADD("timer0", model2_state, model2_timer_cb)
-	MCFG_TIMER_PTR((uintptr_t)0)
-	MCFG_TIMER_DRIVER_ADD("timer1", model2_state, model2_timer_cb)
-	MCFG_TIMER_PTR((uintptr_t)1)
-	MCFG_TIMER_DRIVER_ADD("timer2", model2_state, model2_timer_cb)
-	MCFG_TIMER_PTR((uintptr_t)2)
-	MCFG_TIMER_DRIVER_ADD("timer3", model2_state, model2_timer_cb)
-	MCFG_TIMER_PTR((uintptr_t)3)
-
-	MCFG_S24TILE_DEVICE_ADD("tile", 0x3fff)
-	MCFG_S24TILE_DEVICE_PALETTE("palette")
-
-	MCFG_SCREEN_ADD("screen", RASTER)
-	MCFG_SCREEN_VIDEO_ATTRIBUTES(VIDEO_UPDATE_AFTER_VBLANK )
-	MCFG_SCREEN_RAW_PARAMS(VIDEO_CLOCK/2, 656, 0/*+69*/, 496/*+69*/, 424, 0/*+25*/, 384/*+25*/) // TODO: from System 24, might not be accurate for Model 2
-	MCFG_SCREEN_UPDATE_DRIVER(model2_state, screen_update_model2)
-
-	MCFG_PALETTE_ADD("palette", 8192)
-
-	MCFG_VIDEO_START_OVERRIDE(model2_state,model2)
+	MCFG_FRAGMENT_ADD( model2_timers )
+	MCFG_FRAGMENT_ADD( model2_screen )
 
 	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
 
@@ -2350,26 +2349,8 @@ MACHINE_CONFIG_START(model2_state::model2b)
 	MCFG_EEPROM_SERIAL_93C46_ADD("eeprom")
 	MCFG_NVRAM_ADD_1FILL("backup1")
 
-	MCFG_TIMER_DRIVER_ADD("timer0", model2_state, model2_timer_cb)
-	MCFG_TIMER_PTR((uintptr_t)0)
-	MCFG_TIMER_DRIVER_ADD("timer1", model2_state, model2_timer_cb)
-	MCFG_TIMER_PTR((uintptr_t)1)
-	MCFG_TIMER_DRIVER_ADD("timer2", model2_state, model2_timer_cb)
-	MCFG_TIMER_PTR((uintptr_t)2)
-	MCFG_TIMER_DRIVER_ADD("timer3", model2_state, model2_timer_cb)
-	MCFG_TIMER_PTR((uintptr_t)3)
-
-	MCFG_S24TILE_DEVICE_ADD("tile", 0x3fff)
-	MCFG_S24TILE_DEVICE_PALETTE("palette")
-
-	MCFG_SCREEN_ADD("screen", RASTER)
-	MCFG_SCREEN_VIDEO_ATTRIBUTES(VIDEO_UPDATE_AFTER_VBLANK )
-	MCFG_SCREEN_RAW_PARAMS(VIDEO_CLOCK/2, 656, 0/*+69*/, 496/*+69*/, 424, 0/*+25*/, 384/*+25*/) // TODO: from System 24, might not be accurate for Model 2
-	MCFG_SCREEN_UPDATE_DRIVER(model2_state, screen_update_model2)
-
-	MCFG_PALETTE_ADD("palette", 8192)
-
-	MCFG_VIDEO_START_OVERRIDE(model2_state,model2)
+	MCFG_FRAGMENT_ADD( model2_timers )
+	MCFG_FRAGMENT_ADD( model2_screen )
 
 	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
 
@@ -2444,26 +2425,8 @@ MACHINE_CONFIG_START(model2_state::model2c)
 	MCFG_EEPROM_SERIAL_93C46_ADD("eeprom")
 	MCFG_NVRAM_ADD_1FILL("backup1")
 
-	MCFG_TIMER_DRIVER_ADD("timer0", model2_state, model2_timer_cb)
-	MCFG_TIMER_PTR((uintptr_t)0)
-	MCFG_TIMER_DRIVER_ADD("timer1", model2_state, model2_timer_cb)
-	MCFG_TIMER_PTR((uintptr_t)1)
-	MCFG_TIMER_DRIVER_ADD("timer2", model2_state, model2_timer_cb)
-	MCFG_TIMER_PTR((uintptr_t)2)
-	MCFG_TIMER_DRIVER_ADD("timer3", model2_state, model2_timer_cb)
-	MCFG_TIMER_PTR((uintptr_t)3)
-
-	MCFG_S24TILE_DEVICE_ADD("tile", 0x3fff)
-	MCFG_S24TILE_DEVICE_PALETTE("palette")
-
-	MCFG_SCREEN_ADD("screen", RASTER)
-	MCFG_SCREEN_VIDEO_ATTRIBUTES(VIDEO_UPDATE_AFTER_VBLANK )
-	MCFG_SCREEN_RAW_PARAMS(VIDEO_CLOCK/2, 656, 0/*+69*/, 496/*+69*/, 424, 0/*+25*/, 384/*+25*/) // TODO: from System 24, might not be accurate for Model 2
-	MCFG_SCREEN_UPDATE_DRIVER(model2_state, screen_update_model2)
-
-	MCFG_PALETTE_ADD("palette", 8192)
-
-	MCFG_VIDEO_START_OVERRIDE(model2_state,model2)
+	MCFG_FRAGMENT_ADD( model2_timers )
+	MCFG_FRAGMENT_ADD( model2_screen )
 
 	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
 

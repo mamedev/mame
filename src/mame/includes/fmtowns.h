@@ -282,6 +282,8 @@ class towns_state : public driver_device
 
 	DECLARE_READ8_MEMBER(towns_gfx_high_r);
 	DECLARE_WRITE8_MEMBER(towns_gfx_high_w);
+	DECLARE_READ8_MEMBER(towns_gfx_packed_r);
+	DECLARE_WRITE8_MEMBER(towns_gfx_packed_w);
 	DECLARE_READ8_MEMBER(towns_gfx_r);
 	DECLARE_WRITE8_MEMBER(towns_gfx_w);
 	DECLARE_READ8_MEMBER(towns_video_cff80_r);

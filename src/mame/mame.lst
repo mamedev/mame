@@ -2314,6 +2314,7 @@ c386sx16                        // 1990 Commodore 386SX-16
 pc30iii                         // Commodore PC 30-III
 pc40iii                         // Commodore PC 40-III
 mbc28                           // Sanyo MBC-28
+comportii                       // Compaq Portable II
 comportiii                      // Compaq Portable III
 pcd2                            // Siemens PCD-2
 ct386sx                         //
@@ -10624,6 +10625,7 @@ wizzard                         //
 @source:crystal.cpp
 crysbios                        //
 crysking                        // 2001 Brezzasoft. Crystal of the kings
+crzclass                        // 200? TJF
 crzyddz2                        // 2006 Sealy
 ddz                             // 200?
 donghaer                        //
@@ -11408,6 +11410,11 @@ dkongjrj                        // (c) 1982 Nintendo
 dkongjrpb                       // bootleg
 dkongo                          // (c) 1981 Nintendo
 dkongpe                         // hack Pauline Edition
+dkonghs                         // hack
+dkongike                        // hack
+dkongjrhs                       // hack
+dkongjrc                        // hack
+dkongddk                        // hack
 dkongx                          // hack
 dkongx11                        // hack
 drakton                         // (c) 1984 Epos Corporation
@@ -14679,9 +14686,9 @@ ctstein                         // Castle Toy
 einvaderc                       // Entex
 funjacks                        // Mattel
 funrlgl                         // Mattel
-h2hbaskb                        // Coleco
-h2hhockey                       // Coleco
-h2hsoccer                       // Coleco
+h2hbaskbc                       // Coleco
+h2hhockeyc                      // Coleco
+h2hsoccerc                      // Coleco
 lchicken                        // LJN
 lightfgt                        // Milton Bradley
 mdallas                         // Mattel
@@ -14841,6 +14848,7 @@ gpoker                          // Gakken
 h2hbaseb                        // Coleco
 h2hboxing                       // Coleco
 h2hfootb                        // Coleco
+h2hhockey                       // Coleco
 horseran                        // Mattel
 lostreas                        // Parker Bros
 matchnum                        // A-One LSI
@@ -15344,6 +15352,9 @@ instantm                        //
 
 @source:instruct.cpp
 instruct                        //
+
+@source:inteladv.cpp
+inteladv
 
 @source:intellec4.cpp
 intlc44                         //
@@ -17992,10 +18003,12 @@ avengers                        // 2/1987 (c) 1987 (US)
 avengers2                       // 2/1987 (c) 1987 (US)
 buraiken                        // 2/1987 (c) 1987 (Japan)
 buraikenb                       // 2/1987 (c) 1987 (Japan)
+fball                           //
 lwings                          // 11/1986 (c) 1986
 lwings2                         // 11/1986 (c) 1986
 lwingsb                         // 11/1986 (c) 1986 (bootleg)
 lwingsj                         // 11/1986 (c) 1986
+lwingsja                        // 11/1986 (c) 1986
 sectionz                        // 12/1985 (c) 1985
 sectionza                       // 12/1985 (c) 1985
 trojan                          // 4/1986 (c) 1986 (US)
@@ -18003,7 +18016,6 @@ trojana                         // 4/1986 (c) 1986 (US)
 trojanb                         // bootleg
 trojanj                         // 4/1986 (c) 1986 (Japan)
 trojanr                         // 4/1986 (c) 1986 + Romstar
-fball                        //
 
 @source:lwriter.cpp
 lwriter                         // Apple LaserWriter
@@ -20525,6 +20537,7 @@ rad_ssoc                        // (c)2004 Radica
 
 @source:megaphx.cpp
 megaphx                         // (c) 1991 Dinamic / Inder
+hamboy                          // (c) 1990 Dinamic / Inder
 
 @source:megaplay.cpp
 megaplay                        //
@@ -29799,8 +29812,20 @@ gprnrs16
 vgpocket
 vgpmini
 sy889
+sy888b
 dgun2573
 bittboy
+mc_89in1
+mc_cb280
+mc_pg150
+mc_hh210
+dvnimbus
+cbrs8
+mc_tv200
+fcpocket
+mog_m320
+fapocket
+zdog
 
 @source:newbrain.cpp
 newbrain                        //
@@ -30260,6 +30285,7 @@ paclandj                        // (c) 1984
 paclandjo                       // (c) 1984
 paclandjo2                      // (c) 1984
 paclandm                        // (c) 1984 Midway
+paclandm2                       // (c) 1984 Bally-Midway
 
 @source:pacman.cpp
 8bpm                            // (c) 1985 Seatongrove Ltd (Magic Eletronics USA license)
@@ -32449,6 +32475,7 @@ r9751                           // ROLM 9751 phone system
 
 @source:rabbit.cpp
 rabbit                          // (c) 1997 Electronic Arts
+rabbitjt                        // (c) 1996 Electronic Arts
 
 @source:rad_eu3a14.cpp
 rad_gtg
@@ -34668,6 +34695,9 @@ simpsons4pa                     // GX072 (c) 1991
 @source:sitcom.cpp
 sitcom                          //
 sitcomtmr                       //
+
+@source:sk1.cpp
+sk1                             //
 
 @source:skeetsht.cpp
 popshot                         // (c) 1991 (prototype)
@@ -38914,6 +38944,9 @@ xsleenaj                        // TA-0019 (c) 1986
 @source:xavix.cpp
 taitons1                        //
 xavtenni                        //
+rad_ping                        //
+rad_mtrk                        //
+rad_bb2                         //
 
 @source:xbox.cpp
 xbox                            //

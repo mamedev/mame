@@ -1329,6 +1329,9 @@ uint16_t ppu2c0x_device::get_vram_dest() {
 	return m_videomem_addr;
 }
 
+void ppu2c0x_device::set_vram_dest(uint16_t dest) {
+	m_videomem_addr = dest;
+}
 
 /*************************************
  *

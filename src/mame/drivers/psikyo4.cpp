@@ -326,9 +326,9 @@ static ADDRESS_MAP_START( ps4_map, AS_PROGRAM, 32, psikyo4_state )
 	AM_RANGE(0x02000000, 0x021fffff) AM_ROM AM_REGION("maincpu", 0x100000) // data ROM
 	AM_RANGE(0x03000000, 0x030037ff) AM_RAM AM_SHARE("spriteram")
 	AM_RANGE(0x03003fe0, 0x03003fe3) AM_READWRITE(ps4_eeprom_r,ps4_eeprom_w)
+	AM_RANGE(0x03003fe4, 0x03003fef) AM_RAM_WRITE(ps4_vidregs_w) AM_SHARE("vidregs") // vid regs?
 	AM_RANGE(0x03003fe4, 0x03003fe7) AM_READNOP // also writes to this address - might be vblank?
 //  AM_RANGE(0x03003fe4, 0x03003fe7) AM_WRITENOP // might be vblank?
-	AM_RANGE(0x03003fe4, 0x03003fef) AM_RAM_WRITE(ps4_vidregs_w) AM_SHARE("vidregs") // vid regs?
 	AM_RANGE(0x03003ff0, 0x03003ff3) AM_WRITE(ps4_screen1_brt_w) // screen 1 brightness
 	AM_RANGE(0x03003ff4, 0x03003ff7) AM_WRITE(ps4_bgpen_1_dword_w) AM_SHARE("bgpen_1") // screen 1 clear colour
 	AM_RANGE(0x03003ff8, 0x03003ffb) AM_WRITE(ps4_screen2_brt_w) // screen 2 brightness

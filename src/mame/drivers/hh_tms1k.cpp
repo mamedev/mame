@@ -70,7 +70,7 @@
  @MP3300   TMS1000   1979, Milton Bradley Simon (Rev F)
  @MP3301A  TMS1000   1979, Milton Bradley Big Trak
  *MP3320A  TMS1000   1980, Coleco Head to Head: Electronic Basketball
- *MP3321A  TMS1000   1980, Coleco Head to Head: Electronic Hockey
+ @MP3321A  TMS1000   1980, Coleco Head to Head: Electronic Hockey
  @M32001   TMS1000   1981, Coleco Quiz Wiz Challenger (note: MP3398, MP3399, M3200x?)
  *M32018   TMS1000   1990, unknown device (have decap/dump)
   M32045B  TMS1000   1983, Chrysler Electronic Voice Alert (11-function) -> eva.cpp
@@ -143,6 +143,7 @@
   - finish bshipb SN76477 sound
   - improve elecbowl driver
   - is alphie(patent) the same as the final version?
+  - h2hhockey R9 timing is wrong: passing seems too slow, and in-game clock too fast
 
 ***************************************************************************/
 
@@ -201,6 +202,7 @@
 #include "h2hbaseb.lh"
 #include "h2hboxing.lh"
 #include "h2hfootb.lh"
+#include "h2hhockey.lh"
 #include "horseran.lh"
 #include "lostreas.lh" // clickable
 #include "matchnum.lh" // clickable
@@ -1064,7 +1066,7 @@ MACHINE_CONFIG_END
 
 /***************************************************************************
 
-  Coleco Zodiac - The Astrology Computer
+  Coleco Zodiac - The Astrology Computer (model 2110)
   * TMS1100 MP3435 (no decap)
   * 8-digit 7seg display, 12 other LEDs, 1-bit sound
 
@@ -1242,7 +1244,7 @@ MACHINE_CONFIG_END
 
 /***************************************************************************
 
-  Coleco Electronic Quarterback
+  Coleco Electronic Quarterback (model 2120)
   * TMS1100NLL MP3415 (die label same)
   * 9-digit LED grid, 1-bit sound
 
@@ -1357,7 +1359,7 @@ MACHINE_CONFIG_END
 
 /***************************************************************************
 
-  Coleco Head to Head: Electronic Football
+  Coleco Head to Head: Electronic Football (model 2140)
   * TMS1100NLLE (rev. E!) MP3460 (die label same)
   * 2*SN75492N LED display drivers, 9-digit LED grid, 1-bit sound
 
@@ -1475,7 +1477,150 @@ MACHINE_CONFIG_END
 
 /***************************************************************************
 
-  Coleco Head to Head: Electronic Baseball
+  Coleco Head to Head: Electronic Hockey (model 2160)
+  * TMS1000NLL E MP3321A (die label 1000E MP3321A)
+  * 2-digit 7seg LED display, LED grid display, 1-bit sound
+
+  Unlike the COP420 version(see hh_cop400.cpp driver), each game has its own MCU.
+
+***************************************************************************/
+
+class h2hhockey_state : public hh_tms1k_state
+{
+public:
+	h2hhockey_state(const machine_config &mconfig, device_type type, const char *tag)
+		: hh_tms1k_state(mconfig, type, tag),
+		m_cap_empty_timer(*this, "cap_empty")
+	{ }
+
+	required_device<timer_device> m_cap_empty_timer;
+	TIMER_DEVICE_CALLBACK_MEMBER(cap_empty_callback);
+	bool m_cap;
+
+	void prepare_display();
+	DECLARE_WRITE16_MEMBER(write_r);
+	DECLARE_WRITE16_MEMBER(write_o);
+	DECLARE_READ8_MEMBER(read_k);
+	void h2hhockey(machine_config &config);
+
+protected:
+	virtual void machine_start() override;
+};
+
+// handlers
+
+TIMER_DEVICE_CALLBACK_MEMBER(h2hhockey_state::cap_empty_callback)
+{
+	if (~m_r & 0x200)
+		m_cap = false;
+}
+
+void h2hhockey_state::prepare_display()
+{
+	// R6,R7 are commons for R0-R5
+	u16 sel = 0;
+	if (m_r & 0x40) sel |= (m_r & 0x3f);
+	if (m_r & 0x80) sel |= (m_r & 0x3f) << 6;
+
+	set_display_segmask(0xc0, 0x7f);
+	display_matrix(7, 6+6, m_o, sel);
+}
+
+WRITE16_MEMBER(h2hhockey_state::write_r)
+{
+	// R0-R3: input mux
+	m_inp_mux = (data & 0xf);
+
+	// R8: speaker out
+	m_speaker->level_w(data >> 8 & 1);
+
+	// R9: K8 and 15uF cap to V- (used as timer)
+	if (data & 0x200)
+		m_cap = true;
+	else if (m_r & 0x200) // falling edge
+		m_cap_empty_timer->adjust(attotime::from_msec(28)); // not accurate
+
+	// R0-R7: led select
+	m_r = data;
+	prepare_display();
+}
+
+WRITE16_MEMBER(h2hhockey_state::write_o)
+{
+	// O1-O7: led data
+	m_o = data >> 1 & 0x7f;
+	prepare_display();
+}
+
+READ8_MEMBER(h2hhockey_state::read_k)
+{
+	// K1-K4: multiplexed inputs, K8: R9 and capacitor
+	return (read_inputs(4) & 7) | (m_cap ? 8 : 0);
+}
+
+// config
+
+static INPUT_PORTS_START( h2hhockey )
+	PORT_START("IN.0") // R0
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_JOYSTICK_RIGHT ) PORT_16WAY PORT_NAME("P1 Pass CW") // clockwise
+	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_JOYSTICK_LEFT ) PORT_16WAY PORT_NAME("P1 Pass CCW") // counter-clockwise
+	PORT_CONFNAME( 0x04, 0x00, DEF_STR( Players ) )
+	PORT_CONFSETTING(    0x00, "1" )
+	PORT_CONFSETTING(    0x04, "2" )
+
+	PORT_START("IN.1") // R1
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_BUTTON1 ) PORT_NAME("P1 Shoot")
+	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_START ) PORT_NAME("Start/Display")
+	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_UNUSED )
+
+	PORT_START("IN.2") // R2
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_JOYSTICK_RIGHT ) PORT_COCKTAIL PORT_16WAY PORT_NAME("P2 Defense Right")
+	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_JOYSTICK_LEFT ) PORT_COCKTAIL PORT_16WAY PORT_NAME("P2 Defense Left")
+	PORT_CONFNAME( 0x04, 0x00, DEF_STR( Difficulty ) )
+	PORT_CONFSETTING(    0x00, "1" )
+	PORT_CONFSETTING(    0x04, "2" )
+
+	PORT_START("IN.3") // R3
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_BUTTON2 ) PORT_COCKTAIL PORT_NAME("P2 Goalie Right")
+	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_BUTTON1 ) PORT_COCKTAIL PORT_NAME("P2 Goalie Left")
+	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_UNUSED )
+INPUT_PORTS_END
+
+void h2hhockey_state::machine_start()
+{
+	hh_tms1k_state::machine_start();
+
+	// zerofill/register for savestates
+	m_cap = false;
+	save_item(NAME(m_cap));
+}
+
+MACHINE_CONFIG_START(h2hhockey_state::h2hhockey)
+
+	/* basic machine hardware */
+	MCFG_CPU_ADD("maincpu", TMS1000, 375000) // approximation - RC osc. R=43K, C=100pF
+	MCFG_TMS1XXX_READ_K_CB(READ8(h2hhockey_state, read_k))
+	MCFG_TMS1XXX_WRITE_R_CB(WRITE16(h2hhockey_state, write_r))
+	MCFG_TMS1XXX_WRITE_O_CB(WRITE16(h2hhockey_state, write_o))
+
+	MCFG_TIMER_DRIVER_ADD("cap_empty", h2hhockey_state, cap_empty_callback)
+
+	MCFG_TIMER_DRIVER_ADD_PERIODIC("display_decay", hh_tms1k_state, display_decay_tick, attotime::from_msec(1))
+	MCFG_DEFAULT_LAYOUT(layout_h2hhockey)
+
+	/* sound hardware */
+	MCFG_SPEAKER_STANDARD_MONO("mono")
+	MCFG_SOUND_ADD("speaker", SPEAKER_SOUND, 0)
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
+MACHINE_CONFIG_END
+
+
+
+
+
+/***************************************************************************
+
+  Coleco Head to Head: Electronic Baseball (model 2180)
   * PCB labels Coleco rev C 73891/2
   * TMS1170NLN MP1525-N2 (die label MP1525)
   * 9-digit cyan VFD display, and other LEDs behind bezel, 1-bit sound
@@ -1614,7 +1759,7 @@ MACHINE_CONFIG_END
 
 /***************************************************************************
 
-  Coleco Head to Head: Electronic Boxing
+  Coleco Head to Head: Electronic Boxing (model 2190)
   * TMS1100NLL M34018-N2 (die label M34018)
   * 2-digit 7seg LED display, LED grid display, 1-bit sound
 
@@ -8643,6 +8788,7 @@ WRITE16_MEMBER(ss7in1_state::write_o)
 
 READ8_MEMBER(ss7in1_state::read_k)
 {
+	// K: multiplexed inputs
 	return read_inputs(4);
 }
 
@@ -9421,6 +9567,17 @@ ROM_START( h2hfootb )
 ROM_END
 
 
+ROM_START( h2hhockey )
+	ROM_REGION( 0x0400, "maincpu", 0 )
+	ROM_LOAD( "mp3321a", 0x0000, 0x0400, CRC(e974e604) SHA1(ed740c98ce96ad70ee5237eccae1f54a75ad8100) )
+
+	ROM_REGION( 867, "maincpu:mpla", 0 )
+	ROM_LOAD( "tms1000_common1_micro.pla", 0, 867, CRC(4becec19) SHA1(3c8a9be0f00c88c81f378b76886c39b10304f330) )
+	ROM_REGION( 365, "maincpu:opla", 0 )
+	ROM_LOAD( "tms1000_h2hhockey_output.pla", 0, 365, CRC(9d1a91e1) SHA1(96303eb22375129b0dfbfcd823c8ca5b919511bc) )
+ROM_END
+
+
 ROM_START( h2hbaseb )
 	ROM_REGION( 0x0800, "maincpu", 0 )
 	ROM_LOAD( "mp1525", 0x0000, 0x0800, CRC(b5d6bf9b) SHA1(2cc9f35f077c1209c46d16ec853af87e4725c2fd) )
@@ -10164,6 +10321,7 @@ CONS( 1978, amaztron,   0,         0, amaztron,  amaztron,  amaztron_state,  0, 
 COMP( 1979, zodiac,     0,         0, zodiac,    zodiac,    zodiac_state,    0, "Coleco", "Zodiac - The Astrology Computer", MACHINE_SUPPORTS_SAVE )
 CONS( 1978, cqback,     0,         0, cqback,    cqback,    cqback_state,    0, "Coleco", "Electronic Quarterback", MACHINE_SUPPORTS_SAVE )
 CONS( 1980, h2hfootb,   0,         0, h2hfootb,  h2hfootb,  h2hfootb_state,  0, "Coleco", "Head to Head: Electronic Football", MACHINE_SUPPORTS_SAVE )
+CONS( 1980, h2hhockey,  0,         0, h2hhockey, h2hhockey, h2hhockey_state, 0, "Coleco", "Head to Head: Electronic Hockey (TMS1000 version)", MACHINE_SUPPORTS_SAVE )
 CONS( 1980, h2hbaseb,   0,         0, h2hbaseb,  h2hbaseb,  h2hbaseb_state,  0, "Coleco", "Head to Head: Electronic Baseball", MACHINE_SUPPORTS_SAVE )
 CONS( 1981, h2hboxing,  0,         0, h2hboxing, h2hboxing, h2hboxing_state, 0, "Coleco", "Head to Head: Electronic Boxing", MACHINE_SUPPORTS_SAVE )
 CONS( 1981, quizwizc,   0,         0, quizwizc,  quizwizc,  quizwizc_state,  0, "Coleco", "Quiz Wiz Challenger", MACHINE_SUPPORTS_SAVE ) // ***

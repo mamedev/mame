@@ -790,7 +790,9 @@ void model2_renderer::model2_3d_render(triangle *tri, const rectangle &cliprect)
 	renderer = (tri->texheader[0] >> 13) & 7;
 
 	/* calculate and clip to viewport */
-	rectangle vp(tri->viewport[0] - 8, tri->viewport[2] - 8, (384-tri->viewport[3])+90, (384-tri->viewport[1])+90);
+	// TODO: correct? seems to be right for all cases
+	//rectangle vp(tri->viewport[0] - 8, tri->viewport[2] - 8, (384-tri->viewport[3])+90, (384-tri->viewport[1])+90);
+	rectangle vp(tri->viewport[0] - 8, tri->viewport[2] - tri->viewport[0], tri->viewport[1] - 127, tri->viewport[3] - tri->viewport[1]);
 	vp &= cliprect;
 
 	extra.state = &m_state;
@@ -882,9 +884,9 @@ static void model2_3d_project( triangle *tri )
 }
 
 /* 3D Rasterizer frame start: Resets frame variables */
-static void model2_3d_frame_start( model2_state *state )
+void model2_state::model2_3d_frame_start( void )
 {
-	raster_state *raster = state->m_raster;
+	raster_state *raster = m_raster;
 
 	/* reset the triangle list index */
 	raster->tri_list_index = 0;
@@ -2548,13 +2550,13 @@ static uint32_t * geo_process_command( geo_state *geo, uint32_t opcode, uint32_t
 	return input;
 }
 
-static void geo_parse( model2_state *state )
+void model2_state::geo_parse( void )
 {
-	uint32_t  address = (state->m_geo_read_start_address/4);
-	uint32_t *input = &state->m_bufferram[address];
+	uint32_t  address = (m_geo_read_start_address & 0x7ffff)/4;
+	uint32_t *input = &m_bufferram[address];
 	uint32_t  opcode;
 
-	while( input != nullptr && (input - state->m_bufferram) < 0x20000  )
+	while( input != nullptr && (input - m_bufferram) < 0x20000  )
 	{
 		/* read in the opcode */
 		opcode = *input++;
@@ -2566,14 +2568,14 @@ static void geo_parse( model2_state *state )
 			address = (opcode & 0x7FFFF) / 4;
 
 			/* update our pointer */
-			input = &state->m_bufferram[address];
+			input = &m_bufferram[address];
 
 			/* go again */
 			continue;
 		}
 
 		/* process it */
-		input = geo_process_command( state->m_geo, opcode, input );
+		input = geo_process_command( m_geo, opcode, input );
 	}
 }
 
@@ -2597,40 +2599,41 @@ VIDEO_START_MEMBER(model2_state,model2)
 	geo_init( (uint32_t*)memregion("user2")->base() );
 
 	/* init various video-related pointers */
-	m_palram = make_unique_clear<uint16_t[]>(0x2000);
+	m_palram = make_unique_clear<uint16_t[]>(0x4000/2);
+	m_colorxlat = make_unique_clear<uint16_t[]>(0xc000/2);
+	m_lumaram = make_unique_clear<uint16_t[]>(0x10000/2);
 }
 
 uint32_t model2_state::screen_update_model2(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
 {
 	//logerror("--- frame ---\n");
-
+	int layer;
+	
 	bitmap.fill(m_palette->pen(0), cliprect);
 	m_sys24_bitmap.fill(0, cliprect);
 
 	segas24_tile_device *tile = machine().device<segas24_tile_device>("tile");
-	tile->draw(screen, m_sys24_bitmap, cliprect, 7, 0, 0);
-	tile->draw(screen, m_sys24_bitmap, cliprect, 6, 0, 0);
-	tile->draw(screen, m_sys24_bitmap, cliprect, 5, 0, 0);
-	tile->draw(screen, m_sys24_bitmap, cliprect, 4, 0, 0);
+
+	for(layer=3;layer>=0;layer--)
+		tile->draw(screen, m_sys24_bitmap, cliprect, layer<<1, 0, 0);
 
 	copybitmap_trans(bitmap, m_sys24_bitmap, 0, 0, 0, 0, cliprect, 0);
 
 	/* tell the rasterizer we're starting a frame */
-	model2_3d_frame_start(this);
+	model2_3d_frame_start();
 
 	/* let the geometry engine do it's thing */ /* TODO: don't do it here! */
-	geo_parse(this);
+	geo_parse();
 
 	/* have the rasterizer output the frame */
 	model2_3d_frame_end( bitmap, cliprect );
 
 	m_sys24_bitmap.fill(0, cliprect);
-	tile->draw(screen, m_sys24_bitmap, cliprect, 3, 0, 0);
-	tile->draw(screen, m_sys24_bitmap, cliprect, 2, 0, 0);
-	tile->draw(screen, m_sys24_bitmap, cliprect, 1, 0, 0);
-	tile->draw(screen, m_sys24_bitmap, cliprect, 0, 0, 0);
+
+	for(layer=3;layer>=0;layer--)
+		tile->draw(screen, m_sys24_bitmap, cliprect, (layer<<1) | 1, 0, 0);
 
 	copybitmap_trans(bitmap, m_sys24_bitmap, 0, 0, 0, 0, cliprect, 0);
-
+	
 	return 0;
 }
