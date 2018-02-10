@@ -38,6 +38,7 @@
 #include "machine/keyboard.h"
 #include "video/upd3301.h"
 #include "machine/i8257.h"
+#include "machine/am9519.h"
 #include "screen.h"
 
 #define Z80_TAG         "z80"
@@ -108,7 +109,10 @@ static ADDRESS_MAP_START(olyboss_io, AS_IO, 8, olyboss_state)
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	ADDRESS_MAP_UNMAP_HIGH
 	AM_RANGE(0x0, 0x8) AM_DEVREADWRITE(I8257_TAG, i8257_device, read, write)
-	AM_RANGE(0x9, 0x7f) AM_READWRITE(port_read,port_write)
+	AM_RANGE(0x9, 0x2f) AM_READWRITE(port_read,port_write)
+	AM_RANGE(0x30, 0x30) AM_DEVREADWRITE("uic", am9519_device, data_r, data_w)
+	AM_RANGE(0x31, 0x31) AM_DEVREADWRITE("uic", am9519_device, stat_r, cmd_w)
+	AM_RANGE(0x32, 0x7f) AM_READWRITE(port_read,port_write)
 	AM_RANGE(0x80, 0x81) AM_DEVREADWRITE(UPD3301_TAG, upd3301_device, read, write)
 	AM_RANGE(0x82, 0xff) AM_READWRITE(port_read,port_write)
 ADDRESS_MAP_END
@@ -285,6 +289,7 @@ MACHINE_CONFIG_START( olyboss_state::olybossd )
 	MCFG_CPU_ADD(Z80_TAG, Z80, 4_MHz_XTAL)
 	MCFG_CPU_PROGRAM_MAP(olyboss_mem)
 	MCFG_CPU_IO_MAP(olyboss_io)
+	MCFG_CPU_IRQ_ACKNOWLEDGE_DEVICE("uic", am9519_device, iack_cb)
 
 	/* video hardware */
 
@@ -295,6 +300,9 @@ MACHINE_CONFIG_START( olyboss_state::olybossd )
 	MCFG_SCREEN_VISIBLE_AREA(0, (80*8)-1, 0, (28*11)-1)
 
 	/* devices */
+
+	MCFG_DEVICE_ADD("uic", AM9519, 0)
+	MCFG_AM9519_OUT_INT_CB(INPUTLINE(Z80_TAG, 0))
 
 	MCFG_DEVICE_ADD(I8257_TAG, I8257, XTAL(4'000'000))
 	MCFG_I8257_OUT_HRQ_CB(WRITELINE(olyboss_state, hrq_w))
