@@ -56,57 +56,6 @@ WRITE16_MEMBER(inder_sb_device::megaphx_0x050000_w)
 
 }
 
-void inder_sb_device::update_sound_irqs(void)
-{
-	if (m_soundirq) m_audiocpu->set_input_line(INPUT_LINE_IRQ0, ASSERT_LINE);
-	else m_audiocpu->set_input_line(INPUT_LINE_IRQ0, CLEAR_LINE);
-}
-
-WRITE_LINE_MEMBER(inder_sb_device::z80ctc_ch0)
-{
-//  int bank = m_soundbank[0] & 7;  membank("snddata")->set_entry(bank);
-//  m_audiocpu->set_input_line(INPUT_LINE_IRQ0, state ? ASSERT_LINE : CLEAR_LINE);
-	if (state) m_soundirq |= 0x1;
-	else m_soundirq &= ~0x1;
-
-	update_sound_irqs();
-}
-
-
-WRITE_LINE_MEMBER(inder_sb_device::z80ctc_ch1)
-{
-//  int bank = m_soundbank[1] & 7;  membank("snddata")->set_entry(bank);
-//  m_audiocpu->set_input_line(INPUT_LINE_IRQ0, state ? ASSERT_LINE : CLEAR_LINE);
-	if (state) m_soundirq |= 0x2;
-	else m_soundirq &= ~0x2;
-
-	update_sound_irqs();
-}
-
-
-WRITE_LINE_MEMBER(inder_sb_device::z80ctc_ch2)
-{
-//  int bank = m_soundbank[2] & 7;  membank("snddata")->set_entry(bank);
-//  m_audiocpu->set_input_line(INPUT_LINE_IRQ0, state ? ASSERT_LINE : CLEAR_LINE);
-	if (state) m_soundirq |= 0x4;
-	else m_soundirq &= ~0x4;
-
-	update_sound_irqs();
-}
-
-
-
-
-WRITE_LINE_MEMBER(inder_sb_device::z80ctc_ch3)
-{
-//  int bank = m_soundbank[3] & 7;  membank("snddata")->set_entry(bank);
-//  m_audiocpu->set_input_line(INPUT_LINE_IRQ0, state ? ASSERT_LINE : CLEAR_LINE);
-	if (state) m_soundirq |= 0x8;
-	else m_soundirq &= ~0x8;
-
-	update_sound_irqs();
-}
-
 
 
 
@@ -210,11 +159,7 @@ MACHINE_CONFIG_START(inder_sb_device::device_add_mconfig)
 
 	MCFG_DEVICE_ADD("ctc", Z80CTC, 4000000) // unk freq
 	// runs in IM2 , vector set to 0x20 , values there are 0xCC, 0x02, 0xE6, 0x02, 0x09, 0x03, 0x23, 0x03  (so 02cc, 02e6, 0309, 0323, all of which are valid irq handlers)
-	MCFG_Z80CTC_INTR_CB(WRITELINE(inder_sb_device, z80ctc_ch0))
-	MCFG_Z80CTC_ZC0_CB(WRITELINE(inder_sb_device, z80ctc_ch1))
-	MCFG_Z80CTC_ZC1_CB(WRITELINE(inder_sb_device, z80ctc_ch2))
-	MCFG_Z80CTC_ZC2_CB(WRITELINE(inder_sb_device, z80ctc_ch3))
-	// was this correct?!?
+	MCFG_Z80CTC_INTR_CB(INPUTLINE("audiocpu", 0))
 
 	MCFG_SPEAKER_STANDARD_MONO("speaker")
 	MCFG_SOUND_ADD("dac0", DAC_8BIT_R2R_TWOS_COMPLEMENT, 0) MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 0.5) // unknown DAC
@@ -237,9 +182,13 @@ void inder_sb_device::device_start()
 {
 	m_sounddata_bank->configure_entries(0, 8, memregion("user2")->base(), 0x8000);
 	m_sounddata_bank->set_entry(0);
+
+	save_item(NAME(m_soundbank));
+	save_item(NAME(m_soundsent));
+	save_item(NAME(m_sounddata));
+	save_item(NAME(m_soundback));
 }
 
 void inder_sb_device::device_reset()
 {
-	m_soundirq = 0;
 }

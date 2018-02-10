@@ -42,8 +42,6 @@ public:
 	DECLARE_READ16_MEMBER(megaphx_0x050002_r);
 	DECLARE_WRITE16_MEMBER(megaphx_0x050000_w);
 
-	void update_sound_irqs(void);
-
 protected:
 	virtual void device_add_mconfig(machine_config &config) override;
 	virtual void device_start() override;
@@ -60,13 +58,6 @@ private:
 	int m_soundsent;
 	uint8_t m_sounddata;
 	uint8_t m_soundback;
-
-	int m_soundirq;
-
-	DECLARE_WRITE_LINE_MEMBER(z80ctc_ch0);
-	DECLARE_WRITE_LINE_MEMBER(z80ctc_ch1);
-	DECLARE_WRITE_LINE_MEMBER(z80ctc_ch2);
-	DECLARE_WRITE_LINE_MEMBER(z80ctc_ch3);
 };
 
 #endif // MAME_MACHINE_INDER_SB_H
