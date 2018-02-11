@@ -33,6 +33,7 @@ public:
 		, m_screen(*this, "screen")
 		, m_vtac(*this, "vtac")
 		, m_brg(*this, "brg%u", 1)
+		, m_usart(*this, "usart%u", 1)
 		, m_earom(*this, "earom")
 		, m_picu(*this, "picu")
 		, m_p_chargen(*this, "chargen")
@@ -61,6 +62,7 @@ private:
 	required_device<screen_device> m_screen;
 	required_device<crt5037_device> m_vtac;
 	required_device_array<com8116_device, 2> m_brg;
+	required_device_array<i8251_device, 2> m_usart;
 	required_device<er1400_device> m_earom;
 	required_device<i8214_device> m_picu;
 	required_region_ptr<u8> m_p_chargen;
@@ -155,6 +157,9 @@ void v100_state::machine_start()
 {
 	m_picu->inte_w(1);
 	m_picu->etlg_w(1);
+
+	m_usart[0]->write_cts(0);
+	m_usart[1]->write_cts(0);
 
 	m_active_row = 0;
 	save_item(NAME(m_active_row));
