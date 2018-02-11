@@ -345,9 +345,6 @@ cococart_slot_device &coco_multipak_device::active_cts_slot()
 
 void coco_multipak_device::set_select(uint8_t new_select)
 {
-
-	logerror("setselect to %2.2x\n", new_select);
-
 	// identify old value for CART, in case this needs to change
 	cococart_slot_device::line_value old_cart = active_cts_slot().get_line_value(line::CART);
 
@@ -372,7 +369,7 @@ void coco_multipak_device::set_select(uint8_t new_select)
 
 READ8_MEMBER(coco_multipak_device::ff7f_read)
 {
-	return m_select & 0xcc;
+	return m_select | 0xcc;
 }
 
 //-------------------------------------------------
