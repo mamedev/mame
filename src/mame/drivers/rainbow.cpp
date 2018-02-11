@@ -534,7 +534,7 @@ public:
 	}
 
 	DECLARE_READ8_MEMBER(read_video_ram_r);
-	DECLARE_WRITE_LINE_MEMBER(clear_video_interrupt);
+	DECLARE_WRITE_LINE_MEMBER(video_interrupt);
 
 	DECLARE_READ8_MEMBER(diagnostic_r);
 	DECLARE_WRITE8_MEMBER(diagnostic_w);
@@ -609,7 +609,6 @@ public:
 	DECLARE_READ8_MEMBER(GDC_EXTRA_REGISTER_r);
 
 	uint32_t screen_update_rainbow(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
-	INTERRUPT_GEN_MEMBER(vblank_irq);
 	IRQ_CALLBACK_MEMBER(irq_callback);
 
 	DECLARE_WRITE_LINE_MEMBER(write_keyboard_clock);
@@ -2626,12 +2625,14 @@ WRITE_LINE_MEMBER(rainbow_state::GDC_vblank_irq)
 } // 7220 vblank IRQ
 
 
-INTERRUPT_GEN_MEMBER(rainbow_state::vblank_irq)
+WRITE_LINE_MEMBER(rainbow_state::video_interrupt)
 {
-	raise_8088_irq(IRQ_8088_VBL);
-	m_crtc->notify_vblank(true);
+	if (state == ASSERT_LINE)
+		raise_8088_irq(IRQ_8088_VBL);
+	else
+		lower_8088_irq(IRQ_8088_VBL);
 
-	if (m_POWER_GOOD && m_crtc->MHFU(MHFU_IS_ENABLED)) // If enabled...
+	if (state == ASSERT_LINE && m_POWER_GOOD && m_crtc->MHFU(MHFU_IS_ENABLED)) // If enabled...
 	{
 		if (m_crtc->MHFU(MHFU_VALUE) > 10) // + more than (10 * 16.666) msecs gone (108 ms would be by the book)
 		{
@@ -2642,12 +2643,6 @@ INTERRUPT_GEN_MEMBER(rainbow_state::vblank_irq)
 				cmd_timer->adjust(attotime::from_msec(RESET_DURATION_MS));
 		}
 	}
-}
-
-WRITE_LINE_MEMBER(rainbow_state::clear_video_interrupt)
-{
-	lower_8088_irq(IRQ_8088_VBL);
-	m_crtc->notify_vblank(false);
 }
 
 // Reflects bits from 'diagnostic_w' (1:1), except test jumpers
@@ -3194,7 +3189,6 @@ MCFG_CPU_IO_MAP(rainbow8088_io)
 MCFG_CPU_ADD("subcpu", Z80, XTAL(24'073'400) / 6)
 MCFG_CPU_PROGRAM_MAP(rainbowz80_mem)
 MCFG_CPU_IO_MAP(rainbowz80_io)
-MCFG_CPU_VBLANK_INT_DRIVER("screen", rainbow_state, vblank_irq)
 
 /* video hardware */
 MCFG_SCREEN_ADD("screen", RASTER)
@@ -3209,7 +3203,7 @@ MCFG_DEVICE_ADD("vt100_video", RAINBOW_VIDEO, XTAL(24'073'400))
 MCFG_VT_SET_SCREEN("screen")
 MCFG_VT_CHARGEN("chargen")
 MCFG_VT_VIDEO_RAM_CALLBACK(READ8(rainbow_state, read_video_ram_r))
-MCFG_VT_VIDEO_CLEAR_VIDEO_INTERRUPT_CALLBACK(WRITELINE(rainbow_state, clear_video_interrupt))
+MCFG_VT_VIDEO_VERT_FREQ_INTR_CALLBACK(WRITELINE(rainbow_state, video_interrupt))
 
 // *************************** COLOR GRAPHICS (OPTION) **************************************
 // While the OSC frequency is confirmed, the divider is not (refresh rate is ~60 Hz with 32).

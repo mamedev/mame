@@ -64,7 +64,7 @@ public:
 	DECLARE_WRITE8_MEMBER(vt100_baud_rate_w);
 	DECLARE_WRITE8_MEMBER(vt100_nvr_latch_w);
 	DECLARE_READ8_MEMBER(vt100_read_video_ram_r);
-	DECLARE_WRITE_LINE_MEMBER(vt100_clear_video_interrupt);
+	DECLARE_WRITE_LINE_MEMBER(vert_freq_intr_w);
 	required_shared_ptr<uint8_t> m_p_ram;
 	bool m_keyboard_int;
 	bool m_receiver_int;
@@ -72,7 +72,6 @@ public:
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
 	uint32_t screen_update_vt100(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
-	INTERRUPT_GEN_MEMBER(vt100_vertical_interrupt);
 	IRQ_CALLBACK_MEMBER(vt100_irq_callback);
 	void vt102(machine_config &config);
 	void vt100(machine_config &config);
@@ -233,15 +232,11 @@ READ8_MEMBER( vt100_state::vt100_read_video_ram_r )
 	return m_p_ram[offset];
 }
 
-WRITE_LINE_MEMBER( vt100_state::vt100_clear_video_interrupt )
+WRITE_LINE_MEMBER( vt100_state::vert_freq_intr_w )
 {
-	m_vertical_int = 0;
-}
-
-INTERRUPT_GEN_MEMBER(vt100_state::vt100_vertical_interrupt)
-{
-	m_vertical_int = 1;
-	device.execute().set_input_line(0, HOLD_LINE);
+	m_vertical_int = (state == ASSERT_LINE) ? 1 : 0;
+	if (state)
+		m_maincpu->set_input_line(0, HOLD_LINE);
 }
 
 /* F4 Character Displayer */
@@ -267,7 +262,6 @@ MACHINE_CONFIG_START(vt100_state::vt100)
 	MCFG_CPU_ADD("maincpu",I8080, XTAL(24'883'200) / 9)
 	MCFG_CPU_PROGRAM_MAP(vt100_mem)
 	MCFG_CPU_IO_MAP(vt100_io)
-	MCFG_CPU_VBLANK_INT_DRIVER("screen", vt100_state,  vt100_vertical_interrupt)
 	MCFG_CPU_IRQ_ACKNOWLEDGE_DRIVER(vt100_state,vt100_irq_callback)
 
 	/* video hardware */
@@ -286,7 +280,7 @@ MACHINE_CONFIG_START(vt100_state::vt100)
 	MCFG_VT_SET_SCREEN("screen")
 	MCFG_VT_CHARGEN("chargen")
 	MCFG_VT_VIDEO_RAM_CALLBACK(READ8(vt100_state, vt100_read_video_ram_r))
-	MCFG_VT_VIDEO_CLEAR_VIDEO_INTERRUPT_CALLBACK(WRITELINE(vt100_state, vt100_clear_video_interrupt))
+	MCFG_VT_VIDEO_VERT_FREQ_INTR_CALLBACK(WRITELINE(vt100_state, vert_freq_intr_w))
 	MCFG_VT_VIDEO_LBA7_CALLBACK(DEVWRITELINE("nvr", er1400_device, clock_w))
 
 	MCFG_DEVICE_ADD("i8251", I8251, 0) // 2.7648Mhz phi-clock (not used for tx clock or rx clock?)
@@ -318,7 +312,6 @@ MACHINE_CONFIG_DERIVED(vt100_state::vt102, vt100)
 	MCFG_CPU_REPLACE("maincpu", I8085A, XTAL(24'073'400) / 4)
 	MCFG_CPU_PROGRAM_MAP(vt100_mem)
 	MCFG_CPU_IO_MAP(vt100_io)
-	MCFG_CPU_VBLANK_INT_DRIVER("screen", vt100_state,  vt100_vertical_interrupt)
 	MCFG_CPU_IRQ_ACKNOWLEDGE_DRIVER(vt100_state,vt100_irq_callback)
 MACHINE_CONFIG_END
 
