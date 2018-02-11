@@ -48,12 +48,20 @@ public:
 	DECLARE_READ8_MEMBER(read_5846);
 	DECLARE_READ8_MEMBER(read_5847);
 
+	DECLARE_READ8_MEMBER(page_r);
+	DECLARE_WRITE8_MEMBER(page_w);
+
 	DECLARE_WRITE_LINE_MEMBER(vsyn_w);
 	DECLARE_WRITE8_MEMBER(uart_status_update);
 
 	void ampex(machine_config &config);
 private:
 	virtual void machine_start() override;
+
+	u8 m_page;
+	u8 m_attr;
+	bool m_attr_readback;
+	std::unique_ptr<u16[]> m_paged_ram;
 
 	required_device<cpu_device> m_maincpu;
 	required_device<ay31015_device> m_uart;
@@ -73,18 +81,26 @@ READ8_MEMBER(ampex_state::read_5840)
 
 WRITE8_MEMBER(ampex_state::write_5840)
 {
+	m_page = (data & 0x30) >> 4;
+
 	logerror("%s: Write %02X to 5840\n", machine().describe_context(), data);
 }
 
 READ8_MEMBER(ampex_state::read_5841)
 {
 	logerror("%s: Read from 5841\n", machine().describe_context());
-	return m_uart->get_output_pin(AY31015_DAV) << 3;
+	u8 result = m_uart->get_output_pin(AY31015_DAV) << 3;
+	result |= m_uart->get_output_pin(AY31015_OR) << 4;
+	result |= m_uart->get_output_pin(AY31015_PE) << 5;
+	result |= m_uart->get_output_pin(AY31015_FE) << 6;
+	return result;
 }
 
 WRITE8_MEMBER(ampex_state::write_5841)
 {
-	//logerror("%s: Write %02X to 5841\n", machine().describe_context(), data);
+	// bit 7 set for UART loopback test
+
+	m_attr_readback = BIT(data, 5);
 }
 
 READ8_MEMBER(ampex_state::read_5842)
@@ -109,6 +125,7 @@ READ8_MEMBER(ampex_state::read_5843)
 WRITE8_MEMBER(ampex_state::write_5843)
 {
 	logerror("%s: Write %02X to 5843\n", machine().describe_context(), data);
+	m_attr = (data & 0x78) >> 3;
 }
 
 READ8_MEMBER(ampex_state::read_5846)
@@ -121,6 +138,19 @@ READ8_MEMBER(ampex_state::read_5847)
 {
 	// acknowledges RST 4/5 interrupt (value not used)
 	return 0;
+}
+
+READ8_MEMBER(ampex_state::page_r)
+{
+	if (m_attr_readback)
+		return 0x87 | m_paged_ram[m_page * 0x1800 + offset] >> 5;
+	else
+		return 0xff & m_paged_ram[m_page * 0x1800 + offset];
+}
+
+WRITE8_MEMBER(ampex_state::page_w)
+{
+	m_paged_ram[m_page * 0x1800 + offset] = data | m_attr << 8;
 }
 
 WRITE_LINE_MEMBER(ampex_state::vsyn_w)
@@ -144,7 +174,7 @@ static ADDRESS_MAP_START( mem_map, AS_PROGRAM, 8, ampex_state )
 	AM_RANGE(0x5846, 0x5846) AM_READ(read_5846)
 	AM_RANGE(0x5847, 0x5847) AM_READ(read_5847)
 	AM_RANGE(0x5c00, 0x5c0f) AM_DEVREADWRITE("vtac", crt5037_device, read, write)
-	AM_RANGE(0x8000, 0x9fff) AM_RAM
+	AM_RANGE(0x8000, 0x97ff) AM_READWRITE(page_r, page_w)
 	AM_RANGE(0xc000, 0xcfff) AM_RAM // video RAM
 ADDRESS_MAP_END
 
@@ -153,7 +183,17 @@ INPUT_PORTS_END
 
 void ampex_state::machine_start()
 {
+	m_page = 0;
+	m_attr = 0;
+	m_attr_readback = false;
+	m_paged_ram = std::make_unique<u16[]>(0x1800 * 4);
+
 	m_uart->set_input_pin(AY31015_SWE, 0);
+
+	save_item(NAME(m_page));
+	save_item(NAME(m_attr));
+	save_item(NAME(m_attr_readback));
+	save_pointer(NAME(m_paged_ram.get()), 0x1800 * 4);
 }
 
 MACHINE_CONFIG_START(ampex_state::ampex)
