@@ -79,7 +79,7 @@ WRITE8_MEMBER(ampex_state::write_5840)
 READ8_MEMBER(ampex_state::read_5841)
 {
 	logerror("%s: Read from 5841\n", machine().describe_context());
-	return 0;
+	return m_uart->get_output_pin(AY31015_DAV) << 3;
 }
 
 WRITE8_MEMBER(ampex_state::write_5841)
@@ -95,7 +95,7 @@ READ8_MEMBER(ampex_state::read_5842)
 
 WRITE8_MEMBER(ampex_state::write_5842)
 {
-	logerror("%s: Write %02X to 5842\n", machine().describe_context(), data);
+	m_uart->set_transmit_data(data);
 }
 
 READ8_MEMBER(ampex_state::read_5843)
