@@ -72,6 +72,12 @@
 
 
 //**************************************************************************
+//  MACROS / CONSTANTS
+//**************************************************************************
+
+static constexpr uint8_t MULTI_SLOT_LOOKUP[] = {0xcc, 0xdd, 0xee, 0xff};
+
+//**************************************************************************
 //  TYPE DEFINITIONS
 //**************************************************************************
 
@@ -109,6 +115,8 @@ namespace
 		DECLARE_WRITE_LINE_MEMBER(multi_slot4_halt_w);
 
 		virtual address_space &cartridge_space() override;
+		virtual ioport_constructor device_input_ports() const override;
+		INPUT_CHANGED_MEMBER( switch_changed );
 
 	protected:
 		// device-level overrides
@@ -124,6 +132,7 @@ namespace
 
 		// internal state
 		uint8_t m_select;
+		uint8_t m_block;
 
 		// internal accessors
 		int active_scs_slot_number() const;
@@ -134,6 +143,7 @@ namespace
 
 		// methods
 		void set_select(uint8_t new_select);
+		DECLARE_READ8_MEMBER(ff7f_read);
 		DECLARE_WRITE8_MEMBER(ff7f_write);
 		void update_line(int slot_number, line ln);
 	};
@@ -185,6 +195,14 @@ MACHINE_CONFIG_START(coco_multipak_device::device_add_mconfig)
 	MCFG_COCO_CARTRIDGE_HALT_CB(DEVWRITELINE(DEVICE_SELF, coco_multipak_device, multi_slot4_halt_w))
 MACHINE_CONFIG_END
 
+INPUT_PORTS_START( coco_multipack )
+	PORT_START( "MPI Slot Switch" )
+	PORT_DIPNAME( 0x03, 0x03, "Multi-Pak Slot Switch" ) PORT_CHANGED_MEMBER(DEVICE_SELF, coco_multipak_device, switch_changed, nullptr)
+		PORT_DIPSETTING( 0x00, "Slot 1" )
+		PORT_DIPSETTING( 0x01, "Slot 2" )
+		PORT_DIPSETTING( 0x02, "Slot 3" )
+		PORT_DIPSETTING( 0x03, "Slot 4" )
+INPUT_PORTS_END
 
 //**************************************************************************
 //  GLOBAL VARIABLES
@@ -199,13 +217,22 @@ DEFINE_DEVICE_TYPE(COCO_MULTIPAK, coco_multipak_device, "coco_multipack", "CoCo 
 //**************************************************************************
 
 //-------------------------------------------------
+//  input_ports - device-specific input ports
+//-------------------------------------------------
+
+ioport_constructor coco_multipak_device::device_input_ports() const
+{
+	return INPUT_PORTS_NAME( coco_multipack );
+}
+
+//-------------------------------------------------
 //  coco_multipak_device - constructor
 //-------------------------------------------------
 
 coco_multipak_device::coco_multipak_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
 	: device_t(mconfig, COCO_MULTIPAK, tag, owner, clock)
 	, device_cococart_interface(mconfig, *this)
-	, m_slots(*this, "slot%u", 1), m_select(0)
+	, m_slots(*this, "slot%u", 1), m_select(0), m_block(0)
 {
 }
 
@@ -217,13 +244,15 @@ coco_multipak_device::coco_multipak_device(const machine_config &mconfig, const 
 void coco_multipak_device::device_start()
 {
 	// install $FF7F handler
-	install_write_handler(0xFF7F, 0xFF7F, write8_delegate(FUNC(coco_multipak_device::ff7f_write), this));
+	install_readwrite_handler(0xFF7F, 0xFF7F, read8_delegate(FUNC(coco_multipak_device::ff7f_read), this),write8_delegate(FUNC(coco_multipak_device::ff7f_write), this));
 
 	// initial state
 	m_select = 0xFF;
+	m_block = 0;
 
 	// save state
 	save_item(NAME(m_select));
+	save_item(NAME(m_block));
 }
 
 
@@ -233,7 +262,19 @@ void coco_multipak_device::device_start()
 
 void coco_multipak_device::device_reset()
 {
-	m_select = 0xFF;
+	m_select = MULTI_SLOT_LOOKUP[ioport("MPI Slot Switch")->read()];
+	m_block = 0;
+}
+
+
+//-------------------------------------------------
+//  switch_changed - panel switch changed
+//-------------------------------------------------
+
+INPUT_CHANGED_MEMBER( coco_multipak_device::switch_changed )
+{
+	if( m_block == 0 )
+		set_select(MULTI_SLOT_LOOKUP[newval]);
 }
 
 
@@ -304,6 +345,9 @@ cococart_slot_device &coco_multipak_device::active_cts_slot()
 
 void coco_multipak_device::set_select(uint8_t new_select)
 {
+
+	logerror("setselect to %2.2x\n", new_select);
+
 	// identify old value for CART, in case this needs to change
 	cococart_slot_device::line_value old_cart = active_cts_slot().get_line_value(line::CART);
 
@@ -323,11 +367,21 @@ void coco_multipak_device::set_select(uint8_t new_select)
 
 
 //-------------------------------------------------
+//  ff7f_read
+//-------------------------------------------------
+
+READ8_MEMBER(coco_multipak_device::ff7f_read)
+{
+	return m_select & 0xcc;
+}
+
+//-------------------------------------------------
 //  ff7f_write
 //-------------------------------------------------
 
 WRITE8_MEMBER(coco_multipak_device::ff7f_write)
 {
+	m_block = 0xff;
 	set_select(data);
 }
 
