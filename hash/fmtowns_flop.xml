@@ -515,8 +515,8 @@ Zurukamashi Ver 2.0                                           Nikkonren Kikaku  
 		<publisher>日本ファルコム (Nihon Falcom)</publisher>
 		<info name="release" value="199112xx" />
 		<part name="flop1" interface="floppy_3_5">
-			<dataarea name="flop" size="1282688">
-				<rom name="brandish (disk 1).d88" size="1282688" crc="f97219d3" sha1="4b416caf3426b6673bada95c02f49ab8c7606689" offset="0" status="baddump" />
+			<dataarea name="flop" size="1284608">
+				<rom name="brandish (disk 1).d88" size="1284608" crc="1e661a20" sha1="faa4ae3dad5012cdef1803b9f29e3f2710eea519" offset="0" status="baddump" />
 			</dataarea>
 		</part>
 		<part name="flop2" interface="floppy_3_5">
@@ -531,8 +531,7 @@ Zurukamashi Ver 2.0                                           Nikkonren Kikaku  
 		</part>
 	</software>
 
-	<!-- Hangs after the title screen - might be related to the copy protection -->
-	<software name="cameltry" supported="no">
+	<software name="cameltry">
 		<description>Cameltry</description>
 		<year>1994</year>
 		<publisher>電波新聞社 (Dempa Shinbunsha)</publisher>

@@ -197,6 +197,7 @@ TIMER_CALLBACK_MEMBER(upd71071_device::dma_transfer_timer)
 			}
 			// TODO: send terminal count
 			set_eop(ASSERT_LINE);
+			m_reg.status |= (0x01 << channel);  // END or TC
 		}
 		break;
 	case 0x08:  // memory -> I/O
@@ -235,6 +236,7 @@ TIMER_CALLBACK_MEMBER(upd71071_device::dma_transfer_timer)
 			}
 			// TODO: send terminal count
 			set_eop(ASSERT_LINE);
+			m_reg.status |= (0x01 << channel);  // END or TC
 		}
 		break;
 	case 0x0c:  // Invalid
@@ -293,7 +295,6 @@ int upd71071_device::dmarq(int state, int channel)
 	{
 		m_dmarq[channel] = 0;  // clear DMARQ line
 		m_reg.status &= ~(0x10 << channel);
-		m_reg.status |= (0x01 << channel);  // END or TC
 	}
 	return 0;
 }
