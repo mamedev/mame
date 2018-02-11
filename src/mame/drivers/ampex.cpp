@@ -48,6 +48,7 @@ public:
 	DECLARE_READ8_MEMBER(read_5846);
 	DECLARE_READ8_MEMBER(read_5847);
 
+	DECLARE_WRITE_LINE_MEMBER(vsyn_w);
 	DECLARE_WRITE8_MEMBER(uart_status_update);
 
 	void ampex(machine_config &config);
@@ -72,7 +73,7 @@ READ8_MEMBER(ampex_state::read_5840)
 
 WRITE8_MEMBER(ampex_state::write_5840)
 {
-	logerror("%s: Write %02X to 5840\n", machine().describe_context());
+	logerror("%s: Write %02X to 5840\n", machine().describe_context(), data);
 }
 
 READ8_MEMBER(ampex_state::read_5841)
@@ -83,7 +84,7 @@ READ8_MEMBER(ampex_state::read_5841)
 
 WRITE8_MEMBER(ampex_state::write_5841)
 {
-	//logerror("%s: Write %02X to 5841\n", machine().describe_context());
+	//logerror("%s: Write %02X to 5841\n", machine().describe_context(), data);
 }
 
 READ8_MEMBER(ampex_state::read_5842)
@@ -94,7 +95,7 @@ READ8_MEMBER(ampex_state::read_5842)
 
 WRITE8_MEMBER(ampex_state::write_5842)
 {
-	logerror("%s: Write %02X to 5842\n", machine().describe_context());
+	logerror("%s: Write %02X to 5842\n", machine().describe_context(), data);
 }
 
 READ8_MEMBER(ampex_state::read_5843)
@@ -107,7 +108,7 @@ READ8_MEMBER(ampex_state::read_5843)
 
 WRITE8_MEMBER(ampex_state::write_5843)
 {
-	logerror("%s: Write %02X to 5843\n", machine().describe_context());
+	logerror("%s: Write %02X to 5843\n", machine().describe_context(), data);
 }
 
 READ8_MEMBER(ampex_state::read_5846)
@@ -120,6 +121,11 @@ READ8_MEMBER(ampex_state::read_5847)
 {
 	// acknowledges RST 4/5 interrupt (value not used)
 	return 0;
+}
+
+WRITE_LINE_MEMBER(ampex_state::vsyn_w)
+{
+	// should generate RST 6 interrupt
 }
 
 WRITE8_MEMBER(ampex_state::uart_status_update)
@@ -161,6 +167,7 @@ MACHINE_CONFIG_START(ampex_state::ampex)
 	// FIXME: dot clock should be divided by char width
 	MCFG_DEVICE_ADD("vtac", CRT5037, XTAL(23'814'000) / 2)
 	MCFG_TMS9927_CHAR_WIDTH(CHAR_WIDTH)
+	MCFG_TMS9927_VSYN_CALLBACK(WRITELINE(ampex_state, vsyn_w))
 	MCFG_VIDEO_SET_SCREEN("screen")
 
 	MCFG_DEVICE_ADD("uart", AY31015, 0) // COM8017, actually
