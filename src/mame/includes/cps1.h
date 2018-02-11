@@ -419,6 +419,7 @@ public:
 	void kodb(machine_config &config);
 	void varthb(machine_config &config);
 	void sgyxz(machine_config &config);
+	void wofabl(machine_config &config);
 	void punipic(machine_config &config);
 	void dinopic(machine_config &config);
 	void slampic(machine_config &config);
