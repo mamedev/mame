@@ -9,8 +9,8 @@ Final Crash is a bootleg of Final Fight
 Final Fight is by Capcom and runs on CPS1 hardware
 The bootleg was manufactured by Playmark of Italy
 
-this driver depends heavily on cps1.c, but has been
-kept apart in an attempt to keep cps1.c clutter free
+this driver depends heavily on cps1.cpp, but has been
+kept apart in an attempt to keep cps1.cpp clutter free
 
 Sound is very different from CPS1.
 
@@ -82,6 +82,8 @@ sgyxz: garbage left behind. A priority problem can be seen in 3rd demo where
        the fighters walk through the crowd instead of behind.
 
 slampic: no sound. A priority problem between sprites and crowd.
+
+wofabl: no sprites.
 
 */
 
@@ -794,6 +796,22 @@ static ADDRESS_MAP_START( sgyxz_map, AS_PROGRAM, 16, cps_state )
 	AM_RANGE(0xff0000, 0xffffff) AM_RAM
 ADDRESS_MAP_END
 
+static ADDRESS_MAP_START( wofabl_map, AS_PROGRAM, 16, cps_state )
+	AM_RANGE(0x000000, 0x3fffff) AM_ROM
+	AM_RANGE(0x800030, 0x800031) AM_WRITE(cps1_coinctrl_w)
+	AM_RANGE(0x800100, 0x80013f) AM_RAM AM_SHARE("cps_a_regs")  /* CPS-A custom */
+	AM_RANGE(0x800140, 0x80017f) AM_RAM AM_SHARE("cps_b_regs")  /* CPS-B custom */
+	AM_RANGE(0x880000, 0x880001) AM_READ_PORT("IN1")            /* Player input ports */
+	AM_RANGE(0x880006, 0x880007) AM_WRITE(cps1_soundlatch_w)
+	AM_RANGE(0x880008, 0x88000f) AM_READ(cps1_dsw_r)            /* System input ports / Dip Switches */
+	AM_RANGE(0x880e78, 0x880e79) AM_READ(cps1_in2_r)            /* Player 3 controls (later games) */
+	AM_RANGE(0x890000, 0x890001) AM_WRITE(cps1_soundlatch2_w)
+	AM_RANGE(0x900000, 0x92ffff) AM_RAM_WRITE(cps1_gfxram_w) AM_SHARE("gfxram")
+	AM_RANGE(0xf1c004, 0xf1c005) AM_WRITE(cpsq_coinctrl2_w)     /* Coin control2 (later games) */
+	AM_RANGE(0xf1c006, 0xf1c007) AM_READ_PORT("EEPROMIN") AM_WRITE_PORT("EEPROMOUT")
+	AM_RANGE(0xff0000, 0xffffff) AM_RAM
+ADDRESS_MAP_END
+
 static ADDRESS_MAP_START( slampic_map, AS_PROGRAM, 16, cps_state )
 	AM_RANGE(0x000000, 0x3fffff) AM_ROM
 	AM_RANGE(0x800006, 0x800007) AM_WRITENOP //AM_WRITE(cps1_soundlatch2_w)
@@ -1425,6 +1443,29 @@ static INPUT_PORTS_START( sgyxz )
 	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_OUTPUT ) PORT_WRITE_LINE_DEVICE_MEMBER("eeprom", eeprom_serial_93cxx_device, cs_write)
 INPUT_PORTS_END
 
+static INPUT_PORTS_START( wofabl )
+	PORT_INCLUDE(sgyxz)
+
+	PORT_MODIFY("DSWA")
+	PORT_DIPUNKNOWN_DIPLOC( 0x01, 0x01, "SW(A):1" )
+	PORT_DIPUNKNOWN_DIPLOC( 0x02, 0x02, "SW(A):2" )
+	PORT_DIPUNKNOWN_DIPLOC( 0x04, 0x04, "SW(A):3" )
+	PORT_DIPUNKNOWN_DIPLOC( 0x08, 0x08, "SW(A):4" )
+	PORT_DIPUNKNOWN_DIPLOC( 0x10, 0x10, "SW(A):5" )
+	PORT_DIPUNKNOWN_DIPLOC( 0x20, 0x20, "SW(A):6" )
+	PORT_DIPUNKNOWN_DIPLOC( 0x40, 0x40, "SW(A):7" )
+	PORT_DIPUNKNOWN_DIPLOC( 0x80, 0x80, "SW(A):8" )
+
+	PORT_MODIFY("DSWB")
+	PORT_DIPUNKNOWN_DIPLOC( 0x01, 0x01, "SW(B):1" )
+	PORT_DIPUNKNOWN_DIPLOC( 0x02, 0x02, "SW(B):2" )
+	PORT_DIPUNKNOWN_DIPLOC( 0x04, 0x04, "SW(B):3" )
+	PORT_DIPUNKNOWN_DIPLOC( 0x08, 0x08, "SW(B):4" )
+	PORT_DIPUNKNOWN_DIPLOC( 0x10, 0x10, "SW(B):5" )
+	PORT_DIPUNKNOWN_DIPLOC( 0x20, 0x20, "SW(B):6" )
+	PORT_DIPUNKNOWN_DIPLOC( 0x40, 0x40, "SW(B):7" )
+	PORT_DIPUNKNOWN_DIPLOC( 0x80, 0x80, "SW(B):8" )
+INPUT_PORTS_END
 
 MACHINE_START_MEMBER(cps_state,fcrash)
 {
@@ -2341,7 +2382,36 @@ ROM_START( sgyxz )
 	ROM_LOAD( "sgyxz_snd1.bin", 0x00000, 0x40000,  CRC(c15ac0f2) SHA1(8d9e5519d9820e4ac4f70555088c80e64d052c9d) )
 ROM_END
 
+MACHINE_CONFIG_DERIVED(cps_state::wofabl, sgyxz)
 
+	MCFG_CPU_MODIFY("maincpu")
+	MCFG_CPU_PROGRAM_MAP(wofabl_map)
+MACHINE_CONFIG_END
+
+ROM_START( wofabl )
+	ROM_REGION( CODE_SIZE, "maincpu", 0 ) /* 68000 Code */
+	ROM_LOAD16_BYTE( "5.prg.040", 0x000000, 0x80000, CRC(4d9d2327) SHA1(b8029b117083a1c31546455fa53d9ee83a4ff7ad) )
+	ROM_LOAD16_BYTE( "3.prg.040", 0x000001, 0x80000, CRC(ef25fe49) SHA1(d45d3c94cb57187b2f6ac248e9c3c9989be38f99) )
+	ROM_LOAD16_BYTE( "6.prg.010", 0x100000, 0x20000, CRC(93eeb161) SHA1(0b8efb7ace59791ffb8a3f7826f0ea74620d7a0f) ) // x111111xxxxxxxxxx = 0xFF
+	ROM_LOAD16_BYTE( "4.prg.010", 0x100001, 0x20000, CRC(a0751944) SHA1(84f092992f0f94acffbbb43168fbcee2c45da789) ) // x111111xxxxxxxxxx = 0xFF
+
+	ROM_REGION( 0x400000, "gfx", 0 ) /* rearranged in init */
+	ROMX_LOAD( "gfx13.040",  0x000000, 0x80000, CRC(8e8db215) SHA1(cc85e576bf09c3edab9afc1b5fa0a152f4140c06) , ROM_GROUPWORD | ROM_SKIP(6) )
+	ROMX_LOAD( "gfx15.040",  0x000002, 0x80000, CRC(a5e4f449) SHA1(9956f82818ccc685367b5fe5e4bc8b59b65c31c1) , ROM_GROUPWORD | ROM_SKIP(6) )
+	ROMX_LOAD( "gfx14.040",  0x000004, 0x80000, CRC(f34a7f9d) SHA1(6d67623c93147a779f07ef103188f3e2cb6d6d6e) , ROM_GROUPWORD | ROM_SKIP(6) )
+	ROMX_LOAD( "gfx16.040",  0x000006, 0x80000, CRC(49a3dfc7) SHA1(c14ea91745fd72be936b6db9981d12d958326757) , ROM_GROUPWORD | ROM_SKIP(6) )
+	ROMX_LOAD( "gfx9.040",   0x200000, 0x80000, CRC(f8f33a0e) SHA1(33f172b79499d4a76b53c070c0007bd1604a71bd) , ROM_GROUPWORD | ROM_SKIP(6) )
+	ROMX_LOAD( "gfx11.040",  0x200002, 0x80000, CRC(13324965) SHA1(979754ebd15a2989f92b5b7fc5bae99eb83c3593) , ROM_GROUPWORD | ROM_SKIP(6) )
+	ROMX_LOAD( "gfx10.040",  0x200004, 0x80000, CRC(6a060c6c) SHA1(49e4da9373272e5889caa79a86c39ee34087c480) , ROM_GROUPWORD | ROM_SKIP(6) )
+	ROMX_LOAD( "gfx12.040",  0x200006, 0x80000, CRC(c29f7b70) SHA1(95d22dcd9e2a48ddea7573d0be75225e0aae798f) , ROM_GROUPWORD | ROM_SKIP(6) )
+
+	ROM_REGION( 0x20000, "audiocpu", 0 ) /* Z80 code */
+	ROM_LOAD( "sound.512", 0x00000, 0x10000,  CRC(210c376f) SHA1(0d937c86078d0a106f5636b7daf5fc0266c2c2ec) ) // identical to sgyxz
+	ROM_RELOAD(           0x8000, 0x10000 )
+
+	ROM_REGION( 0x040000, "oki", 0 ) /* Samples */
+	ROM_LOAD( "sound.020", 0x00000, 0x40000,  CRC(672dcb46) SHA1(e76c1ce81689a55b573fb6e5c9a860cb756cd876) ) // almost identical to sgyxz
+ROM_END
 
 // ************************************************************************* PUNIPIC, PUNIPIC2, PUNIPIC3
 
@@ -3124,5 +3194,6 @@ GAME( 1992, sf2m9,     sf2ce,    sf2m1,     sf2,      cps_state, sf2m1,    ROT0,
 GAME( 1993, slampic,   slammast, slampic,   slammast, cps_state, dinopic,  ROT0,   "bootleg", "Saturday Night Slam Masters (bootleg with PIC16c57)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_NO_SOUND | MACHINE_SUPPORTS_SAVE ) // 930713 ETC
 
 GAME( 1999, sgyxz,     wof,      sgyxz,     sgyxz,    cps_state, cps1,     ROT0,   "bootleg (All-In Electronic)", "Warriors of Fate ('sgyxz' bootleg)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE )   // 921005 - Sangokushi 2
+GAME( 1999, wofabl,    wof,      wofabl,    wofabl,   cps_state, sf2mdtb,  ROT0,   "bootleg", "Sangokushi II (bootleg)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE )   // no sprites - 921005 - Sangokushi 2
 
 GAME( 1992, varthb,    varth,    varthb,    varth,    cps_state, dinopic,  ROT270, "bootleg", "Varth: Operation Thunderstorm (bootleg)", MACHINE_SUPPORTS_SAVE )
