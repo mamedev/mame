@@ -20,7 +20,7 @@ Source images from Redump, Trurip and The Dumping Union. (3 known missing dumped
         </part>
     </software>
 
-	<software name="banditem">
+    <software name="banditem">
         <description>Bandai Item Collection 70'</description>
         <year>1995</year>
         <publisher>Bandai</publisher>
@@ -31,7 +31,7 @@ Source images from Redump, Trurip and The Dumping Union. (3 known missing dumped
         </part>
     </software>
 	
-	<software name="bsmoonsq">
+    <software name="bsmoonsq">
         <description>Bishoujo Senshi Sailor Moon S: Quiz Taiketsu! Sailor Power Shuketsu!!</description>
         <year>1994</year>
         <publisher>Bandai</publisher>
@@ -42,7 +42,7 @@ Source images from Redump, Trurip and The Dumping Union. (3 known missing dumped
         </part>
     </software>
 	
-	<software name="bsmoonhl">
+    <software name="bsmoonhl">
         <description>Bishoujo Senshi Sailor Moon SuperS: Sailor Moon to Hiragana Lesson!</description>
         <year>1995</year>
         <publisher>Bandai</publisher>
@@ -53,7 +53,7 @@ Source images from Redump, Trurip and The Dumping Union. (3 known missing dumped
         </part>
     </software>
 	
-	<software name="bsmoonsy">
+    <software name="bsmoonsy">
         <description>Bishoujo Senshi Sailor Moon SuperS: Youkoso! Sailor Youchien</description>
         <year>1995</year>
         <publisher>Bandai</publisher>
@@ -64,7 +64,7 @@ Source images from Redump, Trurip and The Dumping Union. (3 known missing dumped
         </part>
     </software>
 	
-	<software name="dbzsszkc">
+    <software name="dbzsszkc">
         <description>Dragon Ball Z: Shin Saiyajin Zetsumetsu Keikaku: Chikyuu Hen</description>
         <year>1994</year>
         <publisher>Bandai</publisher>
@@ -75,7 +75,7 @@ Source images from Redump, Trurip and The Dumping Union. (3 known missing dumped
         </part>
     </software>
 	
-	<software name="dbzsszku">
+    <software name="dbzsszku">
         <description>Dragon Ball Z: Shin Saiyajin Zetsumetsu Keikaku: Uchuu Hen</description>
         <year>1994</year>
         <publisher>Bandai</publisher>
@@ -86,7 +86,7 @@ Source images from Redump, Trurip and The Dumping Union. (3 known missing dumped
         </part>
     </software>
 	
-	<software name="evsahfs">
+    <software name="evsahfs">
         <description>Elements Voice Series: Aya Hisakawa: Forest Sways</description>
         <year>1995</year>
         <publisher>Bandai</publisher>
@@ -97,7 +97,7 @@ Source images from Redump, Trurip and The Dumping Union. (3 known missing dumped
         </part>
     </software>
 	
-	<software name="evsmkwm">
+    <software name="evsmkwm">
         <description>Elements Voice Series: Mariko Kouda: Welcome to the Marikotown!</description>
         <year>1996</year>
         <publisher>Bandai</publisher>
@@ -108,8 +108,8 @@ Source images from Redump, Trurip and The Dumping Union. (3 known missing dumped
         </part>
     </software>
 	
-	<software name="evsmkwb">
-        <description>Elements Voice Series: Mika Kanai: Wind & Breeze</description>
+    <software name="evsmkwb">
+        <description>Elements Voice Series: Mika Kanai: Wind &amp; Breeze</description>
         <year>1995</year>
         <publisher>Bandai</publisher>
         <part interface="cdrom" name="cdrom">
@@ -119,7 +119,7 @@ Source images from Redump, Trurip and The Dumping Union. (3 known missing dumped
         </part>
     </software>
 	
-	<software name="evsrfps">
+    <software name="evsrfps">
         <description>Elements Voice Series: Rica Fukami: Private Step</description>
         <year>1995</year>
         <publisher>Bandai</publisher>
@@ -130,7 +130,7 @@ Source images from Redump, Trurip and The Dumping Union. (3 known missing dumped
         </part>
     </software>
 	
-	<software name="gamera">
+    <software name="gamera">
         <description>Gamera: The Time Adventure</description>
         <year>1995</year>
         <publisher>Bandai</publisher>
@@ -141,7 +141,7 @@ Source images from Redump, Trurip and The Dumping Union. (3 known missing dumped
         </part>
     </software>
 	
-	<software name="hellkitt">
+    <software name="hellkitt">
         <description>Hello Kitty: Yume no Kuni Daiboken</description>
         <year>1994</year>
         <publisher>Bandai</publisher>
@@ -152,7 +152,7 @@ Source images from Redump, Trurip and The Dumping Union. (3 known missing dumped
         </part>
     </software>
 	
-	<software name="ienakiko">
+    <software name="ienakiko">
         <description>Ie Naki Ko: Suzu no Sentaku</description>
         <year>1995</year>
         <publisher>Bandai</publisher>
@@ -163,7 +163,7 @@ Source images from Redump, Trurip and The Dumping Union. (3 known missing dumped
         </part>
     </software>
 	
-	<software name="newtonk">
+    <software name="newtonk">
         <description>Newton Museum: Kyoryu Nendaiki Kohen</description>
         <year>1994</year>
         <publisher>Bandai</publisher>
@@ -174,7 +174,7 @@ Source images from Redump, Trurip and The Dumping Union. (3 known missing dumped
         </part>
     </software>
 	
-	<software name="newtonz">
+    <software name="newtonz">
         <description>Newton Museum: Kyoryu Nendaiki Zenpen</description>
         <year>1994</year>
         <publisher>Bandai</publisher>
@@ -185,7 +185,7 @@ Source images from Redump, Trurip and The Dumping Union. (3 known missing dumped
         </part>
     </software>
 	
-	<software name="nintamar">
+    <software name="nintamar">
         <description>Nintama Rantarou: Gungun Nobiru Chinou-hen</description>
         <year>199?</year>
         <publisher>Bandai</publisher>
@@ -196,7 +196,7 @@ Source images from Redump, Trurip and The Dumping Union. (3 known missing dumped
         </part>
     </software>
 	
-	<software name="norbandd">
+    <software name="norbandd">
         <description>Norimono Banzai!! Densha Daishuugou!!</description>
         <year>1994</year>
         <publisher>Bandai</publisher>
@@ -207,7 +207,7 @@ Source images from Redump, Trurip and The Dumping Union. (3 known missing dumped
         </part>
     </software>
 	
-	<software name="norbankd">
+    <software name="norbankd">
         <description>Norimono Banzai!! Kuruma Daishuugou!!</description>
         <year>1995</year>
         <publisher>Bandai</publisher>
@@ -218,7 +218,7 @@ Source images from Redump, Trurip and The Dumping Union. (3 known missing dumped
         </part>
     </software>
 	
-	<software name="sdgundam">
+    <software name="sdgundam">
         <description>SD Gundam: Daizukan</description>
         <year>1994</year>
         <publisher>Bandai</publisher>
@@ -229,7 +229,7 @@ Source images from Redump, Trurip and The Dumping Union. (3 known missing dumped
         </part>
     </software>
 	
-	<software name="sdt">
+    <software name="sdt">
         <description>Shuppatsu! Dobutsu Tankentai</description>
         <year>1995</year>
         <publisher>Bandai</publisher>
@@ -240,7 +240,7 @@ Source images from Redump, Trurip and The Dumping Union. (3 known missing dumped
         </part>
     </software>
 	
-	<software name="soreikea">
+    <software name="soreikea">
         <description>Soreike! Anpanman: Picnic de Obenkyou</description>
         <year>1995</year>
         <publisher>Bandai</publisher>
@@ -251,7 +251,7 @@ Source images from Redump, Trurip and The Dumping Union. (3 known missing dumped
         </part>
     </software>
 	
-	<software name="ultseven">
+    <software name="ultseven">
         <description>Ultra Seven: Chikyu Boei Sakusen</description>
         <year>1994</year>
         <publisher>Bandai</publisher>
@@ -262,7 +262,7 @@ Source images from Redump, Trurip and The Dumping Union. (3 known missing dumped
         </part>
     </software>
 	
-	<software name="ultmanat">
+    <software name="ultmanat">
         <description>Ultraman: Alphabet TV e Youkoso</description>
         <year>1995</year>
         <publisher>Bandai</publisher>
@@ -273,7 +273,7 @@ Source images from Redump, Trurip and The Dumping Union. (3 known missing dumped
         </part>
     </software>
 	
-	<software name="ultmanhd">
+    <software name="ultmanhd">
         <description>Ultraman: Hiragana Daisakusen</description>
         <year>1995</year>
         <publisher>Bandai</publisher>
@@ -284,7 +284,7 @@ Source images from Redump, Trurip and The Dumping Union. (3 known missing dumped
         </part>
     </software>
 	
-	<software name="ultmanoy">
+    <software name="ultmanoy">
         <description>Ultraman: Oide yo! Ultra Youchien</description>
         <year>1995</year>
         <publisher>Bandai</publisher>
@@ -295,7 +295,7 @@ Source images from Redump, Trurip and The Dumping Union. (3 known missing dumped
         </part>
     </software>
 	
-	<software name="ultmancu">
+    <software name="ultmancu">
         <description>Ultraman: Chinou UP Daisakusen</description>
         <year>1995</year>
         <publisher>Bandai</publisher>
@@ -306,7 +306,7 @@ Source images from Redump, Trurip and The Dumping Union. (3 known missing dumped
         </part>
     </software>
 	
-	<software name="ultmankg">
+    <software name="ultmankg">
         <description>Ultraman Powered: Kaiju Gekimetsu Sakusen</description>
         <year>1995</year>
         <publisher>Bandai</publisher>
