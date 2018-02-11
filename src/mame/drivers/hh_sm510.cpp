@@ -3307,7 +3307,7 @@ void tsonic_state::update_speaker()
 
 WRITE8_MEMBER(tsonic_state::write_r)
 {
-	// R1: to speaker, via 120K resistor
+	// R: to speaker, via 120K resistor
 	m_r = data;
 	update_speaker();
 }
@@ -3571,6 +3571,124 @@ MACHINE_CONFIG_START(tsfight2_state::tsfight2)
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
 	MCFG_SOUND_ADD("speaker", SPEAKER_SOUND, 0)
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
+MACHINE_CONFIG_END
+
+
+
+
+
+/***************************************************************************
+
+  Tiger Sonic The Hedgehog 2 (model 78-527)
+  * Sharp SM511 under epoxy (die label N86)
+  * lcd screen with custom segments, 2-bit sound
+
+***************************************************************************/
+
+class tsonic2_state : public hh_sm510_state
+{
+public:
+	tsonic2_state(const machine_config &mconfig, device_type type, const char *tag)
+		: hh_sm510_state(mconfig, type, tag)
+	{
+		m_inp_lines = 5;
+		m_inp_fixed = 5;
+	}
+
+	void update_speaker();
+	DECLARE_WRITE8_MEMBER(write_r);
+	DECLARE_WRITE8_MEMBER(write_s);
+	void tsonic2(machine_config &config);
+};
+
+// handlers
+
+void tsonic2_state::update_speaker()
+{
+	m_speaker->level_w((m_s << 1 & 2) | (m_r & 1));
+}
+
+WRITE8_MEMBER(tsonic2_state::write_r)
+{
+	// R: to speaker, via 120K resistor
+	m_r = data;
+	update_speaker();
+}
+
+WRITE8_MEMBER(tsonic2_state::write_s)
+{
+	// S1: to speaker, via 39K resistor
+	m_s = data;
+	update_speaker();
+
+	// other: input mux
+	hh_sm510_state::input_w(space, 0, data >> 1);
+}
+
+// config
+
+static INPUT_PORTS_START( tsonic2 )
+	PORT_START("IN.0") // S2
+	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_JOYSTICK_UP ) PORT_CHANGED_MEMBER(DEVICE_SELF, hh_sm510_state, input_changed, nullptr)
+	PORT_BIT( 0x0b, IP_ACTIVE_HIGH, IPT_UNUSED )
+
+	PORT_START("IN.1") // S3
+	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_JOYSTICK_RIGHT ) PORT_CHANGED_MEMBER(DEVICE_SELF, hh_sm510_state, input_changed, nullptr)
+	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_JOYSTICK_LEFT ) PORT_CHANGED_MEMBER(DEVICE_SELF, hh_sm510_state, input_changed, nullptr)
+	PORT_BIT( 0x09, IP_ACTIVE_HIGH, IPT_UNUSED )
+
+	PORT_START("IN.2") // S4
+	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_JOYSTICK_DOWN ) PORT_CHANGED_MEMBER(DEVICE_SELF, hh_sm510_state, input_changed, nullptr)
+	PORT_BIT( 0x0d, IP_ACTIVE_HIGH, IPT_UNUSED )
+
+	PORT_START("IN.3") // S5
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_BUTTON1 ) PORT_CHANGED_MEMBER(DEVICE_SELF, hh_sm510_state, input_changed, nullptr) // Action
+	PORT_BIT( 0x0e, IP_ACTIVE_HIGH, IPT_UNUSED )
+
+	PORT_START("IN.4") // S6
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_SELECT ) PORT_CHANGED_MEMBER(DEVICE_SELF, hh_sm510_state, input_changed, nullptr) PORT_NAME("Pause")
+	PORT_BIT( 0x0e, IP_ACTIVE_HIGH, IPT_UNUSED )
+
+	PORT_START("IN.5") // GND!
+	PORT_BIT( 0x07, IP_ACTIVE_HIGH, IPT_UNUSED )
+	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_START ) PORT_CHANGED_MEMBER(DEVICE_SELF, hh_sm510_state, input_changed, nullptr) PORT_NAME("Power On/Start")
+
+	PORT_START("BA")
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_VOLUME_DOWN ) PORT_NAME("Sound")
+
+	PORT_START("B")
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_POWER_OFF )
+
+	PORT_START("ACL")
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_SERVICE1 ) PORT_CHANGED_MEMBER(DEVICE_SELF, hh_sm510_state, acl_button, nullptr) PORT_NAME("ACL")
+INPUT_PORTS_END
+
+static const s16 tsonic2_speaker_levels[] = { 0, 0x7fff/3*1, 0x7fff/3*2, 0x7fff };
+
+MACHINE_CONFIG_START(tsonic2_state::tsonic2)
+
+	/* basic machine hardware */
+	MCFG_CPU_ADD("maincpu", SM511, 32.768_kHz_XTAL)
+	MCFG_SM510_WRITE_SEGS_CB(WRITE16(hh_sm510_state, sm510_lcd_segment_w))
+	MCFG_SM510_READ_K_CB(READ8(hh_sm510_state, input_r))
+	MCFG_SM510_WRITE_S_CB(WRITE8(tsonic2_state, write_s))
+	MCFG_SM510_WRITE_R_CB(WRITE8(tsonic2_state, write_r))
+	MCFG_SM510_READ_BA_CB(IOPORT("BA"))
+	MCFG_SM510_READ_B_CB(IOPORT("B"))
+
+	/* video hardware */
+	MCFG_SCREEN_SVG_ADD("screen", "svg")
+	MCFG_SCREEN_REFRESH_RATE(50)
+	MCFG_SCREEN_SIZE(1475, 1080)
+	MCFG_SCREEN_VISIBLE_AREA(0, 1475-1, 0, 1080-1)
+	MCFG_TIMER_DRIVER_ADD_PERIODIC("display_decay", hh_sm510_state, display_decay_tick, attotime::from_msec(1))
+	MCFG_DEFAULT_LAYOUT(layout_svg)
+
+	/* sound hardware */
+	MCFG_SPEAKER_STANDARD_MONO("mono")
+	MCFG_SOUND_ADD("speaker", SPEAKER_SOUND, 0)
+	MCFG_SPEAKER_LEVELS(4, tsonic2_speaker_levels)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
 MACHINE_CONFIG_END
 
@@ -5169,6 +5287,18 @@ ROM_START( tsfight2 )
 ROM_END
 
 
+ROM_START( tsonic2 )
+	ROM_REGION( 0x1000, "maincpu", 0 )
+	ROM_LOAD( "n86.program", 0x0000, 0x1000, CRC(782874c5) SHA1(b7eb1f56cbc781ba0b90f6b4b5b51944120733cc) )
+
+	ROM_REGION( 0x100, "maincpu:melody", 0 )
+	ROM_LOAD( "n86.melody", 0x000, 0x100, CRC(c16fa2b2) SHA1(222772d311fd3b3b05d80cfd539c2c862bed0be5) )
+
+	ROM_REGION( 667887, "svg", 0)
+	ROM_LOAD( "tsonic2.svg", 0, 667887, CRC(ef82d40e) SHA1(f22efba565adb32634d8b46c31459ec833b13d98) )
+ROM_END
+
+
 ROM_START( tsddragon )
 	ROM_REGION( 0x1000, "maincpu", 0 )
 	ROM_LOAD( "mf5", 0x0000, 0x1000, CRC(264c8e82) SHA1(470eb2f09a58ef05eb0b7c8e11380ad1d8ce4e1a) )
@@ -5329,6 +5459,7 @@ CONS( 1992, tbttf,       0,          0, tbttf,       tbttf,       tbttf_state,  
 CONS( 1992, tsonic,      0,          0, tsonic,      tsonic,      tsonic_state,      0, "Tiger Electronics (licensed from Sega)", "Sonic The Hedgehog (handheld)", MACHINE_SUPPORTS_SAVE )
 CONS( 1993, tdummies,    0,          0, tdummies,    tdummies,    tdummies_state,    0, "Tiger Electronics", "The Incredible Crash Dummies (handheld)", MACHINE_SUPPORTS_SAVE )
 CONS( 1993, tsfight2,    0,          0, tsfight2,    tsfight2,    tsfight2_state,    0, "Tiger Electronics (licensed from Capcom)", "Street Fighter II (handheld)", MACHINE_SUPPORTS_SAVE )
+CONS( 1993, tsonic2,     0,          0, tsonic2,     tsonic2,     tsonic2_state,     0, "Tiger Electronics (licensed from Sega)", "Sonic The Hedgehog 2 (handheld)", MACHINE_SUPPORTS_SAVE )
 CONS( 1993, tsddragon,   0,          0, tsddragon,   tsddragon,   tsddragon_state,   0, "Tiger Electronics (licensed from Technos)", "Super Double Dragon (handheld)", MACHINE_SUPPORTS_SAVE )
 CONS( 1993, tnmarebc,    0,          0, tnmarebc,    tnmarebc,    tnmarebc_state,    0, "Tiger Electronics", "Nightmare Before Christmas (handheld)", MACHINE_SUPPORTS_SAVE ) // note: title has no "The"
 CONS( 1993, tmkombat,    0,          0, tmkombat,    tmkombat,    tmkombat_state,    0, "Tiger Electronics (licensed from Midway)", "Mortal Kombat (handheld)", MACHINE_SUPPORTS_SAVE )
