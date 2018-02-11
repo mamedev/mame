@@ -254,6 +254,7 @@ public:
 	DECLARE_DRIVER_INIT(drakton);
 	DECLARE_DRIVER_INIT(dkonghs);
 	DECLARE_DRIVER_INIT(dkongx);
+	DECLARE_DRIVER_INIT(dkong3hs);
 	TILE_GET_INFO_MEMBER(dkong_bg_tile_info);
 	TILE_GET_INFO_MEMBER(radarscp1_bg_tile_info);
 	DECLARE_MACHINE_START(dkong2b);
@@ -296,6 +297,7 @@ public:
 	void dk_braze(machine_config &config);
 	void dkj_braze(machine_config &config);
 	void ddk_braze(machine_config &config);
+	void dk3_braze(machine_config &config);
 	void strtheat(machine_config &config);
 	void spclforc(machine_config &config);
 	void s2650(machine_config &config);
