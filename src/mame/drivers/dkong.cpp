@@ -3614,15 +3614,10 @@ DRIVER_INIT_MEMBER(dkong_state, dkong3hs)
 {
 	m_decrypted = std::make_unique<uint8_t[]>(0x10000);
 
-	m_maincpu->space(AS_PROGRAM).install_read_bank(0x0000, 0x5fff, "bank1");
-	m_maincpu->space(AS_PROGRAM).install_read_bank(0x8000, 0xffff, "bank2");
-
 	braze_decrypt_rom(m_decrypted.get());
 
-	membank("bank1")->configure_entries(0, 1, m_decrypted.get(), 0x8000);
-	membank("bank1")->set_entry(0);
-	membank("bank2")->configure_entries(0, 1, m_decrypted.get() + 0x8000, 0x8000);
-	membank("bank2")->set_entry(0);
+	m_maincpu->space(AS_PROGRAM).install_rom(0x0000, 0x5fff, m_decrypted.get());
+	m_maincpu->space(AS_PROGRAM).install_rom(0x8000, 0xffff, m_decrypted.get() + 0x8000);
 
 	address_space &space = m_maincpu->space(AS_PROGRAM);
 	space.install_read_handler(0xc000, 0xc000, read8_delegate(FUNC(dkong_state::braze_eeprom_r), this));
