@@ -1796,6 +1796,11 @@ MACHINE_CONFIG_DERIVED(dkong_state::ddk_braze, dkj_braze)
 	MCFG_MACHINE_RESET_OVERRIDE(dkong_state,ddk)
 MACHINE_CONFIG_END
 
+MACHINE_CONFIG_DERIVED(dkong_state::dk3_braze, dkong3)
+
+	MCFG_EEPROM_SERIAL_93C46_8BIT_ADD("eeprom")
+MACHINE_CONFIG_END
+
 MACHINE_CONFIG_START(dkong_state::dkong3)
 
 	/* basic machine hardware */
@@ -2946,6 +2951,42 @@ ROM_START( dkong3b )
 	ROM_LOAD( "dk3b-v.2n",    0x0400, 0x0100, CRC(50e33434) SHA1(b63da9bed9dc4c7da78e4c26d4ba14b65f2b7e72) ) /* character color codes on a per-column basis */
 ROM_END
 
+ROM_START( dkong3hs )
+	ROM_REGION( 0x10000, "maincpu", 0 )
+	ROM_LOAD( "dk3c.7b",      0x0000, 0x2000, CRC(38d5f38e) SHA1(5a6bb0e5070211515e3d56bd7d4c2d1655ac1621) )
+	ROM_LOAD( "dk3c.7c",      0x2000, 0x2000, CRC(c9134379) SHA1(ecddb3694b93cb3dc98c3b1aeeee928e27529aba) )
+	ROM_LOAD( "dk3c.7d",      0x4000, 0x2000, CRC(d22e2921) SHA1(59a4a1a36aaca19ee0a7255d832df9d042ba34fb) )
+	ROM_LOAD( "dk3c.7e",      0x8000, 0x2000, CRC(615f14b7) SHA1(145674073e95d97c9131b6f2b03303eadb57ca78) )
+
+	ROM_REGION( 0x10000, "braze", 0 )
+	ROM_LOAD( "dk3_10a.bin", 0x0000, 0x10000, CRC(0008652b) SHA1(f1d90bb18373a6f24634b6d2cd766a28d07ab9f4) ) /* Version 1.0a */
+
+	ROM_REGION( 0x10000, "n2a03a", 0 )  /* sound #1 */
+	ROM_LOAD( "dk3c.5l",      0xe000, 0x2000, CRC(7ff88885) SHA1(d530581778aab260e21f04c38e57ba34edea7c64) )
+
+	ROM_REGION( 0x10000, "n2a03b", 0 )  /* sound #2 */
+	ROM_LOAD( "dk3c.6h",      0xe000, 0x2000, CRC(36d7200c) SHA1(7965fcb9bc1c0fdcae8a8e79df9c7b7439c506d8) )
+
+	ROM_REGION( 0x2000, "gfx1", 0 )
+	ROM_LOAD( "dk3v.3n",      0x0000, 0x1000, CRC(415a99c7) SHA1(e0855b03bb1dc0d8ae46da9fe33ca30ecf6a2e96) )
+	ROM_LOAD( "dk3v.3p",      0x1000, 0x1000, CRC(25744ea0) SHA1(4866e43e80b010ccf2c8cc94c232786521f9e26e) )
+
+	ROM_REGION( 0x4000, "gfx2", 0 )
+	ROM_LOAD( "dk3v.7c",      0x0000, 0x1000, CRC(8ffa1737) SHA1(fa5896124227d412fbdf83f129ddffa32cf2053b) )
+	ROM_LOAD( "dk3v.7d",      0x1000, 0x1000, CRC(9ac84686) SHA1(a089376b9c23094490703152ad98ed27f519402d) )
+	ROM_LOAD( "dk3v.7e",      0x2000, 0x1000, CRC(0c0af3fb) SHA1(03e0c3f51bc3c20f95cb02f76f2d80188d5dbe36) )
+	ROM_LOAD( "dk3v.7f",      0x3000, 0x1000, CRC(55c58662) SHA1(7f3d5a1b386cc37d466e42392ffefc928666a8dc) )
+
+	ROM_REGION( 0x0500, "proms", 0 )
+	ROM_LOAD( "dkc1-c.1d",    0x0000, 0x0200, CRC(df54befc) SHA1(7912dbf0a0c8ef68f4ae0f95e55ab164da80e4a1) ) /* palette red & green component */
+	ROM_LOAD( "dkc1-c.1c",    0x0200, 0x0200, CRC(66a77f40) SHA1(c408d65990f0edd78c4590c447426f383fcd2d88) ) /* palette blue component */
+	ROM_LOAD( "dkc1-v.2n",    0x0400, 0x0100, CRC(50e33434) SHA1(b63da9bed9dc4c7da78e4c26d4ba14b65f2b7e72) ) /* character color codes on a per-column basis */
+
+	ROM_REGION( 0x0020, "adrdecode", 0 )
+	/* address decode prom 18s030 - this has inverted outputs. The dump does not reflect this. */
+	ROM_LOAD( "dkc1-v.5e",    0x0000, 0x0020, CRC(d3e2eaf8) SHA1(87bb298137c26570dafb4ac495c87e82441e70e5) )
+ROM_END
+
 ROM_START( hunchbkd )
 	ROM_REGION( 0x8000, "maincpu", 0 )
 	ROM_LOAD( "hb.5e",        0x0000, 0x1000, CRC(4c3ac070) SHA1(636843b33f1b7e994b112fa29e65038098528b8c) )
@@ -3569,6 +3610,25 @@ DRIVER_INIT_MEMBER(dkong_state,dkongx)
 	space.install_write_handler(0xc800, 0xc800, write8_delegate(FUNC(dkong_state::braze_eeprom_w),this));
 }
 
+DRIVER_INIT_MEMBER(dkong_state, dkong3hs)
+{
+	m_decrypted = std::make_unique<uint8_t[]>(0x10000);
+
+	m_maincpu->space(AS_PROGRAM).install_read_bank(0x0000, 0x5fff, "bank1");
+	m_maincpu->space(AS_PROGRAM).install_read_bank(0x8000, 0xffff, "bank2");
+
+	braze_decrypt_rom(m_decrypted.get());
+
+	membank("bank1")->configure_entries(0, 1, m_decrypted.get(), 0x8000);
+	membank("bank1")->set_entry(0);
+	membank("bank2")->configure_entries(0, 1, m_decrypted.get() + 0x8000, 0x8000);
+	membank("bank2")->set_entry(0);
+
+	address_space &space = m_maincpu->space(AS_PROGRAM);
+	space.install_read_handler(0xc000, 0xc000, read8_delegate(FUNC(dkong_state::braze_eeprom_r), this));
+	space.install_write_handler(0xc000, 0xc000, write8_delegate(FUNC(dkong_state::braze_eeprom_w), this));
+}
+
 DRIVER_INIT_MEMBER(dkong_state,dkingjr)
 {
 	uint8_t *prom = memregion("proms")->base();
@@ -3620,6 +3680,7 @@ GAME( 1982, maguila,   dkongjr,  dkongjr,   dkongjr,  dkong_state, dkingjr,  ROT
 GAME( 1983, dkong3,    0,        dkong3,    dkong3,   dkong_state, 0,        ROT90,  "Nintendo of America", "Donkey Kong 3 (US)",                                  MACHINE_SUPPORTS_SAVE )
 GAME( 1983, dkong3j,   dkong3,   dkong3,    dkong3,   dkong_state, 0,        ROT90,  "Nintendo",            "Donkey Kong 3 (Japan)",                               MACHINE_SUPPORTS_SAVE )
 GAME( 1984, dkong3b,   dkong3,   dkong3b,   dkong3b,  dkong_state, 0,        ROT90,  "bootleg",             "Donkey Kong 3 (bootleg on Donkey Kong Jr. hardware)", MACHINE_SUPPORTS_SAVE )
+GAME( 1983, dkong3hs,  dkong3,   dk3_braze, dkong3,   dkong_state, dkong3hs, ROT90,  "hack (Braze Technologies)", "Donkey Kong High Score Kit (hack,V1.0a)",        MACHINE_SUPPORTS_SAVE )
 
 GAME( 1983, pestplce,  mario,    pestplce,  pestplce, dkong_state, 0,        ROT180, "bootleg", "Pest Place", MACHINE_WRONG_COLORS | MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
 
