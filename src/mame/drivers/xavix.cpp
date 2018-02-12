@@ -466,7 +466,38 @@ WRITE8_MEMBER(xavix_state::vid_dma_params_2_w)
 
 WRITE8_MEMBER(xavix_state::vid_dma_trigger_w)
 {
-	logerror("%s: vid_dma_trigger_w with data %02x params %02x%02x %02x%02x\n", machine().describe_context(), data, m_vid_dma_param1[0], m_vid_dma_param1[1], m_vid_dma_param2[0], m_vid_dma_param2[1]);
+	uint16_t len = data & 0x07;
+	uint16_t src = (m_vid_dma_param1[1]<<8) | m_vid_dma_param1[0];
+	uint16_t dst = (m_vid_dma_param2[0]<<8);
+	dst += 0x6000;
+
+	uint8_t unk = m_vid_dma_param2[1];
+
+	logerror("%s: vid_dma_trigger_w with trg %02x size %04x src %04x dest %04x unk (%02x)\n", machine().describe_context(), data & 0xf8, len,src,dst,unk);
+
+	if (unk)
+	{
+		fatalerror("m_vid_dma_param2[1] != 0x00 (is %02x)\n", m_vid_dma_param2[1]);
+	}
+
+	if (len == 0x00)
+	{
+		len = 0x08;
+		logerror(" (length was 0x0, assuming 0x8)\n");
+	}
+
+	len = len << 8;
+
+	address_space& dmaspace = m_maincpu->space(AS_PROGRAM);
+
+	if (data & 0x40)
+	{
+		for (int i = 0; i < len; i++)
+		{
+			uint8_t dat = dmaspace.read_byte(src + i);
+			dmaspace.write_byte(dst + i, dat);
+		}
+	}
 }
 
 READ8_MEMBER(xavix_state::vid_dma_trigger_r)
