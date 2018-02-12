@@ -379,8 +379,8 @@ ADDRESS_MAP_START(srmp5_state::srmp5_mem)
 	AM_RANGE(0x0a000000, 0x0a0fffff) AM_READWRITE(spr_r, spr_w)
 	AM_RANGE(0x0a100000, 0x0a17ffff) AM_DEVREADWRITE16("palette", palette_device, read16, write16, 0x0000ffff) AM_SHARE("palette")
 	//0?N???A?????????i??????????
-	AM_RANGE(0x0a180000, 0x0a180003) AM_READNOP // write 0x00000400
 	AM_RANGE(0x0a180000, 0x0a18011f) AM_READWRITE(srmp5_vidregs_r, srmp5_vidregs_w)
+	AM_RANGE(0x0a180000, 0x0a180003) AM_READNOP // write 0x00000400
 	AM_RANGE(0x0a200000, 0x0a3fffff) AM_READWRITE(tileram_r, tileram_w)
 	AM_RANGE(0x0fc00000, 0x0fdfffff) AM_MIRROR(0x10000000) AM_ROM AM_REGION("sub", 0)
 

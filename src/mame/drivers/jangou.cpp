@@ -444,8 +444,8 @@ ADDRESS_MAP_START(jangou_state::roylcrdn_cpu0_io)
 	AM_RANGE(0x10,0x10) AM_READ_PORT("DSW")         /* DSW + blitter busy flag */
 	AM_RANGE(0x10,0x10) AM_WRITENOP                 /* Writes continuosly 0's in attract mode, and 1's in game */
 	AM_RANGE(0x11,0x11) AM_WRITE(mux_w)
-	AM_RANGE(0x13,0x13) AM_READNOP                  /* Often reads bit7 with unknown purposes */
 	AM_RANGE(0x12,0x17) AM_DEVICE("blitter",jangou_blitter_device, blit_v1_regs)
+	AM_RANGE(0x13,0x13) AM_READNOP                  /* Often reads bit7 with unknown purposes */
 	AM_RANGE(0x20,0x2f) AM_DEVWRITE("blitter",jangou_blitter_device, vregs_w)
 	AM_RANGE(0x30,0x30) AM_WRITENOP                 /* Seems to write 0x10 on each sound event */
 ADDRESS_MAP_END

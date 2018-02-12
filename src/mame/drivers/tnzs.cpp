@@ -809,7 +809,6 @@ ADDRESS_MAP_END
 
 ADDRESS_MAP_START(tnzsb_state::tnzsb_sub_map)
 	AM_IMPORT_FROM(tnzsb_base_sub_map)
-	AM_RANGE(0xf000, 0xf003) AM_READONLY
 	AM_RANGE(0xf000, 0xf3ff) AM_RAM_DEVWRITE("palette", palette_device, write8) AM_SHARE("palette")
 ADDRESS_MAP_END
 

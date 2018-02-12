@@ -81,7 +81,7 @@ ADDRESS_MAP_START(cdi_state::cdimono1_mem)
 	AM_RANGE(0x00400000, 0x0047ffff) AM_ROM AM_REGION("maincpu", 0)
 	AM_RANGE(0x004fffe0, 0x004fffff) AM_DEVREADWRITE("mcd212", mcd212_device, regs_r, regs_w)
 	AM_RANGE(0x00500000, 0x0057ffff) AM_RAM
-	AM_RANGE(0x00500000, 0x00ffffff) AM_NOP
+	AM_RANGE(0x00580000, 0x00ffffff) AM_NOP
 	AM_RANGE(0x00e00000, 0x00efffff) AM_RAM // DVC
 	AM_RANGE(0x80000000, 0x8000807f) AM_DEVREADWRITE("scc68070", cdi68070_device, periphs_r, periphs_w)
 ADDRESS_MAP_END

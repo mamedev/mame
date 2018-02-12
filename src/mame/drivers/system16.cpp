@@ -1102,8 +1102,6 @@ ADDRESS_MAP_START(segas1x_bootleg_state::shdancbl_map)
 	AM_RANGE(0xc41004, 0xc41005) AM_READ_PORT("P2")
 	AM_RANGE(0xc44000, 0xc44001) AM_WRITENOP // only used via clr.w after tilebank set
 
-
-	AM_RANGE(0xe4001c, 0xe4001d) AM_WRITENOP // to prevent access to screen blanking control below
 	AM_RANGE(0xe40000, 0xe4ffff) AM_NOP
 	AM_RANGE(0xfe0020, 0xfe003f) AM_WRITENOP // config regs
 	AM_RANGE(0xffc000, 0xffffff) AM_RAM
