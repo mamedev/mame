@@ -263,7 +263,8 @@ ADDRESS_MAP_START(fromanc2_state::fromanc4_main_map)
 	AM_RANGE(0xe30000, 0xe30013) AM_WRITENOP                        // ???
 	AM_RANGE(0xe40000, 0xe40013) AM_WRITENOP                        // ???
 
-	AM_RANGE(0xe50000, 0xe5000f) AM_DEVREAD8("uart", ns16550_device, ins8250_r, 0x00ff) AM_WRITE(uart_w) // EXT-COMM PORT ?
+	AM_RANGE(0xe50000, 0xe5000f) AM_DEVREAD8("uart", ns16550_device, ins8250_r, 0x00ff) // EXT-COMM PORT ?
+	AM_RANGE(0xe50000, 0xe5000f) AM_WRITE(uart_w) // EXT-COMM PORT ?
 ADDRESS_MAP_END
 
 
