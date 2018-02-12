@@ -498,12 +498,17 @@ void address_map::import_submaps(running_machine &machine, device_t &owner, int 
 			// Recursively import if needed
 			submap.import_submaps(machine, *mapdevice, data_width, endian);
 
+			offs_t max_end = entry->m_addrend - entry->m_addrstart;
+
 			if(!entry->m_mask || (entry->m_mask & base_unitmask) == base_unitmask)
 			{
 				// Easy case, no unitmask at mapping level - Merge in all the map contents in order
 				while (submap.m_entrylist.count())
 				{
 					address_map_entry *subentry = submap.m_entrylist.detach_head();
+					if (subentry->m_addrend > max_end)
+						subentry->m_addrend = max_end;
+
 					subentry->m_addrstart += entry->m_addrstart;
 					subentry->m_addrend += entry->m_addrstart;
 					subentry->m_addrmirror |= entry->m_addrmirror;
@@ -515,9 +520,6 @@ void address_map::import_submaps(running_machine &machine, device_t &owner, int 
 						delete subentry;
 						continue;
 					}
-
-					if (subentry->m_addrend > entry->m_addrend)
-						subentry->m_addrend = entry->m_addrend;
 
 					// Insert the entry in the map
 					m_entrylist.insert_after(*subentry, prev);
@@ -532,6 +534,7 @@ void address_map::import_submaps(running_machine &machine, device_t &owner, int 
 					if ((entry->m_mask >> i) & 1)
 						ratio ++;
 				ratio = data_width / ratio;
+				max_end = (max_end + 1) / ratio - 1;
 
 				// Then merge the contents taking the ratio into account
 				while (submap.m_entrylist.count())
@@ -564,6 +567,9 @@ void address_map::import_submaps(running_machine &machine, device_t &owner, int 
 					else
 						subentry->m_mask = entry->m_mask;
 
+					if (subentry->m_addrend > max_end)
+						subentry->m_addrend = max_end;
+
 					subentry->m_addrstart = subentry->m_addrstart * ratio + entry->m_addrstart;
 					subentry->m_addrend = (subentry->m_addrend + 1) * ratio - 1 + entry->m_addrstart;
 					subentry->m_addrmirror = (subentry->m_addrmirror / ratio) | entry->m_addrmirror;
@@ -575,9 +581,6 @@ void address_map::import_submaps(running_machine &machine, device_t &owner, int 
 						delete subentry;
 						continue;
 					}
-
-					if (subentry->m_addrend > entry->m_addrend)
-						subentry->m_addrend = entry->m_addrend;
 
 					// Insert the entry in the map
 					m_entrylist.insert_after(*subentry, prev);
