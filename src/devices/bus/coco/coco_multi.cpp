@@ -70,6 +70,8 @@
 #define SLOT3_TAG           "slot3"
 #define SLOT4_TAG           "slot4"
 
+#define SWITCH_CONFIG_TAG   "switch"
+
 
 //**************************************************************************
 //  MACROS / CONSTANTS
@@ -196,12 +198,12 @@ MACHINE_CONFIG_START(coco_multipak_device::device_add_mconfig)
 MACHINE_CONFIG_END
 
 INPUT_PORTS_START( coco_multipack )
-	PORT_START( "MPI Slot Switch" )
-	PORT_DIPNAME( 0x03, 0x03, "Multi-Pak Slot Switch" ) PORT_CHANGED_MEMBER(DEVICE_SELF, coco_multipak_device, switch_changed, nullptr)
-		PORT_DIPSETTING( 0x00, "Slot 1" )
-		PORT_DIPSETTING( 0x01, "Slot 2" )
-		PORT_DIPSETTING( 0x02, "Slot 3" )
-		PORT_DIPSETTING( 0x03, "Slot 4" )
+	PORT_START( SWITCH_CONFIG_TAG )
+	PORT_CONFNAME( 0x03, 0x03, "Multi-Pak Slot Switch" ) PORT_CHANGED_MEMBER(DEVICE_SELF, coco_multipak_device, switch_changed, nullptr)
+		PORT_CONFSETTING( 0x00, "Slot 1" )
+		PORT_CONFSETTING( 0x01, "Slot 2" )
+		PORT_CONFSETTING( 0x02, "Slot 3" )
+		PORT_CONFSETTING( 0x03, "Slot 4" )
 INPUT_PORTS_END
 
 //**************************************************************************
@@ -262,7 +264,7 @@ void coco_multipak_device::device_start()
 
 void coco_multipak_device::device_reset()
 {
-	m_select = MULTI_SLOT_LOOKUP[ioport("MPI Slot Switch")->read()];
+	set_select(MULTI_SLOT_LOOKUP[ioport(SWITCH_CONFIG_TAG)->read()]);
 	m_block = 0;
 }
 
