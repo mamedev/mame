@@ -122,10 +122,10 @@ void isa16_ide_device::device_reset()
 {
 	m_is_primary = (ioport("DSW")->read() & 1) ? false : true;
 	if (m_is_primary) {
-		m_isa->install_device(0x01f0, 0x01f7, *this, &isa16_ide_device::map, 16);
+		m_isa->install_device(0x01f0, 0x01f7, *this, &isa16_ide_device::map);
 		m_isa->install_device(0x03f0, 0x03f7, *this, &isa16_ide_device::alt_map);
 	} else {
-		m_isa->install_device(0x0170, 0x0177, *this, &isa16_ide_device::map, 16);
+		m_isa->install_device(0x0170, 0x0177, *this, &isa16_ide_device::map);
 		m_isa->install_device(0x0370, 0x0377, *this, &isa16_ide_device::alt_map);
 	}
 }
