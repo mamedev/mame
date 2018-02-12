@@ -35,6 +35,7 @@
             But the FM-Towns definitely uses reg 7 as bits 24-31.
             The documentation on the V53A manual doesn't show these bits either, maybe it's
             an external connection on the FMT? might be worth checking overflow behavior etc.
+            The Towns manual confirms the top 8 bits are external to the DMAC and there's no carry into them.
 
     0x08:
     0x09:   Device Control register (16-bit)
@@ -195,6 +196,11 @@ TIMER_CALLBACK_MEMBER(upd71071_device::dma_transfer_timer)
 				m_reg.address_current[channel] = m_reg.address_base[channel];
 				m_reg.count_current[channel] = m_reg.count_base[channel];
 			}
+			else
+			{
+				m_timer[channel]->adjust(attotime::never);
+				m_reg.mask |= (0x01 << channel);  // END or TC
+			}
 			// TODO: send terminal count
 			set_eop(ASSERT_LINE);
 			m_reg.status |= (0x01 << channel);  // END or TC
@@ -233,6 +239,11 @@ TIMER_CALLBACK_MEMBER(upd71071_device::dma_transfer_timer)
 			{
 				m_reg.address_current[channel] = m_reg.address_base[channel];
 				m_reg.count_current[channel] = m_reg.count_base[channel];
+			}
+			else
+			{
+				m_timer[channel]->adjust(attotime::never);
+				m_reg.mask |= (0x01 << channel);  // END or TC
 			}
 			// TODO: send terminal count
 			set_eop(ASSERT_LINE);
@@ -295,6 +306,7 @@ int upd71071_device::dmarq(int state, int channel)
 	{
 		m_dmarq[channel] = 0;  // clear DMARQ line
 		m_reg.status &= ~(0x10 << channel);
+		m_timer[channel]->adjust(attotime::never);
 	}
 	return 0;
 }
