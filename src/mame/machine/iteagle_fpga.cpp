@@ -26,7 +26,7 @@ ADDRESS_MAP_START(iteagle_fpga_device::rtc_map)
 ADDRESS_MAP_END
 
 ADDRESS_MAP_START(iteagle_fpga_device::ram_map)
-	AM_RANGE(0x00000, 0x40) AM_READWRITE(e1_nvram_r, e1_nvram_w)
+	AM_RANGE(0x00000, 0x3f) AM_READWRITE(e1_nvram_r, e1_nvram_w)
 	AM_RANGE(0x10000, 0x1ffff) AM_READWRITE(e1_ram_r, e1_ram_w)
 ADDRESS_MAP_END
 
