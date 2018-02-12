@@ -22,7 +22,7 @@
 
 ADDRESS_MAP_START(mpcb963_device::map)
 	AM_RANGE(0x00000000, 0x0000007f) AM_READ(idprom_r)
-	AM_RANGE(0x00000080, 0x0000008f) AM_DEVICE8("ramdac0", bt459_device, map, 0xff)
+	AM_RANGE(0x00000080, 0x0000008f) AM_DEVICE8("ramdac0", bt459_device, map, 0x00ff)
 	AM_RANGE(0x000000b0, 0x000000b3) AM_READWRITE16(control_r, control_w, 0xffff)
 	//AM_RANGE(0x000000d4, 0x000000d7) AM_READWRITE8(, 0xff) // currently unknown
 	//AM_RANGE(0x000000a0, 0x000000a0) AM_READWRITE8(, 0xff) // currently unknown
@@ -31,8 +31,8 @@ ADDRESS_MAP_END
 
 ADDRESS_MAP_START(mpcba79_device::map)
 	AM_RANGE(0x00000000, 0x0000007f) AM_READ(idprom_r)
-	AM_RANGE(0x00000080, 0x0000008f) AM_DEVICE8("ramdac0", bt459_device, map, 0xff)
-	AM_RANGE(0x00000090, 0x0000009f) AM_DEVICE8("ramdac1", bt459_device, map, 0xff)
+	AM_RANGE(0x00000080, 0x0000008f) AM_DEVICE8("ramdac0", bt459_device, map, 0x00ff)
+	AM_RANGE(0x00000090, 0x0000009f) AM_DEVICE8("ramdac1", bt459_device, map, 0x00ff)
 	AM_RANGE(0x000000b0, 0x000000b3) AM_READWRITE16(control_r, control_w, 0xffff)
 	//AM_RANGE(0x000000d4, 0x000000d7) AM_READWRITE8(, 0xff) // currently unknown
 	//AM_RANGE(0x000000a0, 0x000000a0) AM_READWRITE8(, 0xff) // currently unknown
