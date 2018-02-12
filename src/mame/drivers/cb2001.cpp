@@ -582,7 +582,8 @@ ADDRESS_MAP_START(cb2001_state::cb2001_io)
 	AM_RANGE(0x20, 0x21) AM_DEVREAD8("aysnd", ay8910_device, data_r, 0xff00)
 	AM_RANGE(0x22, 0x23) AM_DEVWRITE8("aysnd", ay8910_device, data_address_w, 0xffff)
 
-	AM_RANGE(0x30, 0x31) AM_READ8(irq_ack_r, 0x00ff) AM_WRITE(cb2001_vidctrl_w)
+	AM_RANGE(0x30, 0x31) AM_READ8(irq_ack_r, 0x00ff)
+	AM_RANGE(0x30, 0x31) AM_WRITE(cb2001_vidctrl_w)
 	AM_RANGE(0x32, 0x33) AM_WRITE(cb2001_vidctrl2_w)
 ADDRESS_MAP_END
 

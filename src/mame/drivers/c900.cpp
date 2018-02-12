@@ -69,7 +69,8 @@ ADDRESS_MAP_START(c900_state::io_map)
 	AM_RANGE(0x0000, 0x007f) AM_DEVREADWRITE8("cio", z8036_device, read, write, 0x00ff)
 	//AM_RANGE(0x0100, 0x011f) AM_DEVREADWRITE8("scc", scc8030_device, zbus_r, zbus_w, 0x00ff)  // range for one channel
 	AM_RANGE(0x0100, 0x0101) AM_READ(stat_r)
-	AM_RANGE(0x0110, 0x0111) AM_READ(key_r) AM_DEVWRITE8("terminal", generic_terminal_device, write, 0x00ff)
+	AM_RANGE(0x0110, 0x0111) AM_READ(key_r)
+	AM_RANGE(0x0110, 0x0111) AM_DEVWRITE8("terminal", generic_terminal_device, write, 0x00ff)
 ADDRESS_MAP_END
 
 static INPUT_PORTS_START( c900 )

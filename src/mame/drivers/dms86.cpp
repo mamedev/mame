@@ -95,7 +95,8 @@ ADDRESS_MAP_START(dms86_state::io_map)
 	AM_RANGE(0x88, 0x8f) AM_DEVREADWRITE8("ctc", z80ctc_device, read, write, 0x00ff)
 	AM_RANGE(0x90, 0x97) AM_DEVREADWRITE8("sio2", z80sio_device, ba_cd_r, ba_cd_w, 0x00ff)
 	AM_RANGE(0x9A, 0x9B) AM_READ(port9a_r) // parallel SASI port
-	AM_RANGE(0x9c, 0x9d) AM_READ(port9c_r) AM_DEVWRITE8("terminal", generic_terminal_device, write, 0xff)
+	AM_RANGE(0x9c, 0x9d) AM_READ(port9c_r)
+	AM_RANGE(0x9c, 0x9d) AM_DEVWRITE8("terminal", generic_terminal_device, write, 0x00ff)
 ADDRESS_MAP_END
 
 /* Input ports */

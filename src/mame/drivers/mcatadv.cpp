@@ -203,7 +203,8 @@ ADDRESS_MAP_START(mcatadv_state::mcatadv_map)
 
 	AM_RANGE(0xb00018, 0xb00019) AM_DEVWRITE("watchdog", watchdog_timer_device, reset16_w) // NOST Only
 	AM_RANGE(0xb0001e, 0xb0001f) AM_READ(mcat_wd_r) // MCAT Only
-	AM_RANGE(0xc00000, 0xc00001) AM_DEVREAD8("soundlatch2", generic_latch_8_device, read, 0x00ff) AM_WRITE(mcat_soundlatch_w)
+	AM_RANGE(0xc00000, 0xc00001) AM_DEVREAD8("soundlatch2", generic_latch_8_device, read, 0x00ff)
+	AM_RANGE(0xc00000, 0xc00001) AM_WRITE(mcat_soundlatch_w)
 ADDRESS_MAP_END
 
 /*** Sound ***/
