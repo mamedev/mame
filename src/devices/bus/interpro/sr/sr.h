@@ -80,8 +80,8 @@ public:
 		offs_t end = start + (SR_SIZE - 1);
 
 		// install the device address map
-		m_data_space->install_device(start, end, device, map, 32);
-		m_io_space->install_device(start, end, device, map, 32);
+		m_data_space->install_device(start, end, device, map);
+		m_io_space->install_device(start, end, device, map);
 
 		m_slot_count++;
 	}

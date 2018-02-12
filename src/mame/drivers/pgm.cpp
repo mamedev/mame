@@ -321,7 +321,8 @@ ADDRESS_MAP_START(pgm_state::pgm_base_mem)
 	AM_RANGE(0xa00000, 0xa011ff) AM_RAM_DEVWRITE("palette", palette_device, write16) AM_SHARE("palette")
 	AM_RANGE(0xb00000, 0xb0ffff) AM_RAM AM_SHARE("videoregs") /* Video Regs inc. Zoom Table */
 
-	AM_RANGE(0xc00002, 0xc00003) AM_DEVREAD8("soundlatch", generic_latch_8_device, read, 0x00ff) AM_WRITE(m68k_l1_w)
+	AM_RANGE(0xc00002, 0xc00003) AM_DEVREAD8("soundlatch", generic_latch_8_device, read, 0x00ff)
+	AM_RANGE(0xc00002, 0xc00003) AM_WRITE(m68k_l1_w)
 	AM_RANGE(0xc00004, 0xc00005) AM_DEVREADWRITE8("soundlatch2", generic_latch_8_device, read, write, 0x00ff)
 	AM_RANGE(0xc00006, 0xc00007) AM_DEVREADWRITE8("rtc", v3021_device, read, write, 0x00ff)
 	AM_RANGE(0xc00008, 0xc00009) AM_WRITE(z80_reset_w)

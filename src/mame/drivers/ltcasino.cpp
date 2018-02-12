@@ -99,8 +99,8 @@ ADDRESS_MAP_START(ltcasino_state::ltcasino_map)
 	AM_RANGE(0xec20, 0xec20) AM_DEVREAD("aysnd", ay8910_device, data_r)
 	AM_RANGE(0xec21, 0xec21) AM_READ_PORT("BUTTONS") //ltcasino -> pc: F3F3 (A in service) and F3FD (B in service)
 	AM_RANGE(0xec20, 0xec21) AM_DEVWRITE("aysnd", ay8910_device, data_address_w)
-	AM_RANGE(0xec3e, 0xec3e) AM_READNOP //not used
 	AM_RANGE(0xec30, 0xec3f) AM_RAM
+	AM_RANGE(0xec3e, 0xec3e) AM_READNOP //not used
 	AM_RANGE(0xf000, 0xffff) AM_ROM
 ADDRESS_MAP_END
 

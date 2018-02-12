@@ -512,7 +512,7 @@ ADDRESS_MAP_START(metalmx_state::main_map)
 	AM_RANGE(0x600000, 0x6fffff) AM_READWRITE(host_dram_r, host_dram_w)
 	AM_RANGE(0x700000, 0x7fffff) AM_READWRITE(host_vram_r, host_vram_w)
 	AM_RANGE(0x800000, 0x80001f) AM_READWRITE(dsp32c_2_r, dsp32c_2_w)
-	AM_RANGE(0x800000, 0x85ffff) AM_NOP         /* Unknown */
+	AM_RANGE(0x800020, 0x85ffff) AM_NOP         /* Unknown */
 	AM_RANGE(0x880000, 0x88001f) AM_READWRITE(dsp32c_1_r, dsp32c_1_w)
 	AM_RANGE(0x980000, 0x9800ff) AM_WRITE(reset_w)
 	AM_RANGE(0xb40000, 0xb40003) AM_READWRITE(sound_data_r, sound_data_w)

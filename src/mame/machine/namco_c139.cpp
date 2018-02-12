@@ -33,11 +33,11 @@ ADDRESS_MAP_START(namco_c139_device::data_map)
 ADDRESS_MAP_END
 
 ADDRESS_MAP_START(namco_c139_device::regs_map)
-	AM_RANGE(0x00, 0x00) AM_READ(status_r) // WRITE clears flags
-	AM_RANGE(0x02, 0x02) AM_NOP // settings?
-//  AM_RANGE(0x0a, 0x0a) // WRITE tx_w
-//  AM_RANGE(0x0c, 0x0c) // READ rx_r
-//  AM_RANGE(0x0e, 0x0e) //
+	AM_RANGE(0x00, 0x01) AM_READ(status_r) // WRITE clears flags
+	AM_RANGE(0x02, 0x03) AM_NOP // settings?
+//  AM_RANGE(0x0a, 0x0b) // WRITE tx_w
+//  AM_RANGE(0x0c, 0x0d) // READ rx_r
+//  AM_RANGE(0x0e, 0x0f) //
 ADDRESS_MAP_END
 
 //-------------------------------------------------

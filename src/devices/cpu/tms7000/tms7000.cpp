@@ -55,8 +55,8 @@ DEFINE_DEVICE_TYPE(TMS70C46, tms70c46_device, "tms70c46", "TMC70C46")
 ADDRESS_MAP_START(tms7000_device::tms7000_mem)
 	AM_RANGE(0x0000, 0x007f) AM_RAM // 128 bytes internal RAM
 	AM_RANGE(0x0080, 0x00ff) AM_READWRITE(tms7000_unmapped_rf_r, tms7000_unmapped_rf_w)
-	AM_RANGE(0x0104, 0x0105) AM_WRITENOP // no port A write or ddr
 	AM_RANGE(0x0100, 0x010b) AM_READWRITE(tms7000_pf_r, tms7000_pf_w)
+	AM_RANGE(0x0104, 0x0105) AM_WRITENOP // no port A write or ddr
 ADDRESS_MAP_END
 
 ADDRESS_MAP_START(tms7000_device::tms7001_mem)

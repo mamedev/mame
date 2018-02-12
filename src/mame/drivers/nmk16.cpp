@@ -5033,9 +5033,9 @@ ADDRESS_MAP_START(nmk16_state::afega_map)
 	AM_RANGE(0x080012, 0x080013) AM_READ(afega_unknown_r)
 	AM_RANGE(0x080000, 0x08001d) AM_WRITEONLY               //
 	AM_RANGE(0x08001e, 0x08001f) AM_WRITE(afega_soundlatch_w)   // To Sound CPU
+	AM_RANGE(0x080020, 0x087fff) AM_WRITEONLY               //
 /**/AM_RANGE(0x084000, 0x084003) AM_RAM_WRITE(afega_scroll0_w)  // Scroll on redhawkb (mirror or changed?..)
 /**/AM_RANGE(0x084004, 0x084007) AM_RAM_WRITE(afega_scroll1_w)  // Scroll on redhawkb (mirror or changed?..)
-	AM_RANGE(0x080020, 0x087fff) AM_WRITEONLY               //
 /**/AM_RANGE(0x088000, 0x0885ff) AM_RAM_DEVWRITE("palette", palette_device, write16) AM_SHARE("palette") // Palette
 	AM_RANGE(0x088600, 0x08bfff) AM_WRITEONLY               //
 /**/AM_RANGE(0x08c000, 0x08c003) AM_RAM_WRITE(afega_scroll0_w) AM_SHARE("afega_scroll_0")   // Scroll
@@ -5058,9 +5058,9 @@ ADDRESS_MAP_START(nmk16_state::firehawk_map)
 	AM_RANGE(0x280012, 0x280013) AM_READ(afega_unknown_r)
 	AM_RANGE(0x280000, 0x28001d) AM_WRITEONLY               //
 	AM_RANGE(0x28001e, 0x28001f) AM_WRITE(afega_soundlatch_w)   // To Sound CPU
+	AM_RANGE(0x280020, 0x287fff) AM_WRITEONLY               //
 /**/AM_RANGE(0x284000, 0x284003) AM_RAM_WRITE(afega_scroll0_w)  // Scroll on redhawkb (mirror or changed?..)
 /**/AM_RANGE(0x284004, 0x284007) AM_RAM_WRITE(afega_scroll1_w)  // Scroll on redhawkb (mirror or changed?..)
-	AM_RANGE(0x280020, 0x287fff) AM_WRITEONLY               //
 /**/AM_RANGE(0x288000, 0x2885ff) AM_RAM_DEVWRITE("palette", palette_device, write16) AM_SHARE("palette") // Palette
 	AM_RANGE(0x288600, 0x28bfff) AM_WRITEONLY               //
 /**/AM_RANGE(0x28c000, 0x28c003) AM_RAM_WRITE(afega_scroll0_w) AM_SHARE("afega_scroll_0")   // Scroll

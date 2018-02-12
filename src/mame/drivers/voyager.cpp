@@ -251,7 +251,7 @@ ADDRESS_MAP_START(voyager_state::voyager_map)
 	AM_RANGE(0x000e0000, 0x000fffff) AM_ROMBANK("bank1")
 	AM_RANGE(0x000e0000, 0x000fffff) AM_WRITE(bios_ram_w)
 	AM_RANGE(0x00100000, 0x03ffffff) AM_RAM  // 64MB
-	AM_RANGE(0x02000000, 0x28ffffff) AM_NOP
+	AM_RANGE(0x04000000, 0x28ffffff) AM_NOP
 	//AM_RANGE(0x04000000, 0x040001ff) AM_RAM
 	//AM_RANGE(0x08000000, 0x080001ff) AM_RAM
 	//AM_RANGE(0x0c000000, 0x0c0001ff) AM_RAM
@@ -277,7 +277,6 @@ ADDRESS_MAP_START(voyager_state::voyager_io)
 	AM_RANGE(0x02a0, 0x02a7) AM_NOP //To debug
 	AM_RANGE(0x02c0, 0x02c7) AM_NOP //To debug
 	AM_RANGE(0x02e0, 0x02ef) AM_NOP //To debug
-	AM_RANGE(0x0278, 0x02ff) AM_NOP //To debug
 	AM_RANGE(0x02f8, 0x02ff) AM_NOP //To debug
 	AM_RANGE(0x0320, 0x038f) AM_NOP //To debug
 	AM_RANGE(0x03a0, 0x03a7) AM_NOP //To debug

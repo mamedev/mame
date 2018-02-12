@@ -50,8 +50,8 @@ public:
 	DECLARE_WRITE8_MEMBER(diablo68k_leds_w);
 	DECLARE_READ8_MEMBER(diablo68k_input1_r);
 	DECLARE_READ8_MEMBER(diablo68k_input2_r);
-	void diablo68k(machine_config &config);
 	void diablo68k_map(address_map &map);
+	void diablo68k(machine_config &config);
 };
 
 
