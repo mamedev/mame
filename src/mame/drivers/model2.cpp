@@ -234,6 +234,8 @@ uint32_t model2_state::copro_fifoout_pop(address_space &space,uint32_t offset, u
 {
 	uint32_t r;
 
+	m_maincpu->i960_noburst();
+	
 	if (m_copro_fifoout_num == 0)
 	{
 		/* Reading from empty FIFO causes the i960 to enter wait state */
@@ -242,7 +244,7 @@ uint32_t model2_state::copro_fifoout_pop(address_space &space,uint32_t offset, u
 		/* spin the main cpu and let the TGP catch up */
 		// TODO: Daytona needs a much shorter spin time (like 25 usecs), but that breaks other games even moreso
 		// @seealso http://www.mameworld.info/ubbthreads/showflat.php?Cat=&Number=358069&page=&view=&sb=5&o=&vc=1
-		m_maincpu->spin_until_time(attotime::from_usec(100));
+		m_maincpu->spin_until_time(attotime::from_usec(25));
 
 		return 0;
 	}

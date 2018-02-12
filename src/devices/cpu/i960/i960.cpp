@@ -599,11 +599,41 @@ void i960_cpu_device::do_ret()
 	}
 }
 
+void i960_cpu_device::i960_stall_save(uint32_t t1, uint32_t t2, int index, int size, bool disp)
+{
+	m_stall.t1 = t1;
+	m_stall.t2 = t2;
+	m_stall.index = index;
+	m_stall.size = size;
+	m_stall.disp = disp;
+	m_stall.special = true;
+}
+
+void i960_cpu_device::execute_stall_op(uint32_t opcode)
+{	
+	int i;
+	m_icount--;
+	for(i=m_stall.index;i<m_stall.size;i++)
+	{
+		m_r[m_stall.t2+i] = i960_read_dword_unaligned(m_stall.t1);
+		if(m_stalled == true)
+		{
+			i960_stall_save(m_stall.t1,m_stall.t2,i,m_stall.size,m_stall.disp);
+			return;
+		}
+	}
+
+	if(m_stall.disp == true)
+		m_IP += 4;
+	
+	m_stall.special = false;
+}
+
 void i960_cpu_device::execute_op(uint32_t opcode)
 {
 	uint32_t t1, t2;
 	double t1f, t2f;
-
+	
 	switch(opcode >> 24) {
 		case 0x08: // b
 			m_icount--;
@@ -1905,12 +1935,19 @@ void i960_cpu_device::execute_op(uint32_t opcode)
 
 		case 0x98:{// ldl
 			int i;
+			bool extra_disp;
 			m_icount -= 5;
 			t1 = get_ea(opcode);
 			t2 = (opcode>>19)&0x1e;
+			extra_disp = (m_IP - m_PIP) > 4;
 			m_bursting = 1;
 			for(i=0; i<2; i++) {
 				m_r[t2+i] = i960_read_dword_unaligned(t1);
+				if(m_stalled)
+				{
+					i960_stall_save(t1,t2,i,2,extra_disp);
+					return;
+				}
 				if(m_bursting)
 					t1 += 4;
 			}
@@ -1933,12 +1970,19 @@ void i960_cpu_device::execute_op(uint32_t opcode)
 
 		case 0xa0:{// ldt
 			int i;
+			bool extra_disp;
 			m_icount -= 6;
 			t1 = get_ea(opcode);
 			t2 = (opcode>>19)&0x1c;
+			extra_disp = (m_IP - m_PIP) > 4;
 			m_bursting = 1;
 			for(i=0; i<3; i++) {
 				m_r[t2+i] = i960_read_dword_unaligned(t1);
+				if(m_stalled)
+				{
+					i960_stall_save(t1,t2,i,3,extra_disp);
+					return;
+				}
 				if(m_bursting)
 					t1 += 4;
 			}
@@ -1961,12 +2005,19 @@ void i960_cpu_device::execute_op(uint32_t opcode)
 
 		case 0xb0:{// ldq
 			int i;
+			bool extra_disp;
 			m_icount -= 7;
 			t1 = get_ea(opcode);
 			t2 = (opcode>>19)&0x1c;
+			extra_disp = (m_IP - m_PIP) > 4;
 			m_bursting = 1;
 			for(i=0; i<4; i++) {
 				m_r[t2+i] = i960_read_dword_unaligned(t1);
+				if(m_stalled)
+				{
+					i960_stall_save(t1,t2,i,4,extra_disp);
+					return;
+				}
 				if(m_bursting)
 					t1 += 4;
 			}
@@ -2017,7 +2068,9 @@ void i960_cpu_device::execute_run()
 {
 	uint32_t opcode;
 
-	check_irqs();
+	if(m_stall.special == false)
+		check_irqs();
+	
 	while(m_icount > 0) {
 		m_PIP = m_IP;
 		debugger_instruction_hook(this, m_IP);
@@ -2027,7 +2080,12 @@ void i960_cpu_device::execute_run()
 		opcode = m_direct->read_dword(m_IP);
 		m_IP += 4;
 
-		execute_op(opcode);
+		m_stalled = false;
+
+		if(m_stall.special == true)
+			execute_stall_op(opcode);
+		else
+			execute_op(opcode);
 	}
 }
 
