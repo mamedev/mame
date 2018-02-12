@@ -34,7 +34,6 @@
 
 
 #define RS232_TAG       "rs232"
-#define COM5016T_TAG    "com5016t"
 
 class vt100_state : public driver_device
 {
@@ -44,8 +43,7 @@ public:
 		m_maincpu(*this, "maincpu"),
 		m_crtc(*this, "vt100_video"),
 		m_keyboard(*this, "keyboard"),
-		m_uart(*this, "i8251"),
-		m_dbrg(*this, COM5016T_TAG),
+		m_dbrg(*this, "dbrg"),
 		m_nvr(*this, "nvr"),
 		m_p_ram(*this, "p_ram")
 	{
@@ -54,7 +52,6 @@ public:
 	required_device<cpu_device> m_maincpu;
 	required_device<vt100_video_device> m_crtc;
 	required_device<vt100_keyboard_device> m_keyboard;
-	required_device<i8251_device> m_uart;
 	required_device<com8116_device> m_dbrg;
 	required_device<er1400_device> m_nvr;
 	DECLARE_READ8_MEMBER(vt100_flags_r);
@@ -160,8 +157,8 @@ static ADDRESS_MAP_START(vt100_io, AS_IO, 8, vt100_state)
 	ADDRESS_MAP_UNMAP_HIGH
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	// 0x00, 0x01 PUSART  (Intel 8251)
-	AM_RANGE (0x00, 0x00) AM_DEVREADWRITE("i8251", i8251_device, data_r, data_w)
-	AM_RANGE (0x01, 0x01) AM_DEVREADWRITE("i8251", i8251_device, status_r, control_w)
+	AM_RANGE (0x00, 0x00) AM_DEVREADWRITE("pusart", i8251_device, data_r, data_w)
+	AM_RANGE (0x01, 0x01) AM_DEVREADWRITE("pusart", i8251_device, status_r, control_w)
 	// 0x02 Baud rate generator
 	AM_RANGE (0x02, 0x02) AM_WRITE(vt100_baud_rate_w)
 	// 0x22 Modem buffer
@@ -259,7 +256,7 @@ GFXDECODE_END
 
 MACHINE_CONFIG_START(vt100_state::vt100)
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu",I8080, XTAL(24'883'200) / 9)
+	MCFG_CPU_ADD("maincpu", I8080, XTAL(24'883'200) / 9)
 	MCFG_CPU_PROGRAM_MAP(vt100_mem)
 	MCFG_CPU_IO_MAP(vt100_io)
 	MCFG_CPU_IRQ_ACKNOWLEDGE_DRIVER(vt100_state,vt100_irq_callback)
@@ -283,18 +280,18 @@ MACHINE_CONFIG_START(vt100_state::vt100)
 	MCFG_VT_VIDEO_VERT_FREQ_INTR_CALLBACK(WRITELINE(vt100_state, vert_freq_intr_w))
 	MCFG_VT_VIDEO_LBA7_CALLBACK(DEVWRITELINE("nvr", er1400_device, clock_w))
 
-	MCFG_DEVICE_ADD("i8251", I8251, 0) // 2.7648Mhz phi-clock (not used for tx clock or rx clock?)
+	MCFG_DEVICE_ADD("pusart", I8251, XTAL(24'883'200) / 9)
 	MCFG_I8251_TXD_HANDLER(DEVWRITELINE(RS232_TAG, rs232_port_device, write_txd))
 	MCFG_I8251_DTR_HANDLER(DEVWRITELINE(RS232_TAG, rs232_port_device, write_dtr))
 	MCFG_I8251_RTS_HANDLER(DEVWRITELINE(RS232_TAG, rs232_port_device, write_rts))
 
 	MCFG_RS232_PORT_ADD(RS232_TAG, default_rs232_devices, nullptr)
-	MCFG_RS232_RXD_HANDLER(DEVWRITELINE("i8251", i8251_device, write_rxd))
-	MCFG_RS232_DSR_HANDLER(DEVWRITELINE("i8251", i8251_device, write_dsr))
+	MCFG_RS232_RXD_HANDLER(DEVWRITELINE("pusart", i8251_device, write_rxd))
+	MCFG_RS232_DSR_HANDLER(DEVWRITELINE("pusart", i8251_device, write_dsr))
 
-	MCFG_DEVICE_ADD(COM5016T_TAG, COM8116, 5068800/*XTAL(24'883'200) / 9*/) // COM5016T-013, 2.7648Mhz Clock, currently hacked wrongly
-	MCFG_COM8116_FR_HANDLER(DEVWRITELINE("i8251", i8251_device, write_rxc))
-	MCFG_COM8116_FT_HANDLER(DEVWRITELINE("i8251", i8251_device, write_txc))
+	MCFG_DEVICE_ADD("dbrg", COM5016_013, XTAL(24'883'200) / 9) // COM5016T-013, 2.7648Mhz Clock
+	MCFG_COM8116_FR_HANDLER(DEVWRITELINE("pusart", i8251_device, write_rxc))
+	MCFG_COM8116_FT_HANDLER(DEVWRITELINE("pusart", i8251_device, write_txc))
 
 	MCFG_DEVICE_ADD("nvr", ER1400, 0)
 
@@ -313,6 +310,13 @@ MACHINE_CONFIG_DERIVED(vt100_state::vt102, vt100)
 	MCFG_CPU_PROGRAM_MAP(vt100_mem)
 	MCFG_CPU_IO_MAP(vt100_io)
 	MCFG_CPU_IRQ_ACKNOWLEDGE_DRIVER(vt100_state,vt100_irq_callback)
+
+	MCFG_DEVICE_MODIFY("pusart")
+	MCFG_DEVICE_CLOCK(XTAL(24'073'400) / 8)
+
+	MCFG_DEVICE_REPLACE("dbrg", COM8116_003, XTAL(24'073'400) / 4)
+	MCFG_COM8116_FR_HANDLER(DEVWRITELINE("pusart", i8251_device, write_rxc))
+	MCFG_COM8116_FT_HANDLER(DEVWRITELINE("pusart", i8251_device, write_txc))
 MACHINE_CONFIG_END
 
 /* VT1xx models:

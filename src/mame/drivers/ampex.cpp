@@ -19,7 +19,7 @@ the PCB, which go so far as to include the standard 8224 clock generator.
 #include "emu.h"
 #include "cpu/z80/z80.h"
 #include "machine/ay31015.h"
-//#include "machine/com8116.h"
+#include "machine/com8116.h"
 #include "video/tms9927.h"
 #include "screen.h"
 
@@ -32,6 +32,7 @@ public:
 		: driver_device(mconfig, type, tag)
 		, m_maincpu(*this, "maincpu")
 		, m_uart(*this, "uart")
+		, m_dbrg(*this, "dbrg")
 		, m_p_chargen(*this, "chargen")
 	{ }
 
@@ -65,6 +66,7 @@ private:
 
 	required_device<cpu_device> m_maincpu;
 	required_device<ay31015_device> m_uart;
+	required_device<com8116_device> m_dbrg;
 	required_region_ptr<u8> m_p_chargen;
 };
 
@@ -88,7 +90,6 @@ WRITE8_MEMBER(ampex_state::write_5840)
 
 READ8_MEMBER(ampex_state::read_5841)
 {
-	logerror("%s: Read from 5841\n", machine().describe_context());
 	u8 result = m_uart->get_output_pin(AY31015_DAV) << 3;
 	result |= m_uart->get_output_pin(AY31015_OR) << 4;
 	result |= m_uart->get_output_pin(AY31015_PE) << 5;
@@ -212,6 +213,8 @@ MACHINE_CONFIG_START(ampex_state::ampex)
 
 	MCFG_DEVICE_ADD("uart", AY31015, 0) // COM8017, actually
 	MCFG_AY31015_STATUS_CHANGED_CB(WRITE8(ampex_state, uart_status_update))
+
+	MCFG_DEVICE_ADD("dbrg", COM5016_5, XTAL(4'915'200))
 MACHINE_CONFIG_END
 
 ROM_START( dialog80 )
