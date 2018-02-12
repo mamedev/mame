@@ -114,7 +114,7 @@ image_init_result apexc_cylinder_image_device::call_load()
 	/* load RAM contents */
 	m_writable = !is_readonly();
 
-	fread( machine().root_device().memregion("maincpu")->base(), 0x1000);
+	fread( machine().root_device().memshare("maincpu")->ptr(), 0x1000);
 #ifdef LSB_FIRST
 	{   /* fix endianness */
 		uint32_t *RAM = (uint32_t *)(machine().root_device().memregion("maincpu")->base());
@@ -845,13 +845,8 @@ GFXDECODE_END
 
 
 ADDRESS_MAP_START(apexc_state::apexc_mem_map)
-#if 0
-	AM_RANGE(0x0000, 0x03ff) AM_RAM /* 1024 32-bit words (expandable to 8192) */
-	AM_RANGE(0x0400, 0x1fff) AM_NOP
-#else
-	AM_RANGE(0x0000, 0x0fff) AM_RAM AM_REGION("maincpu", 0x0000)
+	AM_RANGE(0x0000, 0x0fff) AM_RAM AM_SHARE("maincpu")
 	AM_RANGE(0x1000, 0x7fff) AM_NOP
-#endif
 ADDRESS_MAP_END
 
 
@@ -888,8 +883,7 @@ MACHINE_CONFIG_END
 
 ROM_START(apexc)
 	/*CPU memory space*/
-	ROM_REGION32_BE(0x10000, "maincpu", ROMREGION_ERASEFF)
-		/* Note this computer has no ROM... */
+	/* Note this computer has no ROM... */
 
 	ROM_REGION(apexcfontdata_size, "chargen", ROMREGION_ERASEFF)
 		/* space filled with our font */

@@ -1057,7 +1057,7 @@ ADDRESS_MAP_START(a2000_state::a2000_mem)
 	AM_RANGE(0xc80000, 0xd7ffff) AM_READWRITE(custom_chip_r, custom_chip_w)
 	AM_RANGE(0xd80000, 0xdbffff) AM_NOP
 	AM_RANGE(0xdc0000, 0xdc7fff) AM_READWRITE(clock_r, clock_w)
-	AM_RANGE(0xd80000, 0xddffff) AM_NOP
+	AM_RANGE(0xdc8000, 0xddffff) AM_NOP
 	AM_RANGE(0xde0000, 0xdeffff) AM_READWRITE(custom_chip_r, custom_chip_w)
 	AM_RANGE(0xdf0000, 0xdfffff) AM_READWRITE(custom_chip_r, custom_chip_w)
 	AM_RANGE(0xe00000, 0xe7ffff) AM_WRITENOP AM_READ(rom_mirror_r)
@@ -1128,7 +1128,7 @@ ADDRESS_MAP_START(a500p_state::a500p_mem)
 	AM_RANGE(0xc80000, 0xd7ffff) AM_READWRITE(custom_chip_r, custom_chip_w)
 	AM_RANGE(0xd80000, 0xdbffff) AM_NOP
 	AM_RANGE(0xdc0000, 0xdc7fff) AM_READWRITE(clock_r, clock_w)
-	AM_RANGE(0xd80000, 0xddffff) AM_NOP
+	AM_RANGE(0xdc8000, 0xddffff) AM_NOP
 	AM_RANGE(0xde0000, 0xdeffff) AM_READWRITE(custom_chip_r, custom_chip_w)
 	AM_RANGE(0xdf0000, 0xdfffff) AM_READWRITE(custom_chip_r, custom_chip_w)
 	AM_RANGE(0xe00000, 0xe7ffff) AM_WRITENOP AM_READ(rom_mirror_r)

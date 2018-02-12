@@ -597,9 +597,10 @@ ADDRESS_MAP_END
 ADDRESS_MAP_START(blaster_state::blaster_map)
 	AM_RANGE(0x0000, 0x3fff) AM_READ_BANK("bank1") AM_WRITEONLY AM_SHARE("videoram")
 	AM_RANGE(0x4000, 0x8fff) AM_READ_BANK("bank2") AM_WRITEONLY
-	AM_RANGE(0xbb00, 0xbbff) AM_WRITEONLY AM_SHARE("blaster_pal0")
-	AM_RANGE(0xbc00, 0xbcff) AM_WRITEONLY AM_SHARE("blaster_scan")
-	AM_RANGE(0x9000, 0xbfff) AM_RAM
+	AM_RANGE(0x9000, 0xbaff) AM_RAM
+	AM_RANGE(0xbb00, 0xbbff) AM_RAM AM_SHARE("blaster_pal0")
+	AM_RANGE(0xbc00, 0xbcff) AM_RAM AM_SHARE("blaster_scan")
+	AM_RANGE(0xbd00, 0xbfff) AM_RAM
 	AM_RANGE(0xc000, 0xc00f) AM_MIRROR(0x03f0) AM_WRITEONLY AM_SHARE("paletteram")
 	AM_RANGE(0xc804, 0xc807) AM_MIRROR(0x00f0) AM_DEVREADWRITE("pia_0", pia6821_device, read, write)
 	AM_RANGE(0xc80c, 0xc80f) AM_MIRROR(0x00f0) AM_DEVREADWRITE("pia_1", pia6821_device, read, write)

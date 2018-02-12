@@ -239,7 +239,7 @@ ADDRESS_MAP_START(ti68k_state::ti89t_mem)
 	AM_RANGE(0x600000, 0x6fffff) AM_READWRITE(ti68k_io_r, ti68k_io_w)
 	AM_RANGE(0x700000, 0x70ffff) AM_READWRITE(ti68k_io2_r, ti68k_io2_w)
 	AM_RANGE(0x800000, 0xbfffff) AM_READWRITE(flash_r, flash_w)
-	AM_RANGE(0xbf0000, 0xffffff) AM_NOP
+	AM_RANGE(0xc00000, 0xffffff) AM_NOP
 ADDRESS_MAP_END
 
 

@@ -303,13 +303,13 @@ ADDRESS_MAP_START(liberate_state::liberatb_map)
 	AM_RANGE(0x4400, 0x47ff) AM_WRITE(liberate_videoram_w) AM_SHARE("videoram")
 	AM_RANGE(0x4800, 0x4fff) AM_WRITEONLY AM_SHARE("spriteram")
 	AM_RANGE(0x6200, 0x67ff) AM_WRITEONLY AM_SHARE("scratchram")
+	AM_RANGE(0x8000, 0xffff) AM_ROM
 	AM_RANGE(0xf000, 0xf00f) AM_WRITE(deco16_io_w)
 	AM_RANGE(0xf000, 0xf000) AM_READ_PORT("IN1")
 	AM_RANGE(0xf001, 0xf001) AM_READ_PORT("IN2")
 	AM_RANGE(0xf002, 0xf002) AM_READ_PORT("IN3")
 	AM_RANGE(0xf003, 0xf003) AM_READ_PORT("DSW1")
 	AM_RANGE(0xf004, 0xf004) AM_READ_PORT("DSW2")
-	AM_RANGE(0x8000, 0xffff) AM_ROM
 ADDRESS_MAP_END
 
 /*************************************
