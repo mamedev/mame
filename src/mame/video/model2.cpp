@@ -2566,7 +2566,7 @@ void model2_state::geo_parse( void )
 		if ( opcode & 0x80000000 )
 		{
 			/* get the address */
-			address = (opcode & 0x7FFFF) / 4;
+			address = (opcode & 0x1FFFF) / 4;
 
 			/* update our pointer */
 			input = &m_bufferram[address];
