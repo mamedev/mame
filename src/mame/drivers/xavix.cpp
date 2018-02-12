@@ -43,16 +43,16 @@ public:
 	xavix_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag),
 		m_maincpu(*this, "maincpu"),
-		spr_attr0(*this, "spr_attr0"),
-		spr_attr1(*this, "spr_attr1"),
-		spr_attr2(*this, "spr_attr2"),
-		spr_attr3(*this, "spr_attr3"),
-		spr_attr5(*this, "spr_attr5"),
-		spr_attr6(*this, "spr_attr6"),
-		spr_attr7(*this, "spr_attr7"),
+		m_spr_attr0(*this, "spr_attr0"),
+		m_spr_attr1(*this, "spr_attr1"),
+		m_spr_attr2(*this, "spr_attr2"),
+		m_spr_attr3(*this, "spr_attr3"),
+		m_spr_attr5(*this, "spr_attr5"),
+		m_spr_attr6(*this, "spr_attr6"),
+		m_spr_attr7(*this, "spr_attr7"),
 		m_palram1(*this, "palram1"),
 		m_palram2(*this, "palram2"),
-		spr_attra(*this, "spr_attra"),
+		m_spr_attra(*this, "spr_attra"),
 		m_palette(*this, "palette")
 	{ }
 
@@ -139,19 +139,19 @@ private:
 
 	uint8_t get_vectors(int which, int half);
 
-	required_shared_ptr<uint8_t> spr_attr0;
-	required_shared_ptr<uint8_t> spr_attr1;
-	required_shared_ptr<uint8_t> spr_attr2;
-	required_shared_ptr<uint8_t> spr_attr3;
+	required_shared_ptr<uint8_t> m_spr_attr0;
+	required_shared_ptr<uint8_t> m_spr_attr1;
+	required_shared_ptr<uint8_t> m_spr_attr2;
+	required_shared_ptr<uint8_t> m_spr_attr3;
 
-	required_shared_ptr<uint8_t> spr_attr5;
-	required_shared_ptr<uint8_t> spr_attr6;
-	required_shared_ptr<uint8_t> spr_attr7;
+	required_shared_ptr<uint8_t> m_spr_attr5;
+	required_shared_ptr<uint8_t> m_spr_attr6;
+	required_shared_ptr<uint8_t> m_spr_attr7;
 
 	required_shared_ptr<uint8_t> m_palram1;
 	required_shared_ptr<uint8_t> m_palram2;
 
-	required_shared_ptr<uint8_t> spr_attra;
+	required_shared_ptr<uint8_t> m_spr_attra;
 	
 	required_device<palette_device> m_palette;
 
