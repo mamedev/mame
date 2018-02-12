@@ -1453,7 +1453,7 @@ ADDRESS_MAP_START(model2_state::model2_base_mem)
 
 	//AM_RANGE(0x00880000, 0x00883fff) AM_WRITE(copro_w)
 
-	AM_RANGE(0x00900000, 0x0097ffff) AM_RAM AM_SHARE("bufferram")
+	AM_RANGE(0x00900000, 0x0091ffff) AM_MIRROR(0x60000) AM_RAM AM_SHARE("bufferram")
 
 	AM_RANGE(0x00980004, 0x00980007) AM_READ(fifoctl_r)
 	AM_RANGE(0x0098000c, 0x0098000f) AM_READWRITE(videoctl_r,videoctl_w)
