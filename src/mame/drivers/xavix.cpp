@@ -4,30 +4,10 @@
 
     Skeleton driver for XaviX TV PNP console and childs (Let's! Play TV Classic)
 
-    CPU is an M6502 derivative where opcode 0x22 has 3 bytes of operands.
-    Definitely not: 65C816 or Mitsu M740.
-
-    Code at F34F is thus:
-
-    F34F:  STA $6200,X
-    F352:  INX
-    F353:  BNE $F34F
-    F355:  UNK 12 FA 80
-    F359:  UNK 12 A8 80
-    F35D:  UNK 12 1B 80
-    F361:  SEC
-    F362:  LDA #$CD
-    F364:  SBC #$CA
-
-    later on
-
-    F3C9:  UNK 00 E4 C4
-
-    TODO:
-    - identify CPU
-    - figure out ROM banking
+    CPU is an M6502 derivative with added opcodes for far-call handling
 
     Notes from http://www.videogameconsolelibrary.com/pg00-xavix.htm#page=reviews (thanks Guru!)
+	(** this isn't entirely accurate, XaviX Tennis appears to be Super Xavix, see other notes in driver)
 
     XaviXPORT arrived on the scene with 3 game titles (XaviX Tennis, XaviX Bowling and XaviX Baseball) using their
     original XaviX Multiprocessor.  This proprietary chip is reported to contain an 8-bit high speed central processing
@@ -40,6 +20,10 @@
     containing the upgraded "Super XaviX".  This new chip is said to sport a 16-bit high central processing unit (65816) at 43 MHz.
     SSD COMPANY LIMITED is already working on their next chip called "XaviX II" that is said to be a 32-bit RISC processor
     with 3D capabilities.
+
+	Important addresses
+
+	0x18340 in Monster Truck is the self-test mode, shows me which registers need to retain their values etc.
 
 ***************************************************************************/
 
@@ -59,8 +43,16 @@ public:
 	xavix_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag),
 		m_maincpu(*this, "maincpu"),
+		spr_attr0(*this, "spr_attr0"),
+		spr_attr1(*this, "spr_attr1"),
+		spr_attr2(*this, "spr_attr2"),
+		spr_attr3(*this, "spr_attr3"),
+		spr_attr5(*this, "spr_attr5"),
+		spr_attr6(*this, "spr_attr6"),
+		spr_attr7(*this, "spr_attr7"),
 		m_palram1(*this, "palram1"),
 		m_palram2(*this, "palram2"),
+		spr_attra(*this, "spr_attra"),
 		m_palette(*this, "palette")
 	{ }
 
@@ -101,8 +93,13 @@ public:
 	DECLARE_WRITE8_MEMBER(xavix_75ff_w);
 	DECLARE_READ8_MEMBER(xavix_75f9_r);
 
+	DECLARE_READ8_MEMBER(mult_r);
+	DECLARE_WRITE8_MEMBER(mult_param_w);
+
 	INTERRUPT_GEN_MEMBER(interrupt);
 	TIMER_DEVICE_CALLBACK_MEMBER(scanline_cb);
+
+	DECLARE_DRIVER_INIT(xavix);
 
 	void xavix_map(address_map &map);
 protected:
@@ -129,13 +126,31 @@ private:
 	uint8_t m_irq_vector1_lo_data;
 	uint8_t m_irq_vector1_hi_data;
 
+	uint8_t m_multparams[3];
+	uint8_t m_multresults[2];
+
 	uint8_t get_vectors(int which, int half);
+
+	required_shared_ptr<uint8_t> spr_attr0;
+	required_shared_ptr<uint8_t> spr_attr1;
+	required_shared_ptr<uint8_t> spr_attr2;
+	required_shared_ptr<uint8_t> spr_attr3;
+
+	required_shared_ptr<uint8_t> spr_attr5;
+	required_shared_ptr<uint8_t> spr_attr6;
+	required_shared_ptr<uint8_t> spr_attr7;
 
 	required_shared_ptr<uint8_t> m_palram1;
 	required_shared_ptr<uint8_t> m_palram2;
+
+	required_shared_ptr<uint8_t> spr_attra;
+	
 	required_device<palette_device> m_palette;
 
 	void handle_palette(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+
+	int m_rgnlen;
+	uint8_t* m_rgn;
 };
 
 void xavix_state::video_start()
@@ -184,18 +199,14 @@ WRITE8_MEMBER(xavix_state::dma_trigger_w)
 	uint16_t dest = (m_dmadst_hi_data<<8) | m_dmadst_lo_data;
 	uint16_t len = (m_dmalen_hi_data<<8) | m_dmalen_lo_data;
 
-	// TODO: don't do tag lookups here once satisfied this is correct
-	const uint32_t rgnlen = memregion("bios")->bytes();
-	uint8_t *rgn = memregion("bios")->base();
-	
-	source &= rgnlen-1;
+	source &= m_rgnlen-1;
 	logerror("  (possible DMA op SRC %08x DST %04x LEN %04x)\n", source, dest, len);
 
 	address_space& destspace = m_maincpu->space(AS_PROGRAM);
 
 	for (int i = 0; i < len; i++)
 	{
-		uint8_t dat = rgn[(source + i) & (rgnlen-1)];
+		uint8_t dat = m_rgn[(source + i) & (m_rgnlen-1)];
 		destspace.write_byte(dest + i, dat);
 	}
 }
@@ -411,21 +422,50 @@ READ8_MEMBER(xavix_state::xavix_75f5_r)
 	return 0xff;
 }
 
-// DATA reads from 0x8000-0xffff are banked by byte 0xff of 'ram'
+READ8_MEMBER(xavix_state::mult_r)
+{
+	return m_multresults[offset];
+}
+
+WRITE8_MEMBER(xavix_state::mult_param_w)
+{
+	COMBINE_DATA(&m_multparams[offset]);
+	// there are NOPs after one of the writes, so presumably the operation is write triggerd and not intstant
+	// see test code at 0184a4 in monster truck
+
+	if (offset == 2)
+	{
+		// assume 0 is upper bits, might be 'mode' instead, check
+		uint16_t param1 = (m_multparams[0]<<8) | (m_multparams[1]);
+		uint8_t param2 = (m_multparams[2]);
+
+		uint16_t result =  param1*param2;
+
+		m_multresults[1] = (result>>8)&0xff;
+		m_multresults[0] = result&0xff;
+	}
+}
+
+
+// DATA reads from 0x8000-0xffff are banked by byte 0xff of 'ram' (this is handled in the CPU core)
 
 ADDRESS_MAP_START(xavix_state::xavix_map)
 	AM_RANGE(0x000000, 0x0001ff) AM_RAM
 	AM_RANGE(0x000200, 0x003fff) AM_RAM
 
-	// 6xxx ranges could be the video controller
-
-	AM_RANGE(0x006000, 0x0061ff) AM_RAM // taitons1 writes to other areas here, but might already be off the rails
-	AM_RANGE(0x006200, 0x0062ff) AM_RAM // cleared to 0x80 by both games
-	AM_RANGE(0x006300, 0x0067ff) AM_RAM // taitons1 writes to other areas here, but might already be off the rails
-	
-	// could be palettes?
+	// 6xxx ranges are the video hardware
+	// appears to be 256 sprites (shares will be renamed once their purpose is known)
+	AM_RANGE(0x006000, 0x0060ff) AM_RAM AM_SHARE("spr_attr0")
+	AM_RANGE(0x006100, 0x0061ff) AM_RAM AM_SHARE("spr_attr1")
+	AM_RANGE(0x006200, 0x0062ff) AM_RAM AM_SHARE("spr_attr2") // cleared to 0x80 by both games, maybe enable registers?
+	AM_RANGE(0x006300, 0x0063ff) AM_RAM AM_SHARE("spr_attr3")
+	// 6400 range unused
+	AM_RANGE(0x006500, 0x0065ff) AM_RAM AM_SHARE("spr_attr5")
+	AM_RANGE(0x006600, 0x0066ff) AM_RAM AM_SHARE("spr_attr6")
+	AM_RANGE(0x006700, 0x0067ff) AM_RAM AM_SHARE("spr_attr7")
 	AM_RANGE(0x006800, 0x0068ff) AM_RAM AM_SHARE("palram1") // written with 6900
 	AM_RANGE(0x006900, 0x0069ff) AM_RAM AM_SHARE("palram2") // startup (taitons1)
+	AM_RANGE(0x006a00, 0x006a1f) AM_RAM AM_SHARE("spr_attra") // test mode, pass flag 0x20
 
 	AM_RANGE(0x006a00, 0x006a00) AM_WRITENOP
 	AM_RANGE(0x006a01, 0x006a01) AM_WRITENOP
@@ -451,11 +491,11 @@ ADDRESS_MAP_START(xavix_state::xavix_map)
 	AM_RANGE(0x006fe6, 0x006fe6) AM_WRITENOP
 
 	// function in rad_mtrk at 0184b7 uses this
-	AM_RANGE(0x006fe8, 0x006fe8) AM_WRITENOP // cleared in interrupt 0
-	AM_RANGE(0x006fe9, 0x006fe9) AM_WRITENOP // startup - cleared in interrupt 0
+	AM_RANGE(0x006fe8, 0x006fe8) AM_RAM // r/w tested
+	AM_RANGE(0x006fe9, 0x006fe9) AM_RAM // r/w tested
 	AM_RANGE(0x006fea, 0x006fea) AM_WRITENOP 
 
-	AM_RANGE(0x006ff0, 0x006ff0) AM_WRITENOP // cleared in interrupt 0
+	AM_RANGE(0x006ff0, 0x006ff0) AM_RAM // r/w tested
 	AM_RANGE(0x006ff1, 0x006ff1) AM_WRITENOP // startup - cleared in interrupt 0
 	AM_RANGE(0x006ff2, 0x006ff2) AM_WRITENOP // set to 07 after clearing above things in interrupt 0
 
@@ -464,20 +504,24 @@ ADDRESS_MAP_START(xavix_state::xavix_map)
 
 	// 7xxx ranges system controller?
 
-	AM_RANGE(0x0075f0, 0x0075f0) AM_RAM // read/written 8 times in a row
-	AM_RANGE(0x0075f1, 0x0075f1) AM_RAM // read/written 8 times in a row
+	AM_RANGE(0x0075f0, 0x0075f0) AM_RAM // r/w tested read/written 8 times in a row
+	AM_RANGE(0x0075f1, 0x0075f1) AM_RAM // r/w tested read/written 8 times in a row
 	AM_RANGE(0x0075f4, 0x0075f4) AM_READ(xavix_75f4_r) // related to 75f0 (read after writing there - rad_mtrk)
 	AM_RANGE(0x0075f5, 0x0075f5) AM_READ(xavix_75f5_r) // related to 75f1 (read after writing there - rad_mtrk)
 
 	// taitons1 after 75f7/75f8
-	AM_RANGE(0x0075f6, 0x0075f6) AM_WRITE(xavix_75f6_w)
+	AM_RANGE(0x0075f6, 0x0075f6) AM_RAM // r/w tested AM_WRITE(xavix_75f6_w)
 	// taitons1 written as a pair
 	AM_RANGE(0x0075f7, 0x0075f7) AM_WRITE(xavix_75f7_w)
-	AM_RANGE(0x0075f8, 0x0075f8) AM_WRITE(xavix_75f8_w)
+	AM_RANGE(0x0075f8, 0x0075f8) AM_RAM // r/w tested AM_WRITE(xavix_75f8_w)
 	// taitons1 written after 75f6, then read
 	//AM_RANGE(0x0075f9, 0x0075f9) AM_READWRITE(xavix_75f9_r, xavix_75f9_w)
 	// at another time
-	AM_RANGE(0x0075fd, 0x0075fd) AM_WRITENOP
+	AM_RANGE(0x0075fa, 0x0075fa) AM_RAM // r/w tested
+	AM_RANGE(0x0075fb, 0x0075fb) AM_RAM // r/w tested
+	AM_RANGE(0x0075fc, 0x0075fc) AM_RAM // r/w tested
+
+	AM_RANGE(0x0075fd, 0x0075fd) AM_RAM // r/w tested
 	AM_RANGE(0x0075fe, 0x0075fe) AM_WRITENOP
 	// taitons1 written other 75xx operations
 	AM_RANGE(0x0075ff, 0x0075ff) AM_WRITE(xavix_75ff_w)
@@ -512,13 +556,12 @@ ADDRESS_MAP_START(xavix_state::xavix_map)
 	AM_RANGE(0x007b81, 0x007b81) AM_WRITENOP
 	AM_RANGE(0x007b82, 0x007b82) AM_WRITENOP
 
+	AM_RANGE(0x007c01, 0x007c01) AM_RAM // r/w tested
 	AM_RANGE(0x007c02, 0x007c02) AM_WRITENOP // once
 
-	AM_RANGE(0x007ff2, 0x007ff2) AM_WRITENOP
-	AM_RANGE(0x007ff3, 0x007ff3) AM_WRITENOP
-	AM_RANGE(0x007ff4, 0x007ff4) AM_WRITENOP
-	//AM_RANGE(0x007ff5, 0x007ff5) AM_READNOP
-	//AM_RANGE(0x007ff6, 0x007ff6) AM_READNOP
+	// this is a multiplication chip
+	AM_RANGE(0x007ff2, 0x007ff4) AM_WRITE(mult_param_w)
+	AM_RANGE(0x007ff5, 0x007ff6) AM_READ(mult_r)
 	
 	// maybe irq enable, written after below
 	AM_RANGE(0x007ff9, 0x007ff9) AM_WRITE(irq_enable_w)
@@ -529,7 +572,8 @@ ADDRESS_MAP_START(xavix_state::xavix_map)
 	AM_RANGE(0x007ffe, 0x007ffe) AM_WRITE(irq_vector1_lo_w)
 	AM_RANGE(0x007fff, 0x007fff) AM_WRITE(irq_vector1_hi_w)
 
-	AM_RANGE(0x008000, 0x7fffff) AM_ROM AM_REGION("bios", 0x008000) AM_MIRROR(0x800000) // rad_mtrk relies on rom mirroring
+//  rom is installed in init due to different rom sizes and mirroring required
+//	AM_RANGE(0x008000, 0x7fffff) AM_ROM AM_REGION("bios", 0x008000) AM_MIRROR(0x800000) // rad_mtrk relies on rom mirroring
 ADDRESS_MAP_END
 
 static INPUT_PORTS_START( xavix )
@@ -705,6 +749,15 @@ MACHINE_CONFIG_START(xavix_state::xavix)
 //  MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.30)
 MACHINE_CONFIG_END
 
+DRIVER_INIT_MEMBER(xavix_state,xavix)
+{
+	m_rgnlen = memregion("bios")->bytes();
+	m_rgn = memregion("bios")->base();
+
+	// mirror the rom across the space
+	address_space &space = m_maincpu->space(AS_PROGRAM);
+	space.install_rom(0x8000, m_rgnlen, ((~(m_rgnlen-1))<<1)&0xffffff, m_rgn+0x8000);
+}
 
 /***************************************************************************
 
@@ -713,64 +766,68 @@ MACHINE_CONFIG_END
 ***************************************************************************/
 
 ROM_START( taitons1 )
-	ROM_REGION( 0x800000, "bios", ROMREGION_ERASE00 )
+	ROM_REGION( 0x200000, "bios", ROMREGION_ERASE00 )
 	ROM_LOAD( "taitonostalgia1.u3", 0x000000, 0x200000, CRC(25bd8c67) SHA1(a109cd2da6aa4596e3ca3abd1afce2d0001a473f) )
-	ROM_RELOAD(0x200000,0x200000)
-	ROM_RELOAD(0x400000,0x200000)
-	ROM_RELOAD(0x600000,0x200000)
+ROM_END
+
+ROM_START( rad_box )
+	ROM_REGION(0x200000, "bios", ROMREGION_ERASE00)
+	ROM_LOAD("boxing.bin", 0x000000, 0x200000, CRC(5cd40714) SHA1(165260228c029a9502ca0598c84c24fd9bdeaebe) )
 ROM_END
 
 ROM_START( rad_ping )
-	ROM_REGION( 0x800000, "bios", ROMREGION_ERASE00 )
+	ROM_REGION( 0x100000, "bios", ROMREGION_ERASE00 )
 	ROM_LOAD( "pingpong.bin", 0x000000, 0x100000, CRC(629f7f47) SHA1(2bb19fd202f1e6c319d2f7d18adbfed8a7669235) )
-	ROM_RELOAD(0x100000,0x100000)
-	ROM_RELOAD(0x200000,0x100000)
-	ROM_RELOAD(0x300000,0x100000)
-	ROM_RELOAD(0x400000,0x100000)
-	ROM_RELOAD(0x500000,0x100000)
-	ROM_RELOAD(0x600000,0x100000)
-	ROM_RELOAD(0x700000,0x100000)
 ROM_END
 
-ROM_START( rad_mtrk )
-	ROM_REGION( 0x800000, "bios", ROMREGION_ERASE00 )
-	ROM_LOAD( "monstertruck.bin", 0x000000, 0x400000, CRC(dccda0a7) SHA1(7953cf29643672f8367639555b797c20bb533eab) )
-	ROM_RELOAD(0x400000,0x400000)
+ROM_START( rad_crdn )
+	ROM_REGION( 0x100000, "bios", ROMREGION_ERASE00 )
+	ROM_LOAD( "cardnight.bin", 0x000000, 0x100000, CRC(d19eba08) SHA1(cedb9fe785f2a559f518a1d8ecf80d500ddc63c7) )
 ROM_END
 
 ROM_START( rad_bb2 )
-	ROM_REGION( 0x800000, "bios", ROMREGION_ERASE00 )
+	ROM_REGION( 0x200000, "bios", ROMREGION_ERASE00 )
 	ROM_LOAD( "baseball2.bin", 0x000000, 0x200000, CRC(bdbf6202) SHA1(18d5cc2d77cbb734629a7a5b6e0f419d21beedbd) )
-	ROM_RELOAD(0x200000,0x200000)
-	ROM_RELOAD(0x400000,0x200000)
-	ROM_RELOAD(0x600000,0x200000)
 ROM_END
+
+ROM_START( rad_mtrk )
+	ROM_REGION( 0x400000, "bios", ROMREGION_ERASE00 )
+	ROM_LOAD( "monstertruck.bin", 0x000000, 0x400000, CRC(dccda0a7) SHA1(7953cf29643672f8367639555b797c20bb533eab) )
+ROM_END
+
+ROM_START( eka_strt )
+	ROM_REGION( 0x080000, "bios", ROMREGION_ERASE00 )
+	ROM_LOAD( "ekarastartcart.bin", 0x000000, 0x080000, CRC(8c12c0c2) SHA1(8cc1b098894af25a4bfccada884125b66f5fe8b2) )
+ROM_END
+
+/* Standalone TV Games */
+
+CONS( 2006, taitons1,  0,   0,  xavix,  xavix, xavix_state, xavix, "Bandai / SSD Company LTD / Taito", "Let's! TV Play Classic - Taito Nostalgia 1", MACHINE_IS_SKELETON )
+
+CONS( 2000, rad_ping,  0,   0,  xavix,  xavix, xavix_state, xavix, "Radica / SSD Company LTD / Simmer Technology", "Play TV Ping Pong", MACHINE_IS_SKELETON ) // "Simmer Technology" is also known as "Hummer Technology Co., Ltd"
+CONS( 2003, rad_mtrk,  0,   0,  xavix,  xavix, xavix_state, xavix, "Radica / SSD Company LTD",                     "Play TV Monster Truck", MACHINE_IS_SKELETON )
+CONS( 200?, rad_box,   0,   0,  xavix,  xavix, xavix_state, xavix, "Radica / SSD Company LTD",                     "Play TV Boxing", MACHINE_IS_SKELETON)
+CONS( 200?, rad_crdn,  0,   0,  xavix,  xavix, xavix_state, xavix, "Radica / SSD Company LTD",                     "Play TV Card Night", MACHINE_IS_SKELETON)
+CONS( 2002, rad_bb2,   0,   0,  xavix,  xavix, xavix_state, xavix, "Radica / SSD Company LTD",                     "Play TV Baseball 2", MACHINE_IS_SKELETON ) // contains string "Radica RBB2 V1.0"
+
+CONS (200?, eka_strt,  0,   0,  xavix,  xavix, xavix_state, xavix, "Takara / SSD Company LTD",                     "e-kara Starter", MACHINE_IS_SKELETON)
+
+/* The 'XaviXPORT' isn't a real console, more of a TV adapter, all the actual hardware (CPU including video hw, sound hw) is in the cartridges and controllers
+   and can vary between games, see notes at top of driver.
+
+   According to sources XaviX Tennis should be a standard XaviX CPU, but at the very least makes significantly more use of custom opcodes than Taito Nostalgia
+   and Radica Ping Pong which only appears to use the call far / return far for extended memory space.
+   
+   Furthermore it also seems to require some regular 6502 opcodes to be replaced with custom ones, yet the other games expect these to act normally.  This
+   leads me to believe that XaviX Tennis is almost certainly a Super XaviX title.
+
+   The CPU die on XaviX Tennis is internally marked as NEC 85054-611
+
+*/
 
 ROM_START( xavtenni )
 	ROM_REGION( 0x800000, "bios", ROMREGION_ERASE00 )
 	ROM_LOAD( "xavixtennis.bin", 0x000000, 0x800000, CRC(23a1d918) SHA1(2241c59e8ea8328013e55952ebf9060ea0a4675b) )
 ROM_END
 
-/* Standalone TV Games */
-
-CONS( 2006, taitons1,  0,   0,  xavix,  xavix, xavix_state, 0, "Bandai / SSD Company LTD / Taito", "Let's! TV Play Classic - Taito Nostalgia 1", MACHINE_IS_SKELETON )
-
-CONS( 2000, rad_ping,  0,   0,  xavix,  xavix, xavix_state, 0, "Radica / SSD Company LTD / Simmer Technology", "Play TV Ping Pong", MACHINE_IS_SKELETON ) // "Simmer Technology" is also known as "Hummer Technology Co., Ltd"
-CONS( 2003, rad_mtrk,  0,   0,  xavix,  xavix, xavix_state, 0, "Radica / SSD Company LTD",                     "Play TV Monster Truck", MACHINE_IS_SKELETON )
-CONS( 2002, rad_bb2,   0,   0,  xavix,  xavix, xavix_state, 0, "Radica / SSD Company LTD",                     "Play TV Baseball 2", MACHINE_IS_SKELETON ) // contains string "Radica RBB2 V1.0"
-
-/* The 'XaviXPORT' isn't a real console, more of a TV adapter, all the actual hardware (CPU including video hw, sound hw) is in the cartridges and controllers
-   and can vary between games, see notes at top of driver.
-
-   According to sources XaviX Tennis should be a standard XaviX CPU, but at the very least makes significantly more use of custom opcodes than all the other
-   games which only use the call far / return far for extended memory space.
-   
-   Furthermore it also seems to require some regular 6502 opcodes to be replaced with custom ones, yet the other games expect these to act normally.  This
-   leads me to believe that XaviX Tennis is more likely to be a Super XaviX title.
-
-   The CPU die on XaviX Tennis is internally marked as NEC 85054-611
-
-*/
-CONS( 2004, xavtenni,  0,   0,  xavix,  xavix, xavix_state, 0, "SSD Company LTD", "XaviX Tennis (XaviXPORT)", MACHINE_IS_SKELETON )
-
-
+CONS( 2004, xavtenni,  0,   0,  xavix,  xavix, xavix_state, xavix, "SSD Company LTD", "XaviX Tennis (XaviXPORT)", MACHINE_IS_SKELETON )

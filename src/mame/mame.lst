@@ -38956,6 +38956,9 @@ xavtenni                        //
 rad_ping                        //
 rad_mtrk                        //
 rad_bb2                         //
+rad_box                         //
+rad_crdn                        //
+eka_strt                        //
 
 @source:xbox.cpp
 xbox                            //
