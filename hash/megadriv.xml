@@ -2114,6 +2114,7 @@ Info on Sega chip labels (from Sunbeam / Digital Corruption)
 
 
 	<software name="dracula" supported="no">
+	<!-- Inputs don't work on Options screen, and game hangs upon starting. -->
 		<description>Bram Stoker's Dracula (Euro)</description>
 		<year>1993</year>
 		<publisher>Sony Imagesoft</publisher>
@@ -12055,6 +12056,7 @@ but dumps still have to be confirmed.
 	</software>
 
 	<software name="draculau" cloneof="dracula" supported="no">
+	<!-- Inputs don't work on Options screen, and game hangs upon starting. -->
 		<description>Bram Stoker's Dracula (USA)</description>
 		<year>1993</year>
 		<publisher>Sony Imagesoft</publisher>
@@ -15088,7 +15090,7 @@ but dumps still have to be confirmed.
 		</part>
 	</software>
 
-	<software name="espnnfl" supported="no"> <!-- it freezes at head/tail -->
+	<software name="espnnfl"> <!-- Needs a 6-button controller -->
 		<description>ESPN Sunday Night NFL (USA)</description>
 		<year>1994</year>
 		<publisher>Sony Imagesoft</publisher>
@@ -16792,7 +16794,8 @@ but dumps still have to be confirmed.
 		</part>
 	</software>
 
-	<software name="hyokkohj" supported="partial">
+	<software name="hyokkohj" supported="no">
+	<!-- Inputs don't work -->
 		<description>Hyokkori Hyoutan-jima - Daitouryou o Mezase! (Jpn)</description>
 		<year>1992</year>
 		<publisher>Sega</publisher>
@@ -21131,6 +21134,7 @@ Notice that these are not working on real hardware due to bugged code with VDP i
 	</software>
 
 	<software name="olympgldu2" cloneof="olympgld" supported="no">
+	<!-- Music works, but the game black screens during the intro -->
 		<description>Olympic Gold (USA, Alt)</description>
 		<year>1992</year>
 		<publisher>U.S. Gold</publisher>
@@ -23833,6 +23837,7 @@ Notice that these are not working on real hardware due to bugged code with VDP i
 	</software>
 
 	<software name="sesame" supported="no">
+	<!-- Fails to boot -->
 		<description>Sesame Street Counting Cafe (USA)</description>
 		<year>1994</year>
 		<publisher>Electronic Arts</publisher>
@@ -24847,6 +24852,7 @@ Notice that these are not working on real hardware due to bugged code with VDP i
 	</software>
 
 	<software name="sonicjam" supported="no">
+	<!-- Fails to boot -->
 		<description>Sonic Jam 6 (Alt)</description>
 		<year>199?</year>
 		<publisher>&lt;unlicensed&gt;</publisher>
@@ -27224,6 +27230,7 @@ Notice that these are not working on real hardware due to bugged code with VDP i
 	</software>
 
 	<software name="telebrad" supported="no">
+	<!-- Fails to boot -->
 		<description>Telebradesco Residencia (Bra)</description>
 		<year>199?</year>
 		<publisher>&lt;unknown&gt;</publisher>
@@ -28966,6 +28973,7 @@ Notice that these are not working on real hardware due to bugged code with VDP i
 	</software>
 
 	<software name="wondlib" supported="no">
+	<!-- Fails to boot -->
 		<description>Wonder Library (Jpn)</description>
 		<year>199?</year>
 		<publisher>Victor</publisher>
@@ -30363,7 +30371,7 @@ Notice that these are not working on real hardware due to bugged code with VDP i
 		</part>
 	</software>
 
-	<software name="beggarp" supported="partial">
+	<software name="beggarp">
 		<description>Beggar Prince (Euro, USA)</description>
 		<year>2005</year>
 		<publisher>Super Fighter Team</publisher>
@@ -31234,7 +31242,8 @@ Notice that these are not working on real hardware due to bugged code with VDP i
 		</part>
 	</software>
 
-	<software name="whacacri" supported="partial">
+	<software name="whacacri" supported="no">
+	<!-- Inputs don't work -->
 		<description>Whac-a-Critter (USA)</description>
 		<year>1993</year>
 		<publisher>Realtec</publisher>
