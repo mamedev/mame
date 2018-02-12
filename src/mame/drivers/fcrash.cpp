@@ -78,12 +78,10 @@ sf2m1: crowd is missing. Plane's tail comes off a bit. Patch used.
 
 sf2mdt, sf2mdta: ok
 
-sgyxz: garbage left behind. A priority problem can be seen in 3rd demo where
+sgyxz, wofabl: garbage left behind. A priority problem can be seen in 3rd demo where
        the fighters walk through the crowd instead of behind.
 
 slampic: no sound. A priority problem between sprites and crowd.
-
-wofabl: no sprites.
 
 */
 
@@ -797,7 +795,7 @@ ADDRESS_MAP_START(cps_state::sgyxz_map)
 ADDRESS_MAP_END
 
 ADDRESS_MAP_START(cps_state::wofabl_map)
-	AM_RANGE(0x000000, 0x3fffff) AM_ROM
+	AM_RANGE(0x000000, 0x1fffff) AM_ROM
 	AM_RANGE(0x800030, 0x800031) AM_WRITE(cps1_coinctrl_w)
 	AM_RANGE(0x800100, 0x80013f) AM_RAM AM_SHARE("cps_a_regs")  /* CPS-A custom */
 	AM_RANGE(0x800140, 0x80017f) AM_RAM AM_SHARE("cps_b_regs")  /* CPS-B custom */
@@ -2919,27 +2917,12 @@ DRIVER_INIT_MEMBER(cps_state, sf2mdt)
 
 DRIVER_INIT_MEMBER(cps_state, sf2mdtb)
 {
-	int i;
-	uint32_t gfx_size = memregion( "gfx" )->bytes();
-	uint8_t *rom = memregion( "gfx" )->base();
-	uint8_t tmp;
-
-	for( i = 0; i < gfx_size; i += 8 )
-	{
-		tmp = rom[i + 1];
-		rom[i + 1] = rom[i + 4];
-		rom[i + 4] = tmp;
-		tmp = rom[i + 3];
-		rom[i + 3] = rom[i + 6];
-		rom[i + 6] = tmp;
-	}
-
 	/* bootleg sprite ram */
 	m_bootleg_sprite_ram = std::make_unique<uint16_t[]>(0x2000);
 	m_maincpu->space(AS_PROGRAM).install_ram(0x700000, 0x703fff, m_bootleg_sprite_ram.get());
 	m_maincpu->space(AS_PROGRAM).install_ram(0x704000, 0x707fff, m_bootleg_sprite_ram.get()); /* both of these need to be mapped  */
 
-	DRIVER_INIT_CALL(cps1);
+	DRIVER_INIT_CALL(wofabl);
 }
 
 
@@ -2962,6 +2945,26 @@ DRIVER_INIT_MEMBER(cps_state, sf2b)
 	m_bootleg_sprite_ram = std::make_unique<uint16_t[]>(0x2000);
 	m_maincpu->space(AS_PROGRAM).install_ram(0x700000, 0x703fff, m_bootleg_sprite_ram.get());
 	m_maincpu->space(AS_PROGRAM).install_ram(0x704000, 0x707fff, m_bootleg_sprite_ram.get());
+
+	DRIVER_INIT_CALL(cps1);
+}
+
+DRIVER_INIT_MEMBER(cps_state, wofabl)
+{
+	int i;
+	uint32_t gfx_size = memregion( "gfx" )->bytes();
+	uint8_t *rom = memregion( "gfx" )->base();
+	uint8_t tmp;
+
+	for( i = 0; i < gfx_size; i += 8 )
+	{
+		tmp = rom[i + 1];
+		rom[i + 1] = rom[i + 4];
+		rom[i + 4] = tmp;
+		tmp = rom[i + 3];
+		rom[i + 3] = rom[i + 6];
+		rom[i + 6] = tmp;
+	}
 
 	DRIVER_INIT_CALL(cps1);
 }
@@ -3194,6 +3197,6 @@ GAME( 1992, sf2m9,     sf2ce,    sf2m1,     sf2,      cps_state, sf2m1,    ROT0,
 GAME( 1993, slampic,   slammast, slampic,   slammast, cps_state, dinopic,  ROT0,   "bootleg", "Saturday Night Slam Masters (bootleg with PIC16c57)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_NO_SOUND | MACHINE_SUPPORTS_SAVE ) // 930713 ETC
 
 GAME( 1999, sgyxz,     wof,      sgyxz,     sgyxz,    cps_state, cps1,     ROT0,   "bootleg (All-In Electronic)", "Warriors of Fate ('sgyxz' bootleg)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE )   // 921005 - Sangokushi 2
-GAME( 1999, wofabl,    wof,      wofabl,    wofabl,   cps_state, sf2mdtb,  ROT0,   "bootleg", "Sangokushi II (bootleg)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE )   // no sprites - 921005 - Sangokushi 2
+GAME( 1999, wofabl,    wof,      wofabl,    wofabl,   cps_state, wofabl,   ROT0,   "bootleg", "Sangokushi II (bootleg)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE )   // heavy gfx glitches - 921005 - Sangokushi 2
 
 GAME( 1992, varthb,    varth,    varthb,    varth,    cps_state, dinopic,  ROT270, "bootleg", "Varth: Operation Thunderstorm (bootleg)", MACHINE_SUPPORTS_SAVE )

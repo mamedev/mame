@@ -2509,42 +2509,42 @@ static uint32_t * geo_code_jump( geo_state *geo, uint32_t opcode, uint32_t *inpu
 	return input;
 }
 
-static uint32_t * geo_process_command( geo_state *geo, uint32_t opcode, uint32_t *input )
+static uint32_t * geo_process_command( geo_state *geo, uint32_t opcode, uint32_t *input, bool *end_code )
 {
 	switch( (opcode >> 23) & 0x1f )
 	{
-		case 0x00: input = geo_nop( geo, opcode, input );               break;
-		case 0x01: input = geo_object_data( geo, opcode, input );       break;
-		case 0x02: input = geo_direct_data( geo, opcode, input );       break;
-		case 0x03: input = geo_window_data( geo, opcode, input );       break;
-		case 0x04: input = geo_texture_data( geo, opcode, input );      break;
-		case 0x05: input = geo_polygon_data( geo, opcode, input );      break;
+		case 0x00: input = geo_nop( geo, opcode, input );                   break;
+		case 0x01: input = geo_object_data( geo, opcode, input );           break;
+		case 0x02: input = geo_direct_data( geo, opcode, input );           break;
+		case 0x03: input = geo_window_data( geo, opcode, input );           break;
+		case 0x04: input = geo_texture_data( geo, opcode, input );          break;
+		case 0x05: input = geo_polygon_data( geo, opcode, input );          break;
 		case 0x06: input = geo_texture_parameters( geo, opcode, input );    break;
-		case 0x07: input = geo_mode( geo, opcode, input );              break;
+		case 0x07: input = geo_mode( geo, opcode, input );                  break;
 		case 0x08: input = geo_zsort_mode( geo, opcode, input );            break;
 		case 0x09: input = geo_focal_distance( geo, opcode, input );        break;
-		case 0x0A: input = geo_light_source( geo, opcode, input );      break;
-		case 0x0B: input = geo_matrix_write( geo, opcode, input );      break;
-		case 0x0C: input = geo_translate_write( geo, opcode, input );   break;
-		case 0x0D: input = geo_data_mem_push( geo, opcode, input );     break;
-		case 0x0E: input = geo_test( geo, opcode, input );              break;
-		case 0x0F: input = geo_end( geo, opcode, input );               break;
-		case 0x10: input = geo_dummy( geo, opcode, input );             break;
-		case 0x11: input = geo_object_data( geo, opcode, input );       break;
-		case 0x12: input = geo_direct_data( geo, opcode, input );       break;
-		case 0x13: input = geo_window_data( geo, opcode, input );       break;
-		case 0x14: input = geo_log_data( geo, opcode, input );          break;
-		case 0x15: input = geo_polygon_data( geo, opcode, input );      break;
-		case 0x16: input = geo_lod( geo, opcode, input );               break;
-		case 0x17: input = geo_mode( geo, opcode, input );              break;
+		case 0x0A: input = geo_light_source( geo, opcode, input );          break;
+		case 0x0B: input = geo_matrix_write( geo, opcode, input );          break;
+		case 0x0C: input = geo_translate_write( geo, opcode, input );       break;
+		case 0x0D: input = geo_data_mem_push( geo, opcode, input );         break;
+		case 0x0E: input = geo_test( geo, opcode, input );                  break;
+		case 0x0F: input = geo_end( geo, opcode, input ); *end_code = true; break;
+		case 0x10: input = geo_dummy( geo, opcode, input );                 break;
+		case 0x11: input = geo_object_data( geo, opcode, input );           break;
+		case 0x12: input = geo_direct_data( geo, opcode, input );           break;
+		case 0x13: input = geo_window_data( geo, opcode, input );           break;
+		case 0x14: input = geo_log_data( geo, opcode, input );              break;
+		case 0x15: input = geo_polygon_data( geo, opcode, input );          break;
+		case 0x16: input = geo_lod( geo, opcode, input );                   break;
+		case 0x17: input = geo_mode( geo, opcode, input );                  break;
 		case 0x18: input = geo_zsort_mode( geo, opcode, input );            break;
 		case 0x19: input = geo_focal_distance( geo, opcode, input );        break;
-		case 0x1A: input = geo_light_source( geo, opcode, input );      break;
-		case 0x1B: input = geo_matrix_write( geo, opcode, input );      break;
-		case 0x1C: input = geo_translate_write( geo, opcode, input );   break;
-		case 0x1D: input = geo_code_upload( geo, opcode, input );       break;
-		case 0x1E: input = geo_code_jump( geo, opcode, input );         break;
-		case 0x1F: input = geo_end( geo, opcode, input );               break;
+		case 0x1A: input = geo_light_source( geo, opcode, input );          break;
+		case 0x1B: input = geo_matrix_write( geo, opcode, input );          break;
+		case 0x1C: input = geo_translate_write( geo, opcode, input );       break;
+		case 0x1D: input = geo_code_upload( geo, opcode, input );           break;
+		case 0x1E: input = geo_code_jump( geo, opcode, input );             break;
+		case 0x1F: input = geo_end( geo, opcode, input ); *end_code = true; break;
 	}
 
 	return input;
@@ -2552,11 +2552,12 @@ static uint32_t * geo_process_command( geo_state *geo, uint32_t opcode, uint32_t
 
 void model2_state::geo_parse( void )
 {
-	uint32_t  address = (m_geo_read_start_address & 0x7ffff)/4;
+	uint32_t  address = (m_geo_read_start_address & 0x1ffff)/4;
 	uint32_t *input = &m_bufferram[address];
 	uint32_t  opcode;
-
-	while( input != nullptr && (input - m_bufferram) < 0x20000  )
+	bool end_code = false;
+	
+	while( end_code == false && (input - m_bufferram) < 0x20000/4  )
 	{
 		/* read in the opcode */
 		opcode = *input++;
@@ -2565,7 +2566,7 @@ void model2_state::geo_parse( void )
 		if ( opcode & 0x80000000 )
 		{
 			/* get the address */
-			address = (opcode & 0x7FFFF) / 4;
+			address = (opcode & 0x1FFFF) / 4;
 
 			/* update our pointer */
 			input = &m_bufferram[address];
@@ -2575,7 +2576,7 @@ void model2_state::geo_parse( void )
 		}
 
 		/* process it */
-		input = geo_process_command( m_geo, opcode, input );
+		input = geo_process_command( m_geo, opcode, input, &end_code );
 	}
 }
 
