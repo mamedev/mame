@@ -2423,6 +2423,97 @@ MACHINE_CONFIG_END
 
 /***************************************************************************
 
+  Tiger Strider (model 7-815)
+  * Sharp SM510 under epoxy (die label M92)
+  * lcd screen with custom segments, 1-bit sound
+
+***************************************************************************/
+
+class tstrider_state : public hh_sm510_state
+{
+public:
+	tstrider_state(const machine_config &mconfig, device_type type, const char *tag)
+		: hh_sm510_state(mconfig, type, tag)
+	{
+		m_inp_lines = 5;
+		m_inp_fixed = 5;
+	}
+
+	void tstrider(machine_config &config);
+};
+
+// config
+
+static INPUT_PORTS_START( tstrider )
+	PORT_START("IN.0") // S1
+	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_JOYSTICK_UP ) PORT_CHANGED_MEMBER(DEVICE_SELF, hh_sm510_state, input_changed, nullptr)
+	PORT_BIT( 0x0b, IP_ACTIVE_HIGH, IPT_UNUSED )
+
+	PORT_START("IN.1") // S2
+	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_JOYSTICK_RIGHT ) PORT_CHANGED_MEMBER(DEVICE_SELF, hh_sm510_state, input_changed, nullptr)
+	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_JOYSTICK_LEFT ) PORT_CHANGED_MEMBER(DEVICE_SELF, hh_sm510_state, input_changed, nullptr)
+	PORT_BIT( 0x09, IP_ACTIVE_HIGH, IPT_UNUSED )
+
+	PORT_START("IN.2") // S3
+	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_JOYSTICK_DOWN ) PORT_CHANGED_MEMBER(DEVICE_SELF, hh_sm510_state, input_changed, nullptr)
+	PORT_BIT( 0x0d, IP_ACTIVE_HIGH, IPT_UNUSED )
+
+	PORT_START("IN.3") // S4
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_BUTTON1 ) PORT_CHANGED_MEMBER(DEVICE_SELF, hh_sm510_state, input_changed, nullptr) PORT_NAME("Attack/Pick")
+	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_BUTTON2 ) PORT_CHANGED_MEMBER(DEVICE_SELF, hh_sm510_state, input_changed, nullptr) PORT_NAME("Weapon")
+	PORT_BIT( 0x0c, IP_ACTIVE_HIGH, IPT_UNUSED )
+
+	PORT_START("IN.4") // S5
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_SELECT ) PORT_CHANGED_MEMBER(DEVICE_SELF, hh_sm510_state, input_changed, nullptr) PORT_NAME("Select")
+	PORT_BIT( 0x0e, IP_ACTIVE_HIGH, IPT_UNUSED )
+
+	PORT_START("IN.5") // GND!
+	PORT_BIT( 0x07, IP_ACTIVE_HIGH, IPT_UNUSED )
+	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_START ) PORT_CHANGED_MEMBER(DEVICE_SELF, hh_sm510_state, input_changed, nullptr) PORT_NAME("Power On/Start")
+
+	PORT_START("BA")
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_VOLUME_DOWN ) PORT_NAME("Sound")
+
+	PORT_START("B")
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_POWER_OFF )
+
+	PORT_START("ACL")
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_SERVICE1 ) PORT_CHANGED_MEMBER(DEVICE_SELF, hh_sm510_state, acl_button, nullptr) PORT_NAME("ACL")
+INPUT_PORTS_END
+
+MACHINE_CONFIG_START(tstrider_state::tstrider)
+
+	/* basic machine hardware */
+	MCFG_CPU_ADD("maincpu", SM510, 32.768_kHz_XTAL)
+	MCFG_SM510_R_MASK_OPTION(SM510_R_CONTROL_OUTPUT)
+	MCFG_SM510_WRITE_SEGS_CB(WRITE16(hh_sm510_state, sm510_lcd_segment_w))
+	MCFG_SM510_READ_K_CB(READ8(hh_sm510_state, input_r))
+	MCFG_SM510_WRITE_S_CB(WRITE8(hh_sm510_state, input_w))
+	MCFG_SM510_WRITE_R_CB(WRITE8(hh_sm510_state, piezo_r1_w))
+	MCFG_SM510_READ_BA_CB(IOPORT("BA"))
+	MCFG_SM510_READ_B_CB(IOPORT("B"))
+
+	/* video hardware */
+	MCFG_SCREEN_SVG_ADD("screen", "svg")
+	MCFG_SCREEN_REFRESH_RATE(50)
+	MCFG_SCREEN_SIZE(1479, 1080)
+	MCFG_SCREEN_VISIBLE_AREA(0, 1479-1, 0, 1080-1)
+
+	MCFG_TIMER_DRIVER_ADD_PERIODIC("display_decay", hh_sm510_state, display_decay_tick, attotime::from_msec(1))
+	MCFG_DEFAULT_LAYOUT(layout_svg)
+
+	/* sound hardware */
+	MCFG_SPEAKER_STANDARD_MONO("mono")
+	MCFG_SOUND_ADD("speaker", SPEAKER_SOUND, 0)
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
+MACHINE_CONFIG_END
+
+
+
+
+
+/***************************************************************************
+
   Tiger Golden Axe (model 7-817)
   * Sharp SM510 under epoxy (die label M94)
   * lcd screen with custom segments, 1-bit sound
@@ -5173,6 +5264,15 @@ ROM_START( tsharr2 )
 ROM_END
 
 
+ROM_START( tstrider )
+	ROM_REGION( 0x1000, "maincpu", 0 )
+	ROM_LOAD( "m92", 0x0000, 0x1000, CRC(4b488e8f) SHA1(b037c220c4a456f0dac67d759736f202a7609ee5) )
+
+	ROM_REGION( 554817, "svg", 0)
+	ROM_LOAD( "tstrider.svg", 0, 554817, CRC(be5de6bd) SHA1(cde0a3fe21af24d7d22d2ce0aec9c308f8696c7e) )
+ROM_END
+
+
 ROM_START( tgoldnaxe )
 	ROM_REGION( 0x1000, "maincpu", 0 )
 	ROM_LOAD( "m94", 0x0000, 0x1000, CRC(af183fbf) SHA1(23716e2a7c4bb4842b2af1a43fe88db44e18dc17) )
@@ -5447,6 +5547,7 @@ CONS( 1989, tvindictr,   0,          0, tvindictr,   tvindictr,   tvindictr_stat
 CONS( 1989, tgaiden,     0,          0, tgaiden,     tgaiden,     tgaiden_state,     0, "Tiger Electronics (licensed from Tecmo)", "Ninja Gaiden (handheld)", MACHINE_SUPPORTS_SAVE | MACHINE_NOT_WORKING )
 CONS( 1989, tbatman,     0,          0, tbatman,     tbatman,     tbatman_state,     0, "Tiger Electronics", "Batman (handheld)", MACHINE_SUPPORTS_SAVE )
 CONS( 1990, tsharr2,     0,          0, tsharr2,     tsharr2,     tsharr2_state,     0, "Tiger Electronics (licensed from Sega)", "Space Harrier II (handheld)", MACHINE_SUPPORTS_SAVE )
+CONS( 1990, tstrider,    0,          0, tstrider,    tstrider,    tstrider_state,    0, "Tiger Electronics (licensed from Capcom)", "Strider (handheld)", MACHINE_SUPPORTS_SAVE )
 CONS( 1990, tgoldnaxe,   0,          0, tgoldnaxe,   tgoldnaxe,   tgoldnaxe_state,   0, "Tiger Electronics (licensed from Sega)", "Golden Axe (handheld)", MACHINE_SUPPORTS_SAVE )
 CONS( 1990, trobocop2,   0,          0, trobocop2,   trobocop2,   trobocop2_state,   0, "Tiger Electronics", "Robocop 2 (handheld)", MACHINE_SUPPORTS_SAVE )
 CONS( 1990, taltbeast,   0,          0, taltbeast,   taltbeast,   taltbeast_state,   0, "Tiger Electronics (licensed from Sega)", "Altered Beast (handheld)", MACHINE_SUPPORTS_SAVE )
