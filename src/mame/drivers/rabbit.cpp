@@ -985,11 +985,11 @@ ROM_START( rabbit )
 ROM_END
 
 ROM_START( rabbitjt )
-	ROM_REGION( 0x200000, "maincpu", 0 ) /* 68020 Code */
-	ROM_LOAD32_BYTE( "wotr0.0", 0x000000, 0x080000, CRC(a1c30c91) SHA1(fe35c5521acba902ca74c6d1ea2b92593138a10a) )
-	ROM_LOAD32_BYTE( "wotr1.1", 0x000001, 0x080000, CRC(9b7697e6) SHA1(c60cdc3db7321b2846637d92ae864ca80796ad73) )
-	ROM_LOAD32_BYTE( "wotr2.2", 0x000002, 0x080000, CRC(9809b825) SHA1(05f965c87782062e66e5a88313a12b230de90800) )
-	ROM_LOAD32_BYTE( "wotr3.3", 0x000003, 0x080000, CRC(ce8ebb82) SHA1(69eb8410a3b7d9cbb682d0911bcad1a92ac3aca7) )
+	ROM_REGION( 0x200000, "maincpu", 0 ) /* 68020 Code, handwritten labels */
+	ROM_LOAD32_BYTE( "pvo0_mst_1-28.u82", 0x000000, 0x080000, CRC(a1c30c91) SHA1(fe35c5521acba902ca74c6d1ea2b92593138a10a) ) // actually 1/28, presumably build date
+	ROM_LOAD32_BYTE( "pvo1_mst_1-28.u84", 0x000001, 0x080000, CRC(9b7697e6) SHA1(c60cdc3db7321b2846637d92ae864ca80796ad73) )
+	ROM_LOAD32_BYTE( "pvo2_mst_1-28.u83", 0x000002, 0x080000, CRC(9809b825) SHA1(05f965c87782062e66e5a88313a12b230de90800) )
+	ROM_LOAD32_BYTE( "pvo3_mst_1-28.u85", 0x000003, 0x080000, CRC(ce8ebb82) SHA1(69eb8410a3b7d9cbb682d0911bcad1a92ac3aca7) )
 
 
 // the rom test tests as if things were mapped like this (video chip / blitter space?)
