@@ -93,10 +93,10 @@ public:
 	DECLARE_DRIVER_INIT(master);
 	DECLARE_READ8_MEMBER(master_trampoline_r);
 	DECLARE_WRITE8_MEMBER(master_trampoline_w);
-	void master(machine_config &config);
-
 	void master_map(address_map &map);
 	void master_trampoline(address_map &map);
+	void master(machine_config &config);
+
 protected:
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
