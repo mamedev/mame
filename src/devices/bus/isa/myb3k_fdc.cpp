@@ -161,7 +161,7 @@ void isa8_myb3k_fdc4710_device::device_start()
 
 	set_isa_device();
 	m_isa->set_dma_channel(2, this, true);
-	m_isa->install_device(0x020, 0x027, *this, &isa8_myb3k_fdc4710_device::map, 8);
+	m_isa->install_device(0x020, 0x027, *this, &isa8_myb3k_fdc4710_device::map);
 }
 
 void isa8_myb3k_fdc4711_device::device_start()
@@ -169,7 +169,7 @@ void isa8_myb3k_fdc4711_device::device_start()
 	LOG("%s\n", FUNCNAME);
 
 	set_isa_device();
-	m_isa->install_device(0x020, 0x027, *this, &isa8_myb3k_fdc4711_device::map, 8);
+	m_isa->install_device(0x020, 0x027, *this, &isa8_myb3k_fdc4711_device::map);
 	m_isa->set_dma_channel(2, this, true);
 }
 
