@@ -174,6 +174,7 @@ gt64xxx_device::gt64xxx_device(const machine_config &mconfig, const char *tag, d
 
 void gt64xxx_device::set_map(int id, const address_map_constructor &map, device_t *device)
 {
+	m_cs_devices[id] = device;
 	m_cs_maps[id] = map;
 }
 
