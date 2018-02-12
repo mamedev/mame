@@ -81,7 +81,8 @@ public:
 	DECLARE_WRITE8_MEMBER(vid_dma_trigger_w);
 	DECLARE_READ8_MEMBER(vid_dma_trigger_r);
 
-	DECLARE_READ8_MEMBER(xavix_7a01_r);
+	DECLARE_READ8_MEMBER(xavix_io_0_r);
+	DECLARE_READ8_MEMBER(xavix_io_1_r);
 
 	DECLARE_WRITE8_MEMBER(irq_enable_w);
 	DECLARE_WRITE8_MEMBER(irq_vector0_lo_w);
@@ -156,6 +157,7 @@ private:
 	required_device<palette_device> m_palette;
 
 	void handle_palette(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	double hue2rgb(double p, double q, double t);
 
 	int m_rgnlen;
 	uint8_t* m_rgn;
@@ -166,10 +168,20 @@ void xavix_state::video_start()
 }
 
 
+double xavix_state::hue2rgb(double p, double q, double t)
+{
+	if (t < 0) t += 1;
+	if (t > 1) t -= 1;
+	if (t < 1 / 6.0f) return p + (q - p) * 6 * t;
+	if (t < 1 / 2.0f) return q;
+	if (t < 2 / 3.0f) return p + (q - p) * (2 / 3.0f - t) * 6;
+	return p;
+}
+
 
 void xavix_state::handle_palette(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
-	// Palette (WRONG! it's probably more like the rad_eu3a14.cpp etc. ones)
+	// not verified
 	int offs = 0;
 	for (int index = 0; index < 256; index++)
 	{
@@ -177,17 +189,36 @@ void xavix_state::handle_palette(screen_device &screen, bitmap_ind16 &bitmap, co
 		dat |= m_palram2[offs]<<8;
 		offs++;
 
-		int r = (dat & 0x000f) >> 0;
-		int g = (dat & 0x00f0) >> 4;
-		int b = (dat & 0x0f00) >> 8;
-		int i = (dat & 0xf000) >> 12;
-		i+=1;
+		int l_raw = (dat & 0x1f00) >> 8;
+		int sl_raw =(dat & 0x00e0) >> 5;
+		int h_raw = (dat & 0x001f) >> 0;
 
-		r = (r * i)-1;
-		g = (g * i)-1;
-		b = (b * i)-1;
+		//if (h_raw > 24)
+		//	printf("hraw >24 (%02x)\n", h_raw);
 
-		m_palette->set_pen_color(index, r, g, b);
+		double l = (double)l_raw / 31.0f;
+		double s = (double)sl_raw / 7.0f;
+		double h = (double)h_raw / 24.0f;
+
+		double r, g, b;
+
+		if (s == 0) {
+			r = g = b = l; // greyscale
+		}
+		else {
+			double q = l < 0.5f ? l * (1 + s) : l + s - l * s;
+			double p = 2 * l - q;
+			r = hue2rgb(p, q, h + 1 / 3.0f);
+			g = hue2rgb(p, q, h);
+			b = hue2rgb(p, q, h - 1 / 3.0f);
+		}
+
+		int r_real = r * 255.0f;
+		int g_real = g * 255.0f;
+		int b_real = b * 255.0f;
+
+		m_palette->set_pen_color(index, r_real, g_real, b_real);
+
 	}
 }
 
@@ -366,10 +397,15 @@ READ8_MEMBER(xavix_state::xavix_75f9_r)
 	return 0x00;
 }
 
-
-READ8_MEMBER(xavix_state::xavix_7a01_r)
+READ8_MEMBER(xavix_state::xavix_io_0_r)
 {
-	//logerror("%s: xavix_7a01_r (random status?)\n", machine().describe_context());
+	//return 0x00;
+	return 0x01; // enter test mode
+}
+
+READ8_MEMBER(xavix_state::xavix_io_1_r)
+{
+	//logerror("%s: xavix_io_1_r (random status?)\n", machine().describe_context());
 	/*	
 
 	rad_mtrk checks for 0x40 at (interrupt code)
@@ -598,9 +634,9 @@ ADDRESS_MAP_START(xavix_state::xavix_map)
 	AM_RANGE(0x007986, 0x007986) AM_WRITE(rom_dmalen_lo_w)
 	AM_RANGE(0x007987, 0x007987) AM_WRITE(rom_dmalen_hi_w)
 
-	//AM_RANGE(0x007a00, 0x007a00) AM_READNOP // startup (taitons1)
-	AM_RANGE(0x007a01, 0x007a01) AM_READ(xavix_7a01_r) AM_WRITENOP // startup (taitons1)
-
+	// GPIO stuff
+	AM_RANGE(0x007a00, 0x007a00) AM_READ(xavix_io_0_r)
+	AM_RANGE(0x007a01, 0x007a01) AM_READ(xavix_io_1_r) AM_WRITENOP // startup (taitons1)
 	//AM_RANGE(0x007a02, 0x007a02) AM_WRITENOP // startup, gets set to 20, 7a00 is then also written with 20 
 	//AM_RANGE(0x007a03, 0x007a03) AM_READNOP AM_WRITENOP // startup (gets set to 84 which is the same as the bits checked on 7a01, possible port direction register?)
 
