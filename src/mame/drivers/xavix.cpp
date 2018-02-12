@@ -43,6 +43,7 @@ public:
 	xavix_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag),
 		m_maincpu(*this, "maincpu"),
+		m_mainram(*this, "mainram"),
 		m_spr_attr0(*this, "spr_attr0"),
 		m_spr_attr1(*this, "spr_attr1"),
 		m_spr_attr2(*this, "spr_attr2"),
@@ -53,7 +54,10 @@ public:
 		m_palram1(*this, "palram1"),
 		m_palram2(*this, "palram2"),
 		m_spr_attra(*this, "spr_attra"),
-		m_palette(*this, "palette")
+		m_palette(*this, "palette"),
+		m_in0(*this, "IN0"),
+		m_in1(*this, "IN1"),
+		m_gfxdecode(*this, "gfxdecode")
 	{ }
 
 	// devices
@@ -140,6 +144,8 @@ private:
 
 	uint8_t get_vectors(int which, int half);
 
+	required_shared_ptr<uint8_t> m_mainram;
+
 	required_shared_ptr<uint8_t> m_spr_attr0;
 	required_shared_ptr<uint8_t> m_spr_attr1;
 	required_shared_ptr<uint8_t> m_spr_attr2;
@@ -155,6 +161,11 @@ private:
 	required_shared_ptr<uint8_t> m_spr_attra;
 	
 	required_device<palette_device> m_palette;
+
+	required_ioport m_in0;
+	required_ioport m_in1;
+
+	required_device<gfxdecode_device> m_gfxdecode;
 
 	void handle_palette(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	double hue2rgb(double p, double q, double t);
@@ -196,7 +207,13 @@ void xavix_state::handle_palette(screen_device &screen, bitmap_ind16 &bitmap, co
 		//if (h_raw > 24)
 		//	printf("hraw >24 (%02x)\n", h_raw);
 
-		double l = (double)l_raw / 31.0f;
+		//if (l_raw > 17)
+		//	printf("lraw >17 (%02x)\n", l_raw);
+
+		//if (sl_raw > 7)
+		//	printf("sl_raw >5 (%02x)\n", sl_raw);
+
+		double l = (double)l_raw / 17.0f;
 		double s = (double)sl_raw / 7.0f;
 		double h = (double)h_raw / 24.0f;
 
@@ -226,6 +243,32 @@ void xavix_state::handle_palette(screen_device &screen, bitmap_ind16 &bitmap, co
 uint32_t xavix_state::screen_update( screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect )
 {
 	handle_palette(screen, bitmap, cliprect);
+
+	// why are the first two logos in Monster Truck stored as tilemaps in main ram?
+	// test mode isn't? is the code meant to process them instead? - there are no sprites in the sprite list at the time (and only one in test mode)
+	gfx_element *gfx = m_gfxdecode->gfx(1);
+	int count = 0;
+	for (int y = 0; y < 16; y++)
+	{
+		for (int x = 0; x < 16; x++)
+		{
+			int tile = m_mainram[count++];
+			tile += 0x4900;
+
+			gfx->opaque(bitmap,cliprect,tile,0,0,0,x*16,y*16);
+		}
+	}
+	
+
+	//printf("frame\n");
+	for (int i = 0; i < 0x100; i++)
+	{
+		if ((m_spr_attr2[i] != 0x81) && (m_spr_attr2[i] != 0x80) && (m_spr_attr2[i] != 0x00))
+		{
+			//printf("sprite with enable? %02x attr0 %02x attr1 %02x attr3 %02x attr5 %02x attr6 %02x attr7 %02x\n", m_spr_attr2[i], m_spr_attr0[i], m_spr_attr1[i], m_spr_attr3[i], m_spr_attr5[i], m_spr_attr6[i], m_spr_attr7[i] );
+		}
+	}
+
 	return 0;
 }
 
@@ -400,7 +443,8 @@ READ8_MEMBER(xavix_state::xavix_75f9_r)
 READ8_MEMBER(xavix_state::xavix_io_0_r)
 {
 	//return 0x00;
-	return 0x01; // enter test mode
+	//return 0x01; // enter test mode
+	return m_in0->read();
 }
 
 READ8_MEMBER(xavix_state::xavix_io_1_r)
@@ -450,8 +494,8 @@ READ8_MEMBER(xavix_state::xavix_io_1_r)
 
 	*/
 
-	
-	return 0x02;
+	//return 0x02;
+	return m_in1->read();
 }
 
 READ8_MEMBER(xavix_state::xavix_75f4_r)
@@ -546,13 +590,13 @@ READ8_MEMBER(xavix_state::vid_dma_trigger_r)
 
 ADDRESS_MAP_START(xavix_state::xavix_map)
 	AM_RANGE(0x000000, 0x0001ff) AM_RAM
-	AM_RANGE(0x000200, 0x003fff) AM_RAM
+	AM_RANGE(0x000200, 0x003fff) AM_RAM AM_SHARE("mainram")
 
 	// 6xxx ranges are the video hardware
 	// appears to be 256 sprites (shares will be renamed once their purpose is known)
 	AM_RANGE(0x006000, 0x0060ff) AM_RAM AM_SHARE("spr_attr0")
 	AM_RANGE(0x006100, 0x0061ff) AM_RAM AM_SHARE("spr_attr1")
-	AM_RANGE(0x006200, 0x0062ff) AM_RAM AM_SHARE("spr_attr2") // cleared to 0x80 by both games, maybe enable registers?
+	AM_RANGE(0x006200, 0x0062ff) AM_RAM AM_SHARE("spr_attr2") // cleared to 0x8f0 by both games, maybe enable registers?
 	AM_RANGE(0x006300, 0x0063ff) AM_RAM AM_SHARE("spr_attr3")
 	AM_RANGE(0x006400, 0x0064ff) AM_RAM // 6400 range unused by code, does it exist?
 	AM_RANGE(0x006500, 0x0065ff) AM_RAM AM_SHARE("spr_attr5")
@@ -562,6 +606,7 @@ ADDRESS_MAP_START(xavix_state::xavix_map)
 	AM_RANGE(0x006900, 0x0069ff) AM_RAM AM_SHARE("palram2") // startup (taitons1)
 	AM_RANGE(0x006a00, 0x006a1f) AM_RAM AM_SHARE("spr_attra") // test mode, pass flag 0x20
 
+	/*
 	AM_RANGE(0x006fc0, 0x006fc0) AM_WRITENOP // startup
 
 	AM_RANGE(0x006fc8, 0x006fc8) AM_WRITENOP
@@ -575,7 +620,7 @@ ADDRESS_MAP_START(xavix_state::xavix_map)
 
 	//AM_RANGE(0x006fd7, 0x006fd7) AM_READNOP AM_WRITENOP
 	AM_RANGE(0x006fd8, 0x006fd8) AM_WRITENOP // startup (taitons1)
-
+	*/
 	AM_RANGE(0x006fe0, 0x006fe0) AM_READWRITE(vid_dma_trigger_r, vid_dma_trigger_w) // after writing to 6fe1/6fe2 and 6fe5/6fe6 rad_mtrk writes 0x43/0x44 here then polls on 0x40   (see function call at c273) write values are hardcoded, similar code at 18401
 	AM_RANGE(0x006fe1, 0x006fe2) AM_WRITE(vid_dma_params_1_w)
 	AM_RANGE(0x006fe5, 0x006fe6) AM_WRITE(vid_dma_params_2_w)
@@ -602,7 +647,7 @@ ADDRESS_MAP_START(xavix_state::xavix_map)
 	// taitons1 after 75f7/75f8
 	AM_RANGE(0x0075f6, 0x0075f6) AM_RAM // r/w tested AM_WRITE(xavix_75f6_w)
 	// taitons1 written as a pair
-	AM_RANGE(0x0075f7, 0x0075f7) AM_WRITE(xavix_75f7_w)
+	//AM_RANGE(0x0075f7, 0x0075f7) AM_WRITE(xavix_75f7_w)
 	AM_RANGE(0x0075f8, 0x0075f8) AM_RAM // r/w tested AM_WRITE(xavix_75f8_w)
 	// taitons1 written after 75f6, then read
 	//AM_RANGE(0x0075f9, 0x0075f9) AM_READWRITE(xavix_75f9_r, xavix_75f9_w)
@@ -612,14 +657,14 @@ ADDRESS_MAP_START(xavix_state::xavix_map)
 	AM_RANGE(0x0075fc, 0x0075fc) AM_RAM // r/w tested
 
 	AM_RANGE(0x0075fd, 0x0075fd) AM_RAM // r/w tested
-	AM_RANGE(0x0075fe, 0x0075fe) AM_WRITENOP
+	//AM_RANGE(0x0075fe, 0x0075fe) AM_WRITENOP
 	// taitons1 written other 75xx operations
-	AM_RANGE(0x0075ff, 0x0075ff) AM_WRITE(xavix_75ff_w)
+	//AM_RANGE(0x0075ff, 0x0075ff) AM_WRITE(xavix_75ff_w)
 
-	AM_RANGE(0x007810, 0x007810) AM_WRITENOP // startup
+	//AM_RANGE(0x007810, 0x007810) AM_WRITENOP // startup
 
-	AM_RANGE(0x007900, 0x007900) AM_WRITE(xavix_7900_w) // startup
-	AM_RANGE(0x007902, 0x007902) AM_WRITENOP // startup
+	//AM_RANGE(0x007900, 0x007900) AM_WRITE(xavix_7900_w) // startup
+	//AM_RANGE(0x007902, 0x007902) AM_WRITENOP // startup
 
 	// DMA trigger for below (written after the others) waits on status of bit 1 in a loop
 	AM_RANGE(0x007980, 0x007980) AM_READWRITE(dma_trigger_r, dma_trigger_w)
@@ -636,18 +681,18 @@ ADDRESS_MAP_START(xavix_state::xavix_map)
 
 	// GPIO stuff
 	AM_RANGE(0x007a00, 0x007a00) AM_READ(xavix_io_0_r)
-	AM_RANGE(0x007a01, 0x007a01) AM_READ(xavix_io_1_r) AM_WRITENOP // startup (taitons1)
+	AM_RANGE(0x007a01, 0x007a01) AM_READ(xavix_io_1_r) //AM_WRITENOP // startup (taitons1)
 	//AM_RANGE(0x007a02, 0x007a02) AM_WRITENOP // startup, gets set to 20, 7a00 is then also written with 20 
 	//AM_RANGE(0x007a03, 0x007a03) AM_READNOP AM_WRITENOP // startup (gets set to 84 which is the same as the bits checked on 7a01, possible port direction register?)
 
-	AM_RANGE(0x007a80, 0x007a80) AM_WRITENOP
+	//AM_RANGE(0x007a80, 0x007a80) AM_WRITENOP
 
 	//AM_RANGE(0x007b80, 0x007b80) AM_READNOP
-	AM_RANGE(0x007b81, 0x007b81) AM_WRITENOP
-	AM_RANGE(0x007b82, 0x007b82) AM_WRITENOP
+	//AM_RANGE(0x007b81, 0x007b81) AM_WRITENOP
+	//AM_RANGE(0x007b82, 0x007b82) AM_WRITENOP
 
-	AM_RANGE(0x007c01, 0x007c01) AM_RAM // r/w tested
-	AM_RANGE(0x007c02, 0x007c02) AM_WRITENOP // once
+	//AM_RANGE(0x007c01, 0x007c01) AM_RAM // r/w tested
+	//AM_RANGE(0x007c02, 0x007c02) AM_WRITENOP // once
 
 	// this is a multiplication chip
 	AM_RANGE(0x007ff2, 0x007ff4) AM_WRITE(mult_param_w)
@@ -667,9 +712,8 @@ ADDRESS_MAP_START(xavix_state::xavix_map)
 ADDRESS_MAP_END
 
 static INPUT_PORTS_START( xavix )
-	/* dummy active high structure */
-	PORT_START("SYSA")
-	PORT_DIPNAME( 0x01, 0x00, "SYSA" )
+	PORT_START("IN0")
+	PORT_DIPNAME( 0x01, 0x00, "IN0" )
 	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x01, DEF_STR( On ) )
 	PORT_DIPNAME( 0x02, 0x00, DEF_STR( Unknown ) )
@@ -694,32 +738,31 @@ static INPUT_PORTS_START( xavix )
 	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x80, DEF_STR( On ) )
 
-	/* dummy active low structure */
-	PORT_START("DSWA")
-	PORT_DIPNAME( 0x01, 0x01, "DSWA" )
-	PORT_DIPSETTING(    0x01, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x02, 0x02, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(    0x02, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x04, 0x04, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(    0x04, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x08, 0x08, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(    0x08, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x10, 0x10, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(    0x10, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x20, 0x20, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(    0x20, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x40, 0x40, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(    0x40, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x80, 0x80, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(    0x80, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_START("IN1")
+	PORT_DIPNAME( 0x01, 0x00, "IN1" )
+	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x01, DEF_STR( On ) )
+	PORT_DIPNAME( 0x02, 0x00, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x02, DEF_STR( On ) )
+	PORT_DIPNAME( 0x04, 0x00, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x04, DEF_STR( On ) )
+	PORT_DIPNAME( 0x08, 0x00, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x08, DEF_STR( On ) )
+	PORT_DIPNAME( 0x10, 0x00, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x10, DEF_STR( On ) )
+	PORT_DIPNAME( 0x20, 0x00, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x20, DEF_STR( On ) )
+	PORT_DIPNAME( 0x40, 0x00, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x40, DEF_STR( On ) )
+	PORT_DIPNAME( 0x80, 0x00, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x80, DEF_STR( On ) )
 INPUT_PORTS_END
 
 /* correct, 4bpp gfxs */
@@ -756,11 +799,24 @@ static const gfx_layout charlayout8bpp =
 	8*8*8
 };
 
+static const gfx_layout char16layout8bpp =
+{
+	16,16,
+	RGN_FRAC(1,1),
+	8,
+	{ STEP8(0,1) },
+	{ STEP16(0,8) },
+	{ STEP16(0,16*8) },
+	16*16*8
+};
+
+
 
 static GFXDECODE_START( xavix )
 	GFXDECODE_ENTRY( "bios", 0, charlayout,   0, 1 )
 	GFXDECODE_ENTRY( "bios", 0, char16layout, 0, 1 )
 	GFXDECODE_ENTRY( "bios", 0, charlayout8bpp, 0, 1 )
+	GFXDECODE_ENTRY( "bios", 0, char16layout8bpp, 0, 1 )
 GFXDECODE_END
 
 
@@ -826,7 +882,7 @@ MACHINE_CONFIG_START(xavix_state::xavix)
 	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500))
 	MCFG_SCREEN_UPDATE_DRIVER(xavix_state, screen_update)
 	MCFG_SCREEN_SIZE(32*8, 32*8)
-	MCFG_SCREEN_VISIBLE_AREA(0*8, 32*8-1, 0*8, 32*8-1)
+	MCFG_SCREEN_VISIBLE_AREA(0*8, 32*8-1, 0*8, 28*8-1)
 	MCFG_SCREEN_PALETTE("palette")
 
 	MCFG_GFXDECODE_ADD("gfxdecode", "palette", xavix)
