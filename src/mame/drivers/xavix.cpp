@@ -67,14 +67,19 @@ public:
 	DECLARE_WRITE8_MEMBER(xavix_7900_w);
 
 	DECLARE_WRITE8_MEMBER(dma_trigger_w);
-	DECLARE_WRITE8_MEMBER(dmasrc_lo_w);
-	DECLARE_WRITE8_MEMBER(dmasrc_md_w);
-	DECLARE_WRITE8_MEMBER(dmasrc_hi_w);
-	DECLARE_WRITE8_MEMBER(dmadst_lo_w);
-	DECLARE_WRITE8_MEMBER(dmadst_hi_w);
-	DECLARE_WRITE8_MEMBER(dmalen_lo_w);
-	DECLARE_WRITE8_MEMBER(dmalen_hi_w);
+	DECLARE_WRITE8_MEMBER(rom_dmasrc_lo_w);
+	DECLARE_WRITE8_MEMBER(rom_dmasrc_md_w);
+	DECLARE_WRITE8_MEMBER(rom_dmasrc_hi_w);
+	DECLARE_WRITE8_MEMBER(rom_dmadst_lo_w);
+	DECLARE_WRITE8_MEMBER(rom_dmadst_hi_w);
+	DECLARE_WRITE8_MEMBER(rom_dmalen_lo_w);
+	DECLARE_WRITE8_MEMBER(rom_dmalen_hi_w);
 	DECLARE_READ8_MEMBER(dma_trigger_r);
+
+	DECLARE_WRITE8_MEMBER(vid_dma_params_1_w);
+	DECLARE_WRITE8_MEMBER(vid_dma_params_2_w);
+	DECLARE_WRITE8_MEMBER(vid_dma_trigger_w);
+	DECLARE_READ8_MEMBER(vid_dma_trigger_r);
 
 	DECLARE_READ8_MEMBER(xavix_7a01_r);
 
@@ -110,15 +115,15 @@ protected:
 	virtual void video_start() override;
 
 private:
-	uint8_t m_dmasrc_lo_data;
-	uint8_t m_dmasrc_md_data;
-	uint8_t m_dmasrc_hi_data;
+	uint8_t m_rom_dmasrc_lo_data;
+	uint8_t m_rom_dmasrc_md_data;
+	uint8_t m_rom_dmasrc_hi_data;
 
-	uint8_t m_dmadst_lo_data;
-	uint8_t m_dmadst_hi_data;
+	uint8_t m_rom_dmadst_lo_data;
+	uint8_t m_rom_dmadst_hi_data;
 
-	uint8_t m_dmalen_lo_data;
-	uint8_t m_dmalen_hi_data;
+	uint8_t m_rom_dmalen_lo_data;
+	uint8_t m_rom_dmalen_hi_data;
 
 	uint8_t m_irq_enable_data;
 	uint8_t m_irq_vector0_lo_data;
@@ -128,6 +133,9 @@ private:
 
 	uint8_t m_multparams[3];
 	uint8_t m_multresults[2];
+
+	uint8_t m_vid_dma_param1[2];
+	uint8_t m_vid_dma_param2[2];
 
 	uint8_t get_vectors(int which, int half);
 
@@ -195,9 +203,9 @@ WRITE8_MEMBER(xavix_state::dma_trigger_w)
 {
 	logerror("%s: dma_trigger_w %02x\n", machine().describe_context(), data);
 
-	uint32_t source = (m_dmasrc_hi_data << 16) | (m_dmasrc_md_data<<8) | m_dmasrc_lo_data;
-	uint16_t dest = (m_dmadst_hi_data<<8) | m_dmadst_lo_data;
-	uint16_t len = (m_dmalen_hi_data<<8) | m_dmalen_lo_data;
+	uint32_t source = (m_rom_dmasrc_hi_data << 16) | (m_rom_dmasrc_md_data<<8) | m_rom_dmasrc_lo_data;
+	uint16_t dest = (m_rom_dmadst_hi_data<<8) | m_rom_dmadst_lo_data;
+	uint16_t len = (m_rom_dmalen_hi_data<<8) | m_rom_dmalen_lo_data;
 
 	source &= m_rgnlen-1;
 	logerror("  (possible DMA op SRC %08x DST %04x LEN %04x)\n", source, dest, len);
@@ -211,52 +219,52 @@ WRITE8_MEMBER(xavix_state::dma_trigger_w)
 	}
 }
 
-WRITE8_MEMBER(xavix_state::dmasrc_lo_w)
+WRITE8_MEMBER(xavix_state::rom_dmasrc_lo_w)
 {
-	logerror("%s: dmasrc_lo_w %02x\n", machine().describe_context(), data);
-	m_dmasrc_lo_data = data;
+	logerror("%s: rom_dmasrc_lo_w %02x\n", machine().describe_context(), data);
+	m_rom_dmasrc_lo_data = data;
 }
 
-WRITE8_MEMBER(xavix_state::dmasrc_md_w)
+WRITE8_MEMBER(xavix_state::rom_dmasrc_md_w)
 {
-	logerror("%s: dmasrc_md_w %02x\n", machine().describe_context(), data);
-	m_dmasrc_md_data = data;
+	logerror("%s: rom_dmasrc_md_w %02x\n", machine().describe_context(), data);
+	m_rom_dmasrc_md_data = data;
 }
 
-WRITE8_MEMBER(xavix_state::dmasrc_hi_w)
+WRITE8_MEMBER(xavix_state::rom_dmasrc_hi_w)
 {
-	logerror("%s: dmasrc_hi_w %02x\n", machine().describe_context(), data);
-	m_dmasrc_hi_data = data;
+	logerror("%s: rom_dmasrc_hi_w %02x\n", machine().describe_context(), data);
+	m_rom_dmasrc_hi_data = data;
 	// this would mean Taito Nostalgia relies on mirroring tho, as it has the high bits set... so could just be wrong
-	logerror("  (DMA ROM source of %02x%02x%02x)\n", m_dmasrc_hi_data, m_dmasrc_md_data, m_dmasrc_lo_data);
+	logerror("  (DMA ROM source of %02x%02x%02x)\n", m_rom_dmasrc_hi_data, m_rom_dmasrc_md_data, m_rom_dmasrc_lo_data);
 }
 
-WRITE8_MEMBER(xavix_state::dmadst_lo_w)
+WRITE8_MEMBER(xavix_state::rom_dmadst_lo_w)
 {
-	logerror("%s: dmadst_lo_w %02x\n", machine().describe_context(), data);
-	m_dmadst_lo_data = data;
+	logerror("%s: rom_dmadst_lo_w %02x\n", machine().describe_context(), data);
+	m_rom_dmadst_lo_data = data;
 }
 
-WRITE8_MEMBER(xavix_state::dmadst_hi_w)
+WRITE8_MEMBER(xavix_state::rom_dmadst_hi_w)
 {
-	logerror("%s: dmadst_hi_w %02x\n", machine().describe_context(), data);
-	m_dmadst_hi_data = data;
+	logerror("%s: rom_dmadst_hi_w %02x\n", machine().describe_context(), data);
+	m_rom_dmadst_hi_data = data;
 
-	logerror("  (DMA dest of %02x%02x)\n", m_dmadst_hi_data, m_dmadst_lo_data);
+	logerror("  (DMA dest of %02x%02x)\n", m_rom_dmadst_hi_data, m_rom_dmadst_lo_data);
 }
 
-WRITE8_MEMBER(xavix_state::dmalen_lo_w)
+WRITE8_MEMBER(xavix_state::rom_dmalen_lo_w)
 {
-	logerror("%s: dmalen_lo_w %02x\n", machine().describe_context(), data);
-	m_dmalen_lo_data = data;
+	logerror("%s: rom_dmalen_lo_w %02x\n", machine().describe_context(), data);
+	m_rom_dmalen_lo_data = data;
 }
 
-WRITE8_MEMBER(xavix_state::dmalen_hi_w)
+WRITE8_MEMBER(xavix_state::rom_dmalen_hi_w)
 {
-	logerror("%s: dmalen_hi_w %02x\n", machine().describe_context(), data);
-	m_dmalen_hi_data = data;
+	logerror("%s: rom_dmalen_hi_w %02x\n", machine().describe_context(), data);
+	m_rom_dmalen_hi_data = data;
 
-	logerror("  (DMA len of %02x%02x)\n", m_dmalen_hi_data, m_dmalen_lo_data);
+	logerror("  (DMA len of %02x%02x)\n", m_rom_dmalen_hi_data, m_rom_dmalen_lo_data);
 }
 
 READ8_MEMBER(xavix_state::dma_trigger_r)
@@ -446,6 +454,26 @@ WRITE8_MEMBER(xavix_state::mult_param_w)
 	}
 }
 
+WRITE8_MEMBER(xavix_state::vid_dma_params_1_w)
+{
+	m_vid_dma_param1[offset] = data;
+}
+
+WRITE8_MEMBER(xavix_state::vid_dma_params_2_w)
+{
+	m_vid_dma_param2[offset] = data;
+}
+
+WRITE8_MEMBER(xavix_state::vid_dma_trigger_w)
+{
+	logerror("%s: vid_dma_trigger_w with data %02x params %02x%02x %02x%02x\n", machine().describe_context(), data, m_vid_dma_param1[0], m_vid_dma_param1[1], m_vid_dma_param2[0], m_vid_dma_param2[1]);
+}
+
+READ8_MEMBER(xavix_state::vid_dma_trigger_r)
+{
+	// expects bit 0x40 to clear in most cases
+	return 0x00;
+}
 
 // DATA reads from 0x8000-0xffff are banked by byte 0xff of 'ram' (this is handled in the CPU core)
 
@@ -459,16 +487,13 @@ ADDRESS_MAP_START(xavix_state::xavix_map)
 	AM_RANGE(0x006100, 0x0061ff) AM_RAM AM_SHARE("spr_attr1")
 	AM_RANGE(0x006200, 0x0062ff) AM_RAM AM_SHARE("spr_attr2") // cleared to 0x80 by both games, maybe enable registers?
 	AM_RANGE(0x006300, 0x0063ff) AM_RAM AM_SHARE("spr_attr3")
-	// 6400 range unused
+	AM_RANGE(0x006400, 0x0064ff) AM_RAM // 6400 range unused by code, does it exist?
 	AM_RANGE(0x006500, 0x0065ff) AM_RAM AM_SHARE("spr_attr5")
 	AM_RANGE(0x006600, 0x0066ff) AM_RAM AM_SHARE("spr_attr6")
 	AM_RANGE(0x006700, 0x0067ff) AM_RAM AM_SHARE("spr_attr7")
 	AM_RANGE(0x006800, 0x0068ff) AM_RAM AM_SHARE("palram1") // written with 6900
 	AM_RANGE(0x006900, 0x0069ff) AM_RAM AM_SHARE("palram2") // startup (taitons1)
 	AM_RANGE(0x006a00, 0x006a1f) AM_RAM AM_SHARE("spr_attra") // test mode, pass flag 0x20
-
-	AM_RANGE(0x006a00, 0x006a00) AM_WRITENOP
-	AM_RANGE(0x006a01, 0x006a01) AM_WRITENOP
 
 	AM_RANGE(0x006fc0, 0x006fc0) AM_WRITENOP // startup
 
@@ -484,11 +509,9 @@ ADDRESS_MAP_START(xavix_state::xavix_map)
 	//AM_RANGE(0x006fd7, 0x006fd7) AM_READNOP AM_WRITENOP
 	AM_RANGE(0x006fd8, 0x006fd8) AM_WRITENOP // startup (taitons1)
 
-	//AM_RANGE(0x006fe0, 0x006fe0) AM_READNOP AM_WRITENOP // after writing to 6fe1/6fe2 and 6fe5/6fe6 rad_mtrk writes 0x43/0x44 here then polls on 0x40   (see function call at c273) write values are hardcoded, similar code at 18401
-	AM_RANGE(0x006fe1, 0x006fe1) AM_WRITENOP
-	AM_RANGE(0x006fe2, 0x006fe2) AM_WRITENOP
-	AM_RANGE(0x006fe5, 0x006fe5) AM_WRITENOP
-	AM_RANGE(0x006fe6, 0x006fe6) AM_WRITENOP
+	AM_RANGE(0x006fe0, 0x006fe0) AM_READWRITE(vid_dma_trigger_r, vid_dma_trigger_w) // after writing to 6fe1/6fe2 and 6fe5/6fe6 rad_mtrk writes 0x43/0x44 here then polls on 0x40   (see function call at c273) write values are hardcoded, similar code at 18401
+	AM_RANGE(0x006fe1, 0x006fe2) AM_WRITE(vid_dma_params_1_w)
+	AM_RANGE(0x006fe5, 0x006fe6) AM_WRITE(vid_dma_params_2_w)
 
 	// function in rad_mtrk at 0184b7 uses this
 	AM_RANGE(0x006fe8, 0x006fe8) AM_RAM // r/w tested
@@ -534,15 +557,15 @@ ADDRESS_MAP_START(xavix_state::xavix_map)
 	// DMA trigger for below (written after the others) waits on status of bit 1 in a loop
 	AM_RANGE(0x007980, 0x007980) AM_READWRITE(dma_trigger_r, dma_trigger_w)
 	// DMA source
-	AM_RANGE(0x007981, 0x007981) AM_WRITE(dmasrc_lo_w)
-	AM_RANGE(0x007982, 0x007982) AM_WRITE(dmasrc_md_w)
-	AM_RANGE(0x007983, 0x007983) AM_WRITE(dmasrc_hi_w)
+	AM_RANGE(0x007981, 0x007981) AM_WRITE(rom_dmasrc_lo_w)
+	AM_RANGE(0x007982, 0x007982) AM_WRITE(rom_dmasrc_md_w)
+	AM_RANGE(0x007983, 0x007983) AM_WRITE(rom_dmasrc_hi_w)
 	// DMA dest
-	AM_RANGE(0x007984, 0x007984) AM_WRITE(dmadst_lo_w)
-	AM_RANGE(0x007985, 0x007985) AM_WRITE(dmadst_hi_w)
+	AM_RANGE(0x007984, 0x007984) AM_WRITE(rom_dmadst_lo_w)
+	AM_RANGE(0x007985, 0x007985) AM_WRITE(rom_dmadst_hi_w)
 	// DMA length
-	AM_RANGE(0x007986, 0x007986) AM_WRITE(dmalen_lo_w)
-	AM_RANGE(0x007987, 0x007987) AM_WRITE(dmalen_hi_w)
+	AM_RANGE(0x007986, 0x007986) AM_WRITE(rom_dmalen_lo_w)
+	AM_RANGE(0x007987, 0x007987) AM_WRITE(rom_dmalen_hi_w)
 
 	//AM_RANGE(0x007a00, 0x007a00) AM_READNOP // startup (taitons1)
 	AM_RANGE(0x007a01, 0x007a01) AM_READ(xavix_7a01_r) AM_WRITENOP // startup (taitons1)
@@ -680,15 +703,15 @@ void xavix_state::machine_start()
 
 void xavix_state::machine_reset()
 {
-	m_dmasrc_lo_data = 0;
-	m_dmasrc_md_data = 0;
-	m_dmasrc_hi_data = 0;
+	m_rom_dmasrc_lo_data = 0;
+	m_rom_dmasrc_md_data = 0;
+	m_rom_dmasrc_hi_data = 0;
 
-	m_dmadst_lo_data = 0;
-	m_dmadst_hi_data = 0;
+	m_rom_dmadst_lo_data = 0;
+	m_rom_dmadst_hi_data = 0;
 
-	m_dmalen_lo_data = 0;
-	m_dmalen_hi_data = 0;
+	m_rom_dmalen_lo_data = 0;
+	m_rom_dmalen_hi_data = 0;
 
 	m_irq_enable_data = 0;
 	m_irq_vector0_lo_data = 0;
