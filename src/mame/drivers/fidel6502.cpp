@@ -497,6 +497,9 @@ public:
 	DECLARE_MACHINE_RESET(su9);
 	DECLARE_INPUT_CHANGED_MEMBER(su9_cpu_freq);
 	void su9_set_cpu_freq();
+	void csc_map(address_map &map);
+	void su9_map(address_map &map);
+	void rsc_map(address_map &map);
 	void csc(machine_config &config);
 	void su9(machine_config &config);
 	void rsc(machine_config &config);
@@ -509,6 +512,8 @@ public:
 	DECLARE_WRITE8_MEMBER(eas_ppi_porta_w);
 	DECLARE_READ8_MEMBER(eas_ppi_portb_r);
 	DECLARE_WRITE8_MEMBER(eas_ppi_portc_w);
+	void eas_map(address_map &map);
+	void eag_map(address_map &map);
 	void eas(machine_config &config);
 	void eag(machine_config &config);
 
@@ -521,6 +526,8 @@ public:
 	DECLARE_MACHINE_RESET(sc9c);
 	DECLARE_INPUT_CHANGED_MEMBER(sc9c_cpu_freq);
 	void sc9c_set_cpu_freq();
+	void sc9_map(address_map &map);
+	void sc9d_map(address_map &map);
 	void sc9b(machine_config &config);
 	void sc9c(machine_config &config);
 	void sc9d(machine_config &config);
@@ -532,6 +539,8 @@ public:
 	DECLARE_WRITE8_MEMBER(sc12_control_w);
 	DECLARE_READ8_MEMBER(sc12_input_r);
 	void sc12_set_cpu_freq(offs_t offset);
+	void sc12_map(address_map &map);
+	void sc12_trampoline(address_map &map);
 	void sc12(machine_config &config);
 	void sc12b(machine_config &config);
 
@@ -541,6 +550,9 @@ public:
 	DECLARE_WRITE8_MEMBER(fexcel_ttl_w);
 	DECLARE_READ8_MEMBER(fexcelb_ttl_r);
 	DECLARE_READ8_MEMBER(fexcel_ttl_r);
+	void fexcel_map(address_map &map);
+	void fexcelb_map(address_map &map);
+	void fexcelp_map(address_map &map);
 	void fexcel(machine_config &config);
 	void fexcelb(machine_config &config);
 	void fexcel4(machine_config &config);
@@ -556,36 +568,24 @@ public:
 	DECLARE_WRITE8_MEMBER(fdesdis_lcd_w);
 	DECLARE_READ8_MEMBER(fdesdis_input_r);
 	DECLARE_DRIVER_INIT(fdesdis);
+	void fdesdis_map(address_map &map);
 	void fdes2000d(machine_config &config);
 	void fdes2100d(machine_config &config);
 
 	// Phantom
 	DECLARE_MACHINE_RESET(fphantom);
 	DECLARE_DRIVER_INIT(fphantom);
+	void fphantom_map(address_map &map);
 	void fphantom(machine_config &config);
 
 	// Chesster
 	DECLARE_WRITE8_MEMBER(chesster_control_w);
 	DECLARE_WRITE8_MEMBER(kishon_control_w);
 	DECLARE_DRIVER_INIT(chesster);
+	void chesster_map(address_map &map);
+	void kishon_map(address_map &map);
 	void chesster(machine_config &config);
 	void kishon(machine_config &config);
-	void chesster_map(address_map &map);
-	void csc_map(address_map &map);
-	void eag_map(address_map &map);
-	void eas_map(address_map &map);
-	void fdesdis_map(address_map &map);
-	void fexcel_map(address_map &map);
-	void fexcelb_map(address_map &map);
-	void fexcelp_map(address_map &map);
-	void fphantom_map(address_map &map);
-	void kishon_map(address_map &map);
-	void rsc_map(address_map &map);
-	void sc12_map(address_map &map);
-	void sc12_trampoline(address_map &map);
-	void sc9_map(address_map &map);
-	void sc9d_map(address_map &map);
-	void su9_map(address_map &map);
 };
 
 

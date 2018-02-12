@@ -48,8 +48,8 @@ public:
 	DECLARE_READ8_MEMBER(sc6_input_r);
 	DECLARE_READ_LINE_MEMBER(sc6_input6_r);
 	DECLARE_READ_LINE_MEMBER(sc6_input7_r);
-	void sc6(machine_config &config);
 	void sc6_map(address_map &map);
+	void sc6(machine_config &config);
 };
 
 

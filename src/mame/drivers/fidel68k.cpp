@@ -207,6 +207,9 @@ public:
 
 	// Excel 68000
 	DECLARE_WRITE8_MEMBER(fex68k_mux_w);
+	void fex68k_map(address_map &map);
+	void fex68km2_map(address_map &map);
+	void fex68km3_map(address_map &map);
 	void fex68k(machine_config &config);
 	void fex68km2(machine_config &config);
 	void fex68km3(machine_config &config);
@@ -216,6 +219,8 @@ public:
 	DECLARE_READ8_MEMBER(fdes68k_input_r);
 	DECLARE_WRITE8_MEMBER(fdes68k_lcd_w);
 	DECLARE_DRIVER_INIT(fdes2265);
+	void fdes2265_map(address_map &map);
+	void fdes2325_map(address_map &map);
 	void fdes2265(machine_config &config);
 	void fdes2325(machine_config &config);
 
@@ -227,19 +232,14 @@ public:
 	DECLARE_WRITE8_MEMBER(eag_7seg_w);
 	DECLARE_WRITE8_MEMBER(eag_mux_w);
 	DECLARE_READ8_MEMBER(eag_input2_r);
+	void eag_map(address_map &map);
+	void eagv7_map(address_map &map);
+	void eagv11_map(address_map &map);
 	void eag(machine_config &config);
 	void eagv7(machine_config &config);
 	void eagv9(machine_config &config);
 	void eagv10(machine_config &config);
 	void eagv11(machine_config &config);
-	void eag_map(address_map &map);
-	void eagv11_map(address_map &map);
-	void eagv7_map(address_map &map);
-	void fdes2265_map(address_map &map);
-	void fdes2325_map(address_map &map);
-	void fex68k_map(address_map &map);
-	void fex68km2_map(address_map &map);
-	void fex68km3_map(address_map &map);
 };
 
 
