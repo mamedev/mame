@@ -1980,6 +1980,15 @@ static INPUT_PORTS_START( skytargt )
 	MODEL2_PLAYER_INPUTS(2, BUTTON1, BUTTON2, BUTTON3, BUTTON4)
 INPUT_PORTS_END
 
+static INPUT_PORTS_START( dynabb )
+	PORT_INCLUDE(model2)
+
+	PORT_START("ANA0")
+	PORT_BIT(0xff, 0x00, IPT_PEDAL) PORT_SENSITIVITY(100) PORT_KEYDELTA(50) PORT_PLAYER(1) PORT_NAME("P1 Bat Swing")
+
+	PORT_START("ANA1")
+	PORT_BIT(0xff, 0x00, IPT_PEDAL2) PORT_SENSITIVITY(100) PORT_KEYDELTA(50) PORT_PLAYER(2) PORT_NAME("P2 Bat Swing")
+INPUT_PORTS_END
 
 TIMER_DEVICE_CALLBACK_MEMBER(model2_state::model2_interrupt)
 {
@@ -6065,8 +6074,8 @@ GAME( 1996, lastbrnxu, lastbrnx, model2b,      model2,  model2_state, 0,        
 GAME( 1996, lastbrnxj, lastbrnx, model2b,      model2,  model2_state, 0,        ROT0, "Sega",   "Last Bronx (Japan, Revision A)", MACHINE_NOT_WORKING|MACHINE_IMPERFECT_GRAPHICS )
 GAME( 1996, doa,              0, model2b_0229, model2,  model2_state, doa,      ROT0, "Sega",   "Dead or Alive (Model 2B, Revision B)", MACHINE_NOT_WORKING|MACHINE_IMPERFECT_GRAPHICS )
 GAME( 1996, sgt24h,           0, indy500,      srallyc, model2_state, sgt24h,   ROT0, "Jaleco", "Super GT 24h", MACHINE_NOT_WORKING|MACHINE_IMPERFECT_GRAPHICS )
-GAME( 1996, dynabb,           0, model2b,      model2,  model2_state, 0,        ROT0, "Sega",   "Dynamite Baseball", MACHINE_NOT_WORKING|MACHINE_IMPERFECT_GRAPHICS )
-GAME( 1997, dynabb97,         0, model2b,      model2,  model2_state, 0,        ROT0, "Sega",   "Dynamite Baseball 97 (Revision A)", MACHINE_NOT_WORKING|MACHINE_IMPERFECT_GRAPHICS )
+GAME( 1996, dynabb,           0, model2b,      dynabb,  model2_state, 0,        ROT0, "Sega",   "Dynamite Baseball", MACHINE_NOT_WORKING|MACHINE_IMPERFECT_GRAPHICS )
+GAME( 1997, dynabb97,         0, model2b,      dynabb,  model2_state, 0,        ROT0, "Sega",   "Dynamite Baseball 97 (Revision A)", MACHINE_NOT_WORKING|MACHINE_IMPERFECT_GRAPHICS )
 GAME( 1997, overrevb,   overrev, indy500,      srallyc, model2_state, 0,        ROT0, "Jaleco", "Over Rev (Model 2B, Revision B)", MACHINE_NOT_WORKING|MACHINE_IMPERFECT_GRAPHICS )
 GAME( 1997, zerogun,          0, model2b_5881, model2,  model2_state, zerogun,  ROT0, "Psikyo", "Zero Gunner (Export, Model 2B)", MACHINE_NOT_WORKING|MACHINE_IMPERFECT_GRAPHICS )
 GAME( 1997, zerogunj,   zerogun, model2b_5881, model2,  model2_state, zerogun,  ROT0, "Psikyo", "Zero Gunner (Japan, Model 2B)", MACHINE_NOT_WORKING|MACHINE_IMPERFECT_GRAPHICS )
