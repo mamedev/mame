@@ -27,9 +27,10 @@ DEFINE_DEVICE_TYPE(TMS1670, tms1670_cpu_device, "tms1670", "TMS1670") // high vo
 
 
 // internal memory maps
-ADDRESS_MAP_START(tms1k_base_device::program_12bit_8)
+ADDRESS_MAP_START(tms1400_cpu_device::program_12bit_8)
 	AM_RANGE(0x000, 0xfff) AM_ROM
 ADDRESS_MAP_END
+
 
 // device definitions
 tms1400_cpu_device::tms1400_cpu_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock)
