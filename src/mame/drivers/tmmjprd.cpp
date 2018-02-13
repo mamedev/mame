@@ -94,6 +94,7 @@ public:
 	void draw_tilemap(bitmap_ind16 &bitmap, const rectangle &cliprect, uint32_t*tileram, uint32_t*tileregs, uint8_t*rom );
 	void tmmjprd(machine_config &config);
 	void tmpdoki(machine_config &config);
+	void tmmjprd_map(address_map &map);
 };
 
 
@@ -691,7 +692,7 @@ WRITE32_MEMBER(tmmjprd_state::brt_2_w)
 	}
 }
 
-static ADDRESS_MAP_START( tmmjprd_map, AS_PROGRAM, 32, tmmjprd_state )
+ADDRESS_MAP_START(tmmjprd_state::tmmjprd_map)
 	AM_RANGE(0x000000, 0x1fffff) AM_ROM
 	AM_RANGE(0x200010, 0x200013) AM_READ(randomtmmjprds) // gfx chip status?
 	/* check these are used .. */

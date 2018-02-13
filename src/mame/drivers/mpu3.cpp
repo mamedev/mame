@@ -268,6 +268,7 @@ public:
 	required_device<meters_device> m_meters;
 	optional_device<roc10937_device> m_vfd;
 	void mpu3base(machine_config &config);
+	void mpu3_basemap(address_map &map);
 };
 
 #define DISPLAY_PORT 0
@@ -830,7 +831,7 @@ READ8_MEMBER(mpu3_state::mpu3ptm_r)
 	return ptm2->read(offset >>2);
 }
 
-static ADDRESS_MAP_START( mpu3_basemap, AS_PROGRAM, 8, mpu3_state )
+ADDRESS_MAP_START(mpu3_state::mpu3_basemap)
 	AM_RANGE(0x0000, 0x07ff) AM_RAM AM_SHARE("nvram")
 	AM_RANGE(0x1000, 0xffff) AM_ROM
 	AM_RANGE(0x8800, 0x881f) AM_READWRITE(mpu3ptm_r, mpu3ptm_w)/* PTM6840 IC2 */

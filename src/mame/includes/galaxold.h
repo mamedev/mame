@@ -12,8 +12,8 @@
 
 ***************************************************************************/
 
-#ifndef __GALAXOLD_H__
-#define __GALAXOLD_H__
+#ifndef MAME_INCLUDES_GALAXOLD_H
+#define MAME_INCLUDES_GALAXOLD_H
 
 #include "machine/7474.h"
 #include "machine/timer.h"
@@ -294,6 +294,35 @@ public:
 	void ckongmc(machine_config &config);
 	void galaxian_audio(machine_config &config);
 	void mooncrst_audio(machine_config &config);
+	void _4in1_map(address_map &map);
+	void bagmanmc_map(address_map &map);
+	void bongo(address_map &map);
+	void bongo_io(address_map &map);
+	void bullsdrtg_data_map(address_map &map);
+	void ckongg_map(address_map &map);
+	void ckongmc_map(address_map &map);
+	void dkongjrm_map(address_map &map);
+	void dkongjrmc_map(address_map &map);
+	void drivfrcg(address_map &map);
+	void drivfrcg_io(address_map &map);
+	void galaxold_map(address_map &map);
+	void guttang_map(address_map &map);
+	void hexpoola_data(address_map &map);
+	void hexpoola_io(address_map &map);
+	void hunchbkg(address_map &map);
+	void hunchbkg_data(address_map &map);
+	void hustlerb3_map(address_map &map);
+	void mooncrst_map(address_map &map);
+	void ozon1_io_map(address_map &map);
+	void ozon1_map(address_map &map);
+	void racknrol(address_map &map);
+	void racknrol_io(address_map &map);
+	void rockclim_map(address_map &map);
+	void scramb2_map(address_map &map);
+	void scramblb_map(address_map &map);
+	void scrambler_map(address_map &map);
+	void spcwarp(address_map &map);
+	void tazzmang(address_map &map);
 };
 
 #define galaxold_coin_counter_0_w galaxold_coin_counter_w

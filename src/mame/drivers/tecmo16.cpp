@@ -38,7 +38,7 @@ Notes:
 
 /******************************************************************************/
 
-static ADDRESS_MAP_START( fstarfrc_map, AS_PROGRAM, 16, tecmo16_state )
+ADDRESS_MAP_START(tecmo16_state::fstarfrc_map)
 	AM_RANGE(0x000000, 0x07ffff) AM_ROM
 	AM_RANGE(0x100000, 0x103fff) AM_RAM /* Main RAM */
 	AM_RANGE(0x110000, 0x110fff) AM_RAM_WRITE(charram_w) AM_SHARE("charram")
@@ -61,7 +61,7 @@ static ADDRESS_MAP_START( fstarfrc_map, AS_PROGRAM, 16, tecmo16_state )
 	AM_RANGE(0x16001e, 0x16001f) AM_WRITE(scroll2_y_w)
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( ginkun_map, AS_PROGRAM, 16, tecmo16_state )
+ADDRESS_MAP_START(tecmo16_state::ginkun_map)
 	AM_RANGE(0x000000, 0x07ffff) AM_ROM
 	AM_RANGE(0x100000, 0x103fff) AM_RAM /* Main RAM */
 	AM_RANGE(0x110000, 0x110fff) AM_RAM_WRITE(charram_w) AM_SHARE("charram")
@@ -86,7 +86,7 @@ static ADDRESS_MAP_START( ginkun_map, AS_PROGRAM, 16, tecmo16_state )
 	AM_RANGE(0x16001e, 0x16001f) AM_WRITE(scroll2_y_w)
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( sound_map, AS_PROGRAM, 8, tecmo16_state )
+ADDRESS_MAP_START(tecmo16_state::sound_map)
 	AM_RANGE(0x0000, 0xefff) AM_ROM
 	AM_RANGE(0xf000, 0xfbff) AM_RAM /* Sound RAM */
 	AM_RANGE(0xfc00, 0xfc00) AM_DEVREADWRITE("oki", okim6295_device, read, write)

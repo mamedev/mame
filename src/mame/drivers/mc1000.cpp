@@ -123,6 +123,9 @@ public:
 	DECLARE_DRIVER_INIT(mc1000);
 	TIMER_DEVICE_CALLBACK_MEMBER(ne555_tick);
 	void mc1000(machine_config &config);
+	void mc1000_banking_mem(address_map &map);
+	void mc1000_io(address_map &map);
+	void mc1000_mem(address_map &map);
 };
 
 /* Memory Banking */
@@ -229,7 +232,7 @@ WRITE8_MEMBER( mc1000_state::mc6847_attr_w )
 
 /* Memory Maps */
 
-static ADDRESS_MAP_START( mc1000_mem, AS_PROGRAM, 8, mc1000_state )
+ADDRESS_MAP_START(mc1000_state::mc1000_mem)
 	AM_RANGE(0x0000, 0x1fff) AM_RAMBANK("bank1")
 	AM_RANGE(0x2000, 0x27ff) AM_RAMBANK("bank2") AM_SHARE("mc6845_vram")
 	AM_RANGE(0x2800, 0x3fff) AM_RAM AM_SHARE("ram2800")
@@ -239,7 +242,7 @@ static ADDRESS_MAP_START( mc1000_mem, AS_PROGRAM, 8, mc1000_state )
 	AM_RANGE(0xc000, 0xffff) AM_ROM AM_REGION(Z80_TAG, 0)
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( mc1000_banking_mem, AS_OPCODES, 8, mc1000_state )
+ADDRESS_MAP_START(mc1000_state::mc1000_banking_mem)
 	AM_RANGE(0x0000, 0x1fff) AM_RAMBANK("bank1")
 	AM_RANGE(0x2000, 0x27ff) AM_RAMBANK("bank2") AM_SHARE("mc6845_vram")
 	AM_RANGE(0x2800, 0x3fff) AM_RAM AM_SHARE("ram2800")
@@ -249,7 +252,7 @@ static ADDRESS_MAP_START( mc1000_banking_mem, AS_OPCODES, 8, mc1000_state )
 	AM_RANGE(0xc000, 0xffff) AM_READ(rom_banking_r)
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( mc1000_io, AS_IO, 8, mc1000_state )
+ADDRESS_MAP_START(mc1000_state::mc1000_io)
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	AM_RANGE(0x04, 0x04) AM_READWRITE(printer_r, printer_w)
 	AM_RANGE(0x05, 0x05) AM_DEVWRITE("cent_data_out", output_latch_device, write)
@@ -538,7 +541,7 @@ MACHINE_CONFIG_START(mc1000_state::mc1000)
 	/* basic machine hardware */
 	MCFG_CPU_ADD(Z80_TAG, Z80, 3579545)
 	MCFG_CPU_PROGRAM_MAP(mc1000_mem)
-	MCFG_CPU_DECRYPTED_OPCODES_MAP(mc1000_banking_mem)
+	MCFG_CPU_OPCODES_MAP(mc1000_banking_mem)
 	MCFG_CPU_IO_MAP(mc1000_io)
 
 	/* timers */

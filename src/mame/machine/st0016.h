@@ -61,6 +61,8 @@ public:
 	int st0016_ramgfx;
 	std::unique_ptr<uint8_t[]> m_charram;
 
+	void st0016_cpu_internal_io_map(address_map &map);
+	void st0016_cpu_internal_map(address_map &map);
 protected:
 	bool ismacs() const { return m_game_flag & 0x80; }
 	bool ismacs1() const { return (m_game_flag & 0x180) == 0x180; }

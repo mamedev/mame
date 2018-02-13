@@ -60,7 +60,7 @@ WRITE8_MEMBER(dogfgt_state::dogfgt_soundcontrol_w)
 
 
 
-static ADDRESS_MAP_START( main_map, AS_PROGRAM, 8, dogfgt_state )
+ADDRESS_MAP_START(dogfgt_state::main_map)
 	AM_RANGE(0x0000, 0x07ff) AM_READWRITE(sharedram_r, sharedram_w) AM_SHARE("sharedram")
 	AM_RANGE(0x0f80, 0x0fdf) AM_WRITEONLY AM_SHARE("spriteram")
 	AM_RANGE(0x1000, 0x17ff) AM_WRITE(dogfgt_bgvideoram_w) AM_SHARE("bgvideoram")
@@ -79,7 +79,7 @@ static ADDRESS_MAP_START( main_map, AS_PROGRAM, 8, dogfgt_state )
 	AM_RANGE(0x8000, 0xffff) AM_ROM
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( sub_map, AS_PROGRAM, 8, dogfgt_state )
+ADDRESS_MAP_START(dogfgt_state::sub_map)
 	AM_RANGE(0x0000, 0x07ff) AM_RAM
 	AM_RANGE(0x2000, 0x27ff) AM_READWRITE(sharedram_r, sharedram_w)
 	AM_RANGE(0x4000, 0x4000) AM_WRITE(sub_irqack_w)

@@ -27,6 +27,9 @@ public:
 	SCN2674_DRAW_CHARACTER_MEMBER(draw_character);
 
 	void tr175(machine_config &config);
+	void mem_map(address_map &map);
+	void ramdac_map(address_map &map);
+	void vram_map(address_map &map);
 private:
 	required_device<cpu_device> m_maincpu;
 };
@@ -46,7 +49,7 @@ READ8_MEMBER(tr175_state::fff400_r)
 	return 0;
 }
 
-static ADDRESS_MAP_START( mem_map, AS_PROGRAM, 16, tr175_state )
+ADDRESS_MAP_START(tr175_state::mem_map)
 	AM_RANGE(0x000000, 0x01ffff) AM_ROM AM_REGION("maincpu", 0)
 	AM_RANGE(0xfe8000, 0xfebfff) AM_RAM // 8-bit?
 	AM_RANGE(0xfefe00, 0xfefedd) AM_WRITENOP // 8-bit; cleared at startup
@@ -67,11 +70,11 @@ SCN2674_DRAW_CHARACTER_MEMBER(tr175_state::draw_character)
 {
 }
 
-static ADDRESS_MAP_START( vram_map, 0, 8, tr175_state )
+ADDRESS_MAP_START(tr175_state::vram_map)
 	AM_RANGE(0x0000, 0x3fff) AM_READNOP
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( ramdac_map, 0, 8, tr175_state )
+ADDRESS_MAP_START(tr175_state::ramdac_map)
 	AM_RANGE(0x000, 0x3ff) AM_DEVREADWRITE("ramdac", ramdac_device, ramdac_pal_r, ramdac_rgb666_w)
 ADDRESS_MAP_END
 

@@ -52,7 +52,7 @@ public:
 	sega_scu_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
 	// I/O operations
-	DECLARE_ADDRESS_MAP(regs_map, 32);
+	void regs_map(address_map &map);
 
 	// DMA
 	DECLARE_READ32_MEMBER(dma_lv0_r);

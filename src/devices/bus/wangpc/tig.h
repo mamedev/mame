@@ -29,6 +29,8 @@ public:
 	// construction/destruction
 	wangpc_tig_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
+	void upd7220_0_map(address_map &map);
+	void upd7220_1_map(address_map &map);
 protected:
 	// device-level overrides
 	virtual void device_start() override;

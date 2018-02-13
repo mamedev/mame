@@ -57,6 +57,9 @@ public:
 	INTERRUPT_GEN_MEMBER(p2000_interrupt);
 	void p2000t(machine_config &config);
 	void p2000m(machine_config &config);
+	void p2000m_mem(address_map &map);
+	void p2000t_io(address_map &map);
+	void p2000t_mem(address_map &map);
 };
 
 #endif // MAME_INCLUDES_P2000T_H

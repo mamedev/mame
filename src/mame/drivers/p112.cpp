@@ -50,16 +50,18 @@ public:
 	uint32_t screen_update_p112(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	required_device<cpu_device> m_maincpu;
 	void p112(machine_config &config);
+	void p112_io(address_map &map);
+	void p112_mem(address_map &map);
 };
 
 
-static ADDRESS_MAP_START(p112_mem, AS_PROGRAM, 8, p112_state)
+ADDRESS_MAP_START(p112_state::p112_mem)
 	ADDRESS_MAP_UNMAP_HIGH
 	AM_RANGE(0x00000, 0x07fff) AM_ROM
 	AM_RANGE(0x08000, 0xfffff) AM_RAM
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START(p112_io, AS_IO, 8, p112_state)
+ADDRESS_MAP_START(p112_state::p112_io)
 	ADDRESS_MAP_UNMAP_HIGH
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
 ADDRESS_MAP_END

@@ -38,6 +38,8 @@
 #include "machine/keyboard.h"
 #include "video/upd3301.h"
 #include "machine/i8257.h"
+#include "machine/am9519.h"
+#include "machine/upd765.h"
 #include "screen.h"
 
 #define Z80_TAG         "z80"
@@ -57,60 +59,63 @@ public:
 			m_maincpu(*this, Z80_TAG),
 			m_dma(*this, I8257_TAG),
 			m_crtc(*this,UPD3301_TAG),
+			m_fdc(*this, "fdc"),
 			m_char_rom(*this, UPD3301_TAG)
 		{ }
 
 	DECLARE_DRIVER_INIT(olyboss);
-	DECLARE_READ8_MEMBER( videoram_read );
-	DECLARE_WRITE8_MEMBER( videoram_write );
 	DECLARE_READ8_MEMBER(keyboard_read);
-	DECLARE_READ8_MEMBER(port_read);
-	DECLARE_WRITE8_MEMBER(port_write);
 
 	UPD3301_DRAW_CHARACTER_MEMBER( olyboss_display_pixels );
 
 	DECLARE_WRITE_LINE_MEMBER( hrq_w );
+	DECLARE_WRITE_LINE_MEMBER( tc_w );
 	DECLARE_READ8_MEMBER( dma_mem_r );
+	DECLARE_WRITE8_MEMBER( dma_mem_w );
+	DECLARE_READ8_MEMBER( fdcctrl_r );
+	DECLARE_WRITE8_MEMBER( fdcctrl_w );
+	DECLARE_READ8_MEMBER( fdcdma_r );
+	DECLARE_WRITE8_MEMBER( fdcdma_w );
+	DECLARE_WRITE8_MEMBER( crtcdma_w );
 	
 	void olybossd(machine_config &config);
+	void olyboss_io(address_map &map);
+	void olyboss_mem(address_map &map);
 	
-protected:
+private:
 	required_device<cpu_device> m_maincpu;
 	required_device<i8257_device> m_dma;
 	required_device<upd3301_device> m_crtc;
+	required_device<upd765a_device> m_fdc;
 	required_memory_region m_char_rom;
-	//uint32_t screen_update_olyboss(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);	
-private:
 
 	bool m_keybhit;
 	u8 m_keystroke;
-	uint8_t m_mainVideoram[0x2000];
 	void keyboard_put(u8 data);	
-
-
+	u8 m_fdcctrl;
+	u8 m_channel;
 };
 
 //**************************************************************************
 //  ADDRESS MAPS
 //**************************************************************************
 
-static ADDRESS_MAP_START(olyboss_mem, AS_PROGRAM, 8, olyboss_state)
+ADDRESS_MAP_START(olyboss_state::olyboss_mem)
 	AM_RANGE(0x0000, 0x7ff ) AM_ROM AM_REGION("mainrom", 0)
 	AM_RANGE(0x800,  0xbffd) AM_RAM
 	AM_RANGE(0xbffe, 0xbfff) AM_READ(keyboard_read)
-	//AM_RANGE(0xc000,  0xf2c5) AM_RAM
 	AM_RANGE(0xc000,  0xffff) AM_RAM
-	//AM_RANGE(0xf2c6, 0xffbf ) AM_READWRITE(videoram_read,videoram_write)
-	//AM_RANGE(0xffc0, 0xffff) AM_RAM
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START(olyboss_io, AS_IO, 8, olyboss_state)
+ADDRESS_MAP_START(olyboss_state::olyboss_io)
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	ADDRESS_MAP_UNMAP_HIGH
 	AM_RANGE(0x0, 0x8) AM_DEVREADWRITE(I8257_TAG, i8257_device, read, write)
-	AM_RANGE(0x9, 0x7f) AM_READWRITE(port_read,port_write)
+	AM_RANGE(0x10, 0x11) AM_DEVICE("fdc", upd765a_device, map)
+	AM_RANGE(0x30, 0x30) AM_DEVREADWRITE("uic", am9519_device, data_r, data_w)
+	AM_RANGE(0x31, 0x31) AM_DEVREADWRITE("uic", am9519_device, stat_r, cmd_w)
+	AM_RANGE(0x60, 0x60) AM_READWRITE(fdcctrl_r, fdcctrl_w)
 	AM_RANGE(0x80, 0x81) AM_DEVREADWRITE(UPD3301_TAG, upd3301_device, read, write)
-	AM_RANGE(0x82, 0xff) AM_READWRITE(port_read,port_write)
 ADDRESS_MAP_END
 
 static INPUT_PORTS_START( olyboss )
@@ -131,7 +136,6 @@ UPD3301_DRAW_CHARACTER_MEMBER( olyboss_state::olyboss_display_pixels )
 	//if (lc >= 8) return;
 	if (csr) 
 	{
-		logerror("csr\n");
 		data = 0xff;
 	}
 
@@ -141,58 +145,6 @@ UPD3301_DRAW_CHARACTER_MEMBER( olyboss_state::olyboss_display_pixels )
 		bitmap.pix32(y, (sx * 8) + i) = color?0xffffff:0;
 		data <<= 1;
 	}
-}
-
-/* not used */
-/*
-uint32_t olyboss_state::screen_update_olyboss(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
-{
-	uint8_t *chargen = memregion(UPD3301_TAG)->base();
-	//uint8_t *chargen = memregion("chargen")->base();
-	uint8_t y,ra,chr,gfx;
-	uint16_t sy=0,ma=0,x;
-
-	bitmap.fill(0);
-	
-	int numColumns=80;
-	for (y = 28; y > 0; y--)
-	{
-		for (ra = 0; ra < 11; ra++)
-		{
-			uint16_t *p = &bitmap.pix16(sy++);
-
-			for (x = ma; x < ma + numColumns; x++)
-			{
-				chr = m_mainVideoram[x];
-				gfx = chargen[(chr<<4) | ra ];
-				
-				*p++ = BIT(gfx, 7);
-				*p++ = BIT(gfx, 6);
-				*p++ = BIT(gfx, 5);
-				*p++ = BIT(gfx, 4);
-				*p++ = BIT(gfx, 3);
-				*p++ = BIT(gfx, 2);
-				*p++ = BIT(gfx, 1);
-				*p++ = BIT(gfx, 0);
-			}
-		}
-		ma+=numColumns+40;
-	}
-
-
-	return 0;
-}
-*/
-
-WRITE8_MEMBER( olyboss_state::videoram_write )
-{
-	// logerror("vramw [%2.2x][%2.2x] port0 [%2.2x] fbfd [%2.2x] fbfe [%2.2x] PC [%4.4x]\n",offset,data,m_port0,m_fbfd,m_fbfe,m_maincpu->safe_pc());
-	m_mainVideoram[offset]=data;
-}
-
-READ8_MEMBER( olyboss_state::videoram_read )
-{
-	return m_mainVideoram[offset];
 }
 
 //**************************************************************************
@@ -231,6 +183,7 @@ DRIVER_INIT_MEMBER( olyboss_state, olyboss )
 
 	/* initialize DMA */
 	m_dma->ready_w(1);
+	m_fdcctrl = 0;
 }
 
 void olyboss_state::keyboard_put(u8 data)
@@ -252,30 +205,59 @@ WRITE_LINE_MEMBER( olyboss_state::hrq_w )
 	m_dma->hlda_w(state);
 }
 
+WRITE_LINE_MEMBER( olyboss_state::tc_w )
+{
+	if((m_channel == 0) && state)
+	{
+		m_fdc->tc_w(1);
+		m_fdc->tc_w(0);
+	}
+}
+
 READ8_MEMBER( olyboss_state::dma_mem_r )
 {
 	address_space &program = m_maincpu->space(AS_PROGRAM);
-
-	if (offset==0xf2c6)
-	{
-		logerror("DMA read at offset [%x] val is [%2.2x]\n",offset,program.read_byte(offset));
-	}
-	
 	return program.read_byte(offset);
 }
 
-/* ports */
-
-WRITE8_MEMBER( olyboss_state::port_write )
+WRITE8_MEMBER( olyboss_state::dma_mem_w )
 {
-	logerror("Wrote to port [%2.2x] value [%2.2x]\n",offset,data);
+	address_space &program = m_maincpu->space(AS_PROGRAM);
+	program.write_byte(offset, data);
 }
 
-READ8_MEMBER( olyboss_state::port_read)
+READ8_MEMBER( olyboss_state::fdcdma_r )
 {
-	logerror("Reading from port [%2.2x]\n",offset);
-	return 0xff;
+	m_channel = 0;
+	return m_fdc->dma_r();
 }
+
+WRITE8_MEMBER( olyboss_state::fdcdma_w )
+{
+	m_channel = 0;
+	m_fdc->dma_w(data);
+}
+
+WRITE8_MEMBER( olyboss_state::crtcdma_w )
+{
+	m_channel = 2;
+	m_crtc->dack_w(space, offset, data, mem_mask);
+}
+
+READ8_MEMBER( olyboss_state::fdcctrl_r )
+{
+	return m_fdcctrl | 0x80; // 0xc0 seems to indicate an 8" drive
+}
+
+WRITE8_MEMBER( olyboss_state::fdcctrl_w )
+{
+	m_fdcctrl = data;
+	m_fdc->subdevice<floppy_connector>("0")->get_device()->mon_w(!(data & 2));
+}
+
+static SLOT_INTERFACE_START( boss_floppies )
+	SLOT_INTERFACE( "525qd", FLOPPY_525_QD )
+SLOT_INTERFACE_END
 
 //**************************************************************************
 //  MACHINE CONFIGURATION
@@ -285,6 +267,7 @@ MACHINE_CONFIG_START( olyboss_state::olybossd )
 	MCFG_CPU_ADD(Z80_TAG, Z80, 4_MHz_XTAL)
 	MCFG_CPU_PROGRAM_MAP(olyboss_mem)
 	MCFG_CPU_IO_MAP(olyboss_io)
+	MCFG_CPU_IRQ_ACKNOWLEDGE_DEVICE("uic", am9519_device, iack_cb)
 
 	/* video hardware */
 
@@ -296,15 +279,28 @@ MACHINE_CONFIG_START( olyboss_state::olybossd )
 
 	/* devices */
 
+	MCFG_DEVICE_ADD("uic", AM9519, 0)
+	MCFG_AM9519_OUT_INT_CB(INPUTLINE(Z80_TAG, 0))
+
+	MCFG_UPD765A_ADD("fdc", true, true)
+	MCFG_UPD765_INTRQ_CALLBACK(DEVWRITELINE("uic", am9519_device, ireq2_w)) MCFG_DEVCB_INVERT
+	MCFG_UPD765_DRQ_CALLBACK(DEVWRITELINE(I8257_TAG, i8257_device, dreq0_w))
+	MCFG_FLOPPY_DRIVE_ADD("fdc:0", boss_floppies, "525qd", floppy_image_device::default_floppy_formats)
+
 	MCFG_DEVICE_ADD(I8257_TAG, I8257, XTAL(4'000'000))
 	MCFG_I8257_OUT_HRQ_CB(WRITELINE(olyboss_state, hrq_w))
 	MCFG_I8257_IN_MEMR_CB(READ8(olyboss_state, dma_mem_r))
-	MCFG_I8257_OUT_IOW_2_CB(DEVWRITE8(UPD3301_TAG, upd3301_device, dack_w))
+	MCFG_I8257_OUT_MEMW_CB(WRITE8(olyboss_state, dma_mem_w))
+	MCFG_I8257_IN_IOR_0_CB(READ8(olyboss_state, fdcdma_r))
+	MCFG_I8257_OUT_IOW_0_CB(WRITE8(olyboss_state, fdcdma_w))
+	MCFG_I8257_OUT_IOW_2_CB(WRITE8(olyboss_state, crtcdma_w))
+	MCFG_I8257_OUT_TC_CB(WRITELINE(olyboss_state, tc_w))
 
 	MCFG_DEVICE_ADD(UPD3301_TAG, UPD3301, XTAL(14'318'181))
 	MCFG_UPD3301_CHARACTER_WIDTH(8)
 	MCFG_UPD3301_DRAW_CHARACTER_CALLBACK_OWNER(olyboss_state, olyboss_display_pixels)
 	MCFG_UPD3301_DRQ_CALLBACK(DEVWRITELINE(I8257_TAG, i8257_device, dreq2_w))
+	MCFG_UPD3301_INT_CALLBACK(DEVWRITELINE("uic", am9519_device, ireq0_w)) MCFG_DEVCB_INVERT
 	MCFG_VIDEO_SET_SCREEN(SCREEN_TAG)
 
 	/* keyboard */

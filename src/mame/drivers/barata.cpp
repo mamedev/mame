@@ -57,6 +57,7 @@ public:
 
 	required_device<cpu_device> m_maincpu;
 	void barata(machine_config &config);
+	void i8051_io_port(address_map &map);
 private:
 	unsigned char row_selection;
 };
@@ -294,7 +295,7 @@ READ8_MEMBER(barata_state::port2_r)
 * Memory Map Information *
 *************************/
 
-static ADDRESS_MAP_START( i8051_io_port, AS_IO, 8, barata_state )
+ADDRESS_MAP_START(barata_state::i8051_io_port)
 	AM_RANGE(MCS51_PORT_P0,   MCS51_PORT_P0  ) AM_WRITE(port0_w)
 	AM_RANGE(MCS51_PORT_P1,   MCS51_PORT_P1  ) AM_READ_PORT("PORT1")
 	AM_RANGE(MCS51_PORT_P2,   MCS51_PORT_P2  ) AM_READWRITE(port2_r, port2_w)

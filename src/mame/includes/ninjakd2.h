@@ -131,4 +131,12 @@ public:
 	void mnight(machine_config &config);
 	void ninjakd2(machine_config &config);
 	void ninjakd2_core(machine_config &config);
+	void decrypted_opcodes_map(address_map &map);
+	void mnight_main_cpu(address_map &map);
+	void ninjakd2_main_cpu(address_map &map);
+	void ninjakd2_sound_cpu(address_map &map);
+	void ninjakd2_sound_io(address_map &map);
+	void ninjakid_nopcm_sound_cpu(address_map &map);
+	void omegaf_main_cpu(address_map &map);
+	void robokid_main_cpu(address_map &map);
 };

@@ -59,8 +59,8 @@ public:
 	template <class Object> static devcb_base &set_delay_wr_callback(device_t &device, Object &&cb) { return downcast<i80130_device &>(device).m_write_delay.set_callback(std::forward<Object>(cb)); }
 	template <class Object> static devcb_base &set_baud_wr_callback(device_t &device, Object &&cb) { return downcast<i80130_device &>(device).m_write_baud.set_callback(std::forward<Object>(cb)); }
 
-	virtual DECLARE_ADDRESS_MAP(rom_map, 16);
-	virtual DECLARE_ADDRESS_MAP(io_map, 16);
+	virtual void rom_map(address_map &map);
+	virtual void io_map(address_map &map);
 
 	uint8_t inta_r() { return m_pic->acknowledge(); }
 

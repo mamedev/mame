@@ -96,6 +96,16 @@ public:
 
 	u8 debug_peek_o_index() { return m_o_index; } // get output PLA index, for debugging (don't use in emulation)
 
+	void data_128x4(address_map &map);
+	void data_144x4(address_map &map);
+	void data_192x4(address_map &map);
+	void data_32x4(address_map &map);
+	void data_64x4(address_map &map);
+	void program_10bit_8(address_map &map);
+	void program_11bit_8(address_map &map);
+	void program_11bit_9(address_map &map);
+	void program_12bit_8(address_map &map);
+	void program_9bit_8(address_map &map);
 protected:
 	// construction/destruction
 	tms1k_base_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, u32 clock, u8 o_pins, u8 r_pins, u8 pc_bits, u8 byte_bits, u8 x_bits, int prgwidth, address_map_constructor program, int datawidth, address_map_constructor data);

@@ -413,7 +413,7 @@ WRITE16_MEMBER(hyprduel_state::blitter_w)
                                 Memory Maps
 ***************************************************************************/
 
-static ADDRESS_MAP_START( hyprduel_map, AS_PROGRAM, 16, hyprduel_state )
+ADDRESS_MAP_START(hyprduel_state::hyprduel_map)
 	AM_RANGE(0x000000, 0x07ffff) AM_ROM
 	AM_RANGE(0x400000, 0x41ffff) AM_RAM_WRITE(vram_0_w) AM_SHARE("vram_0")     /* Layer 0 */
 	AM_RANGE(0x420000, 0x43ffff) AM_RAM_WRITE(vram_1_w) AM_SHARE("vram_1")     /* Layer 1 */
@@ -446,7 +446,7 @@ static ADDRESS_MAP_START( hyprduel_map, AS_PROGRAM, 16, hyprduel_state )
 	AM_RANGE(0xfe4000, 0xffffff) AM_RAM AM_SHARE("sharedram3")
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( hyprduel_map2, AS_PROGRAM, 16, hyprduel_state )
+ADDRESS_MAP_START(hyprduel_state::hyprduel_map2)
 	AM_RANGE(0x000000, 0x003fff) AM_RAM AM_SHARE("sharedram1")                      /* shadow ($c00000 - $c03fff : vector) */
 	AM_RANGE(0x004000, 0x007fff) AM_READONLY AM_WRITENOP AM_SHARE("sharedram3")         /* shadow ($fe4000 - $fe7fff : read only) */
 	AM_RANGE(0x400000, 0x400003) AM_DEVREADWRITE8("ymsnd", ym2151_device, read, write, 0x00ff )
@@ -460,7 +460,7 @@ ADDRESS_MAP_END
 
 /* Magical Error - video is at 8x now */
 
-static ADDRESS_MAP_START( magerror_map, AS_PROGRAM, 16, hyprduel_state )
+ADDRESS_MAP_START(hyprduel_state::magerror_map)
 	AM_RANGE(0x000000, 0x07ffff) AM_ROM
 	AM_RANGE(0x400000, 0x400001) AM_WRITE(subcpu_control_w)
 	AM_RANGE(0x800000, 0x81ffff) AM_RAM_WRITE(vram_0_w) AM_SHARE("vram_0")     /* Layer 0 */
@@ -493,7 +493,7 @@ static ADDRESS_MAP_START( magerror_map, AS_PROGRAM, 16, hyprduel_state )
 	AM_RANGE(0xfe4000, 0xffffff) AM_RAM AM_SHARE("sharedram3")
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( magerror_map2, AS_PROGRAM, 16, hyprduel_state )
+ADDRESS_MAP_START(hyprduel_state::magerror_map2)
 	AM_RANGE(0x000000, 0x003fff) AM_RAM AM_SHARE("sharedram1")                      /* shadow ($c00000 - $c03fff : vector) */
 	AM_RANGE(0x004000, 0x007fff) AM_READONLY AM_WRITENOP AM_SHARE("sharedram3")     /* shadow ($fe4000 - $fe7fff : read only) */
 	AM_RANGE(0x400000, 0x400003) AM_NOP

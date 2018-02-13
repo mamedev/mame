@@ -61,7 +61,7 @@ const tiny_rom_entry *iskr_1030_keyboard_device::device_rom_region() const
 //  ADDRESS_MAP( kb_io )
 //-------------------------------------------------
 
-static ADDRESS_MAP_START( iskr_1030_keyboard_io, AS_IO, 8, iskr_1030_keyboard_device )
+ADDRESS_MAP_START(iskr_1030_keyboard_device::iskr_1030_keyboard_io)
 	AM_RANGE(0x00, 0xff) AM_READWRITE(ram_r, ram_w)
 ADDRESS_MAP_END
 

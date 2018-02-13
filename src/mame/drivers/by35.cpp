@@ -142,6 +142,8 @@ public:
 	void nuovo(machine_config &config);
 	void as2888(machine_config &config);
 	void as2888_audio(machine_config &config);
+	void by35_map(address_map &map);
+	void nuovo_map(address_map &map);
 private:
 	uint8_t m_u10a;
 	uint8_t m_u10b;
@@ -182,7 +184,7 @@ private:
 };
 
 
-static ADDRESS_MAP_START( by35_map, AS_PROGRAM, 8, by35_state )
+ADDRESS_MAP_START(by35_state::by35_map)
 	ADDRESS_MAP_GLOBAL_MASK(0x7fff)     // A15 is not connected
 	AM_RANGE(0x0000, 0x007f) AM_RAM
 	AM_RANGE(0x0088, 0x008b) AM_DEVREADWRITE("pia_u10", pia6821_device, read, write)
@@ -191,7 +193,7 @@ static ADDRESS_MAP_START( by35_map, AS_PROGRAM, 8, by35_state )
 	AM_RANGE(0x1000, 0x7fff) AM_ROM // AM_REGION("roms", 0 )
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( nuovo_map, AS_PROGRAM, 8, by35_state )
+ADDRESS_MAP_START(by35_state::nuovo_map)
 	AM_RANGE(0x0000, 0x07ff) AM_RAM AM_SHARE("nvram")
 //  AM_RANGE(0x0000, 0x007f) AM_RAM     // Schematics infer that the M6802 internal RAM is disabled.
 	AM_RANGE(0x0088, 0x008b) AM_DEVREADWRITE("pia_u10", pia6821_device, read, write)

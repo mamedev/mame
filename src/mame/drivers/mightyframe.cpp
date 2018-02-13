@@ -25,11 +25,12 @@ public:
 	{ }
 
 void mightyframe(machine_config &config);
+void mem_map(address_map &map);
 private:
 //  required_device<cpu_device> m_maincpu;
 };
 
-static ADDRESS_MAP_START( mem_map, AS_PROGRAM, 16, mightyframe_state )
+ADDRESS_MAP_START(mightyframe_state::mem_map)
 	AM_RANGE(0x000000, 0x007fff) AM_ROM
 ADDRESS_MAP_END
 

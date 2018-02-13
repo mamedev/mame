@@ -41,7 +41,7 @@ WRITE8_MEMBER(hcastle_state::hcastle_coin_w)
 
 
 
-static ADDRESS_MAP_START( hcastle_map, AS_PROGRAM, 8, hcastle_state )
+ADDRESS_MAP_START(hcastle_state::hcastle_map)
 	AM_RANGE(0x0000, 0x0007) AM_WRITE(hcastle_pf1_control_w)
 	AM_RANGE(0x0020, 0x003f) AM_RAM /* rowscroll? */
 	AM_RANGE(0x0200, 0x0207) AM_WRITE(hcastle_pf2_control_w)
@@ -76,7 +76,7 @@ WRITE8_MEMBER(hcastle_state::sound_bank_w)
 	m_k007232->set_bank(bank_A, bank_B );
 }
 
-static ADDRESS_MAP_START( sound_map, AS_PROGRAM, 8, hcastle_state )
+ADDRESS_MAP_START(hcastle_state::sound_map)
 	AM_RANGE(0x0000, 0x7fff) AM_ROM
 	AM_RANGE(0x8000, 0x87ff) AM_RAM
 	AM_RANGE(0x9800, 0x987f) AM_DEVREADWRITE("k051649", k051649_device, k051649_waveform_r, k051649_waveform_w)

@@ -532,7 +532,7 @@ WRITE8_MEMBER( mpz80_state::disp_col_w )
 //  ADDRESS_MAP( mpz80_mem )
 //-------------------------------------------------
 
-static ADDRESS_MAP_START( mpz80_mem, AS_PROGRAM, 8, mpz80_state )
+ADDRESS_MAP_START(mpz80_state::mpz80_mem)
 	AM_RANGE(0x0000, 0xffff) AM_READWRITE(mmu_r, mmu_w)
 /*
     Task 0 Segment 0 map:
@@ -552,7 +552,7 @@ ADDRESS_MAP_END
 //  ADDRESS_MAP( mpz80_io )
 //-------------------------------------------------
 
-static ADDRESS_MAP_START( mpz80_io, AS_IO, 8, mpz80_state )
+ADDRESS_MAP_START(mpz80_state::mpz80_io)
 	AM_RANGE(0x0000, 0xffff) AM_READWRITE(mmu_io_r, mmu_io_w)
 ADDRESS_MAP_END
 

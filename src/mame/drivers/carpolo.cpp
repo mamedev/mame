@@ -34,7 +34,7 @@
  *
  *************************************/
 
-static ADDRESS_MAP_START( main_map, AS_PROGRAM, 8, carpolo_state )
+ADDRESS_MAP_START(carpolo_state::main_map)
 	AM_RANGE(0x0000, 0x01ff) AM_RAM
 	AM_RANGE(0x3000, 0x30ff) AM_WRITEONLY AM_SHARE("alpharam")
 	AM_RANGE(0x4000, 0x400f) AM_WRITEONLY AM_SHARE("spriteram")

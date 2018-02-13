@@ -80,4 +80,13 @@ public:
 	void dynablsb(machine_config &config);
 	void matchit2(machine_config &config);
 	void quizf1(machine_config &config);
+	void bomblord_main_cpu_map(address_map &map);
+	void dynablsb_main_cpu_io_map(address_map &map);
+	void dynablsb_main_cpu_map(address_map &map);
+	void dynablsb_sound_cpu_io_map(address_map &map);
+	void m90_main_cpu_io_map(address_map &map);
+	void m90_main_cpu_map(address_map &map);
+	void m90_sound_cpu_io_map(address_map &map);
+	void m90_sound_cpu_map(address_map &map);
+	void m99_sound_cpu_io_map(address_map &map);
 };

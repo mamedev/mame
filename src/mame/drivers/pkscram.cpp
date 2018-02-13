@@ -59,6 +59,7 @@ public:
 	required_device<gfxdecode_device> m_gfxdecode;
 	required_device<screen_device> m_screen;
 	void pkscramble(machine_config &config);
+	void pkscramble_map(address_map &map);
 };
 
 
@@ -118,7 +119,7 @@ WRITE16_MEMBER(pkscram_state::pkscramble_output_w)
 	machine().bookkeeping().coin_counter_w(0, data & 0x80);
 }
 
-static ADDRESS_MAP_START( pkscramble_map, AS_PROGRAM, 16, pkscram_state )
+ADDRESS_MAP_START(pkscram_state::pkscramble_map)
 	ADDRESS_MAP_GLOBAL_MASK(0x7ffff)
 	AM_RANGE(0x000000, 0x01ffff) AM_ROM
 	AM_RANGE(0x040000, 0x0400ff) AM_RAM AM_SHARE("nvram")

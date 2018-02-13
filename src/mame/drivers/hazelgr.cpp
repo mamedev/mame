@@ -23,18 +23,20 @@ public:
 	{ }
 
 	void haze(machine_config &config);
+	void io_map(address_map &map);
+	void mem_map(address_map &map);
 private:
 	required_device<cpu_device> m_maincpu;
 };
 
 
 
-static ADDRESS_MAP_START( mem_map, AS_PROGRAM, 8, haze_state )
+ADDRESS_MAP_START(haze_state::mem_map)
 	AM_RANGE(0x0000, 0x17ff) AM_ROM
 	AM_RANGE(0x9000, 0x9fff) AM_RAM
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( io_map, AS_IO, 8, haze_state )
+ADDRESS_MAP_START(haze_state::io_map)
 	ADDRESS_MAP_UNMAP_HIGH
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	AM_RANGE(0x80, 0x83) AM_DEVREADWRITE("ctc1", z80ctc_device, read, write) // irq 17E0 => 0183(ch3)

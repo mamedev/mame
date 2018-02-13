@@ -29,6 +29,7 @@ public:
 	DECLARE_READ8_MEMBER( io6000_read );
 	DECLARE_WRITE8_MEMBER( io6000_write );
 
+	void finalchs_mem(address_map &map);
 protected:
 	// device-level overrides
 	virtual void device_start() override;

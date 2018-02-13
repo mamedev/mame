@@ -142,6 +142,10 @@ public:
 	TIMER_CALLBACK_MEMBER(static_vblank_timer);
 	void rm480z(machine_config &config);
 	void rm380z(machine_config &config);
+	void rm380z_io(address_map &map);
+	void rm380z_mem(address_map &map);
+	void rm480z_io(address_map &map);
+	void rm480z_mem(address_map &map);
 };
 
 #endif // MAME_INCLUDES_RM380Z_H

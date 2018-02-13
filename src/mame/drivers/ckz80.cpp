@@ -93,6 +93,8 @@ public:
 	DECLARE_DRIVER_INIT(master);
 	DECLARE_READ8_MEMBER(master_trampoline_r);
 	DECLARE_WRITE8_MEMBER(master_trampoline_w);
+	void master_map(address_map &map);
+	void master_trampoline(address_map &map);
 	void master(machine_config &config);
 
 protected:
@@ -276,7 +278,7 @@ DRIVER_INIT_MEMBER(ckz80_state, master)
 
 // Master
 
-static ADDRESS_MAP_START( master_map, AS_PROGRAM, 8, ckz80_state )
+ADDRESS_MAP_START(ckz80_state::master_map)
 	AM_RANGE(0x0000, 0x1fff) AM_MIRROR(0x6000) AM_ROM AM_REGION("maincpu", 0) // _A15
 	AM_RANGE(0xa000, 0xa000) AM_MIRROR(0x1fff) AM_READWRITE(master_input_r, master_control_w) // A13
 	AM_RANGE(0xc000, 0xc7ff) AM_MIRROR(0x3800) AM_RAM // A14
@@ -304,7 +306,7 @@ READ8_MEMBER(ckz80_state::master_trampoline_r)
 	return data;
 }
 
-static ADDRESS_MAP_START( master_trampoline, AS_PROGRAM, 8, ckz80_state )
+ADDRESS_MAP_START(ckz80_state::master_trampoline)
 	AM_RANGE(0x0000, 0xffff) AM_READWRITE(master_trampoline_r, master_trampoline_w)
 ADDRESS_MAP_END
 

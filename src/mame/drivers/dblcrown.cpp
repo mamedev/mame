@@ -104,6 +104,8 @@ public:
 	DECLARE_PALETTE_INIT(dblcrown);
 
 	void dblcrown(machine_config &config);
+	void dblcrown_io(address_map &map);
+	void dblcrown_map(address_map &map);
 protected:
 	// driver_device overrides
 	virtual void machine_start() override;
@@ -337,7 +339,7 @@ WRITE8_MEMBER(dblcrown_state::watchdog_w)
 }
 
 
-static ADDRESS_MAP_START( dblcrown_map, AS_PROGRAM, 8, dblcrown_state )
+ADDRESS_MAP_START(dblcrown_state::dblcrown_map)
 	ADDRESS_MAP_UNMAP_HIGH
 	AM_RANGE(0x0000, 0x7fff) AM_ROM
 	AM_RANGE(0x8000, 0x9fff) AM_ROMBANK("rom_bank")
@@ -352,7 +354,7 @@ static ADDRESS_MAP_START( dblcrown_map, AS_PROGRAM, 8, dblcrown_state )
 
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( dblcrown_io, AS_IO, 8, dblcrown_state )
+ADDRESS_MAP_START(dblcrown_state::dblcrown_io)
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	ADDRESS_MAP_UNMAP_HIGH
 	AM_RANGE(0x00, 0x00) AM_READ_PORT("DSWA")

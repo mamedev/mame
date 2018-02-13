@@ -99,29 +99,29 @@ WRITE8_MEMBER(busicom_state::printer_ctrl_w)
 {
 }
 
-static ADDRESS_MAP_START(busicom_rom, i4004_cpu_device::AS_ROM, 8, busicom_state )
+ADDRESS_MAP_START(busicom_state::busicom_rom)
 	ADDRESS_MAP_UNMAP_HIGH
 	AM_RANGE(0x0000, 0x04FF) AM_ROM AM_REGION("maincpu", 0)
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START(busicom_mem, i4004_cpu_device::AS_RAM_MEMORY, 8, busicom_state )
+ADDRESS_MAP_START(busicom_state::busicom_mem)
 	ADDRESS_MAP_UNMAP_HIGH
 	AM_RANGE(0x0000, 0x07F) AM_RAM
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START(busicom_stat, i4004_cpu_device::AS_RAM_STATUS, 8, busicom_state )
+ADDRESS_MAP_START(busicom_state::busicom_stat)
 	ADDRESS_MAP_UNMAP_HIGH
 	AM_RANGE(0x0000, 0x01F) AM_RAM
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( busicom_rp, i4004_cpu_device::AS_ROM_PORTS, 8, busicom_state )
+ADDRESS_MAP_START(busicom_state::busicom_rp)
 	ADDRESS_MAP_UNMAP_HIGH
 	AM_RANGE(0x0000, 0x000f) AM_MIRROR(0x0700) AM_WRITE(shifter_w) // ROM0 I/O
 	AM_RANGE(0x0010, 0x001f) AM_MIRROR(0x0700) AM_READWRITE(keyboard_r,printer_ctrl_w) // ROM1 I/O
 	AM_RANGE(0x0020, 0x002f) AM_MIRROR(0x0700) AM_READ(printer_r)  // ROM2 I/O
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( busicom_mp, i4004_cpu_device::AS_RAM_PORTS, 8, busicom_state )
+ADDRESS_MAP_START(busicom_state::busicom_mp)
 	AM_RANGE(0x00, 0x00) AM_WRITE(printer_w) // RAM0 output
 	AM_RANGE(0x01, 0x01) AM_WRITE(status_w)  // RAM1 output
 ADDRESS_MAP_END

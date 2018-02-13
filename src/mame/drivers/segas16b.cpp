@@ -1707,7 +1707,7 @@ WRITE16_MEMBER( segas16b_state::sjryuko_custom_io_w )
 //  MAIN CPU ADDRESS MAPS
 //**************************************************************************
 
-static ADDRESS_MAP_START( system16b_map, AS_PROGRAM, 16, segas16b_state )
+ADDRESS_MAP_START(segas16b_state::system16b_map)
 	ADDRESS_MAP_UNMAP_HIGH
 	AM_RANGE(0x000000, 0xffffff) AM_DEVREADWRITE8("mapper", sega_315_5195_mapper_device, read, write, 0x00ff)
 
@@ -1720,11 +1720,11 @@ static ADDRESS_MAP_START( system16b_map, AS_PROGRAM, 16, segas16b_state )
 	AM_RANGE(0x500000, 0x503fff) AM_RAM AM_SHARE("workram")
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( decrypted_opcodes_map, AS_OPCODES, 16, segas16b_state )
+ADDRESS_MAP_START(segas16b_state::decrypted_opcodes_map)
 	AM_RANGE(0x00000, 0xfffff) AM_ROMBANK("fd1094_decrypted_opcodes")
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( system16c_map, AS_PROGRAM, 16, segas16b_state )
+ADDRESS_MAP_START(segas16b_state::system16c_map)
 	ADDRESS_MAP_UNMAP_HIGH
 	AM_RANGE(0x000000, 0xffffff) AM_DEVREADWRITE8("mapper", sega_315_5195_mapper_device, read, write, 0x00ff)
 
@@ -1737,7 +1737,7 @@ static ADDRESS_MAP_START( system16c_map, AS_PROGRAM, 16, segas16b_state )
 	AM_RANGE(0x500000, 0x53ffff) AM_RAM AM_SHARE("workram") // only change from system16b_map
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( system16b_bootleg_map, AS_PROGRAM, 16, segas16b_state )
+ADDRESS_MAP_START(segas16b_state::system16b_bootleg_map)
 	AM_RANGE(0x000000, 0x03ffff) AM_ROM
 	AM_RANGE(0x200000, 0x23ffff) AM_RAM // used during startup for decompression
 	AM_RANGE(0x3f0000, 0x3fffff) AM_WRITE(rom_5704_bank_w)
@@ -1750,7 +1750,7 @@ static ADDRESS_MAP_START( system16b_bootleg_map, AS_PROGRAM, 16, segas16b_state 
 	AM_RANGE(0xffc000, 0xffffff) AM_RAM AM_SHARE("workram")
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( map_fpointbla, AS_PROGRAM, 16, segas16b_state )
+ADDRESS_MAP_START(segas16b_state::map_fpointbla)
 	AM_RANGE(0x000000, 0x01ffff) AM_ROM
 	AM_RANGE(0x02000e, 0x02000f) AM_READ_PORT("P2")
 	AM_RANGE(0x0a0000, 0x0a001f) AM_RAM AM_SHARE("bootleg_scroll")
@@ -1765,17 +1765,17 @@ static ADDRESS_MAP_START( map_fpointbla, AS_PROGRAM, 16, segas16b_state )
 	AM_RANGE(0xffc000, 0xffffff) AM_RAM AM_SHARE("workram")
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( decrypted_opcodes_map_x, AS_OPCODES, 16, segas16b_state )
+ADDRESS_MAP_START(segas16b_state::decrypted_opcodes_map_x)
 	ADDRESS_MAP_UNMAP_HIGH
 	AM_RANGE(0x000000, 0x03ffff) AM_ROM AM_SHARE("decrypted_opcodes")
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( decrypted_opcodes_map_fpointbla, AS_OPCODES, 16, segas16b_state )
+ADDRESS_MAP_START(segas16b_state::decrypted_opcodes_map_fpointbla)
 	ADDRESS_MAP_UNMAP_HIGH
 	AM_RANGE(0x000000, 0x01ffff) AM_ROM AM_SHARE("decrypted_opcodes")
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( lockonph_map, AS_PROGRAM, 16, segas16b_state )
+ADDRESS_MAP_START(segas16b_state::lockonph_map)
 	// this still appears to have a mapper device, does the hardware use it? should we move this to all be configured by it?
 	AM_RANGE(0x000000, 0x0bffff) AM_ROM
 	AM_RANGE(0x3f0000, 0x3fffff) AM_WRITE(rom_5704_bank_w)
@@ -1800,7 +1800,7 @@ ADDRESS_MAP_END
 
 
 
-static ADDRESS_MAP_START( fpointbl_map, AS_PROGRAM, 16, segas16b_state )
+ADDRESS_MAP_START(segas16b_state::fpointbl_map)
 	AM_RANGE(0x000000, 0x0bffff) AM_ROM
 
 	AM_RANGE(0x400000, 0x40ffff) AM_DEVREADWRITE("segaic16vid", segaic16_video_device, tileram_r, tileram_w) AM_SHARE("tileram")
@@ -1826,7 +1826,7 @@ ADDRESS_MAP_END
     Flash Point (Datsu bootlegs = fpointbl, fpointbj)
     Has sound latch at $E000 instead of I/O ports $C0-FF
 */
-static ADDRESS_MAP_START( fpointbl_sound_map, AS_PROGRAM, 8, segas16b_state )
+ADDRESS_MAP_START(segas16b_state::fpointbl_sound_map)
 	AM_RANGE(0x0000, 0x7fff) AM_ROM
 	AM_RANGE(0xe000, 0xe000) AM_DEVREAD("soundlatch", generic_latch_8_device, read)
 	AM_RANGE(0xf800, 0xffff) AM_RAM
@@ -1848,7 +1848,7 @@ WRITE16_MEMBER(segas16b_state::bootleg_custom_io_w)
 //  SOUND CPU ADDRESS MAPS
 //**************************************************************************
 
-static ADDRESS_MAP_START( sound_map, AS_PROGRAM, 8, segas16b_state )
+ADDRESS_MAP_START(segas16b_state::sound_map)
 	ADDRESS_MAP_UNMAP_HIGH
 	AM_RANGE(0x0000, 0x7fff) AM_ROM
 	AM_RANGE(0x8000, 0xdfff) AM_ROMBANK("soundbank")
@@ -1856,13 +1856,13 @@ static ADDRESS_MAP_START( sound_map, AS_PROGRAM, 8, segas16b_state )
 	AM_RANGE(0xf800, 0xffff) AM_RAM
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( sound_decrypted_opcodes_map, AS_OPCODES, 8, segas16b_state )
+ADDRESS_MAP_START(segas16b_state::sound_decrypted_opcodes_map)
 	ADDRESS_MAP_UNMAP_HIGH
 	AM_RANGE(0x0000, 0x7fff) AM_ROM AM_SHARE("sound_decrypted_opcodes")
 	AM_RANGE(0x8000, 0xdfff) AM_ROMBANK("soundbank")
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( sound_portmap, AS_IO, 8, segas16b_state )
+ADDRESS_MAP_START(segas16b_state::sound_portmap)
 	ADDRESS_MAP_UNMAP_HIGH
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	AM_RANGE(0x00, 0x01) AM_MIRROR(0x3e) AM_DEVREADWRITE("ym2151", ym2151_device, read, write)
@@ -1872,13 +1872,13 @@ static ADDRESS_MAP_START( sound_portmap, AS_IO, 8, segas16b_state )
 ADDRESS_MAP_END
 
 // similar to whizz / other philko games in sidearms.cpp, but with the m6295
-static ADDRESS_MAP_START( lockonph_sound_map, AS_PROGRAM, 8, segas16b_state )
+ADDRESS_MAP_START(segas16b_state::lockonph_sound_map)
 	ADDRESS_MAP_UNMAP_HIGH
 	AM_RANGE(0x0000, 0xf7ff) AM_ROM
 	AM_RANGE(0xf800, 0xffff) AM_RAM
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( lockonph_sound_iomap, AS_IO, 8, segas16b_state )
+ADDRESS_MAP_START(segas16b_state::lockonph_sound_iomap)
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	AM_RANGE(0x00, 0x01) AM_DEVREADWRITE("ymsnd", ym2151_device, read, write)
 	AM_RANGE(0x40, 0x40) AM_WRITENOP // ??
@@ -1899,7 +1899,7 @@ WRITE8_MEMBER(segas16b_state::spin_68k_w)
 	m_maincpu->spin_until_time(m_maincpu->cycles_to_attotime(20000));
 }
 
-static ADDRESS_MAP_START( mcu_io_map, AS_IO, 8, segas16b_state )
+ADDRESS_MAP_START(segas16b_state::mcu_io_map)
 	ADDRESS_MAP_UNMAP_HIGH
 	AM_RANGE(0x0000, 0x001f) AM_MIRROR(0xff00) AM_DEVREADWRITE("mapper", sega_315_5195_mapper_device, read, write)
 	AM_RANGE(MCS51_PORT_P1, MCS51_PORT_P1) AM_READ_PORT("SERVICE") AM_WRITE(spin_68k_w)
@@ -3745,7 +3745,7 @@ MACHINE_CONFIG_DERIVED(segas16b_state::system16b_mc8123, system16b)
 	MCFG_CPU_REPLACE("soundcpu", MC8123, MASTER_CLOCK_10MHz/2)
 	MCFG_CPU_PROGRAM_MAP(sound_map)
 	MCFG_CPU_IO_MAP(sound_portmap)
-	MCFG_CPU_DECRYPTED_OPCODES_MAP(sound_decrypted_opcodes_map)
+	MCFG_CPU_OPCODES_MAP(sound_decrypted_opcodes_map)
 MACHINE_CONFIG_END
 
 MACHINE_CONFIG_DERIVED(segas16b_state::system16b_fd1089a, system16b)
@@ -3763,7 +3763,7 @@ MACHINE_CONFIG_END
 MACHINE_CONFIG_DERIVED(segas16b_state::system16b_fd1094, system16b)
 	MCFG_CPU_REPLACE("maincpu", FD1094, MASTER_CLOCK_10MHz)
 	MCFG_CPU_PROGRAM_MAP(system16b_map)
-	MCFG_CPU_DECRYPTED_OPCODES_MAP(decrypted_opcodes_map)
+	MCFG_CPU_OPCODES_MAP(decrypted_opcodes_map)
 	MCFG_CPU_VBLANK_INT_DRIVER("screen", segas16b_state, irq4_line_hold)
 MACHINE_CONFIG_END
 
@@ -3811,7 +3811,7 @@ MACHINE_CONFIG_END
 MACHINE_CONFIG_DERIVED(segas16b_state::system16b_split, system16b)
 	MCFG_CPU_MODIFY("maincpu")
 	MCFG_CPU_PROGRAM_MAP(system16b_bootleg_map)
-	MCFG_CPU_DECRYPTED_OPCODES_MAP(decrypted_opcodes_map_x)
+	MCFG_CPU_OPCODES_MAP(decrypted_opcodes_map_x)
 
 	MCFG_DEVICE_REMOVE("mapper")
 MACHINE_CONFIG_END
@@ -3866,7 +3866,7 @@ MACHINE_CONFIG_END
 MACHINE_CONFIG_DERIVED(segas16b_state::fpointbla, fpointbl)
 	MCFG_CPU_MODIFY("maincpu")
 	MCFG_CPU_PROGRAM_MAP(map_fpointbla)
-	MCFG_CPU_DECRYPTED_OPCODES_MAP(decrypted_opcodes_map_fpointbla)
+	MCFG_CPU_OPCODES_MAP(decrypted_opcodes_map_fpointbla)
 
 	MCFG_CPU_MODIFY("soundcpu")
 	MCFG_CPU_PROGRAM_MAP(sound_map)
@@ -7873,7 +7873,9 @@ ROM_END
 //  Sonic Boom, Sega System 16B
 //  CPU: FD1094 (317-0053)
 //  ROM Board type: 171-5358
-//  Sega ID# for ROM board: 834-6532-01
+//  Sega game ID: 833-6531-01 SONIC BOOM
+//    Main board: 837-6533
+//     Rom board: 834-6532-01
 //
 //  Pos.   Silk        Type        Part                Pos.   Silk        Type        Part
 //
@@ -9561,7 +9563,7 @@ WRITE16_MEMBER( isgsm_state::main_bank_change_w )
 		membank(ISGSM_MAIN_BANK)->set_base(memregion("maincpu")->base());
 }
 
-static ADDRESS_MAP_START( isgsm_map, AS_PROGRAM, 16, isgsm_state )
+ADDRESS_MAP_START(isgsm_state::isgsm_map)
 
 	AM_RANGE(0x000000, 0x0fffff) AM_ROMBANK(ISGSM_MAIN_BANK) AM_REGION("bios", 0) // this area is ALWAYS read-only, even when the game is banked in
 	AM_RANGE(0x200000, 0x23ffff) AM_RAM // used during startup for decompression

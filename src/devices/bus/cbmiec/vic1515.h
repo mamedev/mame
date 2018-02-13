@@ -28,6 +28,8 @@ public:
 	// construction/destruction
 	vic1515_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
+	void vic1515_io(address_map &map);
+	void vic1515_mem(address_map &map);
 protected:
 	// device-level overrides
 	virtual void device_start() override;

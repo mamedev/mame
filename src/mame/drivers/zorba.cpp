@@ -71,15 +71,13 @@ ToDo:
 #include "speaker.h"
 
 
-namespace {
-
-ADDRESS_MAP_START( zorba_mem, AS_PROGRAM, 8, zorba_state )
+ADDRESS_MAP_START(zorba_state::zorba_mem)
 	AM_RANGE( 0x0000, 0x3fff ) AM_READ_BANK("bankr0") AM_WRITE_BANK("bankw0")
 	AM_RANGE( 0x4000, 0xffff ) AM_RAM
 ADDRESS_MAP_END
 
 
-ADDRESS_MAP_START( zorba_io, AS_IO, 8, zorba_state )
+ADDRESS_MAP_START(zorba_state::zorba_io)
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	AM_RANGE(0x00, 0x03) AM_DEVREADWRITE("pit", pit8254_device, read, write)
 	AM_RANGE(0x04, 0x04) AM_READWRITE(rom_r, rom_w)
@@ -98,6 +96,7 @@ ADDRESS_MAP_START( zorba_io, AS_IO, 8, zorba_state )
 	AM_RANGE(0x60, 0x63) AM_DEVREADWRITE("pia1", pia6821_device, read, write)
 ADDRESS_MAP_END
 
+namespace {
 
 INPUT_PORTS_START( zorba )
 	PORT_START("CNF")

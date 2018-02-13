@@ -169,7 +169,7 @@ WRITE8_MEMBER( tek4051_state::lbs_w )
 //  ADDRESS_MAP( tek4051_mem )
 //-------------------------------------------------
 
-static ADDRESS_MAP_START( tek4051_mem, AS_PROGRAM, 8, tek4051_state )
+ADDRESS_MAP_START(tek4051_state::tek4051_mem)
 	AM_RANGE(0x0000, 0x1fff) AM_RAM
 	AM_RANGE(0x2000, 0x7fff) AM_RAM // optional RAM
 	AM_RANGE(0x8000, 0x877f) AM_ROM AM_REGION(MC6800_TAG, 0)
@@ -193,7 +193,7 @@ ADDRESS_MAP_END
 //  ADDRESS_MAP( tek4052_mem )
 //-------------------------------------------------
 
-static ADDRESS_MAP_START( tek4052_mem, AS_PROGRAM, 8, tek4052_state )
+ADDRESS_MAP_START(tek4052_state::tek4052_mem)
 ADDRESS_MAP_END
 
 

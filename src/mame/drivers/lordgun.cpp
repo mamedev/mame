@@ -278,7 +278,7 @@ WRITE16_MEMBER(lordgun_state::lordgun_soundlatch_w)
 	m_soundcpu->set_input_line(INPUT_LINE_NMI, PULSE_LINE);
 }
 
-static ADDRESS_MAP_START( lordgun_map, AS_PROGRAM, 16, lordgun_state )
+ADDRESS_MAP_START(lordgun_state::lordgun_map)
 	AM_RANGE(0x000000, 0x0fffff) AM_ROM
 	AM_RANGE(0x200000, 0x20ffff) AM_RAM
 	AM_RANGE(0x210000, 0x21ffff) AM_RAM AM_SHARE("priority_ram")                        // PRIORITY
@@ -310,7 +310,7 @@ static ADDRESS_MAP_START( lordgun_map, AS_PROGRAM, 16, lordgun_state )
 ADDRESS_MAP_END
 
 
-static ADDRESS_MAP_START( aliencha_map, AS_PROGRAM, 16, lordgun_state )
+ADDRESS_MAP_START(lordgun_state::aliencha_map)
 	AM_RANGE(0x000000, 0x1fffff) AM_ROM
 	AM_RANGE(0x200000, 0x20ffff) AM_RAM
 	AM_RANGE(0x210000, 0x21ffff) AM_RAM AM_SHARE("priority_ram")                        // PRIORITY
@@ -337,7 +337,7 @@ static ADDRESS_MAP_START( aliencha_map, AS_PROGRAM, 16, lordgun_state )
 	AM_RANGE(0x50b900, 0x50b9ff) AM_READWRITE(aliencha_protection_r, aliencha_protection_w)
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( ymf278_map, 0, 8, lordgun_state)
+ADDRESS_MAP_START(lordgun_state::ymf278_map)
 	AM_RANGE(0x000000, 0x1fffff) AM_ROM
 ADDRESS_MAP_END
 
@@ -347,7 +347,7 @@ ADDRESS_MAP_END
 
 ***************************************************************************/
 
-static ADDRESS_MAP_START( lordgun_soundmem_map, AS_PROGRAM, 8, lordgun_state )
+ADDRESS_MAP_START(lordgun_state::lordgun_soundmem_map)
 	AM_RANGE(0x0000, 0xefff) AM_ROM
 	AM_RANGE(0xf000, 0xffff) AM_RAM
 ADDRESS_MAP_END
@@ -359,7 +359,7 @@ WRITE8_MEMBER(lordgun_state::lordgun_okibank_w)
 //  popmessage("OKI %x", data);
 }
 
-static ADDRESS_MAP_START( lordgun_soundio_map, AS_IO, 8, lordgun_state )
+ADDRESS_MAP_START(lordgun_state::lordgun_soundio_map)
 	AM_RANGE(0x1000, 0x1001) AM_DEVWRITE("ymsnd", ym3812_device, write)
 	AM_RANGE(0x2000, 0x2000) AM_DEVREADWRITE("oki", okim6295_device, read, write)
 	AM_RANGE(0x3000, 0x3000) AM_DEVREAD("soundlatch2", generic_latch_8_device, read)
@@ -369,7 +369,7 @@ static ADDRESS_MAP_START( lordgun_soundio_map, AS_IO, 8, lordgun_state )
 ADDRESS_MAP_END
 
 
-static ADDRESS_MAP_START( aliencha_soundio_map, AS_IO, 8, lordgun_state )
+ADDRESS_MAP_START(lordgun_state::aliencha_soundio_map)
 	AM_RANGE(0x3000, 0x3000) AM_DEVREAD("soundlatch2", generic_latch_8_device, read)
 	AM_RANGE(0x4000, 0x4000) AM_DEVREAD("soundlatch", generic_latch_8_device, read)
 	AM_RANGE(0x5000, 0x5000) AM_WRITENOP    // writes 03 then 07 at end of NMI

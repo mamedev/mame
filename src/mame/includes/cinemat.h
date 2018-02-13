@@ -195,4 +195,14 @@ public:
 	void wotw_sound(machine_config &config);
 	void demon_sound(machine_config &config);
 	void qb3_sound(machine_config &config);
+	void data_map(address_map &map);
+	void data_map_qb3(address_map &map);
+	void demon_sound_map(address_map &map);
+	void demon_sound_ports(address_map &map);
+	void io_map(address_map &map);
+	void io_map_qb3(address_map &map);
+	void program_map_16k(address_map &map);
+	void program_map_32k(address_map &map);
+	void program_map_4k(address_map &map);
+	void program_map_8k(address_map &map);
 };

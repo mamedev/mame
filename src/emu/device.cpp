@@ -422,51 +422,65 @@ void device_t::set_machine(running_machine &machine)
 //  list and return status
 //-------------------------------------------------
 
-bool device_t::findit(bool isvalidation) const
+bool device_t::findit(bool pre_map, bool isvalidation) const
 {
 	bool allfound = true;
 	for (finder_base *autodev = m_auto_finder_list; autodev != nullptr; autodev = autodev->next())
-	{
-		if (isvalidation)
+		if (autodev->is_pre_map() == pre_map)
 		{
-			// sanity checking
-			const char *tag = autodev->finder_tag();
-			if (tag == nullptr)
+			if (isvalidation)
 			{
-				osd_printf_error("Finder tag is null!\n");
-				allfound = false;
-				continue;
+				// sanity checking
+				const char *tag = autodev->finder_tag();
+				if (tag == nullptr)
+				{
+					osd_printf_error("Finder tag is null!\n");
+					allfound = false;
+					continue;
+				}
+				if (tag[0] == '^' && tag[1] == ':')
+				{
+					osd_printf_error("Malformed finder tag: %s\n", tag);
+					allfound = false;
+					continue;
+				}
 			}
-			if (tag[0] == '^' && tag[1] == ':')
-			{
-				osd_printf_error("Malformed finder tag: %s\n", tag);
-				allfound = false;
-				continue;
-			}
+			allfound &= autodev->findit(isvalidation);
 		}
-		allfound &= autodev->findit(isvalidation);
-	}
 	return allfound;
 }
 
 //-------------------------------------------------
-//  resolve_objects - find objects referenced in
-//  configuration
+//  resolve_pre_map - find objects that may be used
+//  in memory maps
 //-------------------------------------------------
 
-void device_t::resolve_objects()
+void device_t::resolve_pre_map()
 {
 	// prepare the logerror buffer
 	if (m_machine->allow_logging())
 		m_string_buffer.reserve(1024);
 
-	// find all the registered devices
-	if (!findit(false))
+	// find all the registered pre-map objects
+	if (!findit(true, false))
+		throw emu_fatalerror("Missing some required devices, unable to proceed");
+}
+
+//-------------------------------------------------
+//  resolve_post_map - find objects that are created
+//  in memory maps
+//-------------------------------------------------
+
+void device_t::resolve_post_map()
+{
+	// find all the registered post-map objects
+	if (!findit(false, false))
 		throw emu_fatalerror("Missing some required objects, unable to proceed");
 
 	// allow implementation to do additional setup
 	device_resolve_objects();
 }
+
 
 //-------------------------------------------------
 //  start - start a device

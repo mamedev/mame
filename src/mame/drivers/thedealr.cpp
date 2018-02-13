@@ -77,6 +77,8 @@ public:
 	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	DECLARE_WRITE_LINE_MEMBER(screen_vblank);
 	void thedealr(machine_config &config);
+	void thedealr(address_map &map);
+	void thedealr_sub(address_map &map);
 };
 
 /***************************************************************************
@@ -271,7 +273,7 @@ WRITE8_MEMBER(thedealr_state::unk_w)
 //  popmessage("UNK %02x", data);
 }
 
-static ADDRESS_MAP_START( thedealr, AS_PROGRAM, 8, thedealr_state )
+ADDRESS_MAP_START(thedealr_state::thedealr)
 	AM_RANGE(0x0000, 0x07ff) AM_RAM AM_SHARE("nvram")
 
 	AM_RANGE(0x2000, 0x2000) AM_RAM // w ff at boot (after clearing commram)
@@ -305,7 +307,7 @@ ADDRESS_MAP_END
 
 ***************************************************************************/
 
-static ADDRESS_MAP_START( thedealr_sub, AS_PROGRAM, 8, thedealr_state )
+ADDRESS_MAP_START(thedealr_state::thedealr_sub)
 	// Work RAM
 	AM_RANGE(0x0000, 0x00ff) AM_RAM
 	AM_RANGE(0x0100, 0x01ff) AM_RAM

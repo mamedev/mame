@@ -47,6 +47,7 @@ public:
 	void gts80b_s1(machine_config &config);
 	void gts80b_s(machine_config &config);
 	void gts80b(machine_config &config);
+	void gts80b_map(address_map &map);
 private:
 	uint8_t m_dispcmd;
 	uint8_t m_port2a;
@@ -61,7 +62,7 @@ private:
 	optional_device<gottlieb_sound_r1_device> m_r1_sound;
 };
 
-static ADDRESS_MAP_START( gts80b_map, AS_PROGRAM, 8, gts80b_state )
+ADDRESS_MAP_START(gts80b_state::gts80b_map)
 	ADDRESS_MAP_GLOBAL_MASK(0x3fff)
 	AM_RANGE(0x0000, 0x017f) AM_RAM
 	AM_RANGE(0x0200, 0x027f) AM_DEVREADWRITE("riot1", riot6532_device, read, write)

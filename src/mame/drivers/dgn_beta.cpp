@@ -140,7 +140,7 @@ static const unsigned char dgnbeta_palette[] =
 
 */
 
-static ADDRESS_MAP_START( dgnbeta_map, AS_PROGRAM, 8, dgn_beta_state )
+ADDRESS_MAP_START(dgn_beta_state::dgnbeta_map)
 	AM_RANGE(0x0000, 0x0FFF)    AM_RAMBANK("bank1")
 	AM_RANGE(0x1000, 0x1FFF)    AM_RAMBANK("bank2")
 	AM_RANGE(0x2000, 0x2FFF)    AM_RAMBANK("bank3")

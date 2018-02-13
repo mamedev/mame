@@ -95,7 +95,7 @@ DEFINE_DEVICE_TYPE(ATARI_JSA_IIIS, atari_jsa_iiis_device, "atjsa3s", "Atari JSA 
 //  MEMORY MAPS
 //**************************************************************************
 
-static ADDRESS_MAP_START( atarijsa1_map, AS_PROGRAM, 8, atari_jsa_i_device )
+ADDRESS_MAP_START(atari_jsa_i_device::atarijsa1_map)
 	AM_RANGE(0x0000, 0x1fff) AM_RAM
 	AM_RANGE(0x2000, 0x2001) AM_DEVREADWRITE("ym2151", ym2151_device, read, write)
 	AM_RANGE(0x2800, 0x2800) AM_MIRROR(0x01f9)                                                                      // N/C
@@ -112,7 +112,7 @@ static ADDRESS_MAP_START( atarijsa1_map, AS_PROGRAM, 8, atari_jsa_i_device )
 ADDRESS_MAP_END
 
 
-static ADDRESS_MAP_START( atarijsa2_map, AS_PROGRAM, 8, atari_jsa_ii_device )
+ADDRESS_MAP_START(atari_jsa_ii_device::atarijsa2_map)
 	AM_RANGE(0x0000, 0x1fff) AM_RAM
 	AM_RANGE(0x2000, 0x2001) AM_DEVREADWRITE("ym2151", ym2151_device, read, write)
 	AM_RANGE(0x2800, 0x2800) AM_MIRROR(0x01f9) AM_READ(oki_r)                                                       // /RDV
@@ -129,7 +129,7 @@ ADDRESS_MAP_END
 
 
 // full map verified from schematics and Batman GALs
-static ADDRESS_MAP_START( atarijsa3_map, AS_PROGRAM, 8, atari_jsa_iii_device )
+ADDRESS_MAP_START(atari_jsa_iii_device::atarijsa3_map)
 	AM_RANGE(0x0000, 0x1fff) AM_RAM
 	AM_RANGE(0x2000, 0x2001) AM_MIRROR(0x07fe) AM_DEVREADWRITE("ym2151", ym2151_device, read, write)
 	AM_RANGE(0x2800, 0x2801) AM_MIRROR(0x05f8) AM_READWRITE(oki_r, overall_volume_w)                                // /RDV
@@ -145,13 +145,13 @@ static ADDRESS_MAP_START( atarijsa3_map, AS_PROGRAM, 8, atari_jsa_iii_device )
 ADDRESS_MAP_END
 
 
-static ADDRESS_MAP_START( jsa3_oki1_map, 0, 8, atari_jsa_iii_device )
+ADDRESS_MAP_START(atari_jsa_iii_device::jsa3_oki1_map)
 	AM_RANGE(0x00000, 0x1ffff) AM_ROMBANK("oki1lo")
 	AM_RANGE(0x20000, 0x3ffff) AM_ROMBANK("oki1hi")
 ADDRESS_MAP_END
 
 
-static ADDRESS_MAP_START( jsa3_oki2_map, 0, 8, atari_jsa_iiis_device )
+ADDRESS_MAP_START(atari_jsa_iiis_device::jsa3_oki2_map)
 	AM_RANGE(0x00000, 0x1ffff) AM_ROMBANK("oki2lo")
 	AM_RANGE(0x20000, 0x3ffff) AM_ROMBANK("oki2hi")
 ADDRESS_MAP_END

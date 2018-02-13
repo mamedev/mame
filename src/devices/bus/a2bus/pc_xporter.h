@@ -56,6 +56,8 @@ public:
 	DECLARE_WRITE8_MEMBER(pc_page_w);
 	DECLARE_WRITE8_MEMBER(nmi_enable_w);
 
+	void pc_io(address_map &map);
+	void pc_map(address_map &map);
 protected:
 	a2bus_pcxporter_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock);
 

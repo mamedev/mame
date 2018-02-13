@@ -48,6 +48,7 @@ public:
 	void remove_boot_rom();
 
 	void risc2500(machine_config &config);
+	void risc2500_mem(address_map &map);
 private:
 	required_device<cpu_device> m_maincpu;
 	required_device<ram_device> m_ram;
@@ -287,7 +288,7 @@ void risc2500_state::machine_reset()
 	install_boot_rom();
 }
 
-static ADDRESS_MAP_START(risc2500_mem, AS_PROGRAM, 32, risc2500_state )
+ADDRESS_MAP_START(risc2500_state::risc2500_mem)
 	AM_RANGE( 0x00000000,  0x0001ffff )  AM_RAM
 	AM_RANGE( 0x01800000,  0x01800003 )  AM_READ(disable_boot_rom)
 	AM_RANGE( 0x01000000,  0x01000003 )  AM_READWRITE(p1000_r, p1000_w)

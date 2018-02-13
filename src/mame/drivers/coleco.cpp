@@ -94,13 +94,13 @@ WRITE8_MEMBER( coleco_state::paddle_on_w )
 
 /* Memory Maps */
 
-static ADDRESS_MAP_START( coleco_map, AS_PROGRAM, 8, coleco_state )
+ADDRESS_MAP_START(coleco_state::coleco_map)
 	AM_RANGE(0x0000, 0x1fff) AM_ROM
 	AM_RANGE(0x6000, 0x63ff) AM_RAM AM_MIRROR(0x1c00) AM_SHARE("ram")
 	AM_RANGE(0x8000, 0xffff) AM_ROM
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( coleco_io_map, AS_IO, 8, coleco_state )
+ADDRESS_MAP_START(coleco_state::coleco_io_map)
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	AM_RANGE(0x80, 0x80) AM_MIRROR(0x1f) AM_WRITE(paddle_off_w)
 	AM_RANGE(0xa0, 0xa0) AM_MIRROR(0x1e) AM_DEVREADWRITE("tms9928a", tms9928a_device, vram_read, vram_write)
@@ -111,7 +111,7 @@ static ADDRESS_MAP_START( coleco_io_map, AS_IO, 8, coleco_state )
 	AM_RANGE(0xe2, 0xe2) AM_MIRROR(0x1d) AM_READ(paddle_2_r)
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( czz50_map, AS_PROGRAM, 8, coleco_state )
+ADDRESS_MAP_START(coleco_state::czz50_map)
 	AM_RANGE(0x0000, 0x3fff) AM_ROM
 	AM_RANGE(0x6000, 0x63ff) AM_RAM AM_MIRROR(0x1c00) AM_SHARE("ram")
 	AM_RANGE(0x8000, 0xffff) AM_ROM

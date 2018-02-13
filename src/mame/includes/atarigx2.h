@@ -71,4 +71,5 @@ public:
 	void atarigx2(machine_config &config);
 	void atarigx2_0x200(machine_config &config);
 	void atarigx2_0x400(machine_config &config);
+	void main_map(address_map &map);
 };

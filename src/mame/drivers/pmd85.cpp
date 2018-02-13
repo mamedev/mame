@@ -220,17 +220,17 @@ uint32_t pmd85_state::screen_update_pmd85(screen_device &screen, bitmap_ind16 &b
 
 /* I/O ports */
 
-static ADDRESS_MAP_START( pmd85_io_map, AS_IO, 8, pmd85_state )
+ADDRESS_MAP_START(pmd85_state::pmd85_io_map)
 	AM_RANGE( 0x00, 0xff) AM_READWRITE(pmd85_io_r, pmd85_io_w )
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( mato_io_map, AS_IO, 8, pmd85_state )
+ADDRESS_MAP_START(pmd85_state::mato_io_map)
 	AM_RANGE( 0x00, 0xff) AM_READWRITE(mato_io_r, mato_io_w )
 ADDRESS_MAP_END
 
 /* memory w/r functions */
 
-static ADDRESS_MAP_START( pmd85_mem , AS_PROGRAM, 8, pmd85_state )
+ADDRESS_MAP_START(pmd85_state::pmd85_mem)
 	AM_RANGE(0x0000, 0x0fff) AM_RAMBANK("bank1")
 	AM_RANGE(0x1000, 0x1fff) AM_RAMBANK("bank2")
 	AM_RANGE(0x2000, 0x2fff) AM_RAMBANK("bank3")
@@ -243,7 +243,7 @@ static ADDRESS_MAP_START( pmd85_mem , AS_PROGRAM, 8, pmd85_state )
 	AM_RANGE(0xc000, 0xffff) AM_RAMBANK("bank8")
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( pmd852a_mem , AS_PROGRAM, 8, pmd85_state )
+ADDRESS_MAP_START(pmd85_state::pmd852a_mem)
 	AM_RANGE(0x0000, 0x0fff) AM_RAMBANK("bank1")
 	AM_RANGE(0x1000, 0x1fff) AM_RAMBANK("bank2")
 	AM_RANGE(0x2000, 0x2fff) AM_RAMBANK("bank3")
@@ -256,7 +256,7 @@ static ADDRESS_MAP_START( pmd852a_mem , AS_PROGRAM, 8, pmd85_state )
 	AM_RANGE(0xc000, 0xffff) AM_RAMBANK("bank10")
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( pmd853_mem , AS_PROGRAM, 8, pmd85_state )
+ADDRESS_MAP_START(pmd85_state::pmd853_mem)
 	AM_RANGE(0x0000, 0x1fff) AM_READ_BANK("bank1") AM_WRITE_BANK("bank9")
 	AM_RANGE(0x2000, 0x3fff) AM_READ_BANK("bank2") AM_WRITE_BANK("bank10")
 	AM_RANGE(0x4000, 0x5fff) AM_READ_BANK("bank3") AM_WRITE_BANK("bank11")
@@ -267,7 +267,7 @@ static ADDRESS_MAP_START( pmd853_mem , AS_PROGRAM, 8, pmd85_state )
 	AM_RANGE(0xe000, 0xffff) AM_READ_BANK("bank8") AM_WRITE_BANK("bank16")
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( alfa_mem , AS_PROGRAM, 8, pmd85_state )
+ADDRESS_MAP_START(pmd85_state::alfa_mem)
 	AM_RANGE(0x0000, 0x0fff) AM_RAMBANK("bank1")
 	AM_RANGE(0x1000, 0x33ff) AM_RAMBANK("bank2")
 	AM_RANGE(0x3400, 0x3fff) AM_RAMBANK("bank3")
@@ -278,14 +278,14 @@ static ADDRESS_MAP_START( alfa_mem , AS_PROGRAM, 8, pmd85_state )
 	AM_RANGE(0xc000, 0xffff) AM_RAMBANK("bank7")
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( mato_mem , AS_PROGRAM, 8, pmd85_state )
+ADDRESS_MAP_START(pmd85_state::mato_mem)
 	AM_RANGE(0x0000, 0x3fff) AM_RAMBANK("bank1")
 	AM_RANGE(0x4000, 0x7fff) AM_RAMBANK("bank2")
 	AM_RANGE(0x8000, 0xbfff) AM_READ_BANK("bank3")
 	AM_RANGE(0xc000, 0xffff) AM_RAMBANK("bank4")
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( c2717_mem , AS_PROGRAM, 8, pmd85_state )
+ADDRESS_MAP_START(pmd85_state::c2717_mem)
 	AM_RANGE(0x0000, 0x3fff) AM_RAMBANK("bank1")
 	AM_RANGE(0x4000, 0x7fff) AM_RAMBANK("bank2")
 	AM_RANGE(0x8000, 0xbfff) AM_READ_BANK("bank3")

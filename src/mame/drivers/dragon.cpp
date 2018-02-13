@@ -33,7 +33,7 @@
 //  ADDRESS_MAP( dragon_mem )
 //-------------------------------------------------
 
-static ADDRESS_MAP_START( dragon_mem, AS_PROGRAM, 8, dragon_state )
+ADDRESS_MAP_START(dragon_state::dragon_mem)
 ADDRESS_MAP_END
 
 

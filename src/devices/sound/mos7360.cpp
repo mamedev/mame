@@ -170,7 +170,7 @@ DEFINE_DEVICE_TYPE(MOS7360, mos7360_device, "mos7360", "MOS 7360 TED")
 
 
 // default address maps
-static ADDRESS_MAP_START( mos7360_videoram_map, 0, 8, mos7360_device )
+ADDRESS_MAP_START(mos7360_device::mos7360_videoram_map)
 	AM_RANGE(0x0000, 0xffff) AM_RAM
 ADDRESS_MAP_END
 
@@ -264,7 +264,7 @@ mos7360_device::mos7360_device(const machine_config &mconfig, const char *tag, d
 		device_memory_interface(mconfig, *this),
 		device_sound_interface(mconfig, *this),
 		device_video_interface(mconfig, *this),
-		m_videoram_space_config("videoram", ENDIANNESS_LITTLE, 8, 16, 0, nullptr, *ADDRESS_MAP_NAME(mos7360_videoram_map)),
+		m_videoram_space_config("videoram", ENDIANNESS_LITTLE, 8, 16, 0, address_map_constructor(), address_map_constructor(FUNC(mos7360_device::mos7360_videoram_map), this)),
 		m_write_irq(*this),
 		m_read_k(*this),
 		m_stream(nullptr)

@@ -264,7 +264,7 @@ WRITE8_MEMBER( mm1_state::ls259_w )
 //  ADDRESS_MAP( mm1_map )
 //-------------------------------------------------
 
-static ADDRESS_MAP_START( mm1_map, AS_PROGRAM, 8, mm1_state )
+ADDRESS_MAP_START(mm1_state::mm1_map)
 	AM_RANGE(0x0000, 0xffff) AM_READWRITE(read, write)
 ADDRESS_MAP_END
 

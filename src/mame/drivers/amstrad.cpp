@@ -123,7 +123,7 @@ Some bugs left :
 /* Memory is banked in 16k blocks. However, the multiface
 pages the memory in 8k blocks! The ROM can
 be paged into bank 0 and bank 3. */
-static ADDRESS_MAP_START(amstrad_mem, AS_PROGRAM, 8, amstrad_state )
+ADDRESS_MAP_START(amstrad_state::amstrad_mem)
 	AM_RANGE(0x00000, 0x01fff) AM_READ_BANK("bank1") AM_WRITE_BANK("bank9")
 	AM_RANGE(0x02000, 0x03fff) AM_READ_BANK("bank2") AM_WRITE_BANK("bank10")
 	AM_RANGE(0x04000, 0x05fff) AM_READ_BANK("bank3") AM_WRITE_BANK("bank11")
@@ -137,7 +137,7 @@ ADDRESS_MAP_END
 /* I've handled the I/O ports in this way, because the ports
 are not fully decoded by the CPC h/w. Doing it this way means
 I can decode it myself and a lot of  software should work */
-static ADDRESS_MAP_START(amstrad_io, AS_IO, 8, amstrad_state )
+ADDRESS_MAP_START(amstrad_state::amstrad_io)
 	AM_RANGE(0x0000, 0xffff) AM_READWRITE(amstrad_cpc_io_r, amstrad_cpc_io_w )
 ADDRESS_MAP_END
 

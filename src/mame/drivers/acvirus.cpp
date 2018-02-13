@@ -84,6 +84,7 @@ public:
 
 	DECLARE_DRIVER_INIT(virus);
 	void virus(machine_config &config);
+	void virus_map(address_map &map);
 };
 
 void acvirus_state::machine_start()
@@ -96,7 +97,7 @@ void acvirus_state::machine_reset()
 {
 }
 
-static ADDRESS_MAP_START( virus_map, AS_PROGRAM, 8, acvirus_state )
+ADDRESS_MAP_START(acvirus_state::virus_map)
 	AM_RANGE(0x0000, 0x7fff) AM_ROM AM_REGION("maincpu", 0) // fixed 32K of flash image
 	AM_RANGE(0x8000, 0xffff) AM_ROMBANK("rombank")
 ADDRESS_MAP_END

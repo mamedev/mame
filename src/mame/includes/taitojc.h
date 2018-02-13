@@ -137,4 +137,10 @@ public:
 	void draw_object_bank(bitmap_ind16 &bitmap, const rectangle &cliprect, uint8_t bank_type, uint8_t pri);
 	void taitojc(machine_config &config);
 	void dendego(machine_config &config);
+	void dendego_map(address_map &map);
+	void hc11_io_map(address_map &map);
+	void hc11_pgm_map(address_map &map);
+	void taitojc_map(address_map &map);
+	void tms_data_map(address_map &map);
+	void tms_program_map(address_map &map);
 };

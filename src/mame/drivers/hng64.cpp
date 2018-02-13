@@ -947,7 +947,7 @@ WRITE16_MEMBER(hng64_state::main_sound_comms_w)
 }
 
 
-static ADDRESS_MAP_START( hng_map, AS_PROGRAM, 32, hng64_state )
+ADDRESS_MAP_START(hng64_state::hng_map)
 
 	AM_RANGE(0x00000000, 0x00ffffff) AM_RAM AM_SHARE("mainram")
 	AM_RANGE(0x04000000, 0x05ffffff) AM_WRITENOP AM_ROM AM_REGION("gameprg", 0) AM_SHARE("cart")

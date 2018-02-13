@@ -21,7 +21,7 @@
 
 DEFINE_DEVICE_TYPE(TMP68301, tmp68301_device, "tmp68301", "Toshiba TMP68301")
 
-static ADDRESS_MAP_START( tmp68301_regs, 0, 16, tmp68301_device )
+ADDRESS_MAP_START(tmp68301_device::tmp68301_regs)
 //  AM_RANGE(0x000,0x3ff) AM_RAM
 	AM_RANGE(0x080,0x093) AM_READWRITE8(icr_r, icr_w,0x00ff)
 
@@ -127,7 +127,7 @@ tmp68301_device::tmp68301_device(const machine_config &mconfig, const char *tag,
 		m_scr(0),
 		m_pdir(0),
 		m_pdr(0),
-		m_space_config("regs", ENDIANNESS_LITTLE, 16, 10, 0, nullptr, *ADDRESS_MAP_NAME(tmp68301_regs))
+	  m_space_config("regs", ENDIANNESS_LITTLE, 16, 10, 0, address_map_constructor(), address_map_constructor(FUNC(tmp68301_device::tmp68301_regs), this))
 {
 	memset(m_regs, 0, sizeof(m_regs));
 	memset(m_icr, 0, sizeof(m_icr));

@@ -435,7 +435,7 @@ WRITE8_MEMBER(psychic5_state::bombsa_flipscreen_w)
 
 ***************************************************************************/
 
-static ADDRESS_MAP_START( psychic5_main_map, AS_PROGRAM, 8, psychic5_state )
+ADDRESS_MAP_START(psychic5_state::psychic5_main_map)
 	AM_RANGE(0x0000, 0x7fff) AM_ROM
 	AM_RANGE(0x8000, 0xbfff) AM_ROMBANK("mainbank")
 	AM_RANGE(0xc000, 0xdfff) AM_DEVICE("vrambank", address_map_bank_device, amap8)
@@ -452,7 +452,7 @@ static ADDRESS_MAP_START( psychic5_main_map, AS_PROGRAM, 8, psychic5_state )
 ADDRESS_MAP_END
 
 
-static ADDRESS_MAP_START( psychic5_vrambank_map, AS_PROGRAM, 8, psychic5_state )
+ADDRESS_MAP_START(psychic5_state::psychic5_vrambank_map)
 	AM_RANGE(0x0000, 0x0fff) AM_RAM_WRITE(bg_videoram_w) AM_SHARE("bg_videoram")
 	AM_RANGE(0x1000, 0x1fff) AM_RAM
 
@@ -473,20 +473,20 @@ static ADDRESS_MAP_START( psychic5_vrambank_map, AS_PROGRAM, 8, psychic5_state )
 ADDRESS_MAP_END
 
 
-static ADDRESS_MAP_START( psychic5_sound_map, AS_PROGRAM, 8, psychic5_state )
+ADDRESS_MAP_START(psychic5_state::psychic5_sound_map)
 	AM_RANGE(0x0000, 0x7fff) AM_ROM
 	AM_RANGE(0xc000, 0xc7ff) AM_RAM
 	AM_RANGE(0xe000, 0xe000) AM_DEVREAD("soundlatch", generic_latch_8_device, read)
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( psychic5_soundport_map, AS_IO, 8, psychic5_state )
+ADDRESS_MAP_START(psychic5_state::psychic5_soundport_map)
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	AM_RANGE(0x00, 0x01) AM_DEVWRITE("ym1", ym2203_device, write)
 	AM_RANGE(0x80, 0x81) AM_DEVWRITE("ym2", ym2203_device, write)
 ADDRESS_MAP_END
 
 
-static ADDRESS_MAP_START( bombsa_main_map, AS_PROGRAM, 8, psychic5_state )
+ADDRESS_MAP_START(psychic5_state::bombsa_main_map)
 	AM_RANGE(0x0000, 0x7fff) AM_ROM
 	AM_RANGE(0x8000, 0xbfff) AM_ROMBANK("mainbank")
 	AM_RANGE(0xc000, 0xcfff) AM_RAM
@@ -505,20 +505,20 @@ static ADDRESS_MAP_START( bombsa_main_map, AS_PROGRAM, 8, psychic5_state )
 	AM_RANGE(0xe000, 0xffff) AM_DEVICE("vrambank", address_map_bank_device, amap8)
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( bombsa_sound_map, AS_PROGRAM, 8, psychic5_state )
+ADDRESS_MAP_START(psychic5_state::bombsa_sound_map)
 	AM_RANGE(0x0000, 0xbfff) AM_ROM
 	AM_RANGE(0xc000, 0xc7ff) AM_RAM
 	AM_RANGE(0xe000, 0xe000) AM_DEVREAD("soundlatch", generic_latch_8_device, read)
 	AM_RANGE(0xf000, 0xf000) AM_WRITEONLY                               // Is this a confirm of some sort?
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( bombsa_soundport_map, AS_IO, 8, psychic5_state )
+ADDRESS_MAP_START(psychic5_state::bombsa_soundport_map)
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	AM_RANGE(0x00, 0x01) AM_DEVREADWRITE("ym1", ym2203_device, read, write)
 	AM_RANGE(0x80, 0x81) AM_DEVREADWRITE("ym2", ym2203_device, read, write)
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( bombsa_vrambank_map, AS_PROGRAM, 8, psychic5_state )
+ADDRESS_MAP_START(psychic5_state::bombsa_vrambank_map)
 	AM_RANGE(0x0000, 0x1fff) AM_RAM_WRITE(bg_videoram_w) AM_SHARE("bg_videoram")
 
 	AM_RANGE(0x2000, 0x2000) AM_READ_PORT("SYSTEM")

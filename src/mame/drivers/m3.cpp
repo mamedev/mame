@@ -30,6 +30,8 @@ public:
 	MC6845_UPDATE_ROW(crtc_update_row);
 
 	void m3(machine_config &config);
+	void io_map(address_map &map);
+	void mem_map(address_map &map);
 private:
 	virtual void machine_reset() override;
 	required_device<cpu_device> m_maincpu;
@@ -38,13 +40,13 @@ private:
 	required_device<palette_device> m_palette;
 };
 
-static ADDRESS_MAP_START( mem_map, AS_PROGRAM, 8, m3_state )
+ADDRESS_MAP_START(m3_state::mem_map)
 	AM_RANGE(0x0000, 0xe7ff) AM_RAM
 	AM_RANGE(0xe800, 0xefff) AM_RAM AM_SHARE("videoram")
 	AM_RANGE(0xf000, 0xffff) AM_ROM AM_REGION("roms", 0)
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( io_map, AS_PROGRAM, 8, m3_state )
+ADDRESS_MAP_START(m3_state::io_map)
 	ADDRESS_MAP_GLOBAL_MASK (0xff)
 	AM_RANGE(0x84, 0x84) AM_DEVREADWRITE("crtc", mc6845_device, status_r, address_w)
 	AM_RANGE(0x85, 0x85) AM_DEVREADWRITE("crtc", mc6845_device, register_r, register_w)

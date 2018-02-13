@@ -2,8 +2,8 @@
 // copyright-holders:Olivier Galibert
 #pragma once
 
-#ifndef __NEXT__
-#define __NEXT__
+#ifndef MAME_INCLUDES_NEXT_H
+#define MAME_INCLUDES_NEXT_H
 
 #include "cpu/m68000/m68000.h"
 #include "machine/nscsi_bus.h"
@@ -126,6 +126,13 @@ public:
 	void next(machine_config &config);
 	void nextstc(machine_config &config);
 	void nexts(machine_config &config);
+	void next_0b_m_mem(address_map &map);
+	void next_0b_m_nofdc_mem(address_map &map);
+	void next_0c_c_mem(address_map &map);
+	void next_0c_m_mem(address_map &map);
+	void next_2c_c_mem(address_map &map);
+	void next_fdc_mem(address_map &map);
+	void next_mem(address_map &map);
 protected:
 	struct dma_slot {
 		uint32_t start, limit, chain_start, chain_limit, current;

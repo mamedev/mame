@@ -41,6 +41,7 @@ public:
 	DECLARE_WRITE8_MEMBER(nmk004_tomain_w);
 	void ym2203_irq_handler(int irq);
 
+	void nmk004_sound_mem_map(address_map &map);
 protected:
 	// device-level overrides
 	virtual void device_start() override;

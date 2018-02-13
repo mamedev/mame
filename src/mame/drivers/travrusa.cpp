@@ -58,7 +58,7 @@ and 2764 eprom (swapped D3/D4 and D5/D6 data lines)
 #include "screen.h"
 
 
-static ADDRESS_MAP_START( main_map, AS_PROGRAM, 8, travrusa_state )
+ADDRESS_MAP_START(travrusa_state::main_map)
 	AM_RANGE(0x0000, 0x7fff) AM_ROM
 	AM_RANGE(0x8000, 0x8fff) AM_RAM_WRITE(travrusa_videoram_w) AM_SHARE("videoram")
 	AM_RANGE(0x9000, 0x9000) AM_WRITE(travrusa_scroll_x_low_w)

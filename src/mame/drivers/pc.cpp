@@ -395,30 +395,37 @@ public:
 	void eagle1600(machine_config &config);
 	void laser_turbo_xt(machine_config &config);
 	void ibm5550(machine_config &config);
+	void epc_io(address_map &map);
+	void ibm5550_io(address_map &map);
+	void pc16_io(address_map &map);
+	void pc16_map(address_map &map);
+	void pc8_io(address_map &map);
+	void pc8_map(address_map &map);
+	void zenith_map(address_map &map);
 };
 
-static ADDRESS_MAP_START( pc8_map, AS_PROGRAM, 8, pc_state )
+ADDRESS_MAP_START(pc_state::pc8_map)
 	ADDRESS_MAP_UNMAP_HIGH
 	AM_RANGE(0xf0000, 0xfffff) AM_ROM AM_REGION("bios", 0)
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( zenith_map, AS_PROGRAM, 8, pc_state )
+ADDRESS_MAP_START(pc_state::zenith_map)
 	ADDRESS_MAP_UNMAP_HIGH
 	AM_RANGE(0xf0000, 0xf7fff) AM_RAM
 	AM_RANGE(0xf8000, 0xfffff) AM_ROM AM_REGION("bios", 0x8000)
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( pc16_map, AS_PROGRAM, 16, pc_state )
+ADDRESS_MAP_START(pc_state::pc16_map)
 	ADDRESS_MAP_UNMAP_HIGH
 	AM_RANGE(0xf0000, 0xfffff) AM_ROM AM_REGION("bios", 0)
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START(pc8_io, AS_IO, 8, pc_state )
+ADDRESS_MAP_START(pc_state::pc8_io)
 	ADDRESS_MAP_UNMAP_HIGH
 	AM_RANGE(0x0000, 0x00ff) AM_DEVICE("mb", ibm5160_mb_device, map)
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START(pc16_io, AS_IO, 16, pc_state )
+ADDRESS_MAP_START(pc_state::pc16_io)
 	ADDRESS_MAP_UNMAP_HIGH
 	AM_RANGE(0x0000, 0x00ff) AM_DEVICE8("mb", ibm5160_mb_device, map, 0xffff)
 	AM_RANGE(0x0070, 0x007f) AM_RAM // needed for Poisk-2
@@ -429,13 +436,13 @@ READ8_MEMBER(pc_state::unk_r)
 	return 0;
 }
 
-static ADDRESS_MAP_START(ibm5550_io, AS_IO, 16, pc_state )
+ADDRESS_MAP_START(pc_state::ibm5550_io)
 	ADDRESS_MAP_UNMAP_HIGH
 	AM_RANGE(0x0000, 0x00ff) AM_DEVICE8("mb", ibm5160_mb_device, map, 0xffff)
 	AM_RANGE(0x00a0, 0x00a1) AM_READ8(unk_r, 0x00ff )
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START(epc_io, AS_IO, 8, pc_state)
+ADDRESS_MAP_START(pc_state::epc_io)
 	ADDRESS_MAP_UNMAP_HIGH
 	AM_RANGE(0x0000, 0x00ff) AM_DEVICE("mb", ibm5160_mb_device, map)
 	AM_RANGE(0x0070, 0x0070) AM_DEVREADWRITE("i8251", i8251_device, data_r, data_w)

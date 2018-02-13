@@ -55,6 +55,7 @@ public:
 	DECLARE_WRITE_LINE_MEMBER(write_centronics_busy);
 	void basic(machine_config &config);
 	void jtc(machine_config &config);
+	void jtc_mem(address_map &map);
 };
 
 
@@ -65,6 +66,7 @@ public:
 		: jtc_state(mconfig, type, tag)
 	{ }
 	void jtces88(machine_config &config);
+	void jtc_es1988_mem(address_map &map);
 };
 
 
@@ -78,6 +80,7 @@ public:
 	virtual void video_start() override;
 	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	void jtces23(machine_config &config);
+	void jtc_es23_mem(address_map &map);
 };
 
 
@@ -100,6 +103,7 @@ public:
 	std::unique_ptr<uint8_t[]> m_color_ram_g;
 	std::unique_ptr<uint8_t[]> m_color_ram_b;
 	void jtces40(machine_config &config);
+	void jtc_es40_mem(address_map &map);
 };
 
 
@@ -206,7 +210,7 @@ WRITE8_MEMBER( jtces40_state::banksel_w )
 
 /* Memory Maps */
 
-static ADDRESS_MAP_START( jtc_mem, AS_PROGRAM, 8, jtc_state )
+ADDRESS_MAP_START(jtc_state::jtc_mem)
 	ADDRESS_MAP_UNMAP_HIGH
 	AM_RANGE(0x7001, 0x7001) AM_MIRROR(0x0ff0) AM_READ_PORT("Y1")
 	AM_RANGE(0x7002, 0x7002) AM_MIRROR(0x0ff0) AM_READ_PORT("Y2")
@@ -224,7 +228,7 @@ static ADDRESS_MAP_START( jtc_mem, AS_PROGRAM, 8, jtc_state )
 	AM_RANGE(0xfe00, 0xffff) AM_RAM AM_SHARE("video_ram")
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( jtc_es1988_mem, AS_PROGRAM, 8, jtces88_state )
+ADDRESS_MAP_START(jtces88_state::jtc_es1988_mem)
 	ADDRESS_MAP_UNMAP_HIGH
 	AM_RANGE(0x0800, 0x0fff) AM_ROM
 	AM_RANGE(0x2000, 0x27ff) AM_ROM
@@ -244,7 +248,7 @@ static ADDRESS_MAP_START( jtc_es1988_mem, AS_PROGRAM, 8, jtces88_state )
 	AM_RANGE(0xfe00, 0xffff) AM_RAM AM_SHARE("video_ram")
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( jtc_es23_mem, AS_PROGRAM, 8, jtces23_state )
+ADDRESS_MAP_START(jtces23_state::jtc_es23_mem)
 	ADDRESS_MAP_UNMAP_HIGH
 	AM_RANGE(0x0800, 0x17ff) AM_ROM
 	AM_RANGE(0x7000, 0x7000) AM_MIRROR(0x0ff0) AM_READ_PORT("Y0")
@@ -267,7 +271,7 @@ static ADDRESS_MAP_START( jtc_es23_mem, AS_PROGRAM, 8, jtces23_state )
 	AM_RANGE(0xf800, 0xffff) AM_RAM AM_SHARE("video_ram")
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( jtc_es40_mem, AS_PROGRAM, 8, jtces40_state )
+ADDRESS_MAP_START(jtces40_state::jtc_es40_mem)
 	ADDRESS_MAP_UNMAP_HIGH
 	AM_RANGE(0x0800, 0x1fff) AM_ROM
 	AM_RANGE(0x4000, 0x5fff) AM_READWRITE(videoram_r, videoram_w)

@@ -31,7 +31,7 @@ DEFINE_DEVICE_TYPE(TMS5501, tms5501_device, "tms5501", "TMS5501 Multifunction I/
 
 
 // I/O address map
-DEVICE_ADDRESS_MAP_START( io_map, 8, tms5501_device )
+ADDRESS_MAP_START(tms5501_device::io_map)
 	AM_RANGE(0x00, 0x00) AM_READ(rb_r)
 	AM_RANGE(0x01, 0x01) AM_READ(xi_r)
 	AM_RANGE(0x02, 0x02) AM_READ(rst_r)

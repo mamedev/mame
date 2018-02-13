@@ -79,6 +79,10 @@ public:
 	uint8_t main_data;
 	uint8_t host_io_40;
 	void sderby2(machine_config &config);
+	void main_io_map(address_map &map);
+	void main_program_map(address_map &map);
+	void sub_io_map(address_map &map);
+	void sub_program_map(address_map &map);
 };
 
 
@@ -178,7 +182,7 @@ READ8_MEMBER(sderby2_state::sub_io_0_r)
  2KB of palette per screen? (0x7FF)
 
 */
-static ADDRESS_MAP_START( main_program_map, AS_PROGRAM, 8, sderby2_state )
+ADDRESS_MAP_START(sderby2_state::main_program_map)
 	AM_RANGE(0x0000, 0x7fff) AM_ROM
 	AM_RANGE(0x8000, 0x9fff) AM_RAM
 	AM_RANGE(0xa000, 0xbfff) AM_RAM
@@ -190,7 +194,7 @@ static ADDRESS_MAP_START( main_program_map, AS_PROGRAM, 8, sderby2_state )
 	AM_RANGE(0xf000, 0xffff) AM_RAM // Is this banked?
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( main_io_map, AS_IO, 8, sderby2_state )
+ADDRESS_MAP_START(sderby2_state::main_io_map)
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	AM_RANGE(0x10, 0x10) AM_READ(host_r)
 	AM_RANGE(0x20, 0x20) AM_WRITE(sub_nmi)
@@ -206,7 +210,7 @@ ADDRESS_MAP_END
 18 x 2148  (1024x4) Side
  4 x 2148  (1024x4) Near 316-5012 and 316-5011
 */
-static ADDRESS_MAP_START( sub_program_map, AS_PROGRAM, 8, sderby2_state )
+ADDRESS_MAP_START(sderby2_state::sub_program_map)
 	AM_RANGE(0x0000, 0x7fff) AM_ROM
 
 	AM_RANGE(0xc000, 0xcfff) AM_RAM // Tested at FFF, 1016, 102D
@@ -218,7 +222,7 @@ static ADDRESS_MAP_START( sub_program_map, AS_PROGRAM, 8, sderby2_state )
 	AM_RANGE(0xe000, 0xffff) AM_RAM // Tested at FE8
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( sub_io_map, AS_IO, 8, sderby2_state )
+ADDRESS_MAP_START(sderby2_state::sub_io_map)
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	AM_RANGE(0x00, 0x00) AM_READ(sub_io_0_r)
 	AM_RANGE(0x20, 0x20) AM_READ(sub_r)

@@ -130,6 +130,7 @@ public:
 
 	DECLARE_DRIVER_INIT(elektron);
 	void elektron(machine_config &config);
+	void elektron_map(address_map &map);
 };
 
 void elekmono_state::machine_start()
@@ -140,7 +141,7 @@ void elekmono_state::machine_reset()
 {
 }
 
-static ADDRESS_MAP_START( elektron_map, AS_PROGRAM, 32, elekmono_state )
+ADDRESS_MAP_START(elekmono_state::elektron_map)
 	AM_RANGE(0x00000000, 0x000fffff) AM_ROM AM_REGION("maincpu", 0)
 	AM_RANGE(0x00100000, 0x001fffff) AM_RAM // patch memory
 	AM_RANGE(0x00200000, 0x002fffff) AM_RAM // main RAM

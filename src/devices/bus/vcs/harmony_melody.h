@@ -23,6 +23,7 @@ public:
 
 	DECLARE_READ8_MEMBER(read8_r);
 
+	void harmony_arm7_map(address_map &map);
 private:
 	// device-level overrides
 	virtual void device_start() override;

@@ -26,6 +26,9 @@ public:
 	u32 screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 
 	void vp60(machine_config &config);
+	void io_map(address_map &map);
+	void kbd_map(address_map &map);
+	void mem_map(address_map &map);
 private:
 	required_device<cpu_device> m_maincpu;
 	required_region_ptr<u8> m_p_chargen;
@@ -36,15 +39,15 @@ u32 vp60_state::screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const
 	return 0;
 }
 
-static ADDRESS_MAP_START( mem_map, AS_PROGRAM, 8, vp60_state )
+ADDRESS_MAP_START(vp60_state::mem_map)
 	AM_RANGE(0x0000, 0x2fff) AM_ROM AM_REGION("maincpu", 0)
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( io_map, AS_PROGRAM, 8, vp60_state )
+ADDRESS_MAP_START(vp60_state::io_map)
 	AM_RANGE(0x8000, 0x87ff) AM_RAM
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( kbd_map, AS_PROGRAM, 8, vp60_state )
+ADDRESS_MAP_START(vp60_state::kbd_map)
 	AM_RANGE(0x000, 0x3ff) AM_ROM AM_REGION("keyboard", 0)
 ADDRESS_MAP_END
 

@@ -23,6 +23,8 @@ public:
 	virtual void WriteData( uint8_t *data, int dataLength ) override;
 	virtual void ReadData( uint8_t *data, int dataLength ) override;
 
+	void s1410_io(address_map &map);
+	void s1410_mem(address_map &map);
 protected:
 	// optional information overrides
 	virtual const tiny_rom_entry *device_rom_region() const override;

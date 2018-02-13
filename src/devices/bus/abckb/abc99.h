@@ -41,6 +41,9 @@ public:
 	DECLARE_WRITE8_MEMBER( z5_p2_w );
 	DECLARE_READ8_MEMBER( z5_t1_r );
 
+	void abc99_z2_io(address_map &map);
+	void abc99_z2_mem(address_map &map);
+	void abc99_z5_mem(address_map &map);
 protected:
 	// device-level overrides
 	virtual void device_start() override;

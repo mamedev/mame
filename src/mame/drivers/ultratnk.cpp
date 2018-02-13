@@ -161,7 +161,7 @@ WRITE8_MEMBER(ultratnk_state::explosion_w)
 }
 
 
-static ADDRESS_MAP_START( ultratnk_cpu_map, AS_PROGRAM, 8, ultratnk_state )
+ADDRESS_MAP_START(ultratnk_state::ultratnk_cpu_map)
 
 	ADDRESS_MAP_GLOBAL_MASK(0x3fff)
 

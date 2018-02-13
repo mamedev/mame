@@ -56,6 +56,7 @@ public:
 	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 
 	void cball(machine_config &config);
+	void cpu_map(address_map &map);
 protected:
 	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr) override;
 };
@@ -161,7 +162,7 @@ WRITE8_MEMBER(cball_state::wram_w)
 
 
 
-static ADDRESS_MAP_START( cpu_map, AS_PROGRAM, 8, cball_state )
+ADDRESS_MAP_START(cball_state::cpu_map)
 	ADDRESS_MAP_GLOBAL_MASK(0x7fff)
 
 	AM_RANGE(0x0000, 0x03ff) AM_READ(wram_r) AM_MASK(0x7f)

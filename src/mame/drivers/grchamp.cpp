@@ -544,7 +544,7 @@ GFXDECODE_END
  *************************************/
 
 /* complete memory map derived from schematics */
-static ADDRESS_MAP_START( main_map, AS_PROGRAM, 8, grchamp_state )
+ADDRESS_MAP_START(grchamp_state::main_map)
 	AM_RANGE(0x0000, 0x3fff) AM_ROM
 	AM_RANGE(0x4000, 0x43ff) AM_MIRROR(0x0400) AM_RAM
 	AM_RANGE(0x4800, 0x4bff) AM_MIRROR(0x0400) AM_RAM AM_SHARE("radarram")
@@ -553,7 +553,7 @@ static ADDRESS_MAP_START( main_map, AS_PROGRAM, 8, grchamp_state )
 ADDRESS_MAP_END
 
 
-static ADDRESS_MAP_START( main_portmap, AS_IO, 8, grchamp_state )
+ADDRESS_MAP_START(grchamp_state::main_portmap)
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	AM_RANGE(0x00, 0x00) AM_MIRROR(0x78) AM_READ_PORT("ACCEL")
 	AM_RANGE(0x02, 0x02) AM_MIRROR(0x78) AM_READ(sub_to_main_comm_r)
@@ -572,7 +572,7 @@ ADDRESS_MAP_END
 
 
 /* complete memory map derived from schematics */
-static ADDRESS_MAP_START( sub_map, AS_PROGRAM, 8, grchamp_state )
+ADDRESS_MAP_START(grchamp_state::sub_map)
 	AM_RANGE(0x0000, 0x1fff) AM_ROM
 	AM_RANGE(0x2000, 0x27ff) AM_RAM_WRITE(left_w) AM_SHARE("leftram")
 	AM_RANGE(0x2800, 0x2fff) AM_RAM_WRITE(right_w) AM_SHARE("rightram")
@@ -582,7 +582,7 @@ static ADDRESS_MAP_START( sub_map, AS_PROGRAM, 8, grchamp_state )
 ADDRESS_MAP_END
 
 
-static ADDRESS_MAP_START( sub_portmap, AS_IO, 8, grchamp_state )
+ADDRESS_MAP_START(grchamp_state::sub_portmap)
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	AM_RANGE(0x00, 0x03) AM_READ(main_to_sub_comm_r)
 	AM_RANGE(0x00, 0x0f) AM_MIRROR(0x70) AM_WRITE(cpu1_outputs_w)
@@ -619,7 +619,7 @@ ADDRESS_MAP_END
  0  1  0  1  0  x  x  x  x  x  x  x  x  x  0  1   W   OPEN BUS
  0  1  0  1  0  x  x  x  x  x  x  x  x  x  1  x   RW  OPEN BUS
 */
-static ADDRESS_MAP_START( sound_map, AS_PROGRAM, 8, grchamp_state )
+ADDRESS_MAP_START(grchamp_state::sound_map)
 	AM_RANGE(0x0000, 0x1fff) AM_ROM
 	// 2000-3fff are empty rom sockets
 	AM_RANGE(0x4000, 0x43ff) AM_RAM

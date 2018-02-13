@@ -160,6 +160,9 @@ public:
 	DECLARE_READ8_MEMBER(hd61830_rd_r);
 	IRQ_CALLBACK_MEMBER(portfolio_int_ack);
 	void portfolio(machine_config &config);
+	void portfolio_io(address_map &map);
+	void portfolio_lcdc(address_map &map);
+	void portfolio_mem(address_map &map);
 };
 
 
@@ -774,7 +777,7 @@ WRITE8_MEMBER( portfolio_state::io_w )
 //  ADDRESS_MAP( portfolio_mem )
 //-------------------------------------------------
 
-static ADDRESS_MAP_START( portfolio_mem, AS_PROGRAM, 8, portfolio_state )
+ADDRESS_MAP_START(portfolio_state::portfolio_mem)
 	AM_RANGE(0x00000, 0xfffff) AM_READWRITE(mem_r, mem_w)
 ADDRESS_MAP_END
 
@@ -783,7 +786,7 @@ ADDRESS_MAP_END
 //  ADDRESS_MAP( portfolio_io )
 //-------------------------------------------------
 
-static ADDRESS_MAP_START( portfolio_io, AS_IO, 8, portfolio_state )
+ADDRESS_MAP_START(portfolio_state::portfolio_io)
 	AM_RANGE(0x0000, 0xffff) AM_READWRITE(io_r, io_w)
 ADDRESS_MAP_END
 
@@ -792,7 +795,7 @@ ADDRESS_MAP_END
 //  ADDRESS_MAP( portfolio_lcdc )
 //-------------------------------------------------
 
-static ADDRESS_MAP_START( portfolio_lcdc, 0, 8, portfolio_state )
+ADDRESS_MAP_START(portfolio_state::portfolio_lcdc)
 	ADDRESS_MAP_GLOBAL_MASK(0x7ff)
 	AM_RANGE(0x0000, 0x07ff) AM_RAM
 ADDRESS_MAP_END

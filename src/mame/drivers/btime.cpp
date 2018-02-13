@@ -184,7 +184,7 @@ TIMER_DEVICE_CALLBACK_MEMBER(btime_state::audio_nmi_gen)
 	m_audionmi->in_w<1>((scanline & 8) >> 3);
 }
 
-static ADDRESS_MAP_START( btime_map, AS_PROGRAM, 8, btime_state )
+ADDRESS_MAP_START(btime_state::btime_map)
 	AM_RANGE(0x0000, 0x07ff) AM_RAM AM_SHARE("rambase")
 	AM_RANGE(0x0c00, 0x0c0f) AM_RAM_DEVWRITE("palette", palette_device, write8) AM_SHARE("palette")
 	AM_RANGE(0x1000, 0x13ff) AM_RAM AM_SHARE("videoram")
@@ -199,7 +199,7 @@ static ADDRESS_MAP_START( btime_map, AS_PROGRAM, 8, btime_state )
 	AM_RANGE(0xb000, 0xffff) AM_ROM
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( cookrace_map, AS_PROGRAM, 8, btime_state )
+ADDRESS_MAP_START(btime_state::cookrace_map)
 	AM_RANGE(0x0000, 0x03ff) AM_RAM AM_SHARE("rambase")
 	AM_RANGE(0x0500, 0x3fff) AM_ROM
 	AM_RANGE(0xc000, 0xc3ff) AM_RAM AM_SHARE("videoram")
@@ -219,7 +219,7 @@ static ADDRESS_MAP_START( cookrace_map, AS_PROGRAM, 8, btime_state )
 	AM_RANGE(0xfff9, 0xffff) AM_ROM
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( tisland_map, AS_PROGRAM, 8, btime_state )
+ADDRESS_MAP_START(btime_state::tisland_map)
 	AM_RANGE(0x0000, 0x07ff) AM_RAM AM_SHARE("rambase")
 	AM_RANGE(0x0c00, 0x0c0f) AM_RAM_DEVWRITE("palette", palette_device, write8) AM_SHARE("palette")
 	AM_RANGE(0x1000, 0x13ff) AM_RAM AM_SHARE("videoram")
@@ -235,7 +235,7 @@ static ADDRESS_MAP_START( tisland_map, AS_PROGRAM, 8, btime_state )
 	AM_RANGE(0x9000, 0xffff) AM_ROM
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( zoar_map, AS_PROGRAM, 8, btime_state )
+ADDRESS_MAP_START(btime_state::zoar_map)
 	AM_RANGE(0x0000, 0x07ff) AM_RAM AM_SHARE("rambase")
 	AM_RANGE(0x8000, 0x83ff) AM_WRITEONLY AM_SHARE("videoram")
 	AM_RANGE(0x8400, 0x87ff) AM_WRITEONLY AM_SHARE("colorram")
@@ -253,7 +253,7 @@ static ADDRESS_MAP_START( zoar_map, AS_PROGRAM, 8, btime_state )
 	AM_RANGE(0xd000, 0xffff) AM_ROM
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( lnc_map, AS_PROGRAM, 8, btime_state )
+ADDRESS_MAP_START(btime_state::lnc_map)
 	AM_RANGE(0x0000, 0x3bff) AM_RAM AM_SHARE("rambase")
 	AM_RANGE(0x3c00, 0x3fff) AM_RAM_WRITE(lnc_videoram_w) AM_SHARE("videoram")
 	AM_RANGE(0x7800, 0x7bff) AM_WRITEONLY AM_SHARE("colorram")  /* this is just here to initialize the pointer */
@@ -268,7 +268,7 @@ static ADDRESS_MAP_START( lnc_map, AS_PROGRAM, 8, btime_state )
 	AM_RANGE(0xc000, 0xffff) AM_ROM
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( mmonkey_map, AS_PROGRAM, 8, btime_state )
+ADDRESS_MAP_START(btime_state::mmonkey_map)
 	AM_RANGE(0x0000, 0x3bff) AM_RAM AM_SHARE("rambase")
 	AM_RANGE(0x3c00, 0x3fff) AM_RAM_WRITE(lnc_videoram_w) AM_SHARE("videoram")
 	AM_RANGE(0x7800, 0x7bff) AM_WRITEONLY AM_SHARE("colorram")      /* this is just here to initialize the pointer */
@@ -283,7 +283,7 @@ static ADDRESS_MAP_START( mmonkey_map, AS_PROGRAM, 8, btime_state )
 	AM_RANGE(0xc000, 0xffff) AM_ROM
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( bnj_map, AS_PROGRAM, 8, btime_state )
+ADDRESS_MAP_START(btime_state::bnj_map)
 	AM_RANGE(0x0000, 0x07ff) AM_RAM AM_SHARE("rambase")
 	AM_RANGE(0x1000, 0x1000) AM_READ_PORT("DSW1")
 	AM_RANGE(0x1001, 0x1001) AM_READ_PORT("DSW2") AM_WRITE(bnj_video_control_w)
@@ -302,7 +302,7 @@ static ADDRESS_MAP_START( bnj_map, AS_PROGRAM, 8, btime_state )
 	AM_RANGE(0xa000, 0xffff) AM_ROM
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( disco_map, AS_PROGRAM, 8, btime_state )
+ADDRESS_MAP_START(btime_state::disco_map)
 	AM_RANGE(0x0000, 0x04ff) AM_RAM AM_SHARE("rambase")
 	AM_RANGE(0x2000, 0x7fff) AM_RAM_WRITE(deco_charram_w) AM_SHARE("deco_charram")
 	AM_RANGE(0x8000, 0x83ff) AM_RAM AM_SHARE("videoram")
@@ -319,7 +319,7 @@ ADDRESS_MAP_END
 
 
 
-static ADDRESS_MAP_START( audio_map, AS_PROGRAM, 8, btime_state )
+ADDRESS_MAP_START(btime_state::audio_map)
 	AM_RANGE(0x0000, 0x03ff) AM_MIRROR(0x1c00) AM_RAM AM_SHARE("audio_rambase")
 	AM_RANGE(0x2000, 0x3fff) AM_DEVWRITE("ay1", ay8910_device, data_w)
 	AM_RANGE(0x4000, 0x5fff) AM_DEVWRITE("ay1", ay8910_device, address_w)
@@ -330,7 +330,7 @@ static ADDRESS_MAP_START( audio_map, AS_PROGRAM, 8, btime_state )
 	AM_RANGE(0xe000, 0xefff) AM_MIRROR(0x1000) AM_ROM
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( disco_audio_map, AS_PROGRAM, 8, btime_state )
+ADDRESS_MAP_START(btime_state::disco_audio_map)
 	AM_RANGE(0x0000, 0x03ff) AM_RAM
 	AM_RANGE(0x4000, 0x4fff) AM_DEVWRITE("ay1", ay8910_device, data_w)
 	AM_RANGE(0x5000, 0x5fff) AM_DEVWRITE("ay1", ay8910_device, address_w)

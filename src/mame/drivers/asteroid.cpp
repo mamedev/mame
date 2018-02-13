@@ -248,7 +248,7 @@ WRITE8_MEMBER(asteroid_state::llander_led_w)
  *
  *************************************/
 
-static ADDRESS_MAP_START( asteroid_map, AS_PROGRAM, 8, asteroid_state )
+ADDRESS_MAP_START(asteroid_state::asteroid_map)
 	ADDRESS_MAP_GLOBAL_MASK(0x7fff)
 	AM_RANGE(0x0000, 0x01ff) AM_RAM
 	AM_RANGE(0x0200, 0x02ff) AM_RAMBANK("ram1") AM_SHARE("ram1")
@@ -269,7 +269,7 @@ static ADDRESS_MAP_START( asteroid_map, AS_PROGRAM, 8, asteroid_state )
 ADDRESS_MAP_END
 
 
-static ADDRESS_MAP_START( astdelux_map, AS_PROGRAM, 8, asteroid_state )
+ADDRESS_MAP_START(asteroid_state::astdelux_map)
 	ADDRESS_MAP_GLOBAL_MASK(0x7fff)
 	AM_RANGE(0x0000, 0x01ff) AM_RAM
 	AM_RANGE(0x0200, 0x02ff) AM_RAMBANK("ram1") AM_SHARE("ram1")
@@ -292,7 +292,7 @@ static ADDRESS_MAP_START( astdelux_map, AS_PROGRAM, 8, asteroid_state )
 ADDRESS_MAP_END
 
 
-static ADDRESS_MAP_START( llander_map, AS_PROGRAM, 8, asteroid_state )
+ADDRESS_MAP_START(asteroid_state::llander_map)
 	ADDRESS_MAP_GLOBAL_MASK(0x7fff)
 	AM_RANGE(0x0000, 0x00ff) AM_RAM AM_MIRROR(0x1f00)
 	AM_RANGE(0x2000, 0x2000) AM_READ_PORT("IN0")

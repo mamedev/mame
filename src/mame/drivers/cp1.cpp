@@ -54,6 +54,7 @@ public:
 	DECLARE_WRITE8_MEMBER(i8155_portc_w);
 
 	void cp1(machine_config &config);
+	void cp1_io(address_map &map);
 private:
 	uint8_t   m_7seg;
 	uint8_t   m_port2;
@@ -180,7 +181,7 @@ WRITE8_MEMBER(cp1_state::i8155_portc_w)
 }
 
 
-static ADDRESS_MAP_START( cp1_io , AS_IO, 8, cp1_state)
+ADDRESS_MAP_START(cp1_state::cp1_io)
 	ADDRESS_MAP_UNMAP_HIGH
 	AM_RANGE( 0x00,             0xff )          AM_READWRITE( i8155_read, i8155_write)
 ADDRESS_MAP_END

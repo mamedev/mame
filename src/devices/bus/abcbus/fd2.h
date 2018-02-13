@@ -35,6 +35,8 @@ public:
 
 	DECLARE_WRITE8_MEMBER( status_w );
 
+	void abc_fd2_io(address_map &map);
+	void abc_fd2_mem(address_map &map);
 protected:
 	// device-level overrides
 	virtual void device_start() override;

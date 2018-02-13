@@ -177,6 +177,9 @@ public:
 	int         m_busint[8];
 	int         m_irqs[8];
 	void dmv(machine_config &config);
+	void dmv_io(address_map &map);
+	void dmv_mem(address_map &map);
+	void upd7220_map(address_map &map);
 };
 
 WRITE8_MEMBER(dmv_state::tc_set_w)
@@ -508,12 +511,12 @@ uint8_t dmv_state::program_read(address_space &space, int cas, offs_t offset)
 	return data;
 }
 
-static ADDRESS_MAP_START(dmv_mem, AS_PROGRAM, 8, dmv_state)
+ADDRESS_MAP_START(dmv_state::dmv_mem)
 	ADDRESS_MAP_UNMAP_HIGH
 	AM_RANGE( 0x0000, 0xffff ) AM_READWRITE(program_r, program_w)
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( dmv_io , AS_IO, 8, dmv_state)
+ADDRESS_MAP_START(dmv_state::dmv_io)
 	ADDRESS_MAP_UNMAP_HIGH
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	AM_RANGE(0x00, 0x00) AM_WRITE(leds_w)
@@ -555,7 +558,7 @@ WRITE8_MEMBER(dmv_state::kb_mcu_port2_w)
 	m_slot7->keyint_w(BIT(data, 4));
 }
 
-static ADDRESS_MAP_START( upd7220_map, 0, 16, dmv_state )
+ADDRESS_MAP_START(dmv_state::upd7220_map)
 	ADDRESS_MAP_GLOBAL_MASK(0x1ffff)
 	AM_RANGE(0x00000, 0x1ffff) AM_RAM  AM_SHARE("video_ram")
 ADDRESS_MAP_END

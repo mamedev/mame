@@ -197,6 +197,8 @@ public:
 	void ql_ntsc(machine_config &config);
 	void opd(machine_config &config);
 	void ql(machine_config &config);
+	void ipc_io(address_map &map);
+	void ql_mem(address_map &map);
 };
 
 
@@ -494,7 +496,7 @@ READ8_MEMBER( ql_state::ipc_bus_r )
 //  ADDRESS_MAP( ql_mem )
 //-------------------------------------------------
 
-static ADDRESS_MAP_START( ql_mem, AS_PROGRAM, 8, ql_state )
+ADDRESS_MAP_START(ql_state::ql_mem)
 	AM_RANGE(0x000000, 0x0fffff) AM_READWRITE(read, write)
 ADDRESS_MAP_END
 
@@ -503,7 +505,7 @@ ADDRESS_MAP_END
 //  ADDRESS_MAP( ipc_io )
 //-------------------------------------------------
 
-static ADDRESS_MAP_START( ipc_io, AS_IO, 8, ql_state )
+ADDRESS_MAP_START(ql_state::ipc_io)
 	AM_RANGE(0x00, 0x7f) AM_WRITE(ipc_w)
 	AM_RANGE(0x27, 0x28) AM_READNOP // IPC reads these to set P0 (bus) to Hi-Z mode
 ADDRESS_MAP_END

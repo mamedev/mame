@@ -51,16 +51,18 @@ public:
 	IRQ_CALLBACK_MEMBER(sm1800_irq_callback);
 	I8275_DRAW_CHARACTER_MEMBER( crtc_display_pixels );
 	void sm1800(machine_config &config);
+	void sm1800_io(address_map &map);
+	void sm1800_mem(address_map &map);
 };
 
-static ADDRESS_MAP_START(sm1800_mem, AS_PROGRAM, 8, sm1800_state)
+ADDRESS_MAP_START(sm1800_state::sm1800_mem)
 	ADDRESS_MAP_UNMAP_HIGH
 	AM_RANGE( 0x0000, 0x07ff ) AM_ROM
 	//AM_RANGE( 0x0fb0, 0x0fff ) AM_DEVWRITE("i8275", i8275_device, dack_w)
 	AM_RANGE( 0x1000, 0x17ff ) AM_RAM // videoram looks like 1080-17FF, normal ascii
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( sm1800_io, AS_IO, 8, sm1800_state)
+ADDRESS_MAP_START(sm1800_state::sm1800_io)
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	ADDRESS_MAP_UNMAP_HIGH
 	AM_RANGE( 0x3c, 0x3d ) AM_DEVREADWRITE("i8275", i8275_device, read, write)

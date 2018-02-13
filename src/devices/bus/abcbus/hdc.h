@@ -31,6 +31,8 @@ public:
 	// construction/destruction
 	abc_hdc_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
+	void abc_hdc_io(address_map &map);
+	void abc_hdc_mem(address_map &map);
 protected:
 	// device-level overrides
 	virtual void device_start() override;

@@ -99,7 +99,7 @@ WRITE8_MEMBER(hanaawas_state::key_matrix_status_w)
 		m_coin_settings = data & 0xf;
 }
 
-static ADDRESS_MAP_START( hanaawas_map, AS_PROGRAM, 8, hanaawas_state )
+ADDRESS_MAP_START(hanaawas_state::hanaawas_map)
 	AM_RANGE(0x0000, 0x2fff) AM_ROM
 	AM_RANGE(0x4000, 0x4fff) AM_ROM
 	AM_RANGE(0x6000, 0x6fff) AM_ROM
@@ -110,7 +110,7 @@ static ADDRESS_MAP_START( hanaawas_map, AS_PROGRAM, 8, hanaawas_state )
 ADDRESS_MAP_END
 
 
-static ADDRESS_MAP_START( io_map, AS_IO, 8, hanaawas_state )
+ADDRESS_MAP_START(hanaawas_state::io_map)
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	AM_RANGE(0x00, 0x00) AM_READWRITE(hanaawas_input_port_0_r, hanaawas_inputs_mux_w)
 	AM_RANGE(0x01, 0x01) AM_READNOP AM_WRITE(key_matrix_status_w) /* r bit 1: status ready, presumably of the input mux device / w = configure device? */

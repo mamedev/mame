@@ -60,6 +60,8 @@ public:
 	DECLARE_READ8_MEMBER( fdc_r );
 	DECLARE_WRITE8_MEMBER( fdc_w );
 
+	void luxor_55_10828_io(address_map &map);
+	void luxor_55_10828_mem(address_map &map);
 protected:
 	// device-level overrides
 	virtual void device_start() override;

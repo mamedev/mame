@@ -563,26 +563,26 @@ WRITE8_MEMBER( kc85_state::lcd_w )
 
 /* Memory Maps */
 
-static ADDRESS_MAP_START( kc85_mem, AS_PROGRAM, 8, kc85_state )
+ADDRESS_MAP_START(kc85_state::kc85_mem)
 	ADDRESS_MAP_UNMAP_HIGH
 	AM_RANGE(0x0000, 0x7fff) AM_ROMBANK("bank1")
 	AM_RANGE(0x8000, 0xffff) AM_RAMBANK("bank2")
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( pc8201_mem, AS_PROGRAM, 8, pc8201_state )
+ADDRESS_MAP_START(pc8201_state::pc8201_mem)
 	ADDRESS_MAP_UNMAP_HIGH
 	AM_RANGE(0x0000, 0x7fff) AM_RAMBANK("bank1")
 	AM_RANGE(0x8000, 0xffff) AM_RAMBANK("bank2")
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( tandy200_mem, AS_PROGRAM, 8, tandy200_state )
+ADDRESS_MAP_START(tandy200_state::tandy200_mem)
 	ADDRESS_MAP_UNMAP_HIGH
 	AM_RANGE(0x0000, 0x7fff) AM_ROMBANK("bank1")
 	AM_RANGE(0x8000, 0x9fff) AM_ROM
 	AM_RANGE(0xa000, 0xffff) AM_RAMBANK("bank2")
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( kc85_io, AS_IO, 8, kc85_state )
+ADDRESS_MAP_START(kc85_state::kc85_io)
 	ADDRESS_MAP_UNMAP_HIGH
 //  AM_RANGE(0x70, 0x70) AM_MIRROR(0x0f) optional RAM unit
 //  AM_RANGE(0x80, 0x80) AM_MIRROR(0x0f) optional I/O controller unit
@@ -595,12 +595,12 @@ static ADDRESS_MAP_START( kc85_io, AS_IO, 8, kc85_state )
 	AM_RANGE(0xf0, 0xf1) AM_MIRROR(0x0e) AM_READWRITE(lcd_r, lcd_w)
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( trsm100_io, AS_IO, 8, kc85_state )
+ADDRESS_MAP_START(kc85_state::trsm100_io)
 	AM_IMPORT_FROM(kc85_io)
 	AM_RANGE(0xa0, 0xa0) AM_MIRROR(0x0f) AM_WRITE(modem_w)
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( pc8201_io, AS_IO, 8, pc8201_state )
+ADDRESS_MAP_START(pc8201_state::pc8201_io)
 	ADDRESS_MAP_UNMAP_HIGH
 //  AM_RANGE(0x70, 0x70) AM_MIRROR(0x0f) optional video interface 8255
 	AM_RANGE(0x80, 0x80) AM_MIRROR(0x03) AM_WRITE(romah_w)
@@ -616,7 +616,7 @@ static ADDRESS_MAP_START( pc8201_io, AS_IO, 8, pc8201_state )
 	AM_RANGE(0xf0, 0xf1) AM_MIRROR(0x0e) AM_READWRITE(lcd_r, lcd_w)
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( tandy200_io, AS_IO, 8, tandy200_state )
+ADDRESS_MAP_START(tandy200_state::tandy200_io)
 	ADDRESS_MAP_UNMAP_HIGH
 	AM_RANGE(0x90, 0x9f) AM_DEVREADWRITE(RP5C01A_TAG, rp5c01_device, read, write)
 //  AM_RANGE(0xa0, 0xa0) AM_MIRROR(0x0f) AM_DEVWRITE(TCM5089_TAG, write)

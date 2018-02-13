@@ -65,16 +65,16 @@ WRITE8_MEMBER( vcs80_state::pio_w )
 
 /* Memory Maps */
 
-static ADDRESS_MAP_START( vcs80_bd_mem, AS_PROGRAM, 8, vcs80_state )
+ADDRESS_MAP_START(vcs80_state::vcs80_bd_mem)
 	AM_RANGE(0x0000, 0x01ff) AM_ROM AM_REGION(Z80_TAG, 0)
 	AM_RANGE(0x0400, 0x07ff) AM_RAM
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( vcs80_mem, AS_PROGRAM, 8, vcs80_state )
+ADDRESS_MAP_START(vcs80_state::vcs80_mem)
 	AM_RANGE(0x0000, 0xffff) AM_READWRITE(mem_r, mem_w)
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( vcs80_io, AS_IO, 8, vcs80_state )
+ADDRESS_MAP_START(vcs80_state::vcs80_io)
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	AM_RANGE(0x00, 0xff) AM_READWRITE(io_r, io_w)
 ADDRESS_MAP_END

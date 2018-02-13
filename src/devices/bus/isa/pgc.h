@@ -32,6 +32,8 @@ public:
 
 	void reset_common();
 
+	void pgc_io(address_map &map);
+	void pgc_map(address_map &map);
 protected:
 	isa8_pgc_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock);
 

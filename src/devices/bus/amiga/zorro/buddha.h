@@ -30,7 +30,7 @@ public:
 	// construction/destruction
 	buddha_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
-	DECLARE_ADDRESS_MAP(mmio_map, 16);
+	void mmio_map(address_map &map);
 
 	// speed register
 	DECLARE_READ16_MEMBER( speed_r );

@@ -1020,17 +1020,6 @@ void i80286_cpu_device::write_port_word(uint16_t port, uint16_t data)
 	m_io->write_word_unaligned(port, data);
 }
 
-uint8_t i80286_cpu_device::fetch_op()
-{
-	uint8_t data;
-	if(m_ip > m_limit[CS])
-		throw TRAP(FAULT_GP, 0);
-
-	data = m_direct_opcodes->read_byte( update_pc() & m_amask, m_fetch_xor );
-	m_ip++;
-	return data;
-}
-
 uint8_t i80286_cpu_device::fetch()
 {
 	uint8_t data;

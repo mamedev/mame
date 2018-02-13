@@ -61,4 +61,7 @@ public:
 	required_device<palette_device> m_palette;
 	optional_shared_ptr<uint8_t> m_decrypted_opcodes;
 	void commando(machine_config &config);
+	void commando_map(address_map &map);
+	void decrypted_opcodes_map(address_map &map);
+	void sound_map(address_map &map);
 };

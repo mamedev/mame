@@ -975,7 +975,7 @@ DRIVER_INIT_MEMBER(stv_state, hopper)
 	m_slave->space(AS_PROGRAM).install_readwrite_handler(0x00400000, 0x0040003f, read32_delegate(FUNC(stv_state::stv_ioga_r32),this), write32_delegate(FUNC(stv_state::hop_ioga_w32),this));
 }
 
-static ADDRESS_MAP_START( stv_mem, AS_PROGRAM, 32, stv_state )
+ADDRESS_MAP_START(stv_state::stv_mem)
 	AM_RANGE(0x00000000, 0x0007ffff) AM_ROM AM_MIRROR(0x20000000) AM_REGION("bios", 0) // bios
 	AM_RANGE(0x00100000, 0x0010007f) AM_DEVREADWRITE8("smpc", smpc_hle_device, read, write, 0xffffffff)
 	AM_RANGE(0x00180000, 0x0018ffff) AM_READWRITE8(saturn_backupram_r,saturn_backupram_w,0xffffffff) AM_SHARE("share1")
@@ -1001,7 +1001,7 @@ static ADDRESS_MAP_START( stv_mem, AS_PROGRAM, 32, stv_state )
 	AM_RANGE(0xc0000000, 0xc00007ff) AM_RAM // cache RAM
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( sound_mem, AS_PROGRAM, 16, stv_state )
+ADDRESS_MAP_START(stv_state::sound_mem)
 	AM_RANGE(0x000000, 0x0fffff) AM_RAM AM_SHARE("sound_ram")
 	AM_RANGE(0x100000, 0x100fff) AM_DEVREADWRITE("scsp", scsp_device, read, write)
 ADDRESS_MAP_END
@@ -3572,6 +3572,27 @@ ROM_START( patocar )
 	ROM_LOAD( "patocar.nv", 0x0000, 0x0080, CRC(d9873ee8) SHA1(e74747816bba6745afd718b0beec67a884c6a31c) )
 ROM_END
 
+ROM_START( sackids )
+//	STV_BIOS
+
+	// wants it's own specific bios, marked "CKBP1.13J0001024" at 0x800
+	// PC=06004150 is where it compares this
+	// it also looks like it has a specific I/O board for the lightpen
+	ROM_REGION32_BE( 0x080000, "bios", 0 ) /* SH2 code */
+	ROM_LOAD16_WORD_SWAP( "epr-20091.ic8",   0x000000, 0x080000, BAD_DUMP CRC(59ed40f4) SHA1(eff0f54c70bce05ff3a289bf30b1027e1c8cd117) )
+
+	ROM_REGION32_BE( 0x3000000, "cart", ROMREGION_ERASE00 ) /* SH2 code */
+    ROM_LOAD16_WORD_SWAP( "ic22.bin",     0x0200000, 0x200000, CRC(4d9d1870) SHA1(c702964af2767b0db4ca1d6c7d07356e675d5efd) )
+    ROM_LOAD16_WORD_SWAP( "ic24.bin",     0x0400000, 0x200000, CRC(39fca3e5) SHA1(29be552f58b69f8f3f237ca14f13af3673559123) )
+    ROM_LOAD16_WORD_SWAP( "ic26.bin",     0x0600000, 0x200000, CRC(f38c79b6) SHA1(a470a22ef3d735c9929f70ef5441547a07a480e8) )
+    ROM_LOAD16_WORD_SWAP( "ic28.bin",     0x0800000, 0x200000, CRC(63d09f3c) SHA1(e470e5af52f9ee70bf160ff58a5cbafd7e674073) )
+    ROM_LOAD16_WORD_SWAP( "ic30.bin",     0x0a00000, 0x200000, CRC(f89811ba) SHA1(8fa8b4b09430456bce63e45686640c7bcdde90e9) )
+    ROM_LOAD16_WORD_SWAP( "ic32.bin",     0x0c00000, 0x200000, CRC(1db6c26b) SHA1(2e14b7b021bce145f989295fdc6effcd799f00a4) )
+    ROM_LOAD16_WORD_SWAP( "ic34.bin",     0x0e00000, 0x200000, CRC(0f3622c8) SHA1(69337114d6902675018371101f0fba01902de54a) )
+    ROM_LOAD16_WORD_SWAP( "ic36.bin",     0x1000000, 0x200000, CRC(9a4109e5) SHA1(ba59caac5f5a80fc52c507d8a47f322a380aa9a1) ) // empty / FF filled
+	
+	ROM_REGION32_BE( 0x3000000, "abus", ROMREGION_ERASE00 ) /* SH2 code */
+ROM_END
 
 
 GAME( 1996, stvbios,   0,       stv_slot, stv,      stv_state,   stv,        ROT0,   "Sega",                         "ST-V Bios", MACHINE_IS_BIOS_ROOT )
@@ -3639,7 +3660,7 @@ GAME( 1999, pclub2v3,  stvbios, stv,      stv,      stvpc_state, stv,        ROT
 GAME( 1999, pclubpok,  stvbios, stv,      stv,      stvpc_state, stv,        ROT0,   "Atlus",                        "Print Club Pokemon B (U 991126 V1.000)", MACHINE_NOT_WORKING )
 // Japan sets
 GAME( 1999, pclub2fc,  stvbios, stv,      stv,      stvpc_state, stv,        ROT0,   "Atlus",                        "Print Club 2 Felix The Cat (Rev. A) (J 970415 V1.100)", MACHINE_NOT_WORKING )
-GAME( 1998, pclub2pf,  stvbios, stv,      stv,      stvpc_state, stv,        ROT0,   "Atlus",                        "Print Club 2 Puffy (Japan)", MACHINE_NOT_WORKING ) // version info is blank
+GAME( 1998, pclub2pf,  stvbios, stv,      stv,      stvpc_state, stv,        ROT0,   "Atlus",                        "Print Club 2 Puffy (J V1.100)", MACHINE_NOT_WORKING ) // version info is blank
 GAME( 1997, pclub2pe,  stvbios, stv,      stv,      stvpc_state, stv,        ROT0,   "Atlus",                        "Print Club 2 Pepsiman (J 970618 V1.100)", MACHINE_NOT_WORKING )
 GAME( 1997, pclub2wb,  stvbios, stv,      stv,      stvpc_state, stv,        ROT0,   "Atlus",                        "Print Club 2 Warner Bros (J 970228 V1.000)", MACHINE_NOT_WORKING )
 
@@ -3686,9 +3707,11 @@ GAME( 1996, decathlt,  stvbios, stv_5838, stv,      stv_state,   decathlt,   ROT
 GAME( 1996, decathlto, decathlt,stv_5838, stv,      stv_state,   decathlt,   ROT0,   "Sega",                         "Decathlete (JUET 960424 V1.000)", MACHINE_NO_SOUND | MACHINE_NOT_WORKING | MACHINE_UNEMULATED_PROTECTION )
 GAME( 1998, twcup98,   stvbios, stv_5881, stv,      stv_state,   twcup98,    ROT0,   "Tecmo",                        "Tecmo World Cup '98 (JUET 980410 V1.000)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_GRAPHICS ) // some situations with the GK result in the game stalling, maybe CPU core bug??
 GAME( 1998, twsoc98,   twcup98, stv_5881, stv,      stv_state,   twcup98,    ROT0,   "Tecmo",                        "Tecmo World Soccer '98 (JUET 980410 V1.000)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_GRAPHICS ) // ^^ (check)
+
 /* Gives I/O errors */
 GAME( 1996, magzun,    stvbios, stv,      stv,      stv_state,   magzun,     ROT0,   "Sega",                         "Magical Zunou Power (J 961031 V1.000)", MACHINE_NOT_WORKING | MACHINE_NODEVICE_MICROPHONE )
-GAME( 1998, choroqhr,  stvbios, stv,      stv,      stv_state,   stv,        ROT0,   "Sega / Takara",                "Choro Q Hyper Racing 5 (J 981230 V1.000)", MACHINE_NOT_WORKING )
+GAME( 1998, choroqhr,  stvbios, stv,      stv,      stv_state,   stv,        ROT0,   "Sega / Takara",                "Choro Q Hyper Racing 5 (J 981230 V1.000)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_GRAPHICS )
+GAME( 2000, sackids,  stvbios, stv,      stv,      stv_state,   stv,        ROT0,    "Sega",                         "Soreyuke Anpanman Crayon Kids (J 001026 V1.000)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_GRAPHICS )
 
 /* CD games */
 GAME( 1995, sfish2,    0,       stv,      stv,      stv_state,   stv,        ROT0,   "Sega",                         "Sport Fishing 2 (UET 951106 V1.10e)", MACHINE_IMPERFECT_SOUND | MACHINE_NOT_WORKING | MACHINE_NODEVICE_LAN )

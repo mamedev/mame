@@ -115,6 +115,8 @@ public:
 	required_device<gfxdecode_device> m_gfxdecode;
 	required_device<palette_device> m_palette;
 	void mwarr(machine_config &config);
+	void mwarr_map(address_map &map);
+	void oki2_map(address_map &map);
 };
 
 
@@ -210,7 +212,7 @@ WRITE16_MEMBER(mwarr_state::mwarr_brightness_w)
  *
  *************************************/
 
-static ADDRESS_MAP_START( mwarr_map, AS_PROGRAM, 16, mwarr_state )
+ADDRESS_MAP_START(mwarr_state::mwarr_map)
 	AM_RANGE(0x000000, 0x0fffff) AM_ROM
 	AM_RANGE(0x100000, 0x1007ff) AM_RAM_WRITE(bg_videoram_w) AM_SHARE("bg_videoram")
 	AM_RANGE(0x100800, 0x100fff) AM_RAM_WRITE(mlow_videoram_w) AM_SHARE("mlow_videoram")
@@ -233,7 +235,7 @@ static ADDRESS_MAP_START( mwarr_map, AS_PROGRAM, 16, mwarr_state )
 	AM_RANGE(0x190000, 0x190001) AM_DEVREADWRITE8("oki2", okim6295_device, read, write, 0x00ff)
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( oki2_map, 0, 8, mwarr_state)
+ADDRESS_MAP_START(mwarr_state::oki2_map)
 	/* $00000-$20000 stays the same in all sound banks, */
 	/* the second half of the bank is what gets switched */
 	AM_RANGE(0x00000, 0x1ffff) AM_ROM AM_REGION("oki2", 0)

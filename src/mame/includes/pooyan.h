@@ -48,4 +48,5 @@ public:
 
 	INTERRUPT_GEN_MEMBER(interrupt);
 	void pooyan(machine_config &config);
+	void main_map(address_map &map);
 };

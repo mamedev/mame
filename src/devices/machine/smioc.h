@@ -30,6 +30,7 @@ class smioc_device : public device_t
 public:
 	/* Constructor and Destructor */
 	smioc_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	void smioc_mem(address_map &map);
 protected:
 	/* Device-level overrides */
 	virtual void device_start() override;

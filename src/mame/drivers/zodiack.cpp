@@ -147,7 +147,7 @@ WRITE8_MEMBER( zodiack_state::control_w )
 }
 
 
-static ADDRESS_MAP_START( main_map, AS_PROGRAM, 8, zodiack_state )
+ADDRESS_MAP_START(zodiack_state::main_map)
 	AM_RANGE(0x0000, 0x4fff) AM_ROM
 	AM_RANGE(0x5800, 0x5fff) AM_RAM
 	AM_RANGE(0x6081, 0x6081) AM_READ_PORT("DSW0") AM_WRITE(control_w)
@@ -167,14 +167,14 @@ static ADDRESS_MAP_START( main_map, AS_PROGRAM, 8, zodiack_state )
 	AM_RANGE(0xc000, 0xcfff) AM_ROM
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( sound_map, AS_PROGRAM, 8, zodiack_state )
+ADDRESS_MAP_START(zodiack_state::sound_map)
 	AM_RANGE(0x0000, 0x1fff) AM_ROM
 	AM_RANGE(0x2000, 0x23ff) AM_RAM
 	AM_RANGE(0x4000, 0x4000) AM_WRITE(sound_nmi_enable_w)
 	AM_RANGE(0x6000, 0x6000) AM_DEVREADWRITE("soundlatch", generic_latch_8_device, read, write)
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( io_map, AS_IO, 8, zodiack_state  )
+ADDRESS_MAP_START(zodiack_state::io_map)
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	AM_RANGE(0x00, 0x01) AM_DEVWRITE("aysnd", ay8910_device, address_data_w)
 ADDRESS_MAP_END

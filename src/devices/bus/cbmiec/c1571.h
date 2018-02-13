@@ -68,6 +68,7 @@ public:
 
 	void wpt_callback(floppy_image_device *floppy, int state);
 
+	void c1571_mem(address_map &map);
 protected:
 	c1571_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock);
 
@@ -165,6 +166,7 @@ public:
 	// construction/destruction
 	mini_chief_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
+	void mini_chief_mem(address_map &map);
 protected:
 	// optional information overrides
 	virtual const tiny_rom_entry *device_rom_region() const override;

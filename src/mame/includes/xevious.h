@@ -75,4 +75,6 @@ public:
 	optional_device<cpu_device> m_subcpu3;
 	void xevious(machine_config &config);
 	void battles(machine_config &config);
+	void battles_mem4(address_map &map);
+	void xevious_map(address_map &map);
 };

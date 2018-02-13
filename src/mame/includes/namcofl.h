@@ -89,4 +89,7 @@ public:
 	int FLobjcode2tile(int code);
 	void TilemapCB(uint16_t code, int *tile, int *mask);
 	void namcofl(machine_config &config);
+	void namcoc75_am(address_map &map);
+	void namcoc75_io(address_map &map);
+	void namcofl_mem(address_map &map);
 };

@@ -7,11 +7,11 @@ DEFINE_DEVICE_TYPE(I82875P_HOST,     i82875p_host_device,     "i82875p_host",   
 DEFINE_DEVICE_TYPE(I82875P_AGP,      i82875p_agp_device,      "i82875p_agp",      "Intel 82875P AGP Bridge")
 DEFINE_DEVICE_TYPE(I82875P_OVERFLOW, i82875p_overflow_device, "i82875p_overflow", "Intel 82875P Configuration Overflow")
 
-DEVICE_ADDRESS_MAP_START(agp_translation_map, 32, i82875p_host_device)
+ADDRESS_MAP_START(i82875p_host_device::agp_translation_map)
 ADDRESS_MAP_END
 
-DEVICE_ADDRESS_MAP_START(config_map, 32, i82875p_host_device)
-	AM_INHERIT_FROM(pci_host_device::config_map)
+ADDRESS_MAP_START(i82875p_host_device::config_map)
+	AM_IMPORT_FROM(pci_host_device::config_map)
 	AM_RANGE(0x50, 0x53) AM_READWRITE8 (agpm_r,     agpm_w,     0x0000ff00)
 	AM_RANGE(0x50, 0x53) AM_READ8      (gc_r,                   0x00ff0000)
 	AM_RANGE(0x50, 0x53) AM_READ8      (csabcont_r,             0xff000000)
@@ -441,7 +441,7 @@ void i82875p_agp_device::device_reset()
 	agp_bridge_device::device_reset();
 }
 
-DEVICE_ADDRESS_MAP_START(overflow_map, 32, i82875p_overflow_device)
+ADDRESS_MAP_START(i82875p_overflow_device::overflow_map)
 	AM_RANGE(0x000, 0x007) AM_READWRITE8(dram_row_boundary_r,    dram_row_boundary_w,  0xffffffff)
 	AM_RANGE(0x010, 0x013) AM_READWRITE8(dram_row_attribute_r,   dram_row_attribute_w, 0xffffffff)
 	AM_RANGE(0x060, 0x064) AM_READWRITE (dram_timing_r,          dram_timing_w)

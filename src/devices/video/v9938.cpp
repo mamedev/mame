@@ -39,7 +39,18 @@ todo:
 #include "emu.h"
 #include "v9938.h"
 
-//#define VERBOSE 1
+#define LOG_WARN     (1U<<1)
+#define LOG_INT      (1U<<2)
+#define LOG_STATUS   (1U<<3)
+#define LOG_REGWRITE (1U<<4)
+#define LOG_COMMAND  (1U<<5)
+#define LOG_MODE     (1U<<6)
+#define LOG_NOTIMP   (1U<<7)
+#define LOG_DETAIL   (1U<<8)
+
+// Minimum log should be warnings
+#define VERBOSE (LOG_GENERAL | LOG_WARN )
+
 #include "logmacro.h"
 
 enum
@@ -78,7 +89,7 @@ static const char *const v9938_modes[] = {
 Similar to the TMS9928, the V9938 has an own address space. It can handle
 at most 192 KiB RAM (128 KiB base, 64 KiB expansion).
 */
-static ADDRESS_MAP_START(memmap, AS_DATA, 8, v99x8_device)
+ADDRESS_MAP_START(v99x8_device::memmap)
 	ADDRESS_MAP_GLOBAL_MASK(0x3ffff)
 	AM_RANGE(0x00000, 0x2ffff) AM_RAM
 ADDRESS_MAP_END
@@ -120,7 +131,7 @@ v99x8_device::v99x8_device(const machine_config &mconfig, device_type type, cons
 	m_vdp_engine(nullptr),
 	m_pal_ntsc(0)
 {
-	static_set_addrmap(*this, AS_DATA, ADDRESS_MAP_NAME(memmap));
+	set_addrmap(AS_DATA, address_map_constructor(FUNC(v99x8_device::memmap), this));
 }
 
 v9938_device::v9938_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
@@ -162,7 +173,7 @@ void v99x8_device::device_timer(emu_timer &timer, device_timer_id id, int param,
 		(((scanline + m_cont_reg[23]) & 255) == m_cont_reg[19]) )
 	{
 		m_stat_reg[1] |= 1;
-		LOG("V9938: scanline interrupt (%d)\n", scanline);
+		LOGMASKED(LOG_INT, "Scanline interrupt (%d)\n", scanline);
 	}
 	else if (!(m_cont_reg[0] & 0x10))
 	{
@@ -313,7 +324,7 @@ void v9958_device::palette_init()
 	int r,g,b,y,j,k,k0,j0;
 
 	// set up YJK table
-	LOG("Building YJK table for V9958 screens, may take a while ... \n");
+	LOGMASKED(LOG_DETAIL, "Building YJK table for V9958 screens, may take a while ... \n");
 
 	for (y=0;y<32;y++) for (k=0;k<64;k++) for (j=0;j<64;j++)
 	{
@@ -458,7 +469,7 @@ uint8_t v99x8_device::status_r()
 		break;
 	}
 
-	LOG("V9938: Read %02x from S#%d\n", ret, reg);
+	LOGMASKED(LOG_STATUS, "Read %02x from S#%d\n", ret, reg);
 	check_int ();
 
 	return ret;
@@ -764,7 +775,7 @@ void v99x8_device::check_int()
 	if (n != m_int_state)
 	{
 		m_int_state = n;
-		LOG("V9938: IRQ line %s\n", n ? "up" : "down");
+		LOGMASKED(LOG_INT, "IRQ line %s\n", n ? "up" : "down");
 	}
 
 	/*
@@ -800,7 +811,7 @@ void v99x8_device::register_write (int reg, int data)
 
 	if (reg > 46)
 	{
-		LOG("V9938: Attempted to write to non-existant R#%d\n", reg);
+		LOGMASKED(LOG_WARN, "Attempted to write to non-existent R#%d\n", reg);
 		return;
 	}
 
@@ -813,7 +824,7 @@ void v99x8_device::register_write (int reg, int data)
 		m_cont_reg[reg] = data;
 		set_mode();
 		check_int();
-		LOG("v9938: mode = %s\n", v9938_modes[m_mode]);
+		LOGMASKED(LOG_MODE, "Mode = %s\n", v9938_modes[m_mode]);
 		break;
 
 	case 18:
@@ -832,14 +843,14 @@ void v99x8_device::register_write (int reg, int data)
 	case 20:
 	case 21:
 	case 22:
-		LOG("v9938: Write %02xh to R#%d; color burst not emulated\n", data, reg);
+		LOGMASKED(LOG_NOTIMP, "Write %02xh to R#%d; color burst not emulated\n", data, reg);
 		break;
 	case 25:
 	case 26:
 	case 27:
 		if (m_model != MODEL_V9958)
 		{
-			LOG("v9938: Attempting to write %02xh to V9958 R#%d\n", data, reg);
+			LOGMASKED(LOG_WARN, "Attempting to write %02xh to R#%d (invalid on v9938)\n", data, reg);
 			data = 0;
 		}
 		else
@@ -859,7 +870,7 @@ void v99x8_device::register_write (int reg, int data)
 	}
 
 	if (reg != 15)
-		LOG("v9938: Write %02x to R#%d\n", data, reg);
+		LOGMASKED(LOG_REGWRITE, "Write %02x to R#%d\n", data, reg);
 
 	m_cont_reg[reg] = data;
 }
@@ -1808,7 +1819,7 @@ void v99x8_device::set_mode()
 
 	if (m_vdp_engine && m_mode != i)
 	{
-		LOG("Command aborted due to mode change\n");
+		LOGMASKED(LOG_WARN, "Command aborted due to mode change\n");
 		m_vdp_engine = nullptr;
 		m_stat_reg[2] &= 0xFE;
 	}
@@ -2236,7 +2247,7 @@ inline void v99x8_device::VDPpsetlowlevel(int addr, uint8_t CL, uint8_t M, uint8
 	case 11:  if (CL) val ^= CL; break;
 	case 12:  if (CL) val = (val & M) | ~(CL|M); break;
 	default:
-		LOG("v9938: invalid operation %d in pset\n", OP);
+		LOGMASKED(LOG_WARN, "Invalid operation %d in pset\n", OP);
 	}
 
 	m_vram_space->write_byte(addr, val);
@@ -2863,9 +2874,9 @@ void v99x8_device::report_vdp_command(uint8_t Op)
 	CM = Op>>4;
 	LO = Op&0x0F;
 
-	LOG("V9938: Opcode %02Xh %s-%s (%d,%d)->(%d,%d),%d [%d,%d]%s\n",
+	LOGMASKED(LOG_COMMAND, "Opcode %02x %s-%s s=(%d,%d), d=(%d,%d), c=%02x, wh=[%d,%d]%s\n",
 		Op, Commands[CM], Ops[LO],
-		SX,SY, DX,DY, CL, m_cont_reg[45]&0x04? -NX:NX,
+		SX,SY, DX,DY, CL&0xff, m_cont_reg[45]&0x04? -NX:NX,
 		m_cont_reg[45]&0x08? -NY:NY,
 		m_cont_reg[45]&0x70? " on ExtVRAM":""
 		);
@@ -2891,6 +2902,9 @@ uint8_t v99x8_device::command_unit_w(uint8_t Op)
 
 	//  if(Verbose&0x02)
 	report_vdp_command(Op);
+
+	if ((m_vdp_engine != nullptr) && (m_mmc.CM != CM_ABRT))
+		LOGMASKED(LOG_WARN, "Command overrun; previous command not completed\n");
 
 	switch(Op>>4) {
 	case CM_ABRT:
@@ -2945,7 +2959,7 @@ uint8_t v99x8_device::command_unit_w(uint8_t Op)
 		m_vdp_engine=&v99x8_device::hmmc_engine;
 		break;
 	default:
-		LOG("V9938: Unrecognized opcode %02Xh\n",Op);
+		LOGMASKED(LOG_WARN, "Unrecognized opcode %02Xh\n",Op);
 		return(0);
 	}
 

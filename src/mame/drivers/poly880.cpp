@@ -63,7 +63,7 @@ WRITE8_MEMBER( poly880_state::cldig_w )
 
 /* Memory Maps */
 
-static ADDRESS_MAP_START( poly880_mem, AS_PROGRAM, 8, poly880_state )
+ADDRESS_MAP_START(poly880_state::poly880_mem)
 	AM_RANGE(0x0000, 0x03ff) AM_MIRROR(0x0c00) AM_ROM
 	AM_RANGE(0x1000, 0x13ff) AM_MIRROR(0x0c00) AM_ROM
 	AM_RANGE(0x2000, 0x23ff) AM_MIRROR(0x0c00) AM_ROM
@@ -72,7 +72,7 @@ static ADDRESS_MAP_START( poly880_mem, AS_PROGRAM, 8, poly880_state )
 	AM_RANGE(0x8000, 0xffff) AM_RAMBANK("bank1")
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( poly880_io, AS_IO, 8, poly880_state )
+ADDRESS_MAP_START(poly880_state::poly880_io)
 	ADDRESS_MAP_GLOBAL_MASK(0xaf)
 	AM_RANGE(0x80, 0x83) AM_DEVREADWRITE(Z80PIO1_TAG, z80pio_device, read_alt, write_alt)
 	AM_RANGE(0x84, 0x87) AM_DEVREADWRITE(Z80PIO2_TAG, z80pio_device, read_alt, write_alt)

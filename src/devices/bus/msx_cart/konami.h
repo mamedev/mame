@@ -186,6 +186,7 @@ public:
 	DECLARE_WRITE8_MEMBER(io_20_w);
 	DECLARE_READ8_MEMBER(io_00_r);
 
+	void vlm_map(address_map &map);
 protected:
 	// device-level overrides
 	virtual void device_start() override;

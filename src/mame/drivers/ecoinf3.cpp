@@ -275,6 +275,8 @@ public:
 	DECLARE_DRIVER_INIT(ecoinf3);
 	DECLARE_DRIVER_INIT(ecoinf3_swap);
 	void ecoinf3_pyramid(machine_config &config);
+	void pyramid_memmap(address_map &map);
+	void pyramid_portmap(address_map &map);
 };
 
 
@@ -429,12 +431,12 @@ WRITE8_MEMBER(ecoinf3_state::ppi8255_intf_e_write_a_alpha_display)
 
 }
 
-static ADDRESS_MAP_START( pyramid_memmap, AS_PROGRAM, 8, ecoinf3_state )
+ADDRESS_MAP_START(ecoinf3_state::pyramid_memmap)
 	AM_RANGE(0x0000, 0xdfff) AM_ROM
 	AM_RANGE(0xe000, 0xffff) AM_RAM
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( pyramid_portmap, AS_IO, 8, ecoinf3_state )
+ADDRESS_MAP_START(ecoinf3_state::pyramid_portmap)
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	AM_RANGE(0x00, 0x3f) AM_RAM // z180 internal area!
 

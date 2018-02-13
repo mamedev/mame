@@ -41,7 +41,7 @@ public:
 	DECLARE_WRITE8_MEMBER(param_w);
 	DECLARE_READ8_MEMBER (data_r);
 	DECLARE_WRITE8_MEMBER(data_w);
-	DECLARE_ADDRESS_MAP(map, 8);
+	void map(address_map &map);
 
 	void ready_w(bool val);
 

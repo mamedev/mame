@@ -240,7 +240,7 @@ WRITE8_MEMBER(liberate_state::prosport_charram_w)
  *
  *************************************/
 
-static ADDRESS_MAP_START( prosport_map, AS_PROGRAM, 8, liberate_state )
+ADDRESS_MAP_START(liberate_state::prosport_map)
 	AM_RANGE(0x0000, 0x03ff) AM_MIRROR(0x2000) AM_RAM
 	AM_RANGE(0x0200, 0x021f) AM_RAM_DEVWRITE("palette", palette_device, write8) AM_SHARE("palette")
 	AM_RANGE(0x0400, 0x07ff) AM_RAM_WRITE(prosport_bg_vram_w) AM_SHARE("bg_vram")
@@ -254,7 +254,7 @@ static ADDRESS_MAP_START( prosport_map, AS_PROGRAM, 8, liberate_state )
 	AM_RANGE(0x8000, 0x800f) AM_ROMBANK("bank1")
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( liberate_map, AS_PROGRAM, 8, liberate_state )
+ADDRESS_MAP_START(liberate_state::liberate_map)
 	AM_RANGE(0x0000, 0x0fff) AM_RAM
 	AM_RANGE(0x1000, 0x3fff) AM_ROM /* Mirror of main rom */
 	AM_RANGE(0x4000, 0x7fff) AM_READ(deco16_bank_r)
@@ -267,11 +267,11 @@ static ADDRESS_MAP_START( liberate_map, AS_PROGRAM, 8, liberate_state )
 	AM_RANGE(0x8000, 0x800f) AM_ROMBANK("bank1")
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( decrypted_opcodes_map, AS_OPCODES, 8, liberate_state )
+ADDRESS_MAP_START(liberate_state::decrypted_opcodes_map)
 	AM_RANGE(0x8000, 0xffff) AM_ROM AM_SHARE("decrypted_opcodes")
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( prosoccr_map, AS_PROGRAM, 8, liberate_state )
+ADDRESS_MAP_START(liberate_state::prosoccr_map)
 	AM_RANGE(0x0000, 0x0fff) AM_RAM
 	AM_RANGE(0x1000, 0x3fff) AM_ROM /* Mirror of main rom */
 	AM_RANGE(0x4000, 0x7fff) AM_READ(prosoccr_bank_r)
@@ -284,17 +284,17 @@ static ADDRESS_MAP_START( prosoccr_map, AS_PROGRAM, 8, liberate_state )
 	AM_RANGE(0xa000, 0xffff) AM_ROM
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( deco16_io_map, AS_IO, 8, liberate_state )
+ADDRESS_MAP_START(liberate_state::deco16_io_map)
 	AM_RANGE(0x00, 0x00) AM_READ_PORT("IN0") AM_WRITE(deco16_bank_w)
 	AM_RANGE(0x01, 0x01) AM_READ_PORT("TILT")
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( prosoccr_io_map, AS_IO, 8, liberate_state )
+ADDRESS_MAP_START(liberate_state::prosoccr_io_map)
 	AM_RANGE(0x00, 0x00) AM_READ_PORT("IN0") AM_WRITE(prosoccr_io_bank_w)
 	//AM_RANGE(0x01, 0x01) AM_READ_PORT("TILT")
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( liberatb_map, AS_PROGRAM, 8, liberate_state )
+ADDRESS_MAP_START(liberate_state::liberatb_map)
 	AM_RANGE(0x0000, 0x0fff) AM_RAM
 	AM_RANGE(0x00fe, 0x00fe) AM_READ_PORT("IN0")
 	AM_RANGE(0x1000, 0x3fff) AM_ROM /* Mirror of main rom */
@@ -303,13 +303,13 @@ static ADDRESS_MAP_START( liberatb_map, AS_PROGRAM, 8, liberate_state )
 	AM_RANGE(0x4400, 0x47ff) AM_WRITE(liberate_videoram_w) AM_SHARE("videoram")
 	AM_RANGE(0x4800, 0x4fff) AM_WRITEONLY AM_SHARE("spriteram")
 	AM_RANGE(0x6200, 0x67ff) AM_WRITEONLY AM_SHARE("scratchram")
+	AM_RANGE(0x8000, 0xffff) AM_ROM
 	AM_RANGE(0xf000, 0xf00f) AM_WRITE(deco16_io_w)
 	AM_RANGE(0xf000, 0xf000) AM_READ_PORT("IN1")
 	AM_RANGE(0xf001, 0xf001) AM_READ_PORT("IN2")
 	AM_RANGE(0xf002, 0xf002) AM_READ_PORT("IN3")
 	AM_RANGE(0xf003, 0xf003) AM_READ_PORT("DSW1")
 	AM_RANGE(0xf004, 0xf004) AM_READ_PORT("DSW2")
-	AM_RANGE(0x8000, 0xffff) AM_ROM
 ADDRESS_MAP_END
 
 /*************************************
@@ -318,7 +318,7 @@ ADDRESS_MAP_END
  *
  *************************************/
 
-static ADDRESS_MAP_START( prosoccr_sound_map, AS_PROGRAM, 8, liberate_state )
+ADDRESS_MAP_START(liberate_state::prosoccr_sound_map)
 	AM_RANGE(0x0000, 0x01ff) AM_RAM
 	AM_RANGE(0x2000, 0x2000) AM_DEVWRITE("ay1", ay8912_device, data_w)
 	AM_RANGE(0x4000, 0x4000) AM_DEVWRITE("ay1", ay8912_device, address_w)
@@ -329,7 +329,7 @@ static ADDRESS_MAP_START( prosoccr_sound_map, AS_PROGRAM, 8, liberate_state )
 	AM_RANGE(0xe000, 0xffff) AM_ROM
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( liberate_sound_map, AS_PROGRAM, 8, liberate_state )
+ADDRESS_MAP_START(liberate_state::liberate_sound_map)
 	AM_RANGE(0x0000, 0x01ff) AM_RAM
 	AM_RANGE(0x1000, 0x1000) AM_WRITENOP
 	AM_RANGE(0x3000, 0x3000) AM_DEVWRITE("ay1", ay8912_device, data_w)
@@ -774,7 +774,7 @@ MACHINE_CONFIG_END
 
 MACHINE_CONFIG_DERIVED(liberate_state::liberate, liberate_base)
 	MCFG_DEVICE_MODIFY("maincpu")
-	MCFG_CPU_DECRYPTED_OPCODES_MAP(decrypted_opcodes_map)
+	MCFG_CPU_OPCODES_MAP(decrypted_opcodes_map)
 MACHINE_CONFIG_END
 
 MACHINE_CONFIG_DERIVED(liberate_state::liberatb, liberate_base)

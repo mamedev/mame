@@ -263,6 +263,15 @@ public:
 	void lhb2(machine_config &config);
 	void lhb(machine_config &config);
 	void drgnwrld_igs012(machine_config &config);
+	void drgnwrld(address_map &map);
+	void drgnwrld_igs012(address_map &map);
+	void lhb(address_map &map);
+	void lhb2(address_map &map);
+	void nkishusp(address_map &map);
+	void vbowl(address_map &map);
+	void vbowlhk(address_map &map);
+	void wlcc(address_map &map);
+	void xymg(address_map &map);
 };
 
 
@@ -2554,7 +2563,7 @@ DRIVER_INIT_MEMBER(igs011_state,nkishusp)
 
 ***************************************************************************/
 
-static ADDRESS_MAP_START( drgnwrld, AS_PROGRAM, 16, igs011_state )
+ADDRESS_MAP_START(igs011_state::drgnwrld)
 //  drgnwrld: IGS011 protection dynamically mapped at 1dd7x
 //  AM_RANGE( 0x01dd70, 0x01dd77 ) AM_WRITE(igs011_prot1_w )
 //  AM_RANGE( 0x01dd78, 0x01dd79 ) AM_READ ( igs011_prot1_r )
@@ -2588,7 +2597,7 @@ static ADDRESS_MAP_START( drgnwrld, AS_PROGRAM, 16, igs011_state )
 	AM_RANGE( 0xa88000, 0xa88001 ) AM_READ(igs_3_dips_r )
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( drgnwrld_igs012, AS_PROGRAM, 16, igs011_state )
+ADDRESS_MAP_START(igs011_state::drgnwrld_igs012)
 	AM_IMPORT_FROM(drgnwrld)
 
 	// IGS012
@@ -2631,7 +2640,7 @@ WRITE16_MEMBER(igs011_state::lhb_okibank_w)
 //  popmessage("oki %04x",data);
 }
 
-static ADDRESS_MAP_START( lhb, AS_PROGRAM, 16, igs011_state )
+ADDRESS_MAP_START(igs011_state::lhb)
 	AM_RANGE( 0x000000, 0x07ffff ) AM_ROM
 
 //  lhb: IGS011 protection dynamically mapped at 834x
@@ -2672,7 +2681,7 @@ static ADDRESS_MAP_START( lhb, AS_PROGRAM, 16, igs011_state )
 	AM_RANGE( 0x888000, 0x888001 ) AM_READ(igs_5_dips_r )
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( xymg, AS_PROGRAM, 16, igs011_state )
+ADDRESS_MAP_START(igs011_state::xymg)
 	AM_RANGE( 0x000000, 0x07ffff ) AM_ROM
 
 //  xymg: IGS011 protection dynamically mapped at 834x
@@ -2712,7 +2721,7 @@ static ADDRESS_MAP_START( xymg, AS_PROGRAM, 16, igs011_state )
 	AM_RANGE( 0x888000, 0x888001 ) AM_READ(igs_3_dips_r )
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( wlcc, AS_PROGRAM, 16, igs011_state )
+ADDRESS_MAP_START(igs011_state::wlcc)
 //  wlcc: IGS011 protection dynamically mapped at 834x
 //  AM_RANGE( 0x008340, 0x008347 ) AM_WRITE(igs011_prot1_w )
 //  AM_RANGE( 0x008348, 0x008349 ) AM_READ(igs011_prot1_r )
@@ -2751,7 +2760,7 @@ ADDRESS_MAP_END
 
 
 
-static ADDRESS_MAP_START( lhb2, AS_PROGRAM, 16, igs011_state )
+ADDRESS_MAP_START(igs011_state::lhb2)
 	AM_RANGE( 0x000000, 0x07ffff ) AM_ROM
 
 //  lhb2: IGS011 protection dynamically mapped at 1ff8x
@@ -2792,7 +2801,7 @@ ADDRESS_MAP_END
 
 
 
-static ADDRESS_MAP_START( nkishusp, AS_PROGRAM, 16, igs011_state )
+ADDRESS_MAP_START(igs011_state::nkishusp)
 	AM_RANGE( 0x000000, 0x07ffff ) AM_ROM
 
 //  nkishusp: IGS011 protection dynamically mapped at 1ff8x
@@ -2896,7 +2905,7 @@ WRITE16_MEMBER(igs011_state::vbowl_link_1_w){ }
 WRITE16_MEMBER(igs011_state::vbowl_link_2_w){ }
 WRITE16_MEMBER(igs011_state::vbowl_link_3_w){ }
 
-static ADDRESS_MAP_START( vbowl, AS_PROGRAM, 16, igs011_state )
+ADDRESS_MAP_START(igs011_state::vbowl)
 	AM_RANGE( 0x000000, 0x07ffff ) AM_ROM
 
 //  vbowl: IGS011 protection dynamically mapped at 834x
@@ -2966,7 +2975,7 @@ static ADDRESS_MAP_START( vbowl, AS_PROGRAM, 16, igs011_state )
 ADDRESS_MAP_END
 
 
-static ADDRESS_MAP_START( vbowlhk, AS_PROGRAM, 16, igs011_state )
+ADDRESS_MAP_START(igs011_state::vbowlhk)
 	AM_IMPORT_FROM(vbowl)
 	AM_RANGE( 0x800000, 0x800003 ) AM_WRITE(vbowlhk_igs003_w )
 	AM_RANGE( 0x50f600, 0x50f7ff ) AM_READ(vbowlhk_igs011_prot2_r         )   // read

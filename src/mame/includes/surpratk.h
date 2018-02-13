@@ -48,4 +48,6 @@ public:
 	K052109_CB_MEMBER(tile_callback);
 	DECLARE_WRITE8_MEMBER(banking_callback);
 	void surpratk(machine_config &config);
+	void bank0000_map(address_map &map);
+	void surpratk_map(address_map &map);
 };

@@ -253,36 +253,36 @@ WRITE8_MEMBER( tmc1800_state::dispoff_w )
 
 // Telmac 1800
 
-static ADDRESS_MAP_START( tmc1800_map, AS_PROGRAM, 8, tmc1800_state )
+ADDRESS_MAP_START(tmc1800_state::tmc1800_map)
 	AM_RANGE(0x0000, 0x07ff) AM_MIRROR(0x7800) AM_RAM
 	AM_RANGE(0x8000, 0x81ff) AM_MIRROR(0x7e00) AM_ROM AM_REGION(CDP1802_TAG, 0)
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( tmc1800_io_map, AS_IO, 8, tmc1800_state )
+ADDRESS_MAP_START(tmc1800_state::tmc1800_io_map)
 	AM_RANGE(0x01, 0x01) AM_READWRITE(dispon_r, dispoff_w)
 	AM_RANGE(0x02, 0x02) AM_WRITE(keylatch_w)
 ADDRESS_MAP_END
 
 // OSCOM 1000B
 
-static ADDRESS_MAP_START( osc1000b_map, AS_PROGRAM, 8, osc1000b_state )
+ADDRESS_MAP_START(osc1000b_state::osc1000b_map)
 	AM_RANGE(0x0000, 0x07ff) AM_MIRROR(0x7800) AM_RAM
 	AM_RANGE(0x8000, 0x81ff) AM_MIRROR(0x7e00) AM_ROM AM_REGION(CDP1802_TAG, 0)
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( osc1000b_io_map, AS_IO, 8, osc1000b_state )
+ADDRESS_MAP_START(osc1000b_state::osc1000b_io_map)
 	AM_RANGE(0x02, 0x02) AM_WRITE(keylatch_w)
 ADDRESS_MAP_END
 
 // Telmac 2000
 
-static ADDRESS_MAP_START( tmc2000_map, AS_PROGRAM, 8, tmc2000_state )
+ADDRESS_MAP_START(tmc2000_state::tmc2000_map)
 	ADDRESS_MAP_UNMAP_HIGH
 	AM_RANGE(0x0000, 0x7fff) // RAM / monitor ROM
 	AM_RANGE(0x8000, 0xffff) // color RAM / monitor ROM
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( tmc2000_io_map, AS_IO, 8, tmc2000_state )
+ADDRESS_MAP_START(tmc2000_state::tmc2000_io_map)
 	ADDRESS_MAP_UNMAP_HIGH
 	AM_RANGE(0x01, 0x01) AM_DEVREADWRITE(CDP1864_TAG, cdp1864_device, dispon_r, step_bgcolor_w)
 	AM_RANGE(0x02, 0x02) AM_WRITE(keylatch_w)
@@ -291,12 +291,12 @@ ADDRESS_MAP_END
 
 // OSCOM Nano
 
-static ADDRESS_MAP_START( nano_map, AS_PROGRAM, 8, nano_state )
+ADDRESS_MAP_START(nano_state::nano_map)
 	AM_RANGE(0x0000, 0x7fff) // RAM / monitor ROM
 	AM_RANGE(0x8000, 0x81ff) AM_MIRROR(0x7e00) AM_ROM AM_REGION(CDP1802_TAG, 0)
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( nano_io_map, AS_IO, 8, nano_state )
+ADDRESS_MAP_START(nano_state::nano_io_map)
 	AM_RANGE(0x01, 0x01) AM_DEVREADWRITE(CDP1864_TAG, cdp1864_device, dispon_r, step_bgcolor_w)
 	AM_RANGE(0x02, 0x02) AM_WRITE(keylatch_w)
 	AM_RANGE(0x04, 0x04) AM_DEVREAD(CDP1864_TAG, cdp1864_device, dispoff_r) AM_WRITE(bankswitch_w)

@@ -124,4 +124,8 @@ public:
 	void NB2TilemapCB(uint16_t code, int *tile, int *mask);
 	void namconb1(machine_config &config);
 	void namconb2(machine_config &config);
+	void namcoc75_am(address_map &map);
+	void namcoc75_io(address_map &map);
+	void namconb1_am(address_map &map);
+	void namconb2_am(address_map &map);
 };

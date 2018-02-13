@@ -87,7 +87,7 @@ DEFINE_DEVICE_TYPE(PPU_2C05_04, ppu2c05_04_device, "ppu2c05_04", "2C05_04 PPU")
 
 
 // default address map
-static ADDRESS_MAP_START( ppu2c0x, 0, 8, ppu2c0x_device )
+ADDRESS_MAP_START(ppu2c0x_device::ppu2c0x)
 	AM_RANGE(0x0000, 0x3eff) AM_RAM
 	AM_RANGE(0x3f00, 0x3fff) AM_READWRITE(palette_read, palette_write)
 //  AM_RANGE(0x0000, 0x3fff) AM_RAM
@@ -129,7 +129,7 @@ ppu2c0x_device::ppu2c0x_device(const machine_config &mconfig, device_type type, 
 	: device_t(mconfig, type, tag, owner, clock)
 	, device_memory_interface(mconfig, *this)
 	, device_video_interface(mconfig, *this)
-	, m_space_config("videoram", ENDIANNESS_LITTLE, 8, 17, 0, nullptr, *ADDRESS_MAP_NAME(ppu2c0x))
+	, m_space_config("videoram", ENDIANNESS_LITTLE, 8, 17, 0, address_map_constructor(), address_map_constructor(FUNC(ppu2c0x_device::ppu2c0x), this))
 	, m_cpu(*this, finder_base::DUMMY_TAG)
 	, m_scanline(0)  // reset the scanline count
 	, m_refresh_data(0)
@@ -1329,6 +1329,9 @@ uint16_t ppu2c0x_device::get_vram_dest() {
 	return m_videomem_addr;
 }
 
+void ppu2c0x_device::set_vram_dest(uint16_t dest) {
+	m_videomem_addr = dest;
+}
 
 /*************************************
  *

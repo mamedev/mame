@@ -45,6 +45,7 @@ public:
 
 	void scv(machine_config &config);
 	void scv_pal(machine_config &config);
+	void scv_mem(address_map &map);
 protected:
 	enum
 	{
@@ -69,7 +70,7 @@ protected:
 };
 
 
-static ADDRESS_MAP_START( scv_mem, AS_PROGRAM, 8, scv_state )
+ADDRESS_MAP_START(scv_state::scv_mem)
 	AM_RANGE( 0x0000, 0x0fff ) AM_ROM   // BIOS
 
 	AM_RANGE( 0x2000, 0x3403 ) AM_RAM AM_SHARE("videoram")  // VRAM + 4 registers

@@ -249,7 +249,7 @@ READ8_MEMBER( psion1_state::switchoff_r )
 	return 0;
 }
 
-static ADDRESS_MAP_START(psion1_mem, AS_PROGRAM, 8, psion1_state)
+ADDRESS_MAP_START(psion1_state::psion1_mem)
 	AM_RANGE(0x0000, 0x001f) AM_READWRITE(hd63701_int_reg_r, hd63701_int_reg_w)
 	AM_RANGE(0x0040, 0x00ff) AM_RAM AM_SHARE("sys_register")
 	AM_RANGE(0x2000, 0x2000) AM_MIRROR(0x07fe) AM_DEVREADWRITE("hd44780", hd44780_device, control_read, control_write)
@@ -261,7 +261,7 @@ static ADDRESS_MAP_START(psion1_mem, AS_PROGRAM, 8, psion1_state)
 	AM_RANGE(0xf000, 0xffff) AM_ROM
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START(psioncm_mem, AS_PROGRAM, 8, psion_state)
+ADDRESS_MAP_START(psion_state::psioncm_mem)
 	ADDRESS_MAP_UNMAP_LOW
 	AM_RANGE(0x0000, 0x001f) AM_READWRITE(hd63701_int_reg_r, hd63701_int_reg_w)
 	AM_RANGE(0x0040, 0x00ff) AM_RAM AM_SHARE("sys_register")
@@ -270,7 +270,7 @@ static ADDRESS_MAP_START(psioncm_mem, AS_PROGRAM, 8, psion_state)
 	AM_RANGE(0x8000, 0xffff) AM_ROM
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START(psionla_mem, AS_PROGRAM, 8, psion_state)
+ADDRESS_MAP_START(psion_state::psionla_mem)
 	ADDRESS_MAP_UNMAP_LOW
 	AM_RANGE(0x0000, 0x001f) AM_READWRITE(hd63701_int_reg_r, hd63701_int_reg_w)
 	AM_RANGE(0x0040, 0x00ff) AM_RAM AM_SHARE("sys_register")
@@ -279,7 +279,7 @@ static ADDRESS_MAP_START(psionla_mem, AS_PROGRAM, 8, psion_state)
 	AM_RANGE(0x8000, 0xffff) AM_ROM
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START(psionp350_mem, AS_PROGRAM, 8, psion_state)
+ADDRESS_MAP_START(psion_state::psionp350_mem)
 	ADDRESS_MAP_UNMAP_LOW
 	AM_RANGE(0x0000, 0x001f) AM_READWRITE(hd63701_int_reg_r, hd63701_int_reg_w)
 	AM_RANGE(0x0040, 0x00ff) AM_RAM AM_SHARE("sys_register")
@@ -289,7 +289,7 @@ static ADDRESS_MAP_START(psionp350_mem, AS_PROGRAM, 8, psion_state)
 	AM_RANGE(0x8000, 0xffff) AM_ROM
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START(psionlam_mem, AS_PROGRAM, 8, psion_state)
+ADDRESS_MAP_START(psion_state::psionlam_mem)
 	ADDRESS_MAP_UNMAP_LOW
 	AM_RANGE(0x0000, 0x001f) AM_READWRITE(hd63701_int_reg_r, hd63701_int_reg_w)
 	AM_RANGE(0x0040, 0x00ff) AM_RAM AM_SHARE("sys_register")
@@ -299,7 +299,7 @@ static ADDRESS_MAP_START(psionlam_mem, AS_PROGRAM, 8, psion_state)
 	AM_RANGE(0xc000, 0xffff) AM_ROM
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START(psionlz_mem, AS_PROGRAM, 8, psion_state)
+ADDRESS_MAP_START(psion_state::psionlz_mem)
 	ADDRESS_MAP_UNMAP_LOW
 	AM_RANGE(0x0000, 0x001f) AM_READWRITE(hd63701_int_reg_r, hd63701_int_reg_w)
 	AM_RANGE(0x0040, 0x00ff) AM_RAM AM_SHARE("sys_register")

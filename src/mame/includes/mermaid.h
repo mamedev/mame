@@ -104,4 +104,5 @@ public:
 	DECLARE_WRITE_LINE_MEMBER(rougien_adpcm_int);
 	void rougien(machine_config &config);
 	void mermaid(machine_config &config);
+	void mermaid_map(address_map &map);
 };

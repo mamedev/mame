@@ -60,6 +60,7 @@ public:
 	// configuration
 	void set_data_ready_callback(data_ready_delegate callback) { m_data_ready = callback; }
 
+	void vp931_portmap(address_map &map);
 protected:
 	// timer IDs
 	enum

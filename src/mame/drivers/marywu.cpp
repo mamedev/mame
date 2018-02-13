@@ -40,6 +40,8 @@ public:
 	DECLARE_READ8_MEMBER(keyboard_r);
 	DECLARE_READ8_MEMBER(port_r);
 	void marywu(machine_config &config);
+	void io_map(address_map &map);
+	void program_map(address_map &map);
 private:
 	uint8_t m_selected_7seg_module;
 };
@@ -167,11 +169,11 @@ WRITE8_MEMBER( marywu_state::display_7seg_data_w )
 	output().set_digit_value(2 * m_selected_7seg_module + 1, patterns[(data >> 4) & 0x0F]);
 }
 
-static ADDRESS_MAP_START( program_map, AS_PROGRAM, 8, marywu_state )
+ADDRESS_MAP_START(marywu_state::program_map)
 	AM_RANGE(0x0000, 0x7fff) AM_ROM
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( io_map, AS_IO, 8, marywu_state )
+ADDRESS_MAP_START(marywu_state::io_map)
 	AM_RANGE(0x8000, 0x87ff) AM_MIRROR(0x0800) AM_RAM /* HM6116: 2kbytes of Static RAM */
 	AM_RANGE(0x9000, 0x9000) AM_MIRROR(0x0ffc) AM_DEVWRITE("ay1", ay8910_device, data_address_w)
 	AM_RANGE(0x9001, 0x9001) AM_MIRROR(0x0ffc) AM_DEVREADWRITE("ay1", ay8910_device, data_r, data_w)

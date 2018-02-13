@@ -2,8 +2,8 @@
 // copyright-holders:Curt Coder,Jonathan Gevaryahu
 #pragma once
 
-#ifndef __TDV2324__
-#define __TDV2324__
+#ifndef MAME_INCLUDES_TDV2324_H
+#define MAME_INCLUDES_TDV2324_H
 
 
 #include "cpu/i8085/i8085.h"
@@ -81,6 +81,11 @@ public:
 	// video state
 	required_shared_ptr<uint8_t> m_video_ram;
 	void tdv2324(machine_config &config);
+	void tdv2324_fdc_mem(address_map &map);
+	void tdv2324_io(address_map &map);
+	void tdv2324_mem(address_map &map);
+	void tdv2324_sub_io(address_map &map);
+	void tdv2324_sub_mem(address_map &map);
 };
 
 

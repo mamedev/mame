@@ -42,7 +42,7 @@ DEFINE_DEVICE_TYPE(BUDDHA, buddha_device, "buddha", "Buddha IDE controller")
 //  mmio_map - device-specific memory mapped I/O
 //-------------------------------------------------
 
-DEVICE_ADDRESS_MAP_START( mmio_map, 16, buddha_device )
+ADDRESS_MAP_START(buddha_device::mmio_map)
 	AM_RANGE(0x7fe, 0x7ff) AM_READWRITE(speed_r, speed_w)
 	AM_RANGE(0x800, 0x8ff) AM_READWRITE(ide_0_cs0_r, ide_0_cs0_w)
 	AM_RANGE(0x900, 0x9ff) AM_READWRITE(ide_0_cs1_r, ide_0_cs1_w)

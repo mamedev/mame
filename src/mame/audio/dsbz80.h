@@ -42,6 +42,8 @@ public:
 	DECLARE_WRITE8_MEMBER(mpeg_stereo_w);
 	DECLARE_READ8_MEMBER(mpeg_pos_r);
 
+	void dsbz80_map(address_map &map);
+	void dsbz80io_map(address_map &map);
 protected:
 	// device-level overrides
 	virtual void device_start() override;

@@ -41,6 +41,8 @@ public:
 	DECLARE_READ8_MEMBER( ppi_pb_r );
 	DECLARE_WRITE8_MEMBER( ppi_pc_w );
 
+	void tube_zep100_io(address_map &map);
+	void tube_zep100_mem(address_map &map);
 protected:
 	// device-level overrides
 	virtual void device_start() override;

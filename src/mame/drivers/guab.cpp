@@ -95,6 +95,7 @@ public:
 	DECLARE_FLOPPY_FORMATS(floppy_formats);
 
 	void guab(machine_config &config);
+	void guab_map(address_map &map);
 protected:
 	virtual void machine_start() override;
 
@@ -115,7 +116,7 @@ private:
 //  ADDRESS MAPS
 //**************************************************************************
 
-static ADDRESS_MAP_START( guab_map, AS_PROGRAM, 16, guab_state )
+ADDRESS_MAP_START(guab_state::guab_map)
 	AM_RANGE(0x000000, 0x00ffff) AM_ROM
 	AM_RANGE(0x040000, 0x04ffff) AM_ROM AM_REGION("maincpu", 0x10000)
 	AM_RANGE(0x0c0000, 0x0c0007) AM_DEVREADWRITE8("i8255_1", i8255_device, read, write, 0x00ff)

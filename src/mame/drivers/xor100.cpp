@@ -262,13 +262,13 @@ WRITE8_MEMBER( xor100_state::fdc_dsel_w )
 
 /* Memory Maps */
 
-static ADDRESS_MAP_START( xor100_mem, AS_PROGRAM, 8, xor100_state )
+ADDRESS_MAP_START(xor100_state::xor100_mem)
 	AM_RANGE(0x0000, 0xffff) AM_WRITE_BANK("bank1")
 	AM_RANGE(0x0000, 0xf7ff) AM_READ_BANK("bank2")
 	AM_RANGE(0xf800, 0xffff) AM_READ_BANK("bank3")
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( xor100_io, AS_IO, 8, xor100_state )
+ADDRESS_MAP_START(xor100_state::xor100_io)
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	AM_RANGE(0x00, 0x00) AM_DEVREADWRITE(I8251_A_TAG, i8251_device, data_r, data_w)
 	AM_RANGE(0x01, 0x01) AM_DEVREADWRITE(I8251_A_TAG, i8251_device, status_r, control_w)

@@ -375,6 +375,9 @@ public:
 	void scorpion2_dm01_3m(machine_config &config);
 	void scorpion2_vidm(machine_config &config);
 	void scorpion2(machine_config &config);
+	void memmap_no_vid(address_map &map);
+	void memmap_vid(address_map &map);
+	void sc2_basemap(address_map &map);
 };
 
 
@@ -1481,7 +1484,7 @@ void bfm_sc2_state::save_state()
 }
 
 
-static ADDRESS_MAP_START( sc2_basemap, AS_PROGRAM, 8, bfm_sc2_state )
+ADDRESS_MAP_START(bfm_sc2_state::sc2_basemap)
 	AM_RANGE(0x0000, 0x1fff) AM_RAM AM_SHARE("nvram") //8k
 
 	AM_RANGE(0x2300, 0x230B) AM_READ(mux_input_r)
@@ -1526,7 +1529,7 @@ static ADDRESS_MAP_START( sc2_basemap, AS_PROGRAM, 8, bfm_sc2_state )
 	AM_RANGE(0x8000, 0xFFFF) AM_ROM
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( memmap_no_vid, AS_PROGRAM, 8, bfm_sc2_state )
+ADDRESS_MAP_START(bfm_sc2_state::memmap_no_vid)
 	AM_IMPORT_FROM( sc2_basemap )
 	AM_RANGE(0x2000, 0x2000) AM_READ(vfd_status_r)
 	AM_RANGE(0x2000, 0x20FF) AM_WRITE(reel12_w)
@@ -1536,7 +1539,7 @@ ADDRESS_MAP_END
 
 // memory map for scorpion2 board video addon /////////////////////////////
 
-static ADDRESS_MAP_START( memmap_vid, AS_PROGRAM, 8, bfm_sc2_state )
+ADDRESS_MAP_START(bfm_sc2_state::memmap_vid)
 	AM_IMPORT_FROM( sc2_basemap )
 
 	AM_RANGE(0x2000, 0x2000) AM_READ(vfd_status_hop_r)      // vfd status register

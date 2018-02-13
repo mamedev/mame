@@ -58,6 +58,8 @@ public:
 
 	TIMER_DEVICE_CALLBACK_MEMBER(rotaryf_interrupt);
 	void rotaryf(machine_config &config);
+	void rotaryf_io_map(address_map &map);
+	void rotaryf_map(address_map &map);
 };
 
 
@@ -192,14 +194,14 @@ uint32_t rotaryf_state::screen_update(screen_device &screen, bitmap_rgb32 &bitma
 }
 
 
-static ADDRESS_MAP_START( rotaryf_map, AS_PROGRAM, 8, rotaryf_state )
+ADDRESS_MAP_START(rotaryf_state::rotaryf_map)
 	AM_RANGE(0x0000, 0x17ff) AM_MIRROR(0x4000) AM_ROM
 	AM_RANGE(0x7000, 0x73ff) AM_MIRROR(0x0c00) AM_RAM
 	AM_RANGE(0x8000, 0x9fff) AM_MIRROR(0x4000) AM_RAM AM_SHARE("videoram")
 	AM_RANGE(0xa000, 0xa1ff) AM_RAM /* writes 00, 18, 27, 3C, 7E, FE to A019, A039, A059... A179 */
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( rotaryf_io_map, AS_IO, 8, rotaryf_state )
+ADDRESS_MAP_START(rotaryf_state::rotaryf_io_map)
 	AM_RANGE(0x02, 0x02) AM_WRITENOP
 	AM_RANGE(0x04, 0x04) AM_WRITENOP
 	AM_RANGE(0x07, 0x07) AM_WRITENOP

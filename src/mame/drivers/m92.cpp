@@ -346,7 +346,7 @@ WRITE16_MEMBER(m92_state::m92_sound_reset_w)
 /*****************************************************************************/
 
 /* appears to be an earlier board */
-static ADDRESS_MAP_START( lethalth_map, AS_PROGRAM, 16, m92_state )
+ADDRESS_MAP_START(m92_state::lethalth_map)
 	AM_RANGE(0x00000, 0x7ffff) AM_ROM
 	AM_RANGE(0x80000, 0x8ffff) AM_RAM_WRITE(m92_vram_w) AM_SHARE("vram_data")
 	AM_RANGE(0xe0000, 0xeffff) AM_RAM /* System ram */
@@ -357,7 +357,7 @@ static ADDRESS_MAP_START( lethalth_map, AS_PROGRAM, 16, m92_state )
 	AM_RANGE(0xffff0, 0xfffff) AM_ROM AM_REGION("maincpu", 0x7fff0)
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( m92_map, AS_PROGRAM, 16, m92_state )
+ADDRESS_MAP_START(m92_state::m92_map)
 	AM_RANGE(0x00000, 0x9ffff) AM_ROM
 	AM_RANGE(0xa0000, 0xbffff) AM_ROMBANK("bank1")
 	AM_RANGE(0xc0000, 0xcffff) AM_ROM AM_REGION("maincpu", 0x00000) /* Mirror used by In The Hunt as protection */
@@ -370,7 +370,7 @@ static ADDRESS_MAP_START( m92_map, AS_PROGRAM, 16, m92_state )
 	AM_RANGE(0xffff0, 0xfffff) AM_ROM AM_REGION("maincpu", 0x7fff0)
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( m92_portmap, AS_IO, 16, m92_state )
+ADDRESS_MAP_START(m92_state::m92_portmap)
 	AM_RANGE(0x00, 0x01) AM_READ_PORT("P1_P2")
 	AM_RANGE(0x02, 0x03) AM_READ_PORT("COINS_DSW3")
 	AM_RANGE(0x04, 0x05) AM_READ_PORT("DSW")
@@ -391,7 +391,7 @@ WRITE16_MEMBER(m92_state::oki_bank_w)
 	m_oki->set_rom_bank((data+1) & 0x3); // +1?
 }
 
-static ADDRESS_MAP_START( ppan_portmap, AS_IO, 16, m92_state )
+ADDRESS_MAP_START(m92_state::ppan_portmap)
 	AM_RANGE(0x00, 0x01) AM_READ_PORT("P1_P2")
 	AM_RANGE(0x02, 0x03) AM_READ_PORT("COINS_DSW3")
 	AM_RANGE(0x04, 0x05) AM_READ_PORT("DSW")
@@ -410,7 +410,7 @@ ADDRESS_MAP_END
 
 /******************************************************************************/
 
-static ADDRESS_MAP_START( sound_map, AS_PROGRAM, 16, m92_state )
+ADDRESS_MAP_START(m92_state::sound_map)
 	AM_RANGE(0x00000, 0x1ffff) AM_ROM
 	AM_RANGE(0xa0000, 0xa3fff) AM_RAM
 	AM_RANGE(0xa8000, 0xa803f) AM_DEVREADWRITE8("irem", iremga20_device, irem_ga20_r, irem_ga20_w, 0x00ff)

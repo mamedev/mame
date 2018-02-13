@@ -52,7 +52,7 @@ public:
 	virtual void map_extra(uint64_t memory_window_start, uint64_t memory_window_end, uint64_t memory_offset, address_space *memory_space,
 						   uint64_t io_window_start, uint64_t io_window_end, uint64_t io_offset, address_space *io_space) override;
 
-	virtual DECLARE_ADDRESS_MAP(config_map, 32) override;
+	virtual void config_map(address_map &map) override;
 
 protected:
 	virtual void device_start() override;

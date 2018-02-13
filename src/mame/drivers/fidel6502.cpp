@@ -497,6 +497,9 @@ public:
 	DECLARE_MACHINE_RESET(su9);
 	DECLARE_INPUT_CHANGED_MEMBER(su9_cpu_freq);
 	void su9_set_cpu_freq();
+	void csc_map(address_map &map);
+	void su9_map(address_map &map);
+	void rsc_map(address_map &map);
 	void csc(machine_config &config);
 	void su9(machine_config &config);
 	void rsc(machine_config &config);
@@ -509,6 +512,8 @@ public:
 	DECLARE_WRITE8_MEMBER(eas_ppi_porta_w);
 	DECLARE_READ8_MEMBER(eas_ppi_portb_r);
 	DECLARE_WRITE8_MEMBER(eas_ppi_portc_w);
+	void eas_map(address_map &map);
+	void eag_map(address_map &map);
 	void eas(machine_config &config);
 	void eag(machine_config &config);
 
@@ -521,6 +526,8 @@ public:
 	DECLARE_MACHINE_RESET(sc9c);
 	DECLARE_INPUT_CHANGED_MEMBER(sc9c_cpu_freq);
 	void sc9c_set_cpu_freq();
+	void sc9_map(address_map &map);
+	void sc9d_map(address_map &map);
 	void sc9b(machine_config &config);
 	void sc9c(machine_config &config);
 	void sc9d(machine_config &config);
@@ -532,6 +539,8 @@ public:
 	DECLARE_WRITE8_MEMBER(sc12_control_w);
 	DECLARE_READ8_MEMBER(sc12_input_r);
 	void sc12_set_cpu_freq(offs_t offset);
+	void sc12_map(address_map &map);
+	void sc12_trampoline(address_map &map);
 	void sc12(machine_config &config);
 	void sc12b(machine_config &config);
 
@@ -541,6 +550,9 @@ public:
 	DECLARE_WRITE8_MEMBER(fexcel_ttl_w);
 	DECLARE_READ8_MEMBER(fexcelb_ttl_r);
 	DECLARE_READ8_MEMBER(fexcel_ttl_r);
+	void fexcel_map(address_map &map);
+	void fexcelb_map(address_map &map);
+	void fexcelp_map(address_map &map);
 	void fexcel(machine_config &config);
 	void fexcelb(machine_config &config);
 	void fexcel4(machine_config &config);
@@ -556,18 +568,22 @@ public:
 	DECLARE_WRITE8_MEMBER(fdesdis_lcd_w);
 	DECLARE_READ8_MEMBER(fdesdis_input_r);
 	DECLARE_DRIVER_INIT(fdesdis);
+	void fdesdis_map(address_map &map);
 	void fdes2000d(machine_config &config);
 	void fdes2100d(machine_config &config);
 
 	// Phantom
 	DECLARE_MACHINE_RESET(fphantom);
 	DECLARE_DRIVER_INIT(fphantom);
+	void fphantom_map(address_map &map);
 	void fphantom(machine_config &config);
 
 	// Chesster
 	DECLARE_WRITE8_MEMBER(chesster_control_w);
 	DECLARE_WRITE8_MEMBER(kishon_control_w);
 	DECLARE_DRIVER_INIT(chesster);
+	void chesster_map(address_map &map);
+	void kishon_map(address_map &map);
 	void chesster(machine_config &config);
 	void kishon(machine_config &config);
 };
@@ -1137,7 +1153,7 @@ DRIVER_INIT_MEMBER(fidel6502_state, chesster)
 
 // CSC, SU9, RSC
 
-static ADDRESS_MAP_START( csc_map, AS_PROGRAM, 8, fidel6502_state )
+ADDRESS_MAP_START(fidel6502_state::csc_map)
 	ADDRESS_MAP_UNMAP_HIGH
 	AM_RANGE(0x0000, 0x07ff) AM_MIRROR(0x4000) AM_RAM
 	AM_RANGE(0x0800, 0x0bff) AM_MIRROR(0x4400) AM_RAM
@@ -1147,7 +1163,7 @@ static ADDRESS_MAP_START( csc_map, AS_PROGRAM, 8, fidel6502_state )
 	AM_RANGE(0xa000, 0xffff) AM_ROM
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( su9_map, AS_PROGRAM, 8, fidel6502_state )
+ADDRESS_MAP_START(fidel6502_state::su9_map)
 	ADDRESS_MAP_UNMAP_HIGH
 	AM_RANGE(0x0000, 0x0fff) AM_RAM
 	AM_RANGE(0x1000, 0x1003) AM_DEVREADWRITE("pia0", pia6821_device, read, write)
@@ -1157,7 +1173,7 @@ static ADDRESS_MAP_START( su9_map, AS_PROGRAM, 8, fidel6502_state )
 	AM_RANGE(0xc000, 0xffff) AM_ROM
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( rsc_map, AS_PROGRAM, 8, fidel6502_state )
+ADDRESS_MAP_START(fidel6502_state::rsc_map)
 	ADDRESS_MAP_UNMAP_HIGH
 	AM_RANGE(0x0000, 0x03ff) AM_RAM
 	AM_RANGE(0x2000, 0x2003) AM_DEVREADWRITE("pia", pia6821_device, read, write)
@@ -1167,7 +1183,7 @@ ADDRESS_MAP_END
 
 // EAS, EAG
 
-static ADDRESS_MAP_START( eas_map, AS_PROGRAM, 8, fidel6502_state )
+ADDRESS_MAP_START(fidel6502_state::eas_map)
 	ADDRESS_MAP_UNMAP_HIGH
 	AM_RANGE(0x0000, 0x0fff) AM_RAM AM_SHARE("nvram")
 	AM_RANGE(0x2000, 0x5fff) AM_READ(cartridge_r)
@@ -1179,7 +1195,7 @@ static ADDRESS_MAP_START( eas_map, AS_PROGRAM, 8, fidel6502_state )
 	AM_RANGE(0xc000, 0xffff) AM_ROM
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( eag_map, AS_PROGRAM, 8, fidel6502_state )
+ADDRESS_MAP_START(fidel6502_state::eag_map)
 	ADDRESS_MAP_UNMAP_HIGH
 	AM_RANGE(0x0000, 0x1fff) AM_RAM AM_SHARE("nvram")
 	AM_RANGE(0x2000, 0x5fff) AM_READ(cartridge_r)
@@ -1193,7 +1209,7 @@ ADDRESS_MAP_END
 
 // SC9
 
-static ADDRESS_MAP_START( sc9_map, AS_PROGRAM, 8, fidel6502_state )
+ADDRESS_MAP_START(fidel6502_state::sc9_map)
 	ADDRESS_MAP_UNMAP_HIGH
 	AM_RANGE(0x0000, 0x07ff) AM_MIRROR(0x1800) AM_RAM
 	AM_RANGE(0x2000, 0x5fff) AM_READ(cartridge_r)
@@ -1203,7 +1219,7 @@ static ADDRESS_MAP_START( sc9_map, AS_PROGRAM, 8, fidel6502_state )
 	AM_RANGE(0xc000, 0xffff) AM_ROM
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( sc9d_map, AS_PROGRAM, 8, fidel6502_state )
+ADDRESS_MAP_START(fidel6502_state::sc9d_map)
 	AM_IMPORT_FROM( sc9_map )
 	AM_RANGE(0xa000, 0xa007) AM_MIRROR(0x1ff8) AM_READ(sc9d_input_r)
 ADDRESS_MAP_END
@@ -1211,11 +1227,11 @@ ADDRESS_MAP_END
 
 // SC12
 
-static ADDRESS_MAP_START( sc12_trampoline, AS_PROGRAM, 8, fidel6502_state )
+ADDRESS_MAP_START(fidel6502_state::sc12_trampoline)
 	AM_RANGE(0x0000, 0xffff) AM_READWRITE(sc12_trampoline_r, sc12_trampoline_w)
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( sc12_map, AS_PROGRAM, 8, fidel6502_state )
+ADDRESS_MAP_START(fidel6502_state::sc12_map)
 	ADDRESS_MAP_UNMAP_HIGH
 	AM_RANGE(0x0000, 0x0fff) AM_RAM
 	AM_RANGE(0x2000, 0x5fff) AM_READ(cartridge_r)
@@ -1229,20 +1245,20 @@ ADDRESS_MAP_END
 
 // Excellence
 
-static ADDRESS_MAP_START( fexcel_map, AS_PROGRAM, 8, fidel6502_state )
+ADDRESS_MAP_START(fidel6502_state::fexcel_map)
 	AM_RANGE(0x0000, 0x07ff) AM_MIRROR(0x3800) AM_RAM
 	AM_RANGE(0x4000, 0x4007) AM_MIRROR(0x3ff8) AM_READWRITE(fexcel_ttl_r, fexcel_ttl_w)
 	//AM_RANGE(0x8000, 0x8000) AM_READNOP // checks for opening book module, but hw doesn't have a module slot
 	AM_RANGE(0xc000, 0xffff) AM_ROM
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( fexcelp_map, AS_PROGRAM, 8, fidel6502_state )
+ADDRESS_MAP_START(fidel6502_state::fexcelp_map)
 	AM_RANGE(0x0000, 0x1fff) AM_MIRROR(0x2000) AM_RAM
 	AM_RANGE(0x4000, 0x4007) AM_MIRROR(0x3ff8) AM_READWRITE(fexcel_ttl_r, fexcel_ttl_w)
 	AM_RANGE(0x8000, 0xffff) AM_ROM
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( fexcelb_map, AS_PROGRAM, 8, fidel6502_state )
+ADDRESS_MAP_START(fidel6502_state::fexcelb_map)
 	AM_RANGE(0x0000, 0x1fff) AM_MIRROR(0x2000) AM_RAM
 	AM_RANGE(0x4000, 0x4007) AM_MIRROR(0x3ff8) AM_READWRITE(fexcelb_ttl_r, fexcel_ttl_w)
 	AM_RANGE(0x8000, 0xffff) AM_ROM
@@ -1251,7 +1267,7 @@ ADDRESS_MAP_END
 
 // Designer Display, Phantom, Chesster
 
-static ADDRESS_MAP_START( fdesdis_map, AS_PROGRAM, 8, fidel6502_state )
+ADDRESS_MAP_START(fidel6502_state::fdesdis_map)
 	AM_RANGE(0x0000, 0x1fff) AM_RAM
 	AM_RANGE(0x2000, 0x2007) AM_MIRROR(0x1ff8) AM_READWRITE(fdesdis_input_r, fdesdis_control_w)
 	AM_RANGE(0x4000, 0x7fff) AM_ROMBANK("bank1")
@@ -1259,13 +1275,13 @@ static ADDRESS_MAP_START( fdesdis_map, AS_PROGRAM, 8, fidel6502_state )
 	AM_RANGE(0x8000, 0xffff) AM_ROM
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( fphantom_map, AS_PROGRAM, 8, fidel6502_state )
+ADDRESS_MAP_START(fidel6502_state::fphantom_map)
 	AM_RANGE(0x0000, 0x1fff) AM_RAM
 	AM_RANGE(0x4000, 0x7fff) AM_ROMBANK("bank1")
 	AM_RANGE(0x8000, 0xffff) AM_ROM
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( chesster_map, AS_PROGRAM, 8, fidel6502_state )
+ADDRESS_MAP_START(fidel6502_state::chesster_map)
 	AM_RANGE(0x0000, 0x1fff) AM_RAM
 	AM_RANGE(0x2000, 0x2007) AM_MIRROR(0x1ff8) AM_READWRITE(fdesdis_input_r, chesster_control_w)
 	AM_RANGE(0x4000, 0x7fff) AM_ROMBANK("bank1")
@@ -1273,7 +1289,7 @@ static ADDRESS_MAP_START( chesster_map, AS_PROGRAM, 8, fidel6502_state )
 	AM_RANGE(0x8000, 0xffff) AM_ROM
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( kishon_map, AS_PROGRAM, 8, fidel6502_state )
+ADDRESS_MAP_START(fidel6502_state::kishon_map)
 	AM_IMPORT_FROM( chesster_map )
 	AM_RANGE(0x2000, 0x2007) AM_MIRROR(0x1ff8) AM_READWRITE(fdesdis_input_r, kishon_control_w)
 ADDRESS_MAP_END

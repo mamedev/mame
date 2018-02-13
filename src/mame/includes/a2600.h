@@ -8,8 +8,8 @@
 
  ****************************************************************************/
 
-#ifndef MAME_INCLUDES_A2600H
-#define MAME_INCLUDES_A2600H
+#ifndef MAME_INCLUDES_A2600_H
+#define MAME_INCLUDES_A2600_H
 
 #pragma once
 
@@ -75,6 +75,7 @@ public:
 	void a2600p(machine_config &config);
 	void a2600(machine_config &config);
 	void a2600_cartslot(machine_config &config);
+	void a2600_mem(address_map &map);
 protected:
 	required_device<vcs_control_port_device> m_joy1;
 	required_device<vcs_control_port_device> m_joy2;
@@ -92,6 +93,4 @@ protected:
 };
 
 
-#endif /* MAME_INCLUDES_A2600H */
-
-
+#endif // MAME_INCLUDES_A2600_H

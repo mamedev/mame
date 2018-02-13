@@ -63,6 +63,7 @@ public:
 	}
 
 	void micro20(machine_config &config);
+	void micro20_map(address_map &map);
 private:
 	u8 m_tin;
 	u8 m_h4;
@@ -139,7 +140,7 @@ READ32_MEMBER(micro20_state::buserror_r)
     ADDRESS MAPS
 ***************************************************************************/
 
-static ADDRESS_MAP_START(micro20_map, AS_PROGRAM, 32, micro20_state )
+ADDRESS_MAP_START(micro20_state::micro20_map)
 	AM_RANGE(0x00000000, 0x001fffff) AM_RAM AM_SHARE("mainram")
 	AM_RANGE(0x00200000, 0x002fffff) AM_READ(buserror_r)
 	AM_RANGE(0x00800000, 0x0083ffff) AM_ROM AM_REGION("bootrom", 0)

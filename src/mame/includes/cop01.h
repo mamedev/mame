@@ -68,4 +68,10 @@ public:
 	void draw_sprites( bitmap_ind16 &bitmap, const rectangle &cliprect );
 	void mightguy(machine_config &config);
 	void cop01(machine_config &config);
+	void audio_io_map(address_map &map);
+	void cop01_map(address_map &map);
+	void io_map(address_map &map);
+	void mightguy_audio_io_map(address_map &map);
+	void mightguy_io_map(address_map &map);
+	void sound_map(address_map &map);
 };

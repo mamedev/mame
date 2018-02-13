@@ -71,6 +71,8 @@ public:
 	void ram_bank_w(uint16_t offset, uint8_t data, uint8_t bank_num);
 	TIMER_DEVICE_CALLBACK_MEMBER(dfruit_irq_scanline);
 	void dfruit(machine_config &config);
+	void dfruit_map(address_map &map);
+	void tc0091lvc_map(address_map &map);
 };
 
 void dfruit_state::video_start()
@@ -162,7 +164,7 @@ WRITE8_MEMBER(dfruit_state::dfruit_ram_1_w) { ram_bank_w(offset, data, 1); }
 WRITE8_MEMBER(dfruit_state::dfruit_ram_2_w) { ram_bank_w(offset, data, 2); }
 WRITE8_MEMBER(dfruit_state::dfruit_ram_3_w) { ram_bank_w(offset, data, 3); }
 
-static ADDRESS_MAP_START( tc0091lvc_map, AS_PROGRAM, 8, dfruit_state )
+ADDRESS_MAP_START(dfruit_state::tc0091lvc_map)
 	AM_RANGE(0x0000, 0x5fff) AM_ROM
 	AM_RANGE(0x6000, 0x7fff) AM_READ(dfruit_rom_r)
 
@@ -181,7 +183,7 @@ static ADDRESS_MAP_START( tc0091lvc_map, AS_PROGRAM, 8, dfruit_state )
 ADDRESS_MAP_END
 
 
-static ADDRESS_MAP_START( dfruit_map, AS_PROGRAM, 8, dfruit_state )
+ADDRESS_MAP_START(dfruit_state::dfruit_map)
 	AM_IMPORT_FROM(tc0091lvc_map)
 	AM_RANGE(0xa000, 0xa003) AM_DEVREADWRITE("ppi8255_0", i8255_device, read, write)
 	AM_RANGE(0xa004, 0xa005) AM_DEVREADWRITE("opn", ym2203_device, read, write)

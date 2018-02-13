@@ -313,6 +313,8 @@ public:
 	required_device_array<cd4099_device, 3> m_latch;
 
 	void luckybal(machine_config &config);
+	void main_io(address_map &map);
+	void main_map(address_map &map);
 };
 
 
@@ -320,12 +322,12 @@ public:
 *             Memory Map              *
 **************************************/
 
-static ADDRESS_MAP_START( main_map, AS_PROGRAM, 8, luckybal_state )
+ADDRESS_MAP_START(luckybal_state::main_map)
 	AM_RANGE(0x0000, 0x57ff) AM_ROM
 	AM_RANGE(0xe000, 0xffff) AM_RAM  // 6264 SRAM
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( main_io, AS_IO, 8, luckybal_state )
+ADDRESS_MAP_START(luckybal_state::main_io)
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	AM_RANGE(0x90, 0x90) AM_WRITE(port90_bitswap_w)
 	AM_RANGE(0xc0, 0xc3) AM_READWRITE(ppi_bitswap_r, ppi_bitswap_w)

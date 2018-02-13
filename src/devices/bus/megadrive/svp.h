@@ -45,6 +45,8 @@ public:
 	virtual DECLARE_WRITE16_MEMBER(write_pmc);
 	virtual DECLARE_WRITE16_MEMBER(write_al);
 
+	void md_svp_ext_map(address_map &map);
+	void md_svp_ssp_map(address_map &map);
 protected:
 	md_rom_svp_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock);
 

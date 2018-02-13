@@ -112,6 +112,7 @@ public:
 	void nespalc(machine_config &config);
 	void nes(machine_config &config);
 	void fds(machine_config &config);
+	void nes_map(address_map &map);
 private:
 	memory_bank       *m_prg_bank_mem[5];
 

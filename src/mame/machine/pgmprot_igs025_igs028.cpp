@@ -172,7 +172,7 @@ DRIVER_INIT_MEMBER(pgm_028_025_state,olds)
 
 }
 
-static ADDRESS_MAP_START( olds_mem, AS_PROGRAM, 16, pgm_028_025_state )
+ADDRESS_MAP_START(pgm_028_025_state::olds_mem)
 	AM_IMPORT_FROM(pgm_mem)
 	AM_RANGE(0x100000, 0x3fffff) AM_ROMBANK("bank1") /* Game ROM */
 	AM_RANGE(0x400000, 0x403fff) AM_RAM AM_SHARE("sharedprotram") // Shared with protection device

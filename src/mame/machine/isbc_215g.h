@@ -25,6 +25,8 @@ public:
 	static void static_set_maincpu_tag(device_t &device, const char *maincpu_tag) { downcast<isbc_215g_device &>(device).m_maincpu_tag = maincpu_tag; }
 	template<class _Object> static devcb_base &static_set_irq_callback(device_t &device, _Object object) { return downcast<isbc_215g_device &>(device).m_out_irq_func.set_callback(object); }
 
+	void isbc_215g_io(address_map &map);
+	void isbc_215g_mem(address_map &map);
 protected:
 	virtual void device_start() override;
 	virtual void device_reset() override;

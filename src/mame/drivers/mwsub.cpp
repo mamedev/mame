@@ -37,6 +37,8 @@ public:
 	DECLARE_WRITE8_MEMBER(submar_led_w);
 	DECLARE_WRITE8_MEMBER(submar_irq_clear_w);
 	void submar(machine_config &config);
+	void submar_map(address_map &map);
+	void submar_portmap(address_map &map);
 };
 
 
@@ -123,13 +125,13 @@ WRITE8_MEMBER(submar_state::submar_irq_clear_w)
 }
 
 
-static ADDRESS_MAP_START( submar_map, AS_PROGRAM, 8, submar_state )
+ADDRESS_MAP_START(submar_state::submar_map)
 	ADDRESS_MAP_GLOBAL_MASK(0x7fff)
 	AM_RANGE(0x0000, 0x1fff) AM_ROM
 	AM_RANGE(0x2000, 0x207f) AM_RAM
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( submar_portmap, AS_IO, 8, submar_state )
+ADDRESS_MAP_START(submar_state::submar_portmap)
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	AM_RANGE(0x00, 0x00) AM_READWRITE(submar_sensor0_r, submar_motor_w)
 	AM_RANGE(0x01, 0x01) AM_READWRITE(submar_sensor1_r, submar_lamp_w)

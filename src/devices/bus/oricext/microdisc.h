@@ -15,7 +15,7 @@ public:
 	microdisc_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 	virtual ~microdisc_device();
 
-	DECLARE_ADDRESS_MAP(map, 8);
+	void map(address_map &map);
 	DECLARE_WRITE8_MEMBER(port_314_w);
 	DECLARE_READ8_MEMBER(port_314_r);
 	DECLARE_READ8_MEMBER(port_318_r);

@@ -271,6 +271,12 @@ public:
 	void dn5500(machine_config &config);
 	void dn5500_15i(machine_config &config);
 	void dn3500_19i(machine_config &config);
+	void dn3000_map(address_map &map);
+	void dn3500_map(address_map &map);
+	void dn5500_map(address_map &map);
+	void dsp3000_map(address_map &map);
+	void dsp3500_map(address_map &map);
+	void dsp5500_map(address_map &map);
 private:
 	uint32_t ptm_counter;
 	uint8_t sio_output_data;

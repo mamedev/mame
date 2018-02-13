@@ -39,6 +39,8 @@ public:
 
 	DECLARE_WRITE8_MEMBER( j3_w );
 
+	void abc77_io(address_map &map);
+	void abc77_map(address_map &map);
 protected:
 	abc77_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock);
 

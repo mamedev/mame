@@ -61,4 +61,6 @@ public:
 	INTERRUPT_GEN_MEMBER(interrupt_nmi);
 	void draw_sprites( bitmap_ind16 &bitmap, const rectangle &cliprect );
 	void jailbrek(machine_config &config);
+	void jailbrek_map(address_map &map);
+	void vlm_map(address_map &map);
 };

@@ -47,26 +47,30 @@ public:
 	void kbd_put(u8 data);
 
 	void c900(machine_config &config);
+	void data_map(address_map &map);
+	void io_map(address_map &map);
+	void mem_map(address_map &map);
 private:
 	uint8_t m_term_data;
 	required_device<cpu_device> m_maincpu;
 	required_device<generic_terminal_device> m_terminal;
 };
 
-static ADDRESS_MAP_START(mem_map, AS_PROGRAM, 16, c900_state)
+ADDRESS_MAP_START(c900_state::mem_map)
 	AM_RANGE(0x00000, 0x07fff) AM_ROM AM_REGION("roms", 0)
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START(data_map, AS_DATA, 16, c900_state)
+ADDRESS_MAP_START(c900_state::data_map)
 	AM_RANGE(0x00000, 0x07fff) AM_ROM AM_REGION("roms", 0)
 	AM_RANGE(0x08000, 0x6ffff) AM_RAM
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START(io_map, AS_IO, 16, c900_state)
+ADDRESS_MAP_START(c900_state::io_map)
 	AM_RANGE(0x0000, 0x007f) AM_DEVREADWRITE8("cio", z8036_device, read, write, 0x00ff)
 	//AM_RANGE(0x0100, 0x011f) AM_DEVREADWRITE8("scc", scc8030_device, zbus_r, zbus_w, 0x00ff)  // range for one channel
 	AM_RANGE(0x0100, 0x0101) AM_READ(stat_r)
-	AM_RANGE(0x0110, 0x0111) AM_READ(key_r) AM_DEVWRITE8("terminal", generic_terminal_device, write, 0x00ff)
+	AM_RANGE(0x0110, 0x0111) AM_READ(key_r)
+	AM_RANGE(0x0110, 0x0111) AM_DEVWRITE8("terminal", generic_terminal_device, write, 0x00ff)
 ADDRESS_MAP_END
 
 static INPUT_PORTS_START( c900 )

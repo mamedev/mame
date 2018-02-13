@@ -448,7 +448,7 @@ WRITE_LINE_MEMBER( c1pmf_state::osi470_pia_cb2_w )
 
 /* Memory Maps */
 
-static ADDRESS_MAP_START( osi600_mem, AS_PROGRAM, 8, sb2m600_state )
+ADDRESS_MAP_START(sb2m600_state::osi600_mem)
 	AM_RANGE(0x0000, 0x1fff) AM_RAMBANK("bank1")
 	AM_RANGE(0xa000, 0xbfff) AM_ROM
 	AM_RANGE(0xd000, 0xd3ff) AM_RAM AM_SHARE("video_ram")
@@ -457,7 +457,7 @@ static ADDRESS_MAP_START( osi600_mem, AS_PROGRAM, 8, sb2m600_state )
 	AM_RANGE(0xf800, 0xffff) AM_ROM
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( uk101_mem, AS_PROGRAM, 8, uk101_state )
+ADDRESS_MAP_START(uk101_state::uk101_mem)
 	AM_RANGE(0x0000, 0x1fff) AM_RAMBANK("bank1")
 	AM_RANGE(0xa000, 0xbfff) AM_ROM
 	AM_RANGE(0xd000, 0xd3ff) AM_RAM AM_SHARE("video_ram")
@@ -467,7 +467,7 @@ static ADDRESS_MAP_START( uk101_mem, AS_PROGRAM, 8, uk101_state )
 	AM_RANGE(0xf800, 0xffff) AM_ROM
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( c1p_mem, AS_PROGRAM, 8, c1p_state )
+ADDRESS_MAP_START(c1p_state::c1p_mem)
 	AM_RANGE(0x0000, 0x4fff) AM_RAMBANK("bank1")
 	AM_RANGE(0xa000, 0xbfff) AM_ROM
 	AM_RANGE(0xc704, 0xc707) AM_DEVREADWRITE("pia_1", pia6821_device, read, write)
@@ -483,7 +483,7 @@ static ADDRESS_MAP_START( c1p_mem, AS_PROGRAM, 8, c1p_state )
 	AM_RANGE(0xf800, 0xffff) AM_ROM
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( c1pmf_mem, AS_PROGRAM, 8, c1pmf_state )
+ADDRESS_MAP_START(c1pmf_state::c1pmf_mem)
 	AM_RANGE(0x0000, 0x4fff) AM_RAMBANK("bank1")
 	AM_RANGE(0xa000, 0xbfff) AM_ROM
 	AM_RANGE(0xc000, 0xc003) AM_DEVREADWRITE("pia_0", pia6821_device, read, write) // FDC

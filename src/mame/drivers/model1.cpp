@@ -863,7 +863,7 @@ WRITE16_MEMBER(model1_state::mr2_w)
 		logerror("MW 10[r10], %f (%x)\n", *(float *)(m_mr2+0x1f10/2), m_maincpu->pc());
 }
 
-static ADDRESS_MAP_START( model1_mem, AS_PROGRAM, 16, model1_state )
+ADDRESS_MAP_START(model1_state::model1_mem)
 	AM_RANGE(0x000000, 0x0fffff) AM_ROM
 	AM_RANGE(0x100000, 0x1fffff) AM_ROMBANK("bank1")
 	AM_RANGE(0x200000, 0x2fffff) AM_ROM
@@ -910,12 +910,12 @@ static ADDRESS_MAP_START( model1_mem, AS_PROGRAM, 16, model1_state )
 	AM_RANGE(0xf80000, 0xffffff) AM_ROM
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( model1_io, AS_IO, 16, model1_state )
+ADDRESS_MAP_START(model1_state::model1_io)
 	AM_RANGE(0xd20000, 0xd20003) AM_READ(model1_tgp_copro_ram_r)
 	AM_RANGE(0xd80000, 0xd80003) AM_READ(model1_tgp_copro_r)
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( model1_vr_mem, AS_PROGRAM, 16, model1_state )
+ADDRESS_MAP_START(model1_state::model1_vr_mem)
 	AM_RANGE(0x000000, 0x0fffff) AM_ROM
 	AM_RANGE(0x100000, 0x1fffff) AM_ROMBANK("bank1")
 	AM_RANGE(0x200000, 0x2fffff) AM_ROM
@@ -962,7 +962,7 @@ static ADDRESS_MAP_START( model1_vr_mem, AS_PROGRAM, 16, model1_state )
 	AM_RANGE(0xfc0000, 0xffffff) AM_ROM
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( model1_vr_io, AS_IO, 16, model1_state )
+ADDRESS_MAP_START(model1_state::model1_vr_io)
 	AM_RANGE(0xd20000, 0xd20003) AM_READ(model1_vr_tgp_ram_r)
 	AM_RANGE(0xd80000, 0xd80003) AM_READ(model1_vr_tgp_r)
 ADDRESS_MAP_END
@@ -1665,7 +1665,7 @@ MACHINE_CONFIG_DERIVED(model1_state::swa, model1)
 	MCFG_DEVCB_CHAIN_OUTPUT(DEVWRITELINE(DSBZ80_TAG, dsbz80_device, write_txd))
 MACHINE_CONFIG_END
 
-static ADDRESS_MAP_START( polhemus_map, AS_PROGRAM, 16, model1_state )
+ADDRESS_MAP_START(model1_state::polhemus_map)
 	ADDRESS_MAP_GLOBAL_MASK(0xfffff)
 	AM_RANGE(0x00000, 0x03fff) AM_RAM
 	AM_RANGE(0xf8000, 0xfffff) AM_ROM AM_REGION("polhemus", 0)

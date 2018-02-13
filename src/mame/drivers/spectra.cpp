@@ -63,6 +63,7 @@ public:
 	TIMER_DEVICE_CALLBACK_MEMBER(nmitimer);
 	TIMER_DEVICE_CALLBACK_MEMBER(outtimer);
 	void spectra(machine_config &config);
+	void spectra_map(address_map &map);
 private:
 	uint8_t m_porta;
 	uint8_t m_portb;
@@ -76,7 +77,7 @@ private:
 };
 
 
-static ADDRESS_MAP_START( spectra_map, AS_PROGRAM, 8, spectra_state )
+ADDRESS_MAP_START(spectra_state::spectra_map)
 	ADDRESS_MAP_UNMAP_HIGH
 	ADDRESS_MAP_GLOBAL_MASK(0xfff)
 	AM_RANGE(0x0000, 0x00ff) AM_RAM AM_SHARE("nvram") // battery backed, 2x 5101L

@@ -66,6 +66,8 @@ public:
 	TIMER_DEVICE_CALLBACK_MEMBER(timer_s);
 	TIMER_DEVICE_CALLBACK_MEMBER(timer_x);
 	void hankin(machine_config &config);
+	void hankin_map(address_map &map);
+	void hankin_sub_map(address_map &map);
 private:
 	bool m_timer_x;
 	bool m_timer_sb;
@@ -103,7 +105,7 @@ private:
 };
 
 
-static ADDRESS_MAP_START( hankin_map, AS_PROGRAM, 8, hankin_state )
+ADDRESS_MAP_START(hankin_state::hankin_map)
 	ADDRESS_MAP_GLOBAL_MASK(0x1fff)
 	AM_RANGE(0x0000, 0x007f) AM_RAM // internal to the cpu
 	AM_RANGE(0x0088, 0x008b) AM_DEVREADWRITE("ic11", pia6821_device, read, write)
@@ -112,7 +114,7 @@ static ADDRESS_MAP_START( hankin_map, AS_PROGRAM, 8, hankin_state )
 	AM_RANGE(0x1000, 0x1fff) AM_ROM AM_REGION("roms", 0)
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( hankin_sub_map, AS_PROGRAM, 8, hankin_state )
+ADDRESS_MAP_START(hankin_state::hankin_sub_map)
 	ADDRESS_MAP_GLOBAL_MASK(0x1fff)
 	AM_RANGE(0x0000, 0x007f) AM_RAM // internal to the cpu
 	AM_RANGE(0x0080, 0x0083) AM_DEVREADWRITE("ic2", pia6821_device, read, write)

@@ -58,4 +58,8 @@ public:
 	static const atari_motion_objects_config s_mob_config;
 	void badlandsb(machine_config &config);
 	void badlands(machine_config &config);
+	void audio_map(address_map &map);
+	void bootleg_audio_map(address_map &map);
+	void bootleg_map(address_map &map);
+	void main_map(address_map &map);
 };

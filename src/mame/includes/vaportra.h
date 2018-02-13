@@ -61,4 +61,6 @@ public:
 
 	DECO16IC_BANK_CB_MEMBER(bank_callback);
 	void vaportra(machine_config &config);
+	void main_map(address_map &map);
+	void sound_map(address_map &map);
 };

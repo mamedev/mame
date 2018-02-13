@@ -54,6 +54,7 @@ public:
 	// callbacks
 	template <class Reply> void set_reply_callback(Reply &&cb) { m_reply_cb.set_callback(std::forward<Reply>(cb)); }
 
+	void wpcsnd_map(address_map &map);
 protected:
 	// overrides
 	virtual void device_start() override;

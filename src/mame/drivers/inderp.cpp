@@ -37,6 +37,7 @@ public:
 	DECLARE_READ8_MEMBER(inputs_r);
 
 	void inderp(machine_config &config);
+	void maincpu_map(address_map &map);
 private:
 	required_device<cpu_device> m_maincpu;
 	required_ioport_array<10> m_inputs;
@@ -44,7 +45,7 @@ private:
 	u8 m_irqcnt;
 };
 
-static ADDRESS_MAP_START( maincpu_map, AS_PROGRAM, 8, inderp_state )
+ADDRESS_MAP_START(inderp_state::maincpu_map)
 	ADDRESS_MAP_UNMAP_HIGH
 	AM_RANGE(0x0000, 0x00ff) AM_MIRROR(0x500) AM_RAM // 2x 5101/2101, battery-backed
 	AM_RANGE(0x0200, 0x02ff) AM_MIRROR(0x400) // outputs CI-110 (displays)

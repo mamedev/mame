@@ -144,6 +144,7 @@ public:
 	void hp48g(machine_config &config);
 	void hp48gx(machine_config &config);
 	void hp49g(machine_config &config);
+	void hp48(address_map &map);
 };
 
 

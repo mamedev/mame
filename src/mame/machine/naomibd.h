@@ -18,7 +18,7 @@ public:
 	static void static_set_eeprom_tag(device_t &device, const char *_eeprom_tag);
 
 	// Can be patched in the underlying class
-	virtual DECLARE_ADDRESS_MAP(submap, 16);
+	virtual void submap(address_map &map);
 
 	DECLARE_WRITE16_MEMBER(rom_offseth_w);          // 5f7000
 	DECLARE_WRITE16_MEMBER(rom_offsetl_w);          // 5f7004

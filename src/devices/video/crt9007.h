@@ -114,6 +114,7 @@ public:
 
 	void set_character_width(int value);
 
+	void crt9007(address_map &map);
 protected:
 	// device-level overrides
 	virtual void device_start() override;

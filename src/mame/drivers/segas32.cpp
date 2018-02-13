@@ -1119,7 +1119,7 @@ WRITE8_MEMBER(segas32_state::sound_dummy_w)
  *
  *************************************/
 
-static ADDRESS_MAP_START( system32_map, AS_PROGRAM, 16, segas32_state )
+ADDRESS_MAP_START(segas32_state::system32_map)
 	ADDRESS_MAP_UNMAP_HIGH
 	AM_RANGE(0x000000, 0x1fffff) AM_ROM
 	AM_RANGE(0x200000, 0x20ffff) AM_MIRROR(0x0f0000) AM_RAM AM_SHARE("workram")
@@ -1140,7 +1140,7 @@ static ADDRESS_MAP_START( system32_map, AS_PROGRAM, 16, segas32_state )
 ADDRESS_MAP_END
 
 
-static ADDRESS_MAP_START( multi32_map, AS_PROGRAM, 32, segas32_state )
+ADDRESS_MAP_START(segas32_state::multi32_map)
 	ADDRESS_MAP_UNMAP_HIGH
 	ADDRESS_MAP_GLOBAL_MASK(0xffffff)
 	AM_RANGE(0x000000, 0x1fffff) AM_ROM
@@ -1173,7 +1173,7 @@ ADDRESS_MAP_END
  *
  *************************************/
 
-static ADDRESS_MAP_START( system32_sound_map, AS_PROGRAM, 8, segas32_state )
+ADDRESS_MAP_START(segas32_state::system32_sound_map)
 	AM_RANGE(0x0000, 0x9fff) AM_ROM AM_REGION("soundcpu", 0)
 	AM_RANGE(0xa000, 0xbfff) AM_ROMBANK("bank1")
 	AM_RANGE(0xc000, 0xc00f) AM_MIRROR(0x0ff0) AM_DEVWRITE("rfsnd", rf5c68_device, rf5c68_w)
@@ -1181,7 +1181,7 @@ static ADDRESS_MAP_START( system32_sound_map, AS_PROGRAM, 8, segas32_state )
 	AM_RANGE(0xe000, 0xffff) AM_RAM AM_SHARE("z80_shared_ram")
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( system32_sound_portmap, AS_IO, 8, segas32_state )
+ADDRESS_MAP_START(segas32_state::system32_sound_portmap)
 	ADDRESS_MAP_UNMAP_HIGH
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	AM_RANGE(0x80, 0x83) AM_MIRROR(0x0c) AM_DEVREADWRITE("ym1", ym3438_device, read, write)
@@ -1194,14 +1194,14 @@ static ADDRESS_MAP_START( system32_sound_portmap, AS_IO, 8, segas32_state )
 ADDRESS_MAP_END
 
 
-static ADDRESS_MAP_START( multi32_sound_map, AS_PROGRAM, 8, segas32_state )
+ADDRESS_MAP_START(segas32_state::multi32_sound_map)
 	AM_RANGE(0x0000, 0x9fff) AM_ROM AM_REGION("soundcpu", 0)
 	AM_RANGE(0xa000, 0xbfff) AM_ROMBANK("bank1")
 	AM_RANGE(0xc000, 0xdfff) AM_DEVREADWRITE("sega", multipcm_device, read, write)
 	AM_RANGE(0xe000, 0xffff) AM_RAM AM_SHARE("z80_shared_ram")
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( multi32_sound_portmap, AS_IO, 8, segas32_state )
+ADDRESS_MAP_START(segas32_state::multi32_sound_portmap)
 	ADDRESS_MAP_UNMAP_HIGH
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	AM_RANGE(0x80, 0x83) AM_MIRROR(0x0c) AM_DEVREADWRITE("ymsnd", ym3438_device, read, write)
@@ -1213,7 +1213,7 @@ static ADDRESS_MAP_START( multi32_sound_portmap, AS_IO, 8, segas32_state )
 ADDRESS_MAP_END
 
 
-static ADDRESS_MAP_START( multipcm_map, 0, 8, segas32_state )
+ADDRESS_MAP_START(segas32_state::multipcm_map)
 	AM_RANGE(0x000000, 0x0fffff) AM_ROM
 	AM_RANGE(0x100000, 0x17ffff) AM_ROMBANK("multipcmbanklo")
 	AM_RANGE(0x180000, 0x1fffff) AM_ROMBANK("multipcmbankhi")
@@ -1225,7 +1225,7 @@ ADDRESS_MAP_END
  *
  *************************************/
 
-static ADDRESS_MAP_START( v25_map, AS_PROGRAM, 8, segas32_state )
+ADDRESS_MAP_START(segas32_state::v25_map)
 	AM_RANGE(0x00000, 0x0ffff) AM_ROM AM_REGION("mcu", 0)
 	AM_RANGE(0x10000, 0x1ffff) AM_DEVREADWRITE("dpram", mb8421_device, left_r, left_w)
 	AM_RANGE(0xf0000, 0xfffff) AM_ROM AM_REGION("mcu", 0)
@@ -1238,11 +1238,11 @@ ADDRESS_MAP_END
  *
  *************************************/
 
-static ADDRESS_MAP_START( upd7725_prg_map, AS_PROGRAM, 32, segas32_state )
+ADDRESS_MAP_START(segas32_state::upd7725_prg_map)
 	AM_RANGE(0x0000, 0x07ff) AM_ROM AM_REGION("dspprg", 0)
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( upd7725_data_map, AS_DATA, 16, segas32_state )
+ADDRESS_MAP_START(segas32_state::upd7725_data_map)
 	AM_RANGE(0x0000, 0x03ff) AM_ROM AM_REGION("dspdata", 0)
 ADDRESS_MAP_END
 
@@ -2319,7 +2319,7 @@ segas32_regular_state::segas32_regular_state(const machine_config &mconfig, cons
 
 
 
-static ADDRESS_MAP_START( system32_analog_map, AS_PROGRAM, 16, segas32_state )
+ADDRESS_MAP_START(segas32_state::system32_analog_map)
 	ADDRESS_MAP_UNMAP_HIGH
 	AM_IMPORT_FROM(system32_map)
 	AM_RANGE(0xc00050, 0xc00057) AM_MIRROR(0x0fff80) AM_DEVREADWRITE8("adc", msm6253_device, d7_r, address_w, 0x00ff)
@@ -2354,7 +2354,7 @@ segas32_analog_state::segas32_analog_state(const machine_config &mconfig, device
 
 
 
-static ADDRESS_MAP_START( system32_trackball_map, AS_PROGRAM, 16, segas32_trackball_state )
+ADDRESS_MAP_START(segas32_trackball_state::system32_trackball_map)
 	ADDRESS_MAP_UNMAP_HIGH
 	AM_IMPORT_FROM(system32_map)
 	//AM_RANGE(0xc00040, 0xc0005f) AM_MIRROR(0x0fff80) AM_READWRITE8(sonic_custom_io_r, sonic_custom_io_w, 0x00ff)
@@ -2395,7 +2395,7 @@ segas32_trackball_state::segas32_trackball_state(const machine_config &mconfig, 
 
 
 
-static ADDRESS_MAP_START( system32_4player_map, AS_PROGRAM, 16, segas32_state )
+ADDRESS_MAP_START(segas32_state::system32_4player_map)
 	ADDRESS_MAP_UNMAP_HIGH
 	AM_IMPORT_FROM(system32_map)
 	AM_RANGE(0xc00060, 0xc00067) AM_MIRROR(0x0fff80) AM_DEVREADWRITE8("ppi", i8255_device, read, write, 0x00ff)
@@ -2429,7 +2429,7 @@ segas32_4player_state::segas32_4player_state(const machine_config &mconfig, devi
 
 
 
-static ADDRESS_MAP_START( ga2_main_map, AS_PROGRAM, 16, segas32_state )
+ADDRESS_MAP_START(segas32_state::ga2_main_map)
 	ADDRESS_MAP_UNMAP_HIGH
 	AM_IMPORT_FROM(system32_4player_map)
 	AM_RANGE(0xa00000, 0xa00fff) AM_DEVREADWRITE8("dpram", mb8421_device, right_r, right_w, 0x00ff)
@@ -2506,7 +2506,7 @@ WRITE_LINE_MEMBER(segas32_cd_state::scsi_drq_w)
 	printf("%02x DRQ\n",state);
 }
 
-static ADDRESS_MAP_START( system32_cd_map, AS_PROGRAM, 16, segas32_state )
+ADDRESS_MAP_START(segas32_state::system32_cd_map)
 	ADDRESS_MAP_UNMAP_HIGH
 	AM_IMPORT_FROM(system32_map)
 	#if S32_KOKOROJI_TEST_CD
@@ -2641,7 +2641,7 @@ sega_multi32_state::sega_multi32_state(const machine_config &mconfig, device_typ
 }
 
 
-static ADDRESS_MAP_START( multi32_analog_map, AS_PROGRAM, 32, sega_multi32_analog_state )
+ADDRESS_MAP_START(sega_multi32_analog_state::multi32_analog_map)
 	ADDRESS_MAP_UNMAP_HIGH
 	ADDRESS_MAP_GLOBAL_MASK(0xffffff)
 	AM_IMPORT_FROM(multi32_map)
@@ -2686,7 +2686,7 @@ sega_multi32_analog_state::sega_multi32_analog_state(const machine_config &mconf
 }
 
 
-static ADDRESS_MAP_START( multi32_6player_map, AS_PROGRAM, 32, segas32_state )
+ADDRESS_MAP_START(segas32_state::multi32_6player_map)
 	ADDRESS_MAP_UNMAP_HIGH
 	ADDRESS_MAP_GLOBAL_MASK(0xffffff)
 	AM_IMPORT_FROM(multi32_map)

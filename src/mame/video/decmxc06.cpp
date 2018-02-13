@@ -101,7 +101,7 @@ void deco_mxc06_device::draw_sprites( bitmap_ind16 &bitmap, const rectangle &cli
 		sx = 240 - sx;
 		sy = 240 - sy;
 
-		if (machine().driver_data()->flip_screen())
+		if (m_flip_screen)
 		{
 			sy = 240 - sy;
 			sx = 240 - sx;
@@ -128,7 +128,8 @@ void deco_mxc06_device::draw_sprites( bitmap_ind16 &bitmap, const rectangle &cli
 
 			code &= ~(h - 1);
 
-			if (flipy)
+			// not affected by flipscreen
+			if (spriteram[offs] & 0x4000)
 				incy = -1;
 			else
 			{
@@ -218,6 +219,9 @@ void deco_mxc06_device::draw_sprites_bootleg( bitmap_ind16 &bitmap, const rectan
 void deco_mxc06_device::device_start()
 {
 	m_priority_type = 0;
+	m_flip_screen = false;
+
+	save_item(NAME(m_flip_screen));
 }
 
 void deco_mxc06_device::device_reset()

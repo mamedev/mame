@@ -78,4 +78,13 @@ public:
 	void pbillrdm(machine_config &config);
 	void omega(machine_config &config);
 	void freekick(machine_config &config);
+	void decrypted_opcodes_map(address_map &map);
+	void freekick_io_map(address_map &map);
+	void freekick_map(address_map &map);
+	void gigas_io_map(address_map &map);
+	void gigas_map(address_map &map);
+	void oigas_io_map(address_map &map);
+	void omega_io_map(address_map &map);
+	void omega_map(address_map &map);
+	void pbillrd_map(address_map &map);
 };

@@ -19,7 +19,7 @@ class mpu_pc98_device : public device_t
 public:
 	// construction/destruction
 	mpu_pc98_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
-	DECLARE_ADDRESS_MAP(map, 8);
+	void map(address_map &map);
 protected:
 	// device-level overrides
 	virtual void device_start() override;

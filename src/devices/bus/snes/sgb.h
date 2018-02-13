@@ -39,6 +39,7 @@ public:
 	virtual DECLARE_WRITE8_MEMBER(gb_ie_w);
 	virtual DECLARE_WRITE8_MEMBER(gb_timer_callback);
 
+	void supergb_map(address_map &map);
 protected:
 	// construction/destruction
 	sns_rom_sgb_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock);

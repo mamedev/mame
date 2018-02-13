@@ -943,7 +943,7 @@ uint32_t cxhumax_state::screen_update_cxhumax(screen_device &screen, bitmap_rgb3
 	return 0;
 }
 
-static ADDRESS_MAP_START(cxhumax_map, AS_PROGRAM, 32, cxhumax_state)
+ADDRESS_MAP_START(cxhumax_state::cxhumax_map)
 	AM_RANGE(0x00000000, 0x03ffffff) AM_RAM AM_SHARE("ram") AM_MIRROR(0x40000000)           // 64?MB RAM
 	AM_RANGE(0xe0000000, 0xe000ffff) AM_READWRITE(cx_hsx_r, cx_hsx_w)                       // HSX
 	AM_RANGE(0xe0010000, 0xe0010003) AM_READWRITE(cx_romdescr_r, cx_romdescr_w)             // ROM Descriptor

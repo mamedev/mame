@@ -103,7 +103,7 @@ WRITE8_MEMBER(homerun_state::homerun_d7756_sample_w)
 		m_d7756->port_w(space, 0, data);
 }
 
-static ADDRESS_MAP_START( homerun_memmap, AS_PROGRAM, 8, homerun_state )
+ADDRESS_MAP_START(homerun_state::homerun_memmap)
 	AM_RANGE(0x0000, 0x3fff) AM_ROM
 	AM_RANGE(0x4000, 0x7fff) AM_ROMBANK("bank1")
 	AM_RANGE(0x8000, 0x9fff) AM_RAM_WRITE(homerun_videoram_w) AM_SHARE("videoram")
@@ -112,7 +112,7 @@ static ADDRESS_MAP_START( homerun_memmap, AS_PROGRAM, 8, homerun_state )
 	AM_RANGE(0xc000, 0xdfff) AM_RAM
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( homerun_iomap, AS_IO, 8, homerun_state )
+ADDRESS_MAP_START(homerun_state::homerun_iomap)
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	AM_RANGE(0x10, 0x10) AM_WRITE(homerun_d7756_sample_w)
 	AM_RANGE(0x20, 0x20) AM_WRITE(homerun_control_w)

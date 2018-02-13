@@ -36,6 +36,8 @@ public:
 	DECLARE_READ8_MEMBER( upd765_tc_r );
 	DECLARE_WRITE8_MEMBER( fdc_control_w );
 
+	void cpu_io(address_map &map);
+	void cpu_mem(address_map &map);
 protected:
 	// device-level overrides
 	virtual void device_start() override;

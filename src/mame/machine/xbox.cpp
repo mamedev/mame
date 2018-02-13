@@ -826,7 +826,7 @@ void xbox_base_state::machine_start()
 	save_item(NAME(pic16lc_buffer));
 }
 
-ADDRESS_MAP_START(xbox_base_map, AS_PROGRAM, 32, xbox_base_state)
+ADDRESS_MAP_START(xbox_base_state::xbox_base_map)
 	AM_RANGE(0x00000000, 0x07ffffff) AM_RAM // 128 megabytes
 #if 0
 	AM_RANGE(0xf0000000, 0xf7ffffff) AM_RAM AM_SHARE("nv2a_share") // 3d accelerator wants this
@@ -839,7 +839,7 @@ ADDRESS_MAP_START(xbox_base_map, AS_PROGRAM, 32, xbox_base_state)
 #endif
 ADDRESS_MAP_END
 
-ADDRESS_MAP_START(xbox_base_map_io, AS_IO, 32, xbox_base_state)
+ADDRESS_MAP_START(xbox_base_state::xbox_base_map_io)
 	AM_RANGE(0x0020, 0x0023) AM_DEVREADWRITE8("pic8259_1", pic8259_device, read, write, 0xffffffff)
 	AM_RANGE(0x002c, 0x002f) AM_READWRITE8(superio_read, superio_write, 0xffff0000)
 	AM_RANGE(0x0040, 0x0043) AM_DEVREADWRITE8("pit8254", pit8254_device, read, write, 0xffffffff)

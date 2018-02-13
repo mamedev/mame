@@ -79,6 +79,8 @@ public:
 
 	void z1013k76(machine_config &config);
 	void z1013(machine_config &config);
+	void z1013_io(address_map &map);
+	void z1013_mem(address_map &map);
 private:
 	uint8_t m_keyboard_line;
 	bool m_keyboard_part;
@@ -91,13 +93,13 @@ private:
 
 
 /* Address maps */
-static ADDRESS_MAP_START(z1013_mem, AS_PROGRAM, 8, z1013_state)
+ADDRESS_MAP_START(z1013_state::z1013_mem)
 	AM_RANGE( 0x0000, 0xebff ) AM_RAM
 	AM_RANGE( 0xec00, 0xefff ) AM_RAM AM_SHARE("videoram")
 	AM_RANGE( 0xf000, 0xffff ) AM_ROM //  ROM
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START(z1013_io, AS_IO, 8, z1013_state)
+ADDRESS_MAP_START(z1013_state::z1013_io)
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	AM_RANGE( 0x00, 0x03 ) AM_DEVREADWRITE("z80pio", z80pio_device, read_alt, write_alt)
 	AM_RANGE( 0x08, 0x08 ) AM_WRITE(z1013_keyboard_w)

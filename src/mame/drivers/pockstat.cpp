@@ -155,6 +155,7 @@ public:
 	void ps_intc_set_interrupt_line(uint32_t line, int state);
 	void ps_timer_start(int index);
 	void pockstat(machine_config &config);
+	void pockstat_mem(address_map &map);
 };
 
 
@@ -840,7 +841,7 @@ WRITE32_MEMBER(pockstat_state::ps_audio_w)
 	verboselog(0, "ps_audio_w: Unknown Write: %08x = %08x & %08x\n", 0xd800000 + (offset << 2), data, mem_mask);
 }
 
-static ADDRESS_MAP_START(pockstat_mem, AS_PROGRAM, 32, pockstat_state )
+ADDRESS_MAP_START(pockstat_state::pockstat_mem)
 	AM_RANGE(0x00000000, 0x000007ff) AM_RAM
 	AM_RANGE(0x02000000, 0x02ffffff) AM_READ(ps_rombank_r)
 	AM_RANGE(0x04000000, 0x04003fff) AM_ROM AM_REGION("maincpu", 0)

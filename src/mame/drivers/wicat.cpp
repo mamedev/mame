@@ -128,6 +128,11 @@ public:
 
 
 	void wicat(machine_config &config);
+	void wicat_mem(address_map &map);
+	void wicat_video_io(address_map &map);
+	void wicat_video_mem(address_map &map);
+	void wicat_wd1000_io(address_map &map);
+	void wicat_wd1000_mem(address_map &map);
 private:
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
@@ -155,7 +160,7 @@ private:
 };
 
 
-static ADDRESS_MAP_START(wicat_mem, AS_PROGRAM, 16, wicat_state)
+ADDRESS_MAP_START(wicat_state::wicat_mem)
 	ADDRESS_MAP_UNMAP_LOW
 	ADDRESS_MAP_GLOBAL_MASK(0xffffff)
 	AM_RANGE(0x000000, 0x001fff) AM_ROM AM_REGION("c2", 0x0000)
@@ -179,12 +184,12 @@ static ADDRESS_MAP_START(wicat_mem, AS_PROGRAM, 16, wicat_state)
 	AM_RANGE(0xf00f00, 0xf00fff) AM_READWRITE(invalid_r,invalid_w)
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START(wicat_video_mem, AS_PROGRAM, 16, wicat_state)
+ADDRESS_MAP_START(wicat_state::wicat_video_mem)
 	AM_RANGE(0x0000, 0x7fff) AM_ROM AM_REGION("g1", 0x0000)
 	AM_RANGE(0x8000, 0xffff) AM_RAM
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START(wicat_video_io, AS_IO, 8, wicat_state)
+ADDRESS_MAP_START(wicat_state::wicat_video_io)
 	// these are largely wild guesses...
 	AM_RANGE(0x0000,0x0003) AM_READWRITE(video_timer_r,video_timer_w)  // some sort of timer?
 	AM_RANGE(0x0100,0x0107) AM_READWRITE(video_uart0_r,video_uart0_w)  // INS2651 UART #1
@@ -202,12 +207,12 @@ static ADDRESS_MAP_START(wicat_video_io, AS_IO, 8, wicat_state)
 	AM_RANGE(0x9000,0x9fff) AM_ROM AM_REGION("g2char",0x0000)
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START(wicat_wd1000_mem, AS_PROGRAM, 16, wicat_state)
+ADDRESS_MAP_START(wicat_state::wicat_wd1000_mem)
 	AM_RANGE(0x0000, 0x17ff) AM_ROM AM_REGION("wd3", 0x0000)
 	AM_RANGE(0x1800, 0x1fff) AM_NOP
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START(wicat_wd1000_io, AS_IO, 8, wicat_state)
+ADDRESS_MAP_START(wicat_state::wicat_wd1000_io)
 	AM_RANGE(0x0000, 0x00ff) AM_RAM  // left bank  - RAM
 	AM_RANGE(0x0100, 0x01ff) AM_RAM  // right bank - I/O ports (TODO)
 ADDRESS_MAP_END

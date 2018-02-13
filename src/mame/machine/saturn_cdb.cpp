@@ -25,7 +25,7 @@ void saturn_cdb_device::device_start()
 {
 }
 
-static ADDRESS_MAP_START( saturn_cdb_map, AS_PROGRAM, 32, saturn_cdb_device )
+ADDRESS_MAP_START(saturn_cdb_device::saturn_cdb_map)
 	AM_RANGE(0x00000000, 0x0000ffff) AM_ROM
 	AM_RANGE(0x01000000, 0x010fffff) AM_RAM // RAM buffer area?
 	AM_RANGE(0x02000000, 0x0200003f) AM_RAM // i/f with SH-2s

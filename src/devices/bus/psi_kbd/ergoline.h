@@ -33,6 +33,8 @@ public:
 	// from host
 	virtual void tx_w(int state) override;
 
+	void kbd_io(address_map &map);
+	void kbd_mem(address_map &map);
 protected:
 	// device_t overrides
 	virtual const tiny_rom_entry *device_rom_region() const override;

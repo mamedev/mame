@@ -192,7 +192,7 @@ WRITE_LINE_MEMBER( pcw_state::pcw_fdc_interrupt )
     block 3 could be paged into any bank, and this explains the
     setup of the memory below.
 */
-static ADDRESS_MAP_START(pcw_map, AS_PROGRAM, 8, pcw_state )
+ADDRESS_MAP_START(pcw_state::pcw_map)
 	AM_RANGE(0x0000, 0x3fff) AM_READ_BANK("bank1") AM_WRITE_BANK("bank5")
 	AM_RANGE(0x4000, 0x7fff) AM_READ_BANK("bank2") AM_WRITE_BANK("bank6")
 	AM_RANGE(0x8000, 0xbfff) AM_READ_BANK("bank3") AM_WRITE_BANK("bank7")
@@ -948,7 +948,7 @@ WRITE8_MEMBER(pcw_state::pcw9512_parallel_w)
 	logerror("pcw9512 parallel w: offs: %04x data: %02x\n",offset,data);
 }
 
-static ADDRESS_MAP_START(pcw_io, AS_IO, 8, pcw_state )
+ADDRESS_MAP_START(pcw_state::pcw_io)
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	AM_RANGE(0x000, 0x001) AM_MIRROR(0x7e) AM_DEVICE("upd765",      upd765a_device, map)
 	AM_RANGE(0x080, 0x0ef) AM_READWRITE(pcw_expansion_r,            pcw_expansion_w)
@@ -964,7 +964,7 @@ ADDRESS_MAP_END
 
 
 
-static ADDRESS_MAP_START(pcw9512_io, AS_IO, 8, pcw_state )
+ADDRESS_MAP_START(pcw_state::pcw9512_io)
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	AM_RANGE(0x000, 0x001) AM_MIRROR(0x7e) AM_DEVICE("upd765",      upd765a_device, map)
 	AM_RANGE(0x080, 0x0ef) AM_READWRITE(pcw_expansion_r,            pcw_expansion_w)

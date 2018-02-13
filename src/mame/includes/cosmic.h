@@ -115,4 +115,9 @@ public:
 	void devzone(machine_config &config);
 	void panic(machine_config &config);
 	void magspot(machine_config &config);
+	void cosmica_map(address_map &map);
+	void cosmicg_io_map(address_map &map);
+	void cosmicg_map(address_map &map);
+	void magspot_map(address_map &map);
+	void panic_map(address_map &map);
 };

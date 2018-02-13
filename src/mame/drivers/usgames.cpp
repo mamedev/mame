@@ -64,7 +64,7 @@ WRITE8_MEMBER(usgames_state::lamps2_w)
 }
 
 
-static ADDRESS_MAP_START( usgames_map, AS_PROGRAM, 8, usgames_state )
+ADDRESS_MAP_START(usgames_state::usgames_map)
 	AM_RANGE(0x0000, 0x1fff) AM_RAM AM_SHARE("nvram")
 	AM_RANGE(0x2000, 0x2000) AM_READ_PORT("DSW")
 	AM_RANGE(0x2010, 0x2010) AM_READ_PORT("INPUTS")
@@ -83,7 +83,7 @@ static ADDRESS_MAP_START( usgames_map, AS_PROGRAM, 8, usgames_state )
 ADDRESS_MAP_END
 
 
-static ADDRESS_MAP_START( usg185_map, AS_PROGRAM, 8, usgames_state )
+ADDRESS_MAP_START(usgames_state::usg185_map)
 	AM_RANGE(0x0000, 0x1fff) AM_RAM AM_SHARE("nvram")
 	AM_RANGE(0x2000, 0x2001) AM_DEVWRITE("aysnd", ay8912_device, address_data_w)
 	AM_RANGE(0x2400, 0x2400) AM_READ_PORT("DSW")

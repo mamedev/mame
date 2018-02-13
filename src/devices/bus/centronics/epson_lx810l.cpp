@@ -95,7 +95,7 @@ const tiny_rom_entry *epson_ap2000_device::device_rom_region() const
 //  ADDRESS_MAP( lx810l_mem )
 //-------------------------------------------------
 
-static ADDRESS_MAP_START( lx810l_mem, AS_PROGRAM, 8, epson_lx810l_device )
+ADDRESS_MAP_START(epson_lx810l_device::lx810l_mem)
 	AM_RANGE(0x0000, 0x7fff) AM_ROM /* 32k firmware */
 	AM_RANGE(0x8000, 0x9fff) AM_RAM /* 8k external RAM */
 	AM_RANGE(0xa000, 0xbfff) AM_READWRITE(fakemem_r, fakemem_w) /* fake memory, write one, set all */

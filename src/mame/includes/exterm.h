@@ -58,4 +58,8 @@ public:
 	TMS340X0_FROM_SHIFTREG_CB_MEMBER(from_shiftreg_slave);
 	uint16_t exterm_trackball_port_r(int which, uint16_t mem_mask);
 	void exterm(machine_config &config);
+	void master_map(address_map &map);
+	void slave_map(address_map &map);
+	void sound_master_map(address_map &map);
+	void sound_slave_map(address_map &map);
 };

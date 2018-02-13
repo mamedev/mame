@@ -46,22 +46,25 @@ public:
 	required_device<cpu_device> m_maincpu;
 	required_device<multipcm_device> m_ymw258;
 	void tg100(machine_config &config);
+	void tg100_io_map(address_map &map);
+	void tg100_map(address_map &map);
+	void ymw258_map(address_map &map);
 };
 
 /* all memory accesses are decoded by the gate array... */
-static ADDRESS_MAP_START( tg100_map, AS_PROGRAM, 16, tg100_state )
+ADDRESS_MAP_START(tg100_state::tg100_map)
 	AM_RANGE(0x00000000, 0x0007ffff) AM_RAM /* gate array stuff */
 	AM_RANGE(0x00080000, 0x0009ffff) AM_ROM AM_REGION("prgrom", 0x00000)
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( tg100_io_map, AS_IO, 8, tg100_state )
+ADDRESS_MAP_START(tg100_state::tg100_io_map)
 //  ADDRESS_MAP_GLOBAL_MASK(0xff)
 ADDRESS_MAP_END
 
 static INPUT_PORTS_START( tg100 )
 INPUT_PORTS_END
 
-static ADDRESS_MAP_START( ymw258_map, 0, 8, tg100_state )
+ADDRESS_MAP_START(tg100_state::ymw258_map)
 	AM_RANGE(0x000000, 0x1fffff) AM_ROM
 ADDRESS_MAP_END
 

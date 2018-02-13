@@ -46,4 +46,7 @@ public:
 	DECLARE_READ16_MEMBER( dietgo_protection_region_0_104_r );
 	DECLARE_WRITE16_MEMBER( dietgo_protection_region_0_104_w );
 	void dietgo(machine_config &config);
+	void decrypted_opcodes_map(address_map &map);
+	void dietgo_map(address_map &map);
+	void sound_map(address_map &map);
 };

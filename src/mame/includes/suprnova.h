@@ -170,4 +170,5 @@ public:
 	void sknsj(machine_config &config);
 	void sknse(machine_config &config);
 	void skns(machine_config &config);
+	void skns_map(address_map &map);
 };

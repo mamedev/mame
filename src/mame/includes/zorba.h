@@ -81,6 +81,8 @@ public:
 	DECLARE_INPUT_CHANGED_MEMBER(printer_type);
 
 	void zorba(machine_config &config);
+	void zorba_io(address_map &map);
+	void zorba_mem(address_map &map);
 private:
 	required_ioport                     m_config_port;
 
