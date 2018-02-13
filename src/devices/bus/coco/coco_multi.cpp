@@ -275,7 +275,7 @@ void coco_multipak_device::device_reset()
 
 INPUT_CHANGED_MEMBER( coco_multipak_device::switch_changed )
 {
-	if( m_block == 0 )
+	if (m_block == 0)
 		set_select(MULTI_SLOT_LOOKUP[newval]);
 }
 
