@@ -209,7 +209,7 @@ ADDRESS_MAP_START(tnx1_state::maincpu_program_map)
 ADDRESS_MAP_END
 
 ADDRESS_MAP_START(tpp2_state::maincpu_program_map)
-	AM_IMPORT_FROM(tnx1_state::maincpu_program_map)
+	AM_IMPORT_FROM(tpp1_state::maincpu_program_map)
 	//AM_RANGE(0x8000, 0x87ff) AM_NOP // 7f (normally unpopulated)
 	AM_RANGE(0x8800, 0x8bff) AM_RAM // 7h
 	AM_RANGE(0xc000, 0xdfff) AM_WRITE(background_w)
