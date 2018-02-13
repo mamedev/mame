@@ -339,7 +339,8 @@ ADDRESS_MAP_START(astrocorp_state::showhanc_map)
 	AM_RANGE( 0x08e000, 0x08e001 ) AM_READ_PORT("EEPROMIN")
 	AM_RANGE( 0x090000, 0x093fff ) AM_RAM AM_SHARE("nvram") // battery
 	AM_RANGE( 0x0a0000, 0x0a0001 ) AM_WRITE(astrocorp_screen_enable_w)
-	AM_RANGE( 0x0e0000, 0x0e0001 ) AM_READ(astrocorp_unk_r) AM_DEVWRITE8("oki", okim6295_device, write, 0xff00)
+	AM_RANGE( 0x0e0000, 0x0e0001 ) AM_READ(astrocorp_unk_r)
+	AM_RANGE( 0x0e0000, 0x0e0001 ) AM_DEVWRITE8("oki", okim6295_device, write, 0xff00)
 ADDRESS_MAP_END
 
 ADDRESS_MAP_START(astrocorp_state::skilldrp_map)

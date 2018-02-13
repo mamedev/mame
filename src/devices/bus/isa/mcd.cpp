@@ -51,7 +51,7 @@ void mcd_isa_device::device_start()
 	cdrom_image_device::device_start();
 	set_isa_device();
 	m_isa->set_dma_channel(5, this, false);
-	m_isa->install_device(0x0310, 0x0311, *this, &mcd_isa_device::map, 16);
+	m_isa->install_device(0x0310, 0x0311, *this, &mcd_isa_device::map);
 }
 
 //-------------------------------------------------
