@@ -69,10 +69,14 @@ public:
 	UPD3301_DRAW_CHARACTER_MEMBER( olyboss_display_pixels );
 
 	DECLARE_WRITE_LINE_MEMBER( hrq_w );
+	DECLARE_WRITE_LINE_MEMBER( tc_w );
 	DECLARE_READ8_MEMBER( dma_mem_r );
 	DECLARE_WRITE8_MEMBER( dma_mem_w );
 	DECLARE_READ8_MEMBER( fdcctrl_r );
 	DECLARE_WRITE8_MEMBER( fdcctrl_w );
+	DECLARE_READ8_MEMBER( fdcdma_r );
+	DECLARE_WRITE8_MEMBER( fdcdma_w );
+	DECLARE_WRITE8_MEMBER( crtcdma_w );
 	
 	void olybossd(machine_config &config);
 	void olyboss_io(address_map &map);
@@ -89,6 +93,7 @@ private:
 	u8 m_keystroke;
 	void keyboard_put(u8 data);	
 	u8 m_fdcctrl;
+	u8 m_channel;
 };
 
 //**************************************************************************
@@ -200,6 +205,15 @@ WRITE_LINE_MEMBER( olyboss_state::hrq_w )
 	m_dma->hlda_w(state);
 }
 
+WRITE_LINE_MEMBER( olyboss_state::tc_w )
+{
+	if((m_channel == 0) && state)
+	{
+		m_fdc->tc_w(1);
+		m_fdc->tc_w(0);
+	}
+}
+
 READ8_MEMBER( olyboss_state::dma_mem_r )
 {
 	address_space &program = m_maincpu->space(AS_PROGRAM);
@@ -210,6 +224,24 @@ WRITE8_MEMBER( olyboss_state::dma_mem_w )
 {
 	address_space &program = m_maincpu->space(AS_PROGRAM);
 	program.write_byte(offset, data);
+}
+
+READ8_MEMBER( olyboss_state::fdcdma_r )
+{
+	m_channel = 0;
+	return m_fdc->dma_r();
+}
+
+WRITE8_MEMBER( olyboss_state::fdcdma_w )
+{
+	m_channel = 0;
+	m_fdc->dma_w(data);
+}
+
+WRITE8_MEMBER( olyboss_state::crtcdma_w )
+{
+	m_channel = 2;
+	m_crtc->dack_w(space, offset, data, mem_mask);
 }
 
 READ8_MEMBER( olyboss_state::fdcctrl_r )
@@ -259,9 +291,10 @@ MACHINE_CONFIG_START( olyboss_state::olybossd )
 	MCFG_I8257_OUT_HRQ_CB(WRITELINE(olyboss_state, hrq_w))
 	MCFG_I8257_IN_MEMR_CB(READ8(olyboss_state, dma_mem_r))
 	MCFG_I8257_OUT_MEMW_CB(WRITE8(olyboss_state, dma_mem_w))
-	MCFG_I8257_IN_IOR_0_CB(DEVREAD8("fdc", upd765a_device, mdma_r))
-	MCFG_I8257_OUT_IOW_0_CB(DEVWRITE8("fdc", upd765a_device, mdma_w))
-	MCFG_I8257_OUT_IOW_2_CB(DEVWRITE8(UPD3301_TAG, upd3301_device, dack_w))
+	MCFG_I8257_IN_IOR_0_CB(READ8(olyboss_state, fdcdma_r))
+	MCFG_I8257_OUT_IOW_0_CB(WRITE8(olyboss_state, fdcdma_w))
+	MCFG_I8257_OUT_IOW_2_CB(WRITE8(olyboss_state, crtcdma_w))
+	MCFG_I8257_OUT_TC_CB(WRITELINE(olyboss_state, tc_w))
 
 	MCFG_DEVICE_ADD(UPD3301_TAG, UPD3301, XTAL(14'318'181))
 	MCFG_UPD3301_CHARACTER_WIDTH(8)
