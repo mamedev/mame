@@ -46,8 +46,8 @@ public:
 		m_mainram(*this, "mainram"),
 		m_spr_attr0(*this, "spr_attr0"),
 		m_spr_attr1(*this, "spr_attr1"),
-		m_spr_attr2(*this, "spr_attr2"),
-		m_spr_attr3(*this, "spr_attr3"),
+		m_spr_ypos(*this, "spr_attr2"),
+		m_spr_xpos(*this, "spr_attr3"),
 		m_spr_attr5(*this, "spr_attr5"),
 		m_spr_attr6(*this, "spr_attr6"),
 		m_spr_attr7(*this, "spr_attr7"),
@@ -103,6 +103,8 @@ public:
 	DECLARE_WRITE8_MEMBER(xavix_75ff_w);
 	DECLARE_READ8_MEMBER(xavix_75f9_r);
 
+	DECLARE_READ8_MEMBER(pal_ntsc_r);
+
 	DECLARE_READ8_MEMBER(mult_r);
 	DECLARE_WRITE8_MEMBER(mult_param_w);
 
@@ -148,8 +150,8 @@ private:
 
 	required_shared_ptr<uint8_t> m_spr_attr0;
 	required_shared_ptr<uint8_t> m_spr_attr1;
-	required_shared_ptr<uint8_t> m_spr_attr2;
-	required_shared_ptr<uint8_t> m_spr_attr3;
+	required_shared_ptr<uint8_t> m_spr_ypos;
+	required_shared_ptr<uint8_t> m_spr_xpos;
 
 	required_shared_ptr<uint8_t> m_spr_attr5;
 	required_shared_ptr<uint8_t> m_spr_attr6;
@@ -253,7 +255,11 @@ uint32_t xavix_state::screen_update( screen_device &screen, bitmap_ind16 &bitmap
 		for (int x = 0; x < 16; x++)
 		{
 			int tile = m_mainram[count++];
-			tile += 0x4900;
+			
+			int gfxbase = (m_spr_attra[1] << 8) | (m_spr_attra[0]);
+			// upper bit is often set, maybe just because it relies on mirroring, maybe other purpose
+
+			tile += (gfxbase<<1);
 
 			gfx->opaque(bitmap,cliprect,tile,0,0,0,x*16,y*16);
 		}
@@ -262,8 +268,8 @@ uint32_t xavix_state::screen_update( screen_device &screen, bitmap_ind16 &bitmap
 	//printf("frame\n");
 	for (int i = 0; i < 0x100; i++)
 	{
-		int ypos = m_spr_attr2[i];
-		int xpos = m_spr_attr3[i];
+		int ypos = m_spr_ypos[i];
+		int xpos = m_spr_xpos[i];
 		int tile = m_spr_attr6[i];
 		tile += 0x4b00;
 
@@ -281,9 +287,9 @@ uint32_t xavix_state::screen_update( screen_device &screen, bitmap_ind16 &bitmap
 		gfx->transpen(bitmap,cliprect,tile,10,0,0,xpos,ypos,0);
 
 		/*
-		if ((m_spr_attr2[i] != 0x81) && (m_spr_attr2[i] != 0x80) && (m_spr_attr2[i] != 0x00))
+		if ((m_spr_ypos[i] != 0x81) && (m_spr_ypos[i] != 0x80) && (m_spr_ypos[i] != 0x00))
 		{
-			printf("sprite with enable? %02x attr0 %02x attr1 %02x attr3 %02x attr5 %02x attr6 %02x attr7 %02x\n", m_spr_attr2[i], m_spr_attr0[i], m_spr_attr1[i], m_spr_attr3[i], m_spr_attr5[i], m_spr_attr6[i], m_spr_attr7[i] );
+			printf("sprite with enable? %02x attr0 %02x attr1 %02x attr3 %02x attr5 %02x attr6 %02x attr7 %02x\n", m_spr_ypos[i], m_spr_attr0[i], m_spr_attr1[i], m_spr_xpos[i], m_spr_attr5[i], m_spr_attr6[i], m_spr_attr7[i] );
 		}
 		*/
 	}
@@ -605,6 +611,13 @@ READ8_MEMBER(xavix_state::vid_dma_trigger_r)
 	return 0x00;
 }
 
+READ8_MEMBER(xavix_state::pal_ntsc_r)
+{
+	// only seen 0x10 checked in code
+	// in monster truck the tile base address gets set based on this, there are 2 copies of the test screen in rom, one for pal, one for ntsc, see 1854c
+	return 0x10;
+}
+
 // DATA reads from 0x8000-0xffff are banked by byte 0xff of 'ram' (this is handled in the CPU core)
 
 ADDRESS_MAP_START(xavix_state::xavix_map)
@@ -654,7 +667,7 @@ ADDRESS_MAP_START(xavix_state::xavix_map)
 	AM_RANGE(0x006ff2, 0x006ff2) AM_WRITENOP // set to 07 after clearing above things in interrupt 0
 
 	AM_RANGE(0x006ff8, 0x006ff8) AM_RAM // always seems to be a read/store or read/modify/store
-	//AM_RANGE(0x006ff9, 0x006ff9) AM_READNOP
+	AM_RANGE(0x006ff9, 0x006ff9) AM_READ(pal_ntsc_r)
 
 	// 7xxx ranges system controller?
 
