@@ -671,7 +671,7 @@ ADDRESS_MAP_START(equites_state::splndrbt_map)
 	AM_RANGE(0x080000, 0x080001) AM_READ_PORT("IN0")
 	AM_RANGE(0x0c0000, 0x0c0001) AM_READ_PORT("IN1")
 	AM_RANGE(0x0c0000, 0x0c0001) AM_SELECT(0x020000) AM_WRITE8(equites_bgcolor_w, 0xff00)
-	;map(0x180000, 0x180001).select(0x03c000).lw8("mainlatch_w", [this](address_space &space, offs_t offset, u8 data, u8 mem_mask){ m_mainlatch->write_a3(space, offset >> 13, data, mem_mask); }).umask16(0xff00);
+	;map(0x0c0000, 0x0c0001).select(0x03c000).lw8("mainlatch_w", [this](address_space &space, offs_t offset, u8 data, u8 mem_mask){ m_mainlatch->write_a3(space, offset >> 13, data, mem_mask); }).umask16(0x00ff);
 	AM_RANGE(0x100000, 0x100001) AM_WRITE(splndrbt_bg_scrollx_w)
 	AM_RANGE(0x140000, 0x140001) AM_DEVWRITE8("soundlatch", generic_latch_8_device, write, 0x00ff)
 	AM_RANGE(0x1c0000, 0x1c0001) AM_WRITE(splndrbt_bg_scrolly_w)
