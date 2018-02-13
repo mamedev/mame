@@ -643,8 +643,7 @@ ADDRESS_MAP_START(namcona1_state::namcona1_mcu_map)
 	AM_RANGE(0x200000, 0x27ffff) AM_READWRITE(na1mcu_shared_r, na1mcu_shared_w) // shared work RAM
 ADDRESS_MAP_END
 
-
-static ADDRESS_MAP_START( namcona1_c219_map, 0, 16, namcona1_state )
+ADDRESS_MAP_START(namcona1_state::namcona1_c219_map)
 	AM_RANGE(0x00000, 0x7ffff) AM_RAM AM_SHARE("workram")
 ADDRESS_MAP_END
 
