@@ -118,7 +118,7 @@ READ8_MEMBER(dragrace_state::dragrace_scanline_r)
 }
 
 
-static ADDRESS_MAP_START( dragrace_map, AS_PROGRAM, 8, dragrace_state )
+ADDRESS_MAP_START(dragrace_state::dragrace_map)
 	AM_RANGE(0x0080, 0x00ff) AM_RAM
 	AM_RANGE(0x0800, 0x083f) AM_READ(dragrace_input_r)
 	AM_RANGE(0x0900, 0x0907) AM_DEVWRITE("latch_f5", addressable_latch_device, write_d0)

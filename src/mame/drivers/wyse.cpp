@@ -40,16 +40,18 @@ public:
 	{ }
 
 void wyse(machine_config &config);
+void io_map(address_map &map);
+void mem_map(address_map &map);
 private:
 //  required_device<cpu_device> m_maincpu;
 };
 
-static ADDRESS_MAP_START( mem_map, AS_PROGRAM, 8, wyse_state )
+ADDRESS_MAP_START(wyse_state::mem_map)
 	AM_RANGE(0x0000, 0x1fff) AM_ROM
 	AM_RANGE(0xc000, 0xffff) AM_RAM AM_SHARE("videoram")
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( io_map, AS_IO, 8, wyse_state )
+ADDRESS_MAP_START(wyse_state::io_map)
 ADDRESS_MAP_END
 
 static INPUT_PORTS_START( wyse )

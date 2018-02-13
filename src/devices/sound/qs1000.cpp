@@ -137,12 +137,12 @@ DEFINE_DEVICE_TYPE(QS1000, qs1000_device, "qs1000", "QS1000")
 //  GLOBAL VARIABLES
 //**************************************************************************
 
-static ADDRESS_MAP_START( qs1000_prg_map, AS_PROGRAM, 8, qs1000_device )
+ADDRESS_MAP_START(qs1000_device::qs1000_prg_map)
 	AM_RANGE(0x0000, 0x7fff) AM_ROM
 ADDRESS_MAP_END
 
 
-static ADDRESS_MAP_START( qs1000_io_map, AS_IO, 8, qs1000_device )
+ADDRESS_MAP_START(qs1000_device::qs1000_io_map)
 	AM_RANGE(0x0000, 0x00ff) AM_RAM
 	AM_RANGE(0x0200, 0x0211) AM_WRITE(wave_w)
 	AM_RANGE(MCS51_PORT_P1, MCS51_PORT_P1) AM_READWRITE(p1_r, p1_w)

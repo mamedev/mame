@@ -15,7 +15,7 @@
 
 DEFINE_DEVICE_TYPE(POWERVR2, powervr2_device, "powervr2", "PowerVR 2")
 
-DEVICE_ADDRESS_MAP_START(ta_map, 32, powervr2_device)
+ADDRESS_MAP_START(powervr2_device::ta_map)
 	AM_RANGE(0x0000, 0x0003) AM_READ(     id_r)
 	AM_RANGE(0x0004, 0x0007) AM_READ(     revision_r)
 	AM_RANGE(0x0008, 0x000b) AM_READWRITE(softreset_r,        softreset_w)
@@ -89,7 +89,7 @@ DEVICE_ADDRESS_MAP_START(ta_map, 32, powervr2_device)
 	AM_RANGE(0x1000, 0x1fff) AM_READWRITE(palette_r,          palette_w)
 ADDRESS_MAP_END
 
-DEVICE_ADDRESS_MAP_START(pd_dma_map, 32, powervr2_device)
+ADDRESS_MAP_START(powervr2_device::pd_dma_map)
 	AM_RANGE(0x00,   0x03)   AM_READWRITE(sb_pdstap_r,        sb_pdstap_w)
 	AM_RANGE(0x04,   0x07)   AM_READWRITE(sb_pdstar_r,        sb_pdstar_w)
 	AM_RANGE(0x08,   0x0b)   AM_READWRITE(sb_pdlen_r,         sb_pdlen_w)

@@ -45,6 +45,7 @@ public:
 
 	uint8_t data_r();
 
+	void abc80_keyboard_io(address_map &map);
 protected:
 	// device-level overrides
 	virtual void device_start() override;

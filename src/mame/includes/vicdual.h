@@ -192,6 +192,37 @@ public:
 	void alphaho(machine_config &config);
 	void tranqgun(machine_config &config);
 	void tranqgun_audio(machine_config &config);
+	void alphaho_io_map(address_map &map);
+	void brdrline_io_map(address_map &map);
+	void carhntds_dualgame_map(address_map &map);
+	void carhntds_io_map(address_map &map);
+	void carnival_io_map(address_map &map);
+	void depthch_io_map(address_map &map);
+	void depthch_map(address_map &map);
+	void digger_io_map(address_map &map);
+	void frogs_io_map(address_map &map);
+	void frogs_map(address_map &map);
+	void headon2_io_map(address_map &map);
+	void headon2_map(address_map &map);
+	void headon_io_map(address_map &map);
+	void headon_map(address_map &map);
+	void headonn_io_map(address_map &map);
+	void heiankyo_io_map(address_map &map);
+	void invds_io_map(address_map &map);
+	void invho2_io_map(address_map &map);
+	void invinco_io_map(address_map &map);
+	void invinco_map(address_map &map);
+	void mboard_map(address_map &map);
+	void pulsar_io_map(address_map &map);
+	void safari_io_map(address_map &map);
+	void safari_map(address_map &map);
+	void samurai_io_map(address_map &map);
+	void samurai_map(address_map &map);
+	void spacetrk_io_map(address_map &map);
+	void sspacaho_io_map(address_map &map);
+	void sspaceat_io_map(address_map &map);
+	void tranqgun_io_map(address_map &map);
+	void vicdual_dualgame_map(address_map &map);
 };
 
 class nsub_state : public vicdual_state
@@ -221,4 +252,6 @@ public:
 
 	virtual pen_t choose_pen(uint8_t x, uint8_t y, pen_t back_pen) override;
 	void nsub(machine_config &config);
+	void nsub_io_map(address_map &map);
+	void nsub_map(address_map &map);
 };

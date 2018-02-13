@@ -44,7 +44,7 @@ public:
 	// construction/destruction
 	imagetek_i4100_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
-	DECLARE_ADDRESS_MAP(map, 16);
+	void map(address_map &map);
 
 	static void static_set_gfxdecode_tag(device_t &device, const char *tag);
 	static void static_set_tmap_xoffsets(device_t &device, int x1, int x2, int x3);
@@ -187,7 +187,7 @@ public:
 	// construction/destruction
 	imagetek_i4220_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
-	DECLARE_ADDRESS_MAP(v2_map, 16);
+	void v2_map(address_map &map);
 
 	// needed by Blazing Tornado / Grand Striker 2 for mixing with PSAC
 	// (it's unknown how the chip enables external sync)
@@ -203,7 +203,7 @@ public:
 	// construction/destruction
 	imagetek_i4300_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
-	DECLARE_ADDRESS_MAP(v3_map, 16);
+	void v3_map(address_map &map);
 
 
 protected:

@@ -160,6 +160,10 @@ public:
 	INTERRUPT_GEN_MEMBER(main_irq);
 	INTERRUPT_GEN_MEMBER(sound_irq);
 	void sub(machine_config &config);
+	void subm_io(address_map &map);
+	void subm_map(address_map &map);
+	void subm_sound_io(address_map &map);
+	void subm_sound_map(address_map &map);
 };
 
 void sub_state::machine_start()
@@ -257,7 +261,7 @@ WRITE_LINE_MEMBER(sub_state::int_mask_w)
 		m_maincpu->set_input_line(0, CLEAR_LINE);
 }
 
-static ADDRESS_MAP_START( subm_map, AS_PROGRAM, 8, sub_state )
+ADDRESS_MAP_START(sub_state::subm_map)
 	AM_RANGE(0x0000, 0xafff) AM_ROM
 	AM_RANGE(0xb000, 0xbfff) AM_RAM
 	AM_RANGE(0xc000, 0xc3ff) AM_RAM AM_SHARE("attr")
@@ -282,18 +286,18 @@ WRITE8_MEMBER(sub_state::nmi_mask_w)
 		m_soundcpu->set_input_line(INPUT_LINE_NMI, CLEAR_LINE);
 }
 
-static ADDRESS_MAP_START( subm_io, AS_IO, 8, sub_state )
+ADDRESS_MAP_START(sub_state::subm_io)
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	AM_RANGE(0x00, 0x00) AM_DEVREAD("soundlatch2", generic_latch_8_device, read) AM_DEVWRITE("soundlatch", generic_latch_8_device, write) // to/from sound CPU
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( subm_sound_map, AS_PROGRAM, 8, sub_state )
+ADDRESS_MAP_START(sub_state::subm_sound_map)
 	AM_RANGE(0x0000, 0x3fff) AM_ROM
 	AM_RANGE(0x4000, 0x47ff) AM_RAM
 	AM_RANGE(0x6000, 0x6000) AM_WRITE(nmi_mask_w)
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( subm_sound_io, AS_IO, 8, sub_state )
+ADDRESS_MAP_START(sub_state::subm_sound_io)
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	AM_RANGE(0x00, 0x00) AM_DEVREAD("soundlatch", generic_latch_8_device, read) AM_DEVWRITE("soundlatch2", generic_latch_8_device, write) // to/from main CPU
 	AM_RANGE(0x40, 0x41) AM_DEVREADWRITE("ay1", ay8910_device, data_r, address_data_w)

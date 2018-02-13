@@ -248,7 +248,7 @@ READ8_MEMBER( atomeb_state::dos_r )
     ADDRESS_MAP( atom_mem )
 -------------------------------------------------*/
 
-static ADDRESS_MAP_START( atom_mem, AS_PROGRAM, 8, atom_state )
+ADDRESS_MAP_START(atom_state::atom_mem)
 	AM_RANGE(0x0000, 0x09ff) AM_RAM
 	AM_RANGE(0x0a00, 0x0a03) AM_MIRROR(0x1f8) AM_DEVICE(I8271_TAG, i8271_device, map)
 	AM_RANGE(0x0a04, 0x0a04) AM_MIRROR(0x1f8) AM_DEVREADWRITE(I8271_TAG, i8271_device, data_r, data_w)
@@ -267,7 +267,7 @@ ADDRESS_MAP_END
     ADDRESS_MAP( atomeb_mem )
 -------------------------------------------------*/
 
-static ADDRESS_MAP_START( atomeb_mem, AS_PROGRAM, 8, atomeb_state )
+ADDRESS_MAP_START(atomeb_state::atomeb_mem)
 	AM_IMPORT_FROM(atom_mem)
 	AM_RANGE(0xa000, 0xafff) AM_READ(ext_r)
 	AM_RANGE(0xbfff, 0xbfff) AM_READWRITE(eprom_r, eprom_w)
@@ -278,7 +278,7 @@ ADDRESS_MAP_END
     ADDRESS_MAP( atombb_mem )
 -------------------------------------------------*/
 
-static ADDRESS_MAP_START( atombb_mem, AS_PROGRAM, 8, atom_state )
+ADDRESS_MAP_START(atom_state::atombb_mem)
 	AM_RANGE(0x0000, 0x3fff) AM_RAM
 	AM_RANGE(0x4000, 0x57ff) AM_RAM AM_SHARE("video_ram")
 

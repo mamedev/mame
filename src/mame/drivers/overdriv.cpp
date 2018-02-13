@@ -156,7 +156,7 @@ WRITE16_MEMBER(overdriv_state::slave_irq5_assert_w)
 	m_subcpu->set_input_line(5, HOLD_LINE);
 }
 
-static ADDRESS_MAP_START( overdriv_master_map, AS_PROGRAM, 16, overdriv_state )
+ADDRESS_MAP_START(overdriv_state::overdriv_master_map)
 	AM_RANGE(0x000000, 0x03ffff) AM_ROM
 	AM_RANGE(0x040000, 0x043fff) AM_RAM                 /* work RAM */
 	AM_RANGE(0x080000, 0x080fff) AM_RAM_DEVWRITE("palette", palette_device, write16) AM_SHARE("palette")
@@ -221,7 +221,7 @@ WRITE16_MEMBER(overdriv_state::objdma_w)
 	m_k053246->k053246_w(space,5,data,mem_mask);
 }
 
-static ADDRESS_MAP_START( overdriv_slave_map, AS_PROGRAM, 16, overdriv_state )
+ADDRESS_MAP_START(overdriv_state::overdriv_slave_map)
 	AM_RANGE(0x000000, 0x03ffff) AM_ROM
 	AM_RANGE(0x080000, 0x083fff) AM_RAM /* work RAM */
 	AM_RANGE(0x0c0000, 0x0c1fff) AM_RAM //AM_DEVREADWRITE("k053250_1", k053250_device, ram_r, ram_w)
@@ -244,7 +244,7 @@ WRITE8_MEMBER(overdriv_state::sound_ack_w)
 	m_audiocpu->set_input_line(M6809_IRQ_LINE, CLEAR_LINE);
 }
 
-static ADDRESS_MAP_START( overdriv_sound_map, AS_PROGRAM, 8, overdriv_state )
+ADDRESS_MAP_START(overdriv_state::overdriv_sound_map)
 	AM_RANGE(0x0000, 0x0000) AM_WRITE(sound_ack_w)
 	// 0x012 read during explosions
 	// 0x180
@@ -255,7 +255,7 @@ static ADDRESS_MAP_START( overdriv_sound_map, AS_PROGRAM, 8, overdriv_state )
 	AM_RANGE(0x1000, 0xffff) AM_ROM
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( overdriv_k053260_map, 0, 8, overdriv_state )
+ADDRESS_MAP_START(overdriv_state::overdriv_k053260_map)
 	AM_RANGE(0x00000000, 0x001fffff) AM_ROM AM_REGION("k053260", 0)
 ADDRESS_MAP_END
 

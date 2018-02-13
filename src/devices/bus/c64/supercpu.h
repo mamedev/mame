@@ -29,6 +29,7 @@ public:
 	// construction/destruction
 	c64_supercpu_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
+	void c64_supercpu_map(address_map &map);
 protected:
 	// device-level overrides
 	virtual void device_start() override;

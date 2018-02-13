@@ -3,7 +3,7 @@
 
 #include "audio/seibu.h"
 
-class dcon_state : public driver_device
+class dcon_state : public driver_device, protected seibu_sound_common
 {
 public:
 	dcon_state(const machine_config &mconfig, device_type type, const char *tag)
@@ -61,4 +61,6 @@ public:
 	void draw_sprites( screen_device &screen, bitmap_ind16 &bitmap,const rectangle &cliprect);
 	void dcon(machine_config &config);
 	void sdgndmps(machine_config &config);
+	void dcon_map(address_map &map);
+	void sdgndmps_map(address_map &map);
 };

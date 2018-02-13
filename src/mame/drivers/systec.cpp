@@ -49,17 +49,19 @@ public:
 	{ }
 
 	void systec(machine_config &config);
+	void systec_io(address_map &map);
+	void systec_mem(address_map &map);
 private:
 	virtual void machine_reset() override;
 	required_device<cpu_device> m_maincpu;
 };
 
-static ADDRESS_MAP_START(systec_mem, AS_PROGRAM, 8, systec_state)
+ADDRESS_MAP_START(systec_state::systec_mem)
 	ADDRESS_MAP_UNMAP_HIGH
 	AM_RANGE(0x0000, 0xffff) AM_RAM AM_REGION("maincpu", 0)
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START(systec_io, AS_IO, 8, systec_state)
+ADDRESS_MAP_START(systec_state::systec_io)
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	AM_RANGE(0x68, 0x6b) // fdc?
 	AM_RANGE(0x6c, 0x6c) // motor control?

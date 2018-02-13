@@ -349,7 +349,7 @@ TIMER_DEVICE_CALLBACK_MEMBER(shadfrce_state::scanline)
 
 /* Memory Maps */
 
-static ADDRESS_MAP_START( shadfrce_map, AS_PROGRAM, 16, shadfrce_state )
+ADDRESS_MAP_START(shadfrce_state::shadfrce_map)
 	AM_RANGE(0x000000, 0x0fffff) AM_ROM
 	AM_RANGE(0x100000, 0x100fff) AM_RAM_WRITE(bg0videoram_w) AM_SHARE("bg0videoram") /* video */
 	AM_RANGE(0x101000, 0x101fff) AM_RAM
@@ -385,7 +385,7 @@ WRITE8_MEMBER(shadfrce_state::oki_bankswitch_w)
 	m_oki->set_rom_bank(data & 1);
 }
 
-static ADDRESS_MAP_START( shadfrce_sound_map, AS_PROGRAM, 8, shadfrce_state )
+ADDRESS_MAP_START(shadfrce_state::shadfrce_sound_map)
 	AM_RANGE(0x0000, 0xbfff) AM_ROM
 	AM_RANGE(0xc000, 0xc7ff) AM_RAM
 	AM_RANGE(0xc800, 0xc801) AM_DEVREADWRITE("ymsnd", ym2151_device, read, write)

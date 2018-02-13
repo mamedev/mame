@@ -82,7 +82,7 @@ private:
 	uint8_t  tco_rld, tco_tmr, tco_dat_in, tco_dat_out, tco_message1, tco_message2;
 	uint8_t  tco_wdstatus, sw_irq_gen;
 
-	DECLARE_ADDRESS_MAP(map, 32);
+	void map(address_map &map);
 };
 
 DECLARE_DEVICE_TYPE(LPC_ACPI, lpc_acpi_device)

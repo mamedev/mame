@@ -62,7 +62,7 @@ const tiny_rom_entry *comx_pl80_device::device_rom_region() const
 //  ADDRESS_MAP( comxpl80_mem )
 //-------------------------------------------------
 
-static ADDRESS_MAP_START( comxpl80_mem, AS_PROGRAM, 8, comx_pl80_device )
+ADDRESS_MAP_START(comx_pl80_device::comxpl80_mem)
 /*  AM_RANGE(0x000, 0x000) AM_READWRITE(cx005_port_a_r, cx005_port_a_w)
     AM_RANGE(0x001, 0x001) AM_READWRITE(cx005_port_b_r, cx005_port_b_w)
     AM_RANGE(0x002, 0x002) AM_READWRITE(cx005_port_c_r, cx005_port_c_w)
@@ -85,7 +85,7 @@ ADDRESS_MAP_END
 //  ADDRESS_MAP( comxpl80_io )
 //-------------------------------------------------
 
-static ADDRESS_MAP_START( comxpl80_io, AS_IO, 8, comx_pl80_device )
+ADDRESS_MAP_START(comx_pl80_device::comxpl80_io)
 	ADDRESS_MAP_UNMAP_HIGH
 	AM_RANGE(0x00, 0x00) AM_WRITE(pa_w)
 	AM_RANGE(0x01, 0x01) AM_WRITE(pb_w)

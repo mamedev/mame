@@ -73,7 +73,7 @@ public:
 	template <class Object> static devcb_base &set_xi_rd_callback(device_t &device, Object &&cb) { return downcast<tms5501_device &>(device).m_read_xi.set_callback(std::forward<Object>(cb)); }
 	template <class Object> static devcb_base &set_xo_wr_callback(device_t &device, Object &&cb) { return downcast<tms5501_device &>(device).m_write_xo.set_callback(std::forward<Object>(cb)); }
 
-	virtual DECLARE_ADDRESS_MAP(io_map, 8);
+	virtual void io_map(address_map &map);
 
 	DECLARE_WRITE_LINE_MEMBER( rcv_w );
 

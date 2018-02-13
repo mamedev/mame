@@ -271,6 +271,12 @@ public:
 	void meritm_crt250(machine_config &config);
 	void meritm_crt250_questions(machine_config &config);
 	void meritm_crt250_crt252_crt258(machine_config &config);
+	void meritm_crt250_crt258_io_map(address_map &map);
+	void meritm_crt250_io_map(address_map &map);
+	void meritm_crt250_map(address_map &map);
+	void meritm_crt250_questions_map(address_map &map);
+	void meritm_io_map(address_map &map);
+	void meritm_map(address_map &map);
 };
 
 
@@ -531,12 +537,12 @@ READ8_MEMBER(meritm_state::meritm_ds1644_r)
  *
  *************************************/
 
-static ADDRESS_MAP_START( meritm_crt250_map, AS_PROGRAM, 8, meritm_state )
+ADDRESS_MAP_START(meritm_state::meritm_crt250_map)
 	AM_RANGE(0x0000, 0xdfff) AM_ROMBANK("bank1")
 	AM_RANGE(0xe000, 0xffff) AM_RAM AM_SHARE("nvram")
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( meritm_crt250_questions_map, AS_PROGRAM, 8, meritm_state )
+ADDRESS_MAP_START(meritm_state::meritm_crt250_questions_map)
 	AM_RANGE(0x0000, 0xdfff) AM_ROMBANK("bank1")
 	AM_RANGE(0x0000, 0x0000) AM_WRITE(meritm_crt250_questions_lo_w)
 	AM_RANGE(0x0001, 0x0001) AM_WRITE(meritm_crt250_questions_hi_w)
@@ -544,7 +550,7 @@ static ADDRESS_MAP_START( meritm_crt250_questions_map, AS_PROGRAM, 8, meritm_sta
 	AM_RANGE(0xe000, 0xffff) AM_RAM AM_SHARE("nvram")
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( meritm_crt250_io_map, AS_IO, 8, meritm_state )
+ADDRESS_MAP_START(meritm_state::meritm_crt250_io_map)
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	AM_RANGE(0x10, 0x13) AM_DEVREADWRITE("v9938_0", v9938_device, read, write)
 	AM_RANGE(0x20, 0x23) AM_DEVREADWRITE("v9938_1", v9938_device, read, write)
@@ -556,7 +562,7 @@ static ADDRESS_MAP_START( meritm_crt250_io_map, AS_IO, 8, meritm_state )
 	AM_RANGE(0xff, 0xff) AM_WRITE(meritm_crt250_bank_w)
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( meritm_crt250_crt258_io_map, AS_IO, 8, meritm_state )
+ADDRESS_MAP_START(meritm_state::meritm_crt250_crt258_io_map)
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	AM_RANGE(0x10, 0x13) AM_DEVREADWRITE("v9938_0", v9938_device, read, write)
 	AM_RANGE(0x20, 0x23) AM_DEVREADWRITE("v9938_1", v9938_device, read, write)
@@ -569,13 +575,13 @@ static ADDRESS_MAP_START( meritm_crt250_crt258_io_map, AS_IO, 8, meritm_state )
 	AM_RANGE(0xff, 0xff) AM_WRITE(meritm_crt250_bank_w)
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( meritm_map, AS_PROGRAM, 8, meritm_state )
+ADDRESS_MAP_START(meritm_state::meritm_map)
 	AM_RANGE(0x0000, 0x7fff) AM_ROMBANK("bank1")
 	AM_RANGE(0x8000, 0xdfff) AM_ROMBANK("bank2")
 	AM_RANGE(0xe000, 0xffff) AM_RAMBANK("bank3") AM_SHARE("nvram")
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( meritm_io_map, AS_IO, 8, meritm_state )
+ADDRESS_MAP_START(meritm_state::meritm_io_map)
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	AM_RANGE(0x00, 0x00) AM_WRITE(meritm_psd_a15_w)
 	AM_RANGE(0x01, 0x01) AM_DEVWRITE("watchdog", watchdog_timer_device, reset_w)

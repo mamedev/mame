@@ -14,7 +14,6 @@
 #include "cpu/tms57002/tms57002.h"
 #include "sound/zsg2.h"
 
-ADDRESS_MAP_EXTERN(taitozoom_mn_map, 16);
 
 class taito_zoom_device : public device_t
 
@@ -31,6 +30,10 @@ public:
 	DECLARE_WRITE8_MEMBER(shared_ram_w);
 	DECLARE_READ8_MEMBER(tms_ctrl_r);
 	DECLARE_WRITE8_MEMBER(tms_ctrl_w);
+
+	void set_use_flash() { m_use_flash = true; }
+
+	void taitozoom_mn_map(address_map &map);
 protected:
 	// device-level overrides
 	virtual void device_start() override;
@@ -45,6 +48,7 @@ private:
 	// internal state
 	uint16_t m_reg_address;
 	uint8_t m_tms_ctrl;
+	bool m_use_flash;
 	std::unique_ptr<uint8_t[]> m_snd_shared_ram;
 };
 
@@ -52,5 +56,8 @@ DECLARE_DEVICE_TYPE(TAITO_ZOOM, taito_zoom_device)
 
 #define MCFG_TAITO_ZOOM_ADD(_tag) \
 	MCFG_DEVICE_ADD(_tag, TAITO_ZOOM, 0)
+
+#define MCFG_TAITO_ZOOM_USE_FLASH \
+	downcast<taito_zoom_device *>(device)->set_use_flash();
 
 #endif // MAME_AUDIO_TAITO_ZM_H

@@ -46,12 +46,12 @@ void mb_vcu_device::static_set_palette_tag(device_t &device, const char *tag)
 }
 
 
-static ADDRESS_MAP_START( mb_vcu_vram, 0, 8, mb_vcu_device )
+ADDRESS_MAP_START(mb_vcu_device::mb_vcu_vram)
 	AM_RANGE(0x00000,0x7ffff) AM_RAM // enough for a 256x256x4 x 2 pages of framebuffer with 4 layers (TODO: doubled for simplicity)
 ADDRESS_MAP_END
 
 
-static ADDRESS_MAP_START( mb_vcu_pal_ram, 1, 8, mb_vcu_device )
+ADDRESS_MAP_START(mb_vcu_device::mb_vcu_pal_ram)
 	AM_RANGE(0x0000, 0x00ff) AM_RAM
 	AM_RANGE(0x0200, 0x02ff) AM_RAM
 	AM_RANGE(0x0400, 0x04ff) AM_RAM
@@ -155,8 +155,8 @@ mb_vcu_device::mb_vcu_device(const machine_config &mconfig, const char *tag, dev
 	: device_t(mconfig, MB_VCU, tag, owner, clock)
 	, device_memory_interface(mconfig, *this)
 	, device_video_interface(mconfig, *this)
-	, m_videoram_space_config("videoram", ENDIANNESS_LITTLE, 8, 19, 0, nullptr, *ADDRESS_MAP_NAME(mb_vcu_vram))
-	, m_paletteram_space_config("palram", ENDIANNESS_LITTLE, 8, 16, 0, nullptr, *ADDRESS_MAP_NAME(mb_vcu_pal_ram))
+	, m_videoram_space_config("videoram", ENDIANNESS_LITTLE, 8, 19, 0, address_map_constructor(), address_map_constructor(FUNC(mb_vcu_device::mb_vcu_vram), this))
+	, m_paletteram_space_config("palram", ENDIANNESS_LITTLE, 8, 16, 0, address_map_constructor(), address_map_constructor(FUNC(mb_vcu_device::mb_vcu_pal_ram), this))
 	, m_cpu(*this, finder_base::DUMMY_TAG)
 	, m_palette(*this, finder_base::DUMMY_TAG)
 {

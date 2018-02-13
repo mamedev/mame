@@ -6,8 +6,8 @@
  *
  ****************************************************************************/
 
-#ifndef PCW16_H_
-#define PCW16_H_
+#ifndef MAME_INCLUDES_PCW16_H
+#define MAME_INCLUDES_PCW16_H
 
 #include "cpu/z80/z80.h"
 #include "machine/upd765.h"     /* FDC superio */
@@ -142,6 +142,8 @@ public:
 	void pcw16_vh_decode_mode1(bitmap_ind16 &bitmap, int x, int y, unsigned char byte);
 	void pcw16_vh_decode_mode2(bitmap_ind16 &bitmap, int x, int y, unsigned char byte);
 	void pcw16(machine_config &config);
+	void pcw16_io(address_map &map);
+	void pcw16_map(address_map &map);
 };
 
-#endif /* PCW16_H_ */
+#endif // MAME_INCLUDES_PCW16_H

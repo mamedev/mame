@@ -237,6 +237,20 @@ public:
 	void ti81(machine_config &config);
 	void ti85(machine_config &config);
 	void ti84p(machine_config &config);
+	void ti81_io(address_map &map);
+	void ti81_mem(address_map &map);
+	void ti81v2_io(address_map &map);
+	void ti82_io(address_map &map);
+	void ti83_io(address_map &map);
+	void ti83p_asic_mem(address_map &map);
+	void ti83p_banked_mem(address_map &map);
+	void ti83p_io(address_map &map);
+	void ti83pse_banked_mem(address_map &map);
+	void ti83pse_io(address_map &map);
+	void ti84p_banked_mem(address_map &map);
+	void ti85_io(address_map &map);
+	void ti86_io(address_map &map);
+	void ti86_mem(address_map &map);
 	//address_space &asic;
 };
 

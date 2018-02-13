@@ -2,8 +2,8 @@
 // copyright-holders:Curt Coder
 #pragma once
 
-#ifndef __MIKROMIKKO__
-#define __MIKROMIKKO__
+#ifndef MAME_INCLUDES_MIKROMIKKO_H
+#define MAME_INCLUDES_MIKROMIKKO_H
 
 #include "bus/rs232/rs232.h"
 #include "cpu/i8085/i8085.h"
@@ -130,6 +130,8 @@ public:
 	void mm1m6(machine_config &config);
 	void mm1m6_video(machine_config &config);
 	void mm1m7(machine_config &config);
+	void mm1_map(address_map &map);
+	void mm1_upd7220_map(address_map &map);
 };
 
 #endif

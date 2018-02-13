@@ -646,6 +646,7 @@ public:
 	void sc4_adder4(machine_config &config);
 	void sc4_no_reels(machine_config &config);
 	void sc4dmd(machine_config &config);
+	void sc4_map(address_map &map);
 protected:
 	optional_ioport_array<16> m_io_ports;
 };
@@ -668,6 +669,7 @@ public:
 	// devices
 	required_device<m68340_cpu_device> m_adder4cpu;
 	void sc4_adder4(machine_config &config);
+	void sc4_adder4_map(address_map &map);
 };
 
 

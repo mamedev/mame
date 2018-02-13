@@ -22,9 +22,10 @@ public:
 
 
 	void set_gfxregion(int region) { m_gfxregion = region; };
-	void draw_sprites( bitmap_ind16 &bitmap, const rectangle &cliprect, uint16_t* spriteram16, int pri_mask, int pri_val, int col_mask );
-	void draw_sprites_bootleg( bitmap_ind16 &bitmap, const rectangle &cliprect, uint16_t* spriteram, int pri_mask, int pri_val, int col_mask );
-	void set_pri_type( int type ) { m_priority_type = type; }
+	void draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprect, uint16_t* spriteram16, int pri_mask, int pri_val, int col_mask);
+	void draw_sprites_bootleg(bitmap_ind16 &bitmap, const rectangle &cliprect, uint16_t* spriteram, int pri_mask, int pri_val, int col_mask);
+	void set_pri_type(int type) { m_priority_type = type; }
+	void set_flip_screen(bool flip) { m_flip_screen = flip; }
 
 protected:
 	virtual void device_start() override;
@@ -33,6 +34,7 @@ protected:
 	uint8_t m_gfxregion;
 	int m_priority_type; // just so we can support the existing drivers without converting everything to pdrawgfx just yet
 	int m_ramsize;
+	bool m_flip_screen;
 
 private:
 	required_device<gfxdecode_device> m_gfxdecode;

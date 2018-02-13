@@ -46,9 +46,7 @@ protected:
 
 	virtual void device_start() override;
 	virtual void device_reset() override;
-	virtual void state_export(const device_state_entry &entry) override;
-
-	uint32_t XPC;
+	virtual offs_t pc_to_external(u16 pc) override;
 
 	uint8_t bank_i, bank_y;
 

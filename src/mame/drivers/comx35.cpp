@@ -292,7 +292,7 @@ WRITE8_MEMBER( comx35_state::io_w )
 //  ADDRESS_MAP( comx35_mem )
 //-------------------------------------------------
 
-static ADDRESS_MAP_START( comx35_mem, AS_PROGRAM, 8, comx35_state )
+ADDRESS_MAP_START(comx35_state::comx35_mem)
 	ADDRESS_MAP_UNMAP_HIGH
 	AM_RANGE(0x0000, 0xffff) AM_READWRITE(mem_r, mem_w)
 ADDRESS_MAP_END
@@ -302,7 +302,7 @@ ADDRESS_MAP_END
 //  ADDRESS_MAP( comx35_io )
 //-------------------------------------------------
 
-static ADDRESS_MAP_START( comx35_io, AS_IO, 8, comx35_state )
+ADDRESS_MAP_START(comx35_state::comx35_io)
 	ADDRESS_MAP_UNMAP_HIGH
 	AM_RANGE(0x00, 0x07) AM_READWRITE(io_r, io_w)
 ADDRESS_MAP_END

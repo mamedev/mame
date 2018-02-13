@@ -33,6 +33,7 @@ public:
 	DECLARE_READ8_MEMBER(switch_r);
 	DECLARE_WRITE8_MEMBER(latch_w);
 
+	void cpu_io_map(address_map &map);
 protected:
 	virtual void device_start() override;
 	virtual void device_reset() override;

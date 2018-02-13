@@ -76,6 +76,7 @@ public:
 	INTERRUPT_GEN_MEMBER(vbl_int);
 
 	void accomm(machine_config &config);
+	void main_map(address_map &map);
 protected:
 	// devices
 	required_device<g65816_device> m_maincpu;
@@ -633,7 +634,7 @@ WRITE_LINE_MEMBER(accomm_state::econet_clk_w)
 	m_adlc->txc_w(state);
 }
 
-static ADDRESS_MAP_START( main_map, AS_PROGRAM, 8, accomm_state )
+ADDRESS_MAP_START(accomm_state::main_map)
 	AM_RANGE(0x000000, 0x1fffff) AM_READWRITE(ram_r, ram_w)                                       /* System RAM */
 	AM_RANGE(0x200000, 0x3fffff) AM_NOP                                                           /* External expansion RAM */
 	AM_RANGE(0x400000, 0x400000) AM_NOP                                                           /* MODEM */

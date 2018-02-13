@@ -249,7 +249,7 @@ INPUT_PORTS_END
 
 
 
-static ADDRESS_MAP_START( pce_mem , AS_PROGRAM, 8, pce_state )
+ADDRESS_MAP_START(pce_state::pce_mem)
 	AM_RANGE( 0x000000, 0x0FFFFF) AM_DEVREADWRITE("cartslot", pce_cart_slot_device, read_cart, write_cart)
 	AM_RANGE( 0x100000, 0x10FFFF) AM_RAM AM_SHARE("cd_ram")
 	AM_RANGE( 0x110000, 0x1EDFFF) AM_NOP
@@ -265,12 +265,12 @@ static ADDRESS_MAP_START( pce_mem , AS_PROGRAM, 8, pce_state )
 	AM_RANGE( 0x1FF800, 0x1FFBFF) AM_READWRITE( pce_cd_intf_r, pce_cd_intf_w )
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( pce_io , AS_IO, 8, pce_state )
+ADDRESS_MAP_START(pce_state::pce_io)
 	AM_RANGE( 0x00, 0x03) AM_DEVREADWRITE( "huc6270", huc6270_device, read, write )
 ADDRESS_MAP_END
 
 
-static ADDRESS_MAP_START( sgx_mem , AS_PROGRAM, 8, pce_state )
+ADDRESS_MAP_START(pce_state::sgx_mem)
 	AM_RANGE( 0x000000, 0x0FFFFF) AM_DEVREADWRITE("cartslot", pce_cart_slot_device, read_cart, write_cart)
 	AM_RANGE( 0x100000, 0x10FFFF) AM_RAM AM_SHARE("cd_ram")
 	AM_RANGE( 0x110000, 0x1EDFFF) AM_NOP
@@ -289,7 +289,7 @@ static ADDRESS_MAP_START( sgx_mem , AS_PROGRAM, 8, pce_state )
 ADDRESS_MAP_END
 
 
-static ADDRESS_MAP_START( sgx_io , AS_IO, 8, pce_state )
+ADDRESS_MAP_START(pce_state::sgx_io)
 	AM_RANGE( 0x00, 0x03) AM_DEVREADWRITE( "huc6202", huc6202_device, io_read, io_write )
 ADDRESS_MAP_END
 

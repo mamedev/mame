@@ -428,7 +428,7 @@ WRITE16_MEMBER(dec0_state::midres_sound_w)
 
 /******************************************************************************/
 
-static ADDRESS_MAP_START( dec0_map, AS_PROGRAM, 16, dec0_state )
+ADDRESS_MAP_START(dec0_state::dec0_map)
 	AM_RANGE(0x000000, 0x05ffff) AM_ROM
 	AM_RANGE(0x240000, 0x240007) AM_DEVWRITE("tilegen1", deco_bac06_device, pf_control_0_w)                          /* text layer */
 	AM_RANGE(0x240010, 0x240017) AM_DEVWRITE("tilegen1", deco_bac06_device, pf_control_1_w)
@@ -461,14 +461,14 @@ static ADDRESS_MAP_START( dec0_map, AS_PROGRAM, 16, dec0_state )
 	AM_RANGE(0xffc000, 0xffc7ff) AM_RAM AM_SHARE("spriteram")                               /* Sprites */
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( robocop_sub_map, AS_PROGRAM, 8, dec0_state )
+ADDRESS_MAP_START(dec0_state::robocop_sub_map)
 	AM_RANGE(0x000000, 0x00ffff) AM_ROM
 	AM_RANGE(0x1f0000, 0x1f1fff) AM_RAM                                 /* Main ram */
 	AM_RANGE(0x1f2000, 0x1f3fff) AM_RAM AM_SHARE("robocop_shared")  /* Shared ram */
 	AM_RANGE(0x1ff400, 0x1ff403) AM_DEVWRITE("sub", h6280_device, irq_status_w)
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( hippodrm_sub_map, AS_PROGRAM, 8, dec0_state )
+ADDRESS_MAP_START(dec0_state::hippodrm_sub_map)
 	AM_RANGE(0x000000, 0x00ffff) AM_ROM
 	AM_RANGE(0x180000, 0x18001f) AM_RAM AM_SHARE("hippodrm_shared")
 	AM_RANGE(0x1a0000, 0x1a0007) AM_DEVWRITE("tilegen3", deco_bac06_device, pf_control0_8bit_packed_w)
@@ -569,7 +569,7 @@ READ16_MEMBER(dec0_state::slyspy_state_r)
 }
 
 
-static ADDRESS_MAP_START( slyspy_protection_map, AS_PROGRAM, 16, dec0_state )
+ADDRESS_MAP_START(dec0_state::slyspy_protection_map)
 	AM_RANGE(0x04000, 0x04001) AM_MIRROR(0x30000) AM_READ(slyspy_state_r) AM_WRITENOP
 	AM_RANGE(0x0a000, 0x0a001) AM_MIRROR(0x30000) AM_WRITE(slyspy_state_w)
 	// Default state (called by Traps 1, 3, 4, 7, C)
@@ -595,7 +595,7 @@ static ADDRESS_MAP_START( slyspy_protection_map, AS_PROGRAM, 16, dec0_state )
 	AM_RANGE(0x38000, 0x39fff) AM_DEVWRITE("tilegen2", deco_bac06_device, pf_data_w)
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( slyspy_map, AS_PROGRAM, 16, dec0_state )
+ADDRESS_MAP_START(dec0_state::slyspy_map)
 	AM_RANGE(0x000000, 0x05ffff) AM_ROM
 
 	/* The location of pf1 & pf2 can change in the 240000 - 24ffff region according to protection */
@@ -618,7 +618,7 @@ static ADDRESS_MAP_START( slyspy_map, AS_PROGRAM, 16, dec0_state )
 ADDRESS_MAP_END
 
 
-static ADDRESS_MAP_START( midres_map, AS_PROGRAM, 16, dec0_state )
+ADDRESS_MAP_START(dec0_state::midres_map)
 	AM_RANGE(0x000000, 0x07ffff) AM_ROM
 	AM_RANGE(0x100000, 0x103fff) AM_RAM AM_SHARE("ram")
 	AM_RANGE(0x120000, 0x1207ff) AM_RAM AM_SHARE("spriteram")
@@ -648,7 +648,7 @@ static ADDRESS_MAP_START( midres_map, AS_PROGRAM, 16, dec0_state )
 	AM_RANGE(0x340400, 0x3407ff) AM_DEVREADWRITE("tilegen1", deco_bac06_device, pf_rowscroll_r, pf_rowscroll_w)
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( midresb_map, AS_PROGRAM, 16, dec0_state )
+ADDRESS_MAP_START(dec0_state::midresb_map)
 	AM_IMPORT_FROM( midres_map )
 	AM_RANGE(0x160010, 0x160011) AM_WRITE(dec0_priority_w)
 	AM_RANGE(0x180000, 0x18000f) AM_READ(dec0_controls_r)
@@ -661,7 +661,7 @@ ADDRESS_MAP_END
 
 /******************************************************************************/
 
-static ADDRESS_MAP_START( dec0_s_map, AS_PROGRAM, 8, dec0_state )
+ADDRESS_MAP_START(dec0_state::dec0_s_map)
 	AM_RANGE(0x0000, 0x05ff) AM_RAM
 	AM_RANGE(0x0800, 0x0801) AM_DEVWRITE("ym1", ym2203_device, write)
 	AM_RANGE(0x1000, 0x1001) AM_DEVWRITE("ym2", ym3812_device, write)
@@ -671,7 +671,7 @@ static ADDRESS_MAP_START( dec0_s_map, AS_PROGRAM, 8, dec0_state )
 ADDRESS_MAP_END
 
 /* Physical memory map (21 bits) */
-static ADDRESS_MAP_START( slyspy_s_map, AS_PROGRAM, 8, dec0_state )
+ADDRESS_MAP_START(dec0_state::slyspy_s_map)
 	AM_RANGE(0x000000, 0x00ffff) AM_ROM
 	AM_RANGE(0x080000, 0x0fffff) AM_DEVICE("sndprotect", address_map_bank_device, amap8 )
 	AM_RANGE(0x1f0000, 0x1f1fff) AM_RAMBANK("bank8")
@@ -700,7 +700,7 @@ READ8_MEMBER(dec0_state::slyspy_sound_state_reset_r)
 	return 0xff;
 }
 
-static ADDRESS_MAP_START( slyspy_sound_protection_map, AS_PROGRAM, 8, dec0_state )
+ADDRESS_MAP_START(dec0_state::slyspy_sound_protection_map)
 	AM_RANGE(0x020000, 0x020001) AM_MIRROR(0x180000) AM_READ(slyspy_sound_state_r) /* Protection counter */
 	AM_RANGE(0x050000, 0x050001) AM_MIRROR(0x180000) AM_READ(slyspy_sound_state_reset_r)
 	// state 0
@@ -726,7 +726,7 @@ static ADDRESS_MAP_START( slyspy_sound_protection_map, AS_PROGRAM, 8, dec0_state
 ADDRESS_MAP_END
 
 
-static ADDRESS_MAP_START( midres_s_map, AS_PROGRAM, 8, dec0_state )
+ADDRESS_MAP_START(dec0_state::midres_s_map)
 	AM_RANGE(0x000000, 0x00ffff) AM_ROM
 	AM_RANGE(0x108000, 0x108001) AM_DEVWRITE("ym2", ym3812_device, write)
 	AM_RANGE(0x118000, 0x118001) AM_DEVWRITE("ym1", ym2203_device, write)
@@ -766,7 +766,7 @@ WRITE16_MEMBER( dec0_automat_state::automat_palette_w )
 
 
 
-static ADDRESS_MAP_START( automat_map, AS_PROGRAM, 16, dec0_automat_state )
+ADDRESS_MAP_START(dec0_automat_state::automat_map)
 	AM_RANGE(0x000000, 0x05ffff) AM_ROM
 
 	AM_RANGE(0x240000, 0x240007) AM_RAM         /* text layer */
@@ -805,7 +805,7 @@ static ADDRESS_MAP_START( automat_map, AS_PROGRAM, 16, dec0_automat_state )
 	AM_RANGE(0xffc000, 0xffcfff) AM_RAM AM_SHARE("spriteram")           /* Sprites */
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( secretab_map, AS_PROGRAM, 16, dec0_automat_state )
+ADDRESS_MAP_START(dec0_automat_state::secretab_map)
 	AM_RANGE(0x000000, 0x05ffff) AM_ROM
 //  AM_RANGE(0x240000, 0x240007) AM_DEVWRITE("tilegen2", deco_bac06_device, pf_control_0_w)
 //  AM_RANGE(0x240010, 0x240017) AM_DEVWRITE("tilegen2", deco_bac06_device, pf_control_1_w)
@@ -833,7 +833,7 @@ static ADDRESS_MAP_START( secretab_map, AS_PROGRAM, 16, dec0_automat_state )
 ADDRESS_MAP_END
 
 
-static ADDRESS_MAP_START( automat_s_map, AS_PROGRAM, 8, dec0_automat_state )
+ADDRESS_MAP_START(dec0_automat_state::automat_s_map)
 	AM_RANGE(0x0000, 0x7fff) AM_ROM
 	AM_RANGE(0x8000, 0xbfff) AM_ROMBANK("soundbank")
 	AM_RANGE(0xc000, 0xc7ff) AM_RAM
@@ -845,7 +845,7 @@ static ADDRESS_MAP_START( automat_s_map, AS_PROGRAM, 8, dec0_automat_state )
 	AM_RANGE(0xf000, 0xf000) AM_DEVWRITE("adpcm_select1", ls157_device, ba_w)
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( secretab_s_map, AS_PROGRAM, 8, dec0_automat_state )
+ADDRESS_MAP_START(dec0_automat_state::secretab_s_map)
 	AM_RANGE(0x0000, 0x7fff) AM_ROM
 	AM_RANGE(0x8000, 0xbfff) AM_ROMBANK("soundbank")
 	AM_RANGE(0xc000, 0xc7ff) AM_RAM
@@ -857,7 +857,7 @@ static ADDRESS_MAP_START( secretab_s_map, AS_PROGRAM, 8, dec0_automat_state )
 	AM_RANGE(0xf000, 0xf000) AM_DEVWRITE("adpcm_select1", ls157_device, ba_w)
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( mcu_io_map, AS_IO, 8, dec0_state )
+ADDRESS_MAP_START(dec0_state::mcu_io_map)
 	ADDRESS_MAP_UNMAP_HIGH
 	AM_RANGE(MCS51_PORT_P0, MCS51_PORT_P3) AM_READWRITE(dec0_mcu_port_r, dec0_mcu_port_w)
 ADDRESS_MAP_END

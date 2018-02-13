@@ -331,7 +331,7 @@ READ32_MEMBER(sega_315_5838_comp_device::doa_prot_r)
 
 	if (offset == 0x7ff8/4)
 	{
-		retval = m_protram[m_protstate+1] | m_protram[m_protstate]<<8;
+		retval = m_protram[m_protstate] | m_protram[m_protstate+1]<<8;
 		m_protstate+=2;
 		printf("doa_prot_read %08x %08x %08x\n", offset*4, retval, mem_mask);
 	}

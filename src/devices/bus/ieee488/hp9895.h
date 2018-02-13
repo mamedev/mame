@@ -56,6 +56,8 @@ public:
 	// Floppy drive interface
 	void floppy_ready_cb(floppy_image_device *floppy , int state);
 
+	void z80_io_map(address_map &map);
+	void z80_program_map(address_map &map);
 protected:
 	virtual void device_start() override;
 	virtual void device_reset() override;

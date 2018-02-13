@@ -176,7 +176,7 @@ WRITE16_MEMBER(rungun_state::palette_write)
 	cur_paldevice.set_pen_color(offset,pal5bit(r),pal5bit(g),pal5bit(b));
 }
 
-static ADDRESS_MAP_START( rungun_map, AS_PROGRAM, 16, rungun_state )
+ADDRESS_MAP_START(rungun_state::rungun_map)
 	AM_RANGE(0x000000, 0x2fffff) AM_ROM                                         // main program + data
 	AM_RANGE(0x300000, 0x3007ff) AM_READWRITE(palette_read,palette_write)
 	AM_RANGE(0x380000, 0x39ffff) AM_RAM                                         // work RAM
@@ -236,7 +236,7 @@ WRITE_LINE_MEMBER(rungun_state::k054539_nmi_gen)
 
 /* sound (this should be split into audio/xexex.c or pregx.c or so someday) */
 
-static ADDRESS_MAP_START( rungun_sound_map, AS_PROGRAM, 8, rungun_state )
+ADDRESS_MAP_START(rungun_state::rungun_sound_map)
 	AM_RANGE(0x0000, 0x7fff) AM_ROM
 	AM_RANGE(0x8000, 0xbfff) AM_ROMBANK("bank2")
 	AM_RANGE(0xc000, 0xdfff) AM_RAM
@@ -250,7 +250,7 @@ static ADDRESS_MAP_START( rungun_sound_map, AS_PROGRAM, 8, rungun_state )
 ADDRESS_MAP_END
 
 
-static ADDRESS_MAP_START( rungun_k054539_map, 0, 8, rungun_state )
+ADDRESS_MAP_START(rungun_state::rungun_k054539_map)
 	AM_RANGE(0x000000, 0x3fffff) AM_ROM AM_REGION("k054539", 0)
 ADDRESS_MAP_END
 

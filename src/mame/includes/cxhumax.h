@@ -1,7 +1,8 @@
 // license:BSD-3-Clause
 // copyright-holders:Lukasz Markowski
-#ifndef CXHUMAX_H_
-#define CXHUMAX_H_
+
+#ifndef MAME_INCLUDES_CXHUMAX_H
+#define MAME_INCLUDES_CXHUMAX_H
 
 #include "cpu/arm7/arm7.h"
 #include "cpu/arm7/arm7core.h"
@@ -166,6 +167,7 @@ public:
 	uint32_t screen_update_cxhumax(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 	TIMER_CALLBACK_MEMBER(timer_tick);
 	void cxhumax(machine_config &config);
+	void cxhumax_map(address_map &map);
 };
 
 #define INTDEST         0   // Interrupt destination (1=IRQ, 0=FIQ)
@@ -279,4 +281,4 @@ public:
 #define DRM_BCKGND_REG                  3
 #define DRM_OSD_PTR_REG                 32
 
-#endif /* CXHUMAX_H_ */
+#endif // MAME_INCLUDES_CXHUMAX_H

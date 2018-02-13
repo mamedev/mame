@@ -123,7 +123,7 @@ WRITE16_MEMBER( boogwing_state::priority_w )
 }
 
 
-static ADDRESS_MAP_START( boogwing_map, AS_PROGRAM, 16, boogwing_state )
+ADDRESS_MAP_START(boogwing_state::boogwing_map)
 	AM_RANGE(0x000000, 0x0fffff) AM_ROM
 	AM_RANGE(0x200000, 0x20ffff) AM_RAM
 
@@ -160,11 +160,11 @@ static ADDRESS_MAP_START( boogwing_map, AS_PROGRAM, 16, boogwing_state )
 	AM_RANGE(0x3c0000, 0x3c004f) AM_DEVREADWRITE("deco_ace", deco_ace_device, ace_r, ace_w)
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( decrypted_opcodes_map, AS_OPCODES, 16, boogwing_state )
+ADDRESS_MAP_START(boogwing_state::decrypted_opcodes_map)
 	AM_RANGE(0x000000, 0x0fffff) AM_ROM AM_SHARE("decrypted_opcodes")
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( audio_map, AS_PROGRAM, 8, boogwing_state )
+ADDRESS_MAP_START(boogwing_state::audio_map)
 	AM_RANGE(0x000000, 0x00ffff) AM_ROM
 	AM_RANGE(0x100000, 0x100001) AM_NOP
 	AM_RANGE(0x110000, 0x110001) AM_DEVREADWRITE("ymsnd", ym2151_device, read, write)
@@ -342,7 +342,7 @@ MACHINE_CONFIG_START(boogwing_state::boogwing)
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", M68000, MAIN_XTAL/2)   /* DE102 */
 	MCFG_CPU_PROGRAM_MAP(boogwing_map)
-	MCFG_CPU_DECRYPTED_OPCODES_MAP(decrypted_opcodes_map)
+	MCFG_CPU_OPCODES_MAP(decrypted_opcodes_map)
 	MCFG_CPU_VBLANK_INT_DRIVER("screen", boogwing_state,  irq6_line_hold)
 
 	MCFG_CPU_ADD("audiocpu", H6280, SOUND_XTAL/4)

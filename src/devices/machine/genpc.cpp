@@ -534,7 +534,7 @@ ibm5160_mb_device::ibm5160_mb_device(
 {
 }
 
-DEVICE_ADDRESS_MAP_START( map, 8, ibm5160_mb_device )
+ADDRESS_MAP_START(ibm5160_mb_device::map)
 	AM_RANGE(0x0000, 0x000f) AM_DEVREADWRITE("dma8237", am9517a_device, read, write)
 	AM_RANGE(0x0020, 0x002f) AM_DEVREADWRITE("pic8259", pic8259_device, read, write)
 	AM_RANGE(0x0040, 0x004f) AM_DEVREADWRITE("pit8253", pit8253_device, read, write)
@@ -916,7 +916,7 @@ ioport_constructor pc_noppi_mb_device::device_input_ports() const
 	return INPUT_PORTS_NAME( pc_noppi_mb );
 }
 
-DEVICE_ADDRESS_MAP_START( map, 8, pc_noppi_mb_device )
+ADDRESS_MAP_START(pc_noppi_mb_device::map)
 	AM_RANGE(0x0000, 0x000f) AM_DEVREADWRITE("dma8237", am9517a_device, read, write)
 	AM_RANGE(0x0020, 0x002f) AM_DEVREADWRITE("pic8259", pic8259_device, read, write)
 	AM_RANGE(0x0040, 0x004f) AM_DEVREADWRITE("pit8253", pit8253_device, read, write)

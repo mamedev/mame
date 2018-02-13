@@ -46,4 +46,6 @@ public:
 	void redbaron(machine_config &config);
 	void bzone(machine_config &config);
 	void bzone_audio(machine_config &config);
+	void bzone_map(address_map &map);
+	void redbaron_map(address_map &map);
 };

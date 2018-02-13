@@ -34,9 +34,10 @@ public:
 	uint32_t screen_update_hapyfish(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 	required_device<cpu_device> m_maincpu;
 	void hapyfish(machine_config &config);
+	void hapyfish_map(address_map &map);
 };
 
-static ADDRESS_MAP_START( hapyfish_map, AS_PROGRAM, 32, hapyfish_state )
+ADDRESS_MAP_START(hapyfish_state::hapyfish_map)
 	AM_RANGE(0x00000000, 0x00003fff) AM_ROM
 ADDRESS_MAP_END
 

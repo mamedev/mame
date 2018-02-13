@@ -132,6 +132,7 @@ public:
 
 	void postload();
 	void popobear(machine_config &config);
+	void popobear_mem(address_map &map);
 };
 
 
@@ -472,7 +473,7 @@ WRITE8_MEMBER(popobear_state::irq_ack_w)
 	}
 }
 
-static ADDRESS_MAP_START( popobear_mem, AS_PROGRAM, 16, popobear_state )
+ADDRESS_MAP_START(popobear_state::popobear_mem)
 	ADDRESS_MAP_UNMAP_HIGH
 	AM_RANGE(0x000000, 0x03ffff) AM_ROM
 	AM_RANGE(0x210000, 0x21ffff) AM_RAM

@@ -48,6 +48,7 @@ public:
 	DECLARE_READ8_MEMBER( rtc_data_r );
 	DECLARE_WRITE8_MEMBER( rtc_data_w );
 
+	void e01_mem(address_map &map);
 protected:
 	enum
 	{

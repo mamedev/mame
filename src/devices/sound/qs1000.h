@@ -85,6 +85,8 @@ public:
 	DECLARE_READ8_MEMBER( p3_r );
 	DECLARE_WRITE8_MEMBER( p3_w );
 
+	void qs1000_io_map(address_map &map);
+	void qs1000_prg_map(address_map &map);
 protected:
 	// device-level overrides
 	virtual const tiny_rom_entry *device_rom_region() const override;

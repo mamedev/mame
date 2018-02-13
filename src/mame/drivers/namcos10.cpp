@@ -444,6 +444,9 @@ public:
 	void ns10_gjspace(machine_config &config);
 	void ns10_nflclsfb(machine_config &config);
 	void ns10_gamshara(machine_config &config);
+	void namcos10_map(address_map &map);
+	void namcos10_memm_map(address_map &map);
+	void namcos10_memn_map(address_map &map);
 private:
 	enum {
 		I2CP_IDLE,
@@ -485,7 +488,7 @@ public:
 };
 
 
-static ADDRESS_MAP_START( namcos10_map, AS_PROGRAM, 32, namcos10_state )
+ADDRESS_MAP_START(namcos10_state::namcos10_map)
 	AM_RANGE(0x1f500000, 0x1f501fff) AM_RAM AM_SHARE("share3") /* ram? stores block numbers */
 	AM_RANGE(0x9f500000, 0x9f501fff) AM_RAM AM_SHARE("share3") /* ram? stores block numbers */
 	AM_RANGE(0xbf500000, 0xbf501fff) AM_RAM AM_SHARE("share3") /* ram? stores block numbers */
@@ -671,7 +674,7 @@ void namcos10_state::i2c_update()
 	i2c_prev_clock = clock;
 }
 
-static ADDRESS_MAP_START( namcos10_memm_map, AS_PROGRAM, 32, namcos10_state )
+ADDRESS_MAP_START(namcos10_state::namcos10_memm_map)
 	AM_IMPORT_FROM(namcos10_map)
 
 	AM_RANGE(0x1f300000, 0x1f300003) AM_WRITE16(crypto_switch_w, 0x0000ffff)
@@ -766,7 +769,7 @@ READ16_MEMBER(namcos10_state::nand_block_r)
 	return block[ offset ];
 }
 
-static ADDRESS_MAP_START( namcos10_memn_map, AS_PROGRAM, 32, namcos10_state )
+ADDRESS_MAP_START(namcos10_state::namcos10_memn_map)
 	AM_IMPORT_FROM(namcos10_map)
 
 	AM_RANGE(0x1f300000, 0x1f300003) AM_WRITE16(crypto_switch_w, 0x0000ffff)

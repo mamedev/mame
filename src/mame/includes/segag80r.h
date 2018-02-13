@@ -20,7 +20,7 @@
 
 class sega005_sound_device;
 
-class segag80r_state : public driver_device
+class segag80r_state : public segag80snd_common
 {
 public:
 	enum
@@ -29,7 +29,7 @@ public:
 	};
 
 	segag80r_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag),
+		: segag80snd_common(mconfig, type, tag),
 		m_mainram(*this, "mainram"),
 		m_videoram(*this, "videoram"),
 		m_sn1(*this, "sn1"),
@@ -177,7 +177,13 @@ public:
 	void sega005_sound_board(machine_config &config);
 	void spaceod_sound_board(machine_config &config);
 	void monsterb_sound_board(machine_config &config);
-	void sega_speech_board(machine_config &config);
+	void g80r_opcodes_map(address_map &map);
+	void main_map(address_map &map);
+	void main_portmap(address_map &map);
+	void main_ppi8255_portmap(address_map &map);
+	void sega_315_opcodes_map(address_map &map);
+	void sindbadm_portmap(address_map &map);
+	void sindbadm_sound_map(address_map &map);
 protected:
 	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr) override;
 	emu_timer *m_vblank_latch_clear_timer;

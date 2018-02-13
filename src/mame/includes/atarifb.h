@@ -102,6 +102,10 @@ public:
 	void atarifb(machine_config &config);
 	void soccer(machine_config &config);
 	void abaseb(machine_config &config);
+	void abaseb_map(address_map &map);
+	void atarifb4_map(address_map &map);
+	void atarifb_map(address_map &map);
+	void soccer_map(address_map &map);
 };
 
 /*----------- defined in audio/atarifb.c -----------*/

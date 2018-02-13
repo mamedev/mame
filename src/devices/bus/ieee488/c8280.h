@@ -34,6 +34,8 @@ public:
 	DECLARE_READ8_MEMBER( fk5_r );
 	DECLARE_WRITE8_MEMBER( fk5_w );
 
+	void c8280_fdc_mem(address_map &map);
+	void c8280_main_mem(address_map &map);
 protected:
 	// device-level overrides
 	virtual void device_start() override;

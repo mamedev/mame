@@ -77,6 +77,7 @@ public:
 	required_device<screen_device> m_screen;
 	required_device<palette_device> m_palette;
 	void pzletime(machine_config &config);
+	void pzletime_map(address_map &map);
 };
 
 
@@ -232,7 +233,7 @@ CUSTOM_INPUT_MEMBER(pzletime_state::ticket_status_r)
 	return (m_ticket && !(m_screen->frame_number() % 128));
 }
 
-static ADDRESS_MAP_START( pzletime_map, AS_PROGRAM, 16, pzletime_state )
+ADDRESS_MAP_START(pzletime_state::pzletime_map)
 	AM_RANGE(0x000000, 0x3fffff) AM_ROM
 	AM_RANGE(0x700000, 0x700005) AM_RAM_WRITE(video_regs_w) AM_SHARE("video_regs")
 	AM_RANGE(0x800000, 0x800001) AM_DEVREADWRITE8("oki", okim6295_device, read, write, 0x00ff)

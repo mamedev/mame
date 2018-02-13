@@ -494,7 +494,7 @@ WRITE_LINE_MEMBER(metro_state::vdp_blit_end_w)
 */
 
 
-static ADDRESS_MAP_START( metro_sound_map, AS_PROGRAM, 8, metro_state )
+ADDRESS_MAP_START(metro_state::metro_sound_map)
 	AM_RANGE(0x0000, 0x3fff) AM_ROM         /* External ROM */
 	AM_RANGE(0x4000, 0x7fff) AM_ROMBANK("bank1")    /* External ROM (Banked) */
 	AM_RANGE(0x8000, 0x87ff) AM_RAM         /* External RAM */
@@ -503,7 +503,7 @@ ADDRESS_MAP_END
 /*****************/
 
 
-static ADDRESS_MAP_START( ymf278_map, 0, 8, metro_state )
+ADDRESS_MAP_START(metro_state::ymf278_map)
 	AM_RANGE(0x000000, 0x27ffff) AM_ROM
 ADDRESS_MAP_END
 
@@ -544,7 +544,7 @@ READ16_MEMBER(metro_state::balcube_dsw_r)
 }
 
 
-static ADDRESS_MAP_START( balcube_map, AS_PROGRAM, 16, metro_state )
+ADDRESS_MAP_START(metro_state::balcube_map)
 	AM_RANGE(0x000000, 0x07ffff) AM_ROM                                             // ROM
 	AM_RANGE(0x300000, 0x300001) AM_DEVREAD8("ymf", ymf278b_device, read, 0x00ff)   // Sound
 	AM_RANGE(0x300000, 0x30000b) AM_DEVWRITE8("ymf", ymf278b_device, write, 0x00ff) // Sound
@@ -565,7 +565,7 @@ ADDRESS_MAP_END
 ***************************************************************************/
 
 
-static ADDRESS_MAP_START( daitoa_map, AS_PROGRAM, 16, metro_state )
+ADDRESS_MAP_START(metro_state::daitoa_map)
 	AM_RANGE(0x000000, 0x07ffff) AM_ROM                                             // ROM
 	AM_RANGE(0x100000, 0x17ffff) AM_DEVICE("vdp2", imagetek_i4220_device, v2_map )
 	AM_RANGE(0x1788a2, 0x1788a3) AM_READWRITE(metro_irq_cause_r, metro_irq_cause_w) // IRQ Cause / IRQ Acknowledge
@@ -585,7 +585,7 @@ ADDRESS_MAP_END
                                 Bang Bang Ball
 ***************************************************************************/
 
-static ADDRESS_MAP_START( bangball_map, AS_PROGRAM, 16, metro_state )
+ADDRESS_MAP_START(metro_state::bangball_map)
 	AM_RANGE(0x000000, 0x07ffff) AM_ROM                                             // ROM
 	AM_RANGE(0xb00000, 0xb00001) AM_DEVREAD8("ymf", ymf278b_device, read, 0x00ff)   // Sound
 	AM_RANGE(0xb00000, 0xb0000b) AM_DEVWRITE8("ymf", ymf278b_device, write, 0x00ff) // Sound
@@ -605,7 +605,7 @@ ADDRESS_MAP_END
                                 Battle Bubble
 ***************************************************************************/
 
-static ADDRESS_MAP_START( batlbubl_map, AS_PROGRAM, 16, metro_state )
+ADDRESS_MAP_START(metro_state::batlbubl_map)
 	AM_RANGE(0x000000, 0x0fffff) AM_ROM                                             // ROM
 	AM_RANGE(0x100000, 0x17ffff) AM_DEVICE("vdp2", imagetek_i4220_device, v2_map)
 	AM_RANGE(0x1788a2, 0x1788a3) AM_READWRITE(metro_irq_cause_r,metro_irq_cause_w)  // IRQ Cause / IRQ Acknowledge
@@ -626,7 +626,7 @@ ADDRESS_MAP_END
                              Mouse Shooter GoGo
 ***************************************************************************/
 
-static ADDRESS_MAP_START( msgogo_map, AS_PROGRAM, 16, metro_state )
+ADDRESS_MAP_START(metro_state::msgogo_map)
 	AM_RANGE(0x000000, 0x07ffff) AM_ROM                                             // ROM
 	AM_RANGE(0x100000, 0x17ffff) AM_DEVICE("vdp2", imagetek_i4220_device, v2_map)
 	AM_RANGE(0x1788a2, 0x1788a3) AM_READWRITE(metro_irq_cause_r,metro_irq_cause_w)  // IRQ Cause / IRQ Acknowledge
@@ -645,7 +645,7 @@ ADDRESS_MAP_END
                                 Daitoride
 ***************************************************************************/
 
-static ADDRESS_MAP_START( daitorid_map, AS_PROGRAM, 16, metro_state )
+ADDRESS_MAP_START(metro_state::daitorid_map)
 	AM_RANGE(0x000000, 0x03ffff) AM_ROM                                             // ROM
 	AM_RANGE(0x400000, 0x47ffff) AM_DEVICE("vdp2", imagetek_i4220_device, v2_map)
 	AM_RANGE(0x4788a2, 0x4788a3) AM_READWRITE(metro_irq_cause_r, metro_irq_cause_w) // IRQ Cause / IRQ Acknowledge
@@ -664,7 +664,7 @@ ADDRESS_MAP_END
                                 Dharma Doujou
 ***************************************************************************/
 
-static ADDRESS_MAP_START( dharma_map, AS_PROGRAM, 16, metro_state )
+ADDRESS_MAP_START(metro_state::dharma_map)
 	AM_RANGE(0x000000, 0x03ffff) AM_ROM                                             // ROM
 	AM_RANGE(0x400000, 0x40ffff) AM_RAM AM_MIRROR(0x0f0000)                         // RAM (mirrored)
 	AM_RANGE(0x800000, 0x87ffff) AM_DEVICE("vdp2", imagetek_i4220_device, v2_map)
@@ -683,7 +683,7 @@ ADDRESS_MAP_END
                                 Karate Tournament
 ***************************************************************************/
 
-static ADDRESS_MAP_START( karatour_map, AS_PROGRAM, 16, metro_state )
+ADDRESS_MAP_START(metro_state::karatour_map)
 	AM_RANGE(0x000000, 0x07ffff) AM_ROM                                             // ROM
 	AM_RANGE(0x400000, 0x400001) AM_READWRITE(metro_soundstatus_r, metro_soundstatus_w) // From Sound CPU
 	AM_RANGE(0x400002, 0x400003) AM_READ_PORT("IN0")                                // Inputs
@@ -706,7 +706,7 @@ ADDRESS_MAP_END
 
 /* same limited tilemap access as karatour */
 
-static ADDRESS_MAP_START( kokushi_map, AS_PROGRAM, 16, metro_state )
+ADDRESS_MAP_START(metro_state::kokushi_map)
 	AM_RANGE(0x000000, 0x07ffff) AM_ROM                                             // ROM
 	AM_RANGE(0x700000, 0x70ffff) AM_RAM AM_MIRROR(0x0f0000)                         // RAM (mirrored)
 	AM_RANGE(0x800000, 0x87ffff) AM_DEVICE("vdp2", imagetek_i4220_device, v2_map)
@@ -724,7 +724,7 @@ ADDRESS_MAP_END
                                 Last Fortress
 ***************************************************************************/
 
-static ADDRESS_MAP_START( lastfort_map, AS_PROGRAM, 16, metro_state )
+ADDRESS_MAP_START(metro_state::lastfort_map)
 	AM_RANGE(0x000000, 0x03ffff) AM_ROM                                             // ROM
 	AM_RANGE(0x400000, 0x40ffff) AM_RAM AM_MIRROR(0x0f0000)                         // RAM (mirrored)
 	AM_RANGE(0x800000, 0x87ffff) AM_DEVICE("vdp", imagetek_i4100_device, map)
@@ -744,7 +744,7 @@ ADDRESS_MAP_END
 /* the German version is halfway between lastfort and ladykill (karatour) memory maps */
 
 /* todo: clean up input reads etc. */
-static ADDRESS_MAP_START( lastforg_map, AS_PROGRAM, 16, metro_state )
+ADDRESS_MAP_START(metro_state::lastforg_map)
 	AM_RANGE(0x000000, 0x03ffff) AM_ROM                                             // ROM
 	AM_RANGE(0x400000, 0x400001) AM_READWRITE(metro_soundstatus_r, metro_soundstatus_w) // From / To Sound CPU
 	AM_RANGE(0x400002, 0x400003) AM_READ_PORT("IN0")                                // Inputs
@@ -813,7 +813,7 @@ WRITE8_MEMBER(metro_state::gakusai_eeprom_w)
 	m_eeprom->clk_write(BIT(data, 1) ? ASSERT_LINE : CLEAR_LINE );
 }
 
-static ADDRESS_MAP_START( gakusai_map, AS_PROGRAM, 16, metro_state )
+ADDRESS_MAP_START(metro_state::gakusai_map)
 	AM_RANGE(0x000000, 0x07ffff) AM_ROM                                             // ROM
 	AM_RANGE(0x200000, 0x27ffff) AM_DEVICE("vdp3", imagetek_i4300_device, v3_map )
 	AM_RANGE(0x278810, 0x27881f) AM_WRITEONLY AM_SHARE("irq_levels")                // IRQ Levels
@@ -838,7 +838,7 @@ ADDRESS_MAP_END
                                 Mahjong Gakuensai 2
 ***************************************************************************/
 
-static ADDRESS_MAP_START( gakusai2_map, AS_PROGRAM, 16, metro_state )
+ADDRESS_MAP_START(metro_state::gakusai2_map)
 	AM_RANGE(0x000000, 0x07ffff) AM_ROM                                             // ROM
 	AM_RANGE(0x600000, 0x67ffff) AM_DEVICE("vdp3", imagetek_i4300_device, v3_map)
 	AM_RANGE(0x678810, 0x67881f) AM_WRITEONLY AM_SHARE("irq_levels")                // IRQ Levels
@@ -888,7 +888,7 @@ WRITE8_MEMBER(metro_state::dokyusp_eeprom_reset_w)
 	m_eeprom->cs_write(BIT(data, 0) ? ASSERT_LINE : CLEAR_LINE);
 }
 
-static ADDRESS_MAP_START( dokyusp_map, AS_PROGRAM, 16, metro_state )
+ADDRESS_MAP_START(metro_state::dokyusp_map)
 	AM_RANGE(0x000000, 0x03ffff) AM_ROM                                             // ROM
 	AM_RANGE(0x200000, 0x27ffff) AM_DEVICE("vdp3", imagetek_i4300_device, v3_map)
 	AM_RANGE(0x278810, 0x27881f) AM_WRITEONLY AM_SHARE("irq_levels")                // IRQ Levels
@@ -913,7 +913,7 @@ ADDRESS_MAP_END
                             Mahjong Doukyuusei
 ***************************************************************************/
 
-static ADDRESS_MAP_START( dokyusei_map, AS_PROGRAM, 16, metro_state )
+ADDRESS_MAP_START(metro_state::dokyusei_map)
 	AM_RANGE(0x000000, 0x03ffff) AM_ROM                                             // ROM
 	AM_RANGE(0x400000, 0x47ffff) AM_DEVICE("vdp3", imagetek_i4300_device, v3_map)
 	AM_RANGE(0x478810, 0x47881f) AM_WRITEONLY AM_SHARE("irq_levels")                // IRQ Levels
@@ -940,7 +940,7 @@ ADDRESS_MAP_END
                                 Pang Pom's
 ***************************************************************************/
 
-static ADDRESS_MAP_START( pangpoms_map, AS_PROGRAM, 16, metro_state )
+ADDRESS_MAP_START(metro_state::pangpoms_map)
 	AM_RANGE(0x000000, 0x03ffff) AM_ROM                                             // ROM
 	AM_RANGE(0x400000, 0x47ffff) AM_DEVICE("vdp", imagetek_i4100_device, map)
 	AM_RANGE(0x4788a2, 0x4788a3) AM_READWRITE(metro_irq_cause_r,metro_irq_cause_w)  // IRQ Cause / IRQ Acknowledge
@@ -962,7 +962,7 @@ ADDRESS_MAP_END
                                 Poitto!
 ***************************************************************************/
 
-static ADDRESS_MAP_START( poitto_map, AS_PROGRAM, 16, metro_state )
+ADDRESS_MAP_START(metro_state::poitto_map)
 	AM_RANGE(0x000000, 0x03ffff) AM_ROM                                             // ROM
 	AM_RANGE(0x400000, 0x40ffff) AM_RAM AM_MIRROR(0x0f0000)                         // RAM (mirrored)
 	AM_RANGE(0x800000, 0x800001) AM_READ_PORT("IN0") AM_WRITE(metro_soundstatus_w)  // To Sound CPU
@@ -981,7 +981,7 @@ ADDRESS_MAP_END
                                 Sky Alert
 ***************************************************************************/
 
-static ADDRESS_MAP_START( skyalert_map, AS_PROGRAM, 16, metro_state )
+ADDRESS_MAP_START(metro_state::skyalert_map)
 	AM_RANGE(0x000000, 0x03ffff) AM_ROM                                             // ROM
 	AM_RANGE(0x400000, 0x400001) AM_READWRITE(metro_soundstatus_r,metro_soundstatus_w)  // From / To Sound CPU
 	AM_RANGE(0x400002, 0x400003) AM_READNOP AM_WRITE(metro_coin_lockout_1word_w)    // Coin Lockout
@@ -1003,7 +1003,7 @@ ADDRESS_MAP_END
                                 Pururun
 ***************************************************************************/
 
-static ADDRESS_MAP_START( pururun_map, AS_PROGRAM, 16, metro_state )
+ADDRESS_MAP_START(metro_state::pururun_map)
 	AM_RANGE(0x000000, 0x07ffff) AM_ROM                                             // ROM
 	AM_RANGE(0x400000, 0x400001) AM_READ_PORT("IN0") AM_WRITE(metro_soundstatus_w)  // To Sound CPU
 	AM_RANGE(0x400002, 0x400003) AM_READ_PORT("IN1")                                //
@@ -1022,7 +1022,7 @@ ADDRESS_MAP_END
                             Toride II Adauchi Gaiden
 ***************************************************************************/
 
-static ADDRESS_MAP_START( toride2g_map, AS_PROGRAM, 16, metro_state )
+ADDRESS_MAP_START(metro_state::toride2g_map)
 	AM_RANGE(0x000000, 0x07ffff) AM_ROM                                             // ROM
 	AM_RANGE(0x400000, 0x40ffff) AM_RAM AM_MIRROR(0x0f0000)                         // RAM (mirrored)
 	AM_RANGE(0x800000, 0x800001) AM_READ_PORT("IN0") AM_WRITE(metro_soundstatus_w)  // Watchdog (R)? / To Sound CPU (W)
@@ -1056,20 +1056,20 @@ WRITE8_MEMBER(metro_state::blzntrnd_sh_bankswitch_w)
 	membank("bank1")->set_base(&RAM[bankaddress]);
 }
 
-static ADDRESS_MAP_START( blzntrnd_sound_map, AS_PROGRAM, 8, metro_state )
+ADDRESS_MAP_START(metro_state::blzntrnd_sound_map)
 	AM_RANGE(0x0000, 0x7fff) AM_ROM
 	AM_RANGE(0x8000, 0xbfff) AM_ROMBANK("bank1")
 	AM_RANGE(0xe000, 0xffff) AM_RAM
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( blzntrnd_sound_io_map, AS_IO, 8, metro_state )
+ADDRESS_MAP_START(metro_state::blzntrnd_sound_io_map)
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	AM_RANGE(0x00, 0x00) AM_WRITE(blzntrnd_sh_bankswitch_w)
 	AM_RANGE(0x40, 0x40) AM_DEVREAD("soundlatch", generic_latch_8_device, read) AM_WRITENOP
 	AM_RANGE(0x80, 0x83) AM_DEVREADWRITE("ymsnd", ym2610_device, read, write)
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( blzntrnd_map, AS_PROGRAM, 16, metro_state )
+ADDRESS_MAP_START(metro_state::blzntrnd_map)
 	AM_RANGE(0x000000, 0x1fffff) AM_ROM                                             // ROM
 	AM_RANGE(0x200000, 0x27ffff) AM_DEVICE("vdp2", imagetek_i4220_device, v2_map)
 	AM_RANGE(0x2788a2, 0x2788a3) AM_READWRITE(metro_irq_cause_r,metro_irq_cause_w)  // IRQ Cause / IRQ Acknowledge
@@ -1097,7 +1097,7 @@ WRITE8_MEMBER(metro_state::mouja_sound_rombank_w)
 	membank("okibank")->set_entry((data >> 3) & 0x07);
 }
 
-static ADDRESS_MAP_START( mouja_map, AS_PROGRAM, 16, metro_state )
+ADDRESS_MAP_START(metro_state::mouja_map)
 	AM_RANGE(0x000000, 0x07ffff) AM_ROM                                             // ROM
 	AM_RANGE(0x400000, 0x47ffff) AM_DEVICE("vdp3", imagetek_i4300_device, v3_map)
 	AM_RANGE(0x478810, 0x47881f) AM_WRITEONLY AM_SHARE("irq_levels")                // IRQ Levels
@@ -1116,7 +1116,7 @@ static ADDRESS_MAP_START( mouja_map, AS_PROGRAM, 16, metro_state )
 	AM_RANGE(0xf00000, 0xf0ffff) AM_RAM AM_MIRROR(0x0f0000)                         // RAM (mirrored)
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( mouja_okimap, 0, 8, metro_state )
+ADDRESS_MAP_START(metro_state::mouja_okimap)
 	AM_RANGE(0x00000, 0x1ffff) AM_ROM
 	AM_RANGE(0x20000, 0x3ffff) AM_ROMBANK("okibank")
 ADDRESS_MAP_END
@@ -1213,7 +1213,7 @@ WRITE16_MEMBER(metro_state::puzzlet_irq_enable_w)
 
 
 // H8/3007 CPU
-static ADDRESS_MAP_START( puzzlet_map, AS_PROGRAM, 16, metro_state )
+ADDRESS_MAP_START(metro_state::puzzlet_map)
 	AM_RANGE(0x000000, 0x1fffff) AM_ROM
 	AM_RANGE(0x430000, 0x433fff) AM_RAM
 	AM_RANGE(0x470000, 0x47dfff) AM_RAM
@@ -1241,7 +1241,7 @@ WRITE16_MEMBER(metro_state::puzzlet_portb_w)
 //  popmessage("PORTB %02x", data);
 }
 
-static ADDRESS_MAP_START( puzzlet_io_map, AS_IO, 16, metro_state )
+ADDRESS_MAP_START(metro_state::puzzlet_io_map)
 	AM_RANGE(h8_device::PORT_7,   h8_device::PORT_7) AM_READ_PORT("IN2")
 	AM_RANGE(h8_device::PORT_B,   h8_device::PORT_B) AM_READ_PORT("DSW0") AM_WRITE(puzzlet_portb_w)
 ADDRESS_MAP_END
@@ -1284,7 +1284,7 @@ WRITE_LINE_MEMBER(metro_state::vmetal_es8712_irq)
 		m_maincpu->set_input_line(3, state);
 }
 
-static ADDRESS_MAP_START( vmetal_map, AS_PROGRAM, 16, metro_state )
+ADDRESS_MAP_START(metro_state::vmetal_map)
 	AM_RANGE(0x000000, 0x0fffff) AM_ROM                                             // ROM
 	AM_RANGE(0x100000, 0x17ffff) AM_DEVICE("vdp2", imagetek_i4220_device, v2_map)
 	AM_RANGE(0x1788a2, 0x1788a3) AM_READWRITE(metro_irq_cause_r, metro_irq_cause_w) // IRQ Cause / IRQ Acknowledge

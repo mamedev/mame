@@ -373,7 +373,7 @@ WRITE8_MEMBER(segag80v_state::unknown_w)
  *************************************/
 
 /* complete memory map derived from schematics */
-static ADDRESS_MAP_START( main_map, AS_PROGRAM, 8, segag80v_state )
+ADDRESS_MAP_START(segag80v_state::main_map)
 	AM_RANGE(0x0000, 0x07ff) AM_ROM     /* CPU board ROM */
 	AM_RANGE(0x0800, 0xbfff) AM_ROM     /* PROM board ROM area */
 	AM_RANGE(0xc800, 0xcfff) AM_RAM_WRITE(mainram_w) AM_SHARE("mainram")
@@ -382,7 +382,7 @@ ADDRESS_MAP_END
 
 
 /* complete memory map derived from schematics */
-static ADDRESS_MAP_START( main_portmap, AS_IO, 8, segag80v_state )
+ADDRESS_MAP_START(segag80v_state::main_portmap)
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	AM_RANGE(0xbc, 0xbc) /* AM_READ ??? */
 	AM_RANGE(0xbd, 0xbe) AM_WRITE(multiply_w)

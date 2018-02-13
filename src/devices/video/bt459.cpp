@@ -24,7 +24,7 @@
 
 DEFINE_DEVICE_TYPE(BT459, bt459_device, "bt459", "Brooktree 150MHz Monolithic CMOS 256x24 Color Palette RAMDAC")
 
-DEVICE_ADDRESS_MAP_START(map, 8, bt459_device)
+ADDRESS_MAP_START(bt459_device::map)
 	AM_RANGE(0x00, 0x00) AM_READWRITE(address_lo_r, address_lo_w)
 	AM_RANGE(0x01, 0x01) AM_READWRITE(address_hi_r, address_hi_w)
 	AM_RANGE(0x02, 0x02) AM_READWRITE(register_r, register_w)

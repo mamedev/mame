@@ -37,4 +37,6 @@ public:
 	required_device<gfxdecode_device> m_gfxdecode;
 	required_device<palette_device> m_palette;
 	void markham(machine_config &config);
+	void markham_master_map(address_map &map);
+	void markham_slave_map(address_map &map);
 };

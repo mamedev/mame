@@ -65,13 +65,13 @@ static DEVICE_INPUT_DEFAULTS_START(altos8600_terminal)
 	DEVICE_INPUT_DEFAULTS( "RS232_STOPBITS", 0xff, RS232_STOPBITS_1 )
 DEVICE_INPUT_DEFAULTS_END
 
-static ADDRESS_MAP_START(ics_mem, AS_PROGRAM, 8, acs8600_ics_device)
+ADDRESS_MAP_START(acs8600_ics_device::ics_mem)
 	AM_RANGE(0x0000, 0x0fff) AM_ROM AM_REGION("icscpu", 0)
 	AM_RANGE(0x1000, 0x17ff) AM_RAM
 	AM_RANGE(0x8000, 0xffff) AM_READWRITE(hostram_r, hostram_w)
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START(ics_io, AS_PROGRAM, 8, acs8600_ics_device)
+ADDRESS_MAP_START(acs8600_ics_device::ics_io)
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	AM_RANGE(0x00, 0x03) AM_DEVREADWRITE("sio1", z80sio_device, ba_cd_r, ba_cd_w)
 	AM_RANGE(0x04, 0x07) AM_DEVREADWRITE("sio2", z80sio_device, ba_cd_r, ba_cd_w)

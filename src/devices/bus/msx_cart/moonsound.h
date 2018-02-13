@@ -23,6 +23,7 @@ public:
 	DECLARE_READ8_MEMBER(read_ymf278b_pcm);
 	DECLARE_READ8_MEMBER(read_c0);
 
+	void ymf278b_map(address_map &map);
 protected:
 	// device-level overrides
 	virtual void device_start() override;

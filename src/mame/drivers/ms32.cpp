@@ -346,7 +346,7 @@ WRITE32_MEMBER(ms32_state::coin_counter_w)
 	machine().bookkeeping().coin_counter_w(1, data & 0x20);
 }
 
-static ADDRESS_MAP_START( ms32_map, AS_PROGRAM, 32, ms32_state )
+ADDRESS_MAP_START(ms32_state::ms32_map)
 	/* RAM areas verified by testing on real hw - usually accessed at the 0xfc000000 + mirror */
 	AM_RANGE(0xc0000000, 0xc0007fff) AM_READWRITE8(ms32_nvram_r8,   ms32_nvram_w8,   0x000000ff) AM_MIRROR(0x3c1f8000)  // nvram is 8-bit wide, 0x2000 in size */
 /*  AM_RANGE(0xc0008000, 0xc01fffff) // mirrors of nvramram, handled above */
@@ -411,7 +411,7 @@ WRITE32_MEMBER(ms32_state::ms32_irq5_guess_w)
 	irq_raise(5);
 }
 
-static ADDRESS_MAP_START( f1superb_map, AS_PROGRAM, 32, ms32_state )
+ADDRESS_MAP_START(ms32_state::f1superb_map)
 	AM_IMPORT_FROM(ms32_map)
 
 	AM_RANGE(0xfd0d0000, 0xfd0d0003) AM_READ_PORT("DSW2") // MB-93159
@@ -1373,7 +1373,7 @@ WRITE8_MEMBER(ms32_state::to_main_w)
 	irq_raise(1);
 }
 
-static ADDRESS_MAP_START( ms32_sound_map, AS_PROGRAM, 8, ms32_state )
+ADDRESS_MAP_START(ms32_state::ms32_sound_map)
 	AM_RANGE(0x0000, 0x3eff) AM_ROM
 	AM_RANGE(0x3f00, 0x3f0f) AM_DEVREADWRITE("ymf", ymf271_device, read, write)
 	AM_RANGE(0x3f10, 0x3f10) AM_READWRITE(latch_r,to_main_w)

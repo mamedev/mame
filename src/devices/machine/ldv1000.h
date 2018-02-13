@@ -62,6 +62,8 @@ public:
 	uint8_t status_strobe_r() const { return (m_portc1 & 0x20) ? ASSERT_LINE : CLEAR_LINE; }
 	uint8_t command_strobe_r() const { return (m_portc1 & 0x10) ? ASSERT_LINE : CLEAR_LINE; }
 
+	void ldv1000_map(address_map &map);
+	void ldv1000_portmap(address_map &map);
 protected:
 	// timer IDs
 	enum

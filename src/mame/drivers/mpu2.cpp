@@ -50,13 +50,14 @@ public:
 	{ }
 
 	void mpu2(machine_config &config);
+	void mpu2_basemap(address_map &map);
 protected:
 
 	// devices
 	required_device<cpu_device> m_maincpu;
 };
 
-static ADDRESS_MAP_START( mpu2_basemap, AS_PROGRAM, 8, mpu2_state )
+ADDRESS_MAP_START(mpu2_state::mpu2_basemap)
 	ADDRESS_MAP_GLOBAL_MASK(0x3fff) // A14/A15 Not Connected
 	AM_RANGE(0x0000, 0x007f) AM_RAM
 	AM_RANGE(0x0800, 0x0fff) AM_ROM AM_REGION("romp1", 0)

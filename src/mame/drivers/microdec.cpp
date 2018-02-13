@@ -55,6 +55,8 @@ public:
 	DECLARE_DRIVER_INIT(microdec);
 
 	void microdec(machine_config &config);
+	void microdec_io(address_map &map);
+	void microdec_mem(address_map &map);
 private:
 	uint8_t m_portf8;
 	bool m_fdc_rdy;
@@ -120,13 +122,13 @@ WRITE8_MEMBER( microdec_state::portf8_w )
 		m_floppy->mon_w(0);
 }
 
-static ADDRESS_MAP_START(microdec_mem, AS_PROGRAM, 8, microdec_state)
+ADDRESS_MAP_START(microdec_state::microdec_mem)
 	ADDRESS_MAP_UNMAP_HIGH
 	AM_RANGE( 0x0000, 0x0fff ) AM_READ_BANK("bankr0") AM_WRITE_BANK("bankw0")
 	AM_RANGE( 0x1000, 0xffff ) AM_RAM
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START(microdec_io, AS_IO, 8, microdec_state)
+ADDRESS_MAP_START(microdec_state::microdec_io)
 	ADDRESS_MAP_UNMAP_HIGH
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	AM_RANGE(0xf5, 0xf5) AM_READ(portf5_r)

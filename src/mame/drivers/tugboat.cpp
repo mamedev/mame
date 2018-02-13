@@ -79,6 +79,7 @@ public:
 		int addr,int gfx0,int gfx1,int transparency);
 
 		void tugboat(machine_config &config);
+		void main_map(address_map &map);
 protected:
 	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr) override;
 };
@@ -232,7 +233,7 @@ void tugboat_state::machine_reset()
 }
 
 
-static ADDRESS_MAP_START( main_map, AS_PROGRAM, 8, tugboat_state )
+ADDRESS_MAP_START(tugboat_state::main_map)
 	ADDRESS_MAP_GLOBAL_MASK(0x7fff)
 	AM_RANGE(0x0000, 0x01ff) AM_RAM AM_SHARE("ram")
 	AM_RANGE(0x1060, 0x1061) AM_DEVWRITE("aysnd", ay8910_device, address_data_w)

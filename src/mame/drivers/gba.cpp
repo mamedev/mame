@@ -1237,7 +1237,7 @@ WRITE_LINE_MEMBER(gba_state::dma_vblank_callback)
 	}
 }
 
-static ADDRESS_MAP_START( gba_map, AS_PROGRAM, 32, gba_state )
+ADDRESS_MAP_START(gba_state::gba_map)
 	ADDRESS_MAP_UNMAP_HIGH // for "Fruit Mura no Doubutsu Tachi" and "Classic NES Series"
 	AM_RANGE(0x00000000, 0x00003fff) AM_ROM AM_MIRROR(0x01ffc000) AM_READ(gba_bios_r)
 	AM_RANGE(0x02000000, 0x0203ffff) AM_RAM AM_MIRROR(0xfc0000)

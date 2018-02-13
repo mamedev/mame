@@ -72,6 +72,8 @@ public:
 	DECLARE_WRITE_LINE_MEMBER(irqhandler);
 
 	void drill(machine_config &config);
+	void drill_map(address_map &map);
+
 	#ifdef UNUSED_FUNCTION
 	enum
 	{
@@ -192,7 +194,7 @@ WRITE16_MEMBER(_2mindril_state::drill_irq_w)
 	COMBINE_DATA(&m_irq_reg);
 }
 
-static ADDRESS_MAP_START( drill_map, AS_PROGRAM, 16, _2mindril_state )
+ADDRESS_MAP_START(_2mindril_state::drill_map)
 	AM_RANGE(0x000000, 0x07ffff) AM_ROM
 	AM_RANGE(0x200000, 0x20ffff) AM_RAM
 	AM_RANGE(0x300000, 0x3000ff) AM_RAM

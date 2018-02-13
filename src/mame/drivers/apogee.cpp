@@ -43,11 +43,12 @@ public:
 
 	required_device<speaker_sound_device> m_speaker;
 	void apogee(machine_config &config);
+	void apogee_mem(address_map &map);
 };
 
 
 /* Address maps */
-static ADDRESS_MAP_START(apogee_mem, AS_PROGRAM, 8, apogee_state )
+ADDRESS_MAP_START(apogee_state::apogee_mem)
 	AM_RANGE( 0x0000, 0x0fff ) AM_RAMBANK("bank1") // First bank
 	AM_RANGE( 0x1000, 0xebff ) AM_RAM  // RAM
 	AM_RANGE( 0xec00, 0xec03 ) AM_DEVREADWRITE("pit8253", pit8253_device, read, write) AM_MIRROR(0x00fc)

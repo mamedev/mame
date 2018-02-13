@@ -103,6 +103,9 @@ public:
 	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 
 	void dunhuang(machine_config &config);
+	void dunhuang_io_map(address_map &map);
+	void dunhuang_map(address_map &map);
+	void ramdac_map(address_map &map);
 protected:
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
@@ -425,7 +428,7 @@ WRITE8_MEMBER(dunhuang_state::layers_w)
                                 Memory Maps
 ***************************************************************************/
 
-static ADDRESS_MAP_START( dunhuang_map, AS_PROGRAM, 8, dunhuang_state )
+ADDRESS_MAP_START(dunhuang_state::dunhuang_map)
 	AM_RANGE( 0x0000, 0x5fff ) AM_ROM
 	AM_RANGE( 0x6000, 0x7fff ) AM_RAM
 	AM_RANGE( 0x8000, 0xffff ) AM_ROMBANK( "mainbank" )
@@ -480,7 +483,7 @@ WRITE8_MEMBER(dunhuang_state::rombank_w)
 }
 
 
-static ADDRESS_MAP_START( dunhuang_io_map, AS_IO, 8, dunhuang_state )
+ADDRESS_MAP_START(dunhuang_state::dunhuang_io_map)
 	AM_RANGE( 0x0000, 0x0000 ) AM_WRITE(pos_x_w )
 	AM_RANGE( 0x0001, 0x0001 ) AM_WRITE(pos_y_w )
 	AM_RANGE( 0x0002, 0x0004 ) AM_WRITE(tile_w )
@@ -524,7 +527,7 @@ static ADDRESS_MAP_START( dunhuang_io_map, AS_IO, 8, dunhuang_state )
 	AM_RANGE( 0x0098, 0x0098 ) AM_DEVWRITE("ay8910", ay8910_device, address_w )
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( ramdac_map, 0, 8, dunhuang_state )
+ADDRESS_MAP_START(dunhuang_state::ramdac_map)
 	AM_RANGE(0x000, 0x3ff) AM_DEVREADWRITE("ramdac", ramdac_device, ramdac_pal_r, ramdac_rgb666_w)
 ADDRESS_MAP_END
 

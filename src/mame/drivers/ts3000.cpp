@@ -22,16 +22,18 @@ public:
 	{ }
 
 void ts3000(machine_config &config);
+void io_map(address_map &map);
+void mem_map(address_map &map);
 private:
 //  required_device<cpu_device> m_maincpu;
 };
 
-static ADDRESS_MAP_START( mem_map, AS_PROGRAM, 8, ts3000_state )
+ADDRESS_MAP_START(ts3000_state::mem_map)
 	AM_RANGE(0x00000,0x0ffff) AM_RAM
 	AM_RANGE(0xfc000,0xfffff) AM_ROM AM_REGION("roms", 0)
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( io_map, AS_PROGRAM, 8, ts3000_state )
+ADDRESS_MAP_START(ts3000_state::io_map)
 ADDRESS_MAP_END
 
 static INPUT_PORTS_START( ts3000 )

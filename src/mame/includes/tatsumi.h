@@ -87,6 +87,10 @@ public:
 	DECLARE_WRITE_LINE_MEMBER(apache3_68000_reset);
 
 	void apache3(machine_config &config);
+	void apache3_68000_map(address_map &map);
+	void apache3_v20_map(address_map &map);
+	void apache3_v30_map(address_map &map);
+	void apache3_z80_map(address_map &map);
 private:
 	void draw_sky(bitmap_rgb32 &bitmap, const rectangle &cliprect, int palette_base, int start_offset);
 	void draw_ground(bitmap_rgb32 &dst, const rectangle &cliprect);
@@ -133,6 +137,9 @@ public:
 	uint32_t screen_update_roundup5(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 
 	void roundup5(machine_config &config);
+	void roundup5_68000_map(address_map &map);
+	void roundup5_v30_map(address_map &map);
+	void roundup5_z80_map(address_map &map);
 private:
 	void draw_road(bitmap_rgb32 &bitmap, const rectangle &cliprect, bitmap_ind8 &shadow_bitmap);
 
@@ -188,6 +195,11 @@ public:
 
 	void cyclwarr(machine_config &config);
 	void bigfight(machine_config &config);
+	void bigfight_68000a_map(address_map &map);
+	void bigfight_68000b_map(address_map &map);
+	void cyclwarr_68000a_map(address_map &map);
+	void cyclwarr_68000b_map(address_map &map);
+	void cyclwarr_z80_map(address_map &map);
 private:
 	required_device_array<cxd1095_device, 2> m_io;
 	required_device<generic_latch_8_device> m_soundlatch;

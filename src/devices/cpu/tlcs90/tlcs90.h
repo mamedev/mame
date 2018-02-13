@@ -78,6 +78,11 @@ public:
 	TIMER_CALLBACK_MEMBER( t90_timer_callback );
 	TIMER_CALLBACK_MEMBER( t90_timer4_callback );
 
+	void tmp90840_mem(address_map &map);
+	void tmp90841_mem(address_map &map);
+	void tmp90ph44_mem(address_map &map);
+	void tmp91640_mem(address_map &map);
+	void tmp91641_mem(address_map &map);
 protected:
 	enum _e_op {    UNKNOWN,    NOP,    EX,     EXX,    LD,     LDW,    LDA,    LDI,    LDIR,   LDD,    LDDR,   CPI,    CPIR,   CPD,    CPDR,   PUSH,   POP,    JP,     JR,     CALL,   CALLR,      RET,    RETI,   HALT,   DI,     EI,     SWI,    DAA,    CPL,    NEG,    LDAR,   RCF,    SCF,    CCF,    TSET,   BIT,    SET,    RES,    INC,    DEC,    INCX,   DECX,   INCW,   DECW,   ADD,    ADC,    SUB,    SBC,    AND,    XOR,    OR,     CP,     RLC,    RRC,    RL,     RR,     SLA,    SRA,    SLL,    SRL,    RLD,    RRD,    DJNZ,   MUL,    DIV     };
 

@@ -111,6 +111,13 @@ public:
 	void system16a_i8751(machine_config &config);
 	void system16a_fd1089b(machine_config &config);
 	void aceattaca_fd1094(machine_config &config);
+	void decrypted_opcodes_map(address_map &map);
+	void mcu_io_map(address_map &map);
+	void sound_decrypted_opcodes_map(address_map &map);
+	void sound_map(address_map &map);
+	void sound_no7751_portmap(address_map &map);
+	void sound_portmap(address_map &map);
+	void system16a_map(address_map &map);
 protected:
 	// internal types
 	typedef delegate<void ()> i8751_sim_delegate;

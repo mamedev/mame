@@ -36,6 +36,10 @@ public:
 	DECLARE_WRITE8_MEMBER(program_w);
 	DECLARE_READ8_MEMBER(rom_r);
 
+	void k230_io(address_map &map);
+	void k230_mem(address_map &map);
+	void k234_mem(address_map &map);
+	void k235_io(address_map &map);
 protected:
 	dmv_k230_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock);
 

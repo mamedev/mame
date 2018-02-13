@@ -34,12 +34,12 @@ Memo:
 #include "speaker.h"
 
 
-static ADDRESS_MAP_START( hyhoo_map, AS_PROGRAM, 8, hyhoo_state )
+ADDRESS_MAP_START(hyhoo_state::hyhoo_map)
 	AM_RANGE(0x0000, 0xefff) AM_ROM
 	AM_RANGE(0xf000, 0xffff) AM_RAM AM_SHARE("nvram")
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( hyhoo_io_map, AS_IO, 8, hyhoo_state )
+ADDRESS_MAP_START(hyhoo_state::hyhoo_io_map)
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
 //  AM_RANGE(0x00, 0x00) AM_DEVWRITE("nb1413m3", nb1413m3_device, nmi_clock_w)
 	AM_RANGE(0x00, 0x7f) AM_DEVREAD("nb1413m3", nb1413m3_device, sndrom_r)

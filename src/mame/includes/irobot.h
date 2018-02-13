@@ -105,4 +105,5 @@ public:
 	required_device<screen_device> m_screen;
 	required_device<palette_device> m_palette;
 	void irobot(machine_config &config);
+	void irobot_map(address_map &map);
 };

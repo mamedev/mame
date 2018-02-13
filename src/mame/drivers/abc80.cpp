@@ -177,7 +177,7 @@ WRITE8_MEMBER( abc80_state::csg_w )
 //  ADDRESS_MAP( abc80_mem )
 //-------------------------------------------------
 
-static ADDRESS_MAP_START( abc80_mem, AS_PROGRAM, 8, abc80_state )
+ADDRESS_MAP_START(abc80_state::abc80_mem)
 	ADDRESS_MAP_UNMAP_HIGH
 	AM_RANGE(0x0000, 0xffff) AM_READWRITE(read, write)
 ADDRESS_MAP_END
@@ -187,7 +187,7 @@ ADDRESS_MAP_END
 //  ADDRESS_MAP( abc80_io )
 //-------------------------------------------------
 
-static ADDRESS_MAP_START( abc80_io, AS_IO, 8, abc80_state )
+ADDRESS_MAP_START(abc80_state::abc80_io)
 	ADDRESS_MAP_UNMAP_HIGH
 	ADDRESS_MAP_GLOBAL_MASK(0x17)
 	AM_RANGE(0x00, 0x00) AM_DEVREADWRITE(ABCBUS_TAG, abcbus_slot_device, inp_r, out_w)

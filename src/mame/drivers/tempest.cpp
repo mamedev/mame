@@ -340,6 +340,7 @@ public:
 
 	virtual void machine_start() override;
 	void tempest(machine_config &config);
+	void main_map(address_map &map);
 };
 
 
@@ -440,7 +441,7 @@ READ8_MEMBER(tempest_state::rom_ae1f_r)
 }
 
 
-static ADDRESS_MAP_START( main_map, AS_PROGRAM, 8, tempest_state )
+ADDRESS_MAP_START(tempest_state::main_map)
 	AM_RANGE(0x0000, 0x07ff) AM_RAM
 	AM_RANGE(0x0800, 0x080f) AM_WRITEONLY AM_SHARE("colorram")
 	AM_RANGE(0x0c00, 0x0c00) AM_READ_PORT("IN0")

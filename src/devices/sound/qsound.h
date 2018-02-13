@@ -38,6 +38,8 @@ public:
 	DECLARE_WRITE8_MEMBER(qsound_w);
 	DECLARE_READ8_MEMBER(qsound_r);
 
+	void dsp16_data_map(address_map &map);
+	void dsp16_program_map(address_map &map);
 protected:
 	// device-level overrides
 	const tiny_rom_entry *device_rom_region() const override;

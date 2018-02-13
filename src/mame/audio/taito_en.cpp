@@ -197,7 +197,7 @@ WRITE16_MEMBER( taito_en_device::es5510_dsp_w )
  *
  *************************************/
 
-static ADDRESS_MAP_START( en_sound_map, AS_PROGRAM, 16, taito_en_device )
+ADDRESS_MAP_START(taito_en_device::en_sound_map)
 	AM_RANGE(0x000000, 0x00ffff) AM_RAM AM_MIRROR(0x30000) AM_SHARE("share1")
 	AM_RANGE(0x140000, 0x140fff) AM_DEVREADWRITE8("dpram", mb8421_device, right_r, right_w, 0xff00)
 	AM_RANGE(0x200000, 0x20001f) AM_DEVREADWRITE("ensoniq", es5505_device, read, write)

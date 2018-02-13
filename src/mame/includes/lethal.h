@@ -60,4 +60,7 @@ public:
 	K056832_CB_MEMBER(tile_callback);
 	void lethalej(machine_config &config);
 	void lethalen(machine_config &config);
+	void bank4000_map(address_map &map);
+	void le_main(address_map &map);
+	void le_sound(address_map &map);
 };

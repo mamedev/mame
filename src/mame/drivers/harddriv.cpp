@@ -539,7 +539,7 @@ public:
 };
 
 
-static ADDRESS_MAP_START( driver_68k_map, AS_PROGRAM, 16, harddriv_state )
+ADDRESS_MAP_START(harddriv_state::driver_68k_map)
 	ADDRESS_MAP_UNMAP_HIGH
 	AM_RANGE(0x000000, 0x0fffff) AM_ROM
 	AM_RANGE(0x600000, 0x603fff) AM_READ(hd68k_port0_r)
@@ -558,7 +558,7 @@ static ADDRESS_MAP_START( driver_68k_map, AS_PROGRAM, 16, harddriv_state )
 ADDRESS_MAP_END
 
 
-static ADDRESS_MAP_START( driver_gsp_map, AS_PROGRAM, 16, harddriv_state )
+ADDRESS_MAP_START(harddriv_state::driver_gsp_map)
 	ADDRESS_MAP_UNMAP_HIGH
 	AM_RANGE(0x00000000, 0x0000200f) AM_NOP                 /* hit during self-test */
 	AM_RANGE(0x02000000, 0x0207ffff) AM_READWRITE(hdgsp_vram_2bpp_r, hdgsp_vram_1bpp_w)
@@ -571,7 +571,7 @@ static ADDRESS_MAP_START( driver_gsp_map, AS_PROGRAM, 16, harddriv_state )
 ADDRESS_MAP_END
 
 
-static ADDRESS_MAP_START( driver_msp_map, AS_PROGRAM, 16, harddriv_state )
+ADDRESS_MAP_START(harddriv_state::driver_msp_map)
 	ADDRESS_MAP_UNMAP_HIGH
 	AM_RANGE(0x00000000, 0x000fffff) AM_RAM AM_SHARE("msp_ram")
 	AM_RANGE(0x00700000, 0x007fffff) AM_RAM AM_SHARE("msp_ram")
@@ -587,7 +587,7 @@ ADDRESS_MAP_END
  *
  *************************************/
 
-static ADDRESS_MAP_START( multisync_68k_map, AS_PROGRAM, 16, harddriv_state )
+ADDRESS_MAP_START(harddriv_state::multisync_68k_map)
 	ADDRESS_MAP_UNMAP_HIGH
 	AM_RANGE(0x000000, 0x0fffff) AM_ROM
 	AM_RANGE(0x604000, 0x607fff) AM_READWRITE(hd68k_sound_reset_r, hd68k_nwr_w)
@@ -605,7 +605,7 @@ static ADDRESS_MAP_START( multisync_68k_map, AS_PROGRAM, 16, harddriv_state )
 ADDRESS_MAP_END
 
 
-static ADDRESS_MAP_START( multisync_gsp_map, AS_PROGRAM, 16, harddriv_state )
+ADDRESS_MAP_START(harddriv_state::multisync_gsp_map)
 	ADDRESS_MAP_UNMAP_HIGH
 	AM_RANGE(0x00000000, 0x0000200f) AM_NOP                 /* hit during self-test */
 	AM_RANGE(0x02000000, 0x020fffff) AM_READWRITE(hdgsp_vram_2bpp_r, hdgsp_vram_2bpp_w)
@@ -625,7 +625,7 @@ ADDRESS_MAP_END
  *
  *************************************/
 
-static ADDRESS_MAP_START( multisync2_68k_map, AS_PROGRAM, 16, harddriv_state )
+ADDRESS_MAP_START(harddriv_state::multisync2_68k_map)
 	ADDRESS_MAP_UNMAP_HIGH
 	AM_RANGE(0x000000, 0x1fffff) AM_ROM
 	AM_RANGE(0x604000, 0x607fff) AM_WRITE(hd68k_nwr_w)
@@ -644,7 +644,7 @@ ADDRESS_MAP_END
 
 
 /* GSP is identical to original multisync */
-static ADDRESS_MAP_START( multisync2_gsp_map, AS_PROGRAM, 16, harddriv_state )
+ADDRESS_MAP_START(harddriv_state::multisync2_gsp_map)
 	ADDRESS_MAP_UNMAP_HIGH
 	AM_RANGE(0x00000000, 0x0000200f) AM_NOP                 /* hit during self-test */
 	AM_RANGE(0x02000000, 0x020fffff) AM_READWRITE(hdgsp_vram_2bpp_r, hdgsp_vram_2bpp_w)
@@ -664,14 +664,14 @@ ADDRESS_MAP_END
  *
  *************************************/
 
-static ADDRESS_MAP_START( adsp_program_map, AS_PROGRAM, 32, harddriv_state )
+ADDRESS_MAP_START(harddriv_state::adsp_program_map)
 	ADDRESS_MAP_UNMAP_HIGH
 	AM_RANGE(0x0000, 0x1fff) AM_RAM AM_SHARE("adsp_pgm_memory")
 	AM_RANGE(0x2000, 0x3fff) AM_READNOP // ROM?
 ADDRESS_MAP_END
 
 
-static ADDRESS_MAP_START( adsp_data_map, AS_DATA, 16, harddriv_state )
+ADDRESS_MAP_START(harddriv_state::adsp_data_map)
 	ADDRESS_MAP_UNMAP_HIGH
 	AM_RANGE(0x0000, 0x1fff) AM_RAM AM_SHARE("adsp_data")
 	AM_RANGE(0x2000, 0x2fff) AM_READWRITE(hdadsp_special_r, hdadsp_special_w)
@@ -685,13 +685,13 @@ ADDRESS_MAP_END
  *
  *************************************/
 
-static ADDRESS_MAP_START( ds3_program_map, AS_PROGRAM, 32, harddriv_state )
+ADDRESS_MAP_START(harddriv_state::ds3_program_map)
 	ADDRESS_MAP_UNMAP_HIGH
 	AM_RANGE(0x0000, 0x3fff) AM_RAM AM_SHARE("adsp_pgm_memory")
 ADDRESS_MAP_END
 
 
-static ADDRESS_MAP_START( ds3_data_map, AS_DATA, 16, harddriv_state )
+ADDRESS_MAP_START(harddriv_state::ds3_data_map)
 	ADDRESS_MAP_UNMAP_HIGH
 	AM_RANGE(0x0000, 0x1fff) AM_RAM AM_SHARE("adsp_data")
 	AM_RANGE(0x2000, 0x3fff) AM_READWRITE(hdds3_special_r, hdds3_special_w)
@@ -700,12 +700,12 @@ static ADDRESS_MAP_START( ds3_data_map, AS_DATA, 16, harddriv_state )
 ADDRESS_MAP_END
 
 
-static ADDRESS_MAP_START( ds3sdsp_program_map, AS_PROGRAM, 32, harddriv_state )
+ADDRESS_MAP_START(harddriv_state::ds3sdsp_program_map)
 	ADDRESS_MAP_UNMAP_HIGH
 	AM_RANGE(0x0000, 0x3fff) AM_RAM AM_SHARE("ds3sdsp_pgm")
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( ds3sdsp_data_map, AS_DATA, 16, harddriv_state )
+ADDRESS_MAP_START(harddriv_state::ds3sdsp_data_map)
 	ADDRESS_MAP_UNMAP_HIGH
 	AM_RANGE(0x2000, 0x3fff) AM_READWRITE(hdds3_sdsp_special_r, hdds3_sdsp_special_w)
 	AM_RANGE(0x3800, 0x39ff) AM_RAM                     /* internal RAM */
@@ -713,12 +713,12 @@ static ADDRESS_MAP_START( ds3sdsp_data_map, AS_DATA, 16, harddriv_state )
 ADDRESS_MAP_END
 
 
-static ADDRESS_MAP_START( ds3xdsp_program_map, AS_PROGRAM, 32, harddriv_state )
+ADDRESS_MAP_START(harddriv_state::ds3xdsp_program_map)
 	ADDRESS_MAP_UNMAP_HIGH
 	AM_RANGE(0x0000, 0x3fff) AM_RAM AM_SHARE("ds3xdsp_pgm")
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( ds3xdsp_data_map, AS_DATA, 16, harddriv_state )
+ADDRESS_MAP_START(harddriv_state::ds3xdsp_data_map)
 	ADDRESS_MAP_UNMAP_HIGH
 	AM_RANGE(0x0000, 0x1fff) AM_RAM // TODO
 	AM_RANGE(0x3800, 0x39ff) AM_RAM                     /* internal RAM */
@@ -733,7 +733,7 @@ ADDRESS_MAP_END
  *
  *************************************/
 
-static ADDRESS_MAP_START( dsk_dsp32_map, AS_PROGRAM, 32, harddriv_state )
+ADDRESS_MAP_START(harddriv_state::dsk_dsp32_map)
 	ADDRESS_MAP_UNMAP_HIGH
 	AM_RANGE(0x000000, 0x001fff) AM_RAM
 	AM_RANGE(0x600000, 0x63ffff) AM_RAM AM_SHARE("dsp32_ram")
@@ -748,7 +748,7 @@ ADDRESS_MAP_END
  *
  *************************************/
 
-static ADDRESS_MAP_START( dsk2_dsp32_map, AS_PROGRAM, 32, harddriv_state )
+ADDRESS_MAP_START(harddriv_state::dsk2_dsp32_map)
 	ADDRESS_MAP_UNMAP_HIGH
 	AM_RANGE(0x000000, 0x001fff) AM_RAM
 	AM_RANGE(0x200000, 0x23ffff) AM_RAM

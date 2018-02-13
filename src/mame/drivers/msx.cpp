@@ -539,7 +539,7 @@ PCB Layouts missing
 #include "speaker.h"
 
 
-static ADDRESS_MAP_START ( msx_memory_map, AS_PROGRAM, 8, msx_state )
+ADDRESS_MAP_START(msx_state::msx_memory_map)
 	AM_RANGE(0x0000, 0xfffe) AM_READWRITE(msx_mem_read, msx_mem_write)
 	AM_RANGE(0xffff, 0xffff) AM_READWRITE(msx_sec_slot_r, msx_sec_slot_w)
 ADDRESS_MAP_END
@@ -554,7 +554,7 @@ WRITE8_MEMBER(msx_state::msx_ay8910_w)
 }
 
 
-static ADDRESS_MAP_START ( msx_io_map, AS_IO, 8, msx_state )
+ADDRESS_MAP_START(msx_state::msx_io_map)
 	ADDRESS_MAP_UNMAP_HIGH
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	// 0x7c - 0x7d : MSX-MUSIC/FM-PAC write port. Handlers will be installed if MSX-MUSIC is present in a system
@@ -570,7 +570,7 @@ static ADDRESS_MAP_START ( msx_io_map, AS_IO, 8, msx_state )
 ADDRESS_MAP_END
 
 
-static ADDRESS_MAP_START ( msx2_io_map, AS_IO, 8, msx_state )
+ADDRESS_MAP_START(msx_state::msx2_io_map)
 	ADDRESS_MAP_UNMAP_HIGH
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	AM_RANGE( 0x40, 0x4f) AM_READWRITE(msx_switched_r, msx_switched_w)
@@ -588,7 +588,7 @@ static ADDRESS_MAP_START ( msx2_io_map, AS_IO, 8, msx_state )
 ADDRESS_MAP_END
 
 
-static ADDRESS_MAP_START ( msx2p_io_map, AS_IO, 8, msx_state )
+ADDRESS_MAP_START(msx_state::msx2p_io_map)
 	ADDRESS_MAP_UNMAP_HIGH
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	AM_RANGE( 0x40, 0x4f) AM_READWRITE(msx_switched_r, msx_switched_w)

@@ -472,6 +472,9 @@ public:
 	void draw_reel_layer(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect, int category);
 	uint32_t screen_update_sfbonus(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	void sfbonus(machine_config &config);
+	void ramdac_map(address_map &map);
+	void sfbonus_io(address_map &map);
+	void sfbonus_map(address_map &map);
 };
 
 
@@ -1209,7 +1212,7 @@ uint32_t sfbonus_state::screen_update_sfbonus(screen_device &screen, bitmap_ind1
 
 
 
-static ADDRESS_MAP_START( sfbonus_map, AS_PROGRAM, 8, sfbonus_state )
+ADDRESS_MAP_START(sfbonus_state::sfbonus_map)
 	AM_RANGE(0x0000, 0xefff) AM_ROMBANK("bank1") AM_WRITE(sfbonus_videoram_w)
 	AM_RANGE(0xf000, 0xffff) AM_RAM AM_SHARE("nvram")
 ADDRESS_MAP_END
@@ -1279,7 +1282,7 @@ WRITE8_MEMBER(sfbonus_state::sfbonus_2c01_w)
 }
 
 
-static ADDRESS_MAP_START( sfbonus_io, AS_IO, 8, sfbonus_state )
+ADDRESS_MAP_START(sfbonus_state::sfbonus_io)
 	AM_RANGE(0x0400, 0x0400) AM_READ_PORT("KEY1")
 	AM_RANGE(0x0408, 0x0408) AM_READ_PORT("KEY2")
 	AM_RANGE(0x0410, 0x0410) AM_READ_PORT("KEY3")
@@ -1356,7 +1359,7 @@ void sfbonus_state::machine_reset()
 }
 
 
-static ADDRESS_MAP_START( ramdac_map, 0, 8, sfbonus_state )
+ADDRESS_MAP_START(sfbonus_state::ramdac_map)
 	AM_RANGE(0x000, 0x3ff) AM_DEVREADWRITE("ramdac",ramdac_device,ramdac_pal_r,ramdac_rgb666_w)
 ADDRESS_MAP_END
 

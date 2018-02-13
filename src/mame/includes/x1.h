@@ -179,6 +179,12 @@ public:
 	uint8_t m_key_irq_flag;       /**< Keyboard IRQ pending. */
 	uint8_t m_key_irq_vector;     /**< Keyboard IRQ vector. */
 
+	void x1_io(address_map &map);
+	void x1_io_banks(address_map &map);
+	void x1_io_banks_common(address_map &map);
+	void x1_mem(address_map &map);
+	void x1turbo_io_banks(address_map &map);
+	void x1turbo_mem(address_map &map);
 protected:
 	struct scrn_reg_t
 	{

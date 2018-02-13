@@ -170,6 +170,7 @@ public:
 	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 
 	void jclub2(machine_config &config);
+	void jclub2_map(address_map &map);
 private:
 	required_device<st0020_device> m_st0020;
 };
@@ -200,6 +201,9 @@ public:
 	DECLARE_READ32_MEMBER(cmd_stat_word_r);
 
 	void jclub2o(machine_config &config);
+	void jclub2o_map(address_map &map);
+	void st0016_io(address_map &map);
+	void st0016_mem(address_map &map);
 private:
 	uint8_t m_cmd1;
 	uint8_t m_cmd2;
@@ -238,6 +242,7 @@ public:
 	DECLARE_VIDEO_START(darkhors);
 
 	void darkhors(machine_config &config);
+	void darkhors_map(address_map &map);
 private:
 	required_shared_ptr<uint32_t> m_tmapram;
 	required_shared_ptr<uint32_t> m_tmapscroll;
@@ -567,7 +572,7 @@ WRITE32_MEMBER(jclub2o_state::cmd2_word_w)
 	}
 }
 
-static ADDRESS_MAP_START( jclub2o_map, AS_PROGRAM, 32, jclub2o_state )
+ADDRESS_MAP_START(jclub2o_state::jclub2o_map)
 	AM_RANGE(0x000000, 0x27ffff) AM_ROM
 	AM_RANGE(0x400000, 0x41ffff) AM_RAM AM_SHARE("nvram") // battery
 
@@ -649,7 +654,7 @@ WRITE8_MEMBER(jclub2o_state::cmd2_w)
 	logerror("%s: cmd2_w %02x\n", machine().describe_context(), m_cmd2);
 }
 
-static ADDRESS_MAP_START( st0016_mem, AS_PROGRAM, 8, jclub2o_state )
+ADDRESS_MAP_START(jclub2o_state::st0016_mem)
 	AM_RANGE(0x0000, 0x7fff) AM_ROM
 	AM_RANGE(0x8000, 0xbfff) AM_ROMBANK("bank1")
 	AM_RANGE(0xe800, 0xe8ff) AM_RAM
@@ -658,7 +663,7 @@ static ADDRESS_MAP_START( st0016_mem, AS_PROGRAM, 8, jclub2o_state )
 	AM_RANGE(0xf000, 0xffff) AM_RAM
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( st0016_io, AS_IO, 8, jclub2o_state )
+ADDRESS_MAP_START(jclub2o_state::st0016_io)
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	//AM_RANGE(0x00, 0xbf) AM_READ(st0016_vregs_r) AM_WRITE(st0016_vregs_w)
 	AM_RANGE(0xc0, 0xc0) AM_READWRITE(cmd1_r, cmd1_w)
@@ -690,7 +695,7 @@ WRITE32_MEMBER(common_state::eeprom_93c46_w)
 	}
 }
 
-static ADDRESS_MAP_START( jclub2_map, AS_PROGRAM, 32, jclub2_state )
+ADDRESS_MAP_START(jclub2_state::jclub2_map)
 	AM_RANGE(0x000000, 0x27ffff) AM_ROM
 	AM_RANGE(0x400000, 0x41ffff) AM_RAM AM_SHARE("nvram") // battery
 
@@ -779,7 +784,7 @@ WRITE32_MEMBER(darkhors_state::out1_w)
 	}
 }
 
-static ADDRESS_MAP_START( darkhors_map, AS_PROGRAM, 32, darkhors_state )
+ADDRESS_MAP_START(darkhors_state::darkhors_map)
 	AM_RANGE(0x000000, 0x0fffff) AM_ROM
 	AM_RANGE(0x400000, 0x41ffff) AM_RAM AM_SHARE("nvram") // battery
 

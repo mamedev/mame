@@ -419,20 +419,27 @@ void mario_state::set_ea(int ea)
 void mario_state::sound_start()
 {
 	device_t *audiocpu = machine().device("audiocpu");
-
-#if USE_8039
 	uint8_t *SND = memregion("audiocpu")->base();
 
+#if USE_8039
 	SND[0x1001] = 0x01;
 #endif
 
 	m_eabank = nullptr;
 	if (audiocpu != nullptr && audiocpu->type() != Z80)
 	{
+
 		m_eabank = "bank1";
 		audiocpu->memory().space(AS_PROGRAM).install_read_bank(0x000, 0x7ff, "bank1");
-		membank("bank1")->configure_entry(0, memregion("audiocpu")->base());
-		membank("bank1")->configure_entry(1, memregion("audiocpu")->base() + 0x1000);
+		membank("bank1")->configure_entry(0, &SND[0]);
+		membank("bank1")->configure_entry(1, &SND[0x1000]);
+
+#if !USE_8039
+		// Hack to bootstrap MCU program into external MB1
+		SND[0x0000] = 0xf5;
+		SND[0x0001] = 0x04;
+		SND[0x0002] = 0x00;
+#endif
 	}
 
 	save_item(NAME(m_last));
@@ -604,16 +611,16 @@ WRITE8_MEMBER(mario_state::mario_sh3_w)
  *
  *************************************/
 
-static ADDRESS_MAP_START( mario_sound_map, AS_PROGRAM, 8, mario_state )
+ADDRESS_MAP_START(mario_state::mario_sound_map)
 	AM_RANGE(0x0000, 0x07ff) AM_ROMBANK("bank1") AM_REGION("audiocpu", 0)
 	AM_RANGE(0x0800, 0x0fff) AM_ROM
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( mario_sound_io_map, AS_IO, 8, mario_state )
+ADDRESS_MAP_START(mario_state::mario_sound_io_map)
 	AM_RANGE(0x00, 0xff) AM_READ(mario_sh_tune_r) AM_WRITE(mario_sh_sound_w)
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( masao_sound_map, AS_PROGRAM, 8, mario_state )
+ADDRESS_MAP_START(mario_state::masao_sound_map)
 	AM_RANGE(0x0000, 0x0fff) AM_ROM
 	AM_RANGE(0x2000, 0x23ff) AM_RAM
 	AM_RANGE(0x4000, 0x4000) AM_DEVREADWRITE("aysnd", ay8910_device, data_r, data_w)

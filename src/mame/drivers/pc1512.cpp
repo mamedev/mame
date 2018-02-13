@@ -607,7 +607,7 @@ READ8_MEMBER( pc1640_state::io_r )
 //  ADDRESS_MAP( pc1512_mem )
 //-------------------------------------------------
 
-static ADDRESS_MAP_START( pc1512_mem, AS_PROGRAM, 16, pc1512_state )
+ADDRESS_MAP_START(pc1512_state::pc1512_mem)
 	AM_RANGE(0x00000, 0x9ffff) AM_RAM
 	AM_RANGE(0xb8000, 0xbbfff) AM_READWRITE8(video_ram_r, video_ram_w, 0xffff)
 	AM_RANGE(0xfc000, 0xfffff) AM_ROM AM_REGION(I8086_TAG, 0)
@@ -618,7 +618,7 @@ ADDRESS_MAP_END
 //  ADDRESS_MAP( pc1512_io )
 //-------------------------------------------------
 
-static ADDRESS_MAP_START( pc1512_io, AS_IO, 16, pc1512_state )
+ADDRESS_MAP_START(pc1512_state::pc1512_io)
 	// [RH] 29 Aug 2016: I can find no evidence to indicate that Amstrad had only 10 I/O lines, as the
 	// schematic calls for a stock 8086 and the I/O and data lines are multiplexed onto the same bus,
 	// plus address lines 20-10 are towards the middle of a standard ISA slot. If it turns out that this
@@ -643,7 +643,7 @@ ADDRESS_MAP_END
 //  ADDRESS_MAP( pc1640_mem )
 //-------------------------------------------------
 
-static ADDRESS_MAP_START( pc1640_mem, AS_PROGRAM, 16, pc1640_state )
+ADDRESS_MAP_START(pc1640_state::pc1640_mem)
 	AM_RANGE(0x00000, 0x9ffff) AM_RAM
 	AM_RANGE(0xf0000, 0xf3fff) AM_MIRROR(0xc000) AM_ROM AM_REGION(I8086_TAG, 0)
 ADDRESS_MAP_END
@@ -653,7 +653,7 @@ ADDRESS_MAP_END
 //  ADDRESS_MAP( pc1640_io )
 //-------------------------------------------------
 
-static ADDRESS_MAP_START( pc1640_io, AS_IO, 16, pc1640_state )
+ADDRESS_MAP_START(pc1640_state::pc1640_io)
 	AM_RANGE(0x0000, 0xffff) AM_READ8(io_r, 0xffff)
 
 	AM_RANGE(0x000, 0x00f) AM_DEVWRITE8(I8237A5_TAG, am9517a_device, write, 0xffff)

@@ -33,7 +33,7 @@ WRITE8_MEMBER(ssozumo_state::sh_command_w)
 }
 
 
-static ADDRESS_MAP_START( ssozumo_map, AS_PROGRAM, 8, ssozumo_state )
+ADDRESS_MAP_START(ssozumo_state::ssozumo_map)
 	AM_RANGE(0x0000, 0x077f) AM_RAM
 	AM_RANGE(0x0780, 0x07ff) AM_RAM AM_SHARE("spriteram")
 	AM_RANGE(0x2000, 0x23ff) AM_RAM_WRITE(videoram2_w) AM_SHARE("videoram2")
@@ -58,7 +58,7 @@ WRITE8_MEMBER(ssozumo_state::sound_nmi_mask_w)
 }
 
 /* Same as Tag Team */
-static ADDRESS_MAP_START( ssozumo_sound_map, AS_PROGRAM, 8, ssozumo_state )
+ADDRESS_MAP_START(ssozumo_state::ssozumo_sound_map)
 	AM_RANGE(0x0000, 0x01ff) AM_RAM
 	AM_RANGE(0x2000, 0x2001) AM_DEVWRITE("ay1", ay8910_device, data_address_w)
 	AM_RANGE(0x2002, 0x2003) AM_DEVWRITE("ay2", ay8910_device, data_address_w)

@@ -65,7 +65,7 @@ READ16_MEMBER(darkseal_state::control_r)
 
 /******************************************************************************/
 
-static ADDRESS_MAP_START( darkseal_map, AS_PROGRAM, 16, darkseal_state )
+ADDRESS_MAP_START(darkseal_state::darkseal_map)
 	AM_RANGE(0x000000, 0x07ffff) AM_ROM
 	AM_RANGE(0x100000, 0x103fff) AM_RAM AM_SHARE("ram")
 	AM_RANGE(0x120000, 0x1207ff) AM_RAM AM_SHARE("spriteram")
@@ -88,7 +88,7 @@ ADDRESS_MAP_END
 
 /******************************************************************************/
 
-static ADDRESS_MAP_START( sound_map, AS_PROGRAM, 8, darkseal_state )
+ADDRESS_MAP_START(darkseal_state::sound_map)
 	AM_RANGE(0x000000, 0x00ffff) AM_ROM
 	AM_RANGE(0x100000, 0x100001) AM_DEVREADWRITE("ym1", ym2203_device, read, write)
 	AM_RANGE(0x110000, 0x110001) AM_DEVREADWRITE("ym2", ym2151_device, read, write)

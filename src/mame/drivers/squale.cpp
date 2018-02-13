@@ -135,6 +135,8 @@ public:
 	TIMER_DEVICE_CALLBACK_MEMBER(squale_scanline);
 
 	void squale(machine_config &config);
+	void squale_io(address_map &map);
+	void squale_mem(address_map &map);
 private:
 	required_device<acia6850_device> m_acia;
 	required_device<ay8910_device> m_ay8910;
@@ -616,7 +618,7 @@ TIMER_DEVICE_CALLBACK_MEMBER( squale_state::squale_scanline )
 	m_ef9365->update_scanline((uint16_t)param);
 }
 
-static ADDRESS_MAP_START(squale_mem, AS_PROGRAM, 8, squale_state)
+ADDRESS_MAP_START(squale_state::squale_mem)
 	ADDRESS_MAP_UNMAP_HIGH
 	AM_RANGE(0x0000,0xefff) AM_RAM
 	AM_RANGE(0xf000,0xf00f) AM_DEVREADWRITE("ef9365", ef9365_device, data_r, data_w)
@@ -634,7 +636,7 @@ static ADDRESS_MAP_START(squale_mem, AS_PROGRAM, 8, squale_state)
 
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( squale_io, AS_IO, 8, squale_state)
+ADDRESS_MAP_START(squale_state::squale_io)
 	ADDRESS_MAP_UNMAP_HIGH
 ADDRESS_MAP_END
 

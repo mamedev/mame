@@ -59,6 +59,8 @@ public:
 	TIMER_DEVICE_CALLBACK_MEMBER(zero_timer);
 	void gp_1(machine_config &config);
 	void gp_1s(machine_config &config);
+	void gp_1_io(address_map &map);
+	void gp_1_map(address_map &map);
 private:
 	uint8_t m_u14;
 	uint8_t m_digit;
@@ -79,12 +81,12 @@ private:
 };
 
 
-static ADDRESS_MAP_START( gp_1_map, AS_PROGRAM, 8, gp_1_state )
+ADDRESS_MAP_START(gp_1_state::gp_1_map)
 	AM_RANGE(0x0000, 0x0fff) AM_ROM AM_REGION("roms", 0)
 	AM_RANGE(0x8c00, 0x8cff) AM_RAM AM_SHARE("nvram")
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( gp_1_io, AS_IO, 8, gp_1_state )
+ADDRESS_MAP_START(gp_1_state::gp_1_io)
 	ADDRESS_MAP_GLOBAL_MASK(0x0f)
 	AM_RANGE(0x04, 0x07) AM_DEVREADWRITE("ppi", i8255_device, read, write)
 	AM_RANGE(0x08, 0x0b) AM_DEVREADWRITE("ctc", z80ctc_device, read, write)

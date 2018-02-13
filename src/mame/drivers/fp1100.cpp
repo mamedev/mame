@@ -92,6 +92,9 @@ public:
 	TIMER_DEVICE_CALLBACK_MEMBER(timer_c);
 	required_device<palette_device> m_palette;
 	void fp1100(machine_config &config);
+	void io_map(address_map &map);
+	void main_map(address_map &map);
+	void sub_map(address_map &map);
 private:
 	uint8_t m_irq_mask;
 	uint8_t m_main_latch;
@@ -209,13 +212,13 @@ READ8_MEMBER( fp1100_state::slot_id_r )
 	return m_slot[m_slot_num & 7].id;
 }
 
-static ADDRESS_MAP_START(main_map, AS_PROGRAM, 8, fp1100_state )
+ADDRESS_MAP_START(fp1100_state::main_map)
 	ADDRESS_MAP_UNMAP_HIGH
 	AM_RANGE(0x0000, 0x8fff) AM_READ_BANK("bankr0") AM_WRITE_BANK("bankw0")
 	AM_RANGE(0x9000, 0xffff) AM_RAM AM_REGION("wram", 0x9000)
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START(io_map, AS_IO, 8, fp1100_state )
+ADDRESS_MAP_START(fp1100_state::io_map)
 	ADDRESS_MAP_UNMAP_HIGH
 	//AM_RANGE(0x0000, 0xfeff) slot memory area
 	AM_RANGE(0xff00, 0xff7f) AM_READWRITE(slot_id_r,slot_bank_w)
@@ -272,7 +275,7 @@ WRITE8_MEMBER( fp1100_state::kbd_row_w )
 	m_beep->set_state(BIT(data, 4));
 }
 
-static ADDRESS_MAP_START(sub_map, AS_PROGRAM, 8, fp1100_state )
+ADDRESS_MAP_START(fp1100_state::sub_map)
 	AM_RANGE(0x0000, 0x1fff) AM_ROM AM_REGION("sub_ipl",0x0000)
 	AM_RANGE(0x2000, 0xdfff) AM_RAM AM_SHARE("videoram") //vram B/R/G
 	AM_RANGE(0xe000, 0xe000) AM_MIRROR(0x3fe) AM_DEVREADWRITE("crtc", mc6845_device, status_r,address_w)

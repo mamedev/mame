@@ -68,6 +68,8 @@ public:
 	DECOSPR_PRIORITY_CB_MEMBER(pri_callback);
 	void hvysmsh(machine_config &config);
 	void wcvol95(machine_config &config);
+	void hvysmsh_map(address_map &map);
+	void wcvol95_map(address_map &map);
 };
 
 
@@ -84,8 +86,8 @@ void deco156_state::video_start()
 
 uint32_t deco156_state::screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
 {
-	//FIXME: flip_screen_x should not be written!
-	flip_screen_set_no_update(1);
+	// sprites are flipped relative to tilemaps
+	m_sprgen->set_flip_screen(true);
 
 	screen.priority().fill(0);
 	bitmap.fill(0);
@@ -122,7 +124,7 @@ WRITE32_MEMBER(deco156_state::pf2_rowscroll_w){ data &= 0x0000ffff; mem_mask &= 
 WRITE32_MEMBER(deco156_state::spriteram_w){ data &= 0x0000ffff; mem_mask &= 0x0000ffff; COMBINE_DATA(&m_spriteram[offset]); }
 
 
-static ADDRESS_MAP_START( hvysmsh_map, AS_PROGRAM, 32, deco156_state )
+ADDRESS_MAP_START(deco156_state::hvysmsh_map)
 	AM_RANGE(0x000000, 0x0fffff) AM_ROM
 	AM_RANGE(0x100000, 0x107fff) AM_RAM
 	AM_RANGE(0x120000, 0x120003) AM_READ_PORT("INPUTS")
@@ -142,7 +144,7 @@ static ADDRESS_MAP_START( hvysmsh_map, AS_PROGRAM, 32, deco156_state )
 	AM_RANGE(0x1e0000, 0x1e1fff) AM_READWRITE(spriteram_r, spriteram_w)
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( wcvol95_map, AS_PROGRAM, 32, deco156_state )
+ADDRESS_MAP_START(deco156_state::wcvol95_map)
 	AM_RANGE(0x000000, 0x0fffff) AM_ROM
 	AM_RANGE(0x100000, 0x10001f) AM_DEVREADWRITE("tilegen1", deco16ic_device, pf_control_dword_r, pf_control_dword_w)
 	AM_RANGE(0x110000, 0x111fff) AM_DEVREADWRITE("tilegen1", deco16ic_device, pf1_data_dword_r, pf1_data_dword_w)

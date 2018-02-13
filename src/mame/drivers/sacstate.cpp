@@ -54,6 +54,8 @@ public:
 	DECLARE_WRITE8_MEMBER(port08_w);
 	void kbd_put(u8 data);
 	void sacstate(machine_config &config);
+	void sacstate_io(address_map &map);
+	void sacstate_mem(address_map &map);
 private:
 	uint8_t m_term_data;
 	uint8_t m_val;
@@ -92,13 +94,13 @@ WRITE8_MEMBER( sacstate_state::port08_w )
 		m_val = 0;
 }
 
-static ADDRESS_MAP_START(sacstate_mem, AS_PROGRAM, 8, sacstate_state)
+ADDRESS_MAP_START(sacstate_state::sacstate_mem)
 	ADDRESS_MAP_UNMAP_HIGH
 	AM_RANGE(0x000,0x7ff) AM_ROM
 	AM_RANGE(0x800,0xfff) AM_RAM
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START(sacstate_io, AS_IO, 8, sacstate_state)
+ADDRESS_MAP_START(sacstate_state::sacstate_io)
 	ADDRESS_MAP_UNMAP_HIGH
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	AM_RANGE(0x00,0x00) AM_READ(port00_r)

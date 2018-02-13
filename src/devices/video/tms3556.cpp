@@ -57,7 +57,7 @@ DEFINE_DEVICE_TYPE(TMS3556, tms3556_device, "tms3556", "Texas Instruments TMS355
 
 
 // default address map
-static ADDRESS_MAP_START( tms3556, 0, 8, tms3556_device )
+ADDRESS_MAP_START(tms3556_device::tms3556)
 	AM_RANGE(0x0000, 0xffff) AM_RAM
 ADDRESS_MAP_END
 
@@ -109,7 +109,7 @@ inline void tms3556_device::writebyte(offs_t address, uint8_t data)
 tms3556_device::tms3556_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
 	: device_t(mconfig, TMS3556, tag, owner, clock),
 		device_memory_interface(mconfig, *this),
-		m_space_config("videoram", ENDIANNESS_LITTLE, 8, 17, 0, nullptr, *ADDRESS_MAP_NAME(tms3556)),
+		m_space_config("videoram", ENDIANNESS_LITTLE, 8, 17, 0, address_map_constructor(), address_map_constructor(FUNC(tms3556_device::tms3556), this)),
 		m_reg(0), m_reg2(0),
 		m_reg_access_phase(0),
 		m_row_col_written(0),

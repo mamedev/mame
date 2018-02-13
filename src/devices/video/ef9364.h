@@ -54,6 +54,7 @@ public:
 	void char_latch_w(uint8_t data);
 	void command_w(uint8_t cmd);
 
+	void ef9364(address_map &map);
 protected:
 	// device-level overrides
 	virtual void device_start() override;

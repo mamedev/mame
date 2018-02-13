@@ -56,6 +56,7 @@ public:
 	DECLARE_WRITE8_MEMBER( kb_y8_w );
 	DECLARE_WRITE8_MEMBER( kb_yc_w );
 
+	void apricot_keyboard_io(address_map &map);
 protected:
 	// device-level overrides
 	virtual void device_start() override;

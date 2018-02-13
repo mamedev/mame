@@ -108,6 +108,8 @@ public:
 	required_device<palette_device> m_palette;
 	required_device<generic_latch_8_device> m_soundlatch;
 	void wyvernf0(machine_config &config);
+	void sound_map(address_map &map);
+	void wyvernf0_map(address_map &map);
 };
 
 
@@ -383,7 +385,7 @@ WRITE8_MEMBER(wyvernf0_state::nmi_enable_w)
 	}
 }
 
-static ADDRESS_MAP_START( wyvernf0_map, AS_PROGRAM, 8, wyvernf0_state )
+ADDRESS_MAP_START(wyvernf0_state::wyvernf0_map)
 	AM_RANGE(0x0000, 0x7fff) AM_ROM
 	AM_RANGE(0x8000, 0x8fff) AM_RAM
 
@@ -422,7 +424,7 @@ static ADDRESS_MAP_START( wyvernf0_map, AS_PROGRAM, 8, wyvernf0_state )
 	AM_RANGE(0xdc00, 0xdc00) AM_WRITENOP    // irq ack?
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( sound_map, AS_PROGRAM, 8, wyvernf0_state )
+ADDRESS_MAP_START(wyvernf0_state::sound_map)
 	AM_RANGE(0x0000, 0x3fff) AM_ROM
 	AM_RANGE(0xc000, 0xc7ff) AM_RAM
 	AM_RANGE(0xc800, 0xc801) AM_DEVWRITE("ay1", ym2149_device, address_data_w)

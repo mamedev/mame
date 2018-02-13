@@ -200,7 +200,7 @@ DEFINE_DEVICE_TYPE(PC_KBD_MICROSOFT_NATURAL, pc_kbd_microsoft_natural_device, "k
     ADDRESS MAPS
 *****************************************************************************/
 
-static ADDRESS_MAP_START( microsoft_natural_io, AS_IO, 8, pc_kbd_microsoft_natural_device )
+ADDRESS_MAP_START(pc_kbd_microsoft_natural_device::microsoft_natural_io)
 	AM_RANGE(MCS51_PORT_P0, MCS51_PORT_P0) AM_READWRITE(p0_read, p0_write)
 	AM_RANGE(MCS51_PORT_P1, MCS51_PORT_P1) AM_WRITE(p1_write)
 	AM_RANGE(MCS51_PORT_P2, MCS51_PORT_P2) AM_WRITE(p2_write)

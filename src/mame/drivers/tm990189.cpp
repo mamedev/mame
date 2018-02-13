@@ -162,6 +162,9 @@ public:
 	void hold_load();
 	void tm990_189_v(machine_config &config);
 	void tm990_189(machine_config &config);
+	void tm990_189_cru_map(address_map &map);
+	void tm990_189_memmap(address_map &map);
+	void tm990_189_v_memmap(address_map &map);
 private:
 	void draw_digit(void);
 	void led_set(int number, bool state);
@@ -721,14 +724,14 @@ static const tms9901_interface sys9901reset_param =
     0x3000-0x3fff: 4kb onboard ROM
 */
 
-static ADDRESS_MAP_START( tm990_189_memmap, AS_PROGRAM, 8, tm990189_state )
+ADDRESS_MAP_START(tm990189_state::tm990_189_memmap)
 	AM_RANGE(0x0000, 0x07ff) AM_RAM                                 /* RAM */
 	AM_RANGE(0x0800, 0x0fff) AM_ROM                                 /* extra ROM - application programs with unibug, remaining 2kb of program for university basic */
 	AM_RANGE(0x1000, 0x2fff) AM_NOP                                 /* reserved for expansion (RAM and/or tms9918 video controller) */
 	AM_RANGE(0x3000, 0x3fff) AM_ROM                                 /* main ROM - unibug or university basic */
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( tm990_189_v_memmap, AS_PROGRAM, 8, tm990189_state )
+ADDRESS_MAP_START(tm990189_state::tm990_189_v_memmap)
 	AM_RANGE(0x0000, 0x07ff) AM_RAM                                 /* RAM */
 	AM_RANGE(0x0800, 0x0fff) AM_ROM                                 /* extra ROM - application programs with unibug, remaining 2kb of program for university basic */
 
@@ -796,7 +799,7 @@ ADDRESS_MAP_END
            d
 */
 
-static ADDRESS_MAP_START( tm990_189_cru_map, AS_IO, 8, tm990189_state )
+ADDRESS_MAP_START(tm990189_state::tm990_189_cru_map)
 	AM_RANGE(0x0000, 0x003f) AM_DEVREAD(TMS9901_0_TAG, tms9901_device, read)      /* user I/O tms9901 */
 	AM_RANGE(0x0040, 0x006f) AM_DEVREAD(TMS9901_1_TAG, tms9901_device, read)      /* system I/O tms9901 */
 	AM_RANGE(0x0080, 0x00cf) AM_DEVREAD("tms9902", tms9902_device, cruread)     /* optional tms9902 */

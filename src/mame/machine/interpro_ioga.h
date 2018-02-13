@@ -118,7 +118,7 @@ public:
 
 	static void static_set_memory(device_t &device, const char *const tag, const int spacenum);
 
-	virtual DECLARE_ADDRESS_MAP(map, 32) = 0;
+	virtual void map(address_map &map) = 0;
 
 	// interrupt request lines
 	DECLARE_WRITE_LINE_MEMBER(ir0_w) { set_int_line(INT_HARD_EX, IRQ_SCSI, state); }
@@ -152,9 +152,9 @@ public:
 		IRQ_NEGPOL          = 0x0800,
 		IRQ_ENABLE_INTERNAL = 0x1000
 	};
-	DECLARE_READ16_MEMBER(icr_r) const { return m_hwicr[offset]; }
+	DECLARE_READ16_MEMBER(icr_r) { return m_hwicr[offset]; }
 	DECLARE_WRITE16_MEMBER(icr_w);
-	DECLARE_READ16_MEMBER(icr18_r) const { return icr_r(space, 18, mem_mask); }
+	DECLARE_READ16_MEMBER(icr18_r) { return icr_r(space, 18, mem_mask); }
 	DECLARE_WRITE16_MEMBER(icr18_w) { icr_w(space, 18, data, mem_mask); }
 
 	enum nmictrl_mask
@@ -167,12 +167,12 @@ public:
 
 		NMI_IE      = NMI_ENABLE1 | NMI_ENABLE2
 	};
-	DECLARE_READ8_MEMBER(nmictrl_r) const { return m_nmictrl; }
+	DECLARE_READ8_MEMBER(nmictrl_r) { return m_nmictrl; }
 	DECLARE_WRITE8_MEMBER(nmictrl_w);
 
-	DECLARE_READ8_MEMBER(softint_r) const { return m_softint; }
+	DECLARE_READ8_MEMBER(softint_r) { return m_softint; }
 	DECLARE_WRITE8_MEMBER(softint_w);
-	DECLARE_READ16_MEMBER(softint_vector_r) const { return m_swicr[offset]; }
+	DECLARE_READ16_MEMBER(softint_vector_r) { return m_swicr[offset]; }
 	DECLARE_WRITE16_MEMBER(softint_vector_w);
 
 	// dma request lines
@@ -201,29 +201,29 @@ public:
 
 		DMA_CTRL_WMASK   = 0xfd000e00  // writable fields
 	};
-	DECLARE_READ32_MEMBER(dma_plotter_r) const { return dma_r(space, offset, mem_mask, DMA_PLOTTER); }
+	DECLARE_READ32_MEMBER(dma_plotter_r) { return dma_r(space, offset, mem_mask, DMA_PLOTTER); }
 	DECLARE_WRITE32_MEMBER(dma_plotter_w) { dma_w(space, offset, data, mem_mask, DMA_PLOTTER); }
-	DECLARE_READ32_MEMBER(dma_scsi_r) const { return dma_r(space, offset, mem_mask, DMA_SCSI); }
+	DECLARE_READ32_MEMBER(dma_scsi_r) { return dma_r(space, offset, mem_mask, DMA_SCSI); }
 	DECLARE_WRITE32_MEMBER(dma_scsi_w) { dma_w(space, offset, data, mem_mask, DMA_SCSI); }
-	DECLARE_READ32_MEMBER(dma_floppy_r) const { return dma_r(space, offset, mem_mask, DMA_FLOPPY); }
+	DECLARE_READ32_MEMBER(dma_floppy_r) { return dma_r(space, offset, mem_mask, DMA_FLOPPY); }
 	DECLARE_WRITE32_MEMBER(dma_floppy_w) { dma_w(space, offset, data, mem_mask, DMA_FLOPPY); }
 
-	DECLARE_READ32_MEMBER(serial_dma0_addr_r) const { return serial_dma_addr_r(space, offset, mem_mask, 0); }
+	DECLARE_READ32_MEMBER(serial_dma0_addr_r) { return serial_dma_addr_r(space, offset, mem_mask, 0); }
 	DECLARE_WRITE32_MEMBER(serial_dma0_addr_w) { serial_dma_addr_w(space, offset, data, mem_mask, 0); }
-	DECLARE_READ32_MEMBER(serial_dma0_ctrl_r) const { return serial_dma_ctrl_r(space, offset, mem_mask, 0); }
+	DECLARE_READ32_MEMBER(serial_dma0_ctrl_r) { return serial_dma_ctrl_r(space, offset, mem_mask, 0); }
 	DECLARE_WRITE32_MEMBER(serial_dma0_ctrl_w) { serial_dma_ctrl_w(space, offset, data, mem_mask, 0); }
 
-	DECLARE_READ32_MEMBER(serial_dma1_addr_r) const { return serial_dma_addr_r(space, offset, mem_mask, 1); }
+	DECLARE_READ32_MEMBER(serial_dma1_addr_r) { return serial_dma_addr_r(space, offset, mem_mask, 1); }
 	DECLARE_WRITE32_MEMBER(serial_dma1_addr_w) { serial_dma_addr_w(space, offset, data, mem_mask, 1); }
-	DECLARE_READ32_MEMBER(serial_dma1_ctrl_r) const { return serial_dma_ctrl_r(space, offset, mem_mask, 1); }
+	DECLARE_READ32_MEMBER(serial_dma1_ctrl_r) { return serial_dma_ctrl_r(space, offset, mem_mask, 1); }
 	DECLARE_WRITE32_MEMBER(serial_dma1_ctrl_w) { serial_dma_ctrl_w(space, offset, data, mem_mask, 1); }
 
-	DECLARE_READ32_MEMBER(serial_dma2_addr_r) const { return serial_dma_addr_r(space, offset, mem_mask, 2); }
+	DECLARE_READ32_MEMBER(serial_dma2_addr_r) { return serial_dma_addr_r(space, offset, mem_mask, 2); }
 	DECLARE_WRITE32_MEMBER(serial_dma2_addr_w) { serial_dma_addr_w(space, offset, data, mem_mask, 2); }
-	DECLARE_READ32_MEMBER(serial_dma2_ctrl_r) const { return serial_dma_ctrl_r(space, offset, mem_mask, 2); }
+	DECLARE_READ32_MEMBER(serial_dma2_ctrl_r) { return serial_dma_ctrl_r(space, offset, mem_mask, 2); }
 	DECLARE_WRITE32_MEMBER(serial_dma2_ctrl_w) { serial_dma_ctrl_w(space, offset, data, mem_mask, 2); }
 
-	DECLARE_READ32_MEMBER(dma_plotter_eosl_r) const { return m_dma_plotter_eosl; }
+	DECLARE_READ32_MEMBER(dma_plotter_eosl_r) { return m_dma_plotter_eosl; }
 	DECLARE_WRITE32_MEMBER(dma_plotter_eosl_w) { m_dma_plotter_eosl = data ^ 0xffff0000; }
 
 	// bus arbitration and control
@@ -239,7 +239,7 @@ public:
 		ARBCTL_BGR_ETHB = 0x0080,
 		ARBCTL_BGR_ETHA = 0x0100
 	};
-	DECLARE_READ16_MEMBER(arbctl_r) const { return m_arbctl; }
+	DECLARE_READ16_MEMBER(arbctl_r) { return m_arbctl; }
 	DECLARE_WRITE16_MEMBER(arbctl_w);
 
 	enum error_businfo_mask
@@ -260,14 +260,14 @@ public:
 		BINFO_BG_SRMASTER = 0x0c00
 	};
 	DECLARE_READ32_MEMBER(error_businfo_r);
-	DECLARE_READ32_MEMBER(error_address_r) const { return m_error_address; }
-	DECLARE_READ32_MEMBER(bus_timeout_r) const { return m_bus_timeout; }
+	DECLARE_READ32_MEMBER(error_address_r) { return m_error_address; }
+	DECLARE_READ32_MEMBER(bus_timeout_r) { return m_bus_timeout; }
 	DECLARE_WRITE32_MEMBER(bus_timeout_w) { m_bus_timeout = data; }
 
 	DECLARE_WRITE32_MEMBER(bus_error) { m_error_address = data; m_error_businfo = offset; }
 
 	// timers
-	DECLARE_READ32_MEMBER(timer0_r) const;
+	DECLARE_READ32_MEMBER(timer0_r);
 	DECLARE_WRITE32_MEMBER(timer0_w);
 
 	enum timer1_mask
@@ -276,12 +276,12 @@ public:
 		TIMER1_START   = 0x00010000,
 		TIMER1_EXPIRED = 0x00020000
 	};
-	DECLARE_READ32_MEMBER(timer1_r) const;
+	DECLARE_READ32_MEMBER(timer1_r);
 	DECLARE_WRITE32_MEMBER(timer1_w);
 
-	DECLARE_READ32_MEMBER(timer2_count_r) const;
+	DECLARE_READ32_MEMBER(timer2_count_r);
 	DECLARE_WRITE32_MEMBER(timer2_count_w);
-	DECLARE_READ32_MEMBER(timer2_value_r) const;
+	DECLARE_READ32_MEMBER(timer2_value_r);
 	DECLARE_WRITE32_MEMBER(timer2_value_w);
 
 	enum timer3_mask
@@ -290,10 +290,10 @@ public:
 		TIMER3_START   = 0x40000000,
 		TIMER3_EXPIRED = 0x80000000
 	};
-	DECLARE_READ32_MEMBER(timer3_r) const;
+	DECLARE_READ32_MEMBER(timer3_r);
 	DECLARE_WRITE32_MEMBER(timer3_w);
 
-	DECLARE_READ32_MEMBER(prescaler_r) const;
+	DECLARE_READ32_MEMBER(prescaler_r);
 	DECLARE_WRITE32_MEMBER(prescaler_w);
 
 	// mouse
@@ -465,7 +465,7 @@ class turquoise_ioga_device : public interpro_ioga_device
 public:
 	turquoise_ioga_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
-	virtual DECLARE_ADDRESS_MAP(map, 32) override;
+	virtual void map(address_map &map) override;
 
 	DECLARE_WRITE16_MEMBER(eth_w);
 	DECLARE_READ16_MEMBER(eth_r);
@@ -477,7 +477,7 @@ protected:
 	{
 		ETH_BASE_MASK = 0xffe00000
 	};
-	DECLARE_READ32_MEMBER(eth_base_r) const { return m_eth_base; }
+	DECLARE_READ32_MEMBER(eth_base_r) { return m_eth_base; }
 	DECLARE_WRITE32_MEMBER(eth_base_w);
 
 	enum eth_control_mask
@@ -494,7 +494,7 @@ protected:
 
 		//ETH_MASK     = 0x4ff2  // channel attention and error bits not persistent
 	};
-	DECLARE_READ16_MEMBER(eth_control_r) const { return m_eth_control; }
+	DECLARE_READ16_MEMBER(eth_control_r) { return m_eth_control; }
 	DECLARE_WRITE16_MEMBER(eth_control_w);
 
 private:
@@ -507,7 +507,7 @@ class sapphire_ioga_device : public interpro_ioga_device
 public:
 	sapphire_ioga_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
-	virtual DECLARE_ADDRESS_MAP(map, 32) override;
+	virtual void map(address_map &map) override;
 
 	DECLARE_WRITE32_MEMBER(eth_w);
 	DECLARE_READ32_MEMBER(eth_r);
@@ -524,7 +524,7 @@ protected:
 		ETH_CHA_RTAG   = 0x00000e00,
 		ETH_REMAP_ADDR = 0xfffff000
 	};
-	DECLARE_READ32_MEMBER(eth_remap_r) const { return m_eth_remap; }
+	DECLARE_READ32_MEMBER(eth_remap_r) { return m_eth_remap; }
 	DECLARE_WRITE32_MEMBER(eth_remap_w);
 
 	enum eth_mappg_mask
@@ -536,7 +536,7 @@ protected:
 		ETH_CHB_RTAG  = 0x00000e00,
 		ETH_MAPPG     = 0xfffff000
 	};
-	DECLARE_READ32_MEMBER(eth_mappg_r) const { return m_eth_mappg; }
+	DECLARE_READ32_MEMBER(eth_mappg_r) { return m_eth_mappg; }
 	DECLARE_WRITE32_MEMBER(eth_mappg_w);
 
 	enum eth_control_mask
@@ -553,7 +553,7 @@ protected:
 
 		ETH_MASK     = 0x00004ff2  // channel attention and error bits not persistent
 	};
-	DECLARE_READ32_MEMBER(eth_control_r) const;
+	DECLARE_READ32_MEMBER(eth_control_r);
 	DECLARE_WRITE32_MEMBER(eth_control_w);
 
 private:

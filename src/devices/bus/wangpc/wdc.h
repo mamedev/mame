@@ -43,6 +43,8 @@ public:
 	DECLARE_READ8_MEMBER( ctc_ch3_r );
 	DECLARE_WRITE8_MEMBER( ctc_ch3_w );
 
+	void wangpc_wdc_io(address_map &map);
+	void wangpc_wdc_mem(address_map &map);
 protected:
 	// device-level overrides
 	virtual void device_start() override;

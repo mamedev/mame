@@ -128,7 +128,7 @@ WRITE8_MEMBER(paradise_state::torus_coin_counter_w)
 	machine().bookkeeping().coin_counter_w(0, data ^ 0xff);
 }
 
-static ADDRESS_MAP_START( base_map, AS_PROGRAM, 8, paradise_state )
+ADDRESS_MAP_START(paradise_state::base_map)
 	AM_RANGE(0x0000, 0x7fff) AM_ROM /* ROM */
 	AM_RANGE(0x8000, 0xbfff) AM_ROMBANK("prgbank")    /* ROM (banked) */
 	AM_RANGE(0xc000, 0xc7ff) AM_RAM_WRITE(vram_2_w) AM_SHARE("vram_2") /* Background */
@@ -136,27 +136,27 @@ static ADDRESS_MAP_START( base_map, AS_PROGRAM, 8, paradise_state )
 	AM_RANGE(0xd000, 0xd7ff) AM_RAM_WRITE(vram_0_w) AM_SHARE("vram_0") /* Foreground */
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( paradise_map, AS_PROGRAM, 8, paradise_state )
+ADDRESS_MAP_START(paradise_state::paradise_map)
 	AM_IMPORT_FROM(base_map)
 	AM_RANGE(0xd800, 0xd8ff) AM_RAM // RAM
 	AM_RANGE(0xd900, 0xe0ff) AM_RAM AM_SHARE("spriteram")   // Sprites
 	AM_RANGE(0xe100, 0xffff) AM_RAM // RAM
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( tgtball_map, AS_PROGRAM, 8, paradise_state )
+ADDRESS_MAP_START(paradise_state::tgtball_map)
 	AM_IMPORT_FROM(base_map)
 	AM_RANGE(0xd800, 0xd8ff) AM_RAM // RAM
 	AM_RANGE(0xd900, 0xd9ff) AM_RAM AM_SHARE("spriteram")   // Sprites
 	AM_RANGE(0xda00, 0xffff) AM_RAM // RAM
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( torus_map, AS_PROGRAM, 8, paradise_state )
+ADDRESS_MAP_START(paradise_state::torus_map)
 	AM_IMPORT_FROM(base_map)
 	AM_RANGE(0xd800, 0xdfff) AM_RAM AM_SHARE("spriteram")   // Sprites
 	AM_RANGE(0xe000, 0xffff) AM_RAM // RAM
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( torus_io_map, AS_IO, 8, paradise_state )
+ADDRESS_MAP_START(paradise_state::torus_io_map)
 	AM_RANGE(0x0000, 0x17ff) AM_RAM_WRITE(palette_w) AM_SHARE("paletteram")    // Palette
 	AM_RANGE(0x1800, 0x1800) AM_WRITE(priority_w)  // Layers priority
 	AM_RANGE(0x2001, 0x2001) AM_WRITE(flipscreen_w)    // Flip Screen
@@ -171,7 +171,7 @@ static ADDRESS_MAP_START( torus_io_map, AS_IO, 8, paradise_state )
 	AM_RANGE(0x8000, 0xffff) AM_RAM_WRITE(pixmap_w) AM_SHARE("videoram")   // Pixmap
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( paradise_io_map, AS_IO, 8, paradise_state )
+ADDRESS_MAP_START(paradise_state::paradise_io_map)
 	AM_IMPORT_FROM(torus_io_map)
 	AM_RANGE(0x2007, 0x2007) AM_WRITE(paradise_okibank_w)   // OKI 1 samples bank
 	AM_RANGE(0x2030, 0x2030) AM_DEVREADWRITE("oki2", okim6295_device, read, write)  // OKI 1

@@ -1919,7 +1919,8 @@ void validity_checker::validate_devices()
 		m_current_device = &device;
 
 		// validate auto-finders
-		device.findit(true);
+		device.findit(true, true);
+		device.findit(false, true);
 
 		// validate the device tag
 		validate_tag(device.basetag());
@@ -1979,7 +1980,8 @@ void validity_checker::validate_devices()
 				for (device_t &card_dev : device_iterator(*card))
 				{
 					m_current_device = &card_dev;
-					card_dev.findit(true);
+					card_dev.findit(true, true);
+					card_dev.findit(false, true);
 					card_dev.validity_check(*this);
 					m_current_device = nullptr;
 				}

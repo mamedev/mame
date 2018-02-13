@@ -49,6 +49,8 @@ public:
 	DECLARE_WRITE_LINE_MEMBER(fdc_intrq_w);
 
 	void altos5(machine_config &config);
+	void io_map(address_map &map);
+	void mem_map(address_map &map);
 private:
 	uint8_t m_port08;
 	uint8_t m_port09;
@@ -67,7 +69,7 @@ private:
 	required_device<floppy_connector> m_floppy1;
 };
 
-static ADDRESS_MAP_START(mem_map, AS_PROGRAM, 8, altos5_state)
+ADDRESS_MAP_START(altos5_state::mem_map)
 	ADDRESS_MAP_UNMAP_HIGH
 	AM_RANGE( 0x0000, 0x0fff ) AM_READ_BANK("bankr0") AM_WRITE_BANK("bankw0")
 	AM_RANGE( 0x1000, 0x1fff ) AM_READ_BANK("bankr1") AM_WRITE_BANK("bankw1")
@@ -87,7 +89,7 @@ static ADDRESS_MAP_START(mem_map, AS_PROGRAM, 8, altos5_state)
 	AM_RANGE( 0xf000, 0xffff ) AM_READ_BANK("bankrf") AM_WRITE_BANK("bankwf")
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START(io_map, AS_IO, 8, altos5_state)
+ADDRESS_MAP_START(altos5_state::io_map)
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	AM_RANGE(0x00, 0x03) AM_DEVREADWRITE("dma", z80dma_device, read, write)
 	AM_RANGE(0x04, 0x07) AM_DEVREADWRITE("fdc", fd1797_device, read, write)

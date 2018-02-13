@@ -65,6 +65,8 @@ public:
 	DECLARE_DRIVER_INIT(sys2900);
 	uint32_t screen_update_sys2900(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	void sys2900(machine_config &config);
+	void io_map(address_map &map);
+	void mem_map(address_map &map);
 private:
 	virtual void machine_reset() override;
 	virtual void video_start() override;
@@ -75,7 +77,7 @@ protected:
 };
 
 
-static ADDRESS_MAP_START(mem_map, AS_PROGRAM, 8, sys2900_state)
+ADDRESS_MAP_START(sys2900_state::mem_map)
 	ADDRESS_MAP_UNMAP_HIGH
 	AM_RANGE( 0x0000, 0x07ff ) AM_RAMBANK("boot")
 	AM_RANGE( 0x0800, 0xefff ) AM_RAM
@@ -83,7 +85,7 @@ static ADDRESS_MAP_START(mem_map, AS_PROGRAM, 8, sys2900_state)
 	AM_RANGE( 0xf800, 0xffff ) AM_RAM
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START(io_map, AS_IO, 8, sys2900_state)
+ADDRESS_MAP_START(sys2900_state::io_map)
 	ADDRESS_MAP_UNMAP_HIGH
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	AM_RANGE(0x20, 0x23) AM_DEVREADWRITE("sio1", z80sio_device, ba_cd_r, ba_cd_w)

@@ -161,6 +161,12 @@ public:
 
 	uint32_t m_dsp_rom_address;
 	void taitopjc(machine_config &config);
+	void mn10200_map(address_map &map);
+	void ppc603e_mem(address_map &map);
+	void tlcs900h_mem(address_map &map);
+	void tms_data_map(address_map &map);
+	void tms_io_map(address_map &map);
+	void tms_program_map(address_map &map);
 };
 
 void taitopjc_state::video_exit()
@@ -520,7 +526,7 @@ WRITE64_MEMBER(taitopjc_state::dsp_w)
 // DBAT2 U: 0xc0000003   L: 0xc0000022      (0xc0000000...0xc001ffff)
 // DBAT3 U: 0xfe0003ff   L: 0xfe000022      (0xfe000000...0xffffffff)
 
-static ADDRESS_MAP_START( ppc603e_mem, AS_PROGRAM, 64, taitopjc_state )
+ADDRESS_MAP_START(taitopjc_state::ppc603e_mem)
 	AM_RANGE(0x00000000, 0x003fffff) AM_RAM // Work RAM
 	AM_RANGE(0x40000000, 0x4000000f) AM_READWRITE(video_r, video_w)
 	AM_RANGE(0x80000000, 0x80003fff) AM_READWRITE(dsp_r, dsp_w)
@@ -619,7 +625,7 @@ WRITE16_MEMBER(taitopjc_state::tlcs_unk_w)
 // 0xfc0fb5: INTRX1
 // 0xfc0f41: INTTX1
 
-static ADDRESS_MAP_START( tlcs900h_mem, AS_PROGRAM, 16, taitopjc_state )
+ADDRESS_MAP_START(taitopjc_state::tlcs900h_mem)
 	AM_RANGE(0x010000, 0x02ffff) AM_RAM     // Work RAM
 	AM_RANGE(0x040000, 0x0400ff) AM_READWRITE8(tlcs_sound_r, tlcs_sound_w, 0xffff)
 	AM_RANGE(0x044000, 0x045fff) AM_RAM AM_SHARE("nvram")
@@ -628,7 +634,7 @@ static ADDRESS_MAP_START( tlcs900h_mem, AS_PROGRAM, 16, taitopjc_state )
 	AM_RANGE(0xfc0000, 0xffffff) AM_ROM AM_REGION("io_cpu", 0)
 ADDRESS_MAP_END
 
-ADDRESS_MAP_START( mn10200_map, AS_PROGRAM, 16, taitopjc_state )
+ADDRESS_MAP_START(taitopjc_state::mn10200_map)
 	AM_RANGE(0x080000, 0x0fffff) AM_ROM AM_REGION("mn10200", 0)
 ADDRESS_MAP_END
 
@@ -670,18 +676,18 @@ WRITE16_MEMBER(taitopjc_state::dsp_romh_w)
 }
 
 
-static ADDRESS_MAP_START( tms_program_map, AS_PROGRAM, 16, taitopjc_state )
+ADDRESS_MAP_START(taitopjc_state::tms_program_map)
 	AM_RANGE(0x0000, 0x3fff) AM_ROM AM_REGION("user2", 0)
 	AM_RANGE(0x4c00, 0xefff) AM_ROM AM_REGION("user2", 0x9800)
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( tms_data_map, AS_DATA, 16, taitopjc_state )
+ADDRESS_MAP_START(taitopjc_state::tms_data_map)
 	AM_RANGE(0x4000, 0x6fff) AM_ROM AM_REGION("user2", 0x8000)
 	AM_RANGE(0x7000, 0xefff) AM_RAM
 	AM_RANGE(0xf000, 0xffff) AM_READWRITE(tms_dspshare_r, tms_dspshare_w)
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( tms_io_map, AS_IO, 16, taitopjc_state )
+ADDRESS_MAP_START(taitopjc_state::tms_io_map)
 	AM_RANGE(0x0053, 0x0053) AM_WRITE(dsp_roml_w)
 	AM_RANGE(0x0057, 0x0057) AM_WRITE(dsp_romh_w)
 	AM_RANGE(0x0058, 0x0058) AM_DEVWRITE("tc0780fpa", tc0780fpa_device, poly_fifo_w)

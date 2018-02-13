@@ -34,6 +34,7 @@ public:
 	DECLARE_READ8_MEMBER(p3_read);
 	DECLARE_WRITE8_MEMBER(p3_write);
 
+	void microsoft_natural_io(address_map &map);
 protected:
 	// device-level overrides
 	virtual void device_start() override;

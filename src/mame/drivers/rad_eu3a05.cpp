@@ -236,6 +236,8 @@ public:
 
 	void radicasi(machine_config &config);
 
+	void radicasi_bank_map(address_map &map);
+	void radicasi_map(address_map &map);
 protected:
 	// driver_device overrides
 	virtual void machine_start() override;
@@ -901,7 +903,7 @@ READ8_MEMBER(radica_eu3a05_state::read_full_space)
 	return fullbankspace.read_byte(offset);
 }
 
-static ADDRESS_MAP_START( radicasi_map, AS_PROGRAM, 8, radica_eu3a05_state )
+ADDRESS_MAP_START(radica_eu3a05_state::radicasi_map)
 	// can the addresses move around?
 	AM_RANGE(0x0000, 0x05ff) AM_RAM AM_SHARE("ram")
 	AM_RANGE(0x0600, 0x3dff) AM_RAM AM_SHARE("vram")
@@ -968,7 +970,7 @@ static ADDRESS_MAP_START( radicasi_map, AS_PROGRAM, 8, radica_eu3a05_state )
 ADDRESS_MAP_END
 
 
-static ADDRESS_MAP_START( radicasi_bank_map, AS_PROGRAM, 8, radica_eu3a05_state )
+ADDRESS_MAP_START(radica_eu3a05_state::radicasi_bank_map)
 	AM_RANGE(0x000000, 0xffffff) AM_NOP // shut up any logging when video params are invalid
 	AM_RANGE(0x000000, 0x3fffff) AM_ROM AM_REGION("maincpu", 0)
 	AM_RANGE(0x400000, 0x40ffff) AM_RAM // ?? only ever cleared maybe a mirror of below?

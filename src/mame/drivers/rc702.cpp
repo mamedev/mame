@@ -75,6 +75,8 @@ public:
 	void kbd_put(u8 data);
 
 	void rc702(machine_config &config);
+	void rc702_io(address_map &map);
+	void rc702_mem(address_map &map);
 private:
 	bool m_q_state;
 	bool m_qbar_state;
@@ -95,12 +97,12 @@ private:
 };
 
 
-static ADDRESS_MAP_START(rc702_mem, AS_PROGRAM, 8, rc702_state)
+ADDRESS_MAP_START(rc702_state::rc702_mem)
 	AM_RANGE(0x0000, 0x07ff) AM_READ_BANK("bankr0") AM_WRITE_BANK("bankw0")
 	AM_RANGE(0x0800, 0xffff) AM_RAM
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START(rc702_io, AS_IO, 8, rc702_state)
+ADDRESS_MAP_START(rc702_state::rc702_io)
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	ADDRESS_MAP_UNMAP_HIGH
 	AM_RANGE(0x00, 0x01) AM_DEVREADWRITE("crtc", i8275_device, read, write)

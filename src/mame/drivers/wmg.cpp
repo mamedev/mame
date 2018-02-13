@@ -105,6 +105,8 @@ public:
 	DECLARE_CUSTOM_INPUT_MEMBER(wmg_mux_r);
 
 	void wmg(machine_config &config);
+	void wmg_cpu1(address_map &map);
+	void wmg_cpu2(address_map &map);
 private:
 
 	uint8_t m_wmg_c400;
@@ -124,7 +126,7 @@ private:
  *  Address Map
  *
  *************************************/
-static ADDRESS_MAP_START( wmg_cpu1, AS_PROGRAM, 8, wmg_state )
+ADDRESS_MAP_START(wmg_state::wmg_cpu1)
 	AM_RANGE(0x0000, 0x8fff) AM_READ_BANK("bank1") AM_WRITEONLY AM_SHARE("videoram")
 	AM_RANGE(0x9000, 0xbfff) AM_RAM
 	AM_RANGE(0xc000, 0xcfff) AM_ROMBANK("bank7")
@@ -132,7 +134,7 @@ static ADDRESS_MAP_START( wmg_cpu1, AS_PROGRAM, 8, wmg_state )
 	AM_RANGE(0xd000, 0xd000) AM_WRITE(wmg_d000_w)
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( wmg_cpu2, AS_PROGRAM, 8, wmg_state )
+ADDRESS_MAP_START(wmg_state::wmg_cpu2)
 	AM_RANGE(0x0000, 0x007f) AM_RAM     /* internal RAM */
 	AM_RANGE(0x0080, 0x00ff) AM_RAM     /* MC6810 RAM */
 	AM_RANGE(0x0400, 0x0403) AM_MIRROR(0x8000) AM_DEVREADWRITE("pia_2", pia6821_device, read, write)

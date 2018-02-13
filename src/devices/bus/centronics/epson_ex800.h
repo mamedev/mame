@@ -41,6 +41,7 @@ public:
 
 	DECLARE_INPUT_CHANGED_MEMBER(online_switch);
 
+	void ex800_mem(address_map &map);
 protected:
 	// device-level overrides
 	virtual void device_start() override;

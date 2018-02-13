@@ -375,7 +375,7 @@ WRITE8_MEMBER(bwidow_state::irq_ack_w)
  *
  *************************************/
 
-static ADDRESS_MAP_START( bwidow_map, AS_PROGRAM, 8, bwidow_state )
+ADDRESS_MAP_START(bwidow_state::bwidow_map)
 	AM_RANGE(0x0000, 0x07ff) AM_RAM
 	AM_RANGE(0x2000, 0x27ff) AM_RAM AM_SHARE("vectorram") AM_REGION("maincpu", 0x2000)
 	AM_RANGE(0x2800, 0x5fff) AM_ROM
@@ -395,7 +395,7 @@ static ADDRESS_MAP_START( bwidow_map, AS_PROGRAM, 8, bwidow_state )
 	AM_RANGE(0x9000, 0xffff) AM_ROM
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( bwidowp_map, AS_PROGRAM, 8, bwidow_state )
+ADDRESS_MAP_START(bwidow_state::bwidowp_map)
 	AM_RANGE(0x0000, 0x07ff) AM_RAM
 	AM_RANGE(0x0800, 0x080f) AM_DEVREADWRITE("pokey1", pokey_device, read, write)
 	AM_RANGE(0x0810, 0x081f) AM_DEVREADWRITE("pokey2", pokey_device, read, write)
@@ -415,7 +415,7 @@ static ADDRESS_MAP_START( bwidowp_map, AS_PROGRAM, 8, bwidow_state )
 	AM_RANGE(0xa000, 0xffff) AM_ROM
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( spacduel_map, AS_PROGRAM, 8, bwidow_state )
+ADDRESS_MAP_START(bwidow_state::spacduel_map)
 	AM_RANGE(0x0000, 0x03ff) AM_RAM
 	AM_RANGE(0x0800, 0x0800) AM_READ_PORT("IN0")
 	AM_RANGE(0x0900, 0x0907) AM_READ(spacduel_IN3_r)    /* IN1 */

@@ -45,6 +45,9 @@ public:
 	void phoenix(machine_config &config);
 	void survival(machine_config &config);
 	void pleiads(machine_config &config);
+	void phoenix_memory_map(address_map &map);
+	void pleiads_memory_map(address_map &map);
+	void survival_memory_map(address_map &map);
 protected:
 	required_device<cpu_device>             m_maincpu;
 	optional_device<pleiads_sound_device>   m_pleiads_custom;

@@ -133,6 +133,9 @@ public:
 	void bml3mk5(machine_config &config);
 	void bml3(machine_config &config);
 	void bml3_common(machine_config &config);
+	void bml3_mem(address_map &map);
+	void bml3mk2_mem(address_map &map);
+	void bml3mk5_mem(address_map &map);
 private:
 	u8 m_hres_reg;
 	u8 m_crtc_vreg[0x100];
@@ -398,7 +401,7 @@ WRITE_LINE_MEMBER(bml3_state::bml3bus_firq_w)
 }
 
 
-static ADDRESS_MAP_START(bml3_mem, AS_PROGRAM, 8, bml3_state)
+ADDRESS_MAP_START(bml3_state::bml3_mem)
 	ADDRESS_MAP_UNMAP_HIGH
 	AM_RANGE(0x0000, 0x03ff) AM_RAM
 	AM_RANGE(0x0400, 0x43ff) AM_READWRITE(bml3_vram_r,bml3_vram_w)
@@ -451,13 +454,13 @@ static ADDRESS_MAP_START(bml3_mem, AS_PROGRAM, 8, bml3_state)
 #endif
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START(bml3mk2_mem, AS_PROGRAM, 8, bml3_state)
+ADDRESS_MAP_START(bml3_state::bml3mk2_mem)
 	AM_IMPORT_FROM(bml3_mem)
 	// TODO: anything to add here?
 
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START(bml3mk5_mem, AS_PROGRAM, 8, bml3_state)
+ADDRESS_MAP_START(bml3_state::bml3mk5_mem)
 	AM_IMPORT_FROM(bml3_mem)
 	// TODO: anything to add here?
 

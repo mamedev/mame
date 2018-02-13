@@ -44,6 +44,7 @@ public:
 	DECLARE_DRIVER_INIT(gaminator);
 	required_device<cpu_device> m_maincpu;
 	void gaminator(machine_config &config);
+	void gaminator_map(address_map &map);
 };
 
 WRITE32_MEMBER(gaminator_state::gamtor_unk_w)
@@ -52,7 +53,7 @@ WRITE32_MEMBER(gaminator_state::gamtor_unk_w)
 
 
 
-static ADDRESS_MAP_START( gaminator_map, AS_PROGRAM, 32, gaminator_state )
+ADDRESS_MAP_START(gaminator_state::gaminator_map)
 	AM_RANGE(0x00000000, 0x07ffffff) AM_ROM
 	AM_RANGE(0x08000000, 0x0bffffff) AM_RAM
 	AM_RANGE(0x1e040008, 0x1e04000b) AM_WRITE(gamtor_unk_w )

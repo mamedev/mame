@@ -985,7 +985,7 @@ WRITE32_MEMBER(konamigx_state::type1_cablamps_w)
 /* 68EC020 memory handlers */
 /**********************************************************************************/
 
-static ADDRESS_MAP_START( gx_base_memmap, AS_PROGRAM, 32, konamigx_state )
+ADDRESS_MAP_START(konamigx_state::gx_base_memmap)
 	AM_RANGE(0x000000, 0x01ffff) AM_ROM // BIOS ROM
 	AM_RANGE(0x200000, 0x3fffff) AM_ROM // main program ROM
 	AM_RANGE(0x400000, 0x7fffff) AM_ROM // data ROM
@@ -1013,7 +1013,7 @@ static ADDRESS_MAP_START( gx_base_memmap, AS_PROGRAM, 32, konamigx_state )
 	AM_RANGE(0xda2000, 0xda3fff) AM_DEVREADWRITE("k056832", k056832_device, ram_long_r, ram_long_w)
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( gx_type1_map, AS_PROGRAM, 32, konamigx_state )
+ADDRESS_MAP_START(konamigx_state::gx_type1_map)
 	AM_IMPORT_FROM(gx_base_memmap)
 	AM_RANGE(0xd90000, 0xd97fff) AM_RAM_DEVWRITE("palette", palette_device, write32) AM_SHARE("palette")
 	AM_RANGE(0xdc0000, 0xdc1fff) AM_RAM         // LAN RAM? (Racin' Force has, Open Golf doesn't)
@@ -1032,13 +1032,13 @@ static ADDRESS_MAP_START( gx_type1_map, AS_PROGRAM, 32, konamigx_state )
 	AM_RANGE(0xfc0000, 0xfc00ff) AM_RAM // chip 22N / S
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( gx_type2_map, AS_PROGRAM, 32, konamigx_state )
+ADDRESS_MAP_START(konamigx_state::gx_type2_map)
 	AM_IMPORT_FROM(gx_base_memmap)
 	AM_RANGE(0xcc0000, 0xcc0003) AM_WRITE(esc_w)
 	AM_RANGE(0xd90000, 0xd97fff) AM_RAM_DEVWRITE("palette", palette_device, write32) AM_SHARE("palette")
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( gx_type3_map, AS_PROGRAM, 32, konamigx_state )
+ADDRESS_MAP_START(konamigx_state::gx_type3_map)
 	AM_IMPORT_FROM(gx_base_memmap)
 	AM_RANGE(0xd90000, 0xd97fff) AM_RAM
 	//AM_RANGE(0xcc0000, 0xcc0007) AM_WRITE(type4_prot_w)
@@ -1052,7 +1052,7 @@ static ADDRESS_MAP_START( gx_type3_map, AS_PROGRAM, 32, konamigx_state )
 	//AM_RANGE(0xf00000, 0xf07fff) AM_RAM
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( gx_type4_map, AS_PROGRAM, 32, konamigx_state )
+ADDRESS_MAP_START(konamigx_state::gx_type4_map)
 	AM_IMPORT_FROM(gx_base_memmap)
 	AM_RANGE(0xcc0000, 0xcc0007) AM_WRITE(type4_prot_w)
 	AM_RANGE(0xd90000, 0xd97fff) AM_RAM
@@ -1104,7 +1104,7 @@ WRITE16_MEMBER(konamigx_state::tms57002_control_word_w)
 }
 
 /* 68000 memory handling */
-static ADDRESS_MAP_START( gxsndmap, AS_PROGRAM, 16, konamigx_state )
+ADDRESS_MAP_START(konamigx_state::gxsndmap)
 	AM_RANGE(0x000000, 0x03ffff) AM_ROM
 	AM_RANGE(0x100000, 0x10ffff) AM_RAM
 	AM_RANGE(0x200000, 0x2004ff) AM_DEVREADWRITE8("k054539_1", k054539_device, read, write, 0xff00)
@@ -1115,7 +1115,7 @@ static ADDRESS_MAP_START( gxsndmap, AS_PROGRAM, 16, konamigx_state )
 	AM_RANGE(0x580000, 0x580001) AM_WRITENOP // 'NRES' - D2: K056602 /RESET
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( gxtmsmap, AS_DATA, 8, konamigx_state )
+ADDRESS_MAP_START(konamigx_state::gxtmsmap)
 	AM_RANGE(0x00000, 0x3ffff) AM_RAM
 ADDRESS_MAP_END
 

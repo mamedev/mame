@@ -130,7 +130,7 @@ private:
 	int m_width;
 
 	// screen drawing
-	bitmap_rgb32 *m_bitmap;     // bitmap
+	bitmap_rgb32 m_bitmap;     // bitmap
 	int m_y;                        // current scanline
 	int m_hrtc;                     // horizontal retrace
 	int m_vrtc;                     // vertical retrace

@@ -56,4 +56,7 @@ public:
 	K007420_CALLBACK_MEMBER(rockrage_sprite_callback);
 
 	void rockrage(machine_config &config);
+	void rockrage_map(address_map &map);
+	void rockrage_sound_map(address_map &map);
+	void rockrage_vlm_map(address_map &map);
 };

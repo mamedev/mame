@@ -36,6 +36,7 @@ public:
 	DECLARE_READ8_MEMBER(read8);
 	DECLARE_WRITE8_MEMBER(write8);
 
+	void upd7220_map(address_map &map);
 protected:
 	// device-level overrides
 	virtual void device_start() override;

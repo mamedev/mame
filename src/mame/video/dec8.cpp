@@ -203,7 +203,11 @@ void dec8_state::srdarwin_draw_sprites(  bitmap_ind16 &bitmap, const rectangle &
 
 uint32_t dec8_state::screen_update_cobracom(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
-	flip_screen_set(m_tilegen1->get_flip_state());
+	bool flip = m_tilegen1->get_flip_state();
+	m_tilegen1->set_flip_screen(flip);
+	m_tilegen2->set_flip_screen(flip);
+	m_spritegen_mxc->set_flip_screen(flip);
+	m_fix_tilemap->set_flip(flip ? (TILEMAP_FLIPY | TILEMAP_FLIPX) : 0);
 
 	m_tilegen1->deco_bac06_pf_draw(bitmap,cliprect,TILEMAP_DRAW_OPAQUE, 0x00, 0x00, 0x00, 0x00);
 	m_spritegen_mxc->draw_sprites(bitmap, cliprect, m_buffered_spriteram16, 0x04, 0x00, 0x03);
@@ -274,7 +278,10 @@ VIDEO_START_MEMBER(dec8_state,ghostb)
 
 uint32_t dec8_state::screen_update_oscar(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
-	flip_screen_set(m_tilegen1->get_flip_state());
+	bool flip = m_tilegen1->get_flip_state();
+	m_tilegen1->set_flip_screen(flip);
+	m_spritegen_mxc->set_flip_screen(flip);
+	m_fix_tilemap->set_flip(flip ? (TILEMAP_FLIPY | TILEMAP_FLIPX) : 0);
 
 	// we mimic the priority scheme in dec0.c, this was originally a bit different, so this could be wrong
 	m_tilegen1->deco_bac06_pf_draw(bitmap,cliprect,TILEMAP_DRAW_OPAQUE, 0x00, 0x00, 0x00, 0x00);

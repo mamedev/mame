@@ -101,6 +101,7 @@ public:
 	DECLARE_WRITE_LINE_MEMBER(irq11_w);
 
 	void ms0515(machine_config &config);
+	void ms0515_mem(address_map &map);
 protected:
 	virtual void machine_reset() override;
 
@@ -127,7 +128,7 @@ private:
 	floppy_image_device *m_floppy;
 };
 
-static ADDRESS_MAP_START(ms0515_mem, AS_PROGRAM, 16, ms0515_state)
+ADDRESS_MAP_START(ms0515_state::ms0515_mem)
 	ADDRESS_MAP_UNMAP_HIGH
 	AM_RANGE(0000000, 0017777) AM_RAMBANK("bank0") // RAM
 	AM_RANGE(0020000, 0037777) AM_RAMBANK("bank1") // RAM

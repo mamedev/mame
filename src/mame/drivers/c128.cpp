@@ -245,6 +245,12 @@ public:
 	void c128dcr(machine_config &config);
 	void c128dcrp(machine_config &config);
 	void c128d81(machine_config &config);
+	void m8502_mem(address_map &map);
+	void vdc_videoram_map(address_map &map);
+	void vic_colorram_map(address_map &map);
+	void vic_videoram_map(address_map &map);
+	void z80_io(address_map &map);
+	void z80_mem(address_map &map);
 };
 
 
@@ -664,7 +670,7 @@ READ8_MEMBER( c128_state::vic_colorram_r )
 //  ADDRESS_MAP( z80_mem )
 //-------------------------------------------------
 
-static ADDRESS_MAP_START( z80_mem, AS_PROGRAM, 8, c128_state )
+ADDRESS_MAP_START(c128_state::z80_mem)
 	AM_RANGE(0x0000, 0xffff) AM_READWRITE(z80_r, z80_w)
 ADDRESS_MAP_END
 
@@ -673,7 +679,7 @@ ADDRESS_MAP_END
 //  ADDRESS_MAP( z80_io )
 //-------------------------------------------------
 
-static ADDRESS_MAP_START( z80_io, AS_IO, 8, c128_state )
+ADDRESS_MAP_START(c128_state::z80_io)
 	AM_RANGE(0x0000, 0xffff) AM_READWRITE(z80_io_r, z80_io_w)
 ADDRESS_MAP_END
 
@@ -682,7 +688,7 @@ ADDRESS_MAP_END
 //  ADDRESS_MAP( m8502_mem )
 //-------------------------------------------------
 
-static ADDRESS_MAP_START( m8502_mem, AS_PROGRAM, 8, c128_state )
+ADDRESS_MAP_START(c128_state::m8502_mem)
 	AM_RANGE(0x0000, 0xffff) AM_READWRITE(read, write)
 ADDRESS_MAP_END
 
@@ -691,7 +697,7 @@ ADDRESS_MAP_END
 //  ADDRESS_MAP( vic_videoram_map )
 //-------------------------------------------------
 
-static ADDRESS_MAP_START( vic_videoram_map, 0, 8, c128_state )
+ADDRESS_MAP_START(c128_state::vic_videoram_map)
 	AM_RANGE(0x0000, 0x3fff) AM_READ(vic_videoram_r)
 ADDRESS_MAP_END
 
@@ -700,7 +706,7 @@ ADDRESS_MAP_END
 //  ADDRESS_MAP( vic_colorram_map )
 //-------------------------------------------------
 
-static ADDRESS_MAP_START( vic_colorram_map, 1, 8, c128_state )
+ADDRESS_MAP_START(c128_state::vic_colorram_map)
 	AM_RANGE(0x000, 0x3ff) AM_READ(vic_colorram_r)
 ADDRESS_MAP_END
 
@@ -709,7 +715,7 @@ ADDRESS_MAP_END
 //  ADDRESS_MAP( vdc_videoram_map )
 //-------------------------------------------------
 
-static ADDRESS_MAP_START( vdc_videoram_map, 0, 8, c128_state )
+ADDRESS_MAP_START(c128_state::vdc_videoram_map)
 	AM_RANGE(0x0000, 0xffff) AM_RAM
 ADDRESS_MAP_END
 

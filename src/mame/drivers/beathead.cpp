@@ -274,7 +274,7 @@ WRITE32_MEMBER( beathead_state::coin_count_w )
  *
  *************************************/
 
-static ADDRESS_MAP_START( main_map, AS_PROGRAM, 32, beathead_state)
+ADDRESS_MAP_START(beathead_state::main_map)
 	AM_RANGE(0x00000000, 0x0001ffff) AM_RAM AM_SHARE("ram_base")
 	AM_RANGE(0x01800000, 0x01bfffff) AM_ROM AM_REGION("user1", 0) AM_SHARE("rom_base")
 	AM_RANGE(0x40000000, 0x400007ff) AM_RAM_WRITE(eeprom_data_w) AM_SHARE("nvram")

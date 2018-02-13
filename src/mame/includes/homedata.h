@@ -158,4 +158,14 @@ public:
 	void pteacher(machine_config &config);
 	void lemnangl(machine_config &config);
 	void mjkinjas(machine_config &config);
+	void cpu0_map(address_map &map);
+	void cpu1_map(address_map &map);
+	void cpu2_map(address_map &map);
+	void mrokumei_map(address_map &map);
+	void mrokumei_sound_io_map(address_map &map);
+	void mrokumei_sound_map(address_map &map);
+	void pteacher_map(address_map &map);
+	void pteacher_upd7807_map(address_map &map);
+	void reikaids_map(address_map &map);
+	void reikaids_upd7807_map(address_map &map);
 };

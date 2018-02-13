@@ -33,6 +33,7 @@ public:
 		, m_screen(*this, "screen")
 		, m_vtac(*this, "vtac")
 		, m_brg(*this, "brg%u", 1)
+		, m_usart(*this, "usart%u", 1)
 		, m_earom(*this, "earom")
 		, m_picu(*this, "picu")
 		, m_p_chargen(*this, "chargen")
@@ -54,6 +55,8 @@ public:
 	u32 screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 
 	void v100(machine_config &config);
+	void io_map(address_map &map);
+	void mem_map(address_map &map);
 private:
 	virtual void machine_start() override;
 
@@ -61,6 +64,7 @@ private:
 	required_device<screen_device> m_screen;
 	required_device<crt5037_device> m_vtac;
 	required_device_array<com8116_device, 2> m_brg;
+	required_device_array<i8251_device, 2> m_usart;
 	required_device<er1400_device> m_earom;
 	required_device<i8214_device> m_picu;
 	required_region_ptr<u8> m_p_chargen;
@@ -156,6 +160,9 @@ void v100_state::machine_start()
 	m_picu->inte_w(1);
 	m_picu->etlg_w(1);
 
+	m_usart[0]->write_cts(0);
+	m_usart[1]->write_cts(0);
+
 	m_active_row = 0;
 	save_item(NAME(m_active_row));
 }
@@ -220,13 +227,13 @@ WRITE8_MEMBER(v100_state::ppi_porta_w)
 	//logerror("Writing %02X to PPI port A\n", data);
 }
 
-static ADDRESS_MAP_START( mem_map, AS_PROGRAM, 8, v100_state )
+ADDRESS_MAP_START(v100_state::mem_map)
 	AM_RANGE(0x0000, 0x1fff) AM_ROM AM_REGION("maincpu", 0)
 	AM_RANGE(0x4000, 0x4fff) AM_RAM AM_SHARE("videoram")
 	AM_RANGE(0x5000, 0x5fff) AM_RAM
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( io_map, AS_IO, 8, v100_state )
+ADDRESS_MAP_START(v100_state::io_map)
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	AM_RANGE(0x00, 0x0f) AM_DEVWRITE("vtac", crt5037_device, write)
 	AM_RANGE(0x10, 0x10) AM_WRITE(brg_w<0>)

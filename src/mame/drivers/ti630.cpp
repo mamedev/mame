@@ -55,6 +55,8 @@ public:
 	DECLARE_DRIVER_INIT(ti630);
 	DECLARE_PALETTE_INIT(ti630);
 	void ti630(machine_config &config);
+	void i80c31_io(address_map &map);
+	void i80c31_prg(address_map &map);
 private:
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
@@ -64,7 +66,7 @@ private:
 
 #define LOG_IO_PORTS 0
 
-static ADDRESS_MAP_START(i80c31_prg, AS_PROGRAM, 8, ti630_state)
+ADDRESS_MAP_START(ti630_state::i80c31_prg)
 	AM_RANGE(0x0000, 0xffff) AM_ROM
 ADDRESS_MAP_END
 
@@ -72,7 +74,7 @@ DRIVER_INIT_MEMBER( ti630_state, ti630 )
 {
 }
 
-static ADDRESS_MAP_START(i80c31_io, AS_IO, 8, ti630_state)
+ADDRESS_MAP_START(ti630_state::i80c31_io)
 	AM_RANGE(0x0000,0x0000) /*AM_MIRROR(?)*/ AM_DEVWRITE("hd44780", hd44780_device, control_write)
 	AM_RANGE(0x1000,0x1000) /*AM_MIRROR(?)*/ AM_DEVWRITE("hd44780", hd44780_device, data_write)
 	AM_RANGE(0x2000,0x2000) /*AM_MIRROR(?)*/ AM_DEVREAD("hd44780", hd44780_device, control_read)

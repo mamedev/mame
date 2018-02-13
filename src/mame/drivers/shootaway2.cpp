@@ -37,6 +37,8 @@ public:
 	uint32_t screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 
 	void m74(machine_config &config);
+	void c68_map(address_map &map);
+	void sub_map(address_map &map);
 protected:
 
 	// devices
@@ -64,11 +66,11 @@ uint32_t m74_state::screen_update(screen_device &screen, bitmap_rgb32 &bitmap, c
 	return 0;
 }
 
-static ADDRESS_MAP_START( c68_map, AS_PROGRAM, 8, m74_state )
+ADDRESS_MAP_START(m74_state::c68_map)
 	AM_RANGE(0x8000, 0xffff) AM_ROM AM_REGION("maincpu", 0x0000)
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( sub_map, AS_PROGRAM, 8, m74_state )
+ADDRESS_MAP_START(m74_state::sub_map)
 	AM_RANGE(0x0000, 0x7fff) AM_ROM AM_REGION("subcpu", 0)
 	AM_RANGE(0x8000, 0xffff) AM_RAM
 ADDRESS_MAP_END

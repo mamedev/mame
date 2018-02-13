@@ -388,6 +388,11 @@ public:
 	void mace(machine_config &config);
 	void vaportrx(machine_config &config);
 	void sfrushrk(machine_config &config);
+	void seattle_cs0_map(address_map &map);
+	void seattle_cs1_map(address_map &map);
+	void seattle_cs2_map(address_map &map);
+	void seattle_cs3_map(address_map &map);
+	void seattle_flagstaff_cs3_map(address_map &map);
 };
 
 
@@ -1100,19 +1105,19 @@ PCI Mem  = 08000000-09FFFFFF
 
 */
 
-static ADDRESS_MAP_START(seattle_cs0_map, AS_PROGRAM, 32, seattle_state)
+ADDRESS_MAP_START(seattle_state::seattle_cs0_map)
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START(seattle_cs1_map, AS_PROGRAM, 32, seattle_state)
+ADDRESS_MAP_START(seattle_state::seattle_cs1_map)
 	AM_RANGE(0x01000000, 0x01000003) AM_WRITE(asic_fifo_w)
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START(seattle_cs2_map, AS_PROGRAM, 32, seattle_state)
+ADDRESS_MAP_START(seattle_state::seattle_cs2_map)
 	AM_RANGE(0x00000000, 0x00000003) AM_READWRITE(analog_port_r, analog_port_w)  // Flagstaff only
 ADDRESS_MAP_END
 
 // This map shares the PHOENIX, SEATTLE, and SEATTLE_WIDGET calls
-static ADDRESS_MAP_START(seattle_cs3_map, AS_PROGRAM, 32, seattle_state)
+ADDRESS_MAP_START(seattle_state::seattle_cs3_map)
 	AM_RANGE(0x00000000, 0x0000003f) AM_DEVREADWRITE("ioasic", midway_ioasic_device, read, write)
 	AM_RANGE(0x00100000, 0x0011ffff) AM_READWRITE(cmos_r, cmos_w)
 	AM_RANGE(0x00800000, 0x0080001f) AM_READWRITE(carnevil_gun_r, carnevil_gun_w) // Carnevil driver only
@@ -1129,7 +1134,7 @@ static ADDRESS_MAP_START(seattle_cs3_map, AS_PROGRAM, 32, seattle_state)
 	AM_RANGE(0x01f00000, 0x01f00003) AM_READWRITE(asic_reset_r, asic_reset_w)
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START(seattle_flagstaff_cs3_map, AS_PROGRAM, 32, seattle_state)
+ADDRESS_MAP_START(seattle_state::seattle_flagstaff_cs3_map)
 	AM_RANGE(0x00000000, 0x0000003f) AM_DEVREADWRITE("ioasic", midway_ioasic_device, read, write)
 	AM_RANGE(0x00100000, 0x0011ffff) AM_READWRITE(cmos_r, cmos_w)
 	AM_RANGE(0x00c00000, 0x00c0003f) AM_READWRITE(ethernet_r, ethernet_w);
@@ -1872,10 +1877,10 @@ MACHINE_CONFIG_START(seattle_state::seattle_common)
 	MCFG_PCI_ROOT_ADD(":pci")
 
 	MCFG_GT64010_ADD(PCI_ID_GALILEO, ":maincpu", SYSTEM_CLOCK, GALILEO_IRQ_NUM)
-	MCFG_GT64XXX_SET_CS(0, seattle_cs0_map)
-	MCFG_GT64XXX_SET_CS(1, seattle_cs1_map)
-	MCFG_GT64XXX_SET_CS(2, seattle_cs2_map)
-	MCFG_GT64XXX_SET_CS(3, seattle_cs3_map)
+	MCFG_GT64XXX_SET_CS(0, seattle_state::seattle_cs0_map)
+	MCFG_GT64XXX_SET_CS(1, seattle_state::seattle_cs1_map)
+	MCFG_GT64XXX_SET_CS(2, seattle_state::seattle_cs2_map)
+	MCFG_GT64XXX_SET_CS(3, seattle_state::seattle_cs3_map)
 	MCFG_GT64XX_SET_SIMM0(0x00800000)
 
 	MCFG_IDE_PCI_ADD(PCI_ID_IDE, 0x100b0002, 0x01, 0x0)
@@ -1948,7 +1953,7 @@ MACHINE_CONFIG_DERIVED(seattle_state::flagstaff, seattle_common)
 	MCFG_MIPS3_SYSTEM_CLOCK(SYSTEM_CLOCK)
 
 	MCFG_DEVICE_MODIFY(PCI_ID_GALILEO)
-	MCFG_GT64XXX_SET_CS(3, seattle_flagstaff_cs3_map)
+	MCFG_GT64XXX_SET_CS(3, seattle_state::seattle_flagstaff_cs3_map)
 
 	MCFG_SMC91C94_ADD("ethernet")
 	MCFG_SMC91C94_IRQ_CALLBACK(WRITELINE(seattle_state, ethernet_interrupt))

@@ -142,7 +142,7 @@ CN1     - main board connector (17x2 pin header)
     ADDRESS_MAP( crvision_map )
 -------------------------------------------------*/
 
-static ADDRESS_MAP_START( crvision_map, AS_PROGRAM, 8, crvision_state )
+ADDRESS_MAP_START(crvision_state::crvision_map)
 	AM_RANGE(0x0000, 0x03ff) AM_MIRROR(0x0c00) AM_RAM
 	AM_RANGE(0x1000, 0x1003) AM_MIRROR(0x0ffc) AM_DEVREADWRITE(PIA6821_TAG, pia6821_device, read, write)
 	AM_RANGE(0x2000, 0x2000) AM_MIRROR(0x0ffe) AM_DEVREAD(TMS9929_TAG, tms9928a_device, vram_read)
@@ -163,7 +163,7 @@ ADDRESS_MAP_END
     ADDRESS_MAP( lasr2001_map )
 -------------------------------------------------*/
 
-static ADDRESS_MAP_START( lasr2001_map, AS_PROGRAM, 8, laser2001_state )
+ADDRESS_MAP_START(laser2001_state::lasr2001_map)
 	AM_RANGE(0x0000, 0x03ff) AM_MIRROR(0x0c00) AM_RAM
 	AM_RANGE(0x1000, 0x1003) AM_MIRROR(0x0ffc) AM_DEVREADWRITE(PIA6821_TAG, pia6821_device, read, write)
 	AM_RANGE(0x2000, 0x2000) AM_MIRROR(0x0ffe) AM_DEVREAD(TMS9929_TAG, tms9928a_device, vram_read)

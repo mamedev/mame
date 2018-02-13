@@ -38,6 +38,8 @@ public:
 //  DECLARE_READ8_MEMBER(tecnbras_io_r);
 	DECLARE_DRIVER_INIT(tecnbras);
 void tecnbras(machine_config &config);
+void i80c31_io(address_map &map);
+void i80c31_prg(address_map &map);
 private:
 	int m_xcoord;
 	char m_digit[14][7];
@@ -46,13 +48,13 @@ private:
 	required_device<cpu_device> m_maincpu;
 };
 
-static ADDRESS_MAP_START(i80c31_prg, AS_PROGRAM, 8, tecnbras_state)
+ADDRESS_MAP_START(tecnbras_state::i80c31_prg)
 	AM_RANGE(0x0000, 0x7FFF) AM_ROM
 	AM_RANGE(0x8000, 0xFFFF) AM_RAM
 ADDRESS_MAP_END
 
 #define DMD_OFFSET 24 //This is a guess. We should verify the real hardware behaviour
-static ADDRESS_MAP_START(i80c31_io, AS_IO, 8, tecnbras_state)
+ADDRESS_MAP_START(tecnbras_state::i80c31_io)
 	AM_RANGE(0x0100+DMD_OFFSET, 0x0145+DMD_OFFSET) AM_WRITE(set_x_position_w)
 	AM_RANGE(0x06B8, 0x06BC) AM_WRITE(print_column_w)
 	AM_RANGE(MCS51_PORT_P1, MCS51_PORT_P1) AM_NOP /*buzzer ?*/

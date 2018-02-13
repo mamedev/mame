@@ -128,6 +128,7 @@ public:
 	virtual void machine_start () override;
 	virtual void machine_reset () override;
 	void lwriter(machine_config &config);
+	void maincpu_map(address_map &map);
 private:
 	required_device<cpu_device> m_maincpu;
 	required_device<scc8530_device> m_scc;
@@ -200,7 +201,7 @@ The ADB bit-bang transceiver MCU connects to the VIA CB1 (adbclk) and CB2 (adbda
 as well as PA0 (ST1), PA2 (ST2) and PA3 (ADB /INT)
 */
 
-static ADDRESS_MAP_START (maincpu_map, AS_PROGRAM, 16, lwriter_state)
+ADDRESS_MAP_START(lwriter_state::maincpu_map)
 	ADDRESS_MAP_UNMAP_HIGH
 	AM_RANGE(0x000000, 0x1fffff) AM_READWRITE(bankedarea_r, bankedarea_w)
 	AM_RANGE(0x200000, 0x2fffff) AM_ROM AM_REGION("rom", 0) // 1MB ROM

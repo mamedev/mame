@@ -117,6 +117,7 @@ public:
 	DECLARE_DRIVER_INIT(seibucats);
 
 	void seibucats(machine_config &config);
+	void seibucats_map(address_map &map);
 protected:
 	// driver_device overrides
 	virtual void machine_start() override;
@@ -162,7 +163,7 @@ WRITE16_MEMBER(seibucats_state::aux_rtc_w)
 {
 }
 
-static ADDRESS_MAP_START( seibucats_map, AS_PROGRAM, 32, seibucats_state )
+ADDRESS_MAP_START(seibucats_state::seibucats_map)
 	// TODO: map devices
 	AM_RANGE(0x00000000, 0x0003ffff) AM_RAM AM_SHARE("mainram")
 

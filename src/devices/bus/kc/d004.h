@@ -31,6 +31,8 @@ public:
 	DECLARE_WRITE8_MEMBER(fdd_select_w);
 	DECLARE_WRITE8_MEMBER(hw_terminal_count_w);
 
+	void kc_d004_io(address_map &map);
+	void kc_d004_mem(address_map &map);
 protected:
 	kc_d004_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock);
 
@@ -90,6 +92,7 @@ public:
 	DECLARE_READ8_MEMBER(gide_r);
 	DECLARE_WRITE8_MEMBER(gide_w);
 
+	void kc_d004_gide_io(address_map &map);
 protected:
 	// device-level overrides
 	virtual void device_reset() override;

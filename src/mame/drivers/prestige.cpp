@@ -162,6 +162,9 @@ public:
 	void glcolor(machine_config &config);
 	void prestige(machine_config &config);
 	void gl7007sl(machine_config &config);
+	void glcolor_io(address_map &map);
+	void prestige_io(address_map &map);
+	void prestige_mem(address_map &map);
 };
 
 
@@ -320,7 +323,7 @@ WRITE8_MEMBER( prestige_state::lcdc_w )
 }
 
 
-static ADDRESS_MAP_START(prestige_mem, AS_PROGRAM, 8, prestige_state)
+ADDRESS_MAP_START(prestige_state::prestige_mem)
 	AM_RANGE(0x0000, 0x3fff) AM_ROMBANK("bank1")
 	AM_RANGE(0x4000, 0x7fff) AM_ROMBANK("bank2")
 	AM_RANGE(0x8000, 0xbfff) AM_ROMBANK("bank3")
@@ -328,7 +331,7 @@ static ADDRESS_MAP_START(prestige_mem, AS_PROGRAM, 8, prestige_state)
 	AM_RANGE(0xe000, 0xffff) AM_RAMBANK("bank5")
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( prestige_io , AS_IO, 8, prestige_state)
+ADDRESS_MAP_START(prestige_state::prestige_io)
 	ADDRESS_MAP_UNMAP_HIGH
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	AM_RANGE(0x04, 0x05) AM_READWRITE(mouse_r, mouse_w)
@@ -338,7 +341,7 @@ static ADDRESS_MAP_START( prestige_io , AS_IO, 8, prestige_state)
 	AM_RANGE(0x50, 0x56) AM_READWRITE(bankswitch_r, bankswitch_w)
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( glcolor_io , AS_IO, 8, prestige_state)
+ADDRESS_MAP_START(prestige_state::glcolor_io)
 	ADDRESS_MAP_UNMAP_HIGH
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	AM_RANGE(0x30, 0x3f) AM_WRITE(lcdc_w)

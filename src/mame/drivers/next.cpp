@@ -892,7 +892,7 @@ WRITE_LINE_MEMBER(next_state::vblank_w)
 	}
 }
 
-static ADDRESS_MAP_START( next_mem, AS_PROGRAM, 32, next_state )
+ADDRESS_MAP_START(next_state::next_mem)
 	AM_RANGE(0x00000000, 0x0001ffff) AM_ROM AM_REGION("user1", 0)
 	AM_RANGE(0x01000000, 0x0101ffff) AM_ROM AM_REGION("user1", 0)
 	AM_RANGE(0x02000000, 0x020001ff) AM_MIRROR(0x300200) AM_READWRITE(dma_ctrl_r, dma_ctrl_w)
@@ -932,34 +932,34 @@ static ADDRESS_MAP_START( next_mem, AS_PROGRAM, 32, next_state )
 //  AM_RANGE(0x1c000000, 0x1c03ffff) main RAM w AB function
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( next_0b_m_nofdc_mem, AS_PROGRAM, 32, next_state )
+ADDRESS_MAP_START(next_state::next_0b_m_nofdc_mem)
 	AM_IMPORT_FROM(next_mem)
 	AM_RANGE(0x0b000000, 0x0b03ffff) AM_RAM AM_SHARE("vram")
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( next_fdc_mem, AS_PROGRAM, 32, next_state )
+ADDRESS_MAP_START(next_state::next_fdc_mem)
 	AM_IMPORT_FROM(next_mem)
 	AM_RANGE(0x02014100, 0x02014107) AM_MIRROR(0x300000) AM_DEVICE8("fdc", n82077aa_device, map, 0xffffffff)
 	AM_RANGE(0x02014108, 0x0201410b) AM_MIRROR(0x300000) AM_READWRITE(fdc_control_r, fdc_control_w)
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( next_0b_m_mem, AS_PROGRAM, 32, next_state )
+ADDRESS_MAP_START(next_state::next_0b_m_mem)
 	AM_IMPORT_FROM(next_fdc_mem)
 	AM_RANGE(0x0b000000, 0x0b03ffff) AM_RAM AM_SHARE("vram")
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( next_0c_m_mem, AS_PROGRAM, 32, next_state )
+ADDRESS_MAP_START(next_state::next_0c_m_mem)
 	AM_IMPORT_FROM(next_fdc_mem)
 	AM_RANGE(0x0c000000, 0x0c1fffff) AM_RAM AM_SHARE("vram")
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( next_0c_c_mem, AS_PROGRAM, 32, next_state )
+ADDRESS_MAP_START(next_state::next_0c_c_mem)
 	AM_IMPORT_FROM(next_fdc_mem)
 	AM_RANGE(0x0c000000, 0x0c1fffff) AM_RAM AM_SHARE("vram")
 	AM_RANGE(0x02018180, 0x02018183) AM_MIRROR(0x300000) AM_WRITE8(ramdac_w, 0xffffffff)
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( next_2c_c_mem, AS_PROGRAM, 32, next_state )
+ADDRESS_MAP_START(next_state::next_2c_c_mem)
 	AM_IMPORT_FROM(next_fdc_mem)
 	AM_RANGE(0x2c000000, 0x2c1fffff) AM_RAM AM_SHARE("vram")
 	AM_RANGE(0x02018180, 0x02018183) AM_MIRROR(0x300000) AM_WRITE8(ramdac_w, 0xffffffff)

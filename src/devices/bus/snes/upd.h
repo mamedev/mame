@@ -27,6 +27,8 @@ public:
 	virtual DECLARE_READ32_MEMBER(necdsp_prg_r);
 	virtual DECLARE_READ16_MEMBER(necdsp_data_r);
 
+	void dsp_data_map_lorom(address_map &map);
+	void dsp_prg_map_lorom(address_map &map);
 protected:
 	sns_rom20_necdsp_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock);
 
@@ -57,6 +59,8 @@ public:
 	virtual DECLARE_READ32_MEMBER(necdsp_prg_r);
 	virtual DECLARE_READ16_MEMBER(necdsp_data_r);
 
+	void dsp_data_map_hirom(address_map &map);
+	void dsp_prg_map_hirom(address_map &map);
 protected:
 	sns_rom21_necdsp_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock);
 
@@ -84,6 +88,8 @@ public:
 	virtual DECLARE_READ32_MEMBER(setadsp_prg_r);
 	virtual DECLARE_READ16_MEMBER(setadsp_data_r);
 
+	void st01x_data_map(address_map &map);
+	void st01x_prg_map(address_map &map);
 protected:
 	// construction/destruction
 	sns_rom_setadsp_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock);

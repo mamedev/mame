@@ -74,4 +74,7 @@ public:
 	required_device<palette_device> m_palette;
 	void sshanghb(machine_config &config);
 	void sshangha(machine_config &config);
+	void sshangha_map(address_map &map);
+	void sshangha_sound_map(address_map &map);
+	void sshanghb_map(address_map &map);
 };

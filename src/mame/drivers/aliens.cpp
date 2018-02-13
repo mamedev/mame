@@ -85,7 +85,7 @@ WRITE8_MEMBER(aliens_state::k052109_051960_w)
 		m_k051960->k051960_w(space, offset - 0x3c00, data);
 }
 
-static ADDRESS_MAP_START( aliens_map, AS_PROGRAM, 8, aliens_state )
+ADDRESS_MAP_START(aliens_state::aliens_map)
 	AM_RANGE(0x0000, 0x03ff) AM_DEVICE("bank0000", address_map_bank_device, amap8)
 	AM_RANGE(0x0400, 0x1fff) AM_RAM
 	AM_RANGE(0x2000, 0x3fff) AM_ROMBANK("rombank")                                /* banked ROM */
@@ -100,12 +100,12 @@ static ADDRESS_MAP_START( aliens_map, AS_PROGRAM, 8, aliens_state )
 	AM_RANGE(0x8000, 0xffff) AM_ROM AM_REGION("maincpu", 0x28000)                   /* ROM e24_j02.bin */
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( bank0000_map, AS_PROGRAM, 8, aliens_state )
+ADDRESS_MAP_START(aliens_state::bank0000_map)
 	AM_RANGE(0x0000, 0x03ff) AM_RAM
 	AM_RANGE(0x0400, 0x07ff) AM_RAM_DEVWRITE("palette", palette_device, write8) AM_SHARE("palette")
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( aliens_sound_map, AS_PROGRAM, 8, aliens_state )
+ADDRESS_MAP_START(aliens_state::aliens_sound_map)
 	AM_RANGE(0x0000, 0x7fff) AM_ROM                                     /* ROM g04_b03.bin */
 	AM_RANGE(0x8000, 0x87ff) AM_RAM                                     /* RAM */
 	AM_RANGE(0xa000, 0xa001) AM_DEVREADWRITE("ymsnd", ym2151_device, read, write)

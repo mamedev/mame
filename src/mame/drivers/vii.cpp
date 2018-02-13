@@ -141,6 +141,7 @@ public:
 	void spg2xx_base(machine_config &config);
 	void spg2xx_basep(machine_config &config);
 	void batman(machine_config &config);
+	void vii_mem(address_map &map);
 protected:
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
@@ -1003,7 +1004,7 @@ WRITE16_MEMBER( spg2xx_game_state::spriteram_w )
 }
 */
 
-static ADDRESS_MAP_START( vii_mem, AS_PROGRAM, 16, spg2xx_game_state )
+ADDRESS_MAP_START(spg2xx_game_state::vii_mem)
 	AM_RANGE( 0x000000, 0x3fffff ) AM_ROMBANK("cart")
 
 	AM_RANGE( 0x000000, 0x0027ff ) AM_RAM AM_SHARE("p_ram")

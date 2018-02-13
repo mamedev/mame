@@ -93,6 +93,8 @@ public:
 	z88cart_slot_device * m_carts[4];
 	DECLARE_PALETTE_INIT(z88);
 	void z88(machine_config &config);
+	void z88_io(address_map &map);
+	void z88_mem(address_map &map);
 };
 
 #endif /* MAME_INCLUDES_Z88_H */

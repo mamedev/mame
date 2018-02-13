@@ -46,6 +46,8 @@ public:
 	I8275_DRAW_CHARACTER_MEMBER(crtc_display_pixels);
 
 	void sagitta180(machine_config &config);
+	void maincpu_io_map(address_map &map);
+	void maincpu_map(address_map &map);
 private:
 	/* devices */
 	required_device<palette_device> m_palette;
@@ -115,7 +117,7 @@ void sagitta180_state::machine_reset()
 {
 }
 
-static ADDRESS_MAP_START( maincpu_map, AS_PROGRAM, 8, sagitta180_state )
+ADDRESS_MAP_START(sagitta180_state::maincpu_map)
 	ADDRESS_MAP_GLOBAL_MASK(0xffff)
 	AM_RANGE(0x0000, 0x07ff) AM_ROM
 //  AM_RANGE(0x0800, 0x17ff) AM_ROM
@@ -123,7 +125,7 @@ static ADDRESS_MAP_START( maincpu_map, AS_PROGRAM, 8, sagitta180_state )
 ADDRESS_MAP_END
 
 
-static ADDRESS_MAP_START( maincpu_io_map, AS_IO, 8, sagitta180_state )
+ADDRESS_MAP_START(sagitta180_state::maincpu_io_map)
 	AM_RANGE(0x00, 0x00) AM_READ_PORT("DSW")
 	AM_RANGE(0x20, 0x20) AM_DEVREADWRITE("uart", i8251_device, data_r, data_w)
 	AM_RANGE(0x21, 0x21) AM_DEVREADWRITE("uart", i8251_device, status_r, control_w)

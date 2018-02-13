@@ -219,7 +219,7 @@ DRIVER_INIT_MEMBER(ssystem3_state,ssystem3)
 	ssystem3_lcd_reset();
 }
 
-static ADDRESS_MAP_START( ssystem3_map , AS_PROGRAM, 8, ssystem3_state )
+ADDRESS_MAP_START(ssystem3_state::ssystem3_map)
 	AM_RANGE( 0x0000, 0x03ff) AM_RAM
 					/*
 67-de playfield ($40 means white, $80 black)

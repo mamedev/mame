@@ -46,10 +46,12 @@ public:
 
 	virtual void machine_start() override;
 	void gammagic(machine_config &config);
+	void gammagic_io(address_map &map);
+	void gammagic_map(address_map &map);
 };
 
 // Memory is mostly handled by the chipset
-static ADDRESS_MAP_START( gammagic_map, AS_PROGRAM, 32, gammagic_state )
+ADDRESS_MAP_START(gammagic_state::gammagic_map)
 	AM_RANGE(0x00000000, 0x0009ffff) AM_RAM
 	AM_RANGE(0x000a0000, 0x000bffff) AM_DEVREADWRITE8("vga", vga_device, mem_r, mem_w, 0xffffffff)
 	AM_RANGE(0x000e0000, 0x000fffff) AM_ROM AM_REGION("user", 0x20000)/* System BIOS */
@@ -58,14 +60,15 @@ static ADDRESS_MAP_START( gammagic_map, AS_PROGRAM, 32, gammagic_state )
 	AM_RANGE(0xfffe0000, 0xffffffff) AM_ROM AM_REGION("user", 0x20000)/* System BIOS */
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( gammagic_io, AS_IO, 32, gammagic_state)
+ADDRESS_MAP_START(gammagic_state::gammagic_io)
 	AM_IMPORT_FROM(pcat32_io_common)
 	AM_RANGE(0x00e8, 0x00ef) AM_NOP
 	AM_RANGE(0x00f0, 0x01ef) AM_NOP
-	AM_RANGE(0x01f8, 0x03ef) AM_NOP
+	AM_RANGE(0x01f8, 0x03af) AM_NOP
 	AM_RANGE(0x03b0, 0x03bf) AM_DEVREADWRITE8("vga", vga_device, port_03b0_r, port_03b0_w, 0xffffffff)
 	AM_RANGE(0x03c0, 0x03cf) AM_DEVREADWRITE8("vga", vga_device, port_03c0_r, port_03c0_w, 0xffffffff)
 	AM_RANGE(0x03d0, 0x03df) AM_DEVREADWRITE8("vga", vga_device, port_03d0_r, port_03d0_w, 0xffffffff)
+	AM_RANGE(0x03e0, 0x03ef) AM_NOP
 	AM_RANGE(0x0cf8, 0x0cff) AM_DEVREADWRITE("pcibus", pci_bus_legacy_device, read, write)
 	AM_RANGE(0x0400, 0xffff) AM_NOP
 ADDRESS_MAP_END

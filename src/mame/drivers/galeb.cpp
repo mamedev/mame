@@ -64,7 +64,7 @@ READ8_MEMBER(galeb_state::tape_data_r)
 }
 
 /* Address maps */
-static ADDRESS_MAP_START(galeb_mem, AS_PROGRAM, 8, galeb_state )
+ADDRESS_MAP_START(galeb_state::galeb_mem)
 	AM_RANGE( 0x0000, 0x1fff ) AM_RAM  // RAM
 	AM_RANGE( 0xbfe0, 0xbfe7 ) AM_READ(keyboard_r )
 	AM_RANGE( 0xbfe0, 0xbfe0 ) AM_WRITE(dac_w)

@@ -32,7 +32,7 @@ TIMER_DEVICE_CALLBACK_MEMBER(shaolins_state::interrupt)
 
 
 
-static ADDRESS_MAP_START( shaolins_map, AS_PROGRAM, 8, shaolins_state )
+ADDRESS_MAP_START(shaolins_state::shaolins_map)
 	AM_RANGE(0x0000, 0x0000) AM_WRITE(nmi_w)   /* bit 0 = flip screen, bit 1 = nmi enable, bit 2 = ? */
 														/* bit 3, bit 4 = coin counters */
 	AM_RANGE(0x0100, 0x0100) AM_DEVWRITE("watchdog", watchdog_timer_device, reset_w)

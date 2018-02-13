@@ -194,6 +194,7 @@ public:
 	DECLARE_READ8_MEMBER( pokey_r );
 	DECLARE_WRITE8_MEMBER( pokey_w );
 
+	void atarijsa1_map(address_map &map);
 protected:
 	// device level overrides
 	virtual void device_add_mconfig(machine_config &config) override;
@@ -226,6 +227,7 @@ public:
 	// read/write handlers
 	DECLARE_READ8_MEMBER( rdio_r );
 
+	void atarijsa2_map(address_map &map);
 protected:
 	// device level overrides
 	virtual void device_add_mconfig(machine_config &config) override;
@@ -243,6 +245,8 @@ public:
 	// construction/destruction
 	atari_jsa_iii_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
+	void atarijsa3_map(address_map &map);
+	void jsa3_oki1_map(address_map &map);
 protected:
 	// derived construction/destruction
 	atari_jsa_iii_device(const machine_config &mconfig, device_type devtype, const char *tag, device_t *owner, uint32_t clock, int channels);
@@ -268,6 +272,7 @@ public:
 	// construction/destruction
 	atari_jsa_iiis_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
+	void jsa3_oki2_map(address_map &map);
 protected:
 	// device level overrides
 	virtual void device_add_mconfig(machine_config &config) override;

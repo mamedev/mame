@@ -487,7 +487,7 @@ P1KEY11  29|30  P2KEY11
 
 
 // ps3v1
-static ADDRESS_MAP_START( ps3v1_map, AS_PROGRAM, 32, psikyosh_state )
+ADDRESS_MAP_START(psikyosh_state::ps3v1_map)
 // rom mapping
 	AM_RANGE(0x00000000, 0x000fffff) AM_ROM // program ROM (1 meg)
 	AM_RANGE(0x02000000, 0x020fffff) AM_ROM AM_REGION("maincpu", 0x100000) // data ROM
@@ -511,7 +511,7 @@ static ADDRESS_MAP_START( ps3v1_map, AS_PROGRAM, 32, psikyosh_state )
 ADDRESS_MAP_END
 
 // ps5, ps5v2
-static ADDRESS_MAP_START( ps5_map, AS_PROGRAM, 32, psikyosh_state )
+ADDRESS_MAP_START(psikyosh_state::ps5_map)
 // rom mapping
 	AM_RANGE(0x00000000, 0x000fffff) AM_ROM // program ROM (1 meg)
 // inputs/eeprom

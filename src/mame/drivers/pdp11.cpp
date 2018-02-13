@@ -119,6 +119,8 @@ public:
 	void pdp11ub2(machine_config &config);
 	void pdp11(machine_config &config);
 	void pdp11qb(machine_config &config);
+	void pdp11_mem(address_map &map);
+	void pdp11qb_mem(address_map &map);
 };
 
 READ16_MEMBER(pdp11_state::teletype_ctrl_r)
@@ -159,7 +161,7 @@ WRITE16_MEMBER(pdp11_state::teletype_ctrl_w)
 	}
 }
 
-static ADDRESS_MAP_START(pdp11_mem, AS_PROGRAM, 16, pdp11_state)
+ADDRESS_MAP_START(pdp11_state::pdp11_mem)
 	ADDRESS_MAP_UNMAP_HIGH
 	AM_RANGE( 0x0000, 0xdfff ) AM_RAM  // RAM
 	AM_RANGE( 0xea00, 0xfeff ) AM_ROM
@@ -168,7 +170,7 @@ static ADDRESS_MAP_START(pdp11_mem, AS_PROGRAM, 16, pdp11_state)
 	AM_RANGE( 0xfe78, 0xfe7b ) AM_DEVWRITE("rx01", rx01_device, write)
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START(pdp11qb_mem, AS_PROGRAM, 16, pdp11_state)
+ADDRESS_MAP_START(pdp11_state::pdp11qb_mem)
 	ADDRESS_MAP_UNMAP_HIGH
 	AM_RANGE( 0x0000, 0xe9ff ) AM_RAM  // RAM
 	AM_RANGE( 0xea00, 0xefff ) AM_ROM

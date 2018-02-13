@@ -304,14 +304,14 @@ WRITE8_MEMBER(samcoupe_state::samcoupe_lpt2_strobe_w)
     ADDRESS MAPS
 ***************************************************************************/
 
-static ADDRESS_MAP_START( samcoupe_mem, AS_PROGRAM, 8, samcoupe_state )
+ADDRESS_MAP_START(samcoupe_state::samcoupe_mem)
 	AM_RANGE(0x0000, 0x3fff) AM_RAM AM_READWRITE(sam_bank1_r, sam_bank1_w) // AM_RAMBANK("bank1")
 	AM_RANGE(0x4000, 0x7fff) AM_RAM AM_READWRITE(sam_bank2_r, sam_bank2_w) // AM_RAMBANK("bank2")
 	AM_RANGE(0x8000, 0xbfff) AM_RAM AM_READWRITE(sam_bank3_r, sam_bank3_w) // AM_RAMBANK("bank3")
 	AM_RANGE(0xc000, 0xffff) AM_RAM AM_READWRITE(sam_bank4_r, sam_bank4_w) // AM_RAMBANK("bank4")
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( samcoupe_io, AS_IO, 8, samcoupe_state )
+ADDRESS_MAP_START(samcoupe_state::samcoupe_io)
 	AM_RANGE(0x0080, 0x0081) AM_SELECT(0xff00) AM_WRITE(samcoupe_ext_mem_w)
 	AM_RANGE(0x00e0, 0x00e7) AM_SELECT(0xff10) AM_READWRITE(samcoupe_disk_r, samcoupe_disk_w)
 	AM_RANGE(0x00e8, 0x00e8) AM_SELECT(0xff00) AM_DEVWRITE("lpt1_data_out", output_latch_device, write)

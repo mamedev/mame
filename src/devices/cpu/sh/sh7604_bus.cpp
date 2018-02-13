@@ -93,7 +93,7 @@ WRITE16_MEMBER(sh7604_bus_device::refresh_timer_constant_w)
 	COMBINE_DATA(&m_rtcor);
 }
 
-DEVICE_ADDRESS_MAP_START( bus_regs, 16, sh7604_bus_device )
+ADDRESS_MAP_START(sh7604_bus_device::bus_regs)
 	AM_RANGE(0x00, 0x01) AM_READWRITE(bus_control_1_r, bus_control_1_w)
 	AM_RANGE(0x02, 0x03) AM_READWRITE(bus_control_2_r, bus_control_2_w)
 	AM_RANGE(0x04, 0x05) AM_READWRITE(wait_control_r, wait_control_w)

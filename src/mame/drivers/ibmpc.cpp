@@ -273,14 +273,16 @@ public:
 	void ibm5160(machine_config &config);
 	void ibm5150(machine_config &config);
 	void ibm5140(machine_config &config);
+	void pc8_io(address_map &map);
+	void pc8_map(address_map &map);
 };
 
-static ADDRESS_MAP_START( pc8_map, AS_PROGRAM, 8, ibmpc_state )
+ADDRESS_MAP_START(ibmpc_state::pc8_map)
 	ADDRESS_MAP_UNMAP_HIGH
 	AM_RANGE(0xf0000, 0xfffff) AM_ROM AM_REGION("bios", 0)
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START(pc8_io, AS_IO, 8, ibmpc_state )
+ADDRESS_MAP_START(ibmpc_state::pc8_io)
 	ADDRESS_MAP_UNMAP_HIGH
 	AM_RANGE(0x0000, 0x00ff) AM_DEVICE("mb", ibm5160_mb_device, map)
 ADDRESS_MAP_END

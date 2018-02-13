@@ -302,6 +302,8 @@ public:
 	void draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprect);
 	virtual void machine_reset() override;
 	void witch(machine_config &config);
+	void map_main(address_map &map);
+	void map_sub(address_map &map);
 };
 
 
@@ -479,7 +481,7 @@ WRITE8_MEMBER(witch_state::yscroll_w)
 	m_scrolly=data;
 }
 
-static ADDRESS_MAP_START( map_main, AS_PROGRAM, 8, witch_state )
+ADDRESS_MAP_START(witch_state::map_main)
 	AM_RANGE(0x0000, UNBANKED_SIZE-1) AM_ROM
 	AM_RANGE(UNBANKED_SIZE, 0x7fff) AM_ROMBANK("bank1")
 	AM_RANGE(0x8000, 0x8001) AM_DEVREADWRITE("ym1", ym2203_device, read, write)
@@ -502,7 +504,7 @@ static ADDRESS_MAP_START( map_main, AS_PROGRAM, 8, witch_state )
 ADDRESS_MAP_END
 
 
-static ADDRESS_MAP_START( map_sub, AS_PROGRAM, 8, witch_state )
+ADDRESS_MAP_START(witch_state::map_sub)
 	AM_RANGE(0x0000, 0x7fff) AM_ROM
 	AM_RANGE(0x8000, 0x8001) AM_DEVREADWRITE("ym1", ym2203_device, read, write)
 	AM_RANGE(0x8008, 0x8009) AM_DEVREADWRITE("ym2", ym2203_device, read, write)

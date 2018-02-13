@@ -78,6 +78,9 @@ public:
 
 	void namcona1(machine_config &config);
 
+	void namcona1_main_map(address_map &map);
+	void namcona1_mcu_io_map(address_map &map);
+	void namcona1_mcu_map(address_map &map);
 protected:
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
@@ -193,4 +196,5 @@ public:
 
 	DECLARE_DRIVER_INIT(xday2);
 	void xday2(machine_config &config);
+	void xday2_main_map(address_map &map);
 };

@@ -178,7 +178,7 @@ INTERRUPT_GEN_MEMBER(stactics_state::interrupt)
  *
  *************************************/
 
-static ADDRESS_MAP_START( main_map, AS_PROGRAM, 8, stactics_state )
+ADDRESS_MAP_START(stactics_state::main_map)
 	AM_RANGE(0x0000, 0x2fff) AM_ROM
 	AM_RANGE(0x4000, 0x40ff) AM_MIRROR(0x0700) AM_RAM
 	AM_RANGE(0x5000, 0x5000) AM_MIRROR(0x0fff) AM_READ_PORT("IN0")

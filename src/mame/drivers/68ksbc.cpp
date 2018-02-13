@@ -42,11 +42,12 @@ public:
 	{ }
 
 	void c68ksbc(machine_config &config);
+	void c68ksbc_mem(address_map &map);
 private:
 	required_device<cpu_device> m_maincpu;
 };
 
-static ADDRESS_MAP_START(c68ksbc_mem, AS_PROGRAM, 16, c68ksbc_state)
+ADDRESS_MAP_START(c68ksbc_state::c68ksbc_mem)
 	ADDRESS_MAP_UNMAP_HIGH
 	AM_RANGE(0x000000, 0x002fff) AM_ROM
 	AM_RANGE(0x003000, 0x5fffff) AM_RAM

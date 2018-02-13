@@ -335,7 +335,6 @@ MACHINE_START_MEMBER(ti85_state,ti83p)
 void ti85_state::ti8xpse_init_common()
 {
 	//address_space &space = m_maincpu->space(AS_PROGRAM);
-	//address_space &asic =  ADDRESS_MAP_NAME(ti83p_asic_mem);
 
 	m_timer_interrupt_mask = 0;
 	m_timer_interrupt_status = 0;

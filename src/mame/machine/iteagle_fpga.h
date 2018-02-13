@@ -103,9 +103,9 @@ private:
 	void update_sequence(uint32_t data);
 	void update_sequence_eg1(uint32_t data);
 
-	DECLARE_ADDRESS_MAP(rtc_map, 32);
-	DECLARE_ADDRESS_MAP(fpga_map, 32);
-	DECLARE_ADDRESS_MAP(ram_map, 32);
+	void rtc_map(address_map &map);
+	void fpga_map(address_map &map);
+	void ram_map(address_map &map);
 
 	DECLARE_READ32_MEMBER( fpga_r );
 	DECLARE_WRITE32_MEMBER( fpga_w );
@@ -141,7 +141,7 @@ private:
 
 	std::array<uint16_t, 0x40> m_iteagle_default_eeprom;
 
-	DECLARE_ADDRESS_MAP(eeprom_map, 32);
+	void eeprom_map(address_map &map);
 	DECLARE_READ32_MEMBER( eeprom_r );
 	DECLARE_WRITE32_MEMBER( eeprom_w );
 
@@ -163,7 +163,7 @@ private:
 	uint32_t m_ctrl_regs[0xd0/4];
 	uint8_t m_rtc_regs[0x100];
 
-	DECLARE_ADDRESS_MAP(ctrl_map, 32);
+	void ctrl_map(address_map &map);
 
 	DECLARE_READ32_MEMBER( ctrl_r );
 	DECLARE_WRITE32_MEMBER( ctrl_w );

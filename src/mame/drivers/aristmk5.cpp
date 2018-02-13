@@ -522,6 +522,9 @@ public:
 	void aristmk5_touch(machine_config &config);
 	void aristmk5_usa_touch(machine_config &config);
 	void aristmk5_usa(machine_config &config);
+	void aristmk5_drame_map(address_map &map);
+	void aristmk5_map(address_map &map);
+	void aristmk5_usa_map(address_map &map);
 private:
 	required_device_array<eeprom_serial_93cxx_device, 2> m_eeprom;
 	required_device<ds1302_device> m_rtc;
@@ -902,7 +905,7 @@ WRITE8_MEMBER(aristmk5_state::bill_acceptor_lamps_w)
 		output().set_lamp_value(24 + i, BIT(data, i));
 }
 
-static ADDRESS_MAP_START( aristmk5_map, AS_PROGRAM, 32, aristmk5_state )
+ADDRESS_MAP_START(aristmk5_state::aristmk5_map)
 	AM_RANGE(0x02000000, 0x02ffffff) AM_RAM AM_SHARE("physicalram") /* physical RAM - 16 MB for now, should be 512k for the A310 */
 
 	AM_RANGE(0x03000000, 0x0331ffff) AM_READWRITE(archimedes_ioc_r, archimedes_ioc_w)
@@ -936,7 +939,7 @@ static ADDRESS_MAP_START( aristmk5_map, AS_PROGRAM, 32, aristmk5_state )
 ADDRESS_MAP_END
 
 /* U.S games have no dram emulator enabled */
-static ADDRESS_MAP_START( aristmk5_usa_map, AS_PROGRAM, 32, aristmk5_state )
+ADDRESS_MAP_START(aristmk5_state::aristmk5_usa_map)
 	AM_IMPORT_FROM(aristmk5_map)
 
 	AM_RANGE(0x00000000, 0x01ffffff) AM_READWRITE(archimedes_memc_logical_r, archimedes_memc_logical_w)
@@ -965,7 +968,7 @@ static ADDRESS_MAP_START( aristmk5_usa_map, AS_PROGRAM, 32, aristmk5_state )
 ADDRESS_MAP_END
 
 /* with dram emulator enabled */
-static ADDRESS_MAP_START( aristmk5_drame_map, AS_PROGRAM, 32, aristmk5_state )
+ADDRESS_MAP_START(aristmk5_state::aristmk5_drame_map)
 	AM_IMPORT_FROM(aristmk5_map)
 
 	AM_RANGE(0x00000000, 0x01ffffff) AM_READWRITE(aristmk5_drame_memc_logical_r, archimedes_memc_logical_w)

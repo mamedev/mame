@@ -223,6 +223,10 @@ public:
 	void vfxsd(machine_config &config);
 	void eps(machine_config &config);
 	void vfx32(machine_config &config);
+	void eps_map(address_map &map);
+	void sq1_map(address_map &map);
+	void vfx_map(address_map &map);
+	void vfxsd_map(address_map &map);
 private:
 	uint16_t  *m_rom, *m_ram;
 	uint16_t m_analog_values[8];
@@ -377,7 +381,7 @@ WRITE16_MEMBER(esq5505_state::lower_w)
 	}
 }
 
-static ADDRESS_MAP_START( vfx_map, AS_PROGRAM, 16, esq5505_state )
+ADDRESS_MAP_START(esq5505_state::vfx_map)
 	AM_RANGE(0x000000, 0x007fff) AM_READWRITE(lower_r, lower_w)
 	AM_RANGE(0x200000, 0x20001f) AM_DEVREADWRITE("otis", es5505_device, read, write)
 	AM_RANGE(0x280000, 0x28001f) AM_DEVREADWRITE8("duart", mc68681_device, read, write, 0x00ff)
@@ -386,7 +390,7 @@ static ADDRESS_MAP_START( vfx_map, AS_PROGRAM, 16, esq5505_state )
 	AM_RANGE(0xff0000, 0xffffff) AM_RAM AM_SHARE("osram")
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( vfxsd_map, AS_PROGRAM, 16, esq5505_state )
+ADDRESS_MAP_START(esq5505_state::vfxsd_map)
 	AM_RANGE(0x000000, 0x00ffff) AM_READWRITE(lower_r, lower_w)
 	AM_RANGE(0x200000, 0x20001f) AM_DEVREADWRITE("otis", es5505_device, read, write)
 	AM_RANGE(0x280000, 0x28001f) AM_DEVREADWRITE8("duart", mc68681_device, read, write, 0x00ff)
@@ -397,7 +401,7 @@ static ADDRESS_MAP_START( vfxsd_map, AS_PROGRAM, 16, esq5505_state )
 	AM_RANGE(0xff0000, 0xffffff) AM_RAM AM_SHARE("osram")
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( eps_map, AS_PROGRAM, 16, esq5505_state )
+ADDRESS_MAP_START(esq5505_state::eps_map)
 	AM_RANGE(0x000000, 0x007fff) AM_READWRITE(lower_r, lower_w)
 	AM_RANGE(0x200000, 0x20001f) AM_DEVREADWRITE("otis", es5505_device, read, write)
 	AM_RANGE(0x240000, 0x2400ff) AM_DEVREADWRITE("mc68450", hd63450_device, read, write)
@@ -408,7 +412,7 @@ static ADDRESS_MAP_START( eps_map, AS_PROGRAM, 16, esq5505_state )
 	AM_RANGE(0xff0000, 0xffffff) AM_RAM AM_SHARE("osram")
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( sq1_map, AS_PROGRAM, 16, esq5505_state )
+ADDRESS_MAP_START(esq5505_state::sq1_map)
 	AM_RANGE(0x000000, 0x03ffff) AM_READWRITE(lower_r, lower_w)
 	AM_RANGE(0x200000, 0x20001f) AM_DEVREADWRITE("otis", es5505_device, read, write)
 	AM_RANGE(0x260000, 0x2601ff) AM_DEVREADWRITE8("esp", es5510_device, host_r, host_w, 0x0ff)

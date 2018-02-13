@@ -76,6 +76,7 @@ public:
 
 	void mnumber(machine_config &config);
 	void itgamble(machine_config &config);
+	void itgamble_map(address_map &map);
 protected:
 
 	// devices
@@ -107,7 +108,7 @@ uint32_t itgamble_state::screen_update(screen_device &screen, bitmap_ind16 &bitm
 * Memory map information *
 *************************/
 
-static ADDRESS_MAP_START( itgamble_map, AS_PROGRAM, 16, itgamble_state )
+ADDRESS_MAP_START(itgamble_state::itgamble_map)
 	ADDRESS_MAP_GLOBAL_MASK(0xffffff)
 	AM_RANGE(0x000000, 0xffffff) AM_ROM
 ADDRESS_MAP_END

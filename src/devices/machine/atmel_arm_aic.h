@@ -27,7 +27,7 @@ public:
 	// configuration
 	template <class Object> static devcb_base &set_line_callback(device_t &device, Object &&cb) { return downcast<arm_aic_device &>(device).m_irq_out.set_callback(std::forward<Object>(cb)); }
 
-	DECLARE_ADDRESS_MAP(regs_map, 32);
+	void regs_map(address_map &map);
 
 	DECLARE_READ32_MEMBER(irq_vector_r);
 	DECLARE_READ32_MEMBER(firq_vector_r);

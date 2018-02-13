@@ -36,6 +36,7 @@ public:
 	DECLARE_WRITE_LINE_MEMBER(paperempty_led_w);
 	DECLARE_WRITE_LINE_MEMBER(reset_w);
 
+	void lx800_mem(address_map &map);
 protected:
 	epson_lx800_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock);
 

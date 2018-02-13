@@ -3,10 +3,8 @@
 
 #pragma once
 
-#ifndef __PC6001__
-#define __PC6001__
-
-#include "emu.h"
+#ifndef MAME_INCLUDES_PC6001_H
+#define MAME_INCLUDES_PC6001_H
 
 #include "cpu/z80/z80.h"
 #include "imagedev/cassette.h"
@@ -15,6 +13,7 @@
 #include "machine/timer.h"
 #include "sound/ay8910.h"
 #include "sound/upd7752.h"
+//#include "sound/2203intf.h"
 #include "sound/wave.h"
 #include "video/mc6847.h"
 
@@ -22,6 +21,7 @@
 #include "bus/generic/carts.h"
 
 #include "speaker.h"
+#include "screen.h"
 
 #include "formats/p6001_cas.h"
 
@@ -33,6 +33,7 @@ public:
 		m_ppi(*this, "ppi8255"),
 		m_ram(*this, "ram"),
 		m_maincpu(*this, "maincpu"),
+		m_screen(*this, "screen"),
 		m_cassette(*this, "cassette"),
 		m_cas_hack(*this, "cas_hack"),
 		m_cart(*this, "cartslot"),
@@ -69,10 +70,13 @@ public:
 	IRQ_CALLBACK_MEMBER(irq_callback);
 
 	void pc6001(machine_config &config);
+	void pc6001_io(address_map &map);
+	void pc6001_map(address_map &map);
 protected:
 	required_device<i8255_device> m_ppi;
 	optional_shared_ptr<uint8_t> m_ram;
 	required_device<cpu_device> m_maincpu;
+	required_device<screen_device> m_screen;
 	optional_device<cassette_image_device> m_cassette;
 	optional_device<generic_slot_device> m_cas_hack;
 	required_device<generic_slot_device> m_cart;
@@ -99,6 +103,9 @@ protected:
 	uint8_t check_keyboard_press();
 	inline void cassette_latch_control(bool new_state);
 	inline void ppi_control_hack_w(uint8_t data);
+	inline void set_timer_divider(uint8_t data);
+	inline void set_videoram_bank(uint32_t offs);
+	inline void set_maincpu_irq_line(uint8_t vector_num);
 	
 	// video functions
 	void draw_gfx_mode4(bitmap_ind16 &bitmap,const rectangle &cliprect,int attr);
@@ -115,7 +122,6 @@ protected:
 	uint8_t m_sys_latch;
 	uint32_t m_cas_offset;
 	uint32_t m_cas_maxsize;
-	uint8_t m_gfx_bank_on;
 	uint8_t m_bank_opt;
 	uint8_t m_timer_irq_mask;
 	uint8_t m_timer_irq_mask2;
@@ -167,14 +173,16 @@ public:
 	DECLARE_WRITE8_MEMBER(mk2_timer_adj_w);
 	DECLARE_WRITE8_MEMBER(mk2_timer_irqv_w);
 
-	DECLARE_MACHINE_RESET(pc6001mk2);
 	DECLARE_PALETTE_INIT(pc6001mk2);
 	void pc6001mk2(machine_config &config);
 
 	uint32_t screen_update_pc6001mk2(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 
+	void pc6001mk2_io(address_map &map);
+	void pc6001mk2_map(address_map &map);
 protected:
 	uint8_t m_bgcol_bank;
+	uint8_t m_gfx_bank_on;
 	required_memory_bank m_bank2;
 	required_memory_bank m_bank3;
 	required_memory_bank m_bank4;
@@ -182,6 +190,10 @@ protected:
 	required_memory_bank m_bank6;
 	required_memory_bank m_bank7;
 	required_memory_bank m_bank8;
+	inline void refresh_crtc_params();
+	
+	virtual void video_start() override; 
+	virtual void machine_reset() override;
 	
 private:
 	uint8_t m_bank_r0;
@@ -207,15 +219,18 @@ public:
 	DECLARE_WRITE8_MEMBER(fdc_w);
 
 	void pc6601(machine_config &config);
+	void pc6601_io(address_map &map);
 };
 
 class pc6001sr_state : public pc6601_state
 {
 public:
 	pc6001sr_state(const machine_config &mconfig, device_type type, const char *tag)
-		: pc6601_state(mconfig, type, tag)
+		: pc6601_state(mconfig, type, tag),
+		m_sr_irq_vectors(*this, "irq_vectors")
 	{};
 
+	DECLARE_READ8_MEMBER(hw_rev_r);
 	DECLARE_READ8_MEMBER(sr_bank_rn_r);
 	DECLARE_WRITE8_MEMBER(sr_bank_rn_w);
 	DECLARE_READ8_MEMBER(sr_bank_wn_r);
@@ -232,21 +247,42 @@ public:
 	DECLARE_WRITE8_MEMBER(sr_vram_bank_w);
 	DECLARE_WRITE8_MEMBER(sr_system_latch_w);
 	DECLARE_WRITE8_MEMBER(necsr_ppi8255_w);
-
+	DECLARE_WRITE8_MEMBER(sr_bitmap_yoffs_w);
+	DECLARE_WRITE8_MEMBER(sr_bitmap_xoffs_w);
+	
 	INTERRUPT_GEN_MEMBER(sr_vrtc_irq);
-
-	DECLARE_MACHINE_RESET(pc6001sr);
 
 	uint32_t screen_update_pc6001sr(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 
 	void pc6001sr(machine_config &config);
-	
+
+	void pc6001sr_io(address_map &map);
+	void pc6001sr_map(address_map &map);
+protected:
+	virtual void video_start() override; 
+	virtual void machine_reset() override;
+
 private:
 	uint8_t m_sr_bank_r[8];
 	uint8_t m_sr_bank_w[8];
 	uint8_t m_kludge;
-	uint8_t m_sr_video_mode;
-
+	bool m_sr_text_mode;
+	uint8_t m_sr_text_rows;
+	uint8_t *m_gvram;
+	uint8_t m_bitmap_yoffs,m_bitmap_xoffs;
+	
+	enum{
+		SUB_CPU_IRQ = 0,
+		JOYSTICK_IRQ,
+		TIMER_IRQ,
+		VOICE_IRQ,
+		VRTC_IRQ,
+		RS232_IRQ,
+		PRINTER_IRQ,
+		EXT_IRQ
+	};
+	
+	required_shared_ptr<uint8_t> m_sr_irq_vectors;
 };
 
 #endif

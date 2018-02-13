@@ -185,6 +185,8 @@ public:
 	DECLARE_WRITE16_MEMBER(eeprom_8401c_w);
 	virtual void machine_start() override;
 	void bpmmicro(machine_config &config);
+	void i286_io(address_map &map);
+	void i286_mem(address_map &map);
 private:
 	required_device<cpu_device> m_maincpu;
 	required_device<eeprom_serial_93cxx_device> m_eeprom_u38;
@@ -328,7 +330,7 @@ read <- 00
  Address Maps
 ******************************************************************************/
 
-static ADDRESS_MAP_START(i286_mem, AS_PROGRAM, 16, bpmmicro_state)
+ADDRESS_MAP_START(bpmmicro_state::i286_mem)
 	ADDRESS_MAP_UNMAP_HIGH
 	AM_RANGE(0x000000, 0x07ffff) AM_RAM // 512k ram
 	AM_RANGE(0x082200, 0x82201) AM_WRITE(unknown_82200_w)
@@ -343,7 +345,7 @@ static ADDRESS_MAP_START(i286_mem, AS_PROGRAM, 16, bpmmicro_state)
 	AM_RANGE(0xfffff0, 0xffffff) AM_ROM AM_REGION("bios", 0x1fff0) //?
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START(i286_io, AS_IO, 16, bpmmicro_state)
+ADDRESS_MAP_START(bpmmicro_state::i286_io)
 	ADDRESS_MAP_UNMAP_HIGH
 ADDRESS_MAP_END
 

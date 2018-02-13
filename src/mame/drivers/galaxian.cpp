@@ -1549,13 +1549,13 @@ LATCH: (write 7000-77ff)
 
 /* map derived from schematics */
 
-static ADDRESS_MAP_START( galaxian_map_discrete, AS_PROGRAM, 8, galaxian_state )
+ADDRESS_MAP_START(galaxian_state::galaxian_map_discrete)
 	AM_RANGE(0x6004, 0x6007) AM_MIRROR(0x07f8) AM_DEVWRITE("cust", galaxian_sound_device, lfo_freq_w)
 	AM_RANGE(0x6800, 0x6807) AM_MIRROR(0x07f8) AM_DEVWRITE("cust", galaxian_sound_device, sound_w)
 	AM_RANGE(0x7800, 0x7800) AM_MIRROR(0x07ff) AM_DEVWRITE("cust", galaxian_sound_device, pitch_w)
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( galaxian_map_base, AS_PROGRAM, 8, galaxian_state )
+ADDRESS_MAP_START(galaxian_state::galaxian_map_base)
 	ADDRESS_MAP_UNMAP_HIGH
 	AM_RANGE(0x0000, 0x3fff) AM_ROM
 	AM_RANGE(0x4000, 0x43ff) AM_MIRROR(0x0400) AM_RAM
@@ -1577,20 +1577,20 @@ static ADDRESS_MAP_START( galaxian_map_base, AS_PROGRAM, 8, galaxian_state )
 	AM_RANGE(0x7800, 0x7800) AM_MIRROR(0x07ff) AM_DEVREAD("watchdog", watchdog_timer_device, reset_r)
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( galaxian_map, AS_PROGRAM, 8, galaxian_state )
+ADDRESS_MAP_START(galaxian_state::galaxian_map)
 	AM_IMPORT_FROM(galaxian_map_base)
 	AM_IMPORT_FROM(galaxian_map_discrete)
 ADDRESS_MAP_END
 
 /* map derived from schematics */
 
-static ADDRESS_MAP_START( mooncrst_map_discrete, AS_PROGRAM, 8, galaxian_state )
+ADDRESS_MAP_START(galaxian_state::mooncrst_map_discrete)
 	AM_RANGE(0xa004, 0xa007) AM_MIRROR(0x07f8) AM_DEVWRITE("cust", galaxian_sound_device, lfo_freq_w)
 	AM_RANGE(0xa800, 0xa807) AM_MIRROR(0x07f8) AM_DEVWRITE("cust", galaxian_sound_device, sound_w)
 	AM_RANGE(0xb800, 0xb800) AM_MIRROR(0x07ff) AM_DEVWRITE("cust", galaxian_sound_device, pitch_w)
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( mooncrst_map_base, AS_PROGRAM, 8, galaxian_state )
+ADDRESS_MAP_START(galaxian_state::mooncrst_map_base)
 	ADDRESS_MAP_UNMAP_HIGH
 	AM_RANGE(0x0000, 0x3fff) AM_ROM
 	AM_RANGE(0x8000, 0x83ff) AM_MIRROR(0x0400) AM_RAM
@@ -1611,17 +1611,17 @@ static ADDRESS_MAP_START( mooncrst_map_base, AS_PROGRAM, 8, galaxian_state )
 	AM_RANGE(0xb800, 0xb800) AM_MIRROR(0x07ff) AM_DEVREAD("watchdog", watchdog_timer_device, reset_r)
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( moonqsr_decrypted_opcodes_map, AS_OPCODES, 8, galaxian_state )
+ADDRESS_MAP_START(galaxian_state::moonqsr_decrypted_opcodes_map)
 	AM_RANGE(0x0000, 0x3fff) AM_ROM AM_SHARE("decrypted_opcodes")
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( mooncrst_map, AS_PROGRAM, 8, galaxian_state )
+ADDRESS_MAP_START(galaxian_state::mooncrst_map)
 	AM_IMPORT_FROM(mooncrst_map_base)
 	AM_IMPORT_FROM(mooncrst_map_discrete)
 ADDRESS_MAP_END
 
 
-static ADDRESS_MAP_START( fantastc_map, AS_PROGRAM, 8, galaxian_state )
+ADDRESS_MAP_START(galaxian_state::fantastc_map)
 	ADDRESS_MAP_UNMAP_HIGH
 	AM_RANGE(0x0000, 0x7fff) AM_ROM
 	AM_RANGE(0x8000, 0x87ff) AM_RAM
@@ -1639,7 +1639,7 @@ static ADDRESS_MAP_START( fantastc_map, AS_PROGRAM, 8, galaxian_state )
 	AM_RANGE(0xfffe, 0xfffe) AM_NOP // ?
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( timefgtr_map, AS_PROGRAM, 8, galaxian_state )
+ADDRESS_MAP_START(galaxian_state::timefgtr_map)
 	ADDRESS_MAP_UNMAP_HIGH
 	AM_RANGE(0x0000, 0x7fff) AM_ROM
 	AM_RANGE(0x8000, 0x87ff) AM_RAM
@@ -1659,7 +1659,7 @@ static ADDRESS_MAP_START( timefgtr_map, AS_PROGRAM, 8, galaxian_state )
 //  AM_RANGE(0xfff8, 0xffff) AM_WRITENOP // sound related?
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( zigzag_map, AS_PROGRAM, 8, galaxian_state )
+ADDRESS_MAP_START(galaxian_state::zigzag_map)
 	ADDRESS_MAP_UNMAP_HIGH
 	AM_RANGE(0x0000, 0x1fff) AM_ROM
 	AM_RANGE(0x2000, 0x2fff) AM_ROMBANK("bank1")
@@ -1683,7 +1683,7 @@ ADDRESS_MAP_END
 
 
 /* map derived from schematics */
-static ADDRESS_MAP_START( theend_map, AS_PROGRAM, 8, galaxian_state )
+ADDRESS_MAP_START(galaxian_state::theend_map)
 	ADDRESS_MAP_UNMAP_HIGH
 	AM_RANGE(0x0000, 0x3fff) AM_ROM
 	AM_RANGE(0x4000, 0x47ff) AM_RAM
@@ -1701,7 +1701,7 @@ static ADDRESS_MAP_START( theend_map, AS_PROGRAM, 8, galaxian_state )
 ADDRESS_MAP_END
 
 /* map not derived from schematics. Used by explorer and takeoff */
-static ADDRESS_MAP_START( explorer_map, AS_PROGRAM, 8, galaxian_state )
+ADDRESS_MAP_START(galaxian_state::explorer_map)
 	ADDRESS_MAP_UNMAP_HIGH
 	AM_RANGE(0x0000, 0x3fff) AM_ROM
 	AM_RANGE(0x4000, 0x47ff) AM_RAM
@@ -1725,7 +1725,7 @@ static ADDRESS_MAP_START( explorer_map, AS_PROGRAM, 8, galaxian_state )
 ADDRESS_MAP_END
 
 /* map derived from schematics */
-static ADDRESS_MAP_START( scobra_map, AS_PROGRAM, 8, galaxian_state )
+ADDRESS_MAP_START(galaxian_state::scobra_map)
 	ADDRESS_MAP_UNMAP_HIGH
 	AM_RANGE(0x0000, 0x7fff) AM_ROM
 	AM_RANGE(0x8000, 0x87ff) AM_MIRROR(0x4000) AM_RAM
@@ -1744,7 +1744,7 @@ static ADDRESS_MAP_START( scobra_map, AS_PROGRAM, 8, galaxian_state )
 ADDRESS_MAP_END
 
 
-static ADDRESS_MAP_START( anteateruk_map, AS_PROGRAM, 8, galaxian_state )
+ADDRESS_MAP_START(galaxian_state::anteateruk_map)
 	ADDRESS_MAP_UNMAP_HIGH
 	AM_RANGE(0x0000, 0x03ff) AM_ROM
 	AM_RANGE(0x0400, 0x0bff) AM_RAM
@@ -1764,7 +1764,7 @@ static ADDRESS_MAP_START( anteateruk_map, AS_PROGRAM, 8, galaxian_state )
 ADDRESS_MAP_END
 
 
-static ADDRESS_MAP_START( spactrai_map, AS_PROGRAM, 8, galaxian_state )
+ADDRESS_MAP_START(galaxian_state::spactrai_map)
 	ADDRESS_MAP_UNMAP_HIGH
 	AM_RANGE(0x0000, 0x01ff) AM_ROM
 	AM_RANGE(0x0200, 0x05ff) AM_RAM // this sits over ROM, does the 0x400 bytes of ROM underneath bank or appear elsewhere?
@@ -1798,7 +1798,7 @@ static ADDRESS_MAP_START( spactrai_map, AS_PROGRAM, 8, galaxian_state )
 
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( anteaterg_map, AS_PROGRAM, 8, galaxian_state )
+ADDRESS_MAP_START(galaxian_state::anteaterg_map)
 	ADDRESS_MAP_UNMAP_HIGH
 	AM_RANGE(0x0000, 0x03ff) AM_ROM
 	AM_RANGE(0x0400, 0x0bff) AM_RAM
@@ -1819,7 +1819,7 @@ static ADDRESS_MAP_START( anteaterg_map, AS_PROGRAM, 8, galaxian_state )
 	AM_RANGE(0xf600, 0xf603) AM_MIRROR(0x01fc) AM_DEVREADWRITE("ppi8255_0", i8255_device, read, write)
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( anteatergg_map, AS_PROGRAM, 8, galaxian_state )
+ADDRESS_MAP_START(galaxian_state::anteatergg_map)
 	ADDRESS_MAP_UNMAP_HIGH
 	AM_IMPORT_FROM(galaxian_map_discrete)
 	AM_RANGE(0x0000, 0x3fff) AM_ROM
@@ -1841,7 +1841,7 @@ static ADDRESS_MAP_START( anteatergg_map, AS_PROGRAM, 8, galaxian_state )
 ADDRESS_MAP_END
 
 /* map derived from schematics */
-static ADDRESS_MAP_START( frogger_map, AS_PROGRAM, 8, galaxian_state )
+ADDRESS_MAP_START(galaxian_state::frogger_map)
 	ADDRESS_MAP_UNMAP_HIGH
 	AM_RANGE(0x0000, 0x3fff) AM_ROM
 	AM_RANGE(0x8000, 0x87ff) AM_RAM
@@ -1858,7 +1858,7 @@ ADDRESS_MAP_END
 
 
 /* map derived from schematics */
-static ADDRESS_MAP_START( turtles_map, AS_PROGRAM, 8, galaxian_state )
+ADDRESS_MAP_START(galaxian_state::turtles_map)
 	ADDRESS_MAP_UNMAP_HIGH
 	AM_RANGE(0x0000, 0x7fff) AM_ROM
 	AM_RANGE(0x8000, 0x87ff) AM_MIRROR(0x4000) AM_RAM
@@ -1879,7 +1879,7 @@ ADDRESS_MAP_END
 
 
 /* map NOT derived from schematics */
-static ADDRESS_MAP_START( amigo2_map, AS_PROGRAM, 8, galaxian_state )
+ADDRESS_MAP_START(galaxian_state::amigo2_map)
 	AM_RANGE(0x0000, 0x3fff) AM_ROM
 	AM_RANGE(0x4000, 0x4000) AM_READ_PORT("IN0") AM_DEVWRITE("soundlatch", generic_latch_8_device, write)
 	AM_RANGE(0x4001, 0x4001) AM_READ_PORT("IN1")
@@ -1900,7 +1900,7 @@ static ADDRESS_MAP_START( amigo2_map, AS_PROGRAM, 8, galaxian_state )
 	AM_RANGE(0xa800, 0xa800) AM_DEVREAD("watchdog", watchdog_timer_device, reset_r)
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( turpins_map, AS_PROGRAM, 8, galaxian_state )
+ADDRESS_MAP_START(galaxian_state::turpins_map)
 	AM_RANGE(0x0000, 0x7fff) AM_ROM
 	AM_RANGE(0x8000, 0x87ff) AM_RAM
 	AM_RANGE(0x9000, 0x93ff) AM_MIRROR(0x0400) AM_RAM_WRITE(galaxian_videoram_w) AM_SHARE("videoram")
@@ -1919,7 +1919,7 @@ ADDRESS_MAP_END
 
 /* this is the same as theend, except for separate RGB background controls
    and some extra ROM space at $7000 and $C000 */
-static ADDRESS_MAP_START( sfx_map, AS_PROGRAM, 8, galaxian_state )
+ADDRESS_MAP_START(galaxian_state::sfx_map)
 	AM_RANGE(0x0000, 0x3fff) AM_ROM
 	AM_RANGE(0x4000, 0x47ff) AM_RAM
 	AM_RANGE(0x4800, 0x4bff) AM_MIRROR(0x0400) AM_RAM_WRITE(galaxian_videoram_w) AM_SHARE("videoram")
@@ -1938,7 +1938,7 @@ static ADDRESS_MAP_START( sfx_map, AS_PROGRAM, 8, galaxian_state )
 ADDRESS_MAP_END
 
 
-static ADDRESS_MAP_START( monsterz_map, AS_PROGRAM, 8, galaxian_state )
+ADDRESS_MAP_START(galaxian_state::monsterz_map)
 	AM_RANGE(0x0000, 0x37ff) AM_ROM
 	AM_RANGE(0x3800, 0x3fff) AM_RAM // extra RAM used by protection
 	AM_RANGE(0x4000, 0x47ff) AM_RAM
@@ -1967,7 +1967,7 @@ ADDRESS_MAP_END
     $8000-$afff: additional ROM area
     $b000-$bfff: protection
 */
-static ADDRESS_MAP_START( jumpbug_map, AS_PROGRAM, 8, galaxian_state )
+ADDRESS_MAP_START(galaxian_state::jumpbug_map)
 	ADDRESS_MAP_UNMAP_HIGH
 	AM_RANGE(0x0000, 0x3fff) AM_ROM
 	AM_RANGE(0x4000, 0x47ff) AM_RAM
@@ -1989,7 +1989,7 @@ static ADDRESS_MAP_START( jumpbug_map, AS_PROGRAM, 8, galaxian_state )
 ADDRESS_MAP_END
 
 
-static ADDRESS_MAP_START( frogf_map, AS_PROGRAM, 8, galaxian_state )
+ADDRESS_MAP_START(galaxian_state::frogf_map)
 	ADDRESS_MAP_UNMAP_HIGH
 	AM_RANGE(0x0000, 0x3fff) AM_ROM
 	AM_RANGE(0x8000, 0x87ff) AM_RAM
@@ -2006,7 +2006,7 @@ ADDRESS_MAP_END
 
 
 /* mooncrst */
-static ADDRESS_MAP_START( mshuttle_map, AS_PROGRAM, 8, galaxian_state )
+ADDRESS_MAP_START(galaxian_state::mshuttle_map)
 	ADDRESS_MAP_UNMAP_HIGH
 	AM_RANGE(0x0000, 0x7fff) AM_ROM
 	AM_RANGE(0x8000, 0x83ff) AM_RAM
@@ -2025,11 +2025,11 @@ static ADDRESS_MAP_START( mshuttle_map, AS_PROGRAM, 8, galaxian_state )
 	AM_RANGE(0xb800, 0xb800) AM_DEVREAD("watchdog", watchdog_timer_device, reset_r)
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( mshuttle_decrypted_opcodes_map, AS_OPCODES, 8, galaxian_state )
+ADDRESS_MAP_START(galaxian_state::mshuttle_decrypted_opcodes_map)
 	AM_RANGE(0x0000, 0x7fff) AM_ROM AM_SHARE("decrypted_opcodes")
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( mshuttle_portmap, AS_IO, 8, galaxian_state )
+ADDRESS_MAP_START(galaxian_state::mshuttle_portmap)
 	ADDRESS_MAP_UNMAP_HIGH
 	ADDRESS_MAP_GLOBAL_MASK(0x0f)
 	AM_RANGE(0x08, 0x08) AM_WRITE(mshuttle_ay8910_control_w)
@@ -2053,7 +2053,7 @@ WRITE8_MEMBER(galaxian_state::tenspot_unk_e000_w)
 	logerror("tenspot_unk_e000_w %02x\n",data);
 }
 
-static ADDRESS_MAP_START( tenspot_select_map, AS_PROGRAM, 8, galaxian_state )
+ADDRESS_MAP_START(galaxian_state::tenspot_select_map)
 	ADDRESS_MAP_UNMAP_HIGH
 	AM_RANGE(0x0000, 0x07ff) AM_ROM
 	AM_RANGE(0x2000, 0x23ff) AM_RAM
@@ -2083,7 +2083,7 @@ WRITE8_MEMBER(galaxian_state::froggeram_ppi8255_w)
 	if (offset & 0x0200) m_ppi8255[1]->write(space, offset & 3, data);
 }
 
-static ADDRESS_MAP_START( froggeram_map, AS_PROGRAM, 8, galaxian_state )
+ADDRESS_MAP_START(galaxian_state::froggeram_map)
 	ADDRESS_MAP_UNMAP_HIGH
 	AM_RANGE(0x0000, 0x2fff) AM_ROM
 	AM_RANGE(0x4000, 0x43ff) AM_READWRITE(froggeram_ppi8255_r, froggeram_ppi8255_w)
@@ -2104,40 +2104,40 @@ ADDRESS_MAP_END
  *************************************/
 
 /* Konami Frogger with 1 x AY-8910A */
-static ADDRESS_MAP_START( frogger_sound_map, AS_PROGRAM, 8, galaxian_state )
+ADDRESS_MAP_START(galaxian_state::frogger_sound_map)
 	ADDRESS_MAP_GLOBAL_MASK(0x7fff)
 	AM_RANGE(0x0000, 0x1fff) AM_ROM
 	AM_RANGE(0x4000, 0x43ff) AM_MIRROR(0x1c00) AM_RAM
 	AM_RANGE(0x6000, 0x6fff) AM_MIRROR(0x1000) AM_WRITE(konami_sound_filter_w)
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( frogger_sound_portmap, AS_IO, 8, galaxian_state )
+ADDRESS_MAP_START(galaxian_state::frogger_sound_portmap)
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	AM_RANGE(0x00, 0xff) AM_READWRITE(frogger_ay8910_r, frogger_ay8910_w)
 ADDRESS_MAP_END
 
 
 /* Konami generic with 2 x AY-8910A */
-static ADDRESS_MAP_START( konami_sound_map, AS_PROGRAM, 8, galaxian_state )
+ADDRESS_MAP_START(galaxian_state::konami_sound_map)
 	AM_RANGE(0x0000, 0x2fff) AM_ROM
 	AM_RANGE(0x8000, 0x83ff) AM_MIRROR(0x6c00) AM_RAM
 	AM_RANGE(0x9000, 0x9fff) AM_MIRROR(0x6000) AM_WRITE(konami_sound_filter_w)
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( konami_sound_portmap, AS_IO, 8, galaxian_state )
+ADDRESS_MAP_START(galaxian_state::konami_sound_portmap)
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	AM_RANGE(0x00, 0xff) AM_READWRITE(konami_ay8910_r, konami_ay8910_w)
 ADDRESS_MAP_END
 
 
 /* Checkman with 1 x AY-8910A */
-static ADDRESS_MAP_START( checkman_sound_map, AS_PROGRAM, 8, galaxian_state )
+ADDRESS_MAP_START(galaxian_state::checkman_sound_map)
 	ADDRESS_MAP_UNMAP_HIGH
 	AM_RANGE(0x0000, 0x0fff) AM_ROM
 	AM_RANGE(0x2000, 0x23ff) AM_RAM
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( checkman_sound_portmap, AS_IO, 8, galaxian_state )
+ADDRESS_MAP_START(galaxian_state::checkman_sound_portmap)
 	ADDRESS_MAP_UNMAP_HIGH
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	AM_RANGE(0x03, 0x03) AM_DEVREAD("soundlatch", generic_latch_8_device, read)
@@ -2147,7 +2147,7 @@ ADDRESS_MAP_END
 
 
 /* Checkman alternate with 1 x AY-8910A */
-static ADDRESS_MAP_START( checkmaj_sound_map, AS_PROGRAM, 8, galaxian_state )
+ADDRESS_MAP_START(galaxian_state::checkmaj_sound_map)
 	ADDRESS_MAP_UNMAP_HIGH
 	AM_RANGE(0x0000, 0x0fff) AM_ROM
 	AM_RANGE(0x8000, 0x83ff) AM_RAM
@@ -2158,12 +2158,12 @@ ADDRESS_MAP_END
 
 /* Take Off with 1x AY-8912*/
 
-static ADDRESS_MAP_START( takeoff_sound_map, AS_PROGRAM, 8, galaxian_state )
+ADDRESS_MAP_START(galaxian_state::takeoff_sound_map)
 	AM_RANGE(0x0000, 0x0fff) AM_ROM
 	AM_RANGE(0x8000, 0x83ff) AM_MIRROR(0x6c00) AM_RAM
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( takeoff_sound_portmap, AS_IO, 8, galaxian_state )
+ADDRESS_MAP_START(galaxian_state::takeoff_sound_portmap)
 	ADDRESS_MAP_UNMAP_HIGH
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	AM_RANGE(0x20, 0x20) AM_READ(konami_sound_timer_r)
@@ -2172,14 +2172,14 @@ static ADDRESS_MAP_START( takeoff_sound_portmap, AS_IO, 8, galaxian_state )
 ADDRESS_MAP_END
 
 /* King and Balloon with DAC */
-static ADDRESS_MAP_START( kingball_sound_map, AS_PROGRAM, 8, galaxian_state )
+ADDRESS_MAP_START(galaxian_state::kingball_sound_map)
 	ADDRESS_MAP_UNMAP_HIGH
 	ADDRESS_MAP_GLOBAL_MASK(0x3fff)
 	AM_RANGE(0x0000, 0x1fff) AM_ROM
 	AM_RANGE(0x0000, 0x03ff) AM_MIRROR(0x1c00) AM_RAM
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( kingball_sound_portmap, AS_IO, 8, galaxian_state )
+ADDRESS_MAP_START(galaxian_state::kingball_sound_portmap)
 	ADDRESS_MAP_UNMAP_HIGH
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	AM_RANGE(0x00, 0x00) AM_MIRROR(0xff) AM_DEVREAD("soundlatch", generic_latch_8_device, read) AM_WRITE(kingball_dac_w)
@@ -2187,17 +2187,17 @@ ADDRESS_MAP_END
 
 
 /* SF-X sample player */
-static ADDRESS_MAP_START( sfx_sample_map, AS_PROGRAM, 8, galaxian_state )
+ADDRESS_MAP_START(galaxian_state::sfx_sample_map)
 	AM_RANGE(0x0000, 0x5fff) AM_ROM
 	AM_RANGE(0x8000, 0x83ff) AM_MIRROR(0x6c00) AM_RAM
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( sfx_sample_portmap, AS_IO, 8, galaxian_state )
+ADDRESS_MAP_START(galaxian_state::sfx_sample_portmap)
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	AM_RANGE(0x00, 0xff) AM_READWRITE(sfx_sample_io_r, sfx_sample_io_w)
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( turpins_sound_map, AS_PROGRAM, 8, galaxian_state )
+ADDRESS_MAP_START(galaxian_state::turpins_sound_map)
 	AM_IMPORT_FROM(konami_sound_map)
 	AM_RANGE(0x9000, 0x9000) AM_READ(konami_sound_timer_r) // why does it read it here AND from the AY port?
 ADDRESS_MAP_END
@@ -5863,7 +5863,7 @@ MACHINE_CONFIG_END
 
 MACHINE_CONFIG_DERIVED(galaxian_state::moonqsr, mooncrst)
 	MCFG_CPU_MODIFY("maincpu")
-	MCFG_CPU_DECRYPTED_OPCODES_MAP(moonqsr_decrypted_opcodes_map)
+	MCFG_CPU_OPCODES_MAP(moonqsr_decrypted_opcodes_map)
 MACHINE_CONFIG_END
 
 
@@ -5968,7 +5968,7 @@ MACHINE_CONFIG_DERIVED(galaxian_state::mshuttle, galaxian_base)
 	/* basic machine hardware */
 	MCFG_CPU_MODIFY("maincpu")
 	MCFG_CPU_PROGRAM_MAP(mshuttle_map)
-	MCFG_CPU_DECRYPTED_OPCODES_MAP(mshuttle_decrypted_opcodes_map)
+	MCFG_CPU_OPCODES_MAP(mshuttle_decrypted_opcodes_map)
 	MCFG_CPU_IO_MAP(mshuttle_portmap)
 
 	/* sound hardware */

@@ -121,17 +121,17 @@ DRIVER_INIT_MEMBER(nbmj8688_state,kaguya2)
 }
 
 
-static ADDRESS_MAP_START( mjsikaku_map, AS_PROGRAM, 8, nbmj8688_state )
+ADDRESS_MAP_START(nbmj8688_state::mjsikaku_map)
 	AM_RANGE(0x0000, 0xf7ff) AM_ROM
 	AM_RANGE(0xf800, 0xffff) AM_RAM AM_SHARE("nvram")
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( secolove_map, AS_PROGRAM, 8, nbmj8688_state )
+ADDRESS_MAP_START(nbmj8688_state::secolove_map)
 	AM_RANGE(0x0000, 0xefff) AM_ROM
 	AM_RANGE(0xf000, 0xf7ff) AM_RAM AM_SHARE("nvram")
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( ojousan_map, AS_PROGRAM, 8, nbmj8688_state )
+ADDRESS_MAP_START(nbmj8688_state::ojousan_map)
 	AM_RANGE(0x0000, 0x6fff) AM_ROM
 	AM_RANGE(0x7000, 0x7fff) AM_RAM AM_SHARE("nvram")
 	AM_RANGE(0x8000, 0xffff) AM_ROM
@@ -146,7 +146,7 @@ READ8_MEMBER(nbmj8688_state::ff_r)
 	return 0xff;
 }
 
-static ADDRESS_MAP_START( secolove_io_map, AS_IO, 8, nbmj8688_state )
+ADDRESS_MAP_START(nbmj8688_state::secolove_io_map)
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	AM_RANGE(0x00, 0x7f) AM_DEVREAD("nb1413m3", nb1413m3_device, sndrom_r)
 	AM_RANGE(0x00, 0x00) AM_DEVWRITE("nb1413m3", nb1413m3_device, nmi_clock_w)
@@ -171,7 +171,7 @@ WRITE8_MEMBER(nbmj8688_state::barline_output_w)
 	machine().bookkeeping().coin_counter_w(0,data & 0x02);
 }
 
-static ADDRESS_MAP_START( barline_io_map, AS_IO, 8, nbmj8688_state )
+ADDRESS_MAP_START(nbmj8688_state::barline_io_map)
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
 //  AM_RANGE(0x00, 0x7f) AM_DEVREAD("nb1413m3", nb1413m3_device, sndrom_r)
 	AM_RANGE(0x00, 0x00) AM_DEVWRITE("nb1413m3", nb1413m3_device, sndrombank1_w)
@@ -189,7 +189,7 @@ static ADDRESS_MAP_START( barline_io_map, AS_IO, 8, nbmj8688_state )
 	AM_RANGE(0xf1, 0xf1) AM_DEVREAD("nb1413m3", nb1413m3_device, dipsw2_r)
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( crystalg_io_map, AS_IO, 8, nbmj8688_state )
+ADDRESS_MAP_START(nbmj8688_state::crystalg_io_map)
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	AM_RANGE(0x00, 0x7f) AM_DEVREAD("nb1413m3", nb1413m3_device, sndrom_r)
 	AM_RANGE(0x00, 0x00) AM_DEVWRITE("nb1413m3", nb1413m3_device, nmi_clock_w)
@@ -209,7 +209,7 @@ static ADDRESS_MAP_START( crystalg_io_map, AS_IO, 8, nbmj8688_state )
 ADDRESS_MAP_END
 
 
-static ADDRESS_MAP_START( otonano_io_map, AS_IO, 8, nbmj8688_state )
+ADDRESS_MAP_START(nbmj8688_state::otonano_io_map)
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	AM_RANGE(0x00, 0x7f) AM_DEVREAD("nb1413m3", nb1413m3_device, sndrom_r)
 	AM_RANGE(0x00, 0x00) AM_DEVWRITE("nb1413m3", nb1413m3_device, nmi_clock_w)
@@ -228,7 +228,7 @@ static ADDRESS_MAP_START( otonano_io_map, AS_IO, 8, nbmj8688_state )
 ADDRESS_MAP_END
 
 
-static ADDRESS_MAP_START( kaguya_io_map, AS_IO, 8, nbmj8688_state )
+ADDRESS_MAP_START(nbmj8688_state::kaguya_io_map)
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	AM_RANGE(0x00, 0x7f) AM_DEVREAD("nb1413m3", nb1413m3_device, sndrom_r)
 	AM_RANGE(0x00, 0x00) AM_DEVWRITE("nb1413m3", nb1413m3_device, nmi_clock_w)
@@ -248,7 +248,7 @@ static ADDRESS_MAP_START( kaguya_io_map, AS_IO, 8, nbmj8688_state )
 ADDRESS_MAP_END
 
 
-static ADDRESS_MAP_START( iemoto_io_map, AS_IO, 8, nbmj8688_state )
+ADDRESS_MAP_START(nbmj8688_state::iemoto_io_map)
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	AM_RANGE(0x00, 0x7f) AM_DEVREAD("nb1413m3", nb1413m3_device, sndrom_r)
 	AM_RANGE(0x00, 0x00) AM_DEVWRITE("nb1413m3", nb1413m3_device, nmi_clock_w)
@@ -270,7 +270,7 @@ static ADDRESS_MAP_START( iemoto_io_map, AS_IO, 8, nbmj8688_state )
 ADDRESS_MAP_END
 
 
-static ADDRESS_MAP_START( seiha_io_map, AS_IO, 8, nbmj8688_state )
+ADDRESS_MAP_START(nbmj8688_state::seiha_io_map)
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	AM_RANGE(0x00, 0x7f) AM_DEVREAD("nb1413m3", nb1413m3_device, sndrom_r)
 	AM_RANGE(0x00, 0x00) AM_DEVWRITE("nb1413m3", nb1413m3_device, nmi_clock_w)
@@ -291,7 +291,7 @@ static ADDRESS_MAP_START( seiha_io_map, AS_IO, 8, nbmj8688_state )
 	AM_RANGE(0xf0, 0xf0) AM_WRITE(scrolly_w)
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( mjgaiden_io_map, AS_IO, 8, nbmj8688_state )
+ADDRESS_MAP_START(nbmj8688_state::mjgaiden_io_map)
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	AM_RANGE(0x00, 0x7f) AM_DEVREAD("nb1413m3", nb1413m3_device, sndrom_r)
 	AM_RANGE(0x00, 0x00) AM_DEVWRITE("nb1413m3", nb1413m3_device, nmi_clock_w)
@@ -311,14 +311,14 @@ static ADDRESS_MAP_START( mjgaiden_io_map, AS_IO, 8, nbmj8688_state )
 	AM_RANGE(0xf0, 0xf0) AM_WRITE(scrolly_w)
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( p16bit_LCD_io_map, AS_IO, 8, nbmj8688_state )
+ADDRESS_MAP_START(nbmj8688_state::p16bit_LCD_io_map)
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	AM_RANGE(0x00, 0x7f) AM_DEVREAD("nb1413m3", nb1413m3_device, sndrom_r)
 	AM_RANGE(0x00, 0x00) AM_DEVWRITE("nb1413m3", nb1413m3_device, nmi_clock_w)
-	AM_RANGE(0x42, 0x42) AM_DEVREADWRITE("lcdc0", hd61830_device, data_r, data_w)
-	AM_RANGE(0x43, 0x43) AM_DEVREADWRITE("lcdc0", hd61830_device, status_r, control_w)
-	AM_RANGE(0x44, 0x44) AM_DEVREADWRITE("lcdc1", hd61830_device, data_r, data_w)
-	AM_RANGE(0x45, 0x45) AM_DEVREADWRITE("lcdc1", hd61830_device, status_r, control_w)
+	AM_RANGE(0x42, 0x42) AM_DEVWRITE("lcdc0", hd61830_device, data_w)
+	AM_RANGE(0x43, 0x43) AM_DEVWRITE("lcdc0", hd61830_device, control_w)
+	AM_RANGE(0x44, 0x44) AM_DEVWRITE("lcdc1", hd61830_device, data_w)
+	AM_RANGE(0x45, 0x45) AM_DEVWRITE("lcdc1", hd61830_device, control_w)
 	AM_RANGE(0x46, 0x46) AM_WRITE(HD61830B_both_data_w)
 	AM_RANGE(0x47, 0x47) AM_WRITE(HD61830B_both_instr_w)
 	AM_RANGE(0x81, 0x81) AM_DEVREAD("psg", ay8910_device, data_r)
@@ -337,7 +337,7 @@ static ADDRESS_MAP_START( p16bit_LCD_io_map, AS_IO, 8, nbmj8688_state )
 ADDRESS_MAP_END
 
 
-static ADDRESS_MAP_START( mjsikaku_io_map, AS_IO, 8, nbmj8688_state )
+ADDRESS_MAP_START(nbmj8688_state::mjsikaku_io_map)
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	AM_RANGE(0x00, 0x7f) AM_DEVREAD("nb1413m3", nb1413m3_device, sndrom_r)
 	AM_RANGE(0x00, 0x00) AM_DEVWRITE("nb1413m3", nb1413m3_device, nmi_clock_w)
@@ -358,7 +358,7 @@ static ADDRESS_MAP_START( mjsikaku_io_map, AS_IO, 8, nbmj8688_state )
 ADDRESS_MAP_END
 
 
-static ADDRESS_MAP_START( mmsikaku_io_map, AS_IO, 8, nbmj8688_state )
+ADDRESS_MAP_START(nbmj8688_state::mmsikaku_io_map)
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	AM_RANGE(0x00, 0x7f) AM_DEVREAD("nb1413m3", nb1413m3_device, sndrom_r)
 	AM_RANGE(0x00, 0x00) AM_DEVWRITE("nb1413m3", nb1413m3_device, nmi_clock_w)
