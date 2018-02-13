@@ -26,7 +26,7 @@ WRITE8_MEMBER(nes_state::nes_vh_sprite_dma_w)
 	m_ppu->spriteram_dma(space, data);
 }
 
-static ADDRESS_MAP_START( nes_map, AS_PROGRAM, 8, nes_state )
+ADDRESS_MAP_START(nes_state::nes_map)
 	AM_RANGE(0x0000, 0x07ff) AM_RAM AM_MIRROR(0x1800)                   /* RAM */
 	AM_RANGE(0x2000, 0x3fff) AM_DEVREADWRITE("ppu", ppu2c0x_device, read, write)        /* PPU registers */
 	AM_RANGE(0x4014, 0x4014) AM_WRITE(nes_vh_sprite_dma_w)              /* stupid address space hole */

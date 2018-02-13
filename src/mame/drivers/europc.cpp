@@ -88,6 +88,8 @@ public:
 	void europc(machine_config &config);
 	void europc2(machine_config &config);
 	void euroxt(machine_config &config);
+	void europc_io(address_map &map);
+	void europc_map(address_map &map);
 };
 
 /*
@@ -494,12 +496,12 @@ static INPUT_PORTS_START( europc )
 	PORT_BIT(0xfffe, IP_ACTIVE_HIGH, IPT_UNUSED)
 INPUT_PORTS_END
 
-static ADDRESS_MAP_START( europc_map, AS_PROGRAM, 8, europc_pc_state )
+ADDRESS_MAP_START(europc_pc_state::europc_map)
 	ADDRESS_MAP_UNMAP_HIGH
 	AM_RANGE(0xf0000, 0xfffff) AM_ROM AM_REGION("bios", 0)
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START(europc_io, AS_IO, 8, europc_pc_state )
+ADDRESS_MAP_START(europc_pc_state::europc_io)
 	ADDRESS_MAP_UNMAP_HIGH
 	AM_RANGE(0x0000, 0x00ff) AM_DEVICE("mb", pc_noppi_mb_device, map)
 	AM_RANGE(0x0060, 0x0063) AM_READWRITE(europc_pio_r, europc_pio_w)

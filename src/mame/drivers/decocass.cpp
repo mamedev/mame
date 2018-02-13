@@ -80,7 +80,7 @@ READ8_MEMBER(decocass_state::mirrorcolorram_r)
 }
 
 
-static ADDRESS_MAP_START( decocass_map, AS_PROGRAM, 8, decocass_state )
+ADDRESS_MAP_START(decocass_state::decocass_map)
 	AM_RANGE(0x0000, 0x5fff) AM_RAM AM_SHARE("rambase")
 	AM_RANGE(0x6000, 0xbfff) AM_RAM_WRITE(decocass_charram_w) AM_SHARE("charram") /* still RMS3 RAM */
 	AM_RANGE(0xc000, 0xc3ff) AM_RAM_WRITE(decocass_fgvideoram_w) AM_SHARE("fgvideoram")  /* DSP3 RAM */
@@ -121,7 +121,7 @@ static ADDRESS_MAP_START( decocass_map, AS_PROGRAM, 8, decocass_state )
 	AM_RANGE(0xf000, 0xffff) AM_ROM
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( decocass_sound_map, AS_PROGRAM, 8, decocass_state )
+ADDRESS_MAP_START(decocass_state::decocass_sound_map)
 	AM_RANGE(0x0000, 0x0fff) AM_RAM
 	AM_RANGE(0x1000, 0x17ff) AM_READWRITE(decocass_sound_nmi_enable_r, decocass_sound_nmi_enable_w)
 	AM_RANGE(0x1800, 0x1fff) AM_READWRITE(decocass_sound_data_ack_reset_r, decocass_sound_data_ack_reset_w)

@@ -39,6 +39,8 @@ public:
 	uint32_t screen_update_mc8020(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 
 	void mc8020(machine_config &config);
+	void io_map(address_map &map);
+	void mem_map(address_map &map);
 private:
 	u8 m_row;
 	required_shared_ptr<u8> m_p_videoram;
@@ -46,7 +48,7 @@ private:
 	required_ioport_array<7> m_keyboard;
 };
 
-static ADDRESS_MAP_START( mem_map, AS_PROGRAM, 8, mc8020_state )
+ADDRESS_MAP_START(mc8020_state::mem_map)
 	ADDRESS_MAP_UNMAP_HIGH
 	AM_RANGE(0x0000, 0x0bff) AM_ROM
 	AM_RANGE(0x0c00, 0x0fff) AM_RAM AM_SHARE("videoram")// 1KB RAM ZRE
@@ -54,7 +56,7 @@ static ADDRESS_MAP_START( mem_map, AS_PROGRAM, 8, mc8020_state )
 	AM_RANGE(0x6000, 0xffff) AM_RAM
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( io_map, AS_IO, 8, mc8020_state )
+ADDRESS_MAP_START(mc8020_state::io_map)
 	ADDRESS_MAP_UNMAP_HIGH
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	AM_RANGE(0xf0, 0xf3) AM_DEVREADWRITE("ctc", z80ctc_device, read, write)

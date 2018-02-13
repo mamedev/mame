@@ -30,6 +30,8 @@ public:
 	required_device<cpu_device> m_maincpu;
 	required_device<ram_device> m_ram;
 	void vt320(machine_config &config);
+	void vt320_io(address_map &map);
+	void vt320_mem(address_map &map);
 };
 
 /*
@@ -59,11 +61,11 @@ Texas Inst. 749X 75146
 Signetics? 74LS373N
 8-bit D-type latch. This has eight inputs and eight outputs.
 */
-static ADDRESS_MAP_START(vt320_mem, AS_PROGRAM, 8, vt320_state)
+ADDRESS_MAP_START(vt320_state::vt320_mem)
 	AM_RANGE(0x0000, 0xffff) AM_ROM
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START(vt320_io, AS_IO, 8, vt320_state)
+ADDRESS_MAP_START(vt320_state::vt320_io)
 ADDRESS_MAP_END
 
 /* Input ports */

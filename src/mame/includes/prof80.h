@@ -102,6 +102,9 @@ public:
 	emu_timer   *m_floppy_motor_off_timer;
 
 	void prof80(machine_config &config);
+	void prof80_io(address_map &map);
+	void prof80_mem(address_map &map);
+	void prof80_mmu(address_map &map);
 };
 
 #endif

@@ -108,6 +108,9 @@ public:
 	void rs128(machine_config &config);
 	void mtx500(machine_config &config);
 	void mtx512(machine_config &config);
+	void mtx_io(address_map &map);
+	void mtx_mem(address_map &map);
+	void rs128_io(address_map &map);
 };
 
 #endif // MAME_INCLUDES_MTX_H

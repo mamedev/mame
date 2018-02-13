@@ -33,6 +33,7 @@ public:
 	required_device<gfxdecode_device> m_gfxdecode;
 	required_device<palette_device> m_palette;
 	void buster(machine_config &config);
+	void mainmap(address_map &map);
 };
 
 
@@ -69,12 +70,13 @@ READ8_MEMBER(buster_state::test_r)
 }
 #endif
 
-static ADDRESS_MAP_START( mainmap, AS_PROGRAM, 8, buster_state )
+ADDRESS_MAP_START(buster_state::mainmap)
 	AM_RANGE(0x0000, 0x3fff) AM_ROM// AM_SHARE("rom")
 	AM_RANGE(0x4000, 0x47ff) AM_RAM AM_SHARE("wram")
 	AM_RANGE(0x5000, 0x5fff) AM_RAM AM_SHARE("vram")
 	AM_RANGE(0x6000, 0x6000) AM_DEVWRITE("crtc", mc6845_device, address_w)
 	AM_RANGE(0x6001, 0x6001) AM_DEVREADWRITE("crtc", mc6845_device, register_r, register_w)
+	AM_RANGE(0x7c00, 0x7cff) AM_RAM // ???
 	AM_RANGE(0x7c80, 0x7c80) AM_READ_PORT("IN0")
 	AM_RANGE(0x7c82, 0x7c82) AM_READ_PORT("IN1")
 	AM_RANGE(0x7c84, 0x7c84) AM_READ_PORT("IN2")
@@ -83,7 +85,6 @@ static ADDRESS_MAP_START( mainmap, AS_PROGRAM, 8, buster_state )
 	AM_RANGE(0x7c8a, 0x7c8a) AM_READ_PORT("IN5")
 	AM_RANGE(0x7c8c, 0x7c8c) AM_READ_PORT("IN6")
 	AM_RANGE(0x7c8e, 0x7c8e) AM_READ_PORT("IN7")
-	AM_RANGE(0x7c00, 0x7cff) AM_RAM // ???
 	AM_RANGE(0x8800, 0x8fff) AM_RAM AM_SHARE("wram")//AM_READ(test_r) // ???
 	AM_RANGE(0xa000, 0xa0ff) AM_RAM // nvram?
 ADDRESS_MAP_END

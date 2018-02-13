@@ -42,6 +42,7 @@ public:
 	required_device<gfxdecode_device> m_gfxdecode;
 	required_device<palette_device> m_palette;
 	void skyraid(machine_config &config);
+	void skyraid_map(address_map &map);
 };
 
 /*----------- defined in audio/skyraid.c -----------*/

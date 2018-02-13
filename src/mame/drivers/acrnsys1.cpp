@@ -75,6 +75,7 @@ public:
 	TIMER_DEVICE_CALLBACK_MEMBER(acrnsys1_c);
 	TIMER_DEVICE_CALLBACK_MEMBER(acrnsys1_p);
 	void acrnsys1(machine_config &config);
+	void acrnsys1_map(address_map &map);
 private:
 	required_device<cpu_device> m_maincpu;
 	required_device<ttl74145_device> m_ttl74145;
@@ -163,7 +164,7 @@ WRITE8_MEMBER( acrnsys1_state::acrnsys1_led_segment_w )
     ADDRESS MAPS
 ***************************************************************************/
 
-static ADDRESS_MAP_START( acrnsys1_map, AS_PROGRAM, 8, acrnsys1_state )
+ADDRESS_MAP_START(acrnsys1_state::acrnsys1_map)
 	AM_RANGE(0x0000, 0x03ff) AM_RAM
 	AM_RANGE(0x0e00, 0x0e7f) AM_MIRROR(0x100) AM_DEVREADWRITE("b1", ins8154_device, ins8154_r, ins8154_w)
 	AM_RANGE(0x0e80, 0x0eff) AM_MIRROR(0x100) AM_RAM

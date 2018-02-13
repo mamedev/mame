@@ -273,7 +273,7 @@ READ16_MEMBER(mcr68_state::trisport_port_1_r)
  *
  *************************************/
 
-static ADDRESS_MAP_START( mcr68_map, AS_PROGRAM, 16, mcr68_state )
+ADDRESS_MAP_START(mcr68_state::mcr68_map)
 	ADDRESS_MAP_UNMAP_HIGH
 	ADDRESS_MAP_GLOBAL_MASK(0x1fffff)
 	AM_RANGE(0x000000, 0x03ffff) AM_ROM
@@ -297,7 +297,7 @@ ADDRESS_MAP_END
  *
  *************************************/
 
-static ADDRESS_MAP_START( pigskin_map, AS_PROGRAM, 16, mcr68_state )
+ADDRESS_MAP_START(mcr68_state::pigskin_map)
 	ADDRESS_MAP_UNMAP_HIGH
 	ADDRESS_MAP_GLOBAL_MASK(0x1fffff)
 	AM_RANGE(0x000000, 0x03ffff) AM_ROM
@@ -322,7 +322,7 @@ ADDRESS_MAP_END
  *
  *************************************/
 
-static ADDRESS_MAP_START( trisport_map, AS_PROGRAM, 16, mcr68_state )
+ADDRESS_MAP_START(mcr68_state::trisport_map)
 	ADDRESS_MAP_UNMAP_HIGH
 	ADDRESS_MAP_GLOBAL_MASK(0x1fffff)
 	AM_RANGE(0x000000, 0x03ffff) AM_ROM

@@ -76,6 +76,7 @@ public:
 	TIMER_CALLBACK_MEMBER(timer_d_callback);
 
 	void jr200(machine_config &config);
+	void jr200_mem(address_map &map);
 protected:
 	required_device<cpu_device> m_maincpu;
 	required_device<beep_device> m_beeper;
@@ -371,7 +372,7 @@ WRITE8_MEMBER(jr200_state::mn1271_io_w)
 	}
 }
 
-static ADDRESS_MAP_START(jr200_mem, AS_PROGRAM, 8, jr200_state )
+ADDRESS_MAP_START(jr200_state::jr200_mem)
 /*
     0000-3fff RAM
     4000-4fff RAM ( 4k expansion)

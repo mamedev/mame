@@ -242,7 +242,7 @@ WRITE_LINE_MEMBER(sprint2_state::lamp4_w)
 	output().set_led_value(3, state);
 }
 
-static ADDRESS_MAP_START( sprint2_map, AS_PROGRAM, 8, sprint2_state )
+ADDRESS_MAP_START(sprint2_state::sprint2_map)
 	ADDRESS_MAP_GLOBAL_MASK(0x3fff)
 	AM_RANGE(0x0000, 0x03ff) AM_READWRITE(sprint2_wram_r,sprint2_wram_w)
 	AM_RANGE(0x0400, 0x07ff) AM_RAM_WRITE(sprint2_video_ram_w) AM_SHARE("video_ram")

@@ -84,6 +84,7 @@ public:
 	virtual void video_start() override;
 	uint32_t screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 	void odyssey(machine_config &config);
+	void odyssey_map(address_map &map);
 };
 
 void odyssey_state::video_start()
@@ -100,7 +101,7 @@ uint32_t odyssey_state::screen_update(screen_device &screen, bitmap_rgb32 &bitma
 *             Memory Map              *
 **************************************/
 
-static ADDRESS_MAP_START( odyssey_map, AS_PROGRAM, 32, odyssey_state )
+ADDRESS_MAP_START(odyssey_state::odyssey_map)
 ADDRESS_MAP_END
 
 

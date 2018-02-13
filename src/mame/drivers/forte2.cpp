@@ -62,16 +62,18 @@ public:
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
 	void pesadelo(machine_config &config);
+	void io_mem(address_map &map);
+	void program_mem(address_map &map);
 };
 
 
 
-static ADDRESS_MAP_START( program_mem, AS_PROGRAM, 8, forte2_state )
+ADDRESS_MAP_START(forte2_state::program_mem)
 	AM_RANGE(0x0000, 0xbfff) AM_ROM
 	AM_RANGE(0xc000, 0xffff) AM_RAM
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( io_mem, AS_IO, 8, forte2_state )
+ADDRESS_MAP_START(forte2_state::io_mem)
 	ADDRESS_MAP_UNMAP_HIGH
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	AM_RANGE(0x98, 0x98) AM_DEVREADWRITE( "tms9928a", tms9928a_device, vram_read, vram_write )

@@ -40,7 +40,7 @@ public:
 	// construction/destruction
 	namco_c148_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
-	DECLARE_ADDRESS_MAP(map, 16);
+	void map(address_map &map);
 
 	static void configure_device(device_t &device, const char *tag, bool is_master)
 	{

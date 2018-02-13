@@ -68,6 +68,7 @@ public:
 	void ssystem3_playfield_read(int *on, int *ready);
 
 	void ssystem3(machine_config &config);
+	void ssystem3_map(address_map &map);
 private:
 	uint8_t m_porta;
 	std::unique_ptr<uint8_t[]> m_videoram;

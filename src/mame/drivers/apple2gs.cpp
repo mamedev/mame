@@ -182,7 +182,7 @@ static const floppy_interface apple2gs_floppy525_floppy_interface =
 };
 
 
-static ADDRESS_MAP_START( apple2gs_map, AS_PROGRAM, 8, apple2gs_state )
+ADDRESS_MAP_START(apple2gs_state::apple2gs_map)
 	/* nothing in the address map - everything is added dynamically */
 ADDRESS_MAP_END
 

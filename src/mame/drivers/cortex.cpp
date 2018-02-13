@@ -73,6 +73,8 @@ public:
 	DECLARE_DRIVER_INIT(init);
 
 	void cortex(machine_config &config);
+	void io_map(address_map &map);
+	void mem_map(address_map &map);
 private:
 	bool m_kbd_ack;
 	bool m_vdp_int;
@@ -83,7 +85,7 @@ private:
 	required_ioport m_io_dsw;
 };
 
-static ADDRESS_MAP_START( mem_map, AS_PROGRAM, 8, cortex_state )
+ADDRESS_MAP_START(cortex_state::mem_map)
 	AM_RANGE(0x0000, 0x7fff) AM_READ_BANK("bankr0") AM_WRITE_BANK("bankw0")
 	AM_RANGE(0x8000, 0xefff) AM_RAM
 	AM_RANGE(0xf100, 0xf11f) AM_RAM // memory mapping unit
@@ -92,7 +94,7 @@ static ADDRESS_MAP_START( mem_map, AS_PROGRAM, 8, cortex_state )
 	//AM_RANGE(0xf140, 0xf147) // fdc tms9909
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( io_map, AS_IO, 8, cortex_state )
+ADDRESS_MAP_START(cortex_state::io_map)
 	ADDRESS_MAP_UNMAP_HIGH
 	AM_RANGE(0x0000, 0x0007) AM_MIRROR(0x18) AM_DEVWRITE("control", ls259_device, write_d0)
 	AM_RANGE(0x0000, 0x0000) AM_READ(pio_r)

@@ -418,7 +418,7 @@ WRITE16_MEMBER(armedf_state::irq_lv2_ack_w)
  *
  *************************************/
 
-static ADDRESS_MAP_START( terraf_map, AS_PROGRAM, 16, armedf_state )
+ADDRESS_MAP_START(armedf_state::terraf_map)
 	AM_RANGE(0x000000, 0x05ffff) AM_ROM
 	AM_RANGE(0x060000, 0x0603ff) AM_RAM AM_SHARE("spriteram")
 	AM_RANGE(0x060400, 0x063fff) AM_RAM
@@ -440,7 +440,7 @@ static ADDRESS_MAP_START( terraf_map, AS_PROGRAM, 16, armedf_state )
 	AM_RANGE(0x07c00e, 0x07c00f) AM_WRITE(irq_lv1_ack_w)
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( kozure_map, AS_PROGRAM, 16, armedf_state )
+ADDRESS_MAP_START(armedf_state::kozure_map)
 	AM_IMPORT_FROM( terraf_map )
 	AM_RANGE(0x060000, 0x060fff) AM_RAM AM_SHARE("spriteram")
 	AM_RANGE(0x061000, 0x063fff) AM_RAM
@@ -449,7 +449,7 @@ static ADDRESS_MAP_START( kozure_map, AS_PROGRAM, 16, armedf_state )
 //  AM_RANGE(0xffd000, 0xffd001) AM_WRITENOP /* passes crc ROM information to MCU, I guess */
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( cclimbr2_map, AS_PROGRAM, 16, armedf_state )
+ADDRESS_MAP_START(armedf_state::cclimbr2_map)
 	AM_RANGE(0x000000, 0x05ffff) AM_ROM
 	AM_RANGE(0x060000, 0x060fff) AM_RAM AM_SHARE("spriteram")
 	AM_RANGE(0x061000, 0x063fff) AM_RAM
@@ -471,7 +471,7 @@ static ADDRESS_MAP_START( cclimbr2_map, AS_PROGRAM, 16, armedf_state )
 	AM_RANGE(0x07c00e, 0x07c00f) AM_WRITE(irq_lv2_ack_w)
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( legion_map, AS_PROGRAM, 16, armedf_state )
+ADDRESS_MAP_START(armedf_state::legion_map)
 	AM_RANGE(0x000000, 0x05ffff) AM_ROM
 	AM_RANGE(0x060000, 0x060fff) AM_RAM AM_SHARE("spriteram")
 	AM_RANGE(0x061000, 0x063fff) AM_RAM
@@ -502,7 +502,7 @@ WRITE8_MEMBER(armedf_state::legionjb_fg_scroll_w)
 	m_fg_scrolly = (m_legion_cmd[0x00] & 0xff) | ((m_legion_cmd[0x01] & 0x3) << 8);
 }
 
-static ADDRESS_MAP_START( legionjb_map, AS_PROGRAM, 16, armedf_state )
+ADDRESS_MAP_START(armedf_state::legionjb_map)
 	AM_RANGE(0x040000, 0x04003f) AM_WRITE8(legionjb_fg_scroll_w,0x00ff)
 	AM_RANGE(0x000000, 0x05ffff) AM_ROM
 	AM_RANGE(0x060000, 0x060fff) AM_RAM AM_SHARE("spriteram")
@@ -525,7 +525,7 @@ static ADDRESS_MAP_START( legionjb_map, AS_PROGRAM, 16, armedf_state )
 	AM_RANGE(0x07c00e, 0x07c00f) AM_WRITE(irq_lv2_ack_w)
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( armedf_map, AS_PROGRAM, 16, armedf_state )
+ADDRESS_MAP_START(armedf_state::armedf_map)
 	AM_RANGE(0x000000, 0x05ffff) AM_ROM
 	AM_RANGE(0x060000, 0x060fff) AM_RAM AM_SHARE("spriteram")
 	AM_RANGE(0x061000, 0x065fff) AM_RAM
@@ -717,7 +717,7 @@ WRITE8_MEMBER(bigfghtr_state::mcu_spritelist_w)
 	popmessage("MCU access spritelist %04x = %02x, contact MAMEdev",offset,data);
 }
 
-static ADDRESS_MAP_START( bigfghtr_map, AS_PROGRAM, 16, bigfghtr_state )
+ADDRESS_MAP_START(bigfghtr_state::bigfghtr_map)
 	AM_RANGE(0x000000, 0x07ffff) AM_ROM
 	AM_RANGE(0x080000, 0x0805ff) AM_RAM AM_SHARE("spriteram")
 	AM_RANGE(0x080600, 0x083fff) AM_READWRITE8(main_sharedram_r,main_sharedram_w,0xffff)
@@ -743,23 +743,23 @@ static ADDRESS_MAP_START( bigfghtr_map, AS_PROGRAM, 16, bigfghtr_state )
 	AM_RANGE(0x400000, 0x400001) AM_READ(latch_r)
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( bigfghtr_mcu_map, AS_PROGRAM, 8, bigfghtr_state )
+ADDRESS_MAP_START(bigfghtr_state::bigfghtr_mcu_map)
 	AM_RANGE(0x0000, 0x0fff) AM_ROM
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( bigfghtr_mcu_io_map, AS_IO, 8, bigfghtr_state )
+ADDRESS_MAP_START(bigfghtr_state::bigfghtr_mcu_io_map)
 	AM_RANGE(0x00000, 0x005ff) AM_WRITE(mcu_spritelist_w) //Sprite RAM, guess shared as well
 	AM_RANGE(0x00600, 0x03fff) AM_RAM AM_SHARE("sharedram")
 	AM_RANGE(MCS51_PORT_P1,MCS51_PORT_P1) AM_READNOP // bit 5: bus contention related?
 	AM_RANGE(MCS51_PORT_P3,MCS51_PORT_P3) AM_WRITENOP
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( sound_map, AS_PROGRAM, 8, armedf_state )
+ADDRESS_MAP_START(armedf_state::sound_map)
 	AM_RANGE(0x0000, 0xf7ff) AM_ROM
 	AM_RANGE(0xf800, 0xffff) AM_RAM
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( cclimbr2_soundmap, AS_PROGRAM, 8, armedf_state )
+ADDRESS_MAP_START(armedf_state::cclimbr2_soundmap)
 	AM_RANGE(0x0000, 0xbfff) AM_ROM
 	AM_RANGE(0xc000, 0xffff) AM_RAM
 ADDRESS_MAP_END
@@ -792,20 +792,20 @@ WRITE8_MEMBER(armedf_state::fg_scroll_msb_w)
 }
 
 
-static ADDRESS_MAP_START( terrafjb_extraz80_map, AS_PROGRAM, 8, armedf_state )
+ADDRESS_MAP_START(armedf_state::terrafjb_extraz80_map)
 	AM_RANGE(0x0000, 0x3fff) AM_ROM
 	AM_RANGE(0x4000, 0x5fff) AM_READWRITE(blitter_txram_r,blitter_txram_w)
 	AM_RANGE(0x8000, 0x87ff) AM_RAM
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( terrafjb_extraz80_portmap, AS_IO, 8, armedf_state )
+ADDRESS_MAP_START(armedf_state::terrafjb_extraz80_portmap)
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	AM_RANGE(0x00,0x00) AM_WRITE(fg_scrollx_w)
 	AM_RANGE(0x01,0x01) AM_WRITE(fg_scrolly_w)
 	AM_RANGE(0x02,0x02) AM_WRITE(fg_scroll_msb_w)
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( sound_portmap, AS_IO, 8, armedf_state )
+ADDRESS_MAP_START(armedf_state::sound_portmap)
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	AM_RANGE(0x0, 0x1) AM_DEVWRITE("ymsnd", ym3812_device, write)
 	AM_RANGE(0x2, 0x2) AM_DEVWRITE("dac1", dac_byte_interface, write)
@@ -814,7 +814,7 @@ static ADDRESS_MAP_START( sound_portmap, AS_IO, 8, armedf_state )
 	AM_RANGE(0x6, 0x6) AM_DEVREAD("soundlatch", generic_latch_8_device, read)
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( sound_3526_portmap, AS_IO, 8, armedf_state )
+ADDRESS_MAP_START(armedf_state::sound_3526_portmap)
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	AM_RANGE(0x0, 0x1) AM_DEVWRITE("ymsnd", ym3526_device, write)
 	AM_RANGE(0x2, 0x2) AM_DEVWRITE("dac1", dac_byte_interface, write)

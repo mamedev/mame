@@ -184,7 +184,7 @@ READ8_MEMBER( vc4000_state::elektor_cass_r )
 	return (m_cassette->input() > 0.03) ? 0xff : 0x7f;
 }
 
-static ADDRESS_MAP_START( vc4000_mem, AS_PROGRAM, 8, vc4000_state )
+ADDRESS_MAP_START(vc4000_state::vc4000_mem)
 	ADDRESS_MAP_UNMAP_HIGH
 	ADDRESS_MAP_GLOBAL_MASK(0x1fff)
 	AM_RANGE(0x0000, 0x07ff) AM_ROM
@@ -192,7 +192,7 @@ static ADDRESS_MAP_START( vc4000_mem, AS_PROGRAM, 8, vc4000_state )
 	AM_RANGE(0x1700, 0x17ff) AM_READWRITE(vc4000_video_r, vc4000_video_w) AM_MIRROR(0x0800)
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START(elektor_mem, AS_PROGRAM, 8, vc4000_state)
+ADDRESS_MAP_START(vc4000_state::elektor_mem)
 	ADDRESS_MAP_UNMAP_HIGH
 	ADDRESS_MAP_GLOBAL_MASK(0x1fff)
 	AM_RANGE(0x0000, 0x07ff) AM_ROM

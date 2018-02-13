@@ -24,7 +24,7 @@ DEFINE_DEVICE_TYPE(A2BUS_SOFTCARD, a2bus_softcard_device, "a2softcard", "Microso
 
 #define Z80_TAG         "z80"
 
-static ADDRESS_MAP_START( z80_mem, AS_PROGRAM, 8, a2bus_softcard_device )
+ADDRESS_MAP_START(a2bus_softcard_device::z80_mem)
 	AM_RANGE(0x0000, 0xffff) AM_READWRITE(dma_r, dma_w)
 ADDRESS_MAP_END
 

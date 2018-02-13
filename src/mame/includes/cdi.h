@@ -130,6 +130,12 @@ public:
 	void quizard3(machine_config &config);
 	void quizard1(machine_config &config);
 	void quizard(machine_config &config);
+	void cdi910_mem(address_map &map);
+	void cdimono1_mem(address_map &map);
+	void cdimono2_mem(address_map &map);
+	void cdimono2_servo_mem(address_map &map);
+	void cdimono2_slave_mem(address_map &map);
+	void mcu_io_map(address_map &map);
 };
 
 /*----------- debug defines -----------*/

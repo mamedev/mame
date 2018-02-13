@@ -236,7 +236,7 @@ WRITE8_MEMBER(spdodgeb_state::mcu63701_w)
 
 
 
-static ADDRESS_MAP_START( spdodgeb_map, AS_PROGRAM, 8, spdodgeb_state )
+ADDRESS_MAP_START(spdodgeb_state::spdodgeb_map)
 	AM_RANGE(0x0000, 0x0fff) AM_RAM
 	AM_RANGE(0x1000, 0x10ff) AM_WRITEONLY AM_SHARE("spriteram")
 	AM_RANGE(0x2000, 0x2fff) AM_RAM_WRITE(videoram_w) AM_SHARE("videoram")
@@ -253,7 +253,7 @@ static ADDRESS_MAP_START( spdodgeb_map, AS_PROGRAM, 8, spdodgeb_state )
 	AM_RANGE(0x8000, 0xffff) AM_ROM
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( spdodgeb_sound_map, AS_PROGRAM, 8, spdodgeb_state )
+ADDRESS_MAP_START(spdodgeb_state::spdodgeb_sound_map)
 	AM_RANGE(0x0000, 0x0fff) AM_RAM
 	AM_RANGE(0x1000, 0x1000) AM_DEVREAD("soundlatch", generic_latch_8_device, read)
 	AM_RANGE(0x2800, 0x2801) AM_DEVWRITE("ymsnd", ym3812_device, write)

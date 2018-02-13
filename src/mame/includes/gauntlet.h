@@ -70,4 +70,6 @@ public:
 	void gauntlet(machine_config &config);
 	void gaunt2p(machine_config &config);
 	void gauntlet2(machine_config &config);
+	void main_map(address_map &map);
+	void sound_map(address_map &map);
 };

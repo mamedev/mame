@@ -33,6 +33,9 @@ public:
 	DECLARE_DRIVER_INIT(s11b_invert);
 
 	void s11b(machine_config &config);
+	void s11b_audio_map(address_map &map);
+	void s11b_bg_map(address_map &map);
+	void s11b_main_map(address_map &map);
 protected:
 	optional_device<hc55516_device> m_bg_hc55516;
 

@@ -62,6 +62,8 @@ public:
 	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 
 	void nanos(machine_config &config);
+	void nanos_io(address_map &map);
+	void nanos_mem(address_map &map);
 private:
 	uint8_t m_key_command;
 	uint8_t m_last_code;
@@ -91,7 +93,7 @@ private:
 
 
 
-static ADDRESS_MAP_START(nanos_mem, AS_PROGRAM, 8, nanos_state)
+ADDRESS_MAP_START(nanos_state::nanos_mem)
 	AM_RANGE( 0x0000, 0x0fff ) AM_READ_BANK("bank1") AM_WRITE_BANK("bank3")
 	AM_RANGE( 0x1000, 0xffff ) AM_RAMBANK("bank2")
 ADDRESS_MAP_END
@@ -137,7 +139,7 @@ static const z80_daisy_config nanos_daisy_chain[] =
 	{ nullptr }
 };
 
-static ADDRESS_MAP_START( nanos_io , AS_IO, 8, nanos_state)
+ADDRESS_MAP_START(nanos_state::nanos_io)
 	ADDRESS_MAP_UNMAP_HIGH
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	/* CPU card */

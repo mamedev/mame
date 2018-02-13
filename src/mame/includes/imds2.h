@@ -73,6 +73,10 @@ class imds2_state : public driver_device
 	virtual void machine_reset() override;
 
 	void imds2(machine_config &config);
+	void ioc_io_map(address_map &map);
+	void ioc_mem_map(address_map &map);
+	void ipc_io_map(address_map &map);
+	void ipc_mem_map(address_map &map);
 	private:
 	required_device<i8085a_cpu_device> m_ipccpu;
 	required_device<pic8259_device> m_ipcsyspic;

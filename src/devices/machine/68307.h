@@ -68,6 +68,7 @@ public:
 	uint16_t get_cs(offs_t address);
 	void licr2_interrupt();
 
+	void m68307_internal_map(address_map &map);
 protected:
 	class m68307_sim;
 	class m68307_mbus;

@@ -21,7 +21,7 @@ inder_vid_device::inder_vid_device(const machine_config &mconfig, const char *ta
 {
 }
 
-static ADDRESS_MAP_START( megaphx_tms_map, AS_PROGRAM, 16, inder_vid_device )
+ADDRESS_MAP_START(inder_vid_device::megaphx_tms_map)
 
 	AM_RANGE(0x00000000, 0x003fffff) AM_RAM AM_SHARE("vram") // vram?
 
@@ -99,7 +99,7 @@ WRITE_LINE_MEMBER(inder_vid_device::m68k_gen_int)
 }
 
 
-static ADDRESS_MAP_START( ramdac_map, 0, 8, inder_vid_device )
+ADDRESS_MAP_START(inder_vid_device::ramdac_map)
 	AM_RANGE(0x000, 0x3ff) AM_DEVREADWRITE("ramdac",ramdac_device,ramdac_pal_r,ramdac_rgb888_w)
 ADDRESS_MAP_END
 

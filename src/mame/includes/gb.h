@@ -94,6 +94,9 @@ public:
 	void gbcolor(machine_config &config);
 	void gbpocket(machine_config &config);
 	void gameboy(machine_config &config);
+	void gameboy_map(address_map &map);
+	void gbc_map(address_map &map);
+	void sgb_map(address_map &map);
 protected:
 	enum {
 		SIO_ENABLED = 0x80,
@@ -148,6 +151,7 @@ public:
 	DECLARE_WRITE8_MEMBER(bank2_w);
 	optional_device<megaduck_cart_slot_device> m_cartslot;
 	void megaduck(machine_config &config);
+	void megaduck_map(address_map &map);
 };
 
 

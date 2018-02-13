@@ -23,6 +23,7 @@ public:
 	DECLARE_READ8_MEMBER (not_implemented_r);
 	DECLARE_WRITE8_MEMBER (not_implemented_w);
 
+	void fcisio1_mem(address_map &map);
 protected:
 	vme_fcisio1_card_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock);
 

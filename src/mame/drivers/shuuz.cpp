@@ -110,7 +110,7 @@ READ16_MEMBER(shuuz_state::special_port0_r)
  *
  *************************************/
 
-static ADDRESS_MAP_START( main_map, AS_PROGRAM, 16, shuuz_state )
+ADDRESS_MAP_START(shuuz_state::main_map)
 	AM_RANGE(0x000000, 0x03ffff) AM_ROM
 	AM_RANGE(0x100000, 0x100fff) AM_DEVREADWRITE8("eeprom", eeprom_parallel_28xx_device, read, write, 0x00ff)
 	AM_RANGE(0x101000, 0x101fff) AM_DEVWRITE("eeprom", eeprom_parallel_28xx_device, unlock_write16)

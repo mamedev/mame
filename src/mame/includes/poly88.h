@@ -66,6 +66,10 @@ public:
 
 	void poly88(machine_config &config);
 	void poly8813(machine_config &config);
+	void poly8813_io(address_map &map);
+	void poly8813_mem(address_map &map);
+	void poly88_io(address_map &map);
+	void poly88_mem(address_map &map);
 protected:
 	required_device<cpu_device> m_maincpu;
 	required_device<i8251_device> m_uart;

@@ -81,6 +81,10 @@ public:
 	int m_ksc;              /* keyboard scan column */
 	DECLARE_PALETTE_INIT(px8);
 	void px8(machine_config &config);
+	void px8_io(address_map &map);
+	void px8_mem(address_map &map);
+	void px8_slave_io(address_map &map);
+	void px8_slave_mem(address_map &map);
 };
 
 #endif

@@ -35,6 +35,7 @@ public:
 	DECLARE_READ8_MEMBER( aha1542_r );
 	DECLARE_WRITE8_MEMBER( aha1542_w );
 
+	void z84c0010_mem(address_map &map);
 protected:
 	// device-level overrides
 	virtual void device_start() override;

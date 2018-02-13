@@ -95,6 +95,7 @@ public:
 	void sprint2(machine_config &config);
 	void dominos4(machine_config &config);
 	void dominos(machine_config &config);
+	void sprint2_map(address_map &map);
 };
 
 /*----------- defined in audio/sprint2.c -----------*/

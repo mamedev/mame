@@ -87,4 +87,11 @@ public:
 	void redalert_audio(machine_config &config);
 	void redalert_audio_m37b(machine_config &config);
 	void redalert_audio_voice(machine_config &config);
+	void demoneye_audio_map(address_map &map);
+	void demoneye_main_map(address_map &map);
+	void panther_main_map(address_map &map);
+	void redalert_audio_map(address_map &map);
+	void redalert_main_map(address_map &map);
+	void redalert_voice_map(address_map &map);
+	void ww3_main_map(address_map &map);
 };

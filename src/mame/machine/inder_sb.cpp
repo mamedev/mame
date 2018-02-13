@@ -18,16 +18,20 @@ inder_sb_device::inder_sb_device(const machine_config &mconfig, const char *tag,
 	, device_mixer_interface(mconfig, *this, 2)
 	, m_audiocpu(*this, "audiocpu")
 	, m_ctc(*this, "ctc")
+	, m_audiocpu_rom(*this, "audiocpu")
+	, m_sounddata_bank(*this, "snddata")
 {
 }
 
 
 
 // hacks for test purposes, these are installed over the program rom so we know when irqs are actually taken
-READ8_MEMBER(inder_sb_device::megaphx_02cc_hack_r)  { /*logerror("%04x audicpu IRQ hack 0x02cc\n", machine().device("audiocpu")->safe_pc());*/  int bank = m_soundbank[0] & 7;  membank("snddata")->set_entry(bank); return memregion("audiocpu")->base()[0x02cc]; }
-READ8_MEMBER(inder_sb_device::megaphx_02e6_hack_r)  { /*logerror("%04x audicpu IRQ hack 0x02e6\n", machine().device("audiocpu")->safe_pc());*/  int bank = m_soundbank[1] & 7;  membank("snddata")->set_entry(bank); return memregion("audiocpu")->base()[0x02e6]; }
-READ8_MEMBER(inder_sb_device::megaphx_0309_hack_r)  { /*logerror("%04x audicpu IRQ hack 0x0309\n", machine().device("audiocpu")->safe_pc());*/  int bank = m_soundbank[2] & 7;  membank("snddata")->set_entry(bank); return memregion("audiocpu")->base()[0x0309]; }
-READ8_MEMBER(inder_sb_device::megaphx_0323_hack_r)  { /*logerror("%04x audicpu IRQ hack 0x0323\n", machine().device("audiocpu")->safe_pc());*/  int bank = m_soundbank[3] & 7;  membank("snddata")->set_entry(bank); return memregion("audiocpu")->base()[0x0323]; }
+READ8_MEMBER(inder_sb_device::vec_bankswitch_r)
+{
+	if (!machine().side_effect_disabled())
+		m_sounddata_bank->set_entry(m_soundbank[(offset & 6) >> 1] & 7);
+	return m_audiocpu_rom[offset + 0x0020];
+}
 
 
 
@@ -36,7 +40,7 @@ READ16_MEMBER(inder_sb_device::megaphx_0x050002_r)
 	machine().scheduler().synchronize();
 //  int pc = machine().device("maincpu")->safe_pc();
 	int ret = m_soundback;
-	m_soundback = 0;
+	//m_soundback = 0;
 	//logerror("(%06x) megaphx_0x050002_r (from z80?) %04x\n", pc, mem_mask);
 	return ret;
 }
@@ -52,66 +56,6 @@ WRITE16_MEMBER(inder_sb_device::megaphx_0x050000_w)
 
 }
 
-void inder_sb_device::install_sound_hacks(void)
-{
-	address_space &space = m_audiocpu->space(AS_PROGRAM);
-	space.install_read_handler(0x02cc, 0x02cc, read8_delegate(FUNC(inder_sb_device::megaphx_02cc_hack_r), this));
-	space.install_read_handler(0x02e6, 0x02e6, read8_delegate(FUNC(inder_sb_device::megaphx_02e6_hack_r), this));
-	space.install_read_handler(0x0309, 0x0309, read8_delegate(FUNC(inder_sb_device::megaphx_0309_hack_r), this));
-	space.install_read_handler(0x0323, 0x0323, read8_delegate(FUNC(inder_sb_device::megaphx_0323_hack_r), this));
-}
-
-void inder_sb_device::update_sound_irqs(void)
-{
-	if (m_soundirq) m_audiocpu->set_input_line(INPUT_LINE_IRQ0, ASSERT_LINE);
-	else m_audiocpu->set_input_line(INPUT_LINE_IRQ0, CLEAR_LINE);
-}
-
-WRITE_LINE_MEMBER(inder_sb_device::z80ctc_ch0)
-{
-//  int bank = m_soundbank[0] & 7;  membank("snddata")->set_entry(bank);
-//  m_audiocpu->set_input_line(INPUT_LINE_IRQ0, state ? ASSERT_LINE : CLEAR_LINE);
-	if (state) m_soundirq |= 0x1;
-	else m_soundirq &= ~0x1;
-
-	update_sound_irqs();
-}
-
-
-WRITE_LINE_MEMBER(inder_sb_device::z80ctc_ch1)
-{
-//  int bank = m_soundbank[1] & 7;  membank("snddata")->set_entry(bank);
-//  m_audiocpu->set_input_line(INPUT_LINE_IRQ0, state ? ASSERT_LINE : CLEAR_LINE);
-	if (state) m_soundirq |= 0x2;
-	else m_soundirq &= ~0x2;
-
-	update_sound_irqs();
-}
-
-
-WRITE_LINE_MEMBER(inder_sb_device::z80ctc_ch2)
-{
-//  int bank = m_soundbank[2] & 7;  membank("snddata")->set_entry(bank);
-//  m_audiocpu->set_input_line(INPUT_LINE_IRQ0, state ? ASSERT_LINE : CLEAR_LINE);
-	if (state) m_soundirq |= 0x4;
-	else m_soundirq &= ~0x4;
-
-	update_sound_irqs();
-}
-
-
-
-
-WRITE_LINE_MEMBER(inder_sb_device::z80ctc_ch3)
-{
-//  int bank = m_soundbank[3] & 7;  membank("snddata")->set_entry(bank);
-//  m_audiocpu->set_input_line(INPUT_LINE_IRQ0, state ? ASSERT_LINE : CLEAR_LINE);
-	if (state) m_soundirq |= 0x8;
-	else m_soundirq &= ~0x8;
-
-	update_sound_irqs();
-}
-
 
 
 
@@ -122,8 +66,9 @@ static const z80_daisy_config daisy_chain[] =
 };
 
 
-static ADDRESS_MAP_START( sound_map, AS_PROGRAM, 8, inder_sb_device )
+ADDRESS_MAP_START(inder_sb_device::sound_map)
 	AM_RANGE(0x0000, 0x1fff) AM_ROM
+	AM_RANGE(0x0020, 0x0020) AM_SELECT(0x0006) AM_READ(vec_bankswitch_r)
 	AM_RANGE(0x4000, 0x7fff) AM_RAM
 	AM_RANGE(0x8000, 0xffff) AM_ROMBANK("snddata")
 ADDRESS_MAP_END
@@ -179,7 +124,7 @@ WRITE8_MEMBER(inder_sb_device::dac3_rombank_write)
 }
 
 
-static ADDRESS_MAP_START( sound_io, AS_IO, 8, inder_sb_device )
+ADDRESS_MAP_START(inder_sb_device::sound_io)
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	AM_RANGE(0x00, 0x00) AM_DEVWRITE("dac0", dac_byte_interface, write)
 	AM_RANGE(0x01, 0x01) AM_DEVWRITE("dac0vol", dac_byte_interface, write)
@@ -214,11 +159,7 @@ MACHINE_CONFIG_START(inder_sb_device::device_add_mconfig)
 
 	MCFG_DEVICE_ADD("ctc", Z80CTC, 4000000) // unk freq
 	// runs in IM2 , vector set to 0x20 , values there are 0xCC, 0x02, 0xE6, 0x02, 0x09, 0x03, 0x23, 0x03  (so 02cc, 02e6, 0309, 0323, all of which are valid irq handlers)
-	MCFG_Z80CTC_INTR_CB(WRITELINE(inder_sb_device, z80ctc_ch0))
-	MCFG_Z80CTC_ZC0_CB(WRITELINE(inder_sb_device, z80ctc_ch1))
-	MCFG_Z80CTC_ZC1_CB(WRITELINE(inder_sb_device, z80ctc_ch2))
-	MCFG_Z80CTC_ZC2_CB(WRITELINE(inder_sb_device, z80ctc_ch3))
-	// was this correct?!?
+	MCFG_Z80CTC_INTR_CB(INPUTLINE("audiocpu", 0))
 
 	MCFG_SPEAKER_STANDARD_MONO("speaker")
 	MCFG_SOUND_ADD("dac0", DAC_8BIT_R2R_TWOS_COMPLEMENT, 0) MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 0.5) // unknown DAC
@@ -239,13 +180,15 @@ MACHINE_CONFIG_END
 
 void inder_sb_device::device_start()
 {
-	membank("snddata")->configure_entries(0, 8, memregion("user2")->base(), 0x8000);
-	membank("snddata")->set_entry(0);
+	m_sounddata_bank->configure_entries(0, 8, memregion("user2")->base(), 0x8000);
+	m_sounddata_bank->set_entry(0);
 
-	install_sound_hacks();
+	save_item(NAME(m_soundbank));
+	save_item(NAME(m_soundsent));
+	save_item(NAME(m_sounddata));
+	save_item(NAME(m_soundback));
 }
 
 void inder_sb_device::device_reset()
 {
-	m_soundirq = 0;
 }

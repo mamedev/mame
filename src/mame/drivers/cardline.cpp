@@ -76,6 +76,8 @@ public:
 	required_device<palette_device> m_palette;
 	required_device<screen_device> m_screen;
 	void cardline(machine_config &config);
+	void mem_io(address_map &map);
+	void mem_prg(address_map &map);
 };
 
 void cardline_state::machine_start()
@@ -210,11 +212,11 @@ WRITE8_MEMBER(cardline_state::lamps_w)
 	output().set_lamp_value(7,(data >> 7) & 1);
 }
 
-static ADDRESS_MAP_START( mem_prg, AS_PROGRAM, 8, cardline_state )
+ADDRESS_MAP_START(cardline_state::mem_prg)
 	AM_RANGE(0x0000, 0xffff) AM_ROM
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( mem_io, AS_IO, 8, cardline_state )
+ADDRESS_MAP_START(cardline_state::mem_io)
 	AM_RANGE(0x0000, 0x1fff) AM_RAM
 	AM_RANGE(0x2003, 0x2003) AM_READ_PORT("IN0")
 	AM_RANGE(0x2005, 0x2005) AM_READ_PORT("IN1")

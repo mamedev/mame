@@ -82,6 +82,12 @@ public:
 
 	void mz800(machine_config &config);
 	void mz700(machine_config &config);
+	void mz700_banke(address_map &map);
+	void mz700_io(address_map &map);
+	void mz700_mem(address_map &map);
+	void mz800_bankf(address_map &map);
+	void mz800_io(address_map &map);
+	void mz800_mem(address_map &map);
 private:
 	int m_mz700;                /* 1 if running on an mz700 */
 

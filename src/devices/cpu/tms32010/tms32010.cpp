@@ -83,7 +83,7 @@ DEFINE_DEVICE_TYPE(TMS32016, tms32016_device, "tms32016", "TMS32016")
  *  TMS32010 Internal Memory Map
  ****************************************************************************/
 
-static ADDRESS_MAP_START( tms32010_ram, AS_DATA, 16, tms32010_device )
+ADDRESS_MAP_START(tms32010_device::tms32010_ram)
 	AM_RANGE(0x00, 0x7f) AM_RAM     /* Page 0 */
 	AM_RANGE(0x80, 0x8f) AM_RAM     /* Page 1 */
 ADDRESS_MAP_END
@@ -92,14 +92,14 @@ ADDRESS_MAP_END
  *  TMS32015/6 Internal Memory Map
  ****************************************************************************/
 
-static ADDRESS_MAP_START( tms32015_ram, AS_DATA, 16, tms32010_device )
+ADDRESS_MAP_START(tms32010_device::tms32015_ram)
 	AM_RANGE(0x00, 0x7f) AM_RAM     /* Page 0 */
 	AM_RANGE(0x80, 0xff) AM_RAM     /* Page 1 */
 ADDRESS_MAP_END
 
 
 tms32010_device::tms32010_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-	: tms32010_device(mconfig, TMS32010, tag, owner, clock, ADDRESS_MAP_NAME(tms32010_ram), 0x0fff)
+	: tms32010_device(mconfig, TMS32010, tag, owner, clock, address_map_constructor(FUNC(tms32010_device::tms32010_ram), this), 0x0fff)
 {
 }
 
@@ -116,13 +116,13 @@ tms32010_device::tms32010_device(const machine_config &mconfig, device_type type
 
 
 tms32015_device::tms32015_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-	: tms32010_device(mconfig, TMS32015, tag, owner, clock, ADDRESS_MAP_NAME(tms32015_ram), 0x0fff)
+	: tms32010_device(mconfig, TMS32015, tag, owner, clock, address_map_constructor(FUNC(tms32015_device::tms32015_ram), this), 0x0fff)
 {
 }
 
 
 tms32016_device::tms32016_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-	: tms32010_device(mconfig, TMS32016, tag, owner, clock, ADDRESS_MAP_NAME(tms32015_ram), 0xffff)
+	: tms32010_device(mconfig, TMS32016, tag, owner, clock, address_map_constructor(FUNC(tms32016_device::tms32015_ram), this), 0xffff)
 {
 }
 

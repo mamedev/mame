@@ -127,6 +127,10 @@ public:
 	required_device<screen_device> m_screen;
 	ESRIP_DRAW(esripsys_draw);
 	void esripsys(machine_config &config);
+	void frame_cpu_map(address_map &map);
+	void game_cpu_map(address_map &map);
+	void sound_cpu_map(address_map &map);
+	void video_cpu_map(address_map &map);
 };
 
 #endif // MAME_INCLUDES_ESRIPSYS_H

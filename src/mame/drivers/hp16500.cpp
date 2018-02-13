@@ -103,6 +103,10 @@ public:
 	void hp16500a(machine_config &config);
 	void hp1651(machine_config &config);
 	void hp1650(machine_config &config);
+	void hp16500_map(address_map &map);
+	void hp16500a_map(address_map &map);
+	void hp1650_map(address_map &map);
+	void hp1651_map(address_map &map);
 private:
 	uint32_t m_palette[256], m_colors[3], m_count, m_clutoffs;
 };
@@ -217,7 +221,7 @@ WRITE_LINE_MEMBER(hp16500_state::irq_2)
 	m_maincpu->set_input_line_and_vector(M68K_IRQ_2, state, M68K_INT_ACK_AUTOVECTOR);
 }
 
-static ADDRESS_MAP_START(hp1650_map, AS_PROGRAM, 16, hp16500_state)
+ADDRESS_MAP_START(hp16500_state::hp1650_map)
 	AM_RANGE(0x000000, 0x00ffff) AM_ROM AM_REGION("bios", 0)
 
 	AM_RANGE(0x201000, 0x201001) AM_WRITE(maskval_w)
@@ -244,7 +248,7 @@ static ADDRESS_MAP_START(hp1650_map, AS_PROGRAM, 16, hp16500_state)
 ADDRESS_MAP_END
 
 // like 1650 but moves main RAM to match 16500a
-static ADDRESS_MAP_START(hp1651_map, AS_PROGRAM, 16, hp16500_state)
+ADDRESS_MAP_START(hp16500_state::hp1651_map)
 	AM_RANGE(0x000000, 0x00ffff) AM_ROM AM_REGION("bios", 0)
 
 	AM_RANGE(0x201000, 0x201001) AM_WRITE(maskval_w)
@@ -270,7 +274,7 @@ static ADDRESS_MAP_START(hp1651_map, AS_PROGRAM, 16, hp16500_state)
 	AM_RANGE(0x980000, 0xa7ffff) AM_RAM
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START(hp16500a_map, AS_PROGRAM, 16, hp16500_state)
+ADDRESS_MAP_START(hp16500_state::hp16500a_map)
 	AM_RANGE(0x000000, 0x00ffff) AM_ROM AM_REGION("bios", 0)
 
 	AM_RANGE(0x201000, 0x201001) AM_WRITE(maskval_w)
@@ -296,7 +300,7 @@ uint32_t hp16500_state::screen_update_hp16500a(screen_device &screen, bitmap_rgb
 	return 0;
 }
 
-static ADDRESS_MAP_START(hp16500_map, AS_PROGRAM, 32, hp16500_state)
+ADDRESS_MAP_START(hp16500_state::hp16500_map)
 	AM_RANGE(0x00000000, 0x0001ffff) AM_ROM AM_REGION("bios", 0)
 	AM_RANGE(0x0020f000, 0x0020f003) AM_WRITE(palette_w)
 

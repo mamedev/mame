@@ -65,6 +65,8 @@ public:
 	uint8_t reg_p38;
 	uint32_t fdd_68k_dma_address; /* FDD <-> m68k DMA read/write address */
 
+	void pdc_io(address_map &map);
+	void pdc_mem(address_map &map);
 protected:
 	/* Device-level overrides */
 	virtual void device_start() override;

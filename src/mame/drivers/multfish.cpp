@@ -679,7 +679,7 @@ DRIVER_INIT_MEMBER(igrosoft_gamble_state,crzmon2ent)
 	// needs gfx (and palette) descrambles
 }
 
-static ADDRESS_MAP_START( igrosoft_gamble_map, AS_PROGRAM, 8, igrosoft_gamble_state )
+ADDRESS_MAP_START(igrosoft_gamble_state::igrosoft_gamble_map)
 	AM_RANGE(0x0000, 0x7fff) AM_ROM AM_WRITE(igrosoft_gamble_vid_w)
 	AM_RANGE(0x8000, 0xbfff) AM_ROMBANK("bank1")
 	AM_RANGE(0xc000, 0xdfff) AM_READWRITE(igrosoft_gamble_timekeeper_r, igrosoft_gamble_timekeeper_w)
@@ -912,7 +912,7 @@ WRITE8_MEMBER(igrosoft_gamble_state::igrosoft_gamble_dispenable_w)
 	m_disp_enable = data;
 }
 
-static ADDRESS_MAP_START( igrosoft_gamble_portmap, AS_IO, 8, igrosoft_gamble_state )
+ADDRESS_MAP_START(igrosoft_gamble_state::igrosoft_gamble_portmap)
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	AM_RANGE(0x10, 0x10) AM_READ_PORT("IN0")
 	AM_RANGE(0x11, 0x11) AM_READ_PORT("IN1")
@@ -977,7 +977,7 @@ static ADDRESS_MAP_START( igrosoft_gamble_portmap, AS_IO, 8, igrosoft_gamble_sta
 	AM_RANGE(0xf8, 0xfd)  AM_WRITE(igrosoft_gamble_bank_w)
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( rollfr_portmap, AS_IO, 8, igrosoft_gamble_state )
+ADDRESS_MAP_START(igrosoft_gamble_state::rollfr_portmap)
 	AM_IMPORT_FROM(igrosoft_gamble_portmap)
 	AM_RANGE(0x33, 0x33) AM_WRITE(rollfr_hopper_w)
 ADDRESS_MAP_END

@@ -63,6 +63,8 @@ public:
 	required_device<gfxdecode_device> m_gfxdecode;
 	required_device<palette_device> m_palette;
 	void superdq(machine_config &config);
+	void superdq_io(address_map &map);
+	void superdq_map(address_map &map);
 };
 
 TILE_GET_INFO_MEMBER(superdq_state::get_tile_info)
@@ -206,13 +208,13 @@ WRITE8_MEMBER(superdq_state::superdq_ld_w)
  *
  *************************************/
 
-static ADDRESS_MAP_START( superdq_map, AS_PROGRAM, 8, superdq_state )
+ADDRESS_MAP_START(superdq_state::superdq_map)
 	AM_RANGE(0x0000, 0x3fff) AM_ROM
 	AM_RANGE(0x4000, 0x47ff) AM_RAM
 	AM_RANGE(0x5c00, 0x5fff) AM_RAM_WRITE(superdq_videoram_w) AM_SHARE("videoram")
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( superdq_io, AS_IO, 8, superdq_state )
+ADDRESS_MAP_START(superdq_state::superdq_io)
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	AM_RANGE(0x00, 0x00) AM_READ_PORT("IN0") AM_WRITE(superdq_ld_w)
 	AM_RANGE(0x01, 0x01) AM_READ_PORT("IN1")

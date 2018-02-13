@@ -58,6 +58,7 @@ public:
 	void de_type1(machine_config &config);
 	void de_type2_alpha3(machine_config &config);
 	void de_type3(machine_config &config);
+	void de_2_audio_map(address_map &map);
 protected:
 
 	// devices
@@ -133,7 +134,7 @@ private:
     AM_RANGE(0x4000, 0xffff) AM_ROM
 ADDRESS_MAP_END
 */
-static ADDRESS_MAP_START( de_2_audio_map, AS_PROGRAM, 8, de_2_state )
+ADDRESS_MAP_START(de_2_state::de_2_audio_map)
 	AM_RANGE(0x0000, 0x1fff) AM_RAM
 	AM_RANGE(0x2000, 0x2001) AM_DEVREADWRITE("ym2151", ym2151_device, read, write)
 	AM_RANGE(0x2400, 0x2400) AM_READ(sound_latch_r)
@@ -924,11 +925,11 @@ ROM_START(torp_a16)
 ROM_END
 
 
-GAME(1990,  bttf_a28,       0,          de_type3,        de_2, de_2_state,   de_2,   ROT0,   "Data East",    "Back To the Future (2.8)",             MACHINE_IS_SKELETON_MECHANICAL)
-GAME(1990,  bttf_a27,       bttf_a28,   de_type3,        de_2, de_2_state,   de_2,   ROT0,   "Data East",    "Back To the Future (2.7)",             MACHINE_IS_SKELETON_MECHANICAL)
-GAME(1990,  bttf_a20,       bttf_a28,   de_type3,        de_2, de_2_state,   de_2,   ROT0,   "Data East",    "Back To the Future (2.0)",             MACHINE_IS_SKELETON_MECHANICAL)
-GAME(1990,  bttf_a21,       bttf_a28,   de_type3,        de_2, de_2_state,   de_2,   ROT0,   "Data East",    "Back To The Future (2.1)",             MACHINE_IS_SKELETON_MECHANICAL)
-GAME(199?,  bttf_g27,       bttf_a28,   de_type3,        de_2, de_2_state,   de_2,   ROT0,   "Data East",    "Back To the Future (2.7 Germany)",     MACHINE_IS_SKELETON_MECHANICAL)
+GAME(1990,  bttf_a28,       0,          de_type3,        de_2, de_2_state,   de_2,   ROT0,   "Data East",    "Back to the Future - The Pinball (2.8)",          MACHINE_IS_SKELETON_MECHANICAL)
+GAME(1990,  bttf_a27,       bttf_a28,   de_type3,        de_2, de_2_state,   de_2,   ROT0,   "Data East",    "Back to the Future - The Pinball (2.7)",          MACHINE_IS_SKELETON_MECHANICAL)
+GAME(1990,  bttf_a20,       bttf_a28,   de_type3,        de_2, de_2_state,   de_2,   ROT0,   "Data East",    "Back to the Future - The Pinball (2.0)",          MACHINE_IS_SKELETON_MECHANICAL)
+GAME(1990,  bttf_a21,       bttf_a28,   de_type3,        de_2, de_2_state,   de_2,   ROT0,   "Data East",    "Back to the Future - The Pinball (2.1)",          MACHINE_IS_SKELETON_MECHANICAL)
+GAME(199?,  bttf_g27,       bttf_a28,   de_type3,        de_2, de_2_state,   de_2,   ROT0,   "Data East",    "Back to the Future - The Pinball (2.7, Germany)", MACHINE_IS_SKELETON_MECHANICAL)
 GAME(1990,  kiko_a10,       0,          de_type3,        de_2, de_2_state,   de_2,   ROT0,   "Data East",    "King Kong (1.0)",                      MACHINE_IS_SKELETON_MECHANICAL)
 GAME(1987,  lwar_a83,       0,          de_type1,        de_2, de_2_state,   de_2,   ROT0,   "Data East",    "Laser War (8.3)",                      MACHINE_IS_SKELETON_MECHANICAL)
 GAME(1987,  lwar_a81,       lwar_a83,   de_type1,        de_2, de_2_state,   de_2,   ROT0,   "Data East",    "Laser War (8.1)",                      MACHINE_IS_SKELETON_MECHANICAL)

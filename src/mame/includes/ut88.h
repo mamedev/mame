@@ -66,6 +66,10 @@ public:
 
 	void ut88(machine_config &config);
 	void ut88mini(machine_config &config);
+	void ut88_io(address_map &map);
+	void ut88_mem(address_map &map);
+	void ut88mini_io(address_map &map);
+	void ut88mini_mem(address_map &map);
 private:
 	required_device<cassette_image_device> m_cassette;
 	optional_device<i8255_device> m_ppi;

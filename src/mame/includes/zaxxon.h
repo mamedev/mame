@@ -114,5 +114,10 @@ public:
 	void zaxxon(machine_config &config);
 	void zaxxon_samples(machine_config &config);
 	void congo_samples(machine_config &config);
+	void congo_map(address_map &map);
+	void congo_sound_map(address_map &map);
+	void decrypted_opcodes_map(address_map &map);
+	void ixion_map(address_map &map);
+	void zaxxon_map(address_map &map);
 };
 

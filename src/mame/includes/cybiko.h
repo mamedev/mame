@@ -83,6 +83,12 @@ public:
 	void cybikoxt(machine_config &config);
 	void cybikov2(machine_config &config);
 	void cybikov1(machine_config &config);
+	void cybikov1_io(address_map &map);
+	void cybikov1_mem(address_map &map);
+	void cybikov2_io(address_map &map);
+	void cybikov2_mem(address_map &map);
+	void cybikoxt_io(address_map &map);
+	void cybikoxt_mem(address_map &map);
 };
 
 #endif // MAME_INCLUDES_CYBIKO_H

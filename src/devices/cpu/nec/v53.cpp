@@ -414,7 +414,7 @@ WRITE_LINE_MEMBER(v53_base_device::hack_w)
 
 /* General stuff */
 
-static ADDRESS_MAP_START( v53_internal_port_map, AS_IO, 16, v53_base_device )
+ADDRESS_MAP_START(v53_base_device::v53_internal_port_map)
 	AM_RANGE(0xffe0, 0xffe1) AM_WRITE8( BSEL_w,  0x00ff) // 0xffe0 // uPD71037 DMA mode bank selection register
 	AM_RANGE(0xffe0, 0xffe1) AM_WRITE8( BADR_w,  0xff00) // 0xffe1 // uPD71037 DMA mode bank register peripheral mapping (also uses OPHA)
 //  AM_RANGE(0xffe2, 0xffe3) // (reserved     ,  0x00ff) // 0xffe2
@@ -536,7 +536,7 @@ MACHINE_CONFIG_END
 
 v53_base_device::v53_base_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock, offs_t fetch_xor, uint8_t prefetch_size, uint8_t prefetch_cycles, uint32_t chip_type)
 	: nec_common_device(mconfig, type, tag, owner, clock, true, fetch_xor, prefetch_size, prefetch_cycles, chip_type),
-	m_io_space_config( "io", ENDIANNESS_LITTLE, 16, 16, 0, ADDRESS_MAP_NAME( v53_internal_port_map ) ),
+	m_io_space_config( "io", ENDIANNESS_LITTLE, 16, 16, 0, address_map_constructor(FUNC(v53_base_device::v53_internal_port_map), this) ),
 	m_v53tcu(*this, "pit"),
 	m_v53dmau(*this, "upd71071dma"),
 	m_v53icu(*this, "upd71059pic"),

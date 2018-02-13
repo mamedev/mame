@@ -38,6 +38,8 @@ public:
 	DECLARE_READ8_MEMBER( p2_r );
 	DECLARE_WRITE8_MEMBER( p2_w );
 
+	void adam_fdc_io(address_map &map);
+	void adam_fdc_mem(address_map &map);
 protected:
 	// device-level overrides
 	virtual void device_start() override;

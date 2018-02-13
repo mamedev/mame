@@ -108,6 +108,10 @@ public:
 	void draw_sprites( bitmap_ind16 &bitmap, const rectangle &cliprect );
 	DECLARE_WRITE_LINE_MEMBER(yunsung8_adpcm_int);
 	void discoboy(machine_config &config);
+	void discoboy_map(address_map &map);
+	void io_map(address_map &map);
+	void rambank1_map(address_map &map);
+	void sound_map(address_map &map);
 };
 
 void discoboy_state::draw_sprites( bitmap_ind16 &bitmap, const rectangle &cliprect )
@@ -269,7 +273,7 @@ WRITE8_MEMBER(discoboy_state::rambank2_w)
 		printf("unk rb2_w\n");
 }
 
-static ADDRESS_MAP_START( discoboy_map, AS_PROGRAM, 8, discoboy_state )
+ADDRESS_MAP_START(discoboy_state::discoboy_map)
 	AM_RANGE(0x0000, 0x7fff) AM_ROM
 	AM_RANGE(0x8000, 0xbfff) AM_ROMBANK("mainbank")
 	AM_RANGE(0xc000, 0xc7ff) AM_DEVICE("rambank1", address_map_bank_device, amap8)
@@ -279,7 +283,7 @@ static ADDRESS_MAP_START( discoboy_map, AS_PROGRAM, 8, discoboy_state )
 	AM_RANGE(0xf000, 0xffff) AM_RAM
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( rambank1_map, AS_PROGRAM, 8, discoboy_state )
+ADDRESS_MAP_START(discoboy_state::rambank1_map)
 	AM_RANGE(0x0000, 0x07ff) AM_RAM AM_SHARE("ram_1")
 	AM_RANGE(0x0800, 0x0fff) AM_RAM AM_SHARE("ram_2")
 ADDRESS_MAP_END
@@ -290,7 +294,7 @@ READ8_MEMBER(discoboy_state::port_06_r)
 	return 0x00;
 }
 
-static ADDRESS_MAP_START( io_map, AS_IO, 8, discoboy_state )
+ADDRESS_MAP_START(discoboy_state::io_map)
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	AM_RANGE(0x00, 0x00) AM_READ_PORT("DSWA") AM_WRITE(port_00_w)
 	AM_RANGE(0x01, 0x01) AM_READ_PORT("SYSTEM") AM_WRITE(port_01_w)
@@ -314,7 +318,7 @@ WRITE8_MEMBER(discoboy_state::yunsung8_sound_bankswitch_w)
 		logerror("%s: Bank %02X\n", machine().describe_context(), data);
 }
 
-static ADDRESS_MAP_START( sound_map, AS_PROGRAM, 8, discoboy_state )
+ADDRESS_MAP_START(discoboy_state::sound_map)
 	AM_RANGE(0x0000, 0x7fff) AM_ROM
 	AM_RANGE(0x8000, 0xbfff) AM_ROMBANK("sndbank")
 	AM_RANGE(0xe000, 0xe000) AM_WRITE(yunsung8_sound_bankswitch_w)

@@ -51,7 +51,7 @@ READ16_MEMBER(goal92_state::goal92_inputs_r)
 	return 0;
 }
 
-static ADDRESS_MAP_START( goal92_map, AS_PROGRAM, 16, goal92_state )
+ADDRESS_MAP_START(goal92_state::goal92_map)
 	AM_RANGE(0x000000, 0x0fffff) AM_ROM
 	AM_RANGE(0x100000, 0x1007ff) AM_RAM
 	AM_RANGE(0x100800, 0x100fff) AM_RAM_WRITE(goal92_background_w) AM_SHARE("bg_data")
@@ -84,7 +84,7 @@ WRITE8_MEMBER(goal92_state::adpcm_data_w)
 	m_msm5205next = data;
 }
 
-static ADDRESS_MAP_START( sound_cpu, AS_PROGRAM, 8, goal92_state )
+ADDRESS_MAP_START(goal92_state::sound_cpu)
 	AM_RANGE(0x0000, 0x7fff) AM_ROM
 	AM_RANGE(0x8000, 0xbfff) AM_ROMBANK("bank1")
 	AM_RANGE(0xe000, 0xe000) AM_WRITE(adpcm_control_w)

@@ -81,6 +81,9 @@ public:
 	DECLARE_DRIVER_INIT(vcs80);
 	TIMER_DEVICE_CALLBACK_MEMBER(vcs80_keyboard_tick);
 	void vcs80(machine_config &config);
+	void vcs80_bd_mem(address_map &map);
+	void vcs80_io(address_map &map);
+	void vcs80_mem(address_map &map);
 };
 
 #endif

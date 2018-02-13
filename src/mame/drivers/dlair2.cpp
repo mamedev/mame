@@ -54,6 +54,8 @@ public:
 	DECLARE_PALETTE_INIT(dlair2);
 
 	void dlair2(machine_config &config);
+	void dlair2_io(address_map &map);
+	void dlair2_map(address_map &map);
 protected:
 	// driver_device overrides
 	virtual void machine_start() override;
@@ -71,12 +73,12 @@ uint32_t dlair2_state::screen_update( screen_device &screen, bitmap_ind16 &bitma
 	return 0;
 }
 
-static ADDRESS_MAP_START( dlair2_map, AS_PROGRAM, 8, dlair2_state )
+ADDRESS_MAP_START(dlair2_state::dlair2_map)
 	AM_RANGE(0x00000, 0xeffff) AM_RAM
 	AM_RANGE(0xf0000, 0xfffff) AM_ROM AM_REGION("ipl", 0)
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( dlair2_io, AS_IO, 8, dlair2_state )
+ADDRESS_MAP_START(dlair2_state::dlair2_io)
 //  AM_RANGE(0x020, 0x020) ICR
 //  AM_RANGE(0x042, 0x043) sound related
 //  AM_RANGE(0x061, 0x061) sound related

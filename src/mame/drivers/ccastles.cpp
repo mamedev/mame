@@ -321,7 +321,7 @@ WRITE8_MEMBER(ccastles_state::nvram_w)
  *************************************/
 
 /* complete memory map derived from schematics */
-static ADDRESS_MAP_START( main_map, AS_PROGRAM, 8, ccastles_state )
+ADDRESS_MAP_START(ccastles_state::main_map)
 	AM_RANGE(0x0000, 0x7fff) AM_RAM_WRITE(ccastles_videoram_w) AM_SHARE("videoram")
 	AM_RANGE(0x0000, 0x0001) AM_WRITE(ccastles_bitmode_addr_w)
 	AM_RANGE(0x0002, 0x0002) AM_READWRITE(ccastles_bitmode_r, ccastles_bitmode_w)

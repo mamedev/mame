@@ -161,6 +161,7 @@ public:
 	uint16_t get_vram_dest();
 	void set_vram_dest(uint16_t dest);
 
+	void ppu2c0x(address_map &map);
 protected:
 	// registers definition
 	enum

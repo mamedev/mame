@@ -64,6 +64,7 @@ public:
 
 	IRQ_CALLBACK_MEMBER(irq_callback);
 
+	void tmp68301_regs(address_map &map);
 protected:
 	// device-level overrides
 	virtual void device_start() override;

@@ -495,15 +495,25 @@ static void chcolor(palette_device &palette, pen_t color, uint16_t data)
 	palette.set_pen_color(color, pal5bit(data >> 0), pal5bit(data >> 5), pal5bit(data >> 10));
 }
 
-WRITE16_MEMBER(model2_state::model2_palette_w)
+WRITE16_MEMBER(model2_state::palette_w)
 {
 	COMBINE_DATA(&m_palram[offset]);
 	chcolor(*m_palette, offset, m_palram[offset]);
 }
 
-READ16_MEMBER(model2_state::model2_palette_r)
+READ16_MEMBER(model2_state::palette_r)
 {
 	return m_palram[offset];
+}
+
+WRITE16_MEMBER(model2_state::colorxlat_w)
+{
+	COMBINE_DATA(&m_colorxlat[offset]);
+}
+
+READ16_MEMBER(model2_state::colorxlat_r)
+{
+	return m_colorxlat[offset];
 }
 
 WRITE32_MEMBER(model2_state::ctrl0_w)
@@ -1406,18 +1416,14 @@ WRITE32_MEMBER(model2_state::model2o_tex_w1)
 	}
 }
 
-WRITE32_MEMBER(model2_state::model2o_luma_w)
+READ16_MEMBER(model2_state::lumaram_r)
 {
-	if ( (offset & 1) == 0 )
-	{
-		m_lumaram[offset>>1] &= 0xffff0000;
-		m_lumaram[offset>>1] |= data & 0xffff;
-	}
-	else
-	{
-		m_lumaram[offset>>1] &= 0x0000ffff;
-		m_lumaram[offset>>1] |= (data & 0xffff) << 16;
-	}
+	return m_lumaram[offset];
+}
+
+WRITE16_MEMBER(model2_state::lumaram_w)
+{
+	COMBINE_DATA(&m_lumaram[offset]);
 }
 
 /* Top Skater reads here and discards the result */
@@ -1435,7 +1441,7 @@ READ32_MEMBER(model2_state::polygon_count_r)
 }
 
 /* common map for all Model 2 versions */
-static ADDRESS_MAP_START( model2_base_mem, AS_PROGRAM, 32, model2_state )
+ADDRESS_MAP_START(model2_state::model2_base_mem)
 	AM_RANGE(0x00000000, 0x001fffff) AM_ROM AM_WRITENOP
 
 	AM_RANGE(0x00500000, 0x005fffff) AM_RAM AM_SHARE("workram")
@@ -1447,7 +1453,7 @@ static ADDRESS_MAP_START( model2_base_mem, AS_PROGRAM, 32, model2_state )
 
 	//AM_RANGE(0x00880000, 0x00883fff) AM_WRITE(copro_w)
 
-	AM_RANGE(0x00900000, 0x0097ffff) AM_RAM AM_SHARE("bufferram")
+	AM_RANGE(0x00900000, 0x0091ffff) AM_MIRROR(0x60000) AM_RAM AM_SHARE("bufferram")
 
 	AM_RANGE(0x00980004, 0x00980007) AM_READ(fifoctl_r)
 	AM_RANGE(0x0098000c, 0x0098000f) AM_READWRITE(videoctl_r,videoctl_w)
@@ -1465,8 +1471,8 @@ static ADDRESS_MAP_START( model2_base_mem, AS_PROGRAM, 32, model2_state )
 	AM_RANGE(0x01070000, 0x01070003) AM_WRITENOP AM_MIRROR(0x100000)        // Video synchronization switch
 	AM_RANGE(0x01080000, 0x010fffff) AM_DEVREADWRITE16("tile", segas24_tile_device, char_r, char_w,0xffffffff) AM_MIRROR(0x100000)
 
-	AM_RANGE(0x01800000, 0x01803fff) AM_READWRITE16(model2_palette_r,model2_palette_w,0xffffffff)
-	AM_RANGE(0x01810000, 0x0181bfff) AM_RAM AM_SHARE("colorxlat")
+	AM_RANGE(0x01800000, 0x01803fff) AM_READWRITE16(palette_r,  palette_w,0xffffffff)
+	AM_RANGE(0x01810000, 0x0181bfff) AM_READWRITE16(colorxlat_r,colorxlat_w,0xffffffff)
 	AM_RANGE(0x0181c000, 0x0181c003) AM_WRITE(model2_3d_zclip_w)
 	AM_RANGE(0x01a10000, 0x01a13fff) AM_DEVREADWRITE8("m2comm", m2comm_device, share_r, share_w, 0xffffffff)
 	AM_RANGE(0x01a14000, 0x01a14003) AM_DEVREADWRITE8("m2comm", m2comm_device, cn_r, cn_w, 0x000000ff)
@@ -1483,6 +1489,8 @@ static ADDRESS_MAP_START( model2_base_mem, AS_PROGRAM, 32, model2_state )
 	// format is xGGGGGBBBBBRRRRR (512x400)
 	AM_RANGE(0x11600000, 0x1167ffff) AM_RAM AM_SHARE("fbvram1") // framebuffer A (last bronx title screen)
 	AM_RANGE(0x11680000, 0x116fffff) AM_RAM AM_SHARE("fbvram2") // framebuffer B
+	
+	AM_RANGE(0x12800000, 0x1281ffff) AM_READWRITE16(lumaram_r,lumaram_w,0x0000ffff) // polygon "luma" RAM
 ADDRESS_MAP_END
 
 READ8_MEMBER(model2_state::virtuacop_lightgun_r)
@@ -1538,7 +1546,7 @@ READ8_MEMBER(model2_state::model2o_in_r)
 }
 
 /* original Model 2 overrides */
-static ADDRESS_MAP_START( model2o_mem, AS_PROGRAM, 32, model2_state )
+ADDRESS_MAP_START(model2_state::model2o_mem)
 	AM_IMPORT_FROM(model2_base_mem)
 
 	AM_RANGE(0x00200000, 0x0021ffff) AM_RAM
@@ -1555,7 +1563,6 @@ static ADDRESS_MAP_START( model2o_mem, AS_PROGRAM, 32, model2_state )
 
 	AM_RANGE(0x12000000, 0x121fffff) AM_RAM_WRITE(model2o_tex_w0) AM_MIRROR(0x200000) AM_SHARE("textureram0")   // texture RAM 0
 	AM_RANGE(0x12400000, 0x125fffff) AM_RAM_WRITE(model2o_tex_w1) AM_MIRROR(0x200000) AM_SHARE("textureram1")   // texture RAM 1
-	AM_RANGE(0x12800000, 0x1281ffff) AM_RAM_WRITE(model2o_luma_w) AM_SHARE("lumaram") // polygon "luma" RAM
 
 	AM_RANGE(0x01c00000, 0x01c0001f) AM_READ8(model2o_in_r, 0x00ff00ff)
 	AM_RANGE(0x01c00040, 0x01c00043) AM_READ(daytona_unk_r)
@@ -1575,7 +1582,7 @@ READ32_MEMBER(model2_state::copro_status_r)
 }
 
 /* 2A-CRX overrides */
-static ADDRESS_MAP_START( model2a_crx_mem, AS_PROGRAM, 32, model2_state )
+ADDRESS_MAP_START(model2_state::model2a_crx_mem)
 	AM_IMPORT_FROM(model2_base_mem)
 
 	AM_RANGE(0x00200000, 0x0023ffff) AM_RAM
@@ -1591,7 +1598,6 @@ static ADDRESS_MAP_START( model2a_crx_mem, AS_PROGRAM, 32, model2_state )
 
 	AM_RANGE(0x12000000, 0x121fffff) AM_RAM_WRITE(model2o_tex_w0) AM_MIRROR(0x200000) AM_SHARE("textureram0")   // texture RAM 0
 	AM_RANGE(0x12400000, 0x125fffff) AM_RAM_WRITE(model2o_tex_w1) AM_MIRROR(0x200000) AM_SHARE("textureram1")   // texture RAM 1
-	AM_RANGE(0x12800000, 0x1281ffff) AM_RAM_WRITE(model2o_luma_w) AM_SHARE("lumaram") // polygon "luma" RAM
 
 	AM_RANGE(0x01c00000, 0x01c0001f) AM_READ8(model2_crx_in_r, 0x00ff00ff)
 	AM_RANGE(0x01c00000, 0x01c00003) AM_WRITE(ctrl0_w)
@@ -1604,7 +1610,7 @@ static ADDRESS_MAP_START( model2a_crx_mem, AS_PROGRAM, 32, model2_state )
 ADDRESS_MAP_END
 
 /* 2B-CRX overrides */
-static ADDRESS_MAP_START( model2b_crx_mem, AS_PROGRAM, 32, model2_state )
+ADDRESS_MAP_START(model2_state::model2b_crx_mem)
 	AM_IMPORT_FROM(model2_base_mem)
 
 	AM_RANGE(0x00200000, 0x0023ffff) AM_RAM
@@ -1628,8 +1634,8 @@ static ADDRESS_MAP_START( model2b_crx_mem, AS_PROGRAM, 32, model2_state )
 	AM_RANGE(0x11100000, 0x111fffff) AM_RAM AM_SHARE("textureram0") // texture RAM 0 (2b/2c)
 	AM_RANGE(0x11200000, 0x112fffff) AM_RAM AM_SHARE("textureram1") // texture RAM 1 (2b/2c)
 	AM_RANGE(0x11300000, 0x113fffff) AM_RAM AM_SHARE("textureram1") // texture RAM 1 (2b/2c)
-	AM_RANGE(0x11400000, 0x1140ffff) AM_RAM AM_SHARE("lumaram")     // polygon "luma" RAM (2b/2c)
-	AM_RANGE(0x12800000, 0x1281ffff) AM_RAM AM_SHARE("lumaram") // polygon "luma" RAM
+	AM_RANGE(0x11400000, 0x1140ffff) AM_READWRITE16(lumaram_r,lumaram_w,0xffffffff)    // polygon "luma" RAM (2b/2c)
+	AM_RANGE(0x12800000, 0x1281ffff) AM_READWRITE16(lumaram_r,lumaram_w,0x0000ffff) // polygon "luma" RAM
 
 	AM_RANGE(0x01c00000, 0x01c0001f) AM_READ8(model2_crx_in_r, 0x00ff00ff)
 	AM_RANGE(0x01c00000, 0x01c00003) AM_WRITE(ctrl0_w)
@@ -1641,7 +1647,7 @@ static ADDRESS_MAP_START( model2b_crx_mem, AS_PROGRAM, 32, model2_state )
 ADDRESS_MAP_END
 
 /* 2C-CRX overrides */
-static ADDRESS_MAP_START( model2c_crx_mem, AS_PROGRAM, 32, model2_state )
+ADDRESS_MAP_START(model2_state::model2c_crx_mem)
 	AM_IMPORT_FROM(model2_base_mem)
 
 	AM_RANGE(0x00200000, 0x0023ffff) AM_RAM
@@ -1657,8 +1663,9 @@ static ADDRESS_MAP_START( model2c_crx_mem, AS_PROGRAM, 32, model2_state )
 
 	AM_RANGE(0x11000000, 0x111fffff) AM_RAM AM_SHARE("textureram0") // texture RAM 0 (2b/2c)
 	AM_RANGE(0x11200000, 0x113fffff) AM_RAM AM_SHARE("textureram1") // texture RAM 1 (2b/2c)
-	AM_RANGE(0x11400000, 0x1140ffff) AM_RAM AM_SHARE("lumaram")     // polygon "luma" RAM (2b/2c)
-
+	AM_RANGE(0x11400000, 0x1140ffff) AM_READWRITE16(lumaram_r,lumaram_w,0xffffffff)    // polygon "luma" RAM (2b/2c)
+	AM_RANGE(0x12800000, 0x1281ffff) AM_READWRITE16(lumaram_r,lumaram_w,0x0000ffff) // polygon "luma" RAM
+	
 	AM_RANGE(0x01c00000, 0x01c0001f) AM_READ8(model2_crx_in_r, 0x00ff00ff)
 	AM_RANGE(0x01c00000, 0x01c00003) AM_WRITE(ctrl0_w)
 	AM_RANGE(0x01c00014, 0x01c00017) AM_WRITE(hotd_lightgun_w)
@@ -2048,7 +2055,7 @@ WRITE16_MEMBER(model2_state::model2snd_ctrl)
 	}
 }
 
-static ADDRESS_MAP_START( model2_snd, AS_PROGRAM, 16, model2_state )
+ADDRESS_MAP_START(model2_state::model2_snd)
 	AM_RANGE(0x000000, 0x07ffff) AM_RAM AM_REGION("audiocpu", 0) AM_SHARE("soundram")
 	AM_RANGE(0x100000, 0x100fff) AM_DEVREADWRITE("scsp", scsp_device, read, write)
 	AM_RANGE(0x400000, 0x400001) AM_WRITE(model2snd_ctrl)
@@ -2095,7 +2102,7 @@ WRITE32_MEMBER(model2_state::copro_sharc_buffer_w)
 	m_bufferram[offset & 0x7fff] = data;
 }
 
-static ADDRESS_MAP_START( copro_sharc_map, AS_DATA, 32, model2_state )
+ADDRESS_MAP_START(model2_state::copro_sharc_map)
 	AM_RANGE(0x0400000, 0x0bfffff) AM_READ(copro_sharc_input_fifo_r)
 	AM_RANGE(0x0c00000, 0x13fffff) AM_WRITE(copro_sharc_output_fifo_w)
 	AM_RANGE(0x1400000, 0x1bfffff) AM_READWRITE(copro_sharc_buffer_r, copro_sharc_buffer_w)
@@ -2104,7 +2111,7 @@ static ADDRESS_MAP_START( copro_sharc_map, AS_DATA, 32, model2_state )
 ADDRESS_MAP_END
 
 #if 0
-static ADDRESS_MAP_START( geo_sharc_map, AS_DATA, 32, model2_state )
+ADDRESS_MAP_START(model2_state::geo_sharc_map)
 ADDRESS_MAP_END
 #endif
 
@@ -2121,7 +2128,7 @@ WRITE32_MEMBER(model2_state::copro_tgp_buffer_w)
 	m_bufferram[offset&0x7fff] = data;
 }
 
-static ADDRESS_MAP_START( copro_tgp_map, AS_PROGRAM, 32, model2_state )
+ADDRESS_MAP_START(model2_state::copro_tgp_map)
 	AM_RANGE(0x00000000, 0x00007fff) AM_RAM AM_SHARE("tgp_program")
 	AM_RANGE(0x00400000, 0x00407fff) AM_READWRITE(copro_tgp_buffer_r, copro_tgp_buffer_w)
 	AM_RANGE(0x00800000, 0x009fffff) AM_ROM AM_REGION("tgp", 0)
@@ -2210,12 +2217,12 @@ WRITE8_MEMBER(model2_state::driveio_port_w)
 //  popmessage("%02x",data);
 }
 
-static ADDRESS_MAP_START( drive_map, AS_PROGRAM, 8, model2_state )
+ADDRESS_MAP_START(model2_state::drive_map)
 	AM_RANGE(0x0000, 0x7fff) AM_ROM
 	AM_RANGE(0xe000, 0xffff) AM_RAM
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( drive_io_map, AS_IO, 8, model2_state )
+ADDRESS_MAP_START(model2_state::drive_io_map)
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	AM_RANGE(0x00, 0x00) AM_WRITENOP //watchdog
 	AM_RANGE(0x20, 0x2f) AM_DEVREADWRITE("driveio1", sega_315_5296_device, read, write)
@@ -2377,12 +2384,12 @@ MACHINE_CONFIG_DERIVED(model2_state::indy500, model2b)
 MACHINE_CONFIG_END
 
 
-static ADDRESS_MAP_START( rchase2_iocpu_map, AS_PROGRAM, 8, model2_state )
+ADDRESS_MAP_START(model2_state::rchase2_iocpu_map)
 	AM_RANGE(0x0000, 0x7fff) AM_ROM
 	AM_RANGE(0x8000, 0x9fff) AM_RAM
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( rchase2_ioport_map, AS_IO, 8, model2_state )
+ADDRESS_MAP_START(model2_state::rchase2_ioport_map)
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	AM_RANGE(0x00, 0x07) AM_DEVREADWRITE("ioexp", cxd1095_device, read, write)
 ADDRESS_MAP_END
@@ -2396,7 +2403,7 @@ MACHINE_CONFIG_DERIVED(model2_state::rchase2, model2b)
 MACHINE_CONFIG_END
 
 
-static ADDRESS_MAP_START( copro_tgpx4_map, AS_PROGRAM, 64, model2_state )
+ADDRESS_MAP_START(model2_state::copro_tgpx4_map)
 	AM_RANGE(0x00000000, 0x00007fff) AM_RAM AM_SHARE("tgpx4_program")
 ADDRESS_MAP_END
 

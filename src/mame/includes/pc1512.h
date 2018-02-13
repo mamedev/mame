@@ -230,6 +230,8 @@ public:
 	void pc1512hd(machine_config &config);
 	void pc1512(machine_config &config);
 	void pc1512dd(machine_config &config);
+	void pc1512_io(address_map &map);
+	void pc1512_mem(address_map &map);
 };
 
 class pc1640_state : public pc1512_state
@@ -253,6 +255,8 @@ public:
 	void pc1640hd(machine_config &config);
 	void pc1640(machine_config &config);
 	void pc1640dd(machine_config &config);
+	void pc1640_io(address_map &map);
+	void pc1640_mem(address_map &map);
 };
 
 // ---------- defined in video/pc1512.c ----------

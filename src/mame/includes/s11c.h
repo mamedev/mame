@@ -22,6 +22,7 @@ public:
 	DECLARE_DRIVER_INIT(s11c);
 
 	void s11c(machine_config &config);
+	void s11c_main_map(address_map &map);
 protected:
 
 private:

@@ -35,6 +35,9 @@ public:
 	DECLARE_WRITE8_MEMBER( mem_w );
 	DECLARE_READ8_MEMBER( opcode_r );
 
+	void tube_z80_fetch(address_map &map);
+	void tube_z80_io(address_map &map);
+	void tube_z80_mem(address_map &map);
 protected:
 	// device-level overrides
 	virtual void device_start() override;

@@ -33,7 +33,7 @@ public:
 	sh7604_bus_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
 	// I/O operations
-	DECLARE_ADDRESS_MAP( bus_regs, 16 );
+	void bus_regs(address_map &map);
 
 	DECLARE_WRITE32_MEMBER( write );
 	DECLARE_READ32_MEMBER( read );

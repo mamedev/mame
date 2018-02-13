@@ -372,7 +372,7 @@ WRITE8_MEMBER( vip_state::io_w )
 //  ADDRESS_MAP( vip_mem )
 //-------------------------------------------------
 
-static ADDRESS_MAP_START( vip_mem, AS_PROGRAM, 8, vip_state )
+ADDRESS_MAP_START(vip_state::vip_mem)
 	ADDRESS_MAP_UNMAP_HIGH
 	AM_RANGE(0x0000, 0xffff) AM_READWRITE(read, write)
 ADDRESS_MAP_END
@@ -382,7 +382,7 @@ ADDRESS_MAP_END
 //  ADDRESS_MAP( vip_io )
 //-------------------------------------------------
 
-static ADDRESS_MAP_START( vip_io, AS_IO, 8, vip_state )
+ADDRESS_MAP_START(vip_state::vip_io)
 	ADDRESS_MAP_UNMAP_HIGH
 	AM_RANGE(0x00, 0x07) AM_READWRITE(io_r, io_w)
 ADDRESS_MAP_END

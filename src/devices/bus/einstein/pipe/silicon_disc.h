@@ -39,7 +39,7 @@ protected:
 	virtual void device_reset() override;
 
 private:
-	DECLARE_ADDRESS_MAP(map, 8);
+	void map(address_map &map);
 
 	required_memory_region m_rom;
 	required_memory_region m_bios;

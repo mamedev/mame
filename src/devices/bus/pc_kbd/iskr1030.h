@@ -32,6 +32,7 @@ public:
 	DECLARE_READ8_MEMBER( ram_r );
 	DECLARE_WRITE8_MEMBER( ram_w );
 
+	void iskr_1030_keyboard_io(address_map &map);
 protected:
 	// device-level overrides
 	virtual void device_start() override;

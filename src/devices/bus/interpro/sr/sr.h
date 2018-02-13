@@ -80,8 +80,8 @@ public:
 		offs_t end = start + (SR_SIZE - 1);
 
 		// install the device address map
-		m_data_space->install_device(start, end, device, map, 32);
-		m_io_space->install_device(start, end, device, map, 32);
+		m_data_space->install_device(start, end, device, map);
+		m_io_space->install_device(start, end, device, map);
 
 		m_slot_count++;
 	}
@@ -116,7 +116,7 @@ public:
 	// construction/destruction
 	virtual ~device_sr_card_interface();
 
-	virtual DECLARE_ADDRESS_MAP(map, 32) = 0;
+	virtual void map(address_map &map) = 0;
 
 	void set_sr_device();
 

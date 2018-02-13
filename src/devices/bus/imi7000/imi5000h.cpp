@@ -62,7 +62,7 @@ const tiny_rom_entry *imi5000h_device::device_rom_region() const
 //  ADDRESS_MAP( imi5000h_mem )
 //-------------------------------------------------
 
-static ADDRESS_MAP_START( imi5000h_mem, AS_PROGRAM, 8, imi5000h_device )
+ADDRESS_MAP_START(imi5000h_device::imi5000h_mem)
 	ADDRESS_MAP_UNMAP_HIGH
 	AM_RANGE(0x0000, 0x0fff) AM_MIRROR(0x1000) AM_ROM AM_REGION(Z80_TAG, 0)
 	AM_RANGE(0x4000, 0x47ff) AM_MIRROR(0x1800) AM_RAM
@@ -76,7 +76,7 @@ ADDRESS_MAP_END
 //  ADDRESS_MAP( imi5000h_io )
 //-------------------------------------------------
 
-static ADDRESS_MAP_START( imi5000h_io, AS_IO, 8, imi5000h_device )
+ADDRESS_MAP_START(imi5000h_device::imi5000h_io)
 	ADDRESS_MAP_UNMAP_HIGH
 	ADDRESS_MAP_GLOBAL_MASK(0x9f)
 	AM_RANGE(0x00, 0x03) AM_DEVREADWRITE(Z80PIO_0_TAG, z80pio_device, read, write)

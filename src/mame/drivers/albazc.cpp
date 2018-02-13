@@ -51,6 +51,7 @@ public:
 	required_device<palette_device> m_palette;
 	required_device<ticket_dispenser_device> m_hopper;
 	void hanaroku(machine_config &config);
+	void hanaroku_map(address_map &map);
 };
 
 
@@ -175,7 +176,7 @@ WRITE8_MEMBER(albazc_state::albazc_vregs_w)
 
 /* main cpu */
 
-static ADDRESS_MAP_START( hanaroku_map, AS_PROGRAM, 8, albazc_state )
+ADDRESS_MAP_START(albazc_state::hanaroku_map)
 	AM_RANGE(0x0000, 0x7fff) AM_ROM
 	AM_RANGE(0x8000, 0x87ff) AM_RAM AM_SHARE("spriteram1")
 	AM_RANGE(0x9000, 0x97ff) AM_RAM AM_SHARE("spriteram2")

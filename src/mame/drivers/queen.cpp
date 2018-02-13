@@ -55,6 +55,8 @@ public:
 	virtual void machine_reset() override;
 	void intel82439tx_init();
 	void queen(machine_config &config);
+	void queen_io(address_map &map);
+	void queen_map(address_map &map);
 };
 
 
@@ -231,7 +233,7 @@ WRITE32_MEMBER(queen_state::bios_ram_w)
 	}
 }
 
-static ADDRESS_MAP_START( queen_map, AS_PROGRAM, 32, queen_state )
+ADDRESS_MAP_START(queen_state::queen_map)
 	AM_RANGE(0x00000000, 0x0009ffff) AM_RAM
 	AM_RANGE(0x000a0000, 0x000bffff) AM_DEVREADWRITE8("vga", vga_device, mem_r, mem_w, 0xffffffff)
 	AM_RANGE(0x000e0000, 0x000effff) AM_ROMBANK("bios_ext") AM_WRITE(bios_ext_ram_w)
@@ -240,7 +242,7 @@ static ADDRESS_MAP_START( queen_map, AS_PROGRAM, 32, queen_state )
 	AM_RANGE(0xfffc0000, 0xffffffff) AM_ROM AM_REGION("bios", 0)    /* System BIOS */
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( queen_io, AS_IO, 32, queen_state )
+ADDRESS_MAP_START(queen_state::queen_io)
 	AM_IMPORT_FROM(pcat32_io_common)
 	AM_RANGE(0x00e8, 0x00ef) AM_NOP
 

@@ -45,6 +45,8 @@ public:
 	DECLARE_READ8_MEMBER( sasi_rst_r );
 	DECLARE_WRITE8_MEMBER( sasi_rst_w );
 
+	void luxor_55_21056_io(address_map &map);
+	void luxor_55_21056_mem(address_map &map);
 protected:
 	// device-level overrides
 	virtual void device_start() override;

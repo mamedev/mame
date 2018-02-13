@@ -51,6 +51,8 @@ public:
 	uint32_t screen_update_timetrv(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 	required_device<cpu_device> m_maincpu;
 	void timetrv(machine_config &config);
+	void timetrv_io(address_map &map);
+	void timetrv_map(address_map &map);
 };
 
 
@@ -82,13 +84,13 @@ READ8_MEMBER(timetrv_state::in_r)
 	return 0xff;
 }
 
-static ADDRESS_MAP_START( timetrv_map, AS_PROGRAM, 8, timetrv_state )
+ADDRESS_MAP_START(timetrv_state::timetrv_map)
 	AM_RANGE(0x00000, 0x0ffff) AM_RAM //irq vectors + work ram
 	AM_RANGE(0x10000, 0x107ff) AM_DEVREADWRITE("eeprom", eeprom_parallel_28xx_device, read, write)
 	AM_RANGE(0xc0000, 0xfffff) AM_ROM
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( timetrv_io, AS_IO, 8, timetrv_state )
+ADDRESS_MAP_START(timetrv_state::timetrv_io)
 	AM_RANGE(0x0122, 0x0123) AM_WRITENOP //eeprom write bits
 	AM_RANGE(0x1000, 0x1003) AM_DEVREADWRITE("ppi1", i8255_device, read, write)
 	AM_RANGE(0x1080, 0x1083) AM_DEVREADWRITE("ppi2", i8255_device, read, write)

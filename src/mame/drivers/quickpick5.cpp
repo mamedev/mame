@@ -80,6 +80,7 @@ public:
 	DECLARE_WRITE8_MEMBER(vram_w);
 
 	void quickpick5(machine_config &config);
+	void quickpick5_main(address_map &map);
 protected:
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
@@ -263,7 +264,7 @@ TIMER_DEVICE_CALLBACK_MEMBER(quickpick5_state::scanline)
 	}
 }
 
-static ADDRESS_MAP_START( quickpick5_main, AS_PROGRAM, 8, quickpick5_state )
+ADDRESS_MAP_START(quickpick5_state::quickpick5_main)
 	AM_RANGE(0x0000, 0x7fff) AM_ROM AM_REGION("maincpu", 0)
 	AM_RANGE(0x8000, 0xbfff) AM_ROMBANK("bank1")
 	AM_RANGE(0xc000, 0xdbff) AM_RAM AM_SHARE("nvram")

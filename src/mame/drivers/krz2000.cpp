@@ -39,6 +39,7 @@ public:
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
 	void k2000(machine_config &config);
+	void k2000_map(address_map &map);
 };
 
 void k2000_state::machine_start()
@@ -49,7 +50,7 @@ void k2000_state::machine_reset()
 {
 }
 
-static ADDRESS_MAP_START( k2000_map, AS_PROGRAM, 16, k2000_state )
+ADDRESS_MAP_START(k2000_state::k2000_map)
 	AM_RANGE(0x000000, 0x0fffff) AM_ROM AM_REGION("maincpu", 0)
 	AM_RANGE(0x100000, 0x11ffff) AM_RAM
 	AM_RANGE(0xfffc00, 0xffffff) AM_DEVREADWRITE("tmp68301", tmp68301_device, regs_r, regs_w)  // TMP68301 Registers

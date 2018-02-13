@@ -10625,6 +10625,7 @@ wizzard                         //
 @source:crystal.cpp
 crysbios                        //
 crysking                        // 2001 Brezzasoft. Crystal of the kings
+crzclass                        // 200? TJF
 crzyddz2                        // 2006 Sealy
 ddz                             // 200?
 donghaer                        //
@@ -11396,6 +11397,7 @@ dkong                           // (c) 1981 Nintendo of America
 dkong3                          // (c) 1983 Nintendo of America
 dkong3b                         // bootleg
 dkong3j                         // (c) 1983 Nintendo
+dkong3hs                        // hack
 dkongf                          // hack from Jeff's Romhack
 dkonghrd                        //
 dkongj                          // (c) 1981 Nintendo
@@ -11409,6 +11411,11 @@ dkongjrj                        // (c) 1982 Nintendo
 dkongjrpb                       // bootleg
 dkongo                          // (c) 1981 Nintendo
 dkongpe                         // hack Pauline Edition
+dkonghs                         // hack
+dkongike                        // hack
+dkongjrhs                       // hack
+dkongjrc                        // hack
+dkongddk                        // hack
 dkongx                          // hack
 dkongx11                        // hack
 drakton                         // (c) 1984 Epos Corporation
@@ -12601,6 +12608,7 @@ sf2mdtb                         // bootleg
 sgyxz                           // bootleg (All-In Electronics)
 slampic                         // bootleg
 varthb                          // bootleg
+wofabl                          // bootleg
 
 @source:feversoc.cpp
 feversoc                        // (c) 2004
@@ -14680,9 +14688,9 @@ ctstein                         // Castle Toy
 einvaderc                       // Entex
 funjacks                        // Mattel
 funrlgl                         // Mattel
-h2hbaskb                        // Coleco
-h2hhockey                       // Coleco
-h2hsoccer                       // Coleco
+h2hbaskbc                       // Coleco
+h2hhockeyc                      // Coleco
+h2hsoccerc                      // Coleco
 lchicken                        // LJN
 lightfgt                        // Milton Bradley
 mdallas                         // Mattel
@@ -14776,11 +14784,14 @@ tapollo13                       // Tiger
 tbatfor                         // Tiger
 tbatman                         // Tiger
 tbtoads                         // Tiger
+tbttf                           // Tiger
 tddragon                        // Tiger
 tdummies                        // Tiger
 tgaiden                         // Tiger
 tgaunt                          // Tiger
+tgoldeye                        // Tiger
 tgoldnaxe                       // Tiger
+thook                           // Tiger
 tigarden                        // Tronica
 tjdredd                         // Tiger
 tkarnov                         // Tiger
@@ -14790,12 +14801,15 @@ tnmarebc                        // Tiger
 trobhood                        // Tiger
 trobocop2                       // Tiger
 tsddragon                       // Tiger
+tsf2010                         // Tiger
 tsfight2                        // Tiger
 tshadow                         // Tiger
 tsharr2                         // Tiger
 tsjam                           // Tiger
 tskelwarr                       // Tiger
 tsonic                          // Tiger
+tsonic2                         // Tiger
+tstrider                        // Tiger
 tswampt                         // Tiger
 tvindictr                       // Tiger
 
@@ -14842,6 +14856,7 @@ gpoker                          // Gakken
 h2hbaseb                        // Coleco
 h2hboxing                       // Coleco
 h2hfootb                        // Coleco
+h2hhockey                       // Coleco
 horseran                        // Mattel
 lostreas                        // Parker Bros
 matchnum                        // A-One LSI
@@ -15507,6 +15522,7 @@ gtroyal                         // (c) 1999 Incredible Technologies
 gtsupreme                       // (c) 2000 Incredible Technologies
 hardyard                        // (c) 1993 Strata/Incredible Technologies
 hardyard10                      // (c) 1993 Strata/Incredible Technologies
+hardyard11                      // (c) 1993 Strata/Incredible Technologies
 hotmemry                        // (c) 1994 Tuning/Incredible Technologies
 hotmemry11                      // (c) 1994 Tuning/Incredible Technologies
 pairs                           // (c) 1994 Strata/Incredible Technologies
@@ -17996,10 +18012,12 @@ avengers                        // 2/1987 (c) 1987 (US)
 avengers2                       // 2/1987 (c) 1987 (US)
 buraiken                        // 2/1987 (c) 1987 (Japan)
 buraikenb                       // 2/1987 (c) 1987 (Japan)
+fball                           //
 lwings                          // 11/1986 (c) 1986
 lwings2                         // 11/1986 (c) 1986
 lwingsb                         // 11/1986 (c) 1986 (bootleg)
 lwingsj                         // 11/1986 (c) 1986
+lwingsja                        // 11/1986 (c) 1986
 sectionz                        // 12/1985 (c) 1985
 sectionza                       // 12/1985 (c) 1985
 trojan                          // 4/1986 (c) 1986 (US)
@@ -18007,7 +18025,6 @@ trojana                         // 4/1986 (c) 1986 (US)
 trojanb                         // bootleg
 trojanj                         // 4/1986 (c) 1986 (Japan)
 trojanr                         // 4/1986 (c) 1986 + Romstar
-fball                        //
 
 @source:lwriter.cpp
 lwriter                         // Apple LaserWriter
@@ -20433,6 +20450,7 @@ solarfox                        // (c) 1981
 sutapper                        // (c) 1983
 tapper                          // (c) 1983
 tappera                         // (c) 1983
+tapperb                         // (c) 1983
 timber                          // (c) 1984
 tron                            // (c) 1982
 tron2                           // (c) 1982
@@ -31031,6 +31049,7 @@ peps0092                        // (c) 1996 IGT - International Game Technology
 peps0206                        // (c) 1996 IGT - International Game Technology
 peps0207                        // (c) 1996 IGT - International Game Technology
 peps0239                        // (c) 1996 IGT - International Game Technology
+peps0280                        // (c) 1996 IGT - International Game Technology
 peps0296                        // (c) 1996 IGT - International Game Technology
 peps0298                        // (c) 1996 IGT - International Game Technology
 peps0308                        // (c) 1996 IGT - International Game Technology
@@ -38936,9 +38955,9 @@ xsleenaj                        // TA-0019 (c) 1986
 @source:xavix.cpp
 taitons1                        //
 xavtenni                        //
-rad_ping						//
-rad_mtrk						//
-rad_bb2							//
+rad_ping                        //
+rad_mtrk                        //
+rad_bb2                         //
 
 @source:xbox.cpp
 xbox                            //

@@ -56,6 +56,7 @@ public:
 	DECLARE_READ8_MEMBER( pia_r );
 	DECLARE_WRITE8_MEMBER( pia_w );
 	void ob68k1a(machine_config &config);
+	void ob68k1a_mem(address_map &map);
 };
 
 #endif

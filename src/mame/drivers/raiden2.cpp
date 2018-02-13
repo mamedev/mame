@@ -490,7 +490,7 @@ WRITE16_MEMBER(raiden2_state::sprite_prot_off_w)
 	AM_RANGE(0x20000, fixedsize-1) AM_ROMBANK("mainbank")                  \
 	AM_RANGE(fixedsize, 0xfffff)   AM_ROM AM_REGION("maincpu", fixedsize)
 
-static ADDRESS_MAP_START( raiden2_cop_mem, AS_PROGRAM, 16, raiden2_state )
+ADDRESS_MAP_START(raiden2_state::raiden2_cop_mem)
 	AM_RANGE(0x0041c, 0x0041d) AM_DEVWRITE("raiden2cop", raiden2cop_device, cop_angle_target_w) // angle target (for 0x6200 COP macro)
 	AM_RANGE(0x0041e, 0x0041f) AM_DEVWRITE("raiden2cop", raiden2cop_device, cop_angle_step_w)   // angle step   (for 0x6200 COP macro)
 	AM_RANGE(0x00420, 0x00421) AM_DEVWRITE("raiden2cop", raiden2cop_device, cop_itoa_low_w)
@@ -561,14 +561,14 @@ static ADDRESS_MAP_START( raiden2_cop_mem, AS_PROGRAM, 16, raiden2_state )
 	AM_RANGE(0x00762, 0x00763) AM_READ(sprite_prot_dst1_r)
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( raiden2_common_mem, AS_PROGRAM, 16, raiden2_state )
+ADDRESS_MAP_START(raiden2_state::raiden2_common_mem)
 	AM_RANGE(0x00000, 0x003ff) AM_RAM
 
 	AM_IMPORT_FROM( raiden2_cop_mem )
 
 	AM_RANGE(0x0068e, 0x0068f) AM_WRITENOP //irq ack / sprite buffering?
 
-	AM_RANGE(0x00700, 0x0071f) AM_DEVREADWRITE8_MOD("seibu_sound", seibu_sound_device, main_r, main_w, rshift<1>, 0x00ff)
+	;map(0x00700, 0x0071f).lrw8("seibu_sound_rw", [this](address_space &space, offs_t offset, u8 mem_mask){ return m_seibu_sound->main_r(space, offset >> 1, mem_mask); }, [this](address_space &space, offs_t offset, u8 data, u8 mem_mask){ m_seibu_sound->main_w(space, offset >> 1, data, mem_mask); }).umask16(0x00ff);
 
 	AM_RANGE(0x00740, 0x00741) AM_READ_PORT("DSW")
 	AM_RANGE(0x00744, 0x00745) AM_READ_PORT("P1_P2")
@@ -587,12 +587,12 @@ static ADDRESS_MAP_START( raiden2_common_mem, AS_PROGRAM, 16, raiden2_state )
 	AM_RANGE(0x1f000, 0x1ffff) AM_RAM //_DEVWRITE("palette", palette_device, write) AM_SHARE("palette")
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( raiden2_mem, AS_PROGRAM, 16, raiden2_state )
+ADDRESS_MAP_START(raiden2_state::raiden2_mem)
 	AM_IMPORT_FROM( raiden2_common_mem )
 	BANK_MAP(0x40000)
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( raidendx_mem, AS_PROGRAM, 16, raiden2_state )
+ADDRESS_MAP_START(raiden2_state::raidendx_mem)
 	AM_IMPORT_FROM( raiden2_common_mem )
 	AM_RANGE(0x00470, 0x00471) AM_READWRITE(cop_tile_bank_2_r,raidendx_cop_bank_2_w)
 	AM_RANGE(0x004d0, 0x004d7) AM_RAM //???
@@ -602,7 +602,7 @@ static ADDRESS_MAP_START( raidendx_mem, AS_PROGRAM, 16, raiden2_state )
 	BANK_MAP(0x30000)
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( zeroteam_mem, AS_PROGRAM, 16, raiden2_state )
+ADDRESS_MAP_START(raiden2_state::zeroteam_mem)
 	AM_RANGE(0x00000, 0x003ff) AM_RAM
 
 	AM_IMPORT_FROM( raiden2_cop_mem )
@@ -612,7 +612,7 @@ static ADDRESS_MAP_START( zeroteam_mem, AS_PROGRAM, 16, raiden2_state )
 
 	AM_RANGE(0x0068e, 0x0068f) AM_WRITENOP // irq ack / sprite buffering?
 
-	AM_RANGE(0x00700, 0x0071f) AM_DEVREADWRITE8_MOD("seibu_sound", seibu_sound_device, main_r, main_w, rshift<1>, 0x00ff)
+	;map(0x00700, 0x0071f).lrw8("seibu_sound_rw", [this](address_space &space, offs_t offset, u8 mem_mask){ return m_seibu_sound->main_r(space, offset >> 1, mem_mask); }, [this](address_space &space, offs_t offset, u8 data, u8 mem_mask){ m_seibu_sound->main_w(space, offset >> 1, data, mem_mask); }).umask16(0x00ff);
 
 	AM_RANGE(0x00740, 0x00741) AM_READ_PORT("DSW")
 	AM_RANGE(0x00744, 0x00745) AM_READ_PORT("P1_P2")
@@ -631,7 +631,7 @@ static ADDRESS_MAP_START( zeroteam_mem, AS_PROGRAM, 16, raiden2_state )
 	BANK_MAP(0x40000)
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( xsedae_mem, AS_PROGRAM, 16, raiden2_state )
+ADDRESS_MAP_START(raiden2_state::xsedae_mem)
 	AM_RANGE(0x00000, 0x003ff) AM_RAM
 
 	AM_IMPORT_FROM( raiden2_cop_mem )
@@ -641,7 +641,7 @@ static ADDRESS_MAP_START( xsedae_mem, AS_PROGRAM, 16, raiden2_state )
 
 	AM_RANGE(0x0068e, 0x0068f) AM_WRITENOP //irq ack / sprite buffering?
 
-	AM_RANGE(0x00700, 0x0071f) AM_DEVREADWRITE8_MOD("seibu_sound", seibu_sound_device, main_r, main_w, rshift<1>, 0x00ff)
+	;map(0x00700, 0x0071f).lrw8("seibu_sound_rw", [this](address_space &space, offs_t offset, u8 mem_mask){ return m_seibu_sound->main_r(space, offset >> 1, mem_mask); }, [this](address_space &space, offs_t offset, u8 data, u8 mem_mask){ m_seibu_sound->main_w(space, offset >> 1, data, mem_mask); }).umask16(0x00ff);
 
 	AM_RANGE(0x00740, 0x00741) AM_READ_PORT("DSW")
 	AM_RANGE(0x00744, 0x00745) AM_READ_PORT("P1_P2")
@@ -661,7 +661,7 @@ static ADDRESS_MAP_START( xsedae_mem, AS_PROGRAM, 16, raiden2_state )
 	AM_RANGE(0x20000, 0xfffff) AM_ROM AM_REGION("maincpu", 0x20000)
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( raiden2_sound_map, AS_PROGRAM, 8, raiden2_state )
+ADDRESS_MAP_START(raiden2_state::raiden2_sound_map)
 	AM_RANGE(0x0000, 0x1fff) AM_ROM
 	AM_RANGE(0x2000, 0x27ff) AM_RAM
 	AM_RANGE(0x4000, 0x4000) AM_DEVWRITE("seibu_sound", seibu_sound_device, pending_w)
@@ -682,7 +682,7 @@ static ADDRESS_MAP_START( raiden2_sound_map, AS_PROGRAM, 8, raiden2_state )
 	AM_RANGE(0x401a, 0x401a) AM_READNOP
 ADDRESS_MAP_END
 
-ADDRESS_MAP_START( zeroteam_sound_map, AS_PROGRAM, 8, raiden2_state )
+ADDRESS_MAP_START(raiden2_state::zeroteam_sound_map)
 	AM_RANGE(0x0000, 0x1fff) AM_ROM
 	AM_RANGE(0x2000, 0x27ff) AM_RAM
 	AM_RANGE(0x4000, 0x4000) AM_DEVWRITE("seibu_sound", seibu_sound_device, pending_w)

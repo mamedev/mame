@@ -345,6 +345,7 @@ public:
 	void cbm3008(machine_config &config);
 	void pet2001(machine_config &config);
 	void pet2001n32(machine_config &config);
+	void pet2001_mem(address_map &map);
 };
 
 
@@ -447,6 +448,7 @@ public:
 	uint8_t m_cr;
 	void cbm8296d(machine_config &config);
 	void cbm8296(machine_config &config);
+	void cbm8296_mem(address_map &map);
 };
 
 
@@ -882,7 +884,7 @@ WRITE8_MEMBER( cbm8296_state::write )
 //  ADDRESS_MAP( pet2001_mem )
 //-------------------------------------------------
 
-static ADDRESS_MAP_START( pet2001_mem, AS_PROGRAM, 8, pet_state )
+ADDRESS_MAP_START(pet_state::pet2001_mem)
 	AM_RANGE(0x0000, 0xffff) AM_READWRITE(read, write)
 ADDRESS_MAP_END
 
@@ -891,7 +893,7 @@ ADDRESS_MAP_END
 //  ADDRESS_MAP( cbm8296_mem )
 //-------------------------------------------------
 
-static ADDRESS_MAP_START( cbm8296_mem, AS_PROGRAM, 8, cbm8296_state )
+ADDRESS_MAP_START(cbm8296_state::cbm8296_mem)
 	AM_RANGE(0x0000, 0xffff) AM_READWRITE(read, write)
 ADDRESS_MAP_END
 

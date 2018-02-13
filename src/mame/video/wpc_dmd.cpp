@@ -7,7 +7,7 @@
 
 DEFINE_DEVICE_TYPE(WPC_DMD, wpc_dmd_device, "wpc_dmd", "Williams Pinball Controller Dot Matrix Display")
 
-DEVICE_ADDRESS_MAP_START( registers, 8, wpc_dmd_device )
+ADDRESS_MAP_START(wpc_dmd_device::registers)
 	AM_RANGE(0, 0) AM_WRITE(bank2_w)
 	AM_RANGE(1, 1) AM_WRITE(bank0_w)
 	AM_RANGE(2, 2) AM_WRITE(bank6_w)

@@ -129,6 +129,10 @@ public:
 	void astra_single_37(machine_config &config);
 	void astrafr_dual_2e(machine_config &config);
 	void astrafr_dual_37(machine_config &config);
+	void astra_map(address_map &map);
+	void astrafr_master_alt_map(address_map &map);
+	void astrafr_master_map(address_map &map);
+	void astrafr_slave_map(address_map &map);
 };
 
 
@@ -243,21 +247,21 @@ WRITE32_MEMBER(astrafr_state::astrafr_slave_mem_w)
 
 
 
-static ADDRESS_MAP_START( astrafr_master_map, AS_PROGRAM, 32, astrafr_state )
+ADDRESS_MAP_START(astrafr_state::astrafr_master_map)
 	AM_RANGE(0x000000, 0xffffffff) AM_READWRITE(astrafr_mem_r, astrafr_mem_w)
 ADDRESS_MAP_END
 
 
-static ADDRESS_MAP_START( astrafr_master_alt_map, AS_PROGRAM, 32, astrafr_state )
+ADDRESS_MAP_START(astrafr_state::astrafr_master_alt_map)
 	AM_RANGE(0x000000, 0xffffffff) AM_READWRITE(astrafr_mem_r, astrafr_mem_w)
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( astra_map, AS_PROGRAM, 32, astrafr_state )
+ADDRESS_MAP_START(astrafr_state::astra_map)
 	AM_RANGE(0x000000, 0xffffffff) AM_READWRITE(astrafr_mem_r, astrafr_mem_w)
 ADDRESS_MAP_END
 
 // probably identical, afaik they're linked units..
-static ADDRESS_MAP_START( astrafr_slave_map, AS_PROGRAM, 32, astrafr_state )
+ADDRESS_MAP_START(astrafr_state::astrafr_slave_map)
 	AM_RANGE(0x000000, 0xffffffff) AM_READWRITE(astrafr_slave_mem_r, astrafr_slave_mem_w)
 ADDRESS_MAP_END
 

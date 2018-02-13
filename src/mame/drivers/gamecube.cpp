@@ -26,6 +26,7 @@ public:
 	{ }
 
 	void gc(machine_config &config);
+	void ppc_mem(address_map &map);
 protected:
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
@@ -41,7 +42,7 @@ private:
 //  ADDRESS MAPS
 //**************************************************************************
 
-static ADDRESS_MAP_START( ppc_mem, AS_PROGRAM, 64, gamecube_state )
+ADDRESS_MAP_START(gamecube_state::ppc_mem)
 	AM_RANGE(0x00000000, 0x017fffff) AM_RAM // 24 MB main memory
 	AM_RANGE(0x08000000, 0x081fffff) AM_RAM //  2 MB embedded framebuffer
 	AM_RANGE(0xfff00000, 0xffffffff) AM_ROMBANK("boot")

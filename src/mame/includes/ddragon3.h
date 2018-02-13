@@ -89,6 +89,11 @@ public:
 	void ctribe(machine_config &config);
 	void ddragon3b(machine_config &config);
 	void ddragon3(machine_config &config);
+	void ctribe_map(address_map &map);
+	void ctribe_sound_map(address_map &map);
+	void dd3b_map(address_map &map);
+	void ddragon3_map(address_map &map);
+	void sound_map(address_map &map);
 };
 
 
@@ -129,4 +134,5 @@ public:
 
 	void wwfwfest(machine_config &config);
 	void wwfwfstb(machine_config &config);
+	void main_map(address_map &map);
 };

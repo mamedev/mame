@@ -67,7 +67,7 @@ protected:
 	};
 
 	// construction/destruction
-	z8_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock, uint32_t rom_size, address_map_delegate map);
+	z8_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock, uint32_t rom_size, address_map_constructor map);
 
 	// device-level overrides
 	virtual void device_start() override;
@@ -93,8 +93,8 @@ protected:
 	// device_disasm_interface overrides
 	virtual util::disasm_interface *create_disassembler() override;
 
-	DECLARE_ADDRESS_MAP(program_2kb, 8);
-	DECLARE_ADDRESS_MAP(program_4kb, 8);
+	void program_2kb(address_map &map);
+	void program_4kb(address_map &map);
 
 private:
 	address_space_config m_program_config;

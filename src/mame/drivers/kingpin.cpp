@@ -57,6 +57,9 @@ public:
 
 	DECLARE_WRITE8_MEMBER(sound_nmi_w);
 	void kingpin(machine_config &config);
+	void kingpin_io_map(address_map &map);
+	void kingpin_program_map(address_map &map);
+	void kingpin_sound_map(address_map &map);
 };
 
 
@@ -66,12 +69,12 @@ WRITE8_MEMBER(kingpin_state::sound_nmi_w)
 	m_audiocpu->set_input_line(INPUT_LINE_NMI, PULSE_LINE);
 }
 
-static ADDRESS_MAP_START( kingpin_program_map, AS_PROGRAM, 8, kingpin_state )
+ADDRESS_MAP_START(kingpin_state::kingpin_program_map)
 	AM_RANGE(0x0000, 0xdfff) AM_ROM
 	AM_RANGE(0xf000, 0xf7ff) AM_RAM AM_SHARE("nvram")
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( kingpin_io_map, AS_IO, 8, kingpin_state )
+ADDRESS_MAP_START(kingpin_state::kingpin_io_map)
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	AM_RANGE(0x00, 0x03) AM_DEVREADWRITE("ppi8255_0", i8255_device, read, write)
 	AM_RANGE(0x10, 0x13) AM_DEVREADWRITE("ppi8255_1", i8255_device, read, write)
@@ -84,7 +87,7 @@ static ADDRESS_MAP_START( kingpin_io_map, AS_IO, 8, kingpin_state )
 	//AM_RANGE(0x70, 0x70) AM_WRITENOP // ?
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( kingpin_sound_map, AS_PROGRAM, 8, kingpin_state )
+ADDRESS_MAP_START(kingpin_state::kingpin_sound_map)
 	AM_RANGE(0x0000, 0x1fff) AM_ROM
 	AM_RANGE(0x8000, 0x8001) AM_DEVWRITE("aysnd", ay8910_device, address_data_w)
 	//AM_RANGE(0x8400, 0x8400) AM_READNOP // ?

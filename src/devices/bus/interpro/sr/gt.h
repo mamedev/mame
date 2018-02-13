@@ -26,9 +26,9 @@ public:
 		CONTROL_BUSY   = 0x8000
 	};
 
-	virtual DECLARE_READ16_MEMBER(control_r) const = 0;
+	virtual DECLARE_READ16_MEMBER(control_r) = 0;
 	virtual DECLARE_WRITE16_MEMBER(control_w) = 0;
-	virtual DECLARE_READ32_MEMBER(vram_r) const = 0;
+	virtual DECLARE_READ32_MEMBER(vram_r) = 0;
 	virtual DECLARE_WRITE32_MEMBER(vram_w) = 0;
 
 protected:
@@ -48,11 +48,11 @@ public:
 
 	static const int GT_SCREEN_COUNT = 1;
 
-	virtual DECLARE_ADDRESS_MAP(map, 32) override;
+	virtual void map(address_map &map) override;
 
-	virtual DECLARE_READ16_MEMBER(control_r) const override { return m_control; }
+	virtual DECLARE_READ16_MEMBER(control_r) override { return m_control; }
 	virtual DECLARE_WRITE16_MEMBER(control_w) override;
-	virtual DECLARE_READ32_MEMBER(vram_r) const override;
+	virtual DECLARE_READ32_MEMBER(vram_r) override;
 	virtual DECLARE_WRITE32_MEMBER(vram_w) override;
 
 protected:
@@ -75,11 +75,11 @@ public:
 
 	static const int GT_SCREEN_COUNT = 2;
 
-	virtual DECLARE_ADDRESS_MAP(map, 32) override;
+	virtual void map(address_map &map) override;
 
-	virtual DECLARE_READ16_MEMBER(control_r) const override { return m_control; }
+	virtual DECLARE_READ16_MEMBER(control_r) override { return m_control; }
 	virtual DECLARE_WRITE16_MEMBER(control_w) override;
-	virtual DECLARE_READ32_MEMBER(vram_r) const override;
+	virtual DECLARE_READ32_MEMBER(vram_r) override;
 	virtual DECLARE_WRITE32_MEMBER(vram_w) override;
 
 protected:

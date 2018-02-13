@@ -27,7 +27,7 @@ public:
 	// construction/destruction
 	msm6255_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
-	virtual DECLARE_ADDRESS_MAP(map, 8);
+	virtual void map(address_map &map);
 
 	DECLARE_READ8_MEMBER( ir_r );
 	DECLARE_WRITE8_MEMBER( ir_w );
@@ -37,6 +37,7 @@ public:
 
 	uint32_t screen_update(screen_device &device, bitmap_ind16 &bitmap, const rectangle &cliprect);
 
+	void msm6255(address_map &map);
 protected:
 	// device-level overrides
 	virtual void device_start() override;

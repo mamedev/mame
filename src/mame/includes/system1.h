@@ -189,4 +189,13 @@ public:
 	void sys1piox_315_5177(machine_config &config);
 	void sys1piox_315_5155(machine_config &config);
 	void sys2rowxb(machine_config &config);
+	void banked_decrypted_opcodes_map(address_map &map);
+	void decrypted_opcodes_map(address_map &map);
+	void mcu_io_map(address_map &map);
+	void nob_mcu_io_map(address_map &map);
+	void nobo_map(address_map &map);
+	void sound_map(address_map &map);
+	void system1_map(address_map &map);
+	void system1_pio_io_map(address_map &map);
+	void system1_ppi_io_map(address_map &map);
 };

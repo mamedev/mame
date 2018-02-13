@@ -36,6 +36,9 @@ public:
 	void lunarbat(machine_config &config);
 	void bwidow_audio(machine_config &config);
 	void gravitar_audio(machine_config &config);
+	void bwidow_map(address_map &map);
+	void bwidowp_map(address_map &map);
+	void spacduel_map(address_map &map);
 };
 
 #endif // MAME_INCLUDES_BWIDOW_H

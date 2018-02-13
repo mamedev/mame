@@ -29,6 +29,7 @@ public:
 
 	required_device<cpu_device> m_maincpu;
 	void caprcyc(machine_config &config);
+	void caprcyc_map(address_map &map);
 };
 
 
@@ -38,7 +39,7 @@ public:
 
 ***************************************************************************/
 
-static ADDRESS_MAP_START( caprcyc_map, AS_PROGRAM, 32, caprcyc_state ) // TODO...
+ADDRESS_MAP_START(caprcyc_state::caprcyc_map) // TODO...
 	AM_RANGE(0x00000000, 0x0003ffff) AM_ROM
 ADDRESS_MAP_END
 

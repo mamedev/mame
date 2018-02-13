@@ -5,8 +5,8 @@
 
 DEFINE_DEVICE_TYPE(I82439TX_NEW, i82439tx_host_device, "i82439tx_new", "Intel 82439TX northbridge")
 
-DEVICE_ADDRESS_MAP_START(config_map, 32, i82439tx_host_device)
-	AM_INHERIT_FROM(pci_host_device::config_map)
+ADDRESS_MAP_START(i82439tx_host_device::config_map)
+	AM_IMPORT_FROM(pci_host_device::config_map)
 	AM_RANGE(0x50, 0x53) AM_READWRITE8(pcon_r,   pcon_w,   0x000000ff)
 	AM_RANGE(0x50, 0x53) AM_READWRITE8(cc_r,     cc_w,     0x00ff0000)
 	AM_RANGE(0x54, 0x57) AM_READWRITE8(dramec_r, dramec_w, 0x00ff0000)

@@ -43,6 +43,8 @@ public:
 	uint8_t   m_ctrl;
 	uint8_t   m_digit_idx;
 	void piggypas(machine_config &config);
+	void piggypas_io(address_map &map);
+	void piggypas_map(address_map &map);
 };
 
 
@@ -63,11 +65,11 @@ WRITE8_MEMBER(piggypas_state::mcs51_tx_callback)
 	output().set_digit_value(m_digit_idx++, bitswap<8>(data,7,6,4,3,2,1,0,5) & 0x7f);
 }
 
-static ADDRESS_MAP_START( piggypas_map, AS_PROGRAM, 8, piggypas_state )
+ADDRESS_MAP_START(piggypas_state::piggypas_map)
 	AM_RANGE(0x0000, 0x7fff) AM_ROM
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( piggypas_io, AS_IO, 8, piggypas_state )
+ADDRESS_MAP_START(piggypas_state::piggypas_io)
 	AM_RANGE(0x0000, 0x07ff) AM_RAM AM_SHARE("nvram")
 	AM_RANGE(0x0800, 0x0803) AM_DEVREADWRITE("ppi", i8255_device, read, write)
 	AM_RANGE(0x1000, 0x1000) AM_DEVREADWRITE("oki", okim6295_device, read, write)

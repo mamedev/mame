@@ -104,6 +104,11 @@ public:
 	void swtpc09d3(machine_config &config);
 	void swtpc09u(machine_config &config);
 	void swtpc09(machine_config &config);
+	void flex_dc4_piaide_mem(address_map &map);
+	void flex_dmf2_mem(address_map &map);
+	void mp09_mem(address_map &map);
+	void uniflex_dmf2_mem(address_map &map);
+	void uniflex_dmf3_mem(address_map &map);
 protected:
 	virtual void machine_start() override;
 

@@ -49,7 +49,7 @@ const tiny_rom_entry *databoard_4112_23_t::device_rom_region() const
 //  ADDRESS_MAP( databoard_4112_23_mem )
 //-------------------------------------------------
 
-static ADDRESS_MAP_START( databoard_4112_23_mem, AS_PROGRAM, 8, databoard_4112_23_t )
+ADDRESS_MAP_START(databoard_4112_23_t::databoard_4112_23_mem)
 	AM_RANGE(0x0000, 0x1fff) AM_ROM AM_REGION(Z80_TAG, 0)
 ADDRESS_MAP_END
 
@@ -58,7 +58,7 @@ ADDRESS_MAP_END
 //  ADDRESS_MAP( databoard_4112_23_io )
 //-------------------------------------------------
 
-static ADDRESS_MAP_START( databoard_4112_23_io, AS_IO, 8, databoard_4112_23_t )
+ADDRESS_MAP_START(databoard_4112_23_t::databoard_4112_23_io)
 ADDRESS_MAP_END
 
 

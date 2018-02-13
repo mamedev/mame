@@ -11,8 +11,8 @@
 #include "cpu/mcs48/mcs48.h"
 #include "cpu/m68000/m68000.h"
 #include "bus/centronics/ctronics.h"
+#include "machine/am9519.h"
 #include "machine/keyboard.h"
-#include "machine/pic8259.h"
 #include "machine/ram.h"
 #include "machine/timer.h"
 #include "machine/trs80m2kb.h"
@@ -94,6 +94,9 @@ public:
 	DECLARE_WRITE_LINE_MEMBER(write_centronics_perror);
 
 	void trs80m2(machine_config &config);
+	void m68000_mem(address_map &map);
+	void z80_io(address_map &map);
+	void z80_mem(address_map &map);
 protected:
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
@@ -150,7 +153,7 @@ public:
 	trs80m16_state(const machine_config &mconfig, device_type type, const char *tag)
 		: trs80m2_state(mconfig, type, tag)
 		, m_subcpu(*this, M68000_TAG)
-		, m_pic(*this, AM9519A_TAG)
+		, m_uic(*this, AM9519A_TAG)
 	{
 	}
 
@@ -158,11 +161,12 @@ public:
 	DECLARE_WRITE8_MEMBER( tcl_w );
 
 	void trs80m16(machine_config &config);
+	void m16_z80_io(address_map &map);
 protected:
 	virtual void machine_start() override;
 
 	required_device<cpu_device> m_subcpu;
-	required_device<pic8259_device> m_pic;
+	required_device<am9519_device> m_uic;
 
 	uint16_t m_ual;
 	uint8_t m_limit[2];

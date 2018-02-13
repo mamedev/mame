@@ -92,7 +92,7 @@ WRITE8_MEMBER(parodius_state::sound_arm_nmi_w)
 
 /********************************************/
 
-static ADDRESS_MAP_START( parodius_map, AS_PROGRAM, 8, parodius_state )
+ADDRESS_MAP_START(parodius_state::parodius_map)
 	AM_RANGE(0x0000, 0x07ff) AM_DEVICE("bank0000", address_map_bank_device, amap8)
 	AM_RANGE(0x0800, 0x1fff) AM_RAM
 	AM_RANGE(0x2000, 0x5fff) AM_DEVREADWRITE("k052109", k052109_device, read, write)
@@ -112,17 +112,17 @@ static ADDRESS_MAP_START( parodius_map, AS_PROGRAM, 8, parodius_state )
 	AM_RANGE(0xa000, 0xffff) AM_ROM AM_REGION("maincpu", 0x3a000)
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( bank0000_map, AS_PROGRAM, 8, parodius_state )
+ADDRESS_MAP_START(parodius_state::bank0000_map)
 	AM_RANGE(0x0000, 0x07ff) AM_RAM
 	AM_RANGE(0x1000, 0x1fff) AM_RAM_DEVWRITE("palette", palette_device, write8) AM_SHARE("palette")
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( bank2000_map, AS_PROGRAM, 8, parodius_state )
+ADDRESS_MAP_START(parodius_state::bank2000_map)
 	AM_RANGE(0x0000, 0x07ff) AM_DEVREADWRITE("k052109", k052109_device, read, write)
 	AM_RANGE(0x0800, 0x0fff) AM_DEVREADWRITE("k053245", k05324x_device, k053245_r, k053245_w)
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( parodius_sound_map, AS_PROGRAM, 8, parodius_state )
+ADDRESS_MAP_START(parodius_state::parodius_sound_map)
 	AM_RANGE(0x0000, 0xefff) AM_ROM
 	AM_RANGE(0xf000, 0xf7ff) AM_RAM
 	AM_RANGE(0xf800, 0xf801) AM_DEVREADWRITE("ymsnd", ym2151_device,read,write)

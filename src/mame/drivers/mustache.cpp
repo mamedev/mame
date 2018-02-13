@@ -45,7 +45,7 @@ YM2151:
 #define YM_CLOCK    (XTAL1/4)
 
 
-static ADDRESS_MAP_START( memmap, AS_PROGRAM, 8, mustache_state )
+ADDRESS_MAP_START(mustache_state::memmap)
 	AM_RANGE(0x0000, 0x7fff) AM_DEVREAD("sei80bu", sei80bu_device, data_r)
 	AM_RANGE(0x8000, 0xbfff) AM_ROM
 	AM_RANGE(0xc000, 0xcfff) AM_RAM_WRITE(videoram_w) AM_SHARE("videoram")
@@ -65,7 +65,7 @@ static ADDRESS_MAP_START( memmap, AS_PROGRAM, 8, mustache_state )
 	AM_RANGE(0xf000, 0xffff) AM_RAM
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( decrypted_opcodes_map, AS_OPCODES, 8, mustache_state )
+ADDRESS_MAP_START(mustache_state::decrypted_opcodes_map)
 	AM_RANGE(0x0000, 0x7fff) AM_DEVREAD("sei80bu", sei80bu_device, opcode_r)
 	AM_RANGE(0x8000, 0xbfff) AM_ROM AM_REGION("maincpu", 0x8000)
 ADDRESS_MAP_END
@@ -182,7 +182,7 @@ MACHINE_CONFIG_START(mustache_state::mustache)
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", Z80, CPU_CLOCK)
 	MCFG_CPU_PROGRAM_MAP(memmap)
-	MCFG_CPU_DECRYPTED_OPCODES_MAP(decrypted_opcodes_map)
+	MCFG_CPU_OPCODES_MAP(decrypted_opcodes_map)
 	MCFG_TIMER_DRIVER_ADD_SCANLINE("scantimer", mustache_state, scanline, "screen", 0, 1)
 
 	MCFG_DEVICE_ADD("sei80bu", SEI80BU, 0)

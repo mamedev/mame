@@ -104,4 +104,11 @@ public:
 	void f1gp2(machine_config &config);
 	void f1gpb(machine_config &config);
 	void f1gp(machine_config &config);
+	void f1gp2_cpu1_map(address_map &map);
+	void f1gp_cpu1_map(address_map &map);
+	void f1gp_cpu2_map(address_map &map);
+	void f1gpb_cpu1_map(address_map &map);
+	void f1gpb_cpu2_map(address_map &map);
+	void sound_io_map(address_map &map);
+	void sound_map(address_map &map);
 };

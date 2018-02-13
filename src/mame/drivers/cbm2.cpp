@@ -231,6 +231,9 @@ public:
 	void b128(machine_config &config);
 	void b256(machine_config &config);
 	void cbm610(machine_config &config);
+	void cbm2_mem(address_map &map);
+	void ext_io(address_map &map);
+	void ext_mem(address_map &map);
 };
 
 
@@ -318,6 +321,9 @@ public:
 	int m_vic_irq;
 	void p500_pal(machine_config &config);
 	void p500_ntsc(machine_config &config);
+	void p500_mem(address_map &map);
+	void vic_colorram_map(address_map &map);
+	void vic_videoram_map(address_map &map);
 };
 
 
@@ -1151,7 +1157,7 @@ READ8_MEMBER( p500_state::vic_colorram_r )
 //  ADDRESS_MAP( cbm2_mem )
 //-------------------------------------------------
 
-static ADDRESS_MAP_START( cbm2_mem, AS_PROGRAM, 8, cbm2_state )
+ADDRESS_MAP_START(cbm2_state::cbm2_mem)
 	AM_RANGE(0x00000, 0xfffff) AM_READWRITE(read, write)
 ADDRESS_MAP_END
 
@@ -1160,7 +1166,7 @@ ADDRESS_MAP_END
 //  ADDRESS_MAP( ext_mem )
 //-------------------------------------------------
 
-static ADDRESS_MAP_START( ext_mem, AS_PROGRAM, 8, cbm2_state )
+ADDRESS_MAP_START(cbm2_state::ext_mem)
 	AM_RANGE(0x00000, 0xeffff) AM_READWRITE(ext_read, ext_write)
 	AM_RANGE(0xf0000, 0xf0fff) AM_MIRROR(0xf000) AM_ROM AM_REGION(EXT_I8088_TAG, 0)
 ADDRESS_MAP_END
@@ -1170,7 +1176,7 @@ ADDRESS_MAP_END
 //  ADDRESS_MAP( ext_io )
 //-------------------------------------------------
 
-static ADDRESS_MAP_START( ext_io, AS_IO, 8, cbm2_state )
+ADDRESS_MAP_START(cbm2_state::ext_io)
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	AM_RANGE(0x0000, 0x0001) AM_MIRROR(0x1e) AM_DEVREADWRITE(EXT_I8259A_TAG, pic8259_device, read, write)
 	AM_RANGE(0x0020, 0x0027) AM_MIRROR(0x18) AM_DEVREADWRITE(EXT_MOS6525_TAG, tpi6525_device, read, write)
@@ -1181,7 +1187,7 @@ ADDRESS_MAP_END
 //  ADDRESS_MAP( p500_mem )
 //-------------------------------------------------
 
-static ADDRESS_MAP_START( p500_mem, AS_PROGRAM, 8, p500_state )
+ADDRESS_MAP_START(p500_state::p500_mem)
 	AM_RANGE(0x00000, 0xfffff) AM_READWRITE(read, write)
 ADDRESS_MAP_END
 
@@ -1190,7 +1196,7 @@ ADDRESS_MAP_END
 //  ADDRESS_MAP( vic_videoram_map )
 //-------------------------------------------------
 
-static ADDRESS_MAP_START( vic_videoram_map, 0, 8, p500_state )
+ADDRESS_MAP_START(p500_state::vic_videoram_map)
 	AM_RANGE(0x0000, 0x3fff) AM_READ(vic_videoram_r)
 ADDRESS_MAP_END
 
@@ -1199,7 +1205,7 @@ ADDRESS_MAP_END
 //  ADDRESS_MAP( vic_colorram_map )
 //-------------------------------------------------
 
-static ADDRESS_MAP_START( vic_colorram_map, 1, 8, p500_state )
+ADDRESS_MAP_START(p500_state::vic_colorram_map)
 	AM_RANGE(0x000, 0x3ff) AM_READ(vic_colorram_r)
 ADDRESS_MAP_END
 

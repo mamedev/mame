@@ -155,6 +155,11 @@ public:
 	void magic10(machine_config &config);
 	void hotslot(machine_config &config);
 	void sgsafari(machine_config &config);
+	void hotslot_map(address_map &map);
+	void magic102_map(address_map &map);
+	void magic10_map(address_map &map);
+	void magic10a_map(address_map &map);
+	void sgsafari_map(address_map &map);
 };
 
 
@@ -311,7 +316,7 @@ WRITE16_MEMBER(magic10_state::magic10_out_w)
 *       Memory Maps        *
 ***************************/
 
-static ADDRESS_MAP_START( magic10_map, AS_PROGRAM, 16, magic10_state )
+ADDRESS_MAP_START(magic10_state::magic10_map)
 	AM_RANGE(0x000000, 0x03ffff) AM_ROM
 	AM_RANGE(0x100000, 0x100fff) AM_RAM_WRITE(layer1_videoram_w) AM_SHARE("layer1_videoram")
 	AM_RANGE(0x101000, 0x101fff) AM_RAM_WRITE(layer0_videoram_w) AM_SHARE("layer0_videoram")
@@ -327,7 +332,7 @@ static ADDRESS_MAP_START( magic10_map, AS_PROGRAM, 16, magic10_state )
 	AM_RANGE(0x600000, 0x603fff) AM_RAM
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( magic10a_map, AS_PROGRAM, 16, magic10_state )
+ADDRESS_MAP_START(magic10_state::magic10a_map)
 	AM_RANGE(0x000000, 0x03ffff) AM_ROM
 	AM_RANGE(0x100000, 0x100fff) AM_RAM_WRITE(layer1_videoram_w) AM_SHARE("layer1_videoram")
 	AM_RANGE(0x101000, 0x101fff) AM_RAM_WRITE(layer0_videoram_w) AM_SHARE("layer0_videoram")
@@ -343,7 +348,7 @@ static ADDRESS_MAP_START( magic10a_map, AS_PROGRAM, 16, magic10_state )
 	AM_RANGE(0x600000, 0x603fff) AM_RAM
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( magic102_map, AS_PROGRAM, 16, magic10_state )
+ADDRESS_MAP_START(magic10_state::magic102_map)
 	AM_RANGE(0x000000, 0x03ffff) AM_ROM
 	AM_RANGE(0x100000, 0x100fff) AM_RAM_WRITE(layer1_videoram_w) AM_SHARE("layer1_videoram")
 	AM_RANGE(0x101000, 0x101fff) AM_RAM_WRITE(layer0_videoram_w) AM_SHARE("layer0_videoram")
@@ -362,7 +367,7 @@ static ADDRESS_MAP_START( magic102_map, AS_PROGRAM, 16, magic10_state )
 	AM_RANGE(0x700080, 0x700087) AM_RAM AM_SHARE("vregs")   // video registers?
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( hotslot_map, AS_PROGRAM, 16, magic10_state )
+ADDRESS_MAP_START(magic10_state::hotslot_map)
 	AM_RANGE(0x000000, 0x03ffff) AM_ROM
 	AM_RANGE(0x100000, 0x100fff) AM_RAM_WRITE(layer1_videoram_w) AM_SHARE("layer1_videoram")
 	AM_RANGE(0x101000, 0x101fff) AM_RAM_WRITE(layer0_videoram_w) AM_SHARE("layer0_videoram")
@@ -381,7 +386,7 @@ static ADDRESS_MAP_START( hotslot_map, AS_PROGRAM, 16, magic10_state )
 	AM_RANGE(0x700080, 0x700087) AM_RAM AM_SHARE("vregs")
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( sgsafari_map, AS_PROGRAM, 16, magic10_state )
+ADDRESS_MAP_START(magic10_state::sgsafari_map)
 	AM_RANGE(0x000000, 0x03ffff) AM_ROM
 	AM_RANGE(0x100000, 0x100fff) AM_RAM_WRITE(layer1_videoram_w) AM_SHARE("layer1_videoram")
 	AM_RANGE(0x101000, 0x101fff) AM_RAM_WRITE(layer0_videoram_w) AM_SHARE("layer0_videoram")

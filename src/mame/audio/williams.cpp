@@ -159,7 +159,7 @@ WRITE8_MEMBER(williams_cvsd_sound_device::cvsd_clock_set_w)
 //  audio CPU map
 //-------------------------------------------------
 
-static ADDRESS_MAP_START( williams_cvsd_map, AS_PROGRAM, 8, williams_cvsd_sound_device )
+ADDRESS_MAP_START(williams_cvsd_sound_device::williams_cvsd_map)
 	AM_RANGE(0x0000, 0x07ff) AM_MIRROR(0x1800) AM_RAM
 	AM_RANGE(0x2000, 0x2001) AM_MIRROR(0x1ffe) AM_DEVREADWRITE("ym2151", ym2151_device, read, write)
 	AM_RANGE(0x4000, 0x4003) AM_MIRROR(0x1ffc) AM_DEVREADWRITE("pia", pia6821_device, read, write)
@@ -455,7 +455,7 @@ WRITE8_MEMBER(williams_narc_sound_device::cvsd_clock_set_w)
 //  master CPU map
 //-------------------------------------------------
 
-static ADDRESS_MAP_START( williams_narc_master_map, AS_PROGRAM, 8, williams_narc_sound_device )
+ADDRESS_MAP_START(williams_narc_sound_device::williams_narc_master_map)
 	AM_RANGE(0x0000, 0x1fff) AM_RAM
 	AM_RANGE(0x2000, 0x2001) AM_MIRROR(0x03fe) AM_DEVREADWRITE("ym2151", ym2151_device, read, write)
 	AM_RANGE(0x2800, 0x2800) AM_MIRROR(0x03ff) AM_WRITE(master_talkback_w)
@@ -473,7 +473,7 @@ ADDRESS_MAP_END
 //  slave CPU map
 //-------------------------------------------------
 
-static ADDRESS_MAP_START( williams_narc_slave_map, AS_PROGRAM, 8, williams_narc_sound_device )
+ADDRESS_MAP_START(williams_narc_sound_device::williams_narc_slave_map)
 	AM_RANGE(0x0000, 0x1fff) AM_RAM
 	AM_RANGE(0x2000, 0x2000) AM_MIRROR(0x03ff) AM_WRITE(cvsd_clock_set_w)
 	AM_RANGE(0x2400, 0x2400) AM_MIRROR(0x03ff) AM_WRITE(cvsd_digit_clock_clear_w)
@@ -717,7 +717,7 @@ WRITE8_MEMBER(williams_adpcm_sound_device::talkback_w)
 //  audio CPU map
 //-------------------------------------------------
 
-static ADDRESS_MAP_START( williams_adpcm_map, AS_PROGRAM, 8, williams_adpcm_sound_device )
+ADDRESS_MAP_START(williams_adpcm_sound_device::williams_adpcm_map)
 	AM_RANGE(0x0000, 0x1fff) AM_RAM
 	AM_RANGE(0x2000, 0x2000) AM_MIRROR(0x03ff) AM_WRITE(bank_select_w)
 	AM_RANGE(0x2400, 0x2401) AM_MIRROR(0x03fe) AM_DEVREADWRITE("ym2151", ym2151_device, read, write)
@@ -735,7 +735,7 @@ ADDRESS_MAP_END
 //  OKI6295 map
 //-------------------------------------------------
 
-static ADDRESS_MAP_START( williams_adpcm_oki_map, 0, 8, williams_adpcm_sound_device )
+ADDRESS_MAP_START(williams_adpcm_sound_device::williams_adpcm_oki_map)
 	AM_RANGE(0x00000, 0x1ffff) AM_ROMBANK("okibank")
 	AM_RANGE(0x20000, 0x3ffff) AM_ROM AM_REGION("oki", 0x60000)
 ADDRESS_MAP_END

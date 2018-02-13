@@ -148,7 +148,7 @@ UPD65031_MEMORY_UPDATE(z88_state::bankswitch_update)
 }
 
 
-static ADDRESS_MAP_START(z88_mem, AS_PROGRAM, 8, z88_state )
+ADDRESS_MAP_START(z88_state::z88_mem)
 	AM_RANGE(0x0000, 0x1fff) AM_READWRITE_BANK("bank1")
 	AM_RANGE(0x2000, 0x3fff) AM_READWRITE_BANK("bank2")
 	AM_RANGE(0x4000, 0x7fff) AM_READWRITE_BANK("bank3")
@@ -156,7 +156,7 @@ static ADDRESS_MAP_START(z88_mem, AS_PROGRAM, 8, z88_state )
 	AM_RANGE(0xc000, 0xffff) AM_READWRITE_BANK("bank5")
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( z88_io, AS_IO, 8, z88_state )
+ADDRESS_MAP_START(z88_state::z88_io)
 	AM_RANGE(0x0000, 0xffff)    AM_DEVREADWRITE("blink", upd65031_device, read, write)
 ADDRESS_MAP_END
 

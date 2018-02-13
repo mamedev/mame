@@ -154,6 +154,8 @@ public:
 	DECLARE_WRITE8_MEMBER(controller_strobe_w);
 
 	void agat7(machine_config &config);
+	void agat7_map(address_map &map);
+	void inhbank_map(address_map &map);
 private:
 	int m_speaker_state;
 	int m_cassette_state;
@@ -680,7 +682,7 @@ WRITE8_MEMBER(agat7_state::agat7_ram_w)
  * and are supported only on motherboards with 32K onboard.
  * all extra RAM (onboard or addon) is accessible via 16K window at 0x8000.
  */
-static ADDRESS_MAP_START( agat7_map, AS_PROGRAM, 8, agat7_state )
+ADDRESS_MAP_START(agat7_state::agat7_map)
 	ADDRESS_MAP_UNMAP_HIGH
 	AM_RANGE(0x0000, 0xbfff) AM_READWRITE(agat7_ram_r, agat7_ram_w)
 	AM_RANGE(0xc000, 0xc000) AM_MIRROR(0xf) AM_READ(keyb_data_r) AM_WRITENOP
@@ -699,7 +701,7 @@ static ADDRESS_MAP_START( agat7_map, AS_PROGRAM, 8, agat7_state )
 	AM_RANGE(0xd000, 0xffff) AM_DEVICE(A7_UPPERBANK_TAG, address_map_bank_device, amap8)
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( inhbank_map, AS_PROGRAM, 8, agat7_state )
+ADDRESS_MAP_START(agat7_state::inhbank_map)
 	AM_RANGE(0x0000, 0x2fff) AM_ROM AM_REGION("maincpu", 0x1000) AM_WRITE(inh_w)
 	AM_RANGE(0x3000, 0x5fff) AM_READWRITE(inh_r, inh_w)
 ADDRESS_MAP_END

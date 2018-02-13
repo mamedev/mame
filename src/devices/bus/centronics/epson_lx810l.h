@@ -63,6 +63,7 @@ public:
 #define uabs(x) ((x) > 0 ? (x) : -(x))
 	unsigned int bitmap_line(int i) { return ((uabs(m_pf_pos_abs) / 6) + i) % m_bitmap.height(); }
 
+	void lx810l_mem(address_map &map);
 protected:
 	epson_lx810l_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock);
 

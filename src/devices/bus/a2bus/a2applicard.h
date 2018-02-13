@@ -32,6 +32,8 @@ public:
 	DECLARE_READ8_MEMBER( z80_io_r );
 	DECLARE_WRITE8_MEMBER( z80_io_w );
 
+	void z80_io(address_map &map);
+	void z80_mem(address_map &map);
 protected:
 	a2bus_applicard_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock);
 

@@ -28,23 +28,19 @@
 #include "tranz330.lh"
 
 
-static void construct_address_map_tranz330_mem(address_map &map)
+void tranz330_state::tranz330_mem(address_map &map)
 {
-	map.configure(AS_PROGRAM, 8);
-
 	map(0x0000, 0x7fff).rom();
 	map(0x8000, 0xffff).ram();
 }
 
-static void construct_address_map_tranz330_io(address_map &map)
+void tranz330_state::tranz330_io(address_map &map)
 {
-	map.configure(AS_IO, 8);
 	map.global_mask(0xff);
-
-	map(0x00, 0x03).rw(PIO_TAG,  FUNC(z80pio_device::read_alt), FUNC(z80pio_device::write_alt));
-	map(0x10, 0x13).rw(CTC_TAG,  FUNC(z80ctc_device::read),     FUNC(z80ctc_device::write));
-	map(0x20, 0x23).rw(DART_TAG, FUNC(z80dart_device::ba_cd_r), FUNC(z80dart_device::ba_cd_w));
-	map(0x30, 0x3f).rw(RTC_TAG,  FUNC(msm6242_device::read),    FUNC(msm6242_device::write));
+	map(0x00, 0x03).rw(m_pio,  FUNC(z80pio_device::read_alt), FUNC(z80pio_device::write_alt));
+	map(0x10, 0x13).rw(m_ctc,  FUNC(z80ctc_device::read),     FUNC(z80ctc_device::write));
+	map(0x20, 0x23).rw(m_dart, FUNC(z80dart_device::ba_cd_r), FUNC(z80dart_device::ba_cd_w));
+	map(0x30, 0x3f).rw(m_rtc,  FUNC(msm6242_device::read),    FUNC(msm6242_device::write));
 }
 
 static void construct_ioport_tranz330(device_t &owner, ioport_list &portlist, std::string &errorbuf)

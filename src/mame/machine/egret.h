@@ -101,6 +101,7 @@ public:
 
 	devcb_write_line write_reset, write_linechange, write_via_clock, write_via_data;
 
+	void egret_map(address_map &map);
 protected:
 	// device-level overrides
 	virtual void device_start() override;

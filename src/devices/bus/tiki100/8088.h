@@ -32,6 +32,8 @@ public:
 	DECLARE_READ8_MEMBER( read );
 	DECLARE_WRITE8_MEMBER( write );
 
+	void i8088_io(address_map &map);
+	void i8088_mem(address_map &map);
 protected:
 	// device-level overrides
 	virtual void device_start() override;

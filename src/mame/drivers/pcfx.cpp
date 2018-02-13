@@ -50,6 +50,8 @@ public:
 	TIMER_CALLBACK_MEMBER(pad_func);
 
 	void pcfx(machine_config &config);
+	void pcfx_io(address_map &map);
+	void pcfx_mem(address_map &map);
 protected:
 	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr) override;
 
@@ -92,7 +94,7 @@ WRITE8_MEMBER(pcfx_state::extio_w)
 	io_space.write_byte(offset, data);
 }
 
-static ADDRESS_MAP_START( pcfx_mem, AS_PROGRAM, 32, pcfx_state )
+ADDRESS_MAP_START(pcfx_state::pcfx_mem)
 	AM_RANGE( 0x00000000, 0x001FFFFF ) AM_RAM   /* RAM */
 //  AM_RANGE( 0x80000000, 0x807FFFFF ) AM_READWRITE8(extio_r,extio_w,0xffffffff)    /* EXTIO */
 	AM_RANGE( 0xE0000000, 0xE7FFFFFF ) AM_NOP   /* BackUp RAM */
@@ -183,7 +185,7 @@ WRITE16_MEMBER( pcfx_state::pad_w )
 }
 
 
-static ADDRESS_MAP_START( pcfx_io, AS_IO, 32, pcfx_state )
+ADDRESS_MAP_START(pcfx_state::pcfx_io)
 	AM_RANGE( 0x00000000, 0x000000FF ) AM_READWRITE16(pad_r, pad_w, 0xffffffff) /* PAD */
 	AM_RANGE( 0x00000100, 0x000001FF ) AM_NOP   /* HuC6230 */
 	AM_RANGE( 0x00000200, 0x000002FF ) AM_DEVICE16( "huc6271", huc6271_device, regs, 0xffff )   /* HuC6271 */

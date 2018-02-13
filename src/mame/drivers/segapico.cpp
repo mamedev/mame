@@ -156,6 +156,7 @@ public:
 	DECLARE_DRIVER_INIT(pico);
 	DECLARE_DRIVER_INIT(picou);
 	DECLARE_DRIVER_INIT(picoj);
+	void pico_mem(address_map &map);
 };
 
 class pico_state : public pico_base_state
@@ -340,7 +341,7 @@ WRITE16_MEMBER(pico_base_state::pico_68k_io_write )
 	}
 }
 
-static ADDRESS_MAP_START( pico_mem, AS_PROGRAM, 16, pico_base_state )
+ADDRESS_MAP_START(pico_base_state::pico_mem)
 	AM_RANGE(0x000000, 0x3fffff) AM_ROM
 
 	AM_RANGE(0x800000, 0x80001f) AM_READWRITE(pico_68k_io_read, pico_68k_io_write)
@@ -564,11 +565,12 @@ public:
 	required_device<copera_cart_slot_device> m_picocart;
 	DECLARE_MACHINE_START(copera);
 	void copera(machine_config &config);
+	void copera_mem(address_map &map);
 };
 
 
 
-static ADDRESS_MAP_START( copera_mem, AS_PROGRAM, 16, copera_state )
+ADDRESS_MAP_START(copera_state::copera_mem)
 	AM_RANGE(0x000000, 0x3fffff) AM_ROM
 
 	AM_RANGE(0x800000, 0x80001f) AM_READWRITE(pico_68k_io_read, pico_68k_io_write)

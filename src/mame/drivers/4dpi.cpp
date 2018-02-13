@@ -50,6 +50,7 @@ public:
 	inline void ATTR_PRINTF(3,4) verboselog( int n_level, const char *s_fmt, ... );
 	required_device<cpu_device> m_maincpu;
 	void sgi_ip6(machine_config &config);
+	void sgi_ip6_map(address_map &map);
 };
 
 
@@ -217,7 +218,7 @@ void sgi_ip6_state::machine_reset()
     ADDRESS MAPS
 ***************************************************************************/
 
-static ADDRESS_MAP_START( sgi_ip6_map, AS_PROGRAM, 32, sgi_ip6_state )
+ADDRESS_MAP_START(sgi_ip6_state::sgi_ip6_map)
 	AM_RANGE( 0x1f880000, 0x1f880003 ) AM_READWRITE(ip6_unk1_r, ip6_unk1_w)
 	AM_RANGE( 0x1fb00000, 0x1fb00003 ) AM_READWRITE(ip6_unk3_r, ip6_unk3_w)
 	AM_RANGE( 0x1fbc004c, 0x1fbc004f ) AM_READWRITE(ip6_unk2_r, ip6_unk2_w)

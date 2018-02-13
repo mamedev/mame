@@ -46,6 +46,8 @@ public:
 	void phc25(machine_config &config);
 	void pal(machine_config &config);
 	void ntsc(machine_config &config);
+	void phc25_io(address_map &map);
+	void phc25_mem(address_map &map);
 private:
 	virtual void video_start() override;
 	uint8_t *m_char_rom;

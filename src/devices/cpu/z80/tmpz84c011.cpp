@@ -15,7 +15,7 @@
 
 DEFINE_DEVICE_TYPE(TMPZ84C011, tmpz84c011_device, "tmpz84c011", "TMPZ84C011")
 
-static ADDRESS_MAP_START( tmpz84c011_internal_io_map, AS_IO, 8, tmpz84c011_device )
+ADDRESS_MAP_START(tmpz84c011_device::tmpz84c011_internal_io_map)
 	AM_RANGE(0x10, 0x13) AM_MIRROR(0xff00) AM_DEVREADWRITE("tmpz84c011_ctc", z80ctc_device, read, write)
 
 	AM_RANGE(0x50, 0x50) AM_MIRROR(0xff00) AM_READWRITE(tmpz84c011_pa_r, tmpz84c011_pa_w)
@@ -33,7 +33,7 @@ ADDRESS_MAP_END
 
 tmpz84c011_device::tmpz84c011_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
 	: z80_device(mconfig, TMPZ84C011, tag, owner, clock),
-	m_io_space_config( "io", ENDIANNESS_LITTLE, 8, 16, 0, ADDRESS_MAP_NAME( tmpz84c011_internal_io_map ) ),
+	m_io_space_config( "io", ENDIANNESS_LITTLE, 8, 16, 0, address_map_constructor(FUNC(tmpz84c011_device::tmpz84c011_internal_io_map), this)),
 	m_ctc(*this, "tmpz84c011_ctc"),
 	m_outportsa(*this),
 	m_outportsb(*this),

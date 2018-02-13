@@ -1196,7 +1196,7 @@ READ32_MEMBER( atarigx2_state::rrreveng_prot_r )
  *
  *************************************/
 
-static ADDRESS_MAP_START( main_map, AS_PROGRAM, 32, atarigx2_state )
+ADDRESS_MAP_START(atarigx2_state::main_map)
 	ADDRESS_MAP_UNMAP_HIGH
 	AM_RANGE(0x000000, 0x07ffff) AM_ROM
 	AM_RANGE(0xc80000, 0xc80fff) AM_RAM

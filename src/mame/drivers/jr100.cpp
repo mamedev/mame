@@ -73,6 +73,7 @@ public:
 
 
 	void jr100(machine_config &config);
+	void jr100_mem(address_map &map);
 protected:
 	required_device<via6522_device> m_via;
 	required_device<cassette_image_device> m_cassette;
@@ -129,7 +130,7 @@ WRITE8_MEMBER(jr100_state::jr100_via_w)
 	m_via->write(space,offset,data);
 }
 
-static ADDRESS_MAP_START(jr100_mem, AS_PROGRAM, 8, jr100_state )
+ADDRESS_MAP_START(jr100_state::jr100_mem)
 	ADDRESS_MAP_UNMAP_HIGH
 	AM_RANGE(0x0000, 0x3fff) AM_RAM AM_SHARE("ram")
 	AM_RANGE(0xc000, 0xc0ff) AM_RAM AM_SHARE("pcg")

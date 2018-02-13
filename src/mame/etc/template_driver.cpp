@@ -30,6 +30,8 @@ public:
 
 	void xxx(machine_config &config);
 
+	void xxx_io(address_map &map);
+	void xxx_map(address_map &map);
 protected:
 	// driver_device overrides
 	virtual void machine_start() override;
@@ -50,11 +52,11 @@ uint32_t xxx_state::screen_update( screen_device &screen, bitmap_ind16 &bitmap, 
 	return 0;
 }
 
-static ADDRESS_MAP_START( xxx_map, AS_PROGRAM, 8, xxx_state )
+ADDRESS_MAP_START(xxx_state::xxx_map)
 	AM_RANGE(0x0000, 0x7fff) AM_ROM
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( xxx_io, AS_IO, 8, xxx_state )
+ADDRESS_MAP_START(xxx_state::xxx_io)
 //  ADDRESS_MAP_GLOBAL_MASK(0xff)
 ADDRESS_MAP_END
 

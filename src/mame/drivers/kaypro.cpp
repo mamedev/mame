@@ -64,13 +64,13 @@ READ8_MEMBER( kaypro_state::kaypro484_87_r ) { return 0x7f; }    /* to bypass un
 
 ************************************************************/
 
-static ADDRESS_MAP_START( kaypro_map, AS_PROGRAM, 8, kaypro_state )
+ADDRESS_MAP_START(kaypro_state::kaypro_map)
 	AM_RANGE(0x0000, 0x2fff) AM_READ_BANK("bankr0") AM_WRITE_BANK("bankw0")
 	AM_RANGE(0x3000, 0x3fff) AM_RAMBANK("bank3")
 	AM_RANGE(0x4000, 0xffff) AM_RAM AM_REGION("rambank", 0x4000)
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( kayproii_io, AS_IO, 8, kaypro_state )
+ADDRESS_MAP_START(kaypro_state::kayproii_io)
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	ADDRESS_MAP_UNMAP_HIGH
 	AM_RANGE(0x00, 0x03) AM_DEVWRITE("brg", com8116_device, stt_w)
@@ -81,7 +81,7 @@ static ADDRESS_MAP_START( kayproii_io, AS_IO, 8, kaypro_state )
 	AM_RANGE(0x1c, 0x1f) AM_DEVREADWRITE("z80pio_s", z80pio_device, read_alt, write_alt)
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( kaypro484_io, AS_IO, 8, kaypro_state )
+ADDRESS_MAP_START(kaypro_state::kaypro484_io)
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	ADDRESS_MAP_UNMAP_HIGH
 	AM_RANGE(0x00, 0x03) AM_DEVWRITE("brg", com8116_device, str_w)

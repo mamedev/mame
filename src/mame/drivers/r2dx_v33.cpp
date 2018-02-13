@@ -138,6 +138,12 @@ public:
 	void nzerotea(machine_config &config);
 	void rdx_v33(machine_config &config);
 	void zerotm2k(machine_config &config);
+	void nzerotea_map(address_map &map);
+	void nzeroteam_base_map(address_map &map);
+	void r2dx_oki_map(address_map &map);
+	void rdx_v33_common_map(address_map &map);
+	void rdx_v33_map(address_map &map);
+	void zerotm2k_map(address_map &map);
 protected:
 	virtual void machine_start() override;
 
@@ -398,7 +404,7 @@ READ16_MEMBER(r2dx_v33_state::r2dx_debug_r)
 	return 0xffff;
 }
 
-static ADDRESS_MAP_START( rdx_v33_common_map, AS_PROGRAM, 16, r2dx_v33_state )
+ADDRESS_MAP_START(r2dx_v33_state::rdx_v33_common_map)
 	AM_RANGE(0x00000, 0x003ff) AM_RAM // vectors copied here
 
 	AM_RANGE(0x00400, 0x00401) AM_WRITE(r2dx_tilemapdma_w) // tilemaps to private buffer
@@ -441,7 +447,7 @@ static ADDRESS_MAP_START( rdx_v33_common_map, AS_PROGRAM, 16, r2dx_v33_state )
 	AM_RANGE(0x1f000, 0x1ffff) AM_RAM //_DEVWRITE("palette", palette_device, write) AM_SHARE("palette")
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( rdx_v33_map, AS_PROGRAM, 16, r2dx_v33_state )
+ADDRESS_MAP_START(r2dx_v33_state::rdx_v33_map)
 	AM_IMPORT_FROM( rdx_v33_common_map )
 	
 	AM_RANGE(0x00404, 0x00405) AM_WRITE(r2dx_rom_bank_w)
@@ -471,21 +477,25 @@ static ADDRESS_MAP_START( rdx_v33_map, AS_PROGRAM, 16, r2dx_v33_state )
 ADDRESS_MAP_END
 
 
-static ADDRESS_MAP_START( nzeroteam_base_map, AS_PROGRAM, 16, r2dx_v33_state )
+ADDRESS_MAP_START(r2dx_v33_state::nzeroteam_base_map)
 	AM_IMPORT_FROM( rdx_v33_common_map )
 	
-	AM_RANGE(0x00404, 0x00405) AM_NOP //_WRITE(r2dx_rom_bank_w) maincpu rom is actually bankswitched but always 2
-	AM_RANGE(0x00406, 0x00407) AM_NOP // always 6022, supposed to be the tile bank but ignores the actual value???
+	AM_RANGE(0x00000, 0x003ff) AM_RAM //stack area
+
+	AM_RANGE(0x00400, 0x00401) AM_WRITE(r2dx_tilemapdma_w) // tilemaps to private buffer
+	AM_RANGE(0x00402, 0x00403) AM_WRITE(r2dx_paldma_w)  // palettes to private buffer
+	// AM_RANGE(0x00404, 0x00405) AM_WRITE(r2dx_rom_bank_w) maincpu rom is actually bankswitched but always 2
+	// AM_RANGE(0x00406, 0x00407) AM_WRITE(tile_bank_w) // not the same?
 
 //  AM_RANGE(0x00762, 0x00763) AM_READ(nzerotea_unknown_r)
 
-	AM_RANGE(0x00780, 0x0079f) AM_DEVREADWRITE8_MOD("seibu_sound", seibu_sound_device, main_r, main_w, rshift<1>, 0x00ff)
-	
+	;map(0x00780, 0x0079f).lrw8("seibu_sound_rw", [this](address_space &space, offs_t offset, u8 mem_mask){ return m_seibu_sound->main_r(space, offset >> 1, mem_mask); }, [this](address_space &space, offs_t offset, u8 data, u8 mem_mask){ m_seibu_sound->main_w(space, offset >> 1, data, mem_mask); }).umask16(0x00ff);
+
 //	AM_RANGE(0x20000, 0x2ffff) AM_ROMBANK("mainbank") AM_WRITENOP
 	AM_RANGE(0x20000, 0xfffff) AM_ROM AM_REGION("maincpu", 0x20000 )
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( nzerotea_map, AS_PROGRAM, 16, r2dx_v33_state )
+ADDRESS_MAP_START(r2dx_v33_state::nzerotea_map)
 	AM_IMPORT_FROM( nzeroteam_base_map )
 	AM_RANGE(0x00740, 0x00741) AM_READ_PORT("DSW")
 	AM_RANGE(0x00744, 0x00745) AM_READ_PORT("INPUT")
@@ -501,7 +511,7 @@ WRITE16_MEMBER(r2dx_v33_state::zerotm2k_eeprom_w)
 	m_eeprom->cs_write((data & 0x01) ? ASSERT_LINE : CLEAR_LINE);
 }
 
-static ADDRESS_MAP_START( zerotm2k_map, AS_PROGRAM, 16, r2dx_v33_state )
+ADDRESS_MAP_START(r2dx_v33_state::zerotm2k_map)
 	AM_IMPORT_FROM( nzeroteam_base_map )
 	AM_RANGE(0x00740, 0x00741) AM_READ_PORT("P3_P4")
 	AM_RANGE(0x00744, 0x00745) AM_READ_PORT("INPUT")
@@ -694,7 +704,7 @@ MACHINE_RESET_MEMBER(r2dx_v33_state,nzeroteam)
 	common_reset(0,1,2,0);
 }
 
-static ADDRESS_MAP_START( r2dx_oki_map, 0, 8, r2dx_v33_state )
+ADDRESS_MAP_START(r2dx_v33_state::r2dx_oki_map)
 	AM_RANGE(0x00000, 0x3ffff) AM_ROMBANK("okibank")
 ADDRESS_MAP_END
 

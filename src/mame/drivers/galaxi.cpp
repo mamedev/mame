@@ -113,6 +113,8 @@ public:
 	void galaxi(machine_config &config);
 	void lastfour(machine_config &config);
 	void magjoker(machine_config &config);
+	void galaxi_map(address_map &map);
+	void lastfour_map(address_map &map);
 };
 
 
@@ -300,7 +302,7 @@ CUSTOM_INPUT_MEMBER(galaxi_state::hopper_r)
                             Memory Maps
 ***************************************************************************/
 
-static ADDRESS_MAP_START( galaxi_map, AS_PROGRAM, 16, galaxi_state )
+ADDRESS_MAP_START(galaxi_state::galaxi_map)
 	AM_RANGE(0x000000, 0x03ffff) AM_ROM
 
 	AM_RANGE(0x100000, 0x1003ff) AM_RAM_WRITE(galaxi_bg1_w) AM_SHARE("bg1_ram")
@@ -324,7 +326,7 @@ static ADDRESS_MAP_START( galaxi_map, AS_PROGRAM, 16, galaxi_state )
 ADDRESS_MAP_END
 
 
-static ADDRESS_MAP_START( lastfour_map, AS_PROGRAM, 16, galaxi_state )
+ADDRESS_MAP_START(galaxi_state::lastfour_map)
 	AM_RANGE(0x000000, 0x03ffff) AM_ROM
 
 	// bg3+4 / 1+2 seem to be swapped, order, palettes, scroll register etc. all suggest this

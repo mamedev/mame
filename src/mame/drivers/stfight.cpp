@@ -267,7 +267,7 @@ TODO:
 #include "speaker.h"
 
 
-static ADDRESS_MAP_START( cpu1_map, AS_PROGRAM, 8, stfight_state )
+ADDRESS_MAP_START(stfight_state::cpu1_map)
 	AM_RANGE(0x0000, 0x7fff) AM_ROM
 	AM_RANGE(0x8000, 0xbfff) AM_ROMBANK("mainbank")                  /* sf02.bin */
 	AM_RANGE(0xc000, 0xc0ff) AM_RAM_DEVWRITE("palette", palette_device, write8) AM_SHARE("palette")
@@ -286,7 +286,7 @@ static ADDRESS_MAP_START( cpu1_map, AS_PROGRAM, 8, stfight_state )
 	AM_RANGE(0xe000, 0xefff) AM_RAM
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( stfight_cpu1_map, AS_PROGRAM, 8, stfight_state )
+ADDRESS_MAP_START(stfight_state::stfight_cpu1_map)
 	AM_IMPORT_FROM(cpu1_map)
 	AM_RANGE(0xc807, 0xc807) AM_DEVWRITE("stfight_vid", stfight_video_device, stfight_sprite_bank_w)
 	AM_RANGE(0xd000, 0xd7ff) AM_RAM_DEVWRITE("stfight_vid", stfight_video_device, stfight_text_char_w) AM_SHARE("txram")
@@ -295,12 +295,12 @@ static ADDRESS_MAP_START( stfight_cpu1_map, AS_PROGRAM, 8, stfight_state )
 ADDRESS_MAP_END
 
 
-static ADDRESS_MAP_START( decrypted_opcodes_map, AS_OPCODES, 8, stfight_state )
+ADDRESS_MAP_START(stfight_state::decrypted_opcodes_map)
 	AM_RANGE(0x0000, 0x7fff) AM_ROM AM_SHARE("decrypted_opcodes")
 ADDRESS_MAP_END
 
 
-static ADDRESS_MAP_START( cshooter_cpu1_map, AS_PROGRAM, 8, stfight_state )
+ADDRESS_MAP_START(stfight_state::cshooter_cpu1_map)
 	AM_IMPORT_FROM(cpu1_map)
 	AM_RANGE(0xc801, 0xc801) AM_WRITE(stfight_bank_w)
 	AM_RANGE(0xd000, 0xd7ff) AM_RAM_DEVWRITE("airraid_vid", airraid_video_device, txram_w) AM_SHARE("txram")
@@ -311,7 +311,7 @@ ADDRESS_MAP_END
 
 
 
-static ADDRESS_MAP_START( cpu2_map, AS_PROGRAM, 8, stfight_state )
+ADDRESS_MAP_START(stfight_state::cpu2_map)
 	AM_RANGE(0x0000, 0x7fff) AM_ROM
 	AM_RANGE(0xc000, 0xc001) AM_DEVREADWRITE("ym1", ym2203_device, read, write)
 	AM_RANGE(0xc800, 0xc801) AM_DEVREADWRITE("ym2", ym2203_device, read, write)
@@ -495,7 +495,7 @@ MACHINE_CONFIG_END
 MACHINE_CONFIG_DERIVED(stfight_state::stfight, stfight_base)
 	MCFG_CPU_MODIFY("maincpu")
 	MCFG_CPU_PROGRAM_MAP(stfight_cpu1_map)
-	MCFG_CPU_DECRYPTED_OPCODES_MAP(decrypted_opcodes_map)
+	MCFG_CPU_OPCODES_MAP(decrypted_opcodes_map)
 	MCFG_CPU_VBLANK_INT_DRIVER("stfight_vid:screen", stfight_state,  stfight_vb_interrupt)
 
 	MCFG_STFIGHT_VIDEO_ADD("stfight_vid")

@@ -29,7 +29,7 @@ public:
 	// construction/destruction
 	cgenie_fdc_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
-	DECLARE_ADDRESS_MAP(mmio, 8);
+	void mmio(address_map &map);
 
 	TIMER_DEVICE_CALLBACK_MEMBER(timer_callback);
 

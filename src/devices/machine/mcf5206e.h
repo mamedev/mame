@@ -155,6 +155,7 @@ public:
 	DECLARE_READ8_MEMBER( MBDR_r );
 	DECLARE_WRITE8_MEMBER( MBDR_w );
 
+	void coldfire_regs_map(address_map &map);
 protected:
 	// device-level overrides
 	virtual void device_start() override;

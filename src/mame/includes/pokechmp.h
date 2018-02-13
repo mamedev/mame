@@ -35,4 +35,7 @@ public:
 	required_device<palette_device> m_palette;
 	required_device<generic_latch_8_device> m_soundlatch;
 	void pokechmp(machine_config &config);
+	void pokechmp_map(address_map &map);
+	void pokechmp_oki_map(address_map &map);
+	void pokechmp_sound_map(address_map &map);
 };

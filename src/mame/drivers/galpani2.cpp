@@ -347,7 +347,7 @@ WRITE8_MEMBER(galpani2_state::galpani2_oki2_bank_w)
 }
 
 
-static ADDRESS_MAP_START( galpani2_mem1, AS_PROGRAM, 16, galpani2_state )
+ADDRESS_MAP_START(galpani2_state::galpani2_mem1)
 	AM_RANGE(0x000000, 0x0fffff) AM_ROM                                             // ROM
 	AM_RANGE(0x100000, 0x10ffff) AM_RAM AM_SHARE("ram")     // Work RAM
 	AM_RANGE(0x110000, 0x11000f) AM_RAM                                             // ? corrupted? stack dumper on POST failure, pc+sr on gp2se
@@ -415,7 +415,7 @@ WRITE16_MEMBER(galpani2_state::subdatabank_select_w)
 }
 
 
-static ADDRESS_MAP_START( galpani2_mem2, AS_PROGRAM, 16, galpani2_state )
+ADDRESS_MAP_START(galpani2_state::galpani2_mem2)
 	AM_RANGE(0x000000, 0x03ffff) AM_ROM                                                             // ROM
 	AM_RANGE(0x100000, 0x13ffff) AM_RAM AM_SHARE("ram2")                                        // Work RAM
 	AM_RANGE(0x400000, 0x5fffff) AM_RAM AM_SHARE("bg15")  // bg15

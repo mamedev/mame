@@ -172,6 +172,8 @@ public:
 	void midvplus(machine_config &config);
 	void offroadc(machine_config &config);
 	void midvunit(machine_config &config);
+	void midvplus_map(address_map &map);
+	void midvunit_map(address_map &map);
 protected:
 	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr) override;
 };

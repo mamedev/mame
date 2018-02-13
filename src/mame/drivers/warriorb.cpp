@@ -223,7 +223,7 @@ WRITE16_MEMBER(warriorb_state::tc0100scn_dual_screen_w)
                       MEMORY STRUCTURES
 ***********************************************************/
 
-static ADDRESS_MAP_START( darius2d_map, AS_PROGRAM, 16, warriorb_state )
+ADDRESS_MAP_START(warriorb_state::darius2d_map)
 	AM_RANGE(0x000000, 0x0fffff) AM_ROM
 	AM_RANGE(0x100000, 0x10ffff) AM_RAM     /* main ram */
 	AM_RANGE(0x200000, 0x213fff) AM_DEVREAD("tc0100scn_1", tc0100scn_device, word_r) AM_WRITE(tc0100scn_dual_screen_w)   /* tilemaps (all screens) */
@@ -239,7 +239,7 @@ static ADDRESS_MAP_START( darius2d_map, AS_PROGRAM, 16, warriorb_state )
 	AM_RANGE(0x830000, 0x830003) AM_READWRITE(sound_r, sound_w)
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( warriorb_map, AS_PROGRAM, 16, warriorb_state )
+ADDRESS_MAP_START(warriorb_state::warriorb_map)
 	AM_RANGE(0x000000, 0x1fffff) AM_ROM
 	AM_RANGE(0x200000, 0x213fff) AM_RAM
 	AM_RANGE(0x300000, 0x313fff) AM_DEVREAD("tc0100scn_1", tc0100scn_device, word_r) AM_WRITE(tc0100scn_dual_screen_w)   /* tilemaps (all screens) */
@@ -256,7 +256,7 @@ ADDRESS_MAP_END
 
 /***************************************************************************/
 
-static ADDRESS_MAP_START( z80_sound_map, AS_PROGRAM, 8, warriorb_state )
+ADDRESS_MAP_START(warriorb_state::z80_sound_map)
 	AM_RANGE(0x0000, 0x3fff) AM_ROM
 	AM_RANGE(0x4000, 0x7fff) AM_ROMBANK("z80bank")
 	AM_RANGE(0xc000, 0xdfff) AM_RAM

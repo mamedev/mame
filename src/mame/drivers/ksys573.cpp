@@ -523,6 +523,12 @@ public:
 	static void hyprbbc2_cassette_install(device_t *device);
 	static void hypbbc2p_cassette_install(device_t *device);
 	static void cr589_config(device_t *device);
+	void fbaitbc_map(address_map &map);
+	void flashbank_map(address_map &map);
+	void gunmania_map(address_map &map);
+	void konami573_map(address_map &map);
+	void konami573a_map(address_map &map);
+	void konami573d_map(address_map &map);
 protected:
 	virtual void driver_start() override;
 
@@ -607,7 +613,7 @@ void ATTR_PRINTF( 3,4 )  ksys573_state::verboselog( int n_level, const char *s_f
 	}
 }
 
-static ADDRESS_MAP_START( konami573_map, AS_PROGRAM, 32, ksys573_state )
+ADDRESS_MAP_START(ksys573_state::konami573_map)
 	AM_RANGE( 0x1f000000, 0x1f3fffff ) AM_DEVICE16( "flashbank", address_map_bank_device, amap16, 0xffffffff )
 	AM_RANGE( 0x1f400000, 0x1f400003 ) AM_READ_PORT( "IN0" ) AM_WRITE_PORT( "OUT0" )
 	AM_RANGE( 0x1f400004, 0x1f400007 ) AM_READ_PORT( "IN1" )
@@ -623,7 +629,7 @@ static ADDRESS_MAP_START( konami573_map, AS_PROGRAM, 32, ksys573_state )
 	AM_RANGE( 0x1f6a0000, 0x1f6a0003 ) AM_READWRITE16( security_r, security_w, 0x0000ffff )
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( flashbank_map, AS_PROGRAM, 16, ksys573_state )
+ADDRESS_MAP_START(ksys573_state::flashbank_map)
 	AM_RANGE( 0x0000000, 0x03fffff ) AM_DEVREADWRITE8( "29f016a.31m", intelfsh8_device, read, write, 0x00ff )
 	AM_RANGE( 0x0000000, 0x03fffff ) AM_DEVREADWRITE8( "29f016a.27m", intelfsh8_device, read, write, 0xff00 )
 	AM_RANGE( 0x0400000, 0x07fffff ) AM_DEVREADWRITE8( "29f016a.31l", intelfsh8_device, read, write, 0x00ff )
@@ -636,22 +642,22 @@ static ADDRESS_MAP_START( flashbank_map, AS_PROGRAM, 16, ksys573_state )
 	AM_RANGE( 0x8000000, 0xbffffff ) AM_DEVREADWRITE( "pccard2", pccard_slot_device, read_memory, write_memory )
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( konami573d_map, AS_PROGRAM, 32, ksys573_state )
+ADDRESS_MAP_START(ksys573_state::konami573d_map)
 	AM_IMPORT_FROM( konami573_map )
 	AM_RANGE( 0x1f640000, 0x1f6400ff ) AM_DEVICE16( "k573dio", k573dio_device, amap, 0xffffffff )
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( konami573a_map, AS_PROGRAM, 32, ksys573_state )
+ADDRESS_MAP_START(ksys573_state::konami573a_map)
 	AM_IMPORT_FROM( konami573_map )
 	AM_RANGE( 0x1f640000, 0x1f6400ff ) AM_READWRITE16( gx700pwbf_io_r, gx700pwbf_io_w, 0xffffffff )
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( fbaitbc_map, AS_PROGRAM, 32, ksys573_state )
+ADDRESS_MAP_START(ksys573_state::fbaitbc_map)
 	AM_IMPORT_FROM( konami573_map )
 	AM_RANGE( 0x1f640000, 0x1f6400ff ) AM_READWRITE16( ge765pwbba_r, ge765pwbba_w, 0xffffffff )
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( gunmania_map, AS_PROGRAM, 32, ksys573_state )
+ADDRESS_MAP_START(ksys573_state::gunmania_map)
 	AM_IMPORT_FROM( konami573_map )
 	AM_RANGE( 0x1f640000, 0x1f6400ff ) AM_READWRITE16( gunmania_r, gunmania_w, 0xffffffff )
 ADDRESS_MAP_END

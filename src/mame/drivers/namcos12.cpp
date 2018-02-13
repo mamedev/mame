@@ -1169,6 +1169,21 @@ public:
 	void namcos12_sub_irq( screen_device &screen, bool vblank_state );
 
 	void coh700(machine_config &config);
+	void golgo13_h8iomap(address_map &map);
+	void jvsiomap(address_map &map);
+	void jvsmap(address_map &map);
+	void namcos12_map(address_map &map);
+	void plarailjvsiomap(address_map &map);
+	void plarailjvsmap(address_map &map);
+	void ptblank2_map(address_map &map);
+	void s12h8iomap(address_map &map);
+	void s12h8jvsiomap(address_map &map);
+	void s12h8railiomap(address_map &map);
+	void s12h8rwjvsmap(address_map &map);
+	void s12h8rwmap(address_map &map);
+	void tdjvsiomap(address_map &map);
+	void tdjvsmap(address_map &map);
+	void tektagt_map(address_map &map);
 protected:
 	virtual void machine_reset() override;
 };
@@ -1318,7 +1333,7 @@ void namcos12_state::namcos12_sub_irq( screen_device &screen, bool vblank_state 
 	m_sub_portb = (m_sub_portb & 0x7f) | (vblank_state << 7);
 }
 
-static ADDRESS_MAP_START( namcos12_map, AS_PROGRAM, 32, namcos12_state )
+ADDRESS_MAP_START(namcos12_state::namcos12_map)
 	AM_RANGE(0x1f000000, 0x1f000003) AM_READNOP AM_WRITE16(bankoffset_w, 0x0000ffff)          /* banking */
 	AM_RANGE(0x1f080000, 0x1f083fff) AM_READWRITE16(sharedram_r, sharedram_w, 0xffffffff) /* shared ram?? */
 	AM_RANGE(0x1f140000, 0x1f140fff) AM_DEVREADWRITE8("at28c16", at28c16_device, read, write, 0x00ff00ff) /* eeprom */
@@ -1332,14 +1347,14 @@ static ADDRESS_MAP_START( namcos12_map, AS_PROGRAM, 32, namcos12_state )
 	AM_RANGE(0x1fa00000, 0x1fbfffff) AM_ROMBANK("bank1") /* banked roms */
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( ptblank2_map, AS_PROGRAM, 32, namcos12_state )
+ADDRESS_MAP_START(namcos12_state::ptblank2_map)
 	AM_IMPORT_FROM( namcos12_map )
 
 	AM_RANGE(0x1f780000, 0x1f78000f) AM_READ16(system11gun_r, 0xffffffff)
 	AM_RANGE(0x1f788000, 0x1f788003) AM_WRITE16(system11gun_w, 0xffffffff)
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( tektagt_map, AS_PROGRAM, 32, namcos12_state )
+ADDRESS_MAP_START(namcos12_state::tektagt_map)
 	AM_IMPORT_FROM( namcos12_map )
 
 	AM_RANGE(0x1fb00000, 0x1fb00003) AM_READWRITE16(tektagt_protection_1_r, tektagt_protection_1_w, 0xffffffff)
@@ -1518,7 +1533,7 @@ void namcos12_boothack_state::machine_reset()
 }
 
 /* H8/3002 MCU stuff */
-static ADDRESS_MAP_START( s12h8rwmap, AS_PROGRAM, 16, namcos12_state )
+ADDRESS_MAP_START(namcos12_state::s12h8rwmap)
 	AM_RANGE(0x000000, 0x07ffff) AM_ROM
 	AM_RANGE(0x080000, 0x08ffff) AM_RAM AM_SHARE("sharedram")
 	AM_RANGE(0x280000, 0x287fff) AM_DEVREADWRITE("c352", c352_device, read, write)
@@ -1529,7 +1544,7 @@ static ADDRESS_MAP_START( s12h8rwmap, AS_PROGRAM, 16, namcos12_state )
 ADDRESS_MAP_END
 
 // map for JVS games w/o controls connected directly
-static ADDRESS_MAP_START( s12h8rwjvsmap, AS_PROGRAM, 16, namcos12_state )
+ADDRESS_MAP_START(namcos12_state::s12h8rwjvsmap)
 	AM_RANGE(0x000000, 0x07ffff) AM_ROM
 	AM_RANGE(0x080000, 0x08ffff) AM_RAM AM_SHARE("sharedram")
 	AM_RANGE(0x280000, 0x287fff) AM_DEVREADWRITE("c352", c352_device, read, write)
@@ -1583,7 +1598,7 @@ READ16_MEMBER(namcos12_state::s12_mcu_jvs_p8_r)
 	return 0x12;    // bit 4 = JVS enable.  aplarail requires it to be on, soulclbr & others will require JVS I/O if it's on
 }
 
-static ADDRESS_MAP_START( s12h8iomap, AS_IO, 16, namcos12_state )
+ADDRESS_MAP_START(namcos12_state::s12h8iomap)
 	AM_RANGE(h8_device::PORT_6, h8_device::PORT_6) AM_READ(s12_mcu_p6_r)
 	AM_RANGE(h8_device::PORT_7, h8_device::PORT_7) AM_READ_PORT("DSW")
 	AM_RANGE(h8_device::PORT_8, h8_device::PORT_8) AM_READ(s12_mcu_p8_r) AM_WRITENOP
@@ -1595,7 +1610,7 @@ static ADDRESS_MAP_START( s12h8iomap, AS_IO, 16, namcos12_state )
 	AM_RANGE(h8_device::ADC_3, h8_device::ADC_3) AM_NOP
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( s12h8jvsiomap, AS_IO, 16, namcos12_state )
+ADDRESS_MAP_START(namcos12_state::s12h8jvsiomap)
 	AM_RANGE(h8_device::PORT_6, h8_device::PORT_6) AM_READ(s12_mcu_p6_r)
 	AM_RANGE(h8_device::PORT_7, h8_device::PORT_7) AM_READ_PORT("DSW")
 	AM_RANGE(h8_device::PORT_8, h8_device::PORT_8) AM_READ(s12_mcu_jvs_p8_r) AM_WRITENOP
@@ -1607,7 +1622,7 @@ static ADDRESS_MAP_START( s12h8jvsiomap, AS_IO, 16, namcos12_state )
 	AM_RANGE(h8_device::ADC_3, h8_device::ADC_3) AM_NOP
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( s12h8railiomap, AS_IO, 16, namcos12_state )
+ADDRESS_MAP_START(namcos12_state::s12h8railiomap)
 	AM_RANGE(h8_device::PORT_6, h8_device::PORT_6) AM_READ(s12_mcu_p6_r)
 	AM_RANGE(h8_device::PORT_7, h8_device::PORT_7) AM_READ_PORT("DSW")
 	AM_RANGE(h8_device::PORT_8, h8_device::PORT_8) AM_READ(s12_mcu_jvs_p8_r) AM_WRITENOP
@@ -1631,7 +1646,7 @@ READ16_MEMBER(namcos12_state::s12_mcu_gun_v_r)
 	return ioport("LIGHT0_Y")->read();
 }
 
-static ADDRESS_MAP_START( golgo13_h8iomap, AS_IO, 16, namcos12_state )
+ADDRESS_MAP_START(namcos12_state::golgo13_h8iomap)
 	AM_IMPORT_FROM( s12h8iomap )
 
 	AM_RANGE(h8_device::ADC_1, h8_device::ADC_1) AM_READ(s12_mcu_gun_h_r)
@@ -1734,12 +1749,12 @@ MACHINE_CONFIG_DERIVED(namcos12_boothack_state::golgo13, coh700)
 MACHINE_CONFIG_END
 
 #define JVSCLOCK    (XTAL(14'745'600))
-static ADDRESS_MAP_START( jvsmap, AS_PROGRAM, 16, namcos12_state )
+ADDRESS_MAP_START(namcos12_state::jvsmap)
 	AM_RANGE(0x0000, 0x1fff) AM_ROM AM_REGION("iocpu", 0)
 	AM_RANGE(0xc000, 0xffff) AM_RAM
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( jvsiomap, AS_IO, 16, namcos12_state )
+ADDRESS_MAP_START(namcos12_state::jvsiomap)
 ADDRESS_MAP_END
 
 
@@ -1782,14 +1797,14 @@ READ16_MEMBER(namcos12_state::iob_p6_r)
 	return sb | 0;
 }
 
-static ADDRESS_MAP_START( tdjvsmap, AS_PROGRAM, 16, namcos12_state )
+ADDRESS_MAP_START(namcos12_state::tdjvsmap)
 	AM_RANGE(0x0000, 0x3fff) AM_ROM AM_REGION("iocpu", 0)
 	AM_RANGE(0x6000, 0x6001) AM_READ_PORT("IN01")
 	AM_RANGE(0x6002, 0x6003) AM_READ_PORT("IN23")
 	AM_RANGE(0xc000, 0xffff) AM_RAM
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( tdjvsiomap, AS_IO, 16, namcos12_state )
+ADDRESS_MAP_START(namcos12_state::tdjvsiomap)
 	AM_RANGE(h8_device::PORT_4, h8_device::PORT_4) AM_READWRITE(iob_p4_r, iob_p4_w)
 	AM_RANGE(h8_device::PORT_6, h8_device::PORT_6) AM_READ(iob_p6_r)
 	AM_RANGE(h8_device::ADC_0, h8_device::ADC_0) AM_READ_PORT("STEER")
@@ -1797,14 +1812,14 @@ static ADDRESS_MAP_START( tdjvsiomap, AS_IO, 16, namcos12_state )
 	AM_RANGE(h8_device::ADC_2, h8_device::ADC_2) AM_READ_PORT("GAS")
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( plarailjvsmap, AS_PROGRAM, 16, namcos12_state )
+ADDRESS_MAP_START(namcos12_state::plarailjvsmap)
 	AM_RANGE(0x0000, 0x3fff) AM_ROM AM_REGION("iocpu", 0)
 	AM_RANGE(0x6000, 0x6001) AM_READ_PORT("IN01")
 	AM_RANGE(0x6002, 0x6003) AM_READ_PORT("IN23")
 	AM_RANGE(0xc000, 0xffff) AM_RAM
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( plarailjvsiomap, AS_IO, 16, namcos12_state )
+ADDRESS_MAP_START(namcos12_state::plarailjvsiomap)
 	AM_RANGE(h8_device::PORT_4, h8_device::PORT_4) AM_READWRITE(iob_p4_r, iob_p4_w)
 	AM_RANGE(h8_device::PORT_6, h8_device::PORT_6) AM_READ_PORT("SERVICE")
 	AM_RANGE(h8_device::ADC_0, h8_device::ADC_0) AM_NOP

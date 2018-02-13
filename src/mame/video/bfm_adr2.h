@@ -37,6 +37,7 @@ public:
 
 	void adder2_decode_char_roms();
 
+	void adder2_memmap(address_map &map);
 protected:
 	// device-level overrides
 	virtual void device_start() override;

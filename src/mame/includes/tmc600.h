@@ -87,6 +87,9 @@ public:
 	CDP1869_PCB_READ_MEMBER(tmc600_pcb_r);
 	void tmc600(machine_config &config);
 	void tmc600_video(machine_config &config);
+	void cdp1869_page_ram(address_map &map);
+	void tmc600_io_map(address_map &map);
+	void tmc600_map(address_map &map);
 };
 
 #endif

@@ -52,6 +52,8 @@ public:
 	void kbd_put(u8 data);
 
 	void dms86(machine_config &config);
+	void io_map(address_map &map);
+	void mem_map(address_map &map);
 private:
 	u8 m_term_data;
 	virtual void machine_reset() override;
@@ -79,13 +81,13 @@ READ16_MEMBER( dms86_state::port9c_r )
 }
 
 
-static ADDRESS_MAP_START(mem_map, AS_PROGRAM, 16, dms86_state)
+ADDRESS_MAP_START(dms86_state::mem_map)
 	ADDRESS_MAP_UNMAP_HIGH
 	AM_RANGE(0x00000, 0x1ffff) AM_RAM
 	AM_RANGE(0xfe000, 0xfffff) AM_ROM AM_REGION("roms",0)
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START(io_map, AS_IO, 16, dms86_state)
+ADDRESS_MAP_START(dms86_state::io_map)
 	ADDRESS_MAP_UNMAP_HIGH
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	AM_RANGE(0x82, 0x83) AM_READ(port82_r)
@@ -93,7 +95,8 @@ static ADDRESS_MAP_START(io_map, AS_IO, 16, dms86_state)
 	AM_RANGE(0x88, 0x8f) AM_DEVREADWRITE8("ctc", z80ctc_device, read, write, 0x00ff)
 	AM_RANGE(0x90, 0x97) AM_DEVREADWRITE8("sio2", z80sio_device, ba_cd_r, ba_cd_w, 0x00ff)
 	AM_RANGE(0x9A, 0x9B) AM_READ(port9a_r) // parallel SASI port
-	AM_RANGE(0x9c, 0x9d) AM_READ(port9c_r) AM_DEVWRITE8("terminal", generic_terminal_device, write, 0xff)
+	AM_RANGE(0x9c, 0x9d) AM_READ(port9c_r)
+	AM_RANGE(0x9c, 0x9d) AM_DEVWRITE8("terminal", generic_terminal_device, write, 0x00ff)
 ADDRESS_MAP_END
 
 /* Input ports */

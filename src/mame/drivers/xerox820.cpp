@@ -165,13 +165,13 @@ WRITE8_MEMBER( xerox820ii_state::sync_w )
 
 /* Memory Maps */
 
-static ADDRESS_MAP_START( xerox820_mem, AS_PROGRAM, 8, xerox820_state )
+ADDRESS_MAP_START(xerox820_state::xerox820_mem)
 	ADDRESS_MAP_UNMAP_HIGH
 	AM_RANGE(0x3000, 0x3fff) AM_RAM AM_SHARE("video_ram")
 	AM_RANGE(0x4000, 0xffff) AM_RAM
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( xerox820_io, AS_IO, 8, xerox820_state )
+ADDRESS_MAP_START(xerox820_state::xerox820_io)
 	AM_RANGE(0x00, 0x00) AM_MIRROR(0xff03) AM_DEVWRITE(COM8116_TAG, com8116_device, str_w)
 	AM_RANGE(0x04, 0x07) AM_MIRROR(0xff00) AM_DEVREADWRITE(Z80SIO_TAG, z80sio0_device, ba_cd_r, ba_cd_w)
 	AM_RANGE(0x08, 0x0b) AM_MIRROR(0xff00) AM_DEVREADWRITE(Z80PIO_GP_TAG, z80pio_device, read_alt, write_alt)
@@ -182,13 +182,13 @@ static ADDRESS_MAP_START( xerox820_io, AS_IO, 8, xerox820_state )
 	AM_RANGE(0x1c, 0x1f) AM_MIRROR(0xff00) AM_DEVREADWRITE(Z80PIO_KB_TAG, z80pio_device, read_alt, write_alt)
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( xerox820ii_mem, AS_PROGRAM, 8, xerox820ii_state )
+ADDRESS_MAP_START(xerox820ii_state::xerox820ii_mem)
 	ADDRESS_MAP_UNMAP_HIGH
 	AM_RANGE(0x3000, 0x3fff) AM_RAM AM_SHARE("video_ram")
 	AM_RANGE(0xc000, 0xffff) AM_RAM
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( xerox820ii_io, AS_IO, 8, xerox820ii_state )
+ADDRESS_MAP_START(xerox820ii_state::xerox820ii_io)
 	AM_IMPORT_FROM(xerox820_io)
 	AM_RANGE(0x28, 0x29) AM_MIRROR(0xff00) AM_WRITE(bell_w)
 	AM_RANGE(0x30, 0x31) AM_MIRROR(0xff00) AM_WRITE(slden_w)
@@ -197,12 +197,12 @@ static ADDRESS_MAP_START( xerox820ii_io, AS_IO, 8, xerox820ii_state )
 	AM_RANGE(0x68, 0x69) AM_MIRROR(0xff00) AM_WRITE(sync_w)
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( xerox168_mem, AS_PROGRAM, 16, xerox820ii_state )
+ADDRESS_MAP_START(xerox820ii_state::xerox168_mem)
 	AM_RANGE(0x00000, 0x3ffff) AM_RAM
 	AM_RANGE(0xff000, 0xfffff) AM_ROM AM_REGION(I8086_TAG, 0)
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( mk83_mem, AS_PROGRAM, 8, xerox820_state )
+ADDRESS_MAP_START(xerox820_state::mk83_mem)
 	ADDRESS_MAP_UNMAP_HIGH
 	AM_RANGE(0x3000, 0x6fff) AM_RAM
 	AM_RANGE(0x7000, 0x7fff) AM_RAM AM_SHARE("video_ram")

@@ -42,6 +42,8 @@ public:
 	DECLARE_READ8_MEMBER(mpu_r);
 	DECLARE_WRITE8_MEMBER(mpu_w);
 
+	void mpu401_io_map(address_map &map);
+	void mpu401_map(address_map &map);
 protected:
 	// device-level overrides
 	virtual void device_start() override;

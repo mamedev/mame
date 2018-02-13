@@ -38,6 +38,7 @@ public:
 	TMS340X0_SCANLINE_IND16_CB_MEMBER(scanline_update);
 
 	void midxunit(machine_config &config);
+	void main_map(address_map &map);
 private:
 	required_shared_ptr<uint16_t> m_nvram;
 	required_device<midway_serial_pic_device> m_midway_serial_pic;

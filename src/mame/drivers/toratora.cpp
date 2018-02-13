@@ -94,6 +94,7 @@ public:
 	uint32_t screen_update_toratora(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 	INTERRUPT_GEN_MEMBER(toratora_timer);
 	void toratora(machine_config &config);
+	void main_map(address_map &map);
 };
 
 
@@ -315,7 +316,7 @@ WRITE_LINE_MEMBER(toratora_state::sn2_ca2_u2_w)
  *
  *************************************/
 
-static ADDRESS_MAP_START( main_map, AS_PROGRAM, 8, toratora_state )
+ADDRESS_MAP_START(toratora_state::main_map)
 	AM_RANGE(0x0000, 0x0fff) AM_RAM
 	AM_RANGE(0x1000, 0x7fff) AM_ROM  /* not fully populated */
 	AM_RANGE(0x8000, 0x9fff) AM_RAM AM_SHARE("videoram")

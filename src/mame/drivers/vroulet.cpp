@@ -82,6 +82,8 @@ public:
 
 	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	void vroulet(machine_config &config);
+	void vroulet_io_map(address_map &map);
+	void vroulet_map(address_map &map);
 };
 
 
@@ -148,7 +150,7 @@ uint32_t vroulet_state::screen_update(screen_device &screen, bitmap_ind16 &bitma
 
 /* Memory Maps */
 
-static ADDRESS_MAP_START( vroulet_map, AS_PROGRAM, 8, vroulet_state )
+ADDRESS_MAP_START(vroulet_state::vroulet_map)
 	AM_RANGE(0x0000, 0x5fff) AM_ROM
 	AM_RANGE(0x6000, 0x67ff) AM_RAM AM_SHARE("nvram")
 	AM_RANGE(0x8000, 0x8000) AM_NOP
@@ -159,7 +161,7 @@ static ADDRESS_MAP_START( vroulet_map, AS_PROGRAM, 8, vroulet_state )
 	AM_RANGE(0xc000, 0xc000) AM_NOP
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( vroulet_io_map, AS_IO, 8, vroulet_state )
+ADDRESS_MAP_START(vroulet_state::vroulet_io_map)
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	AM_RANGE(0x00, 0x00) AM_DEVREAD("aysnd", ay8910_device, data_r)
 	AM_RANGE(0x00, 0x01) AM_DEVWRITE("aysnd", ay8910_device, data_address_w)

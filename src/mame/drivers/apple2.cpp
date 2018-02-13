@@ -189,6 +189,8 @@ public:
 	void apple2(machine_config &config);
 	void space84(machine_config &config);
 	void apple2p(machine_config &config);
+	void apple2_map(address_map &map);
+	void inhbank_map(address_map &map);
 private:
 	int m_speaker_state;
 	int m_cassette_state;
@@ -948,7 +950,7 @@ WRITE8_MEMBER(napple2_state::ram_w)
 	}
 }
 
-static ADDRESS_MAP_START( apple2_map, AS_PROGRAM, 8, napple2_state )
+ADDRESS_MAP_START(napple2_state::apple2_map)
 	AM_RANGE(0x0000, 0xbfff) AM_READWRITE(ram_r, ram_w)
 	AM_RANGE(0xc000, 0xc000) AM_MIRROR(0xf) AM_READ(keyb_data_r) AM_WRITENOP
 	AM_RANGE(0xc010, 0xc010) AM_MIRROR(0xf) AM_READWRITE(keyb_strobe_r, keyb_strobe_w)
@@ -964,7 +966,7 @@ static ADDRESS_MAP_START( apple2_map, AS_PROGRAM, 8, napple2_state )
 	AM_RANGE(0xd000, 0xffff) AM_DEVICE(A2_UPPERBANK_TAG, address_map_bank_device, amap8)
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( inhbank_map, AS_PROGRAM, 8, napple2_state )
+ADDRESS_MAP_START(napple2_state::inhbank_map)
 	AM_RANGE(0x0000, 0x2fff) AM_ROM AM_REGION("maincpu", 0x1000) AM_WRITE(inh_w)
 	AM_RANGE(0x3000, 0x5fff) AM_READWRITE(inh_r, inh_w)
 ADDRESS_MAP_END

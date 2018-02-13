@@ -37,6 +37,8 @@ public:
 	DECLARE_WRITE8_MEMBER( p2_w );
 	DECLARE_READ8_MEMBER( p4_r );
 
+	void adam_ddp_io(address_map &map);
+	void adam_ddp_mem(address_map &map);
 protected:
 	// device-level overrides
 	virtual void device_start() override;

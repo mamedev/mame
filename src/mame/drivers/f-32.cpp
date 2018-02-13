@@ -54,6 +54,10 @@ public:
 	uint32_t screen_update_mosaicf2(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	void mosaicf2(machine_config &config);
 	void royalpk2(machine_config &config);
+	void common_map(address_map &map);
+	void mosaicf2_io(address_map &map);
+	void royalpk2_io(address_map &map);
+	void royalpk2_map(address_map &map);
 };
 
 
@@ -78,7 +82,7 @@ uint32_t mosaicf2_state::screen_update_mosaicf2(screen_device &screen, bitmap_in
 
 
 
-static ADDRESS_MAP_START( common_map, AS_PROGRAM, 32, mosaicf2_state )
+ADDRESS_MAP_START(mosaicf2_state::common_map)
 	AM_RANGE(0x00000000, 0x001fffff) AM_RAM
 	AM_RANGE(0x40000000, 0x4003ffff) AM_RAM AM_SHARE("videoram")
 	AM_RANGE(0x80000000, 0x80ffffff) AM_ROM AM_REGION("user2",0)
@@ -97,7 +101,7 @@ READ32_MEMBER(mosaicf2_state::f32_input_port_1_r)
 }
 
 
-static ADDRESS_MAP_START( mosaicf2_io, AS_IO, 32, mosaicf2_state )
+ADDRESS_MAP_START(mosaicf2_state::mosaicf2_io)
 	AM_RANGE(0x4000, 0x4003) AM_DEVREAD8("oki", okim6295_device, read, 0x000000ff)
 	AM_RANGE(0x4810, 0x4813) AM_DEVREAD8("ymsnd", ym2151_device, status_r, 0x000000ff)
 	AM_RANGE(0x5000, 0x5003) AM_READ_PORT("P1")
@@ -217,14 +221,14 @@ INPUT_PORTS_END
 
 
 
-static ADDRESS_MAP_START( royalpk2_map, AS_PROGRAM, 32, mosaicf2_state )
+ADDRESS_MAP_START(mosaicf2_state::royalpk2_map)
 	AM_RANGE(0x00000000, 0x003fffff) AM_RAM
 	AM_RANGE(0x40000000, 0x4003ffff) AM_RAM AM_SHARE("videoram")
 	AM_RANGE(0x80000000, 0x807fffff) AM_ROM AM_REGION("user2",0)
 	AM_RANGE(0xfff00000, 0xffffffff) AM_ROM AM_REGION("user1",0)
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( royalpk2_io, AS_IO, 32, mosaicf2_state )
+ADDRESS_MAP_START(mosaicf2_state::royalpk2_io)
 	AM_RANGE(0x4900, 0x4903) AM_READ_PORT("SYSTEM_P2")
 
 	AM_RANGE(0x4a00, 0x4a03) AM_READ_PORT("EEPROMIN")

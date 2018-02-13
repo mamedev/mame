@@ -56,6 +56,7 @@ public:
 	DECLARE_WRITE8_MEMBER(orbit_noise_rst_w);
 
 	void orbit(machine_config &config);
+	void orbit_map(address_map &map);
 protected:
 	virtual void machine_start() override;
 	virtual void machine_reset() override;

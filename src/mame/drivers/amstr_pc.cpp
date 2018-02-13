@@ -90,18 +90,22 @@ public:
 	void pc2086(machine_config &config);
 	void ppc640(machine_config &config);
 	void ppc512(machine_config &config);
+	void pc200_io(address_map &map);
+	void pc2086_map(address_map &map);
+	void ppc512_io(address_map &map);
+	void ppc640_map(address_map &map);
 };
 
-static ADDRESS_MAP_START( ppc640_map, AS_PROGRAM, 16, amstrad_pc_state )
+ADDRESS_MAP_START(amstrad_pc_state::ppc640_map)
 	AM_RANGE(0xf0000, 0xfffff) AM_ROM AM_REGION("bios", 0)
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( pc2086_map, AS_PROGRAM, 16, amstrad_pc_state )
+ADDRESS_MAP_START(amstrad_pc_state::pc2086_map)
 	AM_RANGE(0xc0000, 0xc9fff) AM_ROM AM_REGION("bios", 0)
 	AM_RANGE(0xf0000, 0xfffff) AM_ROM AM_REGION("bios", 0x10000)
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START(pc200_io, AS_IO, 16, amstrad_pc_state )
+ADDRESS_MAP_START(amstrad_pc_state::pc200_io)
 	AM_RANGE(0x0000, 0x00ff) AM_DEVICE8("mb", pc_noppi_mb_device, map, 0xffff)
 	AM_RANGE(0x0060, 0x0065) AM_READWRITE8(pc1640_port60_r, pc1640_port60_w, 0xffff)
 	AM_RANGE(0x0078, 0x0079) AM_READWRITE8(pc1640_mouse_x_r, pc1640_mouse_x_w, 0xffff)
@@ -112,7 +116,7 @@ static ADDRESS_MAP_START(pc200_io, AS_IO, 16, amstrad_pc_state )
 	AM_RANGE(0x03bc, 0x03bf) AM_DEVREADWRITE8("lpt_0", pc_lpt_device, read, write, 0x00ff)
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START(ppc512_io, AS_IO, 16, amstrad_pc_state )
+ADDRESS_MAP_START(amstrad_pc_state::ppc512_io)
 	AM_IMPORT_FROM(pc200_io)
 	AM_RANGE(0x0070, 0x0071) AM_DEVREADWRITE8("rtc", mc146818_device, read, write, 0xffff)
 ADDRESS_MAP_END

@@ -154,6 +154,7 @@ public:
 	IRQ_CALLBACK_MEMBER(iack_handler);
 
 	void manohman(machine_config &config);
+	void mem_map(address_map &map);
 private:
 	virtual void machine_start() override;
 
@@ -179,7 +180,7 @@ IRQ_CALLBACK_MEMBER(manohman_state::iack_handler)
 *           Memory Map Definition            *
 *********************************************/
 
-static ADDRESS_MAP_START( mem_map, AS_PROGRAM, 16, manohman_state )
+ADDRESS_MAP_START(manohman_state::mem_map)
 	AM_RANGE(0x000000, 0x01ffff) AM_ROM
 	AM_RANGE(0x100000, 0x10003f) AM_DEVREADWRITE8("pit", pit68230_device, read, write, 0x00ff)
 	AM_RANGE(0x200000, 0x20001f) AM_DEVREADWRITE8("duart", mc68681_device, read, write, 0x00ff)

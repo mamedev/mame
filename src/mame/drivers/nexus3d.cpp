@@ -48,6 +48,7 @@ public:
 	virtual void video_start() override;
 	uint32_t screen_update_nexus3d(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 	void nexus3d(machine_config &config);
+	void nexus3d_map(address_map &map);
 };
 
 
@@ -77,7 +78,7 @@ READ32_MEMBER(nexus3d_state::nexus3d_unk_r)
 //
 //}
 
-static ADDRESS_MAP_START( nexus3d_map, AS_PROGRAM, 32, nexus3d_state )
+ADDRESS_MAP_START(nexus3d_state::nexus3d_map)
 	AM_RANGE(0x00000000, 0x003fffff) AM_RAM AM_SHARE("mainram")
 
 	AM_RANGE(0x00400000, 0x01ffffff) AM_RAM // ?? uploads various data, + pointers to data in the 0x01ffxxxx range, might be video system related

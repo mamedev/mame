@@ -172,6 +172,10 @@ public:
 
 	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	void ppmast93(machine_config &config);
+	void ppmast93_cpu1_io(address_map &map);
+	void ppmast93_cpu1_map(address_map &map);
+	void ppmast93_cpu2_io(address_map &map);
+	void ppmast93_cpu2_map(address_map &map);
 };
 
 
@@ -200,7 +204,7 @@ WRITE8_MEMBER(ppmast93_state::port4_w)
 	membank("cpubank")->set_entry(data & 0x07);
 }
 
-static ADDRESS_MAP_START( ppmast93_cpu1_map, AS_PROGRAM, 8, ppmast93_state )
+ADDRESS_MAP_START(ppmast93_state::ppmast93_cpu1_map)
 	AM_RANGE(0x0000, 0x7fff) AM_ROM AM_WRITENOP
 	AM_RANGE(0x8000, 0xbfff) AM_ROMBANK("cpubank")
 	AM_RANGE(0xd000, 0xd7ff) AM_RAM_WRITE(bgram_w) AM_SHARE("bgram")
@@ -209,7 +213,7 @@ static ADDRESS_MAP_START( ppmast93_cpu1_map, AS_PROGRAM, 8, ppmast93_state )
 	AM_RANGE(0xf800, 0xffff) AM_RAM
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( ppmast93_cpu1_io, AS_IO, 8, ppmast93_state )
+ADDRESS_MAP_START(ppmast93_state::ppmast93_cpu1_io)
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	AM_RANGE(0x00, 0x00) AM_READ_PORT("P1") AM_DEVWRITE("soundlatch", generic_latch_8_device, write)
 	AM_RANGE(0x02, 0x02) AM_READ_PORT("P2")
@@ -218,13 +222,13 @@ static ADDRESS_MAP_START( ppmast93_cpu1_io, AS_IO, 8, ppmast93_state )
 	AM_RANGE(0x08, 0x08) AM_READ_PORT("DSW2")
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( ppmast93_cpu2_map, AS_PROGRAM, 8, ppmast93_state )
+ADDRESS_MAP_START(ppmast93_state::ppmast93_cpu2_map)
 	AM_RANGE(0x0000, 0xfbff) AM_ROM AM_REGION("sub", 0x10000)
 	AM_RANGE(0xfc00, 0xfc00) AM_DEVREAD("soundlatch", generic_latch_8_device, read)
 	AM_RANGE(0xfd00, 0xffff) AM_RAM
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( ppmast93_cpu2_io, AS_IO, 8, ppmast93_state )
+ADDRESS_MAP_START(ppmast93_state::ppmast93_cpu2_io)
 	AM_RANGE(0x0000, 0xffff) AM_ROM AM_REGION("sub", 0x20000)
 	AM_RANGE(0x0000, 0x0001) AM_MIRROR(0xff00) AM_DEVWRITE("ymsnd", ym2413_device, write)
 	AM_RANGE(0x0002, 0x0002) AM_MIRROR(0xff00) AM_DEVWRITE("dac", dac_byte_interface, write)

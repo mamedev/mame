@@ -50,4 +50,6 @@ public:
 	static const atari_motion_objects_config s_mob_config;
 	void cybstorm(machine_config &config);
 	void round2(machine_config &config);
+	void main_map(address_map &map);
+	void vadbank_map(address_map &map);
 };

@@ -207,6 +207,9 @@ public:
 
 	// Excel 68000
 	DECLARE_WRITE8_MEMBER(fex68k_mux_w);
+	void fex68k_map(address_map &map);
+	void fex68km2_map(address_map &map);
+	void fex68km3_map(address_map &map);
 	void fex68k(machine_config &config);
 	void fex68km2(machine_config &config);
 	void fex68km3(machine_config &config);
@@ -216,6 +219,8 @@ public:
 	DECLARE_READ8_MEMBER(fdes68k_input_r);
 	DECLARE_WRITE8_MEMBER(fdes68k_lcd_w);
 	DECLARE_DRIVER_INIT(fdes2265);
+	void fdes2265_map(address_map &map);
+	void fdes2325_map(address_map &map);
 	void fdes2265(machine_config &config);
 	void fdes2325(machine_config &config);
 
@@ -227,6 +232,9 @@ public:
 	DECLARE_WRITE8_MEMBER(eag_7seg_w);
 	DECLARE_WRITE8_MEMBER(eag_mux_w);
 	DECLARE_READ8_MEMBER(eag_input2_r);
+	void eag_map(address_map &map);
+	void eagv7_map(address_map &map);
+	void eagv11_map(address_map &map);
 	void eag(machine_config &config);
 	void eagv7(machine_config &config);
 	void eagv9(machine_config &config);
@@ -384,7 +392,7 @@ WRITE8_MEMBER(fidel68k_state::eag_mux_w)
 
 // Excel 68000
 
-static ADDRESS_MAP_START( fex68k_map, AS_PROGRAM, 16, fidel68k_state )
+ADDRESS_MAP_START(fidel68k_state::fex68k_map)
 	AM_RANGE(0x000000, 0x00ffff) AM_ROM
 	AM_RANGE(0x000000, 0x00000f) AM_MIRROR(0x00fff0) AM_WRITE8(eag_leds_w, 0x00ff)
 	AM_RANGE(0x000000, 0x00000f) AM_MIRROR(0x00fff0) AM_WRITE8(eag_7seg_w, 0xff00)
@@ -393,12 +401,12 @@ static ADDRESS_MAP_START( fex68k_map, AS_PROGRAM, 16, fidel68k_state )
 	AM_RANGE(0x140000, 0x14000f) AM_MIRROR(0x03fff0) AM_WRITE8(fex68k_mux_w, 0x00ff)
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( fex68km2_map, AS_PROGRAM, 16, fidel68k_state )
+ADDRESS_MAP_START(fidel68k_state::fex68km2_map)
 	AM_IMPORT_FROM( fex68k_map )
 	AM_RANGE(0x200000, 0x21ffff) AM_RAM
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( fex68km3_map, AS_PROGRAM, 16, fidel68k_state )
+ADDRESS_MAP_START(fidel68k_state::fex68km3_map)
 	AM_IMPORT_FROM( fex68k_map )
 	AM_RANGE(0x200000, 0x20ffff) AM_RAM
 ADDRESS_MAP_END
@@ -406,7 +414,7 @@ ADDRESS_MAP_END
 
 // Designer Master
 
-static ADDRESS_MAP_START( fdes2265_map, AS_PROGRAM, 16, fidel68k_state )
+ADDRESS_MAP_START(fidel68k_state::fdes2265_map)
 	ADDRESS_MAP_UNMAP_HIGH
 	AM_RANGE(0x000000, 0x00ffff) AM_ROM
 	AM_RANGE(0x000000, 0x00000f) AM_WRITE8(fdes68k_lcd_w, 0x00ff)
@@ -416,7 +424,7 @@ static ADDRESS_MAP_START( fdes2265_map, AS_PROGRAM, 16, fidel68k_state )
 	AM_RANGE(0x140000, 0x14000f) AM_WRITE8(fdes68k_control_w, 0x00ff)
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( fdes2325_map, AS_PROGRAM, 32, fidel68k_state )
+ADDRESS_MAP_START(fidel68k_state::fdes2325_map)
 	ADDRESS_MAP_UNMAP_HIGH
 	AM_RANGE(0x000000, 0x00ffff) AM_ROM
 	AM_RANGE(0x100000, 0x10000f) AM_WRITE8(fdes68k_lcd_w, 0x00ff00ff)
@@ -435,7 +443,7 @@ DRIVER_INIT_MEMBER(fidel68k_state, eag)
 	m_maincpu->space(AS_PROGRAM).install_ram(0x200000, 0x200000 + m_ram->size() - 1, m_ram->pointer());
 }
 
-static ADDRESS_MAP_START( eag_map, AS_PROGRAM, 16, fidel68k_state )
+ADDRESS_MAP_START(fidel68k_state::eag_map)
 	AM_RANGE(0x000000, 0x01ffff) AM_ROM
 	AM_RANGE(0x104000, 0x107fff) AM_RAM
 	AM_RANGE(0x300000, 0x30000f) AM_MIRROR(0x000010) AM_WRITE8(eag_7seg_w, 0xff00) AM_READNOP
@@ -447,7 +455,7 @@ static ADDRESS_MAP_START( eag_map, AS_PROGRAM, 16, fidel68k_state )
 	AM_RANGE(0x700002, 0x700003) AM_READ8(eag_input2_r, 0x00ff)
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( eagv7_map, AS_PROGRAM, 32, fidel68k_state )
+ADDRESS_MAP_START(fidel68k_state::eagv7_map)
 	AM_RANGE(0x000000, 0x01ffff) AM_ROM
 	AM_RANGE(0x104000, 0x107fff) AM_RAM
 	AM_RANGE(0x200000, 0x2fffff) AM_RAM
@@ -461,7 +469,7 @@ static ADDRESS_MAP_START( eagv7_map, AS_PROGRAM, 32, fidel68k_state )
 	AM_RANGE(0x800000, 0x807fff) AM_RAM
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( eagv11_map, AS_PROGRAM, 32, fidel68k_state )
+ADDRESS_MAP_START(fidel68k_state::eagv11_map)
 	AM_RANGE(0x00000000, 0x0001ffff) AM_ROM
 	AM_RANGE(0x00200000, 0x003fffff) AM_RAM
 	AM_RANGE(0x00b00000, 0x00b0000f) AM_MIRROR(0x00000010) AM_WRITE8(eag_7seg_w, 0xff00ff00) AM_READNOP

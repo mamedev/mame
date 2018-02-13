@@ -114,7 +114,7 @@ WRITE8_MEMBER( abc_fd2_device::status_w )
 //  ADDRESS_MAP( abc_fd2_mem )
 //-------------------------------------------------
 
-static ADDRESS_MAP_START( abc_fd2_mem, AS_PROGRAM, 8, abc_fd2_device )
+ADDRESS_MAP_START(abc_fd2_device::abc_fd2_mem)
 	AM_RANGE(0x0000, 0x03ff) AM_ROM AM_REGION(Z80_TAG, 0)
 	AM_RANGE(0x0800, 0x0bff) AM_RAM
 ADDRESS_MAP_END
@@ -124,7 +124,7 @@ ADDRESS_MAP_END
 //  ADDRESS_MAP( abc_fd2_io )
 //-------------------------------------------------
 
-static ADDRESS_MAP_START( abc_fd2_io, AS_IO, 8, abc_fd2_device )
+ADDRESS_MAP_START(abc_fd2_device::abc_fd2_io)
 	ADDRESS_MAP_GLOBAL_MASK(0x73)
 	AM_RANGE(0x30, 0x33) AM_DEVREADWRITE(Z80PIO_TAG, z80pio_device, read_alt, write_alt)
 	AM_RANGE(0x50, 0x53) AM_DEVREADWRITE(FD1771_TAG, fd1771_device, read, write)

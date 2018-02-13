@@ -68,6 +68,8 @@ public:
 	DECLARE_PALETTE_INIT(pc4);
 
 	void pc4(machine_config &config);
+	void pc4_io(address_map &map);
+	void pc4_mem(address_map &map);
 protected:
 	required_memory_region m_region_charset;
 	required_memory_bank m_rombank;

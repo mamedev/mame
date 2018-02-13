@@ -53,13 +53,15 @@ public:
 	DECLARE_DRIVER_INIT(madmotor);
 	uint32_t screen_update_madmotor(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	void madmotor(machine_config &config);
+	void madmotor_map(address_map &map);
+	void sound_map(address_map &map);
 };
 
 
 /******************************************************************************/
 
 
-static ADDRESS_MAP_START( madmotor_map, AS_PROGRAM, 16, madmotor_state )
+ADDRESS_MAP_START(madmotor_state::madmotor_map)
 	AM_RANGE(0x000000, 0x07ffff) AM_ROM
 	AM_RANGE(0x180000, 0x180007) AM_DEVWRITE("tilegen1", deco_bac06_device, pf_control_0_w)                          /* text layer */
 	AM_RANGE(0x180010, 0x180017) AM_DEVWRITE("tilegen1", deco_bac06_device, pf_control_1_w)
@@ -87,7 +89,7 @@ ADDRESS_MAP_END
 /******************************************************************************/
 
 /* Physical memory map (21 bits) */
-static ADDRESS_MAP_START( sound_map, AS_PROGRAM, 8, madmotor_state )
+ADDRESS_MAP_START(madmotor_state::sound_map)
 	AM_RANGE(0x000000, 0x00ffff) AM_ROM
 	AM_RANGE(0x100000, 0x100001) AM_DEVREADWRITE("ym1", ym2203_device, read, write)
 	AM_RANGE(0x110000, 0x110001) AM_DEVREADWRITE("ym2", ym2151_device, read, write)

@@ -67,7 +67,7 @@ static inline void ATTR_PRINTF(3,4) verboselog(device_t& device, int n_level, co
 *      Memory maps       *
 *************************/
 
-static ADDRESS_MAP_START( cdimono1_mem, AS_PROGRAM, 16, cdi_state )
+ADDRESS_MAP_START(cdi_state::cdimono1_mem)
 	AM_RANGE(0x00000000, 0x0007ffff) AM_RAM AM_SHARE("planea")
 	AM_RANGE(0x00200000, 0x0027ffff) AM_RAM AM_SHARE("planeb")
 	AM_RANGE(0x00300000, 0x00303bff) AM_DEVREADWRITE("cdic", cdicdic_device, ram_r, ram_w)
@@ -81,12 +81,12 @@ static ADDRESS_MAP_START( cdimono1_mem, AS_PROGRAM, 16, cdi_state )
 	AM_RANGE(0x00400000, 0x0047ffff) AM_ROM AM_REGION("maincpu", 0)
 	AM_RANGE(0x004fffe0, 0x004fffff) AM_DEVREADWRITE("mcd212", mcd212_device, regs_r, regs_w)
 	AM_RANGE(0x00500000, 0x0057ffff) AM_RAM
-	AM_RANGE(0x00500000, 0x00ffffff) AM_NOP
+	AM_RANGE(0x00580000, 0x00ffffff) AM_NOP
 	AM_RANGE(0x00e00000, 0x00efffff) AM_RAM // DVC
 	AM_RANGE(0x80000000, 0x8000807f) AM_DEVREADWRITE("scc68070", cdi68070_device, periphs_r, periphs_w)
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( cdimono2_mem, AS_PROGRAM, 16, cdi_state )
+ADDRESS_MAP_START(cdi_state::cdimono2_mem)
 	AM_RANGE(0x00000000, 0x0007ffff) AM_RAM AM_SHARE("planea")
 	AM_RANGE(0x00200000, 0x0027ffff) AM_RAM AM_SHARE("planeb")
 #if ENABLE_UART_PRINTING
@@ -105,7 +105,7 @@ static ADDRESS_MAP_START( cdimono2_mem, AS_PROGRAM, 16, cdi_state )
 	AM_RANGE(0x80000000, 0x8000807f) AM_DEVREADWRITE("scc68070", cdi68070_device, periphs_r, periphs_w)
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( cdi910_mem, AS_PROGRAM, 16, cdi_state )
+ADDRESS_MAP_START(cdi_state::cdi910_mem)
 	AM_RANGE(0x00000000, 0x0007ffff) AM_RAM AM_SHARE("planea")
 	AM_RANGE(0x00180000, 0x001fffff) AM_ROM AM_REGION("maincpu", 0) // boot vectors point here
 
@@ -126,13 +126,13 @@ static ADDRESS_MAP_START( cdi910_mem, AS_PROGRAM, 16, cdi_state )
 ADDRESS_MAP_END
 
 
-static ADDRESS_MAP_START( cdimono2_servo_mem, AS_PROGRAM, 8, cdi_state )
+ADDRESS_MAP_START(cdi_state::cdimono2_servo_mem)
 	AM_RANGE(0x0000, 0x001f) AM_READWRITE(servo_io_r, servo_io_w)
 	AM_RANGE(0x0050, 0x00ff) AM_RAM
 	AM_RANGE(0x0100, 0x1fff) AM_ROM AM_REGION("servo", 0x100)
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( cdimono2_slave_mem, AS_PROGRAM, 8, cdi_state )
+ADDRESS_MAP_START(cdi_state::cdimono2_slave_mem)
 	AM_RANGE(0x0000, 0x001f) AM_READWRITE(slave_io_r, slave_io_w)
 	AM_RANGE(0x0050, 0x00ff) AM_RAM
 	AM_RANGE(0x0100, 0x1fff) AM_ROM AM_REGION("slave", 0x100)
@@ -946,7 +946,7 @@ READ8_MEMBER( cdi_state::quizard_mcu_p1_r )
 	return machine().rand();
 }
 
-static ADDRESS_MAP_START( mcu_io_map, AS_IO, 8, cdi_state )
+ADDRESS_MAP_START(cdi_state::mcu_io_map)
 	ADDRESS_MAP_UNMAP_HIGH
 	AM_RANGE(MCS51_PORT_P1, MCS51_PORT_P1) AM_READ(quizard_mcu_p1_r)
 ADDRESS_MAP_END

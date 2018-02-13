@@ -147,7 +147,7 @@ uint16_t via6522_device::get_counter1_value()
 // device type definition
 DEFINE_DEVICE_TYPE(VIA6522, via6522_device, "via6522", "6522 VIA")
 
-DEVICE_ADDRESS_MAP_START( map, 8, via6522_device )
+ADDRESS_MAP_START(via6522_device::map)
 	AM_RANGE(0x00, 0x0f) AM_READWRITE(read, write)
 ADDRESS_MAP_END
 

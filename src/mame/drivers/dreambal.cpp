@@ -73,6 +73,7 @@ public:
 		}
 	}
 	void dreambal(machine_config &config);
+	void dreambal_map(address_map &map);
 };
 
 
@@ -110,7 +111,7 @@ WRITE16_MEMBER( dreambal_state::dreambal_protection_region_0_104_w )
 	m_deco104->write_data( space, deco146_addr, data, mem_mask, cs );
 }
 
-static ADDRESS_MAP_START( dreambal_map, AS_PROGRAM, 16, dreambal_state )
+ADDRESS_MAP_START(dreambal_state::dreambal_map)
 //ADDRESS_MAP_UNMAP_HIGH
 	AM_RANGE(0x000000, 0x07ffff) AM_ROM
 	AM_RANGE(0x100000, 0x100fff) AM_DEVREADWRITE("tilegen1", deco16ic_device, pf1_data_r, pf1_data_w)

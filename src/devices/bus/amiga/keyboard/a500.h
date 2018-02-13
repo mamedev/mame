@@ -66,6 +66,7 @@ public:
 
 	DECLARE_INPUT_CHANGED_MEMBER(check_reset);
 
+	void mpu6500_map(address_map &map);
 protected:
 	a500_kbd_device(
 			const machine_config &mconfig,

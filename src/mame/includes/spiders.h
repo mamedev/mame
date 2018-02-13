@@ -46,4 +46,6 @@ public:
 	required_device<cpu_device> m_audiocpu;
 	void spiders(machine_config &config);
 	void spiders_audio(machine_config &config);
+	void spiders_audio_map(address_map &map);
+	void spiders_main_map(address_map &map);
 };

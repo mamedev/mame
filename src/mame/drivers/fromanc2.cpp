@@ -171,7 +171,7 @@ WRITE16_MEMBER(fromanc2_state::uart_w)
  *
  *************************************/
 
-static ADDRESS_MAP_START( fromanc2_main_map, AS_PROGRAM, 16, fromanc2_state )
+ADDRESS_MAP_START(fromanc2_state::fromanc2_main_map)
 	AM_RANGE(0x000000, 0x07ffff) AM_ROM                                 // MAIN ROM
 
 	AM_RANGE(0x802000, 0x802fff) AM_READNOP                             // ???
@@ -204,7 +204,7 @@ static ADDRESS_MAP_START( fromanc2_main_map, AS_PROGRAM, 16, fromanc2_state )
 	AM_RANGE(0xd80000, 0xd8ffff) AM_RAM                                 // WORK RAM
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( fromancr_main_map, AS_PROGRAM, 16, fromanc2_state )
+ADDRESS_MAP_START(fromanc2_state::fromancr_main_map)
 	AM_RANGE(0x000000, 0x07ffff) AM_ROM                                 // MAIN ROM
 
 	AM_RANGE(0x800000, 0x803fff) AM_WRITE(fromancr_videoram_0_w)        // VRAM BG (1P/2P)
@@ -232,7 +232,7 @@ static ADDRESS_MAP_START( fromancr_main_map, AS_PROGRAM, 16, fromanc2_state )
 	AM_RANGE(0xd80000, 0xd8ffff) AM_RAM                                 // WORK RAM
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( fromanc4_main_map, AS_PROGRAM, 16, fromanc2_state )
+ADDRESS_MAP_START(fromanc2_state::fromanc4_main_map)
 	AM_RANGE(0x000000, 0x07ffff) AM_ROM                             // MAIN ROM
 	AM_RANGE(0x400000, 0x7fffff) AM_ROM                             // DATA ROM
 
@@ -263,18 +263,19 @@ static ADDRESS_MAP_START( fromanc4_main_map, AS_PROGRAM, 16, fromanc2_state )
 	AM_RANGE(0xe30000, 0xe30013) AM_WRITENOP                        // ???
 	AM_RANGE(0xe40000, 0xe40013) AM_WRITENOP                        // ???
 
-	AM_RANGE(0xe50000, 0xe5000f) AM_DEVREAD8("uart", ns16550_device, ins8250_r, 0x00ff) AM_WRITE(uart_w) // EXT-COMM PORT ?
+	AM_RANGE(0xe50000, 0xe5000f) AM_DEVREAD8("uart", ns16550_device, ins8250_r, 0x00ff) // EXT-COMM PORT ?
+	AM_RANGE(0xe50000, 0xe5000f) AM_WRITE(uart_w) // EXT-COMM PORT ?
 ADDRESS_MAP_END
 
 
-static ADDRESS_MAP_START( fromanc2_sub_map, AS_PROGRAM, 8, fromanc2_state )
+ADDRESS_MAP_START(fromanc2_state::fromanc2_sub_map)
 	AM_RANGE(0x0000, 0x3fff) AM_ROM                                 // ROM
 	AM_RANGE(0x4000, 0x7fff) AM_ROMBANK("bank1")                    // ROM(BANK)
 	AM_RANGE(0x8000, 0xbfff) AM_RAM                                 // RAM(WORK)
 	AM_RANGE(0xc000, 0xffff) AM_RAMBANK("bank2")                    // RAM(BANK)
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( fromanc2_sub_io_map, AS_IO, 8, fromanc2_state )
+ADDRESS_MAP_START(fromanc2_state::fromanc2_sub_io_map)
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	AM_RANGE(0x00, 0x00) AM_WRITE(fromanc2_subcpu_rombank_w)
 	AM_RANGE(0x02, 0x02) AM_READWRITE(fromanc2_maincpu_r_l, fromanc2_maincpu_w_l) // to/from MAIN CPU
@@ -283,12 +284,12 @@ static ADDRESS_MAP_START( fromanc2_sub_io_map, AS_IO, 8, fromanc2_state )
 ADDRESS_MAP_END
 
 
-static ADDRESS_MAP_START( fromanc2_sound_map, AS_PROGRAM, 8, fromanc2_state )
+ADDRESS_MAP_START(fromanc2_state::fromanc2_sound_map)
 	AM_RANGE(0x0000, 0xdfff) AM_ROM
 	AM_RANGE(0xe000, 0xffff) AM_RAM
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( fromanc2_sound_io_map, AS_IO, 8, fromanc2_state )
+ADDRESS_MAP_START(fromanc2_state::fromanc2_sound_io_map)
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	AM_RANGE(0x00, 0x00) AM_DEVREAD("soundlatch", generic_latch_8_device, read) AM_WRITENOP     // snd cmd (1P) / ?
 	AM_RANGE(0x04, 0x04) AM_DEVREAD("soundlatch2", generic_latch_8_device, read)                // snd cmd (2P)

@@ -46,6 +46,8 @@ public:
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
 	void dorachan(machine_config &config);
+	void dorachan_io_map(address_map &map);
+	void dorachan_map(address_map &map);
 };
 
 
@@ -128,7 +130,7 @@ WRITE8_MEMBER(dorachan_state::control_w)
 }
 
 
-static ADDRESS_MAP_START( dorachan_map, AS_PROGRAM, 8, dorachan_state )
+ADDRESS_MAP_START(dorachan_state::dorachan_map)
 	AM_RANGE(0x0000, 0x17ff) AM_ROM
 	AM_RANGE(0x1800, 0x1fff) AM_RAM
 	AM_RANGE(0x2000, 0x23ff) AM_ROM
@@ -140,7 +142,7 @@ static ADDRESS_MAP_START( dorachan_map, AS_PROGRAM, 8, dorachan_state )
 	AM_RANGE(0x6000, 0x77ff) AM_ROM
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( dorachan_io_map, AS_IO, 8, dorachan_state )
+ADDRESS_MAP_START(dorachan_state::dorachan_io_map)
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	AM_RANGE(0x01, 0x01) AM_WRITENOP
 	AM_RANGE(0x02, 0x02) AM_WRITENOP

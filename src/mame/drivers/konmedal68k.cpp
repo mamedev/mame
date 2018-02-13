@@ -78,6 +78,7 @@ public:
 		return m_k056832->piratesh_rom_r(space, offset, mem_mask);
 	}
 
+	void kzaurus_main(address_map &map);
 protected:
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
@@ -187,7 +188,7 @@ uint32_t konmedal68k_state::screen_update_konmedal68k(screen_device &screen, bit
 	return 0;
 }
 
-static ADDRESS_MAP_START( kzaurus_main, AS_PROGRAM, 16, konmedal68k_state )
+ADDRESS_MAP_START(konmedal68k_state::kzaurus_main)
 	AM_RANGE(0x000000, 0x07ffff) AM_ROM AM_REGION("maincpu", 0)
 	AM_RANGE(0x400000, 0x403fff) AM_RAM
 	AM_RANGE(0x800000, 0x800001) AM_WRITE(control_w)

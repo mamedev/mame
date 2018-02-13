@@ -113,7 +113,7 @@ WRITE8_MEMBER(fcombat_state::ee00_w)
 {
 }
 
-static ADDRESS_MAP_START( main_map, AS_PROGRAM, 8, fcombat_state )
+ADDRESS_MAP_START(fcombat_state::main_map)
 	AM_RANGE(0x0000, 0x7fff) AM_ROM
 	AM_RANGE(0xc000, 0xc7ff) AM_RAM
 	AM_RANGE(0xd000, 0xd7ff) AM_RAM AM_SHARE("videoram")
@@ -134,7 +134,7 @@ static ADDRESS_MAP_START( main_map, AS_PROGRAM, 8, fcombat_state )
 ADDRESS_MAP_END
 
 
-static ADDRESS_MAP_START( audio_map, AS_PROGRAM, 8, fcombat_state )
+ADDRESS_MAP_START(fcombat_state::audio_map)
 	AM_RANGE(0x0000, 0x3fff) AM_ROM
 	AM_RANGE(0x4000, 0x47ff) AM_RAM
 	AM_RANGE(0x6000, 0x6000) AM_DEVREAD("soundlatch", generic_latch_8_device, read)

@@ -89,6 +89,7 @@ public:
 		STATE_RTE = 0x300
 	};
 
+	void decrypted_opcodes_map(address_map &map);
 protected:
 	required_memory_bank m_decrypted_opcodes_bank;
 

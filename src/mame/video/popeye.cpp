@@ -109,7 +109,7 @@ static const res_net_info popeye_7052_obj_net_info =
 };
 
 
-PALETTE_INIT_MEMBER(popeye_state, tpp1)
+PALETTE_INIT_MEMBER(tpp1_state, palette_init)
 {
 	/* Two of the PROM address pins are tied together */
 	for (int i = 0; i < 0x20; i++)
@@ -123,21 +123,7 @@ PALETTE_INIT_MEMBER(popeye_state, tpp1)
 	update_palette();
 }
 
-PALETTE_INIT_MEMBER(popeye_state,popeyebl)
-{
-	/* Two of the PROM address pins are tied together */
-	for (int i = 0; i < 0x20; i++)
-	{
-		int color = (i & 0xf) | ((i & 0x8) << 1);
-		m_color_prom[i + 0x20] = m_color_prom[color + 0x20];
-	}
-
-	m_last_palette = -1;
-
-	update_palette();
-}
-
-PALETTE_INIT_MEMBER(popeye_state, tnx1)
+PALETTE_INIT_MEMBER(tnx1_state, palette_init)
 {
 	/* Two of the PROM address pins are tied together and one is not connected... */
 	for (int i = 0;i < 0x100;i++)
@@ -151,7 +137,7 @@ PALETTE_INIT_MEMBER(popeye_state, tnx1)
 	update_palette();
 }
 
-void popeye_state::update_palette()
+void tnx1_state::update_palette()
 {
 	if ((*m_palettebank ^ m_last_palette) & 0x08)
 	{
@@ -268,48 +254,48 @@ void popeye_state::update_palette()
 	m_last_palette = *m_palettebank;
 }
 
-WRITE8_MEMBER(popeye_state::tnx1_bitmap_w)
+WRITE8_MEMBER(tnx1_state::background_w)
 {
 	// TODO: confirm the memory layout
 	bool lsn = (data & 0x80) == 0;
 	if (lsn)
 	{
-		m_bitmapram[offset] = (m_bitmapram[offset] & 0xf0) | (data & 0xf);
+		m_background_ram[offset] = (m_background_ram[offset] & 0xf0) | (data & 0xf);
 	}
 	else
 	{
-		m_bitmapram[offset] = (m_bitmapram[offset] & 0x0f) | (data << 4);
+		m_background_ram[offset] = (m_background_ram[offset] & 0x0f) | (data << 4);
 	}
 }
 
-WRITE8_MEMBER(popeye_state::tpp2_bitmap_w)
+WRITE8_MEMBER(tpp2_state::background_w)
 {
 	// TODO: confirm the memory layout
 	bool lsn = (offset & 0x40) == 0;
 	offset = (offset & 0x3f) | ((offset & ~0x7f) >> 1);
 	if (lsn)
 	{
-		m_bitmapram[offset] = (m_bitmapram[offset] & 0xf0) | (data & 0xf);
+		m_background_ram[offset] = (m_background_ram[offset] & 0xf0) | (data & 0xf);
 	}
 	else
 	{
-		m_bitmapram[offset] = (m_bitmapram[offset] & 0x0f) | (data << 4);
+		m_background_ram[offset] = (m_background_ram[offset] & 0x0f) | (data << 4);
 	}
 }
 
-WRITE8_MEMBER(popeye_state::popeye_videoram_w)
+WRITE8_MEMBER(tnx1_state::popeye_videoram_w)
 {
 	m_videoram[offset] = data;
 	m_fg_tilemap->mark_tile_dirty(offset);
 }
 
-WRITE8_MEMBER(popeye_state::popeye_colorram_w)
+WRITE8_MEMBER(tnx1_state::popeye_colorram_w)
 {
 	m_colorram[offset] = data;
 	m_fg_tilemap->mark_tile_dirty(offset);
 }
 
-TILE_GET_INFO_MEMBER(popeye_state::get_fg_tile_info)
+TILE_GET_INFO_MEMBER(tnx1_state::get_fg_tile_info)
 {
 	int code = m_videoram[tile_index];
 	int color = m_colorram[tile_index] & 0x0f;
@@ -317,37 +303,21 @@ TILE_GET_INFO_MEMBER(popeye_state::get_fg_tile_info)
 	SET_TILE_INFO_MEMBER(0, code, color, 0);
 }
 
-void popeye_state::video_start()
+void tnx1_state::video_start()
 {
 	m_sprite_bitmap = std::make_unique<bitmap_ind16>(512, 512);
 
-	m_fg_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(popeye_state::get_fg_tile_info),this), TILEMAP_SCAN_ROWS, 16, 16, 32, 32);
+	m_fg_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(tnx1_state::get_fg_tile_info),this), TILEMAP_SCAN_ROWS, 16, 16, 32, 32);
 	m_fg_tilemap->set_transparent_pen(0);
 
 	m_field = 0;
 
 	save_item(NAME(m_field));
 	save_item(NAME(m_last_palette));
-	save_item(NAME(*m_sprite_bitmap));
-	save_item(NAME(m_bitmapram));
+	save_item(NAME(m_background_ram));
 }
 
-VIDEO_START_MEMBER(popeye_state,tpp1)
-{
-	m_sprite_bitmap = std::make_unique<bitmap_ind16>(512, 512);
-
-	m_fg_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(popeye_state::get_fg_tile_info),this), TILEMAP_SCAN_ROWS, 16, 16, 32, 32);
-	m_fg_tilemap->set_transparent_pen(0);
-
-	m_field = 0;
-
-	save_item(NAME(m_field));
-	save_item(NAME(m_last_palette));
-	save_item(NAME(*m_sprite_bitmap));
-	save_item(NAME(m_bitmapram));
-}
-
-void popeye_state::draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprect)
+void tnx1_state::draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
 	m_sprite_bitmap->fill(0, cliprect);
 
@@ -377,7 +347,7 @@ void popeye_state::draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprect)
 			{
 				/*
 				* offs+3:
-				* bit 7 ?
+				* bit 7 ? TODO: figure out why olive oil and wimpy have some of these bits set
 				* bit 6 ?
 				* bit 5 ?
 				* bit 4 MSB of sprite code
@@ -430,7 +400,7 @@ void popeye_state::draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprect)
 	copybitmap_trans(bitmap, *m_sprite_bitmap, 0, 0, 0, 0, cliprect, 0);
 }
 
-void popeye_state::draw_field(bitmap_ind16 &bitmap, const rectangle &cliprect)
+void tnx1_state::draw_field(bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
 	int x;
 	int y;
@@ -440,10 +410,8 @@ void popeye_state::draw_field(bitmap_ind16 &bitmap, const rectangle &cliprect)
 			bitmap.pix(y, x) = 0;
 }
 
-uint32_t popeye_state::screen_update_tnx1(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
+void tnx1_state::draw_background(bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
-	update_palette();
-
 	for (int y = cliprect.min_y; y <= cliprect.max_y; y++)
 	{
 		int sy = y;
@@ -455,30 +423,21 @@ uint32_t popeye_state::screen_update_tnx1(screen_device &screen, bitmap_ind16 &b
 		for (int x = cliprect.min_x; x <= cliprect.max_x; x++)
 		{
 			if (sy < 0)
-				bitmap.pix16(y, x) = m_bitmapram[0x3f] & 0xf; // TODO: find out exactly where the data is fetched from
+				bitmap.pix16(y, x) = m_background_ram[0x3f] & 0xf; // TODO: find out exactly where the data is fetched from
 			else
 			{
 				// TODO: confirm the memory layout
 				int sx = x + (2 * (m_background_pos[0] | ((m_background_pos[2] & 1) << 8))) + 0x70;
 				int shift = (sx & 0x200) / 0x80;
 
-				bitmap.pix16(y, x) = (m_bitmapram[((sx / 8) & 0x3f) + ((sy / 8) * 0x40)] >> shift) & 0xf;
+				bitmap.pix16(y, x) = (m_background_ram[((sx / 8) & 0x3f) + ((sy / 8) * 0x40)] >> shift) & 0xf;
 			}
 		}
 	}
-
-	draw_sprites(bitmap, cliprect);
-	m_fg_tilemap->draw(screen, bitmap, cliprect, 0, 0);
-#if USE_INTERLACE
-	draw_field(bitmap, cliprect);
-#endif
-	return 0;
 }
 
-uint32_t popeye_state::screen_update_tpp1(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
+void tpp1_state::draw_background(bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
-	update_palette();
-
 	for (int y = cliprect.min_y; y <= cliprect.max_y; y++)
 	{
 		int sy = y;
@@ -490,18 +449,49 @@ uint32_t popeye_state::screen_update_tpp1(screen_device &screen, bitmap_ind16 &b
 		for (int x = cliprect.min_x; x <= cliprect.max_x; x++)
 		{
 			if (sy < 0)
-				bitmap.pix16(y, x) = m_bitmapram[0x3f] & 0xf; // TODO: find out exactly where the data is fetched from
+				bitmap.pix16(y, x) = m_background_ram[0x3f] & 0xf; // TODO: find out exactly where the data is fetched from
 			else
 			{
 				// TODO: confirm the memory layout
 				int sx = x + (2 * m_background_pos[0]) + 0x70;
 				int shift = (sy & 4);
 
-				bitmap.pix16(y, x) = (m_bitmapram[((sx / 8) & 0x3f) + ((sy / 8) * 0x40)] >> shift) & 0xf;
+				bitmap.pix16(y, x) = (m_background_ram[((sx / 8) & 0x3f) + ((sy / 8) * 0x40)] >> shift) & 0xf;
 			}
 		}
 	}
+}
 
+void tpp2_state::draw_background(bitmap_ind16 &bitmap, const rectangle &cliprect)
+{
+	for (int y = cliprect.min_y; y <= cliprect.max_y; y++)
+	{
+		int sy = y;
+		if (flip_screen())
+			sy ^= 0x1ff;
+
+		sy -= 0x200 - (2 * m_background_pos[1]);
+
+		for (int x = cliprect.min_x; x <= cliprect.max_x; x++)
+		{
+			if (sy < 0)
+				bitmap.pix16(y, x) = m_background_ram[0x3f] & 0xf; // TODO: find out exactly where the data is fetched from
+			else
+			{
+				// TODO: confirm the memory layout
+				int sx = x + (2 * m_background_pos[0]) + 0x72;
+				int shift = (sy & 4);
+
+				bitmap.pix16(y, x) = (m_background_ram[((sx / 8) & 0x3f) + ((sy / 8) * 0x40)] >> shift) & 0xf;
+			}
+		}
+	}
+}
+
+uint32_t tnx1_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
+{
+	update_palette();
+	draw_background(bitmap, cliprect);
 	draw_sprites(bitmap, cliprect);
 	m_fg_tilemap->draw(screen, bitmap, cliprect, 0, 0);
 #if USE_INTERLACE

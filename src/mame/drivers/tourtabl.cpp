@@ -31,6 +31,7 @@ public:
 	DECLARE_READ16_MEMBER(tourtabl_read_input_port);
 	DECLARE_READ8_MEMBER(tourtabl_get_databus_contents);
 	void tourtabl(machine_config &config);
+	void main_map(address_map &map);
 };
 
 
@@ -61,7 +62,7 @@ READ8_MEMBER(tourtabl_state::tourtabl_get_databus_contents)
 }
 
 
-static ADDRESS_MAP_START( main_map, AS_PROGRAM, 8, tourtabl_state )
+ADDRESS_MAP_START(tourtabl_state::main_map)
 	AM_RANGE(0x0000, 0x007f) AM_MIRROR(0x0100) AM_DEVREADWRITE("tia_video", tia_video_device, read, write)
 	AM_RANGE(0x0080, 0x00ff) AM_MIRROR(0x0100) AM_RAM
 	AM_RANGE(0x0280, 0x029f) AM_DEVREADWRITE("riot1", riot6532_device, read, write)

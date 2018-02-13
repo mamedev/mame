@@ -105,7 +105,7 @@ const tiny_rom_entry *hardbox_device::device_rom_region() const
 //  ADDRESS_MAP( hardbox_mem )
 //-------------------------------------------------
 
-static ADDRESS_MAP_START( hardbox_mem, AS_PROGRAM, 8, hardbox_device )
+ADDRESS_MAP_START(hardbox_device::hardbox_mem)
 	AM_RANGE(0x0000, 0x3fff) AM_RAM
 	AM_RANGE(0xe000, 0xffff) AM_ROM AM_REGION(Z80_TAG, 0)
 ADDRESS_MAP_END
@@ -115,7 +115,7 @@ ADDRESS_MAP_END
 //  ADDRESS_MAP( hardbox_io )
 //-------------------------------------------------
 
-static ADDRESS_MAP_START( hardbox_io, AS_IO, 8, hardbox_device )
+ADDRESS_MAP_START(hardbox_device::hardbox_io)
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	AM_RANGE(0x10, 0x13) AM_DEVREADWRITE(I8255_0_TAG, i8255_device, read, write)
 	AM_RANGE(0x14, 0x17) AM_DEVREADWRITE(I8255_1_TAG, i8255_device, read, write)

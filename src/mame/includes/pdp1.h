@@ -303,6 +303,7 @@ public:
 	int read_spacewar() { return m_spacewar->read(); }
 
 	void pdp1(machine_config &config);
+	void pdp1_map(address_map &map);
 private:
 	pdp1_reset_param_t m_reset_param;
 	int m_old_typewriter_keys[4];

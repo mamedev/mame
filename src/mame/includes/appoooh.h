@@ -70,6 +70,9 @@ public:
 	void robowres(machine_config &config);
 	void appoooh(machine_config &config);
 	void appoooh_common(machine_config &config);
+	void decrypted_opcodes_map(address_map &map);
+	void main_map(address_map &map);
+	void main_portmap(address_map &map);
 };
 
 #define CHR1_OFST   0x00  /* palette page of char set #1 */

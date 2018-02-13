@@ -28,16 +28,16 @@ DEFINE_DEVICE_TYPE(NAMCO_C139, namco_c139_device, "namco_c139", "Namco C139 Seri
 //  LIVE DEVICE
 //**************************************************************************
 
-static ADDRESS_MAP_START( data_map, AS_DATA, 16, namco_c139_device )
+ADDRESS_MAP_START(namco_c139_device::data_map)
 	AM_RANGE(0x0000, 0x3fff) AM_RAM AM_SHARE("sharedram")
 ADDRESS_MAP_END
 
-DEVICE_ADDRESS_MAP_START( regs_map, 16, namco_c139_device )
-	AM_RANGE(0x00, 0x00) AM_READ(status_r) // WRITE clears flags
-	AM_RANGE(0x02, 0x02) AM_NOP // settings?
-//  AM_RANGE(0x0a, 0x0a) // WRITE tx_w
-//  AM_RANGE(0x0c, 0x0c) // READ rx_r
-//  AM_RANGE(0x0e, 0x0e) //
+ADDRESS_MAP_START(namco_c139_device::regs_map)
+	AM_RANGE(0x00, 0x01) AM_READ(status_r) // WRITE clears flags
+	AM_RANGE(0x02, 0x03) AM_NOP // settings?
+//  AM_RANGE(0x0a, 0x0b) // WRITE tx_w
+//  AM_RANGE(0x0c, 0x0d) // READ rx_r
+//  AM_RANGE(0x0e, 0x0f) //
 ADDRESS_MAP_END
 
 //-------------------------------------------------
@@ -47,7 +47,7 @@ ADDRESS_MAP_END
 namco_c139_device::namco_c139_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
 	: device_t(mconfig, NAMCO_C139, tag, owner, clock),
 	device_memory_interface(mconfig, *this),
-	m_space_config("data", ENDIANNESS_BIG, 16, 14, 0, *ADDRESS_MAP_NAME(data_map))
+	m_space_config("data", ENDIANNESS_BIG, 16, 14, 0, address_map_constructor(FUNC(namco_c139_device::data_map), this))
 {
 }
 

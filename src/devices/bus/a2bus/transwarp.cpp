@@ -31,7 +31,7 @@ DEFINE_DEVICE_TYPE(A2BUS_TRANSWARP, a2bus_transwarp_device, "a2twarp", "Applied 
 
 #define CPU_TAG         "tw65c02"
 
-static ADDRESS_MAP_START( m65c02_mem, AS_PROGRAM, 8, a2bus_transwarp_device )
+ADDRESS_MAP_START(a2bus_transwarp_device::m65c02_mem)
 	AM_RANGE(0x0000, 0xffff) AM_READWRITE(dma_r, dma_w)
 ADDRESS_MAP_END
 

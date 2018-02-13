@@ -186,7 +186,7 @@ WRITE16_MEMBER(taito_f3_state::f3_unk_w)
 
 /******************************************************************************/
 
-static ADDRESS_MAP_START( f3_map, AS_PROGRAM, 32, taito_f3_state )
+ADDRESS_MAP_START(taito_f3_state::f3_map)
 	AM_RANGE(0x000000, 0x1fffff) AM_ROM
 	AM_RANGE(0x300000, 0x30007f) AM_WRITE(f3_sound_bankswitch_w)
 	AM_RANGE(0x400000, 0x41ffff) AM_MIRROR(0x20000) AM_RAM AM_SHARE("f3_ram")
@@ -206,7 +206,7 @@ static ADDRESS_MAP_START( f3_map, AS_PROGRAM, 32, taito_f3_state )
 	AM_RANGE(0xc80100, 0xc80103) AM_WRITE(f3_sound_reset_1_w)
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( bubsympb_map, AS_PROGRAM, 32, taito_f3_state )
+ADDRESS_MAP_START(taito_f3_state::bubsympb_map)
 	AM_RANGE(0x000000, 0x1fffff) AM_ROM
 	AM_RANGE(0x300000, 0x30007f) AM_WRITE(f3_sound_bankswitch_w)
 	AM_RANGE(0x400000, 0x41ffff) AM_MIRROR(0x20000) AM_RAM AM_SHARE("f3_ram")

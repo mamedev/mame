@@ -80,6 +80,8 @@ public:
 	void tvlinkp(machine_config &config);
 	void svision(machine_config &config);
 	void svisionn(machine_config &config);
+	void svision_mem(address_map &map);
+	void tvlink_mem(address_map &map);
 protected:
 	required_device<cpu_device> m_maincpu;
 	required_device<svision_sound_device> m_sound;

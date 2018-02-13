@@ -260,7 +260,7 @@ WRITE8_MEMBER(pacland_state::irq_2_ctrl_w)
 
 
 
-static ADDRESS_MAP_START( main_map, AS_PROGRAM, 8, pacland_state )
+ADDRESS_MAP_START(pacland_state::main_map)
 	AM_RANGE(0x0000, 0x0fff) AM_RAM_WRITE(videoram_w) AM_SHARE("videoram")
 	AM_RANGE(0x1000, 0x1fff) AM_RAM_WRITE(videoram2_w) AM_SHARE("videoram2")
 	AM_RANGE(0x2000, 0x37ff) AM_RAM AM_SHARE("spriteram")
@@ -276,7 +276,7 @@ static ADDRESS_MAP_START( main_map, AS_PROGRAM, 8, pacland_state )
 	AM_RANGE(0x9000, 0x9fff) AM_WRITE(flipscreen_w)
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( mcu_map, AS_PROGRAM, 8, pacland_state )
+ADDRESS_MAP_START(pacland_state::mcu_map)
 	AM_RANGE(0x0000, 0x001f) AM_DEVREADWRITE("mcu", hd63701_cpu_device, m6801_io_r, m6801_io_w)
 	AM_RANGE(0x0080, 0x00ff) AM_RAM
 	AM_RANGE(0x1000, 0x13ff) AM_DEVREADWRITE("namco", namco_cus30_device, namcos1_cus30_r, namcos1_cus30_w)      /* PSG device, shared RAM */
@@ -294,7 +294,7 @@ READ8_MEMBER(pacland_state::readFF)
 	return 0xff;
 }
 
-static ADDRESS_MAP_START( mcu_port_map, AS_IO, 8, pacland_state )
+ADDRESS_MAP_START(pacland_state::mcu_port_map)
 	AM_RANGE(M6801_PORT1, M6801_PORT1) AM_READ_PORT("IN2")
 	AM_RANGE(M6801_PORT1, M6801_PORT1) AM_WRITE(coin_w)
 	AM_RANGE(M6801_PORT2, M6801_PORT2) AM_READ(readFF)  /* leds won't work otherwise */

@@ -78,4 +78,7 @@ public:
 	K056832_CB_MEMBER(tile_callback);
 	K053246_CB_MEMBER(sprite_callback);
 	void dbz(machine_config &config);
+	void dbz_map(address_map &map);
+	void dbz_sound_io_map(address_map &map);
+	void dbz_sound_map(address_map &map);
 };

@@ -123,6 +123,8 @@ public:
 	static void mpc105_config(device_t *device);
 	void bebox(machine_config &config);
 	void bebox2(machine_config &config);
+	void bebox_mem(address_map &map);
+	void bebox_slave_mem(address_map &map);
 protected:
 	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr) override;
 };

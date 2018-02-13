@@ -80,7 +80,7 @@ WRITE8_MEMBER( eti660_state::colorram_w )
 
 /* Memory Maps */
 
-static ADDRESS_MAP_START( mem_map, AS_PROGRAM, 8, eti660_state )
+ADDRESS_MAP_START(eti660_state::mem_map)
 	ADDRESS_MAP_GLOBAL_MASK(0xfff)
 	AM_RANGE(0x0000, 0x03ff) AM_ROM
 	AM_RANGE(0x0400, 0x047f) AM_RAM
@@ -88,7 +88,7 @@ static ADDRESS_MAP_START( mem_map, AS_PROGRAM, 8, eti660_state )
 	AM_RANGE(0x0600, 0x0fff) AM_RAM
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( io_map, AS_IO, 8, eti660_state )
+ADDRESS_MAP_START(eti660_state::io_map)
 	AM_RANGE(0x01, 0x01) AM_DEVREADWRITE(CDP1864_TAG, cdp1864_device, dispon_r, step_bgcolor_w)
 	AM_RANGE(0x02, 0x02) AM_READWRITE(pia_r, pia_w)
 	AM_RANGE(0x03, 0x03) AM_WRITE(colorram_w)

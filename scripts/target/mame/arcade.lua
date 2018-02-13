@@ -861,6 +861,8 @@ function createMAMEProjects(_target, _subtarget, _name)
 	}
 	includedirs {
 		ext_includedir("flac"),
+		ext_includedir("glm"),
+		ext_includedir("jpeg"),
 	}
 
 end
@@ -3156,11 +3158,6 @@ files {
 }
 
 createMAMEProjects(_target, _subtarget, "sega")
-
-includedirs {
-	ext_includedir("glm"),
-}
-
 files {
 	MAME_DIR .. "src/mame/drivers/angelkds.cpp",
 	MAME_DIR .. "src/mame/includes/angelkds.h",
@@ -4416,11 +4413,6 @@ files {
 --------------------------------------------------
 
 createMAMEProjects(_target, _subtarget, "misc")
-
-includedirs {
-	ext_includedir("jpeg"),
-}
-
 files {
 	MAME_DIR .. "src/mame/drivers/39in1.cpp",
 	MAME_DIR .. "src/mame/machine/pxa255.h",

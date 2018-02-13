@@ -182,6 +182,25 @@ public:
 	void ghostb(machine_config &config);
 	void oscar(machine_config &config);
 	void gondo(machine_config &config);
+	void cobra_map(address_map &map);
+	void csilver_map(address_map &map);
+	void csilver_s_map(address_map &map);
+	void csilver_sub_map(address_map &map);
+	void dec8_mcu_io_map(address_map &map);
+	void dec8_s_map(address_map &map);
+	void garyoret_map(address_map &map);
+	void gondo_map(address_map &map);
+	void lastmisn_map(address_map &map);
+	void lastmisn_sub_map(address_map &map);
+	void meikyuh_map(address_map &map);
+	void oscar_map(address_map &map);
+	void oscar_s_map(address_map &map);
+	void oscar_sub_map(address_map &map);
+	void shackled_map(address_map &map);
+	void shackled_sub_map(address_map &map);
+	void srdarwin_map(address_map &map);
+	void srdarwin_mcu_io_map(address_map &map);
+	void ym3526_s_map(address_map &map);
 protected:
 	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr) override;
 

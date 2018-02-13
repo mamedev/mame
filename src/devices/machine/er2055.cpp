@@ -19,7 +19,7 @@
 // device type definition
 DEFINE_DEVICE_TYPE(ER2055, er2055_device, "er2055", "ER2055 EAROM")
 
-static ADDRESS_MAP_START( er2055_map, AS_PROGRAM, 8, er2055_device )
+ADDRESS_MAP_START(er2055_device::er2055_map)
 	AM_RANGE(0x0000, 0x003f) AM_RAM
 ADDRESS_MAP_END
 
@@ -38,7 +38,7 @@ er2055_device::er2055_device(const machine_config &mconfig, const char *tag, dev
 		device_memory_interface(mconfig, *this),
 		device_nvram_interface(mconfig, *this),
 		m_region(*this, DEVICE_SELF),
-		m_space_config("EAROM", ENDIANNESS_BIG, 8, 6, 0, *ADDRESS_MAP_NAME(er2055_map)),
+		m_space_config("EAROM", ENDIANNESS_BIG, 8, 6, 0, address_map_constructor(FUNC(er2055_device::er2055_map), this)),
 		m_control_state(0),
 		m_address(0),
 		m_data(0)

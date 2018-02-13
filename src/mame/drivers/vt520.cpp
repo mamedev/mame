@@ -31,10 +31,12 @@ public:
 	required_region_ptr<uint8_t> m_rom;
 	void vt520(machine_config &config);
 	void vt420(machine_config &config);
+	void vt520_io(address_map &map);
+	void vt520_mem(address_map &map);
 };
 
 
-static ADDRESS_MAP_START(vt520_mem, AS_PROGRAM, 8, vt520_state)
+ADDRESS_MAP_START(vt520_state::vt520_mem)
 	AM_RANGE(0x0000, 0xffff) AM_RAMBANK("bank1")
 ADDRESS_MAP_END
 
@@ -51,7 +53,7 @@ READ8_MEMBER( vt520_state::vt520_some_r )
 	return 0x40;
 }
 
-static ADDRESS_MAP_START(vt520_io, AS_IO, 8, vt520_state)
+ADDRESS_MAP_START(vt520_state::vt520_io)
 	ADDRESS_MAP_UNMAP_HIGH
 	AM_RANGE(0x7ffb, 0x7ffb) AM_READ(vt520_some_r)
 ADDRESS_MAP_END

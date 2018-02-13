@@ -28,6 +28,7 @@ public:
 	uint32_t screen_update_comquest(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	required_device<cpu_device> m_maincpu;
 	void comquest(machine_config &config);
+	void comquest_mem(address_map &map);
 };
 
 #endif // MAME_INCLUDES_COMQUEST_H

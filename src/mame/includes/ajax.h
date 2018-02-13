@@ -61,4 +61,7 @@ public:
 	K052109_CB_MEMBER(tile_callback);
 	K051960_CB_MEMBER(sprite_callback);
 	void ajax(machine_config &config);
+	void ajax_main_map(address_map &map);
+	void ajax_sound_map(address_map &map);
+	void ajax_sub_map(address_map &map);
 };

@@ -66,6 +66,7 @@ public:
 	void palm(machine_config &config);
 	void palmpro(machine_config &config);
 	void pilot5k(machine_config &config);
+	void palm_map(address_map &map);
 };
 
 
@@ -164,7 +165,7 @@ PALETTE_INIT_MEMBER(palm_state, palm)
     ADDRESS MAPS
 ***************************************************************************/
 
-static ADDRESS_MAP_START(palm_map, AS_PROGRAM, 16, palm_state)
+ADDRESS_MAP_START(palm_state::palm_map)
 	AM_RANGE(0xc00000, 0xe07fff) AM_ROM AM_REGION("bios", 0)
 	AM_RANGE(0xfff000, 0xffffff) AM_DEVREADWRITE(MC68328_TAG, mc68328_device, read, write)
 ADDRESS_MAP_END

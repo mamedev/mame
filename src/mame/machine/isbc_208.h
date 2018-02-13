@@ -14,7 +14,7 @@ class isbc_208_device : public device_t
 public:
 	isbc_208_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
-	DECLARE_ADDRESS_MAP(map, 8);
+	void map(address_map &map);
 	DECLARE_READ8_MEMBER(stat_r);
 	DECLARE_WRITE8_MEMBER(aux_w);
 

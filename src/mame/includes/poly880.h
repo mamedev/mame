@@ -54,6 +54,8 @@ public:
 	uint8_t m_digit;
 	uint8_t m_segment;
 	void poly880(machine_config &config);
+	void poly880_io(address_map &map);
+	void poly880_mem(address_map &map);
 };
 
 #endif

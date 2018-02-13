@@ -85,6 +85,8 @@ public:
 	int m_sound_g;
 	DECLARE_PALETTE_INIT(advision);
 	void advision(machine_config &config);
+	void io_map(address_map &map);
+	void program_map(address_map &map);
 };
 
 #endif

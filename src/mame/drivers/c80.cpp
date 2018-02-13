@@ -63,13 +63,13 @@ data of next byte, and so on.
 
 /* Memory Maps */
 
-static ADDRESS_MAP_START( c80_mem, AS_PROGRAM, 8, c80_state )
+ADDRESS_MAP_START(c80_state::c80_mem)
 	ADDRESS_MAP_UNMAP_HIGH
 	AM_RANGE(0x0000, 0x07ff) AM_ROM
 	AM_RANGE(0x0800, 0x0bff) AM_MIRROR(0x400) AM_RAM
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( c80_io, AS_IO, 8, c80_state )
+ADDRESS_MAP_START(c80_state::c80_io)
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	AM_RANGE(0x7c, 0x7f) AM_DEVREADWRITE(Z80PIO2_TAG, z80pio_device, read, write)
 	AM_RANGE(0xbc, 0xbf) AM_DEVREADWRITE(Z80PIO1_TAG, z80pio_device, read, write)

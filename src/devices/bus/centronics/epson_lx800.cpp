@@ -52,7 +52,7 @@ const tiny_rom_entry *epson_lx800_device::device_rom_region() const
 //  ADDRESS_MAP( lx800_mem )
 //-------------------------------------------------
 
-static ADDRESS_MAP_START( lx800_mem, AS_PROGRAM, 8, epson_lx800_device )
+ADDRESS_MAP_START(epson_lx800_device::lx800_mem)
 	AM_RANGE(0x0000, 0x7fff) AM_ROM /* 32k firmware */
 	AM_RANGE(0x8000, 0x9fff) AM_RAM /* 8k external RAM */
 	AM_RANGE(0xa000, 0xbfff) AM_NOP /* not used */

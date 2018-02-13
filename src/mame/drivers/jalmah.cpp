@@ -234,6 +234,8 @@ public:
 	required_device<palette_device> m_palette;
 	void urashima(machine_config &config);
 	void jalmah(machine_config &config);
+	void jalmah(address_map &map);
+	void urashima(address_map &map);
 };
 
 
@@ -1015,7 +1017,7 @@ WRITE16_MEMBER(jalmah_state::jalmah_flip_screen_w)
 //  popmessage("%04x",data);
 }
 
-static ADDRESS_MAP_START( jalmah, AS_PROGRAM, 16, jalmah_state )
+ADDRESS_MAP_START(jalmah_state::jalmah)
 	AM_RANGE(0x000000, 0x07ffff) AM_ROM
 	AM_RANGE(0x080000, 0x080001) AM_READ_PORT("SYSTEM")
 	AM_RANGE(0x080002, 0x080003) AM_READ_PORT("DSW")
@@ -1039,7 +1041,7 @@ static ADDRESS_MAP_START( jalmah, AS_PROGRAM, 16, jalmah_state )
 	AM_RANGE(0x100000, 0x10ffff) AM_RAM AM_SHARE("jmcu_code")/*extra RAM for MCU code prg (NOT ON REAL HW!!!)*/
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( urashima, AS_PROGRAM, 16, jalmah_state )
+ADDRESS_MAP_START(jalmah_state::urashima)
 	AM_RANGE(0x000000, 0x07ffff) AM_ROM
 	AM_RANGE(0x080000, 0x080001) AM_READ_PORT("SYSTEM")
 	AM_RANGE(0x080002, 0x080003) AM_READ_PORT("DSW")

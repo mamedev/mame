@@ -23,7 +23,6 @@ public:
 
 	void vck_callback( int st );
 	void hyprolyb_adpcm(machine_config &config);
-
 protected:
 	// device-level overrides
 	virtual void device_start() override;

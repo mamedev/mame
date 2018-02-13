@@ -63,7 +63,7 @@ WRITE8_MEMBER(momoko_state::momoko_bg_read_bank_w)
 
 /****************************************************************************/
 
-static ADDRESS_MAP_START( momoko_map, AS_PROGRAM, 8, momoko_state )
+ADDRESS_MAP_START(momoko_state::momoko_map)
 	AM_RANGE(0x0000, 0xbfff) AM_ROM
 	AM_RANGE(0xc000, 0xcfff) AM_RAM
 	AM_RANGE(0xd064, 0xd0ff) AM_RAM AM_SHARE("spriteram")
@@ -87,7 +87,7 @@ static ADDRESS_MAP_START( momoko_map, AS_PROGRAM, 8, momoko_state )
 	AM_RANGE(0xf007, 0xf007) AM_WRITE(momoko_bg_priority_w)
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( momoko_sound_map, AS_PROGRAM, 8, momoko_state )
+ADDRESS_MAP_START(momoko_state::momoko_sound_map)
 	AM_RANGE(0x0000, 0x7fff) AM_ROM
 	AM_RANGE(0x8000, 0x87ff) AM_RAM
 	AM_RANGE(0x9000, 0x9000) AM_WRITENOP /* unknown */

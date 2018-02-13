@@ -74,4 +74,7 @@ public:
 	K053246_CB_MEMBER(sprite_callback);
 	void xmen(machine_config &config);
 	void xmen6p(machine_config &config);
+	void _6p_main_map(address_map &map);
+	void main_map(address_map &map);
+	void sound_map(address_map &map);
 };

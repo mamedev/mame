@@ -69,6 +69,11 @@ public:
 	void montec(machine_config &config);
 	void monteciv(machine_config &config);
 	void megaiv(machine_config &config);
+	void megaiv_mem(address_map &map);
+	void mondial2_mem(address_map &map);
+	void montec_mem(address_map &map);
+	void smondial2_mem(address_map &map);
+	void smondial_mem(address_map &map);
 protected:
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
@@ -240,7 +245,7 @@ READ8_MEMBER(mephisto_montec_state::megaiv_input_r)
 }
 
 
-static ADDRESS_MAP_START(montec_mem , AS_PROGRAM, 8, mephisto_montec_state )
+ADDRESS_MAP_START(mephisto_montec_state::montec_mem)
 	AM_RANGE( 0x0000, 0x1fff ) AM_RAM AM_SHARE("nvram")
 	AM_RANGE( 0x2400, 0x2400 ) AM_READ(montec_input_r)
 	AM_RANGE( 0x2800, 0x2800 ) AM_DEVWRITE("board", mephisto_board_device, mux_w)
@@ -256,7 +261,7 @@ static ADDRESS_MAP_START(montec_mem , AS_PROGRAM, 8, mephisto_montec_state )
 	AM_RANGE( 0x8000, 0xffff ) AM_ROM
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START(megaiv_mem , AS_PROGRAM, 8, mephisto_montec_state )
+ADDRESS_MAP_START(mephisto_montec_state::megaiv_mem)
 	AM_RANGE( 0x0000, 0x1fff ) AM_RAM AM_SHARE("nvram")
 	AM_RANGE( 0x2400, 0x2400 ) AM_WRITE(megaiv_led_w)
 	AM_RANGE( 0x2800, 0x2800 ) AM_DEVWRITE("board", mephisto_board_device, mux_w)
@@ -270,7 +275,7 @@ static ADDRESS_MAP_START(megaiv_mem , AS_PROGRAM, 8, mephisto_montec_state )
 ADDRESS_MAP_END
 
 
-static ADDRESS_MAP_START(smondial2_mem , AS_PROGRAM, 8, mephisto_montec_state )
+ADDRESS_MAP_START(mephisto_montec_state::smondial2_mem)
 	AM_IMPORT_FROM(megaiv_mem)
 	AM_RANGE( 0x4000, 0x7fff ) AM_DEVREAD("cartslot", generic_slot_device, read_rom)
 ADDRESS_MAP_END
@@ -303,7 +308,7 @@ WRITE8_MEMBER(mephisto_montec_state::smondial_led_data_w)
 	m_beeper->set_state(BIT(m_leds_mux, 7));
 }
 
-static ADDRESS_MAP_START(smondial_mem , AS_PROGRAM, 8, mephisto_montec_state )
+ADDRESS_MAP_START(mephisto_montec_state::smondial_mem)
 	AM_RANGE( 0x0000, 0x1fff ) AM_RAM AM_SHARE("nvram")
 	AM_RANGE( 0x4000, 0x4007 ) AM_READ(megaiv_input_r)
 	AM_RANGE( 0x6400, 0x6407 ) AM_WRITE(smondial_led_data_w)
@@ -334,7 +339,7 @@ WRITE8_MEMBER(mephisto_montec_state::mondial2_input_mux_w)
 }
 
 
-static ADDRESS_MAP_START(mondial2_mem , AS_PROGRAM, 8, mephisto_montec_state )
+ADDRESS_MAP_START(mephisto_montec_state::mondial2_mem)
 	AM_RANGE( 0x0000, 0x07ff ) AM_RAM AM_SHARE("nvram")
 	AM_RANGE( 0x2000, 0x2000 ) AM_WRITE(mondial2_input_mux_w)
 	AM_RANGE( 0x2800, 0x2800 ) AM_DEVWRITE("board", mephisto_board_device, mux_w)

@@ -375,7 +375,7 @@ WRITE8_MEMBER(badlands_state::audio_io_w)
  *
  *************************************/
 
-static ADDRESS_MAP_START( main_map, AS_PROGRAM, 16, badlands_state )
+ADDRESS_MAP_START(badlands_state::main_map)
 	AM_RANGE(0x000000, 0x03ffff) AM_ROM
 	AM_RANGE(0xfc0000, 0xfc1fff) AM_READ(sound_busy_r) AM_DEVWRITE("soundcomm", atari_sound_comm_device, sound_reset_w)
 	AM_RANGE(0xfd0000, 0xfd1fff) AM_DEVREADWRITE8("eeprom", eeprom_parallel_28xx_device, read, write, 0x00ff)
@@ -404,7 +404,7 @@ ADDRESS_MAP_END
  *
  *************************************/
 
-static ADDRESS_MAP_START( audio_map, AS_PROGRAM, 8, badlands_state )
+ADDRESS_MAP_START(badlands_state::audio_map)
 	AM_RANGE(0x0000, 0x1fff) AM_RAM
 	AM_RANGE(0x2000, 0x2001) AM_DEVREADWRITE("ymsnd", ym2151_device, read, write)
 	AM_RANGE(0x2800, 0x2bff) AM_READWRITE(audio_io_r, audio_io_w)
@@ -654,7 +654,7 @@ WRITE8_MEMBER(badlands_state::bootleg_shared_w)
 	m_b_sharedram[offset] = data;
 }
 
-static ADDRESS_MAP_START( bootleg_map, AS_PROGRAM, 16, badlands_state )
+ADDRESS_MAP_START(badlands_state::bootleg_map)
 	AM_RANGE(0x000000, 0x03ffff) AM_ROM
 
 	// only 0-0xff accessed, assume all range is shared
@@ -685,7 +685,7 @@ WRITE8_MEMBER(badlands_state::bootleg_main_irq_w)
 	m_maincpu->set_input_line(2, HOLD_LINE);
 }
 
-static ADDRESS_MAP_START( bootleg_audio_map, AS_PROGRAM, 8, badlands_state )
+ADDRESS_MAP_START(badlands_state::bootleg_audio_map)
 	AM_RANGE(0x0000, 0x1fff) AM_ROM AM_REGION("audiorom", 0)
 	AM_RANGE(0x2000, 0x3fff) AM_RAM AM_SHARE("b_sharedram")
 	AM_RANGE(0x4000, 0xcfff) AM_ROM AM_REGION("audiorom", 0x4000)

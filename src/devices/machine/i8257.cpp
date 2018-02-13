@@ -231,7 +231,7 @@ inline void i8257_device::dma_write()
 		}
 		break;
 	}
-	LOGTFR(" channel %d Offset %04x: %02x\n", m_channel, offset, m_temp);
+	LOGTFR(" channel %d Offset %04x: %02x %04x\n", m_current_channel, offset, m_temp, m_channel[m_current_channel].m_count);
 }
 
 
@@ -248,7 +248,6 @@ inline void i8257_device::advance()
 	if(tc)
 	{
 		m_status |= 1 << m_current_channel;
-		m_request &= ~(1 << m_current_channel); // docs imply this isn't right but pc-8001 works better with it
 		set_tc(1);
 
 		if(al)

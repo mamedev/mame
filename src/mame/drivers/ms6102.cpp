@@ -89,6 +89,8 @@ public:
 	void kbd_put(u8 data);
 
 	void ms6102(machine_config &config);
+	void ms6102_io(address_map &map);
+	void ms6102_mem(address_map &map);
 private:
 	bool m_kbd_ready;
 	uint8_t m_kbd_data;
@@ -107,14 +109,14 @@ private:
 	required_region_ptr<u8> m_p_chargen;
 };
 
-static ADDRESS_MAP_START(ms6102_mem, AS_PROGRAM, 8, ms6102_state)
+ADDRESS_MAP_START(ms6102_state::ms6102_mem)
 	ADDRESS_MAP_UNMAP_HIGH
 	AM_RANGE (0x0000, 0x2fff) AM_ROM
 	AM_RANGE (0x3800, 0x3bff) AM_RAM AM_SHARE("nvram")
 	AM_RANGE (0xc000, 0xffff) AM_RAM AM_SHARE("videoram")
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START(ms6102_io, AS_IO, 8, ms6102_state)
+ADDRESS_MAP_START(ms6102_state::ms6102_io)
 	ADDRESS_MAP_UNMAP_HIGH
 	AM_RANGE (0x00, 0x00) AM_DEVREADWRITE("i8251", i8251_device, data_r, data_w)
 	AM_RANGE (0x01, 0x01) AM_DEVREADWRITE("i8251", i8251_device, status_r, control_w)

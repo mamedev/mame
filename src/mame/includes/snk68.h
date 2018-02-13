@@ -74,4 +74,8 @@ public:
 	void streetsm(machine_config &config);
 	void searchar(machine_config &config);
 	void pow(machine_config &config);
+	void pow_map(address_map &map);
+	void searchar_map(address_map &map);
+	void sound_io_map(address_map &map);
+	void sound_map(address_map &map);
 };

@@ -107,7 +107,7 @@ WRITE16_MEMBER(relief_state::audio_volume_w)
 	}
 }
 
-static ADDRESS_MAP_START( oki_map, 0, 8, relief_state )
+ADDRESS_MAP_START(relief_state::oki_map)
 	AM_RANGE(0x00000, 0x1ffff) AM_ROMBANK("okibank")
 	AM_RANGE(0x20000, 0x3ffff) AM_ROM
 ADDRESS_MAP_END
@@ -119,7 +119,7 @@ ADDRESS_MAP_END
  *
  *************************************/
 
-static ADDRESS_MAP_START( main_map, AS_PROGRAM, 16, relief_state )
+ADDRESS_MAP_START(relief_state::main_map)
 	ADDRESS_MAP_UNMAP_HIGH
 	ADDRESS_MAP_GLOBAL_MASK(0x3fffff)
 	AM_RANGE(0x000000, 0x07ffff) AM_ROM

@@ -57,4 +57,5 @@ public:
 	INTERRUPT_GEN_MEMBER(labyrunr_vblank_interrupt);
 	INTERRUPT_GEN_MEMBER(labyrunr_timer_interrupt);
 	void labyrunr(machine_config &config);
+	void labyrunr_map(address_map &map);
 };

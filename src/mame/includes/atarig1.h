@@ -72,6 +72,7 @@ public:
 	void pitfight(machine_config &config);
 	void hydrap(machine_config &config);
 	void hydra(machine_config &config);
+	void main_map(address_map &map);
 private:
 	void pitfightb_cheap_slapstic_init();
 };

@@ -128,6 +128,10 @@ public:
 	optional_shared_ptr<uint8_t> m_decrypted_opcodes;
 	void caloriee(machine_config &config);
 	void calorie(machine_config &config);
+	void calorie_map(address_map &map);
+	void calorie_sound_io_map(address_map &map);
+	void calorie_sound_map(address_map &map);
+	void decrypted_opcodes_map(address_map &map);
 };
 
 
@@ -260,7 +264,7 @@ WRITE8_MEMBER(calorie_state::bogus_w)
  *
  *************************************/
 
-static ADDRESS_MAP_START( calorie_map, AS_PROGRAM, 8, calorie_state )
+ADDRESS_MAP_START(calorie_state::calorie_map)
 	AM_RANGE(0x0000, 0x7fff) AM_ROM
 	AM_RANGE(0x8000, 0xbfff) AM_ROM
 	AM_RANGE(0xc000, 0xcfff) AM_RAM AM_SHARE("ram")
@@ -276,19 +280,19 @@ static ADDRESS_MAP_START( calorie_map, AS_PROGRAM, 8, calorie_state )
 	AM_RANGE(0xf800, 0xf800) AM_DEVWRITE("soundlatch", generic_latch_8_device, write)
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( decrypted_opcodes_map, AS_OPCODES, 8, calorie_state )
+ADDRESS_MAP_START(calorie_state::decrypted_opcodes_map)
 	AM_RANGE(0x0000, 0x7fff) AM_ROM AM_SHARE("decrypted_opcodes")
 	AM_RANGE(0x8000, 0xbfff) AM_ROM
 	AM_RANGE(0xc000, 0xcfff) AM_RAM AM_SHARE("ram")
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( calorie_sound_map, AS_PROGRAM, 8, calorie_state )
+ADDRESS_MAP_START(calorie_state::calorie_sound_map)
 	AM_RANGE(0x0000, 0x3fff) AM_ROM
 	AM_RANGE(0x8000, 0x87ff) AM_RAM
 	AM_RANGE(0xc000, 0xc000) AM_READ(calorie_soundlatch_r)
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( calorie_sound_io_map, AS_IO, 8, calorie_state )
+ADDRESS_MAP_START(calorie_state::calorie_sound_io_map)
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	// 3rd ?
 	AM_RANGE(0x00, 0xff) AM_WRITE(bogus_w)
@@ -460,7 +464,7 @@ MACHINE_CONFIG_START(calorie_state::calorie)
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", Z80,4000000)         /* 4 MHz */
 	MCFG_CPU_PROGRAM_MAP(calorie_map)
-	MCFG_CPU_DECRYPTED_OPCODES_MAP(decrypted_opcodes_map)
+	MCFG_CPU_OPCODES_MAP(decrypted_opcodes_map)
 	MCFG_CPU_VBLANK_INT_DRIVER("screen", calorie_state,  irq0_line_hold)
 
 	MCFG_CPU_ADD("audiocpu", Z80,3000000)        /* 3 MHz */
@@ -500,7 +504,7 @@ MACHINE_CONFIG_END
 MACHINE_CONFIG_DERIVED(calorie_state::caloriee, calorie)
 	MCFG_CPU_REPLACE("maincpu", SEGA_317_0004,4000000)         /* 4 MHz */
 	MCFG_CPU_PROGRAM_MAP(calorie_map)
-	MCFG_CPU_DECRYPTED_OPCODES_MAP(decrypted_opcodes_map)
+	MCFG_CPU_OPCODES_MAP(decrypted_opcodes_map)
 	MCFG_CPU_VBLANK_INT_DRIVER("screen", calorie_state,  irq0_line_hold)
 	MCFG_SEGAZ80_SET_DECRYPTED_TAG(":decrypted_opcodes")
 MACHINE_CONFIG_END

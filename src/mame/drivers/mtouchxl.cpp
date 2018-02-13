@@ -77,6 +77,9 @@ public:
 	DECLARE_READ8_MEMBER(coin_r);
 	void at486(machine_config &config);
 	static void cdrom(device_t *device);
+	void at32_io(address_map &map);
+	void at32_map(address_map &map);
+	void dbank_map(address_map &map);
 };
 
 WRITE8_MEMBER(mtxl_state::bank_w)
@@ -101,7 +104,7 @@ WRITE8_MEMBER(mtxl_state::key_w)
 	m_multikey->write_dq((data & 0x20) ? ASSERT_LINE : CLEAR_LINE);
 }
 
-static ADDRESS_MAP_START( at32_map, AS_PROGRAM, 32, mtxl_state )
+ADDRESS_MAP_START(mtxl_state::at32_map)
 	ADDRESS_MAP_UNMAP_HIGH
 	#ifndef REAL_PCI_CHIPSET
 	AM_RANGE(0x00000000, 0x0009ffff) AM_RAMBANK("bank10")
@@ -112,7 +115,7 @@ static ADDRESS_MAP_START( at32_map, AS_PROGRAM, 32, mtxl_state )
 	#endif
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( at32_io, AS_IO, 32, mtxl_state )
+ADDRESS_MAP_START(mtxl_state::at32_io)
 	ADDRESS_MAP_UNMAP_HIGH
 	#ifndef REAL_PCI_CHIPSET
 	AM_RANGE(0x0000, 0x001f) AM_DEVREADWRITE8("mb:dma8237_1", am9517a_device, read, write, 0xffffffff)
@@ -135,7 +138,7 @@ static ADDRESS_MAP_START( at32_io, AS_IO, 32, mtxl_state )
 	#endif
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( dbank_map, AS_PROGRAM, 32, mtxl_state )
+ADDRESS_MAP_START(mtxl_state::dbank_map)
 	AM_RANGE(0x000000, 0x0fffff) AM_ROM AM_REGION("ioboard", 0)
 	AM_RANGE(0x100000, 0x17ffff) AM_DEVREADWRITE8("flash", intelfsh8_device, read, write, 0xffffffff)
 ADDRESS_MAP_END

@@ -72,4 +72,8 @@ public:
 	void draw_sprites( bitmap_ind16 &bitmap, const rectangle &cliprect );
 	void espial(machine_config &config);
 	void netwars(machine_config &config);
+	void espial_map(address_map &map);
+	void espial_sound_io_map(address_map &map);
+	void espial_sound_map(address_map &map);
+	void netwars_map(address_map &map);
 };

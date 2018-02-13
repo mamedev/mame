@@ -83,6 +83,8 @@ public:
 	DECLARE_PALETTE_INIT(micronic);
 
 	void micronic(machine_config &config);
+	void micronic_io(address_map &map);
+	void micronic_mem(address_map &map);
 protected:
 	required_memory_bank m_bank1;
 	required_ioport m_bit0;

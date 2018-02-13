@@ -95,7 +95,7 @@ WRITE8_MEMBER(tank8_state::motor_w)
 	m_discrete->write(space, NODE_RELATIVE(TANK8_MOTOR1_EN, offset), data);
 }
 
-static ADDRESS_MAP_START( tank8_cpu_map, AS_PROGRAM, 8, tank8_state )
+ADDRESS_MAP_START(tank8_state::tank8_cpu_map)
 	AM_RANGE(0x0000, 0x00ff) AM_RAM
 	AM_RANGE(0x0400, 0x17ff) AM_ROM
 	AM_RANGE(0xf800, 0xffff) AM_ROM

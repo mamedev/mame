@@ -99,7 +99,7 @@ READ8_MEMBER(malzak_state::s2636_portA_r)
 	}
 }
 
-static ADDRESS_MAP_START( malzak_map, AS_PROGRAM, 8, malzak_state )
+ADDRESS_MAP_START(malzak_state::malzak_map)
 	ADDRESS_MAP_GLOBAL_MASK(0x7fff)
 	AM_RANGE(0x0000, 0x0bff) AM_ROM
 	AM_RANGE(0x0c00, 0x0fff) AM_ROMBANK("bank1")
@@ -119,7 +119,7 @@ static ADDRESS_MAP_START( malzak_map, AS_PROGRAM, 8, malzak_state )
 ADDRESS_MAP_END
 
 
-static ADDRESS_MAP_START( malzak2_map, AS_PROGRAM, 8, malzak_state )
+ADDRESS_MAP_START(malzak_state::malzak2_map)
 	ADDRESS_MAP_GLOBAL_MASK(0x7fff)
 	AM_RANGE(0x0000, 0x0bff) AM_ROM
 	AM_RANGE(0x0c00, 0x0fff) AM_ROMBANK("bank1")
@@ -180,7 +180,7 @@ READ8_MEMBER(malzak_state::collision_r)
 	return 0xd0 + m_collision_counter;
 }
 
-static ADDRESS_MAP_START( malzak_io_map, AS_IO, 8, malzak_state )
+ADDRESS_MAP_START(malzak_state::malzak_io_map)
 	AM_RANGE(0x00, 0x00) AM_READ(collision_r) // returns where a collision can occur.
 	AM_RANGE(0x40, 0x40) AM_WRITE(port40_w)  // possibly sound codes for dual SN76477s
 	AM_RANGE(0x60, 0x60) AM_WRITE(port60_w)  // possibly playfield scroll X offset
@@ -189,7 +189,7 @@ static ADDRESS_MAP_START( malzak_io_map, AS_IO, 8, malzak_state )
 	AM_RANGE(0xc0, 0xc0) AM_WRITE(portc0_w)  // possibly playfield row selection for writing and/or collisions
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( malzak_data_map, AS_DATA, 8, malzak_state )
+ADDRESS_MAP_START(malzak_state::malzak_data_map)
 	AM_RANGE(S2650_DATA_PORT, S2650_DATA_PORT) AM_READ(s2650_data_r)  // read upon death
 ADDRESS_MAP_END
 

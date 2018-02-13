@@ -210,13 +210,15 @@ public:
 
 	void sun3_80(machine_config &config);
 	void sun3_460(machine_config &config);
+	void sun3_460_mem(address_map &map);
+	void sun3_80_mem(address_map &map);
 private:
 	uint32_t m_enable, m_buserr, m_diag, m_printer, m_irqctrl, m_memreg, m_memerraddr;
 	uint32_t m_iommu[0x800];
 	bool m_bInBusErr;
 };
 
-static ADDRESS_MAP_START(sun3_80_mem, AS_PROGRAM, 32, sun3x_state)
+ADDRESS_MAP_START(sun3x_state::sun3_80_mem)
 	AM_RANGE(0x00000000, 0x03ffffff) AM_RAM AM_SHARE("p_ram") AM_WRITE(ramwrite_w)
 	AM_RANGE(0x40000000, 0x40000003) AM_READWRITE(cause_buserr_r, cause_buserr_w)
 	AM_RANGE(0x50300000, 0x50300003) AM_READ(p4id_r)
@@ -239,7 +241,7 @@ static ADDRESS_MAP_START(sun3_80_mem, AS_PROGRAM, 32, sun3x_state)
 	AM_RANGE(0xfefe0000, 0xfefeffff) AM_ROM AM_REGION("user1",0)
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START(sun3_460_mem, AS_PROGRAM, 32, sun3x_state)
+ADDRESS_MAP_START(sun3x_state::sun3_460_mem)
 	AM_RANGE(0x00000000, 0x03ffffff) AM_RAM AM_SHARE("p_ram") AM_WRITE(ramwrite_w)
 	AM_RANGE(0x09000000, 0x09000003) AM_READWRITE(cause_buserr_r, cause_buserr_w)
 	AM_RANGE(0x50300000, 0x50300003) AM_READ(p4id_r)

@@ -15,7 +15,7 @@ DEFINE_DEVICE_TYPE(H8S2329, h8s2329_device, "h8s2329", "H8S/2329")
 
 
 h8s2320_device::h8s2320_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock, uint32_t start) :
-	h8s2000_device(mconfig, type, tag, owner, clock, address_map_delegate(FUNC(h8s2320_device::map), this)),
+	h8s2000_device(mconfig, type, tag, owner, clock, address_map_constructor(FUNC(h8s2320_device::map), this)),
 	intc(*this, "intc"),
 	adc(*this, "adc"),
 	dma(*this, "dma"),
@@ -98,7 +98,7 @@ h8s2329_device::h8s2329_device(const machine_config &mconfig, const char *tag, d
 {
 }
 
-DEVICE_ADDRESS_MAP_START(map, 16, h8s2320_device)
+ADDRESS_MAP_START(h8s2320_device::map)
 	AM_RANGE(ram_start, 0xfffbff) AM_RAM
 
 	AM_RANGE(0xfffe80, 0xfffe81) AM_DEVREADWRITE8("timer16:3", h8_timer16_channel_device, tcr_r,    tcr_w,    0xff00)

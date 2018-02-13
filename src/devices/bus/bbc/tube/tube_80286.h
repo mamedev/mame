@@ -32,6 +32,8 @@ public:
 	DECLARE_READ8_MEMBER( disable_boot_rom );
 	DECLARE_WRITE8_MEMBER( irq_latch_w );
 
+	void tube_80286_io(address_map &map);
+	void tube_80286_mem(address_map &map);
 protected:
 	// device-level overrides
 	virtual void device_start() override;

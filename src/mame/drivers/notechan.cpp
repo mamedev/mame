@@ -315,6 +315,8 @@ public:
 	DECLARE_WRITE8_MEMBER(out_fa_w);
 	DECLARE_WRITE8_MEMBER(out_ff_w);
 	void notechan(machine_config &config);
+	void notechan_map(address_map &map);
+	void notechan_port_map(address_map &map);
 };
 
 
@@ -322,12 +324,12 @@ public:
 *           Memory Map Definition            *
 *********************************************/
 
-static ADDRESS_MAP_START( notechan_map, AS_PROGRAM, 8, notechan_state )
+ADDRESS_MAP_START(notechan_state::notechan_map)
 	AM_RANGE(0x0000, 0x7fff) AM_ROM
 	AM_RANGE(0xa000, 0xbfff) AM_RAM
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( notechan_port_map, AS_IO, 8, notechan_state )
+ADDRESS_MAP_START(notechan_state::notechan_port_map)
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	AM_RANGE(0xf0, 0xf0) AM_DEVREADWRITE("oki", okim6295_device, read, write)
 	AM_RANGE(0xf8, 0xf8) AM_READ_PORT("IN0") AM_WRITE(out_f8_w)

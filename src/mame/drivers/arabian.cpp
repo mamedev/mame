@@ -211,7 +211,7 @@ WRITE8_MEMBER(arabian_state::mcu_port_p_w)
  *
  *************************************/
 
-static ADDRESS_MAP_START( main_map, AS_PROGRAM, 8, arabian_state )
+ADDRESS_MAP_START(arabian_state::main_map)
 	AM_RANGE(0x0000, 0x7fff) AM_ROM
 	AM_RANGE(0x8000, 0xbfff) AM_WRITE(arabian_videoram_w)
 	AM_RANGE(0xc000, 0xc000) AM_MIRROR(0x01ff) AM_READ_PORT("IN0")
@@ -228,7 +228,7 @@ ADDRESS_MAP_END
  *
  *************************************/
 
-static ADDRESS_MAP_START( main_io_map, AS_IO, 8, arabian_state )
+ADDRESS_MAP_START(arabian_state::main_io_map)
 	AM_RANGE(0xc800, 0xc800) AM_MIRROR(0x01ff) AM_DEVWRITE("aysnd", ay8910_device, address_w)
 	AM_RANGE(0xca00, 0xca00) AM_MIRROR(0x01ff) AM_DEVWRITE("aysnd", ay8910_device, data_w)
 ADDRESS_MAP_END

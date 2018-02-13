@@ -71,6 +71,8 @@ public:
 	void maple_w(const uint32_t *data, uint32_t in_size) override;
 	virtual void maple_reset() override;
 
+	void mie_map(address_map &map);
+	void mie_port(address_map &map);
 protected:
 	const char *gpio_name[8];
 	const char *jvs_name;

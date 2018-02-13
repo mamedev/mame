@@ -207,6 +207,19 @@ public:
 	void starzan(machine_config &config);
 	void spkrform(machine_config &config);
 	void sdmg2(machine_config &config);
+	void decrypted_opcodes_map(address_map &map);
+	void iqblocka_io(address_map &map);
+	void iqblocka_map(address_map &map);
+	void lhzb2(address_map &map);
+	void lhzb2a(address_map &map);
+	void mgcs(address_map &map);
+	void mgdha_map(address_map &map);
+	void sdmg2(address_map &map);
+	void slqz2(address_map &map);
+	void spkrform_io(address_map &map);
+	void spkrform_map(address_map &map);
+	void tjsb_io(address_map &map);
+	void tjsb_map(address_map &map);
 };
 
 void igs017_state::machine_reset()
@@ -1129,14 +1142,14 @@ DRIVER_INIT_MEMBER(igs017_state,spkrform)
 // iqblocka
 
 
-static ADDRESS_MAP_START( iqblocka_map, AS_PROGRAM, 8, igs017_state )
+ADDRESS_MAP_START(igs017_state::iqblocka_map)
 	AM_RANGE( 0x00000, 0x0dfff ) AM_ROM
 	AM_RANGE( 0x0e000, 0x0efff ) AM_RAM
 	AM_RANGE( 0x0f000, 0x0ffff ) AM_RAM
 	AM_RANGE( 0x10000, 0x3ffff ) AM_ROM
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( decrypted_opcodes_map, AS_OPCODES, 8, igs017_state )
+ADDRESS_MAP_START(igs017_state::decrypted_opcodes_map)
 	AM_RANGE( 0x00000, 0x3ffff ) AM_ROM AM_SHARE("decrypted_opcodes")
 ADDRESS_MAP_END
 
@@ -1185,7 +1198,7 @@ READ8_MEMBER(igs017_state::input_r)
 	}
 }
 
-static ADDRESS_MAP_START( iqblocka_io, AS_IO, 8, igs017_state )
+ADDRESS_MAP_START(igs017_state::iqblocka_io)
 	AM_RANGE( 0x0000, 0x7fff ) AM_DEVREADWRITE("igs017_igs031", igs017_igs031_device, read,write)
 
 	AM_RANGE( 0x0000, 0x003f ) AM_RAM // internal regs
@@ -1458,7 +1471,7 @@ READ8_MEMBER(igs017_state::mgcs_keys_r)
 
 
 
-static ADDRESS_MAP_START( mgcs, AS_PROGRAM, 16, igs017_state )
+ADDRESS_MAP_START(igs017_state::mgcs)
 	AM_RANGE( 0x000000, 0x07ffff ) AM_ROM
 	AM_RANGE( 0x300000, 0x303fff ) AM_RAM
 	AM_RANGE( 0x49c000, 0x49c003 ) AM_WRITE(mgcs_magic_w ) AM_READ(mgcs_magic_r )
@@ -1540,7 +1553,7 @@ READ16_MEMBER(igs017_state::sdmg2_magic_r)
 	return 0xffff;
 }
 
-static ADDRESS_MAP_START( sdmg2, AS_PROGRAM, 16, igs017_state )
+ADDRESS_MAP_START(igs017_state::sdmg2)
 	AM_RANGE(0x000000, 0x07ffff) AM_ROM
 	AM_RANGE(0x1f0000, 0x1fffff) AM_RAM
 
@@ -1653,7 +1666,7 @@ READ16_MEMBER(igs017_state::mgdha_magic_r)
 	return 0xffff;
 }
 
-static ADDRESS_MAP_START( mgdha_map, AS_PROGRAM, 16, igs017_state )
+ADDRESS_MAP_START(igs017_state::mgdha_map)
 	AM_RANGE(0x000000, 0x07ffff) AM_ROM
 	AM_RANGE(0x600000, 0x603fff) AM_RAM
 	AM_RANGE(0x876000, 0x876003) AM_WRITE(mgdha_magic_w )
@@ -1718,7 +1731,7 @@ READ8_MEMBER(igs017_state::tjsb_input_r)
 	}
 }
 
-static ADDRESS_MAP_START( tjsb_map, AS_PROGRAM, 8, igs017_state )
+ADDRESS_MAP_START(igs017_state::tjsb_map)
 	AM_RANGE( 0x00000, 0x0dfff ) AM_ROM
 	AM_RANGE( 0x0e000, 0x0e000 ) AM_WRITE(input_select_w )
 	AM_RANGE( 0x0e001, 0x0e001 ) AM_READWRITE(tjsb_input_r, tjsb_output_w )
@@ -1727,7 +1740,7 @@ static ADDRESS_MAP_START( tjsb_map, AS_PROGRAM, 8, igs017_state )
 	AM_RANGE( 0x10000, 0x3ffff ) AM_ROM
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( tjsb_io, AS_IO, 8, igs017_state )
+ADDRESS_MAP_START(igs017_state::tjsb_io)
 	AM_RANGE( 0x0000, 0x7fff ) AM_DEVREADWRITE("igs017_igs031", igs017_igs031_device, read,write)
 
 	AM_RANGE( 0x0000, 0x003f ) AM_RAM // internal regs
@@ -1741,7 +1754,7 @@ ADDRESS_MAP_END
 // spkrform
 
 
-static ADDRESS_MAP_START( spkrform_map, AS_PROGRAM, 8, igs017_state )
+ADDRESS_MAP_START(igs017_state::spkrform_map)
 	AM_RANGE( 0x00000, 0x0dfff ) AM_ROM
 	AM_RANGE( 0x0e000, 0x0efff ) AM_RAM
 	AM_RANGE( 0x0e9bf, 0x0e9bf ) AM_NOP // hack: uncomment to switch to Formosa
@@ -1767,7 +1780,7 @@ READ8_MEMBER(igs017_state::spkrform_input_r)
 	}
 }
 
-static ADDRESS_MAP_START( spkrform_io, AS_IO, 8, igs017_state )
+ADDRESS_MAP_START(igs017_state::spkrform_io)
 	AM_RANGE( 0x0000, 0x7fff ) AM_DEVREADWRITE("igs017_igs031", igs017_igs031_device, read,write)
 
 	AM_RANGE( 0x0000, 0x003f ) AM_RAM // internal regs
@@ -1845,7 +1858,7 @@ READ16_MEMBER(igs017_state::lhzb2_magic_r)
 	return 0xffff;
 }
 
-static ADDRESS_MAP_START( lhzb2, AS_PROGRAM, 16, igs017_state )
+ADDRESS_MAP_START(igs017_state::lhzb2)
 	AM_RANGE(0x000000, 0x07ffff) AM_ROM
 	AM_RANGE(0x500000, 0x503fff) AM_RAM
 	AM_RANGE(0x910000, 0x910003) AM_WRITE( lhzb2_magic_w )
@@ -2157,7 +2170,7 @@ WRITE16_MEMBER(igs017_state::lhzb2a_input_select_w)
 	}
 }
 
-static ADDRESS_MAP_START( lhzb2a, AS_PROGRAM, 16, igs017_state )
+ADDRESS_MAP_START(igs017_state::lhzb2a)
 	AM_RANGE(0x000000, 0x07ffff) AM_ROM
 
 	// prot2
@@ -2227,7 +2240,7 @@ READ16_MEMBER(igs017_state::slqz2_magic_r)
 	return 0xffff;
 }
 
-static ADDRESS_MAP_START( slqz2, AS_PROGRAM, 16, igs017_state )
+ADDRESS_MAP_START(igs017_state::slqz2)
 	AM_RANGE(0x000000, 0x07ffff) AM_ROM
 	AM_RANGE(0x100000, 0x103fff) AM_RAM
 	AM_RANGE(0x602000, 0x602003) AM_WRITE( slqz2_magic_w )
@@ -3300,7 +3313,7 @@ MACHINE_CONFIG_END
 
 MACHINE_CONFIG_DERIVED(igs017_state::starzan, iqblocka)
 	MCFG_DEVICE_MODIFY("maincpu")
-	MCFG_CPU_DECRYPTED_OPCODES_MAP(decrypted_opcodes_map)
+	MCFG_CPU_OPCODES_MAP(decrypted_opcodes_map)
 MACHINE_CONFIG_END
 
 

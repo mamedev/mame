@@ -52,4 +52,7 @@ public:
 	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	void draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprect );
 	void scotrsht(machine_config &config);
+	void scotrsht_map(address_map &map);
+	void scotrsht_sound_map(address_map &map);
+	void scotrsht_sound_port(address_map &map);
 };

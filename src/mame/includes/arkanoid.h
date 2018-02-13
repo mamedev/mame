@@ -104,4 +104,11 @@ public:
 	void hexaa(machine_config &config);
 	void p3mcu(machine_config &config);
 	void arkanoid(machine_config &config);
+	void arkanoid_map(address_map &map);
+	void bootleg_map(address_map &map);
+	void brixian_map(address_map &map);
+	void hexa_map(address_map &map);
+	void hexaa_map(address_map &map);
+	void hexaa_sub_iomap(address_map &map);
+	void hexaa_sub_map(address_map &map);
 };

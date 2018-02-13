@@ -34,18 +34,20 @@ public:
 	{ }
 
 	void jade(machine_config &config);
+	void io_map(address_map &map);
+	void mem_map(address_map &map);
 private:
 	required_device<cpu_device> m_maincpu;
 };
 
 
-static ADDRESS_MAP_START(mem_map, AS_PROGRAM, 8, jade_state)
+ADDRESS_MAP_START(jade_state::mem_map)
 	ADDRESS_MAP_UNMAP_HIGH
 	AM_RANGE(0x0000, 0x07ff) AM_ROM AM_REGION("roms", 0)
 	AM_RANGE(0x0800, 0xffff) AM_RAM
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START(io_map, AS_IO, 8, jade_state)
+ADDRESS_MAP_START(jade_state::io_map)
 	ADDRESS_MAP_UNMAP_HIGH
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	AM_RANGE(0x28, 0x2b) AM_DEVREADWRITE("ctc2", z80ctc_device, read, write)

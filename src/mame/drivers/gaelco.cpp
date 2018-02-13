@@ -25,7 +25,6 @@ Year   Game                PCB            NOTES
 
 #include "cpu/m6809/m6809.h"
 #include "cpu/m68000/m68000.h"
-#include "machine/74259.h"
 #include "sound/okim6295.h"
 #include "sound/3812intf.h"
 
@@ -107,7 +106,7 @@ WRITE16_MEMBER(gaelco_state::thoop_encrypted_w)
  *
  *************************************/
 
-static ADDRESS_MAP_START( bigkarnk_map, AS_PROGRAM, 16, gaelco_state )
+ADDRESS_MAP_START(gaelco_state::bigkarnk_map)
 	AM_RANGE(0x000000, 0x07ffff) AM_ROM                                                         /* ROM */
 	AM_RANGE(0x100000, 0x101fff) AM_RAM_WRITE(gaelco_vram_w) AM_SHARE("videoram")               /* Video RAM */
 	AM_RANGE(0x102000, 0x103fff) AM_RAM                                                         /* Screen RAM */
@@ -120,12 +119,12 @@ static ADDRESS_MAP_START( bigkarnk_map, AS_PROGRAM, 16, gaelco_state )
 	AM_RANGE(0x700004, 0x700005) AM_READ_PORT("P1")
 	AM_RANGE(0x700006, 0x700007) AM_READ_PORT("P2")
 	AM_RANGE(0x700008, 0x700009) AM_READ_PORT("SERVICE")
-	AM_RANGE(0x70000a, 0x70000b) AM_SELECT(0x000070) AM_DEVWRITE8_MOD("outlatch", ls259_device, write_d0, rshift<3>, 0x00ff)
+	;map(0x70000a, 0x70000b).select(0x000070).lw8("outlatch_w", [this](address_space &space, offs_t offset, u8 data, u8 mem_mask){ m_outlatch->write_d0(space, offset >> 3, data, mem_mask); }).umask16(0x00ff);
 	AM_RANGE(0x70000e, 0x70000f) AM_DEVWRITE8("soundlatch", generic_latch_8_device, write, 0x00ff)               /* Triggers a FIRQ on the sound CPU */
 	AM_RANGE(0xff8000, 0xffffff) AM_RAM                                                         /* Work RAM */
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( bigkarnk_snd_map, AS_PROGRAM, 8, gaelco_state )
+ADDRESS_MAP_START(gaelco_state::bigkarnk_snd_map)
 	AM_RANGE(0x0000, 0x07ff) AM_RAM                                         /* RAM */
 	AM_RANGE(0x0800, 0x0801) AM_DEVREADWRITE("oki", okim6295_device, read, write)   /* OKI6295 */
 //  AM_RANGE(0x0900, 0x0900) AM_WRITENOP                                    /* enable sound output? */
@@ -134,7 +133,7 @@ static ADDRESS_MAP_START( bigkarnk_snd_map, AS_PROGRAM, 8, gaelco_state )
 	AM_RANGE(0x0c00, 0xffff) AM_ROM                                         /* ROM */
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( maniacsq_map, AS_PROGRAM, 16, gaelco_state )
+ADDRESS_MAP_START(gaelco_state::maniacsq_map)
 	AM_RANGE(0x000000, 0x0fffff) AM_ROM                                                         /* ROM */
 	AM_RANGE(0x100000, 0x101fff) AM_RAM_WRITE(gaelco_vram_w) AM_SHARE("videoram")               /* Video RAM */
 	AM_RANGE(0x102000, 0x103fff) AM_RAM                                                         /* Screen RAM */
@@ -151,7 +150,7 @@ static ADDRESS_MAP_START( maniacsq_map, AS_PROGRAM, 16, gaelco_state )
 	AM_RANGE(0xff0000, 0xffffff) AM_RAM                                                         /* Work RAM */
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( squash_map, AS_PROGRAM, 16, gaelco_state )
+ADDRESS_MAP_START(gaelco_state::squash_map)
 	AM_RANGE(0x000000, 0x0fffff) AM_ROM                                                         /* ROM */
 	AM_RANGE(0x100000, 0x101fff) AM_RAM_WRITE(gaelco_vram_encrypted_w) AM_SHARE("videoram")         /* Video RAM */
 	AM_RANGE(0x102000, 0x103fff) AM_RAM_WRITE(gaelco_encrypted_w) AM_SHARE("screenram")                /* Screen RAM */
@@ -163,13 +162,13 @@ static ADDRESS_MAP_START( squash_map, AS_PROGRAM, 16, gaelco_state )
 	AM_RANGE(0x700002, 0x700003) AM_READ_PORT("DSW1")
 	AM_RANGE(0x700004, 0x700005) AM_READ_PORT("P1")
 	AM_RANGE(0x700006, 0x700007) AM_READ_PORT("P2")
-	AM_RANGE(0x70000a, 0x70000b) AM_SELECT(0x000070) AM_DEVWRITE8_MOD("outlatch", ls259_device, write_d0, rshift<3>, 0x00ff)
+	;map(0x70000a, 0x70000b).select(0x000070).lw8("outlatch_w", [this](address_space &space, offs_t offset, u8 data, u8 mem_mask){ m_outlatch->write_d0(space, offset >> 3, data, mem_mask); }).umask16(0x00ff);
 	AM_RANGE(0x70000c, 0x70000d) AM_WRITE8(OKIM6295_bankswitch_w, 0x00ff)
 	AM_RANGE(0x70000e, 0x70000f) AM_DEVREADWRITE8("oki", okim6295_device, read, write, 0x00ff)                      /* OKI6295 status register */
 	AM_RANGE(0xff0000, 0xffffff) AM_RAM                                                         /* Work RAM */
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( thoop_map, AS_PROGRAM, 16, gaelco_state )
+ADDRESS_MAP_START(gaelco_state::thoop_map)
 	AM_RANGE(0x000000, 0x0fffff) AM_ROM                                                         /* ROM */
 	AM_RANGE(0x100000, 0x101fff) AM_RAM_WRITE(thoop_vram_encrypted_w) AM_SHARE("videoram")          /* Video RAM */
 	AM_RANGE(0x102000, 0x103fff) AM_RAM_WRITE(thoop_encrypted_w) AM_SHARE("screenram")             /* Screen RAM */
@@ -181,14 +180,14 @@ static ADDRESS_MAP_START( thoop_map, AS_PROGRAM, 16, gaelco_state )
 	AM_RANGE(0x700002, 0x700003) AM_READ_PORT("DSW1")
 	AM_RANGE(0x700004, 0x700005) AM_READ_PORT("P1")
 	AM_RANGE(0x700006, 0x700007) AM_READ_PORT("P2")
-	AM_RANGE(0x70000a, 0x70000b) AM_SELECT(0x000070) AM_DEVWRITE8_MOD("outlatch", ls259_device, write_d0, rshift<3>, 0x00ff)
+	;map(0x70000a, 0x70000b).select(0x000070).lw8("outlatch_w", [this](address_space &space, offs_t offset, u8 data, u8 mem_mask){ m_outlatch->write_d0(space, offset >> 3, data, mem_mask); }).umask16(0x00ff);
 	AM_RANGE(0x70000c, 0x70000d) AM_WRITE8(OKIM6295_bankswitch_w, 0x00ff)
 	AM_RANGE(0x70000e, 0x70000f) AM_DEVREADWRITE8("oki", okim6295_device, read, write, 0x00ff)                      /* OKI6295 status register */
 	AM_RANGE(0xff0000, 0xffffff) AM_RAM                                                         /* Work RAM */
 ADDRESS_MAP_END
 
 
-static ADDRESS_MAP_START( oki_map, 0, 8, gaelco_state )
+ADDRESS_MAP_START(gaelco_state::oki_map)
 	AM_RANGE(0x00000, 0x2ffff) AM_ROM
 	AM_RANGE(0x30000, 0x3ffff) AM_ROMBANK("okibank")
 ADDRESS_MAP_END

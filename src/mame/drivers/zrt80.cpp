@@ -52,6 +52,8 @@ public:
 	MC6845_UPDATE_ROW(crtc_update_row);
 
 	void zrt80(machine_config &config);
+	void io_map(address_map &map);
+	void mem_map(address_map &map);
 private:
 	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr) override;
 	uint8_t m_term_data;
@@ -98,7 +100,7 @@ WRITE8_MEMBER(zrt80_state::zrt80_38_w)
 	m_beep->set_state(1);
 }
 
-static ADDRESS_MAP_START( mem_map, AS_PROGRAM, 8, zrt80_state )
+ADDRESS_MAP_START(zrt80_state::mem_map)
 	ADDRESS_MAP_UNMAP_HIGH
 	AM_RANGE(0x0000, 0x0fff) AM_ROM // Z25 - Main firmware
 	AM_RANGE(0x1000, 0x1fff) AM_ROM // Z24 - Expansion
@@ -108,7 +110,7 @@ static ADDRESS_MAP_START( mem_map, AS_PROGRAM, 8, zrt80_state )
 
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( io_map, AS_IO, 8, zrt80_state )
+ADDRESS_MAP_START(zrt80_state::io_map)
 	ADDRESS_MAP_UNMAP_HIGH
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	AM_RANGE(0x00, 0x07) AM_DEVREADWRITE("ins8250", ins8250_device, ins8250_r, ins8250_w )
