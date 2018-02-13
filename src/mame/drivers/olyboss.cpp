@@ -59,6 +59,7 @@ public:
 			m_maincpu(*this, Z80_TAG),
 			m_dma(*this, I8257_TAG),
 			m_crtc(*this,UPD3301_TAG),
+			m_fdc(*this, "fdc"),
 			m_char_rom(*this, UPD3301_TAG)
 		{ }
 
@@ -69,6 +70,9 @@ public:
 
 	DECLARE_WRITE_LINE_MEMBER( hrq_w );
 	DECLARE_READ8_MEMBER( dma_mem_r );
+	DECLARE_WRITE8_MEMBER( dma_mem_w );
+	DECLARE_READ8_MEMBER( fdcctrl_r );
+	DECLARE_WRITE8_MEMBER( fdcctrl_w );
 	
 	void olybossd(machine_config &config);
 	void olyboss_io(address_map &map);
@@ -78,13 +82,13 @@ private:
 	required_device<cpu_device> m_maincpu;
 	required_device<i8257_device> m_dma;
 	required_device<upd3301_device> m_crtc;
+	required_device<upd765a_device> m_fdc;
 	required_memory_region m_char_rom;
 
 	bool m_keybhit;
 	u8 m_keystroke;
 	void keyboard_put(u8 data);	
-
-
+	u8 m_fdcctrl;
 };
 
 //**************************************************************************
@@ -105,6 +109,7 @@ ADDRESS_MAP_START(olyboss_state::olyboss_io)
 	AM_RANGE(0x10, 0x11) AM_DEVICE("fdc", upd765a_device, map)
 	AM_RANGE(0x30, 0x30) AM_DEVREADWRITE("uic", am9519_device, data_r, data_w)
 	AM_RANGE(0x31, 0x31) AM_DEVREADWRITE("uic", am9519_device, stat_r, cmd_w)
+	AM_RANGE(0x60, 0x60) AM_READWRITE(fdcctrl_r, fdcctrl_w)
 	AM_RANGE(0x80, 0x81) AM_DEVREADWRITE(UPD3301_TAG, upd3301_device, read, write)
 ADDRESS_MAP_END
 
@@ -173,6 +178,7 @@ DRIVER_INIT_MEMBER( olyboss_state, olyboss )
 
 	/* initialize DMA */
 	m_dma->ready_w(1);
+	m_fdcctrl = 0;
 }
 
 void olyboss_state::keyboard_put(u8 data)
@@ -198,6 +204,23 @@ READ8_MEMBER( olyboss_state::dma_mem_r )
 {
 	address_space &program = m_maincpu->space(AS_PROGRAM);
 	return program.read_byte(offset);
+}
+
+WRITE8_MEMBER( olyboss_state::dma_mem_w )
+{
+	address_space &program = m_maincpu->space(AS_PROGRAM);
+	program.write_byte(offset, data);
+}
+
+READ8_MEMBER( olyboss_state::fdcctrl_r )
+{
+	return m_fdcctrl | 0x80; // 0xc0 seems to indicate an 8" drive
+}
+
+WRITE8_MEMBER( olyboss_state::fdcctrl_w )
+{
+	m_fdcctrl = data;
+	m_fdc->subdevice<floppy_connector>("0")->get_device()->mon_w(!(data & 2));
 }
 
 static SLOT_INTERFACE_START( boss_floppies )
@@ -229,12 +252,15 @@ MACHINE_CONFIG_START( olyboss_state::olybossd )
 
 	MCFG_UPD765A_ADD("fdc", true, true)
 	MCFG_UPD765_INTRQ_CALLBACK(DEVWRITELINE("uic", am9519_device, ireq2_w)) MCFG_DEVCB_INVERT
-	MCFG_UPD765_DRQ_CALLBACK(NOOP)
+	MCFG_UPD765_DRQ_CALLBACK(DEVWRITELINE(I8257_TAG, i8257_device, dreq0_w))
 	MCFG_FLOPPY_DRIVE_ADD("fdc:0", boss_floppies, "525qd", floppy_image_device::default_floppy_formats)
 
 	MCFG_DEVICE_ADD(I8257_TAG, I8257, XTAL(4'000'000))
 	MCFG_I8257_OUT_HRQ_CB(WRITELINE(olyboss_state, hrq_w))
 	MCFG_I8257_IN_MEMR_CB(READ8(olyboss_state, dma_mem_r))
+	MCFG_I8257_OUT_MEMW_CB(WRITE8(olyboss_state, dma_mem_w))
+	MCFG_I8257_IN_IOR_0_CB(DEVREAD8("fdc", upd765a_device, mdma_r))
+	MCFG_I8257_OUT_IOW_0_CB(DEVWRITE8("fdc", upd765a_device, mdma_w))
 	MCFG_I8257_OUT_IOW_2_CB(DEVWRITE8(UPD3301_TAG, upd3301_device, dack_w))
 
 	MCFG_DEVICE_ADD(UPD3301_TAG, UPD3301, XTAL(14'318'181))
