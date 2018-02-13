@@ -259,14 +259,33 @@ uint32_t xavix_state::screen_update( screen_device &screen, bitmap_ind16 &bitmap
 		}
 	}
 	
-
 	//printf("frame\n");
 	for (int i = 0; i < 0x100; i++)
 	{
+		int ypos = m_spr_attr2[i];
+		int xpos = m_spr_attr3[i];
+		int tile = m_spr_attr6[i];
+		tile += 0x4b00;
+
+		ypos = 0xff - ypos;
+
+		xpos -= 136;
+		ypos -= 192;
+
+
+		xpos &=0xff;
+		ypos &=0xff;
+
+		//if (!(ypos & 1))
+		
+		gfx->transpen(bitmap,cliprect,tile,10,0,0,xpos,ypos,0);
+
+		/*
 		if ((m_spr_attr2[i] != 0x81) && (m_spr_attr2[i] != 0x80) && (m_spr_attr2[i] != 0x00))
 		{
-			//printf("sprite with enable? %02x attr0 %02x attr1 %02x attr3 %02x attr5 %02x attr6 %02x attr7 %02x\n", m_spr_attr2[i], m_spr_attr0[i], m_spr_attr1[i], m_spr_attr3[i], m_spr_attr5[i], m_spr_attr6[i], m_spr_attr7[i] );
+			printf("sprite with enable? %02x attr0 %02x attr1 %02x attr3 %02x attr5 %02x attr6 %02x attr7 %02x\n", m_spr_attr2[i], m_spr_attr0[i], m_spr_attr1[i], m_spr_attr3[i], m_spr_attr5[i], m_spr_attr6[i], m_spr_attr7[i] );
 		}
+		*/
 	}
 
 	return 0;
@@ -765,6 +784,34 @@ static INPUT_PORTS_START( xavix )
 	PORT_DIPSETTING(    0x80, DEF_STR( On ) )
 INPUT_PORTS_END
 
+/* Test mode lists the following
+
+  LED (on power button?)
+  Throttle Low
+  Throttle High
+  Reverse
+  NO2
+  Steering Left (4 positions)
+  Steering Right (4 positions)
+  Horn
+
+*/
+
+
+static INPUT_PORTS_START( rad_mtrk )
+	PORT_INCLUDE(xavix)
+
+	PORT_MODIFY("IN0")
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_BUTTON5 ) PORT_NAME("Nitro")
+	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_BUTTON4 ) PORT_NAME("Throttle High")
+	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_BUTTON3 ) PORT_NAME("Throttle Low")
+	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_BUTTON2 ) PORT_NAME("Reverse / Back")
+
+	PORT_MODIFY("IN1")
+	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_BUTTON1 ) PORT_NAME("Horn")
+	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_SERVICE1 ) // some kind of 'power off' (fades screen to black, jumps to an infinite loop) maybe low battery condition or just the power button?
+INPUT_PORTS_END
+
 /* correct, 4bpp gfxs */
 static const gfx_layout charlayout =
 {
@@ -813,8 +860,8 @@ static const gfx_layout char16layout8bpp =
 
 
 static GFXDECODE_START( xavix )
-	GFXDECODE_ENTRY( "bios", 0, charlayout,   0, 1 )
-	GFXDECODE_ENTRY( "bios", 0, char16layout, 0, 1 )
+	GFXDECODE_ENTRY( "bios", 0, charlayout,   0, 16 )
+	GFXDECODE_ENTRY( "bios", 0, char16layout, 0, 16 )
 	GFXDECODE_ENTRY( "bios", 0, charlayout8bpp, 0, 1 )
 	GFXDECODE_ENTRY( "bios", 0, char16layout8bpp, 0, 1 )
 GFXDECODE_END
@@ -891,8 +938,7 @@ MACHINE_CONFIG_START(xavix_state::xavix)
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
-//  MCFG_SOUND_ADD("aysnd", AY8910, MAIN_CLOCK/4)
-//  MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.30)
+	// sound is PCM
 MACHINE_CONFIG_END
 
 DRIVER_INIT_MEMBER(xavix_state,xavix)
@@ -948,26 +994,32 @@ ROM_END
 
 /* Standalone TV Games */
 
-CONS( 2006, taitons1,  0,   0,  xavix,  xavix, xavix_state, xavix, "Bandai / SSD Company LTD / Taito", "Let's! TV Play Classic - Taito Nostalgia 1", MACHINE_IS_SKELETON )
+CONS( 2006, taitons1,  0,   0,  xavix,  xavix,   xavix_state, xavix, "Bandai / SSD Company LTD / Taito", "Let's! TV Play Classic - Taito Nostalgia 1", MACHINE_IS_SKELETON )
 
-CONS( 2000, rad_ping,  0,   0,  xavix,  xavix, xavix_state, xavix, "Radica / SSD Company LTD / Simmer Technology", "Play TV Ping Pong", MACHINE_IS_SKELETON ) // "Simmer Technology" is also known as "Hummer Technology Co., Ltd"
-CONS( 2003, rad_mtrk,  0,   0,  xavix,  xavix, xavix_state, xavix, "Radica / SSD Company LTD",                     "Play TV Monster Truck", MACHINE_IS_SKELETON )
-CONS( 200?, rad_box,   0,   0,  xavix,  xavix, xavix_state, xavix, "Radica / SSD Company LTD",                     "Play TV Boxing", MACHINE_IS_SKELETON)
-CONS( 200?, rad_crdn,  0,   0,  xavix,  xavix, xavix_state, xavix, "Radica / SSD Company LTD",                     "Play TV Card Night", MACHINE_IS_SKELETON)
-CONS( 2002, rad_bb2,   0,   0,  xavix,  xavix, xavix_state, xavix, "Radica / SSD Company LTD",                     "Play TV Baseball 2", MACHINE_IS_SKELETON ) // contains string "Radica RBB2 V1.0"
+CONS( 2000, rad_ping,  0,   0,  xavix,  xavix,    xavix_state, xavix, "Radica / SSD Company LTD / Simmer Technology", "Play TV Ping Pong", MACHINE_IS_SKELETON ) // "Simmer Technology" is also known as "Hummer Technology Co., Ltd"
+CONS( 2003, rad_mtrk,  0,   0,  xavix,  rad_mtrk, xavix_state, xavix, "Radica / SSD Company LTD",                     "Play TV Monster Truck", MACHINE_IS_SKELETON )
+CONS( 200?, rad_box,   0,   0,  xavix,  xavix,    xavix_state, xavix, "Radica / SSD Company LTD",                     "Play TV Boxing", MACHINE_IS_SKELETON)
+CONS( 200?, rad_crdn,  0,   0,  xavix,  xavix,    xavix_state, xavix, "Radica / SSD Company LTD",                     "Play TV Card Night", MACHINE_IS_SKELETON)
+CONS( 2002, rad_bb2,   0,   0,  xavix,  xavix,    xavix_state, xavix, "Radica / SSD Company LTD",                     "Play TV Baseball 2", MACHINE_IS_SKELETON ) // contains string "Radica RBB2 V1.0"
 
-CONS (200?, eka_strt,  0,   0,  xavix,  xavix, xavix_state, xavix, "Takara / SSD Company LTD",                     "e-kara Starter", MACHINE_IS_SKELETON)
+CONS (200?, eka_strt,  0,   0,  xavix,  xavix,    xavix_state, xavix, "Takara / SSD Company LTD",                     "e-kara Starter", MACHINE_IS_SKELETON)
 
 /* The 'XaviXPORT' isn't a real console, more of a TV adapter, all the actual hardware (CPU including video hw, sound hw) is in the cartridges and controllers
    and can vary between games, see notes at top of driver.
 
-   According to sources XaviX Tennis should be a standard XaviX CPU, but at the very least makes significantly more use of custom opcodes than Taito Nostalgia
-   and Radica Ping Pong which only appears to use the call far / return far for extended memory space.
+   According to sources XaviX Tennis should be a standard XaviX CPU, but at the very least makes significantly more use of custom opcodes than the above titles
+   which only appears to use the call far / return far for extended memory space.
    
    Furthermore it also seems to require some regular 6502 opcodes to be replaced with custom ones, yet the other games expect these to act normally.  This
    leads me to believe that XaviX Tennis is almost certainly a Super XaviX title.
 
-   The CPU die on XaviX Tennis is internally marked as NEC 85054-611
+   The CPU die on XaviX Tennis is internally marked as NEC 85054-611 and is very different to thw two below
+
+   Radica Monster truck die is marked SSD PL7351 with SSD98 also printed on the die
+   Radia Ping Pong      die is marked SSD PA7270 with SSD97 also printed on the die (otherwise looks identical to Monster Truck)
+	
+   Star Wars Saga Edition also seems to be making use of additional opcodes, meaning it could also be Super Xavix, or something in-between (unless they're
+   caused by the bad dump, but it looks intentional)
 
 */
 
@@ -976,4 +1028,15 @@ ROM_START( xavtenni )
 	ROM_LOAD( "xavixtennis.bin", 0x000000, 0x800000, CRC(23a1d918) SHA1(2241c59e8ea8328013e55952ebf9060ea0a4675b) )
 ROM_END
 
-CONS( 2004, xavtenni,  0,   0,  xavix,  xavix, xavix_state, xavix, "SSD Company LTD", "XaviX Tennis (XaviXPORT)", MACHINE_IS_SKELETON )
+
+ROM_START( ttv_sw )
+	ROM_REGION( 0x800000, "bios", ROMREGION_ERASE00 )
+	// wasn't giving consistent reads
+	ROM_LOAD( "jedibad.bin", 0x000000, 0x800000, BAD_DUMP CRC(a12862fe) SHA1(9b5a07bdf35f72f2e2d127de5e6849ce5fa2afa0) )
+ROM_END
+
+
+CONS( 2004, xavtenni,  0,   0,  xavix,  xavix, xavix_state, xavix, "SSD Company LTD",         "XaviX Tennis (XaviXPORT)", MACHINE_IS_SKELETON )
+CONS( 2005, ttv_sw,    0,   0,  xavix,  xavix, xavix_state, xavix, "Tiger / SSD Company LTD", "Star Wars Saga Edition - Lightsaber Battle Game", MACHINE_IS_SKELETON )
+
+
