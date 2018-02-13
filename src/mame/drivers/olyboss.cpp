@@ -78,6 +78,8 @@ public:
 	DECLARE_WRITE8_MEMBER( fdcdma_w );
 	DECLARE_WRITE8_MEMBER( crtcdma_w );
 	
+	void olybossb(machine_config &config);
+	void olybossc(machine_config &config);
 	void olybossd(machine_config &config);
 	void olyboss_io(address_map &map);
 	void olyboss_mem(address_map &map);
@@ -255,7 +257,11 @@ WRITE8_MEMBER( olyboss_state::fdcctrl_w )
 	m_fdc->subdevice<floppy_connector>("0")->get_device()->mon_w(!(data & 2));
 }
 
-static SLOT_INTERFACE_START( boss_floppies )
+static SLOT_INTERFACE_START( bossb_floppies )
+	SLOT_INTERFACE( "525dd", FLOPPY_525_DD )
+SLOT_INTERFACE_END
+
+static SLOT_INTERFACE_START( bosscd_floppies )
 	SLOT_INTERFACE( "525qd", FLOPPY_525_QD )
 SLOT_INTERFACE_END
 
@@ -285,7 +291,8 @@ MACHINE_CONFIG_START( olyboss_state::olybossd )
 	MCFG_UPD765A_ADD("fdc", true, true)
 	MCFG_UPD765_INTRQ_CALLBACK(DEVWRITELINE("uic", am9519_device, ireq2_w)) MCFG_DEVCB_INVERT
 	MCFG_UPD765_DRQ_CALLBACK(DEVWRITELINE(I8257_TAG, i8257_device, dreq0_w))
-	MCFG_FLOPPY_DRIVE_ADD("fdc:0", boss_floppies, "525qd", floppy_image_device::default_floppy_formats)
+	MCFG_FLOPPY_DRIVE_ADD("fdc:0", bosscd_floppies, "525qd", floppy_image_device::default_floppy_formats)
+	MCFG_FLOPPY_DRIVE_SOUND(true)
 
 	MCFG_DEVICE_ADD(I8257_TAG, I8257, XTAL(4'000'000))
 	MCFG_I8257_OUT_HRQ_CB(WRITELINE(olyboss_state, hrq_w))
@@ -309,9 +316,38 @@ MACHINE_CONFIG_START( olyboss_state::olybossd )
 	
 MACHINE_CONFIG_END
 
+MACHINE_CONFIG_DERIVED( olyboss_state::olybossb, olybossd )
+	MCFG_DEVICE_REMOVE("fdc:0")
+	MCFG_FLOPPY_DRIVE_ADD("fdc:0", bossb_floppies, "525dd", floppy_image_device::default_floppy_formats)
+	MCFG_FLOPPY_DRIVE_SOUND(true)
+	MCFG_FLOPPY_DRIVE_ADD("fdc:1", bossb_floppies, "525dd", floppy_image_device::default_floppy_formats)
+	MCFG_FLOPPY_DRIVE_SOUND(true)
+MACHINE_CONFIG_END
+
+MACHINE_CONFIG_DERIVED( olyboss_state::olybossc, olybossd )
+	MCFG_FLOPPY_DRIVE_ADD("fdc:1", bosscd_floppies, "525qd", floppy_image_device::default_floppy_formats)
+	MCFG_FLOPPY_DRIVE_SOUND(true)
+MACHINE_CONFIG_END
+
 //**************************************************************************
 //  ROM DEFINITIONS
 //**************************************************************************
+
+ROM_START( olybossb )
+	ROM_REGION(0x800, "mainrom", ROMREGION_ERASEFF)
+	ROM_LOAD( "olympia_boss_system_251-462.bin", 0x0000, 0x800, CRC(01b99609) SHA1(07b764c36337c12f7b40aa309b0805ceed8b22e2) )
+
+	ROM_REGION( 0x800, UPD3301_TAG, 0)
+	ROM_LOAD( "olympia_boss_graphics_251-461.bin", 0x0000, 0x800, CRC(56149540) SHA1(b2b893bd219308fc98a38528beb7ddae391c7609) )
+ROM_END
+
+ROM_START( olybossc )
+	ROM_REGION(0x800, "mainrom", ROMREGION_ERASEFF)
+	ROM_LOAD( "olympia_boss_system_251-462.bin", 0x0000, 0x800, CRC(01b99609) SHA1(07b764c36337c12f7b40aa309b0805ceed8b22e2) )
+
+	ROM_REGION( 0x800, UPD3301_TAG, 0)
+	ROM_LOAD( "olympia_boss_graphics_251-461.bin", 0x0000, 0x800, CRC(56149540) SHA1(b2b893bd219308fc98a38528beb7ddae391c7609) )
+ROM_END
 
 ROM_START( olybossd )
 	ROM_REGION(0x800, "mainrom", ROMREGION_ERASEFF)
@@ -320,12 +356,12 @@ ROM_START( olybossd )
 	ROM_REGION( 0x800, UPD3301_TAG, 0)
 	ROM_LOAD( "olympia_boss_graphics_251-461.bin", 0x0000, 0x800, CRC(56149540) SHA1(b2b893bd219308fc98a38528beb7ddae391c7609) )
 ROM_END
-
-
 //**************************************************************************
 //  SYSTEM DRIVERS
 //**************************************************************************
 
 //   YEAR  NAME			PARENT	COMPAT	MACHINE		INPUT		CLASS			INIT		COMPANY						FULLNAME			FLAGS
+COMP(1981, olybossb,	0,		0,		olybossb,	olyboss,	olyboss_state,	olyboss,	"Olympia International",	"Olympia BOSS B",	MACHINE_NOT_WORKING | MACHINE_NO_SOUND )
+COMP(1981, olybossc,	0,		0,		olybossc,	olyboss,	olyboss_state,	olyboss,	"Olympia International",	"Olympia BOSS C",	MACHINE_NOT_WORKING | MACHINE_NO_SOUND )
 COMP(1981, olybossd,	0,		0,		olybossd,	olyboss,	olyboss_state,	olyboss,	"Olympia International",	"Olympia BOSS D",	MACHINE_NOT_WORKING | MACHINE_NO_SOUND )
 

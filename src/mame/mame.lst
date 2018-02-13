@@ -30187,6 +30187,8 @@ okean240t                       //
 olibochu                        // M47 (c) 1981 + "GDI presents"
 
 @source:olyboss.cpp
+olybossb                        // Olympia BOSS B
+olybossc                        // Olympia BOSS C
 olybossd                        // Olympia BOSS D
 
 @source:omegrace.cpp
