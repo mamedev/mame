@@ -46,11 +46,11 @@ public:
 		m_mainram(*this, "mainram"),
 		m_spr_attr0(*this, "spr_attr0"),
 		m_spr_attr1(*this, "spr_attr1"),
-		m_spr_ypos(*this, "spr_attr2"),
-		m_spr_xpos(*this, "spr_attr3"),
-		m_spr_attr5(*this, "spr_attr5"),
-		m_spr_attr6(*this, "spr_attr6"),
-		m_spr_attr7(*this, "spr_attr7"),
+		m_spr_ypos(*this, "spr_ypos"),
+		m_spr_xpos(*this, "spr_xpos"),
+		m_spr_addr_lo(*this, "spr_addr_lo"),
+		m_spr_addr_md(*this, "spr_addr_md"),
+		m_spr_addr_hi(*this, "spr_addr_hi"),
 		m_palram1(*this, "palram1"),
 		m_palram2(*this, "palram2"),
 		m_spr_attra(*this, "spr_attra"),
@@ -153,9 +153,9 @@ private:
 	required_shared_ptr<uint8_t> m_spr_ypos;
 	required_shared_ptr<uint8_t> m_spr_xpos;
 
-	required_shared_ptr<uint8_t> m_spr_attr5;
-	required_shared_ptr<uint8_t> m_spr_attr6;
-	required_shared_ptr<uint8_t> m_spr_attr7;
+	required_shared_ptr<uint8_t> m_spr_addr_lo;
+	required_shared_ptr<uint8_t> m_spr_addr_md;
+	required_shared_ptr<uint8_t> m_spr_addr_hi;
 
 	required_shared_ptr<uint8_t> m_palram1;
 	required_shared_ptr<uint8_t> m_palram2;
@@ -174,7 +174,38 @@ private:
 
 	int m_rgnlen;
 	uint8_t* m_rgn;
+
+	// variables used by rendering
+	int m_tmp_dataaddress;
+	int m_tmp_databit;
+	void set_data_address(int address, int bit);
+	uint8_t get_next_bit();
+
 };
+
+void xavix_state::set_data_address(int address, int bit)
+{
+	m_tmp_dataaddress = address;
+	m_tmp_databit = bit;
+}
+
+uint8_t xavix_state::get_next_bit()
+{
+	uint8_t bit = m_rgn[m_tmp_dataaddress & (m_rgnlen - 1)];
+	bit = bit >> m_tmp_databit;
+	bit &= 1;
+
+	m_tmp_databit++;
+
+	if (m_tmp_databit == 8)
+	{
+		m_tmp_databit = 0;
+		m_tmp_dataaddress++;
+	}
+
+	return bit;
+}
+
 
 void xavix_state::video_start()
 {
@@ -246,6 +277,9 @@ uint32_t xavix_state::screen_update( screen_device &screen, bitmap_ind16 &bitmap
 {
 	handle_palette(screen, bitmap, cliprect);
 
+	bitmap.fill(0, cliprect); 
+
+#if 1
 	// why are the first two logos in Monster Truck stored as tilemaps in main ram?
 	// test mode isn't? is the code meant to process them instead? - there are no sprites in the sprite list at the time (and only one in test mode)
 	gfx_element *gfx = m_gfxdecode->gfx(1);
@@ -264,32 +298,112 @@ uint32_t xavix_state::screen_update( screen_device &screen, bitmap_ind16 &bitmap
 			gfx->opaque(bitmap,cliprect,tile,0,0,0,x*16,y*16);
 		}
 	}
-	
+#endif	
+
 	//printf("frame\n");
-	for (int i = 0; i < 0x100; i++)
+	// priority doesn't seem to be based on list order, there are bad sprite-sprite priorities with either forward or reverse
+	for (int i = 0xff; i >= 0; i--)
 	{
+		/* attribute 0 bits
+		   pppp bbb-    p = palette, b = bpp
+
+		   attribute 1 bits
+	       ---- ---f    f = flipx 
+		*/
+
 		int ypos = m_spr_ypos[i];
 		int xpos = m_spr_xpos[i];
-		int tile = m_spr_attr6[i];
-		tile += 0x4b00;
+		int tile = (m_spr_addr_hi[i] << 16) | (m_spr_addr_md[i] << 8) | m_spr_addr_lo[i];
+		int attr0 = m_spr_attr0[i]; 
+		int attr1 = m_spr_attr1[i]; 
+	
+		int pal =   (attr0 & 0xf0)>>4;
+		int flipx = (attr1 & 0x01);
+
+		int drawheight = 16;
+		int drawwidth = 16;
+
+		tile &= (m_rgnlen-1);
+
+#if 0
+		// taito nostalgia 1 also seems to use a different addressing, is it selectable or is the chip different?
+		
+		// taito nost attr1 is 84 / 80 / 88 / 8c for the various elements of the xavix logo.  monster truck uses ec / fc / dc / 4c / 5c / 6c (final 6 sprites ingame are 00 00 f0 f0 f0 f0, radar?)
+
+		if (attr1 & 0x04)
+		{
+			drawwidth=16;
+		}
+		else
+		{
+			drawwidth = 8;
+			xpos += 4;
+		}
+
+		if (drawwidth==16) tile = tile * 64;
+		else tile = tile * 32;
+		tile += 0xd8000;
+		drawheight = 8;
+#endif
 
 		ypos = 0xff - ypos;
 
 		xpos -= 136;
 		ypos -= 192;
 
-
 		xpos &=0xff;
 		ypos &=0xff;
+	
+		int bpp = 1;
 
-		//if (!(ypos & 1))
-		
-		gfx->transpen(bitmap,cliprect,tile,10,0,0,xpos,ypos,0);
+		bpp = (attr0 & 0x0e) >> 1;
+		bpp += 1;
+
+		// set the address here so we can increment in bits in the draw function
+		set_data_address(tile,0);
+
+		for (int y = 0; y < drawheight; y++)
+		{
+			int row = ypos+y;
+
+			for (int x = 0; x < drawwidth; x++)
+			{
+
+				int col;
+				
+				if (flipx)
+				{
+					col = xpos - x;
+				}
+				else
+				{
+					col = xpos + x;
+				} 
+
+				uint8_t dat = 0;
+
+				for (int i = 0; i < bpp; i++)
+				{
+					dat |= (get_next_bit() << i);
+				}
+					
+				if ((row >= cliprect.min_x && row < cliprect.max_x) && (col >= cliprect.min_y && col < cliprect.max_y))
+				{
+					uint16_t* rowptr;
+
+					rowptr = &bitmap.pix16(row);
+					if (dat)
+						rowptr[col] = (dat + (pal << 4)) & 0xff;
+				}
+			}
+			
+		}
+
 
 		/*
 		if ((m_spr_ypos[i] != 0x81) && (m_spr_ypos[i] != 0x80) && (m_spr_ypos[i] != 0x00))
 		{
-			printf("sprite with enable? %02x attr0 %02x attr1 %02x attr3 %02x attr5 %02x attr6 %02x attr7 %02x\n", m_spr_ypos[i], m_spr_attr0[i], m_spr_attr1[i], m_spr_xpos[i], m_spr_attr5[i], m_spr_attr6[i], m_spr_attr7[i] );
+			printf("sprite with enable? %02x attr0 %02x attr1 %02x attr3 %02x attr5 %02x attr6 %02x attr7 %02x\n", m_spr_ypos[i], m_spr_attr0[i], m_spr_attr1[i], m_spr_xpos[i], m_spr_addr_lo[i], m_spr_addr_md[i], m_spr_addr_hi[i] );
 		}
 		*/
 	}
@@ -615,7 +729,8 @@ READ8_MEMBER(xavix_state::pal_ntsc_r)
 {
 	// only seen 0x10 checked in code
 	// in monster truck the tile base address gets set based on this, there are 2 copies of the test screen in rom, one for pal, one for ntsc, see 1854c
-	return 0x10;
+	//return 0x00; // NTSC
+	return 0x10; // PAL
 }
 
 // DATA reads from 0x8000-0xffff are banked by byte 0xff of 'ram' (this is handled in the CPU core)
@@ -628,12 +743,12 @@ ADDRESS_MAP_START(xavix_state::xavix_map)
 	// appears to be 256 sprites (shares will be renamed once their purpose is known)
 	AM_RANGE(0x006000, 0x0060ff) AM_RAM AM_SHARE("spr_attr0")
 	AM_RANGE(0x006100, 0x0061ff) AM_RAM AM_SHARE("spr_attr1")
-	AM_RANGE(0x006200, 0x0062ff) AM_RAM AM_SHARE("spr_attr2") // cleared to 0x8f0 by both games, maybe enable registers?
-	AM_RANGE(0x006300, 0x0063ff) AM_RAM AM_SHARE("spr_attr3")
+	AM_RANGE(0x006200, 0x0062ff) AM_RAM AM_SHARE("spr_ypos") // cleared to 0x8f0 by both games, maybe enable registers?
+	AM_RANGE(0x006300, 0x0063ff) AM_RAM AM_SHARE("spr_xpos")
 	AM_RANGE(0x006400, 0x0064ff) AM_RAM // 6400 range unused by code, does it exist?
-	AM_RANGE(0x006500, 0x0065ff) AM_RAM AM_SHARE("spr_attr5")
-	AM_RANGE(0x006600, 0x0066ff) AM_RAM AM_SHARE("spr_attr6")
-	AM_RANGE(0x006700, 0x0067ff) AM_RAM AM_SHARE("spr_attr7")
+	AM_RANGE(0x006500, 0x0065ff) AM_RAM AM_SHARE("spr_addr_lo")
+	AM_RANGE(0x006600, 0x0066ff) AM_RAM AM_SHARE("spr_addr_md")
+	AM_RANGE(0x006700, 0x0067ff) AM_RAM AM_SHARE("spr_addr_hi")
 	AM_RANGE(0x006800, 0x0068ff) AM_RAM AM_SHARE("palram1") // written with 6900
 	AM_RANGE(0x006900, 0x0069ff) AM_RAM AM_SHARE("palram2") // startup (taitons1)
 	AM_RANGE(0x006a00, 0x006a1f) AM_RAM AM_SHARE("spr_attra") // test mode, pass flag 0x20
@@ -720,7 +835,7 @@ ADDRESS_MAP_START(xavix_state::xavix_map)
 	//AM_RANGE(0x007a80, 0x007a80) AM_WRITENOP
 
 	//AM_RANGE(0x007b80, 0x007b80) AM_READNOP
-	//AM_RANGE(0x007b81, 0x007b81) AM_WRITENOP
+	//AM_RANGE(0x007b81, 0x007b81) AM_WRITENOP // every frame?
 	//AM_RANGE(0x007b82, 0x007b82) AM_WRITENOP
 
 	//AM_RANGE(0x007c01, 0x007c01) AM_RAM // r/w tested
