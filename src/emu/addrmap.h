@@ -100,6 +100,9 @@ public:
 	address_map_entry &umask32(u32 _mask);
 	address_map_entry &umask64(u64 _mask);
 
+	// chip select width setting
+	address_map_entry &cswidth(int _cswidth) { m_cswidth = _cswidth; return *this; }
+
 	// I/O port configuration
 	address_map_entry &read_port(const char *tag) { m_read.m_type = AMH_PORT; m_read.m_tag = tag; return *this; }
 	address_map_entry &write_port(const char *tag) { m_write.m_type = AMH_PORT; m_write.m_tag = tag; return *this; }
@@ -317,6 +320,7 @@ public:
 	offs_t                  m_addrmask;             // mask bits
 	offs_t                  m_addrselect;           // select bits
 	u64                     m_mask;                 // mask for which lanes apply
+	int                     m_cswidth;              // chip select width override
 	map_handler_data        m_read;                 // data for read handler
 	map_handler_data        m_write;                // data for write handler
 	map_handler_data        m_setoffsethd;          // data for setoffset handler
@@ -374,7 +378,7 @@ public:
 	// construction/destruction
 	address_map(device_t &device, int spacenum);
 	address_map(device_t &device, address_map_entry *entry);
-	address_map(const address_space &space, offs_t start, offs_t end, u64 unitmask, device_t &device, address_map_constructor submap_delegate);
+	address_map(const address_space &space, offs_t start, offs_t end, u64 unitmask, int cswidth, device_t &device, address_map_constructor submap_delegate);
 	~address_map();
 
 	// setters
