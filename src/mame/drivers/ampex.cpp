@@ -53,7 +53,7 @@ public:
 	DECLARE_WRITE8_MEMBER(page_w);
 
 	DECLARE_WRITE_LINE_MEMBER(vsyn_w);
-	DECLARE_WRITE8_MEMBER(uart_status_update);
+	DECLARE_WRITE_LINE_MEMBER(dav_w);
 
 	void ampex(machine_config &config);
 	void mem_map(address_map &map);
@@ -160,7 +160,7 @@ WRITE_LINE_MEMBER(ampex_state::vsyn_w)
 	// should generate RST 6 interrupt
 }
 
-WRITE8_MEMBER(ampex_state::uart_status_update)
+WRITE_LINE_MEMBER(ampex_state::dav_w)
 {
 	// DAV should generate RST 7
 }
@@ -213,7 +213,7 @@ MACHINE_CONFIG_START(ampex_state::ampex)
 	MCFG_VIDEO_SET_SCREEN("screen")
 
 	MCFG_DEVICE_ADD("uart", AY31015, 0) // COM8017, actually
-	MCFG_AY31015_STATUS_CHANGED_CB(WRITE8(ampex_state, uart_status_update))
+	MCFG_AY31015_WRITE_DAV_CB(WRITELINE(ampex_state, dav_w))
 
 	MCFG_DEVICE_ADD("dbrg", COM5016_5, XTAL(4'915'200))
 MACHINE_CONFIG_END
