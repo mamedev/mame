@@ -29,8 +29,6 @@ public:
 	// construction/destruction
 	databoard_4112_23_t(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
-	void databoard_4112_23_io(address_map &map);
-	void databoard_4112_23_mem(address_map &map);
 protected:
 	// device-level overrides
 	virtual void device_start() override;
@@ -53,6 +51,9 @@ private:
 	required_device<cpu_device> m_maincpu;
 
 	bool m_cs;
+
+	void databoard_4112_23_io(address_map &map);
+	void databoard_4112_23_mem(address_map &map);
 };
 
 

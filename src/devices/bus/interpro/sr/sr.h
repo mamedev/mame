@@ -116,8 +116,6 @@ public:
 	// construction/destruction
 	virtual ~device_sr_card_interface();
 
-	virtual void map(address_map &map) = 0;
-
 	void set_sr_device();
 
 	// inline configuration
@@ -125,6 +123,8 @@ public:
 
 protected:
 	device_sr_card_interface(const machine_config &mconfig, device_t &device);
+
+	virtual void map(address_map &map) = 0;
 
 	sr_device  *m_sr;
 	const char *m_sr_tag;

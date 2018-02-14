@@ -33,8 +33,6 @@ public:
 	// construction/destruction
 	hardbox_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
-	void hardbox_io(address_map &map);
-	void hardbox_mem(address_map &map);
 protected:
 	// device-level overrides
 	virtual void device_start() override;
@@ -57,6 +55,9 @@ private:
 	DECLARE_WRITE8_MEMBER( ppi1_pb_w );
 	DECLARE_READ8_MEMBER( ppi1_pc_r );
 	DECLARE_WRITE8_MEMBER( ppi1_pc_w );
+
+	void hardbox_io(address_map &map);
+	void hardbox_mem(address_map &map);
 
 	enum
 	{

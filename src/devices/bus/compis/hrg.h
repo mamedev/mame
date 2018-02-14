@@ -29,7 +29,6 @@ public:
 	// construction/destruction
 	compis_hrg_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
-	void hrg_map(address_map &map);
 protected:
 	compis_hrg_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock);
 
@@ -52,6 +51,8 @@ protected:
 
 private:
 	UPD7220_DISPLAY_PIXELS_MEMBER( display_pixels );
+
+	void hrg_map(address_map &map);
 };
 
 
@@ -63,13 +64,14 @@ public:
 	// construction/destruction
 	compis_uhrg_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
-	void uhrg_map(address_map &map);
 protected:
 	// optional information overrides
 	virtual void device_add_mconfig(machine_config &config) override;
 
 private:
 	UPD7220_DISPLAY_PIXELS_MEMBER( display_pixels );
+
+	void uhrg_map(address_map &map);
 };
 
 

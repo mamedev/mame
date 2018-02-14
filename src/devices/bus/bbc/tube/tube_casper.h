@@ -28,7 +28,6 @@ public:
 	// construction/destruction
 	bbc_tube_casper_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
-	void tube_casper_mem(address_map &map);
 protected:
 	// device-level overrides
 	virtual void device_start() override;
@@ -47,6 +46,8 @@ private:
 	required_device<via6522_device> m_via6522_1;
 	required_memory_region m_casper_rom;
 	required_memory_region m_host_rom;
+
+	void tube_casper_mem(address_map &map);
 };
 
 
