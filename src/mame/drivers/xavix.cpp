@@ -289,13 +289,18 @@ uint32_t xavix_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap,
 	{
 		// why are the first two logos in Monster Truck stored as tilemaps in main ram?
 		// test mode isn't? is the code meant to process them instead? - there are no sprites in the sprite list at the time (and only one in test mode)
-		gfx_element *gfx = m_gfxdecode->gfx(1);
-		int count = 0;
+		gfx_element *gfx;
+		int count;
+		
+		count = 0;
+		gfx = m_gfxdecode->gfx(1);
 		for (int y = 0; y < 16; y++)
 		{
 			for (int x = 0; x < 16; x++)
 			{
-				int tile = m_mainram[count++];
+				int tile = m_mainram[count];
+				tile |= (m_mainram[count+0x100]<<8);
+				count++;
 
 				int gfxbase = (m_spr_attra[1] << 8) | (m_spr_attra[0]);
 				// upper bit is often set, maybe just because it relies on mirroring, maybe other purpose
@@ -305,6 +310,34 @@ uint32_t xavix_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap,
 				gfx->opaque(bitmap, cliprect, tile, 0, 0, 0, x * 16, y * 16);
 			}
 		}
+
+
+		// there is a 2nd layer in monster truck too, there must be more to the gfxbase tho, because the lower layer can't be using the same gfxbase..
+		count = 0x200;
+		gfx = m_gfxdecode->gfx(0);
+		for (int y = 0; y < 32; y++)
+		{
+			for (int x = 0; x < 32; x++)
+			{
+				int tile = m_mainram[count];
+				tile |= (m_mainram[count+0x400]<<8);
+				count++;
+
+				int gfxbase = (m_spr_attra[1] << 8) | (m_spr_attra[0]);
+				// upper bit is often set, maybe just because it relies on mirroring, maybe other purpose
+
+				// even the transpen makes no sense here, it's 0 on the used elements, 15 on the unused ones.. are 00 tiles just ignored?
+				if (tile)
+				{
+					tile += (gfxbase << 3);
+					gfx->transpen(bitmap, cliprect, tile, 0, 0, 0, x * 8, (y * 8) - 16, 0);
+				}
+			}
+		}
+
+
+
+
 	}
 
 	//printf("frame\n");
@@ -374,10 +407,13 @@ uint32_t xavix_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap,
 		ypos = 0xff - ypos;
 
 		xpos -= 136;
-		ypos -= 192;
+		ypos -= 152;
 
 		xpos &= 0xff;
 		ypos &= 0xff;
+
+		if (ypos >=192)
+			ypos -= 256;
 
 		int bpp = 1;
 
@@ -800,11 +836,11 @@ ADDRESS_MAP_START(xavix_state::xavix_map)
 	// function in rad_mtrk at 0184b7 uses this
 	AM_RANGE(0x006fe8, 0x006fe8) AM_RAM // r/w tested
 	AM_RANGE(0x006fe9, 0x006fe9) AM_RAM // r/w tested
-	AM_RANGE(0x006fea, 0x006fea) AM_WRITENOP 
+	//AM_RANGE(0x006fea, 0x006fea) AM_WRITENOP 
 
 	AM_RANGE(0x006ff0, 0x006ff0) AM_RAM // r/w tested
-	AM_RANGE(0x006ff1, 0x006ff1) AM_WRITENOP // startup - cleared in interrupt 0
-	AM_RANGE(0x006ff2, 0x006ff2) AM_WRITENOP // set to 07 after clearing above things in interrupt 0
+	//AM_RANGE(0x006ff1, 0x006ff1) AM_WRITENOP // startup - cleared in interrupt 0
+	//AM_RANGE(0x006ff2, 0x006ff2) AM_WRITENOP // set to 07 after clearing above things in interrupt 0
 
 	AM_RANGE(0x006ff8, 0x006ff8) AM_RAM // always seems to be a read/store or read/modify/store
 	AM_RANGE(0x006ff9, 0x006ff9) AM_READ(pal_ntsc_r)
