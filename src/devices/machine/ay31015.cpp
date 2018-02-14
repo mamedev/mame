@@ -208,7 +208,7 @@ void ay31015_device::device_reset()
 inline uint8_t ay31015_device::get_si()
 {
 	if (!m_read_si_cb.isnull())
-		m_pins[AY31015_SI] = m_read_si_cb(0) ? 1 : 0;
+		m_pins[AY31015_SI] = m_read_si_cb();
 
 	return m_pins[AY31015_SI];
 }
@@ -219,7 +219,7 @@ inline void ay31015_device::set_so( int data )
 	m_pins[AY31015_SO] = data ? 1 : 0;
 
 	if (!m_write_so_cb.isnull())
-		m_write_so_cb((offs_t)0, m_pins[AY31015_SO]);
+		m_write_so_cb(m_pins[AY31015_SO]);
 }
 
 

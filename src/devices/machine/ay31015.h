@@ -148,8 +148,8 @@ protected:
 	double m_tx_clock;    /* TCP - pin 40 */
 	emu_timer *m_tx_timer;
 
-	devcb_read8 m_read_si_cb;               // SI - pin 20 - This will be called whenever the SI pin is sampled. Optional
-	devcb_write8 m_write_so_cb;             // SO - pin 25 - This will be called whenever data is put on the SO pin. Optional
+	devcb_read_line m_read_si_cb;           // SI - pin 20 - This will be called whenever the SI pin is sampled. Optional
+	devcb_write_line m_write_so_cb;         // SO - pin 25 - This will be called whenever data is put on the SO pin. Optional
 	devcb_write_line m_write_pe_cb;         // PE - pin 13 - This will be called whenever the PE pin may have changed. Optional
 	devcb_write_line m_write_fe_cb;         // FE - pin 14 - This will be called whenever the FE pin may have changed. Optional
 	devcb_write_line m_write_or_cb;         // OR - pin 15 - This will be called whenever the OR pin may have changed. Optional
