@@ -1125,7 +1125,8 @@ MACHINE_CONFIG_START(stv_state::stv)
 
 MACHINE_CONFIG_END
 
-MACHINE_CONFIG_DERIVED(stv_state::stv_5881, stv)
+MACHINE_CONFIG_START(stv_state::stv_5881)
+	stv(config);
 	MCFG_DEVICE_ADD("315_5881", SEGA315_5881_CRYPT, 0)
 	MCFG_SET_READ_CALLBACK(stv_state, crypt_read_callback)
 MACHINE_CONFIG_END
@@ -1141,7 +1142,8 @@ uint16_t stv_state::crypt_read_callback_ch2(uint32_t addr)
 	return m_maincpu->space().read_word(0x02000000 + 0x0000000 + (addr * 2));
 }
 
-MACHINE_CONFIG_DERIVED(stv_state::stv_5838, stv)
+MACHINE_CONFIG_START(stv_state::stv_5838)
+	stv(config);
 	MCFG_DEVICE_ADD("315_5838", SEGA315_5838_COMP, 0)
 	MCFG_SET_5838_READ_CALLBACK_CH1(stv_state, crypt_read_callback_ch1)
 	MCFG_SET_5838_READ_CALLBACK_CH2(stv_state, crypt_read_callback_ch2)
@@ -1163,7 +1165,8 @@ WRITE32_MEMBER( stv_state::batmanfr_sound_comms_w )
 }
 
 
-MACHINE_CONFIG_DERIVED(stv_state::batmanfr, stv)
+MACHINE_CONFIG_START(stv_state::batmanfr)
+	stv(config);
 	MCFG_DEVICE_ADD("rax", ACCLAIM_RAX, 0)
 MACHINE_CONFIG_END
 
@@ -1182,12 +1185,14 @@ MACHINE_CONFIG_START(stv_state::stv_cartslot)
 	MCFG_SOFTWARE_LIST_ADD("cart_list","stv")
 MACHINE_CONFIG_END
 
-MACHINE_CONFIG_DERIVED(stv_state::stv_slot, stv)
-	MCFG_FRAGMENT_ADD( stv_cartslot )
+MACHINE_CONFIG_START(stv_state::stv_slot)
+	stv(config);
+	stv_cartslot(config);
 MACHINE_CONFIG_END
 
-MACHINE_CONFIG_DERIVED(stv_state::hopper, stv)
-		MCFG_HOPPER_ADD("hopper", attotime::from_msec(100), TICKET_MOTOR_ACTIVE_HIGH, TICKET_STATUS_ACTIVE_HIGH)
+MACHINE_CONFIG_START(stv_state::hopper)
+	stv(config);
+	MCFG_HOPPER_ADD("hopper", attotime::from_msec(100), TICKET_MOTOR_ACTIVE_HIGH, TICKET_STATUS_ACTIVE_HIGH)
 MACHINE_CONFIG_END
 
 MACHINE_RESET_MEMBER(stv_state,stv)

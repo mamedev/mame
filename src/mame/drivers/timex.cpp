@@ -682,7 +682,8 @@ static GFXDECODE_START( ts2068 )
 	GFXDECODE_ENTRY( "maincpu", 0x13d00, ts2068_charlayout, 0, 8 )
 GFXDECODE_END
 
-MACHINE_CONFIG_DERIVED(spectrum_state::ts2068, spectrum_128)
+MACHINE_CONFIG_START(spectrum_state::ts2068)
+	spectrum_128(config);
 	MCFG_CPU_REPLACE("maincpu", Z80, XTAL(14'112'000)/4)        /* From Schematic; 3.528 MHz */
 	MCFG_CPU_PROGRAM_MAP(ts2068_mem)
 	MCFG_CPU_IO_MAP(ts2068_io)
@@ -721,13 +722,15 @@ MACHINE_CONFIG_DERIVED(spectrum_state::ts2068, spectrum_128)
 MACHINE_CONFIG_END
 
 
-MACHINE_CONFIG_DERIVED(spectrum_state::uk2086, ts2068)
+MACHINE_CONFIG_START(spectrum_state::uk2086)
+	ts2068(config);
 	MCFG_SCREEN_MODIFY("screen")
 	MCFG_SCREEN_REFRESH_RATE(50)
 MACHINE_CONFIG_END
 
 
-MACHINE_CONFIG_DERIVED(spectrum_state::tc2048, spectrum)
+MACHINE_CONFIG_START(spectrum_state::tc2048)
+	spectrum(config);
 	MCFG_CPU_MODIFY("maincpu")
 	MCFG_CPU_PROGRAM_MAP(tc2048_mem)
 	MCFG_CPU_IO_MAP(tc2048_io)

@@ -1736,7 +1736,7 @@ MACHINE_CONFIG_START(namcos2_state::base)
 	MCFG_MACHINE_RESET_OVERRIDE(namcos2_state,namcos2)
 	MCFG_NVRAM_ADD_1FILL("nvram")
 
-	MCFG_FRAGMENT_ADD(configure_c148_standard)
+	configure_c148_standard(config);
 	MCFG_NAMCO_C139_ADD("sci")
 
 	MCFG_SCREEN_ADD("screen", RASTER)
@@ -1764,7 +1764,8 @@ MACHINE_CONFIG_START(namcos2_state::base)
 MACHINE_CONFIG_END
 
 /* adjusted machine driver start */
-MACHINE_CONFIG_DERIVED(namcos2_state::base2, base)
+MACHINE_CONFIG_START(namcos2_state::base2)
+	base(config);
 
 	MCFG_C140_REPLACE("c140", C140_SOUND_CLOCK) /* 21.333kHz */
 	MCFG_C140_BANK_TYPE(SYSTEM2)
@@ -1773,12 +1774,14 @@ MACHINE_CONFIG_DERIVED(namcos2_state::base2, base)
 MACHINE_CONFIG_END
 /* end */
 
-MACHINE_CONFIG_DERIVED(namcos2_state::assaultp, base2)
+MACHINE_CONFIG_START(namcos2_state::assaultp)
+	base2(config);
 
 	MCFG_QUANTUM_TIME(attotime::from_hz(12000*8)) /* CPU slices per frame - boosted (along with MCU speed) so that the Mode Select works */
 MACHINE_CONFIG_END
 
-MACHINE_CONFIG_DERIVED(namcos2_state::base3, base)
+MACHINE_CONFIG_START(namcos2_state::base3)
+	base(config);
 
 	MCFG_C140_REPLACE("c140", C140_SOUND_CLOCK) /* 21.333kHz */
 	MCFG_C140_BANK_TYPE(SYSTEM2)
@@ -1813,7 +1816,7 @@ MACHINE_CONFIG_START(namcos2_state::gollygho)
 	MCFG_MACHINE_RESET_OVERRIDE(namcos2_state,namcos2)
 	MCFG_NVRAM_ADD_1FILL("nvram")
 
-	MCFG_FRAGMENT_ADD(configure_c148_standard)
+	configure_c148_standard(config);
 	MCFG_NAMCO_C139_ADD("sci")
 
 	MCFG_SCREEN_ADD("screen", RASTER)
@@ -1863,7 +1866,7 @@ MACHINE_CONFIG_START(namcos2_state::finallap)
 	MCFG_MACHINE_RESET_OVERRIDE(namcos2_state,namcos2)
 	MCFG_NVRAM_ADD_1FILL("nvram")
 
-	MCFG_FRAGMENT_ADD(configure_c148_standard)
+	configure_c148_standard(config);
 	MCFG_NAMCO_C139_ADD("sci")
 
 	MCFG_SCREEN_ADD("screen", RASTER)
@@ -1918,7 +1921,7 @@ MACHINE_CONFIG_START(namcos2_state::sgunner)
 	MCFG_MACHINE_RESET_OVERRIDE(namcos2_state,namcos2)
 	MCFG_NVRAM_ADD_1FILL("nvram")
 
-	MCFG_FRAGMENT_ADD(configure_c148_standard)
+	configure_c148_standard(config);
 	MCFG_NAMCO_C139_ADD("sci")
 
 	MCFG_SCREEN_ADD("screen", RASTER)
@@ -1975,7 +1978,7 @@ MACHINE_CONFIG_START(namcos2_state::sgunner2)
 	MCFG_MACHINE_RESET_OVERRIDE(namcos2_state,namcos2)
 	MCFG_NVRAM_ADD_1FILL("nvram")
 
-	MCFG_FRAGMENT_ADD(configure_c148_standard)
+	configure_c148_standard(config);
 	MCFG_NAMCO_C139_ADD("sci")
 
 	MCFG_SCREEN_ADD("screen", RASTER)
@@ -2027,7 +2030,7 @@ MACHINE_CONFIG_START(namcos2_state::luckywld)
 	MCFG_MACHINE_RESET_OVERRIDE(namcos2_state,namcos2)
 	MCFG_NVRAM_ADD_1FILL("nvram")
 
-	MCFG_FRAGMENT_ADD(configure_c148_standard)
+	configure_c148_standard(config);
 	MCFG_NAMCO_C139_ADD("sci")
 
 	MCFG_SCREEN_ADD("screen", RASTER)
@@ -2082,7 +2085,7 @@ MACHINE_CONFIG_START(namcos2_state::metlhawk)
 	MCFG_MACHINE_RESET_OVERRIDE(namcos2_state,namcos2)
 	MCFG_NVRAM_ADD_1FILL("nvram")
 
-	MCFG_FRAGMENT_ADD(configure_c148_standard)
+	configure_c148_standard(config);
 	MCFG_NAMCO_C139_ADD("sci")
 
 	MCFG_SCREEN_ADD("screen", RASTER)

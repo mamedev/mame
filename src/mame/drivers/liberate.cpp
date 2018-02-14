@@ -772,12 +772,14 @@ MACHINE_CONFIG_START(liberate_state::liberate_base)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
 MACHINE_CONFIG_END
 
-MACHINE_CONFIG_DERIVED(liberate_state::liberate, liberate_base)
+MACHINE_CONFIG_START(liberate_state::liberate)
+	liberate_base(config);
 	MCFG_DEVICE_MODIFY("maincpu")
 	MCFG_CPU_OPCODES_MAP(decrypted_opcodes_map)
 MACHINE_CONFIG_END
 
-MACHINE_CONFIG_DERIVED(liberate_state::liberatb, liberate_base)
+MACHINE_CONFIG_START(liberate_state::liberatb)
+	liberate_base(config);
 
 	/* basic machine hardware */
 	MCFG_CPU_REPLACE("maincpu", M6502, 2000000)
@@ -785,14 +787,16 @@ MACHINE_CONFIG_DERIVED(liberate_state::liberatb, liberate_base)
 	MCFG_CPU_VBLANK_INT_DRIVER("screen", liberate_state,  deco16_interrupt)
 MACHINE_CONFIG_END
 
-MACHINE_CONFIG_DERIVED(liberate_state::boomrang, liberate_base)
+MACHINE_CONFIG_START(liberate_state::boomrang)
+	liberate_base(config);
 
 	MCFG_VIDEO_START_OVERRIDE(liberate_state,boomrang)
 	MCFG_SCREEN_MODIFY("screen")
 	MCFG_SCREEN_UPDATE_DRIVER(liberate_state, screen_update_boomrang)
 MACHINE_CONFIG_END
 
-MACHINE_CONFIG_DERIVED(liberate_state::prosoccr, liberate_base)
+MACHINE_CONFIG_START(liberate_state::prosoccr)
+	liberate_base(config);
 
 	/* basic machine hardware */
 	MCFG_CPU_MODIFY("maincpu")

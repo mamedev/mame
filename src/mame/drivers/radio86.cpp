@@ -391,13 +391,15 @@ MACHINE_CONFIG_START(radio86_state::radio86)
 MACHINE_CONFIG_END
 
 
-MACHINE_CONFIG_DERIVED(radio86_state::radio16, radio86)
+MACHINE_CONFIG_START(radio86_state::radio16)
+	radio86(config);
 	/* basic machine hardware */
 	MCFG_CPU_MODIFY("maincpu")
 	MCFG_CPU_PROGRAM_MAP(radio86_16_mem)
 MACHINE_CONFIG_END
 
-MACHINE_CONFIG_DERIVED(radio86_state::radiorom, radio86)
+MACHINE_CONFIG_START(radio86_state::radiorom)
+	radio86(config);
 	/* basic machine hardware */
 	MCFG_CPU_MODIFY("maincpu")
 	MCFG_CPU_PROGRAM_MAP(radio86rom_mem)
@@ -413,7 +415,8 @@ MACHINE_CONFIG_DERIVED(radio86_state::radiorom, radio86)
 	MCFG_SOFTWARE_LIST_ADD("cart_list", "radio86_cart")
 MACHINE_CONFIG_END
 
-MACHINE_CONFIG_DERIVED(radio86_state::radioram, radio86)
+MACHINE_CONFIG_START(radio86_state::radioram)
+	radio86(config);
 	/* basic machine hardware */
 	MCFG_CPU_MODIFY("maincpu")
 	MCFG_CPU_PROGRAM_MAP(radio86ram_mem)
@@ -424,7 +427,8 @@ MACHINE_CONFIG_DERIVED(radio86_state::radioram, radio86)
 	MCFG_I8255_OUT_PORTC_CB(WRITE8(radio86_state, radio86_romdisk_portc_w))
 MACHINE_CONFIG_END
 
-MACHINE_CONFIG_DERIVED(radio86_state::rk7007, radio86)
+MACHINE_CONFIG_START(radio86_state::rk7007)
+	radio86(config);
 	/* basic machine hardware */
 	MCFG_CPU_MODIFY("maincpu")
 	MCFG_CPU_IO_MAP(rk7007_io)
@@ -436,7 +440,8 @@ MACHINE_CONFIG_DERIVED(radio86_state::rk7007, radio86)
 	MCFG_I8255_OUT_PORTC_CB(WRITE8(radio86_state, radio86_8255_portc_w2))
 MACHINE_CONFIG_END
 
-MACHINE_CONFIG_DERIVED(radio86_state::rk700716, radio16)
+MACHINE_CONFIG_START(radio86_state::rk700716)
+	radio16(config);
 	/* basic machine hardware */
 	MCFG_CPU_MODIFY("maincpu")
 	MCFG_CPU_IO_MAP(rk7007_io)
@@ -448,13 +453,15 @@ MACHINE_CONFIG_DERIVED(radio86_state::rk700716, radio16)
 	MCFG_I8255_OUT_PORTC_CB(WRITE8(radio86_state, radio86_8255_portc_w2))
 MACHINE_CONFIG_END
 
-MACHINE_CONFIG_DERIVED(radio86_state::mikron2, radio86)
+MACHINE_CONFIG_START(radio86_state::mikron2)
+	radio86(config);
 	/* basic machine hardware */
 	MCFG_CPU_MODIFY("maincpu")
 	MCFG_CPU_PROGRAM_MAP(mikron2_mem)
 MACHINE_CONFIG_END
 
-MACHINE_CONFIG_DERIVED(radio86_state::impuls03, radio86)
+MACHINE_CONFIG_START(radio86_state::impuls03)
+	radio86(config);
 	/* basic machine hardware */
 	MCFG_CPU_MODIFY("maincpu")
 	MCFG_CPU_PROGRAM_MAP(impuls03_mem)

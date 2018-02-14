@@ -1449,7 +1449,8 @@ MACHINE_CONFIG_START(jalmah_state::jalmah)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.5)
 MACHINE_CONFIG_END
 
-MACHINE_CONFIG_DERIVED(jalmah_state::urashima, jalmah)
+MACHINE_CONFIG_START(jalmah_state::urashima)
+	jalmah(config);
 
 	MCFG_CPU_MODIFY("maincpu")
 	MCFG_CPU_PROGRAM_MAP(urashima)

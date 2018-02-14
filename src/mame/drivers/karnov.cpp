@@ -847,7 +847,8 @@ MACHINE_CONFIG_START(karnov_state::karnov)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 MACHINE_CONFIG_END
 
-MACHINE_CONFIG_DERIVED(karnov_state::karnovjbl, karnov)
+MACHINE_CONFIG_START(karnov_state::karnovjbl)
+	karnov(config);
 	/* X-TALs:
 	Top board next to #9 is 20.000 MHz
 	Top board next to the microcontroller is 6.000 MHz
@@ -872,7 +873,8 @@ ADDRESS_MAP_START(karnov_state::chelnovjbl_mcu_io_map)
 ADDRESS_MAP_END
 
 
-MACHINE_CONFIG_DERIVED(karnov_state::chelnovjbl, karnov)
+MACHINE_CONFIG_START(karnov_state::chelnovjbl)
+	karnov(config);
 	MCFG_CPU_ADD("mcu", I8031, 2000000) // ??mhz
 	MCFG_CPU_PROGRAM_MAP(chelnovjbl_mcu_map)
 	MCFG_CPU_IO_MAP(chelnovjbl_mcu_io_map)

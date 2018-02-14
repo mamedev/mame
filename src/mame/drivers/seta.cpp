@@ -8256,7 +8256,8 @@ ADDRESS_MAP_START(seta_state::blockcarb_sound_portmap)
 //  AM_RANGE(0xc0, 0xc0) AM_MIRROR(0x3f) AM_DEVREAD("soundlatch", generic_latch_8_device, read)
 ADDRESS_MAP_END
 
-MACHINE_CONFIG_DERIVED(seta_state::blockcarb, blockcar)
+MACHINE_CONFIG_START(seta_state::blockcarb)
+	blockcar(config);
 
 	/* basic machine hardware */
 	MCFG_CPU_MODIFY("maincpu")
@@ -8649,7 +8650,8 @@ MACHINE_CONFIG_END
                                 Zombie Raid
 ***************************************************************************/
 
-MACHINE_CONFIG_DERIVED(seta_state::zombraid, gundhara)
+MACHINE_CONFIG_START(seta_state::zombraid)
+	gundhara(config);
 
 	/* basic machine hardware */
 	MCFG_CPU_MODIFY("maincpu")
@@ -8863,7 +8865,8 @@ MACHINE_CONFIG_START(seta_state::keroppij)
 	MCFG_SOUND_ROUTE(1, "rspeaker", 1.0)
 MACHINE_CONFIG_END
 
-MACHINE_CONFIG_DERIVED(seta_state::keroppi, keroppij)
+MACHINE_CONFIG_START(seta_state::keroppi)
+	keroppij(config);
 	MCFG_GFXDECODE_MODIFY("gfxdecode", tndrcade)
 MACHINE_CONFIG_END
 
@@ -9263,7 +9266,8 @@ ADDRESS_MAP_START(seta_state::thunderlbl_sound_portmap)
 ADDRESS_MAP_END
 
 
-MACHINE_CONFIG_DERIVED(seta_state::thunderlbl, thunderl)
+MACHINE_CONFIG_START(seta_state::thunderlbl)
+	thunderl(config);
 
 	/* basic machine hardware */
 	MCFG_CPU_MODIFY("maincpu")
@@ -9323,7 +9327,8 @@ MACHINE_CONFIG_START(seta_state::wiggie)
 	MCFG_GENERIC_LATCH_DATA_PENDING_CB(INPUTLINE("audiocpu", 0))
 MACHINE_CONFIG_END
 
-MACHINE_CONFIG_DERIVED(seta_state::superbar, wiggie)
+MACHINE_CONFIG_START(seta_state::superbar)
+	wiggie(config);
 
 	MCFG_GFXDECODE_MODIFY("gfxdecode", superbar)
 MACHINE_CONFIG_END
@@ -9545,7 +9550,8 @@ MACHINE_CONFIG_START(seta_state::zingzip)
 MACHINE_CONFIG_END
 
 
-MACHINE_CONFIG_DERIVED(seta_state::zingzipbl, zingzip)
+MACHINE_CONFIG_START(seta_state::zingzipbl)
+	zingzip(config);
 	MCFG_GFXDECODE_MODIFY("gfxdecode", zingzipbl)
 
 	MCFG_DEVICE_REMOVE("maincpu")
@@ -9726,7 +9732,8 @@ MACHINE_CONFIG_END
                              International Toote
 ***************************************************************************/
 
-MACHINE_CONFIG_DERIVED(jockeyc_state::inttoote, jockeyc)
+MACHINE_CONFIG_START(jockeyc_state::inttoote)
+	jockeyc(config);
 	MCFG_DEVICE_REMOVE("maincpu")
 	MCFG_CPU_ADD("maincpu", M68000, XTAL(16'000'000)) // TMP68HC000N-16
 	MCFG_CPU_PROGRAM_MAP(inttoote_map)

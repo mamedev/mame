@@ -1369,7 +1369,8 @@ MACHINE_CONFIG_START(snes_console_state::snes)
 	MCFG_SOFTWARE_LIST_ADD("st_list","snes_strom")
 MACHINE_CONFIG_END
 
-MACHINE_CONFIG_DERIVED(snes_console_state::snespal, snes)
+MACHINE_CONFIG_START(snes_console_state::snespal)
+	snes(config);
 	MCFG_CPU_MODIFY( "maincpu" )
 	MCFG_CPU_CLOCK( MCLK_PAL )
 

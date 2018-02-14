@@ -866,7 +866,8 @@ static SLOT_INTERFACE_START(saturn_cart)
 SLOT_INTERFACE_END
 
 
-MACHINE_CONFIG_DERIVED(sat_console_state::saturnus, saturn)
+MACHINE_CONFIG_START(sat_console_state::saturnus)
+	saturn(config);
 	MCFG_CDROM_ADD( "cdrom" )
 	MCFG_CDROM_INTERFACE("sat_cdrom")
 	MCFG_DEVICE_ADD("saturn_cdb", SATURN_CDB, 16000000)
@@ -882,7 +883,8 @@ MACHINE_CONFIG_DERIVED(sat_console_state::saturnus, saturn)
 
 MACHINE_CONFIG_END
 
-MACHINE_CONFIG_DERIVED(sat_console_state::saturneu, saturn)
+MACHINE_CONFIG_START(sat_console_state::saturneu)
+	saturn(config);
 	MCFG_CDROM_ADD( "cdrom" )
 	MCFG_CDROM_INTERFACE("sat_cdrom")
 	MCFG_DEVICE_ADD("saturn_cdb", SATURN_CDB, 16000000)
@@ -897,7 +899,8 @@ MACHINE_CONFIG_DERIVED(sat_console_state::saturneu, saturn)
 	smpc_hle_device::static_set_region_code(*device, 12);
 MACHINE_CONFIG_END
 
-MACHINE_CONFIG_DERIVED(sat_console_state::saturnjp, saturn)
+MACHINE_CONFIG_START(sat_console_state::saturnjp)
+	saturn(config);
 	MCFG_CDROM_ADD( "cdrom" )
 	MCFG_CDROM_INTERFACE("sat_cdrom")
 	MCFG_DEVICE_ADD("saturn_cdb", SATURN_CDB, 16000000)

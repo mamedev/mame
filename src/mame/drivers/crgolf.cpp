@@ -559,7 +559,8 @@ MACHINE_CONFIG_START(crgolf_state::crgolf)
 MACHINE_CONFIG_END
 
 
-MACHINE_CONFIG_DERIVED(crgolf_state::crgolfhi, crgolf)
+MACHINE_CONFIG_START(crgolf_state::crgolfhi)
+	crgolf(config);
 
 	MCFG_SOUND_ADD("msm", MSM5205, 384000)
 	MCFG_MSM5205_VCLK_CB(WRITELINE(crgolf_state, vck_callback))
@@ -568,7 +569,8 @@ MACHINE_CONFIG_DERIVED(crgolf_state::crgolfhi, crgolf)
 MACHINE_CONFIG_END
 
 
-MACHINE_CONFIG_DERIVED(crgolf_state::mastrglf, crgolfhi)
+MACHINE_CONFIG_START(crgolf_state::mastrglf)
+	crgolfhi(config);
 
 	/* basic machine hardware */
 	MCFG_CPU_MODIFY("maincpu")

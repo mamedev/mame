@@ -221,7 +221,8 @@ MACHINE_CONFIG_START(compc_state::compc)
 	MCFG_SOFTWARE_LIST_ADD("disk_list", "ibm5150")
 MACHINE_CONFIG_END
 
-MACHINE_CONFIG_DERIVED(compc_state::pc10iii, compc)
+MACHINE_CONFIG_START(compc_state::pc10iii)
+	compc(config);
 	MCFG_DEVICE_MODIFY("maincpu")
 	MCFG_CPU_IO_MAP(compciii_io)
 MACHINE_CONFIG_END

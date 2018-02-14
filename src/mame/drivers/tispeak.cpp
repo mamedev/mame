@@ -1290,11 +1290,12 @@ MACHINE_CONFIG_START(tispeak_state::snmath)
 
 	MCFG_SPEAKER_STANDARD_MONO("mono")
 	MCFG_SOUND_ADD("tms5100", CD2801, MASTER_CLOCK)
-	MCFG_FRAGMENT_ADD(tms5110_route)
+	tms5110_route(config);
 MACHINE_CONFIG_END
 
 
-MACHINE_CONFIG_DERIVED(tispeak_state::sns_cd2801, snmath)
+MACHINE_CONFIG_START(tispeak_state::sns_cd2801)
+	snmath(config);
 
 	/* basic machine hardware */
 	MCFG_CPU_MODIFY("maincpu")
@@ -1310,34 +1311,39 @@ MACHINE_CONFIG_DERIVED(tispeak_state::sns_cd2801, snmath)
 	MCFG_SOFTWARE_LIST_ADD("cart_list", "snspell")
 MACHINE_CONFIG_END
 
-MACHINE_CONFIG_DERIVED(tispeak_state::snspellit, sns_cd2801)
+MACHINE_CONFIG_START(tispeak_state::snspellit)
+	sns_cd2801(config);
 
 	/* basic machine hardware */
 	MCFG_DEFAULT_LAYOUT(layout_snmath)
 MACHINE_CONFIG_END
 
-MACHINE_CONFIG_DERIVED(tispeak_state::sns_tmc0281, sns_cd2801)
+MACHINE_CONFIG_START(tispeak_state::sns_tmc0281)
+	sns_cd2801(config);
 
 	/* sound hardware */
 	MCFG_SOUND_REPLACE("tms5100", TMC0281, MASTER_CLOCK)
-	MCFG_FRAGMENT_ADD(tms5110_route)
+	tms5110_route(config);
 MACHINE_CONFIG_END
 
-MACHINE_CONFIG_DERIVED(tispeak_state::snspellsp, sns_tmc0281)
+MACHINE_CONFIG_START(tispeak_state::snspellsp)
+	sns_tmc0281(config);
 
 	/* basic machine hardware */
 	MCFG_DEFAULT_LAYOUT(layout_snspellsp)
 MACHINE_CONFIG_END
 
-MACHINE_CONFIG_DERIVED(tispeak_state::sns_tmc0281d, sns_cd2801)
+MACHINE_CONFIG_START(tispeak_state::sns_tmc0281d)
+	sns_cd2801(config);
 
 	/* sound hardware */
 	MCFG_SOUND_REPLACE("tms5100", TMC0281D, MASTER_CLOCK)
-	MCFG_FRAGMENT_ADD(tms5110_route)
+	tms5110_route(config);
 MACHINE_CONFIG_END
 
 
-MACHINE_CONFIG_DERIVED(tispeak_state::snread, snmath)
+MACHINE_CONFIG_START(tispeak_state::snread)
+	snmath(config);
 
 	/* basic machine hardware */
 	MCFG_CPU_MODIFY("maincpu")
@@ -1354,7 +1360,8 @@ MACHINE_CONFIG_DERIVED(tispeak_state::snread, snmath)
 MACHINE_CONFIG_END
 
 
-MACHINE_CONFIG_DERIVED(tispeak_state::lantutor, snmath)
+MACHINE_CONFIG_START(tispeak_state::lantutor)
+	snmath(config);
 
 	/* basic machine hardware */
 	MCFG_CPU_MODIFY("maincpu")
@@ -1388,7 +1395,7 @@ MACHINE_CONFIG_START(tispeak_state::snspellc)
 
 	MCFG_SPEAKER_STANDARD_MONO("mono")
 	MCFG_SOUND_ADD("tms5100", TMC0281D, MASTER_CLOCK)
-	MCFG_FRAGMENT_ADD(tms5110_route)
+	tms5110_route(config);
 
 	/* cartridge */
 	MCFG_GENERIC_CARTSLOT_ADD("cartslot", generic_plain_slot, "snspell")
@@ -1398,11 +1405,12 @@ MACHINE_CONFIG_START(tispeak_state::snspellc)
 	MCFG_SOFTWARE_LIST_ADD("cart_list", "snspell")
 MACHINE_CONFIG_END
 
-MACHINE_CONFIG_DERIVED(tispeak_state::snspellcuk, snspellc)
+MACHINE_CONFIG_START(tispeak_state::snspellcuk)
+	snspellc(config);
 
 	/* sound hardware */
 	MCFG_SOUND_REPLACE("tms5100", CD2801, MASTER_CLOCK) // CD2801A!
-	MCFG_FRAGMENT_ADD(tms5110_route)
+	tms5110_route(config);
 MACHINE_CONFIG_END
 
 
@@ -1423,10 +1431,11 @@ MACHINE_CONFIG_START(tispeak_state::vocaid)
 
 	MCFG_SPEAKER_STANDARD_MONO("mono")
 	MCFG_SOUND_ADD("tms5100", CD2802, MASTER_CLOCK)
-	MCFG_FRAGMENT_ADD(tms5110_route)
+	tms5110_route(config);
 MACHINE_CONFIG_END
 
-MACHINE_CONFIG_DERIVED(tispeak_state::tntell, vocaid)
+MACHINE_CONFIG_START(tispeak_state::tntell)
+	vocaid(config);
 
 	/* cartridge */
 	MCFG_GENERIC_CARTSLOT_ADD("cartslot", generic_plain_slot, "tntell")
@@ -1453,7 +1462,7 @@ MACHINE_CONFIG_START(tispeak_state::k28m2)
 
 	MCFG_SPEAKER_STANDARD_MONO("mono")
 	MCFG_SOUND_ADD("tms5100", TMS5110A, MASTER_CLOCK)
-	MCFG_FRAGMENT_ADD(tms5110_route)
+	tms5110_route(config);
 
 	/* cartridge */
 	MCFG_GENERIC_CARTSLOT_ADD("cartslot", generic_plain_slot, "k28m2")

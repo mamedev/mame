@@ -231,7 +231,7 @@ MACHINE_CONFIG_START(channelf_state::channelf)
 	MCFG_SOUND_ADD("custom", CHANNELF_SOUND, 0)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.00)
 
-	MCFG_FRAGMENT_ADD( channelf_cart )
+	channelf_cart(config);
 MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(channelf_state::sabavdpl)
@@ -258,7 +258,7 @@ MACHINE_CONFIG_START(channelf_state::sabavdpl)
 	MCFG_SOUND_ADD("custom", CHANNELF_SOUND, 0)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.00)
 
-	MCFG_FRAGMENT_ADD( channelf_cart )
+	channelf_cart(config);
 MACHINE_CONFIG_END
 
 
@@ -286,7 +286,7 @@ MACHINE_CONFIG_START(channelf_state::channlf2)
 	MCFG_SOUND_ADD("custom", CHANNELF_SOUND, 0)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.00)
 
-	MCFG_FRAGMENT_ADD( channelf_cart )
+	channelf_cart(config);
 MACHINE_CONFIG_END
 
 
@@ -314,7 +314,7 @@ MACHINE_CONFIG_START(channelf_state::sabavpl2)
 	MCFG_SOUND_ADD("custom", CHANNELF_SOUND, 0)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
 
-	MCFG_FRAGMENT_ADD( channelf_cart )
+	channelf_cart(config);
 MACHINE_CONFIG_END
 
 ROM_START( channelf )

@@ -450,7 +450,7 @@ MACHINE_CONFIG_START(atari_s1_state::atari_s1)
 	MCFG_WATCHDOG_ADD("watchdog")
 
 	/* Sound */
-	MCFG_FRAGMENT_ADD( genpin_audio )
+	genpin_audio(config);
 	MCFG_SPEAKER_STANDARD_MONO("speaker")
 
 	MCFG_SOUND_ADD("dac", DAC_4BIT_R2R, 0) MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 0.3) // unknown DAC
@@ -464,12 +464,14 @@ MACHINE_CONFIG_START(atari_s1_state::atari_s1)
 	MCFG_TIMER_DRIVER_ADD_PERIODIC("timer_s", atari_s1_state, timer_s, attotime::from_hz(AUDIO_CLK))
 MACHINE_CONFIG_END
 
-MACHINE_CONFIG_DERIVED(atari_s1_state::atarians, atari_s1)
+MACHINE_CONFIG_START(atari_s1_state::atarians)
+	atari_s1(config);
 	MCFG_CPU_MODIFY("maincpu")
 	MCFG_CPU_PROGRAM_MAP(atarians_map)
 MACHINE_CONFIG_END
 
-MACHINE_CONFIG_DERIVED(atari_s1_state::midearth, atari_s1)
+MACHINE_CONFIG_START(atari_s1_state::midearth)
+	atari_s1(config);
 	MCFG_CPU_MODIFY("maincpu")
 	MCFG_CPU_PROGRAM_MAP(midearth_map)
 MACHINE_CONFIG_END

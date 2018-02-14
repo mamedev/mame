@@ -938,11 +938,12 @@ MACHINE_CONFIG_START(bbc_state::bbca)
 	MCFG_VIA6522_IRQ_HANDLER(DEVWRITELINE("irqs", input_merger_device, in_w<1>))
 
 	/* EPROM sockets */
-	MCFG_FRAGMENT_ADD(bbc_eprom_sockets)
+	bbc_eprom_sockets(config);
 MACHINE_CONFIG_END
 
 
-MACHINE_CONFIG_DERIVED(bbc_state::bbcb, bbca)
+MACHINE_CONFIG_START(bbc_state::bbcb)
+	bbca(config);
 	/* basic machine hardware */
 	MCFG_CPU_MODIFY( "maincpu" )
 	MCFG_CPU_PROGRAM_MAP(bbcb_nofdc_mem)
@@ -1017,7 +1018,8 @@ MACHINE_CONFIG_DERIVED(bbc_state::bbcb, bbca)
 MACHINE_CONFIG_END
 
 
-MACHINE_CONFIG_DERIVED(bbc_state::bbcb_de, bbcb)
+MACHINE_CONFIG_START(bbc_state::bbcb_de)
+	bbcb(config);
 	/* basic machine hardware */
 	MCFG_CPU_MODIFY("maincpu")
 	MCFG_CPU_PROGRAM_MAP(bbcb_mem)
@@ -1038,7 +1040,8 @@ MACHINE_CONFIG_DERIVED(bbc_state::bbcb_de, bbcb)
 MACHINE_CONFIG_END
 
 
-MACHINE_CONFIG_DERIVED(bbc_state::bbcb_us, bbcb)
+MACHINE_CONFIG_START(bbc_state::bbcb_us)
+	bbcb(config);
 	/* basic machine hardware */
 	MCFG_CPU_MODIFY("maincpu")
 	MCFG_CPU_PROGRAM_MAP(bbcb_mem)
@@ -1065,7 +1068,8 @@ MACHINE_CONFIG_DERIVED(bbc_state::bbcb_us, bbcb)
 MACHINE_CONFIG_END
 
 
-MACHINE_CONFIG_DERIVED(bbc_state::bbcbp, bbcb)
+MACHINE_CONFIG_START(bbc_state::bbcbp)
+	bbcb(config);
 	/* basic machine hardware */
 	MCFG_CPU_MODIFY( "maincpu" )  /* M6512 */
 	MCFG_CPU_PROGRAM_MAP(bbcbp_mem)
@@ -1086,7 +1090,8 @@ MACHINE_CONFIG_DERIVED(bbc_state::bbcbp, bbcb)
 MACHINE_CONFIG_END
 
 
-MACHINE_CONFIG_DERIVED(bbc_state::bbcbp128, bbcbp)
+MACHINE_CONFIG_START(bbc_state::bbcbp128)
+	bbcbp(config);
 	/* basic machine hardware */
 	MCFG_CPU_MODIFY( "maincpu" )  /* M6512 */
 	MCFG_CPU_PROGRAM_MAP(bbcbp128_mem)
@@ -1103,7 +1108,8 @@ MACHINE_CONFIG_END
 ****************************************************************************/
 
 
-MACHINE_CONFIG_DERIVED(torch240_state::torchf, bbcb)
+MACHINE_CONFIG_START(torch240_state::torchf)
+	bbcb(config);
 	/* basic machine hardware */
 	MCFG_CPU_MODIFY("maincpu")
 	MCFG_CPU_PROGRAM_MAP(bbcb_mem)
@@ -1128,7 +1134,8 @@ MACHINE_CONFIG_DERIVED(torch240_state::torchf, bbcb)
 MACHINE_CONFIG_END
 
 
-MACHINE_CONFIG_DERIVED(torch240_state::torchh10, torchf)
+MACHINE_CONFIG_START(torch240_state::torchh10)
+	torchf(config);
 	/* fdc */
 	MCFG_DEVICE_REMOVE("i8271:1")
 
@@ -1137,7 +1144,8 @@ MACHINE_CONFIG_DERIVED(torch240_state::torchh10, torchf)
 MACHINE_CONFIG_END
 
 
-MACHINE_CONFIG_DERIVED(torch240_state::torchh21, torchf)
+MACHINE_CONFIG_START(torch240_state::torchh21)
+	torchf(config);
 	/* fdc */
 	MCFG_DEVICE_REMOVE("i8271:1")
 
@@ -1153,7 +1161,8 @@ MACHINE_CONFIG_END
 ****************************************************************************/
 
 
-MACHINE_CONFIG_DERIVED(bbc_state::abc110, bbcbp)
+MACHINE_CONFIG_START(bbc_state::abc110)
+	bbcbp(config);
 	/* fdc */
 	MCFG_DEVICE_REMOVE("wd1770:1")
 
@@ -1185,7 +1194,8 @@ MACHINE_CONFIG_DERIVED(bbc_state::abc110, bbcbp)
 MACHINE_CONFIG_END
 
 
-MACHINE_CONFIG_DERIVED(bbc_state::acw443, bbcbp)
+MACHINE_CONFIG_START(bbc_state::acw443)
+	bbcbp(config);
 	/* fdc */
 	MCFG_DEVICE_REMOVE("wd1770:1")
 
@@ -1209,7 +1219,8 @@ MACHINE_CONFIG_DERIVED(bbc_state::acw443, bbcbp)
 MACHINE_CONFIG_END
 
 
-MACHINE_CONFIG_DERIVED(bbc_state::abc310, bbcbp)
+MACHINE_CONFIG_START(bbc_state::abc310)
+	bbcbp(config);
 	/* fdc */
 	MCFG_DEVICE_REMOVE("wd1770:1")
 
@@ -1236,7 +1247,8 @@ MACHINE_CONFIG_END
 ****************************************************************************/
 
 
-MACHINE_CONFIG_DERIVED(bbc_state::reutapm, bbcbp)
+MACHINE_CONFIG_START(bbc_state::reutapm)
+	bbcbp(config);
 	/* basic machine hardware */
 	MCFG_CPU_MODIFY( "maincpu" )  /* M6512 */
 	MCFG_CPU_PROGRAM_MAP(reutapm_mem)
@@ -1272,7 +1284,8 @@ MACHINE_CONFIG_END
 ****************************************************************************/
 
 
-MACHINE_CONFIG_DERIVED(bbc_state::econx25, bbcbp)
+MACHINE_CONFIG_START(bbc_state::econx25)
+	bbcbp(config);
 	/* sound hardware */
 	MCFG_DEVICE_REMOVE("vsm")
 	MCFG_DEVICE_REMOVE("tms5220")
@@ -1455,7 +1468,8 @@ MACHINE_CONFIG_START(bbc_state::bbcm)
 MACHINE_CONFIG_END
 
 
-MACHINE_CONFIG_DERIVED(bbc_state::bbcmt, bbcm)
+MACHINE_CONFIG_START(bbc_state::bbcmt)
+	bbcm(config);
 	/* Add 65C102 co-processor */
 	MCFG_DEVICE_MODIFY("intube")
 	MCFG_SLOT_DEFAULT_OPTION("65c102")
@@ -1463,7 +1477,8 @@ MACHINE_CONFIG_DERIVED(bbc_state::bbcmt, bbcm)
 MACHINE_CONFIG_END
 
 
-MACHINE_CONFIG_DERIVED(bbc_state::bbcmaiv, bbcm)
+MACHINE_CONFIG_START(bbc_state::bbcmaiv)
+	bbcm(config);
 	/* Add 65C102 co-processor */
 	MCFG_DEVICE_MODIFY("intube")
 	MCFG_SLOT_DEFAULT_OPTION("65c102")
@@ -1476,7 +1491,8 @@ MACHINE_CONFIG_DERIVED(bbc_state::bbcmaiv, bbcm)
 MACHINE_CONFIG_END
 
 
-MACHINE_CONFIG_DERIVED(bbc_state::bbcmet, bbcm)
+MACHINE_CONFIG_START(bbc_state::bbcmet)
+	bbcm(config);
 	/* printer */
 	MCFG_DEVICE_REMOVE("centronics")
 	MCFG_DEVICE_REMOVE("cent_data_out")
@@ -1512,7 +1528,8 @@ MACHINE_CONFIG_DERIVED(bbc_state::bbcmet, bbcm)
 MACHINE_CONFIG_END
 
 
-MACHINE_CONFIG_DERIVED(bbc_state::bbcm512, bbcm)
+MACHINE_CONFIG_START(bbc_state::bbcm512)
+	bbcm(config);
 	/* Add Intel 80186 co-processor */
 	MCFG_DEVICE_MODIFY("intube")
 	MCFG_SLOT_DEFAULT_OPTION("80186")
@@ -1520,7 +1537,8 @@ MACHINE_CONFIG_DERIVED(bbc_state::bbcm512, bbcm)
 MACHINE_CONFIG_END
 
 
-MACHINE_CONFIG_DERIVED(bbc_state::bbcmarm, bbcm)
+MACHINE_CONFIG_START(bbc_state::bbcmarm)
+	bbcm(config);
 	/* Add ARM co-processor */
 	MCFG_DEVICE_MODIFY("extube")
 	MCFG_SLOT_DEFAULT_OPTION("arm")
@@ -1528,7 +1546,8 @@ MACHINE_CONFIG_DERIVED(bbc_state::bbcmarm, bbcm)
 MACHINE_CONFIG_END
 
 
-MACHINE_CONFIG_DERIVED(bbc_state::discmate, bbcm)
+MACHINE_CONFIG_START(bbc_state::discmate)
+	bbcm(config);
 	/* Add Sony CDK-3000PII Auto Disc Loader */
 
 	/* Add interface boards connected to cassette and RS423 */
@@ -1543,7 +1562,8 @@ MACHINE_CONFIG_DERIVED(bbc_state::discmate, bbcm)
 MACHINE_CONFIG_END
 
 
-MACHINE_CONFIG_DERIVED(bbc_state::cfa3000, bbcm)
+MACHINE_CONFIG_START(bbc_state::cfa3000)
+	bbcm(config);
 	MCFG_MACHINE_START_OVERRIDE(bbc_state, cfa3000)
 
 	/* fdc */
@@ -1581,7 +1601,8 @@ MACHINE_CONFIG_END
 ****************************************************************************/
 
 
-MACHINE_CONFIG_DERIVED(bbc_state::bbcmc, bbcm)
+MACHINE_CONFIG_START(bbc_state::bbcmc)
+	bbcm(config);
 	/* cassette */
 	MCFG_DEVICE_REMOVE("cassette")
 
@@ -1626,7 +1647,8 @@ MACHINE_CONFIG_DERIVED(bbc_state::bbcmc, bbcm)
 MACHINE_CONFIG_END
 
 
-MACHINE_CONFIG_DERIVED(bbc_state::pro128s, bbcmc)
+MACHINE_CONFIG_START(bbc_state::pro128s)
+	bbcmc(config);
 	/* software lists */
 	MCFG_SOFTWARE_LIST_REMOVE("flop_ls_mc")
 	MCFG_SOFTWARE_LIST_REMOVE("flop_ls_pro128s")
@@ -1643,13 +1665,15 @@ MACHINE_CONFIG_END
 
 /* Both LTM machines used a 9" Hantarex MT3000 green monitor */
 
-MACHINE_CONFIG_DERIVED(bbc_state::ltmpbp, bbcbp)
+MACHINE_CONFIG_START(bbc_state::ltmpbp)
+	bbcbp(config);
 	/* basic machine hardware */
 	MCFG_MACHINE_RESET_OVERRIDE(bbc_state, ltmpbp)
 MACHINE_CONFIG_END
 
 
-MACHINE_CONFIG_DERIVED(bbc_state::ltmpm, bbcm)
+MACHINE_CONFIG_START(bbc_state::ltmpm)
+	bbcm(config);
 	/* basic machine hardware */
 	MCFG_MACHINE_RESET_OVERRIDE(bbc_state, ltmpm)
 MACHINE_CONFIG_END

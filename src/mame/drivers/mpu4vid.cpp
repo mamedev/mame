@@ -1274,7 +1274,7 @@ MACHINE_CONFIG_START(mpu4vid_state::mpu4_vid)
 
 	MCFG_NVRAM_ADD_0FILL("nvram")               /* confirm */
 
-	MCFG_FRAGMENT_ADD(mpu4_common)
+	mpu4_common(config);
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
@@ -1331,34 +1331,38 @@ MACHINE_CONFIG_START(mpu4vid_state::mpu4_vid)
 	MCFG_ACIA6850_IRQ_HANDLER(WRITELINE(mpu4vid_state, m68k_acia_irq))
 MACHINE_CONFIG_END
 
-MACHINE_CONFIG_DERIVED(mpu4vid_state::crmaze, mpu4_vid)
+MACHINE_CONFIG_START(mpu4vid_state::crmaze)
+	mpu4_vid(config);
 	MCFG_DEVICE_MODIFY("pia_ic5")
 	MCFG_PIA_READPA_HANDLER(READ8(mpu4vid_state, pia_ic5_porta_track_r))
 	MCFG_PIA_WRITEPA_HANDLER(NOOP)
 	MCFG_PIA_WRITEPB_HANDLER(NOOP)
 MACHINE_CONFIG_END
 
-MACHINE_CONFIG_DERIVED(mpu4vid_state::mating, crmaze)
+MACHINE_CONFIG_START(mpu4vid_state::mating)
+	crmaze(config);
 	MCFG_CPU_MODIFY("video")
 	MCFG_CPU_PROGRAM_MAP(mpu4oki_68k_map)
 
-	MCFG_FRAGMENT_ADD(mpu4_common2)
+	mpu4_common2(config);
 
 	MCFG_SOUND_ADD("msm6376", OKIM6376, 128000) //?
 	MCFG_SOUND_ROUTE(0, "lspeaker", 0.5)
 	MCFG_SOUND_ROUTE(1, "rspeaker", 0.5)
 MACHINE_CONFIG_END
 
-MACHINE_CONFIG_DERIVED(mpu4vid_state::bwbvid, mpu4_vid)
+MACHINE_CONFIG_START(mpu4vid_state::bwbvid)
+	mpu4_vid(config);
 	MCFG_CPU_MODIFY("video")
 	MCFG_CPU_PROGRAM_MAP(bwbvid_68k_map)
 MACHINE_CONFIG_END
 
-MACHINE_CONFIG_DERIVED(mpu4vid_state::bwbvid5, bwbvid)
+MACHINE_CONFIG_START(mpu4vid_state::bwbvid5)
+	bwbvid(config);
 	MCFG_CPU_MODIFY("video")
 	MCFG_CPU_PROGRAM_MAP(bwbvid5_68k_map)
 
-	MCFG_FRAGMENT_ADD(mpu4_common2)
+	mpu4_common2(config);
 
 	MCFG_SOUND_ADD("msm6376", OKIM6376, 128000) //?
 	MCFG_SOUND_ROUTE(0, "lspeaker", 0.5)

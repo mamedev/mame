@@ -388,14 +388,15 @@ MACHINE_CONFIG_START(play_2_state::play_2)
 	MCFG_7474_COMP_OUTPUT_CB(DEVWRITELINE("maincpu", cosmac_device, int_w)) MCFG_DEVCB_INVERT // int is reversed in mame
 
 	/* Sound */
-	MCFG_FRAGMENT_ADD( genpin_audio )
+	genpin_audio(config);
 
 	MCFG_SPEAKER_STANDARD_MONO("mono")
 	MCFG_CDP1863_ADD("1863", 0, XTAL(2'950'000) / 8)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.00)
 MACHINE_CONFIG_END
 
-MACHINE_CONFIG_DERIVED(play_2_state::zira, play_2)
+MACHINE_CONFIG_START(play_2_state::zira)
+	play_2(config);
 	MCFG_CPU_ADD("cop402", COP402, XTAL(2'000'000))
 	MCFG_CPU_PROGRAM_MAP(zira_sound_map)
 	MCFG_COP400_CONFIG( COP400_CKI_DIVISOR_16, COP400_CKO_OSCILLATOR_OUTPUT, false )

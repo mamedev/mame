@@ -208,7 +208,8 @@ MACHINE_CONFIG_START(gaelco2_state::maniacsq)
 	MCFG_SOUND_ROUTE(1, "rspeaker", 1.0)
 MACHINE_CONFIG_END
 
-MACHINE_CONFIG_DERIVED(gaelco2_state::maniacsq_d5002fp, maniacsq)
+MACHINE_CONFIG_START(gaelco2_state::maniacsq_d5002fp)
+	maniacsq(config);
 	MCFG_DEVICE_ADD("gaelco_ds5002fp", GAELCO_DS5002FP, XTAL(24'000'000) / 2) /* ? */
 	MCFG_DEVICE_ADDRESS_MAP(0, mcu_hostmem_map)
 MACHINE_CONFIG_END
@@ -966,7 +967,8 @@ MACHINE_CONFIG_START(gaelco2_state::alighunt)
 	MCFG_SOUND_ROUTE(1, "rspeaker", 1.0)
 MACHINE_CONFIG_END
 
-MACHINE_CONFIG_DERIVED(gaelco2_state::alighunt_d5002fp, alighunt)
+MACHINE_CONFIG_START(gaelco2_state::alighunt_d5002fp)
+	alighunt(config);
 	MCFG_DEVICE_ADD("gaelco_ds5002fp", GAELCO_DS5002FP, XTAL(24'000'000) / 2) /* 12 MHz */
 	MCFG_DEVICE_ADDRESS_MAP(0, mcu_hostmem_map)
 MACHINE_CONFIG_END
@@ -1278,7 +1280,8 @@ MACHINE_CONFIG_START(gaelco2_state::touchgo)
 	MCFG_SOUND_ROUTE(1, "lspeaker", 1.0)
 MACHINE_CONFIG_END
 
-MACHINE_CONFIG_DERIVED(gaelco2_state::touchgo_d5002fp, touchgo)
+MACHINE_CONFIG_START(gaelco2_state::touchgo_d5002fp)
+	touchgo(config);
 	MCFG_DEVICE_ADD("gaelco_ds5002fp", GAELCO_DS5002FP, XTAL(40'000'000) / 4) /* 10MHz? - Not verified */
 	MCFG_DEVICE_ADDRESS_MAP(0, mcu_hostmem_map)
 MACHINE_CONFIG_END

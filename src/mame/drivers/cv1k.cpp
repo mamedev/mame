@@ -493,7 +493,8 @@ MACHINE_CONFIG_START(cv1k_state::cv1k)
 	MCFG_EPIC12_SET_MAINRAMSIZE(0x800000)
 MACHINE_CONFIG_END
 
-MACHINE_CONFIG_DERIVED(cv1k_state::cv1k_d, cv1k)
+MACHINE_CONFIG_START(cv1k_state::cv1k_d)
+	cv1k(config);
 
 	/* basic machine hardware */
 	MCFG_DEVICE_REMOVE("maincpu")

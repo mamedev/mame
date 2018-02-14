@@ -1289,7 +1289,7 @@ MACHINE_CONFIG_START(armedf_state::terraf)
 	MCFG_BUFFERED_SPRITERAM16_ADD("spriteram")
 
 	/* sound hardware */
-	MCFG_FRAGMENT_ADD(terraf_sound)
+	terraf_sound(config);
 MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(armedf_state::terrafjb)
@@ -1344,7 +1344,8 @@ MACHINE_CONFIG_START(armedf_state::terrafjb)
 	MCFG_SOUND_ROUTE_EX(0, "dac2", 1.0, DAC_VREF_POS_INPUT) MCFG_SOUND_ROUTE_EX(0, "dac2", -1.0, DAC_VREF_NEG_INPUT)
 MACHINE_CONFIG_END
 
-MACHINE_CONFIG_DERIVED(armedf_state::terrafb, terraf)
+MACHINE_CONFIG_START(armedf_state::terrafb)
+	terraf(config);
 	MCFG_DEVICE_REMOVE("nb1414m4")
 MACHINE_CONFIG_END
 
@@ -1379,7 +1380,7 @@ MACHINE_CONFIG_START(armedf_state::kozure)
 	MCFG_BUFFERED_SPRITERAM16_ADD("spriteram")
 
 	/* sound hardware */
-	MCFG_FRAGMENT_ADD(terraf_sound)
+	terraf_sound(config);
 MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(armedf_state::armedf)
@@ -1607,7 +1608,7 @@ MACHINE_CONFIG_START(bigfghtr_state::bigfghtr)
 	MCFG_BUFFERED_SPRITERAM16_ADD("spriteram")
 
 	/* sound hardware */
-	MCFG_FRAGMENT_ADD(terraf_sound)
+	terraf_sound(config);
 MACHINE_CONFIG_END
 
 /*************************************

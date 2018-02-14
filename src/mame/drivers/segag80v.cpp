@@ -894,7 +894,8 @@ MACHINE_CONFIG_START(segag80v_state::g80v_base)
 MACHINE_CONFIG_END
 
 
-MACHINE_CONFIG_DERIVED(segag80v_state::elim2, g80v_base)
+MACHINE_CONFIG_START(segag80v_state::elim2)
+	g80v_base(config);
 
 	/* custom sound board */
 	MCFG_SOUND_ADD("samples", SAMPLES, 0)
@@ -904,7 +905,8 @@ MACHINE_CONFIG_DERIVED(segag80v_state::elim2, g80v_base)
 MACHINE_CONFIG_END
 
 
-MACHINE_CONFIG_DERIVED(segag80v_state::spacfury, g80v_base)
+MACHINE_CONFIG_START(segag80v_state::spacfury)
+	g80v_base(config);
 
 	/* custom sound board */
 	MCFG_SOUND_ADD("samples", SAMPLES, 0)
@@ -913,11 +915,12 @@ MACHINE_CONFIG_DERIVED(segag80v_state::spacfury, g80v_base)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 0.1)
 
 	/* speech board */
-	MCFG_FRAGMENT_ADD(sega_speech_board)
+	sega_speech_board(config);
 MACHINE_CONFIG_END
 
 
-MACHINE_CONFIG_DERIVED(segag80v_state::zektor, g80v_base)
+MACHINE_CONFIG_START(segag80v_state::zektor)
+	g80v_base(config);
 
 	/* custom sound board */
 	MCFG_SOUND_ADD("samples", SAMPLES, 0)
@@ -929,21 +932,23 @@ MACHINE_CONFIG_DERIVED(segag80v_state::zektor, g80v_base)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 0.33)
 
 	/* speech board */
-	MCFG_FRAGMENT_ADD(sega_speech_board)
+	sega_speech_board(config);
 MACHINE_CONFIG_END
 
 
-MACHINE_CONFIG_DERIVED(segag80v_state::tacscan, g80v_base)
+MACHINE_CONFIG_START(segag80v_state::tacscan)
+	g80v_base(config);
 
 	/* universal sound board */
 	MCFG_SEGAUSB_ADD("usbsnd")
 MACHINE_CONFIG_END
 
 
-MACHINE_CONFIG_DERIVED(segag80v_state::startrek, g80v_base)
+MACHINE_CONFIG_START(segag80v_state::startrek)
+	g80v_base(config);
 
 	/* speech board */
-	MCFG_FRAGMENT_ADD(sega_speech_board)
+	sega_speech_board(config);
 
 	/* universal sound board */
 	MCFG_SEGAUSB_ADD("usbsnd")

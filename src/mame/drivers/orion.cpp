@@ -147,7 +147,8 @@ MACHINE_CONFIG_START(orion_state::orion128)
 	MCFG_RAM_DEFAULT_VALUE(0x00)
 MACHINE_CONFIG_END
 
-MACHINE_CONFIG_DERIVED(orion_state::orion128ms, orion128)
+MACHINE_CONFIG_START(orion_state::orion128ms)
+	orion128(config);
 	MCFG_DEVICE_REMOVE("ppi8255_2")
 	MCFG_DEVICE_ADD("ppi8255_2", I8255A, 0)
 	MCFG_I8255_OUT_PORTA_CB(WRITE8(radio86_state, radio86_8255_porta_w2))
@@ -226,7 +227,8 @@ MACHINE_CONFIG_START(orion_state::orionz80)
 	MCFG_RAM_DEFAULT_VALUE(0x00)
 MACHINE_CONFIG_END
 
-MACHINE_CONFIG_DERIVED(orion_state::orionz80ms, orionz80)
+MACHINE_CONFIG_START(orion_state::orionz80ms)
+	orionz80(config);
 
 	MCFG_DEVICE_REMOVE("ppi8255_2")
 	MCFG_DEVICE_ADD("ppi8255_2", I8255A, 0)

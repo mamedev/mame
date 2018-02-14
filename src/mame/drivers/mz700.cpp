@@ -432,7 +432,8 @@ MACHINE_CONFIG_START(mz_state::mz700)
 MACHINE_CONFIG_END
 
 
-MACHINE_CONFIG_DERIVED(mz_state::mz800, mz700)
+MACHINE_CONFIG_START(mz_state::mz800)
+	mz700(config);
 	MCFG_DEVICE_REMOVE("banke")
 
 	/* basic machine hardware */

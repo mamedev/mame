@@ -551,7 +551,8 @@ MACHINE_CONFIG_START(ladybug_state::ladybug)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 MACHINE_CONFIG_END
 
-MACHINE_CONFIG_DERIVED(ladybug_state::dorodon, ladybug)
+MACHINE_CONFIG_START(ladybug_state::dorodon)
+	ladybug(config);
 	MCFG_CPU_MODIFY("maincpu")
 	MCFG_CPU_OPCODES_MAP(decrypted_opcodes_map)
 MACHINE_CONFIG_END

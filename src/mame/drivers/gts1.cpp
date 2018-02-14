@@ -721,7 +721,7 @@ MACHINE_CONFIG_START(gts1_state::gts1)
 	MCFG_DEFAULT_LAYOUT( layout_gts1 )
 
 	/* Sound */
-	MCFG_FRAGMENT_ADD( genpin_audio )
+	genpin_audio(config);
 MACHINE_CONFIG_END
 
 

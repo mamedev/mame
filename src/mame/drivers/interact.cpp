@@ -146,7 +146,7 @@ MACHINE_CONFIG_START(interact_state::interact)
 
 	MCFG_VIDEO_START_OVERRIDE(interact_state,hec2hrp)
 
-	MCFG_FRAGMENT_ADD(hector_audio)
+	hector_audio(config);
 
 	MCFG_CASSETTE_ADD("cassette")
 	MCFG_CASSETTE_FORMATS(hector_cassette_formats)
@@ -183,7 +183,7 @@ MACHINE_CONFIG_START(interact_state::hector1)
 
 	MCFG_VIDEO_START_OVERRIDE(interact_state,hec2hrp)
 
-	MCFG_FRAGMENT_ADD(hector_audio)
+	hector_audio(config);
 
 	MCFG_CASSETTE_ADD("cassette")
 	MCFG_CASSETTE_FORMATS(hector_cassette_formats)

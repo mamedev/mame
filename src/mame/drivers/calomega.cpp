@@ -2616,7 +2616,8 @@ MACHINE_CONFIG_START(calomega_state::sys903)
 MACHINE_CONFIG_END
 
 
-MACHINE_CONFIG_DERIVED(calomega_state::s903mod, sys903)
+MACHINE_CONFIG_START(calomega_state::s903mod)
+	sys903(config);
 
 	/* basic machine hardware */
 
@@ -2633,7 +2634,8 @@ MACHINE_CONFIG_DERIVED(calomega_state::s903mod, sys903)
 MACHINE_CONFIG_END
 
 
-MACHINE_CONFIG_DERIVED(calomega_state::sys905, sys903)
+MACHINE_CONFIG_START(calomega_state::sys905)
+	sys903(config);
 
 	/* basic machine hardware */
 
@@ -2657,7 +2659,8 @@ MACHINE_CONFIG_DERIVED(calomega_state::sys905, sys903)
 MACHINE_CONFIG_END
 
 
-MACHINE_CONFIG_DERIVED(calomega_state::sys906, sys903)
+MACHINE_CONFIG_START(calomega_state::sys906)
+	sys903(config);
 
 	/* basic machine hardware */
 

@@ -725,7 +725,8 @@ ADDRESS_MAP_START(snesb_state::mcu_io_map)
 ADDRESS_MAP_END
 
 
-MACHINE_CONFIG_DERIVED(snesb_state::mk3snes, kinstb)
+MACHINE_CONFIG_START(snesb_state::mk3snes)
+	kinstb(config);
 
 	MCFG_CPU_ADD("mcu", I8751, XTAL(8'000'000))
 	MCFG_CPU_IO_MAP(mcu_io_map)
@@ -741,7 +742,8 @@ MACHINE_RESET_MEMBER( snesb_state, ffight2b )
 	cpu0space.write_byte(0x7eadce, 0x00);
 }
 
-MACHINE_CONFIG_DERIVED(snesb_state::ffight2b, kinstb)
+MACHINE_CONFIG_START(snesb_state::ffight2b)
+	kinstb(config);
 	MCFG_MACHINE_RESET_OVERRIDE( snesb_state, ffight2b )
 MACHINE_CONFIG_END
 

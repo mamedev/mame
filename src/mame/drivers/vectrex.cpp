@@ -215,7 +215,8 @@ static INPUT_PORTS_START(raaspec)
 INPUT_PORTS_END
 
 
-MACHINE_CONFIG_DERIVED(vectrex_state::raaspec, vectrex)
+MACHINE_CONFIG_START(vectrex_state::raaspec)
+	vectrex(config);
 	MCFG_CPU_MODIFY("maincpu")
 	MCFG_CPU_PROGRAM_MAP(raaspec_map)
 	MCFG_NVRAM_ADD_0FILL("nvram")

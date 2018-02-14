@@ -606,7 +606,7 @@ MACHINE_CONFIG_START(comx35_state::pal)
 	MCFG_COSMAC_SC_CALLBACK(WRITE8(comx35_state, sc_w))
 
 	// sound and video hardware
-	MCFG_FRAGMENT_ADD(comx35_pal_video)
+	comx35_pal_video(config);
 
 	// peripheral hardware
 	MCFG_DEVICE_ADD(CDP1871_TAG, CDP1871, cdp1869_device::CPU_CLK_PAL/8)
@@ -656,7 +656,7 @@ MACHINE_CONFIG_START(comx35_state::ntsc)
 	MCFG_COSMAC_SC_CALLBACK(WRITE8(comx35_state, sc_w))
 
 	// sound and video hardware
-	MCFG_FRAGMENT_ADD(comx35_ntsc_video)
+	comx35_ntsc_video(config);
 
 	// peripheral hardware
 	MCFG_DEVICE_ADD(CDP1871_TAG, CDP1871, cdp1869_device::CPU_CLK_PAL/8)

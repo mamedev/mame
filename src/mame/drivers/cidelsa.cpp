@@ -401,7 +401,7 @@ MACHINE_CONFIG_START(cidelsa_state::destryer)
 	MCFG_NVRAM_ADD_0FILL("nvram")
 
 	/* sound and video hardware */
-	MCFG_FRAGMENT_ADD(destryer_video)
+	destryer_video(config);
 MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(cidelsa_state::destryera)
@@ -416,7 +416,7 @@ MACHINE_CONFIG_START(cidelsa_state::destryera)
 	MCFG_NVRAM_ADD_0FILL("nvram")
 
 	/* sound and video hardware */
-	MCFG_FRAGMENT_ADD(destryer_video)
+	destryer_video(config);
 MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(cidelsa_state::altair)
@@ -445,7 +445,7 @@ MACHINE_CONFIG_START(cidelsa_state::altair)
 	MCFG_CDP1852_DO_CALLBACK(WRITE8(cidelsa_state, altair_out1_w))
 
 	/* sound and video hardware */
-	MCFG_FRAGMENT_ADD(altair_video)
+	altair_video(config);
 MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(draco_state::draco)
@@ -483,7 +483,7 @@ MACHINE_CONFIG_START(draco_state::draco)
 	MCFG_CDP1852_DO_CALLBACK(WRITE8(draco_state, out1_w))
 
 	/* sound and video hardware */
-	MCFG_FRAGMENT_ADD(draco_video)
+	draco_video(config);
 MACHINE_CONFIG_END
 
 /* ROMs */

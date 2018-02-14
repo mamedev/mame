@@ -126,7 +126,7 @@ MACHINE_CONFIG_START(quakeat_state::quake)
 	MCFG_CPU_IO_MAP(quake_io)
 	MCFG_CPU_IRQ_ACKNOWLEDGE_DEVICE("pic8259_1", pic8259_device, inta_cb)
 
-	MCFG_FRAGMENT_ADD( pcat_common )
+	pcat_common(config);
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)

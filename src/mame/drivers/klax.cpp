@@ -236,7 +236,8 @@ ADDRESS_MAP_START(klax_state::bootleg_sound_map)
 	AM_RANGE(0x0000, 0x7fff) AM_ROM
 ADDRESS_MAP_END
 
-MACHINE_CONFIG_DERIVED(klax_state::klax2bl, klax)
+MACHINE_CONFIG_START(klax_state::klax2bl)
+	klax(config);
 	MCFG_CPU_MODIFY("maincpu")
 	MCFG_CPU_PROGRAM_MAP(klax2bl_map)
 

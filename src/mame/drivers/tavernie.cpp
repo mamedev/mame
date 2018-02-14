@@ -331,7 +331,8 @@ MACHINE_CONFIG_START(tavernie_state::cpu09)
 	MCFG_DEVCB_CHAIN_OUTPUT(DEVWRITELINE("acia", acia6850_device, write_rxc))
 MACHINE_CONFIG_END
 
-MACHINE_CONFIG_DERIVED(tavernie_state::ivg09, cpu09)
+MACHINE_CONFIG_START(tavernie_state::ivg09)
+	cpu09(config);
 	/* basic machine hardware */
 	MCFG_CPU_MODIFY("maincpu")
 	MCFG_CPU_PROGRAM_MAP(ivg09_mem)

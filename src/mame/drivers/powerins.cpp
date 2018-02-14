@@ -341,7 +341,8 @@ MACHINE_CONFIG_START(powerins_state::powerins)
 	MCFG_NMK112_ROM1("oki2")
 MACHINE_CONFIG_END
 
-MACHINE_CONFIG_DERIVED(powerins_state::powerinsa, powerins)
+MACHINE_CONFIG_START(powerins_state::powerinsa)
+	powerins(config);
 
 	/* basic machine hardware */
 
@@ -364,7 +365,8 @@ MACHINE_CONFIG_DERIVED(powerins_state::powerinsa, powerins)
 	MCFG_DEVICE_REMOVE("nmk112")
 MACHINE_CONFIG_END
 
-MACHINE_CONFIG_DERIVED(powerins_state::powerinsb, powerins)
+MACHINE_CONFIG_START(powerins_state::powerinsb)
+	powerins(config);
 
 	/* basic machine hardware */
 

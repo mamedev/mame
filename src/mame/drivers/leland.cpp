@@ -1007,7 +1007,7 @@ MACHINE_CONFIG_START(leland_state::leland)
 	MCFG_NVRAM_ADD_0FILL("battery")
 
 	/* video hardware */
-	MCFG_FRAGMENT_ADD(leland_video)
+	leland_video(config);
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("speaker")
 
@@ -1034,7 +1034,8 @@ MACHINE_CONFIG_START(leland_state::leland)
 MACHINE_CONFIG_END
 
 
-MACHINE_CONFIG_DERIVED(leland_state::redline, leland)
+MACHINE_CONFIG_START(leland_state::redline)
+	leland(config);
 
 	/* basic machine hardware */
 	MCFG_CPU_MODIFY("master")
@@ -1050,7 +1051,8 @@ MACHINE_CONFIG_DERIVED(leland_state::redline, leland)
 MACHINE_CONFIG_END
 
 
-MACHINE_CONFIG_DERIVED(leland_state::quarterb, redline)
+MACHINE_CONFIG_START(leland_state::quarterb)
+	redline(config);
 
 	/* basic machine hardware */
 	MCFG_CPU_MODIFY("audiocpu")
@@ -1062,7 +1064,8 @@ MACHINE_CONFIG_DERIVED(leland_state::quarterb, redline)
 MACHINE_CONFIG_END
 
 
-MACHINE_CONFIG_DERIVED(leland_state::lelandi, quarterb)
+MACHINE_CONFIG_START(leland_state::lelandi)
+	quarterb(config);
 
 	/* basic machine hardware */
 	MCFG_CPU_MODIFY("slave")
@@ -1096,14 +1099,15 @@ MACHINE_CONFIG_START(leland_state::ataxx)
 	MCFG_NVRAM_ADD_0FILL("battery")
 
 	/* video hardware */
-	MCFG_FRAGMENT_ADD(ataxx_video)
+	ataxx_video(config);
 
 	/* sound hardware */
 	MCFG_DEVICE_ADD("custom", ATAXX_80186, 0)
 MACHINE_CONFIG_END
 
 
-MACHINE_CONFIG_DERIVED(leland_state::wsf, ataxx)
+MACHINE_CONFIG_START(leland_state::wsf)
+	ataxx(config);
 	MCFG_CPU_MODIFY("audiocpu")
 	MCFG_80186_TMROUT1_HANDLER(DEVWRITELINE("custom", leland_80186_sound_device, i80186_tmr1_w))
 

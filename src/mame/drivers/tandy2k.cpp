@@ -881,7 +881,8 @@ MACHINE_CONFIG_START(tandy2k_state::tandy2k)
 	MCFG_RAM_EXTRA_OPTIONS("256K,384K,512K,640K,768K,896K")
 MACHINE_CONFIG_END
 
-MACHINE_CONFIG_DERIVED(tandy2k_state::tandy2k_hd, tandy2k)
+MACHINE_CONFIG_START(tandy2k_state::tandy2k_hd)
+	tandy2k(config);
 	// basic machine hardware
 	MCFG_CPU_MODIFY(I80186_TAG)
 	MCFG_CPU_IO_MAP(tandy2k_hd_io)

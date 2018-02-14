@@ -357,10 +357,10 @@ MACHINE_CONFIG_START(jedi_state::jedi)
 	MCFG_WATCHDOG_ADD("watchdog")
 
 	/* video hardware */
-	MCFG_FRAGMENT_ADD(jedi_video)
+	jedi_video(config);
 
 	/* audio hardware */
-	MCFG_FRAGMENT_ADD(jedi_audio)
+	jedi_audio(config);
 MACHINE_CONFIG_END
 
 

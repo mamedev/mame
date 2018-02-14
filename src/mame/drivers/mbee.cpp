@@ -746,13 +746,15 @@ MACHINE_CONFIG_START(mbee_state::mbeeic)
 	MCFG_CASSETTE_DEFAULT_STATE(CASSETTE_STOPPED | CASSETTE_MOTOR_ENABLED | CASSETTE_SPEAKER_ENABLED)
 MACHINE_CONFIG_END
 
-MACHINE_CONFIG_DERIVED(mbee_state::mbeepc, mbeeic)
+MACHINE_CONFIG_START(mbee_state::mbeepc)
+	mbeeic(config);
 	MCFG_CPU_MODIFY( "maincpu" )
 	MCFG_CPU_PROGRAM_MAP(mbeepc_mem)
 	MCFG_CPU_IO_MAP(mbeepc_io)
 MACHINE_CONFIG_END
 
-MACHINE_CONFIG_DERIVED(mbee_state::mbeeppc, mbeeic)
+MACHINE_CONFIG_START(mbee_state::mbeeppc)
+	mbeeic(config);
 	MCFG_CPU_MODIFY( "maincpu" )
 	MCFG_CPU_PROGRAM_MAP(mbeeppc_mem)
 	MCFG_CPU_IO_MAP(mbeeppc_io)
@@ -764,7 +766,8 @@ MACHINE_CONFIG_DERIVED(mbee_state::mbeeppc, mbeeic)
 	MCFG_MC146818_IRQ_HANDLER(WRITELINE(mbee_state, rtc_irq_w))
 MACHINE_CONFIG_END
 
-MACHINE_CONFIG_DERIVED(mbee_state::mbee56, mbeeic)
+MACHINE_CONFIG_START(mbee_state::mbee56)
+	mbeeic(config);
 	MCFG_CPU_MODIFY( "maincpu" )
 	MCFG_CPU_PROGRAM_MAP(mbee56_mem)
 	MCFG_CPU_IO_MAP(mbee56_io)
@@ -779,7 +782,8 @@ MACHINE_CONFIG_DERIVED(mbee_state::mbee56, mbeeic)
 	MCFG_FLOPPY_DRIVE_SOUND(true)
 MACHINE_CONFIG_END
 
-MACHINE_CONFIG_DERIVED(mbee_state::mbee128, mbee56)
+MACHINE_CONFIG_START(mbee_state::mbee128)
+	mbee56(config);
 	MCFG_CPU_MODIFY( "maincpu" )
 	MCFG_CPU_PROGRAM_MAP(mbee256_mem)
 	MCFG_CPU_IO_MAP(mbee128_io)
@@ -788,7 +792,8 @@ MACHINE_CONFIG_DERIVED(mbee_state::mbee128, mbee56)
 	MCFG_MC146818_IRQ_HANDLER(WRITELINE(mbee_state, rtc_irq_w))
 MACHINE_CONFIG_END
 
-MACHINE_CONFIG_DERIVED(mbee_state::mbee128p, mbeeppc)
+MACHINE_CONFIG_START(mbee_state::mbee128p)
+	mbeeppc(config);
 	MCFG_CPU_MODIFY( "maincpu" )
 	MCFG_CPU_PROGRAM_MAP(mbee256_mem)
 	MCFG_CPU_IO_MAP(mbee128_io)
@@ -803,7 +808,8 @@ MACHINE_CONFIG_DERIVED(mbee_state::mbee128p, mbeeppc)
 	MCFG_FLOPPY_DRIVE_SOUND(true)
 MACHINE_CONFIG_END
 
-MACHINE_CONFIG_DERIVED(mbee_state::mbee256, mbee128p)
+MACHINE_CONFIG_START(mbee_state::mbee256)
+	mbee128p(config);
 	MCFG_CPU_MODIFY( "maincpu" )
 	MCFG_CPU_PROGRAM_MAP(mbee256_mem)
 	MCFG_CPU_IO_MAP(mbee256_io)
@@ -817,7 +823,8 @@ MACHINE_CONFIG_DERIVED(mbee_state::mbee256, mbee128p)
 	MCFG_FLOPPY_DRIVE_SOUND(true)
 MACHINE_CONFIG_END
 
-MACHINE_CONFIG_DERIVED(mbee_state::mbeett, mbeeppc)
+MACHINE_CONFIG_START(mbee_state::mbeett)
+	mbeeppc(config);
 	MCFG_CPU_MODIFY( "maincpu" )
 	MCFG_CPU_PROGRAM_MAP(mbeett_mem)
 	MCFG_CPU_IO_MAP(mbeett_io)

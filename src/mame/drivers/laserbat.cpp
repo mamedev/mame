@@ -494,7 +494,8 @@ MACHINE_CONFIG_START(laserbat_state_base::laserbat_base)
 
 MACHINE_CONFIG_END
 
-MACHINE_CONFIG_DERIVED(laserbat_state::laserbat, laserbat_base)
+MACHINE_CONFIG_START(laserbat_state::laserbat)
+	laserbat_base(config);
 
 	// video hardware
 	MCFG_PALETTE_ADD("palette", 256)
@@ -526,7 +527,8 @@ MACHINE_CONFIG_DERIVED(laserbat_state::laserbat, laserbat_base)
 
 MACHINE_CONFIG_END
 
-MACHINE_CONFIG_DERIVED(catnmous_state::catnmous, laserbat_base)
+MACHINE_CONFIG_START(catnmous_state::catnmous)
+	laserbat_base(config);
 
 	// video hardware
 	MCFG_PALETTE_ADD("palette", 256)

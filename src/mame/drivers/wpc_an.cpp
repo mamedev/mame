@@ -336,7 +336,7 @@ MACHINE_CONFIG_START(wpc_an_state::wpc_an_base)
 MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(wpc_an_state::wpc_an)
-	MCFG_FRAGMENT_ADD(wpc_an_base)
+	wpc_an_base(config);
 
 	MCFG_SPEAKER_STANDARD_MONO("speaker")
 	MCFG_SOUND_ADD("wpcsnd", WPCSND, 0)
@@ -346,7 +346,7 @@ MACHINE_CONFIG_START(wpc_an_state::wpc_an)
 MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(wpc_an_state::wpc_an_dd)
-	MCFG_FRAGMENT_ADD(wpc_an_base)
+	wpc_an_base(config);
 
 	MCFG_SPEAKER_STANDARD_MONO("speaker")
 	MCFG_SOUND_ADD("bg", S11C_BG, 0)

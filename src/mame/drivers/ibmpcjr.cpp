@@ -676,7 +676,8 @@ static GFXDECODE_START( ibmpcjx )
 	GFXDECODE_ENTRY( "kanji", 0x0000, kanji_layout, 3, 1 )
 GFXDECODE_END
 
-MACHINE_CONFIG_DERIVED(pcjr_state::ibmpcjx, ibmpcjr)
+MACHINE_CONFIG_START(pcjr_state::ibmpcjx)
+	ibmpcjr(config);
 	MCFG_CPU_MODIFY("maincpu")
 	MCFG_CPU_PROGRAM_MAP(ibmpcjx_map)
 	MCFG_CPU_IO_MAP(ibmpcjx_io)

@@ -24,12 +24,11 @@ public:
 	tvboy_state(const machine_config &mconfig, device_type type, const char *tag)
 		: a2600_state(mconfig, type, tag)
 		, m_crom(*this, "crom")
-		, m_rom(*this, "mainrom") {};
+		, m_rom(*this, "mainrom") { }
 
 	DECLARE_WRITE8_MEMBER(bank_write);
 
 	void tvboyii(machine_config &config);
-	void supertvboy(machine_config &config);
 
 	void rom_map(address_map &map);
 	void tvboy_mem(address_map &map);
@@ -119,9 +118,6 @@ MACHINE_CONFIG_START(tvboy_state::tvboyii)
 	MCFG_VCS_CONTROL_PORT_ADD(CONTROL2_TAG, vcs_control_port_devices, nullptr)
 MACHINE_CONFIG_END
 
-MACHINE_CONFIG_DERIVED(tvboy_state::supertvboy, tvboyii)
-MACHINE_CONFIG_END
-
 static INPUT_PORTS_START( tvboyii )
 	PORT_START("SWB")
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_OTHER ) PORT_NAME("Reset Game") PORT_CODE(KEYCODE_2)
@@ -156,6 +152,6 @@ ROM_START( stvboy )
 ROM_END
 
 
-/*    YEAR  NAME    PARENT  COMPAT  MACHINE INPUT  STATE        INIT    COMPANY     FULLNAME */
-CONS( 199?, tvboyii,    0,      0, tvboyii,     tvboyii, tvboy_state, 0, "Systema", "TV Boy II (PAL)" ,    MACHINE_SUPPORTS_SAVE )
-CONS( 1995, stvboy,     0,      0, supertvboy,  tvboyii, tvboy_state, 0, "Akor",    "Super TV Boy (PAL)" , MACHINE_SUPPORTS_SAVE )
+//    YEAR  NAME     PARENT  COMPAT  MACHINE  INPUT    STATE        INIT  COMPANY    FULLNAME
+CONS( 199?, tvboyii, 0,      0,      tvboyii, tvboyii, tvboy_state, 0,    "Systema", "TV Boy II (PAL)" ,    MACHINE_SUPPORTS_SAVE )
+CONS( 1995, stvboy,  0,      0,      tvboyii, tvboyii, tvboy_state, 0,    "Akor",    "Super TV Boy (PAL)" , MACHINE_SUPPORTS_SAVE )

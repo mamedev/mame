@@ -388,7 +388,8 @@ MACHINE_CONFIG_START(spool99_state::spool99)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", 0.47)
 MACHINE_CONFIG_END
 
-MACHINE_CONFIG_DERIVED(spool99_state::vcarn, spool99)
+MACHINE_CONFIG_START(spool99_state::vcarn)
+	spool99(config);
 	MCFG_CPU_MODIFY("maincpu")
 	MCFG_CPU_PROGRAM_MAP(vcarn_map)
 

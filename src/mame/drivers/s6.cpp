@@ -409,7 +409,7 @@ MACHINE_CONFIG_START(s6_state::s6)
 	MCFG_DEFAULT_LAYOUT(layout_s6)
 
 	/* Sound */
-	MCFG_FRAGMENT_ADD( genpin_audio )
+	genpin_audio(config);
 
 	/* Devices */
 	MCFG_DEVICE_ADD("pia22", PIA6821, 0)

@@ -433,7 +433,7 @@ MACHINE_CONFIG_START(s4_state::s4)
 	MCFG_DEFAULT_LAYOUT(layout_s4)
 
 	/* Sound */
-	MCFG_FRAGMENT_ADD( genpin_audio )
+	genpin_audio(config);
 
 	/* Devices */
 	MCFG_DEVICE_ADD("pia22", PIA6821, 0)
@@ -474,7 +474,8 @@ MACHINE_CONFIG_START(s4_state::s4)
 	MCFG_NVRAM_ADD_0FILL("nvram")
 MACHINE_CONFIG_END
 
-MACHINE_CONFIG_DERIVED(s4_state::s4a, s4)
+MACHINE_CONFIG_START(s4_state::s4a)
+	s4(config);
 	/* Add the soundcard */
 	MCFG_CPU_ADD("audiocpu", M6808, 3580000)
 	MCFG_CPU_PROGRAM_MAP(s4_audio_map)

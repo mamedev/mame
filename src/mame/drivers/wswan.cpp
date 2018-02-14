@@ -154,7 +154,8 @@ MACHINE_CONFIG_START(wswan_state::wswan)
 	MCFG_SOFTWARE_LIST_COMPATIBLE_ADD("pc2_list","pockchalv2")
 MACHINE_CONFIG_END
 
-MACHINE_CONFIG_DERIVED(wswan_state::wscolor, wswan)
+MACHINE_CONFIG_START(wswan_state::wscolor)
+	wswan(config);
 	MCFG_CPU_MODIFY("maincpu")
 	MCFG_CPU_PROGRAM_MAP(wscolor_mem)
 	MCFG_MACHINE_START_OVERRIDE(wswan_state, wscolor)

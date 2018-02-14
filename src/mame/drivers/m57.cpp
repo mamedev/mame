@@ -252,7 +252,7 @@ MACHINE_CONFIG_START(m57_state::m57)
 	MCFG_PALETTE_INIT_OWNER(m57_state, m57)
 
 	/* sound hardware */
-	//MCFG_FRAGMENT_ADD(m52_sound_c_audio)
+	//m52_sound_c_audio(config);
 	MCFG_DEVICE_ADD("irem_audio", IREM_M52_SOUNDC_AUDIO, 0)
 
 MACHINE_CONFIG_END

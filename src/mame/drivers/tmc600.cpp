@@ -263,7 +263,7 @@ MACHINE_CONFIG_START(tmc600_state::tmc600)
 	MCFG_COSMAC_SC_CALLBACK(WRITE8(tmc600_state, sc_w))
 
 	// sound and video hardware
-	MCFG_FRAGMENT_ADD(tmc600_video)
+	tmc600_video(config);
 
 	// keyboard output latch
 	MCFG_DEVICE_ADD(CDP1852_KB_TAG, CDP1852, XTAL(3'570'000)/8) // clock is CDP1802 TPB

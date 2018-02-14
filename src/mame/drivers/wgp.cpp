@@ -962,7 +962,8 @@ MACHINE_CONFIG_START(wgp_state::wgp)
 MACHINE_CONFIG_END
 
 
-MACHINE_CONFIG_DERIVED(wgp_state::wgp2, wgp)
+MACHINE_CONFIG_START(wgp_state::wgp2)
+	wgp(config);
 
 	MCFG_QUANTUM_TIME(attotime::from_hz(12000))
 	/* video hardware */

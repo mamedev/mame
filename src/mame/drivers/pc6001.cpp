@@ -1532,7 +1532,8 @@ MACHINE_CONFIG_END
 
 
 
-MACHINE_CONFIG_DERIVED(pc6001mk2_state::pc6001mk2, pc6001)
+MACHINE_CONFIG_START(pc6001mk2_state::pc6001mk2)
+	pc6001(config);
 	/* basic machine hardware */
 	MCFG_CPU_MODIFY("maincpu")
 	MCFG_CPU_PROGRAM_MAP(pc6001mk2_map)
@@ -1554,7 +1555,8 @@ MACHINE_CONFIG_DERIVED(pc6001mk2_state::pc6001mk2, pc6001)
 
 MACHINE_CONFIG_END
 
-MACHINE_CONFIG_DERIVED(pc6601_state::pc6601, pc6001mk2)
+MACHINE_CONFIG_START(pc6601_state::pc6601)
+	pc6001mk2(config);
 
 	/* basic machine hardware */
 	MCFG_CPU_REPLACE("maincpu", Z80, PC6001_MAIN_CLOCK / 2)
@@ -1564,7 +1566,8 @@ MACHINE_CONFIG_DERIVED(pc6601_state::pc6601, pc6001mk2)
 	MCFG_CPU_IRQ_ACKNOWLEDGE_DRIVER(pc6001_state, irq_callback)
 MACHINE_CONFIG_END
 
-MACHINE_CONFIG_DERIVED(pc6001sr_state::pc6001sr, pc6001mk2)
+MACHINE_CONFIG_START(pc6001sr_state::pc6001sr)
+	pc6001mk2(config);
 
 	/* basic machine hardware */
 	//*Yes*, PC-6001 SR Z80 CPU is actually slower than older models (better waitstates tho?)

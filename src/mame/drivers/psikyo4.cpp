@@ -695,7 +695,8 @@ MACHINE_CONFIG_START(psikyo4_state::ps4big)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", 1.0)
 MACHINE_CONFIG_END
 
-MACHINE_CONFIG_DERIVED(psikyo4_state::ps4small, ps4big)
+MACHINE_CONFIG_START(psikyo4_state::ps4small)
+	ps4big(config);
 
 	/* basic machine hardware */
 

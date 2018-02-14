@@ -947,7 +947,8 @@ MACHINE_CONFIG_START(novag6502_state::sexpert)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
 MACHINE_CONFIG_END
 
-MACHINE_CONFIG_DERIVED(novag6502_state::sforte, sexpert)
+MACHINE_CONFIG_START(novag6502_state::sforte)
+	sexpert(config);
 
 	/* basic machine hardware */
 	MCFG_CPU_MODIFY("maincpu")

@@ -1091,7 +1091,8 @@ MACHINE_CONFIG_START(namcos86_state::hopmappy)
 MACHINE_CONFIG_END
 
 
-MACHINE_CONFIG_DERIVED(namcos86_state::roishtar, hopmappy)
+MACHINE_CONFIG_START(namcos86_state::roishtar)
+	hopmappy(config);
 
 	/* basic machine hardware */
 	MCFG_CPU_MODIFY("cpu2")
@@ -1102,7 +1103,8 @@ MACHINE_CONFIG_DERIVED(namcos86_state::roishtar, hopmappy)
 MACHINE_CONFIG_END
 
 
-MACHINE_CONFIG_DERIVED(namcos86_state::genpeitd, hopmappy)
+MACHINE_CONFIG_START(namcos86_state::genpeitd)
+	hopmappy(config);
 
 	/* basic machine hardware */
 	MCFG_CPU_MODIFY("cpu2")
@@ -1117,7 +1119,8 @@ MACHINE_CONFIG_DERIVED(namcos86_state::genpeitd, hopmappy)
 MACHINE_CONFIG_END
 
 
-MACHINE_CONFIG_DERIVED(namcos86_state::rthunder, hopmappy)
+MACHINE_CONFIG_START(namcos86_state::rthunder)
+	hopmappy(config);
 
 	/* basic machine hardware */
 	MCFG_CPU_MODIFY("cpu2")
@@ -1132,7 +1135,8 @@ MACHINE_CONFIG_DERIVED(namcos86_state::rthunder, hopmappy)
 MACHINE_CONFIG_END
 
 
-MACHINE_CONFIG_DERIVED(namcos86_state::wndrmomo, hopmappy)
+MACHINE_CONFIG_START(namcos86_state::wndrmomo)
+	hopmappy(config);
 
 	/* basic machine hardware */
 	MCFG_CPU_MODIFY("cpu2")

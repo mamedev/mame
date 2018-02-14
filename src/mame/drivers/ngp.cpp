@@ -854,7 +854,8 @@ MACHINE_CONFIG_START(ngp_state::ngp_common)
 MACHINE_CONFIG_END
 
 
-MACHINE_CONFIG_DERIVED(ngp_state::ngp, ngp_common)
+MACHINE_CONFIG_START(ngp_state::ngp)
+	ngp_common(config);
 
 	MCFG_K1GE_ADD( "k1ge", 6.144_MHz_XTAL, "screen", WRITELINE( ngp_state, ngp_vblank_pin_w ), WRITELINE( ngp_state, ngp_hblank_pin_w ) )
 
@@ -872,7 +873,8 @@ MACHINE_CONFIG_DERIVED(ngp_state::ngp, ngp_common)
 MACHINE_CONFIG_END
 
 
-MACHINE_CONFIG_DERIVED(ngp_state::ngpc, ngp_common)
+MACHINE_CONFIG_START(ngp_state::ngpc)
+	ngp_common(config);
 	MCFG_K2GE_ADD( "k1ge", 6.144_MHz_XTAL, "screen", WRITELINE( ngp_state, ngp_vblank_pin_w ), WRITELINE( ngp_state, ngp_hblank_pin_w ) )
 
 	MCFG_SCREEN_MODIFY("screen")

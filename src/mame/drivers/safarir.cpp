@@ -422,7 +422,7 @@ MACHINE_CONFIG_START(safarir_state::safarir)
 	MCFG_SCREEN_PALETTE("palette")
 
 	/* audio hardware */
-	MCFG_FRAGMENT_ADD(safarir_audio)
+	safarir_audio(config);
 MACHINE_CONFIG_END
 
 

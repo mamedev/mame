@@ -810,7 +810,8 @@ MACHINE_CONFIG_START(psikyosh_state::psikyo3v1)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 MACHINE_CONFIG_END
 
-MACHINE_CONFIG_DERIVED(psikyosh_state::psikyo5, psikyo3v1)
+MACHINE_CONFIG_START(psikyosh_state::psikyo5)
+	psikyo3v1(config);
 
 	/* basic machine hardware */
 
@@ -818,7 +819,8 @@ MACHINE_CONFIG_DERIVED(psikyosh_state::psikyo5, psikyo3v1)
 	MCFG_CPU_PROGRAM_MAP(ps5_map)
 MACHINE_CONFIG_END
 
-MACHINE_CONFIG_DERIVED(psikyosh_state::psikyo5_240, psikyo3v1)
+MACHINE_CONFIG_START(psikyosh_state::psikyo5_240)
+	psikyo3v1(config);
 
 	/* basic machine hardware */
 

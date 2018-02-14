@@ -606,7 +606,8 @@ MACHINE_CONFIG_START(lsasquad_state::lsasquad)
 	MCFG_SOUND_ROUTE(3, "mono", 0.63)
 MACHINE_CONFIG_END
 
-MACHINE_CONFIG_DERIVED(lsasquad_state::storming, lsasquad)
+MACHINE_CONFIG_START(lsasquad_state::storming)
+	lsasquad(config);
 
 	MCFG_CPU_MODIFY("maincpu")
 	MCFG_CPU_PROGRAM_MAP(storming_map)

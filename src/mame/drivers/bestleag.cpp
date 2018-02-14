@@ -402,7 +402,8 @@ MACHINE_CONFIG_START(bestleag_state::bestleag)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", 1.00)
 MACHINE_CONFIG_END
 
-MACHINE_CONFIG_DERIVED(bestleag_state::bestleaw, bestleag)
+MACHINE_CONFIG_START(bestleag_state::bestleaw)
+	bestleag(config);
 	MCFG_SCREEN_MODIFY("screen")
 	MCFG_SCREEN_UPDATE_DRIVER(bestleag_state, screen_update_bestleaw)
 MACHINE_CONFIG_END

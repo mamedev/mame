@@ -387,7 +387,8 @@ MACHINE_CONFIG_START(alesis_state::hr16)
 	MCFG_NVRAM_ADD_0FILL("nvram")
 MACHINE_CONFIG_END
 
-MACHINE_CONFIG_DERIVED(alesis_state::sr16, hr16)
+MACHINE_CONFIG_START(alesis_state::sr16)
+	hr16(config);
 	/* basic machine hardware */
 	MCFG_CPU_MODIFY("maincpu")
 	MCFG_CPU_PROGRAM_MAP(sr16_mem)
@@ -404,7 +405,8 @@ MACHINE_CONFIG_DERIVED(alesis_state::sr16, hr16)
 	MCFG_HD44780_PIXEL_UPDATE_CB(alesis_state, sr16_pixel_update)
 MACHINE_CONFIG_END
 
-MACHINE_CONFIG_DERIVED(alesis_state::mmt8, hr16)
+MACHINE_CONFIG_START(alesis_state::mmt8)
+	hr16(config);
 	/* basic machine hardware */
 	MCFG_CPU_MODIFY("maincpu")
 	MCFG_CPU_IO_MAP(mmt8_io)

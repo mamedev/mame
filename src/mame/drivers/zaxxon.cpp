@@ -948,22 +948,25 @@ MACHINE_CONFIG_START(zaxxon_state::root)
 MACHINE_CONFIG_END
 
 
-MACHINE_CONFIG_DERIVED(zaxxon_state::zaxxon, root)
+MACHINE_CONFIG_START(zaxxon_state::zaxxon)
+	root(config);
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("speaker")
-	MCFG_FRAGMENT_ADD(zaxxon_samples)
+	zaxxon_samples(config);
 MACHINE_CONFIG_END
 
 
 
-MACHINE_CONFIG_DERIVED(zaxxon_state::szaxxon, zaxxon)
+MACHINE_CONFIG_START(zaxxon_state::szaxxon)
+	zaxxon(config);
 	MCFG_CPU_MODIFY("maincpu")
 	MCFG_CPU_OPCODES_MAP(decrypted_opcodes_map)
 MACHINE_CONFIG_END
 
 
-MACHINE_CONFIG_DERIVED(zaxxon_state::szaxxone, zaxxon)
+MACHINE_CONFIG_START(zaxxon_state::szaxxone)
+	zaxxon(config);
 	MCFG_CPU_REPLACE("maincpu", SEGA_315_5013, MASTER_CLOCK/16)
 	MCFG_CPU_PROGRAM_MAP(zaxxon_map)
 	MCFG_CPU_OPCODES_MAP(decrypted_opcodes_map)
@@ -973,7 +976,8 @@ MACHINE_CONFIG_END
 
 
 
-MACHINE_CONFIG_DERIVED(zaxxon_state::futspye, root)
+MACHINE_CONFIG_START(zaxxon_state::futspye)
+	root(config);
 	MCFG_CPU_REPLACE("maincpu", SEGA_315_5061, MASTER_CLOCK/16)
 	MCFG_CPU_PROGRAM_MAP(zaxxon_map)
 	MCFG_CPU_OPCODES_MAP(decrypted_opcodes_map)
@@ -987,14 +991,15 @@ MACHINE_CONFIG_DERIVED(zaxxon_state::futspye, root)
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("speaker")
-	MCFG_FRAGMENT_ADD(zaxxon_samples)
+	zaxxon_samples(config);
 
 MACHINE_CONFIG_END
 
 
 
 
-MACHINE_CONFIG_DERIVED(zaxxon_state::razmataze, root)
+MACHINE_CONFIG_START(zaxxon_state::razmataze)
+	root(config);
 	MCFG_CPU_REPLACE("maincpu", SEGA_315_5098,  MASTER_CLOCK/16)
 	MCFG_CPU_PROGRAM_MAP(ixion_map)
 	MCFG_CPU_OPCODES_MAP(decrypted_opcodes_map)
@@ -1013,7 +1018,8 @@ MACHINE_CONFIG_DERIVED(zaxxon_state::razmataze, root)
 	MCFG_SEGAUSBROM_ADD("usbsnd")
 MACHINE_CONFIG_END
 
-MACHINE_CONFIG_DERIVED(zaxxon_state::ixion, razmataze)
+MACHINE_CONFIG_START(zaxxon_state::ixion)
+	razmataze(config);
 	MCFG_CPU_REPLACE("maincpu", SEGA_315_5013, MASTER_CLOCK/16)
 	MCFG_CPU_PROGRAM_MAP(ixion_map)
 	MCFG_CPU_OPCODES_MAP(decrypted_opcodes_map)
@@ -1024,7 +1030,8 @@ MACHINE_CONFIG_DERIVED(zaxxon_state::ixion, razmataze)
 	MCFG_ADDRESSABLE_LATCH_Q6_OUT_CB(NOOP) // flip screen not used
 MACHINE_CONFIG_END
 
-MACHINE_CONFIG_DERIVED(zaxxon_state::congo, root)
+MACHINE_CONFIG_START(zaxxon_state::congo)
+	root(config);
 
 	MCFG_CPU_MODIFY("maincpu")
 	MCFG_CPU_PROGRAM_MAP(congo_map)
@@ -1068,7 +1075,7 @@ MACHINE_CONFIG_DERIVED(zaxxon_state::congo, root)
 	MCFG_SOUND_ADD("sn2", SN76489A, SOUND_CLOCK/4) // schematic shows sn76489A
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 1.0)
 
-	MCFG_FRAGMENT_ADD(congo_samples)
+	congo_samples(config);
 MACHINE_CONFIG_END
 
 

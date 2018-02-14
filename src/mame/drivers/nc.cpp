@@ -1467,7 +1467,8 @@ static SLOT_INTERFACE_START( ibmpc_floppies )
 		SLOT_INTERFACE( "525dd", FLOPPY_525_DD )
 SLOT_INTERFACE_END
 
-MACHINE_CONFIG_DERIVED(nc_state::nc200, nc100)
+MACHINE_CONFIG_START(nc_state::nc200)
+	nc100(config);
 
 	MCFG_CPU_MODIFY( "maincpu" )
 	MCFG_CPU_IO_MAP(nc200_io)

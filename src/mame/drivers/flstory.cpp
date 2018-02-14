@@ -866,7 +866,8 @@ MACHINE_CONFIG_START(flstory_state::onna34ro)
 	MCFG_SOUND_ROUTE_EX(0, "dac", 1.0, DAC_VREF_POS_INPUT) MCFG_SOUND_ROUTE_EX(0, "dac", -1.0, DAC_VREF_NEG_INPUT)
 MACHINE_CONFIG_END
 
-MACHINE_CONFIG_DERIVED(flstory_state::onna34ro_mcu, onna34ro)
+MACHINE_CONFIG_START(flstory_state::onna34ro_mcu)
+	onna34ro(config);
 	MCFG_CPU_MODIFY("maincpu")
 	MCFG_CPU_PROGRAM_MAP(onna34ro_mcu_map)
 

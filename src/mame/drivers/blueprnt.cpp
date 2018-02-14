@@ -389,7 +389,8 @@ MACHINE_CONFIG_START(blueprnt_state::blueprnt)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
 MACHINE_CONFIG_END
 
-MACHINE_CONFIG_DERIVED(blueprnt_state::grasspin, blueprnt)
+MACHINE_CONFIG_START(blueprnt_state::grasspin)
+	blueprnt(config);
 
 	/* basic machine hardware */
 	MCFG_CPU_MODIFY("maincpu")

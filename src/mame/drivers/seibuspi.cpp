@@ -1913,13 +1913,15 @@ MACHINE_CONFIG_START(seibuspi_state::spi)
 	MCFG_SOUND_ROUTE(1, "rspeaker", 1.0)
 MACHINE_CONFIG_END
 
-MACHINE_CONFIG_DERIVED(seibuspi_state::ejanhs, spi)
+MACHINE_CONFIG_START(seibuspi_state::ejanhs)
+	spi(config);
 
 	/* video hardware */
 	MCFG_VIDEO_START_OVERRIDE(seibuspi_state, ejanhs)
 MACHINE_CONFIG_END
 
-MACHINE_CONFIG_DERIVED(seibuspi_state::rdft2, spi)
+MACHINE_CONFIG_START(seibuspi_state::rdft2)
+	spi(config);
 	MCFG_CPU_MODIFY("maincpu")
 	MCFG_CPU_PROGRAM_MAP(rdft2_map)
 MACHINE_CONFIG_END
@@ -1934,7 +1936,8 @@ MACHINE_RESET_MEMBER(seibuspi_state,sxx2e)
 	m_sb_coin_latch = 0;
 }
 
-MACHINE_CONFIG_DERIVED(seibuspi_state::sxx2e, spi)
+MACHINE_CONFIG_START(seibuspi_state::sxx2e)
+	spi(config);
 
 	/* basic machine hardware */
 	MCFG_CPU_MODIFY("maincpu")
@@ -1958,7 +1961,8 @@ MACHINE_CONFIG_DERIVED(seibuspi_state::sxx2e, spi)
 	MCFG_SOUND_ROUTE(1, "rspeaker", 1.0)
 MACHINE_CONFIG_END
 
-MACHINE_CONFIG_DERIVED(seibuspi_state::sxx2f, sxx2e)
+MACHINE_CONFIG_START(seibuspi_state::sxx2f)
+	sxx2e(config);
 
 	/* basic machine hardware */
 	MCFG_CPU_MODIFY("maincpu")
@@ -1972,7 +1976,8 @@ MACHINE_CONFIG_DERIVED(seibuspi_state::sxx2f, sxx2e)
 	// clock is unknown, possibly slower than 7.159MHz
 MACHINE_CONFIG_END
 
-MACHINE_CONFIG_DERIVED(seibuspi_state::sxx2g, sxx2f) // clocks differ, but otherwise same hw as sxx2f
+MACHINE_CONFIG_START(seibuspi_state::sxx2g) // clocks differ, but otherwise same hw as sxx2f
+	sxx2f(config);
 
 	/* basic machine hardware */
 	MCFG_CPU_MODIFY("maincpu") // AMD AM386DX/DX-40, 28.63636MHz

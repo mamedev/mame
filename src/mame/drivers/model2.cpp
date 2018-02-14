@@ -2196,8 +2196,8 @@ MACHINE_CONFIG_START(model2_state::model2o)
 	MCFG_NVRAM_ADD_1FILL("backup1")
 	MCFG_NVRAM_ADD_1FILL("backup2")
 
-	MCFG_FRAGMENT_ADD( model2_timers )
-	MCFG_FRAGMENT_ADD( model2_screen )
+	model2_timers(config);
+	model2_screen(config);
 
 	MCFG_SEGAM1AUDIO_ADD(M1AUDIO_TAG)
 	MCFG_SEGAM1AUDIO_RXD_HANDLER(DEVWRITELINE("uart", i8251_device, write_rxd))
@@ -2257,8 +2257,9 @@ MACHINE_CONFIG_START(model2_state::sj25_0207_01)
 	MCFG_DEVICE_ADD("driveadc", MSM6253, 0)
 MACHINE_CONFIG_END
 
-MACHINE_CONFIG_DERIVED(model2_state::daytona, model2o)
-	MCFG_FRAGMENT_ADD(sj25_0207_01)
+MACHINE_CONFIG_START(model2_state::daytona)
+	model2o(config);
+	sj25_0207_01(config);
 MACHINE_CONFIG_END
 
 /* 2A-CRX */
@@ -2283,8 +2284,8 @@ MACHINE_CONFIG_START(model2_state::model2a)
 	MCFG_EEPROM_SERIAL_93C46_ADD("eeprom")
 	MCFG_NVRAM_ADD_1FILL("backup1")
 
-	MCFG_FRAGMENT_ADD( model2_timers )
-	MCFG_FRAGMENT_ADD( model2_screen )
+	model2_timers(config);
+	model2_screen(config);
 
 	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
 
@@ -2302,11 +2303,13 @@ MACHINE_CONFIG_START(model2_state::model2a)
 	MCFG_M2COMM_ADD("m2comm")
 MACHINE_CONFIG_END
 
-MACHINE_CONFIG_DERIVED(model2_state::manxtt, model2a)
+MACHINE_CONFIG_START(model2_state::manxtt)
+	model2a(config);
 	MCFG_MACHINE_START_OVERRIDE(model2_state,srallyc)
 MACHINE_CONFIG_END
 
-MACHINE_CONFIG_DERIVED(model2_state::manxttdx, manxtt) /* Includes a Model 1 Sound board for additional sounds - Deluxe version only */
+MACHINE_CONFIG_START(model2_state::manxttdx) /* Includes a Model 1 Sound board for additional sounds - Deluxe version only */
+	manxtt(config);
 	MCFG_SEGAM1AUDIO_ADD(M1AUDIO_TAG)
 	MCFG_SEGAM1AUDIO_RXD_HANDLER(DEVWRITELINE("uart", i8251_device, write_rxd))
 
@@ -2320,19 +2323,22 @@ uint16_t model2_state::crypt_read_callback(uint32_t addr)
 	return ((dat&0xff00)>>8)|((dat&0x00ff)<<8);
 }
 
-MACHINE_CONFIG_DERIVED(model2_state::model2a_5881, model2a)
+MACHINE_CONFIG_START(model2_state::model2a_5881)
+	model2a(config);
 	MCFG_DEVICE_ADD("315_5881", SEGA315_5881_CRYPT, 0)
 	MCFG_SET_READ_CALLBACK(model2_state, crypt_read_callback)
 MACHINE_CONFIG_END
 
-MACHINE_CONFIG_DERIVED(model2_state::model2a_0229, model2a)
+MACHINE_CONFIG_START(model2_state::model2a_0229)
+	model2a(config);
 	MCFG_DEVICE_ADD("317_0229", SEGA315_5838_COMP, 0)
 //  MCFG_SET_5838_READ_CALLBACK(model2_state, crypt_read_callback)
 MACHINE_CONFIG_END
 
-MACHINE_CONFIG_DERIVED(model2_state::srallyc, model2a)
+MACHINE_CONFIG_START(model2_state::srallyc)
+	model2a(config);
 	MCFG_MACHINE_START_OVERRIDE(model2_state,srallyc)
-	MCFG_FRAGMENT_ADD(sj25_0207_01)
+	sj25_0207_01(config);
 MACHINE_CONFIG_END
 
 /* 2B-CRX */
@@ -2360,8 +2366,8 @@ MACHINE_CONFIG_START(model2_state::model2b)
 	MCFG_EEPROM_SERIAL_93C46_ADD("eeprom")
 	MCFG_NVRAM_ADD_1FILL("backup1")
 
-	MCFG_FRAGMENT_ADD( model2_timers )
-	MCFG_FRAGMENT_ADD( model2_screen )
+	model2_timers(config);
+	model2_screen(config);
 
 	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
 
@@ -2380,17 +2386,20 @@ MACHINE_CONFIG_START(model2_state::model2b)
 MACHINE_CONFIG_END
 
 
-MACHINE_CONFIG_DERIVED(model2_state::model2b_5881, model2b)
+MACHINE_CONFIG_START(model2_state::model2b_5881)
+	model2b(config);
 	MCFG_DEVICE_ADD("315_5881", SEGA315_5881_CRYPT, 0)
 	MCFG_SET_READ_CALLBACK(model2_state, crypt_read_callback)
 MACHINE_CONFIG_END
 
-MACHINE_CONFIG_DERIVED(model2_state::model2b_0229, model2b)
+MACHINE_CONFIG_START(model2_state::model2b_0229)
+	model2b(config);
 	MCFG_DEVICE_ADD("317_0229", SEGA315_5838_COMP, 0)
 //  MCFG_SET_5838_READ_CALLBACK(model2_state, crypt_read_callback)
 MACHINE_CONFIG_END
 
-MACHINE_CONFIG_DERIVED(model2_state::indy500, model2b)
+MACHINE_CONFIG_START(model2_state::indy500)
+	model2b(config);
 	MCFG_MACHINE_START_OVERRIDE(model2_state,srallyc)
 MACHINE_CONFIG_END
 
@@ -2405,7 +2414,8 @@ ADDRESS_MAP_START(model2_state::rchase2_ioport_map)
 	AM_RANGE(0x00, 0x07) AM_DEVREADWRITE("ioexp", cxd1095_device, read, write)
 ADDRESS_MAP_END
 
-MACHINE_CONFIG_DERIVED(model2_state::rchase2, model2b)
+MACHINE_CONFIG_START(model2_state::rchase2)
+	model2b(config);
 	MCFG_CPU_ADD("iocpu", Z80, 4000000)
 	MCFG_CPU_PROGRAM_MAP(rchase2_iocpu_map)
 	MCFG_CPU_IO_MAP(rchase2_ioport_map)
@@ -2436,8 +2446,8 @@ MACHINE_CONFIG_START(model2_state::model2c)
 	MCFG_EEPROM_SERIAL_93C46_ADD("eeprom")
 	MCFG_NVRAM_ADD_1FILL("backup1")
 
-	MCFG_FRAGMENT_ADD( model2_timers )
-	MCFG_FRAGMENT_ADD( model2_screen )
+	model2_timers(config);
+	model2_screen(config);
 
 	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
 
@@ -2455,7 +2465,8 @@ MACHINE_CONFIG_START(model2_state::model2c)
 	MCFG_M2COMM_ADD("m2comm")
 MACHINE_CONFIG_END
 
-MACHINE_CONFIG_DERIVED(model2_state::stcc, model2c)
+MACHINE_CONFIG_START(model2_state::stcc)
+	model2c(config);
 	MCFG_DSBZ80_ADD(DSBZ80_TAG)
 	MCFG_SOUND_ROUTE(0, "lspeaker", 1.0)
 	MCFG_SOUND_ROUTE(1, "rspeaker", 1.0)
@@ -2464,12 +2475,14 @@ MACHINE_CONFIG_DERIVED(model2_state::stcc, model2c)
 	MCFG_I8251_TXD_HANDLER(DEVWRITELINE(DSBZ80_TAG, dsbz80_device, write_txd))
 MACHINE_CONFIG_END
 
-MACHINE_CONFIG_DERIVED(model2_state::model2c_5881, model2c)
+MACHINE_CONFIG_START(model2_state::model2c_5881)
+	model2c(config);
 	MCFG_DEVICE_ADD("315_5881", SEGA315_5881_CRYPT, 0)
 	MCFG_SET_READ_CALLBACK(model2_state, crypt_read_callback)
 MACHINE_CONFIG_END
 
-MACHINE_CONFIG_DERIVED(model2_state::overrev2c, model2c)
+MACHINE_CONFIG_START(model2_state::overrev2c)
+	model2c(config);
 	MCFG_MACHINE_START_OVERRIDE(model2_state,srallyc)
 MACHINE_CONFIG_END
 

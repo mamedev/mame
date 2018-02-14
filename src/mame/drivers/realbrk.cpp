@@ -791,7 +791,8 @@ MACHINE_CONFIG_START(realbrk_state::realbrk)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", 0.50)
 MACHINE_CONFIG_END
 
-MACHINE_CONFIG_DERIVED(realbrk_state::pkgnsh, realbrk)
+MACHINE_CONFIG_START(realbrk_state::pkgnsh)
+	realbrk(config);
 	MCFG_CPU_MODIFY("maincpu")
 	MCFG_CPU_PROGRAM_MAP(pkgnsh_mem)
 
@@ -799,12 +800,14 @@ MACHINE_CONFIG_DERIVED(realbrk_state::pkgnsh, realbrk)
 	MCFG_TMP68301_OUT_PARALLEL_CB(NOOP)
 MACHINE_CONFIG_END
 
-MACHINE_CONFIG_DERIVED(realbrk_state::pkgnshdx, pkgnsh)
+MACHINE_CONFIG_START(realbrk_state::pkgnshdx)
+	pkgnsh(config);
 	MCFG_CPU_MODIFY("maincpu")
 	MCFG_CPU_PROGRAM_MAP(pkgnshdx_mem)
 MACHINE_CONFIG_END
 
-MACHINE_CONFIG_DERIVED(realbrk_state::dai2kaku, realbrk)
+MACHINE_CONFIG_START(realbrk_state::dai2kaku)
+	realbrk(config);
 	MCFG_CPU_MODIFY("maincpu")
 	MCFG_CPU_PROGRAM_MAP(dai2kaku_mem)
 

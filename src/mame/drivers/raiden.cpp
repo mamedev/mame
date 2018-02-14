@@ -367,7 +367,8 @@ MACHINE_CONFIG_START(raiden_state::raiden)
 	MCFG_SEIBU_SOUND_YM_WRITE_CB(DEVWRITE8("ymsnd", ym3812_device, write))
 MACHINE_CONFIG_END
 
-MACHINE_CONFIG_DERIVED(raiden_state::raidene, raiden)
+MACHINE_CONFIG_START(raiden_state::raidene)
+	raiden(config);
 	MCFG_DEVICE_MODIFY("audiocpu")
 	MCFG_CPU_PROGRAM_MAP(raiden_sound_map)
 	MCFG_CPU_OPCODES_MAP(raiden_sound_decrypted_opcodes_map)
@@ -376,7 +377,8 @@ MACHINE_CONFIG_DERIVED(raiden_state::raidene, raiden)
 	MCFG_DEVICE_PROGRAM_MAP(sei80bu_encrypted_full_map)
 MACHINE_CONFIG_END
 
-MACHINE_CONFIG_DERIVED(raiden_state::raidenu, raidene)
+MACHINE_CONFIG_START(raiden_state::raidenu)
+	raidene(config);
 
 	/* basic machine hardware */
 	MCFG_CPU_MODIFY("maincpu")
@@ -391,7 +393,8 @@ WRITE16_MEMBER( raiden_state::raidenb_layer_scroll_w )
 	COMBINE_DATA(&m_raidenb_scroll_ram[offset]);
 }
 
-MACHINE_CONFIG_DERIVED(raiden_state::raidenb, raiden)
+MACHINE_CONFIG_START(raiden_state::raidenb)
+	raiden(config);
 
 	/* basic machine hardware */
 	MCFG_CPU_MODIFY("maincpu")

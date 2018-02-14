@@ -1091,11 +1091,13 @@ MACHINE_CONFIG_START(twinkle_state::twinkle)
 	MCFG_SOUND_ROUTE(1, "speakerright", 1.0)
 MACHINE_CONFIG_END
 
-MACHINE_CONFIG_DERIVED(twinkle_state::twinklex, twinkle)
+MACHINE_CONFIG_START(twinkle_state::twinklex)
+	twinkle(config);
 	MCFG_X76F041_ADD( "security" )
 MACHINE_CONFIG_END
 
-MACHINE_CONFIG_DERIVED(twinkle_state::twinklei, twinkle)
+MACHINE_CONFIG_START(twinkle_state::twinklei)
+	twinkle(config);
 	MCFG_I2CMEM_ADD( "security" )
 	MCFG_I2CMEM_DATA_SIZE( 0x100 )
 MACHINE_CONFIG_END

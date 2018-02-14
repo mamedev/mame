@@ -494,7 +494,8 @@ MACHINE_CONFIG_START(_4enraya_state::_4enraya )
 MACHINE_CONFIG_END
 
 
-MACHINE_CONFIG_DERIVED(_4enraya_state::unkpacg, _4enraya)
+MACHINE_CONFIG_START(_4enraya_state::unkpacg)
+	_4enraya(config);
 
 	/* basic machine hardware */
 	MCFG_CPU_MODIFY("maincpu")

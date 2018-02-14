@@ -511,12 +511,14 @@ MACHINE_CONFIG_START(bagman_state::bagman)
 	MCFG_ADDRESSABLE_LATCH_Q5_OUT_CB(WRITELINE(bagman_state, tmsprom_csq1_w))
 MACHINE_CONFIG_END
 
-MACHINE_CONFIG_DERIVED(bagman_state::sbagman, bagman)
+MACHINE_CONFIG_START(bagman_state::sbagman)
+	bagman(config);
 	MCFG_DEVICE_MODIFY("mainlatch")
 	MCFG_ADDRESSABLE_LATCH_Q3_OUT_CB(WRITELINE(bagman_state, video_enable_w))
 MACHINE_CONFIG_END
 
-MACHINE_CONFIG_DERIVED(bagman_state::sbagmani, sbagman)
+MACHINE_CONFIG_START(bagman_state::sbagmani)
+	sbagman(config);
 
 	// only 1 AY8910
 	MCFG_DEVICE_REMOVE("tmsprom")
@@ -625,7 +627,8 @@ MACHINE_CONFIG_START(bagman_state::botanic)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.40)
 MACHINE_CONFIG_END
 
-MACHINE_CONFIG_DERIVED(bagman_state::squaitsa, botanic)
+MACHINE_CONFIG_START(bagman_state::squaitsa)
+	botanic(config);
 	MCFG_MACHINE_START_OVERRIDE(bagman_state, squaitsa)
 
 	MCFG_SOUND_MODIFY("aysnd")

@@ -675,7 +675,7 @@ uint32_t mtech_state::screen_update_menu(screen_device &screen, bitmap_rgb32 &bi
 
 MACHINE_CONFIG_START(mtech_state::megatech)
 	/* basic machine hardware */
-	MCFG_FRAGMENT_ADD(md_ntsc)
+	md_ntsc(config);
 
 	/* Megatech has an extra SMS based bios *and* an additional screen */
 	MCFG_CPU_ADD("mtbios", Z80, MASTER_CLOCK / 15) /* ?? */
@@ -766,7 +766,8 @@ image_init_result mtech_state::load_cart(device_image_interface &image, generic_
 	MCFG_GENERIC_CARTSLOT_ADD(_tag, generic_plain_slot, "megatech_cart") \
 	MCFG_GENERIC_LOAD(mtech_state, _load)
 
-MACHINE_CONFIG_DERIVED(mtech_state::megatech_multislot, megatech)
+MACHINE_CONFIG_START(mtech_state::megatech_multislot)
+	megatech(config);
 
 	// add cart slots
 	MCFG_MEGATECH_CARTSLOT_ADD("mt_slot1", mt_cart1)
@@ -782,7 +783,8 @@ MACHINE_CONFIG_DERIVED(mtech_state::megatech_multislot, megatech)
 MACHINE_CONFIG_END
 
 
-MACHINE_CONFIG_DERIVED(mtech_state::megatech_fixedslot, megatech)
+MACHINE_CONFIG_START(mtech_state::megatech_fixedslot)
+	megatech(config);
 
 	// add cart slots
 	MCFG_MEGATECH_CARTSLOT_ADD("mt_slot1", mt_cart1)

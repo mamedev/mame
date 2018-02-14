@@ -180,7 +180,7 @@ MACHINE_CONFIG_START(pecom_state::pecom64)
 	MCFG_COSMAC_SC_CALLBACK(WRITE8(pecom_state, sc_w))
 
 	// sound and video hardware
-	MCFG_FRAGMENT_ADD(pecom_video)
+	pecom_video(config);
 
 	// devices
 	MCFG_CASSETTE_ADD( "cassette" )

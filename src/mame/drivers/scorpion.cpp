@@ -286,7 +286,8 @@ static GFXDECODE_START( quorum )
 	GFXDECODE_ENTRY( "maincpu", 0x1fb00, quorum_charlayout, 0, 8 )
 GFXDECODE_END
 
-MACHINE_CONFIG_DERIVED(scorpion_state::scorpion, spectrum_128)
+MACHINE_CONFIG_START(scorpion_state::scorpion)
+	spectrum_128(config);
 	MCFG_CPU_MODIFY("maincpu")
 	MCFG_CPU_PROGRAM_MAP(scorpion_mem)
 	MCFG_CPU_IO_MAP(scorpion_io)
@@ -307,11 +308,13 @@ MACHINE_CONFIG_DERIVED(scorpion_state::scorpion, spectrum_128)
 	MCFG_DEVICE_REMOVE("exp")
 MACHINE_CONFIG_END
 
-MACHINE_CONFIG_DERIVED(scorpion_state::profi, scorpion)
+MACHINE_CONFIG_START(scorpion_state::profi)
+	scorpion(config);
 	MCFG_GFXDECODE_MODIFY("gfxdecode", profi)
 MACHINE_CONFIG_END
 
-MACHINE_CONFIG_DERIVED(scorpion_state::quorum, scorpion)
+MACHINE_CONFIG_START(scorpion_state::quorum)
+	scorpion(config);
 	MCFG_GFXDECODE_MODIFY("gfxdecode", quorum)
 MACHINE_CONFIG_END
 

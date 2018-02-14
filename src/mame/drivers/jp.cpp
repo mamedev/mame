@@ -364,7 +364,7 @@ MACHINE_CONFIG_START(jp_state::jp)
 	MCFG_DEFAULT_LAYOUT(layout_jp)
 
 	/* Sound */
-	MCFG_FRAGMENT_ADD( genpin_audio )
+	genpin_audio(config);
 	MCFG_SPEAKER_STANDARD_MONO("ayvol")
 	MCFG_SOUND_ADD("ay", AY8910, XTAL(8'000'000) / 4)
 	MCFG_AY8910_PORT_A_READ_CB(READ8(jp_state, porta_r))
@@ -399,7 +399,8 @@ IRQ_CALLBACK_MEMBER(jp_state::sound_int_cb)
 	return 0xff;
 }
 
-MACHINE_CONFIG_DERIVED(jp_state::jps, jp)
+MACHINE_CONFIG_START(jp_state::jps)
+	jp(config);
 	MCFG_CPU_ADD("soundcpu", Z80, XTAL(8'000'000) / 2)
 	MCFG_CPU_PROGRAM_MAP(jp_sound_map)
 	MCFG_CPU_IRQ_ACKNOWLEDGE_DRIVER(jp_state, sound_int_cb)

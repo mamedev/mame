@@ -527,7 +527,8 @@ MACHINE_CONFIG_START(exprraid_state::exprraid)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.60)
 MACHINE_CONFIG_END
 
-MACHINE_CONFIG_DERIVED(exprraid_state::exprboot, exprraid)
+MACHINE_CONFIG_START(exprraid_state::exprboot)
+	exprraid(config);
 
 	MCFG_CPU_REPLACE("maincpu", M6502, 1500000)        /* 1.5 MHz ??? */
 	MCFG_CPU_PROGRAM_MAP(master_map)

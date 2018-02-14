@@ -4023,18 +4023,21 @@ MACHINE_CONFIG_START(apple2e_state::apple2e)
 	MCFG_CASSETTE_DEFAULT_STATE(CASSETTE_STOPPED)
 MACHINE_CONFIG_END
 
-MACHINE_CONFIG_DERIVED(apple2e_state::mprof3, apple2e)
+MACHINE_CONFIG_START(apple2e_state::mprof3)
+	apple2e(config);
 	/* internal ram */
 	MCFG_RAM_MODIFY(RAM_TAG)
 	MCFG_RAM_DEFAULT_SIZE("128K")
 MACHINE_CONFIG_END
 
-MACHINE_CONFIG_DERIVED(apple2e_state::apple2ee, apple2e)
+MACHINE_CONFIG_START(apple2e_state::apple2ee)
+	apple2e(config);
 	MCFG_CPU_REPLACE("maincpu", M65C02, 1021800)        /* close to actual CPU frequency of 1.020484 MHz */
 	MCFG_CPU_PROGRAM_MAP(apple2e_map)
 MACHINE_CONFIG_END
 
-MACHINE_CONFIG_DERIVED(apple2e_state::spectred, apple2e)
+MACHINE_CONFIG_START(apple2e_state::spectred)
+	apple2e(config);
 	MCFG_CPU_ADD("keyb_mcu", I8035, XTAL(4'000'000)) /* guessed frequency */
 	MCFG_CPU_PROGRAM_MAP(spectred_keyb_map)
 
@@ -4042,7 +4045,8 @@ MACHINE_CONFIG_DERIVED(apple2e_state::spectred, apple2e)
 		//      and then remove the keyb CPU inherited from apple2e
 MACHINE_CONFIG_END
 
-MACHINE_CONFIG_DERIVED(apple2e_state::tk3000, apple2e)
+MACHINE_CONFIG_START(apple2e_state::tk3000)
+	apple2e(config);
 	MCFG_CPU_REPLACE("maincpu", M65C02, 1021800)        /* close to actual CPU frequency of 1.020484 MHz */
 	MCFG_CPU_PROGRAM_MAP(apple2e_map)
 
@@ -4050,12 +4054,14 @@ MACHINE_CONFIG_DERIVED(apple2e_state::tk3000, apple2e)
 //  MCFG_CPU_PROGRAM_MAP(tk3000_kbd_map)
 MACHINE_CONFIG_END
 
-MACHINE_CONFIG_DERIVED(apple2e_state::apple2ep, apple2e)
+MACHINE_CONFIG_START(apple2e_state::apple2ep)
+	apple2e(config);
 	MCFG_CPU_REPLACE("maincpu", M65C02, 1021800)        /* close to actual CPU frequency of 1.020484 MHz */
 	MCFG_CPU_PROGRAM_MAP(apple2e_map)
 MACHINE_CONFIG_END
 
-MACHINE_CONFIG_DERIVED(apple2e_state::apple2c, apple2ee)
+MACHINE_CONFIG_START(apple2e_state::apple2c)
+	apple2ee(config);
 	MCFG_CPU_REPLACE("maincpu", M65C02, 1021800)        /* close to actual CPU frequency of 1.020484 MHz */
 	MCFG_CPU_PROGRAM_MAP(apple2c_map)
 
@@ -4119,20 +4125,23 @@ static const floppy_interface apple2cp_floppy35_floppy_interface =
 	"floppy_3_5"
 };
 
-MACHINE_CONFIG_DERIVED(apple2e_state::apple2cp, apple2c)
+MACHINE_CONFIG_START(apple2e_state::apple2cp)
+	apple2c(config);
 	MCFG_A2BUS_SLOT_REMOVE("sl4")
 	MCFG_A2BUS_SLOT_REMOVE("sl6")
 	MCFG_IWM_ADD(IICP_IWM_TAG, a2cp_interface)
 	MCFG_LEGACY_FLOPPY_SONY_2_DRIVES_ADD(apple2cp_floppy35_floppy_interface)
 MACHINE_CONFIG_END
 
-MACHINE_CONFIG_DERIVED(apple2e_state::apple2c_iwm, apple2c)
+MACHINE_CONFIG_START(apple2e_state::apple2c_iwm)
+	apple2c(config);
 
 	MCFG_A2BUS_SLOT_REMOVE("sl6")
 	MCFG_A2BUS_ONBOARD_ADD("a2bus", "sl6", A2BUS_IWM_FDC, NOOP)
 MACHINE_CONFIG_END
 
-MACHINE_CONFIG_DERIVED(apple2e_state::apple2c_mem, apple2c)
+MACHINE_CONFIG_START(apple2e_state::apple2c_mem)
+	apple2c(config);
 	MCFG_CPU_REPLACE("maincpu", M65C02, 1021800)        /* close to actual CPU frequency of 1.020484 MHz */
 	MCFG_CPU_PROGRAM_MAP(apple2c_memexp_map)
 
@@ -4161,7 +4170,8 @@ static const floppy_interface floppy_interface =
 	"floppy_5_25"
 };
 
-MACHINE_CONFIG_DERIVED(apple2e_state::laser128, apple2c)
+MACHINE_CONFIG_START(apple2e_state::laser128)
+	apple2c(config);
 	MCFG_CPU_REPLACE("maincpu", M65C02, 1021800)        /* close to actual CPU frequency of 1.020484 MHz */
 	MCFG_CPU_PROGRAM_MAP(laser128_map)
 
@@ -4184,7 +4194,8 @@ MACHINE_CONFIG_DERIVED(apple2e_state::laser128, apple2c)
 	MCFG_RAM_EXTRA_OPTIONS("128K, 384K, 640K, 896K, 1152K")
 MACHINE_CONFIG_END
 
-MACHINE_CONFIG_DERIVED(apple2e_state::laser128ex2, apple2c)
+MACHINE_CONFIG_START(apple2e_state::laser128ex2)
+	apple2c(config);
 	MCFG_CPU_REPLACE("maincpu", M65C02, 1021800)        /* close to actual CPU frequency of 1.020484 MHz */
 	MCFG_CPU_PROGRAM_MAP(laser128_map)
 
@@ -4207,7 +4218,8 @@ MACHINE_CONFIG_DERIVED(apple2e_state::laser128ex2, apple2c)
 	MCFG_RAM_EXTRA_OPTIONS("128K, 384K, 640K, 896K, 1152K")
 MACHINE_CONFIG_END
 
-MACHINE_CONFIG_DERIVED(apple2e_state::ceci, apple2e)
+MACHINE_CONFIG_START(apple2e_state::ceci)
+	apple2e(config);
 	MCFG_A2BUS_SLOT_REMOVE("sl1")
 	MCFG_A2BUS_SLOT_REMOVE("sl2")
 	MCFG_A2BUS_SLOT_REMOVE("sl3")

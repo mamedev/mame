@@ -1113,7 +1113,8 @@ INPUT_CHANGED_MEMBER(mod4_state::sw_one_shot)
   MOD 4-specific configuration
 ----------------------------------*/
 
-MACHINE_CONFIG_DERIVED(mod4_state::mod4, intellec4)
+MACHINE_CONFIG_START(mod4_state::mod4)
+	intellec4(config);
 	MCFG_CPU_ADD("maincpu", I4004, 5.185_MHz_XTAL / 7)
 	MCFG_I4004_ROM_MAP(intellec4_rom)
 	MCFG_I4004_RAM_MEMORY_MAP(intellec4_ram_memory)
@@ -1337,7 +1338,8 @@ INPUT_CHANGED_MEMBER(mod40_state::sw_single_step)
   MOD 40-specific configuration
 ----------------------------------*/
 
-MACHINE_CONFIG_DERIVED(mod40_state::mod40, intellec4)
+MACHINE_CONFIG_START(mod40_state::mod40)
+	intellec4(config);
 	MCFG_CPU_ADD("maincpu", I4040, 5.185_MHz_XTAL / 7)
 	MCFG_I4040_ROM_MAP(intellec4_rom)
 	MCFG_I4040_RAM_MEMORY_MAP(intellec4_ram_memory)

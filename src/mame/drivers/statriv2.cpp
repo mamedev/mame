@@ -634,7 +634,8 @@ MACHINE_CONFIG_START(statriv2_state::statriv2)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 MACHINE_CONFIG_END
 
-MACHINE_CONFIG_DERIVED(statriv2_state::statriv2v, statriv2)
+MACHINE_CONFIG_START(statriv2_state::statriv2v)
+	statriv2(config);
 
 	/* basic machine hardware */
 
@@ -645,7 +646,8 @@ MACHINE_CONFIG_DERIVED(statriv2_state::statriv2v, statriv2)
 	MCFG_GFXDECODE_MODIFY("gfxdecode", vertical)
 MACHINE_CONFIG_END
 
-MACHINE_CONFIG_DERIVED(statriv2_state::funcsino, statriv2)
+MACHINE_CONFIG_START(statriv2_state::funcsino)
+	statriv2(config);
 
 	/* basic machine hardware */
 

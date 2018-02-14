@@ -1288,27 +1288,32 @@ MACHINE_CONFIG_START(coinmstr_state::coinmstr)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
 MACHINE_CONFIG_END
 
-MACHINE_CONFIG_DERIVED(coinmstr_state::quizmstr, coinmstr)
+MACHINE_CONFIG_START(coinmstr_state::quizmstr)
+	coinmstr(config);
 	MCFG_CPU_MODIFY("maincpu")
 	MCFG_CPU_IO_MAP(quizmstr_io_map)
 MACHINE_CONFIG_END
 
-MACHINE_CONFIG_DERIVED(coinmstr_state::trailblz, coinmstr)
+MACHINE_CONFIG_START(coinmstr_state::trailblz)
+	coinmstr(config);
 	MCFG_CPU_MODIFY("maincpu")
 	MCFG_CPU_IO_MAP(trailblz_io_map)
 MACHINE_CONFIG_END
 
-MACHINE_CONFIG_DERIVED(coinmstr_state::supnudg2, coinmstr)
+MACHINE_CONFIG_START(coinmstr_state::supnudg2)
+	coinmstr(config);
 	MCFG_CPU_MODIFY("maincpu")
 	MCFG_CPU_IO_MAP(supnudg2_io_map)
 MACHINE_CONFIG_END
 
-MACHINE_CONFIG_DERIVED(coinmstr_state::pokeroul, coinmstr)
+MACHINE_CONFIG_START(coinmstr_state::pokeroul)
+	coinmstr(config);
 	MCFG_CPU_MODIFY("maincpu")
 	MCFG_CPU_IO_MAP(pokeroul_io_map)
 MACHINE_CONFIG_END
 
-MACHINE_CONFIG_DERIVED(coinmstr_state::jpcoin, coinmstr)
+MACHINE_CONFIG_START(coinmstr_state::jpcoin)
+	coinmstr(config);
 	MCFG_CPU_MODIFY("maincpu")
 	MCFG_CPU_PROGRAM_MAP(jpcoin_map)
 	MCFG_CPU_IO_MAP(jpcoin_io_map)

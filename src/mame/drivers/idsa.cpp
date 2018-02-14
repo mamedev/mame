@@ -341,7 +341,7 @@ MACHINE_CONFIG_START(idsa_state::idsa)
 	//MCFG_DEFAULT_LAYOUT()
 
 	/* sound hardware */
-	MCFG_FRAGMENT_ADD( genpin_audio )
+	genpin_audio(config);
 	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
 	MCFG_SOUND_ADD("speech", SP0256, 3120000) // unknown variant
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "lspeaker", 1.5)
@@ -357,7 +357,8 @@ MACHINE_CONFIG_START(idsa_state::idsa)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", 0.75)
 MACHINE_CONFIG_END
 
-MACHINE_CONFIG_DERIVED(idsa_state::bsktbllp, idsa)
+MACHINE_CONFIG_START(idsa_state::bsktbllp)
+	idsa(config);
 	MCFG_DEVICE_MODIFY("aysnd1")
 	MCFG_AY8910_PORT_A_WRITE_CB(WRITE8(idsa_state, ppi_control_w))
 	MCFG_AY8910_PORT_B_WRITE_CB(WRITE8(idsa_state, ppi_data_w))

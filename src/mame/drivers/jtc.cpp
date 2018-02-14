@@ -746,7 +746,8 @@ MACHINE_CONFIG_START(jtc_state::basic)
 	MCFG_CENTRONICS_BUSY_HANDLER(WRITELINE(jtc_state, write_centronics_busy))
 MACHINE_CONFIG_END
 
-MACHINE_CONFIG_DERIVED(jtc_state::jtc, basic)
+MACHINE_CONFIG_START(jtc_state::jtc)
+	basic(config);
 	/* video hardware */
 	MCFG_SCREEN_ADD(SCREEN_TAG, RASTER)
 	MCFG_SCREEN_REFRESH_RATE(50)
@@ -763,7 +764,8 @@ MACHINE_CONFIG_DERIVED(jtc_state::jtc, basic)
 	MCFG_RAM_DEFAULT_SIZE("2K")
 MACHINE_CONFIG_END
 
-MACHINE_CONFIG_DERIVED(jtces88_state::jtces88, jtc)
+MACHINE_CONFIG_START(jtces88_state::jtces88)
+	jtc(config);
 	/* basic machine hardware */
 	MCFG_CPU_MODIFY(UB8830D_TAG)
 	MCFG_CPU_PROGRAM_MAP(jtc_es1988_mem)
@@ -773,7 +775,8 @@ MACHINE_CONFIG_DERIVED(jtces88_state::jtces88, jtc)
 	MCFG_RAM_DEFAULT_SIZE("4K")
 MACHINE_CONFIG_END
 
-MACHINE_CONFIG_DERIVED(jtces23_state::jtces23, basic)
+MACHINE_CONFIG_START(jtces23_state::jtces23)
+	basic(config);
 	/* basic machine hardware */
 	MCFG_CPU_MODIFY(UB8830D_TAG)
 	MCFG_CPU_PROGRAM_MAP(jtc_es23_mem)
@@ -795,7 +798,8 @@ MACHINE_CONFIG_DERIVED(jtces23_state::jtces23, basic)
 	MCFG_RAM_DEFAULT_SIZE("4K")
 MACHINE_CONFIG_END
 
-MACHINE_CONFIG_DERIVED(jtces40_state::jtces40, basic)
+MACHINE_CONFIG_START(jtces40_state::jtces40)
+	basic(config);
 	/* basic machine hardware */
 	MCFG_CPU_MODIFY(UB8830D_TAG)
 	MCFG_CPU_PROGRAM_MAP(jtc_es40_mem)

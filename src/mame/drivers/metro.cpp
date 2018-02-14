@@ -3087,7 +3087,7 @@ MACHINE_CONFIG_END
 
 // TODO: these comes from the CRTC inside the i4100
 MACHINE_CONFIG_START(metro_state::i4100_config_360x224)
-	MCFG_FRAGMENT_ADD( i4100_config )
+	i4100_config(config);
 
 	MCFG_DEVICE_MODIFY("screen")
 	MCFG_SCREEN_SIZE(360, 224)
@@ -3095,7 +3095,7 @@ MACHINE_CONFIG_START(metro_state::i4100_config_360x224)
 MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(metro_state::i4220_config_320x240)
-	MCFG_FRAGMENT_ADD( i4220_config )
+	i4220_config(config);
 
 	MCFG_DEVICE_MODIFY("screen")
 	MCFG_SCREEN_SIZE(320, 240)
@@ -3103,7 +3103,7 @@ MACHINE_CONFIG_START(metro_state::i4220_config_320x240)
 MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(metro_state::i4220_config_304x224)
-	MCFG_FRAGMENT_ADD( i4220_config )
+	i4220_config(config);
 
 	MCFG_DEVICE_MODIFY("screen")
 	MCFG_SCREEN_SIZE(320, 240)
@@ -3111,7 +3111,7 @@ MACHINE_CONFIG_START(metro_state::i4220_config_304x224)
 MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(metro_state::i4300_config_384x224)
-	MCFG_FRAGMENT_ADD( i4300_config )
+	i4300_config(config);
 
 	MCFG_DEVICE_MODIFY("screen")
 	MCFG_SCREEN_SIZE(384, 240)
@@ -3119,7 +3119,7 @@ MACHINE_CONFIG_START(metro_state::i4300_config_384x224)
 MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(metro_state::i4300_config_320x240)
-	MCFG_FRAGMENT_ADD( i4300_config )
+	i4300_config(config);
 
 	MCFG_DEVICE_MODIFY("screen")
 	MCFG_SCREEN_SIZE(384, 240)
@@ -3136,7 +3136,7 @@ MACHINE_CONFIG_START(metro_state::msgogo)
 	MCFG_CPU_PERIODIC_INT_DRIVER(metro_state, metro_periodic_interrupt,  60) // ?
 
 	/* video hardware */
-	MCFG_FRAGMENT_ADD( i4220_config )
+	i4220_config(config);
 	MCFG_DEVICE_MODIFY("vdp2")
 	MCFG_I4100_TILEMAP_XOFFSETS(-2,-2,-2)
 
@@ -3149,21 +3149,24 @@ MACHINE_CONFIG_START(metro_state::msgogo)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 MACHINE_CONFIG_END
 
-MACHINE_CONFIG_DERIVED(metro_state::balcube, msgogo)
+MACHINE_CONFIG_START(metro_state::balcube)
+	msgogo(config);
 	MCFG_CPU_MODIFY("maincpu")
 	MCFG_CPU_PROGRAM_MAP(balcube_map)
 	MCFG_CPU_VBLANK_INT_DRIVER("screen", metro_state,  metro_vblank_interrupt)
 	MCFG_CPU_PERIODIC_INT_DRIVER(metro_state, metro_periodic_interrupt,  8*60) // ?
 MACHINE_CONFIG_END
 
-MACHINE_CONFIG_DERIVED(metro_state::daitoa, msgogo)
+MACHINE_CONFIG_START(metro_state::daitoa)
+	msgogo(config);
 	MCFG_CPU_MODIFY("maincpu")
 	MCFG_CPU_PROGRAM_MAP(daitoa_map)
 	MCFG_CPU_VBLANK_INT_DRIVER("screen", metro_state,  metro_vblank_interrupt)
 	MCFG_CPU_PERIODIC_INT_DRIVER(metro_state, metro_periodic_interrupt,  8*60) // ?
 MACHINE_CONFIG_END
 
-MACHINE_CONFIG_DERIVED(metro_state::bangball, msgogo)
+MACHINE_CONFIG_START(metro_state::bangball)
+	msgogo(config);
 	MCFG_CPU_MODIFY("maincpu")
 	MCFG_CPU_PROGRAM_MAP(bangball_map)
 	MCFG_CPU_VBLANK_INT_REMOVE()
@@ -3175,7 +3178,8 @@ MACHINE_CONFIG_DERIVED(metro_state::bangball, msgogo)
 	MCFG_SCREEN_REFRESH_RATE(60)
 MACHINE_CONFIG_END
 
-MACHINE_CONFIG_DERIVED(metro_state::batlbubl, msgogo)
+MACHINE_CONFIG_START(metro_state::batlbubl)
+	msgogo(config);
 	MCFG_CPU_MODIFY("maincpu")
 	MCFG_CPU_PROGRAM_MAP(batlbubl_map)
 	MCFG_CPU_VBLANK_INT_REMOVE()
@@ -3217,10 +3221,10 @@ MACHINE_CONFIG_START(metro_state::daitorid)
 	MCFG_CPU_VBLANK_INT_DRIVER("screen", metro_state,  metro_vblank_interrupt)
 	MCFG_CPU_PERIODIC_INT_DRIVER(metro_state, metro_periodic_interrupt,  8*60) // ?
 
-	MCFG_FRAGMENT_ADD(daitorid_upd7810_sound)
+	daitorid_upd7810_sound(config);
 
 	/* video hardware */
-	MCFG_FRAGMENT_ADD( i4220_config )
+	i4220_config(config);
 	MCFG_DEVICE_MODIFY("vdp2")
 	MCFG_I4100_TILEMAP_XOFFSETS(-2,-2,-2)
 
@@ -3246,10 +3250,10 @@ MACHINE_CONFIG_START(metro_state::dharma)
 	MCFG_CPU_VBLANK_INT_DRIVER("screen", metro_state,  metro_vblank_interrupt)
 	MCFG_CPU_PERIODIC_INT_DRIVER(metro_state, metro_periodic_interrupt,  8*60) // ?
 
-	MCFG_FRAGMENT_ADD(metro_upd7810_sound)
+	metro_upd7810_sound(config);
 
 	/* video hardware */
-	MCFG_FRAGMENT_ADD(i4220_config)
+	i4220_config(config);
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
@@ -3271,10 +3275,10 @@ MACHINE_CONFIG_START(metro_state::karatour)
 	MCFG_CPU_VBLANK_INT_DRIVER("screen", metro_state,  karatour_interrupt)
 	MCFG_CPU_PERIODIC_INT_DRIVER(metro_state, metro_periodic_interrupt,  8*60) // ?
 
-	MCFG_FRAGMENT_ADD(metro_upd7810_sound)
+	metro_upd7810_sound(config);
 
 	/* video hardware */
-	MCFG_FRAGMENT_ADD(i4100_config)
+	i4100_config(config);
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
@@ -3297,10 +3301,10 @@ MACHINE_CONFIG_START(metro_state::_3kokushi)
 	MCFG_CPU_VBLANK_INT_DRIVER("screen", metro_state,  karatour_interrupt)
 	MCFG_CPU_PERIODIC_INT_DRIVER(metro_state, metro_periodic_interrupt,  8*60) // ?
 
-	MCFG_FRAGMENT_ADD(metro_upd7810_sound)
+	metro_upd7810_sound(config);
 
 	/* video hardware */
-	MCFG_FRAGMENT_ADD( i4220_config_320x240 )
+	i4220_config_320x240(config);
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
@@ -3323,10 +3327,10 @@ MACHINE_CONFIG_START(metro_state::lastfort)
 	MCFG_CPU_VBLANK_INT_DRIVER("screen", metro_state,  metro_vblank_interrupt)
 	MCFG_CPU_PERIODIC_INT_DRIVER(metro_state, metro_periodic_interrupt,  8*60) // ?
 
-	MCFG_FRAGMENT_ADD(metro_upd7810_sound)
+	metro_upd7810_sound(config);
 
 	/* video hardware */
-	MCFG_FRAGMENT_ADD( i4100_config_360x224 )
+	i4100_config_360x224(config);
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
@@ -3348,9 +3352,9 @@ MACHINE_CONFIG_START(metro_state::lastforg)
 	MCFG_CPU_VBLANK_INT_DRIVER("screen", metro_state,  karatour_interrupt)
 	MCFG_CPU_PERIODIC_INT_DRIVER(metro_state, metro_periodic_interrupt,  8*60) // ?
 
-	MCFG_FRAGMENT_ADD(metro_upd7810_sound)
+	metro_upd7810_sound(config);
 
-	MCFG_FRAGMENT_ADD( i4100_config_360x224 )
+	i4100_config_360x224(config);
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
@@ -3373,7 +3377,7 @@ MACHINE_CONFIG_START(metro_state::dokyusei)
 	MCFG_CPU_IRQ_ACKNOWLEDGE_DRIVER(metro_state,metro_irq_callback)
 
 	/* video hardware */
-	MCFG_FRAGMENT_ADD( i4300_config )
+	i4300_config(config);
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
@@ -3398,7 +3402,7 @@ MACHINE_CONFIG_START(metro_state::dokyusp)
 	MCFG_WATCHDOG_ADD("watchdog")
 
 	/* video hardware */
-	MCFG_FRAGMENT_ADD( i4300_config_384x224 )
+	i4300_config_384x224(config);
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
@@ -3424,7 +3428,7 @@ MACHINE_CONFIG_START(metro_state::gakusai)
 	MCFG_WATCHDOG_ADD("watchdog")
 
 	/* video hardware */
-	MCFG_FRAGMENT_ADD( i4300_config_320x240 )
+	i4300_config_320x240(config);
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
@@ -3450,7 +3454,7 @@ MACHINE_CONFIG_START(metro_state::gakusai2)
 	MCFG_WATCHDOG_ADD("watchdog")
 
 	/* video hardware */
-	MCFG_FRAGMENT_ADD( i4300_config_320x240 )
+	i4300_config_320x240(config);
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
@@ -3471,10 +3475,10 @@ MACHINE_CONFIG_START(metro_state::pangpoms)
 	MCFG_CPU_VBLANK_INT_DRIVER("screen", metro_state,  metro_vblank_interrupt)
 	MCFG_CPU_PERIODIC_INT_DRIVER(metro_state, metro_periodic_interrupt,  8*60) // ?
 
-	MCFG_FRAGMENT_ADD(metro_upd7810_sound)
+	metro_upd7810_sound(config);
 
 	/* video hardware */
-	MCFG_FRAGMENT_ADD( i4100_config_360x224 )
+	i4100_config_360x224(config);
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
@@ -3497,10 +3501,10 @@ MACHINE_CONFIG_START(metro_state::poitto)
 	MCFG_CPU_VBLANK_INT_DRIVER("screen", metro_state,  metro_vblank_interrupt)
 	MCFG_CPU_PERIODIC_INT_DRIVER(metro_state, metro_periodic_interrupt,  8*60) // ?
 
-	MCFG_FRAGMENT_ADD(metro_upd7810_sound)
+	metro_upd7810_sound(config);
 
 	/* video hardware */
-	MCFG_FRAGMENT_ADD( i4100_config_360x224 )
+	i4100_config_360x224(config);
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
@@ -3523,10 +3527,10 @@ MACHINE_CONFIG_START(metro_state::pururun)
 	MCFG_CPU_VBLANK_INT_DRIVER("screen", metro_state,  metro_vblank_interrupt)
 	MCFG_CPU_PERIODIC_INT_DRIVER(metro_state, metro_periodic_interrupt,  8*60) // ?
 
-	MCFG_FRAGMENT_ADD(daitorid_upd7810_sound)
+	daitorid_upd7810_sound(config);
 
 	/* video hardware */
-	MCFG_FRAGMENT_ADD( i4220_config )
+	i4220_config(config);
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
@@ -3550,9 +3554,9 @@ MACHINE_CONFIG_START(metro_state::skyalert)
 	MCFG_CPU_VBLANK_INT_DRIVER("screen", metro_state,  metro_vblank_interrupt)
 	MCFG_CPU_PERIODIC_INT_DRIVER(metro_state, metro_periodic_interrupt,  8*60) // ?
 
-	MCFG_FRAGMENT_ADD(metro_upd7810_sound)
+	metro_upd7810_sound(config);
 
-	MCFG_FRAGMENT_ADD(i4100_config_360x224)
+	i4100_config_360x224(config);
 
 
 	/* sound hardware */
@@ -3576,10 +3580,10 @@ MACHINE_CONFIG_START(metro_state::toride2g)
 	MCFG_CPU_VBLANK_INT_DRIVER("screen", metro_state,  metro_vblank_interrupt)
 	MCFG_CPU_PERIODIC_INT_DRIVER(metro_state, metro_periodic_interrupt,  8*60) // ?
 
-	MCFG_FRAGMENT_ADD(metro_upd7810_sound)
+	metro_upd7810_sound(config);
 
 	/* video hardware */
-	MCFG_FRAGMENT_ADD( i4220_config )
+	i4220_config(config);
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
@@ -3605,7 +3609,7 @@ MACHINE_CONFIG_START(metro_state::mouja)
 	MCFG_WATCHDOG_ADD("watchdog")
 
 	/* video hardware */
-	MCFG_FRAGMENT_ADD( i4300_config )
+	i4300_config(config);
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
@@ -3627,7 +3631,7 @@ MACHINE_CONFIG_START(metro_state::vmetal)
 	MCFG_CPU_PERIODIC_INT_DRIVER(metro_state, metro_periodic_interrupt,  8*60) // ?
 
 	/* video hardware */
-	MCFG_FRAGMENT_ADD( i4220_config_304x224 )
+	i4220_config_304x224(config);
 
 	MCFG_DEVICE_MODIFY("vdp2")
 	MCFG_I4100_TILEMAP_XOFFSETS(-16,-16,-16)
@@ -3691,7 +3695,8 @@ MACHINE_CONFIG_START(metro_state::blzntrnd)
 	MCFG_SOUND_ROUTE(2, "mono", 1.0)
 MACHINE_CONFIG_END
 
-MACHINE_CONFIG_DERIVED(metro_state::gstrik2, blzntrnd)
+MACHINE_CONFIG_START(metro_state::gstrik2)
+	blzntrnd(config);
 	MCFG_GFXDECODE_MODIFY("gfxdecode", gstrik2)
 	MCFG_VIDEO_START_OVERRIDE(metro_state,gstrik2)
 
@@ -3720,7 +3725,7 @@ MACHINE_CONFIG_START(metro_state::puzzlet)
 
 	/* video hardware */
 	// TODO: looks like game is running in i4220 compatibilty mode, $778000 seems to be an id for the chip?
-	MCFG_FRAGMENT_ADD( i4220_config )
+	i4220_config(config);
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")

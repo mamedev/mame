@@ -975,7 +975,8 @@ MACHINE_CONFIG_START(slapfght_state::tigerh)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
 MACHINE_CONFIG_END
 
-MACHINE_CONFIG_DERIVED(slapfght_state::tigerhb1, tigerh)
+MACHINE_CONFIG_START(slapfght_state::tigerhb1)
+	tigerh(config);
 
 	/* basic machine hardware */
 	MCFG_CPU_MODIFY("maincpu")
@@ -985,7 +986,8 @@ MACHINE_CONFIG_DERIVED(slapfght_state::tigerhb1, tigerh)
 	MCFG_DEVICE_REMOVE("bmcu")
 MACHINE_CONFIG_END
 
-MACHINE_CONFIG_DERIVED(slapfght_state::tigerhb2, tigerhb1)
+MACHINE_CONFIG_START(slapfght_state::tigerhb2)
+	tigerhb1(config);
 
 	/* basic machine hardware */
 	MCFG_CPU_MODIFY("maincpu")
@@ -1046,7 +1048,8 @@ MACHINE_CONFIG_START(slapfght_state::slapfigh)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
 MACHINE_CONFIG_END
 
-MACHINE_CONFIG_DERIVED(slapfght_state::slapfighb1, slapfigh)
+MACHINE_CONFIG_START(slapfght_state::slapfighb1)
+	slapfigh(config);
 
 	/* basic machine hardware */
 	MCFG_CPU_MODIFY("maincpu")
@@ -1056,21 +1059,24 @@ MACHINE_CONFIG_DERIVED(slapfght_state::slapfighb1, slapfigh)
 	MCFG_DEVICE_REMOVE("bmcu")
 MACHINE_CONFIG_END
 
-MACHINE_CONFIG_DERIVED(slapfght_state::slapfighb2, slapfighb1)
+MACHINE_CONFIG_START(slapfght_state::slapfighb2)
+	slapfighb1(config);
 
 	/* basic machine hardware */
 	MCFG_CPU_MODIFY("maincpu")
 	MCFG_CPU_PROGRAM_MAP(slapfighb2_map)
 MACHINE_CONFIG_END
 
-MACHINE_CONFIG_DERIVED(slapfght_state::getstarb1, slapfighb1)
+MACHINE_CONFIG_START(slapfght_state::getstarb1)
+	slapfighb1(config);
 
 	/* basic machine hardware */
 	MCFG_CPU_MODIFY("maincpu")
 	MCFG_CPU_IO_MAP(getstarb1_io_map)
 MACHINE_CONFIG_END
 
-MACHINE_CONFIG_DERIVED(slapfght_state::getstarb2, slapfighb1)
+MACHINE_CONFIG_START(slapfght_state::getstarb2)
+	slapfighb1(config);
 
 	/* basic machine hardware */
 	MCFG_CPU_MODIFY("maincpu")

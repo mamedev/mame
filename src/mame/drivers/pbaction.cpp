@@ -323,7 +323,8 @@ MACHINE_CONFIG_START(pbaction_state::pbaction)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
 MACHINE_CONFIG_END
 
-MACHINE_CONFIG_DERIVED(pbaction_state::pbactionx, pbaction)
+MACHINE_CONFIG_START(pbaction_state::pbactionx)
+	pbaction(config);
 	MCFG_CPU_REPLACE("maincpu", SEGA_CPU_PBACTIO4, 4000000)   /* 4 MHz? */
 	MCFG_CPU_PROGRAM_MAP(pbaction_map)
 	MCFG_CPU_VBLANK_INT_DRIVER("screen", pbaction_state,  vblank_irq)

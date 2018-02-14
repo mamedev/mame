@@ -3377,7 +3377,8 @@ MACHINE_CONFIG_START(cps_state::cps1_10MHz)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.30)
 MACHINE_CONFIG_END
 
-MACHINE_CONFIG_DERIVED(cps_state::forgottn, cps1_10MHz)
+MACHINE_CONFIG_START(cps_state::forgottn)
+	cps1_10MHz(config);
 	MCFG_CPU_MODIFY("maincpu")
 	MCFG_CPU_PROGRAM_MAP(forgottn_map)
 
@@ -3386,20 +3387,23 @@ MACHINE_CONFIG_DERIVED(cps_state::forgottn, cps1_10MHz)
 	MCFG_UPD4701_PORTY("DIAL1")
 MACHINE_CONFIG_END
 
-MACHINE_CONFIG_DERIVED(cps_state::cps1_12MHz, cps1_10MHz)
+MACHINE_CONFIG_START(cps_state::cps1_12MHz)
+	cps1_10MHz(config);
 
 	/* basic machine hardware */
 	MCFG_CPU_MODIFY("maincpu")
 	MCFG_CPU_CLOCK( XTAL(12'000'000) )    /* verified on pcb */
 MACHINE_CONFIG_END
 
-MACHINE_CONFIG_DERIVED(cps_state::pang3, cps1_12MHz)
+MACHINE_CONFIG_START(cps_state::pang3)
+	cps1_12MHz(config);
 
 	/* basic machine hardware */
 	MCFG_EEPROM_SERIAL_93C46_ADD("eeprom")
 MACHINE_CONFIG_END
 
-MACHINE_CONFIG_DERIVED(cps_state::ganbare, cps1_10MHz)
+MACHINE_CONFIG_START(cps_state::ganbare)
+	cps1_10MHz(config);
 
 	/* basic machine hardware */
 	MCFG_CPU_MODIFY("maincpu")
@@ -3408,7 +3412,8 @@ MACHINE_CONFIG_DERIVED(cps_state::ganbare, cps1_10MHz)
 	MCFG_M48T35_ADD("m48t35")
 MACHINE_CONFIG_END
 
-MACHINE_CONFIG_DERIVED(cps_state::qsound, cps1_12MHz)
+MACHINE_CONFIG_START(cps_state::qsound)
+	cps1_12MHz(config);
 
 	/* basic machine hardware */
 	MCFG_CPU_REPLACE("maincpu", M68000, XTAL(12'000'000) )    /* verified on pcb */
@@ -3439,18 +3444,21 @@ MACHINE_CONFIG_DERIVED(cps_state::qsound, cps1_12MHz)
 	MCFG_SOUND_ROUTE(1, "rspeaker", 1.0)
 MACHINE_CONFIG_END
 
-MACHINE_CONFIG_DERIVED(cps_state::wofhfh, cps1_12MHz)
+MACHINE_CONFIG_START(cps_state::wofhfh)
+	cps1_12MHz(config);
 
 	/* basic machine hardware */
 	MCFG_EEPROM_SERIAL_93C46_8BIT_ADD("eeprom")
 MACHINE_CONFIG_END
 
-MACHINE_CONFIG_DERIVED(cps_state::sf2m3, cps1_12MHz)
+MACHINE_CONFIG_START(cps_state::sf2m3)
+	cps1_12MHz(config);
 	MCFG_CPU_MODIFY("maincpu")
 	MCFG_CPU_PROGRAM_MAP(sf2m3_map)
 MACHINE_CONFIG_END
 
-MACHINE_CONFIG_DERIVED(cps_state::sf2m10, cps1_12MHz)
+MACHINE_CONFIG_START(cps_state::sf2m10)
+	cps1_12MHz(config);
 	MCFG_CPU_MODIFY("maincpu")
 	MCFG_CPU_PROGRAM_MAP(sf2m10_map)
 MACHINE_CONFIG_END

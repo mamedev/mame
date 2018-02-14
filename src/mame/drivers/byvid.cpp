@@ -812,7 +812,8 @@ MACHINE_CONFIG_START(by133_state::babypac)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "beee", 0.10)
 MACHINE_CONFIG_END
 
-MACHINE_CONFIG_DERIVED(by133_state::granny, babypac)
+MACHINE_CONFIG_START(by133_state::granny)
+	babypac(config);
 	MCFG_DEVICE_REMOVE("videocpu")
 	MCFG_CPU_ADD("videocpu", MC6809, XTAL(8'000'000)) // MC68B09P (XTAL value hard to read)
 	MCFG_CPU_PROGRAM_MAP(granny_map)

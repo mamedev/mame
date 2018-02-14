@@ -559,7 +559,8 @@ MACHINE_CONFIG_START(marineb_state::marineb)
 MACHINE_CONFIG_END
 
 
-MACHINE_CONFIG_DERIVED(marineb_state::changes, marineb)
+MACHINE_CONFIG_START(marineb_state::changes)
+	marineb(config);
 
 	/* basic machine hardware */
 
@@ -570,7 +571,8 @@ MACHINE_CONFIG_DERIVED(marineb_state::changes, marineb)
 MACHINE_CONFIG_END
 
 
-MACHINE_CONFIG_DERIVED(marineb_state::springer, marineb)
+MACHINE_CONFIG_START(marineb_state::springer)
+	marineb(config);
 
 	/* basic machine hardware */
 	MCFG_DEVICE_MODIFY("outlatch")
@@ -583,7 +585,8 @@ MACHINE_CONFIG_DERIVED(marineb_state::springer, marineb)
 MACHINE_CONFIG_END
 
 
-MACHINE_CONFIG_DERIVED(marineb_state::hoccer, marineb)
+MACHINE_CONFIG_START(marineb_state::hoccer)
+	marineb(config);
 
 	/* basic machine hardware */
 
@@ -594,7 +597,8 @@ MACHINE_CONFIG_DERIVED(marineb_state::hoccer, marineb)
 MACHINE_CONFIG_END
 
 
-MACHINE_CONFIG_DERIVED(marineb_state::wanted, marineb)
+MACHINE_CONFIG_START(marineb_state::wanted)
+	marineb(config);
 
 	/* basic machine hardware */
 	MCFG_CPU_MODIFY("maincpu")
@@ -615,7 +619,8 @@ MACHINE_CONFIG_DERIVED(marineb_state::wanted, marineb)
 MACHINE_CONFIG_END
 
 
-MACHINE_CONFIG_DERIVED(marineb_state::hopprobo, marineb)
+MACHINE_CONFIG_START(marineb_state::hopprobo)
+	marineb(config);
 
 	/* basic machine hardware */
 
@@ -626,7 +631,8 @@ MACHINE_CONFIG_DERIVED(marineb_state::hopprobo, marineb)
 MACHINE_CONFIG_END
 
 
-MACHINE_CONFIG_DERIVED(marineb_state::bcruzm12, wanted)
+MACHINE_CONFIG_START(marineb_state::bcruzm12)
+	wanted(config);
 
 	/* basic machine hardware */
 	MCFG_DEVICE_MODIFY("outlatch")

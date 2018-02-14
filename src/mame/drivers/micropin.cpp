@@ -301,7 +301,7 @@ MACHINE_CONFIG_START(micropin_state::micropin)
 	MCFG_DEFAULT_LAYOUT(layout_micropin)
 
 	/* Sound */
-	MCFG_FRAGMENT_ADD( genpin_audio )
+	genpin_audio(config);
 	MCFG_SPEAKER_STANDARD_MONO("mono")
 	MCFG_SOUND_ADD("beeper", BEEP, 387)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
@@ -336,7 +336,7 @@ MACHINE_CONFIG_START(micropin_state::pentacup2)
 	//MCFG_NVRAM_ADD_0FILL("nvram")
 
 	/* Sound */
-	MCFG_FRAGMENT_ADD( genpin_audio )
+	genpin_audio(config);
 MACHINE_CONFIG_END
 
 /*-------------------------------------------------------------------

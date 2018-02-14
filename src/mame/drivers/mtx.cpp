@@ -348,10 +348,11 @@ MACHINE_CONFIG_START(mtx_state::mtx512)
 MACHINE_CONFIG_END
 
 /*-------------------------------------------------
-    MACHINE_CONFIG_DERIVED( mtx500, mtx512 )
+    MACHINE_CONFIG_START( mtx500 )
 -------------------------------------------------*/
 
-MACHINE_CONFIG_DERIVED(mtx_state::mtx500, mtx512)
+MACHINE_CONFIG_START(mtx_state::mtx500)
+	mtx512(config);
 
 	/* internal ram */
 	MCFG_RAM_MODIFY(RAM_TAG)
@@ -360,10 +361,11 @@ MACHINE_CONFIG_DERIVED(mtx_state::mtx500, mtx512)
 MACHINE_CONFIG_END
 
 /*-------------------------------------------------
-    MACHINE_CONFIG_DERIVED( rs128, mtx512 )
+    MACHINE_CONFIG_START( rs128 )
 -------------------------------------------------*/
 
-MACHINE_CONFIG_DERIVED(mtx_state::rs128, mtx512)
+MACHINE_CONFIG_START(mtx_state::rs128)
+	mtx512(config);
 
 	/* basic machine hardware */
 	MCFG_CPU_MODIFY(Z80_TAG)

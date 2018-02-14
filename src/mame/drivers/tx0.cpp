@@ -1583,7 +1583,8 @@ MACHINE_CONFIG_START(tx0_state::tx0_64kw)
 	MCFG_PALETTE_INIT_OWNER(tx0_state, tx0)
 MACHINE_CONFIG_END
 
-MACHINE_CONFIG_DERIVED(tx0_state::tx0_8kw, tx0_64kw)
+MACHINE_CONFIG_START(tx0_state::tx0_8kw)
+	tx0_64kw(config);
 
 	/* basic machine hardware */
 	/* TX0 CPU @ approx. 167 kHz (no master clock, but the memory cycle time is

@@ -598,7 +598,8 @@ MACHINE_CONFIG_END
 
 
 
-MACHINE_CONFIG_DERIVED(senjyo_state::senjyox_e, senjyo)
+MACHINE_CONFIG_START(senjyo_state::senjyox_e)
+	senjyo(config);
 	MCFG_CPU_REPLACE("maincpu", SEGA_315_5015, 4000000)   /* 4 MHz? */
 	MCFG_CPU_PROGRAM_MAP(senjyo_map)
 	MCFG_CPU_OPCODES_MAP(decrypted_opcodes_map)
@@ -606,7 +607,8 @@ MACHINE_CONFIG_DERIVED(senjyo_state::senjyox_e, senjyo)
 	MCFG_SEGACRPT_SET_DECRYPTED_TAG(":decrypted_opcodes")
 MACHINE_CONFIG_END
 
-MACHINE_CONFIG_DERIVED(senjyo_state::senjyox_a, senjyo)
+MACHINE_CONFIG_START(senjyo_state::senjyox_a)
+	senjyo(config);
 	MCFG_CPU_REPLACE("maincpu", SEGA_315_5018, 4000000)   /* 4 MHz? */
 	MCFG_CPU_PROGRAM_MAP(senjyo_map)
 	MCFG_CPU_OPCODES_MAP(decrypted_opcodes_map)
@@ -615,7 +617,8 @@ MACHINE_CONFIG_DERIVED(senjyo_state::senjyox_a, senjyo)
 MACHINE_CONFIG_END
 
 
-MACHINE_CONFIG_DERIVED(senjyo_state::starforb, senjyox_e)
+MACHINE_CONFIG_START(senjyo_state::starforb)
+	senjyox_e(config);
 
 	/* basic machine hardware */
 	MCFG_CPU_MODIFY("maincpu")

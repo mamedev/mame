@@ -1727,21 +1727,24 @@ MACHINE_CONFIG_START(namcos12_state::coh700)
 	//MCFG_SOUND_ROUTE(3, "rspeaker", 1.00)
 MACHINE_CONFIG_END
 
-MACHINE_CONFIG_DERIVED(namcos12_boothack_state::ptblank2, coh700)
+MACHINE_CONFIG_START(namcos12_boothack_state::ptblank2)
+	coh700(config);
 
 	/* basic machine hardware */
 	MCFG_CPU_MODIFY("maincpu")
 	MCFG_CPU_PROGRAM_MAP( ptblank2_map )
 MACHINE_CONFIG_END
 
-MACHINE_CONFIG_DERIVED(namcos12_boothack_state::tektagt, coh700)
+MACHINE_CONFIG_START(namcos12_boothack_state::tektagt)
+	coh700(config);
 
 	/* basic machine hardware */
 	MCFG_CPU_MODIFY("maincpu")
 	MCFG_CPU_PROGRAM_MAP( tektagt_map )
 MACHINE_CONFIG_END
 
-MACHINE_CONFIG_DERIVED(namcos12_boothack_state::golgo13, coh700)
+MACHINE_CONFIG_START(namcos12_boothack_state::golgo13)
+	coh700(config);
 
 	/* basic machine hardware */
 	MCFG_CPU_MODIFY("sub")
@@ -1758,7 +1761,8 @@ ADDRESS_MAP_START(namcos12_state::jvsiomap)
 ADDRESS_MAP_END
 
 
-MACHINE_CONFIG_DERIVED(namcos12_boothack_state::truckk, coh700)
+MACHINE_CONFIG_START(namcos12_boothack_state::truckk)
+	coh700(config);
 	// Timer at 115200*16 for the jvs serial clock
 	MCFG_DEVICE_MODIFY(":sub:sci0")
 	MCFG_H8_SCI_SET_EXTERNAL_CLOCK_PERIOD(attotime::from_hz(JVSCLOCK/8))
@@ -1827,7 +1831,8 @@ ADDRESS_MAP_START(namcos12_state::plarailjvsiomap)
 	AM_RANGE(h8_device::ADC_2, h8_device::ADC_2) AM_NOP
 ADDRESS_MAP_END
 
-MACHINE_CONFIG_DERIVED(namcos12_boothack_state::technodr, coh700)
+MACHINE_CONFIG_START(namcos12_boothack_state::technodr)
+	coh700(config);
 	// Timer at 115200*16 for the jvs serial clock
 	MCFG_DEVICE_MODIFY(":sub:sci0")
 	MCFG_H8_SCI_SET_EXTERNAL_CLOCK_PERIOD(attotime::from_hz(JVSCLOCK/8))
@@ -1849,7 +1854,8 @@ MACHINE_CONFIG_DERIVED(namcos12_boothack_state::technodr, coh700)
 	MCFG_QUANTUM_TIME(attotime::from_hz(2*115200))
 MACHINE_CONFIG_END
 
-MACHINE_CONFIG_DERIVED(namcos12_boothack_state::aplarail, coh700)
+MACHINE_CONFIG_START(namcos12_boothack_state::aplarail)
+	coh700(config);
 	// Timer at 115200*16 for the jvs serial clock
 	MCFG_DEVICE_MODIFY(":sub:sci0")
 	MCFG_H8_SCI_SET_EXTERNAL_CLOCK_PERIOD(attotime::from_hz(JVSCLOCK/8))

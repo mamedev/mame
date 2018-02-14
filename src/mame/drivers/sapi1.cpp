@@ -644,7 +644,8 @@ MACHINE_CONFIG_START(sapi1_state::sapi1)
 	MCFG_RAM_DEFAULT_SIZE("64K")
 MACHINE_CONFIG_END
 
-MACHINE_CONFIG_DERIVED(sapi1_state::sapi2, sapi1)
+MACHINE_CONFIG_START(sapi1_state::sapi2)
+	sapi1(config);
 	/* basic machine hardware */
 	MCFG_CPU_MODIFY("maincpu")
 	MCFG_CPU_PROGRAM_MAP(sapi2_mem)
@@ -652,7 +653,8 @@ MACHINE_CONFIG_DERIVED(sapi1_state::sapi2, sapi1)
 	MCFG_GENERIC_KEYBOARD_CB(PUT(sapi1_state, kbd_put))
 MACHINE_CONFIG_END
 
-MACHINE_CONFIG_DERIVED(sapi1_state::sapi3, sapi2)
+MACHINE_CONFIG_START(sapi1_state::sapi3)
+	sapi2(config);
 	/* basic machine hardware */
 	MCFG_CPU_MODIFY("maincpu")
 	MCFG_CPU_PROGRAM_MAP(sapi3_mem)
@@ -664,7 +666,8 @@ MACHINE_CONFIG_DERIVED(sapi1_state::sapi3, sapi2)
 	MCFG_SCREEN_UPDATE_DRIVER(sapi1_state, screen_update_sapi3)
 MACHINE_CONFIG_END
 
-MACHINE_CONFIG_DERIVED(sapi1_state::sapi3b, sapi3)
+MACHINE_CONFIG_START(sapi1_state::sapi3b)
+	sapi3(config);
 	/* basic machine hardware */
 	MCFG_CPU_MODIFY("maincpu")
 	MCFG_CPU_PROGRAM_MAP(sapi3b_mem)

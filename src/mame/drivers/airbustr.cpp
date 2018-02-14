@@ -605,7 +605,8 @@ MACHINE_CONFIG_START(airbustr_state::airbustr)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.80)
 MACHINE_CONFIG_END
 
-MACHINE_CONFIG_DERIVED(airbustr_state::airbustrb, airbustr)
+MACHINE_CONFIG_START(airbustr_state::airbustrb)
+	airbustr(config);
 	MCFG_WATCHDOG_MODIFY("watchdog")
 	MCFG_WATCHDOG_TIME_INIT(attotime::from_seconds(0)) // no protection device or watchdog
 MACHINE_CONFIG_END

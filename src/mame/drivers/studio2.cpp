@@ -656,7 +656,7 @@ MACHINE_CONFIG_START(studio2_state::studio2)
 	MCFG_SOUND_ADD("beeper", BEEP, 300)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.00)
 
-	MCFG_FRAGMENT_ADD( studio2_cartslot )
+	studio2_cartslot(config);
 MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(visicom_state::visicom)
@@ -717,7 +717,7 @@ MACHINE_CONFIG_START(mpt02_state::mpt02)
 
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
 
-	MCFG_FRAGMENT_ADD( studio2_cartslot )
+	studio2_cartslot(config);
 MACHINE_CONFIG_END
 
 /* ROMs */

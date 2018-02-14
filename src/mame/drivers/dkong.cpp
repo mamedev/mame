@@ -1743,7 +1743,8 @@ MACHINE_CONFIG_START(dkong_state::dkong_base)
 	MCFG_VIDEO_START_OVERRIDE(dkong_state,dkong)
 MACHINE_CONFIG_END
 
-MACHINE_CONFIG_DERIVED(dkong_state::radarscp, dkong_base)
+MACHINE_CONFIG_START(dkong_state::radarscp)
+	dkong_base(config);
 
 	/* basic machine hardware */
 	MCFG_MACHINE_START_OVERRIDE(dkong_state,radarscp)
@@ -1752,10 +1753,11 @@ MACHINE_CONFIG_DERIVED(dkong_state::radarscp, dkong_base)
 	MCFG_PALETTE_INIT_OWNER(dkong_state,radarscp)
 
 	/* sound hardware */
-	MCFG_FRAGMENT_ADD(radarscp_audio)
+	radarscp_audio(config);
 MACHINE_CONFIG_END
 
-MACHINE_CONFIG_DERIVED(dkong_state::radarscp1, dkong_base)
+MACHINE_CONFIG_START(dkong_state::radarscp1)
+	dkong_base(config);
 
 	/* basic machine hardware */
 	MCFG_MACHINE_START_OVERRIDE(dkong_state,radarscp1)
@@ -1764,11 +1766,12 @@ MACHINE_CONFIG_DERIVED(dkong_state::radarscp1, dkong_base)
 	MCFG_PALETTE_INIT_OWNER(dkong_state,radarscp1)
 
 	/* sound hardware */
-	MCFG_FRAGMENT_ADD(radarscp1_audio)
+	radarscp1_audio(config);
 MACHINE_CONFIG_END
 
 
-MACHINE_CONFIG_DERIVED(dkong_state::dkong2b, dkong_base)
+MACHINE_CONFIG_START(dkong_state::dkong2b)
+	dkong_base(config);
 
 	/* basic machine hardware */
 	MCFG_MACHINE_START_OVERRIDE(dkong_state,dkong2b)
@@ -1776,27 +1779,31 @@ MACHINE_CONFIG_DERIVED(dkong_state::dkong2b, dkong_base)
 	MCFG_PALETTE_ENTRIES(DK2B_PALETTE_LENGTH)
 
 	/* sound hardware */
-	MCFG_FRAGMENT_ADD(dkong2b_audio)
+	dkong2b_audio(config);
 
 	MCFG_WATCHDOG_ADD("watchdog")
 MACHINE_CONFIG_END
 
-MACHINE_CONFIG_DERIVED(dkong_state::dk_braze, dkong2b)
+MACHINE_CONFIG_START(dkong_state::dk_braze)
+	dkong2b(config);
 
 	MCFG_EEPROM_SERIAL_93C46_8BIT_ADD("eeprom")
 MACHINE_CONFIG_END
 
-MACHINE_CONFIG_DERIVED(dkong_state::dkj_braze, dkongjr)
+MACHINE_CONFIG_START(dkong_state::dkj_braze)
+	dkongjr(config);
 
 	MCFG_EEPROM_SERIAL_93C46_8BIT_ADD("eeprom")
 MACHINE_CONFIG_END
 
-MACHINE_CONFIG_DERIVED(dkong_state::ddk_braze, dkj_braze)
+MACHINE_CONFIG_START(dkong_state::ddk_braze)
+	dkj_braze(config);
 
 	MCFG_MACHINE_RESET_OVERRIDE(dkong_state,ddk)
 MACHINE_CONFIG_END
 
-MACHINE_CONFIG_DERIVED(dkong_state::dk3_braze, dkong3)
+MACHINE_CONFIG_START(dkong_state::dk3_braze)
+	dkong3(config);
 
 	MCFG_EEPROM_SERIAL_93C46_8BIT_ADD("eeprom")
 MACHINE_CONFIG_END
@@ -1829,21 +1836,23 @@ MACHINE_CONFIG_START(dkong_state::dkong3)
 	MCFG_VIDEO_START_OVERRIDE(dkong_state,dkong)
 
 	/* sound hardware */
-	MCFG_FRAGMENT_ADD(dkong3_audio)
+	dkong3_audio(config);
 MACHINE_CONFIG_END
 
-MACHINE_CONFIG_DERIVED(dkong_state::dkongjr, dkong_base)
+MACHINE_CONFIG_START(dkong_state::dkongjr)
+	dkong_base(config);
 
 	MCFG_CPU_MODIFY("maincpu")
 	MCFG_CPU_PROGRAM_MAP(dkongjr_map)
 
 	/* sound hardware */
-	MCFG_FRAGMENT_ADD(dkongjr_audio)
+	dkongjr_audio(config);
 
 	MCFG_WATCHDOG_ADD("watchdog")
 MACHINE_CONFIG_END
 
-MACHINE_CONFIG_DERIVED(dkong_state::pestplce, dkongjr)
+MACHINE_CONFIG_START(dkong_state::pestplce)
+	dkongjr(config);
 
 	/* video hardware */
 	MCFG_GFXDECODE_MODIFY("gfxdecode", pestplce)
@@ -1854,7 +1863,8 @@ MACHINE_CONFIG_DERIVED(dkong_state::pestplce, dkongjr)
 	MCFG_SCREEN_UPDATE_DRIVER(dkong_state, screen_update_pestplce)
 MACHINE_CONFIG_END
 
-MACHINE_CONFIG_DERIVED(dkong_state::dkong3b, dkongjr)
+MACHINE_CONFIG_START(dkong_state::dkong3b)
+	dkongjr(config);
 
 	/* basic machine hardware */
 	MCFG_PALETTE_MODIFY("palette")
@@ -1867,7 +1877,8 @@ MACHINE_CONFIG_END
  *
  *************************************/
 
-MACHINE_CONFIG_DERIVED(dkong_state::s2650, dkong2b)
+MACHINE_CONFIG_START(dkong_state::s2650)
+	dkong2b(config);
 
 	/* basic machine hardware */
 	MCFG_CPU_REPLACE("maincpu", S2650, CLOCK_1H / 2)    /* ??? */
@@ -1885,12 +1896,14 @@ MACHINE_CONFIG_DERIVED(dkong_state::s2650, dkong2b)
 	MCFG_MACHINE_START_OVERRIDE(dkong_state,s2650)
 MACHINE_CONFIG_END
 
-MACHINE_CONFIG_DERIVED(dkong_state::herbiedk, s2650)
+MACHINE_CONFIG_START(dkong_state::herbiedk)
+	s2650(config);
 	MCFG_CPU_MODIFY("maincpu")
 	MCFG_S2650_SENSE_INPUT(DEVREADLINE("screen", screen_device, vblank)) MCFG_DEVCB_INVERT // ???
 MACHINE_CONFIG_END
 
-MACHINE_CONFIG_DERIVED(dkong_state::spclforc, herbiedk)
+MACHINE_CONFIG_START(dkong_state::spclforc)
+	herbiedk(config);
 
 	/* basic machine hardware */
 	MCFG_DEVICE_REMOVE("soundcpu")
@@ -1906,7 +1919,8 @@ MACHINE_CONFIG_END
  *
  *************************************/
 
-MACHINE_CONFIG_DERIVED(dkong_state::strtheat, dkong2b)
+MACHINE_CONFIG_START(dkong_state::strtheat)
+	dkong2b(config);
 
 	/* basic machine hardware */
 	MCFG_CPU_MODIFY("maincpu")
@@ -1915,7 +1929,8 @@ MACHINE_CONFIG_DERIVED(dkong_state::strtheat, dkong2b)
 	MCFG_MACHINE_RESET_OVERRIDE(dkong_state,strtheat)
 MACHINE_CONFIG_END
 
-MACHINE_CONFIG_DERIVED(dkong_state::drakton, dkong2b)
+MACHINE_CONFIG_START(dkong_state::drakton)
+	dkong2b(config);
 
 	/* basic machine hardware */
 	MCFG_CPU_MODIFY("maincpu")
@@ -1924,7 +1939,8 @@ MACHINE_CONFIG_DERIVED(dkong_state::drakton, dkong2b)
 	MCFG_MACHINE_RESET_OVERRIDE(dkong_state,drakton)
 MACHINE_CONFIG_END
 
-MACHINE_CONFIG_DERIVED(dkong_state::drktnjr, dkongjr)
+MACHINE_CONFIG_START(dkong_state::drktnjr)
+	dkongjr(config);
 
 	/* basic machine hardware */
 	MCFG_CPU_MODIFY("maincpu")

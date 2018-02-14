@@ -708,7 +708,8 @@ MACHINE_CONFIG_START(namcos16_state::liblrabl)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 MACHINE_CONFIG_END
 
-MACHINE_CONFIG_DERIVED(namcos16_state::toypop, liblrabl)
+MACHINE_CONFIG_START(namcos16_state::toypop)
+	liblrabl(config);
 	MCFG_CPU_MODIFY("maincpu")
 	MCFG_CPU_PROGRAM_MAP(master_toypop_map)
 MACHINE_CONFIG_END

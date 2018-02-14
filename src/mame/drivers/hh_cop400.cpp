@@ -475,13 +475,15 @@ MACHINE_CONFIG_START(h2hbaskbc_state::h2hbaskbc)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
 MACHINE_CONFIG_END
 
-MACHINE_CONFIG_DERIVED(h2hbaskbc_state::h2hhockeyc, h2hbaskbc)
+MACHINE_CONFIG_START(h2hbaskbc_state::h2hhockeyc)
+	h2hbaskbc(config);
 
 	/* basic machine hardware */
 	MCFG_DEFAULT_LAYOUT(layout_h2hhockeyc)
 MACHINE_CONFIG_END
 
-MACHINE_CONFIG_DERIVED(h2hbaskbc_state::h2hsoccerc, h2hbaskbc)
+MACHINE_CONFIG_START(h2hbaskbc_state::h2hsoccerc)
+	h2hbaskbc(config);
 
 	/* basic machine hardware */
 	MCFG_DEFAULT_LAYOUT(layout_h2hsoccerc)

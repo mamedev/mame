@@ -275,7 +275,8 @@ MACHINE_CONFIG_START(cybstorm_state::round2)
 MACHINE_CONFIG_END
 
 
-MACHINE_CONFIG_DERIVED(cybstorm_state::cybstorm, round2)
+MACHINE_CONFIG_START(cybstorm_state::cybstorm)
+	round2(config);
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
 

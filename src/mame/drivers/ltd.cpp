@@ -532,7 +532,7 @@ MACHINE_CONFIG_START(ltd_state::ltd3)
 	MCFG_DEFAULT_LAYOUT(layout_ltd)
 
 	/* Sound */
-	MCFG_FRAGMENT_ADD( genpin_audio )
+	genpin_audio(config);
 
 	MCFG_TIMER_DRIVER_ADD_PERIODIC("timer_r", ltd_state, timer_r, attotime::from_hz(500))
 MACHINE_CONFIG_END
@@ -549,7 +549,7 @@ MACHINE_CONFIG_START(ltd_state::ltd4)
 	MCFG_DEFAULT_LAYOUT(layout_ltd)
 
 	/* Sound */
-	MCFG_FRAGMENT_ADD( genpin_audio )
+	genpin_audio(config);
 
 	MCFG_SPEAKER_STANDARD_MONO("mono")
 	MCFG_SOUND_ADD("aysnd_0", AY8910, XTAL(3'579'545)/2) /* guess */

@@ -580,14 +580,16 @@ MACHINE_CONFIG_START(mhavoc_state::mhavoc)
 MACHINE_CONFIG_END
 
 
-MACHINE_CONFIG_DERIVED(mhavoc_state::mhavocrv, mhavoc)
+MACHINE_CONFIG_START(mhavoc_state::mhavocrv)
+	mhavoc(config);
 
 	MCFG_SOUND_ADD("tms", TMS5220, MHAVOC_CLOCK/2/9)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 MACHINE_CONFIG_END
 
 
-MACHINE_CONFIG_DERIVED(mhavoc_state::alphaone, mhavoc)
+MACHINE_CONFIG_START(mhavoc_state::alphaone)
+	mhavoc(config);
 
 	/* basic machine hardware */
 	MCFG_CPU_MODIFY("alpha")

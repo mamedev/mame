@@ -2848,7 +2848,8 @@ MACHINE_CONFIG_START(taitof2_state::taito_f2)
 	MCFG_TC0140SYT_SLAVE_CPU("audiocpu")
 MACHINE_CONFIG_END
 
-MACHINE_CONFIG_DERIVED(taitof2_state::taito_f2_tc0220ioc, taito_f2 )
+MACHINE_CONFIG_START(taitof2_state::taito_f2_tc0220ioc )
+	taito_f2(config);
 
 	/* basic machine hardware */
 	MCFG_DEVICE_REMOVE("watchdog")
@@ -2861,7 +2862,8 @@ MACHINE_CONFIG_DERIVED(taitof2_state::taito_f2_tc0220ioc, taito_f2 )
 	MCFG_TC0220IOC_READ_7_CB(IOPORT("IN2"))
 MACHINE_CONFIG_END
 
-MACHINE_CONFIG_DERIVED(taitof2_state::taito_f2_tc0510nio, taito_f2 )
+MACHINE_CONFIG_START(taitof2_state::taito_f2_tc0510nio )
+	taito_f2(config);
 
 	/* basic machine hardware */
 	MCFG_DEVICE_REMOVE("watchdog")
@@ -2876,7 +2878,8 @@ MACHINE_CONFIG_DERIVED(taitof2_state::taito_f2_tc0510nio, taito_f2 )
 	MCFG_PALETTE_FORMAT(xRRRRRGGGGGBBBBB)
 MACHINE_CONFIG_END
 
-MACHINE_CONFIG_DERIVED(taitof2_state::taito_f2_te7750, taito_f2 )
+MACHINE_CONFIG_START(taitof2_state::taito_f2_te7750 )
+	taito_f2(config);
 	MCFG_DEVICE_ADD("te7750", TE7750, 0)
 	MCFG_TE7750_IN_PORT1_CB(IOPORT("DSWA"))
 	MCFG_TE7750_IN_PORT2_CB(IOPORT("DSWB"))
@@ -2889,7 +2892,8 @@ MACHINE_CONFIG_DERIVED(taitof2_state::taito_f2_te7750, taito_f2 )
 MACHINE_CONFIG_END
 
 
-MACHINE_CONFIG_DERIVED(taitof2_state::finalb, taito_f2_tc0220ioc)
+MACHINE_CONFIG_START(taitof2_state::finalb)
+	taito_f2_tc0220ioc(config);
 
 	/* basic machine hardware */
 	MCFG_CPU_MODIFY("maincpu")
@@ -2913,7 +2917,8 @@ MACHINE_CONFIG_DERIVED(taitof2_state::finalb, taito_f2_tc0220ioc)
 MACHINE_CONFIG_END
 
 
-MACHINE_CONFIG_DERIVED(taitof2_state::dondokod, taito_f2_tc0220ioc)
+MACHINE_CONFIG_START(taitof2_state::dondokod)
+	taito_f2_tc0220ioc(config);
 
 	/* basic machine hardware */
 	MCFG_CPU_MODIFY("maincpu")
@@ -2941,7 +2946,8 @@ MACHINE_CONFIG_DERIVED(taitof2_state::dondokod, taito_f2_tc0220ioc)
 MACHINE_CONFIG_END
 
 
-MACHINE_CONFIG_DERIVED(taitof2_state::megab, taito_f2_tc0220ioc)
+MACHINE_CONFIG_START(taitof2_state::megab)
+	taito_f2_tc0220ioc(config);
 
 	/* basic machine hardware */
 	MCFG_CPU_MODIFY("maincpu")
@@ -2965,7 +2971,8 @@ MACHINE_CONFIG_DERIVED(taitof2_state::megab, taito_f2_tc0220ioc)
 MACHINE_CONFIG_END
 
 
-MACHINE_CONFIG_DERIVED(taitof2_state::thundfox, taito_f2_tc0220ioc)
+MACHINE_CONFIG_START(taitof2_state::thundfox)
+	taito_f2_tc0220ioc(config);
 
 	/* basic machine hardware */
 	MCFG_CPU_MODIFY("maincpu")
@@ -3002,7 +3009,8 @@ MACHINE_CONFIG_DERIVED(taitof2_state::thundfox, taito_f2_tc0220ioc)
 MACHINE_CONFIG_END
 
 
-MACHINE_CONFIG_DERIVED(taitof2_state::cameltry, taito_f2_tc0220ioc)
+MACHINE_CONFIG_START(taitof2_state::cameltry)
+	taito_f2_tc0220ioc(config);
 
 	/* basic machine hardware */
 	MCFG_CPU_MODIFY("maincpu")
@@ -3029,7 +3037,8 @@ MACHINE_CONFIG_DERIVED(taitof2_state::cameltry, taito_f2_tc0220ioc)
 MACHINE_CONFIG_END
 
 
-MACHINE_CONFIG_DERIVED(taitof2_state::qtorimon, taito_f2_tc0220ioc)
+MACHINE_CONFIG_START(taitof2_state::qtorimon)
+	taito_f2_tc0220ioc(config);
 
 	/* basic machine hardware */
 	MCFG_CPU_MODIFY("maincpu")
@@ -3051,7 +3060,8 @@ MACHINE_CONFIG_DERIVED(taitof2_state::qtorimon, taito_f2_tc0220ioc)
 MACHINE_CONFIG_END
 
 
-MACHINE_CONFIG_DERIVED(taitof2_state::liquidk, taito_f2_tc0220ioc)
+MACHINE_CONFIG_START(taitof2_state::liquidk)
+	taito_f2_tc0220ioc(config);
 
 	/* basic machine hardware */
 	MCFG_CPU_MODIFY("maincpu")
@@ -3074,7 +3084,8 @@ MACHINE_CONFIG_DERIVED(taitof2_state::liquidk, taito_f2_tc0220ioc)
 MACHINE_CONFIG_END
 
 
-MACHINE_CONFIG_DERIVED(taitof2_state::quizhq, taito_f2)
+MACHINE_CONFIG_START(taitof2_state::quizhq)
+	taito_f2(config);
 
 	/* basic machine hardware */
 	MCFG_CPU_MODIFY("maincpu")
@@ -3096,7 +3107,8 @@ MACHINE_CONFIG_DERIVED(taitof2_state::quizhq, taito_f2)
 MACHINE_CONFIG_END
 
 
-MACHINE_CONFIG_DERIVED(taitof2_state::ssi, taito_f2_tc0510nio)
+MACHINE_CONFIG_START(taitof2_state::ssi)
+	taito_f2_tc0510nio(config);
 
 	/* basic machine hardware */
 	MCFG_CPU_MODIFY("maincpu")
@@ -3120,7 +3132,8 @@ MACHINE_CONFIG_DERIVED(taitof2_state::ssi, taito_f2_tc0510nio)
 MACHINE_CONFIG_END
 
 
-MACHINE_CONFIG_DERIVED(taitof2_state::gunfront, taito_f2_tc0510nio)
+MACHINE_CONFIG_START(taitof2_state::gunfront)
+	taito_f2_tc0510nio(config);
 
 	/* basic machine hardware */
 	MCFG_CPU_MODIFY("maincpu")
@@ -3146,7 +3159,8 @@ MACHINE_CONFIG_DERIVED(taitof2_state::gunfront, taito_f2_tc0510nio)
 MACHINE_CONFIG_END
 
 
-MACHINE_CONFIG_DERIVED(taitof2_state::growl, taito_f2)
+MACHINE_CONFIG_START(taitof2_state::growl)
+	taito_f2(config);
 
 	/* basic machine hardware */
 	MCFG_CPU_MODIFY("maincpu")
@@ -3168,7 +3182,8 @@ MACHINE_CONFIG_DERIVED(taitof2_state::growl, taito_f2)
 MACHINE_CONFIG_END
 
 
-MACHINE_CONFIG_DERIVED(taitof2_state::mjnquest, taito_f2)
+MACHINE_CONFIG_START(taitof2_state::mjnquest)
+	taito_f2(config);
 
 	/* basic machine hardware */
 	MCFG_CPU_MODIFY("maincpu")
@@ -3188,7 +3203,8 @@ MACHINE_CONFIG_DERIVED(taitof2_state::mjnquest, taito_f2)
 MACHINE_CONFIG_END
 
 
-MACHINE_CONFIG_DERIVED(taitof2_state::footchmp, taito_f2_te7750)
+MACHINE_CONFIG_START(taitof2_state::footchmp)
+	taito_f2_te7750(config);
 
 	/* basic machine hardware */
 	MCFG_CPU_MODIFY("maincpu")
@@ -3212,14 +3228,16 @@ MACHINE_CONFIG_DERIVED(taitof2_state::footchmp, taito_f2_te7750)
 	MCFG_TC0360PRI_ADD("tc0360pri")
 MACHINE_CONFIG_END
 
-MACHINE_CONFIG_DERIVED(taitof2_state::footchmpbl, footchmp)
+MACHINE_CONFIG_START(taitof2_state::footchmpbl)
+	footchmp(config);
 
 	/* video hardware */
 	MCFG_GFXDECODE_MODIFY("gfxdecode", footchmpbl)
 MACHINE_CONFIG_END
 
 
-MACHINE_CONFIG_DERIVED(taitof2_state::hthero, taito_f2_te7750)
+MACHINE_CONFIG_START(taitof2_state::hthero)
+	taito_f2_te7750(config);
 
 	/* basic machine hardware */
 	MCFG_CPU_MODIFY("maincpu")
@@ -3244,7 +3262,8 @@ MACHINE_CONFIG_DERIVED(taitof2_state::hthero, taito_f2_te7750)
 MACHINE_CONFIG_END
 
 
-MACHINE_CONFIG_DERIVED(taitof2_state::koshien, taito_f2_tc0510nio)
+MACHINE_CONFIG_START(taitof2_state::koshien)
+	taito_f2_tc0510nio(config);
 
 	/* basic machine hardware */
 	MCFG_CPU_MODIFY("maincpu")
@@ -3269,7 +3288,8 @@ MACHINE_CONFIG_DERIVED(taitof2_state::koshien, taito_f2_tc0510nio)
 MACHINE_CONFIG_END
 
 
-MACHINE_CONFIG_DERIVED(taitof2_state::yuyugogo, taito_f2_tc0510nio)
+MACHINE_CONFIG_START(taitof2_state::yuyugogo)
+	taito_f2_tc0510nio(config);
 
 	/* basic machine hardware */
 	MCFG_CPU_MODIFY("maincpu")
@@ -3293,7 +3313,8 @@ MACHINE_CONFIG_DERIVED(taitof2_state::yuyugogo, taito_f2_tc0510nio)
 MACHINE_CONFIG_END
 
 
-MACHINE_CONFIG_DERIVED(taitof2_state::ninjak, taito_f2)
+MACHINE_CONFIG_START(taitof2_state::ninjak)
+	taito_f2(config);
 
 	/* basic machine hardware */
 	MCFG_CPU_MODIFY("maincpu")
@@ -3325,7 +3346,8 @@ MACHINE_CONFIG_DERIVED(taitof2_state::ninjak, taito_f2)
 MACHINE_CONFIG_END
 
 
-MACHINE_CONFIG_DERIVED(taitof2_state::solfigtr, taito_f2)
+MACHINE_CONFIG_START(taitof2_state::solfigtr)
+	taito_f2(config);
 
 	/* basic machine hardware */
 	MCFG_CPU_MODIFY("maincpu")
@@ -3349,7 +3371,8 @@ MACHINE_CONFIG_DERIVED(taitof2_state::solfigtr, taito_f2)
 MACHINE_CONFIG_END
 
 
-MACHINE_CONFIG_DERIVED(taitof2_state::qzquest, taito_f2_tc0510nio)
+MACHINE_CONFIG_START(taitof2_state::qzquest)
+	taito_f2_tc0510nio(config);
 
 	/* basic machine hardware */
 	MCFG_CPU_MODIFY("maincpu")
@@ -3367,7 +3390,8 @@ MACHINE_CONFIG_DERIVED(taitof2_state::qzquest, taito_f2_tc0510nio)
 MACHINE_CONFIG_END
 
 
-MACHINE_CONFIG_DERIVED(taitof2_state::pulirula, taito_f2_tc0510nio)
+MACHINE_CONFIG_START(taitof2_state::pulirula)
+	taito_f2_tc0510nio(config);
 
 	/* basic machine hardware */
 	MCFG_CPU_MODIFY("maincpu")
@@ -3394,7 +3418,8 @@ MACHINE_CONFIG_DERIVED(taitof2_state::pulirula, taito_f2_tc0510nio)
 MACHINE_CONFIG_END
 
 
-MACHINE_CONFIG_DERIVED(taitof2_state::metalb, taito_f2_tc0510nio)
+MACHINE_CONFIG_START(taitof2_state::metalb)
+	taito_f2_tc0510nio(config);
 
 	/* basic machine hardware */
 	MCFG_CPU_MODIFY("maincpu")
@@ -3422,7 +3447,8 @@ MACHINE_CONFIG_DERIVED(taitof2_state::metalb, taito_f2_tc0510nio)
 MACHINE_CONFIG_END
 
 
-MACHINE_CONFIG_DERIVED(taitof2_state::qzchikyu, taito_f2_tc0510nio)
+MACHINE_CONFIG_START(taitof2_state::qzchikyu)
+	taito_f2_tc0510nio(config);
 
 	/* basic machine hardware */
 	MCFG_CPU_MODIFY("maincpu")
@@ -3444,7 +3470,8 @@ MACHINE_CONFIG_DERIVED(taitof2_state::qzchikyu, taito_f2_tc0510nio)
 MACHINE_CONFIG_END
 
 
-MACHINE_CONFIG_DERIVED(taitof2_state::yesnoj, taito_f2)
+MACHINE_CONFIG_START(taitof2_state::yesnoj)
+	taito_f2(config);
 
 	/* basic machine hardware */
 	MCFG_CPU_MODIFY("maincpu")
@@ -3467,7 +3494,8 @@ MACHINE_CONFIG_DERIVED(taitof2_state::yesnoj, taito_f2)
 MACHINE_CONFIG_END
 
 
-MACHINE_CONFIG_DERIVED(taitof2_state::deadconx, taito_f2_te7750)
+MACHINE_CONFIG_START(taitof2_state::deadconx)
+	taito_f2_te7750(config);
 
 	/* basic machine hardware */
 	MCFG_CPU_MODIFY("maincpu")
@@ -3491,7 +3519,8 @@ MACHINE_CONFIG_DERIVED(taitof2_state::deadconx, taito_f2_te7750)
 MACHINE_CONFIG_END
 
 
-MACHINE_CONFIG_DERIVED(taitof2_state::deadconxj, taito_f2_te7750)
+MACHINE_CONFIG_START(taitof2_state::deadconxj)
+	taito_f2_te7750(config);
 
 	/* basic machine hardware */
 	MCFG_CPU_MODIFY("maincpu")
@@ -3515,7 +3544,8 @@ MACHINE_CONFIG_DERIVED(taitof2_state::deadconxj, taito_f2_te7750)
 MACHINE_CONFIG_END
 
 
-MACHINE_CONFIG_DERIVED(taitof2_state::dinorex, taito_f2_tc0510nio)
+MACHINE_CONFIG_START(taitof2_state::dinorex)
+	taito_f2_tc0510nio(config);
 
 	/* basic machine hardware */
 	MCFG_CPU_MODIFY("maincpu")
@@ -3540,7 +3570,8 @@ MACHINE_CONFIG_DERIVED(taitof2_state::dinorex, taito_f2_tc0510nio)
 MACHINE_CONFIG_END
 
 
-MACHINE_CONFIG_DERIVED(taitof2_state::qjinsei, taito_f2_tc0510nio)
+MACHINE_CONFIG_START(taitof2_state::qjinsei)
+	taito_f2_tc0510nio(config);
 
 	/* basic machine hardware */
 	MCFG_CPU_MODIFY("maincpu")
@@ -3565,7 +3596,8 @@ MACHINE_CONFIG_DERIVED(taitof2_state::qjinsei, taito_f2_tc0510nio)
 MACHINE_CONFIG_END
 
 
-MACHINE_CONFIG_DERIVED(taitof2_state::qcrayon, taito_f2_tc0510nio)
+MACHINE_CONFIG_START(taitof2_state::qcrayon)
+	taito_f2_tc0510nio(config);
 
 	/* basic machine hardware */
 	MCFG_CPU_MODIFY("maincpu")
@@ -3590,7 +3622,8 @@ MACHINE_CONFIG_DERIVED(taitof2_state::qcrayon, taito_f2_tc0510nio)
 MACHINE_CONFIG_END
 
 
-MACHINE_CONFIG_DERIVED(taitof2_state::qcrayon2, taito_f2_tc0510nio)
+MACHINE_CONFIG_START(taitof2_state::qcrayon2)
+	taito_f2_tc0510nio(config);
 
 	/* basic machine hardware */
 	MCFG_CPU_MODIFY("maincpu")
@@ -3615,7 +3648,8 @@ MACHINE_CONFIG_DERIVED(taitof2_state::qcrayon2, taito_f2_tc0510nio)
 MACHINE_CONFIG_END
 
 
-MACHINE_CONFIG_DERIVED(taitof2_state::driftout, taito_f2_tc0510nio)
+MACHINE_CONFIG_START(taitof2_state::driftout)
+	taito_f2_tc0510nio(config);
 
 	/* basic machine hardware */
 	MCFG_CPU_MODIFY("maincpu")

@@ -912,7 +912,8 @@ MACHINE_CONFIG_START(rallyx_state::jungler)
 MACHINE_CONFIG_END
 
 
-MACHINE_CONFIG_DERIVED(rallyx_state::tactcian, jungler)
+MACHINE_CONFIG_START(rallyx_state::tactcian)
+	jungler(config);
 
 	/* basic machine hardware */
 
@@ -923,7 +924,8 @@ MACHINE_CONFIG_DERIVED(rallyx_state::tactcian, jungler)
 MACHINE_CONFIG_END
 
 
-MACHINE_CONFIG_DERIVED(rallyx_state::locomotn, jungler)
+MACHINE_CONFIG_START(rallyx_state::locomotn)
+	jungler(config);
 
 	/* basic machine hardware */
 
@@ -935,7 +937,8 @@ MACHINE_CONFIG_DERIVED(rallyx_state::locomotn, jungler)
 MACHINE_CONFIG_END
 
 
-MACHINE_CONFIG_DERIVED(rallyx_state::commsega, jungler)
+MACHINE_CONFIG_START(rallyx_state::commsega)
+	jungler(config);
 
 	/* basic machine hardware */
 

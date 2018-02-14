@@ -477,7 +477,7 @@ MACHINE_CONFIG_START(sprint8_state::sprint8)
 	MCFG_PALETTE_INDIRECT_ENTRIES(18)
 	MCFG_PALETTE_INIT_OWNER(sprint8_state, sprint8)
 
-	MCFG_FRAGMENT_ADD(sprint8_audio)
+	sprint8_audio(config);
 MACHINE_CONFIG_END
 
 

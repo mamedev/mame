@@ -630,12 +630,14 @@ MACHINE_CONFIG_START(snk68_state::pow)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
 MACHINE_CONFIG_END
 
-MACHINE_CONFIG_DERIVED(snk68_state::streetsm, pow)
+MACHINE_CONFIG_START(snk68_state::streetsm)
+	pow(config);
 	MCFG_DEVICE_MODIFY("sprites")
 	MCFG_SNK68_SPR_SET_TILE_INDIRECT( snk68_state, tile_callback_notpow )
 MACHINE_CONFIG_END
 
-MACHINE_CONFIG_DERIVED(snk68_state::searchar, streetsm)
+MACHINE_CONFIG_START(snk68_state::searchar)
+	streetsm(config);
 
 	MCFG_CPU_MODIFY("maincpu")
 	MCFG_CPU_PROGRAM_MAP(searchar_map)

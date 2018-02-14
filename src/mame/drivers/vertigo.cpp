@@ -129,7 +129,7 @@ MACHINE_CONFIG_START(vertigo_state::vertigo)
 	MCFG_CPU_PROGRAM_MAP(vertigo_map)
 	MCFG_CPU_PERIODIC_INT_DRIVER(vertigo_state, vertigo_interrupt, 60)
 
-	MCFG_FRAGMENT_ADD(exidy440_audio)
+	exidy440_audio(config);
 
 	MCFG_DEVICE_ADD("pit", PIT8254, 0)
 	MCFG_PIT8253_CLK0(XTAL(24'000'000) / 100)

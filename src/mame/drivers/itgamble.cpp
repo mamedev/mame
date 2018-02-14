@@ -236,7 +236,8 @@ MACHINE_CONFIG_START(itgamble_state::itgamble)
 MACHINE_CONFIG_END
 
 
-MACHINE_CONFIG_DERIVED(itgamble_state::mnumber, itgamble)
+MACHINE_CONFIG_START(itgamble_state::mnumber)
+	itgamble(config);
 	MCFG_CPU_MODIFY("maincpu")
 	MCFG_CPU_CLOCK(MNUMBER_MAIN_CLOCK/2)    /* probably the wrong CPU */
 
@@ -246,7 +247,8 @@ MACHINE_CONFIG_END
 
 
 #ifdef UNUSED_CODE
-static MACHINE_CONFIG_DERIVED( ejollyx5, itgamble )
+static MACHINE_CONFIG_START( ejollyx5 )
+	itgamble(config);
 	/* wrong CPU. we need a Renesas M16/62A 16bit microcomputer core */
 	MCFG_CPU_MODIFY("maincpu")
 	MCFG_CPU_CLOCK(EJOLLYX5_MAIN_CLOCK/2)   /* up to 10MHz.*/

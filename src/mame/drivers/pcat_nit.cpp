@@ -232,9 +232,9 @@ MACHINE_CONFIG_START(pcat_nit_state::pcat_nit)
 	MCFG_CPU_IRQ_ACKNOWLEDGE_DEVICE("pic8259_1", pic8259_device, inta_cb)
 
 	/* video hardware */
-	MCFG_FRAGMENT_ADD( pcvideo_vga )
+	pcvideo_vga(config);
 
-	MCFG_FRAGMENT_ADD( pcat_common )
+	pcat_common(config);
 	MCFG_DEVICE_ADD( "ns16450_0", NS16450, XTAL(1'843'200) )
 	MCFG_INS8250_OUT_TX_CB(DEVWRITELINE("microtouch", microtouch_device, rx))
 	MCFG_INS8250_OUT_INT_CB(DEVWRITELINE("pic8259_1", pic8259_device, ir4_w))
@@ -251,9 +251,9 @@ MACHINE_CONFIG_START(pcat_nit_state::bonanza)
 	MCFG_CPU_IRQ_ACKNOWLEDGE_DEVICE("pic8259_1", pic8259_device, inta_cb)
 
 	/* video hardware */
-	MCFG_FRAGMENT_ADD( pcvideo_cirrus_gd5428 )
+	pcvideo_cirrus_gd5428(config);
 
-	MCFG_FRAGMENT_ADD( pcat_common )
+	pcat_common(config);
 	MCFG_DEVICE_ADD( "ns16450_0", NS16450, XTAL(1'843'200) )
 	MCFG_INS8250_OUT_TX_CB(DEVWRITELINE("microtouch", microtouch_device, rx))
 	MCFG_INS8250_OUT_INT_CB(DEVWRITELINE("pic8259_1", pic8259_device, ir4_w))

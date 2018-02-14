@@ -814,19 +814,22 @@ MACHINE_CONFIG_START(pgm2_state::pgm2)
 MACHINE_CONFIG_END
 
 // not strictly needed as the video code supports changing on the fly, but makes recording easier etc.
-MACHINE_CONFIG_DERIVED(pgm2_state::pgm2_lores, pgm2)
+MACHINE_CONFIG_START(pgm2_state::pgm2_lores)
+	pgm2(config);
 	MCFG_SCREEN_MODIFY("screen")
 	MCFG_SCREEN_VISIBLE_AREA(0, 320-1, 0, 240-1)
 MACHINE_CONFIG_END
 
-MACHINE_CONFIG_DERIVED(pgm2_state::pgm2_hires, pgm2)
+MACHINE_CONFIG_START(pgm2_state::pgm2_hires)
+	pgm2(config);
 	MCFG_CPU_MODIFY("maincpu")
 	MCFG_CPU_PROGRAM_MAP(pgm2_module_rom_map)
 	MCFG_SCREEN_MODIFY("screen")
 	MCFG_SCREEN_VISIBLE_AREA(0, 512-1, 0, 240-1)
 MACHINE_CONFIG_END
 
-MACHINE_CONFIG_DERIVED(pgm2_state::pgm2_ramrom, pgm2)
+MACHINE_CONFIG_START(pgm2_state::pgm2_ramrom)
+	pgm2(config);
 	MCFG_CPU_MODIFY("maincpu")
 	MCFG_CPU_PROGRAM_MAP(pgm2_ram_rom_map)
 MACHINE_CONFIG_END

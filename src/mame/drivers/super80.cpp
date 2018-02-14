@@ -753,13 +753,15 @@ MACHINE_CONFIG_START(super80_state::super80)
 	MCFG_SOFTWARE_LIST_ADD("cass_list", "super80_cass")
 MACHINE_CONFIG_END
 
-MACHINE_CONFIG_DERIVED(super80_state::super80d, super80)
+MACHINE_CONFIG_START(super80_state::super80d)
+	super80(config);
 	MCFG_GFXDECODE_MODIFY("gfxdecode", super80d)
 	MCFG_SCREEN_MODIFY("screen")
 	MCFG_SCREEN_UPDATE_DRIVER(super80_state, screen_update_super80d)
 MACHINE_CONFIG_END
 
-MACHINE_CONFIG_DERIVED(super80_state::super80e, super80)
+MACHINE_CONFIG_START(super80_state::super80e)
+	super80(config);
 	MCFG_CPU_MODIFY("maincpu")
 	MCFG_CPU_IO_MAP(super80e_io)
 	MCFG_GFXDECODE_MODIFY("gfxdecode", super80e)
@@ -767,7 +769,8 @@ MACHINE_CONFIG_DERIVED(super80_state::super80e, super80)
 	MCFG_SCREEN_UPDATE_DRIVER(super80_state, screen_update_super80e)
 MACHINE_CONFIG_END
 
-MACHINE_CONFIG_DERIVED(super80_state::super80m, super80)
+MACHINE_CONFIG_START(super80_state::super80m)
+	super80(config);
 	MCFG_CPU_MODIFY("maincpu")
 	MCFG_CPU_PROGRAM_MAP(super80m_map)
 
@@ -839,7 +842,8 @@ MACHINE_CONFIG_START(super80_state::super80v)
 	MCFG_TIMER_DRIVER_ADD_PERIODIC("timer_k", super80_state, timer_k, attotime::from_hz(300)) // keyb scan
 MACHINE_CONFIG_END
 
-MACHINE_CONFIG_DERIVED(super80_state::super80r, super80v)
+MACHINE_CONFIG_START(super80_state::super80r)
+	super80v(config);
 	MCFG_CPU_MODIFY("maincpu")
 	MCFG_CPU_IO_MAP(super80r_io)
 

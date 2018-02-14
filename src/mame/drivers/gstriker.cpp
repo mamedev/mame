@@ -558,7 +558,8 @@ MACHINE_CONFIG_START(gstriker_state::gstriker)
 	MCFG_SOUND_ROUTE(2, "rspeaker", 1.0)
 MACHINE_CONFIG_END
 
-MACHINE_CONFIG_DERIVED(gstriker_state::twc94, gstriker)
+MACHINE_CONFIG_START(gstriker_state::twc94)
+	gstriker(config);
 	MCFG_CPU_REPLACE("maincpu", M68000, 16000000)
 	MCFG_CPU_PROGRAM_MAP(twcup94_map)
 	MCFG_CPU_VBLANK_INT_DRIVER("screen", gstriker_state,  irq1_line_hold)
@@ -571,7 +572,8 @@ MACHINE_CONFIG_DERIVED(gstriker_state::twc94, gstriker)
 MACHINE_CONFIG_END
 
 
-MACHINE_CONFIG_DERIVED(gstriker_state::vgoal, twc94)
+MACHINE_CONFIG_START(gstriker_state::vgoal)
+	twc94(config);
 	MCFG_DEVICE_MODIFY("vsystem_spr")
 	MCFG_VSYSTEM_SPR_SET_TRANSPEN(0xf) // different vs. the other games, find register
 MACHINE_CONFIG_END

@@ -805,7 +805,8 @@ MACHINE_CONFIG_START(gaiden_state::shadoww)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.20)
 MACHINE_CONFIG_END
 
-MACHINE_CONFIG_DERIVED(gaiden_state::raiga, shadoww)
+MACHINE_CONFIG_START(gaiden_state::raiga)
+	shadoww(config);
 
 	MCFG_SCREEN_MODIFY("screen")
 	MCFG_SCREEN_UPDATE_DRIVER(gaiden_state, screen_update_raiga)

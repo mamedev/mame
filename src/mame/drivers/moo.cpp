@@ -602,7 +602,8 @@ MACHINE_CONFIG_START(moo_state::moobl)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", 1.0)
 MACHINE_CONFIG_END
 
-MACHINE_CONFIG_DERIVED(moo_state::bucky, moo)
+MACHINE_CONFIG_START(moo_state::bucky)
+	moo(config);
 
 	MCFG_CPU_MODIFY("maincpu")
 	MCFG_CPU_PROGRAM_MAP(bucky_map)

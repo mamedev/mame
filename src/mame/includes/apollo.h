@@ -654,7 +654,7 @@ private:
 DECLARE_DEVICE_TYPE(APOLLO_GRAPHICS, apollo_graphics_15i)
 
 #define MCFG_APOLLO_GRAPHICS_ADD( _tag) \
-	MCFG_FRAGMENT_ADD(apollo_graphics) \
+	apollo_graphics(config); \
 	MCFG_DEVICE_ADD(_tag, APOLLO_GRAPHICS, 0)
 
 class apollo_graphics_19i : public apollo_graphics_15i
@@ -673,7 +673,7 @@ private:
 DECLARE_DEVICE_TYPE(APOLLO_MONO19I, apollo_graphics_19i)
 
 #define MCFG_APOLLO_MONO19I_ADD(_tag) \
-	MCFG_FRAGMENT_ADD(apollo_mono19i) \
+	apollo_mono19i(config); \
 	MCFG_DEVICE_ADD(_tag, APOLLO_MONO19I, 0)
 
 #ifdef APOLLO_XXL

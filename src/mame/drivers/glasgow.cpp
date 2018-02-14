@@ -728,13 +728,15 @@ MACHINE_CONFIG_START(glasgow_state::glasgow)
 	MCFG_TIMER_DRIVER_ADD_PERIODIC("nmi_timer", glasgow_state, update_nmi, attotime::from_hz(50))
 MACHINE_CONFIG_END
 
-MACHINE_CONFIG_DERIVED(glasgow_state::amsterd, glasgow)
+MACHINE_CONFIG_START(glasgow_state::amsterd)
+	glasgow(config);
 	/* basic machine hardware */
 	MCFG_CPU_MODIFY("maincpu")
 	MCFG_CPU_PROGRAM_MAP(amsterd_mem)
 MACHINE_CONFIG_END
 
-MACHINE_CONFIG_DERIVED(glasgow_state::dallas32, glasgow)
+MACHINE_CONFIG_START(glasgow_state::dallas32)
+	glasgow(config);
 	/* basic machine hardware */
 	MCFG_CPU_REPLACE("maincpu", M68020, 14000000)
 	MCFG_CPU_PROGRAM_MAP(dallas32_mem)

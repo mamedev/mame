@@ -370,16 +370,18 @@ MACHINE_CONFIG_START(gts80a_state::gts80a)
 	MCFG_RIOT6532_IRQ_CB(INPUTLINE("maincpu", M6502_IRQ_LINE))
 
 	/* Sound */
-	MCFG_FRAGMENT_ADD( genpin_audio )
+	genpin_audio(config);
 	MCFG_SPEAKER_STANDARD_MONO("speaker")
 MACHINE_CONFIG_END
 
-MACHINE_CONFIG_DERIVED(gts80a_state::gts80a_s, gts80a)
+MACHINE_CONFIG_START(gts80a_state::gts80a_s)
+	gts80a(config);
 	MCFG_SOUND_ADD("r0sound", GOTTLIEB_SOUND_REV0, 0)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 1.0)
 MACHINE_CONFIG_END
 
-MACHINE_CONFIG_DERIVED(gts80a_state::gts80a_ss, gts80a)
+MACHINE_CONFIG_START(gts80a_state::gts80a_ss)
+	gts80a(config);
 	MCFG_SOUND_ADD("r1sound", GOTTLIEB_SOUND_REV1, 0)
 	//MCFG_SOUND_ADD("r1sound", GOTTLIEB_SOUND_REV1_WITH_VOTRAX, 0)  // votrax crashes
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 1.0)
@@ -448,7 +450,8 @@ ADDRESS_MAP_START(caveman_state::video_io_map)
 
 ADDRESS_MAP_END
 
-MACHINE_CONFIG_DERIVED(caveman_state::caveman, gts80a_ss)
+MACHINE_CONFIG_START(caveman_state::caveman)
+	gts80a_ss(config);
 	MCFG_CPU_ADD("video_cpu", I8088, 5000000)
 	MCFG_CPU_PROGRAM_MAP(video_map)
 	MCFG_CPU_IO_MAP(video_io_map)

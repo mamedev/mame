@@ -1371,14 +1371,16 @@ MACHINE_CONFIG_START(arkanoid_state::arkanoid)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.66)
 MACHINE_CONFIG_END
 
-MACHINE_CONFIG_DERIVED(arkanoid_state::p3mcu, arkanoid)
+MACHINE_CONFIG_START(arkanoid_state::p3mcu)
+	arkanoid(config);
 
 	/* unprotected MCU */
 	MCFG_DEVICE_REPLACE("mcu", ARKANOID_68705P3, XTAL(12'000'000)/4)
 	MCFG_ARKANOID_MCU_PORTB_R_CB(IOPORT("MUX"))
 MACHINE_CONFIG_END
 
-MACHINE_CONFIG_DERIVED(arkanoid_state::p3mcuay, arkanoid)
+MACHINE_CONFIG_START(arkanoid_state::p3mcuay)
+	arkanoid(config);
 
 	/* unprotected MCU */
 	MCFG_DEVICE_REPLACE("mcu", ARKANOID_68705P3, XTAL(12'000'000)/4)
@@ -1391,7 +1393,8 @@ MACHINE_CONFIG_DERIVED(arkanoid_state::p3mcuay, arkanoid)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.66)
 MACHINE_CONFIG_END
 
-MACHINE_CONFIG_DERIVED(arkanoid_state::bootleg, arkanoid)
+MACHINE_CONFIG_START(arkanoid_state::bootleg)
+	arkanoid(config);
 
 	/* basic machine hardware */
 	MCFG_CPU_MODIFY("maincpu")
@@ -1400,7 +1403,8 @@ MACHINE_CONFIG_DERIVED(arkanoid_state::bootleg, arkanoid)
 	MCFG_DEVICE_REMOVE("mcu")
 MACHINE_CONFIG_END
 
-MACHINE_CONFIG_DERIVED(arkanoid_state::aysnd, bootleg)
+MACHINE_CONFIG_START(arkanoid_state::aysnd)
+	bootleg(config);
 	MCFG_SOUND_REPLACE("aysnd", AY8910, XTAL(12'000'000)/4)
 	MCFG_AY8910_OUTPUT_TYPE(AY8910_SINGLE_OUTPUT)
 	MCFG_AY8910_PORT_A_READ_CB(IOPORT("UNUSED"))
@@ -1439,7 +1443,8 @@ MACHINE_CONFIG_START(arkanoid_state::hexa)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
 MACHINE_CONFIG_END
 
-MACHINE_CONFIG_DERIVED(arkanoid_state::hexaa, hexa)
+MACHINE_CONFIG_START(arkanoid_state::hexaa)
+	hexa(config);
 	MCFG_CPU_MODIFY("maincpu")
 	MCFG_CPU_PROGRAM_MAP(hexaa_map)
 	MCFG_CPU_VBLANK_INT_DRIVER("screen", arkanoid_state,  irq0_line_hold)

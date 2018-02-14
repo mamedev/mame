@@ -1567,7 +1567,7 @@ MACHINE_CONFIG_START(fhawk_state::fhawk)
 	MCFG_MACHINE_RESET_OVERRIDE(taitol_state, taito_l)
 
 	/* video hardware */
-	MCFG_FRAGMENT_ADD(l_system_video)
+	l_system_video(config);
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
@@ -1586,7 +1586,8 @@ MACHINE_CONFIG_START(fhawk_state::fhawk)
 MACHINE_CONFIG_END
 
 
-MACHINE_CONFIG_DERIVED(champwr_state::champwr, fhawk)
+MACHINE_CONFIG_START(champwr_state::champwr)
+	fhawk(config);
 
 	/* basic machine hardware */
 	MCFG_CPU_MODIFY("maincpu")
@@ -1641,7 +1642,7 @@ MACHINE_CONFIG_START(taitol_2cpu_state::raimais)
 	MCFG_MACHINE_RESET_OVERRIDE(taitol_state, taito_l)
 
 	/* video hardware */
-	MCFG_FRAGMENT_ADD(l_system_video)
+	l_system_video(config);
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
@@ -1685,7 +1686,7 @@ MACHINE_CONFIG_START(taitol_2cpu_state::kurikint)
 	MCFG_MACHINE_RESET_OVERRIDE(taitol_state, taito_l)
 
 	/* video hardware */
-	MCFG_FRAGMENT_ADD(l_system_video)
+	l_system_video(config);
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
@@ -1709,7 +1710,7 @@ MACHINE_CONFIG_START(taitol_1cpu_state::plotting)
 	MCFG_MACHINE_RESET_OVERRIDE(taitol_state, taito_l)
 
 	/* video hardware */
-	MCFG_FRAGMENT_ADD(l_system_video)
+	l_system_video(config);
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
@@ -1732,7 +1733,8 @@ MACHINE_CONFIG_START(taitol_1cpu_state::plotting)
 MACHINE_CONFIG_END
 
 
-MACHINE_CONFIG_DERIVED(taitol_1cpu_state::puzznic, plotting)
+MACHINE_CONFIG_START(taitol_1cpu_state::puzznic)
+	plotting(config);
 
 	/* basic machine hardware */
 	MCFG_CPU_MODIFY("maincpu")
@@ -1741,7 +1743,8 @@ MACHINE_CONFIG_DERIVED(taitol_1cpu_state::puzznic, plotting)
 	MCFG_DEVICE_ADD("mcu", ARKANOID_68705P3, 3_MHz_XTAL)
 MACHINE_CONFIG_END
 
-MACHINE_CONFIG_DERIVED(taitol_1cpu_state::puzznici, plotting)
+MACHINE_CONFIG_START(taitol_1cpu_state::puzznici)
+	plotting(config);
 
 	/* basic machine hardware */
 	MCFG_CPU_MODIFY("maincpu")
@@ -1749,7 +1752,8 @@ MACHINE_CONFIG_DERIVED(taitol_1cpu_state::puzznici, plotting)
 MACHINE_CONFIG_END
 
 
-MACHINE_CONFIG_DERIVED(horshoes_state::horshoes, plotting)
+MACHINE_CONFIG_START(horshoes_state::horshoes)
+	plotting(config);
 
 	/* basic machine hardware */
 	MCFG_CPU_MODIFY("maincpu")
@@ -1761,7 +1765,8 @@ MACHINE_CONFIG_DERIVED(horshoes_state::horshoes, plotting)
 MACHINE_CONFIG_END
 
 
-MACHINE_CONFIG_DERIVED(taitol_1cpu_state::palamed, plotting)
+MACHINE_CONFIG_START(taitol_1cpu_state::palamed)
+	plotting(config);
 
 	/* basic machine hardware */
 	MCFG_CPU_MODIFY("maincpu")
@@ -1781,7 +1786,8 @@ MACHINE_CONFIG_DERIVED(taitol_1cpu_state::palamed, plotting)
 MACHINE_CONFIG_END
 
 
-MACHINE_CONFIG_DERIVED(taitol_1cpu_state::cachat, plotting)
+MACHINE_CONFIG_START(taitol_1cpu_state::cachat)
+	plotting(config);
 
 	/* basic machine hardware */
 	MCFG_CPU_MODIFY("maincpu")
@@ -1828,7 +1834,7 @@ MACHINE_CONFIG_START(taitol_2cpu_state::evilston)
 	MCFG_MACHINE_RESET_OVERRIDE(taitol_state, taito_l)
 
 	/* video hardware */
-	MCFG_FRAGMENT_ADD(l_system_video)
+	l_system_video(config);
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")

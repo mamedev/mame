@@ -313,11 +313,13 @@ MACHINE_CONFIG_START(astrafr_state::astrafr_dual)
 	MCFG_MACHINE_START_OVERRIDE(astrafr_state, astra_common )
 MACHINE_CONFIG_END
 
-MACHINE_CONFIG_DERIVED(astrafr_state::astrafr_dual_2e, astrafr_dual)
+MACHINE_CONFIG_START(astrafr_state::astrafr_dual_2e)
+	astrafr_dual(config);
 	MCFG_MACHINE_START_OVERRIDE(astrafr_state, astra_2e )
 MACHINE_CONFIG_END
 
-MACHINE_CONFIG_DERIVED(astrafr_state::astrafr_dual_37, astrafr_dual)
+MACHINE_CONFIG_START(astrafr_state::astrafr_dual_37)
+	astrafr_dual(config);
 	MCFG_MACHINE_START_OVERRIDE(astrafr_state, astra_37 )
 MACHINE_CONFIG_END
 
@@ -329,7 +331,8 @@ MACHINE_CONFIG_START(astrafr_state::astrafr_dual_alt)
 	MCFG_CPU_PROGRAM_MAP(astrafr_slave_map)
 MACHINE_CONFIG_END
 
-MACHINE_CONFIG_DERIVED(astrafr_state::astrafr_dual_alt_37, astrafr_dual_alt)
+MACHINE_CONFIG_START(astrafr_state::astrafr_dual_alt_37)
+	astrafr_dual_alt(config);
 	MCFG_MACHINE_START_OVERRIDE(astrafr_state, astra_37 )
 MACHINE_CONFIG_END
 
@@ -341,11 +344,13 @@ MACHINE_CONFIG_START(astrafr_state::astra_single)
 	MCFG_MACHINE_START_OVERRIDE(astrafr_state, astra_common )
 MACHINE_CONFIG_END
 
-MACHINE_CONFIG_DERIVED(astrafr_state::astra_single_37, astra_single)
+MACHINE_CONFIG_START(astrafr_state::astra_single_37)
+	astra_single(config);
 	MCFG_MACHINE_START_OVERRIDE(astrafr_state, astra_37 )
 MACHINE_CONFIG_END
 
-MACHINE_CONFIG_DERIVED(astrafr_state::astra_single_2e, astra_single)
+MACHINE_CONFIG_START(astrafr_state::astra_single_2e)
+	astra_single(config);
 	MCFG_MACHINE_START_OVERRIDE(astrafr_state, astra_2e )
 MACHINE_CONFIG_END
 
@@ -364,11 +369,13 @@ MACHINE_CONFIG_START(astrafr_state::astra_single_alt)
 	MCFG_MACHINE_START_OVERRIDE(astrafr_state, astra_common )
 MACHINE_CONFIG_END
 
-MACHINE_CONFIG_DERIVED(astrafr_state::astra_single_alt_57, astra_single_alt)
+MACHINE_CONFIG_START(astrafr_state::astra_single_alt_57)
+	astra_single_alt(config);
 	MCFG_MACHINE_START_OVERRIDE(astrafr_state, astra_57 )
 MACHINE_CONFIG_END
 
-MACHINE_CONFIG_DERIVED(astrafr_state::astra_single_alt_37, astra_single_alt)
+MACHINE_CONFIG_START(astrafr_state::astra_single_alt_37)
+	astra_single_alt(config);
 	MCFG_MACHINE_START_OVERRIDE(astrafr_state, astra_37 )
 MACHINE_CONFIG_END
 

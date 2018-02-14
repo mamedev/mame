@@ -747,7 +747,8 @@ MACHINE_CONFIG_START(taitoh_state::recordbr)
 MACHINE_CONFIG_END
 
 
-MACHINE_CONFIG_DERIVED(taitoh_state::tetristh, recordbr)
+MACHINE_CONFIG_START(taitoh_state::tetristh)
+	recordbr(config);
 
 	/* basic machine hardware */
 	MCFG_CPU_MODIFY("maincpu")

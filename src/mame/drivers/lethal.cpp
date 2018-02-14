@@ -542,7 +542,8 @@ MACHINE_CONFIG_START(lethal_state::lethalen)
 	MCFG_SOUND_ROUTE(1, "rspeaker", 1.0)
 MACHINE_CONFIG_END
 
-MACHINE_CONFIG_DERIVED(lethal_state::lethalej, lethalen)
+MACHINE_CONFIG_START(lethal_state::lethalej)
+	lethalen(config);
 
 	MCFG_SCREEN_MODIFY("screen")
 	MCFG_SCREEN_VISIBLE_AREA(224, 512-1, 16, 240-1)

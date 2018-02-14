@@ -551,7 +551,7 @@ MACHINE_CONFIG_START(pgm_state::pgmbase)
 MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(pgm_state::pgm)
-	MCFG_FRAGMENT_ADD(pgmbase)
+	pgmbase(config);
 MACHINE_CONFIG_END
 
 

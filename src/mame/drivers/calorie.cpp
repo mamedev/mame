@@ -501,7 +501,8 @@ MACHINE_CONFIG_START(calorie_state::calorie)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.8)
 MACHINE_CONFIG_END
 
-MACHINE_CONFIG_DERIVED(calorie_state::caloriee, calorie)
+MACHINE_CONFIG_START(calorie_state::caloriee)
+	calorie(config);
 	MCFG_CPU_REPLACE("maincpu", SEGA_317_0004,4000000)         /* 4 MHz */
 	MCFG_CPU_PROGRAM_MAP(calorie_map)
 	MCFG_CPU_OPCODES_MAP(decrypted_opcodes_map)

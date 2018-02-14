@@ -2549,7 +2549,8 @@ MACHINE_CONFIG_START(nbmj9195_state::NBMJDRV1_base)
 	MCFG_SOUND_ROUTE_EX(0, "dac2", 1.0, DAC_VREF_POS_INPUT) MCFG_SOUND_ROUTE_EX(0, "dac2", -1.0, DAC_VREF_NEG_INPUT)
 MACHINE_CONFIG_END
 
-MACHINE_CONFIG_DERIVED(nbmj9195_state::NBMJDRV1, NBMJDRV1_base)
+MACHINE_CONFIG_START(nbmj9195_state::NBMJDRV1)
+	NBMJDRV1_base(config);
 
 	/* basic machine hardware */
 	MCFG_CPU_MODIFY("maincpu")
@@ -2557,7 +2558,8 @@ MACHINE_CONFIG_DERIVED(nbmj9195_state::NBMJDRV1, NBMJDRV1_base)
 MACHINE_CONFIG_END
 
 
-MACHINE_CONFIG_DERIVED(nbmj9195_state::NBMJDRV2, NBMJDRV1_base)
+MACHINE_CONFIG_START(nbmj9195_state::NBMJDRV2)
+	NBMJDRV1_base(config);
 
 	/* basic machine hardware */
 	MCFG_CPU_MODIFY("maincpu")
@@ -2568,7 +2570,8 @@ MACHINE_CONFIG_DERIVED(nbmj9195_state::NBMJDRV2, NBMJDRV1_base)
 MACHINE_CONFIG_END
 
 
-MACHINE_CONFIG_DERIVED(nbmj9195_state::NBMJDRV3, NBMJDRV1_base)
+MACHINE_CONFIG_START(nbmj9195_state::NBMJDRV3)
+	NBMJDRV1_base(config);
 
 	/* basic machine hardware */
 	MCFG_CPU_MODIFY("maincpu")
@@ -2584,7 +2587,8 @@ MACHINE_CONFIG_END
 
 //-------------------------------------------------------------------------
 
-MACHINE_CONFIG_DERIVED(nbmj9195_state::mjuraden, NBMJDRV1)
+MACHINE_CONFIG_START(nbmj9195_state::mjuraden)
+	NBMJDRV1(config);
 
 	/* basic machine hardware */
 	MCFG_CPU_MODIFY("maincpu")
@@ -2593,7 +2597,8 @@ MACHINE_CONFIG_DERIVED(nbmj9195_state::mjuraden, NBMJDRV1)
 MACHINE_CONFIG_END
 
 
-MACHINE_CONFIG_DERIVED(nbmj9195_state::koinomp, NBMJDRV1)
+MACHINE_CONFIG_START(nbmj9195_state::koinomp)
+	NBMJDRV1(config);
 
 	/* basic machine hardware */
 	MCFG_CPU_MODIFY("maincpu")
@@ -2602,7 +2607,8 @@ MACHINE_CONFIG_DERIVED(nbmj9195_state::koinomp, NBMJDRV1)
 MACHINE_CONFIG_END
 
 
-MACHINE_CONFIG_DERIVED(nbmj9195_state::patimono, NBMJDRV1)
+MACHINE_CONFIG_START(nbmj9195_state::patimono)
+	NBMJDRV1(config);
 
 	/* basic machine hardware */
 	MCFG_CPU_MODIFY("maincpu")
@@ -2610,7 +2616,8 @@ MACHINE_CONFIG_DERIVED(nbmj9195_state::patimono, NBMJDRV1)
 MACHINE_CONFIG_END
 
 
-MACHINE_CONFIG_DERIVED(nbmj9195_state::janbari, NBMJDRV1)
+MACHINE_CONFIG_START(nbmj9195_state::janbari)
+	NBMJDRV1(config);
 
 	/* basic machine hardware */
 	MCFG_CPU_MODIFY("maincpu")
@@ -2620,7 +2627,8 @@ MACHINE_CONFIG_DERIVED(nbmj9195_state::janbari, NBMJDRV1)
 MACHINE_CONFIG_END
 
 
-MACHINE_CONFIG_DERIVED(nbmj9195_state::mmehyou, NBMJDRV1)
+MACHINE_CONFIG_START(nbmj9195_state::mmehyou)
+	NBMJDRV1(config);
 
 	/* basic machine hardware */
 	MCFG_CPU_MODIFY("maincpu")
@@ -2631,7 +2639,8 @@ MACHINE_CONFIG_DERIVED(nbmj9195_state::mmehyou, NBMJDRV1)
 MACHINE_CONFIG_END
 
 
-MACHINE_CONFIG_DERIVED(nbmj9195_state::ultramhm, NBMJDRV1)
+MACHINE_CONFIG_START(nbmj9195_state::ultramhm)
+	NBMJDRV1(config);
 
 	/* basic machine hardware */
 	MCFG_CPU_MODIFY("maincpu")
@@ -2642,7 +2651,8 @@ MACHINE_CONFIG_DERIVED(nbmj9195_state::ultramhm, NBMJDRV1)
 MACHINE_CONFIG_END
 
 
-MACHINE_CONFIG_DERIVED(nbmj9195_state::gal10ren, NBMJDRV1)
+MACHINE_CONFIG_START(nbmj9195_state::gal10ren)
+	NBMJDRV1(config);
 
 	/* basic machine hardware */
 	MCFG_CPU_MODIFY("maincpu")
@@ -2650,7 +2660,8 @@ MACHINE_CONFIG_DERIVED(nbmj9195_state::gal10ren, NBMJDRV1)
 MACHINE_CONFIG_END
 
 
-MACHINE_CONFIG_DERIVED(nbmj9195_state::renaiclb, NBMJDRV1)
+MACHINE_CONFIG_START(nbmj9195_state::renaiclb)
+	NBMJDRV1(config);
 
 	/* basic machine hardware */
 	MCFG_CPU_MODIFY("maincpu")
@@ -2658,7 +2669,8 @@ MACHINE_CONFIG_DERIVED(nbmj9195_state::renaiclb, NBMJDRV1)
 MACHINE_CONFIG_END
 
 
-MACHINE_CONFIG_DERIVED(nbmj9195_state::mjlaman, NBMJDRV1)
+MACHINE_CONFIG_START(nbmj9195_state::mjlaman)
+	NBMJDRV1(config);
 
 	/* basic machine hardware */
 	MCFG_CPU_MODIFY("maincpu")
@@ -2666,7 +2678,8 @@ MACHINE_CONFIG_DERIVED(nbmj9195_state::mjlaman, NBMJDRV1)
 MACHINE_CONFIG_END
 
 
-MACHINE_CONFIG_DERIVED(nbmj9195_state::mkeibaou, NBMJDRV1)
+MACHINE_CONFIG_START(nbmj9195_state::mkeibaou)
+	NBMJDRV1(config);
 
 	/* basic machine hardware */
 	MCFG_CPU_MODIFY("maincpu")
@@ -2674,7 +2687,8 @@ MACHINE_CONFIG_DERIVED(nbmj9195_state::mkeibaou, NBMJDRV1)
 MACHINE_CONFIG_END
 
 
-MACHINE_CONFIG_DERIVED(nbmj9195_state::pachiten, NBMJDRV1)
+MACHINE_CONFIG_START(nbmj9195_state::pachiten)
+	NBMJDRV1(config);
 
 	/* basic machine hardware */
 	MCFG_CPU_MODIFY("maincpu")
@@ -2684,13 +2698,15 @@ MACHINE_CONFIG_DERIVED(nbmj9195_state::pachiten, NBMJDRV1)
 MACHINE_CONFIG_END
 
 
-MACHINE_CONFIG_DERIVED(nbmj9195_state::sailorws, NBMJDRV1)
+MACHINE_CONFIG_START(nbmj9195_state::sailorws)
+	NBMJDRV1(config);
 
 	/* basic machine hardware */
 MACHINE_CONFIG_END
 
 
-MACHINE_CONFIG_DERIVED(nbmj9195_state::sailorwr, NBMJDRV1)
+MACHINE_CONFIG_START(nbmj9195_state::sailorwr)
+	NBMJDRV1(config);
 
 	/* basic machine hardware */
 	MCFG_CPU_MODIFY("maincpu")
@@ -2700,7 +2716,8 @@ MACHINE_CONFIG_DERIVED(nbmj9195_state::sailorwr, NBMJDRV1)
 MACHINE_CONFIG_END
 
 
-MACHINE_CONFIG_DERIVED(nbmj9195_state::psailor1, NBMJDRV1)
+MACHINE_CONFIG_START(nbmj9195_state::psailor1)
+	NBMJDRV1(config);
 
 	/* basic machine hardware */
 	MCFG_CPU_MODIFY("maincpu")
@@ -2708,7 +2725,8 @@ MACHINE_CONFIG_DERIVED(nbmj9195_state::psailor1, NBMJDRV1)
 MACHINE_CONFIG_END
 
 
-MACHINE_CONFIG_DERIVED(nbmj9195_state::psailor2, NBMJDRV1)
+MACHINE_CONFIG_START(nbmj9195_state::psailor2)
+	NBMJDRV1(config);
 
 	/* basic machine hardware */
 	MCFG_CPU_MODIFY("maincpu")
@@ -2716,7 +2734,8 @@ MACHINE_CONFIG_DERIVED(nbmj9195_state::psailor2, NBMJDRV1)
 MACHINE_CONFIG_END
 
 
-MACHINE_CONFIG_DERIVED(nbmj9195_state::otatidai, NBMJDRV1)
+MACHINE_CONFIG_START(nbmj9195_state::otatidai)
+	NBMJDRV1(config);
 
 	/* basic machine hardware */
 	MCFG_CPU_MODIFY("maincpu")
@@ -2724,7 +2743,8 @@ MACHINE_CONFIG_DERIVED(nbmj9195_state::otatidai, NBMJDRV1)
 MACHINE_CONFIG_END
 
 
-MACHINE_CONFIG_DERIVED(nbmj9195_state::yosimoto, NBMJDRV1)
+MACHINE_CONFIG_START(nbmj9195_state::yosimoto)
+	NBMJDRV1(config);
 
 	/* basic machine hardware */
 	MCFG_CPU_MODIFY("maincpu")
@@ -2732,7 +2752,8 @@ MACHINE_CONFIG_DERIVED(nbmj9195_state::yosimoto, NBMJDRV1)
 MACHINE_CONFIG_END
 
 
-MACHINE_CONFIG_DERIVED(nbmj9195_state::yosimotm, NBMJDRV1)
+MACHINE_CONFIG_START(nbmj9195_state::yosimotm)
+	NBMJDRV1(config);
 
 	/* basic machine hardware */
 	MCFG_CPU_MODIFY("maincpu")
@@ -2742,7 +2763,8 @@ MACHINE_CONFIG_DERIVED(nbmj9195_state::yosimotm, NBMJDRV1)
 MACHINE_CONFIG_END
 
 
-MACHINE_CONFIG_DERIVED(nbmj9195_state::jituroku, NBMJDRV1)
+MACHINE_CONFIG_START(nbmj9195_state::jituroku)
+	NBMJDRV1(config);
 
 	/* basic machine hardware */
 	MCFG_CPU_MODIFY("maincpu")
@@ -2750,7 +2772,8 @@ MACHINE_CONFIG_DERIVED(nbmj9195_state::jituroku, NBMJDRV1)
 MACHINE_CONFIG_END
 
 
-MACHINE_CONFIG_DERIVED(nbmj9195_state::ngpgal, NBMJDRV2)
+MACHINE_CONFIG_START(nbmj9195_state::ngpgal)
+	NBMJDRV2(config);
 
 	/* basic machine hardware */
 	MCFG_CPU_MODIFY("maincpu")
@@ -2759,7 +2782,8 @@ MACHINE_CONFIG_DERIVED(nbmj9195_state::ngpgal, NBMJDRV2)
 MACHINE_CONFIG_END
 
 
-MACHINE_CONFIG_DERIVED(nbmj9195_state::mjgottsu, NBMJDRV2)
+MACHINE_CONFIG_START(nbmj9195_state::mjgottsu)
+	NBMJDRV2(config);
 
 	/* basic machine hardware */
 	MCFG_CPU_MODIFY("maincpu")
@@ -2768,7 +2792,8 @@ MACHINE_CONFIG_DERIVED(nbmj9195_state::mjgottsu, NBMJDRV2)
 MACHINE_CONFIG_END
 
 
-MACHINE_CONFIG_DERIVED(nbmj9195_state::bakuhatu, NBMJDRV2)
+MACHINE_CONFIG_START(nbmj9195_state::bakuhatu)
+	NBMJDRV2(config);
 
 	/* basic machine hardware */
 	MCFG_CPU_MODIFY("maincpu")
@@ -2777,7 +2802,8 @@ MACHINE_CONFIG_DERIVED(nbmj9195_state::bakuhatu, NBMJDRV2)
 MACHINE_CONFIG_END
 
 
-MACHINE_CONFIG_DERIVED(nbmj9195_state::cmehyou, NBMJDRV2)
+MACHINE_CONFIG_START(nbmj9195_state::cmehyou)
+	NBMJDRV2(config);
 
 	/* basic machine hardware */
 	MCFG_CPU_MODIFY("maincpu")
@@ -2786,7 +2812,8 @@ MACHINE_CONFIG_DERIVED(nbmj9195_state::cmehyou, NBMJDRV2)
 MACHINE_CONFIG_END
 
 
-MACHINE_CONFIG_DERIVED(nbmj9195_state::mjkoiura, NBMJDRV2)
+MACHINE_CONFIG_START(nbmj9195_state::mjkoiura)
+	NBMJDRV2(config);
 
 	/* basic machine hardware */
 	MCFG_CPU_MODIFY("maincpu")
@@ -2795,7 +2822,8 @@ MACHINE_CONFIG_DERIVED(nbmj9195_state::mjkoiura, NBMJDRV2)
 MACHINE_CONFIG_END
 
 
-MACHINE_CONFIG_DERIVED(nbmj9195_state::mkoiuraa, NBMJDRV2)
+MACHINE_CONFIG_START(nbmj9195_state::mkoiuraa)
+	NBMJDRV2(config);
 
 	/* basic machine hardware */
 	MCFG_CPU_MODIFY("maincpu")
@@ -2804,7 +2832,8 @@ MACHINE_CONFIG_DERIVED(nbmj9195_state::mkoiuraa, NBMJDRV2)
 MACHINE_CONFIG_END
 
 
-MACHINE_CONFIG_DERIVED(nbmj9195_state::mscoutm, NBMJDRV3)
+MACHINE_CONFIG_START(nbmj9195_state::mscoutm)
+	NBMJDRV3(config);
 
 	/* basic machine hardware */
 	MCFG_CPU_MODIFY("maincpu")
@@ -2813,7 +2842,8 @@ MACHINE_CONFIG_DERIVED(nbmj9195_state::mscoutm, NBMJDRV3)
 MACHINE_CONFIG_END
 
 
-MACHINE_CONFIG_DERIVED(nbmj9195_state::imekura, NBMJDRV3)
+MACHINE_CONFIG_START(nbmj9195_state::imekura)
+	NBMJDRV3(config);
 
 	/* basic machine hardware */
 	MCFG_CPU_MODIFY("maincpu")
@@ -2822,7 +2852,8 @@ MACHINE_CONFIG_DERIVED(nbmj9195_state::imekura, NBMJDRV3)
 MACHINE_CONFIG_END
 
 
-MACHINE_CONFIG_DERIVED(nbmj9195_state::mjegolf, NBMJDRV3)
+MACHINE_CONFIG_START(nbmj9195_state::mjegolf)
+	NBMJDRV3(config);
 
 	/* basic machine hardware */
 	MCFG_CPU_MODIFY("maincpu")
@@ -2831,7 +2862,8 @@ MACHINE_CONFIG_DERIVED(nbmj9195_state::mjegolf, NBMJDRV3)
 MACHINE_CONFIG_END
 
 
-MACHINE_CONFIG_DERIVED(nbmj9195_state::shabdama, NBMJDRV1)
+MACHINE_CONFIG_START(nbmj9195_state::shabdama)
+	NBMJDRV1(config);
 
 	/* basic machine hardware */
 	MCFG_CPU_MODIFY("maincpu")

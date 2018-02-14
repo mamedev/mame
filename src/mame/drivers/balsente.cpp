@@ -1370,7 +1370,8 @@ MACHINE_CONFIG_START(balsente_state::balsente)
 MACHINE_CONFIG_END
 
 
-MACHINE_CONFIG_DERIVED(balsente_state::shrike, balsente)
+MACHINE_CONFIG_START(balsente_state::shrike)
+	balsente(config);
 
 	/* basic machine hardware */
 

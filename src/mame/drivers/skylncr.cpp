@@ -1678,14 +1678,16 @@ MACHINE_CONFIG_START(skylncr_state::skylncr)
 MACHINE_CONFIG_END
 
 
-MACHINE_CONFIG_DERIVED(skylncr_state::mbutrfly, skylncr)
+MACHINE_CONFIG_START(skylncr_state::mbutrfly)
+	skylncr(config);
 
 	MCFG_CPU_MODIFY("maincpu")
 	MCFG_CPU_IO_MAP(io_map_mbutrfly)
 MACHINE_CONFIG_END
 
 
-MACHINE_CONFIG_DERIVED(skylncr_state::neraidou, skylncr)
+MACHINE_CONFIG_START(skylncr_state::neraidou)
+	skylncr(config);
 
 	/* basic machine hardware */
 	MCFG_CPU_MODIFY("maincpu")
@@ -1693,7 +1695,8 @@ MACHINE_CONFIG_DERIVED(skylncr_state::neraidou, skylncr)
 MACHINE_CONFIG_END
 
 
-MACHINE_CONFIG_DERIVED(skylncr_state::sstar97, skylncr)
+MACHINE_CONFIG_START(skylncr_state::sstar97)
+	skylncr(config);
 
 	/* basic machine hardware */
 	MCFG_CPU_MODIFY("maincpu")
@@ -1701,7 +1704,8 @@ MACHINE_CONFIG_DERIVED(skylncr_state::sstar97, skylncr)
 MACHINE_CONFIG_END
 
 
-MACHINE_CONFIG_DERIVED(skylncr_state::bdream97, skylncr)
+MACHINE_CONFIG_START(skylncr_state::bdream97)
+	skylncr(config);
 
 	/* basic machine hardware */
 	MCFG_CPU_MODIFY("maincpu")

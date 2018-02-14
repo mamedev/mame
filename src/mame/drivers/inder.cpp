@@ -1357,7 +1357,7 @@ MACHINE_CONFIG_START(inder_state::brvteam)
 	MCFG_DEFAULT_LAYOUT(layout_inder)
 
 	/* Sound */
-	MCFG_FRAGMENT_ADD( genpin_audio )
+	genpin_audio(config);
 	MCFG_SPEAKER_STANDARD_MONO("snvol")
 	MCFG_SOUND_ADD("sn", SN76489, XTAL(8'000'000) / 2) // jumper choice of 2 or 4 MHz
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "snvol", 2.0)
@@ -1375,7 +1375,7 @@ MACHINE_CONFIG_START(inder_state::canasta)
 	MCFG_DEFAULT_LAYOUT(layout_inder)
 
 	/* Sound */
-	MCFG_FRAGMENT_ADD( genpin_audio )
+	genpin_audio(config);
 	MCFG_SPEAKER_STANDARD_MONO("ayvol")
 	MCFG_SOUND_ADD("ay", AY8910, XTAL(4'000'000) / 2)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "ayvol", 1.0)
@@ -1396,7 +1396,7 @@ MACHINE_CONFIG_START(inder_state::lapbylap)
 	MCFG_DEFAULT_LAYOUT(layout_inder)
 
 	/* Sound */
-	MCFG_FRAGMENT_ADD( genpin_audio )
+	genpin_audio(config);
 	MCFG_SPEAKER_STANDARD_MONO("ayvol")
 	MCFG_SOUND_ADD("ay1", AY8910, XTAL(2'000'000)) // same xtal that drives subcpu
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "ayvol", 1.0)
@@ -1420,7 +1420,7 @@ MACHINE_CONFIG_START(inder_state::inder)
 	MCFG_DEFAULT_LAYOUT(layout_inder)
 
 	/* Sound */
-	MCFG_FRAGMENT_ADD( genpin_audio )
+	genpin_audio(config);
 	MCFG_SPEAKER_STANDARD_MONO("msmvol")
 	MCFG_SOUND_ADD("msm", MSM5205, XTAL(384'000))
 	MCFG_MSM5205_VCK_CALLBACK(DEVWRITELINE("9a", ttl7474_device, clock_w))

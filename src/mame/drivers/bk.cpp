@@ -192,7 +192,8 @@ MACHINE_CONFIG_START(bk_state::bk0010)
 	MCFG_SOFTWARE_LIST_ADD("cass_list","bk0010")
 MACHINE_CONFIG_END
 
-MACHINE_CONFIG_DERIVED(bk_state::bk0010fd, bk0010)
+MACHINE_CONFIG_START(bk_state::bk0010fd)
+	bk0010(config);
 	/* basic machine hardware */
 	MCFG_CPU_MODIFY("maincpu")
 	MCFG_CPU_PROGRAM_MAP(bk0010fd_mem)

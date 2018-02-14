@@ -973,13 +973,14 @@ MACHINE_CONFIG_START(m62_state::ldrun)
 	MCFG_PALETTE_INIT_OWNER(m62_state,m62_spr)
 
 	/* sound hardware */
-	//MCFG_FRAGMENT_ADD(m62_audio)
+	//m62_audio(config);
 	MCFG_DEVICE_ADD("irem_audio", IREM_M62_AUDIO, 0)
 
 MACHINE_CONFIG_END
 
 
-MACHINE_CONFIG_DERIVED(m62_state::kungfum, ldrun)
+MACHINE_CONFIG_START(m62_state::kungfum)
+	ldrun(config);
 
 	/* basic machine hardware */
 	MCFG_CPU_MODIFY("maincpu")
@@ -996,7 +997,8 @@ MACHINE_CONFIG_DERIVED(m62_state::kungfum, ldrun)
 MACHINE_CONFIG_END
 
 
-MACHINE_CONFIG_DERIVED(m62_state::battroad, ldrun)
+MACHINE_CONFIG_START(m62_state::battroad)
+	ldrun(config);
 
 	/* basic machine hardware */
 	MCFG_CPU_MODIFY("maincpu")
@@ -1020,7 +1022,8 @@ MACHINE_CONFIG_DERIVED(m62_state::battroad, ldrun)
 MACHINE_CONFIG_END
 
 
-MACHINE_CONFIG_DERIVED(m62_state::ldrun2, ldrun)
+MACHINE_CONFIG_START(m62_state::ldrun2)
+	ldrun(config);
 
 	/* basic machine hardware */
 	MCFG_CPU_MODIFY("maincpu")
@@ -1033,7 +1036,8 @@ MACHINE_CONFIG_DERIVED(m62_state::ldrun2, ldrun)
 MACHINE_CONFIG_END
 
 
-MACHINE_CONFIG_DERIVED(m62_state::ldrun3, ldrun)
+MACHINE_CONFIG_START(m62_state::ldrun3)
+	ldrun(config);
 
 	/* basic machine hardware */
 	MCFG_CPU_MODIFY("maincpu")
@@ -1047,7 +1051,8 @@ MACHINE_CONFIG_DERIVED(m62_state::ldrun3, ldrun)
 MACHINE_CONFIG_END
 
 
-MACHINE_CONFIG_DERIVED(m62_state::ldrun4, ldrun)
+MACHINE_CONFIG_START(m62_state::ldrun4)
+	ldrun(config);
 
 	/* basic machine hardware */
 	MCFG_CPU_MODIFY("maincpu")
@@ -1061,7 +1066,8 @@ MACHINE_CONFIG_DERIVED(m62_state::ldrun4, ldrun)
 MACHINE_CONFIG_END
 
 
-MACHINE_CONFIG_DERIVED(m62_state::lotlot, ldrun)
+MACHINE_CONFIG_START(m62_state::lotlot)
+	ldrun(config);
 
 	/* basic machine hardware */
 	MCFG_CPU_MODIFY("maincpu")
@@ -1082,7 +1088,8 @@ MACHINE_CONFIG_DERIVED(m62_state::lotlot, ldrun)
 MACHINE_CONFIG_END
 
 
-MACHINE_CONFIG_DERIVED(m62_state::kidniki, ldrun)
+MACHINE_CONFIG_START(m62_state::kidniki)
+	ldrun(config);
 
 	/* basic machine hardware */
 	MCFG_CPU_MODIFY("maincpu")
@@ -1098,7 +1105,8 @@ MACHINE_CONFIG_DERIVED(m62_state::kidniki, ldrun)
 MACHINE_CONFIG_END
 
 
-MACHINE_CONFIG_DERIVED(m62_state::spelunkr, ldrun)
+MACHINE_CONFIG_START(m62_state::spelunkr)
+	ldrun(config);
 
 	/* basic machine hardware */
 	MCFG_CPU_MODIFY("maincpu")
@@ -1113,7 +1121,8 @@ MACHINE_CONFIG_DERIVED(m62_state::spelunkr, ldrun)
 MACHINE_CONFIG_END
 
 
-MACHINE_CONFIG_DERIVED(m62_state::spelunk2, ldrun)
+MACHINE_CONFIG_START(m62_state::spelunk2)
+	ldrun(config);
 
 	/* basic machine hardware */
 	MCFG_CPU_MODIFY("maincpu")
@@ -1134,7 +1143,8 @@ MACHINE_CONFIG_DERIVED(m62_state::spelunk2, ldrun)
 MACHINE_CONFIG_END
 
 
-MACHINE_CONFIG_DERIVED(m62_state::youjyudn, ldrun)
+MACHINE_CONFIG_START(m62_state::youjyudn)
+	ldrun(config);
 
 	/* basic machine hardware */
 	MCFG_CPU_MODIFY("maincpu")
@@ -1154,7 +1164,8 @@ MACHINE_CONFIG_DERIVED(m62_state::youjyudn, ldrun)
 MACHINE_CONFIG_END
 
 
-MACHINE_CONFIG_DERIVED(m62_state::horizon, ldrun)
+MACHINE_CONFIG_START(m62_state::horizon)
+	ldrun(config);
 
 	/* basic machine hardware */
 	MCFG_CPU_MODIFY("maincpu")

@@ -381,11 +381,11 @@ MACHINE_CONFIG_START(taitowlf_state::taitowlf)
 	MCFG_PCI_BUS_LEGACY_DEVICE(0, nullptr, intel82439tx_pci_r, intel82439tx_pci_w)
 	MCFG_PCI_BUS_LEGACY_DEVICE(7, nullptr, intel82371ab_pci_r, intel82371ab_pci_w)
 
-	MCFG_FRAGMENT_ADD( pcat_common )
+	pcat_common(config);
 
 	/* video hardware */
 	#if ENABLE_VGA
-	MCFG_FRAGMENT_ADD( pcvideo_vga )
+	pcvideo_vga(config);
 	#else
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)

@@ -1026,7 +1026,8 @@ MACHINE_CONFIG_START(fanucspmg_state::fanucspmg)
 	MCFG_MC6845_OUT_VSYNC_CB(WRITELINE(fanucspmg_state, vsync_w))
 MACHINE_CONFIG_END
 
-MACHINE_CONFIG_DERIVED(fanucspmg_state::fanucspmgm, fanucspmg)
+MACHINE_CONFIG_START(fanucspmg_state::fanucspmgm)
+	fanucspmg(config);
 	MCFG_DEVICE_REMOVE( CRTC_TAG )
 
 	MCFG_MC6845_ADD( CRTC_TAG, HD6845, SCREEN_TAG, XTAL(8'000'000)/2)

@@ -338,7 +338,8 @@ MACHINE_CONFIG_START(blockout_state::blockout)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", 0.50)
 MACHINE_CONFIG_END
 
-MACHINE_CONFIG_DERIVED(blockout_state::agress, blockout)
+MACHINE_CONFIG_START(blockout_state::agress)
+	blockout(config);
 	MCFG_CPU_MODIFY( "maincpu" )
 	MCFG_CPU_PROGRAM_MAP(agress_map)
 MACHINE_CONFIG_END

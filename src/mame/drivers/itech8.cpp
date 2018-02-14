@@ -1699,7 +1699,8 @@ MACHINE_CONFIG_START(itech8_state::itech8_core_lo)
 MACHINE_CONFIG_END
 
 
-MACHINE_CONFIG_DERIVED(itech8_state::itech8_core_hi, itech8_core_lo)
+MACHINE_CONFIG_START(itech8_state::itech8_core_hi)
+	itech8_core_lo(config);
 
 	/* basic machine hardware */
 	MCFG_CPU_MODIFY("maincpu")
@@ -1780,10 +1781,11 @@ MACHINE_CONFIG_END
 
 /************* full drivers ******************/
 
-MACHINE_CONFIG_DERIVED(itech8_state::wfortune, itech8_core_hi)
+MACHINE_CONFIG_START(itech8_state::wfortune)
+	itech8_core_hi(config);
 
 	/* basic machine hardware */
-	MCFG_FRAGMENT_ADD(itech8_sound_ym2203)
+	itech8_sound_ym2203(config);
 
 	/* video hardware */
 	MCFG_SCREEN_MODIFY("screen")
@@ -1794,10 +1796,11 @@ MACHINE_CONFIG_DERIVED(itech8_state::wfortune, itech8_core_hi)
 MACHINE_CONFIG_END
 
 
-MACHINE_CONFIG_DERIVED(itech8_state::grmatch, itech8_core_hi)
+MACHINE_CONFIG_START(itech8_state::grmatch)
+	itech8_core_hi(config);
 
 	/* basic machine hardware */
-	MCFG_FRAGMENT_ADD(itech8_sound_ym2608b)
+	itech8_sound_ym2608b(config);
 
 	/* video hardware */
 	MCFG_SCREEN_MODIFY("screen")
@@ -1810,10 +1813,11 @@ MACHINE_CONFIG_DERIVED(itech8_state::grmatch, itech8_core_hi)
 MACHINE_CONFIG_END
 
 
-MACHINE_CONFIG_DERIVED(itech8_state::stratab_hi, itech8_core_hi)
+MACHINE_CONFIG_START(itech8_state::stratab_hi)
+	itech8_core_hi(config);
 
 	/* basic machine hardware */
-	MCFG_FRAGMENT_ADD(itech8_sound_ym2203)
+	itech8_sound_ym2203(config);
 
 	/* video hardware */
 	MCFG_SCREEN_MODIFY("screen")
@@ -1823,10 +1827,11 @@ MACHINE_CONFIG_DERIVED(itech8_state::stratab_hi, itech8_core_hi)
 MACHINE_CONFIG_END
 
 
-MACHINE_CONFIG_DERIVED(itech8_state::stratab_lo, itech8_core_lo)
+MACHINE_CONFIG_START(itech8_state::stratab_lo)
+	itech8_core_lo(config);
 
 	/* basic machine hardware */
-	MCFG_FRAGMENT_ADD(itech8_sound_ym2203)
+	itech8_sound_ym2203(config);
 
 	/* video hardware */
 	MCFG_SCREEN_MODIFY("screen")
@@ -1835,10 +1840,11 @@ MACHINE_CONFIG_DERIVED(itech8_state::stratab_lo, itech8_core_lo)
 MACHINE_CONFIG_END
 
 
-MACHINE_CONFIG_DERIVED(itech8_state::slikshot_hi, itech8_core_hi)
+MACHINE_CONFIG_START(itech8_state::slikshot_hi)
+	itech8_core_hi(config);
 
 	/* basic machine hardware */
-	MCFG_FRAGMENT_ADD(itech8_sound_ym2203)
+	itech8_sound_ym2203(config);
 
 	MCFG_CPU_ADD("sub", Z80, CLOCK_8MHz/2)
 	MCFG_CPU_PROGRAM_MAP(slikz80_mem_map)
@@ -1852,10 +1858,11 @@ MACHINE_CONFIG_DERIVED(itech8_state::slikshot_hi, itech8_core_hi)
 MACHINE_CONFIG_END
 
 
-MACHINE_CONFIG_DERIVED(itech8_state::slikshot_lo, itech8_core_lo)
+MACHINE_CONFIG_START(itech8_state::slikshot_lo)
+	itech8_core_lo(config);
 
 	/* basic machine hardware */
-	MCFG_FRAGMENT_ADD(itech8_sound_ym2203)
+	itech8_sound_ym2203(config);
 
 	MCFG_CPU_ADD("sub", Z80, CLOCK_8MHz/2)
 	MCFG_CPU_PROGRAM_MAP(slikz80_mem_map)
@@ -1869,10 +1876,11 @@ MACHINE_CONFIG_DERIVED(itech8_state::slikshot_lo, itech8_core_lo)
 MACHINE_CONFIG_END
 
 
-MACHINE_CONFIG_DERIVED(itech8_state::slikshot_lo_noz80, itech8_core_lo)
+MACHINE_CONFIG_START(itech8_state::slikshot_lo_noz80)
+	itech8_core_lo(config);
 
 	/* basic machine hardware */
-	MCFG_FRAGMENT_ADD(itech8_sound_ym2203)
+	itech8_sound_ym2203(config);
 
 	/* video hardware */
 	MCFG_SCREEN_MODIFY("screen")
@@ -1881,7 +1889,8 @@ MACHINE_CONFIG_DERIVED(itech8_state::slikshot_lo_noz80, itech8_core_lo)
 MACHINE_CONFIG_END
 
 
-MACHINE_CONFIG_DERIVED(itech8_state::sstrike, slikshot_lo)
+MACHINE_CONFIG_START(itech8_state::sstrike)
+	slikshot_lo(config);
 
 	/* basic machine hardware */
 	MCFG_MACHINE_START_OVERRIDE(itech8_state,sstrike)
@@ -1889,10 +1898,11 @@ MACHINE_CONFIG_DERIVED(itech8_state::sstrike, slikshot_lo)
 MACHINE_CONFIG_END
 
 
-MACHINE_CONFIG_DERIVED(itech8_state::hstennis_hi, itech8_core_hi)
+MACHINE_CONFIG_START(itech8_state::hstennis_hi)
+	itech8_core_hi(config);
 
 	/* basic machine hardware */
-	MCFG_FRAGMENT_ADD(itech8_sound_ym3812)
+	itech8_sound_ym3812(config);
 
 	/* video hardware */
 	MCFG_SCREEN_MODIFY("screen")
@@ -1901,10 +1911,11 @@ MACHINE_CONFIG_DERIVED(itech8_state::hstennis_hi, itech8_core_hi)
 MACHINE_CONFIG_END
 
 
-MACHINE_CONFIG_DERIVED(itech8_state::hstennis_lo, itech8_core_lo)
+MACHINE_CONFIG_START(itech8_state::hstennis_lo)
+	itech8_core_lo(config);
 
 	/* basic machine hardware */
-	MCFG_FRAGMENT_ADD(itech8_sound_ym3812)
+	itech8_sound_ym3812(config);
 
 	/* video hardware */
 	MCFG_SCREEN_MODIFY("screen")
@@ -1913,10 +1924,11 @@ MACHINE_CONFIG_DERIVED(itech8_state::hstennis_lo, itech8_core_lo)
 MACHINE_CONFIG_END
 
 
-MACHINE_CONFIG_DERIVED(itech8_state::rimrockn, itech8_core_hi)
+MACHINE_CONFIG_START(itech8_state::rimrockn)
+	itech8_core_hi(config);
 
 	/* basic machine hardware */
-	MCFG_FRAGMENT_ADD(itech8_sound_ym3812_external)
+	itech8_sound_ym3812_external(config);
 
 	MCFG_CPU_REPLACE("maincpu", HD6309, CLOCK_12MHz)
 	MCFG_CPU_PROGRAM_MAP(tmshi_map)
@@ -1929,10 +1941,11 @@ MACHINE_CONFIG_DERIVED(itech8_state::rimrockn, itech8_core_hi)
 MACHINE_CONFIG_END
 
 
-MACHINE_CONFIG_DERIVED(itech8_state::ninclown, itech8_core_hi)
+MACHINE_CONFIG_START(itech8_state::ninclown)
+	itech8_core_hi(config);
 
 	/* basic machine hardware */
-	MCFG_FRAGMENT_ADD(itech8_sound_ym3812_external)
+	itech8_sound_ym3812_external(config);
 
 	MCFG_CPU_REPLACE("maincpu", M68000, CLOCK_12MHz)
 	MCFG_CPU_PROGRAM_MAP(ninclown_map)
@@ -1946,10 +1959,11 @@ MACHINE_CONFIG_DERIVED(itech8_state::ninclown, itech8_core_hi)
 MACHINE_CONFIG_END
 
 
-MACHINE_CONFIG_DERIVED(itech8_state::gtg2, itech8_core_lo)
+MACHINE_CONFIG_START(itech8_state::gtg2)
+	itech8_core_lo(config);
 
 	/* basic machine hardware */
-	MCFG_FRAGMENT_ADD(itech8_sound_ym3812_external)
+	itech8_sound_ym3812_external(config);
 
 	MCFG_CPU_MODIFY("maincpu")
 	MCFG_CPU_PROGRAM_MAP(gtg2_map)

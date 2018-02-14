@@ -473,7 +473,8 @@ MACHINE_CONFIG_START(sauro_state::tecfri)
 
 MACHINE_CONFIG_END
 
-MACHINE_CONFIG_DERIVED(sauro_state::trckydoc, tecfri)
+MACHINE_CONFIG_START(sauro_state::trckydoc)
+	tecfri(config);
 
 	MCFG_CPU_MODIFY("maincpu")
 	MCFG_CPU_PROGRAM_MAP(trckydoc_map)
@@ -491,7 +492,8 @@ MACHINE_CONFIG_DERIVED(sauro_state::trckydoc, tecfri)
 
 MACHINE_CONFIG_END
 
-MACHINE_CONFIG_DERIVED(sauro_state::sauro, tecfri)
+MACHINE_CONFIG_START(sauro_state::sauro)
+	tecfri(config);
 
 	MCFG_CPU_MODIFY("maincpu")
 	MCFG_CPU_PROGRAM_MAP(sauro_map)
@@ -522,7 +524,8 @@ MACHINE_CONFIG_DERIVED(sauro_state::sauro, tecfri)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 MACHINE_CONFIG_END
 
-MACHINE_CONFIG_DERIVED(sauro_state::saurob, sauro)
+MACHINE_CONFIG_START(sauro_state::saurob)
+	sauro(config);
 
 	MCFG_CPU_MODIFY("audiocpu")
 	MCFG_CPU_PROGRAM_MAP(saurob_sound_map)

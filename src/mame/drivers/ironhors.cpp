@@ -440,7 +440,8 @@ READ8_MEMBER(ironhors_state::farwest_soundlatch_r)
 	return m_soundlatch->read(m_soundcpu->space(AS_PROGRAM), 0);
 }
 
-MACHINE_CONFIG_DERIVED(ironhors_state::farwest, ironhors)
+MACHINE_CONFIG_START(ironhors_state::farwest)
+	ironhors(config);
 
 	MCFG_CPU_MODIFY("maincpu")
 	MCFG_CPU_PROGRAM_MAP(farwest_master_map)
