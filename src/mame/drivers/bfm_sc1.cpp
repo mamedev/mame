@@ -1122,7 +1122,8 @@ MACHINE_CONFIG_END
 // machine driver for scorpion1 board + adder2 extension ////////////////////////////
 /////////////////////////////////////////////////////////////////////////////////////
 
-MACHINE_CONFIG_DERIVED(bfm_sc1_state::scorpion1_adder2, scorpion1)
+MACHINE_CONFIG_START(bfm_sc1_state::scorpion1_adder2)
+	scorpion1(config);
 
 	MCFG_CPU_MODIFY("maincpu")
 	MCFG_CPU_PROGRAM_MAP(sc1_adder2)                // setup read and write memorymap
@@ -1136,7 +1137,8 @@ MACHINE_CONFIG_END
 // machine driver for scorpion1 board ///////////////////////////////////////////////
 /////////////////////////////////////////////////////////////////////////////////////
 
-MACHINE_CONFIG_DERIVED(bfm_sc1_state::scorpion1_viper, scorpion1)
+MACHINE_CONFIG_START(bfm_sc1_state::scorpion1_viper)
+	scorpion1(config);
 	MCFG_CPU_MODIFY("maincpu")
 	MCFG_CPU_PROGRAM_MAP(sc1_viper)                 // setup read and write memorymap
 

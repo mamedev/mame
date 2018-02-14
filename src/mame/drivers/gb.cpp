@@ -685,7 +685,8 @@ MACHINE_CONFIG_START(gb_state::supergb)
 MACHINE_CONFIG_END
 
 
-MACHINE_CONFIG_DERIVED(gb_state::supergb2, gameboy)
+MACHINE_CONFIG_START(gb_state::supergb2)
+	gameboy(config);
 	/* basic machine hardware */
 	MCFG_CPU_MODIFY("maincpu")
 	MCFG_CPU_PROGRAM_MAP(sgb_map)
@@ -709,7 +710,8 @@ MACHINE_CONFIG_DERIVED(gb_state::supergb2, gameboy)
 MACHINE_CONFIG_END
 
 
-MACHINE_CONFIG_DERIVED(gb_state::gbpocket, gameboy)
+MACHINE_CONFIG_START(gb_state::gbpocket)
+	gameboy(config);
 
 	/* video hardware */
 	MCFG_PALETTE_MODIFY("palette")

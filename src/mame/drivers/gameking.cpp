@@ -303,11 +303,13 @@ MACHINE_CONFIG_START(gameking_state::gameking)
 	MCFG_GENERIC_LOAD(gameking_state, gameking_cart)
 MACHINE_CONFIG_END
 
-MACHINE_CONFIG_DERIVED(gameking_state::gameking1, gameking)
+MACHINE_CONFIG_START(gameking_state::gameking1)
+	gameking(config);
 	MCFG_SOFTWARE_LIST_ADD("cart_list", "gameking")
 MACHINE_CONFIG_END
 
-MACHINE_CONFIG_DERIVED(gameking_state::gameking3, gameking)
+MACHINE_CONFIG_START(gameking_state::gameking3)
+	gameking(config);
 	MCFG_SOFTWARE_LIST_ADD("cart_list", "gameking")
 	MCFG_SOFTWARE_LIST_ADD("cart_list_3", "gameking3")
 MACHINE_CONFIG_END

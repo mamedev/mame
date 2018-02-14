@@ -1416,7 +1416,8 @@ MACHINE_CONFIG_START(firebeat_state::firebeat2)
 	MCFG_MIDI_KBD_ADD("kbd1", DEVWRITELINE("duart_midi:chan1", ins8250_uart_device, rx_w), 31250)
 MACHINE_CONFIG_END
 
-MACHINE_CONFIG_DERIVED(firebeat_state::firebeat_spu, firebeat)
+MACHINE_CONFIG_START(firebeat_state::firebeat_spu)
+	firebeat(config);
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("audiocpu", M68000, 16000000)

@@ -1013,7 +1013,8 @@ WRITE_LINE_MEMBER( avt_state::avtnfl_w )
 	m_pio1->port_b_write((m_pio1->port_b_read() & 0xbf) | (state ? 0x40 : 0));
 }
 
-MACHINE_CONFIG_DERIVED(avt_state::avtnfl, avt)
+MACHINE_CONFIG_START(avt_state::avtnfl)
+	avt(config);
 	MCFG_DEVICE_REMOVE("crtc")
 	MCFG_MC6845_ADD("crtc", MC6845, "screen", CRTC_CLOCK)    /* guess */
 	MCFG_MC6845_SHOW_BORDER_AREA(false)

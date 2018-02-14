@@ -672,13 +672,15 @@ MACHINE_CONFIG_START(asteroid_state::asteroid_base)
 	MCFG_AVGDVG_VECTOR("vector")
 MACHINE_CONFIG_END
 
-MACHINE_CONFIG_DERIVED(asteroid_state::asteroid, asteroid_base)
+MACHINE_CONFIG_START(asteroid_state::asteroid)
+	asteroid_base(config);
 
 	/* sound hardware */
-	MCFG_FRAGMENT_ADD(asteroid_sound)
+	asteroid_sound(config);
 MACHINE_CONFIG_END
 
-MACHINE_CONFIG_DERIVED(asteroid_state::asterock, asteroid)
+MACHINE_CONFIG_START(asteroid_state::asterock)
+	asteroid(config);
 
 	/* basic machine hardware */
 	MCFG_CPU_MODIFY("maincpu")
@@ -686,7 +688,8 @@ MACHINE_CONFIG_DERIVED(asteroid_state::asterock, asteroid)
 MACHINE_CONFIG_END
 
 
-MACHINE_CONFIG_DERIVED(asteroid_state::astdelux, asteroid_base)
+MACHINE_CONFIG_START(asteroid_state::astdelux)
+	asteroid_base(config);
 
 	/* basic machine hardware */
 	MCFG_CPU_MODIFY("maincpu")
@@ -695,7 +698,7 @@ MACHINE_CONFIG_DERIVED(asteroid_state::astdelux, asteroid_base)
 	MCFG_ATARIVGEAROM_ADD("earom")
 
 	/* sound hardware */
-	MCFG_FRAGMENT_ADD(astdelux_sound)
+	astdelux_sound(config);
 
 	MCFG_SOUND_ADD("pokey", POKEY, MASTER_CLOCK/8)
 	MCFG_POKEY_ALLPOT_R_CB(IOPORT("DSW2"))
@@ -713,7 +716,8 @@ MACHINE_CONFIG_DERIVED(asteroid_state::astdelux, asteroid_base)
 MACHINE_CONFIG_END
 
 
-MACHINE_CONFIG_DERIVED(asteroid_state::llander, asteroid_base)
+MACHINE_CONFIG_START(asteroid_state::llander)
+	asteroid_base(config);
 
 	/* basic machine hardware */
 	MCFG_CPU_MODIFY("maincpu")
@@ -726,7 +730,7 @@ MACHINE_CONFIG_DERIVED(asteroid_state::llander, asteroid_base)
 	MCFG_SCREEN_UPDATE_DEVICE("vector", vector_device, screen_update)
 
 	/* sound hardware */
-	MCFG_FRAGMENT_ADD(llander_sound)
+	llander_sound(config);
 MACHINE_CONFIG_END
 
 

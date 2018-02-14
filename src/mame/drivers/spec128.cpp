@@ -288,7 +288,8 @@ static GFXDECODE_START( spec128 )
 GFXDECODE_END
 
 
-MACHINE_CONFIG_DERIVED(spectrum_state::spectrum_128, spectrum)
+MACHINE_CONFIG_START(spectrum_state::spectrum_128)
+	spectrum(config);
 
 	MCFG_DEVICE_REMOVE("maincpu")
 

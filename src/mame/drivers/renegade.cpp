@@ -505,7 +505,8 @@ MACHINE_CONFIG_START(renegade_state::renegade)
 MACHINE_CONFIG_END
 
 
-MACHINE_CONFIG_DERIVED(renegade_state::kuniokunb, renegade)
+MACHINE_CONFIG_START(renegade_state::kuniokunb)
+	renegade(config);
 	MCFG_CPU_MODIFY("maincpu")
 	MCFG_CPU_PROGRAM_MAP(renegade_nomcu_map)
 

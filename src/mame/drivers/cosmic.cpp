@@ -1028,7 +1028,8 @@ TIMER_DEVICE_CALLBACK_MEMBER(cosmic_state::panic_scanline)
 }
 
 
-MACHINE_CONFIG_DERIVED(cosmic_state::panic, cosmic)
+MACHINE_CONFIG_START(cosmic_state::panic)
+	cosmic(config);
 
 	/* basic machine hardware */
 	MCFG_CPU_MODIFY("maincpu")
@@ -1058,7 +1059,8 @@ MACHINE_CONFIG_DERIVED(cosmic_state::panic, cosmic)
 MACHINE_CONFIG_END
 
 
-MACHINE_CONFIG_DERIVED(cosmic_state::cosmica, cosmic)
+MACHINE_CONFIG_START(cosmic_state::cosmica)
+	cosmic(config);
 
 	/* basic machine hardware */
 	MCFG_CPU_MODIFY("maincpu")
@@ -1120,7 +1122,8 @@ MACHINE_CONFIG_START(cosmic_state::cosmicg)
 MACHINE_CONFIG_END
 
 
-MACHINE_CONFIG_DERIVED(cosmic_state::magspot, cosmic)
+MACHINE_CONFIG_START(cosmic_state::magspot)
+	cosmic(config);
 
 	/* basic machine hardware */
 	MCFG_CPU_REPLACE("maincpu", Z80, Z80_MASTER_CLOCK/4) /* 2.704 MHz, verified via schematics */
@@ -1144,7 +1147,8 @@ MACHINE_CONFIG_DERIVED(cosmic_state::magspot, cosmic)
 MACHINE_CONFIG_END
 
 
-MACHINE_CONFIG_DERIVED(cosmic_state::devzone, magspot)
+MACHINE_CONFIG_START(cosmic_state::devzone)
+	magspot(config);
 
 	/* basic machine hardware */
 
@@ -1154,7 +1158,8 @@ MACHINE_CONFIG_DERIVED(cosmic_state::devzone, magspot)
 MACHINE_CONFIG_END
 
 
-MACHINE_CONFIG_DERIVED(cosmic_state::nomnlnd, cosmic)
+MACHINE_CONFIG_START(cosmic_state::nomnlnd)
+	cosmic(config);
 
 	/* basic machine hardware */
 	MCFG_CPU_MODIFY("maincpu")

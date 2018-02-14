@@ -1630,7 +1630,8 @@ MACHINE_CONFIG_START(dec0_state::dec0_base)
 	MCFG_GENERIC_LATCH_DATA_PENDING_CB(INPUTLINE("audiocpu", INPUT_LINE_NMI))
 MACHINE_CONFIG_END
 
-MACHINE_CONFIG_DERIVED(dec0_state::dec0, dec0_base)
+MACHINE_CONFIG_START(dec0_state::dec0)
+	dec0_base(config);
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", M68000, XTAL(20'000'000) / 2)
@@ -1664,7 +1665,8 @@ MACHINE_CONFIG_DERIVED(dec0_state::dec0, dec0_base)
 MACHINE_CONFIG_END
 
 
-MACHINE_CONFIG_DERIVED(dec0_state::dec1, dec0_base)
+MACHINE_CONFIG_START(dec0_state::dec1)
+	dec0_base(config);
 	/* basic machine hardware */
 	/* maincpu and audiocpu clocks and address maps differ per game */
 
@@ -1867,7 +1869,8 @@ MACHINE_CONFIG_START(dec0_automat_state::secretab)
 MACHINE_CONFIG_END
 
 
-MACHINE_CONFIG_DERIVED(dec0_state::hbarrel, dec0)
+MACHINE_CONFIG_START(dec0_state::hbarrel)
+	dec0(config);
 
 	MCFG_CPU_ADD("mcu", I8751, XTAL(8'000'000))
 	MCFG_CPU_IO_MAP(mcu_io_map)
@@ -1877,7 +1880,8 @@ MACHINE_CONFIG_DERIVED(dec0_state::hbarrel, dec0)
 	MCFG_SCREEN_UPDATE_DRIVER(dec0_state, screen_update_hbarrel)
 MACHINE_CONFIG_END
 
-MACHINE_CONFIG_DERIVED(dec0_state::baddudes, dec0)
+MACHINE_CONFIG_START(dec0_state::baddudes)
+	dec0(config);
 
 	MCFG_CPU_ADD("mcu", I8751, XTAL(8'000'000))
 	MCFG_CPU_IO_MAP(mcu_io_map)
@@ -1887,21 +1891,24 @@ MACHINE_CONFIG_DERIVED(dec0_state::baddudes, dec0)
 	MCFG_SCREEN_UPDATE_DRIVER(dec0_state, screen_update_baddudes)
 MACHINE_CONFIG_END
 
-MACHINE_CONFIG_DERIVED(dec0_state::drgninjab, dec0)
+MACHINE_CONFIG_START(dec0_state::drgninjab)
+	dec0(config);
 
 	/* video hardware */
 	MCFG_SCREEN_MODIFY("screen")
 	MCFG_SCREEN_UPDATE_DRIVER(dec0_state, screen_update_baddudes)
 MACHINE_CONFIG_END
 
-MACHINE_CONFIG_DERIVED(dec0_state::birdtry, dec0)
+MACHINE_CONFIG_START(dec0_state::birdtry)
+	dec0(config);
 
 	/* video hardware */
 	MCFG_SCREEN_MODIFY("screen")
 	MCFG_SCREEN_UPDATE_DRIVER(dec0_state, screen_update_birdtry)
 MACHINE_CONFIG_END
 
-MACHINE_CONFIG_DERIVED(dec0_state::robocop, dec0)
+MACHINE_CONFIG_START(dec0_state::robocop)
+	dec0(config);
 
 	MCFG_CPU_ADD("sub", H6280, XTAL(21'477'272) / 16)
 	MCFG_CPU_PROGRAM_MAP(robocop_sub_map)
@@ -1913,14 +1920,16 @@ MACHINE_CONFIG_DERIVED(dec0_state::robocop, dec0)
 	MCFG_SCREEN_UPDATE_DRIVER(dec0_state, screen_update_robocop)
 MACHINE_CONFIG_END
 
-MACHINE_CONFIG_DERIVED(dec0_state::robocopb, dec0)
+MACHINE_CONFIG_START(dec0_state::robocopb)
+	dec0(config);
 
 	/* video hardware */
 	MCFG_SCREEN_MODIFY("screen")
 	MCFG_SCREEN_UPDATE_DRIVER(dec0_state, screen_update_robocop)
 MACHINE_CONFIG_END
 
-MACHINE_CONFIG_DERIVED(dec0_state::hippodrm, dec0)
+MACHINE_CONFIG_START(dec0_state::hippodrm)
+	dec0(config);
 
 	MCFG_CPU_ADD("sub", H6280, XTAL(21'477'272) / 16)
 	MCFG_CPU_PROGRAM_MAP(hippodrm_sub_map)
@@ -1932,7 +1941,8 @@ MACHINE_CONFIG_DERIVED(dec0_state::hippodrm, dec0)
 	MCFG_SCREEN_UPDATE_DRIVER(dec0_state, screen_update_hippodrm)
 MACHINE_CONFIG_END
 
-MACHINE_CONFIG_DERIVED(dec0_state::ffantasybl, dec0)
+MACHINE_CONFIG_START(dec0_state::ffantasybl)
+	dec0(config);
 
 //  MCFG_CPU_ADD("sub", H6280, XTAL(21'477'272) / 16)
 //  MCFG_CPU_PROGRAM_MAP(hippodrm_sub_map)
@@ -1953,7 +1963,8 @@ MACHINE_RESET_MEMBER(dec0_state,slyspy)
 	m_sndprotect->set_bank(m_slyspy_sound_state);
 }
 
-MACHINE_CONFIG_DERIVED(dec0_state::slyspy, dec1)
+MACHINE_CONFIG_START(dec0_state::slyspy)
+	dec1(config);
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", M68000, XTAL(20'000'000)/2) /* verified on pcb (20MHZ OSC) 68000P12 running at 10Mhz */
@@ -1986,7 +1997,8 @@ MACHINE_CONFIG_DERIVED(dec0_state::slyspy, dec1)
 	MCFG_MACHINE_RESET_OVERRIDE(dec0_state,slyspy)
 MACHINE_CONFIG_END
 
-MACHINE_CONFIG_DERIVED(dec0_state::midres, dec1)
+MACHINE_CONFIG_START(dec0_state::midres)
+	dec1(config);
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", M68000, XTAL(20'000'000)/2) /* verified on pcb (20MHZ OSC) 68000P12 running at 10Mhz */
@@ -2003,7 +2015,8 @@ MACHINE_CONFIG_DERIVED(dec0_state::midres, dec1)
 	MCFG_GFXDECODE_MODIFY("gfxdecode", midres)
 MACHINE_CONFIG_END
 
-MACHINE_CONFIG_DERIVED(dec0_state::midresb, midres)
+MACHINE_CONFIG_START(dec0_state::midresb)
+	midres(config);
 	MCFG_CPU_MODIFY("maincpu")
 	MCFG_CPU_PROGRAM_MAP(midresb_map)
 
@@ -2029,7 +2042,8 @@ MACHINE_CONFIG_DERIVED(dec0_state::midresb, midres)
 
 MACHINE_CONFIG_END
 
-MACHINE_CONFIG_DERIVED(dec0_state::midresbj, midresb)
+MACHINE_CONFIG_START(dec0_state::midresbj)
+	midresb(config);
 	MCFG_DEVICE_REMOVE("mcu")
 MACHINE_CONFIG_END
 

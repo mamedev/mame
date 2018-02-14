@@ -964,7 +964,8 @@ MACHINE_CONFIG_START(pasopia7_state::p7_base)
 	MCFG_FLOPPY_DRIVE_ADD("fdc:1", pasopia7_floppies, "525hd", floppy_image_device::default_floppy_formats)
 MACHINE_CONFIG_END
 
-MACHINE_CONFIG_DERIVED(pasopia7_state::p7_raster, p7_base)
+MACHINE_CONFIG_START(pasopia7_state::p7_raster)
+	p7_base(config);
 	MCFG_SCREEN_ADD("screen", RASTER)
 	MCFG_SCREEN_REFRESH_RATE(60)
 	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500)) /* not accurate */
@@ -983,7 +984,8 @@ MACHINE_CONFIG_DERIVED(pasopia7_state::p7_raster, p7_base)
 MACHINE_CONFIG_END
 
 
-MACHINE_CONFIG_DERIVED(pasopia7_state::p7_lcd, p7_base)
+MACHINE_CONFIG_START(pasopia7_state::p7_lcd)
+	p7_base(config);
 	MCFG_SCREEN_ADD("screen", LCD)
 	MCFG_SCREEN_REFRESH_RATE(60)
 	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500)) /* not accurate */

@@ -21,8 +21,6 @@ class m58846_device : public melps4_cpu_device
 public:
 	m58846_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
-	void data_128x4(address_map &map);
-	void program_2kx9(address_map &map);
 protected:
 	// device-level overrides
 	virtual void device_start() override;
@@ -34,6 +32,9 @@ protected:
 	// timers
 	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr) override;
 	virtual void write_v(uint8_t data) override;
+
+	void data_128x4(address_map &map);
+	void program_2kx9(address_map &map);
 
 	emu_timer *m_timer;
 	void reset_timer();

@@ -22,12 +22,12 @@ DEFINE_DEVICE_TYPE(KB1013VK12, kb1013vk12_device, "kb1013vk1_2", "KB1013VK1-2") 
 
 
 // internal memory maps
-ADDRESS_MAP_START(sm510_base_device::program_1_8k)
+ADDRESS_MAP_START(sm5a_device::program_1_8k)
 	AM_RANGE(0x000, 0x6ff) AM_ROM
 	AM_RANGE(0x700, 0x73f) AM_ROM AM_MIRROR(0x0c0)
 ADDRESS_MAP_END
 
-ADDRESS_MAP_START(sm510_base_device::data_5x13x4)
+ADDRESS_MAP_START(sm5a_device::data_5x13x4)
 	AM_RANGE(0x00, 0x0b) AM_RAM
 	AM_RANGE(0x0c, 0x0c) AM_RAM AM_MIRROR(0x03)
 	AM_RANGE(0x10, 0x1b) AM_RAM

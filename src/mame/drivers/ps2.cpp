@@ -91,7 +91,7 @@ MACHINE_CONFIG_START(ps2_state::ps2m30286)
 
 	MCFG_DEVICE_ADD("mb", AT_MB, 0)
 	MCFG_QUANTUM_TIME(attotime::from_hz(60))
-	MCFG_FRAGMENT_ADD( at_softlists )
+	at_softlists(config);
 
 	MCFG_ISA16_SLOT_ADD("mb:isabus","isa1", pc_isa16_cards, "vga", true)
 	MCFG_ISA16_SLOT_ADD("mb:isabus","isa2", pc_isa16_cards, "fdc", false)
@@ -113,7 +113,7 @@ MACHINE_CONFIG_START(ps2_state::ps2386)
 
 	MCFG_DEVICE_ADD("mb", AT_MB, 0)
 	MCFG_QUANTUM_TIME(attotime::from_hz(60))
-	MCFG_FRAGMENT_ADD( at_softlists )
+	at_softlists(config);
 
 	// on board devices
 	MCFG_ISA16_SLOT_ADD("mb:isabus","board1", pc_isa16_cards, "fdcsmc", true)

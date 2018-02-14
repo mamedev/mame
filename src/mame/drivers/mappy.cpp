@@ -1364,7 +1364,7 @@ MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(mappy_state::superpac)
 
-	MCFG_FRAGMENT_ADD(superpac_common)
+	superpac_common(config);
 
 	MCFG_DEVICE_ADD("namcoio_1", NAMCO_56XX, 0)
 	MCFG_NAMCO56XX_IN_0_CB(IOPORT("COINS"))
@@ -1382,7 +1382,7 @@ MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(mappy_state::pacnpal)
 
-	MCFG_FRAGMENT_ADD(superpac_common)
+	superpac_common(config);
 
 	MCFG_DEVICE_ADD("namcoio_1", NAMCO_56XX, 0)
 	MCFG_NAMCO56XX_IN_0_CB(IOPORT("COINS"))
@@ -1402,7 +1402,7 @@ MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(mappy_state::grobda)
 
-	MCFG_FRAGMENT_ADD(superpac_common)
+	superpac_common(config);
 
 	MCFG_DEVICE_ADD("namcoio_1", NAMCO_58XX, 0)
 	MCFG_NAMCO58XX_IN_0_CB(IOPORT("COINS"))
@@ -1544,7 +1544,7 @@ MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(mappy_state::mappy)
 
-	MCFG_FRAGMENT_ADD(mappy_common)
+	mappy_common(config);
 
 	MCFG_DEVICE_ADD("namcoio_1", NAMCO_58XX, 0)
 	MCFG_NAMCO58XX_IN_0_CB(IOPORT("COINS"))
@@ -1562,7 +1562,7 @@ MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(mappy_state::digdug2)
 
-	MCFG_FRAGMENT_ADD(mappy_common)
+	mappy_common(config);
 
 	MCFG_WATCHDOG_MODIFY("watchdog")
 	MCFG_WATCHDOG_VBLANK_INIT("screen", 0)
@@ -1581,7 +1581,8 @@ MACHINE_CONFIG_START(mappy_state::digdug2)
 	MCFG_NAMCO56XX_OUT_0_CB(DEVWRITELINE("dipmux", ls157_device, select_w)) MCFG_DEVCB_BIT(0)
 MACHINE_CONFIG_END
 
-MACHINE_CONFIG_DERIVED(mappy_state::todruaga, digdug2)
+MACHINE_CONFIG_START(mappy_state::todruaga)
+	digdug2(config);
 
 	/* video hardware */
 	MCFG_GFXDECODE_MODIFY("gfxdecode", todruaga)
@@ -1591,7 +1592,7 @@ MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(mappy_state::motos)
 
-	MCFG_FRAGMENT_ADD(mappy_common)
+	mappy_common(config);
 
 	MCFG_DEVICE_ADD("namcoio_1", NAMCO_56XX, 0)
 	MCFG_NAMCO56XX_IN_0_CB(IOPORT("COINS"))

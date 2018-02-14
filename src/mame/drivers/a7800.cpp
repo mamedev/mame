@@ -1392,7 +1392,8 @@ MACHINE_CONFIG_START(a7800_state::a7800_ntsc)
 MACHINE_CONFIG_END
 
 
-MACHINE_CONFIG_DERIVED(a7800_state::a7800_pal, a7800_ntsc)
+MACHINE_CONFIG_START(a7800_state::a7800_pal)
+	a7800_ntsc(config);
 	/* basic machine hardware */
 	MCFG_CPU_MODIFY("maincpu")
 	MCFG_CPU_CLOCK(CLK_PAL)

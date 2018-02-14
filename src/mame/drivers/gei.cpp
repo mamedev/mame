@@ -998,7 +998,8 @@ MACHINE_CONFIG_START(gei_state::getrivia)
 	MCFG_SOUND_ROUTE_EX(0, "dac", 1.0, DAC_VREF_POS_INPUT)
 MACHINE_CONFIG_END
 
-MACHINE_CONFIG_DERIVED(gei_state::findout, getrivia)
+MACHINE_CONFIG_START(gei_state::findout)
+	getrivia(config);
 
 	MCFG_CPU_MODIFY("maincpu")
 	MCFG_CPU_PROGRAM_MAP(findout_map)
@@ -1010,7 +1011,8 @@ MACHINE_CONFIG_DERIVED(gei_state::findout, getrivia)
 	MCFG_I8255_IN_PORTC_CB(READ8(gei_state, portC_r))
 MACHINE_CONFIG_END
 
-MACHINE_CONFIG_DERIVED(gei_state::quizvid, findout)
+MACHINE_CONFIG_START(gei_state::quizvid)
+	findout(config);
 
 	MCFG_CPU_MODIFY("maincpu")
 	MCFG_CPU_PROGRAM_MAP(quizvid_map)
@@ -1019,7 +1021,8 @@ MACHINE_CONFIG_DERIVED(gei_state::quizvid, findout)
 	MCFG_PALETTE_ADD_3BIT_GRB("palette")
 MACHINE_CONFIG_END
 
-MACHINE_CONFIG_DERIVED(gei_state::gselect, getrivia)
+MACHINE_CONFIG_START(gei_state::gselect)
+	getrivia(config);
 
 	/* basic machine hardware */
 
@@ -1043,7 +1046,8 @@ MACHINE_CONFIG_DERIVED(gei_state::gselect, getrivia)
 	MCFG_I8255_OUT_PORTC_CB(WRITE8(gei_state, nmi_w))
 MACHINE_CONFIG_END
 
-MACHINE_CONFIG_DERIVED(gei_state::jokpokera, getrivia)
+MACHINE_CONFIG_START(gei_state::jokpokera)
+	getrivia(config);
 
 	/* basic machine hardware */
 
@@ -1053,7 +1057,8 @@ MACHINE_CONFIG_DERIVED(gei_state::jokpokera, getrivia)
 	MCFG_CPU_PROGRAM_MAP(gselect_map)
 MACHINE_CONFIG_END
 
-MACHINE_CONFIG_DERIVED(gei_state::amuse, getrivia)
+MACHINE_CONFIG_START(gei_state::amuse)
+	getrivia(config);
 
 	/* basic machine hardware */
 
@@ -1061,7 +1066,8 @@ MACHINE_CONFIG_DERIVED(gei_state::amuse, getrivia)
 	MCFG_CPU_PROGRAM_MAP(amuse_map)
 MACHINE_CONFIG_END
 
-MACHINE_CONFIG_DERIVED(gei_state::gepoker, getrivia)
+MACHINE_CONFIG_START(gei_state::gepoker)
+	getrivia(config);
 
 	/* basic machine hardware */
 
@@ -1069,19 +1075,22 @@ MACHINE_CONFIG_DERIVED(gei_state::gepoker, getrivia)
 	MCFG_CPU_PROGRAM_MAP(gepoker_map)
 MACHINE_CONFIG_END
 
-MACHINE_CONFIG_DERIVED(gei_state::amuse1, getrivia)
+MACHINE_CONFIG_START(gei_state::amuse1)
+	getrivia(config);
 
 	MCFG_CPU_MODIFY("maincpu")
 	MCFG_CPU_PROGRAM_MAP(amuse1_map)
 MACHINE_CONFIG_END
 
-MACHINE_CONFIG_DERIVED(gei_state::suprpokr, getrivia)
+MACHINE_CONFIG_START(gei_state::suprpokr)
+	getrivia(config);
 
 	MCFG_CPU_MODIFY("maincpu")
 	MCFG_CPU_PROGRAM_MAP(suprpokr_map)
 MACHINE_CONFIG_END
 
-MACHINE_CONFIG_DERIVED(gei_state::sprtauth, getrivia)
+MACHINE_CONFIG_START(gei_state::sprtauth)
+	getrivia(config);
 
 	MCFG_CPU_MODIFY("maincpu")
 	MCFG_CPU_PROGRAM_MAP(sprtauth_map)

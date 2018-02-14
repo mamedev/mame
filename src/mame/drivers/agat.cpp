@@ -59,6 +59,7 @@
 
 #include "bus/a2bus/a2diskii.h"
 #include "bus/a2bus/agat7langcard.h"
+#include "bus/a2bus/agat7ports.h"
 #include "bus/a2bus/agat7ram.h"
 #include "bus/a2bus/agat840k_hle.h"
 
@@ -1060,7 +1061,7 @@ static SLOT_INTERFACE_START(agat7_cards)
 	SLOT_INTERFACE("a7ram", A2BUS_AGAT7RAM) // Agat-7 32K RAM Card -- decimal 3.089.119-01, KR565RU6D chips
 	SLOT_INTERFACE("a7fdc", A2BUS_AGAT7_FDC) // Disk II clone -- decimal 3.089.105
 	SLOT_INTERFACE("a7fdc840", A2BUS_AGAT840K_HLE) // 840K floppy controller -- decimal 7.104.351 or 3.089.023?
-	// Serial-parallel card -- decimal 3.089.106
+	SLOT_INTERFACE("a7ports", A2BUS_AGAT7_PORTS) // Serial-parallel card -- decimal 3.089.106
 	// Printer card (agat9) -- decimal 3.089.174
 
 	// 3rd party cards
@@ -1128,7 +1129,7 @@ MACHINE_CONFIG_START(agat7_state::agat7)
 	MCFG_A2BUS_OUT_INH_CB(WRITELINE(agat7_state, a2bus_inh_w))
 	MCFG_A2BUS_SLOT_ADD(A7_BUS_TAG, "sl2", agat7_cards, "a7lang")
 	MCFG_A2BUS_SLOT_ADD(A7_BUS_TAG, "sl3", agat7_cards, "a7fdc")
-	MCFG_A2BUS_SLOT_ADD(A7_BUS_TAG, "sl4", agat7_cards, nullptr)
+	MCFG_A2BUS_SLOT_ADD(A7_BUS_TAG, "sl4", agat7_cards, "a7ports")
 	MCFG_A2BUS_SLOT_ADD(A7_BUS_TAG, "sl5", agat7_cards, nullptr)
 	MCFG_A2BUS_SLOT_ADD(A7_BUS_TAG, "sl6", agat7_cards, "a7ram")
 

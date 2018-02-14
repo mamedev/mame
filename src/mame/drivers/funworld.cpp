@@ -3101,7 +3101,8 @@ MACHINE_CONFIG_START(funworld_state::fw1stpal)
 MACHINE_CONFIG_END
 
 
-MACHINE_CONFIG_DERIVED(funworld_state::fw2ndpal, fw1stpal)
+MACHINE_CONFIG_START(funworld_state::fw2ndpal)
+	fw1stpal(config);
 	MCFG_CPU_REPLACE("maincpu", R65C02, CPU_CLOCK) /* 2MHz */
 	MCFG_CPU_PROGRAM_MAP(funworld_map)
 	MCFG_CPU_VBLANK_INT_DRIVER("screen", funworld_state, nmi_line_pulse)
@@ -3110,8 +3111,9 @@ MACHINE_CONFIG_END
 
 
 
-MACHINE_CONFIG_DERIVED(funworld_state::funquiz, fw1stpal)
-//  MCFG_FRAGMENT_ADD(fw2ndpal)
+MACHINE_CONFIG_START(funworld_state::funquiz)
+	fw1stpal(config);
+//  fw2ndpal(config);
 	MCFG_CPU_REPLACE("maincpu", R65C02, CPU_CLOCK) /* 2MHz */
 	MCFG_CPU_PROGRAM_MAP(funquiz_map)
 	MCFG_CPU_VBLANK_INT_DRIVER("screen", funworld_state, nmi_line_pulse)
@@ -3124,7 +3126,8 @@ MACHINE_CONFIG_DERIVED(funworld_state::funquiz, fw1stpal)
 MACHINE_CONFIG_END
 
 
-MACHINE_CONFIG_DERIVED(funworld_state::magicrd2, fw1stpal)
+MACHINE_CONFIG_START(funworld_state::magicrd2)
+	fw1stpal(config);
 	MCFG_CPU_REPLACE("maincpu", R65C02, CPU_CLOCK) /* 2MHz */
 	MCFG_CPU_PROGRAM_MAP(magicrd2_map)
 	MCFG_CPU_VBLANK_INT_DRIVER("screen", funworld_state, nmi_line_pulse)
@@ -3143,42 +3146,48 @@ MACHINE_CONFIG_DERIVED(funworld_state::magicrd2, fw1stpal)
 MACHINE_CONFIG_END
 
 
-MACHINE_CONFIG_DERIVED(funworld_state::royalcd1, fw1stpal)
+MACHINE_CONFIG_START(funworld_state::royalcd1)
+	fw1stpal(config);
 	MCFG_CPU_REPLACE("maincpu", R65C02, CPU_CLOCK) /* (G65SC02P in pro version) 2MHz */
 	MCFG_CPU_PROGRAM_MAP(magicrd2_map)
 	MCFG_CPU_VBLANK_INT_DRIVER("screen", funworld_state, nmi_line_pulse)
 MACHINE_CONFIG_END
 
 
-MACHINE_CONFIG_DERIVED(funworld_state::royalcd2, fw2ndpal)
+MACHINE_CONFIG_START(funworld_state::royalcd2)
+	fw2ndpal(config);
 	MCFG_CPU_REPLACE("maincpu", R65C02, CPU_CLOCK) /* 2MHz */
 	MCFG_CPU_PROGRAM_MAP(magicrd2_map)
 	MCFG_CPU_VBLANK_INT_DRIVER("screen", funworld_state, nmi_line_pulse)
 MACHINE_CONFIG_END
 
 
-MACHINE_CONFIG_DERIVED(funworld_state::cuoreuno, fw1stpal)
+MACHINE_CONFIG_START(funworld_state::cuoreuno)
+	fw1stpal(config);
 	MCFG_CPU_REPLACE("maincpu", R65C02, CPU_CLOCK) /* 2MHz */
 	MCFG_CPU_PROGRAM_MAP(cuoreuno_map)
 	MCFG_CPU_VBLANK_INT_DRIVER("screen", funworld_state, nmi_line_pulse)
 MACHINE_CONFIG_END
 
 
-MACHINE_CONFIG_DERIVED(funworld_state::saloon, fw1stpal)
+MACHINE_CONFIG_START(funworld_state::saloon)
+	fw1stpal(config);
 	MCFG_CPU_REPLACE("maincpu", R65C02, CPU_CLOCK) /* 2MHz */
 	MCFG_CPU_PROGRAM_MAP(saloon_map)
 	MCFG_CPU_VBLANK_INT_DRIVER("screen", funworld_state, nmi_line_pulse)
 MACHINE_CONFIG_END
 
 
-MACHINE_CONFIG_DERIVED(funworld_state::witchryl, fw1stpal)
+MACHINE_CONFIG_START(funworld_state::witchryl)
+	fw1stpal(config);
 	MCFG_CPU_REPLACE("maincpu", R65C02, CPU_CLOCK) /* 2MHz */
 	MCFG_CPU_PROGRAM_MAP(witchryl_map)
 	MCFG_CPU_VBLANK_INT_DRIVER("screen", funworld_state, nmi_line_pulse)
 MACHINE_CONFIG_END
 
 
-MACHINE_CONFIG_DERIVED(funworld_state::lunapark, fw1stpal)
+MACHINE_CONFIG_START(funworld_state::lunapark)
+	fw1stpal(config);
 	MCFG_CPU_REPLACE("maincpu", R65C02, CPU_CLOCK) /* 2MHz */
 	MCFG_CPU_PROGRAM_MAP(lunapark_map)  // mirrored video RAM (4000/5000 to 6000/7000).
 	MCFG_CPU_VBLANK_INT_DRIVER("screen", funworld_state, nmi_line_pulse)
@@ -3187,14 +3196,16 @@ MACHINE_CONFIG_DERIVED(funworld_state::lunapark, fw1stpal)
 MACHINE_CONFIG_END
 
 
-MACHINE_CONFIG_DERIVED(funworld_state::chinatow, fw2ndpal)
+MACHINE_CONFIG_START(funworld_state::chinatow)
+	fw2ndpal(config);
 	MCFG_CPU_REPLACE("maincpu", R65C02, CPU_CLOCK) /* 2MHz */
 	MCFG_CPU_PROGRAM_MAP(chinatow_map)
 	MCFG_CPU_VBLANK_INT_DRIVER("screen", funworld_state, nmi_line_pulse)
 	MCFG_VIDEO_START_OVERRIDE(funworld_state, chinatow)
 MACHINE_CONFIG_END
 
-MACHINE_CONFIG_DERIVED(funworld_state::rcdino4, fw1stpal)
+MACHINE_CONFIG_START(funworld_state::rcdino4)
+	fw1stpal(config);
 	MCFG_CPU_REPLACE("maincpu", R65C02, CPU_CLOCK) /* 2MHz */
 	MCFG_CPU_PROGRAM_MAP(chinatow_map)
 	MCFG_CPU_VBLANK_INT_DRIVER("screen", funworld_state, nmi_line_pulse)
@@ -3202,7 +3213,8 @@ MACHINE_CONFIG_DERIVED(funworld_state::rcdino4, fw1stpal)
 MACHINE_CONFIG_END
 
 
-MACHINE_CONFIG_DERIVED(funworld_state::intrgmes, fw1stpal)
+MACHINE_CONFIG_START(funworld_state::intrgmes)
+	fw1stpal(config);
 	MCFG_CPU_REPLACE("maincpu", R65C02, CPU_CLOCK) /* 2MHz */
 	MCFG_CPU_PROGRAM_MAP(intergames_map)
 	MCFG_CPU_VBLANK_INT_DRIVER("screen", funworld_state, nmi_line_pulse)
@@ -3210,7 +3222,8 @@ MACHINE_CONFIG_DERIVED(funworld_state::intrgmes, fw1stpal)
 MACHINE_CONFIG_END
 
 
-MACHINE_CONFIG_DERIVED(funworld_state::fw_a7_11, fw1stpal)
+MACHINE_CONFIG_START(funworld_state::fw_a7_11)
+	fw1stpal(config);
 	MCFG_CPU_REPLACE("maincpu", R65C02, CPU_CLOCK) /* 2MHz */
 	MCFG_CPU_PROGRAM_MAP(fw_a7_11_map)
 	MCFG_CPU_VBLANK_INT_DRIVER("screen", funworld_state, nmi_line_pulse)

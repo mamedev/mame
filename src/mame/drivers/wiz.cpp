@@ -823,7 +823,8 @@ MACHINE_CONFIG_START(wiz_state::kungfut)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.10)
 MACHINE_CONFIG_END
 
-MACHINE_CONFIG_DERIVED(wiz_state::wiz, kungfut)
+MACHINE_CONFIG_START(wiz_state::wiz)
+	kungfut(config);
 
 	/* basic machine hardware */
 	MCFG_CPU_MODIFY("maincpu")
@@ -836,7 +837,8 @@ MACHINE_CONFIG_DERIVED(wiz_state::wiz, kungfut)
 MACHINE_CONFIG_END
 
 
-MACHINE_CONFIG_DERIVED(wiz_state::stinger, kungfut)
+MACHINE_CONFIG_START(wiz_state::stinger)
+	kungfut(config);
 
 	/* basic machine hardware */
 	MCFG_CPU_MODIFY("maincpu")
@@ -861,7 +863,8 @@ MACHINE_CONFIG_DERIVED(wiz_state::stinger, kungfut)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.5)
 MACHINE_CONFIG_END
 
-MACHINE_CONFIG_DERIVED(wiz_state::scion, stinger)
+MACHINE_CONFIG_START(wiz_state::scion)
+	stinger(config);
 
 	MCFG_CPU_MODIFY("maincpu")
 	MCFG_DEVICE_REMOVE_ADDRESS_MAP(AS_OPCODES)

@@ -1017,7 +1017,8 @@ MACHINE_CONFIG_START(gticlub_state::gticlub)
 	MCFG_KONPPC_CGBOARD_TYPE(GTICLUB)
 MACHINE_CONFIG_END
 
-MACHINE_CONFIG_DERIVED(gticlub_state::thunderh, gticlub)
+MACHINE_CONFIG_START(gticlub_state::thunderh)
+	gticlub(config);
 
 	MCFG_DEVICE_REMOVE("adc1038")
 	MCFG_DEVICE_ADD("adc1038", ADC1038, 0)
@@ -1029,7 +1030,8 @@ MACHINE_CONFIG_DERIVED(gticlub_state::thunderh, gticlub)
 	MCFG_K056230_HACK(1)
 MACHINE_CONFIG_END
 
-MACHINE_CONFIG_DERIVED(gticlub_state::slrasslt, gticlub)
+MACHINE_CONFIG_START(gticlub_state::slrasslt)
+	gticlub(config);
 
 	MCFG_DEVICE_REMOVE("adc1038")
 	MCFG_DEVICE_ADD("adc1038", ADC1038, 0)

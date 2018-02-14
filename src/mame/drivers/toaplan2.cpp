@@ -4053,7 +4053,8 @@ MACHINE_CONFIG_START(toaplan2_state::bgaregga)
 MACHINE_CONFIG_END
 
 
-MACHINE_CONFIG_DERIVED(toaplan2_state::bgareggabl, bgaregga)
+MACHINE_CONFIG_START(toaplan2_state::bgareggabl)
+	bgaregga(config);
 	MCFG_VIDEO_START_OVERRIDE(toaplan2_state,bgareggabl)
 
 	MCFG_SCREEN_MODIFY("screen")

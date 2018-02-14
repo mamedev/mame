@@ -537,7 +537,7 @@ MACHINE_CONFIG_START(a2600_state::a2600)
 	MCFG_VCS_CONTROL_PORT_ADD(CONTROL1_TAG, vcs_control_port_devices, "joy")
 	MCFG_VCS_CONTROL_PORT_ADD(CONTROL2_TAG, vcs_control_port_devices, nullptr)
 
-	MCFG_FRAGMENT_ADD(a2600_cartslot)
+	a2600_cartslot(config);
 	MCFG_SOFTWARE_LIST_FILTER("cart_list", "NTSC")
 MACHINE_CONFIG_END
 
@@ -587,7 +587,7 @@ MACHINE_CONFIG_START(a2600_state::a2600p)
 	MCFG_VCS_CONTROL_PORT_ADD(CONTROL1_TAG, vcs_control_port_devices, "joy")
 	MCFG_VCS_CONTROL_PORT_ADD(CONTROL2_TAG, vcs_control_port_devices, nullptr)
 
-	MCFG_FRAGMENT_ADD(a2600_cartslot)
+	a2600_cartslot(config);
 	MCFG_SOFTWARE_LIST_FILTER("cart_list", "PAL")
 MACHINE_CONFIG_END
 

@@ -183,7 +183,8 @@ static GFXDECODE_START( atmtb2 )
 GFXDECODE_END
 
 
-MACHINE_CONFIG_DERIVED(atm_state::atm, spectrum_128)
+MACHINE_CONFIG_START(atm_state::atm)
+	spectrum_128(config);
 	MCFG_CPU_MODIFY("maincpu")
 	MCFG_CPU_PROGRAM_MAP(atm_mem)
 	MCFG_CPU_IO_MAP(atm_io)
@@ -197,7 +198,8 @@ MACHINE_CONFIG_DERIVED(atm_state::atm, spectrum_128)
 	MCFG_DEVICE_REMOVE("exp")
 MACHINE_CONFIG_END
 
-MACHINE_CONFIG_DERIVED(atm_state::atmtb2, atm)
+MACHINE_CONFIG_START(atm_state::atmtb2)
+	atm(config);
 	MCFG_GFXDECODE_MODIFY("gfxdecode", atmtb2)
 MACHINE_CONFIG_END
 

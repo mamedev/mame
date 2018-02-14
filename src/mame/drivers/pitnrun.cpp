@@ -327,7 +327,8 @@ MACHINE_CONFIG_START(pitnrun_state::pitnrun)
 	MCFG_DEVICE_ADD("noiselatch", LS259, 0) // 1J
 MACHINE_CONFIG_END
 
-MACHINE_CONFIG_DERIVED(pitnrun_state::pitnrun_mcu, pitnrun)
+MACHINE_CONFIG_START(pitnrun_state::pitnrun_mcu)
+	pitnrun(config);
 	MCFG_CPU_MODIFY("maincpu")
 	MCFG_CPU_PROGRAM_MAP(pitnrun_map_mcu)
 

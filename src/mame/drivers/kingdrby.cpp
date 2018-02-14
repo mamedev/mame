@@ -994,7 +994,8 @@ MACHINE_CONFIG_START(kingdrby_state::kingdrby)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
 MACHINE_CONFIG_END
 
-MACHINE_CONFIG_DERIVED(kingdrby_state::kingdrbb, kingdrby)
+MACHINE_CONFIG_START(kingdrby_state::kingdrbb)
+	kingdrby(config);
 
 	MCFG_CPU_MODIFY("slave")
 	MCFG_CPU_PROGRAM_MAP(slave_1986_map)
@@ -1017,7 +1018,8 @@ MACHINE_CONFIG_DERIVED(kingdrby_state::kingdrbb, kingdrby)
 	/* actually unused */
 MACHINE_CONFIG_END
 
-MACHINE_CONFIG_DERIVED(kingdrby_state::cowrace, kingdrbb)
+MACHINE_CONFIG_START(kingdrby_state::cowrace)
+	kingdrbb(config);
 
 	MCFG_CPU_MODIFY("soundcpu")
 	MCFG_CPU_PROGRAM_MAP(cowrace_sound_map)

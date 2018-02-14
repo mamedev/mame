@@ -1543,7 +1543,8 @@ MACHINE_CONFIG_START(px4_state::px4)
 	MCFG_SOFTWARE_LIST_ADD("epson_cpm_list", "epson_cpm")
 MACHINE_CONFIG_END
 
-MACHINE_CONFIG_DERIVED(px4p_state::px4p, px4)
+MACHINE_CONFIG_START(px4p_state::px4p)
+	px4(config);
 	MCFG_CPU_MODIFY("maincpu")
 	MCFG_CPU_IO_MAP(px4p_io)
 

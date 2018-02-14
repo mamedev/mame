@@ -459,7 +459,8 @@ MACHINE_CONFIG_END
 // for dual-screen output Run and Gun requires the video de-multiplexer board connected to the Jamma output, this gives you 2 Jamma connectors, one for each screen.
 // this means when operated as a single dedicated cabinet the game runs at 60fps, and has smoother animations than when operated as a twin setup where each
 // screen only gets an update every other frame.
-MACHINE_CONFIG_DERIVED(rungun_state::rng_dual, rng)
+MACHINE_CONFIG_START(rungun_state::rng_dual)
+	rng(config);
 	MCFG_SCREEN_MODIFY("screen")
 	MCFG_SCREEN_UPDATE_DRIVER(rungun_state, screen_update_rng_dual_left)
 

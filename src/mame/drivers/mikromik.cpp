@@ -525,9 +525,10 @@ MACHINE_CONFIG_END
 //  MACHINE_CONFIG( mm1m6 )
 //-------------------------------------------------
 
-MACHINE_CONFIG_DERIVED(mm1_state::mm1m6, mm1)
+MACHINE_CONFIG_START(mm1_state::mm1m6)
+	mm1(config);
 	// video hardware
-	MCFG_FRAGMENT_ADD(mm1m6_video)
+	mm1m6_video(config);
 MACHINE_CONFIG_END
 
 
@@ -535,9 +536,10 @@ MACHINE_CONFIG_END
 //  MACHINE_CONFIG( mm1m7 )
 //-------------------------------------------------
 
-MACHINE_CONFIG_DERIVED(mm1_state::mm1m7, mm1)
+MACHINE_CONFIG_START(mm1_state::mm1m7)
+	mm1(config);
 	// video hardware
-	MCFG_FRAGMENT_ADD(mm1m6_video)
+	mm1m6_video(config);
 
 	// TODO hard disk
 MACHINE_CONFIG_END

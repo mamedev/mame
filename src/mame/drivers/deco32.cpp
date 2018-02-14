@@ -2021,7 +2021,8 @@ MACHINE_CONFIG_START(fghthist_state::fghthist)
 MACHINE_CONFIG_END
 
 // DE-0395-1
-MACHINE_CONFIG_DERIVED(fghthist_state::fghthsta, fghthist)
+MACHINE_CONFIG_START(fghthist_state::fghthsta)
+	fghthist(config);
 	MCFG_CPU_MODIFY("maincpu")
 	MCFG_CPU_PROGRAM_MAP(fghthsta_memmap)
 
@@ -2035,7 +2036,8 @@ MACHINE_CONFIG_DERIVED(fghthist_state::fghthsta, fghthist)
 MACHINE_CONFIG_END
 
 // DE-0396-0
-MACHINE_CONFIG_DERIVED(fghthist_state::fghthistu, fghthsta)
+MACHINE_CONFIG_START(fghthist_state::fghthistu)
+	fghthsta(config);
 	MCFG_DEVICE_REMOVE("audiocpu")
 
 	MCFG_CPU_ADD("audiocpu", Z80, XTAL(32'220'000) / 9)
@@ -2159,7 +2161,8 @@ MACHINE_CONFIG_START(dragngun_state::dragngun)
 	MCFG_LC7535_VOLUME_CB(dragngun_state, volume_gun_changed)
 MACHINE_CONFIG_END
 
-MACHINE_CONFIG_DERIVED(dragngun_state::lockloadu, dragngun)
+MACHINE_CONFIG_START(dragngun_state::lockloadu)
+	dragngun(config);
 	MCFG_CPU_MODIFY("maincpu")
 	MCFG_CPU_PROGRAM_MAP(lockloadu_map)
 
@@ -2446,7 +2449,8 @@ MACHINE_CONFIG_START(nslasher_state::nslasher)
 MACHINE_CONFIG_END
 
 // the US release uses a H6280 instead of a Z80, much like Lock 'n' Loaded
-MACHINE_CONFIG_DERIVED(nslasher_state::nslasheru, nslasher)
+MACHINE_CONFIG_START(nslasher_state::nslasheru)
+	nslasher(config);
 	MCFG_CPU_REPLACE("audiocpu", H6280, 32220000/8)
 	MCFG_CPU_PROGRAM_MAP(h6280_sound_map)
 

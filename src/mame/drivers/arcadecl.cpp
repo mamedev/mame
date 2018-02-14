@@ -358,7 +358,8 @@ MACHINE_CONFIG_START(arcadecl_state::arcadecl)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 MACHINE_CONFIG_END
 
-MACHINE_CONFIG_DERIVED(arcadecl_state::sparkz, arcadecl)
+MACHINE_CONFIG_START(arcadecl_state::sparkz)
+	arcadecl(config);
 	MCFG_DEVICE_REMOVE("mob")
 MACHINE_CONFIG_END
 

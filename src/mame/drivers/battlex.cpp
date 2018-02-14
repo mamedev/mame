@@ -315,7 +315,8 @@ MACHINE_CONFIG_START(battlex_state::battlex)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.40)
 MACHINE_CONFIG_END
 
-MACHINE_CONFIG_DERIVED(battlex_state::dodgeman, battlex)
+MACHINE_CONFIG_START(battlex_state::dodgeman)
+	battlex(config);
 
 	MCFG_CPU_MODIFY("maincpu")
 	MCFG_CPU_IO_MAP(dodgeman_io_map)

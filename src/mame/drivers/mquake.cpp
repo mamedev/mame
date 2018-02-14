@@ -323,7 +323,7 @@ MACHINE_CONFIG_START(mquake_state::mquake)
 	MCFG_NVRAM_ADD_0FILL("nvram")
 
 	/* video hardware */
-	MCFG_FRAGMENT_ADD(ntsc_video)
+	ntsc_video(config);
 
 	MCFG_PALETTE_ADD("palette", 4096)
 	MCFG_PALETTE_INIT_OWNER(mquake_state,amiga)

@@ -287,7 +287,7 @@ MACHINE_CONFIG_START(dambustr_state::dambustr)
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("speaker")
 
-	MCFG_FRAGMENT_ADD(galaxian_audio)
+	galaxian_audio(config);
 MACHINE_CONFIG_END
 
 

@@ -255,7 +255,8 @@ MACHINE_CONFIG_START(mmodular_state::alm16)
 MACHINE_CONFIG_END
 
 
-MACHINE_CONFIG_DERIVED(mmodular_state::van16, alm16)
+MACHINE_CONFIG_START(mmodular_state::van16)
+	alm16(config);
 	MCFG_CPU_MODIFY("maincpu")
 	MCFG_CPU_PROGRAM_MAP(van16_mem)
 MACHINE_CONFIG_END
@@ -274,7 +275,8 @@ MACHINE_CONFIG_START(mmodular_state::alm32)
 MACHINE_CONFIG_END
 
 
-MACHINE_CONFIG_DERIVED(mmodular_state::van32, alm32)
+MACHINE_CONFIG_START(mmodular_state::van32)
+	alm32(config);
 	MCFG_CPU_MODIFY("maincpu")
 	MCFG_CPU_PROGRAM_MAP(van32_mem)
 MACHINE_CONFIG_END

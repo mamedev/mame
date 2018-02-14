@@ -617,7 +617,8 @@ MACHINE_CONFIG_START(sbrkout_state::sbrkout)
 MACHINE_CONFIG_END
 
 
-MACHINE_CONFIG_DERIVED(sbrkout_state::sbrkoutct, sbrkout)
+MACHINE_CONFIG_START(sbrkout_state::sbrkoutct)
+	sbrkout(config);
 	MCFG_CPU_MODIFY("maincpu")
 	MCFG_CPU_PROGRAM_MAP(sbrkoutct_main_map)
 

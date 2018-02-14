@@ -1714,7 +1714,8 @@ MACHINE_CONFIG_START(fidel6502_state::csc)
 	MCFG_SOUND_ROUTE_EX(0, "dac", 1.0, DAC_VREF_POS_INPUT)
 MACHINE_CONFIG_END
 
-MACHINE_CONFIG_DERIVED(fidel6502_state::su9, csc)
+MACHINE_CONFIG_START(fidel6502_state::su9)
+	csc(config);
 
 	/* basic machine hardware */
 	MCFG_CPU_MODIFY("maincpu")
@@ -1760,7 +1761,8 @@ MACHINE_CONFIG_START(fidel6502_state::eas)
 	MCFG_SOFTWARE_LIST_ADD("cart_list", "fidel_scc")
 MACHINE_CONFIG_END
 
-MACHINE_CONFIG_DERIVED(fidel6502_state::eag, eas)
+MACHINE_CONFIG_START(fidel6502_state::eag)
+	eas(config);
 
 	/* basic machine hardware */
 	MCFG_CPU_REPLACE("maincpu", R65C02, 5_MHz_XTAL) // R65C02P4
@@ -1795,20 +1797,23 @@ MACHINE_CONFIG_START(fidel6502_state::sc9d)
 	MCFG_SOFTWARE_LIST_ADD("cart_list", "fidel_scc")
 MACHINE_CONFIG_END
 
-MACHINE_CONFIG_DERIVED(fidel6502_state::sc9b, sc9d)
+MACHINE_CONFIG_START(fidel6502_state::sc9b)
+	sc9d(config);
 
 	/* basic machine hardware */
 	MCFG_CPU_REPLACE("maincpu", M6502, 1500000) // from ceramic resonator "681 JSA", measured
 	MCFG_CPU_PROGRAM_MAP(sc9_map)
 MACHINE_CONFIG_END
 
-MACHINE_CONFIG_DERIVED(fidel6502_state::sc9c, sc9b)
+MACHINE_CONFIG_START(fidel6502_state::sc9c)
+	sc9b(config);
 
 	/* basic machine hardware */
 	MCFG_MACHINE_RESET_OVERRIDE(fidel6502_state, sc9c)
 MACHINE_CONFIG_END
 
-MACHINE_CONFIG_DERIVED(fidel6502_state::playmatic, sc9b)
+MACHINE_CONFIG_START(fidel6502_state::playmatic)
+	sc9b(config);
 
 	/* basic machine hardware */
 	MCFG_CPU_MODIFY("maincpu")
@@ -1850,7 +1855,8 @@ MACHINE_CONFIG_START(fidel6502_state::sc12)
 	MCFG_SOFTWARE_LIST_ADD("cart_list", "fidel_scc")
 MACHINE_CONFIG_END
 
-MACHINE_CONFIG_DERIVED(fidel6502_state::sc12b, sc12)
+MACHINE_CONFIG_START(fidel6502_state::sc12b)
+	sc12(config);
 
 	/* basic machine hardware */
 	MCFG_CPU_MODIFY("maincpu")
@@ -1886,35 +1892,40 @@ MACHINE_CONFIG_START(fidel6502_state::fexcel)
 	MCFG_SOUND_ROUTE_EX(0, "dac", 1.0, DAC_VREF_POS_INPUT)
 MACHINE_CONFIG_END
 
-MACHINE_CONFIG_DERIVED(fidel6502_state::fexcel4, fexcel)
+MACHINE_CONFIG_START(fidel6502_state::fexcel4)
+	fexcel(config);
 
 	/* basic machine hardware */
 	MCFG_CPU_REPLACE("maincpu", R65C02, 4_MHz_XTAL) // R65C02P4
 	MCFG_CPU_PROGRAM_MAP(fexcel_map)
 MACHINE_CONFIG_END
 
-MACHINE_CONFIG_DERIVED(fidel6502_state::fexcelb, fexcel)
+MACHINE_CONFIG_START(fidel6502_state::fexcelb)
+	fexcel(config);
 
 	/* basic machine hardware */
 	MCFG_CPU_MODIFY("maincpu")
 	MCFG_CPU_PROGRAM_MAP(fexcelb_map)
 MACHINE_CONFIG_END
 
-MACHINE_CONFIG_DERIVED(fidel6502_state::fexcelp, fexcel)
+MACHINE_CONFIG_START(fidel6502_state::fexcelp)
+	fexcel(config);
 
 	/* basic machine hardware */
 	MCFG_CPU_REPLACE("maincpu", R65C02, 5_MHz_XTAL) // R65C02P4
 	MCFG_CPU_PROGRAM_MAP(fexcelp_map)
 MACHINE_CONFIG_END
 
-MACHINE_CONFIG_DERIVED(fidel6502_state::granits, fexcelp)
+MACHINE_CONFIG_START(fidel6502_state::granits)
+	fexcelp(config);
 
 	/* basic machine hardware */
 	MCFG_CPU_MODIFY("maincpu")
 	MCFG_DEVICE_CLOCK(8_MHz_XTAL) // overclocked
 MACHINE_CONFIG_END
 
-MACHINE_CONFIG_DERIVED(fidel6502_state::fdes2100, fexcel)
+MACHINE_CONFIG_START(fidel6502_state::fdes2100)
+	fexcel(config);
 
 	/* basic machine hardware */
 	MCFG_CPU_REPLACE("maincpu", M65C02, 5_MHz_XTAL) // WDC 65C02
@@ -1930,14 +1941,16 @@ MACHINE_CONFIG_DERIVED(fidel6502_state::fdes2100, fexcel)
 	MCFG_DEFAULT_LAYOUT(layout_fidel_des)
 MACHINE_CONFIG_END
 
-MACHINE_CONFIG_DERIVED(fidel6502_state::fdes2000, fdes2100)
+MACHINE_CONFIG_START(fidel6502_state::fdes2000)
+	fdes2100(config);
 
 	/* basic machine hardware */
 	MCFG_CPU_REPLACE("maincpu", R65C02, 3_MHz_XTAL) // RP65C02G
 	MCFG_CPU_PROGRAM_MAP(fexcelp_map)
 MACHINE_CONFIG_END
 
-MACHINE_CONFIG_DERIVED(fidel6502_state::fexcelv, fexcelb)
+MACHINE_CONFIG_START(fidel6502_state::fexcelv)
+	fexcelb(config);
 
 	/* sound hardware */
 	MCFG_SOUND_ADD("speech", S14001A, 25000) // R/C circuit, around 25khz
@@ -1945,7 +1958,8 @@ MACHINE_CONFIG_DERIVED(fidel6502_state::fexcelv, fexcelb)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 0.75)
 MACHINE_CONFIG_END
 
-MACHINE_CONFIG_DERIVED(fidel6502_state::fexceld, fexcelb)
+MACHINE_CONFIG_START(fidel6502_state::fexceld)
+	fexcelb(config);
 
 	/* basic machine hardware */
 	MCFG_DEFAULT_LAYOUT(layout_fidel_exd)
@@ -1970,7 +1984,8 @@ MACHINE_CONFIG_START(fidel6502_state::fdes2100d)
 	MCFG_SOUND_ROUTE_EX(0, "dac", 1.0, DAC_VREF_POS_INPUT)
 MACHINE_CONFIG_END
 
-MACHINE_CONFIG_DERIVED(fidel6502_state::fdes2000d, fdes2100d)
+MACHINE_CONFIG_START(fidel6502_state::fdes2000d)
+	fdes2100d(config);
 
 	/* basic machine hardware */
 	MCFG_CPU_REPLACE("maincpu", R65C02, 3_MHz_XTAL) // R65C02P3
@@ -2016,7 +2031,8 @@ MACHINE_CONFIG_START(fidel6502_state::chesster)
 	MCFG_SOUND_ROUTE_EX(0, "dac8", 1.0, DAC_VREF_POS_INPUT) MCFG_SOUND_ROUTE_EX(0, "dac8", -1.0, DAC_VREF_NEG_INPUT)
 MACHINE_CONFIG_END
 
-MACHINE_CONFIG_DERIVED(fidel6502_state::kishon, chesster)
+MACHINE_CONFIG_START(fidel6502_state::kishon)
+	chesster(config);
 
 	/* basic machine hardware */
 	MCFG_CPU_MODIFY("maincpu")

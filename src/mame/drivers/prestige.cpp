@@ -767,7 +767,8 @@ MACHINE_CONFIG_START(prestige_state::prestige_base)
 	MCFG_RAM_EXTRA_OPTIONS("64K")
 MACHINE_CONFIG_END
 
-MACHINE_CONFIG_DERIVED(prestige_state::glcolor, prestige_base)
+MACHINE_CONFIG_START(prestige_state::glcolor)
+	prestige_base(config);
 	MCFG_CPU_MODIFY("maincpu")
 	MCFG_CPU_IO_MAP(glcolor_io)
 
@@ -785,41 +786,48 @@ MACHINE_CONFIG_DERIVED(prestige_state::glcolor, prestige_base)
 	MCFG_SOFTWARE_LIST_COMPATIBLE_ADD("snotec_cart", "snotec")
 MACHINE_CONFIG_END
 
-MACHINE_CONFIG_DERIVED(prestige_state::glmcolor, glcolor)
+MACHINE_CONFIG_START(prestige_state::glmcolor)
+	glcolor(config);
 	MCFG_CPU_MODIFY("maincpu")
 	MCFG_CPU_IO_MAP(prestige_io)
 MACHINE_CONFIG_END
 
-MACHINE_CONFIG_DERIVED(prestige_state::snotec, glcolor)
+MACHINE_CONFIG_START(prestige_state::snotec)
+	glcolor(config);
 	MCFG_SOFTWARE_LIST_REMOVE("cart_list")
 	MCFG_SOFTWARE_LIST_REMOVE("snotec_cart")
 	MCFG_SOFTWARE_LIST_ADD("cart_list", "snotec")
 	MCFG_SOFTWARE_LIST_COMPATIBLE_ADD("glcolor_cart", "glcolor")
 MACHINE_CONFIG_END
 
-MACHINE_CONFIG_DERIVED(prestige_state::prestige, prestige_base)
+MACHINE_CONFIG_START(prestige_state::prestige)
+	prestige_base(config);
 	MCFG_SOFTWARE_LIST_COMPATIBLE_ADD("gl6000sl_cart", "gl6000sl")
 	MCFG_SOFTWARE_LIST_COMPATIBLE_ADD("misterx_cart", "misterx")
 	MCFG_SOFTWARE_LIST_COMPATIBLE_ADD("gl2000_cart", "gl2000")
 MACHINE_CONFIG_END
 
-MACHINE_CONFIG_DERIVED(prestige_state::gl6000sl, prestige_base)
+MACHINE_CONFIG_START(prestige_state::gl6000sl)
+	prestige_base(config);
 	MCFG_SOFTWARE_LIST_ADD("cart_list", "gl6000sl")
 	MCFG_SOFTWARE_LIST_COMPATIBLE_ADD("misterx_cart", "misterx")
 	MCFG_SOFTWARE_LIST_COMPATIBLE_ADD("gl2000_cart", "gl2000")
 MACHINE_CONFIG_END
 
-MACHINE_CONFIG_DERIVED(prestige_state::gl7007sl, prestige_base)
+MACHINE_CONFIG_START(prestige_state::gl7007sl)
+	prestige_base(config);
 	MCFG_SOFTWARE_LIST_COMPATIBLE_ADD("gl6000sl_cart", "gl6000sl")
 	MCFG_SOFTWARE_LIST_COMPATIBLE_ADD("gl2000_cart", "gl2000")
 	MCFG_SOFTWARE_LIST_COMPATIBLE_ADD("misterx_cart", "misterx")
 MACHINE_CONFIG_END
 
-MACHINE_CONFIG_DERIVED(prestige_state::gjmovie, prestige_base)
+MACHINE_CONFIG_START(prestige_state::gjmovie)
+	prestige_base(config);
 	MCFG_SOFTWARE_LIST_ADD("cart_list", "gjmovie")
 MACHINE_CONFIG_END
 
-MACHINE_CONFIG_DERIVED(prestige_state::princ, prestige_base)
+MACHINE_CONFIG_START(prestige_state::princ)
+	prestige_base(config);
 	MCFG_DEVICE_REMOVE("cartslot")
 	MCFG_GENERIC_CARTSLOT_ADD("cartslot", generic_plain_slot, "princ_cart")
 	MCFG_SOFTWARE_LIST_ADD("cart_list", "princ")

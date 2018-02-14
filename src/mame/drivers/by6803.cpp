@@ -385,7 +385,7 @@ MACHINE_CONFIG_START(by6803_state::by6803)
 	//MCFG_DEFAULT_LAYOUT(layout_by6803)
 
 	/* Sound */
-	MCFG_FRAGMENT_ADD( genpin_audio )
+	genpin_audio(config);
 
 	/* Devices */
 	MCFG_DEVICE_ADD("pia0", PIA6821, 0)

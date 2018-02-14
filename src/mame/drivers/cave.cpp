@@ -2432,7 +2432,8 @@ MACHINE_CONFIG_START(cave_state::korokoro)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 MACHINE_CONFIG_END
 
-MACHINE_CONFIG_DERIVED(cave_state::crusherm, korokoro)
+MACHINE_CONFIG_START(cave_state::crusherm)
+	korokoro(config);
 	MCFG_CPU_MODIFY("maincpu")
 	MCFG_CPU_PROGRAM_MAP(crusherm_map)
 MACHINE_CONFIG_END
@@ -2602,7 +2603,8 @@ MACHINE_CONFIG_START(cave_state::pacslot)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", 1.0)
 MACHINE_CONFIG_END
 
-MACHINE_CONFIG_DERIVED(cave_state::paceight, pacslot)
+MACHINE_CONFIG_START(cave_state::paceight)
+	pacslot(config);
 	MCFG_CPU_MODIFY("maincpu")
 	MCFG_CPU_PROGRAM_MAP(paceight_map)
 MACHINE_CONFIG_END
@@ -2854,7 +2856,8 @@ MACHINE_CONFIG_START(cave_state::tekkencw)
 	// oki2 chip spot and rom socket are both unpopulated
 MACHINE_CONFIG_END
 
-MACHINE_CONFIG_DERIVED(cave_state::tekkenbs, tekkencw)
+MACHINE_CONFIG_START(cave_state::tekkenbs)
+	tekkencw(config);
 	MCFG_CPU_MODIFY("maincpu")
 	MCFG_CPU_PROGRAM_MAP(tekkenbs_map)
 MACHINE_CONFIG_END

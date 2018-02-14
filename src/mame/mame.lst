@@ -14800,6 +14800,7 @@ tmkombat                        // Tiger
 tnmarebc                        // Tiger
 trobhood                        // Tiger
 trobocop2                       // Tiger
+trobocop3                       // Tiger
 tsddragon                       // Tiger
 tsf2010                         // Tiger
 tsfight2                        // Tiger
@@ -38954,10 +38955,14 @@ xsleenaj                        // TA-0019 (c) 1986
 
 @source:xavix.cpp
 taitons1                        //
-xavtenni                        //
 rad_ping                        //
 rad_mtrk                        //
 rad_bb2                         //
+rad_box                         //
+rad_crdn                        //
+eka_strt                        //
+xavtenni                        //
+ttv_sw                          //
 
 @source:xbox.cpp
 xbox                            //

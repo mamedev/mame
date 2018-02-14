@@ -3253,7 +3253,8 @@ MACHINE_CONFIG_START(taitoz_state::bshark)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "lspeaker", 1.0)
 MACHINE_CONFIG_END
 
-MACHINE_CONFIG_DERIVED(taitoz_state::bsharkjjs, bshark)
+MACHINE_CONFIG_START(taitoz_state::bsharkjjs)
+	bshark(config);
 
 	/* basic machine hardware */
 

@@ -382,7 +382,8 @@ MACHINE_CONFIG_START(homerun_state::dynashot)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
 MACHINE_CONFIG_END
 
-MACHINE_CONFIG_DERIVED(homerun_state::homerun, dynashot)
+MACHINE_CONFIG_START(homerun_state::homerun)
+	dynashot(config);
 
 	/* sound hardware */
 	MCFG_SOUND_ADD("d7756", UPD7756, UPD7759_STANDARD_CLOCK)
@@ -394,7 +395,8 @@ MACHINE_CONFIG_DERIVED(homerun_state::homerun, dynashot)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
 MACHINE_CONFIG_END
 
-MACHINE_CONFIG_DERIVED(homerun_state::ganjaja, dynashot)
+MACHINE_CONFIG_START(homerun_state::ganjaja)
+	dynashot(config);
 
 	/* basic machine hardware */
 	MCFG_CPU_MODIFY("maincpu")

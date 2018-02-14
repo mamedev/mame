@@ -117,7 +117,8 @@ MACHINE_CONFIG_START(basic52_state::basic31)
 	MCFG_DEVICE_ADD("ppi8255", I8255, 0)
 MACHINE_CONFIG_END
 
-MACHINE_CONFIG_DERIVED(basic52_state::basic52, basic31)
+MACHINE_CONFIG_START(basic52_state::basic52)
+	basic31(config);
 	/* basic machine hardware */
 	MCFG_CPU_REPLACE("maincpu", I8052, XTAL(11'059'200))
 	MCFG_CPU_PROGRAM_MAP(basic52_mem)

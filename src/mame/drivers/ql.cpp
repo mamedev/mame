@@ -977,7 +977,8 @@ MACHINE_CONFIG_END
 //  MACHINE_CONFIG( ql_ntsc )
 //-------------------------------------------------
 
-MACHINE_CONFIG_DERIVED(ql_state::ql_ntsc, ql)
+MACHINE_CONFIG_START(ql_state::ql_ntsc)
+	ql(config);
 	// video hardware
 	MCFG_SCREEN_MODIFY(SCREEN_TAG)
 	MCFG_SCREEN_REFRESH_RATE(60)
@@ -990,7 +991,8 @@ MACHINE_CONFIG_END
 //  MACHINE_CONFIG( opd )
 //-------------------------------------------------
 
-MACHINE_CONFIG_DERIVED(ql_state::opd, ql)
+MACHINE_CONFIG_START(ql_state::opd)
+	ql(config);
 	// internal ram
 	MCFG_RAM_MODIFY(RAM_TAG)
 	MCFG_RAM_DEFAULT_SIZE("128K")
@@ -1003,7 +1005,8 @@ MACHINE_CONFIG_END
 //  MACHINE_CONFIG( megaopd )
 //-------------------------------------------------
 
-static MACHINE_CONFIG_DERIVED( megaopd, ql )
+static MACHINE_CONFIG_START( megaopd )
+static 	ql(config);
     // internal ram
     MCFG_RAM_MODIFY(RAM_TAG)
     MCFG_RAM_DEFAULT_SIZE("256K")

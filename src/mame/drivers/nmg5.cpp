@@ -1030,7 +1030,8 @@ MACHINE_CONFIG_START(nmg5_state::nmg5)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 MACHINE_CONFIG_END
 
-MACHINE_CONFIG_DERIVED(nmg5_state::garogun, nmg5)
+MACHINE_CONFIG_START(nmg5_state::garogun)
+	nmg5(config);
 
 	/* basic machine hardware */
 
@@ -1042,7 +1043,8 @@ MACHINE_CONFIG_DERIVED(nmg5_state::garogun, nmg5)
 MACHINE_CONFIG_END
 
 
-MACHINE_CONFIG_DERIVED(nmg5_state::pclubys, nmg5)
+MACHINE_CONFIG_START(nmg5_state::pclubys)
+	nmg5(config);
 
 	/* basic machine hardware */
 
@@ -1055,7 +1057,8 @@ MACHINE_CONFIG_DERIVED(nmg5_state::pclubys, nmg5)
 	MCFG_GFXDECODE_MODIFY("gfxdecode", pclubys)
 MACHINE_CONFIG_END
 
-MACHINE_CONFIG_DERIVED(nmg5_state::searchp2, nmg5)
+MACHINE_CONFIG_START(nmg5_state::searchp2)
+	nmg5(config);
 
 	/* basic machine hardware */
 
@@ -1065,7 +1068,8 @@ MACHINE_CONFIG_DERIVED(nmg5_state::searchp2, nmg5)
 	MCFG_GFXDECODE_MODIFY("gfxdecode", pclubys)
 MACHINE_CONFIG_END
 
-MACHINE_CONFIG_DERIVED(nmg5_state::_7ordi, nmg5)
+MACHINE_CONFIG_START(nmg5_state::_7ordi)
+	nmg5(config);
 
 	/* basic machine hardware */
 

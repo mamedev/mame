@@ -568,7 +568,8 @@ MACHINE_CONFIG_START(mil4000_state::mil4000)
 MACHINE_CONFIG_END
 
 
-MACHINE_CONFIG_DERIVED(mil4000_state::chewheel, mil4000)
+MACHINE_CONFIG_START(mil4000_state::chewheel)
+	mil4000(config);
 	MCFG_CPU_REPLACE("maincpu", M68000, CPU_CLOCK) /* 2MHz */
 	MCFG_CPU_PROGRAM_MAP(chewheel_map)
 	MCFG_CPU_VBLANK_INT_DRIVER("screen", mil4000_state,  irq5_line_hold)

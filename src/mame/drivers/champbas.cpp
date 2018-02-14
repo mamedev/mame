@@ -606,7 +606,8 @@ MACHINE_CONFIG_START(champbas_state::champbas)
 	MCFG_SOUND_ROUTE_EX(0, "dac", 1.0, DAC_VREF_POS_INPUT) MCFG_SOUND_ROUTE_EX(0, "dac", -1.0, DAC_VREF_NEG_INPUT)
 MACHINE_CONFIG_END
 
-MACHINE_CONFIG_DERIVED(champbas_state::champbasj, champbas)
+MACHINE_CONFIG_START(champbas_state::champbasj)
+	champbas(config);
 
 	/* basic machine hardware */
 	MCFG_CPU_MODIFY("maincpu")
@@ -621,21 +622,24 @@ MACHINE_CONFIG_DERIVED(champbas_state::champbasj, champbas)
 MACHINE_CONFIG_END
 
 
-MACHINE_CONFIG_DERIVED(champbas_state::champbasja, champbas)
+MACHINE_CONFIG_START(champbas_state::champbasja)
+	champbas(config);
 
 	/* basic machine hardware */
 	MCFG_CPU_MODIFY("maincpu")
 	MCFG_CPU_PROGRAM_MAP(champbasja_map)
 MACHINE_CONFIG_END
 
-MACHINE_CONFIG_DERIVED(champbas_state::champbasjb, champbas)
+MACHINE_CONFIG_START(champbas_state::champbasjb)
+	champbas(config);
 
 	/* basic machine hardware */
 	MCFG_CPU_MODIFY("maincpu")
 	MCFG_CPU_PROGRAM_MAP(champbasjb_map)
 MACHINE_CONFIG_END
 
-MACHINE_CONFIG_DERIVED(champbas_state::champbb2, champbasj)
+MACHINE_CONFIG_START(champbas_state::champbb2)
+	champbasj(config);
 
 	/* basic machine hardware */
 	MCFG_CPU_MODIFY("maincpu")
@@ -643,7 +647,8 @@ MACHINE_CONFIG_DERIVED(champbas_state::champbb2, champbasj)
 MACHINE_CONFIG_END
 
 
-MACHINE_CONFIG_DERIVED(champbas_state::tbasebal, champbas)
+MACHINE_CONFIG_START(champbas_state::tbasebal)
+	champbas(config);
 
 	/* basic machine hardware */
 	MCFG_CPU_MODIFY("maincpu")

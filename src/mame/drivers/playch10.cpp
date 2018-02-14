@@ -695,11 +695,13 @@ MACHINE_CONFIG_START(playch10_state::playch10)
 	MCFG_RP5H01_ADD("rp5h01")
 MACHINE_CONFIG_END
 
-MACHINE_CONFIG_DERIVED(playch10_state::playchnv, playch10)
+MACHINE_CONFIG_START(playch10_state::playchnv)
+	playch10(config);
 	MCFG_NVRAM_ADD_0FILL("nvram")
 MACHINE_CONFIG_END
 
-MACHINE_CONFIG_DERIVED(playch10_state::playch10_hboard, playch10)
+MACHINE_CONFIG_START(playch10_state::playch10_hboard)
+	playch10(config);
 	MCFG_VIDEO_START_OVERRIDE(playch10_state,playch10_hboard)
 	MCFG_MACHINE_START_OVERRIDE(playch10_state,playch10_hboard)
 MACHINE_CONFIG_END

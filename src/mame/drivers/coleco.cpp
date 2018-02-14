@@ -400,7 +400,8 @@ MACHINE_CONFIG_START(coleco_state::coleco)
 	MCFG_TIMER_DRIVER_ADD_PERIODIC("paddle_timer", coleco_state, paddle_update_callback, attotime::from_msec(20))
 MACHINE_CONFIG_END
 
-MACHINE_CONFIG_DERIVED(coleco_state::colecop, coleco)
+MACHINE_CONFIG_START(coleco_state::colecop)
+	coleco(config);
 
 	/* video hardware */
 	MCFG_DEVICE_REMOVE("tms9928a")
@@ -413,14 +414,16 @@ MACHINE_CONFIG_DERIVED(coleco_state::colecop, coleco)
 	MCFG_SCREEN_UPDATE_DEVICE( "tms9928a", tms9928a_device, screen_update )
 MACHINE_CONFIG_END
 
-MACHINE_CONFIG_DERIVED(coleco_state::czz50, coleco)
+MACHINE_CONFIG_START(coleco_state::czz50)
+	coleco(config);
 
 	/* basic machine hardware */
 	MCFG_CPU_MODIFY("maincpu") // note: cpu speed unverified, assume it's the same as ColecoVision
 	MCFG_CPU_PROGRAM_MAP(czz50_map)
 MACHINE_CONFIG_END
 
-MACHINE_CONFIG_DERIVED(coleco_state::dina, czz50)
+MACHINE_CONFIG_START(coleco_state::dina)
+	czz50(config);
 
 	/* video hardware */
 	MCFG_DEVICE_REMOVE("tms9928a")

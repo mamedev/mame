@@ -1277,7 +1277,8 @@ MACHINE_CONFIG_START(norautp_state::noraut_base)
 MACHINE_CONFIG_END
 
 
-MACHINE_CONFIG_DERIVED(norautp_state::norautp, noraut_base)
+MACHINE_CONFIG_START(norautp_state::norautp)
+	noraut_base(config);
 
 	/* basic machine hardware */
 	MCFG_CPU_MODIFY("maincpu")
@@ -1285,7 +1286,8 @@ MACHINE_CONFIG_DERIVED(norautp_state::norautp, noraut_base)
 MACHINE_CONFIG_END
 
 
-MACHINE_CONFIG_DERIVED(norautp_state::norautpl, noraut_base)
+MACHINE_CONFIG_START(norautp_state::norautpl)
+	noraut_base(config);
 
 	/* basic machine hardware */
 	MCFG_CPU_MODIFY("maincpu")
@@ -1297,7 +1299,8 @@ MACHINE_CONFIG_DERIVED(norautp_state::norautpl, noraut_base)
 MACHINE_CONFIG_END
 
 
-MACHINE_CONFIG_DERIVED(norautp_state::norautxp, noraut_base)
+MACHINE_CONFIG_START(norautp_state::norautxp)
+	noraut_base(config);
 
 	/* basic machine hardware */
 	MCFG_CPU_MODIFY("maincpu")
@@ -1306,7 +1309,8 @@ MACHINE_CONFIG_DERIVED(norautp_state::norautxp, noraut_base)
 MACHINE_CONFIG_END
 
 
-MACHINE_CONFIG_DERIVED(norautp_state::nortest1, noraut_base)
+MACHINE_CONFIG_START(norautp_state::nortest1)
+	noraut_base(config);
 
 	/* basic machine hardware */
 	MCFG_CPU_MODIFY("maincpu")
@@ -1315,7 +1319,8 @@ MACHINE_CONFIG_DERIVED(norautp_state::nortest1, noraut_base)
 MACHINE_CONFIG_END
 
 
-MACHINE_CONFIG_DERIVED(norautp_state::norautx4, noraut_base)
+MACHINE_CONFIG_START(norautp_state::norautx4)
+	noraut_base(config);
 
 	/* basic machine hardware */
 	MCFG_CPU_MODIFY("maincpu")
@@ -1325,7 +1330,8 @@ MACHINE_CONFIG_END
 
 
 #ifdef UNUSED_CODE
-static MACHINE_CONFIG_DERIVED( norautx8, noraut_base )
+static MACHINE_CONFIG_START( norautx8 )
+	noraut_base(config);
 
 	/* basic machine hardware */
 	MCFG_CPU_MODIFY("maincpu")
@@ -1335,7 +1341,8 @@ MACHINE_CONFIG_END
 #endif
 
 
-MACHINE_CONFIG_DERIVED(norautp_state::kimble, noraut_base)
+MACHINE_CONFIG_START(norautp_state::kimble)
+	noraut_base(config);
 
 	/* basic machine hardware */
 	MCFG_CPU_MODIFY("maincpu")
@@ -1347,7 +1354,8 @@ MACHINE_CONFIG_DERIVED(norautp_state::kimble, noraut_base)
 	MCFG_DISCRETE_INTF(kimble)
 MACHINE_CONFIG_END
 
-MACHINE_CONFIG_DERIVED(norautp_state::newhilop, noraut_base)
+MACHINE_CONFIG_START(norautp_state::newhilop)
+	noraut_base(config);
 
 	/* basic machine hardware */
 	MCFG_CPU_MODIFY("maincpu")
@@ -1359,7 +1367,8 @@ MACHINE_CONFIG_END
 /********** 8080 based **********/
 
 
-MACHINE_CONFIG_DERIVED(norautp_state::dphl, noraut_base)
+MACHINE_CONFIG_START(norautp_state::dphl)
+	noraut_base(config);
 
 	/* basic machine hardware */
 	MCFG_CPU_REPLACE("maincpu", I8080, DPHL_CPU_CLOCK)
@@ -1372,7 +1381,8 @@ MACHINE_CONFIG_DERIVED(norautp_state::dphl, noraut_base)
 MACHINE_CONFIG_END
 
 
-MACHINE_CONFIG_DERIVED(norautp_state::dphla, noraut_base)
+MACHINE_CONFIG_START(norautp_state::dphla)
+	noraut_base(config);
 
 	/* basic machine hardware */
 	MCFG_CPU_REPLACE("maincpu", I8080, DPHL_CPU_CLOCK)
@@ -1385,7 +1395,8 @@ MACHINE_CONFIG_DERIVED(norautp_state::dphla, noraut_base)
 MACHINE_CONFIG_END
 
 
-MACHINE_CONFIG_DERIVED(norautp_state::kimbldhl, noraut_base)
+MACHINE_CONFIG_START(norautp_state::kimbldhl)
+	noraut_base(config);
 
 	/* basic machine hardware */
 	MCFG_CPU_REPLACE("maincpu", I8080, DPHL_CPU_CLOCK)
@@ -1398,7 +1409,8 @@ MACHINE_CONFIG_DERIVED(norautp_state::kimbldhl, noraut_base)
 MACHINE_CONFIG_END
 
 
-MACHINE_CONFIG_DERIVED(norautp_state::dphltest, noraut_base)
+MACHINE_CONFIG_START(norautp_state::dphltest)
+	noraut_base(config);
 
 	/* basic machine hardware */
 	MCFG_CPU_REPLACE("maincpu", I8080, DPHL_CPU_CLOCK)
@@ -1411,7 +1423,8 @@ MACHINE_CONFIG_DERIVED(norautp_state::dphltest, noraut_base)
 MACHINE_CONFIG_END
 
 
-MACHINE_CONFIG_DERIVED(norautp_state::drhl, noraut_base)
+MACHINE_CONFIG_START(norautp_state::drhl)
+	noraut_base(config);
 
 	/* basic machine hardware */
 	MCFG_CPU_REPLACE("maincpu", I8080, DPHL_CPU_CLOCK)
@@ -1424,7 +1437,8 @@ MACHINE_CONFIG_DERIVED(norautp_state::drhl, noraut_base)
 MACHINE_CONFIG_END
 
 
-MACHINE_CONFIG_DERIVED(norautp_state::ssjkrpkr, noraut_base)
+MACHINE_CONFIG_START(norautp_state::ssjkrpkr)
+	noraut_base(config);
 
 	/* basic machine hardware */
 	MCFG_CPU_REPLACE("maincpu", I8080, DPHL_CPU_CLOCK)

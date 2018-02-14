@@ -671,7 +671,7 @@ ADDRESS_MAP_START(equites_state::splndrbt_map)
 	AM_RANGE(0x080000, 0x080001) AM_READ_PORT("IN0")
 	AM_RANGE(0x0c0000, 0x0c0001) AM_READ_PORT("IN1")
 	AM_RANGE(0x0c0000, 0x0c0001) AM_SELECT(0x020000) AM_WRITE8(equites_bgcolor_w, 0xff00)
-	;map(0x180000, 0x180001).select(0x03c000).lw8("mainlatch_w", [this](address_space &space, offs_t offset, u8 data, u8 mem_mask){ m_mainlatch->write_a3(space, offset >> 13, data, mem_mask); }).umask16(0xff00);
+	;map(0x0c0000, 0x0c0001).select(0x03c000).lw8("mainlatch_w", [this](address_space &space, offs_t offset, u8 data, u8 mem_mask){ m_mainlatch->write_a3(space, offset >> 13, data, mem_mask); }).umask16(0x00ff);
 	AM_RANGE(0x100000, 0x100001) AM_WRITE(splndrbt_bg_scrollx_w)
 	AM_RANGE(0x140000, 0x140001) AM_DEVWRITE8("soundlatch", generic_latch_8_device, write, 0x00ff)
 	AM_RANGE(0x1c0000, 0x1c0001) AM_WRITE(splndrbt_bg_scrolly_w)
@@ -1138,7 +1138,7 @@ MACHINE_CONFIG_START(equites_state::equites)
 	MCFG_ADDRESSABLE_LATCH_Q2_OUT_CB(WRITELINE(equites_state, mcu_start_w))
 	MCFG_ADDRESSABLE_LATCH_Q3_OUT_CB(WRITELINE(equites_state, mcu_switch_w))
 
-	MCFG_FRAGMENT_ADD(common_sound)
+	common_sound(config);
 
 	MCFG_DEVICE_ADD("alpha_8201", ALPHA_8201, 4000000/8) // 8303 or 8304 (same device!)
 	MCFG_QUANTUM_PERFECT_CPU("alpha_8201:mcu")
@@ -1161,7 +1161,8 @@ MACHINE_CONFIG_START(equites_state::equites)
 	MCFG_VIDEO_START_OVERRIDE(equites_state,equites)
 MACHINE_CONFIG_END
 
-MACHINE_CONFIG_DERIVED(equites_state::gekisou, equites)
+MACHINE_CONFIG_START(equites_state::gekisou)
+	equites(config);
 
 	/* basic machine hardware */
 	MCFG_CPU_MODIFY("maincpu")
@@ -1189,7 +1190,7 @@ MACHINE_CONFIG_START(equites_state::splndrbt)
 	MCFG_ADDRESSABLE_LATCH_Q2_OUT_CB(WRITELINE(equites_state, mcu_switch_w))
 	MCFG_ADDRESSABLE_LATCH_Q3_OUT_CB(WRITELINE(equites_state, splndrbt_selchar_w))
 
-	MCFG_FRAGMENT_ADD(common_sound)
+	common_sound(config);
 
 	MCFG_DEVICE_ADD("alpha_8201", ALPHA_8201, 4000000/8) // 8303 or 8304 (same device!)
 	MCFG_QUANTUM_PERFECT_CPU("alpha_8201:mcu")
@@ -1210,7 +1211,8 @@ MACHINE_CONFIG_START(equites_state::splndrbt)
 	MCFG_VIDEO_START_OVERRIDE(equites_state,splndrbt)
 MACHINE_CONFIG_END
 
-MACHINE_CONFIG_DERIVED(equites_state::hvoltage, splndrbt)
+MACHINE_CONFIG_START(equites_state::hvoltage)
+	splndrbt(config);
 
 	// mcu not dumped, so add simulated mcu
 	MCFG_CPU_ADD("mcu", ALPHA8301L, 4000000/8)

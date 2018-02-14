@@ -1014,7 +1014,8 @@ MACHINE_CONFIG_START(lwings_state::fball)
 MACHINE_CONFIG_END
 
 
-MACHINE_CONFIG_DERIVED(lwings_state::trojan, lwings)
+MACHINE_CONFIG_START(lwings_state::trojan)
+	lwings(config);
 
 	/* basic machine hardware */
 	MCFG_CPU_MODIFY("maincpu")
@@ -1045,7 +1046,8 @@ MACHINE_CONFIG_DERIVED(lwings_state::trojan, lwings)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
 MACHINE_CONFIG_END
 
-MACHINE_CONFIG_DERIVED(lwings_state::avengers, trojan)
+MACHINE_CONFIG_START(lwings_state::avengers)
+	trojan(config);
 
 	/* basic machine hardware */
 	MCFG_CPU_MODIFY("maincpu")
@@ -1059,7 +1061,8 @@ MACHINE_CONFIG_DERIVED(lwings_state::avengers, trojan)
 	MCFG_VIDEO_START_OVERRIDE(lwings_state,avengers)
 MACHINE_CONFIG_END
 
-MACHINE_CONFIG_DERIVED(lwings_state::avengersb, avengers)
+MACHINE_CONFIG_START(lwings_state::avengersb)
+	avengers(config);
 	/* video hardware */
 	MCFG_VIDEO_START_OVERRIDE(lwings_state,avengersb)
 MACHINE_CONFIG_END

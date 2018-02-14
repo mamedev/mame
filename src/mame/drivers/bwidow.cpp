@@ -752,18 +752,20 @@ MACHINE_CONFIG_START(bwidow_state::bwidow)
 	MCFG_AVGDVG_VECTOR("vector")
 
 	/* sound hardware */
-	MCFG_FRAGMENT_ADD(bwidow_audio)
+	bwidow_audio(config);
 
 MACHINE_CONFIG_END
 
-MACHINE_CONFIG_DERIVED(bwidow_state::bwidowp, bwidow)
+MACHINE_CONFIG_START(bwidow_state::bwidowp)
+	bwidow(config);
 	MCFG_CPU_MODIFY("maincpu")
 	MCFG_CPU_PROGRAM_MAP(bwidowp_map)
 
 	MCFG_WATCHDOG_ADD("watchdog")
 MACHINE_CONFIG_END
 
-MACHINE_CONFIG_DERIVED(bwidow_state::gravitar, bwidow)
+MACHINE_CONFIG_START(bwidow_state::gravitar)
+	bwidow(config);
 
 	/* basic machine hardware */
 
@@ -772,11 +774,12 @@ MACHINE_CONFIG_DERIVED(bwidow_state::gravitar, bwidow)
 	MCFG_SCREEN_VISIBLE_AREA(0, 420, 0, 400)
 
 	/* sound hardware */
-	MCFG_FRAGMENT_ADD(gravitar_audio)
+	gravitar_audio(config);
 MACHINE_CONFIG_END
 
 
-MACHINE_CONFIG_DERIVED(bwidow_state::lunarbat, gravitar)
+MACHINE_CONFIG_START(bwidow_state::lunarbat)
+	gravitar(config);
 
 	/* basic machine hardware */
 	MCFG_CPU_MODIFY("maincpu")
@@ -788,7 +791,8 @@ MACHINE_CONFIG_DERIVED(bwidow_state::lunarbat, gravitar)
 MACHINE_CONFIG_END
 
 
-MACHINE_CONFIG_DERIVED(bwidow_state::spacduel, gravitar)
+MACHINE_CONFIG_START(bwidow_state::spacduel)
+	gravitar(config);
 
 	/* basic machine hardware */
 	MCFG_CPU_MODIFY("maincpu")

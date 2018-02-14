@@ -717,7 +717,8 @@ MACHINE_CONFIG_START(niyanpai_state::niyanpai)
 	MCFG_NICHISND_ADD("nichisnd")
 MACHINE_CONFIG_END
 
-MACHINE_CONFIG_DERIVED(niyanpai_state::musobana, niyanpai)
+MACHINE_CONFIG_START(niyanpai_state::musobana)
+	niyanpai(config);
 
 	/* basic machine hardware */
 	MCFG_CPU_MODIFY("maincpu")
@@ -726,14 +727,16 @@ MACHINE_CONFIG_DERIVED(niyanpai_state::musobana, niyanpai)
 	MCFG_MACHINE_START_OVERRIDE(niyanpai_state, musobana)
 MACHINE_CONFIG_END
 
-MACHINE_CONFIG_DERIVED(niyanpai_state::mhhonban, musobana)
+MACHINE_CONFIG_START(niyanpai_state::mhhonban)
+	musobana(config);
 
 	/* basic machine hardware */
 	MCFG_CPU_MODIFY("maincpu")
 	MCFG_CPU_PROGRAM_MAP(mhhonban_map)
 MACHINE_CONFIG_END
 
-MACHINE_CONFIG_DERIVED(niyanpai_state::zokumahj, musobana)
+MACHINE_CONFIG_START(niyanpai_state::zokumahj)
+	musobana(config);
 
 	/* basic machine hardware */
 	MCFG_CPU_MODIFY("maincpu")

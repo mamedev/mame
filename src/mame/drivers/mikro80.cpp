@@ -195,7 +195,8 @@ MACHINE_CONFIG_START(mikro80_state::mikro80)
 	MCFG_SOFTWARE_LIST_ADD("cass_list", "mikro80")
 MACHINE_CONFIG_END
 
-MACHINE_CONFIG_DERIVED(mikro80_state::radio99, mikro80)
+MACHINE_CONFIG_START(mikro80_state::radio99)
+	mikro80(config);
 
 	/* basic machine hardware */
 	MCFG_CPU_MODIFY("maincpu")
@@ -206,7 +207,8 @@ MACHINE_CONFIG_DERIVED(mikro80_state::radio99, mikro80)
 	MCFG_SOUND_ROUTE_EX(0, "dac", 1.0, DAC_VREF_POS_INPUT)
 MACHINE_CONFIG_END
 
-MACHINE_CONFIG_DERIVED(mikro80_state::kristall, mikro80)
+MACHINE_CONFIG_START(mikro80_state::kristall)
+	mikro80(config);
 	MCFG_CPU_MODIFY("maincpu")
 	MCFG_CPU_IO_MAP(kristall_io)
 MACHINE_CONFIG_END

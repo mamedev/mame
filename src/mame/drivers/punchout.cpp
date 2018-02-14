@@ -671,7 +671,8 @@ MACHINE_CONFIG_START(punchout_state::punchout)
 MACHINE_CONFIG_END
 
 
-MACHINE_CONFIG_DERIVED(punchout_state::spnchout, punchout)
+MACHINE_CONFIG_START(punchout_state::spnchout)
+	punchout(config);
 
 	/* basic machine hardware */
 	MCFG_CPU_MODIFY("maincpu")
@@ -685,7 +686,8 @@ MACHINE_CONFIG_DERIVED(punchout_state::spnchout, punchout)
 MACHINE_CONFIG_END
 
 
-MACHINE_CONFIG_DERIVED(punchout_state::armwrest, punchout)
+MACHINE_CONFIG_START(punchout_state::armwrest)
+	punchout(config);
 
 	/* basic machine hardware */
 	MCFG_CPU_MODIFY("maincpu")

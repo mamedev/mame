@@ -1653,7 +1653,8 @@ MACHINE_CONFIG_START(model1_state::model1)
 	MCFG_M1COMM_ADD("m1comm")
 MACHINE_CONFIG_END
 
-MACHINE_CONFIG_DERIVED(model1_state::swa, model1)
+MACHINE_CONFIG_START(model1_state::swa)
+	model1(config);
 	MCFG_SPEAKER_STANDARD_STEREO("dleft", "dright")
 	MCFG_DSBZ80_ADD(DSBZ80_TAG)
 	MCFG_SOUND_ROUTE(0, "dleft", 1.0)
@@ -1671,7 +1672,8 @@ ADDRESS_MAP_START(model1_state::polhemus_map)
 	AM_RANGE(0xf8000, 0xfffff) AM_ROM AM_REGION("polhemus", 0)
 ADDRESS_MAP_END
 
-MACHINE_CONFIG_DERIVED(model1_state::netmerc, model1)
+MACHINE_CONFIG_START(model1_state::netmerc)
+	model1(config);
 	MCFG_CPU_ADD("polhemus", I386SX, 16000000)
 	MCFG_CPU_PROGRAM_MAP(polhemus_map)
 MACHINE_CONFIG_END

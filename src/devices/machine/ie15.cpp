@@ -600,7 +600,7 @@ ROM_START( ie15 )
 ROM_END
 
 MACHINE_CONFIG_START(ie15_device::device_add_mconfig)
-	MCFG_FRAGMENT_ADD(ie15core)
+	ie15core(config);
 
 	MCFG_SCREEN_ADD_MONOCHROME("screen", RASTER, rgb_t::green())
 	MCFG_SCREEN_UPDATE_DRIVER(ie15_device, screen_update)

@@ -403,17 +403,19 @@ MACHINE_CONFIG_START(de_3_state::de_3)
 	MCFG_DECOCPU_LAMP(WRITE8(de_3_state,lamps_w))
 	MCFG_DECOCPU_DMDSTATUS(READ8(de_3_state,dmd_status_r))
 
-	MCFG_FRAGMENT_ADD( genpin_audio )
+	genpin_audio(config);
 
 	MCFG_DECOBSMT_ADD(DECOBSMT_TAG)
 
 MACHINE_CONFIG_END
 
-MACHINE_CONFIG_DERIVED(de_3_state::de_3_dmd2, de_3)
+MACHINE_CONFIG_START(de_3_state::de_3_dmd2)
+	de_3(config);
 	MCFG_DECODMD_TYPE2_ADD("decodmd2",":gfx3")
 MACHINE_CONFIG_END
 
-MACHINE_CONFIG_DERIVED(de_3_state::de_3_dmd1, de_3)
+MACHINE_CONFIG_START(de_3_state::de_3_dmd1)
+	de_3(config);
 	MCFG_DECODMD_TYPE1_ADD("decodmd1",":gfx3")
 MACHINE_CONFIG_END
 

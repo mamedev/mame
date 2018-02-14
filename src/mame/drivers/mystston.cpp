@@ -198,7 +198,7 @@ MACHINE_CONFIG_START(mystston_state::mystston)
 	MCFG_CPU_PROGRAM_MAP(main_map)
 
 	/* video hardware */
-	MCFG_FRAGMENT_ADD(mystston_video)
+	mystston_video(config);
 
 	/* audio hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")

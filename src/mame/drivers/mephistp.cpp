@@ -195,7 +195,8 @@ MACHINE_CONFIG_START(mephisto_pinball_state::mephisto)
 MACHINE_CONFIG_END
 
 #ifdef UNUSED_DEFINITION
-static MACHINE_CONFIG_DERIVED(sport2k, mephisto)
+static MACHINE_CONFIG_START(sport2k)
+	mephisto(config);
 	MCFG_CPU_MODIFY("soundcpu")
 	MCFG_CPU_IO_MAP(sport2k_8051_io)
 

@@ -855,7 +855,8 @@ MACHINE_CONFIG_START(igs009_state::jingbell)
 MACHINE_CONFIG_END
 
 
-MACHINE_CONFIG_DERIVED(igs009_state::gp98, jingbell)
+MACHINE_CONFIG_START(igs009_state::gp98)
+	jingbell(config);
 	/* basic machine hardware */
 	MCFG_CPU_MODIFY("maincpu")
 	MCFG_CPU_IO_MAP(gp98_portmap)

@@ -992,7 +992,8 @@ MACHINE_CONFIG_START(namcona1_state::namcona1)
 	MCFG_SOUND_ROUTE(1, "lspeaker", 1.00)
 MACHINE_CONFIG_END
 
-MACHINE_CONFIG_DERIVED(namcona2_state::namcona2, namcona1)
+MACHINE_CONFIG_START(namcona2_state::namcona2)
+	namcona1(config);
 
 	/* basic machine hardware */
 //	MCFG_CPU_MODIFY("maincpu")
@@ -1003,7 +1004,8 @@ MACHINE_CONFIG_DERIVED(namcona2_state::namcona2, namcona1)
 	MCFG_CPU_IO_MAP( namcona1_mcu_io_map)
 MACHINE_CONFIG_END
 
-MACHINE_CONFIG_DERIVED(xday2_namcona2_state::xday2, namcona2)
+MACHINE_CONFIG_START(xday2_namcona2_state::xday2)
+	namcona2(config);
 	MCFG_CPU_MODIFY("maincpu")
 	MCFG_CPU_PROGRAM_MAP(xday2_main_map)
 

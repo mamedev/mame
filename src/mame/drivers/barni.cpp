@@ -79,7 +79,7 @@ MACHINE_CONFIG_START(barni_state::barni)
 	/* sound hardware */
 	//tmms5220
 	//dac
-	MCFG_FRAGMENT_ADD( genpin_audio )
+	genpin_audio(config);
 MACHINE_CONFIG_END
 
 

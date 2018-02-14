@@ -1752,7 +1752,8 @@ TIMER_DEVICE_CALLBACK_MEMBER(blitz68k_state::steaser_mcu_sim)
 }
 
 
-MACHINE_CONFIG_DERIVED(blitz68k_state::steaser, ilpag)
+MACHINE_CONFIG_START(blitz68k_state::steaser)
+	ilpag(config);
 	MCFG_CPU_MODIFY("maincpu")
 	MCFG_CPU_PROGRAM_MAP(steaser_map)
 	MCFG_CPU_VBLANK_INT_DRIVER("screen", blitz68k_state, irq5_line_hold) //3, 4 & 6 used, mcu comms?

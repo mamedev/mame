@@ -1717,7 +1717,8 @@ MACHINE_CONFIG_START(itech32_state::timekill)
 MACHINE_CONFIG_END
 
 
-MACHINE_CONFIG_DERIVED(itech32_state::bloodstm, timekill)
+MACHINE_CONFIG_START(itech32_state::bloodstm)
+	timekill(config);
 
 	/* basic machine hardware */
 
@@ -1732,7 +1733,8 @@ MACHINE_CONFIG_DERIVED(itech32_state::bloodstm, timekill)
 MACHINE_CONFIG_END
 
 
-MACHINE_CONFIG_DERIVED(itech32_state::drivedge, timekill)
+MACHINE_CONFIG_START(itech32_state::drivedge)
+	timekill(config);
 
 	/* basic machine hardware */
 
@@ -1760,7 +1762,8 @@ MACHINE_CONFIG_DERIVED(itech32_state::drivedge, timekill)
 MACHINE_CONFIG_END
 
 
-MACHINE_CONFIG_DERIVED(itech32_state::sftm, timekill)
+MACHINE_CONFIG_START(itech32_state::sftm)
+	timekill(config);
 
 	/* basic machine hardware */
 
@@ -1781,7 +1784,8 @@ MACHINE_CONFIG_DERIVED(itech32_state::sftm, timekill)
 MACHINE_CONFIG_END
 
 
-MACHINE_CONFIG_DERIVED(itech32_state::tourny, sftm)
+MACHINE_CONFIG_START(itech32_state::tourny)
+	sftm(config);
 
 	/* basic machine hardware */
 

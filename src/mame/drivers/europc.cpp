@@ -548,13 +548,15 @@ MACHINE_CONFIG_START(europc_pc_state::europc)
 MACHINE_CONFIG_END
 
 //Euro PC II
-MACHINE_CONFIG_DERIVED(europc_pc_state::europc2, europc)
+MACHINE_CONFIG_START(europc_pc_state::europc2)
+	europc(config);
 	MCFG_DEVICE_MODIFY(RAM_TAG)
 	MCFG_RAM_DEFAULT_SIZE("768K") // could be configured by the BIOS as 640K, 640K+128K EMS or 512K+256K EMS
 MACHINE_CONFIG_END
 
 //Euro XT
-MACHINE_CONFIG_DERIVED(europc_pc_state::euroxt, europc)
+MACHINE_CONFIG_START(europc_pc_state::euroxt)
+	europc(config);
 	MCFG_DEVICE_MODIFY(RAM_TAG)
 	MCFG_RAM_DEFAULT_SIZE("768K")
 	MCFG_DEVICE_MODIFY("isa2")

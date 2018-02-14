@@ -163,7 +163,8 @@ MACHINE_CONFIG_START(lisa_state::lisa)
 MACHINE_CONFIG_END
 
 
-MACHINE_CONFIG_DERIVED(lisa_state::lisa210, lisa)
+MACHINE_CONFIG_START(lisa_state::lisa210)
+	lisa(config);
 	MCFG_CPU_MODIFY( "fdccpu" )
 	MCFG_CPU_PROGRAM_MAP(lisa210_fdc_map)
 
@@ -178,7 +179,8 @@ MACHINE_CONFIG_DERIVED(lisa_state::lisa210, lisa)
 MACHINE_CONFIG_END
 
 
-MACHINE_CONFIG_DERIVED(lisa_state::macxl, lisa210)
+MACHINE_CONFIG_START(lisa_state::macxl)
+	lisa210(config);
 	MCFG_SCREEN_MODIFY("screen")
 	MCFG_SCREEN_SIZE(   768/* ???? */, 447/* ???? */)
 	MCFG_SCREEN_VISIBLE_AREA(0, 608-1, 0, 431-1)

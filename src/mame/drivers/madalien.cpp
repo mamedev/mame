@@ -159,7 +159,7 @@ MACHINE_CONFIG_START(madalien_state::madalien)
 	MCFG_CPU_VBLANK_INT_DRIVER("screen", madalien_state,  nmi_line_pulse)
 
 	/* video hardware */
-	MCFG_FRAGMENT_ADD(madalien_video)
+	madalien_video(config);
 
 	/* audio hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")

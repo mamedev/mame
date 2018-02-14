@@ -176,7 +176,8 @@ MACHINE_CONFIG_START(swtpc_state::swtpc)
 	MCFG_RAM_EXTRA_OPTIONS("4K,8K,12K,16K,20K,24K,28K,32K")
 MACHINE_CONFIG_END
 
-MACHINE_CONFIG_DERIVED(swtpc_state::swtpcm, swtpc)
+MACHINE_CONFIG_START(swtpc_state::swtpcm)
+	swtpc(config);
 	MCFG_CPU_MODIFY("maincpu")
 	MCFG_CPU_CLOCK(XTAL(1'797'100) / 2)
 

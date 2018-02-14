@@ -463,7 +463,8 @@ MACHINE_CONFIG_START(breakout_state::breakout)
 	MCFG_SOUND_ROUTE_EX(0, "dac", 1.0, DAC_VREF_POS_INPUT) MCFG_SOUND_ROUTE_EX(0, "dac", -1.0, DAC_VREF_NEG_INPUT)
 MACHINE_CONFIG_END
 
-MACHINE_CONFIG_DERIVED(pong_state::pongf, pong)
+MACHINE_CONFIG_START(pong_state::pongf)
+	pong(config);
 
 	/* basic machine hardware */
 	MCFG_DEVICE_MODIFY("maincpu")

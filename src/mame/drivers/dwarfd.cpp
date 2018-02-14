@@ -757,7 +757,8 @@ MACHINE_CONFIG_START(dwarfd_state::dwarfd)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 MACHINE_CONFIG_END
 
-MACHINE_CONFIG_DERIVED(dwarfd_state::pokeresp, dwarfd)
+MACHINE_CONFIG_START(dwarfd_state::pokeresp)
+	dwarfd(config);
 	MCFG_CPU_MODIFY("maincpu")
 	MCFG_CPU_PROGRAM_MAP(pokeresp_map)
 	MCFG_CPU_IO_MAP(io_map)
@@ -766,7 +767,8 @@ MACHINE_CONFIG_DERIVED(dwarfd_state::pokeresp, dwarfd)
 	MCFG_I8275_DRAW_CHARACTER_CALLBACK_OWNER(dwarfd_state, pesp_display_pixels)
 MACHINE_CONFIG_END
 
-MACHINE_CONFIG_DERIVED(dwarfd_state::qc, dwarfd)
+MACHINE_CONFIG_START(dwarfd_state::qc)
+	dwarfd(config);
 
 	MCFG_CPU_MODIFY("maincpu")
 	MCFG_CPU_PROGRAM_MAP(qc_map)

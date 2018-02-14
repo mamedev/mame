@@ -734,7 +734,8 @@ MACHINE_CONFIG_START(dlair_state::dlair_base)
 MACHINE_CONFIG_END
 
 
-MACHINE_CONFIG_DERIVED(dlair_state::dlair_pr7820, dlair_base)
+MACHINE_CONFIG_START(dlair_state::dlair_pr7820)
+	dlair_base(config);
 	MCFG_LASERDISC_PR7820_ADD("ld_pr7820")
 	MCFG_SOUND_ROUTE(0, "lspeaker", 1.0)
 	MCFG_SOUND_ROUTE(1, "rspeaker", 1.0)
@@ -742,7 +743,8 @@ MACHINE_CONFIG_DERIVED(dlair_state::dlair_pr7820, dlair_base)
 MACHINE_CONFIG_END
 
 
-MACHINE_CONFIG_DERIVED(dlair_state::dlair_ldv1000, dlair_base)
+MACHINE_CONFIG_START(dlair_state::dlair_ldv1000)
+	dlair_base(config);
 	MCFG_LASERDISC_LDV1000_ADD("ld_ldv1000")
 	MCFG_SOUND_ROUTE(0, "lspeaker", 1.0)
 	MCFG_SOUND_ROUTE(1, "rspeaker", 1.0)

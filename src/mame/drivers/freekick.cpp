@@ -795,7 +795,8 @@ MACHINE_CONFIG_START(freekick_state::base)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
 MACHINE_CONFIG_END
 
-MACHINE_CONFIG_DERIVED(freekick_state::pbillrd, base)
+MACHINE_CONFIG_START(freekick_state::pbillrd)
+	base(config);
 	MCFG_DEVICE_MODIFY("outlatch") // 10K
 	MCFG_ADDRESSABLE_LATCH_Q0_OUT_CB(WRITELINE(freekick_state, flipscreen_x_w))
 	MCFG_ADDRESSABLE_LATCH_Q1_OUT_CB(WRITELINE(freekick_state, flipscreen_y_w))
@@ -805,7 +806,8 @@ MACHINE_CONFIG_DERIVED(freekick_state::pbillrd, base)
 	MCFG_MACHINE_RESET_OVERRIDE(freekick_state,freekick)
 MACHINE_CONFIG_END
 
-MACHINE_CONFIG_DERIVED(freekick_state::pbillrdm, pbillrd)
+MACHINE_CONFIG_START(freekick_state::pbillrdm)
+	pbillrd(config);
 	MCFG_CPU_REPLACE("maincpu", MC8123, XTAL(12'000'000)/4)
 	MCFG_CPU_PROGRAM_MAP(pbillrd_map)
 	MCFG_CPU_OPCODES_MAP(decrypted_opcodes_map)
@@ -813,7 +815,8 @@ MACHINE_CONFIG_DERIVED(freekick_state::pbillrdm, pbillrd)
 	MCFG_CPU_VBLANK_INT_DRIVER("screen", freekick_state,  freekick_irqgen)
 MACHINE_CONFIG_END
 
-MACHINE_CONFIG_DERIVED(freekick_state::freekick, base)
+MACHINE_CONFIG_START(freekick_state::freekick)
+	base(config);
 
 	/* basic machine hardware */
 	MCFG_CPU_MODIFY("maincpu")
@@ -842,7 +845,8 @@ MACHINE_CONFIG_DERIVED(freekick_state::freekick, base)
 	MCFG_SCREEN_UPDATE_DRIVER(freekick_state, screen_update_freekick)
 MACHINE_CONFIG_END
 
-MACHINE_CONFIG_DERIVED(freekick_state::gigas, base)
+MACHINE_CONFIG_START(freekick_state::gigas)
+	base(config);
 
 	/* basic machine hardware */
 	MCFG_CPU_MODIFY("maincpu")
@@ -862,7 +866,8 @@ MACHINE_CONFIG_DERIVED(freekick_state::gigas, base)
 	MCFG_SCREEN_UPDATE_DRIVER(freekick_state, screen_update_gigas)
 MACHINE_CONFIG_END
 
-MACHINE_CONFIG_DERIVED(freekick_state::gigasm, base)
+MACHINE_CONFIG_START(freekick_state::gigasm)
+	base(config);
 
 	/* basic machine hardware */
 	MCFG_CPU_REPLACE("maincpu", MC8123, XTAL(12'000'000)/4)
@@ -884,7 +889,8 @@ MACHINE_CONFIG_DERIVED(freekick_state::gigasm, base)
 	MCFG_SCREEN_UPDATE_DRIVER(freekick_state, screen_update_gigas)
 MACHINE_CONFIG_END
 
-MACHINE_CONFIG_DERIVED(freekick_state::oigas, gigas)
+MACHINE_CONFIG_START(freekick_state::oigas)
+	gigas(config);
 
 	/* basic machine hardware */
 	MCFG_CPU_MODIFY("maincpu")

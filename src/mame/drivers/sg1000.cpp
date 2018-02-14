@@ -551,10 +551,11 @@ MACHINE_CONFIG_START(sg1000_state::sg1000)
 MACHINE_CONFIG_END
 
 /*-------------------------------------------------
-    MACHINE_CONFIG_DERIVED( omv, sg1000 )
+    MACHINE_CONFIG_START( omv )
 -------------------------------------------------*/
 
-MACHINE_CONFIG_DERIVED(sg1000_state::omv, sg1000)
+MACHINE_CONFIG_START(sg1000_state::omv)
+	sg1000(config);
 	MCFG_CPU_MODIFY(Z80_TAG)
 	MCFG_CPU_PROGRAM_MAP(omv_map)
 	MCFG_CPU_IO_MAP(omv_io_map)

@@ -158,7 +158,8 @@ MACHINE_CONFIG_START(ac1_state::ac1)
 	MCFG_CASSETTE_ADD( "cassette" )
 MACHINE_CONFIG_END
 
-MACHINE_CONFIG_DERIVED(ac1_state::ac1_32, ac1)
+MACHINE_CONFIG_START(ac1_state::ac1_32)
+	ac1(config);
 
 	MCFG_CPU_MODIFY("maincpu")
 	MCFG_CPU_PROGRAM_MAP(ac1_32_mem)

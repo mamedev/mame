@@ -516,7 +516,8 @@ MACHINE_CONFIG_START(lasso_state::base)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 1.0)
 MACHINE_CONFIG_END
 
-MACHINE_CONFIG_DERIVED(lasso_state::lasso, base)
+MACHINE_CONFIG_START(lasso_state::lasso)
+	base(config);
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("blitter", M6502, 11289000/16) /* guess */
@@ -526,7 +527,8 @@ MACHINE_CONFIG_DERIVED(lasso_state::lasso, base)
 	MCFG_PALETTE_INIT_OWNER(lasso_state, lasso)
 MACHINE_CONFIG_END
 
-MACHINE_CONFIG_DERIVED(lasso_state::chameleo, base)
+MACHINE_CONFIG_START(lasso_state::chameleo)
+	base(config);
 
 	/* basic machine hardware */
 	MCFG_CPU_MODIFY("maincpu")
@@ -543,7 +545,8 @@ MACHINE_CONFIG_DERIVED(lasso_state::chameleo, base)
 	MCFG_SCREEN_UPDATE_DRIVER(lasso_state, screen_update_chameleo)
 MACHINE_CONFIG_END
 
-MACHINE_CONFIG_DERIVED(lasso_state::wwjgtin, base)
+MACHINE_CONFIG_START(lasso_state::wwjgtin)
+	base(config);
 
 	/* basic machine hardware */
 	MCFG_CPU_MODIFY("maincpu")
@@ -572,7 +575,8 @@ MACHINE_CONFIG_DERIVED(lasso_state::wwjgtin, base)
 	MCFG_SOUND_ROUTE_EX(0, "dac", 1.0, DAC_VREF_POS_INPUT) MCFG_SOUND_ROUTE_EX(0, "dac", -1.0, DAC_VREF_NEG_INPUT)
 MACHINE_CONFIG_END
 
-MACHINE_CONFIG_DERIVED(lasso_state::pinbo, base)
+MACHINE_CONFIG_START(lasso_state::pinbo)
+	base(config);
 
 	/* basic machine hardware */
 	MCFG_CPU_REPLACE("maincpu", M6502, XTAL(18'000'000)/24)

@@ -916,7 +916,8 @@ MACHINE_CONFIG_END
 
 /* Rescue, Minefield and Strategy X have extra colors, and custom video initialise */
 /* routines to set up the graduated color backgound they use */
-MACHINE_CONFIG_DERIVED(scobra_state::rescue, type1)
+MACHINE_CONFIG_START(scobra_state::rescue)
+	type1(config);
 
 	/* basic machine hardware */
 
@@ -929,19 +930,22 @@ MACHINE_CONFIG_DERIVED(scobra_state::rescue, type1)
 	MCFG_VIDEO_START_OVERRIDE(scobra_state,rescue)
 MACHINE_CONFIG_END
 
-MACHINE_CONFIG_DERIVED(scobra_state::rescuefe, rescue)
+MACHINE_CONFIG_START(scobra_state::rescuefe)
+	rescue(config);
 	/* basic machine hardware */
 	MCFG_CPU_MODIFY("maincpu")
 	MCFG_CPU_PROGRAM_MAP(rescuefe_map)
 MACHINE_CONFIG_END
 
-MACHINE_CONFIG_DERIVED(scobra_state::rescueb, rescue)
+MACHINE_CONFIG_START(scobra_state::rescueb)
+	rescue(config);
 	MCFG_DEVICE_MODIFY("ppi8255_1")
 	MCFG_I8255_IN_PORTC_CB(READ8(scobra_state, rescueb_a002_r)) // protection? must return 0xfc or the game jumps to 0x00
 MACHINE_CONFIG_END
 
 
-MACHINE_CONFIG_DERIVED(scobra_state::minefld, type1)
+MACHINE_CONFIG_START(scobra_state::minefld)
+	type1(config);
 
 	/* basic machine hardware */
 
@@ -954,13 +958,15 @@ MACHINE_CONFIG_DERIVED(scobra_state::minefld, type1)
 	MCFG_VIDEO_START_OVERRIDE(scobra_state,minefld)
 MACHINE_CONFIG_END
 
-MACHINE_CONFIG_DERIVED(scobra_state::minefldfe, minefld)
+MACHINE_CONFIG_START(scobra_state::minefldfe)
+	minefld(config);
 	MCFG_CPU_MODIFY("maincpu")
 	MCFG_CPU_PROGRAM_MAP(minefldfe_map)
 MACHINE_CONFIG_END
 
 
-MACHINE_CONFIG_DERIVED(scobra_state::mimonkey, type1)
+MACHINE_CONFIG_START(scobra_state::mimonkey)
+	type1(config);
 
 	/* basic machine hardware */
 	MCFG_CPU_MODIFY("maincpu")
@@ -971,14 +977,16 @@ MACHINE_CONFIG_DERIVED(scobra_state::mimonkey, type1)
 MACHINE_CONFIG_END
 
 
-MACHINE_CONFIG_DERIVED(scobra_state::type2, type1)
+MACHINE_CONFIG_START(scobra_state::type2)
+	type1(config);
 
 	/* basic machine hardware */
 	MCFG_CPU_MODIFY("maincpu")
 	MCFG_CPU_PROGRAM_MAP(type2_map)
 MACHINE_CONFIG_END
 
-MACHINE_CONFIG_DERIVED(scobra_state::tazmani3, type2)
+MACHINE_CONFIG_START(scobra_state::tazmani3)
+	type2(config);
 
 	/* basic machine hardware */
 	MCFG_CPU_MODIFY("maincpu")
@@ -986,7 +994,8 @@ MACHINE_CONFIG_DERIVED(scobra_state::tazmani3, type2)
 MACHINE_CONFIG_END
 
 
-MACHINE_CONFIG_DERIVED(scobra_state::stratgyx, type2)
+MACHINE_CONFIG_START(scobra_state::stratgyx)
+	type2(config);
 
 	/* basic machine hardware */
 
@@ -1005,7 +1014,8 @@ MACHINE_CONFIG_DERIVED(scobra_state::stratgyx, type2)
 MACHINE_CONFIG_END
 
 
-MACHINE_CONFIG_DERIVED(scobra_state::darkplnt, type2)
+MACHINE_CONFIG_START(scobra_state::darkplnt)
+	type2(config);
 
 	/* basic machine hardware */
 
@@ -1077,7 +1087,8 @@ MACHINE_CONFIG_START(scobra_state::hustler)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.33)
 MACHINE_CONFIG_END
 
-MACHINE_CONFIG_DERIVED(scobra_state::hustlerb, hustler)
+MACHINE_CONFIG_START(scobra_state::hustlerb)
+	hustler(config);
 
 	/* basic machine hardware */
 	MCFG_CPU_MODIFY("maincpu")
@@ -1088,7 +1099,8 @@ MACHINE_CONFIG_DERIVED(scobra_state::hustlerb, hustler)
 	MCFG_CPU_IO_MAP(hustlerb_sound_io_map)
 MACHINE_CONFIG_END
 
-MACHINE_CONFIG_DERIVED(scobra_state::hustlerb4, hustler)
+MACHINE_CONFIG_START(scobra_state::hustlerb4)
+	hustler(config);
 
 	/* basic machine hardware */
 	MCFG_CPU_MODIFY("maincpu")

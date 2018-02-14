@@ -457,7 +457,8 @@ MACHINE_CONFIG_START(kangaroo_state::nomcu)
 MACHINE_CONFIG_END
 
 
-MACHINE_CONFIG_DERIVED(kangaroo_state::mcu, nomcu)
+MACHINE_CONFIG_START(kangaroo_state::mcu)
+	nomcu(config);
 
 	MCFG_MACHINE_START_OVERRIDE(kangaroo_state,kangaroo_mcu)
 

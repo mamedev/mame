@@ -405,7 +405,8 @@ MACHINE_CONFIG_START(zn_state::zn1_1mb_vram)
 	MCFG_DEVICE_ADD("at28c16", AT28C16, 0)
 MACHINE_CONFIG_END
 
-MACHINE_CONFIG_DERIVED(zn_state::zn1_2mb_vram, zn1_1mb_vram)
+MACHINE_CONFIG_START(zn_state::zn1_2mb_vram)
+	zn1_1mb_vram(config);
 	MCFG_PSXGPU_REPLACE( "maincpu", "gpu", CXD8561Q, 0x200000, XTAL(53'693'175) )
 MACHINE_CONFIG_END
 
@@ -632,7 +633,8 @@ ADDRESS_MAP_START(zn_state::qsound_portmap)
 	AM_RANGE(0x00, 0x00) AM_DEVREAD("soundlatch", generic_latch_8_device, read)
 ADDRESS_MAP_END
 
-MACHINE_CONFIG_DERIVED(zn_state::coh1000c, zn1_1mb_vram)
+MACHINE_CONFIG_START(zn_state::coh1000c)
+	zn1_1mb_vram(config);
 	MCFG_CPU_MODIFY("maincpu")
 	MCFG_CPU_PROGRAM_MAP(coh1000c_map)
 
@@ -648,11 +650,13 @@ MACHINE_CONFIG_DERIVED(zn_state::coh1000c, zn1_1mb_vram)
 	MCFG_SOUND_ROUTE(1, "rspeaker", 1.0)
 MACHINE_CONFIG_END
 
-MACHINE_CONFIG_DERIVED(zn_state::glpracr, coh1000c)
+MACHINE_CONFIG_START(zn_state::glpracr)
+	coh1000c(config);
 	MCFG_MACHINE_RESET_OVERRIDE(zn_state, glpracr)
 MACHINE_CONFIG_END
 
-MACHINE_CONFIG_DERIVED(zn_state::coh1002c, zn1_2mb_vram)
+MACHINE_CONFIG_START(zn_state::coh1002c)
+	zn1_2mb_vram(config);
 	MCFG_CPU_MODIFY("maincpu")
 	MCFG_CPU_PROGRAM_MAP(coh1000c_map)
 
@@ -809,7 +813,8 @@ Notes:
                        Unpopulated sockets on Rival Schools - None
 */
 
-MACHINE_CONFIG_DERIVED(zn_state::coh3002c, zn2)
+MACHINE_CONFIG_START(zn_state::coh3002c)
+	zn2(config);
 	MCFG_CPU_MODIFY("maincpu")
 	MCFG_CPU_PROGRAM_MAP(coh1000c_map)
 
@@ -1091,7 +1096,8 @@ ADDRESS_MAP_START(zn_state::fx1a_sound_map)
 ADDRESS_MAP_END
 
 
-MACHINE_CONFIG_DERIVED(zn_state::coh1000ta, zn1_1mb_vram)
+MACHINE_CONFIG_START(zn_state::coh1000ta)
+	zn1_1mb_vram(config);
 	MCFG_CPU_MODIFY("maincpu")
 	MCFG_CPU_PROGRAM_MAP(coh1000ta_map)
 
@@ -1149,7 +1155,8 @@ MACHINE_RESET_MEMBER(zn_state,coh1000tb)
 	m_bankedroms->set_entry( 0 );
 }
 
-MACHINE_CONFIG_DERIVED(zn_state::coh1000tb, zn1_1mb_vram)
+MACHINE_CONFIG_START(zn_state::coh1000tb)
+	zn1_1mb_vram(config);
 
 	/* basic machine hardware */
 	MCFG_CPU_MODIFY("maincpu")
@@ -1169,7 +1176,8 @@ MACHINE_CONFIG_DERIVED(zn_state::coh1000tb, zn1_1mb_vram)
 	MCFG_TAITO_ZOOM_ADD("taito_zoom")
 MACHINE_CONFIG_END
 
-MACHINE_CONFIG_DERIVED(zn_state::coh1002tb, zn1_2mb_vram)
+MACHINE_CONFIG_START(zn_state::coh1002tb)
+	zn1_2mb_vram(config);
 
 	/* basic machine hardware */
 	MCFG_CPU_MODIFY("maincpu")
@@ -1414,7 +1422,8 @@ ADDRESS_MAP_START(zn_state::coh1000w_map)
 	AM_RANGE(0x1f7f4000, 0x1f7f4fff) AM_READWRITE16(vt83c461_32_r, vt83c461_32_w, 0xffffffff)
 ADDRESS_MAP_END
 
-MACHINE_CONFIG_DERIVED(zn_state::coh1000w, zn1_2mb_vram)
+MACHINE_CONFIG_START(zn_state::coh1000w)
+	zn1_2mb_vram(config);
 	MCFG_CPU_MODIFY("maincpu")
 	MCFG_CPU_PROGRAM_MAP(coh1000w_map)
 
@@ -1611,7 +1620,8 @@ ADDRESS_MAP_START(zn_state::psarc_snd_map)
 	AM_RANGE(0x100020, 0xffffff) AM_WRITENOP
 ADDRESS_MAP_END
 
-MACHINE_CONFIG_DERIVED(zn_state::coh1002e, zn1_2mb_vram)
+MACHINE_CONFIG_START(zn_state::coh1002e)
+	zn1_2mb_vram(config);
 	MCFG_CPU_MODIFY("maincpu")
 	MCFG_CPU_PROGRAM_MAP(coh1002e_map)
 
@@ -1743,7 +1753,8 @@ MACHINE_RESET_MEMBER(zn_state,bam2)
 	m_bankedroms->set_entry( 1 );
 }
 
-MACHINE_CONFIG_DERIVED(zn_state::bam2, zn1_2mb_vram)
+MACHINE_CONFIG_START(zn_state::bam2)
+	zn1_2mb_vram(config);
 	MCFG_CPU_MODIFY("maincpu")
 	MCFG_CPU_PROGRAM_MAP(bam2_map)
 
@@ -2073,12 +2084,14 @@ ADDRESS_MAP_START(zn_state::jdredd_map)
 	AM_RANGE(0x1fbfff90, 0x1fbfff9f) AM_DEVREADWRITE16("ata", ata_interface_device, read_cs0, write_cs0, 0xffffffff)
 ADDRESS_MAP_END
 
-MACHINE_CONFIG_DERIVED(zn_state::coh1000a, zn1_2mb_vram)
+MACHINE_CONFIG_START(zn_state::coh1000a)
+	zn1_2mb_vram(config);
 	MCFG_CPU_MODIFY("maincpu")
 	MCFG_CPU_PROGRAM_MAP(coh1000a_map)
 MACHINE_CONFIG_END
 
-MACHINE_CONFIG_DERIVED(zn_state::nbajamex, coh1000a)
+MACHINE_CONFIG_START(zn_state::nbajamex)
+	coh1000a(config);
 	MCFG_CPU_MODIFY("maincpu")
 	MCFG_CPU_PROGRAM_MAP(nbajamex_map)
 	MCFG_NVRAM_ADD_1FILL("71256")
@@ -2086,7 +2099,8 @@ MACHINE_CONFIG_DERIVED(zn_state::nbajamex, coh1000a)
 	MCFG_DEVICE_ADD("rax", ACCLAIM_RAX, 0)
 MACHINE_CONFIG_END
 
-MACHINE_CONFIG_DERIVED(zn_state::jdredd, coh1000a)
+MACHINE_CONFIG_START(zn_state::jdredd)
+	coh1000a(config);
 	MCFG_CPU_MODIFY("maincpu")
 	MCFG_CPU_PROGRAM_MAP(jdredd_map)
 
@@ -2253,7 +2267,8 @@ ADDRESS_MAP_START(zn_state::atlus_snd_map)
 ADDRESS_MAP_END
 
 
-MACHINE_CONFIG_DERIVED(zn_state::coh1001l, zn1_2mb_vram)
+MACHINE_CONFIG_START(zn_state::coh1001l)
+	zn1_2mb_vram(config);
 	MCFG_CPU_MODIFY("maincpu")
 	MCFG_CPU_PROGRAM_MAP(coh1001l_map)
 
@@ -2301,7 +2316,8 @@ MACHINE_RESET_MEMBER(zn_state,coh1002v)
 	m_bankedroms->set_entry( 0 );
 }
 
-MACHINE_CONFIG_DERIVED(zn_state::coh1002v, zn1_2mb_vram)
+MACHINE_CONFIG_START(zn_state::coh1002v)
+	zn1_2mb_vram(config);
 	MCFG_CPU_MODIFY("maincpu")
 	MCFG_CPU_PROGRAM_MAP(coh1002v_map)
 
@@ -2484,7 +2500,8 @@ MACHINE_RESET_MEMBER(zn_state,coh1002m)
 	m_bankedroms->set_entry( 0 );
 }
 
-MACHINE_CONFIG_DERIVED(zn_state::coh1002m, zn1_2mb_vram)
+MACHINE_CONFIG_START(zn_state::coh1002m)
+	zn1_2mb_vram(config);
 	MCFG_CPU_MODIFY("maincpu")
 	MCFG_CPU_PROGRAM_MAP(coh1002m_map)
 
@@ -2532,7 +2549,8 @@ ADDRESS_MAP_START(zn_state::coh1002ml_link_port_map)
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
 ADDRESS_MAP_END
 
-MACHINE_CONFIG_DERIVED(zn_state::coh1002msnd, coh1002m)
+MACHINE_CONFIG_START(zn_state::coh1002msnd)
+	coh1002m(config);
 
 	/* basic machine hardware */
 	MCFG_CPU_MODIFY("maincpu")
@@ -2553,7 +2571,8 @@ MACHINE_CONFIG_DERIVED(zn_state::coh1002msnd, coh1002m)
 	MCFG_SOUND_ROUTE(1, "rspeaker", 0.35)
 MACHINE_CONFIG_END
 
-MACHINE_CONFIG_DERIVED(zn_state::coh1002ml, coh1002m)
+MACHINE_CONFIG_START(zn_state::coh1002ml)
+	coh1002m(config);
 	MCFG_CPU_ADD("link", Z80, 4000000) // ?
 	MCFG_CPU_PROGRAM_MAP(coh1002ml_link_map)
 	MCFG_CPU_IO_MAP(coh1002ml_link_port_map)

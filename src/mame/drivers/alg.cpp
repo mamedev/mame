@@ -313,7 +313,7 @@ MACHINE_CONFIG_START(alg_state::alg_r1)
 	MCFG_NVRAM_ADD_0FILL("nvram")
 
 	/* video hardware */
-	MCFG_FRAGMENT_ADD(ntsc_video)
+	ntsc_video(config);
 
 	MCFG_LASERDISC_LDP1450_ADD("laserdisc",9600)
 	MCFG_LASERDISC_SCREEN("screen")
@@ -359,19 +359,21 @@ MACHINE_CONFIG_START(alg_state::alg_r1)
 MACHINE_CONFIG_END
 
 
-MACHINE_CONFIG_DERIVED(alg_state::alg_r2, alg_r1)
+MACHINE_CONFIG_START(alg_state::alg_r2)
+	alg_r1(config);
 	MCFG_CPU_MODIFY("maincpu")
 	MCFG_CPU_PROGRAM_MAP(main_map_r2)
 MACHINE_CONFIG_END
 
 
-MACHINE_CONFIG_DERIVED(alg_state::picmatic, alg_r1)
+MACHINE_CONFIG_START(alg_state::picmatic)
+	alg_r1(config);
 	/* adjust for PAL specs */
 	MCFG_CPU_REPLACE("maincpu", M68000, amiga_state::CLK_7M_PAL)
 	MCFG_CPU_PROGRAM_MAP(main_map_picmatic)
 
 	MCFG_DEVICE_REMOVE("screen")
-	MCFG_FRAGMENT_ADD(pal_video)
+	pal_video(config);
 
 	MCFG_DEVICE_MODIFY("amiga")
 	MCFG_DEVICE_CLOCK(amiga_state::CLK_C1_PAL)

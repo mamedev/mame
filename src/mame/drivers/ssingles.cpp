@@ -578,7 +578,8 @@ INTERRUPT_GEN_MEMBER(ssingles_state::atamanot_irq)
 	// ...
 }
 
-MACHINE_CONFIG_DERIVED(ssingles_state::atamanot, ssingles)
+MACHINE_CONFIG_START(ssingles_state::atamanot)
+	ssingles(config);
 	MCFG_CPU_MODIFY("maincpu")
 	MCFG_CPU_PROGRAM_MAP(atamanot_map)
 	MCFG_CPU_IO_MAP(atamanot_io_map)

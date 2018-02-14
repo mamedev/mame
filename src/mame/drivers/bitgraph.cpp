@@ -580,7 +580,7 @@ MACHINE_CONFIG_START(bitgraph_state::bitgrpha)
 	MCFG_CPU_ADD(M68K_TAG, M68000, XTAL(6'900'000))
 	MCFG_CPU_PROGRAM_MAP(bitgrapha_mem)
 
-	MCFG_FRAGMENT_ADD(bg_motherboard)
+	bg_motherboard(config);
 
 	MCFG_DEVICE_ADD("system_clock", CLOCK, 40)
 	MCFG_CLOCK_SIGNAL_HANDLER(WRITELINE(bitgraph_state, system_clock_write))
@@ -603,8 +603,8 @@ MACHINE_CONFIG_START(bitgraph_state::bitgrphb)
 	MCFG_CPU_ADD(M68K_TAG, M68000, XTAL(6'900'000))
 	MCFG_CPU_PROGRAM_MAP(bitgraphb_mem)
 
-	MCFG_FRAGMENT_ADD(bg_motherboard)
-//  MCFG_FRAGMENT_ADD(bg_ppu)
+	bg_motherboard(config);
+//  bg_ppu(config);
 
 	MCFG_DEVICE_ADD("system_clock", CLOCK, 1040)
 	MCFG_CLOCK_SIGNAL_HANDLER(WRITELINE(bitgraph_state, system_clock_write))

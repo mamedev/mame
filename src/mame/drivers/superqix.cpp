@@ -1446,7 +1446,8 @@ MACHINE_CONFIG_START(superqix_state::sqix)
 MACHINE_CONFIG_END
 
 
-MACHINE_CONFIG_DERIVED(superqix_state::sqix_8031, sqix)
+MACHINE_CONFIG_START(superqix_state::sqix_8031)
+	sqix(config);
 	MCFG_CPU_MODIFY("mcu") /* p8031ah, clock not verified */
 	MCFG_CPU_IO_MAP(sqix_8031_mcu_io_map)
 MACHINE_CONFIG_END

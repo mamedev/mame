@@ -79,8 +79,8 @@ public:
 	DECLARE_READ8_MEMBER(nascom1_port_02_r);
 	DECLARE_DRIVER_INIT(nascom);
 	void screen_update(bitmap_ind16 &bitmap, const rectangle &cliprect, int char_height);
-	DECLARE_READ8_MEMBER(nascom1_hd6402_si);
-	DECLARE_WRITE8_MEMBER(nascom1_hd6402_so);
+	DECLARE_READ_LINE_MEMBER(nascom1_hd6402_si);
+	DECLARE_WRITE_LINE_MEMBER(nascom1_hd6402_so);
 	DECLARE_DEVICE_IMAGE_LOAD_MEMBER( nascom1_cassette );
 	DECLARE_DEVICE_IMAGE_UNLOAD_MEMBER( nascom1_cassette );
 	DECLARE_SNAPSHOT_LOAD_MEMBER( nascom1 );
@@ -210,12 +210,12 @@ READ8_MEMBER( nascom_state::nascom1_port_02_r )
 	return data;
 }
 
-READ8_MEMBER( nascom_state::nascom1_hd6402_si )
+READ_LINE_MEMBER( nascom_state::nascom1_hd6402_si )
 {
 	return 1;
 }
 
-WRITE8_MEMBER( nascom_state::nascom1_hd6402_so )
+WRITE_LINE_MEMBER( nascom_state::nascom1_hd6402_so )
 {
 }
 
@@ -670,8 +670,8 @@ MACHINE_CONFIG_START(nascom_state::nascom)
 	MCFG_DEVICE_ADD( "hd6402", AY31015, 0 )
 	MCFG_AY31015_TX_CLOCK(( XTAL(16'000'000) / 16 ) / 256)
 	MCFG_AY31015_RX_CLOCK(( XTAL(16'000'000) / 16 ) / 256)
-	MCFG_AY51013_READ_SI_CB(READ8(nascom_state, nascom1_hd6402_si))
-	MCFG_AY51013_WRITE_SO_CB(WRITE8(nascom_state, nascom1_hd6402_so))
+	MCFG_AY51013_READ_SI_CB(READLINE(nascom_state, nascom1_hd6402_si))
+	MCFG_AY51013_WRITE_SO_CB(WRITELINE(nascom_state, nascom1_hd6402_so))
 
 	// cassette is connected to the uart
 	MCFG_CASSETTE_ADD("cassette")
@@ -688,13 +688,15 @@ MACHINE_CONFIG_START(nascom_state::nascom)
 	MCFG_SNAPSHOT_ADD("snapshot", nascom_state, nascom1, "nas", 0.5)
 MACHINE_CONFIG_END
 
-MACHINE_CONFIG_DERIVED(nascom1_state::nascom1, nascom)
+MACHINE_CONFIG_START(nascom1_state::nascom1)
+	nascom(config);
 	MCFG_CPU_ADD("maincpu", Z80, XTAL(16'000'000) / 8)
 	MCFG_CPU_PROGRAM_MAP(nascom1_mem)
 	MCFG_CPU_IO_MAP(nascom1_io)
 MACHINE_CONFIG_END
 
-MACHINE_CONFIG_DERIVED(nascom2_state::nascom2, nascom)
+MACHINE_CONFIG_START(nascom2_state::nascom2)
+	nascom(config);
 	MCFG_CPU_ADD("maincpu", Z80, XTAL(16'000'000) / 4)
 	MCFG_CPU_PROGRAM_MAP(nascom2_mem)
 	MCFG_CPU_IO_MAP(nascom2_io)
@@ -728,7 +730,8 @@ MACHINE_CONFIG_DERIVED(nascom2_state::nascom2, nascom)
 	MCFG_SOFTWARE_LIST_ADD("floppy_list", "nascom_flop")
 MACHINE_CONFIG_END
 
-MACHINE_CONFIG_DERIVED(nascom2_state::nascom2c, nascom2)
+MACHINE_CONFIG_START(nascom2_state::nascom2c)
+	nascom2(config);
 	MCFG_CPU_MODIFY("maincpu")
 	MCFG_CPU_PROGRAM_MAP(nascom2c_mem)
 

@@ -222,8 +222,8 @@ MACHINE_CONFIG_START(redalert_state::redalert_audio)
 
 	MCFG_SPEAKER_STANDARD_MONO("mono")
 
-	MCFG_FRAGMENT_ADD( redalert_audio_m37b )
-	MCFG_FRAGMENT_ADD( redalert_audio_voice )
+	redalert_audio_m37b(config);
+	redalert_audio_voice(config);
 
 	MCFG_SOUND_START_OVERRIDE( redalert_state, redalert )
 
@@ -239,7 +239,7 @@ MACHINE_CONFIG_START(redalert_state::ww3_audio)
 
 	MCFG_SPEAKER_STANDARD_MONO("mono")
 
-	MCFG_FRAGMENT_ADD( redalert_audio_m37b )
+	redalert_audio_m37b(config);
 
 	MCFG_SOUND_START_OVERRIDE( redalert_state, redalert )
 

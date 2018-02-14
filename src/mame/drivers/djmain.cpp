@@ -1417,12 +1417,14 @@ MACHINE_CONFIG_START(djmain_state::djmainj)
 	MCFG_SOUND_ROUTE(1, "rspeaker", 1.0)
 MACHINE_CONFIG_END
 
-MACHINE_CONFIG_DERIVED(djmain_state::djmainu, djmainj)
+MACHINE_CONFIG_START(djmain_state::djmainu)
+	djmainj(config);
 	MCFG_CPU_MODIFY("maincpu")
 	MCFG_CPU_PROGRAM_MAP(maincpu_djmainu)
 MACHINE_CONFIG_END
 
-MACHINE_CONFIG_DERIVED(djmain_state::djmaina, djmainj)
+MACHINE_CONFIG_START(djmain_state::djmaina)
+	djmainj(config);
 	MCFG_CPU_MODIFY("maincpu")
 	MCFG_CPU_PROGRAM_MAP(maincpu_djmaina)
 MACHINE_CONFIG_END

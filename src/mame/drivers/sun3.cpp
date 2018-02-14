@@ -1032,7 +1032,8 @@ MACHINE_CONFIG_START(sun3_state::sun3)
 MACHINE_CONFIG_END
 
 // Sun 3/60
-MACHINE_CONFIG_DERIVED(sun3_state::sun3_60, sun3)
+MACHINE_CONFIG_START(sun3_state::sun3_60)
+	sun3(config);
 	MCFG_CPU_REPLACE("maincpu", M68020, 20000000)
 	MCFG_CPU_PROGRAM_MAP(sun3_mem)
 
@@ -1044,13 +1045,15 @@ MACHINE_CONFIG_DERIVED(sun3_state::sun3_60, sun3)
 MACHINE_CONFIG_END
 
 // Sun 3/E
-MACHINE_CONFIG_DERIVED(sun3_state::sun3e, sun3)
+MACHINE_CONFIG_START(sun3_state::sun3e)
+	sun3(config);
 	MCFG_CPU_REPLACE("maincpu", M68020, 20000000)
 	MCFG_CPU_PROGRAM_MAP(sun3_mem)
 MACHINE_CONFIG_END
 
 // 3/260 and 3/280 (the Sun 3200 board)
-MACHINE_CONFIG_DERIVED(sun3_state::sun3200, sun3)
+MACHINE_CONFIG_START(sun3_state::sun3200)
+	sun3(config);
 	MCFG_CPU_REPLACE("maincpu", M68020, 25000000)
 	MCFG_CPU_PROGRAM_MAP(sun3_mem)
 

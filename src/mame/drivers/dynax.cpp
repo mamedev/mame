@@ -4518,7 +4518,8 @@ MACHINE_CONFIG_END
                             Mahjong Dial Q2
 ***************************************************************************/
 
-MACHINE_CONFIG_DERIVED(dynax_state::mjdialq2, mjfriday)
+MACHINE_CONFIG_START(dynax_state::mjdialq2)
+	mjfriday(config);
 
 	/* basic machine hardware */
 	MCFG_CPU_MODIFY("maincpu")
@@ -4546,7 +4547,8 @@ INTERRUPT_GEN_MEMBER(dynax_state::yarunara_clock_interrupt)
 	sprtmtch_update_irq();
 }
 
-MACHINE_CONFIG_DERIVED(dynax_state::yarunara, hnoridur)
+MACHINE_CONFIG_START(dynax_state::yarunara)
+	hnoridur(config);
 
 	/* basic machine hardware */
 	MCFG_CPU_MODIFY("maincpu")
@@ -4568,13 +4570,15 @@ MACHINE_CONFIG_DERIVED(dynax_state::yarunara, hnoridur)
 	MCFG_DEVICE_ADD("rtc", MSM6242, XTAL(32'768))
 MACHINE_CONFIG_END
 
-MACHINE_CONFIG_DERIVED(dynax_state::mjangels, yarunara)
+MACHINE_CONFIG_START(dynax_state::mjangels)
+	yarunara(config);
 	MCFG_DEVICE_MODIFY("bankdev")
 	MCFG_DEVICE_PROGRAM_MAP(mjangels_banked_map)
 	MCFG_ADDRESS_MAP_BANK_ADDR_WIDTH(21)
 MACHINE_CONFIG_END
 
-MACHINE_CONFIG_DERIVED(dynax_state::quiztvqq, mjangels)
+MACHINE_CONFIG_START(dynax_state::quiztvqq)
+	mjangels(config);
 
 	/* basic machine hardware */
 	MCFG_CPU_MODIFY("maincpu")
@@ -4586,7 +4590,8 @@ MACHINE_CONFIG_END
                             Mahjong Campus Hunting
 ***************************************************************************/
 
-MACHINE_CONFIG_DERIVED(dynax_state::mcnpshnt, hnoridur)
+MACHINE_CONFIG_START(dynax_state::mcnpshnt)
+	hnoridur(config);
 	MCFG_CPU_MODIFY("maincpu")
 	MCFG_CPU_PROGRAM_MAP(mcnpshnt_mem_map)
 	MCFG_CPU_IO_MAP(mcnpshnt_io_map)
@@ -4599,7 +4604,8 @@ MACHINE_CONFIG_END
                             7jigen
 ***************************************************************************/
 
-MACHINE_CONFIG_DERIVED(dynax_state::nanajign, hnoridur)
+MACHINE_CONFIG_START(dynax_state::nanajign)
+	hnoridur(config);
 	MCFG_CPU_MODIFY("maincpu")
 	MCFG_CPU_PROGRAM_MAP(nanajign_mem_map)
 	MCFG_CPU_IO_MAP(nanajign_io_map)
@@ -4697,7 +4703,8 @@ MACHINE_CONFIG_START(dynax_state::jantouki)
 	MCFG_DEVICE_ADD("rtc", MSM6242, XTAL(32'768))
 MACHINE_CONFIG_END
 
-MACHINE_CONFIG_DERIVED(dynax_state::janyuki, jantouki)
+MACHINE_CONFIG_START(dynax_state::janyuki)
+	jantouki(config);
 	MCFG_PALETTE_MODIFY("palette")
 	MCFG_PALETTE_INIT_OWNER(dynax_state,janyuki)         // static palette
 MACHINE_CONFIG_END
@@ -4720,7 +4727,8 @@ void dynax_state::mjelctrn_update_irq()
 	cpu.trg2(1);
 }
 
-MACHINE_CONFIG_DERIVED(dynax_state::mjelctrn, hnoridur)
+MACHINE_CONFIG_START(dynax_state::mjelctrn)
+	hnoridur(config);
 	MCFG_CPU_REPLACE("maincpu", TMPZ84C015, XTAL(22'000'000) / 4)
 	MCFG_CPU_PROGRAM_MAP(nanajign_mem_map)
 	MCFG_CPU_IO_MAP(mjelctrn_io_map)
@@ -4740,7 +4748,8 @@ MACHINE_CONFIG_DERIVED(dynax_state::mjelctrn, hnoridur)
 	MCFG_VIDEO_START_OVERRIDE(dynax_state,mjelctrn)
 MACHINE_CONFIG_END
 
-MACHINE_CONFIG_DERIVED(dynax_state::mjembase, mjelctrn)
+MACHINE_CONFIG_START(dynax_state::mjembase)
+	mjelctrn(config);
 	MCFG_CPU_MODIFY("maincpu")
 	MCFG_CPU_IO_MAP(mjembase_io_map)
 	MCFG_TMPZ84C015_IN_PA_CB(IOPORT("DSW1"))
@@ -4764,7 +4773,8 @@ MACHINE_CONFIG_END
     0x40 is vblank
     0x46 is a periodic irq? */
 
-MACHINE_CONFIG_DERIVED(dynax_state::neruton, mjelctrn)
+MACHINE_CONFIG_START(dynax_state::neruton)
+	mjelctrn(config);
 	MCFG_VIDEO_START_OVERRIDE(dynax_state,neruton)
 MACHINE_CONFIG_END
 
@@ -4854,13 +4864,15 @@ MACHINE_CONFIG_START(dynax_state::tenkai)
 	MCFG_MSM6242_OUT_INT_HANDLER(INPUTLINE("maincpu", INPUT_LINE_IRQ2))
 MACHINE_CONFIG_END
 
-MACHINE_CONFIG_DERIVED(dynax_state::majrjhdx, tenkai)
+MACHINE_CONFIG_START(dynax_state::majrjhdx)
+	tenkai(config);
 	MCFG_PALETTE_MODIFY("palette")
 	MCFG_PALETTE_ENTRIES(512)
 	MCFG_PALETTE_INIT_OWNER(dynax_state,sprtmtch)            // static palette
 MACHINE_CONFIG_END
 
-MACHINE_CONFIG_DERIVED(dynax_state::mjreach, tenkai)
+MACHINE_CONFIG_START(dynax_state::mjreach)
+	tenkai(config);
 	MCFG_DEVICE_MODIFY("mainlatch")
 	MCFG_ADDRESSABLE_LATCH_Q0_OUT_CB(WRITELINE(dynax_state, flipscreen_w)) // not inverted
 MACHINE_CONFIG_END

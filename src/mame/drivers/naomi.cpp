@@ -2727,7 +2727,7 @@ MACHINE_CONFIG_START(dc_state::naomi_aw_base)
 MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(naomi_state::naomi_base)
-	MCFG_FRAGMENT_ADD( naomi_aw_base )
+	naomi_aw_base(config);
 
     MCFG_CPU_MODIFY("maincpu")
 	MCFG_CPU_PROGRAM_MAP(naomi_map)
@@ -2755,7 +2755,8 @@ MACHINE_CONFIG_END
  * Naomi 1, unprotected ROM sub-board
  */
 
-MACHINE_CONFIG_DERIVED(naomi_state::naomi, naomi_base)
+MACHINE_CONFIG_START(naomi_state::naomi)
+	naomi_base(config);
 	MCFG_NAOMI_ROM_BOARD_ADD("rom_board", "naomibd_eeprom", WRITE8(dc_state, g1_irq))
 MACHINE_CONFIG_END
 
@@ -2763,7 +2764,8 @@ MACHINE_CONFIG_END
  * Naomi 1 GD-Rom
  */
 
-MACHINE_CONFIG_DERIVED(naomi_state::naomigd, naomi_base)
+MACHINE_CONFIG_START(naomi_state::naomigd)
+	naomi_base(config);
 	MCFG_NAOMI_GDROM_BOARD_ADD("rom_board", ":gdrom", ":pic", "naomibd_eeprom", WRITE8(dc_state, g1_irq))
 MACHINE_CONFIG_END
 
@@ -2771,7 +2773,8 @@ MACHINE_CONFIG_END
  * Naomi 1, M1 sub-board
  */
 
-MACHINE_CONFIG_DERIVED(naomi_state::naomim1, naomi_base)
+MACHINE_CONFIG_START(naomi_state::naomim1)
+	naomi_base(config);
 	MCFG_NAOMI_M1_BOARD_ADD("rom_board", "naomibd_eeprom", WRITE8(dc_state, g1_irq))
 MACHINE_CONFIG_END
 
@@ -2779,7 +2782,8 @@ MACHINE_CONFIG_END
  * Naomi 1, M2/3 sub-board
  */
 
-MACHINE_CONFIG_DERIVED(naomi_state::naomim2, naomi_base)
+MACHINE_CONFIG_START(naomi_state::naomim2)
+	naomi_base(config);
 	MCFG_NAOMI_M2_BOARD_ADD("rom_board", "naomibd_eeprom", WRITE8(dc_state, g1_irq))
 MACHINE_CONFIG_END
 
@@ -2787,7 +2791,8 @@ MACHINE_CONFIG_END
  * Naomi 1, M4 sub-board
  */
 
-MACHINE_CONFIG_DERIVED(naomi_state::naomim4, naomi_base)
+MACHINE_CONFIG_START(naomi_state::naomim4)
+	naomi_base(config);
 	MCFG_NAOMI_M4_BOARD_ADD("rom_board", "pic_readout", "naomibd_eeprom", WRITE8(dc_state, g1_irq))
 MACHINE_CONFIG_END
 
@@ -2795,7 +2800,8 @@ MACHINE_CONFIG_END
  * Naomi 2
  */
 /*
-MACHINE_CONFIG_DERIVED((naomi2_state::naomi2, naomi)
+MACHINE_CONFIG_START((naomi2_state::naomi2)
+	naomi(config);
     MCFG_CPU_MODIFY("maincpu")
     MCFG_CPU_PROGRAM_MAP(naomi2_map)
 	MCFG_CPU_IO_MAP(naomi_port)
@@ -2812,8 +2818,8 @@ MACHINE_CONFIG_START(naomi2_state::naomi2_base)
 MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(naomi2_state::naomi2gd)
-	MCFG_FRAGMENT_ADD( naomigd )
-	MCFG_FRAGMENT_ADD( naomi2_base )
+	naomigd(config);
+	naomi2_base(config);
 
 	MCFG_CPU_MODIFY("maincpu")
 	MCFG_CPU_PROGRAM_MAP(naomi2_map)
@@ -2824,8 +2830,8 @@ MACHINE_CONFIG_END
  */
 
 MACHINE_CONFIG_START(naomi2_state::naomi2m1)
-	MCFG_FRAGMENT_ADD( naomim1 )
-	MCFG_FRAGMENT_ADD( naomi2_base )
+	naomim1(config);
+	naomi2_base(config);
 
 	MCFG_CPU_MODIFY("maincpu")
 	MCFG_CPU_PROGRAM_MAP(naomi2_map)
@@ -2836,8 +2842,8 @@ MACHINE_CONFIG_END
  */
 
 MACHINE_CONFIG_START(naomi2_state::naomi2m2)
-	MCFG_FRAGMENT_ADD( naomim2 )
-	MCFG_FRAGMENT_ADD( naomi2_base )
+	naomim2(config);
+	naomi2_base(config);
 
 	MCFG_CPU_MODIFY("maincpu")
 	MCFG_CPU_PROGRAM_MAP(naomi2_map)
@@ -2848,7 +2854,7 @@ MACHINE_CONFIG_END
  */
 
 MACHINE_CONFIG_START(atomiswave_state::aw_base)
-	MCFG_FRAGMENT_ADD( naomi_aw_base )
+	naomi_aw_base(config);
 
 	MCFG_CPU_MODIFY("maincpu")
 	MCFG_CPU_PROGRAM_MAP(aw_map)
@@ -2862,13 +2868,15 @@ MACHINE_CONFIG_START(atomiswave_state::aw_base)
 	MCFG_MACHINE_RESET_OVERRIDE(dc_state,dc_console)
 MACHINE_CONFIG_END
 
-MACHINE_CONFIG_DERIVED(atomiswave_state::aw1c, aw_base)
+MACHINE_CONFIG_START(atomiswave_state::aw1c)
+	aw_base(config);
 	MCFG_DC_CONTROLLER_ADD("dcctrl0", "maple_dc", 0, ":P1.0", ":P1.1", ":P1.A0", ":P1.A1", ":P1.A2", ":P1.A3", ":P1.A4", ":P1.A5")
 	// TODO: isn't it supposed to be just one controller?
 	MCFG_DC_CONTROLLER_ADD("dcctrl1", "maple_dc", 1, ":P2.0", ":P2.1", ":P2.A0", ":P2.A1", ":P2.A2", ":P2.A3", ":P2.A4", ":P2.A5")
 MACHINE_CONFIG_END
 
-MACHINE_CONFIG_DERIVED(atomiswave_state::aw2c, aw_base)
+MACHINE_CONFIG_START(atomiswave_state::aw2c)
+	aw_base(config);
 	MCFG_DC_CONTROLLER_ADD("dcctrl0", "maple_dc", 0, ":P1.0", ":P1.1", ":P1.A0", ":P1.A1", ":P1.A2", ":P1.A3", ":P1.A4", ":P1.A5")
 	MCFG_DC_CONTROLLER_ADD("dcctrl1", "maple_dc", 1, ":P2.0", ":P2.1", ":P2.A0", ":P2.A1", ":P2.A2", ":P2.A3", ":P2.A4", ":P2.A5")
 MACHINE_CONFIG_END

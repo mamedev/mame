@@ -398,7 +398,8 @@ MACHINE_CONFIG_START(k3_state::flagrall)
 MACHINE_CONFIG_END
 
 
-MACHINE_CONFIG_DERIVED(k3_state::k3, flagrall)
+MACHINE_CONFIG_START(k3_state::k3)
+	flagrall(config);
 
 	MCFG_CPU_MODIFY("maincpu")
 	MCFG_CPU_PROGRAM_MAP(k3_map)

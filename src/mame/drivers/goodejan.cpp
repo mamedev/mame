@@ -683,7 +683,8 @@ MACHINE_CONFIG_START(goodejan_state::goodejan)
 	MCFG_SEIBU_SOUND_YM_WRITE_CB(DEVWRITE8("ymsnd", ym3812_device, write))
 MACHINE_CONFIG_END
 
-MACHINE_CONFIG_DERIVED(goodejan_state::totmejan, goodejan)
+MACHINE_CONFIG_START(goodejan_state::totmejan)
+	goodejan(config);
 	MCFG_CPU_MODIFY("maincpu")
 	MCFG_CPU_IO_MAP(totmejan_io_map)
 MACHINE_CONFIG_END

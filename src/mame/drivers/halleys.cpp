@@ -1968,7 +1968,8 @@ MACHINE_CONFIG_START(halleys_state::halleys)
 MACHINE_CONFIG_END
 
 
-MACHINE_CONFIG_DERIVED(halleys_state::benberob, halleys)
+MACHINE_CONFIG_START(halleys_state::benberob)
+	halleys(config);
 	MCFG_CPU_MODIFY("maincpu")
 	MCFG_CPU_CLOCK(XTAL(19'968'000)/12) /* not verified but pcb identical to halley's comet */
 	MCFG_TIMER_MODIFY("scantimer")

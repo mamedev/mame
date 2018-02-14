@@ -1781,7 +1781,8 @@ MACHINE_CONFIG_START(snowbros_state::snowbros)
 MACHINE_CONFIG_END
 
 
-MACHINE_CONFIG_DERIVED(snowbros_state::wintbob, snowbros)
+MACHINE_CONFIG_START(snowbros_state::wintbob)
+	snowbros(config);
 
 	/* basic machine hardware */
 	MCFG_CPU_MODIFY("maincpu")
@@ -1798,7 +1799,8 @@ MACHINE_CONFIG_DERIVED(snowbros_state::wintbob, snowbros)
 MACHINE_CONFIG_END
 
 
-MACHINE_CONFIG_DERIVED(snowbros_state::semicom, snowbros)
+MACHINE_CONFIG_START(snowbros_state::semicom)
+	snowbros(config);
 
 	/* basic machine hardware */
 	MCFG_CPU_MODIFY("maincpu")
@@ -1828,7 +1830,8 @@ MACHINE_CONFIG_DERIVED(snowbros_state::semicom, snowbros)
 MACHINE_CONFIG_END
 
 
-MACHINE_CONFIG_DERIVED(snowbros_state::semicom_mcu, semicom)
+MACHINE_CONFIG_START(snowbros_state::semicom_mcu)
+	semicom(config);
 
 	/* basic machine hardware */
 
@@ -1838,7 +1841,8 @@ MACHINE_CONFIG_DERIVED(snowbros_state::semicom_mcu, semicom)
 MACHINE_CONFIG_END
 
 
-MACHINE_CONFIG_DERIVED(snowbros_state::semiprot, semicom)
+MACHINE_CONFIG_START(snowbros_state::semiprot)
+	semicom(config);
 	MCFG_MACHINE_RESET_OVERRIDE (snowbros_state, semiprot )
 MACHINE_CONFIG_END
 
@@ -1940,7 +1944,8 @@ Intel P8752 (mcu)
 
 */
 
-MACHINE_CONFIG_DERIVED(snowbros_state::finalttr, semicom)
+MACHINE_CONFIG_START(snowbros_state::finalttr)
+	semicom(config);
 
 	MCFG_CPU_MODIFY("maincpu")
 	MCFG_CPU_CLOCK(XTAL(12'000'000))
@@ -1961,7 +1966,8 @@ MACHINE_CONFIG_DERIVED(snowbros_state::finalttr, semicom)
 MACHINE_CONFIG_END
 
 
-MACHINE_CONFIG_DERIVED(snowbros_state::_4in1, semicom)
+MACHINE_CONFIG_START(snowbros_state::_4in1)
+	semicom(config);
 
 	/* basic machine hardware */
 	MCFG_GFXDECODE_MODIFY("gfxdecode", snowbros)

@@ -484,7 +484,8 @@ MACHINE_CONFIG_START(mephisto_polgar_state::polgar)
 	MCFG_DEFAULT_LAYOUT(layout_mephisto_lcd)
 MACHINE_CONFIG_END
 
-MACHINE_CONFIG_DERIVED(mephisto_polgar_state::polgar10, polgar)
+MACHINE_CONFIG_START(mephisto_polgar_state::polgar10)
+	polgar(config);
 	MCFG_CPU_MODIFY("maincpu")
 	MCFG_CPU_CLOCK( XTAL(10'000'000) )
 MACHINE_CONFIG_END
@@ -510,7 +511,8 @@ MACHINE_CONFIG_START(mephisto_risc_state::mrisc)
 	MCFG_DEFAULT_LAYOUT(layout_mephisto_lcd)
 MACHINE_CONFIG_END
 
-MACHINE_CONFIG_DERIVED(mephisto_milano_state::milano, polgar)
+MACHINE_CONFIG_START(mephisto_milano_state::milano)
+	polgar(config);
 	MCFG_CPU_MODIFY("maincpu")
 	MCFG_CPU_PROGRAM_MAP(milano_mem)
 
@@ -520,14 +522,16 @@ MACHINE_CONFIG_DERIVED(mephisto_milano_state::milano, polgar)
 	MCFG_DEFAULT_LAYOUT(layout_mephisto_milano)
 MACHINE_CONFIG_END
 
-MACHINE_CONFIG_DERIVED(mephisto_academy_state::academy, polgar)
+MACHINE_CONFIG_START(mephisto_academy_state::academy)
+	polgar(config);
 	MCFG_CPU_MODIFY("maincpu")
 	MCFG_CPU_PROGRAM_MAP(academy_mem)
 
 	MCFG_DEFAULT_LAYOUT(layout_mephisto_academy)
 MACHINE_CONFIG_END
 
-MACHINE_CONFIG_DERIVED(mephisto_modena_state::modena, polgar)
+MACHINE_CONFIG_START(mephisto_modena_state::modena)
+	polgar(config);
 	MCFG_CPU_MODIFY("maincpu")          // W65C02SP
 	MCFG_CPU_CLOCK(XTAL(4'194'304))
 	MCFG_CPU_PROGRAM_MAP(modena_mem)

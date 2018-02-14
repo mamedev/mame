@@ -781,7 +781,8 @@ MACHINE_CONFIG_END
 	MCFG_GENERIC_EXTENSIONS("bin,rom") \
 	MCFG_GENERIC_LOAD(atomeb_state, _load)
 
-MACHINE_CONFIG_DERIVED(atomeb_state::atomeb, atom)
+MACHINE_CONFIG_START(atomeb_state::atomeb)
+	atom(config);
 	MCFG_CPU_MODIFY(SY6502_TAG)
 	MCFG_CPU_PROGRAM_MAP(atomeb_mem)
 
@@ -865,7 +866,8 @@ MACHINE_CONFIG_END
     MACHINE_DRIVER( prophet2 )
 -------------------------------------------------*/
 
-//static MACHINE_CONFIG_DERIVED( prophet2, atom )
+//static MACHINE_CONFIG_START( prophet2 )
+//	atom(config);
 //  /* basic machine hardware */
 //  MCFG_CPU_MODIFY(SY6502_TAG)
 //  MCFG_CPU_PROGRAM_MAP(prophet_mem)
@@ -888,7 +890,8 @@ MACHINE_CONFIG_END
     MACHINE_DRIVER( prophet3 )
 -------------------------------------------------*/
 
-//static MACHINE_CONFIG_DERIVED( prophet3, atom )
+//static MACHINE_CONFIG_START( prophet3 )
+//	atom(config);
 //  /* basic machine hardware */
 //  MCFG_CPU_MODIFY(SY6502_TAG)
 //  MCFG_CPU_PROGRAM_MAP(prophet_mem)
@@ -905,7 +908,8 @@ MACHINE_CONFIG_END
     MACHINE_DRIVER( atommc )
 -------------------------------------------------*/
 
-//static MACHINE_CONFIG_DERIVED( atommc, atom )
+//static MACHINE_CONFIG_START( atommc )
+//	atom(config);
 //  /* Software lists */
 //  MCFG_SOFTWARE_LIST_ADD("mmc_list","atom_mmc")
 //  MCFG_SOFTWARE_LIST_REMOVE("flop_list")

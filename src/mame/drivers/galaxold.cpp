@@ -2248,16 +2248,18 @@ MACHINE_CONFIG_START(galaxold_state::galaxold_base)
 MACHINE_CONFIG_END
 
 
-MACHINE_CONFIG_DERIVED(galaxold_state::galaxian, galaxold_base)
+MACHINE_CONFIG_START(galaxold_state::galaxian)
+	galaxold_base(config);
 
 	/* basic machine hardware */
 
 	/* sound hardware */
-	MCFG_FRAGMENT_ADD(galaxian_audio)
+	galaxian_audio(config);
 MACHINE_CONFIG_END
 
 
-MACHINE_CONFIG_DERIVED(galaxold_state::mooncrst, galaxold_base)
+MACHINE_CONFIG_START(galaxold_state::mooncrst)
+	galaxold_base(config);
 
 	/* basic machine hardware */
 	MCFG_CPU_MODIFY("maincpu")
@@ -2267,7 +2269,7 @@ MACHINE_CONFIG_DERIVED(galaxold_state::mooncrst, galaxold_base)
 	MCFG_VIDEO_START_OVERRIDE(galaxold_state,mooncrst)
 
 	/* sound hardware */
-	MCFG_FRAGMENT_ADD(mooncrst_audio)
+	mooncrst_audio(config);
 MACHINE_CONFIG_END
 
 // 'Videotron'
@@ -2276,7 +2278,8 @@ MACHINE_CONFIG_END
 // but neither of the games we have (froggerv and hustlerb3) make use of either. There are a number
 // of unpopulated positions on the game board which presumably can be populated with code for the
 // 2nd Z80.
-MACHINE_CONFIG_DERIVED(galaxold_state::videotron, galaxian)
+MACHINE_CONFIG_START(galaxold_state::videotron)
+	galaxian(config);
 
 	/* basic machine hardware */
 	MCFG_CPU_MODIFY("maincpu")
@@ -2287,14 +2290,16 @@ MACHINE_CONFIG_DERIVED(galaxold_state::videotron, galaxian)
 MACHINE_CONFIG_END
 
 
-MACHINE_CONFIG_DERIVED(galaxold_state::porter, mooncrst)
+MACHINE_CONFIG_START(galaxold_state::porter)
+	mooncrst(config);
 
 	/* video hardware */
 	MCFG_VIDEO_START_OVERRIDE(galaxold_state, pisces)
 MACHINE_CONFIG_END
 
 
-MACHINE_CONFIG_DERIVED(galaxold_state::scramblb, galaxian)
+MACHINE_CONFIG_START(galaxold_state::scramblb)
+	galaxian(config);
 
 	/* basic machine hardware */
 	MCFG_CPU_MODIFY("maincpu")
@@ -2309,7 +2314,8 @@ MACHINE_CONFIG_DERIVED(galaxold_state::scramblb, galaxian)
 MACHINE_CONFIG_END
 
 
-MACHINE_CONFIG_DERIVED(galaxold_state::scramb2, galaxian)
+MACHINE_CONFIG_START(galaxold_state::scramb2)
+	galaxian(config);
 
 	/* basic machine hardware */
 	MCFG_CPU_MODIFY("maincpu")
@@ -2324,7 +2330,8 @@ MACHINE_CONFIG_DERIVED(galaxold_state::scramb2, galaxian)
 MACHINE_CONFIG_END
 
 
-MACHINE_CONFIG_DERIVED(galaxold_state::scrambler, galaxian)
+MACHINE_CONFIG_START(galaxold_state::scrambler)
+	galaxian(config);
 
 	/* basic machine hardware */
 	MCFG_CPU_MODIFY("maincpu")
@@ -2339,7 +2346,8 @@ MACHINE_CONFIG_DERIVED(galaxold_state::scrambler, galaxian)
 MACHINE_CONFIG_END
 
 
-MACHINE_CONFIG_DERIVED(galaxold_state::guttang, galaxian)
+MACHINE_CONFIG_START(galaxold_state::guttang)
+	galaxian(config);
 
 	/* basic machine hardware */
 	MCFG_CPU_MODIFY("maincpu")
@@ -2355,7 +2363,8 @@ MACHINE_CONFIG_DERIVED(galaxold_state::guttang, galaxian)
 MACHINE_CONFIG_END
 
 
-MACHINE_CONFIG_DERIVED(galaxold_state::_4in1, galaxian)
+MACHINE_CONFIG_START(galaxold_state::_4in1)
+	galaxian(config);
 
 	/* basic machine hardware */
 	MCFG_CPU_MODIFY("maincpu")
@@ -2368,7 +2377,8 @@ MACHINE_CONFIG_DERIVED(galaxold_state::_4in1, galaxian)
 MACHINE_CONFIG_END
 
 
-MACHINE_CONFIG_DERIVED(galaxold_state::bagmanmc, mooncrst)
+MACHINE_CONFIG_START(galaxold_state::bagmanmc)
+	mooncrst(config);
 
 	/* basic machine hardware */
 	MCFG_CPU_MODIFY("maincpu")
@@ -2381,7 +2391,8 @@ MACHINE_CONFIG_DERIVED(galaxold_state::bagmanmc, mooncrst)
 MACHINE_CONFIG_END
 
 
-MACHINE_CONFIG_DERIVED(galaxold_state::dkongjrm, mooncrst)
+MACHINE_CONFIG_START(galaxold_state::dkongjrm)
+	mooncrst(config);
 
 	/* basic machine hardware */
 	MCFG_CPU_MODIFY("maincpu")
@@ -2392,7 +2403,8 @@ MACHINE_CONFIG_DERIVED(galaxold_state::dkongjrm, mooncrst)
 MACHINE_CONFIG_END
 
 
-MACHINE_CONFIG_DERIVED(galaxold_state::dkongjrmc, mooncrst)
+MACHINE_CONFIG_START(galaxold_state::dkongjrmc)
+	mooncrst(config);
 	MCFG_CPU_MODIFY("maincpu")
 	MCFG_CPU_PROGRAM_MAP(dkongjrmc_map)
 
@@ -2400,7 +2412,8 @@ MACHINE_CONFIG_DERIVED(galaxold_state::dkongjrmc, mooncrst)
 MACHINE_CONFIG_END
 
 
-MACHINE_CONFIG_DERIVED(galaxold_state::rockclim, mooncrst)
+MACHINE_CONFIG_START(galaxold_state::rockclim)
+	mooncrst(config);
 
 	/* basic machine hardware */
 	MCFG_CPU_MODIFY("maincpu")
@@ -2418,7 +2431,8 @@ MACHINE_CONFIG_DERIVED(galaxold_state::rockclim, mooncrst)
 MACHINE_CONFIG_END
 
 
-MACHINE_CONFIG_DERIVED(galaxold_state::ozon1, galaxold_base)
+MACHINE_CONFIG_START(galaxold_state::ozon1)
+	galaxold_base(config);
 
 	/* basic machine hardware */
 	MCFG_CPU_MODIFY("maincpu")
@@ -2467,11 +2481,12 @@ MACHINE_CONFIG_START(galaxold_state::drivfrcg)
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("speaker")
 
-	MCFG_FRAGMENT_ADD(galaxian_audio)
+	galaxian_audio(config);
 MACHINE_CONFIG_END
 
 
-MACHINE_CONFIG_DERIVED(galaxold_state::bongo, galaxold_base)
+MACHINE_CONFIG_START(galaxold_state::bongo)
+	galaxold_base(config);
 
 	/* basic machine hardware */
 	MCFG_CPU_MODIFY("maincpu")
@@ -2490,7 +2505,8 @@ MACHINE_CONFIG_DERIVED(galaxold_state::bongo, galaxold_base)
 MACHINE_CONFIG_END
 
 
-MACHINE_CONFIG_DERIVED(galaxold_state::hunchbkg, galaxold_base)
+MACHINE_CONFIG_START(galaxold_state::hunchbkg)
+	galaxold_base(config);
 
 	/* basic machine hardware */
 	MCFG_CPU_REPLACE("maincpu", S2650, PIXEL_CLOCK / 4)
@@ -2505,11 +2521,12 @@ MACHINE_CONFIG_DERIVED(galaxold_state::hunchbkg, galaxold_base)
 
 	MCFG_MACHINE_RESET_OVERRIDE(galaxold_state,hunchbkg)
 
-	MCFG_FRAGMENT_ADD(galaxian_audio)
+	galaxian_audio(config);
 MACHINE_CONFIG_END
 
 
-MACHINE_CONFIG_DERIVED(galaxold_state::spcwarp, hunchbkg)
+MACHINE_CONFIG_START(galaxold_state::spcwarp)
+	hunchbkg(config);
 	/* hunchbkg, but with a different memory map */
 	/* basic machine hardware */
 	MCFG_CPU_MODIFY("maincpu")
@@ -2517,7 +2534,8 @@ MACHINE_CONFIG_DERIVED(galaxold_state::spcwarp, hunchbkg)
 MACHINE_CONFIG_END
 
 
-MACHINE_CONFIG_DERIVED(galaxold_state::tazzmang, galaxian)
+MACHINE_CONFIG_START(galaxold_state::tazzmang)
+	galaxian(config);
 
 	/* basic machine hardware */
 	MCFG_CPU_MODIFY("maincpu")
@@ -2581,7 +2599,8 @@ MACHINE_CONFIG_START(galaxold_state::hexpoola)
 MACHINE_CONFIG_END
 
 
-MACHINE_CONFIG_DERIVED(galaxold_state::ckongg, galaxian)
+MACHINE_CONFIG_START(galaxold_state::ckongg)
+	galaxian(config);
 
 	/* basic machine hardware */
 	MCFG_CPU_MODIFY("maincpu")
@@ -2593,7 +2612,8 @@ MACHINE_CONFIG_DERIVED(galaxold_state::ckongg, galaxian)
 MACHINE_CONFIG_END
 
 
-MACHINE_CONFIG_DERIVED(galaxold_state::ckongmc, mooncrst)
+MACHINE_CONFIG_START(galaxold_state::ckongmc)
+	mooncrst(config);
 
 	/* basic machine hardware */
 	MCFG_CPU_MODIFY("maincpu")
@@ -2605,7 +2625,8 @@ MACHINE_CONFIG_DERIVED(galaxold_state::ckongmc, mooncrst)
 MACHINE_CONFIG_END
 
 
-MACHINE_CONFIG_DERIVED(galaxold_state::bullsdrtg, hexpoola)
+MACHINE_CONFIG_START(galaxold_state::bullsdrtg)
+	hexpoola(config);
 
 	MCFG_CPU_MODIFY("maincpu")
 	MCFG_CPU_DATA_MAP(bullsdrtg_data_map)

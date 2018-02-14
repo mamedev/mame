@@ -253,7 +253,8 @@ GFXDECODE_END
 
 
 
-MACHINE_CONFIG_DERIVED(pentagon_state::pentagon, spectrum_128)
+MACHINE_CONFIG_START(pentagon_state::pentagon)
+	spectrum_128(config);
 	MCFG_CPU_MODIFY("maincpu")
 	MCFG_CPU_CLOCK(XTAL(14'000'000) / 4)
 	MCFG_CPU_PROGRAM_MAP(pentagon_mem)
@@ -282,7 +283,8 @@ MACHINE_CONFIG_DERIVED(pentagon_state::pentagon, spectrum_128)
 	MCFG_SOFTWARE_LIST_ADD("cass_list_pen","pentagon_cass")
 MACHINE_CONFIG_END
 
-MACHINE_CONFIG_DERIVED(pentagon_state::pent1024, pentagon)
+MACHINE_CONFIG_START(pentagon_state::pent1024)
+	pentagon(config);
 	/* internal ram */
 	MCFG_RAM_MODIFY(RAM_TAG)
 	MCFG_RAM_DEFAULT_SIZE("1024K")

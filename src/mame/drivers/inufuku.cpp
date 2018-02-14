@@ -381,7 +381,8 @@ MACHINE_CONFIG_START(inufuku_state::inufuku)
 MACHINE_CONFIG_END
 
 
-MACHINE_CONFIG_DERIVED(inufuku_state::_3on3dunk, inufuku)
+MACHINE_CONFIG_START(inufuku_state::_3on3dunk)
+	inufuku(config);
 	MCFG_GFXDECODE_MODIFY("gfxdecode", _3on3dunk)
 MACHINE_CONFIG_END
 

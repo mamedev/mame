@@ -870,7 +870,8 @@ MACHINE_CONFIG_START(tubep_state::tubep)
 MACHINE_CONFIG_END
 
 
-MACHINE_CONFIG_DERIVED(tubep_state::tubepb, tubep)
+MACHINE_CONFIG_START(tubep_state::tubepb)
+	tubep(config);
 
 	MCFG_CPU_REPLACE("mcu", M6802,6000000) /* ? MHz Xtal */
 	MCFG_CPU_PROGRAM_MAP(nsc_map)

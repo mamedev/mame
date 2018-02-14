@@ -239,7 +239,7 @@ MACHINE_CONFIG_START(comebaby_state::comebaby)
 	MCFG_CPU_PROGRAM_MAP(comebaby_map)
 	MCFG_CPU_IO_MAP(comebaby_io)
 	
-	MCFG_FRAGMENT_ADD( pcat_common )
+	pcat_common(config);
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)

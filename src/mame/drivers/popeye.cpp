@@ -209,7 +209,7 @@ ADDRESS_MAP_START(tnx1_state::maincpu_program_map)
 ADDRESS_MAP_END
 
 ADDRESS_MAP_START(tpp2_state::maincpu_program_map)
-	AM_IMPORT_FROM(tnx1_state::maincpu_program_map)
+	AM_IMPORT_FROM(tpp1_state::maincpu_program_map)
 	//AM_RANGE(0x8000, 0x87ff) AM_NOP // 7f (normally unpopulated)
 	AM_RANGE(0x8800, 0x8bff) AM_RAM // 7h
 	AM_RANGE(0xc000, 0xdfff) AM_WRITE(background_w)
@@ -500,7 +500,8 @@ MACHINE_CONFIG_START(tnx1_state::config)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.40)
 MACHINE_CONFIG_END
 
-MACHINE_CONFIG_DERIVED(tpp2_state::config, tpp1_state::config)
+MACHINE_CONFIG_START(tpp2_state::config)
+	tpp1_state::config(config);
 	MCFG_SOUND_MODIFY("aysnd")
 	MCFG_SOUND_ROUTES_RESET()
 	MCFG_AY8910_OUTPUT_TYPE(AY8910_RESISTOR_OUTPUT) /* Does tnx1, tpp1 & popeyebl have the same filtering? */

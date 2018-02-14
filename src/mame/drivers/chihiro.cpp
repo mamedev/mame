@@ -1845,7 +1845,8 @@ void chihiro_state::an2131sc_configuration(device_t *device)
 	MCFG_OHCI_HLEAN2131SC_REGION(":others", 0x2080)
 }
 
-MACHINE_CONFIG_DERIVED(chihiro_state::chihiro_base, xbox_base)
+MACHINE_CONFIG_START(chihiro_state::chihiro_base)
+	xbox_base(config);
 	MCFG_CPU_MODIFY("maincpu")
 	MCFG_CPU_PROGRAM_MAP(chihiro_map)
 	MCFG_CPU_IO_MAP(chihiro_map_io)
@@ -1867,7 +1868,8 @@ MACHINE_CONFIG_DERIVED(chihiro_state::chihiro_base, xbox_base)
 	MCFG_SEGA_837_13551_DEVICE_ADD("837_13551", "jvs_master", ":TILT", ":P1", ":P2", ":A0", ":A1", ":A2", ":A3", ":A4", ":A5", ":A6", ":A7", ":OUTPUT")
 MACHINE_CONFIG_END
 
-MACHINE_CONFIG_DERIVED(chihiro_state::chihirogd, chihiro_base)
+MACHINE_CONFIG_START(chihiro_state::chihirogd)
+	chihiro_base(config);
 	MCFG_NAOMI_GDROM_BOARD_ADD("rom_board", ":gdrom", "^pic", nullptr, NOOP)
 	MCFG_DEVICE_ADD("network", SEGA_NETWORK_BOARD, 0)
 MACHINE_CONFIG_END

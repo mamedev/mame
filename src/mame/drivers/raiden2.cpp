@@ -1060,7 +1060,8 @@ MACHINE_CONFIG_START(raiden2_state::raiden2)
 	MCFG_SEIBU_SOUND_YM_WRITE_CB(DEVWRITE8("ymsnd", ym2151_device, write))
 MACHINE_CONFIG_END
 
-MACHINE_CONFIG_DERIVED(raiden2_state::raidendx, raiden2)
+MACHINE_CONFIG_START(raiden2_state::raidendx)
+	raiden2(config);
 	MCFG_CPU_MODIFY("maincpu")
 	MCFG_CPU_PROGRAM_MAP(raidendx_mem)
 
@@ -1092,6 +1093,7 @@ MACHINE_CONFIG_START(raiden2_state::zeroteam_sound)
 MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(raiden2_state::zeroteam)
+	zeroteam_sound(config);
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", V30, MAIN_CLOCK) /* verified on pcb */
@@ -1119,12 +1121,11 @@ MACHINE_CONFIG_START(raiden2_state::zeroteam)
 	MCFG_RAIDEN2COP_VIDEORAM_OUT_CB(WRITE16(raiden2_state, m_videoram_private_w))
 
 	MCFG_VIDEO_START_OVERRIDE(raiden2_state,raiden2)
-
-	/* sound hardware */
-	MCFG_FRAGMENT_ADD(zeroteam_sound)
 MACHINE_CONFIG_END
 
-MACHINE_CONFIG_DERIVED(raiden2_state::xsedae, zeroteam)
+MACHINE_CONFIG_START(raiden2_state::xsedae)
+	zeroteam(config);
+
 	MCFG_CPU_MODIFY("maincpu")
 	MCFG_CPU_PROGRAM_MAP(xsedae_mem)
 

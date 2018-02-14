@@ -370,7 +370,8 @@ MACHINE_CONFIG_START(starwars_state::starwars)
 MACHINE_CONFIG_END
 
 
-MACHINE_CONFIG_DERIVED(starwars_state::esb, starwars)
+MACHINE_CONFIG_START(starwars_state::esb)
+	starwars(config);
 	MCFG_CPU_MODIFY("maincpu")
 	MCFG_CPU_PROGRAM_MAP(esb_main_map)
 

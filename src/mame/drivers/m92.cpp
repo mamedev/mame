@@ -978,44 +978,52 @@ MACHINE_CONFIG_START(m92_state::m92)
 MACHINE_CONFIG_END
 
 
-MACHINE_CONFIG_DERIVED(m92_state::gunforce, m92)
+MACHINE_CONFIG_START(m92_state::gunforce)
+	m92(config);
 	MCFG_CPU_MODIFY("soundcpu")
 	MCFG_V25_CONFIG(gunforce_decryption_table)
 MACHINE_CONFIG_END
 
-MACHINE_CONFIG_DERIVED(m92_state::bmaster, m92)
+MACHINE_CONFIG_START(m92_state::bmaster)
+	m92(config);
 	MCFG_CPU_MODIFY("soundcpu")
 	MCFG_V25_CONFIG(bomberman_decryption_table)
 MACHINE_CONFIG_END
 
-MACHINE_CONFIG_DERIVED(m92_state::lethalth, m92)
+MACHINE_CONFIG_START(m92_state::lethalth)
+	m92(config);
 	MCFG_CPU_MODIFY("maincpu")
 	MCFG_CPU_PROGRAM_MAP(lethalth_map)
 	MCFG_CPU_MODIFY("soundcpu")
 	MCFG_V25_CONFIG(lethalth_decryption_table)
 MACHINE_CONFIG_END
 
-MACHINE_CONFIG_DERIVED(m92_state::uccops, m92)
+MACHINE_CONFIG_START(m92_state::uccops)
+	m92(config);
 	MCFG_CPU_MODIFY("soundcpu")
 	MCFG_V25_CONFIG(dynablaster_decryption_table)
 MACHINE_CONFIG_END
 
-MACHINE_CONFIG_DERIVED(m92_state::mysticri, m92)
+MACHINE_CONFIG_START(m92_state::mysticri)
+	m92(config);
 	MCFG_CPU_MODIFY("soundcpu")
 	MCFG_V25_CONFIG(mysticri_decryption_table)
 MACHINE_CONFIG_END
 
-MACHINE_CONFIG_DERIVED(m92_state::majtitl2, m92)
+MACHINE_CONFIG_START(m92_state::majtitl2)
+	m92(config);
 	MCFG_CPU_MODIFY("soundcpu")
 	MCFG_V25_CONFIG(majtitl2_decryption_table)
 MACHINE_CONFIG_END
 
-MACHINE_CONFIG_DERIVED(m92_state::hook, m92)
+MACHINE_CONFIG_START(m92_state::hook)
+	m92(config);
 	MCFG_CPU_MODIFY("soundcpu")
 	MCFG_V25_CONFIG(hook_decryption_table)
 MACHINE_CONFIG_END
 
-MACHINE_CONFIG_DERIVED(m92_state::ppan, m92)
+MACHINE_CONFIG_START(m92_state::ppan)
+	m92(config);
 	MCFG_CPU_MODIFY("maincpu")
 	MCFG_CPU_IO_MAP(ppan_portmap)
 
@@ -1033,24 +1041,28 @@ MACHINE_CONFIG_DERIVED(m92_state::ppan, m92)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 MACHINE_CONFIG_END
 
-MACHINE_CONFIG_DERIVED(m92_state::rtypeleo, m92)
+MACHINE_CONFIG_START(m92_state::rtypeleo)
+	m92(config);
 	MCFG_CPU_MODIFY("soundcpu")
 	MCFG_V25_CONFIG(rtypeleo_decryption_table)
 MACHINE_CONFIG_END
 
 
-MACHINE_CONFIG_DERIVED(m92_state::inthunt, m92)
+MACHINE_CONFIG_START(m92_state::inthunt)
+	m92(config);
 	MCFG_CPU_MODIFY("soundcpu")
 	MCFG_V25_CONFIG(inthunt_decryption_table)
 MACHINE_CONFIG_END
 
 
-MACHINE_CONFIG_DERIVED(m92_state::nbbatman, m92)
+MACHINE_CONFIG_START(m92_state::nbbatman)
+	m92(config);
 	MCFG_CPU_MODIFY("soundcpu")
 	MCFG_V25_CONFIG(leagueman_decryption_table)
 MACHINE_CONFIG_END
 
-MACHINE_CONFIG_DERIVED(m92_state::nbbatman2bl, m92)
+MACHINE_CONFIG_START(m92_state::nbbatman2bl)
+	m92(config);
 	MCFG_DEVICE_REMOVE("soundcpu")
 	MCFG_DEVICE_REMOVE("ymsnd")
 	MCFG_DEVICE_REMOVE("irem")
@@ -1062,21 +1074,24 @@ MACHINE_CONFIG_DERIVED(m92_state::nbbatman2bl, m92)
 
 MACHINE_CONFIG_END
 
-MACHINE_CONFIG_DERIVED(m92_state::psoldier, m92)
+MACHINE_CONFIG_START(m92_state::psoldier)
+	m92(config);
 	MCFG_CPU_MODIFY("soundcpu")
 	MCFG_V25_CONFIG(psoldier_decryption_table)
 	/* video hardware */
 	MCFG_GFXDECODE_MODIFY("gfxdecode", psoldier)
 MACHINE_CONFIG_END
 
-MACHINE_CONFIG_DERIVED(m92_state::dsoccr94j, m92)
+MACHINE_CONFIG_START(m92_state::dsoccr94j)
+	m92(config);
 	MCFG_CPU_MODIFY("soundcpu")
 	MCFG_V25_CONFIG(dsoccr94_decryption_table)
 	/* video hardware */
 	MCFG_GFXDECODE_MODIFY("gfxdecode", psoldier)
 MACHINE_CONFIG_END
 
-MACHINE_CONFIG_DERIVED(m92_state::gunforc2, m92)
+MACHINE_CONFIG_START(m92_state::gunforc2)
+	m92(config);
 	MCFG_CPU_MODIFY("soundcpu")
 	MCFG_V25_CONFIG(lethalth_decryption_table)
 MACHINE_CONFIG_END

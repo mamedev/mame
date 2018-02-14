@@ -853,7 +853,8 @@ MACHINE_CONFIG_START(ddragon3_state::ddragon3)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", 1.50)
 MACHINE_CONFIG_END
 
-MACHINE_CONFIG_DERIVED(ddragon3_state::ddragon3b, ddragon3)
+MACHINE_CONFIG_START(ddragon3_state::ddragon3b)
+	ddragon3(config);
 
 	MCFG_CPU_MODIFY("maincpu")
 	MCFG_CPU_PROGRAM_MAP(dd3b_map)
@@ -862,7 +863,8 @@ MACHINE_CONFIG_DERIVED(ddragon3_state::ddragon3b, ddragon3)
 	MCFG_SCREEN_VBLANK_CALLBACK(NOOP)
 MACHINE_CONFIG_END
 
-MACHINE_CONFIG_DERIVED(ddragon3_state::ctribe, ddragon3)
+MACHINE_CONFIG_START(ddragon3_state::ctribe)
+	ddragon3(config);
 
 	MCFG_CPU_MODIFY("maincpu")
 	MCFG_CPU_PROGRAM_MAP(ctribe_map)
@@ -927,7 +929,8 @@ MACHINE_CONFIG_START(wwfwfest_state::wwfwfest)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.90)
 MACHINE_CONFIG_END
 
-MACHINE_CONFIG_DERIVED(wwfwfest_state::wwfwfstb, wwfwfest)
+MACHINE_CONFIG_START(wwfwfest_state::wwfwfstb)
+	wwfwfest(config);
 	MCFG_VIDEO_START_OVERRIDE(wwfwfest_state,wwfwfstb)
 MACHINE_CONFIG_END
 

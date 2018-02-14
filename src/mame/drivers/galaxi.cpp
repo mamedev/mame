@@ -480,7 +480,8 @@ MACHINE_CONFIG_START(galaxi_state::galaxi)
 MACHINE_CONFIG_END
 
 
-MACHINE_CONFIG_DERIVED(galaxi_state::magjoker, galaxi)
+MACHINE_CONFIG_START(galaxi_state::magjoker)
+	galaxi(config);
 
 	/* sound hardware */
 	MCFG_SOUND_MODIFY("oki")
@@ -491,7 +492,8 @@ MACHINE_CONFIG_DERIVED(galaxi_state::magjoker, galaxi)
 MACHINE_CONFIG_END
 
 
-MACHINE_CONFIG_DERIVED(galaxi_state::lastfour, galaxi)
+MACHINE_CONFIG_START(galaxi_state::lastfour)
+	galaxi(config);
 
 	/* basic machine hardware */
 	MCFG_CPU_MODIFY("maincpu")

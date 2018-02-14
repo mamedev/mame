@@ -3683,14 +3683,16 @@ MACHINE_CONFIG_START(namcos23_state::s23)
 	MCFG_SOUND_ROUTE(3, "lspeaker", 1.00)
 MACHINE_CONFIG_END
 
-MACHINE_CONFIG_DERIVED(namcos23_state::timecrs2, s23)
+MACHINE_CONFIG_START(namcos23_state::timecrs2)
+	s23(config);
 
 	/* basic machine hardware */
 	MCFG_CPU_MODIFY("iocpu")
 	MCFG_CPU_PROGRAM_MAP( timecrs2iobrdmap )
 MACHINE_CONFIG_END
 
-MACHINE_CONFIG_DERIVED(namcos23_state::gmen, s23)
+MACHINE_CONFIG_START(namcos23_state::gmen)
+	s23(config);
 
 	/* basic machine hardware */
 	MCFG_CPU_MODIFY("maincpu")
@@ -3760,7 +3762,8 @@ MACHINE_CONFIG_START(namcos23_state::ss23)
 	MCFG_SOUND_ROUTE(3, "lspeaker", 1.00)
 MACHINE_CONFIG_END
 
-MACHINE_CONFIG_DERIVED(namcos23_state::timecrs2v4a, ss23)
+MACHINE_CONFIG_START(namcos23_state::timecrs2v4a)
+	ss23(config);
 	/* basic machine hardware */
 	MCFG_CPU_ADD("iocpu", H83334, JVSCLOCK )
 	MCFG_CPU_PROGRAM_MAP( timecrs2iobrdmap )
@@ -3772,7 +3775,8 @@ MACHINE_CONFIG_DERIVED(namcos23_state::timecrs2v4a, ss23)
 	MCFG_H8_SCI_TX_CALLBACK(DEVWRITELINE(":iocpu:sci0", h8_sci_device, rx_w))
 MACHINE_CONFIG_END
 
-MACHINE_CONFIG_DERIVED(namcos23_state::ss23e2, ss23)
+MACHINE_CONFIG_START(namcos23_state::ss23e2)
+	ss23(config);
 
 	/* basic machine hardware */
 	MCFG_CPU_MODIFY("maincpu")

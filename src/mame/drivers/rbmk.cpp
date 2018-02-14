@@ -599,7 +599,8 @@ MACHINE_CONFIG_START(rbmk_state::rbmk)
 	MCFG_SOUND_ROUTE(1, "rspeaker", 0.60)
 MACHINE_CONFIG_END
 
-MACHINE_CONFIG_DERIVED(rbmk_state::rbspm, rbmk)
+MACHINE_CONFIG_START(rbmk_state::rbspm)
+	rbmk(config);
 	MCFG_CPU_MODIFY("maincpu")
 	MCFG_CPU_PROGRAM_MAP(rbspm_mem)
 

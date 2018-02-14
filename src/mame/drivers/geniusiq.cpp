@@ -722,7 +722,8 @@ MACHINE_CONFIG_START(geniusiq_state::iq128)
 	MCFG_SOFTWARE_LIST_ADD("cart_list", "iq128")
 MACHINE_CONFIG_END
 
-MACHINE_CONFIG_DERIVED(geniusiq_state::iqtv512, iq128)
+MACHINE_CONFIG_START(geniusiq_state::iqtv512)
+	iq128(config);
 	/* internal flash */
 	MCFG_DEVICE_REMOVE("flash")
 	MCFG_AMD_29F040_ADD("flash")

@@ -1280,7 +1280,8 @@ MACHINE_CONFIG_END
 
 
 
-MACHINE_CONFIG_DERIVED(rohga_state::hangzo, schmeisr)
+MACHINE_CONFIG_START(rohga_state::hangzo)
+	schmeisr(config);
 
 	/* basic machine hardware */
 	MCFG_CPU_MODIFY("maincpu")

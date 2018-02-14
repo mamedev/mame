@@ -376,7 +376,8 @@ MACHINE_CONFIG_START(mephisto_state::mephisto)
 	MCFG_DEFAULT_LAYOUT(layout_mephisto)
 MACHINE_CONFIG_END
 
-MACHINE_CONFIG_DERIVED(mephisto_state::rebel5, mephisto)
+MACHINE_CONFIG_START(mephisto_state::rebel5)
+	mephisto(config);
 	/* basic machine hardware */
 	MCFG_CPU_MODIFY("maincpu")
 	MCFG_CPU_PROGRAM_MAP(rebel5_mem)
@@ -385,7 +386,8 @@ MACHINE_CONFIG_DERIVED(mephisto_state::rebel5, mephisto)
 
 MACHINE_CONFIG_END
 
-MACHINE_CONFIG_DERIVED(mephisto_state::mm2, mephisto)
+MACHINE_CONFIG_START(mephisto_state::mm2)
+	mephisto(config);
 	MCFG_CPU_REPLACE("maincpu", M65C02, 3700000)
 	MCFG_CPU_PROGRAM_MAP(mm2_mem)
 	MCFG_MACHINE_START_OVERRIDE(mephisto_state, mm2 )
@@ -394,7 +396,8 @@ MACHINE_CONFIG_DERIVED(mephisto_state::mm2, mephisto)
 	MCFG_TIMER_DRIVER_ADD_PERIODIC("irq_timer", mephisto_state, update_irq, attotime::from_hz(450))
 MACHINE_CONFIG_END
 
-MACHINE_CONFIG_DERIVED(mephisto_state::mm4tk, mephisto)
+MACHINE_CONFIG_START(mephisto_state::mm4tk)
+	mephisto(config);
 	MCFG_CPU_MODIFY("maincpu")
 	MCFG_CPU_REPLACE("maincpu", M65C02, 18000000)
 	MCFG_CPU_PROGRAM_MAP(mephisto_mem)

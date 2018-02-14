@@ -517,14 +517,16 @@ TIMER_DEVICE_CALLBACK_MEMBER(gundealr_state::yamyam_mcu_sim)
 	m_rambase[0x006] = ioport("IN0")->read();
 }
 
-MACHINE_CONFIG_DERIVED(gundealr_state::yamyam, gundealr)
+MACHINE_CONFIG_START(gundealr_state::yamyam)
+	gundealr(config);
 	MCFG_CPU_MODIFY("maincpu")
 	MCFG_CPU_PROGRAM_MAP(yamyam_main_map)
 
 	MCFG_TIMER_DRIVER_ADD_PERIODIC("mcusim", gundealr_state, yamyam_mcu_sim, attotime::from_hz(6000000/60)) /* 6mhz confirmed */
 MACHINE_CONFIG_END
 
-MACHINE_CONFIG_DERIVED(gundealr_state::gundealrbl, yamyam)
+MACHINE_CONFIG_START(gundealr_state::gundealrbl)
+	yamyam(config);
 	MCFG_DEVICE_REMOVE("mcusim")
 MACHINE_CONFIG_END
 

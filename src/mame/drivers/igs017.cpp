@@ -3311,7 +3311,8 @@ MACHINE_CONFIG_START(igs017_state::iqblocka)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.5)
 MACHINE_CONFIG_END
 
-MACHINE_CONFIG_DERIVED(igs017_state::starzan, iqblocka)
+MACHINE_CONFIG_START(igs017_state::starzan)
+	iqblocka(config);
 	MCFG_DEVICE_MODIFY("maincpu")
 	MCFG_CPU_OPCODES_MAP(decrypted_opcodes_map)
 MACHINE_CONFIG_END

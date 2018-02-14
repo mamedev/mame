@@ -1789,19 +1789,22 @@ MACHINE_CONFIG_START(gottlieb_state::gottlieb_core)
 MACHINE_CONFIG_END
 
 
-MACHINE_CONFIG_DERIVED(gottlieb_state::gottlieb1, gottlieb_core)
+MACHINE_CONFIG_START(gottlieb_state::gottlieb1)
+	gottlieb_core(config);
 	MCFG_SOUND_ADD("r1sound", GOTTLIEB_SOUND_REV1, 0)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 1.0)
 MACHINE_CONFIG_END
 
 
-MACHINE_CONFIG_DERIVED(gottlieb_state::gottlieb2, gottlieb_core)
+MACHINE_CONFIG_START(gottlieb_state::gottlieb2)
+	gottlieb_core(config);
 	MCFG_SOUND_ADD("r2sound", GOTTLIEB_SOUND_REV2, 0)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 1.0)
 MACHINE_CONFIG_END
 
 
-MACHINE_CONFIG_DERIVED(gottlieb_state::g2laser, gottlieb_core)
+MACHINE_CONFIG_START(gottlieb_state::g2laser)
+	gottlieb_core(config);
 	MCFG_SOUND_ADD("r2sound", GOTTLIEB_SOUND_REV2, 0)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 1.0)
 
@@ -1826,13 +1829,15 @@ MACHINE_CONFIG_END
  *************************************/
 
 
-MACHINE_CONFIG_DERIVED(gottlieb_state::gottlieb1_votrax, gottlieb_core)
+MACHINE_CONFIG_START(gottlieb_state::gottlieb1_votrax)
+	gottlieb_core(config);
 	MCFG_SOUND_ADD("r1sound", GOTTLIEB_SOUND_REV1_VOTRAX, 0)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 1.0)
 MACHINE_CONFIG_END
 
 
-MACHINE_CONFIG_DERIVED(gottlieb_state::reactor, gottlieb1_votrax)
+MACHINE_CONFIG_START(gottlieb_state::reactor)
+	gottlieb1_votrax(config);
 
 	/* basic machine hardware */
 	MCFG_CPU_MODIFY("maincpu")
@@ -1842,23 +1847,27 @@ MACHINE_CONFIG_DERIVED(gottlieb_state::reactor, gottlieb1_votrax)
 MACHINE_CONFIG_END
 
 
-MACHINE_CONFIG_DERIVED(gottlieb_state::qbert, gottlieb1_votrax)
+MACHINE_CONFIG_START(gottlieb_state::qbert)
+	gottlieb1_votrax(config);
 
 	/* sound hardware */
-	MCFG_FRAGMENT_ADD(qbert_knocker)
+	qbert_knocker(config);
 MACHINE_CONFIG_END
 
 
-MACHINE_CONFIG_DERIVED(gottlieb_state::tylz, gottlieb1_votrax)
+MACHINE_CONFIG_START(gottlieb_state::tylz)
+	gottlieb1_votrax(config);
 MACHINE_CONFIG_END
 
 
-MACHINE_CONFIG_DERIVED(gottlieb_state::screwloo, gottlieb2)
+MACHINE_CONFIG_START(gottlieb_state::screwloo)
+	gottlieb2(config);
 
 	MCFG_VIDEO_START_OVERRIDE(gottlieb_state,screwloo)
 MACHINE_CONFIG_END
 
-MACHINE_CONFIG_DERIVED(gottlieb_state::cobram3, gottlieb_core)
+MACHINE_CONFIG_START(gottlieb_state::cobram3)
+	gottlieb_core(config);
 	MCFG_SOUND_ADD("r2sound", GOTTLIEB_SOUND_REV2, 0)
 	MCFG_GOTTLIEB_ENABLE_COBRAM3_MODS()
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 1.0)

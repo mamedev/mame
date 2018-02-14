@@ -923,7 +923,8 @@ MACHINE_CONFIG_START(snk6502_state::sasuke)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
 MACHINE_CONFIG_END
 
-MACHINE_CONFIG_DERIVED(snk6502_state::satansat, sasuke)
+MACHINE_CONFIG_START(snk6502_state::satansat)
+	sasuke(config);
 	// basic machine hardware
 	MCFG_CPU_MODIFY("maincpu")
 	MCFG_CPU_PROGRAM_MAP(satansat_map)
@@ -1036,7 +1037,8 @@ MACHINE_CONFIG_START(snk6502_state::vanguard)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
 MACHINE_CONFIG_END
 
-MACHINE_CONFIG_DERIVED(snk6502_state::fantasy, vanguard)
+MACHINE_CONFIG_START(snk6502_state::fantasy)
+	vanguard(config);
 	// basic machine hardware
 	MCFG_CPU_MODIFY("maincpu")
 	MCFG_CPU_PROGRAM_MAP(fantasy_map)
@@ -1073,13 +1075,15 @@ MACHINE_CONFIG_DERIVED(snk6502_state::fantasy, vanguard)
 	MCFG_DEVICE_REMOVE("sn76477.2")
 MACHINE_CONFIG_END
 
-MACHINE_CONFIG_DERIVED(snk6502_state::nibbler, fantasy)
+MACHINE_CONFIG_START(snk6502_state::nibbler)
+	fantasy(config);
 
 	// sound hardware
 	MCFG_DEVICE_REMOVE("samples")
 MACHINE_CONFIG_END
 
-MACHINE_CONFIG_DERIVED(snk6502_state::pballoon, nibbler)
+MACHINE_CONFIG_START(snk6502_state::pballoon)
+	nibbler(config);
 	// basic machine hardware
 	MCFG_CPU_MODIFY("maincpu")
 	MCFG_CPU_PROGRAM_MAP(pballoon_map)

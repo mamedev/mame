@@ -5896,7 +5896,8 @@ MACHINE_CONFIG_START(model3_state::model3_15)
 	MCFG_M3COMM_ADD("comm_board")
 MACHINE_CONFIG_END
 
-MACHINE_CONFIG_DERIVED(model3_state::scud, model3_15)
+MACHINE_CONFIG_START(model3_state::scud)
+	model3_15(config);
 	MCFG_DSBZ80_ADD(DSBZ80_TAG)
 	MCFG_SOUND_ROUTE(0, "lspeaker", 1.0)
 	MCFG_SOUND_ROUTE(1, "rspeaker", 1.0)
@@ -5949,7 +5950,8 @@ MACHINE_CONFIG_START(model3_state::model3_20)
 	MCFG_M3COMM_ADD("comm_board")
 MACHINE_CONFIG_END
 
-MACHINE_CONFIG_DERIVED(model3_state::model3_20_5881, model3_20)
+MACHINE_CONFIG_START(model3_state::model3_20_5881)
+	model3_20(config);
 	MCFG_DEVICE_ADD("315_5881", SEGA315_5881_CRYPT, 0)
 	MCFG_SET_READ_CALLBACK(model3_state, crypt_read_callback)
 MACHINE_CONFIG_END
@@ -6009,7 +6011,8 @@ uint16_t model3_state::crypt_read_callback(uint32_t addr)
 	return dat;
 }
 
-MACHINE_CONFIG_DERIVED(model3_state::model3_21_5881, model3_21)
+MACHINE_CONFIG_START(model3_state::model3_21_5881)
+	model3_21(config);
 	MCFG_DEVICE_ADD("315_5881", SEGA315_5881_CRYPT, 0)
 	MCFG_SET_READ_CALLBACK(model3_state, crypt_read_callback)
 MACHINE_CONFIG_END

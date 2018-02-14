@@ -417,7 +417,8 @@ MACHINE_CONFIG_START(airraid_state::airraid)
 MACHINE_CONFIG_END
 
 
-MACHINE_CONFIG_DERIVED(airraid_state::airraid_crypt, airraid)
+MACHINE_CONFIG_START(airraid_state::airraid_crypt)
+	airraid(config);
 	MCFG_CPU_MODIFY("maincpu")
 	MCFG_CPU_OPCODES_MAP(decrypted_opcodes_map)
 MACHINE_CONFIG_END

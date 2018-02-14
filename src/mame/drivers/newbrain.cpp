@@ -822,7 +822,7 @@ MACHINE_CONFIG_START(newbrain_state::newbrain)
 	MCFG_COP400_READ_SI_CB(READLINE(newbrain_state, tdi_r))
 
 	// video hardware
-	MCFG_FRAGMENT_ADD(newbrain_video)
+	newbrain_video(config);
 
 	// devices
 	MCFG_NEWBRAIN_EXPANSION_SLOT_ADD(NEWBRAIN_EXPANSION_SLOT_TAG, XTAL(16'000'000)/4, newbrain_expansion_cards, "eim")
@@ -846,7 +846,8 @@ MACHINE_CONFIG_END
 //  MACHINE_CONFIG( newbrain_ad )
 //-------------------------------------------------
 
-MACHINE_CONFIG_DERIVED(newbrain_state::newbrain_ad, newbrain)
+MACHINE_CONFIG_START(newbrain_state::newbrain_ad)
+	newbrain(config);
 	MCFG_DEFAULT_LAYOUT(layout_newbrain)
 MACHINE_CONFIG_END
 
@@ -855,7 +856,8 @@ MACHINE_CONFIG_END
 //  MACHINE_CONFIG( newbrain_a )
 //-------------------------------------------------
 
-MACHINE_CONFIG_DERIVED(newbrain_state::newbrain_a, newbrain)
+MACHINE_CONFIG_START(newbrain_state::newbrain_a)
+	newbrain(config);
 	MCFG_DEFAULT_LAYOUT(layout_newbraina)
 MACHINE_CONFIG_END
 
@@ -864,7 +866,8 @@ MACHINE_CONFIG_END
 //  MACHINE_CONFIG( newbrain_md )
 //-------------------------------------------------
 
-MACHINE_CONFIG_DERIVED(newbrain_state::newbrain_md, newbrain)
+MACHINE_CONFIG_START(newbrain_state::newbrain_md)
+	newbrain(config);
 	MCFG_DEFAULT_LAYOUT(layout_newbrain)
 MACHINE_CONFIG_END
 

@@ -375,7 +375,8 @@ MACHINE_CONFIG_START(strnskil_state::strnskil)
 MACHINE_CONFIG_END
 
 
-MACHINE_CONFIG_DERIVED(strnskil_state::banbam, strnskil)
+MACHINE_CONFIG_START(strnskil_state::banbam)
+	strnskil(config);
 	MCFG_CPU_ADD("mcu", MB8841, 8000000/2)
 //  MCFG_MB88XX_READ_K_CB(READ8(strnskil_state, mcu_portk_r))
 //  MCFG_MB88XX_READ_R0_CB(READ8(strnskil_state, mcu_portr0_r))

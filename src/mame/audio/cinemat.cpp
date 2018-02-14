@@ -1455,7 +1455,8 @@ SOUND_RESET_MEMBER( cinemat_state, qb3 )
 }
 
 
-MACHINE_CONFIG_DERIVED(cinemat_state::qb3_sound, demon_sound)
+MACHINE_CONFIG_START(cinemat_state::qb3_sound)
+	demon_sound(config);
 	MCFG_SOUND_RESET_OVERRIDE(cinemat_state, qb3)
 
 	MCFG_DEVICE_MODIFY("outlatch")

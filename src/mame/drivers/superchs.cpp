@@ -286,7 +286,8 @@ MACHINE_CONFIG_START(superchs_state::superchs)
 	MCFG_DEVICE_ADD("taito_en", TAITO_EN, 0)
 MACHINE_CONFIG_END
 
-MACHINE_CONFIG_DERIVED(superchs_state::chase3, superchs)
+MACHINE_CONFIG_START(superchs_state::chase3)
+	superchs(config);
 
 	MCFG_CPU_MODIFY("sub")
 	MCFG_CPU_PROGRAM_MAP(chase3_cpub_map)

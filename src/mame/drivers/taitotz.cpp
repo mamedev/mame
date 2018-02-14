@@ -2604,7 +2604,8 @@ MACHINE_CONFIG_START(taitotz_state::taitotz)
 
 MACHINE_CONFIG_END
 
-MACHINE_CONFIG_DERIVED(taitotz_state::landhigh, taitotz)
+MACHINE_CONFIG_START(taitotz_state::landhigh)
+	taitotz(config);
 	MCFG_CPU_MODIFY("iocpu")
 	MCFG_CPU_PROGRAM_MAP(landhigh_tlcs900h_mem)
 MACHINE_CONFIG_END

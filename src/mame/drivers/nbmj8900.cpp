@@ -335,7 +335,8 @@ MACHINE_CONFIG_START(nbmj8900_state::ohpaipee)
 	MCFG_SOUND_ROUTE_EX(0, "dac", 1.0, DAC_VREF_POS_INPUT) MCFG_SOUND_ROUTE_EX(0, "dac", -1.0, DAC_VREF_NEG_INPUT)
 MACHINE_CONFIG_END
 
-MACHINE_CONFIG_DERIVED(nbmj8900_state::togenkyo, ohpaipee)
+MACHINE_CONFIG_START(nbmj8900_state::togenkyo)
+	ohpaipee(config);
 
 	/* basic machine hardware */
 	MCFG_CPU_MODIFY("maincpu")

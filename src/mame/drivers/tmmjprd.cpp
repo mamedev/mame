@@ -816,7 +816,8 @@ MACHINE_CONFIG_START(tmmjprd_state::tmmjprd)
 	MCFG_SOUND_ROUTE(1, "lspeaker", 1.00)
 MACHINE_CONFIG_END
 
-MACHINE_CONFIG_DERIVED(tmmjprd_state::tmpdoki, tmmjprd)
+MACHINE_CONFIG_START(tmmjprd_state::tmpdoki)
+	tmmjprd(config);
 	MCFG_DEFAULT_LAYOUT(layout_horizont)
 MACHINE_CONFIG_END
 

@@ -27,11 +27,7 @@ DEFINE_DEVICE_TYPE(TP0320, tp0320_cpu_device, "tp0320", "TP0320") // 28-pin SDIP
 
 
 // internal memory maps
-ADDRESS_MAP_START(tms1k_base_device::program_11bit_9)
-	AM_RANGE(0x000, 0x7ff) AM_ROM
-ADDRESS_MAP_END
-
-ADDRESS_MAP_START(tms1k_base_device::data_192x4)
+ADDRESS_MAP_START(tp0320_cpu_device::data_192x4)
 	AM_RANGE(0x00, 0x7f) AM_RAM
 	AM_RANGE(0x80, 0xbf) AM_RAM AM_MIRROR(0x40) // DAM
 ADDRESS_MAP_END

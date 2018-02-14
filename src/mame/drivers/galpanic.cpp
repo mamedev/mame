@@ -266,7 +266,8 @@ MACHINE_CONFIG_START(galpanic_state::galpanic)
 MACHINE_CONFIG_END
 
 
-MACHINE_CONFIG_DERIVED(galpanic_state::galpanica, galpanic)
+MACHINE_CONFIG_START(galpanic_state::galpanica)
+	galpanic(config);
 	MCFG_CPU_MODIFY("maincpu")
 	MCFG_CPU_PROGRAM_MAP(galpanica_map)
 

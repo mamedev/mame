@@ -439,7 +439,7 @@ MACHINE_CONFIG_START(s3_state::s3)
 	MCFG_DEFAULT_LAYOUT(layout_s3)
 
 	/* Sound */
-	MCFG_FRAGMENT_ADD( genpin_audio )
+	genpin_audio(config);
 
 	/* Devices */
 	MCFG_DEVICE_ADD("pia22", PIA6821, 0)
@@ -480,7 +480,8 @@ MACHINE_CONFIG_START(s3_state::s3)
 	MCFG_NVRAM_ADD_0FILL("nvram")
 MACHINE_CONFIG_END
 
-MACHINE_CONFIG_DERIVED(s3_state::s3a, s3)
+MACHINE_CONFIG_START(s3_state::s3a)
+	s3(config);
 	/* Add the soundcard */
 	MCFG_CPU_ADD("audiocpu", M6802, 3580000)
 	MCFG_CPU_PROGRAM_MAP(s3_audio_map)

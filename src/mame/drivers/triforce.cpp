@@ -587,7 +587,8 @@ MACHINE_CONFIG_START(triforce_state::triforce_base)
 
 MACHINE_CONFIG_END
 
-MACHINE_CONFIG_DERIVED(triforce_state::triforcegd, triforce_base)
+MACHINE_CONFIG_START(triforce_state::triforcegd)
+	triforce_base(config);
 	MCFG_NAOMI_GDROM_BOARD_ADD("rom_board", ":gdrom", ":pic", nullptr, NOOP)
 MACHINE_CONFIG_END
 

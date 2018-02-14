@@ -476,7 +476,8 @@ MACHINE_CONFIG_START(cyberbal_state::cyberbal)
 MACHINE_CONFIG_END
 
 
-MACHINE_CONFIG_DERIVED(cyberbal_state::cyberbalt, cyberbal)
+MACHINE_CONFIG_START(cyberbal_state::cyberbalt)
+	cyberbal(config);
 	MCFG_DEVICE_REMOVE("eeprom")
 	MCFG_EEPROM_2816_ADD("eeprom")
 	MCFG_EEPROM_28XX_LOCK_AFTER_WRITE(true)

@@ -184,7 +184,8 @@ MACHINE_CONFIG_START(mice_state::mice)
 	MCFG_DEVICE_ADD("ppi", I8255, 0)
 MACHINE_CONFIG_END
 
-MACHINE_CONFIG_DERIVED(mice_state::mice2, mice)
+MACHINE_CONFIG_START(mice_state::mice2)
+	mice(config);
 	MCFG_CPU_MODIFY("maincpu")
 	MCFG_CPU_PROGRAM_MAP(mice2_mem)
 	MCFG_CPU_IO_MAP(mice2_io)

@@ -393,7 +393,8 @@ MACHINE_CONFIG_START(segam1_state::segam1)
 	//MCFG_YM2612_IRQ_HANDLER(WRITELINE(segam1_state, ym3438_irq_handler))
 MACHINE_CONFIG_END
 
-MACHINE_CONFIG_DERIVED(segam1_state::unkm1, segam1)
+MACHINE_CONFIG_START(segam1_state::unkm1)
+	segam1(config);
 	MCFG_CPU_MODIFY("audiocpu")
 	MCFG_CPU_PROGRAM_MAP(unkm1_sound_map)
 

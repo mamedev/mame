@@ -4228,7 +4228,9 @@ MACHINE_CONFIG_START(nmk16_state::tdragon)
 	MCFG_DEVICE_ADDRESS_MAP(0, oki2_map)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.10)
 MACHINE_CONFIG_END
-MACHINE_CONFIG_DERIVED(nmk16_state::tdragon_prot, tdragon)
+
+MACHINE_CONFIG_START(nmk16_state::tdragon_prot)
+	tdragon(config);
 	MCFG_TIMER_DRIVER_ADD_PERIODIC("coinsim", nmk16_state, tdragon_mcu_sim, attotime::from_hz(10000))
 MACHINE_CONFIG_END
 
@@ -4342,7 +4344,9 @@ MACHINE_CONFIG_START(nmk16_state::hachamf)
 	MCFG_DEVICE_ADDRESS_MAP(0, oki2_map)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.10)
 MACHINE_CONFIG_END
-MACHINE_CONFIG_DERIVED(nmk16_state::hachamf_prot, hachamf)
+
+MACHINE_CONFIG_START(nmk16_state::hachamf_prot)
+	hachamf(config);
 	MCFG_TIMER_DRIVER_ADD_PERIODIC("coinsim", nmk16_state, hachamf_mcu_sim, attotime::from_hz(10000))
 MACHINE_CONFIG_END
 
@@ -4558,7 +4562,8 @@ MACHINE_CONFIG_START(nmk16_state::tdragon2)
 	MCFG_NMK112_ROM1("oki2")
 MACHINE_CONFIG_END
 
-MACHINE_CONFIG_DERIVED(nmk16_state::tdragon3h, tdragon2)
+MACHINE_CONFIG_START(nmk16_state::tdragon3h)
+	tdragon2(config);
 	MCFG_CPU_MODIFY("maincpu")
 	MCFG_CPU_PROGRAM_MAP(tdragon3h_map)
 MACHINE_CONFIG_END
@@ -5244,7 +5249,8 @@ MACHINE_CONFIG_START(nmk16_state::stagger1)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", 0.70)
 MACHINE_CONFIG_END
 
-MACHINE_CONFIG_DERIVED(nmk16_state::redhawki, stagger1)
+MACHINE_CONFIG_START(nmk16_state::redhawki)
+	stagger1(config);
 
 	/* basic machine hardware */
 	/* video hardware */
@@ -5252,7 +5258,8 @@ MACHINE_CONFIG_DERIVED(nmk16_state::redhawki, stagger1)
 	MCFG_SCREEN_UPDATE_DRIVER(nmk16_state, screen_update_redhawki)
 MACHINE_CONFIG_END
 
-MACHINE_CONFIG_DERIVED(nmk16_state::redhawkb, stagger1)
+MACHINE_CONFIG_START(nmk16_state::redhawkb)
+	stagger1(config);
 
 	/* basic machine hardware */
 	/* video hardware */
@@ -5261,7 +5268,8 @@ MACHINE_CONFIG_DERIVED(nmk16_state::redhawkb, stagger1)
 	MCFG_SCREEN_UPDATE_DRIVER(nmk16_state, screen_update_redhawkb)
 MACHINE_CONFIG_END
 
-MACHINE_CONFIG_DERIVED(nmk16_state::grdnstrm, stagger1)
+MACHINE_CONFIG_START(nmk16_state::grdnstrm)
+	stagger1(config);
 
 	/* basic machine hardware */
 
@@ -5272,7 +5280,8 @@ MACHINE_CONFIG_DERIVED(nmk16_state::grdnstrm, stagger1)
 	MCFG_SCREEN_UPDATE_DRIVER(nmk16_state, screen_update_firehawk)
 MACHINE_CONFIG_END
 
-MACHINE_CONFIG_DERIVED(nmk16_state::grdnstrmk, stagger1) /* Side by side with PCB, the music seems too fast as well */
+MACHINE_CONFIG_START(nmk16_state::grdnstrmk) /* Side by side with PCB, the music seems too fast as well */
+	stagger1(config);
 
 	/* basic machine hardware */
 
@@ -5283,7 +5292,8 @@ MACHINE_CONFIG_DERIVED(nmk16_state::grdnstrmk, stagger1) /* Side by side with PC
 	MCFG_VIDEO_START_OVERRIDE(nmk16_state,grdnstrm)
 MACHINE_CONFIG_END
 
-MACHINE_CONFIG_DERIVED(nmk16_state::popspops, grdnstrm)
+MACHINE_CONFIG_START(nmk16_state::popspops)
+	grdnstrm(config);
 
 	/* basic machine hardware */
 
@@ -5325,7 +5335,8 @@ MACHINE_CONFIG_START(nmk16_state::firehawk)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 MACHINE_CONFIG_END
 
-MACHINE_CONFIG_DERIVED(nmk16_state::spec2k, firehawk)
+MACHINE_CONFIG_START(nmk16_state::spec2k)
+	firehawk(config);
 	MCFG_CPU_MODIFY("maincpu")
 	MCFG_CPU_PROGRAM_MAP(afega_map)
 MACHINE_CONFIG_END

@@ -412,13 +412,14 @@ MACHINE_CONFIG_START(m52_state::m52)
 	MCFG_SCREEN_PALETTE("palette")
 
 	/* sound hardware */
-	//MCFG_FRAGMENT_ADD(m52_sound_c_audio)
+	//m52_sound_c_audio(config);
 	MCFG_DEVICE_ADD("irem_audio", IREM_M52_SOUNDC_AUDIO, 0)
 
 MACHINE_CONFIG_END
 
 
-MACHINE_CONFIG_DERIVED(m52_state::alpha1v, m52)
+MACHINE_CONFIG_START(m52_state::alpha1v)
+	m52(config);
 
 	/* basic machine hardware */
 	MCFG_CPU_MODIFY("maincpu")

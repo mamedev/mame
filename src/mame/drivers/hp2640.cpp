@@ -148,7 +148,7 @@ public:
 	DECLARE_READ8_MEMBER(async_status_r);
 	DECLARE_WRITE8_MEMBER(async_control_w);
 	DECLARE_WRITE8_MEMBER(async_data_w);
-	DECLARE_WRITE8_MEMBER(async_status_change);
+	DECLARE_WRITE_LINE_MEMBER(async_dav_w);
 	DECLARE_WRITE_LINE_MEMBER(async_txd_w);
 
 	TIMER_DEVICE_CALLBACK_MEMBER(timer_beep_exp);
@@ -485,7 +485,7 @@ WRITE8_MEMBER(hp2645_state::async_data_w)
 	m_uart->set_transmit_data(data);
 }
 
-WRITE8_MEMBER(hp2645_state::async_status_change)
+WRITE_LINE_MEMBER(hp2645_state::async_dav_w)
 {
 	update_async_irq();
 }
@@ -1006,7 +1006,7 @@ MACHINE_CONFIG_START(hp2645_state::hp2645)
 	MCFG_DEVICE_ADD("uart", AY31015, 0)
 	MCFG_AY31015_READ_SI_CB(DEVREADLINE("rs232" , rs232_port_device , rxd_r))
 	MCFG_AY31015_WRITE_SO_CB(WRITELINE(hp2645_state , async_txd_w))
-	MCFG_AY31015_STATUS_CHANGED_CB(WRITE8(hp2645_state , async_status_change))
+	MCFG_AY31015_WRITE_DAV_CB(WRITELINE(hp2645_state , async_dav_w))
 
 	// Beep
 	MCFG_SPEAKER_STANDARD_MONO("mono")

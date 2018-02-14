@@ -854,7 +854,8 @@ MACHINE_CONFIG_START(coolpool_state::coolpool)
 MACHINE_CONFIG_END
 
 
-MACHINE_CONFIG_DERIVED(coolpool_state::_9ballsht, coolpool)
+MACHINE_CONFIG_START(coolpool_state::_9ballsht)
+	coolpool(config);
 
 	MCFG_CPU_MODIFY("maincpu")
 	MCFG_CPU_PROGRAM_MAP(nballsht_map)

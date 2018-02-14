@@ -593,7 +593,7 @@ MACHINE_CONFIG_START(peyper_state::peyper)
 	MCFG_DEFAULT_LAYOUT(layout_peyper)
 
 	/* Sound */
-	MCFG_FRAGMENT_ADD( genpin_audio )
+	genpin_audio(config);
 	MCFG_SPEAKER_STANDARD_MONO("ayvol")
 	MCFG_SOUND_ADD("ay1", AY8910, 2500000)
 	MCFG_AY8910_PORT_A_WRITE_CB(WRITE8(peyper_state, p1a_w))

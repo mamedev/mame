@@ -744,6 +744,7 @@ MACHINE_CONFIG_START(r2dx_v33_state::rdx_v33)
 MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(r2dx_v33_state::nzerotea)
+	raiden2_state::zeroteam_sound(config); /* sound system same as zero team */
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", V33, MAIN_CLOCK) /* verified on pcb */
@@ -767,12 +768,10 @@ MACHINE_CONFIG_START(r2dx_v33_state::nzerotea)
 	MCFG_DEVICE_ADD("crtc", SEIBU_CRTC, 0)
 	MCFG_SEIBU_CRTC_LAYER_EN_CB(WRITE16(raiden2_state, tilemap_enable_w))
 	MCFG_SEIBU_CRTC_LAYER_SCROLL_CB(WRITE16(raiden2_state, tile_scroll_w))
-
-	/* sound hardware */
-	MCFG_FRAGMENT_ADD(raiden2_state::zeroteam_sound)
 MACHINE_CONFIG_END
 
-MACHINE_CONFIG_DERIVED(r2dx_v33_state::zerotm2k, nzerotea)
+MACHINE_CONFIG_START(r2dx_v33_state::zerotm2k)
+	nzerotea(config);
 	MCFG_CPU_MODIFY("maincpu")
 	MCFG_CPU_PROGRAM_MAP(zerotm2k_map)
 

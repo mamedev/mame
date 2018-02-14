@@ -293,7 +293,8 @@ MACHINE_CONFIG_START(rollrace_state::rollrace)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "lspeaker", 0.10)
 MACHINE_CONFIG_END
 
-MACHINE_CONFIG_DERIVED(rollrace_state::rollace2, rollrace)
+MACHINE_CONFIG_START(rollrace_state::rollace2)
+	rollrace(config);
 
 	/* basic machine hardware */
 

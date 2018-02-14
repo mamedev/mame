@@ -761,7 +761,8 @@ MACHINE_CONFIG_START(thomson_state::to7)
 	MCFG_SOFTWARE_LIST_ADD("to7_qd_list","to7_qd")
 MACHINE_CONFIG_END
 
-MACHINE_CONFIG_DERIVED(thomson_state::t9000, to7)
+MACHINE_CONFIG_START(thomson_state::t9000)
+	to7(config);
 MACHINE_CONFIG_END
 
 
@@ -923,7 +924,8 @@ INPUT_PORTS_END
 
 /* ------------ driver ------------ */
 
-MACHINE_CONFIG_DERIVED(thomson_state::to770, to7)
+MACHINE_CONFIG_START(thomson_state::to770)
+	to7(config);
 	MCFG_MACHINE_START_OVERRIDE( thomson_state, to770 )
 	MCFG_MACHINE_RESET_OVERRIDE( thomson_state, to770 )
 
@@ -949,7 +951,8 @@ MACHINE_CONFIG_DERIVED(thomson_state::to770, to7)
 	MCFG_SOFTWARE_LIST_COMPATIBLE_ADD("to7_cart_list","to7_cart")
 MACHINE_CONFIG_END
 
-MACHINE_CONFIG_DERIVED(thomson_state::to770a, to770)
+MACHINE_CONFIG_START(thomson_state::to770a)
+	to770(config);
 	MCFG_DEVICE_REMOVE("t770_cart_list")
 	MCFG_SOFTWARE_LIST_ADD("t770a_cart_list","to770a_cart")
 MACHINE_CONFIG_END
@@ -1113,7 +1116,8 @@ INPUT_PORTS_END
 
 /* ------------ driver ------------ */
 
-MACHINE_CONFIG_DERIVED(thomson_state::mo5, to7)
+MACHINE_CONFIG_START(thomson_state::mo5)
+	to7(config);
 	MCFG_MACHINE_START_OVERRIDE( thomson_state, mo5 )
 	MCFG_MACHINE_RESET_OVERRIDE( thomson_state, mo5 )
 
@@ -1158,7 +1162,8 @@ MACHINE_CONFIG_DERIVED(thomson_state::mo5, to7)
 	MCFG_RAM_DEFAULT_SIZE("112K")
 MACHINE_CONFIG_END
 
-MACHINE_CONFIG_DERIVED(thomson_state::mo5e, mo5)
+MACHINE_CONFIG_START(thomson_state::mo5e)
+	mo5(config);
 MACHINE_CONFIG_END
 
 
@@ -1473,7 +1478,8 @@ INPUT_PORTS_END
 
 /* ------------ driver ------------ */
 
-MACHINE_CONFIG_DERIVED(thomson_state::to9, to7)
+MACHINE_CONFIG_START(thomson_state::to9)
+	to7(config);
 	MCFG_MACHINE_START_OVERRIDE( thomson_state, to9 )
 	MCFG_MACHINE_RESET_OVERRIDE( thomson_state, to9 )
 
@@ -1695,7 +1701,8 @@ INPUT_PORTS_END
 
 /* ------------ driver ------------ */
 
-MACHINE_CONFIG_DERIVED(thomson_state::to8, to7)
+MACHINE_CONFIG_START(thomson_state::to8)
+	to7(config);
 	MCFG_MACHINE_START_OVERRIDE( thomson_state, to8 )
 	MCFG_MACHINE_RESET_OVERRIDE( thomson_state, to8 )
 
@@ -1732,7 +1739,8 @@ MACHINE_CONFIG_DERIVED(thomson_state::to8, to7)
 	MCFG_SOFTWARE_LIST_COMPATIBLE_ADD("to7_qd_list", "to7_qd")
 MACHINE_CONFIG_END
 
-MACHINE_CONFIG_DERIVED(thomson_state::to8d, to8)
+MACHINE_CONFIG_START(thomson_state::to8d)
+	to8(config);
 MACHINE_CONFIG_END
 
 
@@ -1858,7 +1866,8 @@ INPUT_PORTS_END
 
 /* ------------ driver ------------ */
 
-MACHINE_CONFIG_DERIVED(thomson_state::to9p, to7)
+MACHINE_CONFIG_START(thomson_state::to9p)
+	to7(config);
 	MCFG_MACHINE_START_OVERRIDE( thomson_state, to9p )
 	MCFG_MACHINE_RESET_OVERRIDE( thomson_state, to9p )
 
@@ -2207,7 +2216,8 @@ INPUT_PORTS_END
 
 /* ------------ driver ------------ */
 
-MACHINE_CONFIG_DERIVED(thomson_state::mo6, to7)
+MACHINE_CONFIG_START(thomson_state::mo6)
+	to7(config);
 	MCFG_MACHINE_START_OVERRIDE( thomson_state, mo6 )
 	MCFG_MACHINE_RESET_OVERRIDE( thomson_state, mo6 )
 
@@ -2261,7 +2271,8 @@ MACHINE_CONFIG_DERIVED(thomson_state::mo6, to7)
 	MCFG_SOFTWARE_LIST_COMPATIBLE_ADD("mo5_qd_list","mo5_qd")
 MACHINE_CONFIG_END
 
-MACHINE_CONFIG_DERIVED(thomson_state::pro128, mo6)
+MACHINE_CONFIG_START(thomson_state::pro128)
+	mo6(config);
 	MCFG_DEVICE_REMOVE("mo6_cass_list")
 	MCFG_DEVICE_REMOVE("mo6_flop_list")
 
@@ -2476,7 +2487,8 @@ INPUT_PORTS_END
 
 /* ------------ driver ------------ */
 
-MACHINE_CONFIG_DERIVED(thomson_state::mo5nr, to7)
+MACHINE_CONFIG_START(thomson_state::mo5nr)
+	to7(config);
 	MCFG_MACHINE_START_OVERRIDE( thomson_state, mo5nr )
 	MCFG_MACHINE_RESET_OVERRIDE( thomson_state, mo5nr )
 

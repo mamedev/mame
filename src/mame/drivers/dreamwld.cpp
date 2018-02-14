@@ -829,7 +829,8 @@ MACHINE_CONFIG_START(dreamwld_state::baryon)
 
 MACHINE_CONFIG_END
 
-MACHINE_CONFIG_DERIVED(dreamwld_state::dreamwld, baryon)
+MACHINE_CONFIG_START(dreamwld_state::dreamwld)
+	baryon(config);
 
 	/* basic machine hardware */
 	MCFG_CPU_MODIFY("maincpu")

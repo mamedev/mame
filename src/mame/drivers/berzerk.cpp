@@ -1135,7 +1135,8 @@ MACHINE_CONFIG_START(berzerk_state::berzerk)
 MACHINE_CONFIG_END
 
 
-MACHINE_CONFIG_DERIVED(berzerk_state::frenzy, berzerk)
+MACHINE_CONFIG_START(berzerk_state::frenzy)
+	berzerk(config);
 
 	/* basic machine hardware */
 	MCFG_CPU_MODIFY("maincpu")

@@ -1231,7 +1231,8 @@ MACHINE_CONFIG_START(mitchell_state::pang)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 MACHINE_CONFIG_END
 
-MACHINE_CONFIG_DERIVED(mitchell_state::pangnv, pang)
+MACHINE_CONFIG_START(mitchell_state::pangnv)
+	pang(config);
 	MCFG_NVRAM_ADD_0FILL("nvram")
 MACHINE_CONFIG_END
 
@@ -1266,7 +1267,8 @@ WRITE_LINE_MEMBER(mitchell_state::spangbl_adpcm_int)
 }
 
 
-MACHINE_CONFIG_DERIVED(mitchell_state::spangbl, pangnv)
+MACHINE_CONFIG_START(mitchell_state::spangbl)
+	pangnv(config);
 
 	MCFG_CPU_MODIFY("maincpu")
 	MCFG_CPU_PROGRAM_MAP(spangbl_map)
@@ -1294,7 +1296,8 @@ MACHINE_CONFIG_DERIVED(mitchell_state::spangbl, pangnv)
 	MCFG_74157_OUT_CB(DEVWRITE8("msm", msm5205_device, data_w))
 MACHINE_CONFIG_END
 
-MACHINE_CONFIG_DERIVED(mitchell_state::pangba, spangbl)
+MACHINE_CONFIG_START(mitchell_state::pangba)
+	spangbl(config);
 	MCFG_CPU_MODIFY("audiocpu")
 	MCFG_CPU_PROGRAM_MAP(pangba_sound_map)
 

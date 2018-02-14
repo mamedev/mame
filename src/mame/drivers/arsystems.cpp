@@ -310,7 +310,7 @@ MACHINE_CONFIG_START(arcadia_amiga_state::arcadia)
 	MCFG_NVRAM_ADD_0FILL("nvram")
 
 	/* video hardware */
-	MCFG_FRAGMENT_ADD(ntsc_video)
+	ntsc_video(config);
 
 	MCFG_PALETTE_ADD("palette", 4096)
 	MCFG_PALETTE_INIT_OWNER(arcadia_amiga_state,amiga)
@@ -347,7 +347,8 @@ MACHINE_CONFIG_START(arcadia_amiga_state::arcadia)
 	MCFG_AMIGA_FDC_DSKSYN_CALLBACK(WRITELINE(amiga_state, fdc_dsksyn_w))
 MACHINE_CONFIG_END
 
-MACHINE_CONFIG_DERIVED(arcadia_amiga_state::argh, arcadia)
+MACHINE_CONFIG_START(arcadia_amiga_state::argh)
+	arcadia(config);
 
 	/* basic machine hardware */
 	MCFG_CPU_MODIFY("maincpu")

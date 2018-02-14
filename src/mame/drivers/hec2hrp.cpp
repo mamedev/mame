@@ -423,7 +423,7 @@ MACHINE_CONFIG_START(hec2hrp_state::hec2hr)
 	MCFG_PALETTE_ADD("palette", 16)
 	MCFG_VIDEO_START_OVERRIDE(hec2hrp_state,hec2hrp)
 
-	MCFG_FRAGMENT_ADD(hector_audio)
+	hector_audio(config);
 
 	/* Gestion cassette*/
 	MCFG_CASSETTE_ADD( "cassette" )
@@ -458,7 +458,7 @@ MACHINE_CONFIG_START(hec2hrp_state::hec2hrp)
 	MCFG_PALETTE_ADD("palette", 16)
 	MCFG_VIDEO_START_OVERRIDE(hec2hrp_state,hec2hrp)
 
-	MCFG_FRAGMENT_ADD(hector_audio)
+	hector_audio(config);
 
 	/* Gestion cassette*/
 	MCFG_CASSETTE_ADD( "cassette" )
@@ -507,7 +507,7 @@ MACHINE_CONFIG_START(hec2hrp_state::hec2mx40)
 	MCFG_PALETTE_ADD("palette", 16)
 	MCFG_VIDEO_START_OVERRIDE(hec2hrp_state,hec2hrp)
 
-	MCFG_FRAGMENT_ADD(hector_audio)
+	hector_audio(config);
 
 	/* Gestion cassette*/
 	MCFG_CASSETTE_ADD( "cassette" )
@@ -551,7 +551,7 @@ MACHINE_CONFIG_START(hec2hrp_state::hec2hrx)
 	MCFG_PALETTE_ADD("palette", 16)
 	MCFG_VIDEO_START_OVERRIDE(hec2hrp_state,hec2hrp)
 
-	MCFG_FRAGMENT_ADD(hector_audio)
+	hector_audio(config);
 
 	// Gestion cassette
 	MCFG_CASSETTE_ADD( "cassette" )
@@ -592,7 +592,7 @@ MACHINE_CONFIG_START(hec2hrp_state::hec2mdhrx)
 	MCFG_PALETTE_ADD("palette", 16)
 	MCFG_VIDEO_START_OVERRIDE(hec2hrp_state,hec2hrp)
 
-	MCFG_FRAGMENT_ADD(hector_audio)
+	hector_audio(config);
 
 	// Gestion cassette
 	MCFG_CASSETTE_ADD( "cassette" )
@@ -637,7 +637,7 @@ MACHINE_CONFIG_START(hec2hrp_state::hec2mx80)
 	MCFG_PALETTE_ADD("palette", 16)
 	MCFG_VIDEO_START_OVERRIDE(hec2hrp_state,hec2hrp)
 
-	MCFG_FRAGMENT_ADD(hector_audio)
+	hector_audio(config);
 
 	/* Gestion cassette*/
 	MCFG_CASSETTE_ADD( "cassette" )

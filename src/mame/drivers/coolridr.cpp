@@ -3741,7 +3741,8 @@ MACHINE_CONFIG_START(coolridr_state::coolridr)
 	MCFG_SOUND_ROUTE(0, "rspeaker", 1.0)
 MACHINE_CONFIG_END
 
-MACHINE_CONFIG_DERIVED(coolridr_state::aquastge, coolridr)
+MACHINE_CONFIG_START(coolridr_state::aquastge)
+	coolridr(config);
 	MCFG_CPU_MODIFY("maincpu")
 	MCFG_CPU_PROGRAM_MAP(aquastge_h1_map)
 

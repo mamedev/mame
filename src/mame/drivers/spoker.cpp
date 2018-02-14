@@ -637,7 +637,8 @@ MACHINE_CONFIG_START(spoker_state::spoker)
 MACHINE_CONFIG_END
 
 
-MACHINE_CONFIG_DERIVED(spoker_state::_3super8, spoker)
+MACHINE_CONFIG_START(spoker_state::_3super8)
+	spoker(config);
 
 	MCFG_CPU_REPLACE("maincpu", Z80, XTAL(24'000'000) / 4)    /* z840006, 24/4 MHz? */
 	MCFG_CPU_MODIFY("maincpu")

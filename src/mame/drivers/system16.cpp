@@ -2166,7 +2166,8 @@ MACHINE_CONFIG_START(segas1x_bootleg_state::system16_base)
 	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
 MACHINE_CONFIG_END
 
-MACHINE_CONFIG_DERIVED(segas1x_bootleg_state::shinobi_datsu, system16_base)
+MACHINE_CONFIG_START(segas1x_bootleg_state::shinobi_datsu)
+	system16_base(config);
 
 	/* basic machine hardware */
 	MCFG_CPU_MODIFY("maincpu")
@@ -2179,11 +2180,12 @@ MACHINE_CONFIG_DERIVED(segas1x_bootleg_state::shinobi_datsu, system16_base)
 	MCFG_SCREEN_MODIFY("screen")
 	MCFG_SCREEN_UPDATE_DRIVER(segas1x_bootleg_state, screen_update_s16a_bootleg)
 
-	MCFG_FRAGMENT_ADD(datsu_2x_ym2203_msm5205)
+	datsu_2x_ym2203_msm5205(config);
 MACHINE_CONFIG_END
 
 
-MACHINE_CONFIG_DERIVED(segas1x_bootleg_state::passshtb, system16_base)
+MACHINE_CONFIG_START(segas1x_bootleg_state::passshtb)
+	system16_base(config);
 
 	/* basic machine hardware */
 	MCFG_CPU_MODIFY("maincpu")
@@ -2197,11 +2199,12 @@ MACHINE_CONFIG_DERIVED(segas1x_bootleg_state::passshtb, system16_base)
 	MCFG_SCREEN_MODIFY("screen")
 	MCFG_SCREEN_UPDATE_DRIVER(segas1x_bootleg_state, screen_update_s16a_bootleg)
 
-	MCFG_FRAGMENT_ADD(z80_ym2151_upd7759)
+	z80_ym2151_upd7759(config);
 MACHINE_CONFIG_END
 
 
-MACHINE_CONFIG_DERIVED(segas1x_bootleg_state::passsht4b, system16_base)
+MACHINE_CONFIG_START(segas1x_bootleg_state::passsht4b)
+	system16_base(config);
 
 	/* basic machine hardware */
 	MCFG_CPU_MODIFY("maincpu")
@@ -2216,12 +2219,13 @@ MACHINE_CONFIG_DERIVED(segas1x_bootleg_state::passsht4b, system16_base)
 	MCFG_SCREEN_MODIFY("screen")
 	MCFG_SCREEN_UPDATE_DRIVER(segas1x_bootleg_state, screen_update_s16a_bootleg_passht4b)
 
-	MCFG_FRAGMENT_ADD(datsu_2x_ym2203_msm5205)
+	datsu_2x_ym2203_msm5205(config);
 	MCFG_DEVICE_MODIFY("5205")
 	MCFG_MSM5205_PRESCALER_SELECTOR(S96_4B)
 MACHINE_CONFIG_END
 
-MACHINE_CONFIG_DERIVED(segas1x_bootleg_state::wb3bb, system16_base)
+MACHINE_CONFIG_START(segas1x_bootleg_state::wb3bb)
+	system16_base(config);
 
 	/* basic machine hardware */
 	MCFG_CPU_MODIFY("maincpu")
@@ -2236,7 +2240,7 @@ MACHINE_CONFIG_DERIVED(segas1x_bootleg_state::wb3bb, system16_base)
 	MCFG_SCREEN_MODIFY("screen")
 	MCFG_SCREEN_UPDATE_DRIVER(segas1x_bootleg_state, screen_update_s16a_bootleg)
 
-	MCFG_FRAGMENT_ADD(z80_ym2151)
+	z80_ym2151(config);
 MACHINE_CONFIG_END
 
 
@@ -2270,56 +2274,62 @@ MACHINE_CONFIG_START(segas1x_bootleg_state::goldnaxeb_base)
 	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
 MACHINE_CONFIG_END
 
-MACHINE_CONFIG_DERIVED(segas1x_bootleg_state::goldnaxeb1, goldnaxeb_base)
+MACHINE_CONFIG_START(segas1x_bootleg_state::goldnaxeb1)
+	goldnaxeb_base(config);
 
-	MCFG_FRAGMENT_ADD(z80_ym2151_upd7759)
+	z80_ym2151_upd7759(config);
 MACHINE_CONFIG_END
 
-MACHINE_CONFIG_DERIVED(segas1x_bootleg_state::goldnaxeb2, goldnaxeb_base)
+MACHINE_CONFIG_START(segas1x_bootleg_state::goldnaxeb2)
+	goldnaxeb_base(config);
 
 	/* basic machine hardware */
 	MCFG_CPU_MODIFY("maincpu")
 	MCFG_CPU_PROGRAM_MAP(goldnaxeb2_map)
 	MCFG_DEVICE_REMOVE_ADDRESS_MAP(AS_OPCODES)
 
-	MCFG_FRAGMENT_ADD(datsu_2x_ym2203_msm5205)
+	datsu_2x_ym2203_msm5205(config);
 MACHINE_CONFIG_END
 
 
-MACHINE_CONFIG_DERIVED(segas1x_bootleg_state::bayrouteb1, goldnaxeb1)
+MACHINE_CONFIG_START(segas1x_bootleg_state::bayrouteb1)
+	goldnaxeb1(config);
 
 	/* basic machine hardware */
 	MCFG_CPU_MODIFY("maincpu")
 	MCFG_CPU_PROGRAM_MAP(bayrouteb1_map)
 MACHINE_CONFIG_END
 
-MACHINE_CONFIG_DERIVED(segas1x_bootleg_state::bayrouteb2, goldnaxeb_base)
+MACHINE_CONFIG_START(segas1x_bootleg_state::bayrouteb2)
+	goldnaxeb_base(config);
 
 	/* basic machine hardware */
 	MCFG_CPU_MODIFY("maincpu")
 	MCFG_CPU_PROGRAM_MAP(bayrouteb2_map)
 	MCFG_DEVICE_REMOVE_ADDRESS_MAP(AS_OPCODES)
 
-	MCFG_FRAGMENT_ADD(datsu_ym2151_msm5205)
+	datsu_ym2151_msm5205(config);
 
 	MCFG_DEVICE_MODIFY("sprites")
 	MCFG_BOOTLEG_SYS16B_SPRITES_XORIGIN(189-107)
 
 MACHINE_CONFIG_END
 
-MACHINE_CONFIG_DERIVED(segas1x_bootleg_state::tturfbl, system16_base)
+MACHINE_CONFIG_START(segas1x_bootleg_state::tturfbl)
+	system16_base(config);
 
 	/* basic machine hardware */
 	MCFG_CPU_MODIFY("maincpu")
 	MCFG_CPU_PROGRAM_MAP(tturfbl_map)
 
-	MCFG_FRAGMENT_ADD(datsu_ym2151_msm5205)
+	datsu_ym2151_msm5205(config);
 
 	MCFG_BOOTLEG_SYS16B_SPRITES_ADD("sprites")
 	MCFG_BOOTLEG_SYS16B_SPRITES_XORIGIN(189-107)
 MACHINE_CONFIG_END
 
-MACHINE_CONFIG_DERIVED(segas1x_bootleg_state::dduxbl, system16_base)
+MACHINE_CONFIG_START(segas1x_bootleg_state::dduxbl)
+	system16_base(config);
 
 	/* basic machine hardware */
 	MCFG_CPU_MODIFY("maincpu")
@@ -2328,10 +2338,11 @@ MACHINE_CONFIG_DERIVED(segas1x_bootleg_state::dduxbl, system16_base)
 	MCFG_BOOTLEG_SYS16B_SPRITES_ADD("sprites")
 	MCFG_BOOTLEG_SYS16B_SPRITES_XORIGIN(189-112)
 
-	MCFG_FRAGMENT_ADD(z80_ym2151)
+	z80_ym2151(config);
 MACHINE_CONFIG_END
 
-MACHINE_CONFIG_DERIVED(segas1x_bootleg_state::eswatbl, system16_base)
+MACHINE_CONFIG_START(segas1x_bootleg_state::eswatbl)
+	system16_base(config);
 
 	/* basic machine hardware */
 	MCFG_CPU_MODIFY("maincpu")
@@ -2340,10 +2351,11 @@ MACHINE_CONFIG_DERIVED(segas1x_bootleg_state::eswatbl, system16_base)
 	MCFG_BOOTLEG_SYS16B_SPRITES_ADD("sprites")
 	MCFG_BOOTLEG_SYS16B_SPRITES_XORIGIN(189-124)
 
-	MCFG_FRAGMENT_ADD(z80_ym2151_upd7759)
+	z80_ym2151_upd7759(config);
 MACHINE_CONFIG_END
 
-MACHINE_CONFIG_DERIVED(segas1x_bootleg_state::eswatbl2, system16_base)
+MACHINE_CONFIG_START(segas1x_bootleg_state::eswatbl2)
+	system16_base(config);
 
 	/* basic machine hardware */
 	MCFG_CPU_MODIFY("maincpu")
@@ -2352,10 +2364,11 @@ MACHINE_CONFIG_DERIVED(segas1x_bootleg_state::eswatbl2, system16_base)
 	MCFG_BOOTLEG_SYS16B_SPRITES_ADD("sprites")
 	MCFG_BOOTLEG_SYS16B_SPRITES_XORIGIN(189-121)
 
-	MCFG_FRAGMENT_ADD(datsu_2x_ym2203_msm5205)
+	datsu_2x_ym2203_msm5205(config);
 MACHINE_CONFIG_END
 
-MACHINE_CONFIG_DERIVED(segas1x_bootleg_state::tetrisbl, system16_base)
+MACHINE_CONFIG_START(segas1x_bootleg_state::tetrisbl)
+	system16_base(config);
 
 	/* basic machine hardware */
 	MCFG_CPU_MODIFY("maincpu")
@@ -2364,10 +2377,11 @@ MACHINE_CONFIG_DERIVED(segas1x_bootleg_state::tetrisbl, system16_base)
 	MCFG_BOOTLEG_SYS16B_SPRITES_ADD("sprites")
 	MCFG_BOOTLEG_SYS16B_SPRITES_XORIGIN(189-112)
 
-	MCFG_FRAGMENT_ADD(z80_ym2151)
+	z80_ym2151(config);
 MACHINE_CONFIG_END
 
-MACHINE_CONFIG_DERIVED(segas1x_bootleg_state::altbeastbl, system16_base)
+MACHINE_CONFIG_START(segas1x_bootleg_state::altbeastbl)
+	system16_base(config);
 	/* basic machine hardware */
 	MCFG_CPU_MODIFY("maincpu")
 	MCFG_CPU_PROGRAM_MAP(tetrisbl_map)
@@ -2375,12 +2389,13 @@ MACHINE_CONFIG_DERIVED(segas1x_bootleg_state::altbeastbl, system16_base)
 	MCFG_BOOTLEG_SYS16B_SPRITES_ADD("sprites")
 	MCFG_BOOTLEG_SYS16B_SPRITES_XORIGIN(189-112)
 
-	MCFG_FRAGMENT_ADD(datsu_2x_ym2203_msm5205)
+	datsu_2x_ym2203_msm5205(config);
 	MCFG_DEVICE_MODIFY("5205")
 	MCFG_MSM5205_PRESCALER_SELECTOR(S96_4B)
 MACHINE_CONFIG_END
 
-MACHINE_CONFIG_DERIVED(segas1x_bootleg_state::beautyb, system16_base)
+MACHINE_CONFIG_START(segas1x_bootleg_state::beautyb)
+	system16_base(config);
 
 	/* basic machine hardware */
 	MCFG_CPU_MODIFY("maincpu")
@@ -2388,7 +2403,7 @@ MACHINE_CONFIG_DERIVED(segas1x_bootleg_state::beautyb, system16_base)
 
 	// no sprites
 
-	MCFG_FRAGMENT_ADD(z80_ym2151)
+	z80_ym2151(config);
 MACHINE_CONFIG_END
 
 
@@ -2443,7 +2458,8 @@ MACHINE_CONFIG_START(segas1x_bootleg_state::system18)
 MACHINE_CONFIG_END
 
 
-MACHINE_CONFIG_DERIVED(segas1x_bootleg_state::astormbl, system18)
+MACHINE_CONFIG_START(segas1x_bootleg_state::astormbl)
+	system18(config);
 
 	/* basic machine hardware */
 	MCFG_CPU_MODIFY("maincpu")
@@ -2488,7 +2504,8 @@ MACHINE_CONFIG_START(segas1x_bootleg_state::astormb2)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 MACHINE_CONFIG_END
 
-MACHINE_CONFIG_DERIVED(segas1x_bootleg_state::mwalkbl, astormb2)
+MACHINE_CONFIG_START(segas1x_bootleg_state::mwalkbl)
+	astormb2(config);
 
 	/* basic machine hardware */
 	MCFG_CPU_MODIFY("maincpu")
@@ -2496,7 +2513,8 @@ MACHINE_CONFIG_DERIVED(segas1x_bootleg_state::mwalkbl, astormb2)
 MACHINE_CONFIG_END
 
 
-MACHINE_CONFIG_DERIVED(segas1x_bootleg_state::shdancbl, system18)
+MACHINE_CONFIG_START(segas1x_bootleg_state::shdancbl)
+	system18(config);
 
 	/* basic machine hardware */
 	MCFG_CPU_MODIFY("maincpu")
@@ -2514,7 +2532,8 @@ MACHINE_CONFIG_DERIVED(segas1x_bootleg_state::shdancbl, system18)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", 0.80)
 MACHINE_CONFIG_END
 
-MACHINE_CONFIG_DERIVED(segas1x_bootleg_state::shdancbla, system18)
+MACHINE_CONFIG_START(segas1x_bootleg_state::shdancbla)
+	system18(config);
 
 	/* basic machine hardware */
 	MCFG_CPU_MODIFY("maincpu")

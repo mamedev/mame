@@ -1727,21 +1727,24 @@ MACHINE_CONFIG_START(namcos12_state::coh700)
 	//MCFG_SOUND_ROUTE(3, "rspeaker", 1.00)
 MACHINE_CONFIG_END
 
-MACHINE_CONFIG_DERIVED(namcos12_boothack_state::ptblank2, coh700)
+MACHINE_CONFIG_START(namcos12_boothack_state::ptblank2)
+	coh700(config);
 
 	/* basic machine hardware */
 	MCFG_CPU_MODIFY("maincpu")
 	MCFG_CPU_PROGRAM_MAP( ptblank2_map )
 MACHINE_CONFIG_END
 
-MACHINE_CONFIG_DERIVED(namcos12_boothack_state::tektagt, coh700)
+MACHINE_CONFIG_START(namcos12_boothack_state::tektagt)
+	coh700(config);
 
 	/* basic machine hardware */
 	MCFG_CPU_MODIFY("maincpu")
 	MCFG_CPU_PROGRAM_MAP( tektagt_map )
 MACHINE_CONFIG_END
 
-MACHINE_CONFIG_DERIVED(namcos12_boothack_state::golgo13, coh700)
+MACHINE_CONFIG_START(namcos12_boothack_state::golgo13)
+	coh700(config);
 
 	/* basic machine hardware */
 	MCFG_CPU_MODIFY("sub")
@@ -1758,7 +1761,8 @@ ADDRESS_MAP_START(namcos12_state::jvsiomap)
 ADDRESS_MAP_END
 
 
-MACHINE_CONFIG_DERIVED(namcos12_boothack_state::truckk, coh700)
+MACHINE_CONFIG_START(namcos12_boothack_state::truckk)
+	coh700(config);
 	// Timer at 115200*16 for the jvs serial clock
 	MCFG_DEVICE_MODIFY(":sub:sci0")
 	MCFG_H8_SCI_SET_EXTERNAL_CLOCK_PERIOD(attotime::from_hz(JVSCLOCK/8))
@@ -1827,7 +1831,8 @@ ADDRESS_MAP_START(namcos12_state::plarailjvsiomap)
 	AM_RANGE(h8_device::ADC_2, h8_device::ADC_2) AM_NOP
 ADDRESS_MAP_END
 
-MACHINE_CONFIG_DERIVED(namcos12_boothack_state::technodr, coh700)
+MACHINE_CONFIG_START(namcos12_boothack_state::technodr)
+	coh700(config);
 	// Timer at 115200*16 for the jvs serial clock
 	MCFG_DEVICE_MODIFY(":sub:sci0")
 	MCFG_H8_SCI_SET_EXTERNAL_CLOCK_PERIOD(attotime::from_hz(JVSCLOCK/8))
@@ -1849,7 +1854,8 @@ MACHINE_CONFIG_DERIVED(namcos12_boothack_state::technodr, coh700)
 	MCFG_QUANTUM_TIME(attotime::from_hz(2*115200))
 MACHINE_CONFIG_END
 
-MACHINE_CONFIG_DERIVED(namcos12_boothack_state::aplarail, coh700)
+MACHINE_CONFIG_START(namcos12_boothack_state::aplarail)
+	coh700(config);
 	// Timer at 115200*16 for the jvs serial clock
 	MCFG_DEVICE_MODIFY(":sub:sci0")
 	MCFG_H8_SCI_SET_EXTERNAL_CLOCK_PERIOD(attotime::from_hz(JVSCLOCK/8))
@@ -3161,6 +3167,9 @@ ROM_START( technodr )
 
 	ROM_REGION( 0x40000, "iocpu", 0)  /* Truck K. I/O board */
 	ROM_LOAD( "th1io-a.4f",   0x000000, 0x040000, CRC(1cbbce27) SHA1(71d61d9218543e1b0b2a6c550a8ff2b7c6267257) )
+
+	ROM_REGION( 0x800, "at28c16", 0)    /* NVRAM with printer off by default */
+	ROM_LOAD( "at28c16",      0x000000, 0x000800, CRC(01227f45) SHA1(fb4e6ebaa789e4dd2794607d149627ff17047076) )
 ROM_END
 
 ROM_START( aplarail )
@@ -3213,7 +3222,7 @@ GAME( 1998, ehrgeizja, ehrgeiz,  coh700,   namcos12,  namcos12_state,          n
 GAME( 1998, mdhorse,   0,        coh700,   namcos12,  namcos12_state,          namcos12, ROT0, "MOSS / Namco",    "Derby Quiz My Dream Horse (Japan, MDH1/VER.A2)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_NOT_WORKING ) /* KC035 */
 GAME( 1998, aplarail,  0,        aplarail, aplarail,  namcos12_boothack_state, namcos12, ROT0, "Namco / Tomy",    "Attack Pla Rail (Japan, AP1/VER.A)", MACHINE_IMPERFECT_GRAPHICS ) /* KC032 */
 GAME( 1998, sws98,     0,        coh700,   namcos12,  namcos12_state,          namcos12, ROT0, "Namco",           "Super World Stadium '98 (Japan, SS81/VER.A)", MACHINE_IMPERFECT_GRAPHICS ) /* KC0?? */
-GAME( 1998, technodr,  0,        technodr, technodr,  namcos12_boothack_state, technodr, ROT0, "Namco",           "Techno Drive (Japan, TD2/VER.B)", MACHINE_IMPERFECT_GRAPHICS ) /* KC056 */
+GAME( 1998, technodr,  0,        technodr, technodr,  namcos12_boothack_state, technodr, ROT0, "Namco",           "Techno Drive (Japan, TD2/VER.B)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_NODEVICE_PRINTER ) /* KC056 */
 GAME( 1998, tenkomor,  0,        coh700,   namcos12,  namcos12_boothack_state, namcos12, ROT90,"Namco",           "Tenkomori Shooting (World, TKM2/VER.A1)", MACHINE_IMPERFECT_GRAPHICS ) /* KC036 */
 GAME( 1998, tenkomorja,tenkomor, coh700,   namcos12,  namcos12_boothack_state, namcos12, ROT90,"Namco",           "Tenkomori Shooting (Japan, TKM1/VER.A1)", MACHINE_IMPERFECT_GRAPHICS ) /* KC036 */
 GAME( 1998, fgtlayer,  0,        coh700,   namcos12,  namcos12_boothack_state, namcos12, ROT0, "Arika / Namco",   "Fighting Layer (Japan, FTL1/VER.A)", MACHINE_IMPERFECT_GRAPHICS ) /* KC037 */

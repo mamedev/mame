@@ -973,7 +973,7 @@ MACHINE_CONFIG_START(gameplan_state::gameplan)
 	MCFG_MACHINE_RESET_OVERRIDE(gameplan_state,gameplan)
 
 	/* video hardware */
-	MCFG_FRAGMENT_ADD(gameplan_video)
+	gameplan_video(config);
 
 	/* audio hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
@@ -1005,7 +1005,8 @@ MACHINE_CONFIG_START(gameplan_state::gameplan)
 MACHINE_CONFIG_END
 
 
-MACHINE_CONFIG_DERIVED(gameplan_state::leprechn, gameplan)
+MACHINE_CONFIG_START(gameplan_state::leprechn)
+	gameplan(config);
 	MCFG_CPU_MODIFY("maincpu")
 	MCFG_CPU_CLOCK(LEPRECHAUN_MAIN_CPU_CLOCK)
 
@@ -1014,7 +1015,7 @@ MACHINE_CONFIG_DERIVED(gameplan_state::leprechn, gameplan)
 	MCFG_CPU_PROGRAM_MAP(leprechn_audio_map)
 
 	/* video hardware */
-	MCFG_FRAGMENT_ADD(leprechn_video)
+	leprechn_video(config);
 
 	/* via */
 	MCFG_DEVICE_MODIFY("via6522_0")

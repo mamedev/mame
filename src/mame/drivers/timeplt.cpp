@@ -458,7 +458,8 @@ MACHINE_CONFIG_START(timeplt_state::timeplt)
 MACHINE_CONFIG_END
 
 
-MACHINE_CONFIG_DERIVED(timeplt_state::psurge, timeplt)
+MACHINE_CONFIG_START(timeplt_state::psurge)
+	timeplt(config);
 
 	/* basic machine hardware */
 	MCFG_CPU_MODIFY("maincpu")
@@ -474,7 +475,8 @@ MACHINE_CONFIG_DERIVED(timeplt_state::psurge, timeplt)
 	MCFG_VIDEO_START_OVERRIDE(timeplt_state,psurge)
 MACHINE_CONFIG_END
 
-MACHINE_CONFIG_DERIVED(timeplt_state::bikkuric, timeplt)
+MACHINE_CONFIG_START(timeplt_state::bikkuric)
+	timeplt(config);
 
 	MCFG_GFXDECODE_MODIFY("gfxdecode", chkun)
 
@@ -485,7 +487,8 @@ MACHINE_CONFIG_DERIVED(timeplt_state::bikkuric, timeplt)
 	MCFG_VIDEO_START_OVERRIDE(timeplt_state,chkun)
 MACHINE_CONFIG_END
 
-MACHINE_CONFIG_DERIVED(timeplt_state::chkun, bikkuric)
+MACHINE_CONFIG_START(timeplt_state::chkun)
+	bikkuric(config);
 
 	MCFG_GFXDECODE_MODIFY("gfxdecode", chkun)
 

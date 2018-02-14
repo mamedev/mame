@@ -329,12 +329,13 @@ MACHINE_CONFIG_START(travrusa_state::travrusa)
 	MCFG_PALETTE_INIT_OWNER(travrusa_state, travrusa)
 
 	/* sound hardware */
-	//MCFG_FRAGMENT_ADD(m52_sound_c_audio)
+	//m52_sound_c_audio(config);
 	MCFG_DEVICE_ADD("irem_audio", IREM_M52_SOUNDC_AUDIO, 0)
 
 MACHINE_CONFIG_END
 
-MACHINE_CONFIG_DERIVED(travrusa_state::shtrider, travrusa)
+MACHINE_CONFIG_START(travrusa_state::shtrider)
+	travrusa(config);
 
 	/* video hardware */
 	MCFG_GFXDECODE_MODIFY("gfxdecode", shtrider)
@@ -342,7 +343,8 @@ MACHINE_CONFIG_DERIVED(travrusa_state::shtrider, travrusa)
 	MCFG_PALETTE_INIT_OWNER(travrusa_state,shtrider)
 MACHINE_CONFIG_END
 
-MACHINE_CONFIG_DERIVED(travrusa_state::shtriderb, travrusa)
+MACHINE_CONFIG_START(travrusa_state::shtriderb)
+	travrusa(config);
 
 	/* video hardware */
 	MCFG_GFXDECODE_MODIFY("gfxdecode", shtrider)

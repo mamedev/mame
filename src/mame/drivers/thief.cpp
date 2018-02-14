@@ -427,7 +427,8 @@ MACHINE_CONFIG_START(thief_state::thief)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
 MACHINE_CONFIG_END
 
-MACHINE_CONFIG_DERIVED(thief_state::sharkatt, thief)
+MACHINE_CONFIG_START(thief_state::sharkatt)
+	thief(config);
 	MCFG_CPU_MODIFY("maincpu")
 	MCFG_CPU_PROGRAM_MAP(sharkatt_main_map)
 
@@ -438,7 +439,8 @@ MACHINE_CONFIG_DERIVED(thief_state::sharkatt, thief)
 	MCFG_SAMPLES_NAMES(sharkatt_sample_names)
 MACHINE_CONFIG_END
 
-MACHINE_CONFIG_DERIVED(thief_state::natodef, thief)
+MACHINE_CONFIG_START(thief_state::natodef)
+	thief(config);
 	MCFG_DEVICE_MODIFY("samples")
 	MCFG_SAMPLES_NAMES(natodef_sample_names)
 MACHINE_CONFIG_END
