@@ -57,7 +57,9 @@ public:
 		m_palette(*this, "palette"),
 		m_in0(*this, "IN0"),
 		m_in1(*this, "IN1"),
-		m_gfxdecode(*this, "gfxdecode")
+		m_gfxdecode(*this, "gfxdecode"),
+		m_alt_addressing(0),
+		m_tilemap_enabled(1)
 	{ }
 
 	// devices
@@ -112,6 +114,7 @@ public:
 	TIMER_DEVICE_CALLBACK_MEMBER(scanline_cb);
 
 	DECLARE_DRIVER_INIT(xavix);
+	DECLARE_DRIVER_INIT(taitons1);
 
 	void xavix_map(address_map &map);
 protected:
@@ -180,6 +183,9 @@ private:
 	int m_tmp_databit;
 	void set_data_address(int address, int bit);
 	uint8_t get_next_bit();
+
+	int m_alt_addressing;
+	int m_tilemap_enabled;
 
 };
 
@@ -273,32 +279,33 @@ void xavix_state::handle_palette(screen_device &screen, bitmap_ind16 &bitmap, co
 }
 
 
-uint32_t xavix_state::screen_update( screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect )
+uint32_t xavix_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
 	handle_palette(screen, bitmap, cliprect);
 
-	bitmap.fill(0, cliprect); 
+	bitmap.fill(0, cliprect);
 
-#if 1
-	// why are the first two logos in Monster Truck stored as tilemaps in main ram?
-	// test mode isn't? is the code meant to process them instead? - there are no sprites in the sprite list at the time (and only one in test mode)
-	gfx_element *gfx = m_gfxdecode->gfx(1);
-	int count = 0;
-	for (int y = 0; y < 16; y++)
+	if (m_tilemap_enabled)
 	{
-		for (int x = 0; x < 16; x++)
+		// why are the first two logos in Monster Truck stored as tilemaps in main ram?
+		// test mode isn't? is the code meant to process them instead? - there are no sprites in the sprite list at the time (and only one in test mode)
+		gfx_element *gfx = m_gfxdecode->gfx(1);
+		int count = 0;
+		for (int y = 0; y < 16; y++)
 		{
-			int tile = m_mainram[count++];
-			
-			int gfxbase = (m_spr_attra[1] << 8) | (m_spr_attra[0]);
-			// upper bit is often set, maybe just because it relies on mirroring, maybe other purpose
+			for (int x = 0; x < 16; x++)
+			{
+				int tile = m_mainram[count++];
 
-			tile += (gfxbase<<1);
+				int gfxbase = (m_spr_attra[1] << 8) | (m_spr_attra[0]);
+				// upper bit is often set, maybe just because it relies on mirroring, maybe other purpose
 
-			gfx->opaque(bitmap,cliprect,tile,0,0,0,x*16,y*16);
+				tile += (gfxbase << 1);
+
+				gfx->opaque(bitmap, cliprect, tile, 0, 0, 0, x * 16, y * 16);
+			}
 		}
 	}
-#endif	
 
 	//printf("frame\n");
 	// priority doesn't seem to be based on list order, there are bad sprite-sprite priorities with either forward or reverse
@@ -308,69 +315,87 @@ uint32_t xavix_state::screen_update( screen_device &screen, bitmap_ind16 &bitmap
 		   pppp bbb-    p = palette, b = bpp
 
 		   attribute 1 bits
-	       ---- ---f    f = flipx 
+		   ---- ss-f    s = size, f = flipx
 		*/
 
 		int ypos = m_spr_ypos[i];
 		int xpos = m_spr_xpos[i];
 		int tile = (m_spr_addr_hi[i] << 16) | (m_spr_addr_md[i] << 8) | m_spr_addr_lo[i];
-		int attr0 = m_spr_attr0[i]; 
-		int attr1 = m_spr_attr1[i]; 
-	
-		int pal =   (attr0 & 0xf0)>>4;
+		int attr0 = m_spr_attr0[i];
+		int attr1 = m_spr_attr1[i];
+
+		int pal = (attr0 & 0xf0) >> 4;
 		int flipx = (attr1 & 0x01);
 
 		int drawheight = 16;
 		int drawwidth = 16;
 
-		tile &= (m_rgnlen-1);
+		tile &= (m_rgnlen - 1);
 
-#if 0
 		// taito nostalgia 1 also seems to use a different addressing, is it selectable or is the chip different?
-		
 		// taito nost attr1 is 84 / 80 / 88 / 8c for the various elements of the xavix logo.  monster truck uses ec / fc / dc / 4c / 5c / 6c (final 6 sprites ingame are 00 00 f0 f0 f0 f0, radar?)
 
-		if (attr1 & 0x04)
+		if ((attr1 & 0x0c) == 0x0c)
 		{
-			drawwidth=16;
+			drawheight = 16;
+			drawwidth = 16;
+			if (m_alt_addressing)
+				tile = tile * 128;
 		}
-		else
+		else if ((attr1 & 0x0c) == 0x08)
 		{
+			drawheight = 16;
 			drawwidth = 8;
 			xpos += 4;
+			if (m_alt_addressing)
+				tile = tile * 64;
+		}
+		else if ((attr1 & 0x0c) == 0x04)
+		{
+			drawheight = 8;
+			drawwidth = 16;
+			ypos -= 4;
+			if (m_alt_addressing)
+				tile = tile * 64;
+		}
+		else if ((attr1 & 0x0c) == 0x00)
+		{
+			drawheight = 8;
+			drawwidth = 8;
+			xpos += 4;
+			ypos -= 4;
+			if (m_alt_addressing)
+				tile = tile * 32;
 		}
 
-		if (drawwidth==16) tile = tile * 64;
-		else tile = tile * 32;
-		tile += 0xd8000;
-		drawheight = 8;
-#endif
+		if (m_alt_addressing)
+			tile += 0xd8000;
 
 		ypos = 0xff - ypos;
 
 		xpos -= 136;
 		ypos -= 192;
 
-		xpos &=0xff;
-		ypos &=0xff;
-	
+		xpos &= 0xff;
+		ypos &= 0xff;
+
 		int bpp = 1;
 
 		bpp = (attr0 & 0x0e) >> 1;
 		bpp += 1;
 
 		// set the address here so we can increment in bits in the draw function
-		set_data_address(tile,0);
+		set_data_address(tile, 0);
 
 		for (int y = 0; y < drawheight; y++)
 		{
-			int row = ypos+y;
+			int row = ypos + y;
 
 			for (int x = 0; x < drawwidth; x++)
 			{
 
 				int col;
-				
+
 				if (flipx)
 				{
 					col = xpos - x;
@@ -378,7 +403,7 @@ uint32_t xavix_state::screen_update( screen_device &screen, bitmap_ind16 &bitmap
 				else
 				{
 					col = xpos + x;
-				} 
+				}
 
 				uint8_t dat = 0;
 
@@ -386,7 +411,7 @@ uint32_t xavix_state::screen_update( screen_device &screen, bitmap_ind16 &bitmap
 				{
 					dat |= (get_next_bit() << i);
 				}
-					
+
 				if ((row >= cliprect.min_x && row < cliprect.max_x) && (col >= cliprect.min_y && col < cliprect.max_y))
 				{
 					uint16_t* rowptr;
@@ -396,7 +421,7 @@ uint32_t xavix_state::screen_update( screen_device &screen, bitmap_ind16 &bitmap
 						rowptr[col] = (dat + (pal << 4)) & 0xff;
 				}
 			}
-			
+
 		}
 
 
@@ -1079,6 +1104,14 @@ DRIVER_INIT_MEMBER(xavix_state,xavix)
 	space.install_rom(0x8000, m_rgnlen, ((~(m_rgnlen-1))<<1)&0xffffff, m_rgn+0x8000);
 }
 
+DRIVER_INIT_MEMBER(xavix_state, taitons1)
+{
+	DRIVER_INIT_CALL(xavix);
+	m_alt_addressing = 1;
+	m_tilemap_enabled = 0;
+}
+
+
 /***************************************************************************
 
   Game driver(s)
@@ -1122,7 +1155,7 @@ ROM_END
 
 /* Standalone TV Games */
 
-CONS( 2006, taitons1,  0,   0,  xavix,  xavix,   xavix_state, xavix, "Bandai / SSD Company LTD / Taito", "Let's! TV Play Classic - Taito Nostalgia 1", MACHINE_IS_SKELETON )
+CONS( 2006, taitons1,  0,   0,  xavix,  xavix,    xavix_state, taitons1, "Bandai / SSD Company LTD / Taito", "Let's! TV Play Classic - Taito Nostalgia 1", MACHINE_IS_SKELETON )
 
 CONS( 2000, rad_ping,  0,   0,  xavix,  xavix,    xavix_state, xavix, "Radica / SSD Company LTD / Simmer Technology", "Play TV Ping Pong", MACHINE_IS_SKELETON ) // "Simmer Technology" is also known as "Hummer Technology Co., Ltd"
 CONS( 2003, rad_mtrk,  0,   0,  xavix,  rad_mtrk, xavix_state, xavix, "Radica / SSD Company LTD",                     "Play TV Monster Truck", MACHINE_IS_SKELETON )
