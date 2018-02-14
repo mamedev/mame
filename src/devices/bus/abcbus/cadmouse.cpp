@@ -64,7 +64,7 @@ Notes:
 //  DEVICE DEFINITIONS
 //**************************************************************************
 
-DEFINE_DEVICE_TYPE(ABC_CADMOUSE, abc_cadmouse_device, "abccad", "ABC-CAD Mouse/Hi-res Unit")
+DEFINE_DEVICE_TYPE(ABC_CADMOUSE, abc_cadmouse_device, "cadabc", "CAD ABC Mouse/Hi-res Unit")
 
 //-------------------------------------------------
 //  ROM( abc_cadmouse )
