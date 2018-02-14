@@ -463,10 +463,6 @@ WRITE8_MEMBER(dec8_state::flip_screen_w){ flip_screen_set(data); }
 
 /******************************************************************************/
 
-#define BANKED_ROM_MAP	                                    \
-	AM_RANGE(0x4000, 0x7fff) AM_ROMBANK("mainbank")         \
-	AM_RANGE(0x8000, 0xffff) AM_ROM
-
 ADDRESS_MAP_START(dec8_state::lastmisn_map)
 	AM_RANGE(0x0000, 0x0fff) AM_RAM AM_SHARE("share1")
 	AM_RANGE(0x1000, 0x13ff) AM_RAM_DEVWRITE("palette", deco_rmc3_device, write8) AM_SHARE("palette")
@@ -489,7 +485,8 @@ ADDRESS_MAP_START(dec8_state::lastmisn_map)
 	AM_RANGE(0x2800, 0x2fff) AM_RAM AM_SHARE("spriteram")
 	AM_RANGE(0x3000, 0x37ff) AM_RAM AM_SHARE("share2")
 	AM_RANGE(0x3800, 0x3fff) AM_READWRITE(dec8_bg_data_r, dec8_bg_data_w) AM_SHARE("bg_data")
-	BANKED_ROM_MAP
+	AM_RANGE(0x4000, 0x7fff) AM_ROMBANK("mainbank")
+	AM_RANGE(0x8000, 0xffff) AM_ROM
 ADDRESS_MAP_END
 
 ADDRESS_MAP_START(dec8_state::lastmisn_sub_map)
@@ -532,7 +529,8 @@ ADDRESS_MAP_START(dec8_state::shackled_map)
 	AM_RANGE(0x2800, 0x2fff) AM_RAM AM_SHARE("spriteram")
 	AM_RANGE(0x3000, 0x37ff) AM_RAM AM_SHARE("share2")
 	AM_RANGE(0x3800, 0x3fff) AM_READWRITE(dec8_bg_data_r, dec8_bg_data_w) AM_SHARE("bg_data")
-	BANKED_ROM_MAP
+	AM_RANGE(0x4000, 0x7fff) AM_ROMBANK("mainbank")
+	AM_RANGE(0x8000, 0xffff) AM_ROM
 ADDRESS_MAP_END
 
 ADDRESS_MAP_START(dec8_state::shackled_sub_map)
@@ -579,7 +577,8 @@ ADDRESS_MAP_START(dec8_state::gondo_map)
 	AM_RANGE(0x3838, 0x3838) AM_READ(i8751_h_r)
 	AM_RANGE(0x3839, 0x3839) AM_READ(i8751_l_r)
 	AM_RANGE(0x383a, 0x383b) AM_WRITE(dec8_i8751_w)
-	BANKED_ROM_MAP
+	AM_RANGE(0x4000, 0x7fff) AM_ROMBANK("mainbank")
+	AM_RANGE(0x8000, 0xffff) AM_ROM
 ADDRESS_MAP_END
 
 ADDRESS_MAP_START(dec8_state::garyoret_map)
@@ -600,7 +599,8 @@ ADDRESS_MAP_START(dec8_state::garyoret_map)
 	AM_RANGE(0x3838, 0x3839) AM_WRITE(dec8_i8751_w)
 	AM_RANGE(0x383a, 0x383a) AM_READ(i8751_h_r)
 	AM_RANGE(0x383b, 0x383b) AM_READ(i8751_l_r)
-	BANKED_ROM_MAP
+	AM_RANGE(0x4000, 0x7fff) AM_ROMBANK("mainbank")
+	AM_RANGE(0x8000, 0xffff) AM_ROM
 ADDRESS_MAP_END
 
 ADDRESS_MAP_START(dec8_state::meikyuh_map)
@@ -623,7 +623,8 @@ ADDRESS_MAP_START(dec8_state::meikyuh_map)
 	AM_RANGE(0x3840, 0x3840) AM_WRITE(ghostb_bank_w)
 	AM_RANGE(0x3860, 0x3860) AM_READ(i8751_l_r)
 	AM_RANGE(0x3860, 0x3861) AM_WRITE(dec8_i8751_w)
-	BANKED_ROM_MAP
+	AM_RANGE(0x4000, 0x7fff) AM_ROMBANK("mainbank")
+	AM_RANGE(0x8000, 0xffff) AM_ROM
 ADDRESS_MAP_END
 
 ADDRESS_MAP_START(dec8_state::csilver_map)
@@ -647,7 +648,8 @@ ADDRESS_MAP_START(dec8_state::csilver_map)
 	AM_RANGE(0x2800, 0x2fff) AM_RAM AM_SHARE("spriteram")
 	AM_RANGE(0x3000, 0x37ff) AM_RAM AM_SHARE("share2")
 	AM_RANGE(0x3800, 0x3fff) AM_READWRITE(dec8_bg_data_r, dec8_bg_data_w) AM_SHARE("bg_data")
-	BANKED_ROM_MAP
+	AM_RANGE(0x4000, 0x7fff) AM_ROMBANK("mainbank")
+	AM_RANGE(0x8000, 0xffff) AM_ROM
 ADDRESS_MAP_END
 
 ADDRESS_MAP_START(dec8_state::csilver_sub_map)
@@ -686,7 +688,8 @@ ADDRESS_MAP_START(dec8_state::oscar_map)
 	AM_RANGE(0x3d80, 0x3d80) AM_WRITE(dec8_sound_w)         /* SOUN */
 	AM_RANGE(0x3e00, 0x3e00) AM_WRITENOP            /* COINCL */
 	AM_RANGE(0x3e80, 0x3e83) AM_WRITE(oscar_int_w)
-	BANKED_ROM_MAP
+	AM_RANGE(0x4000, 0x7fff) AM_ROMBANK("mainbank")
+	AM_RANGE(0x8000, 0xffff) AM_ROM
 ADDRESS_MAP_END
 
 ADDRESS_MAP_START(dec8_state::oscar_sub_map)
@@ -716,7 +719,8 @@ ADDRESS_MAP_START(dec8_state::srdarwin_map)
 	AM_RANGE(0x3801, 0x3801) AM_READ_PORT("IN0")    /* Player 1 */
 	AM_RANGE(0x3802, 0x3802) AM_READ_PORT("IN1")    /* Player 2 (cocktail) + VBL */
 	AM_RANGE(0x3803, 0x3803) AM_READ_PORT("DSW1")   /* Dip 2 */
-	BANKED_ROM_MAP
+	AM_RANGE(0x4000, 0x7fff) AM_ROMBANK("mainbank")
+	AM_RANGE(0x8000, 0xffff) AM_ROM
 ADDRESS_MAP_END
 
 ADDRESS_MAP_START(dec8_state::cobra_map)
@@ -740,7 +744,8 @@ ADDRESS_MAP_START(dec8_state::cobra_map)
 	AM_RANGE(0x3c00, 0x3c00) AM_WRITE(dec8_bank_w)
 	AM_RANGE(0x3c02, 0x3c02) AM_WRITE(dec8_mxc06_karn_buffer_spriteram_w) /* DMA */
 	AM_RANGE(0x3e00, 0x3e00) AM_WRITE(dec8_sound_w)
-	BANKED_ROM_MAP
+	AM_RANGE(0x4000, 0x7fff) AM_ROMBANK("mainbank")
+	AM_RANGE(0x8000, 0xffff) AM_ROM
 ADDRESS_MAP_END
 
 /******************************************************************************/
