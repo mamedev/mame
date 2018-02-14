@@ -407,7 +407,8 @@ MACHINE_CONFIG_START(re900_state::re900)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.5)
 MACHINE_CONFIG_END
 
-MACHINE_CONFIG_DERIVED(re900_state::bs94, re900)
+MACHINE_CONFIG_START(re900_state::bs94)
+	re900(config);
 
 	/* sound hardware   */
 	MCFG_SOUND_MODIFY("ay_re900")

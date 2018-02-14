@@ -1442,7 +1442,8 @@ MACHINE_CONFIG_START(napple2_state::apple2_common)
 	MCFG_CASSETTE_INTERFACE("apple2_cass")
 MACHINE_CONFIG_END
 
-MACHINE_CONFIG_DERIVED(napple2_state::apple2, apple2_common)
+MACHINE_CONFIG_START(napple2_state::apple2)
+	apple2_common(config);
 	/* internal ram */
 	MCFG_RAM_ADD(RAM_TAG)
 	MCFG_RAM_DEFAULT_SIZE("48K")
@@ -1450,7 +1451,8 @@ MACHINE_CONFIG_DERIVED(napple2_state::apple2, apple2_common)
 	MCFG_RAM_DEFAULT_VALUE(0x00)
 MACHINE_CONFIG_END
 
-MACHINE_CONFIG_DERIVED(napple2_state::apple2p, apple2_common)
+MACHINE_CONFIG_START(napple2_state::apple2p)
+	apple2_common(config);
 	/* internal ram */
 	MCFG_RAM_ADD(RAM_TAG)
 	MCFG_RAM_DEFAULT_SIZE("48K")
@@ -1458,16 +1460,19 @@ MACHINE_CONFIG_DERIVED(napple2_state::apple2p, apple2_common)
 	MCFG_RAM_DEFAULT_VALUE(0x00)
 MACHINE_CONFIG_END
 
-MACHINE_CONFIG_DERIVED(napple2_state::space84, apple2p)
+MACHINE_CONFIG_START(napple2_state::space84)
+	apple2p(config);
 MACHINE_CONFIG_END
 
-MACHINE_CONFIG_DERIVED(napple2_state::apple2jp, apple2p)
+MACHINE_CONFIG_START(napple2_state::apple2jp)
+	apple2p(config);
 	MCFG_SCREEN_MODIFY("screen")
 	MCFG_SCREEN_UPDATE_DRIVER(napple2_state, screen_update_jp)
 MACHINE_CONFIG_END
 
 #if 0
-static MACHINE_CONFIG_DERIVED( laba2p, apple2p )
+static MACHINE_CONFIG_START( laba2p )
+	apple2p(config);
 	MCFG_MACHINE_START_OVERRIDE(napple2_state,laba2p)
 
 	MCFG_A2BUS_SLOT_REMOVE("sl0")

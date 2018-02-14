@@ -581,7 +581,8 @@ MACHINE_CONFIG_START(gaplus_state::gaplus)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.80)
 MACHINE_CONFIG_END
 
-MACHINE_CONFIG_DERIVED(gaplus_state::gaplusd, gaplus)
+MACHINE_CONFIG_START(gaplus_state::gaplusd)
+	gaplus(config);
 
 	MCFG_DEVICE_REPLACE("namcoio_1", NAMCO_58XX, 0)
 	MCFG_NAMCO58XX_IN_0_CB(IOPORT("COINS"))
@@ -596,7 +597,8 @@ MACHINE_CONFIG_DERIVED(gaplus_state::gaplusd, gaplus)
 	MCFG_NAMCO56XX_IN_3_CB(IOPORT("DSWA_LOW"))
 MACHINE_CONFIG_END
 
-MACHINE_CONFIG_DERIVED(gaplus_state::gapluso, gaplusd)
+MACHINE_CONFIG_START(gaplus_state::gapluso)
+	gaplusd(config);
 
 	/* basic machine hardware */
 	MCFG_CPU_MODIFY("maincpu")

@@ -286,7 +286,7 @@ MACHINE_CONFIG_START(gts3_state::gts3)
 	MCFG_DEFAULT_LAYOUT(layout_gts3)
 
 	/* Sound */
-	MCFG_FRAGMENT_ADD( genpin_audio )
+	genpin_audio(config);
 
 	MCFG_DEVICE_ADD("u4", VIA6522, XTAL(4'000'000) / 2)
 	MCFG_VIA6522_IRQ_HANDLER(INPUTLINE("maincpu", M65C02_IRQ_LINE))

@@ -802,27 +802,33 @@ MACHINE_CONFIG_START(atarisy1_state::atarisy1)
 	MCFG_VIA6522_WRITEPB_HANDLER(WRITE8(atarisy1_state, via_pb_w))
 MACHINE_CONFIG_END
 
-MACHINE_CONFIG_DERIVED(atarisy1_state::marble, atarisy1)
+MACHINE_CONFIG_START(atarisy1_state::marble)
+	atarisy1(config);
 	MCFG_SLAPSTIC_ADD("slapstic", 103)
 MACHINE_CONFIG_END
 
-MACHINE_CONFIG_DERIVED(atarisy1_state::peterpak, atarisy1)
+MACHINE_CONFIG_START(atarisy1_state::peterpak)
+	atarisy1(config);
 	MCFG_SLAPSTIC_ADD("slapstic", 107)
 MACHINE_CONFIG_END
 
-MACHINE_CONFIG_DERIVED(atarisy1_state::indytemp, atarisy1)
+MACHINE_CONFIG_START(atarisy1_state::indytemp)
+	atarisy1(config);
 	MCFG_SLAPSTIC_ADD("slapstic", 105)
 MACHINE_CONFIG_END
 
-MACHINE_CONFIG_DERIVED(atarisy1_state::roadrunn, atarisy1)
+MACHINE_CONFIG_START(atarisy1_state::roadrunn)
+	atarisy1(config);
 	MCFG_SLAPSTIC_ADD("slapstic", 108)
 MACHINE_CONFIG_END
 
-MACHINE_CONFIG_DERIVED(atarisy1_state::roadb109, atarisy1)
+MACHINE_CONFIG_START(atarisy1_state::roadb109)
+	atarisy1(config);
 	MCFG_SLAPSTIC_ADD("slapstic", 109)
 MACHINE_CONFIG_END
 
-MACHINE_CONFIG_DERIVED(atarisy1_state::roadb110, atarisy1)
+MACHINE_CONFIG_START(atarisy1_state::roadb110)
+	atarisy1(config);
 	MCFG_SLAPSTIC_ADD("slapstic", 110)
 MACHINE_CONFIG_END
 

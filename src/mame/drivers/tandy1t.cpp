@@ -683,9 +683,9 @@ MACHINE_CONFIG_START(tandy1000_state::t1000hx)
 	MCFG_CPU_IO_MAP(tandy1000_io)
 	MCFG_CPU_IRQ_ACKNOWLEDGE_DEVICE("mb:pic8259", pic8259_device, inta_cb)
 
-	MCFG_FRAGMENT_ADD(tandy1000_common)
+	tandy1000_common(config);
 
-	MCFG_FRAGMENT_ADD(tandy1000_90key)
+	tandy1000_90key(config);
 
 	// plus cards are isa with a nonstandard conntector
 	MCFG_ISA8_SLOT_ADD("mb:isa", "plus1", pc_isa8_cards, nullptr, false)
@@ -693,7 +693,8 @@ MACHINE_CONFIG_START(tandy1000_state::t1000hx)
 	MCFG_RAM_EXTRA_OPTIONS("256K, 384K")
 MACHINE_CONFIG_END
 
-MACHINE_CONFIG_DERIVED(tandy1000_state::t1000sx, t1000hx)
+MACHINE_CONFIG_START(tandy1000_state::t1000sx)
+	t1000hx(config);
 	MCFG_DEVICE_MODIFY("isa_fdc")
 	MCFG_SLOT_OPTION_MACHINE_CONFIG("fdc_xt", cfg_fdc_525)
 
@@ -713,9 +714,9 @@ MACHINE_CONFIG_START(tandy1000_state::t1000rl)
 	MCFG_CPU_IO_MAP(tandy1000_bank_io)
 	MCFG_CPU_IRQ_ACKNOWLEDGE_DEVICE("mb:pic8259", pic8259_device, inta_cb)
 
-	MCFG_FRAGMENT_ADD(tandy1000_common)
+	tandy1000_common(config);
 
-	MCFG_FRAGMENT_ADD(tandy1000_101key)
+	tandy1000_101key(config);
 
 	MCFG_DEVICE_ADD("biosbank", ADDRESS_MAP_BANK, 0)
 	MCFG_DEVICE_PROGRAM_MAP(biosbank_map)
@@ -729,7 +730,8 @@ MACHINE_CONFIG_START(tandy1000_state::t1000rl)
 	MCFG_RAM_EXTRA_OPTIONS("384K")
 MACHINE_CONFIG_END
 
-MACHINE_CONFIG_DERIVED(tandy1000_state::t1000sl2, t1000rl)
+MACHINE_CONFIG_START(tandy1000_state::t1000sl2)
+	t1000rl(config);
 	MCFG_CPU_MODIFY( "maincpu" )
 	MCFG_CPU_CLOCK( XTAL(24'000'000) / 3 )
 
@@ -745,9 +747,9 @@ MACHINE_CONFIG_START(tandy1000_state::t1000tl)
 	MCFG_CPU_IO_MAP(tandy1000_16_io)
 	MCFG_CPU_IRQ_ACKNOWLEDGE_DEVICE("mb:pic8259", pic8259_device, inta_cb)
 
-	MCFG_FRAGMENT_ADD(tandy1000_common)
+	tandy1000_common(config);
 
-	MCFG_FRAGMENT_ADD(tandy1000_101key)
+	tandy1000_101key(config);
 
 	MCFG_ISA8_SLOT_ADD("mb:isa", "isa1", pc_isa8_cards, nullptr, false)
 	MCFG_ISA8_SLOT_ADD("mb:isa", "isa2", pc_isa8_cards, nullptr, false)
@@ -756,12 +758,13 @@ MACHINE_CONFIG_START(tandy1000_state::t1000tl)
 	MCFG_ISA8_SLOT_ADD("mb:isa", "isa5", pc_isa8_cards, nullptr, false)
 MACHINE_CONFIG_END
 
-MACHINE_CONFIG_DERIVED(tandy1000_state::t1000tx, t1000tl)
+MACHINE_CONFIG_START(tandy1000_state::t1000tx)
+	t1000tl(config);
 	MCFG_CPU_MODIFY( "maincpu" )
 	MCFG_CPU_IO_MAP(tandy1000tx_io)
 
 	MCFG_DEVICE_REMOVE("pc_keyboard")
-	MCFG_FRAGMENT_ADD(tandy1000_90key)
+	tandy1000_90key(config);
 MACHINE_CONFIG_END
 
 #ifdef UNUSED_DEFINITION

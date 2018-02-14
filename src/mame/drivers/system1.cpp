@@ -2190,7 +2190,8 @@ MACHINE_CONFIG_END
 
 
 /* reduced visible area for scrolling games */
-MACHINE_CONFIG_DERIVED(system1_state::sys1ppis, sys1ppi)
+MACHINE_CONFIG_START(system1_state::sys1ppis)
+	sys1ppi(config);
 
 	/* video hardware */
 	MCFG_SCREEN_MODIFY("screen")
@@ -2203,7 +2204,8 @@ MACHINE_CONFIG_END
 
 
 /* revised board with 128kbit ROMs and a Z80 PIO for outputs */
-MACHINE_CONFIG_DERIVED(system1_state::sys1pio, sys1ppi)
+MACHINE_CONFIG_START(system1_state::sys1pio)
+	sys1ppi(config);
 
 	MCFG_CPU_MODIFY("maincpu")
 	MCFG_CPU_IO_MAP(system1_pio_io_map)
@@ -2234,162 +2236,188 @@ MACHINE_CONFIG_END
 	MCFG_CPU_VBLANK_INT_DRIVER("screen", system1_state, irq0_line_hold)
 
 
-MACHINE_CONFIG_DERIVED(system1_state::sys1pioxb, sys1pio)
+MACHINE_CONFIG_START(system1_state::sys1pioxb)
+	sys1pio(config);
 	MCFG_CPU_REPLACE("maincpu", MC8123, MASTER_CLOCK)
 	ENCRYPTED_SYS1PIO_MAPS
 MACHINE_CONFIG_END
 
-MACHINE_CONFIG_DERIVED(system1_state::sys1ppix_315_5178, sys1ppi)
+MACHINE_CONFIG_START(system1_state::sys1ppix_315_5178)
+	sys1ppi(config);
 	MCFG_CPU_REPLACE("maincpu", SEGA_315_5178, MASTER_CLOCK)
 	ENCRYPTED_SYS1PPI_MAPS
 	MCFG_SEGAZ80_SET_DECRYPTED_TAG(":decrypted_opcodes")
 MACHINE_CONFIG_END
 
-MACHINE_CONFIG_DERIVED(system1_state::sys1ppix_315_5179, sys1ppi)
+MACHINE_CONFIG_START(system1_state::sys1ppix_315_5179)
+	sys1ppi(config);
 	MCFG_CPU_REPLACE("maincpu", SEGA_315_5179, MASTER_CLOCK)
 	ENCRYPTED_SYS1PPI_MAPS
 	MCFG_SEGAZ80_SET_DECRYPTED_TAG(":decrypted_opcodes")
 MACHINE_CONFIG_END
 
-MACHINE_CONFIG_DERIVED(system1_state::sys1ppix_315_5051, sys1ppi)
+MACHINE_CONFIG_START(system1_state::sys1ppix_315_5051)
+	sys1ppi(config);
 	MCFG_CPU_REPLACE("maincpu", SEGA_315_5051, MASTER_CLOCK)
 	ENCRYPTED_SYS1PPI_MAPS
 	MCFG_SEGACRPT_SET_DECRYPTED_TAG(":decrypted_opcodes")
 MACHINE_CONFIG_END
 
-MACHINE_CONFIG_DERIVED(system1_state::sys1ppix_315_5048, sys1ppi)
+MACHINE_CONFIG_START(system1_state::sys1ppix_315_5048)
+	sys1ppi(config);
 	MCFG_CPU_REPLACE("maincpu", SEGA_315_5048, MASTER_CLOCK)
 	ENCRYPTED_SYS1PPI_MAPS
 	MCFG_SEGACRPT_SET_DECRYPTED_TAG(":decrypted_opcodes")
 MACHINE_CONFIG_END
 
-MACHINE_CONFIG_DERIVED(system1_state::sys1ppix_315_5033, sys1ppi)
+MACHINE_CONFIG_START(system1_state::sys1ppix_315_5033)
+	sys1ppi(config);
 	MCFG_CPU_REPLACE("maincpu", SEGA_315_5033, MASTER_CLOCK)
 	ENCRYPTED_SYS1PPI_MAPS
 	MCFG_SEGACRPT_SET_DECRYPTED_TAG(":decrypted_opcodes")
 MACHINE_CONFIG_END
 
-MACHINE_CONFIG_DERIVED(system1_state::sys1ppix_315_5065, sys1ppi)
+MACHINE_CONFIG_START(system1_state::sys1ppix_315_5065)
+	sys1ppi(config);
 	MCFG_CPU_REPLACE("maincpu", SEGA_315_5065, MASTER_CLOCK)
 	ENCRYPTED_SYS1PPI_MAPS
 	MCFG_SEGACRPT_SET_DECRYPTED_TAG(":decrypted_opcodes")
 MACHINE_CONFIG_END
 
 
-MACHINE_CONFIG_DERIVED(system1_state::sys1ppix_315_5098, sys1ppi)
+MACHINE_CONFIG_START(system1_state::sys1ppix_315_5098)
+	sys1ppi(config);
 	MCFG_CPU_REPLACE("maincpu", SEGA_315_5098, MASTER_CLOCK)
 	ENCRYPTED_SYS1PPI_MAPS
 	MCFG_SEGACRPT_SET_DECRYPTED_TAG(":decrypted_opcodes")
 MACHINE_CONFIG_END
 
-MACHINE_CONFIG_DERIVED(system1_state::sys1piox_315_5177, sys1pio)
+MACHINE_CONFIG_START(system1_state::sys1piox_315_5177)
+	sys1pio(config);
 	MCFG_CPU_REPLACE("maincpu", SEGA_315_5177, MASTER_CLOCK)
 	ENCRYPTED_SYS1PIO_MAPS
 	MCFG_SEGAZ80_SET_DECRYPTED_TAG(":decrypted_opcodes")
 MACHINE_CONFIG_END
 
-MACHINE_CONFIG_DERIVED(system1_state::sys1piox_315_5162, sys1pio)
+MACHINE_CONFIG_START(system1_state::sys1piox_315_5162)
+	sys1pio(config);
 	MCFG_CPU_REPLACE("maincpu", SEGA_315_5162, MASTER_CLOCK)
 	ENCRYPTED_SYS1PIO_MAPS
 	MCFG_SEGAZ80_SET_DECRYPTED_TAG(":decrypted_opcodes")
 MACHINE_CONFIG_END
 
-MACHINE_CONFIG_DERIVED(system1_state::sys1piox_317_0006, sys1pio)
+MACHINE_CONFIG_START(system1_state::sys1piox_317_0006)
+	sys1pio(config);
 	MCFG_CPU_REPLACE("maincpu", SEGA_317_0006, MASTER_CLOCK)
 	ENCRYPTED_SYS1PIO_MAPS
 	MCFG_SEGAZ80_SET_DECRYPTED_TAG(":decrypted_opcodes")
 MACHINE_CONFIG_END
 
-MACHINE_CONFIG_DERIVED(system1_state::sys1piox_315_5135, sys1pio)
+MACHINE_CONFIG_START(system1_state::sys1piox_315_5135)
+	sys1pio(config);
 	MCFG_CPU_REPLACE("maincpu", SEGA_315_5135, MASTER_CLOCK)
 	ENCRYPTED_SYS1PIO_MAPS
 	MCFG_SEGACRPT_SET_DECRYPTED_TAG(":decrypted_opcodes")
 MACHINE_CONFIG_END
 
-MACHINE_CONFIG_DERIVED(system1_state::sys1piox_315_5132, sys1pio)
+MACHINE_CONFIG_START(system1_state::sys1piox_315_5132)
+	sys1pio(config);
 	MCFG_CPU_REPLACE("maincpu", SEGA_315_5132, MASTER_CLOCK)
 	ENCRYPTED_SYS1PIO_MAPS
 	MCFG_SEGACRPT_SET_DECRYPTED_TAG(":decrypted_opcodes")
 MACHINE_CONFIG_END
 
-MACHINE_CONFIG_DERIVED(system1_state::sys1piox_315_5155, sys1pio)
+MACHINE_CONFIG_START(system1_state::sys1piox_315_5155)
+	sys1pio(config);
 	MCFG_CPU_REPLACE("maincpu", SEGA_315_5155, MASTER_CLOCK)
 	ENCRYPTED_SYS1PIO_MAPS
 	MCFG_SEGACRPT_SET_DECRYPTED_TAG(":decrypted_opcodes")
 MACHINE_CONFIG_END
 
-MACHINE_CONFIG_DERIVED(system1_state::sys1piox_315_5110, sys1pio)
+MACHINE_CONFIG_START(system1_state::sys1piox_315_5110)
+	sys1pio(config);
 	MCFG_CPU_REPLACE("maincpu", SEGA_315_5110, MASTER_CLOCK)
 	ENCRYPTED_SYS1PIO_MAPS
 	MCFG_SEGACRPT_SET_DECRYPTED_TAG(":decrypted_opcodes")
 MACHINE_CONFIG_END
 
-MACHINE_CONFIG_DERIVED(system1_state::sys1piox_315_5051, sys1pio)
+MACHINE_CONFIG_START(system1_state::sys1piox_315_5051)
+	sys1pio(config);
 	MCFG_CPU_REPLACE("maincpu", SEGA_315_5051, MASTER_CLOCK)
 	ENCRYPTED_SYS1PIO_MAPS
 	MCFG_SEGACRPT_SET_DECRYPTED_TAG(":decrypted_opcodes")
 MACHINE_CONFIG_END
 
-MACHINE_CONFIG_DERIVED(system1_state::sys1piox_315_5098, sys1pio)
+MACHINE_CONFIG_START(system1_state::sys1piox_315_5098)
+	sys1pio(config);
 	MCFG_CPU_REPLACE("maincpu", SEGA_315_5098, MASTER_CLOCK)
 	ENCRYPTED_SYS1PIO_MAPS
 	MCFG_SEGACRPT_SET_DECRYPTED_TAG(":decrypted_opcodes")
 MACHINE_CONFIG_END
 
-MACHINE_CONFIG_DERIVED(system1_state::sys1piox_315_5102, sys1pio)
+MACHINE_CONFIG_START(system1_state::sys1piox_315_5102)
+	sys1pio(config);
 	MCFG_CPU_REPLACE("maincpu", SEGA_315_5102, MASTER_CLOCK)
 	ENCRYPTED_SYS1PIO_MAPS
 	MCFG_SEGACRPT_SET_DECRYPTED_TAG(":decrypted_opcodes")
 MACHINE_CONFIG_END
 
 
-MACHINE_CONFIG_DERIVED(system1_state::sys1piox_315_5133, sys1pio)
+MACHINE_CONFIG_START(system1_state::sys1piox_315_5133)
+	sys1pio(config);
 	MCFG_CPU_REPLACE("maincpu", SEGA_315_5133, MASTER_CLOCK)
 	ENCRYPTED_SYS1PIO_MAPS
 	MCFG_SEGACRPT_SET_DECRYPTED_TAG(":decrypted_opcodes")
 MACHINE_CONFIG_END
 
 
-MACHINE_CONFIG_DERIVED(system1_state::sys1piox_315_5093, sys1pio)
+MACHINE_CONFIG_START(system1_state::sys1piox_315_5093)
+	sys1pio(config);
 	MCFG_CPU_REPLACE("maincpu", SEGA_315_5093, MASTER_CLOCK)
 	ENCRYPTED_SYS1PIO_MAPS
 	MCFG_SEGACRPT_SET_DECRYPTED_TAG(":decrypted_opcodes")
 MACHINE_CONFIG_END
 
-MACHINE_CONFIG_DERIVED(system1_state::sys1piox_315_5065, sys1pio)
+MACHINE_CONFIG_START(system1_state::sys1piox_315_5065)
+	sys1pio(config);
 	MCFG_CPU_REPLACE("maincpu", SEGA_315_5065, MASTER_CLOCK)
 	ENCRYPTED_SYS1PIO_MAPS
 	MCFG_SEGACRPT_SET_DECRYPTED_TAG(":decrypted_opcodes")
 MACHINE_CONFIG_END
 
 /* reduced visible area for scrolling games */
-MACHINE_CONFIG_DERIVED(system1_state::sys1pios, sys1pio)
+MACHINE_CONFIG_START(system1_state::sys1pios)
+	sys1pio(config);
 
 	/* video hardware */
 	MCFG_SCREEN_MODIFY("screen")
 	MCFG_SCREEN_VISIBLE_AREA(2*(0*8+8), 2*(32*8-1-8), 0*8, 28*8-1)
 MACHINE_CONFIG_END
 
-MACHINE_CONFIG_DERIVED(system1_state::sys1piosx_315_5099, sys1pios)
+MACHINE_CONFIG_START(system1_state::sys1piosx_315_5099)
+	sys1pios(config);
 	MCFG_CPU_REPLACE("maincpu", SEGA_315_5065, MASTER_CLOCK)
 	ENCRYPTED_SYS1PIO_MAPS
 	MCFG_SEGACRPT_SET_DECRYPTED_TAG(":decrypted_opcodes")
 MACHINE_CONFIG_END
 
-MACHINE_CONFIG_DERIVED(system1_state::sys1piosx_315_spat, sys1pios)
+MACHINE_CONFIG_START(system1_state::sys1piosx_315_spat)
+	sys1pios(config);
 	MCFG_CPU_REPLACE("maincpu", SEGA_315_SPAT, MASTER_CLOCK)
 	ENCRYPTED_SYS1PIO_MAPS
 	MCFG_SEGACRPT_SET_DECRYPTED_TAG(":decrypted_opcodes")
 MACHINE_CONFIG_END
 
 
-MACHINE_CONFIG_DERIVED(system1_state::sys1ppisx_315_5064, sys1ppis)
+MACHINE_CONFIG_START(system1_state::sys1ppisx_315_5064)
+	sys1ppis(config);
 	MCFG_CPU_REPLACE("maincpu", SEGA_315_5064, MASTER_CLOCK)
 	ENCRYPTED_SYS1PPI_MAPS
 	MCFG_SEGACRPT_SET_DECRYPTED_TAG(":decrypted_opcodes")
 MACHINE_CONFIG_END
 
-MACHINE_CONFIG_DERIVED(system1_state::sys1ppisx_315_5041, sys1ppis)
+MACHINE_CONFIG_START(system1_state::sys1ppisx_315_5041)
+	sys1ppis(config);
 	MCFG_CPU_REPLACE("maincpu", SEGA_315_5041, MASTER_CLOCK)
 	ENCRYPTED_SYS1PPI_MAPS
 	MCFG_SEGACRPT_SET_DECRYPTED_TAG(":decrypted_opcodes")
@@ -2417,14 +2445,16 @@ MACHINE_CONFIG_END
 
 
 /* alternate program map with RAM/collision swapped */
-MACHINE_CONFIG_DERIVED(system1_state::nob, sys1ppi)
+MACHINE_CONFIG_START(system1_state::nob)
+	sys1ppi(config);
 
 	/* basic machine hardware */
 	MCFG_CPU_MODIFY("maincpu")
 	MCFG_CPU_PROGRAM_MAP(nobo_map)
 MACHINE_CONFIG_END
 
-MACHINE_CONFIG_DERIVED(system1_state::nobm, nob)
+MACHINE_CONFIG_START(system1_state::nobm)
+	nob(config);
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("mcu", I8751, SOUND_CLOCK)
@@ -2434,7 +2464,8 @@ MACHINE_CONFIG_END
 
 
 /* system2 video */
-MACHINE_CONFIG_DERIVED(system1_state::sys2, sys1ppi)
+MACHINE_CONFIG_START(system1_state::sys2)
+	sys1ppi(config);
 
 	MCFG_MACHINE_START_OVERRIDE(system1_state,system2)
 
@@ -2444,70 +2475,82 @@ MACHINE_CONFIG_DERIVED(system1_state::sys2, sys1ppi)
 	MCFG_SCREEN_UPDATE_DRIVER(system1_state, screen_update_system2)
 MACHINE_CONFIG_END
 
-MACHINE_CONFIG_DERIVED(system1_state::sys2x, sys2)
+MACHINE_CONFIG_START(system1_state::sys2x)
+	sys2(config);
 	MCFG_DEVICE_MODIFY("maincpu")
 	MCFG_CPU_OPCODES_MAP(decrypted_opcodes_map)
 MACHINE_CONFIG_END
 
-MACHINE_CONFIG_DERIVED(system1_state::sys2_315_5177, sys2)
+MACHINE_CONFIG_START(system1_state::sys2_315_5177)
+	sys2(config);
 	MCFG_CPU_REPLACE("maincpu", SEGA_315_5177, MASTER_CLOCK)
 	ENCRYPTED_SYS1PPI_MAPS
 	MCFG_SEGAZ80_SET_DECRYPTED_TAG(":decrypted_opcodes")
 MACHINE_CONFIG_END
 
-MACHINE_CONFIG_DERIVED(system1_state::sys2_315_5176, sys2)
+MACHINE_CONFIG_START(system1_state::sys2_315_5176)
+	sys2(config);
 	MCFG_CPU_REPLACE("maincpu", SEGA_315_5176, MASTER_CLOCK)
 	ENCRYPTED_SYS1PPI_MAPS
 	MCFG_SEGAZ80_SET_DECRYPTED_TAG(":decrypted_opcodes")
 MACHINE_CONFIG_END
 
-MACHINE_CONFIG_DERIVED(system1_state::sys2_317_0006, sys2)
+MACHINE_CONFIG_START(system1_state::sys2_317_0006)
+	sys2(config);
 	MCFG_CPU_REPLACE("maincpu", SEGA_317_0006, MASTER_CLOCK)
 	ENCRYPTED_SYS1PPI_MAPS
 	MCFG_SEGAZ80_SET_DECRYPTED_TAG(":decrypted_opcodes")
 MACHINE_CONFIG_END
 
-MACHINE_CONFIG_DERIVED(system1_state::sys2_317_0007, sys2)
+MACHINE_CONFIG_START(system1_state::sys2_317_0007)
+	sys2(config);
 	MCFG_CPU_REPLACE("maincpu", SEGA_317_0007, MASTER_CLOCK)
 	ENCRYPTED_SYS1PPI_MAPS
 	MCFG_SEGAZ80_SET_DECRYPTED_TAG(":decrypted_opcodes")
 MACHINE_CONFIG_END
 
 
-MACHINE_CONFIG_DERIVED(system1_state::sys2xb, sys2)
+MACHINE_CONFIG_START(system1_state::sys2xb)
+	sys2(config);
 	MCFG_CPU_REPLACE("maincpu", MC8123, MASTER_CLOCK)
 	ENCRYPTED_SYS2_MC8123_MAPS
 MACHINE_CONFIG_END
 
-MACHINE_CONFIG_DERIVED(system1_state::sys2xboot, sys2)
+MACHINE_CONFIG_START(system1_state::sys2xboot)
+	sys2(config);
 	MCFG_CPU_MODIFY("maincpu")
 	MCFG_CPU_OPCODES_MAP(banked_decrypted_opcodes_map)
 MACHINE_CONFIG_END
 
-MACHINE_CONFIG_DERIVED(system1_state::sys2m, sys2)
-	MCFG_FRAGMENT_ADD( mcu )
+MACHINE_CONFIG_START(system1_state::sys2m)
+	sys2(config);
+	mcu(config);
 MACHINE_CONFIG_END
 
 /* system2 with rowscroll */
-MACHINE_CONFIG_DERIVED(system1_state::sys2row, sys2)
+MACHINE_CONFIG_START(system1_state::sys2row)
+	sys2(config);
 
 	/* video hardware */
 	MCFG_SCREEN_MODIFY("screen")
 	MCFG_SCREEN_UPDATE_DRIVER(system1_state, screen_update_system2_rowscroll)
 MACHINE_CONFIG_END
 
-MACHINE_CONFIG_DERIVED(system1_state::sys2rowxb, sys2row)
+MACHINE_CONFIG_START(system1_state::sys2rowxb)
+	sys2row(config);
 	MCFG_CPU_REPLACE("maincpu", MC8123, MASTER_CLOCK)
 	ENCRYPTED_SYS2_MC8123_MAPS
 MACHINE_CONFIG_END
 
-MACHINE_CONFIG_DERIVED(system1_state::sys2rowxboot, sys2row)
+MACHINE_CONFIG_START(system1_state::sys2rowxboot)
+	sys2row(config);
 	MCFG_CPU_MODIFY("maincpu")
 	MCFG_CPU_OPCODES_MAP(banked_decrypted_opcodes_map)
 MACHINE_CONFIG_END
 
-MACHINE_CONFIG_DERIVED(system1_state::sys2rowm, sys2row)
-	MCFG_FRAGMENT_ADD( mcu )
+MACHINE_CONFIG_START(system1_state::sys2rowm)
+	sys2row(config);
+	mcu(config);
 MACHINE_CONFIG_END
 
 

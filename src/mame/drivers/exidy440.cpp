@@ -1002,19 +1002,20 @@ MACHINE_CONFIG_START(exidy440_state::exidy440)
 	MCFG_NVRAM_ADD_0FILL("nvram")
 
 	/* video hardware */
-	MCFG_FRAGMENT_ADD(exidy440_video)
+	exidy440_video(config);
 
 	/* audio hardware */
-	MCFG_FRAGMENT_ADD(exidy440_audio)
+	exidy440_audio(config);
 MACHINE_CONFIG_END
 
 
-MACHINE_CONFIG_DERIVED(exidy440_state::topsecex, exidy440)
+MACHINE_CONFIG_START(exidy440_state::topsecex)
+	exidy440(config);
 
 	/* basic machine hardware */
 
 	/* video hardware */
-	MCFG_FRAGMENT_ADD(topsecex_video)
+	topsecex_video(config);
 MACHINE_CONFIG_END
 
 

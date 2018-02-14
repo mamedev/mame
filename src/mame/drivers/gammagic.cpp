@@ -132,7 +132,7 @@ MACHINE_CONFIG_START(gammagic_state::gammagic)
 	MCFG_CPU_IO_MAP(gammagic_io)
 	MCFG_CPU_IRQ_ACKNOWLEDGE_DEVICE("pic8259_1", pic8259_device, inta_cb)
 
-	MCFG_FRAGMENT_ADD( pcat_common )
+	pcat_common(config);
 
 //  MCFG_I82371SB_ADD("i82371sb")
 //  MCFG_I82439TX_ADD("i82439tx", "maincpu", "user")
@@ -140,7 +140,7 @@ MACHINE_CONFIG_START(gammagic_state::gammagic)
 //  MCFG_PCI_BUS_DEVICE(0, "i82439tx", i82439tx_pci_read, i82439tx_pci_write)
 //  MCFG_PCI_BUS_DEVICE(1, "i82371sb", i82371sb_pci_read, i82371sb_pci_write)
 	/* video hardware */
-	MCFG_FRAGMENT_ADD( pcvideo_vga )
+	pcvideo_vga(config);
 
 MACHINE_CONFIG_END
 

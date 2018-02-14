@@ -666,7 +666,8 @@ MACHINE_CONFIG_START(tecmo_state::rygar)
 MACHINE_CONFIG_END
 
 
-MACHINE_CONFIG_DERIVED(tecmo_state::gemini, rygar)
+MACHINE_CONFIG_START(tecmo_state::gemini)
+	rygar(config);
 
 	/* basic machine hardware */
 	MCFG_CPU_MODIFY("maincpu")
@@ -682,13 +683,15 @@ MACHINE_CONFIG_DERIVED(tecmo_state::gemini, rygar)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 MACHINE_CONFIG_END
 
-MACHINE_CONFIG_DERIVED(tecmo_state::geminib, gemini)
+MACHINE_CONFIG_START(tecmo_state::geminib)
+	gemini(config);
 	// 24.18 MHz OSC / 59.62 Hz, bootleg only?
 	MCFG_SCREEN_MODIFY("screen")
 	MCFG_SCREEN_RAW_PARAMS(24180000/4, 384,0,256,264,16,240)
 MACHINE_CONFIG_END
 
-MACHINE_CONFIG_DERIVED(tecmo_state::silkworm, gemini)
+MACHINE_CONFIG_START(tecmo_state::silkworm)
+	gemini(config);
 
 	/* basic machine hardware */
 	MCFG_CPU_MODIFY("maincpu")
@@ -696,7 +699,8 @@ MACHINE_CONFIG_DERIVED(tecmo_state::silkworm, gemini)
 	MCFG_CPU_PROGRAM_MAP(silkworm_map)
 MACHINE_CONFIG_END
 
-MACHINE_CONFIG_DERIVED(tecmo_state::backfirt, gemini)
+MACHINE_CONFIG_START(tecmo_state::backfirt)
+	gemini(config);
 
 	/* this pcb has no MSM5205 */
 	MCFG_DEVICE_REMOVE("msm")

@@ -454,7 +454,8 @@ MACHINE_CONFIG_START(progolf_state::progolf)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.23)
 MACHINE_CONFIG_END
 
-MACHINE_CONFIG_DERIVED(progolf_state::progolfa, progolf)
+MACHINE_CONFIG_START(progolf_state::progolfa)
+	progolf(config);
 	MCFG_DEVICE_REMOVE("maincpu") /* different encrypted cpu to progolf */
 	MCFG_CPU_ADD("maincpu", DECO_CPU6, 3000000/2) /* guess, 3 Mhz makes the game to behave worse? */
 	MCFG_CPU_PROGRAM_MAP(main_cpu)

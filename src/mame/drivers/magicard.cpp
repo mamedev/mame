@@ -1009,7 +1009,8 @@ MACHINE_CONFIG_START(magicard_state::magicard)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 MACHINE_CONFIG_END
 
-MACHINE_CONFIG_DERIVED(magicard_state::hotslots, magicard)
+MACHINE_CONFIG_START(magicard_state::hotslots)
+	magicard(config);
 	MCFG_CPU_MODIFY("maincpu")
 	MCFG_CPU_PROGRAM_MAP(hotslots_mem)
 

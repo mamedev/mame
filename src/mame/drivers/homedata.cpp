@@ -1364,13 +1364,15 @@ MACHINE_CONFIG_START(homedata_state::pteacher)
 	MCFG_SOUND_ROUTE_EX(0, "dac", 1.0, DAC_VREF_POS_INPUT) MCFG_SOUND_ROUTE_EX(0, "dac", -1.0, DAC_VREF_NEG_INPUT)
 MACHINE_CONFIG_END
 
-MACHINE_CONFIG_DERIVED(homedata_state::mjkinjas, pteacher)
+MACHINE_CONFIG_START(homedata_state::mjkinjas)
+	pteacher(config);
 
 	MCFG_CPU_MODIFY("audiocpu")
 	MCFG_CPU_CLOCK(11000000)    /* 11MHz ? */
 MACHINE_CONFIG_END
 
-MACHINE_CONFIG_DERIVED(homedata_state::lemnangl, pteacher)
+MACHINE_CONFIG_START(homedata_state::lemnangl)
+	pteacher(config);
 
 	/* video hardware */
 	MCFG_GFXDECODE_MODIFY("gfxdecode", lemnangl)

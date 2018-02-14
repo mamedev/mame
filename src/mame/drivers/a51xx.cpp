@@ -140,7 +140,8 @@ MACHINE_CONFIG_START(a51xx_state::a5120)
 
 MACHINE_CONFIG_END
 
-MACHINE_CONFIG_DERIVED(a51xx_state::a5130, a5120)
+MACHINE_CONFIG_START(a51xx_state::a5130)
+	a5120(config);
 	/* basic machine hardware */
 	MCFG_CPU_MODIFY("maincpu")
 	MCFG_CPU_PROGRAM_MAP(a5130_mem)

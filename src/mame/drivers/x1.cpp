@@ -2283,7 +2283,8 @@ MACHINE_CONFIG_START(x1_state::x1)
 	MCFG_TIMER_DRIVER_ADD_PERIODIC("cmt_wind_timer", x1_state, x1_cmt_wind_timer, attotime::from_hz(16))
 MACHINE_CONFIG_END
 
-MACHINE_CONFIG_DERIVED(x1_state::x1turbo, x1)
+MACHINE_CONFIG_START(x1_state::x1turbo)
+	x1(config);
 	MCFG_CPU_MODIFY("x1_cpu")
 	MCFG_CPU_PROGRAM_MAP(x1turbo_mem)
 	MCFG_Z80_DAISY_CHAIN(x1turbo_daisy)

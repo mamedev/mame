@@ -207,7 +207,7 @@ MACHINE_CONFIG_START(inderp_state::inderp)
 
 	/* sound hardware */
 	//discrete ?
-	MCFG_FRAGMENT_ADD( genpin_audio )
+	genpin_audio(config);
 MACHINE_CONFIG_END
 
 

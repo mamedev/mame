@@ -562,7 +562,8 @@ MACHINE_CONFIG_START(bloodbro_state::bloodbro)
 	MCFG_SEIBU_SOUND_YM_WRITE_CB(DEVWRITE8("ymsnd", ym3812_device, write))
 MACHINE_CONFIG_END
 
-MACHINE_CONFIG_DERIVED(bloodbro_state::weststry, bloodbro)
+MACHINE_CONFIG_START(bloodbro_state::weststry)
+	bloodbro(config);
 
 	MCFG_CPU_MODIFY("maincpu")
 	MCFG_CPU_PROGRAM_MAP(weststry_map)
@@ -596,7 +597,8 @@ MACHINE_CONFIG_DERIVED(bloodbro_state::weststry, bloodbro)
 	MCFG_SEIBU_SOUND_YM_WRITE_CB(WRITE8(bloodbro_state, weststry_opl_w))
 MACHINE_CONFIG_END
 
-MACHINE_CONFIG_DERIVED(bloodbro_state::skysmash, bloodbro)
+MACHINE_CONFIG_START(bloodbro_state::skysmash)
+	bloodbro(config);
 
 	MCFG_CPU_MODIFY("maincpu")
 	MCFG_CPU_PROGRAM_MAP(skysmash_map)

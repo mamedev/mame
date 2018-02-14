@@ -634,7 +634,8 @@ MACHINE_CONFIG_START(digel804_state::digel804)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
 MACHINE_CONFIG_END
 
-MACHINE_CONFIG_DERIVED(digel804_state::ep804, digel804)
+MACHINE_CONFIG_START(digel804_state::ep804)
+	digel804(config);
 	/* basic machine hardware */
 	MCFG_CPU_MODIFY("maincpu")  /* Z80, X1(aka E0 on schematics): 3.6864Mhz */
 	MCFG_CPU_PROGRAM_MAP(z80_mem_804_1_2)

@@ -762,7 +762,8 @@ MACHINE_CONFIG_START(m107_state::firebarr)
 	MCFG_SOUND_ROUTE(1, "rspeaker", 1.0)
 MACHINE_CONFIG_END
 
-MACHINE_CONFIG_DERIVED(m107_state::dsoccr94, firebarr)
+MACHINE_CONFIG_START(m107_state::dsoccr94)
+	firebarr(config);
 
 	/* basic machine hardware */
 	MCFG_CPU_MODIFY("maincpu")
@@ -777,7 +778,8 @@ MACHINE_CONFIG_DERIVED(m107_state::dsoccr94, firebarr)
 MACHINE_CONFIG_END
 
 
-MACHINE_CONFIG_DERIVED(m107_state::wpksoc, firebarr)
+MACHINE_CONFIG_START(m107_state::wpksoc)
+	firebarr(config);
 	MCFG_CPU_MODIFY("maincpu")
 	MCFG_CPU_PROGRAM_MAP(wpksoc_map)
 	MCFG_CPU_IO_MAP(wpksoc_io_map)
@@ -786,7 +788,8 @@ MACHINE_CONFIG_DERIVED(m107_state::wpksoc, firebarr)
 	MCFG_V25_CONFIG(leagueman_decryption_table)
 MACHINE_CONFIG_END
 
-MACHINE_CONFIG_DERIVED(m107_state::airass, firebarr)
+MACHINE_CONFIG_START(m107_state::airass)
+	firebarr(config);
 	MCFG_GFXDECODE_MODIFY("gfxdecode", m107)
 
 	MCFG_CPU_MODIFY("soundcpu")

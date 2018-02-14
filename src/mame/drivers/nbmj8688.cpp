@@ -2478,7 +2478,8 @@ MACHINE_CONFIG_START(nbmj8688_state::NBMJDRV_4096)
 	MCFG_SOUND_ROUTE_EX(0, "dac", 1.0, DAC_VREF_POS_INPUT) MCFG_SOUND_ROUTE_EX(0, "dac", -1.0, DAC_VREF_NEG_INPUT)
 MACHINE_CONFIG_END
 
-MACHINE_CONFIG_DERIVED(nbmj8688_state::NBMJDRV_256, NBMJDRV_4096)
+MACHINE_CONFIG_START(nbmj8688_state::NBMJDRV_256)
+	NBMJDRV_4096(config);
 
 	/* basic machine hardware */
 
@@ -2490,7 +2491,8 @@ MACHINE_CONFIG_DERIVED(nbmj8688_state::NBMJDRV_256, NBMJDRV_4096)
 	MCFG_VIDEO_START_OVERRIDE(nbmj8688_state,mbmj8688_8bit)
 MACHINE_CONFIG_END
 
-MACHINE_CONFIG_DERIVED(nbmj8688_state::NBMJDRV_65536, NBMJDRV_4096)
+MACHINE_CONFIG_START(nbmj8688_state::NBMJDRV_65536)
+	NBMJDRV_4096(config);
 
 	/* basic machine hardware */
 
@@ -2505,7 +2507,8 @@ MACHINE_CONFIG_END
 
 // --------------------------------------------------------------------------------
 
-MACHINE_CONFIG_DERIVED(nbmj8688_state::crystalg, NBMJDRV_256)
+MACHINE_CONFIG_START(nbmj8688_state::crystalg)
+	NBMJDRV_256(config);
 
 	/* basic machine hardware */
 	MCFG_CPU_MODIFY("maincpu")
@@ -2516,19 +2519,22 @@ MACHINE_CONFIG_DERIVED(nbmj8688_state::crystalg, NBMJDRV_256)
 	MCFG_NB1413M3_TYPE( NB1413M3_CRYSTALG )
 MACHINE_CONFIG_END
 
-MACHINE_CONFIG_DERIVED(nbmj8688_state::crystal2, crystalg)
+MACHINE_CONFIG_START(nbmj8688_state::crystal2)
+	crystalg(config);
 
 	MCFG_DEVICE_MODIFY("nb1413m3")
 	MCFG_NB1413M3_TYPE( NB1413M3_CRYSTAL2 )
 MACHINE_CONFIG_END
 
-MACHINE_CONFIG_DERIVED(nbmj8688_state::nightlov, crystalg)
+MACHINE_CONFIG_START(nbmj8688_state::nightlov)
+	crystalg(config);
 
 	MCFG_DEVICE_MODIFY("nb1413m3")
 	MCFG_NB1413M3_TYPE( NB1413M3_NIGHTLOV )
 MACHINE_CONFIG_END
 
-MACHINE_CONFIG_DERIVED(nbmj8688_state::apparel, NBMJDRV_256)
+MACHINE_CONFIG_START(nbmj8688_state::apparel)
+	NBMJDRV_256(config);
 
 	/* basic machine hardware */
 	MCFG_CPU_MODIFY("maincpu")
@@ -2539,7 +2545,8 @@ MACHINE_CONFIG_DERIVED(nbmj8688_state::apparel, NBMJDRV_256)
 	MCFG_NB1413M3_TYPE( NB1413M3_APPAREL )
 MACHINE_CONFIG_END
 
-MACHINE_CONFIG_DERIVED(nbmj8688_state::mbmj_h12bit, NBMJDRV_4096)
+MACHINE_CONFIG_START(nbmj8688_state::mbmj_h12bit)
+	NBMJDRV_4096(config);
 
 	/* basic machine hardware */
 	MCFG_CPU_MODIFY("maincpu")
@@ -2550,26 +2557,30 @@ MACHINE_CONFIG_DERIVED(nbmj8688_state::mbmj_h12bit, NBMJDRV_4096)
 	MCFG_VIDEO_START_OVERRIDE(nbmj8688_state,mbmj8688_hybrid_12bit)
 MACHINE_CONFIG_END
 
-MACHINE_CONFIG_DERIVED(nbmj8688_state::citylove, mbmj_h12bit)
+MACHINE_CONFIG_START(nbmj8688_state::citylove)
+	mbmj_h12bit(config);
 
 	MCFG_DEVICE_MODIFY("nb1413m3")
 	MCFG_NB1413M3_TYPE( NB1413M3_CITYLOVE )
 MACHINE_CONFIG_END
 
-MACHINE_CONFIG_DERIVED(nbmj8688_state::mcitylov, mbmj_h12bit)
+MACHINE_CONFIG_START(nbmj8688_state::mcitylov)
+	mbmj_h12bit(config);
 
 	MCFG_DEVICE_MODIFY("nb1413m3")
 	MCFG_NB1413M3_TYPE( NB1413M3_MCITYLOV )
 MACHINE_CONFIG_END
 
-MACHINE_CONFIG_DERIVED(nbmj8688_state::secolove, mbmj_h12bit)
+MACHINE_CONFIG_START(nbmj8688_state::secolove)
+	mbmj_h12bit(config);
 
 	MCFG_DEVICE_MODIFY("nb1413m3")
 	MCFG_NB1413M3_TYPE( NB1413M3_SECOLOVE )
 MACHINE_CONFIG_END
 
 /*Same as h12bit HW with different sound HW + NMI enable bit*/
-MACHINE_CONFIG_DERIVED(nbmj8688_state::barline, mbmj_h12bit)
+MACHINE_CONFIG_START(nbmj8688_state::barline)
+	mbmj_h12bit(config);
 
 	/* basic machine hardware */
 	MCFG_CPU_MODIFY("maincpu")
@@ -2585,7 +2596,8 @@ MACHINE_CONFIG_DERIVED(nbmj8688_state::barline, mbmj_h12bit)
 	MCFG_DEVICE_REMOVE("vref")
 MACHINE_CONFIG_END
 
-MACHINE_CONFIG_DERIVED(nbmj8688_state::mbmj_p16bit, NBMJDRV_65536)
+MACHINE_CONFIG_START(nbmj8688_state::mbmj_p16bit)
+	NBMJDRV_65536(config);
 
 	/* basic machine hardware */
 	MCFG_CPU_MODIFY("maincpu")
@@ -2659,55 +2671,64 @@ MACHINE_CONFIG_START(nbmj8688_state::mbmj_p16bit_LCD)
 	MCFG_SOUND_ROUTE_EX(0, "dac", 1.0, DAC_VREF_POS_INPUT) MCFG_SOUND_ROUTE_EX(0, "dac", -1.0, DAC_VREF_NEG_INPUT)
 MACHINE_CONFIG_END
 
-MACHINE_CONFIG_DERIVED(nbmj8688_state::bijokkoy, mbmj_p16bit_LCD)
+MACHINE_CONFIG_START(nbmj8688_state::bijokkoy)
+	mbmj_p16bit_LCD(config);
 
 	MCFG_DEVICE_MODIFY("nb1413m3")
 	MCFG_NB1413M3_TYPE( NB1413M3_BIJOKKOY )
 MACHINE_CONFIG_END
 
-MACHINE_CONFIG_DERIVED(nbmj8688_state::bijokkog, mbmj_p16bit_LCD)
+MACHINE_CONFIG_START(nbmj8688_state::bijokkog)
+	mbmj_p16bit_LCD(config);
 
 	MCFG_DEVICE_MODIFY("nb1413m3")
 	MCFG_NB1413M3_TYPE( NB1413M3_BIJOKKOG )
 MACHINE_CONFIG_END
 
-MACHINE_CONFIG_DERIVED(nbmj8688_state::housemnq, mbmj_p16bit_LCD)
+MACHINE_CONFIG_START(nbmj8688_state::housemnq)
+	mbmj_p16bit_LCD(config);
 
 	MCFG_DEVICE_MODIFY("nb1413m3")
 	MCFG_NB1413M3_TYPE( NB1413M3_HOUSEMNQ )
 MACHINE_CONFIG_END
 
-MACHINE_CONFIG_DERIVED(nbmj8688_state::housemn2, mbmj_p16bit_LCD)
+MACHINE_CONFIG_START(nbmj8688_state::housemn2)
+	mbmj_p16bit_LCD(config);
 
 	MCFG_DEVICE_MODIFY("nb1413m3")
 	MCFG_NB1413M3_TYPE( NB1413M3_HOUSEMN2 )
 MACHINE_CONFIG_END
 
-MACHINE_CONFIG_DERIVED(nbmj8688_state::livegal, mbmj_p16bit_LCD)
+MACHINE_CONFIG_START(nbmj8688_state::livegal)
+	mbmj_p16bit_LCD(config);
 
 	MCFG_DEVICE_MODIFY("nb1413m3")
 	MCFG_NB1413M3_TYPE( NB1413M3_LIVEGAL )
 MACHINE_CONFIG_END
 
-MACHINE_CONFIG_DERIVED(nbmj8688_state::orangec, mbmj_p16bit)
+MACHINE_CONFIG_START(nbmj8688_state::orangec)
+	mbmj_p16bit(config);
 
 	MCFG_DEVICE_MODIFY("nb1413m3")
 	MCFG_NB1413M3_TYPE( NB1413M3_ORANGEC )
 MACHINE_CONFIG_END
 
-MACHINE_CONFIG_DERIVED(nbmj8688_state::orangeci, mbmj_p16bit)
+MACHINE_CONFIG_START(nbmj8688_state::orangeci)
+	mbmj_p16bit(config);
 
 	MCFG_DEVICE_MODIFY("nb1413m3")
 	MCFG_NB1413M3_TYPE( NB1413M3_ORANGECI )
 MACHINE_CONFIG_END
 
-MACHINE_CONFIG_DERIVED(nbmj8688_state::vipclub, mbmj_p16bit)
+MACHINE_CONFIG_START(nbmj8688_state::vipclub)
+	mbmj_p16bit(config);
 
 	MCFG_DEVICE_MODIFY("nb1413m3")
 	MCFG_NB1413M3_TYPE( NB1413M3_VIPCLUB )
 MACHINE_CONFIG_END
 
-MACHINE_CONFIG_DERIVED(nbmj8688_state::seiha, NBMJDRV_65536)
+MACHINE_CONFIG_START(nbmj8688_state::seiha)
+	NBMJDRV_65536(config);
 
 	/* basic machine hardware */
 	MCFG_CPU_MODIFY("maincpu")
@@ -2718,13 +2739,15 @@ MACHINE_CONFIG_DERIVED(nbmj8688_state::seiha, NBMJDRV_65536)
 	MCFG_NB1413M3_TYPE( NB1413M3_SEIHA )
 MACHINE_CONFIG_END
 
-MACHINE_CONFIG_DERIVED(nbmj8688_state::seiham, seiha)
+MACHINE_CONFIG_START(nbmj8688_state::seiham)
+	seiha(config);
 
 	MCFG_DEVICE_MODIFY("nb1413m3")
 	MCFG_NB1413M3_TYPE( NB1413M3_SEIHAM )
 MACHINE_CONFIG_END
 
-MACHINE_CONFIG_DERIVED(nbmj8688_state::mjgaiden, NBMJDRV_4096)
+MACHINE_CONFIG_START(nbmj8688_state::mjgaiden)
+	NBMJDRV_4096(config);
 
 	/* basic machine hardware */
 
@@ -2736,7 +2759,8 @@ MACHINE_CONFIG_DERIVED(nbmj8688_state::mjgaiden, NBMJDRV_4096)
 	MCFG_NB1413M3_TYPE( NB1413M3_OJOUSAN )
 MACHINE_CONFIG_END
 
-MACHINE_CONFIG_DERIVED(nbmj8688_state::iemoto, NBMJDRV_65536)
+MACHINE_CONFIG_START(nbmj8688_state::iemoto)
+	NBMJDRV_65536(config);
 
 	/* basic machine hardware */
 	MCFG_CPU_MODIFY("maincpu")
@@ -2747,7 +2771,8 @@ MACHINE_CONFIG_DERIVED(nbmj8688_state::iemoto, NBMJDRV_65536)
 	MCFG_NB1413M3_TYPE( NB1413M3_IEMOTO )
 MACHINE_CONFIG_END
 
-MACHINE_CONFIG_DERIVED(nbmj8688_state::ojousan, NBMJDRV_65536)
+MACHINE_CONFIG_START(nbmj8688_state::ojousan)
+	NBMJDRV_65536(config);
 
 	/* basic machine hardware */
 	MCFG_CPU_MODIFY("maincpu")
@@ -2758,44 +2783,51 @@ MACHINE_CONFIG_DERIVED(nbmj8688_state::ojousan, NBMJDRV_65536)
 	MCFG_NB1413M3_TYPE( NB1413M3_OJOUSAN )
 MACHINE_CONFIG_END
 
-MACHINE_CONFIG_DERIVED(nbmj8688_state::ojousanm, ojousan)
+MACHINE_CONFIG_START(nbmj8688_state::ojousanm)
+	ojousan(config);
 
 	MCFG_DEVICE_MODIFY("nb1413m3")
 	MCFG_NB1413M3_TYPE( NB1413M3_OJOUSANM )
 MACHINE_CONFIG_END
 
-MACHINE_CONFIG_DERIVED(nbmj8688_state::swinggal, ojousan)
+MACHINE_CONFIG_START(nbmj8688_state::swinggal)
+	ojousan(config);
 
 		MCFG_CPU_MODIFY("maincpu")
 	MCFG_CPU_PROGRAM_MAP(secolove_map)
 	MCFG_CPU_IO_MAP(iemoto_io_map)
 MACHINE_CONFIG_END
 
-MACHINE_CONFIG_DERIVED(nbmj8688_state::iemotom, ojousan)
+MACHINE_CONFIG_START(nbmj8688_state::iemotom)
+	ojousan(config);
 
 	MCFG_DEVICE_MODIFY("nb1413m3")
 	MCFG_NB1413M3_TYPE( NB1413M3_IEMOTOM )
 MACHINE_CONFIG_END
 
-MACHINE_CONFIG_DERIVED(nbmj8688_state::ryuuha, ojousan)
+MACHINE_CONFIG_START(nbmj8688_state::ryuuha)
+	ojousan(config);
 
 	MCFG_DEVICE_MODIFY("nb1413m3")
 	MCFG_NB1413M3_TYPE( NB1413M3_RYUUHA )
 MACHINE_CONFIG_END
 
-MACHINE_CONFIG_DERIVED(nbmj8688_state::korinai, ojousan)
+MACHINE_CONFIG_START(nbmj8688_state::korinai)
+	ojousan(config);
 
 	MCFG_DEVICE_MODIFY("nb1413m3")
 	MCFG_NB1413M3_TYPE( NB1413M3_KORINAI )
 MACHINE_CONFIG_END
 
-MACHINE_CONFIG_DERIVED(nbmj8688_state::korinaim, ojousan)
+MACHINE_CONFIG_START(nbmj8688_state::korinaim)
+	ojousan(config);
 
 	MCFG_DEVICE_MODIFY("nb1413m3")
 	MCFG_NB1413M3_TYPE( NB1413M3_KORINAIM )
 MACHINE_CONFIG_END
 
-MACHINE_CONFIG_DERIVED(nbmj8688_state::mbmj_p12bit, NBMJDRV_4096)
+MACHINE_CONFIG_START(nbmj8688_state::mbmj_p12bit)
+	NBMJDRV_4096(config);
 
 	/* basic machine hardware */
 	MCFG_CPU_MODIFY("maincpu")
@@ -2803,37 +2835,43 @@ MACHINE_CONFIG_DERIVED(nbmj8688_state::mbmj_p12bit, NBMJDRV_4096)
 	MCFG_CPU_IO_MAP(kaguya_io_map)
 MACHINE_CONFIG_END
 
-MACHINE_CONFIG_DERIVED(nbmj8688_state::kaguya, mbmj_p12bit)
+MACHINE_CONFIG_START(nbmj8688_state::kaguya)
+	mbmj_p12bit(config);
 
 	MCFG_DEVICE_MODIFY("nb1413m3")
 	MCFG_NB1413M3_TYPE( NB1413M3_KAGUYA )
 MACHINE_CONFIG_END
 
-MACHINE_CONFIG_DERIVED(nbmj8688_state::kaguya2, mbmj_p12bit)
+MACHINE_CONFIG_START(nbmj8688_state::kaguya2)
+	mbmj_p12bit(config);
 
 	MCFG_DEVICE_MODIFY("nb1413m3")
 	MCFG_NB1413M3_TYPE( NB1413M3_KAGUYA2 )
 MACHINE_CONFIG_END
 
-MACHINE_CONFIG_DERIVED(nbmj8688_state::kanatuen, mbmj_p12bit)
+MACHINE_CONFIG_START(nbmj8688_state::kanatuen)
+	mbmj_p12bit(config);
 
 	MCFG_DEVICE_MODIFY("nb1413m3")
 	MCFG_NB1413M3_TYPE( NB1413M3_KANATUEN )
 MACHINE_CONFIG_END
 
-MACHINE_CONFIG_DERIVED(nbmj8688_state::kyuhito, mbmj_p12bit)
+MACHINE_CONFIG_START(nbmj8688_state::kyuhito)
+	mbmj_p12bit(config);
 
 	MCFG_DEVICE_MODIFY("nb1413m3")
 	MCFG_NB1413M3_TYPE( NB1413M3_KYUHITO )
 MACHINE_CONFIG_END
 
-MACHINE_CONFIG_DERIVED(nbmj8688_state::idhimitu, mbmj_p12bit)
+MACHINE_CONFIG_START(nbmj8688_state::idhimitu)
+	mbmj_p12bit(config);
 
 	MCFG_DEVICE_MODIFY("nb1413m3")
 	MCFG_NB1413M3_TYPE( NB1413M3_IDHIMITU )
 MACHINE_CONFIG_END
 
-MACHINE_CONFIG_DERIVED(nbmj8688_state::mjsikaku, NBMJDRV_4096)
+MACHINE_CONFIG_START(nbmj8688_state::mjsikaku)
+	NBMJDRV_4096(config);
 
 	/* basic machine hardware */
 	MCFG_CPU_MODIFY("maincpu")
@@ -2848,7 +2886,8 @@ MACHINE_CONFIG_DERIVED(nbmj8688_state::mjsikaku, NBMJDRV_4096)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 0.7)
 MACHINE_CONFIG_END
 
-MACHINE_CONFIG_DERIVED(nbmj8688_state::mmsikaku, NBMJDRV_4096)
+MACHINE_CONFIG_START(nbmj8688_state::mmsikaku)
+	NBMJDRV_4096(config);
 
 	/* basic machine hardware */
 	MCFG_CPU_MODIFY("maincpu")
@@ -2859,7 +2898,8 @@ MACHINE_CONFIG_DERIVED(nbmj8688_state::mmsikaku, NBMJDRV_4096)
 	MCFG_NB1413M3_TYPE( NB1413M3_MMSIKAKU )
 MACHINE_CONFIG_END
 
-MACHINE_CONFIG_DERIVED(nbmj8688_state::otonano, mjsikaku)
+MACHINE_CONFIG_START(nbmj8688_state::otonano)
+	mjsikaku(config);
 
 	/* basic machine hardware */
 	MCFG_CPU_MODIFY("maincpu")
@@ -2869,7 +2909,8 @@ MACHINE_CONFIG_DERIVED(nbmj8688_state::otonano, mjsikaku)
 	MCFG_NB1413M3_TYPE( NB1413M3_OTONANO )
 MACHINE_CONFIG_END
 
-MACHINE_CONFIG_DERIVED(nbmj8688_state::mjcamera, otonano)
+MACHINE_CONFIG_START(nbmj8688_state::mjcamera)
+	otonano(config);
 
 	MCFG_DEVICE_MODIFY("nb1413m3")
 	MCFG_NB1413M3_TYPE( NB1413M3_MJCAMERA )

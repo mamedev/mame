@@ -906,14 +906,16 @@ MACHINE_CONFIG_START(systeme_state::systeme)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
 MACHINE_CONFIG_END
 
-MACHINE_CONFIG_DERIVED(systeme_state::hangonjr, systeme)
+MACHINE_CONFIG_START(systeme_state::hangonjr)
+	systeme(config);
 	MCFG_DEVICE_MODIFY("ppi")
 	MCFG_I8255_IN_PORTA_CB(READ8(systeme_state, hangonjr_port_f8_read))
 	MCFG_I8255_IN_PORTC_CB(CONSTANT(0)) // bit 4 must be the ADC0804 /INTR signal
 	MCFG_I8255_OUT_PORTC_CB(WRITE8(systeme_state, hangonjr_port_fa_write)) // CD4051 selector input
 MACHINE_CONFIG_END
 
-MACHINE_CONFIG_DERIVED(systeme_state::ridleofp, systeme)
+MACHINE_CONFIG_START(systeme_state::ridleofp)
+	systeme(config);
 	MCFG_DEVICE_ADD("upd4701", UPD4701A, 0) // on 834-6193 I/O sub board
 	MCFG_UPD4701_PORTX("PAD1")
 	MCFG_UPD4701_PORTY("PAD2")
@@ -927,14 +929,16 @@ MACHINE_CONFIG_DERIVED(systeme_state::ridleofp, systeme)
 	MCFG_DEVCB_CHAIN_OUTPUT(DEVWRITELINE("upd4701", upd4701_device, resety_w)) MCFG_DEVCB_BIT(0) // or possibly bit 1
 MACHINE_CONFIG_END
 
-MACHINE_CONFIG_DERIVED(systeme_state::systemex, systeme)
+MACHINE_CONFIG_START(systeme_state::systemex)
+	systeme(config);
 	MCFG_CPU_REPLACE("maincpu", MC8123, XTAL(10'738'635)/2) /* Z80B @ 5.3693Mhz */
 	MCFG_CPU_PROGRAM_MAP(systeme_map)
 	MCFG_CPU_IO_MAP(io_map)
 	MCFG_CPU_OPCODES_MAP(decrypted_opcodes_map)
 MACHINE_CONFIG_END
 
-MACHINE_CONFIG_DERIVED(systeme_state::systemex_315_5177, systeme)
+MACHINE_CONFIG_START(systeme_state::systemex_315_5177)
+	systeme(config);
 	MCFG_CPU_REPLACE("maincpu", SEGA_315_5177, XTAL(10'738'635)/2) /* Z80B @ 5.3693Mhz */
 	MCFG_CPU_PROGRAM_MAP(systeme_map)
 	MCFG_CPU_IO_MAP(io_map)
@@ -942,7 +946,8 @@ MACHINE_CONFIG_DERIVED(systeme_state::systemex_315_5177, systeme)
 	MCFG_SEGAZ80_SET_DECRYPTED_TAG(":decrypted_opcodes")
 MACHINE_CONFIG_END
 
-MACHINE_CONFIG_DERIVED(systeme_state::systemeb, systeme)
+MACHINE_CONFIG_START(systeme_state::systemeb)
+	systeme(config);
 	MCFG_CPU_REPLACE("maincpu", MC8123, XTAL(10'738'635)/2) /* Z80B @ 5.3693Mhz */
 	MCFG_CPU_PROGRAM_MAP(systeme_map)
 	MCFG_CPU_IO_MAP(io_map)

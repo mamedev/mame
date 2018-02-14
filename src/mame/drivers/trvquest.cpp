@@ -188,7 +188,7 @@ MACHINE_CONFIG_START(gameplan_state::trvquest)
 	MCFG_MACHINE_RESET_OVERRIDE(gameplan_state,trvquest)
 
 	/* video hardware */
-	MCFG_FRAGMENT_ADD(trvquest_video)
+	trvquest_video(config);
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")

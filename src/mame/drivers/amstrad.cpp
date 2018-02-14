@@ -961,7 +961,8 @@ MACHINE_CONFIG_START(amstrad_state::amstrad_base)
 
 MACHINE_CONFIG_END
 
-MACHINE_CONFIG_DERIVED(amstrad_state::cpc464, amstrad_base)
+MACHINE_CONFIG_START(amstrad_state::cpc464)
+	amstrad_base(config);
 	MCFG_DEVICE_ADD("exp", CPC_EXPANSION_SLOT, 0)
 	MCFG_DEVICE_SLOT_INTERFACE(cpc464_exp_cards, nullptr, false)
 	MCFG_CPC_EXPANSION_SLOT_OUT_IRQ_CB(INPUTLINE("maincpu", 0))
@@ -975,7 +976,8 @@ MACHINE_CONFIG_DERIVED(amstrad_state::cpc464, amstrad_base)
 	MCFG_RAM_EXTRA_OPTIONS("128K,320K,576K")
 MACHINE_CONFIG_END
 
-MACHINE_CONFIG_DERIVED(amstrad_state::cpc664, amstrad_base)
+MACHINE_CONFIG_START(amstrad_state::cpc664)
+	amstrad_base(config);
 	MCFG_UPD765A_ADD("upd765", true, true)
 	MCFG_FLOPPY_DRIVE_ADD("upd765:0", amstrad_floppies, "3ssdd", floppy_image_device::default_floppy_formats)
 	MCFG_FLOPPY_DRIVE_ADD("upd765:1", amstrad_floppies, "35ssdd", floppy_image_device::default_floppy_formats)
@@ -994,7 +996,8 @@ MACHINE_CONFIG_DERIVED(amstrad_state::cpc664, amstrad_base)
 	MCFG_RAM_EXTRA_OPTIONS("128K,320K,576K")
 MACHINE_CONFIG_END
 
-MACHINE_CONFIG_DERIVED(amstrad_state::cpc6128, amstrad_base)
+MACHINE_CONFIG_START(amstrad_state::cpc6128)
+	amstrad_base(config);
 	MCFG_UPD765A_ADD("upd765", true, true)
 	MCFG_FLOPPY_DRIVE_ADD("upd765:0", amstrad_floppies, "3ssdd", floppy_image_device::default_floppy_formats)
 	MCFG_FLOPPY_DRIVE_ADD("upd765:1", amstrad_floppies, "35ssdd", floppy_image_device::default_floppy_formats)
@@ -1014,7 +1017,8 @@ MACHINE_CONFIG_DERIVED(amstrad_state::cpc6128, amstrad_base)
 MACHINE_CONFIG_END
 
 
-MACHINE_CONFIG_DERIVED(amstrad_state::kccomp, cpc6128)
+MACHINE_CONFIG_START(amstrad_state::kccomp)
+	cpc6128(config);
 	MCFG_MACHINE_START_OVERRIDE(amstrad_state,kccomp)
 	MCFG_MACHINE_RESET_OVERRIDE(amstrad_state,kccomp)
 
@@ -1083,7 +1087,7 @@ MACHINE_CONFIG_START(amstrad_state::cpcplus)
 
 	MCFG_UPD765A_ADD("upd765", true, true)
 
-	MCFG_FRAGMENT_ADD(cpcplus_cartslot)
+	cpcplus_cartslot(config);
 
 	MCFG_FLOPPY_DRIVE_ADD("upd765:0", amstrad_floppies, "3ssdd", floppy_image_device::default_floppy_formats)
 	MCFG_FLOPPY_DRIVE_ADD("upd765:1", amstrad_floppies, "35ssdd", floppy_image_device::default_floppy_formats)
@@ -1146,7 +1150,7 @@ MACHINE_CONFIG_START(amstrad_state::gx4000)
 	MCFG_AY8910_PORT_A_READ_CB(READ8(amstrad_state, amstrad_psg_porta_read)) /* portA read */
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
 
-	MCFG_FRAGMENT_ADD(cpcplus_cartslot)
+	cpcplus_cartslot(config);
 
 	/* internal ram */
 	MCFG_RAM_ADD(RAM_TAG)
@@ -1154,7 +1158,8 @@ MACHINE_CONFIG_START(amstrad_state::gx4000)
 MACHINE_CONFIG_END
 
 
-MACHINE_CONFIG_DERIVED(amstrad_state::aleste, cpc6128)
+MACHINE_CONFIG_START(amstrad_state::aleste)
+	cpc6128(config);
 	MCFG_MACHINE_START_OVERRIDE(amstrad_state,aleste)
 	MCFG_MACHINE_RESET_OVERRIDE(amstrad_state,aleste)
 

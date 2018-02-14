@@ -414,13 +414,15 @@ MACHINE_CONFIG_START(pengo_state::pengo)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 MACHINE_CONFIG_END
 
-MACHINE_CONFIG_DERIVED(pengo_state::pengou, pengo)
+MACHINE_CONFIG_START(pengo_state::pengou)
+	pengo(config);
 
 	MCFG_CPU_MODIFY("maincpu")
 	MCFG_DEVICE_REMOVE_ADDRESS_MAP(AS_OPCODES)
 MACHINE_CONFIG_END
 
-MACHINE_CONFIG_DERIVED(pengo_state::pengoe, pengo)
+MACHINE_CONFIG_START(pengo_state::pengoe)
+	pengo(config);
 	MCFG_CPU_REPLACE("maincpu", SEGA_315_5010, MASTER_CLOCK/6)
 	MCFG_CPU_PROGRAM_MAP(pengo_map)
 	MCFG_CPU_OPCODES_MAP(decrypted_opcodes_map)
@@ -428,7 +430,8 @@ MACHINE_CONFIG_DERIVED(pengo_state::pengoe, pengo)
 	MCFG_SEGACRPT_SET_DECRYPTED_TAG(":decrypted_opcodes")
 MACHINE_CONFIG_END
 
-MACHINE_CONFIG_DERIVED(pengo_state::jrpacmbl, pengo)
+MACHINE_CONFIG_START(pengo_state::jrpacmbl)
+	pengo(config);
 
 	/* basic machine hardware */
 	MCFG_CPU_MODIFY("maincpu")

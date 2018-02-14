@@ -585,7 +585,8 @@ MACHINE_CONFIG_START(sf_state::sfan)
 MACHINE_CONFIG_END
 
 
-MACHINE_CONFIG_DERIVED(sf_state::sfus, sfan)
+MACHINE_CONFIG_START(sf_state::sfus)
+	sfan(config);
 
 	/* basic machine hardware */
 	MCFG_CPU_MODIFY("maincpu")
@@ -593,7 +594,8 @@ MACHINE_CONFIG_DERIVED(sf_state::sfus, sfan)
 MACHINE_CONFIG_END
 
 
-MACHINE_CONFIG_DERIVED(sf_state::sfjp, sfan)
+MACHINE_CONFIG_START(sf_state::sfjp)
+	sfan(config);
 
 	/* basic machine hardware */
 	MCFG_CPU_MODIFY("maincpu")
@@ -601,7 +603,8 @@ MACHINE_CONFIG_DERIVED(sf_state::sfjp, sfan)
 MACHINE_CONFIG_END
 
 
-MACHINE_CONFIG_DERIVED(sf_state::sfp, sfan)
+MACHINE_CONFIG_START(sf_state::sfp)
+	sfan(config);
 
 	/* basic machine hardware */
 	MCFG_CPU_MODIFY("maincpu")

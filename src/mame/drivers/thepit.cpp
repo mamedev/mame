@@ -755,12 +755,14 @@ MACHINE_CONFIG_START(thepit_state::thepit)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
 MACHINE_CONFIG_END
 
-MACHINE_CONFIG_DERIVED(thepit_state::fitter, thepit)
+MACHINE_CONFIG_START(thepit_state::fitter)
+	thepit(config);
 	MCFG_DEVICE_MODIFY("mainlatch") // IC42
 	MCFG_ADDRESSABLE_LATCH_Q2_OUT_CB(WRITELINE(thepit_state, coin_lockout_w))
 MACHINE_CONFIG_END
 
-MACHINE_CONFIG_DERIVED(thepit_state::desertdn, fitter)
+MACHINE_CONFIG_START(thepit_state::desertdn)
+	fitter(config);
 
 	/* basic machine hardware */
 	MCFG_CPU_MODIFY("maincpu")
@@ -773,7 +775,8 @@ MACHINE_CONFIG_DERIVED(thepit_state::desertdn, fitter)
 	MCFG_GFXDECODE_MODIFY("gfxdecode", intrepid)
 MACHINE_CONFIG_END
 
-MACHINE_CONFIG_DERIVED(thepit_state::intrepid, fitter)
+MACHINE_CONFIG_START(thepit_state::intrepid)
+	fitter(config);
 
 	/* basic machine hardware */
 	MCFG_CPU_MODIFY("maincpu")
@@ -787,7 +790,8 @@ MACHINE_CONFIG_DERIVED(thepit_state::intrepid, fitter)
 MACHINE_CONFIG_END
 
 
-MACHINE_CONFIG_DERIVED(thepit_state::suprmous, intrepid)
+MACHINE_CONFIG_START(thepit_state::suprmous)
+	intrepid(config);
 
 	/* basic machine hardware */
 

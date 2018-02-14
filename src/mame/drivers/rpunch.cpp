@@ -499,7 +499,8 @@ MACHINE_CONFIG_START(rpunch_state::rpunch)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
 MACHINE_CONFIG_END
 
-MACHINE_CONFIG_DERIVED(rpunch_state::svolley, rpunch)
+MACHINE_CONFIG_START(rpunch_state::svolley)
+	rpunch(config);
 	MCFG_VIDEO_START_OVERRIDE(rpunch_state,svolley)
 MACHINE_CONFIG_END
 

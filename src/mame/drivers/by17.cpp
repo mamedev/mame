@@ -989,7 +989,7 @@ MACHINE_CONFIG_START(by17_state::by17)
 	MCFG_DEFAULT_LAYOUT(layout_by17)
 
 	/* Sound */
-	MCFG_FRAGMENT_ADD( genpin_audio )
+	genpin_audio(config);
 
 	/* Devices */
 	MCFG_DEVICE_ADD("pia_u10", PIA6821, 0)

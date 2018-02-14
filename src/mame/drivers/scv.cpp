@@ -686,7 +686,8 @@ MACHINE_CONFIG_START(scv_state::scv)
 MACHINE_CONFIG_END
 
 
-MACHINE_CONFIG_DERIVED(scv_state::scv_pal, scv)
+MACHINE_CONFIG_START(scv_state::scv_pal)
+	scv(config);
 	MCFG_CPU_MODIFY( "maincpu" )
 	MCFG_CPU_CLOCK( 3780000 )
 

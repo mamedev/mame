@@ -411,7 +411,8 @@ MACHINE_CONFIG_START(dcheese_state::dcheese)
 MACHINE_CONFIG_END
 
 
-MACHINE_CONFIG_DERIVED(dcheese_state::fredmem, dcheese)
+MACHINE_CONFIG_START(dcheese_state::fredmem)
+	dcheese(config);
 	MCFG_SCREEN_MODIFY("screen")
 	MCFG_SCREEN_VISIBLE_AREA(0, 359, 0, 239)
 MACHINE_CONFIG_END

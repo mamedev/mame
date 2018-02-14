@@ -548,7 +548,8 @@ MACHINE_CONFIG_START(apf_state::apfm1000)
 	MCFG_SOFTWARE_LIST_ADD("cart_list", "apfm1000")
 MACHINE_CONFIG_END
 
-MACHINE_CONFIG_DERIVED(apf_state::apfimag, apfm1000)
+MACHINE_CONFIG_START(apf_state::apfimag)
+	apfm1000(config);
 	MCFG_CPU_MODIFY( "maincpu" )
 	MCFG_CPU_PROGRAM_MAP( apfimag_map)
 

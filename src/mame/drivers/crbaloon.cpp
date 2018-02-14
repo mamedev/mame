@@ -383,7 +383,7 @@ MACHINE_CONFIG_START(crbaloon_state::crbaloon)
 	MCFG_SCREEN_PALETTE("palette")
 
 	/* audio hardware */
-	MCFG_FRAGMENT_ADD(crbaloon_audio)
+	crbaloon_audio(config);
 
 MACHINE_CONFIG_END
 

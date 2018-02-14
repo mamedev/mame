@@ -601,7 +601,8 @@ MACHINE_CONFIG_START(atvtrack_state::atvtrack)
 	MCFG_PALETTE_ADD("palette", 0x1000)
 MACHINE_CONFIG_END
 
-MACHINE_CONFIG_DERIVED(smashdrv_state::smashdrv, atvtrack)
+MACHINE_CONFIG_START(smashdrv_state::smashdrv)
+	atvtrack(config);
 	MCFG_CPU_MODIFY("maincpu")
 	MCFG_CPU_PROGRAM_MAP(smashdrv_main_map)
 	MCFG_CPU_IO_MAP(smashdrv_main_port)

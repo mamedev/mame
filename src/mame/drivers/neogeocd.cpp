@@ -1042,7 +1042,8 @@ uint32_t ngcd_state::screen_update_neocd(screen_device &screen, bitmap_rgb32 &bi
 }
 
 
-MACHINE_CONFIG_DERIVED(ngcd_state::neocd, neogeo_base)
+MACHINE_CONFIG_START(ngcd_state::neocd)
+	neogeo_base(config);
 
 	MCFG_CPU_MODIFY("maincpu")
 	MCFG_CPU_PROGRAM_MAP(neocd_main_map)

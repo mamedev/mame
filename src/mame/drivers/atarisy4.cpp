@@ -783,7 +783,8 @@ MACHINE_CONFIG_START(atarisy4_state::atarisy4)
 
 MACHINE_CONFIG_END
 
-MACHINE_CONFIG_DERIVED(atarisy4_state::airrace, atarisy4)
+MACHINE_CONFIG_START(atarisy4_state::airrace)
+	atarisy4(config);
 
 	MCFG_CPU_ADD("dsp1", TMS32010, 16000000)
 	MCFG_CPU_PROGRAM_MAP(dsp1_map)

@@ -415,7 +415,8 @@ MACHINE_CONFIG_START(isbc_state::rpc86)
 	//MCFG_ISBX_SLOT_MINTR1_CALLBACK(DEVWRITELINE("pic_0", pic8259_device, ir6_w))
 MACHINE_CONFIG_END
 
-MACHINE_CONFIG_DERIVED(isbc_state::isbc8605, rpc86)
+MACHINE_CONFIG_START(isbc_state::isbc8605)
+	rpc86(config);
 	MCFG_CPU_MODIFY("maincpu")
 	MCFG_CPU_IO_MAP(isbc8605_io)
 
@@ -424,7 +425,8 @@ MACHINE_CONFIG_DERIVED(isbc_state::isbc8605, rpc86)
 	MCFG_ISBC_208_IRQ(DEVWRITELINE("pic_0", pic8259_device, ir5_w))
 MACHINE_CONFIG_END
 
-MACHINE_CONFIG_DERIVED(isbc_state::isbc8630, rpc86)
+MACHINE_CONFIG_START(isbc_state::isbc8630)
+	rpc86(config);
 	MCFG_CPU_MODIFY("maincpu")
 	MCFG_CPU_IO_MAP(isbc8630_io)
 
@@ -537,7 +539,8 @@ MACHINE_CONFIG_START(isbc_state::isbc286)
 	MCFG_ISBC_215_IRQ(DEVWRITELINE("pic_0", pic8259_device, ir5_w))
 MACHINE_CONFIG_END
 
-MACHINE_CONFIG_DERIVED(isbc_state::isbc2861, isbc286)
+MACHINE_CONFIG_START(isbc_state::isbc2861)
+	isbc286(config);
 	MCFG_CPU_MODIFY("maincpu")
 	MCFG_CPU_PROGRAM_MAP(isbc2861_mem)
 MACHINE_CONFIG_END

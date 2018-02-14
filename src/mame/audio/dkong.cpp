@@ -1351,14 +1351,16 @@ MACHINE_CONFIG_START(dkong_state::dkong2b_audio)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 MACHINE_CONFIG_END
 
-MACHINE_CONFIG_DERIVED(dkong_state::radarscp_audio, dkong2b_audio)
+MACHINE_CONFIG_START(dkong_state::radarscp_audio)
+	dkong2b_audio(config);
 
 	MCFG_DISCRETE_REPLACE("discrete", 0, radarscp)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.7)
 MACHINE_CONFIG_END
 
 
-MACHINE_CONFIG_DERIVED(dkong_state::radarscp1_audio, radarscp_audio)
+MACHINE_CONFIG_START(dkong_state::radarscp1_audio)
+	radarscp_audio(config);
 
 	MCFG_CPU_MODIFY("soundcpu")
 	MCFG_CPU_IO_MAP(radarscp1_sound_io_map)

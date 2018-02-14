@@ -1023,15 +1023,17 @@ MACHINE_CONFIG_START(myb3k_state::myb3k)
 	MCFG_SCREEN_UPDATE_DEVICE("crtc", h46505_device, screen_update)
 MACHINE_CONFIG_END
 
-MACHINE_CONFIG_DERIVED(myb3k_state::jb3000, myb3k)
+MACHINE_CONFIG_START(myb3k_state::jb3000)
+	myb3k(config);
 	/* Keyboard */
 	MCFG_DEVICE_REPLACE("myb3k_keyboard", JB3000_KEYBOARD, 0)
 	MCFG_MYB3K_KEYBOARD_CB(PUT(myb3k_state, kbd_set_data_and_interrupt))
 
 MACHINE_CONFIG_END
 
-MACHINE_CONFIG_DERIVED(myb3k_state::stepone, myb3k)
-  /* Keyboard */
+MACHINE_CONFIG_START(myb3k_state::stepone)
+	myb3k(config);
+	/* Keyboard */
 	MCFG_DEVICE_REPLACE("myb3k_keyboard", STEPONE_KEYBOARD, 0)
 	MCFG_MYB3K_KEYBOARD_CB(PUT(myb3k_state, kbd_set_data_and_interrupt))
 

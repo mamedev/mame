@@ -622,7 +622,8 @@ MACHINE_CONFIG_END
 
 
 /* same as above but with additional Z80 for samples playback */
-MACHINE_CONFIG_DERIVED(tigeroad_state::toramich, tigeroad)
+MACHINE_CONFIG_START(tigeroad_state::toramich)
+	tigeroad(config);
 
 	/* basic machine hardware */
 
@@ -695,7 +696,8 @@ void pushman_state::machine_start()
 	save_item(NAME(m_mcu_latch_ctl));
 }
 
-MACHINE_CONFIG_DERIVED(pushman_state::pushman, f1dream_comad)
+MACHINE_CONFIG_START(pushman_state::pushman)
+	f1dream_comad(config);
 	MCFG_CPU_MODIFY("maincpu")
 	MCFG_CPU_PROGRAM_MAP(pushman_map)
 
@@ -706,7 +708,8 @@ MACHINE_CONFIG_DERIVED(pushman_state::pushman, f1dream_comad)
 MACHINE_CONFIG_END
 
 
-MACHINE_CONFIG_DERIVED(pushman_state::bballs, pushman)
+MACHINE_CONFIG_START(pushman_state::bballs)
+	pushman(config);
 	MCFG_CPU_MODIFY("maincpu")
 	MCFG_CPU_PROGRAM_MAP(bballs_map)
 MACHINE_CONFIG_END

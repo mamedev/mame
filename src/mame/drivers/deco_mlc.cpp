@@ -563,11 +563,13 @@ MACHINE_CONFIG_START(deco_mlc_state::mlc)
 	MCFG_SOUND_ROUTE(1, "rspeaker", 1.0)
 MACHINE_CONFIG_END
 
-MACHINE_CONFIG_DERIVED(deco_mlc_state::mlc_6bpp, mlc)
+MACHINE_CONFIG_START(deco_mlc_state::mlc_6bpp)
+	mlc(config);
 	MCFG_GFXDECODE_MODIFY("gfxdecode", 6bpp)
 MACHINE_CONFIG_END
 
-MACHINE_CONFIG_DERIVED(deco_mlc_state::mlc_5bpp, mlc)
+MACHINE_CONFIG_START(deco_mlc_state::mlc_5bpp)
+	mlc(config);
 	MCFG_GFXDECODE_MODIFY("gfxdecode", 5bpp)
 
 	// TODO: mono? ch.0 doesn't output any sound in-game

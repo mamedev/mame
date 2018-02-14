@@ -218,7 +218,8 @@ MACHINE_CONFIG_START(timeplt_audio_device::timeplt_sound)
 MACHINE_CONFIG_END
 
 
-MACHINE_CONFIG_DERIVED(timeplt_audio_device::locomotn_sound, timeplt_sound)
+MACHINE_CONFIG_START(timeplt_audio_device::locomotn_sound)
+	timeplt_sound(config);
 
 	/* basic machine hardware */
 	MCFG_CPU_MODIFY("tpsound")

@@ -997,7 +997,8 @@ MACHINE_CONFIG_START(cyclemb_state::cyclemb)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
 MACHINE_CONFIG_END
 
-MACHINE_CONFIG_DERIVED(cyclemb_state::skydest, cyclemb)
+MACHINE_CONFIG_START(cyclemb_state::skydest)
+	cyclemb(config);
 	MCFG_CPU_MODIFY("maincpu")
 	MCFG_CPU_IO_MAP(skydest_io)
 

@@ -239,7 +239,7 @@ MACHINE_CONFIG_START(victory_state::victory)
 
 
 	/* audio hardware */
-	MCFG_FRAGMENT_ADD(victory_audio)
+	victory_audio(config);
 
 MACHINE_CONFIG_END
 

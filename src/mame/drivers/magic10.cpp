@@ -719,7 +719,8 @@ MACHINE_CONFIG_START(magic10_state::magic10)
 MACHINE_CONFIG_END
 
 
-MACHINE_CONFIG_DERIVED(magic10_state::magic10a, magic10)
+MACHINE_CONFIG_START(magic10_state::magic10a)
+	magic10(config);
 
 	/* basic machine hardware */
 	MCFG_CPU_MODIFY("maincpu")
@@ -727,7 +728,8 @@ MACHINE_CONFIG_DERIVED(magic10_state::magic10a, magic10)
 MACHINE_CONFIG_END
 
 
-MACHINE_CONFIG_DERIVED(magic10_state::magic102, magic10)
+MACHINE_CONFIG_START(magic10_state::magic102)
+	magic10(config);
 
 	/* basic machine hardware */
 	MCFG_CPU_MODIFY("maincpu")
@@ -738,7 +740,8 @@ MACHINE_CONFIG_DERIVED(magic10_state::magic102, magic10)
 MACHINE_CONFIG_END
 
 
-MACHINE_CONFIG_DERIVED(magic10_state::hotslot, magic10)
+MACHINE_CONFIG_START(magic10_state::hotslot)
+	magic10(config);
 
 	/* basic machine hardware */
 	MCFG_CPU_MODIFY("maincpu")
@@ -749,7 +752,8 @@ MACHINE_CONFIG_DERIVED(magic10_state::hotslot, magic10)
 MACHINE_CONFIG_END
 
 
-MACHINE_CONFIG_DERIVED(magic10_state::sgsafari, magic10)
+MACHINE_CONFIG_START(magic10_state::sgsafari)
+	magic10(config);
 
 	/* basic machine hardware */
 	MCFG_CPU_MODIFY("maincpu")

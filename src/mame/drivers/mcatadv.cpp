@@ -473,7 +473,8 @@ MACHINE_CONFIG_START(mcatadv_state::mcatadv)
 	MCFG_SOUND_ROUTE(2, "rspeaker", 0.5)
 MACHINE_CONFIG_END
 
-MACHINE_CONFIG_DERIVED(mcatadv_state::nost, mcatadv)
+MACHINE_CONFIG_START(mcatadv_state::nost)
+	mcatadv(config);
 
 	MCFG_CPU_MODIFY("soundcpu")
 	MCFG_CPU_PROGRAM_MAP(nost_sound_map)

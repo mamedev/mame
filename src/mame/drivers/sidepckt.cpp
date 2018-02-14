@@ -403,7 +403,8 @@ MACHINE_CONFIG_START(sidepckt_state::sidepckt)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 MACHINE_CONFIG_END
 
-MACHINE_CONFIG_DERIVED(sidepckt_state::sidepcktb, sidepckt)
+MACHINE_CONFIG_START(sidepckt_state::sidepcktb)
+	sidepckt(config);
 
 	/* basic machine hardware */
 	MCFG_CPU_MODIFY("maincpu")

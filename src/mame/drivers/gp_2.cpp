@@ -587,7 +587,7 @@ MACHINE_CONFIG_START(gp_2_state::gp_2)
 	MCFG_DEFAULT_LAYOUT(layout_gp_2)
 
 	/* Sound */
-	MCFG_FRAGMENT_ADD( genpin_audio )
+	genpin_audio(config);
 
 	/* Devices */
 	MCFG_DEVICE_ADD("ppi", I8255A, 0 )

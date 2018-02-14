@@ -443,7 +443,8 @@ MACHINE_CONFIG_START(silvmil_state::silvmil)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
 MACHINE_CONFIG_END
 
-MACHINE_CONFIG_DERIVED(silvmil_state::puzzlove, silvmil)
+MACHINE_CONFIG_START(silvmil_state::puzzlove)
+	silvmil(config);
 	MCFG_DEVICE_REMOVE("audiocpu")
 	MCFG_CPU_ADD("audiocpu", Z80, XTAL(4'000'000)) /* Verified */
 	MCFG_CPU_PROGRAM_MAP(silvmil_sound_map)
@@ -456,11 +457,12 @@ MACHINE_CONFIG_DERIVED(silvmil_state::puzzlove, silvmil)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
 MACHINE_CONFIG_END
 
-MACHINE_CONFIG_DERIVED(silvmil_state::puzzlovek, puzzlove)
-		MCFG_DEVICE_REMOVE("ymsnd")
-		MCFG_YM2151_ADD("ymsnd", XTAL(15'000'000)/4) /* Verified */
-		MCFG_YM2151_IRQ_HANDLER(INPUTLINE("audiocpu", 0))
-		MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
+MACHINE_CONFIG_START(silvmil_state::puzzlovek)
+	puzzlove(config);
+	MCFG_DEVICE_REMOVE("ymsnd")
+	MCFG_YM2151_ADD("ymsnd", XTAL(15'000'000)/4) /* Verified */
+	MCFG_YM2151_IRQ_HANDLER(INPUTLINE("audiocpu", 0))
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
 MACHINE_CONFIG_END
 
 

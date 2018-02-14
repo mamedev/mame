@@ -1436,7 +1436,8 @@ MACHINE_CONFIG_START(ms32_state::ms32)
 
 MACHINE_CONFIG_END
 
-MACHINE_CONFIG_DERIVED(ms32_state::f1superb, ms32)
+MACHINE_CONFIG_START(ms32_state::f1superb)
+	ms32(config);
 	/* basic machine hardware */
 	MCFG_CPU_MODIFY("maincpu")
 	MCFG_CPU_PROGRAM_MAP(f1superb_map)

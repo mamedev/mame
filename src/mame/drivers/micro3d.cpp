@@ -388,7 +388,8 @@ MACHINE_CONFIG_START(micro3d_state::micro3d)
 	MCFG_SOUND_ROUTE(1, "rspeaker", 1.0)
 MACHINE_CONFIG_END
 
-MACHINE_CONFIG_DERIVED(micro3d_state::botss11, micro3d)
+MACHINE_CONFIG_START(micro3d_state::botss11)
+	micro3d(config);
 	MCFG_DEVICE_MODIFY("adc")
 	MCFG_ADC0844_CH1_CB(NOOP)
 MACHINE_CONFIG_END

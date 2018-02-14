@@ -272,7 +272,7 @@ MACHINE_CONFIG_START(zac_1_state::zac_1)
 	MCFG_DEFAULT_LAYOUT(layout_zac_1)
 
 	/* Sound */
-	MCFG_FRAGMENT_ADD( genpin_audio )
+	genpin_audio(config);
 MACHINE_CONFIG_END
 
 /*************************** LOCOMOTION ********************************/
@@ -299,7 +299,8 @@ READ8_MEMBER( zac_1_state::reset_int_r )
 	return 0;
 }
 
-MACHINE_CONFIG_DERIVED(zac_1_state::locomotp, zac_1)
+MACHINE_CONFIG_START(zac_1_state::locomotp)
+	zac_1(config);
 	/* basic machine hardware */
 	MCFG_CPU_MODIFY("maincpu")
 	MCFG_CPU_PROGRAM_MAP(locomotp_map)

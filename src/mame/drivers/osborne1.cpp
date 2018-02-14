@@ -338,7 +338,8 @@ MACHINE_CONFIG_START(osborne1_state::osborne1)
 	MCFG_SOFTWARE_LIST_ADD("flop_list","osborne1")
 MACHINE_CONFIG_END
 
-MACHINE_CONFIG_DERIVED(osborne1nv_state::osborne1nv, osborne1)
+MACHINE_CONFIG_START(osborne1nv_state::osborne1nv)
+	osborne1(config);
 	MCFG_CPU_MODIFY("maincpu")
 	MCFG_CPU_IO_MAP(osborne1nv_io)
 

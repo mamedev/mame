@@ -366,7 +366,8 @@ ADDRESS_MAP_START(hyperspt_state::hyprolyb_adpcm_map)
 ADDRESS_MAP_END
 
 
-MACHINE_CONFIG_DERIVED(hyperspt_state::hypersptb, hyperspt)
+MACHINE_CONFIG_START(hyperspt_state::hypersptb)
+	hyperspt(config);
 	MCFG_DEVICE_REMOVE("vlm")
 
 	MCFG_CPU_MODIFY("audiocpu")
@@ -386,7 +387,8 @@ MACHINE_CONFIG_DERIVED(hyperspt_state::hypersptb, hyperspt)
 MACHINE_CONFIG_END
 
 
-MACHINE_CONFIG_DERIVED(hyperspt_state::roadf, hyperspt)
+MACHINE_CONFIG_START(hyperspt_state::roadf)
+	hyperspt(config);
 
 	MCFG_CPU_MODIFY("maincpu")
 	MCFG_CPU_PROGRAM_MAP(roadf_map)

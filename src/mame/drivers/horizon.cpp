@@ -220,7 +220,8 @@ MACHINE_CONFIG_START(horizon_state::horizon)
 	MCFG_SOFTWARE_LIST_ADD("flop_list", "horizon")
 MACHINE_CONFIG_END
 
-MACHINE_CONFIG_DERIVED(horizon_state::horizon2mhz, horizon)
+MACHINE_CONFIG_START(horizon_state::horizon2mhz)
+	horizon(config);
 	MCFG_CPU_MODIFY("z80")
 	MCFG_CPU_CLOCK(XTAL(4'000'000) / 2)
 

@@ -1573,7 +1573,7 @@ MACHINE_CONFIG_START(dooyong_z80_ym2203_state::gulfstrm)
 	MCFG_VIDEO_START_OVERRIDE(dooyong_z80_ym2203_state, gulfstrm)
 
 	/* sound hardware */
-	MCFG_FRAGMENT_ADD( sound_2203 ) /* 3.579545MHz */
+	sound_2203(config); /* 3.579545MHz */
 MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(dooyong_z80_ym2203_state::pollux)
@@ -1612,7 +1612,7 @@ MACHINE_CONFIG_START(dooyong_z80_ym2203_state::pollux)
 	MCFG_VIDEO_START_OVERRIDE(dooyong_z80_ym2203_state, pollux)
 
 	/* sound hardware */
-	MCFG_FRAGMENT_ADD( sound_2203 ) /* 3.579545MHz or 4Mhz ??? */
+	sound_2203(config); /* 3.579545MHz or 4Mhz ??? */
 MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(dooyong_z80_state::bluehawk)
@@ -1652,7 +1652,7 @@ MACHINE_CONFIG_START(dooyong_z80_state::bluehawk)
 	MCFG_VIDEO_START_OVERRIDE(dooyong_z80_state, bluehawk)
 
 	/* sound hardware */
-	MCFG_FRAGMENT_ADD( sound_2151 ) /* 3.579545MHz or 4Mhz ??? */
+	sound_2151(config); /* 3.579545MHz or 4Mhz ??? */
 MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(dooyong_z80_state::flytiger)
@@ -1691,7 +1691,7 @@ MACHINE_CONFIG_START(dooyong_z80_state::flytiger)
 	MCFG_VIDEO_START_OVERRIDE(dooyong_z80_state, flytiger)
 
 	/* sound hardware */
-	MCFG_FRAGMENT_ADD( sound_2151 )
+	sound_2151(config);
 MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(dooyong_z80_state::primella)
@@ -1728,7 +1728,7 @@ MACHINE_CONFIG_START(dooyong_z80_state::primella)
 	MCFG_VIDEO_START_OVERRIDE(dooyong_z80_state, primella)
 
 	/* sound hardware */
-	MCFG_FRAGMENT_ADD( sound_2151_4mhz ) /* PCB has only 1 OSC at 16Mhz */
+	sound_2151_4mhz(config); /* PCB has only 1 OSC at 16Mhz */
 MACHINE_CONFIG_END
 
 
@@ -1780,15 +1780,17 @@ MACHINE_CONFIG_START(rshark_state::dooyong_68k)
 	MCFG_VIDEO_START_OVERRIDE(rshark_state, rshark)
 
 	// sound hardware
-	MCFG_FRAGMENT_ADD(sound_2151_4mhz)
+	sound_2151_4mhz(config);
 MACHINE_CONFIG_END
 
-MACHINE_CONFIG_DERIVED(rshark_state::rshark, dooyong_68k)
+MACHINE_CONFIG_START(rshark_state::rshark)
+	dooyong_68k(config);
 	MCFG_CPU_MODIFY("maincpu")
 	MCFG_CPU_PROGRAM_MAP(rshark_map)
 MACHINE_CONFIG_END
 
-MACHINE_CONFIG_DERIVED(rshark_state::superx, dooyong_68k)
+MACHINE_CONFIG_START(rshark_state::superx)
+	dooyong_68k(config);
 	MCFG_CPU_MODIFY("maincpu")
 	MCFG_CPU_PROGRAM_MAP(superx_map)
 MACHINE_CONFIG_END
@@ -1827,7 +1829,7 @@ MACHINE_CONFIG_START(popbingo_state::popbingo)
 	MCFG_VIDEO_START_OVERRIDE(popbingo_state, popbingo)
 
 	// sound hardware
-	MCFG_FRAGMENT_ADD(sound_2151_4mhz)
+	sound_2151_4mhz(config);
 MACHINE_CONFIG_END
 
 } // anonymous namespace

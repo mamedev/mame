@@ -259,13 +259,15 @@ MACHINE_CONFIG_START(gumbo_state::gumbo)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", 0.47)
 MACHINE_CONFIG_END
 
-MACHINE_CONFIG_DERIVED(gumbo_state::mspuzzle, gumbo)
+MACHINE_CONFIG_START(gumbo_state::mspuzzle)
+	gumbo(config);
 
 	MCFG_CPU_MODIFY("maincpu")
 	MCFG_CPU_PROGRAM_MAP(mspuzzle_map)
 MACHINE_CONFIG_END
 
-MACHINE_CONFIG_DERIVED(gumbo_state::dblpoint, gumbo)
+MACHINE_CONFIG_START(gumbo_state::dblpoint)
+	gumbo(config);
 
 	MCFG_CPU_MODIFY("maincpu")
 	MCFG_CPU_PROGRAM_MAP(dblpoint_map)

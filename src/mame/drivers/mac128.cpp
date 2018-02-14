@@ -1381,7 +1381,8 @@ MACHINE_CONFIG_START(mac128_state::mac512ke)
 	MCFG_SOFTWARE_LIST_ADD("hdd_list", "mac_hdd")
 MACHINE_CONFIG_END
 
-MACHINE_CONFIG_DERIVED(mac128_state::mac128k, mac512ke)
+MACHINE_CONFIG_START(mac128_state::mac128k)
+	mac512ke(config);
 
 	/* internal ram */
 	MCFG_RAM_MODIFY(RAM_TAG)
@@ -1389,7 +1390,8 @@ MACHINE_CONFIG_DERIVED(mac128_state::mac128k, mac512ke)
 MACHINE_CONFIG_END
 
 
-MACHINE_CONFIG_DERIVED(mac128_state::macplus, mac512ke)
+MACHINE_CONFIG_START(mac128_state::macplus)
+	mac512ke(config);
 	MCFG_CPU_MODIFY( "maincpu" )
 	MCFG_CPU_PROGRAM_MAP(macplus_map)
 

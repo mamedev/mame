@@ -514,7 +514,8 @@ MACHINE_CONFIG_START(rmhaihai_state::rmhaihai)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 MACHINE_CONFIG_END
 
-MACHINE_CONFIG_DERIVED(rmhaihai_state::rmhaisei, rmhaihai)
+MACHINE_CONFIG_START(rmhaihai_state::rmhaisei)
+	rmhaihai(config);
 
 	/* basic machine hardware */
 
@@ -524,7 +525,8 @@ MACHINE_CONFIG_DERIVED(rmhaihai_state::rmhaisei, rmhaihai)
 	MCFG_PALETTE_ENTRIES(0x200)
 MACHINE_CONFIG_END
 
-MACHINE_CONFIG_DERIVED(rmhaihai_state::themj, rmhaihai)
+MACHINE_CONFIG_START(rmhaihai_state::themj)
+	rmhaihai(config);
 
 	/* basic machine hardware */
 

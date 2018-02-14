@@ -1303,7 +1303,8 @@ MACHINE_CONFIG_START(videopkr_state::videopkr)
 MACHINE_CONFIG_END
 
 
-MACHINE_CONFIG_DERIVED(videopkr_state::blckjack, videopkr)
+MACHINE_CONFIG_START(videopkr_state::blckjack)
+	videopkr(config);
 
 	/* basic machine hardware */
 
@@ -1314,7 +1315,8 @@ MACHINE_CONFIG_DERIVED(videopkr_state::blckjack, videopkr)
 MACHINE_CONFIG_END
 
 
-MACHINE_CONFIG_DERIVED(videopkr_state::videodad, videopkr)
+MACHINE_CONFIG_START(videopkr_state::videodad)
+	videopkr(config);
 
 	/* basic machine hardware */
 	MCFG_CPU_MODIFY("maincpu")
@@ -1330,7 +1332,8 @@ MACHINE_CONFIG_DERIVED(videopkr_state::videodad, videopkr)
 MACHINE_CONFIG_END
 
 
-MACHINE_CONFIG_DERIVED(videopkr_state::babypkr, videopkr)
+MACHINE_CONFIG_START(videopkr_state::babypkr)
+	videopkr(config);
 
 	/* basic machine hardware */
 	MCFG_CPU_MODIFY("maincpu")
@@ -1354,7 +1357,8 @@ MACHINE_CONFIG_DERIVED(videopkr_state::babypkr, videopkr)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 0.3)
 MACHINE_CONFIG_END
 
-MACHINE_CONFIG_DERIVED(videopkr_state::fortune1, videopkr)
+MACHINE_CONFIG_START(videopkr_state::fortune1)
+	videopkr(config);
 
 	/* basic machine hardware */
 	MCFG_CPU_MODIFY("maincpu")
@@ -1364,7 +1368,8 @@ MACHINE_CONFIG_DERIVED(videopkr_state::fortune1, videopkr)
 	MCFG_PALETTE_INIT_OWNER(videopkr_state,fortune1)
 MACHINE_CONFIG_END
 
-MACHINE_CONFIG_DERIVED(videopkr_state::bpoker, babypkr)
+MACHINE_CONFIG_START(videopkr_state::bpoker)
+	babypkr(config);
 	MCFG_CPU_REPLACE("maincpu", I8751, XTAL(6'000'000))
 	MCFG_CPU_PROGRAM_MAP(i8751_map)
 	MCFG_CPU_IO_MAP(i8751_io_port)

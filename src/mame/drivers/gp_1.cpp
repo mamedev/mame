@@ -438,7 +438,7 @@ MACHINE_CONFIG_START(gp_1_state::gp_1)
 	MCFG_DEFAULT_LAYOUT(layout_gp_1)
 
 	/* Sound */
-	MCFG_FRAGMENT_ADD( genpin_audio )
+	genpin_audio(config);
 
 	/* Devices */
 	MCFG_DEVICE_ADD("ppi", I8255A, 0 )
@@ -451,7 +451,8 @@ MACHINE_CONFIG_START(gp_1_state::gp_1)
 	MCFG_TIMER_DRIVER_ADD_PERIODIC("gp1", gp_1_state, zero_timer, attotime::from_hz(120)) // mains freq*2
 MACHINE_CONFIG_END
 
-MACHINE_CONFIG_DERIVED(gp_1_state::gp_1s, gp_1)
+MACHINE_CONFIG_START(gp_1_state::gp_1s)
+	gp_1(config);
 	MCFG_SPEAKER_STANDARD_MONO("mono")
 	MCFG_SOUND_ADD("snsnd", SN76477, 0)
 	MCFG_SN76477_NOISE_PARAMS(0, 0, 0)                // noise + filter: N/C

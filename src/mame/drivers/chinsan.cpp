@@ -544,7 +544,8 @@ MACHINE_CONFIG_START(chinsan_state::chinsan)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
 MACHINE_CONFIG_END
 
-MACHINE_CONFIG_DERIVED(chinsan_state::mayumi, chinsan)
+MACHINE_CONFIG_START(chinsan_state::mayumi)
+	chinsan(config);
 	// standard Z80 instead of MC-8123
 	MCFG_DEVICE_REMOVE("maincpu")
 	MCFG_CPU_ADD("maincpu", Z80, XTAL(10'000'000)/2)

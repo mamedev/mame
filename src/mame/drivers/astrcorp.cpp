@@ -538,7 +538,8 @@ MACHINE_CONFIG_START(astrocorp_state::showhand)
 MACHINE_CONFIG_END
 
 
-MACHINE_CONFIG_DERIVED(astrocorp_state::showhanc, showhand)
+MACHINE_CONFIG_START(astrocorp_state::showhanc)
+	showhand(config);
 	MCFG_CPU_MODIFY("maincpu")
 	MCFG_CPU_PROGRAM_MAP(showhanc_map)
 MACHINE_CONFIG_END
@@ -592,7 +593,8 @@ MACHINE_CONFIG_START(astrocorp_state::skilldrp)
 MACHINE_CONFIG_END
 
 
-MACHINE_CONFIG_DERIVED(astrocorp_state::speeddrp, skilldrp)
+MACHINE_CONFIG_START(astrocorp_state::speeddrp)
+	skilldrp(config);
 	MCFG_CPU_MODIFY("maincpu")
 	MCFG_CPU_PROGRAM_MAP(speeddrp_map)
 MACHINE_CONFIG_END

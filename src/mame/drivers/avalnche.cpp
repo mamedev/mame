@@ -255,19 +255,21 @@ MACHINE_CONFIG_START(avalnche_state::avalnche_base)
 	MCFG_SCREEN_UPDATE_DRIVER(avalnche_state, screen_update_avalnche)
 MACHINE_CONFIG_END
 
-MACHINE_CONFIG_DERIVED(avalnche_state::avalnche, avalnche_base)
+MACHINE_CONFIG_START(avalnche_state::avalnche)
+	avalnche_base(config);
 	/* sound hardware */
-	MCFG_FRAGMENT_ADD(avalnche_sound)
+	avalnche_sound(config);
 MACHINE_CONFIG_END
 
-MACHINE_CONFIG_DERIVED(avalnche_state::acatch, avalnche_base)
+MACHINE_CONFIG_START(avalnche_state::acatch)
+	avalnche_base(config);
 
 	/* basic machine hardware */
 	MCFG_CPU_MODIFY("maincpu")
 	MCFG_CPU_PROGRAM_MAP(catch_map)
 
 	/* sound hardware... */
-	MCFG_FRAGMENT_ADD(acatch_sound)
+	acatch_sound(config);
 MACHINE_CONFIG_END
 
 

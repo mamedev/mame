@@ -245,7 +245,7 @@ MACHINE_CONFIG_START(zac_proto_state::zac_proto)
 	MCFG_DEFAULT_LAYOUT(layout_zac_proto)
 
 	/* Sound */
-	MCFG_FRAGMENT_ADD( genpin_audio )
+	genpin_audio(config);
 MACHINE_CONFIG_END
 
 /*--------------------------------

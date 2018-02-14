@@ -2258,8 +2258,9 @@ MACHINE_CONFIG_START(bfm_sc2_state::scorpion2_vid)
 MACHINE_CONFIG_END
 
 /* machine driver for scorpion2_vid board with meters (i.e. quintoon uk). Are we really sure the other games don't?*/
-MACHINE_CONFIG_DERIVED(bfm_sc2_state::scorpion2_vidm, scorpion2_vid)
-	MCFG_FRAGMENT_ADD(_8meters)
+MACHINE_CONFIG_START(bfm_sc2_state::scorpion2_vidm)
+	scorpion2_vid(config);
+	_8meters(config);
 MACHINE_CONFIG_END
 
 
@@ -3741,23 +3742,25 @@ MACHINE_CONFIG_START(bfm_sc2_state::scorpion2)
 	MCFG_STARPOINT_48STEP_ADD("reel5")
 	MCFG_STEPPER_OPTIC_CALLBACK(WRITELINE(bfm_sc2_state, reel5_optic_cb))
 
-	MCFG_FRAGMENT_ADD(_8meters)
+	_8meters(config);
 MACHINE_CONFIG_END
 
 #if 0
-static MACHINE_CONFIG_DERIVED( scorpion2_3m, scorpion2 )
+static MACHINE_CONFIG_START( scorpion2_3m )
+static 	scorpion2(config);
 	MCFG_DEVICE_REMOVE("meters")
-	MCFG_FRAGMENT_ADD(_3meters)
+	_3meters(config);
 MACHINE_CONFIG_END
 #endif
 
 /* machine driver for scorpion3 board */
-MACHINE_CONFIG_DERIVED(bfm_sc2_state::scorpion3, scorpion2)
+MACHINE_CONFIG_START(bfm_sc2_state::scorpion3)
+	scorpion2(config);
 	MCFG_CPU_MODIFY("maincpu")
 	MCFG_CPU_PROGRAM_MAP(memmap_no_vid)
 
 	MCFG_DEVICE_REMOVE("meters")
-	MCFG_FRAGMENT_ADD(_5meters)
+	_5meters(config);
 MACHINE_CONFIG_END
 
 
@@ -3801,17 +3804,19 @@ MACHINE_CONFIG_START(bfm_sc2_state::scorpion2_dm01)
 	MCFG_STARPOINT_48STEP_ADD("reel5")
 	MCFG_STEPPER_OPTIC_CALLBACK(WRITELINE(bfm_sc2_state, reel5_optic_cb))
 
-	MCFG_FRAGMENT_ADD( _8meters)
+	_8meters(config);
 MACHINE_CONFIG_END
 
-MACHINE_CONFIG_DERIVED(bfm_sc2_state::scorpion2_dm01_3m, scorpion2_dm01)
+MACHINE_CONFIG_START(bfm_sc2_state::scorpion2_dm01_3m)
+	scorpion2_dm01(config);
 	MCFG_DEVICE_REMOVE("meters")
-	MCFG_FRAGMENT_ADD( _3meters)
+	_3meters(config);
 MACHINE_CONFIG_END
 
-MACHINE_CONFIG_DERIVED(bfm_sc2_state::scorpion2_dm01_5m, scorpion2_dm01)
+MACHINE_CONFIG_START(bfm_sc2_state::scorpion2_dm01_5m)
+	scorpion2_dm01(config);
 	MCFG_DEVICE_REMOVE("meters")
-	MCFG_FRAGMENT_ADD( _5meters)
+	_5meters(config);
 MACHINE_CONFIG_END
 
 void bfm_sc2_state::sc2awp_common_init(int reels, int decrypt)

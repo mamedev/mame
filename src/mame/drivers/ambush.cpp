@@ -725,7 +725,8 @@ MACHINE_CONFIG_START(ambush_state::ambush)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.33)
 MACHINE_CONFIG_END
 
-MACHINE_CONFIG_DERIVED(ambush_state::mariobl, ambush)
+MACHINE_CONFIG_START(ambush_state::mariobl)
+	ambush(config);
 	MCFG_CPU_MODIFY("maincpu")
 	MCFG_CPU_PROGRAM_MAP(bootleg_map)
 
@@ -755,7 +756,8 @@ MACHINE_CONFIG_DERIVED(ambush_state::mariobl, ambush)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.33)
 MACHINE_CONFIG_END
 
-MACHINE_CONFIG_DERIVED(ambush_state::dkong3abl, mariobl)
+MACHINE_CONFIG_START(ambush_state::dkong3abl)
+	mariobl(config);
 	MCFG_MACHINE_START_OVERRIDE(ambush_state, dkong3abl)
 
 	MCFG_GFXDECODE_MODIFY("gfxdecode", dkong3abl)

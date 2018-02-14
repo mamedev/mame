@@ -551,14 +551,16 @@ MACHINE_CONFIG_START(kyugo_state::kyugo_base)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.30)
 MACHINE_CONFIG_END
 
-MACHINE_CONFIG_DERIVED(kyugo_state::gyrodine, kyugo_base)
+MACHINE_CONFIG_START(kyugo_state::gyrodine)
+	kyugo_base(config);
 	/* add watchdog */
 	MCFG_WATCHDOG_ADD("watchdog")
 	MCFG_CPU_MODIFY("maincpu")
 	MCFG_CPU_PROGRAM_MAP(gyrodine_main_map)
 MACHINE_CONFIG_END
 
-MACHINE_CONFIG_DERIVED(kyugo_state::repulse, kyugo_base)
+MACHINE_CONFIG_START(kyugo_state::repulse)
+	kyugo_base(config);
 
 	/* basic machine hardware */
 	MCFG_CPU_MODIFY("sub")
@@ -566,7 +568,8 @@ MACHINE_CONFIG_DERIVED(kyugo_state::repulse, kyugo_base)
 	MCFG_CPU_IO_MAP(repulse_sub_portmap)
 MACHINE_CONFIG_END
 
-MACHINE_CONFIG_DERIVED(kyugo_state::srdmissn, kyugo_base)
+MACHINE_CONFIG_START(kyugo_state::srdmissn)
+	kyugo_base(config);
 
 	/* basic machine hardware */
 	MCFG_CPU_MODIFY("sub")
@@ -574,7 +577,8 @@ MACHINE_CONFIG_DERIVED(kyugo_state::srdmissn, kyugo_base)
 	MCFG_CPU_IO_MAP(srdmissn_sub_portmap)
 MACHINE_CONFIG_END
 
-MACHINE_CONFIG_DERIVED(kyugo_state::flashgala, kyugo_base)
+MACHINE_CONFIG_START(kyugo_state::flashgala)
+	kyugo_base(config);
 
 	/* basic machine hardware */
 	MCFG_CPU_MODIFY("sub")
@@ -582,7 +586,8 @@ MACHINE_CONFIG_DERIVED(kyugo_state::flashgala, kyugo_base)
 	MCFG_CPU_IO_MAP(flashgala_sub_portmap)
 MACHINE_CONFIG_END
 
-MACHINE_CONFIG_DERIVED(kyugo_state::legend, kyugo_base)
+MACHINE_CONFIG_START(kyugo_state::legend)
+	kyugo_base(config);
 
 	/* basic machine hardware */
 	MCFG_CPU_MODIFY("sub")

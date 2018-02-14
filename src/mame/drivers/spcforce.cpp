@@ -331,7 +331,8 @@ MACHINE_CONFIG_START(spcforce_state::spcforce)
 	MCFG_SN76496_READY_HANDLER(WRITELINE(spcforce_state, write_sn3_ready))
 MACHINE_CONFIG_END
 
-MACHINE_CONFIG_DERIVED(spcforce_state::meteors, spcforce)
+MACHINE_CONFIG_START(spcforce_state::meteors)
+	spcforce(config);
 	MCFG_DEVICE_MODIFY("mainlatch")
 	MCFG_ADDRESSABLE_LATCH_Q3_OUT_CB(NOOP)
 	MCFG_ADDRESSABLE_LATCH_Q5_OUT_CB(WRITELINE(spcforce_state, irq_mask_w)) // ??

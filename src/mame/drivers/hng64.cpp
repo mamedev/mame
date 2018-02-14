@@ -1553,8 +1553,8 @@ MACHINE_CONFIG_START(hng64_state::hng64)
 	MCFG_PALETTE_ADD("palette", 0x1000)
 	MCFG_PALETTE_FORMAT(XRGB)
 
-	MCFG_FRAGMENT_ADD( hng64_audio )
-	MCFG_FRAGMENT_ADD( hng64_network )
+	hng64_audio(config);
+	hng64_network(config);
 
 	MCFG_CPU_ADD("iomcu", TMP87PH40AN, 8000000)
 	MCFG_DEVICE_DISABLE() // work in progress

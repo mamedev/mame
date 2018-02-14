@@ -1969,7 +1969,8 @@ MACHINE_CONFIG_START(cischeat_state::bigrun)
 MACHINE_CONFIG_END
 
 
-MACHINE_CONFIG_DERIVED(cischeat_state::cischeat, bigrun)
+MACHINE_CONFIG_START(cischeat_state::cischeat)
+	bigrun(config);
 
 	/* basic machine hardware */
 	MCFG_CPU_MODIFY("cpu1")
@@ -2006,7 +2007,8 @@ MACHINE_CONFIG_DERIVED(cischeat_state::cischeat, bigrun)
 MACHINE_CONFIG_END
 
 
-MACHINE_CONFIG_DERIVED(cischeat_state::f1gpstar, bigrun)
+MACHINE_CONFIG_START(cischeat_state::f1gpstar)
+	bigrun(config);
 
 	/* basic machine hardware */
 	MCFG_CPU_MODIFY("cpu1")
@@ -2042,7 +2044,8 @@ MACHINE_CONFIG_DERIVED(cischeat_state::f1gpstar, bigrun)
 MACHINE_CONFIG_END
 
 
-MACHINE_CONFIG_DERIVED(cischeat_state::f1gpstr2, f1gpstar)
+MACHINE_CONFIG_START(cischeat_state::f1gpstr2)
+	f1gpstar(config);
 
 	/* basic machine hardware */
 
@@ -2059,7 +2062,8 @@ MACHINE_CONFIG_DERIVED(cischeat_state::f1gpstr2, f1gpstar)
 MACHINE_CONFIG_END
 
 
-MACHINE_CONFIG_DERIVED(cischeat_state::wildplt, f1gpstr2)
+MACHINE_CONFIG_START(cischeat_state::wildplt)
+	f1gpstr2(config);
 	MCFG_CPU_MODIFY("cpu1")
 	MCFG_CPU_PROGRAM_MAP(wildplt_map)
 MACHINE_CONFIG_END
@@ -2142,7 +2146,8 @@ TIMER_DEVICE_CALLBACK_MEMBER(cischeat_state::armchamp2_scanline)
 		m_maincpu->set_input_line(4, HOLD_LINE);
 }
 
-MACHINE_CONFIG_DERIVED(cischeat_state::armchmp2, scudhamm)
+MACHINE_CONFIG_START(cischeat_state::armchmp2)
+	scudhamm(config);
 
 	/* basic machine hardware */
 	MCFG_CPU_MODIFY("maincpu")

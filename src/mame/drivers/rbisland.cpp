@@ -723,7 +723,8 @@ MACHINE_CONFIG_START(rbisland_state::jumping)
 MACHINE_CONFIG_END
 
 /* Imnoe PCB uses 16MHz CPU crystal instead of 18.432 for CPU */
-MACHINE_CONFIG_DERIVED(rbisland_state::jumpingi, jumping)
+MACHINE_CONFIG_START(rbisland_state::jumpingi)
+	jumping(config);
 	MCFG_CPU_REPLACE("maincpu", M68000, XTAL(16'000'000)/2)  /* verified on pcb */
 	MCFG_CPU_PROGRAM_MAP(jumping_map)
 	MCFG_CPU_VBLANK_INT_DRIVER("screen", rbisland_state,  irq4_line_hold)

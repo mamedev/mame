@@ -471,7 +471,8 @@ MACHINE_CONFIG_START(quizdna_state::quizdna)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.30)
 MACHINE_CONFIG_END
 
-MACHINE_CONFIG_DERIVED(quizdna_state::gakupara, quizdna)
+MACHINE_CONFIG_START(quizdna_state::gakupara)
+	quizdna(config);
 
 	/* basic machine hardware */
 
@@ -480,7 +481,8 @@ MACHINE_CONFIG_DERIVED(quizdna_state::gakupara, quizdna)
 
 MACHINE_CONFIG_END
 
-MACHINE_CONFIG_DERIVED(quizdna_state::gekiretu, quizdna)
+MACHINE_CONFIG_START(quizdna_state::gekiretu)
+	quizdna(config);
 
 	/* basic machine hardware */
 

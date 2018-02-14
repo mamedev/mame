@@ -1407,7 +1407,8 @@ MACHINE_CONFIG_START(nes_vt_state::nes_vt)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
 MACHINE_CONFIG_END
 
-MACHINE_CONFIG_DERIVED(nes_vt_state::nes_vt_hum, nes_vt)
+MACHINE_CONFIG_START(nes_vt_state::nes_vt_hum)
+	nes_vt(config);
 	MCFG_CPU_MODIFY("maincpu")
 	MCFG_CPU_PROGRAM_MAP(nes_vt_hum_map)
 	
@@ -1415,7 +1416,8 @@ MACHINE_CONFIG_DERIVED(nes_vt_state::nes_vt_hum, nes_vt)
 	MCFG_PPU_VT03_SET_DESCRAMBLE(descram_ppu_2012_2017[3]);
 MACHINE_CONFIG_END
 
-MACHINE_CONFIG_DERIVED(nes_vt_state::nes_vt_pjoy, nes_vt)
+MACHINE_CONFIG_START(nes_vt_state::nes_vt_pjoy)
+	nes_vt(config);
 	MCFG_CPU_MODIFY("maincpu")
 	MCFG_CPU_PROGRAM_MAP(nes_vt_pjoy_map)
 	
@@ -1424,7 +1426,8 @@ MACHINE_CONFIG_DERIVED(nes_vt_state::nes_vt_pjoy, nes_vt)
 MACHINE_CONFIG_END
 
 
-MACHINE_CONFIG_DERIVED(nes_vt_state::nes_vt_sp69, nes_vt)
+MACHINE_CONFIG_START(nes_vt_state::nes_vt_sp69)
+	nes_vt(config);
 	MCFG_CPU_MODIFY("maincpu")
 	MCFG_CPU_PROGRAM_MAP(nes_vt_sp69_map)
 	
@@ -1433,22 +1436,26 @@ MACHINE_CONFIG_DERIVED(nes_vt_state::nes_vt_sp69, nes_vt)
 MACHINE_CONFIG_END
 
 
-MACHINE_CONFIG_DERIVED(nes_vt_state::nes_vt_xx, nes_vt)
+MACHINE_CONFIG_START(nes_vt_state::nes_vt_xx)
+	nes_vt(config);
 	MCFG_CPU_MODIFY("maincpu")
 	MCFG_CPU_PROGRAM_MAP(nes_vt_xx_map)
 MACHINE_CONFIG_END
 
-MACHINE_CONFIG_DERIVED(nes_vt_state::nes_vt_cy, nes_vt_xx)
+MACHINE_CONFIG_START(nes_vt_state::nes_vt_cy)
+	nes_vt_xx(config);
 	MCFG_CPU_MODIFY("maincpu")
 	MCFG_CPU_PROGRAM_MAP(nes_vt_cy_map)
 MACHINE_CONFIG_END
 
-MACHINE_CONFIG_DERIVED(nes_vt_state::nes_vt_bt, nes_vt_xx)
+MACHINE_CONFIG_START(nes_vt_state::nes_vt_bt)
+	nes_vt_xx(config);
 	MCFG_CPU_MODIFY("maincpu")
 	MCFG_CPU_PROGRAM_MAP(nes_vt_bt_map)
 MACHINE_CONFIG_END
 
-MACHINE_CONFIG_DERIVED(nes_vt_state::nes_vt_dg, nes_vt_xx)
+MACHINE_CONFIG_START(nes_vt_state::nes_vt_dg)
+	nes_vt_xx(config);
 	MCFG_CPU_MODIFY("maincpu")
 	MCFG_CPU_PROGRAM_MAP(nes_vt_dg_map)
 
@@ -1459,7 +1466,8 @@ MACHINE_CONFIG_DERIVED(nes_vt_state::nes_vt_dg, nes_vt_xx)
 	MCFG_SCREEN_VISIBLE_AREA(0*8, 32*8-1, 0*8, 30*8-1)
 MACHINE_CONFIG_END
 
-MACHINE_CONFIG_DERIVED(nes_vt_state::nes_vt_vg, nes_vt_dg )
+MACHINE_CONFIG_START(nes_vt_state::nes_vt_vg )
+	nes_vt_dg(config);
 
 	MCFG_CPU_MODIFY("maincpu")
 	MCFG_CPU_PROGRAM_MAP(nes_vt_hh_map)
@@ -1470,7 +1478,8 @@ MACHINE_CONFIG_DERIVED(nes_vt_state::nes_vt_vg, nes_vt_dg )
 MACHINE_CONFIG_END
 
 // New mystery handheld architecture, VTxx derived
-MACHINE_CONFIG_DERIVED(nes_vt_state::nes_vt_hh, nes_vt_xx)
+MACHINE_CONFIG_START(nes_vt_state::nes_vt_hh)
+	nes_vt_xx(config);
 	MCFG_CPU_MODIFY("maincpu")
 	MCFG_CPU_PROGRAM_MAP(nes_vt_hh_map)
 	MCFG_PPU_VT03_MODIFY("ppu")
@@ -1488,18 +1497,19 @@ static INPUT_PORTS_START( nes_vt )
 PORT_START("CARTSEL")
 INPUT_PORTS_END
 
-MACHINE_CONFIG_DERIVED(nes_vt_state::nes_vt_fp, nes_vt_xx)
-MCFG_CPU_MODIFY("maincpu")
-MCFG_CPU_PROGRAM_MAP(nes_vt_fp_map)
+MACHINE_CONFIG_START(nes_vt_state::nes_vt_fp)
+	nes_vt_xx(config);
+	MCFG_CPU_MODIFY("maincpu")
+	MCFG_CPU_PROGRAM_MAP(nes_vt_fp_map)
 
-MCFG_PPU_VT03_MODIFY("ppu")
-MCFG_PPU_VT03_SET_PAL_MODE(PAL_MODE_NEW_RGB12);
+	MCFG_PPU_VT03_MODIFY("ppu")
+	MCFG_PPU_VT03_SET_PAL_MODE(PAL_MODE_NEW_RGB12);
 MACHINE_CONFIG_END
 
-MACHINE_CONFIG_DERIVED(nes_vt_state::nes_vt_fa, nes_vt_xx)
-MCFG_CPU_MODIFY("maincpu")
-MCFG_CPU_PROGRAM_MAP(nes_vt_fa_map)
-
+MACHINE_CONFIG_START(nes_vt_state::nes_vt_fa)
+	nes_vt_xx(config);
+	MCFG_CPU_MODIFY("maincpu")
+	MCFG_CPU_PROGRAM_MAP(nes_vt_fa_map)
 MACHINE_CONFIG_END
 
 

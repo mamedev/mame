@@ -589,12 +589,14 @@ MACHINE_CONFIG_START(eolith_state::eolith45)
 	MCFG_SOUND_ROUTE(1, "rspeaker", 1.0)
 MACHINE_CONFIG_END
 
-MACHINE_CONFIG_DERIVED(eolith_state::eolith50, eolith45)
+MACHINE_CONFIG_START(eolith_state::eolith50)
+	eolith45(config);
 	MCFG_CPU_MODIFY("maincpu")
 	MCFG_CPU_CLOCK(50000000)         /* 50 MHz */
 MACHINE_CONFIG_END
 
-MACHINE_CONFIG_DERIVED(eolith_state::ironfort, eolith45)
+MACHINE_CONFIG_START(eolith_state::ironfort)
+	eolith45(config);
 	MCFG_CPU_MODIFY("maincpu")
 	MCFG_CPU_CLOCK(44900000) /* Normally 45MHz??? but PCB actually had a 44.9MHz OSC, so it's value is used */
 MACHINE_CONFIG_END

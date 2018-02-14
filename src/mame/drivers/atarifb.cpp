@@ -581,7 +581,8 @@ MACHINE_CONFIG_START(atarifb_state::atarifb)
 MACHINE_CONFIG_END
 
 
-MACHINE_CONFIG_DERIVED(atarifb_state::atarifb4, atarifb)
+MACHINE_CONFIG_START(atarifb_state::atarifb4)
+	atarifb(config);
 
 	/* basic machine hardware */
 	MCFG_CPU_MODIFY("maincpu")
@@ -589,7 +590,8 @@ MACHINE_CONFIG_DERIVED(atarifb_state::atarifb4, atarifb)
 MACHINE_CONFIG_END
 
 
-MACHINE_CONFIG_DERIVED(atarifb_state::abaseb, atarifb)
+MACHINE_CONFIG_START(atarifb_state::abaseb)
+	atarifb(config);
 
 	/* basic machine hardware */
 	MCFG_CPU_MODIFY("maincpu")
@@ -606,7 +608,8 @@ MACHINE_CONFIG_DERIVED(atarifb_state::abaseb, atarifb)
 MACHINE_CONFIG_END
 
 
-MACHINE_CONFIG_DERIVED(atarifb_state::soccer, atarifb)
+MACHINE_CONFIG_START(atarifb_state::soccer)
+	atarifb(config);
 
 	/* basic machine hardware */
 	MCFG_CPU_MODIFY("maincpu")

@@ -203,7 +203,7 @@ MACHINE_CONFIG_START(mpu4dealem_state::dealem)
 	MCFG_CPU_ADD("maincpu", M6809, MPU4_MASTER_CLOCK/4)
 	MCFG_CPU_PROGRAM_MAP(dealem_memmap)
 
-	MCFG_FRAGMENT_ADD(mpu4_common)
+	mpu4_common(config);
 
 	MCFG_SPEAKER_STANDARD_MONO("mono")
 	MCFG_SOUND_ADD("ay8913",AY8913, MPU4_MASTER_CLOCK/4)

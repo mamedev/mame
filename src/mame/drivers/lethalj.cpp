@@ -663,7 +663,8 @@ MACHINE_CONFIG_START(lethalj_state::gameroom)
 MACHINE_CONFIG_END
 
 
-MACHINE_CONFIG_DERIVED(lethalj_state::lethalj, gameroom)
+MACHINE_CONFIG_START(lethalj_state::lethalj)
+	gameroom(config);
 
 	MCFG_CPU_MODIFY("maincpu")
 	MCFG_TMS340X0_PIXEL_CLOCK(VIDEO_CLOCK_LETHALJ) /* pixel clock */

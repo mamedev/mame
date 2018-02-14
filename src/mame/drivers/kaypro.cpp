@@ -269,7 +269,8 @@ MACHINE_CONFIG_START(kaypro_state::kayproii)
 	MCFG_SOFTWARE_LIST_ADD("flop_list","kayproii")
 MACHINE_CONFIG_END
 
-MACHINE_CONFIG_DERIVED(kaypro_state::kayproiv, kayproii)
+MACHINE_CONFIG_START(kaypro_state::kayproiv)
+	kayproii(config);
 	MCFG_DEVICE_REMOVE("z80pio_s")
 	MCFG_DEVICE_ADD("z80pio_s", Z80PIO, 2500000)
 	MCFG_Z80PIO_OUT_INT_CB(INPUTLINE("maincpu", INPUT_LINE_IRQ0))
@@ -367,16 +368,19 @@ MACHINE_CONFIG_START(kaypro_state::kaypro484)
 	MCFG_FLOPPY_DRIVE_SOUND(true)
 MACHINE_CONFIG_END
 
-MACHINE_CONFIG_DERIVED(kaypro_state::kaypro10, kaypro484)
+MACHINE_CONFIG_START(kaypro_state::kaypro10)
+	kaypro484(config);
 	MCFG_DEVICE_REMOVE("fdc:1")  // only has 1 floppy drive
 	// need to add hard drive & controller
 MACHINE_CONFIG_END
 
-MACHINE_CONFIG_DERIVED(kaypro_state::kaypronew2, kaypro484)
+MACHINE_CONFIG_START(kaypro_state::kaypronew2)
+	kaypro484(config);
 	MCFG_DEVICE_REMOVE("fdc:1")  // only has 1 floppy drive
 MACHINE_CONFIG_END
 
-MACHINE_CONFIG_DERIVED(kaypro_state::kaypro284, kaypro484)
+MACHINE_CONFIG_START(kaypro_state::kaypro284)
+	kaypro484(config);
 	MCFG_DEVICE_REMOVE("fdc:0")
 	MCFG_DEVICE_REMOVE("fdc:1")
 	MCFG_FLOPPY_DRIVE_ADD("fdc:0", kaypro_floppies, "525ssdd", floppy_image_device::default_floppy_formats)
@@ -385,7 +389,8 @@ MACHINE_CONFIG_DERIVED(kaypro_state::kaypro284, kaypro484)
 	MCFG_FLOPPY_DRIVE_SOUND(true)
 MACHINE_CONFIG_END
 
-MACHINE_CONFIG_DERIVED(kaypro_state::omni2, kayproiv)
+MACHINE_CONFIG_START(kaypro_state::omni2)
+	kayproiv(config);
 	MCFG_SCREEN_MODIFY("screen")
 	MCFG_SCREEN_UPDATE_DRIVER(kaypro_state, screen_update_omni2)
 MACHINE_CONFIG_END

@@ -343,7 +343,8 @@ MACHINE_CONFIG_START(starfire_state::fireone)
 MACHINE_CONFIG_END
 
 
-MACHINE_CONFIG_DERIVED(starfire_state::starfire, fireone)
+MACHINE_CONFIG_START(starfire_state::starfire)
+	fireone(config);
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")

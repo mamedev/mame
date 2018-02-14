@@ -557,27 +557,32 @@ MACHINE_CONFIG_START(vc4000_state::vc4000)
 	MCFG_SOFTWARE_LIST_ADD("cart_list", "vc4000")
 MACHINE_CONFIG_END
 
-MACHINE_CONFIG_DERIVED(vc4000_state::cx3000tc, vc4000)
+MACHINE_CONFIG_START(vc4000_state::cx3000tc)
+	vc4000(config);
 	MCFG_DEVICE_REMOVE("cart_list")
 	MCFG_SOFTWARE_LIST_ADD("cart_list", "cx3000tc")
 MACHINE_CONFIG_END
 
-MACHINE_CONFIG_DERIVED(vc4000_state::mpu1000, vc4000)
+MACHINE_CONFIG_START(vc4000_state::mpu1000)
+	vc4000(config);
 	MCFG_DEVICE_REMOVE("cart_list")
 	MCFG_SOFTWARE_LIST_ADD("cart_list", "mpu1000")
 MACHINE_CONFIG_END
 
-MACHINE_CONFIG_DERIVED(vc4000_state::database, vc4000)
+MACHINE_CONFIG_START(vc4000_state::database)
+	vc4000(config);
 	MCFG_DEVICE_REMOVE("cart_list")
 	MCFG_SOFTWARE_LIST_ADD("cart_list", "database")
 MACHINE_CONFIG_END
 
-MACHINE_CONFIG_DERIVED(vc4000_state::rwtrntcs, vc4000)
+MACHINE_CONFIG_START(vc4000_state::rwtrntcs)
+	vc4000(config);
 	MCFG_DEVICE_REMOVE("cart_list")
 	MCFG_SOFTWARE_LIST_ADD("cart_list", "rwtrntcs")
 MACHINE_CONFIG_END
 
-MACHINE_CONFIG_DERIVED(vc4000_state::h21, vc4000)
+MACHINE_CONFIG_START(vc4000_state::h21)
+	vc4000(config);
 	MCFG_DEVICE_REMOVE("cartslot")
 	MCFG_H21_CARTRIDGE_ADD("cartslot", vc4000_cart, nullptr)
 
@@ -585,7 +590,8 @@ MACHINE_CONFIG_DERIVED(vc4000_state::h21, vc4000)
 	MCFG_SOFTWARE_LIST_ADD("cart_list", "h21")
 MACHINE_CONFIG_END
 
-MACHINE_CONFIG_DERIVED(vc4000_state::elektor, vc4000)
+MACHINE_CONFIG_START(vc4000_state::elektor)
+	vc4000(config);
 	MCFG_CPU_MODIFY("maincpu")
 	MCFG_CPU_PROGRAM_MAP(elektor_mem)
 	MCFG_CASSETTE_ADD( "cassette" )

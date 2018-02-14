@@ -368,7 +368,8 @@ MACHINE_CONFIG_START(runaway_state::runaway)
 MACHINE_CONFIG_END
 
 
-MACHINE_CONFIG_DERIVED(runaway_state::qwak, runaway)
+MACHINE_CONFIG_START(runaway_state::qwak)
+	runaway(config);
 
 	/* basic machine hardware */
 

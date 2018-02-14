@@ -978,7 +978,8 @@ MACHINE_CONFIG_END
 //  MACHINE_CONFIG( plus4p )
 //-------------------------------------------------
 
-MACHINE_CONFIG_DERIVED(c16_state::plus4p, plus4)
+MACHINE_CONFIG_START(c16_state::plus4p)
+	plus4(config);
 	MCFG_DEVICE_MODIFY(MOS7501_TAG)
 	MCFG_DEVICE_CLOCK(XTAL(17'734'470)/20)
 
@@ -999,7 +1000,8 @@ MACHINE_CONFIG_END
 //  MACHINE_CONFIG( plus4n )
 //-------------------------------------------------
 
-MACHINE_CONFIG_DERIVED(c16_state::plus4n, plus4)
+MACHINE_CONFIG_START(c16_state::plus4n)
+	plus4(config);
 	MCFG_DEVICE_MODIFY(MOS7501_TAG)
 	MCFG_DEVICE_CLOCK(XTAL(14'318'181)/16)
 
@@ -1020,7 +1022,8 @@ MACHINE_CONFIG_END
 //  MACHINE_CONFIG( c16n )
 //-------------------------------------------------
 
-MACHINE_CONFIG_DERIVED(c16_state::c16n, plus4n)
+MACHINE_CONFIG_START(c16_state::c16n)
+	plus4n(config);
 	MCFG_CPU_MODIFY(MOS7501_TAG)
 	MCFG_M7501_PORT_CALLBACKS(READ8(c16_state, cpu_r), WRITE8(plus4_state, cpu_w))
 	MCFG_M7501_PORT_PULLS(0x00, 0xc0)
@@ -1042,7 +1045,8 @@ MACHINE_CONFIG_END
 //  MACHINE_CONFIG( c16p )
 //-------------------------------------------------
 
-MACHINE_CONFIG_DERIVED(c16_state::c16p, plus4p)
+MACHINE_CONFIG_START(c16_state::c16p)
+	plus4p(config);
 	MCFG_CPU_MODIFY(MOS7501_TAG)
 	MCFG_M7501_PORT_CALLBACKS(READ8(c16_state, cpu_r), WRITE8(plus4_state, cpu_w))
 	MCFG_M7501_PORT_PULLS(0x00, 0xc0)
@@ -1064,7 +1068,8 @@ MACHINE_CONFIG_END
 //  MACHINE_CONFIG( c232 )
 //-------------------------------------------------
 
-MACHINE_CONFIG_DERIVED(c16_state::c232, c16p)
+MACHINE_CONFIG_START(c16_state::c232)
+	c16p(config);
 	MCFG_DEVICE_MODIFY(RAM_TAG)
 	MCFG_RAM_DEFAULT_SIZE("32K")
 MACHINE_CONFIG_END
@@ -1074,7 +1079,8 @@ MACHINE_CONFIG_END
 //  MACHINE_CONFIG( v364 )
 //-------------------------------------------------
 
-MACHINE_CONFIG_DERIVED(c16_state::v364, plus4n)
+MACHINE_CONFIG_START(c16_state::v364)
+	plus4n(config);
 	MCFG_SOUND_ADD(T6721A_TAG, T6721A, XTAL(640'000))
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
 

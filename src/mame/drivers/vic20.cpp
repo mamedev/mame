@@ -837,7 +837,8 @@ MACHINE_CONFIG_END
 //  MACHINE_CONFIG( ntsc )
 //-------------------------------------------------
 
-MACHINE_CONFIG_DERIVED(vic20_state::ntsc, vic20)
+MACHINE_CONFIG_START(vic20_state::ntsc)
+	vic20(config);
 	// basic machine hardware
 	MCFG_CPU_ADD(M6502_TAG, M6502, MOS6560_CLOCK)
 	MCFG_CPU_PROGRAM_MAP(vic20_mem)
@@ -884,7 +885,8 @@ MACHINE_CONFIG_END
 //  MACHINE_CONFIG( pal )
 //-------------------------------------------------
 
-MACHINE_CONFIG_DERIVED(vic20_state::pal, vic20)
+MACHINE_CONFIG_START(vic20_state::pal)
+	vic20(config);
 	// basic machine hardware
 	MCFG_CPU_ADD(M6502_TAG, M6502, MOS6561_CLOCK)
 	MCFG_CPU_PROGRAM_MAP(vic20_mem)

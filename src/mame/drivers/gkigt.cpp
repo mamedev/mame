@@ -642,7 +642,8 @@ MACHINE_CONFIG_START(igt_gameking_state::igt_gameking)
 	MCFG_NVRAM_ADD_1FILL("nvram")
 MACHINE_CONFIG_END
 
-MACHINE_CONFIG_DERIVED(igt_gameking_state::igt_ms72c, igt_gameking)
+MACHINE_CONFIG_START(igt_gameking_state::igt_ms72c)
+	igt_gameking(config);
 	MCFG_CPU_MODIFY("maincpu")
 	MCFG_CPU_PROGRAM_MAP(igt_ms72c_map)
 MACHINE_CONFIG_END

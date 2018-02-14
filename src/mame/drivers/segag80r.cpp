@@ -853,17 +853,19 @@ MACHINE_CONFIG_START(segag80r_state::g80r_base)
 MACHINE_CONFIG_END
 
 
-MACHINE_CONFIG_DERIVED(segag80r_state::astrob, g80r_base)
+MACHINE_CONFIG_START(segag80r_state::astrob)
+	g80r_base(config);
 
 	/* basic machine hardware */
 
 	/* sound boards */
-	MCFG_FRAGMENT_ADD(astrob_sound_board)
-	MCFG_FRAGMENT_ADD(sega_speech_board)
+	astrob_sound_board(config);
+	sega_speech_board(config);
 MACHINE_CONFIG_END
 
 
-MACHINE_CONFIG_DERIVED(segag80r_state::sega005, g80r_base)
+MACHINE_CONFIG_START(segag80r_state::sega005)
+	g80r_base(config);
 
 	/* basic machine hardware */
 
@@ -871,11 +873,12 @@ MACHINE_CONFIG_DERIVED(segag80r_state::sega005, g80r_base)
 	MCFG_CPU_IO_MAP(main_ppi8255_portmap)
 
 	/* sound boards */
-	MCFG_FRAGMENT_ADD(sega005_sound_board)
+	sega005_sound_board(config);
 MACHINE_CONFIG_END
 
 
-MACHINE_CONFIG_DERIVED(segag80r_state::spaceod, g80r_base)
+MACHINE_CONFIG_START(segag80r_state::spaceod)
+	g80r_base(config);
 
 	/* basic machine hardware */
 
@@ -887,11 +890,12 @@ MACHINE_CONFIG_DERIVED(segag80r_state::spaceod, g80r_base)
 	MCFG_PALETTE_ENTRIES(64+64)
 
 	/* sound boards */
-	MCFG_FRAGMENT_ADD(spaceod_sound_board)
+	spaceod_sound_board(config);
 MACHINE_CONFIG_END
 
 
-MACHINE_CONFIG_DERIVED(segag80r_state::monsterb, g80r_base)
+MACHINE_CONFIG_START(segag80r_state::monsterb)
+	g80r_base(config);
 
 	/* basic machine hardware */
 
@@ -904,10 +908,11 @@ MACHINE_CONFIG_DERIVED(segag80r_state::monsterb, g80r_base)
 	MCFG_PALETTE_ENTRIES(64+64)
 
 	/* sound boards */
-	MCFG_FRAGMENT_ADD(monsterb_sound_board)
+	monsterb_sound_board(config);
 MACHINE_CONFIG_END
 
-MACHINE_CONFIG_DERIVED(segag80r_state::monster2, monsterb)
+MACHINE_CONFIG_START(segag80r_state::monster2)
+	monsterb(config);
 	MCFG_CPU_REPLACE("maincpu", SEGA_315_SPAT, VIDEO_CLOCK/4)
 	MCFG_CPU_PROGRAM_MAP(main_map)
 	MCFG_CPU_IO_MAP(main_ppi8255_portmap)
@@ -917,7 +922,8 @@ MACHINE_CONFIG_DERIVED(segag80r_state::monster2, monsterb)
 	MCFG_SEGACRPT_SET_DECRYPTED_TAG(":decrypted_opcodes")
 MACHINE_CONFIG_END
 
-MACHINE_CONFIG_DERIVED(segag80r_state::pignewt, g80r_base)
+MACHINE_CONFIG_START(segag80r_state::pignewt)
+	g80r_base(config);
 
 	/* basic machine hardware */
 
@@ -931,7 +937,8 @@ MACHINE_CONFIG_DERIVED(segag80r_state::pignewt, g80r_base)
 MACHINE_CONFIG_END
 
 
-MACHINE_CONFIG_DERIVED(segag80r_state::sindbadm, g80r_base)
+MACHINE_CONFIG_START(segag80r_state::sindbadm)
+	g80r_base(config);
 
 	/* basic machine hardware */
 	MCFG_CPU_REPLACE("maincpu", SEGA_315_5028, VIDEO_CLOCK/4)

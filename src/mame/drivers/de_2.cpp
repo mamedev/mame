@@ -553,8 +553,8 @@ MACHINE_CONFIG_START(de_2_state::de_type1)
 	/* Video */
 	MCFG_DEFAULT_LAYOUT(layout_de2)
 
-	MCFG_FRAGMENT_ADD(genpin_audio)
-	MCFG_FRAGMENT_ADD(de_bg_audio)
+	genpin_audio(config);
+	de_bg_audio(config);
 MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(de_2_state::de_type2)
@@ -569,8 +569,8 @@ MACHINE_CONFIG_START(de_2_state::de_type2)
 	/* Video */
 	MCFG_DEFAULT_LAYOUT(layout_de2)
 
-	MCFG_FRAGMENT_ADD(genpin_audio)
-	MCFG_FRAGMENT_ADD(de_bg_audio)
+	genpin_audio(config);
+	de_bg_audio(config);
 MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(de_2_state::de_type2_alpha3)
@@ -585,8 +585,8 @@ MACHINE_CONFIG_START(de_2_state::de_type2_alpha3)
 	/* Video */
 	MCFG_DEFAULT_LAYOUT(layout_de2a3)
 
-	MCFG_FRAGMENT_ADD(genpin_audio)
-	MCFG_FRAGMENT_ADD(de_bg_audio)
+	genpin_audio(config);
+	de_bg_audio(config);
 MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(de_2_state::de_type3)
@@ -601,8 +601,8 @@ MACHINE_CONFIG_START(de_2_state::de_type3)
 	/* Video */
 	MCFG_DEFAULT_LAYOUT(layout_de2a3)
 
-	MCFG_FRAGMENT_ADD(genpin_audio)
-	MCFG_FRAGMENT_ADD(de_bg_audio)
+	genpin_audio(config);
+	de_bg_audio(config);
 MACHINE_CONFIG_END
 
 

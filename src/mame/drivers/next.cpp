@@ -1034,12 +1034,14 @@ MACHINE_CONFIG_START(next_state::next_base)
 	MCFG_NEXTMO_DRQ_CALLBACK(WRITELINE(next_state, mo_drq))
 MACHINE_CONFIG_END
 
-MACHINE_CONFIG_DERIVED(next_state::next, next_base)
+MACHINE_CONFIG_START(next_state::next)
+	next_base(config);
 	MCFG_CPU_ADD("maincpu", M68030, XTAL(25'000'000))
 	MCFG_CPU_PROGRAM_MAP(next_0b_m_nofdc_mem)
 MACHINE_CONFIG_END
 
-MACHINE_CONFIG_DERIVED(next_state::next_fdc_base, next_base)
+MACHINE_CONFIG_START(next_state::next_fdc_base)
+	next_base(config);
 	MCFG_N82077AA_ADD("fdc", n82077aa_device::MODE_PS2)
 	MCFG_UPD765_INTRQ_CALLBACK(WRITELINE(next_state, fdc_irq))
 	MCFG_UPD765_DRQ_CALLBACK(WRITELINE(next_state, fdc_drq))
@@ -1049,39 +1051,46 @@ MACHINE_CONFIG_DERIVED(next_state::next_fdc_base, next_base)
 	MCFG_SOFTWARE_LIST_ADD("flop_list", "next")
 MACHINE_CONFIG_END
 
-MACHINE_CONFIG_DERIVED(next_state::nexts, next_fdc_base)
+MACHINE_CONFIG_START(next_state::nexts)
+	next_fdc_base(config);
 	MCFG_CPU_ADD("maincpu", M68040, XTAL(25'000'000))
 	MCFG_CPU_PROGRAM_MAP(next_0b_m_mem)
 MACHINE_CONFIG_END
 
-MACHINE_CONFIG_DERIVED(next_state::nexts2, next_fdc_base)
+MACHINE_CONFIG_START(next_state::nexts2)
+	next_fdc_base(config);
 	MCFG_CPU_ADD("maincpu", M68040, XTAL(25'000'000))
 	MCFG_CPU_PROGRAM_MAP(next_0b_m_mem)
 MACHINE_CONFIG_END
 
-MACHINE_CONFIG_DERIVED(next_state::nextsc, next_fdc_base)
+MACHINE_CONFIG_START(next_state::nextsc)
+	next_fdc_base(config);
 	MCFG_CPU_ADD("maincpu", M68040, XTAL(25'000'000))
 	MCFG_CPU_PROGRAM_MAP(next_2c_c_mem)
 MACHINE_CONFIG_END
 
-MACHINE_CONFIG_DERIVED(next_state::nextst, next_fdc_base)
+MACHINE_CONFIG_START(next_state::nextst)
+	next_fdc_base(config);
 	MCFG_CPU_ADD("maincpu", M68040, XTAL(33'000'000))
 	MCFG_CPU_PROGRAM_MAP(next_0b_m_mem)
 MACHINE_CONFIG_END
 
-MACHINE_CONFIG_DERIVED(next_state::nextstc, next_fdc_base)
+MACHINE_CONFIG_START(next_state::nextstc)
+	next_fdc_base(config);
 	MCFG_CPU_ADD("maincpu", M68040, XTAL(33'000'000))
 	MCFG_CPU_PROGRAM_MAP(next_0c_c_mem)
 	MCFG_SCREEN_MODIFY("screen")
 	MCFG_SCREEN_VISIBLE_AREA(0, 832-1, 0, 624-1)
 MACHINE_CONFIG_END
 
-MACHINE_CONFIG_DERIVED(next_state::nextct, next_fdc_base)
+MACHINE_CONFIG_START(next_state::nextct)
+	next_fdc_base(config);
 	MCFG_CPU_ADD("maincpu", M68040, XTAL(33'000'000))
 	MCFG_CPU_PROGRAM_MAP(next_0c_m_mem)
 MACHINE_CONFIG_END
 
-MACHINE_CONFIG_DERIVED(next_state::nextctc, next_fdc_base)
+MACHINE_CONFIG_START(next_state::nextctc)
+	next_fdc_base(config);
 	MCFG_CPU_ADD("maincpu", M68040, XTAL(33'000'000))
 	MCFG_CPU_PROGRAM_MAP(next_0c_c_mem)
 	MCFG_SCREEN_MODIFY("screen")

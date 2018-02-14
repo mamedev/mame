@@ -1091,7 +1091,8 @@ MACHINE_CONFIG_START(gnw_mmouse_state::gnw_mmouse)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
 MACHINE_CONFIG_END
 
-MACHINE_CONFIG_DERIVED(gnw_mmouse_state::gnw_egg, gnw_mmouse)
+MACHINE_CONFIG_START(gnw_mmouse_state::gnw_egg)
+	gnw_mmouse(config);
 
 	/* video hardware */
 	MCFG_SCREEN_MODIFY("screen")
@@ -1099,7 +1100,8 @@ MACHINE_CONFIG_DERIVED(gnw_mmouse_state::gnw_egg, gnw_mmouse)
 	MCFG_SCREEN_VISIBLE_AREA(0, 1694-1, 0, 1080-1)
 MACHINE_CONFIG_END
 
-MACHINE_CONFIG_DERIVED(gnw_mmouse_state::nupogodi, gnw_mmouse)
+MACHINE_CONFIG_START(gnw_mmouse_state::nupogodi)
+	gnw_mmouse(config);
 
 	/* basic machine hardware */
 	MCFG_CPU_REPLACE("maincpu", KB1013VK12, 32.768_kHz_XTAL)
@@ -1115,7 +1117,8 @@ MACHINE_CONFIG_DERIVED(gnw_mmouse_state::nupogodi, gnw_mmouse)
 	MCFG_SCREEN_VISIBLE_AREA(0, 1715-1, 0, 1080-1)
 MACHINE_CONFIG_END
 
-MACHINE_CONFIG_DERIVED(gnw_mmouse_state::exospace, nupogodi)
+MACHINE_CONFIG_START(gnw_mmouse_state::exospace)
+	nupogodi(config);
 
 	/* video hardware */
 	MCFG_SCREEN_MODIFY("screen")
@@ -1839,7 +1842,8 @@ MACHINE_CONFIG_START(tgaunt_state::tgaunt)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
 MACHINE_CONFIG_END
 
-MACHINE_CONFIG_DERIVED(tgaunt_state::trobhood, tgaunt)
+MACHINE_CONFIG_START(tgaunt_state::trobhood)
+	tgaunt(config);
 
 	/* video hardware */
 	MCFG_SCREEN_MODIFY("screen")

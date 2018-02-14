@@ -1827,7 +1827,8 @@ MACHINE_CONFIG_END
 
 
 /* same as above, but with additional 68705 MCU */
-MACHINE_CONFIG_DERIVED(taitosj_state::mcu, nomcu)
+MACHINE_CONFIG_START(taitosj_state::mcu)
+	nomcu(config);
 
 	/* basic machine hardware */
 	MCFG_CPU_MODIFY("maincpu")
@@ -1844,7 +1845,8 @@ MACHINE_CONFIG_DERIVED(taitosj_state::mcu, nomcu)
 MACHINE_CONFIG_END
 
 
-MACHINE_CONFIG_DERIVED(taitosj_state::kikstart, mcu)
+MACHINE_CONFIG_START(taitosj_state::kikstart)
+	mcu(config);
 
 	/* basic machine hardware */
 	MCFG_CPU_MODIFY("maincpu")

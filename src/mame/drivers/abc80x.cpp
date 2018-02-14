@@ -1023,7 +1023,7 @@ MACHINE_CONFIG_START(abc800c_state::abc800c)
 	MCFG_CPU_IO_MAP(abc800c_io)
 
 	// video hardware
-	MCFG_FRAGMENT_ADD(abc800c_video)
+	abc800c_video(config);
 
 	// sound hardware
 	MCFG_SPEAKER_STANDARD_MONO("mono")
@@ -1098,7 +1098,7 @@ MACHINE_CONFIG_START(abc800m_state::abc800m)
 	MCFG_CPU_IO_MAP(abc800m_io)
 
 	// video hardware
-	MCFG_FRAGMENT_ADD(abc800m_video)
+	abc800m_video(config);
 
 	// sound hardware
 	MCFG_SPEAKER_STANDARD_MONO("mono")
@@ -1173,7 +1173,7 @@ MACHINE_CONFIG_START(abc802_state::abc802)
 	MCFG_CPU_IO_MAP(abc802_io)
 
 	// video hardware
-	MCFG_FRAGMENT_ADD(abc802_video)
+	abc802_video(config);
 
 	// sound hardware
 	MCFG_SPEAKER_STANDARD_MONO("mono")
@@ -1249,7 +1249,7 @@ MACHINE_CONFIG_START(abc806_state::abc806)
 	MCFG_CPU_IO_MAP(abc806_io)
 
 	// video hardware
-	MCFG_FRAGMENT_ADD(abc806_video)
+	abc806_video(config);
 
 	// peripheral hardware
 	MCFG_E0516_ADD(E0516_TAG, ABC806_X02)

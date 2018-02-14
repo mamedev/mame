@@ -597,7 +597,7 @@ MACHINE_CONFIG_START(force68k_state::fccpu1)
 	MCFG_CENTRONICS_OUTPUT_LATCH_ADD ("cent_data_out", "centronics")
 
 	// EPROM sockets
-	MCFG_FRAGMENT_ADD(fccpu1_eprom_sockets)
+	fccpu1_eprom_sockets(config);
 
 	// VME interface
 	MCFG_VME_DEVICE_ADD("vme")

@@ -573,7 +573,8 @@ MACHINE_CONFIG_START(pcd_state::pcd)
 	MCFG_SCSIDEV_ADD("scsi:1", "harddisk", OMTI5100, SCSI_ID_0)
 MACHINE_CONFIG_END
 
-MACHINE_CONFIG_DERIVED(pcd_state::pcx, pcd)
+MACHINE_CONFIG_START(pcd_state::pcx)
+	pcd(config);
 	MCFG_CPU_MODIFY("maincpu")
 	MCFG_CPU_IO_MAP(pcx_io)
 

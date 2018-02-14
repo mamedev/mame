@@ -781,10 +781,11 @@ MACHINE_CONFIG_START(crvision_state::creativision)
 MACHINE_CONFIG_END
 
 /*-------------------------------------------------
-    MACHINE_CONFIG_DERIVED( ntsc, creativision )
+    MACHINE_CONFIG_START( ntsc )
 -------------------------------------------------*/
 
-MACHINE_CONFIG_DERIVED(crvision_state::ntsc, creativision)
+MACHINE_CONFIG_START(crvision_state::ntsc)
+	creativision(config);
 	// video hardware
 	MCFG_DEVICE_ADD( TMS9929_TAG, TMS9918, XTAL(10'738'635) / 2 )
 	MCFG_TMS9928A_VRAM_SIZE(0x4000)
@@ -794,10 +795,11 @@ MACHINE_CONFIG_DERIVED(crvision_state::ntsc, creativision)
 MACHINE_CONFIG_END
 
 /*-------------------------------------------------
-    MACHINE_CONFIG_DERIVED( pal, creativision )
+    MACHINE_CONFIG_START( pal )
 -------------------------------------------------*/
 
-MACHINE_CONFIG_DERIVED(crvision_pal_state::pal, creativision)
+MACHINE_CONFIG_START(crvision_pal_state::pal)
+	creativision(config);
 	// video hardware
 	MCFG_DEVICE_ADD( TMS9929_TAG, TMS9929, XTAL(10'738'635) / 2 )
 	MCFG_TMS9928A_VRAM_SIZE(0x4000)

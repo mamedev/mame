@@ -809,7 +809,8 @@ MACHINE_CONFIG_START(ssfindo_state::ssfindo)
 	MCFG_PALETTE_ADD("palette", 256)
 MACHINE_CONFIG_END
 
-MACHINE_CONFIG_DERIVED(ssfindo_state::ppcar, ssfindo)
+MACHINE_CONFIG_START(ssfindo_state::ppcar)
+	ssfindo(config);
 
 	/* basic machine hardware */
 	MCFG_CPU_MODIFY("maincpu")
@@ -818,7 +819,8 @@ MACHINE_CONFIG_DERIVED(ssfindo_state::ppcar, ssfindo)
 	MCFG_DEVICE_REMOVE("i2cmem")
 MACHINE_CONFIG_END
 
-MACHINE_CONFIG_DERIVED(ssfindo_state::tetfight, ppcar)
+MACHINE_CONFIG_START(ssfindo_state::tetfight)
+	ppcar(config);
 
 	/* basic machine hardware */
 	MCFG_CPU_MODIFY("maincpu")

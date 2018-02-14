@@ -367,17 +367,19 @@ MACHINE_CONFIG_START(mario_state::mario_base)
 
 MACHINE_CONFIG_END
 
-MACHINE_CONFIG_DERIVED(mario_state::mario, mario_base)
-	MCFG_FRAGMENT_ADD(mario_audio)
+MACHINE_CONFIG_START(mario_state::mario)
+	mario_base(config);
+	mario_audio(config);
 MACHINE_CONFIG_END
 
-MACHINE_CONFIG_DERIVED(mario_state::masao, mario_base)
+MACHINE_CONFIG_START(mario_state::masao)
+	mario_base(config);
 	MCFG_CPU_MODIFY("maincpu")
 	MCFG_CPU_CLOCK(4000000)        /* 4.000 MHz (?) */
 	MCFG_CPU_PROGRAM_MAP(masao_map)
 
 	/* sound hardware */
-	MCFG_FRAGMENT_ADD(masao_audio)
+	masao_audio(config);
 MACHINE_CONFIG_END
 
 

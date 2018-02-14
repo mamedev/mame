@@ -613,7 +613,8 @@ MACHINE_CONFIG_START(terracre_state::ym3526)
 	MCFG_SOUND_ROUTE_EX(0, "dac2", 1.0, DAC_VREF_POS_INPUT) MCFG_SOUND_ROUTE_EX(0, "dac2", -1.0, DAC_VREF_NEG_INPUT)
 MACHINE_CONFIG_END
 
-MACHINE_CONFIG_DERIVED(terracre_state::ym2203, ym3526)
+MACHINE_CONFIG_START(terracre_state::ym2203)
+	ym3526(config);
 	MCFG_CPU_MODIFY("audiocpu")
 	MCFG_CPU_IO_MAP(sound_2203_io_map)
 
@@ -626,14 +627,16 @@ MACHINE_CONFIG_DERIVED(terracre_state::ym2203, ym3526)
 	MCFG_SOUND_ROUTE(3, "speaker", 0.4)
 MACHINE_CONFIG_END
 
-MACHINE_CONFIG_DERIVED(terracre_state::amazon_base, ym3526)
+MACHINE_CONFIG_START(terracre_state::amazon_base)
+	ym3526(config);
 	MCFG_CPU_MODIFY("maincpu")
 	MCFG_CPU_PROGRAM_MAP(amazon_base_map)
 
 	MCFG_MACHINE_START_OVERRIDE(terracre_state,amazon)
 MACHINE_CONFIG_END
 
-MACHINE_CONFIG_DERIVED(terracre_state::amazon_1412m2, amazon_base)
+MACHINE_CONFIG_START(terracre_state::amazon_1412m2)
+	amazon_base(config);
 	MCFG_CPU_MODIFY("maincpu")
 	MCFG_CPU_PROGRAM_MAP(amazon_1412m2_map)
 

@@ -454,7 +454,8 @@ MACHINE_CONFIG_START(alphasmart_state::alphasmart)
 	MCFG_NVRAM_ADD_0FILL("nvram")
 MACHINE_CONFIG_END
 
-MACHINE_CONFIG_DERIVED(asma2k_state::asma2k, alphasmart)
+MACHINE_CONFIG_START(asma2k_state::asma2k)
+	alphasmart(config);
 	MCFG_CPU_MODIFY("maincpu")
 	MCFG_CPU_PROGRAM_MAP(asma2k_mem)
 MACHINE_CONFIG_END

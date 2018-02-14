@@ -496,7 +496,7 @@ MACHINE_CONFIG_START(cgc7900_state::cgc7900)
     MCFG_CPU_PROGRAM_MAP(omti10_mem)*/
 
 	/* video hardware */
-	MCFG_FRAGMENT_ADD(cgc7900_video)
+	cgc7900_video(config);
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")

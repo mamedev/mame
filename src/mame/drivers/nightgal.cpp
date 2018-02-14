@@ -785,7 +785,8 @@ MACHINE_CONFIG_START(nightgal_state::royalqn)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.40)
 MACHINE_CONFIG_END
 
-MACHINE_CONFIG_DERIVED(nightgal_state::sexygal, royalqn)
+MACHINE_CONFIG_START(nightgal_state::sexygal)
+	royalqn(config);
 
 	/* basic machine hardware */
 	MCFG_CPU_MODIFY("maincpu")
@@ -808,7 +809,8 @@ MACHINE_CONFIG_DERIVED(nightgal_state::sexygal, royalqn)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.40)
 MACHINE_CONFIG_END
 
-MACHINE_CONFIG_DERIVED(nightgal_state::sweetgal, sexygal)
+MACHINE_CONFIG_START(nightgal_state::sweetgal)
+	sexygal(config);
 	MCFG_CPU_MODIFY("maincpu")
 	MCFG_CPU_PROGRAM_MAP(sweetgal_map)
 
@@ -816,14 +818,16 @@ MACHINE_CONFIG_DERIVED(nightgal_state::sweetgal, sexygal)
 	MCFG_DEVICE_REMOVE("audiocpu")
 MACHINE_CONFIG_END
 
-MACHINE_CONFIG_DERIVED(nightgal_state::ngalsumr, royalqn)
+MACHINE_CONFIG_START(nightgal_state::ngalsumr)
+	royalqn(config);
 	MCFG_CPU_MODIFY("maincpu")
 	// TODO: happens from protection device
 	MCFG_CPU_PERIODIC_INT_DRIVER(nightgal_state, nmi_line_pulse, 60)
 
 MACHINE_CONFIG_END
 
-MACHINE_CONFIG_DERIVED(nightgal_state::sgaltrop, sexygal)
+MACHINE_CONFIG_START(nightgal_state::sgaltrop)
+	sexygal(config);
 	MCFG_CPU_MODIFY("maincpu")
 	MCFG_CPU_IO_MAP(sgaltrop_io)
 

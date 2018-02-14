@@ -192,7 +192,7 @@ MACHINE_CONFIG_START(vd_state::vd)
 	MCFG_TIMER_DRIVER_ADD_PERIODIC("irq", vd_state, irq, attotime::from_hz(484))
 
 	/* Sound */
-	MCFG_FRAGMENT_ADD( genpin_audio )
+	genpin_audio(config);
 	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
 	MCFG_SOUND_ADD("ay1", AY8910, 2000000) //?
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "lspeaker", 0.33/3)

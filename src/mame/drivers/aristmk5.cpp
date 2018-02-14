@@ -2095,19 +2095,22 @@ MACHINE_CONFIG_START(aristmk5_state::aristmk5)
 MACHINE_CONFIG_END
 
 
-MACHINE_CONFIG_DERIVED(aristmk5_state::aristmk5_touch, aristmk5)
+MACHINE_CONFIG_START(aristmk5_state::aristmk5_touch)
+	aristmk5(config);
 	MCFG_DEVICE_MODIFY("uart_0a")
 	MCFG_INS8250_OUT_TX_CB(DEVWRITELINE("microtouch", microtouch_device, rx))
 
 	MCFG_MICROTOUCH_ADD("microtouch", 2400, DEVWRITELINE("uart_0a", ins8250_uart_device, rx_w))
 MACHINE_CONFIG_END
 
-MACHINE_CONFIG_DERIVED(aristmk5_state::aristmk5_usa, aristmk5)
+MACHINE_CONFIG_START(aristmk5_state::aristmk5_usa)
+	aristmk5(config);
 	MCFG_CPU_MODIFY("maincpu")
 	MCFG_CPU_PROGRAM_MAP(aristmk5_usa_map)
 MACHINE_CONFIG_END
 
-MACHINE_CONFIG_DERIVED(aristmk5_state::aristmk5_usa_touch, aristmk5_usa)
+MACHINE_CONFIG_START(aristmk5_state::aristmk5_usa_touch)
+	aristmk5_usa(config);
 	MCFG_DEVICE_MODIFY("uart_0a")
 	MCFG_INS8250_OUT_TX_CB(DEVWRITELINE("microtouch", microtouch_device, rx))
 

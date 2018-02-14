@@ -469,7 +469,8 @@ MACHINE_CONFIG_START(mexico86_state::mexico86)
 MACHINE_CONFIG_END
 
 
-MACHINE_CONFIG_DERIVED(mexico86_state::knightb, mexico86)
+MACHINE_CONFIG_START(mexico86_state::knightb)
+	mexico86(config);
 
 	/* basic machine hardware */
 
@@ -481,7 +482,8 @@ MACHINE_CONFIG_DERIVED(mexico86_state::knightb, mexico86)
 MACHINE_CONFIG_END
 
 
-MACHINE_CONFIG_DERIVED(mexico86_state::kikikai, knightb)
+MACHINE_CONFIG_START(mexico86_state::kikikai)
+	knightb(config);
 
 	/* basic machine hardware */
 

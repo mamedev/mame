@@ -618,7 +618,8 @@ MACHINE_CONFIG_END
 //  MACHINE_CONFIG( ep128 )
 //-------------------------------------------------
 
-MACHINE_CONFIG_DERIVED(ep64_state::ep128, ep64)
+MACHINE_CONFIG_START(ep64_state::ep128)
+	ep64(config);
 	MCFG_DEVICE_MODIFY(DAVE_TAG)
 	MCFG_DEVICE_ADDRESS_MAP(AS_PROGRAM, dave_128k_mem)
 

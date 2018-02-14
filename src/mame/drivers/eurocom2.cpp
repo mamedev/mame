@@ -473,7 +473,8 @@ MACHINE_CONFIG_START(eurocom2_state::eurocom2)
 //  MCFG_FLOPPY_DRIVE_SOUND(true)
 MACHINE_CONFIG_END
 
-MACHINE_CONFIG_DERIVED(waveterm_state::waveterm, eurocom2)
+MACHINE_CONFIG_START(waveterm_state::waveterm)
+	eurocom2(config);
 	MCFG_CPU_MODIFY("maincpu")
 	MCFG_CPU_PROGRAM_MAP(waveterm_map)
 

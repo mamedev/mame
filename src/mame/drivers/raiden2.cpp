@@ -1458,7 +1458,8 @@ MACHINE_CONFIG_START(raiden2_state::raiden2)
 	MCFG_SEIBU_SOUND_YM_WRITE_CB(DEVWRITE8("ymsnd", ym2151_device, write))
 MACHINE_CONFIG_END
 
-MACHINE_CONFIG_DERIVED(raiden2_state::xsedae, raiden2)
+MACHINE_CONFIG_START(raiden2_state::xsedae)
+	raiden2(config);
 	MCFG_CPU_MODIFY("maincpu")
 	MCFG_CPU_PROGRAM_MAP(xsedae_mem)
 
@@ -1469,7 +1470,8 @@ MACHINE_CONFIG_DERIVED(raiden2_state::xsedae, raiden2)
 	MCFG_SCREEN_VISIBLE_AREA(0*8, 40*8-1, 0, 32*8-1)
 MACHINE_CONFIG_END
 
-MACHINE_CONFIG_DERIVED(raiden2_state::raidendx, raiden2)
+MACHINE_CONFIG_START(raiden2_state::raidendx)
+	raiden2(config);
 	MCFG_CPU_MODIFY("maincpu")
 	MCFG_CPU_PROGRAM_MAP(raidendx_mem)
 

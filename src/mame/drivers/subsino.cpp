@@ -2808,7 +2808,8 @@ MACHINE_CONFIG_START(subsino_state::victor21)
 MACHINE_CONFIG_END
 
 /* same but with an additional protection. */
-MACHINE_CONFIG_DERIVED(subsino_state::victor5, victor21)
+MACHINE_CONFIG_START(subsino_state::victor5)
+	victor21(config);
 
 	/* basic machine hardware */
 	MCFG_CPU_MODIFY("maincpu")
@@ -2893,7 +2894,8 @@ MACHINE_CONFIG_START(subsino_state::srider)
 MACHINE_CONFIG_END
 
 
-MACHINE_CONFIG_DERIVED(subsino_state::sharkpy, srider)
+MACHINE_CONFIG_START(subsino_state::sharkpy)
+	srider(config);
 
 	/* basic machine hardware */
 	MCFG_CPU_MODIFY("maincpu")
@@ -2984,7 +2986,8 @@ MACHINE_CONFIG_START(subsino_state::stbsub)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 MACHINE_CONFIG_END
 
-MACHINE_CONFIG_DERIVED(subsino_state::mtrainnv, stbsub)
+MACHINE_CONFIG_START(subsino_state::mtrainnv)
+	stbsub(config);
 
 	/* basic machine hardware */
 	MCFG_CPU_MODIFY("maincpu")

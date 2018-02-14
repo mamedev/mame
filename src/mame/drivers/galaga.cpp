@@ -1732,7 +1732,8 @@ MACHINE_CONFIG_START(galaga_state::galaga)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.90)
 MACHINE_CONFIG_END
 
-MACHINE_CONFIG_DERIVED(galaga_state::galagab, galaga)
+MACHINE_CONFIG_START(galaga_state::galagab)
+	galaga(config);
 
 	/* basic machine hardware */
 
@@ -1752,7 +1753,8 @@ MACHINE_CONFIG_DERIVED(galaga_state::galagab, galaga)
 	MCFG_DEVICE_REMOVE("discrete")
 MACHINE_CONFIG_END
 
-MACHINE_CONFIG_DERIVED(galaga_state::gatsbee, galaga)
+MACHINE_CONFIG_START(galaga_state::gatsbee)
+	galaga(config);
 	MCFG_CPU_MODIFY("maincpu")
 	MCFG_CPU_PROGRAM_MAP(gatsbee_main_map)
 
@@ -1836,7 +1838,8 @@ MACHINE_CONFIG_START(xevious_state::xevious)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.90)
 MACHINE_CONFIG_END
 
-MACHINE_CONFIG_DERIVED(xevious_state::battles, xevious)
+MACHINE_CONFIG_START(xevious_state::battles)
+	xevious(config);
 
 	/* basic machine hardware */
 
@@ -1949,7 +1952,8 @@ MACHINE_CONFIG_START(digdug_state::digdug)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.90 * 10.0 / 16.0)
 MACHINE_CONFIG_END
 
-MACHINE_CONFIG_DERIVED(digdug_state::dzigzag, digdug)
+MACHINE_CONFIG_START(digdug_state::dzigzag)
+	digdug(config);
 
 	/* basic machine hardware */
 

@@ -2224,7 +2224,8 @@ MACHINE_CONFIG_START(dec8_state::ghostb)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.70)
 MACHINE_CONFIG_END
 
-MACHINE_CONFIG_DERIVED(dec8_state::meikyuh, ghostb)
+MACHINE_CONFIG_START(dec8_state::meikyuh)
+	ghostb(config);
 	MCFG_CPU_REPLACE("audiocpu", M6502, 1500000)
 	MCFG_CPU_PROGRAM_MAP(dec8_s_map)
 MACHINE_CONFIG_END

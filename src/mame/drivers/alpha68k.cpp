@@ -2160,7 +2160,8 @@ MACHINE_CONFIG_START(alpha68k_state::alpha68k_II)
 	MCFG_SOUND_ROUTE_EX(0, "dac", 1.0, DAC_VREF_POS_INPUT) MCFG_SOUND_ROUTE_EX(0, "dac", -1.0, DAC_VREF_NEG_INPUT)
 MACHINE_CONFIG_END
 
-MACHINE_CONFIG_DERIVED(alpha68k_state::btlfieldb, alpha68k_II)
+MACHINE_CONFIG_START(alpha68k_state::btlfieldb)
+	alpha68k_II(config);
 	MCFG_CPU_MODIFY("maincpu")
 	MCFG_CPU_VBLANK_INT_DRIVER("screen", alpha68k_state, irq1_line_hold)
 	MCFG_CPU_PERIODIC_INT_DRIVER(alpha68k_state, irq2_line_hold, 60*4) // MCU irq

@@ -269,13 +269,15 @@ MACHINE_CONFIG_START(pcktgal_state::pcktgal)
 MACHINE_CONFIG_END
 
 
-MACHINE_CONFIG_DERIVED(pcktgal_state::bootleg, pcktgal)
+MACHINE_CONFIG_START(pcktgal_state::bootleg)
+	pcktgal(config);
 	MCFG_GFXDECODE_MODIFY("gfxdecode", bootleg)
 	MCFG_SCREEN_MODIFY("screen")
 	MCFG_SCREEN_UPDATE_DRIVER(pcktgal_state, screen_update_pcktgalb)
 MACHINE_CONFIG_END
 
-MACHINE_CONFIG_DERIVED(pcktgal_state::pcktgal2, pcktgal)
+MACHINE_CONFIG_START(pcktgal_state::pcktgal2)
+	pcktgal(config);
 	MCFG_DEVICE_REMOVE("audiocpu")
 	MCFG_CPU_ADD("audiocpu", M6502, 1500000) /* doesn't use the encrypted 222 */
 	MCFG_CPU_PROGRAM_MAP(pcktgal_sound_map)

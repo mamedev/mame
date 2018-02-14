@@ -506,7 +506,8 @@ MACHINE_CONFIG_START(sms_state::sms_base)
 	MCFG_SMS_CONTROL_PORT_PIXEL_HANDLER(READ32(sms_state, sms_pixel_color))
 MACHINE_CONFIG_END
 
-MACHINE_CONFIG_DERIVED(sms_state::sms_ntsc_base, sms_base)
+MACHINE_CONFIG_START(sms_state::sms_ntsc_base)
+	sms_base(config);
 	MCFG_CPU_ADD("maincpu", Z80, XTAL(10'738'635)/3)
 	MCFG_CPU_PROGRAM_MAP(sms_mem)
 	MCFG_CPU_IO_MAP(sms_io)
@@ -566,7 +567,8 @@ MACHINE_CONFIG_END
 	MCFG_SCREEN_REFRESH_RATE(_pixelclock / (sega315_5124_device::WIDTH * sega315_5124_device::HEIGHT_NTSC))
 
 
-MACHINE_CONFIG_DERIVED(sms_state::sms2_ntsc, sms_ntsc_base)
+MACHINE_CONFIG_START(sms_state::sms2_ntsc)
+	sms_ntsc_base(config);
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
 	MCFG_SCREEN_SMS_NTSC_RAW_PARAMS(XTAL(10'738'635)/2)
@@ -580,7 +582,8 @@ MACHINE_CONFIG_DERIVED(sms_state::sms2_ntsc, sms_ntsc_base)
 MACHINE_CONFIG_END
 
 
-MACHINE_CONFIG_DERIVED(sms_state::sms1_ntsc, sms_ntsc_base)
+MACHINE_CONFIG_START(sms_state::sms1_ntsc)
+	sms_ntsc_base(config);
 
 	MCFG_CPU_MODIFY("maincpu")
 	MCFG_CPU_PROGRAM_MAP(sms1_mem)  // This adds the SegaScope handlers for 3-D glasses
@@ -616,7 +619,8 @@ MACHINE_CONFIG_DERIVED(sms_state::sms1_ntsc, sms_ntsc_base)
 	MCFG_SMS_EXPANSION_ADD("smsexp", sms_expansion_devices, nullptr)
 MACHINE_CONFIG_END
 
-MACHINE_CONFIG_DERIVED(smssdisp_state::sms_sdisp, sms1_ntsc)
+MACHINE_CONFIG_START(smssdisp_state::sms_sdisp)
+	sms1_ntsc(config);
 
 	MCFG_DEVICE_MODIFY("sms_vdp")
 	MCFG_SEGA315_5124_INT_CB(WRITELINE(smssdisp_state, sms_store_int_callback))
@@ -663,7 +667,8 @@ MACHINE_CONFIG_DERIVED(smssdisp_state::sms_sdisp, sms1_ntsc)
 	MCFG_SMS_CARD_ADD("slot32", sms_cart, nullptr)
 MACHINE_CONFIG_END
 
-MACHINE_CONFIG_DERIVED(sms_state::sms_pal_base, sms_base)
+MACHINE_CONFIG_START(sms_state::sms_pal_base)
+	sms_base(config);
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", Z80, MASTER_CLOCK_PAL/15)
 	MCFG_CPU_PROGRAM_MAP(sms_mem)
@@ -676,7 +681,8 @@ MACHINE_CONFIG_DERIVED(sms_state::sms_pal_base, sms_base)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.00)
 MACHINE_CONFIG_END
 
-MACHINE_CONFIG_DERIVED(sms_state::sms2_pal, sms_pal_base)
+MACHINE_CONFIG_START(sms_state::sms2_pal)
+	sms_pal_base(config);
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
@@ -690,7 +696,8 @@ MACHINE_CONFIG_DERIVED(sms_state::sms2_pal, sms_pal_base)
 	MCFG_SEGA315_5246_PAUSE_CB(WRITELINE(sms_state, sms_pause_callback))
 MACHINE_CONFIG_END
 
-MACHINE_CONFIG_DERIVED(sms_state::sms1_pal, sms_pal_base)
+MACHINE_CONFIG_START(sms_state::sms1_pal)
+	sms_pal_base(config);
 
 	MCFG_CPU_MODIFY("maincpu")
 	MCFG_CPU_PROGRAM_MAP(sms1_mem)  // This adds the SegaScope handlers for 3-D glasses
@@ -727,7 +734,8 @@ MACHINE_CONFIG_DERIVED(sms_state::sms1_pal, sms_pal_base)
 MACHINE_CONFIG_END
 
 
-MACHINE_CONFIG_DERIVED(sms_state::sms_paln_base, sms_base)
+MACHINE_CONFIG_START(sms_state::sms_paln_base)
+	sms_base(config);
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", Z80, MASTER_CLOCK_PALN/3)
 	MCFG_CPU_PROGRAM_MAP(sms_mem)
@@ -740,7 +748,8 @@ MACHINE_CONFIG_DERIVED(sms_state::sms_paln_base, sms_base)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.00)
 MACHINE_CONFIG_END
 
-MACHINE_CONFIG_DERIVED(sms_state::sms3_paln, sms_paln_base)
+MACHINE_CONFIG_START(sms_state::sms3_paln)
+	sms_paln_base(config);
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
@@ -754,7 +763,8 @@ MACHINE_CONFIG_DERIVED(sms_state::sms3_paln, sms_paln_base)
 	MCFG_SEGA315_5246_PAUSE_CB(WRITELINE(sms_state, sms_pause_callback))
 MACHINE_CONFIG_END
 
-MACHINE_CONFIG_DERIVED(sms_state::sms1_paln, sms_paln_base)
+MACHINE_CONFIG_START(sms_state::sms1_paln)
+	sms_paln_base(config);
 
 	MCFG_CPU_MODIFY("maincpu")
 	MCFG_CPU_PROGRAM_MAP(sms1_mem)  // This adds the SegaScope handlers for 3-D glasses
@@ -791,7 +801,8 @@ MACHINE_CONFIG_DERIVED(sms_state::sms1_paln, sms_paln_base)
 MACHINE_CONFIG_END
 
 
-MACHINE_CONFIG_DERIVED(sms_state::sms_br_base, sms_base)
+MACHINE_CONFIG_START(sms_state::sms_br_base)
+	sms_base(config);
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", Z80, MASTER_CLOCK_PALM/3)
 	MCFG_CPU_PROGRAM_MAP(sms_mem)
@@ -805,7 +816,8 @@ MACHINE_CONFIG_DERIVED(sms_state::sms_br_base, sms_base)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.00)
 MACHINE_CONFIG_END
 
-MACHINE_CONFIG_DERIVED(sms_state::sms3_br, sms_br_base)
+MACHINE_CONFIG_START(sms_state::sms3_br)
+	sms_br_base(config);
 	/* video hardware */
 	// PAL-M height/width parameters are the same of NTSC screens.
 	MCFG_SCREEN_ADD("screen", RASTER)
@@ -819,7 +831,8 @@ MACHINE_CONFIG_DERIVED(sms_state::sms3_br, sms_br_base)
 	MCFG_SEGA315_5246_PAUSE_CB(WRITELINE(sms_state, sms_pause_callback))
 MACHINE_CONFIG_END
 
-MACHINE_CONFIG_DERIVED(sms_state::sms1_br, sms_br_base)
+MACHINE_CONFIG_START(sms_state::sms1_br)
+	sms_br_base(config);
 
 	MCFG_CPU_MODIFY("maincpu")
 	MCFG_CPU_PROGRAM_MAP(sms1_mem)  // This adds the SegaScope handlers for 3-D glasses
@@ -857,7 +870,8 @@ MACHINE_CONFIG_DERIVED(sms_state::sms1_br, sms_br_base)
 MACHINE_CONFIG_END
 
 
-MACHINE_CONFIG_DERIVED(sms_state::sms2_kr, sms2_ntsc)
+MACHINE_CONFIG_START(sms_state::sms2_kr)
+	sms2_ntsc(config);
 	MCFG_CPU_MODIFY("maincpu")
 	MCFG_CPU_IO_MAP(smskr_io)
 
@@ -866,7 +880,8 @@ MACHINE_CONFIG_DERIVED(sms_state::sms2_kr, sms2_ntsc)
 	MCFG_SOFTWARE_LIST_ADD("cart_list2","sg1000")
 MACHINE_CONFIG_END
 
-MACHINE_CONFIG_DERIVED(sms_state::sms1_kr, sms1_ntsc)
+MACHINE_CONFIG_START(sms_state::sms1_kr)
+	sms1_ntsc(config);
 	MCFG_CPU_MODIFY("maincpu")
 	MCFG_CPU_IO_MAP(smskr_io)
 
@@ -885,7 +900,8 @@ MACHINE_CONFIG_DERIVED(sms_state::sms1_kr, sms1_ntsc)
 	MCFG_SEGA315_5124_CSYNC_CB(WRITELINE(sms_state, sms_csync_callback))
 MACHINE_CONFIG_END
 
-MACHINE_CONFIG_DERIVED(sms_state::smsj, sms1_kr)
+MACHINE_CONFIG_START(sms_state::smsj)
+	sms1_kr(config);
 	MCFG_CPU_MODIFY("maincpu")
 	MCFG_CPU_IO_MAP(smsj_io)
 
@@ -895,7 +911,8 @@ MACHINE_CONFIG_DERIVED(sms_state::smsj, sms1_kr)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.00)
 MACHINE_CONFIG_END
 
-MACHINE_CONFIG_DERIVED(sms_state::sg1000m3, sms1_ntsc)
+MACHINE_CONFIG_START(sms_state::sg1000m3)
+	sms1_ntsc(config);
 	MCFG_CPU_MODIFY("maincpu")
 	MCFG_CPU_IO_MAP(sg1000m3_io)
 

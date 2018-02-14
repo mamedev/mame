@@ -471,7 +471,8 @@ MACHINE_CONFIG_START(liberatr_state::liberatr)
 MACHINE_CONFIG_END
 
 
-MACHINE_CONFIG_DERIVED(liberatr_state::liberat2, liberatr)
+MACHINE_CONFIG_START(liberatr_state::liberat2)
+	liberatr(config);
 
 	/* basic machine hardware */
 	MCFG_CPU_MODIFY("maincpu")

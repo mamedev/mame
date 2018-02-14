@@ -1295,14 +1295,16 @@ MACHINE_CONFIG_START(spg2xx_game_state::spg2xx_base)
 	MCFG_PALETTE_ADD("palette", 32768)
 MACHINE_CONFIG_END
 
-MACHINE_CONFIG_DERIVED(spg2xx_game_state::spg2xx_basep, spg2xx_base)
+MACHINE_CONFIG_START(spg2xx_game_state::spg2xx_basep)
+	spg2xx_base(config);
 
 	MCFG_SCREEN_MODIFY( "screen" )
 	MCFG_SCREEN_REFRESH_RATE(50)
 MACHINE_CONFIG_END
 
 
-MACHINE_CONFIG_DERIVED(spg2xx_cart_state::vii, spg2xx_base)
+MACHINE_CONFIG_START(spg2xx_cart_state::vii)
+	spg2xx_base(config);
 	MCFG_GENERIC_CARTSLOT_ADD("cartslot", generic_plain_slot, "vii_cart")
 	MCFG_GENERIC_WIDTH(GENERIC_ROM16_WIDTH)
 	MCFG_GENERIC_LOAD(spg2xx_cart_state, vii_cart)
@@ -1310,7 +1312,8 @@ MACHINE_CONFIG_DERIVED(spg2xx_cart_state::vii, spg2xx_base)
 	MCFG_SOFTWARE_LIST_ADD("vii_cart","vii")
 MACHINE_CONFIG_END
 
-MACHINE_CONFIG_DERIVED(spg2xx_cart_state::vsmile, spg2xx_base)
+MACHINE_CONFIG_START(spg2xx_cart_state::vsmile)
+	spg2xx_base(config);
 	MCFG_GENERIC_CARTSLOT_ADD("cartslot", generic_plain_slot, "vsmile_cart")
 	MCFG_GENERIC_WIDTH(GENERIC_ROM16_WIDTH)
 	MCFG_GENERIC_LOAD(spg2xx_cart_state, vsmile_cart)
@@ -1318,7 +1321,8 @@ MACHINE_CONFIG_DERIVED(spg2xx_cart_state::vsmile, spg2xx_base)
 	MCFG_SOFTWARE_LIST_ADD("cart_list","vsmile_cart")
 MACHINE_CONFIG_END
 
-MACHINE_CONFIG_DERIVED(spg2xx_game_state::batman, spg2xx_base)
+MACHINE_CONFIG_START(spg2xx_game_state::batman)
+	spg2xx_base(config);
 	MCFG_I2CMEM_ADD("i2cmem")
 	MCFG_I2CMEM_DATA_SIZE(0x200)
 MACHINE_CONFIG_END

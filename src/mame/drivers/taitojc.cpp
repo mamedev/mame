@@ -1112,7 +1112,8 @@ MACHINE_CONFIG_START(taitojc_state::taitojc)
 	MCFG_DEVICE_ADD("taito_en", TAITO_EN, 0)
 MACHINE_CONFIG_END
 
-MACHINE_CONFIG_DERIVED(taitojc_state::dendego, taitojc)
+MACHINE_CONFIG_START(taitojc_state::dendego)
+	taitojc(config);
 
 	/* basic machine hardware */
 	MCFG_CPU_MODIFY("maincpu")

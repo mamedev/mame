@@ -836,7 +836,7 @@ MACHINE_CONFIG_START(camplynx_state::lynx48k)
 	MCFG_SCREEN_VISIBLE_AREA(0, 511, 0, 479)
 	MCFG_SCREEN_UPDATE_DEVICE("crtc", mc6845_device, screen_update)
 
-	MCFG_FRAGMENT_ADD(lynx_common)
+	lynx_common(config);
 
 	MCFG_CASSETTE_ADD("cassette")
 	MCFG_CASSETTE_FORMATS(lynx48k_cassette_formats)
@@ -851,12 +851,13 @@ MACHINE_CONFIG_START(camplynx_state::lynx48k)
 	MCFG_MC6845_OUT_VSYNC_CB(INPUTLINE("maincpu", INPUT_LINE_IRQ0))
 MACHINE_CONFIG_END
 
-MACHINE_CONFIG_DERIVED(camplynx_state::lynx96k, lynx48k)
+MACHINE_CONFIG_START(camplynx_state::lynx96k)
+	lynx48k(config);
 	/* basic machine hardware */
 	MCFG_CPU_MODIFY("maincpu")
 	MCFG_CPU_IO_MAP(lynx96k_io)
 
-	MCFG_FRAGMENT_ADD(lynx_disk)
+	lynx_disk(config);
 MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(camplynx_state::lynx128k)
@@ -876,7 +877,7 @@ MACHINE_CONFIG_START(camplynx_state::lynx128k)
 	MCFG_SCREEN_VISIBLE_AREA(0, 511, 0, 479)
 	MCFG_SCREEN_UPDATE_DEVICE("crtc", mc6845_device, screen_update)
 
-	MCFG_FRAGMENT_ADD(lynx_common)
+	lynx_common(config);
 
 	MCFG_CASSETTE_ADD("cassette")
 	MCFG_CASSETTE_FORMATS(lynx128k_cassette_formats)
@@ -890,7 +891,7 @@ MACHINE_CONFIG_START(camplynx_state::lynx128k)
 	MCFG_MC6845_UPDATE_ROW_CB(camplynx_state, lynx128k_update_row)
 	MCFG_MC6845_OUT_VSYNC_CB(INPUTLINE("maincpu", INPUT_LINE_IRQ0))
 
-	MCFG_FRAGMENT_ADD(lynx_disk)
+	lynx_disk(config);
 MACHINE_CONFIG_END
 
 DRIVER_INIT_MEMBER(camplynx_state, lynx48k)

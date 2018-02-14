@@ -264,7 +264,7 @@ MACHINE_CONFIG_START(copsnrob_state::copsnrob)
 	MCFG_GFXDECODE_ADD("gfxdecode", "palette", copsnrob)
 	MCFG_PALETTE_ADD_MONOCHROME("palette")
 
-	MCFG_FRAGMENT_ADD(copsnrob_audio)
+	copsnrob_audio(config);
 MACHINE_CONFIG_END
 
 

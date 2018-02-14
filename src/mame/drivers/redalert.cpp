@@ -395,10 +395,10 @@ MACHINE_CONFIG_START(redalert_state::redalert)
 	MCFG_CPU_VBLANK_INT_DRIVER("screen", redalert_state,  redalert_vblank_interrupt)
 
 	/* video hardware */
-	MCFG_FRAGMENT_ADD(redalert_video)
+	redalert_video(config);
 
 	/* audio hardware */
-	MCFG_FRAGMENT_ADD(redalert_audio)
+	redalert_audio(config);
 MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(redalert_state::ww3)
@@ -409,10 +409,10 @@ MACHINE_CONFIG_START(redalert_state::ww3)
 	MCFG_CPU_VBLANK_INT_DRIVER("screen", redalert_state,  redalert_vblank_interrupt)
 
 	/* video hardware */
-	MCFG_FRAGMENT_ADD(ww3_video)
+	ww3_video(config);
 
 	/* audio hardware */
-	MCFG_FRAGMENT_ADD(ww3_audio)
+	ww3_audio(config);
 MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(redalert_state::panther)
@@ -423,10 +423,10 @@ MACHINE_CONFIG_START(redalert_state::panther)
 	MCFG_CPU_VBLANK_INT_DRIVER("screen", redalert_state,  redalert_vblank_interrupt)
 
 	/* video hardware */
-	MCFG_FRAGMENT_ADD(panther_video)
+	panther_video(config);
 
 	/* audio hardware */
-	MCFG_FRAGMENT_ADD(ww3_audio)
+	ww3_audio(config);
 MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(redalert_state::demoneye)
@@ -437,10 +437,10 @@ MACHINE_CONFIG_START(redalert_state::demoneye)
 	MCFG_CPU_VBLANK_INT_DRIVER("screen", redalert_state,  redalert_vblank_interrupt)
 
 	/* video hardware */
-	MCFG_FRAGMENT_ADD(demoneye_video)
+	demoneye_video(config);
 
 	/* audio hardware */
-	MCFG_FRAGMENT_ADD(demoneye_audio)
+	demoneye_audio(config);
 MACHINE_CONFIG_END
 
 

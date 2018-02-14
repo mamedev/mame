@@ -487,12 +487,14 @@ MACHINE_CONFIG_START(supbtime_state::supbtime)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
 MACHINE_CONFIG_END
 
-MACHINE_CONFIG_DERIVED(supbtime_state::chinatwn, supbtime)
+MACHINE_CONFIG_START(supbtime_state::chinatwn)
+	supbtime(config);
 	MCFG_CPU_MODIFY("maincpu")
 	MCFG_CPU_PROGRAM_MAP(chinatwn_map)
 MACHINE_CONFIG_END
 
-MACHINE_CONFIG_DERIVED(supbtime_state::tumblep, supbtime)
+MACHINE_CONFIG_START(supbtime_state::tumblep)
+	supbtime(config);
 	MCFG_CPU_MODIFY("maincpu")
 	MCFG_CPU_PROGRAM_MAP(tumblep_map)
 

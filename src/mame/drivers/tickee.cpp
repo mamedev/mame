@@ -792,7 +792,8 @@ MACHINE_CONFIG_START(tickee_state::tickee)
 MACHINE_CONFIG_END
 
 
-MACHINE_CONFIG_DERIVED(tickee_state::ghoshunt, tickee)
+MACHINE_CONFIG_START(tickee_state::ghoshunt)
+	tickee(config);
 
 	/* basic machine hardware */
 	MCFG_CPU_MODIFY("maincpu")

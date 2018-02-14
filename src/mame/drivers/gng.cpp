@@ -438,7 +438,8 @@ MACHINE_CONFIG_START(gng_state::gng)
 	MCFG_SOUND_ROUTE(3, "mono", 0.20)
 MACHINE_CONFIG_END
 
-MACHINE_CONFIG_DERIVED(gng_state::diamond, gng)
+MACHINE_CONFIG_START(gng_state::diamond)
+	gng(config);
 	MCFG_CPU_MODIFY("maincpu")
 	MCFG_CPU_PROGRAM_MAP(diamond_map)
 

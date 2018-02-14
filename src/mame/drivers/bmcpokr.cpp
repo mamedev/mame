@@ -838,7 +838,8 @@ MACHINE_CONFIG_START(bmcpokr_state::bmcpokr)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", 0.50)
 MACHINE_CONFIG_END
 
-MACHINE_CONFIG_DERIVED(bmcpokr_state::mjmaglmp, bmcpokr)
+MACHINE_CONFIG_START(bmcpokr_state::mjmaglmp)
+	bmcpokr(config);
 	MCFG_CPU_MODIFY("maincpu")
 	MCFG_CPU_PROGRAM_MAP(mjmaglmp_map)
 MACHINE_CONFIG_END

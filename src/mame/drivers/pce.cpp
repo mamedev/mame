@@ -347,13 +347,15 @@ MACHINE_CONFIG_START(pce_state::pce_common)
 MACHINE_CONFIG_END
 
 
-MACHINE_CONFIG_DERIVED(pce_state::pce, pce_common)
+MACHINE_CONFIG_START(pce_state::pce)
+	pce_common(config);
 	MCFG_PCE_CARTRIDGE_ADD("cartslot", pce_cart, nullptr)
 	MCFG_SOFTWARE_LIST_ADD("cart_list","pce")
 MACHINE_CONFIG_END
 
 
-MACHINE_CONFIG_DERIVED(pce_state::tg16, pce_common)
+MACHINE_CONFIG_START(pce_state::tg16)
+	pce_common(config);
 	MCFG_TG16_CARTRIDGE_ADD("cartslot", pce_cart, nullptr)
 	MCFG_SOFTWARE_LIST_ADD("cart_list","tg16")
 MACHINE_CONFIG_END

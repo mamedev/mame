@@ -1070,7 +1070,8 @@ MACHINE_CONFIG_START(alphatp_12_state::alphatp2)
 	MCFG_FLOPPY_DRIVE_ADD("fdc:1", alphatp2_floppies, "525ssdd", floppy_image_device::default_floppy_formats)
 MACHINE_CONFIG_END
 
-MACHINE_CONFIG_DERIVED(alphatp_12_state::alphatp2u, alphatp2)
+MACHINE_CONFIG_START(alphatp_12_state::alphatp2u)
+	alphatp2(config);
 	MCFG_DEVICE_REMOVE("fdc:0")
 	MCFG_DEVICE_REMOVE("fdc:1")
 	MCFG_FLOPPY_DRIVE_ADD("fdc:0", alphatp2su_floppies, "525dd", floppy_image_device::default_floppy_formats)
@@ -1148,7 +1149,8 @@ MACHINE_CONFIG_START(alphatp_34_state::alphatp3)
 	MCFG_FLOPPY_DRIVE_ADD("fdc:1", alphatp3_floppies, "525qd", floppy_image_device::default_floppy_formats)
 MACHINE_CONFIG_END
 
-MACHINE_CONFIG_DERIVED(alphatp_34_state::alphatp30, alphatp3)
+MACHINE_CONFIG_START(alphatp_34_state::alphatp30)
+	alphatp3(config);
 	MCFG_CPU_ADD("i8088", I8088, 6000000) // unknown clock
 	MCFG_CPU_PROGRAM_MAP(alphatp30_8088_map)
 	MCFG_CPU_IO_MAP(alphatp30_8088_io)

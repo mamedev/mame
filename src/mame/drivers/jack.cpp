@@ -941,13 +941,15 @@ MACHINE_CONFIG_START(jack_state::jack)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 MACHINE_CONFIG_END
 
-MACHINE_CONFIG_DERIVED(jack_state::treahunt, jack)
+MACHINE_CONFIG_START(jack_state::treahunt)
+	jack(config);
 	MCFG_CPU_MODIFY("maincpu")
 	MCFG_CPU_OPCODES_MAP(decrypted_opcodes_map)
 MACHINE_CONFIG_END
 
 
-MACHINE_CONFIG_DERIVED(jack_state::striv, jack)
+MACHINE_CONFIG_START(jack_state::striv)
+	jack(config);
 
 	/* basic machine hardware */
 	MCFG_CPU_MODIFY("maincpu")
@@ -970,7 +972,8 @@ INTERRUPT_GEN_MEMBER(jack_state::joinem_vblank_irq)
 		device.execute().set_input_line(INPUT_LINE_NMI, PULSE_LINE);
 }
 
-MACHINE_CONFIG_DERIVED(jack_state::joinem, jack)
+MACHINE_CONFIG_START(jack_state::joinem)
+	jack(config);
 
 	/* basic machine hardware */
 	MCFG_CPU_MODIFY("maincpu")
@@ -995,7 +998,8 @@ MACHINE_CONFIG_DERIVED(jack_state::joinem, jack)
 MACHINE_CONFIG_END
 
 
-MACHINE_CONFIG_DERIVED(jack_state::unclepoo, joinem)
+MACHINE_CONFIG_START(jack_state::unclepoo)
+	joinem(config);
 
 	/* basic machine hardware */
 	MCFG_CPU_MODIFY("maincpu")

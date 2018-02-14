@@ -1499,7 +1499,8 @@ MACHINE_CONFIG_START(williams_state::williams)
 MACHINE_CONFIG_END
 
 
-MACHINE_CONFIG_DERIVED(williams_state::defender, williams)
+MACHINE_CONFIG_START(williams_state::defender)
+	williams(config);
 
 	/* basic machine hardware */
 
@@ -1524,14 +1525,16 @@ MACHINE_CONFIG_DERIVED(williams_state::defender, williams)
 MACHINE_CONFIG_END
 
 
-MACHINE_CONFIG_DERIVED(williams_state::jin, defender) // needs a different screen size or the credit text is clipped
+MACHINE_CONFIG_START(williams_state::jin) // needs a different screen size or the credit text is clipped
+	defender(config);
 	/* basic machine hardware */
 	MCFG_SCREEN_MODIFY("screen")
 	MCFG_SCREEN_VISIBLE_AREA(0, 315, 7, 247-1)
 MACHINE_CONFIG_END
 
 
-MACHINE_CONFIG_DERIVED(williams_state::williams_muxed, williams)
+MACHINE_CONFIG_START(williams_state::williams_muxed)
+	williams(config);
 
 	/* basic machine hardware */
 
@@ -1555,7 +1558,8 @@ MACHINE_CONFIG_DERIVED(williams_state::williams_muxed, williams)
 MACHINE_CONFIG_END
 
 
-MACHINE_CONFIG_DERIVED(williams_state::spdball, williams)
+MACHINE_CONFIG_START(williams_state::spdball)
+	williams(config);
 
 	/* basic machine hardware */
 
@@ -1566,7 +1570,8 @@ MACHINE_CONFIG_DERIVED(williams_state::spdball, williams)
 MACHINE_CONFIG_END
 
 
-MACHINE_CONFIG_DERIVED(williams_state::lottofun, williams)
+MACHINE_CONFIG_START(williams_state::lottofun)
+	williams(config);
 
 	/* basic machine hardware */
 
@@ -1579,7 +1584,8 @@ MACHINE_CONFIG_DERIVED(williams_state::lottofun, williams)
 MACHINE_CONFIG_END
 
 
-MACHINE_CONFIG_DERIVED(williams_state::sinistar, williams)
+MACHINE_CONFIG_START(williams_state::sinistar)
+	williams(config);
 
 	/* basic machine hardware */
 	MCFG_CPU_MODIFY("maincpu")
@@ -1599,7 +1605,8 @@ MACHINE_CONFIG_DERIVED(williams_state::sinistar, williams)
 MACHINE_CONFIG_END
 
 
-MACHINE_CONFIG_DERIVED(williams_state::playball, williams)
+MACHINE_CONFIG_START(williams_state::playball)
+	williams(config);
 
 	/* basic machine hardware */
 
@@ -1621,7 +1628,8 @@ MACHINE_CONFIG_DERIVED(williams_state::playball, williams)
 MACHINE_CONFIG_END
 
 
-MACHINE_CONFIG_DERIVED(blaster_state::blastkit, williams)
+MACHINE_CONFIG_START(blaster_state::blastkit)
+	williams(config);
 
 	/* basic machine hardware */
 	MCFG_CPU_MODIFY("maincpu")
@@ -1648,7 +1656,8 @@ MACHINE_CONFIG_DERIVED(blaster_state::blastkit, williams)
 MACHINE_CONFIG_END
 
 
-MACHINE_CONFIG_DERIVED(blaster_state::blaster, blastkit)
+MACHINE_CONFIG_START(blaster_state::blaster)
+	blastkit(config);
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("soundcpu_b", M6808, SOUND_CLOCK) // internal clock divider of 4, effective frequency is 894.886kHz
@@ -1757,7 +1766,8 @@ MACHINE_CONFIG_START(williams2_state::williams2)
 MACHINE_CONFIG_END
 
 
-MACHINE_CONFIG_DERIVED(williams2_state::inferno, williams2)
+MACHINE_CONFIG_START(williams2_state::inferno)
+	williams2(config);
 	MCFG_DEVICE_MODIFY("pia_0")
 	MCFG_PIA_READPA_HANDLER(DEVREAD8("mux", ls157_x2_device, output_r))
 	MCFG_PIA_CA2_HANDLER(DEVWRITELINE("mux", ls157_x2_device, select_w))
@@ -1768,7 +1778,8 @@ MACHINE_CONFIG_DERIVED(williams2_state::inferno, williams2)
 MACHINE_CONFIG_END
 
 
-MACHINE_CONFIG_DERIVED(williams2_state::mysticm, williams2)
+MACHINE_CONFIG_START(williams2_state::mysticm)
+	williams2(config);
 
 	/* basic machine hardware */
 
@@ -1783,7 +1794,8 @@ MACHINE_CONFIG_DERIVED(williams2_state::mysticm, williams2)
 MACHINE_CONFIG_END
 
 
-MACHINE_CONFIG_DERIVED(tshoot_state::tshoot, williams2)
+MACHINE_CONFIG_START(tshoot_state::tshoot)
+	williams2(config);
 
 	/* basic machine hardware */
 	MCFG_CPU_MODIFY("maincpu")
@@ -1810,7 +1822,8 @@ MACHINE_CONFIG_DERIVED(tshoot_state::tshoot, williams2)
 MACHINE_CONFIG_END
 
 
-MACHINE_CONFIG_DERIVED(joust2_state::joust2, williams2)
+MACHINE_CONFIG_START(joust2_state::joust2)
+	williams2(config);
 
 	/* basic machine hardware */
 	MCFG_CPU_MODIFY("maincpu")

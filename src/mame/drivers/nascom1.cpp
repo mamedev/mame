@@ -688,13 +688,15 @@ MACHINE_CONFIG_START(nascom_state::nascom)
 	MCFG_SNAPSHOT_ADD("snapshot", nascom_state, nascom1, "nas", 0.5)
 MACHINE_CONFIG_END
 
-MACHINE_CONFIG_DERIVED(nascom1_state::nascom1, nascom)
+MACHINE_CONFIG_START(nascom1_state::nascom1)
+	nascom(config);
 	MCFG_CPU_ADD("maincpu", Z80, XTAL(16'000'000) / 8)
 	MCFG_CPU_PROGRAM_MAP(nascom1_mem)
 	MCFG_CPU_IO_MAP(nascom1_io)
 MACHINE_CONFIG_END
 
-MACHINE_CONFIG_DERIVED(nascom2_state::nascom2, nascom)
+MACHINE_CONFIG_START(nascom2_state::nascom2)
+	nascom(config);
 	MCFG_CPU_ADD("maincpu", Z80, XTAL(16'000'000) / 4)
 	MCFG_CPU_PROGRAM_MAP(nascom2_mem)
 	MCFG_CPU_IO_MAP(nascom2_io)
@@ -728,7 +730,8 @@ MACHINE_CONFIG_DERIVED(nascom2_state::nascom2, nascom)
 	MCFG_SOFTWARE_LIST_ADD("floppy_list", "nascom_flop")
 MACHINE_CONFIG_END
 
-MACHINE_CONFIG_DERIVED(nascom2_state::nascom2c, nascom2)
+MACHINE_CONFIG_START(nascom2_state::nascom2c)
+	nascom2(config);
 	MCFG_CPU_MODIFY("maincpu")
 	MCFG_CPU_PROGRAM_MAP(nascom2c_mem)
 

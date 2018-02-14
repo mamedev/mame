@@ -231,7 +231,8 @@ MACHINE_CONFIG_START(poly88_state::poly88)
 	MCFG_SNAPSHOT_ADD("snapshot", poly88_state, poly88, "img", 2)
 MACHINE_CONFIG_END
 
-MACHINE_CONFIG_DERIVED(poly88_state::poly8813, poly88)
+MACHINE_CONFIG_START(poly88_state::poly8813)
+	poly88(config);
 	MCFG_CPU_MODIFY("maincpu")
 	MCFG_CPU_PROGRAM_MAP(poly8813_mem)
 	MCFG_CPU_IO_MAP(poly8813_io)

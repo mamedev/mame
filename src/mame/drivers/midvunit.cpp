@@ -1156,27 +1156,31 @@ MACHINE_CONFIG_START(midvunit_state::midvcommon)
 MACHINE_CONFIG_END
 
 
-MACHINE_CONFIG_DERIVED(midvunit_state::midvunit, midvcommon)
+MACHINE_CONFIG_START(midvunit_state::midvunit)
+	midvcommon(config);
 
 	/* sound hardware */
 	MCFG_DEVICE_ADD("dcs", DCS_AUDIO_2K, 0)
 MACHINE_CONFIG_END
 
 
-MACHINE_CONFIG_DERIVED(midvunit_state::crusnwld, midvunit)
+MACHINE_CONFIG_START(midvunit_state::crusnwld)
+	midvunit(config);
 	/* valid values are 450 or 460 */
 	MCFG_DEVICE_ADD("serial_pic", MIDWAY_SERIAL_PIC, 0)
 	MCFG_MIDWAY_SERIAL_PIC_UPPER(450)
 MACHINE_CONFIG_END
 
-MACHINE_CONFIG_DERIVED(midvunit_state::offroadc, midvunit)
+MACHINE_CONFIG_START(midvunit_state::offroadc)
+	midvunit(config);
 	/* valid values are 230 or 234 */
 	MCFG_DEVICE_ADD("serial_pic2", MIDWAY_SERIAL_PIC2, 0)
 	MCFG_MIDWAY_SERIAL_PIC2_UPPER(230)
 	MCFG_MIDWAY_SERIAL_PIC2_YEAR_OFFS(94)
 MACHINE_CONFIG_END
 
-MACHINE_CONFIG_DERIVED(midvunit_state::midvplus, midvcommon)
+MACHINE_CONFIG_START(midvunit_state::midvplus)
+	midvcommon(config);
 
 	/* basic machine hardware */
 	MCFG_CPU_MODIFY("maincpu")

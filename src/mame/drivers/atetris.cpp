@@ -405,7 +405,8 @@ MACHINE_CONFIG_START(atetris_state::atetrisb2)
 MACHINE_CONFIG_END
 
 
-MACHINE_CONFIG_DERIVED(atetris_state::atetrisb3, atetrisb2)
+MACHINE_CONFIG_START(atetris_state::atetrisb3)
+	atetrisb2(config);
 
 	MCFG_CPU_REPLACE("maincpu", M6502, MASTER_CLOCK/8)
 	MCFG_CPU_PROGRAM_MAP(atetrisb3_map)

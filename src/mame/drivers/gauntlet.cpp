@@ -551,22 +551,26 @@ MACHINE_CONFIG_START(gauntlet_state::gauntlet_base)
 MACHINE_CONFIG_END
 
 
-MACHINE_CONFIG_DERIVED(gauntlet_state::gauntlet, gauntlet_base)
+MACHINE_CONFIG_START(gauntlet_state::gauntlet)
+	gauntlet_base(config);
 	MCFG_SLAPSTIC_ADD("slapstic", 104)
 MACHINE_CONFIG_END
 
 
-MACHINE_CONFIG_DERIVED(gauntlet_state::gaunt2p, gauntlet_base)
+MACHINE_CONFIG_START(gauntlet_state::gaunt2p)
+	gauntlet_base(config);
 	MCFG_SLAPSTIC_ADD("slapstic", 107)
 MACHINE_CONFIG_END
 
 
-MACHINE_CONFIG_DERIVED(gauntlet_state::gauntlet2, gauntlet_base)
+MACHINE_CONFIG_START(gauntlet_state::gauntlet2)
+	gauntlet_base(config);
 	MCFG_SLAPSTIC_ADD("slapstic", 106)
 MACHINE_CONFIG_END
 
 
-MACHINE_CONFIG_DERIVED(gauntlet_state::vindctr2, gauntlet_base)
+MACHINE_CONFIG_START(gauntlet_state::vindctr2)
+	gauntlet_base(config);
 	MCFG_SLAPSTIC_ADD("slapstic", 118)
 MACHINE_CONFIG_END
 

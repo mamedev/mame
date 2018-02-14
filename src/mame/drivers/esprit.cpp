@@ -137,7 +137,8 @@ MACHINE_CONFIG_START(esprit_state::esprit)
 	MCFG_MC6845_UPDATE_ROW_CB(esprit_state, crtc_update_row)
 MACHINE_CONFIG_END
 
-MACHINE_CONFIG_DERIVED(esprit_state::esprit3, esprit)
+MACHINE_CONFIG_START(esprit_state::esprit3)
+	esprit(config);
 	MCFG_CPU_MODIFY("maincpu")
 	MCFG_CPU_PROGRAM_MAP(mem3_map)
 MACHINE_CONFIG_END

@@ -4317,7 +4317,8 @@ MACHINE_CONFIG_START(goldnpkr_state::goldnpkr_base)
 MACHINE_CONFIG_END
 
 
-MACHINE_CONFIG_DERIVED(goldnpkr_state::goldnpkr, goldnpkr_base)
+MACHINE_CONFIG_START(goldnpkr_state::goldnpkr)
+	goldnpkr_base(config);
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
@@ -4327,7 +4328,8 @@ MACHINE_CONFIG_DERIVED(goldnpkr_state::goldnpkr, goldnpkr_base)
 MACHINE_CONFIG_END
 
 
-MACHINE_CONFIG_DERIVED(goldnpkr_state::pottnpkr, goldnpkr_base)
+MACHINE_CONFIG_START(goldnpkr_state::pottnpkr)
+	goldnpkr_base(config);
 
 	/* basic machine hardware */
 	MCFG_CPU_MODIFY("maincpu")
@@ -4345,7 +4347,8 @@ MACHINE_CONFIG_DERIVED(goldnpkr_state::pottnpkr, goldnpkr_base)
 MACHINE_CONFIG_END
 
 
-MACHINE_CONFIG_DERIVED(goldnpkr_state::witchcrd, goldnpkr_base)
+MACHINE_CONFIG_START(goldnpkr_state::witchcrd)
+	goldnpkr_base(config);
 
 	/* basic machine hardware */
 	MCFG_CPU_MODIFY("maincpu")
@@ -4367,7 +4370,8 @@ MACHINE_CONFIG_DERIVED(goldnpkr_state::witchcrd, goldnpkr_base)
 MACHINE_CONFIG_END
 
 
-MACHINE_CONFIG_DERIVED(goldnpkr_state::wcfalcon, goldnpkr_base)
+MACHINE_CONFIG_START(goldnpkr_state::wcfalcon)
+	goldnpkr_base(config);
 
 	/* basic machine hardware */
 	MCFG_CPU_MODIFY("maincpu")
@@ -4390,7 +4394,8 @@ MACHINE_CONFIG_DERIVED(goldnpkr_state::wcfalcon, goldnpkr_base)
 MACHINE_CONFIG_END
 
 
-MACHINE_CONFIG_DERIVED(goldnpkr_state::wildcard, goldnpkr_base)
+MACHINE_CONFIG_START(goldnpkr_state::wildcard)
+	goldnpkr_base(config);
 
 	/* basic machine hardware */
 	MCFG_CPU_MODIFY("maincpu")
@@ -4414,7 +4419,8 @@ MACHINE_CONFIG_DERIVED(goldnpkr_state::wildcard, goldnpkr_base)
 MACHINE_CONFIG_END
 
 
-MACHINE_CONFIG_DERIVED(goldnpkr_state::wcrdxtnd, goldnpkr_base)
+MACHINE_CONFIG_START(goldnpkr_state::wcrdxtnd)
+	goldnpkr_base(config);
 
 	/* basic machine hardware */
 	MCFG_CPU_MODIFY("maincpu")
@@ -4438,7 +4444,8 @@ MACHINE_CONFIG_DERIVED(goldnpkr_state::wcrdxtnd, goldnpkr_base)
 MACHINE_CONFIG_END
 
 
-MACHINE_CONFIG_DERIVED(goldnpkr_state::wildcrdb, goldnpkr_base)
+MACHINE_CONFIG_START(goldnpkr_state::wildcrdb)
+	goldnpkr_base(config);
 
 	/* basic machine hardware */
 	MCFG_CPU_MODIFY("maincpu")
@@ -4467,7 +4474,8 @@ MACHINE_CONFIG_DERIVED(goldnpkr_state::wildcrdb, goldnpkr_base)
 MACHINE_CONFIG_END
 
 
-MACHINE_CONFIG_DERIVED(goldnpkr_state::genie, goldnpkr_base)
+MACHINE_CONFIG_START(goldnpkr_state::genie)
+	goldnpkr_base(config);
 
 	/* basic machine hardware */
 	MCFG_CPU_MODIFY("maincpu")
@@ -4489,7 +4497,8 @@ MACHINE_CONFIG_DERIVED(goldnpkr_state::genie, goldnpkr_base)
 MACHINE_CONFIG_END
 
 
-MACHINE_CONFIG_DERIVED(goldnpkr_state::geniea, goldnpkr_base)
+MACHINE_CONFIG_START(goldnpkr_state::geniea)
+	goldnpkr_base(config);
 
 	/* basic machine hardware */
 	MCFG_CPU_MODIFY("maincpu")
@@ -4511,7 +4520,8 @@ MACHINE_CONFIG_DERIVED(goldnpkr_state::geniea, goldnpkr_base)
 MACHINE_CONFIG_END
 
 
-MACHINE_CONFIG_DERIVED(goldnpkr_state::mondial, goldnpkr_base)
+MACHINE_CONFIG_START(goldnpkr_state::mondial)
+	goldnpkr_base(config);
 
 	/* basic machine hardware */
 	MCFG_CPU_MODIFY("maincpu")
@@ -4527,7 +4537,8 @@ MACHINE_CONFIG_DERIVED(goldnpkr_state::mondial, goldnpkr_base)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 MACHINE_CONFIG_END
 
-MACHINE_CONFIG_DERIVED(goldnpkr_state::bchancep, goldnpkr_base)
+MACHINE_CONFIG_START(goldnpkr_state::bchancep)
+	goldnpkr_base(config);
 
 	/* basic machine hardware */
 	MCFG_CPU_MODIFY("maincpu")

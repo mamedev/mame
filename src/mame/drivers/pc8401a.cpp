@@ -594,7 +594,7 @@ MACHINE_CONFIG_START(pc8401a_state::pc8401a)
 	MCFG_RS232_DSR_HANDLER(DEVWRITELINE(I8251_TAG, i8251_device, write_dsr))
 
 	/* video hardware */
-	MCFG_FRAGMENT_ADD(pc8401a_video)
+	pc8401a_video(config);
 
 	/* option ROM cartridge */
 	MCFG_GENERIC_CARTSLOT_ADD("cartslot", generic_plain_slot, nullptr)
@@ -636,7 +636,7 @@ MACHINE_CONFIG_START(pc8500_state::pc8500)
 	MCFG_RS232_DSR_HANDLER(DEVWRITELINE(I8251_TAG, i8251_device, write_dsr))
 
 	/* video hardware */
-	MCFG_FRAGMENT_ADD(pc8500_video)
+	pc8500_video(config);
 
 	/* option ROM cartridge */
 	MCFG_GENERIC_CARTSLOT_ADD("cartslot", generic_plain_slot, nullptr)

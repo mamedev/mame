@@ -695,7 +695,8 @@ MACHINE_CONFIG_START(astinvad_state::kamikaze)
 MACHINE_CONFIG_END
 
 
-MACHINE_CONFIG_DERIVED(astinvad_state::spcking2, kamikaze)
+MACHINE_CONFIG_START(astinvad_state::spcking2)
+	kamikaze(config);
 
 	/* basic machine hardware */
 	MCFG_DEVICE_MODIFY("ppi8255_1")

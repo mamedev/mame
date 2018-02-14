@@ -220,7 +220,8 @@ MACHINE_CONFIG_START(stlforce_state::stlforce)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 MACHINE_CONFIG_END
 
-MACHINE_CONFIG_DERIVED(stlforce_state::twinbrat, stlforce)
+MACHINE_CONFIG_START(stlforce_state::twinbrat)
+	stlforce(config);
 
 	/* basic machine hardware */
 	MCFG_CPU_MODIFY("maincpu")

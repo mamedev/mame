@@ -2179,7 +2179,8 @@ MACHINE_CONFIG_START(kaneko16_gtmr_state::gtmr)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.5)
 MACHINE_CONFIG_END
 
-MACHINE_CONFIG_DERIVED(kaneko16_gtmr_state::gtmre, gtmr)
+MACHINE_CONFIG_START(kaneko16_gtmr_state::gtmre)
+	gtmr(config);
 	MCFG_DEVICE_MODIFY("toybox")
 	MCFG_TOYBOX_TABLE_TYPE(ALT)
 MACHINE_CONFIG_END
@@ -2188,7 +2189,8 @@ MACHINE_CONFIG_END
                             Great 1000 Miles Rally 2
 ***************************************************************************/
 
-MACHINE_CONFIG_DERIVED(kaneko16_gtmr_state::gtmr2, gtmre)
+MACHINE_CONFIG_START(kaneko16_gtmr_state::gtmr2)
+	gtmre(config);
 
 	/* basic machine hardware */
 	MCFG_CPU_MODIFY("maincpu")
@@ -2199,7 +2201,8 @@ MACHINE_CONFIG_END
                                 Blood Warrior
 ***************************************************************************/
 
-MACHINE_CONFIG_DERIVED(kaneko16_gtmr_state::bloodwar, gtmr)
+MACHINE_CONFIG_START(kaneko16_gtmr_state::bloodwar)
+	gtmr(config);
 
 	/* basic machine hardware */
 	MCFG_CPU_MODIFY("maincpu")
@@ -2220,7 +2223,8 @@ MACHINE_CONFIG_END
                             Bonk's Adventure
 ***************************************************************************/
 
-MACHINE_CONFIG_DERIVED(kaneko16_gtmr_state::bonkadv, gtmr)
+MACHINE_CONFIG_START(kaneko16_gtmr_state::bonkadv)
+	gtmr(config);
 
 	/* basic machine hardware */
 	MCFG_CPU_MODIFY("maincpu")
@@ -2449,7 +2453,8 @@ ADDRESS_MAP_START(kaneko16_shogwarr_state::brapboys_oki2_map)
 	AM_RANGE(0x20000, 0x3ffff) AM_ROMBANK("bank11")
 ADDRESS_MAP_END
 
-MACHINE_CONFIG_DERIVED(kaneko16_shogwarr_state::brapboys, shogwarr)
+MACHINE_CONFIG_START(kaneko16_shogwarr_state::brapboys)
+	shogwarr(config);
 	MCFG_SOUND_MODIFY("oki2")
 	MCFG_DEVICE_ADDRESS_MAP(0, brapboys_oki2_map)
 

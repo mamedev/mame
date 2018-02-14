@@ -577,7 +577,8 @@ MACHINE_CONFIG_START(smsmfg_state::sms)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
 MACHINE_CONFIG_END
 
-MACHINE_CONFIG_DERIVED(smsmfg_state::sureshot, sms)
+MACHINE_CONFIG_START(smsmfg_state::sureshot)
+	sms(config);
 
 	MCFG_CPU_MODIFY("maincpu")
 	MCFG_CPU_PROGRAM_MAP(sureshot_map)

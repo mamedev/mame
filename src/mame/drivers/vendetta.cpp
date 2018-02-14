@@ -491,7 +491,8 @@ MACHINE_CONFIG_START(vendetta_state::vendetta)
 MACHINE_CONFIG_END
 
 
-MACHINE_CONFIG_DERIVED(vendetta_state::esckids, vendetta)
+MACHINE_CONFIG_START(vendetta_state::esckids)
+	vendetta(config);
 
 	/* basic machine hardware */
 	MCFG_CPU_MODIFY("maincpu")

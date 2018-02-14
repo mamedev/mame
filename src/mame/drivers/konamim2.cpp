@@ -1325,7 +1325,8 @@ MACHINE_CONFIG_START(konamim2_state::m2)
 
 MACHINE_CONFIG_END
 
-MACHINE_CONFIG_DERIVED(konamim2_state::_3do_m2, m2)
+MACHINE_CONFIG_START(konamim2_state::_3do_m2)
+	m2(config);
 	MCFG_CPU_MODIFY("maincpu")
 	MCFG_CPU_PROGRAM_MAP(_3do_m2_main_m)
 
