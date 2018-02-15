@@ -223,7 +223,8 @@ private:
 
 	void handle_palette(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	double hue2rgb(double p, double q, double t);
-
+	void draw_tile(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect, int tile, int bpp, int xpos, int ypos, int drawheight, int drawwidth, int flipx, int pal, int opaque);
+	
 	int m_rgnlen;
 	uint8_t* m_rgn;
 
@@ -327,6 +328,55 @@ void xavix_state::handle_palette(screen_device &screen, bitmap_ind16 &bitmap, co
 	}
 }
 
+void xavix_state::draw_tile(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect, int tile, int bpp, int xpos, int ypos, int drawheight, int drawwidth, int flipx, int pal, int opaque)
+{
+	// set the address here so we can increment in bits in the draw function
+	set_data_address(tile, 0);
+
+	for (int y = 0; y < drawheight; y++)
+	{
+		int row = ypos + y;
+
+		for (int x = 0; x < drawwidth; x++)
+		{
+
+			int col;
+
+			if (flipx)
+			{
+				col = xpos - x;
+			}
+			else
+			{
+				col = xpos + x;
+			}
+
+			uint8_t dat = 0;
+
+			for (int i = 0; i < bpp; i++)
+			{
+				dat |= (get_next_bit() << i);
+			}
+
+			if ((row >= cliprect.min_y && row <= cliprect.max_y) && (col >= cliprect.min_x && col <= cliprect.max_x))
+			{
+				uint16_t* rowptr;
+
+				rowptr = &bitmap.pix16(row);
+				
+				if (opaque)
+				{
+					rowptr[col] = (dat + (pal << 4)) & 0xff;
+				}
+				else
+				{
+					if (dat)
+						rowptr[col] = (dat + (pal << 4)) & 0xff;
+				}
+			}
+		}
+	}
+}
 
 uint32_t xavix_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
@@ -334,15 +384,29 @@ uint32_t xavix_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap,
 
 	bitmap.fill(0, cliprect);
 
+	static int bankhack = 0;
+
+	if (machine().input().code_pressed_once(KEYCODE_W))
+	{
+		bankhack++;
+		printf("%02x\n", bankhack);
+	}
+
+	if (machine().input().code_pressed_once(KEYCODE_Q))
+	{
+		bankhack--;
+		printf("%02x\n", bankhack);
+	}
+
 	if (m_tilemap_enabled)
 	{
 		// why are the first two logos in Monster Truck stored as tilemaps in main ram?
 		// test mode isn't? is the code meant to process them instead? - there are no sprites in the sprite list at the time (and only one in test mode)
-		gfx_element *gfx;
 		int count;
 		
+		int alt_tileaddressing = 0;
+
 		count = 0;
-		gfx = m_gfxdecode->gfx(1);
 		for (int y = 0; y < 16; y++)
 		{
 			for (int x = 0; x < 16; x++)
@@ -350,20 +414,41 @@ uint32_t xavix_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap,
 				int tile = m_mainram[count];
 				tile |= (m_mainram[count+0x100]<<8);
 				count++;
+				int bpp = 4;
 
-				int gfxbase = (m_spr_attra[1] << 8) | (m_spr_attra[0]);
+				if (m_6fc8_regs[0x3] == 0x36) bpp = 4;
+				else if (m_6fc8_regs[0x3] == 0x3c) bpp = 7;
+
+				int basereg;
+
+				if (!alt_tileaddressing)
+				{
+					basereg = 0;
+				}
+				else
+				{
+					basereg = bankhack;
+				}
+
 				// upper bit is often set, maybe just because it relies on mirroring, maybe other purpose
+				int gfxbase = (m_spr_attra[(basereg*2)+1] << 16) | (m_spr_attra[(basereg*2)]<<8);
 
-				tile += (gfxbase << 1);
+				if (!alt_tileaddressing)
+				{
+					if (bpp == 4) tile = tile * 128;
+					if (bpp == 7) tile = tile * 224;
+				}
+	
+				tile += gfxbase;
 
-				gfx->opaque(bitmap, cliprect, tile, 0, 0, 0, x * 16, y * 16);
+				draw_tile(screen, bitmap, cliprect, tile, bpp, x*16, (y*16)-24, 16, 16, 0, 0, 1);
+
 			}
 		}
 
 
 		// there is a 2nd layer in monster truck too, there must be more to the gfxbase tho, because the lower layer can't be using the same gfxbase..
 		count = 0x200;
-		gfx = m_gfxdecode->gfx(0);
 		for (int y = 0; y < 32; y++)
 		{
 			for (int x = 0; x < 32; x++)
@@ -371,22 +456,36 @@ uint32_t xavix_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap,
 				int tile = m_mainram[count];
 				tile |= (m_mainram[count+0x400]<<8);
 				count++;
+				int bpp = 4;
 
-				int gfxbase = (m_spr_attra[1] << 8) | (m_spr_attra[0]);
+				int basereg;
+
+				if (!alt_tileaddressing)
+				{
+					basereg = 0;
+				}
+				else
+				{
+					basereg = bankhack;
+				}
+
 				// upper bit is often set, maybe just because it relies on mirroring, maybe other purpose
+				int gfxbase = (m_spr_attra[(basereg*2)+1] << 16) | (m_spr_attra[(basereg*2)]<<8);
+
+				if (!alt_tileaddressing)
+				{
+					if (bpp == 4) tile = tile * 32;
+					if (bpp == 7) tile = tile * 56;
+				}
 
 				// even the transpen makes no sense here, it's 0 on the used elements, 15 on the unused ones.. are 00 tiles just ignored?
 				if (tile)
 				{
-					tile += (gfxbase << 3);
-					gfx->transpen(bitmap, cliprect, tile, 0, 0, 0, x * 8, (y * 8) - 16, 0);
+					tile += gfxbase;
+					draw_tile(screen, bitmap, cliprect, tile, bpp, x*8, (y*8)-16, 8, 8, 0, 0, 0);
 				}
 			}
 		}
-
-
-
-
 	}
 
 	//logerror("frame\n");
@@ -469,45 +568,7 @@ uint32_t xavix_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap,
 		bpp = (attr0 & 0x0e) >> 1;
 		bpp += 1;
 
-		// set the address here so we can increment in bits in the draw function
-		set_data_address(tile, 0);
-
-		for (int y = 0; y < drawheight; y++)
-		{
-			int row = ypos + y;
-
-			for (int x = 0; x < drawwidth; x++)
-			{
-
-				int col;
-
-				if (flipx)
-				{
-					col = xpos - x;
-				}
-				else
-				{
-					col = xpos + x;
-				}
-
-				uint8_t dat = 0;
-
-				for (int i = 0; i < bpp; i++)
-				{
-					dat |= (get_next_bit() << i);
-				}
-
-				if ((row >= cliprect.min_x && row < cliprect.max_x) && (col >= cliprect.min_y && col < cliprect.max_y))
-				{
-					uint16_t* rowptr;
-
-					rowptr = &bitmap.pix16(row);
-					if (dat)
-						rowptr[col] = (dat + (pal << 4)) & 0xff;
-				}
-			}
-
-		}
+		draw_tile(screen, bitmap, cliprect, tile, bpp, xpos, ypos, drawheight, drawwidth, flipx, pal, 0);
 
 
 		/*
@@ -983,7 +1044,24 @@ WRITE8_MEMBER(xavix_state::xavix_6fc0_w)
 
 WRITE8_MEMBER(xavix_state::xavix_6fc8_w)
 {
-	// 0x4 and 0x5 appear to be bg tilemap scroll
+	/*
+	   0x0 seems to be where the tilemap is in ram (02 in monster truck, 0f in ekara)
+	       it gets set to 0x40 in monster truck test mode, which is outside of ram but test mode requires a fixed 'column scan' layout
+		   so that might be special
+
+	   0x1 unknown
+
+	   0x2 unused?
+
+	   0x3 could be palette / bpp selection
+
+	   0x4 and 0x5 appear to be bg tilemap scroll
+
+	   0x6 unknown
+
+	   0x7 could be mode (16x16, 8x8 etc.)
+
+	 */
 
 	if ((offset != 0x4) && (offset != 0x5))
 	{
@@ -1000,6 +1078,7 @@ WRITE8_MEMBER(xavix_state::xavix_6fd8_w)
 
 WRITE8_MEMBER(xavix_state::xavix_6fd7_w)
 {
+	// mode for 2nd tilemap?
 	logerror("%s: xavix_6fd7_w data %02x\n", machine().describe_context(), data);
 }
 
@@ -1020,7 +1099,7 @@ ADDRESS_MAP_START(xavix_state::xavix_map)
 	// appears to be 256 sprites (shares will be renamed once their purpose is known)
 	AM_RANGE(0x006000, 0x0060ff) AM_RAM AM_SHARE("spr_attr0")
 	AM_RANGE(0x006100, 0x0061ff) AM_RAM AM_SHARE("spr_attr1")
-	AM_RANGE(0x006200, 0x0062ff) AM_RAM AM_SHARE("spr_ypos") // cleared to 0x8f0 by both games, maybe enable registers?
+	AM_RANGE(0x006200, 0x0062ff) AM_RAM AM_SHARE("spr_ypos") // cleared to 0x80 by both games, maybe enable registers?
 	AM_RANGE(0x006300, 0x0063ff) AM_RAM AM_SHARE("spr_xpos")
 	AM_RANGE(0x006400, 0x0064ff) AM_RAM // 6400 range unused by code, does it exist?
 	AM_RANGE(0x006500, 0x0065ff) AM_RAM AM_SHARE("spr_addr_lo")
