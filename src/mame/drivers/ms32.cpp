@@ -2369,7 +2369,7 @@ ROM_START( tp2m32 )
 	ROM_LOAD( "mr96019-03.10", 0x000000, 0x400000, CRC(94af8057) SHA1(e3bc6e02fe4c503ae51284770a76abbeff989147) )
 
 	ROM_REGION( 0x080000, "gfx4", 0 ) /* tx tiles */
-	ROM_LOAD( "mp2_30.ver1.0.30", 0x000000, 0x080000, CRC(6845e476) SHA1(61c33714db2e2b5ccdcef0e0d3efdc391fe6aba2) ) /* labeled M  P2 21 Ver1.0  - game name in Kanji between M and P2 */
+	ROM_LOAD( "mp2_30.ver1.0.30", 0x000000, 0x080000, CRC(6845e476) SHA1(61c33714db2e2b5ccdcef0e0d3efdc391fe6aba2) ) /* labeled M  P2 30 Ver1.0  - game name in Kanji between M and P2 */
 
 	ROM_REGION( 0x40000, "audiocpu", 0 ) /* z80 program */
 	ROM_LOAD( "mp2_21.ver1.0.21", 0x000000, 0x040000, CRC(2bcc4176) SHA1(74740fa13ab81b9819b4cfbe9d34a0749ba23b8f) ) /* labeled M  P2 21 Ver1.0  - game name in Kanji between M and P2 */
@@ -2576,8 +2576,8 @@ GAME( 1994, bbbxing,   0,        ms32, bbbxing,  ms32_state, ss92046_01, ROT0,  
 GAME( 1994, suchie2,   0,        ms32, suchie2,  ms32_state, suchie2,    ROT0,   "Jaleco",        "Idol Janshi Suchie-Pai II (ver 1.1)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
 GAME( 1994, suchie2o,  suchie2,  ms32, suchie2,  ms32_state, suchie2,    ROT0,   "Jaleco",        "Idol Janshi Suchie-Pai II (ver 1.0)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
 GAME( 1995, desertwr,  0,        ms32, desertwr, ms32_state, ss91022_10, ROT270, "Jaleco",        "Desert War / Wangan Sensou (ver 1.0)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
-GAME( 1995, gametngk,  0,        ms32, gametngk, ms32_state, ss91022_10, ROT270, "Jaleco",        "The Game Paradise - Master of Shooting! / Game Tengoku - The Game Paradise", MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
-GAME( 1995, tetrisp,   0,        ms32, tetrisp,  ms32_state, ss92046_01, ROT0,   "Jaleco / BPS",  "Tetris Plus", MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
+GAME( 1995, gametngk,  0,        ms32, gametngk, ms32_state, ss91022_10, ROT270, "Jaleco",        "The Game Paradise - Master of Shooting! / Game Tengoku - The Game Paradise (ver 1.0)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
+GAME( 1995, tetrisp,   0,        ms32, tetrisp,  ms32_state, ss92046_01, ROT0,   "Jaleco / BPS",  "Tetris Plus (ver 1.0)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
 GAME( 1995, p47aces,   0,        ms32, p47aces,  ms32_state, ss92048_01, ROT0,   "Jaleco",         "P-47 Aces", MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
 GAME( 1995, akiss,     0,        ms32, suchie2,  ms32_state, kirarast,   ROT0,   "Jaleco",         "Mahjong Angel Kiss (ver 1.0)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
 GAME( 1996, gratia,    0,        ms32, gratia,   ms32_state, ss92047_01, ROT0,   "Jaleco",         "Gratia - Second Earth (ver 1.0, 92047-01 version)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
