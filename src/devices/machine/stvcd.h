@@ -31,8 +31,11 @@ protected:
 	virtual void device_start() override;
 	virtual void device_reset() override;
 	virtual void device_stop() override;
+	virtual const tiny_rom_entry *device_rom_region() const override;
 
 private:
+	void saturn_cdb_map(address_map &map);
+
 	TIMER_DEVICE_CALLBACK_MEMBER( stv_sector_cb );
 	TIMER_DEVICE_CALLBACK_MEMBER( stv_sh1_sim );
 
