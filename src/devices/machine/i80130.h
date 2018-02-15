@@ -73,9 +73,6 @@ public:
 	DECLARE_WRITE_LINE_MEMBER( ir6_w ) { m_pic->ir6_w(state); }
 	DECLARE_WRITE_LINE_MEMBER( ir7_w ) { m_pic->ir7_w(state); }
 
-	DECLARE_READ16_MEMBER( io_r );
-	DECLARE_WRITE16_MEMBER( io_w );
-
 protected:
 	// device-level overrides
 	virtual void device_start() override;
@@ -99,6 +96,9 @@ private:
 	DECLARE_WRITE_LINE_MEMBER( systick_w ) { m_write_systick(state); }
 	DECLARE_WRITE_LINE_MEMBER( delay_w ) { m_write_delay(state); }
 	DECLARE_WRITE_LINE_MEMBER( baud_w ) { m_write_baud(state); }
+
+	DECLARE_READ16_MEMBER( io_r );
+	DECLARE_WRITE16_MEMBER( io_w );
 };
 
 

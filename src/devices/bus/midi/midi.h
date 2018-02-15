@@ -59,7 +59,6 @@ protected:
 	midi_port_device *m_port;
 };
 
-extern const device_type MIDI_PORT;
 DECLARE_DEVICE_TYPE(MIDI_PORT, midi_port_device)
 
 SLOT_INTERFACE_EXTERN(midiin_slot);

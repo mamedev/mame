@@ -191,12 +191,11 @@ private:
 	TIMER_CALLBACK_MEMBER( timer_callback );
 };
 
-/* used in: hyhoo.c, niyanpai.c, pastelg.c, nbmj8688.c, nbmj8891.c, nbmj8991.c, nbmj9195.c*/
+/* used in: hyhoo.cpp, niyanpai.cpp, pastelg.cpp, nbmj8688.cpp, nbmj8891.cpp, nbmj8991.cpp, nbmj9195.cpp */
 INPUT_PORTS_EXTERN( nbmjcontrols );
 INPUT_PORTS_EXTERN( nbhf1_ctrl );
 INPUT_PORTS_EXTERN( nbhf2_ctrl );
 
-extern const device_type NB1413M3;
 DECLARE_DEVICE_TYPE(NB1413M3, nb1413m3_device)
 
 

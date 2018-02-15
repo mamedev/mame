@@ -84,7 +84,6 @@ private:
 
 
 // device type definition
-extern const device_type IMI5000H;
 DECLARE_DEVICE_TYPE(IMI5000H, imi5000h_device)
 
 #endif // MAME_BUS_IMI7000_IMI5000H_H

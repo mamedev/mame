@@ -38,7 +38,6 @@ private:
 	required_region_ptr<u8> m_key;
 };
 
-extern const device_type MC8123;
 DECLARE_DEVICE_TYPE(MC8123, mc8123_device)
 
 #endif // MAME_MACHINE_MC8123

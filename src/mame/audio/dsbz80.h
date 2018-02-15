@@ -64,7 +64,6 @@ private:
 
 
 // device type definition
-extern const device_type DSBZ80;
 DECLARE_DEVICE_TYPE(DSBZ80, dsbz80_device)
 
 #endif // MAME_AUDIO_DSBZ80_H

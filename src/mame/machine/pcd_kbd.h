@@ -37,7 +37,6 @@ private:
 	DECLARE_READ_LINE_MEMBER( t0_r );
 };
 
-extern const device_type PCD_KEYBOARD;
 DECLARE_DEVICE_TYPE(PCD_KEYBOARD, pcd_keyboard_device)
 
 #endif // MAME_INCLUDES_PCD_KBD_H

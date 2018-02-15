@@ -118,7 +118,6 @@ private:
 
 
 // device type definition
-extern const device_type TMS3556;
 DECLARE_DEVICE_TYPE(TMS3556, tms3556_device)
 
 #endif // MAME_VIDEO_TMS3556_H

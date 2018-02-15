@@ -60,7 +60,6 @@ private:
 	IRQ_CALLBACK_MEMBER(int_cb);
 };
 
-extern const device_type M24_Z8000;
 DECLARE_DEVICE_TYPE(M24_Z8000, m24_z8000_device)
 
 #endif // MAME_MACHINE_M24_Z8000_H

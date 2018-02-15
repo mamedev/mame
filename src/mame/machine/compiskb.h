@@ -73,7 +73,6 @@ private:
 
 
 // device type definition
-extern const device_type COMPIS_KEYBOARD;
 DECLARE_DEVICE_TYPE(COMPIS_KEYBOARD, compis_keyboard_device)
 
 #endif // MAME_INCLUDES_COMPISKB_H

@@ -60,14 +60,8 @@ public:
 	DECLARE_WRITE_LINE_MEMBER( store );
 	DECLARE_WRITE_LINE_MEMBER( recall );
 
-	void x2212_e2prom_map(address_map &map);
-	void x2212_sram_map(address_map &map);
 protected:
 	x2212_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock, int size_data);
-
-	// internal helpers
-	void store();
-	void recall();
 
 	// device-level overrides
 	virtual void device_start() override;
@@ -80,6 +74,7 @@ protected:
 	virtual void nvram_read(emu_file &file) override;
 	virtual void nvram_write(emu_file &file) override;
 
+private:
 	// configuration state
 	bool                        m_auto_save;
 
@@ -96,6 +91,13 @@ protected:
 
 	int const m_size_data;
 	optional_region_ptr<uint8_t> m_default_data;
+
+	// internal helpers
+	void store();
+	void recall();
+
+	void x2212_e2prom_map(address_map &map);
+	void x2212_sram_map(address_map &map);
 };
 
 class x2210_device : public x2212_device
