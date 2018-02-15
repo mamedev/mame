@@ -230,7 +230,8 @@ inline void ay31015_device::update_status_pin(uint8_t reg_bit, ay31015_output_pi
 	if (new_value != m_pins[pin])
 	{
 		m_pins[pin] = new_value;
-		write_cb(new_value);
+		if (!write_cb.isnull())
+			write_cb(new_value);
 	}
 }
 

@@ -68,7 +68,6 @@ private:
 	uint8_t m_joy1, m_joy2, m_joy3, m_joy4;
 	uint8_t m_joy_pckt[16];
 	uint16_t m_vram_offs;
-	uint8_t m_mlt_req;
 
 	uint32_t m_lcd_buffer[4 * 160 * 8];
 	uint16_t m_lcd_output[320];
