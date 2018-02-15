@@ -1393,6 +1393,8 @@ Note: on screen copyright is (c)1998 Coinmaster.
 #include "jockeyc.lh"
 #include "setaroul.lh"
 
+#include <algorithm>
+
 #if __uPD71054_TIMER
 // this mess should be replaced with pit8254, see madshark
 
@@ -3445,7 +3447,7 @@ WRITE8_MEMBER(seta_state::calibr50_soundlatch2_w)
 }
 
 ADDRESS_MAP_START(seta_state::calibr50_sub_map)
-	;map(0x0000, 0x1fff).lrw8("calibr50_x1_010_rw", [this](address_space &space, offs_t offset, u8 mem_mask){ return m_x1snd->read(space, offset ^ 0x1000, mem_mask); }, [this](address_space &space, offs_t offset, u8 data, u8 mem_mask){ m_x1snd->write(space, offset ^ 0x1000, data, mem_mask); }); // Sound
+	AM_RANGE(0x0000, 0x1fff) AM_DEVREADWRITE("x1snd", x1_010_device, read ,write) // Sound
 	AM_RANGE(0x4000, 0x4000) AM_DEVREAD("soundlatch", generic_latch_8_device, read)             // From Main CPU
 	AM_RANGE(0x4000, 0x4000) AM_WRITE(calibr50_sub_bankswitch_w)        // Bankswitching
 	AM_RANGE(0x8000, 0xbfff) AM_ROMBANK("subbank")                        // Banked ROM
@@ -7969,6 +7971,7 @@ MACHINE_CONFIG_START(seta_state::usclssic)
 	MCFG_GENERIC_LATCH_SEPARATE_ACKNOWLEDGE(true)
 
 	MCFG_SOUND_ADD("x1snd", X1_010, 16000000)   /* 16 MHz */
+	MCFG_X1_010_ADDRESS_XOR(0x1000)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 MACHINE_CONFIG_END
 
@@ -8028,6 +8031,7 @@ MACHINE_CONFIG_START(seta_state::calibr50)
 	MCFG_GENERIC_LATCH_8_ADD("soundlatch2")
 
 	MCFG_SOUND_ADD("x1snd", X1_010, 16000000)   /* 16 MHz */
+	MCFG_X1_010_ADDRESS_XOR(0x1000)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
 MACHINE_CONFIG_END
 
@@ -11837,7 +11841,7 @@ DRIVER_INIT_MEMBER(seta_state,blandia)
 		buf[rpos] = rom[rpos*2+1];
 	}
 
-	memcpy( rom, &buf[0], rom_size );
+	std::copy( buf.begin(), buf.end(), &rom[0] );
 
 	rom = memregion("gfx3")->base() + 0x40000;
 
@@ -11846,7 +11850,7 @@ DRIVER_INIT_MEMBER(seta_state,blandia)
 		buf[rpos] = rom[rpos*2+1];
 	}
 
-	memcpy( rom, &buf[0], rom_size );
+	std::copy( buf.begin(), buf.end(), &rom[0] );
 }
 
 
@@ -11884,7 +11888,7 @@ DRIVER_INIT_MEMBER(seta_state,wiggie)
 	len = memregion("maincpu")->bytes();
 	for (i = 0;i < len;i += 16)
 	{
-		memcpy(temp,&src[i],16);
+		std::copy(&src[i],&src[i+16],std::begin(temp));
 		for (j = 0;j < 16;j++)
 		{
 			static const int convtable[16] =
