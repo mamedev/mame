@@ -170,7 +170,7 @@ Not Dumped:
 Super Strong Warriors
 
 NOTE: Several games us the ROM cart board number for the EPROM numbers.  Though several
-      us MB-93138 for the MB-94166 cart
+      us MB93166 for the MB-94166 cart
 
 ************************************************************************************
 
