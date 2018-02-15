@@ -436,8 +436,7 @@ uint32_t xavix_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap,
 
 				if (!alt_tileaddressing)
 				{
-					if (bpp == 4) tile = tile * 128;
-					if (bpp == 7) tile = tile * 224;
+					tile = tile * (32 * bpp);
 				}
 	
 				tile += gfxbase;
@@ -478,8 +477,7 @@ uint32_t xavix_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap,
 
 				if (!alt_tileaddressing)
 				{
-					if (bpp == 4) tile = tile * 32;
-					if (bpp == 7) tile = tile * 56;
+					tile = tile * (8 * bpp);
 				}
 
 				// even the transpen makes no sense here, it's 0 on the used elements, 15 on the unused ones.. are 00 tiles just ignored?
