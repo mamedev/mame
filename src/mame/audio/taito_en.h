@@ -27,6 +27,8 @@ public:
 	DECLARE_WRITE16_MEMBER( en_es5505_bank_w );
 	DECLARE_WRITE8_MEMBER( en_volume_w );
 
+	void set_bank(int bank, int entry) { m_cpubank[bank]->set_entry(entry); }
+
 	void en_sound_map(address_map &map);
 protected:
 	// device-level overrides

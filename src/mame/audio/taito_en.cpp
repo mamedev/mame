@@ -42,6 +42,10 @@ void taito_en_device::device_start()
 {
 	m_pump->set_otis(m_ensoniq);
 	m_pump->set_esp(m_esp);
+	uint8_t *ROM = m_osrom->base();
+	uint32_t max = (m_osrom->bytes() - 0x100000) / 0x20000;
+	for (int i = 0; i < 3; i++)
+		m_cpubank[i]->configure_entries(0, max, &ROM[0x100000], 0x20000);
 }
 
 
@@ -52,11 +56,11 @@ void taito_en_device::device_start()
 void taito_en_device::device_reset()
 {
 	/* Sound cpu program loads to 0xc00000 so we use a bank */
+	m_cpubank[0]->set_entry(0);
+	m_cpubank[1]->set_entry(1);
+	m_cpubank[2]->set_entry(2);
+	
 	uint16_t *ROM = (uint16_t *)m_osrom->base();
-	m_cpubank[0]->set_base(&ROM[0x80000]);
-	m_cpubank[1]->set_base(&ROM[0x90000]);
-	m_cpubank[2]->set_base(&ROM[0xa0000]);
-
 	std::copy(&ROM[0x80000], &ROM[0x80004], &m_osram[0]); /* Stack and Reset vectors */
 
 	/* reset CPU to catch any banking of startup vectors */
