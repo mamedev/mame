@@ -385,6 +385,8 @@ uint32_t xavix_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap,
 
 	bitmap.fill(0, cliprect);
 
+	int alt_tileaddressing = 0;
+
 	static int bankhack = 0;
 
 	if (machine().input().code_pressed_once(KEYCODE_W))
@@ -404,8 +406,7 @@ uint32_t xavix_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap,
 		// why are the first two logos in Monster Truck stored as tilemaps in main ram?
 		// test mode isn't? is the code meant to process them instead? - there are no sprites in the sprite list at the time (and only one in test mode)
 		int count;
-		
-		int alt_tileaddressing = 0;
+
 
 		count = 0;
 		for (int y = 0; y < 16; y++)
@@ -414,12 +415,12 @@ uint32_t xavix_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap,
 			{
 				int bpp, pal, scrolly, scrollx;
 				int tile = m_mainram[count];
-				tile |= (m_mainram[count+0x100]<<8);
+				tile |= (m_mainram[count + 0x100] << 8);
 				count++;
 
-				bpp = (m_tmap1_regs[0x3] & 0x0e)>>1;
+				bpp = (m_tmap1_regs[0x3] & 0x0e) >> 1;
 				bpp++;
-				pal = (m_tmap1_regs[0x6] & 0xf0)>>4;
+				pal = (m_tmap1_regs[0x6] & 0xf0) >> 4;
 				scrolly = m_tmap1_regs[0x5];
 				scrollx = m_tmap1_regs[0x4];
 
@@ -435,68 +436,19 @@ uint32_t xavix_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap,
 				}
 
 				// upper bit is often set, maybe just because it relies on mirroring, maybe other purpose
-				int gfxbase = (m_spr_attra[(basereg*2)+1] << 16) | (m_spr_attra[(basereg*2)]<<8);
+				int gfxbase = (m_spr_attra[(basereg * 2) + 1] << 16) | (m_spr_attra[(basereg * 2)] << 8);
 
 				if (!alt_tileaddressing)
 				{
 					tile = tile * (32 * bpp);
 				}
-	
+
 				tile += gfxbase;
 
-				draw_tile(screen, bitmap, cliprect, tile, bpp, (x*16)+scrollx, ((y*16)-16)-scrolly, 16, 16, 0, pal, 1);
-				draw_tile(screen, bitmap, cliprect, tile, bpp, (x*16)+scrollx, (((y*16)-16)-scrolly)+256, 16, 16, 0, pal, 1); // wrap-y
-				draw_tile(screen, bitmap, cliprect, tile, bpp, ((x*16)+scrollx)-256, ((y*16)-16)-scrolly, 16, 16, 0, pal, 1); // wrap-x
-				draw_tile(screen, bitmap, cliprect, tile, bpp, ((x*16)+scrollx)-256, (((y*16)-16)-scrolly)+256, 16, 16, 0, pal, 1); // wrap-y and x
-			}
-		}
-
-
-		// there is a 2nd layer in monster truck too, there must be more to the gfxbase tho, because the lower layer can't be using the same gfxbase..
-		count = 0x200;
-		for (int y = 0; y < 32; y++)
-		{
-			for (int x = 0; x < 32; x++)
-			{
-				int bpp, pal, scrolly, scrollx;
-				int tile = m_mainram[count];
-				tile |= (m_mainram[count+0x400]<<8);
-				count++;
-
-				bpp = (m_tmap2_regs[0x3] & 0x0e)>>1;
-				bpp++;
-				pal = (m_tmap2_regs[0x6] & 0xf0)>>4;
-				scrolly = m_tmap2_regs[0x5];
-				scrollx = m_tmap2_regs[0x4];
-
-				int basereg;
-
-				if (!alt_tileaddressing)
-				{
-					basereg = 0;
-				}
-				else
-				{
-					basereg = bankhack;
-				}
-
-				// upper bit is often set, maybe just because it relies on mirroring, maybe other purpose
-				int gfxbase = (m_spr_attra[(basereg*2)+1] << 16) | (m_spr_attra[(basereg*2)]<<8);
-
-				if (!alt_tileaddressing)
-				{
-					tile = tile * (8 * bpp);
-				}
-
-				// even the transpen makes no sense here, it's 0 on the used elements, 15 on the unused ones.. are 00 tiles just ignored?
-				if (tile)
-				{
-					tile += gfxbase;
-					draw_tile(screen, bitmap, cliprect, tile, bpp, (x*8)+scrollx, ((y*8)-16)-scrolly, 8, 8, 0, pal, 0);
-					draw_tile(screen, bitmap, cliprect, tile, bpp, (x*8)+scrollx, (((y*8)-16)-scrolly)+256, 8, 8, 0, pal, 0); // wrap-y
-					draw_tile(screen, bitmap, cliprect, tile, bpp, ((x*8)+scrollx)-256, ((y*8)-16)-scrolly, 8, 8, 0, pal, 0); // wrap x
-					draw_tile(screen, bitmap, cliprect, tile, bpp, ((x*8)+scrollx)-256, (((y*8)-16)-scrolly)+256, 8, 8, 0, pal, 0); // wrap-y and x
-				}
+				draw_tile(screen, bitmap, cliprect, tile, bpp, (x * 16) + scrollx, ((y * 16) - 16) - scrolly, 16, 16, 0, pal, 1);
+				draw_tile(screen, bitmap, cliprect, tile, bpp, (x * 16) + scrollx, (((y * 16) - 16) - scrolly) + 256, 16, 16, 0, pal, 1); // wrap-y
+				draw_tile(screen, bitmap, cliprect, tile, bpp, ((x * 16) + scrollx) - 256, ((y * 16) - 16) - scrolly, 16, 16, 0, pal, 1); // wrap-x
+				draw_tile(screen, bitmap, cliprect, tile, bpp, ((x * 16) + scrollx) - 256, (((y * 16) - 16) - scrolly) + 256, 16, 16, 0, pal, 1); // wrap-y and x
 			}
 		}
 	}
@@ -583,7 +535,9 @@ uint32_t xavix_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap,
 		bpp += 1;
 
 		draw_tile(screen, bitmap, cliprect, tile, bpp, xpos, ypos, drawheight, drawwidth, flipx, pal, 0);
-
+		draw_tile(screen, bitmap, cliprect, tile, bpp, xpos-256, ypos, drawheight, drawwidth, flipx, pal, 0); // wrap-x
+		draw_tile(screen, bitmap, cliprect, tile, bpp, xpos, ypos-256, drawheight, drawwidth, flipx, pal, 0); // wrap-y
+		draw_tile(screen, bitmap, cliprect, tile, bpp, xpos-256, ypos-256, drawheight, drawwidth, flipx, pal, 0); // wrap-x,y
 
 		/*
 		if ((m_spr_ypos[i] != 0x81) && (m_spr_ypos[i] != 0x80) && (m_spr_ypos[i] != 0x00))
@@ -591,6 +545,57 @@ uint32_t xavix_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap,
 			logerror("sprite with enable? %02x attr0 %02x attr1 %02x attr3 %02x attr5 %02x attr6 %02x attr7 %02x\n", m_spr_ypos[i], m_spr_attr0[i], m_spr_attr1[i], m_spr_xpos[i], m_spr_addr_lo[i], m_spr_addr_md[i], m_spr_addr_hi[i] );
 		}
 		*/
+	}
+
+	if (m_tilemap_enabled)
+	{
+		// there is a 2nd layer in monster truck too, there must be more to the gfxbase tho, because the lower layer can't be using the same gfxbase..
+		int count = 0x200;
+		for (int y = 0; y < 32; y++)
+		{
+			for (int x = 0; x < 32; x++)
+			{
+				int bpp, pal, scrolly, scrollx;
+				int tile = m_mainram[count];
+				tile |= (m_mainram[count+0x400]<<8);
+				count++;
+
+				bpp = (m_tmap2_regs[0x3] & 0x0e)>>1;
+				bpp++;
+				pal = (m_tmap2_regs[0x6] & 0xf0)>>4;
+				scrolly = m_tmap2_regs[0x5];
+				scrollx = m_tmap2_regs[0x4];
+
+				int basereg;
+
+				if (!alt_tileaddressing)
+				{
+					basereg = 0;
+				}
+				else
+				{
+					basereg = bankhack;
+				}
+
+				// upper bit is often set, maybe just because it relies on mirroring, maybe other purpose
+				int gfxbase = (m_spr_attra[(basereg*2)+1] << 16) | (m_spr_attra[(basereg*2)]<<8);
+
+				if (!alt_tileaddressing)
+				{
+					tile = tile * (8 * bpp);
+				}
+
+				// even the transpen makes no sense here, it's 0 on the used elements, 15 on the unused ones.. are 00 tiles just ignored?
+				if (tile)
+				{
+					tile += gfxbase;
+					draw_tile(screen, bitmap, cliprect, tile, bpp, (x*8)+scrollx, ((y*8)-16)-scrolly, 8, 8, 0, pal, 0);
+					draw_tile(screen, bitmap, cliprect, tile, bpp, (x*8)+scrollx, (((y*8)-16)-scrolly)+256, 8, 8, 0, pal, 0); // wrap-y
+					draw_tile(screen, bitmap, cliprect, tile, bpp, ((x*8)+scrollx)-256, ((y*8)-16)-scrolly, 8, 8, 0, pal, 0); // wrap x
+					draw_tile(screen, bitmap, cliprect, tile, bpp, ((x*8)+scrollx)-256, (((y*8)-16)-scrolly)+256, 8, 8, 0, pal, 0); // wrap-y and x
+				}
+			}
+		}
 	}
 
 	return 0;
@@ -1455,7 +1460,7 @@ MACHINE_CONFIG_START(xavix_state::xavix)
 	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500))
 	MCFG_SCREEN_UPDATE_DRIVER(xavix_state, screen_update)
 	MCFG_SCREEN_SIZE(32*8, 32*8)
-	MCFG_SCREEN_VISIBLE_AREA(0*8, 32*8-1, 0*8, 28*8-1)
+	MCFG_SCREEN_VISIBLE_AREA(1*8, 31*8-1, 0*8, 28*8-1)
 	MCFG_SCREEN_PALETTE("palette")
 
 	MCFG_GFXDECODE_ADD("gfxdecode", "palette", xavix)
