@@ -412,13 +412,16 @@ uint32_t xavix_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap,
 		{
 			for (int x = 0; x < 16; x++)
 			{
+				int bpp, pal, scrolly, scrollx;
 				int tile = m_mainram[count];
 				tile |= (m_mainram[count+0x100]<<8);
 				count++;
-				int bpp;
 
 				bpp = (m_tmap1_regs[0x3] & 0x0e)>>1;
 				bpp++;
+				pal = (m_tmap1_regs[0x6] & 0xf0)>>4;
+				scrolly = m_tmap1_regs[0x5];
+				scrollx = m_tmap1_regs[0x4];
 
 				int basereg;
 
@@ -441,8 +444,10 @@ uint32_t xavix_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap,
 	
 				tile += gfxbase;
 
-				draw_tile(screen, bitmap, cliprect, tile, bpp, x*16, (y*16)-24, 16, 16, 0, 0, 1);
-
+				draw_tile(screen, bitmap, cliprect, tile, bpp, (x*16)+scrollx, ((y*16)-16)-scrolly, 16, 16, 0, pal, 1);
+				draw_tile(screen, bitmap, cliprect, tile, bpp, (x*16)+scrollx, (((y*16)-16)-scrolly)+256, 16, 16, 0, pal, 1); // wrap-y
+				draw_tile(screen, bitmap, cliprect, tile, bpp, ((x*16)+scrollx)-256, ((y*16)-16)-scrolly, 16, 16, 0, pal, 1); // wrap-x
+				draw_tile(screen, bitmap, cliprect, tile, bpp, ((x*16)+scrollx)-256, (((y*16)-16)-scrolly)+256, 16, 16, 0, pal, 1); // wrap-y and x
 			}
 		}
 
@@ -453,13 +458,16 @@ uint32_t xavix_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap,
 		{
 			for (int x = 0; x < 32; x++)
 			{
+				int bpp, pal, scrolly, scrollx;
 				int tile = m_mainram[count];
 				tile |= (m_mainram[count+0x400]<<8);
 				count++;
-				int bpp = 4;
 
 				bpp = (m_tmap2_regs[0x3] & 0x0e)>>1;
 				bpp++;
+				pal = (m_tmap2_regs[0x6] & 0xf0)>>4;
+				scrolly = m_tmap2_regs[0x5];
+				scrollx = m_tmap2_regs[0x4];
 
 				int basereg;
 
@@ -484,7 +492,10 @@ uint32_t xavix_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap,
 				if (tile)
 				{
 					tile += gfxbase;
-					draw_tile(screen, bitmap, cliprect, tile, bpp, x*8, (y*8)-16, 8, 8, 0, 0, 0);
+					draw_tile(screen, bitmap, cliprect, tile, bpp, (x*8)+scrollx, ((y*8)-16)-scrolly, 8, 8, 0, pal, 0);
+					draw_tile(screen, bitmap, cliprect, tile, bpp, (x*8)+scrollx, (((y*8)-16)-scrolly)+256, 8, 8, 0, pal, 0); // wrap-y
+					draw_tile(screen, bitmap, cliprect, tile, bpp, ((x*8)+scrollx)-256, ((y*8)-16)-scrolly, 8, 8, 0, pal, 0); // wrap x
+					draw_tile(screen, bitmap, cliprect, tile, bpp, ((x*8)+scrollx)-256, (((y*8)-16)-scrolly)+256, 8, 8, 0, pal, 0); // wrap-y and x
 				}
 			}
 		}
