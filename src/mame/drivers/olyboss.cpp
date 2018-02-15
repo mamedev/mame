@@ -68,7 +68,17 @@ public:
 			m_char_rom(*this, UPD3301_TAG)
 		{ }
 
-	DECLARE_DRIVER_INIT(olyboss);
+public:
+	void olybossb(machine_config &config);
+	void olybossc(machine_config &config);
+	void olybossd(machine_config &config);
+
+protected:
+	virtual void machine_start() override;
+	virtual void machine_reset() override;
+	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr) override;
+
+private:
 	DECLARE_READ8_MEMBER(keyboard_read);
 
 	UPD3301_DRAW_CHARACTER_MEMBER( olyboss_display_pixels );
@@ -87,14 +97,9 @@ public:
 	DECLARE_WRITE8_MEMBER( vchrmap_w );
 	DECLARE_WRITE8_MEMBER( vchrram_w );
 	DECLARE_WRITE8_MEMBER( ppic_w );
-	
-	void olybossb(machine_config &config);
-	void olybossc(machine_config &config);
-	void olybossd(machine_config &config);
 	void olyboss_io(address_map &map);
 	void olyboss_mem(address_map &map);
 	
-private:
 	required_device<cpu_device> m_maincpu;
 	required_device<i8257_device> m_dma;
 	required_device<upd3301_device> m_crtc;
@@ -111,7 +116,14 @@ private:
 	u8 m_fdcctrl;
 	u8 m_channel, m_vchrmap, m_vchrpage;
 	u8 m_vchrram[0x800];
+	emu_timer *m_timer;
 };
+
+void olyboss_state::device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr)
+{
+	m_uic->ireq7_w(ASSERT_LINE);
+	m_uic->ireq7_w(CLEAR_LINE);
+}
 
 //**************************************************************************
 //  ADDRESS MAPS
@@ -127,6 +139,7 @@ ADDRESS_MAP_START(olyboss_state::olyboss_io)
 	ADDRESS_MAP_UNMAP_HIGH
 	AM_RANGE(0x0, 0x8) AM_DEVREADWRITE(I8257_TAG, i8257_device, read, write)
 	AM_RANGE(0x10, 0x11) AM_DEVICE("fdc", upd765a_device, map)
+	//AM_RANGE(0x20, 0x20) //beeper?
 	AM_RANGE(0x30, 0x30) AM_DEVREADWRITE("uic", am9519_device, data_r, data_w)
 	AM_RANGE(0x31, 0x31) AM_DEVREADWRITE("uic", am9519_device, stat_r, cmd_w)
 	AM_RANGE(0x40, 0x43) AM_DEVREADWRITE("ppi", i8255_device, read, write)
@@ -166,7 +179,7 @@ WRITE8_MEMBER( olyboss_state::vchrmap_w )
 
 WRITE8_MEMBER( olyboss_state::vchrram_w )
 {
-	m_vchrram[(m_vchrpage << 4) + offset] = data;
+	m_vchrram[(m_vchrpage << 4) + (offset ^ 0xf)] = data;
 }
 
 //**************************************************************************
@@ -175,7 +188,11 @@ WRITE8_MEMBER( olyboss_state::vchrram_w )
 
 UPD3301_DRAW_CHARACTER_MEMBER( olyboss_state::olyboss_display_pixels )
 {
-	uint8_t data = m_char_rom->base()[(cc << 4) | lc];
+	uint8_t data = cc & 0x7f;
+	if(cc & 0x80)
+		data = m_vchrram[(data << 4) | lc];
+	else
+		data = m_char_rom->base()[(data << 4) | lc];
 	int i;
 
 	//if (lc >= 8) return;
@@ -213,13 +230,19 @@ WRITE8_MEMBER( olyboss_state::ppic_w )
 	m_fdcctrl = (m_fdcctrl & ~0x10) | (BIT(data, 5) ? 0x10 : 0);
 }
 
-DRIVER_INIT_MEMBER( olyboss_state, olyboss )
+void olyboss_state::machine_start()
+{
+	m_timer = timer_alloc();
+}
+
+void olyboss_state::machine_reset()
 {
 	m_keybhit=false;
 
 	m_fdcctrl = 0;
 	m_vchrmap = 0;
 	m_vchrpage = 0;
+	m_timer->adjust(attotime::from_hz(60), 0, attotime::from_hz(60)); // unknown timer freq, possibly com2651 BRCLK
 }
 
 void olyboss_state::keyboard_put(u8 data)
@@ -404,6 +427,6 @@ ROM_END
 //**************************************************************************
 
 //   YEAR  NAME			PARENT	COMPAT	MACHINE		INPUT		CLASS			INIT		COMPANY						FULLNAME			FLAGS
-COMP(1981, olybossb,	olybossd,	0,		olybossb,	olyboss,	olyboss_state,	olyboss,	"Olympia International",	"Olympia BOSS B",	MACHINE_NOT_WORKING | MACHINE_NO_SOUND )
-COMP(1981, olybossc,	olybossd,	0,		olybossc,	olyboss,	olyboss_state,	olyboss,	"Olympia International",	"Olympia BOSS C",	MACHINE_NOT_WORKING | MACHINE_NO_SOUND )
-COMP(1981, olybossd,	0,			0,		olybossd,	olyboss,	olyboss_state,	olyboss,	"Olympia International",	"Olympia BOSS D",	MACHINE_NOT_WORKING | MACHINE_NO_SOUND )
+COMP(1981, olybossb,	olybossd,	0,		olybossb,	olyboss,	olyboss_state,	0,	"Olympia International",	"Olympia BOSS B",	MACHINE_NOT_WORKING | MACHINE_NO_SOUND )
+COMP(1981, olybossc,	olybossd,	0,		olybossc,	olyboss,	olyboss_state,	0,	"Olympia International",	"Olympia BOSS C",	MACHINE_NOT_WORKING | MACHINE_NO_SOUND )
+COMP(1981, olybossd,	0,			0,		olybossd,	olyboss,	olyboss_state,	0,	"Olympia International",	"Olympia BOSS D",	MACHINE_NOT_WORKING | MACHINE_NO_SOUND )
