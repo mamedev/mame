@@ -319,4 +319,4 @@ ROM_START( galastrm )
 ROM_END
 
 
-GAME( 1992, galastrm, 0, galastrm, galastrm, galastrm_state, 0, ROT0, "Taito Corporation", "Galactic Storm (Japan)", MACHINE_IMPERFECT_GRAPHICS )
+GAME( 1992, galastrm, 0, galastrm, galastrm, galastrm_state, 0, ROT0, "Taito Corporation", "Galactic Storm (Japan)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND )
