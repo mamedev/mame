@@ -3319,10 +3319,7 @@ ADDRESS_MAP_END
 
 WRITE8_MEMBER(seta_state::sub_bankswitch_w)
 {
-	uint8_t *rom = memregion("sub")->base();
-	int bank = data >> 4;
-
-	membank("bank1")->set_base(&rom[bank * 0x4000 + 0xc000]);
+	m_subbank->set_entry(data >> 4);
 }
 
 WRITE8_MEMBER(seta_state::sub_bankswitch_lockout_w)
@@ -3351,7 +3348,7 @@ ADDRESS_MAP_START(seta_state::tndrcade_sub_map)
 	AM_RANGE(0x3000, 0x3001) AM_DEVWRITE("ym2", ym3812_device, write)
 	AM_RANGE(0x5000, 0x57ff) AM_RAM AM_SHARE("sharedram")       // Shared RAM
 	AM_RANGE(0x6000, 0x7fff) AM_ROM                             // ROM
-	AM_RANGE(0x8000, 0xbfff) AM_ROMBANK("bank1")                        // Banked ROM
+	AM_RANGE(0x8000, 0xbfff) AM_ROMBANK("subbank")                        // Banked ROM
 	AM_RANGE(0xc000, 0xffff) AM_ROM                             // ROM
 ADDRESS_MAP_END
 
@@ -3370,7 +3367,7 @@ ADDRESS_MAP_START(seta_state::twineagl_sub_map)
 	AM_RANGE(0x1002, 0x1002) AM_READ_PORT("COINS")          // Coins
 	AM_RANGE(0x5000, 0x57ff) AM_RAM AM_SHARE("sharedram")       // Shared RAM
 	AM_RANGE(0x7000, 0x7fff) AM_ROM                         // ROM
-	AM_RANGE(0x8000, 0xbfff) AM_ROMBANK("bank1")                    // Banked ROM
+	AM_RANGE(0x8000, 0xbfff) AM_ROMBANK("subbank")                    // Banked ROM
 	AM_RANGE(0xc000, 0xffff) AM_ROM                         // ROM
 ADDRESS_MAP_END
 
@@ -3410,7 +3407,7 @@ ADDRESS_MAP_START(seta_state::downtown_sub_map)
 	AM_RANGE(0x1000, 0x1000) AM_WRITE(sub_bankswitch_lockout_w) // ROM Bank + Coin Lockout
 	AM_RANGE(0x5000, 0x57ff) AM_RAM AM_SHARE("sharedram")       // Shared RAM
 	AM_RANGE(0x7000, 0x7fff) AM_ROM                         // ROM
-	AM_RANGE(0x8000, 0xbfff) AM_ROMBANK("bank1")                    // Banked ROM
+	AM_RANGE(0x8000, 0xbfff) AM_ROMBANK("subbank")                    // Banked ROM
 	AM_RANGE(0xc000, 0xffff) AM_ROM                         // ROM
 ADDRESS_MAP_END
 
@@ -3448,10 +3445,10 @@ WRITE8_MEMBER(seta_state::calibr50_soundlatch2_w)
 }
 
 ADDRESS_MAP_START(seta_state::calibr50_sub_map)
-	AM_RANGE(0x0000, 0x1fff) AM_DEVREADWRITE("x1snd", x1_010_device, read ,write) // Sound
+	;map(0x0000, 0x1fff).lrw8("calibr50_x1_010_rw", [this](address_space &space, offs_t offset, u8 mem_mask){ return m_x1snd->read(space, offset ^ 0x1000, mem_mask); }, [this](address_space &space, offs_t offset, u8 data, u8 mem_mask){ m_x1snd->write(space, offset ^ 0x1000, data, mem_mask); }); // Sound
 	AM_RANGE(0x4000, 0x4000) AM_DEVREAD("soundlatch", generic_latch_8_device, read)             // From Main CPU
 	AM_RANGE(0x4000, 0x4000) AM_WRITE(calibr50_sub_bankswitch_w)        // Bankswitching
-	AM_RANGE(0x8000, 0xbfff) AM_ROMBANK("bank1")                        // Banked ROM
+	AM_RANGE(0x8000, 0xbfff) AM_ROMBANK("subbank")                        // Banked ROM
 	AM_RANGE(0xc000, 0xffff) AM_ROM                             // ROM
 	AM_RANGE(0xc000, 0xc000) AM_WRITE(calibr50_soundlatch2_w)   // To Main CPU
 ADDRESS_MAP_END
@@ -3472,7 +3469,7 @@ ADDRESS_MAP_START(seta_state::metafox_sub_map)
 	AM_RANGE(0x1006, 0x1006) AM_READ_PORT("P2")             // P2
 	AM_RANGE(0x5000, 0x57ff) AM_RAM AM_SHARE("sharedram")       // Shared RAM
 	AM_RANGE(0x7000, 0x7fff) AM_ROM                         // ROM
-	AM_RANGE(0x8000, 0xbfff) AM_ROMBANK("bank1")                    // Banked ROM
+	AM_RANGE(0x8000, 0xbfff) AM_ROMBANK("subbank")                    // Banked ROM
 	AM_RANGE(0xc000, 0xffff) AM_ROM                         // ROM
 ADDRESS_MAP_END
 
@@ -7972,7 +7969,6 @@ MACHINE_CONFIG_START(seta_state::usclssic)
 	MCFG_GENERIC_LATCH_SEPARATE_ACKNOWLEDGE(true)
 
 	MCFG_SOUND_ADD("x1snd", X1_010, 16000000)   /* 16 MHz */
-	MCFG_X1_010_ADDRESS(0x1000)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 MACHINE_CONFIG_END
 
@@ -8032,7 +8028,6 @@ MACHINE_CONFIG_START(seta_state::calibr50)
 	MCFG_GENERIC_LATCH_8_ADD("soundlatch2")
 
 	MCFG_SOUND_ADD("x1snd", X1_010, 16000000)   /* 16 MHz */
-	MCFG_X1_010_ADDRESS(0x1000)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
 MACHINE_CONFIG_END
 
@@ -11700,6 +11695,21 @@ READ16_MEMBER(seta_state::twineagl_debug_r)
 	return 0;
 }
 
+DRIVER_INIT_MEMBER(seta_state,bank6502)
+{
+	uint8_t *rom = memregion("sub")->base();
+	uint32_t max = (memregion("sub")->bytes() - 0xc000) / 0x4000;
+
+	if (max > 1) // if 6502 ROM is bankswitched(size is larger than 0x4000)
+	{
+		m_subbank->configure_entries(0, max, &rom[0xc000], 0x4000);
+		if (max < 16)
+			m_subbank->configure_entries(max, 16-max, &rom[0xc000], 0x4000); // Unverified : Bankswitching is Mirrored?
+	}
+	else
+		m_subbank->configure_entries(0, 16, &rom[0xc000], 0); // Not bankswitched : for avoid crashing when accessing bank functions
+}
+
 /* Extra RAM ? Check code at 0x00ba90 */
 /* 2000F8 = A3 enables it, 2000F8 = 00 disables? see downtown too */
 READ16_MEMBER(seta_state::twineagl_200100_r)
@@ -11720,6 +11730,7 @@ WRITE16_MEMBER(seta_state::twineagl_200100_w)
 
 DRIVER_INIT_MEMBER(seta_state,twineagl)
 {
+	DRIVER_INIT_CALL(bank6502);
 	/* debug? */
 	m_maincpu->space(AS_PROGRAM).install_read_handler(0x800000, 0x8000ff, read16_delegate(FUNC(seta_state::twineagl_debug_r),this));
 
@@ -11753,6 +11764,7 @@ WRITE16_MEMBER(seta_state::downtown_protection_w)
 
 DRIVER_INIT_MEMBER(seta_state,downtown)
 {
+	DRIVER_INIT_CALL(bank6502);
 	m_maincpu->space(AS_PROGRAM).install_readwrite_handler(0x200000, 0x2001ff, read16_delegate(FUNC(seta_state::downtown_protection_r),this), write16_delegate(FUNC(seta_state::downtown_protection_w),this));
 }
 
@@ -11773,6 +11785,7 @@ READ16_MEMBER(seta_state::arbalest_debug_r)
 
 DRIVER_INIT_MEMBER(seta_state,arbalest)
 {
+	DRIVER_INIT_CALL(bank6502);
 	m_maincpu->space(AS_PROGRAM).install_read_handler(0x80000, 0x8000f, read16_delegate(FUNC(seta_state::arbalest_debug_r),this));
 }
 
@@ -11801,6 +11814,7 @@ READ16_MEMBER(seta_state::metafox_protection_r)
 
 DRIVER_INIT_MEMBER(seta_state,metafox)
 {
+	DRIVER_INIT_CALL(bank6502);
 	m_maincpu->space(AS_PROGRAM).install_read_handler(0x21c000, 0x21ffff,read16_delegate(FUNC(seta_state::metafox_protection_r),this));
 }
 
@@ -11920,8 +11934,8 @@ DRIVER_INIT_MEMBER(jockeyc_state,inttoote)
 ***************************************************************************/
 
 /* 68000 + 65C02 */
-GAME( 1987, tndrcade,  0,        tndrcade,  tndrcade,  seta_state,     0,         ROT270, "Seta (Taito license)",      "Thundercade / Twin Formation" , 0) // Title/License: DSW
-GAME( 1987, tndrcadej, tndrcade, tndrcade,  tndrcadj,  seta_state,     0,         ROT270, "Seta (Taito license)",      "Tokusyu Butai U.A.G. (Japan)" , 0) // License: DSW
+GAME( 1987, tndrcade,  0,        tndrcade,  tndrcade,  seta_state,     bank6502,  ROT270, "Seta (Taito license)",      "Thundercade / Twin Formation" , 0) // Title/License: DSW
+GAME( 1987, tndrcadej, tndrcade, tndrcade,  tndrcadj,  seta_state,     bank6502,  ROT270, "Seta (Taito license)",      "Tokusyu Butai U.A.G. (Japan)" , 0) // License: DSW
 
 GAME( 1988, twineagl,  0,        twineagl,  twineagl,  seta_state,     twineagl,  ROT270, "Seta (Taito license)",      "Twin Eagle - Revenge Joe's Brother" , 0) // Country/License: DSW
 
@@ -11930,9 +11944,9 @@ GAME( 1989, downtown2, downtown, downtown,  downtown,  seta_state,     downtown,
 GAME( 1989, downtownj, downtown, downtown,  downtown,  seta_state,     downtown,  ROT270, "Seta",                      "DownTown / Mokugeki (joystick hack)" , 0) // Country/License: DSW
 GAME( 1989, downtownp, downtown, downtown,  downtown,  seta_state,     downtown,  ROT270, "Seta",                      "DownTown / Mokugeki (prototype)" , 0) // Country/License: DSW
 
-GAME( 1989, usclssic,  0,        usclssic,  usclssic,  seta_state,     0,         ROT270, "Seta",                      "U.S. Classic" , 0) // Country/License: DSW
+GAME( 1989, usclssic,  0,        usclssic,  usclssic,  seta_state,     bank6502,  ROT270, "Seta",                      "U.S. Classic" , 0) // Country/License: DSW
 
-GAME( 1989, calibr50,  0,        calibr50,  calibr50,  seta_state,     0,         ROT270, "Athena / Seta",             "Caliber 50" , 0) // Country/License: DSW
+GAME( 1989, calibr50,  0,        calibr50,  calibr50,  seta_state,     bank6502,  ROT270, "Athena / Seta",             "Caliber 50" , 0) // Country/License: DSW
 
 GAME( 1989, arbalest,  0,        metafox,   arbalest,  seta_state,     arbalest,  ROT270, "Seta",                      "Arbalester" , 0) // Country/License: DSW
 
@@ -11975,7 +11989,7 @@ GAME( 1992, neobattl,  0,        umanclub,  neobattl,  seta_state,     0,       
 
 GAME( 1992, umanclub,  0,        umanclub,  umanclub,  seta_state,     0,         ROT0,   "Banpresto / Tsuburaya Productions", "Ultraman Club - Tatakae! Ultraman Kyoudai!!", 0 )
 
-GAME( 1992, zingzip,   0,        zingzip,   zingzip,   seta_state,     0,         ROT270, "Allumer / Tecmo",           "Zing Zing Zip", 0 )
+GAME( 1992, zingzip,   0,        zingzip,   zingzip,   seta_state,     0,         ROT270, "Allumer / Tecmo",           "Zing Zing Zip", 0 ) // This set has Chinese Characters in Title screen, it distributed for Chinese market/or Title: DSW?
 GAME( 1992, zingzipbl, zingzip,  zingzipbl, zingzip,   seta_state,     0,         ROT270, "bootleg",                   "Zing Zing Zip (bootleg)", MACHINE_NOT_WORKING )
 
 GAME( 1993, atehate,   0,        atehate,   atehate,   seta_state,     0,         ROT0,   "Athena",                    "Athena no Hatena ?", 0 )

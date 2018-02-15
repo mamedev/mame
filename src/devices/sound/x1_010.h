@@ -10,8 +10,6 @@ class x1_010_device : public device_t, public device_sound_interface
 public:
 	x1_010_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
-	// static configuration
-	static void set_address(device_t &device, int addr) { downcast<x1_010_device &>(device).m_adr = addr; }
 
 	DECLARE_READ8_MEMBER ( read );
 	DECLARE_WRITE8_MEMBER( write );
@@ -36,7 +34,6 @@ private:
 	/* Variables only used here */
 	required_region_ptr<int8_t> m_region;    // ROM
 	int m_rate;                              // Output sampling rate (Hz)
-	int m_adr;                               // address
 	sound_stream *  m_stream;                // Stream handle
 	int m_sound_enable;                      // sound output enable/disable
 	uint8_t   m_reg[0x2000];                 // X1-010 Register & wave form area
@@ -49,8 +46,5 @@ private:
 
 DECLARE_DEVICE_TYPE(X1_010, x1_010_device)
 
-
-#define MCFG_X1_010_ADDRESS(_addr) \
-	x1_010_device::set_address(*device, _addr);
 
 #endif // MAME_SOUND_X1_010_H

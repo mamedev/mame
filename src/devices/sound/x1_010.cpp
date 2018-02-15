@@ -91,7 +91,6 @@ x1_010_device::x1_010_device(const machine_config &mconfig, const char *tag, dev
 		device_sound_interface(mconfig, *this),
 		m_region(*this, DEVICE_SELF),
 		m_rate(0),
-		m_adr(0),
 		m_stream(nullptr),
 		m_sound_enable(0),
 		m_base_clock(0)
@@ -143,14 +142,12 @@ void x1_010_device::enable_w(int data)
 
 READ8_MEMBER( x1_010_device::read )
 {
-	offset ^= m_adr;
 	return m_reg[offset];
 }
 
 WRITE8_MEMBER( x1_010_device::write )
 {
 	int channel, reg;
-	offset ^= m_adr;
 
 	channel = offset/sizeof(X1_010_CHANNEL);
 	reg     = offset%sizeof(X1_010_CHANNEL);
