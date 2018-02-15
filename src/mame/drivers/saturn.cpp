@@ -428,12 +428,10 @@ test1f diagnostic hacks:
 #include "cpu/m68000/m68000.h"
 #include "cpu/scudsp/scudsp.h"
 #include "cpu/sh/sh2.h"
-#include "imagedev/chd_cd.h"
 #include "machine/nvram.h"
 #include "machine/smpc.h"
 #include "machine/stvcd.h"
 #include "machine/saturn_cdb.h"
-#include "sound/cdda.h"
 #include "sound/scsp.h"
 #include "video/stvvdp1.h"
 #include "video/stvvdp2.h"
@@ -442,6 +440,8 @@ test1f diagnostic hacks:
 #include "bus/saturn/dram.h"
 #include "bus/saturn/rom.h"
 #include "bus/saturn/sat_slot.h"
+
+#include "bus/sat_ctrl/ctrl.h"
 
 #include "screen.h"
 #include "softlist.h"
@@ -456,6 +456,7 @@ public:
 		: saturn_state(mconfig, type, tag)
 		, m_exp(*this, "exp")
 		, m_nvram(*this, "nvram")
+		, m_stvcd(*this, "stvcd")
 		, m_ctrl1(*this, "ctrl1")
 		, m_ctrl2(*this, "ctrl2")
 	{ }
@@ -489,6 +490,7 @@ public:
 
 	required_device<sat_cart_slot_device> m_exp;
 	required_device<nvram_device> m_nvram;
+	required_device<stvcd_device> m_stvcd;
 
 	required_device<saturn_control_port_device> m_ctrl1;
 	required_device<saturn_control_port_device> m_ctrl2;
@@ -529,7 +531,7 @@ ADDRESS_MAP_START(sat_console_state::saturn_mem)
 //  AM_RANGE(0x04000000, 0x047fffff) AM_RAM // External Battery RAM area
 	AM_RANGE(0x04fffffc, 0x04ffffff) AM_READ8(saturn_cart_type_r,0x000000ff)
 	AM_RANGE(0x05000000, 0x057fffff) AM_READ(abus_dummy_r)
-	AM_RANGE(0x05800000, 0x0589ffff) AM_READWRITE(stvcd_r, stvcd_w)
+	AM_RANGE(0x05800000, 0x0589ffff) AM_DEVREADWRITE("stvcd", stvcd_device, stvcd_r, stvcd_w)
 	/* Sound */
 	AM_RANGE(0x05a00000, 0x05a7ffff) AM_READWRITE16(saturn_soundram_r, saturn_soundram_w,0xffffffff)
 	AM_RANGE(0x05b00000, 0x05b00fff) AM_DEVREADWRITE16("scsp", scsp_device, read, write, 0xffffffff)
@@ -556,13 +558,13 @@ ADDRESS_MAP_END
 INPUT_CHANGED_MEMBER(sat_console_state::tray_open)
 {
 	if(newval)
-		stvcd_set_tray_open();
+		m_stvcd->set_tray_open();
 }
 
 INPUT_CHANGED_MEMBER(sat_console_state::tray_close)
 {
 	if(newval)
-		stvcd_set_tray_close();
+		m_stvcd->set_tray_close();
 }
 
 static INPUT_PORTS_START( saturn )
@@ -655,8 +657,6 @@ MACHINE_START_MEMBER(sat_console_state, saturn)
 	save_item(NAME(m_scsp_last_line));
 	save_item(NAME(m_vdp2.odd));
 
-	machine().add_notifier(MACHINE_NOTIFY_EXIT, machine_notify_delegate(&sat_console_state::stvcd_exit, this));
-
 	// TODO: trampoline
 	m_audiocpu->set_reset_callback(write_line_delegate(FUNC(saturn_state::m68k_reset_callback),this));
 }
@@ -686,8 +686,6 @@ MACHINE_RESET_MEMBER(sat_console_state,saturn)
 
 	m_maincpu->set_unscaled_clock(MASTER_CLOCK_320/2);
 	m_slave->set_unscaled_clock(MASTER_CLOCK_320/2);
-
-	stvcd_reset();
 
 	m_vdp2.old_crmd = -1;
 	m_vdp2.old_tvmd = -1;
@@ -826,9 +824,6 @@ MACHINE_CONFIG_START(sat_console_state::saturn)
 
 	MCFG_NVRAM_ADD_CUSTOM_DRIVER("nvram", sat_console_state, nvram_init)
 
-	MCFG_TIMER_DRIVER_ADD("sector_timer", sat_console_state, stv_sector_cb)
-	MCFG_TIMER_DRIVER_ADD("sh1_cmd", sat_console_state, stv_sh1_sim)
-
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
 	MCFG_SCREEN_RAW_PARAMS(MASTER_CLOCK_320/8, 427, 0, 320, 263, 0, 224)
@@ -847,9 +842,9 @@ MACHINE_CONFIG_START(sat_console_state::saturn)
 	MCFG_SOUND_ROUTE(0, "lspeaker", 1.0)
 	MCFG_SOUND_ROUTE(1, "rspeaker", 1.0)
 
-	MCFG_SOUND_ADD("cdda", CDDA, 0)
-	MCFG_SOUND_ROUTE(0, "lspeaker", 1.0)
-	MCFG_SOUND_ROUTE(1, "rspeaker", 1.0)
+	MCFG_DEVICE_ADD("stvcd", STVCD, 0)
+	//MCFG_SOUND_ROUTE(0, "lspeaker", 1.0)
+	//MCFG_SOUND_ROUTE(1, "rspeaker", 1.0)
 
 	MCFG_SATURN_CONTROL_PORT_ADD("ctrl1", saturn_controls, "joypad")
 	MCFG_SATURN_CONTROL_PORT_ADD("ctrl2", saturn_controls, "joypad")
@@ -868,8 +863,6 @@ SLOT_INTERFACE_END
 
 MACHINE_CONFIG_START(sat_console_state::saturnus)
 	saturn(config);
-	MCFG_CDROM_ADD( "cdrom" )
-	MCFG_CDROM_INTERFACE("sat_cdrom")
 	MCFG_DEVICE_ADD("saturn_cdb", SATURN_CDB, 16000000)
 
 	MCFG_SOFTWARE_LIST_ADD("cd_list","saturn")
@@ -885,8 +878,6 @@ MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(sat_console_state::saturneu)
 	saturn(config);
-	MCFG_CDROM_ADD( "cdrom" )
-	MCFG_CDROM_INTERFACE("sat_cdrom")
 	MCFG_DEVICE_ADD("saturn_cdb", SATURN_CDB, 16000000)
 
 	MCFG_SOFTWARE_LIST_ADD("cd_list","saturn")
@@ -901,8 +892,6 @@ MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(sat_console_state::saturnjp)
 	saturn(config);
-	MCFG_CDROM_ADD( "cdrom" )
-	MCFG_CDROM_INTERFACE("sat_cdrom")
 	MCFG_DEVICE_ADD("saturn_cdb", SATURN_CDB, 16000000)
 
 	MCFG_SOFTWARE_LIST_ADD("cd_list","saturn")
@@ -918,7 +907,6 @@ MACHINE_CONFIG_END
 
 void sat_console_state::saturn_init_driver(int rgn)
 {
-//  m_saturn_region = rgn;
 	m_vdp2.pal = (rgn == 12) ? 1 : 0;
 
 	// set compatible options
