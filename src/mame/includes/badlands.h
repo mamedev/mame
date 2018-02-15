@@ -36,19 +36,14 @@ public:
 			m_audiocpu(*this, "audiocpu"),
 			m_soundcomm(*this, "soundcomm"),
 			m_playfield_tilemap(*this, "playfield"),
-			m_mob(*this, "mob"),
-			m_b_sharedram(*this, "b_sharedram")
+			m_mob(*this, "mob")
 			{ }
 
 	optional_device<cpu_device> m_audiocpu;
 	optional_device<atari_sound_comm_device> m_soundcomm;
 
 	required_device<tilemap_device> m_playfield_tilemap;
-	required_device<atari_motion_objects_device> m_mob;
-	optional_shared_ptr<uint8_t> m_b_sharedram;
-
-	uint8_t           m_pedal_value[2];
-	uint8_t           m_playfield_tile_bank;
+	optional_device<atari_motion_objects_device> m_mob;
 
 	virtual void update_interrupts() override;
 	virtual void scanline_update(screen_device &screen, int scanline) override;
@@ -71,13 +66,19 @@ public:
 	void badlands(machine_config &config);
 	void audio_map(address_map &map);
 	void main_map(address_map &map);
+	
+private:
+	uint8_t           m_pedal_value[2];
+	uint8_t           m_playfield_tile_bank;
 };
 
 class badlandsbl_state : public badlands_state
 {
 public:
 	badlandsbl_state(const machine_config &mconfig, device_type type, const char *tag)
-		: badlands_state(mconfig, type, tag)
+		: badlands_state(mconfig, type, tag),
+		  m_b_sharedram(*this, "b_sharedram"),
+		  m_spriteram(*this, "spriteram")
 	{}
 	
 	DECLARE_READ8_MEMBER(bootleg_shared_r);
@@ -89,9 +90,14 @@ public:
 	void badlandsb(machine_config &config);
 	void bootleg_map(address_map &map);
 	void bootleg_audio_map(address_map &map);
+	uint32_t screen_update_badlandsbl(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	
 protected:
 	virtual void machine_reset() override;
+	
+private:
+	required_shared_ptr<uint8_t> m_b_sharedram;
+	required_shared_ptr<uint16_t> m_spriteram;
 };
 
 

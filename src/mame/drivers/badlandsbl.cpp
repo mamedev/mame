@@ -35,11 +35,63 @@
 #include "emu.h"
 #include "includes/badlands.h"
 
+uint32_t badlandsbl_state::screen_update_badlandsbl(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
+{
+	// start drawing
+	//m_mob->draw_async(cliprect);
+
+	// draw the playfield
+	m_playfield_tilemap->draw(screen, bitmap, cliprect, 0, 0);
+
+	// draw bootleg sprites chip
+	// TODO: is this derived from something else?
+	{
+		gfx_element *gfx = m_gfxdecode->gfx(1);
+		
+		for(int count=0;count<0x100-0x10;count+=4)
+		{
+			if((m_spriteram[count+3] & 0xff) == 0xff)
+				return 0;
+		
+			uint16 tile = m_spriteram[count];
+			int y = (511 - 14) - (m_spriteram[count+1] & 0x1ff);
+			int x = (m_spriteram[count+2] >> 7) - 7;
+			int color = (m_spriteram[count+3] >> 8) & 7;
+			int h = (m_spriteram[count+3] & 0xf) + 1;
+			
+			for(int yi=0;yi<h;yi++)
+				gfx->transpen(bitmap,cliprect,tile+yi,color,0,0,x,y+yi*8,0);
+		}
+	}
+	
+	// draw and merge the MO
+	#if 0
+	bitmap_ind16 &mobitmap = m_mob->bitmap();
+	for (const sparse_dirty_rect *rect = m_mob->first_dirty_rect(cliprect); rect != nullptr; rect = rect->next())
+		for (int y = rect->min_y; y <= rect->max_y; y++)
+		{
+			uint16_t *mo = &mobitmap.pix16(y);
+			uint16_t *pf = &bitmap.pix16(y);
+			for (int x = rect->min_x; x <= rect->max_x; x++)
+				if (mo[x] != 0xffff)
+				{
+					/* not yet verified
+					*/
+					if ((mo[x] & atari_motion_objects_device::PRIORITY_MASK) || !(pf[x] & 8))
+						pf[x] = mo[x] & atari_motion_objects_device::DATA_MASK;
+				}
+		}
+	#endif
+	return 0;
+}
+
+
 READ16_MEMBER(badlandsbl_state::badlandsb_unk_r)
 {
 	return 0xffff;
 }
 
+// TODO: this prolly mimics audio_io_r/_w in original version
 READ8_MEMBER(badlandsbl_state::bootleg_shared_r)
 {
 	return m_b_sharedram[offset];
@@ -53,10 +105,11 @@ WRITE8_MEMBER(badlandsbl_state::bootleg_shared_w)
 ADDRESS_MAP_START(badlandsbl_state::bootleg_map)
 	AM_RANGE(0x000000, 0x03ffff) AM_ROM
 
-	// only 0-0xff accessed, assume all range is shared
-	AM_RANGE(0x400000, 0x401fff) AM_READWRITE8(bootleg_shared_r,bootleg_shared_w,0xffff)
+	AM_RANGE(0x400000, 0x40000f) AM_READWRITE8(bootleg_shared_r,bootleg_shared_w,0xffff)
+	AM_RANGE(0x400010, 0x4000ff) AM_RAM AM_SHARE("spriteram")
 
-	AM_RANGE(0xfc0000, 0xfc0001) AM_READ(badlandsb_unk_r ) // sound comms?
+	// sound comms?
+	AM_RANGE(0xfc0000, 0xfc0001) AM_READ(badlandsb_unk_r) AM_WRITENOP
 
 	AM_RANGE(0xfd0000, 0xfd1fff) AM_DEVREADWRITE8("eeprom", eeprom_parallel_28xx_device, read, write, 0x00ff)
 	//AM_RANGE(0xfe0000, 0xfe1fff) AM_DEVWRITE("watchdog", watchdog_timer_device, reset_w)
@@ -71,8 +124,8 @@ ADDRESS_MAP_START(badlandsbl_state::bootleg_map)
 
 	AM_RANGE(0xffc000, 0xffc3ff) AM_DEVREADWRITE8("palette", palette_device, read8, write8, 0xff00) AM_SHARE("palette")
 	AM_RANGE(0xffe000, 0xffefff) AM_RAM_DEVWRITE("playfield", tilemap_device, write16) AM_SHARE("playfield")
-	// TODO: actually sprites are at 0xfff600-0x7ff ?
-	AM_RANGE(0xfff000, 0xfff1ff) AM_RAM AM_SHARE("mob")
+
+	AM_RANGE(0xfff000, 0xfff1ff) AM_RAM
 	AM_RANGE(0xfff200, 0xffffff) AM_RAM
 ADDRESS_MAP_END
 
@@ -83,7 +136,8 @@ WRITE8_MEMBER(badlandsbl_state::bootleg_main_irq_w)
 
 ADDRESS_MAP_START(badlandsbl_state::bootleg_audio_map)
 	AM_RANGE(0x0000, 0x1fff) AM_ROM AM_REGION("audiorom", 0)
-	AM_RANGE(0x2000, 0x3fff) AM_RAM AM_SHARE("b_sharedram")
+	AM_RANGE(0x2000, 0x200f) AM_RAM AM_SHARE("b_sharedram")
+	AM_RANGE(0x2010, 0x3fff) AM_RAM
 	AM_RANGE(0x4000, 0xcfff) AM_ROM AM_REGION("audiorom", 0x4000)
 	AM_RANGE(0xd400, 0xd400) AM_WRITE(bootleg_main_irq_w) // correct?
 	AM_RANGE(0xd800, 0xd801) AM_DEVREADWRITE("ymsnd", ym2151_device, read, write)
@@ -186,15 +240,15 @@ MACHINE_CONFIG_START(badlandsbl_state::badlandsb)
 	MCFG_PALETTE_MEMBITS(8)
 
 	MCFG_TILEMAP_ADD_STANDARD("playfield", "gfxdecode", 2, badlands_state, get_playfield_tile_info, 8,8, SCAN_ROWS, 64,32)
-	MCFG_ATARI_MOTION_OBJECTS_ADD("mob", "screen", badlands_state::s_mob_config)
-	MCFG_ATARI_MOTION_OBJECTS_GFXDECODE("gfxdecode")
+//	MCFG_ATARI_MOTION_OBJECTS_ADD("mob", "screen", badlands_state::s_mob_config)
+//	MCFG_ATARI_MOTION_OBJECTS_GFXDECODE("gfxdecode")
 
 	MCFG_SCREEN_ADD("screen", RASTER)
 	MCFG_SCREEN_VIDEO_ATTRIBUTES(VIDEO_UPDATE_BEFORE_VBLANK)
 	/* note: these parameters are from published specs, not derived */
 	/* the board uses an SOS-2 chip to generate video signals */
 	MCFG_SCREEN_RAW_PARAMS(ATARI_CLOCK_14MHz/2, 456, 0, 336, 262, 0, 240)
-	MCFG_SCREEN_UPDATE_DRIVER(badlands_state, screen_update_badlands)
+	MCFG_SCREEN_UPDATE_DRIVER(badlandsbl_state, screen_update_badlandsbl)
 	MCFG_SCREEN_PALETTE("palette")
 
 	MCFG_VIDEO_START_OVERRIDE(badlands_state,badlands)
