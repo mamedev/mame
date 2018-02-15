@@ -392,21 +392,25 @@ uint32_t xavix_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap,
 	if (machine().input().code_pressed_once(KEYCODE_W))
 	{
 		bankhack++;
-		printf("%02x\n", bankhack);
+		logerror("%02x\n", bankhack);
 	}
 
 	if (machine().input().code_pressed_once(KEYCODE_Q))
 	{
 		bankhack--;
-		printf("%02x\n", bankhack);
+		logerror("%02x\n", bankhack);
 	}
 
-	if (m_tilemap_enabled)
+	if (m_tmap1_regs[0x7] & 0x02)
+		alt_tileaddressing = 1;
+	else
+		alt_tileaddressing = 0;
+
+	if (m_tmap1_regs[0x7] & 0x80)
 	{
 		// why are the first two logos in Monster Truck stored as tilemaps in main ram?
 		// test mode isn't? is the code meant to process them instead? - there are no sprites in the sprite list at the time (and only one in test mode)
 		int count;
-
 
 		count = 0;
 		for (int y = 0; y < 16; y++)
@@ -432,7 +436,9 @@ uint32_t xavix_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap,
 				}
 				else
 				{
-					basereg = bankhack;
+					basereg = (tile & 0xf000)>>12;
+					tile &= 0x0fff;
+					tile += 4;
 				}
 
 				// upper bit is often set, maybe just because it relies on mirroring, maybe other purpose
@@ -456,6 +462,7 @@ uint32_t xavix_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap,
 
 	//logerror("frame\n");
 	// priority doesn't seem to be based on list order, there are bad sprite-sprite priorities with either forward or reverse
+
 	for (int i = 0xff; i >= 0; i--)
 	{
 		/* attribute 0 bits
@@ -547,7 +554,12 @@ uint32_t xavix_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap,
 		*/
 	}
 
-	if (m_tilemap_enabled)
+	if (m_tmap2_regs[0x7] & 0x02)
+		alt_tileaddressing = 1;
+	else
+		alt_tileaddressing = 0;
+
+	if (m_tmap2_regs[0x7] & 0x80)
 	{
 		// there is a 2nd layer in monster truck too, there must be more to the gfxbase tho, because the lower layer can't be using the same gfxbase..
 		int count = 0x200;
@@ -574,7 +586,10 @@ uint32_t xavix_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap,
 				}
 				else
 				{
-					basereg = bankhack;
+					basereg = (tile & 0xf000)>>12;
+					tile &= 0x0fff;
+					// control word of some kind maybe?
+					tile += 2;
 				}
 
 				// upper bit is often set, maybe just because it relies on mirroring, maybe other purpose
@@ -1068,19 +1083,67 @@ WRITE8_MEMBER(xavix_state::tmap1_regs_w)
 	       it gets set to 0x40 in monster truck test mode, which is outside of ram but test mode requires a fixed 'column scan' layout
 		   so that might be special
 
-	   0x1 unknown
+	   0x1 unknown   (gets set to 0x03 on the course select, uninitialzied before that)
 
 	   0x2 unused?
 
-	   0x3 could be palette / bpp selection
+	   0x3 ---- bbb-     - = ?   b = bpp    (0x36 xavix logo, 0x3c title screen, 0x36 course select)
 
-	   0x4 and 0x5 appear to be bg tilemap scroll
+	   0x4 and 0x5 are scroll
 
-	   0x6 unknown
+	   0x6 pppp ----     p = palette  - = ?   (0x02 xavix logo, 0x01 course select)
 
 	   0x7 could be mode (16x16, 8x8 etc.)
+	        0x00 is disabled?
+	        0x80 means 16x16 tiles
+			0x81 might be 8x8 tiles
+			0x93 course / mode select bg / ingame (weird addressing?)
+
 
 	 */
+
+	/*
+	    6aff base registers
+		-- ingame
+
+		ae 80
+		02 80
+		02 90
+		02 a0
+		02 b0
+		02 c0
+		02 d0
+		02 e0
+
+		02 00
+		04 80
+		04 90
+		04 a0
+		04 b0
+		04 c0
+		04 d0
+		04 e0
+
+		-- menu
+		af 80
+		27 80
+		27 90
+		27 a0
+		27 b0
+		27 c0
+		27 d0
+		27 e0
+
+		27 00
+		00 80
+		00 90
+		00 a0
+		00 b0
+		00 c0
+		00 d0
+		00 e0
+	*/
+
 
 	if ((offset != 0x4) && (offset != 0x5))
 	{
@@ -1092,13 +1155,16 @@ WRITE8_MEMBER(xavix_state::tmap1_regs_w)
 
 WRITE8_MEMBER(xavix_state::xavix_6fd8_w) // also related to tilemap 2?
 {
-	logerror("%s: xavix_6fd8_w data %02x\n", machine().describe_context(), data);
+	//logerror("%s: xavix_6fd8_w data %02x\n", machine().describe_context(), data);
 }
 
 WRITE8_MEMBER(xavix_state::tmap2_regs_w)
 {
 	// same as above but for 2nd tilemap
-	logerror("%s: tmap2_regs_w offset %02x data %02x\n", machine().describe_context(), offset, data);
+	if ((offset != 0x4) && (offset != 0x5))
+	{
+		//logerror("%s: tmap2_regs_w offset %02x data %02x\n", machine().describe_context(), offset, data);
+	}
 
 	COMBINE_DATA(&m_tmap2_regs[offset]);
 }
