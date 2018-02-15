@@ -72,7 +72,6 @@ private:
 	int m_keydown;                  // key down
 	int m_clock;                    // transmit clock
 	int m_hys;                      // hysteresis
-	int m_reset;                    // reset
 	int m_stb;                      // strobe
 	uint8_t m_j3;
 
