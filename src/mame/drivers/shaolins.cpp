@@ -32,7 +32,7 @@ TIMER_DEVICE_CALLBACK_MEMBER(shaolins_state::interrupt)
 
 
 
-static ADDRESS_MAP_START( shaolins_map, AS_PROGRAM, 8, shaolins_state )
+ADDRESS_MAP_START(shaolins_state::shaolins_map)
 	AM_RANGE(0x0000, 0x0000) AM_WRITE(nmi_w)   /* bit 0 = flip screen, bit 1 = nmi enable, bit 2 = ? */
 														/* bit 3, bit 4 = coin counters */
 	AM_RANGE(0x0100, 0x0100) AM_DEVWRITE("watchdog", watchdog_timer_device, reset_w)
@@ -225,7 +225,8 @@ MACHINE_CONFIG_START(shaolins_state::shaolins)
 MACHINE_CONFIG_END
 
 #if 0 // a bootleg board was found with downgraded sound hardware, but is otherwise the same
-static MACHINE_CONFIG_DERIVED( shaolinb, shaolins )
+static MACHINE_CONFIG_START( shaolinb )
+	shaolins(config);
 
 	MCFG_SOUND_REPLACE("sn1", SN76489, MASTER_CLOCK/12) /* only type verified on pcb */
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)

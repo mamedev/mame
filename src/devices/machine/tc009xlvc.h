@@ -47,6 +47,7 @@ public:
 	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	void screen_eof();
 
+	void tc0091lvc_map8(address_map &map);
 protected:
 	virtual void device_start() override;
 	virtual space_config_vector memory_space_config() const override;

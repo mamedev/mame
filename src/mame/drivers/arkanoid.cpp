@@ -824,7 +824,7 @@ a15 a14 a13 a12 a11 a10 a9  a8  a7  a6  a5  a4  a3  a2  a1  a0
 1   1   1   1   x   x   x   x   x   x   x   x   x   x   x   x       OPEN BUS
               |               |               |
 */
-static ADDRESS_MAP_START( arkanoid_map, AS_PROGRAM, 8, arkanoid_state )
+ADDRESS_MAP_START(arkanoid_state::arkanoid_map)
 	AM_RANGE(0x0000, 0xbfff) AM_ROM
 	AM_RANGE(0xc000, 0xc7ff) AM_RAM AM_MIRROR(0x0800)
 	AM_RANGE(0xd000, 0xd001) AM_DEVWRITE("aysnd", ay8910_device, address_data_w) AM_MIRROR(0x0fe6)
@@ -840,7 +840,7 @@ static ADDRESS_MAP_START( arkanoid_map, AS_PROGRAM, 8, arkanoid_state )
 	AM_RANGE(0xf000, 0xffff) AM_READNOP /* fixes instant death in final level */
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( bootleg_map, AS_PROGRAM, 8, arkanoid_state )
+ADDRESS_MAP_START(arkanoid_state::bootleg_map)
 	AM_RANGE(0x0000, 0xbfff) AM_ROM
 	AM_RANGE(0xc000, 0xc7ff) AM_RAM
 	AM_RANGE(0xd000, 0xd000) AM_DEVWRITE("aysnd", ay8910_device, address_w)
@@ -855,7 +855,7 @@ static ADDRESS_MAP_START( bootleg_map, AS_PROGRAM, 8, arkanoid_state )
 	AM_RANGE(0xf000, 0xffff) AM_READNOP /* fixes instant death in final level */
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( hexa_map, AS_PROGRAM, 8, arkanoid_state )
+ADDRESS_MAP_START(arkanoid_state::hexa_map)
 	AM_RANGE(0x0000, 0x7fff) AM_ROM
 	AM_RANGE(0x8000, 0xbfff) AM_ROMBANK("bank1")
 	AM_RANGE(0xc000, 0xc7ff) AM_RAM
@@ -877,7 +877,7 @@ WRITE8_MEMBER(arkanoid_state::hexaa_f000_w)
 	m_hexaa_from_main = data;
 }
 
-static ADDRESS_MAP_START( hexaa_map, AS_PROGRAM, 8, arkanoid_state )
+ADDRESS_MAP_START(arkanoid_state::hexaa_map)
 	AM_RANGE(0x0000, 0x7fff) AM_ROM
 	AM_RANGE(0x8000, 0xbfff) AM_ROMBANK("bank1")
 	AM_RANGE(0xc000, 0xc7ff) AM_RAM
@@ -890,7 +890,7 @@ static ADDRESS_MAP_START( hexaa_map, AS_PROGRAM, 8, arkanoid_state )
 	AM_RANGE(0xf000, 0xf000) AM_READWRITE(hexaa_f000_r, hexaa_f000_w)
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( hexaa_sub_map, AS_PROGRAM, 8, arkanoid_state )
+ADDRESS_MAP_START(arkanoid_state::hexaa_sub_map)
 	AM_RANGE(0x0000, 0x0fff) AM_ROM
 ADDRESS_MAP_END
 
@@ -906,7 +906,7 @@ READ8_MEMBER(arkanoid_state::hexaa_sub_90_r)
 //  return machine().rand();
 }
 
-static ADDRESS_MAP_START( hexaa_sub_iomap, AS_IO, 8, arkanoid_state )
+ADDRESS_MAP_START(arkanoid_state::hexaa_sub_iomap)
 	ADDRESS_MAP_GLOBAL_MASK(0x9f)
 	AM_RANGE(0x00, 0x0f) AM_RAM // ?? could be communication with the other chip (protection?)
 	AM_RANGE(0x80, 0x80) AM_WRITE(hexaa_sub_80_w)
@@ -915,7 +915,7 @@ ADDRESS_MAP_END
 
 
 
-static ADDRESS_MAP_START( brixian_map, AS_PROGRAM, 8, arkanoid_state )
+ADDRESS_MAP_START(arkanoid_state::brixian_map)
 	AM_RANGE(0x0000, 0xbfff) AM_ROM
 	AM_RANGE(0xc000, 0xc7ff) AM_RAM AM_SHARE("protram")
 	AM_RANGE(0xd000, 0xd000) AM_DEVWRITE("aysnd", ay8910_device, address_w)
@@ -1371,14 +1371,16 @@ MACHINE_CONFIG_START(arkanoid_state::arkanoid)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.66)
 MACHINE_CONFIG_END
 
-MACHINE_CONFIG_DERIVED(arkanoid_state::p3mcu, arkanoid)
+MACHINE_CONFIG_START(arkanoid_state::p3mcu)
+	arkanoid(config);
 
 	/* unprotected MCU */
 	MCFG_DEVICE_REPLACE("mcu", ARKANOID_68705P3, XTAL(12'000'000)/4)
 	MCFG_ARKANOID_MCU_PORTB_R_CB(IOPORT("MUX"))
 MACHINE_CONFIG_END
 
-MACHINE_CONFIG_DERIVED(arkanoid_state::p3mcuay, arkanoid)
+MACHINE_CONFIG_START(arkanoid_state::p3mcuay)
+	arkanoid(config);
 
 	/* unprotected MCU */
 	MCFG_DEVICE_REPLACE("mcu", ARKANOID_68705P3, XTAL(12'000'000)/4)
@@ -1391,7 +1393,8 @@ MACHINE_CONFIG_DERIVED(arkanoid_state::p3mcuay, arkanoid)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.66)
 MACHINE_CONFIG_END
 
-MACHINE_CONFIG_DERIVED(arkanoid_state::bootleg, arkanoid)
+MACHINE_CONFIG_START(arkanoid_state::bootleg)
+	arkanoid(config);
 
 	/* basic machine hardware */
 	MCFG_CPU_MODIFY("maincpu")
@@ -1400,7 +1403,8 @@ MACHINE_CONFIG_DERIVED(arkanoid_state::bootleg, arkanoid)
 	MCFG_DEVICE_REMOVE("mcu")
 MACHINE_CONFIG_END
 
-MACHINE_CONFIG_DERIVED(arkanoid_state::aysnd, bootleg)
+MACHINE_CONFIG_START(arkanoid_state::aysnd)
+	bootleg(config);
 	MCFG_SOUND_REPLACE("aysnd", AY8910, XTAL(12'000'000)/4)
 	MCFG_AY8910_OUTPUT_TYPE(AY8910_SINGLE_OUTPUT)
 	MCFG_AY8910_PORT_A_READ_CB(IOPORT("UNUSED"))
@@ -1439,7 +1443,8 @@ MACHINE_CONFIG_START(arkanoid_state::hexa)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
 MACHINE_CONFIG_END
 
-MACHINE_CONFIG_DERIVED(arkanoid_state::hexaa, hexa)
+MACHINE_CONFIG_START(arkanoid_state::hexaa)
+	hexa(config);
 	MCFG_CPU_MODIFY("maincpu")
 	MCFG_CPU_PROGRAM_MAP(hexaa_map)
 	MCFG_CPU_VBLANK_INT_DRIVER("screen", arkanoid_state,  irq0_line_hold)

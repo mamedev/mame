@@ -6,8 +6,8 @@
  *
  ****************************************************************************/
 
-#ifndef VECTREX_H_
-#define VECTREX_H_
+#ifndef MAME_INCLUDES_VECTREX_H
+#define MAME_INCLUDES_VECTREX_H
 
 #include "machine/6522via.h"
 #include "sound/dac.h"
@@ -125,6 +125,8 @@ public:
 
 	void vectrex(machine_config &config);
 	void raaspec(machine_config &config);
+	void raaspec_map(address_map &map);
+	void vectrex_map(address_map &map);
 protected:
 	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr) override;
 
@@ -149,4 +151,4 @@ protected:
 	void vectrex_add_point_stereo(int x, int y, rgb_t color, int intensity);
 };
 
-#endif /* VECTREX_H_ */
+#endif // MAME_INCLUDES_VECTREX_H

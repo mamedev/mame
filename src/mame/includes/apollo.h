@@ -271,6 +271,12 @@ public:
 	void dn5500(machine_config &config);
 	void dn5500_15i(machine_config &config);
 	void dn3500_19i(machine_config &config);
+	void dn3000_map(address_map &map);
+	void dn3500_map(address_map &map);
+	void dn5500_map(address_map &map);
+	void dsp3000_map(address_map &map);
+	void dsp3500_map(address_map &map);
+	void dsp5500_map(address_map &map);
 private:
 	uint32_t ptm_counter;
 	uint8_t sio_output_data;
@@ -648,7 +654,7 @@ private:
 DECLARE_DEVICE_TYPE(APOLLO_GRAPHICS, apollo_graphics_15i)
 
 #define MCFG_APOLLO_GRAPHICS_ADD( _tag) \
-	MCFG_FRAGMENT_ADD(apollo_graphics) \
+	apollo_graphics(config); \
 	MCFG_DEVICE_ADD(_tag, APOLLO_GRAPHICS, 0)
 
 class apollo_graphics_19i : public apollo_graphics_15i
@@ -667,7 +673,7 @@ private:
 DECLARE_DEVICE_TYPE(APOLLO_MONO19I, apollo_graphics_19i)
 
 #define MCFG_APOLLO_MONO19I_ADD(_tag) \
-	MCFG_FRAGMENT_ADD(apollo_mono19i) \
+	apollo_mono19i(config); \
 	MCFG_DEVICE_ADD(_tag, APOLLO_MONO19I, 0)
 
 #ifdef APOLLO_XXL

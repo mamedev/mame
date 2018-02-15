@@ -926,7 +926,7 @@ READ16_MEMBER(cps_state::joy_or_paddle_ecofghtr_r)
  *
  *************************************/
 
-static ADDRESS_MAP_START( cps2_map, AS_PROGRAM, 16, cps_state )
+ADDRESS_MAP_START(cps_state::cps2_map)
 	AM_RANGE(0x000000, 0x3fffff) AM_ROM                                                                         /* 68000 ROM */
 	AM_RANGE(0x400000, 0x40000b) AM_RAM AM_SHARE("output")                                                      /* CPS2 object output */
 	AM_RANGE(0x618000, 0x619fff) AM_READWRITE(qsound_sharedram1_r, qsound_sharedram1_w)                         /* Q RAM */
@@ -953,11 +953,11 @@ static ADDRESS_MAP_START( cps2_map, AS_PROGRAM, 16, cps_state )
 	AM_RANGE(0xff0000, 0xffffff) AM_RAM                                                                         /* RAM */
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( decrypted_opcodes_map, AS_OPCODES, 16, cps_state )
+ADDRESS_MAP_START(cps_state::decrypted_opcodes_map)
 	AM_RANGE(0x000000, 0x3fffff) AM_ROM AM_SHARE("decrypted_opcodes")                                           /* 68000 ROM */
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( dead_cps2_map, AS_PROGRAM, 16, cps_state )
+ADDRESS_MAP_START(cps_state::dead_cps2_map)
 	AM_RANGE(0x000000, 0x3fffff) AM_ROM                                                                         /* 68000 ROM */
 	AM_RANGE(0x400000, 0x40000b) AM_RAM AM_SHARE("output")                                                      /* CPS2 object output */
 	AM_RANGE(0x618000, 0x619fff) AM_READWRITE(qsound_sharedram1_r, qsound_sharedram1_w)                         /* Q RAM */
@@ -1306,7 +1306,7 @@ MACHINE_CONFIG_START(cps_state::cps2)
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", M68000, XTAL(16'000'000))
 	MCFG_CPU_PROGRAM_MAP(cps2_map)
-	MCFG_CPU_DECRYPTED_OPCODES_MAP(decrypted_opcodes_map)
+	MCFG_CPU_OPCODES_MAP(decrypted_opcodes_map)
 	MCFG_TIMER_DRIVER_ADD_SCANLINE("scantimer", cps_state, cps2_interrupt, "screen", 0, 1)
 
 	MCFG_CPU_ADD("audiocpu", Z80, XTAL(8'000'000))
@@ -1339,13 +1339,15 @@ MACHINE_CONFIG_START(cps_state::cps2)
 MACHINE_CONFIG_END
 
 
-MACHINE_CONFIG_DERIVED(cps_state::dead_cps2, cps2)
+MACHINE_CONFIG_START(cps_state::dead_cps2)
+	cps2(config);
 
 	MCFG_CPU_MODIFY("maincpu")
 	MCFG_CPU_PROGRAM_MAP(dead_cps2_map)
 MACHINE_CONFIG_END
 
-MACHINE_CONFIG_DERIVED(cps_state::gigaman2, cps2)
+MACHINE_CONFIG_START(cps_state::gigaman2)
+	cps2(config);
 
 	MCFG_DEVICE_REMOVE("audiocpu")
 	// gigaman2 has an AT89C4051 (8051) MCU as an audio cpu, no qsound.

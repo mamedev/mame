@@ -93,11 +93,11 @@ DEFINE_DEVICE_TYPE(TMS32032, tms32032_device, "tms32032", "TMS32032")
 
 
 // internal memory maps
-static ADDRESS_MAP_START( internal_32031, AS_PROGRAM, 32, tms32031_device )
+ADDRESS_MAP_START(tms32031_device::internal_32031)
 	AM_RANGE(0x809800, 0x809fff) AM_RAM
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( internal_32032, AS_PROGRAM, 32, tms32032_device )
+ADDRESS_MAP_START(tms32032_device::internal_32032)
 	AM_RANGE(0x87fe00, 0x87ffff) AM_RAM
 ADDRESS_MAP_END
 
@@ -282,12 +282,12 @@ tms3203x_device::tms3203x_device(const machine_config &mconfig, device_type type
 }
 
 tms32031_device::tms32031_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-	: tms3203x_device(mconfig, TMS32031, tag, owner, clock, CHIP_TYPE_TMS32031, ADDRESS_MAP_NAME(internal_32031))
+	: tms3203x_device(mconfig, TMS32031, tag, owner, clock, CHIP_TYPE_TMS32031, address_map_constructor(FUNC(tms32031_device::internal_32031), this))
 {
 }
 
 tms32032_device::tms32032_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-	: tms3203x_device(mconfig, TMS32032, tag, owner, clock, CHIP_TYPE_TMS32032, ADDRESS_MAP_NAME(internal_32032))
+	: tms3203x_device(mconfig, TMS32032, tag, owner, clock, CHIP_TYPE_TMS32032, address_map_constructor(FUNC(tms32032_device::internal_32032), this))
 {
 }
 

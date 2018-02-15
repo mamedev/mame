@@ -1,8 +1,8 @@
 // license:BSD-3-Clause
 // copyright-holders:Curt Coder
-#ifndef __C80__
-#define __C80__
 
+#ifndef MAME_INCLUDES_C80_H
+#define MAME_INCLUDES_C80_H
 
 #include "cpu/z80/z80.h"
 #include "cpu/z80/z80daisy.h"
@@ -52,6 +52,8 @@ public:
 	int m_pio1_a5;
 	int m_pio1_brdy;
 	void c80(machine_config &config);
+	void c80_io(address_map &map);
+	void c80_mem(address_map &map);
 };
 
 #endif

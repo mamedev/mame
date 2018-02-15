@@ -100,6 +100,10 @@ public:
 
 	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	void roul(machine_config &config);
+	void roul_cpu_io_map(address_map &map);
+	void roul_map(address_map &map);
+	void sound_cpu_io_map(address_map &map);
+	void sound_map(address_map &map);
 };
 
 
@@ -200,12 +204,12 @@ WRITE8_MEMBER(roul_state::ball_w)
 	m_lamp_old = lamp;
 }
 
-static ADDRESS_MAP_START( roul_map, AS_PROGRAM, 8, roul_state )
+ADDRESS_MAP_START(roul_state::roul_map)
 	AM_RANGE(0x0000, 0x7fff) AM_ROM
 	AM_RANGE(0x8000, 0x8fff) AM_RAM AM_SHARE("nvram")
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( roul_cpu_io_map, AS_IO, 8, roul_state )
+ADDRESS_MAP_START(roul_state::roul_cpu_io_map)
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	AM_RANGE(0xf0, 0xf4) AM_WRITE(blitter_cmd_w)
 	AM_RANGE(0xf5, 0xf5) AM_READ(blitter_status_r)
@@ -216,12 +220,12 @@ static ADDRESS_MAP_START( roul_cpu_io_map, AS_IO, 8, roul_state )
 	AM_RANGE(0xfe, 0xfe) AM_WRITE(sound_latch_w)
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( sound_map, AS_PROGRAM, 8, roul_state )
+ADDRESS_MAP_START(roul_state::sound_map)
 	AM_RANGE(0x0000, 0x0fff) AM_ROM
 	AM_RANGE(0x1000, 0x13ff) AM_RAM
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( sound_cpu_io_map, AS_IO, 8, roul_state )
+ADDRESS_MAP_START(roul_state::sound_cpu_io_map)
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	AM_RANGE(0x00, 0x00) AM_DEVREAD("soundlatch", generic_latch_8_device, read)
 	AM_RANGE(0x00, 0x01) AM_DEVWRITE("aysnd", ay8910_device, address_data_w)

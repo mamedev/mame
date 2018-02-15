@@ -123,7 +123,7 @@ READ32_MEMBER(sh2_device::sh2_internal_a5)
     sh2_internal_map - maps SH2 built-ins
 -------------------------------------------------*/
 
-static ADDRESS_MAP_START( sh7604_map, AS_PROGRAM, 32, sh2_device )
+ADDRESS_MAP_START(sh2_device::sh7604_map)
 	AM_RANGE(0x40000000, 0xbfffffff) AM_READ(sh2_internal_a5)
 /*!
   @todo: cps3boot breaks with this enabled. Needs customization ...
@@ -133,7 +133,7 @@ static ADDRESS_MAP_START( sh7604_map, AS_PROGRAM, 32, sh2_device )
 	AM_RANGE(0xe0000000, 0xe00001ff) AM_MIRROR(0x1ffffe00) AM_READWRITE(sh7604_r, sh7604_w)
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( sh7021_map, AS_PROGRAM, 32, sh2a_device )
+ADDRESS_MAP_START(sh2a_device::sh7021_map)
 //  fall-back
 	AM_RANGE(0x05fffe00, 0x05ffffff) AM_READWRITE16(sh7021_r,sh7021_w,0xffffffff) // SH-7032H internal i/o
 //  overrides
@@ -146,13 +146,13 @@ static ADDRESS_MAP_START( sh7021_map, AS_PROGRAM, 32, sh2a_device )
 //  AM_RANGE(0x0f000000, 0x0f0003ff) AM_RAM AM_SHARE("oram")// on-chip RAM, actually at 0xf000000 (1 kb)
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( sh7032_map, AS_PROGRAM, 32, sh1_device )
+ADDRESS_MAP_START(sh1_device::sh7032_map)
 //  fall-back
 	AM_RANGE(0x05fffe00, 0x05ffffff) AM_READWRITE16(sh7032_r,sh7032_w,0xffffffff) // SH-7032H internal i/o
 ADDRESS_MAP_END
 
 sh2_device::sh2_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-	: sh2_device(mconfig, SH2, tag, owner, clock, CPU_TYPE_SH2, ADDRESS_MAP_NAME(sh7604_map), 32)
+	: sh2_device(mconfig, SH2, tag, owner, clock, CPU_TYPE_SH2, address_map_constructor(FUNC(sh2_device::sh7604_map), this), 32)
 {
 }
 
@@ -178,12 +178,12 @@ sh2_device::sh2_device(const machine_config &mconfig, device_type type, const ch
 }
 
 sh2a_device::sh2a_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-	: sh2_device(mconfig, SH2A, tag, owner, clock, CPU_TYPE_SH2, ADDRESS_MAP_NAME(sh7021_map), 28)
+	: sh2_device(mconfig, SH2A, tag, owner, clock, CPU_TYPE_SH2, address_map_constructor(FUNC(sh2a_device::sh7021_map), this), 28)
 {
 }
 
 sh1_device::sh1_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-	: sh2_device(mconfig, SH1, tag, owner, clock, CPU_TYPE_SH1, ADDRESS_MAP_NAME(sh7032_map), 28)
+	: sh2_device(mconfig, SH1, tag, owner, clock, CPU_TYPE_SH1, address_map_constructor(FUNC(sh1_device::sh7032_map), this), 28)
 {
 }
 

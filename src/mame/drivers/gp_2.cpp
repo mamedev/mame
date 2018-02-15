@@ -66,6 +66,8 @@ public:
 	DECLARE_READ8_MEMBER(portb_r);
 	TIMER_DEVICE_CALLBACK_MEMBER(zero_timer);
 	void gp_2(machine_config &config);
+	void gp_2_io(address_map &map);
+	void gp_2_map(address_map &map);
 private:
 	uint8_t m_u14;
 	uint8_t m_digit;
@@ -85,12 +87,12 @@ private:
 };
 
 
-static ADDRESS_MAP_START( gp_2_map, AS_PROGRAM, 8, gp_2_state )
+ADDRESS_MAP_START(gp_2_state::gp_2_map)
 	AM_RANGE(0x0000, 0x3fff) AM_ROM AM_REGION("roms", 0)
 	AM_RANGE(0x8c00, 0x8dff) AM_RAM AM_SHARE("nvram")
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( gp_2_io, AS_IO, 8, gp_2_state )
+ADDRESS_MAP_START(gp_2_state::gp_2_io)
 	ADDRESS_MAP_GLOBAL_MASK(0x0f)
 	AM_RANGE(0x04, 0x07) AM_DEVREADWRITE("ppi", i8255_device, read, write)
 	AM_RANGE(0x08, 0x0b) AM_DEVREADWRITE("ctc", z80ctc_device, read, write)
@@ -585,7 +587,7 @@ MACHINE_CONFIG_START(gp_2_state::gp_2)
 	MCFG_DEFAULT_LAYOUT(layout_gp_2)
 
 	/* Sound */
-	MCFG_FRAGMENT_ADD( genpin_audio )
+	genpin_audio(config);
 
 	/* Devices */
 	MCFG_DEVICE_ADD("ppi", I8255A, 0 )

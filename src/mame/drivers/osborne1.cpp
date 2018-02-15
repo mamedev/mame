@@ -101,7 +101,7 @@ TODO:
 static constexpr XTAL MAIN_CLOCK = 15.9744_MHz_XTAL;
 
 
-static ADDRESS_MAP_START( osborne1_mem, AS_PROGRAM, 8, osborne1_state )
+ADDRESS_MAP_START(osborne1_state::osborne1_mem)
 	AM_RANGE( 0x0000, 0x0FFF ) AM_READ_BANK("bank_0xxx") AM_WRITE(bank_0xxx_w)
 	AM_RANGE( 0x1000, 0x1FFF ) AM_READ_BANK("bank_1xxx") AM_WRITE(bank_1xxx_w)
 	AM_RANGE( 0x2000, 0x3FFF ) AM_READWRITE(bank_2xxx_3xxx_r, bank_2xxx_3xxx_w)
@@ -110,19 +110,19 @@ static ADDRESS_MAP_START( osborne1_mem, AS_PROGRAM, 8, osborne1_state )
 ADDRESS_MAP_END
 
 
-static ADDRESS_MAP_START( osborne1_op, AS_OPCODES, 8, osborne1_state )
+ADDRESS_MAP_START(osborne1_state::osborne1_op)
 	AM_RANGE( 0x0000, 0xFFFF ) AM_READ(opcode_r)
 ADDRESS_MAP_END
 
 
-static ADDRESS_MAP_START( osborne1_io, AS_IO, 8, osborne1_state )
+ADDRESS_MAP_START(osborne1_state::osborne1_io)
 	ADDRESS_MAP_UNMAP_HIGH
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
 
 	AM_RANGE( 0x00, 0x03 ) AM_MIRROR( 0xfc ) AM_WRITE(bankswitch_w)
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( osborne1nv_io, AS_IO, 8, osborne1_state )
+ADDRESS_MAP_START(osborne1_state::osborne1nv_io)
 	ADDRESS_MAP_UNMAP_HIGH
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
 
@@ -282,7 +282,7 @@ GFXDECODE_END
 MACHINE_CONFIG_START(osborne1_state::osborne1)
 	MCFG_CPU_ADD("maincpu", Z80, MAIN_CLOCK/4)
 	MCFG_CPU_PROGRAM_MAP(osborne1_mem)
-	MCFG_CPU_DECRYPTED_OPCODES_MAP(osborne1_op)
+	MCFG_CPU_OPCODES_MAP(osborne1_op)
 	MCFG_CPU_IO_MAP(osborne1_io)
 	MCFG_Z80_SET_IRQACK_CALLBACK(WRITELINE(osborne1_state, irqack_w))
 
@@ -338,7 +338,8 @@ MACHINE_CONFIG_START(osborne1_state::osborne1)
 	MCFG_SOFTWARE_LIST_ADD("flop_list","osborne1")
 MACHINE_CONFIG_END
 
-MACHINE_CONFIG_DERIVED(osborne1nv_state::osborne1nv, osborne1)
+MACHINE_CONFIG_START(osborne1nv_state::osborne1nv)
+	osborne1(config);
 	MCFG_CPU_MODIFY("maincpu")
 	MCFG_CPU_IO_MAP(osborne1nv_io)
 

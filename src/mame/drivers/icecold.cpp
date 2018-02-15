@@ -64,9 +64,10 @@ public:
 	TIMER_DEVICE_CALLBACK_MEMBER(icecold_sint_timer);
 	TIMER_DEVICE_CALLBACK_MEMBER(icecold_motors_timer);
 	void icecold(machine_config &config);
+	void icecold_map(address_map &map);
 };
 
-static ADDRESS_MAP_START( icecold_map, AS_PROGRAM, 8, icecold_state )
+ADDRESS_MAP_START(icecold_state::icecold_map)
 	AM_RANGE(0x0000, 0x07ff) AM_RAM
 	AM_RANGE(0x4010, 0x4013) AM_DEVREADWRITE("pia0", pia6821_device, read, write)
 	AM_RANGE(0x4020, 0x4023) AM_DEVREADWRITE("pia1", pia6821_device, read, write)

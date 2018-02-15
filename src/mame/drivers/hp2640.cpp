@@ -148,12 +148,14 @@ public:
 	DECLARE_READ8_MEMBER(async_status_r);
 	DECLARE_WRITE8_MEMBER(async_control_w);
 	DECLARE_WRITE8_MEMBER(async_data_w);
-	DECLARE_WRITE8_MEMBER(async_status_change);
+	DECLARE_WRITE_LINE_MEMBER(async_dav_w);
 	DECLARE_WRITE_LINE_MEMBER(async_txd_w);
 
 	TIMER_DEVICE_CALLBACK_MEMBER(timer_beep_exp);
 
 	void hp2645(machine_config &config);
+	void cpu_io_map(address_map &map);
+	void cpu_mem_map(address_map &map);
 protected:
 	required_device<i8080a_cpu_device> m_cpu;
 	required_device<timer_device> m_timer_10ms;
@@ -483,7 +485,7 @@ WRITE8_MEMBER(hp2645_state::async_data_w)
 	m_uart->set_transmit_data(data);
 }
 
-WRITE8_MEMBER(hp2645_state::async_status_change)
+WRITE_LINE_MEMBER(hp2645_state::async_dav_w)
 {
 	update_async_irq();
 }
@@ -951,7 +953,7 @@ static INPUT_PORTS_START(hp2645)
 	PORT_CONFSETTING(0x80, DEF_STR(Off))
 INPUT_PORTS_END
 
-static ADDRESS_MAP_START(cpu_mem_map , AS_PROGRAM , 8 , hp2645_state)
+ADDRESS_MAP_START(hp2645_state::cpu_mem_map)
 	ADDRESS_MAP_UNMAP_LOW
 	AM_RANGE(0x0000 , 0x57ff) AM_ROM
 	AM_RANGE(0x8100 , 0x8100) AM_READ(async_data_r)
@@ -971,7 +973,7 @@ static ADDRESS_MAP_START(cpu_mem_map , AS_PROGRAM , 8 , hp2645_state)
 	AM_RANGE(0xc000 , 0xffff) AM_RAM
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START(cpu_io_map , AS_IO , 8 , hp2645_state)
+ADDRESS_MAP_START(hp2645_state::cpu_io_map)
 	ADDRESS_MAP_UNMAP_LOW
 	AM_RANGE(0x00 , 0xff) AM_WRITE(mode_byte_w)
 ADDRESS_MAP_END
@@ -1004,7 +1006,7 @@ MACHINE_CONFIG_START(hp2645_state::hp2645)
 	MCFG_DEVICE_ADD("uart", AY31015, 0)
 	MCFG_AY31015_READ_SI_CB(DEVREADLINE("rs232" , rs232_port_device , rxd_r))
 	MCFG_AY31015_WRITE_SO_CB(WRITELINE(hp2645_state , async_txd_w))
-	MCFG_AY31015_STATUS_CHANGED_CB(WRITE8(hp2645_state , async_status_change))
+	MCFG_AY31015_WRITE_DAV_CB(WRITELINE(hp2645_state , async_dav_w))
 
 	// Beep
 	MCFG_SPEAKER_STANDARD_MONO("mono")

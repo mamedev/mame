@@ -38,15 +38,17 @@ public:
 	required_device<cpu_device> m_maincpu;
 	void iskr1030m(machine_config &config);
 	void iskr1031(machine_config &config);
+	void iskr1031_io(address_map &map);
+	void iskr1031_map(address_map &map);
 };
 
-static ADDRESS_MAP_START( iskr1031_map, AS_PROGRAM, 16, iskr103x_state )
+ADDRESS_MAP_START(iskr103x_state::iskr1031_map)
 	ADDRESS_MAP_UNMAP_HIGH
 	AM_RANGE(0xf0000, 0xfffff) AM_ROM AM_REGION("bios", 0)
 ADDRESS_MAP_END
 
 
-static ADDRESS_MAP_START(iskr1031_io, AS_IO, 16, iskr103x_state)
+ADDRESS_MAP_START(iskr103x_state::iskr1031_io)
 	ADDRESS_MAP_UNMAP_HIGH
 	AM_RANGE(0x0000, 0x00ff) AM_DEVICE8("mb", ibm5160_mb_device, map, 0xffff)
 ADDRESS_MAP_END
@@ -87,7 +89,8 @@ MACHINE_CONFIG_START(iskr103x_state::iskr1030m)
 	MCFG_RAM_EXTRA_OPTIONS("64K, 128K, 256K, 512K")
 MACHINE_CONFIG_END
 
-MACHINE_CONFIG_DERIVED(iskr103x_state::iskr1031, iskr1030m)
+MACHINE_CONFIG_START(iskr103x_state::iskr1031)
+	iskr1030m(config);
 	MCFG_DEVICE_MODIFY("mb")
 	MCFG_DEVICE_INPUT_DEFAULTS(iskr1031)
 	MCFG_DEVICE_MODIFY("isa1")

@@ -39,6 +39,10 @@ public:
 	DECLARE_WRITE8_MEMBER(lights_b_w);
 
 	void supstarf(machine_config &config);
+	void main_io_map(address_map &map);
+	void main_map(address_map &map);
+	void sound_io_map(address_map &map);
+	void sound_map(address_map &map);
 protected:
 	virtual void machine_start() override;
 
@@ -53,22 +57,22 @@ private:
 	bool m_latch_select;
 };
 
-static ADDRESS_MAP_START(main_map, AS_PROGRAM, 8, supstarf_state)
+ADDRESS_MAP_START(supstarf_state::main_map)
 	AM_RANGE(0x0000, 0x3fff) AM_ROM
 	AM_RANGE(0x8000, 0x8000) AM_DEVREAD("soundlatch1", i8212_device, read) AM_DEVWRITE("soundlatch2", i8212_device, strobe)
 	AM_RANGE(0xc000, 0xc7ff) AM_RAM // 5517 (2Kx8) at IC11
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START(main_io_map, AS_IO, 8, supstarf_state)
+ADDRESS_MAP_START(supstarf_state::main_io_map)
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	AM_RANGE(0x00, 0xff) AM_WRITE(driver_clk_w)
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START(sound_map, AS_PROGRAM, 8, supstarf_state)
+ADDRESS_MAP_START(supstarf_state::sound_map)
 	AM_RANGE(0x000, 0xfff) AM_ROM // external EPROM
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START(sound_io_map, AS_IO, 8, supstarf_state)
+ADDRESS_MAP_START(supstarf_state::sound_io_map)
 	AM_RANGE(0x00, 0xff) AM_READWRITE(psg_latch_r, psg_latch_w)
 ADDRESS_MAP_END
 

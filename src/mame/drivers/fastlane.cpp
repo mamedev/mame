@@ -77,7 +77,7 @@ WRITE8_MEMBER(fastlane_state::fastlane_k2_k007232_w)
 {
 	m_k007232_2->write(space, offset ^ 1, data);
 }
-static ADDRESS_MAP_START( fastlane_map, AS_PROGRAM, 8, fastlane_state )
+ADDRESS_MAP_START(fastlane_state::fastlane_map)
 	AM_RANGE(0x0000, 0x005f) AM_RAM_WRITE(k007121_registers_w) AM_SHARE("k007121_regs") /* 007121 registers */
 	AM_RANGE(0x0800, 0x0800) AM_READ_PORT("DSW3")
 	AM_RANGE(0x0801, 0x0801) AM_READ_PORT("P2")

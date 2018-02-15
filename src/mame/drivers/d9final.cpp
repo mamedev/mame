@@ -66,6 +66,8 @@ public:
 
 	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	void d9final(machine_config &config);
+	void d9final_io(address_map &map);
+	void d9final_map(address_map &map);
 };
 
 
@@ -124,7 +126,7 @@ READ8_MEMBER(d9final_state::prot_latch_r)
 }
 
 
-static ADDRESS_MAP_START( d9final_map, AS_PROGRAM, 8, d9final_state )
+ADDRESS_MAP_START(d9final_state::d9final_map)
 	AM_RANGE(0x0000, 0x7fff) AM_ROM
 	AM_RANGE(0x8000, 0xbfff) AM_ROMBANK("bank1")
 	AM_RANGE(0xc000, 0xc7ff) AM_RAM
@@ -137,7 +139,7 @@ static ADDRESS_MAP_START( d9final_map, AS_PROGRAM, 8, d9final_state )
 	AM_RANGE(0xf800, 0xf80f) AM_DEVREADWRITE("rtc", rtc62421_device, read, write)
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( d9final_io, AS_IO, 8, d9final_state )
+ADDRESS_MAP_START(d9final_state::d9final_io)
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
 //  AM_RANGE(0x00, 0x00) AM_WRITENOP //bit 0: irq enable? screen enable?
 	AM_RANGE(0x00, 0x00) AM_READ_PORT("DSWA")

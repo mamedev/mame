@@ -117,7 +117,7 @@ WRITE8_MEMBER( ob68k1a_state::pia_w )
 //  ADDRESS_MAP( ob68k1a_mem )
 //-------------------------------------------------
 
-static ADDRESS_MAP_START( ob68k1a_mem, AS_PROGRAM, 16, ob68k1a_state )
+ADDRESS_MAP_START(ob68k1a_state::ob68k1a_mem)
 	ADDRESS_MAP_UNMAP_HIGH
 	AM_RANGE(0x000000, 0x01ffff) AM_RAM
 	AM_RANGE(0xfe0000, 0xfeffff) AM_ROM AM_REGION(MC68000L10_TAG, 0)

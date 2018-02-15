@@ -242,6 +242,8 @@ public:
 	}
 
 	void leapster(machine_config &config);
+	void leapster_aux(address_map &map);
+	void leapster_map(address_map &map);
 protected:
 	required_device<cpu_device> m_maincpu;
 	required_device<generic_slot_device> m_cart;
@@ -290,7 +292,7 @@ void leapster_state::machine_reset()
 {
 }
 
-static ADDRESS_MAP_START( leapster_map, AS_PROGRAM, 32, leapster_state )
+ADDRESS_MAP_START(leapster_state::leapster_map)
 	AM_RANGE(0x00000000, 0x007fffff) AM_ROM AM_MIRROR(0x40000000) // pointers in the bios region seem to be to the 40xxxxxx region, either we mirror there or something (real bios?) is acutally missing
 	AM_RANGE(0x0180D800, 0x0180D803) AM_READ(leapster_random_r)
 	AM_RANGE(0x03000000, 0x030007ff) AM_RAM // puts stack here, writes a pointer @ 0x03000000 on startup
@@ -298,7 +300,7 @@ static ADDRESS_MAP_START( leapster_map, AS_PROGRAM, 32, leapster_state )
 //  AM_RANGE(0x80000000, 0x807fffff) AM_ROMBANK("cartrom") // game ROM pointers are all to the 80xxxxxx region, so I assume it maps here - installed if a cart is present
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( leapster_aux, AS_IO, 32, leapster_state )
+ADDRESS_MAP_START(leapster_state::leapster_aux)
 	AM_RANGE(0x00000004b, 0x00000004b) AM_WRITE(leapster_aux004b_w) // this address isn't used by ARC internal stuff afaik, so probably leapster specific
 ADDRESS_MAP_END
 

@@ -89,6 +89,14 @@ public:
 	void sapi2(machine_config &config);
 	void sapi3a(machine_config &config);
 	void sapi3b(machine_config &config);
+	void sapi1_mem(address_map &map);
+	void sapi2_mem(address_map &map);
+	void sapi3_io(address_map &map);
+	void sapi3_mem(address_map &map);
+	void sapi3a_io(address_map &map);
+	void sapi3a_mem(address_map &map);
+	void sapi3b_io(address_map &map);
+	void sapi3b_mem(address_map &map);
 private:
 	uint8_t m_term_data;
 	uint8_t m_keyboard_mask;
@@ -183,7 +191,7 @@ static const uint8_t MHB2501[] = {
 
 
 /* Address maps */
-static ADDRESS_MAP_START(sapi1_mem, AS_PROGRAM, 8, sapi1_state )
+ADDRESS_MAP_START(sapi1_state::sapi1_mem)
 	ADDRESS_MAP_UNMAP_HIGH
 	AM_RANGE(0x0000, 0x0fff) AM_ROM
 	AM_RANGE(0x1000, 0x1fff) AM_ROM // Extension ROM
@@ -196,7 +204,7 @@ static ADDRESS_MAP_START(sapi1_mem, AS_PROGRAM, 8, sapi1_state )
 	AM_RANGE(0x4000, 0x7fff) AM_RAM // REM-1
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START(sapi2_mem, AS_PROGRAM, 8, sapi1_state )
+ADDRESS_MAP_START(sapi1_state::sapi2_mem)
 	ADDRESS_MAP_UNMAP_HIGH
 	AM_RANGE(0x0000, 0x0fff) AM_ROM
 	AM_RANGE(0x1000, 0x1fff) AM_ROM // Extension ROM
@@ -207,14 +215,14 @@ static ADDRESS_MAP_START(sapi2_mem, AS_PROGRAM, 8, sapi1_state )
 	AM_RANGE(0x4000, 0x7fff) AM_RAM // REM-1
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START(sapi3_mem, AS_PROGRAM, 8, sapi1_state )
+ADDRESS_MAP_START(sapi1_state::sapi3_mem)
 	ADDRESS_MAP_UNMAP_HIGH
 	AM_RANGE(0x0000, 0x07ff) AM_RAM AM_RAMBANK("bank1")
 	AM_RANGE(0x0800, 0xf7ff) AM_RAM
 	AM_RANGE(0xf800, 0xffff) AM_RAM AM_SHARE("videoram")
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START(sapi3a_mem, AS_PROGRAM, 8, sapi1_state )
+ADDRESS_MAP_START(sapi1_state::sapi3a_mem)
 	ADDRESS_MAP_UNMAP_HIGH
 	AM_RANGE(0x0000, 0x07ff) AM_RAM AM_RAMBANK("bank1")
 	AM_RANGE(0x0800, 0xf7ff) AM_RAM
@@ -222,7 +230,7 @@ static ADDRESS_MAP_START(sapi3a_mem, AS_PROGRAM, 8, sapi1_state )
 	AM_RANGE(0xfe00, 0xffff) AM_RAM
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START(sapi3b_mem, AS_PROGRAM, 8, sapi1_state )
+ADDRESS_MAP_START(sapi1_state::sapi3b_mem)
 	ADDRESS_MAP_UNMAP_HIGH
 	AM_RANGE(0x0000, 0x07ff) AM_RAM AM_RAMBANK("bank1")
 	AM_RANGE(0x0800, 0xafff) AM_RAM
@@ -230,14 +238,14 @@ static ADDRESS_MAP_START(sapi3b_mem, AS_PROGRAM, 8, sapi1_state )
 	AM_RANGE(0xb800, 0xffff) AM_RAM
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( sapi3_io, AS_IO, 8, sapi1_state )
+ADDRESS_MAP_START(sapi1_state::sapi3_io)
 	ADDRESS_MAP_UNMAP_HIGH
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	AM_RANGE(0x00, 0x00) AM_WRITE(sapi3_00_w)
 	AM_RANGE(0x25, 0x25) AM_READWRITE(sapi3_25_r,sapi3_25_w)
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( sapi3a_io, AS_IO, 8, sapi1_state )
+ADDRESS_MAP_START(sapi1_state::sapi3a_io)
 	ADDRESS_MAP_UNMAP_HIGH
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	AM_RANGE(0x00, 0x00) AM_WRITE(sapi3_00_w)
@@ -248,7 +256,7 @@ static ADDRESS_MAP_START( sapi3a_io, AS_IO, 8, sapi1_state )
 	AM_RANGE(0x25, 0x25) AM_READWRITE(sapi3_25_r,sapi3_25_w)
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( sapi3b_io, AS_IO, 8, sapi1_state )
+ADDRESS_MAP_START(sapi1_state::sapi3b_io)
 	ADDRESS_MAP_UNMAP_HIGH
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	AM_RANGE(0x00, 0x00) AM_WRITE(sapi3_00_w)
@@ -636,7 +644,8 @@ MACHINE_CONFIG_START(sapi1_state::sapi1)
 	MCFG_RAM_DEFAULT_SIZE("64K")
 MACHINE_CONFIG_END
 
-MACHINE_CONFIG_DERIVED(sapi1_state::sapi2, sapi1)
+MACHINE_CONFIG_START(sapi1_state::sapi2)
+	sapi1(config);
 	/* basic machine hardware */
 	MCFG_CPU_MODIFY("maincpu")
 	MCFG_CPU_PROGRAM_MAP(sapi2_mem)
@@ -644,7 +653,8 @@ MACHINE_CONFIG_DERIVED(sapi1_state::sapi2, sapi1)
 	MCFG_GENERIC_KEYBOARD_CB(PUT(sapi1_state, kbd_put))
 MACHINE_CONFIG_END
 
-MACHINE_CONFIG_DERIVED(sapi1_state::sapi3, sapi2)
+MACHINE_CONFIG_START(sapi1_state::sapi3)
+	sapi2(config);
 	/* basic machine hardware */
 	MCFG_CPU_MODIFY("maincpu")
 	MCFG_CPU_PROGRAM_MAP(sapi3_mem)
@@ -656,7 +666,8 @@ MACHINE_CONFIG_DERIVED(sapi1_state::sapi3, sapi2)
 	MCFG_SCREEN_UPDATE_DRIVER(sapi1_state, screen_update_sapi3)
 MACHINE_CONFIG_END
 
-MACHINE_CONFIG_DERIVED(sapi1_state::sapi3b, sapi3)
+MACHINE_CONFIG_START(sapi1_state::sapi3b)
+	sapi3(config);
 	/* basic machine hardware */
 	MCFG_CPU_MODIFY("maincpu")
 	MCFG_CPU_PROGRAM_MAP(sapi3b_mem)

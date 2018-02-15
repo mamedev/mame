@@ -73,6 +73,7 @@ public:
 	MC6845_UPDATE_ROW(crtc_update_row);
 
 	void dim68k(machine_config &config);
+	void dim68k_mem(address_map &map);
 private:
 	bool m_speaker_bit;
 	u8 m_video_control;
@@ -183,7 +184,7 @@ WRITE16_MEMBER( dim68k_state::dim68k_banksw_w )
 {
 }
 
-static ADDRESS_MAP_START(dim68k_mem, AS_PROGRAM, 16, dim68k_state)
+ADDRESS_MAP_START(dim68k_state::dim68k_mem)
 	ADDRESS_MAP_UNMAP_HIGH
 	AM_RANGE(0x00000000, 0x00feffff) AM_RAM AM_SHARE("ram") // 16MB RAM / ROM at boot
 	AM_RANGE(0x00ff0000, 0x00ff1fff) AM_ROM AM_REGION("bootrom", 0)

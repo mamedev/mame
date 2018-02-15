@@ -94,4 +94,8 @@ public:
 	void jumpcoas(machine_config &config);
 	void imago(machine_config &config);
 	void fastfred(machine_config &config);
+	void fastfred_map(address_map &map);
+	void imago_map(address_map &map);
+	void jumpcoas_map(address_map &map);
+	void sound_map(address_map &map);
 };

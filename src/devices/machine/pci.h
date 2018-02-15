@@ -43,7 +43,7 @@ public:
 
 	void map_config(uint8_t device, address_space *config_space);
 
-	virtual DECLARE_ADDRESS_MAP(config_map, 32);
+	virtual void config_map(address_map &map);
 
 	uint32_t unmapped_r(offs_t offset, uint32_t mem_mask, int bank);
 	void unmapped_w(offs_t offset, uint32_t data, uint32_t mem_mask, int bank);
@@ -99,7 +99,7 @@ protected:
 	};
 
 	struct bank_info {
-		address_map_delegate map;
+		address_map_constructor map;
 		device_t *device;
 
 		uint64_t adr;
@@ -129,9 +129,9 @@ protected:
 	virtual void device_reset() override;
 
 	void skip_map_regs(int count);
-	void add_map(uint64_t size, int flags, address_map_delegate &map, device_t *relative_to = nullptr);
+	void add_map(uint64_t size, int flags, const address_map_constructor &map, device_t *relative_to = nullptr);
 	template <typename T> void add_map(uint64_t size, int flags, void (T::*map)(address_map &map), const char *name) {
-		address_map_delegate delegate(map, name, static_cast<T *>(this));
+		address_map_constructor delegate(map, name, static_cast<T *>(this));
 		add_map(size, flags, delegate);
 	}
 
@@ -162,7 +162,7 @@ public:
 
 	virtual DECLARE_READ8_MEMBER(header_type_r) override;
 
-	virtual DECLARE_ADDRESS_MAP(config_map, 32) override;
+	virtual void config_map(address_map &map) override;
 
 	DECLARE_READ32_MEMBER (b_address_base_r);
 	DECLARE_WRITE32_MEMBER(b_address_base_w);
@@ -243,7 +243,7 @@ protected:
 
 class pci_host_device : public pci_bridge_device {
 public:
-	DECLARE_ADDRESS_MAP(io_configuration_access_map, 32);
+	void io_configuration_access_map(address_map &map);
 
 protected:
 	pci_host_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock);

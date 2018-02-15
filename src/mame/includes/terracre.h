@@ -54,4 +54,10 @@ public:
 	void amazon_1412m2(machine_config &config);
 	void ym2203(machine_config &config);
 	void ym3526(machine_config &config);
+	void amazon_1412m2_map(address_map &map);
+	void amazon_base_map(address_map &map);
+	void sound_2203_io_map(address_map &map);
+	void sound_3526_io_map(address_map &map);
+	void sound_map(address_map &map);
+	void terracre_map(address_map &map);
 };

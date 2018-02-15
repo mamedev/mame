@@ -22,10 +22,10 @@ public:
 	{
 	}
 
-	DECLARE_ADDRESS_MAP(map, 8);
+	void map(address_map &map);
 };
 
-DEVICE_ADDRESS_MAP_START( map, 8, asst128_mb_device )
+ADDRESS_MAP_START(asst128_mb_device::map)
 	AM_RANGE(0x0020, 0x002f) AM_DEVREADWRITE("pic8259", pic8259_device, read, write)
 	AM_RANGE(0x0040, 0x004f) AM_DEVREADWRITE("pit8253", pit8253_device, read, write)
 	AM_RANGE(0x0060, 0x006f) AM_DEVREADWRITE("ppi8255", i8255_device, read, write)
@@ -53,6 +53,8 @@ public:
 
 	void machine_start() override;
 	void asst128(machine_config &config);
+	void asst128_io(address_map &map);
+	void asst128_map(address_map &map);
 };
 
 void asst128_state::machine_start()
@@ -68,12 +70,12 @@ WRITE8_MEMBER(asst128_state::asst128_fdc_dor_w)
 	m_fdc->dor_w(space, offset, data, mem_mask);
 }
 
-static ADDRESS_MAP_START( asst128_map, AS_PROGRAM, 16, asst128_state)
+ADDRESS_MAP_START(asst128_state::asst128_map)
 	ADDRESS_MAP_UNMAP_HIGH
 	AM_RANGE(0xf0000, 0xfffff) AM_ROM AM_REGION("bios", 0)
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START(asst128_io, AS_IO, 16, asst128_state)
+ADDRESS_MAP_START(asst128_state::asst128_io)
 	ADDRESS_MAP_UNMAP_HIGH
 	AM_RANGE(0x0000, 0x00ff) AM_DEVICE8("mb", asst128_mb_device, map, 0xffff)
 	AM_RANGE(0x0200, 0x0207) AM_DEVREADWRITE8("pc_joy", pc_joy_device, joy_port_r, joy_port_w, 0xffff)

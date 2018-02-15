@@ -88,4 +88,6 @@ public:
 	void mlc_6bpp(machine_config &config);
 	void avengrgs(machine_config &config);
 	void mlc_5bpp(machine_config &config);
+	void avengrgs_map(address_map &map);
+	void decomlc_map(address_map &map);
 };

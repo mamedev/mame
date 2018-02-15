@@ -198,6 +198,8 @@ public:
 	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 
 	void comebaby(machine_config &config);
+	void comebaby_io(address_map &map);
+	void comebaby_map(address_map &map);
 protected:
 
 	// devices
@@ -216,14 +218,14 @@ uint32_t comebaby_state::screen_update(screen_device &screen, bitmap_ind16 &bitm
 	return 0;
 }
 
-static ADDRESS_MAP_START( comebaby_map, AS_PROGRAM, 32, comebaby_state )
+ADDRESS_MAP_START(comebaby_state::comebaby_map)
 	AM_RANGE(0x00000000, 0x0009ffff) AM_RAM
 	AM_RANGE(0x000a0000, 0x000bffff) AM_RAM
 	AM_RANGE(0x000c0000, 0x000fffff) AM_ROM AM_REGION("bios", 0)
 	AM_RANGE(0xfffc0000, 0xffffffff) AM_ROM AM_REGION("bios", 0)
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( comebaby_io, AS_IO, 32, comebaby_state )
+ADDRESS_MAP_START(comebaby_state::comebaby_io)
 	AM_IMPORT_FROM(pcat32_io_common)
 ADDRESS_MAP_END
 
@@ -237,7 +239,7 @@ MACHINE_CONFIG_START(comebaby_state::comebaby)
 	MCFG_CPU_PROGRAM_MAP(comebaby_map)
 	MCFG_CPU_IO_MAP(comebaby_io)
 	
-	MCFG_FRAGMENT_ADD( pcat_common )
+	pcat_common(config);
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)

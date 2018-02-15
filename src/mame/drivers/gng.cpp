@@ -65,7 +65,7 @@ READ8_MEMBER(gng_state::diamond_hack_r)
 	return 0;
 }
 
-static ADDRESS_MAP_START( gng_map, AS_PROGRAM, 8, gng_state )
+ADDRESS_MAP_START(gng_state::gng_map)
 	AM_RANGE(0x0000, 0x1dff) AM_RAM
 	AM_RANGE(0x1e00, 0x1fff) AM_RAM AM_SHARE("spriteram")
 	AM_RANGE(0x2000, 0x27ff) AM_RAM_WRITE(gng_fgvideoram_w) AM_SHARE("fgvideoram")
@@ -87,7 +87,7 @@ static ADDRESS_MAP_START( gng_map, AS_PROGRAM, 8, gng_state )
 	AM_RANGE(0x6000, 0xffff) AM_ROM
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( diamond_map, AS_PROGRAM, 8, gng_state )
+ADDRESS_MAP_START(gng_state::diamond_map)
 	AM_RANGE(0x0000, 0x1dff) AM_RAM
 	AM_RANGE(0x1e00, 0x1fff) AM_RAM AM_SHARE("spriteram")
 	AM_RANGE(0x2000, 0x27ff) AM_RAM_WRITE(gng_fgvideoram_w) AM_SHARE("fgvideoram")
@@ -115,7 +115,7 @@ ADDRESS_MAP_END
 
 
 
-static ADDRESS_MAP_START( sound_map, AS_PROGRAM, 8, gng_state )
+ADDRESS_MAP_START(gng_state::sound_map)
 	AM_RANGE(0x0000, 0x7fff) AM_ROM
 	AM_RANGE(0xc000, 0xc7ff) AM_RAM
 	AM_RANGE(0xc800, 0xc800) AM_DEVREAD("soundlatch", generic_latch_8_device, read)
@@ -438,7 +438,8 @@ MACHINE_CONFIG_START(gng_state::gng)
 	MCFG_SOUND_ROUTE(3, "mono", 0.20)
 MACHINE_CONFIG_END
 
-MACHINE_CONFIG_DERIVED(gng_state::diamond, gng)
+MACHINE_CONFIG_START(gng_state::diamond)
+	gng(config);
 	MCFG_CPU_MODIFY("maincpu")
 	MCFG_CPU_PROGRAM_MAP(diamond_map)
 

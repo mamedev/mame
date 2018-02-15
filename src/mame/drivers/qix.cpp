@@ -245,7 +245,7 @@ Interrupts:
  *
  *************************************/
 
-static ADDRESS_MAP_START( main_map, AS_PROGRAM, 8, qix_state )
+ADDRESS_MAP_START(qix_state::main_map)
 	AM_RANGE(0x8000, 0x83ff) AM_RAM AM_SHARE("share1")
 	AM_RANGE(0x8400, 0x87ff) AM_RAM
 	AM_RANGE(0x8800, 0x8bff) AM_READNOP   /* 6850 ACIA */
@@ -259,7 +259,7 @@ static ADDRESS_MAP_START( main_map, AS_PROGRAM, 8, qix_state )
 ADDRESS_MAP_END
 
 
-static ADDRESS_MAP_START( kram3_main_map, AS_PROGRAM, 8, qix_state )
+ADDRESS_MAP_START(qix_state::kram3_main_map)
 	AM_RANGE(0x8000, 0x83ff) AM_RAM AM_SHARE("share1")
 	AM_RANGE(0x8400, 0x87ff) AM_RAM
 	AM_RANGE(0x8800, 0x8bff) AM_READNOP   /* 6850 ACIA */
@@ -274,7 +274,7 @@ ADDRESS_MAP_END
 
 
 
-static ADDRESS_MAP_START( zoo_main_map, AS_PROGRAM, 8, qix_state )
+ADDRESS_MAP_START(qix_state::zoo_main_map)
 	AM_RANGE(0x0000, 0x03ff) AM_RAM AM_SHARE("share1")
 	AM_RANGE(0x0400, 0x07ff) AM_RAM
 	AM_RANGE(0x0800, 0x0bff) AM_READNOP   /* ACIA */
@@ -623,20 +623,22 @@ MACHINE_CONFIG_START(qix_state::qix_base)
 	MCFG_PIA_WRITEPB_HANDLER(WRITE8(qix_state, qix_coinctl_w))
 
 	/* video hardware */
-	MCFG_FRAGMENT_ADD(qix_video)
+	qix_video(config);
 MACHINE_CONFIG_END
 
 
-MACHINE_CONFIG_DERIVED(qix_state::qix, qix_base)
-	MCFG_FRAGMENT_ADD(qix_audio)
+MACHINE_CONFIG_START(qix_state::qix)
+	qix_base(config);
+	qix_audio(config);
 MACHINE_CONFIG_END
 
-MACHINE_CONFIG_DERIVED(qix_state::kram3, qix)
+MACHINE_CONFIG_START(qix_state::kram3)
+	qix(config);
 	MCFG_CPU_MODIFY("maincpu")
 	MCFG_CPU_PROGRAM_MAP(kram3_main_map)
 	MCFG_MC6809E_LIC_CB(WRITELINE(qix_state, kram3_lic_maincpu_changed))
 
-	MCFG_FRAGMENT_ADD(kram3_video)
+	kram3_video(config);
 MACHINE_CONFIG_END
 
 /***************************************************************************
@@ -646,7 +648,8 @@ MACHINE_CONFIG_END
 
 ***************************************************************************/
 
-MACHINE_CONFIG_DERIVED(qix_state::mcu, qix)
+MACHINE_CONFIG_START(qix_state::mcu)
+	qix(config);
 
 	/* basic machine hardware */
 
@@ -667,7 +670,8 @@ MACHINE_CONFIG_DERIVED(qix_state::mcu, qix)
 MACHINE_CONFIG_END
 
 
-MACHINE_CONFIG_DERIVED(qix_state::zookeep, mcu)
+MACHINE_CONFIG_START(qix_state::zookeep)
+	mcu(config);
 
 	/* basic machine hardware */
 
@@ -675,7 +679,7 @@ MACHINE_CONFIG_DERIVED(qix_state::zookeep, mcu)
 	MCFG_CPU_PROGRAM_MAP(zoo_main_map)
 
 	/* video hardware */
-	MCFG_FRAGMENT_ADD(zookeep_video)
+	zookeep_video(config);
 MACHINE_CONFIG_END
 
 
@@ -687,7 +691,8 @@ MACHINE_CONFIG_END
 
 ***************************************************************************/
 
-MACHINE_CONFIG_DERIVED(qix_state::slither, qix_base)
+MACHINE_CONFIG_START(qix_state::slither)
+	qix_base(config);
 
 	/* basic machine hardware */
 
@@ -705,10 +710,10 @@ MACHINE_CONFIG_DERIVED(qix_state::slither, qix_base)
 	MCFG_PIA_READPB_HANDLER(NOOP)
 
 	/* video hardware */
-	MCFG_FRAGMENT_ADD(slither_video)
+	slither_video(config);
 
 	/* audio hardware */
-	MCFG_FRAGMENT_ADD(slither_audio)
+	slither_audio(config);
 MACHINE_CONFIG_END
 
 

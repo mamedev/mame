@@ -867,7 +867,7 @@ INTERRUPT_GEN_MEMBER(toaplan2_state::bbakraid_snd_interrupt)
 
 
 
-static ADDRESS_MAP_START( tekipaki_68k_mem, AS_PROGRAM, 16, toaplan2_state )
+ADDRESS_MAP_START(toaplan2_state::tekipaki_68k_mem)
 	AM_RANGE(0x000000, 0x01ffff) AM_ROM
 	AM_RANGE(0x020000, 0x03ffff) AM_ROM                     // extra for Whoopee
 	AM_RANGE(0x080000, 0x082fff) AM_RAM
@@ -885,7 +885,7 @@ ADDRESS_MAP_END
 
 
 
-static ADDRESS_MAP_START( ghox_68k_mem, AS_PROGRAM, 16, toaplan2_state )
+ADDRESS_MAP_START(toaplan2_state::ghox_68k_mem)
 	AM_RANGE(0x000000, 0x03ffff) AM_ROM
 	AM_RANGE(0x040000, 0x040001) AM_READ(ghox_p2_h_analog_r)
 	AM_RANGE(0x080000, 0x083fff) AM_RAM
@@ -898,7 +898,7 @@ static ADDRESS_MAP_START( ghox_68k_mem, AS_PROGRAM, 16, toaplan2_state )
 ADDRESS_MAP_END
 
 
-static ADDRESS_MAP_START( dogyuun_68k_mem, AS_PROGRAM, 16, toaplan2_state )
+ADDRESS_MAP_START(toaplan2_state::dogyuun_68k_mem)
 	AM_RANGE(0x000000, 0x07ffff) AM_ROM
 	AM_RANGE(0x100000, 0x103fff) AM_RAM
 	AM_RANGE(0x200010, 0x200011) AM_READ_PORT("IN1")
@@ -913,7 +913,7 @@ static ADDRESS_MAP_START( dogyuun_68k_mem, AS_PROGRAM, 16, toaplan2_state )
 ADDRESS_MAP_END
 
 
-static ADDRESS_MAP_START( kbash_68k_mem, AS_PROGRAM, 16, toaplan2_state )
+ADDRESS_MAP_START(toaplan2_state::kbash_68k_mem)
 	AM_RANGE(0x000000, 0x07ffff) AM_ROM
 	AM_RANGE(0x100000, 0x103fff) AM_RAM
 	AM_RANGE(0x200000, 0x200fff) AM_READWRITE(shared_ram_r, shared_ram_w )
@@ -927,7 +927,7 @@ static ADDRESS_MAP_START( kbash_68k_mem, AS_PROGRAM, 16, toaplan2_state )
 ADDRESS_MAP_END
 
 
-static ADDRESS_MAP_START( kbash2_68k_mem, AS_PROGRAM, 16, toaplan2_state )
+ADDRESS_MAP_START(toaplan2_state::kbash2_68k_mem)
 	AM_RANGE(0x000000, 0x07ffff) AM_ROM
 	AM_RANGE(0x100000, 0x103fff) AM_RAM
 	AM_RANGE(0x104000, 0x10401f) AM_RAM         // Sound related?
@@ -948,7 +948,7 @@ static ADDRESS_MAP_START( kbash2_68k_mem, AS_PROGRAM, 16, toaplan2_state )
 ADDRESS_MAP_END
 
 
-static ADDRESS_MAP_START( truxton2_68k_mem, AS_PROGRAM, 16, toaplan2_state )
+ADDRESS_MAP_START(toaplan2_state::truxton2_68k_mem)
 	AM_RANGE(0x000000, 0x07ffff) AM_ROM
 	AM_RANGE(0x100000, 0x10ffff) AM_RAM
 	AM_RANGE(0x200000, 0x20000d) AM_DEVREADWRITE("gp9001", gp9001vdp_device, gp9001_vdp_r, gp9001_vdp_w)
@@ -971,7 +971,7 @@ static ADDRESS_MAP_START( truxton2_68k_mem, AS_PROGRAM, 16, toaplan2_state )
 ADDRESS_MAP_END
 
 
-static ADDRESS_MAP_START( pipibibs_68k_mem, AS_PROGRAM, 16, toaplan2_state )
+ADDRESS_MAP_START(toaplan2_state::pipibibs_68k_mem)
 	AM_RANGE(0x000000, 0x03ffff) AM_ROM
 	AM_RANGE(0x080000, 0x082fff) AM_RAM
 	AM_RANGE(0x0c0000, 0x0c0fff) AM_RAM_DEVWRITE("palette", palette_device, write16) AM_SHARE("palette")
@@ -987,7 +987,7 @@ static ADDRESS_MAP_START( pipibibs_68k_mem, AS_PROGRAM, 16, toaplan2_state )
 ADDRESS_MAP_END
 
 // odd scroll registers
-static ADDRESS_MAP_START( pipibibi_bootleg_68k_mem, AS_PROGRAM, 16, toaplan2_state )
+ADDRESS_MAP_START(toaplan2_state::pipibibi_bootleg_68k_mem)
 	AM_RANGE(0x000000, 0x03ffff) AM_ROM
 	AM_RANGE(0x080000, 0x082fff) AM_RAM
 	AM_RANGE(0x083000, 0x0837ff) AM_DEVREADWRITE("gp9001", gp9001vdp_device, pipibibi_bootleg_spriteram16_r, pipibibi_bootleg_spriteram16_w)   // SpriteRAM
@@ -1009,7 +1009,7 @@ static ADDRESS_MAP_START( pipibibi_bootleg_68k_mem, AS_PROGRAM, 16, toaplan2_sta
 ADDRESS_MAP_END
 
 
-static ADDRESS_MAP_START( fixeight_68k_mem, AS_PROGRAM, 16, toaplan2_state )
+ADDRESS_MAP_START(toaplan2_state::fixeight_68k_mem)
 	AM_RANGE(0x000000, 0x07ffff) AM_ROM
 	AM_RANGE(0x100000, 0x103fff) AM_RAM
 	AM_RANGE(0x200000, 0x200001) AM_READ_PORT("IN1")
@@ -1029,7 +1029,7 @@ static ADDRESS_MAP_START( fixeight_68k_mem, AS_PROGRAM, 16, toaplan2_state )
 ADDRESS_MAP_END
 
 
-static ADDRESS_MAP_START( fixeightbl_68k_mem, AS_PROGRAM, 16, toaplan2_state )
+ADDRESS_MAP_START(toaplan2_state::fixeightbl_68k_mem)
 	AM_RANGE(0x000000, 0x0fffff) AM_ROM     // 0-7ffff ?
 	AM_RANGE(0x100000, 0x10ffff) AM_RAM     // 100000-107fff  105000-105xxx  106000-106xxx  108000 - related to sound ?
 	AM_RANGE(0x200000, 0x200001) AM_READ_PORT("IN1")
@@ -1048,7 +1048,7 @@ static ADDRESS_MAP_START( fixeightbl_68k_mem, AS_PROGRAM, 16, toaplan2_state )
 ADDRESS_MAP_END
 
 
-static ADDRESS_MAP_START( vfive_68k_mem, AS_PROGRAM, 16, toaplan2_state )
+ADDRESS_MAP_START(toaplan2_state::vfive_68k_mem)
 	AM_RANGE(0x000000, 0x07ffff) AM_ROM
 	AM_RANGE(0x100000, 0x103fff) AM_RAM
 //  AM_RANGE(0x200000, 0x20ffff) AM_NOP // Read at startup by broken ROM checksum code - see notes
@@ -1063,7 +1063,7 @@ static ADDRESS_MAP_START( vfive_68k_mem, AS_PROGRAM, 16, toaplan2_state )
 ADDRESS_MAP_END
 
 
-static ADDRESS_MAP_START( batsugun_68k_mem, AS_PROGRAM, 16, toaplan2_state )
+ADDRESS_MAP_START(toaplan2_state::batsugun_68k_mem)
 	AM_RANGE(0x000000, 0x07ffff) AM_ROM
 	AM_RANGE(0x100000, 0x10ffff) AM_RAM
 	AM_RANGE(0x200010, 0x200011) AM_READ_PORT("IN1")
@@ -1077,7 +1077,7 @@ static ADDRESS_MAP_START( batsugun_68k_mem, AS_PROGRAM, 16, toaplan2_state )
 	AM_RANGE(0x700000, 0x700001) AM_READ(video_count_r)
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( pwrkick_68k_mem, AS_PROGRAM, 16, toaplan2_state )
+ADDRESS_MAP_START(toaplan2_state::pwrkick_68k_mem)
 	AM_RANGE(0x000000, 0x07ffff) AM_ROM
 	AM_RANGE(0x100000, 0x103fff) AM_RAM AM_SHARE("nvram") // Only 10022C-10037B is actually saved as NVRAM
 	AM_RANGE(0x104000, 0x10ffff) AM_RAM
@@ -1099,7 +1099,7 @@ static ADDRESS_MAP_START( pwrkick_68k_mem, AS_PROGRAM, 16, toaplan2_state )
 	AM_RANGE(0x700038, 0x700039) AM_WRITE8(pwrkick_coin_lockout_w, 0x00ff)
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( othldrby_68k_mem, AS_PROGRAM, 16, toaplan2_state )
+ADDRESS_MAP_START(toaplan2_state::othldrby_68k_mem)
 	AM_RANGE(0x000000, 0x07ffff) AM_ROM
 	AM_RANGE(0x100000, 0x103fff) AM_RAM AM_SHARE("nvram") // Only 10331E-103401 is actually saved as NVRAM
 	AM_RANGE(0x104000, 0x10ffff) AM_RAM
@@ -1135,7 +1135,7 @@ WRITE16_MEMBER(toaplan2_state::enmadaio_oki_bank_w)
 
 }
 
-static ADDRESS_MAP_START( enmadaio_68k_mem, AS_PROGRAM, 16, toaplan2_state )
+ADDRESS_MAP_START(toaplan2_state::enmadaio_68k_mem)
 	AM_RANGE(0x000000, 0x07ffff) AM_ROM
 	AM_RANGE(0x100000, 0x103fff) AM_RAM // AM_SHARE("nvram")
 	AM_RANGE(0x104000, 0x10ffff) AM_RAM
@@ -1161,7 +1161,7 @@ static ADDRESS_MAP_START( enmadaio_68k_mem, AS_PROGRAM, 16, toaplan2_state )
 	AM_RANGE(0x70002c, 0x70002d) AM_WRITENOP
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( snowbro2_68k_mem, AS_PROGRAM, 16, toaplan2_state )
+ADDRESS_MAP_START(toaplan2_state::snowbro2_68k_mem)
 	AM_RANGE(0x000000, 0x07ffff) AM_ROM
 	AM_RANGE(0x100000, 0x10ffff) AM_RAM
 	AM_RANGE(0x300000, 0x30000d) AM_DEVREADWRITE("gp9001", gp9001vdp_device, gp9001_vdp_r, gp9001_vdp_w)
@@ -1181,7 +1181,7 @@ static ADDRESS_MAP_START( snowbro2_68k_mem, AS_PROGRAM, 16, toaplan2_state )
 ADDRESS_MAP_END
 
 
-static ADDRESS_MAP_START( mahoudai_68k_mem, AS_PROGRAM, 16, toaplan2_state )
+ADDRESS_MAP_START(toaplan2_state::mahoudai_68k_mem)
 	AM_RANGE(0x000000, 0x07ffff) AM_ROM
 	AM_RANGE(0x100000, 0x10ffff) AM_RAM
 	AM_RANGE(0x218000, 0x21bfff) AM_READWRITE(shared_ram_r, shared_ram_w)
@@ -1203,7 +1203,7 @@ static ADDRESS_MAP_START( mahoudai_68k_mem, AS_PROGRAM, 16, toaplan2_state )
 ADDRESS_MAP_END
 
 
-static ADDRESS_MAP_START( shippumd_68k_mem, AS_PROGRAM, 16, toaplan2_state )
+ADDRESS_MAP_START(toaplan2_state::shippumd_68k_mem)
 	AM_RANGE(0x000000, 0x0fffff) AM_ROM
 	AM_RANGE(0x100000, 0x10ffff) AM_RAM
 	AM_RANGE(0x218000, 0x21bfff) AM_READWRITE(shared_ram_r, shared_ram_w)
@@ -1226,7 +1226,7 @@ static ADDRESS_MAP_START( shippumd_68k_mem, AS_PROGRAM, 16, toaplan2_state )
 ADDRESS_MAP_END
 
 
-static ADDRESS_MAP_START( bgaregga_68k_mem, AS_PROGRAM, 16, toaplan2_state )
+ADDRESS_MAP_START(toaplan2_state::bgaregga_68k_mem)
 	AM_RANGE(0x000000, 0x0fffff) AM_ROM
 	AM_RANGE(0x100000, 0x10ffff) AM_RAM
 	AM_RANGE(0x218000, 0x21bfff) AM_READWRITE(shared_ram_r, shared_ram_w)
@@ -1248,7 +1248,7 @@ static ADDRESS_MAP_START( bgaregga_68k_mem, AS_PROGRAM, 16, toaplan2_state )
 ADDRESS_MAP_END
 
 
-static ADDRESS_MAP_START( batrider_68k_mem, AS_PROGRAM, 16, toaplan2_state )
+ADDRESS_MAP_START(toaplan2_state::batrider_68k_mem)
 	AM_RANGE(0x000000, 0x1fffff) AM_ROM
 	// actually 200000 - 20ffff is probably all main RAM, and the text and palette RAM are written via DMA
 	AM_RANGE(0x200000, 0x201fff) AM_RAM_WRITE(toaplan2_tx_videoram_w) AM_SHARE("tx_videoram")
@@ -1278,7 +1278,7 @@ static ADDRESS_MAP_START( batrider_68k_mem, AS_PROGRAM, 16, toaplan2_state )
 ADDRESS_MAP_END
 
 
-static ADDRESS_MAP_START( bbakraid_68k_mem, AS_PROGRAM, 16, toaplan2_state )
+ADDRESS_MAP_START(toaplan2_state::bbakraid_68k_mem)
 	AM_RANGE(0x000000, 0x1fffff) AM_ROM
 	// actually 200000 - 20ffff is probably all main RAM, and the text and palette RAM are written via DMA
 	AM_RANGE(0x200000, 0x201fff) AM_RAM_WRITE(toaplan2_tx_videoram_w) AM_SHARE("tx_videoram")
@@ -1309,14 +1309,14 @@ ADDRESS_MAP_END
 
 
 
-static ADDRESS_MAP_START( pipibibs_sound_z80_mem, AS_PROGRAM, 8, toaplan2_state )
+ADDRESS_MAP_START(toaplan2_state::pipibibs_sound_z80_mem)
 	AM_RANGE(0x0000, 0x7fff) AM_ROM
 	AM_RANGE(0x8000, 0x87ff) AM_RAM AM_SHARE("shared_ram")
 	AM_RANGE(0xe000, 0xe001) AM_DEVREADWRITE("ymsnd", ym3812_device, read, write)
 ADDRESS_MAP_END
 
 
-static ADDRESS_MAP_START( raizing_sound_z80_mem, AS_PROGRAM, 8, toaplan2_state )
+ADDRESS_MAP_START(toaplan2_state::raizing_sound_z80_mem)
 	AM_RANGE(0x0000, 0xbfff) AM_ROM
 	AM_RANGE(0xc000, 0xdfff) AM_RAM AM_SHARE("shared_ram")
 	AM_RANGE(0xe000, 0xe001) AM_DEVREADWRITE("ymsnd", ym2151_device, read, write)
@@ -1325,7 +1325,7 @@ static ADDRESS_MAP_START( raizing_sound_z80_mem, AS_PROGRAM, 8, toaplan2_state )
 ADDRESS_MAP_END
 
 
-static ADDRESS_MAP_START( bgaregga_sound_z80_mem, AS_PROGRAM, 8, toaplan2_state )
+ADDRESS_MAP_START(toaplan2_state::bgaregga_sound_z80_mem)
 	AM_RANGE(0x0000, 0x7fff) AM_ROM
 	AM_RANGE(0x8000, 0xbfff) AM_ROMBANK("bank1")
 	AM_RANGE(0xc000, 0xdfff) AM_RAM AM_SHARE("shared_ram")
@@ -1339,14 +1339,14 @@ static ADDRESS_MAP_START( bgaregga_sound_z80_mem, AS_PROGRAM, 8, toaplan2_state 
 ADDRESS_MAP_END
 
 
-static ADDRESS_MAP_START( batrider_sound_z80_mem, AS_PROGRAM, 8, toaplan2_state )
+ADDRESS_MAP_START(toaplan2_state::batrider_sound_z80_mem)
 	AM_RANGE(0x0000, 0x7fff) AM_ROM
 	AM_RANGE(0x8000, 0xbfff) AM_ROMBANK("bank1")
 	AM_RANGE(0xc000, 0xdfff) AM_RAM
 ADDRESS_MAP_END
 
 
-static ADDRESS_MAP_START( batrider_sound_z80_port, AS_IO, 8, toaplan2_state )
+ADDRESS_MAP_START(toaplan2_state::batrider_sound_z80_port)
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	AM_RANGE(0x40, 0x40) AM_DEVWRITE("soundlatch3", generic_latch_8_device, write)
 	AM_RANGE(0x42, 0x42) AM_DEVWRITE("soundlatch4", generic_latch_8_device, write)
@@ -1362,13 +1362,13 @@ static ADDRESS_MAP_START( batrider_sound_z80_port, AS_IO, 8, toaplan2_state )
 ADDRESS_MAP_END
 
 
-static ADDRESS_MAP_START( bbakraid_sound_z80_mem, AS_PROGRAM, 8, toaplan2_state )
+ADDRESS_MAP_START(toaplan2_state::bbakraid_sound_z80_mem)
 	AM_RANGE(0x0000, 0xbfff) AM_ROM     // No banking? ROM only contains code and data up to 0x28DC
 	AM_RANGE(0xc000, 0xffff) AM_RAM
 ADDRESS_MAP_END
 
 
-static ADDRESS_MAP_START( bbakraid_sound_z80_port, AS_IO, 8, toaplan2_state )
+ADDRESS_MAP_START(toaplan2_state::bbakraid_sound_z80_port)
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	AM_RANGE(0x40, 0x40) AM_DEVWRITE("soundlatch3", generic_latch_8_device, write)
 	AM_RANGE(0x42, 0x42) AM_DEVWRITE("soundlatch4", generic_latch_8_device, write)
@@ -1380,14 +1380,14 @@ static ADDRESS_MAP_START( bbakraid_sound_z80_port, AS_IO, 8, toaplan2_state )
 ADDRESS_MAP_END
 
 
-static ADDRESS_MAP_START( v25_mem, AS_PROGRAM, 8, toaplan2_state )
+ADDRESS_MAP_START(toaplan2_state::v25_mem)
 	AM_RANGE(0x00000, 0x00001) AM_DEVREADWRITE("ymsnd", ym2151_device, read, write)
 	AM_RANGE(0x00004, 0x00004) AM_DEVREADWRITE("oki", okim6295_device, read, write)
 	AM_RANGE(0x80000, 0x87fff) AM_MIRROR(0x78000) AM_RAM AM_SHARE("shared_ram")
 ADDRESS_MAP_END
 
 
-static ADDRESS_MAP_START( kbash_v25_mem, AS_PROGRAM, 8, toaplan2_state )
+ADDRESS_MAP_START(toaplan2_state::kbash_v25_mem)
 	AM_RANGE(0x00000, 0x007ff) AM_RAM AM_SHARE("shared_ram")
 	AM_RANGE(0x04000, 0x04001) AM_DEVREADWRITE("ymsnd", ym2151_device, read, write)
 	AM_RANGE(0x04002, 0x04002) AM_DEVREADWRITE("oki", okim6295_device, read, write)
@@ -1395,7 +1395,7 @@ static ADDRESS_MAP_START( kbash_v25_mem, AS_PROGRAM, 8, toaplan2_state )
 ADDRESS_MAP_END
 
 
-static ADDRESS_MAP_START( fixeight_v25_mem, AS_PROGRAM, 8, toaplan2_state )
+ADDRESS_MAP_START(toaplan2_state::fixeight_v25_mem)
 	AM_RANGE(0x00000, 0x00000) AM_READ_PORT("IN1")
 	AM_RANGE(0x00002, 0x00002) AM_READ_PORT("IN2")
 	AM_RANGE(0x00004, 0x00004) AM_READ_PORT("IN3")
@@ -1405,18 +1405,18 @@ static ADDRESS_MAP_START( fixeight_v25_mem, AS_PROGRAM, 8, toaplan2_state )
 ADDRESS_MAP_END
 
 
-static ADDRESS_MAP_START( vfive_v25_mem, AS_PROGRAM, 8, toaplan2_state )
+ADDRESS_MAP_START(toaplan2_state::vfive_v25_mem)
 	AM_RANGE(0x00000, 0x00001) AM_DEVREADWRITE("ymsnd", ym2151_device, read, write)
 	AM_RANGE(0x80000, 0x87fff) AM_MIRROR(0x78000) AM_RAM AM_SHARE("shared_ram")
 ADDRESS_MAP_END
 
 
-static ADDRESS_MAP_START( fixeightbl_oki, 0, 8, toaplan2_state )
+ADDRESS_MAP_START(toaplan2_state::fixeightbl_oki)
 	AM_RANGE(0x00000, 0x2ffff) AM_ROM
 	AM_RANGE(0x30000, 0x3ffff) AM_ROMBANK("bank1")
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( enmadaio_oki, 0, 8, toaplan2_state )
+ADDRESS_MAP_START(toaplan2_state::enmadaio_oki)
 	AM_RANGE(0x00000, 0x3ffff) AM_ROMBANK("bank1")
 ADDRESS_MAP_END
 
@@ -1428,12 +1428,12 @@ READ8_MEMBER(toaplan2_state::tekipaki_cmdavailable_r)
 	else return 0x00;
 };
 
-static ADDRESS_MAP_START( hd647180_mem_map, AS_PROGRAM, 8, toaplan2_state )
+ADDRESS_MAP_START(toaplan2_state::hd647180_mem_map)
 	AM_RANGE(0x00000, 0x03fff) AM_ROM   /* Internal 16k byte ROM */
 	AM_RANGE(0x0fe00, 0x0ffff) AM_RAM   /* Internal 512 byte RAM */
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( hd647180_io_map, AS_IO, 8, toaplan2_state )
+ADDRESS_MAP_START(toaplan2_state::hd647180_io_map)
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
 
 	AM_RANGE(0x60, 0x60) AM_READ(tekipaki_cmdavailable_r)
@@ -1444,7 +1444,7 @@ static ADDRESS_MAP_START( hd647180_io_map, AS_IO, 8, toaplan2_state )
 ADDRESS_MAP_END
 
 
-static ADDRESS_MAP_START( ghox_hd647180_mem_map, AS_PROGRAM, 8, toaplan2_state )
+ADDRESS_MAP_START(toaplan2_state::ghox_hd647180_mem_map)
 	AM_RANGE(0x00000, 0x03fff) AM_ROM   // Internal 16k byte ROM
 	AM_RANGE(0x0fe00, 0x0ffff) AM_RAM   // Internal 512 byte RAM
 	AM_RANGE(0x3fe00, 0x3ffff) AM_RAM   // Relocated internal RAM (RMCR = 30)
@@ -4053,7 +4053,8 @@ MACHINE_CONFIG_START(toaplan2_state::bgaregga)
 MACHINE_CONFIG_END
 
 
-MACHINE_CONFIG_DERIVED(toaplan2_state::bgareggabl, bgaregga)
+MACHINE_CONFIG_START(toaplan2_state::bgareggabl)
+	bgaregga(config);
 	MCFG_VIDEO_START_OVERRIDE(toaplan2_state,bgareggabl)
 
 	MCFG_SCREEN_MODIFY("screen")

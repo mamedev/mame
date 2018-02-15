@@ -283,7 +283,7 @@ WRITE8_MEMBER( liberatr_state::earom_control_w )
  *
  *************************************/
 
-static ADDRESS_MAP_START( liberatr_map, AS_PROGRAM, 8, liberatr_state )
+ADDRESS_MAP_START(liberatr_state::liberatr_map)
 	AM_RANGE(0x0000, 0x3fff) AM_RAM_WRITE(bitmap_w) AM_SHARE("bitmapram")   /* overlapping for my convenience */
 	AM_RANGE(0x0000, 0x0000) AM_RAM AM_SHARE("xcoord")
 	AM_RANGE(0x0001, 0x0001) AM_RAM AM_SHARE("ycoord")
@@ -313,7 +313,7 @@ ADDRESS_MAP_END
  *
  *************************************/
 
-static ADDRESS_MAP_START( liberat2_map, AS_PROGRAM, 8, liberatr_state )
+ADDRESS_MAP_START(liberatr_state::liberat2_map)
 	AM_RANGE(0x0000, 0x3fff) AM_RAM_WRITE(bitmap_w) AM_SHARE("bitmapram")   /* overlapping for my convenience */
 	AM_RANGE(0x0000, 0x0000) AM_RAM AM_SHARE("xcoord")
 	AM_RANGE(0x0001, 0x0001) AM_RAM AM_SHARE("ycoord")
@@ -471,7 +471,8 @@ MACHINE_CONFIG_START(liberatr_state::liberatr)
 MACHINE_CONFIG_END
 
 
-MACHINE_CONFIG_DERIVED(liberatr_state::liberat2, liberatr)
+MACHINE_CONFIG_START(liberatr_state::liberat2)
+	liberatr(config);
 
 	/* basic machine hardware */
 	MCFG_CPU_MODIFY("maincpu")

@@ -17,7 +17,7 @@
 
 
 /* Address maps */
-static ADDRESS_MAP_START(pecom64_mem, AS_PROGRAM, 8, pecom_state )
+ADDRESS_MAP_START(pecom_state::pecom64_mem)
 	AM_RANGE( 0x0000, 0x3fff ) AM_RAMBANK("bank1")
 	AM_RANGE( 0x4000, 0x7fff ) AM_RAMBANK("bank2")
 	AM_RANGE( 0x8000, 0xbfff ) AM_ROM  // ROM 1
@@ -26,7 +26,7 @@ static ADDRESS_MAP_START(pecom64_mem, AS_PROGRAM, 8, pecom_state )
 	AM_RANGE( 0xf800, 0xffff ) AM_RAMBANK("bank4") // CDP1869 / ROM
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( pecom64_io, AS_IO, 8, pecom_state )
+ADDRESS_MAP_START(pecom_state::pecom64_io)
 	AM_RANGE(0x01, 0x01) AM_WRITE(pecom_bank_w)
 	AM_RANGE(0x03, 0x03) AM_READ(pecom_keyboard_r)
 	AM_RANGE(0x03, 0x07) AM_WRITE(pecom_cdp1869_w)
@@ -180,7 +180,7 @@ MACHINE_CONFIG_START(pecom_state::pecom64)
 	MCFG_COSMAC_SC_CALLBACK(WRITE8(pecom_state, sc_w))
 
 	// sound and video hardware
-	MCFG_FRAGMENT_ADD(pecom_video)
+	pecom_video(config);
 
 	// devices
 	MCFG_CASSETTE_ADD( "cassette" )

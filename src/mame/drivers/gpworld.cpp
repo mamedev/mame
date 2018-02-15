@@ -93,6 +93,8 @@ public:
 	required_device<palette_device> m_palette;
 
 	void gpworld(machine_config &config);
+	void mainmem(address_map &map);
+	void mainport(address_map &map);
 protected:
 	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr) override;
 };
@@ -319,7 +321,7 @@ WRITE8_MEMBER(gpworld_state::palette_write)
 }
 
 /* PROGRAM MAP */
-static ADDRESS_MAP_START( mainmem, AS_PROGRAM, 8, gpworld_state )
+ADDRESS_MAP_START(gpworld_state::mainmem)
 	AM_RANGE(0x0000,0xbfff) AM_ROM
 	AM_RANGE(0xc000,0xc7ff) AM_RAM AM_SHARE("sprite_ram")
 	AM_RANGE(0xc800,0xcfff) AM_RAM_WRITE(palette_write) AM_SHARE("palette_ram") /* The memory test reads at 0xc800 */
@@ -336,7 +338,7 @@ ADDRESS_MAP_END
 
 
 /* I/O MAP */
-static ADDRESS_MAP_START( mainport, AS_IO, 8, gpworld_state )
+ADDRESS_MAP_START(gpworld_state::mainport)
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	AM_RANGE(0x01,0x01) AM_WRITE(misc_io_write)
 	AM_RANGE(0x80,0x80) AM_READ_PORT("IN0")

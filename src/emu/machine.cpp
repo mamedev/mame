@@ -84,8 +84,8 @@
 #include "network.h"
 #include "ui/uimain.h"
 #include <time.h>
-#include "rapidjson/include/rapidjson/writer.h"
-#include "rapidjson/include/rapidjson/stringbuffer.h"
+#include <rapidjson/writer.h>
+#include <rapidjson/stringbuffer.h>
 
 #if defined(EMSCRIPTEN)
 #include <emscripten.h>
@@ -223,6 +223,10 @@ void running_machine::start()
 	// initialize the streams engine before the sound devices start
 	m_sound = std::make_unique<sound_manager>(*this);
 
+	// resolve objects that can be used by memory maps
+	for (device_t &device : device_iterator(root_device()))
+		device.resolve_pre_map();
+
 	// configure the address spaces, load ROMs (which needs
 	// width/endianess of the spaces), then populate memory (which
 	// needs rom bases), and finally initialize CPUs (which needs
@@ -250,6 +254,10 @@ void running_machine::start()
 	m_render->resolve_tags();
 
 	manager().create_custom(*this);
+
+	// resolve objects that are created by memory maps
+	for (device_t &device : device_iterator(root_device()))
+		device.resolve_post_map();
 
 	// register callbacks for the devices, then start them
 	add_notifier(MACHINE_NOTIFY_RESET, machine_notify_delegate(&running_machine::reset_all_devices, this));
@@ -1007,10 +1015,6 @@ void running_machine::logfile_callback(const char *buffer)
 
 void running_machine::start_all_devices()
 {
-	// resolve objects first to avoid messy start order dependencies
-	for (device_t &device : device_iterator(root_device()))
-		device.resolve_objects();
-
 	m_dummy_space.start();
 
 	// iterate through the devices
@@ -1318,7 +1322,7 @@ WRITE8_MEMBER(dummy_space_device::write)
 	throw emu_fatalerror("Attempted to write to generic address space (offs %X = %02X)\n", offset, data);
 }
 
-static ADDRESS_MAP_START(dummy, 0, 8, dummy_space_device)
+ADDRESS_MAP_START(dummy_space_device::dummy)
 	AM_RANGE(0x00000000, 0xffffffff) AM_READWRITE(read, write)
 ADDRESS_MAP_END
 
@@ -1327,7 +1331,7 @@ DEFINE_DEVICE_TYPE(DUMMY_SPACE, dummy_space_device, "dummy_space", "Dummy Space"
 dummy_space_device::dummy_space_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock) :
 	device_t(mconfig, DUMMY_SPACE, tag, owner, clock),
 	device_memory_interface(mconfig, *this),
-	m_space_config("dummy", ENDIANNESS_LITTLE, 8, 32, 0, nullptr, *ADDRESS_MAP_NAME(dummy))
+	m_space_config("dummy", ENDIANNESS_LITTLE, 8, 32, 0, address_map_constructor(), address_map_constructor(FUNC(dummy_space_device::dummy), this))
 {
 }
 

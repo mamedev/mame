@@ -81,7 +81,7 @@ WRITE8_MEMBER(goindol_state::prot_fcb0_w)
 
 
 
-static ADDRESS_MAP_START( goindol_map, AS_PROGRAM, 8, goindol_state )
+ADDRESS_MAP_START(goindol_state::goindol_map)
 	AM_RANGE(0x0000, 0x7fff) AM_ROM
 	AM_RANGE(0x8000, 0xbfff) AM_ROMBANK("bank1")
 	AM_RANGE(0xc000, 0xc7ff) AM_RAM AM_SHARE("ram")
@@ -107,7 +107,7 @@ static ADDRESS_MAP_START( goindol_map, AS_PROGRAM, 8, goindol_state )
 	AM_RANGE(0xfd99, 0xfd99) AM_WRITE(prot_fd99_w)
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( sound_map, AS_PROGRAM, 8, goindol_state )
+ADDRESS_MAP_START(goindol_state::sound_map)
 	AM_RANGE(0x0000, 0x7fff) AM_ROM
 	AM_RANGE(0xa000, 0xa001) AM_DEVWRITE("ymsnd", ym2203_device, write)
 	AM_RANGE(0xc000, 0xc7ff) AM_RAM

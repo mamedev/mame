@@ -167,7 +167,7 @@ WRITE_LINE_MEMBER(tankbatt_state::coinlockout_w)
 	machine().bookkeeping().coin_lockout_w(1, state);
 }
 
-static ADDRESS_MAP_START( main_map, AS_PROGRAM, 8, tankbatt_state )
+ADDRESS_MAP_START(tankbatt_state::main_map)
 	AM_RANGE(0x0000, 0x000f) AM_RAM AM_SHARE("bulletsram")
 	AM_RANGE(0x0010, 0x01ff) AM_RAM
 	AM_RANGE(0x0200, 0x07ff) AM_RAM

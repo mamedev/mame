@@ -54,6 +54,8 @@ public:
 	DECLARE_WRITE8_MEMBER(env_off_w);
 
 	void blockade(machine_config &config);
+	void main_io_map(address_map &map);
+	void main_map(address_map &map);
 protected:
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
@@ -79,14 +81,14 @@ private:
 //  ADDRESS MAPS
 //**************************************************************************
 
-static ADDRESS_MAP_START( main_map, AS_PROGRAM, 8, blockade_state )
+ADDRESS_MAP_START(blockade_state::main_map)
 	AM_RANGE(0x0000, 0x03ff) AM_MIRROR(0x6000) AM_ROM
 	AM_RANGE(0x0400, 0x07ff) AM_MIRROR(0x6000) AM_ROM // comotion, blasto, hustle
 	AM_RANGE(0x8000, 0x83ff) AM_MIRROR(0x6c00) AM_RAM_WRITE(videoram_w) AM_SHARE("videoram")
 	AM_RANGE(0x9000, 0x90ff) AM_MIRROR(0x6f00) AM_RAM
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( main_io_map, AS_IO, 8, blockade_state )
+ADDRESS_MAP_START(blockade_state::main_io_map)
 	AM_RANGE(0x01, 0x01) AM_READ_PORT("IN0") AM_WRITE(coin_latch_w)
 	AM_RANGE(0x02, 0x02) AM_READ_PORT("IN1") AM_WRITE(sound_freq_w)
 	AM_RANGE(0x04, 0x04) AM_READ_PORT("IN2") AM_WRITE(env_on_w)

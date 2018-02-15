@@ -13,7 +13,7 @@
     - double spaced rows
     - blanking of top and bottom rows when underline MSB is set
     - end of row/screen - stop dma
-    - preset counters
+    - preset counters - how it affects DMA and HRTC?
 
 */
 
@@ -123,6 +123,7 @@ i8275_device::i8275_device(const machine_config &mconfig, const char *tag, devic
 	m_du(false),
 	m_dma_stop(false),
 	m_end_of_screen(false),
+	m_preset(false),
 	m_cursor_blink(0),
 	m_char_blink(0),
 	m_stored_attr(0)
@@ -177,6 +178,7 @@ void i8275_device::device_start()
 	save_item(NAME(m_du));
 	save_item(NAME(m_dma_stop));
 	save_item(NAME(m_end_of_screen));
+	save_item(NAME(m_preset));
 	save_item(NAME(m_cursor_blink));
 	save_item(NAME(m_char_blink));
 	save_item(NAME(m_stored_attr));
@@ -500,6 +502,22 @@ WRITE8_MEMBER( i8275_device::write )
 	{
 		LOG("I8275 Command %02x\n", data);
 
+		/*
+		 * "internal timing counters are preset, corresponding to a screen display
+		 * position at the top left corner.  Two character clocks are required
+		 * for this operation.  The counters will remain in this state until any
+		 * other command is given."
+		 */
+		if (m_preset)
+		{
+			int hrtc_on_pos = CHARACTERS_PER_ROW * m_hpixels_per_column;
+
+			m_preset = false;
+			m_hrtc_on_timer->adjust(screen().time_until_pos(screen().vpos(), hrtc_on_pos), 0, screen().scan_period());
+			m_scanline = m_vrtc_drq_scanline;
+			m_scanline_timer->adjust(screen().time_until_pos(m_vrtc_drq_scanline, 0), 0, screen().scan_period());
+		}
+
 		switch (data >> 5)
 		{
 		/*
@@ -516,7 +534,8 @@ WRITE8_MEMBER( i8275_device::write )
 			LOG("I8275 IRQ 0\n");
 			m_write_irq(CLEAR_LINE);
 			m_write_drq(0);
-			m_drq_on_timer->adjust(attotime::zero);
+			m_drq_on_timer->adjust(attotime::never);
+			m_dma_stop = true;
 
 			m_param_idx = REG_SCN1;
 			m_param_end = REG_SCN4;
@@ -530,6 +549,7 @@ WRITE8_MEMBER( i8275_device::write )
 		case CMD_START_DISPLAY:
 			m_param[REG_DMA] = data;
 			LOG("I8275 Start Display %u %u\n", DMA_BURST_COUNT, DMA_BURST_SPACE);
+			m_dma_stop = false;
 			m_status |= (ST_IE | ST_VE);
 			break;
 
@@ -566,6 +586,9 @@ WRITE8_MEMBER( i8275_device::write )
 
 		case CMD_PRESET_COUNTERS:
 			LOG("I8275 Preset Counters\n");
+			m_preset = true;
+			m_scanline_timer->adjust(attotime::never);
+			m_hrtc_on_timer->adjust(attotime::never);
 			break;
 		}
 	}
@@ -714,8 +737,8 @@ void i8275_device::recompute_parameters()
 
 	LOG("irq_y %u vrtc_y %u drq_y %u\n", m_irq_scanline, m_vrtc_scanline, m_vrtc_drq_scanline);
 
-	m_scanline_timer->adjust(screen().time_until_pos(0, 0), 0, screen().scan_period());
-	m_scanline = 0;
+	m_scanline = y;
+	m_scanline_timer->adjust(screen().time_until_pos((y + 1) % vert_pix_total, 0), 0, screen().scan_period());
 
 	if (DOUBLE_SPACED_ROWS) fatalerror("Double spaced rows not supported!");
 }

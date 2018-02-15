@@ -147,6 +147,10 @@ public:
 	void batmanfr(machine_config &config);
 	void stv_5838(machine_config &config);
 	void stv_5881(machine_config &config);
+	void stvcd(machine_config &config);
+	void sound_mem(address_map &map);
+	void stv_mem(address_map &map);
+	void stvcd_mem(address_map &map);
 };
 
 class stvpc_state : public stv_state

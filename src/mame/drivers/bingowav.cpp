@@ -56,6 +56,10 @@ public:
 	{ }
 
 	void bingowav(machine_config &config);
+	void bingowav_audio_map(address_map &map);
+	void bingowav_control_map(address_map &map);
+	void bingowav_drive_map(address_map &map);
+	void bingowav_main_map(address_map &map);
 protected:
 	virtual void machine_start() override;
 
@@ -69,7 +73,7 @@ void bingowav_state::machine_start()
 }
 
 
-static ADDRESS_MAP_START( bingowav_main_map, AS_PROGRAM, 16, bingowav_state )
+ADDRESS_MAP_START(bingowav_state::bingowav_main_map)
 	AM_RANGE(0x000000, 0x03ffff) AM_ROM
 	AM_RANGE(0x100000, 0x10ffff) AM_RAM
 	AM_RANGE(0x120000, 0x12001f) AM_DEVREADWRITE8("mainioh", te7750_device, read, write, 0xff00)
@@ -80,7 +84,7 @@ static ADDRESS_MAP_START( bingowav_main_map, AS_PROGRAM, 16, bingowav_state )
 	AM_RANGE(0xfffc00, 0xffffff) AM_DEVREADWRITE("maintmp", tmp68301_device, regs_r, regs_w)
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( bingowav_audio_map, AS_PROGRAM, 8, bingowav_state )
+ADDRESS_MAP_START(bingowav_state::bingowav_audio_map)
 	AM_RANGE(0x0000, 0xbfff) AM_ROM
 	AM_RANGE(0xc000, 0xdfff) AM_RAM
 	AM_RANGE(0xe000, 0xe003) AM_DEVREADWRITE("ymsnd", ym2610_device, read, write)
@@ -89,11 +93,11 @@ static ADDRESS_MAP_START( bingowav_audio_map, AS_PROGRAM, 8, bingowav_state )
 	AM_RANGE(0xf200, 0xf200) AM_WRITENOP
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( bingowav_drive_map, AS_PROGRAM, 16, bingowav_state )
+ADDRESS_MAP_START(bingowav_state::bingowav_drive_map)
 	AM_RANGE(0x000000, 0x01ffff) AM_ROM
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( bingowav_control_map, AS_PROGRAM, 8, bingowav_state )
+ADDRESS_MAP_START(bingowav_state::bingowav_control_map)
 	AM_RANGE(0x0000, 0x3fff) AM_ROM
 	AM_RANGE(0xc000, 0xdfff) AM_RAM
 	AM_RANGE(0xf000, 0xf000) AM_WRITENOP

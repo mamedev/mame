@@ -264,7 +264,7 @@ WRITE8_MEMBER( mm1_state::ls259_w )
 //  ADDRESS_MAP( mm1_map )
 //-------------------------------------------------
 
-static ADDRESS_MAP_START( mm1_map, AS_PROGRAM, 8, mm1_state )
+ADDRESS_MAP_START(mm1_state::mm1_map)
 	AM_RANGE(0x0000, 0xffff) AM_READWRITE(read, write)
 ADDRESS_MAP_END
 
@@ -525,9 +525,10 @@ MACHINE_CONFIG_END
 //  MACHINE_CONFIG( mm1m6 )
 //-------------------------------------------------
 
-MACHINE_CONFIG_DERIVED(mm1_state::mm1m6, mm1)
+MACHINE_CONFIG_START(mm1_state::mm1m6)
+	mm1(config);
 	// video hardware
-	MCFG_FRAGMENT_ADD(mm1m6_video)
+	mm1m6_video(config);
 MACHINE_CONFIG_END
 
 
@@ -535,9 +536,10 @@ MACHINE_CONFIG_END
 //  MACHINE_CONFIG( mm1m7 )
 //-------------------------------------------------
 
-MACHINE_CONFIG_DERIVED(mm1_state::mm1m7, mm1)
+MACHINE_CONFIG_START(mm1_state::mm1m7)
+	mm1(config);
 	// video hardware
-	MCFG_FRAGMENT_ADD(mm1m6_video)
+	mm1m6_video(config);
 
 	// TODO hard disk
 MACHINE_CONFIG_END

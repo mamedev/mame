@@ -112,6 +112,18 @@ public:
 	void terrafjb(machine_config &config);
 	void armedf(machine_config &config);
 	void kozure(machine_config &config);
+	void armedf_map(address_map &map);
+	void cclimbr2_map(address_map &map);
+	void cclimbr2_soundmap(address_map &map);
+	void kozure_map(address_map &map);
+	void legion_map(address_map &map);
+	void legionjb_map(address_map &map);
+	void sound_3526_portmap(address_map &map);
+	void sound_map(address_map &map);
+	void sound_portmap(address_map &map);
+	void terraf_map(address_map &map);
+	void terrafjb_extraz80_map(address_map &map);
+	void terrafjb_extraz80_portmap(address_map &map);
 };
 
 class bigfghtr_state : public armedf_state
@@ -131,4 +143,7 @@ public:
 	DECLARE_READ8_MEMBER(main_sharedram_r);
 	DECLARE_WRITE8_MEMBER(mcu_spritelist_w);
 	void bigfghtr(machine_config &config);
+	void bigfghtr_map(address_map &map);
+	void bigfghtr_mcu_io_map(address_map &map);
+	void bigfghtr_mcu_map(address_map &map);
 };

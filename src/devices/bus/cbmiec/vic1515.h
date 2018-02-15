@@ -42,6 +42,10 @@ protected:
 	void cbm_iec_atn(int state) override;
 	void cbm_iec_data(int state) override;
 	void cbm_iec_reset(int state) override;
+
+private:
+	void vic1515_io(address_map &map);
+	void vic1515_mem(address_map &map);
 };
 
 

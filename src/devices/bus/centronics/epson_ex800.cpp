@@ -198,7 +198,7 @@ const tiny_rom_entry *epson_ex800_device::device_rom_region() const
 //  ADDRESS_MAP( ex800_mem )
 //-------------------------------------------------
 
-static ADDRESS_MAP_START( ex800_mem, AS_PROGRAM, 8, epson_ex800_device )
+ADDRESS_MAP_START(epson_ex800_device::ex800_mem)
 	AM_RANGE(0x0000, 0x7fff) AM_ROM AM_REGION("maincpu", 0)
 	AM_RANGE(0x8000, 0xbfff) AM_RAM /* external RAM */
 	AM_RANGE(0xc000, 0xc7ff) AM_MIRROR(0x1800) AM_READWRITE(devsel_r, devsel_w)

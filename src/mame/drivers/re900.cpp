@@ -122,6 +122,8 @@ public:
 	DECLARE_DRIVER_INIT(re900);
 	void re900(machine_config &config);
 	void bs94(machine_config &config);
+	void mem_io(address_map &map);
+	void mem_prg(address_map &map);
 };
 
 
@@ -244,11 +246,11 @@ WRITE8_MEMBER(re900_state::watchdog_reset_w)
 *    Memory Map Information    *
 *******************************/
 
-static ADDRESS_MAP_START( mem_prg, AS_PROGRAM, 8, re900_state )
+ADDRESS_MAP_START(re900_state::mem_prg)
 	AM_RANGE(0x0000, 0xffff) AM_ROM AM_SHARE("rom")
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( mem_io, AS_IO, 8, re900_state )
+ADDRESS_MAP_START(re900_state::mem_io)
 	AM_RANGE(0x0000, 0xbfff) AM_READ(rom_r)
 	AM_RANGE(0xc000, 0xdfff) AM_RAM AM_SHARE("nvram")
 	AM_RANGE(0xe000, 0xefff) AM_WRITE(watchdog_reset_w)
@@ -405,7 +407,8 @@ MACHINE_CONFIG_START(re900_state::re900)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.5)
 MACHINE_CONFIG_END
 
-MACHINE_CONFIG_DERIVED(re900_state::bs94, re900)
+MACHINE_CONFIG_START(re900_state::bs94)
+	re900(config);
 
 	/* sound hardware   */
 	MCFG_SOUND_MODIFY("ay_re900")

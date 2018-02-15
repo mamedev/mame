@@ -73,4 +73,5 @@ public:
 	required_device<screen_device> m_screen;
 	void fireone(machine_config &config);
 	void starfire(machine_config &config);
+	void main_map(address_map &map);
 };

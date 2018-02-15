@@ -64,6 +64,9 @@ private:
 	DECLARE_READ8_MEMBER( pio3_pb_r );
 	DECLARE_WRITE8_MEMBER( pio3_pb_w );
 
+	void imi5000h_io(address_map &map);
+	void imi5000h_mem(address_map &map);
+
 	enum
 	{
 		LED_FAULT,

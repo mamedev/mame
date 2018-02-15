@@ -184,4 +184,17 @@ public:
 	void system_B(machine_config &config);
 	void system_B_hayaosi1(machine_config &config);
 	void system_Z(machine_config &config);
+	void kickoffb_sound_map(address_map &map);
+	void megasys1A_map(address_map &map);
+	void megasys1A_sound_map(address_map &map);
+	void megasys1B_edfbl_map(address_map &map);
+	void megasys1B_map(address_map &map);
+	void megasys1B_monkelf_map(address_map &map);
+	void megasys1B_sound_map(address_map &map);
+	void megasys1C_map(address_map &map);
+	void megasys1D_map(address_map &map);
+	void megasys1D_oki_map(address_map &map);
+	void megasys1Z_map(address_map &map);
+	void z80_sound_io_map(address_map &map);
+	void z80_sound_map(address_map &map);
 };

@@ -216,6 +216,7 @@ protected:
 	bool m_du;
 	bool m_dma_stop;
 	bool m_end_of_screen;
+	bool m_preset;
 
 	int m_cursor_blink;
 	int m_char_blink;

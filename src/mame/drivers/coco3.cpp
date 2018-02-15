@@ -30,7 +30,7 @@
 //  ADDRESS_MAP( coco3_mem )
 //-------------------------------------------------
 
-static ADDRESS_MAP_START( coco3_mem, AS_PROGRAM, 8, coco3_state )
+ADDRESS_MAP_START(coco3_state::coco3_mem)
 	AM_RANGE(0x0000, 0x1FFF) AM_READ_BANK("rbank0") AM_WRITE_BANK("wbank0")
 	AM_RANGE(0x2000, 0x3FFF) AM_READ_BANK("rbank1") AM_WRITE_BANK("wbank1")
 	AM_RANGE(0x4000, 0x5FFF) AM_READ_BANK("rbank2") AM_WRITE_BANK("wbank2")
@@ -318,7 +318,7 @@ MACHINE_CONFIG_START(coco3_state::coco3)
 	MCFG_SCREEN_VBLANK_TIME(0)
 
 	// sound hardware
-	MCFG_FRAGMENT_ADD( coco_sound )
+	coco_sound(config);
 
 	// internal ram
 	MCFG_RAM_ADD(RAM_TAG)
@@ -326,7 +326,7 @@ MACHINE_CONFIG_START(coco3_state::coco3)
 	MCFG_RAM_EXTRA_OPTIONS("128K,2M,8M")
 
 	// floating space
-	MCFG_FRAGMENT_ADD(coco_floating)
+	coco_floating(config);
 
 	// software lists
 	MCFG_SOFTWARE_LIST_ADD("cart_list","coco_cart")
@@ -336,7 +336,8 @@ MACHINE_CONFIG_START(coco3_state::coco3)
 	MCFG_SOFTWARE_LIST_FILTER("flop_list","COCO3")
 MACHINE_CONFIG_END
 
-MACHINE_CONFIG_DERIVED(coco3_state::coco3p, coco3)
+MACHINE_CONFIG_START(coco3_state::coco3p)
+	coco3(config);
 	MCFG_DEVICE_MODIFY(":")
 	MCFG_DEVICE_CLOCK(XTAL(28'475'000) / 32)
 
@@ -352,12 +353,14 @@ MACHINE_CONFIG_DERIVED(coco3_state::coco3p, coco3)
 	MCFG_GIME_FLOATING_BUS_CALLBACK(READ8(coco_state, floating_bus_read))
 MACHINE_CONFIG_END
 
-MACHINE_CONFIG_DERIVED(coco3_state::coco3h, coco3)
+MACHINE_CONFIG_START(coco3_state::coco3h)
+	coco3(config);
 	MCFG_CPU_REPLACE(MAINCPU_TAG, HD6309E, DERIVED_CLOCK(1, 1))
 	MCFG_CPU_PROGRAM_MAP(coco3_mem)
 MACHINE_CONFIG_END
 
-MACHINE_CONFIG_DERIVED(coco3_state::coco3dw1, coco3)
+MACHINE_CONFIG_START(coco3_state::coco3dw1)
+	coco3(config);
 	MCFG_COCO_CARTRIDGE_REMOVE(CARTRIDGE_TAG)
 	MCFG_COCO_CARTRIDGE_ADD(CARTRIDGE_TAG, coco_cart, "cc3hdb1")
 MACHINE_CONFIG_END

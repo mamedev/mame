@@ -593,6 +593,8 @@ public:
 	static void an2131sc_configuration(device_t *device);
 	void chihirogd(machine_config &config);
 	void chihiro_base(machine_config &config);
+	void chihiro_map(address_map &map);
+	void chihiro_map_io(address_map &map);
 private:
 	void jamtable_disasm(address_space &space, uint32_t address, uint32_t size);
 	void jamtable_disasm_command(int ref, const std::vector<std::string> &params);
@@ -1698,12 +1700,12 @@ WRITE32_MEMBER(chihiro_state::mediaboard_w)
 		xbox_base_devs.pic8259_2->ir2_w(0);
 }
 
-static ADDRESS_MAP_START(chihiro_map, AS_PROGRAM, 32, chihiro_state)
+ADDRESS_MAP_START(chihiro_state::chihiro_map)
 	AM_IMPORT_FROM(xbox_base_map)
 	AM_RANGE(0xff000000, 0xff07ffff) AM_ROM AM_REGION("bios", 0) AM_MIRROR(0x00f80000)
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START(chihiro_map_io, AS_IO, 32, chihiro_state)
+ADDRESS_MAP_START(chihiro_state::chihiro_map_io)
 	AM_IMPORT_FROM(xbox_base_map_io)
 	AM_RANGE(0x4000, 0x40ff) AM_READWRITE(mediaboard_r, mediaboard_w)
 ADDRESS_MAP_END
@@ -1843,7 +1845,8 @@ void chihiro_state::an2131sc_configuration(device_t *device)
 	MCFG_OHCI_HLEAN2131SC_REGION(":others", 0x2080)
 }
 
-MACHINE_CONFIG_DERIVED(chihiro_state::chihiro_base, xbox_base)
+MACHINE_CONFIG_START(chihiro_state::chihiro_base)
+	xbox_base(config);
 	MCFG_CPU_MODIFY("maincpu")
 	MCFG_CPU_PROGRAM_MAP(chihiro_map)
 	MCFG_CPU_IO_MAP(chihiro_map_io)
@@ -1865,7 +1868,8 @@ MACHINE_CONFIG_DERIVED(chihiro_state::chihiro_base, xbox_base)
 	MCFG_SEGA_837_13551_DEVICE_ADD("837_13551", "jvs_master", ":TILT", ":P1", ":P2", ":A0", ":A1", ":A2", ":A3", ":A4", ":A5", ":A6", ":A7", ":OUTPUT")
 MACHINE_CONFIG_END
 
-MACHINE_CONFIG_DERIVED(chihiro_state::chihirogd, chihiro_base)
+MACHINE_CONFIG_START(chihiro_state::chihirogd)
+	chihiro_base(config);
 	MCFG_NAOMI_GDROM_BOARD_ADD("rom_board", ":gdrom", "^pic", nullptr, NOOP)
 	MCFG_DEVICE_ADD("network", SEGA_NETWORK_BOARD, 0)
 MACHINE_CONFIG_END

@@ -105,6 +105,8 @@ public:
 	required_ioport_array<10> m_row;
 
 	void thayers(machine_config &config);
+	void thayers_io_map(address_map &map);
+	void thayers_map(address_map &map);
 protected:
 	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr) override;
 };
@@ -615,13 +617,13 @@ READ8_MEMBER(thayers_state::ssi263_register_r)
 
 /* Memory Maps */
 
-static ADDRESS_MAP_START( thayers_map, AS_PROGRAM, 8, thayers_state )
+ADDRESS_MAP_START(thayers_state::thayers_map)
 	AM_RANGE(0x0000, 0x7fff) AM_ROM
 	AM_RANGE(0x8000, 0xbfff) AM_RAM
 	AM_RANGE(0xc000, 0xdfff) AM_ROM
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( thayers_io_map, AS_IO, 8, thayers_state )
+ADDRESS_MAP_START(thayers_state::thayers_io_map)
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	AM_RANGE(0x00, 0x07) AM_READWRITE(ssi263_register_r, ssi263_register_w)
 	AM_RANGE(0x20, 0x20) AM_WRITE(control_w)

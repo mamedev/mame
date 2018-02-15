@@ -250,11 +250,11 @@ WRITE8_MEMBER(_4enraya_state::fenraya_custom_map_w)
 *      Memory Map Information      *
 ***********************************/
 
-static ADDRESS_MAP_START( main_map, AS_PROGRAM, 8, _4enraya_state )
+ADDRESS_MAP_START(_4enraya_state::main_map)
 	AM_RANGE(0x0000, 0xffff) AM_READWRITE(fenraya_custom_map_r, fenraya_custom_map_w)
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( main_portmap, AS_IO, 8, _4enraya_state )
+ADDRESS_MAP_START(_4enraya_state::main_portmap)
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	AM_RANGE(0x00, 0x00) AM_READ_PORT("DSW")
 	AM_RANGE(0x01, 0x01) AM_READ_PORT("INPUTS")
@@ -264,14 +264,14 @@ static ADDRESS_MAP_START( main_portmap, AS_IO, 8, _4enraya_state )
 ADDRESS_MAP_END
 
 
-static ADDRESS_MAP_START( unkpacg_main_map, AS_PROGRAM, 8, _4enraya_state )
+ADDRESS_MAP_START(_4enraya_state::unkpacg_main_map)
 	AM_RANGE(0x0000, 0x1fff) AM_ROM
 	AM_RANGE(0x6000, 0x67ff) AM_RAM AM_SHARE("nvram")
 	AM_RANGE(0x7000, 0x7fff) AM_WRITE(fenraya_videoram_w)
 	AM_RANGE(0x8000, 0x9fff) AM_ROM
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( unkpacg_main_portmap, AS_IO, 8, _4enraya_state )
+ADDRESS_MAP_START(_4enraya_state::unkpacg_main_portmap)
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	AM_RANGE(0x00, 0x00) AM_READ_PORT("DSW1")
 	AM_RANGE(0x01, 0x01) AM_READ_PORT("IN1")
@@ -494,7 +494,8 @@ MACHINE_CONFIG_START(_4enraya_state::_4enraya )
 MACHINE_CONFIG_END
 
 
-MACHINE_CONFIG_DERIVED(_4enraya_state::unkpacg, _4enraya)
+MACHINE_CONFIG_START(_4enraya_state::unkpacg)
+	_4enraya(config);
 
 	/* basic machine hardware */
 	MCFG_CPU_MODIFY("maincpu")

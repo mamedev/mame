@@ -88,4 +88,9 @@ public:
 	required_device<screen_device> m_screen;
 	required_device<palette_device> m_palette;
 	void bigevglf(machine_config &config);
+	void bigevglf_portmap(address_map &map);
+	void bigevglf_sub_portmap(address_map &map);
+	void main_map(address_map &map);
+	void sound_map(address_map &map);
+	void sub_map(address_map &map);
 };

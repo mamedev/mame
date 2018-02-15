@@ -249,7 +249,7 @@ READ8_MEMBER( psion1_state::switchoff_r )
 	return 0;
 }
 
-static ADDRESS_MAP_START(psion1_mem, AS_PROGRAM, 8, psion1_state)
+ADDRESS_MAP_START(psion1_state::psion1_mem)
 	AM_RANGE(0x0000, 0x001f) AM_READWRITE(hd63701_int_reg_r, hd63701_int_reg_w)
 	AM_RANGE(0x0040, 0x00ff) AM_RAM AM_SHARE("sys_register")
 	AM_RANGE(0x2000, 0x2000) AM_MIRROR(0x07fe) AM_DEVREADWRITE("hd44780", hd44780_device, control_read, control_write)
@@ -261,7 +261,7 @@ static ADDRESS_MAP_START(psion1_mem, AS_PROGRAM, 8, psion1_state)
 	AM_RANGE(0xf000, 0xffff) AM_ROM
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START(psioncm_mem, AS_PROGRAM, 8, psion_state)
+ADDRESS_MAP_START(psion_state::psioncm_mem)
 	ADDRESS_MAP_UNMAP_LOW
 	AM_RANGE(0x0000, 0x001f) AM_READWRITE(hd63701_int_reg_r, hd63701_int_reg_w)
 	AM_RANGE(0x0040, 0x00ff) AM_RAM AM_SHARE("sys_register")
@@ -270,7 +270,7 @@ static ADDRESS_MAP_START(psioncm_mem, AS_PROGRAM, 8, psion_state)
 	AM_RANGE(0x8000, 0xffff) AM_ROM
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START(psionla_mem, AS_PROGRAM, 8, psion_state)
+ADDRESS_MAP_START(psion_state::psionla_mem)
 	ADDRESS_MAP_UNMAP_LOW
 	AM_RANGE(0x0000, 0x001f) AM_READWRITE(hd63701_int_reg_r, hd63701_int_reg_w)
 	AM_RANGE(0x0040, 0x00ff) AM_RAM AM_SHARE("sys_register")
@@ -279,7 +279,7 @@ static ADDRESS_MAP_START(psionla_mem, AS_PROGRAM, 8, psion_state)
 	AM_RANGE(0x8000, 0xffff) AM_ROM
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START(psionp350_mem, AS_PROGRAM, 8, psion_state)
+ADDRESS_MAP_START(psion_state::psionp350_mem)
 	ADDRESS_MAP_UNMAP_LOW
 	AM_RANGE(0x0000, 0x001f) AM_READWRITE(hd63701_int_reg_r, hd63701_int_reg_w)
 	AM_RANGE(0x0040, 0x00ff) AM_RAM AM_SHARE("sys_register")
@@ -289,7 +289,7 @@ static ADDRESS_MAP_START(psionp350_mem, AS_PROGRAM, 8, psion_state)
 	AM_RANGE(0x8000, 0xffff) AM_ROM
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START(psionlam_mem, AS_PROGRAM, 8, psion_state)
+ADDRESS_MAP_START(psion_state::psionlam_mem)
 	ADDRESS_MAP_UNMAP_LOW
 	AM_RANGE(0x0000, 0x001f) AM_READWRITE(hd63701_int_reg_r, hd63701_int_reg_w)
 	AM_RANGE(0x0040, 0x00ff) AM_RAM AM_SHARE("sys_register")
@@ -299,7 +299,7 @@ static ADDRESS_MAP_START(psionlam_mem, AS_PROGRAM, 8, psion_state)
 	AM_RANGE(0xc000, 0xffff) AM_ROM
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START(psionlz_mem, AS_PROGRAM, 8, psion_state)
+ADDRESS_MAP_START(psion_state::psionlz_mem)
 	ADDRESS_MAP_UNMAP_LOW
 	AM_RANGE(0x0000, 0x001f) AM_READWRITE(hd63701_int_reg_r, hd63701_int_reg_w)
 	AM_RANGE(0x0040, 0x00ff) AM_RAM AM_SHARE("sys_register")
@@ -604,7 +604,8 @@ MACHINE_CONFIG_START(psion_state::psion_2lines)
 MACHINE_CONFIG_END
 
 /* basic configuration for 4 lines display */
-MACHINE_CONFIG_DERIVED(psion_state::psion_4lines, psion_2lines)
+MACHINE_CONFIG_START(psion_state::psion_4lines)
+	psion_2lines(config);
 	/* video hardware */
 	MCFG_SCREEN_MODIFY("screen")
 	MCFG_SCREEN_SIZE(6*20, 9*4)
@@ -615,7 +616,8 @@ MACHINE_CONFIG_DERIVED(psion_state::psion_4lines, psion_2lines)
 	MCFG_HD44780_PIXEL_UPDATE_CB(psion_state,lz_pixel_update)
 MACHINE_CONFIG_END
 
-MACHINE_CONFIG_DERIVED(psion1_state::psion1, psion_2lines)
+MACHINE_CONFIG_START(psion1_state::psion1)
+	psion_2lines(config);
 	MCFG_CPU_MODIFY("maincpu")
 	MCFG_CPU_PROGRAM_MAP(psion1_mem)
 
@@ -635,25 +637,29 @@ MACHINE_CONFIG_DERIVED(psion1_state::psion1, psion_2lines)
 	MCFG_SOFTWARE_LIST_ADD("pack_list", "psion1")
 MACHINE_CONFIG_END
 
-MACHINE_CONFIG_DERIVED(psion_state::psioncm, psion_2lines)
+MACHINE_CONFIG_START(psion_state::psioncm)
+	psion_2lines(config);
 
 	MCFG_CPU_MODIFY("maincpu")
 	MCFG_CPU_PROGRAM_MAP(psioncm_mem)
 MACHINE_CONFIG_END
 
-MACHINE_CONFIG_DERIVED(psion_state::psionla, psion_2lines)
+MACHINE_CONFIG_START(psion_state::psionla)
+	psion_2lines(config);
 
 	MCFG_CPU_MODIFY("maincpu")
 	MCFG_CPU_PROGRAM_MAP(psionla_mem)
 MACHINE_CONFIG_END
 
-MACHINE_CONFIG_DERIVED(psion_state::psionlam, psion_2lines)
+MACHINE_CONFIG_START(psion_state::psionlam)
+	psion_2lines(config);
 
 	MCFG_CPU_MODIFY("maincpu")
 	MCFG_CPU_PROGRAM_MAP(psionlam_mem)
 MACHINE_CONFIG_END
 
-MACHINE_CONFIG_DERIVED(psion_state::psionp350, psion_2lines)
+MACHINE_CONFIG_START(psion_state::psionp350)
+	psion_2lines(config);
 
 	MCFG_CPU_MODIFY("maincpu")
 	MCFG_CPU_PROGRAM_MAP(psionp350_mem)
@@ -661,7 +667,8 @@ MACHINE_CONFIG_DERIVED(psion_state::psionp350, psion_2lines)
 	MCFG_NVRAM_ADD_0FILL("nvram3") // paged RAM
 MACHINE_CONFIG_END
 
-MACHINE_CONFIG_DERIVED(psion_state::psionlz, psion_4lines)
+MACHINE_CONFIG_START(psion_state::psionlz)
+	psion_4lines(config);
 
 	MCFG_CPU_MODIFY("maincpu")
 	MCFG_CPU_PROGRAM_MAP(psionlz_mem)

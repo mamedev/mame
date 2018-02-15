@@ -44,6 +44,9 @@ public:
 	DECLARE_PALETTE_INIT(subhuntr);
 	uint32_t screen_update_subhuntr(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	void subhuntr(machine_config &config);
+	void subhuntr_data_map(address_map &map);
+	void subhuntr_io_map(address_map &map);
+	void subhuntr_map(address_map &map);
 };
 
 
@@ -73,15 +76,15 @@ void subhuntr_state::video_start()
 
 ***************************************************************************/
 
-static ADDRESS_MAP_START( subhuntr_map, AS_PROGRAM, 8, subhuntr_state )
+ADDRESS_MAP_START(subhuntr_state::subhuntr_map)
 	AM_RANGE(0x0000, 0x0fff) AM_ROM
 	AM_RANGE(0x1c00, 0x1fff) AM_RAM
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( subhuntr_io_map, AS_PROGRAM, 8, subhuntr_state )
+ADDRESS_MAP_START(subhuntr_state::subhuntr_io_map)
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( subhuntr_data_map, AS_DATA, 8, subhuntr_state )
+ADDRESS_MAP_START(subhuntr_state::subhuntr_data_map)
 //  AM_RANGE(S2650_CTRL_PORT, S2650_CTRL_PORT) AM_READWRITE( ,  )
 //  AM_RANGE(S2650_DATA_PORT, S2650_DATA_PORT) AM_READWRITE( ,  )
 ADDRESS_MAP_END

@@ -66,6 +66,7 @@ public:
 	DECLARE_WRITE32_MEMBER(s3c44b0_gpio_port_w);
 	DECLARE_WRITE16_MEMBER(s3c44b0_i2s_data_w);
 	void juicebox(machine_config &config);
+	void juicebox_map(address_map &map);
 };
 
 inline void juicebox_state::verboselog(int n_level, const char *s_fmt, ...)
@@ -287,7 +288,7 @@ void juicebox_state::machine_reset()
     ADDRESS MAPS
 ***************************************************************************/
 
-static ADDRESS_MAP_START( juicebox_map, AS_PROGRAM, 32, juicebox_state )
+ADDRESS_MAP_START(juicebox_state::juicebox_map)
 	AM_RANGE(0x00000000, 0x007fffff) AM_ROM
 	AM_RANGE(0x04000000, 0x04ffffff) AM_READWRITE(juicebox_nand_r, juicebox_nand_w )
 	AM_RANGE(0x0c000000, 0x0c1fffff) AM_RAM AM_MIRROR(0x00600000)

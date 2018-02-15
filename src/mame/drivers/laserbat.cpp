@@ -165,7 +165,7 @@ READ8_MEMBER(laserbat_state_base::rrowx_r)
 
 */
 
-static ADDRESS_MAP_START( laserbat_map, AS_PROGRAM, 8, laserbat_state_base )
+ADDRESS_MAP_START(laserbat_state_base::laserbat_map)
 	ADDRESS_MAP_UNMAP_HIGH
 
 	AM_RANGE(0x0000, 0x13ff) AM_ROM
@@ -183,7 +183,7 @@ static ADDRESS_MAP_START( laserbat_map, AS_PROGRAM, 8, laserbat_state_base )
 	AM_RANGE(0x1c00, 0x1fff) AM_MIRROR(0x6000) AM_RAM
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( laserbat_io_map, AS_IO, 8, laserbat_state_base )
+ADDRESS_MAP_START(laserbat_state_base::laserbat_io_map)
 	AM_RANGE(0x00, 0x00) AM_READ(rhsc_r)    AM_WRITE(cnt_eff_w)
 	AM_RANGE(0x01, 0x01) /* RBALL */        AM_WRITE(cnt_nav_w)
 	AM_RANGE(0x02, 0x02) AM_READ(rrowx_r)   AM_WRITE(csound1_w)
@@ -494,7 +494,8 @@ MACHINE_CONFIG_START(laserbat_state_base::laserbat_base)
 
 MACHINE_CONFIG_END
 
-MACHINE_CONFIG_DERIVED(laserbat_state::laserbat, laserbat_base)
+MACHINE_CONFIG_START(laserbat_state::laserbat)
+	laserbat_base(config);
 
 	// video hardware
 	MCFG_PALETTE_ADD("palette", 256)
@@ -526,7 +527,8 @@ MACHINE_CONFIG_DERIVED(laserbat_state::laserbat, laserbat_base)
 
 MACHINE_CONFIG_END
 
-MACHINE_CONFIG_DERIVED(catnmous_state::catnmous, laserbat_base)
+MACHINE_CONFIG_START(catnmous_state::catnmous)
+	laserbat_base(config);
 
 	// video hardware
 	MCFG_PALETTE_ADD("palette", 256)

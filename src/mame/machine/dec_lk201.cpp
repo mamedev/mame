@@ -195,7 +195,7 @@ ROM_END
 //  ADDRESS_MAP
 //-------------------------------------------------
 
-static ADDRESS_MAP_START( lk201_map, AS_PROGRAM, 8, lk201_device )
+ADDRESS_MAP_START(lk201_device::lk201_map)
 	AM_RANGE(0x0000, 0x0002) AM_READWRITE(ports_r, ports_w)
 	AM_RANGE(0x0004, 0x0006) AM_READWRITE(ddr_r, ddr_w)
 	AM_RANGE(0x000a, 0x000c) AM_READWRITE(spi_r, spi_w)

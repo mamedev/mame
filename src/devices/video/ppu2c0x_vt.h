@@ -30,10 +30,15 @@
 #define MCFG_PPU_VT03_SET_PAL_MODE(pmode) \
 	ppu_vt03_device::set_palette_mode(*device, pmode);
 
+#define MCFG_PPU_VT03_SET_DESCRAMBLE(dsc) \
+	ppu_vt03_device::set_201x_descramble(*device, dsc);
+
+
 enum vtxx_pal_mode {
 	PAL_MODE_VT0x,
 	PAL_MODE_NEW_RGB,
-	PAL_MODE_NEW_VG
+	PAL_MODE_NEW_VG,
+	PAL_MODE_NEW_RGB12,
 };
 
 class ppu_vt03_device : public ppu2c0x_device {
@@ -44,6 +49,7 @@ public:
 	template <class Object> static devcb_base &set_read_sp_callback(device_t &device, Object &&cb) { return downcast<ppu_vt03_device &>(device).m_read_sp.set_callback(std::forward<Object>(cb)); }
 
 	static void set_palette_mode(device_t &device, vtxx_pal_mode pmode) { downcast<ppu_vt03_device &>(device).m_pal_mode = pmode; }
+	static void set_201x_descramble(device_t &device, const uint8_t descramble[6]) { for (int i = 0; i < 6; i++) downcast<ppu_vt03_device &>(device).m_2012_2017_descramble[i] = descramble[i]; }
 
 	virtual DECLARE_READ8_MEMBER(read) override;
 	virtual DECLARE_WRITE8_MEMBER(write) override;
@@ -86,7 +92,9 @@ private:
 	palette_device *m_palette;
 
 	uint8_t m_201x_regs[0x20];
-
+	
+	uint8_t m_2012_2017_descramble[0x6];
+	
 	vtxx_pal_mode m_pal_mode = PAL_MODE_VT0x;
 
 	void set_2010_reg(uint8_t data);

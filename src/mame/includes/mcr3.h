@@ -70,6 +70,10 @@ public:
 	void mono_tcs(machine_config &config);
 	void mcrscroll(machine_config &config);
 	void mono_sg(machine_config &config);
+	void mcrmono_map(address_map &map);
+	void mcrmono_portmap(address_map &map);
+	void spyhunt_map(address_map &map);
+	void spyhunt_portmap(address_map &map);
 protected:
 	virtual void video_start() override;
 

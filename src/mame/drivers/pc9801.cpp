@@ -672,7 +672,7 @@ READ8_MEMBER(pc9801_state::f0_r)
 	return 0xff;
 }
 
-static ADDRESS_MAP_START( pc9801_map, AS_PROGRAM, 16, pc9801_state )
+ADDRESS_MAP_START(pc9801_state::pc9801_map)
 	AM_RANGE(0xa0000, 0xa3fff) AM_READWRITE(tvram_r,tvram_w) //TVRAM
 	AM_RANGE(0xa8000, 0xbffff) AM_READWRITE8(gvram_r,gvram_w,0xffff) //bitmap VRAM
 	AM_RANGE(0xcc000, 0xcdfff) AM_ROM AM_REGION("sound_bios",0) //sound BIOS
@@ -682,7 +682,7 @@ static ADDRESS_MAP_START( pc9801_map, AS_PROGRAM, 16, pc9801_state )
 ADDRESS_MAP_END
 
 /* first device is even offsets, second one is odd offsets */
-static ADDRESS_MAP_START( pc9801_common_io, AS_IO, 16, pc9801_state )
+ADDRESS_MAP_START(pc9801_state::pc9801_common_io)
 	ADDRESS_MAP_UNMAP_HIGH
 	AM_RANGE(0x0000, 0x001f) AM_DEVREADWRITE8("i8237", am9517a_device, read, write, 0xff00)
 	AM_RANGE(0x0000, 0x001f) AM_READWRITE8(pic_r, pic_w, 0x00ff) // i8259 PIC (bit 3 ON slave / master) / i8237 DMA
@@ -707,7 +707,7 @@ static ADDRESS_MAP_START( pc9801_common_io, AS_IO, 16, pc9801_state )
 	AM_RANGE(0x7fd8, 0x7fdf) AM_DEVREADWRITE8("ppi8255_mouse", i8255_device, read, write, 0xff00)
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( pc9801_io, AS_IO, 16, pc9801_state )
+ADDRESS_MAP_START(pc9801_state::pc9801_io)
 	AM_IMPORT_FROM(pc9801_common_io)
 	AM_RANGE(0x0020, 0x002f) AM_WRITE8(dmapg4_w,0xff00)
 	AM_RANGE(0x0068, 0x0069) AM_WRITE8(pc9801_video_ff_w,0x00ff) //mode FF / <undefined>
@@ -1082,11 +1082,11 @@ WRITE16_MEMBER(pc9801_state::grcg_gvram0_w)
 	upd7220_grcg_w(space, offset | (m_vram_bank << 16), data, mem_mask);
 }
 
-static ADDRESS_MAP_START( ipl_bank, 0, 16, pc9801_state )
+ADDRESS_MAP_START(pc9801_state::ipl_bank)
 	AM_RANGE(0x00000, 0x2ffff) AM_ROM AM_REGION("ipl", 0)
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( pc9801ux_map, AS_PROGRAM, 16, pc9801_state )
+ADDRESS_MAP_START(pc9801_state::pc9801ux_map)
 	AM_RANGE(0x0a0000, 0x0a3fff) AM_READWRITE(tvram_r, tvram_w)
 	AM_RANGE(0x0a4000, 0x0a4fff) AM_READWRITE8(pc9801rs_knjram_r, pc9801rs_knjram_w, 0xffff)
 	AM_RANGE(0x0a8000, 0x0bffff) AM_READWRITE(grcg_gvram_r, grcg_gvram_w)
@@ -1094,7 +1094,7 @@ static ADDRESS_MAP_START( pc9801ux_map, AS_PROGRAM, 16, pc9801_state )
 	AM_RANGE(0x0e8000, 0x0fffff) AM_DEVICE("ipl_bank", address_map_bank_device, amap16)
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( pc9801ux_io, AS_IO, 16, pc9801_state )
+ADDRESS_MAP_START(pc9801_state::pc9801ux_io)
 	ADDRESS_MAP_UNMAP_HIGH
 	AM_IMPORT_FROM(pc9801_common_io)
 	AM_RANGE(0x0020, 0x002f) AM_WRITE8(dmapg8_w,0xff00)
@@ -1113,7 +1113,7 @@ static ADDRESS_MAP_START( pc9801ux_io, AS_IO, 16, pc9801_state )
 	AM_RANGE(0x3fd8, 0x3fdf) AM_DEVREADWRITE8("pit8253", pit8253_device, read, write, 0xff00)
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( pc9801rs_map, AS_PROGRAM, 16, pc9801_state )
+ADDRESS_MAP_START(pc9801_state::pc9801rs_map)
 	AM_IMPORT_FROM(pc9801ux_map)
 //  AM_RANGE(0x0d8000, 0x0d9fff) AM_ROM AM_REGION("ide",0)
 	AM_RANGE(0x0da000, 0x0dbfff) AM_RAM // ide ram
@@ -1121,7 +1121,7 @@ static ADDRESS_MAP_START( pc9801rs_map, AS_PROGRAM, 16, pc9801_state )
 	AM_RANGE(0xfe8000, 0xffffff) AM_DEVICE("ipl_bank", address_map_bank_device, amap16)
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( pc9801rs_io, AS_IO, 16, pc9801_state )
+ADDRESS_MAP_START(pc9801_state::pc9801rs_io)
 	ADDRESS_MAP_UNMAP_HIGH
 	AM_IMPORT_FROM(pc9801ux_io)
 	AM_RANGE(0x0430, 0x0433) AM_READWRITE8(ide_ctrl_r, ide_ctrl_w, 0x00ff)
@@ -1407,7 +1407,7 @@ WRITE16_MEMBER(pc9801_state::pc9821_grcg_gvram0_w)
 }
 
 
-static ADDRESS_MAP_START( pc9821_map, AS_PROGRAM, 32, pc9801_state )
+ADDRESS_MAP_START(pc9801_state::pc9821_map)
 	//AM_RANGE(0x00080000, 0x0009ffff) AM_READWRITE8(winram_r, winram_w, 0xffffffff)
 	AM_RANGE(0x000a0000, 0x000a3fff) AM_READWRITE16(tvram_r, tvram_w, 0xffffffff)
 	AM_RANGE(0x000a4000, 0x000a4fff) AM_READWRITE8(pc9801rs_knjram_r, pc9801rs_knjram_w, 0xffffffff)
@@ -1422,7 +1422,7 @@ static ADDRESS_MAP_START( pc9821_map, AS_PROGRAM, 32, pc9801_state )
 	AM_RANGE(0xfffe8000, 0xffffffff) AM_DEVICE16("ipl_bank", address_map_bank_device, amap16, 0xffffffff)
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( pc9821_io, AS_IO, 32, pc9801_state )
+ADDRESS_MAP_START(pc9801_state::pc9821_io)
 //  ADDRESS_MAP_UNMAP_HIGH // TODO: a read to somewhere makes this to fail at POST
 	AM_RANGE(0x0000, 0x001f) AM_DEVREADWRITE8("i8237", am9517a_device, read, write, 0xff00ff00)
 	AM_RANGE(0x0000, 0x001f) AM_READWRITE8(pic_r, pic_w, 0x00ff00ff) // i8259 PIC (bit 3 ON slave / master) / i8237 DMA
@@ -1507,15 +1507,15 @@ static ADDRESS_MAP_START( pc9821_io, AS_IO, 32, pc9801_state )
 //  AM_RANGE(0xfcd0, 0xfcd3) MIDI port, option F / <undefined>
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( upd7220_1_map, 0, 16, pc9801_state )
+ADDRESS_MAP_START(pc9801_state::upd7220_1_map)
 	AM_RANGE(0x00000, 0x03fff) AM_RAM AM_SHARE("video_ram_1")
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( upd7220_2_map, 0, 16, pc9801_state )
+ADDRESS_MAP_START(pc9801_state::upd7220_2_map)
 	AM_RANGE(0x00000, 0x3ffff) AM_RAM AM_SHARE("video_ram_2")
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( upd7220_grcg_2_map, 0, 16, pc9801_state )
+ADDRESS_MAP_START(pc9801_state::upd7220_grcg_2_map)
 	AM_RANGE(0x00000, 0x3ffff) AM_READWRITE(upd7220_grcg_r, upd7220_grcg_w) AM_SHARE("video_ram_2")
 ADDRESS_MAP_END
 
@@ -2309,9 +2309,9 @@ MACHINE_CONFIG_START(pc9801_state::pc9801_common)
 	/* TODO: check this one */
 	MCFG_I8255_IN_PORTB_CB(IOPORT("DSW5"))
 
-	MCFG_FRAGMENT_ADD(pc9801_keyboard)
-	MCFG_FRAGMENT_ADD(pc9801_mouse)
-	MCFG_FRAGMENT_ADD(pc9801_cbus)
+	pc9801_keyboard(config);
+	pc9801_mouse(config);
+	pc9801_cbus(config);
 
 	MCFG_DEVICE_ADD(UPD8251_TAG, I8251, 0)
 
@@ -2359,7 +2359,7 @@ MACHINE_CONFIG_START(pc9801_state::pc9801)
 	MCFG_CPU_VBLANK_INT_DRIVER("screen", pc9801_state, vrtc_irq)
 	MCFG_CPU_IRQ_ACKNOWLEDGE_DEVICE("pic8259_master", pic8259_device, inta_cb)
 
-	MCFG_FRAGMENT_ADD(pc9801_common)
+	pc9801_common(config);
 
 	MCFG_MACHINE_START_OVERRIDE(pc9801_state,pc9801f)
 	MCFG_MACHINE_RESET_OVERRIDE(pc9801_state,pc9801f)
@@ -2375,7 +2375,7 @@ MACHINE_CONFIG_START(pc9801_state::pc9801)
 	MCFG_FLOPPY_DRIVE_ADD("upd765_2dd:0", pc9801_floppies, "525dd", pc9801_state::floppy_formats)
 	MCFG_FLOPPY_DRIVE_ADD("upd765_2dd:1", pc9801_floppies, "525dd", pc9801_state::floppy_formats)
 
-	MCFG_FRAGMENT_ADD(pc9801_sasi)
+	pc9801_sasi(config);
 	MCFG_UPD1990A_ADD(UPD1990A_TAG, XTAL(32'768), NOOP, NOOP)
 
 	MCFG_DEVICE_MODIFY("i8237")
@@ -2394,7 +2394,7 @@ MACHINE_CONFIG_START(pc9801_state::pc9801rs)
 	MCFG_CPU_VBLANK_INT_DRIVER("screen", pc9801_state, vrtc_irq)
 	MCFG_CPU_IRQ_ACKNOWLEDGE_DEVICE("pic8259_master", pic8259_device, inta_cb)
 
-	MCFG_FRAGMENT_ADD(pc9801_common)
+	pc9801_common(config);
 
 	MCFG_DEVICE_ADD("ipl_bank", ADDRESS_MAP_BANK, 0)
 	MCFG_DEVICE_PROGRAM_MAP(ipl_bank)
@@ -2409,7 +2409,7 @@ MACHINE_CONFIG_START(pc9801_state::pc9801rs)
 	MCFG_DEVICE_MODIFY("i8237")
 	MCFG_DEVICE_CLOCK(MAIN_CLOCK_X1*8); // unknown clock
 
-	MCFG_FRAGMENT_ADD(pc9801_ide)
+	pc9801_ide(config);
 	MCFG_UPD4990A_ADD("upd1990a", XTAL(32'768), NOOP, NOOP)
 
 	MCFG_RAM_ADD(RAM_TAG)
@@ -2423,7 +2423,8 @@ MACHINE_CONFIG_START(pc9801_state::pc9801rs)
 	MCFG_PALETTE_INIT_OWNER(pc9801_state,pc9801)
 MACHINE_CONFIG_END
 
-MACHINE_CONFIG_DERIVED(pc9801_state::pc9801vm, pc9801rs)
+MACHINE_CONFIG_START(pc9801_state::pc9801vm)
+	pc9801rs(config);
 	MCFG_CPU_REPLACE("maincpu",V30,10000000)
 	MCFG_CPU_PROGRAM_MAP(pc9801ux_map)
 	MCFG_CPU_IO_MAP(pc9801ux_io)
@@ -2437,7 +2438,8 @@ MACHINE_CONFIG_DERIVED(pc9801_state::pc9801vm, pc9801rs)
 	MCFG_MACHINE_RESET_OVERRIDE(pc9801_state,pc9801_common)
 MACHINE_CONFIG_END
 
-MACHINE_CONFIG_DERIVED(pc9801_state::pc9801ux, pc9801rs)
+MACHINE_CONFIG_START(pc9801_state::pc9801ux)
+	pc9801rs(config);
 	MCFG_CPU_REPLACE("maincpu",I80286,10000000)
 	MCFG_CPU_PROGRAM_MAP(pc9801ux_map)
 	MCFG_CPU_IO_MAP(pc9801ux_io)
@@ -2447,7 +2449,8 @@ MACHINE_CONFIG_DERIVED(pc9801_state::pc9801ux, pc9801rs)
 //  MCFG_DEVICE_MODIFY("i8237", AM9157A, 10000000) // unknown clock
 MACHINE_CONFIG_END
 
-MACHINE_CONFIG_DERIVED(pc9801_state::pc9801bx2, pc9801rs)
+MACHINE_CONFIG_START(pc9801_state::pc9801bx2)
+	pc9801rs(config);
 	MCFG_CPU_REPLACE("maincpu",I486,25000000)
 	MCFG_CPU_PROGRAM_MAP(pc9821_map)
 	MCFG_CPU_IO_MAP(pc9821_io)
@@ -2457,7 +2460,8 @@ MACHINE_CONFIG_DERIVED(pc9801_state::pc9801bx2, pc9801rs)
 	MCFG_MACHINE_START_OVERRIDE(pc9801_state,pc9801bx2)
 MACHINE_CONFIG_END
 
-MACHINE_CONFIG_DERIVED(pc9801_state::pc9821, pc9801rs)
+MACHINE_CONFIG_START(pc9801_state::pc9821)
+	pc9801rs(config);
 	MCFG_CPU_REPLACE("maincpu", I486, 16000000) // unknown clock
 	MCFG_CPU_PROGRAM_MAP(pc9821_map)
 	MCFG_CPU_IO_MAP(pc9821_io)
@@ -2480,7 +2484,8 @@ MACHINE_CONFIG_DERIVED(pc9801_state::pc9821, pc9801rs)
 	MCFG_PALETTE_INIT_OWNER(pc9801_state,pc9801)
 MACHINE_CONFIG_END
 
-MACHINE_CONFIG_DERIVED(pc9801_state::pc9821ap2, pc9821)
+MACHINE_CONFIG_START(pc9801_state::pc9821ap2)
+	pc9821(config);
 	MCFG_CPU_REPLACE("maincpu", I486, 66666667) // unknown clock
 	MCFG_CPU_PROGRAM_MAP(pc9821_map)
 	MCFG_CPU_IO_MAP(pc9821_io)
@@ -2490,7 +2495,8 @@ MACHINE_CONFIG_DERIVED(pc9801_state::pc9821ap2, pc9821)
 	MCFG_MACHINE_START_OVERRIDE(pc9801_state,pc9821ap2)
 MACHINE_CONFIG_END
 
-MACHINE_CONFIG_DERIVED(pc9801_state::pc9821v20, pc9821)
+MACHINE_CONFIG_START(pc9801_state::pc9821v20)
+	pc9821(config);
 	MCFG_CPU_REPLACE("maincpu",PENTIUM,32000000) /* TODO: clock */
 	MCFG_CPU_PROGRAM_MAP(pc9821_map)
 	MCFG_CPU_IO_MAP(pc9821_io)

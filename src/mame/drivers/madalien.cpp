@@ -67,7 +67,7 @@ WRITE8_MEMBER(madalien_state::madalien_portB_w)
 }
 
 
-static ADDRESS_MAP_START( main_map, AS_PROGRAM, 8, madalien_state )
+ADDRESS_MAP_START(madalien_state::main_map)
 	AM_RANGE(0x0000, 0x03ff) AM_RAM
 
 	AM_RANGE(0x6000, 0x63ff) AM_RAM_WRITE(madalien_videoram_w) AM_SHARE("videoram")
@@ -95,7 +95,7 @@ static ADDRESS_MAP_START( main_map, AS_PROGRAM, 8, madalien_state )
 ADDRESS_MAP_END
 
 
-static ADDRESS_MAP_START( audio_map, AS_PROGRAM, 8, madalien_state )
+ADDRESS_MAP_START(madalien_state::audio_map)
 	AM_RANGE(0x0000, 0x03ff) AM_MIRROR(0x1c00) AM_RAM
 	AM_RANGE(0x6000, 0x6003) AM_MIRROR(0x1ffc) AM_RAM /* unknown device in an epoxy block, might be tilt detection */
 	AM_RANGE(0x8000, 0x8000) AM_MIRROR(0x1ffc) AM_DEVREAD("soundlatch", generic_latch_8_device, read)
@@ -159,7 +159,7 @@ MACHINE_CONFIG_START(madalien_state::madalien)
 	MCFG_CPU_VBLANK_INT_DRIVER("screen", madalien_state,  nmi_line_pulse)
 
 	/* video hardware */
-	MCFG_FRAGMENT_ADD(madalien_video)
+	madalien_video(config);
 
 	/* audio hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")

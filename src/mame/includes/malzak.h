@@ -57,4 +57,8 @@ public:
 	uint32_t screen_update_malzak(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 	void malzak(machine_config &config);
 	void malzak2(machine_config &config);
+	void malzak2_map(address_map &map);
+	void malzak_data_map(address_map &map);
+	void malzak_io_map(address_map &map);
+	void malzak_map(address_map &map);
 };

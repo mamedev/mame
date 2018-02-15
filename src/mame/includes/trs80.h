@@ -139,6 +139,20 @@ public:
 	void ht1080z(machine_config &config);
 	void cp500(machine_config &config);
 	void model4(machine_config &config);
+	void cp500_io(address_map &map);
+	void lnw80_io(address_map &map);
+	void lnw80_map(address_map &map);
+	void meritum_io(address_map &map);
+	void meritum_map(address_map &map);
+	void model1_io(address_map &map);
+	void model1_map(address_map &map);
+	void model3_io(address_map &map);
+	void model3_map(address_map &map);
+	void model4_io(address_map &map);
+	void model4p_io(address_map &map);
+	void sys80_io(address_map &map);
+	void trs80_io(address_map &map);
+	void trs80_map(address_map &map);
 private:
 	uint8_t *m_p_gfxram;
 	uint8_t m_model4;

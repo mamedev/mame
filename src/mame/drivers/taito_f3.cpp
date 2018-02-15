@@ -186,7 +186,7 @@ WRITE16_MEMBER(taito_f3_state::f3_unk_w)
 
 /******************************************************************************/
 
-static ADDRESS_MAP_START( f3_map, AS_PROGRAM, 32, taito_f3_state )
+ADDRESS_MAP_START(taito_f3_state::f3_map)
 	AM_RANGE(0x000000, 0x1fffff) AM_ROM
 	AM_RANGE(0x300000, 0x30007f) AM_WRITE(f3_sound_bankswitch_w)
 	AM_RANGE(0x400000, 0x41ffff) AM_MIRROR(0x20000) AM_RAM AM_SHARE("f3_ram")
@@ -206,7 +206,7 @@ static ADDRESS_MAP_START( f3_map, AS_PROGRAM, 32, taito_f3_state )
 	AM_RANGE(0xc80100, 0xc80103) AM_WRITE(f3_sound_reset_1_w)
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( bubsympb_map, AS_PROGRAM, 32, taito_f3_state )
+ADDRESS_MAP_START(taito_f3_state::bubsympb_map)
 	AM_RANGE(0x000000, 0x1fffff) AM_ROM
 	AM_RANGE(0x300000, 0x30007f) AM_WRITE(f3_sound_bankswitch_w)
 	AM_RANGE(0x400000, 0x41ffff) AM_MIRROR(0x20000) AM_RAM AM_SHARE("f3_ram")
@@ -493,30 +493,35 @@ MACHINE_CONFIG_END
  of the games change the registers during the game (to do so would probably require
  monitor recalibration.)
 */
-MACHINE_CONFIG_DERIVED(taito_f3_state::f3_224a, f3)
+MACHINE_CONFIG_START(taito_f3_state::f3_224a)
+	f3(config);
 	MCFG_SCREEN_MODIFY("screen")
 	MCFG_SCREEN_VISIBLE_AREA(46, 40*8-1 + 46, 31, 31+224-1)
 MACHINE_CONFIG_END
 
-MACHINE_CONFIG_DERIVED(taito_f3_state::f3_224b, f3)
+MACHINE_CONFIG_START(taito_f3_state::f3_224b)
+	f3(config);
 	MCFG_SCREEN_MODIFY("screen")
 	MCFG_SCREEN_VISIBLE_AREA(46, 40*8-1 + 46, 32, 32+224-1)
 MACHINE_CONFIG_END
 
-MACHINE_CONFIG_DERIVED(taito_f3_state::f3_224c, f3)
+MACHINE_CONFIG_START(taito_f3_state::f3_224c)
+	f3(config);
 	MCFG_SCREEN_MODIFY("screen")
 	MCFG_SCREEN_VISIBLE_AREA(46, 40*8-1 + 46, 24, 24+224-1)
 MACHINE_CONFIG_END
 
 /* recalh and gseeker need a default EEPROM to work */
-MACHINE_CONFIG_DERIVED(taito_f3_state::f3_eeprom, f3)
+MACHINE_CONFIG_START(taito_f3_state::f3_eeprom)
+	f3(config);
 
 	MCFG_DEVICE_REMOVE("eeprom")
 	MCFG_EEPROM_SERIAL_93C46_ADD("eeprom")
 	MCFG_EEPROM_SERIAL_DATA(recalh_eeprom, 128) //TODO: convert this into ROM
 MACHINE_CONFIG_END
 
-MACHINE_CONFIG_DERIVED(taito_f3_state::f3_224b_eeprom, f3_224b)
+MACHINE_CONFIG_START(taito_f3_state::f3_224b_eeprom)
+	f3_224b(config);
 
 	MCFG_DEVICE_REMOVE("eeprom")
 	MCFG_EEPROM_SERIAL_93C46_ADD("eeprom")

@@ -81,9 +81,9 @@
 #include <zlib.h>
 #include <iostream>
 #include <fstream>
-#include "rapidjson/include/rapidjson/document.h"
-#include "rapidjson/include/rapidjson/stringbuffer.h"
-#include "rapidjson/include/rapidjson/writer.h"
+#include <rapidjson/document.h>
+#include <rapidjson/stringbuffer.h>
+#include <rapidjson/writer.h>
 #endif
 
 // Generated artwork includes
@@ -165,6 +165,7 @@ public:
 	DECLARE_WRITE_LINE_MEMBER(irq_handler);
 
 	void prodigy(machine_config &config);
+	void maincpu_map(address_map &map);
 private:
 	required_device<cpu_device> m_maincpu;
 	required_device<ttl74145_device> m_74145;
@@ -564,7 +565,7 @@ void prodigy_state::update_bcd()
 	}
 }
 
-static ADDRESS_MAP_START( maincpu_map, AS_PROGRAM, 8, prodigy_state )
+ADDRESS_MAP_START(prodigy_state::maincpu_map)
 	AM_RANGE(0x0000, 0x07ff) AM_RAM
 	AM_RANGE(0x2000, 0x200f) AM_DEVREADWRITE("via", via6522_device, read, write)
 	AM_RANGE(0x6000, 0x7fff) AM_ROM AM_REGION("roms", 0x0000) AM_MIRROR(0x8000)

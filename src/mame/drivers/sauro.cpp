@@ -185,7 +185,7 @@ WRITE8_MEMBER(sauro_state::adpcm_w)
 	m_sp0256->ald_w(space, 0, data);
 }
 
-static ADDRESS_MAP_START( sauro_map, AS_PROGRAM, 8, sauro_state )
+ADDRESS_MAP_START(sauro_state::sauro_map)
 	AM_RANGE(0x0000, 0xdfff) AM_ROM
 	AM_RANGE(0xe000, 0xe7ff) AM_RAM AM_SHARE("nvram")
 	AM_RANGE(0xe800, 0xebff) AM_RAM AM_SHARE("spriteram")
@@ -195,7 +195,7 @@ static ADDRESS_MAP_START( sauro_map, AS_PROGRAM, 8, sauro_state )
 	AM_RANGE(0xfc00, 0xffff) AM_RAM_WRITE(sauro_colorram2_w) AM_SHARE("colorram2")
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( sauro_io_map, AS_IO, 8, sauro_state )
+ADDRESS_MAP_START(sauro_state::sauro_io_map)
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	AM_RANGE(0x00, 0x00) AM_READ_PORT("DSW1")
 	AM_RANGE(0x20, 0x20) AM_READ_PORT("DSW2")
@@ -208,7 +208,7 @@ static ADDRESS_MAP_START( sauro_io_map, AS_IO, 8, sauro_state )
 	AM_RANGE(0xe0, 0xe0) AM_DEVWRITE("watchdog", watchdog_timer_device, reset_w)
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( sauro_sound_map, AS_PROGRAM, 8, sauro_state )
+ADDRESS_MAP_START(sauro_state::sauro_sound_map)
 	AM_RANGE(0x0000, 0x7fff) AM_ROM
 	AM_RANGE(0x8000, 0x87ff) AM_RAM
 	AM_RANGE(0xc000, 0xc001) AM_DEVWRITE("ymsnd", ym3812_device, write)
@@ -219,7 +219,7 @@ static ADDRESS_MAP_START( sauro_sound_map, AS_PROGRAM, 8, sauro_state )
 ADDRESS_MAP_END
 
 
-static ADDRESS_MAP_START( saurob_sound_map, AS_PROGRAM, 8, sauro_state )
+ADDRESS_MAP_START(sauro_state::saurob_sound_map)
 	AM_RANGE(0x0000, 0x7fff) AM_ROM
 	AM_RANGE(0x8000, 0x87ff) AM_RAM
 	AM_RANGE(0xc000, 0xc001) AM_DEVWRITE("ymsnd", ym3812_device, write)
@@ -230,7 +230,7 @@ static ADDRESS_MAP_START( saurob_sound_map, AS_PROGRAM, 8, sauro_state )
 ADDRESS_MAP_END
 
 
-static ADDRESS_MAP_START( trckydoc_map, AS_PROGRAM, 8, sauro_state )
+ADDRESS_MAP_START(sauro_state::trckydoc_map)
 	AM_RANGE(0x0000, 0xdfff) AM_ROM
 	AM_RANGE(0xe000, 0xe7ff) AM_RAM AM_SHARE("nvram")
 	AM_RANGE(0xe800, 0xebff) AM_RAM AM_MIRROR(0x400) AM_SHARE("spriteram")
@@ -473,7 +473,8 @@ MACHINE_CONFIG_START(sauro_state::tecfri)
 
 MACHINE_CONFIG_END
 
-MACHINE_CONFIG_DERIVED(sauro_state::trckydoc, tecfri)
+MACHINE_CONFIG_START(sauro_state::trckydoc)
+	tecfri(config);
 
 	MCFG_CPU_MODIFY("maincpu")
 	MCFG_CPU_PROGRAM_MAP(trckydoc_map)
@@ -491,7 +492,8 @@ MACHINE_CONFIG_DERIVED(sauro_state::trckydoc, tecfri)
 
 MACHINE_CONFIG_END
 
-MACHINE_CONFIG_DERIVED(sauro_state::sauro, tecfri)
+MACHINE_CONFIG_START(sauro_state::sauro)
+	tecfri(config);
 
 	MCFG_CPU_MODIFY("maincpu")
 	MCFG_CPU_PROGRAM_MAP(sauro_map)
@@ -522,7 +524,8 @@ MACHINE_CONFIG_DERIVED(sauro_state::sauro, tecfri)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 MACHINE_CONFIG_END
 
-MACHINE_CONFIG_DERIVED(sauro_state::saurob, sauro)
+MACHINE_CONFIG_START(sauro_state::saurob)
+	sauro(config);
 
 	MCFG_CPU_MODIFY("audiocpu")
 	MCFG_CPU_PROGRAM_MAP(saurob_sound_map)

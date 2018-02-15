@@ -146,6 +146,11 @@ public:
 	void skydest_i8741_reset();
 	void cyclemb(machine_config &config);
 	void skydest(machine_config &config);
+	void cyclemb_io(address_map &map);
+	void cyclemb_map(address_map &map);
+	void cyclemb_sound_io(address_map &map);
+	void cyclemb_sound_map(address_map &map);
+	void skydest_io(address_map &map);
 };
 
 
@@ -567,7 +572,7 @@ WRITE8_MEMBER( cyclemb_state::skydest_i8741_0_w )
 }
 
 
-static ADDRESS_MAP_START( cyclemb_map, AS_PROGRAM, 8, cyclemb_state )
+ADDRESS_MAP_START(cyclemb_state::cyclemb_map)
 	AM_RANGE(0x0000, 0x7fff) AM_ROM
 	AM_RANGE(0x8000, 0x8fff) AM_ROMBANK("bank1")
 	AM_RANGE(0x9000, 0x97ff) AM_RAM AM_SHARE("vram")
@@ -578,7 +583,7 @@ static ADDRESS_MAP_START( cyclemb_map, AS_PROGRAM, 8, cyclemb_state )
 	AM_RANGE(0xb800, 0xbfff) AM_RAM //WRAM
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( cyclemb_io, AS_IO, 8, cyclemb_state )
+ADDRESS_MAP_START(cyclemb_state::cyclemb_io)
 //  ADDRESS_MAP_GLOBAL_MASK(0xff)
 	AM_RANGE(0xc000, 0xc000) AM_WRITE(cyclemb_bankswitch_w)
 	//AM_RANGE(0xc020, 0xc020) AM_WRITENOP // ?
@@ -587,7 +592,7 @@ static ADDRESS_MAP_START( cyclemb_io, AS_IO, 8, cyclemb_state )
 ADDRESS_MAP_END
 
 
-static ADDRESS_MAP_START( skydest_io, AS_IO, 8, cyclemb_state )
+ADDRESS_MAP_START(cyclemb_state::skydest_io)
 //  ADDRESS_MAP_GLOBAL_MASK(0xff)
 	AM_RANGE(0xc000, 0xc000) AM_WRITE(cyclemb_bankswitch_w)
 	//AM_RANGE(0xc020, 0xc020) AM_WRITENOP // ?
@@ -597,7 +602,7 @@ static ADDRESS_MAP_START( skydest_io, AS_IO, 8, cyclemb_state )
 ADDRESS_MAP_END
 
 
-static ADDRESS_MAP_START( cyclemb_sound_map, AS_PROGRAM, 8, cyclemb_state )
+ADDRESS_MAP_START(cyclemb_state::cyclemb_sound_map)
 	AM_RANGE(0x0000, 0x3fff) AM_ROM
 	AM_RANGE(0x6000, 0x63ff) AM_RAM
 
@@ -628,7 +633,7 @@ WRITE8_MEMBER(cyclemb_state::skydest_i8741_1_w)
 }
 
 
-static ADDRESS_MAP_START( cyclemb_sound_io, AS_IO, 8, cyclemb_state )
+ADDRESS_MAP_START(cyclemb_state::cyclemb_sound_io)
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	AM_RANGE(0x00, 0x01) AM_DEVREADWRITE("ymsnd", ym2203_device, read, write)
 	AM_RANGE(0x40, 0x41) AM_READWRITE(skydest_i8741_1_r, skydest_i8741_1_w)
@@ -992,7 +997,8 @@ MACHINE_CONFIG_START(cyclemb_state::cyclemb)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
 MACHINE_CONFIG_END
 
-MACHINE_CONFIG_DERIVED(cyclemb_state::skydest, cyclemb)
+MACHINE_CONFIG_START(cyclemb_state::skydest)
+	cyclemb(config);
 	MCFG_CPU_MODIFY("maincpu")
 	MCFG_CPU_IO_MAP(skydest_io)
 

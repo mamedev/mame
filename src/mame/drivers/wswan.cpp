@@ -42,20 +42,20 @@
 
 #include "wswan.lh"
 
-static ADDRESS_MAP_START (wswan_mem, AS_PROGRAM, 8, wswan_state)
+ADDRESS_MAP_START(wswan_state::wswan_mem)
 	AM_RANGE(0x00000, 0x03fff) AM_DEVREADWRITE("vdp", wswan_video_device, vram_r, vram_w)       // 16kb RAM / 4 colour tiles
 	AM_RANGE(0x04000, 0x0ffff) AM_NOP       // nothing
 	//AM_RANGE(0x10000, 0xeffff)    // cart range, setup at machine_start
 	AM_RANGE(0xf0000, 0xfffff) AM_READ(bios_r)
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START (wscolor_mem, AS_PROGRAM, 8, wswan_state)
+ADDRESS_MAP_START(wswan_state::wscolor_mem)
 	AM_RANGE(0x00000, 0x0ffff) AM_DEVREADWRITE("vdp", wswan_video_device, vram_r, vram_w)       // 16kb RAM / 4 colour tiles, 16 colour tiles + palettes
 	//AM_RANGE(0x10000, 0xeffff)    // cart range, setup at machine_start
 	AM_RANGE(0xf0000, 0xfffff) AM_READ(bios_r)
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START (wswan_io, AS_IO, 8, wswan_state)
+ADDRESS_MAP_START(wswan_state::wswan_io)
 	AM_RANGE(0x00, 0xff) AM_READWRITE(port_r, port_w)   // I/O ports
 ADDRESS_MAP_END
 
@@ -154,7 +154,8 @@ MACHINE_CONFIG_START(wswan_state::wswan)
 	MCFG_SOFTWARE_LIST_COMPATIBLE_ADD("pc2_list","pockchalv2")
 MACHINE_CONFIG_END
 
-MACHINE_CONFIG_DERIVED(wswan_state::wscolor, wswan)
+MACHINE_CONFIG_START(wswan_state::wscolor)
+	wswan(config);
 	MCFG_CPU_MODIFY("maincpu")
 	MCFG_CPU_PROGRAM_MAP(wscolor_mem)
 	MCFG_MACHINE_START_OVERRIDE(wswan_state, wscolor)

@@ -282,7 +282,7 @@ WRITE16_MEMBER( deco_mlc_state::sh96_protection_region_0_146_w )
 
 /******************************************************************************/
 
-static ADDRESS_MAP_START( avengrgs_map, AS_PROGRAM, 32, deco_mlc_state )
+ADDRESS_MAP_START(deco_mlc_state::avengrgs_map)
 	AM_RANGE(0x0000000, 0x00fffff) AM_ROM AM_MIRROR(0xff000000)
 	AM_RANGE(0x0100000, 0x011ffff) AM_RAM AM_SHARE("mlc_ram") AM_MIRROR(0xff000000)
 	AM_RANGE(0x0200000, 0x0200003) AM_READ(mlc_200000_r) AM_MIRROR(0xff000000)
@@ -304,7 +304,7 @@ static ADDRESS_MAP_START( avengrgs_map, AS_PROGRAM, 32, deco_mlc_state )
 	AM_RANGE(0x0600000, 0x0600007) AM_DEVREADWRITE8("ymz", ymz280b_device, read, write, 0xff000000) AM_MIRROR(0xff000000)
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( decomlc_map, AS_PROGRAM, 32, deco_mlc_state )
+ADDRESS_MAP_START(deco_mlc_state::decomlc_map)
 	AM_RANGE(0x0000000, 0x00fffff) AM_ROM
 	AM_RANGE(0x0100000, 0x011ffff) AM_RAM AM_SHARE("mlc_ram")
 	AM_RANGE(0x0200000, 0x0200003) AM_READ(mlc_200000_r)
@@ -563,11 +563,13 @@ MACHINE_CONFIG_START(deco_mlc_state::mlc)
 	MCFG_SOUND_ROUTE(1, "rspeaker", 1.0)
 MACHINE_CONFIG_END
 
-MACHINE_CONFIG_DERIVED(deco_mlc_state::mlc_6bpp, mlc)
+MACHINE_CONFIG_START(deco_mlc_state::mlc_6bpp)
+	mlc(config);
 	MCFG_GFXDECODE_MODIFY("gfxdecode", 6bpp)
 MACHINE_CONFIG_END
 
-MACHINE_CONFIG_DERIVED(deco_mlc_state::mlc_5bpp, mlc)
+MACHINE_CONFIG_START(deco_mlc_state::mlc_5bpp)
+	mlc(config);
 	MCFG_GFXDECODE_MODIFY("gfxdecode", 5bpp)
 
 	// TODO: mono? ch.0 doesn't output any sound in-game

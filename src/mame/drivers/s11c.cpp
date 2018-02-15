@@ -14,7 +14,7 @@
 #include "s11c.lh"
 
 
-static ADDRESS_MAP_START( s11c_main_map, AS_PROGRAM, 8, s11c_state )
+ADDRESS_MAP_START(s11c_state::s11c_main_map)
 	AM_RANGE(0x0000, 0x0fff) AM_RAM AM_SHARE("nvram")
 	AM_RANGE(0x2100, 0x2103) AM_MIRROR(0x00fc) AM_DEVREADWRITE("pia21", pia6821_device, read, write) // sound+solenoids
 	AM_RANGE(0x2200, 0x2200) AM_MIRROR(0x01ff) AM_WRITE(sol3_w) // solenoids
@@ -160,7 +160,7 @@ MACHINE_CONFIG_START(s11c_state::s11c)
 	MCFG_DEFAULT_LAYOUT(layout_s11c)
 
 	/* Sound */
-	MCFG_FRAGMENT_ADD( genpin_audio )
+	genpin_audio(config);
 
 	/* Devices */
 	MCFG_DEVICE_ADD("pia21", PIA6821, 0)

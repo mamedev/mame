@@ -52,17 +52,19 @@ public:
 	DECLARE_READ8_MEMBER(kbd_r);
 
 	void sdk86(machine_config &config);
+	void sdk86_io(address_map &map);
+	void sdk86_mem(address_map &map);
 private:
 	uint8_t m_digit;
 	required_device<cpu_device> m_maincpu;
 };
 
-static ADDRESS_MAP_START(sdk86_mem, AS_PROGRAM, 16, sdk86_state)
+ADDRESS_MAP_START(sdk86_state::sdk86_mem)
 	AM_RANGE(0x00000, 0x00fff) AM_RAM //2K standard, or 4k (board fully populated)
 	AM_RANGE(0xfe000, 0xfffff) AM_ROM
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START(sdk86_io, AS_IO, 16, sdk86_state)
+ADDRESS_MAP_START(sdk86_state::sdk86_io)
 	ADDRESS_MAP_UNMAP_HIGH
 	AM_RANGE(0xfff0, 0xfff1) AM_MIRROR(4) AM_DEVREADWRITE8(I8251_TAG, i8251_device, data_r, data_w, 0xff)
 	AM_RANGE(0xfff2, 0xfff3) AM_MIRROR(4) AM_DEVREADWRITE8(I8251_TAG, i8251_device, status_r, control_w, 0xff)

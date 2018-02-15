@@ -37,16 +37,18 @@ public:
 	uint32_t screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 	void tek4109a(machine_config &config);
 	void tek4107a(machine_config &config);
+	void tek4107a_io(address_map &map);
+	void tek4107a_mem(address_map &map);
 };
 
 /* Memory Maps */
 
-static ADDRESS_MAP_START( tek4107a_mem, AS_PROGRAM, 8, tek4107a_state )
+ADDRESS_MAP_START(tek4107a_state::tek4107a_mem)
 	AM_RANGE(0x00000, 0xbffff) AM_RAM
 	AM_RANGE(0xc0000, 0xfffff) AM_ROM AM_REGION(I80188_TAG, 0)
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( tek4107a_io, AS_IO, 8, tek4107a_state )
+ADDRESS_MAP_START(tek4107a_state::tek4107a_io)
 ADDRESS_MAP_END
 
 /* Input Ports */
@@ -106,7 +108,8 @@ MACHINE_CONFIG_START(tek4107a_state::tek4107a)
 	MCFG_GFXDECODE_ADD("gfxdecode", "palette", tek4107a)
 MACHINE_CONFIG_END
 
-MACHINE_CONFIG_DERIVED(tek4107a_state::tek4109a, tek4107a)
+MACHINE_CONFIG_START(tek4107a_state::tek4109a)
+	tek4107a(config);
 	/* video hardware */
 	MCFG_PALETTE_MODIFY("palette")
 	MCFG_PALETTE_ENTRIES(4096)

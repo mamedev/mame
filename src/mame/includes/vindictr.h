@@ -41,4 +41,5 @@ public:
 
 	static const atari_motion_objects_config s_mob_config;
 	void vindictr(machine_config &config);
+	void main_map(address_map &map);
 };

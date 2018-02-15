@@ -285,6 +285,8 @@ public:
 	void firebeat2(machine_config &config);
 	void firebeat(machine_config &config);
 	void firebeat_spu(machine_config &config);
+	void firebeat_map(address_map &map);
+	void spu_map(address_map &map);
 };
 
 
@@ -1052,7 +1054,7 @@ MACHINE_START_MEMBER(firebeat_state,firebeat)
 	m_maincpu->ppcdrc_add_fastram(0x00000000, 0x01ffffff, false, m_work_ram);
 }
 
-static ADDRESS_MAP_START( firebeat_map, AS_PROGRAM, 32, firebeat_state )
+ADDRESS_MAP_START(firebeat_state::firebeat_map)
 	AM_RANGE(0x00000000, 0x01ffffff) AM_RAM AM_SHARE("work_ram")
 	AM_RANGE(0x70000000, 0x70000fff) AM_READWRITE8(midi_uart_r, midi_uart_w, 0xff000000)
 	AM_RANGE(0x70006000, 0x70006003) AM_WRITE(extend_board_irq_w)
@@ -1075,7 +1077,7 @@ static ADDRESS_MAP_START( firebeat_map, AS_PROGRAM, 32, firebeat_state )
 	AM_RANGE(0x7ff80000, 0x7fffffff) AM_ROM AM_REGION("user1", 0)       /* System BIOS */
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( spu_map, AS_PROGRAM, 16, firebeat_state )
+ADDRESS_MAP_START(firebeat_state::spu_map)
 	AM_RANGE(0x000000, 0x07ffff) AM_ROM
 	AM_RANGE(0x100000, 0x13ffff) AM_RAM
 	AM_RANGE(0x200000, 0x200001) AM_READ(spu_unk_r)
@@ -1414,7 +1416,8 @@ MACHINE_CONFIG_START(firebeat_state::firebeat2)
 	MCFG_MIDI_KBD_ADD("kbd1", DEVWRITELINE("duart_midi:chan1", ins8250_uart_device, rx_w), 31250)
 MACHINE_CONFIG_END
 
-MACHINE_CONFIG_DERIVED(firebeat_state::firebeat_spu, firebeat)
+MACHINE_CONFIG_START(firebeat_state::firebeat_spu)
+	firebeat(config);
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("audiocpu", M68000, 16000000)

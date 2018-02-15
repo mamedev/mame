@@ -99,7 +99,7 @@ const interpro_ioga_device::interrupt_data_t interpro_ioga_device::m_interrupt_d
 	{ INT_SOFT_HI, IRQ_SOFT15,   IRQ_PENDING, "soft int 15", "soft" },
 };
 
-DEVICE_ADDRESS_MAP_START(map, 32, interpro_ioga_device)
+ADDRESS_MAP_START(interpro_ioga_device::map)
 
 	AM_RANGE(0x0c, 0x1b) AM_READWRITE(dma_plotter_r, dma_plotter_w)
 	AM_RANGE(0x1c, 0x1f) AM_READWRITE(dma_plotter_eosl_r, dma_plotter_eosl_w)
@@ -133,15 +133,15 @@ DEVICE_ADDRESS_MAP_START(map, 32, interpro_ioga_device)
 	//c0, c4, c8 -ethernet address a,b,c?
 ADDRESS_MAP_END
 
-DEVICE_ADDRESS_MAP_START(map, 32, turquoise_ioga_device)
-	AM_INHERIT_FROM(interpro_ioga_device::map)
+ADDRESS_MAP_START(turquoise_ioga_device::map)
+	AM_IMPORT_FROM(interpro_ioga_device::map)
 
 	AM_RANGE(0x00, 0x03) AM_READWRITE(eth_base_r, eth_base_w)
 	AM_RANGE(0x04, 0x07) AM_READWRITE16(eth_control_r, eth_control_w, 0xffff)
 ADDRESS_MAP_END
 
-DEVICE_ADDRESS_MAP_START(map, 32, sapphire_ioga_device)
-	AM_INHERIT_FROM(interpro_ioga_device::map)
+ADDRESS_MAP_START(sapphire_ioga_device::map)
+	AM_IMPORT_FROM(interpro_ioga_device::map)
 
 	AM_RANGE(0x00, 0x03) AM_READWRITE(eth_remap_r, eth_remap_w)
 	AM_RANGE(0x04, 0x07) AM_READWRITE(eth_mappg_r, eth_mappg_w)
@@ -914,7 +914,7 @@ READ32_MEMBER(interpro_ioga_device::error_businfo_r)
 /*
  * Timers
  */
-READ32_MEMBER(interpro_ioga_device::timer0_r) const
+READ32_MEMBER(interpro_ioga_device::timer0_r)
 {
 	LOGMASKED(LOG_TIMERRD, "timer0_r data 0x%08x mask 0x%08x (%s)\n", m_timer0_count, mem_mask, machine().describe_context());
 
@@ -942,7 +942,7 @@ TIMER_CALLBACK_MEMBER(interpro_ioga_device::timer0)
 	set_int_line(INT_HARD_EX, IRQ_12, ASSERT_LINE); // FIXME: 60Hz timer on InterPro 2000
 }
 
-READ32_MEMBER(interpro_ioga_device::timer1_r) const
+READ32_MEMBER(interpro_ioga_device::timer1_r)
 {
 	u32 result = m_timer1_count & TIMER1_COUNT;
 
@@ -995,7 +995,7 @@ TIMER_CALLBACK_MEMBER(interpro_ioga_device::timer1)
 	}
 }
 
-READ32_MEMBER(interpro_ioga_device::timer2_count_r) const
+READ32_MEMBER(interpro_ioga_device::timer2_count_r)
 {
 	LOGMASKED(LOG_TIMERRD, "timer2_count_r data 0x%08x mask 0x%08x (%s)\n", m_timer2_count, mem_mask, machine().describe_context());
 
@@ -1009,7 +1009,7 @@ WRITE32_MEMBER(interpro_ioga_device::timer2_count_w)
 	LOGMASKED(LOG_TIMER2, "timer2_count_w data 0x%08x mask 0x%08x (%s)\n", data, mem_mask, machine().describe_context());
 }
 
-READ32_MEMBER(interpro_ioga_device::timer2_value_r) const
+READ32_MEMBER(interpro_ioga_device::timer2_value_r)
 {
 	LOGMASKED(LOG_TIMERRD, "timer2_value_r data 0x%08x mask 0x%08x (%s)\n", m_timer2_value, mem_mask, machine().describe_context());
 
@@ -1024,7 +1024,7 @@ WRITE32_MEMBER(interpro_ioga_device::timer2_value_w)
 	LOGMASKED(LOG_TIMER2, "timer2_value_w data 0x%08x mask 0x%08x (%s)\n", data, mem_mask, machine().describe_context());
 }
 
-READ32_MEMBER(interpro_ioga_device::timer3_r) const
+READ32_MEMBER(interpro_ioga_device::timer3_r)
 {
 	u32 result = m_timer3_count & TIMER3_COUNT;
 
@@ -1075,7 +1075,7 @@ TIMER_CALLBACK_MEMBER(interpro_ioga_device::timer3)
 	}
 }
 
-READ32_MEMBER(interpro_ioga_device::prescaler_r) const
+READ32_MEMBER(interpro_ioga_device::prescaler_r)
 {
 	// FIXME: prescaler only used with timer 1?
 	LOGMASKED(LOG_TIMERRD, "prescaler_r data 0x%08x mask 0x%08x (%s)\n", m_prescaler, mem_mask, machine().describe_context());
@@ -1242,7 +1242,7 @@ WRITE32_MEMBER(sapphire_ioga_device::eth_mappg_w)
 	m_eth_mappg = data & ~0xf;
 }
 
-READ32_MEMBER(sapphire_ioga_device::eth_control_r) const
+READ32_MEMBER(sapphire_ioga_device::eth_control_r)
 {
 	LOGMASKED(LOG_NETWORK, "eth: control_r 0x%08x (%s)\n", m_eth_control, machine().describe_context());
 

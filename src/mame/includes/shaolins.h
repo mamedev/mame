@@ -43,4 +43,5 @@ public:
 
 	TIMER_DEVICE_CALLBACK_MEMBER(interrupt);
 	void shaolins(machine_config &config);
+	void shaolins_map(address_map &map);
 };

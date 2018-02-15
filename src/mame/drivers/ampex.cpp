@@ -1,5 +1,5 @@
 // license:BSD-3-Clause
-// copyright-holders:
+// copyright-holders:AJR
 /*******************************************************************************
 
 2017-11-05 Skeleton
@@ -18,8 +18,8 @@ the PCB, which go so far as to include the standard 8224 clock generator.
 
 #include "emu.h"
 #include "cpu/z80/z80.h"
-//#include "machine/ay31015.h"
-//#include "machine/com8116.h"
+#include "machine/ay31015.h"
+#include "machine/com8116.h"
 #include "video/tms9927.h"
 #include "screen.h"
 
@@ -31,14 +31,43 @@ public:
 	ampex_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag)
 		, m_maincpu(*this, "maincpu")
+		, m_uart(*this, "uart")
+		, m_dbrg(*this, "dbrg")
 		, m_p_chargen(*this, "chargen")
 	{ }
 
 	u32 screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 
+	DECLARE_READ8_MEMBER(read_5840);
+	DECLARE_WRITE8_MEMBER(write_5840);
+	DECLARE_READ8_MEMBER(read_5841);
+	DECLARE_WRITE8_MEMBER(write_5841);
+	DECLARE_READ8_MEMBER(read_5842);
+	DECLARE_WRITE8_MEMBER(write_5842);
+	DECLARE_READ8_MEMBER(read_5843);
+	DECLARE_WRITE8_MEMBER(write_5843);
+	DECLARE_READ8_MEMBER(read_5846);
+	DECLARE_READ8_MEMBER(read_5847);
+
+	DECLARE_READ8_MEMBER(page_r);
+	DECLARE_WRITE8_MEMBER(page_w);
+
+	DECLARE_WRITE_LINE_MEMBER(vsyn_w);
+	DECLARE_WRITE_LINE_MEMBER(dav_w);
+
 	void ampex(machine_config &config);
+	void mem_map(address_map &map);
 private:
+	virtual void machine_start() override;
+
+	u8 m_page;
+	u8 m_attr;
+	bool m_attr_readback;
+	std::unique_ptr<u16[]> m_paged_ram;
+
 	required_device<cpu_device> m_maincpu;
+	required_device<ay31015_device> m_uart;
+	required_device<com8116_device> m_dbrg;
 	required_region_ptr<u8> m_p_chargen;
 };
 
@@ -47,19 +76,127 @@ u32 ampex_state::screen_update(screen_device &screen, bitmap_rgb32 &bitmap, cons
 	return 0;
 }
 
-static ADDRESS_MAP_START( mem_map, AS_PROGRAM, 8, ampex_state )
+READ8_MEMBER(ampex_state::read_5840)
+{
+	logerror("%s: Read from 5840\n", machine().describe_context());
+	return 0;
+}
+
+WRITE8_MEMBER(ampex_state::write_5840)
+{
+	m_page = (data & 0x30) >> 4;
+
+	logerror("%s: Write %02X to 5840\n", machine().describe_context(), data);
+}
+
+READ8_MEMBER(ampex_state::read_5841)
+{
+	u8 result = m_uart->get_output_pin(AY31015_DAV) << 3;
+	result |= m_uart->get_output_pin(AY31015_OR) << 4;
+	result |= m_uart->get_output_pin(AY31015_PE) << 5;
+	result |= m_uart->get_output_pin(AY31015_FE) << 6;
+	return result;
+}
+
+WRITE8_MEMBER(ampex_state::write_5841)
+{
+	// bit 7 set for UART loopback test
+
+	m_attr_readback = BIT(data, 5);
+}
+
+READ8_MEMBER(ampex_state::read_5842)
+{
+	//logerror("%s: Read from 5842\n", machine().describe_context());
+	return 0;
+}
+
+WRITE8_MEMBER(ampex_state::write_5842)
+{
+	m_uart->set_transmit_data(data);
+}
+
+READ8_MEMBER(ampex_state::read_5843)
+{
+	m_uart->set_input_pin(AY31015_RDAV, 0);
+	u8 data = m_uart->get_received_data();
+	m_uart->set_input_pin(AY31015_RDAV, 1);
+	return data;
+}
+
+WRITE8_MEMBER(ampex_state::write_5843)
+{
+	logerror("%s: Write %02X to 5843\n", machine().describe_context(), data);
+	m_attr = (data & 0x78) >> 3;
+}
+
+READ8_MEMBER(ampex_state::read_5846)
+{
+	// probably acknowledges RST 6 interrupt (value not used)
+	return 0;
+}
+
+READ8_MEMBER(ampex_state::read_5847)
+{
+	// acknowledges RST 4/5 interrupt (value not used)
+	return 0;
+}
+
+READ8_MEMBER(ampex_state::page_r)
+{
+	if (m_attr_readback)
+		return 0x87 | m_paged_ram[m_page * 0x1800 + offset] >> 5;
+	else
+		return 0xff & m_paged_ram[m_page * 0x1800 + offset];
+}
+
+WRITE8_MEMBER(ampex_state::page_w)
+{
+	m_paged_ram[m_page * 0x1800 + offset] = data | m_attr << 8;
+}
+
+WRITE_LINE_MEMBER(ampex_state::vsyn_w)
+{
+	// should generate RST 6 interrupt
+}
+
+WRITE_LINE_MEMBER(ampex_state::dav_w)
+{
+	// DAV should generate RST 7
+}
+
+ADDRESS_MAP_START(ampex_state::mem_map)
 	AM_RANGE(0x0000, 0x2fff) AM_ROM AM_REGION("roms", 0)
 	AM_RANGE(0x4000, 0x43ff) AM_RAM // main RAM
 	AM_RANGE(0x4400, 0x57ff) AM_RAM // expansion RAM
-	AM_RANGE(0x5841, 0x5841) AM_WRITENOP // ???
-	AM_RANGE(0x5842, 0x5842) AM_READNOP // ???
+	AM_RANGE(0x5840, 0x5840) AM_READWRITE(read_5840, write_5840)
+	AM_RANGE(0x5841, 0x5841) AM_READWRITE(read_5841, write_5841)
+	AM_RANGE(0x5842, 0x5842) AM_READWRITE(read_5842, write_5842)
+	AM_RANGE(0x5843, 0x5843) AM_READWRITE(read_5843, write_5843)
+	AM_RANGE(0x5846, 0x5846) AM_READ(read_5846)
+	AM_RANGE(0x5847, 0x5847) AM_READ(read_5847)
 	AM_RANGE(0x5c00, 0x5c0f) AM_DEVREADWRITE("vtac", crt5037_device, read, write)
-	AM_RANGE(0x8000, 0x9fff) AM_RAM
+	AM_RANGE(0x8000, 0x97ff) AM_READWRITE(page_r, page_w)
 	AM_RANGE(0xc000, 0xcfff) AM_RAM // video RAM
 ADDRESS_MAP_END
 
 static INPUT_PORTS_START( ampex )
 INPUT_PORTS_END
+
+void ampex_state::machine_start()
+{
+	m_page = 0;
+	m_attr = 0;
+	m_attr_readback = false;
+	m_paged_ram = std::make_unique<u16[]>(0x1800 * 4);
+
+	m_uart->set_input_pin(AY31015_SWE, 0);
+
+	save_item(NAME(m_page));
+	save_item(NAME(m_attr));
+	save_item(NAME(m_attr_readback));
+	save_pointer(NAME(m_paged_ram.get()), 0x1800 * 4);
+}
 
 MACHINE_CONFIG_START(ampex_state::ampex)
 	MCFG_CPU_ADD("maincpu", Z80, XTAL(23'814'000) / 9) // clocked by 8224?
@@ -72,7 +209,13 @@ MACHINE_CONFIG_START(ampex_state::ampex)
 	// FIXME: dot clock should be divided by char width
 	MCFG_DEVICE_ADD("vtac", CRT5037, XTAL(23'814'000) / 2)
 	MCFG_TMS9927_CHAR_WIDTH(CHAR_WIDTH)
+	MCFG_TMS9927_VSYN_CALLBACK(WRITELINE(ampex_state, vsyn_w))
 	MCFG_VIDEO_SET_SCREEN("screen")
+
+	MCFG_DEVICE_ADD("uart", AY31015, 0) // COM8017, actually
+	MCFG_AY31015_WRITE_DAV_CB(WRITELINE(ampex_state, dav_w))
+
+	MCFG_DEVICE_ADD("dbrg", COM5016_5, XTAL(4'915'200))
 MACHINE_CONFIG_END
 
 ROM_START( dialog80 )

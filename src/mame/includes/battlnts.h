@@ -42,4 +42,6 @@ public:
 	K007342_CALLBACK_MEMBER(battlnts_tile_callback);
 	K007420_CALLBACK_MEMBER(battlnts_sprite_callback);
 	void battlnts(machine_config &config);
+	void battlnts_map(address_map &map);
+	void battlnts_sound_map(address_map &map);
 };

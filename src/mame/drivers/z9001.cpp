@@ -64,6 +64,8 @@ public:
 	uint32_t screen_update_z9001(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 
 	void z9001(machine_config &config);
+	void z9001_io(address_map &map);
+	void z9001_mem(address_map &map);
 private:
 	uint8_t m_framecnt;
 	bool m_cassbit;
@@ -77,7 +79,7 @@ private:
 	required_region_ptr<u8> m_p_chargen;
 };
 
-static ADDRESS_MAP_START(z9001_mem, AS_PROGRAM, 8, z9001_state)
+ADDRESS_MAP_START(z9001_state::z9001_mem)
 	ADDRESS_MAP_UNMAP_HIGH
 	AM_RANGE( 0x0000, 0xe7ff ) AM_RAM
 	AM_RANGE( 0xe800, 0xebff ) AM_RAM AM_SHARE("colorram")
@@ -85,7 +87,7 @@ static ADDRESS_MAP_START(z9001_mem, AS_PROGRAM, 8, z9001_state)
 	AM_RANGE( 0xf000, 0xffff ) AM_ROM
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( z9001_io, AS_IO, 8, z9001_state)
+ADDRESS_MAP_START(z9001_state::z9001_io)
 	ADDRESS_MAP_UNMAP_HIGH
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	AM_RANGE(0x80, 0x83) AM_MIRROR(4) AM_DEVREADWRITE("z80ctc", z80ctc_device, read, write)

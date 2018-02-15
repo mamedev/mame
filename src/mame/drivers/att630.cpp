@@ -22,6 +22,7 @@ public:
 	u32 screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 
 	void att630(machine_config &config);
+	void mem_map(address_map &map);
 private:
 	required_device<cpu_device> m_maincpu;
 };
@@ -31,7 +32,7 @@ u32 att630_state::screen_update(screen_device &screen, bitmap_rgb32 &bitmap, con
 	return 0;
 }
 
-static ADDRESS_MAP_START( mem_map, AS_PROGRAM, 16, att630_state )
+ADDRESS_MAP_START(att630_state::mem_map)
 	AM_RANGE(0x000000, 0x03ffff) AM_ROM AM_REGION("maincpu", 0)
 	AM_RANGE(0x200000, 0x20001f) AM_DEVREADWRITE8("duart1", scn2681_device, read, write, 0x00ff)
 	AM_RANGE(0x200020, 0x20003f) AM_DEVREADWRITE8("duart2", scn2681_device, read, write, 0x00ff)

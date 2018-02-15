@@ -229,6 +229,9 @@ public:
 	DECLARE_WRITE_LINE_MEMBER(write_centronics_busy);
 	void pyuutajr(machine_config &config);
 	void tutor(machine_config &config);
+	void pyuutajr_mem(address_map &map);
+	void tutor_io(address_map &map);
+	void tutor_memmap(address_map &map);
 };
 
 
@@ -547,7 +550,7 @@ WRITE8_MEMBER( tutor_state::test_w )
 }
 #endif
 
-static ADDRESS_MAP_START(tutor_memmap, AS_PROGRAM, 8, tutor_state)
+ADDRESS_MAP_START(tutor_state::tutor_memmap)
 	AM_RANGE(0x0000, 0x3fff) AM_ROM
 	AM_RANGE(0x4000, 0x7fff) AM_ROMBANK("bank1") AM_WRITENOP
 	AM_RANGE(0x8000, 0xbfff) AM_ROMBANK("bank2") AM_WRITENOP
@@ -563,7 +566,7 @@ static ADDRESS_MAP_START(tutor_memmap, AS_PROGRAM, 8, tutor_state)
 	AM_RANGE(0xf000, 0xffff) AM_READ(tutor_highmem_r) AM_WRITENOP /*free for expansion (and internal processor RAM)*/
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START(pyuutajr_mem, AS_PROGRAM, 8, tutor_state)
+ADDRESS_MAP_START(tutor_state::pyuutajr_mem)
 	AM_RANGE(0x0000, 0x3fff) AM_ROM
 	AM_RANGE(0x4000, 0x7fff) AM_ROMBANK("bank1") AM_WRITENOP
 	AM_RANGE(0x8000, 0xbfff) AM_ROMBANK("bank2") AM_WRITENOP
@@ -591,7 +594,7 @@ ADDRESS_MAP_END
     >ed00(r): tape input
 */
 
-static ADDRESS_MAP_START(tutor_io, AS_IO, 8, tutor_state)
+ADDRESS_MAP_START(tutor_state::tutor_io)
 	AM_RANGE(0xec0, 0xec7) AM_READ(key_r)               /*keyboard interface*/
 	AM_RANGE(0xed0, 0xed0) AM_READ(tutor_cassette_r)        /*cassette interface*/
 ADDRESS_MAP_END
@@ -770,7 +773,8 @@ MACHINE_CONFIG_START(tutor_state::tutor)
 	MCFG_SOFTWARE_LIST_ADD("cart_list","tutor")
 MACHINE_CONFIG_END
 
-MACHINE_CONFIG_DERIVED(tutor_state::pyuutajr, tutor)
+MACHINE_CONFIG_START(tutor_state::pyuutajr)
+	tutor(config);
 	MCFG_CPU_MODIFY("maincpu")
 	MCFG_CPU_PROGRAM_MAP(pyuutajr_mem)
 	//MCFG_DEVICE_REMOVE("centronics")

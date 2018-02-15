@@ -166,7 +166,7 @@ const tiny_rom_entry *ef9365_device::device_rom_region() const
 // default address map
 // Up to 512*512 per bitplane, 8 bitplanes max.
 //-------------------------------------------------
-static ADDRESS_MAP_START( ef9365, 0, 8, ef9365_device )
+ADDRESS_MAP_START(ef9365_device::ef9365)
 	AM_RANGE(0x00000, ( ( ef9365_device::BITPLANE_MAX_SIZE * ef9365_device::MAX_BITPLANES ) - 1 ) ) AM_RAM
 ADDRESS_MAP_END
 
@@ -199,7 +199,7 @@ ef9365_device::ef9365_device(const machine_config &mconfig, const char *tag, dev
 	device_t(mconfig, EF9365, tag, owner, clock),
 	device_memory_interface(mconfig, *this),
 	device_video_interface(mconfig, *this),
-	m_space_config("videoram", ENDIANNESS_LITTLE, 8, 18, 0, nullptr, *ADDRESS_MAP_NAME(ef9365)),
+	m_space_config("videoram", ENDIANNESS_LITTLE, 8, 18, 0, address_map_constructor(), address_map_constructor(FUNC(ef9365_device::ef9365), this)),
 	m_charset(*this, "ef9365"),
 	m_palette(*this, finder_base::DUMMY_TAG),
 	m_irq_handler(*this)

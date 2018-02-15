@@ -66,4 +66,6 @@ public:
 	K051960_CB_MEMBER(sprite_callback);
 	DECLARE_WRITE8_MEMBER(banking_callback);
 	void _88games(machine_config &config);
+	void main_map(address_map &map);
+	void sound_map(address_map &map);
 };

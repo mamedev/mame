@@ -78,10 +78,11 @@ public:
 	uint32_t screen_update_interact(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	void hector1(machine_config &config);
 	void interact(machine_config &config);
+	void interact_mem(address_map &map);
 };
 
 
-static ADDRESS_MAP_START(interact_mem, AS_PROGRAM, 8, interact_state )
+ADDRESS_MAP_START(interact_state::interact_mem)
 	ADDRESS_MAP_UNMAP_HIGH
 	/* Main ROM page*/
 	AM_RANGE(0x0000,0x3fff) AM_ROM  /*BANK(2)*/
@@ -145,7 +146,7 @@ MACHINE_CONFIG_START(interact_state::interact)
 
 	MCFG_VIDEO_START_OVERRIDE(interact_state,hec2hrp)
 
-	MCFG_FRAGMENT_ADD(hector_audio)
+	hector_audio(config);
 
 	MCFG_CASSETTE_ADD("cassette")
 	MCFG_CASSETTE_FORMATS(hector_cassette_formats)
@@ -182,7 +183,7 @@ MACHINE_CONFIG_START(interact_state::hector1)
 
 	MCFG_VIDEO_START_OVERRIDE(interact_state,hec2hrp)
 
-	MCFG_FRAGMENT_ADD(hector_audio)
+	hector_audio(config);
 
 	MCFG_CASSETTE_ADD("cassette")
 	MCFG_CASSETTE_FORMATS(hector_cassette_formats)

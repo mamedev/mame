@@ -138,6 +138,7 @@ public:
 
 	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	void murogem(machine_config &config);
+	void murogem_map(address_map &map);
 };
 
 
@@ -154,7 +155,7 @@ WRITE8_MEMBER(murogem_state::outport_w)
 }
 
 
-static ADDRESS_MAP_START( murogem_map, AS_PROGRAM, 8, murogem_state )
+ADDRESS_MAP_START(murogem_state::murogem_map)
 	AM_RANGE(0x0000, 0x007f) AM_RAM
 	AM_RANGE(0x4000, 0x4000) AM_DEVWRITE("crtc", mc6845_device, address_w)
 	AM_RANGE(0x4001, 0x4001) AM_DEVWRITE("crtc", mc6845_device, register_w)

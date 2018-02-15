@@ -251,6 +251,9 @@ public:
 	DECLARE_PALETTE_INIT(itt3030);
 
 	void itt3030(machine_config &config);
+	void itt3030_io(address_map &map);
+	void itt3030_map(address_map &map);
+	void lower48_map(address_map &map);
 protected:
 	// driver_device overrides
 	virtual void machine_start() override;
@@ -287,18 +290,18 @@ private:
 // The upper 16K is always the top 16K of the first bank, F5 can set this to 32K
 // Port F6 bits 7-5 select banks 0-7, bit 4 enables bank 8
 
-static ADDRESS_MAP_START( itt3030_map, AS_PROGRAM, 8, itt3030_state )
+ADDRESS_MAP_START(itt3030_state::itt3030_map)
 	AM_RANGE(0x0000, 0xbfff) AM_DEVICE("lowerbank", address_map_bank_device, amap8)
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( lower48_map, AS_PROGRAM, 8, itt3030_state )
+ADDRESS_MAP_START(itt3030_state::lower48_map)
 	AM_RANGE(0x60000, 0x607ff) AM_ROM AM_REGION("maincpu", 0)   // begin "page 8"
 	AM_RANGE(0x60800, 0x60fff) AM_ROM AM_REGION("maincpu", 0)
 	AM_RANGE(0x61000, 0x610ff) AM_RAM AM_MIRROR(0x100)  // only 256 bytes, but ROM also clears 11xx?
 	AM_RANGE(0x63000, 0x63fff) AM_RAM AM_SHARE("vram")
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( itt3030_io, AS_IO, 8, itt3030_state )
+ADDRESS_MAP_START(itt3030_state::itt3030_io)
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	AM_RANGE(0x20, 0x2f) AM_DEVREADWRITE("crt5027", crt5027_device, read, write)
 	AM_RANGE(0x30, 0x31) AM_DEVREADWRITE("kbdmcu", i8741_device, upi41_master_r, upi41_master_w)

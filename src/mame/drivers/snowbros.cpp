@@ -191,7 +191,7 @@ READ16_MEMBER(snowbros_state::toto_read)
 
 /* Snow Bros Memory Map */
 
-static ADDRESS_MAP_START( snowbros_map, AS_PROGRAM, 16, snowbros_state )
+ADDRESS_MAP_START(snowbros_state::snowbros_map)
 	AM_RANGE(0x000000, 0x03ffff) AM_ROM
 	AM_RANGE(0x100000, 0x103fff) AM_RAM
 	AM_RANGE(0x200000, 0x200001) AM_DEVWRITE("watchdog", watchdog_timer_device, reset16_w)
@@ -208,12 +208,12 @@ static ADDRESS_MAP_START( snowbros_map, AS_PROGRAM, 16, snowbros_state )
 	AM_RANGE(0xa00000, 0xa00001) AM_WRITE(snowbros_irq2_ack_w)  /* IRQ 2 acknowledge */
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( sound_map, AS_PROGRAM, 8, snowbros_state )
+ADDRESS_MAP_START(snowbros_state::sound_map)
 	AM_RANGE(0x0000, 0x7fff) AM_ROM
 	AM_RANGE(0x8000, 0x87ff) AM_RAM
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( sound_io_map, AS_IO, 8, snowbros_state )
+ADDRESS_MAP_START(snowbros_state::sound_io_map)
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	AM_RANGE(0x02, 0x03) AM_DEVREADWRITE("ymsnd", ym3812_device, read, write)
 	AM_RANGE(0x04, 0x04) AM_DEVREAD("soundlatch", generic_latch_8_device, read)
@@ -265,17 +265,17 @@ WRITE8_MEMBER(snowbros_state::prot_io_w)
 }
 
 /* Semicom AT89C52 MCU */
-static ADDRESS_MAP_START( protection_map, AS_PROGRAM, 8, snowbros_state )
+ADDRESS_MAP_START(snowbros_state::protection_map)
 	AM_RANGE(0x0000, 0x1fff) AM_ROM
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( protection_iomap, AS_IO, 8, snowbros_state )
+ADDRESS_MAP_START(snowbros_state::protection_iomap)
 	AM_RANGE(MCS51_PORT_P0, MCS51_PORT_P3) AM_READWRITE(prot_io_r,prot_io_w)
 ADDRESS_MAP_END
 
 /* Winter Bobble - bootleg GFX chip */
 
-static ADDRESS_MAP_START( wintbob_map, AS_PROGRAM, 16, snowbros_state )
+ADDRESS_MAP_START(snowbros_state::wintbob_map)
 	AM_RANGE(0x000000, 0x03ffff) AM_ROM
 	AM_RANGE(0x100000, 0x103fff) AM_RAM
 	AM_RANGE(0x200000, 0x200001) AM_DEVWRITE("watchdog", watchdog_timer_device, reset16_w)
@@ -294,7 +294,7 @@ ADDRESS_MAP_END
 
 /* Honey Dolls */
 
-static ADDRESS_MAP_START( honeydol_map, AS_PROGRAM, 16, snowbros_state )
+ADDRESS_MAP_START(snowbros_state::honeydol_map)
 	AM_RANGE(0x000000, 0x03ffff) AM_ROM
 	AM_RANGE(0x100000, 0x10ffff) AM_RAM AM_SHARE("hyperpac_ram")
 	AM_RANGE(0x200000, 0x200001) AM_WRITENOP    /* ? */
@@ -310,13 +310,13 @@ static ADDRESS_MAP_START( honeydol_map, AS_PROGRAM, 16, snowbros_state )
 	AM_RANGE(0xb00000, 0xb01fff) AM_RAM AM_SHARE("spriteram16b")
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( honeydol_sound_map, AS_PROGRAM, 8, snowbros_state )
+ADDRESS_MAP_START(snowbros_state::honeydol_sound_map)
 	AM_RANGE(0x0000, 0x7fff) AM_ROM
 	AM_RANGE(0x8000, 0x87ff) AM_RAM
 	AM_RANGE(0xe010, 0xe010) AM_DEVREADWRITE("oki", okim6295_device, read, write)
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( honeydol_sound_io_map, AS_IO, 8, snowbros_state )
+ADDRESS_MAP_START(snowbros_state::honeydol_sound_io_map)
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	AM_RANGE(0x02, 0x03) AM_DEVREADWRITE("ymsnd", ym3812_device, read, write)                                // not connected?
 	AM_RANGE(0x04, 0x04) AM_DEVREAD("soundlatch", generic_latch_8_device, read)
@@ -325,7 +325,7 @@ ADDRESS_MAP_END
 
 /* Twin Adventure */
 
-static ADDRESS_MAP_START( twinadv_map, AS_PROGRAM, 16, snowbros_state )
+ADDRESS_MAP_START(snowbros_state::twinadv_map)
 	AM_RANGE(0x000000, 0x03ffff) AM_ROM
 	AM_RANGE(0x100000, 0x10ffff) AM_RAM
 	AM_RANGE(0x200000, 0x200001) AM_DEVWRITE("watchdog", watchdog_timer_device, reset16_w)
@@ -352,7 +352,7 @@ WRITE8_MEMBER(snowbros_state::twinadv_oki_bank_w)
 	m_oki->set_rom_bank(bank);
 }
 
-static ADDRESS_MAP_START( twinadv_sound_io_map, AS_IO, 8, snowbros_state )
+ADDRESS_MAP_START(snowbros_state::twinadv_sound_io_map)
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	AM_RANGE(0x02, 0x02) AM_DEVREAD("soundlatch", generic_latch_8_device, read)
 	AM_RANGE(0x02, 0x02) AM_DEVWRITE("soundlatch2", generic_latch_8_device, write) // back to 68k?
@@ -368,7 +368,7 @@ sound hardware is also different
 
 */
 
-static ADDRESS_MAP_START( hyperpac_map, AS_PROGRAM, 16, snowbros_state )
+ADDRESS_MAP_START(snowbros_state::hyperpac_map)
 	AM_RANGE(0x000000, 0x0fffff) AM_ROM
 	AM_RANGE(0x100000, 0x10ffff) AM_RAM AM_SHARE("hyperpac_ram")
 	AM_RANGE(0x300000, 0x300001) AM_DEVWRITE8("soundlatch", generic_latch_8_device, write, 0x00ff)
@@ -384,7 +384,7 @@ static ADDRESS_MAP_START( hyperpac_map, AS_PROGRAM, 16, snowbros_state )
 	AM_RANGE(0xa00000, 0xa00001) AM_WRITE(snowbros_irq2_ack_w)  /* IRQ 2 acknowledge */
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( hyperpac_sound_map, AS_PROGRAM, 8, snowbros_state )
+ADDRESS_MAP_START(snowbros_state::hyperpac_sound_map)
 	AM_RANGE(0x0000, 0xcfff) AM_ROM
 	AM_RANGE(0xd000, 0xd7ff) AM_RAM
 	AM_RANGE(0xf000, 0xf001) AM_DEVREADWRITE("ymsnd", ym2151_device,read,write)
@@ -499,7 +499,7 @@ WRITE16_MEMBER(snowbros_state::sb3_sound_w)
 
 
 
-static ADDRESS_MAP_START( snowbros3_map, AS_PROGRAM, 16, snowbros_state )
+ADDRESS_MAP_START(snowbros_state::snowbros3_map)
 	AM_RANGE( 0x000000, 0x03ffff) AM_ROM
 	AM_RANGE( 0x100000, 0x103fff) AM_RAM
 	AM_RANGE( 0x200000, 0x200001) AM_DEVWRITE("watchdog", watchdog_timer_device, reset16_w)
@@ -518,7 +518,7 @@ ADDRESS_MAP_END
 
 /* Final Tetris */
 
-static ADDRESS_MAP_START( finalttr_map, AS_PROGRAM, 16, snowbros_state )
+ADDRESS_MAP_START(snowbros_state::finalttr_map)
 	AM_RANGE(0x000000, 0x0fffff) AM_ROM
 	AM_RANGE(0x100000, 0x103fff) AM_RAM AM_SHARE("hyperpac_ram")
 	AM_RANGE(0x300000, 0x300001) AM_DEVWRITE8("soundlatch", generic_latch_8_device, write, 0x00ff)
@@ -536,7 +536,7 @@ static ADDRESS_MAP_START( finalttr_map, AS_PROGRAM, 16, snowbros_state )
 ADDRESS_MAP_END
 
 
-static ADDRESS_MAP_START( yutnori_map, AS_PROGRAM, 16, snowbros_state )
+ADDRESS_MAP_START(snowbros_state::yutnori_map)
 	AM_RANGE(0x000000, 0x03ffff) AM_ROM
 
 	// 0x100000  clr.w on startup
@@ -1781,7 +1781,8 @@ MACHINE_CONFIG_START(snowbros_state::snowbros)
 MACHINE_CONFIG_END
 
 
-MACHINE_CONFIG_DERIVED(snowbros_state::wintbob, snowbros)
+MACHINE_CONFIG_START(snowbros_state::wintbob)
+	snowbros(config);
 
 	/* basic machine hardware */
 	MCFG_CPU_MODIFY("maincpu")
@@ -1798,7 +1799,8 @@ MACHINE_CONFIG_DERIVED(snowbros_state::wintbob, snowbros)
 MACHINE_CONFIG_END
 
 
-MACHINE_CONFIG_DERIVED(snowbros_state::semicom, snowbros)
+MACHINE_CONFIG_START(snowbros_state::semicom)
+	snowbros(config);
 
 	/* basic machine hardware */
 	MCFG_CPU_MODIFY("maincpu")
@@ -1828,7 +1830,8 @@ MACHINE_CONFIG_DERIVED(snowbros_state::semicom, snowbros)
 MACHINE_CONFIG_END
 
 
-MACHINE_CONFIG_DERIVED(snowbros_state::semicom_mcu, semicom)
+MACHINE_CONFIG_START(snowbros_state::semicom_mcu)
+	semicom(config);
 
 	/* basic machine hardware */
 
@@ -1838,7 +1841,8 @@ MACHINE_CONFIG_DERIVED(snowbros_state::semicom_mcu, semicom)
 MACHINE_CONFIG_END
 
 
-MACHINE_CONFIG_DERIVED(snowbros_state::semiprot, semicom)
+MACHINE_CONFIG_START(snowbros_state::semiprot)
+	semicom(config);
 	MCFG_MACHINE_RESET_OVERRIDE (snowbros_state, semiprot )
 MACHINE_CONFIG_END
 
@@ -1940,7 +1944,8 @@ Intel P8752 (mcu)
 
 */
 
-MACHINE_CONFIG_DERIVED(snowbros_state::finalttr, semicom)
+MACHINE_CONFIG_START(snowbros_state::finalttr)
+	semicom(config);
 
 	MCFG_CPU_MODIFY("maincpu")
 	MCFG_CPU_CLOCK(XTAL(12'000'000))
@@ -1961,7 +1966,8 @@ MACHINE_CONFIG_DERIVED(snowbros_state::finalttr, semicom)
 MACHINE_CONFIG_END
 
 
-MACHINE_CONFIG_DERIVED(snowbros_state::_4in1, semicom)
+MACHINE_CONFIG_START(snowbros_state::_4in1)
+	semicom(config);
 
 	/* basic machine hardware */
 	MCFG_GFXDECODE_MODIFY("gfxdecode", snowbros)

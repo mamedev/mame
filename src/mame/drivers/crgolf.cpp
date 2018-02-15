@@ -333,7 +333,7 @@ WRITE_LINE_MEMBER(crgolf_state::screenb_enable_w)
  *
  *************************************/
 
-static ADDRESS_MAP_START( main_map, AS_PROGRAM, 8, crgolf_state )
+ADDRESS_MAP_START(crgolf_state::main_map)
 	AM_RANGE(0x0000, 0x3fff) AM_ROM
 	AM_RANGE(0x4000, 0x5fff) AM_RAM
 	AM_RANGE(0x6000, 0x7fff) AM_ROMBANK("bank1")
@@ -343,7 +343,7 @@ static ADDRESS_MAP_START( main_map, AS_PROGRAM, 8, crgolf_state )
 	AM_RANGE(0xa000, 0xffff) AM_DEVICE("vrambank", address_map_bank_device, amap8)
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( vrambank_map, AS_PROGRAM, 8, crgolf_state )
+ADDRESS_MAP_START(crgolf_state::vrambank_map)
 	AM_RANGE(0x0000, 0x5fff) AM_RAM AM_SHARE("vrama")
 	AM_RANGE(0x8000, 0xdfff) AM_RAM AM_SHARE("vramb")
 ADDRESS_MAP_END
@@ -355,7 +355,7 @@ ADDRESS_MAP_END
  *
  *************************************/
 
-static ADDRESS_MAP_START( sound_map, AS_PROGRAM, 8, crgolf_state )
+ADDRESS_MAP_START(crgolf_state::sound_map)
 	AM_RANGE(0x0000, 0x7fff) AM_ROM
 	AM_RANGE(0x8000, 0x87ff) AM_RAM
 	AM_RANGE(0xc000, 0xc001) AM_DEVWRITE("aysnd", ay8910_device, address_data_w)
@@ -371,7 +371,7 @@ ADDRESS_MAP_END
 
 
 
-static ADDRESS_MAP_START( mastrglf_map, AS_PROGRAM, 8, crgolf_state )
+ADDRESS_MAP_START(crgolf_state::mastrglf_map)
 	AM_RANGE(0x0000, 0x3fff) AM_ROM
 	AM_RANGE(0x4000, 0x5fff) AM_ROMBANK("bank1")
 	AM_RANGE(0x6000, 0x8fff) AM_RAM // maybe RAM and ROM here?
@@ -381,7 +381,7 @@ static ADDRESS_MAP_START( mastrglf_map, AS_PROGRAM, 8, crgolf_state )
 ADDRESS_MAP_END
 
 
-static ADDRESS_MAP_START( mastrglf_io, AS_IO, 8, crgolf_state )
+ADDRESS_MAP_START(crgolf_state::mastrglf_io)
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	AM_RANGE(0x00, 0x07) AM_DEVWRITE("mainlatch", ls259_device, write_d0)
 //  AM_RANGE(0x20, 0x20) AM_WRITE(rom_bank_select_w)
@@ -391,7 +391,7 @@ ADDRESS_MAP_END
 
 
 
-static ADDRESS_MAP_START( mastrglf_submap, AS_PROGRAM, 8, crgolf_state )
+ADDRESS_MAP_START(crgolf_state::mastrglf_submap)
 	AM_RANGE(0x0000, 0x7fff) AM_ROM
 	AM_RANGE(0x8000, 0x87ff) AM_RAM
 ADDRESS_MAP_END
@@ -417,7 +417,7 @@ WRITE8_MEMBER(crgolf_state::unk_sub_0c_w)
 }
 
 
-static ADDRESS_MAP_START( mastrglf_subio, AS_IO, 8, crgolf_state )
+ADDRESS_MAP_START(crgolf_state::mastrglf_subio)
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	AM_RANGE(0x00, 0x00) AM_READ(main_to_sound_r) AM_WRITENOP
 	AM_RANGE(0x02, 0x02) AM_READ(unk_sub_02_r )
@@ -559,7 +559,8 @@ MACHINE_CONFIG_START(crgolf_state::crgolf)
 MACHINE_CONFIG_END
 
 
-MACHINE_CONFIG_DERIVED(crgolf_state::crgolfhi, crgolf)
+MACHINE_CONFIG_START(crgolf_state::crgolfhi)
+	crgolf(config);
 
 	MCFG_SOUND_ADD("msm", MSM5205, 384000)
 	MCFG_MSM5205_VCLK_CB(WRITELINE(crgolf_state, vck_callback))
@@ -568,7 +569,8 @@ MACHINE_CONFIG_DERIVED(crgolf_state::crgolfhi, crgolf)
 MACHINE_CONFIG_END
 
 
-MACHINE_CONFIG_DERIVED(crgolf_state::mastrglf, crgolfhi)
+MACHINE_CONFIG_START(crgolf_state::mastrglf)
+	crgolfhi(config);
 
 	/* basic machine hardware */
 	MCFG_CPU_MODIFY("maincpu")

@@ -93,4 +93,10 @@ public:
 	void spnchout(machine_config &config);
 	void armwrest(machine_config &config);
 	void punchout(machine_config &config);
+	void armwrest_map(address_map &map);
+	void punchout_io_map(address_map &map);
+	void punchout_map(address_map &map);
+	void punchout_sound_map(address_map &map);
+	void punchout_vlm_map(address_map &map);
+	void spnchout_io_map(address_map &map);
 };

@@ -60,4 +60,10 @@ public:
 	void crospang(machine_config &config);
 	void bestri(machine_config &config);
 	void bestria(machine_config &config);
+	void bestri_map(address_map &map);
+	void bestria_map(address_map &map);
+	void crospang_base_map(address_map &map);
+	void crospang_map(address_map &map);
+	void crospang_sound_io_map(address_map &map);
+	void crospang_sound_map(address_map &map);
 };

@@ -87,6 +87,8 @@ public:
 	u32 screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 
 	void uts20(machine_config &config);
+	void io_map(address_map &map);
+	void mem_map(address_map &map);
 protected:
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
@@ -186,14 +188,14 @@ WRITE8_MEMBER( univac_state::porte6_w )
 }
 
 
-static ADDRESS_MAP_START( mem_map, AS_PROGRAM, 8, univac_state )
+ADDRESS_MAP_START(univac_state::mem_map)
 	ADDRESS_MAP_UNMAP_HIGH
 	AM_RANGE( 0x0000, 0x4fff ) AM_ROM AM_REGION("roms", 0)
 	AM_RANGE( 0x8000, 0xbfff ) AM_READWRITE(bank_r, bank_w)
 	AM_RANGE( 0xc000, 0xffff ) AM_RAM_WRITE(ram_w) AM_SHARE("videoram")
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( io_map, AS_IO, 8, univac_state )
+ADDRESS_MAP_START(univac_state::io_map)
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	ADDRESS_MAP_UNMAP_HIGH
 	AM_RANGE(0x00, 0x03) AM_DEVREADWRITE("uart", z80sio_device, cd_ba_r, cd_ba_w)

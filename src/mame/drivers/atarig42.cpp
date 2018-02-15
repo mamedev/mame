@@ -320,7 +320,7 @@ WRITE16_MEMBER(atarig42_state::guardians_sloop_data_w)
  *
  *************************************/
 
-static ADDRESS_MAP_START( main_map, AS_PROGRAM, 16, atarig42_state )
+ADDRESS_MAP_START(atarig42_state::main_map)
 	AM_RANGE(0x000000, 0x080001) AM_ROM
 	AM_RANGE(0xe00000, 0xe00001) AM_READ_PORT("IN0")
 	AM_RANGE(0xe00002, 0xe00003) AM_READ_PORT("IN1")
@@ -563,14 +563,16 @@ MACHINE_CONFIG_START(atarig42_state::atarig42)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 MACHINE_CONFIG_END
 
-MACHINE_CONFIG_DERIVED(atarig42_state::atarig42_0x200, atarig42)
+MACHINE_CONFIG_START(atarig42_state::atarig42_0x200)
+	atarig42(config);
 	MCFG_ATARIRLE_ADD("rle", modesc_0x200)
 
 	/* ASIC65 */
 	MCFG_ASIC65_ADD("asic65", ASIC65_ROMBASED)
 MACHINE_CONFIG_END
 
-MACHINE_CONFIG_DERIVED(atarig42_state::atarig42_0x400, atarig42)
+MACHINE_CONFIG_START(atarig42_state::atarig42_0x400)
+	atarig42(config);
 	MCFG_ATARIRLE_ADD("rle", modesc_0x400)
 
 	/* ASIC65 */

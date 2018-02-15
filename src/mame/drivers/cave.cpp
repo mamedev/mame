@@ -434,7 +434,7 @@ WRITE16_MEMBER(cave_state::metmqstr_eeprom_msb_w)
                                 Dangun Feveron
 ***************************************************************************/
 
-static ADDRESS_MAP_START( dfeveron_map, AS_PROGRAM, 16, cave_state )
+ADDRESS_MAP_START(cave_state::dfeveron_map)
 	AM_RANGE(0x000000, 0x0fffff) AM_ROM                                                                 // ROM
 	AM_RANGE(0x100000, 0x10ffff) AM_RAM                                                                 // RAM
 	AM_RANGE(0x300000, 0x300003) AM_DEVREADWRITE8("ymz", ymz280b_device, read, write, 0x00ff)                   // YMZ280
@@ -459,7 +459,7 @@ ADDRESS_MAP_END
                                 Dodonpachi
 ***************************************************************************/
 
-static ADDRESS_MAP_START( ddonpach_map, AS_PROGRAM, 16, cave_state )
+ADDRESS_MAP_START(cave_state::ddonpach_map)
 	AM_RANGE(0x000000, 0x0fffff) AM_ROM                                                                 // ROM
 	AM_RANGE(0x100000, 0x10ffff) AM_RAM                                                                 // RAM
 	AM_RANGE(0x300000, 0x300003) AM_DEVREADWRITE8("ymz", ymz280b_device, read, write, 0x00ff)           // YMZ280
@@ -497,7 +497,7 @@ READ16_MEMBER(cave_state::donpachi_videoregs_r)
 	}
 }
 
-static ADDRESS_MAP_START( donpachi_map, AS_PROGRAM, 16, cave_state )
+ADDRESS_MAP_START(cave_state::donpachi_map)
 	AM_RANGE(0x000000, 0x07ffff) AM_ROM                                                                     // ROM
 	AM_RANGE(0x100000, 0x10ffff) AM_RAM                                                                     // RAM
 	AM_RANGE(0x200000, 0x207fff) AM_RAM_WRITE(cave_vram_1_w) AM_SHARE("vram.1")             // Layer 1
@@ -523,7 +523,7 @@ ADDRESS_MAP_END
                                     Esprade
 ***************************************************************************/
 
-static ADDRESS_MAP_START( esprade_map, AS_PROGRAM, 16, cave_state )
+ADDRESS_MAP_START(cave_state::esprade_map)
 	AM_RANGE(0x000000, 0x0fffff) AM_ROM                                                                 // ROM
 	AM_RANGE(0x100000, 0x10ffff) AM_RAM                                                                 // RAM
 	AM_RANGE(0x300000, 0x300003) AM_DEVREADWRITE8("ymz", ymz280b_device, read, write, 0x00ff)           // YMZ280
@@ -548,7 +548,7 @@ ADDRESS_MAP_END
                                     Gaia Crusaders
 ***************************************************************************/
 
-static ADDRESS_MAP_START( gaia_map, AS_PROGRAM, 16, cave_state )
+ADDRESS_MAP_START(cave_state::gaia_map)
 	AM_RANGE(0x000000, 0x0fffff) AM_ROM                                                                 // ROM
 	AM_RANGE(0x100000, 0x10ffff) AM_RAM                                                                 // RAM
 	AM_RANGE(0x300000, 0x300003) AM_DEVREADWRITE8("ymz", ymz280b_device, read, write, 0x00ff)           // YMZ280
@@ -578,7 +578,7 @@ ADDRESS_MAP_END
                                     Guwange
 ***************************************************************************/
 
-static ADDRESS_MAP_START( guwange_map, AS_PROGRAM, 16, cave_state )
+ADDRESS_MAP_START(cave_state::guwange_map)
 	AM_RANGE(0x000000, 0x0fffff) AM_ROM                                                                 // ROM
 	AM_RANGE(0x200000, 0x20ffff) AM_RAM                                                                 // RAM
 	AM_RANGE(0x300000, 0x30007f) AM_WRITEONLY AM_SHARE("videoregs.0")                     // Video Regs
@@ -605,7 +605,7 @@ ADDRESS_MAP_END
                                 Hotdog Storm
 ***************************************************************************/
 
-static ADDRESS_MAP_START( hotdogst_map, AS_PROGRAM, 16, cave_state )
+ADDRESS_MAP_START(cave_state::hotdogst_map)
 	AM_RANGE(0x000000, 0x0fffff) AM_ROM                                                                 // ROM
 	AM_RANGE(0x300000, 0x30ffff) AM_RAM                                                                 // RAM
 /**/AM_RANGE(0x408000, 0x408fff) AM_RAM AM_SHARE("paletteram.0")  // Palette
@@ -693,7 +693,7 @@ CUSTOM_INPUT_MEMBER(cave_state::korokoro_hopper_r)
 }
 
 
-static ADDRESS_MAP_START( korokoro_map, AS_PROGRAM, 16, cave_state )
+ADDRESS_MAP_START(cave_state::korokoro_map)
 	AM_RANGE(0x000000, 0x07ffff) AM_ROM                                                                     // ROM
 	AM_RANGE(0x100000, 0x107fff) AM_WRITE(cave_vram_0_w) AM_SHARE("vram.0")                 // Layer 0
 	AM_RANGE(0x140000, 0x140005) AM_WRITEONLY AM_SHARE("vctrl.0")                           // Layer 0 Control
@@ -711,7 +711,7 @@ static ADDRESS_MAP_START( korokoro_map, AS_PROGRAM, 16, cave_state )
 	AM_RANGE(0x300000, 0x30ffff) AM_RAM                                                                     // RAM
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( crusherm_map, AS_PROGRAM, 16, cave_state )
+ADDRESS_MAP_START(cave_state::crusherm_map)
 	AM_RANGE(0x000000, 0x07ffff) AM_ROM                                                                     // ROM
 	AM_RANGE(0x100000, 0x107fff) AM_WRITE(cave_vram_0_w) AM_SHARE("vram.0")                 // Layer 0
 	AM_RANGE(0x140000, 0x140005) AM_WRITEONLY AM_SHARE("vctrl.0")                           // Layer 0 Control
@@ -732,7 +732,7 @@ ADDRESS_MAP_END
                                 Mazinger Z
 ***************************************************************************/
 
-static ADDRESS_MAP_START( mazinger_map, AS_PROGRAM, 16, cave_state )
+ADDRESS_MAP_START(cave_state::mazinger_map)
 	AM_RANGE(0x000000, 0x07ffff) AM_ROM                                                                 // ROM
 	AM_RANGE(0x100000, 0x10ffff) AM_RAM                                                                 // RAM
 /**/AM_RANGE(0x200000, 0x207fff) AM_RAM AM_SHARE("spriteram.0")       // Sprites
@@ -757,7 +757,7 @@ ADDRESS_MAP_END
                                 Metamoqester
 ***************************************************************************/
 
-static ADDRESS_MAP_START( metmqstr_map, AS_PROGRAM, 16, cave_state )
+ADDRESS_MAP_START(cave_state::metmqstr_map)
 	AM_RANGE(0x000000, 0x07ffff) AM_ROM                                                                 // ROM
 	AM_RANGE(0x100000, 0x17ffff) AM_ROM                                                                 // ROM
 	AM_RANGE(0x200000, 0x27ffff) AM_ROM                                                                 // ROM
@@ -866,7 +866,7 @@ WRITE16_MEMBER(cave_state::ppsatan_out_w)
 //  popmessage("OUT %04x", data);
 }
 
-static ADDRESS_MAP_START( ppsatan_map, AS_PROGRAM, 16, cave_state )
+ADDRESS_MAP_START(cave_state::ppsatan_map)
 	AM_RANGE(0x000000, 0x03ffff) AM_ROM                                                 // ROM
 	AM_RANGE(0x040000, 0x04ffff) AM_RAM                                                 // RAM
 
@@ -938,7 +938,7 @@ WRITE16_MEMBER(cave_state::pwrinst2_vctrl_1_w){ vctrl_w(space, offset, data, mem
 WRITE16_MEMBER(cave_state::pwrinst2_vctrl_2_w){ vctrl_w(space, offset, data, mem_mask, 2); }
 WRITE16_MEMBER(cave_state::pwrinst2_vctrl_3_w){ vctrl_w(space, offset, data, mem_mask, 3); }
 
-static ADDRESS_MAP_START( pwrinst2_map, AS_PROGRAM, 16, cave_state )
+ADDRESS_MAP_START(cave_state::pwrinst2_map)
 	AM_RANGE(0x000000, 0x1fffff) AM_ROM                                                                     // ROM
 	AM_RANGE(0x400000, 0x40ffff) AM_RAM                                                                     // RAM
 	AM_RANGE(0x500000, 0x500001) AM_READ_PORT("IN0")                                                        // Inputs
@@ -974,7 +974,7 @@ READ16_MEMBER(cave_state::sailormn_input0_r)
 	return ioport("IN0")->read();
 }
 
-static ADDRESS_MAP_START( sailormn_map, AS_PROGRAM, 16, cave_state )
+ADDRESS_MAP_START(cave_state::sailormn_map)
 	AM_RANGE(0x000000, 0x07ffff) AM_ROM                                                                 // ROM
 	AM_RANGE(0x100000, 0x10ffff) AM_RAM                                                                 // RAM
 	AM_RANGE(0x110000, 0x110001) AM_RAM                                                                 // (agallet)
@@ -1008,7 +1008,7 @@ ADDRESS_MAP_END
                             Tekken Card World
 ***************************************************************************/
 
-static ADDRESS_MAP_START( tekkencw_map, AS_PROGRAM, 16, cave_state )
+ADDRESS_MAP_START(cave_state::tekkencw_map)
 	AM_RANGE(0x000000, 0x07ffff) AM_ROM                                                         // ROM
 	AM_RANGE(0x100000, 0x10ffff) AM_RAM AM_SHARE("nvram")                                       // RAM (battery)
 	AM_RANGE(0x200000, 0x207fff) AM_RAM AM_SHARE("spriteram.0")                                 // Sprites
@@ -1031,7 +1031,7 @@ ADDRESS_MAP_END
                           Tekken Battle Scratch
 ***************************************************************************/
 
-static ADDRESS_MAP_START( tekkenbs_map, AS_PROGRAM, 16, cave_state )
+ADDRESS_MAP_START(cave_state::tekkenbs_map)
 	AM_RANGE(0x000000, 0x07ffff) AM_ROM                                                         // ROM
 	AM_RANGE(0x100000, 0x10ffff) AM_RAM AM_SHARE("nvram")                                       // RAM (battery)
 	AM_RANGE(0x200000, 0x207fff) AM_RAM AM_SHARE("spriteram.0")                                 // Sprites
@@ -1094,7 +1094,7 @@ CUSTOM_INPUT_MEMBER(cave_state::tjumpman_hopper_r)
 	return (m_hopper && !(m_screen->frame_number() % 10)) ? 0 : 1;
 }
 
-static ADDRESS_MAP_START( tjumpman_map, AS_PROGRAM, 16, cave_state )
+ADDRESS_MAP_START(cave_state::tjumpman_map)
 	AM_RANGE(0x000000, 0x07ffff) AM_ROM                                                                 // ROM
 	AM_RANGE(0x100000, 0x10ffff) AM_RAM AM_SHARE("nvram")                                               // RAM (battery)
 	AM_RANGE(0x200000, 0x207fff) AM_RAM AM_SHARE("spriteram.0")       // Sprites
@@ -1134,7 +1134,7 @@ WRITE16_MEMBER(cave_state::pacslot_leds_w)
 //  popmessage("led %04X", data);
 }
 
-static ADDRESS_MAP_START( pacslot_map, AS_PROGRAM, 16, cave_state )
+ADDRESS_MAP_START(cave_state::pacslot_map)
 	AM_RANGE(0x000000, 0x07ffff) AM_ROM                                                                 // ROM
 	AM_RANGE(0x100000, 0x10ffff) AM_RAM AM_SHARE("nvram")                                               // RAM (battery)
 	AM_RANGE(0x200000, 0x207fff) AM_RAM AM_SHARE("spriteram.0")       // Sprites
@@ -1159,7 +1159,7 @@ ADDRESS_MAP_END
 
 //TODO: leds need verifying
 
-static ADDRESS_MAP_START( paceight_map, AS_PROGRAM, 16, cave_state )
+ADDRESS_MAP_START(cave_state::paceight_map)
 	AM_RANGE(0x000000, 0x07ffff) AM_ROM                                                                 // ROM
 	AM_RANGE(0x100000, 0x10ffff) AM_RAM AM_SHARE("nvram")                                               // RAM (battery)
 	AM_RANGE(0x200000, 0x207fff) AM_RAM AM_SHARE("spriteram.0")       // Sprites
@@ -1181,7 +1181,7 @@ ADDRESS_MAP_END
                                     Uo Poko
 ***************************************************************************/
 
-static ADDRESS_MAP_START( uopoko_map, AS_PROGRAM, 16, cave_state )
+ADDRESS_MAP_START(cave_state::uopoko_map)
 	AM_RANGE(0x000000, 0x0fffff) AM_ROM                                                                 // ROM
 	AM_RANGE(0x100000, 0x10ffff) AM_RAM                                                                 // RAM
 	AM_RANGE(0x300000, 0x300003) AM_DEVREADWRITE8("ymz", ymz280b_device, read, write, 0x00ff)                   // YMZ280
@@ -1208,12 +1208,12 @@ ADDRESS_MAP_END
 ***************************************************************************/
 
 
-static ADDRESS_MAP_START( oki_map, 0, 8, cave_state )
+ADDRESS_MAP_START(cave_state::oki_map)
 	AM_RANGE(0x00000, 0x1ffff) AM_ROMBANK("okibank1")
 	AM_RANGE(0x20000, 0x3ffff) AM_ROMBANK("okibank2")
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( oki2_map, 0, 8, cave_state )
+ADDRESS_MAP_START(cave_state::oki2_map)
 	AM_RANGE(0x00000, 0x1ffff) AM_ROMBANK("oki2bank1")
 	AM_RANGE(0x20000, 0x3ffff) AM_ROMBANK("oki2bank2")
 ADDRESS_MAP_END
@@ -1239,13 +1239,13 @@ WRITE8_MEMBER(cave_state::hotdogst_okibank_w)
 	membank("okibank2")->set_entry(bank2);
 }
 
-static ADDRESS_MAP_START( hotdogst_sound_map, AS_PROGRAM, 8, cave_state )
+ADDRESS_MAP_START(cave_state::hotdogst_sound_map)
 	AM_RANGE(0x0000, 0x3fff) AM_ROM                 // ROM
 	AM_RANGE(0x4000, 0x7fff) AM_ROMBANK("z80bank")  // ROM (Banked)
 	AM_RANGE(0xe000, 0xffff) AM_RAM                 // RAM
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( hotdogst_sound_portmap, AS_IO, 8, cave_state )
+ADDRESS_MAP_START(cave_state::hotdogst_sound_portmap)
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	AM_RANGE(0x00, 0x00) AM_WRITE(hotdogst_rombank_w)                   // ROM bank
 	AM_RANGE(0x30, 0x30) AM_READ(soundlatch_lo_r)                       // From Main CPU
@@ -1268,14 +1268,14 @@ WRITE8_MEMBER(cave_state::mazinger_rombank_w)
 	membank("z80bank")->set_entry(data & 0x07);
 }
 
-static ADDRESS_MAP_START( mazinger_sound_map, AS_PROGRAM, 8, cave_state )
+ADDRESS_MAP_START(cave_state::mazinger_sound_map)
 	AM_RANGE(0x0000, 0x3fff) AM_ROM                 // ROM
 	AM_RANGE(0x4000, 0x7fff) AM_ROMBANK("z80bank")  // ROM (Banked)
 	AM_RANGE(0xc000, 0xc7ff) AM_RAM                 // RAM
 	AM_RANGE(0xf800, 0xffff) AM_RAM                 // RAM
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( mazinger_sound_portmap, AS_IO, 8, cave_state )
+ADDRESS_MAP_START(cave_state::mazinger_sound_portmap)
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	AM_RANGE(0x00, 0x00) AM_WRITE(mazinger_rombank_w)   // ROM bank
 	AM_RANGE(0x10, 0x10) AM_WRITE(soundlatch_ack_w)     // To Main CPU
@@ -1315,13 +1315,13 @@ WRITE8_MEMBER(cave_state::metmqstr_oki2bank_w)
 	membank("oki2bank2")->set_entry(bank2);
 }
 
-static ADDRESS_MAP_START( metmqstr_sound_map, AS_PROGRAM, 8, cave_state )
+ADDRESS_MAP_START(cave_state::metmqstr_sound_map)
 	AM_RANGE(0x0000, 0x3fff) AM_ROM                 // ROM
 	AM_RANGE(0x4000, 0x7fff) AM_ROMBANK("z80bank")  // ROM (Banked)
 	AM_RANGE(0xe000, 0xffff) AM_RAM                 // RAM
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( metmqstr_sound_portmap, AS_IO, 8, cave_state )
+ADDRESS_MAP_START(cave_state::metmqstr_sound_portmap)
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	AM_RANGE(0x00, 0x00) AM_WRITE(metmqstr_rombank_w)                   // Rom Bank
 	AM_RANGE(0x20, 0x20) AM_READ(soundflags_r)                          // Communication
@@ -1347,13 +1347,13 @@ WRITE8_MEMBER(cave_state::pwrinst2_rombank_w)
 	membank("z80bank")->set_entry(data & 0x07);
 }
 
-static ADDRESS_MAP_START( pwrinst2_sound_map, AS_PROGRAM, 8, cave_state )
+ADDRESS_MAP_START(cave_state::pwrinst2_sound_map)
 	AM_RANGE(0x0000, 0x7fff) AM_ROM                 // ROM
 	AM_RANGE(0x8000, 0xbfff) AM_ROMBANK("z80bank")  // ROM (Banked)
 	AM_RANGE(0xe000, 0xffff) AM_RAM                 // RAM
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( pwrinst2_sound_portmap, AS_IO, 8, cave_state )
+ADDRESS_MAP_START(cave_state::pwrinst2_sound_portmap)
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	AM_RANGE(0x00, 0x00) AM_DEVREADWRITE("oki1", okim6295_device, read, write)  // M6295
 	AM_RANGE(0x08, 0x08) AM_DEVREADWRITE("oki2", okim6295_device, read, write)  //
@@ -1395,13 +1395,13 @@ WRITE8_MEMBER(cave_state::sailormn_oki2bank_w)
 	membank("oki2bank2")->set_entry(bank2);
 }
 
-static ADDRESS_MAP_START( sailormn_sound_map, AS_PROGRAM, 8, cave_state )
+ADDRESS_MAP_START(cave_state::sailormn_sound_map)
 	AM_RANGE(0x0000, 0x3fff) AM_ROM                                     // ROM
 	AM_RANGE(0x4000, 0x7fff) AM_ROMBANK("z80bank")                      // ROM (Banked)
 	AM_RANGE(0xc000, 0xdfff) AM_MIRROR(0x2000) AM_RAM                   // RAM (8KB, mirrored)
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( sailormn_sound_portmap, AS_IO, 8, cave_state )
+ADDRESS_MAP_START(cave_state::sailormn_sound_portmap)
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	AM_RANGE(0x00, 0x00) AM_WRITE(sailormn_rombank_w)                       // Rom Bank
 	AM_RANGE(0x10, 0x10) AM_WRITE(soundlatch_ack_w)                         // To Main CPU
@@ -2432,7 +2432,8 @@ MACHINE_CONFIG_START(cave_state::korokoro)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 MACHINE_CONFIG_END
 
-MACHINE_CONFIG_DERIVED(cave_state::crusherm, korokoro)
+MACHINE_CONFIG_START(cave_state::crusherm)
+	korokoro(config);
 	MCFG_CPU_MODIFY("maincpu")
 	MCFG_CPU_PROGRAM_MAP(crusherm_map)
 MACHINE_CONFIG_END
@@ -2602,7 +2603,8 @@ MACHINE_CONFIG_START(cave_state::pacslot)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", 1.0)
 MACHINE_CONFIG_END
 
-MACHINE_CONFIG_DERIVED(cave_state::paceight, pacslot)
+MACHINE_CONFIG_START(cave_state::paceight)
+	pacslot(config);
 	MCFG_CPU_MODIFY("maincpu")
 	MCFG_CPU_PROGRAM_MAP(paceight_map)
 MACHINE_CONFIG_END
@@ -2854,7 +2856,8 @@ MACHINE_CONFIG_START(cave_state::tekkencw)
 	// oki2 chip spot and rom socket are both unpopulated
 MACHINE_CONFIG_END
 
-MACHINE_CONFIG_DERIVED(cave_state::tekkenbs, tekkencw)
+MACHINE_CONFIG_START(cave_state::tekkenbs)
+	tekkencw(config);
 	MCFG_CPU_MODIFY("maincpu")
 	MCFG_CPU_PROGRAM_MAP(tekkenbs_map)
 MACHINE_CONFIG_END

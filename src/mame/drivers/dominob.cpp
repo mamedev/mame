@@ -97,6 +97,8 @@ public:
 	required_device<gfxdecode_device> m_gfxdecode;
 	required_device<palette_device> m_palette;
 	void dominob(machine_config &config);
+	void memmap(address_map &map);
+	void portmap(address_map &map);
 };
 
 void dominob_state::video_start()
@@ -177,7 +179,7 @@ WRITE8_MEMBER(dominob_state::dominob_d008_w)
 	/* is there a purpose on this ? always set to 0x00 (read from 0xc47b in RAM) */
 }
 
-static ADDRESS_MAP_START( memmap, AS_PROGRAM, 8, dominob_state )
+ADDRESS_MAP_START(dominob_state::memmap)
 	AM_RANGE(0x0000, 0xbfff) AM_ROM AM_WRITENOP // there are some garbage writes to ROM
 	AM_RANGE(0xc000, 0xc7ff) AM_RAM
 
@@ -203,7 +205,7 @@ READ8_MEMBER(dominob_state::dominob_unk_port02_r)
 	return 0xff;
 }
 
-static ADDRESS_MAP_START( portmap, AS_IO, 8, dominob_state )
+ADDRESS_MAP_START(dominob_state::portmap)
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	AM_RANGE(0x02, 0x02) AM_READ(dominob_unk_port02_r)
 ADDRESS_MAP_END

@@ -60,7 +60,7 @@ READ64_MEMBER( macpci_state::unk2_r )
 	return 0;
 }
 
-static ADDRESS_MAP_START(pippin_mem, AS_PROGRAM, 64, macpci_state)
+ADDRESS_MAP_START(macpci_state::pippin_mem)
 	AM_RANGE(0x00000000, 0x005fffff) AM_RAM
 
 	/* writes at 0x0*c01000 the string "Mr. Kesh" and wants it to be read back, true color VRAMs perhaps? */

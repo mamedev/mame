@@ -75,7 +75,7 @@ public:
 
 	TIMER_CALLBACK_MEMBER(scanline_callback);
 
-	DECLARE_ADDRESS_MAP(map, 8);
+	void map(address_map &map);
 
 	DECLARE_WRITE8_MEMBER(control_w);
 	DECLARE_READ8_MEMBER(scanline_r);

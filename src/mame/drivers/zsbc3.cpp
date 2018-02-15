@@ -52,18 +52,20 @@ public:
 	{ }
 
 	void zsbc3(machine_config &config);
+	void zsbc3_io(address_map &map);
+	void zsbc3_mem(address_map &map);
 private:
 	required_device<cpu_device> m_maincpu;
 };
 
 
-static ADDRESS_MAP_START(zsbc3_mem, AS_PROGRAM, 8, zsbc3_state)
+ADDRESS_MAP_START(zsbc3_state::zsbc3_mem)
 	ADDRESS_MAP_UNMAP_HIGH
 	AM_RANGE( 0x0000, 0x07ff ) AM_ROM
 	AM_RANGE( 0x0800, 0xffff ) AM_RAM
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START(zsbc3_io, AS_IO, 8, zsbc3_state)
+ADDRESS_MAP_START(zsbc3_state::zsbc3_io)
 	ADDRESS_MAP_UNMAP_HIGH
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	AM_RANGE(0x08, 0x0b) //AM_DEVREADWRITE("pio", z80pio_device, read, write) // the control bytes appear to be for a PIO

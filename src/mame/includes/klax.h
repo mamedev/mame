@@ -37,6 +37,9 @@ public:
 
 	void klax(machine_config &config);
 	void klax2bl(machine_config &config);
+	void bootleg_sound_map(address_map &map);
+	void klax2bl_map(address_map &map);
+	void klax_map(address_map &map);
 private:
 	required_device<tilemap_device> m_playfield_tilemap;
 	required_device<atari_motion_objects_device> m_mob;

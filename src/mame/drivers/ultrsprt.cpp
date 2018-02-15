@@ -53,6 +53,8 @@ public:
 	uint32_t screen_update_ultrsprt(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 
 	void ultrsprt(machine_config &config);
+	void sound_map(address_map &map);
+	void ultrsprt_map(address_map &map);
 protected:
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
@@ -146,7 +148,7 @@ READ16_MEMBER(ultrsprt_state::upd2_r)
 
 /*****************************************************************************/
 
-static ADDRESS_MAP_START( ultrsprt_map, AS_PROGRAM, 32, ultrsprt_state )
+ADDRESS_MAP_START(ultrsprt_state::ultrsprt_map)
 	AM_RANGE(0x00000000, 0x0007ffff) AM_RAMBANK("vram")
 	AM_RANGE(0x70000000, 0x70000003) AM_READWRITE8(eeprom_r, eeprom_w, 0xff000000)
 	AM_RANGE(0x70000020, 0x70000023) AM_READ16(upd1_r, 0xffffffff)
@@ -162,7 +164,7 @@ ADDRESS_MAP_END
 
 /*****************************************************************************/
 
-static ADDRESS_MAP_START( sound_map, AS_PROGRAM, 16, ultrsprt_state )
+ADDRESS_MAP_START(ultrsprt_state::sound_map)
 	AM_RANGE(0x00000000, 0x0001ffff) AM_ROM
 	AM_RANGE(0x00100000, 0x00101fff) AM_RAM
 	AM_RANGE(0x00200000, 0x0020000f) AM_DEVREADWRITE8("k056800", k056800_device, sound_r, sound_w, 0xffff)

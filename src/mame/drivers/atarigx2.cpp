@@ -1196,7 +1196,7 @@ READ32_MEMBER( atarigx2_state::rrreveng_prot_r )
  *
  *************************************/
 
-static ADDRESS_MAP_START( main_map, AS_PROGRAM, 32, atarigx2_state )
+ADDRESS_MAP_START(atarigx2_state::main_map)
 	ADDRESS_MAP_UNMAP_HIGH
 	AM_RANGE(0x000000, 0x07ffff) AM_ROM
 	AM_RANGE(0xc80000, 0xc80fff) AM_RAM
@@ -1534,12 +1534,14 @@ MACHINE_CONFIG_START(atarigx2_state::atarigx2)
 MACHINE_CONFIG_END
 
 
-MACHINE_CONFIG_DERIVED(atarigx2_state::atarigx2_0x200, atarigx2)
+MACHINE_CONFIG_START(atarigx2_state::atarigx2_0x200)
+	atarigx2(config);
 	MCFG_DEVICE_ADD("xga", ATARI_136094_0072, 0)
 	MCFG_ATARIRLE_ADD("rle", modesc_0x200)
 MACHINE_CONFIG_END
 
-MACHINE_CONFIG_DERIVED(atarigx2_state::atarigx2_0x400, atarigx2)
+MACHINE_CONFIG_START(atarigx2_state::atarigx2_0x400)
+	atarigx2(config);
 	MCFG_DEVICE_ADD("xga", ATARI_136095_0072, 0)
 	MCFG_ATARIRLE_ADD("rle", modesc_0x400)
 MACHINE_CONFIG_END

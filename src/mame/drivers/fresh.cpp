@@ -102,6 +102,7 @@ public:
 	required_device<gfxdecode_device> m_gfxdecode;
 	required_device<palette_device> m_palette;
 	void fresh(machine_config &config);
+	void fresh_map(address_map &map);
 };
 
 
@@ -168,7 +169,7 @@ uint32_t fresh_state::screen_update_fresh(screen_device &screen, bitmap_ind16 &b
 }
 
 
-static ADDRESS_MAP_START( fresh_map, AS_PROGRAM, 16, fresh_state )
+ADDRESS_MAP_START(fresh_state::fresh_map)
 	AM_RANGE(0x000000, 0x03ffff) AM_ROM
 
 	AM_RANGE(0xc00000, 0xc0ffff) AM_RAM_WRITE(fresh_bg_2_videoram_w) AM_SHARE("bg_videoram_2")

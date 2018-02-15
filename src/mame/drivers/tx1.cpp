@@ -478,7 +478,7 @@ READ8_MEMBER(tx1_state::bbjr_analog_r)
  *
  *************************************/
 
-static ADDRESS_MAP_START( tx1_main, AS_PROGRAM, 16, tx1_state )
+ADDRESS_MAP_START(tx1_state::tx1_main)
 	AM_RANGE(0x00000, 0x00fff) AM_MIRROR(0x1000) AM_RAM
 	AM_RANGE(0x02000, 0x02fff) AM_MIRROR(0x1000) AM_RAM
 	AM_RANGE(0x04000, 0x04fff) AM_MIRROR(0x1000) AM_RAM AM_SHARE("nvram")
@@ -494,7 +494,7 @@ static ADDRESS_MAP_START( tx1_main, AS_PROGRAM, 16, tx1_state )
 	AM_RANGE(0x20000, 0x2ffff) AM_MIRROR(0xd0000) AM_ROM
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( tx1_math, AS_PROGRAM, 16, tx1_state )
+ADDRESS_MAP_START(tx1_state::tx1_math)
 	AM_RANGE(0x00000, 0x007ff) AM_RAM AM_SHARE("math_ram")
 	AM_RANGE(0x00800, 0x00fff) AM_READWRITE(tx1_spcs_ram_r, tx1_spcs_ram_w)
 	AM_RANGE(0x01000, 0x01fff) AM_RAM AM_SHARE("rcram")
@@ -507,7 +507,7 @@ static ADDRESS_MAP_START( tx1_math, AS_PROGRAM, 16, tx1_state )
 	AM_RANGE(0x05000, 0x07fff) AM_READ(tx1_spcs_rom_r)
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( tx1_sound_prg, AS_PROGRAM, 8, tx1_state )
+ADDRESS_MAP_START(tx1_state::tx1_sound_prg)
 	AM_RANGE(0x0000, 0x1fff) AM_ROM
 	AM_RANGE(0x3000, 0x37ff) AM_RAM AM_MIRROR(0x800) AM_SHARE("z80_ram")
 	AM_RANGE(0x4000, 0x4000) AM_WRITE(z80_intreq_w)
@@ -517,7 +517,7 @@ static ADDRESS_MAP_START( tx1_sound_prg, AS_PROGRAM, 8, tx1_state )
 	AM_RANGE(0xb000, 0xbfff) AM_READWRITE(ts_r, ts_w)
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( tx1_sound_io, AS_IO, 8, tx1_state )
+ADDRESS_MAP_START(tx1_state::tx1_sound_io)
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	AM_RANGE(0x40, 0x41) AM_DEVWRITE("aysnd", ay8910_device, data_address_w)
 ADDRESS_MAP_END
@@ -529,7 +529,7 @@ ADDRESS_MAP_END
  *
  *************************************/
 
-static ADDRESS_MAP_START( buggyboy_main, AS_PROGRAM, 16, tx1_state )
+ADDRESS_MAP_START(tx1_state::buggyboy_main)
 	AM_RANGE(0x00000, 0x03fff) AM_RAM AM_SHARE("nvram")
 	AM_RANGE(0x04000, 0x04fff) AM_READWRITE(tx1_crtc_r, tx1_crtc_w)
 	AM_RANGE(0x08000, 0x09fff) AM_RAM AM_SHARE("vram")
@@ -544,7 +544,7 @@ static ADDRESS_MAP_START( buggyboy_main, AS_PROGRAM, 16, tx1_state )
 	AM_RANGE(0xf0000, 0xfffff) AM_ROM
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( buggybjr_main, AS_PROGRAM, 16, tx1_state )
+ADDRESS_MAP_START(tx1_state::buggybjr_main)
 	AM_RANGE(0x00000, 0x03fff) AM_RAM AM_SHARE("nvram")
 	AM_RANGE(0x04000, 0x04fff) AM_READWRITE(tx1_crtc_r, tx1_crtc_w)
 	AM_RANGE(0x08000, 0x08fff) AM_RAM AM_SHARE("vram")
@@ -559,7 +559,7 @@ static ADDRESS_MAP_START( buggybjr_main, AS_PROGRAM, 16, tx1_state )
 	AM_RANGE(0xf0000, 0xfffff) AM_ROM
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( buggyboy_math, AS_PROGRAM, 16, tx1_state )
+ADDRESS_MAP_START(tx1_state::buggyboy_math)
 	AM_RANGE(0x00000, 0x007ff) AM_RAM AM_SHARE("math_ram")
 	AM_RANGE(0x00800, 0x00fff) AM_READWRITE(buggyboy_spcs_ram_r, buggyboy_spcs_ram_w)
 	AM_RANGE(0x01000, 0x01fff) AM_RAM AM_SHARE("rcram")
@@ -571,7 +571,7 @@ static ADDRESS_MAP_START( buggyboy_math, AS_PROGRAM, 16, tx1_state )
 ADDRESS_MAP_END
 
 /* Buggy Boy Sound PCB TC033A */
-static ADDRESS_MAP_START( buggyboy_sound_prg, AS_PROGRAM, 8, tx1_state )
+ADDRESS_MAP_START(tx1_state::buggyboy_sound_prg)
 	AM_RANGE(0x0000, 0x3fff) AM_ROM
 	AM_RANGE(0x4000, 0x47ff) AM_RAM AM_SHARE("z80_ram")
 	AM_RANGE(0x6000, 0x6001) AM_READ(bb_analog_r)
@@ -582,7 +582,7 @@ static ADDRESS_MAP_START( buggyboy_sound_prg, AS_PROGRAM, 8, tx1_state )
 ADDRESS_MAP_END
 
 /* Buggy Boy Jr Sound PCB TC043 */
-static ADDRESS_MAP_START( buggybjr_sound_prg, AS_PROGRAM, 8, tx1_state )
+ADDRESS_MAP_START(tx1_state::buggybjr_sound_prg)
 	AM_RANGE(0x0000, 0x3fff) AM_ROM
 	AM_RANGE(0x4000, 0x47ff) AM_RAM AM_SHARE("z80_ram")
 	AM_RANGE(0x5000, 0x5003) AM_DEVREADWRITE("buggyboy", buggyboy_sound_device, pit8253_r, pit8253_w)
@@ -592,7 +592,7 @@ static ADDRESS_MAP_START( buggybjr_sound_prg, AS_PROGRAM, 8, tx1_state )
 ADDRESS_MAP_END
 
 /* Common */
-static ADDRESS_MAP_START( buggyboy_sound_io, AS_IO, 8, tx1_state )
+ADDRESS_MAP_START(tx1_state::buggyboy_sound_io)
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	AM_RANGE(0x40, 0x40) AM_DEVREAD("ym1", ay8910_device, data_r)
 	AM_RANGE(0x40, 0x41) AM_DEVWRITE("ym1", ay8910_device, data_address_w)

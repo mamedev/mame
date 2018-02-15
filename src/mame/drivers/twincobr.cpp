@@ -393,7 +393,7 @@ Shark   Zame
 
 /***************************** 68000 Memory Map *****************************/
 
-static ADDRESS_MAP_START( main_program_map, AS_PROGRAM, 16, twincobr_state )
+ADDRESS_MAP_START(twincobr_state::main_program_map)
 	AM_RANGE(0x000000, 0x02ffff) AM_ROM
 	AM_RANGE(0x030000, 0x033fff) AM_RAM     /* 68K and DSP shared RAM */
 	AM_RANGE(0x040000, 0x040fff) AM_RAM AM_SHARE("spriteram16")
@@ -423,12 +423,12 @@ ADDRESS_MAP_END
 
 /***************************** Z80 Memory Map *******************************/
 
-static ADDRESS_MAP_START( sound_program_map, AS_PROGRAM, 8, twincobr_state )
+ADDRESS_MAP_START(twincobr_state::sound_program_map)
 	AM_RANGE(0x0000, 0x7fff) AM_ROM
 	AM_RANGE(0x8000, 0x87ff) AM_RAM AM_SHARE("sharedram")
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( sound_io_map, AS_IO, 8, twincobr_state )
+ADDRESS_MAP_START(twincobr_state::sound_io_map)
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	AM_RANGE(0x00, 0x01) AM_DEVREADWRITE("ymsnd", ym3812_device, read, write)
 	AM_RANGE(0x10, 0x10) AM_READ_PORT("SYSTEM")         /* Twin Cobra - Coin/Start */
@@ -440,13 +440,13 @@ ADDRESS_MAP_END
 
 /***************************** TMS32010 Memory Map **************************/
 
-static ADDRESS_MAP_START( DSP_program_map, AS_PROGRAM, 16, twincobr_state )
+ADDRESS_MAP_START(twincobr_state::DSP_program_map)
 	AM_RANGE(0x000, 0x7ff) AM_ROM
 ADDRESS_MAP_END
 
 	/* $000 - 08F  TMS32010 Internal Data RAM in Data Address Space */
 
-static ADDRESS_MAP_START( DSP_io_map, AS_IO, 16, twincobr_state )
+ADDRESS_MAP_START(twincobr_state::DSP_io_map)
 	AM_RANGE(0, 0) AM_WRITE(twincobr_dsp_addrsel_w)
 	AM_RANGE(1, 1) AM_READWRITE(twincobr_dsp_r, twincobr_dsp_w)
 	AM_RANGE(2, 2) AM_READWRITE(fsharkbt_dsp_r, fsharkbt_dsp_w)
@@ -456,7 +456,7 @@ ADDRESS_MAP_END
 
 /******************* Flying Shark Bootleg i8741 Memory Map *******************/
 
-static ADDRESS_MAP_START( fsharkbt_i8741_io_map, AS_IO, 8, twincobr_state )
+ADDRESS_MAP_START(twincobr_state::fsharkbt_i8741_io_map)
 	/* IO map unknown as program code isn't dumped */
 ADDRESS_MAP_END
 
@@ -721,7 +721,8 @@ MACHINE_CONFIG_START(twincobr_state::twincobr)
 MACHINE_CONFIG_END
 
 
-MACHINE_CONFIG_DERIVED(twincobr_state::fshark, twincobr)
+MACHINE_CONFIG_START(twincobr_state::fshark)
+	twincobr(config);
 	MCFG_DEVICE_MODIFY("mainlatch")
 	MCFG_ADDRESSABLE_LATCH_Q6_OUT_CB(NOOP)
 
@@ -733,7 +734,8 @@ MACHINE_CONFIG_DERIVED(twincobr_state::fshark, twincobr)
 MACHINE_CONFIG_END
 
 
-MACHINE_CONFIG_DERIVED(twincobr_state::fsharkbt, fshark)
+MACHINE_CONFIG_START(twincobr_state::fsharkbt)
+	fshark(config);
 
 	MCFG_CPU_ADD("mcu", I8741, XTAL(28'000'000)/16)
 	/* Program Map is internal to the CPU */

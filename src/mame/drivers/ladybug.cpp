@@ -70,7 +70,7 @@ TODO:
 #include "speaker.h"
 
 
-static ADDRESS_MAP_START( ladybug_map, AS_PROGRAM, 8, ladybug_state )
+ADDRESS_MAP_START(ladybug_state::ladybug_map)
 	AM_RANGE(0x0000, 0x5fff) AM_ROM
 	AM_RANGE(0x6000, 0x6fff) AM_RAM
 	AM_RANGE(0x7000, 0x73ff) AM_WRITEONLY AM_SHARE("spriteram")
@@ -87,7 +87,7 @@ static ADDRESS_MAP_START( ladybug_map, AS_PROGRAM, 8, ladybug_state )
 	AM_RANGE(0xe000, 0xe000) AM_READ_PORT("IN2")
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( decrypted_opcodes_map, AS_OPCODES, 8, ladybug_state )
+ADDRESS_MAP_START(ladybug_state::decrypted_opcodes_map)
 	AM_RANGE(0x0000, 0x5fff) AM_ROM AM_SHARE("decrypted_opcodes")
 ADDRESS_MAP_END
 
@@ -551,9 +551,10 @@ MACHINE_CONFIG_START(ladybug_state::ladybug)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 MACHINE_CONFIG_END
 
-MACHINE_CONFIG_DERIVED(ladybug_state::dorodon, ladybug)
+MACHINE_CONFIG_START(ladybug_state::dorodon)
+	ladybug(config);
 	MCFG_CPU_MODIFY("maincpu")
-	MCFG_CPU_DECRYPTED_OPCODES_MAP(decrypted_opcodes_map)
+	MCFG_CPU_OPCODES_MAP(decrypted_opcodes_map)
 MACHINE_CONFIG_END
 
 

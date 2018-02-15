@@ -88,6 +88,9 @@ public:
 	void shuriboy(machine_config &config);
 	void ddboy(machine_config &config);
 	void tsukande(machine_config &config);
+	void ddboy_main(address_map &map);
+	void medal_main(address_map &map);
+	void shuriboy_main(address_map &map);
 protected:
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
@@ -222,7 +225,7 @@ WRITE8_MEMBER(konmedal_state::bankswitch_w)
 	m_control = data & 0xf;
 }
 
-static ADDRESS_MAP_START( medal_main, AS_PROGRAM, 8, konmedal_state )
+ADDRESS_MAP_START(konmedal_state::medal_main)
 	AM_RANGE(0x0000, 0x7fff) AM_ROM AM_REGION("maincpu", 0)
 	AM_RANGE(0x8000, 0x9fff) AM_ROMBANK("bank1")
 	AM_RANGE(0xa000, 0xafff) AM_RAM // work RAM?
@@ -241,7 +244,7 @@ static ADDRESS_MAP_START( medal_main, AS_PROGRAM, 8, konmedal_state )
 	AM_RANGE(0xe000, 0xffff) AM_READWRITE(vram_r, vram_w)
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( ddboy_main, AS_PROGRAM, 8, konmedal_state )
+ADDRESS_MAP_START(konmedal_state::ddboy_main)
 	AM_RANGE(0x0000, 0x7fff) AM_ROM AM_REGION("maincpu", 0)
 	AM_RANGE(0x8000, 0x9fff) AM_ROMBANK("bank1")
 	AM_RANGE(0xa000, 0xbfff) AM_RAM // work RAM
@@ -263,7 +266,7 @@ static ADDRESS_MAP_START( ddboy_main, AS_PROGRAM, 8, konmedal_state )
 	AM_RANGE(0xe000, 0xffff) AM_READWRITE(vram_r, vram_w)
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( shuriboy_main, AS_PROGRAM, 8, konmedal_state )
+ADDRESS_MAP_START(konmedal_state::shuriboy_main)
 	AM_RANGE(0x0000, 0x7fff) AM_ROM AM_REGION("maincpu", 0)
 	AM_RANGE(0x8000, 0x87ff) AM_RAM
 	AM_RANGE(0x8800, 0x8800) AM_READ_PORT("IN2")

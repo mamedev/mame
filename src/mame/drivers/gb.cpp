@@ -403,7 +403,7 @@ WRITE8_MEMBER(megaduck_state::bank2_w)
 }
 
 
-static ADDRESS_MAP_START(gameboy_map, AS_PROGRAM, 8, gb_state)
+ADDRESS_MAP_START(gb_state::gameboy_map)
 	ADDRESS_MAP_UNMAP_HIGH
 	AM_RANGE(0x0000, 0x7fff) AM_READWRITE(gb_cart_r, gb_bank_w)
 	AM_RANGE(0x8000, 0x9fff) AM_DEVREADWRITE("ppu", dmg_ppu_device, vram_r, vram_w)          /* 8k VRAM */
@@ -420,7 +420,7 @@ static ADDRESS_MAP_START(gameboy_map, AS_PROGRAM, 8, gb_state)
 	AM_RANGE(0xffff, 0xffff) AM_READWRITE(gb_ie_r, gb_ie_w)                                  /* Interrupt enable register */
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START(sgb_map, AS_PROGRAM, 8, gb_state)
+ADDRESS_MAP_START(gb_state::sgb_map)
 	ADDRESS_MAP_UNMAP_HIGH
 	AM_RANGE(0x0000, 0x7fff) AM_READWRITE(gb_cart_r, gb_bank_w)
 	AM_RANGE(0x8000, 0x9fff) AM_DEVREADWRITE("ppu", sgb_ppu_device, vram_r, vram_w)          /* 8k VRAM */
@@ -437,7 +437,7 @@ static ADDRESS_MAP_START(sgb_map, AS_PROGRAM, 8, gb_state)
 	AM_RANGE(0xffff, 0xffff) AM_READWRITE(gb_ie_r, gb_ie_w)                                  /* Interrupt enable register */
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START(gbc_map, AS_PROGRAM, 8, gb_state)
+ADDRESS_MAP_START(gb_state::gbc_map)
 	ADDRESS_MAP_UNMAP_HIGH
 	AM_RANGE(0x0000, 0x7fff) AM_READWRITE(gbc_cart_r, gb_bank_w)
 	AM_RANGE(0x8000, 0x9fff) AM_DEVREADWRITE("ppu", cgb_ppu_device, vram_r, vram_w)          /* 8k banked VRAM */
@@ -455,7 +455,7 @@ static ADDRESS_MAP_START(gbc_map, AS_PROGRAM, 8, gb_state)
 	AM_RANGE(0xffff, 0xffff) AM_READWRITE(gb_ie_r, gb_ie_w)                                  /* Interrupt enable register */
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START(megaduck_map, AS_PROGRAM, 8, megaduck_state)
+ADDRESS_MAP_START(megaduck_state::megaduck_map)
 	ADDRESS_MAP_UNMAP_HIGH
 	AM_RANGE(0x0000, 0x7fff) AM_READWRITE(cart_r, bank1_w)
 	AM_RANGE(0x8000, 0x9fff) AM_DEVREADWRITE("ppu", dmg_ppu_device, vram_r, vram_w)          /* 8k VRAM */
@@ -685,7 +685,8 @@ MACHINE_CONFIG_START(gb_state::supergb)
 MACHINE_CONFIG_END
 
 
-MACHINE_CONFIG_DERIVED(gb_state::supergb2, gameboy)
+MACHINE_CONFIG_START(gb_state::supergb2)
+	gameboy(config);
 	/* basic machine hardware */
 	MCFG_CPU_MODIFY("maincpu")
 	MCFG_CPU_PROGRAM_MAP(sgb_map)
@@ -709,7 +710,8 @@ MACHINE_CONFIG_DERIVED(gb_state::supergb2, gameboy)
 MACHINE_CONFIG_END
 
 
-MACHINE_CONFIG_DERIVED(gb_state::gbpocket, gameboy)
+MACHINE_CONFIG_START(gb_state::gbpocket)
+	gameboy(config);
 
 	/* video hardware */
 	MCFG_PALETTE_MODIFY("palette")

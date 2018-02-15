@@ -89,6 +89,7 @@ public:
 
 	void oric(machine_config &config);
 	void prav8d(machine_config &config);
+	void oric_mem(address_map &map);
 protected:
 	required_device<cpu_device> m_maincpu;
 	required_device<palette_device> m_palette;
@@ -156,6 +157,7 @@ public:
 	virtual void machine_reset() override;
 
 	void telstrat(machine_config &config);
+	void telestrat_mem(address_map &map);
 protected:
 	enum {
 		P_IRQEN  = 0x01,
@@ -188,7 +190,7 @@ protected:
 };
 
 /* Ram is 64K, with 16K hidden by the rom.  The 300-3ff is also hidden by the i/o */
-static ADDRESS_MAP_START(oric_mem, AS_PROGRAM, 8, oric_state )
+ADDRESS_MAP_START(oric_state::oric_mem)
 	AM_RANGE( 0x0000, 0xffff) AM_RAM AM_SHARE("ram")
 	AM_RANGE( 0x0300, 0x030f) AM_DEVREADWRITE("via6522", via6522_device, read, write) AM_MIRROR(0xf0)
 	AM_RANGE( 0xc000, 0xdfff) AM_READ_BANK("bank_c000_r") AM_WRITE_BANK("bank_c000_w")
@@ -199,7 +201,7 @@ ADDRESS_MAP_END
 /*
 The telestrat has the memory regions split into 16k blocks.
 Memory region &c000-&ffff can be ram or rom. */
-static ADDRESS_MAP_START(telestrat_mem, AS_PROGRAM, 8, telestrat_state )
+ADDRESS_MAP_START(telestrat_state::telestrat_mem)
 	AM_RANGE( 0x0000, 0xffff) AM_RAM AM_SHARE("ram")
 	AM_RANGE( 0x0300, 0x030f) AM_DEVREADWRITE("via6522", via6522_device, read, write)
 	AM_RANGE( 0x0310, 0x0313) AM_DEVREADWRITE("fdc", fd1793_device, read, write)
@@ -818,7 +820,8 @@ MACHINE_CONFIG_START(oric_state::oric)
 	MCFG_ORICEXT_ADD( "ext", oricext_intf, nullptr, "maincpu", WRITELINE(oric_state, ext_irq_w))
 MACHINE_CONFIG_END
 
-MACHINE_CONFIG_DERIVED(oric_state::prav8d, oric)
+MACHINE_CONFIG_START(oric_state::prav8d)
+	oric(config);
 MACHINE_CONFIG_END
 
 FLOPPY_FORMATS_MEMBER( telestrat_state::floppy_formats )
@@ -829,7 +832,8 @@ static SLOT_INTERFACE_START( telestrat_floppies )
 	SLOT_INTERFACE( "3dsdd", FLOPPY_3_DSDD )
 SLOT_INTERFACE_END
 
-MACHINE_CONFIG_DERIVED(telestrat_state::telstrat, oric)
+MACHINE_CONFIG_START(telestrat_state::telstrat)
+	oric(config);
 	MCFG_CPU_MODIFY( "maincpu" )
 	MCFG_CPU_PROGRAM_MAP(telestrat_mem)
 

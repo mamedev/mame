@@ -1503,7 +1503,7 @@ _32X_MAP_WRITEHANDLERS(slave_401c,slave_401e) // _32x_sh2_slave_401c_slave_401e_
 // SH2 memory maps
 /**********************************************************************************************/
 
-ADDRESS_MAP_START( sh2_main_map, AS_PROGRAM, 32, sega_32x_device )
+ADDRESS_MAP_START(sega_32x_device::sh2_main_map)
 	AM_RANGE(0x00000000, 0x00003fff) AM_ROMBANK("masterbios")
 
 	AM_RANGE(0x00004000, 0x00004003) AM_READWRITE(_32x_sh2_master_4000_common_4002_r, _32x_sh2_master_4000_common_4002_w )
@@ -1532,7 +1532,7 @@ ADDRESS_MAP_START( sh2_main_map, AS_PROGRAM, 32, sega_32x_device )
 	AM_RANGE(0xc0000000, 0xc0000fff) AM_RAM
 ADDRESS_MAP_END
 
-ADDRESS_MAP_START( sh2_slave_map, AS_PROGRAM, 32, sega_32x_device )
+ADDRESS_MAP_START(sega_32x_device::sh2_slave_map)
 	AM_RANGE(0x00000000, 0x00003fff) AM_ROMBANK("slavebios")
 
 	AM_RANGE(0x00004000, 0x00004003) AM_READWRITE(_32x_sh2_slave_4000_common_4002_r, _32x_sh2_slave_4000_common_4002_w )

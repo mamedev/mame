@@ -368,6 +368,14 @@ public:
 	void mo5nr(machine_config &config);
 	void to770(machine_config &config);
 	void to8d(machine_config &config);
+	void mo5(address_map &map);
+	void mo5nr(address_map &map);
+	void mo6(address_map &map);
+	void to7(address_map &map);
+	void to770(address_map &map);
+	void to8(address_map &map);
+	void to9(address_map &map);
+	void to9p(address_map &map);
 protected:
 	required_device<cpu_device> m_maincpu;
 	required_device<cassette_image_device> m_cassette;

@@ -2,6 +2,13 @@
 // copyright-holders:David Haywood
 /*
 
+TODO:
+- hookup QUART devices, and fix "QUART COUNTER NOT RUNNING" error message;
+- interrupt system;
+- understand what's "netflex" device;
+- ms72c has extra checks?
+- CMOS never get properly initialized?
+
 Game King board types:
 
 
@@ -85,8 +92,11 @@ More chips (from eBay auction):
 
 #include "emu.h"
 #include "cpu/i960/i960.h"
+#include "machine/mc68681.h"
 #include "machine/nvram.h"
+#include "video/ramdac.h"
 #include "sound/ymz280b.h"
+#include "bus/rs232/rs232.h"
 #include "screen.h"
 #include "speaker.h"
 
@@ -96,10 +106,13 @@ class igt_gameking_state : public driver_device
 public:
 	igt_gameking_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag),
-		m_palette(*this, "palette")
+		m_maincpu(*this, "maincpu"),
+		m_palette(*this, "palette"),
+		m_screen(*this, "screen"),
+		m_vram(*this, "vram"),
+		m_quart1(*this, "quart1")
 	{ }
 
-	required_device<palette_device> m_palette;
 
 	virtual void video_start() override;
 	uint32_t screen_update_igt_gameking(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
@@ -112,74 +125,34 @@ public:
 		return machine().rand();  // don't quite understand this one
 	};
 
-	DECLARE_READ32_MEMBER(igt_gk_28030000_r)
-	{
-		return machine().rand();
-	};
-
 	DECLARE_READ32_MEMBER(uart_status_r);
 	DECLARE_WRITE32_MEMBER(uart_w);
-	DECLARE_WRITE32_MEMBER(clut_w);
-	DECLARE_WRITE32_MEMBER(clut_mask_w);
+	DECLARE_WRITE8_MEMBER(irq_enable_w);
+	DECLARE_WRITE8_MEMBER(irq_ack_w);
+	DECLARE_READ8_MEMBER(irq_vector_r);
+	DECLARE_WRITE8_MEMBER(unk_w);
+	DECLARE_READ8_MEMBER(frame_number_r);
+	INTERRUPT_GEN_MEMBER(vblank_irq);
+
+	DECLARE_READ8_MEMBER(timer_r);
+	DECLARE_READ16_MEMBER(version_r);
 
 	void igt_gameking(machine_config &config);
+	void igt_ms72c(machine_config &config);
+	void igt_gameking_map(address_map &map);
+	void igt_ms72c_map(address_map &map);
+	void ramdac_map(address_map &map);
 private:
-	int m_offset, m_r, m_g, m_b, m_state;
-	bool m_bToggle;
-	u8 m_clut_mask;
+	required_device<cpu_device> m_maincpu;
+	required_device<palette_device> m_palette;
+	required_device<screen_device> m_screen;
+	required_shared_ptr<uint32_t> m_vram;
+	required_device<sc28c94_device> m_quart1;
+
+	uint8_t m_irq_enable;
+	uint8_t m_irq_pend;
+	uint8_t m_timer_count;
 };
-
-static INPUT_PORTS_START( igt_gameking )
-INPUT_PORTS_END
-
-WRITE32_MEMBER(igt_gameking_state::clut_w)
-{
-	if (mem_mask == 0x000000ff)
-	{
-		m_offset = data & 0xff;
-		m_state = 0;
-	}
-	else if (mem_mask == 0x00ff0000)
-	{
-		switch (m_state)
-		{
-			case 0: m_r = (data>>16) & 0xff; m_state++; break;
-			case 1: m_g = (data>>16) & 0xff; m_state++; break;
-			case 2:
-				m_b = (data>>16) & 0xff;
-				//printf("CLUT: color %d = R %d G %d B %d\n", m_offset, m_r, m_g, m_b);
-				m_palette->set_pen_color(m_offset, m_r<<18 | m_g<<10 | m_b<<2);
-				m_state = 0;
-				break;
-		}
-	}
-}
-
-WRITE32_MEMBER(igt_gameking_state::clut_mask_w)
-{
-	m_clut_mask = data & 0xff;
-}
-
-READ32_MEMBER(igt_gameking_state::uart_status_r)
-{
-	return 0x00040000;
-}
-
-WRITE32_MEMBER(igt_gameking_state::uart_w)
-{
-	printf("%c", (data>>16) & 0x7f);
-}
-
-void igt_gameking_state::machine_start()
-{
-}
-
-void igt_gameking_state::machine_reset()
-{
-	m_bToggle = false;
-	m_offset = m_state = m_r = m_g = m_b = 0;
-	m_clut_mask = 0xff;
-}
 
 void igt_gameking_state::video_start()
 {
@@ -187,35 +160,397 @@ void igt_gameking_state::video_start()
 
 uint32_t igt_gameking_state::screen_update_igt_gameking(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
+	int x,y;
+
+	bitmap.fill(m_palette->black_pen(), cliprect);
+
+	for(y = 0; y < 480; y++)
+	{
+		for(x = 0; x < 640; x+=4)
+		{
+			for(int xi=0;xi<4;xi++)
+			{
+				uint32_t color;
+
+				color = (m_vram[(x+y*1024)/4] >> (xi*8)) & 0xff;
+
+				if(cliprect.contains(x+xi, y))
+					bitmap.pix16(y, x+xi) = m_palette->pen(color);
+
+			}
+		}
+	}
+
+
 	return 0;
 }
 
 
+READ32_MEMBER(igt_gameking_state::uart_status_r)
+{
+	return 0x00040004;
+}
 
-static ADDRESS_MAP_START( igt_gameking_mem, AS_PROGRAM, 32, igt_gameking_state )
-	AM_RANGE(0x00000000, 0x0007ffff) AM_ROM
+WRITE32_MEMBER(igt_gameking_state::uart_w)
+{
+	printf("%c", (data>>16) & 0x7f);
+}
+
+WRITE8_MEMBER(igt_gameking_state::irq_enable_w)
+{
+	m_irq_enable = data;
+}
+
+WRITE8_MEMBER(igt_gameking_state::irq_ack_w)
+{
+	//logerror("%02x\n",data);
+	m_maincpu->set_input_line(I960_IRQ0,CLEAR_LINE);
+	m_irq_pend = 0;
+}
+
+READ8_MEMBER(igt_gameking_state::irq_vector_r)
+{
+	return m_irq_pend;
+}
+
+READ8_MEMBER(igt_gameking_state::frame_number_r)
+{
+	// TODO: likely not right, checked in irq 0
+	return 0;//m_screen->frame_number() & 7;
+}
+
+WRITE8_MEMBER(igt_gameking_state::unk_w)
+{
+	// bit 7 toggled, unknown purpose
+}
+
+
+ADDRESS_MAP_START(igt_gameking_state::igt_gameking_map)
+	AM_RANGE(0x00000000, 0x0007ffff) AM_ROM AM_REGION("maincpu", 0)
 	AM_RANGE(0x08000000, 0x081fffff) AM_ROM AM_REGION("game", 0)
+	AM_RANGE(0x08200000, 0x083fffff) AM_ROM AM_REGION("plx", 0)
+
 
 	// it's unclear how much of this is saved and how much total RAM there is.
 	AM_RANGE(0x10000000, 0x1001ffff) AM_RAM AM_SHARE("nvram")
-	AM_RANGE(0x10020000, 0x100fffff) AM_RAM
+	AM_RANGE(0x10020000, 0x17ffffff) AM_RAM
 
-	AM_RANGE(0x18000000, 0x181fffff) AM_RAM // igtsc writes from 18000000 to 1817ffff, ms3 all the way to 181fffff.
+	AM_RANGE(0x18000000, 0x181fffff) AM_RAM AM_SHARE("vram") // igtsc writes from 18000000 to 1817ffff, ms3 all the way to 181fffff.
 
-	// 28010000-2801007f: first 28C94 QUART
-	AM_RANGE(0x28010008, 0x2801000b) AM_READ(igt_gk_28010008_r)
+	// 28000000: MEZ2 SEL, also connected to ymz chip select?
+	// 28010000: first 28C94 QUART (QRT1 SEL)
+	// 28020000: SENET SEL
+	// 28030000: WCHDOG SEL
+	// 28040000: second 28C94 QUART (QRT2 SEL)
+	// 28050000: SOUND SEL
+	// 28060000: COLOR SEL
+	// 28070000: OUT SEL
+//	AM_RANGE(0x28010000, 0x2801007f) AM_DEVREADWRITE8("quart1", sc28c94_device, read, write, 0x00ff00ff)
+	AM_RANGE(0x28010008, 0x2801000b) AM_READ(uart_status_r)
+	AM_RANGE(0x2801001c, 0x2801001f) AM_WRITENOP
 	AM_RANGE(0x28010030, 0x28010033) AM_READ(uart_status_r) // channel D
 	AM_RANGE(0x28010034, 0x28010037) AM_WRITE(uart_w)       // channel D
-	// 28020000-2802007f: second 28C94 QUART
-	AM_RANGE(0x28030000, 0x28030003) AM_READ(igt_gk_28030000_r)
-	AM_RANGE(0x28040000, 0x2804ffff) AM_RAM
+	AM_RANGE(0x28020000, 0x280205ff) AM_RAM // CMOS?
+//	AM_RANGE(0x28020000, 0x2802007f) AM_READ(igt_gk_28010008_r) AM_WRITENOP
+	AM_RANGE(0x28030000, 0x28030003) AM_READ_PORT("IN0")
+//	AM_RANGE(0x28040000, 0x2804007f) AM_DEVREADWRITE8("quart2", sc28c94_device, read, write, 0x00ff00ff)
+	AM_RANGE(0x28040008, 0x2804000b) AM_WRITE8(unk_w,0x00ff0000)
+	AM_RANGE(0x28040008, 0x2804000b) AM_READWRITE8(irq_vector_r,irq_enable_w,0x000000ff)
+	AM_RANGE(0x28040018, 0x2804001b) AM_READ_PORT("IN1") AM_WRITENOP
+	AM_RANGE(0x2804001c, 0x2804001f) AM_READ_PORT("IN4") AM_WRITENOP
+	AM_RANGE(0x28040028, 0x2804002b) AM_READNOP AM_WRITE8(irq_ack_w,0x00ff0000)
+	//	AM_RANGE(0x28040038, 0x2804003b) AM_READ8(timer_r,0x00ff0000)
+	AM_RANGE(0x28040038, 0x2804003b) AM_READ_PORT("IN2") AM_WRITENOP
+	AM_RANGE(0x2804003c, 0x2804003f) AM_READ_PORT("IN3") AM_WRITENOP
+	AM_RANGE(0x28040050, 0x28040053) AM_READ8(frame_number_r,0x000000ff)
+	AM_RANGE(0x28040054, 0x28040057) AM_WRITENOP
+//	AM_RANGE(0x28040054, 0x28040057) AM_WRITE8(irq_ack_w,0x000000ff)
+
 	AM_RANGE(0x28050000, 0x28050003) AM_DEVREADWRITE8("ymz", ymz280b_device, read, write, 0x00ff00ff)
-	AM_RANGE(0x28060000, 0x28060003) AM_WRITE(clut_w)
-	AM_RANGE(0x28060004, 0x28060007) AM_WRITE(clut_mask_w)
+	AM_RANGE(0x28060000, 0x28060003) AM_DEVWRITE8("ramdac",ramdac_device, index_w, 0x000000ff )
+	AM_RANGE(0x28060000, 0x28060003) AM_DEVWRITE8("ramdac",ramdac_device, pal_w, 0x00ff0000 )
+	AM_RANGE(0x28060004, 0x28060007) AM_DEVWRITE8("ramdac",ramdac_device, mask_w, 0x000000ff )
+
+	AM_RANGE(0x3b000000, 0x3b1fffff) AM_ROM AM_REGION("snd", 0)
 
 	AM_RANGE(0xa1000000, 0xa1011fff) AM_RAM // used by gkkey for restart IAC
-
 ADDRESS_MAP_END
+
+READ16_MEMBER(igt_gameking_state::version_r)
+{
+	// TODO: unknown value required, checked at "Cold powerup machine setup"
+	return 0xf777;
+}
+
+READ8_MEMBER(igt_gameking_state::timer_r)
+{
+	// TODO: ms72c 8011ab0 "init_io" check, gets printed as "New security latch value = %x"
+	return m_timer_count++;
+}
+
+ADDRESS_MAP_START(igt_gameking_state::igt_ms72c_map)
+	AM_IMPORT_FROM( igt_gameking_map )
+	AM_RANGE(0x18200000, 0x18200003) AM_READ16(version_r, 0x0000ffff)
+	AM_RANGE(0x28040038, 0x2804003b) AM_READ8(timer_r,0x00ff0000)
+ADDRESS_MAP_END
+
+static INPUT_PORTS_START( igt_gameking )
+	PORT_START("IN0")
+	PORT_DIPNAME( 0x01, 0x01, "IN0" )
+	PORT_DIPSETTING(    0x01, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x02, 0x02, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(    0x02, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x04, 0x04, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(    0x04, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x08, 0x08, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(    0x08, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x10, 0x10, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(    0x10, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x20, 0x20, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(    0x20, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x40, 0x40, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(    0x40, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x80, 0x80, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(    0x80, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x010000, 0x010000, "IN0-1" )
+	PORT_DIPSETTING(    0x010000, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x000000, DEF_STR( On ) )
+	PORT_DIPNAME( 0x020000, 0x020000, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(    0x020000, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x000000, DEF_STR( On ) )
+	PORT_DIPNAME( 0x040000, 0x040000, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(    0x040000, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x000000, DEF_STR( On ) )
+	PORT_DIPNAME( 0x080000, 0x080000, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(    0x080000, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x000000, DEF_STR( On ) )
+	PORT_DIPNAME( 0x100000, 0x100000, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(    0x100000, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x000000, DEF_STR( On ) )
+	PORT_DIPNAME( 0x200000, 0x200000, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(    0x200000, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x000000, DEF_STR( On ) )
+	PORT_DIPNAME( 0x400000, 0x400000, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(    0x400000, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x000000, DEF_STR( On ) )
+	PORT_DIPNAME( 0x800000, 0x800000, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(    0x800000, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x000000, DEF_STR( On ) )
+	PORT_BIT( 0xff00ff00, IP_ACTIVE_LOW, IPT_UNKNOWN )
+
+	PORT_START("IN1")
+	PORT_DIPNAME( 0x01, 0x01, "IN1" )
+	PORT_DIPSETTING(    0x01, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x02, 0x02, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(    0x02, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x04, 0x04, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(    0x04, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x08, 0x08, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(    0x08, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x10, 0x10, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(    0x10, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x20, 0x20, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(    0x20, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x40, 0x40, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(    0x40, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x80, 0x80, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(    0x80, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x010000, 0x010000, "IN1-1" )
+	PORT_DIPSETTING(    0x010000, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x000000, DEF_STR( On ) )
+	PORT_DIPNAME( 0x020000, 0x020000, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(    0x020000, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x000000, DEF_STR( On ) )
+	PORT_DIPNAME( 0x040000, 0x040000, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(    0x040000, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x000000, DEF_STR( On ) )
+	PORT_DIPNAME( 0x080000, 0x080000, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(    0x080000, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x000000, DEF_STR( On ) )
+	PORT_DIPNAME( 0x100000, 0x100000, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(    0x100000, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x000000, DEF_STR( On ) )
+	PORT_DIPNAME( 0x200000, 0x200000, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(    0x200000, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x000000, DEF_STR( On ) )
+	PORT_DIPNAME( 0x400000, 0x400000, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(    0x400000, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x000000, DEF_STR( On ) )
+	PORT_DIPNAME( 0x800000, 0x800000, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(    0x800000, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x000000, DEF_STR( On ) )
+	PORT_BIT( 0xff00ff00, IP_ACTIVE_LOW, IPT_UNKNOWN )
+
+	PORT_START("IN2")
+	PORT_DIPNAME( 0x01, 0x01, "IN2" )
+	PORT_DIPSETTING(    0x01, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x02, 0x02, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(    0x02, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x04, 0x04, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(    0x04, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x08, 0x08, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(    0x08, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x10, 0x10, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(    0x10, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x20, 0x20, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(    0x20, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x40, 0x40, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(    0x40, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x80, 0x80, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(    0x80, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x010000, 0x010000, "Door M" ) // Door M
+	PORT_DIPSETTING(    0x010000, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x000000, DEF_STR( On ) )
+	PORT_DIPNAME( 0x020000, 0x020000, "Door C" ) // Door C
+	PORT_DIPSETTING(    0x020000, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x000000, DEF_STR( On ) )
+	PORT_DIPNAME( 0x040000, 0x040000, "Door B" ) // Door B
+	PORT_DIPSETTING(    0x040000, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x000000, DEF_STR( On ) )
+	PORT_DIPNAME( 0x080000, 0x080000, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(    0x080000, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x000000, DEF_STR( On ) )
+	PORT_DIPNAME( 0x100000, 0x100000, "Attendant key" ) // key switch
+	PORT_DIPSETTING(    0x100000, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x000000, DEF_STR( On ) )
+	PORT_DIPNAME( 0x200000, 0x200000, "test switch" ) // test switch
+	PORT_DIPSETTING(    0x200000, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x000000, DEF_STR( On ) )
+	PORT_DIPNAME( 0x400000, 0x400000, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(    0x400000, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x000000, DEF_STR( On ) )
+	PORT_DIPNAME( 0x800000, 0x800000, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(    0x800000, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x000000, DEF_STR( On ) )
+	PORT_BIT( 0xff00ff00, IP_ACTIVE_LOW, IPT_UNKNOWN )
+
+	PORT_START("IN3")
+	PORT_DIPNAME( 0x01, 0x01, "IN3" )
+	PORT_DIPSETTING(    0x01, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x02, 0x02, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(    0x02, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x04, 0x04, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(    0x04, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x08, 0x08, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(    0x08, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x10, 0x10, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(    0x10, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x20, 0x20, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(    0x20, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x40, 0x40, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(    0x40, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x80, 0x80, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(    0x80, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x010000, 0x010000, "IN3-1" )
+	PORT_DIPSETTING(    0x010000, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x000000, DEF_STR( On ) )
+	PORT_DIPNAME( 0x020000, 0x020000, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(    0x020000, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x000000, DEF_STR( On ) )
+	PORT_DIPNAME( 0x040000, 0x040000, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(    0x040000, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x000000, DEF_STR( On ) )
+	PORT_DIPNAME( 0x080000, 0x080000, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(    0x080000, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x000000, DEF_STR( On ) )
+	PORT_DIPNAME( 0x100000, 0x100000, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(    0x100000, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x000000, DEF_STR( On ) )
+	PORT_DIPNAME( 0x200000, 0x200000, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(    0x200000, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x000000, DEF_STR( On ) )
+	PORT_DIPNAME( 0x400000, 0x400000, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(    0x400000, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x000000, DEF_STR( On ) )
+	PORT_DIPNAME( 0x800000, 0x800000, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(    0x800000, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x000000, DEF_STR( On ) )
+	PORT_BIT( 0xff00ff00, IP_ACTIVE_LOW, IPT_UNKNOWN )
+
+	PORT_START("IN4")
+	PORT_DIPNAME( 0x01, 0x01, "IN4" )
+	PORT_DIPSETTING(    0x01, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x02, 0x02, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(    0x02, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x04, 0x04, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(    0x04, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x08, 0x08, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(    0x08, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x10, 0x10, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(    0x10, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x20, 0x20, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(    0x20, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x40, 0x40, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(    0x40, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x80, 0x80, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(    0x80, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x010000, 0x010000, "IN4-1" )
+	PORT_DIPSETTING(    0x010000, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x000000, DEF_STR( On ) )
+	PORT_DIPNAME( 0x020000, 0x020000, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(    0x020000, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x000000, DEF_STR( On ) )
+	PORT_DIPNAME( 0x040000, 0x040000, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(    0x040000, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x000000, DEF_STR( On ) )
+	PORT_DIPNAME( 0x080000, 0x080000, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(    0x080000, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x000000, DEF_STR( On ) )
+	PORT_DIPNAME( 0x100000, 0x100000, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(    0x100000, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x000000, DEF_STR( On ) )
+	PORT_DIPNAME( 0x200000, 0x200000, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(    0x200000, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x000000, DEF_STR( On ) )
+	PORT_DIPNAME( 0x400000, 0x400000, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(    0x400000, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x000000, DEF_STR( On ) )
+	PORT_DIPNAME( 0x800000, 0x800000, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(    0x800000, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x000000, DEF_STR( On ) )
+	PORT_BIT( 0xff00ff00, IP_ACTIVE_LOW, IPT_UNKNOWN )
+
+INPUT_PORTS_END
 
 static const gfx_layout igt_gameking_layout =
 {
@@ -233,28 +568,70 @@ static GFXDECODE_START( igt_gameking )
 	GFXDECODE_ENTRY( "cg", 0, igt_gameking_layout,   0x0, 1  )
 GFXDECODE_END
 
+ADDRESS_MAP_START(igt_gameking_state::ramdac_map)
+	AM_RANGE(0x000, 0x3ff) AM_DEVREADWRITE("ramdac",ramdac_device,ramdac_pal_r,ramdac_rgb666_w)
+ADDRESS_MAP_END
 
+void igt_gameking_state::machine_start()
+{
+}
+
+void igt_gameking_state::machine_reset()
+{
+	m_timer_count = 0;
+	m_quart1->ip2_w(1); // needs to be high
+}
+
+INTERRUPT_GEN_MEMBER(igt_gameking_state::vblank_irq)
+{
+	if(m_irq_enable & 8)
+	{
+		m_maincpu->set_input_line(I960_IRQ0, ASSERT_LINE);
+		//machine().debug_break();
+		m_irq_pend = 8;
+	}
+}
+
+static DEVICE_INPUT_DEFAULTS_START( terminal )
+	DEVICE_INPUT_DEFAULTS( "RS232_TXBAUD", 0xff, RS232_BAUD_38400 )
+	DEVICE_INPUT_DEFAULTS( "RS232_RXBAUD", 0xff, RS232_BAUD_38400 )
+	DEVICE_INPUT_DEFAULTS( "RS232_STARTBITS", 0xff, RS232_STARTBITS_1 )
+	DEVICE_INPUT_DEFAULTS( "RS232_DATABITS", 0xff, RS232_DATABITS_8 )
+	DEVICE_INPUT_DEFAULTS( "RS232_PARITY", 0xff, RS232_PARITY_NONE )
+	DEVICE_INPUT_DEFAULTS( "RS232_STOPBITS", 0xff, RS232_STOPBITS_1 )
+DEVICE_INPUT_DEFAULTS_END
 
 MACHINE_CONFIG_START(igt_gameking_state::igt_gameking)
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", I960, XTAL(24'000'000))
-	MCFG_CPU_PROGRAM_MAP(igt_gameking_mem)
+	MCFG_CPU_PROGRAM_MAP(igt_gameking_map)
+	MCFG_CPU_VBLANK_INT_DRIVER("screen", igt_gameking_state,  vblank_irq)
 
+	MCFG_SC28C94_ADD("quart1", XTAL(24'000'000) / 6)
+	MCFG_SC28C94_D_TX_CALLBACK(DEVWRITELINE("diag", rs232_port_device, write_txd))
+
+	MCFG_SC28C94_ADD("quart2", XTAL(24'000'000) / 6)
+	MCFG_MC68681_IRQ_CALLBACK(INPUTLINE("maincpu", I960_IRQ0))
+
+	MCFG_RS232_PORT_ADD("diag", default_rs232_devices, nullptr)
+	MCFG_RS232_RXD_HANDLER(DEVWRITELINE("quart1", sc28c94_device, rx_d_w))
+	MCFG_DEVICE_CARD_DEVICE_INPUT_DEFAULTS("terminal", terminal)
 
 	MCFG_GFXDECODE_ADD("gfxdecode", "palette", igt_gameking)
 
 	MCFG_SCREEN_ADD("screen", RASTER)
 	MCFG_SCREEN_REFRESH_RATE(60)
 	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
-	MCFG_SCREEN_SIZE(64*8, 32*8)
-	MCFG_SCREEN_VISIBLE_AREA(8*8, 48*8-1, 2*8, 30*8-1)
+	MCFG_SCREEN_SIZE(1024, 512)
+	MCFG_SCREEN_VISIBLE_AREA(0, 640-1, 0, 480-1)
 	MCFG_SCREEN_UPDATE_DRIVER(igt_gameking_state, screen_update_igt_gameking)
 	MCFG_SCREEN_PALETTE("palette")
 	// Xilinx used as video chip XTAL(26'666'666) on board
 
-	MCFG_PALETTE_ADD("palette", 0x200)
-	MCFG_PALETTE_FORMAT(xRRRRRGGGGGBBBBB)
+	MCFG_PALETTE_ADD("palette", 0x100)
+
+	MCFG_RAMDAC_ADD("ramdac", ramdac_map, "palette")
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
@@ -263,6 +640,12 @@ MACHINE_CONFIG_START(igt_gameking_state::igt_gameking)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 
 	MCFG_NVRAM_ADD_1FILL("nvram")
+MACHINE_CONFIG_END
+
+MACHINE_CONFIG_START(igt_gameking_state::igt_ms72c)
+	igt_gameking(config);
+	MCFG_CPU_MODIFY("maincpu")
+	MCFG_CPU_PROGRAM_MAP(igt_ms72c_map)
 MACHINE_CONFIG_END
 
 ROM_START( ms3 )
@@ -450,7 +833,7 @@ ROM_START( igtsc )
 	ROM_LOAD16_BYTE( "G0001175 GME2 2 of 2 (2-80).bin", 0x000001, 0x100000, CRC(db76db22) SHA1(e389b11a05f0ef0dcee303ba91578f4cd56beba0) )
 
 	// all these SIMM files are bad dumps, they never contains the byte value 0x0d (uploaded in ASCII mode with carriage return stripped out?)
-	ROM_REGION( 0x0800000, "cg", 0 )
+	ROM_REGION( 0x1000000, "cg", ROMREGION_ERASE00 )
 	// uses a SIMM
 	ROM_LOAD( "C0000464 CGF.bin", 0x000000, 0x07ff9a3, BAD_DUMP CRC(52fcc9fd) SHA1(98089dcf550bc3670d29b7ee78e014154e672120) ) // should be 0x800000
 
@@ -482,7 +865,7 @@ ROM_START( gkkey )
 ROM_END
 
 GAME( 1994, ms3,      0,            igt_gameking, igt_gameking, igt_gameking_state,  0, ROT0, "IGT", "Multistar 3",                  MACHINE_NOT_WORKING | MACHINE_NO_SOUND )
-GAME( 1994, ms72c,    0,            igt_gameking, igt_gameking, igt_gameking_state,  0, ROT0, "IGT", "Multistar 7 2c",               MACHINE_NOT_WORKING | MACHINE_NO_SOUND )
+GAME( 1994, ms72c,    0,            igt_ms72c,    igt_gameking, igt_gameking_state,  0, ROT0, "IGT", "Multistar 7 2c",               MACHINE_NOT_WORKING | MACHINE_NO_SOUND )
 GAME( 2003, gkigt4,   0,            igt_gameking, igt_gameking, igt_gameking_state,  0, ROT0, "IGT", "Game King (v4.x)",             MACHINE_NOT_WORKING | MACHINE_NO_SOUND )
 GAME( 2003, gkigt4ms, gkigt4,       igt_gameking, igt_gameking, igt_gameking_state,  0, ROT0, "IGT", "Game King (v4.x, MS)",         MACHINE_NOT_WORKING | MACHINE_NO_SOUND )
 GAME( 2003, gkigt43,  gkigt4,       igt_gameking, igt_gameking, igt_gameking_state,  0, ROT0, "IGT", "Game King (v4.3)",             MACHINE_NOT_WORKING | MACHINE_NO_SOUND )

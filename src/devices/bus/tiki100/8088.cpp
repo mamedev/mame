@@ -49,14 +49,14 @@ const tiny_rom_entry *tiki100_8088_device::device_rom_region() const
 }
 
 
-static ADDRESS_MAP_START( i8088_mem, AS_PROGRAM, 8, tiki100_8088_device )
+ADDRESS_MAP_START(tiki100_8088_device::i8088_mem)
 	AM_RANGE(0x00000, 0xbffff) AM_RAM
 	AM_RANGE(0xc0000, 0xcffff) AM_DEVREADWRITE(":" TIKI100_BUS_TAG, tiki100_bus_device, exin_mrq_r, exin_mrq_w)
 	AM_RANGE(0xff000, 0xfffff) AM_ROM AM_REGION(I8088_TAG, 0)
 ADDRESS_MAP_END
 
 
-static ADDRESS_MAP_START( i8088_io, AS_IO, 8, tiki100_8088_device )
+ADDRESS_MAP_START(tiki100_8088_device::i8088_io)
 	AM_RANGE(0x7f, 0x7f) AM_READWRITE(read, write)
 ADDRESS_MAP_END
 

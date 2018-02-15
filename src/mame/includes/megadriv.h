@@ -136,6 +136,10 @@ public:
 	void md_pal(machine_config &config);
 	void md_bootleg(machine_config &config);
 	void dcat16_megadriv_base(machine_config &config);
+	void dcat16_megadriv_map(address_map &map);
+	void megadriv_map(address_map &map);
+	void megadriv_z80_io_map(address_map &map);
+	void megadriv_z80_map(address_map &map);
 };
 
 class md_cons_state : public md_base_state

@@ -619,7 +619,7 @@ WRITE16_MEMBER(taitof2_state::driveout_sound_command_w)
                      MEMORY STRUCTURES
 ***********************************************************/
 
-static ADDRESS_MAP_START( finalb_map, AS_PROGRAM, 16, taitof2_state )
+ADDRESS_MAP_START(taitof2_state::finalb_map)
 	AM_RANGE(0x000000, 0x03ffff) AM_ROM
 	AM_RANGE(0x100000, 0x10ffff) AM_RAM
 	AM_RANGE(0x200000, 0x200007) AM_DEVREADWRITE("tc0110pcr", tc0110pcr_device, word_r, word_w)    /* palette */
@@ -633,7 +633,7 @@ static ADDRESS_MAP_START( finalb_map, AS_PROGRAM, 16, taitof2_state )
 	AM_RANGE(0xb00002, 0xb00003) AM_WRITENOP   /* ?? */
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( dondokod_map, AS_PROGRAM, 16, taitof2_state )
+ADDRESS_MAP_START(taitof2_state::dondokod_map)
 	AM_RANGE(0x000000, 0x07ffff) AM_ROM
 	AM_RANGE(0x100000, 0x10ffff) AM_RAM
 	AM_RANGE(0x200000, 0x201fff) AM_RAM_DEVWRITE("palette", palette_device, write16) AM_SHARE("palette")
@@ -648,7 +648,7 @@ static ADDRESS_MAP_START( dondokod_map, AS_PROGRAM, 16, taitof2_state )
 	AM_RANGE(0xb00000, 0xb0001f) AM_DEVWRITE8("tc0360pri", tc0360pri_device, write, 0x00ff)  /* ?? */
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( megab_map, AS_PROGRAM, 16, taitof2_state )
+ADDRESS_MAP_START(taitof2_state::megab_map)
 	AM_RANGE(0x000000, 0x07ffff) AM_ROM
 	AM_RANGE(0x100000, 0x100001) AM_DEVWRITE8("tc0140syt", tc0140syt_device, master_port_w, 0xff00)
 	AM_RANGE(0x100002, 0x100003) AM_DEVREADWRITE8("tc0140syt", tc0140syt_device, master_comm_r, master_comm_w, 0xff00)
@@ -664,7 +664,7 @@ static ADDRESS_MAP_START( megab_map, AS_PROGRAM, 16, taitof2_state )
 	AM_RANGE(0x800000, 0x80ffff) AM_RAM AM_SHARE("spriteram")
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( thundfox_map, AS_PROGRAM, 16, taitof2_state )
+ADDRESS_MAP_START(taitof2_state::thundfox_map)
 	AM_RANGE(0x000000, 0x07ffff) AM_ROM
 	AM_RANGE(0x100000, 0x101fff) AM_RAM_DEVWRITE("palette", palette_device, write16) AM_SHARE("palette")
 	AM_RANGE(0x200000, 0x20000f) AM_DEVREADWRITE8("tc0220ioc", tc0220ioc_device, read, write, 0x00ff)
@@ -679,7 +679,7 @@ static ADDRESS_MAP_START( thundfox_map, AS_PROGRAM, 16, taitof2_state )
 	AM_RANGE(0x800000, 0x80001f) AM_DEVWRITE8("tc0360pri", tc0360pri_device, write, 0xff00)
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( cameltry_map, AS_PROGRAM, 16, taitof2_state )
+ADDRESS_MAP_START(taitof2_state::cameltry_map)
 	AM_RANGE(0x000000, 0x03ffff) AM_ROM
 	AM_RANGE(0x100000, 0x10ffff) AM_RAM
 	AM_RANGE(0x200000, 0x201fff) AM_RAM_DEVWRITE("palette", palette_device, write16) AM_SHARE("palette")
@@ -695,7 +695,7 @@ static ADDRESS_MAP_START( cameltry_map, AS_PROGRAM, 16, taitof2_state )
 	AM_RANGE(0xd00000, 0xd0001f) AM_DEVWRITE8("tc0360pri", tc0360pri_device, write, 0x00ff)  /* ?? */
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( cameltrya_map, AS_PROGRAM, 16, taitof2_state )
+ADDRESS_MAP_START(taitof2_state::cameltrya_map)
 	AM_RANGE(0x000000, 0x03ffff) AM_ROM
 	AM_RANGE(0x100000, 0x10ffff) AM_RAM
 	AM_RANGE(0x200000, 0x201fff) AM_RAM_DEVWRITE("palette", palette_device, write16) AM_SHARE("palette")
@@ -711,7 +711,7 @@ static ADDRESS_MAP_START( cameltrya_map, AS_PROGRAM, 16, taitof2_state )
 	AM_RANGE(0xd00000, 0xd0001f) AM_DEVWRITE8("tc0360pri", tc0360pri_device, write, 0x00ff)  /* ?? */
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( qtorimon_map, AS_PROGRAM, 16, taitof2_state )
+ADDRESS_MAP_START(taitof2_state::qtorimon_map)
 	AM_RANGE(0x000000, 0x07ffff) AM_ROM
 	AM_RANGE(0x100000, 0x10ffff) AM_RAM
 	AM_RANGE(0x200000, 0x200007) AM_DEVREADWRITE("tc0110pcr", tc0110pcr_device, word_r, word_w)    /* palette */
@@ -724,7 +724,7 @@ static ADDRESS_MAP_START( qtorimon_map, AS_PROGRAM, 16, taitof2_state )
 	AM_RANGE(0x910000, 0x9120ff) AM_WRITENOP   /* error in init code ? */
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( liquidk_map, AS_PROGRAM, 16, taitof2_state )
+ADDRESS_MAP_START(taitof2_state::liquidk_map)
 	AM_RANGE(0x000000, 0x07ffff) AM_ROM
 	AM_RANGE(0x100000, 0x10ffff) AM_RAM
 	AM_RANGE(0x200000, 0x201fff) AM_RAM_DEVWRITE("palette", palette_device, write16) AM_SHARE("palette")
@@ -737,7 +737,7 @@ static ADDRESS_MAP_START( liquidk_map, AS_PROGRAM, 16, taitof2_state )
 	AM_RANGE(0xb00000, 0xb0001f) AM_DEVWRITE8("tc0360pri", tc0360pri_device, write, 0x00ff)  /* ?? */
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( quizhq_map, AS_PROGRAM, 16, taitof2_state )
+ADDRESS_MAP_START(taitof2_state::quizhq_map)
 	AM_RANGE(0x000000, 0x0bffff) AM_ROM
 	AM_RANGE(0x100000, 0x10ffff) AM_RAM
 	AM_RANGE(0x200000, 0x200007) AM_DEVREADWRITE("tc0110pcr", tc0110pcr_device, word_r, word_w)    /* palette */
@@ -758,7 +758,7 @@ static ADDRESS_MAP_START( quizhq_map, AS_PROGRAM, 16, taitof2_state )
 	AM_RANGE(0x900000, 0x90ffff) AM_RAM AM_SHARE("spriteram")
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( ssi_map, AS_PROGRAM, 16, taitof2_state )
+ADDRESS_MAP_START(taitof2_state::ssi_map)
 	AM_RANGE(0x000000, 0x07ffff) AM_ROM
 	AM_RANGE(0x100000, 0x10000f) AM_DEVREADWRITE("tc0510nio", tc0510nio_device, halfword_r, halfword_w)
 	AM_RANGE(0x200000, 0x20ffff) AM_RAM
@@ -771,7 +771,7 @@ static ADDRESS_MAP_START( ssi_map, AS_PROGRAM, 16, taitof2_state )
 	AM_RANGE(0x800000, 0x80ffff) AM_RAM AM_SHARE("spriteram")   /* sprite ram */
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( gunfront_map, AS_PROGRAM, 16, taitof2_state )
+ADDRESS_MAP_START(taitof2_state::gunfront_map)
 	AM_RANGE(0x000000, 0x0bffff) AM_ROM
 	AM_RANGE(0x100000, 0x10ffff) AM_RAM
 	AM_RANGE(0x200000, 0x201fff) AM_RAM_DEVWRITE("palette", palette_device, write16) AM_SHARE("palette")
@@ -785,7 +785,7 @@ static ADDRESS_MAP_START( gunfront_map, AS_PROGRAM, 16, taitof2_state )
 	AM_RANGE(0xb00000, 0xb0001f) AM_DEVWRITE8("tc0360pri", tc0360pri_device, write, 0x00ff)  /* ?? */
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( growl_map, AS_PROGRAM, 16, taitof2_state )
+ADDRESS_MAP_START(taitof2_state::growl_map)
 	AM_RANGE(0x000000, 0x0fffff) AM_ROM
 	AM_RANGE(0x100000, 0x10ffff) AM_RAM
 	AM_RANGE(0x200000, 0x201fff) AM_RAM_DEVWRITE("palette", palette_device, write16) AM_SHARE("palette")
@@ -808,7 +808,7 @@ static ADDRESS_MAP_START( growl_map, AS_PROGRAM, 16, taitof2_state )
 	AM_RANGE(0xb00000, 0xb0001f) AM_DEVWRITE8("tc0360pri", tc0360pri_device, write, 0x00ff)  /* ?? */
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( mjnquest_map, AS_PROGRAM, 16, taitof2_state )
+ADDRESS_MAP_START(taitof2_state::mjnquest_map)
 	AM_RANGE(0x000000, 0x0fffff) AM_ROM
 	AM_RANGE(0x110000, 0x11ffff) AM_RAM   /* "sram" */
 	AM_RANGE(0x120000, 0x12ffff) AM_RAM
@@ -826,7 +826,7 @@ static ADDRESS_MAP_START( mjnquest_map, AS_PROGRAM, 16, taitof2_state )
 	AM_RANGE(0x500000, 0x50ffff) AM_RAM AM_SHARE("spriteram")
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( footchmp_map, AS_PROGRAM, 16, taitof2_state )
+ADDRESS_MAP_START(taitof2_state::footchmp_map)
 	AM_RANGE(0x000000, 0x07ffff) AM_ROM
 	AM_RANGE(0x100000, 0x10ffff) AM_RAM
 	AM_RANGE(0x200000, 0x20ffff) AM_RAM AM_SHARE("spriteram")
@@ -841,7 +841,7 @@ static ADDRESS_MAP_START( footchmp_map, AS_PROGRAM, 16, taitof2_state )
 	AM_RANGE(0xa00002, 0xa00003) AM_DEVREADWRITE8("tc0140syt", tc0140syt_device, master_comm_r, master_comm_w, 0x00ff)
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( koshien_map, AS_PROGRAM, 16, taitof2_state )
+ADDRESS_MAP_START(taitof2_state::koshien_map)
 	AM_RANGE(0x000000, 0x0fffff) AM_ROM
 	AM_RANGE(0x100000, 0x10ffff) AM_RAM
 	AM_RANGE(0x200000, 0x201fff) AM_RAM_DEVWRITE("palette", palette_device, write16) AM_SHARE("palette")
@@ -855,7 +855,7 @@ static ADDRESS_MAP_START( koshien_map, AS_PROGRAM, 16, taitof2_state )
 	AM_RANGE(0xb00000, 0xb0001f) AM_DEVWRITE8("tc0360pri", tc0360pri_device, write, 0xff00)
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( yuyugogo_map, AS_PROGRAM, 16, taitof2_state )
+ADDRESS_MAP_START(taitof2_state::yuyugogo_map)
 	AM_RANGE(0x000000, 0x03ffff) AM_ROM
 	AM_RANGE(0x200000, 0x20000f) AM_DEVREADWRITE("tc0510nio", tc0510nio_device, halfword_r, halfword_w)
 	AM_RANGE(0x400000, 0x400001) AM_DEVWRITE8("tc0140syt", tc0140syt_device, master_port_w, 0xff00)
@@ -869,7 +869,7 @@ static ADDRESS_MAP_START( yuyugogo_map, AS_PROGRAM, 16, taitof2_state )
 	AM_RANGE(0xd00000, 0xdfffff) AM_ROM AM_REGION("extra", 0)
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( ninjak_map, AS_PROGRAM, 16, taitof2_state )
+ADDRESS_MAP_START(taitof2_state::ninjak_map)
 	AM_RANGE(0x000000, 0x07ffff) AM_ROM
 	AM_RANGE(0x100000, 0x10ffff) AM_RAM
 	AM_RANGE(0x200000, 0x201fff) AM_RAM_DEVWRITE("palette", palette_device, write16) AM_SHARE("palette")
@@ -884,7 +884,7 @@ static ADDRESS_MAP_START( ninjak_map, AS_PROGRAM, 16, taitof2_state )
 	AM_RANGE(0xb00000, 0xb0001f) AM_DEVWRITE8("tc0360pri", tc0360pri_device, write, 0x00ff)  /* b00002 written like a watchdog?! */
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( solfigtr_map, AS_PROGRAM, 16, taitof2_state )
+ADDRESS_MAP_START(taitof2_state::solfigtr_map)
 	AM_RANGE(0x000000, 0x07ffff) AM_ROM
 	AM_RANGE(0x100000, 0x10ffff) AM_RAM
 	AM_RANGE(0x200000, 0x201fff) AM_RAM_DEVWRITE("palette", palette_device, write16) AM_SHARE("palette")
@@ -905,7 +905,7 @@ static ADDRESS_MAP_START( solfigtr_map, AS_PROGRAM, 16, taitof2_state )
 	AM_RANGE(0xb00000, 0xb0001f) AM_DEVWRITE8("tc0360pri", tc0360pri_device, write, 0x00ff)  /* ?? */
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( qzquest_map, AS_PROGRAM, 16, taitof2_state )
+ADDRESS_MAP_START(taitof2_state::qzquest_map)
 	AM_RANGE(0x000000, 0x17ffff) AM_ROM
 	AM_RANGE(0x200000, 0x20000f) AM_DEVREADWRITE("tc0510nio", tc0510nio_device, halfword_r, halfword_w)
 	AM_RANGE(0x300000, 0x300001) AM_DEVWRITE8("tc0140syt", tc0140syt_device, master_port_w, 0x00ff)
@@ -917,7 +917,7 @@ static ADDRESS_MAP_START( qzquest_map, AS_PROGRAM, 16, taitof2_state )
 	AM_RANGE(0x720000, 0x72000f) AM_DEVREADWRITE("tc0100scn", tc0100scn_device, ctrl_word_r, ctrl_word_w)
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( pulirula_map, AS_PROGRAM, 16, taitof2_state )
+ADDRESS_MAP_START(taitof2_state::pulirula_map)
 	AM_RANGE(0x000000, 0x0bffff) AM_ROM
 	AM_RANGE(0x200000, 0x200001) AM_DEVWRITE8("tc0140syt", tc0140syt_device, master_port_w, 0xff00)
 	AM_RANGE(0x200002, 0x200003) AM_DEVREADWRITE8("tc0140syt", tc0140syt_device, master_comm_r, master_comm_w, 0xff00)
@@ -934,7 +934,7 @@ static ADDRESS_MAP_START( pulirula_map, AS_PROGRAM, 16, taitof2_state )
 	AM_RANGE(0xb00000, 0xb0000f) AM_DEVREADWRITE("tc0510nio", tc0510nio_device, halfword_r, halfword_w)
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( metalb_map, AS_PROGRAM, 16, taitof2_state )
+ADDRESS_MAP_START(taitof2_state::metalb_map)
 	AM_RANGE(0x000000, 0x0bffff) AM_ROM
 	AM_RANGE(0x100000, 0x10ffff) AM_RAM
 	AM_RANGE(0x300000, 0x30ffff) AM_RAM AM_SHARE("spriteram")
@@ -949,7 +949,7 @@ static ADDRESS_MAP_START( metalb_map, AS_PROGRAM, 16, taitof2_state )
 //  AM_RANGE(0xa00000, 0xa00001) AM_WRITENOP   /* ??? */
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( qzchikyu_map, AS_PROGRAM, 16, taitof2_state )
+ADDRESS_MAP_START(taitof2_state::qzchikyu_map)
 	AM_RANGE(0x000000, 0x17ffff) AM_ROM
 	AM_RANGE(0x200000, 0x20000f) AM_DEVREADWRITE("tc0510nio", tc0510nio_device, halfword_r, halfword_w)
 	AM_RANGE(0x300000, 0x300001) AM_DEVWRITE8("tc0140syt", tc0140syt_device, master_port_w, 0x00ff)
@@ -961,7 +961,7 @@ static ADDRESS_MAP_START( qzchikyu_map, AS_PROGRAM, 16, taitof2_state )
 	AM_RANGE(0x720000, 0x72000f) AM_DEVREADWRITE("tc0100scn", tc0100scn_device, ctrl_word_r, ctrl_word_w)
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( yesnoj_map, AS_PROGRAM, 16, taitof2_state )
+ADDRESS_MAP_START(taitof2_state::yesnoj_map)
 	AM_RANGE(0x000000, 0x07ffff) AM_ROM
 	AM_RANGE(0x200000, 0x20ffff) AM_RAM
 	AM_RANGE(0x400000, 0x40ffff) AM_RAM AM_SHARE("spriteram")
@@ -980,7 +980,7 @@ static ADDRESS_MAP_START( yesnoj_map, AS_PROGRAM, 16, taitof2_state )
 	AM_RANGE(0xd00000, 0xd00001) AM_WRITENOP   /* lots of similar writes */
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( deadconx_map, AS_PROGRAM, 16, taitof2_state )
+ADDRESS_MAP_START(taitof2_state::deadconx_map)
 	AM_RANGE(0x000000, 0x0fffff) AM_ROM
 	AM_RANGE(0x100000, 0x10ffff) AM_RAM
 	AM_RANGE(0x200000, 0x20ffff) AM_RAM AM_SHARE("spriteram")
@@ -996,7 +996,7 @@ static ADDRESS_MAP_START( deadconx_map, AS_PROGRAM, 16, taitof2_state )
 	AM_RANGE(0xa00002, 0xa00003) AM_DEVREADWRITE8("tc0140syt", tc0140syt_device, master_comm_r, master_comm_w, 0xff00)
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( dinorex_map, AS_PROGRAM, 16, taitof2_state )
+ADDRESS_MAP_START(taitof2_state::dinorex_map)
 	AM_RANGE(0x000000, 0x2fffff) AM_ROM
 	AM_RANGE(0x300000, 0x30000f) AM_DEVREADWRITE("tc0510nio", tc0510nio_device, halfword_r, halfword_w)
 	AM_RANGE(0x400000, 0x400fff) AM_WRITE(taitof2_sprite_extension_w) AM_SHARE("sprite_ext")
@@ -1011,7 +1011,7 @@ static ADDRESS_MAP_START( dinorex_map, AS_PROGRAM, 16, taitof2_state )
 	AM_RANGE(0xb00000, 0xb00001) AM_WRITENOP   /* watchdog? */
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( qjinsei_map, AS_PROGRAM, 16, taitof2_state )
+ADDRESS_MAP_START(taitof2_state::qjinsei_map)
 	AM_RANGE(0x000000, 0x1fffff) AM_ROM
 	AM_RANGE(0x200000, 0x200001) AM_DEVWRITE8("tc0140syt", tc0140syt_device, master_port_w, 0xff00)
 	AM_RANGE(0x200002, 0x200003) AM_DEVREADWRITE8("tc0140syt", tc0140syt_device, master_comm_r, master_comm_w, 0xff00)
@@ -1026,7 +1026,7 @@ static ADDRESS_MAP_START( qjinsei_map, AS_PROGRAM, 16, taitof2_state )
 	AM_RANGE(0xb00000, 0xb0000f) AM_DEVREADWRITE("tc0510nio", tc0510nio_device, halfword_r, halfword_w)
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( qcrayon_map, AS_PROGRAM, 16, taitof2_state )
+ADDRESS_MAP_START(taitof2_state::qcrayon_map)
 	AM_RANGE(0x000000, 0x07ffff) AM_ROM
 	AM_RANGE(0x100000, 0x10ffff) AM_RAM
 //  AM_RANGE(0x200000, 0x200001) AM_WRITENOP   /* unknown */
@@ -1042,7 +1042,7 @@ static ADDRESS_MAP_START( qcrayon_map, AS_PROGRAM, 16, taitof2_state )
 	AM_RANGE(0xb00000, 0xb0001f) AM_DEVWRITE8("tc0360pri", tc0360pri_device, write, 0x00ff)  /* ?? */
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( qcrayon2_map, AS_PROGRAM, 16, taitof2_state )
+ADDRESS_MAP_START(taitof2_state::qcrayon2_map)
 	AM_RANGE(0x000000, 0x07ffff) AM_ROM
 	AM_RANGE(0x200000, 0x20ffff) AM_RAM
 	AM_RANGE(0x300000, 0x301fff) AM_RAM_DEVWRITE("palette", palette_device, write16) AM_SHARE("palette")
@@ -1057,7 +1057,7 @@ static ADDRESS_MAP_START( qcrayon2_map, AS_PROGRAM, 16, taitof2_state )
 	AM_RANGE(0xb00000, 0xb017ff) AM_WRITE(taitof2_sprite_extension_w) AM_SHARE("sprite_ext")
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( driftout_map, AS_PROGRAM, 16, taitof2_state )
+ADDRESS_MAP_START(taitof2_state::driftout_map)
 	AM_RANGE(0x000000, 0x0fffff) AM_ROM
 	AM_RANGE(0x200000, 0x200001) AM_DEVWRITE8("tc0140syt", tc0140syt_device, master_port_w, 0xff00)
 	AM_RANGE(0x200002, 0x200003) AM_DEVREADWRITE8("tc0140syt", tc0140syt_device, master_comm_r, master_comm_w, 0xff00)
@@ -1075,7 +1075,7 @@ static ADDRESS_MAP_START( driftout_map, AS_PROGRAM, 16, taitof2_state )
 ADDRESS_MAP_END
 
 /* same as driftout, except for sound address 0x200000 */
-static ADDRESS_MAP_START( driveout_map, AS_PROGRAM, 16, taitof2_state )
+ADDRESS_MAP_START(taitof2_state::driveout_map)
 	AM_RANGE(0x000000, 0x0fffff) AM_ROM
 	AM_RANGE(0x200000, 0x200003) AM_READNOP AM_WRITE(driveout_sound_command_w)
 	AM_RANGE(0x300000, 0x30ffff) AM_RAM
@@ -1094,7 +1094,7 @@ ADDRESS_MAP_END
 
 /***************************************************************************/
 
-static ADDRESS_MAP_START( sound_map, AS_PROGRAM, 8, taitof2_state )
+ADDRESS_MAP_START(taitof2_state::sound_map)
 	AM_RANGE(0x0000, 0x3fff) AM_ROM
 	AM_RANGE(0x4000, 0x7fff) AM_ROMBANK("bank2")
 	AM_RANGE(0xc000, 0xdfff) AM_RAM
@@ -1111,7 +1111,7 @@ ADDRESS_MAP_END
 
 /* Alt version of Cameltry, YM2203 + M6925 sound */
 
-static ADDRESS_MAP_START( cameltrya_sound_map, AS_PROGRAM, 8, taitof2_state )
+ADDRESS_MAP_START(taitof2_state::cameltrya_sound_map)
 	AM_RANGE(0x0000, 0x7fff) AM_ROM     // I can't see a bank control, but there ARE some bytes past 0x8000
 	AM_RANGE(0x8000, 0x8fff) AM_RAM
 	AM_RANGE(0x9000, 0x9001) AM_DEVREADWRITE("ymsnd", ym2203_device, read, write)
@@ -1122,7 +1122,7 @@ static ADDRESS_MAP_START( cameltrya_sound_map, AS_PROGRAM, 8, taitof2_state )
 ADDRESS_MAP_END
 
 
-static ADDRESS_MAP_START( driveout_sound_map, AS_PROGRAM, 8, taitof2_state )
+ADDRESS_MAP_START(taitof2_state::driveout_sound_map)
 	AM_RANGE(0x0000, 0x7fff) AM_ROM
 	AM_RANGE(0x8000, 0x87ff) AM_RAM
 	AM_RANGE(0x9000, 0x9000) AM_WRITE(oki_bank_w)
@@ -2848,7 +2848,8 @@ MACHINE_CONFIG_START(taitof2_state::taito_f2)
 	MCFG_TC0140SYT_SLAVE_CPU("audiocpu")
 MACHINE_CONFIG_END
 
-MACHINE_CONFIG_DERIVED(taitof2_state::taito_f2_tc0220ioc, taito_f2 )
+MACHINE_CONFIG_START(taitof2_state::taito_f2_tc0220ioc )
+	taito_f2(config);
 
 	/* basic machine hardware */
 	MCFG_DEVICE_REMOVE("watchdog")
@@ -2861,7 +2862,8 @@ MACHINE_CONFIG_DERIVED(taitof2_state::taito_f2_tc0220ioc, taito_f2 )
 	MCFG_TC0220IOC_READ_7_CB(IOPORT("IN2"))
 MACHINE_CONFIG_END
 
-MACHINE_CONFIG_DERIVED(taitof2_state::taito_f2_tc0510nio, taito_f2 )
+MACHINE_CONFIG_START(taitof2_state::taito_f2_tc0510nio )
+	taito_f2(config);
 
 	/* basic machine hardware */
 	MCFG_DEVICE_REMOVE("watchdog")
@@ -2876,7 +2878,8 @@ MACHINE_CONFIG_DERIVED(taitof2_state::taito_f2_tc0510nio, taito_f2 )
 	MCFG_PALETTE_FORMAT(xRRRRRGGGGGBBBBB)
 MACHINE_CONFIG_END
 
-MACHINE_CONFIG_DERIVED(taitof2_state::taito_f2_te7750, taito_f2 )
+MACHINE_CONFIG_START(taitof2_state::taito_f2_te7750 )
+	taito_f2(config);
 	MCFG_DEVICE_ADD("te7750", TE7750, 0)
 	MCFG_TE7750_IN_PORT1_CB(IOPORT("DSWA"))
 	MCFG_TE7750_IN_PORT2_CB(IOPORT("DSWB"))
@@ -2889,7 +2892,8 @@ MACHINE_CONFIG_DERIVED(taitof2_state::taito_f2_te7750, taito_f2 )
 MACHINE_CONFIG_END
 
 
-MACHINE_CONFIG_DERIVED(taitof2_state::finalb, taito_f2_tc0220ioc)
+MACHINE_CONFIG_START(taitof2_state::finalb)
+	taito_f2_tc0220ioc(config);
 
 	/* basic machine hardware */
 	MCFG_CPU_MODIFY("maincpu")
@@ -2913,7 +2917,8 @@ MACHINE_CONFIG_DERIVED(taitof2_state::finalb, taito_f2_tc0220ioc)
 MACHINE_CONFIG_END
 
 
-MACHINE_CONFIG_DERIVED(taitof2_state::dondokod, taito_f2_tc0220ioc)
+MACHINE_CONFIG_START(taitof2_state::dondokod)
+	taito_f2_tc0220ioc(config);
 
 	/* basic machine hardware */
 	MCFG_CPU_MODIFY("maincpu")
@@ -2941,7 +2946,8 @@ MACHINE_CONFIG_DERIVED(taitof2_state::dondokod, taito_f2_tc0220ioc)
 MACHINE_CONFIG_END
 
 
-MACHINE_CONFIG_DERIVED(taitof2_state::megab, taito_f2_tc0220ioc)
+MACHINE_CONFIG_START(taitof2_state::megab)
+	taito_f2_tc0220ioc(config);
 
 	/* basic machine hardware */
 	MCFG_CPU_MODIFY("maincpu")
@@ -2965,7 +2971,8 @@ MACHINE_CONFIG_DERIVED(taitof2_state::megab, taito_f2_tc0220ioc)
 MACHINE_CONFIG_END
 
 
-MACHINE_CONFIG_DERIVED(taitof2_state::thundfox, taito_f2_tc0220ioc)
+MACHINE_CONFIG_START(taitof2_state::thundfox)
+	taito_f2_tc0220ioc(config);
 
 	/* basic machine hardware */
 	MCFG_CPU_MODIFY("maincpu")
@@ -3002,7 +3009,8 @@ MACHINE_CONFIG_DERIVED(taitof2_state::thundfox, taito_f2_tc0220ioc)
 MACHINE_CONFIG_END
 
 
-MACHINE_CONFIG_DERIVED(taitof2_state::cameltry, taito_f2_tc0220ioc)
+MACHINE_CONFIG_START(taitof2_state::cameltry)
+	taito_f2_tc0220ioc(config);
 
 	/* basic machine hardware */
 	MCFG_CPU_MODIFY("maincpu")
@@ -3029,7 +3037,8 @@ MACHINE_CONFIG_DERIVED(taitof2_state::cameltry, taito_f2_tc0220ioc)
 MACHINE_CONFIG_END
 
 
-MACHINE_CONFIG_DERIVED(taitof2_state::qtorimon, taito_f2_tc0220ioc)
+MACHINE_CONFIG_START(taitof2_state::qtorimon)
+	taito_f2_tc0220ioc(config);
 
 	/* basic machine hardware */
 	MCFG_CPU_MODIFY("maincpu")
@@ -3051,7 +3060,8 @@ MACHINE_CONFIG_DERIVED(taitof2_state::qtorimon, taito_f2_tc0220ioc)
 MACHINE_CONFIG_END
 
 
-MACHINE_CONFIG_DERIVED(taitof2_state::liquidk, taito_f2_tc0220ioc)
+MACHINE_CONFIG_START(taitof2_state::liquidk)
+	taito_f2_tc0220ioc(config);
 
 	/* basic machine hardware */
 	MCFG_CPU_MODIFY("maincpu")
@@ -3074,7 +3084,8 @@ MACHINE_CONFIG_DERIVED(taitof2_state::liquidk, taito_f2_tc0220ioc)
 MACHINE_CONFIG_END
 
 
-MACHINE_CONFIG_DERIVED(taitof2_state::quizhq, taito_f2)
+MACHINE_CONFIG_START(taitof2_state::quizhq)
+	taito_f2(config);
 
 	/* basic machine hardware */
 	MCFG_CPU_MODIFY("maincpu")
@@ -3096,7 +3107,8 @@ MACHINE_CONFIG_DERIVED(taitof2_state::quizhq, taito_f2)
 MACHINE_CONFIG_END
 
 
-MACHINE_CONFIG_DERIVED(taitof2_state::ssi, taito_f2_tc0510nio)
+MACHINE_CONFIG_START(taitof2_state::ssi)
+	taito_f2_tc0510nio(config);
 
 	/* basic machine hardware */
 	MCFG_CPU_MODIFY("maincpu")
@@ -3120,7 +3132,8 @@ MACHINE_CONFIG_DERIVED(taitof2_state::ssi, taito_f2_tc0510nio)
 MACHINE_CONFIG_END
 
 
-MACHINE_CONFIG_DERIVED(taitof2_state::gunfront, taito_f2_tc0510nio)
+MACHINE_CONFIG_START(taitof2_state::gunfront)
+	taito_f2_tc0510nio(config);
 
 	/* basic machine hardware */
 	MCFG_CPU_MODIFY("maincpu")
@@ -3146,7 +3159,8 @@ MACHINE_CONFIG_DERIVED(taitof2_state::gunfront, taito_f2_tc0510nio)
 MACHINE_CONFIG_END
 
 
-MACHINE_CONFIG_DERIVED(taitof2_state::growl, taito_f2)
+MACHINE_CONFIG_START(taitof2_state::growl)
+	taito_f2(config);
 
 	/* basic machine hardware */
 	MCFG_CPU_MODIFY("maincpu")
@@ -3168,7 +3182,8 @@ MACHINE_CONFIG_DERIVED(taitof2_state::growl, taito_f2)
 MACHINE_CONFIG_END
 
 
-MACHINE_CONFIG_DERIVED(taitof2_state::mjnquest, taito_f2)
+MACHINE_CONFIG_START(taitof2_state::mjnquest)
+	taito_f2(config);
 
 	/* basic machine hardware */
 	MCFG_CPU_MODIFY("maincpu")
@@ -3188,7 +3203,8 @@ MACHINE_CONFIG_DERIVED(taitof2_state::mjnquest, taito_f2)
 MACHINE_CONFIG_END
 
 
-MACHINE_CONFIG_DERIVED(taitof2_state::footchmp, taito_f2_te7750)
+MACHINE_CONFIG_START(taitof2_state::footchmp)
+	taito_f2_te7750(config);
 
 	/* basic machine hardware */
 	MCFG_CPU_MODIFY("maincpu")
@@ -3212,14 +3228,16 @@ MACHINE_CONFIG_DERIVED(taitof2_state::footchmp, taito_f2_te7750)
 	MCFG_TC0360PRI_ADD("tc0360pri")
 MACHINE_CONFIG_END
 
-MACHINE_CONFIG_DERIVED(taitof2_state::footchmpbl, footchmp)
+MACHINE_CONFIG_START(taitof2_state::footchmpbl)
+	footchmp(config);
 
 	/* video hardware */
 	MCFG_GFXDECODE_MODIFY("gfxdecode", footchmpbl)
 MACHINE_CONFIG_END
 
 
-MACHINE_CONFIG_DERIVED(taitof2_state::hthero, taito_f2_te7750)
+MACHINE_CONFIG_START(taitof2_state::hthero)
+	taito_f2_te7750(config);
 
 	/* basic machine hardware */
 	MCFG_CPU_MODIFY("maincpu")
@@ -3244,7 +3262,8 @@ MACHINE_CONFIG_DERIVED(taitof2_state::hthero, taito_f2_te7750)
 MACHINE_CONFIG_END
 
 
-MACHINE_CONFIG_DERIVED(taitof2_state::koshien, taito_f2_tc0510nio)
+MACHINE_CONFIG_START(taitof2_state::koshien)
+	taito_f2_tc0510nio(config);
 
 	/* basic machine hardware */
 	MCFG_CPU_MODIFY("maincpu")
@@ -3269,7 +3288,8 @@ MACHINE_CONFIG_DERIVED(taitof2_state::koshien, taito_f2_tc0510nio)
 MACHINE_CONFIG_END
 
 
-MACHINE_CONFIG_DERIVED(taitof2_state::yuyugogo, taito_f2_tc0510nio)
+MACHINE_CONFIG_START(taitof2_state::yuyugogo)
+	taito_f2_tc0510nio(config);
 
 	/* basic machine hardware */
 	MCFG_CPU_MODIFY("maincpu")
@@ -3293,7 +3313,8 @@ MACHINE_CONFIG_DERIVED(taitof2_state::yuyugogo, taito_f2_tc0510nio)
 MACHINE_CONFIG_END
 
 
-MACHINE_CONFIG_DERIVED(taitof2_state::ninjak, taito_f2)
+MACHINE_CONFIG_START(taitof2_state::ninjak)
+	taito_f2(config);
 
 	/* basic machine hardware */
 	MCFG_CPU_MODIFY("maincpu")
@@ -3325,7 +3346,8 @@ MACHINE_CONFIG_DERIVED(taitof2_state::ninjak, taito_f2)
 MACHINE_CONFIG_END
 
 
-MACHINE_CONFIG_DERIVED(taitof2_state::solfigtr, taito_f2)
+MACHINE_CONFIG_START(taitof2_state::solfigtr)
+	taito_f2(config);
 
 	/* basic machine hardware */
 	MCFG_CPU_MODIFY("maincpu")
@@ -3349,7 +3371,8 @@ MACHINE_CONFIG_DERIVED(taitof2_state::solfigtr, taito_f2)
 MACHINE_CONFIG_END
 
 
-MACHINE_CONFIG_DERIVED(taitof2_state::qzquest, taito_f2_tc0510nio)
+MACHINE_CONFIG_START(taitof2_state::qzquest)
+	taito_f2_tc0510nio(config);
 
 	/* basic machine hardware */
 	MCFG_CPU_MODIFY("maincpu")
@@ -3367,7 +3390,8 @@ MACHINE_CONFIG_DERIVED(taitof2_state::qzquest, taito_f2_tc0510nio)
 MACHINE_CONFIG_END
 
 
-MACHINE_CONFIG_DERIVED(taitof2_state::pulirula, taito_f2_tc0510nio)
+MACHINE_CONFIG_START(taitof2_state::pulirula)
+	taito_f2_tc0510nio(config);
 
 	/* basic machine hardware */
 	MCFG_CPU_MODIFY("maincpu")
@@ -3394,7 +3418,8 @@ MACHINE_CONFIG_DERIVED(taitof2_state::pulirula, taito_f2_tc0510nio)
 MACHINE_CONFIG_END
 
 
-MACHINE_CONFIG_DERIVED(taitof2_state::metalb, taito_f2_tc0510nio)
+MACHINE_CONFIG_START(taitof2_state::metalb)
+	taito_f2_tc0510nio(config);
 
 	/* basic machine hardware */
 	MCFG_CPU_MODIFY("maincpu")
@@ -3422,7 +3447,8 @@ MACHINE_CONFIG_DERIVED(taitof2_state::metalb, taito_f2_tc0510nio)
 MACHINE_CONFIG_END
 
 
-MACHINE_CONFIG_DERIVED(taitof2_state::qzchikyu, taito_f2_tc0510nio)
+MACHINE_CONFIG_START(taitof2_state::qzchikyu)
+	taito_f2_tc0510nio(config);
 
 	/* basic machine hardware */
 	MCFG_CPU_MODIFY("maincpu")
@@ -3444,7 +3470,8 @@ MACHINE_CONFIG_DERIVED(taitof2_state::qzchikyu, taito_f2_tc0510nio)
 MACHINE_CONFIG_END
 
 
-MACHINE_CONFIG_DERIVED(taitof2_state::yesnoj, taito_f2)
+MACHINE_CONFIG_START(taitof2_state::yesnoj)
+	taito_f2(config);
 
 	/* basic machine hardware */
 	MCFG_CPU_MODIFY("maincpu")
@@ -3467,7 +3494,8 @@ MACHINE_CONFIG_DERIVED(taitof2_state::yesnoj, taito_f2)
 MACHINE_CONFIG_END
 
 
-MACHINE_CONFIG_DERIVED(taitof2_state::deadconx, taito_f2_te7750)
+MACHINE_CONFIG_START(taitof2_state::deadconx)
+	taito_f2_te7750(config);
 
 	/* basic machine hardware */
 	MCFG_CPU_MODIFY("maincpu")
@@ -3491,7 +3519,8 @@ MACHINE_CONFIG_DERIVED(taitof2_state::deadconx, taito_f2_te7750)
 MACHINE_CONFIG_END
 
 
-MACHINE_CONFIG_DERIVED(taitof2_state::deadconxj, taito_f2_te7750)
+MACHINE_CONFIG_START(taitof2_state::deadconxj)
+	taito_f2_te7750(config);
 
 	/* basic machine hardware */
 	MCFG_CPU_MODIFY("maincpu")
@@ -3515,7 +3544,8 @@ MACHINE_CONFIG_DERIVED(taitof2_state::deadconxj, taito_f2_te7750)
 MACHINE_CONFIG_END
 
 
-MACHINE_CONFIG_DERIVED(taitof2_state::dinorex, taito_f2_tc0510nio)
+MACHINE_CONFIG_START(taitof2_state::dinorex)
+	taito_f2_tc0510nio(config);
 
 	/* basic machine hardware */
 	MCFG_CPU_MODIFY("maincpu")
@@ -3540,7 +3570,8 @@ MACHINE_CONFIG_DERIVED(taitof2_state::dinorex, taito_f2_tc0510nio)
 MACHINE_CONFIG_END
 
 
-MACHINE_CONFIG_DERIVED(taitof2_state::qjinsei, taito_f2_tc0510nio)
+MACHINE_CONFIG_START(taitof2_state::qjinsei)
+	taito_f2_tc0510nio(config);
 
 	/* basic machine hardware */
 	MCFG_CPU_MODIFY("maincpu")
@@ -3565,7 +3596,8 @@ MACHINE_CONFIG_DERIVED(taitof2_state::qjinsei, taito_f2_tc0510nio)
 MACHINE_CONFIG_END
 
 
-MACHINE_CONFIG_DERIVED(taitof2_state::qcrayon, taito_f2_tc0510nio)
+MACHINE_CONFIG_START(taitof2_state::qcrayon)
+	taito_f2_tc0510nio(config);
 
 	/* basic machine hardware */
 	MCFG_CPU_MODIFY("maincpu")
@@ -3590,7 +3622,8 @@ MACHINE_CONFIG_DERIVED(taitof2_state::qcrayon, taito_f2_tc0510nio)
 MACHINE_CONFIG_END
 
 
-MACHINE_CONFIG_DERIVED(taitof2_state::qcrayon2, taito_f2_tc0510nio)
+MACHINE_CONFIG_START(taitof2_state::qcrayon2)
+	taito_f2_tc0510nio(config);
 
 	/* basic machine hardware */
 	MCFG_CPU_MODIFY("maincpu")
@@ -3615,7 +3648,8 @@ MACHINE_CONFIG_DERIVED(taitof2_state::qcrayon2, taito_f2_tc0510nio)
 MACHINE_CONFIG_END
 
 
-MACHINE_CONFIG_DERIVED(taitof2_state::driftout, taito_f2_tc0510nio)
+MACHINE_CONFIG_START(taitof2_state::driftout)
+	taito_f2_tc0510nio(config);
 
 	/* basic machine hardware */
 	MCFG_CPU_MODIFY("maincpu")

@@ -40,8 +40,8 @@ static uint8_t cfidata[] = {
 0x01,0x00
 };
 
-DEVICE_ADDRESS_MAP_START(submap, 16, naomi_m4_board)
-	AM_INHERIT_FROM(naomi_board::submap)
+ADDRESS_MAP_START(naomi_m4_board::submap)
+	AM_IMPORT_FROM(naomi_board::submap)
 	AM_RANGE(0x1a, 0x1b) AM_READ(m4_id_r)
 ADDRESS_MAP_END
 

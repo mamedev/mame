@@ -57,7 +57,7 @@ WRITE16_MEMBER(galspnbl_state::soundcommand_w)
 }
 
 
-static ADDRESS_MAP_START( main_map, AS_PROGRAM, 16, galspnbl_state )
+ADDRESS_MAP_START(galspnbl_state::main_map)
 	AM_RANGE(0x000000, 0x3fffff) AM_ROM
 	AM_RANGE(0x700000, 0x703fff) AM_RAM     /* galspnbl work RAM */
 	AM_RANGE(0x708000, 0x70ffff) AM_RAM     /* galspnbl work RAM, bitmaps are decompressed here */
@@ -81,7 +81,7 @@ static ADDRESS_MAP_START( main_map, AS_PROGRAM, 16, galspnbl_state )
 	AM_RANGE(0xa80050, 0xa80051) AM_WRITEONLY AM_SHARE("scroll")    /* ??? */
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( audio_map, AS_PROGRAM, 8, galspnbl_state )
+ADDRESS_MAP_START(galspnbl_state::audio_map)
 	AM_RANGE(0x0000, 0xefff) AM_ROM
 	AM_RANGE(0xf000, 0xf7ff) AM_RAM
 	AM_RANGE(0xf800, 0xf800) AM_DEVREADWRITE("oki", okim6295_device, read, write)

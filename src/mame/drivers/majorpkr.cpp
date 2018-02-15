@@ -512,6 +512,10 @@ public:
 	virtual void video_start() override;
 	uint32_t screen_update_majorpkr(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	void majorpkr(machine_config &config);
+	void map(address_map &map);
+	void palettebanks(address_map &map);
+	void portmap(address_map &map);
+	void vrambanks(address_map &map);
 };
 
 
@@ -738,7 +742,7 @@ WRITE8_MEMBER(majorpkr_state::pulses_w)
 * Memory map information *
 *************************/
 
-static ADDRESS_MAP_START( map, AS_PROGRAM, 8, majorpkr_state )
+ADDRESS_MAP_START(majorpkr_state::map)
 	AM_RANGE(0x0000, 0xdfff) AM_ROM
 	AM_RANGE(0xe000, 0xe7ff) AM_ROMBANK("rom_bank")
 	AM_RANGE(0xe800, 0xefff) AM_RAM AM_SHARE("nvram")
@@ -746,11 +750,11 @@ static ADDRESS_MAP_START( map, AS_PROGRAM, 8, majorpkr_state )
 	AM_RANGE(0xf800, 0xffff) AM_DEVICE("vram_bank", address_map_bank_device, amap8)
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( palettebanks, AS_PROGRAM, 8, majorpkr_state )
+ADDRESS_MAP_START(majorpkr_state::palettebanks)
 	AM_RANGE(0x0000, 0x1fff) AM_RAM_DEVWRITE("palette", palette_device, write8) AM_SHARE("palette")
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( vrambanks, AS_PROGRAM, 8, majorpkr_state )
+ADDRESS_MAP_START(majorpkr_state::vrambanks)
 	AM_RANGE(0x0000, 0x07ff) AM_RAM_WRITE(fg_vram_w) AM_SHARE("fg_vram")
 	AM_RANGE(0x0800, 0x0fff) AM_RAM_WRITE(bg_vram_w) AM_SHARE("bg_vram")
 	AM_RANGE(0x1000, 0x1fff) AM_RAM // spare vram? cleared during boot along with fg and bg
@@ -777,7 +781,7 @@ ADDRESS_MAP_END
   60  W ---> PSG SN76489/96 initialization routines.
              (Maybe a leftover for different hardware).
 */
-static ADDRESS_MAP_START( portmap, AS_IO, 8, majorpkr_state )
+ADDRESS_MAP_START(majorpkr_state::portmap)
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	AM_RANGE(0x00, 0x00) AM_WRITE(rom_bank_w)
 	AM_RANGE(0x01, 0x01) AM_WRITE(palette_bank_w)

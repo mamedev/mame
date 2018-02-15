@@ -979,7 +979,7 @@ MACHINE_START_MEMBER(hotsmash_state, pbillian)
 }
 
 
-static ADDRESS_MAP_START( main_map, AS_PROGRAM, 8, superqix_state_base )
+ADDRESS_MAP_START(superqix_state_base::main_map)
 	AM_RANGE(0x0000, 0x7fff) AM_ROM
 	AM_RANGE(0x8000, 0xbfff) AM_ROMBANK("bank1")
 	// the following four ranges are part of a single 6264 64Kibit SRAM chip, called 'VRAM' in POST
@@ -989,7 +989,7 @@ static ADDRESS_MAP_START( main_map, AS_PROGRAM, 8, superqix_state_base )
 	AM_RANGE(0xf000, 0xffff) AM_RAM
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( pbillian_port_map, AS_IO, 8, hotsmash_state ) // used by both pbillian and hotsmash
+ADDRESS_MAP_START(hotsmash_state::pbillian_port_map) // used by both pbillian and hotsmash
 	AM_RANGE(0x0000, 0x01ff) AM_RAM_DEVWRITE("palette", palette_device, write8) AM_SHARE("palette") // 6116 sram near the jamma connector, "COLOR RAM" during POST
 	//AM_RANGE(0x0200, 0x03ff) AM_RAM // looks like leftover crap from a dev board which had double the color ram? zeroes written here, never read.
 	AM_RANGE(0x0401, 0x0401) AM_DEVREAD("ay1", ay8910_device, data_r) // ay i/o ports connect to "SYSTEM" and "BUTTONS" inputs which includes mcu semaphore flags
@@ -1002,7 +1002,7 @@ static ADDRESS_MAP_START( pbillian_port_map, AS_IO, 8, hotsmash_state ) // used 
 	AM_RANGE(0x041b, 0x041b) AM_READNOP  // input related? but probably not used, may be 'sample has stopped playing' flag? used by prebillian
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( sqix_port_map, AS_IO, 8, superqix_state )
+ADDRESS_MAP_START(superqix_state::sqix_port_map)
 	AM_RANGE(0x0000, 0x00ff) AM_RAM_DEVWRITE("palette", palette_device, write8) AM_SHARE("palette")
 	AM_RANGE(0x0401, 0x0401) AM_DEVREAD("ay1", ay8910_device, data_r)
 	AM_RANGE(0x0402, 0x0402) AM_DEVWRITE("ay1", ay8910_device, data_w)
@@ -1021,12 +1021,12 @@ ADDRESS_MAP_END
 
 /* I8751 memory handlers */
 
-static ADDRESS_MAP_START( sqix_8031_mcu_io_map, AS_IO, 8, superqix_state )
+ADDRESS_MAP_START(superqix_state::sqix_8031_mcu_io_map)
 	AM_RANGE(MCS51_PORT_P1, MCS51_PORT_P1) AM_WRITE(bootleg_mcu_port1_w)
 	AM_RANGE(MCS51_PORT_P3, MCS51_PORT_P3) AM_READWRITE(bootleg_mcu_port3_r, bootleg_mcu_port3_w)
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( sqix_mcu_io_map, AS_IO, 8, superqix_state )
+ADDRESS_MAP_START(superqix_state::sqix_mcu_io_map)
 	AM_RANGE(MCS51_PORT_P0, MCS51_PORT_P0) AM_READ_PORT("SYSTEM")
 	AM_RANGE(MCS51_PORT_P1, MCS51_PORT_P1) AM_READ_PORT("DSW1")
 	AM_RANGE(MCS51_PORT_P2, MCS51_PORT_P2) AM_WRITE(mcu_port2_w)
@@ -1446,7 +1446,8 @@ MACHINE_CONFIG_START(superqix_state::sqix)
 MACHINE_CONFIG_END
 
 
-MACHINE_CONFIG_DERIVED(superqix_state::sqix_8031, sqix)
+MACHINE_CONFIG_START(superqix_state::sqix_8031)
+	sqix(config);
 	MCFG_CPU_MODIFY("mcu") /* p8031ah, clock not verified */
 	MCFG_CPU_IO_MAP(sqix_8031_mcu_io_map)
 MACHINE_CONFIG_END

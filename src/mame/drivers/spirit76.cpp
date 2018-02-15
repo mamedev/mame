@@ -41,13 +41,14 @@ public:
 	DECLARE_WRITE8_MEMBER(unk_w);
 	DECLARE_READ8_MEMBER(unk_r);
 	void spirit76(machine_config &config);
+	void maincpu_map(address_map &map);
 private:
 	u8 m_t_c;
 	virtual void machine_reset() override;
 	required_device<cpu_device> m_maincpu;
 };
 
-static ADDRESS_MAP_START( maincpu_map, AS_PROGRAM, 8, spirit76_state )
+ADDRESS_MAP_START(spirit76_state::maincpu_map)
 	ADDRESS_MAP_UNMAP_HIGH
 //  ADDRESS_MAP_GLOBAL_MASK(0xfff) // this could most likely go in once the memory map is sorted
 	AM_RANGE(0x0000, 0x00ff) AM_RAM // 2x 2112
@@ -138,7 +139,7 @@ MACHINE_CONFIG_START(spirit76_state::spirit76)
 //  MCFG_PIA_IRQB_HANDLER(INPUTLINE("maincpu", M6800_IRQ_LINE))
 
 	/* sound hardware */
-	MCFG_FRAGMENT_ADD( genpin_audio )
+	genpin_audio(config);
 MACHINE_CONFIG_END
 
 

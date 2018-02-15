@@ -79,6 +79,10 @@ public:
 	void themj(machine_config &config);
 	void rmhaisei(machine_config &config);
 	void rmhaihai(machine_config &config);
+	void rmhaihai_io_map(address_map &map);
+	void rmhaihai_map(address_map &map);
+	void themj_io_map(address_map &map);
+	void themj_map(address_map &map);
 };
 
 
@@ -227,7 +231,7 @@ MACHINE_RESET_MEMBER(rmhaihai_state,themj)
 
 
 
-static ADDRESS_MAP_START( rmhaihai_map, AS_PROGRAM, 8, rmhaihai_state )
+ADDRESS_MAP_START(rmhaihai_state::rmhaihai_map)
 	AM_RANGE(0x0000, 0x9fff) AM_ROM
 	AM_RANGE(0xa000, 0xa7ff) AM_RAM AM_SHARE("nvram")
 	AM_RANGE(0xa800, 0xafff) AM_RAM_WRITE(colorram_w) AM_SHARE("colorram")
@@ -238,7 +242,7 @@ static ADDRESS_MAP_START( rmhaihai_map, AS_PROGRAM, 8, rmhaihai_state )
 	AM_RANGE(0xe000, 0xffff) AM_ROM         /* rmhaisei only */
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( rmhaihai_io_map, AS_IO, 8, rmhaihai_state )
+ADDRESS_MAP_START(rmhaihai_state::rmhaihai_io_map)
 	AM_RANGE(0x0000, 0x7fff) AM_READ(samples_r)
 	AM_RANGE(0x8000, 0x8000) AM_READ(keyboard_r) AM_WRITENOP    // ??
 	AM_RANGE(0x8001, 0x8001) AM_READNOP AM_WRITE(keyboard_w)    // ??
@@ -251,7 +255,7 @@ static ADDRESS_MAP_START( rmhaihai_io_map, AS_IO, 8, rmhaihai_state )
 	AM_RANGE(0xbc0c, 0xbc0c) AM_WRITENOP    // ??
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( themj_map, AS_PROGRAM, 8, rmhaihai_state )
+ADDRESS_MAP_START(rmhaihai_state::themj_map)
 	AM_RANGE(0x0000, 0x7fff) AM_ROM
 	AM_RANGE(0x8000, 0x9fff) AM_ROMBANK("bank1")
 	AM_RANGE(0xa000, 0xa7ff) AM_RAM
@@ -261,7 +265,7 @@ static ADDRESS_MAP_START( themj_map, AS_PROGRAM, 8, rmhaihai_state )
 	AM_RANGE(0xe000, 0xffff) AM_ROM
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( themj_io_map, AS_IO, 8, rmhaihai_state )
+ADDRESS_MAP_START(rmhaihai_state::themj_io_map)
 	AM_RANGE(0x0000, 0x7fff) AM_READ(samples_r)
 	AM_RANGE(0x8000, 0x8000) AM_READ(keyboard_r) AM_WRITENOP    // ??
 	AM_RANGE(0x8001, 0x8001) AM_READNOP AM_WRITE(keyboard_w)    // ??
@@ -510,7 +514,8 @@ MACHINE_CONFIG_START(rmhaihai_state::rmhaihai)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 MACHINE_CONFIG_END
 
-MACHINE_CONFIG_DERIVED(rmhaihai_state::rmhaisei, rmhaihai)
+MACHINE_CONFIG_START(rmhaihai_state::rmhaisei)
+	rmhaihai(config);
 
 	/* basic machine hardware */
 
@@ -520,7 +525,8 @@ MACHINE_CONFIG_DERIVED(rmhaihai_state::rmhaisei, rmhaihai)
 	MCFG_PALETTE_ENTRIES(0x200)
 MACHINE_CONFIG_END
 
-MACHINE_CONFIG_DERIVED(rmhaihai_state::themj, rmhaihai)
+MACHINE_CONFIG_START(rmhaihai_state::themj)
+	rmhaihai(config);
 
 	/* basic machine hardware */
 

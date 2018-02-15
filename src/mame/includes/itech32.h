@@ -207,4 +207,12 @@ public:
 	void drivedge(machine_config &config);
 	void bloodstm(machine_config &config);
 	void timekill(machine_config &config);
+	void bloodstm_map(address_map &map);
+	void drivedge_map(address_map &map);
+	void drivedge_tms1_map(address_map &map);
+	void drivedge_tms2_map(address_map &map);
+	void itech020_map(address_map &map);
+	void sound_020_map(address_map &map);
+	void sound_map(address_map &map);
+	void timekill_map(address_map &map);
 };

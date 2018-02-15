@@ -17,8 +17,8 @@ public:
 
 	void set_gain_devices(const char *_left, const char *_right);
 
-	DECLARE_ADDRESS_MAP(main_map, 8);
-	DECLARE_ADDRESS_MAP(sound_map, 8);
+	void main_map(address_map &map);
+	void sound_map(address_map &map);
 
 	DECLARE_READ8_MEMBER( main1_r);
 	DECLARE_WRITE8_MEMBER(main1_w);

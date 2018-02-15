@@ -81,6 +81,7 @@ public:
 	DECLARE_READ16_MEMBER(vrom_r);
 
 	void giclassic(machine_config &config);
+	void satellite_main(address_map &map);
 private:
 	uint8_t m_control;
 };
@@ -142,7 +143,7 @@ READ16_MEMBER(giclassic_state::vrom_r)
 	return m_k056832->piratesh_rom_r(space, offset);
 }
 
-static ADDRESS_MAP_START( satellite_main, AS_PROGRAM, 16, giclassic_state )
+ADDRESS_MAP_START(giclassic_state::satellite_main)
 	AM_RANGE(0x000000, 0x07ffff) AM_ROM AM_REGION("maincpu", 0)
 	AM_RANGE(0x100000, 0x103fff) AM_RAM
 	AM_RANGE(0x200000, 0x200fff) AM_RAM_DEVWRITE("palette", palette_device, write16) AM_SHARE("palette")
@@ -198,6 +199,7 @@ public:
 	DECLARE_READ16_MEMBER(control_r);
 
 	void giclassvr(machine_config &config);
+	void server_main(address_map &map);
 private:
 	uint16 m_control;
 };
@@ -262,7 +264,7 @@ uint32_t giclassicsvr_state::screen_update_giclassicsvr(screen_device &screen, b
 	return 0;
 }
 
-static ADDRESS_MAP_START( server_main, AS_PROGRAM, 16, giclassicsvr_state )
+ADDRESS_MAP_START(giclassicsvr_state::server_main)
 	AM_RANGE(0x000000, 0x07ffff) AM_ROM AM_REGION("maincpu", 0)
 	AM_RANGE(0x080000, 0x08ffff) AM_RAM
 	AM_RANGE(0x090000, 0x093fff) AM_RAM

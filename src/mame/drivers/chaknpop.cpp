@@ -161,7 +161,7 @@ WRITE8_MEMBER(chaknpop_state::coinlock_w)
 
 ***************************************************************************/
 
-static ADDRESS_MAP_START( chaknpop_map, AS_PROGRAM, 8, chaknpop_state )
+ADDRESS_MAP_START(chaknpop_state::chaknpop_map)
 	AM_RANGE(0x0000, 0x7fff) AM_ROM
 	AM_RANGE(0x8000, 0x87ff) AM_RAM
 	AM_RANGE(0x8800, 0x8800) AM_DEVREADWRITE("bmcu", taito68705_mcu_device, data_r, data_w)

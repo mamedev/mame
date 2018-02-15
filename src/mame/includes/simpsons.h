@@ -65,6 +65,10 @@ public:
 	K053246_CB_MEMBER(sprite_callback);
 
 	void simpsons(machine_config &config);
+	void bank0000_map(address_map &map);
+	void bank2000_map(address_map &map);
+	void main_map(address_map &map);
+	void z80_map(address_map &map);
 protected:
 	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr) override;
 };

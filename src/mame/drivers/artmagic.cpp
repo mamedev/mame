@@ -408,7 +408,7 @@ WRITE16_MEMBER(artmagic_state::protection_bit_w)
  *
  *************************************/
 
-static ADDRESS_MAP_START( main_map, AS_PROGRAM, 16, artmagic_state )
+ADDRESS_MAP_START(artmagic_state::main_map)
 	AM_RANGE(0x000000, 0x07ffff) AM_ROM
 	AM_RANGE(0x220000, 0x23ffff) AM_RAM
 	AM_RANGE(0x240000, 0x240fff) AM_RAM AM_SHARE("nvram")
@@ -425,7 +425,7 @@ static ADDRESS_MAP_START( main_map, AS_PROGRAM, 16, artmagic_state )
 ADDRESS_MAP_END
 
 
-static ADDRESS_MAP_START( stonebal_map, AS_PROGRAM, 16, artmagic_state )
+ADDRESS_MAP_START(artmagic_state::stonebal_map)
 	AM_RANGE(0x000000, 0x07ffff) AM_ROM
 	AM_RANGE(0x200000, 0x27ffff) AM_RAM
 	AM_RANGE(0x280000, 0x280fff) AM_RAM AM_SHARE("nvram")
@@ -444,7 +444,7 @@ static ADDRESS_MAP_START( stonebal_map, AS_PROGRAM, 16, artmagic_state )
 ADDRESS_MAP_END
 
 // TODO: jumps to undefined area at PC=33a0 -> 230000, presumably protection device provides a code snippet
-static ADDRESS_MAP_START( shtstar_map, AS_PROGRAM, 16, artmagic_state )
+ADDRESS_MAP_START(artmagic_state::shtstar_map)
 	AM_RANGE(0x000000, 0x07ffff) AM_ROM
 	AM_RANGE(0x200000, 0x27ffff) AM_RAM
 	AM_RANGE(0x280000, 0x280fff) AM_RAM AM_SHARE("nvram")
@@ -464,7 +464,7 @@ ADDRESS_MAP_END
  *
  *************************************/
 
-static ADDRESS_MAP_START( tms_map, AS_PROGRAM, 16, artmagic_state )
+ADDRESS_MAP_START(artmagic_state::tms_map)
 	AM_RANGE(0x00000000, 0x001fffff) AM_RAM AM_SHARE("vram0")
 	AM_RANGE(0x00400000, 0x005fffff) AM_RAM AM_SHARE("vram1")
 	AM_RANGE(0x00800000, 0x0080007f) AM_READWRITE(artmagic_blitter_r, artmagic_blitter_w)
@@ -474,7 +474,7 @@ static ADDRESS_MAP_START( tms_map, AS_PROGRAM, 16, artmagic_state )
 ADDRESS_MAP_END
 
 
-static ADDRESS_MAP_START( stonebal_tms_map, AS_PROGRAM, 16, artmagic_state )
+ADDRESS_MAP_START(artmagic_state::stonebal_tms_map)
 	AM_RANGE(0x00000000, 0x001fffff) AM_RAM AM_SHARE("vram0")
 	AM_RANGE(0x00400000, 0x005fffff) AM_RAM AM_SHARE("vram1")
 	AM_RANGE(0x00800000, 0x0080007f) AM_READWRITE(artmagic_blitter_r, artmagic_blitter_w)
@@ -491,7 +491,7 @@ ADDRESS_MAP_END
  *************************************/
 
 /* see adp.c */
-static ADDRESS_MAP_START( shtstar_subcpu_map, AS_PROGRAM, 16, artmagic_state )
+ADDRESS_MAP_START(artmagic_state::shtstar_subcpu_map)
 	AM_RANGE(0x000000, 0x03ffff) AM_ROM
 	AM_RANGE(0x800140, 0x800141) AM_DEVWRITE8("aysnd", ym2149_device, address_w, 0x00ff)
 	AM_RANGE(0x800142, 0x800143) AM_DEVREADWRITE8("aysnd", ym2149_device, data_r, data_w, 0x00ff)
@@ -499,11 +499,11 @@ static ADDRESS_MAP_START( shtstar_subcpu_map, AS_PROGRAM, 16, artmagic_state )
 	AM_RANGE(0xffc000, 0xffffff) AM_RAM
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( shtstar_guncpu_map, AS_PROGRAM, 8, artmagic_state )
+ADDRESS_MAP_START(artmagic_state::shtstar_guncpu_map)
 	AM_RANGE(0x0000, 0x7fff) AM_ROM
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( shtstar_guncpu_io_map, AS_IO, 8, artmagic_state )
+ADDRESS_MAP_START(artmagic_state::shtstar_guncpu_io_map)
 	AM_RANGE(0xc000, 0xcfff) AM_RAM
 	AM_RANGE(MCS51_PORT_P1, MCS51_PORT_P1) AM_READNOP
 ADDRESS_MAP_END
@@ -834,7 +834,8 @@ MACHINE_CONFIG_START(artmagic_state::artmagic)
 MACHINE_CONFIG_END
 
 
-MACHINE_CONFIG_DERIVED(artmagic_state::cheesech, artmagic)
+MACHINE_CONFIG_START(artmagic_state::cheesech)
+	artmagic(config);
 
 	MCFG_SOUND_MODIFY("oki")
 	MCFG_SOUND_ROUTES_RESET()
@@ -842,7 +843,8 @@ MACHINE_CONFIG_DERIVED(artmagic_state::cheesech, artmagic)
 MACHINE_CONFIG_END
 
 
-MACHINE_CONFIG_DERIVED(artmagic_state::stonebal, artmagic)
+MACHINE_CONFIG_START(artmagic_state::stonebal)
+	artmagic(config);
 
 	MCFG_CPU_MODIFY("maincpu")
 	MCFG_CPU_PROGRAM_MAP(stonebal_map)
@@ -855,7 +857,8 @@ MACHINE_CONFIG_DERIVED(artmagic_state::stonebal, artmagic)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.45)
 MACHINE_CONFIG_END
 
-MACHINE_CONFIG_DERIVED(artmagic_state::shtstar, artmagic)
+MACHINE_CONFIG_START(artmagic_state::shtstar)
+	artmagic(config);
 
 	MCFG_CPU_MODIFY("maincpu")
 	MCFG_CPU_PROGRAM_MAP(shtstar_map)

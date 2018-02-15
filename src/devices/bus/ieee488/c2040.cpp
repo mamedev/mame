@@ -168,7 +168,7 @@ const tiny_rom_entry *c4040_device::device_rom_region() const
 //  ADDRESS_MAP( c2040_main_mem )
 //-------------------------------------------------
 
-static ADDRESS_MAP_START( c2040_main_mem, AS_PROGRAM, 8, c2040_device )
+ADDRESS_MAP_START(c2040_device::c2040_main_mem)
 	ADDRESS_MAP_GLOBAL_MASK(0x7fff)
 	AM_RANGE(0x0000, 0x007f) AM_MIRROR(0x0100) AM_DEVICE(M6532_0_TAG, mos6532_new_device, ram_map)
 	AM_RANGE(0x0080, 0x00ff) AM_MIRROR(0x0100) AM_DEVICE(M6532_1_TAG, mos6532_new_device, ram_map)
@@ -186,7 +186,7 @@ ADDRESS_MAP_END
 //  ADDRESS_MAP( c2040_fdc_mem )
 //-------------------------------------------------
 
-static ADDRESS_MAP_START( c2040_fdc_mem, AS_PROGRAM, 8, c2040_device )
+ADDRESS_MAP_START(c2040_device::c2040_fdc_mem)
 	ADDRESS_MAP_GLOBAL_MASK(0x1fff)
 	AM_RANGE(0x0000, 0x003f) AM_MIRROR(0x0300) AM_DEVICE(M6530_TAG, mos6530_new_device, ram_map)
 	AM_RANGE(0x0040, 0x004f) AM_MIRROR(0x0330) AM_DEVICE(M6522_TAG, via6522_device, map)

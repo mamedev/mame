@@ -301,7 +301,7 @@ WRITE_LINE_MEMBER(qdrmfgp_state::gp2_ide_interrupt)
  *
  *************************************/
 
-static ADDRESS_MAP_START( qdrmfgp_map, AS_PROGRAM, 16, qdrmfgp_state )
+ADDRESS_MAP_START(qdrmfgp_state::qdrmfgp_map)
 	AM_RANGE(0x000000, 0x0fffff) AM_ROM
 	AM_RANGE(0x100000, 0x10ffff) AM_RAM AM_SHARE("workram")                                     /* work ram */
 	AM_RANGE(0x180000, 0x183fff) AM_RAM AM_SHARE("nvram")   /* backup ram */
@@ -324,7 +324,7 @@ static ADDRESS_MAP_START( qdrmfgp_map, AS_PROGRAM, 16, qdrmfgp_state )
 ADDRESS_MAP_END
 
 
-static ADDRESS_MAP_START( qdrmfgp2_map, AS_PROGRAM, 16, qdrmfgp_state )
+ADDRESS_MAP_START(qdrmfgp_state::qdrmfgp2_map)
 	AM_RANGE(0x000000, 0x0fffff) AM_ROM
 	AM_RANGE(0x100000, 0x110fff) AM_RAM AM_SHARE("workram")                                     /* work ram */
 	AM_RANGE(0x180000, 0x183fff) AM_RAM AM_SHARE("nvram")   /* backup ram */
@@ -351,7 +351,7 @@ static ADDRESS_MAP_START( qdrmfgp2_map, AS_PROGRAM, 16, qdrmfgp_state )
 ADDRESS_MAP_END
 
 
-static ADDRESS_MAP_START( qdrmfgp_k054539_map, 0, 8, qdrmfgp_state )
+ADDRESS_MAP_START(qdrmfgp_state::qdrmfgp_k054539_map)
 	AM_RANGE(0x000000, 0x0fffff) AM_ROM AM_REGION("k054539", 0)
 	AM_RANGE(0x100000, 0x45ffff) AM_RAM AM_SHARE("sndram")
 ADDRESS_MAP_END

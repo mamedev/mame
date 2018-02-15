@@ -33,7 +33,7 @@
 //  ADDRESS_MAP( dragon_mem )
 //-------------------------------------------------
 
-static ADDRESS_MAP_START( dragon_mem, AS_PROGRAM, 8, dragon_state )
+ADDRESS_MAP_START(dragon_state::dragon_mem)
 ADDRESS_MAP_END
 
 
@@ -224,10 +224,10 @@ MACHINE_CONFIG_START(dragon_state::dragon_base)
 	MCFG_MC6847_INPUT_CALLBACK(DEVREAD8(SAM_TAG, sam6883_device, display_read))
 
 	// sound hardware
-	MCFG_FRAGMENT_ADD( coco_sound )
+	coco_sound(config);
 
 	// floating space
-	MCFG_FRAGMENT_ADD( coco_floating )
+	coco_floating(config);
 
 	// software lists
 	MCFG_SOFTWARE_LIST_ADD("dragon_cart_list", "dragon_cart")
@@ -236,7 +236,8 @@ MACHINE_CONFIG_START(dragon_state::dragon_base)
 	MCFG_SOFTWARE_LIST_COMPATIBLE_ADD("coco_cart_list", "coco_cart")
 MACHINE_CONFIG_END
 
-MACHINE_CONFIG_DERIVED(dragon_state::dragon32, dragon_base)
+MACHINE_CONFIG_START(dragon_state::dragon32)
+	dragon_base(config);
 	// internal ram
 	MCFG_RAM_ADD(RAM_TAG)
 	MCFG_RAM_DEFAULT_SIZE("32K")
@@ -249,7 +250,8 @@ MACHINE_CONFIG_DERIVED(dragon_state::dragon32, dragon_base)
 	MCFG_COCO_CARTRIDGE_HALT_CB(INPUTLINE(MAINCPU_TAG, INPUT_LINE_HALT))
 MACHINE_CONFIG_END
 
-MACHINE_CONFIG_DERIVED(dragon64_state::dragon64, dragon_base)
+MACHINE_CONFIG_START(dragon64_state::dragon64)
+	dragon_base(config);
 	// internal ram
 	MCFG_RAM_ADD(RAM_TAG)
 	MCFG_RAM_DEFAULT_SIZE("64K")
@@ -269,13 +271,15 @@ MACHINE_CONFIG_DERIVED(dragon64_state::dragon64, dragon_base)
 	MCFG_SOFTWARE_LIST_ADD("dragon_os9_list", "dragon_os9")
 MACHINE_CONFIG_END
 
-MACHINE_CONFIG_DERIVED(dragon200e_state::dragon200e, dragon64)
+MACHINE_CONFIG_START(dragon200e_state::dragon200e)
+	dragon64(config);
 	// video hardware
 	MCFG_DEVICE_MODIFY(VDG_TAG)
 	MCFG_MC6847_CHARROM_CALLBACK(dragon200e_state, char_rom_r)
 MACHINE_CONFIG_END
 
-MACHINE_CONFIG_DERIVED(d64plus_state::d64plus, dragon64)
+MACHINE_CONFIG_START(d64plus_state::d64plus)
+	dragon64(config);
 	// video hardware
 	MCFG_SCREEN_ADD("plus_screen", RASTER)
 	MCFG_SCREEN_REFRESH_RATE(50)
@@ -292,7 +296,8 @@ MACHINE_CONFIG_DERIVED(d64plus_state::d64plus, dragon64)
 	MCFG_MC6845_UPDATE_ROW_CB(d64plus_state, crtc_update_row)
 MACHINE_CONFIG_END
 
-MACHINE_CONFIG_DERIVED(dragon_alpha_state::dgnalpha, dragon_base)
+MACHINE_CONFIG_START(dragon_alpha_state::dgnalpha)
+	dragon_base(config);
 	// internal ram
 	MCFG_RAM_ADD(RAM_TAG)
 	MCFG_RAM_DEFAULT_SIZE("64K")
@@ -339,7 +344,8 @@ MACHINE_CONFIG_DERIVED(dragon_alpha_state::dgnalpha, dragon_base)
 	MCFG_SOFTWARE_LIST_ADD("dragon_os9_list", "dragon_os9")
 MACHINE_CONFIG_END
 
-MACHINE_CONFIG_DERIVED(dragon64_state::tanodr64, dragon64)
+MACHINE_CONFIG_START(dragon64_state::tanodr64)
+	dragon64(config);
 	MCFG_DEVICE_MODIFY(":")
 	MCFG_DEVICE_CLOCK(XTAL(14'318'181) / 4)
 

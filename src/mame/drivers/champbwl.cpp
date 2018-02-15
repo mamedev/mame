@@ -200,6 +200,8 @@ public:
 	DECLARE_WRITE_LINE_MEMBER(screen_vblank_doraemon);
 	void champbwl(machine_config &config);
 	void doraemon(machine_config &config);
+	void champbwl_map(address_map &map);
+	void doraemon(address_map &map);
 };
 
 PALETTE_INIT_MEMBER(champbwl_state,champbwl)
@@ -247,7 +249,7 @@ WRITE8_MEMBER(champbwl_state::champbwl_misc_w)
 	membank("bank1")->set_entry((data & 0x30) >> 4);
 }
 
-static ADDRESS_MAP_START( champbwl_map, AS_PROGRAM, 8, champbwl_state )
+ADDRESS_MAP_START(champbwl_state::champbwl_map)
 	AM_RANGE(0x0000, 0x3fff) AM_ROM AM_REGION("maincpu", 0x10000)
 	AM_RANGE(0x4000, 0x7fff) AM_ROMBANK("bank1")
 	AM_RANGE(0x8000, 0x87ff) AM_RAM AM_SHARE("nvram")
@@ -286,7 +288,7 @@ WRITE8_MEMBER(champbwl_state::doraemon_outputs_w)
 //  popmessage("%02x", data);
 }
 
-static ADDRESS_MAP_START( doraemon, AS_PROGRAM, 8, champbwl_state )
+ADDRESS_MAP_START(champbwl_state::doraemon)
 	AM_RANGE(0x0000, 0x3fff) AM_ROM
 	AM_RANGE(0x4000, 0x7fff) AM_ROMBANK("bank1")
 	AM_RANGE(0x8000, 0x87ff) AM_RAM AM_SHARE("nvram")

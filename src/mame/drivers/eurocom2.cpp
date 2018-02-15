@@ -93,6 +93,7 @@ public:
 	DECLARE_WRITE_LINE_MEMBER(pia1_cb2_w);
 
 	void eurocom2(machine_config &config);
+	void eurocom2_map(address_map &map);
 protected:
 	// driver_device overrides
 	virtual void machine_reset() override;
@@ -141,6 +142,7 @@ public:
 	DECLARE_WRITE8_MEMBER(waveterm_dac);
 
 	void waveterm(machine_config &config);
+	void waveterm_map(address_map &map);
 protected:
 	bool m_driveh;
 	uint8_t m_drive;
@@ -328,7 +330,7 @@ uint32_t eurocom2_state::screen_update(screen_device &screen, bitmap_ind16 &bitm
 	return 0;
 }
 
-static ADDRESS_MAP_START(eurocom2_map, AS_PROGRAM, 8, eurocom2_state)
+ADDRESS_MAP_START(eurocom2_state::eurocom2_map)
 	AM_RANGE(0x0000, 0xefff) AM_RAM AM_SHARE("videoram")
 	AM_RANGE(0xf000, 0xfcef) AM_ROM AM_REGION("maincpu", 0)
 	AM_RANGE(0xfcf0, 0xfcf3) AM_DEVREADWRITE("pia1", pia6821_device, read, write)
@@ -340,7 +342,7 @@ static ADDRESS_MAP_START(eurocom2_map, AS_PROGRAM, 8, eurocom2_state)
 	AM_RANGE(0xfd40, 0xffff) AM_ROM AM_REGION("maincpu", 0xd40) AM_WRITENOP
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START(waveterm_map, AS_PROGRAM, 8, waveterm_state)
+ADDRESS_MAP_START(waveterm_state::waveterm_map)
 	AM_IMPORT_FROM(eurocom2_map)
 	AM_RANGE(0xfd00, 0xfd03) AM_DEVREADWRITE("pia3", pia6821_device, read, write)
 	AM_RANGE(0xfd08, 0xfd0f) AM_DEVREADWRITE("ptm", ptm6840_device, read, write)
@@ -471,7 +473,8 @@ MACHINE_CONFIG_START(eurocom2_state::eurocom2)
 //  MCFG_FLOPPY_DRIVE_SOUND(true)
 MACHINE_CONFIG_END
 
-MACHINE_CONFIG_DERIVED(waveterm_state::waveterm, eurocom2)
+MACHINE_CONFIG_START(waveterm_state::waveterm)
+	eurocom2(config);
 	MCFG_CPU_MODIFY("maincpu")
 	MCFG_CPU_PROGRAM_MAP(waveterm_map)
 

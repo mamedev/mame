@@ -29,7 +29,7 @@ DEFINE_DEVICE_TYPE(UPD7752, upd7752_device, "upd7752", "NEC uPD7752")
 
 
 /* TODO: unknown exact size */
-static ADDRESS_MAP_START( upd7752_ram, 0, 8, upd7752_device )
+ADDRESS_MAP_START(upd7752_device::upd7752_ram)
 //  AM_RANGE(0x0000, 0x7fff) AM_ROM
 	AM_RANGE(0x0000, 0xffff) AM_RAM
 ADDRESS_MAP_END
@@ -46,7 +46,7 @@ upd7752_device::upd7752_device(const machine_config &mconfig, const char *tag, d
 	: device_t(mconfig, UPD7752, tag, owner, clock),
 		device_sound_interface(mconfig, *this),
 		device_memory_interface(mconfig, *this), m_stream(nullptr),
-		m_space_config("ram", ENDIANNESS_LITTLE, 8, 16, 0, nullptr, *ADDRESS_MAP_NAME(upd7752_ram)), m_status(0), m_ram_addr(0), m_mode(0)
+		m_space_config("ram", ENDIANNESS_LITTLE, 8, 16, 0, address_map_constructor(), address_map_constructor(FUNC(upd7752_device::upd7752_ram), this)), m_status(0), m_ram_addr(0), m_mode(0)
 {
 }
 

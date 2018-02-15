@@ -26,11 +26,6 @@ public:
 		CONTROL_BUSY   = 0x8000
 	};
 
-	virtual DECLARE_READ16_MEMBER(control_r) const = 0;
-	virtual DECLARE_WRITE16_MEMBER(control_w) = 0;
-	virtual DECLARE_READ32_MEMBER(vram_r) const = 0;
-	virtual DECLARE_WRITE32_MEMBER(vram_w) = 0;
-
 protected:
 	typedef struct
 	{
@@ -39,6 +34,11 @@ protected:
 
 		bool primary;
 	} gt_screen_t;
+
+	virtual DECLARE_READ16_MEMBER(control_r) = 0;
+	virtual DECLARE_WRITE16_MEMBER(control_w) = 0;
+	virtual DECLARE_READ32_MEMBER(vram_r) = 0;
+	virtual DECLARE_WRITE32_MEMBER(vram_w) = 0;
 };
 
 class mpcb963_device : public gt_device_base
@@ -48,17 +48,17 @@ public:
 
 	static const int GT_SCREEN_COUNT = 1;
 
-	virtual DECLARE_ADDRESS_MAP(map, 32) override;
-
-	virtual DECLARE_READ16_MEMBER(control_r) const override { return m_control; }
-	virtual DECLARE_WRITE16_MEMBER(control_w) override;
-	virtual DECLARE_READ32_MEMBER(vram_r) const override;
-	virtual DECLARE_WRITE32_MEMBER(vram_w) override;
-
 protected:
 	virtual const tiny_rom_entry *device_rom_region() const override;
 	virtual void device_add_mconfig(machine_config &config) override;
 	virtual void device_start() override;
+
+	virtual void map(address_map &map) override;
+
+	virtual DECLARE_READ16_MEMBER(control_r) override { return m_control; }
+	virtual DECLARE_WRITE16_MEMBER(control_w) override;
+	virtual DECLARE_READ32_MEMBER(vram_r) override;
+	virtual DECLARE_WRITE32_MEMBER(vram_w) override;
 
 	u32 screen_update0(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 
@@ -75,13 +75,6 @@ public:
 
 	static const int GT_SCREEN_COUNT = 2;
 
-	virtual DECLARE_ADDRESS_MAP(map, 32) override;
-
-	virtual DECLARE_READ16_MEMBER(control_r) const override { return m_control; }
-	virtual DECLARE_WRITE16_MEMBER(control_w) override;
-	virtual DECLARE_READ32_MEMBER(vram_r) const override;
-	virtual DECLARE_WRITE32_MEMBER(vram_w) override;
-
 protected:
 	virtual const tiny_rom_entry *device_rom_region() const override;
 	virtual void device_add_mconfig(machine_config &config) override;
@@ -89,6 +82,13 @@ protected:
 
 	u32 screen_update0(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 	u32 screen_update1(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
+
+	virtual void map(address_map &map) override;
+
+	virtual DECLARE_READ16_MEMBER(control_r) override { return m_control; }
+	virtual DECLARE_WRITE16_MEMBER(control_w) override;
+	virtual DECLARE_READ32_MEMBER(vram_r) override;
+	virtual DECLARE_WRITE32_MEMBER(vram_w) override;
 
 private:
 	u16 m_control;

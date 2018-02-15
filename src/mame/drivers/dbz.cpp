@@ -106,7 +106,7 @@ WRITE16_MEMBER(dbz_state::dbz_sound_cause_nmi)
 }
 
 
-static ADDRESS_MAP_START( dbz_map, AS_PROGRAM, 16, dbz_state )
+ADDRESS_MAP_START(dbz_state::dbz_map)
 	AM_RANGE(0x000000, 0x0fffff) AM_ROM
 	AM_RANGE(0x480000, 0x48ffff) AM_RAM
 	AM_RANGE(0x490000, 0x491fff) AM_DEVREADWRITE("k056832", k056832_device, ram_word_r, ram_word_w)  // '157 RAM is mirrored twice
@@ -143,7 +143,7 @@ ADDRESS_MAP_END
 /* dbz sound */
 /* IRQ: from YM2151.  NMI: from 68000.  Port 0: write to ack NMI */
 
-static ADDRESS_MAP_START( dbz_sound_map, AS_PROGRAM, 8, dbz_state )
+ADDRESS_MAP_START(dbz_state::dbz_sound_map)
 	AM_RANGE(0x0000, 0x7fff) AM_ROM
 	AM_RANGE(0x8000, 0xbfff) AM_RAM
 	AM_RANGE(0xc000, 0xc001) AM_DEVREADWRITE("ymsnd", ym2151_device, read, write)
@@ -151,7 +151,7 @@ static ADDRESS_MAP_START( dbz_sound_map, AS_PROGRAM, 8, dbz_state )
 	AM_RANGE(0xe000, 0xe001) AM_DEVREAD("soundlatch", generic_latch_8_device, read)
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( dbz_sound_io_map, AS_IO, 8, dbz_state )
+ADDRESS_MAP_START(dbz_state::dbz_sound_io_map)
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	AM_RANGE(0x00, 0x00) AM_WRITENOP
 ADDRESS_MAP_END

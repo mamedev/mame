@@ -64,6 +64,8 @@ public:
 	F3853_INTERRUPT_REQ_CB(mk1_interrupt);
 	required_device<cpu_device> m_maincpu;
 	void mk1(machine_config &config);
+	void mk1_io(address_map &map);
+	void mk1_mem(address_map &map);
 };
 
 
@@ -106,13 +108,13 @@ WRITE8_MEMBER( mk1_state::mk1_f8_w )
 	if ( ! ( m_f8[1] & 8 ) ) m_led[3] = bitswap<8>( m_f8[0],2,1,3,4,5,6,7,0 );
 }
 
-static ADDRESS_MAP_START( mk1_mem, AS_PROGRAM, 8, mk1_state )
+ADDRESS_MAP_START(mk1_state::mk1_mem)
 	AM_RANGE( 0x0000, 0x07ff ) AM_ROM
 	AM_RANGE( 0x1800, 0x18ff ) AM_RAM
 ADDRESS_MAP_END
 
 
-static ADDRESS_MAP_START( mk1_io, AS_IO, 8, mk1_state )
+ADDRESS_MAP_START(mk1_state::mk1_io)
 	AM_RANGE( 0x0, 0x1 ) AM_READWRITE( mk1_f8_r, mk1_f8_w )
 	AM_RANGE( 0xc, 0xf ) AM_DEVREADWRITE("f3853", f3853_device, read, write )
 ADDRESS_MAP_END

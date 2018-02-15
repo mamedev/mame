@@ -126,14 +126,14 @@ void pgm_012_025_state::drgw2_common_init()
 
 }
 
-static ADDRESS_MAP_START( drgw2_mem, AS_PROGRAM, 16, pgm_012_025_state )
+ADDRESS_MAP_START(pgm_012_025_state::drgw2_mem)
 	AM_IMPORT_FROM(pgm_mem)
 	AM_RANGE(0x100000, 0x1fffff) AM_ROMBANK("bank1") /* Game ROM */
 	AM_RANGE(0xd00000, 0xd00fff) AM_NOP // Written, but never read back? Related to the protection device? - IGS012?
 ADDRESS_MAP_END
 
 MACHINE_CONFIG_START(pgm_012_025_state::pgm_012_025_drgw2)
-	MCFG_FRAGMENT_ADD(pgmbase)
+	pgmbase(config);
 
 	MCFG_CPU_MODIFY("maincpu")
 	MCFG_CPU_PROGRAM_MAP(drgw2_mem)

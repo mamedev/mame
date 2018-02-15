@@ -435,6 +435,8 @@ public:
 	void aristmk4_poker(machine_config &config);
 	void aristmk4(machine_config &config);
 	void _86lions(machine_config &config);
+	void aristmk4_map(address_map &map);
+	void aristmk4_poker_map(address_map &map);
 };
 
 /* Partial Cashcade protocol */
@@ -998,7 +1000,7 @@ ADDRESS MAP - SLOT GAMES
 
 ******************************************************************************/
 
-static ADDRESS_MAP_START( aristmk4_map, AS_PROGRAM, 8, aristmk4_state )
+ADDRESS_MAP_START(aristmk4_state::aristmk4_map)
 	AM_RANGE(0x0000, 0x07ff) AM_RAM AM_SHARE("mkiv_vram") // video ram -  chips U49 / U50
 	AM_RANGE(0x0800, 0x17ff) AM_RAM
 	AM_RANGE(0x1800, 0x1800) AM_DEVREADWRITE("crtc", mc6845_device, status_r, address_w)
@@ -1042,7 +1044,7 @@ The graphics rom is mapped from 0x4000 - 0x4fff
 The U87 personality rom is not required, therefore game rom code mapping is from 0x8000-0xffff
 */
 
-static ADDRESS_MAP_START( aristmk4_poker_map, AS_PROGRAM, 8, aristmk4_state )
+ADDRESS_MAP_START(aristmk4_state::aristmk4_poker_map)
 	AM_RANGE(0x0000, 0x07ff) AM_RAM AM_SHARE("mkiv_vram") // video ram -  chips U49 / U50
 	AM_RANGE(0x0800, 0x17ff) AM_RAM
 	AM_RANGE(0x1800, 0x1800) AM_DEVREADWRITE("crtc", mc6845_device, status_r, address_w)
@@ -1820,7 +1822,8 @@ MACHINE_CONFIG_START(aristmk4_state::aristmk4)
 
 MACHINE_CONFIG_END
 
-MACHINE_CONFIG_DERIVED(aristmk4_state::aristmk4_poker, aristmk4)
+MACHINE_CONFIG_START(aristmk4_state::aristmk4_poker)
+	aristmk4(config);
 	/* basic machine hardware */
 	MCFG_CPU_MODIFY("maincpu")
 	MCFG_CPU_PROGRAM_MAP(aristmk4_poker_map)
@@ -1850,7 +1853,8 @@ PALETTE_INIT_MEMBER(aristmk4_state,lions)
 	}
 }
 
-MACHINE_CONFIG_DERIVED(aristmk4_state::_86lions, aristmk4)
+MACHINE_CONFIG_START(aristmk4_state::_86lions)
+	aristmk4(config);
 	MCFG_PALETTE_MODIFY("palette")
 	MCFG_PALETTE_INIT_OWNER(aristmk4_state,lions)
 MACHINE_CONFIG_END

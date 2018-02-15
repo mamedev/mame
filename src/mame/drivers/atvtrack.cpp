@@ -145,6 +145,10 @@ public:
 	void gpu_irq_test();
 	void gpu_irq_set(int);
 	void atvtrack(machine_config &config);
+	void atvtrack_main_map(address_map &map);
+	void atvtrack_main_port(address_map &map);
+	void atvtrack_sub_map(address_map &map);
+	void atvtrack_sub_port(address_map &map);
 protected:
 	bool m_slaverun;
 };
@@ -159,6 +163,8 @@ public:
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
 	void smashdrv(machine_config &config);
+	void smashdrv_main_map(address_map &map);
+	void smashdrv_main_port(address_map &map);
 };
 
 void atvtrack_state::logbinary(uint32_t data,int high=31,int low=0)
@@ -501,7 +507,7 @@ void smashdrv_state::machine_reset()
 
 // ATV Track
 
-static ADDRESS_MAP_START( atvtrack_main_map, AS_PROGRAM, 64, atvtrack_state )
+ADDRESS_MAP_START(atvtrack_state::atvtrack_main_map)
 	AM_RANGE(0x00000000, 0x000003ff) AM_RAM AM_SHARE("sharedmem")
 	AM_RANGE(0x00020000, 0x00020007) AM_READWRITE(control_r, control_w) // control registers
 //  AM_RANGE(0x00020040, 0x0002007f) // audio DAC buffer
@@ -511,13 +517,13 @@ static ADDRESS_MAP_START( atvtrack_main_map, AS_PROGRAM, 64, atvtrack_state )
 	AM_RANGE(0x0c000000, 0x0c7fffff) AM_RAM
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( atvtrack_main_port, AS_IO, 64, atvtrack_state )
+ADDRESS_MAP_START(atvtrack_state::atvtrack_main_port)
 	AM_RANGE(0x00, 0x1f) AM_READWRITE(ioport_r, ioport_w)
 ADDRESS_MAP_END
 
 // Smashing Drive
 
-static ADDRESS_MAP_START( smashdrv_main_map, AS_PROGRAM, 64, smashdrv_state )
+ADDRESS_MAP_START(smashdrv_state::smashdrv_main_map)
 	AM_RANGE(0x00000000, 0x03ffffff) AM_ROM
 	AM_RANGE(0x0c000000, 0x0c7fffff) AM_RAM
 	AM_RANGE(0x10000000, 0x100003ff) AM_RAM AM_SHARE("sharedmem")
@@ -528,13 +534,13 @@ static ADDRESS_MAP_START( smashdrv_main_map, AS_PROGRAM, 64, smashdrv_state )
 	AM_RANGE(0x14000000, 0x143fffff) AM_ROM AM_REGION("data", 0)
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( smashdrv_main_port, AS_IO, 64, smashdrv_state )
+ADDRESS_MAP_START(smashdrv_state::smashdrv_main_port)
 	AM_RANGE(0x00, 0x1f) AM_READWRITE(ioport_r, ioport_w)
 ADDRESS_MAP_END
 
 // Sub CPU (same for both games)
 
-static ADDRESS_MAP_START( atvtrack_sub_map, AS_PROGRAM, 64, atvtrack_state )
+ADDRESS_MAP_START(atvtrack_state::atvtrack_sub_map)
 	AM_RANGE(0x00000000, 0x000003ff) AM_RAM AM_SHARE("sharedmem")
 	AM_RANGE(0x0c000000, 0x0cffffff) AM_RAM
 	AM_RANGE(0x14000000, 0x14003fff) AM_READWRITE32(gpu_r, gpu_w, 0xffffffffffffffffU)
@@ -543,7 +549,7 @@ static ADDRESS_MAP_START( atvtrack_sub_map, AS_PROGRAM, 64, atvtrack_state )
 // 0x18000000 - 0x19FFFFFF GPU RAM (32MB)
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( atvtrack_sub_port, AS_IO, 64, atvtrack_state )
+ADDRESS_MAP_START(atvtrack_state::atvtrack_sub_port)
 ADDRESS_MAP_END
 
 
@@ -595,7 +601,8 @@ MACHINE_CONFIG_START(atvtrack_state::atvtrack)
 	MCFG_PALETTE_ADD("palette", 0x1000)
 MACHINE_CONFIG_END
 
-MACHINE_CONFIG_DERIVED(smashdrv_state::smashdrv, atvtrack)
+MACHINE_CONFIG_START(smashdrv_state::smashdrv)
+	atvtrack(config);
 	MCFG_CPU_MODIFY("maincpu")
 	MCFG_CPU_PROGRAM_MAP(smashdrv_main_map)
 	MCFG_CPU_IO_MAP(smashdrv_main_port)

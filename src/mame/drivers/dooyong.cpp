@@ -114,6 +114,7 @@ protected:
 	optional_device<dooyong_rom_tilemap_device> m_fg2;
 
 	void sound_2151_4mhz(machine_config &config);
+	void bluehawk_sound_map(address_map &map);
 };
 
 class dooyong_z80_state : public dooyong_state
@@ -221,6 +222,9 @@ public:
 	void bluehawk(machine_config &config);
 	void flytiger(machine_config &config);
 	void primella(machine_config &config);
+	void bluehawk_map(address_map &map);
+	void flytiger_map(address_map &map);
+	void primella_map(address_map &map);
 protected:
 	void draw_sprites(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect, unsigned extensions = 0);
 
@@ -293,6 +297,11 @@ public:
 	void pollux(machine_config &config);
 	void lastday(machine_config &config);
 	void gulfstrm(machine_config &config);
+	void gulfstrm_map(address_map &map);
+	void lastday_map(address_map &map);
+	void lastday_sound_map(address_map &map);
+	void pollux_map(address_map &map);
+	void pollux_sound_map(address_map &map);
 protected:
 	int m_interrupt_line_1 = 0;
 	int m_interrupt_line_2 = 0;
@@ -324,6 +333,9 @@ public:
 
 	TIMER_DEVICE_CALLBACK_MEMBER(scanline);
 
+	void popbingo_map(address_map &map);
+	void rshark_map(address_map &map);
+	void superx_map(address_map &map);
 protected:
 	void draw_sprites(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 
@@ -770,7 +782,7 @@ uint32_t popbingo_state::screen_update_popbingo(screen_device &screen, bitmap_in
 
 ***************************************************************************/
 
-ADDRESS_MAP_START( lastday_map, AS_PROGRAM, 8, dooyong_z80_ym2203_state )
+ADDRESS_MAP_START(dooyong_z80_ym2203_state::lastday_map)
 	AM_RANGE(0x0000, 0x7fff) AM_ROM
 	AM_RANGE(0x8000, 0xbfff) AM_ROMBANK("bank1")
 	AM_RANGE(0xc000, 0xc007) AM_DEVWRITE("bg", dooyong_rom_tilemap_device, ctrl_w)
@@ -789,7 +801,7 @@ ADDRESS_MAP_START( lastday_map, AS_PROGRAM, 8, dooyong_z80_ym2203_state )
 	AM_RANGE(0xf000, 0xffff) AM_RAM AM_SHARE("spriteram")
 ADDRESS_MAP_END
 
-ADDRESS_MAP_START( pollux_map, AS_PROGRAM, 8, dooyong_z80_ym2203_state )
+ADDRESS_MAP_START(dooyong_z80_ym2203_state::pollux_map)
 	AM_RANGE(0x0000, 0x7fff) AM_ROM
 	AM_RANGE(0x8000, 0xbfff) AM_ROMBANK("bank1")
 	AM_RANGE(0xc000, 0xcfff) AM_RAM
@@ -807,7 +819,7 @@ ADDRESS_MAP_START( pollux_map, AS_PROGRAM, 8, dooyong_z80_ym2203_state )
 	AM_RANGE(0xf800, 0xffff) AM_READWRITE(paletteram_flytiger_r, paletteram_flytiger_w)
 ADDRESS_MAP_END
 
-ADDRESS_MAP_START( gulfstrm_map, AS_PROGRAM, 8, dooyong_z80_ym2203_state )
+ADDRESS_MAP_START(dooyong_z80_ym2203_state::gulfstrm_map)
 	AM_RANGE(0x0000, 0x7fff) AM_ROM
 	AM_RANGE(0x8000, 0xbfff) AM_ROMBANK("bank1")
 	AM_RANGE(0xc000, 0xcfff) AM_RAM
@@ -826,7 +838,7 @@ ADDRESS_MAP_START( gulfstrm_map, AS_PROGRAM, 8, dooyong_z80_ym2203_state )
 	AM_RANGE(0xf800, 0xffff) AM_RAM_DEVWRITE("palette", palette_device, write8) AM_SHARE("palette")
 ADDRESS_MAP_END
 
-ADDRESS_MAP_START( bluehawk_map, AS_PROGRAM, 8, dooyong_z80_state )
+ADDRESS_MAP_START(dooyong_z80_state::bluehawk_map)
 	AM_RANGE(0x0000, 0x7fff) AM_ROM
 	AM_RANGE(0x8000, 0xbfff) AM_ROMBANK("bank1")
 	AM_RANGE(0xc000, 0xc000) AM_READ_PORT("DSWA")
@@ -846,7 +858,7 @@ ADDRESS_MAP_START( bluehawk_map, AS_PROGRAM, 8, dooyong_z80_state )
 	AM_RANGE(0xf000, 0xffff) AM_RAM
 ADDRESS_MAP_END
 
-ADDRESS_MAP_START( flytiger_map, AS_PROGRAM, 8, dooyong_z80_state )
+ADDRESS_MAP_START(dooyong_z80_state::flytiger_map)
 	AM_RANGE(0x0000, 0x7fff) AM_ROM
 	AM_RANGE(0x8000, 0xbfff) AM_ROMBANK("bank1")
 	AM_RANGE(0xc000, 0xcfff) AM_RAM AM_SHARE("spriteram")
@@ -865,7 +877,7 @@ ADDRESS_MAP_START( flytiger_map, AS_PROGRAM, 8, dooyong_z80_state )
 	AM_RANGE(0xf000, 0xffff) AM_READWRITE(lastday_tx_r, lastday_tx_w)
 ADDRESS_MAP_END
 
-ADDRESS_MAP_START( primella_map, AS_PROGRAM, 8, dooyong_z80_state )
+ADDRESS_MAP_START(dooyong_z80_state::primella_map)
 	AM_RANGE(0x0000, 0x7fff) AM_ROM
 	AM_RANGE(0x8000, 0xbfff) AM_ROMBANK("bank1")
 	AM_RANGE(0xc000, 0xcfff) AM_RAM
@@ -883,7 +895,7 @@ ADDRESS_MAP_START( primella_map, AS_PROGRAM, 8, dooyong_z80_state )
 	AM_RANGE(0xfc08, 0xfc0f) AM_DEVWRITE("fg", dooyong_rom_tilemap_device, ctrl_w)
 ADDRESS_MAP_END
 
-ADDRESS_MAP_START( rshark_map, AS_PROGRAM, 16, dooyong_68k_state )
+ADDRESS_MAP_START(dooyong_68k_state::rshark_map)
 	ADDRESS_MAP_GLOBAL_MASK(0xfffff)    /* super-x needs this and is similar */
 	AM_RANGE(0x000000, 0x03ffff) AM_ROM
 	AM_RANGE(0x040000, 0x04cfff) AM_RAM
@@ -901,7 +913,7 @@ ADDRESS_MAP_START( rshark_map, AS_PROGRAM, 16, dooyong_68k_state )
 	AM_RANGE(0x0cc010, 0x0cc01f) AM_DEVWRITE8("fg2", dooyong_rom_tilemap_device, ctrl_w, 0x00ff)
 ADDRESS_MAP_END
 
-ADDRESS_MAP_START( superx_map, AS_PROGRAM, 16, dooyong_68k_state )
+ADDRESS_MAP_START(dooyong_68k_state::superx_map)
 	ADDRESS_MAP_GLOBAL_MASK(0xfffff)
 	AM_RANGE(0x000000, 0x03ffff) AM_ROM
 	AM_RANGE(0x0d0000, 0x0dcfff) AM_RAM
@@ -919,7 +931,7 @@ ADDRESS_MAP_START( superx_map, AS_PROGRAM, 16, dooyong_68k_state )
 	AM_RANGE(0x08c010, 0x08c01f) AM_DEVWRITE8("fg2", dooyong_rom_tilemap_device, ctrl_w, 0x00ff)
 ADDRESS_MAP_END
 
-ADDRESS_MAP_START( popbingo_map, AS_PROGRAM, 16, dooyong_68k_state )
+ADDRESS_MAP_START(dooyong_68k_state::popbingo_map)
 	ADDRESS_MAP_GLOBAL_MASK(0xfffff)
 	AM_RANGE(0x000000, 0x03ffff) AM_ROM
 	AM_RANGE(0x040000, 0x04cfff) AM_RAM
@@ -939,7 +951,7 @@ ADDRESS_MAP_START( popbingo_map, AS_PROGRAM, 16, dooyong_68k_state )
 	AM_RANGE(0x0dc000, 0x0dc01f) AM_RAM // registers of some kind?
 ADDRESS_MAP_END
 
-ADDRESS_MAP_START( lastday_sound_map, AS_PROGRAM, 8, dooyong_z80_ym2203_state )
+ADDRESS_MAP_START(dooyong_z80_ym2203_state::lastday_sound_map)
 	AM_RANGE(0x0000, 0x7fff) AM_ROM
 	AM_RANGE(0xc000, 0xc7ff) AM_RAM
 	AM_RANGE(0xc800, 0xc800) AM_DEVREAD("soundlatch", generic_latch_8_device, read)
@@ -947,7 +959,7 @@ ADDRESS_MAP_START( lastday_sound_map, AS_PROGRAM, 8, dooyong_z80_ym2203_state )
 	AM_RANGE(0xf002, 0xf003) AM_DEVREADWRITE("ym2", ym2203_device, read, write)
 ADDRESS_MAP_END
 
-ADDRESS_MAP_START( pollux_sound_map, AS_PROGRAM, 8, dooyong_z80_ym2203_state )
+ADDRESS_MAP_START(dooyong_z80_ym2203_state::pollux_sound_map)
 	AM_RANGE(0x0000, 0xefff) AM_ROM
 	AM_RANGE(0xf000, 0xf7ff) AM_RAM
 	AM_RANGE(0xf800, 0xf800) AM_DEVREAD("soundlatch", generic_latch_8_device, read)
@@ -955,7 +967,7 @@ ADDRESS_MAP_START( pollux_sound_map, AS_PROGRAM, 8, dooyong_z80_ym2203_state )
 	AM_RANGE(0xf804, 0xf805) AM_DEVREADWRITE("ym2", ym2203_device, read, write)
 ADDRESS_MAP_END
 
-ADDRESS_MAP_START( bluehawk_sound_map, AS_PROGRAM, 8, dooyong_state )
+ADDRESS_MAP_START(dooyong_state::bluehawk_sound_map)
 	AM_RANGE(0x0000, 0xefff) AM_ROM
 	AM_RANGE(0xf000, 0xf7ff) AM_RAM
 	AM_RANGE(0xf800, 0xf800) AM_DEVREAD("soundlatch", generic_latch_8_device, read)
@@ -1561,7 +1573,7 @@ MACHINE_CONFIG_START(dooyong_z80_ym2203_state::gulfstrm)
 	MCFG_VIDEO_START_OVERRIDE(dooyong_z80_ym2203_state, gulfstrm)
 
 	/* sound hardware */
-	MCFG_FRAGMENT_ADD( sound_2203 ) /* 3.579545MHz */
+	sound_2203(config); /* 3.579545MHz */
 MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(dooyong_z80_ym2203_state::pollux)
@@ -1600,7 +1612,7 @@ MACHINE_CONFIG_START(dooyong_z80_ym2203_state::pollux)
 	MCFG_VIDEO_START_OVERRIDE(dooyong_z80_ym2203_state, pollux)
 
 	/* sound hardware */
-	MCFG_FRAGMENT_ADD( sound_2203 ) /* 3.579545MHz or 4Mhz ??? */
+	sound_2203(config); /* 3.579545MHz or 4Mhz ??? */
 MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(dooyong_z80_state::bluehawk)
@@ -1640,7 +1652,7 @@ MACHINE_CONFIG_START(dooyong_z80_state::bluehawk)
 	MCFG_VIDEO_START_OVERRIDE(dooyong_z80_state, bluehawk)
 
 	/* sound hardware */
-	MCFG_FRAGMENT_ADD( sound_2151 ) /* 3.579545MHz or 4Mhz ??? */
+	sound_2151(config); /* 3.579545MHz or 4Mhz ??? */
 MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(dooyong_z80_state::flytiger)
@@ -1679,7 +1691,7 @@ MACHINE_CONFIG_START(dooyong_z80_state::flytiger)
 	MCFG_VIDEO_START_OVERRIDE(dooyong_z80_state, flytiger)
 
 	/* sound hardware */
-	MCFG_FRAGMENT_ADD( sound_2151 )
+	sound_2151(config);
 MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(dooyong_z80_state::primella)
@@ -1716,7 +1728,7 @@ MACHINE_CONFIG_START(dooyong_z80_state::primella)
 	MCFG_VIDEO_START_OVERRIDE(dooyong_z80_state, primella)
 
 	/* sound hardware */
-	MCFG_FRAGMENT_ADD( sound_2151_4mhz ) /* PCB has only 1 OSC at 16Mhz */
+	sound_2151_4mhz(config); /* PCB has only 1 OSC at 16Mhz */
 MACHINE_CONFIG_END
 
 
@@ -1768,15 +1780,17 @@ MACHINE_CONFIG_START(rshark_state::dooyong_68k)
 	MCFG_VIDEO_START_OVERRIDE(rshark_state, rshark)
 
 	// sound hardware
-	MCFG_FRAGMENT_ADD(sound_2151_4mhz)
+	sound_2151_4mhz(config);
 MACHINE_CONFIG_END
 
-MACHINE_CONFIG_DERIVED(rshark_state::rshark, dooyong_68k)
+MACHINE_CONFIG_START(rshark_state::rshark)
+	dooyong_68k(config);
 	MCFG_CPU_MODIFY("maincpu")
 	MCFG_CPU_PROGRAM_MAP(rshark_map)
 MACHINE_CONFIG_END
 
-MACHINE_CONFIG_DERIVED(rshark_state::superx, dooyong_68k)
+MACHINE_CONFIG_START(rshark_state::superx)
+	dooyong_68k(config);
 	MCFG_CPU_MODIFY("maincpu")
 	MCFG_CPU_PROGRAM_MAP(superx_map)
 MACHINE_CONFIG_END
@@ -1815,7 +1829,7 @@ MACHINE_CONFIG_START(popbingo_state::popbingo)
 	MCFG_VIDEO_START_OVERRIDE(popbingo_state, popbingo)
 
 	// sound hardware
-	MCFG_FRAGMENT_ADD(sound_2151_4mhz)
+	sound_2151_4mhz(config);
 MACHINE_CONFIG_END
 
 } // anonymous namespace

@@ -60,13 +60,13 @@
 /* Address map is dynamically setup when DAT memory is written to  */
 /* only ROM from FF00-FFFF and DAT memory at FFF0-FFFF (write only) is guaranteed always*/
 
-static ADDRESS_MAP_START(mp09_mem, AS_PROGRAM, 8, swtpc09_state)
+ADDRESS_MAP_START(swtpc09_state::mp09_mem)
 	AM_RANGE(0x0000, 0xfeff) AM_READWRITE(main_r, main_w)
 	AM_RANGE(0xff00, 0xffff) AM_ROM AM_REGION("maincpu", 0xff00)
 	AM_RANGE(0xff00, 0xff0f) AM_MIRROR(0xf0) AM_WRITEONLY AM_SHARE("dat")
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START(flex_dmf2_mem, AS_PROGRAM, 8, swtpc09_state)
+ADDRESS_MAP_START(swtpc09_state::flex_dmf2_mem)
 	AM_RANGE(0x00000, 0xfffff) AM_RAM AM_SHARE("mainram") // by default everything is ram, 1MB ram emulated
 	AM_RANGE(0xe000, 0xe003) AM_MIRROR(0xf0000) AM_NOP
 	AM_RANGE(0xe004, 0xe005) AM_MIRROR(0xf0000) AM_DEVREADWRITE("acia", acia6850_device, read, write)
@@ -80,7 +80,7 @@ static ADDRESS_MAP_START(flex_dmf2_mem, AS_PROGRAM, 8, swtpc09_state)
 	AM_RANGE(0xf800, 0xffff) AM_MIRROR(0xf0000) AM_ROM AM_REGION("maincpu", 0xf800)
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START(flex_dc4_piaide_mem, AS_PROGRAM, 8, swtpc09_state)
+ADDRESS_MAP_START(swtpc09_state::flex_dc4_piaide_mem)
 	AM_RANGE(0x00000, 0xfffff) AM_RAM AM_SHARE("mainram") // by default everything is ram, 1MB ram emulated
 	AM_RANGE(0xe000, 0xe003) AM_MIRROR(0xf0000) AM_NOP
 	AM_RANGE(0xe004, 0xe005) AM_MIRROR(0xf0000) AM_DEVREADWRITE("acia", acia6850_device, read, write)
@@ -101,7 +101,7 @@ static ADDRESS_MAP_START(flex_dc4_piaide_mem, AS_PROGRAM, 8, swtpc09_state)
 	AM_RANGE(0xf800, 0xffff) AM_MIRROR(0xf0000) AM_ROM AM_REGION("maincpu", 0xf800)
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START(uniflex_dmf2_mem, AS_PROGRAM, 8, swtpc09_state)
+ADDRESS_MAP_START(swtpc09_state::uniflex_dmf2_mem)
 	AM_RANGE(0x00000, 0xfffff) AM_RAM AM_SHARE("mainram") // by default everything is ram, 1MB ram emulated
 	AM_RANGE(0xe000, 0xe001) AM_MIRROR(0xf0000) AM_DEVREADWRITE("acia", acia6850_device, read, write)
 	AM_RANGE(0xe002, 0xe07f) AM_MIRROR(0xf0000) AM_NOP
@@ -115,7 +115,7 @@ static ADDRESS_MAP_START(uniflex_dmf2_mem, AS_PROGRAM, 8, swtpc09_state)
 	AM_RANGE(0xf800, 0xffff) AM_MIRROR(0xf0000) AM_ROM AM_REGION("maincpu", 0xf800)
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START(uniflex_dmf3_mem, AS_PROGRAM, 8, swtpc09_state)
+ADDRESS_MAP_START(swtpc09_state::uniflex_dmf3_mem)
 	AM_RANGE(0x00000, 0xfffff) AM_RAM AM_SHARE("mainram") // by default everything is ram, 1MB ram emulated
 	AM_RANGE(0xe000, 0xe001) AM_MIRROR(0xf0000) AM_DEVREADWRITE("acia", acia6850_device, read, write)
 	AM_RANGE(0xe002, 0xe07f) AM_MIRROR(0xf0000) AM_NOP
@@ -201,14 +201,16 @@ MACHINE_CONFIG_START(swtpc09_state::swtpc09_base)
 	MCFG_FLOPPY_DRIVE_ADD("fdc:3", swtpc09_floppies, "dd", swtpc09_state::floppy_formats)
 MACHINE_CONFIG_END
 
-MACHINE_CONFIG_DERIVED(swtpc09_state::swtpc09, swtpc09_base)
+MACHINE_CONFIG_START(swtpc09_state::swtpc09)
+	swtpc09_base(config);
 	MCFG_DEVICE_MODIFY("fdc")
 	MCFG_WD_FDC_INTRQ_CALLBACK(WRITELINE(swtpc09_state, fdc_intrq_w))
 	MCFG_WD_FDC_DRQ_CALLBACK(WRITELINE(swtpc09_state, fdc_drq_w))
 MACHINE_CONFIG_END
 
 /* MPU09, MPID, MPS2 DC4 PIAIDE*/
-MACHINE_CONFIG_DERIVED(swtpc09_state::swtpc09i, swtpc09_base)
+MACHINE_CONFIG_START(swtpc09_state::swtpc09i)
+	swtpc09_base(config);
 	MCFG_DEVICE_MODIFY("bankdev")
 	MCFG_DEVICE_PROGRAM_MAP(flex_dc4_piaide_mem)
 
@@ -223,14 +225,16 @@ MACHINE_CONFIG_DERIVED(swtpc09_state::swtpc09i, swtpc09_base)
 MACHINE_CONFIG_END
 
 
-MACHINE_CONFIG_DERIVED(swtpc09_state::swtpc09u, swtpc09)
+MACHINE_CONFIG_START(swtpc09_state::swtpc09u)
+	swtpc09(config);
 	MCFG_DEVICE_MODIFY("bankdev")
 	MCFG_DEVICE_PROGRAM_MAP(uniflex_dmf2_mem)
 MACHINE_CONFIG_END
 
 
 /* MPU09, MPID, MPS2 DMF3 */
-MACHINE_CONFIG_DERIVED(swtpc09_state::swtpc09d3, swtpc09_base)
+MACHINE_CONFIG_START(swtpc09_state::swtpc09d3)
+	swtpc09_base(config);
 	MCFG_CPU_MODIFY("maincpu")
 	MCFG_CPU_CLOCK(XTAL(8'000'000))
 

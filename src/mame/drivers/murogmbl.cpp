@@ -65,6 +65,7 @@ public:
 
 	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	void murogmbl(machine_config &config);
+	void murogmbl_map(address_map &map);
 };
 
 class slotunbl_state : public driver_device
@@ -88,6 +89,7 @@ public:
 
 	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	void slotunbl(machine_config &config);
+	void slotunbl_map(address_map &map);
 };
 
 PALETTE_INIT_MEMBER(murogmbl_state, murogmbl)
@@ -142,7 +144,7 @@ PALETTE_INIT_MEMBER(slotunbl_state, slotunbl)
 	}
 }
 
-static ADDRESS_MAP_START( murogmbl_map, AS_PROGRAM, 8, murogmbl_state )
+ADDRESS_MAP_START(murogmbl_state::murogmbl_map)
 	AM_RANGE(0x0000, 0x1fff) AM_ROM
 	AM_RANGE(0x4000, 0x43ff) AM_RAM
 	AM_RANGE(0x4800, 0x4bff) AM_RAM
@@ -154,7 +156,7 @@ static ADDRESS_MAP_START( murogmbl_map, AS_PROGRAM, 8, murogmbl_state )
 	AM_RANGE(0x7800, 0x7800) AM_READNOP AM_DEVWRITE("dac", dac_byte_interface, write) /* read is always discarded */
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( slotunbl_map, AS_PROGRAM, 8, slotunbl_state )
+ADDRESS_MAP_START(slotunbl_state::slotunbl_map)
 	AM_RANGE(0x0000, 0x1fff) AM_ROM
 	AM_RANGE(0x4000, 0x43ff) AM_RAM
 	AM_RANGE(0x4800, 0x4fff) AM_RAM

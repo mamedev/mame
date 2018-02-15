@@ -436,6 +436,14 @@ public:
 	DECLARE_WRITE_LINE_MEMBER(kurukuru_msm5205_vck);
 	void ppj(machine_config &config);
 	void kurukuru(machine_config &config);
+	void kurukuru_audio_io(address_map &map);
+	void kurukuru_audio_map(address_map &map);
+	void kurukuru_io(address_map &map);
+	void kurukuru_map(address_map &map);
+	void ppj_audio_io(address_map &map);
+	void ppj_audio_map(address_map &map);
+	void ppj_io(address_map &map);
+	void ppj_map(address_map &map);
 };
 
 #define MAIN_CLOCK      XTAL(21'477'272)
@@ -536,13 +544,13 @@ WRITE8_MEMBER(kurukuru_state::kurukuru_soundlatch_w)
 }
 
 
-static ADDRESS_MAP_START( kurukuru_map, AS_PROGRAM, 8, kurukuru_state )
+ADDRESS_MAP_START(kurukuru_state::kurukuru_map)
 	AM_RANGE(0x0000, 0x5fff) AM_ROM
 	AM_RANGE(0x6000, 0xdfff) AM_ROMBANK("bank1")
 	AM_RANGE(0xe000, 0xffff) AM_RAM AM_SHARE("nvram")
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( kurukuru_io, AS_IO, 8, kurukuru_state )
+ADDRESS_MAP_START(kurukuru_state::kurukuru_io)
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	AM_RANGE(0x00, 0x00) AM_MIRROR(0x0f) AM_WRITE(kurukuru_out_latch_w)
 	AM_RANGE(0x10, 0x10) AM_MIRROR(0x0f) AM_READ_PORT("DSW1")
@@ -555,13 +563,13 @@ static ADDRESS_MAP_START( kurukuru_io, AS_IO, 8, kurukuru_state )
 	AM_RANGE(0xd0, 0xd0) AM_MIRROR(0x0f) AM_DEVWRITE("ym2149", ay8910_device, data_w)
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( ppj_map, AS_PROGRAM, 8, kurukuru_state )
+ADDRESS_MAP_START(kurukuru_state::ppj_map)
 	AM_RANGE(0x0000, 0x5fff) AM_ROM
 	AM_RANGE(0x6000, 0xdfff) AM_ROMBANK("bank1")
 	AM_RANGE(0xe000, 0xffff) AM_RAM AM_SHARE("nvram")
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( ppj_io, AS_IO, 8, kurukuru_state )
+ADDRESS_MAP_START(kurukuru_state::ppj_io)
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	AM_RANGE(0x00, 0x00) AM_MIRROR(0x0f) AM_WRITE(kurukuru_bankswitch_w)
 	AM_RANGE(0x10, 0x13) AM_MIRROR(0x0c) AM_DEVREADWRITE( "v9938", v9938_device, read, write )
@@ -631,12 +639,12 @@ READ8_MEMBER(kurukuru_state::kurukuru_adpcm_timer_irqack_r)
 }
 
 
-static ADDRESS_MAP_START( kurukuru_audio_map, AS_PROGRAM, 8, kurukuru_state )
+ADDRESS_MAP_START(kurukuru_state::kurukuru_audio_map)
 	AM_RANGE(0x0000, 0xf7ff) AM_ROM
 	AM_RANGE(0xf800, 0xffff) AM_RAM
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( kurukuru_audio_io, AS_IO, 8, kurukuru_state )
+ADDRESS_MAP_START(kurukuru_state::kurukuru_audio_io)
 	ADDRESS_MAP_GLOBAL_MASK(0x7f)
 	AM_RANGE(0x40, 0x40) AM_MIRROR(0x0f) AM_WRITE(kurukuru_adpcm_data_w)
 	AM_RANGE(0x50, 0x50) AM_MIRROR(0x0f) AM_WRITE(kurukuru_adpcm_reset_w)
@@ -644,12 +652,12 @@ static ADDRESS_MAP_START( kurukuru_audio_io, AS_IO, 8, kurukuru_state )
 	AM_RANGE(0x70, 0x70) AM_MIRROR(0x0f) AM_READ(kurukuru_adpcm_timer_irqack_r)
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( ppj_audio_map, AS_PROGRAM, 8, kurukuru_state )
+ADDRESS_MAP_START(kurukuru_state::ppj_audio_map)
 	AM_RANGE(0x0000, 0xf7ff) AM_ROM
 	AM_RANGE(0xf800, 0xffff) AM_RAM
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( ppj_audio_io, AS_IO, 8, kurukuru_state )
+ADDRESS_MAP_START(kurukuru_state::ppj_audio_io)
 	ADDRESS_MAP_GLOBAL_MASK(0x7f)
 	AM_RANGE(0x20, 0x20) AM_MIRROR(0x0f) AM_WRITE(kurukuru_adpcm_data_w)
 	AM_RANGE(0x30, 0x30) AM_MIRROR(0x0f) AM_WRITE(kurukuru_adpcm_reset_w)

@@ -82,6 +82,7 @@ public:
 	DECLARE_QUICKLOAD_LOAD_MEMBER( d6800 );
 
 	void d6800(machine_config &config);
+	void d6800_map(address_map &map);
 private:
 	uint8_t m_rtc;
 	bool m_cb2;
@@ -109,7 +110,7 @@ private:
 
 /* Memory Maps */
 
-static ADDRESS_MAP_START( d6800_map, AS_PROGRAM, 8, d6800_state )
+ADDRESS_MAP_START(d6800_state::d6800_map)
 	AM_RANGE(0x0000, 0x00ff) AM_RAM
 	AM_RANGE(0x0100, 0x01ff) AM_RAM AM_SHARE("videoram")
 	AM_RANGE(0x0200, 0x0fff) AM_RAM

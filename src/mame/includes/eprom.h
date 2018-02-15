@@ -57,4 +57,7 @@ public:
 	void guts(machine_config &config);
 	void eprom(machine_config &config);
 	void klaxp(machine_config &config);
+	void extra_map(address_map &map);
+	void guts_map(address_map &map);
+	void main_map(address_map &map);
 };

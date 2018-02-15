@@ -97,4 +97,12 @@ public:
 	void nycaptor(machine_config &config);
 	void cyclshtg(machine_config &config);
 	void bronx(machine_config &config);
+	void bronx_master_map(address_map &map);
+	void bronx_slave_io_map(address_map &map);
+	void bronx_slave_map(address_map &map);
+	void cyclshtg_master_map(address_map &map);
+	void cyclshtg_slave_map(address_map &map);
+	void nycaptor_master_map(address_map &map);
+	void nycaptor_slave_map(address_map &map);
+	void sound_map(address_map &map);
 };

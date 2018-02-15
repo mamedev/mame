@@ -279,7 +279,7 @@ static INPUT_PORTS_START( intvkbd )
 	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_7_PAD)
 INPUT_PORTS_END
 
-static ADDRESS_MAP_START( intv_mem, AS_PROGRAM, 16, intv_state )
+ADDRESS_MAP_START(intv_state::intv_mem)
 	AM_RANGE(0x0000, 0x003f) AM_READWRITE(intv_stic_r, intv_stic_w)
 	AM_RANGE(0x0100, 0x01ef) AM_READWRITE(intv_ram8_r, intv_ram8_w)
 	AM_RANGE(0x01f0, 0x01ff) AM_DEVREADWRITE8("ay8914", ay8914_device, read, write, 0x00ff)
@@ -305,7 +305,7 @@ static ADDRESS_MAP_START( intv_mem, AS_PROGRAM, 16, intv_state )
 	AM_RANGE(0xf000, 0xffff) AM_DEVREAD("cartslot", intv_cart_slot_device, read_romf0)
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( intvoice_mem, AS_PROGRAM, 16, intv_state )
+ADDRESS_MAP_START(intv_state::intvoice_mem)
 	AM_RANGE(0x0000, 0x003f) AM_READWRITE(intv_stic_r, intv_stic_w)
 	AM_RANGE(0x0080, 0x0081) AM_DEVREADWRITE("voice", intv_voice_device, read_speech, write_speech) // Intellivoice
 	AM_RANGE(0x0100, 0x01ef) AM_READWRITE(intv_ram8_r, intv_ram8_w)
@@ -332,7 +332,7 @@ static ADDRESS_MAP_START( intvoice_mem, AS_PROGRAM, 16, intv_state )
 	AM_RANGE(0xf000, 0xffff) AM_DEVREAD("voice", intv_voice_device, read_romf0)
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( intv2_mem , AS_PROGRAM, 16, intv_state )
+ADDRESS_MAP_START(intv_state::intv2_mem)
 	AM_RANGE(0x0000, 0x003f) AM_READWRITE(intv_stic_r, intv_stic_w)
 	AM_RANGE(0x0100, 0x01ef) AM_READWRITE(intv_ram8_r, intv_ram8_w)
 	AM_RANGE(0x01f0, 0x01ff) AM_DEVREADWRITE8("ay8914", ay8914_device, read, write, 0x00ff)
@@ -358,7 +358,7 @@ static ADDRESS_MAP_START( intv2_mem , AS_PROGRAM, 16, intv_state )
 	AM_RANGE(0xf000, 0xffff) AM_DEVREAD("cartslot", intv_cart_slot_device, read_romf0)
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( intvecs_mem , AS_PROGRAM, 16, intv_state )
+ADDRESS_MAP_START(intv_state::intvecs_mem)
 	AM_RANGE(0x0000, 0x003f) AM_READWRITE(intv_stic_r, intv_stic_w)
 	AM_RANGE(0x0080, 0x0081) AM_DEVREADWRITE("speech", sp0256_device, spb640_r, spb640_w) /* Intellivoice */
 	// AM_RANGE(0x00E0, 0x00E3) AM_READWRITE( intv_ecs_uart_r, intv_ecs_uart_w )
@@ -387,7 +387,7 @@ static ADDRESS_MAP_START( intvecs_mem , AS_PROGRAM, 16, intv_state )
 	AM_RANGE(0xf000, 0xffff) AM_DEVREADWRITE("ecs", intv_ecs_device, read_romf0, write_romf0)
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( intvkbd_mem , AS_PROGRAM, 16, intv_state )
+ADDRESS_MAP_START(intv_state::intvkbd_mem)
 	AM_RANGE(0x0000, 0x003f) AM_READWRITE(intv_stic_r, intv_stic_w)
 	AM_RANGE(0x0100, 0x01ef) AM_READWRITE(intv_ram8_r, intv_ram8_w)
 	AM_RANGE(0x01f0, 0x01ff) AM_DEVREADWRITE8("ay8914", ay8914_device, read, write, 0x00ff)
@@ -410,7 +410,7 @@ static ADDRESS_MAP_START( intvkbd_mem , AS_PROGRAM, 16, intv_state )
 	AM_RANGE(0xf000, 0xffff) AM_DEVREAD("cartslot", intv_cart_slot_device, read_romf0)
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( intvkbd2_mem , AS_PROGRAM, 8, intv_state )
+ADDRESS_MAP_START(intv_state::intvkbd2_mem)
 	ADDRESS_MAP_UNMAP_HIGH  /* Required because of probing */
 	AM_RANGE(0x0000, 0x3fff) AM_READWRITE(intvkbd_dualport8_lsb_r, intvkbd_dualport8_lsb_w)  /* Dual-port RAM */
 	AM_RANGE(0x4000, 0x40bf) AM_READWRITE(intvkbd_io_r, intvkbd_io_w)
@@ -496,12 +496,14 @@ MACHINE_CONFIG_START(intv_state::intv)
 	MCFG_SOFTWARE_LIST_COMPATIBLE_ADD("ecs_list", "intvecs")
 MACHINE_CONFIG_END
 
-MACHINE_CONFIG_DERIVED(intv_state::intv2, intv)
+MACHINE_CONFIG_START(intv_state::intv2)
+	intv(config);
 	MCFG_CPU_MODIFY( "maincpu" )
 	MCFG_CPU_PROGRAM_MAP(intv2_mem)
 MACHINE_CONFIG_END
 
-MACHINE_CONFIG_DERIVED(intv_state::intvoice, intv)
+MACHINE_CONFIG_START(intv_state::intvoice)
+	intv(config);
 	MCFG_CPU_MODIFY( "maincpu" )
 	MCFG_CPU_PROGRAM_MAP(intvoice_mem)
 
@@ -509,7 +511,8 @@ MACHINE_CONFIG_DERIVED(intv_state::intvoice, intv)
 	MCFG_DEVICE_ADD("voice", INTV_ROM_VOICE, 0)
 MACHINE_CONFIG_END
 
-MACHINE_CONFIG_DERIVED(intv_state::intvecs, intv)
+MACHINE_CONFIG_START(intv_state::intvecs)
+	intv(config);
 	MCFG_CPU_MODIFY( "maincpu" )
 	MCFG_CPU_PROGRAM_MAP(intvecs_mem)
 
@@ -530,7 +533,8 @@ MACHINE_CONFIG_DERIVED(intv_state::intvecs, intv)
 	MCFG_SOFTWARE_LIST_COMPATIBLE_ADD("intv_list", "intv")
 MACHINE_CONFIG_END
 
-MACHINE_CONFIG_DERIVED(intv_state::intvkbd, intv)
+MACHINE_CONFIG_START(intv_state::intvkbd)
+	intv(config);
 	MCFG_CPU_MODIFY( "maincpu" )
 	MCFG_CPU_PROGRAM_MAP(intvkbd_mem)
 

@@ -89,4 +89,10 @@ public:
 	DECLARE_WRITE8_MEMBER(rozcpu_comm_w);
 	DECLARE_WRITE8_MEMBER(rozcpu_pal_w);
 	void divebomb(machine_config &config);
+	void divebomb_fgcpu_iomap(address_map &map);
+	void divebomb_fgcpu_map(address_map &map);
+	void divebomb_rozcpu_iomap(address_map &map);
+	void divebomb_rozcpu_map(address_map &map);
+	void divebomb_spritecpu_iomap(address_map &map);
+	void divebomb_spritecpu_map(address_map &map);
 };

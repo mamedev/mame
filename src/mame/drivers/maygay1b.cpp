@@ -476,7 +476,7 @@ WRITE8_MEMBER(maygay1b_state::m1_lockout_w)
 	}
 }
 
-static ADDRESS_MAP_START( m1_memmap, AS_PROGRAM, 8, maygay1b_state )
+ADDRESS_MAP_START(maygay1b_state::m1_memmap)
 	AM_RANGE(0x0000, 0x1fff) AM_RAM AM_SHARE("nvram")
 
 	AM_RANGE(0x2000, 0x2000) AM_WRITE(reel12_w)
@@ -561,7 +561,7 @@ WRITE8_MEMBER(maygay1b_state::nec_bank1_w)
 	m_upd7759->start_w(1);
 }
 
-static ADDRESS_MAP_START( m1_nec_memmap, AS_PROGRAM, 8, maygay1b_state )
+ADDRESS_MAP_START(maygay1b_state::m1_nec_memmap)
 	AM_RANGE(0x0000, 0x1fff) AM_RAM AM_SHARE("nvram")
 
 	AM_RANGE(0x2000, 0x2000) AM_WRITE(reel12_w)
@@ -761,7 +761,7 @@ READ8_MEMBER(maygay1b_state::mcu_port2_r)
 	return ret;
 }
 
-static ADDRESS_MAP_START( maygay_mcu_io, AS_IO, 8, maygay1b_state )
+ADDRESS_MAP_START(maygay1b_state::maygay_mcu_io)
 	AM_RANGE(MCS51_PORT_P0, MCS51_PORT_P0) AM_READWRITE( mcu_port0_r, mcu_port0_w )
 	AM_RANGE(MCS51_PORT_P1, MCS51_PORT_P1) AM_WRITE( mcu_port1_w )
 	AM_RANGE(MCS51_PORT_P2, MCS51_PORT_P2) AM_READWRITE( mcu_port2_r, mcu_port2_w )
@@ -848,11 +848,13 @@ MACHINE_CONFIG_START(maygay1b_state::maygay_m1)
 	MCFG_DEFAULT_LAYOUT(layout_maygay1b)
 MACHINE_CONFIG_END
 
-MACHINE_CONFIG_DERIVED(maygay1b_state::maygay_m1_no_oki, maygay_m1)
+MACHINE_CONFIG_START(maygay1b_state::maygay_m1_no_oki)
+	maygay_m1(config);
 	MCFG_DEVICE_REMOVE("msm6376")
 MACHINE_CONFIG_END
 
-MACHINE_CONFIG_DERIVED(maygay1b_state::maygay_m1_nec, maygay_m1)
+MACHINE_CONFIG_START(maygay1b_state::maygay_m1_nec)
+	maygay_m1(config);
 	MCFG_CPU_MODIFY("maincpu")
 	MCFG_CPU_PROGRAM_MAP(m1_nec_memmap)
 

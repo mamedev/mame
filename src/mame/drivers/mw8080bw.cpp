@@ -214,7 +214,7 @@ WRITE8_MEMBER(mw8080bw_state::mw8080bw_reversable_shift_count_w)
  *
  *************************************/
 
-static ADDRESS_MAP_START( main_map, AS_PROGRAM, 8, mw8080bw_state )
+ADDRESS_MAP_START(mw8080bw_state::main_map)
 	ADDRESS_MAP_GLOBAL_MASK(0x7fff)
 	AM_RANGE(0x0000, 0x1fff) AM_ROM AM_WRITENOP
 	AM_RANGE(0x2000, 0x3fff) AM_MIRROR(0x4000) AM_RAM AM_SHARE("main_ram")
@@ -330,7 +330,7 @@ CUSTOM_INPUT_MEMBER(mw8080bw_state::seawolf_erase_input_r)
 }
 
 
-static ADDRESS_MAP_START( seawolf_io_map, AS_IO, 8, mw8080bw_state )
+ADDRESS_MAP_START(mw8080bw_state::seawolf_io_map)
 	ADDRESS_MAP_GLOBAL_MASK(0x7)
 	AM_RANGE(0x00, 0x00) AM_MIRROR(0x04) AM_READ(mw8080bw_shift_result_rev_r)
 	AM_RANGE(0x01, 0x01) AM_MIRROR(0x04) AM_READ_PORT("IN0")
@@ -405,7 +405,8 @@ static INPUT_PORTS_START( seawolf )
 INPUT_PORTS_END
 
 
-MACHINE_CONFIG_DERIVED(mw8080bw_state::seawolf, mw8080bw_root)
+MACHINE_CONFIG_START(mw8080bw_state::seawolf)
+	mw8080bw_root(config);
 
 	/* basic machine hardware */
 	MCFG_CPU_MODIFY("maincpu")
@@ -416,7 +417,7 @@ MACHINE_CONFIG_DERIVED(mw8080bw_state::seawolf, mw8080bw_root)
 	MCFG_MB14241_ADD("mb14241")
 
 	/* audio hardware */
-	MCFG_FRAGMENT_ADD(seawolf_audio)
+	seawolf_audio(config);
 
 MACHINE_CONFIG_END
 
@@ -442,7 +443,7 @@ WRITE8_MEMBER(mw8080bw_state::gunfight_io_w)
 }
 
 
-static ADDRESS_MAP_START( gunfight_io_map, AS_IO, 8, mw8080bw_state )
+ADDRESS_MAP_START(mw8080bw_state::gunfight_io_map)
 	ADDRESS_MAP_GLOBAL_MASK(0x7)
 	AM_RANGE(0x00, 0x00) AM_MIRROR(0x04) AM_READ_PORT("IN0")
 	AM_RANGE(0x01, 0x01) AM_MIRROR(0x04) AM_READ_PORT("IN1")
@@ -505,7 +506,8 @@ static INPUT_PORTS_START( gunfight )
 INPUT_PORTS_END
 
 
-MACHINE_CONFIG_DERIVED(mw8080bw_state::gunfight, mw8080bw_root)
+MACHINE_CONFIG_START(mw8080bw_state::gunfight)
+	mw8080bw_root(config);
 
 	/* basic machine hardware */
 	MCFG_CPU_MODIFY("maincpu")
@@ -516,7 +518,7 @@ MACHINE_CONFIG_DERIVED(mw8080bw_state::gunfight, mw8080bw_root)
 	MCFG_MB14241_ADD("mb14241")
 
 	/* audio hardware */
-	MCFG_FRAGMENT_ADD(gunfight_audio)
+	gunfight_audio(config);
 
 MACHINE_CONFIG_END
 
@@ -636,7 +638,7 @@ WRITE8_MEMBER(mw8080bw_state::tornbase_io_w)
 }
 
 
-static ADDRESS_MAP_START( tornbase_io_map, AS_IO, 8, mw8080bw_state )
+ADDRESS_MAP_START(mw8080bw_state::tornbase_io_map)
 	ADDRESS_MAP_GLOBAL_MASK(0x7)
 	AM_RANGE(0x00, 0x00) AM_MIRROR(0x04) AM_READ_PORT("IN0")
 	AM_RANGE(0x01, 0x01) AM_MIRROR(0x04) AM_READ_PORT("IN1")
@@ -733,7 +735,8 @@ static INPUT_PORTS_START( tornbase )
 INPUT_PORTS_END
 
 
-MACHINE_CONFIG_DERIVED(mw8080bw_state::tornbase, mw8080bw_root)
+MACHINE_CONFIG_START(mw8080bw_state::tornbase)
+	mw8080bw_root(config);
 
 	/* basic machine hardware */
 	MCFG_CPU_MODIFY("maincpu")
@@ -744,7 +747,7 @@ MACHINE_CONFIG_DERIVED(mw8080bw_state::tornbase, mw8080bw_root)
 	MCFG_MB14241_ADD("mb14241")
 
 	/* audio hardware */
-	MCFG_FRAGMENT_ADD(tornbase_audio)
+	tornbase_audio(config);
 
 MACHINE_CONFIG_END
 
@@ -756,7 +759,7 @@ MACHINE_CONFIG_END
  *
  *************************************/
 
-static ADDRESS_MAP_START( zzzap_io_map, AS_IO, 8, mw8080bw_state )
+ADDRESS_MAP_START(mw8080bw_state::zzzap_io_map)
 	ADDRESS_MAP_GLOBAL_MASK(0x7)
 	AM_RANGE(0x00, 0x00) AM_MIRROR(0x04) AM_READ_PORT("IN0")
 	AM_RANGE(0x01, 0x01) AM_MIRROR(0x04) AM_READ_PORT("IN1")
@@ -840,7 +843,8 @@ static INPUT_PORTS_START( lagunar )
 INPUT_PORTS_END
 
 
-MACHINE_CONFIG_DERIVED(mw8080bw_state::zzzap, mw8080bw_root)
+MACHINE_CONFIG_START(mw8080bw_state::zzzap)
+	mw8080bw_root(config);
 
 	/* basic machine hardware */
 	MCFG_CPU_MODIFY("maincpu")
@@ -853,7 +857,7 @@ MACHINE_CONFIG_DERIVED(mw8080bw_state::zzzap, mw8080bw_root)
 	MCFG_MB14241_ADD("mb14241")
 
 	/* audio hardware */
-	/* MCFG_FRAGMENT_ADD(zzzap_audio) */
+	/* zzzap_audio(config); */
 
 MACHINE_CONFIG_END
 
@@ -914,7 +918,7 @@ WRITE8_MEMBER(mw8080bw_state::maze_io_w)
 }
 
 
-static ADDRESS_MAP_START( maze_io_map, AS_IO, 8, mw8080bw_state )
+ADDRESS_MAP_START(mw8080bw_state::maze_io_map)
 	ADDRESS_MAP_GLOBAL_MASK(0x3)
 	AM_RANGE(0x00, 0x00) AM_READ_PORT("IN0")
 	AM_RANGE(0x01, 0x01) AM_READ_PORT("IN1")
@@ -952,7 +956,8 @@ static INPUT_PORTS_START( maze )
 INPUT_PORTS_END
 
 
-MACHINE_CONFIG_DERIVED(mw8080bw_state::maze, mw8080bw_root)
+MACHINE_CONFIG_START(mw8080bw_state::maze)
+	mw8080bw_root(config);
 
 	/* basic machine hardware */
 	MCFG_CPU_MODIFY("maincpu")
@@ -963,7 +968,7 @@ MACHINE_CONFIG_DERIVED(mw8080bw_state::maze, mw8080bw_root)
 	MCFG_WATCHDOG_TIME_INIT(PERIOD_OF_555_MONOSTABLE(RES_K(270), CAP_U(10))) /* 2.97s */
 
 	/* audio hardware */
-	MCFG_FRAGMENT_ADD(maze_audio)
+	maze_audio(config);
 
 MACHINE_CONFIG_END
 
@@ -984,7 +989,7 @@ MACHINE_START_MEMBER(mw8080bw_state,boothill)
 }
 
 
-static ADDRESS_MAP_START( boothill_io_map, AS_IO, 8, mw8080bw_state )
+ADDRESS_MAP_START(mw8080bw_state::boothill_io_map)
 	ADDRESS_MAP_GLOBAL_MASK(0x7)
 	AM_RANGE(0x00, 0x00) AM_MIRROR(0x04) AM_READ_PORT("IN0")
 	AM_RANGE(0x01, 0x01) AM_MIRROR(0x04) AM_READ_PORT("IN1")
@@ -1044,7 +1049,8 @@ static INPUT_PORTS_START( boothill )
 INPUT_PORTS_END
 
 
-MACHINE_CONFIG_DERIVED(mw8080bw_state::boothill, mw8080bw_root)
+MACHINE_CONFIG_START(mw8080bw_state::boothill)
+	mw8080bw_root(config);
 
 	/* basic machine hardware */
 	MCFG_CPU_MODIFY("maincpu")
@@ -1058,7 +1064,7 @@ MACHINE_CONFIG_DERIVED(mw8080bw_state::boothill, mw8080bw_root)
 	MCFG_MB14241_ADD("mb14241")
 
 	/* audio hardware */
-	MCFG_FRAGMENT_ADD(boothill_audio)
+	boothill_audio(config);
 
 MACHINE_CONFIG_END
 
@@ -1078,7 +1084,7 @@ WRITE8_MEMBER(mw8080bw_state::checkmat_io_w)
 }
 
 
-static ADDRESS_MAP_START( checkmat_io_map, AS_IO, 8, mw8080bw_state )
+ADDRESS_MAP_START(mw8080bw_state::checkmat_io_map)
 	ADDRESS_MAP_GLOBAL_MASK(0x3)
 	AM_RANGE(0x00, 0x00) AM_READ_PORT("IN0")
 	AM_RANGE(0x01, 0x01) AM_READ_PORT("IN1")
@@ -1151,7 +1157,8 @@ static INPUT_PORTS_START( checkmat )
 INPUT_PORTS_END
 
 
-MACHINE_CONFIG_DERIVED(mw8080bw_state::checkmat, mw8080bw_root)
+MACHINE_CONFIG_START(mw8080bw_state::checkmat)
+	mw8080bw_root(config);
 
 	/* basic machine hardware */
 	MCFG_CPU_MODIFY("maincpu")
@@ -1161,7 +1168,7 @@ MACHINE_CONFIG_DERIVED(mw8080bw_state::checkmat, mw8080bw_root)
 	MCFG_WATCHDOG_TIME_INIT(PERIOD_OF_555_MONOSTABLE(RES_K(270), CAP_U(10))) /* 2.97s */
 
 	/* audio hardware */
-	MCFG_FRAGMENT_ADD(checkmat_audio)
+	checkmat_audio(config);
 
 MACHINE_CONFIG_END
 
@@ -1212,7 +1219,7 @@ CUSTOM_INPUT_MEMBER(mw8080bw_state::desertgu_dip_sw_0_1_r)
 }
 
 
-static ADDRESS_MAP_START( desertgu_io_map, AS_IO, 8, mw8080bw_state )
+ADDRESS_MAP_START(mw8080bw_state::desertgu_io_map)
 	ADDRESS_MAP_GLOBAL_MASK(0x7)
 	AM_RANGE(0x00, 0x00) AM_MIRROR(0x04) AM_READ(mw8080bw_shift_result_rev_r)
 	AM_RANGE(0x01, 0x01) AM_MIRROR(0x04) AM_READ_PORT("IN0")
@@ -1278,7 +1285,8 @@ static INPUT_PORTS_START( desertgu )
 INPUT_PORTS_END
 
 
-MACHINE_CONFIG_DERIVED(mw8080bw_state::desertgu, mw8080bw_root)
+MACHINE_CONFIG_START(mw8080bw_state::desertgu)
+	mw8080bw_root(config);
 
 	/* basic machine hardware */
 	MCFG_CPU_MODIFY("maincpu")
@@ -1292,7 +1300,7 @@ MACHINE_CONFIG_DERIVED(mw8080bw_state::desertgu, mw8080bw_root)
 	MCFG_MB14241_ADD("mb14241")
 
 	/* audio hardware */
-	MCFG_FRAGMENT_ADD(desertgu_audio)
+	desertgu_audio(config);
 
 MACHINE_CONFIG_END
 
@@ -1336,7 +1344,7 @@ CUSTOM_INPUT_MEMBER(mw8080bw_state::dplay_pitch_right_input_r)
 }
 
 
-static ADDRESS_MAP_START( dplay_io_map, AS_IO, 8, mw8080bw_state )
+ADDRESS_MAP_START(mw8080bw_state::dplay_io_map)
 	ADDRESS_MAP_GLOBAL_MASK(0x7)
 	AM_RANGE(0x00, 0x00) AM_MIRROR(0x04) AM_READ_PORT("IN0")
 	AM_RANGE(0x01, 0x01) AM_MIRROR(0x04) AM_READ_PORT("IN1")
@@ -1480,7 +1488,8 @@ static INPUT_PORTS_START( einning )
 INPUT_PORTS_END
 
 
-MACHINE_CONFIG_DERIVED(mw8080bw_state::dplay, mw8080bw_root)
+MACHINE_CONFIG_START(mw8080bw_state::dplay)
+	mw8080bw_root(config);
 
 	/* basic machine hardware */
 	MCFG_CPU_MODIFY("maincpu")
@@ -1493,7 +1502,7 @@ MACHINE_CONFIG_DERIVED(mw8080bw_state::dplay, mw8080bw_root)
 	MCFG_MB14241_ADD("mb14241")
 
 	/* audio hardware */
-	MCFG_FRAGMENT_ADD(dplay_audio)
+	dplay_audio(config);
 
 MACHINE_CONFIG_END
 
@@ -1514,7 +1523,7 @@ MACHINE_START_MEMBER(mw8080bw_state,gmissile)
 }
 
 
-static ADDRESS_MAP_START( gmissile_io_map, AS_IO, 8, mw8080bw_state )
+ADDRESS_MAP_START(mw8080bw_state::gmissile_io_map)
 	ADDRESS_MAP_GLOBAL_MASK(0x7)
 	AM_RANGE(0x00, 0x00) AM_MIRROR(0x04) AM_READ_PORT("IN0")
 	AM_RANGE(0x01, 0x01) AM_MIRROR(0x04) AM_READ_PORT("IN1")
@@ -1575,7 +1584,8 @@ static INPUT_PORTS_START( gmissile )
 INPUT_PORTS_END
 
 
-MACHINE_CONFIG_DERIVED(mw8080bw_state::gmissile, mw8080bw_root)
+MACHINE_CONFIG_START(mw8080bw_state::gmissile)
+	mw8080bw_root(config);
 
 	/* basic machine hardware */
 	MCFG_CPU_MODIFY("maincpu")
@@ -1589,7 +1599,7 @@ MACHINE_CONFIG_DERIVED(mw8080bw_state::gmissile, mw8080bw_root)
 	MCFG_MB14241_ADD("mb14241")
 
 	/* audio hardware */
-	MCFG_FRAGMENT_ADD(gmissile_audio)
+	gmissile_audio(config);
 
 MACHINE_CONFIG_END
 
@@ -1610,7 +1620,7 @@ MACHINE_START_MEMBER(mw8080bw_state,m4)
 }
 
 
-static ADDRESS_MAP_START( m4_io_map, AS_IO, 8, mw8080bw_state )
+ADDRESS_MAP_START(mw8080bw_state::m4_io_map)
 	ADDRESS_MAP_GLOBAL_MASK(0x7)
 	AM_RANGE(0x00, 0x00) AM_MIRROR(0x04) AM_READ_PORT("IN0")
 	AM_RANGE(0x01, 0x01) AM_MIRROR(0x04) AM_READ_PORT("IN1")
@@ -1669,7 +1679,8 @@ static INPUT_PORTS_START( m4 )
 INPUT_PORTS_END
 
 
-MACHINE_CONFIG_DERIVED(mw8080bw_state::m4, mw8080bw_root)
+MACHINE_CONFIG_START(mw8080bw_state::m4)
+	mw8080bw_root(config);
 
 	/* basic machine hardware */
 	MCFG_CPU_MODIFY("maincpu")
@@ -1683,7 +1694,7 @@ MACHINE_CONFIG_DERIVED(mw8080bw_state::m4, mw8080bw_root)
 	MCFG_MB14241_ADD("mb14241")
 
 	/* audio hardware */
-	MCFG_FRAGMENT_ADD(m4_audio)
+	m4_audio(config);
 
 MACHINE_CONFIG_END
 
@@ -1725,7 +1736,7 @@ CUSTOM_INPUT_MEMBER(mw8080bw_state::clowns_controller_r)
 }
 
 
-static ADDRESS_MAP_START( clowns_io_map, AS_IO, 8, mw8080bw_state )
+ADDRESS_MAP_START(mw8080bw_state::clowns_io_map)
 	ADDRESS_MAP_GLOBAL_MASK(0x7)
 	AM_RANGE(0x00, 0x00) AM_MIRROR(0x04) AM_READ_PORT("IN0")
 	AM_RANGE(0x01, 0x01) AM_MIRROR(0x04) AM_READ_PORT("IN1")
@@ -1838,7 +1849,8 @@ static INPUT_PORTS_START( clowns1 )
 INPUT_PORTS_END
 
 
-MACHINE_CONFIG_DERIVED(mw8080bw_state::clowns, mw8080bw_root)
+MACHINE_CONFIG_START(mw8080bw_state::clowns)
+	mw8080bw_root(config);
 
 	/* basic machine hardware */
 	MCFG_CPU_MODIFY("maincpu")
@@ -1852,7 +1864,7 @@ MACHINE_CONFIG_DERIVED(mw8080bw_state::clowns, mw8080bw_root)
 	MCFG_MB14241_ADD("mb14241")
 
 	/* audio hardware */
-	MCFG_FRAGMENT_ADD(clowns_audio)
+	clowns_audio(config);
 
 MACHINE_CONFIG_END
 
@@ -1864,7 +1876,7 @@ MACHINE_CONFIG_END
  *
  *************************************/
 
-static ADDRESS_MAP_START( spacwalk_io_map, AS_IO, 8, mw8080bw_state )
+ADDRESS_MAP_START(mw8080bw_state::spacwalk_io_map)
 	ADDRESS_MAP_GLOBAL_MASK(0x7)
 
 	AM_RANGE(0x00, 0x00) AM_READ_PORT("IN0")
@@ -1934,7 +1946,8 @@ static INPUT_PORTS_START( spacwalk )
 	PORT_ADJUSTER( 40, "R507 - Music Volume" )
 INPUT_PORTS_END
 
-MACHINE_CONFIG_DERIVED(mw8080bw_state::spacwalk, mw8080bw_root)
+MACHINE_CONFIG_START(mw8080bw_state::spacwalk)
+	mw8080bw_root(config);
 
 	/* basic machine hardware */
 	MCFG_CPU_MODIFY("maincpu")
@@ -1948,7 +1961,7 @@ MACHINE_CONFIG_DERIVED(mw8080bw_state::spacwalk, mw8080bw_root)
 	MCFG_MB14241_ADD("mb14241")
 
 	/* audio hardware */
-	MCFG_FRAGMENT_ADD(spacwalk_audio)
+	spacwalk_audio(config);
 
 MACHINE_CONFIG_END
 
@@ -1960,7 +1973,7 @@ MACHINE_CONFIG_END
  *
  *************************************/
 
-static ADDRESS_MAP_START( shuffle_io_map, AS_IO, 8, mw8080bw_state )
+ADDRESS_MAP_START(mw8080bw_state::shuffle_io_map)
 	ADDRESS_MAP_GLOBAL_MASK(0xf)    /* yes, 4, and no mirroring on the read handlers */
 	AM_RANGE(0x01, 0x01) AM_DEVREAD("mb14241", mb14241_device, shift_result_r)
 	AM_RANGE(0x02, 0x02) AM_READ_PORT("IN0")
@@ -2017,7 +2030,8 @@ static INPUT_PORTS_START( shuffle )
 INPUT_PORTS_END
 
 
-MACHINE_CONFIG_DERIVED(mw8080bw_state::shuffle, mw8080bw_root)
+MACHINE_CONFIG_START(mw8080bw_state::shuffle)
+	mw8080bw_root(config);
 
 	/* basic machine hardware */
 	MCFG_CPU_MODIFY("maincpu")
@@ -2030,7 +2044,7 @@ MACHINE_CONFIG_DERIVED(mw8080bw_state::shuffle, mw8080bw_root)
 	MCFG_MB14241_ADD("mb14241")
 
 	/* audio hardware */
-	MCFG_FRAGMENT_ADD(shuffle_audio)
+	shuffle_audio(config);
 
 MACHINE_CONFIG_END
 
@@ -2042,7 +2056,7 @@ MACHINE_CONFIG_END
  *
  *************************************/
 
-static ADDRESS_MAP_START( dogpatch_io_map, AS_IO, 8, mw8080bw_state )
+ADDRESS_MAP_START(mw8080bw_state::dogpatch_io_map)
 	ADDRESS_MAP_GLOBAL_MASK(0x7)
 	AM_RANGE(0x00, 0x00) AM_MIRROR(0x04) AM_READ_PORT("IN0")
 	AM_RANGE(0x01, 0x01) AM_MIRROR(0x04) AM_READ_PORT("IN1")
@@ -2104,7 +2118,8 @@ static INPUT_PORTS_START( dogpatch )
 INPUT_PORTS_END
 
 
-MACHINE_CONFIG_DERIVED(mw8080bw_state::dogpatch, mw8080bw_root)
+MACHINE_CONFIG_START(mw8080bw_state::dogpatch)
+	mw8080bw_root(config);
 
 	/* basic machine hardware */
 	MCFG_CPU_MODIFY("maincpu")
@@ -2117,7 +2132,7 @@ MACHINE_CONFIG_DERIVED(mw8080bw_state::dogpatch, mw8080bw_root)
 	MCFG_MB14241_ADD("mb14241")
 
 	/* audio hardware */
-	MCFG_FRAGMENT_ADD(dogpatch_audio)
+	dogpatch_audio(config);
 
 MACHINE_CONFIG_END
 
@@ -2192,7 +2207,7 @@ WRITE8_MEMBER(mw8080bw_state::spcenctr_io_w)
 }
 
 
-static ADDRESS_MAP_START( spcenctr_io_map, AS_IO, 8, mw8080bw_state )
+ADDRESS_MAP_START(mw8080bw_state::spcenctr_io_map)
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	AM_RANGE(0x00, 0x00) AM_MIRROR(0xfc) AM_READ_PORT("IN0")
 	AM_RANGE(0x01, 0x01) AM_MIRROR(0xfc) AM_READ_PORT("IN1")
@@ -2254,7 +2269,8 @@ static INPUT_PORTS_START( spcenctr )
 INPUT_PORTS_END
 
 
-MACHINE_CONFIG_DERIVED(mw8080bw_state::spcenctr, mw8080bw_root)
+MACHINE_CONFIG_START(mw8080bw_state::spcenctr)
+	mw8080bw_root(config);
 
 	/* basic machine hardware */
 	MCFG_CPU_MODIFY("maincpu")
@@ -2277,7 +2293,7 @@ MACHINE_CONFIG_DERIVED(mw8080bw_state::spcenctr, mw8080bw_root)
 	MCFG_SCREEN_UPDATE_DRIVER(mw8080bw_state, screen_update_spcenctr)
 
 	/* audio hardware */
-	MCFG_FRAGMENT_ADD(spcenctr_audio)
+	spcenctr_audio(config);
 
 MACHINE_CONFIG_END
 
@@ -2299,7 +2315,7 @@ MACHINE_START_MEMBER(mw8080bw_state,phantom2)
 }
 
 
-static ADDRESS_MAP_START( phantom2_io_map, AS_IO, 8, mw8080bw_state )
+ADDRESS_MAP_START(mw8080bw_state::phantom2_io_map)
 	ADDRESS_MAP_GLOBAL_MASK(0x7)
 	AM_RANGE(0x00, 0x00) AM_MIRROR(0x04) AM_READ(mw8080bw_shift_result_rev_r)
 	AM_RANGE(0x01, 0x01) AM_MIRROR(0x04) AM_READ_PORT("IN0")
@@ -2350,7 +2366,8 @@ static INPUT_PORTS_START( phantom2 )
 INPUT_PORTS_END
 
 
-MACHINE_CONFIG_DERIVED(mw8080bw_state::phantom2, mw8080bw_root)
+MACHINE_CONFIG_START(mw8080bw_state::phantom2)
+	mw8080bw_root(config);
 
 	/* basic machine hardware */
 	MCFG_CPU_MODIFY("maincpu")
@@ -2369,7 +2386,7 @@ MACHINE_CONFIG_DERIVED(mw8080bw_state::phantom2, mw8080bw_root)
 	MCFG_MB14241_ADD("mb14241")
 
 	/* audio hardware */
-	MCFG_FRAGMENT_ADD(phantom2_audio)
+	phantom2_audio(config);
 
 MACHINE_CONFIG_END
 
@@ -2426,7 +2443,7 @@ WRITE8_MEMBER(mw8080bw_state::bowler_lights_2_w)
 }
 
 
-static ADDRESS_MAP_START( bowler_io_map, AS_IO, 8, mw8080bw_state )
+ADDRESS_MAP_START(mw8080bw_state::bowler_io_map)
 	ADDRESS_MAP_GLOBAL_MASK(0xf)  /* no masking on the reads, all 4 bits are decoded */
 	AM_RANGE(0x01, 0x01) AM_READ(bowler_shift_result_r)
 	AM_RANGE(0x02, 0x02) AM_READ_PORT("IN0")
@@ -2491,7 +2508,8 @@ static INPUT_PORTS_START( bowler )
 INPUT_PORTS_END
 
 
-MACHINE_CONFIG_DERIVED(mw8080bw_state::bowler, mw8080bw_root)
+MACHINE_CONFIG_START(mw8080bw_state::bowler)
+	mw8080bw_root(config);
 
 	/* basic machine hardware */
 	MCFG_CPU_MODIFY("maincpu")
@@ -2504,7 +2522,7 @@ MACHINE_CONFIG_DERIVED(mw8080bw_state::bowler, mw8080bw_root)
 	MCFG_MB14241_ADD("mb14241")
 
 	/* audio hardware */
-	MCFG_FRAGMENT_ADD(bowler_audio)
+	bowler_audio(config);
 
 MACHINE_CONFIG_END
 
@@ -2612,7 +2630,7 @@ int mw8080bw_state::invaders_is_cabinet_cocktail()
 }
 
 
-static ADDRESS_MAP_START( invaders_io_map, AS_IO, 8, mw8080bw_state )
+ADDRESS_MAP_START(mw8080bw_state::invaders_io_map)
 	ADDRESS_MAP_GLOBAL_MASK(0x7)
 	AM_RANGE(0x00, 0x00) AM_MIRROR(0x04) AM_READ_PORT("IN0")
 	AM_RANGE(0x01, 0x01) AM_MIRROR(0x04) AM_READ_PORT("IN1")
@@ -2702,7 +2720,8 @@ static INPUT_PORTS_START( invaders )
 INPUT_PORTS_END
 
 
-MACHINE_CONFIG_DERIVED(mw8080bw_state::invaders, mw8080bw_root)
+MACHINE_CONFIG_START(mw8080bw_state::invaders)
+	mw8080bw_root(config);
 
 	/* basic machine hardware */
 	MCFG_CPU_MODIFY("maincpu")
@@ -2720,7 +2739,7 @@ MACHINE_CONFIG_DERIVED(mw8080bw_state::invaders, mw8080bw_root)
 	MCFG_MB14241_ADD("mb14241")
 
 	/* audio hardware */
-	MCFG_FRAGMENT_ADD(invaders_audio)
+	invaders_audio(config);
 
 MACHINE_CONFIG_END
 
@@ -2745,7 +2764,7 @@ CUSTOM_INPUT_MEMBER(mw8080bw_state::blueshrk_coin_input_r)
 }
 
 
-static ADDRESS_MAP_START( blueshrk_io_map, AS_IO, 8, mw8080bw_state )
+ADDRESS_MAP_START(mw8080bw_state::blueshrk_io_map)
 	ADDRESS_MAP_GLOBAL_MASK(0x7)
 	AM_RANGE(0x00, 0x00) AM_MIRROR(0x04) AM_READ(mw8080bw_shift_result_rev_r)
 	AM_RANGE(0x01, 0x01) AM_MIRROR(0x04) AM_READ_PORT("IN0")
@@ -2787,7 +2806,8 @@ static INPUT_PORTS_START( blueshrk )
 INPUT_PORTS_END
 
 
-MACHINE_CONFIG_DERIVED(mw8080bw_state::blueshrk, mw8080bw_root)
+MACHINE_CONFIG_START(mw8080bw_state::blueshrk)
+	mw8080bw_root(config);
 
 	/* basic machine hardware */
 	MCFG_CPU_MODIFY("maincpu")
@@ -2800,7 +2820,7 @@ MACHINE_CONFIG_DERIVED(mw8080bw_state::blueshrk, mw8080bw_root)
 	MCFG_MB14241_ADD("mb14241")
 
 	/* audio hardware */
-	MCFG_FRAGMENT_ADD(blueshrk_audio)
+	blueshrk_audio(config);
 
 MACHINE_CONFIG_END
 
@@ -2827,7 +2847,7 @@ uint32_t mw8080bw_state::invad2ct_coin_input_r(void *param)
 #endif
 
 
-static ADDRESS_MAP_START( invad2ct_io_map, AS_IO, 8, mw8080bw_state )
+ADDRESS_MAP_START(mw8080bw_state::invad2ct_io_map)
 	ADDRESS_MAP_GLOBAL_MASK(0x7)
 	AM_RANGE(0x00, 0x00) AM_MIRROR(0x04) AM_READ_PORT("IN0")
 	AM_RANGE(0x01, 0x01) AM_MIRROR(0x04) AM_READ_PORT("IN1")
@@ -2889,7 +2909,8 @@ static INPUT_PORTS_START( invad2ct )
 INPUT_PORTS_END
 
 
-MACHINE_CONFIG_DERIVED(mw8080bw_state::invad2ct, mw8080bw_root)
+MACHINE_CONFIG_START(mw8080bw_state::invad2ct)
+	mw8080bw_root(config);
 
 	/* basic machine hardware */
 	MCFG_CPU_MODIFY("maincpu")
@@ -2902,7 +2923,7 @@ MACHINE_CONFIG_DERIVED(mw8080bw_state::invad2ct, mw8080bw_root)
 	MCFG_MB14241_ADD("mb14241")
 
 	/* audio hardware */
-	MCFG_FRAGMENT_ADD(invad2ct_audio)
+	invad2ct_audio(config);
 
 MACHINE_CONFIG_END
 

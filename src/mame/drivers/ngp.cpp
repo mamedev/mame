@@ -206,6 +206,9 @@ public:
 	void ngp_common(machine_config &config);
 	void ngp(machine_config &config);
 	void ngpc(machine_config &config);
+	void ngp_mem(address_map &map);
+	void z80_io(address_map &map);
+	void z80_mem(address_map &map);
 protected:
 	bool m_nvram_loaded;
 	required_ioport m_io_controls;
@@ -550,7 +553,7 @@ WRITE8_MEMBER( ngp_state::flash1_w )
 }
 
 
-static ADDRESS_MAP_START( ngp_mem, AS_PROGRAM, 8, ngp_state )
+ADDRESS_MAP_START(ngp_state::ngp_mem)
 	AM_RANGE( 0x000080, 0x0000bf )  AM_READWRITE(ngp_io_r, ngp_io_w)                        /* ngp/c specific i/o */
 	AM_RANGE( 0x004000, 0x006fff )  AM_RAM AM_SHARE("mainram")                              /* work ram */
 	AM_RANGE( 0x007000, 0x007fff )  AM_RAM AM_SHARE("share1")                               /* shared with sound cpu */
@@ -579,7 +582,7 @@ WRITE8_MEMBER( ngp_state::ngp_z80_signal_main_w )
 }
 
 
-static ADDRESS_MAP_START( z80_mem, AS_PROGRAM, 8, ngp_state )
+ADDRESS_MAP_START(ngp_state::z80_mem)
 	AM_RANGE( 0x0000, 0x0fff )  AM_RAM AM_SHARE("share1")                       /* shared with tlcs900 */
 	AM_RANGE( 0x4000, 0x4001 )  AM_DEVWRITE("t6w28", t6w28_device, write )      /* sound chip (right, left) */
 	AM_RANGE( 0x8000, 0x8000 )  AM_READWRITE( ngp_z80_comm_r, ngp_z80_comm_w )  /* main-sound communication */
@@ -596,7 +599,7 @@ WRITE8_MEMBER( ngp_state::ngp_z80_clear_irq )
 }
 
 
-static ADDRESS_MAP_START( z80_io, AS_IO, 8, ngp_state )
+ADDRESS_MAP_START(ngp_state::z80_io)
 	AM_RANGE( 0x0000, 0xffff )  AM_WRITE( ngp_z80_clear_irq )
 ADDRESS_MAP_END
 
@@ -851,7 +854,8 @@ MACHINE_CONFIG_START(ngp_state::ngp_common)
 MACHINE_CONFIG_END
 
 
-MACHINE_CONFIG_DERIVED(ngp_state::ngp, ngp_common)
+MACHINE_CONFIG_START(ngp_state::ngp)
+	ngp_common(config);
 
 	MCFG_K1GE_ADD( "k1ge", 6.144_MHz_XTAL, "screen", WRITELINE( ngp_state, ngp_vblank_pin_w ), WRITELINE( ngp_state, ngp_hblank_pin_w ) )
 
@@ -869,7 +873,8 @@ MACHINE_CONFIG_DERIVED(ngp_state::ngp, ngp_common)
 MACHINE_CONFIG_END
 
 
-MACHINE_CONFIG_DERIVED(ngp_state::ngpc, ngp_common)
+MACHINE_CONFIG_START(ngp_state::ngpc)
+	ngp_common(config);
 	MCFG_K2GE_ADD( "k1ge", 6.144_MHz_XTAL, "screen", WRITELINE( ngp_state, ngp_vblank_pin_w ), WRITELINE( ngp_state, ngp_hblank_pin_w ) )
 
 	MCFG_SCREEN_MODIFY("screen")

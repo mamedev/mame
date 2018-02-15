@@ -236,6 +236,16 @@ public:
 	void tx1(machine_config &config);
 	void buggyboy(machine_config &config);
 	void buggybjr(machine_config &config);
+	void buggybjr_main(address_map &map);
+	void buggybjr_sound_prg(address_map &map);
+	void buggyboy_main(address_map &map);
+	void buggyboy_math(address_map &map);
+	void buggyboy_sound_io(address_map &map);
+	void buggyboy_sound_prg(address_map &map);
+	void tx1_main(address_map &map);
+	void tx1_math(address_map &map);
+	void tx1_sound_io(address_map &map);
+	void tx1_sound_prg(address_map &map);
 };
 
 /*----------- defined in audio/tx1.c -----------*/

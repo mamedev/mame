@@ -85,6 +85,8 @@ class naomi_state : public dc_state
 	void naomim1(machine_config &config);
 	void naomigd(machine_config &config);
 	void naomim4(machine_config &config);
+	void naomi_map(address_map &map);
+	void naomi_port(address_map &map);
 };
 
 class naomi2_state : public naomi_state
@@ -108,6 +110,7 @@ public:
 	void naomi2m2(machine_config &config);
 	void naomi2gd(machine_config &config);
 	void naomi2m1(machine_config &config);
+	void naomi2_map(address_map &map);
 };
 
 class atomiswave_state : public dc_state
@@ -135,6 +138,8 @@ public:
 	void aw_base(machine_config &config);
 	void aw1c(machine_config &config);
 	void aw2c(machine_config &config);
+	void aw_map(address_map &map);
+	void aw_port(address_map &map);
 protected:
 	uint8_t aw_ctrl_type;
 	inline int decode_reg32_64(uint32_t offset, uint64_t mem_mask, uint64_t *shift);

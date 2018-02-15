@@ -1,0 +1,42 @@
+<?xml version="1.0"?>
+<!DOCTYPE softwarelist SYSTEM "softwarelist.dtd">
+<softwarelist name="ews286_flop" description="Ericsson PC AT WS286 diskettes">
+
+	<!-- OS and System software -->
+	<software name="dos310c">
+		<description>DOS v3.10C</description>
+		<year>1986</year>
+		<publisher>Microsoft/Ericsson</publisher>
+
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="324574">
+				<rom name="ews286dos3_10c.imd" size="324574" crc="7e6d22ef" sha1="fed510b64b9e1b20ca66ecc8baa195f2dca3ca9c" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="sup310c">
+		<description>DOS Supplemental Programs v3.10C</description>
+		<year>1986</year>
+		<publisher>Microsoft/Ericsson</publisher>
+
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="267342">
+				<rom name="ews286dossup3_10c.imd" size="267342" crc="be271f65" sha1="597598b3aaa2db56a580ddfc90734bd9bceecb74" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="emp410">
+		<description>Ericsson Maintenance Program v4.10</description>
+		<year>1986</year>
+		<publisher>Ericsson</publisher>
+
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="301579">
+				<rom name="ews286maintenance4_10.imd" size="301579" crc="3ce8632a" sha1="5b51587504318257c87e1856476f07e5df279abe" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+</softwarelist>

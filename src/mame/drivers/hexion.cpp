@@ -121,7 +121,7 @@ WRITE8_MEMBER(hexion_state::ccu_int_time_w)
 	m_ccu_int_time = data;
 }
 
-static ADDRESS_MAP_START( hexion_map, AS_PROGRAM, 8, hexion_state )
+ADDRESS_MAP_START(hexion_state::hexion_map)
 	AM_RANGE(0x0000, 0x7fff) AM_ROM
 	AM_RANGE(0x8000, 0x9fff) AM_ROMBANK("bank1")
 	AM_RANGE(0xa000, 0xbfff) AM_RAM
@@ -147,7 +147,7 @@ static ADDRESS_MAP_START( hexion_map, AS_PROGRAM, 8, hexion_state )
 	AM_RANGE(0xf540, 0xf540) AM_DEVREAD("watchdog", watchdog_timer_device, reset_r)
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( hexionb_map, AS_PROGRAM, 8, hexion_state )
+ADDRESS_MAP_START(hexion_state::hexionb_map)
 	AM_RANGE(0x0000, 0x7fff) AM_ROM
 	AM_RANGE(0x8000, 0x9fff) AM_ROMBANK("bank1")
 	AM_RANGE(0xa000, 0xbfff) AM_RAM
@@ -289,7 +289,8 @@ MACHINE_CONFIG_START(hexion_state::hexion)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.5)
 MACHINE_CONFIG_END
 
-MACHINE_CONFIG_DERIVED(hexion_state::hexionb, hexion)
+MACHINE_CONFIG_START(hexion_state::hexionb)
+	hexion(config);
 	MCFG_CPU_MODIFY("maincpu")
 	MCFG_CPU_PROGRAM_MAP(hexionb_map)
 

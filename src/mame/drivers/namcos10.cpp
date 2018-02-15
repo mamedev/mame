@@ -444,6 +444,9 @@ public:
 	void ns10_gjspace(machine_config &config);
 	void ns10_nflclsfb(machine_config &config);
 	void ns10_gamshara(machine_config &config);
+	void namcos10_map(address_map &map);
+	void namcos10_memm_map(address_map &map);
+	void namcos10_memn_map(address_map &map);
 private:
 	enum {
 		I2CP_IDLE,
@@ -485,7 +488,7 @@ public:
 };
 
 
-static ADDRESS_MAP_START( namcos10_map, AS_PROGRAM, 32, namcos10_state )
+ADDRESS_MAP_START(namcos10_state::namcos10_map)
 	AM_RANGE(0x1f500000, 0x1f501fff) AM_RAM AM_SHARE("share3") /* ram? stores block numbers */
 	AM_RANGE(0x9f500000, 0x9f501fff) AM_RAM AM_SHARE("share3") /* ram? stores block numbers */
 	AM_RANGE(0xbf500000, 0xbf501fff) AM_RAM AM_SHARE("share3") /* ram? stores block numbers */
@@ -671,7 +674,7 @@ void namcos10_state::i2c_update()
 	i2c_prev_clock = clock;
 }
 
-static ADDRESS_MAP_START( namcos10_memm_map, AS_PROGRAM, 32, namcos10_state )
+ADDRESS_MAP_START(namcos10_state::namcos10_memm_map)
 	AM_IMPORT_FROM(namcos10_map)
 
 	AM_RANGE(0x1f300000, 0x1f300003) AM_WRITE16(crypto_switch_w, 0x0000ffff)
@@ -766,7 +769,7 @@ READ16_MEMBER(namcos10_state::nand_block_r)
 	return block[ offset ];
 }
 
-static ADDRESS_MAP_START( namcos10_memn_map, AS_PROGRAM, 32, namcos10_state )
+ADDRESS_MAP_START(namcos10_state::namcos10_memn_map)
 	AM_IMPORT_FROM(namcos10_map)
 
 	AM_RANGE(0x1f300000, 0x1f300003) AM_WRITE16(crypto_switch_w, 0x0000ffff)
@@ -956,44 +959,52 @@ MACHINE_CONFIG_START(namcos10_state::namcos10_memn)
 	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
 MACHINE_CONFIG_END
 
-MACHINE_CONFIG_DERIVED(namcos10_state::ns10_mrdrilr2, namcos10_memm)
-/* decrypter device (CPLD in hardware?) */
-MCFG_DEVICE_ADD("decrypter", MRDRILR2_DECRYPTER, 0)
+MACHINE_CONFIG_START(namcos10_state::ns10_mrdrilr2)
+	namcos10_memm(config);
+	/* decrypter device (CPLD in hardware?) */
+	MCFG_DEVICE_ADD("decrypter", MRDRILR2_DECRYPTER, 0)
 MACHINE_CONFIG_END
 
-MACHINE_CONFIG_DERIVED(namcos10_state::ns10_chocovdr, namcos10_memn)
-/* decrypter device (CPLD in hardware?) */
-MCFG_DEVICE_ADD("decrypter", CHOCOVDR_DECRYPTER, 0)
+MACHINE_CONFIG_START(namcos10_state::ns10_chocovdr)
+	namcos10_memn(config);
+	/* decrypter device (CPLD in hardware?) */
+	MCFG_DEVICE_ADD("decrypter", CHOCOVDR_DECRYPTER, 0)
 MACHINE_CONFIG_END
 
-MACHINE_CONFIG_DERIVED(namcos10_state::ns10_gamshara, namcos10_memn)
-/* decrypter device (CPLD in hardware?) */
-MCFG_DEVICE_ADD("decrypter", GAMSHARA_DECRYPTER, 0)
+MACHINE_CONFIG_START(namcos10_state::ns10_gamshara)
+	namcos10_memn(config);
+	/* decrypter device (CPLD in hardware?) */
+	MCFG_DEVICE_ADD("decrypter", GAMSHARA_DECRYPTER, 0)
 MACHINE_CONFIG_END
 
-MACHINE_CONFIG_DERIVED(namcos10_state::ns10_gjspace, namcos10_memn)
-/* decrypter device (CPLD in hardware?) */
-MCFG_DEVICE_ADD("decrypter", GJSPACE_DECRYPTER, 0)
+MACHINE_CONFIG_START(namcos10_state::ns10_gjspace)
+	namcos10_memn(config);
+	/* decrypter device (CPLD in hardware?) */
+	MCFG_DEVICE_ADD("decrypter", GJSPACE_DECRYPTER, 0)
 MACHINE_CONFIG_END
 
-MACHINE_CONFIG_DERIVED(namcos10_state::ns10_knpuzzle, namcos10_memn)
-/* decrypter device (CPLD in hardware?) */
-MCFG_DEVICE_ADD("decrypter", KNPUZZLE_DECRYPTER, 0)
+MACHINE_CONFIG_START(namcos10_state::ns10_knpuzzle)
+	namcos10_memn(config);
+	/* decrypter device (CPLD in hardware?) */
+	MCFG_DEVICE_ADD("decrypter", KNPUZZLE_DECRYPTER, 0)
 MACHINE_CONFIG_END
 
-MACHINE_CONFIG_DERIVED(namcos10_state::ns10_konotako, namcos10_memn)
-/* decrypter device (CPLD in hardware?) */
-MCFG_DEVICE_ADD("decrypter", KONOTAKO_DECRYPTER, 0)
+MACHINE_CONFIG_START(namcos10_state::ns10_konotako)
+	namcos10_memn(config);
+	/* decrypter device (CPLD in hardware?) */
+	MCFG_DEVICE_ADD("decrypter", KONOTAKO_DECRYPTER, 0)
 MACHINE_CONFIG_END
 
-MACHINE_CONFIG_DERIVED(namcos10_state::ns10_nflclsfb, namcos10_memn)
-/* decrypter device (CPLD in hardware?) */
-MCFG_DEVICE_ADD("decrypter", NFLCLSFB_DECRYPTER, 0)
+MACHINE_CONFIG_START(namcos10_state::ns10_nflclsfb)
+	namcos10_memn(config);
+	/* decrypter device (CPLD in hardware?) */
+	MCFG_DEVICE_ADD("decrypter", NFLCLSFB_DECRYPTER, 0)
 MACHINE_CONFIG_END
 
-MACHINE_CONFIG_DERIVED(namcos10_state::ns10_startrgn, namcos10_memn)
-/* decrypter device (CPLD in hardware?) */
-MCFG_DEVICE_ADD("decrypter", STARTRGN_DECRYPTER, 0)
+MACHINE_CONFIG_START(namcos10_state::ns10_startrgn)
+	namcos10_memn(config);
+	/* decrypter device (CPLD in hardware?) */
+	MCFG_DEVICE_ADD("decrypter", STARTRGN_DECRYPTER, 0)
 MACHINE_CONFIG_END
 
 static INPUT_PORTS_START( namcos10 )

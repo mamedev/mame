@@ -54,25 +54,28 @@ public:
 
 	void mcb216(machine_config &config);
 	void cb308(machine_config &config);
+	void cb308_mem(address_map &map);
+	void mcb216_io(address_map &map);
+	void mcb216_mem(address_map &map);
 private:
 	required_device<cpu_device> m_maincpu;
 	required_device<ay31015_device> m_uart;
 };
 
-static ADDRESS_MAP_START(mcb216_mem, AS_PROGRAM, 8, mcb216_state)
+ADDRESS_MAP_START(mcb216_state::mcb216_mem)
 	ADDRESS_MAP_UNMAP_HIGH
 	AM_RANGE(0x0000, 0x0fff) AM_ROM AM_REGION("roms", 0)
 	AM_RANGE(0x2000, 0x23ff) AM_RAM
 	AM_RANGE(0x2400, 0xffff) AM_RAM
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START(mcb216_io, AS_IO, 8, mcb216_state)
+ADDRESS_MAP_START(mcb216_state::mcb216_io)
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	AM_RANGE(0x00, 0x00) AM_READ(port00_r)
 	AM_RANGE(0x01, 0x01) AM_READWRITE(port01_r,port01_w)
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START(cb308_mem, AS_PROGRAM, 8, mcb216_state)
+ADDRESS_MAP_START(mcb216_state::cb308_mem)
 	ADDRESS_MAP_UNMAP_HIGH
 	AM_RANGE(0x0000, 0x1fff) AM_RAM
 	AM_RANGE(0xe000, 0xefff) AM_ROM AM_REGION("roms", 0)

@@ -97,7 +97,7 @@ WRITE8_MEMBER(rockrage_state::rockrage_speech_w)
 	m_vlm->st((data >> 0) & 0x01);
 }
 
-static ADDRESS_MAP_START( rockrage_map, AS_PROGRAM, 8, rockrage_state )
+ADDRESS_MAP_START(rockrage_state::rockrage_map)
 	AM_RANGE(0x0000, 0x1fff) AM_DEVREADWRITE("k007342", k007342_device, read, write)                    /* Color RAM + Video RAM */
 	AM_RANGE(0x2000, 0x21ff) AM_DEVREADWRITE("k007420", k007420_device, read, write)                    /* Sprite RAM */
 	AM_RANGE(0x2200, 0x23ff) AM_DEVREADWRITE("k007342", k007342_device, scroll_r, scroll_w)  /* Scroll RAM */
@@ -117,7 +117,7 @@ static ADDRESS_MAP_START( rockrage_map, AS_PROGRAM, 8, rockrage_state )
 	AM_RANGE(0x8000, 0xffff) AM_ROM                                             /* ROM */
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( rockrage_sound_map, AS_PROGRAM, 8, rockrage_state )
+ADDRESS_MAP_START(rockrage_state::rockrage_sound_map)
 	AM_RANGE(0x2000, 0x2000) AM_DEVWRITE("vlm", vlm5030_device, data_w)              /* VLM5030 */
 	AM_RANGE(0x3000, 0x3000) AM_READ(rockrage_VLM5030_busy_r)           /* VLM5030 */
 	AM_RANGE(0x4000, 0x4000) AM_WRITE(rockrage_speech_w)                /* VLM5030 */
@@ -127,7 +127,7 @@ static ADDRESS_MAP_START( rockrage_sound_map, AS_PROGRAM, 8, rockrage_state )
 	AM_RANGE(0x8000, 0xffff) AM_ROM                                             /* ROM */
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( rockrage_vlm_map, 0, 8, rockrage_state )
+ADDRESS_MAP_START(rockrage_state::rockrage_vlm_map)
 	ADDRESS_MAP_GLOBAL_MASK(0x7fff)
 	AM_RANGE(0x0000, 0x7fff) AM_ROM
 ADDRESS_MAP_END

@@ -248,7 +248,7 @@ READ8_MEMBER( atomeb_state::dos_r )
     ADDRESS_MAP( atom_mem )
 -------------------------------------------------*/
 
-static ADDRESS_MAP_START( atom_mem, AS_PROGRAM, 8, atom_state )
+ADDRESS_MAP_START(atom_state::atom_mem)
 	AM_RANGE(0x0000, 0x09ff) AM_RAM
 	AM_RANGE(0x0a00, 0x0a03) AM_MIRROR(0x1f8) AM_DEVICE(I8271_TAG, i8271_device, map)
 	AM_RANGE(0x0a04, 0x0a04) AM_MIRROR(0x1f8) AM_DEVREADWRITE(I8271_TAG, i8271_device, data_r, data_w)
@@ -267,7 +267,7 @@ ADDRESS_MAP_END
     ADDRESS_MAP( atomeb_mem )
 -------------------------------------------------*/
 
-static ADDRESS_MAP_START( atomeb_mem, AS_PROGRAM, 8, atomeb_state )
+ADDRESS_MAP_START(atomeb_state::atomeb_mem)
 	AM_IMPORT_FROM(atom_mem)
 	AM_RANGE(0xa000, 0xafff) AM_READ(ext_r)
 	AM_RANGE(0xbfff, 0xbfff) AM_READWRITE(eprom_r, eprom_w)
@@ -278,7 +278,7 @@ ADDRESS_MAP_END
     ADDRESS_MAP( atombb_mem )
 -------------------------------------------------*/
 
-static ADDRESS_MAP_START( atombb_mem, AS_PROGRAM, 8, atom_state )
+ADDRESS_MAP_START(atom_state::atombb_mem)
 	AM_RANGE(0x0000, 0x3fff) AM_RAM
 	AM_RANGE(0x4000, 0x57ff) AM_RAM AM_SHARE("video_ram")
 
@@ -781,7 +781,8 @@ MACHINE_CONFIG_END
 	MCFG_GENERIC_EXTENSIONS("bin,rom") \
 	MCFG_GENERIC_LOAD(atomeb_state, _load)
 
-MACHINE_CONFIG_DERIVED(atomeb_state::atomeb, atom)
+MACHINE_CONFIG_START(atomeb_state::atomeb)
+	atom(config);
 	MCFG_CPU_MODIFY(SY6502_TAG)
 	MCFG_CPU_PROGRAM_MAP(atomeb_mem)
 
@@ -865,7 +866,8 @@ MACHINE_CONFIG_END
     MACHINE_DRIVER( prophet2 )
 -------------------------------------------------*/
 
-//static MACHINE_CONFIG_DERIVED( prophet2, atom )
+//static MACHINE_CONFIG_START( prophet2 )
+//	atom(config);
 //  /* basic machine hardware */
 //  MCFG_CPU_MODIFY(SY6502_TAG)
 //  MCFG_CPU_PROGRAM_MAP(prophet_mem)
@@ -888,7 +890,8 @@ MACHINE_CONFIG_END
     MACHINE_DRIVER( prophet3 )
 -------------------------------------------------*/
 
-//static MACHINE_CONFIG_DERIVED( prophet3, atom )
+//static MACHINE_CONFIG_START( prophet3 )
+//	atom(config);
 //  /* basic machine hardware */
 //  MCFG_CPU_MODIFY(SY6502_TAG)
 //  MCFG_CPU_PROGRAM_MAP(prophet_mem)
@@ -905,7 +908,8 @@ MACHINE_CONFIG_END
     MACHINE_DRIVER( atommc )
 -------------------------------------------------*/
 
-//static MACHINE_CONFIG_DERIVED( atommc, atom )
+//static MACHINE_CONFIG_START( atommc )
+//	atom(config);
 //  /* Software lists */
 //  MCFG_SOFTWARE_LIST_ADD("mmc_list","atom_mmc")
 //  MCFG_SOFTWARE_LIST_REMOVE("flop_list")

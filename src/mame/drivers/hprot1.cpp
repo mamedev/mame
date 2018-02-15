@@ -80,6 +80,8 @@ public:
 	void hprotr8a(machine_config &config);
 	void hprot2r6(machine_config &config);
 	void hprot1(machine_config &config);
+	void i80c31_io(address_map &map);
+	void i80c31_prg(address_map &map);
 private:
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
@@ -89,7 +91,7 @@ private:
 
 #define LOG_IO_PORTS 0
 
-static ADDRESS_MAP_START(i80c31_prg, AS_PROGRAM, 8, hprot1_state)
+ADDRESS_MAP_START(hprot1_state::i80c31_prg)
 	AM_RANGE(0x0000, 0xffff) AM_ROM
 ADDRESS_MAP_END
 
@@ -124,7 +126,7 @@ DRIVER_INIT_MEMBER( hprot1_state, hprot1 )
 
 //P1.4 => WhatchDog Input (after timeout resets CPU)
 
-static ADDRESS_MAP_START(i80c31_io, AS_IO, 8, hprot1_state)
+ADDRESS_MAP_START(hprot1_state::i80c31_io)
 	AM_RANGE(0x0000,0x7fff) AM_RAM
 /*TODO: verify the mirror mask value for the HD44780 device */
 	AM_RANGE(0xc000,0xc000) AM_MIRROR(0x13cf) AM_DEVWRITE("hd44780", hd44780_device, control_write)
@@ -332,7 +334,8 @@ MACHINE_CONFIG_START(hprot1_state::hprot1)
 	/* TODO: emulate the ADM695AN chip (watchdog/brownout reset)*/
 MACHINE_CONFIG_END
 
-MACHINE_CONFIG_DERIVED(hprot1_state::hprotr8a, hprot1)
+MACHINE_CONFIG_START(hprot1_state::hprotr8a)
+	hprot1(config);
 	MCFG_CPU_REPLACE("maincpu", I80C31, 11059200) // value of X1 cristal on the PCB
 	MCFG_CPU_PROGRAM_MAP(i80c31_prg)
 	MCFG_CPU_IO_MAP(i80c31_io)
@@ -348,7 +351,8 @@ MACHINE_CONFIG_DERIVED(hprot1_state::hprotr8a, hprot1)
 	/* TODO: add an I2C interface (the board has GND/VCC/SDA/SCL pins available in a connector) */
 MACHINE_CONFIG_END
 
-MACHINE_CONFIG_DERIVED(hprot1_state::hprot2r6, hprot1)
+MACHINE_CONFIG_START(hprot1_state::hprot2r6)
+	hprot1(config);
 	MCFG_CPU_REPLACE("maincpu", I80C31, 11059200) // value of X1 cristal on the PCB
 	MCFG_CPU_PROGRAM_MAP(i80c31_prg)
 	MCFG_CPU_IO_MAP(i80c31_io)

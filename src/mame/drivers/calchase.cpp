@@ -175,6 +175,8 @@ public:
 	void intel82439tx_init();
 	void calchase(machine_config &config);
 	void hostinv(machine_config &config);
+	void calchase_io(address_map &map);
+	void calchase_map(address_map &map);
 };
 
 // Intel 82439TX System Controller (MTXC)
@@ -380,7 +382,7 @@ READ16_MEMBER(calchase_state::calchase_iocard5_r)
 }
 
 
-static ADDRESS_MAP_START( calchase_map, AS_PROGRAM, 32, calchase_state )
+ADDRESS_MAP_START(calchase_state::calchase_map)
 	AM_RANGE(0x00000000, 0x0009ffff) AM_RAM
 	AM_RANGE(0x000a0000, 0x000bffff) AM_DEVREADWRITE8("vga", trident_vga_device, mem_r, mem_w, 0xffffffff) // VGA VRAM
 	AM_RANGE(0x000c0000, 0x000c7fff) AM_RAM AM_REGION("video_bios", 0)
@@ -403,7 +405,7 @@ static ADDRESS_MAP_START( calchase_map, AS_PROGRAM, 32, calchase_state )
 	AM_RANGE(0x000e0000, 0x000effff) AM_ROMBANK("bios_ext") AM_WRITE(bios_ext_ram_w)
 	AM_RANGE(0x000f0000, 0x000fffff) AM_ROMBANK("bios_bank") AM_WRITE(bios_ram_w)
 	AM_RANGE(0x00100000, 0x03ffffff) AM_RAM  // 64MB
-	AM_RANGE(0x02000000, 0x28ffffff) AM_NOP
+	AM_RANGE(0x04000000, 0x28ffffff) AM_NOP
 	//AM_RANGE(0x04000000, 0x040001ff) AM_RAM
 	//AM_RANGE(0x08000000, 0x080001ff) AM_RAM
 	//AM_RANGE(0x0c000000, 0x0c0001ff) AM_RAM
@@ -415,7 +417,7 @@ static ADDRESS_MAP_START( calchase_map, AS_PROGRAM, 32, calchase_state )
 	AM_RANGE(0xfffe0000, 0xffffffff) AM_ROM AM_REGION("bios", 0)    /* System BIOS */
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( calchase_io, AS_IO, 32, calchase_state )
+ADDRESS_MAP_START(calchase_state::calchase_io)
 	AM_IMPORT_FROM(pcat32_io_common)
 	//AM_RANGE(0x00e8, 0x00eb) AM_NOP
 	AM_RANGE(0x00e8, 0x00ef) AM_NOP //AMI BIOS write to this ports as delays between I/O ports operations sending al value -> NEWIODELAY
@@ -428,7 +430,6 @@ static ADDRESS_MAP_START( calchase_io, AS_IO, 32, calchase_state )
 	AM_RANGE(0x02a0, 0x02a7) AM_NOP //To debug
 	AM_RANGE(0x02c0, 0x02c7) AM_NOP //To debug
 	AM_RANGE(0x02e0, 0x02ef) AM_NOP //To debug
-	AM_RANGE(0x0278, 0x02ff) AM_NOP //To debug
 	AM_RANGE(0x02f8, 0x02ff) AM_NOP //To debug
 	AM_RANGE(0x0320, 0x038f) AM_NOP //To debug
 	AM_RANGE(0x03a0, 0x03a7) AM_NOP //To debug
@@ -678,7 +679,7 @@ MACHINE_CONFIG_START(calchase_state::calchase)
 	MCFG_CPU_IO_MAP(calchase_io)
 	MCFG_CPU_IRQ_ACKNOWLEDGE_DEVICE("pic8259_1", pic8259_device, inta_cb)
 
-	MCFG_FRAGMENT_ADD( pcat_common )
+	pcat_common(config);
 
 	MCFG_IDE_CONTROLLER_32_ADD("ide", ata_devices, "hdd", nullptr, true)
 	MCFG_ATA_INTERFACE_IRQ_HANDLER(DEVWRITELINE("pic8259_2", pic8259_device, ir6_w))
@@ -688,7 +689,7 @@ MACHINE_CONFIG_START(calchase_state::calchase)
 	MCFG_PCI_BUS_LEGACY_DEVICE(7, nullptr, intel82371ab_pci_r, intel82371ab_pci_w)
 
 	/* video hardware */
-	MCFG_FRAGMENT_ADD( pcvideo_trident_vga )
+	pcvideo_trident_vga(config);
 
 	MCFG_DEVICE_REMOVE("rtc")
 	MCFG_DS12885_ADD("rtc")
@@ -710,7 +711,7 @@ MACHINE_CONFIG_START(calchase_state::hostinv)
 	MCFG_CPU_IO_MAP(calchase_io)
 	MCFG_CPU_IRQ_ACKNOWLEDGE_DEVICE("pic8259_1", pic8259_device, inta_cb)
 
-	MCFG_FRAGMENT_ADD( pcat_common )
+	pcat_common(config);
 
 	MCFG_IDE_CONTROLLER_32_ADD("ide", ata_devices, "cdrom", nullptr, true)
 	MCFG_ATA_INTERFACE_IRQ_HANDLER(DEVWRITELINE("pic8259_2", pic8259_device, ir6_w))
@@ -720,7 +721,7 @@ MACHINE_CONFIG_START(calchase_state::hostinv)
 	MCFG_PCI_BUS_LEGACY_DEVICE(7, nullptr, intel82371ab_pci_r, intel82371ab_pci_w)
 
 	/* video hardware */
-	MCFG_FRAGMENT_ADD( pcvideo_trident_vga )
+	pcvideo_trident_vga(config);
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")

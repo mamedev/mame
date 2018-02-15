@@ -2,7 +2,7 @@
 // copyright-holders:Angelo Salese
 /*******************************************************************
  *
- * PC6xxx video related functions
+ * PC-6xxx video related functions
  *
  *
  *
@@ -121,7 +121,19 @@ void pc6001_state::video_start()
 	cfg.get_char_rom = pc6001_get_char_rom;
 	m6847_init(machine(), &cfg);
 	#endif
-	m_video_ram = auto_alloc_array(machine(), uint8_t, 0x4000);
+	m_video_ram = auto_alloc_array_clear(machine(), uint8_t, 0x4000);
+}
+
+void pc6001mk2_state::video_start()
+{
+	// ...
+}
+
+void pc6001sr_state::video_start()
+{
+//	m_video_ram = auto_alloc_array_clear(machine(), uint8_t, 0x4000);
+	m_gvram = auto_alloc_array_clear(machine(), uint8_t, 320*256*8); // TODO: size
+	save_pointer(NAME(m_gvram), 320*256*8);
 }
 
 /* this is known as gfx mode 4 */
@@ -525,10 +537,11 @@ uint32_t pc6001sr_state::screen_update_pc6001sr(screen_device &screen, bitmap_in
 	int xi,yi,pen,fgcol,bgcol,color;
 	uint8_t *gfx_data = m_region_gfx1->base();
 
+	bitmap.fill(0,cliprect);
 
-	if(m_sr_video_mode & 8) // text mode
+	if(m_sr_text_mode == true) // text mode
 	{
-		for(y=0;y<20;y++)
+		for(y=0;y<m_sr_text_rows;y++)
 		{
 			for(x=0;x<40;x++)
 			{
@@ -556,56 +569,26 @@ uint32_t pc6001sr_state::screen_update_pc6001sr(screen_device &screen, bitmap_in
 	}
 	else //4bpp bitmap mode (TODO)
 	{
-		int count;
-
-		count = 0;
-
-		for(y=0;y<200;y+=2)
+		for(y=0;y<200;y++)
 		{
-			for(x=0;x<320;x+=4)
+			for(x=0;x<320;x+=2)
 			{
-				color = m_video_ram[count] & 0x0f;
+				uint32_t vram_addr;
+				
+				if(x >= 256)
+					vram_addr = 0x1a00 + (x-256)+y*64;
+				else
+					vram_addr = x+y*256;
+				
+				color = (m_gvram[vram_addr] & 0xf0) >> 4;
 
-				if (cliprect.contains(x+0, y+0))
+				if (cliprect.contains(x, y+0))
 					bitmap.pix16((y+0), (x+0)) = m_palette->pen(color+0x10);
 
-				color = (m_video_ram[count] & 0xf0) >> 4;
+				color = (m_gvram[vram_addr] & 0x0f);
 
 				if (cliprect.contains(x+1, y+0))
 					bitmap.pix16((y+0), (x+1)) = m_palette->pen(color+0x10);
-
-				color = m_video_ram[count+1] & 0x0f;
-
-				if (cliprect.contains(x+2, y+0))
-					bitmap.pix16((y+0), (x+2)) = m_palette->pen(color+0x10);
-
-				color = (m_video_ram[count+1] & 0xf0) >> 4;
-
-				if (cliprect.contains(x+3, y+0))
-					bitmap.pix16((y+0), (x+3)) = m_palette->pen(color+0x10);
-
-				color = m_video_ram[count+2] & 0x0f;
-
-				if (cliprect.contains(x+0, y+1))
-					bitmap.pix16((y+1), (x+0)) = m_palette->pen(color+0x10);
-
-				color = (m_video_ram[count+2] & 0xf0) >> 4;
-
-				if (cliprect.contains(x+1, y+1))
-					bitmap.pix16((y+1), (x+1)) = m_palette->pen(color+0x10);
-
-				color = m_video_ram[count+3] & 0x0f;
-
-				if (cliprect.contains(x+2, y+1))
-					bitmap.pix16((y+1), (x+2)) = m_palette->pen(color+0x10);
-
-				color = (m_video_ram[count+3] & 0xf0) >> 4;
-
-				if (cliprect.contains(x+3, y+1))
-					bitmap.pix16((y+1), (x+3)) = m_palette->pen(color+0x10);
-
-
-				count+=4;
 			}
 		}
 	}

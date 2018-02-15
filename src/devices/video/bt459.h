@@ -179,7 +179,7 @@ public:
 		CR4241_7PIX = 0x06  // cross hair thickness 7 pixels
 	};
 
-	DECLARE_ADDRESS_MAP(map, 8);
+	void map(address_map &map);
 
 	DECLARE_READ8_MEMBER(address_lo_r);
 	DECLARE_WRITE8_MEMBER(address_lo_w);

@@ -432,6 +432,13 @@ public:
 	void nbagold(machine_config &config);
 	void roadburn(machine_config &config);
 	void warfa(machine_config &config);
+	void vegas_cs2_map(address_map &map);
+	void vegas_cs3_map(address_map &map);
+	void vegas_cs4_map(address_map &map);
+	void vegas_cs5_map(address_map &map);
+	void vegas_cs6_map(address_map &map);
+	void vegas_cs7_map(address_map &map);
+	void vegas_cs8_map(address_map &map);
 };
 
 /*************************************
@@ -1652,25 +1659,25 @@ INPUT_PORTS_END
 *  Memory maps
 *
 *************************************/
-static ADDRESS_MAP_START(vegas_cs2_map, AS_PROGRAM, 32, vegas_state)
+ADDRESS_MAP_START(vegas_state::vegas_cs2_map)
 	AM_RANGE(0x00000000, 0x00007003) AM_READWRITE8(sio_r, sio_w, 0xffffffff)
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START(vegas_cs3_map, AS_PROGRAM, 32, vegas_state)
+ADDRESS_MAP_START(vegas_state::vegas_cs3_map)
 	AM_RANGE(0x00000000, 0x00000003) AM_READWRITE(analog_port_r, analog_port_w)
 	//AM_RANGE(0x00001000, 0x00001003) AM_READWRITE(lcd_r, lcd_w)
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START(vegas_cs4_map, AS_PROGRAM, 32, vegas_state)
+ADDRESS_MAP_START(vegas_state::vegas_cs4_map)
 	AM_RANGE(0x00000000, 0x00007fff) AM_READWRITE(timekeeper_r, timekeeper_w)
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START(vegas_cs5_map, AS_PROGRAM, 32, vegas_state)
+ADDRESS_MAP_START(vegas_state::vegas_cs5_map)
 	AM_RANGE(0x00000000, 0x00000003) AM_READWRITE8(cpu_io_r, cpu_io_w, 0xffffffff)
 	AM_RANGE(0x00100000, 0x001fffff) AM_READ(unknown_r)
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START(vegas_cs6_map, AS_PROGRAM, 32, vegas_state)
+ADDRESS_MAP_START(vegas_state::vegas_cs6_map)
 	AM_RANGE(0x00000000, 0x0000003f) AM_DEVREADWRITE("ioasic", midway_ioasic_device, packed_r, packed_w)
 	AM_RANGE(0x00001000, 0x00001003) AM_WRITE(asic_fifo_w)
 	AM_RANGE(0x00003000, 0x00003003) AM_WRITE(dcs3_fifo_full_w)  // if (m_dcs_idma_cs != 0)
@@ -1678,14 +1685,14 @@ static ADDRESS_MAP_START(vegas_cs6_map, AS_PROGRAM, 32, vegas_state)
 	AM_RANGE(0x00007000, 0x00007003) AM_DEVREADWRITE("dcs", dcs_audio_device, dsio_idma_data_r, dsio_idma_data_w) // if (m_dcs_idma_cs == 6)
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START(vegas_cs7_map, AS_PROGRAM, 32, vegas_state)
+ADDRESS_MAP_START(vegas_state::vegas_cs7_map)
 	//AM_RANGE(0x00000000, 0x00000003) AM_READWRITE8(nss_r, nss_w, 0xffffffff)
 	AM_RANGE(0x00001000, 0x0000100f) AM_READWRITE(ethernet_r, ethernet_w)
 	AM_RANGE(0x00005000, 0x00005003) AM_DEVWRITE("dcs", dcs_audio_device, dsio_idma_addr_w) // if (m_dcs_idma_cs == 7)
 	AM_RANGE(0x00007000, 0x00007003) AM_DEVREADWRITE("dcs", dcs_audio_device, dsio_idma_data_r, dsio_idma_data_w) // if (m_dcs_idma_cs == 7)
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START(vegas_cs8_map, AS_PROGRAM, 32, vegas_state)
+ADDRESS_MAP_START(vegas_state::vegas_cs8_map)
 	AM_RANGE(0x01000000, 0x0100001f) AM_DEVREADWRITE8("uart1", ns16550_device, ins8250_r, ins8250_w, 0xff) // Serial ttyS01 (TL16C552 CS0)
 	AM_RANGE(0x01400000, 0x0140001f) AM_DEVREADWRITE8("uart2", ns16550_device, ins8250_r, ins8250_w, 0xff) // Serial ttyS02 (TL16C552 CS1)
 	AM_RANGE(0x01800000, 0x0180001f) AM_READWRITE8(parallel_r, parallel_w, 0xff) // Parallel UART (TL16C552 CS2)
@@ -1711,12 +1718,12 @@ MACHINE_CONFIG_START(vegas_state::vegascore)
 
 	MCFG_VRC5074_ADD(PCI_ID_NILE, ":maincpu")
 	MCFG_VRC5074_SET_SDRAM(0, 0x00800000)
-	MCFG_VRC5074_SET_CS(2, vegas_cs2_map)
-	MCFG_VRC5074_SET_CS(3, vegas_cs3_map)
-	MCFG_VRC5074_SET_CS(4, vegas_cs4_map)
-	MCFG_VRC5074_SET_CS(5, vegas_cs5_map)
-	MCFG_VRC5074_SET_CS(6, vegas_cs6_map)
-	MCFG_VRC5074_SET_CS(7, vegas_cs7_map)
+	MCFG_VRC5074_SET_CS(2, vegas_state::vegas_cs2_map)
+	MCFG_VRC5074_SET_CS(3, vegas_state::vegas_cs3_map)
+	MCFG_VRC5074_SET_CS(4, vegas_state::vegas_cs4_map)
+	MCFG_VRC5074_SET_CS(5, vegas_state::vegas_cs5_map)
+	MCFG_VRC5074_SET_CS(6, vegas_state::vegas_cs6_map)
+	MCFG_VRC5074_SET_CS(7, vegas_state::vegas_cs7_map)
 
 	MCFG_IDE_PCI_ADD(PCI_ID_IDE, 0x10950646, 0x05, 0x0)
 	MCFG_IDE_PCI_IRQ_HANDLER(DEVWRITELINE(PCI_ID_NILE, vrc5074_device, pci_intr_d))
@@ -1747,23 +1754,27 @@ MACHINE_CONFIG_START(vegas_state::vegascore)
 MACHINE_CONFIG_END
 
 
-MACHINE_CONFIG_DERIVED(vegas_state::vegas, vegascore)
+MACHINE_CONFIG_START(vegas_state::vegas)
+	vegascore(config);
 MACHINE_CONFIG_END
 
 
-MACHINE_CONFIG_DERIVED(vegas_state::vegas250, vegascore)
+MACHINE_CONFIG_START(vegas_state::vegas250)
+	vegascore(config);
 	MCFG_CPU_MODIFY("maincpu")
 	MCFG_CPU_CLOCK(vegas_state::SYSTEM_CLOCK*2.5)
 MACHINE_CONFIG_END
 
 
-MACHINE_CONFIG_DERIVED(vegas_state::vegas32m, vegas250)
+MACHINE_CONFIG_START(vegas_state::vegas32m)
+	vegas250(config);
 	MCFG_DEVICE_MODIFY(PCI_ID_NILE)
 	MCFG_VRC5074_SET_SDRAM(0, 0x02000000)
 MACHINE_CONFIG_END
 
 
-MACHINE_CONFIG_DERIVED(vegas_state::vegasban, vegas32m)
+MACHINE_CONFIG_START(vegas_state::vegasban)
+	vegas32m(config);
 	MCFG_DEVICE_REMOVE(PCI_ID_VIDEO)
 	MCFG_VOODOO_PCI_ADD(PCI_ID_VIDEO, TYPE_VOODOO_BANSHEE, ":maincpu")
 	MCFG_VOODOO_PCI_FBMEM(16)
@@ -1772,7 +1783,8 @@ MACHINE_CONFIG_DERIVED(vegas_state::vegasban, vegas32m)
 MACHINE_CONFIG_END
 
 
-MACHINE_CONFIG_DERIVED(vegas_state::vegasv3, vegas32m)
+MACHINE_CONFIG_START(vegas_state::vegasv3)
+	vegas32m(config);
 	MCFG_CPU_REPLACE("maincpu", RM7000LE, vegas_state::SYSTEM_CLOCK*2.5)
 	MCFG_MIPS3_ICACHE_SIZE(16384)
 	MCFG_MIPS3_DCACHE_SIZE(16384)
@@ -1786,7 +1798,8 @@ MACHINE_CONFIG_DERIVED(vegas_state::vegasv3, vegas32m)
 MACHINE_CONFIG_END
 
 
-MACHINE_CONFIG_DERIVED(vegas_state::denver, vegascore)
+MACHINE_CONFIG_START(vegas_state::denver)
+	vegascore(config);
 	MCFG_CPU_REPLACE("maincpu", RM7000LE, vegas_state::SYSTEM_CLOCK*2.5)
 	MCFG_MIPS3_ICACHE_SIZE(16384)
 	MCFG_MIPS3_DCACHE_SIZE(16384)
@@ -1794,7 +1807,7 @@ MACHINE_CONFIG_DERIVED(vegas_state::denver, vegascore)
 
 	MCFG_DEVICE_MODIFY(PCI_ID_NILE)
 	MCFG_VRC5074_SET_SDRAM(0, 0x02000000)
-	MCFG_VRC5074_SET_CS(8, vegas_cs8_map)
+	MCFG_VRC5074_SET_CS(8, vegas_state::vegas_cs8_map)
 
 	MCFG_DEVICE_REMOVE(PCI_ID_VIDEO)
 	MCFG_VOODOO_PCI_ADD(PCI_ID_VIDEO, TYPE_VOODOO_3, ":maincpu")
@@ -1833,7 +1846,8 @@ MACHINE_CONFIG_END
 
 // Per driver configs
 
-MACHINE_CONFIG_DERIVED(vegas_state::gauntleg, vegas)
+MACHINE_CONFIG_START(vegas_state::gauntleg)
+	vegas(config);
 	MCFG_DEVICE_ADD("dcs", DCS2_AUDIO_2104, 0)
 	MCFG_DCS2_AUDIO_DRAM_IN_MB(4)
 	MCFG_DCS2_AUDIO_POLLING_OFFSET(0x0b5d)
@@ -1846,7 +1860,8 @@ MACHINE_CONFIG_DERIVED(vegas_state::gauntleg, vegas)
 	MCFG_MIDWAY_IOASIC_AUTO_ACK(1)
 MACHINE_CONFIG_END
 
-MACHINE_CONFIG_DERIVED(vegas_state::gauntdl, vegas)
+MACHINE_CONFIG_START(vegas_state::gauntdl)
+	vegas(config);
 	MCFG_DEVICE_ADD("dcs", DCS2_AUDIO_2104, 0)
 	MCFG_DCS2_AUDIO_DRAM_IN_MB(4)
 	MCFG_DCS2_AUDIO_POLLING_OFFSET(0x0b5d)
@@ -1859,7 +1874,8 @@ MACHINE_CONFIG_DERIVED(vegas_state::gauntdl, vegas)
 	MCFG_MIDWAY_IOASIC_AUTO_ACK(1)
 MACHINE_CONFIG_END
 
-MACHINE_CONFIG_DERIVED(vegas_state::warfa, vegas250)
+MACHINE_CONFIG_START(vegas_state::warfa)
+	vegas250(config);
 	MCFG_DEVICE_ADD("dcs", DCS2_AUDIO_2104, 0)
 	MCFG_DCS2_AUDIO_DRAM_IN_MB(4)
 	MCFG_DCS2_AUDIO_POLLING_OFFSET(0x0b5d)
@@ -1872,7 +1888,8 @@ MACHINE_CONFIG_DERIVED(vegas_state::warfa, vegas250)
 	MCFG_MIDWAY_IOASIC_AUTO_ACK(1)
 MACHINE_CONFIG_END
 
-MACHINE_CONFIG_DERIVED(vegas_state::tenthdeg, vegas)
+MACHINE_CONFIG_START(vegas_state::tenthdeg)
+	vegas(config);
 	MCFG_DEVICE_ADD("dcs", DCS2_AUDIO_2115, 0)
 	MCFG_DCS2_AUDIO_DRAM_IN_MB(4)
 	MCFG_DCS2_AUDIO_POLLING_OFFSET(0x0afb)
@@ -1885,7 +1902,8 @@ MACHINE_CONFIG_DERIVED(vegas_state::tenthdeg, vegas)
 	MCFG_MIDWAY_IOASIC_AUTO_ACK(1)
 MACHINE_CONFIG_END
 
-MACHINE_CONFIG_DERIVED(vegas_state::roadburn, vegas32m)
+MACHINE_CONFIG_START(vegas_state::roadburn)
+	vegas32m(config);
 	MCFG_DEVICE_ADD("dcs", DCS2_AUDIO_DSIO, 0)
 	MCFG_DCS2_AUDIO_DRAM_IN_MB(4)
 	MCFG_DCS2_AUDIO_POLLING_OFFSET(0x0ddd)
@@ -1898,7 +1916,8 @@ MACHINE_CONFIG_DERIVED(vegas_state::roadburn, vegas32m)
 	MCFG_MIDWAY_IOASIC_AUTO_ACK(1)
 MACHINE_CONFIG_END
 
-MACHINE_CONFIG_DERIVED(vegas_state::nbashowt, vegasban)
+MACHINE_CONFIG_START(vegas_state::nbashowt)
+	vegasban(config);
 	MCFG_DEVICE_ADD("dcs", DCS2_AUDIO_2104, 0)
 	MCFG_DCS2_AUDIO_DRAM_IN_MB(4)
 	MCFG_DCS2_AUDIO_POLLING_OFFSET(0x0b5d)
@@ -1913,7 +1932,8 @@ MACHINE_CONFIG_DERIVED(vegas_state::nbashowt, vegasban)
 	MCFG_MIDWAY_IOASIC_AUX_OUT_CB(WRITE32(vegas_state, i40_w))
 MACHINE_CONFIG_END
 
-MACHINE_CONFIG_DERIVED(vegas_state::nbanfl, vegasban)
+MACHINE_CONFIG_START(vegas_state::nbanfl)
+	vegasban(config);
 	MCFG_DEVICE_ADD("dcs", DCS2_AUDIO_2104, 0)
 	MCFG_DCS2_AUDIO_DRAM_IN_MB(4)
 
@@ -1926,7 +1946,8 @@ MACHINE_CONFIG_DERIVED(vegas_state::nbanfl, vegasban)
 	MCFG_MIDWAY_IOASIC_AUX_OUT_CB(WRITE32(vegas_state, i40_w))
 MACHINE_CONFIG_END
 
-MACHINE_CONFIG_DERIVED(vegas_state::nbagold, vegasban)
+MACHINE_CONFIG_START(vegas_state::nbagold)
+	vegasban(config);
 	MCFG_DEVICE_ADD("dcs", DCS2_AUDIO_2104, 0)
 	MCFG_DCS2_AUDIO_DRAM_IN_MB(4)
 
@@ -1939,7 +1960,8 @@ MACHINE_CONFIG_DERIVED(vegas_state::nbagold, vegasban)
 	MCFG_MIDWAY_IOASIC_AUX_OUT_CB(WRITE32(vegas_state, i40_w))
 MACHINE_CONFIG_END
 
-MACHINE_CONFIG_DERIVED(vegas_state::sf2049, denver)
+MACHINE_CONFIG_START(vegas_state::sf2049)
+	denver(config);
 	MCFG_DEVICE_ADD("dcs", DCS2_AUDIO_DENVER, 0)
 	MCFG_DCS2_AUDIO_DRAM_IN_MB(8)
 	MCFG_DCS2_AUDIO_POLLING_OFFSET(0x872)
@@ -1953,7 +1975,8 @@ MACHINE_CONFIG_DERIVED(vegas_state::sf2049, denver)
 	MCFG_MIDWAY_IOASIC_AUX_OUT_CB(WRITE32(vegas_state, wheel_board_w))
 MACHINE_CONFIG_END
 
-MACHINE_CONFIG_DERIVED(vegas_state::sf2049se, denver)
+MACHINE_CONFIG_START(vegas_state::sf2049se)
+	denver(config);
 	MCFG_DEVICE_ADD("dcs", DCS2_AUDIO_DENVER, 0)
 	MCFG_DCS2_AUDIO_DRAM_IN_MB(8)
 	MCFG_DCS2_AUDIO_POLLING_OFFSET(0x872)
@@ -1967,7 +1990,8 @@ MACHINE_CONFIG_DERIVED(vegas_state::sf2049se, denver)
 	MCFG_MIDWAY_IOASIC_AUX_OUT_CB(WRITE32(vegas_state, wheel_board_w))
 MACHINE_CONFIG_END
 
-MACHINE_CONFIG_DERIVED(vegas_state::sf2049te, denver)
+MACHINE_CONFIG_START(vegas_state::sf2049te)
+	denver(config);
 	MCFG_DEVICE_ADD("dcs", DCS2_AUDIO_DENVER, 0)
 	MCFG_DCS2_AUDIO_DRAM_IN_MB(8)
 	MCFG_DCS2_AUDIO_POLLING_OFFSET(0x872)
@@ -1981,7 +2005,8 @@ MACHINE_CONFIG_DERIVED(vegas_state::sf2049te, denver)
 	MCFG_MIDWAY_IOASIC_AUX_OUT_CB(WRITE32(vegas_state, wheel_board_w))
 MACHINE_CONFIG_END
 
-MACHINE_CONFIG_DERIVED(vegas_state::cartfury, vegasv3)
+MACHINE_CONFIG_START(vegas_state::cartfury)
+	vegasv3(config);
 	MCFG_DEVICE_ADD("dcs", DCS2_AUDIO_2104, 0)
 	MCFG_DCS2_AUDIO_DRAM_IN_MB(4)
 	MCFG_DCS2_AUDIO_POLLING_OFFSET(0x0b5d)

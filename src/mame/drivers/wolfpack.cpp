@@ -127,7 +127,7 @@ WRITE8_MEMBER(wolfpack_state::coldetres_w)
 }
 
 
-static ADDRESS_MAP_START( main_map, AS_PROGRAM, 8, wolfpack_state )
+ADDRESS_MAP_START(wolfpack_state::main_map)
 	AM_RANGE(0x0000, 0x00ff) AM_RAM AM_MIRROR(0x100)
 	AM_RANGE(0x1000, 0x1000) AM_READ_PORT("INPUTS")
 	AM_RANGE(0x1000, 0x10ff) AM_WRITEONLY AM_SHARE("alpha_num_ram")

@@ -79,13 +79,13 @@ public:
 	DECLARE_READ8_MEMBER(nascom1_port_02_r);
 	DECLARE_DRIVER_INIT(nascom);
 	void screen_update(bitmap_ind16 &bitmap, const rectangle &cliprect, int char_height);
-	DECLARE_READ8_MEMBER(nascom1_hd6402_si);
-	DECLARE_WRITE8_MEMBER(nascom1_hd6402_so);
+	DECLARE_READ_LINE_MEMBER(nascom1_hd6402_si);
+	DECLARE_WRITE_LINE_MEMBER(nascom1_hd6402_so);
 	DECLARE_DEVICE_IMAGE_LOAD_MEMBER( nascom1_cassette );
 	DECLARE_DEVICE_IMAGE_UNLOAD_MEMBER( nascom1_cassette );
 	DECLARE_SNAPSHOT_LOAD_MEMBER( nascom1 );
 
-	void nascom1(machine_config &config);
+	void nascom(machine_config &config);
 protected:
 	virtual void machine_reset() override;
 
@@ -101,6 +101,10 @@ public:
 	{ }
 
 	uint32_t screen_update_nascom(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+
+	void nascom1(machine_config &config);
+	void nascom1_io(address_map &map);
+	void nascom1_mem(address_map &map);
 private:
 };
 
@@ -127,6 +131,9 @@ public:
 
 	void nascom2(machine_config &config);
 	void nascom2c(machine_config &config);
+	void nascom2_io(address_map &map);
+	void nascom2_mem(address_map &map);
+	void nascom2c_mem(address_map &map);
 protected:
 	virtual void machine_reset() override;
 
@@ -203,12 +210,12 @@ READ8_MEMBER( nascom_state::nascom1_port_02_r )
 	return data;
 }
 
-READ8_MEMBER( nascom_state::nascom1_hd6402_si )
+READ_LINE_MEMBER( nascom_state::nascom1_hd6402_si )
 {
 	return 1;
 }
 
-WRITE8_MEMBER( nascom_state::nascom1_hd6402_so )
+WRITE_LINE_MEMBER( nascom_state::nascom1_hd6402_so )
 {
 }
 
@@ -466,13 +473,13 @@ void nascom_state::screen_update(bitmap_ind16 &bitmap, const rectangle &cliprect
 //  ADDRESS MAPS
 //**************************************************************************
 
-static ADDRESS_MAP_START( nascom1_mem, AS_PROGRAM, 8, nascom1_state )
+ADDRESS_MAP_START(nascom1_state::nascom1_mem)
 	AM_RANGE(0x0000, 0x07ff) AM_ROM // MONITOR
 	AM_RANGE(0x0800, 0x0bff) AM_RAM AM_SHARE("videoram")
 	AM_RANGE(0x0c00, 0x0fff) AM_RAM // WRAM
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( nascom1_io, AS_IO, 8, nascom1_state )
+ADDRESS_MAP_START(nascom1_state::nascom1_io)
 	ADDRESS_MAP_GLOBAL_MASK(0x0f)
 	AM_RANGE(0x00, 0x00) AM_READWRITE(nascom1_port_00_r, nascom1_port_00_w)
 	AM_RANGE(0x01, 0x01) AM_READWRITE(nascom1_port_01_r, nascom1_port_01_w)
@@ -480,14 +487,14 @@ static ADDRESS_MAP_START( nascom1_io, AS_IO, 8, nascom1_state )
 	AM_RANGE(0x04, 0x07) AM_DEVREADWRITE("z80pio", z80pio_device, read, write )
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( nascom2_mem, AS_PROGRAM, 8, nascom2_state )
+ADDRESS_MAP_START(nascom2_state::nascom2_mem)
 	AM_RANGE(0x0000, 0x07ff) AM_ROM // MONITOR
 	AM_RANGE(0x0800, 0x0bff) AM_RAM AM_SHARE("videoram")
 	AM_RANGE(0x0c00, 0x0fff) AM_RAM // WRAM
 	AM_RANGE(0xe000, 0xffff) AM_ROM AM_REGION("basic", 0)
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( nascom2_io, AS_IO, 8, nascom2_state )
+ADDRESS_MAP_START(nascom2_state::nascom2_io)
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	AM_RANGE(0x00, 0x00) AM_READWRITE(nascom1_port_00_r, nascom1_port_00_w)
 	AM_RANGE(0x01, 0x01) AM_READWRITE(nascom1_port_01_r, nascom1_port_01_w)
@@ -495,7 +502,7 @@ static ADDRESS_MAP_START( nascom2_io, AS_IO, 8, nascom2_state )
 	AM_RANGE(0x04, 0x07) AM_DEVREADWRITE("z80pio", z80pio_device, read, write )
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( nascom2c_mem, AS_PROGRAM, 8, nascom2_state )
+ADDRESS_MAP_START(nascom2_state::nascom2c_mem)
 	AM_RANGE(0xf000, 0xf7ff) AM_ROM AM_REGION("maincpu", 0)
 	AM_RANGE(0xf800, 0xfbff) AM_RAM AM_SHARE("videoram")
 	AM_RANGE(0xfc00, 0xffff) AM_RAM // WRAM
@@ -646,12 +653,7 @@ INPUT_PORTS_END
 //  MACHINE DRIVERS
 //**************************************************************************
 
-MACHINE_CONFIG_START(nascom_state::nascom1)
-	// main cpu
-	MCFG_CPU_ADD("maincpu", Z80, XTAL(16'000'000) / 8)
-	MCFG_CPU_PROGRAM_MAP(nascom1_mem)
-	MCFG_CPU_IO_MAP(nascom1_io)
-
+MACHINE_CONFIG_START(nascom_state::nascom)
 	// video hardware
 	MCFG_SCREEN_ADD("screen", RASTER)
 	MCFG_SCREEN_REFRESH_RATE(50)
@@ -668,8 +670,8 @@ MACHINE_CONFIG_START(nascom_state::nascom1)
 	MCFG_DEVICE_ADD( "hd6402", AY31015, 0 )
 	MCFG_AY31015_TX_CLOCK(( XTAL(16'000'000) / 16 ) / 256)
 	MCFG_AY31015_RX_CLOCK(( XTAL(16'000'000) / 16 ) / 256)
-	MCFG_AY51013_READ_SI_CB(READ8(nascom_state, nascom1_hd6402_si))
-	MCFG_AY51013_WRITE_SO_CB(WRITE8(nascom_state, nascom1_hd6402_so))
+	MCFG_AY51013_READ_SI_CB(READLINE(nascom_state, nascom1_hd6402_si))
+	MCFG_AY51013_WRITE_SO_CB(WRITELINE(nascom_state, nascom1_hd6402_so))
 
 	// cassette is connected to the uart
 	MCFG_CASSETTE_ADD("cassette")
@@ -686,8 +688,16 @@ MACHINE_CONFIG_START(nascom_state::nascom1)
 	MCFG_SNAPSHOT_ADD("snapshot", nascom_state, nascom1, "nas", 0.5)
 MACHINE_CONFIG_END
 
-MACHINE_CONFIG_DERIVED(nascom2_state::nascom2, nascom1)
-	MCFG_CPU_REPLACE("maincpu", Z80, XTAL(16'000'000) / 4)
+MACHINE_CONFIG_START(nascom1_state::nascom1)
+	nascom(config);
+	MCFG_CPU_ADD("maincpu", Z80, XTAL(16'000'000) / 8)
+	MCFG_CPU_PROGRAM_MAP(nascom1_mem)
+	MCFG_CPU_IO_MAP(nascom1_io)
+MACHINE_CONFIG_END
+
+MACHINE_CONFIG_START(nascom2_state::nascom2)
+	nascom(config);
+	MCFG_CPU_ADD("maincpu", Z80, XTAL(16'000'000) / 4)
 	MCFG_CPU_PROGRAM_MAP(nascom2_mem)
 	MCFG_CPU_IO_MAP(nascom2_io)
 
@@ -720,7 +730,8 @@ MACHINE_CONFIG_DERIVED(nascom2_state::nascom2, nascom1)
 	MCFG_SOFTWARE_LIST_ADD("floppy_list", "nascom_flop")
 MACHINE_CONFIG_END
 
-MACHINE_CONFIG_DERIVED(nascom2_state::nascom2c, nascom2)
+MACHINE_CONFIG_START(nascom2_state::nascom2c)
+	nascom2(config);
 	MCFG_CPU_MODIFY("maincpu")
 	MCFG_CPU_PROGRAM_MAP(nascom2c_mem)
 

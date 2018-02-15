@@ -290,7 +290,7 @@ WRITE8_MEMBER(warpwarp_state::warpwarp_out0_w)
 
 
 
-static ADDRESS_MAP_START( geebee_map, AS_PROGRAM, 8, warpwarp_state )
+ADDRESS_MAP_START(warpwarp_state::geebee_map)
 	AM_RANGE(0x0000, 0x1fff) AM_ROM
 	AM_RANGE(0x2000, 0x23ff) AM_MIRROR(0x400) AM_RAM_WRITE(geebee_videoram_w) AM_SHARE("geebee_videoram") // mirror used by kaitei due to a bug
 	AM_RANGE(0x3000, 0x37ff) AM_ROM AM_REGION("gfx1", 0) // 3000-33ff in geebee
@@ -300,14 +300,14 @@ static ADDRESS_MAP_START( geebee_map, AS_PROGRAM, 8, warpwarp_state )
 	AM_RANGE(0x7000, 0x7007) AM_MIRROR(0x0ff8) AM_DEVWRITE("latch", ls259_device, write_d0)
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( geebee_port_map, AS_IO, 8, warpwarp_state )
+ADDRESS_MAP_START(warpwarp_state::geebee_port_map)
 	AM_RANGE(0x50, 0x53) AM_READ(geebee_in_r)
 	AM_RANGE(0x60, 0x6f) AM_WRITE(geebee_out6_w)
 	AM_RANGE(0x70, 0x77) AM_MIRROR(0x08) AM_DEVWRITE("latch", ls259_device, write_d0)
 ADDRESS_MAP_END
 
 
-static ADDRESS_MAP_START( bombbee_map, AS_PROGRAM, 8, warpwarp_state )
+ADDRESS_MAP_START(warpwarp_state::bombbee_map)
 	AM_RANGE(0x0000, 0x1fff) AM_ROM
 	AM_RANGE(0x2000, 0x23ff) AM_RAM
 	AM_RANGE(0x4000, 0x47ff) AM_RAM_WRITE(warpwarp_videoram_w) AM_SHARE("videoram")
@@ -318,7 +318,7 @@ static ADDRESS_MAP_START( bombbee_map, AS_PROGRAM, 8, warpwarp_state )
 	AM_RANGE(0x6030, 0x6037) AM_MIRROR(0x0008) AM_DEVWRITE("latch", ls259_device, write_d0)
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( warpwarp_map, AS_PROGRAM, 8, warpwarp_state )
+ADDRESS_MAP_START(warpwarp_state::warpwarp_map)
 	AM_RANGE(0x0000, 0x3fff) AM_ROM
 	AM_RANGE(0x8000, 0x83ff) AM_RAM
 	AM_RANGE(0x4000, 0x47ff) AM_RAM_WRITE(warpwarp_videoram_w) AM_SHARE("videoram")
@@ -742,12 +742,14 @@ MACHINE_CONFIG_START(warpwarp_state::geebee)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 MACHINE_CONFIG_END
 
-MACHINE_CONFIG_DERIVED(warpwarp_state::geebeeb, geebee)
+MACHINE_CONFIG_START(warpwarp_state::geebeeb)
+	geebee(config);
 	MCFG_DEVICE_MODIFY("latch")
 	MCFG_ADDRESSABLE_LATCH_Q4_OUT_CB(NOOP) // remove coin lockout
 MACHINE_CONFIG_END
 
-MACHINE_CONFIG_DERIVED(warpwarp_state::navarone, geebee)
+MACHINE_CONFIG_START(warpwarp_state::navarone)
+	geebee(config);
 
 	/* basic machine hardware */
 	MCFG_GFXDECODE_MODIFY("gfxdecode", 2k)
@@ -796,7 +798,8 @@ MACHINE_CONFIG_START(warpwarp_state::bombbee)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 MACHINE_CONFIG_END
 
-MACHINE_CONFIG_DERIVED(warpwarp_state::warpwarp, bombbee)
+MACHINE_CONFIG_START(warpwarp_state::warpwarp)
+	bombbee(config);
 
 	/* basic machine hardware */
 	MCFG_CPU_MODIFY("maincpu")

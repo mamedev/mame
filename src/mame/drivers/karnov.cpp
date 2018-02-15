@@ -428,7 +428,7 @@ READ16_MEMBER(karnov_state::karnov_control_r)
  *
  *************************************/
 
-static ADDRESS_MAP_START( karnov_map, AS_PROGRAM, 16, karnov_state )
+ADDRESS_MAP_START(karnov_state::karnov_map)
 	AM_RANGE(0x000000, 0x05ffff) AM_ROM
 	AM_RANGE(0x060000, 0x063fff) AM_RAM AM_SHARE("ram")
 	AM_RANGE(0x080000, 0x080fff) AM_RAM AM_SHARE("spriteram")
@@ -441,19 +441,19 @@ static ADDRESS_MAP_START( karnov_map, AS_PROGRAM, 16, karnov_state )
 ADDRESS_MAP_END
 
 
-static ADDRESS_MAP_START( base_sound_map, AS_PROGRAM, 8, karnov_state )
+ADDRESS_MAP_START(karnov_state::base_sound_map)
 	AM_RANGE(0x0000, 0x05ff) AM_RAM
 	AM_RANGE(0x0800, 0x0800) AM_DEVREAD("soundlatch", generic_latch_8_device, read)
 	AM_RANGE(0x1000, 0x1001) AM_DEVWRITE("ym1", ym2203_device, write)
 	AM_RANGE(0x8000, 0xffff) AM_ROM
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( karnov_sound_map, AS_PROGRAM, 8, karnov_state )
+ADDRESS_MAP_START(karnov_state::karnov_sound_map)
 	AM_IMPORT_FROM(base_sound_map)
 	AM_RANGE(0x1800, 0x1801) AM_DEVWRITE("ym2", ym3526_device, write)
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( karnovjbl_sound_map, AS_PROGRAM, 8, karnov_state )
+ADDRESS_MAP_START(karnov_state::karnovjbl_sound_map)
 	AM_IMPORT_FROM(base_sound_map)
 	AM_RANGE(0x1800, 0x1801) AM_DEVWRITE("ym2", ym3812_device, write)
 ADDRESS_MAP_END
@@ -847,7 +847,8 @@ MACHINE_CONFIG_START(karnov_state::karnov)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 MACHINE_CONFIG_END
 
-MACHINE_CONFIG_DERIVED(karnov_state::karnovjbl, karnov)
+MACHINE_CONFIG_START(karnov_state::karnovjbl)
+	karnov(config);
 	/* X-TALs:
 	Top board next to #9 is 20.000 MHz
 	Top board next to the microcontroller is 6.000 MHz
@@ -861,18 +862,19 @@ MACHINE_CONFIG_DERIVED(karnov_state::karnovjbl, karnov)
 
 MACHINE_CONFIG_END
 
-static ADDRESS_MAP_START( chelnovjbl_mcu_map, AS_PROGRAM, 8, karnov_state )
+ADDRESS_MAP_START(karnov_state::chelnovjbl_mcu_map)
 	AM_RANGE(0x0000, 0x1fff) AM_ROM
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( chelnovjbl_mcu_io_map, AS_IO, 8, karnov_state )
+ADDRESS_MAP_START(karnov_state::chelnovjbl_mcu_io_map)
 	//internal port
 //  AM_RANGE(MCS51_PORT_P1, MCS51_PORT_P1) AM_READWRITE(p1_r, p1_w)
 //  AM_RANGE(MCS51_PORT_P3, MCS51_PORT_P3) AM_READWRITE(p3_r, p3_w)
 ADDRESS_MAP_END
 
 
-MACHINE_CONFIG_DERIVED(karnov_state::chelnovjbl, karnov)
+MACHINE_CONFIG_START(karnov_state::chelnovjbl)
+	karnov(config);
 	MCFG_CPU_ADD("mcu", I8031, 2000000) // ??mhz
 	MCFG_CPU_PROGRAM_MAP(chelnovjbl_mcu_map)
 	MCFG_CPU_IO_MAP(chelnovjbl_mcu_io_map)

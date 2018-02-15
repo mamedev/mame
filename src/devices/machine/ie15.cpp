@@ -332,12 +332,12 @@ WRITE8_MEMBER(ie15_device::flag_w)
 	}
 }
 
-static ADDRESS_MAP_START( ie15_mem, AS_PROGRAM, 8, ie15_device )
+ADDRESS_MAP_START(ie15_device::ie15_mem)
 	ADDRESS_MAP_UNMAP_HIGH
 	AM_RANGE(0x0000, 0x0fff) AM_ROM
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( ie15_io, AS_IO, 8, ie15_device )
+ADDRESS_MAP_START(ie15_device::ie15_io)
 	ADDRESS_MAP_UNMAP_HIGH
 	AM_RANGE(000, 000) AM_READWRITE(mem_r, mem_w)   // 00h W: memory request, R: memory data [6.1.2.2]
 	AM_RANGE(001, 001) AM_READ(serial_rx_ready_r) AM_WRITENOP   // 01h W: memory latch [6.1.2.2]
@@ -600,7 +600,7 @@ ROM_START( ie15 )
 ROM_END
 
 MACHINE_CONFIG_START(ie15_device::device_add_mconfig)
-	MCFG_FRAGMENT_ADD(ie15core)
+	ie15core(config);
 
 	MCFG_SCREEN_ADD_MONOCHROME("screen", RASTER, rgb_t::green())
 	MCFG_SCREEN_UPDATE_DRIVER(ie15_device, screen_update)

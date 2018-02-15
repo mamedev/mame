@@ -305,7 +305,7 @@ WRITE8_MEMBER( spectrum_state::spectrum_plus3_port_1ffd_w )
 
 /* ports are not decoded full.
 The function decodes the ports appropriately */
-static ADDRESS_MAP_START (spectrum_plus3_io, AS_IO, 8, spectrum_state )
+ADDRESS_MAP_START(spectrum_state::spectrum_plus3_io)
 	ADDRESS_MAP_UNMAP_HIGH
 	AM_RANGE(0x0000, 0x0000) AM_READWRITE(spectrum_port_fe_r,spectrum_port_fe_w) AM_SELECT(0xfffe)
 	AM_RANGE(0x4000, 0x4000) AM_WRITE(spectrum_plus3_port_7ffd_w) AM_MIRROR(0x3ffd)
@@ -316,7 +316,7 @@ static ADDRESS_MAP_START (spectrum_plus3_io, AS_IO, 8, spectrum_state )
 	AM_RANGE(0x3000, 0x3000) AM_READWRITE(spectrum_plus3_port_3ffd_r,spectrum_plus3_port_3ffd_w) AM_MIRROR(0x0ffd)
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START(spectrum_plus3_mem, AS_PROGRAM, 8, spectrum_state)
+ADDRESS_MAP_START(spectrum_state::spectrum_plus3_mem)
 	AM_RANGE(0x0000, 0x3fff) AM_ROMBANK("bank1")
 	AM_RANGE(0x4000, 0x7fff) AM_RAMBANK("bank2")
 	AM_RANGE(0x8000, 0xbfff) AM_RAMBANK("bank3")
@@ -369,7 +369,8 @@ static GFXDECODE_START( specpls3 )
 GFXDECODE_END
 
 
-MACHINE_CONFIG_DERIVED(spectrum_state::spectrum_plus3, spectrum_128)
+MACHINE_CONFIG_START(spectrum_state::spectrum_plus3)
+	spectrum_128(config);
 	MCFG_CPU_MODIFY("maincpu")
 	MCFG_CPU_PROGRAM_MAP(spectrum_plus3_mem)
 	MCFG_CPU_IO_MAP(spectrum_plus3_io)

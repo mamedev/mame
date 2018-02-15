@@ -332,7 +332,7 @@ WRITE8_MEMBER(segag80r_state::sindbadm_sn2_SN76496_w)
  *************************************/
 
 /* complete memory map derived from schematics */
-static ADDRESS_MAP_START( main_map, AS_PROGRAM, 8, segag80r_state )
+ADDRESS_MAP_START(segag80r_state::main_map)
 	AM_RANGE(0x0000, 0x07ff) AM_ROM     /* CPU board ROM */
 	AM_RANGE(0x0800, 0x7fff) AM_ROM     /* PROM board ROM area */
 	AM_RANGE(0x8000, 0xbfff) AM_ROM     /* PROM board ROM area */
@@ -340,11 +340,11 @@ static ADDRESS_MAP_START( main_map, AS_PROGRAM, 8, segag80r_state )
 	AM_RANGE(0xe000, 0xffff) AM_RAM_WRITE(vidram_w) AM_SHARE("videoram")
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( g80r_opcodes_map, AS_OPCODES, 8, segag80r_state )
+ADDRESS_MAP_START(segag80r_state::g80r_opcodes_map)
 	AM_RANGE(0x0000, 0xffff) AM_READ(g80r_opcode_r)
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( sega_315_opcodes_map, AS_OPCODES, 8, segag80r_state )
+ADDRESS_MAP_START(segag80r_state::sega_315_opcodes_map)
 	AM_RANGE(0x0000, 0x7fff) AM_ROM AM_SHARE("decrypted_opcodes")
 	AM_RANGE(0x8000, 0xbfff) AM_ROM AM_REGION("maincpu", 0x8000)
 	AM_RANGE(0xc800, 0xcfff) AM_RAM_WRITE(mainram_w) AM_SHARE("mainram")
@@ -353,7 +353,7 @@ ADDRESS_MAP_END
 
 
 /* complete memory map derived from schematics */
-static ADDRESS_MAP_START( main_portmap, AS_IO, 8, segag80r_state )
+ADDRESS_MAP_START(segag80r_state::main_portmap)
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	AM_RANGE(0xbe, 0xbf) AM_READWRITE(segag80r_video_port_r, segag80r_video_port_w)
 	AM_RANGE(0xf9, 0xf9) AM_MIRROR(0x04) AM_WRITE(coin_count_w)
@@ -362,7 +362,7 @@ static ADDRESS_MAP_START( main_portmap, AS_IO, 8, segag80r_state )
 ADDRESS_MAP_END
 
 
-static ADDRESS_MAP_START( main_ppi8255_portmap, AS_IO, 8, segag80r_state )
+ADDRESS_MAP_START(segag80r_state::main_ppi8255_portmap)
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	AM_RANGE(0x0c, 0x0f) AM_DEVREADWRITE("ppi8255", i8255_device, read, write)
 	AM_RANGE(0xbe, 0xbf) AM_READWRITE(segag80r_video_port_r, segag80r_video_port_w)
@@ -372,7 +372,7 @@ static ADDRESS_MAP_START( main_ppi8255_portmap, AS_IO, 8, segag80r_state )
 ADDRESS_MAP_END
 
 
-static ADDRESS_MAP_START( sindbadm_portmap, AS_IO, 8, segag80r_state )
+ADDRESS_MAP_START(segag80r_state::sindbadm_portmap)
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	AM_RANGE(0x42, 0x43) AM_READWRITE(segag80r_video_port_r, segag80r_video_port_w)
 	AM_RANGE(0x80, 0x83) AM_DEVREADWRITE("ppi8255", i8255_device, read, write)
@@ -388,7 +388,7 @@ ADDRESS_MAP_END
  *************************************/
 
 /* complete memory map derived from System 1 schematics */
-static ADDRESS_MAP_START( sindbadm_sound_map, AS_PROGRAM, 8, segag80r_state )
+ADDRESS_MAP_START(segag80r_state::sindbadm_sound_map)
 	AM_RANGE(0x0000, 0x1fff) AM_ROM
 	AM_RANGE(0x8000, 0x87ff) AM_MIRROR(0x1800) AM_RAM
 	AM_RANGE(0xa000, 0xa003) AM_MIRROR(0x1ffc) AM_WRITE(sindbadm_sn1_SN76496_w)
@@ -835,7 +835,7 @@ MACHINE_CONFIG_START(segag80r_state::g80r_base)
 	MCFG_CPU_ADD("maincpu", Z80, VIDEO_CLOCK/4)
 	MCFG_CPU_PROGRAM_MAP(main_map)
 	MCFG_CPU_IO_MAP(main_portmap)
-	MCFG_CPU_DECRYPTED_OPCODES_MAP(g80r_opcodes_map)
+	MCFG_CPU_OPCODES_MAP(g80r_opcodes_map)
 	MCFG_CPU_VBLANK_INT_DRIVER("screen", segag80r_state, segag80r_vblank_start)
 	MCFG_CPU_IRQ_ACKNOWLEDGE_DRIVER(segag80r_state, segag80r_irq_ack)
 
@@ -853,17 +853,19 @@ MACHINE_CONFIG_START(segag80r_state::g80r_base)
 MACHINE_CONFIG_END
 
 
-MACHINE_CONFIG_DERIVED(segag80r_state::astrob, g80r_base)
+MACHINE_CONFIG_START(segag80r_state::astrob)
+	g80r_base(config);
 
 	/* basic machine hardware */
 
 	/* sound boards */
-	MCFG_FRAGMENT_ADD(astrob_sound_board)
-	MCFG_FRAGMENT_ADD(sega_speech_board)
+	astrob_sound_board(config);
+	sega_speech_board(config);
 MACHINE_CONFIG_END
 
 
-MACHINE_CONFIG_DERIVED(segag80r_state::sega005, g80r_base)
+MACHINE_CONFIG_START(segag80r_state::sega005)
+	g80r_base(config);
 
 	/* basic machine hardware */
 
@@ -871,11 +873,12 @@ MACHINE_CONFIG_DERIVED(segag80r_state::sega005, g80r_base)
 	MCFG_CPU_IO_MAP(main_ppi8255_portmap)
 
 	/* sound boards */
-	MCFG_FRAGMENT_ADD(sega005_sound_board)
+	sega005_sound_board(config);
 MACHINE_CONFIG_END
 
 
-MACHINE_CONFIG_DERIVED(segag80r_state::spaceod, g80r_base)
+MACHINE_CONFIG_START(segag80r_state::spaceod)
+	g80r_base(config);
 
 	/* basic machine hardware */
 
@@ -887,11 +890,12 @@ MACHINE_CONFIG_DERIVED(segag80r_state::spaceod, g80r_base)
 	MCFG_PALETTE_ENTRIES(64+64)
 
 	/* sound boards */
-	MCFG_FRAGMENT_ADD(spaceod_sound_board)
+	spaceod_sound_board(config);
 MACHINE_CONFIG_END
 
 
-MACHINE_CONFIG_DERIVED(segag80r_state::monsterb, g80r_base)
+MACHINE_CONFIG_START(segag80r_state::monsterb)
+	g80r_base(config);
 
 	/* basic machine hardware */
 
@@ -904,20 +908,22 @@ MACHINE_CONFIG_DERIVED(segag80r_state::monsterb, g80r_base)
 	MCFG_PALETTE_ENTRIES(64+64)
 
 	/* sound boards */
-	MCFG_FRAGMENT_ADD(monsterb_sound_board)
+	monsterb_sound_board(config);
 MACHINE_CONFIG_END
 
-MACHINE_CONFIG_DERIVED(segag80r_state::monster2, monsterb)
+MACHINE_CONFIG_START(segag80r_state::monster2)
+	monsterb(config);
 	MCFG_CPU_REPLACE("maincpu", SEGA_315_SPAT, VIDEO_CLOCK/4)
 	MCFG_CPU_PROGRAM_MAP(main_map)
 	MCFG_CPU_IO_MAP(main_ppi8255_portmap)
 	MCFG_CPU_VBLANK_INT_DRIVER("screen", segag80r_state, segag80r_vblank_start)
 	MCFG_CPU_IRQ_ACKNOWLEDGE_DRIVER(segag80r_state, segag80r_irq_ack)
-	MCFG_CPU_DECRYPTED_OPCODES_MAP(sega_315_opcodes_map)
+	MCFG_CPU_OPCODES_MAP(sega_315_opcodes_map)
 	MCFG_SEGACRPT_SET_DECRYPTED_TAG(":decrypted_opcodes")
 MACHINE_CONFIG_END
 
-MACHINE_CONFIG_DERIVED(segag80r_state::pignewt, g80r_base)
+MACHINE_CONFIG_START(segag80r_state::pignewt)
+	g80r_base(config);
 
 	/* basic machine hardware */
 
@@ -931,13 +937,14 @@ MACHINE_CONFIG_DERIVED(segag80r_state::pignewt, g80r_base)
 MACHINE_CONFIG_END
 
 
-MACHINE_CONFIG_DERIVED(segag80r_state::sindbadm, g80r_base)
+MACHINE_CONFIG_START(segag80r_state::sindbadm)
+	g80r_base(config);
 
 	/* basic machine hardware */
 	MCFG_CPU_REPLACE("maincpu", SEGA_315_5028, VIDEO_CLOCK/4)
 	MCFG_CPU_PROGRAM_MAP(main_map)
 	MCFG_CPU_IO_MAP(sindbadm_portmap)
-	MCFG_CPU_DECRYPTED_OPCODES_MAP(sega_315_opcodes_map)
+	MCFG_CPU_OPCODES_MAP(sega_315_opcodes_map)
 	MCFG_CPU_VBLANK_INT_DRIVER("screen", segag80r_state,  sindbadm_vblank_start)
 	MCFG_SEGACRPT_SET_DECRYPTED_TAG(":decrypted_opcodes")
 

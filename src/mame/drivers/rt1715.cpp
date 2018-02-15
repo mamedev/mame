@@ -46,6 +46,10 @@ public:
 
 	void rt1715(machine_config &config);
 	void rt1715w(machine_config &config);
+	void k7658_io(address_map &map);
+	void k7658_mem(address_map &map);
+	void rt1715_io(address_map &map);
+	void rt1715_mem(address_map &map);
 protected:
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
@@ -185,12 +189,12 @@ PALETTE_INIT_MEMBER(rt1715_state, rt1715)
     ADDRESS MAPS
 ***************************************************************************/
 
-static ADDRESS_MAP_START( rt1715_mem, AS_PROGRAM, 8, rt1715_state )
+ADDRESS_MAP_START(rt1715_state::rt1715_mem)
 	AM_RANGE(0x0000, 0x07ff) AM_READ_BANK("bank1") AM_WRITE_BANK("bank3")
 	AM_RANGE(0x0800, 0xffff) AM_RAMBANK("bank2")
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( rt1715_io, AS_IO, 8, rt1715_state )
+ADDRESS_MAP_START(rt1715_state::rt1715_io)
 	ADDRESS_MAP_UNMAP_HIGH
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	AM_RANGE(0x00, 0x03) AM_DEVREADWRITE("a71", z80pio_device, read_alt, write_alt)
@@ -202,12 +206,12 @@ static ADDRESS_MAP_START( rt1715_io, AS_IO, 8, rt1715_state )
 	AM_RANGE(0x28, 0x28) AM_WRITE(rt1715_rom_disable)
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( k7658_mem, AS_PROGRAM, 8, rt1715_state )
+ADDRESS_MAP_START(rt1715_state::k7658_mem)
 	AM_RANGE(0x0000, 0xffff) AM_WRITE(k7658_data_w)
 	AM_RANGE(0x0000, 0x07ff) AM_MIRROR(0xf800) AM_ROM
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( k7658_io, AS_IO, 8, rt1715_state )
+ADDRESS_MAP_START(rt1715_state::k7658_io)
 	AM_RANGE(0x2000, 0x2000) AM_MIRROR(0x8000) AM_READ(k7658_led1_r)
 	AM_RANGE(0x4000, 0x4000) AM_MIRROR(0x8000) AM_READ(k7658_led2_r)
 	AM_RANGE(0x8000, 0x9fff) AM_READ(k7658_data_r)
@@ -317,7 +321,8 @@ MACHINE_CONFIG_START(rt1715_state::rt1715)
 	MCFG_RAM_DEFAULT_VALUE(0x00)
 MACHINE_CONFIG_END
 
-MACHINE_CONFIG_DERIVED(rt1715_state::rt1715w, rt1715)
+MACHINE_CONFIG_START(rt1715_state::rt1715w)
+	rt1715(config);
 MACHINE_CONFIG_END
 
 

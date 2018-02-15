@@ -300,7 +300,7 @@ WRITE8_MEMBER(bzone_state::redbaron_joysound_w)
  *
  *************************************/
 
-static ADDRESS_MAP_START( bzone_map, AS_PROGRAM, 8, bzone_state )
+ADDRESS_MAP_START(bzone_state::bzone_map)
 	ADDRESS_MAP_GLOBAL_MASK(0x7fff)
 	AM_RANGE(0x0000, 0x03ff) AM_RAM
 	AM_RANGE(0x0800, 0x0800) AM_READ_PORT("IN0")
@@ -320,7 +320,7 @@ static ADDRESS_MAP_START( bzone_map, AS_PROGRAM, 8, bzone_state )
 	AM_RANGE(0x3000, 0x7fff) AM_ROM
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( redbaron_map, AS_PROGRAM, 8, bzone_state )
+ADDRESS_MAP_START(bzone_state::redbaron_map)
 	ADDRESS_MAP_GLOBAL_MASK(0x7fff)
 	AM_RANGE(0x0000, 0x03ff) AM_RAM
 	AM_RANGE(0x0800, 0x0800) AM_READ_PORT("IN0")
@@ -560,16 +560,18 @@ MACHINE_CONFIG_START(bzone_state::bzone_base)
 
 MACHINE_CONFIG_END
 
-MACHINE_CONFIG_DERIVED(bzone_state::bzone, bzone_base)
+MACHINE_CONFIG_START(bzone_state::bzone)
+	bzone_base(config);
 
 	/* sound hardware */
-	MCFG_FRAGMENT_ADD(bzone_audio)
+	bzone_audio(config);
 
 MACHINE_CONFIG_END
 
 
 
-MACHINE_CONFIG_DERIVED(bzone_state::redbaron, bzone_base)
+MACHINE_CONFIG_START(bzone_state::redbaron)
+	bzone_base(config);
 
 	/* basic machine hardware */
 	MCFG_CPU_MODIFY("maincpu")

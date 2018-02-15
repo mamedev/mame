@@ -996,7 +996,7 @@ READ8_MEMBER(pacman_state::pacman_read_nop)
  *
  *************************************/
 
-static ADDRESS_MAP_START( pacman_map, AS_PROGRAM, 8, pacman_state )
+ADDRESS_MAP_START(pacman_state::pacman_map)
 	//A lot of games don't have an a15 at the cpu.  Generally only games with a cpu daughter board can access the full 32k of romspace.
 	AM_RANGE(0x0000, 0x3fff) AM_MIRROR(0x8000) AM_ROM
 	AM_RANGE(0x4000, 0x43ff) AM_MIRROR(0xa000) AM_RAM_WRITE(pacman_videoram_w) AM_SHARE("videoram")
@@ -1017,7 +1017,7 @@ static ADDRESS_MAP_START( pacman_map, AS_PROGRAM, 8, pacman_state )
 ADDRESS_MAP_END
 
 
-static ADDRESS_MAP_START( birdiy_map, AS_PROGRAM, 8, pacman_state )
+ADDRESS_MAP_START(pacman_state::birdiy_map)
 	AM_RANGE(0x0000, 0x3fff) AM_MIRROR(0x8000) AM_ROM
 	AM_RANGE(0x4000, 0x43ff) AM_MIRROR(0xa000) AM_RAM_WRITE(pacman_videoram_w) AM_SHARE("videoram")
 	AM_RANGE(0x4400, 0x47ff) AM_MIRROR(0xa000) AM_RAM_WRITE(pacman_colorram_w) AM_SHARE("colorram")
@@ -1037,7 +1037,7 @@ static ADDRESS_MAP_START( birdiy_map, AS_PROGRAM, 8, pacman_state )
 ADDRESS_MAP_END
 
 
-static ADDRESS_MAP_START( mspacman_map, AS_PROGRAM, 8, pacman_state )
+ADDRESS_MAP_START(pacman_state::mspacman_map)
 	/* start with 0000-3fff and 8000-bfff mapped to the ROMs */
 	AM_RANGE(0x0000, 0xffff) AM_ROMBANK("bank1")
 	AM_RANGE(0x4000, 0x7fff) AM_MIRROR(0x8000) AM_UNMAP
@@ -1070,7 +1070,7 @@ static ADDRESS_MAP_START( mspacman_map, AS_PROGRAM, 8, pacman_state )
 ADDRESS_MAP_END
 
 
-static ADDRESS_MAP_START( woodpek_map, AS_PROGRAM, 8, pacman_state )
+ADDRESS_MAP_START(pacman_state::woodpek_map)
 	AM_RANGE(0x0000, 0x3fff) AM_ROM
 	AM_RANGE(0x4000, 0x43ff) AM_MIRROR(0xa000) AM_RAM_WRITE(pacman_videoram_w) AM_SHARE("videoram")
 	AM_RANGE(0x4400, 0x47ff) AM_MIRROR(0xa000) AM_RAM_WRITE(pacman_colorram_w) AM_SHARE("colorram")
@@ -1091,7 +1091,7 @@ static ADDRESS_MAP_START( woodpek_map, AS_PROGRAM, 8, pacman_state )
 ADDRESS_MAP_END
 
 
-static ADDRESS_MAP_START( numcrash_map, AS_PROGRAM, 8, pacman_state )
+ADDRESS_MAP_START(pacman_state::numcrash_map)
 	AM_RANGE(0x0000, 0x1fff) AM_ROM
 	AM_RANGE(0x2000, 0x27ff) AM_ROM
 	/* 0x2800 - 0x2fff unmapped? */
@@ -1117,7 +1117,7 @@ static ADDRESS_MAP_START( numcrash_map, AS_PROGRAM, 8, pacman_state )
 ADDRESS_MAP_END
 
 
-static ADDRESS_MAP_START( alibaba_map, AS_PROGRAM, 8, pacman_state )
+ADDRESS_MAP_START(pacman_state::alibaba_map)
 	AM_RANGE(0x0000, 0x3fff) AM_ROM
 	AM_RANGE(0x4000, 0x43ff) AM_MIRROR(0xa000) AM_RAM_WRITE(pacman_videoram_w) AM_SHARE("videoram")
 	AM_RANGE(0x4400, 0x47ff) AM_MIRROR(0xa000) AM_RAM_WRITE(pacman_colorram_w) AM_SHARE("colorram")
@@ -1144,7 +1144,7 @@ static ADDRESS_MAP_START( alibaba_map, AS_PROGRAM, 8, pacman_state )
 ADDRESS_MAP_END
 
 
-static ADDRESS_MAP_START( dremshpr_map, AS_PROGRAM, 8, pacman_state )
+ADDRESS_MAP_START(pacman_state::dremshpr_map)
 	AM_RANGE(0x0000, 0x3fff) AM_ROM
 	AM_RANGE(0x4000, 0x43ff) AM_MIRROR(0xa000) AM_RAM_WRITE(pacman_videoram_w) AM_SHARE("videoram")
 	AM_RANGE(0x4400, 0x47ff) AM_MIRROR(0xa000) AM_RAM_WRITE(pacman_colorram_w) AM_SHARE("colorram")
@@ -1168,7 +1168,7 @@ static ADDRESS_MAP_START( dremshpr_map, AS_PROGRAM, 8, pacman_state )
 ADDRESS_MAP_END
 
 
-static ADDRESS_MAP_START( epos_map, AS_PROGRAM, 8, pacman_state )
+ADDRESS_MAP_START(pacman_state::epos_map)
 	AM_RANGE(0x0000, 0x3fff) AM_MIRROR(0x8000) AM_ROMBANK("bank1")
 	AM_RANGE(0x4000, 0x43ff) AM_MIRROR(0xa000) AM_RAM_WRITE(pacman_videoram_w) AM_SHARE("videoram")
 	AM_RANGE(0x4400, 0x47ff) AM_MIRROR(0xa000) AM_RAM_WRITE(pacman_colorram_w) AM_SHARE("colorram")
@@ -1188,7 +1188,7 @@ static ADDRESS_MAP_START( epos_map, AS_PROGRAM, 8, pacman_state )
 ADDRESS_MAP_END
 
 
-static ADDRESS_MAP_START( s2650games_map, AS_PROGRAM, 8, pacman_state )
+ADDRESS_MAP_START(pacman_state::s2650games_map)
 	AM_RANGE(0x0000, 0x0fff) AM_ROMBANK("bank1")
 	AM_RANGE(0x1000, 0x13ff) AM_MIRROR(0x6000) AM_WRITE(s2650games_colorram_w) AM_SHARE("colorram")
 	AM_RANGE(0x1400, 0x141f) AM_MIRROR(0x6000) AM_WRITE(s2650games_scroll_w)
@@ -1215,7 +1215,7 @@ static ADDRESS_MAP_START( s2650games_map, AS_PROGRAM, 8, pacman_state )
 ADDRESS_MAP_END
 
 
-static ADDRESS_MAP_START( rocktrv2_map, AS_PROGRAM, 8, pacman_state )
+ADDRESS_MAP_START(pacman_state::rocktrv2_map)
 	AM_RANGE(0x0000, 0x3fff) AM_ROM
 	AM_RANGE(0x4000, 0x43ff) AM_RAM_WRITE(pacman_videoram_w) AM_SHARE("videoram")
 	AM_RANGE(0x4400, 0x47ff) AM_RAM_WRITE(pacman_colorram_w) AM_SHARE("colorram")
@@ -1239,7 +1239,7 @@ static ADDRESS_MAP_START( rocktrv2_map, AS_PROGRAM, 8, pacman_state )
 ADDRESS_MAP_END
 
 
-static ADDRESS_MAP_START( bigbucks_map, AS_PROGRAM, 8, pacman_state )
+ADDRESS_MAP_START(pacman_state::bigbucks_map)
 	AM_RANGE(0x0000, 0x3fff) AM_ROM
 	AM_RANGE(0x4000, 0x43ff) AM_RAM_WRITE(pacman_videoram_w) AM_SHARE("videoram")
 	AM_RANGE(0x4400, 0x47ff) AM_RAM_WRITE(pacman_colorram_w) AM_SHARE("colorram")
@@ -1257,7 +1257,7 @@ static ADDRESS_MAP_START( bigbucks_map, AS_PROGRAM, 8, pacman_state )
 ADDRESS_MAP_END
 
 
-static ADDRESS_MAP_START( mschamp_map, AS_PROGRAM, 8, pacman_state )
+ADDRESS_MAP_START(pacman_state::mschamp_map)
 	AM_RANGE(0x0000, 0x3fff) AM_ROMBANK("bank1")
 	AM_RANGE(0x4000, 0x43ff) AM_MIRROR(0xa000) AM_RAM_WRITE(pacman_videoram_w) AM_SHARE("videoram")
 	AM_RANGE(0x4400, 0x47ff) AM_MIRROR(0xa000) AM_RAM_WRITE(pacman_colorram_w) AM_SHARE("colorram")
@@ -1278,7 +1278,7 @@ static ADDRESS_MAP_START( mschamp_map, AS_PROGRAM, 8, pacman_state )
 ADDRESS_MAP_END
 
 
-static ADDRESS_MAP_START( superabc_map, AS_PROGRAM, 8, pacman_state )
+ADDRESS_MAP_START(pacman_state::superabc_map)
 	AM_RANGE(0x0000, 0x3fff) AM_ROMBANK("bank1")
 	AM_RANGE(0x4000, 0x43ff) AM_MIRROR(0xa000) AM_RAM_WRITE(pacman_videoram_w) AM_SHARE("videoram")
 	AM_RANGE(0x4400, 0x47ff) AM_MIRROR(0xa000) AM_RAM_WRITE(pacman_colorram_w) AM_SHARE("colorram")
@@ -1300,7 +1300,7 @@ static ADDRESS_MAP_START( superabc_map, AS_PROGRAM, 8, pacman_state )
 ADDRESS_MAP_END
 
 
-static ADDRESS_MAP_START( crushs_map, AS_PROGRAM, 8, pacman_state )
+ADDRESS_MAP_START(pacman_state::crushs_map)
 	AM_RANGE(0x0000, 0x3fff) AM_MIRROR(0x8000) AM_ROM
 	AM_RANGE(0x4000, 0x43ff) AM_MIRROR(0xa000) AM_RAM_WRITE(pacman_videoram_w) AM_SHARE("videoram")
 	AM_RANGE(0x4400, 0x47ff) AM_MIRROR(0xa000) AM_RAM_WRITE(pacman_colorram_w) AM_SHARE("colorram")
@@ -1319,7 +1319,7 @@ ADDRESS_MAP_END
 
 
 
-static ADDRESS_MAP_START( pengojpm_map, AS_PROGRAM, 8, pacman_state )
+ADDRESS_MAP_START(pacman_state::pengojpm_map)
 	AM_RANGE(0x0000, 0x0fff) AM_ROM
 //  AM_RANGE(0x1000, 0x1fff) // header check for 0x55aa at POST, diagnostic ROM?
 	AM_RANGE(0x4000, 0x7fff) AM_ROM
@@ -1352,66 +1352,66 @@ ADDRESS_MAP_END
  *
  *************************************/
 
-static ADDRESS_MAP_START( writeport, AS_IO, 8, pacman_state )
+ADDRESS_MAP_START(pacman_state::writeport)
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	AM_RANGE(0x00, 0x00) AM_WRITE(pacman_interrupt_vector_w)    /* Pac-Man only */
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( vanvan_portmap, AS_IO, 8, pacman_state )
+ADDRESS_MAP_START(pacman_state::vanvan_portmap)
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	AM_RANGE(0x01, 0x01) AM_DEVWRITE("sn1", sn76496_device, write)
 	AM_RANGE(0x02, 0x02) AM_DEVWRITE("sn2", sn76496_device, write)
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( dremshpr_portmap, AS_IO, 8, pacman_state )
+ADDRESS_MAP_START(pacman_state::dremshpr_portmap)
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	AM_RANGE(0x06, 0x07) AM_DEVWRITE("ay8910", ay8910_device, data_address_w)
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( piranha_portmap, AS_IO, 8, pacman_state )
+ADDRESS_MAP_START(pacman_state::piranha_portmap)
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	AM_RANGE(0x00, 0x00) AM_WRITE(piranha_interrupt_vector_w)
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( nmouse_portmap, AS_IO, 8, pacman_state )
+ADDRESS_MAP_START(pacman_state::nmouse_portmap)
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	AM_RANGE(0x00, 0x00) AM_WRITE(nmouse_interrupt_vector_w)
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( epos_portmap, AS_IO, 8, pacman_state )
+ADDRESS_MAP_START(pacman_state::epos_portmap)
 	AM_IMPORT_FROM(writeport)
 	AM_RANGE(0x00, 0xff) AM_READ(epos_decryption_w)   /* Switch protection logic */
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( mschamp_portmap, AS_IO, 8, pacman_state )
+ADDRESS_MAP_START(pacman_state::mschamp_portmap)
 	AM_IMPORT_FROM(writeport)
 	AM_RANGE(0x00, 0x00) AM_READ(mschamp_kludge_r)
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( bigbucks_portmap, AS_IO, 8, pacman_state )
+ADDRESS_MAP_START(pacman_state::bigbucks_portmap)
 	AM_RANGE(0x0000, 0xffff) AM_READ(bigbucks_question_r)
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( s2650games_dataport, AS_DATA, 8, pacman_state )
+ADDRESS_MAP_START(pacman_state::s2650games_dataport)
 	AM_RANGE(S2650_DATA_PORT, S2650_DATA_PORT) AM_DEVWRITE("sn1", sn76496_device, write)
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( drivfrcp_portmap, AS_IO, 8, pacman_state )
+ADDRESS_MAP_START(pacman_state::drivfrcp_portmap)
 	AM_RANGE(0x00, 0x00) AM_READNOP
 	AM_RANGE(0x01, 0x01) AM_READ(drivfrcp_port1_r)
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( _8bpm_portmap, AS_IO, 8, pacman_state )
+ADDRESS_MAP_START(pacman_state::_8bpm_portmap)
 	AM_RANGE(0x00, 0x00) AM_READNOP
 	AM_RANGE(0x01, 0x01) AM_READ(_8bpm_port1_r)
 	AM_RANGE(0xe0, 0xe0) AM_READNOP
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( porky_portmap, AS_IO, 8, pacman_state )
+ADDRESS_MAP_START(pacman_state::porky_portmap)
 	AM_RANGE(0x01, 0x01) AM_READ(porky_port1_r)
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( crushs_portmap, AS_IO, 8, pacman_state )
+ADDRESS_MAP_START(pacman_state::crushs_portmap)
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	AM_RANGE(0x00, 0x01) AM_DEVWRITE("ay8912", ay8912_device, data_address_w)
 	AM_RANGE(0x01, 0x01) AM_READ_PORT("DSW2")
@@ -3533,27 +3533,31 @@ MACHINE_CONFIG_START(pacman_state::pacman)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 MACHINE_CONFIG_END
 
-MACHINE_CONFIG_DERIVED(pacman_state::maketrax, pacman)
+MACHINE_CONFIG_START(pacman_state::maketrax)
+	pacman(config);
 	MCFG_MACHINE_RESET_OVERRIDE(pacman_state,maketrax)
 MACHINE_CONFIG_END
 
-MACHINE_CONFIG_DERIVED(pacman_state::korosuke, maketrax)
+MACHINE_CONFIG_START(pacman_state::korosuke)
+	maketrax(config);
 	MCFG_DEVICE_MODIFY("mainlatch") // 8K on original boards
 	MCFG_ADDRESSABLE_LATCH_Q7_OUT_CB(NOOP) // outputs 4-7 go to protection chip at 6P
 MACHINE_CONFIG_END
 
-MACHINE_CONFIG_DERIVED(pacman_state::pengojpm, pacman)
+MACHINE_CONFIG_START(pacman_state::pengojpm)
+	pacman(config);
 	MCFG_CPU_MODIFY("maincpu")
 	MCFG_CPU_PROGRAM_MAP(pengojpm_map)
 MACHINE_CONFIG_END
 
 
-MACHINE_CONFIG_DERIVED(pacman_state::birdiy, pacman)
+MACHINE_CONFIG_START(pacman_state::birdiy)
+	pacman(config);
 
 	/* basic machine hardware */
 	MCFG_CPU_MODIFY("maincpu")
 	MCFG_CPU_PROGRAM_MAP(birdiy_map)
-	MCFG_CPU_IO_MAP(0)
+	MCFG_DEVICE_REMOVE_ADDRESS_MAP(AS_IO)
 
 	MCFG_DEVICE_REPLACE("mainlatch", LS259, 0)
 	MCFG_ADDRESSABLE_LATCH_Q1_OUT_CB(WRITELINE(pacman_state, irq_mask_w))
@@ -3570,7 +3574,8 @@ MACHINE_CONFIG_END
 
 
 
-MACHINE_CONFIG_DERIVED(pacman_state::piranha, pacman)
+MACHINE_CONFIG_START(pacman_state::piranha)
+	pacman(config);
 
 	/* basic machine hardware */
 	MCFG_CPU_MODIFY("maincpu")
@@ -3578,7 +3583,8 @@ MACHINE_CONFIG_DERIVED(pacman_state::piranha, pacman)
 MACHINE_CONFIG_END
 
 
-MACHINE_CONFIG_DERIVED(pacman_state::nmouse, pacman)
+MACHINE_CONFIG_START(pacman_state::nmouse)
+	pacman(config);
 
 	/* basic machine hardware */
 	MCFG_CPU_MODIFY("maincpu")
@@ -3586,7 +3592,8 @@ MACHINE_CONFIG_DERIVED(pacman_state::nmouse, pacman)
 MACHINE_CONFIG_END
 
 
-MACHINE_CONFIG_DERIVED(pacman_state::mspacman, pacman)
+MACHINE_CONFIG_START(pacman_state::mspacman)
+	pacman(config);
 
 	/* basic machine hardware */
 	MCFG_CPU_MODIFY("maincpu")
@@ -3597,14 +3604,16 @@ MACHINE_CONFIG_DERIVED(pacman_state::mspacman, pacman)
 MACHINE_CONFIG_END
 
 
-MACHINE_CONFIG_DERIVED(pacman_state::woodpek, pacman)
+MACHINE_CONFIG_START(pacman_state::woodpek)
+	pacman(config);
 
 	/* basic machine hardware */
 	MCFG_CPU_MODIFY("maincpu")
 	MCFG_CPU_PROGRAM_MAP(woodpek_map)
 MACHINE_CONFIG_END
 
-MACHINE_CONFIG_DERIVED(pacman_state::numcrash, pacman)
+MACHINE_CONFIG_START(pacman_state::numcrash)
+	pacman(config);
 
 	/* basic machine hardware */
 	MCFG_CPU_MODIFY("maincpu")
@@ -3615,7 +3624,8 @@ MACHINE_CONFIG_DERIVED(pacman_state::numcrash, pacman)
 	MCFG_ADDRESSABLE_LATCH_Q7_OUT_CB(NOOP) // ???
 MACHINE_CONFIG_END
 
-MACHINE_CONFIG_DERIVED(pacman_state::alibaba, pacman)
+MACHINE_CONFIG_START(pacman_state::alibaba)
+	pacman(config);
 
 	/* basic machine hardware */
 	MCFG_CPU_MODIFY("maincpu")
@@ -3634,7 +3644,8 @@ MACHINE_CONFIG_DERIVED(pacman_state::alibaba, pacman)
 MACHINE_CONFIG_END
 
 
-MACHINE_CONFIG_DERIVED(pacman_state::dremshpr, pacman)
+MACHINE_CONFIG_START(pacman_state::dremshpr)
+	pacman(config);
 
 	/* basic machine hardware */
 	MCFG_CPU_MODIFY("maincpu")
@@ -3652,7 +3663,8 @@ MACHINE_CONFIG_DERIVED(pacman_state::dremshpr, pacman)
 MACHINE_CONFIG_END
 
 
-MACHINE_CONFIG_DERIVED(pacman_state::theglobp, pacman)
+MACHINE_CONFIG_START(pacman_state::theglobp)
+	pacman(config);
 
 	/* basic machine hardware */
 	MCFG_CPU_MODIFY("maincpu")
@@ -3664,7 +3676,8 @@ MACHINE_CONFIG_DERIVED(pacman_state::theglobp, pacman)
 MACHINE_CONFIG_END
 
 
-MACHINE_CONFIG_DERIVED(pacman_state::acitya, pacman)
+MACHINE_CONFIG_START(pacman_state::acitya)
+	pacman(config);
 
 	/* basic machine hardware */
 	MCFG_CPU_MODIFY("maincpu")
@@ -3676,7 +3689,8 @@ MACHINE_CONFIG_DERIVED(pacman_state::acitya, pacman)
 MACHINE_CONFIG_END
 
 
-MACHINE_CONFIG_DERIVED(pacman_state::eeekk, pacman)
+MACHINE_CONFIG_START(pacman_state::eeekk)
+	pacman(config);
 
 	/* basic machine hardware */
 	MCFG_CPU_MODIFY("maincpu")
@@ -3688,7 +3702,8 @@ MACHINE_CONFIG_DERIVED(pacman_state::eeekk, pacman)
 MACHINE_CONFIG_END
 
 
-MACHINE_CONFIG_DERIVED(pacman_state::vanvan, pacman)
+MACHINE_CONFIG_START(pacman_state::vanvan)
+	pacman(config);
 
 	/* basic machine hardware */
 	MCFG_CPU_MODIFY("maincpu")
@@ -3714,7 +3729,8 @@ MACHINE_CONFIG_DERIVED(pacman_state::vanvan, pacman)
 MACHINE_CONFIG_END
 
 
-MACHINE_CONFIG_DERIVED(pacman_state::bigbucks, pacman)
+MACHINE_CONFIG_START(pacman_state::bigbucks)
+	pacman(config);
 
 	/* basic machine hardware */
 	MCFG_CPU_MODIFY("maincpu")
@@ -3730,7 +3746,8 @@ MACHINE_CONFIG_DERIVED(pacman_state::bigbucks, pacman)
 MACHINE_CONFIG_END
 
 
-MACHINE_CONFIG_DERIVED(pacman_state::s2650games, pacman)
+MACHINE_CONFIG_START(pacman_state::s2650games)
+	pacman(config);
 
 	/* basic machine hardware */
 	MCFG_DEVICE_REMOVE("maincpu")
@@ -3767,7 +3784,8 @@ MACHINE_CONFIG_DERIVED(pacman_state::s2650games, pacman)
 MACHINE_CONFIG_END
 
 
-MACHINE_CONFIG_DERIVED(pacman_state::drivfrcp, s2650games)
+MACHINE_CONFIG_START(pacman_state::drivfrcp)
+	s2650games(config);
 
 	/* basic machine hardware */
 	MCFG_CPU_MODIFY("maincpu")
@@ -3775,7 +3793,8 @@ MACHINE_CONFIG_DERIVED(pacman_state::drivfrcp, s2650games)
 MACHINE_CONFIG_END
 
 
-MACHINE_CONFIG_DERIVED(pacman_state::_8bpm, s2650games )
+MACHINE_CONFIG_START(pacman_state::_8bpm )
+	s2650games(config);
 
 	/* basic machine hardware */
 	MCFG_CPU_MODIFY("maincpu")
@@ -3783,7 +3802,8 @@ MACHINE_CONFIG_DERIVED(pacman_state::_8bpm, s2650games )
 MACHINE_CONFIG_END
 
 
-MACHINE_CONFIG_DERIVED(pacman_state::porky, s2650games)
+MACHINE_CONFIG_START(pacman_state::porky)
+	s2650games(config);
 
 	/* basic machine hardware */
 	MCFG_CPU_MODIFY("maincpu")
@@ -3791,7 +3811,8 @@ MACHINE_CONFIG_DERIVED(pacman_state::porky, s2650games)
 MACHINE_CONFIG_END
 
 
-MACHINE_CONFIG_DERIVED(pacman_state::rocktrv2, pacman)
+MACHINE_CONFIG_START(pacman_state::rocktrv2)
+	pacman(config);
 
 	/* basic machine hardware */
 	MCFG_CPU_MODIFY("maincpu")
@@ -3803,7 +3824,8 @@ MACHINE_CONFIG_DERIVED(pacman_state::rocktrv2, pacman)
 MACHINE_CONFIG_END
 
 
-MACHINE_CONFIG_DERIVED(pacman_state::mschamp, pacman)
+MACHINE_CONFIG_START(pacman_state::mschamp)
+	pacman(config);
 
 	/* basic machine hardware */
 	MCFG_CPU_MODIFY("maincpu")
@@ -3815,7 +3837,8 @@ MACHINE_CONFIG_DERIVED(pacman_state::mschamp, pacman)
 MACHINE_CONFIG_END
 
 
-MACHINE_CONFIG_DERIVED(pacman_state::superabc, pacman)
+MACHINE_CONFIG_START(pacman_state::superabc)
+	pacman(config);
 
 	/* basic machine hardware */
 	MCFG_CPU_MODIFY("maincpu")
@@ -3830,13 +3853,15 @@ MACHINE_CONFIG_DERIVED(pacman_state::superabc, pacman)
 MACHINE_CONFIG_END
 
 
-MACHINE_CONFIG_DERIVED(pacman_state::crush4, mschamp)
+MACHINE_CONFIG_START(pacman_state::crush4)
+	mschamp(config);
 
 	/* basic machine hardware */
 	MCFG_GFXDECODE_MODIFY("gfxdecode", crush4)
 MACHINE_CONFIG_END
 
-MACHINE_CONFIG_DERIVED(pacman_state::crushs, pacman)
+MACHINE_CONFIG_START(pacman_state::crushs)
+	pacman(config);
 
 	/* basic machine hardware */
 	MCFG_CPU_MODIFY("maincpu")

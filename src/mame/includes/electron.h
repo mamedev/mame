@@ -10,8 +10,8 @@
  *
  ****************************************************************************/
 
-#ifndef ELECTRON_H_
-#define ELECTRON_H_
+#ifndef MAME_INCLUDES_ELECTRON_H
+#define MAME_INCLUDES_ELECTRON_H
 
 #include "machine/ram.h"
 #include "imagedev/cassette.h"
@@ -118,9 +118,10 @@ public:
 
 	void electron(machine_config &config);
 	void btm2105(machine_config &config);
+	void electron_mem(address_map &map);
 protected:
 	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr) override;
 };
 
 
-#endif /* ELECTRON_H_ */
+#endif // MAME_INCLUDES_ELECTRON_H

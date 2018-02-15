@@ -83,6 +83,8 @@ public:
 	required_device<ticket_dispenser_device> m_hopper;
 	required_ioport_array<6> m_in;
 	void big10(machine_config &config);
+	void main_io(address_map &map);
+	void main_map(address_map &map);
 };
 
 
@@ -117,13 +119,13 @@ READ8_MEMBER(big10_state::mux_r)
 *             Memory Map              *
 **************************************/
 
-static ADDRESS_MAP_START( main_map, AS_PROGRAM, 8, big10_state )
+ADDRESS_MAP_START(big10_state::main_map)
 	AM_RANGE(0x0000, 0xbfff) AM_ROM
 	AM_RANGE(0xc000, 0xdfff) AM_RAM AM_SHARE("nvram")
 	AM_RANGE(0xf000, 0xffff) AM_RAM
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( main_io, AS_IO, 8, big10_state )
+ADDRESS_MAP_START(big10_state::main_io)
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	AM_RANGE(0x00, 0x00) AM_READ(mux_r)         /* present in test mode */
 	AM_RANGE(0x02, 0x02) AM_READ_PORT("SYSTEM") /* coins and service */

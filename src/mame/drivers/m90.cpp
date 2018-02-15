@@ -67,7 +67,7 @@ WRITE16_MEMBER(m90_state::unknown_w)
 
 /***************************************************************************/
 
-static ADDRESS_MAP_START( m90_main_cpu_map, AS_PROGRAM, 16, m90_state )
+ADDRESS_MAP_START(m90_state::m90_main_cpu_map)
 	AM_RANGE(0x00000, 0x7ffff) AM_ROM
 	AM_RANGE(0x80000, 0x8ffff) AM_ROMBANK("bank1")  /* Quiz F1 only */
 	AM_RANGE(0xa0000, 0xa3fff) AM_RAM
@@ -76,7 +76,7 @@ static ADDRESS_MAP_START( m90_main_cpu_map, AS_PROGRAM, 16, m90_state )
 	AM_RANGE(0xffff0, 0xfffff) AM_ROM
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( dynablsb_main_cpu_map, AS_PROGRAM, 16, m90_state )
+ADDRESS_MAP_START(m90_state::dynablsb_main_cpu_map)
 	AM_RANGE(0x00000, 0x3ffff) AM_ROM
 	AM_RANGE(0x6000e, 0x60fff) AM_RAM AM_SHARE("spriteram")
 	AM_RANGE(0xa0000, 0xa3fff) AM_RAM
@@ -85,7 +85,7 @@ static ADDRESS_MAP_START( dynablsb_main_cpu_map, AS_PROGRAM, 16, m90_state )
 	AM_RANGE(0xffff0, 0xfffff) AM_ROM
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( bomblord_main_cpu_map, AS_PROGRAM, 16, m90_state )
+ADDRESS_MAP_START(m90_state::bomblord_main_cpu_map)
 	AM_RANGE(0x00000, 0x7ffff) AM_ROM
 	AM_RANGE(0xa0000, 0xa3fff) AM_RAM
 	AM_RANGE(0xc000e, 0xc0fff) AM_RAM AM_SHARE("spriteram")
@@ -94,7 +94,7 @@ static ADDRESS_MAP_START( bomblord_main_cpu_map, AS_PROGRAM, 16, m90_state )
 	AM_RANGE(0xffff0, 0xfffff) AM_ROM
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( m90_main_cpu_io_map, AS_IO, 16, m90_state )
+ADDRESS_MAP_START(m90_state::m90_main_cpu_io_map)
 	AM_RANGE(0x00, 0x01) AM_DEVWRITE8("m72", m72_audio_device, sound_command_w, 0x00ff)
 	AM_RANGE(0x00, 0x01) AM_READ_PORT("P1_P2")
 	AM_RANGE(0x02, 0x03) AM_WRITE(m90_coincounter_w)
@@ -104,7 +104,7 @@ static ADDRESS_MAP_START( m90_main_cpu_io_map, AS_IO, 16, m90_state )
 	AM_RANGE(0x80, 0x8f) AM_WRITE(m90_video_control_w)
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( dynablsb_main_cpu_io_map, AS_IO, 16, m90_state )
+ADDRESS_MAP_START(m90_state::dynablsb_main_cpu_io_map)
 	AM_RANGE(0x00, 0x01) AM_DEVWRITE8("soundlatch", generic_latch_8_device, write, 0x00ff)
 	AM_RANGE(0x00, 0x01) AM_READ_PORT("P1_P2")
 	AM_RANGE(0x02, 0x03) AM_WRITE(m90_coincounter_w)
@@ -118,12 +118,12 @@ ADDRESS_MAP_END
 
 /*****************************************************************************/
 
-static ADDRESS_MAP_START( m90_sound_cpu_map, AS_PROGRAM, 8, m90_state )
+ADDRESS_MAP_START(m90_state::m90_sound_cpu_map)
 	AM_RANGE(0x0000, 0xefff) AM_ROM
 	AM_RANGE(0xf000, 0xffff) AM_RAM
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( m90_sound_cpu_io_map, AS_IO, 8, m90_state )
+ADDRESS_MAP_START(m90_state::m90_sound_cpu_io_map)
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	AM_RANGE(0x00, 0x01) AM_DEVREADWRITE("ymsnd", ym2151_device, read, write)
 	AM_RANGE(0x80, 0x80) AM_DEVREAD("soundlatch", generic_latch_8_device, read)
@@ -133,14 +133,14 @@ static ADDRESS_MAP_START( m90_sound_cpu_io_map, AS_IO, 8, m90_state )
 	AM_RANGE(0x84, 0x84) AM_DEVREAD("m72", m72_audio_device, sample_r)
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( dynablsb_sound_cpu_io_map, AS_IO, 8, m90_state )
+ADDRESS_MAP_START(m90_state::dynablsb_sound_cpu_io_map)
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	AM_RANGE(0x00, 0x01) AM_DEVREADWRITE("ymsnd", ym2151_device, read, write)
 	AM_RANGE(0x80, 0x80) AM_DEVREAD("soundlatch", generic_latch_8_device, read)
 	AM_RANGE(0x82, 0x82) AM_DEVWRITE("dac", dac_byte_interface, write)
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( m99_sound_cpu_io_map, AS_IO, 8, m90_state )
+ADDRESS_MAP_START(m90_state::m99_sound_cpu_io_map)
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	AM_RANGE(0x00, 0x01) AM_DEVWRITE("m72", m72_audio_device, poundfor_sample_addr_w)
 	AM_RANGE(0x40, 0x41) AM_DEVREADWRITE("ymsnd", ym2151_device, read, write)
@@ -759,54 +759,62 @@ MACHINE_CONFIG_START(m90_state::m90)
 MACHINE_CONFIG_END
 
 
-MACHINE_CONFIG_DERIVED(m90_state::hasamu, m90)
+MACHINE_CONFIG_START(m90_state::hasamu)
+	m90(config);
 	MCFG_CPU_MODIFY("maincpu")
 	MCFG_V25_CONFIG(gunforce_decryption_table)
 MACHINE_CONFIG_END
 
-MACHINE_CONFIG_DERIVED(m90_state::quizf1, m90)
+MACHINE_CONFIG_START(m90_state::quizf1)
+	m90(config);
 	MCFG_CPU_MODIFY("maincpu")
 	MCFG_V25_CONFIG(lethalth_decryption_table)
 	MCFG_SCREEN_MODIFY("screen")
 	MCFG_SCREEN_VISIBLE_AREA(6*8, 54*8-1, 17*8-8, 47*8-1+8)
 MACHINE_CONFIG_END
 
-MACHINE_CONFIG_DERIVED(m90_state::matchit2, m90)
+MACHINE_CONFIG_START(m90_state::matchit2)
+	m90(config);
 	MCFG_CPU_MODIFY("maincpu")
 	MCFG_V25_CONFIG(matchit2_decryption_table)
 	MCFG_SCREEN_MODIFY("screen")
 	MCFG_SCREEN_VISIBLE_AREA(6*8, 54*8-1, 17*8-8, 47*8-1+8)
 MACHINE_CONFIG_END
 
-MACHINE_CONFIG_DERIVED(m90_state::riskchal, m90)
+MACHINE_CONFIG_START(m90_state::riskchal)
+	m90(config);
 	MCFG_CPU_MODIFY("maincpu")
 	MCFG_V25_CONFIG(gussun_decryption_table)
 	MCFG_SCREEN_MODIFY("screen")
 	MCFG_SCREEN_VISIBLE_AREA(10*8, 50*8-1, 17*8, 47*8-1)
 MACHINE_CONFIG_END
 
-MACHINE_CONFIG_DERIVED(m90_state::bombrman, m90)
+MACHINE_CONFIG_START(m90_state::bombrman)
+	m90(config);
 	MCFG_CPU_MODIFY("maincpu")
 	MCFG_V25_CONFIG(bomberman_decryption_table)
 	MCFG_SCREEN_MODIFY("screen")
 	MCFG_SCREEN_VISIBLE_AREA(10*8, 50*8-1, 17*8, 47*8-1)
 MACHINE_CONFIG_END
 
-MACHINE_CONFIG_DERIVED(m90_state::bbmanwj, m90)
+MACHINE_CONFIG_START(m90_state::bbmanwj)
+	m90(config);
 	MCFG_CPU_MODIFY("maincpu")
 	MCFG_V25_CONFIG(dynablaster_decryption_table)
 	MCFG_SCREEN_MODIFY("screen")
 	MCFG_SCREEN_VISIBLE_AREA(10*8, 50*8-1, 17*8, 47*8-1)
 MACHINE_CONFIG_END
 
-MACHINE_CONFIG_DERIVED(m90_state::bbmanw, bbmanwj)
+MACHINE_CONFIG_START(m90_state::bbmanw)
+	bbmanwj(config);
 	MCFG_CPU_MODIFY("soundcpu")
 	MCFG_CPU_IO_MAP(m99_sound_cpu_io_map)
 	MCFG_CPU_PERIODIC_INT_DRIVER(m90_state, fake_nmi,  128*60)
 MACHINE_CONFIG_END
 
 
-MACHINE_CONFIG_DERIVED(m90_state::bomblord, m90)
+MACHINE_CONFIG_START(m90_state::bomblord)
+	m90(config);
 	MCFG_CPU_REPLACE("maincpu", V30, 32000000/4)
 	MCFG_CPU_PROGRAM_MAP(bomblord_main_cpu_map)
 	MCFG_CPU_IO_MAP(m90_main_cpu_io_map)
@@ -824,7 +832,8 @@ MACHINE_CONFIG_DERIVED(m90_state::bomblord, m90)
 MACHINE_CONFIG_END
 
 
-MACHINE_CONFIG_DERIVED(m90_state::dynablsb, m90)
+MACHINE_CONFIG_START(m90_state::dynablsb)
+	m90(config);
 	MCFG_CPU_REPLACE("maincpu", V30, 32000000/4)
 	MCFG_CPU_PROGRAM_MAP(dynablsb_main_cpu_map)
 	MCFG_CPU_IO_MAP(dynablsb_main_cpu_io_map)

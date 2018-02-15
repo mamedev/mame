@@ -96,6 +96,10 @@ public:
 	required_device<floppy_connector>       m_floppy1;
 
 	void osborne1(machine_config &config);
+	void osborne1_io(address_map &map);
+	void osborne1_mem(address_map &map);
+	void osborne1_op(address_map &map);
+	void osborne1nv_io(address_map &map);
 protected:
 	TIMER_CALLBACK_MEMBER(video_callback);
 	TIMER_CALLBACK_MEMBER(acia_rxc_txc_callback);

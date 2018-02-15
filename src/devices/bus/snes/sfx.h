@@ -16,6 +16,15 @@ public:
 	// construction/destruction
 	sns_rom_superfx_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
+protected:
+	// device-level overrides
+	virtual void device_start() override;
+	virtual void device_reset() override;
+
+	virtual void device_add_mconfig(machine_config &config) override;
+
+	virtual DECLARE_WRITE_LINE_MEMBER(snes_extern_irq_w);
+
 	// additional reading and writing
 	virtual DECLARE_READ8_MEMBER(read_l) override;
 	virtual DECLARE_READ8_MEMBER(read_h) override;
@@ -31,18 +40,12 @@ public:
 	virtual DECLARE_WRITE8_MEMBER(superfx_w_bank2);
 	virtual DECLARE_WRITE8_MEMBER(superfx_w_bank3);
 
-protected:
-	// device-level overrides
-	virtual void device_start() override;
-	virtual void device_reset() override;
-
-	virtual void device_add_mconfig(machine_config &config) override;
-
-	virtual DECLARE_WRITE_LINE_MEMBER(snes_extern_irq_w);
-
+private:
 	required_device<superfx_device> m_superfx;
 
 	uint8_t sfx_ram[0x200000];
+
+	void sfx_map(address_map &map);
 };
 
 

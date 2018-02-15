@@ -25,7 +25,7 @@ DEFINE_DEVICE_TYPE(BBC_TUBE_Z80, bbc_tube_z80_device, "bbc_tube_z80", "Acorn Z80
 //  ADDRESS_MAP( tube_z80_mem )
 //-------------------------------------------------
 
-static ADDRESS_MAP_START(tube_z80_mem, AS_PROGRAM, 8, bbc_tube_z80_device)
+ADDRESS_MAP_START(bbc_tube_z80_device::tube_z80_mem)
 	AM_RANGE(0x0000, 0xffff) AM_READWRITE(mem_r, mem_w)
 ADDRESS_MAP_END
 
@@ -33,7 +33,7 @@ ADDRESS_MAP_END
 //  ADDRESS_MAP( tube_z80_fetch )
 //-------------------------------------------------
 
-static ADDRESS_MAP_START(tube_z80_fetch, AS_OPCODES, 8, bbc_tube_z80_device)
+ADDRESS_MAP_START(bbc_tube_z80_device::tube_z80_fetch)
 	AM_RANGE(0x000, 0xffff) AM_READ(opcode_r)
 ADDRESS_MAP_END
 
@@ -41,7 +41,7 @@ ADDRESS_MAP_END
 //  ADDRESS_MAP( tube_z80_io )
 //-------------------------------------------------
 
-static ADDRESS_MAP_START(tube_z80_io, AS_IO, 8, bbc_tube_z80_device)
+ADDRESS_MAP_START(bbc_tube_z80_device::tube_z80_io)
 	AM_RANGE(0x00, 0x07) AM_MIRROR(0xff00) AM_DEVREADWRITE("ula", tube_device, parasite_r, parasite_w)
 ADDRESS_MAP_END
 
@@ -61,7 +61,7 @@ ROM_END
 MACHINE_CONFIG_START(bbc_tube_z80_device::device_add_mconfig)
 	MCFG_CPU_ADD("z80", Z80, XTAL(12'000'000) / 2)
 	MCFG_CPU_PROGRAM_MAP(tube_z80_mem)
-	MCFG_CPU_DECRYPTED_OPCODES_MAP(tube_z80_fetch)
+	MCFG_CPU_OPCODES_MAP(tube_z80_fetch)
 	MCFG_CPU_IO_MAP(tube_z80_io)
 	MCFG_CPU_IRQ_ACKNOWLEDGE_DEVICE(DEVICE_SELF, bbc_tube_z80_device, irq_callback)
 

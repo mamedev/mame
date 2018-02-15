@@ -31,6 +31,9 @@ public:
 	u32 screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 
 	void v102(machine_config &config);
+	void io_map(address_map &map);
+	void kbd_map(address_map &map);
+	void mem_map(address_map &map);
 private:
 	required_device<cpu_device> m_maincpu;
 	required_region_ptr<u8> m_p_chargen;
@@ -43,7 +46,7 @@ u32 v102_state::screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const
 }
 
 
-static ADDRESS_MAP_START( mem_map, AS_PROGRAM, 8, v102_state )
+ADDRESS_MAP_START(v102_state::mem_map)
 	ADDRESS_MAP_UNMAP_HIGH
 	AM_RANGE(0x0000, 0x3fff) AM_ROM AM_REGION("maincpu", 0)
 	AM_RANGE(0x8000, 0x8fff) AM_RAM
@@ -51,7 +54,7 @@ static ADDRESS_MAP_START( mem_map, AS_PROGRAM, 8, v102_state )
 	AM_RANGE(0xb800, 0xb9ff) AM_DEVREADWRITE("eeprom", eeprom_parallel_28xx_device, read, write)
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( io_map, AS_IO, 8, v102_state )
+ADDRESS_MAP_START(v102_state::io_map)
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	//AM_RANGE(0x00, 0x3f) AM_DEVREADWRITE("vpac", crt9007_device, read, write)
 	AM_RANGE(0x18, 0x19) AM_WRITENOP
@@ -63,7 +66,7 @@ static ADDRESS_MAP_START( io_map, AS_IO, 8, v102_state )
 	//AM_RANGE(0xbf, 0xbf) ???
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( kbd_map, AS_PROGRAM, 8, v102_state )
+ADDRESS_MAP_START(v102_state::kbd_map)
 	AM_RANGE(0x000, 0x7ff) AM_ROM AM_REGION("keyboard", 0)
 ADDRESS_MAP_END
 

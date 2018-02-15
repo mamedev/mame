@@ -591,7 +591,7 @@ TIMER_DEVICE_CALLBACK_MEMBER(mac_state::mac_scanline)
     ADDRESS MAPS
 ***************************************************************************/
 
-static ADDRESS_MAP_START(mac512ke_map, AS_PROGRAM, 16, mac_state )
+ADDRESS_MAP_START(mac_state::mac512ke_map)
 	AM_RANGE(0x800000, 0x9fffff) AM_READ(mac_scc_r)
 	AM_RANGE(0xa00000, 0xbfffff) AM_WRITE(mac_scc_w)
 	AM_RANGE(0xc00000, 0xdfffff) AM_READWRITE(mac_iwm_r, mac_iwm_w)
@@ -599,7 +599,7 @@ static ADDRESS_MAP_START(mac512ke_map, AS_PROGRAM, 16, mac_state )
 	AM_RANGE(0xfffff0, 0xffffff) AM_READWRITE(mac_autovector_r, mac_autovector_w)
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START(macplus_map, AS_PROGRAM, 16, mac_state )
+ADDRESS_MAP_START(mac_state::macplus_map)
 	AM_RANGE(0x580000, 0x5fffff) AM_READWRITE(macplus_scsi_r, macplus_scsi_w)
 	AM_RANGE(0x800000, 0x9fffff) AM_READ(mac_scc_r)
 	AM_RANGE(0xa00000, 0xbfffff) AM_WRITE(mac_scc_w)
@@ -608,7 +608,7 @@ static ADDRESS_MAP_START(macplus_map, AS_PROGRAM, 16, mac_state )
 	AM_RANGE(0xfffff0, 0xffffff) AM_READWRITE(mac_autovector_r, mac_autovector_w)
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START(macse_map, AS_PROGRAM, 16, mac_state )
+ADDRESS_MAP_START(mac_state::macse_map)
 	AM_RANGE(0x580000, 0x5fffff) AM_READWRITE(macplus_scsi_r, macplus_scsi_w)
 	AM_RANGE(0x900000, 0x9fffff) AM_READ(mac_scc_r)
 	AM_RANGE(0xb00000, 0xbfffff) AM_WRITE(mac_scc_w)
@@ -617,7 +617,7 @@ static ADDRESS_MAP_START(macse_map, AS_PROGRAM, 16, mac_state )
 	AM_RANGE(0xfffff0, 0xffffff) AM_READWRITE(mac_autovector_r, mac_autovector_w)
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START(macprtb_map, AS_PROGRAM, 16, mac_state )
+ADDRESS_MAP_START(mac_state::macprtb_map)
 	AM_RANGE(0x900000, 0x93ffff) AM_ROM AM_REGION("bootrom", 0) AM_MIRROR(0x0c0000)
 	AM_RANGE(0xf60000, 0xf6ffff) AM_READWRITE(mac_iwm_r, mac_iwm_w)
 	AM_RANGE(0xf70000, 0xf7ffff) AM_READWRITE(mac_via_r, mac_via_w)
@@ -629,7 +629,7 @@ static ADDRESS_MAP_START(macprtb_map, AS_PROGRAM, 16, mac_state )
 	AM_RANGE(0xfffff0, 0xffffff) AM_READWRITE(mac_autovector_r, mac_autovector_w)
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START(maclc_map, AS_PROGRAM, 32, mac_state )
+ADDRESS_MAP_START(mac_state::maclc_map)
 	ADDRESS_MAP_GLOBAL_MASK(0x80ffffff) // V8 uses bit 31 and 23-0 for address decoding only
 
 	AM_RANGE(0xa00000, 0xafffff) AM_ROM AM_REGION("bootrom", 0) // ROM (in 32-bit mode)
@@ -646,7 +646,7 @@ static ADDRESS_MAP_START(maclc_map, AS_PROGRAM, 32, mac_state )
 	AM_RANGE(0xf40000, 0xfbffff) AM_RAM AM_SHARE("vram")
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START(maclc3_map, AS_PROGRAM, 32, mac_state )
+ADDRESS_MAP_START(mac_state::maclc3_map)
 	AM_RANGE(0x40000000, 0x400fffff) AM_ROM AM_REGION("bootrom", 0) AM_MIRROR(0x0ff00000)
 
 	AM_RANGE(0x50000000, 0x50001fff) AM_READWRITE16(mac_via_r, mac_via_w, 0xffffffff) AM_MIRROR(0x00f00000)
@@ -665,7 +665,7 @@ static ADDRESS_MAP_START(maclc3_map, AS_PROGRAM, 32, mac_state )
 	AM_RANGE(0x60000000, 0x600fffff) AM_RAM AM_MIRROR(0x0ff00000) AM_SHARE("vram")
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START(macii_map, AS_PROGRAM, 32, mac_state )
+ADDRESS_MAP_START(mac_state::macii_map)
 	AM_RANGE(0x40000000, 0x4003ffff) AM_ROM AM_REGION("bootrom", 0) AM_MIRROR(0x0ffc0000)
 
 	// MMU remaps I/O without the F
@@ -681,7 +681,7 @@ static ADDRESS_MAP_START(macii_map, AS_PROGRAM, 32, mac_state )
 	AM_RANGE(0x50040000, 0x50041fff) AM_READWRITE16(mac_via_r, mac_via_w, 0xffffffff) AM_MIRROR(0x00f00000)
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START(maciici_map, AS_PROGRAM, 32, mac_state )
+ADDRESS_MAP_START(mac_state::maciici_map)
 	AM_RANGE(0x40000000, 0x4007ffff) AM_ROM AM_REGION("bootrom", 0) AM_MIRROR(0x0ff80000)
 
 	AM_RANGE(0x50000000, 0x50001fff) AM_READWRITE16(mac_via_r, mac_via_w, 0xffffffff) AM_MIRROR(0x00f00000)
@@ -696,7 +696,7 @@ static ADDRESS_MAP_START(maciici_map, AS_PROGRAM, 32, mac_state )
 	AM_RANGE(0x50040000, 0x50041fff) AM_READWRITE16(mac_via_r, mac_via_w, 0xffffffff) AM_MIRROR(0x00f00000)
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START(macse30_map, AS_PROGRAM, 32, mac_state )
+ADDRESS_MAP_START(mac_state::macse30_map)
 	AM_RANGE(0x40000000, 0x4003ffff) AM_ROM AM_REGION("bootrom", 0) AM_MIRROR(0x0ffc0000)
 
 	AM_RANGE(0x50000000, 0x50001fff) AM_READWRITE16(mac_via_r, mac_via_w, 0xffffffff) AM_MIRROR(0x00f00000)
@@ -714,7 +714,7 @@ static ADDRESS_MAP_START(macse30_map, AS_PROGRAM, 32, mac_state )
 	AM_RANGE(0xfeffe000, 0xfeffffff) AM_ROM AM_REGION("se30vrom", 0x0)
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START(maciifx_map, AS_PROGRAM, 32, mac_state )
+ADDRESS_MAP_START(mac_state::maciifx_map)
 	AM_RANGE(0x40000000, 0x4007ffff) AM_ROM AM_REGION("bootrom", 0) AM_MIRROR(0x0ff80000)
 
 	AM_RANGE(0x50000000, 0x50001fff) AM_READWRITE16(mac_via_r, mac_via_w, 0xffffffff) AM_MIRROR(0x00f00000)
@@ -732,7 +732,7 @@ static ADDRESS_MAP_START(maciifx_map, AS_PROGRAM, 32, mac_state )
 ADDRESS_MAP_END
 
 // ROM detects the "Jaws" ASIC by checking for I/O space mirrored at 0x01000000 boundries
-static ADDRESS_MAP_START(macpb140_map, AS_PROGRAM, 32, mac_state )
+ADDRESS_MAP_START(mac_state::macpb140_map)
 	AM_RANGE(0x40000000, 0x400fffff) AM_ROM AM_REGION("bootrom", 0) AM_MIRROR(0x0ff00000)
 
 	AM_RANGE(0x50000000, 0x50001fff) AM_READWRITE16(mac_via_r, mac_via_w, 0xffffffff) AM_MIRROR(0x01f00000)
@@ -748,7 +748,7 @@ static ADDRESS_MAP_START(macpb140_map, AS_PROGRAM, 32, mac_state )
 	AM_RANGE(0xfee08000, 0xfeffffff) AM_RAM AM_SHARE("vram")
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START(macpb160_map, AS_PROGRAM, 32, mac_state )
+ADDRESS_MAP_START(mac_state::macpb160_map)
 	AM_RANGE(0x40000000, 0x400fffff) AM_ROM AM_REGION("bootrom", 0) AM_MIRROR(0x0ff00000)
 
 	AM_RANGE(0x50f00000, 0x50f01fff) AM_READWRITE16(mac_via_r, mac_via_w, 0xffffffff)
@@ -765,7 +765,7 @@ static ADDRESS_MAP_START(macpb160_map, AS_PROGRAM, 32, mac_state )
 	AM_RANGE(0x60000000, 0x6001ffff) AM_RAM AM_SHARE("vram") AM_MIRROR(0x0ffe0000)
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START(macpb165c_map, AS_PROGRAM, 32, mac_state )
+ADDRESS_MAP_START(mac_state::macpb165c_map)
 	AM_RANGE(0x40000000, 0x400fffff) AM_ROM AM_REGION("bootrom", 0) AM_MIRROR(0x0ff00000)
 
 	AM_RANGE(0x50f00000, 0x50f01fff) AM_READWRITE16(mac_via_r, mac_via_w, 0xffffffff)
@@ -787,7 +787,7 @@ static ADDRESS_MAP_START(macpb165c_map, AS_PROGRAM, 32, mac_state )
 	AM_RANGE(0xfcff8000, 0xfcffffff) AM_ROM AM_REGION("vrom", 0x0000)
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START(macpd210_map, AS_PROGRAM, 32, mac_state )
+ADDRESS_MAP_START(mac_state::macpd210_map)
 	AM_RANGE(0x40000000, 0x400fffff) AM_ROM AM_REGION("bootrom", 0) AM_MIRROR(0x0ff00000)
 
 	AM_RANGE(0x50f00000, 0x50f01fff) AM_READWRITE16(mac_via_r, mac_via_w, 0xffffffff)
@@ -806,7 +806,7 @@ static ADDRESS_MAP_START(macpd210_map, AS_PROGRAM, 32, mac_state )
 	AM_RANGE(0x60000000, 0x6001ffff) AM_RAM AM_SHARE("vram") AM_MIRROR(0x0ffe0000)
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START(quadra700_map, AS_PROGRAM, 32, mac_state )
+ADDRESS_MAP_START(mac_state::quadra700_map)
 	AM_RANGE(0x40000000, 0x400fffff) AM_ROM AM_REGION("bootrom", 0) AM_MIRROR(0x0ff00000)
 
 	AM_RANGE(0x50000000, 0x50001fff) AM_READWRITE16(mac_via_r, mac_via_w, 0xffffffff) AM_MIRROR(0x00fc0000)
@@ -825,7 +825,7 @@ static ADDRESS_MAP_START(quadra700_map, AS_PROGRAM, 32, mac_state )
 	AM_RANGE(0xf9800200, 0xf980023f) AM_READWRITE(dafb_dac_r, dafb_dac_w)
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START(pwrmac_map, AS_PROGRAM, 64, mac_state )
+ADDRESS_MAP_START(mac_state::pwrmac_map)
 	AM_RANGE(0x00000000, 0x007fffff) AM_RAM // 8 MB standard
 
 	AM_RANGE(0x40000000, 0x403fffff) AM_ROM AM_REGION("bootrom", 0) AM_MIRROR(0x0fc00000)
@@ -964,7 +964,8 @@ MACHINE_CONFIG_START(mac_state::mac512ke)
 	MCFG_RAM_DEFAULT_SIZE("512K")
 MACHINE_CONFIG_END
 
-MACHINE_CONFIG_DERIVED(mac_state::macplus, mac512ke)
+MACHINE_CONFIG_START(mac_state::macplus)
+	mac512ke(config);
 	MCFG_CPU_MODIFY( "maincpu" )
 	MCFG_CPU_PROGRAM_MAP(macplus_map)
 
@@ -988,7 +989,8 @@ MACHINE_CONFIG_DERIVED(mac_state::macplus, mac512ke)
 	MCFG_SOFTWARE_LIST_ADD("hdd_list", "mac_hdd")
 MACHINE_CONFIG_END
 
-MACHINE_CONFIG_DERIVED(mac_state::macse, macplus)
+MACHINE_CONFIG_START(mac_state::macse)
+	macplus(config);
 	MCFG_CPU_MODIFY("maincpu")
 	MCFG_CPU_PROGRAM_MAP(macse_map)
 
@@ -1012,7 +1014,8 @@ MACHINE_CONFIG_DERIVED(mac_state::macse, macplus)
 	MCFG_MACPDS_SLOT_ADD("sepds", "pds", mac_sepds_cards, nullptr)
 MACHINE_CONFIG_END
 
-MACHINE_CONFIG_DERIVED(mac_state::macclasc, macplus)
+MACHINE_CONFIG_START(mac_state::macclasc)
+	macplus(config);
 	MCFG_CPU_MODIFY("maincpu")
 	MCFG_CPU_PROGRAM_MAP(macse_map)
 
@@ -1166,7 +1169,8 @@ MACHINE_CONFIG_START(mac_state::macii)
 	MCFG_SOFTWARE_LIST_ADD("hdd_list", "mac_hdd")
 MACHINE_CONFIG_END
 
-MACHINE_CONFIG_DERIVED(mac_state::maciihmu, macii)
+MACHINE_CONFIG_START(mac_state::maciihmu)
+	macii(config);
 	MCFG_CPU_REPLACE("maincpu", M68020HMMU, C15M)
 	MCFG_CPU_PROGRAM_MAP(macii_map)
 	MCFG_CPU_DISASSEMBLE_OVERRIDE(mac_state, mac_dasm_override)
@@ -1234,7 +1238,8 @@ MACHINE_CONFIG_START(mac_state::maciifx)
 	MCFG_SOFTWARE_LIST_ADD("hdd_list", "mac_hdd")
 MACHINE_CONFIG_END
 
-MACHINE_CONFIG_DERIVED(mac_state::maclc, macii)
+MACHINE_CONFIG_START(mac_state::maclc)
+	macii(config);
 
 	MCFG_CPU_REPLACE("maincpu", M68020HMMU, C15M)
 	MCFG_CPU_PROGRAM_MAP(maclc_map)
@@ -1291,7 +1296,8 @@ MACHINE_CONFIG_DERIVED(mac_state::maclc, macii)
 	MCFG_QUANTUM_PERFECT_CPU("maincpu")
 MACHINE_CONFIG_END
 
-MACHINE_CONFIG_DERIVED(mac_state::maclc2, maclc)
+MACHINE_CONFIG_START(mac_state::maclc2)
+	maclc(config);
 
 	MCFG_CPU_REPLACE("maincpu", M68030, C15M)
 	MCFG_CPU_PROGRAM_MAP(maclc_map)
@@ -1303,7 +1309,8 @@ MACHINE_CONFIG_DERIVED(mac_state::maclc2, maclc)
 	MCFG_RAM_EXTRA_OPTIONS("6M,8M,10M")
 MACHINE_CONFIG_END
 
-MACHINE_CONFIG_DERIVED(mac_state::maccclas, maclc2)
+MACHINE_CONFIG_START(mac_state::maccclas)
+	maclc2(config);
 
 	MCFG_EGRET_REMOVE()
 	MCFG_CUDA_ADD(CUDA_341S0788)    // should be 0417, but that version won't sync up properly with the '030 right now
@@ -1316,7 +1323,8 @@ MACHINE_CONFIG_DERIVED(mac_state::maccclas, maclc2)
 	MCFG_VIA6522_WRITEPB_HANDLER(WRITE8(mac_state,mac_via_out_b_cdadb))
 MACHINE_CONFIG_END
 
-MACHINE_CONFIG_DERIVED(mac_state::maclc3, maclc)
+MACHINE_CONFIG_START(mac_state::maclc3)
+	maclc(config);
 
 	MCFG_CPU_REPLACE("maincpu", M68030, 25000000)
 	MCFG_CPU_PROGRAM_MAP(maclc3_map)
@@ -1344,7 +1352,8 @@ MACHINE_CONFIG_DERIVED(mac_state::maclc3, maclc)
 	MCFG_EGRET_VIA_DATA_CALLBACK(DEVWRITELINE("via6522_0", via6522_device, write_cb2))
 MACHINE_CONFIG_END
 
-MACHINE_CONFIG_DERIVED(mac_state::maclc520, maclc3)
+MACHINE_CONFIG_START(mac_state::maclc520)
+	maclc3(config);
 
 	MCFG_EGRET_REMOVE()
 	MCFG_CUDA_ADD(CUDA_341S0060)
@@ -1357,7 +1366,8 @@ MACHINE_CONFIG_DERIVED(mac_state::maclc520, maclc3)
 	MCFG_VIA6522_WRITEPB_HANDLER(WRITE8(mac_state,mac_via_out_b_cdadb))
 MACHINE_CONFIG_END
 
-MACHINE_CONFIG_DERIVED(mac_state::maciivx, maclc)
+MACHINE_CONFIG_START(mac_state::maciivx)
+	maclc(config);
 
 	MCFG_CPU_REPLACE("maincpu", M68030, C32M)
 	MCFG_CPU_PROGRAM_MAP(maclc3_map)
@@ -1393,7 +1403,8 @@ MACHINE_CONFIG_DERIVED(mac_state::maciivx, maclc)
 	MCFG_EGRET_VIA_DATA_CALLBACK(DEVWRITELINE("via6522_0", via6522_device, write_cb2))
 MACHINE_CONFIG_END
 
-MACHINE_CONFIG_DERIVED(mac_state::maciivi, maclc)
+MACHINE_CONFIG_START(mac_state::maciivi)
+	maclc(config);
 
 	MCFG_CPU_REPLACE("maincpu", M68030, C15M)
 	MCFG_CPU_PROGRAM_MAP(maclc3_map)
@@ -1429,7 +1440,8 @@ MACHINE_CONFIG_DERIVED(mac_state::maciivi, maclc)
 	MCFG_EGRET_VIA_DATA_CALLBACK(DEVWRITELINE("via6522_0", via6522_device, write_cb2))
 MACHINE_CONFIG_END
 
-MACHINE_CONFIG_DERIVED(mac_state::maciix, macii)
+MACHINE_CONFIG_START(mac_state::maciix)
+	macii(config);
 
 	MCFG_CPU_REPLACE("maincpu", M68030, C15M)
 	MCFG_CPU_PROGRAM_MAP(macii_map)
@@ -1440,7 +1452,8 @@ MACHINE_CONFIG_DERIVED(mac_state::maciix, macii)
 	MCFG_RAM_EXTRA_OPTIONS("8M,32M,64M,96M,128M")
 MACHINE_CONFIG_END
 
-MACHINE_CONFIG_DERIVED(mac_state::maciicx, maciix)    // IIcx is a IIx with only slots 9/a/b
+MACHINE_CONFIG_START(mac_state::maciicx)    // IIcx is a IIx with only slots 9/a/b
+	maciix(config);
 	MCFG_NUBUS_SLOT_REMOVE("nbc")
 	MCFG_NUBUS_SLOT_REMOVE("nbd")
 	MCFG_NUBUS_SLOT_REMOVE("nbe")
@@ -1591,7 +1604,8 @@ MACHINE_CONFIG_START(mac_state::macpb140)
 MACHINE_CONFIG_END
 
 // PowerBook 145 = 140 @ 25 MHz (still 2MB RAM - the 145B upped that to 4MB)
-MACHINE_CONFIG_DERIVED(mac_state::macpb145, macpb140)
+MACHINE_CONFIG_START(mac_state::macpb145)
+	macpb140(config);
 	MCFG_CPU_REPLACE("maincpu", M68030, 25000000)
 	MCFG_CPU_PROGRAM_MAP(macpb140_map)
 	MCFG_CPU_DISASSEMBLE_OVERRIDE(mac_state, mac_dasm_override)
@@ -1602,7 +1616,8 @@ MACHINE_CONFIG_DERIVED(mac_state::macpb145, macpb140)
 MACHINE_CONFIG_END
 
 // PowerBook 170 = 140 @ 25 MHz with an active-matrix LCD (140/145/145B were passive)
-MACHINE_CONFIG_DERIVED(mac_state::macpb170, macpb140)
+MACHINE_CONFIG_START(mac_state::macpb170)
+	macpb140(config);
 	MCFG_CPU_REPLACE("maincpu", M68030, 25000000)
 	MCFG_CPU_PROGRAM_MAP(macpb140_map)
 	MCFG_CPU_DISASSEMBLE_OVERRIDE(mac_state, mac_dasm_override)
@@ -1678,7 +1693,8 @@ MACHINE_CONFIG_START(mac_state::macpb160)
 	MCFG_SOFTWARE_LIST_ADD("hdd_list", "mac_hdd")
 MACHINE_CONFIG_END
 
-MACHINE_CONFIG_DERIVED(mac_state::macpb180, macpb160)
+MACHINE_CONFIG_START(mac_state::macpb180)
+	macpb160(config);
 	MCFG_CPU_REPLACE("maincpu", M68030, 33000000)
 	MCFG_CPU_PROGRAM_MAP(macpb160_map)
 	MCFG_CPU_DISASSEMBLE_OVERRIDE(mac_state, mac_dasm_override)
@@ -1688,7 +1704,8 @@ MACHINE_CONFIG_DERIVED(mac_state::macpb180, macpb160)
 	MCFG_RAM_EXTRA_OPTIONS("8M,12M,16M")
 MACHINE_CONFIG_END
 
-MACHINE_CONFIG_DERIVED(mac_state::macpb180c, macpb160)
+MACHINE_CONFIG_START(mac_state::macpb180c)
+	macpb160(config);
 	MCFG_CPU_REPLACE("maincpu", M68030, 33000000)
 	MCFG_CPU_PROGRAM_MAP(macpb165c_map)
 	MCFG_CPU_DISASSEMBLE_OVERRIDE(mac_state, mac_dasm_override)
@@ -1704,7 +1721,8 @@ MACHINE_CONFIG_DERIVED(mac_state::macpb180c, macpb160)
 	MCFG_RAM_EXTRA_OPTIONS("8M,12M,16M")
 MACHINE_CONFIG_END
 
-MACHINE_CONFIG_DERIVED(mac_state::macpd210, macpb160)
+MACHINE_CONFIG_START(mac_state::macpd210)
+	macpb160(config);
 	MCFG_CPU_REPLACE("maincpu", M68030, 25000000)
 	MCFG_CPU_PROGRAM_MAP(macpd210_map)
 	MCFG_CPU_DISASSEMBLE_OVERRIDE(mac_state, mac_dasm_override)
@@ -1714,7 +1732,8 @@ MACHINE_CONFIG_DERIVED(mac_state::macpd210, macpb160)
 	MCFG_RAM_EXTRA_OPTIONS("8M,12M,16M,20M,24M")
 MACHINE_CONFIG_END
 
-MACHINE_CONFIG_DERIVED(mac_state::macclas2, maclc)
+MACHINE_CONFIG_START(mac_state::macclas2)
+	maclc(config);
 	MCFG_CPU_REPLACE("maincpu", M68030, C15M)
 	MCFG_CPU_PROGRAM_MAP(maclc_map)
 	MCFG_CPU_VBLANK_INT_DRIVER(MAC_SCREEN_NAME, mac_state,  mac_rbv_vbl)
@@ -1743,7 +1762,8 @@ MACHINE_CONFIG_DERIVED(mac_state::macclas2, maclc)
 	MCFG_EGRET_VIA_DATA_CALLBACK(DEVWRITELINE("via6522_0", via6522_device, write_cb2))
 MACHINE_CONFIG_END
 
-MACHINE_CONFIG_DERIVED(mac_state::maciici, macii)
+MACHINE_CONFIG_START(mac_state::maciici)
+	macii(config);
 
 	MCFG_CPU_REPLACE("maincpu", M68030, 25000000)
 	MCFG_CPU_PROGRAM_MAP(maciici_map)
@@ -1774,7 +1794,8 @@ MACHINE_CONFIG_DERIVED(mac_state::maciici, macii)
 	MCFG_RAM_EXTRA_OPTIONS("4M,8M,16M,32M,48M,64M,128M")
 MACHINE_CONFIG_END
 
-MACHINE_CONFIG_DERIVED(mac_state::maciisi, macii)
+MACHINE_CONFIG_START(mac_state::maciisi)
+	macii(config);
 
 	MCFG_CPU_REPLACE("maincpu", M68030, 20000000)
 	MCFG_CPU_PROGRAM_MAP(maciici_map)

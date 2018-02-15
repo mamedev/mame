@@ -76,4 +76,7 @@ public:
 	void sslam_play(int track, int data);
 	void sslam(machine_config &config);
 	void powerbls(machine_config &config);
+	void powerbls_map(address_map &map);
+	void sound_io_map(address_map &map);
+	void sslam_program_map(address_map &map);
 };

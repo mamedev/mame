@@ -89,6 +89,7 @@ public:
 	void spg290_blit_character(bitmap_rgb32 &bitmap, const rectangle &cliprect, uint32_t control, uint32_t attribute, int posy, int posx, uint32_t nptr, uint32_t buf_start, uint32_t transrgb);
 
 	void hyperscan(machine_config &config);
+	void spg290_mem(address_map &map);
 private:
 	static const device_timer_id TIMER_SPG290 = 0;
 	static const device_timer_id TIMER_I2C = 1;
@@ -584,7 +585,7 @@ void hyperscan_state::device_timer(emu_timer &timer, device_timer_id id, int par
 	}
 }
 
-static ADDRESS_MAP_START(spg290_mem, AS_PROGRAM, 32, hyperscan_state)
+ADDRESS_MAP_START(hyperscan_state::spg290_mem)
 	ADDRESS_MAP_GLOBAL_MASK(0x1fffffff)
 	AM_RANGE(0x00000000, 0x00ffffff) AM_RAM AM_MIRROR(0x07000000)
 	AM_RANGE(0x08000000, 0x09ffffff) AM_READWRITE(spg290_regs_r, spg290_regs_w)

@@ -24,6 +24,8 @@ public:
 	static void static_set_maincpu_tag(device_t &device, const char *maincpu_tag) { downcast<acs8600_ics_device &>(device).m_maincpu_tag = maincpu_tag; }
 	const tiny_rom_entry *device_rom_region() const override;
 
+	void ics_io(address_map &map);
+	void ics_mem(address_map &map);
 protected:
 	virtual void device_start() override;
 	virtual void device_add_mconfig(machine_config &config) override;

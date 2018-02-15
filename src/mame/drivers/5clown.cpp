@@ -507,6 +507,8 @@ public:
 	DECLARE_PALETTE_INIT(_5clown);
 	uint32_t screen_update_fclown(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	void fclown(machine_config &config);
+	void fcaudio_map(address_map &map);
+	void fclown_map(address_map &map);
 };
 
 void _5clown_state::machine_start()
@@ -754,7 +756,7 @@ WRITE8_MEMBER(_5clown_state::snd_a02_w)
 * Memory map information *
 *************************/
 
-static ADDRESS_MAP_START( fclown_map, AS_PROGRAM, 8, _5clown_state )
+ADDRESS_MAP_START(_5clown_state::fclown_map)
 	AM_RANGE(0x0000, 0x07ff) AM_RAM AM_SHARE("nvram")
 	AM_RANGE(0x0800, 0x0800) AM_DEVWRITE("crtc", mc6845_device, address_w)
 	AM_RANGE(0x0801, 0x0801) AM_DEVREADWRITE("crtc", mc6845_device, register_r, register_w)
@@ -829,7 +831,7 @@ ADDRESS_MAP_END
 
 */
 
-static ADDRESS_MAP_START( fcaudio_map, AS_PROGRAM, 8, _5clown_state )
+ADDRESS_MAP_START(_5clown_state::fcaudio_map)
 	AM_RANGE(0x0000, 0x07ff) AM_RAM
 	AM_RANGE(0x0800, 0x0800) AM_WRITE(snd_800_w)
 	AM_RANGE(0x0a02, 0x0a02) AM_WRITE(snd_a02_w)

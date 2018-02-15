@@ -36,6 +36,7 @@ class linear_flash_pccard_16mb_device : public linear_flash_pccard_device
 public:
 	linear_flash_pccard_16mb_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
+	void linear_flash_pccard_16mb(address_map &map);
 protected:
 	// device-level overrides
 	virtual void device_add_mconfig(machine_config &config) override;
@@ -47,6 +48,7 @@ class linear_flash_pccard_32mb_device : public linear_flash_pccard_device
 public:
 	linear_flash_pccard_32mb_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
+	void linear_flash_pccard_32mb(address_map &map);
 protected:
 	// device-level overrides
 	virtual void device_add_mconfig(machine_config &config) override;
@@ -58,6 +60,7 @@ class linear_flash_pccard_64mb_device : public linear_flash_pccard_device
 public:
 	linear_flash_pccard_64mb_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
+	void linear_flash_pccard_64mb(address_map &map);
 protected:
 	// device-level overrides
 	virtual void device_add_mconfig(machine_config &config) override;

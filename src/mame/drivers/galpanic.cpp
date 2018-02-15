@@ -133,7 +133,7 @@ WRITE16_MEMBER(galpanic_state::coin_w)
 
 
 
-static ADDRESS_MAP_START( galpanic_map, AS_PROGRAM, 16, galpanic_state )
+ADDRESS_MAP_START(galpanic_state::galpanic_map)
 	AM_RANGE(0x000000, 0x3fffff) AM_ROM
 	AM_RANGE(0x400000, 0x400001) AM_DEVREADWRITE8("oki", okim6295_device, read, write, 0x00ff)
 	AM_RANGE(0x500000, 0x51ffff) AM_RAM AM_SHARE("fgvideoram")
@@ -151,12 +151,12 @@ static ADDRESS_MAP_START( galpanic_map, AS_PROGRAM, 16, galpanic_state )
 	AM_RANGE(0xd00000, 0xd00001) AM_WRITENOP    /* ??? */
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( galpanica_map, AS_PROGRAM, 16, galpanic_state )
+ADDRESS_MAP_START(galpanic_state::galpanica_map)
 	AM_IMPORT_FROM(galpanic_map)
 	AM_RANGE(0xe00000, 0xe00015) AM_DEVREADWRITE("calc1_mcu", kaneko_hit_device, kaneko_hit_r,kaneko_hit_w)
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( galpanic_oki_map, 0, 8, galpanic_state )
+ADDRESS_MAP_START(galpanic_state::galpanic_oki_map)
 	AM_RANGE(0x00000, 0x2ffff) AM_ROM
 	AM_RANGE(0x30000, 0x3ffff) AM_ROMBANK("okibank")
 ADDRESS_MAP_END
@@ -266,7 +266,8 @@ MACHINE_CONFIG_START(galpanic_state::galpanic)
 MACHINE_CONFIG_END
 
 
-MACHINE_CONFIG_DERIVED(galpanic_state::galpanica, galpanic)
+MACHINE_CONFIG_START(galpanic_state::galpanica)
+	galpanic(config);
 	MCFG_CPU_MODIFY("maincpu")
 	MCFG_CPU_PROGRAM_MAP(galpanica_map)
 

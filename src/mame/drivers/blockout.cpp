@@ -95,7 +95,7 @@ WRITE16_MEMBER(blockout_state::blockout_irq5_ack_w)
  *
  *************************************/
 
-static ADDRESS_MAP_START( main_map, AS_PROGRAM, 16, blockout_state )
+ADDRESS_MAP_START(blockout_state::main_map)
 	AM_RANGE(0x000000, 0x03ffff) AM_ROM
 	AM_RANGE(0x100000, 0x100001) AM_READ_PORT("P1")
 	AM_RANGE(0x100002, 0x100003) AM_READ_PORT("P2")
@@ -115,7 +115,7 @@ static ADDRESS_MAP_START( main_map, AS_PROGRAM, 16, blockout_state )
 	AM_RANGE(0x280200, 0x2805ff) AM_RAM_WRITE(blockout_paletteram_w) AM_SHARE("paletteram")
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( agress_map, AS_PROGRAM, 16, blockout_state )
+ADDRESS_MAP_START(blockout_state::agress_map)
 	AM_RANGE(0x000000, 0x03ffff) AM_ROM
 	AM_RANGE(0x100000, 0x100001) AM_READ_PORT("P1")
 	AM_RANGE(0x100002, 0x100003) AM_READ_PORT("P2")
@@ -135,7 +135,7 @@ static ADDRESS_MAP_START( agress_map, AS_PROGRAM, 16, blockout_state )
 	AM_RANGE(0x280200, 0x2805ff) AM_RAM_WRITE(blockout_paletteram_w) AM_SHARE("paletteram")
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( audio_map, AS_PROGRAM, 8, blockout_state )
+ADDRESS_MAP_START(blockout_state::audio_map)
 	AM_RANGE(0x0000, 0x7fff) AM_ROM
 	AM_RANGE(0x8000, 0x87ff) AM_RAM
 	AM_RANGE(0x8800, 0x8801) AM_DEVREADWRITE("ymsnd", ym2151_device, read, write)
@@ -338,7 +338,8 @@ MACHINE_CONFIG_START(blockout_state::blockout)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", 0.50)
 MACHINE_CONFIG_END
 
-MACHINE_CONFIG_DERIVED(blockout_state::agress, blockout)
+MACHINE_CONFIG_START(blockout_state::agress)
+	blockout(config);
 	MCFG_CPU_MODIFY( "maincpu" )
 	MCFG_CPU_PROGRAM_MAP(agress_map)
 MACHINE_CONFIG_END

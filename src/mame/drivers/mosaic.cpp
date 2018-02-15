@@ -117,7 +117,7 @@ READ8_MEMBER(mosaic_state::gfire2_protection_r)
 
 
 
-static ADDRESS_MAP_START( mosaic_map, AS_PROGRAM, 8, mosaic_state )
+ADDRESS_MAP_START(mosaic_state::mosaic_map)
 	AM_RANGE(0x00000, 0x0ffff) AM_ROM
 	AM_RANGE(0x20000, 0x21fff) AM_RAM
 	AM_RANGE(0x22000, 0x22fff) AM_RAM_WRITE(bgvideoram_w) AM_SHARE("bgvideoram")
@@ -125,7 +125,7 @@ static ADDRESS_MAP_START( mosaic_map, AS_PROGRAM, 8, mosaic_state )
 	AM_RANGE(0x24000, 0x241ff) AM_RAM_DEVWRITE("palette", palette_device, write8) AM_SHARE("palette")
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( gfire2_map, AS_PROGRAM, 8, mosaic_state )
+ADDRESS_MAP_START(mosaic_state::gfire2_map)
 	AM_RANGE(0x00000, 0x0ffff) AM_ROM
 	AM_RANGE(0x10000, 0x17fff) AM_RAM
 	AM_RANGE(0x22000, 0x22fff) AM_RAM_WRITE(bgvideoram_w) AM_SHARE("bgvideoram")
@@ -133,7 +133,7 @@ static ADDRESS_MAP_START( gfire2_map, AS_PROGRAM, 8, mosaic_state )
 	AM_RANGE(0x24000, 0x241ff) AM_RAM_DEVWRITE("palette", palette_device, write8) AM_SHARE("palette")
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( mosaic_io_map, AS_IO, 8, mosaic_state )
+ADDRESS_MAP_START(mosaic_state::mosaic_io_map)
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	AM_RANGE(0x00, 0x3f) AM_WRITENOP    /* Z180 internal registers */
 	AM_RANGE(0x30, 0x30) AM_READNOP /* Z180 internal registers */
@@ -143,7 +143,7 @@ static ADDRESS_MAP_START( mosaic_io_map, AS_IO, 8, mosaic_state )
 	AM_RANGE(0x76, 0x76) AM_READ_PORT("P2")
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( gfire2_io_map, AS_IO, 8, mosaic_state )
+ADDRESS_MAP_START(mosaic_state::gfire2_io_map)
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	AM_RANGE(0x00, 0x3f) AM_WRITENOP    /* Z180 internal registers */
 	AM_RANGE(0x30, 0x30) AM_READNOP /* Z180 internal registers */
@@ -303,7 +303,8 @@ MACHINE_CONFIG_START(mosaic_state::mosaic)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
 MACHINE_CONFIG_END
 
-MACHINE_CONFIG_DERIVED(mosaic_state::gfire2, mosaic)
+MACHINE_CONFIG_START(mosaic_state::gfire2)
+	mosaic(config);
 	MCFG_CPU_MODIFY("maincpu")
 	MCFG_CPU_PROGRAM_MAP(gfire2_map)
 	MCFG_CPU_IO_MAP(gfire2_io_map)

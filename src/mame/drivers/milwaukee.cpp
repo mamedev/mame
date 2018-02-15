@@ -30,12 +30,13 @@ public:
 	{ }
 
 		void milwaukee(machine_config &config);
+		void mem_map(address_map &map);
 private:
 	required_device<cpu_device> m_maincpu;
 	//required_region_ptr<u8> m_p_chargen;
 };
 
-static ADDRESS_MAP_START( mem_map, AS_PROGRAM, 8, milwaukee_state )
+ADDRESS_MAP_START(milwaukee_state::mem_map)
 	AM_RANGE(0x0000, 0xf7ff) AM_RAM
 	//AM_RANGE(0xf800, 0xf87f) expansion i/o
 	AM_RANGE(0xf880, 0xf881) AM_DEVREADWRITE("acia1", acia6850_device, read, write) // terminal

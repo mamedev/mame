@@ -24,8 +24,21 @@ public:
 	hp98035_io_card_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 	virtual ~hp98035_io_card_device();
 
+protected:
+	virtual void device_start() override;
+	virtual void device_reset() override;
+	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr) override;
+
+	// device-level overrides
+	virtual ioport_constructor device_input_ports() const override;
+	virtual const tiny_rom_entry *device_rom_region() const override;
+	virtual void device_add_mconfig(machine_config &config) override;
+
 	virtual DECLARE_READ16_MEMBER(reg_r) override;
 	virtual DECLARE_WRITE16_MEMBER(reg_w) override;
+
+private:
+	DECLARE_WRITE8_MEMBER(dc_w);
 
 	DECLARE_WRITE8_MEMBER(ram_addr_w);
 	DECLARE_READ8_MEMBER(ram_data_r);
@@ -44,18 +57,8 @@ public:
 	DECLARE_READ8_MEMBER(clr_inten_r);
 	DECLARE_WRITE8_MEMBER(clr_inten_w);
 
-protected:
-	virtual void device_start() override;
-	virtual void device_reset() override;
-	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr) override;
-
-	// device-level overrides
-	virtual ioport_constructor device_input_ports() const override;
-	virtual const tiny_rom_entry *device_rom_region() const override;
-	virtual void device_add_mconfig(machine_config &config) override;
-
-private:
-	DECLARE_WRITE8_MEMBER(dc_w);
+	void np_io_map(address_map &map);
+	void np_program_map(address_map &map);
 
 	required_device<hp_nanoprocessor_device> m_cpu;
 

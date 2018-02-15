@@ -1319,7 +1319,7 @@ WRITE8_MEMBER( x1_state::x1turbo_mem_w )
  *
  *************************************/
 
-static ADDRESS_MAP_START( x1_io_banks_common, AS_IO, 8, x1_state )
+ADDRESS_MAP_START(x1_state::x1_io_banks_common)
 	ADDRESS_MAP_UNMAP_HIGH
 
 	AM_RANGE(0x0e00, 0x0e02)                   AM_WRITE(x1_rom_w)
@@ -1350,7 +1350,7 @@ static ADDRESS_MAP_START( x1_io_banks_common, AS_IO, 8, x1_state )
 ADDRESS_MAP_END
 
 
-static ADDRESS_MAP_START( x1_io_banks, AS_IO, 8, x1_state )
+ADDRESS_MAP_START(x1_state::x1_io_banks)
 	AM_IMPORT_FROM(x1_io_banks_common)
 
 //  AM_RANGE(0x0700, 0x0701) TODO: user could install ym2151 on plain X1 too
@@ -1363,7 +1363,7 @@ static ADDRESS_MAP_START( x1_io_banks, AS_IO, 8, x1_state )
 ADDRESS_MAP_END
 
 
-static ADDRESS_MAP_START( x1turbo_io_banks, AS_IO, 8, x1_state )
+ADDRESS_MAP_START(x1_state::x1turbo_io_banks)
 	AM_IMPORT_FROM(x1_io_banks_common)
 
 	// a * at the end states devices used on plain X1 too
@@ -1408,15 +1408,15 @@ static ADDRESS_MAP_START( x1turbo_io_banks, AS_IO, 8, x1_state )
 ADDRESS_MAP_END
 
 
-static ADDRESS_MAP_START( x1_mem, AS_PROGRAM, 8, x1_state )
+ADDRESS_MAP_START(x1_state::x1_mem)
 	AM_RANGE(0x0000, 0xffff) AM_READWRITE(x1_mem_r,x1_mem_w)
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( x1turbo_mem, AS_PROGRAM, 8, x1_state )
+ADDRESS_MAP_START(x1_state::x1turbo_mem)
 	AM_RANGE(0x0000, 0xffff) AM_READWRITE(x1turbo_mem_r,x1turbo_mem_w)
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( x1_io, AS_IO, 8, x1_state )
+ADDRESS_MAP_START(x1_state::x1_io)
 	AM_RANGE(0x0000, 0xffff) AM_DEVICE("iobank", address_map_bank_device, amap8)
 ADDRESS_MAP_END
 
@@ -2283,7 +2283,8 @@ MACHINE_CONFIG_START(x1_state::x1)
 	MCFG_TIMER_DRIVER_ADD_PERIODIC("cmt_wind_timer", x1_state, x1_cmt_wind_timer, attotime::from_hz(16))
 MACHINE_CONFIG_END
 
-MACHINE_CONFIG_DERIVED(x1_state::x1turbo, x1)
+MACHINE_CONFIG_START(x1_state::x1turbo)
+	x1(config);
 	MCFG_CPU_MODIFY("x1_cpu")
 	MCFG_CPU_PROGRAM_MAP(x1turbo_mem)
 	MCFG_Z80_DAISY_CHAIN(x1turbo_daisy)
