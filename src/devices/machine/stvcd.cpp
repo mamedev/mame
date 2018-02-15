@@ -66,7 +66,7 @@
 #define CD_STAT_WAIT     0x8000     // waiting for command if set, else executed immediately
 #define CD_STAT_REJECT   0xff00     // ultra-fatal error.
 
-DEFINE_DEVICE_TYPE(STVCD, stvcd_device, "stvcd", "Sega Saturn/ST-V CD-ROM Block")
+DEFINE_DEVICE_TYPE(STVCD, stvcd_device, "stvcd", "Sega Saturn/ST-V CD Block HLE")
 
 stvcd_device::stvcd_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
 	: device_t(mconfig, STVCD, tag, owner, clock)
