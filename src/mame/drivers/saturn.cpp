@@ -431,7 +431,6 @@ test1f diagnostic hacks:
 #include "machine/nvram.h"
 #include "machine/smpc.h"
 #include "machine/stvcd.h"
-#include "machine/saturn_cdb.h"
 #include "sound/scsp.h"
 #include "video/stvvdp1.h"
 #include "video/stvvdp2.h"
@@ -842,7 +841,7 @@ MACHINE_CONFIG_START(sat_console_state::saturn)
 	MCFG_SOUND_ROUTE(0, "lspeaker", 1.0)
 	MCFG_SOUND_ROUTE(1, "rspeaker", 1.0)
 
-	MCFG_DEVICE_ADD("stvcd", STVCD, 0)
+	MCFG_DEVICE_ADD("stvcd", STVCD, 16000000)
 	//MCFG_SOUND_ROUTE(0, "lspeaker", 1.0)
 	//MCFG_SOUND_ROUTE(1, "rspeaker", 1.0)
 
@@ -863,7 +862,6 @@ SLOT_INTERFACE_END
 
 MACHINE_CONFIG_START(sat_console_state::saturnus)
 	saturn(config);
-	MCFG_DEVICE_ADD("saturn_cdb", SATURN_CDB, 16000000)
 
 	MCFG_SOFTWARE_LIST_ADD("cd_list","saturn")
 	MCFG_SOFTWARE_LIST_FILTER("cd_list","NTSC-U")
@@ -878,7 +876,6 @@ MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(sat_console_state::saturneu)
 	saturn(config);
-	MCFG_DEVICE_ADD("saturn_cdb", SATURN_CDB, 16000000)
 
 	MCFG_SOFTWARE_LIST_ADD("cd_list","saturn")
 	MCFG_SOFTWARE_LIST_FILTER("cd_list","PAL")
@@ -892,7 +889,6 @@ MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(sat_console_state::saturnjp)
 	saturn(config);
-	MCFG_DEVICE_ADD("saturn_cdb", SATURN_CDB, 16000000)
 
 	MCFG_SOFTWARE_LIST_ADD("cd_list","saturn")
 	MCFG_SOFTWARE_LIST_FILTER("cd_list","NTSC-J")
