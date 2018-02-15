@@ -26,7 +26,6 @@
 #include "emu.h"
 #include "machine/stvcd.h"
 
-#include "cpu/sh/sh2.h"
 #include "coreutil.h"
 
 // super-verbose
@@ -67,7 +66,7 @@
 #define CD_STAT_WAIT     0x8000     // waiting for command if set, else executed immediately
 #define CD_STAT_REJECT   0xff00     // ultra-fatal error.
 
-DEFINE_DEVICE_TYPE(STVCD, stvcd_device, "stvcd", "Sega Saturn/ST-V CD-ROM Block")
+DEFINE_DEVICE_TYPE(STVCD, stvcd_device, "stvcd", "Sega Saturn/ST-V CD Block HLE")
 
 stvcd_device::stvcd_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
 	: device_t(mconfig, STVCD, tag, owner, clock)
@@ -78,21 +77,7 @@ stvcd_device::stvcd_device(const machine_config &mconfig, const char *tag, devic
 {
 }
 
-ADDRESS_MAP_START(stvcd_device::saturn_cdb_map)
-	AM_RANGE(0x00000000, 0x0000ffff) AM_ROM
-	AM_RANGE(0x01000000, 0x010fffff) AM_RAM // RAM buffer area?
-	AM_RANGE(0x02000000, 0x0200003f) AM_RAM // i/f with SH-2s
-	AM_RANGE(0x02100000, 0x0210003f) AM_RAM // i/f with SH-2s
-	AM_RANGE(0x02180000, 0x0218003f) AM_RAM // i/f with SH-2s
-	AM_RANGE(0x07000000, 0x07000fff) AM_RAM // unknown, internal RAM?
-ADDRESS_MAP_END
-
 MACHINE_CONFIG_START(stvcd_device::device_add_mconfig)
-	MCFG_CPU_ADD("cdbcpu", SH1, DERIVED_CLOCK(1, 1))
-	MCFG_CPU_PROGRAM_MAP(saturn_cdb_map)
-	MCFG_DEVICE_DISABLE() // we're not actually using the CD Block ROM for now
-	// Attempts to use SCI, tight loops checking bit 2 of 0x5ffffc2 (TEIE)
-
 	MCFG_CDROM_ADD("cdrom")
 	MCFG_CDROM_INTERFACE("sat_cdrom")
 
@@ -2753,20 +2738,4 @@ void stvcd_device::set_tray_close()
 	tray_is_closed = 1;
 
 	popmessage("Tray Close");
-}
-
-ROM_START( stvcd )
-	ROM_REGION( 0x10000, "cdbcpu", 0 )
-	ROM_DEFAULT_BIOS("cdb106")
-	ROM_SYSTEM_BIOS( 0, "cdb106", "Saturn CD Block 1.06" )
-	ROMX_LOAD( "cdb106.bin", 0x00000, 0x10000, CRC(3681d3b0) SHA1(b3c20fbe57cd2eb595e9edac86817e5948dccae4), ROM_BIOS(1) ) // for YGR019B?
-	ROM_SYSTEM_BIOS( 1, "cdb105", "Saturn CD Block 1.05" )
-	ROMX_LOAD( "cdb105.bin", 0x00000, 0x10000, CRC(2a2ced5c) SHA1(eb8393058f324e922c11b43709b64fc6ca94ab86), ROM_BIOS(2) ) // for YGR019A?
-	ROM_SYSTEM_BIOS( 2, "ygr022", "Saturn CD Block (YGR022 315-5962)" )
-	ROMX_LOAD( "ygr022.bin", 0x00000, 0x10000, CRC(1c8b9f38) SHA1(f4f6c2aac68c352814d396ae41f81f54ad228e68), ROM_BIOS(3) ) // combined package?
-ROM_END
-
-const tiny_rom_entry *stvcd_device::device_rom_region() const
-{
-	return ROM_NAME(stvcd);
 }
