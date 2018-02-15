@@ -17,7 +17,6 @@ class atarig42_state : public atarigen_state
 public:
 	atarig42_state(const machine_config &mconfig, device_type type, const char *tag)
 		: atarigen_state(mconfig, type, tag),
-			m_maincpu(*this, "maincpu"),
 			m_jsa(*this, "jsa"),
 			m_playfield_tilemap(*this, "playfield"),
 			m_alpha_tilemap(*this, "alpha"),
@@ -25,7 +24,6 @@ public:
 			m_asic65(*this, "asic65"),
 			m_mo_command(*this, "mo_command") { }
 
-	required_device<cpu_device> m_maincpu;
 	required_device<atari_jsa_iii_device> m_jsa;
 
 	required_device<tilemap_device> m_playfield_tilemap;

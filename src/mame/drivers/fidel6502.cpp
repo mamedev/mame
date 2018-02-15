@@ -467,14 +467,12 @@ public:
 	fidel6502_state(const machine_config &mconfig, device_type type, const char *tag)
 		: fidelbase_state(mconfig, type, tag),
 		m_ppi8255(*this, "ppi8255"),
-		m_sc12_map(*this, "sc12_map"),
-		m_cart(*this, "cartslot")
+		m_sc12_map(*this, "sc12_map")
 	{ }
 
 	// devices/pointers
 	optional_device<i8255_device> m_ppi8255;
 	optional_device<address_map_bank_device> m_sc12_map;
-	optional_device<generic_slot_device> m_cart;
 
 	TIMER_DEVICE_CALLBACK_MEMBER(irq_on) { m_maincpu->set_input_line(M6502_IRQ_LINE, ASSERT_LINE); }
 	TIMER_DEVICE_CALLBACK_MEMBER(irq_off) { m_maincpu->set_input_line(M6502_IRQ_LINE, CLEAR_LINE); }

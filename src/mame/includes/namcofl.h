@@ -25,8 +25,6 @@ class namcofl_state : public namcos2_shared_state
 public:
 	namcofl_state(const machine_config &mconfig, device_type type, const char *tag)
 		: namcos2_shared_state(mconfig, type, tag),
-		m_maincpu(*this,"maincpu"),
-		m_mcu(*this,"mcu"),
 		m_c116(*this,"c116"),
 		m_in0(*this, "IN0"),
 		m_in1(*this, "IN1"),
@@ -37,8 +35,6 @@ public:
 		m_wheel(*this, "WHEEL"),
 		m_shareram(*this, "shareram", 32) { }
 
-	required_device<cpu_device> m_maincpu;
-	required_device<cpu_device> m_mcu;
 	required_device<namco_c116_device> m_c116;
 	required_ioport m_in0;
 	required_ioport m_in1;

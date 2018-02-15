@@ -87,8 +87,6 @@ public:
 	wmg_state(const machine_config &mconfig, device_type type, const char *tag)
 		: williams_state(mconfig, type, tag)
 		, m_p_ram(*this, "nvram")
-		, m_pia0(*this, "pia_0")
-		, m_pia1(*this, "pia_1")
 		, m_keyboard(*this, "X%d", 0)
 	{ }
 
@@ -114,8 +112,6 @@ private:
 	uint8_t m_wmg_port_select;
 	uint8_t m_wmg_vram_bank;
 	required_shared_ptr<uint8_t> m_p_ram;
-	required_device<pia6821_device> m_pia0;
-	required_device<pia6821_device> m_pia1;
 	required_ioport_array<17> m_keyboard;
 };
 
@@ -393,8 +389,8 @@ WRITE8_MEMBER( wmg_state::wmg_d000_w )
 	if (data == 0)
 	{
 		/* install the i/o devices into c000-cfff */
-		pia6821_device *pia0 = m_pia0;
-		pia6821_device *pia1 = m_pia1;
+		pia6821_device *pia0 = m_pia_0;
+		pia6821_device *pia1 = m_pia_1;
 
 		space.unmap_read(0xc000, 0xcfff); // throw out bank7
 		space.install_write_bank       (0xc000, 0xc00f, "bank4");
@@ -460,7 +456,7 @@ READ8_MEMBER( wmg_state::wmg_pia_0_r )
     Since there is no code in rom to handle this, it must be a hardware feature
     which probably just resets the cpu. */
 
-	uint8_t data = m_pia0->read(space, offset);
+	uint8_t data = m_pia_0->read(space, offset);
 
 	if ((m_wmg_c400) && (offset == 0) && ((data & 0x30) == 0x30))   // P1 and P2 pressed
 	{

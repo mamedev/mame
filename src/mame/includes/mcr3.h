@@ -15,7 +15,6 @@ class mcr3_state : public mcr_state
 public:
 	mcr3_state(const machine_config &mconfig, device_type type, const char *tag)
 		: mcr_state(mconfig, type, tag),
-		m_cheap_squeak_deluxe(*this, "csd"),
 		m_spyhunt_alpharam(*this, "spyhunt_alpha"),
 		m_maxrpm_adc(*this, "adc"),
 		m_lamplatch(*this, "lamplatch"),
@@ -78,7 +77,6 @@ protected:
 	virtual void video_start() override;
 
 private:
-	optional_device<midway_cheap_squeak_deluxe_device> m_cheap_squeak_deluxe;
 	optional_shared_ptr<uint8_t> m_spyhunt_alpharam;
 	optional_device<adc0844_device> m_maxrpm_adc;
 	optional_device<cd4099_device> m_lamplatch;
