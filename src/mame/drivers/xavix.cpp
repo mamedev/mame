@@ -134,10 +134,10 @@ public:
 	DECLARE_WRITE8_MEMBER(xavix_75ff_w);
 
 	DECLARE_WRITE8_MEMBER(xavix_6fc0_w);
-	DECLARE_WRITE8_MEMBER(xavix_6fc8_w);
+	DECLARE_WRITE8_MEMBER(tmap1_regs_w);
 	DECLARE_WRITE8_MEMBER(xavix_6fd8_w);
-	DECLARE_WRITE8_MEMBER(xavix_6fd7_w);
-	DECLARE_READ8_MEMBER(xavix_6fd7_r);
+	DECLARE_WRITE8_MEMBER(tmap2_regs_w);
+	DECLARE_READ8_MEMBER(tmap2_regs_r);
 
 	DECLARE_READ8_MEMBER(pal_ntsc_r);
 
@@ -181,7 +181,8 @@ private:
 	uint8_t m_vid_dma_param1[2];
 	uint8_t m_vid_dma_param2[2];
 
-	uint8_t m_6fc8_regs[8];
+	uint8_t m_tmap1_regs[8];
+	uint8_t m_tmap2_regs[8];
 
 	uint8_t m_6ff0;
 	uint8_t m_6ff8;
@@ -414,10 +415,10 @@ uint32_t xavix_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap,
 				int tile = m_mainram[count];
 				tile |= (m_mainram[count+0x100]<<8);
 				count++;
-				int bpp = 4;
+				int bpp;
 
-				if (m_6fc8_regs[0x3] == 0x36) bpp = 4;
-				else if (m_6fc8_regs[0x3] == 0x3c) bpp = 7;
+				bpp = (m_tmap1_regs[0x3] & 0x0e)>>1;
+				bpp++;
 
 				int basereg;
 
@@ -458,6 +459,9 @@ uint32_t xavix_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap,
 				count++;
 				int bpp = 4;
 
+				bpp = (m_tmap2_regs[0x3] & 0x0e)>>1;
+				bpp++;
+
 				int basereg;
 
 				if (!alt_tileaddressing)
@@ -487,6 +491,7 @@ uint32_t xavix_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap,
 			}
 		}
 	}
+
 
 	//logerror("frame\n");
 	// priority doesn't seem to be based on list order, there are bad sprite-sprite priorities with either forward or reverse
@@ -1037,12 +1042,12 @@ READ8_MEMBER(xavix_state::pal_ntsc_r)
 	//return 0x10; // PAL
 }
 
-WRITE8_MEMBER(xavix_state::xavix_6fc0_w)
+WRITE8_MEMBER(xavix_state::xavix_6fc0_w) // also related to tilemap 1?
 {
-	//logerror("%s: xavix_6fc0_w data %02x\n", machine().describe_context(), data);
+	logerror("%s: xavix_6fc0_w data %02x\n", machine().describe_context(), data);
 }
 
-WRITE8_MEMBER(xavix_state::xavix_6fc8_w)
+WRITE8_MEMBER(xavix_state::tmap1_regs_w)
 {
 	/*
 	   0x0 seems to be where the tilemap is in ram (02 in monster truck, 0f in ekara)
@@ -1065,27 +1070,31 @@ WRITE8_MEMBER(xavix_state::xavix_6fc8_w)
 
 	if ((offset != 0x4) && (offset != 0x5))
 	{
-		logerror("%s: xavix_6fc8_w offset %02x data %02x\n", machine().describe_context(), offset, data);
+		logerror("%s: tmap1_regs_w offset %02x data %02x\n", machine().describe_context(), offset, data);
 	}
 
-	COMBINE_DATA(&m_6fc8_regs[offset]);
+	COMBINE_DATA(&m_tmap1_regs[offset]);
 }
 
-WRITE8_MEMBER(xavix_state::xavix_6fd8_w)
+WRITE8_MEMBER(xavix_state::xavix_6fd8_w) // also related to tilemap 2?
 {
 	logerror("%s: xavix_6fd8_w data %02x\n", machine().describe_context(), data);
 }
 
-WRITE8_MEMBER(xavix_state::xavix_6fd7_w)
+WRITE8_MEMBER(xavix_state::tmap2_regs_w)
 {
-	// mode for 2nd tilemap?
-	logerror("%s: xavix_6fd7_w data %02x\n", machine().describe_context(), data);
+	// same as above but for 2nd tilemap
+	logerror("%s: tmap2_regs_w offset %02x data %02x\n", machine().describe_context(), offset, data);
+
+	COMBINE_DATA(&m_tmap2_regs[offset]);
 }
 
-READ8_MEMBER(xavix_state::xavix_6fd7_r)
+READ8_MEMBER(xavix_state::tmap2_regs_r)
 {
-	logerror("%s: xavix_6fd7_r\n", machine().describe_context());
-	return machine().rand();
+	// does this return the same data or a status?
+
+	logerror("%s: tmap2_regs_r offset %02x\n", offset, machine().describe_context());
+	return m_tmap2_regs[offset];
 }
 
 
@@ -1112,9 +1121,9 @@ ADDRESS_MAP_START(xavix_state::xavix_map)
 	
 	AM_RANGE(0x006fc0, 0x006fc0) AM_WRITE(xavix_6fc0_w) // startup
 
-	AM_RANGE(0x006fc8, 0x006fcf) AM_WRITE(xavix_6fc8_w) // video registers
+	AM_RANGE(0x006fc8, 0x006fcf) AM_WRITE(tmap1_regs_w) // video registers
 
-	AM_RANGE(0x006fd7, 0x006fd7) AM_READWRITE(xavix_6fd7_r, xavix_6fd7_w)
+	AM_RANGE(0x006fd0, 0x006fd7) AM_READWRITE(tmap2_regs_r, tmap2_regs_w)
 	AM_RANGE(0x006fd8, 0x006fd8) AM_WRITE(xavix_6fd8_w) // startup (taitons1)
 	
 	AM_RANGE(0x006fe0, 0x006fe0) AM_READWRITE(vid_dma_trigger_r, vid_dma_trigger_w) // after writing to 6fe1/6fe2 and 6fe5/6fe6 rad_mtrk writes 0x43/0x44 here then polls on 0x40   (see function call at c273) write values are hardcoded, similar code at 18401
@@ -1392,7 +1401,10 @@ void xavix_state::machine_reset()
 	}
 
 	for (int i = 0; i < 8; i++)
-		m_6fc8_regs[i] = 0;
+	{
+		m_tmap1_regs[i] = 0;
+		m_tmap2_regs[i] = 0;
+	}
 }
 
 typedef device_delegate<uint8_t (int which, int half)> xavix_interrupt_vector_delegate;
