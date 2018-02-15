@@ -336,13 +336,13 @@ WRITE8_MEMBER( c1p_state::osi630_ctrl_w )
 
 	*/
 
-	m_beep->set_state(BIT(data, 1));
+	m_beeper->set_state(BIT(data, 1));
 }
 
 WRITE8_MEMBER( c1p_state::osi630_sound_w )
 {
 	if (data != 0)
-		m_beep->set_clock(49152 / data);
+		m_beeper->set_clock(49152 / data);
 }
 
 /* Disk Drive */
@@ -868,7 +868,7 @@ ROM_END
 
 /* Driver Initialization */
 
-void sb2m600_state::device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr)
+void c1p_state::device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr)
 {
 	switch (id)
 	{
