@@ -2670,6 +2670,8 @@ backfirea                       // MBZ (c) 1995
 
 @source:badlands.cpp
 badlands                        // 136074           (c) 1989
+
+@source:badlandsbl.cpp
 badlandsb                       // bootleg
 badlandsb2                      // bootleg set 2
 
