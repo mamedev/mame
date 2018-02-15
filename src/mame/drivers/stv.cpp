@@ -41,11 +41,9 @@
 #include "cpu/m68000/m68000.h"
 #include "cpu/scudsp/scudsp.h"
 #include "cpu/sh/sh2.h"
-#include "imagedev/chd_cd.h"
 #include "machine/smpc.h"
 #include "machine/stvcd.h"
 #include "machine/stvprot.h"
-#include "sound/cdda.h"
 #include "sound/scsp.h"
 
 #include "screen.h"
@@ -1133,7 +1131,7 @@ MACHINE_CONFIG_START(stv_state::stvcd)
 	MCFG_CPU_PROGRAM_MAP(stvcd_mem)
 	MCFG_DEVICE_MODIFY("slave")
 	MCFG_CPU_PROGRAM_MAP(stvcd_mem)
-	MCFG_DEVICE_ADD("stvcd", STVCD, 0)
+	MCFG_DEVICE_ADD("stvcd", STVCD, 16000000)
 	//MCFG_SOUND_ROUTE(0, "lspeaker", 1.0)
 	//MCFG_SOUND_ROUTE(1, "rspeaker", 1.0)
 MACHINE_CONFIG_END
