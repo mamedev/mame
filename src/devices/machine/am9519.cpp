@@ -224,7 +224,7 @@ WRITE8_MEMBER( am9519_device::cmd_w )
 
 WRITE8_MEMBER( am9519_device::data_w )
 {
-	if((m_cmd & 0xf0) > 0xb0)
+	if((m_cmd & 0xf0) >= 0xb0)
 	{
 		switch(m_cmd >> 4)
 		{
@@ -246,6 +246,7 @@ WRITE8_MEMBER( am9519_device::data_w )
 		}
 		m_cmd = 0;
 	}
+	set_timer();
 }
 
 //-------------------------------------------------
