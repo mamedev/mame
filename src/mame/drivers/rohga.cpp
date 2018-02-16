@@ -104,6 +104,13 @@
 
     TODO:
         nitrobal : blending, priority function wrong
+        wizdfire : Wizard Fire and Dark Seal 2 use the same mask ROM for
+    ADPCM speech samples. Sample banks 0/1 are used for the Japanese
+    version and 2/3 are used for the English version, whose ROM loading
+    currently works around this by swapping the banks. It seems likely that
+    the ROM's highest-order address line is not software-controlled, but
+    either pulled high or grounded by an optional jumper. The PCB should
+    be examined to determine what part it actually connects to.
 
 ***************************************************************************/
 
@@ -1542,7 +1549,6 @@ ROM_START( wizdfire )
 	ROM_LOAD16_BYTE( "mas09", 0x000000, 0x080000,  CRC(5f6deb41) SHA1(850d0e157b4355e866ec770a2012293b2c55648f) )
 
 	ROM_REGION(0x100000, "oki1", 0 ) /* Oki samples */
-	// hack, sample banks 0/1 are used for the Japanese version and 2/3 are used for the English version, I can't find the bankswitch, so swap the halves.
 	ROM_LOAD( "mas10",  0x80000,  0x80000,  CRC(f4b4c8a1) SHA1(c9e80c55e42a78e358b6b14dadc3be7b28bd5d62) )
 	ROM_CONTINUE(0x00000, 0x80000)
 
@@ -1588,7 +1594,6 @@ ROM_START( wizdfireu )
 	ROM_LOAD16_BYTE( "mas09", 0x000000, 0x080000,  CRC(5f6deb41) SHA1(850d0e157b4355e866ec770a2012293b2c55648f) )
 
 	ROM_REGION(0x100000, "oki1", 0 ) /* Oki samples */
-	// hack, sample banks 0/1 are used for the Japanese version and 2/3 are used for the English version, I can't find the bankswitch, so swap the halves
 	ROM_LOAD( "mas10",  0x80000,  0x80000,  CRC(f4b4c8a1) SHA1(c9e80c55e42a78e358b6b14dadc3be7b28bd5d62) )
 	ROM_CONTINUE(0x00000, 0x80000)
 
