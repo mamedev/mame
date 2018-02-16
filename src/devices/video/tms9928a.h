@@ -112,7 +112,6 @@ public:
 	/* RESET pin */
 	void reset_line(int state) { if (state==ASSERT_LINE) device_reset(); }
 
-	void memmap(address_map &map);
 protected:
 	tms9928a_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock, bool is_50hz, bool is_reva, bool is_99);
 
@@ -130,6 +129,8 @@ private:
 	void update_backdrop();
 	void update_table_masks();
 	void set_palette();
+
+	void memmap(address_map &map);
 
 	static const device_timer_id TIMER_LINE = 0;
 	static const device_timer_id GROMCLK = 1;
