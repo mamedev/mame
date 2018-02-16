@@ -35,15 +35,17 @@
 
 #include "emu.h"
 #include "cpu/z80/z80.h"
+#include "cpu/i8085/i8085.h"
 #include "machine/keyboard.h"
 #include "video/upd3301.h"
 #include "machine/i8257.h"
 #include "machine/i8255.h"
 #include "machine/am9519.h"
 #include "machine/upd765.h"
+#include "machine/pic8259.h"
+#include "machine/i8251.h"
 #include "screen.h"
 
-#define Z80_TAG         "z80"
 #define UPD3301_TAG     "upd3301"
 #define I8257_TAG       "i8257"
 #define SCREEN_TAG		"screen"
@@ -57,25 +59,28 @@ class olyboss_state : public driver_device
 public:
 	olyboss_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag),
-			m_maincpu(*this, Z80_TAG),
+			m_maincpu(*this, "maincpu"),
 			m_dma(*this, I8257_TAG),
 			m_crtc(*this,UPD3301_TAG),
 			m_fdc(*this, "fdc"),
 			m_uic(*this, "uic"),
+			m_pic(*this, "pic"),
 			m_ppi(*this, "ppi"),
+			m_fdd0(*this, "fdc:0"),
+			m_fdd1(*this, "fdc:1"),
 			m_rom(*this, "mainrom"),
 			m_lowram(*this, "lowram"),
 			m_char_rom(*this, UPD3301_TAG)
 		{ }
 
 public:
+	void bossb85(machine_config &config);
 	void olybossb(machine_config &config);
 	void olybossc(machine_config &config);
 	void olybossd(machine_config &config);
 
 protected:
 	virtual void machine_start() override;
-	virtual void machine_reset() override;
 	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr) override;
 
 private:
@@ -97,15 +102,24 @@ private:
 	DECLARE_WRITE8_MEMBER( vchrmap_w );
 	DECLARE_WRITE8_MEMBER( vchrram_w );
 	DECLARE_WRITE8_MEMBER( ppic_w );
+	DECLARE_WRITE8_MEMBER( romctrl_w );
 	void olyboss_io(address_map &map);
 	void olyboss_mem(address_map &map);
+	void olyboss85_io(address_map &map);
+	void olyboss85_mem(address_map &map);
+
+	DECLARE_MACHINE_RESET(bossz80);
+	DECLARE_MACHINE_RESET(boss8085);
 	
 	required_device<cpu_device> m_maincpu;
 	required_device<i8257_device> m_dma;
 	required_device<upd3301_device> m_crtc;
 	required_device<upd765a_device> m_fdc;
-	required_device<am9519_device> m_uic;
-	required_device<i8255_device> m_ppi;
+	optional_device<am9519_device> m_uic;
+	optional_device<pic8259_device> m_pic;
+	optional_device<i8255_device> m_ppi;
+	required_device<floppy_connector> m_fdd0;
+	optional_device<floppy_connector> m_fdd1;
 	required_memory_region m_rom;
 	required_shared_ptr<u8> m_lowram;
 	required_memory_region m_char_rom;
@@ -113,11 +127,34 @@ private:
 	bool m_keybhit;
 	u8 m_keystroke;
 	void keyboard_put(u8 data);	
-	u8 m_fdcctrl;
+	void keyboard85_put(u8 data);
+	u8 m_fdcctrl, m_fdctype;
 	u8 m_channel, m_vchrmap, m_vchrpage;
 	u8 m_vchrram[0x800];
+	bool m_romen;
 	emu_timer *m_timer;
 };
+
+MACHINE_RESET_MEMBER(olyboss_state,bossz80)
+{
+	m_keybhit=false;
+	m_romen = true;
+
+	m_fdcctrl = 0;
+	m_vchrmap = 0;
+	m_vchrpage = 0;
+	m_timer->adjust(attotime::from_hz(60), 0, attotime::from_hz(60)); // unknown timer freq, possibly com2651 BRCLK
+}
+
+MACHINE_RESET_MEMBER(olyboss_state,boss8085)
+{
+	m_keybhit=false;
+	m_romen = true;
+
+	m_fdcctrl = 0;
+	m_vchrmap = 0;
+	m_vchrpage = 0;
+}
 
 void olyboss_state::device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr)
 {
@@ -150,13 +187,29 @@ ADDRESS_MAP_START(olyboss_state::olyboss_io)
 	AM_RANGE(0x90, 0x9f) AM_WRITE(vchrram_w)
 ADDRESS_MAP_END
 
+ADDRESS_MAP_START(olyboss_state::olyboss85_mem)
+	AM_RANGE(0x0000, 0x7ff ) AM_READWRITE(rom_r, rom_w) AM_SHARE("lowram")
+	AM_RANGE(0x800,  0xbfff) AM_RAM
+ADDRESS_MAP_END
+
+ADDRESS_MAP_START(olyboss_state::olyboss85_io)
+	ADDRESS_MAP_GLOBAL_MASK(0xff)
+	ADDRESS_MAP_UNMAP_HIGH
+	AM_RANGE(0x0, 0x8) AM_DEVREADWRITE(I8257_TAG, i8257_device, read, write)
+	AM_RANGE(0x10, 0x11) AM_DEVICE("fdc", upd765a_device, map)
+	AM_RANGE(0x20, 0x21) AM_DEVREADWRITE(UPD3301_TAG, upd3301_device, read, write)
+	AM_RANGE(0x30, 0x31) AM_DEVREADWRITE("pic", pic8259_device, read, write)
+//	AM_RANGE(0x45, 0x45) AM_WRITE(romctrl_w)
+	//AM_RANGE(0x50, 0x53) COM2651
+ADDRESS_MAP_END
+
 static INPUT_PORTS_START( olyboss )
 	PORT_START("DSW")
 INPUT_PORTS_END
 
 READ8_MEMBER( olyboss_state::rom_r )
 {
-	return (m_fdcctrl & 1) ? m_lowram[offset] : m_rom->as_u8(offset);
+	return m_romen ?  m_rom->as_u8(offset) : m_lowram[offset];
 }
 
 WRITE8_MEMBER( olyboss_state::rom_w )
@@ -180,6 +233,11 @@ WRITE8_MEMBER( olyboss_state::vchrmap_w )
 WRITE8_MEMBER( olyboss_state::vchrram_w )
 {
 	m_vchrram[(m_vchrpage << 4) + (offset ^ 0xf)] = data;
+}
+
+WRITE8_MEMBER( olyboss_state::romctrl_w )
+{
+	m_romen = data != 0;
 }
 
 //**************************************************************************
@@ -233,16 +291,11 @@ WRITE8_MEMBER( olyboss_state::ppic_w )
 void olyboss_state::machine_start()
 {
 	m_timer = timer_alloc();
-}
-
-void olyboss_state::machine_reset()
-{
-	m_keybhit=false;
-
-	m_fdcctrl = 0;
-	m_vchrmap = 0;
-	m_vchrpage = 0;
-	m_timer->adjust(attotime::from_hz(60), 0, attotime::from_hz(60)); // unknown timer freq, possibly com2651 BRCLK
+	const char *type = m_fdd0->get_device()->shortname();
+	if(!strncmp(type, "floppy_525_qd", 13))
+		m_fdctype = 0xa0;
+	else
+		m_fdctype = 0x80;
 }
 
 void olyboss_state::keyboard_put(u8 data)
@@ -255,6 +308,10 @@ void olyboss_state::keyboard_put(u8 data)
 		m_ppi->pc4_w(ASSERT_LINE);
 		m_ppi->pc4_w(CLEAR_LINE);
 	}
+}
+
+void olyboss_state::keyboard85_put(u8 data)
+{
 }
 
 /* 8257 Interface */
@@ -307,13 +364,16 @@ WRITE8_MEMBER( olyboss_state::crtcdma_w )
 
 READ8_MEMBER( olyboss_state::fdcctrl_r )
 {
-	return m_fdcctrl | 0xa0; // 0xc0 seems to indicate an 8" drive, 0x80 a 5.25" dd drive
+	return m_fdcctrl | m_fdctype; // 0xc0 seems to indicate an 8" drive, 0x80 a 5.25" dd drive, 0xa0 a 5.25" qd drive
 }
 
 WRITE8_MEMBER( olyboss_state::fdcctrl_w )
 {
 	m_fdcctrl = data;
-	m_fdc->subdevice<floppy_connector>("0")->get_device()->mon_w(!(data & 2));
+	m_romen = (m_fdcctrl & 1) ? false : true;
+	m_fdd0->get_device()->mon_w(!(data & 2));
+	if(m_fdd1)
+		m_fdd1->get_device()->mon_w(!(data & 4));
 }
 
 static SLOT_INTERFACE_START( bossb_floppies )
@@ -329,10 +389,12 @@ SLOT_INTERFACE_END
 //**************************************************************************
 
 MACHINE_CONFIG_START( olyboss_state::olybossd )
-	MCFG_CPU_ADD(Z80_TAG, Z80, 4_MHz_XTAL)
+	MCFG_CPU_ADD("maincpu", Z80, 4_MHz_XTAL)
 	MCFG_CPU_PROGRAM_MAP(olyboss_mem)
 	MCFG_CPU_IO_MAP(olyboss_io)
 	MCFG_CPU_IRQ_ACKNOWLEDGE_DEVICE("uic", am9519_device, iack_cb)
+
+	MCFG_MACHINE_RESET_OVERRIDE(olyboss_state, bossz80)
 
 	/* video hardware */
 
@@ -345,7 +407,7 @@ MACHINE_CONFIG_START( olyboss_state::olybossd )
 	/* devices */
 
 	MCFG_DEVICE_ADD("uic", AM9519, 0)
-	MCFG_AM9519_OUT_INT_CB(INPUTLINE(Z80_TAG, 0))
+	MCFG_AM9519_OUT_INT_CB(INPUTLINE("maincpu", 0))
 
 	MCFG_UPD765A_ADD("fdc", true, true)
 	MCFG_UPD765_INTRQ_CALLBACK(DEVWRITELINE("uic", am9519_device, ireq2_w)) MCFG_DEVCB_INVERT
@@ -392,10 +454,66 @@ MACHINE_CONFIG_START( olyboss_state::olybossc )
 	MCFG_FLOPPY_DRIVE_ADD("fdc:1", bosscd_floppies, "525qd", floppy_image_device::default_floppy_formats)
 	MCFG_FLOPPY_DRIVE_SOUND(true)
 MACHINE_CONFIG_END
-	
+
+MACHINE_CONFIG_START( olyboss_state::bossb85 )
+	MCFG_CPU_ADD("maincpu", I8085A, 4_MHz_XTAL)
+	MCFG_CPU_PROGRAM_MAP(olyboss85_mem)
+	MCFG_CPU_IO_MAP(olyboss85_io)
+	MCFG_CPU_IRQ_ACKNOWLEDGE_DEVICE("pic", pic8259_device, inta_cb)
+
+	MCFG_MACHINE_RESET_OVERRIDE(olyboss_state, boss8085)
+	/* video hardware */
+
+	MCFG_SCREEN_ADD(SCREEN_TAG, RASTER)
+	MCFG_SCREEN_REFRESH_RATE(60)
+	MCFG_SCREEN_UPDATE_DEVICE(UPD3301_TAG, upd3301_device, screen_update)
+	MCFG_SCREEN_SIZE(80*8, 28*11)
+	MCFG_SCREEN_VISIBLE_AREA(0, (80*8)-1, 0, (28*11)-1)
+
+	/* devices */
+
+	MCFG_DEVICE_ADD("pic", PIC8259, 0)
+	MCFG_PIC8259_OUT_INT_CB(INPUTLINE("maincpu", 0))
+
+	MCFG_UPD765A_ADD("fdc", true, true)
+	//MCFG_UPD765_INTRQ_CALLBACK(DEVWRITELINE("pic", pic8259_device, ir2_w))
+	MCFG_UPD765_DRQ_CALLBACK(DEVWRITELINE(I8257_TAG, i8257_device, dreq0_w))
+	MCFG_FLOPPY_DRIVE_ADD("fdc:0", bossb_floppies, "525dd", floppy_image_device::default_floppy_formats)
+	MCFG_FLOPPY_DRIVE_SOUND(true)
+
+	MCFG_DEVICE_ADD(I8257_TAG, I8257, XTAL(4'000'000))
+	MCFG_I8257_OUT_HRQ_CB(WRITELINE(olyboss_state, hrq_w))
+	MCFG_I8257_IN_MEMR_CB(READ8(olyboss_state, dma_mem_r))
+	MCFG_I8257_OUT_MEMW_CB(WRITE8(olyboss_state, dma_mem_w))
+	MCFG_I8257_IN_IOR_0_CB(READ8(olyboss_state, fdcdma_r))
+	MCFG_I8257_OUT_IOW_0_CB(WRITE8(olyboss_state, fdcdma_w))
+	MCFG_I8257_OUT_IOW_2_CB(WRITE8(olyboss_state, crtcdma_w))
+	MCFG_I8257_OUT_TC_CB(WRITELINE(olyboss_state, tc_w))
+
+	MCFG_DEVICE_ADD(UPD3301_TAG, UPD3301, XTAL(14'318'181))
+	MCFG_UPD3301_CHARACTER_WIDTH(8)
+	MCFG_UPD3301_DRAW_CHARACTER_CALLBACK_OWNER(olyboss_state, olyboss_display_pixels)
+	MCFG_UPD3301_DRQ_CALLBACK(DEVWRITELINE(I8257_TAG, i8257_device, dreq2_w))
+	MCFG_UPD3301_INT_CALLBACK(DEVWRITELINE("pic", pic8259_device, ir1_w))
+	MCFG_VIDEO_SET_SCREEN(SCREEN_TAG)
+
+	/* keyboard */
+	MCFG_DEVICE_ADD("keyboard", GENERIC_KEYBOARD, 0)
+	MCFG_GENERIC_KEYBOARD_CB(PUT(olyboss_state, keyboard85_put))
+MACHINE_CONFIG_END
+
 //**************************************************************************
 //  ROM DEFINITIONS
 //**************************************************************************
+
+
+ROM_START( bossb85 )
+	ROM_REGION(0x800, "mainrom", ROMREGION_ERASEFF)
+	ROM_LOAD( "boss_8085_bios.bin", 0x0000, 0x800, CRC(43030231) SHA1(a1f6546a9dc1066324e93e5eed886f2313678180) )
+
+	ROM_REGION( 0x800, UPD3301_TAG, 0)
+	ROM_LOAD( "olympia_boss_graphics_251-461.bin", 0x0000, 0x800, CRC(56149540) SHA1(b2b893bd219308fc98a38528beb7ddae391c7609) )
+ROM_END
 
 ROM_START( olybossb )											// verified: BOSS B uses the same ROMs as D, so C is safe to assume as well
 	ROM_REGION(0x800, "mainrom", ROMREGION_ERASEFF)
@@ -427,6 +545,7 @@ ROM_END
 //**************************************************************************
 
 //   YEAR  NAME			PARENT	COMPAT	MACHINE		INPUT		CLASS			INIT		COMPANY						FULLNAME			FLAGS
+COMP(1981, bossb85,		olybossd,	0,		bossb85,	olyboss,	olyboss_state,	0,	"Olympia International",	"Olympia BOSS B 8085",	MACHINE_NOT_WORKING | MACHINE_NO_SOUND )
 COMP(1981, olybossb,	olybossd,	0,		olybossb,	olyboss,	olyboss_state,	0,	"Olympia International",	"Olympia BOSS B",	MACHINE_NOT_WORKING | MACHINE_NO_SOUND )
 COMP(1981, olybossc,	olybossd,	0,		olybossc,	olyboss,	olyboss_state,	0,	"Olympia International",	"Olympia BOSS C",	MACHINE_NOT_WORKING | MACHINE_NO_SOUND )
 COMP(1981, olybossd,	0,			0,		olybossd,	olyboss,	olyboss_state,	0,	"Olympia International",	"Olympia BOSS D",	MACHINE_NOT_WORKING | MACHINE_NO_SOUND )
