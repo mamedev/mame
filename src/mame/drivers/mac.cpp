@@ -2367,4 +2367,4 @@ COMP( 1993, maclc3,   0,        0,      maclc3,   maciici, mac_state,  maclc3,  
 COMP( 1993, maciivx,  0,        0,      maciivx,  maciici, mac_state,  maciivx,      "Apple Computer", "Macintosh IIvx", MACHINE_IMPERFECT_SOUND )
 COMP( 1993, maciivi,  maciivx,  0,      maciivi,  maciici, mac_state,  maciivx,      "Apple Computer", "Macintosh IIvi", MACHINE_IMPERFECT_SOUND )
 COMP( 1993, maclc520, 0,        0,      maclc520, maciici, mac_state,  maclc520,     "Apple Computer", "Macintosh LC 520",  MACHINE_NOT_WORKING )
-COMP( 1994, pmac6100, 0,        0,      pwrmac,   macadb,  mac_state,  macpm6100,    "Apple Computer", "Power Macintosh 6100/60",  MACHINE_NOT_WORKING | MACHINE_NO_SOUND )
+COMP( 1994, pmac6100, 0,        0,      pwrmac,   macadb,  mac_state,  macpm6100,    "Apple Computer", "Power Macintosh 6100/60",  MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND )
