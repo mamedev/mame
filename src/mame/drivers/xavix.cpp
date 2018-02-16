@@ -345,7 +345,7 @@ void xavix_state::draw_tile(screen_device &screen, bitmap_ind16 &bitmap, const r
 
 			if (flipx)
 			{
-				col = xpos - x;
+				col = xpos + (drawwidth-1) - x;
 			}
 			else
 			{
