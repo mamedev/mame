@@ -90,6 +90,7 @@ private:
 
 	DECLARE_WRITE_LINE_MEMBER( hrq_w );
 	DECLARE_WRITE_LINE_MEMBER( tc_w );
+	DECLARE_WRITE_LINE_MEMBER( romdis_w );
 	DECLARE_READ8_MEMBER( dma_mem_r );
 	DECLARE_WRITE8_MEMBER( dma_mem_w );
 	DECLARE_READ8_MEMBER( fdcctrl_r );
@@ -238,6 +239,12 @@ WRITE8_MEMBER( olyboss_state::vchrram_w )
 WRITE8_MEMBER( olyboss_state::romctrl_w )
 {
 	m_romen = data != 0;
+}
+
+WRITE_LINE_MEMBER( olyboss_state::romdis_w )
+{
+	if(state)
+		m_romen = false;
 }
 
 //**************************************************************************
@@ -460,6 +467,7 @@ MACHINE_CONFIG_START( olyboss_state::bossb85 )
 	MCFG_CPU_PROGRAM_MAP(olyboss85_mem)
 	MCFG_CPU_IO_MAP(olyboss85_io)
 	MCFG_CPU_IRQ_ACKNOWLEDGE_DEVICE("pic", pic8259_device, inta_cb)
+	MCFG_I8085A_SOD(WRITELINE(olyboss_state, romdis_w))
 
 	MCFG_MACHINE_RESET_OVERRIDE(olyboss_state, boss8085)
 	/* video hardware */
@@ -494,7 +502,7 @@ MACHINE_CONFIG_START( olyboss_state::bossb85 )
 	MCFG_UPD3301_CHARACTER_WIDTH(8)
 	MCFG_UPD3301_DRAW_CHARACTER_CALLBACK_OWNER(olyboss_state, olyboss_display_pixels)
 	MCFG_UPD3301_DRQ_CALLBACK(DEVWRITELINE(I8257_TAG, i8257_device, dreq2_w))
-	MCFG_UPD3301_INT_CALLBACK(DEVWRITELINE("pic", pic8259_device, ir1_w))
+	MCFG_UPD3301_INT_CALLBACK(INPUTLINE("maincpu", I8085_RST75_LINE))
 	MCFG_VIDEO_SET_SCREEN(SCREEN_TAG)
 
 	/* keyboard */
