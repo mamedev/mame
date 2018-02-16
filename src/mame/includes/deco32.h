@@ -77,13 +77,13 @@ public:
 	DECLARE_WRITE8_MEMBER(volume_w);
 	DECLARE_WRITE32_MEMBER(vblank_ack_w);
 
-	template <int Chip> DECLARE_WRITE32_MEMBER(pf_rowscroll_w);
+	template<int Chip> DECLARE_WRITE32_MEMBER(pf_rowscroll_w);
 	DECLARE_WRITE8_MEMBER(sound_bankswitch_w);
 
 	// captaven, fghthist, nslasher and tattass
-	template <int Chip> DECLARE_READ32_MEMBER(spriteram_r);
-	template <int Chip> DECLARE_WRITE32_MEMBER(spriteram_w);
-	template <int Chip> DECLARE_WRITE32_MEMBER(buffer_spriteram_w);
+	template<int Chip> DECLARE_READ32_MEMBER(spriteram_r);
+	template<int Chip> DECLARE_WRITE32_MEMBER(spriteram_w);
+	template<int Chip> DECLARE_WRITE32_MEMBER(buffer_spriteram_w);
 	DECLARE_WRITE32_MEMBER(pri_w);
 
 	// all but captaven

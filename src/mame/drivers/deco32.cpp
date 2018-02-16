@@ -806,13 +806,13 @@ WRITE32_MEMBER( deco32_state::vblank_ack_w )
 	m_maincpu->set_input_line(ARM_IRQ_LINE, CLEAR_LINE);
 }
 
-template <int Chip>
+template<int Chip>
 READ32_MEMBER(deco32_state::spriteram_r)
 {
 	return m_spriteram16[Chip][offset] ^ 0xffff0000;
 }
 
-template <int Chip>
+template<int Chip>
 WRITE32_MEMBER(deco32_state::spriteram_w)
 {
 	data &= 0x0000ffff;
@@ -820,7 +820,7 @@ WRITE32_MEMBER(deco32_state::spriteram_w)
 	COMBINE_DATA(&m_spriteram16[Chip][offset]);
 }
 
-template <int Chip>
+template<int Chip>
 WRITE32_MEMBER(deco32_state::buffer_spriteram_w)
 {
 	std::copy(&m_spriteram16[Chip][0], &m_spriteram16[Chip][0x2000/4], &m_spriteram16_buffered[Chip][0]);
