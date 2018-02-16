@@ -167,17 +167,17 @@ WRITE16_MEMBER(gaiden_state::gaiden_sound_command_w)
 /* and reads the answer from 0x07a007. The returned values contain the address of */
 /* a function to jump to. */
 
+static const int wildfang_jumppoints[17] =
+{
+	0x0c0c,0x0cac,0x0d42,0x0da2,0x0eea,0x112e,0x1300,0x13fa,
+	0x159a,0x1630,0x109a,0x1700,0x1750,0x1806,0x18d6,0x1a44,
+	0x1b52
+};
+
 WRITE16_MEMBER(gaiden_state::wildfang_protection_w)
 {
 	if (ACCESSING_BITS_8_15)
 	{
-		static const int jumppoints[] =
-		{
-			0x0c0c,0x0cac,0x0d42,0x0da2,0x0eea,0x112e,0x1300,0x13fa,
-			0x159a,0x1630,0x109a,0x1700,0x1750,0x1806,0x18d6,0x1a44,
-			0x1b52
-		};
-
 		data >>= 8;
 
 //      logerror("PC %06x: prot = %02x\n",m_maincpu->pc(),data);
@@ -193,7 +193,7 @@ WRITE16_MEMBER(gaiden_state::wildfang_protection_w)
 				break;
 			case 0x20:  /* low 4 bits of jump code */
 				m_jumpcode |= data & 0x0f;
-				if (m_jumpcode >= ARRAY_LENGTH(jumppoints))
+				if (m_jumpcode >= 17)
 				{
 					logerror("unknown jumpcode %02x\n", m_jumpcode);
 					m_jumpcode = 0;
@@ -201,16 +201,16 @@ WRITE16_MEMBER(gaiden_state::wildfang_protection_w)
 				m_prot = 0x20;
 				break;
 			case 0x30:  /* ask for bits 12-15 of function address */
-				m_prot = 0x40 | ((jumppoints[m_jumpcode] >> 12) & 0x0f);
+				m_prot = 0x40 | ((m_jumppoints[m_jumpcode] >> 12) & 0x0f);
 				break;
 			case 0x40:  /* ask for bits 8-11 of function address */
-				m_prot = 0x50 | ((jumppoints[m_jumpcode] >> 8) & 0x0f);
+				m_prot = 0x50 | ((m_jumppoints[m_jumpcode] >> 8) & 0x0f);
 				break;
 			case 0x50:  /* ask for bits 4-7 of function address */
-				m_prot = 0x60 | ((jumppoints[m_jumpcode] >> 4) & 0x0f);
+				m_prot = 0x60 | ((m_jumppoints[m_jumpcode] >> 4) & 0x0f);
 				break;
 			case 0x60:  /* ask for bits 0-3 of function address */
-				m_prot = 0x70 | ((jumppoints[m_jumpcode] >> 0) & 0x0f);
+				m_prot = 0x70 | ((m_jumppoints[m_jumpcode] >> 0) & 0x0f);
 				break;
 		}
 	}
@@ -268,7 +268,7 @@ same commands as some of the above
 */
 
 /* these are used during startup */
-static const int jumppoints_00[0x100] =
+static const int raiga_jumppoints_00[0x100] =
 {
 	0x6669,    -1,    -1,    -1,    -1,    -1,    -1,    -1,
 		-1,    -1,    -1,    -1,    -1,    -1,0x4a46,    -1,
@@ -281,7 +281,7 @@ static const int jumppoints_00[0x100] =
 };
 
 /* these are used the rest of the time */
-static const int jumppoints_other[0x100] =
+static const int raiga_jumppoints_other[0x100] =
 {
 	0x5457,0x494e,0x5f4b,0x4149,0x5345,0x525f,0x4d49,0x5941,
 	0x5241,0x5349,0x4d4f,0x4a49,    -1,    -1,    -1,    -1,
@@ -314,7 +314,7 @@ void gaiden_state::machine_reset()
 MACHINE_RESET_MEMBER(gaiden_state,raiga)
 {
 	gaiden_state::machine_reset()
-	m_raiga_jumppoints = jumppoints_00;
+	m_jumppoints = raiga_jumppoints_00;
 }
 
 void gaiden_state::machine_start()
@@ -356,12 +356,12 @@ WRITE16_MEMBER(gaiden_state::raiga_protection_w)
 				m_jumpcode |= data & 0x0f;
 				logerror("requested protection jumpcode %02x\n", m_jumpcode);
 //              m_jumpcode = 0;
-				if (m_raiga_jumppoints[m_jumpcode] == -2)
+				if (m_jumppoints[m_jumpcode] == -2)
 				{
-					m_raiga_jumppoints = jumppoints_other;
+					m_jumppoints = raiga_jumppoints_other;
 				}
 
-				if (m_raiga_jumppoints[m_jumpcode] == -1)
+				if (m_jumppoints[m_jumpcode] == -1)
 				{
 					logerror("unknown jumpcode %02x\n", m_jumpcode);
 					popmessage("unknown jumpcode %02x", m_jumpcode);
@@ -370,16 +370,16 @@ WRITE16_MEMBER(gaiden_state::raiga_protection_w)
 				m_prot = 0x20;
 				break;
 			case 0x30:  /* ask for bits 12-15 of function address */
-				m_prot = 0x40 | ((m_raiga_jumppoints[m_jumpcode] >> 12) & 0x0f);
+				m_prot = 0x40 | ((m_jumppoints[m_jumpcode] >> 12) & 0x0f);
 				break;
 			case 0x40:  /* ask for bits 8-11 of function address */
-				m_prot = 0x50 | ((m_raiga_jumppoints[m_jumpcode] >> 8) & 0x0f);
+				m_prot = 0x50 | ((m_jumppoints[m_jumpcode] >> 8) & 0x0f);
 				break;
 			case 0x50:  /* ask for bits 4-7 of function address */
-				m_prot = 0x60 | ((m_raiga_jumppoints[m_jumpcode] >> 4) & 0x0f);
+				m_prot = 0x60 | ((m_jumppoints[m_jumpcode] >> 4) & 0x0f);
 				break;
 			case 0x60:  /* ask for bits 0-3 of function address */
-				m_prot = 0x70 | ((m_raiga_jumppoints[m_jumpcode] >> 0) & 0x0f);
+				m_prot = 0x70 | ((m_jumppoints[m_jumpcode] >> 0) & 0x0f);
 				break;
 		}
 	}
@@ -1592,18 +1592,21 @@ ROM_END
 
 DRIVER_INIT_MEMBER(gaiden_state,shadoww)
 {
+	m_jumppoints = wildfang_jumppoints;
 	/* sprite size Y = sprite size X */
 	m_sprite_sizey = 0;
 }
 
 DRIVER_INIT_MEMBER(gaiden_state,wildfang)
 {
+	m_jumppoints = wildfang_jumppoints;
 	/* sprite size Y = sprite size X */
 	m_sprite_sizey = 0;
 }
 
 DRIVER_INIT_MEMBER(gaiden_state,raiga)
 {
+	m_jumppoints = raiga_jumppoints_00;
 	/* sprite size Y independent from sprite size X */
 	m_sprite_sizey = 2;
 }
@@ -1650,11 +1653,13 @@ void gaiden_state::descramble_drgnbowl(int descramble_cpu)
 
 DRIVER_INIT_MEMBER(gaiden_state,drgnbowl)
 {
+	m_jumppoints = wildfang_jumppoints;
 	descramble_drgnbowl(1);
 }
 
 DRIVER_INIT_MEMBER(gaiden_state,drgnbowla)
 {
+	m_jumppoints = wildfang_jumppoints;
 	descramble_drgnbowl(0);
 }
 

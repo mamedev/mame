@@ -22,7 +22,6 @@ public:
 		m_videoram(*this, "videoram%u", 1),
 		m_spriteram(*this, "spriteram"),
 		m_adpcm_bank(*this, "adpcm_bank"),
-		m_raiga_jumppoints(nullptr),
 		m_maincpu(*this, "maincpu"),
 		m_audiocpu(*this, "audiocpu"),
 		m_gfxdecode(*this, "gfxdecode"),
@@ -62,7 +61,7 @@ public:
 	int         m_sprite_sizey;
 	int         m_prot;
 	int         m_jumpcode;
-	const int   *m_raiga_jumppoints; // raiga specific
+	const int   *m_jumppoints; // raiga, wildfang
 	bool        m_adpcm_toggle;
 
 	/* devices */
