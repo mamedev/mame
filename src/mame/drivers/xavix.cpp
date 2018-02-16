@@ -234,6 +234,9 @@ private:
 	int m_tmp_databit;
 	void set_data_address(int address, int bit);
 	uint8_t get_next_bit();
+	uint8_t get_next_byte();
+
+	int get_current_address_byte();
 
 	int m_alt_addressing;
 	int m_tilemap_enabled;
@@ -261,6 +264,21 @@ uint8_t xavix_state::get_next_bit()
 	}
 
 	return bit;
+}
+
+uint8_t xavix_state::get_next_byte()
+{
+	uint8_t dat = 0;
+	for (int i = 0; i < 8; i++)
+	{
+		dat |= (get_next_bit() << i);
+	}
+	return dat;
+}
+
+int xavix_state::get_current_address_byte()
+{
+	return m_tmp_dataaddress;
 }
 
 
@@ -429,32 +447,55 @@ uint32_t xavix_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap,
 				scrollx = m_tmap1_regs[0x4];
 
 				int basereg;
+				int flipx = 0;
+
+				int gfxbase;
+
 
 				if (!alt_tileaddressing)
 				{
 					basereg = 0;
+					gfxbase = (m_spr_attra[(basereg * 2) + 1] << 16) | (m_spr_attra[(basereg * 2)] << 8);
+
+					tile = tile * (32 * bpp);
+					tile += gfxbase;
 				}
 				else
 				{
 					basereg = (tile & 0xf000)>>12;
 					tile &= 0x0fff;
-					tile += 4;
+					gfxbase = (m_spr_attra[(basereg * 2) + 1] << 16) | (m_spr_attra[(basereg * 2)] << 8);
+
+					tile += gfxbase;
+					set_data_address(tile, 0);
+					
+					// there seems to be a packet stored before the tile?!
+					// the offset used for flipped sprites seems to specifically be changed so that it picks up an extra byte which presumably triggers the flipping
+					uint8_t byte1 = 0;
+					do
+					{
+						byte1 = get_next_byte();
+
+						if (byte1 == 0x05)
+						{
+							flipx = 1;
+						}
+						else if ((byte1 == 0x06) || (byte1 == 0x16) || (byte1 == 0x26) || (byte1 == 0x36))
+						{
+							// tile data will follow?
+						}
+
+					}
+					while ((byte1 & 0x0f) != 0x06);
+
+					tile = get_current_address_byte();
 				}
 
-				// upper bit is often set, maybe just because it relies on mirroring, maybe other purpose
-				int gfxbase = (m_spr_attra[(basereg * 2) + 1] << 16) | (m_spr_attra[(basereg * 2)] << 8);
 
-				if (!alt_tileaddressing)
-				{
-					tile = tile * (32 * bpp);
-				}
-
-				tile += gfxbase;
-
-				draw_tile(screen, bitmap, cliprect, tile, bpp, (x * 16) + scrollx, ((y * 16) - 16) - scrolly, 16, 16, 0, pal, 1);
-				draw_tile(screen, bitmap, cliprect, tile, bpp, (x * 16) + scrollx, (((y * 16) - 16) - scrolly) + 256, 16, 16, 0, pal, 1); // wrap-y
-				draw_tile(screen, bitmap, cliprect, tile, bpp, ((x * 16) + scrollx) - 256, ((y * 16) - 16) - scrolly, 16, 16, 0, pal, 1); // wrap-x
-				draw_tile(screen, bitmap, cliprect, tile, bpp, ((x * 16) + scrollx) - 256, (((y * 16) - 16) - scrolly) + 256, 16, 16, 0, pal, 1); // wrap-y and x
+				draw_tile(screen, bitmap, cliprect, tile, bpp, (x * 16) + scrollx, ((y * 16) - 16) - scrolly, 16, 16, flipx, pal, 1);
+				draw_tile(screen, bitmap, cliprect, tile, bpp, (x * 16) + scrollx, (((y * 16) - 16) - scrolly) + 256, 16, 16, flipx, pal, 1); // wrap-y
+				draw_tile(screen, bitmap, cliprect, tile, bpp, ((x * 16) + scrollx) - 256, ((y * 16) - 16) - scrolly, 16, 16, flipx, pal, 1); // wrap-x
+				draw_tile(screen, bitmap, cliprect, tile, bpp, ((x * 16) + scrollx) - 256, (((y * 16) - 16) - scrolly) + 256, 16, 16, flipx, pal, 1); // wrap-y and x
 			}
 		}
 	}
