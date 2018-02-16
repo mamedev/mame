@@ -33,8 +33,6 @@
 #include "emu.h"
 #include "scsp.h"
 
-#include "sound/cdda.h"
-
 
 #define ICLIP16(x) (x<-32768)?-32768:((x>32767)?32767:x)
 
@@ -150,6 +148,7 @@ scsp_device::scsp_device(const machine_config &mconfig, const char *tag, device_
 		m_roffset(0),
 		m_irq_cb(*this),
 		m_main_irq_cb(*this),
+		m_exts_cb(*this),
 		m_BUFPTR(0),
 		m_SCSPRAM(nullptr),
 		m_SCSPRAM_LENGTH(0),
@@ -211,6 +210,7 @@ void scsp_device::device_start()
 	// set up the IRQ callbacks
 	m_irq_cb.resolve_safe();
 	m_main_irq_cb.resolve_safe();
+	m_exts_cb.resolve_safe(0);
 
 	m_stream = machine().sound().stream_alloc(*this, 0, 2, 44100);
 }
@@ -1056,9 +1056,9 @@ unsigned short scsp_device::r16(address_space &space, unsigned int addr)
 			*/
 			logerror("SCSP: Reading from EXTS register %08x\n",addr);
 			if(addr == 0xee0)
-				v = machine().device<cdda_device>("cdda")->get_channel_volume(0);
+				v = m_exts_cb(0);
 			if(addr == 0xee2)
-				v = machine().device<cdda_device>("cdda")->get_channel_volume(1);
+				v = m_exts_cb(1);
 		}
 	}
 	return v;

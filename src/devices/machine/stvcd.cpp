@@ -94,6 +94,11 @@ void stvcd_device::device_start()
 {
 }
 
+READ16_MEMBER(stvcd_device::channel_volume_r)
+{
+	return m_cdda->get_channel_volume(offset);
+}
+
 int stvcd_device::get_timing_command(void)
 {
 	/* TODO: calculate timings based off command params */
