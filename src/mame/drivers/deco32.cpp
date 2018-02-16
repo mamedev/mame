@@ -784,6 +784,12 @@ WRITE_LINE_MEMBER( nslasher_state::tattass_sound_irq_w )
 
 WRITE8_MEMBER( deco32_state::sound_bankswitch_w )
 {
+	m_oki[0]->set_rom_bank((data >> 0) & 1);
+	m_oki[1]->set_rom_bank((data >> 1) & 1);
+}
+
+WRITE8_MEMBER( dragngun_state::sound_bankswitch_w )
+{
 	m_oki2_bank = (m_oki2_bank & 2) | ((data >> 1) & 1);
 	m_oki[0]->set_rom_bank((data >> 0) & 1);
 	m_oki[1]->set_rom_bank(m_oki2_bank);

@@ -62,7 +62,6 @@ public:
 
 	std::unique_ptr<uint8_t[]> m_dirty_palette; // all but captaven
 	int m_pri; // captaven, fghthist, nslasher and tattass
-	int m_oki2_bank; // lockload
 	std::unique_ptr<uint16_t[]> m_spriteram16[2]; // captaven, fghthist, nslasher and tattass
 	std::unique_ptr<uint16_t[]> m_spriteram16_buffered[2]; // captaven, fghthist, nslasher and tattass
 	std::unique_ptr<uint16_t[]> m_pf_rowscroll[4]; // common
@@ -218,6 +217,7 @@ public:
 
 	uint32_t m_sprite_ctrl;
 	int m_lightgun_port;
+	int m_oki2_bank; // lockload
 	bitmap_rgb32 m_temp_render_bitmap;
 
 	DECLARE_READ32_MEMBER(lightgun_r);
@@ -234,6 +234,7 @@ public:
 	LC7535_VOLUME_CHANGED(volume_main_changed);
 	LC7535_VOLUME_CHANGED(volume_gun_changed);
 	
+	DECLARE_WRITE8_MEMBER(sound_bankswitch_w);
 	DECLARE_WRITE8_MEMBER(lockload_okibank_w); // lockload
 
 	DECLARE_DRIVER_INIT(dragngun);
