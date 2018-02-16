@@ -26,7 +26,6 @@ public:
 		m_ioprot(*this, "ioprot"),
 		m_deco_irq(*this, "irq"),
 		m_decobsmt(*this, "decobsmt"),
-		m_spriteram(*this, "spriteram"),
 		m_sprgen(*this, "spritegen%u", 1),
 		m_sprgenzoom(*this, "spritegen_zoom"),
 		m_eeprom(*this, "eeprom"),
@@ -46,7 +45,6 @@ public:
 	required_device<deco_146_base_device> m_ioprot;
 	optional_device<deco_irq_device> m_deco_irq;
 	optional_device<decobsmt_device> m_decobsmt;
-	optional_device<buffered_spriteram32_device> m_spriteram;
 	optional_device_array<decospr_device, 2> m_sprgen;
 	optional_device<deco_zoomspr_device> m_sprgenzoom;
 	optional_device<eeprom_serial_93cxx_device> m_eeprom;
@@ -203,19 +201,18 @@ class dragngun_state : public deco32_state
 public:
 	dragngun_state(const machine_config &mconfig, device_type type, const char *tag)
 		: deco32_state(mconfig, type, tag),
-		m_sprite_layout_0_ram(*this, "lay0"),
-		m_sprite_layout_1_ram(*this, "lay1"),
-		m_sprite_lookup_0_ram(*this, "look0"),
-		m_sprite_lookup_1_ram(*this, "look1"),
+		m_spriteram(*this, "spriteram"),
+		m_sprite_layout_ram(*this, "lay%u", 0),
+		m_sprite_lookup_ram(*this, "look%u", 0),
 		m_vol_main(*this, "vol_main"),
 		m_vol_gun(*this, "vol_gun"),
 		m_gun_speaker_disabled(true)
 	{ }
+	
+	required_device<buffered_spriteram32_device> m_spriteram;
 
-	required_shared_ptr<uint32_t> m_sprite_layout_0_ram;
-	required_shared_ptr<uint32_t> m_sprite_layout_1_ram;
-	required_shared_ptr<uint32_t> m_sprite_lookup_0_ram;
-	required_shared_ptr<uint32_t> m_sprite_lookup_1_ram;
+	required_shared_ptr_array<uint32_t, 2> m_sprite_layout_ram;
+	required_shared_ptr_array<uint32_t, 2> m_sprite_lookup_ram;
 	required_device<lc7535_device> m_vol_main;
 	optional_device<lc7535_device> m_vol_gun;
 
