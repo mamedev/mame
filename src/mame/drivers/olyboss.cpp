@@ -307,7 +307,7 @@ WRITE8_MEMBER( olyboss_state::crtcdma_w )
 
 READ8_MEMBER( olyboss_state::fdcctrl_r )
 {
-	return m_fdcctrl | 0x80; // 0xc0 seems to indicate an 8" drive
+	return m_fdcctrl | 0xa0; // 0xc0 seems to indicate an 8" drive, 0x80 a 5.25" dd drive
 }
 
 WRITE8_MEMBER( olyboss_state::fdcctrl_w )
