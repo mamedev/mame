@@ -167,7 +167,7 @@ WRITE16_MEMBER(gaiden_state::gaiden_sound_command_w)
 /* and reads the answer from 0x07a007. The returned values contain the address of */
 /* a function to jump to. */
 
-static const int wildfang_jumppoints[17] =
+static const int wildfang_jumppoints[] =
 {
 	0x0c0c,0x0cac,0x0d42,0x0da2,0x0eea,0x112e,0x1300,0x13fa,
 	0x159a,0x1630,0x109a,0x1700,0x1750,0x1806,0x18d6,0x1a44,
@@ -193,7 +193,7 @@ WRITE16_MEMBER(gaiden_state::wildfang_protection_w)
 				break;
 			case 0x20:  /* low 4 bits of jump code */
 				m_jumpcode |= data & 0x0f;
-				if (m_jumpcode >= 17)
+				if (m_jumpcode >= ARRAY_LENGTH(wildfang_jumppoints))
 				{
 					logerror("unknown jumpcode %02x\n", m_jumpcode);
 					m_jumpcode = 0;
