@@ -24,6 +24,9 @@
 #define MCFG_SCSP_MAIN_IRQ_CB(_devcb) \
 	devcb = &scsp_device::set_main_irq_callback(*device, DEVCB_##_devcb);
 
+#define MCFG_SCSP_EXTS_CB(_devcb) \
+	devcb = &scsp_device::set_exts_callback(*device, DEVCB_##_devcb);
+
 
 class scsp_device : public device_t,
 					public device_sound_interface
@@ -34,6 +37,7 @@ public:
 	static void set_roffset(device_t &device, int roffset) { downcast<scsp_device &>(device).m_roffset = roffset; }
 	template <class Object> static devcb_base &set_irq_callback(device_t &device, Object &&cb) { return downcast<scsp_device &>(device).m_irq_cb.set_callback(std::forward<Object>(cb)); }
 	template <class Object> static devcb_base &set_main_irq_callback(device_t &device, Object &&cb) { return downcast<scsp_device &>(device).m_main_irq_cb.set_callback(std::forward<Object>(cb)); }
+	template <class Object> static devcb_base &set_exts_callback(device_t &device, Object &&cb) { return downcast<scsp_device &>(device).m_exts_cb.set_callback(std::forward<Object>(cb)); }
 
 	// SCSP register access
 	DECLARE_READ16_MEMBER( read );
@@ -103,6 +107,7 @@ private:
 	int m_roffset;                /* offset in the region */
 	devcb_write8       m_irq_cb;  /* irq callback */
 	devcb_write_line   m_main_irq_cb;
+	devcb_read16       m_exts_cb;
 
 	union
 	{
