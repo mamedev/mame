@@ -224,7 +224,7 @@ private:
 
 	void handle_palette(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	double hue2rgb(double p, double q, double t);
-	void draw_tile(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect, int tile, int bpp, int xpos, int ypos, int drawheight, int drawwidth, int flipx, int pal, int opaque);
+	void draw_tile(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect, int tile, int bpp, int xpos, int ypos, int drawheight, int drawwidth, int flipx, int flipy, int pal, int opaque);
 	
 	int m_rgnlen;
 	uint8_t* m_rgn;
@@ -347,14 +347,22 @@ void xavix_state::handle_palette(screen_device &screen, bitmap_ind16 &bitmap, co
 	}
 }
 
-void xavix_state::draw_tile(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect, int tile, int bpp, int xpos, int ypos, int drawheight, int drawwidth, int flipx, int pal, int opaque)
+void xavix_state::draw_tile(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect, int tile, int bpp, int xpos, int ypos, int drawheight, int drawwidth, int flipx, int flipy, int pal, int opaque)
 {
 	// set the address here so we can increment in bits in the draw function
 	set_data_address(tile, 0);
 
 	for (int y = 0; y < drawheight; y++)
 	{
-		int row = ypos + y;
+		int row;
+		if (flipy)
+		{
+			row = ypos + (drawheight-1) - y;
+		}
+		else
+		{
+			row = ypos + y;
+		}
 
 		for (int x = 0; x < drawwidth; x++)
 		{
@@ -448,7 +456,7 @@ uint32_t xavix_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap,
 
 				int basereg;
 				int flipx = 0;
-
+				int flipy = 0;
 				int gfxbase;
 
 
@@ -472,6 +480,7 @@ uint32_t xavix_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap,
 					// there seems to be a packet stored before the tile?!
 					// the offset used for flipped sprites seems to specifically be changed so that it picks up an extra byte which presumably triggers the flipping
 					uint8_t byte1 = 0;
+					int done = 0;
 					do
 					{
 						byte1 = get_next_byte();
@@ -480,23 +489,60 @@ uint32_t xavix_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap,
 						{
 							flipx = 1;
 						}
-						else if ((byte1 == 0x06) || (byte1 == 0x16) || (byte1 == 0x26) || (byte1 == 0x36))
+						else if (byte1 == 0x15)
 						{
-							// tile data will follow?
-							pal = (byte1 & 0xf0)>>4;
+							
 						}
+						else if ((byte1 & 0x0f) == 0x06) // there must be other finish conditions too because sometimes this fails..
+						{
+							// tile data will follow after this, always?
+							pal = (byte1 & 0xf0)>>4;
+							done = 1;
+						}
+						else if (byte1 == 0x0d)
+						{
+							//done = 1;
+						}
+						else if ((byte1== 0x03) || (byte1== 0x13))
+						{
+							//flipy = 1;
+						}
+						else if (byte1 == 0x0f)
+						{
 
+						}
+						else if (byte1 == 0x0b)
+						{
+
+						}
+						else if ((byte1 == 0x09) || (byte1 == 0x19))
+						{
+
+						}
+						else if ((byte1 == 0x07) || (byte1 == 0x17))
+						{
+
+						}
+						else if (byte1 == 0x01)
+						{
+
+						}
+						else
+						{
+
+							//printf("unknown packet byte %02x\n", byte1);
+						}
 					}
-					while ((byte1 & 0x0f) != 0x06);
+					while (done == 0);
 
 					tile = get_current_address_byte();
 				}
 
 
-				draw_tile(screen, bitmap, cliprect, tile, bpp, (x * 16) + scrollx, ((y * 16) - 16) - scrolly, 16, 16, flipx, pal, 1);
-				draw_tile(screen, bitmap, cliprect, tile, bpp, (x * 16) + scrollx, (((y * 16) - 16) - scrolly) + 256, 16, 16, flipx, pal, 1); // wrap-y
-				draw_tile(screen, bitmap, cliprect, tile, bpp, ((x * 16) + scrollx) - 256, ((y * 16) - 16) - scrolly, 16, 16, flipx, pal, 1); // wrap-x
-				draw_tile(screen, bitmap, cliprect, tile, bpp, ((x * 16) + scrollx) - 256, (((y * 16) - 16) - scrolly) + 256, 16, 16, flipx, pal, 1); // wrap-y and x
+				draw_tile(screen, bitmap, cliprect, tile, bpp, (x * 16) + scrollx, ((y * 16) - 16) - scrolly, 16, 16, flipx, flipy, pal, 1);
+				draw_tile(screen, bitmap, cliprect, tile, bpp, (x * 16) + scrollx, (((y * 16) - 16) - scrolly) + 256, 16, 16, flipx, flipy, pal, 1); // wrap-y
+				draw_tile(screen, bitmap, cliprect, tile, bpp, ((x * 16) + scrollx) - 256, ((y * 16) - 16) - scrolly, 16, 16, flipx, flipy, pal, 1); // wrap-x
+				draw_tile(screen, bitmap, cliprect, tile, bpp, ((x * 16) + scrollx) - 256, (((y * 16) - 16) - scrolly) + 256, 16, 16, flipx, flipy, pal, 1); // wrap-y and x
 			}
 		}
 	}
@@ -583,10 +629,10 @@ uint32_t xavix_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap,
 		bpp = (attr0 & 0x0e) >> 1;
 		bpp += 1;
 
-		draw_tile(screen, bitmap, cliprect, tile, bpp, xpos, ypos, drawheight, drawwidth, flipx, pal, 0);
-		draw_tile(screen, bitmap, cliprect, tile, bpp, xpos-256, ypos, drawheight, drawwidth, flipx, pal, 0); // wrap-x
-		draw_tile(screen, bitmap, cliprect, tile, bpp, xpos, ypos-256, drawheight, drawwidth, flipx, pal, 0); // wrap-y
-		draw_tile(screen, bitmap, cliprect, tile, bpp, xpos-256, ypos-256, drawheight, drawwidth, flipx, pal, 0); // wrap-x,y
+		draw_tile(screen, bitmap, cliprect, tile, bpp, xpos, ypos, drawheight, drawwidth, flipx, 0, pal, 0);
+		draw_tile(screen, bitmap, cliprect, tile, bpp, xpos-256, ypos, drawheight, drawwidth, flipx, 0, pal, 0); // wrap-x
+		draw_tile(screen, bitmap, cliprect, tile, bpp, xpos, ypos-256, drawheight, drawwidth, flipx, 0, pal, 0); // wrap-y
+		draw_tile(screen, bitmap, cliprect, tile, bpp, xpos-256, ypos-256, drawheight, drawwidth, flipx, 0, pal, 0); // wrap-x,y
 
 		/*
 		if ((m_spr_ypos[i] != 0x81) && (m_spr_ypos[i] != 0x80) && (m_spr_ypos[i] != 0x00))
@@ -646,10 +692,10 @@ uint32_t xavix_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap,
 				if (tile)
 				{
 					tile += gfxbase;
-					draw_tile(screen, bitmap, cliprect, tile, bpp, (x*8)+scrollx, ((y*8)-16)-scrolly, 8, 8, 0, pal, 0);
-					draw_tile(screen, bitmap, cliprect, tile, bpp, (x*8)+scrollx, (((y*8)-16)-scrolly)+256, 8, 8, 0, pal, 0); // wrap-y
-					draw_tile(screen, bitmap, cliprect, tile, bpp, ((x*8)+scrollx)-256, ((y*8)-16)-scrolly, 8, 8, 0, pal, 0); // wrap x
-					draw_tile(screen, bitmap, cliprect, tile, bpp, ((x*8)+scrollx)-256, (((y*8)-16)-scrolly)+256, 8, 8, 0, pal, 0); // wrap-y and x
+					draw_tile(screen, bitmap, cliprect, tile, bpp, (x*8)+scrollx, ((y*8)-16)-scrolly, 8, 8, 0, 0, pal, 0);
+					draw_tile(screen, bitmap, cliprect, tile, bpp, (x*8)+scrollx, (((y*8)-16)-scrolly)+256, 8, 8, 0, 0, pal, 0); // wrap-y
+					draw_tile(screen, bitmap, cliprect, tile, bpp, ((x*8)+scrollx)-256, ((y*8)-16)-scrolly, 8, 8, 0, 0, pal, 0); // wrap x
+					draw_tile(screen, bitmap, cliprect, tile, bpp, ((x*8)+scrollx)-256, (((y*8)-16)-scrolly)+256, 8, 8, 0, 0, pal, 0); // wrap-y and x
 				}
 			}
 		}
