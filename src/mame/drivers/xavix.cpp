@@ -483,6 +483,7 @@ uint32_t xavix_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap,
 						else if ((byte1 == 0x06) || (byte1 == 0x16) || (byte1 == 0x26) || (byte1 == 0x36))
 						{
 							// tile data will follow?
+							pal = (byte1 & 0xf0)>>4;
 						}
 
 					}
