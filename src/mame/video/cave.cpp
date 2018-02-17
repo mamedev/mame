@@ -34,7 +34,7 @@ Note:   if MAME_DEBUG is defined, pressing:
     [ 1024 Zooming Sprites ]
 
         There are 2 or 4 0x4000 Sprite RAM Areas. A hardware register's
-		bit selects an area to display (sprites double buffering).
+        bit selects an area to display (sprites double buffering).
 
         The sprites are NOT tile based: the "tile" size and start address
         is selectable for each sprite with a 16 pixel granularity.
