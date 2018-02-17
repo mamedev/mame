@@ -66,7 +66,6 @@ public:
 
 	uint32_t screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 
-	void ef9365(address_map &map);
 protected:
 	// device-level overrides
 	virtual void device_start() override;
@@ -97,6 +96,8 @@ private:
 	int  cycles_to_us(int cycles);
 	void dump_bitplanes_word();
 	void update_interrupts();
+
+	void ef9365(address_map &map);
 
 	// internal state
 	static constexpr device_timer_id BUSY_TIMER = 0;

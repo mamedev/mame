@@ -30194,6 +30194,7 @@ olibochu                        // M47 (c) 1981 + "GDI presents"
 olybossb                        // Olympia BOSS B
 olybossc                        // Olympia BOSS C
 olybossd                        // Olympia BOSS D
+bossb85                         // Olympia BOSS B 8085
 
 @source:omegrace.cpp
 deltrace                        // bootleg

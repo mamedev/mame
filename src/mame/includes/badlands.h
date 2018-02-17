@@ -85,6 +85,7 @@ public:
 	DECLARE_WRITE8_MEMBER(bootleg_shared_w);
 	DECLARE_WRITE8_MEMBER(bootleg_main_irq_w);
 	DECLARE_READ16_MEMBER(badlandsb_unk_r);
+	DECLARE_READ8_MEMBER(sound_response_r);
 	TIMER_DEVICE_CALLBACK_MEMBER(bootleg_sound_scanline);
 
 	void badlandsb(machine_config &config);
@@ -98,6 +99,8 @@ protected:
 private:
 	required_shared_ptr<uint8_t> m_b_sharedram;
 	required_shared_ptr<uint16_t> m_spriteram;
+	
+	uint8_t m_sound_response;
 };
 
 
