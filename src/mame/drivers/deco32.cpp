@@ -668,12 +668,12 @@ ADDRESS_MAP_END
 // lockload needs hi bits of OKI2 bankswitching
 ADDRESS_MAP_START(dragngun_state::lockload_sound_map)
 	AM_IMPORT_FROM(z80_sound_map)
-	AM_RANGE(0xe000, 0xe000) AM_WRITE(lockload_okibank_w)
+	AM_RANGE(0xe000, 0xe000) AM_WRITE(lockload_okibank_hi_w)
 ADDRESS_MAP_END
 
 ADDRESS_MAP_START(dragngun_state::lockloadu_sound_map)
 	AM_IMPORT_FROM(h6280_sound_map)
-	AM_RANGE(0x150000, 0x150000) AM_WRITE(lockload_okibank_w)
+	AM_RANGE(0x150000, 0x150000) AM_WRITE(lockload_okibank_hi_w)
 ADDRESS_MAP_END
 
 
@@ -788,17 +788,18 @@ WRITE8_MEMBER( deco32_state::sound_bankswitch_w )
 	m_oki[1]->set_rom_bank((data >> 1) & 1);
 }
 
-WRITE8_MEMBER( dragngun_state::sound_bankswitch_w )
+WRITE8_MEMBER( dragngun_state::lockload_okibank_lo_w )
 {
 	m_oki2_bank = (m_oki2_bank & 2) | ((data >> 1) & 1);
+	logerror("Load OKI2 Bank Low bits: %02x, Current : %02x\n",(data >> 1) & 1, m_oki2_bank);
 	m_oki[0]->set_rom_bank((data >> 0) & 1);
 	m_oki[1]->set_rom_bank(m_oki2_bank);
 }
 
-WRITE8_MEMBER( dragngun_state::lockload_okibank_w )
+WRITE8_MEMBER( dragngun_state::lockload_okibank_hi_w )
 {
 	m_oki2_bank = (m_oki2_bank & 1) | ((data & 1) << 1); // TODO : Actually value unverified
-	logerror("Load OKI2 Bank Hi bits: %02x\n",data);
+	logerror("Load OKI2 Bank Hi bits: %02x, Current : %02x\n",((data & 1) << 1), m_oki2_bank);
 	m_oki[1]->set_rom_bank(m_oki2_bank);
 }
 
@@ -2188,6 +2189,9 @@ MACHINE_CONFIG_START(dragngun_state::lockloadu)
 	MCFG_DEVICE_MODIFY("tilegen2")
 	MCFG_DECO16IC_PF1_SIZE(DECO_32x32)
 	MCFG_DECO16IC_PF2_SIZE(DECO_32x32)    // lockload definitely wants pf34 half width..
+
+	MCFG_SOUND_MODIFY("ymsnd")
+	MCFG_YM2151_PORT_WRITE_HANDLER(WRITE8(dragngun_state, lockload_okibank_lo_w))
 MACHINE_CONFIG_END
 
 // DE-0420-1 + Bottom board DE-0421-0
@@ -2277,7 +2281,7 @@ MACHINE_CONFIG_START(dragngun_state::lockload)
 
 	MCFG_YM2151_ADD("ymsnd", 32220000/9)
 	MCFG_YM2151_IRQ_HANDLER(DEVWRITELINE("sound_irq_merger", input_merger_any_high_device, in_w<1>))
-	MCFG_YM2151_PORT_WRITE_HANDLER(WRITE8(deco32_state, sound_bankswitch_w))
+	MCFG_YM2151_PORT_WRITE_HANDLER(WRITE8(dragngun_state, lockload_okibank_lo_w))
 	MCFG_SOUND_ROUTE(0, "lspeaker", 0.42)
 	MCFG_SOUND_ROUTE(1, "rspeaker", 0.42)
 
