@@ -74,49 +74,10 @@ puzznici note
 #include "speaker.h"
 
 
-namespace {
-
-struct
-{
-	void (taitol_state::*notifier)(int);
-	u32 offset;
-} const rambank_modify_notifiers[12] =
-{
-	{ &taitol_state::taitol_chardef14_m, 0x0000 }, // 14
-	{ &taitol_state::taitol_chardef15_m, 0x1000 }, // 15
-	{ &taitol_state::taitol_chardef16_m, 0x2000 }, // 16
-	{ &taitol_state::taitol_chardef17_m, 0x3000 }, // 17
-
-	{ &taitol_state::taitol_bg18_m,      0x8000 }, // 18
-	{ &taitol_state::taitol_bg19_m,      0x9000 }, // 19
-	{ &taitol_state::taitol_char1a_m,    0xa000 }, // 1a
-	{ &taitol_state::taitol_obj1b_m,     0xb000 }, // 1b
-
-	{ &taitol_state::taitol_chardef1c_m, 0x4000 }, // 1c
-	{ &taitol_state::taitol_chardef1d_m, 0x5000 }, // 1d
-	{ &taitol_state::taitol_chardef1e_m, 0x6000 }, // 1e
-	{ &taitol_state::taitol_chardef1f_m, 0x7000 }, // 1f
-};
-
-} // anonymous namespace
-
-
-void taitol_state::palette_notifier(int addr)
-{
-	u8 const *const p = m_palette_ram + (addr & ~1);
-	u8 const byte0 = p[0];
-	u8 const byte1 = p[1];
-
-	//  addr &= 0x1ff;
-
-	if (addr > 0x200)
-		logerror("%s:Large palette ? %03x\n", machine().describe_context(), addr);
-	else
-		m_palette->set_pen_color(addr / 2, pal4bit(byte0), pal4bit(byte0 >> 4), pal4bit(byte1));
-}
-
 void taitol_state::state_register()
 {
+	m_main_bnk->configure_entries(0, m_main_prg->bytes()/0x2000, m_main_prg->base(), 0x2000);
+
 	save_item(NAME(m_irq_adr_table));
 	save_item(NAME(m_irq_enable));
 	save_item(NAME(m_cur_rambank));
@@ -133,16 +94,19 @@ void taitol_state::state_register()
 
 void taitol_2cpu_state::state_register()
 {
+	if (m_audio_bnk.found())
+		m_audio_bnk->configure_entries(0, m_audio_prg->bytes()/0x4000, m_audio_prg->base(), 0x4000);
+
 	taitol_state::state_register();
 }
 
 void fhawk_state::state_register()
 {
+	m_slave_bnk->configure_entries(0, m_slave_prg->bytes()/0x4000, m_slave_prg->base(), 0x4000);
 	taitol_2cpu_state::state_register();
 
 	save_item(NAME(m_cur_rombank2));
 	save_item(NAME(m_high2));
-	save_item(NAME(m_cur_audio_bnk));
 }
 
 void champwr_state::state_register()
@@ -161,10 +125,6 @@ void taitol_1cpu_state::state_register()
 
 MACHINE_START_MEMBER(taitol_state, taito_l)
 {
-	save_item(NAME(m_rambanks));
-	save_item(NAME(m_palette_ram));
-	save_item(NAME(m_empty_ram));
-
 	state_register();
 }
 
@@ -178,15 +138,11 @@ void taitol_state::taito_machine_reset()
 	for (int i = 0; i < 4; i++)
 	{
 		m_cur_rambank[i] = 0x80;
-		m_current_notifier[i] = &taitol_state::palette_notifier;
-		m_current_base[i] = m_palette_ram;
-		m_ram_bnks[i]->set_base(m_current_base[i]);
+		m_ram_bnks[i]->set_bank(m_cur_rambank[i]);
 	}
 
 	m_cur_rombank = 0;
-	m_main_bnk->set_base(&m_main_prg[0]);
-
-	m_gfxdecode->gfx(2)->set_source(m_rambanks);
+	m_main_bnk->set_entry(0);
 
 	m_last_irq_level = 0;
 	m_high = 0;
@@ -208,8 +164,10 @@ void fhawk_state::taito_machine_reset()
 	taitol_2cpu_state::taito_machine_reset();
 
 	m_cur_rombank2 = 0;
+	m_slave_bnk->set_entry(m_cur_rombank2);
+
 	m_high2 = 0;
-	m_cur_audio_bnk = 1;
+	m_audio_bnk->set_entry(1);
 }
 
 void champwr_state::taito_machine_reset()
@@ -304,7 +262,7 @@ WRITE8_MEMBER(taitol_state::rombankswitch_w)
 
 		//logerror("robs %d, %02x (%04x)\n", offset, data, m_main_cpu->pc());
 		m_cur_rombank = data;
-		m_main_bnk->set_base(&m_main_prg[0x2000 * m_cur_rombank]);
+		m_main_bnk->set_entry(m_cur_rombank);
 	}
 }
 
@@ -323,7 +281,7 @@ WRITE8_MEMBER(fhawk_state::rombank2switch_w)
 		//logerror("robs2 %02x (%04x)\n", data, m_main_cpu->pc());
 
 		m_cur_rombank2 = data;
-		m_slave_bnk->set_base(&m_slave_prg[0x4000 * m_cur_rombank2]);
+		m_slave_bnk->set_entry(m_cur_rombank2);
 	}
 }
 
@@ -342,61 +300,13 @@ WRITE8_MEMBER(taitol_state::rambankswitch_w)
 	if (m_cur_rambank[offset] != data)
 	{
 		m_cur_rambank[offset] = data;
-		//logerror("rabs %d, %02x (%04x)\n", offset, data, m_main_cpu->pc());
-		if (data >= 0x14 && data <= 0x1f)
-		{
-			data -= 0x14;
-			m_current_notifier[offset] = rambank_modify_notifiers[data].notifier;
-			m_current_base[offset] = m_rambanks + rambank_modify_notifiers[data].offset;
-		}
-		else if (data == 0x80)
-		{
-			m_current_notifier[offset] = &taitol_state::palette_notifier;
-			m_current_base[offset] = m_palette_ram;
-		}
-		else
-		{
-			logerror("unknown rambankswitch %d, %02x (%04x)\n", offset, data, m_main_cpu->pc());
-			m_current_notifier[offset] = nullptr;
-			m_current_base[offset] = m_empty_ram;
-		}
-		m_ram_bnks[offset]->set_base(m_current_base[offset]);
+		m_ram_bnks[offset]->set_bank(m_cur_rambank[offset]);
 	}
 }
 
 READ8_MEMBER(taitol_state::rambankswitch_r)
 {
 	return m_cur_rambank[offset];
-}
-
-void taitol_state::bank_w(address_space &space, offs_t offset, u8 data, int banknum )
-{
-	if (m_current_base[banknum][offset] != data)
-	{
-		m_current_base[banknum][offset] = data;
-		if (m_current_notifier[banknum])
-			(this->*m_current_notifier[banknum])(offset);
-	}
-}
-
-WRITE8_MEMBER(taitol_state::bank0_w)
-{
-	bank_w(space, offset, data, 0);
-}
-
-WRITE8_MEMBER(taitol_state::bank1_w)
-{
-	bank_w(space, offset, data, 1);
-}
-
-WRITE8_MEMBER(taitol_state::bank2_w)
-{
-	bank_w(space, offset, data, 2);
-}
-
-WRITE8_MEMBER(taitol_state::bank3_w)
-{
-	bank_w(space, offset, data, 3);
 }
 
 WRITE8_MEMBER(taitol_state::coin_control_w)
@@ -469,17 +379,23 @@ WRITE8_MEMBER(champwr_state::msm5205_volume_w)
 
 ADDRESS_MAP_START(taitol_state::common_banks_map)
 	AM_RANGE(0x0000, 0x5fff) AM_ROM
-	AM_RANGE(0x6000, 0x7fff) AM_ROMBANK("bank1")
-	AM_RANGE(0xc000, 0xcfff) AM_ROMBANK("bank2") AM_WRITE(bank0_w)
-	AM_RANGE(0xd000, 0xdfff) AM_ROMBANK("bank3") AM_WRITE(bank1_w)
-	AM_RANGE(0xe000, 0xefff) AM_ROMBANK("bank4") AM_WRITE(bank2_w)
-	AM_RANGE(0xf000, 0xfdff) AM_ROMBANK("bank5") AM_WRITE(bank3_w)
+	AM_RANGE(0x6000, 0x7fff) AM_ROMBANK("mainbank")
+	AM_RANGE(0xc000, 0xcfff) AM_DEVICE("rambank1", address_map_bank_device, amap8)
+	AM_RANGE(0xd000, 0xdfff) AM_DEVICE("rambank2", address_map_bank_device, amap8)
+	AM_RANGE(0xe000, 0xefff) AM_DEVICE("rambank3", address_map_bank_device, amap8)
+	AM_RANGE(0xf000, 0xfdff) AM_DEVICE("rambank4", address_map_bank_device, amap8)
 	AM_RANGE(0xfe00, 0xfe03) AM_READWRITE(taitol_bankc_r, taitol_bankc_w)
 	AM_RANGE(0xfe04, 0xfe04) AM_READWRITE(taitol_control_r, taitol_control_w)
 	AM_RANGE(0xff00, 0xff02) AM_READWRITE(irq_adr_r, irq_adr_w)
 	AM_RANGE(0xff03, 0xff03) AM_READWRITE(irq_enable_r, irq_enable_w)
 	AM_RANGE(0xff04, 0xff07) AM_READWRITE(rambankswitch_r, rambankswitch_w)
 	AM_RANGE(0xff08, 0xff08) AM_READWRITE(rombankswitch_r, rombankswitch_w)
+ADDRESS_MAP_END
+
+
+ADDRESS_MAP_START(taitol_state::tc0090lvc_map)
+	AM_RANGE(0x10000, 0x1ffff) AM_RAM_WRITE(vram_w) AM_SHARE("vram")
+	AM_RANGE(0x80000, 0x801ff) AM_MIRROR(0x00e00) AM_RAM_DEVWRITE("palette", palette_device, write8) AM_SHARE("palette")
 ADDRESS_MAP_END
 
 
@@ -491,7 +407,7 @@ ADDRESS_MAP_END
 
 ADDRESS_MAP_START(fhawk_state::fhawk_2_map)
 	AM_RANGE(0x0000, 0x7fff) AM_ROM
-	AM_RANGE(0x8000, 0xbfff) AM_ROMBANK("bank6")
+	AM_RANGE(0x8000, 0xbfff) AM_ROMBANK("slavebank")
 	AM_RANGE(0xc000, 0xc000) AM_WRITE(rombank2switch_w)
 	AM_RANGE(0xc800, 0xc800) AM_READNOP AM_DEVWRITE("ciu", pc060ha_device, master_port_w)
 	AM_RANGE(0xc801, 0xc801) AM_DEVREADWRITE("ciu", pc060ha_device, master_comm_r, master_comm_w)
@@ -501,7 +417,7 @@ ADDRESS_MAP_END
 
 ADDRESS_MAP_START(fhawk_state::fhawk_3_map)
 	AM_RANGE(0x0000, 0x3fff) AM_ROM
-	AM_RANGE(0x4000, 0x7fff) AM_ROMBANK("bank7")
+	AM_RANGE(0x4000, 0x7fff) AM_ROMBANK("audiobank")
 	AM_RANGE(0x8000, 0x9fff) AM_RAM
 	AM_RANGE(0xe000, 0xe000) AM_READNOP AM_DEVWRITE("ciu", pc060ha_device, slave_port_w)
 	AM_RANGE(0xe001, 0xe001) AM_DEVREADWRITE("ciu", pc060ha_device, slave_comm_r, slave_comm_w)
@@ -527,12 +443,12 @@ ADDRESS_MAP_END
 
 WRITE8_MEMBER(taitol_2cpu_state::sound_bankswitch_w)
 {
-	m_audio_bnk->set_base(&m_audio_prg[(data & 0x03) * 0x4000]);
+	m_audio_bnk->set_entry(data & 0x03);
 }
 
 ADDRESS_MAP_START(taitol_2cpu_state::raimais_3_map)
 	AM_RANGE(0x0000, 0x3fff) AM_ROM
-	AM_RANGE(0x4000, 0x7fff) AM_ROMBANK("bank7")
+	AM_RANGE(0x4000, 0x7fff) AM_ROMBANK("audiobank")
 	AM_RANGE(0xc000, 0xdfff) AM_RAM
 	AM_RANGE(0xe000, 0xe003) AM_DEVREADWRITE("ymsnd", ym2610_device, read, write)
 	AM_RANGE(0xe200, 0xe200) AM_READNOP AM_DEVWRITE("tc0140syt", tc0140syt_device, slave_port_w)
@@ -553,7 +469,7 @@ ADDRESS_MAP_END
 
 ADDRESS_MAP_START(champwr_state::champwr_2_map)
 	AM_RANGE(0x0000, 0x7fff) AM_ROM
-	AM_RANGE(0x8000, 0xbfff) AM_ROMBANK("bank6")
+	AM_RANGE(0x8000, 0xbfff) AM_ROMBANK("slavebank")
 	AM_RANGE(0xc000, 0xdfff) AM_RAM AM_SHARE("share1")
 	AM_RANGE(0xe000, 0xe007) AM_DEVREADWRITE("tc0220ioc", tc0220ioc_device, read, write)
 	AM_RANGE(0xe008, 0xe00f) AM_READNOP
@@ -564,7 +480,7 @@ ADDRESS_MAP_END
 
 ADDRESS_MAP_START(champwr_state::champwr_3_map)
 	AM_RANGE(0x0000, 0x3fff) AM_ROM
-	AM_RANGE(0x4000, 0x7fff) AM_ROMBANK("bank7")
+	AM_RANGE(0x4000, 0x7fff) AM_ROMBANK("audiobank")
 	AM_RANGE(0x8000, 0x8fff) AM_RAM
 	AM_RANGE(0x9000, 0x9001) AM_DEVREADWRITE("ymsnd", ym2203_device, read, write)
 	AM_RANGE(0xa000, 0xa000) AM_READNOP AM_DEVWRITE("ciu", pc060ha_device, slave_port_w)
@@ -669,7 +585,7 @@ ADDRESS_MAP_START(taitol_2cpu_state::evilston_2_map)
 	AM_RANGE(0xc000, 0xdfff) AM_RAM
 	AM_RANGE(0xe000, 0xe7ff) AM_DEVREADWRITE("dpram", mb8421_device, left_r, left_w)
 	AM_RANGE(0xe800, 0xe801) AM_DEVREADWRITE("ymsnd", ym2203_device, read, write)
-	AM_RANGE(0xf000, 0xf7ff) AM_ROMBANK("bank7")
+	AM_RANGE(0xf000, 0xf7ff) AM_ROMBANK("audiobank")
 ADDRESS_MAP_END
 
 
@@ -1489,7 +1405,7 @@ static const gfx_layout sp2_layout =
 static const gfx_layout char_layout =
 {
 	8, 8,
-	1024,
+	0x10000 / (8*4),
 	4,
 	{ 8, 12, 0, 4 },
 	{ 3, 2, 1, 0, 19, 18, 17, 16},
@@ -1500,27 +1416,32 @@ static const gfx_layout char_layout =
 
 
 static GFXDECODE_START( taito_l )
-	GFXDECODE_ENTRY( "gfx1", 0, bg2_layout, 0, 16 )
-	GFXDECODE_ENTRY( "gfx1", 0, sp2_layout, 0, 16 )
-	GFXDECODE_ENTRY( nullptr,           0, char_layout,  0, 16 )  // Ram-based
+	GFXDECODE_ENTRY( "gfx1", 0, bg2_layout,  0, 16 )
+	GFXDECODE_ENTRY( "gfx1", 0, sp2_layout,  0, 16 )
+	GFXDECODE_RAM(   "vram", 0, char_layout, 0, 16 )  // Ram-based
 GFXDECODE_END
 
 
 WRITE8_MEMBER(fhawk_state::portA_w)
 {
-	if (m_cur_audio_bnk != (data & 0x03))
-	{
-		int bankaddress;
-
-		m_cur_audio_bnk = data & 0x03;
-		bankaddress = m_cur_audio_bnk * 0x4000;
-		m_audio_bnk->set_base(&m_audio_prg[bankaddress]);
-		//logerror ("YM2203 bank change val=%02x  %s\n", m_cur_audio_bnk, machine().describe_context() );
-	}
+	m_audio_bnk->set_entry(data & 0x03);
+	//logerror ("YM2203 bank change val=%02x  %s\n", data & 0x03, machine().describe_context() );
 }
 
+#define TC0090LVC_BANK_ADD(_tag)                           \
+	MCFG_DEVICE_ADD(_tag, ADDRESS_MAP_BANK, 0)       \
+	MCFG_DEVICE_PROGRAM_MAP(tc0090lvc_map)                 \
+	MCFG_ADDRESS_MAP_BANK_ENDIANNESS(ENDIANNESS_LITTLE)    \
+	MCFG_ADDRESS_MAP_BANK_DATA_WIDTH(8)                    \
+	MCFG_ADDRESS_MAP_BANK_ADDR_WIDTH(20)                   \
+	MCFG_ADDRESS_MAP_BANK_STRIDE(0x1000)
 
 MACHINE_CONFIG_START(taitol_state::l_system_video)
+	TC0090LVC_BANK_ADD("rambank1")
+	TC0090LVC_BANK_ADD("rambank2")
+	TC0090LVC_BANK_ADD("rambank3")
+	TC0090LVC_BANK_ADD("rambank4")
+
 	MCFG_SCREEN_ADD("screen", RASTER)
 	MCFG_SCREEN_REFRESH_RATE(60)
 	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
@@ -1532,6 +1453,7 @@ MACHINE_CONFIG_START(taitol_state::l_system_video)
 
 	MCFG_GFXDECODE_ADD("gfxdecode", "palette", taito_l)
 	MCFG_PALETTE_ADD("palette", 256)
+	MCFG_PALETTE_FORMAT(xRGBRRRRGGGGBBBB_bit0)
 
 	MCFG_VIDEO_START_OVERRIDE(taitol_state, taito_l)
 
@@ -2426,11 +2348,13 @@ ROM_END
 DRIVER_INIT_MEMBER(taitol_1cpu_state, plottinga)
 {
 	u8 tab[256];
+	u8 *RAM = m_main_prg->base();
+
 	for (unsigned i = 0; i < sizeof(tab); i++)
 		tab[i] = bitswap<8>(i, 0, 1, 2, 3, 4, 5, 6, 7);
 
-	for (unsigned i = 0; i < m_main_prg.length(); i++)
-		m_main_prg[i] = tab[m_main_prg[i]];
+	for (unsigned i = 0; i < m_main_prg->bytes(); i++)
+		RAM[i] = tab[RAM[i]];
 }
 
 
