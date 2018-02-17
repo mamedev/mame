@@ -425,6 +425,57 @@ WRITE16_MEMBER(cave_state::metmqstr_eeprom_msb_w)
 /***************************************************************************
 
 
+                                     VRAM
+
+
+***************************************************************************/
+
+template<int Chip>
+WRITE16_MEMBER(cave_state::vram_w)
+{
+	uint16_t *VRAM = m_vram[Chip];
+	tilemap_t *TILEMAP = m_tilemap[Chip];
+
+	if ((VRAM[offset] & mem_mask) == (data & mem_mask))
+		return;
+
+	COMBINE_DATA(&VRAM[offset]);
+	offset /= 2;
+	if (offset < 0x1000 / 4)    // 16x16 tilemap
+	{
+		offset = (offset % (512 / 16)) * 2 + (offset / (512 / 16)) * (512 / 8) * 2;
+		TILEMAP->mark_tile_dirty(offset + 0);
+		TILEMAP->mark_tile_dirty(offset + 1);
+		TILEMAP->mark_tile_dirty(offset + 0 + 512 / 8);
+		TILEMAP->mark_tile_dirty(offset + 1 + 512 / 8);
+	}
+	else if (offset >= 0x4000 / 4)      // 8x8 tilemap
+		TILEMAP->mark_tile_dirty(offset - 0x4000 / 4);
+}
+
+/*  Some games, that only ever use the 8x8 tiles and no line scroll,
+    use mirror ram. For example in donpachi, writes to 400000-403fff
+    and 408000-407fff both go to the 8x8 tilemap ram. Use this function
+    in this cases. Note that the get_tile_info function looks in the
+    4000-7fff range for tiles, so we have to write the data there. */
+template<int Chip>
+WRITE16_MEMBER(cave_state::vram_8x8_w)
+{
+	uint16_t *VRAM = m_vram[Chip];
+	tilemap_t *TILEMAP = m_tilemap[Chip];
+
+	offset %= 0x4000 / 2;
+	if ((VRAM[offset] & mem_mask) == (data & mem_mask))
+		return;
+
+	COMBINE_DATA(&VRAM[offset + 0x0000 / 2]);
+	COMBINE_DATA(&VRAM[offset + 0x4000 / 2]);
+	TILEMAP->mark_tile_dirty(offset / 2);
+}
+
+/***************************************************************************
+
+
                             Memory Maps - Main CPU
 
 
