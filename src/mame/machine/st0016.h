@@ -96,6 +96,7 @@ protected:
 	virtual space_config_vector memory_space_config() const override;
 
 	required_device<screen_device> m_screen;
+	required_memory_region m_rom;
 
 private:
 	uint8_t m_dma_offset;

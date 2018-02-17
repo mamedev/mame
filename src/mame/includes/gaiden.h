@@ -19,9 +19,7 @@ class gaiden_state : public driver_device
 public:
 	gaiden_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag),
-		m_videoram(*this, "videoram"),
-		m_videoram2(*this, "videoram2"),
-		m_videoram3(*this, "videoram3"),
+		m_videoram(*this, "videoram%u", 1),
 		m_spriteram(*this, "spriteram"),
 		m_adpcm_bank(*this, "adpcm_bank"),
 		m_maincpu(*this, "maincpu"),
@@ -37,9 +35,7 @@ public:
 		{ }
 
 	/* memory pointers */
-	required_shared_ptr<uint16_t> m_videoram;
-	required_shared_ptr<uint16_t> m_videoram2;
-	required_shared_ptr<uint16_t> m_videoram3;
+	required_shared_ptr_array<uint16_t, 3> m_videoram;
 	required_shared_ptr<uint16_t> m_spriteram;
 	optional_memory_bank m_adpcm_bank;
 
@@ -65,7 +61,7 @@ public:
 	int         m_sprite_sizey;
 	int         m_prot;
 	int         m_jumpcode;
-	const int   *m_raiga_jumppoints;
+	const int   *m_jumppoints; // raiga, wildfang
 	bool        m_adpcm_toggle;
 
 	/* devices */
@@ -102,9 +98,8 @@ public:
 	DECLARE_WRITE16_MEMBER(gaiden_fgoffsety_w);
 	DECLARE_WRITE16_MEMBER(gaiden_bgoffsety_w);
 	DECLARE_WRITE16_MEMBER(gaiden_sproffsety_w);
-	DECLARE_WRITE16_MEMBER(gaiden_videoram3_w);
-	DECLARE_WRITE16_MEMBER(gaiden_videoram2_w);
-	DECLARE_WRITE16_MEMBER(gaiden_videoram_w);
+	template<int TileMap> DECLARE_WRITE16_MEMBER(gaiden_videoram_w);
+	DECLARE_WRITE16_MEMBER(gaiden_tx_videoram_w);
 	DECLARE_DRIVER_INIT(raiga);
 	DECLARE_DRIVER_INIT(drgnbowl);
 	DECLARE_DRIVER_INIT(drgnbowla);
@@ -115,7 +110,6 @@ public:
 	TILE_GET_INFO_MEMBER(get_fg_tile_info);
 	TILE_GET_INFO_MEMBER(get_fg_tile_info_raiga);
 	TILE_GET_INFO_MEMBER(get_tx_tile_info);
-	DECLARE_MACHINE_START(raiga);
 	DECLARE_MACHINE_START(mastninj);
 	DECLARE_MACHINE_RESET(raiga);
 	DECLARE_VIDEO_START(gaiden);
@@ -123,7 +117,6 @@ public:
 	DECLARE_VIDEO_START(raiga);
 	uint32_t screen_update_gaiden(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 	uint32_t screen_update_drgnbowl(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
-	uint32_t screen_update_raiga(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 	void drgnbowl_draw_sprites(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	void descramble_drgnbowl(int descramble_cpu);
 	void descramble_mastninj_gfx(uint8_t* src);
@@ -131,11 +124,17 @@ public:
 	void drgnbowl(machine_config &config);
 	void mastninj(machine_config &config);
 	void shadoww(machine_config &config);
+	void wildfang(machine_config &config);
 	void drgnbowl_map(address_map &map);
 	void drgnbowl_sound_map(address_map &map);
 	void drgnbowl_sound_port_map(address_map &map);
 	void gaiden_map(address_map &map);
+	void wildfang_map(address_map &map);
+	void raiga_map(address_map &map);
 	void mastninj_map(address_map &map);
 	void mastninj_sound_map(address_map &map);
 	void sound_map(address_map &map);
+protected:
+	virtual void machine_start() override;
+	virtual void machine_reset() override;
 };
