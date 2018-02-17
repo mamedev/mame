@@ -313,7 +313,7 @@ void gaiden_state::machine_reset()
 
 MACHINE_RESET_MEMBER(gaiden_state,raiga)
 {
-	gaiden_state::machine_reset()
+	gaiden_state::machine_reset();
 	m_jumppoints = raiga_jumppoints_00;
 }
 
@@ -389,6 +389,19 @@ READ16_MEMBER(gaiden_state::raiga_protection_r)
 {
 //  logerror("PC %06x: read prot %02x\n", m_maincpu->pc(), m_prot);
 	return m_prot;
+}
+
+template<int TileMap>
+WRITE16_MEMBER(gaiden_state::gaiden_videoram_w)
+{
+	COMBINE_DATA(&m_videoram[TileMap][offset]);
+	m_background->mark_tile_dirty(offset & 0x07ff);
+}
+
+WRITE16_MEMBER(gaiden_state::gaiden_tx_videoram_w)
+{
+	COMBINE_DATA(&m_videoram[0][offset]);
+	m_text_layer->mark_tile_dirty(offset & 0x03ff);
 }
 
 ADDRESS_MAP_START(gaiden_state::gaiden_map)
