@@ -181,8 +181,8 @@ class jclub2o_state : public jclub2_state
 public:
 	jclub2o_state(const machine_config &mconfig, device_type type, const char *tag) :
 		jclub2_state(mconfig, type, tag),
-		m_soundcpu(*this, "soundcpu", 0),
-		m_soundbank(*this, "soundbank", 0)
+		m_soundcpu(*this, "soundcpu"),
+		m_soundbank(*this, "soundbank")
 	{ }
 	
 	required_device<cpu_device> m_soundcpu;

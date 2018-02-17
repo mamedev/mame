@@ -206,19 +206,6 @@ WRITE16_MEMBER(gaiden_state::gaiden_sproffsety_w)
 	}
 }
 
-template<int TileMap>
-WRITE16_MEMBER(gaiden_state::gaiden_videoram_w)
-{
-	COMBINE_DATA(&m_videoram[TileMap][offset]);
-	m_background->mark_tile_dirty(offset & 0x07ff);
-}
-
-WRITE16_MEMBER(gaiden_state::gaiden_tx_videoram_w)
-{
-	COMBINE_DATA(&m_videoram[0][offset]);
-	m_text_layer->mark_tile_dirty(offset & 0x03ff);
-}
-
 
 
 /***************************************************************************
