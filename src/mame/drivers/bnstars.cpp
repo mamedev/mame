@@ -155,7 +155,6 @@ public:
 	TILE_GET_INFO_MEMBER(get_ms32_bg1_tile_info);
 	TILE_GET_INFO_MEMBER(get_ms32_roz0_tile_info);
 	TILE_GET_INFO_MEMBER(get_ms32_roz1_tile_info);
-	virtual void machine_reset() override;
 	virtual void video_start() override;
 	uint32_t screen_update_bnstars_left(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	uint32_t screen_update_bnstars_right(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
@@ -797,16 +796,9 @@ ADDRESS_MAP_START(bnstars_state::bnstars_sound_map)
 	AM_RANGE(0x3f70, 0x3f70) AM_WRITENOP   // watchdog? banking? very noisy
 	AM_RANGE(0x3f80, 0x3f80) AM_WRITE(ms32_snd_bank_w)
 	AM_RANGE(0x4000, 0x7fff) AM_RAM
-	AM_RANGE(0x8000, 0xbfff) AM_ROMBANK("bank4")
-	AM_RANGE(0xc000, 0xffff) AM_ROMBANK("bank5")
+	AM_RANGE(0x8000, 0xbfff) AM_ROMBANK("z80bank1")
+	AM_RANGE(0xc000, 0xffff) AM_ROMBANK("z80bank2")
 ADDRESS_MAP_END
-
-void bnstars_state::machine_reset()
-{
-	irq_init();
-	membank("bank4")->set_entry(0);
-	membank("bank5")->set_entry(1);
-}
 
 
 MACHINE_CONFIG_START(bnstars_state::bnstars)
@@ -818,7 +810,7 @@ MACHINE_CONFIG_START(bnstars_state::bnstars)
 
 	MCFG_TIMER_DRIVER_ADD_SCANLINE("scantimer", bnstars_state, ms32_interrupt, "lscreen", 0, 1)
 
-	MCFG_CPU_ADD("audiocpu", Z80, 4000000)
+	MCFG_CPU_ADD("audiocpu", Z80, 4000000) // Unverified; it's possibly higher than 4MHz
 	MCFG_CPU_PROGRAM_MAP(bnstars_sound_map)
 
 	MCFG_QUANTUM_TIME(attotime::from_hz(60000))
@@ -856,14 +848,19 @@ MACHINE_CONFIG_START(bnstars_state::bnstars)
 	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
 
 	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
+	MCFG_GENERIC_LATCH_DATA_PENDING_CB(INPUTLINE("audiocpu", INPUT_LINE_NMI))
 
 	MCFG_SOUND_ADD("ymf1", YMF271, 16934400)
 	MCFG_SOUND_ROUTE(0, "lspeaker", 1.0)
 	MCFG_SOUND_ROUTE(1, "rspeaker", 1.0)
+//	MCFG_SOUND_ROUTE(2, "lspeaker", 1.0) Output 2/3 not used?
+//	MCFG_SOUND_ROUTE(3, "rspeaker", 1.0)
 
 	MCFG_SOUND_ADD("ymf2", YMF271, 16934400)
 	MCFG_SOUND_ROUTE(0, "lspeaker", 1.0)
 	MCFG_SOUND_ROUTE(1, "rspeaker", 1.0)
+//	MCFG_SOUND_ROUTE(2, "lspeaker", 1.0) Output 2/3 not used?
+//	MCFG_SOUND_ROUTE(3, "rspeaker", 1.0)
 
 MACHINE_CONFIG_END
 
@@ -937,4 +934,4 @@ DRIVER_INIT_MEMBER(bnstars_state,bnstars)
 	configure_banks();
 }
 
-GAME( 1997, bnstars1, 0,        bnstars, bnstars, bnstars_state, bnstars, ROT0,   "Jaleco", "Vs. Janshi Brandnew Stars", MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND )
+GAME( 1997, bnstars1, 0,        bnstars, bnstars, bnstars_state, bnstars, ROT0,   "Jaleco", "Vs. Janshi Brandnew Stars", MACHINE_IMPERFECT_GRAPHICS )
