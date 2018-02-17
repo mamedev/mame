@@ -130,7 +130,7 @@ public:
 
 	DECLARE_READ16_MEMBER(metafox_protection_r);
 	DECLARE_WRITE16_MEMBER(seta_vregs_w);
-	template<int Layer> DECLARE_WRITE16_MEMBER(seta_vram_w);
+	template<int Layer> DECLARE_WRITE16_MEMBER(vram_w);
 	DECLARE_WRITE16_MEMBER(twineagl_tilebank_w);
 	DECLARE_WRITE16_MEMBER(timer_regs_w);
 	DECLARE_READ16_MEMBER(sharedram_68000_r);
@@ -186,8 +186,7 @@ public:
 	DECLARE_DRIVER_INIT(eightfrc);
 	DECLARE_DRIVER_INIT(pairlove);
 	template<int Offset> TILE_GET_INFO_MEMBER(twineagl_get_tile_info);
-	template<int Offset> TILE_GET_INFO_MEMBER(get_tile_info_0);
-	template<int Offset> TILE_GET_INFO_MEMBER(get_tile_info_1);
+	template<int Layer, int Offset> TILE_GET_INFO_MEMBER(get_tile_info);
 	DECLARE_VIDEO_START(seta_no_layers);
 	DECLARE_VIDEO_START(kyustrkr_no_layers);
 	DECLARE_VIDEO_START(twineagl_1_layer);
@@ -226,8 +225,6 @@ public:
 	TIMER_DEVICE_CALLBACK_MEMBER(calibr50_interrupt);
 	TIMER_DEVICE_CALLBACK_MEMBER(crazyfgt_interrupt);
 	void seta_coin_lockout_w(int data);
-	inline void twineagl_tile_info( tile_data &tileinfo, int tile_index, int offset );
-	inline void get_tile_info( tile_data &tileinfo, int tile_index, int layer, int offset );
 	void set_pens();
 	void usclssic_set_pens();
 	void draw_tilemap_palette_effect(bitmap_ind16 &bitmap, const rectangle &cliprect, tilemap_t *tilemap, int scrollx, int scrolly, int gfxnum, int flipscreen);

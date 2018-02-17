@@ -382,11 +382,12 @@ TILE_GET_INFO_MEMBER(seta_state::twineagl_get_tile_info)
 	SET_TILE_INFO_MEMBER(1, (code & 0x3fff), attr & 0x1f, TILE_FLIPXY((code & 0xc000) >> 14) );
 }
 
-inline void seta_state::get_tile_info( tile_data &tileinfo, int tile_index, int layer, int offset )
+template<int Layer, int Offset> 
+TILE_GET_INFO_MEMBER(seta_state::get_tile_info)
 {
-	int gfx = 1 + layer;
-	uint16_t *vram = m_vram[layer] + offset;
-	uint16_t *vctrl = m_vctrl[layer];
+	int gfx = 1 + Layer;
+	uint16_t *vram = m_vram[Layer] + Offset;
+	uint16_t *vctrl = m_vctrl[Layer];
 	uint16_t code =   vram[ tile_index ];
 	uint16_t attr =   vram[ tile_index + 0x800 ];
 
@@ -396,22 +397,12 @@ inline void seta_state::get_tile_info( tile_data &tileinfo, int tile_index, int 
 	}
 	else
 	{
-		popmessage("Missing Color Mode = 1 for Layer = %d. Contact MAMETesters.",layer);
+		popmessage("Missing Color Mode = 1 for Layer = %d. Contact MAMETesters.",Layer);
 	}
 
 	SET_TILE_INFO_MEMBER(gfx, m_tiles_offset + (code & 0x3fff), attr & 0x1f, TILE_FLIPXY((code & 0xc000) >> 14) );
 }
 
-template<int Offset> TILE_GET_INFO_MEMBER(seta_state::get_tile_info_0){ get_tile_info(tileinfo, tile_index, 0, Offset ); }
-template<int Offset> TILE_GET_INFO_MEMBER(seta_state::get_tile_info_1){ get_tile_info(tileinfo, tile_index, 1, Offset ); }
-
-
-template<int Layer>
-WRITE16_MEMBER(seta_state::seta_vram_w)
-{
-	COMBINE_DATA(&m_vram[Layer][offset]);
-	m_tilemap[Layer][(offset >> 12) & 1]->mark_tile_dirty(offset & 0x7ff);
-}
 
 WRITE16_MEMBER(seta_state::twineagl_tilebank_w)
 {
@@ -438,21 +429,21 @@ VIDEO_START_MEMBER(seta_state,seta_2_layers)
 
 	/* layer 0 */
 	m_tilemap[0][0] = &machine().tilemap().create(
-			*m_gfxdecode, tilemap_get_info_delegate(FUNC(seta_state::get_tile_info_0<0x0000>),this), TILEMAP_SCAN_ROWS,
+			*m_gfxdecode, tilemap_get_info_delegate(&seta_state::get_tile_info<0, 0x0000>, "layer1_bank0", this), TILEMAP_SCAN_ROWS,
 			16,16, 64,32 );
 
 	m_tilemap[0][1] = &machine().tilemap().create(
-			*m_gfxdecode, tilemap_get_info_delegate(FUNC(seta_state::get_tile_info_0<0x1000>),this), TILEMAP_SCAN_ROWS,
+			*m_gfxdecode, tilemap_get_info_delegate(&seta_state::get_tile_info<0, 0x1000>, "layer1_bank1", this), TILEMAP_SCAN_ROWS,
 			16,16, 64,32 );
 
 
 	/* layer 1 */
 	m_tilemap[1][0] = &machine().tilemap().create(
-			*m_gfxdecode, tilemap_get_info_delegate(FUNC(seta_state::get_tile_info_1<0x0000>),this), TILEMAP_SCAN_ROWS,
+			*m_gfxdecode, tilemap_get_info_delegate(&seta_state::get_tile_info<1, 0x0000>, "layer2_bank0", this), TILEMAP_SCAN_ROWS,
 			16,16, 64,32 );
 
 	m_tilemap[1][1] = &machine().tilemap().create(
-			*m_gfxdecode, tilemap_get_info_delegate(FUNC(seta_state::get_tile_info_1<0x1000>),this), TILEMAP_SCAN_ROWS,
+			*m_gfxdecode, tilemap_get_info_delegate(&seta_state::get_tile_info<1, 0x1000>, "layer2_bank1", this), TILEMAP_SCAN_ROWS,
 			16,16, 64,32 );
 
 	m_tilemaps_flip = 0;
@@ -483,11 +474,11 @@ VIDEO_START_MEMBER(seta_state,seta_1_layer)
 
 	/* layer 0 */
 	m_tilemap[0][0] = &machine().tilemap().create(
-			*m_gfxdecode, tilemap_get_info_delegate(FUNC(seta_state::get_tile_info_0<0x0000>),this), TILEMAP_SCAN_ROWS,
+			*m_gfxdecode, tilemap_get_info_delegate(&seta_state::get_tile_info<0, 0x0000>, "layer1_bank0", this), TILEMAP_SCAN_ROWS,
 			16,16, 64,32 );
 
 	m_tilemap[0][1] = &machine().tilemap().create(
-			*m_gfxdecode, tilemap_get_info_delegate(FUNC(seta_state::get_tile_info_0<0x1000>),this), TILEMAP_SCAN_ROWS,
+			*m_gfxdecode, tilemap_get_info_delegate(&seta_state::get_tile_info<0, 0x1000>, "layer1_bank1", this), TILEMAP_SCAN_ROWS,
 			16,16, 64,32 );
 
 	m_color_mode_shift = 4;
