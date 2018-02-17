@@ -292,6 +292,32 @@ WRITE8_MEMBER(nmk16_state::tharrier_oki6295_bankswitch_w)
 		m_okibank[Chip]->set_entry(data);
 }
 
+/***************************************************************************
+
+  VRAM handlers
+
+***************************************************************************/
+
+template<int Bank>
+WRITE16_MEMBER(nmk16_state::nmk_bgvideoram_w)
+{
+	COMBINE_DATA(&m_nmk_bgvideoram[Bank][offset]);
+	m_bg_tilemap[Bank]->mark_tile_dirty(offset);
+}
+
+WRITE16_MEMBER(nmk16_state::nmk_fgvideoram_w)
+{
+	COMBINE_DATA(&m_nmk_fgvideoram[offset]);
+	m_fg_tilemap->mark_tile_dirty(offset);
+}
+
+WRITE16_MEMBER(nmk16_state::nmk_txvideoram_w)
+{
+	COMBINE_DATA(&m_nmk_txvideoram[offset]);
+	m_tx_tilemap->mark_tile_dirty(offset);
+}
+
+
 /***************************************************************************/
 
 ADDRESS_MAP_START(nmk16_state::vandyke_map)

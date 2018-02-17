@@ -186,33 +186,6 @@ VIDEO_START_MEMBER(nmk16_state,bjtwin)
 }
 
 
-
-/***************************************************************************
-
-  Memory handlers
-
-***************************************************************************/
-
-template<int Bank>
-WRITE16_MEMBER(nmk16_state::nmk_bgvideoram_w)
-{
-	COMBINE_DATA(&m_nmk_bgvideoram[Bank][offset]);
-	m_bg_tilemap[Bank]->mark_tile_dirty(offset);
-}
-
-WRITE16_MEMBER(nmk16_state::nmk_fgvideoram_w)
-{
-	COMBINE_DATA(&m_nmk_fgvideoram[offset]);
-	m_fg_tilemap->mark_tile_dirty(offset);
-}
-
-WRITE16_MEMBER(nmk16_state::nmk_txvideoram_w)
-{
-	COMBINE_DATA(&m_nmk_txvideoram[offset]);
-	m_tx_tilemap->mark_tile_dirty(offset);
-}
-
-
 WRITE16_MEMBER(nmk16_state::mustang_scroll_w)
 {
 //  osd_printf_debug("mustang %04x %04x %04x\n",offset,data,mem_mask);
