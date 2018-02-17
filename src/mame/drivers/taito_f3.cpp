@@ -34,7 +34,6 @@
 
 #include "emu.h"
 #include "includes/taito_f3.h"
-#include "audio/taito_en.h"
 
 #include "cpu/m68000/m68000.h"
 #include "machine/eepromser.h"
@@ -122,7 +121,7 @@ WRITE32_MEMBER(taito_f3_state::f3_sound_bankswitch_w)
 {
 	if (m_f3_game==KIRAMEKI) {
 		uint16_t *rom = (uint16_t *)memregion("taito_en:audiocpu")->base();
-		uint32_t idx;
+		int idx;
 
 		idx = (offset << 1) & 0x1e;
 		if (ACCESSING_BITS_0_15)
@@ -133,7 +132,7 @@ WRITE32_MEMBER(taito_f3_state::f3_sound_bankswitch_w)
 
 		/* Banks are 0x20000 bytes each, divide by two to get data16
 		pointer rather than byte pointer */
-		membank("taito_en:bank2")->set_base(&rom[(idx*0x20000)/2 + 0x80000]);
+		m_taito_en->set_bank(1,idx);
 
 	} else {
 		logerror("Sound bankswitch in unsupported game\n");
