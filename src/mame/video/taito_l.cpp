@@ -82,8 +82,8 @@ WRITE8_MEMBER(horshoes_state::bankg_w)
 	{
 		m_horshoes_gfxbank = data;
 
-		m_bg_tilemap[0]->mark_all_dirty();
-		m_bg_tilemap[1]->mark_all_dirty();
+		for (int i = 0; i < 2; i++)
+			m_bg_tilemap[i]->mark_all_dirty();
 	}
 }
 
@@ -94,8 +94,8 @@ WRITE8_MEMBER(taitol_state::taitol_bankc_w)
 		m_bankc[offset] = data;
 //      logerror("Bankc %d, %02x (%s)\n", offset, data, m_maincpu->pc());
 
-		m_bg_tilemap[0]->mark_all_dirty();
-		m_bg_tilemap[1]->mark_all_dirty();
+		for (int i = 0; i < 2; i++)
+			m_bg_tilemap[i]->mark_all_dirty();
 	}
 }
 
@@ -145,10 +145,8 @@ WRITE8_MEMBER(taitol_state::vram_w)
 	switch (offset & 0xf000)
 	{
 		case 0x8000:
-			m_bg_tilemap[0]->mark_tile_dirty((offset & 0xfff) / 2);
-			break;
 		case 0x9000:
-			m_bg_tilemap[1]->mark_tile_dirty((offset & 0xfff) / 2);
+			m_bg_tilemap[(offset >> 12) & 1]->mark_tile_dirty((offset & 0xfff) / 2);
 			break;
 		case 0xa000:
 			m_tx_tilemap->mark_tile_dirty((offset & 0xfff) / 2);
