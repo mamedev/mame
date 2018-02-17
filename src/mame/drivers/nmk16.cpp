@@ -455,7 +455,7 @@ ADDRESS_MAP_START(nmk16_state::twinactn_map)
 	AM_RANGE(0x08000e, 0x08000f) AM_NOP
 	AM_RANGE(0x080014, 0x080015) AM_WRITE(nmk_flipscreen_w)
 	AM_RANGE(0x080016, 0x080017) AM_WRITENOP    // frame number?
-	AM_RANGE(0x08001e, 0x08001f) AM_DEVWRITE("soundlatch", generic_latch_8_device, write, 0x00ff)
+	AM_RANGE(0x08001e, 0x08001f) AM_DEVWRITE8("soundlatch", generic_latch_8_device, write, 0x00ff)
 	AM_RANGE(0x088000, 0x0887ff) AM_RAM_DEVWRITE("palette", palette_device, write16) AM_SHARE("palette")
 	AM_RANGE(0x08c000, 0x08c001) AM_WRITE(mustang_scroll_w)
 	AM_RANGE(0x08c002, 0x08c087) AM_WRITENOP    // ??
@@ -944,7 +944,7 @@ ADDRESS_MAP_START(nmk16_state::ssmissin_map)
 //  AM_RANGE(0x0c000e, 0x0c000f) AM_READ(??)
 	AM_RANGE(0x0c0014, 0x0c0015) AM_WRITE(nmk_flipscreen_w) /* Maybe */
 	AM_RANGE(0x0c0018, 0x0c0019) AM_WRITE(nmk_tilebank_w) /* Tile Bank ? */
-	AM_RANGE(0x0c001e, 0x0c001f) AM_DEVWRITE("soundlatch", generic_latch_8_device, write, 0x00ff)
+	AM_RANGE(0x0c001e, 0x0c001f) AM_DEVWRITE8("soundlatch", generic_latch_8_device, write, 0x00ff)
 	AM_RANGE(0x0c4000, 0x0c4007) AM_RAM_WRITE(nmk_scroll_w)
 	AM_RANGE(0x0c8000, 0x0c87ff) AM_RAM_DEVWRITE("palette", palette_device, write16) AM_SHARE("palette")
 	AM_RANGE(0x0cc000, 0x0cffff) AM_RAM_WRITE(nmk_bgvideoram_w<0>) AM_SHARE("nmk_bgvideoram0")
@@ -1036,7 +1036,7 @@ ADDRESS_MAP_START(nmk16_state::macross2_map)
 	AM_RANGE(0x100014, 0x100015) AM_WRITE(nmk_flipscreen_w)
 	AM_RANGE(0x100016, 0x100017) AM_WRITE(macross2_sound_reset_w)   /* Z80 reset */
 	AM_RANGE(0x100018, 0x100019) AM_WRITE(nmk_tilebank_w)
-	AM_RANGE(0x10001e, 0x10001f) AM_DEVWRITE("soundlatch", generic_latch_8_device, write, 0x00ff) /* to Z80 */
+	AM_RANGE(0x10001e, 0x10001f) AM_DEVWRITE8("soundlatch", generic_latch_8_device, write, 0x00ff) /* to Z80 */
 	AM_RANGE(0x120000, 0x1207ff) AM_RAM_DEVWRITE("palette", palette_device, write16) AM_SHARE("palette")
 
 	AM_RANGE(0x130000, 0x1301ff) AM_RAM AM_SHARE("scrollram")
@@ -1068,7 +1068,7 @@ ADDRESS_MAP_START(nmk16_state::raphero_map)
 	AM_RANGE(0x100014, 0x100015) AM_WRITE(nmk_flipscreen_w)
 	AM_RANGE(0x100016, 0x100017) AM_WRITENOP    /* IRQ enable or z80 sound reset like in Macross 2? */
 	AM_RANGE(0x100018, 0x100019) AM_WRITE(nmk_tilebank_w)
-	AM_RANGE(0x10001e, 0x10001f) AM_DEVWRITE("soundlatch", generic_latch_8_device, write, 0x00ff) /* to Z80 */
+	AM_RANGE(0x10001e, 0x10001f) AM_DEVWRITE8("soundlatch", generic_latch_8_device, write, 0x00ff) /* to Z80 */
 	AM_RANGE(0x120000, 0x1207ff) AM_RAM_DEVWRITE("palette", palette_device, write16) AM_SHARE("palette")
 
 	AM_RANGE(0x130000, 0x1301ff) AM_RAM AM_SHARE("scrollram")
@@ -5041,7 +5041,7 @@ ADDRESS_MAP_START(nmk16_state::afega_map)
 	AM_RANGE(0x080004, 0x080005) AM_READ_PORT("DSW1")           // 2 x DSW
 	AM_RANGE(0x080012, 0x080013) AM_READ(afega_unknown_r)
 	AM_RANGE(0x080000, 0x08001d) AM_WRITEONLY               //
-	AM_RANGE(0x08001e, 0x08001f) AM_DEVWRITE("soundlatch", generic_latch_8_device, write, 0x00ff)   // To Sound CPU
+	AM_RANGE(0x08001e, 0x08001f) AM_DEVWRITE8("soundlatch", generic_latch_8_device, write, 0x00ff)   // To Sound CPU
 	AM_RANGE(0x080020, 0x087fff) AM_WRITEONLY               //
 	AM_RANGE(0x084000, 0x084003) AM_RAM_WRITE(afega_scroll_w<0>)  // Scroll on redhawkb (mirror or changed?..)
 	AM_RANGE(0x084004, 0x084007) AM_RAM_WRITE(afega_scroll_w<1>)  // Scroll on redhawkb (mirror or changed?..)
@@ -5066,7 +5066,7 @@ ADDRESS_MAP_START(nmk16_state::firehawk_map)
 	AM_RANGE(0x280004, 0x280005) AM_READ_PORT("DSW1")           // 2 x DSW
 	AM_RANGE(0x280012, 0x280013) AM_READ(afega_unknown_r)
 	AM_RANGE(0x280000, 0x28001d) AM_WRITEONLY               //
-	AM_RANGE(0x28001e, 0x28001f) AM_DEVWRITE("soundlatch", generic_latch_8_device, write, 0x00ff)   // To Sound CPU
+	AM_RANGE(0x28001e, 0x28001f) AM_DEVWRITE8("soundlatch", generic_latch_8_device, write, 0x00ff)   // To Sound CPU
 	AM_RANGE(0x280020, 0x287fff) AM_WRITEONLY               //
 	AM_RANGE(0x284000, 0x284003) AM_RAM_WRITE(afega_scroll_w<0>)  // Scroll on redhawkb (mirror or changed?..)
 	AM_RANGE(0x284004, 0x284007) AM_RAM_WRITE(afega_scroll_w<1>)  // Scroll on redhawkb (mirror or changed?..)
