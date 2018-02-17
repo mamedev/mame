@@ -62,7 +62,6 @@ private:
 	uint16_t coin_counter[2];
 };
 
-extern const device_type SEGA_837_13551;
 DECLARE_DEVICE_TYPE(SEGA_837_13551, sega_837_13551_device)
 
 #endif // MAME_MACHINE_JVS13551_H

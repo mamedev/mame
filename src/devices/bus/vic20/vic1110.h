@@ -46,7 +46,6 @@ private:
 
 
 // device type definition
-extern const device_type VIC1110;
 DECLARE_DEVICE_TYPE(VIC1110, vic1110_device)
 
 #endif // MAME_BUS_VIC20_VIC1110_H

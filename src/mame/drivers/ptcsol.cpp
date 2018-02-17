@@ -164,8 +164,6 @@ public:
 		, m_iop_s2(*this, "S2")
 		, m_iop_s3(*this, "S3")
 		, m_iop_s4(*this, "S4")
-		, m_cassette1(*this, "cassette")
-		, m_cassette2(*this, "cassette2")
 	{ }
 
 	DECLARE_READ8_MEMBER( sol20_f8_r );
@@ -213,8 +211,6 @@ private:
 	required_ioport m_iop_s2;
 	required_ioport m_iop_s3;
 	required_ioport m_iop_s4;
-	required_device<cassette_image_device> m_cassette1;
-	required_device<cassette_image_device> m_cassette2;
 };
 
 
@@ -224,9 +220,9 @@ private:
 cassette_image_device *sol20_state::cassette_device_image()
 {
 	if (m_sol20_fa & 0x40)
-		return m_cassette2;
+		return m_cass2;
 	else
-		return m_cassette1;
+		return m_cass1;
 }
 
 

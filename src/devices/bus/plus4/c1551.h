@@ -97,7 +97,6 @@ private:
 
 
 // device type definition
-extern const device_type C1551;
 DECLARE_DEVICE_TYPE(C1551, c1551_device)
 
 #endif // MAME_BUS_PLUS4_C1551_H

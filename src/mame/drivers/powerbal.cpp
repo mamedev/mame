@@ -30,14 +30,11 @@ class powerbal_state : public playmark_state
 public:
 	powerbal_state(const machine_config &mconfig, device_type type, const char *tag)
 		: playmark_state(mconfig, type, tag)
-		, m_eeprom(*this, "eeprom")
 	{ }
 
 	/* powerbal-specific */
 	int         m_tilebank;
 	int         m_bg_yoffset;
-
-	optional_device<eeprom_serial_93cxx_device> m_eeprom;
 
 	DECLARE_DRIVER_INIT(powerbal);
 	DECLARE_DRIVER_INIT(magicstk);

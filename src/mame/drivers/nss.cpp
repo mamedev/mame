@@ -313,14 +313,12 @@ public:
 		m_m50458(*this,"m50458"),
 		m_s3520cf(*this, "s3520cf"),
 		m_rp5h01(*this,"rp5h01"),
-		m_screen(*this, "screen"),
 		m_palette(*this, "palette")
 	{ }
 
 	required_device<m50458_device> m_m50458;
 	required_device<s3520cf_device> m_s3520cf;
 	required_device<rp5h01_device> m_rp5h01;
-	required_device<screen_device> m_screen;
 	optional_device<palette_device> m_palette;
 
 	uint8_t m_wram_wp_flag;

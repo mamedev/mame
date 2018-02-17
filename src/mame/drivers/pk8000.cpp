@@ -30,7 +30,6 @@ class pk8000_state : public pk8000_base_state
 public:
 	pk8000_state(const machine_config &mconfig, device_type type, const char *tag)
 		: pk8000_base_state(mconfig, type, tag)
-		, m_maincpu(*this, "maincpu")
 		, m_cassette(*this, "cassette")
 		, m_ram(*this, RAM_TAG)
 		, m_speaker(*this, "speaker")
@@ -69,7 +68,6 @@ public:
 	void pk8000_io(address_map &map);
 	void pk8000_mem(address_map &map);
 protected:
-	required_device<cpu_device> m_maincpu;
 	required_device<cassette_image_device> m_cassette;
 	required_device<ram_device> m_ram;
 	required_device<speaker_sound_device> m_speaker;

@@ -423,7 +423,7 @@ void tnx1_state::draw_background(bitmap_ind16 &bitmap, const rectangle &cliprect
 		for (int x = cliprect.min_x; x <= cliprect.max_x; x++)
 		{
 			if (sy < 0)
-				bitmap.pix16(y, x) = m_background_ram[0x3f] & 0xf; // TODO: find out exactly where the data is fetched from
+				bitmap.pix16(y, x) = m_background_ram[0] & 0xf; // TODO: find out exactly where the data is fetched from
 			else
 			{
 				// TODO: confirm the memory layout
@@ -449,7 +449,7 @@ void tpp1_state::draw_background(bitmap_ind16 &bitmap, const rectangle &cliprect
 		for (int x = cliprect.min_x; x <= cliprect.max_x; x++)
 		{
 			if (sy < 0)
-				bitmap.pix16(y, x) = m_background_ram[0x3f] & 0xf; // TODO: find out exactly where the data is fetched from
+				bitmap.pix16(y, x) = m_background_ram[0] & 0xf; // TODO: find out exactly where the data is fetched from
 			else
 			{
 				// TODO: confirm the memory layout
@@ -475,7 +475,7 @@ void tpp2_state::draw_background(bitmap_ind16 &bitmap, const rectangle &cliprect
 		for (int x = cliprect.min_x; x <= cliprect.max_x; x++)
 		{
 			if (sy < 0)
-				bitmap.pix16(y, x) = m_background_ram[0x3f] & 0xf; // TODO: find out exactly where the data is fetched from
+				bitmap.pix16(y, x) = m_background_ram[((sy & 0x100) / 8) * 0x40] & 0xf;
 			else
 			{
 				// TODO: confirm the memory layout

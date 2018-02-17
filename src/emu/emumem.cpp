@@ -331,14 +331,15 @@ public:
 	void apply_mask(offs_t addrmask) { m_addrmask &= addrmask; }
 
 	void clear_conflicting_subunits(u64 handlermask);
-	bool overriden_by_mask(u64 handlermask);
+	bool overriden_by_mask(u64 handlermask) const;
 
 protected:
 	// Subunit description information
 	struct subunit_info
 	{
 		offs_t              m_addrmask;             // addrmask for this subunit
-		u32                 m_csmask;               // chip select mask for this subunit
+		u64                 m_datamask;             // datamask for this subunit
+		u64                 m_csmask;               // chip select mask for this subunit
 		s32                 m_offset;               // offset to add to the address
 		u32                 m_multiplier;           // multiplier to the pre-split address
 		u8                  m_size;                 // size (8, 16 or 32)
@@ -525,7 +526,7 @@ template<typename HandlerEntry>
 class handler_entry_proxy
 {
 public:
-	handler_entry_proxy(std::list<HandlerEntry *> _handlers, u64 _umask, int _cswidth) : handlers(std::move(_handlers)), umask(_umask), cswidth(_cswidth) {}
+	handler_entry_proxy(std::list<HandlerEntry *> &&_handlers, u64 _umask, int _cswidth) : handlers(std::move(_handlers)), umask(_umask), cswidth(_cswidth) {}
 	handler_entry_proxy(const handler_entry_proxy<HandlerEntry> &hep) : handlers(hep.handlers), umask(hep.umask), cswidth(hep.cswidth) {}
 
 	// forward delegate callbacks configuration
@@ -607,7 +608,7 @@ public:
 
 	// table mapping helpers
 	void map_range(offs_t addrstart, offs_t addrend, offs_t addrmask, offs_t addrmirror, u16 staticentry);
-	void setup_range(offs_t addrstart, offs_t addrend, offs_t addrmask, offs_t addrmirror, u64 umask, std::list<u32> &entries);
+	std::list<u32> setup_range(offs_t addrstart, offs_t addrend, offs_t addrmask, offs_t addrmirror, u64 umask);
 	u16 derive_range(offs_t address, offs_t &addrstart, offs_t &addrend) const;
 
 	// misc helpers
@@ -665,8 +666,9 @@ private:
 	u16 handler_free;
 	u16 get_free_handler();
 	void verify_reference_counts();
-	void setup_range_solid(offs_t addrstart, offs_t addrend, offs_t addrmask, offs_t addrmirror, std::list<u32> &entries);
-	void setup_range_masked(offs_t addrstart, offs_t addrend, offs_t addrmask, offs_t addrmirror, u64 umask, std::list<u32> &entries);
+	bool range_simply_masks(offs_t addrstart, offs_t addrend, offs_t addrmask, offs_t addrmirror, u64 umask);
+	std::list<u32> setup_range_solid(offs_t addrstart, offs_t addrend, offs_t addrmask, offs_t addrmirror);
+	std::list<u32> setup_range_masked(offs_t addrstart, offs_t addrend, offs_t addrmask, offs_t addrmirror, u64 umask);
 
 	void handler_ref(u16 entry, int count)
 	{
@@ -705,12 +707,11 @@ public:
 
 	// range getter
 	handler_entry_proxy<handler_entry_read> handler_map_range(offs_t addrstart, offs_t addrend, offs_t addrmask, offs_t addrmirror, u64 umask = 0, int cswidth = 0) {
-		std::list<u32> entries;
-		setup_range(addrstart, addrend, addrmask, addrmirror, umask, entries);
+		std::list<u32> entries = setup_range(addrstart, addrend, addrmask, addrmirror, umask);
 		std::list<handler_entry_read *> handlers;
 		for (std::list<u32>::const_iterator i = entries.begin(); i != entries.end(); ++i)
 			handlers.push_back(&handler_read(*i));
-		return handler_entry_proxy<handler_entry_read>(handlers, umask, cswidth);
+		return handler_entry_proxy<handler_entry_read>(std::move(handlers), umask, cswidth);
 	}
 
 private:
@@ -778,12 +779,11 @@ public:
 
 	// range getter
 	handler_entry_proxy<handler_entry_write> handler_map_range(offs_t addrstart, offs_t addrend, offs_t addrmask, offs_t addrmirror, u64 umask = 0, int cswidth = 0) {
-		std::list<u32> entries;
-		setup_range(addrstart, addrend, addrmask, addrmirror, umask, entries);
+		std::list<u32> entries = setup_range(addrstart, addrend, addrmask, addrmirror, umask);
 		std::list<handler_entry_write *> handlers;
 		for (std::list<u32>::const_iterator i = entries.begin(); i != entries.end(); ++i)
 			handlers.push_back(&handler_write(*i));
-		return handler_entry_proxy<handler_entry_write>(handlers, umask, cswidth);
+		return handler_entry_proxy<handler_entry_write>(std::move(handlers), umask, cswidth);
 	}
 
 private:
@@ -856,12 +856,11 @@ public:
 
 	// range getter
 	handler_entry_proxy<handler_entry_setoffset> handler_map_range(offs_t addrstart, offs_t addrend, offs_t addrmask, offs_t addrmirror, u64 umask = 0, int cswidth = 0) {
-		std::list<u32> entries;
-		setup_range(addrstart, addrend, addrmask, addrmirror, umask, entries);
+		std::list<u32> entries = setup_range(addrstart, addrend, addrmask, addrmirror, umask);
 		std::list<handler_entry_setoffset *> handlers;
 		for (std::list<u32>::const_iterator i = entries.begin(); i != entries.end(); ++i)
 			handlers.push_back(&handler_setoffset(*i));
-		return handler_entry_proxy<handler_entry_setoffset>(handlers, umask, cswidth);
+		return handler_entry_proxy<handler_entry_setoffset>(std::move(handlers), umask, cswidth);
 	}
 
 private:
@@ -2074,7 +2073,7 @@ void address_space::check_optimize_all(const char *function, int width, offs_t a
 		// Check if the 1-blocks are of appropriate size
 		u64 block_mask = 0xffffffffffffffffU >> (64 - width);
 		u64 cs_mask = 0xffffffffffffffffU >> (64 - ncswidth);
-		for(int pos = 0; pos != 64; pos += ncswidth) {
+		for(int pos = 0; pos < 64; pos += ncswidth) {
 			u64 cmask = (unitmask >> pos) & cs_mask;
 			while (cmask != 0 && (cmask & block_mask) == 0)
 				cmask >>= width;
@@ -3244,15 +3243,37 @@ u16 address_table::get_free_handler()
 //  it
 //-------------------------------------------------
 
-void address_table::setup_range(offs_t addrstart, offs_t addrend, offs_t addrmask, offs_t addrmirror, u64 umask, std::list<u32> &entries)
+std::list<u32> address_table::setup_range(offs_t addrstart, offs_t addrend, offs_t addrmask, offs_t addrmirror, u64 umask)
 {
 	// Careful, you can't shift by 64 or more
 	u64 testmask = (1ULL << (m_space.data_width()-1) << 1) - 1;
 
-	if ((umask & testmask) == 0 || (umask & testmask) == testmask)
-		setup_range_solid(addrstart, addrend, addrmask, addrmirror, entries);
+	if ((umask & testmask) == 0 || (umask & testmask) == testmask || range_simply_masks(addrstart, addrend, addrmask, addrmirror, umask))
+		return setup_range_solid(addrstart, addrend, addrmask, addrmirror);
 	else
-		setup_range_masked(addrstart, addrend, addrmask, addrmirror, umask, entries);
+		return setup_range_masked(addrstart, addrend, addrmask, addrmirror, umask);
+}
+
+//-------------------------------------------------
+//  range_simply_masks - determine if a handler
+//  can fully override part of one existing range
+//  (speeds up mapping in heavily mirrored cases)
+//-------------------------------------------------
+
+bool address_table::range_simply_masks(offs_t addrstart, offs_t addrend, offs_t addrmask, offs_t addrmirror, u64 umask)
+{
+	// convert addresses to bytes
+	m_space.adjust_addresses(addrstart, addrend, addrmask, addrmirror);
+
+	// Validity checks
+	assert_always(addrstart <= addrend, "address_table::setup_range called with start greater than end");
+	assert_always((addrstart & (m_space.alignment() - 1)) == 0, "address_table::setup_range called with misaligned start address");
+	assert_always((addrend & (m_space.alignment() - 1)) == (m_space.alignment() - 1), "address_table::setup_range called with misaligned end address");
+
+	offs_t range_start, range_end;
+	u16 entry = derive_range(addrstart, range_start, range_end);
+
+	return range_end >= (addrend | addrmirror) && (entry < STATIC_COUNT || handler(entry).overriden_by_mask(umask));
 }
 
 //-------------------------------------------------
@@ -3261,8 +3282,10 @@ void address_table::setup_range(offs_t addrstart, offs_t addrend, offs_t addrmas
 //  it.  Replace what's there.
 //-------------------------------------------------
 
-void address_table::setup_range_solid(offs_t addrstart, offs_t addrend, offs_t addrmask, offs_t addrmirror, std::list<u32> &entries)
+std::list<u32> address_table::setup_range_solid(offs_t addrstart, offs_t addrend, offs_t addrmask, offs_t addrmirror)
 {
+	std::list<u32> entries;
+
 	// Grab a free entry
 	u16 entry = get_free_handler();
 
@@ -3271,10 +3294,12 @@ void address_table::setup_range_solid(offs_t addrstart, offs_t addrend, offs_t a
 
 	// Configure and map it
 	map_range(addrstart, addrend, addrmask, addrmirror, entry);
+
+	return entries;
 }
 
 //-------------------------------------------------
-//  setup_range_solid - finds an appropriate handler
+//  setup_range_masked - finds an appropriate handler
 //  entry and requests to populate the address map with
 //  it.  Handle non-overlapping subunits.
 //-------------------------------------------------
@@ -3286,8 +3311,10 @@ namespace {
 	};
 }
 
-void address_table::setup_range_masked(offs_t addrstart, offs_t addrend, offs_t addrmask, offs_t addrmirror, u64 umask, std::list<u32> &entries)
+std::list<u32> address_table::setup_range_masked(offs_t addrstart, offs_t addrend, offs_t addrmask, offs_t addrmirror, u64 umask)
 {
+	std::list<u32> entries;
+
 	// convert addresses to bytes
 	m_space.adjust_addresses(addrstart, addrend, addrmask, addrmirror);
 
@@ -3312,7 +3339,7 @@ void address_table::setup_range_masked(offs_t addrstart, offs_t addrend, offs_t 
 		{
 			offs_t range_start, range_end;
 			u16 entry = derive_range(base_address, range_start, range_end);
-			u32 stop_address = range_end > end_address ? end_address : range_end;
+			u32 stop_address = std::min(range_end, end_address);
 
 			if (entry < STATIC_COUNT || handler(entry).overriden_by_mask(umask))
 				range_override.push_back(subrange(base_address, stop_address));
@@ -3393,6 +3420,7 @@ void address_table::setup_range_masked(offs_t addrstart, offs_t addrend, offs_t 
 	}
 
 	//  verify_reference_counts();
+	return entries;
 }
 
 
@@ -4648,6 +4676,7 @@ void handler_entry::configure_subunits(u64 handlermask, int handlerbits, int csw
 		if (((handlermask >> shift) & unitmask) != 0)
 		{
 			m_subunit_infos[m_subunits].m_addrmask = m_bytemask / (maxunits / multiplier);
+			m_subunit_infos[m_subunits].m_datamask = unitmask << shift;
 			m_subunit_infos[m_subunits].m_csmask = selectmask << (((unitnum^shift_xor_mask) & ~(granularity-1)) * handlerbits);
 			m_subunit_infos[m_subunits].m_offset = cur_offset++;
 			m_subunit_infos[m_subunits].m_size = handlerbits;
@@ -4682,7 +4711,7 @@ void handler_entry::clear_conflicting_subunits(u64 handlermask)
 
 	// Start by the end to avoid unnecessary memmoves
 	for (int i=m_subunits-1; i>=0; i--)
-		if (((handlermask >> m_subunit_infos[i].m_shift) & ((u64(1) << m_subunit_infos[m_subunits].m_size) - 1)) != 0)
+		if ((handlermask & m_subunit_infos[i].m_datamask) != 0)
 		{
 			if (i != m_subunits-1)
 				memmove (m_subunit_infos+i, m_subunit_infos+i+1, (m_subunits-i-1)*sizeof(m_subunit_infos[0]));
@@ -4692,7 +4721,7 @@ void handler_entry::clear_conflicting_subunits(u64 handlermask)
 	// Recompute the inverse mask
 	m_invsubmask = 0;
 	for (int i = 0; i < m_subunits; i++)
-		m_invsubmask |= ((u64(1) << m_subunit_infos[m_subunits].m_size) - 1) << m_subunit_infos[i].m_shift;
+		m_invsubmask |= m_subunit_infos[i].m_datamask;
 	m_invsubmask = ~m_invsubmask;
 }
 
@@ -4703,7 +4732,7 @@ void handler_entry::clear_conflicting_subunits(u64 handlermask)
 //  that's currently present
 //-------------------------------------------------
 
-bool handler_entry::overriden_by_mask(u64 handlermask)
+bool handler_entry::overriden_by_mask(u64 handlermask) const
 {
 	// A mask of 0 is in fact an alternative way of saying ~0
 	if (!handlermask)
@@ -4715,7 +4744,7 @@ bool handler_entry::overriden_by_mask(u64 handlermask)
 
 	// Check whether a subunit would be left
 	for (int i=0; i != m_subunits; i++)
-		if (((handlermask >> m_subunit_infos[i].m_shift) & ((u64(1) << m_subunit_infos[i].m_size) - 1)) == 0)
+		if ((handlermask & m_subunit_infos[i].m_datamask) == 0)
 			return false;
 
 	return true;
@@ -4735,13 +4764,14 @@ void handler_entry::description(char *buffer) const
 		{
 			if (i)
 				*buffer++ = ' ';
-			buffer += sprintf (buffer, "%d:%d:%x:%d:%x:%x:%s",
+			buffer += sprintf (buffer, "%d:%d:%x:%d:%x:%s:%s:%s",
 								m_subunit_infos[i].m_size,
 								m_subunit_infos[i].m_shift,
 								m_subunit_infos[i].m_offset,
 								m_subunit_infos[i].m_multiplier,
 								m_subunit_infos[i].m_addrmask,
-								m_subunit_infos[i].m_csmask,
+								core_i64_hex_format(m_subunit_infos[i].m_datamask, m_datawidth),
+								core_i64_hex_format(m_subunit_infos[i].m_csmask, m_datawidth),
 								subunit_name(i));
 		}
 	}
@@ -5053,7 +5083,7 @@ u64 handler_entry_read::read_stub_64(address_space &space, offs_t offset, u64 ma
 				val = m_subread[index].r32(space, aoffset & si.m_addrmask, mask >> si.m_shift);
 				break;
 			}
-			result |=  u64(val) << si.m_shift;
+			result |= u64(val) << si.m_shift;
 		}
 	}
 	return result;

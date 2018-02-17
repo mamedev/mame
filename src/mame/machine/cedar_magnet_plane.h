@@ -9,7 +9,6 @@
 #include "machine/cedar_magnet_board.h"
 #include "machine/z80pio.h"
 
-extern const device_type CEDAR_MAGNET_PLANE;
 DECLARE_DEVICE_TYPE(CEDAR_MAGNET_PLANE, cedar_magnet_plane_device)
 
 #define MCFG_CEDAR_MAGNET_PLANE_ADD(_tag) \

@@ -93,7 +93,6 @@ public:
 	DECLARE_READ8_MEMBER( read );
 	DECLARE_WRITE8_MEMBER( write );
 
-	void i8155(address_map &map);
 protected:
 	i8155_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock);
 
@@ -103,16 +102,6 @@ protected:
 	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr) override;
 
 	virtual space_config_vector memory_space_config() const override;
-
-	inline uint8_t get_timer_mode();
-	inline void timer_output(int to);
-	inline void timer_stop_count();
-	inline void timer_reload_count();
-	inline int get_port_mode(int port);
-	inline uint8_t read_port(int port);
-	inline void write_port(int port, uint8_t data);
-
-	void register_w(int offset, uint8_t data);
 
 private:
 	devcb_read8        m_in_pa_cb;
@@ -146,6 +135,18 @@ private:
 	emu_timer *m_timer;         // counter timer
 
 	const address_space_config      m_space_config;
+
+	inline uint8_t get_timer_mode();
+	inline void timer_output(int to);
+	inline void timer_stop_count();
+	inline void timer_reload_count();
+	inline int get_port_mode(int port);
+	inline uint8_t read_port(int port);
+	inline void write_port(int port, uint8_t data);
+
+	void register_w(int offset, uint8_t data);
+
+	void i8155(address_map &map);
 };
 
 

@@ -20,8 +20,10 @@ class stvcd_device : public device_t
 public:
 	stvcd_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
-	DECLARE_READ32_MEMBER( stvcd_r );
-	DECLARE_WRITE32_MEMBER( stvcd_w );
+	DECLARE_READ32_MEMBER(stvcd_r);
+	DECLARE_WRITE32_MEMBER(stvcd_w);
+
+	DECLARE_READ16_MEMBER(channel_volume_r);
 
 	void set_tray_open();
 	void set_tray_close();

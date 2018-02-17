@@ -40,13 +40,7 @@ TODO:
 class ide_pci_device : public pci_device {
 public:
 	ide_pci_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
-	required_device<bus_master_ide_controller_device> m_ide;
-	required_device<bus_master_ide_controller_device> m_ide2;
-	virtual void config_map(address_map &map) override;
-	DECLARE_READ32_MEMBER(ide_read_cs1);
-	DECLARE_WRITE32_MEMBER(ide_write_cs1);
-	DECLARE_READ32_MEMBER(ide2_read_cs1);
-	DECLARE_WRITE32_MEMBER(ide2_write_cs1);
+
 	void set_irq_info(const char *tag, const int irq_num);
 	template <class Object> static devcb_base &set_irq_handler(device_t &device, Object &&cb) { return downcast<ide_pci_device &>(device).m_irq_handler.set_callback(std::forward<Object>(cb)); }
 	void set_legacy_top(int val) { m_legacy_top = val & 0xfff; };
@@ -59,6 +53,8 @@ protected:
 	// optional information overrides
 	virtual void device_add_mconfig(machine_config &config) override;
 
+	virtual void config_map(address_map &map) override;
+
 private:
 	DECLARE_WRITE_LINE_MEMBER(ide_interrupt);
 	DECLARE_WRITE8_MEMBER(prog_if_w);
@@ -67,6 +63,13 @@ private:
 	DECLARE_READ32_MEMBER(address_base_r);
 	DECLARE_WRITE32_MEMBER(address_base_w);
 	DECLARE_WRITE32_MEMBER(subsystem_id_w);
+	DECLARE_READ32_MEMBER(ide_read_cs1);
+	DECLARE_WRITE32_MEMBER(ide_write_cs1);
+	DECLARE_READ32_MEMBER(ide2_read_cs1);
+	DECLARE_WRITE32_MEMBER(ide2_write_cs1);
+
+	required_device<bus_master_ide_controller_device> m_ide;
+	required_device<bus_master_ide_controller_device> m_ide2;
 
 	const char *m_cpu_tag;
 	cpu_device *m_cpu;

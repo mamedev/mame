@@ -122,7 +122,6 @@ private:
 };
 
 // device type definition
-extern const device_type KBDC8042;
 DECLARE_DEVICE_TYPE(KBDC8042, kbdc8042_device)
 
 #endif // MAME_MACHINE_8042KBDC_H

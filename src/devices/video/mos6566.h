@@ -233,8 +233,6 @@ public:
 
 	uint32_t screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 
-	void mos6566_colorram_map(address_map &map);
-	void mos6566_videoram_map(address_map &map);
 protected:
 	enum
 	{
@@ -282,6 +280,9 @@ protected:
 	inline void draw_multi( uint16_t p, uint8_t c0, uint8_t c1, uint8_t c2, uint8_t c3 );
 	void draw_graphics();
 	void draw_sprites();
+
+	void mos6566_colorram_map(address_map &map);
+	void mos6566_videoram_map(address_map &map);
 
 	int m_icount;
 	const int m_variant;

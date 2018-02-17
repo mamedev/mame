@@ -152,7 +152,6 @@ private:
 
 
 // device type definition
-extern const device_type UV201;
 DECLARE_DEVICE_TYPE(UV201, uv201_device)
 
 #endif // MAME_VIDEO_UV201_H
