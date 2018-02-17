@@ -1763,7 +1763,7 @@ MACHINE_CONFIG_START(itech32_state::drivedge)
 
 	MCFG_SPEAKER_STANDARD_STEREO("left_back", "right_back")
 	
-	MCFG_SOUND_MODIFY("ensoniq", ES5506, SOUND_CLOCK)
+	MCFG_SOUND_MODIFY("ensoniq")
 	MCFG_ES5506_CHANNELS(2)               /* channels */
 	MCFG_SOUND_ROUTE(2, "right_back", 0.1)  /* swapped stereo */
 	MCFG_SOUND_ROUTE(3, "left_back", 0.1)

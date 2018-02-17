@@ -82,7 +82,6 @@ private:
 	uint16_t m_osd_addr;
 	std::unique_ptr<uint8_t[]> m_shadow_gfx;
 
-	uint8_t m_bg_pen;
 	uint8_t m_phase;
 	uint8_t m_scrf,m_scrr;
 	uint8_t m_space;
