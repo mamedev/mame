@@ -93,7 +93,6 @@ public:
 	void exidy440_bank_select(uint8_t bank);
 	void exidy440(machine_config &config);
 	void exidy440_video(machine_config &config);
-	void exidy440_audio(machine_config &config);
 	void topsecex(machine_config &config);
 	void topsecex_video(machine_config &config);
 	void exidy440_map(address_map &map);
