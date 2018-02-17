@@ -558,7 +558,7 @@ READ8_MEMBER(taitojc_state::mcu_comm_r)
 			return m_mcu_data_main;
 
 		case 0x04:
-			return m_mcu_comm_main | 0x14;
+			return m_mcu_comm_main;
 
 		default:
 			logerror("mcu_comm_r: %02X at %08X\n", offset, m_maincpu->pc());

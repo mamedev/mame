@@ -9,7 +9,7 @@
     Board Info:
 
         CPU   : 68EC020 68000
-        SOUND : Ensoniq
+        SOUND : Ensoniq ES5505 + ES5510
         OSC.  : 40.000MHz 16.000MHz 30.47618MHz
 
         * This board (K11J0717A) uses following chips:
