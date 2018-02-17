@@ -28,7 +28,7 @@ DE-0207-0
 |MB3730  558  558  YM3014  YM2203          CP11.1C   12MHz  |
 |-----------------------------------------------------------|
 Notes:
-      6809   - clock 1.500MHz [12/8]
+      6809   - MC68B09EP, clock 1.500MHz [12/8]
       YM2203 - clock 1.500MHz [12/8]
       VSC30  - clock 3.000MHz [12/4, pin 7), custom DECO DIP40 IC
       HMC20  - DECO HMC20 custom DIP28 IC. Provides many clocks each divided by 2
@@ -389,7 +389,7 @@ void chanbara_state::machine_reset()
 
 MACHINE_CONFIG_START(chanbara_state::chanbara)
 
-	MCFG_CPU_ADD("maincpu", M6809, XTAL(12'000'000)/8)
+	MCFG_CPU_ADD("maincpu", MC6809E, XTAL(12'000'000)/8)
 	MCFG_CPU_PROGRAM_MAP(chanbara_map)
 
 
