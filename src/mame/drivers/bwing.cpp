@@ -361,10 +361,10 @@ void bwing_state::bwing_postload()
 MACHINE_CONFIG_START(bwing_state::bwing)
 
 	// basic machine hardware
-	MCFG_CPU_ADD("maincpu", M6809, 2000000)
+	MCFG_CPU_ADD("maincpu", MC6809E, 2000000)
 	MCFG_CPU_PROGRAM_MAP(bwp1_map)
 
-	MCFG_CPU_ADD("sub", M6809, 2000000)
+	MCFG_CPU_ADD("sub", MC6809E, 2000000)
 	MCFG_CPU_PROGRAM_MAP(bwp2_map)
 
 	MCFG_CPU_ADD("audiocpu", DECO16, 2000000)
