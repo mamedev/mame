@@ -29,7 +29,6 @@ public:
 		m_palette(*this, "palette"),
 		m_sprgen(*this, "spritegen"),
 		m_mixer(*this, "mixer"),
-		m_soundlatch(*this, "soundlatch"),
 		m_msm(*this, "msm%u", 1),
 		m_adpcm_select(*this, "adpcm_select%u", 1)
 		{ }
@@ -72,7 +71,6 @@ public:
 	required_device<palette_device> m_palette;
 	optional_device<tecmo_spr_device> m_sprgen;
 	optional_device<tecmo_mix_device> m_mixer;
-	required_device<generic_latch_8_device> m_soundlatch;
 	optional_device_array<msm5205_device, 2> m_msm;
 	optional_device_array<ls157_device, 2> m_adpcm_select;
 
@@ -98,8 +96,9 @@ public:
 	DECLARE_WRITE16_MEMBER(gaiden_fgoffsety_w);
 	DECLARE_WRITE16_MEMBER(gaiden_bgoffsety_w);
 	DECLARE_WRITE16_MEMBER(gaiden_sproffsety_w);
-	template<int TileMap> DECLARE_WRITE16_MEMBER(gaiden_videoram_w);
-	DECLARE_WRITE16_MEMBER(gaiden_tx_videoram_w);
+	DECLARE_WRITE16_MEMBER(bg_videoram_w);
+	DECLARE_WRITE16_MEMBER(fg_videoram_w);
+	DECLARE_WRITE16_MEMBER(tx_videoram_w);
 	DECLARE_DRIVER_INIT(raiga);
 	DECLARE_DRIVER_INIT(drgnbowl);
 	DECLARE_DRIVER_INIT(drgnbowla);
