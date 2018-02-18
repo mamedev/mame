@@ -5,8 +5,6 @@
 #include "emu.h"
 #include "prot_pvc.h"
 
-#include <algorithm>
-
 
 
 DEFINE_DEVICE_TYPE(NG_PVC_PROT, pvc_prot_device, "ng_pvc_prot", "Neo Geo PVC Protection")
@@ -20,8 +18,7 @@ pvc_prot_device::pvc_prot_device(const machine_config &mconfig, const char *tag,
 
 void pvc_prot_device::device_start()
 {
-	m_cart_ram = make_unique_clear(0x2000/2);
-	save_item(NAME(m_cart_ram.get()), 0x2000/2);
+	save_item(NAME(m_cart_ram));
 }
 
 void pvc_prot_device::device_reset()
@@ -120,21 +117,21 @@ void pvc_prot_device::mslug5_decrypt_68k(uint8_t* rom, uint32_t size)
 		rom[BYTE_XOR_LE(i+2)] = rom16 >> 8;
 	}
 
-	std::copy(&rom[0], &rom[rom_size], buf.begin());
+	memcpy(&buf[0], rom, rom_size);
 	for (int i = 0; i < 0x0100000 / 0x10000; i++)
 	{
 		int ofst = (i & 0xf0) + bitswap<8>((i & 0x0f), 7, 6, 5, 4, 1, 0, 3, 2);
-		std::copy(&buf[ofst * 0x10000], &buf[(ofst+1) * 0x10000], &rom[i * 0x10000]);
+		memcpy(&rom[i * 0x10000], &buf[ofst * 0x10000], 0x10000);
 	}
 	for (int i = 0x100000; i < 0x800000; i += 0x100)
 	{
 		int ofst = (i & 0xf000ff) + ((i & 0x000f00) ^ 0x00700) + (bitswap<8>(((i & 0x0ff000) >> 12), 5, 4, 7, 6, 1, 0, 3, 2) << 12);
-		std::copy(&buf[ofst], &buf[(ofst+0x100)], &rom[i]);
+		memcpy(&rom[i], &buf[ofst], 0x100);
 	}
 
-	std::copy(&rom[0x000000], &rom[rom_size], buf.begin());
-	std::copy(&buf[0x700000], &buf[0x800000], &rom[0x100000]);
-	std::copy(&buf[0x100000], &buf[0x700000], &rom[0x200000]);
+	memcpy(&buf[0], rom, rom_size);
+	memcpy(&rom[0x100000], &buf[0x700000], 0x100000);
+	memcpy(&rom[0x200000], &buf[0x100000], 0x600000);
 }
 
 
@@ -159,21 +156,21 @@ void pvc_prot_device::svc_px_decrypt(uint8_t* rom, uint32_t size)
 		rom[BYTE_XOR_LE(i+2)] = rom16 >> 8;
 	}
 
-	std::copy(&rom[0], &rom[rom_size], buf.begin());
+	memcpy(&buf[0], rom, rom_size);
 	for (int i = 0; i < 0x0100000 / 0x10000; i++)
 	{
 		int ofst = (i & 0xf0) + bitswap<8>((i & 0x0f), 7, 6, 5, 4, 2, 3, 0, 1);
-		std::copy(&buf[ofst * 0x10000], &buf[(ofst+1) * 0x10000], &rom[i * 0x10000]);
+		memcpy(&rom[i * 0x10000], &buf[ofst * 0x10000], 0x10000);
 	}
 
 	for (int i = 0x100000; i < 0x800000; i += 0x100)
 	{
 		int ofst = (i & 0xf000ff) + ((i & 0x000f00) ^ 0x00a00) + (bitswap<8>(((i & 0x0ff000) >> 12), 4, 5, 6, 7, 1, 0, 3, 2) << 12);
-		std::copy(&buf[ofst], &buf[(ofst+0x100)], &rom[i]);
+		memcpy(&rom[i], &buf[ofst], 0x100);
 	}
-	std::copy(&rom[0x000000], &rom[rom_size], buf.begin());
-	std::copy(&buf[0x700000], &buf[0x800000], &rom[0x100000]);
-	std::copy(&buf[0x100000], &buf[0x700000], &rom[0x200000]);
+	memcpy(&buf[0], rom, rom_size );
+	memcpy(&rom[0x100000], &buf[0x700000], 0x100000);
+	memcpy(&rom[0x200000], &buf[0x100000], 0x600000);
 }
 
 
@@ -200,17 +197,17 @@ void pvc_prot_device::kf2k3pcb_decrypt_68k(uint8_t* rom, uint32_t size)
 	for (int i = 0; i < 0x0100000 / 0x10000; i++)
 	{
 		int ofst = (i & 0xf0) + bitswap<8>((i & 0x0f), 7, 6, 5, 4, 1, 0, 3, 2);
-		std::copy(&buf[ofst * 0x10000], &buf[(ofst+1) * 0x10000], &rom[i * 0x10000]);
+		memcpy(&buf[i * 0x10000], &rom[ofst * 0x10000], 0x10000);
 	}
 
 	for (int i = 0x100000; i < 0x900000; i += 0x100)
 	{
 		int ofst = (i & 0xf000ff) + ((i & 0x000f00) ^ 0x00300) + (bitswap<8>(((i & 0x0ff000) >> 12), 4, 5, 6, 7, 1, 0, 3, 2) << 12);
-		std::copy(&buf[ofst], &buf[(ofst+0x100)], &rom[i]);
+		memcpy(&buf[i], &rom[ofst], 0x100);
 	}
-	std::copy(&buf[0x000000], &buf[0x100000], &rom[0x000000]);
-	std::copy(&buf[0x800000], &buf[0x900000], &rom[0x100000]);
-	std::copy(&buf[0x100000], &buf[0x800000], &rom[0x200000]);
+	memcpy(&rom[0x000000], &buf[0x000000], 0x100000);
+	memcpy(&rom[0x100000], &buf[0x800000], 0x100000);
+	memcpy(&rom[0x200000], &buf[0x100000], 0x700000);
 }
 
 
@@ -241,17 +238,17 @@ void pvc_prot_device::kof2003_decrypt_68k(uint8_t* rom, uint32_t size)
 	for (int i = 0; i < 0x0100000 / 0x10000; i++)
 	{
 		int ofst = (i & 0xf0) + bitswap<8>((i & 0x0f), 7, 6, 5, 4, 0, 1, 2, 3);
-		std::copy(&buf[ofst * 0x10000], &buf[(ofst+1) * 0x10000], &rom[i * 0x10000]);
+		memcpy(&buf[i * 0x10000], &rom[ofst * 0x10000], 0x10000);
 	}
 
 	for (int i = 0x100000; i < 0x900000; i += 0x100)
 	{
 		int ofst = (i & 0xf000ff) + ((i & 0x000f00) ^ 0x00800) + (bitswap<8>(((i & 0x0ff000) >> 12), 4, 5, 6, 7, 1, 0, 3, 2) << 12);
-		std::copy(&buf[ofst], &buf[(ofst+0x100)], &rom[i]);
+		memcpy(&buf[i], &rom[ofst], 0x100);
 	}
-	std::copy(&buf[0x000000], &buf[0x100000], &rom[0x000000]);
-	std::copy(&buf[0x800000], &buf[0x900000], &rom[0x100000]);
-	std::copy(&buf[0x100000], &buf[0x800000], &rom[0x200000]);
+	memcpy(&rom[0x000000], &buf[0x000000], 0x100000);
+	memcpy(&rom[0x100000], &buf[0x800000], 0x100000);
+	memcpy(&rom[0x200000], &buf[0x100000], 0x700000);
 }
 
 
@@ -282,14 +279,14 @@ void pvc_prot_device::kof2003h_decrypt_68k(uint8_t* rom, uint32_t size)
 	for (int i = 0; i < 0x0100000 / 0x10000; i++)
 	{
 		int ofst = (i & 0xf0) + bitswap<8>((i & 0x0f), 7, 6, 5, 4, 1, 0, 3, 2);
-		std::copy(&buf[ofst * 0x10000], &buf[(ofst+1) * 0x10000], &rom[i * 0x10000]);
+		memcpy(&buf[i * 0x10000], &rom[ofst * 0x10000], 0x10000);
 	}
 	for (int i = 0x100000; i < 0x900000; i += 0x100)
 	{
 		int ofst = (i & 0xf000ff) + ((i & 0x000f00) ^ 0x00400) + (bitswap<8>(((i & 0x0ff000) >> 12), 6, 7, 4, 5, 0, 1, 2, 3) << 12);
-		std::copy(&buf[ofst], &buf[(ofst+0x100)], &rom[i]);
+		memcpy(&buf[i], &rom[ofst], 0x100);
 	}
-	std::copy(&buf[0x000000], &buf[0x100000], &rom[0x000000]);
-	std::copy(&buf[0x800000], &buf[0x900000], &rom[0x100000]);
-	std::copy(&buf[0x100000], &buf[0x800000], &rom[0x200000]);
+	memcpy(&rom[0x000000], &buf[0x000000], 0x100000);
+	memcpy(&rom[0x100000], &buf[0x800000], 0x100000);
+	memcpy(&rom[0x200000], &buf[0x100000], 0x700000);
 }

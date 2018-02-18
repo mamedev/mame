@@ -5,7 +5,6 @@
 #include "emu.h"
 #include "prot_pcm2.h"
 
-#include <algorithm>
 
 DEFINE_DEVICE_TYPE(NG_PCM2_PROT, pcm2_prot_device, "ng_pcm2_prot", "Neo Geo NEOPCM2 Protection")
 
@@ -46,7 +45,7 @@ void pcm2_prot_device::decrypt(uint8_t* ymrom, uint32_t ymsize, int value)
 
 		for (int i = 0; i < size / 2; i += (value / 2))
 		{
-			std::copy(&rom[i], &rom[i+(value / 2)], buffer.begin());
+			memcpy(&buffer[0], &rom[i], value);
 			for (int j = 0; j < (value / 2); j++)
 			{
 				rom[i + j] = buffer[j ^ (value/4)];
@@ -79,7 +78,7 @@ void pcm2_prot_device::swap(uint8_t* ymrom, uint32_t ymsize, int value)
 	std::vector<uint8_t> buf(0x1000000);
 	int j, d;
 	uint8_t* src = ymrom;
-	std::copy(&src[0], &src[0x1000000], buf.begin());
+	memcpy(&buf[0], src, 0x1000000);
 
 	for (int i = 0; i < 0x1000000; i++)
 	{

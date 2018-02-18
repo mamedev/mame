@@ -34,7 +34,7 @@ protected:
 private:
 	uint16_t m_overlay;
 	uint32_t m_bank_base;
-	std::unique_ptr<uint16_t[]> m_cartridge_ram; // bootlegs
+	uint16_t m_cartridge_ram[0x1000]; // bootlegs
 };
 
 #endif // MAME_BUS_NEOGEO_PROT_KOF2K3BL_H

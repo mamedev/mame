@@ -38,7 +38,8 @@ protected:
 private:
 	uint8_t* m_fixed;
 	uint32_t m_special_bank;
-	std::unique_ptr<uint16_t[]> m_cart_ram[2];
+	uint16_t m_cart_ram[0x1000];
+	uint16_t m_cart_ram2[0x10000];
 };
 
 // device type definition

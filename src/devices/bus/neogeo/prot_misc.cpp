@@ -22,8 +22,6 @@
 #include "emu.h"
 #include "prot_misc.h"
 
-#include <algorithm>
-
 
 DEFINE_DEVICE_TYPE(NEOBOOT_PROT, neoboot_prot_device, "ngboot_prot", "Neo Geo Bootleg Protection(s)")
 
@@ -53,10 +51,10 @@ void neoboot_prot_device::cx_decrypt(uint8_t*sprrom, uint32_t sprrom_size)
 	uint8_t *rom = sprrom;
 	std::vector<uint8_t> buf(cx_size);
 
-	std::copy(&rom[0], &rom[cx_size], buf.begin());
+	memcpy(&buf[0], rom, cx_size);
 
 	for (int i = 0; i < cx_size / 0x40; i++)
-		std::copy(&buf[(i ^ 1) * 0x40], &buf[(1+(i ^ 1)) * 0x40], &rom[i * 0x40]);
+		memcpy(&rom[i * 0x40], &buf[(i ^ 1) * 0x40], 0x40);
 }
 
 
@@ -68,12 +66,12 @@ void neoboot_prot_device::sx_decrypt(uint8_t* fixed, uint32_t fixed_size, int va
 	if (value == 1)
 	{
 		std::vector<uint8_t> buf(sx_size);
-		std::copy(&rom, &rom[sx_size], buf.begin());
+		memcpy(&buf[0], rom, sx_size);
 
 		for (int i = 0; i < sx_size; i += 0x10)
 		{
-			std::copy(&buf[i + 8], &buf[i + 16], &rom[i]);
-			std::copy(&buf[i],     &buf[i + 8],  &rom[i + 8]);
+			memcpy(&rom[i], &buf[i + 8], 8);
+			memcpy(&rom[i + 8], &buf[i], 8);
 		}
 	}
 	else if (value == 2)
@@ -95,7 +93,7 @@ void neoboot_prot_device::kof97oro_px_decode(uint8_t* cpurom, uint32_t cpurom_si
 	for (int i = 0; i < 0x500000/2; i++)
 		tmp[i] = src[i ^ 0x7ffef];
 
-	std::copy(tmp.begin(), tmp.end(), src);
+	memcpy(src, &tmp[0], 0x500000);
 }
 
 
@@ -107,17 +105,17 @@ void neoboot_prot_device::kf10thep_px_decrypt(uint8_t* cpurom, uint32_t cpurom_s
 	uint16_t *rom = (uint16_t*)cpurom;
 	std::vector<uint16_t> buf(0x100000/2);
 
-	std::copy(&rom[0x060000/2], &rom[0x080000/2], &buf[0x000000/2]);
-	std::copy(&rom[0x100000/2], &rom[0x120000/2], &buf[0x020000/2]);
-	std::copy(&rom[0x0e0000/2], &rom[0x100000/2], &buf[0x040000/2]);
-	std::copy(&rom[0x180000/2], &rom[0x1a0000/2], &buf[0x060000/2]);
-	std::copy(&rom[0x020000/2], &rom[0x040000/2], &buf[0x080000/2]);
-	std::copy(&rom[0x140000/2], &rom[0x160000/2], &buf[0x0a0000/2]);
-	std::copy(&rom[0x0c0000/2], &rom[0x0e0000/2], &buf[0x0c0000/2]);
-	std::copy(&rom[0x1a0000/2], &rom[0x1c0000/2], &buf[0x0e0000/2]);
-	std::copy(&rom[0x0402e0/2], &rom[0x04034a/2], &buf[0x0002e0/2]);  // copy banked code to a new memory region
-	std::copy(&rom[0x0492bc/2], &rom[0x049e5a/2], &buf[0x0f92bc/2]); // copy banked code to a new memory region
-	std::copy(buf.begin(), buf.end(), &rom[0]);
+	memcpy(&buf[0x000000/2], &rom[0x060000/2], 0x20000);
+	memcpy(&buf[0x020000/2], &rom[0x100000/2], 0x20000);
+	memcpy(&buf[0x040000/2], &rom[0x0e0000/2], 0x20000);
+	memcpy(&buf[0x060000/2], &rom[0x180000/2], 0x20000);
+	memcpy(&buf[0x080000/2], &rom[0x020000/2], 0x20000);
+	memcpy(&buf[0x0a0000/2], &rom[0x140000/2], 0x20000);
+	memcpy(&buf[0x0c0000/2], &rom[0x0c0000/2], 0x20000);
+	memcpy(&buf[0x0e0000/2], &rom[0x1a0000/2], 0x20000);
+	memcpy(&buf[0x0002e0/2], &rom[0x0402e0/2], 0x6a);  // copy banked code to a new memory region
+	memcpy(&buf[0x0f92bc/2], &rom[0x0492bc/2], 0xb9e); // copy banked code to a new memory region
+	memcpy(rom, &buf[0], 0x100000);
 
 	for (int i = 0xf92bc/2; i < 0xf9e58/2; i++)
 	{
@@ -142,12 +140,12 @@ void neoboot_prot_device::kf2k5uni_px_decrypt(uint8_t* cpurom, uint32_t cpurom_s
 		for (int j = 0; j < 0x80; j += 2)
 		{
 			int ofst = bitswap<8>(j, 0, 3, 4, 5, 6, 1, 2, 7);
-			std::copy(&src[i + ofst], &src[2 + i + ofst], &dst[j]);
+			memcpy(&dst[j], src + i + ofst, 2);
 		}
-		std::copy(std::begin(dst), std::end(dst), &src[i]);
+		memcpy(src + i, &dst[0], 0x80);
 	}
 
-	std::copy(&src[0x600000], &src[0x700000], &src[0]); // Seems to be the same as kof10th
+	memcpy(src, src + 0x600000, 0x100000); // Seems to be the same as kof10th
 }
 
 
@@ -163,7 +161,7 @@ void neoboot_prot_device::kf2k5uni_mx_decrypt(uint8_t* audiorom, uint32_t audior
 {
 	uint8_t *mrom = audiorom;
 
-	for (int i = 0; i < audiorom_size; i++)
+	for (int i = 0; i < 0x30000; i++)
 		mrom[i] = bitswap<8>(mrom[i], 4, 5, 6, 7, 0, 1, 2, 3);
 }
 
@@ -176,10 +174,10 @@ void neoboot_prot_device::decrypt_kof2k4se_68k(uint8_t* cpurom, uint32_t cpurom_
 	uint8_t *src = cpurom + 0x100000;
 	std::vector<uint8_t> dst(0x400000);
 	static const int sec[] = {0x300000,0x200000,0x100000,0x000000};
-	std::copy(&src[0], &src[0x400000], dst.begin());
+	memcpy(&dst[0], src, 0x400000);
 
 	for (int i = 0; i < 4; ++i)
-		std::copy(&dst[sec[i]], &dst[sec[i] + 0x100000], src + i * 0x100000);
+		memcpy(src + i * 0x100000, &dst[sec[i]], 0x100000);
 }
 
 
@@ -202,12 +200,12 @@ void neoboot_prot_device::lans2004_decrypt_68k(uint8_t* cpurom, uint32_t cpurom_
 	std::vector<uint8_t> dst(0x600000);
 
 	for (int i = 0; i < 8; i++)
-		std::copy(&src[sec[i] * 0x20000], &src[(sec[i]+1) * 0x20000], &dst[i * 0x20000]);
+		memcpy (&dst[i * 0x20000], src + sec[i] * 0x20000, 0x20000);
 
-	std::copy(&src[0x045b00], &src[0x047210], &dst[0x0bbb00]);
-	std::copy(&src[0x1a92be], &src[0x1a92ce], &dst[0x02fff0]);
-	std::copy(&src[0x200000], &src[0x600000], &dst[0x100000]);
-	std::copy(dst.begin(), dst.end(), &src[0]);
+	memcpy (&dst[0x0bbb00], src + 0x045b00, 0x001710);
+	memcpy (&dst[0x02fff0], src + 0x1a92be, 0x000010);
+	memcpy (&dst[0x100000], src + 0x200000, 0x400000);
+	memcpy (src, &dst[0], 0x600000);
 
 	for (int i = 0xbbb00/2; i < 0xbe000/2; i++)
 	{
@@ -237,7 +235,7 @@ void neoboot_prot_device::samsho5b_px_decrypt(uint8_t* cpurom, uint32_t cpurom_s
 	uint8_t *rom = cpurom;
 	std::vector<uint8_t> buf(px_size);
 
-	std::copy(&rom[0], &rom[px_size], buf.begin());
+	memcpy(&buf[0], rom, px_size);
 
 	for (int i = 0; i < px_size / 2; i++)
 	{
@@ -245,13 +243,13 @@ void neoboot_prot_device::samsho5b_px_decrypt(uint8_t* cpurom, uint32_t cpurom_s
 		ofst += (i & 0xfffff00);
 		ofst ^= 0x060005;
 
-		std::copy(&buf[ofst * 2], &buf[(ofst+1) * 2], &rom[i * 2]);
+		memcpy(&rom[i * 2], &buf[ofst * 2], 0x02);
 	}
 
-	std::copy(&rom[0], &rom[px_size], buf.begin());
+	memcpy(&buf[0], rom, px_size);
 
-	std::copy(&buf[0x700000], &buf[0x800000], &rom[0x000000]);
-	std::copy(&buf[0x000000], &buf[0x700000], &rom[0x100000]);
+	memcpy(&rom[0x000000], &buf[0x700000], 0x100000);
+	memcpy(&rom[0x100000], &buf[0x000000], 0x700000);
 }
 
 
@@ -319,14 +317,14 @@ void neoboot_prot_device::kog_px_decrypt(uint8_t* cpurom, uint32_t cpurom_size)
 	static const int sec[] = { 0x3, 0x8, 0x7, 0xc, 0x1, 0xa, 0x6, 0xd };
 
 	for (int i = 0; i < 8; i++)
-		std::copy(&src[sec[i] * 0x20000], &src[(sec[i]+1) * 0x20000], &dst[i * 0x20000]);
+		memcpy (&dst[i * 0x20000], src + sec[i] * 0x20000, 0x20000);
 
-	std::copy(&src[0x0407a6], &src[0x0407ac], &dst[0x0007a6]);
-	std::copy(&src[0x0407c6], &src[0x0407cc], &dst[0x0007c6]);
-	std::copy(&src[0x0407e6], &src[0x0407ec], &dst[0x0007e6]);
-	std::copy(&src[0x040000], &src[0x044000], &dst[0x090000]);
-	std::copy(&src[0x200000], &src[0x600000], &dst[0x100000]);
-	std::copy(dst.begin(), dst.end(), &src[0]);
+	memcpy (&dst[0x0007a6], src + 0x0407a6, 0x000006);
+	memcpy (&dst[0x0007c6], src + 0x0407c6, 0x000006);
+	memcpy (&dst[0x0007e6], src + 0x0407e6, 0x000006);
+	memcpy (&dst[0x090000], src + 0x040000, 0x004000);
+	memcpy (&dst[0x100000], src + 0x200000, 0x400000);
+	memcpy (src, &dst[0], 0x600000);
 
 	for (int i = 0x90000/2; i < 0x94000/2; i++)
 	{
@@ -379,13 +377,13 @@ void neoboot_prot_device::svcboot_px_decrypt(uint8_t* cpurom, uint32_t cpurom_si
 	std::vector<uint8_t> dst(size);
 
 	for (int i = 0; i < size / 0x100000; i++)
-		std::copy(&src[sec[i] * 0x100000], &src[(sec[i]+1) * 0x100000], &dst[i * 0x100000]);
+		memcpy(&dst[i * 0x100000], &src[sec[i] * 0x100000], 0x100000);
 
 	for (int i = 0; i < size / 2; i++)
 	{
 		int ofst = bitswap<8>((i & 0x0000ff), 7, 6, 1, 0, 3, 2, 5, 4);
 		ofst += (i & 0xffff00);
-		std::copy(&dst[ofst * 2], &dst[(ofst+1) * 2], &src[i * 2]);
+		memcpy(&src[i * 2], &dst[ofst * 2], 0x02);
 	}
 }
 
@@ -404,7 +402,7 @@ void neoboot_prot_device::svcboot_cx_decrypt(uint8_t* sprrom, uint32_t sprrom_si
 	uint8_t *src = sprrom;
 	std::vector<uint8_t> dst(size);
 
-	std::copy(&src[0], &src[size], &dst[0]);
+	memcpy(&dst[0], src, size);
 	for (int i = 0; i < size / 0x80; i++)
 	{
 		int idx = idx_tbl[(i & 0xf00) >> 8];
@@ -414,7 +412,7 @@ void neoboot_prot_device::svcboot_cx_decrypt(uint8_t* sprrom, uint32_t sprrom_si
 		int bit3 = bitswap4_tbl[idx][3];
 		int ofst = bitswap<8>((i & 0x0000ff), 7, 6, 5, 4, bit3, bit2, bit1, bit0);
 		ofst += (i & 0xfffff00);
-		std::copy(&dst[ofst * 0x80], &dst[(ofst+1) * 0x80], &src[i * 0x80]);
+		memcpy(&src[i * 0x80], &dst[ofst * 0x80], 0x80);
 	}
 }
 
@@ -428,7 +426,7 @@ void neoboot_prot_device::svcplus_px_decrypt(uint8_t* cpurom, uint32_t cpurom_si
 	uint8_t *src = cpurom;
 	std::vector<uint8_t> dst(size);
 
-	std::copy(&src[0], &src[size], dst.begin());
+	memcpy(&dst[0], src, size);
 	for (int i = 0; i < size / 2; i++)
 	{
 		int ofst = bitswap<24>((i & 0xfffff), 0x17, 0x16, 0x15, 0x14, 0x13, 0x00, 0x01, 0x02,
@@ -436,12 +434,12 @@ void neoboot_prot_device::svcplus_px_decrypt(uint8_t* cpurom, uint32_t cpurom_si
 								0x07, 0x06, 0x05, 0x04, 0x03, 0x10, 0x11, 0x12);
 		ofst ^= 0x0f0007;
 		ofst += (i & 0xff00000);
-		std::copy(&dst[ofst * 0x02], &dst[(ofst+1) * 0x02], &src[i * 0x02]);
+		memcpy(&src[i * 0x02], &dst[ofst * 0x02], 0x02);
 	}
 
-	std::copy(&src[0], &src[size], dst.begin());
+	memcpy(&dst[0], src, size);
 	for (int i = 0; i < 6; i++)
-		std::copy(&dst[sec[i] * 0x100000], &dst[(sec[i]+1) * 0x100000], &src[i * 0x100000]);
+		memcpy(&src[i * 0x100000], &dst[sec[i] * 0x100000], 0x100000);
 }
 
 
@@ -462,9 +460,9 @@ void neoboot_prot_device::svcplusa_px_decrypt(uint8_t* cpurom, uint32_t cpurom_s
 	uint8_t *src = cpurom;
 	std::vector<uint8_t> dst(size);
 
-	std::copy(&src[0], &src[size], &dst[0]);
+	memcpy(&dst[0], src, size);
 	for (int i = 0; i < 6; i++)
-		std::copy(&dst[sec[i] * 0x100000], &dst[(sec[i]+1) * 0x100000], &src[i * 0x100000]);
+		memcpy(&src[i * 0x100000], &dst[sec[i] * 0x100000], 0x100000);
 }
 
 
@@ -476,8 +474,8 @@ void neoboot_prot_device::svcsplus_px_decrypt(uint8_t* cpurom, uint32_t cpurom_s
 	int size = cpurom_size;
 	uint8_t *src = cpurom;
 	std::vector<uint8_t> dst(size);
-	
-	std::copy(&src[0], &src[size], &dst[0]);
+
+	memcpy(&dst[0], src, size);
 	for (int i = 0; i < size / 2; i++)
 	{
 		int ofst = bitswap<16>((i & 0x007fff), 0x0f, 0x00, 0x08, 0x09, 0x0b, 0x0a, 0x0c, 0x0d,
@@ -485,7 +483,7 @@ void neoboot_prot_device::svcsplus_px_decrypt(uint8_t* cpurom, uint32_t cpurom_s
 
 		ofst += (i & 0x078000);
 		ofst += sec[(i & 0xf80000) >> 19] << 19;
-		std::copy(&dst[ofst * 2], &dst[(ofst+1) * 2], &src[i * 2]);
+		memcpy(&src[i * 2], &dst[ofst * 2], 0x02);
 	}
 }
 
@@ -521,13 +519,13 @@ void neoboot_prot_device::kof2002b_gfx_decrypt(uint8_t *src, int size)
 
 	for (int i = 0; i < size; i += 0x10000)
 	{
-		std::copy(&src[i], &src[i+0x10000], dst.begin());
+		memcpy(&dst[0], src + i, 0x10000);
 
 		for (int j = 0; j < 0x200; j++)
 		{
 			int n = (j & 0x38) >> 3;
 			int ofst = bitswap<16>(j, 15, 14, 13, 12, 11, 10, 9, t[n][0], t[n][1], t[n][2], 5, 4, 3, t[n][3], t[n][4], t[n][5]);
-			std::copy(&dst[j * 128], &dst[(j+1) * 128], &src[i + (ofst * 128)]);
+			memcpy(src + i + ofst * 128, &dst[j * 128], 128);
 		}
 	}
 }
@@ -547,9 +545,9 @@ void neoboot_prot_device::kf2k2mp_decrypt(uint8_t* cpurom, uint32_t cpurom_size)
 		for (int j = 0; j < 0x80 / 2; j++)
 		{
 			int ofst = bitswap<8>( j, 6, 7, 2, 3, 4, 5, 0, 1 );
-			std::copy(&src[i + (ofst * 2)], &src[i + ((1+ofst) * 2)], &dst[j * 2]);
+			memcpy(dst + j * 2, src + i + ofst * 2, 2);
 		}
-		std::copy(std::begin(dst), std::end(dst), &src[i]);
+		memcpy(src + i, dst, 0x80);
 	}
 }
 
@@ -561,11 +559,11 @@ void neoboot_prot_device::kf2k2mp2_px_decrypt(uint8_t* cpurom, uint32_t cpurom_s
 	uint8_t *src = cpurom;
 	std::vector<uint8_t> dst(0x600000);
 
-	std::copy(&src[0x1c0000], &src[0x200000], &dst[0x000000]);
-	std::copy(&src[0x140000], &src[0x1c0000], &dst[0x040000]);
-	std::copy(&src[0x100000], &src[0x140000], &dst[0x0c0000]);
-	std::copy(&src[0x200000], &src[0x240000], &dst[0x100000]);
-	std::copy(dst.begin(),    dst.end(),      &src[0x000000]);
+	memcpy(&dst[0x000000], &src[0x1C0000], 0x040000);
+	memcpy(&dst[0x040000], &src[0x140000], 0x080000);
+	memcpy(&dst[0x0C0000], &src[0x100000], 0x040000);
+	memcpy(&dst[0x100000], &src[0x200000], 0x400000);
+	memcpy(&src[0x000000], &dst[0x000000], 0x600000);
 }
 
 
@@ -577,8 +575,8 @@ void neoboot_prot_device::kof10th_decrypt(uint8_t* cpurom, uint32_t cpurom_size)
 	std::vector<uint8_t> dst(0x900000);
 	uint8_t *src = cpurom;
 
-	std::copy(&src[0x700000], &src[0x800000], &dst[0x000000]); // Correct (Verified in Uni-bios)
-	std::copy(&src[0x000000], &src[0x800000], &dst[0x100000]);
+	memcpy(&dst[0x000000], src + 0x700000, 0x100000); // Correct (Verified in Uni-bios)
+	memcpy(&dst[0x100000], src + 0x000000, 0x800000);
 
 	for (int i = 0; i < 0x900000; i++)
 	{

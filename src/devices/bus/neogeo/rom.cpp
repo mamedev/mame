@@ -80,11 +80,10 @@ neogeo_vliner_cart_device::neogeo_vliner_cart_device(const machine_config &mconf
 
 void neogeo_vliner_cart_device::device_start()
 {
-	m_cart_ram = std::make_unique<uint16_t[]>(0x2000/2);
-	save_pointer(NAME(m_cart_ram.get()), 0x2000/2);
+	save_item(NAME(m_cart_ram));
 }
 
 void neogeo_vliner_cart_device::device_reset()
 {
-	std::fill(&m_cart_ram[0], &m_cart_ram[0x2000/2], 0);
+	memset(m_cart_ram, 0, 0x2000);
 }

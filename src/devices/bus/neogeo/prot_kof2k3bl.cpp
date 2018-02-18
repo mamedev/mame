@@ -4,8 +4,6 @@
 #include "emu.h"
 #include "prot_kof2k3bl.h"
 
-#include <algorithm>
-
 DEFINE_DEVICE_TYPE(NG_KOF2K3BL_PROT, kof2k3bl_prot_device, "ng_kof2k3bl_prot", "Neo Geo KoF 2003 Bootleg Protection")
 
 
@@ -17,15 +15,14 @@ kof2k3bl_prot_device::kof2k3bl_prot_device(const machine_config &mconfig, const 
 
 void kof2k3bl_prot_device::device_start()
 {
-	m_cartridge_ram = std::make_unique<uint16_t[]>(0x2000/2);
-	save_pointer(NAME(m_cartridge_ram.get()), 0x2000/2);
+	save_item(NAME(m_cartridge_ram));
 	save_item(NAME(m_overlay));
 	save_item(NAME(m_bank_base));
 }
 
 void kof2k3bl_prot_device::device_reset()
 {
-	std::fill(&m_cartridge_ram[0], &m_cartridge_ram[0x2000/2], 0);
+	memset(m_cartridge_ram, 0x00, 0x2000);
 	m_overlay = 0;
 	m_bank_base = 0;
 }
@@ -49,7 +46,7 @@ WRITE16_MEMBER(kof2k3bl_prot_device::kof2003_w)
 	data = COMBINE_DATA(&m_cartridge_ram[offset]);
 	if (offset == 0x1ff0/2 || offset == 0x1ff2/2)
 	{
-		uint8_t* cr = (uint8_t *)m_cartridge_ram.get();
+		uint8_t* cr = (uint8_t *)m_cartridge_ram;
 		uint8_t prt = cr[BYTE_XOR_LE(0x1ff2)];
 		m_bank_base = 0x100000 + ((cr[BYTE_XOR_LE(0x1ff3)] << 16) | (cr[BYTE_XOR_LE(0x1ff2)] << 8) | cr[BYTE_XOR_LE(0x1ff1)]);
 		//uint32_t address = (cr[BYTE_XOR_LE(0x1ff3)] << 16) | (cr[BYTE_XOR_LE(0x1ff2)] << 8) | cr[BYTE_XOR_LE(0x1ff1)];
@@ -68,7 +65,7 @@ WRITE16_MEMBER(kof2k3bl_prot_device::kof2003p_w)
 	data = COMBINE_DATA(&m_cartridge_ram[offset]);
 	if (offset == 0x1ff0/2 || offset == 0x1ff2/2)
 	{
-		uint8_t* cr = (uint8_t *)m_cartridge_ram.get();
+		uint8_t* cr = (uint8_t *)m_cartridge_ram;
 		uint8_t prt = cr[BYTE_XOR_LE(0x1ff2)];
 		m_bank_base = 0x100000 + ((cr[BYTE_XOR_LE(0x1ff3)] << 16) | (cr[BYTE_XOR_LE(0x1ff2)] << 8) | cr[BYTE_XOR_LE(0x1ff0)]);
 		//uint32_t address = (cr[BYTE_XOR_LE(0x1ff3)] << 16) | (cr[BYTE_XOR_LE(0x1ff2)] << 8) | cr[BYTE_XOR_LE(0x1ff0)];
@@ -88,9 +85,9 @@ void kof2k3bl_prot_device::bl_px_decrypt(uint8_t* cpurom, uint32_t cpurom_size)
 	uint8_t *rom = cpurom;
 	std::vector<uint8_t> buf(rom_size);
 
-	std::copy(&rom[0], &rom[rom_size], buf.begin());
+	memcpy(&buf[0], rom, rom_size);
 	for (int i = 0; i < rom_size / 0x100000; i++)
-		std::copy(&buf[sec[i] * 0x100000], &buf[(sec[i]+1) * 0x100000], &rom[i * 0x100000]);
+		memcpy(&rom[i * 0x100000], &buf[sec[i] * 0x100000], 0x100000);
 }
 
 
@@ -103,7 +100,7 @@ void kof2k3bl_prot_device::pl_px_decrypt(uint8_t* cpurom, uint32_t cpurom_size)
 
 	for (int i = 0; i < 0x700000/2; i += 0x100000/2)
 	{
-		std::copy(&rom16[i], &rom16[i + 0x100000/2], tmp.begin());
+		memcpy(&tmp[0], &rom16[i], 0x100000);
 		for (int j = 0; j < 0x100000/2; j++)
 			rom16[i+j] = tmp[bitswap<24>(j,23,22,21,20,19,0,1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18)];
 	}
@@ -128,7 +125,7 @@ void kof2k3bl_prot_device::upl_px_decrypt(uint8_t* cpurom, uint32_t cpurom_size)
 	for (int i = 0; i < 0x2000 / 2; i++)
 	{
 		int ofst = (i & 0xff00) + bitswap<8>((i & 0x00ff), 7, 6, 0, 4, 3, 2, 1, 5);
-		std::copy(&buf[ofst * 2], &buf[(ofst+1) * 2], &rom[i * 2]);
+		memcpy(&rom[i * 2], &buf[ofst * 2], 2);
 	}
 
 	uint16_t* rom16 = (uint16_t*)cpurom;

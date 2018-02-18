@@ -929,7 +929,7 @@ ADDRESS_MAP_END
 
 
 ADDRESS_MAP_START(ngcd_state::neocd_audio_io_map)
-	AM_RANGE(0x00, 0x00) AM_MIRROR(0xff00) AM_DEVREADWRITE("soundlatch1", generic_latch_8_device, read, clear_w)
+	AM_RANGE(0x00, 0x00) AM_MIRROR(0xff00) AM_READ(audio_command_r) AM_DEVWRITE("soundlatch", generic_latch_8_device, clear_w)
 	AM_RANGE(0x04, 0x07) AM_MIRROR(0xff00) AM_DEVREADWRITE("ymsnd", ym2610_device, read, write)
 	AM_RANGE(0x08, 0x08) AM_MIRROR(0xff00) AM_SELECT(0x0010) AM_WRITE(audio_cpu_enable_nmi_w)
 	// banking reads are actually NOP on NeoCD? but some games still access them
@@ -1099,7 +1099,7 @@ ROM_START( neocd )
 	ROM_REGION( 0x100000, "ymsnd", ROMREGION_ERASEFF )
 	/* 1MB of Sound RAM */
 
-	ROM_REGION( 0x10000, "audiocpu", ROMREGION_ERASEFF )
+	ROM_REGION( 0x90000, "audiocpu", ROMREGION_ERASEFF )
 	/* 64KB of Z80 RAM */
 
 	ROM_REGION( 0x200000, "maincpu", ROMREGION_ERASE00 )
@@ -1125,7 +1125,7 @@ ROM_START( neocdz )
 	ROM_REGION( 0x100000, "ymsnd", ROMREGION_ERASEFF )
 	/* 1MB of Sound RAM */
 
-	ROM_REGION( 0x10000, "audiocpu", ROMREGION_ERASEFF )
+	ROM_REGION( 0x90000, "audiocpu", ROMREGION_ERASEFF )
 	/* 64KB of Z80 RAM */
 
 	ROM_REGION( 0x200000, "maincpu", ROMREGION_ERASE00 )

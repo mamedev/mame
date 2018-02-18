@@ -15,8 +15,6 @@
 #include "machine/ng_memcard.h"
 #include "video/neogeo_spr.h"
 
-#include "machine/input_merger.h"
-
 #include "bus/neogeo/slot.h"
 #include "bus/neogeo/carts.h"
 #include "bus/neogeo_ctrl/ctrl.h"
@@ -43,8 +41,8 @@ public:
 		m_screen(*this, "screen"),
 		m_palette(*this, "palette"),
 		m_memcard(*this, "memcard"),
-		m_soundlatch(*this, "soundlatch%u", 1),
-		m_soundnmi(*this, "soundnmi"),
+		m_soundlatch(*this, "soundlatch"),
+		m_soundlatch2(*this, "soundlatch2"),
 		m_region_maincpu(*this, "maincpu"),
 		m_region_sprites(*this, "sprites"),
 		m_region_fixed(*this, "fixed"),
@@ -53,20 +51,26 @@ public:
 		m_region_audiobios(*this, "audiobios"),
 		m_region_audiocpu(*this, "audiocpu"),
 		m_bank_audio_main(*this, "audio_main"),
-		m_biosrom(*this, "mainbios"),
 		m_dsw(*this, "DSW"),
 		m_trackx(*this, "TRACK_X"),
 		m_tracky(*this, "TRACK_Y"),
 		m_edge(*this, "edge"),
-		m_ctrl(*this, "ctrl%u", 1),
+		m_ctrl1(*this, "ctrl1"),
+		m_ctrl2(*this, "ctrl2"),
 		m_use_cart_vectors(0),
 		m_use_cart_audio(0),
-		m_slot(*this, "cslot%u", 1),
+		m_slot1(*this, "cslot1"),
+		m_slot2(*this, "cslot2"),
+		m_slot3(*this, "cslot3"),
+		m_slot4(*this, "cslot4"),
+		m_slot5(*this, "cslot5"),
+		m_slot6(*this, "cslot6")
 	{ }
 
 	DECLARE_READ16_MEMBER(memcard_r);
 	DECLARE_WRITE16_MEMBER(memcard_w);
 	DECLARE_WRITE8_MEMBER(audio_command_w);
+	DECLARE_READ8_MEMBER(audio_command_r);
 	DECLARE_READ8_MEMBER(audio_cpu_bank_select_r);
 	DECLARE_WRITE8_MEMBER(audio_cpu_enable_nmi_w);
 	DECLARE_READ16_MEMBER(unmapped_r);
@@ -203,8 +207,8 @@ protected:
 	required_device<screen_device> m_screen;
 	optional_device<palette_device> m_palette;
 	optional_device<ng_memcard_device> m_memcard;
-	required_device_array<generic_latch_8_device, 2> m_soundlatch;
-	required_device<input_merger_all_high_device> m_soundnmi;
+	required_device<generic_latch_8_device> m_soundlatch;
+	required_device<generic_latch_8_device> m_soundlatch2;
 
 	// memory
 	optional_memory_region m_region_maincpu;
@@ -215,8 +219,6 @@ protected:
 	optional_memory_region m_region_audiobios;
 	optional_memory_region m_region_audiocpu;
 	optional_memory_bank   m_bank_audio_main; // optional because of neocd
-	optional_region_ptr<uint16_t> m_biosrom;
-	region_ptr<uint16_t>  *m_lorom;
 	memory_bank           *m_bank_audio_cart[4];
 	memory_bank           *m_bank_cartridge;
 
@@ -227,7 +229,8 @@ protected:
 	optional_ioport m_trackx;
 	optional_ioport m_tracky;
 	optional_device<neogeo_ctrl_edge_port_device> m_edge;
-	optional_device_array<neogeo_control_port_device, 2> m_ctrl;
+	optional_device<neogeo_control_port_device> m_ctrl1;
+	optional_device<neogeo_control_port_device> m_ctrl2;
 
 	// video hardware, including maincpu interrupts
 	// TODO: make into a device
@@ -251,7 +254,12 @@ protected:
 	// temporary helper to restore memory banking while bankswitch is handled in the driver...
 	uint32_t m_bank_base;
 
-	optional_device_array<neogeo_cart_slot_device, 6> m_slot;
+	optional_device<neogeo_cart_slot_device> m_slot1;
+	optional_device<neogeo_cart_slot_device> m_slot2;
+	optional_device<neogeo_cart_slot_device> m_slot3;
+	optional_device<neogeo_cart_slot_device> m_slot4;
+	optional_device<neogeo_cart_slot_device> m_slot5;
+	optional_device<neogeo_cart_slot_device> m_slot6;
 
 	int m_curr_slot;
 	neogeo_cart_slot_device* m_slots[6];
@@ -271,11 +279,14 @@ private:
 	void create_rgb_lookups();
 	void set_pens();
 
+	void audio_cpu_check_nmi();
 	void set_output_latch(uint8_t data);
 	void set_output_data(uint8_t data);
 
 	// internal state
 	bool       m_recurse;
+	bool       m_audio_cpu_nmi_enabled;
+	bool       m_audio_cpu_nmi_pending;
 
 	// MVS-specific state
 	uint8_t      m_save_ram_unlocked;

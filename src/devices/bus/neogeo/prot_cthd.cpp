@@ -4,8 +4,6 @@
 #include "emu.h"
 #include "prot_cthd.h"
 
-#include <algorithm>
-
 DEFINE_DEVICE_TYPE(NG_CTHD_PROT, cthd_prot_device, "ng_cthd_prot", "Neo Geo CTHD Protection (bootleg)")
 
 
@@ -49,9 +47,10 @@ void cthd_prot_device::fix_do(uint8_t* sprrom, uint32_t sprrom_size, int start, 
 						(BIT(j, 1) << bit1shift) +
 						(BIT(j, 2) << bit2shift) +
 						(BIT(j, 3) << bit3shift);
-			std::copy(&realrom[((i*16)+offset)*tilesize], &realrom[((i*16)+offset+1)*tilesize], &rom[j * tilesize]);
+			memcpy(&rom[j * tilesize], realrom + offset * tilesize, tilesize);
 		}
-		std::copy(&rom[0], &rom[tilesize * 16], &realrom[i * 16]);
+		memcpy(realrom, &rom[0], tilesize * 16);
+		realrom += 16 * tilesize;
 	}
 }
 
@@ -96,16 +95,22 @@ void cthd_prot_device::cthd2003_c(uint8_t* sprrom, uint32_t sprrom_size, int pow
 void cthd_prot_device::decrypt_cthd2003(uint8_t* sprrom, uint32_t sprrom_size, uint8_t* audiorom, uint32_t audiorom_size, uint8_t* fixedrom, uint32_t fixedrom_size)
 {
 	uint8_t *romdata = fixedrom;
-	std::vector<uint8_t> tmp(0x08000);
-	
-	std::copy(&romdata[0x08000], &romdata[0x10000], tmp.begin());
-	std::copy(&romdata[0x10000], &romdata[0x08000], &romdata[0x08000]);
-	std::copy(tmp.begin()      , tmp.end(),         &romdata[0x10000]);
+	std::vector<uint8_t> tmp(8 * 128 * 128);
 
-	romdata = audiorom;
-	std::copy(&romdata[0x08000], &romdata[0x10000], tmp.begin());
-	std::copy(&romdata[0x10000], &romdata[0x08000], &romdata[0x08000]);
-	std::copy(tmp.begin()      , tmp.end(),         &romdata[0x10000]);
+	memcpy(&tmp[8 *  0 * 128], romdata + 8 *  0 * 128, 8 * 32 * 128);
+	memcpy(&tmp[8 * 32 * 128], romdata + 8 * 64 * 128, 8 * 32 * 128);
+	memcpy(&tmp[8 * 64 * 128], romdata + 8 * 32 * 128, 8 * 32 * 128);
+	memcpy(&tmp[8 * 96 * 128], romdata + 8 * 96 * 128, 8 * 32 * 128);
+	memcpy(romdata, &tmp[0], 8 * 128 * 128);
+
+	romdata = audiorom + 0x10000;
+	memcpy(&tmp[8 *  0 * 128], romdata + 8 *  0 * 128, 8 * 32 * 128);
+	memcpy(&tmp[8 * 32 * 128], romdata + 8 * 64 * 128, 8 * 32 * 128);
+	memcpy(&tmp[8 * 64 * 128], romdata + 8 * 32 * 128, 8 * 32 * 128);
+	memcpy(&tmp[8 * 96 * 128], romdata + 8 * 96 * 128, 8 * 32 * 128);
+	memcpy(romdata, &tmp[0], 8 * 128 * 128);
+
+	memcpy(romdata - 0x10000, romdata, 0x10000);
 
 	cthd2003_c(sprrom, sprrom_size, 0);
 }
@@ -179,8 +184,8 @@ void cthd_prot_device::ct2k3sp_sx_decrypt( uint8_t* fixedrom, uint32_t fixedrom_
 	int rom_size = fixedrom_size;
 	uint8_t *rom = fixedrom;
 	std::vector<uint8_t> buf(rom_size);
-	
-	std::copy(&rom[0], &rom[rom_size], buf.begin());
+
+	memcpy(&buf[0], rom, rom_size);
 
 	for (int i = 0; i < rom_size; i++)
 	{
@@ -191,22 +196,25 @@ void cthd_prot_device::ct2k3sp_sx_decrypt( uint8_t* fixedrom, uint32_t fixedrom_
 		rom[i] = buf[ofst];
 	}
 
-	std::copy(&rom[0], &rom[rom_size], buf.begin());
+	memcpy(&buf[0], rom, rom_size);
 
-	std::copy(&buf[0x10000], &buf[0x18000], &rom[0x08000]);
-	std::copy(&buf[0x08000], &buf[0x10000], &rom[0x10000]);
-	std::copy(&buf[0x30000], &buf[0x38000], &rom[0x28000]);
-	std::copy(&buf[0x28000], &buf[0x30000], &rom[0x30000]);
+	memcpy(&rom[0x08000], &buf[0x10000], 0x8000);
+	memcpy(&rom[0x10000], &buf[0x08000], 0x8000);
+	memcpy(&rom[0x28000], &buf[0x30000], 0x8000);
+	memcpy(&rom[0x30000], &buf[0x28000], 0x8000);
 }
 
 void cthd_prot_device::decrypt_ct2k3sp(uint8_t* sprrom, uint32_t sprrom_size, uint8_t* audiorom, uint32_t audiorom_size, uint8_t* fixedrom, uint32_t fixedrom_size)
 {
-	uint8_t *romdata = audiorom;
-	std::vector<uint8_t> tmp(0x08000);
-	std::copy(&romdata[0x08000], &romdata[0x10000], tmp.begin());
-	std::copy(&romdata[0x10000], &romdata[0x08000], &romdata[0x08000]);
-	std::copy(tmp.begin()      , tmp.end(),         &romdata[0x10000]);
+	uint8_t *romdata = audiorom + 0x10000;
+	std::vector<uint8_t> tmp(8 * 128 * 128);
+	memcpy(&tmp[8 *  0 * 128], romdata + 8 *  0 * 128, 8 * 32 * 128);
+	memcpy(&tmp[8 * 32 * 128], romdata + 8 * 64 * 128, 8 * 32 * 128);
+	memcpy(&tmp[8 * 64 * 128], romdata + 8 * 32 * 128, 8 * 32 * 128);
+	memcpy(&tmp[8 * 96 * 128], romdata + 8 * 96 * 128, 8 * 32 * 128);
+	memcpy(romdata, &tmp[0], 8 * 128 * 128);
 
+	memcpy(romdata - 0x10000, romdata, 0x10000);
 	ct2k3sp_sx_decrypt(fixedrom, fixedrom_size);
 	cthd2003_c(sprrom, sprrom_size, 0);
 }
@@ -217,12 +225,15 @@ void cthd_prot_device::decrypt_ct2k3sp(uint8_t* sprrom, uint32_t sprrom_size, ui
 
 void cthd_prot_device::decrypt_ct2k3sa(uint8_t* sprrom, uint32_t sprrom_size, uint8_t* audiorom, uint32_t audiorom_size )
 {
-	uint8_t *romdata = audiorom;
-	std::vector<uint8_t> tmp(0x08000);
-	std::copy(&romdata[0x08000], &romdata[0x10000], tmp.begin());
-	std::copy(&romdata[0x10000], &romdata[0x08000], &romdata[0x08000]);
-	std::copy(tmp.begin()      , tmp.end(),         &romdata[0x10000]);
+	uint8_t *romdata = audiorom + 0x10000;
+	std::vector<uint8_t> tmp(8 * 128 * 128);
+	memcpy(&tmp[8 *  0 * 128], romdata + 8 *  0 * 128, 8 * 32 * 128);
+	memcpy(&tmp[8 * 32 * 128], romdata + 8 * 64 * 128, 8 * 32 * 128);
+	memcpy(&tmp[8 * 64 * 128], romdata + 8 * 32 * 128, 8 * 32 * 128);
+	memcpy(&tmp[8 * 96 * 128], romdata + 8 * 96 * 128, 8 * 32 * 128);
+	memcpy(romdata, &tmp[0], 8 * 128 * 128);
 
+	memcpy(romdata - 0x10000, romdata, 0x10000);
 	cthd2003_c(sprrom,sprrom_size, 0);
 }
 
@@ -269,9 +280,9 @@ void cthd_prot_device::patch_ct2k3sa(uint8_t* cpurom, uint32_t cpurom_size)
 void cthd_prot_device::matrimbl_decrypt(uint8_t* sprrom, uint32_t sprrom_size, uint8_t* audiorom, uint32_t audiorom_size)
 {
 	// decrypt Z80
-	uint8_t *rom = audiorom;
+	uint8_t *rom = audiorom + 0x10000;
 	std::vector<uint8_t> buf(0x20000);
-	std::copy(&rom[0], &rom[0x20000], buf.begin());
+	memcpy(&buf[0], rom, 0x20000);
 
 	int j;
 	for (int i = 0x00000; i < 0x20000; i++)
@@ -302,6 +313,7 @@ void cthd_prot_device::matrimbl_decrypt(uint8_t* sprrom, uint32_t sprrom_size, u
 		}
 		rom[j] = buf[i];
 	}
+	memcpy(rom - 0x10000, rom, 0x10000);
 
 	// decrypt gfx
 	cthd2003_c(sprrom,sprrom_size, 0 );

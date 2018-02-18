@@ -82,7 +82,7 @@ enum
 // ======================> device_neogeo_cart_interface
 
 #define DECRYPT_ALL_PARAMS \
-	uint8_t* cpuregion, uint32_t cpuregion_size,uint8_t* spr_region, uint32_t spr_region_size,uint8_t* fix_region, uint32_t fix_region_size,uint8_t* ym_region, uint32_t ym_region_size,uint8_t* ymdelta_region, uint32_t ymdelta_region_size,uint8_t* audiocpu_region, uint32_t audio_region_size
+	uint8_t* cpuregion, uint32_t cpuregion_size,uint8_t* spr_region, uint32_t spr_region_size,uint8_t* fix_region, uint32_t fix_region_size,uint8_t* ym_region, uint32_t ym_region_size,uint8_t* ymdelta_region, uint32_t ymdelta_region_size,uint8_t* audiocpu_region, uint32_t audio_region_size, uint8_t* audiocrypt_region, uint32_t audiocrypt_region_size
 
 class device_neogeo_cart_interface : public device_slot_card_interface
 {
@@ -123,6 +123,12 @@ public:
 	uint8_t* get_region_audio_base()  { if (m_region_audio.found()) return m_region_audio->base(); return nullptr; }
 	uint32_t get_region_audio_size() { if (m_region_audio.found()) return m_region_audio->bytes(); return 0; }
 
+	void audiocrypt_alloc(uint32_t size) { m_audiocrypt.resize(size); }
+	uint8_t* get_audiocrypt_base() { return m_audiocrypt.size() > 0 ? &m_audiocrypt[0] : nullptr; }
+	uint32_t get_audiocrypt_size() { return m_audiocrypt.size(); }
+	uint8_t* get_region_audiocrypt_base()  { if (m_region_audiocrypt.found()) return m_region_audiocrypt->base(); return nullptr; }
+	uint32_t get_region_audiocrypt_size() { if (m_region_audiocrypt.found()) return m_region_audiocrypt->bytes(); return 0; }
+
 	// TODO: review sprite code later!!
 	void sprites_alloc(uint32_t size) { m_sprites.resize(size); }
 	uint8_t* get_sprites_base() { return m_sprites.size() > 0 ? &m_sprites[0] : nullptr; }
@@ -158,6 +164,7 @@ protected:
 	std::vector<uint8_t> m_sprites;
 	std::vector<uint8_t> m_ym;
 	std::vector<uint8_t> m_ymdelta;
+	std::vector<uint8_t> m_audiocrypt;
 
 	std::vector<uint8_t> m_sprites_opt;
 
@@ -165,6 +172,7 @@ protected:
 	optional_memory_region  m_region_rom;
 	optional_memory_region  m_region_fixed;
 	optional_memory_region  m_region_audio;
+	optional_memory_region  m_region_audiocrypt;
 	optional_memory_region  m_region_spr;
 	optional_memory_region  m_region_ym;
 	optional_memory_region  m_region_ymd;
@@ -261,6 +269,18 @@ public:
 		}
 		return 0;
 	}
+	uint8_t* get_audiocrypt_base()  {
+		if (m_cart) {
+			if (!user_loadable()) return m_cart->get_region_audiocrypt_base(); else return m_cart->get_audiocrypt_base();
+		}
+		return nullptr;
+	}
+	uint32_t get_audiocrypt_size()    {
+		if (m_cart) {
+			if (!user_loadable()) return m_cart->get_region_audiocrypt_size(); else return m_cart->get_audiocrypt_size();
+		}
+		return 0;
+	}
 	uint8_t* get_ym_base()  {
 		if (m_cart) {
 			if (!user_loadable()) return m_cart->get_region_ym_base(); else return m_cart->get_ym_base();
@@ -300,7 +320,8 @@ public:
 										get_fixed_base(), get_fixed_size(),
 										get_ym_base(), get_ym_size(),
 										get_ymdelta_base(), get_ymdelta_size(),
-										get_audio_base(), get_audio_size());  }
+										get_audio_base(), get_audio_size(),
+										get_audiocrypt_base(), get_audiocrypt_size());  }
 
 
 protected:

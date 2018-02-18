@@ -6,8 +6,6 @@
 #include "emu.h"
 #include "includes/neogeo.h"
 
-#include <algorithm>
-
 
 void neopcb_state::machine_start()
 {
@@ -92,8 +90,9 @@ ROM_START( ms5pcb ) /* Encrypted Set, JAMMA PCB */
 	ROM_LOAD16_WORD_SWAP( "sp-4x.sp1", 0x00000, 0x80000, CRC(b4590283) SHA1(47047ed5b6062babc0a0bebcc30e4b3f021e115a) )
 
 	/* Encrypted */
-	ROM_REGION( 0x80000, "audiocpu", 0 )
+	ROM_REGION( 0x80000, "audiocrypt", 0 )
 	ROM_LOAD( "268-m1.m1", 0x00000, 0x80000, CRC(4a5a6e0e) SHA1(df0f660f2465e1db7be5adfcaf5e88ad61a74a42) ) /* mask rom TC534000 */
+	ROM_REGION( 0x90000, "audiocpu", ROMREGION_ERASEFF )
 
 	/* Encrypted */
 
@@ -131,8 +130,9 @@ ROM_START( svcpcb ) /* Encrypted Set, JAMMA PCB */
 	ROM_LOAD16_WORD_SWAP( "sp-4x.sp1", 0x00000, 0x80000, CRC(b4590283) SHA1(47047ed5b6062babc0a0bebcc30e4b3f021e115a) )
 
 	/* Encrypted */
-	ROM_REGION( 0x80000, "audiocpu", 0 )
+	ROM_REGION( 0x80000, "audiocrypt", 0 )
 	ROM_LOAD( "269-m1.m1", 0x00000, 0x80000, CRC(f6819d00) SHA1(d3bbe09df502464f104e53501708ac6e2c1832c6) ) /* mask rom TC534000 */
+	ROM_REGION( 0x90000, "audiocpu", ROMREGION_ERASEFF )
 
 	ROM_Y_ZOOM
 
@@ -169,8 +169,9 @@ ROM_START( svcpcba ) /* Encrypted Set, JAMMA PCB */
 	ROM_LOAD16_WORD_SWAP( "sp-4x.sp1", 0x00000, 0x80000, CRC(b4590283) SHA1(47047ed5b6062babc0a0bebcc30e4b3f021e115a) )
 
 	/* Encrypted */
-	ROM_REGION( 0x80000, "audiocpu", 0 )
+	ROM_REGION( 0x80000, "audiocrypt", 0 )
 	ROM_LOAD( "269-m1.m1", 0x00000, 0x80000, CRC(f6819d00) SHA1(d3bbe09df502464f104e53501708ac6e2c1832c6) )
+	ROM_REGION( 0x90000, "audiocpu", ROMREGION_ERASEFF )
 
 	ROM_Y_ZOOM
 
@@ -207,8 +208,9 @@ ROM_START( kf2k3pcb ) /* Encrypted Set, JAMMA PCB */
 	ROM_LOAD16_WORD_SWAP( "spj.sp1", 0x00000, 0x080000, CRC(148dd727) SHA1(2cf592a16c7157de02a989675d47965f2b3a44dd) ) // encrypted
 
 	/* Encrypted */
-	ROM_REGION( 0x80000, "audiocpu", 0 )
+	ROM_REGION( 0x80000, "audiocrypt", 0 )
 	ROM_LOAD( "271-m1.m1", 0x00000, 0x80000, CRC(d6bcf2bc) SHA1(df78bc95990eb8e8f3638dde6e1876354df7fe84) )
+	ROM_REGION( 0x90000, "audiocpu", ROMREGION_ERASEFF )
 
 	ROM_Y_ZOOM
 
@@ -261,7 +263,7 @@ void neopcb_state::svcpcb_gfx_decrypt()
 		int ofst =  bitswap<24>((i & 0x1fffff), 0x17, 0x16, 0x15, 0x04, 0x0b, 0x0e, 0x08, 0x0c, 0x10, 0x00, 0x0a, 0x13, 0x03, 0x06, 0x02, 0x07, 0x0d, 0x01, 0x11, 0x09, 0x14, 0x0f, 0x12, 0x05);
 		ofst ^= 0x0c8923;
 		ofst += (i & 0xffe00000);
-		std::copy(&buf[ofst * 4], &buf[(ofst * 4) + 4], &rom[i * 4]);
+		memcpy(&rom[i * 4], &buf[ofst * 4], 0x04);
 	}
 }
 
@@ -305,7 +307,7 @@ void neopcb_state::kf2k3pcb_gfx_decrypt()
 		int ofst = bitswap<24>((i & 0x7fffff), 0x17, 0x15, 0x0a, 0x14, 0x13, 0x16, 0x12, 0x11, 0x10, 0x0f, 0x0e, 0x0d, 0x0c, 0x0b, 0x09, 0x08, 0x07, 0x06, 0x05, 0x04, 0x03, 0x02, 0x01, 0x00);
 		ofst ^= 0x000000;
 		ofst += (i & 0xff800000);
-		std::copy(&buf[i], &buf[i+4], &rom[ofst]);
+		memcpy(&rom[ofst], &buf[i], 0x04);
 	}
 }
 
@@ -373,7 +375,7 @@ void neopcb_state::kf2k3pcb_sp1_decrypt()
 		if (buf[i] & 0x0020) buf[i] ^= 0x0008;
 	}
 
-	std::copy(buf.begin(), buf.end(), &rom[0]);
+	memcpy(rom, &buf[0], 0x80000);
 }
 
 
@@ -394,6 +396,8 @@ void neopcb_state::kf2k3pcb_sp1_decrypt()
 #define ym_region_size memregion("ymsnd")->bytes()
 #define audiocpu_region memregion("audiocpu")->base()
 #define audio_region_size memregion("audiocpu")->bytes()
+#define audiocrypt_region memregion("audiocrypt")->base()
+#define audiocrypt_region_size memregion("audiocrypt")->bytes()
 
 
 /*********************************************** non-carts */
@@ -449,7 +453,7 @@ DRIVER_INIT_MEMBER(neopcb_state, ms5pcb)
 
 	m_pvc_prot->mslug5_decrypt_68k(cpuregion, cpuregion_size);
 	m_pcm2_prot->swap(ym_region, ym_region_size, 2);
-	m_cmc_prot->cmc50_m1_decrypt(audiocpu_region, audio_region_size);
+	m_cmc_prot->cmc50_m1_decrypt(audiocrypt_region, audiocrypt_region_size, audiocpu_region, audio_region_size);
 
 	svcpcb_gfx_decrypt();
 	m_cmc_prot->cmc50_gfx_decrypt(spr_region, spr_region_size, MSLUG5_GFX_KEY);
@@ -469,7 +473,7 @@ DRIVER_INIT_MEMBER(neopcb_state, svcpcb)
 
 	m_pvc_prot->svc_px_decrypt(cpuregion, cpuregion_size);
 	m_pcm2_prot->swap(ym_region, ym_region_size, 3);
-	m_cmc_prot->cmc50_m1_decrypt(audiocpu_region, audio_region_size);
+	m_cmc_prot->cmc50_m1_decrypt(audiocrypt_region, audiocrypt_region_size, audiocpu_region, audio_region_size);
 
 	svcpcb_gfx_decrypt();
 	m_cmc_prot->cmc50_gfx_decrypt(spr_region, spr_region_size, SVC_GFX_KEY);
@@ -489,12 +493,12 @@ DRIVER_INIT_MEMBER(neopcb_state, kf2k3pcb)
 	m_pvc_prot->kf2k3pcb_decrypt_68k(cpuregion, cpuregion_size);
 	m_pcm2_prot->swap(ym_region, ym_region_size, 5);
 	kf2k3pcb_sp1_decrypt();
-	m_cmc_prot->cmc50_m1_decrypt(audiocpu_region, audio_region_size);
+	m_cmc_prot->cmc50_m1_decrypt(audiocrypt_region, audiocrypt_region_size, audiocpu_region, audio_region_size);
 	// extra little swap on the m1 - this must be performed AFTER the m1 decrypt
 	// or the m1 checksum (used to generate the key) for decrypting the m1 is
 	// incorrect
 	uint8_t* rom = memregion("audiocpu")->base();
-	for (int i = 0; i < 0x80000; i++)
+	for (int i = 0; i < 0x90000; i++)
 		rom[i] = bitswap<8>(rom[i], 5, 6, 1, 4, 3, 0, 7, 2);
 
 	kf2k3pcb_gfx_decrypt();

@@ -68,7 +68,7 @@ neogeo_pcm2_mslug4_cart_device::neogeo_pcm2_mslug4_cart_device(const machine_con
 
 void neogeo_pcm2_mslug4_cart_device::decrypt_all(DECRYPT_ALL_PARAMS)
 {
-	m_cmc_prot->cmc50_m1_decrypt(audiocpu_region, audio_region_size);
+	m_cmc_prot->cmc50_m1_decrypt(audiocrypt_region, audiocrypt_region_size, audiocpu_region, audio_region_size);
 	m_cmc_prot->cmc50_gfx_decrypt(spr_region, spr_region_size, MSLUG4_GFX_KEY);
 	m_cmc_prot->sfix_decrypt(spr_region, spr_region_size, fix_region, fix_region_size);
 	m_pcm2_prot->decrypt(ym_region, ym_region_size, 8);
@@ -88,7 +88,7 @@ neogeo_pcm2_ms4plus_cart_device::neogeo_pcm2_ms4plus_cart_device(const machine_c
 
 void neogeo_pcm2_ms4plus_cart_device::decrypt_all(DECRYPT_ALL_PARAMS)
 {
-	m_cmc_prot->cmc50_m1_decrypt(audiocpu_region, audio_region_size);
+	m_cmc_prot->cmc50_m1_decrypt(audiocrypt_region, audiocrypt_region_size, audiocpu_region, audio_region_size);
 	m_cmc_prot->cmc50_gfx_decrypt(spr_region, spr_region_size, MSLUG4_GFX_KEY);
 	m_pcm2_prot->decrypt(ym_region, ym_region_size, 8);
 }
@@ -107,7 +107,7 @@ neogeo_pcm2_rotd_cart_device::neogeo_pcm2_rotd_cart_device(const machine_config 
 
 void neogeo_pcm2_rotd_cart_device::decrypt_all(DECRYPT_ALL_PARAMS)
 {
-	m_cmc_prot->cmc50_m1_decrypt(audiocpu_region, audio_region_size);
+	m_cmc_prot->cmc50_m1_decrypt(audiocrypt_region, audiocrypt_region_size, audiocpu_region, audio_region_size);
 	m_cmc_prot->cmc50_gfx_decrypt(spr_region, spr_region_size, ROTD_GFX_KEY);
 	m_cmc_prot->sfix_decrypt(spr_region, spr_region_size, fix_region, fix_region_size);
 	m_pcm2_prot->decrypt(ym_region, ym_region_size, 16);
@@ -126,7 +126,7 @@ neogeo_pcm2_pnyaa_cart_device::neogeo_pcm2_pnyaa_cart_device(const machine_confi
 
 void neogeo_pcm2_pnyaa_cart_device::decrypt_all(DECRYPT_ALL_PARAMS)
 {
-	m_cmc_prot->cmc50_m1_decrypt(audiocpu_region, audio_region_size);
+	m_cmc_prot->cmc50_m1_decrypt(audiocrypt_region, audiocrypt_region_size, audiocpu_region, audio_region_size);
 	m_cmc_prot->cmc50_gfx_decrypt(spr_region, spr_region_size, PNYAA_GFX_KEY);
 	m_cmc_prot->sfix_decrypt(spr_region, spr_region_size, fix_region, fix_region_size);
 	m_pcm2_prot->decrypt(ym_region, ym_region_size, 4);
