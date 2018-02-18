@@ -11,6 +11,7 @@
 #include "emu.h"
 #include "boot_kof10th.h"
 
+#include <algorithm>
 
 //-------------------------------------------------
 //  neogeo_kof10th_cart_device - constructor

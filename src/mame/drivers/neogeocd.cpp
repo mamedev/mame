@@ -929,7 +929,7 @@ ADDRESS_MAP_END
 
 
 ADDRESS_MAP_START(ngcd_state::neocd_audio_io_map)
-	AM_RANGE(0x00, 0x00) AM_MIRROR(0xff00) AM_DEVREADWRITE("soundlatch", generic_latch_8_device, read, clear_w)
+	AM_RANGE(0x00, 0x00) AM_MIRROR(0xff00) AM_DEVREADWRITE("soundlatch1", generic_latch_8_device, read, clear_w)
 	AM_RANGE(0x04, 0x07) AM_MIRROR(0xff00) AM_DEVREADWRITE("ymsnd", ym2610_device, read, write)
 	AM_RANGE(0x08, 0x08) AM_MIRROR(0xff00) AM_SELECT(0x0010) AM_WRITE(audio_cpu_enable_nmi_w)
 	// banking reads are actually NOP on NeoCD? but some games still access them

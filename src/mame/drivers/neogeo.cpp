@@ -794,7 +794,7 @@ WRITE16_MEMBER(neogeo_state::memcard_w)
 
 WRITE8_MEMBER(neogeo_state::audio_command_w)
 {
-	m_soundlatch->write(space, 0, data);
+	m_soundlatch[0]->write(space, 0, data);
 	/* boost the interleave to let the audio CPU read the command */
 	machine().scheduler().boost_interleave(attotime::zero, attotime::from_usec(50));
 }
@@ -802,7 +802,7 @@ WRITE8_MEMBER(neogeo_state::audio_command_w)
 
 CUSTOM_INPUT_MEMBER(neogeo_state::get_audio_result)
 {
-	uint8_t ret = m_soundlatch2->read(m_audiocpu->space(AS_PROGRAM), 0);
+	uint8_t ret = m_soundlatch[1]->read(m_audiocpu->space(AS_PROGRAM), 0);
 
 	return ret;
 }
@@ -1470,7 +1470,7 @@ ADDRESS_MAP_END
  *************************************/
 
 ADDRESS_MAP_START(neogeo_state::audio_io_map)
-	AM_RANGE(0x00, 0x00) AM_MIRROR(0xff00) AM_DEVREADWRITE("soundlatch", generic_latch_8_device, read, clear_w)
+	AM_RANGE(0x00, 0x00) AM_MIRROR(0xff00) AM_DEVREADWRITE("soundlatch1", generic_latch_8_device, read, clear_w)
 	AM_RANGE(0x04, 0x07) AM_MIRROR(0xff00) AM_DEVREADWRITE("ymsnd", ym2610_device, read, write)
 	AM_RANGE(0x08, 0x08) AM_MIRROR(0xff00) AM_SELECT(0x0010) AM_WRITE(audio_cpu_enable_nmi_w)
 	AM_RANGE(0x08, 0x0b) AM_MIRROR(0x00f0) AM_SELECT(0xff00) AM_READ(audio_cpu_bank_select_r)
@@ -1620,7 +1620,7 @@ MACHINE_CONFIG_START(neogeo_state::neogeo_base)
 	/* audio hardware */
 	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
 
-	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
+	MCFG_GENERIC_LATCH_8_ADD("soundlatch1")
 	MCFG_GENERIC_LATCH_DATA_PENDING_CB(DEVWRITELINE("soundnmi", input_merger_all_high_device, in_w<0>))
 
 	MCFG_GENERIC_LATCH_8_ADD("soundlatch2")

@@ -4,6 +4,7 @@
 #include "emu.h"
 #include "prot_sma.h"
 
+#include <algorithm>
 
 DEFINE_DEVICE_TYPE(NG_SMA_PROT, sma_prot_device, "ng_sma_prot", "Neo Geo SMA Protection")
 

@@ -43,8 +43,7 @@ public:
 		m_screen(*this, "screen"),
 		m_palette(*this, "palette"),
 		m_memcard(*this, "memcard"),
-		m_soundlatch(*this, "soundlatch"),
-		m_soundlatch2(*this, "soundlatch2"),
+		m_soundlatch(*this, "soundlatch%u", 1),
 		m_soundnmi(*this, "soundnmi"),
 		m_region_maincpu(*this, "maincpu"),
 		m_region_sprites(*this, "sprites"),
@@ -210,8 +209,7 @@ protected:
 	required_device<screen_device> m_screen;
 	optional_device<palette_device> m_palette;
 	optional_device<ng_memcard_device> m_memcard;
-	required_device<generic_latch_8_device> m_soundlatch;
-	required_device<generic_latch_8_device> m_soundlatch2;
+	required_device_array<generic_latch_8_device, 2> m_soundlatch;
 	required_device<input_merger_all_high_device> m_soundnmi;
 
 	// memory
