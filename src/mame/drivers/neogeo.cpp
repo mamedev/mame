@@ -640,12 +640,12 @@ WRITE8_MEMBER(neogeo_state::audio_cpu_enable_nmi_w)
 
 READ16_MEMBER(neogeo_state::in0_r)
 {
-	return ((m_edge->in0_r(space, offset) & m_ctrl1->ctrl_r(space, offset)) << 8) | m_dsw->read();
+	return ((m_edge->in0_r(space, offset) & m_ctrl[0]->ctrl_r(space, offset)) << 8) | m_dsw->read();
 }
 
 READ16_MEMBER(neogeo_state::in1_r)
 {
-	return ((m_edge->in1_r(space, offset) & m_ctrl2->ctrl_r(space, offset)) << 8) | 0xff;
+	return ((m_edge->in1_r(space, offset) & m_ctrl[1]->ctrl_r(space, offset)) << 8) | 0xff;
 }
 
 CUSTOM_INPUT_MEMBER(neogeo_state::kizuna4p_start_r)
@@ -658,8 +658,8 @@ WRITE8_MEMBER(neogeo_state::io_control_w)
 	switch (offset)
 	{
 		case 0x00:
-			if (m_ctrl1) m_ctrl1->write_ctrlsel(data);
-			if (m_ctrl2) m_ctrl2->write_ctrlsel(data);
+			if (m_ctrl[0]) m_ctrl[0]->write_ctrlsel(data);
+			if (m_ctrl[1]) m_ctrl[1]->write_ctrlsel(data);
 			if (m_edge) m_edge->write_ctrlsel(data);
 			break;
 
@@ -1311,12 +1311,8 @@ void neogeo_state::machine_start()
 	m_upd4990a->c1_w(1);
 	m_upd4990a->c2_w(1);
 
-	if (m_slot1) { m_slots[0] = m_slot1; } else { m_slots[0] = nullptr; }
-	if (m_slot2) { m_slots[1] = m_slot2; } else { m_slots[1] = nullptr; }
-	if (m_slot3) { m_slots[2] = m_slot3; } else { m_slots[2] = nullptr; }
-	if (m_slot4) { m_slots[3] = m_slot4; } else { m_slots[3] = nullptr; }
-	if (m_slot5) { m_slots[4] = m_slot5; } else { m_slots[4] = nullptr; }
-	if (m_slot6) { m_slots[5] = m_slot6; } else { m_slots[5] = nullptr; }
+	for (int slot = 0; slot < 6; slot++)
+		if (m_slot[slot]) { m_slots[slot] = m_slot[slot]; } else { m_slots[slot] = nullptr; }
 
 	m_sprgen->m_fixed_layer_bank_type = 0;
 	m_sprgen->set_screen(m_screen);
@@ -1419,8 +1415,8 @@ ADDRESS_MAP_END
 READ16_MEMBER(aes_state::aes_in2_r)
 {
 	uint32_t ret = m_io_in2->read();
-	ret = (ret & 0xfcff) | (m_ctrl1->read_start_sel() << 8);
-	ret = (ret & 0xf3ff) | (m_ctrl2->read_start_sel() << 10);
+	ret = (ret & 0xfcff) | (m_ctrl[0]->read_start_sel() << 8);
+	ret = (ret & 0xf3ff) | (m_ctrl[1]->read_start_sel() << 10);
 	return ret;
 }
 
@@ -1717,7 +1713,7 @@ MACHINE_START_MEMBER(aes_state, aes)
 	m_type = NEOGEO_AES;
 	common_machine_start();
 
-	m_slots[0] = m_slot1;
+	m_slots[0] = m_slot[0];
 	m_slots[1] = nullptr;
 	m_slots[2] = nullptr;
 	m_slots[3] = nullptr;
@@ -1962,9 +1958,9 @@ ROM_END
 DRIVER_INIT_MEMBER(neogeo_state, neogeo)
 {
 	// install controllers
-	if (m_ctrl1)
+	if (m_ctrl[0])
 		m_maincpu->space(AS_PROGRAM).install_read_handler(0x300000, 0x300001, 0, 0x01ff7e, 0, read16_delegate(FUNC(neogeo_state::in0_r), this));
-	if (m_ctrl2)
+	if (m_ctrl[1])
 		m_maincpu->space(AS_PROGRAM).install_read_handler(0x340000, 0x340001, 0, 0x01fffe, 0, read16_delegate(FUNC(neogeo_state::in1_r), this));
 }
 

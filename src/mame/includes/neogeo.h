@@ -58,16 +58,10 @@ public:
 		m_trackx(*this, "TRACK_X"),
 		m_tracky(*this, "TRACK_Y"),
 		m_edge(*this, "edge"),
-		m_ctrl1(*this, "ctrl1"),
-		m_ctrl2(*this, "ctrl2"),
+		m_ctrl(*this, "ctrl%u", 1),
 		m_use_cart_vectors(0),
 		m_use_cart_audio(0),
-		m_slot1(*this, "cslot1"),
-		m_slot2(*this, "cslot2"),
-		m_slot3(*this, "cslot3"),
-		m_slot4(*this, "cslot4"),
-		m_slot5(*this, "cslot5"),
-		m_slot6(*this, "cslot6")
+		m_slot(*this, "cslot%u", 1),
 	{ }
 
 	DECLARE_READ16_MEMBER(memcard_r);
@@ -233,8 +227,7 @@ protected:
 	optional_ioport m_trackx;
 	optional_ioport m_tracky;
 	optional_device<neogeo_ctrl_edge_port_device> m_edge;
-	optional_device<neogeo_control_port_device> m_ctrl1;
-	optional_device<neogeo_control_port_device> m_ctrl2;
+	optional_device_array<neogeo_control_port_device, 2> m_ctrl;
 
 	// video hardware, including maincpu interrupts
 	// TODO: make into a device
@@ -258,12 +251,7 @@ protected:
 	// temporary helper to restore memory banking while bankswitch is handled in the driver...
 	uint32_t m_bank_base;
 
-	optional_device<neogeo_cart_slot_device> m_slot1;
-	optional_device<neogeo_cart_slot_device> m_slot2;
-	optional_device<neogeo_cart_slot_device> m_slot3;
-	optional_device<neogeo_cart_slot_device> m_slot4;
-	optional_device<neogeo_cart_slot_device> m_slot5;
-	optional_device<neogeo_cart_slot_device> m_slot6;
+	optional_device_array<neogeo_cart_slot_device, 6> m_slot;
 
 	int m_curr_slot;
 	neogeo_cart_slot_device* m_slots[6];
