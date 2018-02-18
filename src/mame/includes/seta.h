@@ -69,6 +69,7 @@ public:
 		m_vctrl_2(*this,"vctrl_2"),
 		m_paletteram(*this,"paletteram"),
 		m_paletteram2(*this,"paletteram2"),
+		m_subbank(*this,"subbank"),
 		m_gfxdecode(*this, "gfxdecode"),
 		m_palette(*this, "palette") { }
 
@@ -103,6 +104,8 @@ public:
 	optional_shared_ptr<uint16_t> m_vctrl_2;
 	optional_shared_ptr<uint16_t> m_paletteram;
 	optional_shared_ptr<uint16_t> m_paletteram2;
+
+	optional_memory_bank m_subbank;
 
 	required_device<gfxdecode_device> m_gfxdecode;
 	required_device<palette_device> m_palette;
@@ -186,6 +189,7 @@ public:
 	DECLARE_READ8_MEMBER(dsw1_r);
 	DECLARE_READ8_MEMBER(dsw2_r);
 	DECLARE_READ16_MEMBER(extra_r);
+	DECLARE_DRIVER_INIT(bank6502);
 	DECLARE_DRIVER_INIT(downtown);
 	DECLARE_DRIVER_INIT(rezon);
 	DECLARE_DRIVER_INIT(twineagl);

@@ -81,6 +81,7 @@ public:
 
 protected:
 	virtual void machine_start() override;
+	virtual void machine_reset() override;
 	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr) override;
 
 private:
@@ -95,6 +96,7 @@ private:
 	DECLARE_WRITE8_MEMBER( dma_mem_w );
 	DECLARE_READ8_MEMBER( fdcctrl_r );
 	DECLARE_WRITE8_MEMBER( fdcctrl_w );
+	DECLARE_WRITE8_MEMBER( fdcctrl85_w );
 	DECLARE_READ8_MEMBER( fdcdma_r );
 	DECLARE_WRITE8_MEMBER( fdcdma_w );
 	DECLARE_WRITE8_MEMBER( crtcdma_w );
@@ -102,16 +104,13 @@ private:
 	DECLARE_WRITE8_MEMBER( rom_w );
 	DECLARE_WRITE8_MEMBER( vchrmap_w );
 	DECLARE_WRITE8_MEMBER( vchrram_w );
+	DECLARE_WRITE8_MEMBER( vchrram85_w );
 	DECLARE_WRITE8_MEMBER( ppic_w );
-	DECLARE_WRITE8_MEMBER( romctrl_w );
 	void olyboss_io(address_map &map);
 	void olyboss_mem(address_map &map);
 	void olyboss85_io(address_map &map);
-	void olyboss85_mem(address_map &map);
+	IRQ_CALLBACK_MEMBER(irq_cb);
 
-	DECLARE_MACHINE_RESET(bossz80);
-	DECLARE_MACHINE_RESET(boss8085);
-	
 	required_device<cpu_device> m_maincpu;
 	required_device<i8257_device> m_dma;
 	required_device<upd3301_device> m_crtc;
@@ -131,36 +130,31 @@ private:
 	void keyboard85_put(u8 data);
 	u8 m_fdcctrl, m_fdctype;
 	u8 m_channel, m_vchrmap, m_vchrpage;
+	u16 m_vchraddr;
 	u8 m_vchrram[0x800];
-	bool m_romen;
+	bool m_romen, m_timstate;
 	emu_timer *m_timer;
 };
 
-MACHINE_RESET_MEMBER(olyboss_state,bossz80)
+void olyboss_state::machine_reset()
 {
 	m_keybhit=false;
 	m_romen = true;
+	m_timstate = false;
 
 	m_fdcctrl = 0;
 	m_vchrmap = 0;
 	m_vchrpage = 0;
-	m_timer->adjust(attotime::from_hz(60), 0, attotime::from_hz(60)); // unknown timer freq, possibly com2651 BRCLK
-}
-
-MACHINE_RESET_MEMBER(olyboss_state,boss8085)
-{
-	m_keybhit=false;
-	m_romen = true;
-
-	m_fdcctrl = 0;
-	m_vchrmap = 0;
-	m_vchrpage = 0;
+	m_timer->adjust(attotime::from_hz(30), 0, attotime::from_hz(30)); // unknown timer freq, possibly com2651 BRCLK
 }
 
 void olyboss_state::device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr)
 {
-	m_uic->ireq7_w(ASSERT_LINE);
-	m_uic->ireq7_w(CLEAR_LINE);
+	m_timstate = !m_timstate;
+	if(m_pic)
+		m_pic->ir0_w(m_timstate);
+	else
+		m_uic->ireq7_w(m_timstate);
 }
 
 //**************************************************************************
@@ -188,11 +182,6 @@ ADDRESS_MAP_START(olyboss_state::olyboss_io)
 	AM_RANGE(0x90, 0x9f) AM_WRITE(vchrram_w)
 ADDRESS_MAP_END
 
-ADDRESS_MAP_START(olyboss_state::olyboss85_mem)
-	AM_RANGE(0x0000, 0x7ff ) AM_READWRITE(rom_r, rom_w) AM_SHARE("lowram")
-	AM_RANGE(0x800,  0xbfff) AM_RAM
-ADDRESS_MAP_END
-
 ADDRESS_MAP_START(olyboss_state::olyboss85_io)
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	ADDRESS_MAP_UNMAP_HIGH
@@ -200,8 +189,9 @@ ADDRESS_MAP_START(olyboss_state::olyboss85_io)
 	AM_RANGE(0x10, 0x11) AM_DEVICE("fdc", upd765a_device, map)
 	AM_RANGE(0x20, 0x21) AM_DEVREADWRITE(UPD3301_TAG, upd3301_device, read, write)
 	AM_RANGE(0x30, 0x31) AM_DEVREADWRITE("pic", pic8259_device, read, write)
-//	AM_RANGE(0x45, 0x45) AM_WRITE(romctrl_w)
-	//AM_RANGE(0x50, 0x53) COM2651
+	AM_RANGE(0x42, 0x42) AM_READ(keyboard_read)
+	AM_RANGE(0x42, 0x44) AM_WRITE(vchrram85_w)
+	AM_RANGE(0x45, 0x45) AM_WRITE(fdcctrl85_w)
 ADDRESS_MAP_END
 
 static INPUT_PORTS_START( olyboss )
@@ -216,6 +206,22 @@ READ8_MEMBER( olyboss_state::rom_r )
 WRITE8_MEMBER( olyboss_state::rom_w )
 {
 	m_lowram[offset] = data;
+}
+
+WRITE8_MEMBER( olyboss_state::vchrram85_w )
+{
+	switch(offset)
+	{
+		case 0:
+			m_vchraddr = (m_vchraddr & 0x00f) | (data << 4);
+			break;
+		case 1:
+			m_vchraddr = (m_vchraddr & 0xff0) | (data & 0xf);
+			break;
+		case 2:
+			m_vchrram[m_vchraddr] = data;
+			break;
+	}
 }
 
 WRITE8_MEMBER( olyboss_state::vchrmap_w )
@@ -236,15 +242,16 @@ WRITE8_MEMBER( olyboss_state::vchrram_w )
 	m_vchrram[(m_vchrpage << 4) + (offset ^ 0xf)] = data;
 }
 
-WRITE8_MEMBER( olyboss_state::romctrl_w )
-{
-	m_romen = data != 0;
-}
-
 WRITE_LINE_MEMBER( olyboss_state::romdis_w )
 {
-	if(state)
-		m_romen = false;
+	m_romen = state ? false : true; 
+}
+
+IRQ_CALLBACK_MEMBER( olyboss_state::irq_cb )
+{
+	if(!irqline)
+		return m_pic->acknowledge();
+	return 0;
 }
 
 //**************************************************************************
@@ -284,6 +291,8 @@ READ8_MEMBER( olyboss_state::keyboard_read )
 	if (m_keybhit)
 	{
 		m_keybhit=false;
+		if(m_pic)
+			m_pic->ir1_w(CLEAR_LINE);
 		return m_keystroke;
 	}
 	return 0x00;
@@ -319,6 +328,12 @@ void olyboss_state::keyboard_put(u8 data)
 
 void olyboss_state::keyboard85_put(u8 data)
 {
+	if(data)
+	{
+		m_pic->ir1_w(ASSERT_LINE);
+		m_keybhit = true;
+		m_keystroke = data;
+	}
 }
 
 /* 8257 Interface */
@@ -383,6 +398,14 @@ WRITE8_MEMBER( olyboss_state::fdcctrl_w )
 		m_fdd1->get_device()->mon_w(!(data & 4));
 }
 
+WRITE8_MEMBER( olyboss_state::fdcctrl85_w )
+{
+	m_fdcctrl = data;
+	m_fdd0->get_device()->mon_w(!(data & 0x40));
+	if(m_fdd1)
+		m_fdd1->get_device()->mon_w(!(data & 0x80));
+}
+
 static SLOT_INTERFACE_START( bossb_floppies )
 	SLOT_INTERFACE( "525dd", FLOPPY_525_DD )
 SLOT_INTERFACE_END
@@ -401,11 +424,9 @@ MACHINE_CONFIG_START( olyboss_state::olybossd )
 	MCFG_CPU_IO_MAP(olyboss_io)
 	MCFG_CPU_IRQ_ACKNOWLEDGE_DEVICE("uic", am9519_device, iack_cb)
 
-	MCFG_MACHINE_RESET_OVERRIDE(olyboss_state, bossz80)
-
 	/* video hardware */
 
-	MCFG_SCREEN_ADD(SCREEN_TAG, RASTER)
+	MCFG_SCREEN_ADD_MONOCHROME(SCREEN_TAG, RASTER, rgb_t::green())
 	MCFG_SCREEN_REFRESH_RATE(60)
 	MCFG_SCREEN_UPDATE_DEVICE(UPD3301_TAG, upd3301_device, screen_update)
 	MCFG_SCREEN_SIZE(80*8, 28*11)
@@ -464,15 +485,14 @@ MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START( olyboss_state::bossb85 )
 	MCFG_CPU_ADD("maincpu", I8085A, 4_MHz_XTAL)
-	MCFG_CPU_PROGRAM_MAP(olyboss85_mem)
+	MCFG_CPU_PROGRAM_MAP(olyboss_mem)
 	MCFG_CPU_IO_MAP(olyboss85_io)
-	MCFG_CPU_IRQ_ACKNOWLEDGE_DEVICE("pic", pic8259_device, inta_cb)
+	MCFG_CPU_IRQ_ACKNOWLEDGE_DRIVER(olyboss_state, irq_cb)
 	MCFG_I8085A_SOD(WRITELINE(olyboss_state, romdis_w))
 
-	MCFG_MACHINE_RESET_OVERRIDE(olyboss_state, boss8085)
 	/* video hardware */
 
-	MCFG_SCREEN_ADD(SCREEN_TAG, RASTER)
+	MCFG_SCREEN_ADD_MONOCHROME(SCREEN_TAG, RASTER, rgb_t::green())
 	MCFG_SCREEN_REFRESH_RATE(60)
 	MCFG_SCREEN_UPDATE_DEVICE(UPD3301_TAG, upd3301_device, screen_update)
 	MCFG_SCREEN_SIZE(80*8, 28*11)
@@ -484,9 +504,11 @@ MACHINE_CONFIG_START( olyboss_state::bossb85 )
 	MCFG_PIC8259_OUT_INT_CB(INPUTLINE("maincpu", 0))
 
 	MCFG_UPD765A_ADD("fdc", true, true)
-	//MCFG_UPD765_INTRQ_CALLBACK(DEVWRITELINE("pic", pic8259_device, ir2_w))
+	MCFG_UPD765_INTRQ_CALLBACK(INPUTLINE("maincpu", I8085_RST65_LINE))
 	MCFG_UPD765_DRQ_CALLBACK(DEVWRITELINE(I8257_TAG, i8257_device, dreq0_w))
 	MCFG_FLOPPY_DRIVE_ADD("fdc:0", bossb_floppies, "525dd", floppy_image_device::default_floppy_formats)
+	MCFG_FLOPPY_DRIVE_SOUND(true)
+	MCFG_FLOPPY_DRIVE_ADD("fdc:1", bossb_floppies, "525dd", floppy_image_device::default_floppy_formats)
 	MCFG_FLOPPY_DRIVE_SOUND(true)
 
 	MCFG_DEVICE_ADD(I8257_TAG, I8257, XTAL(4'000'000))

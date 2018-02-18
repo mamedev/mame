@@ -31,35 +31,9 @@
 
 /******************************************************************************/
 
-WRITE16_MEMBER(darkseal_state::control_w)
+WRITE16_MEMBER(darkseal_state::irq_ack_w)
 {
-	switch (offset<<1) {
-	case 6: /* DMA flag */
-		m_spriteram->copy();
-		return;
-	case 8: /* Sound CPU write */
-		m_soundlatch->write(space, 0, data & 0xff);
-		return;
-	case 0xa: /* IRQ Ack (VBL) */
-		return;
-	}
-}
-
-READ16_MEMBER(darkseal_state::control_r)
-{
-	switch (offset<<1)
-	{
-		case 0:
-			return ioport("DSW")->read();
-
-		case 2:
-			return ioport("P1_P2")->read();
-
-		case 4:
-			return ioport("SYSTEM")->read();
-	}
-
-	return ~0;
+	m_maincpu->set_input_line(M68K_IRQ_6, CLEAR_LINE);
 }
 
 /******************************************************************************/
@@ -70,7 +44,12 @@ ADDRESS_MAP_START(darkseal_state::darkseal_map)
 	AM_RANGE(0x120000, 0x1207ff) AM_RAM AM_SHARE("spriteram")
 	AM_RANGE(0x140000, 0x140fff) AM_RAM_WRITE(palette_24bit_rg_w) AM_SHARE("paletteram")
 	AM_RANGE(0x141000, 0x141fff) AM_RAM_WRITE(palette_24bit_b_w) AM_SHARE("paletteram2")
-	AM_RANGE(0x180000, 0x18000f) AM_READWRITE(control_r, control_w)
+	AM_RANGE(0x180000, 0x180001) AM_READ_PORT("DSW")
+	AM_RANGE(0x180002, 0x180003) AM_READ_PORT("P1_P2")
+	AM_RANGE(0x180004, 0x180005) AM_READ_PORT("SYSTEM")
+	AM_RANGE(0x180006, 0x180007) AM_READNOP AM_DEVWRITE("spriteram", buffered_spriteram16_device, write)
+	AM_RANGE(0x180008, 0x180009) AM_DEVWRITE8("soundlatch", generic_latch_8_device, write, 0x00ff).cswidth(16)
+	AM_RANGE(0x18000a, 0x18000b) AM_READNOP AM_WRITE(irq_ack_w)
 
 	AM_RANGE(0x200000, 0x201fff) AM_DEVREADWRITE("tilegen2", deco16ic_device, pf1_data_r, pf1_data_w)
 	AM_RANGE(0x202000, 0x203fff) AM_DEVREADWRITE("tilegen2", deco16ic_device, pf2_data_r, pf2_data_w)
@@ -231,7 +210,7 @@ MACHINE_CONFIG_START(darkseal_state::darkseal)
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", M68000, XTAL(24'000'000)/2) /* Custom chip 59 */
 	MCFG_CPU_PROGRAM_MAP(darkseal_map)
-	MCFG_CPU_VBLANK_INT_DRIVER("screen", darkseal_state,  irq6_line_hold)/* VBL */
+	MCFG_CPU_VBLANK_INT_DRIVER("screen", darkseal_state,  irq6_line_assert)/* VBL */
 
 	MCFG_CPU_ADD("audiocpu", H6280, XTAL(32'220'000)/4) /* Custom chip 45, Audio section crystal is 32.220 MHz */
 	MCFG_CPU_PROGRAM_MAP(sound_map)

@@ -1,8 +1,8 @@
 // license:BSD-3-Clause
-// copyright-holders:Angelo Salese
+// copyright-holders:David Haywood, Angelo Salese
 /***************************************************************************
 
-    Skeleton driver for XaviX TV PNP console and childs (Let's! Play TV Classic)
+    Preliminary driver for XaviX TV PNP console and childs (Let's! Play TV Classic)
 
     CPU is an M6502 derivative with added opcodes for far-call handling
 
@@ -58,8 +58,7 @@ public:
 		m_in0(*this, "IN0"),
 		m_in1(*this, "IN1"),
 		m_gfxdecode(*this, "gfxdecode"),
-		m_alt_addressing(0),
-		m_tilemap_enabled(1)
+		m_alt_addressing(0)
 	{ }
 
 	// devices
@@ -225,7 +224,9 @@ private:
 	void handle_palette(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	double hue2rgb(double p, double q, double t);
 	void draw_tile(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect, int tile, int bpp, int xpos, int ypos, int drawheight, int drawwidth, int flipx, int flipy, int pal, int opaque);
-	
+	void draw_tilemap(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect, int which);
+	void draw_sprites(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+
 	int m_rgnlen;
 	uint8_t* m_rgn;
 
@@ -239,8 +240,6 @@ private:
 	int get_current_address_byte();
 
 	int m_alt_addressing;
-	int m_tilemap_enabled;
-
 };
 
 void xavix_state::set_data_address(int address, int bit)
@@ -347,207 +346,195 @@ void xavix_state::handle_palette(screen_device &screen, bitmap_ind16 &bitmap, co
 	}
 }
 
-void xavix_state::draw_tile(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect, int tile, int bpp, int xpos, int ypos, int drawheight, int drawwidth, int flipx, int flipy, int pal, int opaque)
+void xavix_state::draw_tilemap(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect, int which)
 {
-	// set the address here so we can increment in bits in the draw function
-	set_data_address(tile, 0);
-
-	for (int y = 0; y < drawheight; y++)
-	{
-		int row;
-		if (flipy)
-		{
-			row = ypos + (drawheight-1) - y;
-		}
-		else
-		{
-			row = ypos + y;
-		}
-
-		for (int x = 0; x < drawwidth; x++)
-		{
-
-			int col;
-
-			if (flipx)
-			{
-				col = xpos + (drawwidth-1) - x;
-			}
-			else
-			{
-				col = xpos + x;
-			}
-
-			uint8_t dat = 0;
-
-			for (int i = 0; i < bpp; i++)
-			{
-				dat |= (get_next_bit() << i);
-			}
-
-			if ((row >= cliprect.min_y && row <= cliprect.max_y) && (col >= cliprect.min_x && col <= cliprect.max_x))
-			{
-				uint16_t* rowptr;
-
-				rowptr = &bitmap.pix16(row);
-				
-				if (opaque)
-				{
-					rowptr[col] = (dat + (pal << 4)) & 0xff;
-				}
-				else
-				{
-					if (dat)
-						rowptr[col] = (dat + (pal << 4)) & 0xff;
-				}
-			}
-		}
-	}
-}
-
-uint32_t xavix_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
-{
-	handle_palette(screen, bitmap, cliprect);
-
-	bitmap.fill(0, cliprect);
-
 	int alt_tileaddressing = 0;
 
-	static int bankhack = 0;
+	int ydimension = 0;
+	int xdimension = 0;
+	int ytilesize = 0;
+	int xtilesize = 0;
+	int offset_multiplier = 0;
+	int opaque = 0;
+	int rambase = 0;
 
-	if (machine().input().code_pressed_once(KEYCODE_W))
+	uint8_t* tileregs;
+
+	// all this is likely controlled by tilemap registers
+	if (which == 0)
 	{
-		bankhack++;
-		logerror("%02x\n", bankhack);
+		tileregs = m_tmap1_regs;
+		ydimension = 16;
+		xdimension = 16;
+		ytilesize = 16;
+		xtilesize = 16;
+		offset_multiplier = 32;
+		opaque = 1;
+		rambase = 0;
+	}
+	else
+	{
+		tileregs = m_tmap2_regs;
+		ydimension = 32;
+		xdimension = 32;
+		ytilesize = 8;
+		xtilesize = 8;
+		offset_multiplier = 8;
+		opaque = 0;
+		rambase = 0x200;
 	}
 
-	if (machine().input().code_pressed_once(KEYCODE_Q))
-	{
-		bankhack--;
-		logerror("%02x\n", bankhack);
-	}
-
-	if (m_tmap1_regs[0x7] & 0x02)
+	if (tileregs[0x7] & 0x02)
 		alt_tileaddressing = 1;
 	else
 		alt_tileaddressing = 0;
 
-	if (m_tmap1_regs[0x7] & 0x80)
+	if (tileregs[0x7] & 0x80)
 	{
-		// why are the first two logos in Monster Truck stored as tilemaps in main ram?
-		// test mode isn't? is the code meant to process them instead? - there are no sprites in the sprite list at the time (and only one in test mode)
+		// there's a tilemap register to specify base in main ram, although in the monster truck test mode it points to an unmapped region
+		// and expected a fixed layout, still need to handle that.
 		int count;
 
-		count = 0;
-		for (int y = 0; y < 16; y++)
+		count = rambase;
+		for (int y = 0; y < ydimension; y++)
 		{
-			for (int x = 0; x < 16; x++)
+			for (int x = 0; x < xdimension; x++)
 			{
 				int bpp, pal, scrolly, scrollx;
 				int tile = m_mainram[count];
-				tile |= (m_mainram[count + 0x100] << 8);
+				tile |= (m_mainram[count + (ydimension*xdimension)] << 8);
 				count++;
 
-				bpp = (m_tmap1_regs[0x3] & 0x0e) >> 1;
+				bpp = (tileregs[0x3] & 0x0e) >> 1;
 				bpp++;
-				pal = (m_tmap1_regs[0x6] & 0xf0) >> 4;
-				scrolly = m_tmap1_regs[0x5];
-				scrollx = m_tmap1_regs[0x4];
+				pal = (tileregs[0x6] & 0xf0) >> 4;
+				scrolly = tileregs[0x5];
+				scrollx = tileregs[0x4];
 
 				int basereg;
 				int flipx = 0;
 				int flipy = 0;
 				int gfxbase;
 
+				// tile 0 is always skipped, doesn't even point to valid data packets in alt mode
+				// this is consistent with the top layer too
+				// should we draw as solid in solid layer?
+				if (tile == 0)
+					continue;
+
+				const int debug_packets = 0;
+				int test = 0;
 
 				if (!alt_tileaddressing)
 				{
 					basereg = 0;
 					gfxbase = (m_spr_attra[(basereg * 2) + 1] << 16) | (m_spr_attra[(basereg * 2)] << 8);
 
-					tile = tile * (32 * bpp);
+					tile = tile * (offset_multiplier * bpp);
 					tile += gfxbase;
 				}
 				else
 				{
-					basereg = (tile & 0xf000)>>12;
+					if (debug_packets) printf("for tile %04x (at %d %d): ", tile, (((x * 16) + scrollx) & 0xff), (((y * 16) + scrolly) & 0xff));
+
+
+					basereg = (tile & 0xf000) >> 12;
 					tile &= 0x0fff;
 					gfxbase = (m_spr_attra[(basereg * 2) + 1] << 16) | (m_spr_attra[(basereg * 2)] << 8);
 
 					tile += gfxbase;
 					set_data_address(tile, 0);
-					
+
 					// there seems to be a packet stored before the tile?!
 					// the offset used for flipped sprites seems to specifically be changed so that it picks up an extra byte which presumably triggers the flipping
 					uint8_t byte1 = 0;
 					int done = 0;
+					int skip = 0;
+
 					do
 					{
 						byte1 = get_next_byte();
 
-						if (byte1 == 0x05)
+						if (debug_packets) printf(" %02x, ", byte1);
+
+						if (skip == 1)
 						{
-							flipx = 1;
+							skip = 0;
+							//test = 1;
 						}
-						else if (byte1 == 0x15)
+						else if ((byte1 & 0x0f) == 0x01)
 						{
-							
+							// used
+						}
+						else if ((byte1 & 0x0f) == 0x03)
+						{
+							// causes next byte to be skipped??
+							skip = 1;
+						}
+						else if ((byte1 & 0x0f) == 0x05)
+						{
+							// the upper bits are often 0x00, 0x10, 0x20, 0x30, why?
+							flipx = 1;
 						}
 						else if ((byte1 & 0x0f) == 0x06) // there must be other finish conditions too because sometimes this fails..
 						{
 							// tile data will follow after this, always?
-							pal = (byte1 & 0xf0)>>4;
+							pal = (byte1 & 0xf0) >> 4;
 							done = 1;
 						}
-						else if (byte1 == 0x0d)
+						else if ((byte1 & 0x0f) == 0x07)
 						{
-							//done = 1;
+							// causes next byte to be skipped??
+							skip = 1;
 						}
-						else if ((byte1== 0x03) || (byte1== 0x13))
+						else if ((byte1 & 0x0f) == 0x09)
 						{
-							//flipy = 1;
+							// used
 						}
-						else if (byte1 == 0x0f)
+						else if ((byte1 & 0x0f) == 0x0a)
 						{
+							// not seen
+						}
+						else if ((byte1 & 0x0f) == 0x0b)
+						{
+							// used
+						}
+						else if ((byte1 & 0x0f) == 0x0c)
+						{
+							// not seen
+						}
+						else if ((byte1 & 0x0f) == 0x0d)
+						{
+							// used
+						}
+						else if ((byte1 & 0x0f) == 0x0e)
+						{
+							// not seen
+						}
+						else if ((byte1 & 0x0f) == 0x0f)
+						{
+							// used
+						}
 
-						}
-						else if (byte1 == 0x0b)
-						{
-
-						}
-						else if ((byte1 == 0x09) || (byte1 == 0x19))
-						{
-
-						}
-						else if ((byte1 == 0x07) || (byte1 == 0x17))
-						{
-
-						}
-						else if (byte1 == 0x01)
-						{
-
-						}
-						else
-						{
-
-							//printf("unknown packet byte %02x\n", byte1);
-						}
-					}
-					while (done == 0);
-
+					} while (done == 0);
+					if (debug_packets) printf("\n");
 					tile = get_current_address_byte();
 				}
 
+				if (test == 1) pal = machine().rand() & 0xf;
 
-				draw_tile(screen, bitmap, cliprect, tile, bpp, (x * 16) + scrollx, ((y * 16) - 16) - scrolly, 16, 16, flipx, flipy, pal, 1);
-				draw_tile(screen, bitmap, cliprect, tile, bpp, (x * 16) + scrollx, (((y * 16) - 16) - scrolly) + 256, 16, 16, flipx, flipy, pal, 1); // wrap-y
-				draw_tile(screen, bitmap, cliprect, tile, bpp, ((x * 16) + scrollx) - 256, ((y * 16) - 16) - scrolly, 16, 16, flipx, flipy, pal, 1); // wrap-x
-				draw_tile(screen, bitmap, cliprect, tile, bpp, ((x * 16) + scrollx) - 256, (((y * 16) - 16) - scrolly) + 256, 16, 16, flipx, flipy, pal, 1); // wrap-y and x
+
+				draw_tile(screen, bitmap, cliprect, tile, bpp, (x * xtilesize) + scrollx, ((y * ytilesize) - 16) - scrolly, xtilesize, ytilesize, flipx, flipy, pal, opaque);
+				draw_tile(screen, bitmap, cliprect, tile, bpp, (x * xtilesize) + scrollx, (((y * ytilesize) - 16) - scrolly) + 256, xtilesize, ytilesize, flipx, flipy, pal, opaque); // wrap-y
+				draw_tile(screen, bitmap, cliprect, tile, bpp, ((x * xtilesize) + scrollx) - 256, ((y * ytilesize) - 16) - scrolly, xtilesize, ytilesize, flipx, flipy, pal, opaque); // wrap-x
+				draw_tile(screen, bitmap, cliprect, tile, bpp, ((x * xtilesize) + scrollx) - 256, (((y * ytilesize) - 16) - scrolly) + 256, xtilesize, ytilesize, flipx, flipy, pal, opaque); // wrap-y and x
 			}
 		}
 	}
+}
 
-
+void xavix_state::draw_sprites(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
+{
 	//logerror("frame\n");
 	// priority doesn't seem to be based on list order, there are bad sprite-sprite priorities with either forward or reverse
 
@@ -641,65 +628,75 @@ uint32_t xavix_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap,
 		}
 		*/
 	}
+}
 
-	if (m_tmap2_regs[0x7] & 0x02)
-		alt_tileaddressing = 1;
-	else
-		alt_tileaddressing = 0;
+void xavix_state::draw_tile(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect, int tile, int bpp, int xpos, int ypos, int drawheight, int drawwidth, int flipx, int flipy, int pal, int opaque)
+{
+	// set the address here so we can increment in bits in the draw function
+	set_data_address(tile, 0);
 
-	if (m_tmap2_regs[0x7] & 0x80)
+	for (int y = 0; y < drawheight; y++)
 	{
-		// there is a 2nd layer in monster truck too, there must be more to the gfxbase tho, because the lower layer can't be using the same gfxbase..
-		int count = 0x200;
-		for (int y = 0; y < 32; y++)
+		int row;
+		if (flipy)
 		{
-			for (int x = 0; x < 32; x++)
+			row = ypos + (drawheight-1) - y;
+		}
+		else
+		{
+			row = ypos + y;
+		}
+
+		for (int x = 0; x < drawwidth; x++)
+		{
+
+			int col;
+
+			if (flipx)
 			{
-				int bpp, pal, scrolly, scrollx;
-				int tile = m_mainram[count];
-				tile |= (m_mainram[count+0x400]<<8);
-				count++;
+				col = xpos + (drawwidth-1) - x;
+			}
+			else
+			{
+				col = xpos + x;
+			}
 
-				bpp = (m_tmap2_regs[0x3] & 0x0e)>>1;
-				bpp++;
-				pal = (m_tmap2_regs[0x6] & 0xf0)>>4;
-				scrolly = m_tmap2_regs[0x5];
-				scrollx = m_tmap2_regs[0x4];
+			uint8_t dat = 0;
 
-				int basereg;
+			for (int i = 0; i < bpp; i++)
+			{
+				dat |= (get_next_bit() << i);
+			}
 
-				if (!alt_tileaddressing)
+			if ((row >= cliprect.min_y && row <= cliprect.max_y) && (col >= cliprect.min_x && col <= cliprect.max_x))
+			{
+				uint16_t* rowptr;
+
+				rowptr = &bitmap.pix16(row);
+				
+				if (opaque)
 				{
-					basereg = 0;
+					rowptr[col] = (dat + (pal << 4)) & 0xff;
 				}
 				else
 				{
-					basereg = (tile & 0xf000)>>12;
-					tile &= 0x0fff;
-					// control word of some kind maybe?
-					tile += 2;
-				}
-
-				// upper bit is often set, maybe just because it relies on mirroring, maybe other purpose
-				int gfxbase = (m_spr_attra[(basereg*2)+1] << 16) | (m_spr_attra[(basereg*2)]<<8);
-
-				if (!alt_tileaddressing)
-				{
-					tile = tile * (8 * bpp);
-				}
-
-				// even the transpen makes no sense here, it's 0 on the used elements, 15 on the unused ones.. are 00 tiles just ignored?
-				if (tile)
-				{
-					tile += gfxbase;
-					draw_tile(screen, bitmap, cliprect, tile, bpp, (x*8)+scrollx, ((y*8)-16)-scrolly, 8, 8, 0, 0, pal, 0);
-					draw_tile(screen, bitmap, cliprect, tile, bpp, (x*8)+scrollx, (((y*8)-16)-scrolly)+256, 8, 8, 0, 0, pal, 0); // wrap-y
-					draw_tile(screen, bitmap, cliprect, tile, bpp, ((x*8)+scrollx)-256, ((y*8)-16)-scrolly, 8, 8, 0, 0, pal, 0); // wrap x
-					draw_tile(screen, bitmap, cliprect, tile, bpp, ((x*8)+scrollx)-256, (((y*8)-16)-scrolly)+256, 8, 8, 0, 0, pal, 0); // wrap-y and x
+					if (dat)
+						rowptr[col] = (dat + (pal << 4)) & 0xff;
 				}
 			}
 		}
 	}
+}
+
+uint32_t xavix_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
+{
+	handle_palette(screen, bitmap, cliprect);
+
+	bitmap.fill(0, cliprect);
+
+	draw_tilemap(screen,bitmap,cliprect,0);
+	draw_sprites(screen,bitmap,cliprect);
+	draw_tilemap(screen,bitmap,cliprect,1);
 
 	return 0;
 }
@@ -1640,7 +1637,6 @@ DRIVER_INIT_MEMBER(xavix_state, taitons1)
 {
 	DRIVER_INIT_CALL(xavix);
 	m_alt_addressing = 1;
-	m_tilemap_enabled = 0;
 }
 
 

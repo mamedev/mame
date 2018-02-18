@@ -914,11 +914,11 @@ MACHINE_RESET_MEMBER(cntsteer_state,cntsteer)
 MACHINE_CONFIG_START(cntsteer_state::cntsteer)
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", M6809, 2000000)      /* ? */
+	MCFG_CPU_ADD("maincpu", MC6809E, 2000000)      /* MC68B09E */
 	MCFG_CPU_PROGRAM_MAP(cntsteer_cpu1_map)
 	MCFG_CPU_VBLANK_INT_DRIVER("screen", cntsteer_state,  nmi_line_pulse) /* ? */
 
-	MCFG_CPU_ADD("subcpu", M6809, 2000000)       /* ? */
+	MCFG_CPU_ADD("subcpu", MC6809E, 2000000)       /* MC68B09E */
 	MCFG_CPU_PROGRAM_MAP(cntsteer_cpu2_map)
 //  MCFG_DEVICE_DISABLE()
 	MCFG_CPU_VBLANK_INT_DRIVER("screen", cntsteer_state,  subcpu_vblank_irq) /* ? */
@@ -968,11 +968,11 @@ MACHINE_CONFIG_END
 MACHINE_CONFIG_START(cntsteer_state::zerotrgt)
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", M6809, 2000000)      /* ? */
+	MCFG_CPU_ADD("maincpu", MC6809E, 2000000)      /* ? */
 	MCFG_CPU_PROGRAM_MAP(gekitsui_cpu1_map)
 	MCFG_CPU_VBLANK_INT_DRIVER("screen", cntsteer_state,  nmi_line_pulse) /* ? */
 
-	MCFG_CPU_ADD("subcpu", M6809, 2000000)       /* ? */
+	MCFG_CPU_ADD("subcpu", MC6809E, 2000000)       /* ? */
 	MCFG_CPU_PROGRAM_MAP(gekitsui_cpu2_map)
 	MCFG_CPU_VBLANK_INT_DRIVER("screen", cntsteer_state,  nmi_line_pulse) /* ? */
 
