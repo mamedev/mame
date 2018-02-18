@@ -386,6 +386,7 @@
 #include "cpu/z80/z80.h"
 #include "machine/gen_latch.h"
 #include "machine/nvram.h"
+#include "machine/rstbuf.h"
 #include "machine/ticket.h"
 #include "sound/ay8910.h"
 #include "sound/msm5205.h"
@@ -404,6 +405,7 @@ public:
 		m_audiocpu(*this, "audiocpu"),
 		m_v9938(*this, "v9938"),
 		m_adpcm(*this, "adpcm"),
+		m_soundirq(*this, "soundirq"),
 		m_hopper(*this, "hopper"),
 		m_bank1(*this, "bank1")
 	{ }
@@ -412,22 +414,20 @@ public:
 	required_device<cpu_device> m_audiocpu;
 	required_device<v9938_device> m_v9938;
 	required_device<msm5205_device> m_adpcm;
+	required_device<rst_neg_buffer_device> m_soundirq;
 	required_device<ticket_dispenser_device> m_hopper;
 	required_memory_bank m_bank1;
 
-	uint8_t m_sound_irq_cause;
 	uint8_t m_adpcm_data;
 
 	DECLARE_WRITE8_MEMBER(kurukuru_out_latch_w);
 	DECLARE_WRITE8_MEMBER(kurukuru_bankswitch_w);
-	DECLARE_WRITE_LINE_MEMBER(soundlatch_irq_w);
 	DECLARE_WRITE8_MEMBER(kurukuru_adpcm_reset_w);
 	DECLARE_READ8_MEMBER(kurukuru_adpcm_timer_irqack_r);
 	DECLARE_WRITE8_MEMBER(kurukuru_adpcm_data_w);
 	DECLARE_WRITE8_MEMBER(ym2149_aout_w);
 	DECLARE_WRITE8_MEMBER(ym2149_bout_w);
 
-	void update_sound_irq(uint8_t cause);
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
 	DECLARE_WRITE_LINE_MEMBER(kurukuru_msm5205_vck);
@@ -457,37 +457,9 @@ public:
 *************************************************/
 
 
-void kurukuru_state::update_sound_irq(uint8_t cause)
-{
-	m_sound_irq_cause = cause & 3;
-	if (m_sound_irq_cause)
-	{
-		// use bit 0 for latch irq, and bit 1 for timer irq
-		// latch irq vector is $ef (rst $28)
-		// timer irq vector is $f7 (rst $30)
-		// if both are asserted, the vector becomes $f7 AND $ef = $e7 (rst $20)
-		const uint8_t irq_vector[4] = { 0x00, 0xef, 0xf7, 0xe7 };
-		m_audiocpu->set_input_line_and_vector(0, ASSERT_LINE, irq_vector[m_sound_irq_cause]);
-	}
-	else
-	{
-		m_audiocpu->set_input_line(0, CLEAR_LINE);
-	}
-}
-
-
-WRITE_LINE_MEMBER(kurukuru_state::soundlatch_irq_w)
-{
-	if (state)
-		update_sound_irq(m_sound_irq_cause | 1);
-	else
-		update_sound_irq(m_sound_irq_cause & ~1);
-}
-
-
 WRITE_LINE_MEMBER(kurukuru_state::kurukuru_msm5205_vck)
 {
-	update_sound_irq(m_sound_irq_cause | 2);
+	m_soundirq->rst30_w(1);
 	m_adpcm->data_w(m_adpcm_data);
 }
 
@@ -628,7 +600,8 @@ WRITE8_MEMBER(kurukuru_state::kurukuru_adpcm_reset_w)
 
 READ8_MEMBER(kurukuru_state::kurukuru_adpcm_timer_irqack_r)
 {
-	update_sound_irq(m_sound_irq_cause & ~2);
+	if (!machine().side_effect_disabled())
+		m_soundirq->rst30_w(0);
 	return 0;
 }
 
@@ -853,7 +826,6 @@ void kurukuru_state::machine_start()
 
 void kurukuru_state::machine_reset()
 {
-	update_sound_irq(0);
 }
 
 /*************************************************
@@ -870,6 +842,7 @@ MACHINE_CONFIG_START(kurukuru_state::kurukuru)
 	MCFG_CPU_ADD("audiocpu", Z80, CPU_CLOCK)
 	MCFG_CPU_PROGRAM_MAP(kurukuru_audio_map)
 	MCFG_CPU_IO_MAP(kurukuru_audio_io)
+	MCFG_CPU_IRQ_ACKNOWLEDGE_DEVICE("soundirq", rst_neg_buffer_device, inta_cb)
 
 	MCFG_NVRAM_ADD_0FILL("nvram")
 
@@ -884,7 +857,13 @@ MACHINE_CONFIG_START(kurukuru_state::kurukuru)
 	MCFG_SPEAKER_STANDARD_MONO("mono")
 
 	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
-	MCFG_GENERIC_LATCH_DATA_PENDING_CB(WRITELINE(kurukuru_state, soundlatch_irq_w))
+	MCFG_GENERIC_LATCH_DATA_PENDING_CB(DEVWRITELINE("soundirq", rst_neg_buffer_device, rst28_w))
+
+	// latch irq vector is $ef (rst $28)
+	// timer irq vector is $f7 (rst $30)
+	// if both are asserted, the vector becomes $f7 AND $ef = $e7 (rst $20)
+	MCFG_DEVICE_ADD("soundirq", RST_NEG_BUFFER, 0)
+	MCFG_RST_BUFFER_INT_CALLBACK(INPUTLINE("audiocpu", 0))
 
 	MCFG_SOUND_ADD("ym2149", YM2149, YM2149_CLOCK)
 	MCFG_AY8910_PORT_B_READ_CB(IOPORT("DSW2"))
@@ -900,40 +879,16 @@ MACHINE_CONFIG_END
 
 
 MACHINE_CONFIG_START(kurukuru_state::ppj)
+	kurukuru(config);
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu",Z80, CPU_CLOCK)
+	MCFG_CPU_MODIFY("maincpu")
 	MCFG_CPU_PROGRAM_MAP(ppj_map)
 	MCFG_CPU_IO_MAP(ppj_io)
 
-	MCFG_CPU_ADD("audiocpu", Z80, CPU_CLOCK)
+	MCFG_CPU_MODIFY("audiocpu")
 	MCFG_CPU_PROGRAM_MAP(ppj_audio_map)
 	MCFG_CPU_IO_MAP(ppj_audio_io)
-
-	MCFG_NVRAM_ADD_0FILL("nvram")
-
-	/* video hardware */
-	MCFG_V9938_ADD("v9938", "screen", VDP_MEM, MAIN_CLOCK)
-	MCFG_V99X8_INTERRUPT_CALLBACK(INPUTLINE("maincpu", 0))
-	MCFG_V99X8_SCREEN_ADD_NTSC("screen", "v9938", MAIN_CLOCK)
-
-	MCFG_TICKET_DISPENSER_ADD("hopper", attotime::from_msec(HOPPER_PULSE), TICKET_MOTOR_ACTIVE_HIGH, TICKET_STATUS_ACTIVE_HIGH )
-
-	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_MONO("mono")
-
-	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
-
-	MCFG_SOUND_ADD("ym2149", YM2149, YM2149_CLOCK)  // pin 26 (/SEL) is low so final clock is clk/2, handled inside the ym2149 core
-	MCFG_AY8910_PORT_B_READ_CB(IOPORT("DSW2"))
-	MCFG_AY8910_PORT_A_WRITE_CB(WRITE8(kurukuru_state, ym2149_aout_w))
-	MCFG_AY8910_PORT_B_WRITE_CB(WRITE8(kurukuru_state, ym2149_bout_w))
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.80)
-
-	MCFG_SOUND_ADD("adpcm", MSM5205, M5205_CLOCK)
-	MCFG_MSM5205_VCLK_CB(WRITELINE(kurukuru_state, kurukuru_msm5205_vck))
-	MCFG_MSM5205_PRESCALER_SELECTOR(S48_4B)  // changed on the fly
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.80)
 MACHINE_CONFIG_END
 
 
