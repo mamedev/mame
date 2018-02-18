@@ -64,7 +64,7 @@ Abstracts the VS9210
 #include "screen.h"
 
 
-DEFINE_DEVICE_TYPE(VSYSTEM_SPR, vsystem_spr_device, "vsystem_spr", "Video System Sprites")
+DEFINE_DEVICE_TYPE(VSYSTEM_SPR, vsystem_spr_device, "vsystem_spr", "Video System VS9108 Sprites")
 
 vsystem_spr_device::vsystem_spr_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
 	: device_t(mconfig, VSYSTEM_SPR, tag, owner, clock)

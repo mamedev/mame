@@ -207,6 +207,24 @@ WRITE16_MEMBER(gaiden_state::gaiden_sproffsety_w)
 }
 
 
+WRITE16_MEMBER(gaiden_state::bg_videoram_w)
+{
+	COMBINE_DATA(&m_videoram[2][offset]);
+	m_background->mark_tile_dirty(offset & 0x07ff);
+}
+
+WRITE16_MEMBER(gaiden_state::fg_videoram_w)
+{
+	COMBINE_DATA(&m_videoram[1][offset]);
+	m_foreground->mark_tile_dirty(offset & 0x07ff);
+}
+
+WRITE16_MEMBER(gaiden_state::tx_videoram_w)
+{
+	COMBINE_DATA(&m_videoram[0][offset]);
+	m_text_layer->mark_tile_dirty(offset & 0x03ff);
+}
+
 
 /***************************************************************************
 

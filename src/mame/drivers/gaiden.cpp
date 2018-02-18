@@ -135,6 +135,7 @@ Notes:
 
 #include "cpu/m68000/m68000.h"
 #include "cpu/z80/z80.h"
+#include "machine/gen_latch.h"
 #include "machine/watchdog.h"
 #include "sound/2203intf.h"
 #include "sound/okim6295.h"
@@ -152,13 +153,6 @@ WRITE16_MEMBER(gaiden_state::irq_ack_w)
 WRITE8_MEMBER(gaiden_state::drgnbowl_irq_ack_w)
 {
 	m_maincpu->set_input_line(5, CLEAR_LINE);
-}
-
-WRITE16_MEMBER(gaiden_state::gaiden_sound_command_w)
-{
-	// Ninja Gaiden writes only to the lower byte; Tecmo Knight and Strato Fighter write to the upper byte instead.
-	// It's not clear which 8 data lines are actually used, but byte smearing is almost certainly involved.
-	m_soundlatch->write(space, 0, data & 0xff);
 }
 
 
@@ -391,25 +385,12 @@ READ16_MEMBER(gaiden_state::raiga_protection_r)
 	return m_prot;
 }
 
-template<int TileMap>
-WRITE16_MEMBER(gaiden_state::gaiden_videoram_w)
-{
-	COMBINE_DATA(&m_videoram[TileMap][offset]);
-	m_background->mark_tile_dirty(offset & 0x07ff);
-}
-
-WRITE16_MEMBER(gaiden_state::gaiden_tx_videoram_w)
-{
-	COMBINE_DATA(&m_videoram[0][offset]);
-	m_text_layer->mark_tile_dirty(offset & 0x03ff);
-}
-
 ADDRESS_MAP_START(gaiden_state::gaiden_map)
 	AM_RANGE(0x000000, 0x03ffff) AM_ROM
 	AM_RANGE(0x060000, 0x063fff) AM_RAM
-	AM_RANGE(0x070000, 0x070fff) AM_RAM_WRITE(gaiden_tx_videoram_w) AM_SHARE("videoram1")
-	AM_RANGE(0x072000, 0x073fff) AM_RAM_WRITE(gaiden_videoram_w<1>) AM_SHARE("videoram2")
-	AM_RANGE(0x074000, 0x075fff) AM_RAM_WRITE(gaiden_videoram_w<2>) AM_SHARE("videoram3")
+	AM_RANGE(0x070000, 0x070fff) AM_RAM_WRITE(tx_videoram_w) AM_SHARE("videoram1")
+	AM_RANGE(0x072000, 0x073fff) AM_RAM_WRITE(fg_videoram_w) AM_SHARE("videoram2")
+	AM_RANGE(0x074000, 0x075fff) AM_RAM_WRITE(bg_videoram_w) AM_SHARE("videoram3")
 	AM_RANGE(0x076000, 0x077fff) AM_RAM AM_SHARE("spriteram")
 	AM_RANGE(0x078000, 0x079fff) AM_RAM_DEVWRITE("palette", palette_device, write16) AM_SHARE("palette")
 	AM_RANGE(0x07a000, 0x07a001) AM_READ_PORT("SYSTEM")
@@ -425,7 +406,9 @@ ADDRESS_MAP_START(gaiden_state::gaiden_map)
 	AM_RANGE(0x07a308, 0x07a309) AM_WRITE(gaiden_bgoffsety_w)
 	AM_RANGE(0x07a30c, 0x07a30d) AM_WRITE(gaiden_bgscrollx_w)
 	AM_RANGE(0x07a800, 0x07a801) AM_DEVWRITE("watchdog", watchdog_timer_device, reset16_w)
-	AM_RANGE(0x07a802, 0x07a803) AM_WRITE(gaiden_sound_command_w)
+	// Ninja Gaiden writes only to the lower byte; Tecmo Knight and Strato Fighter write to the upper byte instead.
+	// It's not clear which 8 data lines are actually connected, but byte smearing is almost certainly involved.
+	AM_RANGE(0x07a802, 0x07a803) AM_DEVWRITE8("soundlatch", generic_latch_8_device, write, 0x00ff).cswidth(16)
 	AM_RANGE(0x07a806, 0x07a807) AM_WRITE(irq_ack_w)
 	AM_RANGE(0x07a808, 0x07a809) AM_WRITE(gaiden_flip_w)
 ADDRESS_MAP_END
@@ -445,9 +428,9 @@ ADDRESS_MAP_END
 ADDRESS_MAP_START(gaiden_state::drgnbowl_map)
 	AM_RANGE(0x000000, 0x03ffff) AM_ROM
 	AM_RANGE(0x060000, 0x063fff) AM_RAM
-	AM_RANGE(0x070000, 0x070fff) AM_RAM_WRITE(gaiden_tx_videoram_w) AM_SHARE("videoram1")
-	AM_RANGE(0x072000, 0x073fff) AM_RAM_WRITE(gaiden_videoram_w<1>) AM_SHARE("videoram2")
-	AM_RANGE(0x074000, 0x075fff) AM_RAM_WRITE(gaiden_videoram_w<2>) AM_SHARE("videoram3")
+	AM_RANGE(0x070000, 0x070fff) AM_RAM_WRITE(tx_videoram_w) AM_SHARE("videoram1")
+	AM_RANGE(0x072000, 0x073fff) AM_RAM_WRITE(fg_videoram_w) AM_SHARE("videoram2")
+	AM_RANGE(0x074000, 0x075fff) AM_RAM_WRITE(bg_videoram_w) AM_SHARE("videoram3")
 	AM_RANGE(0x076000, 0x077fff) AM_RAM AM_SHARE("spriteram")
 	AM_RANGE(0x078000, 0x079fff) AM_RAM_DEVWRITE("palette", palette_device, write16) AM_SHARE("palette")
 	AM_RANGE(0x07a000, 0x07a001) AM_READ_PORT("SYSTEM")
@@ -975,9 +958,9 @@ MACHINE_START_MEMBER(gaiden_state,mastninj)
 ADDRESS_MAP_START(gaiden_state::mastninj_map)
 	AM_RANGE(0x000000, 0x03ffff) AM_ROM
 	AM_RANGE(0x060000, 0x063fff) AM_RAM
-	AM_RANGE(0x070000, 0x070fff) AM_RAM_WRITE(gaiden_tx_videoram_w) AM_SHARE("videoram1")
-	AM_RANGE(0x072000, 0x073fff) AM_RAM_WRITE(gaiden_videoram_w<1>) AM_SHARE("videoram2")
-	AM_RANGE(0x074000, 0x075fff) AM_RAM_WRITE(gaiden_videoram_w<2>) AM_SHARE("videoram3")
+	AM_RANGE(0x070000, 0x070fff) AM_RAM_WRITE(tx_videoram_w) AM_SHARE("videoram1")
+	AM_RANGE(0x072000, 0x073fff) AM_RAM_WRITE(fg_videoram_w) AM_SHARE("videoram2")
+	AM_RANGE(0x074000, 0x075fff) AM_RAM_WRITE(bg_videoram_w) AM_SHARE("videoram3")
 	AM_RANGE(0x076000, 0x077fff) AM_RAM AM_SHARE("spriteram")
 	AM_RANGE(0x078000, 0x079fff) AM_RAM_DEVWRITE("palette", palette_device, write16) AM_SHARE("palette")
 //  AM_RANGE(0x078800, 0x079fff) AM_RAM
