@@ -314,7 +314,6 @@ public:
 	DECLARE_WRITE8_MEMBER(rongrong_select_w);
 	DECLARE_READ8_MEMBER(magic_r);
 	DECLARE_WRITE8_MEMBER(mmpanic_rombank_w);
-	DECLARE_WRITE8_MEMBER(mmpanic_soundlatch_w);
 	DECLARE_WRITE8_MEMBER(mmpanic_blitter_w);
 	DECLARE_WRITE8_MEMBER(mmpanic_blitter2_w);
 	DECLARE_WRITE8_MEMBER(mmpanic_leds_w);
@@ -2388,12 +2387,6 @@ WRITE8_MEMBER(ddenlovr_state::mmpanic_rombank_w)
 	/* Bit 4? */
 }
 
-WRITE8_MEMBER(ddenlovr_state::mmpanic_soundlatch_w)
-{
-	m_soundlatch->write(space, 0, data);
-	m_soundcpu->set_input_line(INPUT_LINE_NMI, PULSE_LINE);
-}
-
 WRITE8_MEMBER(ddenlovr_state::mmpanic_blitter_w)
 {
 	blitter_w(0, offset, data, 0xdf);    // RST 18
@@ -2480,7 +2473,7 @@ ADDRESS_MAP_START(ddenlovr_state::mmpanic_portmap)
 	AM_RANGE(0x74, 0x74) AM_WRITE(mmpanic_rombank_w)
 	AM_RANGE(0x78, 0x78) AM_WRITENOP                // 0, during RST 08 (irq acknowledge?)
 	AM_RANGE(0x7c, 0x7c) AM_DEVREADWRITE("oki", okim6295_device, read, write)   // Sound
-	AM_RANGE(0x8c, 0x8c) AM_WRITE(mmpanic_soundlatch_w) //
+	AM_RANGE(0x8c, 0x8c) AM_DEVWRITE("soundlatch", generic_latch_8_device, write)
 	AM_RANGE(0x88, 0x88) AM_WRITE(mmpanic_leds_w)       // Leds
 	AM_RANGE(0x90, 0x90) AM_WRITENOP                // written just before port 8c
 	AM_RANGE(0x94, 0x94) AM_READ_PORT("DSW1")
@@ -2601,7 +2594,7 @@ ADDRESS_MAP_START(ddenlovr_state::funkyfig_portmap)
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	AM_RANGE(0x00, 0x00) AM_DEVREADWRITE("oki", okim6295_device, read, write)   // Sound
 	AM_RANGE(0x01, 0x01) AM_WRITE(mmpanic_leds_w)       // Leds
-	AM_RANGE(0x02, 0x02) AM_WRITE(mmpanic_soundlatch_w) //
+	AM_RANGE(0x02, 0x02) AM_DEVWRITE("soundlatch", generic_latch_8_device, write)
 	AM_RANGE(0x04, 0x04) AM_READ(funkyfig_busy_r)
 	AM_RANGE(0x1c, 0x1c) AM_READ(funkyfig_dsw_r)
 	AM_RANGE(0x1e, 0x1e) AM_WRITE(funkyfig_rombank_w)
@@ -9957,6 +9950,7 @@ MACHINE_CONFIG_START(ddenlovr_state::mmpanic)
 	MCFG_SPEAKER_STANDARD_MONO("mono")
 
 	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
+	MCFG_GENERIC_LATCH_DATA_PENDING_CB(INPUTLINE("soundcpu", INPUT_LINE_NMI))
 
 	MCFG_SOUND_ADD("ym2413", YM2413, 3579545)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.80)
