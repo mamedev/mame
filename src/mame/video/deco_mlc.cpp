@@ -13,26 +13,22 @@
 #include "emu.h"
 #include "includes/deco_mlc.h"
 
+#include <algorithm>
+
 /******************************************************************************/
 
 VIDEO_START_MEMBER(deco_mlc_state,mlc)
 {
-	if (m_gfxdecode->gfx(0)->granularity()==16)
-		m_colour_mask=0x7f;
-	else if (m_gfxdecode->gfx(0)->granularity()==32)
-		m_colour_mask=0x3f;
-	else
-		m_colour_mask=0x1f;
+	m_colour_mask=(0x800 / m_gfxdecode->gfx(0)->granularity()) - 1;
 
 //  temp_bitmap = std::make_unique<bitmap_rgb32>(512, 512 );
-	m_mlc_buffered_spriteram = std::make_unique<uint16_t[]>(0x3000/2);
-	m_mlc_spriteram_spare = std::make_unique<uint16_t[]>(0x3000/2);
-	m_mlc_spriteram = std::make_unique<uint16_t[]>(0x3000/2);
+	m_buffered_spriteram = std::make_unique<uint16_t[]>(0x3000/4);
+	m_spriteram_spare = std::make_unique<uint16_t[]>(0x3000/4);
+	m_spriteram = std::make_unique<uint16_t[]>(0x3000/4);
 
-
-	save_pointer(NAME(m_mlc_spriteram.get()), 0x3000/2);
-	save_pointer(NAME(m_mlc_spriteram_spare.get()), 0x3000/2);
-	save_pointer(NAME(m_mlc_buffered_spriteram.get()), 0x3000/2);
+	save_pointer(NAME(m_spriteram.get()), 0x3000/4);
+	save_pointer(NAME(m_spriteram_spare.get()), 0x3000/4);
+	save_pointer(NAME(m_buffered_spriteram.get()), 0x3000/4);
 
 }
 
@@ -53,7 +49,6 @@ static void mlc_drawgfxzoomline(deco_mlc_state *state,
 	*/
 
 	/* KW 991012 -- Added code to force clip to bitmap boundary */
-
 
 
 	int sprite_screen_width = (scalex*16+(sx&0xffff))>>16;
@@ -78,8 +73,6 @@ static void mlc_drawgfxzoomline(deco_mlc_state *state,
 			x_index_base = 0;
 		}
 
-
-
 		if( sx < clip.min_x)
 		{ /* clip left */
 			int pixels = clip.min_x-sx;
@@ -97,14 +90,12 @@ static void mlc_drawgfxzoomline(deco_mlc_state *state,
 		{ /* skip if inner loop doesn't draw anything */
 			const pen_t *pal = &state->m_palette->pen(gfx->colorbase() + gfx->granularity() * (color % gfx->colors()));
 			const uint8_t *code_base1 = gfx->get_data(code1 % gfx->elements());
-
+			const uint8_t *code_base2 = gfx->get_data(code2 % gfx->elements());
+			const uint8_t *source1 = code_base1 + (srcline) * gfx->rowbytes();
+			const uint8_t *source2 = code_base2 + (srcline) * gfx->rowbytes();
 			/* no alpha */
 			if (alpha == 0xff)
 			{
-				const uint8_t *code_base2 = gfx->get_data(code2 % gfx->elements());
-				const uint8_t *source1 = code_base1 + (srcline) * gfx->rowbytes();
-				const uint8_t *source2 = code_base2 + (srcline) * gfx->rowbytes();
-
 				int x, x_index = x_index_base;
 
 				for( x=sx; x<ex; x++ )
@@ -119,14 +110,16 @@ static void mlc_drawgfxzoomline(deco_mlc_state *state,
 				}
 			}
 			else
-			{
-				const uint8_t *source = code_base1 + (srcline) * gfx->rowbytes();
-
+			{	/* TODO : 8bpp and alpha can use simultaneously? */
 				int x, x_index = x_index_base;
 				for( x=sx; x<ex; x++ )
 				{
-					int c = source[x_index>>16];
-					if( c != transparent_color ) dest[x] = alpha_blend_r32(dest[x], 0, alpha); //pal[c]);
+					int c = source1[x_index>>16];
+					if (use8bpp)
+						c=(c<<4)|source2[x_index>>16];
+
+					 // m_irq_ram[1] & 0xc0 = 0xc0 : Shadow, 0 : Alpha, Other bits unknown
+					if( c != transparent_color ) dest[x] = alpha_blend_r32(dest[x], (m_irq_ram[1] & 0xc0) ? 0 : pal[c], alpha);
 					x_index += dx;
 				}
 			}
@@ -153,15 +146,15 @@ void deco_mlc_state::draw_sprites( const rectangle &cliprect, int scanline, uint
 
 	int clipper=0;
 	rectangle user_clip;
-	uint16_t* mlc_spriteram=m_mlc_buffered_spriteram.get(); // spriteram32
+	uint16_t* spriteram=m_buffered_spriteram.get();
 
 	//printf("%d - (%08x %08x %08x) (%08x %08x %08x) (%08x %08x %08x)\n", scanline, m_irq_ram[6], m_irq_ram[7], m_irq_ram[8], m_irq_ram[9], m_irq_ram[10], m_irq_ram[11] , m_irq_ram[12] , m_irq_ram[13] , m_irq_ram[14]);
 
 	for (offs = (0x3000/4)-8; offs>=0; offs-=8)
 	{
-		if ((mlc_spriteram[offs+0]&0x8000)==0)
+		if ((spriteram[offs+0]&0x8000)==0)
 			continue;
-		if ((mlc_spriteram[offs+1]&0x2000) && (m_screen->frame_number() & 1))
+		if ((spriteram[offs+1]&0x2000) && (m_screen->frame_number() & 1))
 			continue;
 
 		/*
@@ -203,17 +196,17 @@ void deco_mlc_state::draw_sprites( const rectangle &cliprect, int scanline, uint
 		    Word 3: 0xffff - Low-bits of tile index
 		*/
 
-		y = mlc_spriteram[offs+2]&0x7ff;
-		x = mlc_spriteram[offs+3]&0x7ff;
+		y = spriteram[offs+2]&0x7ff;
+		x = spriteram[offs+3]&0x7ff;
 
 		if (x&0x400) x=-(0x400-(x&0x3ff));
 		if (y&0x400) y=-(0x400-(y&0x3ff));
 
-		fx = mlc_spriteram[offs+1]&0x8000;
-		fy = mlc_spriteram[offs+1]&0x4000;
-		color = mlc_spriteram[offs+1]&0xff;
+		fx = spriteram[offs+1]&0x8000;
+		fy = spriteram[offs+1]&0x4000;
+		color = spriteram[offs+1]&0xff;
 
-		int raster_select = (mlc_spriteram[offs+1]&0x0180)>>7;
+		int raster_select = (spriteram[offs+1]&0x0180)>>7;
 
 
 		// there are 3 different sets of raster values, must be a way to selects
@@ -225,17 +218,17 @@ void deco_mlc_state::draw_sprites( const rectangle &cliprect, int scanline, uint
 		// have the scroll effect applied to them.  all clip windows are the same
 		// so there is no reason to select a clip window other than to be using it
 		// to select a set of raster-set scroll regs?
-		rasterMode = (mlc_spriteram[offs+1]>>10)&0x1;
+		rasterMode = (spriteram[offs+1]>>10)&0x1;
 
 
 
 
 
-		clipper = (mlc_spriteram[offs+1]>>8)&0x3;
+		clipper = (spriteram[offs+1]>>8)&0x3;
 
-		indx = mlc_spriteram[offs+0]&0x3fff;
-		yscale = mlc_spriteram[offs+4]&0x3ff;
-		xscale = mlc_spriteram[offs+5]&0x3ff;
+		indx = spriteram[offs+0]&0x3fff;
+		yscale = spriteram[offs+4]&0x3ff;
+		xscale = spriteram[offs+5]&0x3ff;
 		colorOffset = 0;
 
 		/* Clip windows - this mapping seems odd, but is correct for Skull Fang and StadHr96,
@@ -244,7 +237,7 @@ void deco_mlc_state::draw_sprites( const rectangle &cliprect, int scanline, uint
 
 
 
-		int upperclip = (mlc_spriteram[offs+1]>>10)&0x2;
+		int upperclip = (spriteram[offs+1]>>10)&0x2;
 		// this is used on some ingame gfx in stadhr96
 		// to clip the images of your guys on the bases
 		if (upperclip)
@@ -252,8 +245,8 @@ void deco_mlc_state::draw_sprites( const rectangle &cliprect, int scanline, uint
 
 
 
-		int min_y = m_mlc_clip_ram[(clipper*4)+0];
-		int max_y = m_mlc_clip_ram[(clipper*4)+1];
+		int min_y = m_clip_ram[(clipper*4)+0];
+		int max_y = m_clip_ram[(clipper*4)+1];
 
 		if (scanline<min_y)
 			continue;
@@ -262,8 +255,8 @@ void deco_mlc_state::draw_sprites( const rectangle &cliprect, int scanline, uint
 			continue;
 
 
-		user_clip.min_x=m_mlc_clip_ram[(clipper*4)+2];
-		user_clip.max_x=m_mlc_clip_ram[(clipper*4)+3];
+		user_clip.min_x=m_clip_ram[(clipper*4)+2];
+		user_clip.max_x=m_clip_ram[(clipper*4)+3];
 
 		user_clip &= cliprect;
 
@@ -275,18 +268,18 @@ void deco_mlc_state::draw_sprites( const rectangle &cliprect, int scanline, uint
 		color&=m_colour_mask;
 
 		/* If this bit is set, combine this block with the next one */
-		if (mlc_spriteram[offs+1]&0x1000) {
+		if (spriteram[offs+1]&0x1000) {
 			use8bppMode=1;
 			/* In 8bpp the palette base is stored in the next block */
 			if (offs-8>=0) {
-				color = (mlc_spriteram[offs+1-8]&0x7f);
-				indx2 = mlc_spriteram[offs+0-8]&0x3fff;
+				color = (spriteram[offs+1-8]&0x7f);
+				indx2 = spriteram[offs+0-8]&0x3fff;
 			}
 		} else
 			use8bppMode=0;
 
 		/* Lookup tiles/size in sprite index ram OR in the lookup rom */
-		if (mlc_spriteram[offs+0]&0x4000) {
+		if (spriteram[offs+0]&0x4000) {
 			index_ptr8=rom + indx*8; /* Byte ptr */
 			h=(index_ptr8[1]>>0)&0xf;
 			w=(index_ptr8[3]>>0)&0xf;
@@ -319,7 +312,7 @@ void deco_mlc_state::draw_sprites( const rectangle &cliprect, int scanline, uint
 
 		} else {
 			indx&=0x1fff;
-			index_ptr=m_mlc_vram + indx*4;
+			index_ptr=m_vram + indx*4;
 			h=(index_ptr[0]>>8)&0xf;
 			w=(index_ptr[1]>>8)&0xf;
 
@@ -327,7 +320,7 @@ void deco_mlc_state::draw_sprites( const rectangle &cliprect, int scanline, uint
 			if (!w) w=16;
 
 			if (use8bppMode) {
-				uint32_t* index_ptr2=m_mlc_vram + ((indx2*4)&0x7fff);
+				uint32_t* index_ptr2=m_vram + ((indx2*4)&0x7fff);
 				sprite2=((index_ptr2[2]&0x3)<<16) | (index_ptr2[3]&0xffff);
 			}
 
@@ -505,7 +498,7 @@ void deco_mlc_state::draw_sprites( const rectangle &cliprect, int scanline, uint
 				}
 				else
 				{
-					const uint32_t* ptr=m_mlc_vram + ((tile)&0x7fff);
+					const uint32_t* ptr=m_vram + ((tile)&0x7fff);
 					tile=(*ptr)&0xffff;
 
 					if (tileFormat)
@@ -547,7 +540,7 @@ WRITE_LINE_MEMBER(deco_mlc_state::screen_vblank_mlc)
 		lookup table.  Without buffering incorrect one frame glitches are seen
 		in several places, especially in Hoops.
 		*/
-		memcpy(m_mlc_buffered_spriteram.get(), m_mlc_spriteram.get(), 0x3000/2);
+		std::copy(&m_spriteram[0], &m_spriteram[0x3000/4], &m_buffered_spriteram[0]);
 	}
 }
 
@@ -555,9 +548,6 @@ uint32_t deco_mlc_state::screen_update_mlc(screen_device &screen, bitmap_rgb32 &
 {
 //  temp_bitmap->fill(0, cliprect);
 	bitmap.fill(m_palette->pen(0), cliprect); /* Pen 0 fill colour confirmed from Skull Fang level 2 */
-
-
-
 
 
 	for (int i=cliprect.min_y;i<=cliprect.max_y;i++)
