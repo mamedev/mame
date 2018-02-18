@@ -14,6 +14,7 @@ Driver by Takahiro Nogi (nogi@kt.rim.or.jp) 1999/10/04
 
 #include "cpu/m6502/m6502.h"
 #include "cpu/m6809/m6809.h"
+#include "machine/gen_latch.h"
 #include "sound/ay8910.h"
 #include "sound/dac.h"
 #include "sound/volt_reg.h"
@@ -24,12 +25,6 @@ Driver by Takahiro Nogi (nogi@kt.rim.or.jp) 1999/10/04
 void ssozumo_state::machine_start()
 {
 	save_item(NAME(m_sound_nmi_mask));
-}
-
-WRITE8_MEMBER(ssozumo_state::sh_command_w)
-{
-	m_soundlatch->write(space, 0, data);
-	m_audiocpu->set_input_line(M6502_IRQ_LINE, HOLD_LINE);
 }
 
 
@@ -43,7 +38,7 @@ ADDRESS_MAP_START(ssozumo_state::ssozumo_map)
 	AM_RANGE(0x3400, 0x35ff) AM_RAM
 	AM_RANGE(0x3600, 0x37ff) AM_RAM
 	AM_RANGE(0x4000, 0x4000) AM_READ_PORT("P1") AM_WRITE(flipscreen_w)
-	AM_RANGE(0x4010, 0x4010) AM_READ_PORT("P2") AM_WRITE(sh_command_w)
+	AM_RANGE(0x4010, 0x4010) AM_READ_PORT("P2") AM_DEVWRITE("soundlatch", generic_latch_8_device, write)
 	AM_RANGE(0x4020, 0x4020) AM_READ_PORT("DSW2") AM_WRITE(scroll_w)
 	AM_RANGE(0x4030, 0x4030) AM_READ_PORT("DSW1")
 //  AM_RANGE(0x4030, 0x4030) AM_WRITEONLY
@@ -227,6 +222,7 @@ MACHINE_CONFIG_START(ssozumo_state::ssozumo)
 	MCFG_SPEAKER_STANDARD_MONO("speaker")
 
 	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
+	MCFG_GENERIC_LATCH_DATA_PENDING_CB(INPUTLINE("audiocpu", m6502_device::IRQ_LINE))
 
 	MCFG_SOUND_ADD("ay1", YM2149, 1500000)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 0.3)
