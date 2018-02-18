@@ -27,7 +27,7 @@
 #include "vsystem_spr2.h"
 
 
-DEFINE_DEVICE_TYPE(VSYSTEM_SPR2, vsystem_spr2_device, "vsystem2_spr", "Video System Sprites Type 2")
+DEFINE_DEVICE_TYPE(VSYSTEM_SPR2, vsystem_spr2_device, "vsystem2_spr", "Video System VS8904/VS8905 Sprites")
 
 vsystem_spr2_device::vsystem_spr2_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
 	: device_t(mconfig, VSYSTEM_SPR2, tag, owner, clock)
