@@ -5,6 +5,8 @@
 #include "emu.h"
 #include "prot_kof98.h"
 
+#include <algorithm>
+
 DEFINE_DEVICE_TYPE(NG_KOF98_PROT, kof98_prot_device, "ng_kof98_prot", "Neo Geo KoF 98 Protection")
 
 
@@ -34,37 +36,37 @@ void kof98_prot_device::decrypt_68k(uint8_t* cpurom, uint32_t cpurom_size)
 	static const uint32_t sec[]={ 0x000000, 0x100000, 0x000004, 0x100004, 0x10000a, 0x00000a, 0x10000e, 0x00000e };
 	static const uint32_t pos[]={ 0x000, 0x004, 0x00a, 0x00e };
 
-	memcpy(&dst[0], src, 0x200000);
+	std::copy(&src[0], &src[0x200000], dst.begin());
 	for (i = 0x800; i < 0x100000; i += 0x200)
 	{
 		for (j = 0; j < 0x100; j += 0x10)
 		{
 			for (k = 0; k < 16; k += 2)
 			{
-				memcpy(&src[i+j+k],       &dst[i+j+sec[k/2]+0x100], 2);
-				memcpy(&src[i+j+k+0x100], &dst[i+j+sec[k/2]],       2);
+				std::copy(&dst[i+j+sec[k/2]+0x100], &dst[i+j+sec[k/2]+0x100+2], &src[i+j+k]);
+				std::copy(&dst[i+j+sec[k/2]],       &dst[i+j+sec[k/2]+2],       &src[i+j+k+0x100]);
 			}
 			if (i >= 0x080000 && i < 0x0c0000)
 			{
 				for (k = 0; k < 4; k++)
 				{
-					memcpy(&src[i+j+pos[k]],       &dst[i+j+pos[k]],       2);
-					memcpy(&src[i+j+pos[k]+0x100], &dst[i+j+pos[k]+0x100], 2);
+					std::copy(&dst[i+j+pos[k]],       &dst[i+j+pos[k]+2],       &src[i+j+pos[k]],     );
+					std::copy(&dst[i+j+pos[k]+0x100], &dst[i+j+pos[k]+0x100+2], &src[i+j+pos[k]+0x100]);
 				}
 			}
 			else if (i >= 0x0c0000)
 			{
 				for (k = 0; k < 4; k++)
 				{
-					memcpy(&src[i+j+pos[k]],       &dst[i+j+pos[k]+0x100], 2);
-					memcpy(&src[i+j+pos[k]+0x100], &dst[i+j+pos[k]],       2);
+					std::copy(&dst[i+j+pos[k]+0x100], &dst[i+j+pos[k]+0x100+2], &src[i+j+pos[k]],     );
+					std::copy(&dst[i+j+pos[k]],       &dst[i+j+pos[k]+2],       &src[i+j+pos[k]+0x100]);
 				}
 			}
 		}
-		memcpy(&src[i+0x000000], &dst[i+0x000000], 2);
-		memcpy(&src[i+0x000002], &dst[i+0x100000], 2);
-		memcpy(&src[i+0x000100], &dst[i+0x000100], 2);
-		memcpy(&src[i+0x000102], &dst[i+0x100100], 2);
+		std::copy(&dst[i+0x000000], &dst[i+0x000002], &src[i+0x000000]);
+		std::copy(&dst[i+0x100000], &dst[i+0x100002], &src[i+0x000002]);
+		std::copy(&dst[i+0x000100], &dst[i+0x000102], &src[i+0x000100]);
+		std::copy(&dst[i+0x100100], &dst[i+0x100102], &src[i+0x000102]);
 	}
 	memmove(&src[0x100000], &src[0x200000], 0x400000);
 

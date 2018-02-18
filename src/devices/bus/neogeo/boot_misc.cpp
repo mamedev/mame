@@ -228,7 +228,7 @@ neogeo_ms5plus_cart_device::neogeo_ms5plus_cart_device(const machine_config &mco
 
 void neogeo_ms5plus_cart_device::decrypt_all(DECRYPT_ALL_PARAMS)
 {
-	m_cmc_prot->cmc50_m1_decrypt(audiocrypt_region, audiocrypt_region_size, audiocpu_region,audio_region_size);
+	m_cmc_prot->cmc50_m1_decrypt(audiocpu_region,audio_region_size);
 	m_cmc_prot->cmc50_gfx_decrypt(spr_region, spr_region_size, MSLUG5_GFX_KEY);
 	m_pcm2_prot->swap(ym_region, ym_region_size, 2);
 	m_prot->sx_decrypt(fix_region, fix_region_size, 1);

@@ -25,7 +25,6 @@ device_neogeo_cart_interface::device_neogeo_cart_interface(const machine_config 
 	m_region_rom(*this, "^maincpu"),
 	m_region_fixed(*this, "^fixed"),
 	m_region_audio(*this, "^audiocpu"),
-	m_region_audiocrypt(*this, "^audiocrypt"),
 	m_region_spr(*this, "^sprites"),
 	m_region_ym(*this, "^ymsnd"),
 	m_region_ymd(*this, "^ymsnd.deltat")
@@ -251,10 +250,9 @@ image_init_result neogeo_cart_slot_device::call_load()
 			if (get_software_region("audiocpu") != nullptr)
 			{
 				len = get_software_region_length("audiocpu");
-				m_cart->audio_alloc(len + 0x10000);
+				m_cart->audio_alloc(len);
 				ROM8 = m_cart->get_audio_base();
 				memcpy(ROM8, get_software_region("audiocpu"), len);
-				memcpy(ROM8 + 0x10000, get_software_region("audiocpu"), len); // avoid reloading in XML, should just improve banking instead tho?
 			}
 
 			len = get_software_region_length("ymsnd");
@@ -280,24 +278,13 @@ image_init_result neogeo_cart_slot_device::call_load()
 			ROM8 = m_cart->get_sprites_base();
 			memcpy(ROM8, get_software_region("sprites"), len);
 
-			if (get_software_region("audiocrypt") != nullptr)  // encrypted Z80 code
-			{
-				len = get_software_region_length("audiocrypt");
-				m_cart->audiocrypt_alloc(len);
-				ROM8 = m_cart->get_audiocrypt_base();
-				memcpy(ROM8, get_software_region("audiocrypt"), len);
-				// allocate the audiocpu region to decrypt data into
-				m_cart->audio_alloc(len + 0x10000);
-			}
-
 			m_cart->decrypt_all(
 				(uint8_t*)m_cart->get_rom_base(), m_cart->get_rom_size(),
 				m_cart->get_sprites_base(), m_cart->get_sprites_size(),
 				m_cart->get_fixed_base(), m_cart->get_fixed_size(),
 				m_cart->get_ym_base(), m_cart->get_ym_size(),
 				m_cart->get_ymdelta_base(), m_cart->get_ymdelta_size(),
-				m_cart->get_audio_base(), m_cart->get_audio_size(),
-				m_cart->get_audiocrypt_base(), m_cart->get_audiocrypt_size());
+				m_cart->get_audio_base(), m_cart->get_audio_size());
 
 			// SPEED UP WORKAROUND: to speed up sprite drawing routine, let us store the sprite data in
 			// a different format (we then always access such alt format for drawing)

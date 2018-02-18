@@ -4,6 +4,8 @@
 #include "emu.h"
 #include "prot_cmc.h"
 
+#include <algorithm>
+
 DEFINE_DEVICE_TYPE(NG_CMC_PROT, cmc_prot_device, "ng_cmc_prot", "Neo Geo CMC42/CMC40 Protection")
 
 
@@ -703,11 +705,10 @@ int cmc_prot_device::m1_address_scramble(int address, uint16_t key)
 }
 
 
-void cmc_prot_device::cmc50_m1_decrypt(uint8_t* romcrypt, uint32_t romcrypt_size, uint8_t* romaudio, uint32_t romaudio_size)
+void cmc_prot_device::cmc50_m1_decrypt(uint8_t* romaudio, uint32_t romaudio_size)
 {
-	uint8_t* rom = romcrypt;
-	size_t rom_size = 0x80000;
-	uint8_t* rom2 = romaudio;
+	uint8_t* rom = romaudio;
+	size_t rom_size = romaudio_size;
 
 	std::vector<uint8_t> buffer(rom_size);
 
@@ -718,10 +719,7 @@ void cmc_prot_device::cmc50_m1_decrypt(uint8_t* romcrypt, uint32_t romcrypt_size
 	for (uint32_t i = 0; i < rom_size; i++)
 		buffer[i] = rom[m1_address_scramble(i,key)];
 
-	memcpy(rom, &buffer[0], rom_size);
-
-	memcpy(rom2,rom, 0x10000);
-	memcpy(rom2 + 0x10000, rom, 0x80000);
+	std::copy(buffer.begin(), buffer.end(), &rom[0]);
 
 	#if 0
 	{

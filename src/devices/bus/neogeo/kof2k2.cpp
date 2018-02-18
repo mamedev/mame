@@ -71,7 +71,7 @@ neogeo_kof2002_cart_device::neogeo_kof2002_cart_device(const machine_config &mco
 void neogeo_kof2002_cart_device::decrypt_all(DECRYPT_ALL_PARAMS)
 {
 	m_kof2k2_prot->kof2002_decrypt_68k(cpuregion, cpuregion_size);
-	m_cmc_prot->cmc50_m1_decrypt(audiocrypt_region, audiocrypt_region_size, audiocpu_region, audio_region_size);
+	m_cmc_prot->cmc50_m1_decrypt(audiocpu_region, audio_region_size);
 	m_cmc_prot->cmc50_gfx_decrypt(spr_region, spr_region_size, KOF2002_GFX_KEY);
 	m_cmc_prot->sfix_decrypt(spr_region, spr_region_size, fix_region, fix_region_size);
 	m_pcm2_prot->swap(ym_region, ym_region_size, 0);
@@ -91,7 +91,7 @@ neogeo_kf2k2pls_cart_device::neogeo_kf2k2pls_cart_device(const machine_config &m
 void neogeo_kf2k2pls_cart_device::decrypt_all(DECRYPT_ALL_PARAMS)
 {
 	m_kof2k2_prot->kof2002_decrypt_68k(cpuregion, cpuregion_size);
-	m_cmc_prot->cmc50_m1_decrypt(audiocrypt_region, audiocrypt_region_size, audiocpu_region, audio_region_size);
+	m_cmc_prot->cmc50_m1_decrypt(audiocpu_region, audio_region_size);
 	m_cmc_prot->cmc50_gfx_decrypt(spr_region, spr_region_size, KOF2002_GFX_KEY);
 	m_pcm2_prot->swap(ym_region, ym_region_size, 0);
 }
@@ -111,7 +111,7 @@ neogeo_matrim_cart_device::neogeo_matrim_cart_device(const machine_config &mconf
 void neogeo_matrim_cart_device::decrypt_all(DECRYPT_ALL_PARAMS)
 {
 	m_kof2k2_prot->matrim_decrypt_68k(cpuregion, cpuregion_size);
-	m_cmc_prot->cmc50_m1_decrypt(audiocrypt_region, audiocrypt_region_size, audiocpu_region, audio_region_size);
+	m_cmc_prot->cmc50_m1_decrypt(audiocpu_region, audio_region_size);
 	m_cmc_prot->cmc50_gfx_decrypt(spr_region, spr_region_size, MATRIM_GFX_KEY);
 	m_cmc_prot->sfix_decrypt(spr_region, spr_region_size, fix_region, fix_region_size);
 	m_pcm2_prot->swap(ym_region, ym_region_size, 1);
@@ -131,7 +131,7 @@ neogeo_samsho5_cart_device::neogeo_samsho5_cart_device(const machine_config &mco
 void neogeo_samsho5_cart_device::decrypt_all(DECRYPT_ALL_PARAMS)
 {
 	m_kof2k2_prot->samsho5_decrypt_68k(cpuregion, cpuregion_size);
-	m_cmc_prot->cmc50_m1_decrypt(audiocrypt_region, audiocrypt_region_size, audiocpu_region, audio_region_size);
+	m_cmc_prot->cmc50_m1_decrypt(audiocpu_region, audio_region_size);
 	m_cmc_prot->cmc50_gfx_decrypt(spr_region, spr_region_size, SAMSHO5_GFX_KEY);
 	m_cmc_prot->sfix_decrypt(spr_region, spr_region_size, fix_region, fix_region_size);
 	m_pcm2_prot->swap(ym_region, ym_region_size, 4);
@@ -151,7 +151,7 @@ neogeo_samsho5sp_cart_device::neogeo_samsho5sp_cart_device(const machine_config 
 void neogeo_samsho5sp_cart_device::decrypt_all(DECRYPT_ALL_PARAMS)
 {
 	m_kof2k2_prot->samsh5sp_decrypt_68k(cpuregion, cpuregion_size);
-	m_cmc_prot->cmc50_m1_decrypt(audiocrypt_region, audiocrypt_region_size, audiocpu_region, audio_region_size);
+	m_cmc_prot->cmc50_m1_decrypt(audiocpu_region, audio_region_size);
 	m_cmc_prot->cmc50_gfx_decrypt(spr_region, spr_region_size, SAMSHO5SP_GFX_KEY);
 	m_cmc_prot->sfix_decrypt(spr_region, spr_region_size, fix_region, fix_region_size);
 	m_pcm2_prot->swap(ym_region, ym_region_size, 6);

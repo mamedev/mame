@@ -220,7 +220,7 @@ neogeo_cmc_kof2001_cart_device::neogeo_cmc_kof2001_cart_device(const machine_con
 
 void neogeo_cmc_kof2001_cart_device::decrypt_all(DECRYPT_ALL_PARAMS)
 {
-	m_prot->cmc50_m1_decrypt(audiocrypt_region, audiocrypt_region_size, audiocpu_region, audio_region_size);
+	m_prot->cmc50_m1_decrypt(audiocpu_region, audio_region_size);
 	m_prot->cmc50_gfx_decrypt(spr_region, spr_region_size, KOF2001_GFX_KEY);
 	m_prot->sfix_decrypt(spr_region, spr_region_size, fix_region, fix_region_size);
 }
@@ -238,7 +238,7 @@ neogeo_cmc_kof2000n_cart_device::neogeo_cmc_kof2000n_cart_device(const machine_c
 
 void neogeo_cmc_kof2000n_cart_device::decrypt_all(DECRYPT_ALL_PARAMS)
 {
-	m_prot->cmc50_m1_decrypt(audiocrypt_region, audiocrypt_region_size, audiocpu_region, audio_region_size);
+	m_prot->cmc50_m1_decrypt(audiocpu_region, audio_region_size);
 	m_prot->cmc50_gfx_decrypt(spr_region, spr_region_size, KOF2000_GFX_KEY);
 	m_prot->sfix_decrypt(spr_region, spr_region_size, fix_region, fix_region_size);
 }
@@ -268,7 +268,7 @@ void neogeo_cmc_jockeygp_cart_device::device_reset()
 
 void neogeo_cmc_jockeygp_cart_device::decrypt_all(DECRYPT_ALL_PARAMS)
 {
-	m_prot->cmc50_m1_decrypt(audiocrypt_region, audiocrypt_region_size, audiocpu_region, audio_region_size);
+	m_prot->cmc50_m1_decrypt(audiocpu_region, audio_region_size);
 	m_prot->cmc50_gfx_decrypt(spr_region, spr_region_size, JOCKEYGP_GFX_KEY);
 	m_prot->sfix_decrypt(spr_region, spr_region_size, fix_region, fix_region_size);
 }

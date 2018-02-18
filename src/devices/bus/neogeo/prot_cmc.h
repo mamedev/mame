@@ -64,7 +64,7 @@ public:
 
 	uint16_t generate_cs16(uint8_t *rom, int size);
 	int m1_address_scramble(int address, uint16_t key);
-	void cmc50_m1_decrypt(uint8_t* romcrypt, uint32_t romcrypt_size, uint8_t* romaudio, uint32_t romaudio_size);
+	void cmc50_m1_decrypt(uint8_t* romaudio, uint32_t romaudio_size);
 
 protected:
 	virtual void device_start() override;
