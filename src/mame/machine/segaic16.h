@@ -21,11 +21,14 @@
 //  INTERFACE CONFIGURATION MACROS
 //**************************************************************************
 
-#define MCFG_SEGA_315_5195_MAPPER_ADD(_tag, _cputag, _class, _mapper, _read, _write) \
+#define MCFG_SEGA_315_5195_MAPPER_ADD(_tag, _cputag, _class, _mapper) \
 	MCFG_DEVICE_ADD(_tag, SEGA_315_5195_MEM_MAPPER, 0) \
 	sega_315_5195_mapper_device::static_set_cputag(*device, "^" _cputag); \
-	sega_315_5195_mapper_device::static_set_mapper(*device, sega_315_5195_mapper_device::mapper_delegate(&_class::_mapper, #_class "::" #_mapper, nullptr, (_class *)nullptr)); \
-	sega_315_5195_mapper_device::static_set_sound_readwrite(*device, sega_315_5195_mapper_device::sound_read_delegate(&_class::_read, #_class "::" #_read, nullptr, (_class *)nullptr), sega_315_5195_mapper_device::sound_write_delegate(&_class::_write, #_class "::" #_write, nullptr, (_class *)nullptr));
+	sega_315_5195_mapper_device::static_set_mapper(*device, sega_315_5195_mapper_device::mapper_delegate(&_class::_mapper, #_class "::" #_mapper, nullptr, (_class *)nullptr));
+#define MCFG_SEGA_315_5195_SOUND_READ_CALLBACK(_devcb) \
+	devcb = &sega_315_5195_mapper_device::static_set_sound_read(*device, DEVCB_##_devcb);
+#define MCFG_SEGA_315_5195_SOUND_WRITE_CALLBACK(_devcb) \
+	devcb = &sega_315_5195_mapper_device::static_set_sound_write(*device, DEVCB_##_devcb);
 
 #define MCFG_SEGA_315_5248_MULTIPLIER_ADD(_tag) \
 	MCFG_DEVICE_ADD(_tag, SEGA_315_5248_MULTIPLIER, 0)
@@ -37,8 +40,8 @@
 	MCFG_DEVICE_ADD(_tag, SEGA_315_5250_COMPARE_TIMER, 0)
 #define MCFG_SEGA_315_5250_TIMER_ACK(_class, _func) \
 	sega_315_5250_compare_timer_device::static_set_timer_ack(*device, sega_315_5250_compare_timer_device::timer_ack_delegate(&_class::_func, #_class "::" #_func, nullptr, (_class *)nullptr));
-#define MCFG_SEGA_315_5250_SOUND_WRITE(_class, _func) \
-	sega_315_5250_compare_timer_device::static_set_sound_write(*device, sega_315_5250_compare_timer_device::sound_write_delegate(&_class::_func, #_class "::" #_func, nullptr, (_class *)nullptr));
+#define MCFG_SEGA_315_5250_SOUND_WRITE_CALLBACK(_devcb) \
+	devcb = &sega_315_5250_compare_timer_device::static_set_sound_write(*device, DEVCB_##_devcb);
 
 
 //**************************************************************************
@@ -87,8 +90,6 @@ class sega_315_5195_mapper_device : public device_t
 {
 public:
 	typedef device_delegate<void (sega_315_5195_mapper_device &, uint8_t)> mapper_delegate;
-	typedef device_delegate<uint8_t ()> sound_read_delegate;
-	typedef device_delegate<void (uint8_t)> sound_write_delegate;
 
 	// construction/destruction
 	sega_315_5195_mapper_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
@@ -96,7 +97,14 @@ public:
 	// static configuration helpers
 	static void static_set_cputag(device_t &device, const char *cpu);
 	static void static_set_mapper(device_t &device, mapper_delegate callback);
-	static void static_set_sound_readwrite(device_t &device, sound_read_delegate read, sound_write_delegate write);
+	template<class Object> static devcb_base &static_set_sound_read(device_t &device, Object &&object)
+	{
+		return downcast<sega_315_5195_mapper_device &>(device).m_sound_read.set_callback(std::forward<Object>(object));
+	}
+	template<class Object> static devcb_base &static_set_sound_write(device_t &device, Object &&object)
+	{
+		return downcast<sega_315_5195_mapper_device &>(device).m_sound_write.set_callback(std::forward<Object>(object));
+	}
 
 	// public interface
 	DECLARE_READ8_MEMBER( read );
@@ -166,8 +174,8 @@ private:
 	required_device<m68000_device> m_cpu;
 	required_memory_region      m_cpuregion;
 	mapper_delegate             m_mapper;
-	sound_read_delegate         m_sound_read;
-	sound_write_delegate        m_sound_write;
+	devcb_read8                 m_sound_read;
+	devcb_write8                m_sound_write;
 
 	// internal state
 	address_space *             m_space;
@@ -232,7 +240,6 @@ private:
 class sega_315_5250_compare_timer_device : public device_t
 {
 public:
-	typedef device_delegate<void (uint8_t)> sound_write_delegate;
 	typedef device_delegate<void ()> timer_ack_delegate;
 
 	// construction/destruction
@@ -240,7 +247,10 @@ public:
 
 	// static configuration helpers
 	static void static_set_timer_ack(device_t &device, timer_ack_delegate callback);
-	static void static_set_sound_write(device_t &device, sound_write_delegate write);
+	template<class Object> static devcb_base &static_set_sound_write(device_t &device, Object &&object)
+	{
+		return downcast<sega_315_5250_compare_timer_device &>(device).m_sound_write.set_callback(std::forward<Object>(object));
+	}
 
 	// public interface
 	bool clock();
@@ -259,7 +269,7 @@ private:
 
 	// configuration
 	timer_ack_delegate          m_timer_ack;
-	sound_write_delegate        m_sound_write;
+	devcb_write8                m_sound_write;
 
 	// internal state
 	uint16_t                      m_regs[16];
