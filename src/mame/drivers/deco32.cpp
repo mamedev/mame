@@ -2981,7 +2981,7 @@ ROM_START( dragngunj )
 	ROM_REGION( 0x020000, "gfx1", 0 )
 	ROM_LOAD16_BYTE( "ka-08.a15",  0x00000,  0x10000,  CRC(8fe4e5f5) SHA1(922b94f8ce0c35e965259c11e95891ef4be913d4) ) /* Encrypted tiles */
 	ROM_LOAD16_BYTE( "ka-09.a17",  0x00001,  0x10000,  CRC(e9dcac3f) SHA1(0621e601ffae73bbf69623042c9c8ab0526c3de6) )
-	
+
 	ROM_REGION( 0x120000, "gfx2", 0 )
 	ROM_LOAD( "mar-00.bin",    0x000000,  0x80000,  CRC(d0491a37) SHA1(cc0ae1e9e5f42ba30159fb79bccd2e237cd037d0) ) /* Encrypted tiles */
 	ROM_LOAD( "mar-01.bin",    0x090000,  0x80000,  CRC(d5970365) SHA1(729baf1efbef15c9f3e1d700717f5ba4f10d3014) )
@@ -3621,7 +3621,7 @@ ROM_START( lockloadu ) /* Board No. DE-0359-2 + Bottom board DE-0360-4, a Dragon
 	ROM_LOAD( "mbm-06.n17",  0x00000, 0x100000,  CRC(f34d5999) SHA1(265b5f4e8598bcf9183bf9bd95db69b01536acb2) )
 
 	ROM_REGION(0x80000, "oki3", ROMREGION_ERASE00 )
-//	ROM_LOAD( "mar-07.n19",  0x00000, 0x80000,  CRC(40287d62) SHA1(c00cb08bcdae55bcddc14c38e88b0484b1bc9e3e) )  // same as dragngun, unused
+	ROM_LOAD( "mar-07.n19",  0x00000, 0x80000,  CRC(40287d62) SHA1(c00cb08bcdae55bcddc14c38e88b0484b1bc9e3e) )  // same as dragngun, unused
 ROM_END
 
 ROM_START( tattass )
@@ -3631,7 +3631,7 @@ ROM_START( tattass )
 
 	ROM_REGION(0x10000, "soundcpu", 0 ) /* Sound CPU */
 	ROM_LOAD( "u7.snd",  0x00000, 0x10000,  CRC(6947be8a) SHA1(4ac6c3c7f54501f23c434708cea6bf327bc8cf95) )
-	
+
 	ROM_REGION( 0x200000, "gfx1", 0 )
 	ROM_LOAD16_BYTE( "abak_b01.s02",  0x000000, 0x80000,  CRC(bc805680) SHA1(ccdbca23fc843ef82a3524020999542f43b3c618) )
 	ROM_LOAD16_BYTE( "abak_b01.s13",  0x000001, 0x80000,  CRC(350effcd) SHA1(0452d95be9fc28bd00d846a2cc5828899d69601e) )
@@ -3704,7 +3704,7 @@ ROM_START( tattassa )
 
 	ROM_REGION(0x10000, "soundcpu", 0 ) /* Sound CPU */
 	ROM_LOAD( "u7.snd",  0x00000, 0x10000,  CRC(6947be8a) SHA1(4ac6c3c7f54501f23c434708cea6bf327bc8cf95) )
-	
+
 	ROM_REGION( 0x200000, "gfx1", 0 )
 	ROM_LOAD16_BYTE( "abak_b01.s02",  0x000000, 0x80000,  CRC(bc805680) SHA1(ccdbca23fc843ef82a3524020999542f43b3c618) )
 	ROM_LOAD16_BYTE( "abak_b01.s13",  0x000001, 0x80000,  CRC(350effcd) SHA1(0452d95be9fc28bd00d846a2cc5828899d69601e) )
@@ -3777,7 +3777,7 @@ ROM_START( nslasher ) /* DE-0397-0 PCB */
 
 	ROM_REGION(0x10000, "audiocpu", 0 ) /* Sound CPU */
 	ROM_LOAD( "sndprg.17l",  0x00000,  0x10000,  CRC(18939e92) SHA1(50b37a78d9d2259d4b140dd17393c4e5ca92bca5) )
-	
+
 	ROM_REGION( 0x200000, "gfx1", 0 )
 	ROM_LOAD( "mbh-00.8c",  0x000000,  0x200000,  CRC(a877f8a3) SHA1(79253525f360a73161894f31e211e4d6b38d307a) ) /* Encrypted tiles */
 

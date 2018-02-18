@@ -1649,7 +1649,7 @@ ADDRESS_MAP_START(taitoz_state::spacegun_cpub_map)
 	AM_RANGE(0x000000, 0x03ffff) AM_ROM
 	AM_RANGE(0x20c000, 0x20ffff) AM_RAM
 	AM_RANGE(0x210000, 0x21ffff) AM_RAM AM_SHARE("share1")
-	AM_RANGE(0x800000, 0x80000f) AM_DEVREADWRITE("tc0510nio", tc0510nio_device, halfword_r, halfword_w)
+	AM_RANGE(0x800000, 0x80000f) AM_DEVREADWRITE8("tc0510nio", tc0510nio_device, read, write, 0x00ff).cswidth(16)
 	AM_RANGE(0xc00000, 0xc00007) AM_DEVREADWRITE8("ymsnd", ym2610_device, read, write, 0x00ff)
 	AM_RANGE(0xc0000c, 0xc0000d) AM_NOP // interrupt controller?
 	AM_RANGE(0xc0000e, 0xc0000f) AM_NOP
