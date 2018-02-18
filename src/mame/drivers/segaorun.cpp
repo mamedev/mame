@@ -477,7 +477,7 @@ void segaorun_state::memory_mapper(sega_315_5195_mapper_device &mapper, uint8_t 
 //  port on the memory mapper is read
 //-------------------------------------------------
 
-uint8_t segaorun_state::mapper_sound_r()
+READ8_MEMBER(segaorun_state::mapper_sound_r)
 {
 	return 0;
 }
@@ -488,7 +488,7 @@ uint8_t segaorun_state::mapper_sound_r()
 //  port on the memory mapper is written
 //-------------------------------------------------
 
-void segaorun_state::mapper_sound_w(uint8_t data)
+WRITE8_MEMBER(segaorun_state::mapper_sound_w)
 {
 	synchronize(TID_SOUND_WRITE, data);
 }
@@ -1208,7 +1208,9 @@ MACHINE_CONFIG_START(segaorun_state::outrun_base)
 	MCFG_I8255_IN_PORTC_CB(READ8(segaorun_state, unknown_portc_r))
 	MCFG_I8255_OUT_PORTC_CB(WRITE8(segaorun_state, video_control_w))
 
-	MCFG_SEGA_315_5195_MAPPER_ADD("mapper", "maincpu", segaorun_state, memory_mapper, mapper_sound_r, mapper_sound_w)
+	MCFG_SEGA_315_5195_MAPPER_ADD("mapper", "maincpu", segaorun_state, memory_mapper)
+	MCFG_SEGA_315_5195_SOUND_READ_CALLBACK(READ8(segaorun_state, mapper_sound_r))
+	MCFG_SEGA_315_5195_SOUND_WRITE_CALLBACK(WRITE8(segaorun_state, mapper_sound_w))
 
 	// video hardware
 	MCFG_GFXDECODE_ADD("gfxdecode", "palette", segaorun)
