@@ -972,7 +972,7 @@ void segas16b_state::memory_mapper(sega_315_5195_mapper_device &mapper, uint8_t 
 //  memory mapper chip
 //-------------------------------------------------
 
-uint8_t segas16b_state::mapper_sound_r()
+READ8_MEMBER(segas16b_state::mapper_sound_r)
 {
 	return 0;
 }
@@ -983,17 +983,17 @@ uint8_t segas16b_state::mapper_sound_r()
 //  memory mapper chip
 //-------------------------------------------------
 
-void segas16b_state::mapper_sound_w(uint8_t data)
+WRITE8_MEMBER(segas16b_state::mapper_sound_w)
 {
 	if (m_soundlatch != nullptr)
-		m_soundlatch->write(m_soundcpu->space(AS_PROGRAM), 0, data & 0xff);
+		m_soundlatch->write(space, 0, data);
 	if (m_soundcpu != nullptr)
 		m_soundcpu->set_input_line(0, HOLD_LINE);
 }
 
 WRITE16_MEMBER( segas16b_state::sound_w16 )
 {
-	mapper_sound_w(data);
+	mapper_sound_w(space, 0, data & 0xff);
 }
 
 //**************************************************************************
@@ -3713,7 +3713,9 @@ MACHINE_CONFIG_START(segas16b_state::system16b)
 
 	MCFG_NVRAM_ADD_0FILL("nvram")
 
-	MCFG_SEGA_315_5195_MAPPER_ADD("mapper", "maincpu", segas16b_state, memory_mapper, mapper_sound_r, mapper_sound_w)
+	MCFG_SEGA_315_5195_MAPPER_ADD("mapper", "maincpu", segas16b_state, memory_mapper)
+	MCFG_SEGA_315_5195_SOUND_READ_CALLBACK(READ8(segas16b_state, mapper_sound_r))
+	MCFG_SEGA_315_5195_SOUND_WRITE_CALLBACK(WRITE8(segas16b_state, mapper_sound_w))
 
 	// video hardware
 	MCFG_GFXDECODE_ADD("gfxdecode", "palette", segas16b)
