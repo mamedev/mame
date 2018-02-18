@@ -2664,3 +2664,13 @@ if (CPUS["CLIPPER"]~=null or _OPTIONS["with-tools"]) then
 	table.insert(disasm_files , MAME_DIR .. "src/devices/cpu/clipper/clipperd.cpp")
 	table.insert(disasm_files , MAME_DIR .. "src/devices/cpu/clipper/clipperd.h")
 end
+
+
+--------------------------------------------------
+-- VM Labs Nuon, disassembler only
+--------------------------------------------------
+
+if (_OPTIONS["with-tools"]) then
+	table.insert(disasm_files , MAME_DIR .. "src/devices/cpu/nuon/nuondasm.cpp")
+	table.insert(disasm_files , MAME_DIR .. "src/devices/cpu/nuon/nuondasm.h")
+end
