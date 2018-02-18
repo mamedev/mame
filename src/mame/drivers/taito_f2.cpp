@@ -3170,6 +3170,9 @@ MACHINE_CONFIG_START(taitof2_state::growl)
 	MCFG_VIDEO_START_OVERRIDE(taitof2_state,taitof2_growl)
 	MCFG_SCREEN_MODIFY("screen")
 	MCFG_SCREEN_UPDATE_DRIVER(taitof2_state, screen_update_taitof2_pri)
+	
+	MCFG_PALETTE_MODIFY("palette")
+	MCFG_PALETTE_FORMAT(RRRRGGGGBBBBRGBx)
 
 	MCFG_DEVICE_ADD("tc0100scn", TC0100SCN, 0)
 	MCFG_TC0100SCN_GFX_REGION(1)
@@ -3269,12 +3272,13 @@ MACHINE_CONFIG_START(taitof2_state::koshien)
 	MCFG_CPU_MODIFY("maincpu")
 	MCFG_CPU_PROGRAM_MAP(koshien_map)
 
-	MCFG_PALETTE_MODIFY("palette")
-	MCFG_PALETTE_FORMAT(RRRRGGGGBBBBxxxx)
 	/* video hardware */
 	MCFG_VIDEO_START_OVERRIDE(taitof2_state,taitof2_koshien)
 	MCFG_SCREEN_MODIFY("screen")
 	MCFG_SCREEN_UPDATE_DRIVER(taitof2_state, screen_update_taitof2_pri)
+	
+	MCFG_PALETTE_MODIFY("palette")
+	MCFG_PALETTE_FORMAT(RRRRGGGGBBBBRGBx)
 
 	MCFG_DEVICE_ADD("tc0100scn", TC0100SCN, 0)
 	MCFG_TC0100SCN_GFX_REGION(1)
@@ -3429,7 +3433,8 @@ MACHINE_CONFIG_START(taitof2_state::metalb)
 	MCFG_GFXDECODE_MODIFY("gfxdecode", deadconx)
 	MCFG_PALETTE_MODIFY("palette")
 	MCFG_PALETTE_ENTRIES(8192)
-	MCFG_PALETTE_FORMAT(RRRRGGGGBBBBxxxx)
+	MCFG_PALETTE_FORMAT(RRRRGGGGBBBBRGBx)
+
 	MCFG_VIDEO_START_OVERRIDE(taitof2_state,taitof2_metalb)
 	MCFG_SCREEN_MODIFY("screen")
 	MCFG_SCREEN_UPDATE_DRIVER(taitof2_state, screen_update_taitof2_metalb)
@@ -3479,6 +3484,9 @@ MACHINE_CONFIG_START(taitof2_state::yesnoj)
 
 	/* video hardware */
 	MCFG_GFXDECODE_MODIFY("gfxdecode", yuyugogo)
+	MCFG_PALETTE_MODIFY("palette")
+	MCFG_PALETTE_FORMAT(RRRRGGGGBBBBRGBx)
+
 	MCFG_VIDEO_START_OVERRIDE(taitof2_state,taitof2_yesnoj)
 	MCFG_SCREEN_MODIFY("screen")
 	MCFG_SCREEN_UPDATE_DRIVER(taitof2_state, screen_update_taitof2_yesnoj)
@@ -3503,6 +3511,9 @@ MACHINE_CONFIG_START(taitof2_state::deadconx)
 
 	/* video hardware */
 	MCFG_GFXDECODE_MODIFY("gfxdecode", deadconx)
+	MCFG_PALETTE_MODIFY("palette")
+	MCFG_PALETTE_FORMAT(RRRRGGGGBBBBRGBx)
+
 	MCFG_VIDEO_START_OVERRIDE(taitof2_state,taitof2_deadconx)
 	MCFG_SCREEN_MODIFY("screen")
 	MCFG_SCREEN_UPDATE_DRIVER(taitof2_state, screen_update_taitof2_deadconx)
@@ -3557,7 +3568,7 @@ MACHINE_CONFIG_START(taitof2_state::dinorex)
 	MCFG_SCREEN_UPDATE_DRIVER(taitof2_state, screen_update_taitof2_pri)
 
 	MCFG_PALETTE_MODIFY("palette")
-	MCFG_PALETTE_FORMAT(RRRRGGGGBBBBxxxx)
+	MCFG_PALETTE_FORMAT(RRRRGGGGBBBBRGBx)
 
 	MCFG_DEVICE_ADD("tc0100scn", TC0100SCN, 0)
 	MCFG_TC0100SCN_GFX_REGION(1)
@@ -3583,7 +3594,7 @@ MACHINE_CONFIG_START(taitof2_state::qjinsei)
 	MCFG_SCREEN_UPDATE_DRIVER(taitof2_state, screen_update_taitof2_pri)
 
 	MCFG_PALETTE_MODIFY("palette")
-	MCFG_PALETTE_FORMAT(RRRRGGGGBBBBxxxx)
+	MCFG_PALETTE_FORMAT(RRRRGGGGBBBBRGBx)
 
 	MCFG_DEVICE_ADD("tc0100scn", TC0100SCN, 0)
 	MCFG_TC0100SCN_GFX_REGION(1)
@@ -3609,7 +3620,7 @@ MACHINE_CONFIG_START(taitof2_state::qcrayon)
 	MCFG_SCREEN_UPDATE_DRIVER(taitof2_state, screen_update_taitof2_pri)
 
 	MCFG_PALETTE_MODIFY("palette")
-	MCFG_PALETTE_FORMAT(RRRRGGGGBBBBxxxx)
+	MCFG_PALETTE_FORMAT(RRRRGGGGBBBBRGBx)
 
 	MCFG_DEVICE_ADD("tc0100scn", TC0100SCN, 0)
 	MCFG_TC0100SCN_GFX_REGION(1)
@@ -3635,7 +3646,7 @@ MACHINE_CONFIG_START(taitof2_state::qcrayon2)
 	MCFG_SCREEN_UPDATE_DRIVER(taitof2_state, screen_update_taitof2_pri)
 
 	MCFG_PALETTE_MODIFY("palette")
-	MCFG_PALETTE_FORMAT(RRRRGGGGBBBBxxxx)
+	MCFG_PALETTE_FORMAT(RRRRGGGGBBBBRGBx)
 
 	MCFG_DEVICE_ADD("tc0100scn", TC0100SCN, 0)
 	MCFG_TC0100SCN_GFX_REGION(1)
@@ -3657,6 +3668,9 @@ MACHINE_CONFIG_START(taitof2_state::driftout)
 
 	/* video hardware */
 	MCFG_GFXDECODE_MODIFY("gfxdecode", pivot)
+	MCFG_PALETTE_MODIFY("palette")
+	MCFG_PALETTE_FORMAT(RRRRGGGGBBBBRGBx)
+
 	MCFG_VIDEO_START_OVERRIDE(taitof2_state,taitof2_driftout)
 	MCFG_SCREEN_MODIFY("screen")
 	MCFG_SCREEN_UPDATE_DRIVER(taitof2_state, screen_update_taitof2_pri_roz)
