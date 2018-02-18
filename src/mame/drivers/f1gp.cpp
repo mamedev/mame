@@ -525,6 +525,7 @@ MACHINE_CONFIG_START(f1gp_state::f1gp2)
 
 	MCFG_DEVICE_REMOVE("gga")
 	MCFG_DEVICE_REMOVE("vsystem_spr_old")
+	MCFG_DEVICE_REMOVE("vsystem_spr_ol2")
 	MCFG_DEVICE_ADD("vsystem_spr", VSYSTEM_SPR, 0)
 	MCFG_VSYSTEM_SPR_SET_TILE_INDIRECT( f1gp_state, f1gp2_tile_callback )
 	MCFG_VSYSTEM_SPR_SET_GFXREGION(1)
