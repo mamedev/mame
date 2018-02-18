@@ -110,7 +110,7 @@ static void mlc_drawgfxzoomline(deco_mlc_state *state,
 				}
 			}
 			else
-			{	/* TODO : 8bpp and alpha can use simultaneously? */
+			{ /* TODO : 8bpp and alpha can use simultaneously? */
 				int x, x_index = x_index_base;
 				for( x=sx; x<ex; x++ )
 				{
