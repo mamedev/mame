@@ -4,6 +4,7 @@
 #include "emu.h"
 #include "prot_sma.h"
 
+#include <algorithm>
 
 DEFINE_DEVICE_TYPE(NG_SMA_PROT, sma_prot_device, "ng_sma_prot", "Neo Geo SMA Protection")
 
@@ -403,8 +404,8 @@ void sma_prot_device::kof99_decrypt_68k(uint8_t* base)
 	// swap address lines for the banked part
 	for (int i = 0; i < 0x600000/2; i += 0x800/2)
 	{
-		uint16_t buffer[0x800/2];
-		memcpy(buffer, &rom[i], 0x800);
+		std::vector<uint16_t> buffer(0x800/2);
+		std::copy(&rom[i], &rom[i+(0x800/2)], buffer.begin());
 		for (int j = 0; j < 0x800/2; j++)
 			rom[i+j] = buffer[bitswap<24>(j,23,22,21,20,19,18,17,16,15,14,13,12,11,10,6,2,4,9,8,3,1,7,0,5)];
 	}
@@ -434,8 +435,8 @@ void sma_prot_device::garou_decrypt_68k(uint8_t* base)
 	rom = (uint16_t *)(base + 0x100000);
 	for (int i = 0; i < 0x800000/2; i += 0x8000/2)
 	{
-		uint16_t buffer[0x8000/2];
-		memcpy(buffer, &rom[i], 0x8000);
+		std::vector<uint16_t> buffer(0x8000/2);
+		std::copy(&rom[i], &rom[i+(0x8000/2)], buffer.begin());
 		for (int j = 0; j < 0x8000/2; j++)
 			rom[i+j] = buffer[bitswap<24>(j,23,22,21,20,19,18,17,16,15,14,9,4,8,3,13,6,2,7,0,12,1,11,10,5)];
 	}
@@ -460,8 +461,8 @@ void sma_prot_device::garouh_decrypt_68k(uint8_t* base)
 	rom = (uint16_t *)(base + 0x100000);
 	for (int i = 0; i < 0x800000/2; i += 0x8000/2)
 	{
-		uint16_t buffer[0x8000/2];
-		memcpy(buffer, &rom[i], 0x8000);
+		std::vector<uint16_t> buffer(0x8000/2);
+		std::copy(&rom[i], &rom[i+(0x8000/2)], buffer.begin());
 		for (int j = 0; j < 0x8000/2; j++)
 			rom[i+j] = buffer[bitswap<24>(j,23,22,21,20,19,18,17,16,15,14,12,8,1,7,11,3,13,10,6,9,5,4,0,2)];
 	}
@@ -486,8 +487,8 @@ void sma_prot_device::mslug3_decrypt_68k(uint8_t* base)
 	rom = (uint16_t *)(base + 0x100000);
 	for (int i = 0; i < 0x800000/2; i += 0x10000/2)
 	{
-		uint16_t buffer[0x10000/2];
-		memcpy(buffer, &rom[i], 0x10000);
+		std::vector<uint16_t> buffer(0x10000/2);
+		std::copy(&rom[i], &rom[i+(0x10000/2)], buffer.begin());
 		for (int j = 0; j < 0x10000/2; j++)
 			rom[i+j] = buffer[bitswap<24>(j,23,22,21,20,19,18,17,16,15,2,11,0,14,6,4,13,8,9,3,10,7,5,12,1)];
 	}
@@ -506,8 +507,8 @@ void sma_prot_device::kof2000_decrypt_68k(uint8_t* base)
 	// swap address lines for the banked part
 	for (int i = 0; i < 0x63a000/2; i += 0x800/2)
 	{
-		uint16_t buffer[0x800/2];
-		memcpy(buffer, &rom[i], 0x800);
+		std::vector<uint16_t> buffer(0x800/2);
+		std::copy(&rom[i], &rom[i+(0x800/2)], buffer.begin());
 		for (int j = 0; j < 0x800/2; j++)
 			rom[i+j] = buffer[bitswap<24>(j,23,22,21,20,19,18,17,16,15,14,13,12,11,10,4,1,3,8,6,2,7,0,9,5)];
 	}

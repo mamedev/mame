@@ -140,7 +140,7 @@ neogeo_sma_kof2000_cart_device::neogeo_sma_kof2000_cart_device(const machine_con
 void neogeo_sma_kof2000_cart_device::decrypt_all(DECRYPT_ALL_PARAMS)
 {
 	m_sma_prot->kof2000_decrypt_68k(cpuregion);
-	m_cmc_prot->cmc50_m1_decrypt(audiocrypt_region, audiocrypt_region_size, audiocpu_region, audio_region_size);
+	m_cmc_prot->cmc50_m1_decrypt(audiocpu_region, audio_region_size);
 	m_cmc_prot->cmc50_gfx_decrypt(spr_region, spr_region_size, KOF2000_GFX_KEY);
 	m_cmc_prot->sfix_decrypt(spr_region, spr_region_size, fix_region, fix_region_size);
 }

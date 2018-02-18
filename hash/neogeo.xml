@@ -8214,7 +8214,7 @@
 				<rom value="0" size="0x80000" offset="0x000000" loadflag="fill" />
 			</dataarea>
 				<!-- Encrypted -->
-			<dataarea name="audiocrypt" size="0x80000">
+			<dataarea name="audiocpu" size="0x40000">
 				<rom offset="0x00000" size="0x40000" name="257-m1.m1" crc="4b749113" sha1="2af2361146edd0ce3966614d90165a5c1afb8de4" /> <!-- mask rom TC532000 -->
 			</dataarea>
 			<dataarea name="ymsnd" size="0x1000000">
@@ -8256,7 +8256,7 @@
 				<rom value="0" size="0x80000" offset="0x000000" loadflag="fill" />
 			</dataarea>
 				<!-- Encrypted -->
-			<dataarea name="audiocrypt" size="0x80000">
+			<dataarea name="audiocpu" size="0x40000">
 				<rom offset="0x00000" size="0x40000" name="257-m1.m1" crc="4b749113" sha1="2af2361146edd0ce3966614d90165a5c1afb8de4" /> <!-- mask rom TC532000 -->
 			</dataarea>
 			<dataarea name="ymsnd" size="0x1000000">
@@ -8438,7 +8438,7 @@
 				<rom value="0" size="0x20000" offset="0x000000" loadflag="fill" />
 			</dataarea>
 				<!-- Encrypted -->
-			<dataarea name="audiocrypt" size="0x80000">
+			<dataarea name="audiocpu" size="0x40000">
 				<rom offset="0x00000" size="0x40000" name="265-262-m1.m1" crc="a7f8119f" sha1="71805b39b8b09c32425cf39f9de59b2f755976c2" /> <!-- mask rom TC532000 -->
 			</dataarea>
 			<dataarea name="ymsnd" size="0x1000000">
@@ -8481,7 +8481,7 @@
 				<rom value="0" size="0x20000" offset="0x000000" loadflag="fill" />
 			</dataarea>
 				<!-- Encrypted -->
-			<dataarea name="audiocrypt" size="0x80000">
+			<dataarea name="audiocpu" size="0x40000">
 				<rom offset="0x00000" size="0x40000" name="265-262-m1.m1" crc="a7f8119f" sha1="71805b39b8b09c32425cf39f9de59b2f755976c2" /> <!-- mask rom TC532000 -->
 			</dataarea>
 			<dataarea name="ymsnd" size="0x1000000">
@@ -8534,7 +8534,7 @@
 				<rom value="0" size="0x80000" offset="0x000000" loadflag="fill" />
 			</dataarea>
 				<!-- Encrypted -->
-			<dataarea name="audiocrypt" size="0x80000">
+			<dataarea name="audiocpu" size="0x20000">
 				<rom offset="0x00000" size="0x20000" name="263-m1.m1" crc="46ac8228" sha1="5aeea221050c98e4bb0f16489ce772bf1c80f787" /> <!-- mask rom TC531001 -->
 			</dataarea>
 			<dataarea name="ymsnd" size="0x1000000">
@@ -8574,7 +8574,7 @@
 				<rom value="0" size="0x80000" offset="0x000000" loadflag="fill" />
 			</dataarea>
 				<!-- Encrypted -->
-			<dataarea name="audiocrypt" size="0x80000">
+			<dataarea name="audiocpu" size="0x20000">
 				<rom offset="0x00000" size="0x20000" name="263-m1.m1" crc="46ac8228" sha1="5aeea221050c98e4bb0f16489ce772bf1c80f787" /> <!-- mask rom TC531001 -->
 			</dataarea>
 			<dataarea name="ymsnd" size="0x1000000">
@@ -8623,7 +8623,7 @@
 				<rom value="0" size="0x20000" offset="0x000000" loadflag="fill" />
 			</dataarea>
 				<!-- Encrypted -->
-			<dataarea name="audiocrypt" size="0x80000">
+			<dataarea name="audiocpu" size="0x20000">
 				<rom offset="0x00000" size="0x20000" name="264-m1.m1" crc="4dbd7b43" sha1="6b63756b0d2d30bbf13fbd219833c81fd060ef96" /> <!-- mask rom 27c010 -->
 			</dataarea>
 			<dataarea name="ymsnd" size="0x1000000">
@@ -8665,7 +8665,7 @@
 				<rom value="0" size="0x20000" offset="0x000000" loadflag="fill" />
 			</dataarea>
 			<!-- Encrypted -->
-			<dataarea name="audiocrypt" size="0x80000">
+			<dataarea name="audiocpu" size="0x20000">
 				<rom offset="0x00000" size="0x20000" name="264-m1.m1" crc="4dbd7b43" sha1="6b63756b0d2d30bbf13fbd219833c81fd060ef96" /> <!-- mask rom 27c010 -->
 			</dataarea>
 			<dataarea name="ymsnd" size="0x1000000">
@@ -8716,7 +8716,7 @@
 				<rom value="0" size="0x20000" offset="0x000000" loadflag="fill" />
 			</dataarea>
 				<!-- Encrypted -->
-			<dataarea name="audiocrypt" size="0x80000">
+			<dataarea name="audiocpu" size="0x20000">
 				<rom offset="0x00000" size="0x20000" name="265-m1.m1" crc="85aaa632" sha1="744fba4ca3bc3a5873838af886efb97a8a316104" /> <!-- mask rom TC531001 -->
 			</dataarea>
 			<dataarea name="ymsnd" size="0x1000000">
@@ -8767,7 +8767,7 @@
 				<rom value="0" size="0x80000" offset="0x000000" loadflag="fill" />
 			</dataarea>
 				<!-- Encrypted -->
-			<dataarea name="audiocrypt" size="0x80000">
+			<dataarea name="audiocpu" size="0x20000">
 				<rom offset="0x00000" size="0x20000" name="266-m1.m1" crc="456c3e6c" sha1="5a07d0186198a18d2dda1331093cf29b0b9b2984" /> <!-- mask rom TC531001 -->
 			</dataarea>
 			<dataarea name="ymsnd" size="0x1000000">
@@ -8815,7 +8815,7 @@
 				<rom value="0" size="0x20000" offset="0x000000" loadflag="fill" />
 			</dataarea>
 				<!-- Encrypted -->
-			<dataarea name="audiocrypt" size="0x80000">
+			<dataarea name="audiocpu" size="0x80000">
 				<rom offset="0x00000" size="0x80000" name="267-m1.m1" crc="c7853ccd" sha1="1b7a4c5093cf0fe3861ce44fd1d3b30c71ad0abe" /> <!-- mask rom TC534000 -->
 			</dataarea>
 			<dataarea name="ymsnd" size="0x400000">
@@ -8858,7 +8858,7 @@
 				<rom value="0" size="0x20000" offset="0x000000" loadflag="fill" />
 			</dataarea>
 				<!-- Encrypted -->
-			<dataarea name="audiocrypt" size="0x80000">
+			<dataarea name="audiocpu" size="0x80000">
 				<rom offset="0x00000" size="0x80000" name="268-m1.m1" crc="4a5a6e0e" sha1="df0f660f2465e1db7be5adfcaf5e88ad61a74a42" /> <!-- mask rom TC534000 -->
 			</dataarea>
 			<dataarea name="ymsnd" size="0x1000000">
@@ -8901,7 +8901,7 @@
 				<rom value="0" size="0x20000" offset="0x000000" loadflag="fill" />
 			</dataarea>
 				<!-- Encrypted -->
-			<dataarea name="audiocrypt" size="0x80000">
+			<dataarea name="audiocpu" size="0x80000">
 				<rom offset="0x00000" size="0x80000" name="268-m1.m1" crc="4a5a6e0e" sha1="df0f660f2465e1db7be5adfcaf5e88ad61a74a42" /> <!-- mask rom TC534000 -->
 			</dataarea>
 			<dataarea name="ymsnd" size="0x1000000">
@@ -8952,7 +8952,7 @@
 				<rom value="0" size="0x80000" offset="0x000000" loadflag="fill" />
 			</dataarea>
 				<!-- Encrypted -->
-			<dataarea name="audiocrypt" size="0x80000">
+			<dataarea name="audiocpu" size="0x80000">
 				<rom offset="0x00000" size="0x80000" name="269-m1.m1" crc="f6819d00" sha1="d3bbe09df502464f104e53501708ac6e2c1832c6" /> <!-- mask rom TC534000 -->
 			</dataarea>
 			<dataarea name="ymsnd" size="0x1000000">
@@ -9004,7 +9004,7 @@
 				<rom value="0" size="0x20000" offset="0x000000" loadflag="fill" />
 			</dataarea>
 				<!-- Encrypted -->
-			<dataarea name="audiocrypt" size="0x80000">
+			<dataarea name="audiocpu" size="0x80000">
 				<rom offset="0x00000" size="0x80000" name="270-m1.m1" crc="49c9901a" sha1="2623e9765a0eba58fee2de72851e9dc502344a3d" /> <!-- mask rom 27c040 -->
 			</dataarea>
 			<dataarea name="ymsnd" size="0x1000000">
@@ -9050,7 +9050,7 @@
 				<rom value="0" size="0x20000" offset="0x000000" loadflag="fill" />
 			</dataarea>
 				<!-- Encrypted -->
-			<dataarea name="audiocrypt" size="0x80000">
+			<dataarea name="audiocpu" size="0x80000">
 				<rom offset="0x00000" size="0x80000" name="270-m1.m1" crc="49c9901a" sha1="2623e9765a0eba58fee2de72851e9dc502344a3d" /> <!-- mask rom 27c040 -->
 			</dataarea>
 			<dataarea name="ymsnd" size="0x1000000">
@@ -9092,7 +9092,7 @@
 				<rom value="0" size="0x20000" offset="0x000000" loadflag="fill" />
 			</dataarea>
 				<!-- Encrypted -->
-			<dataarea name="audiocrypt" size="0x80000">
+			<dataarea name="audiocpu" size="0x80000">
 				<rom offset="0x00000" size="0x80000" name="270-m1.m1" crc="49c9901a" sha1="2623e9765a0eba58fee2de72851e9dc502344a3d" /> <!-- mask rom 27c040 -->
 			</dataarea>
 			<dataarea name="ymsnd" size="0x1000000">
@@ -9144,7 +9144,7 @@
 				<rom value="0" size="0x80000" offset="0x000000" loadflag="fill" />
 			</dataarea>
 				<!-- Encrypted -->
-			<dataarea name="audiocrypt" size="0x80000">
+			<dataarea name="audiocpu" size="0x80000">
 				<rom offset="0x00000" size="0x80000" name="271-m1c.m1" crc="f5515629" sha1="7516bf1b0207a3c8d41dc30c478f8d8b1f71304b" />    <!-- mask rom TC534000 -->
 			</dataarea>
 			<dataarea name="ymsnd" size="0x1000000">
@@ -9188,7 +9188,7 @@
 				<rom value="0" size="0x80000" offset="0x000000" loadflag="fill" />
 			</dataarea>
 				<!-- Encrypted -->
-			<dataarea name="audiocrypt" size="0x80000">
+			<dataarea name="audiocpu" size="0x80000">
 				<rom offset="0x00000" size="0x80000" name="271-m1k.m1" crc="48d9affe" sha1="68f01560b91bbada39001ce01bdeeed5c9bb29f2" />    <!-- mask rom TC534000 -->
 			</dataarea>
 			<dataarea name="ymsnd" size="0x1000000">
@@ -9239,7 +9239,7 @@
 				<rom value="0" size="0x20000" offset="0x000000" loadflag="fill" />
 			</dataarea>
 				<!-- Encrypted -->
-			<dataarea name="audiocrypt" size="0x80000">
+			<dataarea name="audiocpu" size="0x80000">
 				<rom offset="0x00000" size="0x80000" name="272-m1.m1" crc="adeebf40" sha1="8cbd63dda3fff4de38060405bf70cd9308c9e66e" />
 			</dataarea>
 			<dataarea name="ymsnd" size="0x1000000">
@@ -9284,7 +9284,7 @@
 				<rom value="0" size="0x20000" offset="0x000000" loadflag="fill" />
 			</dataarea>
 				<!-- Encrypted -->
-			<dataarea name="audiocrypt" size="0x80000">
+			<dataarea name="audiocpu" size="0x80000">
 				<rom offset="0x00000" size="0x80000" name="272-m1.m1" crc="adeebf40" sha1="8cbd63dda3fff4de38060405bf70cd9308c9e66e" />
 			</dataarea>
 			<dataarea name="ymsnd" size="0x1000000">
@@ -9327,7 +9327,7 @@
 				<rom value="0" size="0x20000" offset="0x000000" loadflag="fill" />
 			</dataarea>
 				<!-- Encrypted -->
-			<dataarea name="audiocrypt" size="0x80000">
+			<dataarea name="audiocpu" size="0x80000">
 				<rom offset="0x00000" size="0x80000" name="272-m1.m1" crc="adeebf40" sha1="8cbd63dda3fff4de38060405bf70cd9308c9e66e" />
 			</dataarea>
 			<dataarea name="ymsnd" size="0x1000000">
@@ -9376,7 +9376,7 @@
 				<rom value="0" size="0x20000" offset="0x000000" loadflag="fill" />
 			</dataarea>
 			<!-- Encrypted -->
-			<dataarea name="audiocrypt" size="0x80000">
+			<dataarea name="audiocpu" size="0x80000">
 				<rom offset="0x00000" size="0x80000" name="008-mg1.m1" crc="d163c690" sha1="1dfd04d20c5985037f07cd01000d0b04f3a8f4f4" />    <!-- M27C4001 -->
 			</dataarea>
 			<dataarea name="ymsnd" size="0x0200000">
@@ -9406,7 +9406,7 @@
 				<rom value="0" size="0x20000" offset="0x000000" loadflag="fill" />
 			</dataarea>
 			<!-- Encrypted -->
-			<dataarea name="audiocrypt" size="0x80000">
+			<dataarea name="audiocpu" size="0x80000">
 				<rom offset="0x00000" size="0x80000" name="008-mg1.m1" crc="d163c690" sha1="1dfd04d20c5985037f07cd01000d0b04f3a8f4f4" />    <!-- M27C4001 -->
 			</dataarea>
 			<dataarea name="ymsnd" size="0x0200000">
@@ -9957,7 +9957,7 @@
 				<rom offset="0x000000" size="0x020000" name="ms4-s1p.bin" crc="07ff87ce" sha1="96ddb439de2a26bf9869015d7fb19129d40f3fd9" />
 			</dataarea>
 				<!-- Encrypted -->
-			<dataarea name="audiocrypt" size="0x80000">
+			<dataarea name="audiocpu" size="0x20000">
 				<rom offset="0x00000" size="0x20000" name="263-m1.m1" crc="46ac8228" sha1="5aeea221050c98e4bb0f16489ce772bf1c80f787" /> <!-- mask rom TC531001 -->
 			</dataarea>
 			<dataarea name="ymsnd" size="0x1000000">
@@ -9995,7 +9995,7 @@
 				<rom offset="0x000000" size="0x020000" name="2k2-s1.bin" crc="2255f5bf" sha1="8a82b3e9717df30b580b9d0bac0b403f8102a002" />
 			</dataarea>
 				<!-- Encrypted -->
-			<dataarea name="audiocrypt" size="0x80000">
+			<dataarea name="audiocpu" size="0x20000">
 				<rom offset="0x00000" size="0x20000" name="265-m1.m1" crc="85aaa632" sha1="744fba4ca3bc3a5873838af886efb97a8a316104" /> <!-- mask rom TC531001 -->
 			</dataarea>
 			<dataarea name="ymsnd" size="0x1000000">
@@ -10032,7 +10032,7 @@
 				<rom offset="0x000000" size="0x020000" name="2k2-s1p.bin" crc="595e0006" sha1="ff086bdaa6f40e9ad963e1100a27f44618d684ed" />
 			</dataarea>
 				<!-- Encrypted -->
-			<dataarea name="audiocrypt" size="0x80000">
+			<dataarea name="audiocpu" size="0x20000">
 				<rom offset="0x00000" size="0x20000" name="265-m1.m1" crc="85aaa632" sha1="744fba4ca3bc3a5873838af886efb97a8a316104" /> <!-- mask rom TC531001 -->
 			</dataarea>
 			<dataarea name="ymsnd" size="0x1000000">
@@ -10070,7 +10070,7 @@
 				<rom offset="0x000000" size="0x020000" name="2k2-s1pa.bin" crc="1a3ed064" sha1="9749bb55c750e6b65d651998c2649c5fb68db68e" />
 			</dataarea>
 				<!-- Encrypted -->
-			<dataarea name="audiocrypt" size="0x80000">
+			<dataarea name="audiocpu" size="0x20000">
 				<rom offset="0x00000" size="0x20000" name="265-m1.m1" crc="85aaa632" sha1="744fba4ca3bc3a5873838af886efb97a8a316104" /> <!-- mask rom TC531001 -->
 			</dataarea>
 			<dataarea name="ymsnd" size="0x1000000">
@@ -10108,7 +10108,7 @@
 				<rom offset="0x000000" size="0x020000" name="kf02m-s1.bin" crc="348d6f2c" sha1="586da8a936ebbb71af324339a4b60ec91dfa0990" />
 			</dataarea>
 				<!-- Encrypted -->
-			<dataarea name="audiocrypt" size="0x80000">
+			<dataarea name="audiocpu" size="0x20000">
 				<rom offset="0x00000" size="0x20000" name="265-m1.m1" crc="85aaa632" sha1="744fba4ca3bc3a5873838af886efb97a8a316104" /> <!-- mask rom TC531001 -->
 			</dataarea>
 			<dataarea name="ymsnd" size="0x1000000">
@@ -10146,7 +10146,7 @@
 				<rom offset="0x000000" size="0x020000" name="k2k2m2s1.bin" crc="446e74c5" sha1="efc2afb26578bad9eb21659c70eb0f827d6d1ef6" />
 			</dataarea>
 				<!-- Encrypted -->
-			<dataarea name="audiocrypt" size="0x80000">
+			<dataarea name="audiocpu" size="0x20000">
 				<rom offset="0x00000" size="0x20000" name="265-m1.m1" crc="85aaa632" sha1="744fba4ca3bc3a5873838af886efb97a8a316104" /> <!-- mask rom TC531001 -->
 			</dataarea>
 			<dataarea name="ymsnd" size="0x1000000">
@@ -10398,7 +10398,7 @@
 				<rom name="ms5-s1p.bin" offset="0x00000" size="0x20000" crc="21e04432" sha1="10057a2aa487087f7143d1d69fdad978a6bef0f7" />
 			</dataarea>
 				<!-- Encrypted -->
-			<dataarea name="audiocrypt" size="0x80000">
+			<dataarea name="audiocpu" size="0x80000">
 				<rom offset="0x00000" size="0x80000" name="268-m1.m1" crc="4a5a6e0e" sha1="df0f660f2465e1db7be5adfcaf5e88ad61a74a42" /> <!-- mask rom TC534000 -->
 			</dataarea>
 			<dataarea name="ymsnd" size="0x1000000">

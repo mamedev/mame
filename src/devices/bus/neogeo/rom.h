@@ -53,7 +53,7 @@ protected:
 	virtual void device_reset() override;
 
 private:
-	uint16_t m_cart_ram[0x1000];
+	std::unique_ptr<uint16_t[]> m_cart_ram;
 };
 
 DECLARE_DEVICE_TYPE(NEOGEO_VLINER_CART, neogeo_vliner_cart_device)

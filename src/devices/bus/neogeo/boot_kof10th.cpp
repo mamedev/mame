@@ -11,6 +11,7 @@
 #include "emu.h"
 #include "boot_kof10th.h"
 
+#include <algorithm>
 
 //-------------------------------------------------
 //  neogeo_kof10th_cart_device - constructor
@@ -31,16 +32,18 @@ neogeo_kof10th_cart_device::neogeo_kof10th_cart_device(const machine_config &mco
 
 void neogeo_kof10th_cart_device::device_start()
 {
+	m_cart_ram[0] = std::make_unique<uint16_t[]>(0x2000/2);
+	m_cart_ram[1] = std::make_unique<uint16_t[]>(0x2000/2);
 	save_item(NAME(m_special_bank));
-	save_item(NAME(m_cart_ram));
-	save_item(NAME(m_cart_ram2));
+	save_pointer(NAME(m_cart_ram[0].get()), 0x2000/2, 0);
+	save_pointer(NAME(m_cart_ram[1].get()), 0x2000/2, 1);
 }
 
 void neogeo_kof10th_cart_device::device_reset()
 {
 	m_special_bank = 0;
-	memset(m_cart_ram, 0x00, 0x2000);
-	memset(m_cart_ram2, 0x00, 0x20000);
+	std::fill(&m_cart_ram[0][0], &m_cart_ram[0][0x2000/2], 0);
+	std::fill(&m_cart_ram[1][0], &m_cart_ram[1][0x2000/2], 0);
 }
 
 
@@ -56,9 +59,9 @@ MACHINE_CONFIG_END
 void neogeo_kof10th_cart_device::decrypt_all(DECRYPT_ALL_PARAMS)
 {
 	m_prot->kof10th_decrypt(cpuregion, cpuregion_size);
-	memcpy(m_cart_ram2, (uint8_t *)cpuregion + 0xe0000, 0x20000);
+	memcpy(m_cart_ram[1], (uint8_t *)cpuregion + 0xe0000, 0x20000);
 	m_fixed = (get_fixed_size()) ? get_fixed_base() : get_region_fixed_base();
-	save_pointer(NAME(m_fixed), 0x40000);
+	save_pointer(NAME(m_fixed), 0x40000/2);
 }
 
 
@@ -76,7 +79,7 @@ uint32_t neogeo_kof10th_cart_device::get_bank_base(uint16_t sel)
 
 uint16_t neogeo_kof10th_cart_device::get_helper()
 {
-	return m_cart_ram[0xffc];
+	return m_cart_ram[0][0xffc];
 }
 
 uint32_t neogeo_kof10th_cart_device::get_special_bank()
@@ -86,21 +89,21 @@ uint32_t neogeo_kof10th_cart_device::get_special_bank()
 
 READ16_MEMBER(neogeo_kof10th_cart_device::protection_r)
 {
-	return m_cart_ram[offset];
+	return m_cart_ram[0][offset];
 }
 
 READ16_MEMBER(neogeo_kof10th_cart_device::addon_r)
 {
 	//  printf("kof10th_RAM2_r\n");
-	return m_cart_ram2[offset];
+	return m_cart_ram[1][offset];
 }
 
 WRITE16_MEMBER(neogeo_kof10th_cart_device::protection_w)
 {
 	if (offset < 0x40000/2)
 	{
-		if (!m_cart_ram[0xffe])
-			COMBINE_DATA(&m_cart_ram2[(0x00000/2) + (offset & 0xffff)]);    // Write to RAM bank A
+		if (!m_cart_ram[0][0xffe])
+			COMBINE_DATA(&m_cart_ram[1][(0x00000/2) + (offset & 0xffff)]);    // Write to RAM bank A
 		else
 			m_fixed[offset] = bitswap<8>(data, 7,6,0,4,3,2,1,5);  // Write S data on-the-fly
 	}
@@ -111,11 +114,11 @@ WRITE16_MEMBER(neogeo_kof10th_cart_device::protection_w)
 			// Standard bankswitch
 			//m_bankdev->neogeo_set_main_cpu_bank_address(get_bank_base(data));
 		}
-		else if (offset == 0xffff8/2 && m_cart_ram[0xffc] != data)
+		else if (offset == 0xffff8/2 && m_cart_ram[0][0xffc] != data)
 		{
 			// Special bankswitch
 			m_special_bank = (data & 1) ? 0x800000/2 : 0x700000/2;
 		}
-		COMBINE_DATA(&m_cart_ram[offset & 0xfff]);
+		COMBINE_DATA(&m_cart_ram[0][offset & 0xfff]);
 	}
 }
