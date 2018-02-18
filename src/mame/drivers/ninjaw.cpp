@@ -363,7 +363,7 @@ WRITE8_MEMBER(ninjaw_state::coin_control_w)
 
 WRITE8_MEMBER(ninjaw_state::sound_bankswitch_w)
 {
-	membank("z80bank")->set_entry(data & 7);
+	m_z80bank->set_entry(data & 7);
 }
 
 WRITE16_MEMBER(ninjaw_state::sound_w)
@@ -397,10 +397,10 @@ WRITE8_MEMBER(ninjaw_state::pancontrol_w)
 
 	switch (offset)
 	{
-		case 0: flt = m_2610_1l; break;
-		case 1: flt = m_2610_1r; break;
-		case 2: flt = m_2610_2l; break;
-		case 3: flt = m_2610_2r; break;
+		case 0: flt = m_2610_l[0]; break;
+		case 1: flt = m_2610_r[0]; break;
+		case 2: flt = m_2610_l[1]; break;
+		case 3: flt = m_2610_r[1]; break;
 	}
 
 	m_pandata[offset] = (float)data * (100.f / 255.0f);
@@ -411,9 +411,9 @@ WRITE8_MEMBER(ninjaw_state::pancontrol_w)
 
 WRITE16_MEMBER(ninjaw_state::tc0100scn_triple_screen_w)
 {
-	m_tc0100scn_1->word_w(space, offset, data, mem_mask);
-	m_tc0100scn_2->word_w(space, offset, data, mem_mask);
-	m_tc0100scn_3->word_w(space, offset, data, mem_mask);
+	m_tc0100scn[0]->word_w(space, offset, data, mem_mask);
+	m_tc0100scn[1]->word_w(space, offset, data, mem_mask);
+	m_tc0100scn[2]->word_w(space, offset, data, mem_mask);
 }
 
 /***********************************************************
@@ -712,7 +712,7 @@ void ninjaw_state::postload()
 
 void ninjaw_state::machine_start()
 {
-	membank("z80bank")->configure_entries(0, 8, memregion("audiocpu")->base(), 0x4000);
+	m_z80bank->configure_entries(0, 8, memregion("audiocpu")->base(), 0x4000);
 
 	save_item(NAME(m_cpua_ctrl));
 	save_item(NAME(m_pandata));
@@ -1245,8 +1245,8 @@ ROM_END
 /* Working Games */
 
 //    YEAR, NAME,     PARENT, MACHINE, INPUT,   STATE         INIT,MONITOR,COMPANY,                     FULLNAME,FLAGS
-GAME( 1987, ninjaw,   0,      ninjaw,  ninjaw,  ninjaw_state, 0,   ROT0,   "Taito Corporation Japan",   "The Ninja Warriors (World, later version)", MACHINE_SUPPORTS_SAVE )
-GAME( 1987, ninjaw1,  ninjaw, ninjaw,  ninjaw,  ninjaw_state, 0,   ROT0,   "Taito Corporation Japan",   "The Ninja Warriors (World, earlier version)", MACHINE_SUPPORTS_SAVE )
-GAME( 1987, ninjawj,  ninjaw, ninjaw,  ninjawj, ninjaw_state, 0,   ROT0,   "Taito Corporation",         "The Ninja Warriors (Japan)", MACHINE_SUPPORTS_SAVE )
-GAME( 1987, ninjawu,  ninjaw, ninjaw,  ninjawj, ninjaw_state, 0,   ROT0,   "Taito Corporation America (licensed to Romstar)", "The Ninja Warriors (US, Romstar license)", MACHINE_SUPPORTS_SAVE ) /* Uses same coinage as World, see notes */
-GAME( 1989, darius2,  0,      darius2, darius2, ninjaw_state, 0,   ROT0,   "Taito Corporation",         "Darius II (triple screen) (Japan)", MACHINE_SUPPORTS_SAVE )
+GAME( 1987, ninjaw,   0,      ninjaw,  ninjaw,  ninjaw_state, 0,   ROT0,   "Taito Corporation Japan",   "The Ninja Warriors (World, later version)", MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_SOUND )
+GAME( 1987, ninjaw1,  ninjaw, ninjaw,  ninjaw,  ninjaw_state, 0,   ROT0,   "Taito Corporation Japan",   "The Ninja Warriors (World, earlier version)", MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_SOUND )
+GAME( 1987, ninjawj,  ninjaw, ninjaw,  ninjawj, ninjaw_state, 0,   ROT0,   "Taito Corporation",         "The Ninja Warriors (Japan)", MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_SOUND )
+GAME( 1987, ninjawu,  ninjaw, ninjaw,  ninjawj, ninjaw_state, 0,   ROT0,   "Taito Corporation America (licensed to Romstar)", "The Ninja Warriors (US, Romstar license)", MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_SOUND ) /* Uses same coinage as World, see notes */
+GAME( 1989, darius2,  0,      darius2, darius2, ninjaw_state, 0,   ROT0,   "Taito Corporation",         "Darius II (triple screen) (Japan)", MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_SOUND )
