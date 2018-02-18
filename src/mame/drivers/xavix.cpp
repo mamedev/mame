@@ -140,6 +140,8 @@ public:
 
 	DECLARE_READ8_MEMBER(pal_ntsc_r);
 
+	DECLARE_READ8_MEMBER(xavix_4000_r);
+
 	DECLARE_READ8_MEMBER(mult_r);
 	DECLARE_WRITE8_MEMBER(mult_param_w);
 
@@ -356,9 +358,9 @@ void xavix_state::draw_tilemap(screen_device &screen, bitmap_ind16 &bitmap, cons
 	int xtilesize = 0;
 	int offset_multiplier = 0;
 	int opaque = 0;
-	int rambase = 0;
 
 	uint8_t* tileregs;
+	address_space& mainspace = m_maincpu->space(AS_PROGRAM);
 
 	// all this is likely controlled by tilemap registers
 	if (which == 0)
@@ -370,7 +372,6 @@ void xavix_state::draw_tilemap(screen_device &screen, bitmap_ind16 &bitmap, cons
 		xtilesize = 16;
 		offset_multiplier = 32;
 		opaque = 1;
-		rambase = 0;
 	}
 	else
 	{
@@ -381,7 +382,6 @@ void xavix_state::draw_tilemap(screen_device &screen, bitmap_ind16 &bitmap, cons
 		xtilesize = 8;
 		offset_multiplier = 8;
 		opaque = 0;
-		rambase = 0x200;
 	}
 
 	if (tileregs[0x7] & 0x02)
@@ -395,14 +395,14 @@ void xavix_state::draw_tilemap(screen_device &screen, bitmap_ind16 &bitmap, cons
 		// and expected a fixed layout, still need to handle that.
 		int count;
 
-		count = rambase;
+		count = tileregs[0x0]<<8;
 		for (int y = 0; y < ydimension; y++)
 		{
 			for (int x = 0; x < xdimension; x++)
 			{
 				int bpp, pal, scrolly, scrollx;
-				int tile = m_mainram[count];
-				tile |= (m_mainram[count + (ydimension*xdimension)] << 8);
+				int tile = mainspace.read_byte(count);
+				tile |= mainspace.read_byte(count + (ydimension*xdimension)) << 8;
 				count++;
 
 				bpp = (tileregs[0x3] & 0x0e) >> 1;
@@ -1240,6 +1240,10 @@ WRITE8_MEMBER(xavix_state::tmap1_regs_w)
 
 WRITE8_MEMBER(xavix_state::xavix_6fd8_w) // also related to tilemap 2?
 {
+	// possibly just a mirror of tmap2_regs_w, at least it writes 0x04 here which would be the correct
+	// base address to otherwise write at tmap2_regs_w offset 0
+	tmap2_regs_w(space,offset,data);
+
 	//logerror("%s: xavix_6fd8_w data %02x\n", machine().describe_context(), data);
 }
 
@@ -1262,12 +1266,27 @@ READ8_MEMBER(xavix_state::tmap2_regs_r)
 	return m_tmap2_regs[offset];
 }
 
+READ8_MEMBER(xavix_state::xavix_4000_r)
+{
+	if (offset < 0x100)
+	{
+		return ((offset>>4) | (offset<<4));
+	}
+	else
+	{
+		return 0x00;
+	}
+}
 
 // DATA reads from 0x8000-0xffff are banked by byte 0xff of 'ram' (this is handled in the CPU core)
 
 ADDRESS_MAP_START(xavix_state::xavix_map)
 	AM_RANGE(0x000000, 0x0001ff) AM_RAM
 	AM_RANGE(0x000200, 0x003fff) AM_RAM AM_SHARE("mainram")
+
+	// this might not be a real area, the tilemap base register gets set to 0x40 in monster truck service mode, and expects a fixed layout.
+	// As that would point at this address maybe said layout is being read from here, or maybe it's just a magic tilemap register value that doesn't read address space at all.
+	AM_RANGE(0x004000, 0x0041ff) AM_READ(xavix_4000_r)	
 
 	// 6xxx ranges are the video hardware
 	// appears to be 256 sprites (shares will be renamed once their purpose is known)
@@ -1284,12 +1303,12 @@ ADDRESS_MAP_START(xavix_state::xavix_map)
 	AM_RANGE(0x006a00, 0x006a1f) AM_RAM AM_SHARE("spr_attra") // test mode, pass flag 0x20
 
 	
-	AM_RANGE(0x006fc0, 0x006fc0) AM_WRITE(xavix_6fc0_w) // startup
+	AM_RANGE(0x006fc0, 0x006fc0) AM_WRITE(xavix_6fc0_w) // startup (maybe this is a mirror of tmap1_regs_w)
 
 	AM_RANGE(0x006fc8, 0x006fcf) AM_WRITE(tmap1_regs_w) // video registers
 
 	AM_RANGE(0x006fd0, 0x006fd7) AM_READWRITE(tmap2_regs_r, tmap2_regs_w)
-	AM_RANGE(0x006fd8, 0x006fd8) AM_WRITE(xavix_6fd8_w) // startup (taitons1)
+	AM_RANGE(0x006fd8, 0x006fd8) AM_WRITE(xavix_6fd8_w) // startup (mirror of tmap2_regs_w?)
 	
 	AM_RANGE(0x006fe0, 0x006fe0) AM_READWRITE(vid_dma_trigger_r, vid_dma_trigger_w) // after writing to 6fe1/6fe2 and 6fe5/6fe6 rad_mtrk writes 0x43/0x44 here then polls on 0x40   (see function call at c273) write values are hardcoded, similar code at 18401
 	AM_RANGE(0x006fe1, 0x006fe2) AM_WRITE(vid_dma_params_1_w)
