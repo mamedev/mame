@@ -78,7 +78,7 @@ protected:
 		ADPCM2_PLAYBACK = 1,
 		NONLINEAR8_PLAYBACK = 2,
 		STRAIGHT8_PLAYBACK = 3,
-		8BIT_PLAYBACK = 2
+		EIGHTBIT_PLAYBACK = 2
 	};
 
 	enum
@@ -169,6 +169,7 @@ protected:
 	int       m_ud;
 	int       m_si;
 	int       m_sd;
+	int       m_cmd;
 
 	static constexpr int OKIM9810_VOICES = 8;
 	okim_voice m_voice[OKIM9810_VOICES];

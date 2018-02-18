@@ -55,7 +55,7 @@
 #include "emu.h"
 #include "cpu/score/score.h"
 #include "screen.h"
-
+#include "softlist_dev.h"
 
 #define LOG_SPG290_REGISTER_ACCESS  (1)
 

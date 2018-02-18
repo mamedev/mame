@@ -96,8 +96,8 @@ okim9810_device::okim9810_device(const machine_config &mconfig, const char *tag,
 		m_serial_bits(0),
 		m_ud(0),
 		m_si(0),
-		m_sd(0)
-
+		m_sd(0),
+		m_cmd(0)
 {
 }
 
@@ -129,6 +129,7 @@ void okim9810_device::device_start()
 	save_item(NAME(m_ud));
 	save_item(NAME(m_si));
 	save_item(NAME(m_sd));
+	save_item(NAME(m_cmd));
 
 	for  (int i = 0; i < OKIM9810_VOICES; i++)
 	{
@@ -487,7 +488,7 @@ void okim9810_device::write_tmp_register(uint8_t data)
 			default:
 				break;
 		}
-		osd_printf_debug("DADR direct offset %02 = %02x => ", m_dadr, m_TMP_register);
+		osd_printf_debug("DADR direct offset %02x = %02x => ", m_dadr, m_TMP_register);
 		m_dadr++;
 	}
 }
@@ -519,7 +520,7 @@ WRITE_LINE_MEMBER( okim9810_device::si_w )
 			m_serial_bits++;
 			if (m_serial_bits >= 8)
 			{
-				if (m_cmd = 0)
+				if (m_cmd == 0)
 				{
 					write_command(m_serial_write_latch);
 				}
@@ -635,7 +636,7 @@ void okim9810_device::okim_voice::generate_audio(device_rom_interface &rom,
 		// If interpSampleNum == 0, we are at the beginning of a new interp chunk, gather data
 		if (m_interpSampleNum == 0)
 		{
-			if (m_playbackAlgo & 8BIT_PLAYBACK) // 8-bit case
+			if (m_playbackAlgo & EIGHTBIT_PLAYBACK) // 8-bit case
 			{
 				// If m_sample == 0, we have begun to play a new voice.  Get both the first byte & the second.
 				if (m_sample == 0)
