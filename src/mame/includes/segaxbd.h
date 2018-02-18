@@ -103,7 +103,7 @@ protected:
 
 		// compare/timer chip callbacks
 	void timer_ack_callback();
-	void sound_data_w(uint8_t data);
+	DECLARE_WRITE8_MEMBER(sound_data_w);
 
 	DECLARE_WRITE8_MEMBER(pc_0_w);
 	DECLARE_WRITE8_MEMBER(pd_0_w);

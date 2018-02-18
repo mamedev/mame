@@ -42,6 +42,7 @@ st0016_cpu_device::st0016_cpu_device(const machine_config &mconfig, const char *
 		m_io_space_config("io", ENDIANNESS_LITTLE, 8, 16, 0, address_map_constructor(FUNC(st0016_cpu_device::st0016_cpu_internal_io_map), this)),
 		m_space_config("regs", ENDIANNESS_LITTLE, 8, 16, 0, address_map_constructor(FUNC(st0016_cpu_device::st0016_cpu_internal_map), this)),
 		m_screen(*this, ":screen"),
+		m_rom(*this, DEVICE_SELF),
 		m_game_flag(-1)
 {
 	for (auto & elem : st0016_vregs)
@@ -301,8 +302,8 @@ WRITE8_MEMBER(st0016_cpu_device::st0016_vregs_w)
 		uint32_t length=((st0016_vregs[0xa6]|(st0016_vregs[0xa7]<<8)|((st0016_vregs[0xa8]&0x1f)<<16))+1)<<1;
 
 
-		uint32_t srclen = (memregion(":maincpu")->bytes());
-		uint8_t *mem = memregion(":maincpu")->base();
+		uint32_t srclen = (m_rom->bytes());
+		uint8_t *mem = m_rom->base();
 
 		int xfer_offs = m_dma_offset;
 		if (!m_dma_offs_cb.isnull())

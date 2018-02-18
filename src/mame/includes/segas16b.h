@@ -69,8 +69,8 @@ public:
 
 	// memory mapping
 	void memory_mapper(sega_315_5195_mapper_device &mapper, uint8_t index);
-	uint8_t mapper_sound_r();
-	void mapper_sound_w(uint8_t data);
+	DECLARE_READ8_MEMBER(mapper_sound_r);
+	DECLARE_WRITE8_MEMBER(mapper_sound_w);
 
 	// main CPU read/write handlers
 	DECLARE_WRITE16_MEMBER( rom_5704_bank_w );
