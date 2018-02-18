@@ -147,17 +147,16 @@ ADDRESS_MAP_START(ojankohs_state::ojankoy_io_map)
 ADDRESS_MAP_END
 
 ADDRESS_MAP_START(ojankohs_state::ccasino_io_map)
-	ADDRESS_MAP_GLOBAL_MASK(0xff)
-	AM_RANGE(0x00, 0x00) AM_READ_PORT("system") AM_WRITE(port_select_w)
-	AM_RANGE(0x01, 0x01) AM_READWRITE(keymatrix_p1_r, ojankohs_rombank_w)
-	AM_RANGE(0x02, 0x02) AM_READWRITE(keymatrix_p2_r, ccasino_coinctr_w)
-	AM_RANGE(0x03, 0x03) AM_READ(ccasino_dipsw3_r) AM_WRITE(ojankohs_adpcm_reset_w)
-	AM_RANGE(0x04, 0x04) AM_READ(ccasino_dipsw4_r) AM_WRITE(ojankohs_flipscreen_w)
-	AM_RANGE(0x05, 0x05) AM_WRITE(ojankohs_msm5205_w)
-	AM_RANGE(0x06, 0x06) AM_DEVREAD("aysnd", ay8910_device, data_r)
-	AM_RANGE(0x06, 0x07) AM_DEVWRITE("aysnd", ay8910_device, data_address_w)
-	AM_RANGE(0x08, 0x0f) AM_WRITE(ccasino_palette_w) AM_SHARE("paletteram")     // 16bit address access
-	AM_RANGE(0x10, 0x11) AM_DEVWRITE("gga", vsystem_gga_device, write)
+	AM_RANGE(0x00, 0x00) AM_MIRROR(0xff00) AM_READ_PORT("system") AM_WRITE(port_select_w)
+	AM_RANGE(0x01, 0x01) AM_MIRROR(0xff00) AM_READWRITE(keymatrix_p1_r, ojankohs_rombank_w)
+	AM_RANGE(0x02, 0x02) AM_MIRROR(0xff00) AM_READWRITE(keymatrix_p2_r, ccasino_coinctr_w)
+	AM_RANGE(0x03, 0x03) AM_MIRROR(0xff00) AM_READ(ccasino_dipsw3_r) AM_WRITE(ojankohs_adpcm_reset_w)
+	AM_RANGE(0x04, 0x04) AM_MIRROR(0xff00) AM_READ(ccasino_dipsw4_r) AM_WRITE(ojankohs_flipscreen_w)
+	AM_RANGE(0x05, 0x05) AM_MIRROR(0xff00) AM_WRITE(ojankohs_msm5205_w)
+	AM_RANGE(0x06, 0x06) AM_MIRROR(0xff00) AM_DEVREAD("aysnd", ay8910_device, data_r)
+	AM_RANGE(0x06, 0x07) AM_MIRROR(0xff00) AM_DEVWRITE("aysnd", ay8910_device, data_address_w)
+	AM_RANGE(0x08, 0x0f) AM_SELECT(0xff00) AM_WRITE(ccasino_palette_w)     // 16bit address access
+	AM_RANGE(0x10, 0x11) AM_MIRROR(0xff00) AM_DEVWRITE("gga", vsystem_gga_device, write)
 ADDRESS_MAP_END
 
 ADDRESS_MAP_START(ojankohs_state::ojankoc_io_map)
@@ -812,7 +811,7 @@ MACHINE_CONFIG_START(ojankohs_state::ccasino)
 
 	MCFG_DEVICE_ADD("gga", VSYSTEM_GGA, XTAL(13'333'000)/2) // divider not verified
 
-	MCFG_VIDEO_START_OVERRIDE(ojankohs_state,ojankoy)
+	MCFG_VIDEO_START_OVERRIDE(ojankohs_state,ccasino)
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")

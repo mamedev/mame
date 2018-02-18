@@ -40,7 +40,6 @@ public:
 	void update_scanline(uint16_t scanline);
 	uint32_t screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 
-	void ef9345(address_map &map);
 protected:
 
 	enum class EF9345_MODE {
@@ -87,6 +86,8 @@ private:
 	void makechar_24x40(uint16_t x, uint16_t y);
 	void makechar_12x80(uint16_t x, uint16_t y);
 	void ef9345_exec(uint8_t cmd);
+
+	void ef9345(address_map &map);
 
 	// internal state
 	static const device_timer_id BUSY_TIMER = 0;

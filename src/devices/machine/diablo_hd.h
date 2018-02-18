@@ -14,7 +14,7 @@
 #define DIABLO_HD_0 "diablo0"
 #define DIABLO_HD_1 "diablo1"
 
-extern const device_type DIABLO_HD;
+DECLARE_DEVICE_TYPE(DIABLO_HD, diablo_hd_device)
 
 class diablo_hd_device : public device_t
 {

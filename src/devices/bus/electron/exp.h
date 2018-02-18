@@ -177,7 +177,6 @@ protected:
 
 
 // device type definition
-extern const device_type ELECTRON_EXPANSION_SLOT;
 DECLARE_DEVICE_TYPE(ELECTRON_EXPANSION_SLOT, electron_expansion_slot_device)
 
 SLOT_INTERFACE_EXTERN( electron_expansion_devices );

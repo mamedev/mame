@@ -253,7 +253,7 @@ SOUNDS["YMZ770"] = true
 SOUNDS["MPEG_AUDIO"] = true
 SOUNDS["T6721A"] = true
 SOUNDS["MOS7360"] = true
---SOUNDS["ESQPUMP"] = true
+SOUNDS["ESQPUMP"] = true
 --SOUNDS["VRC6"] = true
 SOUNDS["SB0400"] = true
 SOUNDS["AC97"] = true
@@ -1025,7 +1025,9 @@ files {
 	MAME_DIR .. "src/mame/audio/avalnche.cpp",
 	MAME_DIR .. "src/mame/drivers/badlands.cpp",
 	MAME_DIR .. "src/mame/includes/badlands.h",
+	MAME_DIR .. "src/mame/machine/badlands.cpp",
 	MAME_DIR .. "src/mame/video/badlands.cpp",
+	MAME_DIR .. "src/mame/drivers/badlandsbl.cpp",
 	MAME_DIR .. "src/mame/drivers/bartop52.cpp",
 	MAME_DIR .. "src/mame/drivers/batman.cpp",
 	MAME_DIR .. "src/mame/includes/batman.h",

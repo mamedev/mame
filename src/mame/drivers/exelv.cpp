@@ -124,7 +124,7 @@ public:
 
 TIMER_DEVICE_CALLBACK_MEMBER(exelv_state::exelv_hblank_interrupt)
 {
-	m_tms3556->interrupt(machine());
+	m_tms3556->interrupt();
 }
 
 

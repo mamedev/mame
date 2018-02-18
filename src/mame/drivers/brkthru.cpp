@@ -373,11 +373,11 @@ INTERRUPT_GEN_MEMBER(brkthru_state::vblank_irq)
 MACHINE_CONFIG_START(brkthru_state::brkthru)
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", M6809, MASTER_CLOCK/8)        /* 1.5 MHz ? */
+	MCFG_CPU_ADD("maincpu", MC6809E, MASTER_CLOCK/8)        /* 1.5 MHz ? */
 	MCFG_CPU_PROGRAM_MAP(brkthru_map)
 	MCFG_CPU_VBLANK_INT_DRIVER("screen", brkthru_state,  vblank_irq)
 
-	MCFG_CPU_ADD("audiocpu", M6809, MASTER_CLOCK/8)     /* 1.5 MHz ? */
+	MCFG_CPU_ADD("audiocpu", MC6809, MASTER_CLOCK/2)     /* 1.5 MHz ? */
 	MCFG_CPU_PROGRAM_MAP(sound_map)
 
 

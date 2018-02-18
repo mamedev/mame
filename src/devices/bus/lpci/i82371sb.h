@@ -49,7 +49,6 @@ private:
 };
 
 // device type definition
-extern const device_type I82371SB;
 DECLARE_DEVICE_TYPE(I82371SB, i82371sb_device)
 
 #define MCFG_I82371SB_BOOT_STATE_HOOK(_devcb) \

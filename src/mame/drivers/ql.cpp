@@ -121,7 +121,7 @@ public:
 		m_mdv1(*this, MDV_1),
 		m_mdv2(*this, MDV_2),
 		m_ser1(*this, RS232_A_TAG),
-		m_ser2(*this, RS232_A_TAG),
+		m_ser2(*this, RS232_B_TAG),
 		m_ram(*this, RAM_TAG),
 		m_exp(*this, "exp"),
 		m_cart(*this, "rom"),

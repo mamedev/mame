@@ -1214,7 +1214,7 @@ MACHINE_RESET_MEMBER(homedata_state,reikaids)
 MACHINE_CONFIG_START(homedata_state::mrokumei)
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", M6809, 16000000/4)  /* 4MHz ? */
+	MCFG_CPU_ADD("maincpu", MC6809E, 16000000/4)  /* 4MHz ? */
 	MCFG_CPU_PROGRAM_MAP(mrokumei_map)
 	MCFG_CPU_VBLANK_INT_DRIVER("screen", homedata_state,  homedata_irq) /* also triggered by the blitter */
 
@@ -1261,7 +1261,7 @@ MACHINE_CONFIG_END
 MACHINE_CONFIG_START(homedata_state::reikaids)
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", M6809, 16000000/4)  /* 4MHz ? */
+	MCFG_CPU_ADD("maincpu", MC6809E, 16000000/4)  /* 4MHz ? */
 	MCFG_CPU_PROGRAM_MAP(reikaids_map)
 	MCFG_CPU_VBLANK_INT_DRIVER("screen", homedata_state,  homedata_irq) /* also triggered by the blitter */
 
@@ -1317,7 +1317,7 @@ MACHINE_CONFIG_END
 MACHINE_CONFIG_START(homedata_state::pteacher)
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", M6809, 16000000/4)  /* 4MHz ? */
+	MCFG_CPU_ADD("maincpu", MC6809E, 16000000/4)  /* 4MHz ? */
 	MCFG_CPU_PROGRAM_MAP(pteacher_map)
 	MCFG_CPU_VBLANK_INT_DRIVER("screen", homedata_state,  homedata_irq) /* also triggered by the blitter */
 
@@ -1487,7 +1487,7 @@ GFXDECODE_END
 
 MACHINE_CONFIG_START(homedata_state::mirderby)
 
-	MCFG_CPU_ADD("maincpu", M6809, 16000000/8)  /* 2 Mhz */
+	MCFG_CPU_ADD("maincpu", MC6809E, 16000000/8)  /* 2 Mhz */
 	MCFG_CPU_PROGRAM_MAP(cpu2_map)
 
 
@@ -1496,7 +1496,7 @@ MACHINE_CONFIG_START(homedata_state::mirderby)
 	MCFG_DEVICE_DISABLE()
 	MCFG_CPU_PROGRAM_MAP(cpu0_map)
 
-	MCFG_CPU_ADD("cpu1", M6809, 16000000/8) /* 2 Mhz */
+	MCFG_CPU_ADD("cpu1", MC6809E, 16000000/8) /* 2 Mhz */
 	MCFG_CPU_PROGRAM_MAP(cpu1_map)
 	MCFG_DEVICE_DISABLE()
 	//MCFG_CPU_VBLANK_INT("screen", mirderby_irq)

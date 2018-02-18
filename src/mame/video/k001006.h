@@ -49,7 +49,6 @@ private:
 };
 
 
-extern const device_type K001006;
 DECLARE_DEVICE_TYPE(K001006, k001006_device)
 
 

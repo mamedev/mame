@@ -55,7 +55,6 @@ private:
 
 
 // device type definition
-extern const device_type DECOBSMT;
 DECLARE_DEVICE_TYPE(DECOBSMT, decobsmt_device)
 
 #endif  // MAME_AUDIO_DECOBSMT_H

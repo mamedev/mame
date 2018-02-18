@@ -224,7 +224,7 @@ void compgolf_state::machine_reset()
 MACHINE_CONFIG_START(compgolf_state::compgolf)
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", M6809, 2000000)
+	MCFG_CPU_ADD("maincpu", MC6809E, 2000000) // HD68B09EP
 	MCFG_CPU_PROGRAM_MAP(compgolf_map)
 	MCFG_CPU_VBLANK_INT_DRIVER("screen", compgolf_state,  nmi_line_pulse)
 
