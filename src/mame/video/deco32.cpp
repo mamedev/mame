@@ -61,8 +61,8 @@ void deco32_state::allocate_spriteram(int chip)
 {
 	m_spriteram16[chip] = std::make_unique<uint16_t[]>(0x2000/4);
 	m_spriteram16_buffered[chip] = std::make_unique<uint16_t[]>(0x2000/4);
-	save_pointer(NAME(m_spriteram16[chip].get()), 0x2000/4);
-	save_pointer(NAME(m_spriteram16_buffered[chip].get()), 0x2000/4);
+	save_pointer(NAME(m_spriteram16[chip].get()), 0x2000/4, chip);
+	save_pointer(NAME(m_spriteram16_buffered[chip].get()), 0x2000/4, chip);
 }
 
 void deco32_state::allocate_buffered_palette()
