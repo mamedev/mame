@@ -43,13 +43,14 @@ public:
 	required_region_ptr<uint8_t> m_gfx2;
 
 	timer_device *m_raster_irq_timer;
-	int m_mainCpuIsArm;
+	int m_irqLevel;
 	uint32_t m_mlc_raster_table_1[4*256];
 	uint32_t m_mlc_raster_table_2[4*256];
 	uint32_t m_mlc_raster_table_3[4*256];
 	uint32_t m_vbl_i;
 	int m_lastScanline[9];
 	uint32_t m_colour_mask;
+	uint32_t m_shadow_mask;
 	uint32_t m_alpha_mode;
 
 	std::unique_ptr<uint16_t[]> m_spriteram;

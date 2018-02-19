@@ -192,7 +192,7 @@ WRITE32_MEMBER(deco_mlc_state::eeprom_w)
 TIMER_DEVICE_CALLBACK_MEMBER(deco_mlc_state::interrupt_gen)
 {
 //  logerror("hit scanline IRQ %d (%08x)\n", m_screen->vpos(), info.i);
-	m_maincpu->set_input_line(m_mainCpuIsArm ? ARM_IRQ_LINE : 1, HOLD_LINE);
+	m_maincpu->set_input_line(m_irqLevel, HOLD_LINE);
 }
 
 WRITE32_MEMBER(deco_mlc_state::irq_ram_w)
@@ -225,11 +225,8 @@ WRITE32_MEMBER(deco_mlc_state::irq_ram_w)
 
 	switch (offset*4)
 	{
-	case 0x04:
-		m_alpha_mode = m_irq_ram[0x04/4];
-		return;
 	case 0x10: /* IRQ ack.  Value written doesn't matter */
-		m_maincpu->set_input_line(m_mainCpuIsArm ? ARM_IRQ_LINE : 1, CLEAR_LINE);
+		m_maincpu->set_input_line(m_irqLevel, CLEAR_LINE);
 		return;
 	case 0x14: /* Prepare scanline interrupt */
 		if(m_irq_ram[0x14/4] == -1) // TODO: likely to be anything that doesn't fit into the screen v-pos range.
@@ -920,7 +917,7 @@ DRIVER_INIT_MEMBER(deco_mlc_state,avengrgs)
 	dynamic_cast<sh2_device *>(m_maincpu.target())->sh2drc_add_fastram(0x0200080, 0x02000ff, 0, &m_clip_ram[0]);
 	dynamic_cast<sh2_device *>(m_maincpu.target())->sh2drc_add_fastram(0x0280000, 0x029ffff, 0, &m_vram[0]);
 
-	m_mainCpuIsArm = 0;
+	m_irqLevel = 1;
 	m_maincpu->space(AS_PROGRAM).install_read_handler(0x01089a0, 0x01089a3, read32_delegate(FUNC(deco_mlc_state::avengrgs_speedup_r),this));
 	descramble_sound();
 }
@@ -931,7 +928,7 @@ DRIVER_INIT_MEMBER(deco_mlc_state,mlc)
 	    effective clock rate here to compensate otherwise we have slowdowns in
 	    Skull Fang where there probably shouldn't be. */
 	m_maincpu->set_clock_scale(2.0f);
-	m_mainCpuIsArm = 1;
+	m_irqLevel = ARM_IRQ_LINE;
 	deco156_decrypt(machine());
 	descramble_sound();
 }

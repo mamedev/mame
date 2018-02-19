@@ -19,7 +19,9 @@
 
 VIDEO_START_MEMBER(deco_mlc_state,mlc)
 {
-	m_colour_mask=(0x800 / m_gfxdecode->gfx(0)->granularity()) - 1;
+	int max_color = (0x800 / m_gfxdecode->gfx(0)->granularity());
+	m_colour_mask=max_color - 1;
+	m_shadow_mask=max_color << 1;
 
 //  temp_bitmap = std::make_unique<bitmap_rgb32>(512, 512 );
 	m_buffered_spriteram = std::make_unique<uint16_t[]>(0x3000/4);
@@ -37,10 +39,10 @@ static void mlc_drawgfxzoomline(deco_mlc_state *state,
 		uint32_t* dest,const rectangle &clip,gfx_element *gfx,
 		uint32_t code1,uint32_t code2, uint32_t color,int flipx,int sx,
 		int transparent_color,int use8bpp,
-		int scalex, int alpha, int srcline, int shadowMode  )
+		int scalex, int alpha, int srcline, int shadowMode, int alphaMode  )
 {
 	if (!scalex) return;
-	uint32_t shadowval = shadowMode ? (uint32_t)(~0) : 0;
+	uint32_t shadowval = shadowMode ? 0xffffffff : 0;
 
 	/*
 	scalex and scaley are 16.16 fixed point numbers
@@ -95,7 +97,7 @@ static void mlc_drawgfxzoomline(deco_mlc_state *state,
 			const uint8_t *source1 = code_base1 + (srcline) * gfx->rowbytes();
 			const uint8_t *source2 = code_base2 + (srcline) * gfx->rowbytes();
 			/* no alpha */
-			if (alpha == 0xff)
+			if ((alpha == 0xff) && (!shadowMode))
 			{
 				int x, x_index = x_index_base;
 
@@ -119,8 +121,8 @@ static void mlc_drawgfxzoomline(deco_mlc_state *state,
 					if (use8bpp)
 						c=(c<<4)|source2[x_index>>16];
 
-					 // m_irq_ram[1] & 0xc0 = 0xc0 : Shadow, 0 : Alpha, Other bits unknown
-					if( c != transparent_color ) dest[x] = alpha_blend_r32(dest[x], (state->m_alpha_mode & 0xc0) ? shadowval : pal[c], alpha);
+					 // m_alpha_mode & 0xc0 = 0xc0 : Shadow, 0 : Alpha, Other bits unknown
+					if( c != transparent_color ) dest[x] = alpha_blend_r32(dest[x], (alphaMode & 0xc0) ? shadowval : pal[c], shadowMode ? 0x80 : alpha);
 					x_index += dx;
 				}
 			}
@@ -144,6 +146,7 @@ void deco_mlc_state::draw_sprites( const rectangle &cliprect, int scanline, uint
 	int hibits=0;
 	int tileFormat=0;
 	int rasterMode=0;
+	int shadowMode=0;
 
 	int clipper=0;
 	rectangle user_clip;
@@ -153,7 +156,6 @@ void deco_mlc_state::draw_sprites( const rectangle &cliprect, int scanline, uint
 
 	for (offs = (0x3000/4)-8; offs>=0; offs-=8)
 	{
-		int shadowMode=0;
 		if ((spriteram[offs+0]&0x8000)==0)
 			continue;
 		if ((spriteram[offs+1]&0x2000) && (m_screen->frame_number() & 1))
@@ -223,9 +225,6 @@ void deco_mlc_state::draw_sprites( const rectangle &cliprect, int scanline, uint
 		rasterMode = (spriteram[offs+1]>>10)&0x1;
 
 
-
-
-
 		clipper = (spriteram[offs+1]>>8)&0x3;
 
 		indx = spriteram[offs+0]&0x3fff;
@@ -238,13 +237,11 @@ void deco_mlc_state::draw_sprites( const rectangle &cliprect, int scanline, uint
 		clipper=((clipper&2)>>1)|((clipper&1)<<1); // Swap low two bits
 
 
-
 		int upperclip = (spriteram[offs+1]>>10)&0x2;
 		// this is used on some ingame gfx in stadhr96
 		// to clip the images of your guys on the bases
 		if (upperclip)
 			clipper |= 0x4;
-
 
 
 		int min_y = m_clip_ram[(clipper*4)+0];
@@ -263,10 +260,12 @@ void deco_mlc_state::draw_sprites( const rectangle &cliprect, int scanline, uint
 		user_clip &= cliprect;
 
 		/* Any colours out of range (for the bpp value) trigger 'shadow' mode */
-		if (color & (m_colour_mask+1))
+		shadowMode = (color & (m_shadow_mask)) ? 1 : 0; // shadow mode (OK for skullfng)
+		if ((color & (m_colour_mask+1)) || (shadowMode))
 			alpha=0x80;
 		else
 			alpha=0xff;
+
 		color&=m_colour_mask;
 
 		/* If this bit is set, combine this block with the next one */
@@ -368,6 +367,7 @@ void deco_mlc_state::draw_sprites( const rectangle &cliprect, int scanline, uint
 
 			if (raster_select==1 || raster_select==2 || raster_select==3)
 			{
+				shadowMode = 0; // TODO : Raster enable and shadow mode can't use simultaneously?
 				int irq_base_reg; /* 6, 9, 12  are possible */
 				if (raster_select== 1) irq_base_reg = 6;    // OK upper screen.. left?
 				else if (raster_select== 2) irq_base_reg = 9; // OK upper screen.. main / center
@@ -387,11 +387,7 @@ void deco_mlc_state::draw_sprites( const rectangle &cliprect, int scanline, uint
 			else if (raster_select==0x0)
 			{
 				// possibly disabled?
-				shadowMode = color & ((m_colour_mask+1) << 1); // shadow mode (0x40 : white, 0x00 : black, OK for skullfng)
-				if (shadowMode)
-					alpha = 0x80;
 			}
-
 		}
 
 		xscale *= extra_x_scale;
@@ -526,7 +522,8 @@ void deco_mlc_state::draw_sprites( const rectangle &cliprect, int scanline, uint
 							tile,tile2,
 							color + colorOffset,fx,realxbase,
 							0,
-							use8bppMode,(xscale),alpha, srcline, shadowMode);
+							use8bppMode,(xscale),alpha, srcline,
+							shadowMode, m_alpha_mode);
 
 		}
 
@@ -554,6 +551,7 @@ uint32_t deco_mlc_state::screen_update(screen_device &screen, bitmap_rgb32 &bitm
 //  temp_bitmap->fill(0, cliprect);
 	bitmap.fill(m_palette->pen(0), cliprect); /* Pen 0 fill colour confirmed from Skull Fang level 2 */
 
+	m_alpha_mode = m_irq_ram[0x04/4];
 
 	for (int i=cliprect.min_y;i<=cliprect.max_y;i++)
 	{
