@@ -42,39 +42,35 @@ vsystem_spr2_device::vsystem_spr2_device(const machine_config &mconfig, const ch
 }
 
 //-------------------------------------------------
-//  static_set_gfxdecode_tag: Set the tag of the
+//  set_gfxdecode_tag: Set the tag of the
 //  gfx decoder
 //-------------------------------------------------
 
-void vsystem_spr2_device::static_set_gfxdecode_tag(device_t &device, const char *tag)
+void vsystem_spr2_device::set_gfxdecode_tag(const char *tag)
 {
-	downcast<vsystem_spr2_device &>(device).m_gfxdecode.set_tag(tag);
+	m_gfxdecode.set_tag(tag);
 }
 
 
-void vsystem_spr2_device::set_tile_indirect_cb(device_t &device,vsystem_tile2_indirection_delegate newtilecb)
+void vsystem_spr2_device::set_tile_indirect_cb(vsystem_tile2_indirection_delegate newtilecb)
 {
-	vsystem_spr2_device &dev = downcast<vsystem_spr2_device &>(device);
-	dev.m_newtilecb = newtilecb;
+	m_newtilecb = newtilecb;
 }
 
-void vsystem_spr2_device::set_pritype(device_t &device,int pritype)
+void vsystem_spr2_device::set_pritype(int pritype)
 {
-	vsystem_spr2_device &dev = downcast<vsystem_spr2_device &>(device);
-	dev.m_pritype = pritype;
+	m_pritype = pritype;
 }
 
-void vsystem_spr2_device::set_gfx_region(device_t &device, int gfx_region)
+void vsystem_spr2_device::set_gfx_region(int gfx_region)
 {
-	vsystem_spr2_device &dev = downcast<vsystem_spr2_device &>(device);
-	dev.m_gfx_region = gfx_region;
+	m_gfx_region = gfx_region;
 }
 
-void vsystem_spr2_device::set_offsets(device_t &device, int xoffs, int yoffs)
+void vsystem_spr2_device::set_offsets(int xoffs, int yoffs)
 {
-	vsystem_spr2_device &dev = downcast<vsystem_spr2_device &>(device);
-	dev.m_xoffs = xoffs;
-	dev.m_yoffs = yoffs;
+	m_xoffs = xoffs;
+	m_yoffs = yoffs;
 }
 
 uint32_t vsystem_spr2_device::tile_callback_noindirect(uint32_t tile)

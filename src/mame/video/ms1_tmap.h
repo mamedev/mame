@@ -24,16 +24,16 @@
 	MCFG_MEGASYS1_TILEMAP_COLORBASE(colorbase)
 
 #define MCFG_MEGASYS1_TILEMAP_8X8_SCROLL_FACTOR(scroll_factor) \
-	megasys1_tilemap_device::static_set_8x8_scroll_factor(*device, scroll_factor);
+	downcast<megasys1_tilemap_device &>(*device).set_8x8_scroll_factor(scroll_factor);
 
 #define MCFG_MEGASYS1_TILEMAP_16X16_SCROLL_FACTOR(scroll_factor) \
-	megasys1_tilemap_device::static_set_16x16_scroll_factor(*device, scroll_factor);
+	downcast<megasys1_tilemap_device &>(*device).set_16x16_scroll_factor(scroll_factor);
 
 #define MCFG_MEGASYS1_TILEMAP_BITS_PER_COLOR_CODE(bits) \
-	megasys1_tilemap_device::static_set_bits_per_color_code(*device, bits);
+	downcast<megasys1_tilemap_device &>(*device).set_bits_per_color_code(bits);
 
 #define MCFG_MEGASYS1_TILEMAP_COLORBASE(colorbase) \
-	megasys1_tilemap_device::static_set_colorbase(*device, colorbase);
+	downcast<megasys1_tilemap_device &>(*device).set_colorbase(colorbase);
 
 //**************************************************************************
 //  TYPE DEFINITIONS
@@ -47,11 +47,11 @@ public:
 	// construction/destruction
 	megasys1_tilemap_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
-	// static configuration
-	static void static_set_8x8_scroll_factor(device_t &device, int scroll_factor);
-	static void static_set_16x16_scroll_factor(device_t &device, int scroll_factor);
-	static void static_set_bits_per_color_code(device_t &device, int bits);
-	static void static_set_colorbase(device_t &device, uint16_t colorbase);
+	// configuration
+	void set_8x8_scroll_factor(int scroll_factor);
+	void set_16x16_scroll_factor(int scroll_factor);
+	void set_bits_per_color_code(int bits);
+	void set_colorbase(uint16_t colorbase);
 
 	// memory handlers
 	DECLARE_WRITE16_MEMBER(write);

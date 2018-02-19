@@ -9,14 +9,14 @@
 #include "video/vector.h"
 
 #define MCFG_AVGDVG_VECTOR(_tag) \
-	avgdvg_device::static_set_vector_tag(*device, "^" _tag);
+	downcast<avgdvg_device &>(*device).set_vector_tag("^" _tag);
 
 // ======================> avgdvg_device
 
 class avgdvg_device : public device_t
 {
 public:
-	static void static_set_vector_tag(device_t &device, const char *tag);
+	void set_vector_tag(const char *tag);
 
 	DECLARE_CUSTOM_INPUT_MEMBER(done_r);
 	DECLARE_WRITE8_MEMBER(go_w);

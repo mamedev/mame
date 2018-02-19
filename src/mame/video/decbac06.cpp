@@ -94,13 +94,13 @@ deco_bac06_device::deco_bac06_device(const machine_config &mconfig, const char *
 }
 
 //-------------------------------------------------
-//  static_set_gfxdecode_tag: Set the tag of the
+//  set_gfxdecode_tag: Set the tag of the
 //  gfx decoder
 //-------------------------------------------------
 
-void deco_bac06_device::static_set_gfxdecode_tag(device_t &device, const char *tag)
+void deco_bac06_device::set_gfxdecode_tag(const char *tag)
 {
-	downcast<deco_bac06_device &>(device).m_gfxdecode.set_tag(tag);
+	m_gfxdecode.set_tag(tag);
 }
 
 void deco_bac06_device::device_start()
@@ -134,12 +134,11 @@ void deco_bac06_device::device_reset()
 {
 }
 
-void deco_bac06_device::set_gfx_region_wide(device_t &device, int region8x8, int region16x16, int wide)
+void deco_bac06_device::set_gfx_region_wide(int region8x8, int region16x16, int wide)
 {
-	deco_bac06_device &dev = downcast<deco_bac06_device &>(device);
-	dev.m_gfxregion8x8 = region8x8;
-	dev.m_gfxregion16x16 = region16x16;
-	dev.m_wide = wide;
+	m_gfxregion8x8 = region8x8;
+	m_gfxregion16x16 = region16x16;
+	m_wide = wide;
 }
 
 void deco_bac06_device::set_flip_screen(bool flip)

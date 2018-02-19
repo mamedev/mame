@@ -503,8 +503,8 @@ MACHINE_CONFIG_START(sandscrp_state::sandscrp)
 	MCFG_PALETTE_FORMAT(xGGGGGRRRRRBBBBB)
 
 	MCFG_DEVICE_ADD("view2_0", KANEKO_TMAP, 0)
-	kaneko_view2_tilemap_device::set_gfx_region(*device, 1);
-	kaneko_view2_tilemap_device::set_offset(*device, 0x5b, 0, 256, 224);
+	MCFG_KANEKO_TMAP_GFX_REGION(1)
+	MCFG_KANEKO_TMAP_OFFSET(0x5b, 0, 256, 224)
 	MCFG_KANEKO_TMAP_GFXDECODE("gfxdecode")
 
 	MCFG_DEVICE_ADD("calc1_mcu", KANEKO_HIT, 0)

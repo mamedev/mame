@@ -32,22 +32,22 @@ public:
 	deco16ic_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 	~deco16ic_device() {}
 
-	// static configuration
-	static void static_set_gfxdecode_tag(device_t &device, const char *tag);
-	static void static_set_palette_tag(device_t &device, const char *tag);
-	static void set_bank1_callback(device_t &device, deco16_bank_cb_delegate callback) { downcast<deco16ic_device &>(device).m_bank1_cb = callback; }
-	static void set_bank2_callback(device_t &device, deco16_bank_cb_delegate callback) { downcast<deco16ic_device &>(device).m_bank2_cb = callback; }
-	static void set_split(device_t &device, int split) { downcast<deco16ic_device &>(device).m_split = split; }
-	static void set_pf1_size(device_t &device, int size) { downcast<deco16ic_device &>(device).m_pf1_size = size; }
-	static void set_pf2_size(device_t &device, int size) { downcast<deco16ic_device &>(device).m_pf2_size = size; }
-	static void set_pf1_trans_mask(device_t &device, int mask) { downcast<deco16ic_device &>(device).m_pf1_trans_mask = mask; }
-	static void set_pf2_trans_mask(device_t &device, int mask) { downcast<deco16ic_device &>(device).m_pf2_trans_mask = mask; }
-	static void set_pf1_col_mask(device_t &device, int mask) { downcast<deco16ic_device &>(device).m_pf1_colourmask = mask; }
-	static void set_pf2_col_mask(device_t &device, int mask) { downcast<deco16ic_device &>(device).m_pf2_colourmask = mask; }
-	static void set_pf1_col_bank(device_t &device, int bank) { downcast<deco16ic_device &>(device).m_pf1_colour_bank = bank; }
-	static void set_pf2_col_bank(device_t &device, int bank) { downcast<deco16ic_device &>(device).m_pf2_colour_bank = bank; }
-	static void set_pf12_8x8_bank(device_t &device, int bank) { downcast<deco16ic_device &>(device).m_pf12_8x8_gfx_bank = bank; }
-	static void set_pf12_16x16_bank(device_t &device, int bank) { downcast<deco16ic_device &>(device).m_pf12_16x16_gfx_bank = bank; }
+	// configuration
+	void set_gfxdecode_tag(const char *tag);
+	void set_palette_tag(const char *tag);
+	void set_bank1_callback(deco16_bank_cb_delegate callback) { m_bank1_cb = callback; }
+	void set_bank2_callback(deco16_bank_cb_delegate callback) { m_bank2_cb = callback; }
+	void set_split(int split) { m_split = split; }
+	void set_pf1_size(int size) { m_pf1_size = size; }
+	void set_pf2_size(int size) { m_pf2_size = size; }
+	void set_pf1_trans_mask(int mask) { m_pf1_trans_mask = mask; }
+	void set_pf2_trans_mask(int mask) { m_pf2_trans_mask = mask; }
+	void set_pf1_col_mask(int mask) { m_pf1_colourmask = mask; }
+	void set_pf2_col_mask(int mask) { m_pf2_colourmask = mask; }
+	void set_pf1_col_bank(int bank) { m_pf1_colour_bank = bank; }
+	void set_pf2_col_bank(int bank) { m_pf2_colour_bank = bank; }
+	void set_pf12_8x8_bank(int bank) { m_pf12_8x8_gfx_bank = bank; }
+	void set_pf12_16x16_bank(int bank) { m_pf12_16x16_gfx_bank = bank; }
 
 
 	DECLARE_WRITE16_MEMBER( pf1_data_w );
@@ -173,46 +173,46 @@ DECLARE_DEVICE_TYPE(DECO16IC, deco16ic_device)
 #define MCFG_DECO16IC_SET_SCREEN MCFG_VIDEO_SET_SCREEN
 
 #define MCFG_DECO16IC_BANK1_CB(_class, _method) \
-	deco16ic_device::set_bank1_callback(*device, deco16_bank_cb_delegate(&_class::_method, #_class "::" #_method, this));
+	downcast<deco16ic_device &>(*device).set_bank1_callback(deco16_bank_cb_delegate(&_class::_method, #_class "::" #_method, this));
 
 #define MCFG_DECO16IC_BANK2_CB(_class, _method) \
-	deco16ic_device::set_bank2_callback(*device, deco16_bank_cb_delegate(&_class::_method, #_class "::" #_method, this));
+	downcast<deco16ic_device &>(*device).set_bank2_callback(deco16_bank_cb_delegate(&_class::_method, #_class "::" #_method, this));
 
 #define MCFG_DECO16IC_SPLIT(_split) \
-	deco16ic_device::set_split(*device, _split);
+	downcast<deco16ic_device &>(*device).set_split(_split);
 
 #define MCFG_DECO16IC_PF1_SIZE(_size) \
-	deco16ic_device::set_pf1_size(*device, _size);
+	downcast<deco16ic_device &>(*device).set_pf1_size(_size);
 
 #define MCFG_DECO16IC_PF2_SIZE(_size) \
-	deco16ic_device::set_pf2_size(*device, _size);
+	downcast<deco16ic_device &>(*device).set_pf2_size(_size);
 
 #define MCFG_DECO16IC_PF1_TRANS_MASK(_mask) \
-	deco16ic_device::set_pf1_trans_mask(*device, _mask);
+	downcast<deco16ic_device &>(*device).set_pf1_trans_mask(_mask);
 
 #define MCFG_DECO16IC_PF2_TRANS_MASK(_mask) \
-	deco16ic_device::set_pf2_trans_mask(*device, _mask);
+	downcast<deco16ic_device &>(*device).set_pf2_trans_mask(_mask);
 
 #define MCFG_DECO16IC_PF1_COL_MASK(_mask) \
-	deco16ic_device::set_pf1_col_mask(*device, _mask);
+	downcast<deco16ic_device &>(*device).set_pf1_col_mask(_mask);
 
 #define MCFG_DECO16IC_PF2_COL_MASK(_mask) \
-	deco16ic_device::set_pf2_col_mask(*device, _mask);
+	downcast<deco16ic_device &>(*device).set_pf2_col_mask(_mask);
 
 #define MCFG_DECO16IC_PF1_COL_BANK(_bank) \
-	deco16ic_device::set_pf1_col_bank(*device, _bank);
+	downcast<deco16ic_device &>(*device).set_pf1_col_bank(_bank);
 
 #define MCFG_DECO16IC_PF2_COL_BANK(_bank) \
-	deco16ic_device::set_pf2_col_bank(*device, _bank);
+	downcast<deco16ic_device &>(*device).set_pf2_col_bank(_bank);
 
 #define MCFG_DECO16IC_PF12_8X8_BANK(_bank) \
-	deco16ic_device::set_pf12_8x8_bank(*device, _bank);
+	downcast<deco16ic_device &>(*device).set_pf12_8x8_bank(_bank);
 
 #define MCFG_DECO16IC_PF12_16X16_BANK(_bank) \
-	deco16ic_device::set_pf12_16x16_bank(*device, _bank);
+	downcast<deco16ic_device &>(*device).set_pf12_16x16_bank(_bank);
 
 #define MCFG_DECO16IC_GFXDECODE(_gfxtag) \
-	deco16ic_device::static_set_gfxdecode_tag(*device, "^" _gfxtag);
+	downcast<deco16ic_device &>(*device).set_gfxdecode_tag("^" _gfxtag);
 
 // function definition for a callback
 #define DECO16IC_BANK_CB_MEMBER(_name)     int _name(int bank)

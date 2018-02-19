@@ -349,11 +349,11 @@ void k007121_device::sprites_draw( bitmap_ind16 &bitmap, const rectangle &clipre
 }
 
 //-------------------------------------------------
-//  static_set_palette_tag: Set the tag of the
+//  set_palette_tag: Set the tag of the
 //  palette device
 //-------------------------------------------------
 
-void k007121_device::static_set_palette_tag(device_t &device, const char *tag)
+void k007121_device::set_palette_tag(const char *tag)
 {
-	downcast<k007121_device &>(device).m_palette.set_tag(tag);
+	m_palette.set_tag(tag);
 }

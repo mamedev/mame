@@ -57,15 +57,14 @@ void mb60553_zooming_tilemap_device::device_reset()
 }
 
 
-void mb60553_zooming_tilemap_device::set_gfx_region(device_t &device, int gfxregion)
+void mb60553_zooming_tilemap_device::set_gfx_region(int gfxregion)
 {
-	mb60553_zooming_tilemap_device &dev = downcast<mb60553_zooming_tilemap_device &>(device);
-	dev.m_gfx_region = gfxregion;
+	m_gfx_region = gfxregion;
 }
 
-void mb60553_zooming_tilemap_device::static_set_gfxdecode_tag(device_t &device, const char *tag)
+void mb60553_zooming_tilemap_device::set_gfxdecode_tag(const char *tag)
 {
-	downcast<mb60553_zooming_tilemap_device &>(device).m_gfxdecode.set_tag(tag);
+	m_gfxdecode.set_tag(tag);
 }
 
 

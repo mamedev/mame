@@ -10,28 +10,25 @@ class tc0480scp_device : public device_t
 public:
 	tc0480scp_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
-	// static configuration
-	static void static_set_gfxdecode_tag(device_t &device, const char *tag);
-	static void set_gfx_region(device_t &device, int gfxregion) { downcast<tc0480scp_device &>(device).m_gfxnum = gfxregion; }
-	static void set_tx_region(device_t &device, int txregion) { downcast<tc0480scp_device &>(device).m_txnum = txregion; }
-	static void set_col_base(device_t &device, int col) { downcast<tc0480scp_device &>(device).m_col_base = col; }
-	static void set_offsets(device_t &device, int x_offset, int y_offset)
+	// configuration
+	void set_gfxdecode_tag(const char *tag);
+	void set_gfx_region(int gfxregion) { m_gfxnum = gfxregion; }
+	void set_tx_region(int txregion) { m_txnum = txregion; }
+	void set_col_base(int col) { m_col_base = col; }
+	void set_offsets(int x_offset, int y_offset)
 	{
-		tc0480scp_device &dev = downcast<tc0480scp_device &>(device);
-		dev.m_x_offset = x_offset;
-		dev.m_y_offset = y_offset;
+		m_x_offset = x_offset;
+		m_y_offset = y_offset;
 	}
-	static void set_offsets_tx(device_t &device, int x_offset, int y_offset)
+	void set_offsets_tx(int x_offset, int y_offset)
 	{
-		tc0480scp_device &dev = downcast<tc0480scp_device &>(device);
-		dev.m_text_xoffs = x_offset;
-		dev.m_text_yoffs = y_offset;
+		m_text_xoffs = x_offset;
+		m_text_yoffs = y_offset;
 	}
-	static void set_offsets_flip(device_t &device, int x_offset, int y_offset)
+	void set_offsets_flip(int x_offset, int y_offset)
 	{
-		tc0480scp_device &dev = downcast<tc0480scp_device &>(device);
-		dev.m_flip_xoffs = x_offset;
-		dev.m_flip_yoffs = y_offset;
+		m_flip_xoffs = x_offset;
+		m_flip_yoffs = y_offset;
 	}
 
 	/* When writing a driver, pass zero for the text and flip offsets initially:
@@ -115,24 +112,24 @@ DECLARE_DEVICE_TYPE(TC0480SCP, tc0480scp_device)
 
 
 #define MCFG_TC0480SCP_GFX_REGION(_region) \
-	tc0480scp_device::set_gfx_region(*device, _region);
+	downcast<tc0480scp_device &>(*device).set_gfx_region(_region);
 
 #define MCFG_TC0480SCP_TX_REGION(_region) \
-	tc0480scp_device::set_tx_region(*device, _region);
+	downcast<tc0480scp_device &>(*device).set_tx_region(_region);
 
 #define MCFG_TC0480SCP_OFFSETS(_xoffs, _yoffs) \
-	tc0480scp_device::set_offsets(*device, _xoffs, _yoffs);
+	downcast<tc0480scp_device &>(*device).set_offsets(_xoffs, _yoffs);
 
 #define MCFG_TC0480SCP_OFFSETS_TX(_xoffs, _yoffs) \
-	tc0480scp_device::set_offsets_tx(*device, _xoffs, _yoffs);
+	downcast<tc0480scp_device &>(*device).set_offsets_tx(_xoffs, _yoffs);
 
 #define MCFG_TC0480SCP_OFFSETS_FLIP(_xoffs, _yoffs) \
-	tc0480scp_device::set_offsets_flip(*device, _xoffs, _yoffs);
+	downcast<tc0480scp_device &>(*device).set_offsets_flip(_xoffs, _yoffs);
 
 #define MCFG_TC0480SCP_COL_BASE(_col) \
-	tc0480scp_device::set_col_base(*device, _col);
+	downcast<tc0480scp_device &>(*device).set_col_base(_col);
 
 #define MCFG_TC0480SCP_GFXDECODE(_gfxtag) \
-	tc0480scp_device::static_set_gfxdecode_tag(*device, "^" _gfxtag);
+	downcast<tc0480scp_device &>(*device).set_gfxdecode_tag("^" _gfxtag);
 
 #endif // MAME_VIDEO_TC0480SCP_H

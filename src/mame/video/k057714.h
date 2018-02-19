@@ -10,7 +10,7 @@ class k057714_device : public device_t
 {
 public:
 	k057714_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
-	template <class Object> static devcb_base &static_set_irq_callback(device_t &device, Object &&cb) { return downcast<k057714_device &>(device).m_irq.set_callback(std::forward<Object>(cb)); }
+	template <class Object> devcb_base &set_irq_callback(Object &&cb) { return m_irq.set_callback(std::forward<Object>(cb)); }
 
 	int draw(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 
@@ -64,7 +64,7 @@ private:
 DECLARE_DEVICE_TYPE(K057714, k057714_device)
 
 #define MCFG_K057714_IRQ_CALLBACK(_devcb) \
-	devcb = &k057714_device::static_set_irq_callback(*device, DEVCB_##_devcb);
+	devcb = &downcast<k057714_device &>(*device).set_irq_callback(DEVCB_##_devcb);
 
 
 #endif // MAME_MACHINE_K057714_H

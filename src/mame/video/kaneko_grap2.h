@@ -30,8 +30,8 @@ public:
 
 	int m_chipnum; // used to decide where we write the palette
 
-	static void set_chipnum(device_t &device, int chipnum);
-	static void static_set_palette_tag(device_t &device, const char *tag);
+	void set_chipnum(int chipnum);
+	void set_palette_tag(const char *tag);
 
 	DECLARE_READ16_MEMBER(galpani3_regs1_r);
 	DECLARE_WRITE16_MEMBER(galpani3_regs1_go_w);
@@ -97,7 +97,9 @@ private:
 DECLARE_DEVICE_TYPE(KANEKO_GRAP2, kaneko_grap2_device)
 
 #define MCFG_KANEKO_GRAP2_PALETTE(_palette_tag) \
-	kaneko_grap2_device::static_set_palette_tag(*device, "^" _palette_tag);
+	downcast<kaneko_grap2_device &>(*device).set_palette_tag("^" _palette_tag);
+#define MCFG_KANEKO_GRAP2_CHIPNUM(_chipnum) \
+	downcast<kaneko_grap2_device &>(*device).set_chipnum(_chipnum);
 
 
 #endif // MAME_VIDEO_KANEKO_GRAP2_H

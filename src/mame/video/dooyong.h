@@ -9,29 +9,29 @@
 
 #define MCFG_DOOYONG_ROM_TILEMAP_ADD(tag, gfx, num, rom, offset) \
 		MCFG_DEVICE_ADD(tag, DOOYONG_ROM_TILEMAP, 0) \
-		dooyong_rom_tilemap_device::static_set_gfxdecode_tag(*device, "^" gfx); \
-		dooyong_rom_tilemap_device::static_set_tilerom_tag(*device, "^" rom); \
-		dooyong_rom_tilemap_device::static_set_gfxnum(*device, (num)); \
-		dooyong_rom_tilemap_device::static_set_tilerom_offset(*device, (offset));
+		downcast<dooyong_rom_tilemap_device &>(*device).set_gfxdecode_tag("^" gfx); \
+		downcast<dooyong_rom_tilemap_device &>(*device).set_tilerom_tag("^" rom); \
+		downcast<dooyong_rom_tilemap_device &>(*device).set_gfxnum((num)); \
+		downcast<dooyong_rom_tilemap_device &>(*device).set_tilerom_offset((offset));
 #define MCFG_DOOYONG_ROM_TILEMAP_TRANSPARENT_PEN(pen) \
-		dooyong_rom_tilemap_device::static_set_transparent_pen(*device, (pen));
+		downcast<dooyong_rom_tilemap_device &>(*device).set_transparent_pen((pen));
 #define MCFG_DOOYONG_ROM_TILEMAP_PRIMELLA_CODE_BITS(bits) \
-		dooyong_rom_tilemap_device::static_set_primella_code_bits(*device, (bits));
+		downcast<dooyong_rom_tilemap_device &>(*device).set_primella_code_bits((bits));
 
 #define MCFG_RSHARK_ROM_TILEMAP_ADD(tag, gfx, num, rom, offset, rom2, offset2) \
 		MCFG_DEVICE_ADD(tag, RSHARK_ROM_TILEMAP, 0) \
-		dooyong_rom_tilemap_device::static_set_gfxdecode_tag(*device, "^" gfx); \
-		dooyong_rom_tilemap_device::static_set_tilerom_tag(*device, "^" rom); \
-		dooyong_rom_tilemap_device::static_set_gfxnum(*device, (num)); \
-		dooyong_rom_tilemap_device::static_set_tilerom_offset(*device, (offset)); \
-		dooyong_rom_tilemap_device::static_set_primella_code_bits(*device, 13); \
-		rshark_rom_tilemap_device::static_set_colorrom_tag(*device, "^" rom2); \
-		rshark_rom_tilemap_device::static_set_colorrom_offset(*device, (offset2));
+		downcast<rshark_rom_tilemap_device &>(*device).set_gfxdecode_tag("^" gfx); \
+		downcast<rshark_rom_tilemap_device &>(*device).set_tilerom_tag("^" rom); \
+		downcast<rshark_rom_tilemap_device &>(*device).set_gfxnum((num)); \
+		downcast<rshark_rom_tilemap_device &>(*device).set_tilerom_offset((offset)); \
+		downcast<rshark_rom_tilemap_device &>(*device).set_primella_code_bits(13); \
+		downcast<rshark_rom_tilemap_device &>(*device).set_colorrom_tag("^" rom2); \
+		downcast<rshark_rom_tilemap_device &>(*device).set_colorrom_offset((offset2));
 
 #define MCFG_DOOYONG_RAM_TILEMAP_ADD(tag, gfx, num) \
 		MCFG_DEVICE_ADD(tag, DOOYONG_RAM_TILEMAP, 0) \
-		dooyong_rom_tilemap_device::static_set_gfxdecode_tag(*device, "^" gfx); \
-		dooyong_rom_tilemap_device::static_set_gfxnum(*device, (num));
+		downcast<dooyong_ram_tilemap_device &>(*device).set_gfxdecode_tag("^" gfx); \
+		downcast<dooyong_ram_tilemap_device &>(*device).set_gfxnum((num));
 
 
 DECLARE_DEVICE_TYPE(DOOYONG_ROM_TILEMAP, dooyong_rom_tilemap_device)
@@ -42,8 +42,8 @@ DECLARE_DEVICE_TYPE(DOOYONG_RAM_TILEMAP, dooyong_ram_tilemap_device)
 class dooyong_tilemap_device_base : public device_t
 {
 public:
-	static void static_set_gfxdecode_tag(device_t &device, char const *tag);
-	static void static_set_gfxnum(device_t &device, int gfxnum);
+	void set_gfxdecode_tag(char const *tag);
+	void set_gfxnum(int gfxnum);
 
 	void draw(screen_device &screen, bitmap_ind16 &dest, rectangle const &cliprect, uint32_t flags, uint8_t priority);
 
@@ -71,10 +71,10 @@ class dooyong_rom_tilemap_device : public dooyong_tilemap_device_base
 public:
 	dooyong_rom_tilemap_device(machine_config const &mconfig, char const *tag, device_t *owner, uint32_t clock);
 
-	static void static_set_tilerom_tag(device_t &device, char const *tag);
-	static void static_set_tilerom_offset(device_t &device, int offset);
-	static void static_set_transparent_pen(device_t &device, unsigned pen);
-	static void static_set_primella_code_bits(device_t &device, unsigned bits);
+	void set_tilerom_tag(char const *tag);
+	void set_tilerom_offset(int offset);
+	void set_transparent_pen(unsigned pen);
+	void set_primella_code_bits(unsigned bits);
 
 	DECLARE_WRITE8_MEMBER(ctrl_w);
 
@@ -111,8 +111,8 @@ class rshark_rom_tilemap_device : public dooyong_rom_tilemap_device
 public:
 	rshark_rom_tilemap_device(machine_config const &mconfig, char const *tag, device_t *owner, uint32_t clock);
 
-	static void static_set_colorrom_tag(device_t &device, char const *tag);
-	static void static_set_colorrom_offset(device_t &device, int offset);
+	void set_colorrom_tag(char const *tag);
+	void set_colorrom_offset(int offset);
 
 protected:
 	virtual void device_start() override;

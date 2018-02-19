@@ -22,13 +22,13 @@ deco_zoomspr_device::deco_zoomspr_device(const machine_config &mconfig, const ch
 }
 
 //-------------------------------------------------
-//  static_set_gfxdecode_tag: Set the tag of the
+//  set_gfxdecode_tag: Set the tag of the
 //  gfx decoder
 //-------------------------------------------------
 
-void deco_zoomspr_device::static_set_gfxdecode_tag(device_t &device, const char *tag)
+void deco_zoomspr_device::set_gfxdecode_tag(const char *tag)
 {
-	downcast<deco_zoomspr_device &>(device).m_gfxdecode.set_tag(tag);
+	m_gfxdecode.set_tag(tag);
 }
 
 

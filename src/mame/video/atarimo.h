@@ -21,10 +21,10 @@
 #define MCFG_ATARI_MOTION_OBJECTS_ADD(_tag, _screen, _config) \
 	MCFG_DEVICE_ADD(_tag, ATARI_MOTION_OBJECTS, 0) \
 	MCFG_VIDEO_SET_SCREEN(_screen) \
-	atari_motion_objects_device::static_set_config(*device, _config);
+	downcast<atari_motion_objects_device &>(*device).set_config(_config);
 
 #define MCFG_ATARI_MOTION_OBJECTS_GFXDECODE(_gfxtag) \
-	atari_motion_objects_device::static_set_gfxdecode_tag(*device, "^" _gfxtag);
+	downcast<atari_motion_objects_device &>(*device).set_gfxdecode_tag("^" _gfxtag);
 
 
 //**************************************************************************
@@ -85,9 +85,9 @@ public:
 	// construction/destruction
 	atari_motion_objects_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
-	// static configuration
-	static void static_set_gfxdecode_tag(device_t &device, const char *tag);
-	static void static_set_config(device_t &device, const atari_motion_objects_config &config);
+	// configuration
+	void set_gfxdecode_tag(const char *tag);
+	void set_config(const atari_motion_objects_config &config);
 
 	// getters
 	int bank() const { return m_bank; }

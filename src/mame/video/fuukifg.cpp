@@ -16,9 +16,9 @@ fuukivid_device::fuukivid_device(const machine_config &mconfig, const char *tag,
 {
 }
 
-void fuukivid_device::static_set_gfxdecode_tag(device_t &device, const char *tag)
+void fuukivid_device::set_gfxdecode_tag(const char *tag)
 {
-	downcast<fuukivid_device &>(device).m_gfxdecode.set_tag(tag);
+	m_gfxdecode.set_tag(tag);
 }
 
 

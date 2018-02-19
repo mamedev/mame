@@ -12,7 +12,7 @@
 
 #define MCFG_S24TILE_DEVICE_ADD(_tag, tile_mask) \
 	MCFG_DEVICE_ADD(_tag, S24TILE, 0) \
-	segas24_tile_device::static_set_tile_mask(*device, tile_mask);
+	downcast<segas24_tile_device &>(*device).set_tile_mask(tile_mask);
 
 #define MCFG_S24SPRITE_DEVICE_ADD(_tag) \
 	MCFG_DEVICE_ADD(_tag, S24SPRITE, 0)
@@ -31,8 +31,8 @@ class segas24_tile_device : public device_t, public device_gfx_interface
 public:
 	segas24_tile_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
-	// static configuration
-	static void static_set_tile_mask(device_t &device, uint16_t tile_mask);
+	// configuration
+	void set_tile_mask(uint16_t tile_mask);
 
 	DECLARE_READ16_MEMBER(tile_r);
 	DECLARE_WRITE16_MEMBER(tile_w);
