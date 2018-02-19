@@ -69,6 +69,7 @@ public:
 		m_bankedroms(*this, "bankedroms"),
 		m_rombank(*this, "rombank%u", 1),
 		m_soundbank(*this, "soundbank"),
+		m_okibank(*this, "okibank"),
 		m_znmcu_dataout(1),
 		m_znmcu_dsrout(1)
 	{
@@ -188,6 +189,7 @@ public:
 	void jdredd_map(address_map &map);
 	void nbajamex_map(address_map &map);
 	void nbajamex_bank_map(address_map &map);
+	void oki_map(address_map &map);
 	void psarc_snd_map(address_map &map);
 	void qsound_map(address_map &map);
 	void qsound_portmap(address_map &map);
@@ -230,6 +232,7 @@ private:
 	optional_memory_region m_bankedroms;
 	optional_memory_bank_array<2> m_rombank;
 	optional_memory_bank m_soundbank;
+	optional_memory_bank m_okibank;
 
 	int m_cat702_dataout[2];
 	int m_znmcu_dataout;
