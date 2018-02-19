@@ -550,7 +550,14 @@ READ32_MEMBER(model2_state::fifoctl_r)
 
 READ32_MEMBER(model2_state::videoctl_r)
 {
-	return ((m_screen->frame_number() & 1) << 2) | (m_videocontrol & 3);
+	uint8_t framenum;
+	
+	if(m_render_mode == false)
+		framenum = (m_screen->frame_number() & 2) << 1;
+	else
+		framenum = (m_screen->frame_number() & 1) << 2;
+	
+	return (framenum) | (m_videocontrol & 3);
 }
 
 WRITE32_MEMBER(model2_state::videoctl_w)
@@ -1387,7 +1394,11 @@ WRITE32_MEMBER(model2_state::copro_w)
 
 WRITE32_MEMBER(model2_state::mode_w)
 {
-	osd_printf_debug("Mode = %08X\n", data);
+	// ---- -x-- (1) 60 Hz mode
+	//           (0) 30 Hz mode - skytargt, desert, vstriker, vcop
+	// ---- ---x Test Mode (Host can "access memories that are always being reloaded")
+	m_render_mode = bool(BIT(data,2));
+//	osd_printf_debug("Mode = %08X\n", data);
 }
 
 WRITE32_MEMBER(model2_state::model2o_tex_w0)

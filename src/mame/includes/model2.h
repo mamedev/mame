@@ -292,6 +292,9 @@ public:
 	
 protected:
 	virtual void video_start() override;
+	
+private:
+	bool m_render_mode;
 };
 
 
