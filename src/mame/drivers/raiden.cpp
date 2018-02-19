@@ -398,7 +398,11 @@ MACHINE_CONFIG_START(raiden_state::raidenb)
 
 	/* basic machine hardware */
 	MCFG_CPU_MODIFY("maincpu")
+	MCFG_CPU_CLOCK(XTAL(32'000'000) / 4) // Xtal and clock verified, real hw has heavy slow downs, sometimes making the game borderline unplayable
 	MCFG_CPU_PROGRAM_MAP(raidenb_main_map)
+
+	MCFG_CPU_MODIFY("sub")
+	MCFG_CPU_CLOCK(XTAL(32'000'000) / 4) // Xtal and clock verified
 
 	/* video hardware */
 	MCFG_VIDEO_START_OVERRIDE(raiden_state,raidenb)
