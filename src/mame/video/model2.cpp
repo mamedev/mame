@@ -1969,7 +1969,7 @@ static uint32_t * geo_object_data( geo_state *geo, uint32_t opcode, uint32_t *in
 	if ( oba & 0x01000000 )
 	{
 		/* Fast polygon RAM */
-		obp = &geo->polygon_ram0[oba & 0x7FFF];
+		obp = &geo->polygon_ram1[oba & 0x7FFF];
 	}
 	else if ( oba & 0x00800000 )
 	{
@@ -1979,7 +1979,7 @@ static uint32_t * geo_object_data( geo_state *geo, uint32_t opcode, uint32_t *in
 	else
 	{
 		/* Slow Polygon RAM */
-		obp = &geo->polygon_ram1[oba & 0x7FFF];
+		obp = &geo->polygon_ram0[oba & 0x7FFF];
 	}
 
 	switch( geo->mode & 3 )
@@ -2135,12 +2135,12 @@ static uint32_t * geo_polygon_data( geo_state *geo, uint32_t opcode, uint32_t *i
 	if ( address & 0x01000000 )
 	{
 		/* Fast polygon RAM */
-		p = &geo->polygon_ram0[address & 0x7FFF];
+		p = &geo->polygon_ram1[address & 0x7FFF];
 	}
 	else
 	{
 		/* Slow Polygon RAM */
-		p = &geo->polygon_ram1[address & 0x7FFF];
+		p = &geo->polygon_ram0[address & 0x7FFF];
 	}
 
 	/* read the count */
