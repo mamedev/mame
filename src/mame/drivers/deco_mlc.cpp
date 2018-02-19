@@ -94,11 +94,12 @@
         avengrgs - doesn't generate enough line interrupts?
         ddream95 seems to have a dual screen mode(??)
         hoops** - crash entering test mode (regression from 0.113 era?)
-		skullfng - slowdowns not verified from real PCB, Random hangs at test mode
+        skullfng - slowdowns not verified from real PCB, Random hangs at test mode
 
-	Graphic TODO:
-		blending, raster effect features isn't fully emulated currently
-		Not verified : Can sprites effect 8bpp and alpha blending simultaneously?
+    Graphic TODO:
+        blending, raster effect features isn't fully emulated currently
+        Not verified : Can sprites effect 8bpp and alpha blending simultaneously?
+        Not verified what palette highest bits actually doing
 
     Driver by Bryan McPhail, bmcphail@tendril.co.uk, thank you to Avedis and The Guru.
 
@@ -207,7 +208,7 @@ WRITE32_MEMBER(deco_mlc_state::irq_ram_w)
 		avengrgs : 0x00000cd3
 		stadhr96 : 0x000028f3
 
-	Word 1 : 0xc0 at shadow, 0x00 at alpha (ok for skullfng), Other bits unknown
+	Word 1 : 0xc0 at shadow, 0x00 at alpha, Other bits unknown
 		skullfng : 0x000000c0 or 0x00000000
 		hoops**  : 0xfffffffc
 		avengrgs : 0xffffffff
@@ -224,6 +225,9 @@ WRITE32_MEMBER(deco_mlc_state::irq_ram_w)
 
 	switch (offset*4)
 	{
+	case 0x04:
+		m_alpha_mode = m_irq_ram[0x04/4];
+		return;
 	case 0x10: /* IRQ ack.  Value written doesn't matter */
 		m_maincpu->set_input_line(m_mainCpuIsArm ? ARM_IRQ_LINE : 1, CLEAR_LINE);
 		return;
@@ -504,7 +508,7 @@ MACHINE_CONFIG_START(deco_mlc_state::avengrgs)
 	MCFG_SCREEN_REFRESH_RATE(58)
 	MCFG_SCREEN_SIZE(40*8, 32*8)
 	MCFG_SCREEN_VISIBLE_AREA(0*8, 40*8-1, 1*8, 31*8-1)
-	MCFG_SCREEN_UPDATE_DRIVER(deco_mlc_state, screen_update_mlc)
+	MCFG_SCREEN_UPDATE_DRIVER(deco_mlc_state, screen_update)
 	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE(deco_mlc_state, screen_vblank_mlc))
 	MCFG_SCREEN_VIDEO_ATTRIBUTES(VIDEO_UPDATE_SCANLINE)
 
@@ -539,7 +543,7 @@ MACHINE_CONFIG_START(deco_mlc_state::mlc)
 	MCFG_SCREEN_REFRESH_RATE(58)
 	MCFG_SCREEN_SIZE(40*8, 32*8)
 	MCFG_SCREEN_VISIBLE_AREA(0*8, 40*8-1, 1*8, 31*8-1)
-	MCFG_SCREEN_UPDATE_DRIVER(deco_mlc_state, screen_update_mlc)
+	MCFG_SCREEN_UPDATE_DRIVER(deco_mlc_state, screen_update)
 	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE(deco_mlc_state, screen_vblank_mlc))
 	MCFG_SCREEN_VIDEO_ATTRIBUTES(VIDEO_UPDATE_SCANLINE)
 

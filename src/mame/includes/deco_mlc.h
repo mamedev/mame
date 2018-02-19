@@ -50,6 +50,7 @@ public:
 	uint32_t m_vbl_i;
 	int m_lastScanline[9];
 	uint32_t m_colour_mask;
+	uint32_t m_alpha_mode;
 
 	std::unique_ptr<uint16_t[]> m_spriteram;
 	std::unique_ptr<uint16_t[]> m_spriteram_spare;
@@ -77,7 +78,7 @@ public:
 	DECLARE_DRIVER_INIT(avengrgs);
 	DECLARE_MACHINE_RESET(mlc);
 	DECLARE_VIDEO_START(mlc);
-	uint32_t screen_update_mlc(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
+	uint32_t screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 	DECLARE_WRITE_LINE_MEMBER(screen_vblank_mlc);
 	TIMER_DEVICE_CALLBACK_MEMBER(interrupt_gen);
 	void draw_sprites( const rectangle &cliprect, int scanline, uint32_t* dest);

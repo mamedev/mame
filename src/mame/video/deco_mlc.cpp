@@ -29,7 +29,7 @@ VIDEO_START_MEMBER(deco_mlc_state,mlc)
 	save_pointer(NAME(m_spriteram.get()), 0x3000/4);
 	save_pointer(NAME(m_spriteram_spare.get()), 0x3000/4);
 	save_pointer(NAME(m_buffered_spriteram.get()), 0x3000/4);
-
+	save_item(NAME(m_alpha_mode));
 }
 
 
@@ -37,9 +37,10 @@ static void mlc_drawgfxzoomline(deco_mlc_state *state,
 		uint32_t* dest,const rectangle &clip,gfx_element *gfx,
 		uint32_t code1,uint32_t code2, uint32_t color,int flipx,int sx,
 		int transparent_color,int use8bpp,
-		int scalex, int alpha, int srcline  )
+		int scalex, int alpha, int srcline, int shadowMode  )
 {
 	if (!scalex) return;
+	uint32_t shadowval = shadowMode ? (uint32_t)(~0) : 0;
 
 	/*
 	scalex and scaley are 16.16 fixed point numbers
@@ -119,7 +120,7 @@ static void mlc_drawgfxzoomline(deco_mlc_state *state,
 						c=(c<<4)|source2[x_index>>16];
 
 					 // m_irq_ram[1] & 0xc0 = 0xc0 : Shadow, 0 : Alpha, Other bits unknown
-					if( c != transparent_color ) dest[x] = alpha_blend_r32(dest[x], (m_irq_ram[1] & 0xc0) ? 0 : pal[c], alpha);
+					if( c != transparent_color ) dest[x] = alpha_blend_r32(dest[x], (state->m_alpha_mode & 0xc0) ? shadowval : pal[c], alpha);
 					x_index += dx;
 				}
 			}
@@ -152,6 +153,7 @@ void deco_mlc_state::draw_sprites( const rectangle &cliprect, int scanline, uint
 
 	for (offs = (0x3000/4)-8; offs>=0; offs-=8)
 	{
+		int shadowMode=0;
 		if ((spriteram[offs+0]&0x8000)==0)
 			continue;
 		if ((spriteram[offs+1]&0x2000) && (m_screen->frame_number() & 1))
@@ -385,6 +387,9 @@ void deco_mlc_state::draw_sprites( const rectangle &cliprect, int scanline, uint
 			else if (raster_select==0x0)
 			{
 				// possibly disabled?
+				shadowMode = color & ((m_colour_mask+1) << 1); // shadow mode (0x40 : white, 0x00 : black, OK for skullfng)
+				if (shadowMode)
+					alpha = 0x80;
 			}
 
 		}
@@ -521,7 +526,7 @@ void deco_mlc_state::draw_sprites( const rectangle &cliprect, int scanline, uint
 							tile,tile2,
 							color + colorOffset,fx,realxbase,
 							0,
-							use8bppMode,(xscale),alpha, srcline);
+							use8bppMode,(xscale),alpha, srcline, shadowMode);
 
 		}
 
@@ -544,7 +549,7 @@ WRITE_LINE_MEMBER(deco_mlc_state::screen_vblank_mlc)
 	}
 }
 
-uint32_t deco_mlc_state::screen_update_mlc(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
+uint32_t deco_mlc_state::screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
 {
 //  temp_bitmap->fill(0, cliprect);
 	bitmap.fill(m_palette->pen(0), cliprect); /* Pen 0 fill colour confirmed from Skull Fang level 2 */
