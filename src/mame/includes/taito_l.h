@@ -30,8 +30,7 @@ public:
 	u8 *       m_shared_ram;
 
 	/* video-related */
-	tilemap_t *m_bg_tilemap[0];
-	tilemap_t *m_bg_tilemap[1];
+	tilemap_t *m_bg_tilemap[2];
 	tilemap_t *m_tx_tilemap;
 	std::unique_ptr<u8[]> m_buff_spriteram;
 	int m_cur_ctrl;
@@ -46,7 +45,7 @@ public:
 	int m_irq_enable;
 	int m_last_irq_level;
 	int m_high;
-
+	
 	DECLARE_WRITE8_MEMBER(irq_adr_w);
 	DECLARE_READ8_MEMBER(irq_adr_r);
 	DECLARE_WRITE8_MEMBER(irq_enable_w);
@@ -62,6 +61,7 @@ public:
 	DECLARE_READ8_MEMBER(taitol_bankc_r);
 	DECLARE_WRITE8_MEMBER(taitol_control_w);
 	DECLARE_READ8_MEMBER(taitol_control_r);
+	DECLARE_WRITE8_MEMBER(vram_w);
 	template<int Offset> TILE_GET_INFO_MEMBER(get_tile_info);
 	TILE_GET_INFO_MEMBER(get_tx_tile_info);
 	DECLARE_MACHINE_START(taito_l);
