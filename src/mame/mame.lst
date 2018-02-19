@@ -11606,6 +11606,9 @@ dsb46                           //
 @source:dual68.cpp
 dual68                          //
 
+@source:duet16.cpp
+duet16                          //
+
 @source:dunhuang.cpp
 dunhuang                        // (c) 1995
 

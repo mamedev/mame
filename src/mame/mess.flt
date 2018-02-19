@@ -180,6 +180,7 @@ dps1.cpp
 dragon.cpp
 dsb46.cpp
 dual68.cpp
+duet16.cpp
 dvk_kcgd.cpp
 dvk_ksm.cpp
 e100.cpp
