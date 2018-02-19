@@ -828,7 +828,7 @@ uint32_t seta_state::screen_update_seta_no_layers(screen_device &screen, bitmap_
 void seta_state::seta_layers_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect, int sprite_bank_size, int sprite_setac )
 {
 	int layers_ctrl = -1;
-	int bank[2], x[2]=0, y[2]=0;
+	int bank[2], x[2], y[2];
 	int layer;
 
 	int order   =   0;
@@ -889,6 +889,11 @@ void seta_state::seta_layers_update(screen_device &screen, bitmap_ind16 &bitmap,
 			m_tilemap[layer][1]->set_scrollx(0, x[layer]);
 			m_tilemap[layer][0]->set_scrolly(0, y[layer]);
 			m_tilemap[layer][1]->set_scrolly(0, y[layer]);
+		}
+		else
+		{
+			x[layer] = 0;
+			y[layer] = 0;
 		}
 	}
 
