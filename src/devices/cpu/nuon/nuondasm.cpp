@@ -82,7 +82,7 @@
   1000 1xxx xxxx xxxx . xxxx xxxx xxxx x1CC . f110 10cc cvvv vvvv                        [ecu] bra cC, pc + #xv/31s << 1, nop (asm only wants 28 bits?)
   1000 1xxx xxxx xxxx . vvvv vvvv vvvv vvvv . f111 01ww wwwn n1ab                        [rcu] addr #xwv/32s, rx
 
-  1000 1xxx xxxx xxxx . xxxx xxx0 0000 0000 . 1001 0000 000v vvvv . 101f 0100 wwww wwww  [ecu] jsr cc, #xwv/31u << 1
+  1000 1xxx xxxx xxxx . xxxx xxx0 0000 0000 . 1001 00cc cccv vvvv . 101f 0100 wwww wwww  [ecu] jsr cc, #xwv/31u << 1
   1000 1xxx xxxx xxxx . xxxx xxxx xxx0 0qmm . 1001 01oo ooov vvvv . 101f 111p pppw wwww  [mem] st_s #xwv/32u, 20000000 + qpom/12u << 2  
   1000 1xxx xxxx xxxx . xxxx xxxx xxx0 1qmm . 1001 01oo ooov vvvv . 101f 111p pppw wwww  [mem] st_s #xwv/32u, 20100000 + qpom/12u << 2  
   1000 1xxx xxxx xxxx . xxxx xxxx xxx1 0qmm . 1001 01oo ooov vvvv . 101f 111p pppw wwww  [mem] st_s #xwv/32u, 20500000 + qpom/12u << 2  
@@ -94,11 +94,11 @@
   1000 1xxx xxxx xxxx . xxxx xxxx xxxx xxxx . 1001 10vv vvvn nnnn . 1011 1110 0010 0000  [alu] cmpwc #xv/32s, rn
   1000 1xxx xxxx xxxx . xxxx xxxx xxxx xxxx . 1001 10nn nnnv vvvv . 1011 1110 1000 0000  [alu] cmpwc rn, #xv/32s
 
-  1001 00cc cccv vvvv . 101f 000w wwww wwww                                              [ecu] bra cc, pc + wv/14s
+  1001 00cc cccv vvvv . 101f 000w wwww wwww                                              [ecu] bra cc, pc + wv/14s << 1
   1001 00cc cccv vvvv . 101f 0100 0www wwww                                              [ecu] jsr cc, 20200000 + wv/12u << 1
   1001 00cc cccv vvvv . 101f 0101 0www wwww                                              [ecu] jsr cc, 20300000 + wv/12u << 1
   1001 00cc cccn nnnn . 101f 0111 0000 0000                                              [ecu] jsr cc, (rn)
-  1001 00cc cccv vvvv . 101f 100w wwww wwww                                              [ecu] bra cc, pc + wv/14s, nop
+  1001 00cc cccv vvvv . 101f 100w wwww wwww                                              [ecu] bra cc, pc + wv/14s << 1, nop
   1001 00cc cccv vvvv . 101f 1100 0www wwww                                              [ecu] jsr cc, 20200000 + wv/12u << 1, nop
   1001 00cc cccv vvvv . 101f 1101 0www wwww                                              [ecu] jsr cc, 20300000 + wv/12u << 1, nop
   1001 00cc cccn nnnn . 101f 1111 0000 0000                                              [ecu] jsr cc, (rn), nop
@@ -132,9 +132,9 @@
   1001 10mm mmmo oooo . 1011 0111 000n nnnn                                              [alu] as >>ro, rm, rn
   1001 10mm mmmn nnnn . 1011 0111 001d dddd                                              [alu] asl #(32 - (d/5u) & 31, rm, rn
   1001 10mm mmmn nnnn . 1011 0111 010d dddd                                              [alu] asr #d/5u, rm, rn
-  1001 10nn nnnm mmmm . 1011 1000 000v vvvv                                              [alu] bits #v, >>rm, rn
-  1001 10nn nnnd dddd . 1011 1000 001v vvvv                                              [alu] bits #v, >>#d, rn
-  1001 10oo ooom mmmm . 1011 1000 0100 0000                                              [alu] butt ro, rm, rn
+  1001 10nn nnnm mmmm . 1011 1000 000v vvvv                                              [alu] bits #v/5u, >>rm, rn
+  1001 10nn nnnd dddd . 1011 1000 001v vvvv                                              [alu] bits #v/5u, >>#d/5u, rn
+  1001 10oo ooom mmmm . 1011 1000 010n nnnn                                              [alu] butt ro, rm, rn
   1001 10oo ooom mmmm . 1011 1100 000n nnnn                                              [alu] addwc ro, rm, rn
   1001 10vv vvvm mmmm . 1011 1100 001n nnnn                                              [alu] addwc #v/5u, rm, rn
   1001 10vv vvvn nnnn . 1011 1100 010w wwww                                              [alu] addwc #wv/10u, rn
@@ -161,7 +161,7 @@ offs_t nuon_disassembler::disassemble(std::ostream &stream, offs_t pc, const dat
 	std::string res;
 	offs_t bpc = pc;
 	bool cont = true;
-	while(cont) {
+	for(int count = 0; count < 5 && cont; count++) {
 		if(!res.empty())
 			res = res + " ; ";
 		std::string packet = parse_packet(opcodes, pc, bpc, cont);
@@ -298,7 +298,7 @@ std::string nuon_disassembler::parse_packet(const data_buffer &opcodes, offs_t &
 		if(m(opc1, 0x7c00, 0x5800)) return util::string_format("mv_s r%d, (r%d)", b(opc1, 0, 5, 0), b(opc1, 5, 5, 0));
 		if(m(opc1, 0x7c00, 0x5c00)) return util::string_format("mv_s #%s, (r%d)", u2x(b(opc1, 0, 5, 0), 5), b(opc1, 5, 5, 0));
 		if(m(opc1, 0x7c00, 0x6800)) return util::string_format("bra %s%s", cc(b(opc1, 7, 3, 2), true), reg(bpc + s2i(b(opc1, 0, 7, 1), 8)));
-		if(m(opc1, 0x7c00, 0x6c00)) return util::string_format("bra %s", cc(b(opc1, 7, 3, 2), true), reg(bpc + s2i(b(opc1, 0, 7, 1), 8)));
+		if(m(opc1, 0x7c00, 0x6c00)) return util::string_format("bra %s%s", cc(b(opc1, 7, 3, 2), true), reg(bpc + s2i(b(opc1, 0, 7, 1), 8)));
 		if(m(opc1, 0x7fff, 0x7001)) return util::string_format("halt");
 		if(m(opc1, 0x7c04, 0x7400)) return dec(opc1, util::string_format("addr r%d, %s", b(opc1, 5, 5, 0), rx(b(opc1, 3, 2, 0))));
 		if(m(opc1, 0x7c04, 0x7404)) return dec(opc1, util::string_format("addr %s << 16, %s", u2x(b(opc1, 5, 5, 0), 5), rx(b(opc1, 3, 2, 0))));
@@ -324,11 +324,11 @@ std::string nuon_disassembler::parse_packet(const data_buffer &opcodes, offs_t &
 		pc += 4;
 
 		// 32-bit ecu instructions
-		if(m(opc1, 0xfc00, 0x9000) && m(opc2, 0xee00, 0xa000)) return util::string_format("bra %s%s", cc(b(opc1, 5, 5, 0), true), reg(bpc + s2i(b(opc2, 0, 9, 5) | b(opc1, 0, 5, 0), 14)));
+		if(m(opc1, 0xfc00, 0x9000) && m(opc2, 0xee00, 0xa000)) return util::string_format("bra %s%s", cc(b(opc1, 5, 5, 0), true), reg(bpc + s2i(b(opc2, 0, 9, 6) | b(opc1, 0, 5, 1), 15)));
 		if(m(opc1, 0xfc00, 0x9000) && m(opc2, 0xef80, 0xa400)) return util::string_format("jsr %s%s", cc(b(opc1, 5, 5, 0), true), reg(0x20200000 | b(opc2, 0, 7, 5) | b(opc1, 0, 5, 0)));
 		if(m(opc1, 0xfc00, 0x9000) && m(opc2, 0xef80, 0xa500)) return util::string_format("jsr %s%s", cc(b(opc1, 5, 5, 0), true), reg(0x20300000 | b(opc2, 0, 7, 5) | b(opc1, 0, 5, 0)));
 		if(m(opc1, 0xfc00, 0x9000) && m(opc2, 0xefff, 0xa700)) return util::string_format("jsr %s(r%d)", cc(b(opc1, 5, 5, 0), true), b(opc1, 0, 5, 0));
-		if(m(opc1, 0xfc00, 0x9000) && m(opc2, 0xee00, 0xa800)) return util::string_format("bra %s%s, nop", cc(b(opc1, 5, 5, 0), true), reg(bpc + s2i(b(opc2, 0, 9, 5) | b(opc1, 0, 5, 0), 14)));
+		if(m(opc1, 0xfc00, 0x9000) && m(opc2, 0xee00, 0xa800)) return util::string_format("bra %s%s, nop", cc(b(opc1, 5, 5, 0), true), reg(bpc + s2i(b(opc2, 0, 9, 6) | b(opc1, 0, 5, 1), 15)));
 		if(m(opc1, 0xfc00, 0x9000) && m(opc2, 0xef80, 0xaa00)) return util::string_format("jsr %s%s, nop", cc(b(opc1, 5, 5, 0), true), reg(0x20200000 | b(opc2, 0, 7, 5) | b(opc1, 0, 5, 0)));
 		if(m(opc1, 0xfc00, 0x9000) && m(opc2, 0xef80, 0xad00)) return util::string_format("jsr %s%s, nop", cc(b(opc1, 5, 5, 0), true), reg(0x20300000 | b(opc2, 0, 7, 5) | b(opc1, 0, 5, 0)));
 		if(m(opc1, 0xfc00, 0x9000) && m(opc2, 0xefff, 0xaf00)) return util::string_format("jsr %s(r%d), nop", cc(b(opc1, 5, 5, 0), true), b(opc1, 0, 5, 0));
@@ -346,7 +346,44 @@ std::string nuon_disassembler::parse_packet(const data_buffer &opcodes, offs_t &
 
 		// 32-bit alu instructions
 		if(m(opc1, 0xfc00, 0x9800) && m(opc2, 0xffe0, 0xb000)) return util::string_format("add r%d, r%d, r%d", b(opc1, 5, 5, 0), b(opc1, 0, 5, 0), b(opc2, 0, 5, 0));
-		
+		if(m(opc1, 0xfc00, 0x9800) && m(opc2, 0xffe0, 0xb020)) return util::string_format("add #%s, r%d, r%d", u2x(b(opc1, 5, 5, 0), 5), b(opc1, 0, 5, 0), b(opc2, 0, 5, 0));
+		if(m(opc1, 0xfc00, 0x9800) && m(opc2, 0xffe0, 0xb040)) return util::string_format("add #%s, r%d", u2x(b(opc2, 0, 5, 5) | b(opc1, 5, 5, 0), 10), b(opc1, 0, 5, 0));
+		if(m(opc1, 0xfc00, 0x9800) && m(opc2, 0xffe0, 0xb060)) return util::string_format("add #%s, >>#%d, r%d", u2x(b(opc1, 5, 5, 0), 5), s2x(b(opc2, 0, 5, 0), 5), b(opc1, 0, 5, 0));
+		if(m(opc1, 0xfc00, 0x9800) && m(opc2, 0xffe0, 0xb0a0)) return util::string_format("add r%d, >>#%d, r%d", b(opc1, 5, 5, 0), s2x(b(opc2, 0, 5, 0), 5), b(opc1, 0, 5, 0));
+		if(m(opc1, 0xfc63, 0x9800) && m(opc2, 0xffe3, 0xb0c0)) return util::string_format("add_sv v%d, v%d, v%d", b(opc1, 7, 3, 0), b(opc1, 2, 3, 0), b(opc2, 2, 3, 0));
+		if(m(opc1, 0xfc63, 0x9800) && m(opc2, 0xffe3, 0xb0e0)) return util::string_format("add_p v%d, v%d, v%d", b(opc1, 7, 3, 0), b(opc1, 2, 3, 0), b(opc2, 2, 3, 0));
+		if(m(opc1, 0xfc00, 0x9800) && m(opc2, 0xffe0, 0xb240)) return util::string_format("cmp #%s, r%d", u2x(b(opc2, 0, 5, 5) | b(opc1, 5, 5, 0), 10), b(opc1, 0, 5, 0));
+		if(m(opc1, 0xfc00, 0x9800) && m(opc2, 0xffe0, 0xb260)) return util::string_format("cmp #%s, >>#%d, r%d", u2x(b(opc1, 5, 5, 0), 5), s2x(b(opc2, 0, 5, 0), 5), b(opc1, 0, 5, 0));
+		if(m(opc1, 0xfc00, 0x9800) && m(opc2, 0xffff, 0xb280)) return util::string_format("cmp r%d, #%s", b(opc1, 5, 5, 0), u2x(b(opc1, 0, 5, 0), 5));
+		if(m(opc1, 0xfc00, 0x9800) && m(opc2, 0xffe0, 0xb2a0)) return util::string_format("cmp r%d, >>#%d, r%d", b(opc1, 5, 5, 0), s2x(b(opc2, 0, 5, 0), 5), b(opc1, 0, 5, 0));
+		if(m(opc1, 0xfc00, 0x9800) && m(opc2, 0xffe0, 0xb300)) return util::string_format("and r%d, r%d, r%d", b(opc1, 5, 5, 0), b(opc1, 0, 5, 0), b(opc2, 0, 5, 0));
+		if(m(opc1, 0xfc00, 0x9800) && m(opc2, 0xffe0, 0xb320)) return util::string_format("and #%s, r%d, r%d", u2x(b(opc1, 5, 5, 0), 5), b(opc1, 0, 5, 0), b(opc2, 0, 5, 0));
+		if(m(opc1, 0xfc00, 0x9800) && m(opc2, 0xffe0, 0xb340)) return util::string_format("and #%s, <>#%d, r%d", u2x(b(opc1, 5, 5, 0), 5), s2x(b(opc2, 0, 5, 0), 5), b(opc1, 0, 5, 0));
+		if(m(opc1, 0xfc00, 0x9800) && m(opc2, 0xffe0, 0xb360)) return util::string_format("and #%s, >>r%d, r%d", u2x(b(opc2, 0, 5, 0), 5), b(opc1, 0, 5, 0), b(opc1, 5, 5, 0));
+		if(m(opc1, 0xfc00, 0x9800) && m(opc2, 0xffe0, 0xb380)) return util::string_format("and r%d, <>#%d, r%d", b(opc1, 5, 5, 0), s2x(b(opc2, 0, 5, 0), 5), b(opc1, 0, 5, 0));
+		if(m(opc1, 0xfc00, 0x9800) && m(opc2, 0xffe0, 0xb3a0)) return util::string_format("and r%d, >>r%d, r%d", b(opc1, 5, 5, 0), b(opc1, 0, 5, 0), b(opc2, 0, 5, 0));
+		if(m(opc1, 0xfc00, 0x9800) && m(opc2, 0xffe0, 0xb3c0)) return util::string_format("and r%d, <>r%d, r%d", b(opc1, 5, 5, 0), b(opc1, 0, 5, 0), b(opc2, 0, 5, 0));
+		if(m(opc1, 0xfc00, 0x9800) && m(opc2, 0xffe0, 0xb700)) return util::string_format("as >>r%d, r%d, r%d", b(opc1, 0, 5, 0), b(opc1, 5, 5, 0), b(opc2, 0, 5, 0));
+		if(m(opc1, 0xfc00, 0x9800) && m(opc2, 0xffe0, 0xb720)) return util::string_format("asl #%s, r%d, r%d", u2x((32-b(opc2, 0, 5, 0)) & 31, 5), b(opc1, 5, 5, 0), b(opc1, 0, 5, 0));
+		if(m(opc1, 0xfc00, 0x9800) && m(opc2, 0xffe0, 0xb740)) return util::string_format("asr #%s, r%d, r%d", u2x(b(opc2, 0, 5, 0), 5), b(opc1, 5, 5, 0), b(opc1, 0, 5, 0));
+		if(m(opc1, 0xfc00, 0x9800) && m(opc2, 0xffe0, 0xb800)) return util::string_format("bits #%s, >>r%d, r%d", u2x(b(opc2, 0, 5, 0), 5), b(opc1, 0, 5, 0), b(opc1, 5, 5, 0));
+		if(m(opc1, 0xfc00, 0x9800) && m(opc2, 0xffe0, 0xb820)) return util::string_format("bits #%s, >>#%d, r%d", u2x(b(opc2, 0, 5, 0), 5), b(opc1, 0, 5, 0), b(opc1, 5, 5, 0));
+		if(m(opc1, 0xfc00, 0x9800) && m(opc2, 0xffe0, 0xb840)) return util::string_format("butt r%d, r%d, r%d", b(opc1, 5, 5, 0), b(opc1, 0, 5, 0), b(opc2, 0, 5, 0));
+		if(m(opc1, 0xfc00, 0x9800) && m(opc2, 0xffe0, 0xbc00)) return util::string_format("addwc r%d, r%d, r%d", b(opc1, 5, 5, 0), b(opc1, 0, 5, 0), b(opc2, 0, 5, 0));
+		if(m(opc1, 0xfc00, 0x9800) && m(opc2, 0xffe0, 0xbc20)) return util::string_format("addwc #%s, r%d, r%d", u2x(b(opc1, 5, 5, 0), 5), b(opc1, 0, 5, 0), b(opc2, 0, 5, 0));
+		if(m(opc1, 0xfc00, 0x9800) && m(opc2, 0xffe0, 0xbc40)) return util::string_format("addwc #%s, r%d", u2x(b(opc2, 0, 5, 5) | b(opc1, 5, 5, 0), 10), b(opc1, 0, 5, 0));
+		if(m(opc1, 0xfc00, 0x9800) && m(opc2, 0xffe0, 0xbc60)) return util::string_format("addwc #%s, >>#%d, r%d", u2x(b(opc1, 5, 5, 0), 5), s2x(b(opc2, 0, 5, 0), 5), b(opc1, 0, 5, 0));
+		if(m(opc1, 0xfc00, 0x9800) && m(opc2, 0xffe0, 0xbca0)) return util::string_format("addwc r%d, >>#%d, r%d", b(opc1, 5, 5, 0), s2x(b(opc2, 0, 5, 0), 5), b(opc1, 0, 5, 0));
+		if(m(opc1, 0xfc00, 0x9800) && m(opc2, 0xffff, 0xbe00)) return util::string_format("cmpwc r%d, r%d", b(opc1, 5, 5, 0), b(opc1, 0, 5, 0));
+		if(m(opc1, 0xfc00, 0x9800) && m(opc2, 0xffe0, 0xbe40)) return util::string_format("cmpwc #%s, r%d", u2x(b(opc2, 0, 5, 5) | b(opc1, 5, 5, 0), 10), b(opc1, 0, 5, 0));
+		if(m(opc1, 0xfc00, 0x9800) && m(opc2, 0xffe0, 0xbe60)) return util::string_format("cmpwc #%s, >>#%d, r%d", u2x(b(opc1, 5, 5, 0), 5), s2x(b(opc2, 0, 5, 0), 5), b(opc1, 0, 5, 0));
+		if(m(opc1, 0xfc00, 0x9800) && m(opc2, 0xffff, 0xbe80)) return util::string_format("cmpwc r%d, #%s", b(opc1, 5, 5, 0), u2x(b(opc1, 0, 5, 0), 5));
+		if(m(opc1, 0xfc00, 0x9800) && m(opc2, 0xffe0, 0xbea0)) return util::string_format("cmpwc r%d, >>#%d, r%d", b(opc1, 5, 5, 0), s2x(b(opc2, 0, 5, 0), 5), b(opc1, 0, 5, 0));
+
+		// 32-bits mul instructions
+		if(m(opc1, 0xfc03, 0x9c00) && m(opc2, 0xefe0, 0xac00)) return util::string_format("dotp r%d, v%d, >>svshift, r%d", b(opc1, 5, 5, 0), b(opc1, 2, 3, 0), b(opc2, 0, 5, 0));
+		if(m(opc1, 0xfc00, 0x9c00) && m(opc2, 0xefe0, 0xae80)) return util::string_format("addm r%d, r%d, r%d", b(opc1, 0, 5, 0), b(opc1, 5, 5, 0), b(opc2, 0, 5, 0));
+
 		return util::string_format("?%04x %04x", opc1, opc2);
 	}
 
@@ -396,6 +433,12 @@ std::string nuon_disassembler::parse_packet(const data_buffer &opcodes, offs_t &
 			cont = !(m(opc3, 0xfc00, 0x9000) || m(opc4, 0xf000, 0xb000));
 			pc += 8;
 
+			// 32+32-bit ecu instructions
+			if(m(opc3, 0xffe0, 0x9000) && m(opc4, 0xee00, 0xa400) && m(opc2, 0x01ff, 0x0000))
+				return util::string_format("jsr %s%s",
+										   cc(b(opc3, 5, 5, 0), true),
+										   u2x(b(opc1, 0, 11, 21) | b(opc2, 9, 7, 14) | b(opc4, 0, 8, 6) | b(opc3, 0, 5, 1), 32));
+
 			// 32+32-bit mem instructions
 			if(m(opc3, 0xfc00, 0x9400) && m(opc4, 0xee00, 0xae00) && m(opc2, 0x0018, 0x0000))
 				return util::string_format("st_s #%s, %s",
@@ -409,6 +452,36 @@ std::string nuon_disassembler::parse_packet(const data_buffer &opcodes, offs_t &
 				return util::string_format("st_s #%s, %s",
 										   u2x(b(opc1, 0, 11, 21) | b(opc2, 5, 11, 10) | b(opc4, 5, 5, 5) | b(opc3, 0, 5, 0), 32),
 										   reg(0x20500000 | b(opc2, 2, 1, 13) | b(opc3, 5, 4, 9) | b(opc3, 5, 5, 4) | b(opc2, 0, 2, 2)));
+
+			// 32+32-bit alu instructions
+			if(m(opc3, 0xfc00, 0x9800) && m(opc4, 0xffe0, 0xb020))
+				return util::string_format("add #%s, r%d, r%d",
+										   s2x(b(opc1, 0, 11, 21) | b(opc2, 0, 16, 5) | b(opc3, 5, 5, 0), 32),
+										   b(opc3, 0, 5, 0), b(opc4, 0, 5, 0));
+			if(m(opc3, 0xfc00, 0x9800) && m(opc4, 0xffff, 0xb280))
+				return util::string_format("cmp r%d, #%s",
+										   b(opc3, 5, 5, 0),
+										   s2x(b(opc1, 0, 11, 21) | b(opc2, 0, 16, 5) | b(opc3, 0, 5, 0), 32));
+			if(m(opc3, 0xfc00, 0x9800) && m(opc4, 0xffe0, 0xb320))
+				return util::string_format("add #%s, r%d, r%d",
+										   s2x(b(opc1, 0, 11, 21) | b(opc2, 0, 16, 5) | b(opc3, 0, 5, 0), 32),
+										   b(opc3, 5, 5, 0), b(opc4, 0, 5, 0));
+			if(m(opc3, 0xfc00, 0x9800) && m(opc4, 0xffe0, 0xb360))
+				return util::string_format("add #%s, >>r%d, r%d",
+										   s2x(b(opc1, 0, 11, 21) | b(opc2, 0, 16, 5) | b(opc3, 0, 5, 0), 32),
+										   b(opc3, 5, 5, 0), b(opc4, 0, 5, 0));
+			if(m(opc3, 0xfc00, 0x9800) && m(opc4, 0xffe0, 0xbc20))
+				return util::string_format("addwc #%s, r%d, r%d",
+										   s2x(b(opc1, 0, 11, 21) | b(opc2, 0, 16, 5) | b(opc3, 5, 5, 0), 32),
+										   b(opc3, 0, 5, 0), b(opc4, 0, 5, 0));
+			if(m(opc3, 0xfc00, 0x9800) && m(opc4, 0xffff, 0xbe20))
+				return util::string_format("cmpwc #%s, r%d",
+										   s2x(b(opc1, 0, 11, 21) | b(opc2, 0, 16, 5) | b(opc3, 5, 5, 0), 32),
+										   b(opc3, 0, 5, 0));
+			if(m(opc3, 0xfc00, 0x9800) && m(opc4, 0xffff, 0xbe80))
+				return util::string_format("cmpwc r%d, #%s",
+										   b(opc3, 5, 5, 0),
+										   s2x(b(opc1, 0, 11, 21) | b(opc2, 0, 16, 5) | b(opc3, 0, 5, 0), 32));
 			cont = false;
 			return util::string_format("?%04x %04x %04x %04x", opc1, opc2, opc3, opc4);
 		}
