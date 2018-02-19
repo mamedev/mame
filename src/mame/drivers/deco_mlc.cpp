@@ -94,7 +94,7 @@
         avengrgs - doesn't generate enough line interrupts?
         ddream95 seems to have a dual screen mode(??)
         hoops** - crash entering test mode (regression from 0.113 era?)
-        skullfng - slowdowns not verified from real PCB, Random hangs at test mode
+        skullfng - slowdowns not verified from real PCB, Random hangs sometimes
 
     Graphic TODO:
         blending, raster effect features isn't fully emulated currently
