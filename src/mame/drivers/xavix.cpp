@@ -577,9 +577,9 @@ void xavix_state::draw_sprites(screen_device &screen, bitmap_ind16 &bitmap, cons
 		{
 			drawheight = 16;
 			drawwidth = 16;
-			if (m_alt_addressing==1)
+			if (m_alt_addressing == 1)
 				tile = tile * 128;
-			else if (m_alt_addressing==2)
+			else if (m_alt_addressing == 2)
 				tile = tile * 8;
 		}
 		else if ((attr1 & 0x0c) == 0x08)
@@ -587,9 +587,9 @@ void xavix_state::draw_sprites(screen_device &screen, bitmap_ind16 &bitmap, cons
 			drawheight = 16;
 			drawwidth = 8;
 			xpos += 4;
-			if (m_alt_addressing==1)
+			if (m_alt_addressing == 1)
 				tile = tile * 64;
-			else if (m_alt_addressing==2)
+			else if (m_alt_addressing == 2)
 				tile = tile * 8;
 		}
 		else if ((attr1 & 0x0c) == 0x04)
@@ -597,9 +597,9 @@ void xavix_state::draw_sprites(screen_device &screen, bitmap_ind16 &bitmap, cons
 			drawheight = 8;
 			drawwidth = 16;
 			ypos -= 4;
-			if (m_alt_addressing==1)
+			if (m_alt_addressing == 1)
 				tile = tile * 64;
-			else if (m_alt_addressing==2)
+			else if (m_alt_addressing == 2)
 				tile = tile * 8;
 		}
 		else if ((attr1 & 0x0c) == 0x00)
@@ -608,9 +608,9 @@ void xavix_state::draw_sprites(screen_device &screen, bitmap_ind16 &bitmap, cons
 			drawwidth = 8;
 			xpos += 4;
 			ypos -= 4;
-			if (m_alt_addressing==1)
+			if (m_alt_addressing == 1)
 				tile = tile * 32;
-			else if (m_alt_addressing==2)
+			else if (m_alt_addressing == 2)
 				tile = tile * 8;
 		}
 
@@ -625,7 +625,7 @@ void xavix_state::draw_sprites(screen_device &screen, bitmap_ind16 &bitmap, cons
 		xpos &= 0xff;
 		ypos &= 0xff;
 
-		if (ypos >=192)
+		if (ypos >= 192)
 			ypos -= 256;
 
 		int bpp = 1;
@@ -634,9 +634,9 @@ void xavix_state::draw_sprites(screen_device &screen, bitmap_ind16 &bitmap, cons
 		bpp += 1;
 
 		draw_tile(screen, bitmap, cliprect, tile, bpp, xpos, ypos, drawheight, drawwidth, flipx, 0, pal, 0);
-		draw_tile(screen, bitmap, cliprect, tile, bpp, xpos-256, ypos, drawheight, drawwidth, flipx, 0, pal, 0); // wrap-x
-		draw_tile(screen, bitmap, cliprect, tile, bpp, xpos, ypos-256, drawheight, drawwidth, flipx, 0, pal, 0); // wrap-y
-		draw_tile(screen, bitmap, cliprect, tile, bpp, xpos-256, ypos-256, drawheight, drawwidth, flipx, 0, pal, 0); // wrap-x,y
+		draw_tile(screen, bitmap, cliprect, tile, bpp, xpos - 256, ypos, drawheight, drawwidth, flipx, 0, pal, 0); // wrap-x
+		draw_tile(screen, bitmap, cliprect, tile, bpp, xpos, ypos - 256, drawheight, drawwidth, flipx, 0, pal, 0); // wrap-y
+		draw_tile(screen, bitmap, cliprect, tile, bpp, xpos - 256, ypos - 256, drawheight, drawwidth, flipx, 0, pal, 0); // wrap-x,y
 
 		/*
 		if ((m_spr_ypos[i] != 0x81) && (m_spr_ypos[i] != 0x80) && (m_spr_ypos[i] != 0x00))
