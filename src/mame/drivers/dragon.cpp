@@ -23,6 +23,8 @@
 #include "bus/coco/dragon_jcbsnd.h"
 #include "bus/coco/coco_pak.h"
 #include "bus/coco/coco_ssc.h"
+#include "bus/coco/coco_orch90.h"
+#include "bus/coco/coco_gmc.h"
 
 
 //**************************************************************************
@@ -166,6 +168,8 @@ SLOT_INTERFACE_START( dragon_cart )
 	SLOT_INTERFACE("sdtandy_fdc", SDTANDY_FDC)
 	SLOT_INTERFACE("jcbsnd", DRAGON_JCBSND)     MCFG_SLOT_OPTION_CLOCK("jcbsnd", DERIVED_CLOCK(1, 1))
 	SLOT_INTERFACE("ssc", COCO_SSC)             MCFG_SLOT_OPTION_CLOCK("ssc", DERIVED_CLOCK(1, 1))
+	SLOT_INTERFACE("orch90", COCO_ORCH90)
+	SLOT_INTERFACE("gmc", COCO_PAK_GMC)
 	SLOT_INTERFACE("pak", COCO_PAK)
 SLOT_INTERFACE_END
 

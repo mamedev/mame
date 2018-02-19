@@ -30196,6 +30196,7 @@ olibochu                        // M47 (c) 1981 + "GDI presents"
 olybossb                        // Olympia BOSS B
 olybossc                        // Olympia BOSS C
 olybossd                        // Olympia BOSS D
+bossa85							// Olympia BOSS A 8085
 bossb85                         // Olympia BOSS B 8085
 
 @source:omegrace.cpp
@@ -36734,10 +36735,10 @@ ti81                            // 1990 TI-81 (Z80 2 MHz)
 ti81v2                          // 1990 TI-81 (Z80 2 MHz)
 ti82                            // 1993 TI-82 (Z80 6 MHz)
 ti83                            // 1996 TI-83 (Z80 6 MHz)
-ti83p                           // 1999 TI-83 Plus (Z80 6 MHz)
-ti83pse                         // 2001 TI-83 Plus Silver Edition
-ti84p                           // 2004 TI-84 Plus
-ti84pse                         // 2004 TI-84 Plus Silver Edition
+ti83p                           // 1999 TI-83 Plus (Boot Code 1.00) (Z80 6 MHz)
+ti83pse                         // 2001 TI-83 Plus Silver Edition (Boot Code 1.00)
+ti84p                           // 2004 TI-84 Plus (Boot Code 1.00)
+ti84pse                         // 2004 TI-84 Plus Silver Edition (Boot Code 1.00)
 ti85                            // 1992 TI-85 (Z80 6 MHz)
 ti86                            // 1997 TI-86 (Z80 6 MHz)
 

@@ -287,6 +287,11 @@ public:
 	void model2o_mem(address_map &map);
 	void rchase2_iocpu_map(address_map &map);
 	void rchase2_ioport_map(address_map &map);
+	
+	uint8_t m_gamma_table[256];
+	
+protected:
+	virtual void video_start() override;
 };
 
 
@@ -331,14 +336,14 @@ static inline uint16_t get_texel( uint32_t base_x, uint32_t base_y, int x, int y
 
 struct triangle;
 
-class model2_renderer : public poly_manager<float, m2_poly_extra_data, 10, 32768>
+class model2_renderer : public poly_manager<float, m2_poly_extra_data, 4, 32768>
 {
 public:
 	typedef void (model2_renderer::*scanline_render_func)(int32_t scanline, const extent_t& extent, const m2_poly_extra_data& object, int threadid);
 
 public:
 	model2_renderer(model2_state& state)
-		: poly_manager<float, m2_poly_extra_data, 10, 32768>(state.machine())
+		: poly_manager<float, m2_poly_extra_data, 4, 32768>(state.machine())
 		, m_state(state)
 		, m_destmap(state.m_screen->width(), state.m_screen->height())
 	{

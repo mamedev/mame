@@ -74,6 +74,7 @@ public:
 		{ }
 
 public:
+	void bossa85(machine_config &config);
 	void bossb85(machine_config &config);
 	void olybossb(machine_config &config);
 	void olybossc(machine_config &config);
@@ -406,6 +407,10 @@ WRITE8_MEMBER( olyboss_state::fdcctrl85_w )
 		m_fdd1->get_device()->mon_w(!(data & 0x80));
 }
 
+static SLOT_INTERFACE_START( bossa_floppies )
+	SLOT_INTERFACE( "525ssdd", FLOPPY_525_SSDD )
+SLOT_INTERFACE_END
+
 static SLOT_INTERFACE_START( bossb_floppies )
 	SLOT_INTERFACE( "525dd", FLOPPY_525_DD )
 SLOT_INTERFACE_END
@@ -532,10 +537,26 @@ MACHINE_CONFIG_START( olyboss_state::bossb85 )
 	MCFG_GENERIC_KEYBOARD_CB(PUT(olyboss_state, keyboard85_put))
 MACHINE_CONFIG_END
 
+MACHINE_CONFIG_START( olyboss_state::bossa85 )
+	bossb85(config);
+	MCFG_DEVICE_REMOVE("fdc:0")
+	MCFG_FLOPPY_DRIVE_ADD("fdc:0", bossa_floppies, "525ssdd", floppy_image_device::default_floppy_formats)
+	MCFG_FLOPPY_DRIVE_SOUND(true)
+	MCFG_DEVICE_REMOVE("fdc:1")
+	MCFG_FLOPPY_DRIVE_ADD("fdc:1", bossa_floppies, "525ssdd", floppy_image_device::default_floppy_formats)
+	MCFG_FLOPPY_DRIVE_SOUND(true)
+MACHINE_CONFIG_END
+
 //**************************************************************************
 //  ROM DEFINITIONS
 //**************************************************************************
+ROM_START( bossa85 )
+	ROM_REGION(0x800, "mainrom", ROMREGION_ERASEFF)
+	ROM_LOAD( "boss_8085_bios.bin", 0x0000, 0x800, CRC(43030231) SHA1(a1f6546a9dc1066324e93e5eed886f2313678180) )
 
+	ROM_REGION( 0x800, UPD3301_TAG, 0)
+	ROM_LOAD( "olympia_boss_graphics_251-461.bin", 0x0000, 0x800, CRC(56149540) SHA1(b2b893bd219308fc98a38528beb7ddae391c7609) )
+ROM_END
 
 ROM_START( bossb85 )
 	ROM_REGION(0x800, "mainrom", ROMREGION_ERASEFF)
@@ -575,6 +596,7 @@ ROM_END
 //**************************************************************************
 
 //   YEAR  NAME			PARENT	COMPAT	MACHINE		INPUT		CLASS			INIT		COMPANY						FULLNAME			FLAGS
+COMP(1981, bossa85,		olybossd,	0,		bossa85,	olyboss,	olyboss_state,	0,	"Olympia International",	"Olympia BOSS A 8085",	MACHINE_NOT_WORKING | MACHINE_NO_SOUND )
 COMP(1981, bossb85,		olybossd,	0,		bossb85,	olyboss,	olyboss_state,	0,	"Olympia International",	"Olympia BOSS B 8085",	MACHINE_NOT_WORKING | MACHINE_NO_SOUND )
 COMP(1981, olybossb,	olybossd,	0,		olybossb,	olyboss,	olyboss_state,	0,	"Olympia International",	"Olympia BOSS B",	MACHINE_NOT_WORKING | MACHINE_NO_SOUND )
 COMP(1981, olybossc,	olybossd,	0,		olybossc,	olyboss,	olyboss_state,	0,	"Olympia International",	"Olympia BOSS C",	MACHINE_NOT_WORKING | MACHINE_NO_SOUND )

@@ -133,6 +133,7 @@ void MODEL2_FUNC_NAME(int32_t scanline, const extent_t& extent, const m2_poly_ex
 	uint32_t  tex_mirr_x = object.texmirrorx;
 	uint32_t  tex_mirr_y = object.texmirrory;
 	uint32_t *sheet = object.texsheet;
+	uint8_t  *gamma_value = &state->m_gamma_table[0];
 	float ooz = extent.param[0].start;
 	float uoz = extent.param[1].start;
 	float voz = extent.param[2].start;
@@ -155,7 +156,7 @@ void MODEL2_FUNC_NAME(int32_t scanline, const extent_t& extent, const m2_poly_ex
 		float z = recip_approx(ooz) * 256.0f;
 		int32_t u = uoz * z;
 		int32_t v = voz * z;
-		uint32_t  tr, tg, tb;
+		int  tr, tg, tb;
 		uint16_t  t;
 		uint8_t luma;
 		int u2;
@@ -184,14 +185,18 @@ void MODEL2_FUNC_NAME(int32_t scanline, const extent_t& extent, const m2_poly_ex
 
 		// Virtua Striker sets up a luma of 0x40 for national flags on bleachers, fix here.
 		luma = std::min((int)luma,0x3f);
-
+		// (Again) Virtua Striker seem to lookup colortable with a reversed endianness (stadium ads)
+		luma^= 1;
+		
 		/* we have the 6 bits of luma information along with 5 bits per color component */
 		/* now build and index into the master color lookup table and extract the raw RGB values */
-
 		tr = colortable_r[(luma)] & 0xff;
 		tg = colortable_g[(luma)] & 0xff;
 		tb = colortable_b[(luma)] & 0xff;
-
+		tr = gamma_value[tr];
+		tg = gamma_value[tg];
+		tb = gamma_value[tb];
+		
 		p[x] = rgb_t(tr, tg, tb);
 	}
 }

@@ -59,13 +59,26 @@ public:
 	DECLARE_WRITE8_MEMBER( write );
 	DECLARE_WRITE8_MEMBER( write_tmp_register );
 
+	// serial read/write handlers
+	DECLARE_WRITE_LINE_MEMBER( serial_w );
+	DECLARE_WRITE_LINE_MEMBER( si_w );
+	DECLARE_WRITE_LINE_MEMBER( sd_w );
+	DECLARE_WRITE_LINE_MEMBER( ud_w );
+	DECLARE_WRITE_LINE_MEMBER( cmd_w );
+	DECLARE_READ_LINE_MEMBER( so_r );
+	DECLARE_READ_LINE_MEMBER( sr0_r );
+	DECLARE_READ_LINE_MEMBER( sr1_r );
+	DECLARE_READ_LINE_MEMBER( sr2_r );
+	DECLARE_READ_LINE_MEMBER( sr3_r );
+
 protected:
 	enum
 	{
 		ADPCM_PLAYBACK = 0,
 		ADPCM2_PLAYBACK = 1,
-		STRAIGHT8_PLAYBACK = 2,
-		NONLINEAR8_PLAYBACK = 3
+		NONLINEAR8_PLAYBACK = 2,
+		STRAIGHT8_PLAYBACK = 3,
+		EIGHTBIT_PLAYBACK = 2
 	};
 
 	enum
@@ -103,7 +116,6 @@ protected:
 							stream_sample_t **buffers,
 							int samples,
 							const uint8_t global_volume,
-							const uint32_t clock,
 							const uint8_t filter_type);
 
 		// computes volume scale from 3 volume numbers
@@ -144,11 +156,25 @@ protected:
 	uint8_t m_global_volume;      // volume index set with the OPT command
 	uint8_t m_filter_type;        // interpolation filter type set with the OPT command
 	uint8_t m_output_level;       // flag stating if a voltage follower is connected
+	
+	int       m_dadr;
+	offs_t    m_dadr_start_offset;
+	offs_t    m_dadr_end_offset;
+	uint8_t   m_dadr_flags;
+
+	int       m_serial;
+	int       m_serial_read_latch;
+	int       m_serial_write_latch;
+	int       m_serial_bits;
+	int       m_ud;
+	int       m_si;
+	int       m_sd;
+	int       m_cmd;
 
 	static constexpr int OKIM9810_VOICES = 8;
 	okim_voice m_voice[OKIM9810_VOICES];
 
-	static const uint32_t s_sampling_freq_table[16];
+	static const uint32_t s_sampling_freq_div_table[16];
 };
 
 

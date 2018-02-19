@@ -39,8 +39,6 @@ public:
 
 	/* misc */
 	uint8_t    m_port_select;
-	uint8_t    m_main_to_sound_data;
-	uint8_t    m_sound_to_main_data;
 	uint16_t   m_sample_offset;
 	uint8_t    m_sample_count;
 
@@ -55,10 +53,6 @@ public:
 	DECLARE_READ8_MEMBER(analog_input_r);
 	DECLARE_WRITE8_MEMBER(switch_input_select_w);
 	DECLARE_WRITE8_MEMBER(unknown_w);
-	DECLARE_WRITE8_MEMBER(main_to_sound_w);
-	DECLARE_READ8_MEMBER(main_to_sound_r);
-	DECLARE_WRITE8_MEMBER(sound_to_main_w);
-	DECLARE_READ8_MEMBER(sound_to_main_r);
 	DECLARE_WRITE_LINE_MEMBER(color_select_w);
 	DECLARE_WRITE_LINE_MEMBER(screen_flip_w);
 	DECLARE_WRITE_LINE_MEMBER(screen_select_w);
@@ -75,8 +69,6 @@ public:
 	DECLARE_PALETTE_INIT(crgolf);
 	DECLARE_PALETTE_INIT(mastrglf);
 	uint32_t screen_update_crgolf(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
-	TIMER_CALLBACK_MEMBER(main_to_sound_callback);
-	TIMER_CALLBACK_MEMBER(sound_to_main_callback);
 	void get_pens( pen_t *pens );
 	DECLARE_WRITE_LINE_MEMBER(vck_callback);
 	void crgolfhi(machine_config &config);

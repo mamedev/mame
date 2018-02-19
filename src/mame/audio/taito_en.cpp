@@ -56,9 +56,10 @@ void taito_en_device::device_start()
 void taito_en_device::device_reset()
 {
 	/* Sound cpu program loads to 0xc00000 so we use a bank */
+	uint32_t max = (m_osrom->bytes() - 0x100000) / 0x20000;
 	for (int i = 0; i < 3; i++)
-		m_cpubank[i]->set_entry(i);
-	
+		m_cpubank[i]->set_entry(i % max);
+
 	uint16_t *ROM = (uint16_t *)m_osrom->base();
 	std::copy(&ROM[0x80000], &ROM[0x80004], &m_osram[0]); /* Stack and Reset vectors */
 

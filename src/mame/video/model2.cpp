@@ -2583,7 +2583,7 @@ void model2_state::geo_parse( void )
 /***********************************************************************************************/
 
 
-VIDEO_START_MEMBER(model2_state,model2)
+void model2_state::video_start()
 {
 	const rectangle &visarea = m_screen->visible_area();
 	int width = visarea.width();
@@ -2603,6 +2603,16 @@ VIDEO_START_MEMBER(model2_state,model2)
 	m_palram = make_unique_clear<uint16_t[]>(0x4000/2);
 	m_colorxlat = make_unique_clear<uint16_t[]>(0xc000/2);
 	m_lumaram = make_unique_clear<uint16_t[]>(0x10000/2);
+	
+	// convert (supposedly) 3d sRGB color space into linear
+	// TODO: might be slightly different algorithm (Daytona USA road/cars, VF2 character skins) 
+	for(int i=0;i<256;i++)
+	{
+		double raw_value;
+		raw_value = 255.0 * pow((double)(i) / 255.0,2.2);
+		m_gamma_table[i] = (uint8_t)raw_value;
+//		printf("%02x: %02x %lf\n",i,m_gamma_table[i],raw_value);
+	}
 }
 
 uint32_t model2_state::screen_update_model2(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
