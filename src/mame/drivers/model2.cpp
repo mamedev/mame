@@ -1447,12 +1447,6 @@ READ8_MEMBER(model2_state::tgpid_r)
 	return ID[offset];
 }
 
-/* Sky Target, TODO */
-READ32_MEMBER(model2_state::polygon_count_r)
-{
-	return 0;
-}
-
 /* common map for all Model 2 versions */
 ADDRESS_MAP_START(model2_state::model2_base_mem)
 	AM_RANGE(0x00000000, 0x001fffff) AM_ROM AM_WRITENOP

@@ -293,6 +293,14 @@ WRITE32_MEMBER(model2_state::model2_3d_zclip_w)
 	m_raster->master_z_clip = data;
 }
 
+// TODO: only Sky Target seems to use this for unknown purpose
+READ32_MEMBER(model2_state::polygon_count_r)
+{
+//	printf("%08x\n",m_raster->tri_list_index);
+	
+	return m_raster->tri_list_index;
+}
+
 /*******************************************
  *
  *  Hardware 3D Rasterizer Processing
@@ -794,7 +802,7 @@ void model2_renderer::model2_3d_render(triangle *tri, const rectangle &cliprect)
 	// TODO: this seems to be more accurate but it breaks in some cases
 	//rectangle vp(tri->viewport[0] - 8, tri->viewport[2] - tri->viewport[0], tri->viewport[1] - 90, tri->viewport[3] - tri->viewport[1]);
 	vp &= cliprect;
-
+	
 	extra.state = &m_state;
 	extra.lumabase = ((tri->texheader[1] & 0xFF) << 7) + ((tri->luma >> 5) ^ 0x7);
 	extra.colorbase = (tri->texheader[3] >> 6) & 0x3FF;
@@ -2510,7 +2518,7 @@ static uint32_t * geo_code_jump( geo_state *geo, uint32_t opcode, uint32_t *inpu
 }
 
 static uint32_t * geo_process_command( geo_state *geo, uint32_t opcode, uint32_t *input, bool *end_code )
-{
+{	
 	switch( (opcode >> 23) & 0x1f )
 	{
 		case 0x00: input = geo_nop( geo, opcode, input );                   break;
