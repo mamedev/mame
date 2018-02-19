@@ -201,6 +201,7 @@ public:
 	void segapcm_map(address_map &map);
 	void soundchips16_map(address_map &map);
 	void soundchips_map(address_map &map);
+	void ymz280b_map(address_map &map);
 private:
 	std::vector<uint8_t> m_file_data;
 	required_device<bitbanger_device> m_file;
@@ -1569,6 +1570,10 @@ ADDRESS_MAP_START(vgmplay_state::qsound_map)
 	AM_RANGE(0, 0xffffff) AM_DEVREAD("vgmplay", vgmplay_device, qsound_rom_r)
 ADDRESS_MAP_END
 
+ADDRESS_MAP_START(vgmplay_state::ymz280b_map)
+	AM_RANGE(0, 0xffffff) AM_DEVREAD("vgmplay", vgmplay_device, ymz280b_rom_r)
+ADDRESS_MAP_END
+
 ADDRESS_MAP_START(vgmplay_state::nescpu_map)
 	AM_RANGE(0, 0xffff) AM_RAM AM_SHARE("nesapu_ram")
 ADDRESS_MAP_END
@@ -1705,7 +1710,7 @@ MACHINE_CONFIG_START(vgmplay_state::vgmplay)
 	MCFG_SOUND_ROUTE(1, "rspeaker", 1)
 
 	MCFG_SOUND_ADD("ymz280b", YMZ280B, 16934400)
-	MCFG_YMZ280B_EXT_READ_HANDLER(DEVREAD8("vgmplay", vgmplay_device, ymz280b_rom_r))
+	MCFG_DEVICE_ADDRESS_MAP(0, ymz280b_map)
 	MCFG_SOUND_ROUTE(0, "lspeaker", 1)
 	MCFG_SOUND_ROUTE(1, "rspeaker", 1)
 
