@@ -554,9 +554,6 @@ void ymz280b_device::sound_stream_update(sound_stream &stream, stream_sample_t *
 
 void ymz280b_device::device_start()
 {
-	m_ext_read_handler.resolve();
-	m_ext_write_handler.resolve();
-
 	/* compute ADPCM tables */
 	compute_tables();
 
