@@ -532,15 +532,15 @@ std::string nuon_disassembler::parse_packet(const data_buffer &opcodes, offs_t &
 			if(m(opc3, 0xfc00, 0x9400) && m(opc4, 0xee00, 0xae00) && m(opc2, 0x0018, 0x0000))
 				return util::string_format("st_s #%s, %s",
 										   u2x(b(opc1, 0, 11, 21) | b(opc2, 5, 11, 10) | b(opc4, 5, 5, 5) | b(opc3, 0, 5, 0), 32),
-										   reg(0x20000000 | b(opc2, 2, 1, 13) | b(opc3, 5, 4, 9) | b(opc3, 5, 5, 4) | b(opc2, 0, 2, 2)));
+										   reg(0x20000000 | b(opc2, 2, 1, 13) | b(opc4, 5, 4, 9) | b(opc3, 5, 5, 4) | b(opc2, 0, 2, 2)));
 			if(m(opc3, 0xfc00, 0x9400) && m(opc4, 0xee00, 0xae00) && m(opc2, 0x0018, 0x0008))
 				return util::string_format("st_s #%s, %s",
 										   u2x(b(opc1, 0, 11, 21) | b(opc2, 5, 11, 10) | b(opc4, 5, 5, 5) | b(opc3, 0, 5, 0), 32),
-										   reg(0x20100000 | b(opc2, 2, 1, 13) | b(opc3, 5, 4, 9) | b(opc3, 5, 5, 4) | b(opc2, 0, 2, 2)));
+										   reg(0x20100000 | b(opc2, 2, 1, 13) | b(opc4, 5, 4, 9) | b(opc3, 5, 5, 4) | b(opc2, 0, 2, 2)));
 			if(m(opc3, 0xfc00, 0x9400) && m(opc4, 0xee00, 0xae00) && m(opc2, 0x0018, 0x0010))
 				return util::string_format("st_s #%s, %s",
 										   u2x(b(opc1, 0, 11, 21) | b(opc2, 5, 11, 10) | b(opc4, 5, 5, 5) | b(opc3, 0, 5, 0), 32),
-										   reg(0x20500000 | b(opc2, 2, 1, 13) | b(opc3, 5, 4, 9) | b(opc3, 5, 5, 4) | b(opc2, 0, 2, 2)));
+										   reg(0x20500000 | b(opc2, 2, 1, 13) | b(opc4, 5, 4, 9) | b(opc3, 5, 5, 4) | b(opc2, 0, 2, 2)));
 
 			// 32+32-bit alu instructions
 			if(m(opc3, 0xfc00, 0x9800) && m(opc4, 0xffe0, 0xb020))
