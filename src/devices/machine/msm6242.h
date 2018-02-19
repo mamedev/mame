@@ -93,6 +93,7 @@ private:
 	// methods
 	void rtc_timer_callback();
 	uint64_t current_time();
+	void set_irq(bool active);
 	void irq(uint8_t irq_type);
 	uint64_t bump(int rtc_register, uint64_t delta, uint64_t register_min, uint64_t register_range);
 	void update_rtc_registers();

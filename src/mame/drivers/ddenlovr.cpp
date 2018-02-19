@@ -4353,7 +4353,6 @@ MACHINE_CONFIG_START(ddenlovr_state::htengoku)
 	MCFG_CPU_PROGRAM_MAP(htengoku_mem_map)
 	MCFG_CPU_IO_MAP(htengoku_io_map)
 	MCFG_CPU_VBLANK_INT_DRIVER("screen", ddenlovr_state,  sprtmtch_vblank_interrupt)   /* IM 0 needs an opcode on the data bus */
-	MCFG_CPU_PERIODIC_INT_DRIVER(ddenlovr_state, yarunara_clock_interrupt,  60)    // RTC
 	MCFG_CPU_IRQ_ACKNOWLEDGE_DEVICE("mainirq", rst_pos_buffer_device, inta_cb)
 
 	MCFG_DEVICE_ADD("bankdev", ADDRESS_MAP_BANK, 0)
@@ -4403,6 +4402,7 @@ MACHINE_CONFIG_START(ddenlovr_state::htengoku)
 
 	/* devices */
 	MCFG_DEVICE_ADD("rtc", MSM6242, XTAL(32'768))
+	MCFG_MSM6242_OUT_INT_HANDLER(DEVWRITELINE("mainirq", rst_pos_buffer_device, rst1_w))
 MACHINE_CONFIG_END
 
 

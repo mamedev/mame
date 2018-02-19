@@ -4060,7 +4060,6 @@ MACHINE_START_MEMBER(dynax_state,dynax)
 	save_item(NAME(m_resetkludge));
 	save_item(NAME(m_toggle));
 	save_item(NAME(m_toggle_cpu1));
-	save_item(NAME(m_yarunara_clk_toggle));
 	save_item(NAME(m_rombank));
 	save_item(NAME(m_tenkai_p5_val));
 	save_item(NAME(m_tenkai_6c));
@@ -4087,7 +4086,6 @@ MACHINE_RESET_MEMBER(dynax_state,dynax)
 	m_resetkludge = 0;
 	m_toggle = 0;
 	m_toggle_cpu1 = 0;
-	m_yarunara_clk_toggle = 0;
 	m_rombank = 0;
 	m_tenkai_p5_val = 0;
 	m_tenkai_6c = 0;
@@ -4488,20 +4486,6 @@ MACHINE_CONFIG_END
                     Yarunara / Quiz TV Q&Q / Mahjong Angels
 ***************************************************************************/
 
-/* the old code here didn't work..
-  what was it trying to do?
-  set an irq and clear it before its even taken? */
-
-INTERRUPT_GEN_MEMBER(dynax_state::yarunara_clock_interrupt)
-{
-	m_yarunara_clk_toggle ^= 1;
-
-	if (m_yarunara_clk_toggle == 1)
-		m_mainirq->rst1_w(0);
-	else
-		m_mainirq->rst1_w(1);
-}
-
 MACHINE_CONFIG_START(dynax_state::yarunara)
 	hnoridur(config);
 
@@ -4509,7 +4493,6 @@ MACHINE_CONFIG_START(dynax_state::yarunara)
 	MCFG_CPU_MODIFY("maincpu")
 	MCFG_CPU_PROGRAM_MAP(yarunara_mem_map)
 	MCFG_CPU_IO_MAP(yarunara_io_map)
-	MCFG_CPU_PERIODIC_INT_DRIVER(dynax_state, yarunara_clock_interrupt,  60)    // RTC
 
 	MCFG_DEVICE_MODIFY("bankdev")
 	MCFG_DEVICE_PROGRAM_MAP(yarunara_banked_map)
@@ -4523,6 +4506,7 @@ MACHINE_CONFIG_START(dynax_state::yarunara)
 
 	/* devices */
 	MCFG_DEVICE_ADD("rtc", MSM6242, XTAL(32'768))
+	MCFG_MSM6242_OUT_INT_HANDLER(DEVWRITELINE("mainirq", rst_pos_buffer_device, rst1_w))
 MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(dynax_state::mjangels)

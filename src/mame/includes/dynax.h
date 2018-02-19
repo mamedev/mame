@@ -127,7 +127,6 @@ public:
 	int m_resetkludge;
 	int m_toggle;
 	int m_toggle_cpu1;
-	int m_yarunara_clk_toggle;
 	int m_rombank;
 	uint8_t m_tenkai_p5_val;
 	int m_tenkai_6c;
@@ -257,7 +256,6 @@ public:
 	INTERRUPT_GEN_MEMBER(sprtmtch_vblank_interrupt);
 	INTERRUPT_GEN_MEMBER(jantouki_vblank_interrupt);
 	INTERRUPT_GEN_MEMBER(jantouki_sound_vblank_interrupt);
-	INTERRUPT_GEN_MEMBER(yarunara_clock_interrupt);
 
 	void tenkai_update_rombank();
 
