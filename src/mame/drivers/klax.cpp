@@ -65,7 +65,7 @@ WRITE16_MEMBER(klax_state::interrupt_ack_w)
  *
  *************************************/
 
-MACHINE_RESET_MEMBER(klax_state,klax)
+void klax_state::machine_reset()
 {
 	atarigen_state::machine_reset();
 	scanline_timer_reset(*m_screen, 32);
@@ -196,9 +196,7 @@ MACHINE_CONFIG_START(klax_state::klax)
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", M68000, ATARI_CLOCK_14MHz/2)
 	MCFG_CPU_PROGRAM_MAP(klax_map)
-	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", atarigen_state, video_int_gen)
-
-	MCFG_MACHINE_RESET_OVERRIDE(klax_state,klax)
+	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", klax_state, video_int_gen)
 
 	MCFG_EEPROM_2816_ADD("eeprom")
 	MCFG_EEPROM_28XX_LOCK_AFTER_WRITE(true)
@@ -223,8 +221,6 @@ MACHINE_CONFIG_START(klax_state::klax)
 	MCFG_SCREEN_UPDATE_DRIVER(klax_state, screen_update_klax)
 	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_VIDEO_START_OVERRIDE(klax_state,klax)
-
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
 
@@ -238,6 +234,7 @@ ADDRESS_MAP_END
 
 MACHINE_CONFIG_START(klax_state::klax2bl)
 	klax(config);
+
 	MCFG_CPU_MODIFY("maincpu")
 	MCFG_CPU_PROGRAM_MAP(klax2bl_map)
 

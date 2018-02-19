@@ -16,27 +16,6 @@
 //  TYPE DEFINITIONS
 //**************************************************************************
 
-struct CHAN
-{
-	CHAN() :
-	freq(0),
-	period(0),
-	pos(0),
-	vol_left(0),
-	vol_right(0),
-	on(0),
-	signal(0) { }
-
-	uint16_t  freq;           /* frequency */
-	uint32_t  period;         /* period */
-	uint32_t  pos;            /* position */
-	uint8_t   vol_left;       /* volume left */
-	uint8_t   vol_right;      /* volume right */
-	uint8_t   on;         /* on/off */
-	int8_t    signal;         /* signal */
-};
-
-
 // ======================> wswan_sound_device
 
 class wswan_sound_device : public device_t,
@@ -44,9 +23,30 @@ class wswan_sound_device : public device_t,
 {
 public:
 	wswan_sound_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
-	~wswan_sound_device() { }
+
+	DECLARE_WRITE8_MEMBER( port_w );
 
 protected:
+	struct CHAN
+	{
+		CHAN() :
+		freq(0),
+		period(0),
+		pos(0),
+		vol_left(0),
+		vol_right(0),
+		on(0),
+		signal(0) { }
+
+		uint16_t  freq;           /* frequency */
+		uint32_t  period;         /* period */
+		uint32_t  pos;            /* position */
+		uint8_t   vol_left;       /* volume left */
+		uint8_t   vol_right;      /* volume right */
+		uint8_t   on;         /* on/off */
+		int8_t    signal;         /* signal */
+	};
+
 	// device-level overrides
 	virtual void device_start() override;
 	virtual void device_reset() override;
@@ -54,13 +54,9 @@ protected:
 	// sound stream update overrides
 	virtual void sound_stream_update(sound_stream &stream, stream_sample_t **inputs, stream_sample_t **outputs, int samples) override;
 
-public:
-	DECLARE_WRITE8_MEMBER( port_w );
-
 private:
 	void wswan_ch_set_freq( CHAN *ch, uint16_t freq );
 
-private:
 	sound_stream *m_channel;
 	CHAN m_audio1;     /* Audio channel 1 */
 	CHAN m_audio2;     /* Audio channel 2 */

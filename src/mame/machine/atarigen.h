@@ -262,6 +262,7 @@ public:
 	// construction/destruction
 	atarigen_state(const machine_config &mconfig, device_type type, const char *tag);
 
+protected:
 	// users must call through to these
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
@@ -319,16 +320,16 @@ public:
 	optional_shared_ptr<uint16_t> m_yscroll;
 
 	/* internal state */
-	uint8_t                   m_slapstic_num;
-	uint16_t *                m_slapstic;
-	uint8_t                   m_slapstic_bank;
-	std::vector<uint8_t>          m_slapstic_bank0;
+	uint8_t                 m_slapstic_num;
+	uint16_t *              m_slapstic;
+	uint8_t                 m_slapstic_bank;
+	std::vector<uint8_t>    m_slapstic_bank0;
 	offs_t                  m_slapstic_last_pc;
 	offs_t                  m_slapstic_last_address;
 	offs_t                  m_slapstic_base;
 	offs_t                  m_slapstic_mirror;
 
-	uint32_t                  m_scanlines_per_callback;
+	uint32_t                m_scanlines_per_callback;
 
 
 	atarigen_screen_timer   m_screen_timer[2];
@@ -339,6 +340,9 @@ public:
 	optional_device<palette_device> m_palette;
 	optional_shared_ptr<uint16_t> m_generic_paletteram_16;
 	optional_device<atari_slapstic_device> m_slapstic_device;
+
+private:
+	static const atarigen_screen_timer *get_screen_timer(screen_device &screen);
 };
 
 

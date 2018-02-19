@@ -36,16 +36,11 @@ void cybstorm_state::update_interrupts()
 }
 
 
-MACHINE_START_MEMBER(cybstorm_state,cybstorm)
+void cybstorm_state::machine_start()
 {
 	atarigen_state::machine_start();
 	save_item(NAME(m_latch_data));
 	save_item(NAME(m_alpha_tile_bank));
-}
-
-MACHINE_RESET_MEMBER(cybstorm_state,cybstorm)
-{
-	atarigen_state::machine_reset();
 }
 
 
@@ -237,9 +232,7 @@ MACHINE_CONFIG_START(cybstorm_state::round2)
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", M68EC020, ATARI_CLOCK_14MHz)
 	MCFG_CPU_PROGRAM_MAP(main_map)
-	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", atarigen_state, video_int_gen)
-
-	MCFG_MACHINE_RESET_OVERRIDE(cybstorm_state,cybstorm)
+	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", cybstorm_state, video_int_gen)
 
 	MCFG_EEPROM_2816_ADD("eeprom")
 	MCFG_EEPROM_28XX_LOCK_AFTER_WRITE(true)
@@ -247,7 +240,7 @@ MACHINE_CONFIG_START(cybstorm_state::round2)
 	MCFG_WATCHDOG_ADD("watchdog")
 
 	/* video hardware */
-	MCFG_ATARI_VAD_ADD("vad", "screen", WRITELINE(atarigen_state, scanline_int_write_line))
+	MCFG_ATARI_VAD_ADD("vad", "screen", WRITELINE(cybstorm_state, scanline_int_write_line))
 	MCFG_ATARI_VAD_PLAYFIELD(cybstorm_state, "gfxdecode", get_playfield_tile_info)
 	MCFG_ATARI_VAD_PLAYFIELD2(cybstorm_state, "gfxdecode", get_playfield2_tile_info)
 	MCFG_ATARI_VAD_ALPHA(cybstorm_state, "gfxdecode", get_alpha_tile_info)
@@ -271,16 +264,16 @@ MACHINE_CONFIG_START(cybstorm_state::round2)
 	MCFG_SCREEN_RAW_PARAMS(ATARI_CLOCK_14MHz/2, 456, 0, 336, 262, 0, 240)
 
 	MCFG_SCREEN_UPDATE_DRIVER(cybstorm_state, screen_update_cybstorm)
-	MCFG_VIDEO_START_OVERRIDE(cybstorm_state, cybstorm)
 MACHINE_CONFIG_END
 
 
 MACHINE_CONFIG_START(cybstorm_state::cybstorm)
 	round2(config);
+
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
 
-	MCFG_ATARI_JSA_IIIS_ADD("jsa", WRITELINE(atarigen_state, sound_int_write_line))
+	MCFG_ATARI_JSA_IIIS_ADD("jsa", WRITELINE(cybstorm_state, sound_int_write_line))
 	MCFG_ATARI_JSA_TEST_PORT("9F0010", 22)
 	MCFG_SOUND_ROUTE(0, "lspeaker", 1.0)
 	MCFG_SOUND_ROUTE(1, "rspeaker", 1.0)

@@ -46,7 +46,7 @@ void atarigx2_state::update_interrupts()
 }
 
 
-MACHINE_RESET_MEMBER(atarigx2_state,atarigx2)
+void atarigx2_state::machine_reset()
 {
 	atarigen_state::machine_reset();
 	scanline_timer_reset(*m_screen, 8);
@@ -1499,9 +1499,7 @@ MACHINE_CONFIG_START(atarigx2_state::atarigx2)
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", M68EC020, ATARI_CLOCK_14MHz)
 	MCFG_CPU_PROGRAM_MAP(main_map)
-	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", atarigen_state, video_int_gen)
-
-	MCFG_MACHINE_RESET_OVERRIDE(atarigx2_state,atarigx2)
+	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", atarigx2_state, video_int_gen)
 
 	MCFG_EEPROM_2816_ADD("eeprom")
 	MCFG_EEPROM_28XX_LOCK_AFTER_WRITE(true)
@@ -1522,12 +1520,10 @@ MACHINE_CONFIG_START(atarigx2_state::atarigx2)
 	MCFG_SCREEN_UPDATE_DRIVER(atarigx2_state, screen_update_atarigx2)
 	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_VIDEO_START_OVERRIDE(atarigx2_state,atarigx2)
-
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
 
-	MCFG_ATARI_JSA_IIIS_ADD("jsa", WRITELINE(atarigen_state, sound_int_write_line))
+	MCFG_ATARI_JSA_IIIS_ADD("jsa", WRITELINE(atarigx2_state, sound_int_write_line))
 	MCFG_ATARI_JSA_TEST_PORT("SERVICE", 6)
 	MCFG_SOUND_ROUTE(0, "lspeaker", 1.0)
 	MCFG_SOUND_ROUTE(1, "rspeaker", 1.0)

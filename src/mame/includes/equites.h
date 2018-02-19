@@ -5,6 +5,10 @@
     Equites, Splendor Blast driver
 
 *************************************************************************/
+#ifndef MAME_INCLUDES_EQUITES_H
+#define MAME_INCLUDES_EQUITES_H
+
+#pragma once
 
 #include "machine/alpha8201.h"
 #include "machine/gen_latch.h"
@@ -19,8 +23,8 @@
 class equites_state : public driver_device
 {
 public:
-	equites_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag),
+	equites_state(const machine_config &mconfig, device_type type, const char *tag) :
+		driver_device(mconfig, type, tag),
 		m_bg_videoram(*this, "bg_videoram"),
 		m_spriteram(*this, "spriteram"),
 		m_spriteram_2(*this, "spriteram_2"),
@@ -50,10 +54,7 @@ public:
 	/* video-related */
 	tilemap_t *m_fg_tilemap;
 	tilemap_t *m_bg_tilemap;
-	int       m_fg_char_bank;
 	uint8_t     m_bgcolor;
-	uint16_t    m_splndrbt_bg_scrollx;
-	uint16_t    m_splndrbt_bg_scrolly;
 
 	/* misc */
 	int       m_sound_prom_address;
@@ -68,7 +69,6 @@ public:
 	float     m_cymvol;
 	float     m_hihatvol;
 	int       m_timer_count;
-	int       m_gekisou_unknown_bit;
 
 	/* devices */
 	required_device<cpu_device> m_maincpu;
@@ -91,7 +91,6 @@ public:
 	DECLARE_WRITE8_MEMBER(equites_8155_porta_w);
 	DECLARE_WRITE8_MEMBER(equites_8155_portb_w);
 	DECLARE_WRITE8_MEMBER(equites_8155_portc_w);
-	DECLARE_WRITE16_MEMBER(gekisou_unknown_bit_w);
 	DECLARE_READ16_MEMBER(equites_spriteram_kludge_r);
 	DECLARE_WRITE8_MEMBER(mainlatch_w);
 	DECLARE_READ8_MEMBER(mcu_ram_r);
@@ -103,49 +102,80 @@ public:
 	DECLARE_WRITE16_MEMBER(equites_bg_videoram_w);
 	DECLARE_WRITE8_MEMBER(equites_bgcolor_w);
 	DECLARE_WRITE16_MEMBER(equites_scrollreg_w);
-	DECLARE_WRITE_LINE_MEMBER(splndrbt_selchar_w);
 	DECLARE_WRITE_LINE_MEMBER(flip_screen_w);
-	DECLARE_WRITE16_MEMBER(splndrbt_bg_scrollx_w);
-	DECLARE_WRITE16_MEMBER(splndrbt_bg_scrolly_w);
-	DECLARE_CUSTOM_INPUT_MEMBER(gekisou_unknown_bit_r);
 	DECLARE_WRITE8_MEMBER(equites_8910porta_w);
 	DECLARE_WRITE8_MEMBER(equites_8910portb_w);
-	DECLARE_DRIVER_INIT(splndrbt);
 	DECLARE_DRIVER_INIT(equites);
 	TILE_GET_INFO_MEMBER(equites_fg_info);
-	TILE_GET_INFO_MEMBER(splndrbt_fg_info);
 	TILE_GET_INFO_MEMBER(equites_bg_info);
-	TILE_GET_INFO_MEMBER(splndrbt_bg_info);
 	DECLARE_VIDEO_START(equites);
 	DECLARE_PALETTE_INIT(equites);
-	DECLARE_VIDEO_START(splndrbt);
-	DECLARE_PALETTE_INIT(splndrbt);
 	uint32_t screen_update_equites(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
-	uint32_t screen_update_splndrbt(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	DECLARE_WRITE_LINE_MEMBER(equites_8155_timer_pulse);
 	TIMER_CALLBACK_MEMBER(equites_frq_adjuster_callback);
 	TIMER_DEVICE_CALLBACK_MEMBER(equites_scanline);
-	TIMER_DEVICE_CALLBACK_MEMBER(splndrbt_scanline);
 	DECLARE_WRITE_LINE_MEMBER(equites_msm5232_gate);
 	void equites_draw_sprites_block(bitmap_ind16 &bitmap, const rectangle &cliprect, int start, int end);
 	void equites_draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprect);
-	void splndrbt_draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprect);
-	void splndrbt_copy_bg(bitmap_ind16 &dst_bitmap, const rectangle &cliprect);
 	void equites_update_dac();
 	void unpack_block(const char *region, int offset, int size);
 	void unpack_region(const char *region);
+	void equites(machine_config &config);
 
+protected:
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
 	void common_sound(machine_config &config);
-	void equites(machine_config &config);
-	void splndrbt(machine_config &config);
-	void gekisou(machine_config &config);
-	void hvoltage(machine_config &config);
 	void equites_map(address_map &map);
-	void gekisou_map(address_map &map);
 	void mcu_map(address_map &map);
 	void sound_map(address_map &map);
 	void sound_portmap(address_map &map);
-	void splndrbt_map(address_map &map);
 };
+
+class gekisou_state : public equites_state
+{
+public:
+	using equites_state::equites_state;
+	DECLARE_CUSTOM_INPUT_MEMBER(gekisou_unknown_bit_r);
+	void gekisou(machine_config &config);
+
+protected:
+	virtual void machine_start() override;
+	void gekisou_map(address_map &map);
+	DECLARE_WRITE16_MEMBER(gekisou_unknown_bit_w);
+
+private:
+	int m_gekisou_unknown_bit;
+};
+
+
+class splndrbt_state : public equites_state
+{
+public:
+	using equites_state::equites_state;
+	DECLARE_DRIVER_INIT(splndrbt);
+	void splndrbt(machine_config &config);
+	void hvoltage(machine_config &config);
+
+protected:
+	virtual void machine_start() override;
+	void splndrbt_map(address_map &map);
+	DECLARE_WRITE_LINE_MEMBER(splndrbt_selchar_w);
+	DECLARE_WRITE16_MEMBER(splndrbt_bg_scrollx_w);
+	DECLARE_WRITE16_MEMBER(splndrbt_bg_scrolly_w);
+	TILE_GET_INFO_MEMBER(splndrbt_fg_info);
+	TILE_GET_INFO_MEMBER(splndrbt_bg_info);
+	DECLARE_VIDEO_START(splndrbt);
+	DECLARE_PALETTE_INIT(splndrbt);
+	uint32_t screen_update_splndrbt(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	TIMER_DEVICE_CALLBACK_MEMBER(splndrbt_scanline);
+	void splndrbt_draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprect);
+	void splndrbt_copy_bg(bitmap_ind16 &dst_bitmap, const rectangle &cliprect);
+
+private:
+	int       m_fg_char_bank;
+	uint16_t  m_splndrbt_bg_scrollx;
+	uint16_t  m_splndrbt_bg_scrolly;
+};
+
+#endif // MAME_INCLUDES_EQUITES_H

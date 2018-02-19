@@ -47,26 +47,22 @@
 class sbrkout_state : public driver_device
 {
 public:
-	sbrkout_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag),
+	sbrkout_state(const machine_config &mconfig, device_type type, const char *tag) :
+		driver_device(mconfig, type, tag),
 		m_videoram(*this, "videoram"),
 		m_maincpu(*this, "maincpu"),
 		m_outlatch(*this, "outlatch"),
 		m_dac(*this, "dac"),
 		m_gfxdecode(*this, "gfxdecode"),
 		m_screen(*this, "screen"),
-		m_palette(*this, "palette") { }
+		m_palette(*this, "palette")
+	{ }
 
-	required_shared_ptr<uint8_t> m_videoram;
-	emu_timer *m_scanline_timer;
-	emu_timer *m_pot_timer;
-	tilemap_t *m_bg_tilemap;
-	uint8_t m_sync2_value;
-	uint8_t m_pot_mask[2];
-	uint8_t m_pot_trigger[2];
+	void sbrkout(machine_config &config);
+
+protected:
 	DECLARE_WRITE8_MEMBER(irq_ack_w);
-	DECLARE_READ8_MEMBER(switches_r);
-	DECLARE_READ8_MEMBER(sbrkoutct_switches_r);
+	virtual DECLARE_READ8_MEMBER(switches_r);
 	DECLARE_WRITE_LINE_MEMBER(pot_mask1_w);
 	DECLARE_WRITE_LINE_MEMBER(pot_mask2_w);
 	DECLARE_WRITE8_MEMBER(output_latch_w);
@@ -86,19 +82,34 @@ public:
 	TIMER_CALLBACK_MEMBER(scanline_callback);
 	TIMER_CALLBACK_MEMBER(pot_trigger_callback);
 	void update_nmi_state();
+	void main_map(address_map &map);
+
+private:
+	required_shared_ptr<uint8_t> m_videoram;
+	emu_timer *m_scanline_timer;
+	emu_timer *m_pot_timer;
+	tilemap_t *m_bg_tilemap;
+	uint8_t m_sync2_value;
+	uint8_t m_pot_mask[2];
+	uint8_t m_pot_trigger[2];
+
 	required_device<cpu_device> m_maincpu;
 	required_device<f9334_device> m_outlatch;
 	required_device<dac_bit_interface> m_dac;
 	required_device<gfxdecode_device> m_gfxdecode;
 	required_device<screen_device> m_screen;
 	required_device<palette_device> m_palette;
-	void sbrkoutct(machine_config &config);
-	void sbrkout(machine_config &config);
-	void main_map(address_map &map);
-	void sbrkoutct_main_map(address_map &map);
 };
 
+class sbrkoutct_state : public sbrkout_state
+{
+public:
+	using sbrkout_state::sbrkout_state;
+	void sbrkoutct(machine_config &config);
 
+protected:
+	virtual DECLARE_READ8_MEMBER(switches_r) override;
+};
 
 
 /*************************************
@@ -107,8 +118,8 @@ public:
  *
  *************************************/
 
-#define MAIN_CLOCK      XTAL(12'096'000)
-#define TIME_4V         attotime::from_hz(MAIN_CLOCK/2/256/2/4)
+static constexpr XTAL MAIN_CLOCK    = 12.096_MHz_XTAL;
+#define TIME_4V                     attotime::from_hz(MAIN_CLOCK/2/256/2/4)
 
 
 
@@ -227,7 +238,7 @@ READ8_MEMBER(sbrkout_state::switches_r)
 	return result;
 }
 
-READ8_MEMBER(sbrkout_state::sbrkoutct_switches_r)
+READ8_MEMBER(sbrkoutct_state::switches_r)
 {
 	uint8_t result = 0xff;
 
@@ -423,22 +434,6 @@ ADDRESS_MAP_START(sbrkout_state::main_map)
 	AM_RANGE(0x2800, 0x3fff) AM_ROM
 ADDRESS_MAP_END
 
-ADDRESS_MAP_START(sbrkout_state::sbrkoutct_main_map)
-	ADDRESS_MAP_GLOBAL_MASK(0x3fff)
-	AM_RANGE(0x0000, 0x007f) AM_MIRROR(0x380) AM_RAMBANK("bank1")
-	AM_RANGE(0x0400, 0x07ff) AM_RAM_WRITE(sbrkout_videoram_w) AM_SHARE("videoram")
-	AM_RANGE(0x0800, 0x083f) AM_READ(sbrkoutct_switches_r)
-	AM_RANGE(0x0840, 0x0840) AM_MIRROR(0x003f) AM_READ_PORT("COIN")
-	AM_RANGE(0x0880, 0x0880) AM_MIRROR(0x003f) AM_READ_PORT("START")
-	AM_RANGE(0x08c0, 0x08c0) AM_MIRROR(0x003f) AM_READ_PORT("SERVICE")
-	AM_RANGE(0x0c00, 0x0c00) AM_MIRROR(0x03ff) AM_READ(sync_r)
-	AM_RANGE(0x0c00, 0x0c7f) AM_WRITE(output_latch_w)
-	AM_RANGE(0x0c80, 0x0c80) AM_MIRROR(0x007f) AM_DEVWRITE("watchdog", watchdog_timer_device, reset_w)
-	AM_RANGE(0x0e00, 0x0e00) AM_MIRROR(0x007f) AM_WRITE(irq_ack_w)
-	AM_RANGE(0x1000, 0x1000) AM_MIRROR(0x03ff) AM_READ(sync2_r)
-	AM_RANGE(0x2800, 0x3fff) AM_ROM
-ADDRESS_MAP_END
-
 
 /*************************************
  *
@@ -617,13 +612,11 @@ MACHINE_CONFIG_START(sbrkout_state::sbrkout)
 MACHINE_CONFIG_END
 
 
-MACHINE_CONFIG_START(sbrkout_state::sbrkoutct)
+MACHINE_CONFIG_START(sbrkoutct_state::sbrkoutct)
 	sbrkout(config);
-	MCFG_CPU_MODIFY("maincpu")
-	MCFG_CPU_PROGRAM_MAP(sbrkoutct_main_map)
 
 	MCFG_DEVICE_MODIFY("outlatch")
-	MCFG_ADDRESSABLE_LATCH_Q2_OUT_CB(WRITELINE(sbrkout_state, serve_2_led_w))
+	MCFG_ADDRESSABLE_LATCH_Q2_OUT_CB(WRITELINE(sbrkoutct_state, serve_2_led_w))
 MACHINE_CONFIG_END
 
 /*************************************
@@ -720,7 +713,7 @@ ROM_END
  *
  *************************************/
 
-GAMEL( 1978, sbrkout,   0,       sbrkout,   sbrkout,   sbrkout_state, 0, ROT270, "Atari", "Super Breakout (rev 04)", MACHINE_SUPPORTS_SAVE, layout_sbrkout )
-GAMEL( 1978, sbrkout3,  sbrkout, sbrkout,   sbrkout,   sbrkout_state, 0, ROT270, "Atari", "Super Breakout (rev 03)", MACHINE_SUPPORTS_SAVE, layout_sbrkout )
-GAMEL( 1978, sbrkoutc,  sbrkout, sbrkout,   sbrkoutc,  sbrkout_state, 0, ROT270, "Atari", "Super Breakout (Canyon and Vertical Breakout, prototype)", MACHINE_SUPPORTS_SAVE, layout_sbrkout )
-GAMEL( 1978, sbrkoutct, sbrkout, sbrkoutct, sbrkoutct, sbrkout_state, 0, ROT270, "Atari", "Super Breakout (Cocktail, prototype)", MACHINE_SUPPORTS_SAVE, layout_sbrkout )
+GAMEL( 1978, sbrkout,   0,       sbrkout,   sbrkout,   sbrkout_state,   0, ROT270, "Atari", "Super Breakout (rev 04)", MACHINE_SUPPORTS_SAVE, layout_sbrkout )
+GAMEL( 1978, sbrkout3,  sbrkout, sbrkout,   sbrkout,   sbrkout_state,   0, ROT270, "Atari", "Super Breakout (rev 03)", MACHINE_SUPPORTS_SAVE, layout_sbrkout )
+GAMEL( 1978, sbrkoutc,  sbrkout, sbrkout,   sbrkoutc,  sbrkout_state,   0, ROT270, "Atari", "Super Breakout (Canyon and Vertical Breakout, prototype)", MACHINE_SUPPORTS_SAVE, layout_sbrkout )
+GAMEL( 1978, sbrkoutct, sbrkout, sbrkoutct, sbrkoutct, sbrkoutct_state, 0, ROT270, "Atari", "Super Breakout (Cocktail, prototype)", MACHINE_SUPPORTS_SAVE, layout_sbrkout )

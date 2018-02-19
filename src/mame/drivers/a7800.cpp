@@ -115,17 +115,36 @@
 class a7800_state : public driver_device
 {
 public:
-	a7800_state(const machine_config &mconfig, device_type type, const char *tag)
-	: driver_device(mconfig, type, tag),
-	m_maincpu(*this, "maincpu"),
-	m_tia(*this, "tia"),
-	m_maria(*this, "maria"),
-	m_io_joysticks(*this, "joysticks"),
-	m_io_buttons(*this, "buttons"),
-	m_io_console_buttons(*this, "console_buttons"),
-	m_cart(*this, "cartslot"),
-	m_screen(*this, "screen"),
-	m_bios(*this, "maincpu") { }
+	a7800_state(const machine_config &mconfig, device_type type, const char *tag) :
+		driver_device(mconfig, type, tag),
+		m_maincpu(*this, "maincpu"),
+		m_tia(*this, "tia"),
+		m_maria(*this, "maria"),
+		m_io_joysticks(*this, "joysticks"),
+		m_io_buttons(*this, "buttons"),
+		m_io_console_buttons(*this, "console_buttons"),
+		m_cart(*this, "cartslot"),
+		m_screen(*this, "screen"),
+		m_bios(*this, "maincpu")
+	{
+	}
+
+	void a7800_ntsc(machine_config &config);
+
+protected:
+	DECLARE_READ8_MEMBER(bios_or_cart_r);
+	DECLARE_READ8_MEMBER(tia_r);
+	DECLARE_WRITE8_MEMBER(tia_w);
+	DECLARE_PALETTE_INIT(a7800);
+	TIMER_DEVICE_CALLBACK_MEMBER(interrupt);
+	TIMER_CALLBACK_MEMBER(maria_startdma);
+	DECLARE_READ8_MEMBER(riot_joystick_r);
+	DECLARE_READ8_MEMBER(riot_console_button_r);
+	DECLARE_WRITE8_MEMBER(riot_button_pullup_w);
+
+	virtual void machine_start() override;
+	virtual void machine_reset() override;
+	void a7800_mem(address_map &map);
 
 	int m_lines;
 	int m_ispal;
@@ -137,25 +156,7 @@ public:
 	int m_p2_one_button;
 	int m_bios_enabled;
 
-	DECLARE_READ8_MEMBER(bios_or_cart_r);
-	DECLARE_READ8_MEMBER(tia_r);
-	DECLARE_WRITE8_MEMBER(tia_w);
-	DECLARE_DRIVER_INIT(a7800_pal);
-	DECLARE_DRIVER_INIT(a7800_ntsc);
-	virtual void machine_start() override;
-	virtual void machine_reset() override;
-	DECLARE_PALETTE_INIT(a7800);
-	DECLARE_PALETTE_INIT(a7800p);
-	TIMER_DEVICE_CALLBACK_MEMBER(interrupt);
-	TIMER_CALLBACK_MEMBER(maria_startdma);
-	DECLARE_READ8_MEMBER(riot_joystick_r);
-	DECLARE_READ8_MEMBER(riot_console_button_r);
-	DECLARE_WRITE8_MEMBER(riot_button_pullup_w);
-
-	void a7800_ntsc(machine_config &config);
-	void a7800_pal(machine_config &config);
-	void a7800_mem(address_map &map);
-protected:
+private:
 	required_device<cpu_device> m_maincpu;
 	required_device<tia_device> m_tia;
 	required_device<atari_maria_device> m_maria;
@@ -165,6 +166,24 @@ protected:
 	required_device<a78_cart_slot_device> m_cart;
 	required_device<screen_device> m_screen;
 	required_region_ptr<uint8_t> m_bios;
+};
+
+class a7800_ntsc_state : public a7800_state
+{
+public:
+	using a7800_state::a7800_state;
+	DECLARE_DRIVER_INIT(a7800_ntsc);
+};
+
+class a7800_pal_state : public a7800_state
+{
+public:
+	using a7800_state::a7800_state;
+	DECLARE_DRIVER_INIT(a7800_pal);
+	void a7800_pal(machine_config &config);
+
+protected:
+	DECLARE_PALETTE_INIT(a7800p);
 };
 
 
@@ -1293,7 +1312,7 @@ PALETTE_INIT_MEMBER(a7800_state, a7800)
 }
 
 
-PALETTE_INIT_MEMBER(a7800_state,a7800p)
+PALETTE_INIT_MEMBER(a7800_pal_state,a7800p)
 {
 	palette.set_pen_colors(0, a7800p_palette, ARRAY_LENGTH(a7800p_palette));
 }
@@ -1392,8 +1411,9 @@ MACHINE_CONFIG_START(a7800_state::a7800_ntsc)
 MACHINE_CONFIG_END
 
 
-MACHINE_CONFIG_START(a7800_state::a7800_pal)
+MACHINE_CONFIG_START(a7800_pal_state::a7800_pal)
 	a7800_ntsc(config);
+
 	/* basic machine hardware */
 	MCFG_CPU_MODIFY("maincpu")
 	MCFG_CPU_CLOCK(CLK_PAL)
@@ -1403,14 +1423,14 @@ MACHINE_CONFIG_START(a7800_state::a7800_pal)
 	MCFG_SCREEN_RAW_PARAMS( 7093788, 454, 0, 320, 313, 35, 35 + 228 + 32 )
 
 	MCFG_PALETTE_MODIFY("palette")
-	MCFG_PALETTE_INIT_OWNER(a7800_state, a7800p )
+	MCFG_PALETTE_INIT_OWNER(a7800_pal_state, a7800p)
 
 	/* devices */
 	MCFG_DEVICE_REMOVE("riot")
 	MCFG_DEVICE_ADD("riot", MOS6532_NEW, CLK_PAL)
-	MCFG_MOS6530n_IN_PA_CB(READ8(a7800_state, riot_joystick_r))
-	MCFG_MOS6530n_IN_PB_CB(READ8(a7800_state, riot_console_button_r))
-	MCFG_MOS6530n_OUT_PB_CB(WRITE8(a7800_state, riot_button_pullup_w))
+	MCFG_MOS6530n_IN_PA_CB(READ8(a7800_pal_state, riot_joystick_r))
+	MCFG_MOS6530n_IN_PB_CB(READ8(a7800_pal_state, riot_console_button_r))
+	MCFG_MOS6530n_OUT_PB_CB(WRITE8(a7800_pal_state, riot_button_pullup_w))
 
 	/* software lists */
 	MCFG_DEVICE_REMOVE("cart_list")
@@ -1441,7 +1461,7 @@ ROM_END
  DRIVER INIT
  ***************************************************************************/
 
-DRIVER_INIT_MEMBER(a7800_state,a7800_ntsc)
+DRIVER_INIT_MEMBER(a7800_ntsc_state, a7800_ntsc)
 {
 	m_ispal = false;
 	m_lines = 263;
@@ -1450,7 +1470,7 @@ DRIVER_INIT_MEMBER(a7800_state,a7800_ntsc)
 }
 
 
-DRIVER_INIT_MEMBER(a7800_state,a7800_pal)
+DRIVER_INIT_MEMBER(a7800_pal_state, a7800_pal)
 {
 	m_ispal = true;
 	m_lines = 313;
@@ -1463,6 +1483,6 @@ DRIVER_INIT_MEMBER(a7800_state,a7800_pal)
     GAME DRIVERS
 ***************************************************************************/
 
-/*    YEAR  NAME      PARENT    COMPAT  MACHINE     INPUT  STATE         INIT         COMPANY   FULLNAME */
-CONS( 1986, a7800,    0,        0,      a7800_ntsc, a7800, a7800_state,  a7800_ntsc,  "Atari",  "Atari 7800 (NTSC)" , 0)
-CONS( 1986, a7800p,   a7800,    0,      a7800_pal,  a7800, a7800_state,  a7800_pal,   "Atari",  "Atari 7800 (PAL)" , 0)
+//    YEAR  NAME      PARENT    COMPAT  MACHINE     INPUT  STATE              INIT        COMPANY   FULLNAME             FLAGS
+CONS( 1986, a7800,    0,        0,      a7800_ntsc, a7800, a7800_ntsc_state,  a7800_ntsc, "Atari",  "Atari 7800 (NTSC)", 0 )
+CONS( 1986, a7800p,   a7800,    0,      a7800_pal,  a7800, a7800_pal_state,   a7800_pal,  "Atari",  "Atari 7800 (PAL)",  0 )

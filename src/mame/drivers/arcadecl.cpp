@@ -323,7 +323,7 @@ MACHINE_CONFIG_START(arcadecl_state::arcadecl)
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", M68000, MASTER_CLOCK)
 	MCFG_CPU_PROGRAM_MAP(main_map)
-	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", atarigen_state, video_int_gen)
+	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", arcadecl_state, video_int_gen)
 
 	MCFG_MACHINE_RESET_OVERRIDE(arcadecl_state,arcadecl)
 

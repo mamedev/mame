@@ -114,13 +114,14 @@ class supertnk_state : public driver_device
 {
 public:
 	supertnk_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag),
-		m_maincpu(*this, "maincpu") { }
+		: driver_device(mconfig, type, tag)
+		, m_maincpu(*this, "maincpu")
+	{ }
 
-	std::unique_ptr<uint8_t[]> m_videoram[3];
-	uint8_t m_rom_bank;
-	uint8_t m_bitplane_select;
-	pen_t m_pens[NUM_PENS];
+	DECLARE_DRIVER_INIT(supertnk);
+	void supertnk(machine_config &config);
+
+protected:
 	DECLARE_WRITE8_MEMBER(supertnk_bankswitch_0_w);
 	DECLARE_WRITE8_MEMBER(supertnk_bankswitch_1_w);
 	DECLARE_WRITE8_MEMBER(supertnk_interrupt_ack_w);
@@ -128,16 +129,21 @@ public:
 	DECLARE_READ8_MEMBER(supertnk_videoram_r);
 	DECLARE_WRITE8_MEMBER(supertnk_bitplane_select_0_w);
 	DECLARE_WRITE8_MEMBER(supertnk_bitplane_select_1_w);
-	DECLARE_DRIVER_INIT(supertnk);
+	uint32_t screen_update_supertnk(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
+	INTERRUPT_GEN_MEMBER(supertnk_interrupt);
+
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
 	virtual void video_start() override;
-	uint32_t screen_update_supertnk(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
-	INTERRUPT_GEN_MEMBER(supertnk_interrupt);
-	required_device<cpu_device> m_maincpu;
-	void supertnk(machine_config &config);
 	void supertnk_io_map(address_map &map);
 	void supertnk_map(address_map &map);
+
+private:
+	std::unique_ptr<uint8_t[]> m_videoram[3];
+	uint8_t m_rom_bank;
+	uint8_t m_bitplane_select;
+	pen_t m_pens[NUM_PENS];
+	required_device<cpu_device> m_maincpu;
 };
 
 

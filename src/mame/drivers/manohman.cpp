@@ -144,20 +144,22 @@
 class manohman_state : public driver_device
 {
 public:
-	manohman_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag),
+	manohman_state(const machine_config &mconfig, device_type type, const char *tag) :
+		driver_device(mconfig, type, tag),
 		m_maincpu(*this, "maincpu"),
 		m_duart(*this, "duart"),
 		m_pit(*this, "pit")
 	{ }
 
+	void manohman(machine_config &config);
+
+protected:
+	virtual void machine_start() override;
+	void mem_map(address_map &map);
+
 	IRQ_CALLBACK_MEMBER(iack_handler);
 
-	void manohman(machine_config &config);
-	void mem_map(address_map &map);
 private:
-	virtual void machine_start() override;
-
 	required_device<cpu_device> m_maincpu;
 	required_device<mc68681_device> m_duart;
 	required_device<pit68230_device> m_pit;

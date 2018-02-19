@@ -5,6 +5,10 @@
     Atari Cyberball hardware
 
 *************************************************************************/
+#ifndef MAME_INCLUDES_CYBERBAL_H
+#define MAME_INCLUDES_CYBERBAL_H
+
+#pragma once
 
 #include "machine/atarigen.h"
 #include "audio/atarijsa.h"
@@ -18,24 +22,25 @@
 class cyberbal_state : public atarigen_state
 {
 public:
-	cyberbal_state(const machine_config &mconfig, device_type type, const char *tag)
-		: atarigen_state(mconfig, type, tag),
-			m_audiocpu(*this, "audiocpu"),
-			m_extracpu(*this, "extra"),
-			m_daccpu(*this, "dac"),
-			m_rdac(*this, "rdac"),
-			m_ldac(*this, "ldac"),
-			m_soundcomm(*this, "soundcomm"),
-			m_ymsnd(*this, "ymsnd"),
-			m_jsa(*this, "jsa"),
-			m_playfield_tilemap(*this, "playfield"),
-			m_alpha_tilemap(*this, "alpha"),
-			m_mob(*this, "mob"),
-			m_playfield2_tilemap(*this, "playfield2"),
-			m_alpha2_tilemap(*this, "alpha2"),
-			m_mob2(*this, "mob2"),
-			m_lscreen(*this, "lscreen"),
-			m_rscreen(*this, "rscreen") { }
+	cyberbal_state(const machine_config &mconfig, device_type type, const char *tag) :
+		atarigen_state(mconfig, type, tag),
+		m_audiocpu(*this, "audiocpu"),
+		m_extracpu(*this, "extra"),
+		m_daccpu(*this, "dac"),
+		m_rdac(*this, "rdac"),
+		m_ldac(*this, "ldac"),
+		m_soundcomm(*this, "soundcomm"),
+		m_ymsnd(*this, "ymsnd"),
+		m_jsa(*this, "jsa"),
+		m_playfield_tilemap(*this, "playfield"),
+		m_alpha_tilemap(*this, "alpha"),
+		m_mob(*this, "mob"),
+		m_playfield2_tilemap(*this, "playfield2"),
+		m_alpha2_tilemap(*this, "alpha2"),
+		m_mob2(*this, "mob2"),
+		m_lscreen(*this, "lscreen"),
+		m_rscreen(*this, "rscreen")
+	{ }
 
 	optional_device<m6502_device> m_audiocpu;
 	optional_device<cpu_device> m_extracpu;
@@ -104,9 +109,12 @@ public:
 	void main_map(address_map &map);
 	void sound_68k_map(address_map &map);
 	void sound_map(address_map &map);
+
 private:
 	void video_start_common(int screens);
 	void cyberbal_sound_reset();
 	uint32_t update_one_screen(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect, int index);
 	void update_sound_68k_interrupts();
 };
+
+#endif // MAME_INCLUDES_CYBERBAL_H

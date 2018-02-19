@@ -28,7 +28,7 @@
     INLINE FUNCTIONS
 ***************************************************************************/
 
-inline const atarigen_screen_timer *get_screen_timer(screen_device &screen)
+inline const atarigen_screen_timer *atarigen_state::get_screen_timer(screen_device &screen)
 {
 	atarigen_state *state = screen.machine().driver_data<atarigen_state>();
 	int i;

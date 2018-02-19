@@ -59,6 +59,12 @@ public:
 		, m_cmd(0x01)
 	{ }
 
+	void superslave(machine_config &config);
+
+protected:
+	void superslave_io(address_map &map);
+	void superslave_mem(address_map &map);
+
 	DECLARE_READ8_MEMBER( read );
 	DECLARE_WRITE8_MEMBER( write );
 	DECLARE_WRITE8_MEMBER( baud_w );
@@ -66,9 +72,6 @@ public:
 	DECLARE_READ8_MEMBER( status_r );
 	DECLARE_WRITE8_MEMBER( cmd_w );
 
-	void superslave(machine_config &config);
-	void superslave_io(address_map &map);
-	void superslave_mem(address_map &map);
 private:
 	required_device<cpu_device> m_maincpu;
 	required_device<com8116_device> m_dbrg;
@@ -348,7 +351,7 @@ static const z80_daisy_config superslave_daisy_chain[] =
 //**************************************************************************
 
 //-------------------------------------------------
-//  MACHINE_START( superslave )
+//  machine_start()
 //-------------------------------------------------
 
 void superslave_state::machine_start()

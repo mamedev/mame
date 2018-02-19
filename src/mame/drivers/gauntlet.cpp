@@ -158,14 +158,14 @@ void gauntlet_state::scanline_update(screen_device &screen, int scanline)
 }
 
 
-MACHINE_START_MEMBER(gauntlet_state,gauntlet)
+void gauntlet_state::machine_start()
 {
 	atarigen_state::machine_start();
 	save_item(NAME(m_sound_reset_val));
 }
 
 
-MACHINE_RESET_MEMBER(gauntlet_state,gauntlet)
+void gauntlet_state::machine_reset()
 {
 	m_sound_reset_val = 1;
 
@@ -491,13 +491,10 @@ MACHINE_CONFIG_START(gauntlet_state::gauntlet_base)
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", M68010, ATARI_CLOCK_14MHz/2)
 	MCFG_CPU_PROGRAM_MAP(main_map)
-	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", atarigen_state, video_int_gen)
+	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", gauntlet_state, video_int_gen)
 
 	MCFG_CPU_ADD("audiocpu", M6502, ATARI_CLOCK_14MHz/8)
 	MCFG_CPU_PROGRAM_MAP(sound_map)
-
-	MCFG_MACHINE_START_OVERRIDE(gauntlet_state,gauntlet)
-	MCFG_MACHINE_RESET_OVERRIDE(gauntlet_state,gauntlet)
 
 	MCFG_EEPROM_2804_ADD("eeprom")
 	MCFG_EEPROM_28XX_LOCK_AFTER_WRITE(true)
@@ -523,10 +520,8 @@ MACHINE_CONFIG_START(gauntlet_state::gauntlet_base)
 	MCFG_SCREEN_UPDATE_DRIVER(gauntlet_state, screen_update_gauntlet)
 	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_VIDEO_START_OVERRIDE(gauntlet_state,gauntlet)
-
 	/* sound hardware */
-	MCFG_ATARI_SOUND_COMM_ADD("soundcomm", "audiocpu", WRITELINE(atarigen_state, sound_int_write_line))
+	MCFG_ATARI_SOUND_COMM_ADD("soundcomm", "audiocpu", WRITELINE(gauntlet_state, sound_int_write_line))
 	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
 
 	MCFG_YM2151_ADD("ymsnd", ATARI_CLOCK_14MHz/4)

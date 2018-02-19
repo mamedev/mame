@@ -35,6 +35,10 @@ public:
 		, m_floppy1(*this, "fdc:1")
 	{ }
 
+	DECLARE_DRIVER_INIT(altos5);
+	void altos5(machine_config &config);
+
+protected:
 	DECLARE_READ8_MEMBER(memory_read_byte);
 	DECLARE_WRITE8_MEMBER(memory_write_byte);
 	DECLARE_READ8_MEMBER(io_read_byte);
@@ -44,13 +48,12 @@ public:
 	DECLARE_WRITE8_MEMBER(port08_w);
 	DECLARE_WRITE8_MEMBER(port09_w);
 	DECLARE_WRITE8_MEMBER(port14_w);
-	DECLARE_DRIVER_INIT(altos5);
 	DECLARE_WRITE_LINE_MEMBER(busreq_w);
 	DECLARE_WRITE_LINE_MEMBER(fdc_intrq_w);
 
-	void altos5(machine_config &config);
 	void io_map(address_map &map);
 	void mem_map(address_map &map);
+
 private:
 	uint8_t m_port08;
 	uint8_t m_port09;
@@ -68,6 +71,7 @@ private:
 	required_device<floppy_connector> m_floppy0;
 	required_device<floppy_connector> m_floppy1;
 };
+
 
 ADDRESS_MAP_START(altos5_state::mem_map)
 	ADDRESS_MAP_UNMAP_HIGH
