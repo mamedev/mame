@@ -5274,7 +5274,7 @@ DRIVER_INIT_MEMBER(cave_state,pwrinst2j)
 
 	init_cave();
 
-	init_z80_bank()
+	init_z80_bank();
 
 	std::vector<uint8_t> buffer(len);
 	{

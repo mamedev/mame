@@ -1565,7 +1565,7 @@ uint32_t cave_state::screen_update_cave(screen_device &screen, bitmap_rgb32 &bit
 
 void cave_state::cave_get_sprite_info(int chip)
 {
-	int spriteram_bankmax = m_spriteram.bytes() / 0x4000;
+	int spriteram_bankmax = m_spriteram[chip].bytes() / 0x4000;
 	if (m_videoregs[chip] == nullptr)
 		return;
 
