@@ -1454,6 +1454,87 @@ ROM_START( wlsair60 )
 	ROM_LOAD16_WORD_SWAP( "wlsair60.nand", 0x0000, 0x8400000, CRC(eec23b97) SHA1(1bb88290cf54579a5bb51c08a02d793cd4d79f7a) )
 ROM_END
 
+/*
+Wireless
+(info provided with dump)
+
+System: Wireless Hunting Video Game System
+Publisher: Hamy / Kids Station Toys Inc
+Year: 2011
+ROM: FDI MSP55LV100G
+RAM: Micron Technology 48LC8M16A2
+
+Games:
+
+Secret Mission
+Predator
+Delta Force
+Toy Land
+Dream Forest
+Trophy Season
+Freedom Force
+Be Careful
+Net Power
+Open Training
+Super Archer
+Ultimate Frisbee
+UFO Shooting
+Happy Darts
+Balloon Shoot
+Avatair
+Angry Pirate
+Penguin War
+Ghost Shooter
+Duck Hunt
+
+
+ROM Board:
+
+Package: SO44
+Spacing: 1.27 mm
+Width: 16.14 mm
+Length: 27.78 mm
+Voltage: 3V
+Pinout:
+
+          A25  A24
+            |  |
+      +--------------------------+
+A21 --|==   #  # `.__.'        ==|-- A20
+A18 --|==                      ==|-- A19
+A17 --|==                      ==|-- A8
+ A7 --|==                      ==|-- A9
+ A6 --|==                  o   ==|-- A10
+ A5 --|==  +----------------+  ==|-- A11
+ A4 --|==  |                |  ==|-- A12
+ A3 --|==  |  MSP55LV100G   |  ==|-- A13
+ A2 --|==  |  0834 M02H     |  ==|-- A14
+ A1 --|==  |  JAPAN         |  ==|-- A15
+ A0 --|==  |                |  ==|-- A16
+#CE --|==  |                |  ==|-- A23
+GND --|==  |                |  ==|-- A22
+#OE --|==  |                |  ==|-- Q15
+ Q0 --|==  |                |  ==|-- Q7
+ Q8 --|==  |                |  ==|-- Q14
+ Q1 --|==  +----------------+  ==|-- Q6
+ Q9 --|==                      ==|-- Q13
+ Q2 --|==       M55L100G       ==|-- Q5
+Q10 --|==                      ==|-- Q12
+ Q3 --|==                      ==|-- Q4
+Q11 --|==                      ==|-- VCC
+      +--------------------------+
+
+
+The only interesting string in this ROM is SPF2ALP,
+which is also found in the Wireless Air 60 ROM.
+
+*/
+
+ROM_START( wireless )
+	ROM_REGION( 0x8400000, "maincpu", ROMREGION_ERASEFF )     
+	ROM_LOAD16_WORD_SWAP( "wireless.nand", 0x0000, 0x8400000, CRC(a6ecc20e) SHA1(3645f23ba2bb218e92d4560a8ae29dddbaabf796) )
+ROM_END
+
 //    YEAR  NAME      PARENT    COMPAT    MACHINE      INPUT     STATE              INIT      COMPANY                                              FULLNAME             FLAGS
 
 // VTech systems
@@ -1480,4 +1561,4 @@ CONS( 2006, rad_skatp, rad_skat,0,        spg2xx_basep,rad_skatp,spg2xx_game_sta
 CONS( 200?, zone40,    0,        0,        spg2xx_base, wirels60, spg2xx_game_state, wirels60, "Jungle Soft",                                      "Zone 40", MACHINE_NO_SOUND | MACHINE_NOT_WORKING )
 // might not fit here, NAND dump, has internal bootstrap at least, see above.
 CONS( 200?, wlsair60,  0,        0,        spg2xx_base, wirels60, spg2xx_game_state, wirels60, "Jungle Soft",                                      "Wireless Air 60", MACHINE_NO_SOUND | MACHINE_NOT_WORKING )
-
+CONS( 2011, wireless,  0,        0,        spg2xx_base, wirels60, spg2xx_game_state, wirels60, "Jungle Soft",                                      "Wireless", MACHINE_NO_SOUND | MACHINE_NOT_WORKING )
