@@ -5,6 +5,10 @@
     Atari Shuuz hardware
 
 *************************************************************************/
+#ifndef MAME_INCLUDES_SHUUZ_H
+#define MAME_INCLUDES_SHUUZ_H
+
+#pragma once
 
 #include "machine/atarigen.h"
 #include "video/atarimo.h"
@@ -13,13 +17,13 @@ class shuuz_state : public atarigen_state
 {
 public:
 	shuuz_state(const machine_config &mconfig, device_type type, const char *tag)
-		: atarigen_state(mconfig, type, tag),
-			m_vad(*this, "vad") { }
+		: atarigen_state(mconfig, type, tag)
+		, m_vad(*this, "vad")
+	{ }
 
-	required_device<atari_vad_device> m_vad;
+	void shuuz(machine_config &config);
 
-	int m_cur[2];
-
+protected:
 	virtual void update_interrupts() override;
 
 	DECLARE_WRITE16_MEMBER(latch_w);
@@ -32,7 +36,14 @@ public:
 
 	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 
-	static const atari_motion_objects_config s_mob_config;
-	void shuuz(machine_config &config);
 	void main_map(address_map &map);
+
+private:
+	required_device<atari_vad_device> m_vad;
+
+	int m_cur[2];
+
+	static const atari_motion_objects_config s_mob_config;
 };
+
+#endif // MAME_INCLUDES_SHUUZ_H

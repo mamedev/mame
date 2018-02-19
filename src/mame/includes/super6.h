@@ -46,6 +46,12 @@ public:
 			m_j7(*this, "J7")
 	{ }
 
+	void super6(machine_config &config);
+
+protected:
+	virtual void machine_start() override;
+	virtual void machine_reset() override;
+
 	DECLARE_READ8_MEMBER( fdc_r );
 	DECLARE_WRITE8_MEMBER( fdc_w );
 	DECLARE_WRITE8_MEMBER( s100_w );
@@ -61,15 +67,12 @@ public:
 	DECLARE_READ8_MEMBER(io_read_byte);
 	DECLARE_WRITE8_MEMBER(io_write_byte);
 
-	void super6(machine_config &config);
 	void super6_io(address_map &map);
 	void super6_mem(address_map &map);
-protected:
-	virtual void machine_start() override;
-	virtual void machine_reset() override;
 
 	void bankswitch();
 
+private:
 	required_device<cpu_device> m_maincpu;
 	required_device<z80ctc_device> m_ctc;
 	required_device<z80dart_device> m_dart;

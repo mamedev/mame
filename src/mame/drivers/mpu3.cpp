@@ -181,49 +181,17 @@ public:
 	mpu3_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag)
 		, m_maincpu(*this, "maincpu")
-		, m_reel0(*this, "reel0")
-		, m_reel1(*this, "reel1")
-		, m_reel2(*this, "reel2")
-		, m_reel3(*this, "reel3")
+		, m_reels(*this, "reel%u", 0U)
 		, m_meters(*this, "meters")
 		, m_vfd(*this, "vfd")
 	{ }
 
-	int m_triac_ic3;
-	int m_triac_ic4;
-	int m_triac_ic5;
-	int m_ic3_data;
-	int m_IC11G1;
-	int m_IC11G2A;
-	int m_IC11G2B;
-	int m_IC11GC;
-	int m_IC11GB;
-	int m_IC11GA;
+	DECLARE_DRIVER_INIT(m3hprvpr);
+	void mpu3base(machine_config &config);
 
-	int m_ic10_output;
-	int m_ic11_active;
-	int m_ic11_output;
-	int m_disp_func;
+protected:
+	template <unsigned N> DECLARE_WRITE_LINE_MEMBER(reel_optic_cb) { if (state) m_optic_pattern |= (1 << N); else m_optic_pattern &= ~(1 << N); }
 
-	int m_ic4_input_a;
-	int m_aux1_input;
-	int m_aux2_input;
-	int m_input_strobe;   /* IC11 74LS138 A = CA2 IC3, B = CA2 IC4, C = CA2 IC5 */
-	uint8_t m_lamp_strobe;
-	uint8_t m_led_strobe;
-	int m_signal_50hz;
-
-	const mpu3_chr_table* m_current_chr_table;
-	int m_prot_col;
-
-	int m_optic_pattern;
-
-	DECLARE_WRITE_LINE_MEMBER(reel0_optic_cb) { if (state) m_optic_pattern |= 0x01; else m_optic_pattern &= ~0x01; }
-	DECLARE_WRITE_LINE_MEMBER(reel1_optic_cb) { if (state) m_optic_pattern |= 0x02; else m_optic_pattern &= ~0x02; }
-	DECLARE_WRITE_LINE_MEMBER(reel2_optic_cb) { if (state) m_optic_pattern |= 0x04; else m_optic_pattern &= ~0x04; }
-	DECLARE_WRITE_LINE_MEMBER(reel3_optic_cb) { if (state) m_optic_pattern |= 0x08; else m_optic_pattern &= ~0x08; }
-
-	emu_timer *m_ic21_timer;
 	DECLARE_WRITE8_MEMBER(characteriser_w);
 	DECLARE_READ8_MEMBER(characteriser_r);
 	DECLARE_WRITE8_MEMBER(mpu3ptm_w);
@@ -249,9 +217,6 @@ public:
 	DECLARE_READ8_MEMBER(pia_ic6_portb_r);
 	DECLARE_WRITE8_MEMBER(pia_ic6_porta_w);
 	DECLARE_WRITE8_MEMBER(pia_ic6_portb_w);
-	DECLARE_DRIVER_INIT(m3hprvpr);
-	virtual void machine_start() override;
-	virtual void machine_reset() override;
 	TIMER_CALLBACK_MEMBER(ic21_timeout);
 	TIMER_DEVICE_CALLBACK_MEMBER(gen_50hz);
 	TIMER_DEVICE_CALLBACK_MEMBER(ic10_callback);
@@ -260,15 +225,46 @@ public:
 	void ic21_output(int data);
 	void ic21_setup();
 	void mpu3_config_common();
+
+	virtual void machine_start() override;
+	virtual void machine_reset() override;
+	void mpu3_basemap(address_map &map);
+
+private:
+	int m_triac_ic3;
+	int m_triac_ic4;
+	int m_triac_ic5;
+	int m_ic3_data;
+	int m_IC11G1;
+	int m_IC11G2A;
+	int m_IC11G2B;
+	int m_IC11GC;
+	int m_IC11GB;
+	int m_IC11GA;
+
+	int m_ic10_output;
+	int m_ic11_active;
+	int m_disp_func;
+
+	int m_ic4_input_a;
+	int m_aux1_input;
+	int m_aux2_input;
+	int m_input_strobe;   /* IC11 74LS138 A = CA2 IC3, B = CA2 IC4, C = CA2 IC5 */
+	uint8_t m_lamp_strobe;
+	uint8_t m_led_strobe;
+	int m_signal_50hz;
+
+	const mpu3_chr_table* m_current_chr_table;
+	int m_prot_col;
+
+	int m_optic_pattern;
+
+	emu_timer *m_ic21_timer;
+
 	required_device<cpu_device> m_maincpu;
-	required_device<stepper_device> m_reel0;
-	required_device<stepper_device> m_reel1;
-	required_device<stepper_device> m_reel2;
-	required_device<stepper_device> m_reel3;
+	required_device_array<stepper_device, 4> m_reels;
 	required_device<meters_device> m_meters;
 	optional_device<roc10937_device> m_vfd;
-	void mpu3base(machine_config &config);
-	void mpu3_basemap(address_map &map);
 };
 
 #define DISPLAY_PORT 0
@@ -561,14 +557,14 @@ WRITE_LINE_MEMBER(mpu3_state::pia_ic4_cb2_w)
 WRITE8_MEMBER(mpu3_state::pia_ic5_porta_w)
 {
 	LOG(("%s: IC5 PIA Port A Set to %2x (Reel)\n", machine().describe_context(),data));
-	m_reel0->update( data     & 0x03);
-	m_reel1->update((data>>2) & 0x03);
-	m_reel2->update((data>>4) & 0x03);
-	m_reel3->update((data>>6) & 0x03);
-	awp_draw_reel(machine(),"reel1", *m_reel0);
-	awp_draw_reel(machine(),"reel2", *m_reel1);
-	awp_draw_reel(machine(),"reel3", *m_reel2);
-	awp_draw_reel(machine(),"reel4", *m_reel3);
+	m_reels[0]->update( data     & 0x03);
+	m_reels[1]->update((data>>2) & 0x03);
+	m_reels[2]->update((data>>4) & 0x03);
+	m_reels[3]->update((data>>6) & 0x03);
+	awp_draw_reel(machine(),"reel1", *m_reels[0]);
+	awp_draw_reel(machine(),"reel2", *m_reels[1]);
+	awp_draw_reel(machine(),"reel3", *m_reels[2]);
+	awp_draw_reel(machine(),"reel4", *m_reels[3]);
 }
 
 READ8_MEMBER(mpu3_state::pia_ic5_portb_r)
@@ -896,13 +892,13 @@ MACHINE_CONFIG_START(mpu3_state::mpu3base)
 	MCFG_PIA_IRQB_HANDLER(WRITELINE(mpu3_state, cpu0_irq))
 
 	MCFG_MPU3_REEL_ADD("reel0")
-	MCFG_STEPPER_OPTIC_CALLBACK(WRITELINE(mpu3_state, reel0_optic_cb))
+	MCFG_STEPPER_OPTIC_CALLBACK(WRITELINE(mpu3_state, reel_optic_cb<0>))
 	MCFG_MPU3_REEL_ADD("reel1")
-	MCFG_STEPPER_OPTIC_CALLBACK(WRITELINE(mpu3_state, reel1_optic_cb))
+	MCFG_STEPPER_OPTIC_CALLBACK(WRITELINE(mpu3_state, reel_optic_cb<1>))
 	MCFG_MPU3_REEL_ADD("reel2")
-	MCFG_STEPPER_OPTIC_CALLBACK(WRITELINE(mpu3_state, reel2_optic_cb))
+	MCFG_STEPPER_OPTIC_CALLBACK(WRITELINE(mpu3_state, reel_optic_cb<2>))
 	MCFG_MPU3_REEL_ADD("reel3")
-	MCFG_STEPPER_OPTIC_CALLBACK(WRITELINE(mpu3_state, reel3_optic_cb))
+	MCFG_STEPPER_OPTIC_CALLBACK(WRITELINE(mpu3_state, reel_optic_cb<3>))
 
 	MCFG_DEVICE_ADD("meters", METERS, 0)
 	MCFG_METERS_NUMBER(8)

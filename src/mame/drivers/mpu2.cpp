@@ -44,15 +44,17 @@
 class mpu2_state : public driver_device
 {
 public:
-	mpu2_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag),
-			m_maincpu(*this, "maincpu")
+	mpu2_state(const machine_config &mconfig, device_type type, const char *tag) :
+		driver_device(mconfig, type, tag),
+		m_maincpu(*this, "maincpu")
 	{ }
 
 	void mpu2(machine_config &config);
-	void mpu2_basemap(address_map &map);
-protected:
 
+protected:
+	void mpu2_basemap(address_map &map);
+
+private:
 	// devices
 	required_device<cpu_device> m_maincpu;
 };

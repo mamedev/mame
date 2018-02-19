@@ -31,6 +31,10 @@ public:
 		m_hdd(*this, "hdd"),
 		m_bios(*this, "bios")
 	{}
+
+	void altos8600(machine_config &config);
+
+protected:
 	DECLARE_READ16_MEMBER(cpuram_r);
 	DECLARE_WRITE16_MEMBER(cpuram_w);
 	DECLARE_READ16_MEMBER(stkram_r);
@@ -66,7 +70,9 @@ public:
 	DECLARE_WRITE_LINE_MEMBER(sintr1_w);
 	DECLARE_WRITE8_MEMBER(ics_attn_w);
 	IRQ_CALLBACK_MEMBER(inta);
-	void altos8600(machine_config &config);
+
+	virtual void machine_start() override;
+	virtual void machine_reset() override;
 	void code_mem(address_map &map);
 	void cpu_io(address_map &map);
 	void cpu_mem(address_map &map);
@@ -74,9 +80,6 @@ public:
 	void dmac_mem(address_map &map);
 	void extra_mem(address_map &map);
 	void stack_mem(address_map &map);
-protected:
-	virtual void machine_start() override;
-	virtual void machine_reset() override;
 
 private:
 	u16 xlate_r(address_space &space, offs_t offset, u16 mem_mask, int permbit);
@@ -686,7 +689,7 @@ static SLOT_INTERFACE_START(altos8600_floppies)
 SLOT_INTERFACE_END
 
 MACHINE_CONFIG_START(altos8600_state::altos8600)
-	MCFG_CPU_ADD("maincpu", I8086, XTAL(5'000'000))
+	MCFG_CPU_ADD("maincpu", I8086, 5_MHz_XTAL)
 	MCFG_CPU_PROGRAM_MAP(cpu_mem)
 	MCFG_CPU_IO_MAP(cpu_io)
 	MCFG_CPU_OPCODES_MAP(code_mem)
@@ -696,7 +699,7 @@ MACHINE_CONFIG_START(altos8600_state::altos8600)
 	MCFG_CPU_IRQ_ACKNOWLEDGE_DRIVER(altos8600_state, inta)
 	MCFG_I8086_IF_HANDLER(WRITELINE(altos8600_state, cpuif_w))
 
-	MCFG_CPU_ADD("dmac", I8089, XTAL(5'000'000))
+	MCFG_CPU_ADD("dmac", I8089, 5_MHz_XTAL)
 	MCFG_CPU_PROGRAM_MAP(dmac_mem)
 	MCFG_CPU_IO_MAP(dmac_io)
 	MCFG_I8089_DATA_WIDTH(16)
@@ -720,7 +723,7 @@ MACHINE_CONFIG_START(altos8600_state::altos8600)
 	MCFG_RAM_DEFAULT_SIZE("1M")
 	//MCFG_RAM_EXTRA_OPTIONS("512K")
 
-	MCFG_DEVICE_ADD("uart8274", I8274_NEW, XTAL(16'000'000)/4)
+	MCFG_DEVICE_ADD("uart8274", I8274_NEW, 16_MHz_XTAL/4)
 	MCFG_Z80SIO_OUT_TXDA_CB(DEVWRITELINE("rs232a", rs232_port_device, write_txd))
 	MCFG_Z80SIO_OUT_DTRA_CB(DEVWRITELINE("rs232a", rs232_port_device, write_dtr))
 	MCFG_Z80SIO_OUT_RTSA_CB(DEVWRITELINE("rs232a", rs232_port_device, write_rts))

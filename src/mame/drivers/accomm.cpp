@@ -57,9 +57,6 @@ public:
 			m_ch00rom_enabled(true)
 	{ }
 
-	virtual void machine_reset() override;
-	virtual void machine_start() override;
-
 	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 
 	DECLARE_WRITE8_MEMBER(ch00switch_w);
@@ -76,8 +73,12 @@ public:
 	INTERRUPT_GEN_MEMBER(vbl_int);
 
 	void accomm(machine_config &config);
-	void main_map(address_map &map);
+
 protected:
+	virtual void machine_reset() override;
+	virtual void machine_start() override;
+	void main_map(address_map &map);
+
 	// devices
 	required_device<g65816_device> m_maincpu;
 	required_device<beep_device> m_beeper;
@@ -830,7 +831,7 @@ static INPUT_PORTS_START( accomm )
 INPUT_PORTS_END
 
 MACHINE_CONFIG_START(accomm_state::accomm)
-	MCFG_CPU_ADD("maincpu", G65816, XTAL(16'000'000) / 8)
+	MCFG_CPU_ADD("maincpu", G65816, 16_MHz_XTAL / 8)
 	MCFG_CPU_PROGRAM_MAP(main_map)
 	MCFG_CPU_VBLANK_INT_DRIVER("screen", accomm_state, vbl_int)
 

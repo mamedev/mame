@@ -26,6 +26,9 @@ public:
 			m_duart(*this, "duart")
 	{ }
 
+	void stellafr(machine_config &config);
+
+protected:
 	IRQ_CALLBACK_MEMBER(irq_ack);
 	DECLARE_WRITE8_MEMBER(write_8000c1);
 	DECLARE_READ8_MEMBER(read_800101);
@@ -33,10 +36,9 @@ public:
 	DECLARE_WRITE8_MEMBER(duart_output_w);
 	DECLARE_WRITE8_MEMBER(ay8910_portb_w);
 
-	void stellafr(machine_config &config);
 	void stellafr_map(address_map &map);
-protected:
 
+private:
 	// devices
 	required_device<cpu_device> m_maincpu;
 	required_device<mc68681_device> m_duart;

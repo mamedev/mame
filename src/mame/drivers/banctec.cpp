@@ -33,17 +33,20 @@ public:
 		, m_p_chargen(*this, "chargen")
 	{ }
 
+	void banctec(machine_config &config);
+
+protected:
 	MC6845_UPDATE_ROW(crtc_update_row);
 	MC6845_ON_UPDATE_ADDR_CHANGED(crtc_addr);
 	DECLARE_WRITE8_MEMBER(videoram_w);
-	required_device<palette_device> m_palette;
 
-	void banctec(machine_config &config);
+	virtual void machine_reset() override;
 	void banctec_mcu_mem(address_map &map);
 	void banctec_mem(address_map &map);
+
 private:
+	required_device<palette_device> m_palette;
 	u8 m_video_address;
-	virtual void machine_reset() override;
 	required_device<cpu_device> m_maincpu;
 	required_shared_ptr<u8> m_videoram;
 	required_region_ptr<u8> m_p_chargen;

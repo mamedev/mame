@@ -79,7 +79,7 @@ WRITE_LINE_MEMBER(pecom_state::pecom_prd_w)
 	m_dma = !m_dma;
 }
 
-VIDEO_START_MEMBER(pecom_state,pecom)
+void pecom_state::video_start()
 {
 	/* allocate memory */
 	m_charram = std::make_unique<uint8_t[]>(PECOM_CHAR_RAM_SIZE);
@@ -92,8 +92,6 @@ VIDEO_START_MEMBER(pecom_state,pecom)
 
 MACHINE_CONFIG_START(pecom_state::pecom_video)
 	MCFG_CDP1869_SCREEN_PAL_ADD(CDP1869_TAG, SCREEN_TAG, cdp1869_device::DOT_CLK_PAL)
-
-	MCFG_VIDEO_START_OVERRIDE(pecom_state,pecom)
 
 	MCFG_SPEAKER_STANDARD_MONO("mono")
 

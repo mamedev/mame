@@ -5,6 +5,10 @@
     Atari G42 hardware
 
 *************************************************************************/
+#ifndef MAME_INCLUDES_ATARIG42_H
+#define MAME_INCLUDES_ATARIG42_H
+
+#pragma once
 
 #include "audio/atarijsa.h"
 #include "machine/atarigen.h"
@@ -15,14 +19,33 @@
 class atarig42_state : public atarigen_state
 {
 public:
-	atarig42_state(const machine_config &mconfig, device_type type, const char *tag)
-		: atarigen_state(mconfig, type, tag),
-			m_jsa(*this, "jsa"),
-			m_playfield_tilemap(*this, "playfield"),
-			m_alpha_tilemap(*this, "alpha"),
-			m_rle(*this, "rle"),
-			m_asic65(*this, "asic65"),
-			m_mo_command(*this, "mo_command") { }
+	atarig42_state(const machine_config &mconfig, device_type type, const char *tag) :
+		atarigen_state(mconfig, type, tag),
+		m_jsa(*this, "jsa"),
+		m_playfield_tilemap(*this, "playfield"),
+		m_alpha_tilemap(*this, "alpha"),
+		m_rle(*this, "rle"),
+		m_asic65(*this, "asic65"),
+		m_mo_command(*this, "mo_command")
+	{ }
+
+protected:
+	virtual void machine_start() override;
+	virtual void machine_reset() override;
+	virtual void update_interrupts() override;
+	virtual void scanline_update(screen_device &screen, int scanline) override;
+	DECLARE_READ16_MEMBER(special_port2_r);
+	DECLARE_WRITE16_MEMBER(a2d_select_w);
+	DECLARE_READ16_MEMBER(a2d_data_r);
+	DECLARE_WRITE16_MEMBER(io_latch_w);
+	DECLARE_WRITE16_MEMBER(mo_command_w);
+	TILE_GET_INFO_MEMBER(get_alpha_tile_info);
+	TILE_GET_INFO_MEMBER(get_playfield_tile_info);
+	TILEMAP_MAPPER_MEMBER(atarig42_playfield_scan);
+	DECLARE_VIDEO_START(atarig42);
+	uint32_t screen_update_atarig42(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	void atarig42(machine_config &config);
+	void main_map(address_map &map);
 
 	required_device<atari_jsa_iii_device> m_jsa;
 
@@ -49,30 +72,32 @@ public:
 	uint16_t *        m_sloop_base;
 
 	uint32_t          m_last_accesses[8];
-	virtual void update_interrupts() override;
-	virtual void scanline_update(screen_device &screen, int scanline) override;
-	DECLARE_READ16_MEMBER(special_port2_r);
-	DECLARE_WRITE16_MEMBER(a2d_select_w);
-	DECLARE_READ16_MEMBER(a2d_data_r);
-	DECLARE_WRITE16_MEMBER(io_latch_w);
-	DECLARE_WRITE16_MEMBER(mo_command_w);
+};
+
+class atarig42_0x200_state : public atarig42_state
+{
+public:
+	using atarig42_state::atarig42_state;
+	DECLARE_DRIVER_INIT(roadriot);
+	void atarig42_0x200(machine_config &config);
+
+protected:
 	DECLARE_READ16_MEMBER(roadriot_sloop_data_r);
 	DECLARE_WRITE16_MEMBER(roadriot_sloop_data_w);
+	void roadriot_sloop_tweak(int offset);
+};
+
+class atarig42_0x400_state : public atarig42_state
+{
+public:
+	using atarig42_state::atarig42_state;
+	DECLARE_DRIVER_INIT(guardian);
+	void atarig42_0x400(machine_config &config);
+
+protected:
 	DECLARE_READ16_MEMBER(guardians_sloop_data_r);
 	DECLARE_WRITE16_MEMBER(guardians_sloop_data_w);
-	void roadriot_sloop_tweak(int offset);
 	void guardians_sloop_tweak(int offset);
-	DECLARE_DRIVER_INIT(roadriot);
-	DECLARE_DRIVER_INIT(guardian);
-	TILE_GET_INFO_MEMBER(get_alpha_tile_info);
-	TILE_GET_INFO_MEMBER(get_playfield_tile_info);
-	TILEMAP_MAPPER_MEMBER(atarig42_playfield_scan);
-	DECLARE_MACHINE_START(atarig42);
-	DECLARE_MACHINE_RESET(atarig42);
-	DECLARE_VIDEO_START(atarig42);
-	uint32_t screen_update_atarig42(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
-	void atarig42(machine_config &config);
-	void atarig42_0x200(machine_config &config);
-	void atarig42_0x400(machine_config &config);
-	void main_map(address_map &map);
 };
+
+#endif // MAME_INCLUDES_ATARIG42_H

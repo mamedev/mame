@@ -33,11 +33,10 @@ public:
 		m_palette(*this, "palette"),
 		m_hopper(*this, "hopper") { }
 
+	void hanaroku(machine_config &config);
+
+protected:
 	/* video-related */
-	required_shared_ptr<uint8_t> m_spriteram1;
-	required_shared_ptr<uint8_t> m_spriteram2;
-	required_shared_ptr<uint8_t> m_spriteram3;
-	uint8_t m_flip_bit;
 	DECLARE_WRITE8_MEMBER(hanaroku_out_0_w);
 	DECLARE_WRITE8_MEMBER(hanaroku_out_1_w);
 	DECLARE_WRITE8_MEMBER(hanaroku_out_2_w);
@@ -46,12 +45,17 @@ public:
 	DECLARE_PALETTE_INIT(albazc);
 	uint32_t screen_update_hanaroku(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	void draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprect);
+	void hanaroku_map(address_map &map);
+
+private:
+	required_shared_ptr<uint8_t> m_spriteram1;
+	required_shared_ptr<uint8_t> m_spriteram2;
+	required_shared_ptr<uint8_t> m_spriteram3;
+	uint8_t m_flip_bit;
 	required_device<cpu_device> m_maincpu;
 	required_device<gfxdecode_device> m_gfxdecode;
 	required_device<palette_device> m_palette;
 	required_device<ticket_dispenser_device> m_hopper;
-	void hanaroku(machine_config &config);
-	void hanaroku_map(address_map &map);
 };
 
 

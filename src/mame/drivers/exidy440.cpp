@@ -427,13 +427,13 @@ READ8_MEMBER(exidy440_state::claypign_protection_r)
 }
 
 
-READ8_MEMBER(exidy440_state::topsecex_input_port_5_r)
+READ8_MEMBER(topsecex_state::topsecex_input_port_5_r)
 {
 	return (ioport("AN1")->read() & 1) ? 0x01 : 0x02;
 }
 
 
-WRITE8_MEMBER(exidy440_state::topsecex_yscroll_w)
+WRITE8_MEMBER(topsecex_state::topsecex_yscroll_w)
 {
 	m_topsecex_yscroll = data;
 }
@@ -1056,7 +1056,7 @@ MACHINE_CONFIG_START(exidy440_state::exidy440)
 MACHINE_CONFIG_END
 
 
-MACHINE_CONFIG_START(exidy440_state::topsecex)
+MACHINE_CONFIG_START(topsecex_state::topsecex)
 	exidy440(config);
 
 	/* basic machine hardware */
@@ -2053,16 +2053,16 @@ DRIVER_INIT_MEMBER(exidy440_state,claypign)
 }
 
 
-DRIVER_INIT_MEMBER(exidy440_state,topsecex)
+DRIVER_INIT_MEMBER(topsecex_state,topsecex)
 {
 	DRIVER_INIT_CALL(exidy440);
 
 	/* extra input ports and scrolling */
-	m_maincpu->space(AS_PROGRAM).install_read_handler(0x2ec5, 0x2ec5, read8_delegate(FUNC(exidy440_state::topsecex_input_port_5_r),this));
+	m_maincpu->space(AS_PROGRAM).install_read_handler(0x2ec5, 0x2ec5, read8_delegate(FUNC(topsecex_state::topsecex_input_port_5_r),this));
 	m_maincpu->space(AS_PROGRAM).install_read_port(0x2ec6, 0x2ec6, "AN0");
 	m_maincpu->space(AS_PROGRAM).install_read_port(0x2ec7, 0x2ec7, "IN4");
 
-	m_maincpu->space(AS_PROGRAM).install_write_handler(0x2ec1, 0x2ec1, write8_delegate(FUNC(exidy440_state::topsecex_yscroll_w),this));
+	m_maincpu->space(AS_PROGRAM).install_write_handler(0x2ec1, 0x2ec1, write8_delegate(FUNC(topsecex_state::topsecex_yscroll_w),this));
 }
 
 
@@ -2126,7 +2126,7 @@ GAME( 1985, catch22,  combat,   exidy440, catch22,  exidy440_state, exidy440, RO
 GAME( 1985, cracksht, 0,        exidy440, cracksht, exidy440_state, exidy440, ROT0, "Exidy", "Crackshot (version 2.0)",          0 )
 GAME( 1986, claypign, 0,        exidy440, claypign, exidy440_state, claypign, ROT0, "Exidy", "Clay Pigeon (version 2.0)",        0 )
 GAME( 1986, chiller,  0,        exidy440, chiller,  exidy440_state, exidy440, ROT0, "Exidy", "Chiller (version 3.0)",            0 )
-GAME( 1986, topsecex, 0,        topsecex, topsecex, exidy440_state, topsecex, ROT0, "Exidy", "Top Secret (Exidy) (version 1.0)", 0 )
+GAME( 1986, topsecex, 0,        topsecex, topsecex, topsecex_state, topsecex, ROT0, "Exidy", "Top Secret (Exidy) (version 1.0)", 0 )
 GAME( 1987, hitnmiss, 0,        exidy440, hitnmiss, exidy440_state, exidy440, ROT0, "Exidy", "Hit 'n Miss (version 3.0)",        0 )
 GAME( 1987, hitnmiss2,hitnmiss, exidy440, hitnmiss, exidy440_state, exidy440, ROT0, "Exidy", "Hit 'n Miss (version 2.0)",        0 )
 GAME( 1988, whodunit, 0,        exidy440, whodunit, exidy440_state, exidy440, ROT0, "Exidy", "Who Dunit (version 9.0)",          0 )

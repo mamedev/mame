@@ -5,6 +5,10 @@
     Atari tank8 hardware
 
 *************************************************************************/
+#ifndef MAME_INCLUDES_TANK8_H
+#define MAME_INCLUDES_TANK8_H
+
+#pragma once
 
 #include "sound/discrete.h"
 #include "screen.h"
@@ -34,8 +38,8 @@ public:
 		TIMER_COLLISION
 	};
 
-	tank8_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag),
+	tank8_state(const machine_config &mconfig, device_type type, const char *tag) :
+		driver_device(mconfig, type, tag),
 		m_maincpu(*this, "maincpu"),
 		m_discrete(*this, "discrete"),
 		m_gfxdecode(*this, "gfxdecode"),
@@ -45,8 +49,43 @@ public:
 		m_pos_h_ram(*this, "pos_h_ram"),
 		m_pos_v_ram(*this, "pos_v_ram"),
 		m_pos_d_ram(*this, "pos_d_ram"),
-		m_team(*this, "team") { }
+		m_team(*this, "team")
+	{ }
 
+	DECLARE_DRIVER_INIT(decode);
+	void tank8(machine_config &config);
+
+protected:
+	DECLARE_READ8_MEMBER(collision_r);
+	DECLARE_WRITE8_MEMBER(lockout_w);
+	DECLARE_WRITE8_MEMBER(int_reset_w);
+	DECLARE_WRITE8_MEMBER(video_ram_w);
+	DECLARE_WRITE8_MEMBER(crash_w);
+	DECLARE_WRITE8_MEMBER(explosion_w);
+	DECLARE_WRITE8_MEMBER(bugle_w);
+	DECLARE_WRITE8_MEMBER(bug_w);
+	DECLARE_WRITE8_MEMBER(attract_w);
+	DECLARE_WRITE8_MEMBER(motor_w);
+
+	TILE_GET_INFO_MEMBER(get_tile_info);
+
+	virtual void machine_reset() override;
+	virtual void video_start() override;
+	DECLARE_PALETTE_INIT(tank8);
+
+	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	DECLARE_WRITE_LINE_MEMBER(screen_vblank);
+	void set_pens();
+	inline int get_x_pos(int n);
+	inline int get_y_pos(int n);
+	void draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprect);
+	void draw_bullets(bitmap_ind16 &bitmap, const rectangle &cliprect);
+	void set_collision(int index);
+
+	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr) override;
+	void tank8_cpu_map(address_map &map);
+
+private:
 	required_device<cpu_device> m_maincpu;
 	required_device<discrete_device> m_discrete;
 	required_device<gfxdecode_device> m_gfxdecode;
@@ -65,40 +104,10 @@ public:
 	bitmap_ind16 m_helper2;
 	bitmap_ind16 m_helper3;
 	emu_timer *m_collision_timer;
-
-	DECLARE_READ8_MEMBER(collision_r);
-	DECLARE_WRITE8_MEMBER(lockout_w);
-	DECLARE_WRITE8_MEMBER(int_reset_w);
-	DECLARE_WRITE8_MEMBER(video_ram_w);
-	DECLARE_WRITE8_MEMBER(crash_w);
-	DECLARE_WRITE8_MEMBER(explosion_w);
-	DECLARE_WRITE8_MEMBER(bugle_w);
-	DECLARE_WRITE8_MEMBER(bug_w);
-	DECLARE_WRITE8_MEMBER(attract_w);
-	DECLARE_WRITE8_MEMBER(motor_w);
-
-	TILE_GET_INFO_MEMBER(get_tile_info);
-
-	DECLARE_DRIVER_INIT(decode);
-	virtual void machine_reset() override;
-	virtual void video_start() override;
-	DECLARE_PALETTE_INIT(tank8);
-
-	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
-	DECLARE_WRITE_LINE_MEMBER(screen_vblank);
-	void set_pens();
-	inline int get_x_pos(int n);
-	inline int get_y_pos(int n);
-	void draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprect);
-	void draw_bullets(bitmap_ind16 &bitmap, const rectangle &cliprect);
-	void set_collision(int index);
-
-	void tank8(machine_config &config);
-	void tank8_cpu_map(address_map &map);
-protected:
-	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr) override;
 };
 
 /*----------- defined in audio/tank8.c -----------*/
 
 DISCRETE_SOUND_EXTERN( tank8 );
+
+#endif // MAME_INCLUDES_TANK8_H

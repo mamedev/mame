@@ -41,13 +41,16 @@ public:
 		, m_ram(*this, "ram")
 	{ }
 
+	void altair(machine_config &config);
+
+protected:
 	DECLARE_QUICKLOAD_LOAD_MEMBER(altair);
 
-	void altair(machine_config &config);
+	virtual void machine_reset() override;
 	void io_map(address_map &map);
 	void mem_map(address_map &map);
+
 private:
-	virtual void machine_reset() override;
 	required_device<cpu_device> m_maincpu;
 	required_shared_ptr<uint8_t> m_ram;
 };
@@ -95,7 +98,7 @@ void altair_state::machine_reset()
 
 MACHINE_CONFIG_START(altair_state::altair)
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", I8080, XTAL(2'000'000))
+	MCFG_CPU_ADD("maincpu", I8080, 2_MHz_XTAL)
 	MCFG_CPU_PROGRAM_MAP(mem_map)
 	MCFG_CPU_IO_MAP(io_map)
 

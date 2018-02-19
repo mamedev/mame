@@ -45,14 +45,14 @@ A1                   2101            2101
 
 #include "ace.lh"
 
-#define MASTER_CLOCK XTAL(18'000'000)
+static constexpr XTAL MASTER_CLOCK = 18_MHz_XTAL;
 
 
 class aceal_state : public driver_device
 {
 public:
-	aceal_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag),
+	aceal_state(const machine_config &mconfig, device_type type, const char *tag) :
+		driver_device(mconfig, type, tag),
 		m_maincpu(*this, "maincpu"),
 		m_scoreram(*this, "scoreram"),
 		m_ram2(*this, "ram2"),
@@ -61,6 +61,21 @@ public:
 		m_palette(*this, "palette")
 	{ }
 
+	void ace(machine_config &config);
+
+protected:
+	DECLARE_WRITE8_MEMBER(ace_objpos_w);
+	DECLARE_WRITE8_MEMBER(ace_characterram_w);
+	DECLARE_WRITE8_MEMBER(ace_scoreram_w);
+	DECLARE_READ8_MEMBER(unk_r);
+	virtual void machine_start() override;
+	virtual void machine_reset() override;
+	virtual void video_start() override;
+	uint32_t screen_update_ace(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	void ace_postload();
+	void main_map(address_map &map);
+
+private:
 	required_device<cpu_device> m_maincpu;
 
 	/* video-related */
@@ -72,18 +87,6 @@ public:
 
 	/* input-related */
 	int m_objpos[8];
-
-	DECLARE_WRITE8_MEMBER(ace_objpos_w);
-	DECLARE_WRITE8_MEMBER(ace_characterram_w);
-	DECLARE_WRITE8_MEMBER(ace_scoreram_w);
-	DECLARE_READ8_MEMBER(unk_r);
-	virtual void machine_start() override;
-	virtual void machine_reset() override;
-	virtual void video_start() override;
-	uint32_t screen_update_ace(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
-	void ace_postload();
-	void ace(machine_config &config);
-	void main_map(address_map &map);
 };
 
 

@@ -42,7 +42,7 @@ void vindictr_state::update_interrupts()
 }
 
 
-MACHINE_RESET_MEMBER(vindictr_state,vindictr)
+void vindictr_state::machine_reset()
 {
 	atarigen_state::machine_reset();
 	scanline_timer_reset(*m_screen, 8);
@@ -188,8 +188,6 @@ MACHINE_CONFIG_START(vindictr_state::vindictr)
 	MCFG_CPU_ADD("maincpu", M68010, ATARI_CLOCK_14MHz/2)
 	MCFG_CPU_PROGRAM_MAP(main_map)
 
-	MCFG_MACHINE_RESET_OVERRIDE(vindictr_state,vindictr)
-
 	MCFG_EEPROM_2804_ADD("eeprom")
 	MCFG_EEPROM_28XX_LOCK_AFTER_WRITE(true)
 
@@ -212,12 +210,10 @@ MACHINE_CONFIG_START(vindictr_state::vindictr)
 	MCFG_SCREEN_UPDATE_DRIVER(vindictr_state, screen_update_vindictr)
 	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_VIDEO_START_OVERRIDE(vindictr_state,vindictr)
-
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
 
-	MCFG_ATARI_JSA_I_ADD("jsa", WRITELINE(atarigen_state, sound_int_write_line))
+	MCFG_ATARI_JSA_I_ADD("jsa", WRITELINE(vindictr_state, sound_int_write_line))
 	MCFG_ATARI_JSA_TEST_PORT("260010", 1)
 	MCFG_SOUND_ROUTE(0, "lspeaker", 1.0)
 	MCFG_SOUND_ROUTE(1, "lspeaker", 1.0)

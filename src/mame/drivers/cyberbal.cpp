@@ -407,7 +407,7 @@ MACHINE_CONFIG_START(cyberbal_state::cyberbal)
 
 	MCFG_CPU_ADD("extra", M68000, ATARI_CLOCK_14MHz/2)
 	MCFG_CPU_PROGRAM_MAP(extra_map)
-	MCFG_DEVICE_VBLANK_INT_DRIVER("lscreen", atarigen_state, video_int_gen) /* or is it "right?" */
+	MCFG_DEVICE_VBLANK_INT_DRIVER("lscreen", cyberbal_state, video_int_gen) /* or is it "right?" */
 
 	MCFG_CPU_ADD("dac", M68000, ATARI_CLOCK_14MHz/2)
 	MCFG_CPU_PROGRAM_MAP(sound_68k_map)
@@ -460,7 +460,7 @@ MACHINE_CONFIG_START(cyberbal_state::cyberbal)
 	MCFG_VIDEO_START_OVERRIDE(cyberbal_state,cyberbal)
 
 	/* sound hardware */
-	MCFG_ATARI_SOUND_COMM_ADD("soundcomm", "audiocpu", WRITELINE(atarigen_state, sound_int_write_line))
+	MCFG_ATARI_SOUND_COMM_ADD("soundcomm", "audiocpu", WRITELINE(cyberbal_state, sound_int_write_line))
 	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
 
 	MCFG_YM2151_ADD("ymsnd", ATARI_CLOCK_14MHz/4)
@@ -491,7 +491,7 @@ MACHINE_CONFIG_START(cyberbal_state::cyberbal2p)
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", M68000, ATARI_CLOCK_14MHz/2)
 	MCFG_CPU_PROGRAM_MAP(cyberbal2p_map)
-	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", atarigen_state, video_int_gen)
+	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", cyberbal_state, video_int_gen)
 
 	MCFG_MACHINE_START_OVERRIDE(cyberbal_state,cyberbal2p)
 	MCFG_MACHINE_RESET_OVERRIDE(cyberbal_state,cyberbal2p)
@@ -524,7 +524,7 @@ MACHINE_CONFIG_START(cyberbal_state::cyberbal2p)
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
 
-	MCFG_ATARI_JSA_II_ADD("jsa", WRITELINE(atarigen_state, sound_int_write_line))
+	MCFG_ATARI_JSA_II_ADD("jsa", WRITELINE(cyberbal_state, sound_int_write_line))
 	MCFG_ATARI_JSA_TEST_PORT("IN2", 15)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 MACHINE_CONFIG_END

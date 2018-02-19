@@ -5,6 +5,10 @@
     Atari Video Pinball hardware
 
 *************************************************************************/
+#ifndef MAME_INCLUDES_VIDEOPIN_H
+#define MAME_INCLUDES_VIDEOPIN_H
+
+#pragma once
 
 #include "sound/discrete.h"
 #include "screen.h"
@@ -26,15 +30,43 @@ public:
 		TIMER_INTERRUPT
 	};
 
-	videopin_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag),
+	videopin_state(const machine_config &mconfig, device_type type, const char *tag) :
+		driver_device(mconfig, type, tag),
 		m_maincpu(*this, "maincpu"),
 		m_discrete(*this, "discrete"),
 		m_gfxdecode(*this, "gfxdecode"),
 		m_screen(*this, "screen"),
 		m_palette(*this, "palette"),
-		m_video_ram(*this, "video_ram") { }
+		m_video_ram(*this, "video_ram")
+	{ }
 
+	void videopin(machine_config &config);
+
+protected:
+	DECLARE_READ8_MEMBER(misc_r);
+	DECLARE_WRITE8_MEMBER(led_w);
+	DECLARE_WRITE8_MEMBER(ball_w);
+	DECLARE_WRITE8_MEMBER(video_ram_w);
+	DECLARE_WRITE8_MEMBER(out1_w);
+	DECLARE_WRITE8_MEMBER(out2_w);
+	DECLARE_WRITE8_MEMBER(note_dvsr_w);
+
+	TILEMAP_MAPPER_MEMBER(get_memory_offset);
+	TILE_GET_INFO_MEMBER(get_tile_info);
+
+	virtual void machine_start() override;
+	virtual void machine_reset() override;
+	virtual void video_start() override;
+	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr) override;
+	void main_map(address_map &map);
+
+	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+
+	TIMER_CALLBACK_MEMBER(interrupt_callback);
+	void update_plunger();
+	double calc_plunger_pos();
+
+private:
 	required_device<cpu_device> m_maincpu;
 	required_device<discrete_device> m_discrete;
 	required_device<gfxdecode_device> m_gfxdecode;
@@ -51,33 +83,9 @@ public:
 	int m_ball_y;
 	tilemap_t* m_bg_tilemap;
 	emu_timer *m_interrupt_timer;
-
-	DECLARE_READ8_MEMBER(misc_r);
-	DECLARE_WRITE8_MEMBER(led_w);
-	DECLARE_WRITE8_MEMBER(ball_w);
-	DECLARE_WRITE8_MEMBER(video_ram_w);
-	DECLARE_WRITE8_MEMBER(out1_w);
-	DECLARE_WRITE8_MEMBER(out2_w);
-	DECLARE_WRITE8_MEMBER(note_dvsr_w);
-
-	TILEMAP_MAPPER_MEMBER(get_memory_offset);
-	TILE_GET_INFO_MEMBER(get_tile_info);
-
-	virtual void machine_start() override;
-	virtual void machine_reset() override;
-	virtual void video_start() override;
-
-	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
-
-	TIMER_CALLBACK_MEMBER(interrupt_callback);
-	void update_plunger();
-	double calc_plunger_pos();
-
-	void videopin(machine_config &config);
-	void main_map(address_map &map);
-protected:
-	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr) override;
 };
 
 /*----------- defined in audio/videopin.c -----------*/
 DISCRETE_SOUND_EXTERN( videopin );
+
+#endif // MAME_INCLUDES_VIDEOPIN_H

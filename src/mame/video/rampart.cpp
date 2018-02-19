@@ -51,7 +51,7 @@ const atari_motion_objects_config rampart_state::s_mob_config =
 	0                   /* resulting value to indicate "special" */
 };
 
-VIDEO_START_MEMBER(rampart_state,rampart)
+void rampart_state::video_start()
 {
 	/* set the intial scroll offset */
 	m_mob->set_xscroll(-12);

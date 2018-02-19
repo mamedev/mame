@@ -202,10 +202,29 @@
 class mpu5_state : public driver_device
 {
 public:
-	mpu5_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag),
-			m_maincpu(*this, "maincpu")
+	mpu5_state(const machine_config &mconfig, device_type type, const char *tag) :
+		driver_device(mconfig, type, tag),
+		m_maincpu(*this, "maincpu")
 	{ }
+
+	void mpu5(machine_config &config);
+
+protected:
+	DECLARE_READ32_MEMBER(mpu5_mem_r);
+	DECLARE_WRITE32_MEMBER(mpu5_mem_w);
+
+	DECLARE_READ32_MEMBER(asic_r32);
+	DECLARE_READ8_MEMBER(asic_r8);
+	DECLARE_WRITE32_MEMBER(asic_w32);
+	DECLARE_WRITE8_MEMBER(asic_w8);
+
+	DECLARE_READ32_MEMBER(pic_r);
+	DECLARE_WRITE32_MEMBER(pic_w);
+
+	virtual void machine_start() override;
+	void mpu5_map(address_map &map);
+
+private:
 	uint32_t* m_cpuregion;
 	std::unique_ptr<uint32_t[]> m_mainram;
 	SEC sec;
@@ -221,24 +240,8 @@ public:
 	uint8_t m_pic_output_bit;
 	uint8_t m_input_strobe;
 
-	DECLARE_READ32_MEMBER(mpu5_mem_r);
-	DECLARE_WRITE32_MEMBER(mpu5_mem_w);
-
-	DECLARE_READ32_MEMBER(asic_r32);
-	DECLARE_READ8_MEMBER(asic_r8);
-	DECLARE_WRITE32_MEMBER(asic_w32);
-	DECLARE_WRITE8_MEMBER(asic_w8);
-
-	DECLARE_READ32_MEMBER(pic_r);
-	DECLARE_WRITE32_MEMBER(pic_w);
-
-	void mpu5(machine_config &config);
-	void mpu5_map(address_map &map);
-protected:
-
 	// devices
 	required_device<m68340_cpu_device> m_maincpu;
-	virtual void machine_start() override;
 };
 
 READ8_MEMBER(mpu5_state::asic_r8)

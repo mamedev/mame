@@ -63,24 +63,29 @@ NOTE: The Atari 136002-125 PROM in the sets below wasn't dumped from an actual
 class quantum_state : public driver_device
 {
 public:
-	quantum_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag),
+	quantum_state(const machine_config &mconfig, device_type type, const char *tag) :
+		driver_device(mconfig, type, tag),
 		m_maincpu(*this, "maincpu"),
-		m_avg(*this, "avg") { }
+		m_avg(*this, "avg")
+	{ }
 
+	void quantum(machine_config &config);
+
+protected:
 	DECLARE_READ16_MEMBER(trackball_r);
 	DECLARE_WRITE16_MEMBER(led_w);
 	DECLARE_READ8_MEMBER(input_1_r);
 	DECLARE_READ8_MEMBER(input_2_r);
+	void main_map(address_map &map);
+
+private:
 	required_device<cpu_device> m_maincpu;
 	required_device<avg_quantum_device> m_avg;
-	void quantum(machine_config &config);
-	void main_map(address_map &map);
 };
 
 
-#define MASTER_CLOCK (XTAL(12'096'000))
-#define CLOCK_3KHZ   (MASTER_CLOCK / 4096)
+static constexpr XTAL MASTER_CLOCK = 12.096_MHz_XTAL;
+static constexpr XTAL CLOCK_3KHZ   = MASTER_CLOCK / 4096;
 
 
 /*************************************
