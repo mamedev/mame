@@ -69,6 +69,12 @@
   f110 10cc crrr rrrr                                                                    [ecu] bra cc1, pc + r/7s << 1
   f110 11rr rrrr rrrr                                                                    [ecu] bra pc + r/10s<< 1
   f111 0000 0000 0001                                                                    [ecu] halt
+  f111 00cc ccc1 0000                                                                    [ecu] rts cc
+  f111 00cc ccc1 0001                                                                    [ecu] rts cc, nop
+  f111 00cc ccc1 0010                                                                    [ecu] rti cc, (rzi1)
+  f111 00cc ccc1 0011                                                                    [ecu] rti cc, (rzi1), nop
+  f111 00cc ccc1 0100                                                                    [ecu] rti cc, (rzi2)
+  f111 00cc ccc1 0101                                                                    [ecu] rti cc, (rzi2), nop
   f111 01mm mmmn n0ab                                                                    [rcu] addr rm, rx
   f111 01vv vvvn n1ab                                                                    [rcu] addr #v/5s << 16, rx
   f111 1001 0000 01ab                                                                    [rcu] dec_only
@@ -78,6 +84,7 @@
 
   1000 1xxx xxxx xxxx . xxxx xxxx xxxx xxxx . 0000 01ww wwwn nnnn                        [alu] add #xw/32s, rn
   1000 1xxx xxxx xxxx . xxxx xxxx xxxx xxxx . 0010 00ww wwwn nnnn                        [alu] cmp #xw/32s, rn
+  1000 1xxx xxxx xxxx . xxxx xxxx xxxx xxxx . f101 11nn nnnw wwww                        [mem] mv_s #xw/32s, rn
   1000 1xxx xxxx xxxx . xxxx xxxx xxxx x0CC . f110 10cc cvvv vvvv                        [ecu] bra cC, pc + #xv/31s << 1      (asm only wants 28 bits?)
   1000 1xxx xxxx xxxx . xxxx xxxx xxxx x1CC . f110 10cc cvvv vvvv                        [ecu] bra cC, pc + #xv/31s << 1, nop (asm only wants 28 bits?)
   1000 1xxx xxxx xxxx . vvvv vvvv vvvv vvvv . f111 01ww wwwn n1ab                        [rcu] addr #xwv/32s, rx
@@ -95,21 +102,33 @@
   1000 1xxx xxxx xxxx . xxxx xxxx xxxx xxxx . 1001 10nn nnnv vvvv . 1011 1110 1000 0000  [alu] cmpwc rn, #xv/32s
 
   1001 00cc cccv vvvv . 101f 000w wwww wwww                                              [ecu] bra cc, pc + wv/14s << 1
+  1001 00cc cccv vvvv . 101f 0010 0www wwww                                              [ecu] jmp cc, 20200000 + wv/12u << 1
+  1001 00cc cccv vvvv . 101f 0011 0www wwww                                              [ecu] jmp cc, 20300000 + wv/12u << 1
   1001 00cc cccv vvvv . 101f 0100 0www wwww                                              [ecu] jsr cc, 20200000 + wv/12u << 1
   1001 00cc cccv vvvv . 101f 0101 0www wwww                                              [ecu] jsr cc, 20300000 + wv/12u << 1
+  1001 00cc cccn nnnn . 101f 0110 8000 0000                                              [ecu] jmp cc, (rn)
   1001 00cc cccn nnnn . 101f 0111 0000 0000                                              [ecu] jsr cc, (rn)
   1001 00cc cccv vvvv . 101f 100w wwww wwww                                              [ecu] bra cc, pc + wv/14s << 1, nop
+  1001 00cc cccv vvvv . 101f 1010 0www wwww                                              [ecu] jmp cc, 20200000 + wv/12u << 1, nop
+  1001 00cc cccv vvvv . 101f 1011 0www wwww                                              [ecu] jmp cc, 20300000 + wv/12u << 1, nop
   1001 00cc cccv vvvv . 101f 1100 0www wwww                                              [ecu] jsr cc, 20200000 + wv/12u << 1, nop
   1001 00cc cccv vvvv . 101f 1101 0www wwww                                              [ecu] jsr cc, 20300000 + wv/12u << 1, nop
+  1001 00cc cccn nnnn . 101f 1110 8000 0000                                              [ecu] jmp cc, (rn)
   1001 00cc cccn nnnn . 101f 1111 0000 0000                                              [ecu] jsr cc, (rn), nop
-  1001 01mm mmmn nnnn . 101f 0010 00oo oooo                                              [mem] ld_s 20000000 + om/11u, rn
-  1001 01mm mmmn nnnn . 101f 0010 01oo oooo                                              [mem] ld_s 20100000 + om/11u, rn
-  1001 01mm mmmn nnnn . 101f 0010 10oo oooo                                              [mem] ld_s 20500000 + om/11u, rn
+  1001 01mm mmmn nnnn . 101f 0010 00oo oooo                                              [mem] ld_s 20000000 + om/11u << 2, rn
+  1001 01mm mmmn nnnn . 101f 0010 01oo oooo                                              [mem] ld_s 20100000 + om/11u << 2, rn
+  1001 01mm mmmn nnnn . 101f 0010 10oo oooo                                              [mem] ld_s 20500000 + om/11u << 2, rn
   1001 0100 000n nnnn . 101f 0100 0000 101u                                              [mem] ld_s (xy), rn
-  1001 01mm mmmn nnnn . 101f 1010 00oo oooo                                              [mem] st_s rn, 20000000 + om/11u
-  1001 01mm mmmn nnnn . 101f 1010 01oo oooo                                              [mem] st_s rn, 20100000 + om/11u
-  1001 01mm mmmn nnnn . 101f 1010 10oo oooo                                              [mem] st_s rn, 20500000 + om/11u
+  1001 01nn nnnv vvvv . 101f 0110 0www wwww                                              [mem] mv_s #wv/12s, rn
+  1001 01mm mmmn nnnn . 101f 1010 00oo oooo                                              [mem] st_s rn, 20000000 + om/11u << 2
+  1001 01mm mmmn nnnn . 101f 1010 01oo oooo                                              [mem] st_s rn, 20100000 + om/11u << 2
+  1001 01mm mmmn nnnn . 101f 1010 10oo oooo                                              [mem] st_s rn, 20500000 + om/11u << 2
+  1001 01mm mmmm nn01 . 101f 1011 00oo oooo                                              [mem] st_v vn, 20000000 + om/11u << 4
+  1001 01mm mmmm nn01 . 101f 1011 01oo oooo                                              [mem] st_v vn, 20100000 + om/11u << 4
+  1001 01mm mmmm nn01 . 101f 1011 10oo oooo                                              [mem] st_v vn, 20500000 + om/11u << 4
   1001 0100 000n nnnn . 101f 1100 0000 101u                                              [mem] st_s rn, (xy)
+  1001 01nn nnnm mm00 . 101f 1100 0001 0000                                              [mem] st_v vm, (rn)
+  1001 0100 000n nn00 . 101f 1100 0001 001u                                              [mem] st_v vn, (xy)
   1001 01mm mmmv vvvv . 101f 111o ooow wwww                                              [mem] st_s #wv/10u, 20500000 + om/9 << 4
   1001 10oo ooom mmmm . 1011 0000 000n nnnn                                              [alu] add ro, rm, rn
   1001 10vv vvvm mmmm . 1011 0000 001n nnnn                                              [alu] add #v/5u, rm, rn
@@ -147,9 +166,16 @@
   1001 10mm mmmn nnnn . 1011 1110 101d dddd                                              [alu] cmpwc rm, >>#d/5s, rn
   1001 11oo ooom mm00 . 101f 1100 000n nnnn                                              [mul] dotp ro, vm, >>svshift, rn
   1001 11mm mmmo oooo . 101f 1110 100n nnnn                                              [mul] addm ro, rm, rn
-
-
 */
+
+const nuon_disassembler::reginfo nuon_disassembler::reginfos[] = {
+	{ 0x205001e0, "rc0"      },
+	{ 0x205001f0, "rc1"      },
+	{ 0x20500200, "rx"       },
+	{ 0x20500210, "ry"       },
+	{ 0x20500500, "odmactl"  },
+	{ 0x20500510, "omdacptr" },
+};
 
 u32 nuon_disassembler::opcode_alignment() const
 {
@@ -262,6 +288,34 @@ u32 nuon_disassembler::b(u16 val, int start, int count, int target)
 
 std::string nuon_disassembler::reg(u32 adr) const
 {
+	const unsigned int reg_count = sizeof(reginfos) / sizeof(reginfo);
+	const unsigned int last_index = reg_count - 1;
+	const unsigned int fill1  = last_index | (last_index >> 1);
+	const unsigned int fill2  = fill1 | (fill1 >> 2);
+	const unsigned int fill4  = fill2 | (fill2 >> 4);
+	const unsigned int fill8  = fill4 | (fill4 >> 8);
+	const unsigned int fill16 = fill8 | (fill8 >> 16);
+	const unsigned int ppow2  = fill16 - (fill16 >> 1);
+	unsigned int slot = ppow2;
+	unsigned int step = ppow2;
+	while(step) {
+		if(slot > last_index)
+			slot = slot ^ (step | (step >> 1));
+		else {
+			u32 radr = reginfos[slot].adr;
+			if(adr == radr)
+				return reginfos[slot].name;
+			if(adr > radr)
+				slot = slot | (step >> 1);
+			else
+				slot = slot ^ (step | (step >> 1));
+		}
+		step = step >> 1;
+	}
+
+	if(reginfos[slot].adr == adr)
+		return reginfos[slot].name;
+
 	return util::string_format("0x%08x", adr);
 }
 
@@ -291,6 +345,8 @@ std::string nuon_disassembler::parse_packet(const data_buffer &opcodes, offs_t &
 		// 16-bits normal non-alu
 		cont = !(opc1 & 0x8000);
 		pc += 2;
+
+		// 16-bits mem
 		if(m(opc1, 0x7c00, 0x4800)) return util::string_format("ld_s (r%d), r%d", b(opc1, 5, 5, 0), b(opc1, 0, 5, 0));
 		if(m(opc1, 0x7c00, 0x4c00)) return util::string_format("st_s r%d, (r%d)", b(opc1, 0, 5, 0), b(opc1, 5, 5, 0));
 		if(m(opc1, 0x7c00, 0x5000)) return util::string_format("ld_s %s, r%d", reg(0x20500000 | b(opc1, 5, 5, 4)), b(opc1, 0, 5, 0));
@@ -299,7 +355,17 @@ std::string nuon_disassembler::parse_packet(const data_buffer &opcodes, offs_t &
 		if(m(opc1, 0x7c00, 0x5c00)) return util::string_format("mv_s #%s, (r%d)", u2x(b(opc1, 0, 5, 0), 5), b(opc1, 5, 5, 0));
 		if(m(opc1, 0x7c00, 0x6800)) return util::string_format("bra %s%s", cc(b(opc1, 7, 3, 2), true), reg(bpc + s2i(b(opc1, 0, 7, 1), 8)));
 		if(m(opc1, 0x7c00, 0x6c00)) return util::string_format("bra %s%s", cc(b(opc1, 7, 3, 2), true), reg(bpc + s2i(b(opc1, 0, 7, 1), 8)));
+
+		// 16-bits ecu
 		if(m(opc1, 0x7fff, 0x7001)) return util::string_format("halt");
+		if(m(opc1, 0x7c1f, 0x7010)) return util::string_format("rts%s", cc(b(opc1, 5, 5, 0), false));
+		if(m(opc1, 0x7c1f, 0x7011)) return util::string_format("rts %snop", cc(b(opc1, 5, 5, 0), true));
+		if(m(opc1, 0x7c1f, 0x7012)) return util::string_format("rti %s(rzi1)", cc(b(opc1, 5, 5, 0), true));
+		if(m(opc1, 0x7c1f, 0x7013)) return util::string_format("rti %s(rzi1), nop", cc(b(opc1, 5, 5, 0), true));
+		if(m(opc1, 0x7c1f, 0x7014)) return util::string_format("rti %s(rzi2)", cc(b(opc1, 5, 5, 0), true));
+		if(m(opc1, 0x7c1f, 0x7015)) return util::string_format("rti %s(rzi2), nop", cc(b(opc1, 5, 5, 0), true));
+
+		// 16-bits rcu
 		if(m(opc1, 0x7c04, 0x7400)) return dec(opc1, util::string_format("addr r%d, %s", b(opc1, 5, 5, 0), rx(b(opc1, 3, 2, 0))));
 		if(m(opc1, 0x7c04, 0x7404)) return dec(opc1, util::string_format("addr %s << 16, %s", u2x(b(opc1, 5, 5, 0), 5), rx(b(opc1, 3, 2, 0))));
 		if(m(opc1, 0x7ffc, 0x7904)) return dec(opc1);
@@ -325,23 +391,35 @@ std::string nuon_disassembler::parse_packet(const data_buffer &opcodes, offs_t &
 
 		// 32-bit ecu instructions
 		if(m(opc1, 0xfc00, 0x9000) && m(opc2, 0xee00, 0xa000)) return util::string_format("bra %s%s", cc(b(opc1, 5, 5, 0), true), reg(bpc + s2i(b(opc2, 0, 9, 6) | b(opc1, 0, 5, 1), 15)));
-		if(m(opc1, 0xfc00, 0x9000) && m(opc2, 0xef80, 0xa400)) return util::string_format("jsr %s%s", cc(b(opc1, 5, 5, 0), true), reg(0x20200000 | b(opc2, 0, 7, 5) | b(opc1, 0, 5, 0)));
-		if(m(opc1, 0xfc00, 0x9000) && m(opc2, 0xef80, 0xa500)) return util::string_format("jsr %s%s", cc(b(opc1, 5, 5, 0), true), reg(0x20300000 | b(opc2, 0, 7, 5) | b(opc1, 0, 5, 0)));
+		if(m(opc1, 0xfc00, 0x9000) && m(opc2, 0xef80, 0xa200)) return util::string_format("jmp %s%s", cc(b(opc1, 5, 5, 0), true), reg(0x20200000 | b(opc2, 0, 7, 6) | b(opc1, 0, 5, 1)));
+		if(m(opc1, 0xfc00, 0x9000) && m(opc2, 0xef80, 0xa300)) return util::string_format("jmp %s%s", cc(b(opc1, 5, 5, 0), true), reg(0x20300000 | b(opc2, 0, 7, 6) | b(opc1, 0, 5, 1)));
+		if(m(opc1, 0xfc00, 0x9000) && m(opc2, 0xef80, 0xa400)) return util::string_format("jsr %s%s", cc(b(opc1, 5, 5, 0), true), reg(0x20200000 | b(opc2, 0, 7, 6) | b(opc1, 0, 5, 1)));
+		if(m(opc1, 0xfc00, 0x9000) && m(opc2, 0xef80, 0xa500)) return util::string_format("jsr %s%s", cc(b(opc1, 5, 5, 0), true), reg(0x20300000 | b(opc2, 0, 7, 6) | b(opc1, 0, 5, 1)));
+		if(m(opc1, 0xfc00, 0x9000) && m(opc2, 0xefff, 0xa680)) return util::string_format("jmp %s(r%d)", cc(b(opc1, 5, 5, 0), true), b(opc1, 0, 5, 0));
 		if(m(opc1, 0xfc00, 0x9000) && m(opc2, 0xefff, 0xa700)) return util::string_format("jsr %s(r%d)", cc(b(opc1, 5, 5, 0), true), b(opc1, 0, 5, 0));
 		if(m(opc1, 0xfc00, 0x9000) && m(opc2, 0xee00, 0xa800)) return util::string_format("bra %s%s, nop", cc(b(opc1, 5, 5, 0), true), reg(bpc + s2i(b(opc2, 0, 9, 6) | b(opc1, 0, 5, 1), 15)));
-		if(m(opc1, 0xfc00, 0x9000) && m(opc2, 0xef80, 0xaa00)) return util::string_format("jsr %s%s, nop", cc(b(opc1, 5, 5, 0), true), reg(0x20200000 | b(opc2, 0, 7, 5) | b(opc1, 0, 5, 0)));
-		if(m(opc1, 0xfc00, 0x9000) && m(opc2, 0xef80, 0xad00)) return util::string_format("jsr %s%s, nop", cc(b(opc1, 5, 5, 0), true), reg(0x20300000 | b(opc2, 0, 7, 5) | b(opc1, 0, 5, 0)));
+		if(m(opc1, 0xfc00, 0x9000) && m(opc2, 0xef80, 0xaa00)) return util::string_format("jmp %s%s, nop", cc(b(opc1, 5, 5, 0), true), reg(0x20200000 | b(opc2, 0, 7, 6) | b(opc1, 0, 5, 1)));
+		if(m(opc1, 0xfc00, 0x9000) && m(opc2, 0xef80, 0xab00)) return util::string_format("jmp %s%s, nop", cc(b(opc1, 5, 5, 0), true), reg(0x20300000 | b(opc2, 0, 7, 6) | b(opc1, 0, 5, 1)));
+		if(m(opc1, 0xfc00, 0x9000) && m(opc2, 0xef80, 0xac00)) return util::string_format("jsr %s%s, nop", cc(b(opc1, 5, 5, 0), true), reg(0x20200000 | b(opc2, 0, 7, 6) | b(opc1, 0, 5, 1)));
+		if(m(opc1, 0xfc00, 0x9000) && m(opc2, 0xef80, 0xad00)) return util::string_format("jsr %s%s, nop", cc(b(opc1, 5, 5, 0), true), reg(0x20300000 | b(opc2, 0, 7, 6) | b(opc1, 0, 5, 1)));
+		if(m(opc1, 0xfc00, 0x9000) && m(opc2, 0xefff, 0xae80)) return util::string_format("jmp %s(r%d), nop", cc(b(opc1, 5, 5, 0), true), b(opc1, 0, 5, 0));
 		if(m(opc1, 0xfc00, 0x9000) && m(opc2, 0xefff, 0xaf00)) return util::string_format("jsr %s(r%d), nop", cc(b(opc1, 5, 5, 0), true), b(opc1, 0, 5, 0));
 
 		// 32-bit mem instructions
-		if(m(opc1, 0xfc00, 0x9400) && m(opc2, 0xefc0, 0xa200)) return util::string_format("ld_s %s, r%d", reg(0x20000000 | b(opc2, 0, 6, 5) | b(opc1, 5, 5, 0)), b(opc1, 0, 5, 0));
-		if(m(opc1, 0xfc00, 0x9400) && m(opc2, 0xefc0, 0xa240)) return util::string_format("ld_s %s, r%d", reg(0x20100000 | b(opc2, 0, 6, 5) | b(opc1, 5, 5, 0)), b(opc1, 0, 5, 0));
-		if(m(opc1, 0xfc00, 0x9400) && m(opc2, 0xefc0, 0xa280)) return util::string_format("ld_s %s, r%d", reg(0x20500000 | b(opc2, 0, 6, 5) | b(opc1, 5, 5, 0)), b(opc1, 0, 5, 0));
+		if(m(opc1, 0xfc00, 0x9400) && m(opc2, 0xefc0, 0xa200)) return util::string_format("ld_s %s, r%d", reg(0x20000000 | b(opc2, 0, 6, 7) | b(opc1, 5, 5, 2)), b(opc1, 0, 5, 0));
+		if(m(opc1, 0xfc00, 0x9400) && m(opc2, 0xefc0, 0xa240)) return util::string_format("ld_s %s, r%d", reg(0x20100000 | b(opc2, 0, 6, 7) | b(opc1, 5, 5, 2)), b(opc1, 0, 5, 0));
+		if(m(opc1, 0xfc00, 0x9400) && m(opc2, 0xefc0, 0xa280)) return util::string_format("ld_s %s, r%d", reg(0x20500000 | b(opc2, 0, 6, 7) | b(opc1, 5, 5, 2)), b(opc1, 0, 5, 0));
 		if(m(opc1, 0xffe0, 0x9400) && m(opc2, 0xeffe, 0xa40a)) return util::string_format("ld_s %s, r%d", xy(b(opc2, 0, 1, 0)), b(opc1, 0, 5, 0));
-		if(m(opc1, 0xfc00, 0x9400) && m(opc2, 0xefc0, 0xaa00)) return util::string_format("st_s r%d, %s", b(opc1, 0, 5, 0), reg(0x20000000 | b(opc2, 0, 6, 5) | b(opc1, 5, 5, 0)));
-		if(m(opc1, 0xfc00, 0x9400) && m(opc2, 0xefc0, 0xaa40)) return util::string_format("st_s r%d, %s", b(opc1, 0, 5, 0), reg(0x20100000 | b(opc2, 0, 6, 5) | b(opc1, 5, 5, 0)));
-		if(m(opc1, 0xfc00, 0x9400) && m(opc2, 0xefc0, 0xaa80)) return util::string_format("st_s r%d, %s", b(opc1, 0, 5, 0), reg(0x20500000 | b(opc2, 0, 6, 5) | b(opc1, 5, 5, 0)));
+		if(m(opc1, 0xfc00, 0x9400) && m(opc2, 0xef80, 0xa600)) return util::string_format("mv_s #%s, %s", s2x(b(opc2, 0, 7, 5) | b(opc1, 0, 5, 0), 12), b(opc1, 5, 5, 0));
+		if(m(opc1, 0xfc00, 0x9400) && m(opc2, 0xefc0, 0xaa00)) return util::string_format("st_s r%d, %s", b(opc1, 0, 5, 0), reg(0x20000000 | b(opc2, 0, 6, 7) | b(opc1, 5, 5, 2)));
+		if(m(opc1, 0xfc00, 0x9400) && m(opc2, 0xefc0, 0xaa40)) return util::string_format("st_s r%d, %s", b(opc1, 0, 5, 0), reg(0x20100000 | b(opc2, 0, 6, 7) | b(opc1, 5, 5, 2)));
+		if(m(opc1, 0xfc00, 0x9400) && m(opc2, 0xefc0, 0xaa80)) return util::string_format("st_s r%d, %s", b(opc1, 0, 5, 0), reg(0x20500000 | b(opc2, 0, 6, 7) | b(opc1, 5, 5, 2)));
 		if(m(opc1, 0xffe0, 0x9400) && m(opc2, 0xeffe, 0xac0a)) return util::string_format("st_s r%d, %s", b(opc1, 0, 5, 0), xy(b(opc2, 0, 1, 0)));
+		if(m(opc1, 0xfc03, 0x9401) && m(opc2, 0xefc0, 0xab00)) return util::string_format("st_v v%d, %s", b(opc1, 2, 3, 0), reg(0x20000000 | b(opc2, 0, 6, 9) | b(opc1, 5, 5, 4)));
+		if(m(opc1, 0xfc03, 0x9401) && m(opc2, 0xefc0, 0xab40)) return util::string_format("st_v v%d, %s", b(opc1, 2, 3, 0), reg(0x20100000 | b(opc2, 0, 6, 9) | b(opc1, 5, 5, 4)));
+		if(m(opc1, 0xfc03, 0x9401) && m(opc2, 0xefc0, 0xab80)) return util::string_format("st_v v%d, %s", b(opc1, 2, 3, 0), reg(0x20500000 | b(opc2, 0, 6, 9) | b(opc1, 5, 5, 4)));
+		if(m(opc1, 0xfc03, 0x9400) && m(opc2, 0xefff, 0xac10)) return util::string_format("st_v v%d, (r%d)", b(opc1, 2, 3, 0), b(opc1, 5, 5, 0));
+		if(m(opc1, 0xffe3, 0x9400) && m(opc2, 0xeffe, 0xac12)) return util::string_format("st_v v%d, %s", b(opc1, 2, 3, 0), xy(b(opc2, 0, 1, 0)));
 		if(m(opc1, 0xfc00, 0x9400) && m(opc2, 0xee00, 0xae00)) return util::string_format("st_s #%s, %s", u2x(b(opc2, 0, 5, 5) | b(opc1, 0, 5, 0), 10), reg(0x20500000 | b(opc2, 5, 4, 9) | b(opc1, 5, 5, 4)));
 
 		// 32-bit alu instructions
@@ -396,8 +474,14 @@ std::string nuon_disassembler::parse_packet(const data_buffer &opcodes, offs_t &
 			// 32+16-bits alu
 			cont = false;
 			pc += 6;
-			if(m(opc3, 0xfc00, 0x0400)) return util::string_format("add #%s, r%d", s2x(b(opc1, 0, 11, 21) | b(opc2, 0, 16, 5) | b(opc3, 5, 5, 0), 32), b(opc1, 0, 5, 0));
-			if(m(opc3, 0xfc00, 0x2000)) return util::string_format("cmp #%s, r%d", s2x(b(opc1, 0, 11, 21) | b(opc2, 0, 16, 5) | b(opc3, 5, 5, 0), 32), b(opc1, 0, 5, 0));
+			if(m(opc3, 0xfc00, 0x0400))
+				return util::string_format("add #%s, r%d",
+										   s2x(b(opc1, 0, 11, 21) | b(opc2, 0, 16, 5) | b(opc3, 5, 5, 0), 32),
+										   b(opc1, 0, 5, 0));
+			if(m(opc3, 0xfc00, 0x2000))
+				return util::string_format("cmp #%s, r%d",
+										   s2x(b(opc1, 0, 11, 21) | b(opc2, 0, 16, 5) | b(opc3, 5, 5, 0), 32),
+										   b(opc1, 0, 5, 0));
 
 			return util::string_format("?%04x %04x %04x", opc1, opc2, opc3);
 		}
@@ -407,6 +491,11 @@ std::string nuon_disassembler::parse_packet(const data_buffer &opcodes, offs_t &
 			cont = !(opc3 & 0x8000);
 			pc += 6;
 
+			// 32+16-bits mem
+			if(m(opc3, 0x7c00, 0x5c00))
+				return util::string_format("mv_s #%s, r%d",
+										   s2x(b(opc1, 0, 11, 21) | b(opc2, 0, 16, 5) | b(opc3, 0, 5, 0), 32),
+										   b(opc3, 5, 5, 0));
 			// 32+16-bits ecu
 			if(m(opc3, 0x7c00, 0x6800) && m(opc2, 0x0004, 0x0000))
 				return util::string_format("bra %s%s",
