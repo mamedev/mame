@@ -58,7 +58,8 @@ public:
 		m_in0(*this, "IN0"),
 		m_in1(*this, "IN1"),
 		m_gfxdecode(*this, "gfxdecode"),
-		m_alt_addressing(0)
+		m_alt_addressing(0),
+		m_alt_addressing_base(0)
 	{ }
 
 	// devices
@@ -150,6 +151,8 @@ public:
 
 	DECLARE_DRIVER_INIT(xavix);
 	DECLARE_DRIVER_INIT(taitons1);
+	DECLARE_DRIVER_INIT(rad_box);
+	DECLARE_DRIVER_INIT(rad_crdn);
 
 	void xavix_map(address_map &map);
 protected:
@@ -242,6 +245,7 @@ private:
 	int get_current_address_byte();
 
 	int m_alt_addressing;
+	int m_alt_addressing_base;
 };
 
 void xavix_state::set_data_address(int address, int bit)
@@ -395,14 +399,19 @@ void xavix_state::draw_tilemap(screen_device &screen, bitmap_ind16 &bitmap, cons
 		// and expected a fixed layout, still need to handle that.
 		int count;
 
-		count = tileregs[0x0]<<8;
+		count = 0;// ;
 		for (int y = 0; y < ydimension; y++)
 		{
 			for (int x = 0; x < xdimension; x++)
 			{
 				int bpp, pal, scrolly, scrollx;
-				int tile = mainspace.read_byte(count);
-				tile |= mainspace.read_byte(count + (ydimension*xdimension)) << 8;
+				int tile = 0;
+
+				// the register being 0 probably isn't the condition here
+				if (tileregs[0x0] != 0x00) tile |= mainspace.read_byte((tileregs[0x0]<<8)+count);
+				if (tileregs[0x1] != 0x00) tile |= mainspace.read_byte((tileregs[0x1]<<8)+count) << 8;
+				if (tileregs[0x2] != 0x00) tile |= mainspace.read_byte((tileregs[0x2]<<8)+count) << 16;
+
 				count++;
 
 				bpp = (tileregs[0x3] & 0x0e) >> 1;
@@ -568,24 +577,30 @@ void xavix_state::draw_sprites(screen_device &screen, bitmap_ind16 &bitmap, cons
 		{
 			drawheight = 16;
 			drawwidth = 16;
-			if (m_alt_addressing)
+			if (m_alt_addressing == 1)
 				tile = tile * 128;
+			else if (m_alt_addressing == 2)
+				tile = tile * 8;
 		}
 		else if ((attr1 & 0x0c) == 0x08)
 		{
 			drawheight = 16;
 			drawwidth = 8;
 			xpos += 4;
-			if (m_alt_addressing)
+			if (m_alt_addressing == 1)
 				tile = tile * 64;
+			else if (m_alt_addressing == 2)
+				tile = tile * 8;
 		}
 		else if ((attr1 & 0x0c) == 0x04)
 		{
 			drawheight = 8;
 			drawwidth = 16;
 			ypos -= 4;
-			if (m_alt_addressing)
+			if (m_alt_addressing == 1)
 				tile = tile * 64;
+			else if (m_alt_addressing == 2)
+				tile = tile * 8;
 		}
 		else if ((attr1 & 0x0c) == 0x00)
 		{
@@ -593,12 +608,14 @@ void xavix_state::draw_sprites(screen_device &screen, bitmap_ind16 &bitmap, cons
 			drawwidth = 8;
 			xpos += 4;
 			ypos -= 4;
-			if (m_alt_addressing)
+			if (m_alt_addressing == 1)
 				tile = tile * 32;
+			else if (m_alt_addressing == 2)
+				tile = tile * 8;
 		}
 
 		if (m_alt_addressing)
-			tile += 0xd8000;
+			tile += m_alt_addressing_base;
 
 		ypos = 0xff - ypos;
 
@@ -608,7 +625,7 @@ void xavix_state::draw_sprites(screen_device &screen, bitmap_ind16 &bitmap, cons
 		xpos &= 0xff;
 		ypos &= 0xff;
 
-		if (ypos >=192)
+		if (ypos >= 192)
 			ypos -= 256;
 
 		int bpp = 1;
@@ -617,9 +634,9 @@ void xavix_state::draw_sprites(screen_device &screen, bitmap_ind16 &bitmap, cons
 		bpp += 1;
 
 		draw_tile(screen, bitmap, cliprect, tile, bpp, xpos, ypos, drawheight, drawwidth, flipx, 0, pal, 0);
-		draw_tile(screen, bitmap, cliprect, tile, bpp, xpos-256, ypos, drawheight, drawwidth, flipx, 0, pal, 0); // wrap-x
-		draw_tile(screen, bitmap, cliprect, tile, bpp, xpos, ypos-256, drawheight, drawwidth, flipx, 0, pal, 0); // wrap-y
-		draw_tile(screen, bitmap, cliprect, tile, bpp, xpos-256, ypos-256, drawheight, drawwidth, flipx, 0, pal, 0); // wrap-x,y
+		draw_tile(screen, bitmap, cliprect, tile, bpp, xpos - 256, ypos, drawheight, drawwidth, flipx, 0, pal, 0); // wrap-x
+		draw_tile(screen, bitmap, cliprect, tile, bpp, xpos, ypos - 256, drawheight, drawwidth, flipx, 0, pal, 0); // wrap-y
+		draw_tile(screen, bitmap, cliprect, tile, bpp, xpos - 256, ypos - 256, drawheight, drawwidth, flipx, 0, pal, 0); // wrap-x,y
 
 		/*
 		if ((m_spr_ypos[i] != 0x81) && (m_spr_ypos[i] != 0x80) && (m_spr_ypos[i] != 0x00))
@@ -834,9 +851,12 @@ INTERRUPT_GEN_MEMBER(xavix_state::interrupt)
 	//	if (m_irq_enable_data != 0)
 	//		m_maincpu->set_input_line(INPUT_LINE_IRQ0,HOLD_LINE);
 
+	// this logic is clearly VERY wrong
+
 	if (m_irq_enable_data != 0)
 	{
-		m_maincpu->set_input_line(INPUT_LINE_NMI, PULSE_LINE);
+		if (m_6ff8)
+			m_maincpu->set_input_line(INPUT_LINE_NMI, PULSE_LINE);
 	}
 }
 
@@ -1164,13 +1184,13 @@ WRITE8_MEMBER(xavix_state::xavix_6fc0_w) // also related to tilemap 1?
 WRITE8_MEMBER(xavix_state::tmap1_regs_w)
 {
 	/*
-	   0x0 seems to be where the tilemap is in ram (02 in monster truck, 0f in ekara)
+	   0x0 pointer to address where tile data is
 	       it gets set to 0x40 in monster truck test mode, which is outside of ram but test mode requires a fixed 'column scan' layout
 		   so that might be special
 
-	   0x1 unknown   (gets set to 0x03 on the course select, uninitialzied before that)
+	   0x1 pointer to middle tile bits (if needed, depends on mode) (usually straight after the ram needed for above)
 
-	   0x2 unused?
+	   0x2 pointer to tile highest tile bits (if needed, depends on mode) (usually straight after the ram needed for above)
 
 	   0x3 ---- bbb-     - = ?   b = bpp    (0x36 xavix logo, 0x3c title screen, 0x36 course select)
 
@@ -1294,7 +1314,7 @@ ADDRESS_MAP_START(xavix_state::xavix_map)
 	AM_RANGE(0x006100, 0x0061ff) AM_RAM AM_SHARE("spr_attr1")
 	AM_RANGE(0x006200, 0x0062ff) AM_RAM AM_SHARE("spr_ypos") // cleared to 0x80 by both games, maybe enable registers?
 	AM_RANGE(0x006300, 0x0063ff) AM_RAM AM_SHARE("spr_xpos")
-	AM_RANGE(0x006400, 0x0064ff) AM_RAM // 6400 range unused by code, does it exist?
+	AM_RANGE(0x006400, 0x0064ff) AM_RAM // 6400 range gets populated in some cases, but it seems to be more like work ram, data doesn't matter and must be ignored?
 	AM_RANGE(0x006500, 0x0065ff) AM_RAM AM_SHARE("spr_addr_lo")
 	AM_RANGE(0x006600, 0x0066ff) AM_RAM AM_SHARE("spr_addr_md")
 	AM_RANGE(0x006700, 0x0067ff) AM_RAM AM_SHARE("spr_addr_hi")
@@ -1482,6 +1502,36 @@ static INPUT_PORTS_START( rad_mtrk )
 	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_SERVICE1 ) // some kind of 'power off' (fades screen to black, jumps to an infinite loop) maybe low battery condition or just the power button?
 INPUT_PORTS_END
 
+
+static INPUT_PORTS_START( rad_crdn )
+	PORT_INCLUDE(xavix)
+
+	PORT_MODIFY("IN0")
+	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_BUTTON1 ) // can press this to get to a game select screen
+INPUT_PORTS_END
+
+
+static INPUT_PORTS_START( rad_box )
+	PORT_INCLUDE(xavix)
+
+	PORT_MODIFY("IN0")
+	// 6 types of punch and some navigation controls?
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_BUTTON1 ) PORT_NAME("Left Jan")
+	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_BUTTON2 ) PORT_NAME("Left Hook")
+	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_BUTTON3 ) PORT_NAME("Left Uppercut")
+	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_BUTTON4 ) PORT_NAME("Left Jab")
+	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_BUTTON5 ) PORT_NAME("Left Hook")
+	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_BUTTON6 ) PORT_NAME("Left Uppercut")
+	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_JOYSTICK_LEFT )
+	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_JOYSTICK_RIGHT )
+
+	PORT_MODIFY("IN1")
+	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_BUTTON7 )  PORT_NAME("Block")
+	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_UNKNOWN ) // needs to be high to pass warning screen?
+INPUT_PORTS_END
+
+
+
 /* correct, 4bpp gfxs */
 static const gfx_layout charlayout =
 {
@@ -1656,8 +1706,22 @@ DRIVER_INIT_MEMBER(xavix_state, taitons1)
 {
 	DRIVER_INIT_CALL(xavix);
 	m_alt_addressing = 1;
+	m_alt_addressing_base = 0xd8000;
 }
 
+DRIVER_INIT_MEMBER(xavix_state, rad_box)
+{
+	DRIVER_INIT_CALL(xavix);
+	m_alt_addressing = 2;
+	m_alt_addressing_base = 0x20000;
+}
+
+DRIVER_INIT_MEMBER(xavix_state, rad_crdn)
+{
+	DRIVER_INIT_CALL(xavix);
+	m_alt_addressing = 2;
+	m_alt_addressing_base = 0x00000;
+}
 
 /***************************************************************************
 
@@ -1704,11 +1768,11 @@ ROM_END
 
 CONS( 2006, taitons1,  0,   0,  xavix,  xavix,    xavix_state, taitons1, "Bandai / SSD Company LTD / Taito", "Let's! TV Play Classic - Taito Nostalgia 1", MACHINE_IS_SKELETON )
 
-CONS( 2000, rad_ping,  0,   0,  xavix,  xavix,    xavix_state, xavix, "Radica / SSD Company LTD / Simmer Technology", "Play TV Ping Pong", MACHINE_IS_SKELETON ) // "Simmer Technology" is also known as "Hummer Technology Co., Ltd"
-CONS( 2003, rad_mtrk,  0,   0,  xavix,  rad_mtrk, xavix_state, xavix, "Radica / SSD Company LTD",                     "Play TV Monster Truck", MACHINE_IS_SKELETON )
-CONS( 200?, rad_box,   0,   0,  xavix,  xavix,    xavix_state, xavix, "Radica / SSD Company LTD",                     "Play TV Boxing", MACHINE_IS_SKELETON)
-CONS( 200?, rad_crdn,  0,   0,  xavix,  xavix,    xavix_state, xavix, "Radica / SSD Company LTD",                     "Play TV Card Night", MACHINE_IS_SKELETON)
-CONS( 2002, rad_bb2,   0,   0,  xavix,  xavix,    xavix_state, xavix, "Radica / SSD Company LTD",                     "Play TV Baseball 2", MACHINE_IS_SKELETON ) // contains string "Radica RBB2 V1.0"
+CONS( 2000, rad_ping,  0,   0,  xavix,  xavix,    xavix_state, xavix,    "Radica / SSD Company LTD / Simmer Technology", "Play TV Ping Pong", MACHINE_IS_SKELETON ) // "Simmer Technology" is also known as "Hummer Technology Co., Ltd"
+CONS( 2003, rad_mtrk,  0,   0,  xavix,  rad_mtrk, xavix_state, xavix,    "Radica / SSD Company LTD",                     "Play TV Monster Truck", MACHINE_IS_SKELETON )
+CONS( 200?, rad_box,   0,   0,  xavix,  rad_box,  xavix_state, rad_box,  "Radica / SSD Company LTD",                     "Play TV Boxing", MACHINE_IS_SKELETON)
+CONS( 200?, rad_crdn,  0,   0,  xavix,  rad_crdn, xavix_state, rad_crdn, "Radica / SSD Company LTD",                     "Play TV Card Night", MACHINE_IS_SKELETON)
+CONS( 2002, rad_bb2,   0,   0,  xavix,  xavix,    xavix_state, xavix,    "Radica / SSD Company LTD",                     "Play TV Baseball 2", MACHINE_IS_SKELETON ) // contains string "Radica RBB2 V1.0"
 
 CONS (200?, eka_strt,  0,   0,  xavix,  xavix,    xavix_state, xavix, "Takara / SSD Company LTD",                     "e-kara Starter", MACHINE_IS_SKELETON)
 

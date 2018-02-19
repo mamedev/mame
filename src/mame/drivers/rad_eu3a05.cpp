@@ -15,16 +15,10 @@
     this is presumably for the bitmap layer on Qix
 
     --
-    Known games on this hardare
+    Known games on this hardware
 
     Tetris
     Space Invaders
-
-    ---
-    Other games that might be on this hardware
-
-    Skateboarding
-    + some of the earlier PlayTV games (not Soccer, that's XaviX, see xavix.cpp)
 
     ---
     The XaviX ones seem to have a XaviX logo on the external packaging while the

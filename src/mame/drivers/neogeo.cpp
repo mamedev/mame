@@ -9033,7 +9033,7 @@ ROM_END
  NEO-AEG PROGBK2S (2003.10.16) (NEO-PCM2 PLAYMORE) / NEO-AEG CHAFIO (2003.7.24) (NEO-CMC 7050)
 ****************************************/
 
-ROM_START( samsho5 ) /* Encrypted Set */ /* MVS VERSION */
+ROM_START( samsho5 ) /* Encrypted Set */ /* MVS VERSION, Build Date: Tue Aug 26 22:27:30 2003 */
 	ROM_REGION( 0x800000, "cslot1:maincpu", ROMREGION_BE|ROMREGION_16BIT )
 	ROM_LOAD16_WORD_SWAP( "270-p1.p1",  0x000000, 0x400000, CRC(4a2a09e6) SHA1(2644de02cdab8ccc605488a7c76b8c9cd1d5bcb9) ) /* mask rom TC5332205 */
 	ROM_LOAD16_WORD_SWAP( "270-p2.sp2", 0x400000, 0x400000, CRC(e0c74c85) SHA1(df24a4ee76438e40c2f04a714175a7f85cacdfe0) ) /* mask rom TC5332205 */
@@ -9066,11 +9066,11 @@ ROM_START( samsho5 ) /* Encrypted Set */ /* MVS VERSION */
 	ROM_LOAD16_BYTE( "270-c8.c8", 0x3000001, 0x800000, CRC(02c530a6) SHA1(7a3fafa6075506c6ef78cc4ec2cb72118ec83cb9) ) /* Plane 2,3 */ /* mask rom TC5364205 */
 ROM_END
 
-/* handwritten labels, possible hack of samsho5h?
+/* handwritten labels, but appears to be a legitimate alt revision based on the build date at 0xA6C00
    p1.bin                  270-p1c.p1              90.607002%
-   p2.bin                  270-p2c.sp2             99.999763% (all bytes that differ do so by only bits 0x20 or 0x02, which is suspicious)
+   p2.bin                  270-p2c.sp2             99.999763% (all bytes that differ do so by only bits 0x20 or 0x02)
 */
-ROM_START( samsho5a ) /* Encrypted Set, Alternate Set */ /* MVS VERSION */
+ROM_START( samsho5a ) /* Encrypted Set, Alternate Set */ /* MVS VERSION, Build Date: Mon Oct 20 10:11:27 2003 */
 	ROM_REGION( 0x800000, "cslot1:maincpu", ROMREGION_BE|ROMREGION_16BIT )
 	ROM_LOAD16_WORD_SWAP( "p1.bin", 0x000000, 0x400000, CRC(7795fffe) SHA1(2e74a4dbed553a01f1cb2f3db896375de5f1d212) ) /* EPROM */
 	ROM_LOAD16_WORD_SWAP( "p2.bin", 0x400000, 0x400000, CRC(2b844fe9) SHA1(899fe6457db4a724bdd9c7e4a912eab50a5221d3) ) /* EPROM */
@@ -9103,7 +9103,7 @@ ROM_START( samsho5a ) /* Encrypted Set, Alternate Set */ /* MVS VERSION */
 	ROM_LOAD16_BYTE( "270-c8.c8", 0x3000001, 0x800000, CRC(02c530a6) SHA1(7a3fafa6075506c6ef78cc4ec2cb72118ec83cb9) ) /* Plane 2,3 */ /* mask rom TC5364205 */
 ROM_END
 
-ROM_START( samsho5h ) /* Encrypted Set, Alternate Set */ /* AES VERSION */
+ROM_START( samsho5h ) /* Encrypted Set, Alternate Set */ /* AES VERSION, Build Date: Tue Oct 28 02:24:45 2003 */
 	ROM_REGION( 0x800000, "cslot1:maincpu", ROMREGION_BE|ROMREGION_16BIT )
 	ROM_LOAD16_WORD_SWAP( "270-p1c.p1",  0x000000, 0x400000, CRC(bf956089) SHA1(c538289069bf338b9fa7ecc5c9143763dbb776a8) ) /* mask rom TC5332205 */
 	ROM_LOAD16_WORD_SWAP( "270-p2c.sp2", 0x400000, 0x400000, CRC(943a6b1d) SHA1(12bd02fc197456da6ee86f066086094cef0f4bf9) ) /* mask rom TC5332205 */
