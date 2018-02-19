@@ -790,9 +790,9 @@ void model2_renderer::model2_3d_render(triangle *tri, const rectangle &cliprect)
 	renderer = (tri->texheader[0] >> 13) & 7;
 
 	/* calculate and clip to viewport */
-	// TODO: correct? seems to be right for all cases
-	//rectangle vp(tri->viewport[0] - 8, tri->viewport[2] - 8, (384-tri->viewport[3])+90, (384-tri->viewport[1])+90);
-	rectangle vp(tri->viewport[0] - 8, tri->viewport[2] - tri->viewport[0], tri->viewport[1] - 127, tri->viewport[3] - tri->viewport[1]);
+	rectangle vp(tri->viewport[0] - 8, tri->viewport[2] - 8, (384-tri->viewport[3])+90, (384-tri->viewport[1])+90);
+	// TODO: this seems to be more accurate but it breaks in some cases
+	//rectangle vp(tri->viewport[0] - 8, tri->viewport[2] - tri->viewport[0], tri->viewport[1] - 90, tri->viewport[3] - tri->viewport[1]);
 	vp &= cliprect;
 
 	extra.state = &m_state;
