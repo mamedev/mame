@@ -23,15 +23,16 @@ TODO:
 class albazc_state : public driver_device
 {
 public:
-	albazc_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag),
+	albazc_state(const machine_config &mconfig, device_type type, const char *tag) :
+		driver_device(mconfig, type, tag),
 		m_spriteram1(*this, "spriteram1"),
 		m_spriteram2(*this, "spriteram2"),
 		m_spriteram3(*this, "spriteram3"),
 		m_maincpu(*this, "maincpu"),
 		m_gfxdecode(*this, "gfxdecode"),
 		m_palette(*this, "palette"),
-		m_hopper(*this, "hopper") { }
+		m_hopper(*this, "hopper")
+	{ }
 
 	void hanaroku(machine_config &config);
 

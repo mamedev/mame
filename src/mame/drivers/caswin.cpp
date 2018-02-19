@@ -83,7 +83,8 @@ public:
 		m_sc0_vram(*this, "sc0_vram"),
 		m_sc0_attr(*this, "sc0_attr"),
 		m_maincpu(*this, "maincpu"),
-		m_gfxdecode(*this, "gfxdecode") { }
+		m_gfxdecode(*this, "gfxdecode")
+	{ }
 
 	void vvillage(machine_config &config);
 

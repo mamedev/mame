@@ -35,17 +35,18 @@ protected:
 	DECLARE_WRITE16_MEMBER(mmu_io_w);
 	DECLARE_FLOPPY_FORMATS(floppy_formats);
 
+	void altos486_io(address_map &map);
+	void altos486_mem(address_map &map);
+	void altos486_z80_io(address_map &map);
+	void altos486_z80_mem(address_map &map);
+
+private:
 	required_device<i80186_cpu_device> m_maincpu;
 	required_shared_ptr<uint16_t> m_ram;
 	required_memory_region m_rom;
 
 	bool m_sys_mode;
 	uint8_t m_prot[256];
-	uint16_t m_viol[16];
-	void altos486_io(address_map &map);
-	void altos486_mem(address_map &map);
-	void altos486_z80_io(address_map &map);
-	void altos486_z80_mem(address_map &map);
 };
 
 READ8_MEMBER(altos486_state::read_rmx_ack)

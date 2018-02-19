@@ -81,6 +81,7 @@ protected:
 	void dsp_map(address_map &map);
 	void sound_map(address_map &map);
 	void tomcat_map(address_map &map);
+
 private:
 	required_device<tms5220_device> m_tms;
 	int m_control_num;

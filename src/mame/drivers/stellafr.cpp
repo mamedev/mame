@@ -20,10 +20,10 @@ Possibly related to ADP hardware? The HD63484 video board is definitely absent h
 class stellafr_state : public driver_device
 {
 public:
-	stellafr_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag),
-			m_maincpu(*this, "maincpu"),
-			m_duart(*this, "duart")
+	stellafr_state(const machine_config &mconfig, device_type type, const char *tag) :
+		driver_device(mconfig, type, tag),
+		m_maincpu(*this, "maincpu"),
+		m_duart(*this, "duart")
 	{ }
 
 	void stellafr(machine_config &config);

@@ -35,18 +35,18 @@
 class pcw16_state : public driver_device
 {
 public:
-	pcw16_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag),
-			m_maincpu(*this, "maincpu"),
-			m_flash0(*this, "flash0"),
-			m_flash1(*this, "flash1"),
-			m_fdc(*this, "fdc"),
-			m_uart2(*this, "ns16550_2"),
-			m_beeper(*this, "beeper"),
-			m_ram(*this, RAM_TAG),
-			m_keyboard(*this, "at_keyboard"),
-			m_region_rom(*this, "maincpu"),
-			m_io_extra(*this, "EXTRA")
+	pcw16_state(const machine_config &mconfig, device_type type, const char *tag) :
+		driver_device(mconfig, type, tag),
+		m_maincpu(*this, "maincpu"),
+		m_flash0(*this, "flash0"),
+		m_flash1(*this, "flash1"),
+		m_fdc(*this, "fdc"),
+		m_uart2(*this, "ns16550_2"),
+		m_beeper(*this, "beeper"),
+		m_ram(*this, RAM_TAG),
+		m_keyboard(*this, "at_keyboard"),
+		m_region_rom(*this, "maincpu"),
+		m_io_extra(*this, "EXTRA")
 	{ }
 
 	void pcw16(machine_config &config);

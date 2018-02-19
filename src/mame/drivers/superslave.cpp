@@ -62,6 +62,8 @@ public:
 	void superslave(machine_config &config);
 
 protected:
+	virtual void machine_start() override;
+	virtual void machine_reset() override;
 	void superslave_io(address_map &map);
 	void superslave_mem(address_map &map);
 
@@ -81,9 +83,6 @@ private:
 	required_device<rs232_port_device> m_rs232c;
 	required_device<rs232_port_device> m_rs232d;
 	required_memory_region m_rom;
-
-	virtual void machine_start() override;
-	virtual void machine_reset() override;
 
 	uint8_t m_memctrl;
 	uint8_t m_cmd;

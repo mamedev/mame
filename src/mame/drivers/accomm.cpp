@@ -42,21 +42,24 @@
 class accomm_state : public driver_device
 {
 public:
-	accomm_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag),
-			m_maincpu(*this, "maincpu"),
-			m_beeper(*this, "beeper"),
-			m_ram(*this, RAM_TAG),
-			m_via(*this, "via6522"),
-			m_acia(*this, "acia"),
-			m_acia_clock(*this, "acia_clock"),
-			m_adlc(*this, "mc6854"),
-			m_vram(*this, "vram"),
-			m_keybd1(*this, "LINE1.%u", 0),
-			m_keybd2(*this, "LINE2.%u", 0),
-			m_ch00rom_enabled(true)
+	accomm_state(const machine_config &mconfig, device_type type, const char *tag) :
+		driver_device(mconfig, type, tag),
+		m_maincpu(*this, "maincpu"),
+		m_beeper(*this, "beeper"),
+		m_ram(*this, RAM_TAG),
+		m_via(*this, "via6522"),
+		m_acia(*this, "acia"),
+		m_acia_clock(*this, "acia_clock"),
+		m_adlc(*this, "mc6854"),
+		m_vram(*this, "vram"),
+		m_keybd1(*this, "LINE1.%u", 0),
+		m_keybd2(*this, "LINE2.%u", 0),
+		m_ch00rom_enabled(true)
 	{ }
 
+	void accomm(machine_config &config);
+
+protected:
 	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 
 	DECLARE_WRITE8_MEMBER(ch00switch_w);
@@ -72,9 +75,6 @@ public:
 	DECLARE_PALETTE_INIT(accomm);
 	INTERRUPT_GEN_MEMBER(vbl_int);
 
-	void accomm(machine_config &config);
-
-protected:
 	virtual void machine_reset() override;
 	virtual void machine_start() override;
 	void main_map(address_map &map);
