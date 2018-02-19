@@ -863,7 +863,7 @@ void seta_state::seta_layers_update(screen_device &screen, bitmap_ind16 &bitmap,
 			x[layer]     =   m_vctrl[layer][ 0/2 ];
 			y[layer]     =   m_vctrl[layer][ 2/2 ];
 			bank[layer]  =   m_vctrl[layer][ 4/2 ];
-			bank[layer]  =   (bank[layer] & 0x0008) ? 1 : 0; /*&& (bank[0] & 0x0001)*/
+			bank[layer]  =   (bank[layer] & 0x0008) ? 1 : 0; /*&& (bank[layer] & 0x0001)*/
 
 			/* Select tilemap bank, Only one tilemap bank per layer is enabled */
 			m_tilemap[layer][0]->enable((!bank[layer]));
