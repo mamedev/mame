@@ -51,7 +51,6 @@ public:
 	int m_lastScanline[9];
 	uint32_t m_colour_mask;
 	uint32_t m_shadow_mask;
-	uint32_t m_alpha_mode;
 
 	std::unique_ptr<uint16_t[]> m_spriteram;
 	std::unique_ptr<uint16_t[]> m_spriteram_spare;

@@ -246,15 +246,33 @@ WRITE32_MEMBER(deco_mlc_state::irq_ram_w)
 
 READ32_MEMBER( deco_mlc_state::spriteram_r )
 {
-	return m_spriteram[offset] | 0xffff0000;
+	uint32_t retdata = 0;
+
+	if (ACCESSING_BITS_16_31)
+	{
+		retdata |= 0xffff0000;
+	}
+
+	if (ACCESSING_BITS_0_15)
+	{
+		retdata |= m_spriteram[offset];
+	}
+
+	return retdata;
 }
 
 
 WRITE32_MEMBER( deco_mlc_state::spriteram_w )
 {
-	data &=0x0000ffff;
-	mem_mask &=0x0000ffff;
-	COMBINE_DATA(&m_spriteram[offset]);
+	if (ACCESSING_BITS_16_31)
+	{
+	}
+
+	if (ACCESSING_BITS_0_15)
+	{
+		data &=0x0000ffff;
+		COMBINE_DATA(&m_spriteram[offset]);
+	}
 }
 
 READ16_MEMBER( deco_mlc_state::sh96_protection_region_0_146_r )
@@ -289,7 +307,7 @@ ADDRESS_MAP_START(deco_mlc_state::avengrgs_map)
 	AM_RANGE(0x0200080, 0x02000ff) AM_RAM AM_SHARE("clip_ram") AM_MIRROR(0xff000000)
 	AM_RANGE(0x0204000, 0x0206fff) AM_READWRITE( spriteram_r, spriteram_w ) AM_MIRROR(0xff000000)
 	AM_RANGE(0x0280000, 0x029ffff) AM_RAM AM_SHARE("vram") AM_MIRROR(0xff000000)
-	AM_RANGE(0x0300000, 0x0307fff) AM_DEVREADWRITE16("palette", palette_device, read16, write16, 0x0000ffff) AM_SHARE("palette") AM_MIRROR(0xff000000)
+	AM_RANGE(0x0300000, 0x0307fff) AM_DEVREADWRITE16("palette", palette_device, read16, write16, 0x0000ffff).cswidth(32) AM_SHARE("palette") AM_MIRROR(0xff000000)
 	AM_RANGE(0x0400000, 0x0400003) AM_READ_PORT("INPUTS") AM_MIRROR(0xff000000)
 	AM_RANGE(0x0440000, 0x0440003) AM_READ_PORT("INPUTS2") AM_MIRROR(0xff000000)
 	AM_RANGE(0x0440004, 0x0440007) AM_READ_PORT("INPUTS3") AM_MIRROR(0xff000000)
@@ -311,7 +329,7 @@ ADDRESS_MAP_START(deco_mlc_state::decomlc_map)
 	AM_RANGE(0x0200080, 0x02000ff) AM_RAM AM_SHARE("clip_ram")
 	AM_RANGE(0x0204000, 0x0206fff) AM_READWRITE( spriteram_r, spriteram_w )
 	AM_RANGE(0x0280000, 0x029ffff) AM_RAM AM_SHARE("vram")
-	AM_RANGE(0x0300000, 0x0307fff) AM_DEVREADWRITE16("palette", palette_device, read16, write16, 0x0000ffff) AM_SHARE("palette")
+	AM_RANGE(0x0300000, 0x0307fff) AM_DEVREADWRITE16("palette", palette_device, read16, write16, 0x0000ffff).cswidth(32) AM_SHARE("palette")
 	AM_RANGE(0x0400000, 0x0400003) AM_READ_PORT("INPUTS")
 	AM_RANGE(0x0440000, 0x0440003) AM_READ_PORT("INPUTS2")
 	AM_RANGE(0x0440004, 0x0440007) AM_READ_PORT("INPUTS3")

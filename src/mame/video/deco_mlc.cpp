@@ -31,7 +31,6 @@ VIDEO_START_MEMBER(deco_mlc_state,mlc)
 	save_pointer(NAME(m_spriteram.get()), 0x3000/4);
 	save_pointer(NAME(m_spriteram_spare.get()), 0x3000/4);
 	save_pointer(NAME(m_buffered_spriteram.get()), 0x3000/4);
-	save_item(NAME(m_alpha_mode));
 }
 
 
@@ -121,7 +120,7 @@ static void mlc_drawgfxzoomline(deco_mlc_state *state,
 					if (use8bpp)
 						c=(c<<4)|source2[x_index>>16];
 
-					 // m_alpha_mode & 0xc0 = 0xc0 : Shadow, 0 : Alpha, Other bits unknown
+					 // alphaMode & 0xc0 = 0xc0 : Shadow, 0 : Alpha, Other bits unknown
 					if( c != transparent_color ) dest[x] = alpha_blend_r32(dest[x], (alphaMode & 0xc0) ? shadowval : pal[c], shadowMode ? 0x80 : alpha);
 					x_index += dx;
 				}
@@ -523,7 +522,7 @@ void deco_mlc_state::draw_sprites( const rectangle &cliprect, int scanline, uint
 							color + colorOffset,fx,realxbase,
 							0,
 							use8bppMode,(xscale),alpha, srcline,
-							shadowMode, m_alpha_mode);
+							shadowMode, m_irq_ram[0x04/4]);
 
 		}
 
@@ -550,8 +549,6 @@ uint32_t deco_mlc_state::screen_update(screen_device &screen, bitmap_rgb32 &bitm
 {
 //  temp_bitmap->fill(0, cliprect);
 	bitmap.fill(m_palette->pen(0), cliprect); /* Pen 0 fill colour confirmed from Skull Fang level 2 */
-
-	m_alpha_mode = m_irq_ram[0x04/4];
 
 	for (int i=cliprect.min_y;i<=cliprect.max_y;i++)
 	{
