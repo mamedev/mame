@@ -26,8 +26,7 @@ public:
 		m_pic(*this, "pic"),
 		m_fdc(*this, "fdc"),
 		m_dmac(*this, "dmac"),
-		m_fd0(*this, "fdc:0"),
-		m_fd1(*this, "fdc:1"),
+		m_fd(*this, "fdc:%u", 0),
 		m_chrrom(*this, "char"),
 		m_vram(*this, "vram")
 	{ }
@@ -48,8 +47,7 @@ private:
 	required_device<pic8259_device> m_pic;
 	required_device<upd765a_device> m_fdc;
 	required_device<am9517a_device> m_dmac;
-	required_device<floppy_connector> m_fd0;
-	required_device<floppy_connector> m_fd1;
+	required_device_array<floppy_connector, 2> m_fd;
 	required_memory_region m_chrrom;
 	required_shared_ptr<u16> m_vram;
 };
@@ -66,10 +64,15 @@ WRITE8_MEMBER(duet16_state::pic_w)
 
 WRITE8_MEMBER(duet16_state::fdcctrl_w)
 {
-	m_fd0->get_device()->mon_w(!BIT(data, 0));
-	m_fd1->get_device()->mon_w(!BIT(data, 0));
+	floppy_image_device *f = m_fd[BIT(data, 2) ? 0 : 1]->get_device();
+	m_fdc->set_floppy(f);
+
+	m_fd[0]->get_device()->mon_w(!BIT(data, 0));
+	m_fd[1]->get_device()->mon_w(!BIT(data, 0));
 	if(!BIT(data, 1))
 		m_fdc->soft_reset();
+
+	// TODO: bit 3 = LSPD
 }
 
 READ8_MEMBER(duet16_state::dma_mem_r)
@@ -185,7 +188,7 @@ MACHINE_CONFIG_START(duet16_state::duet16)
 	MCFG_INPUT_MERGER_ANY_HIGH("kbint")
 	MCFG_INPUT_MERGER_OUTPUT_HANDLER(DEVWRITELINE("pic", pic8259_device, ir5_w)) // INT2
 
-	MCFG_DEVICE_ADD("fdc", UPD765A, 0)
+	MCFG_UPD765A_ADD("fdc", true, false)
 	MCFG_UPD765_DRQ_CALLBACK(DEVWRITELINE("dmac", am9517a_device, dreq0_w))
 	MCFG_UPD765_INTRQ_CALLBACK(DEVWRITELINE("pic", pic8259_device, ir3_w)) // INT4
 	MCFG_FLOPPY_DRIVE_ADD("fdc:0", duet16_floppies, "525qd", floppy_image_device::default_floppy_formats)
