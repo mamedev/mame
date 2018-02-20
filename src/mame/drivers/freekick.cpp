@@ -971,7 +971,7 @@ ROM_START( pbillrdsa ) /* all ROMs were HN4827128G-25, except 17, HN27256G-25, C
 	ROM_LOAD( "19", 0xc000, 0x4000, CRC(2335e6dd) SHA1(82352b6f4abea88aad3a96ca63cccccb6e278f48) ) /* encrypted */
 
 	ROM_REGION( 0x2000, "maincpu:key", 0 ) /* MC8123 key */
-	ROM_LOAD( "317-0030.key", 0x0000, 0x2000, CRC(9223f06d) SHA1(51a22a4c80fe273526bde68918c13c6476cec383) )
+	ROM_LOAD( "317-5008.key", 0x0000, 0x2000, CRC(9223f06d) SHA1(51a22a4c80fe273526bde68918c13c6476cec383) ) /* same key as 317-0030 */
 
 	ROM_REGION( 0xc000, "gfx1", 0 ) /* GFX */
 	ROM_LOAD( "pb.4", 0x000000, 0x04000, CRC(2f4d4dd3) SHA1(ee4facabf591c235c270db4f4d3f612b8c474e57) )
