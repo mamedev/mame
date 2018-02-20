@@ -260,6 +260,9 @@ public:
 	void resolve();
 	void resolve_safe(u64 none_constant_value);
 
+	// validity checking
+	void validity_check(validity_checker &valid) const;
+
 protected:
 	// internal helpers
 	virtual void devcb_reset() override;
@@ -316,6 +319,9 @@ public:
 	// resolution
 	void resolve();
 	void resolve_safe();
+
+	// validity checking
+	void validity_check(validity_checker &valid) const;
 
 protected:
 	// internal helpers

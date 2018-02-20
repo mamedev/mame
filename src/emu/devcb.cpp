@@ -149,6 +149,7 @@ devcb_read_base::devcb_read_base(device_t &device, u64 defmask)
 	: devcb_base(device, defmask),
 		m_adapter(&devcb_read_base::read_unresolved_adapter)
 {
+	device.m_input_callbacks.push_back(this);
 }
 
 
@@ -200,75 +201,75 @@ void devcb_read_base::resolve()
 	{
 		switch (m_type)
 		{
-			case CALLBACK_NONE:
-				break;
+		case CALLBACK_NONE:
+			break;
 
-			case CALLBACK_LINE:
-				name = m_readline.name();
-				m_readline.bind_relative_to(*m_device.owner());
-				m_target_int = 0;
-				m_adapter = m_readline.isnull() ? &devcb_read_base::read_constant_adapter : &devcb_read_base::read_line_adapter;
-				m_mask = shift_mask(1);
-				break;
+		case CALLBACK_LINE:
+			name = m_readline.name();
+			m_readline.bind_relative_to(*m_device.owner());
+			m_target_int = 0;
+			m_adapter = m_readline.isnull() ? &devcb_read_base::read_constant_adapter : &devcb_read_base::read_line_adapter;
+			m_mask = shift_mask(1);
+			break;
 
-			case CALLBACK_8:
-				name = m_read8.name();
-				m_read8.bind_relative_to(*m_device.owner());
-				m_target_int = 0;
-				m_adapter = m_read8.isnull() ? &devcb_read_base::read_constant_adapter : &devcb_read_base::read8_adapter;
-				m_mask = shift_mask(0xff);
-				break;
+		case CALLBACK_8:
+			name = m_read8.name();
+			m_read8.bind_relative_to(*m_device.owner());
+			m_target_int = 0;
+			m_adapter = m_read8.isnull() ? &devcb_read_base::read_constant_adapter : &devcb_read_base::read8_adapter;
+			m_mask = shift_mask(0xff);
+			break;
 
-			case CALLBACK_16:
-				name = m_read16.name();
-				m_read16.bind_relative_to(*m_device.owner());
-				m_target_int = 0;
-				m_adapter = m_read16.isnull() ? &devcb_read_base::read_constant_adapter : &devcb_read_base::read16_adapter;
-				m_mask = shift_mask(0xffff);
-				break;
+		case CALLBACK_16:
+			name = m_read16.name();
+			m_read16.bind_relative_to(*m_device.owner());
+			m_target_int = 0;
+			m_adapter = m_read16.isnull() ? &devcb_read_base::read_constant_adapter : &devcb_read_base::read16_adapter;
+			m_mask = shift_mask(0xffff);
+			break;
 
-			case CALLBACK_32:
-				name = m_read32.name();
-				m_read32.bind_relative_to(*m_device.owner());
-				m_target_int = 0;
-				m_adapter = m_read32.isnull() ? &devcb_read_base::read_constant_adapter : &devcb_read_base::read32_adapter;
-				m_mask = shift_mask(0xffffffff);
-				break;
+		case CALLBACK_32:
+			name = m_read32.name();
+			m_read32.bind_relative_to(*m_device.owner());
+			m_target_int = 0;
+			m_adapter = m_read32.isnull() ? &devcb_read_base::read_constant_adapter : &devcb_read_base::read32_adapter;
+			m_mask = shift_mask(0xffffffff);
+			break;
 
-			case CALLBACK_64:
-				name = m_read64.name();
-				m_read64.bind_relative_to(*m_device.owner());
-				m_target_int = 0;
-				m_adapter = m_read64.isnull() ? &devcb_read_base::read_constant_adapter : &devcb_read_base::read64_adapter;
-				break;
+		case CALLBACK_64:
+			name = m_read64.name();
+			m_read64.bind_relative_to(*m_device.owner());
+			m_target_int = 0;
+			m_adapter = m_read64.isnull() ? &devcb_read_base::read_constant_adapter : &devcb_read_base::read64_adapter;
+			break;
 
-			case CALLBACK_IOPORT:
-				name = m_target_tag;
-				resolve_ioport();
-				m_target_int = 0;
-				m_adapter = &devcb_read_base::read_ioport_adapter;
-				break;
+		case CALLBACK_IOPORT:
+			name = m_target_tag;
+			resolve_ioport();
+			m_target_int = 0;
+			m_adapter = &devcb_read_base::read_ioport_adapter;
+			break;
 
-			case CALLBACK_MEMBANK:
-				throw emu_fatalerror("Device read callbacks can't be connected to bank switches\n");
+		case CALLBACK_MEMBANK:
+			throw emu_fatalerror("Device read callbacks can't be connected to bank switches\n");
 
-			case CALLBACK_LOG:
-				m_adapter = &devcb_read_base::read_logged_adapter;
-				m_mask = 0;
-				break;
+		case CALLBACK_LOG:
+			m_adapter = &devcb_read_base::read_logged_adapter;
+			m_mask = 0;
+			break;
 
-			case CALLBACK_CONSTANT:
-				if (m_xor != 0)
-					throw emu_fatalerror("devcb_read: Attempt to invert constant value (%lX ^ %lX)\n", (unsigned long)shift_mask(m_target_int), (unsigned long)m_xor);
-				m_adapter = &devcb_read_base::read_constant_adapter;
-				m_mask = shift_mask(m_target_int);
-				break;
+		case CALLBACK_CONSTANT:
+			if (m_xor != 0)
+				throw emu_fatalerror("devcb_read: Attempt to invert constant value (%lX ^ %lX)\n", (unsigned long)shift_mask(m_target_int), (unsigned long)m_xor);
+			m_adapter = &devcb_read_base::read_constant_adapter;
+			m_mask = shift_mask(m_target_int);
+			break;
 
-			case CALLBACK_INPUTLINE:
-			case CALLBACK_ASSERTLINE:
-			case CALLBACK_CLEARLINE:
-			case CALLBACK_HOLDLINE:
-				throw emu_fatalerror("Device read callbacks can't be connected to input lines\n");
+		case CALLBACK_INPUTLINE:
+		case CALLBACK_ASSERTLINE:
+		case CALLBACK_CLEARLINE:
+		case CALLBACK_HOLDLINE:
+			throw emu_fatalerror("Device read callbacks can't be connected to input lines\n");
 		}
 	}
 	catch (binding_type_exception &binderr)
@@ -398,6 +399,63 @@ u64 devcb_read_base::read_constant_adapter(address_space &space, offs_t offset, 
 }
 
 
+//-------------------------------------------------
+//  validity_check - check the validity of the
+//  callback object
+//-------------------------------------------------
+
+void devcb_read_base::validity_check(validity_checker &valid) const
+{
+	switch (m_type)
+	{
+	case CALLBACK_NONE:
+	case CALLBACK_CONSTANT:
+	case CALLBACK_LOG:
+	case CALLBACK_IOPORT:
+		break;
+
+	case CALLBACK_LINE:
+		if (m_device.owner()->subdevice(m_readline.device_name()) == nullptr)
+			osd_printf_error("Device %s not found for READLINE callback (%s)\n", m_readline.device_name(), m_readline.name());
+		break;
+
+	case CALLBACK_8:
+		if (m_device.owner()->subdevice(m_read8.device_name()) == nullptr)
+			osd_printf_error("Device %s not found for READ8 callback (%s)\n", m_read8.device_name(), m_read8.name());
+		break;
+
+	case CALLBACK_16:
+		if (m_device.owner()->subdevice(m_read16.device_name()) == nullptr)
+			osd_printf_error("Device %s not found for READ16 callback (%s)\n", m_read16.device_name(), m_read16.name());
+		break;
+
+	case CALLBACK_32:
+		if (m_device.owner()->subdevice(m_read32.device_name()) == nullptr)
+			osd_printf_error("Device %s not found for READ32 callback (%s)\n", m_read32.device_name(), m_read32.name());
+		break;
+
+	case CALLBACK_64:
+		if (m_device.owner()->subdevice(m_read64.device_name()) == nullptr)
+			osd_printf_error("Device %s not found for READ64 callback (%s)\n", m_read64.device_name(), m_read64.name());
+		break;
+
+	case CALLBACK_MEMBANK:
+		osd_printf_error("Device read callbacks can't be connected to bank switches\n");
+		break;
+
+	case CALLBACK_INPUTLINE:
+	case CALLBACK_ASSERTLINE:
+	case CALLBACK_CLEARLINE:
+	case CALLBACK_HOLDLINE:		
+		throw emu_fatalerror("Device read callbacks can't be connected to input lines\n");
+		break;
+	}
+
+	if (m_chain != nullptr)
+		m_chain->validity_check(valid);
+}
+
+
 
 //**************************************************************************
 //  DEVCB WRITE CLASS
@@ -411,6 +469,7 @@ devcb_write_base::devcb_write_base(device_t &device, u64 defmask)
 	: devcb_base(device, defmask),
 		m_adapter(&devcb_write_base::write_unresolved_adapter)
 {
+	device.m_output_callbacks.push_back(this);
 }
 
 
@@ -462,76 +521,76 @@ void devcb_write_base::resolve()
 	{
 		switch (m_type)
 		{
-			case CALLBACK_NONE:
-				break;
+		case CALLBACK_NONE:
+			break;
 
-			case CALLBACK_LINE:
-				name = m_writeline.name();
-				m_writeline.bind_relative_to(*m_device.owner());
-				m_adapter = m_writeline.isnull() ? &devcb_write_base::write_noop_adapter : &devcb_write_base::write_line_adapter;
-				break;
+		case CALLBACK_LINE:
+			name = m_writeline.name();
+			m_writeline.bind_relative_to(*m_device.owner());
+			m_adapter = m_writeline.isnull() ? &devcb_write_base::write_noop_adapter : &devcb_write_base::write_line_adapter;
+			break;
 
-			case CALLBACK_8:
-				name = m_write8.name();
-				m_write8.bind_relative_to(*m_device.owner());
-				m_adapter = m_write8.isnull() ? &devcb_write_base::write_noop_adapter : &devcb_write_base::write8_adapter;
-				break;
+		case CALLBACK_8:
+			name = m_write8.name();
+			m_write8.bind_relative_to(*m_device.owner());
+			m_adapter = m_write8.isnull() ? &devcb_write_base::write_noop_adapter : &devcb_write_base::write8_adapter;
+			break;
 
-			case CALLBACK_16:
-				name = m_write16.name();
-				m_write16.bind_relative_to(*m_device.owner());
-				m_adapter = m_write16.isnull() ? &devcb_write_base::write_noop_adapter : &devcb_write_base::write16_adapter;
-				break;
+		case CALLBACK_16:
+			name = m_write16.name();
+			m_write16.bind_relative_to(*m_device.owner());
+			m_adapter = m_write16.isnull() ? &devcb_write_base::write_noop_adapter : &devcb_write_base::write16_adapter;
+			break;
 
-			case CALLBACK_32:
-				name = m_write32.name();
-				m_write32.bind_relative_to(*m_device.owner());
-				m_adapter = m_write32.isnull() ? &devcb_write_base::write_noop_adapter : &devcb_write_base::write32_adapter;
-				break;
+		case CALLBACK_32:
+			name = m_write32.name();
+			m_write32.bind_relative_to(*m_device.owner());
+			m_adapter = m_write32.isnull() ? &devcb_write_base::write_noop_adapter : &devcb_write_base::write32_adapter;
+			break;
 
-			case CALLBACK_64:
-				name = m_write64.name();
-				m_write64.bind_relative_to(*m_device.owner());
-				m_adapter = m_write64.isnull() ? &devcb_write_base::write_noop_adapter : &devcb_write_base::write64_adapter;
-				break;
+		case CALLBACK_64:
+			name = m_write64.name();
+			m_write64.bind_relative_to(*m_device.owner());
+			m_adapter = m_write64.isnull() ? &devcb_write_base::write_noop_adapter : &devcb_write_base::write64_adapter;
+			break;
 
-			case CALLBACK_IOPORT:
-				resolve_ioport();
-				m_adapter = (m_target.ioport == nullptr) ? &devcb_write_base::write_noop_adapter : &devcb_write_base::write_ioport_adapter;
-				break;
+		case CALLBACK_IOPORT:
+			resolve_ioport();
+			m_adapter = (m_target.ioport == nullptr) ? &devcb_write_base::write_noop_adapter : &devcb_write_base::write_ioport_adapter;
+			break;
 
-			case CALLBACK_MEMBANK:
-				resolve_membank();
-				m_adapter = (m_target.membank == nullptr) ? &devcb_write_base::write_noop_adapter : &devcb_write_base::write_membank_adapter;
-				break;
+		case CALLBACK_MEMBANK:
+			resolve_membank();
+			m_adapter = (m_target.membank == nullptr) ? &devcb_write_base::write_noop_adapter : &devcb_write_base::write_membank_adapter;
+			break;
 
-			case CALLBACK_LOG:
-				m_adapter = &devcb_write_base::write_logged_adapter;
-				break;
+		case CALLBACK_LOG:
+			m_adapter = &devcb_write_base::write_logged_adapter;
+			break;
 
-			case CALLBACK_CONSTANT:
-				m_adapter = &devcb_write_base::write_noop_adapter;
-				break;
+		case CALLBACK_CONSTANT:
+			m_adapter = &devcb_write_base::write_noop_adapter;
+			break;
 
-			case CALLBACK_INPUTLINE:
-				resolve_inputline();
-				m_adapter = &devcb_write_base::write_inputline_adapter;
-				break;
+		case CALLBACK_INPUTLINE:
+			resolve_inputline();
+			m_adapter = &devcb_write_base::write_inputline_adapter;
+			break;
 
-			case CALLBACK_ASSERTLINE:
-				resolve_inputline();
-				m_adapter = &devcb_write_base::write_assertline_adapter;
-				break;
+		case CALLBACK_ASSERTLINE:
+			resolve_inputline();
+			m_adapter = &devcb_write_base::write_assertline_adapter;
+			break;
 
-			case CALLBACK_CLEARLINE:
-				resolve_inputline();
-				m_adapter = &devcb_write_base::write_clearline_adapter;
-				break;
+		case CALLBACK_CLEARLINE:
+			resolve_inputline();
+			m_adapter = &devcb_write_base::write_clearline_adapter;
+			break;
 
-			case CALLBACK_HOLDLINE:
-				resolve_inputline();
-				m_adapter = &devcb_write_base::write_holdline_adapter;
-				break;
+		case CALLBACK_HOLDLINE:
+			resolve_inputline();
+			m_adapter = &devcb_write_base::write_holdline_adapter;
+			break;
 		}
 	}
 	catch (binding_type_exception &binderr)
@@ -556,6 +615,70 @@ void devcb_write_base::resolve_safe()
 	if (m_type == CALLBACK_NONE)
 		m_type = CALLBACK_CONSTANT;
 	resolve();
+}
+
+
+//-------------------------------------------------
+//  validity_check - check the validity of the
+//  callback object
+//-------------------------------------------------
+
+void devcb_write_base::validity_check(validity_checker &valid) const
+{
+	switch (m_type)
+	{
+	case CALLBACK_NONE:
+	case CALLBACK_CONSTANT:
+	case CALLBACK_LOG:
+	case CALLBACK_IOPORT:
+	case CALLBACK_MEMBANK:
+		break;
+
+	case CALLBACK_LINE:
+		if (m_device.owner()->subdevice(m_writeline.device_name()) == nullptr)
+			osd_printf_error("Device %s not found for WRITELINE callback (%s)\n", m_writeline.device_name(), m_writeline.name());
+		break;
+
+	case CALLBACK_8:
+		if (m_device.owner()->subdevice(m_write8.device_name()) == nullptr)
+			osd_printf_error("Device %s not found for WRITE8 callback (%s)\n", m_write8.device_name(), m_write8.name());
+		break;
+
+	case CALLBACK_16:
+		if (m_device.owner()->subdevice(m_write16.device_name()) == nullptr)
+			osd_printf_error("Device %s not found for WRITE16 callback (%s)\n", m_write16.device_name(), m_write16.name());
+		break;
+
+	case CALLBACK_32:
+		if (m_device.owner()->subdevice(m_write32.device_name()) == nullptr)
+			osd_printf_error("Device %s not found for WRITE32 callback (%s)\n", m_write32.device_name(), m_write32.name());
+		break;
+
+	case CALLBACK_64:
+		if (m_device.owner()->subdevice(m_write64.device_name()) == nullptr)
+			osd_printf_error("Device %s not found for WRITE64 callback (%s)\n", m_write64.device_name(), m_write64.name());
+		break;
+
+	case CALLBACK_INPUTLINE:
+	case CALLBACK_ASSERTLINE:
+	case CALLBACK_CLEARLINE:
+	case CALLBACK_HOLDLINE:
+	{
+		device_t *device = m_device.owner()->subdevice(m_target_tag);
+		if (device == nullptr)
+			osd_printf_error("Device %s not found for INPUTLINE callback (%d)\n", m_target_tag, int(m_target_int));
+		else
+		{
+			device_execute_interface *execute;
+			if (!device->interface(execute))
+				osd_printf_error("Device %s has no interface for INPUTLINE callback (%d)\n", m_target_tag, int(m_target_int));
+		}
+		break;
+	}
+	}
+
+	if (m_chain != nullptr)
+		m_chain->validity_check(valid);
 }
 
 
