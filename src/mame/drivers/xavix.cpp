@@ -1827,8 +1827,7 @@ ROM_END
 
 ROM_START( ttv_sw )
 	ROM_REGION( 0x800000, "bios", ROMREGION_ERASE00 )
-	// wasn't giving consistent reads
-	ROM_LOAD( "jedibad.bin", 0x000000, 0x800000, BAD_DUMP CRC(a12862fe) SHA1(9b5a07bdf35f72f2e2d127de5e6849ce5fa2afa0) )
+	ROM_LOAD( "jedi.bin", 0x000000, 0x800000, CRC(51cae5fd) SHA1(1ed8d556f31b4182259ca8c766d60c824d8d9744) )
 ROM_END
 
 
