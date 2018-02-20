@@ -10,10 +10,10 @@
 typedef device_delegate<uint16_t (uint16_t)> igs017_igs031_palette_scramble_delegate;
 
 #define MCFG_PALETTE_SCRAMBLE_CB( _class, _method) \
-	igs017_igs031_device::set_palette_scramble_cb(*device, igs017_igs031_palette_scramble_delegate(&_class::_method, #_class "::" #_method, nullptr, (_class *)nullptr));
+	downcast<igs017_igs031_device &>(*device).set_palette_scramble_cb(igs017_igs031_palette_scramble_delegate(&_class::_method, #_class "::" #_method, nullptr, (_class *)nullptr));
 
 #define MCFG_REVERSE_TEXT_BITS \
-	igs017_igs031_device::static_set_text_reverse_bits(*device);
+	downcast<igs017_igs031_device &>(*device).set_text_reverse_bits();
 
 class igs017_igs031_device : public device_t,
 							public device_gfx_interface,
@@ -24,12 +24,11 @@ public:
 	igs017_igs031_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
 
-	static void set_palette_scramble_cb(device_t &device,igs017_igs031_palette_scramble_delegate newtilecb);
+	void set_palette_scramble_cb(igs017_igs031_palette_scramble_delegate newtilecb);
 
-	static void static_set_text_reverse_bits(device_t &device)
+	void set_text_reverse_bits()
 	{
-		igs017_igs031_device &dev = downcast<igs017_igs031_device &>(device);
-		dev.m_revbits = 1;
+		m_revbits = 1;
 	}
 
 	uint16_t palette_callback_straight(uint16_t bgr);

@@ -111,13 +111,13 @@ tc0080vco_device::tc0080vco_device(const machine_config &mconfig, const char *ta
 }
 
 //-------------------------------------------------
-//  static_set_gfxdecode_tag: Set the tag of the
+//  set_gfxdecode_tag: Set the tag of the
 //  gfx decoder
 //-------------------------------------------------
 
-void tc0080vco_device::static_set_gfxdecode_tag(device_t &device, const char *tag)
+void tc0080vco_device::set_gfxdecode_tag(const char *tag)
 {
-	downcast<tc0080vco_device &>(device).m_gfxdecode.set_tag(tag);
+	m_gfxdecode.set_tag(tag);
 }
 
 //-------------------------------------------------

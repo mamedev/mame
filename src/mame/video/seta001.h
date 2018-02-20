@@ -10,16 +10,16 @@ typedef device_delegate<int (uint16_t code, uint8_t color)> gfxbank_cb_delegate;
 #define SETA001_SPRITE_GFXBANK_CB_MEMBER(_name) int _name(uint16_t code, uint8_t color)
 
 #define MCFG_SETA001_SPRITE_GFXBANK_CB(_class, _method) \
-	seta001_device::set_gfxbank_callback(*device, gfxbank_cb_delegate(&_class::_method, #_class "::" #_method, this));
+	downcast<seta001_device &>(*device).set_gfxbank_callback(gfxbank_cb_delegate(&_class::_method, #_class "::" #_method, this));
 
 class seta001_device : public device_t
 {
 public:
 	seta001_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
-	// static configuration
-	static void static_set_gfxdecode_tag(device_t &device, const char *tag);
-	static void set_gfxbank_callback(device_t &device, gfxbank_cb_delegate callback) { downcast<seta001_device &>(device).m_gfxbank_cb = callback; }
+	// configuration
+	void set_gfxdecode_tag(const char *tag);
+	void set_gfxbank_callback(gfxbank_cb_delegate callback) { m_gfxbank_cb = callback; }
 
 	DECLARE_WRITE8_MEMBER( spritebgflag_w8 );
 
@@ -89,6 +89,6 @@ private:
 DECLARE_DEVICE_TYPE(SETA001_SPRITE, seta001_device)
 
 #define MCFG_SETA001_SPRITE_GFXDECODE(_gfxtag) \
-	seta001_device::static_set_gfxdecode_tag(*device, "^" _gfxtag);
+	downcast<seta001_device &>(*device).set_gfxdecode_tag("^" _gfxtag);
 
 #endif // MAME_VIDEO_SETA001_H

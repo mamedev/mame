@@ -19,7 +19,7 @@
 
 #define MCFG_ATARIRLE_ADD(_tag, _interface) \
 	MCFG_DEVICE_ADD(_tag, ATARI_RLE_OBJECTS, 0) \
-	atari_rle_objects_device::static_set_config(*device, _interface);
+	downcast<atari_rle_objects_device &>(*device).set_config(_interface);
 
 
 
@@ -80,8 +80,8 @@ public:
 	// construction/destruction
 	atari_rle_objects_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
-	// static configuration helpers
-	static void static_set_config(device_t &device, const atari_rle_objects_config &config);
+	// configuration helpers
+	void set_config(const atari_rle_objects_config &config);
 
 	// control handlers
 	DECLARE_WRITE8_MEMBER(control_write);

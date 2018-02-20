@@ -11,7 +11,7 @@ class k007121_device : public device_t
 public:
 	k007121_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
-	static void static_set_palette_tag(device_t &device, const char *tag);
+	void set_palette_tag(const char *tag);
 
 	uint8_t ctrlram_r(int offset);
 	DECLARE_WRITE8_MEMBER( ctrl_w );
@@ -38,6 +38,6 @@ DECLARE_DEVICE_TYPE(K007121, k007121_device)
 	MCFG_DEVICE_ADD(_tag, K007121, 0)
 
 #define MCFG_K007121_PALETTE(_palette_tag) \
-	k007121_device::static_set_palette_tag(*device, "^" _palette_tag);
+	downcast<k007121_device &>(*device).set_palette_tag("^" _palette_tag);
 
 #endif // MAME_VIDEO_K007121_H

@@ -1462,9 +1462,9 @@ void dvg_device::device_start()
 	register_state();
 }
 
-void avgdvg_device::static_set_vector_tag(device_t &device, const char *tag)
+void avgdvg_device::set_vector_tag(const char *tag)
 {
-	downcast<avgdvg_device &>(device).m_vector.set_tag(tag);
+	m_vector.set_tag(tag);
 }
 
 avgdvg_device::avgdvg_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock)

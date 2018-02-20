@@ -76,14 +76,13 @@ atari_rle_objects_device::atari_rle_objects_device(const machine_config &mconfig
 
 
 //-------------------------------------------------
-//  static_set_config: Set the tag of the
+//  set_config: Set the tag of the
 //  sound CPU
 //-------------------------------------------------
 
-void atari_rle_objects_device::static_set_config(device_t &device, const atari_rle_objects_config &config)
+void atari_rle_objects_device::set_config(const atari_rle_objects_config &config)
 {
-	atari_rle_objects_device &target = downcast<atari_rle_objects_device &>(device);
-	static_cast<atari_rle_objects_config &>(target) = config;
+	static_cast<atari_rle_objects_config &>(*this) = config;
 }
 
 

@@ -34,11 +34,11 @@ struct kan_tempsprite
 class kaneko16_sprite_device : public device_t, public device_video_interface
 {
 public:
-	// static configuration
-	static void static_set_gfxdecode_tag(device_t &device, const char *tag);
-	static void set_fliptype(device_t &device, int fliptype);
-	static void set_offsets(device_t &device, int xoffs, int yoffs);
-	static void set_priorities(device_t &device, int pri0, int pri1, int pri2, int pri3);
+	// configuration
+	void set_gfxdecode_tag(const char *tag);
+	void set_fliptype(int fliptype);
+	void set_offsets(int xoffs, int yoffs);
+	void set_priorities(int pri0, int pri1, int pri2, int pri3);
 
 	// (legacy) used in the bitmap clear functions
 	virtual int get_sprite_type(void) =0;
@@ -115,7 +115,13 @@ private:
 //extern const device_type KANEKO16_SPRITE;
 
 #define MCFG_KANEKO16_SPRITE_GFXDECODE(_gfxtag) \
-	kaneko16_sprite_device::static_set_gfxdecode_tag(*device, "^" _gfxtag);
+	downcast<kaneko16_sprite_device &>(*device).set_gfxdecode_tag("^" _gfxtag);
+#define MCFG_KANEKO16_SPRITE_PRIORITIES(_pri0, _pri1, _pri2, _pri3) \
+	downcast<kaneko16_sprite_device &>(*device).set_priorities(_pri0, _pri1, _pri2, _pri3);
+#define MCFG_KANEKO16_SPRITE_OFFSETS(_xoffs, _yoffs) \
+	downcast<kaneko16_sprite_device &>(*device).set_offsets(_xoffs, _yoffs);
+#define MCFG_KANEKO16_SPRITE_FLIPTYPE(_fliptype) \
+	downcast<kaneko16_sprite_device &>(*device).set_fliptype(_fliptype);
 
 
 class kaneko_vu002_sprite_device : public kaneko16_sprite_device

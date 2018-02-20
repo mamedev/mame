@@ -11,9 +11,9 @@ class tecmo_spr_device : public device_t
 {
 public:
 	tecmo_spr_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
-	static void set_gfx_region(device_t &device, int gfxregion);
-	static void set_bootleg(device_t &device, int bootleg);
-	static void set_yoffset(device_t &device, int bootleg);
+	void set_gfx_region(int gfxregion);
+	void set_bootleg(int bootleg);
+	void set_yoffset(int yoffset);
 
 	// gaiden.c / spbactn.c / tecmo16.c sprites
 	void gaiden_draw_sprites(screen_device &screen, gfxdecode_device *gfxdecode, const rectangle &cliprect, uint16_t* spriteram, int sprite_sizey, int spr_offset_y, int flip_screen, bitmap_ind16 &sprite_bitmap);
@@ -40,12 +40,12 @@ DECLARE_DEVICE_TYPE(TECMO_SPRITE, tecmo_spr_device)
 
 
 #define MCFG_TECMO_SPRITE_GFX_REGION(_region) \
-	tecmo_spr_device::set_gfx_region(*device, _region);
+	downcast<tecmo_spr_device &>(*device).set_gfx_region(_region);
 
 #define MCFG_TECMO_SPRITE_BOOTLEG(_bootleg) \
-	tecmo_spr_device::set_bootleg(*device, _bootleg);
+	downcast<tecmo_spr_device &>(*device).set_bootleg(_bootleg);
 
 #define MCFG_TECMO_SPRITE_YOFFSET(_yoffset) \
-	tecmo_spr_device::set_yoffset(*device, _yoffset);
+	downcast<tecmo_spr_device &>(*device).set_yoffset(_yoffset);
 
 #endif // MAME_VIDEO_TECMO_SPR_H

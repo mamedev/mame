@@ -10,16 +10,15 @@ class pc090oj_device : public device_t
 public:
 	pc090oj_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
-	// static configuration
-	static void static_set_gfxdecode_tag(device_t &device, const char *tag);
-	static void static_set_palette_tag(device_t &device, const char *tag);
-	static void set_gfx_region(device_t &device, int gfxregion) { downcast<pc090oj_device &>(device).m_gfxnum = gfxregion; }
-	static void set_usebuffer(device_t &device, int use_buf) { downcast<pc090oj_device &>(device).m_use_buffer = use_buf; }
-	static void set_offsets(device_t &device, int x_offset, int y_offset)
+	// configuration
+	void set_gfxdecode_tag(const char *tag);
+	void set_palette_tag(const char *tag);
+	void set_gfx_region(int gfxregion) { m_gfxnum = gfxregion; }
+	void set_usebuffer(int use_buf) { m_use_buffer = use_buf; }
+	void set_offsets(int x_offset, int y_offset)
 	{
-		pc090oj_device &dev = downcast<pc090oj_device &>(device);
-		dev.m_x_offset = x_offset;
-		dev.m_y_offset = y_offset;
+		m_x_offset = x_offset;
+		m_y_offset = y_offset;
 	}
 
 	DECLARE_READ16_MEMBER( word_r );
@@ -63,18 +62,18 @@ DECLARE_DEVICE_TYPE(PC090OJ, pc090oj_device)
 
 
 #define MCFG_PC090OJ_GFX_REGION(_region) \
-	pc090oj_device::set_gfx_region(*device, _region);
+	downcast<pc090oj_device &>(*device).set_gfx_region(_region);
 
 #define MCFG_PC090OJ_OFFSETS(_xoffs, _yoffs) \
-	pc090oj_device::set_offsets(*device, _xoffs, _yoffs);
+	downcast<pc090oj_device &>(*device).set_offsets(_xoffs, _yoffs);
 
 #define MCFG_PC090OJ_USEBUFFER(_use_buf) \
-	pc090oj_device::set_usebuffer(*device, _use_buf);
+	downcast<pc090oj_device &>(*device).set_usebuffer(_use_buf);
 
 #define MCFG_PC090OJ_GFXDECODE(_gfxtag) \
-	pc090oj_device::static_set_gfxdecode_tag(*device, "^" _gfxtag);
+	downcast<pc090oj_device &>(*device).set_gfxdecode_tag("^" _gfxtag);
 
 #define MCFG_PC090OJ_PALETTE(_palette_tag) \
-	pc090oj_device::static_set_palette_tag(*device, "^" _palette_tag);
+	downcast<pc090oj_device &>(*device).set_palette_tag("^" _palette_tag);
 
 #endif // MAME_VIDEO_PC090)J_H

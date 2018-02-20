@@ -68,9 +68,9 @@ kaneko16_sprite_device::kaneko16_sprite_device(
 //  gfx decoder
 //-------------------------------------------------
 
-void kaneko16_sprite_device::static_set_gfxdecode_tag(device_t &device, const char *tag)
+void kaneko16_sprite_device::set_gfxdecode_tag(const char *tag)
 {
-	downcast<kaneko16_sprite_device &>(device).m_gfxdecode.set_tag(tag);
+	m_gfxdecode.set_tag(tag);
 }
 
 void kaneko16_sprite_device::device_start()
@@ -94,29 +94,24 @@ void kaneko16_sprite_device::device_reset()
 	m_sprite_flipy = 0;
 }
 
-void kaneko16_sprite_device::set_priorities(device_t &device, int pri0, int pri1, int pri2, int pri3)
+void kaneko16_sprite_device::set_priorities(int pri0, int pri1, int pri2, int pri3)
 {
-	kaneko16_sprite_device &dev = downcast<kaneko16_sprite_device &>(device);
-
-	dev.m_priority.sprite[0] = pri0;
-	dev.m_priority.sprite[1] = pri1;
-	dev.m_priority.sprite[2] = pri2;
-	dev.m_priority.sprite[3] = pri3;
+	m_priority.sprite[0] = pri0;
+	m_priority.sprite[1] = pri1;
+	m_priority.sprite[2] = pri2;
+	m_priority.sprite[3] = pri3;
 }
 
 
-void kaneko16_sprite_device::set_fliptype(device_t &device, int fliptype)
+void kaneko16_sprite_device::set_fliptype(int fliptype)
 {
-	kaneko16_sprite_device &dev = downcast<kaneko16_sprite_device &>(device);
-	dev.m_sprite_fliptype = fliptype;
-
+	m_sprite_fliptype = fliptype;
 }
 
-void kaneko16_sprite_device::set_offsets(device_t &device, int xoffs, int yoffs)
+void kaneko16_sprite_device::set_offsets(int xoffs, int yoffs)
 {
-	kaneko16_sprite_device &dev = downcast<kaneko16_sprite_device &>(device);
-	dev.m_sprite_xoffs = xoffs;
-	dev.m_sprite_yoffs = yoffs;
+	m_sprite_xoffs = xoffs;
+	m_sprite_yoffs = yoffs;
 }
 
 

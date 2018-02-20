@@ -12,7 +12,7 @@
 
 #define MCFG_WPC_DMD_ADD( _tag, _scanline_cb ) \
 	MCFG_DEVICE_ADD( _tag, WPC_DMD, 0 ) \
-	devcb = &wpc_dmd_device::set_scanline_cb(*device, DEVCB_##_scanline_cb);
+	devcb = &downcast<wpc_dmd_device &>(*device).set_scanline_cb(DEVCB_##_scanline_cb);
 
 class wpc_dmd_device : public device_t
 {
@@ -31,7 +31,7 @@ public:
 	DECLARE_WRITE8_MEMBER(visible_page_w);
 	DECLARE_WRITE8_MEMBER(firq_scanline_w);
 
-	template <class Object> static devcb_base &set_scanline_cb(device_t &device, Object &&cb) { return downcast<wpc_dmd_device &>(device).scanline_cb.set_callback(std::forward<Object>(cb)); }
+	template <class Object> devcb_base &set_scanline_cb(Object &&cb) { return scanline_cb.set_callback(std::forward<Object>(cb)); }
 
 protected:
 	devcb_write_line scanline_cb;

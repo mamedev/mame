@@ -1462,7 +1462,7 @@ void k001005_device::draw( bitmap_rgb32 &bitmap, const rectangle &cliprect )
 	m_renderer->draw(bitmap, cliprect);
 }
 
-void k001005_device::set_texel_chip(device_t &device, const char *tag)
+void k001005_device::set_texel_chip(const char *tag)
 {
-	downcast<k001005_device &>(device).m_k001006_tag = tag;
+	m_k001006_tag = tag;
 }

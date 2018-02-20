@@ -19,20 +19,19 @@ class decospr_device : public device_t, public device_video_interface
 public:
 	decospr_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
-	// static configuration
-	static void static_set_gfxdecode_tag(device_t &device, const char *tag);
-	static void set_gfx_region(device_t &device, int gfxregion);
-	static void set_pri_callback(device_t &device, decospr_pri_cb_delegate callback) { downcast<decospr_device &>(device).m_pri_cb = callback; }
-	static void set_col_callback(device_t &device, decospr_col_cb_delegate callback) { downcast<decospr_device &>(device).m_col_cb = callback; }
-	static void set_is_bootleg(device_t &device, bool is_bootleg) { downcast<decospr_device &>(device).m_is_bootleg = is_bootleg; }
-	static void set_bootleg_type(device_t &device, int bootleg_type) { downcast<decospr_device &>(device).m_bootleg_type = bootleg_type; }
-	static void set_flipallx(device_t &device, int flipallx) { downcast<decospr_device &>(device).m_flipallx = flipallx; }
-	static void set_transpen(device_t &device, int transpen) { downcast<decospr_device &>(device).m_transpen = transpen; }
-	static void set_offsets(device_t &device, int x_offset, int y_offset)
+	// configuration
+	void set_gfxdecode_tag(const char *tag);
+	void set_gfx_region(int gfxregion);
+	void set_pri_callback(decospr_pri_cb_delegate callback) { m_pri_cb = callback; }
+	void set_col_callback(decospr_col_cb_delegate callback) { m_col_cb = callback; }
+	void set_is_bootleg(bool is_bootleg) { m_is_bootleg = is_bootleg; }
+	void set_bootleg_type(int bootleg_type) { m_bootleg_type = bootleg_type; }
+	void set_flipallx(int flipallx) { m_flipallx = flipallx; }
+	void set_transpen(int transpen) { m_transpen = transpen; }
+	void set_offsets(int x_offset, int y_offset)
 	{
-		decospr_device &dev = downcast<decospr_device &>(device);
-		dev.m_x_offset = x_offset;
-		dev.m_y_offset = y_offset;
+		m_x_offset = x_offset;
+		m_y_offset = y_offset;
 	}
 
 	void draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprect, uint16_t* spriteram, int sizewords);
@@ -76,30 +75,30 @@ private:
 DECLARE_DEVICE_TYPE(DECO_SPRITE, decospr_device)
 
 #define MCFG_DECO_SPRITE_GFX_REGION(_region) \
-	decospr_device::set_gfx_region(*device, _region);
+	downcast<decospr_device &>(*device).set_gfx_region(_region);
 
 #define MCFG_DECO_SPRITE_PRIORITY_CB(_class, _method) \
-	decospr_device::set_pri_callback(*device, decospr_pri_cb_delegate(&_class::_method, #_class "::" #_method, this));
+	downcast<decospr_device &>(*device).set_pri_callback(decospr_pri_cb_delegate(&_class::_method, #_class "::" #_method, this));
 
 #define MCFG_DECO_SPRITE_COLOUR_CB(_class, _method) \
-	decospr_device::set_col_callback(*device, decospr_col_cb_delegate(&_class::_method, #_class "::" #_method, this));
+	downcast<decospr_device &>(*device).set_col_callback(decospr_col_cb_delegate(&_class::_method, #_class "::" #_method, this));
 
 #define MCFG_DECO_SPRITE_ISBOOTLEG(_boot) \
-	decospr_device::set_is_bootleg(*device, _boot);
+	downcast<decospr_device &>(*device).set_is_bootleg(_boot);
 
 #define MCFG_DECO_SPRITE_BOOTLEG_TYPE(_bootleg_type) \
-	decospr_device::set_bootleg_type(*device, _bootleg_type);
+	downcast<decospr_device &>(*device).set_bootleg_type(_bootleg_type);
 
 #define MCFG_DECO_SPRITE_FLIPALLX(_flip) \
-	decospr_device::set_flipallx(*device, _flip);
+	downcast<decospr_device &>(*device).set_flipallx(_flip);
 
 #define MCFG_DECO_SPRITE_TRANSPEN(_pen) \
-	decospr_device::set_transpen(*device, _pen);
+	downcast<decospr_device &>(*device).set_transpen(_pen);
 
 #define MCFG_DECO_SPRITE_OFFSETS(_xoffs, _yoffs) \
-	decospr_device::set_offsets(*device, _xoffs, _yoffs);
+	downcast<decospr_device &>(*device).set_offsets(_xoffs, _yoffs);
 
 #define MCFG_DECO_SPRITE_GFXDECODE(_gfxtag) \
-	decospr_device::static_set_gfxdecode_tag(*device, "^" _gfxtag);
+	downcast<decospr_device &>(*device).set_gfxdecode_tag("^" _gfxtag);
 
 #endif // MAME_VIDEO_DECOSPR_H

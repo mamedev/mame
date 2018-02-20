@@ -33,26 +33,26 @@ deco_rmc3_device::deco_rmc3_device(const machine_config &mconfig, const char *ta
 //  INITIALIZATION AND CONFIGURATION
 //**************************************************************************
 
-void deco_rmc3_device::static_set_init(device_t &device, deco_rmc3_palette_init_delegate init)
+void deco_rmc3_device::set_init(deco_rmc3_palette_init_delegate init)
 {
-	downcast<deco_rmc3_device &>(device).m_init = init;
+	m_init = init;
 }
 
 
-void deco_rmc3_device::static_set_entries(device_t &device, u32 entries)
+void deco_rmc3_device::set_entries(u32 entries)
 {
-	downcast<deco_rmc3_device &>(device).m_entries = entries;
+	m_entries = entries;
 }
 
 
-void deco_rmc3_device::static_set_indirect_entries(device_t &device, u32 entries)
+void deco_rmc3_device::set_indirect_entries(u32 entries)
 {
-	downcast<deco_rmc3_device &>(device).m_indirect_entries = entries;
+	m_indirect_entries = entries;
 }
 
-void deco_rmc3_device::static_set_prom_region(device_t &device, const char *region)
+void deco_rmc3_device::set_prom_region(const char *region)
 {
-	downcast<deco_rmc3_device &>(device).m_prom_region.set_tag(region);
+	m_prom_region.set_tag(region);
 }
 
 

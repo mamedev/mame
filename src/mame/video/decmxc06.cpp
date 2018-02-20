@@ -41,10 +41,9 @@ todo:
 #include "decmxc06.h"
 #include "screen.h"
 
-void deco_mxc06_device::set_gfx_region(device_t &device, int region)
+void deco_mxc06_device::set_gfx_region(int region)
 {
-	deco_mxc06_device &dev = downcast<deco_mxc06_device &>(device);
-	dev.m_gfxregion = region;
+	m_gfxregion = region;
 }
 
 
@@ -60,13 +59,13 @@ deco_mxc06_device::deco_mxc06_device(const machine_config &mconfig, const char *
 }
 
 //-------------------------------------------------
-//  static_set_gfxdecode_tag: Set the tag of the
+//  set_gfxdecode_tag: Set the tag of the
 //  gfx decoder
 //-------------------------------------------------
 
-void deco_mxc06_device::static_set_gfxdecode_tag(device_t &device, const char *tag)
+void deco_mxc06_device::set_gfxdecode_tag(const char *tag)
 {
-	downcast<deco_mxc06_device &>(device).m_gfxdecode.set_tag(tag);
+	m_gfxdecode.set_tag(tag);
 }
 
 

@@ -35,11 +35,10 @@ toaplan_scu_device::toaplan_scu_device(const machine_config &mconfig, const char
 {
 }
 
-void toaplan_scu_device::static_set_xoffsets(device_t &device, int xoffs, int xoffs_flipped)
+void toaplan_scu_device::set_xoffsets(int xoffs, int xoffs_flipped)
 {
-	toaplan_scu_device &dev = downcast<toaplan_scu_device &>(device);
-	dev.m_xoffs = xoffs;
-	dev.m_xoffs_flipped = xoffs_flipped;
+	m_xoffs = xoffs;
+	m_xoffs_flipped = xoffs_flipped;
 }
 
 void toaplan_scu_device::device_start()

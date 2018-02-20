@@ -920,13 +920,13 @@ MACHINE_CONFIG_START(expro02_state::expro02)
 	MCFG_PALETTE_INIT_OWNER(expro02_state, expro02)
 
 	MCFG_DEVICE_ADD("view2_0", KANEKO_TMAP, 0)
-	kaneko_view2_tilemap_device::set_gfx_region(*device, 1);
-	kaneko_view2_tilemap_device::set_offset(*device, 0x5b, 0x8, 256, 224);
+	MCFG_KANEKO_TMAP_GFX_REGION(1)
+	MCFG_KANEKO_TMAP_OFFSET(0x5b, 0x8, 256, 224)
 	MCFG_KANEKO_TMAP_GFXDECODE("gfxdecode")
 
 	MCFG_DEVICE_ADD_VU002_SPRITES
-	kaneko16_sprite_device::set_priorities(*device, 8,8,8,8); // above all (not verified)
-	kaneko16_sprite_device::set_offsets(*device, 0, -0x40);
+	MCFG_KANEKO16_SPRITE_PRIORITIES(8,8,8,8) // above all (not verified)
+	MCFG_KANEKO16_SPRITE_OFFSETS(0, -0x40)
 	MCFG_KANEKO16_SPRITE_GFXDECODE("gfxdecode")
 
 	MCFG_DEVICE_ADD("calc1_mcu", KANEKO_HIT, 0)
@@ -958,8 +958,8 @@ MACHINE_CONFIG_START(expro02_state::comad)
 
 	MCFG_DEVICE_MODIFY("view2_0")
 	// these values might not be correct, behavior differs from original boards
-	kaneko_view2_tilemap_device::set_invert_flip(*device, 1);
-	kaneko_view2_tilemap_device::set_offset(*device, -256, -216, 256, 224);
+	MCFG_KANEKO_TMAP_INVERT_FLIP(1)
+	MCFG_KANEKO_TMAP_OFFSET(-256, -216, 256, 224)
 
 	MCFG_WATCHDOG_MODIFY("watchdog")
 	MCFG_WATCHDOG_TIME_INIT(attotime::from_seconds(0))  /* a guess, and certainly wrong */

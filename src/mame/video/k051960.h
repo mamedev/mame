@@ -19,22 +19,22 @@ typedef device_delegate<void (int *code, int *color, int *priority, int *shadow)
 #define K051960_CB_MEMBER(_name)   void _name(int *code, int *color, int *priority, int *shadow)
 
 #define MCFG_K051960_CB(_class, _method) \
-	k051960_device::set_k051960_callback(*device, k051960_cb_delegate(&_class::_method, #_class "::" #_method, this));
+	downcast<k051960_device &>(*device).set_k051960_callback(k051960_cb_delegate(&_class::_method, #_class "::" #_method, this));
 
 #define MCFG_K051960_PLANEORDER(_order) \
-	k051960_device::set_plane_order(*device, _order);
+	downcast<k051960_device &>(*device).set_plane_order(_order);
 
 #define MCFG_K051960_SCREEN_TAG(_tag) \
-	k051960_device::set_screen_tag(*device, "^" _tag);
+	downcast<k051960_device &>(*device).set_screen_tag("^" _tag);
 
 #define MCFG_K051960_IRQ_HANDLER(_devcb) \
-	devcb = &k051960_device::set_irq_handler(*device, DEVCB_##_devcb);
+	devcb = &downcast<k051960_device &>(*device).set_irq_handler(DEVCB_##_devcb);
 
 #define MCFG_K051960_NMI_HANDLER(_devcb) \
-	devcb = &k051960_device::set_nmi_handler(*device, DEVCB_##_devcb);
+	devcb = &downcast<k051960_device &>(*device).set_nmi_handler(DEVCB_##_devcb);
 
 #define MCFG_K051960_VREG_CONTRAST_HANDLER(_devcb) \
-	devcb = &k051960_device::set_vreg_contrast_handler(*device, DEVCB_##_devcb);
+	devcb = &downcast<k051960_device &>(*device).set_vreg_contrast_handler(DEVCB_##_devcb);
 
 
 class k051960_device : public device_t, public device_gfx_interface
@@ -49,20 +49,20 @@ class k051960_device : public device_t, public device_gfx_interface
 public:
 	k051960_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
-	template <class Object> static devcb_base &set_irq_handler(device_t &device, Object &&cb)
-	{ return downcast<k051960_device &>(device).m_irq_handler.set_callback(std::forward<Object>(cb)); }
+	template <class Object> devcb_base &set_irq_handler(Object &&cb)
+	{ return m_irq_handler.set_callback(std::forward<Object>(cb)); }
 
-	template <class Object> static devcb_base &set_nmi_handler(device_t &device, Object &&cb)
-	{ return downcast<k051960_device &>(device).m_nmi_handler.set_callback(std::forward<Object>(cb)); }
+	template <class Object> devcb_base &set_nmi_handler(Object &&cb)
+	{ return m_nmi_handler.set_callback(std::forward<Object>(cb)); }
 
-	template <class Object> static devcb_base &set_vreg_contrast_handler(device_t &device, Object &&cb)
-	{ return downcast<k051960_device &>(device).m_vreg_contrast_handler.set_callback(std::forward<Object>(cb)); }
+	template <class Object> devcb_base &set_vreg_contrast_handler(Object &&cb)
+	{ return m_vreg_contrast_handler.set_callback(std::forward<Object>(cb)); }
 
 
 	// static configuration
-	static void set_k051960_callback(device_t &device, k051960_cb_delegate callback) { downcast<k051960_device &>(device).m_k051960_cb = callback; }
-	static void set_plane_order(device_t &device, int order);
-	static void set_screen_tag(device_t &device, const char *tag);
+	void set_k051960_callback(k051960_cb_delegate callback) { m_k051960_cb = callback; }
+	void set_plane_order(int order);
+	void set_screen_tag(const char *tag);
 
 	/*
 	The callback is passed:

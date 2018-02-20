@@ -10,16 +10,15 @@ class pc080sn_device : public device_t
 public:
 	pc080sn_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
-	// static configuration
-	static void static_set_gfxdecode_tag(device_t &device, const char *tag);
-	static void set_gfx_region(device_t &device, int gfxregion) { downcast<pc080sn_device &>(device).m_gfxnum = gfxregion; }
-	static void set_yinvert(device_t &device, int y_inv) { downcast<pc080sn_device &>(device).m_y_invert = y_inv; }
-	static void set_dblwidth(device_t &device, int dblwidth) { downcast<pc080sn_device &>(device).m_dblwidth = dblwidth; }
-	static void set_offsets(device_t &device, int x_offset, int y_offset)
+	// configuration
+	void set_gfxdecode_tag(const char *tag);
+	void set_gfx_region(int gfxregion) { m_gfxnum = gfxregion; }
+	void set_yinvert(int y_inv) { m_y_invert = y_inv; }
+	void set_dblwidth(int dblwidth) { m_dblwidth = dblwidth; }
+	void set_offsets(int x_offset, int y_offset)
 	{
-		pc080sn_device &dev = downcast<pc080sn_device &>(device);
-		dev.m_x_offset = x_offset;
-		dev.m_y_offset = y_offset;
+		m_x_offset = x_offset;
+		m_y_offset = y_offset;
 	}
 
 	DECLARE_READ16_MEMBER( word_r );
@@ -74,18 +73,18 @@ DECLARE_DEVICE_TYPE(PC080SN, pc080sn_device)
 
 
 #define MCFG_PC080SN_GFX_REGION(_region) \
-	pc080sn_device::set_gfx_region(*device, _region);
+	downcast<pc080sn_device &>(*device).set_gfx_region(_region);
 
 #define MCFG_PC080SN_OFFSETS(_xoffs, _yoffs) \
-	pc080sn_device::set_offsets(*device, _xoffs, _yoffs);
+	downcast<pc080sn_device &>(*device).set_offsets(_xoffs, _yoffs);
 
 #define MCFG_PC080SN_YINVERT(_yinv) \
-	pc080sn_device::set_yinvert(*device, _yinv);
+	downcast<pc080sn_device &>(*device).set_yinvert(_yinv);
 
 #define MCFG_PC080SN_DBLWIDTH(_dbl) \
-	pc080sn_device::set_dblwidth(*device, _dbl);
+	downcast<pc080sn_device &>(*device).set_dblwidth(_dbl);
 
 #define MCFG_PC080SN_GFXDECODE(_gfxtag) \
-	pc080sn_device::static_set_gfxdecode_tag(*device, "^" _gfxtag);
+	downcast<pc080sn_device &>(*device).set_gfxdecode_tag("^" _gfxtag);
 
 #endif // MAME_VIDEO_PC080SN_H

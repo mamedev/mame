@@ -139,10 +139,9 @@ DECOSPR_COLOUR_CB_MEMBER(decospr_device::default_col_cb)
 	return (col >> 9) & 0x1f;
 }
 
-void decospr_device::set_gfx_region(device_t &device, int gfxregion)
+void decospr_device::set_gfx_region(int gfxregion)
 {
-	decospr_device &dev = downcast<decospr_device &>(device);
-	dev.m_gfxregion = gfxregion;
+	m_gfxregion = gfxregion;
 //  printf("decospr_device::set_gfx_region()\n");
 }
 
@@ -165,13 +164,13 @@ decospr_device::decospr_device(const machine_config &mconfig, const char *tag, d
 }
 
 //-------------------------------------------------
-//  static_set_gfxdecode_tag: Set the tag of the
+//  set_gfxdecode_tag: Set the tag of the
 //  gfx decoder
 //-------------------------------------------------
 
-void decospr_device::static_set_gfxdecode_tag(device_t &device, const char *tag)
+void decospr_device::set_gfxdecode_tag(const char *tag)
 {
-	downcast<decospr_device &>(device).m_gfxdecode.set_tag(tag);
+	m_gfxdecode.set_tag(tag);
 }
 
 void decospr_device::device_start()

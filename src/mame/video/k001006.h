@@ -13,9 +13,9 @@ public:
 	k001006_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 	~k001006_device() {}
 
-	// static configuration
-	static void set_gfx_region(device_t &device, const char *tag) { downcast<k001006_device &>(device).m_gfx_region = tag; }
-	static void set_tex_layout(device_t &device, int layout) { downcast<k001006_device &>(device).m_tex_layout = layout; }
+	// configuration
+	void set_gfx_region(const char *tag) { m_gfx_region = tag; }
+	void set_tex_layout(int layout) { m_tex_layout = layout; }
 
 	uint32_t fetch_texel(int page, int pal_index, int u, int v);
 	void preprocess_texture_data(uint8_t *dst, uint8_t *src, int length, int gticlub);
@@ -53,9 +53,9 @@ DECLARE_DEVICE_TYPE(K001006, k001006_device)
 
 
 #define MCFG_K001006_GFX_REGION(_tag) \
-	k001006_device::set_gfx_region(*device, _tag);
+	downcast<k001006_device &>(*device).set_gfx_region(_tag);
 
 #define MCFG_K001006_TEX_LAYOUT(x) \
-	k001006_device::set_tex_layout(*device, x);
+	downcast<k001006_device &>(*device).set_tex_layout(x);
 
 #endif // MAME_VIDEO_K001006_H

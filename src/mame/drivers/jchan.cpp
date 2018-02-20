@@ -606,8 +606,8 @@ MACHINE_CONFIG_START(jchan_state::jchan)
 	MCFG_PALETTE_FORMAT(xGGGGGRRRRRBBBBB)
 
 	MCFG_DEVICE_ADD("view2_0", KANEKO_TMAP, 0)
-	kaneko_view2_tilemap_device::set_gfx_region(*device, 1);
-	kaneko_view2_tilemap_device::set_offset(*device, 25, 11, 320, 240);
+	MCFG_KANEKO_TMAP_GFX_REGION(1)
+	MCFG_KANEKO_TMAP_OFFSET(25, 11, 320, 240)
 	MCFG_KANEKO_TMAP_GFXDECODE("gfxdecode")
 
 

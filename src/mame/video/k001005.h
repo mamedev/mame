@@ -104,7 +104,7 @@ class k001005_device : public device_t, public device_video_interface
 public:
 	k001005_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
-	static void set_texel_chip(device_t &device, const char *tag);
+	void set_texel_chip(const char *tag);
 
 	void draw(bitmap_rgb32 &bitmap, const rectangle &cliprect);
 	void swap_buffers();
@@ -140,6 +140,6 @@ DECLARE_DEVICE_TYPE(K001005, k001005_device)
 
 
 #define MCFG_K001005_TEXEL_CHIP(_tag) \
-	k001005_device::set_texel_chip(*device, _tag);
+	downcast<k001005_device &>(*device).set_texel_chip(_tag);
 
 #endif // MAME_VIDEO_K001005_H

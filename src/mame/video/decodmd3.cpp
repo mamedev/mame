@@ -184,8 +184,7 @@ void decodmd_type3_device::device_reset()
 	m_rombank->set_entry(0);
 }
 
-void decodmd_type3_device::static_set_gfxregion(device_t &device, const char *tag)
+void decodmd_type3_device::set_gfxregion(const char *tag)
 {
-	decodmd_type3_device &cpuboard = downcast<decodmd_type3_device &>(device);
-	cpuboard.m_gfxtag = tag;
+	m_gfxtag = tag;
 }

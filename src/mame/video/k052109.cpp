@@ -188,14 +188,12 @@ k052109_device::k052109_device(const machine_config &mconfig, const char *tag, d
 }
 
 
-void k052109_device::set_ram(device_t &device, bool ram)
+void k052109_device::set_ram(bool ram)
 {
-	k052109_device &dev = downcast<k052109_device &>(device);
-
 	if (ram)
-		device_gfx_interface::static_set_info(dev, gfxinfo_ram);
+		device_gfx_interface::static_set_info(*this, gfxinfo_ram);
 	else
-		device_gfx_interface::static_set_info(dev, gfxinfo);
+		device_gfx_interface::static_set_info(*this, gfxinfo);
 }
 
 
@@ -281,10 +279,9 @@ void k052109_device::device_reset()
 //  set_screen_tag - set screen we are attached to
 //-------------------------------------------------
 
-void k052109_device::set_screen_tag(device_t &device, const char *tag)
+void k052109_device::set_screen_tag(const char *tag)
 {
-	k052109_device &dev = dynamic_cast<k052109_device &>(device);
-	dev.m_screen.set_tag(tag);
+	m_screen.set_tag(tag);
 }
 
 

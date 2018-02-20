@@ -66,13 +66,13 @@ kaneko_pandora_device::kaneko_pandora_device(const machine_config &mconfig, cons
 }
 
 //-------------------------------------------------
-//  static_set_gfxdecode_tag: Set the tag of the
+//  set_gfxdecode_tag: Set the tag of the
 //  gfx decoder
 //-------------------------------------------------
 
-void kaneko_pandora_device::static_set_gfxdecode_tag(device_t &device, const char *tag)
+void kaneko_pandora_device::set_gfxdecode_tag(const char *tag)
 {
-	downcast<kaneko_pandora_device &>(device).m_gfxdecode.set_tag(tag);
+	m_gfxdecode.set_tag(tag);
 }
 
 //-------------------------------------------------
