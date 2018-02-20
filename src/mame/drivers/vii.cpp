@@ -1531,8 +1531,8 @@ which is also found in the Wireless Air 60 ROM.
 */
 
 ROM_START( wireless )
-	ROM_REGION( 0x8400000, "maincpu", ROMREGION_ERASEFF )     
-	ROM_LOAD16_WORD_SWAP( "wireless.nand", 0x0000, 0x8400000, CRC(a6ecc20e) SHA1(3645f23ba2bb218e92d4560a8ae29dddbaabf796) )
+	ROM_REGION( 0x8000000, "maincpu", ROMREGION_ERASEFF )     
+	ROM_LOAD16_WORD_SWAP( "wireless.nand", 0x0000, 0x8000000, CRC(a6ecc20e) SHA1(3645f23ba2bb218e92d4560a8ae29dddbaabf796) )
 ROM_END
 
 //    YEAR  NAME      PARENT    COMPAT    MACHINE      INPUT     STATE              INIT      COMPANY                                              FULLNAME             FLAGS
