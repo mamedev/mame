@@ -366,29 +366,53 @@ void xavix_state::draw_tilemap(screen_device &screen, bitmap_ind16 &bitmap, cons
 	uint8_t* tileregs;
 	address_space& mainspace = m_maincpu->space(AS_PROGRAM);
 
-	// all this is likely controlled by tilemap registers
 	if (which == 0)
 	{
 		tileregs = m_tmap1_regs;
-		ydimension = 16;
-		xdimension = 16;
-		ytilesize = 16;
-		xtilesize = 16;
-		offset_multiplier = 32;
 		opaque = 1;
 	}
 	else
 	{
 		tileregs = m_tmap2_regs;
+		opaque = 0;
+	}
+
+	//printf("draw tilemap %d, regs base0 %02x base1 %02x base2 %02x tilesize,bpp %02x scrollx %02x scrolly %02x pal %02x mode %02x\n", which, tileregs[0x0], tileregs[0x1], tileregs[0x2], tileregs[0x3], tileregs[0x4], tileregs[0x5], tileregs[0x6], tileregs[0x7]);
+
+	switch (tileregs[0x3] & 0x30)
+	{
+	case 0x00:
 		ydimension = 32;
 		xdimension = 32;
 		ytilesize = 8;
 		xtilesize = 8;
-		offset_multiplier = 8;
-		opaque = 0;
+		break;
+
+	case 0x10:
+		ydimension = 32;
+		xdimension = 16;
+		ytilesize = 8;
+		xtilesize = 16;
+		break;
+
+	case 0x20: // guess
+		ydimension = 16;
+		xdimension = 32;
+		ytilesize = 16;
+		xtilesize = 8;
+		break;
+
+	case 0x30:
+		ydimension = 16;
+		xdimension = 16;
+		ytilesize = 16;
+		xtilesize = 16;
+		break;
 	}
 
-	if (tileregs[0x7] & 0x02)
+	offset_multiplier = (ytilesize * xtilesize)/8;
+
+	if (tileregs[0x7] & 0x10)
 		alt_tileaddressing = 1;
 	else
 		alt_tileaddressing = 0;
@@ -396,7 +420,7 @@ void xavix_state::draw_tilemap(screen_device &screen, bitmap_ind16 &bitmap, cons
 	if (tileregs[0x7] & 0x80)
 	{
 		// there's a tilemap register to specify base in main ram, although in the monster truck test mode it points to an unmapped region
-		// and expected a fixed layout, still need to handle that.
+		// and expected a fixed layout, we handle that in the memory map at the moment
 		int count;
 
 		count = 0;// ;
@@ -408,9 +432,9 @@ void xavix_state::draw_tilemap(screen_device &screen, bitmap_ind16 &bitmap, cons
 				int tile = 0;
 
 				// the register being 0 probably isn't the condition here
-				if (tileregs[0x0] != 0x00) tile |= mainspace.read_byte((tileregs[0x0]<<8)+count);
-				if (tileregs[0x1] != 0x00) tile |= mainspace.read_byte((tileregs[0x1]<<8)+count) << 8;
-				if (tileregs[0x2] != 0x00) tile |= mainspace.read_byte((tileregs[0x2]<<8)+count) << 16;
+				if (tileregs[0x0] != 0x00) tile |= mainspace.read_byte((tileregs[0x0] << 8) + count);
+				if (tileregs[0x1] != 0x00) tile |= mainspace.read_byte((tileregs[0x1] << 8) + count) << 8;
+				if (tileregs[0x2] != 0x00) tile |= mainspace.read_byte((tileregs[0x2] << 8) + count) << 16;
 
 				count++;
 
@@ -533,10 +557,10 @@ void xavix_state::draw_tilemap(screen_device &screen, bitmap_ind16 &bitmap, cons
 				if (test == 1) pal = machine().rand() & 0xf;
 
 
-				draw_tile(screen, bitmap, cliprect, tile, bpp, (x * xtilesize) + scrollx, ((y * ytilesize) - 16) - scrolly, xtilesize, ytilesize, flipx, flipy, pal, opaque);
-				draw_tile(screen, bitmap, cliprect, tile, bpp, (x * xtilesize) + scrollx, (((y * ytilesize) - 16) - scrolly) + 256, xtilesize, ytilesize, flipx, flipy, pal, opaque); // wrap-y
-				draw_tile(screen, bitmap, cliprect, tile, bpp, ((x * xtilesize) + scrollx) - 256, ((y * ytilesize) - 16) - scrolly, xtilesize, ytilesize, flipx, flipy, pal, opaque); // wrap-x
-				draw_tile(screen, bitmap, cliprect, tile, bpp, ((x * xtilesize) + scrollx) - 256, (((y * ytilesize) - 16) - scrolly) + 256, xtilesize, ytilesize, flipx, flipy, pal, opaque); // wrap-y and x
+				draw_tile(screen, bitmap, cliprect, tile, bpp, (x * xtilesize) + scrollx, ((y * ytilesize) - 16) - scrolly, ytilesize, xtilesize, flipx, flipy, pal, opaque);
+				draw_tile(screen, bitmap, cliprect, tile, bpp, (x * xtilesize) + scrollx, (((y * ytilesize) - 16) - scrolly) + 256, ytilesize, xtilesize, flipx, flipy, pal, opaque); // wrap-y
+				draw_tile(screen, bitmap, cliprect, tile, bpp, ((x * xtilesize) + scrollx) - 256, ((y * ytilesize) - 16) - scrolly, ytilesize, xtilesize, flipx, flipy, pal, opaque); // wrap-x
+				draw_tile(screen, bitmap, cliprect, tile, bpp, ((x * xtilesize) + scrollx) - 256, (((y * ytilesize) - 16) - scrolly) + 256, ytilesize, xtilesize, flipx, flipy, pal, opaque); // wrap-y and x
 			}
 		}
 	}
@@ -1192,7 +1216,7 @@ WRITE8_MEMBER(xavix_state::tmap1_regs_w)
 
 	   0x2 pointer to tile highest tile bits (if needed, depends on mode) (usually straight after the ram needed for above)
 
-	   0x3 ---- bbb-     - = ?   b = bpp    (0x36 xavix logo, 0x3c title screen, 0x36 course select)
+	   0x3 --tt bbb-     - = ?  tt = tile/tilemap size b = bpp    (0x36 xavix logo, 0x3c title screen, 0x36 course select)
 
 	   0x4 and 0x5 are scroll
 
@@ -1803,8 +1827,7 @@ ROM_END
 
 ROM_START( ttv_sw )
 	ROM_REGION( 0x800000, "bios", ROMREGION_ERASE00 )
-	// wasn't giving consistent reads
-	ROM_LOAD( "jedibad.bin", 0x000000, 0x800000, BAD_DUMP CRC(a12862fe) SHA1(9b5a07bdf35f72f2e2d127de5e6849ce5fa2afa0) )
+	ROM_LOAD( "jedi.bin", 0x000000, 0x800000, CRC(51cae5fd) SHA1(1ed8d556f31b4182259ca8c766d60c824d8d9744) )
 ROM_END
 
 
