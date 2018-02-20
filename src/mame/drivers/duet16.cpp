@@ -49,7 +49,7 @@ READ8_MEMBER(duet16_state::pic_r)
 
 WRITE8_MEMBER(duet16_state::pic_w)
 {
-	m_pic->write(space, offset ^ 1, data, mem_mask);
+	m_pic->write(space, offset ^ 1, data);
 }
 
 ADDRESS_MAP_START(duet16_state::duet16_mem)
@@ -58,13 +58,14 @@ ADDRESS_MAP_START(duet16_state::duet16_mem)
 	AM_RANGE(0xc0000, 0xc0fff) AM_RAM AM_SHARE("vram")
 	AM_RANGE(0xf8000, 0xf801f) AM_DEVREADWRITE8("dmac", am9517a_device, read, write, 0xff00)
 	AM_RANGE(0xf8020, 0xf8023) AM_READWRITE8(pic_r, pic_w, 0x00ff)
-	AM_RANGE(0xf8040, 0xf804f) AM_DEVREADWRITE8("ptm", ptm6840_device, read, write, 0x00ff)
+	AM_RANGE(0xf8040, 0xf804f) AM_DEVREADWRITE8("itm", ptm6840_device, read, write, 0x00ff)
 	AM_RANGE(0xf8060, 0xf8067) AM_DEVREADWRITE8("bgpit", pit8253_device, read, write, 0x00ff)
 	AM_RANGE(0xf8080, 0xf8087) AM_DEVREADWRITE8("sio", upd7201_new_device, ba_cd_r, ba_cd_w, 0x00ff)
 	AM_RANGE(0xf80a0, 0xf80a1) AM_DEVREADWRITE8("kbusart", i8251_device, data_r, data_w, 0x00ff)
 	AM_RANGE(0xf80a2, 0xf80a3) AM_DEVREADWRITE8("kbusart", i8251_device, status_r, control_w, 0x00ff)
 	AM_RANGE(0xf80c0, 0xf80c1) AM_DEVREADWRITE8("crtc", h46505_device, status_r, address_w, 0x00ff)
 	AM_RANGE(0xf80c2, 0xf80c3) AM_DEVREADWRITE8("crtc", h46505_device, register_r, register_w, 0x00ff)
+	AM_RANGE(0xf8100, 0xf8103) AM_DEVICE8("fdc", upd765a_device, map, 0x00ff)
 	AM_RANGE(0xfe000, 0xfffff) AM_ROM AM_REGION("rom", 0)
 ADDRESS_MAP_END
 
@@ -127,7 +128,10 @@ MACHINE_CONFIG_START(duet16_state::duet16)
 	MCFG_PIT8253_OUT2_HANDLER(DEVWRITELINE("kbusart", i8251_device, write_txc))
 	MCFG_DEVCB_CHAIN_OUTPUT(DEVWRITELINE("kbusart", i8251_device, write_rxc))
 
-	MCFG_DEVICE_ADD("ptm", PTM6840, 0)
+	MCFG_DEVICE_ADD("itm", PTM6840, 0)
+	MCFG_PTM6840_EXTERNAL_CLOCKS(0.0, 0.0, (8_MHz_XTAL / 8).dvalue()) // C3 = 1MHz
+	MCFG_PTM6840_OUT2_CB(DEVWRITELINE("itm", ptm6840_device, set_c1)) // C1 = C2 = O3
+	MCFG_DEVCB_CHAIN_OUTPUT(DEVWRITELINE("itm", ptm6840_device, set_c2))
 	MCFG_PTM6840_IRQ_CB(DEVWRITELINE("pic", pic8259_device, ir0_w)) // INT6
 
 	MCFG_DEVICE_ADD("sio", UPD7201_NEW, 8_MHz_XTAL / 2)
