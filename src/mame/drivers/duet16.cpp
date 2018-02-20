@@ -35,9 +35,14 @@ private:
 
 ADDRESS_MAP_START(duet16_state::duet16_mem)
 	AM_RANGE(0x00000, 0x9ffff) AM_RAM
+	AM_RANGE(0xb8000, 0xbffff) AM_RAM
 	AM_RANGE(0xc0000, 0xc0fff) AM_RAM AM_SHARE("vram")
-	AM_RANGE(0xf80c0, 0xf80c1) AM_DEVWRITE8("crtc", h46505_device, address_w, 0x00ff)
-	AM_RANGE(0xf80c2, 0xf80c3) AM_DEVWRITE8("crtc", h46505_device, register_w, 0x00ff)
+	AM_RANGE(0xf8060, 0xf8067) AM_DEVREADWRITE8("bgpit", pit8253_device, read, write, 0x00ff)
+	AM_RANGE(0xf8080, 0xf8087) AM_DEVREADWRITE8("sio", upd7201_new_device, ba_cd_r, ba_cd_w, 0x00ff)
+	AM_RANGE(0xf80a0, 0xf80a1) AM_DEVREADWRITE8("kbusart", i8251_device, data_r, data_w, 0x00ff)
+	AM_RANGE(0xf80a2, 0xf80a3) AM_DEVREADWRITE8("kbusart", i8251_device, status_r, control_w, 0x00ff)
+	AM_RANGE(0xf80c0, 0xf80c1) AM_DEVREADWRITE8("crtc", h46505_device, status_r, address_w, 0x00ff)
+	AM_RANGE(0xf80c2, 0xf80c3) AM_DEVREADWRITE8("crtc", h46505_device, register_r, register_w, 0x00ff)
 	AM_RANGE(0xfe000, 0xfffff) AM_ROM AM_REGION("rom", 0)
 ADDRESS_MAP_END
 
@@ -70,11 +75,18 @@ MACHINE_CONFIG_START(duet16_state::duet16)
 	MCFG_AM9517A_OUT_IOW_2_CB(WRITE8(olyboss_state, crtcdma_w))
 	MCFG_AM9517A_OUT_TC_CB(WRITELINE(olyboss_state, tc_w))*/
 
-	MCFG_DEVICE_ADD("pit", PIT8253, 8_MHz_XTAL/8)
+	MCFG_DEVICE_ADD("bgpit", PIT8253, 0)
+	MCFG_PIT8253_CLK0(8_MHz_XTAL / 13)
+	MCFG_PIT8253_CLK1(8_MHz_XTAL / 13)
+	MCFG_PIT8253_CLK2(8_MHz_XTAL / 13)
+	MCFG_PIT8253_OUT1_HANDLER(DEVWRITELINE("sio", upd7201_new_device, txcb_w))
+	MCFG_DEVCB_CHAIN_OUTPUT(DEVWRITELINE("sio", upd7201_new_device, rxcb_w))
+	MCFG_PIT8253_OUT2_HANDLER(DEVWRITELINE("kbusart", i8251_device, write_txc))
+	MCFG_DEVCB_CHAIN_OUTPUT(DEVWRITELINE("kbusart", i8251_device, write_rxc))
 
-	MCFG_DEVICE_ADD("mpsc", UPD7201_NEW, 4_MHz_XTAL)
+	MCFG_DEVICE_ADD("sio", UPD7201_NEW, 8_MHz_XTAL / 2)
 
-	MCFG_DEVICE_ADD("uart", I8251, 2_MHz_XTAL)
+	MCFG_DEVICE_ADD("kbusart", I8251, 8_MHz_XTAL / 4)
 
 	MCFG_DEVICE_ADD("fdc", UPD765A, 0)
 
