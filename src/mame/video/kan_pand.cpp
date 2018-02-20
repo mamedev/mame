@@ -66,16 +66,6 @@ kaneko_pandora_device::kaneko_pandora_device(const machine_config &mconfig, cons
 }
 
 //-------------------------------------------------
-//  set_gfxdecode_tag: Set the tag of the
-//  gfx decoder
-//-------------------------------------------------
-
-void kaneko_pandora_device::set_gfxdecode_tag(const char *tag)
-{
-	m_gfxdecode.set_tag(tag);
-}
-
-//-------------------------------------------------
 //  device_start - device-specific startup
 //-------------------------------------------------
 

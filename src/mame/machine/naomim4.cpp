@@ -52,12 +52,6 @@ naomi_m4_board::naomi_m4_board(const machine_config &mconfig, const char *tag, d
 {
 }
 
-void naomi_m4_board::static_set_tags(device_t &device, const char *key_tag)
-{
-	naomi_m4_board &dev = downcast<naomi_m4_board &>(device);
-	dev.m_key_data.set_tag(key_tag);
-}
-
 void naomi_m4_board::device_start()
 {
 	naomi_board::device_start();

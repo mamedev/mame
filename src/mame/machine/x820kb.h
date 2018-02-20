@@ -20,7 +20,7 @@
 //**************************************************************************
 
 #define MCFG_XEROX_820_KEYBOARD_KBSTB_CALLBACK(_devcb) \
-	devcb = &xerox_820_keyboard_device::set_kbstb_wr_callback(*device, DEVCB_##_devcb);
+	devcb = &downcast<xerox_820_keyboard_device &>(*device).set_kbstb_wr_callback(DEVCB_##_devcb);
 
 
 
@@ -36,7 +36,7 @@ public:
 	// construction/destruction
 	xerox_820_keyboard_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
-	template <class Object> static devcb_base &set_kbstb_wr_callback(device_t &device, Object &&cb) { return downcast<xerox_820_keyboard_device &>(device).m_kbstb_cb.set_callback(std::forward<Object>(cb)); }
+	template <class Object> devcb_base &set_kbstb_wr_callback(Object &&cb) { return m_kbstb_cb.set_callback(std::forward<Object>(cb)); }
 
 	uint8_t read() { return m_bus; }
 

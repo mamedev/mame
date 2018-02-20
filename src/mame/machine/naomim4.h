@@ -7,14 +7,14 @@
 
 #define MCFG_NAOMI_M4_BOARD_ADD(_tag, _key_tag, _eeprom_tag, _irq_cb) \
 	MCFG_NAOMI_BOARD_ADD(_tag, NAOMI_M4_BOARD, _eeprom_tag, _irq_cb) \
-	naomi_m4_board::static_set_tags(*device, "^" _key_tag);
+	downcast<naomi_m4_board &>(*device).set_tags("^" _key_tag);
 
 class naomi_m4_board : public naomi_board
 {
 public:
 	naomi_m4_board(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
-	static void static_set_tags(device_t &device, const char *key_tag);
+	void set_tags(const char *key_tag) { m_key_data.set_tag(key_tag); }
 
 	virtual void submap(address_map &map) override;
 

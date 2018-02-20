@@ -27,7 +27,7 @@ public:
 	deco_ace_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
 	// configuration
-	void set_palette_tag(const char *tag);
+	void set_palette_tag(const char *tag) { m_palette.set_tag(tag); }
 
 	DECLARE_READ32_MEMBER( buffered_palette_r );
 	DECLARE_READ16_MEMBER( buffered_palette16_r );

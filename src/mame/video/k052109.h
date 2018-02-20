@@ -39,7 +39,7 @@ public:
 
 	void set_k052109_callback(k052109_cb_delegate callback) { m_k052109_cb = callback; }
 	void set_ram(bool ram);
-	void set_screen_tag(const char *tag);
+	void set_screen_tag(const char *tag) { m_screen.set_tag(tag); }
 
 	/*
 	The callback is passed:

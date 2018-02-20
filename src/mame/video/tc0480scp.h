@@ -11,7 +11,7 @@ public:
 	tc0480scp_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
 	// configuration
-	void set_gfxdecode_tag(const char *tag);
+	void set_gfxdecode_tag(const char *tag) { m_gfxdecode.set_tag(tag); }
 	void set_gfx_region(int gfxregion) { m_gfxnum = gfxregion; }
 	void set_tx_region(int txregion) { m_txnum = txregion; }
 	void set_col_base(int col) { m_col_base = col; }

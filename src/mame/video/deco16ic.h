@@ -33,8 +33,8 @@ public:
 	~deco16ic_device() {}
 
 	// configuration
-	void set_gfxdecode_tag(const char *tag);
-	void set_palette_tag(const char *tag);
+	void set_gfxdecode_tag(const char *tag) { m_gfxdecode.set_tag(tag); }
+//	void set_palette_tag(const char *tag);
 	void set_bank1_callback(deco16_bank_cb_delegate callback) { m_bank1_cb = callback; }
 	void set_bank2_callback(deco16_bank_cb_delegate callback) { m_bank2_cb = callback; }
 	void set_split(int split) { m_split = split; }

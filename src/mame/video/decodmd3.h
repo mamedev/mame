@@ -33,7 +33,7 @@ public:
 	DECLARE_WRITE16_MEMBER(crtc_register_w);
 	DECLARE_READ16_MEMBER(crtc_status_r);
 
-	void set_gfxregion(const char *tag);
+	void set_gfxregion(const char *tag) { m_gfxtag = tag; }
 
 	void decodmd3_map(address_map &map);
 protected:

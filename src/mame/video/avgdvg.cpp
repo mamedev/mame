@@ -43,16 +43,6 @@
  *
  *************************************/
 
-void avgdvg_device::set_flip_x(int flip)
-{
-	flip_x = flip;
-}
-
-void avgdvg_device::set_flip_y(int flip)
-{
-	flip_y = flip;
-}
-
 void avgdvg_device::apply_flipping(int *x, int *y)
 {
 	if (flip_x)
@@ -1460,11 +1450,6 @@ void dvg_device::device_start()
 	vg_run_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(avgdvg_device::run_state_machine),this));
 
 	register_state();
-}
-
-void avgdvg_device::set_vector_tag(const char *tag)
-{
-	m_vector.set_tag(tag);
 }
 
 avgdvg_device::avgdvg_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock)

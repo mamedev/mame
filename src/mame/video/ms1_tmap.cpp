@@ -56,27 +56,6 @@ megasys1_tilemap_device::megasys1_tilemap_device(const machine_config &mconfig, 
 {
 }
 
-void megasys1_tilemap_device::set_8x8_scroll_factor(int scroll_factor)
-{
-	m_8x8_scroll_factor = scroll_factor;
-}
-
-void megasys1_tilemap_device::set_16x16_scroll_factor(int scroll_factor)
-{
-	m_16x16_scroll_factor = scroll_factor;
-}
-
-void megasys1_tilemap_device::set_bits_per_color_code(int bits)
-{
-	m_bits_per_color_code = bits;
-}
-
-void megasys1_tilemap_device::set_colorbase(uint16_t colorbase)
-{
-	m_colorbase = colorbase;
-}
-
-
 
 /*************************************
  *

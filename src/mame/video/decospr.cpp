@@ -139,12 +139,6 @@ DECOSPR_COLOUR_CB_MEMBER(decospr_device::default_col_cb)
 	return (col >> 9) & 0x1f;
 }
 
-void decospr_device::set_gfx_region(int gfxregion)
-{
-	m_gfxregion = gfxregion;
-//  printf("decospr_device::set_gfx_region()\n");
-}
-
 DEFINE_DEVICE_TYPE(DECO_SPRITE, decospr_device, "decospr", "DECO 52 Sprite")
 
 decospr_device::decospr_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
@@ -161,16 +155,6 @@ decospr_device::decospr_device(const machine_config &mconfig, const char *tag, d
 {
 	// default color callback
 	m_col_cb =  decospr_col_cb_delegate(FUNC(decospr_device::default_col_cb), this);
-}
-
-//-------------------------------------------------
-//  set_gfxdecode_tag: Set the tag of the
-//  gfx decoder
-//-------------------------------------------------
-
-void decospr_device::set_gfxdecode_tag(const char *tag)
-{
-	m_gfxdecode.set_tag(tag);
 }
 
 void decospr_device::device_start()

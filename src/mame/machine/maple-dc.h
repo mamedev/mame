@@ -9,8 +9,8 @@
 
 #define MCFG_MAPLE_DC_ADD(_tag, _maincpu_tag, _irq_cb)  \
 	MCFG_DEVICE_ADD(_tag, MAPLE_DC, 0) \
-	maple_dc_device::static_set_maincpu_tag(*device, _maincpu_tag); \
-	maple_dc_device::static_set_irq_cb(*device, _irq_cb);
+	downcast<maple_dc_device &>(*device).set_maincpu_tag(_maincpu_tag); \
+	downcast<maple_dc_device &>(*device).set_irq_cb(_irq_cb);
 
 class maple_device;
 
@@ -18,8 +18,8 @@ class maple_dc_device : public device_t
 {
 public:
 	maple_dc_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
-	static void static_set_maincpu_tag(device_t &device, const char *maincpu_tag);
-	static void static_set_irq_cb(device_t &device, void (*irq_cb)(running_machine &));
+	void set_maincpu_tag(const char *new_maincpu_tag) { maincpu_tag = new_maincpu_tag; }
+	void set_irq_cb(void (*new_irq_cb)(running_machine &)) { irq_cb = new_irq_cb; }
 
 	DECLARE_READ32_MEMBER(sb_mdstar_r);  // 5f6c04
 	DECLARE_WRITE32_MEMBER(sb_mdstar_w);

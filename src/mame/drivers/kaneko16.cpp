@@ -2164,7 +2164,7 @@ MACHINE_CONFIG_START(kaneko16_gtmr_state::gtmr)
 	MCFG_DEVICE_ADD("toybox", KANEKO_TOYBOX, 0)
 	/* part of the toybox? */
 	MCFG_DEVICE_ADD("kan_hit", KANEKO_HIT, 0)
-	kaneko_hit_device::set_type(*device, 1);
+	MCFG_KANEKO_HIT_TYPE(1)
 
 
 	MCFG_VIDEO_START_OVERRIDE(kaneko16_gtmr_state,kaneko16)
@@ -2239,7 +2239,7 @@ MACHINE_CONFIG_START(kaneko16_gtmr_state::bonkadv)
 	MCFG_DEVICE_MODIFY("toybox")
 	MCFG_TOYBOX_GAME_TYPE(BONK)
 	MCFG_DEVICE_MODIFY("kan_hit")
-	kaneko_hit_device::set_type(*device, 0);
+	MCFG_KANEKO_HIT_TYPE(0)
 
 
 MACHINE_CONFIG_END
@@ -2419,7 +2419,7 @@ MACHINE_CONFIG_START(kaneko16_shogwarr_state::shogwarr)
 	MCFG_KANEKO16_SPRITE_GFXDECODE("gfxdecode")
 
 	MCFG_DEVICE_ADD("kan_hit", KANEKO_HIT, 0)
-	kaneko_hit_device::set_type(*device, 1);
+	MCFG_KANEKO_HIT_TYPE(1)
 
 	MCFG_DEVICE_ADD("calc3_prot", KANEKO_CALC3, 0)
 
@@ -2459,7 +2459,7 @@ MACHINE_CONFIG_START(kaneko16_shogwarr_state::brapboys)
 	MCFG_DEVICE_ADDRESS_MAP(0, brapboys_oki2_map)
 
 	MCFG_DEVICE_MODIFY("kan_hit")
-	kaneko_hit_device::set_type(*device, 2);
+	MCFG_KANEKO_HIT_TYPE(2)
 
 	MCFG_DEVICE_REMOVE("eeprom")
 	MCFG_EEPROM_SERIAL_93C46_ADD("eeprom")

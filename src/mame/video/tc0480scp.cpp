@@ -183,16 +183,6 @@ tc0480scp_device::tc0480scp_device(const machine_config &mconfig, const char *ta
 }
 
 //-------------------------------------------------
-//  set_gfxdecode_tag: Set the tag of the
-//  gfx decoder
-//-------------------------------------------------
-
-void tc0480scp_device::set_gfxdecode_tag(const char *tag)
-{
-	m_gfxdecode.set_tag(tag);
-}
-
-//-------------------------------------------------
 //  device_start - device-specific startup
 //-------------------------------------------------
 

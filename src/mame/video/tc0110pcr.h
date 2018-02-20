@@ -19,7 +19,7 @@ public:
 
 	void restore_colors();
 
-	void set_palette_tag(const char *tag);
+	void set_palette_tag(const char *tag) { m_palette.set_tag(tag); }
 
 protected:
 	// device-level overrides

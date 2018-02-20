@@ -32,7 +32,7 @@ public:
 	segas24_tile_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
 	// configuration
-	void set_tile_mask(uint16_t tile_mask);
+	void set_tile_mask(uint16_t _tile_mask) { tile_mask = _tile_mask; }
 
 	DECLARE_READ16_MEMBER(tile_r);
 	DECLARE_WRITE16_MEMBER(tile_w);

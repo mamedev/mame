@@ -11,9 +11,9 @@ class tecmo_spr_device : public device_t
 {
 public:
 	tecmo_spr_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
-	void set_gfx_region(int gfxregion);
-	void set_bootleg(int bootleg);
-	void set_yoffset(int yoffset);
+	void set_gfx_region(int gfxregion) { m_gfxregion = gfxregion; }
+	void set_bootleg(int bootleg) { m_bootleg = bootleg; }
+	void set_yoffset(int yoffset) { m_yoffset = yoffset; }
 
 	// gaiden.c / spbactn.c / tecmo16.c sprites
 	void gaiden_draw_sprites(screen_device &screen, gfxdecode_device *gfxdecode, const rectangle &cliprect, uint16_t* spriteram, int sprite_sizey, int spr_offset_y, int flip_screen, bitmap_ind16 &sprite_bitmap);

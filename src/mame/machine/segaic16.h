@@ -23,12 +23,12 @@
 
 #define MCFG_SEGA_315_5195_MAPPER_ADD(_tag, _cputag, _class, _mapper) \
 	MCFG_DEVICE_ADD(_tag, SEGA_315_5195_MEM_MAPPER, 0) \
-	sega_315_5195_mapper_device::static_set_cputag(*device, "^" _cputag); \
-	sega_315_5195_mapper_device::static_set_mapper(*device, sega_315_5195_mapper_device::mapper_delegate(&_class::_mapper, #_class "::" #_mapper, nullptr, (_class *)nullptr));
+	downcast<sega_315_5195_mapper_device &>(*device).set_cputag("^" _cputag); \
+	downcast<sega_315_5195_mapper_device &>(*device).set_mapper(sega_315_5195_mapper_device::mapper_delegate(&_class::_mapper, #_class "::" #_mapper, nullptr, (_class *)nullptr));
 #define MCFG_SEGA_315_5195_SOUND_READ_CALLBACK(_devcb) \
-	devcb = &sega_315_5195_mapper_device::static_set_sound_read(*device, DEVCB_##_devcb);
+	devcb = &downcast<sega_315_5195_mapper_device &>(*device).set_sound_read(DEVCB_##_devcb);
 #define MCFG_SEGA_315_5195_SOUND_WRITE_CALLBACK(_devcb) \
-	devcb = &sega_315_5195_mapper_device::static_set_sound_write(*device, DEVCB_##_devcb);
+	devcb = &downcast<sega_315_5195_mapper_device &>(*device).set_sound_write(DEVCB_##_devcb);
 
 #define MCFG_SEGA_315_5248_MULTIPLIER_ADD(_tag) \
 	MCFG_DEVICE_ADD(_tag, SEGA_315_5248_MULTIPLIER, 0)
@@ -39,9 +39,9 @@
 #define MCFG_SEGA_315_5250_COMPARE_TIMER_ADD(_tag) \
 	MCFG_DEVICE_ADD(_tag, SEGA_315_5250_COMPARE_TIMER, 0)
 #define MCFG_SEGA_315_5250_TIMER_ACK(_class, _func) \
-	sega_315_5250_compare_timer_device::static_set_timer_ack(*device, sega_315_5250_compare_timer_device::timer_ack_delegate(&_class::_func, #_class "::" #_func, nullptr, (_class *)nullptr));
+	downcast<sega_315_5250_compare_timer_device &>(*device).set_timer_ack(sega_315_5250_compare_timer_device::timer_ack_delegate(&_class::_func, #_class "::" #_func, nullptr, (_class *)nullptr));
 #define MCFG_SEGA_315_5250_SOUND_WRITE_CALLBACK(_devcb) \
-	devcb = &sega_315_5250_compare_timer_device::static_set_sound_write(*device, DEVCB_##_devcb);
+	devcb = &downcast<sega_315_5250_compare_timer_device &>(*device).set_sound_write(DEVCB_##_devcb);
 
 
 //**************************************************************************
@@ -94,17 +94,15 @@ public:
 	// construction/destruction
 	sega_315_5195_mapper_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
-	// static configuration helpers
-	static void static_set_cputag(device_t &device, const char *cpu);
-	static void static_set_mapper(device_t &device, mapper_delegate callback);
-	template<class Object> static devcb_base &static_set_sound_read(device_t &device, Object &&object)
+	// configuration helpers
+	void set_cputag(const char *cpu)
 	{
-		return downcast<sega_315_5195_mapper_device &>(device).m_sound_read.set_callback(std::forward<Object>(object));
+		m_cpu.set_tag(cpu);
+		m_cpuregion.set_tag(cpu);
 	}
-	template<class Object> static devcb_base &static_set_sound_write(device_t &device, Object &&object)
-	{
-		return downcast<sega_315_5195_mapper_device &>(device).m_sound_write.set_callback(std::forward<Object>(object));
-	}
+	void set_mapper(mapper_delegate callback) { m_mapper = callback; }
+	template<class Object> devcb_base &set_sound_read(Object &&object) { return m_sound_read.set_callback(std::forward<Object>(object)); }
+	template<class Object> devcb_base &set_sound_write(Object &&object) { return m_sound_write.set_callback(std::forward<Object>(object)); }
 
 	// public interface
 	DECLARE_READ8_MEMBER( read );
@@ -245,12 +243,9 @@ public:
 	// construction/destruction
 	sega_315_5250_compare_timer_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
-	// static configuration helpers
-	static void static_set_timer_ack(device_t &device, timer_ack_delegate callback);
-	template<class Object> static devcb_base &static_set_sound_write(device_t &device, Object &&object)
-	{
-		return downcast<sega_315_5250_compare_timer_device &>(device).m_sound_write.set_callback(std::forward<Object>(object));
-	}
+	// configuration helpers
+	void set_timer_ack(timer_ack_delegate callback) { m_timer_ack = callback; }
+	template<class Object> devcb_base &set_sound_write(Object &&object) { return m_sound_write.set_callback(std::forward<Object>(object)); }
 
 	// public interface
 	bool clock();

@@ -38,16 +38,6 @@ seta001_device::seta001_device(const machine_config &mconfig, const char *tag, d
 {
 }
 
-//-------------------------------------------------
-//  set_gfxdecode_tag: Set the tag of the
-//  gfx decoder
-//-------------------------------------------------
-
-void seta001_device::set_gfxdecode_tag(const char *tag)
-{
-	m_gfxdecode.set_tag(tag);
-}
-
 void seta001_device::device_start()
 {
 	// chukatai draws a column on the left from uninitialized RAM which causes garbage in a debug build

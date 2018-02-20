@@ -35,10 +35,20 @@ class kaneko16_sprite_device : public device_t, public device_video_interface
 {
 public:
 	// configuration
-	void set_gfxdecode_tag(const char *tag);
-	void set_fliptype(int fliptype);
-	void set_offsets(int xoffs, int yoffs);
-	void set_priorities(int pri0, int pri1, int pri2, int pri3);
+	void set_gfxdecode_tag(const char *tag) { m_gfxdecode.set_tag(tag); }
+	void set_fliptype(int fliptype) { m_sprite_fliptype = fliptype; }
+	void set_offsets(int xoffs, int yoffs)
+	{
+		m_sprite_xoffs = xoffs;
+		m_sprite_yoffs = yoffs;
+	}
+	void set_priorities(int pri0, int pri1, int pri2, int pri3)
+	{
+		m_priority.sprite[0] = pri0;
+		m_priority.sprite[1] = pri1;
+		m_priority.sprite[2] = pri2;
+		m_priority.sprite[3] = pri3;
+	}
 
 	// (legacy) used in the bitmap clear functions
 	virtual int get_sprite_type(void) =0;

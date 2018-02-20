@@ -167,15 +167,6 @@ void k051960_device::set_plane_order(int order)
 }
 
 //-------------------------------------------------
-//  set_screen_tag - set screen we are attached to
-//-------------------------------------------------
-
-void k051960_device::set_screen_tag(const char *tag)
-{
-	m_screen.set_tag(tag);
-}
-
-//-------------------------------------------------
 //  device_start - device-specific startup
 //-------------------------------------------------
 

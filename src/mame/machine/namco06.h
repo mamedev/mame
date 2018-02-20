@@ -20,45 +20,45 @@ struct namco_06xx_config
 	MCFG_DEVICE_ADD(_tag, NAMCO_06XX, _clock)
 
 #define MCFG_NAMCO_06XX_MAINCPU(_tag) \
-	namco_06xx_device::set_maincpu(*device, "^" _tag);
+	downcast<namco_06xx_device &>(*device).set_maincpu("^" _tag);
 
 #define MCFG_NAMCO_06XX_READ_0_CB(_devcb) \
-	devcb = &namco_06xx_device::set_read_callback<0>(*device, DEVCB_##_devcb);
+	devcb = &downcast<namco_06xx_device &>(*device).set_read_callback<0>(DEVCB_##_devcb);
 
 #define MCFG_NAMCO_06XX_READ_1_CB(_devcb) \
-	devcb = &namco_06xx_device::set_read_callback<1>(*device, DEVCB_##_devcb);
+	devcb = &downcast<namco_06xx_device &>(*device).set_read_callback<1>(DEVCB_##_devcb);
 
 #define MCFG_NAMCO_06XX_READ_2_CB(_devcb) \
-	devcb = &namco_06xx_device::set_read_callback<2>(*device, DEVCB_##_devcb);
+	devcb = &downcast<namco_06xx_device &>(*device).set_read_callback<2>(DEVCB_##_devcb);
 
 #define MCFG_NAMCO_06XX_READ_3_CB(_devcb) \
-	devcb = &namco_06xx_device::set_read_callback<3>(*device, DEVCB_##_devcb);
+	devcb = &downcast<namco_06xx_device &>(*device).set_read_callback<3>(DEVCB_##_devcb);
 
 
 #define MCFG_NAMCO_06XX_READ_REQUEST_0_CB(_devcb) \
-	devcb = &namco_06xx_device::set_read_request_callback<0>(*device, DEVCB_##_devcb);
+	devcb = &downcast<namco_06xx_device &>(*device).set_read_request_callback<0>(DEVCB_##_devcb);
 
 #define MCFG_NAMCO_06XX_READ_REQUEST_1_CB(_devcb) \
-	devcb = &namco_06xx_device::set_read_request_callback<1>(*device, DEVCB_##_devcb);
+	devcb = &downcast<namco_06xx_device &>(*device).set_read_request_callback<1>(DEVCB_##_devcb);
 
 #define MCFG_NAMCO_06XX_READ_REQUEST_2_CB(_devcb) \
-	devcb = &namco_06xx_device::set_read_request_callback<2>(*device, DEVCB_##_devcb);
+	devcb = &downcast<namco_06xx_device &>(*device).set_read_request_callback<2>(DEVCB_##_devcb);
 
 #define MCFG_NAMCO_06XX_READ_REQUEST_3_CB(_devcb) \
-	devcb = &namco_06xx_device::set_read_request_callback<3>(*device, DEVCB_##_devcb);
+	devcb = &downcast<namco_06xx_device &>(*device).set_read_request_callback<3>(DEVCB_##_devcb);
 
 
 #define MCFG_NAMCO_06XX_WRITE_0_CB(_devcb) \
-	devcb = &namco_06xx_device::set_write_callback<0>(*device, DEVCB_##_devcb);
+	devcb = &downcast<namco_06xx_device &>(*device).set_write_callback<0>(DEVCB_##_devcb);
 
 #define MCFG_NAMCO_06XX_WRITE_1_CB(_devcb) \
-	devcb = &namco_06xx_device::set_write_callback<1>(*device, DEVCB_##_devcb);
+	devcb = &downcast<namco_06xx_device &>(*device).set_write_callback<1>(DEVCB_##_devcb);
 
 #define MCFG_NAMCO_06XX_WRITE_2_CB(_devcb) \
-	devcb = &namco_06xx_device::set_write_callback<2>(*device, DEVCB_##_devcb);
+	devcb = &downcast<namco_06xx_device &>(*device).set_write_callback<2>(DEVCB_##_devcb);
 
 #define MCFG_NAMCO_06XX_WRITE_3_CB(_devcb) \
-	devcb = &namco_06xx_device::set_write_callback<3>(*device, DEVCB_##_devcb);
+	devcb = &downcast<namco_06xx_device &>(*device).set_write_callback<3>(DEVCB_##_devcb);
 
 
 /* device get info callback */
@@ -67,13 +67,13 @@ class namco_06xx_device : public device_t
 public:
 	namco_06xx_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
-	static void set_maincpu(device_t &device, const char *tag) { downcast<namco_06xx_device &>(device).m_nmicpu.set_tag(tag); }
+	void set_maincpu(const char *tag) { m_nmicpu.set_tag(tag); }
 
-	template <unsigned N, class Object> static devcb_base &set_read_callback(device_t &device, Object &&cb) { return downcast<namco_06xx_device &>(device).m_read[N].set_callback(std::forward<Object>(cb)); }
+	template <unsigned N, class Object> devcb_base &set_read_callback(Object &&cb) { return m_read[N].set_callback(std::forward<Object>(cb)); }
 
-	template <unsigned N, class Object> static devcb_base &set_read_request_callback(device_t &device, Object &&cb) { return downcast<namco_06xx_device &>(device).m_readreq[N].set_callback(std::forward<Object>(cb)); }
+	template <unsigned N, class Object> devcb_base &set_read_request_callback(Object &&cb) { return m_readreq[N].set_callback(std::forward<Object>(cb)); }
 
-	template <unsigned N, class Object> static devcb_base &set_write_callback(device_t &device, Object &&cb) { return downcast<namco_06xx_device &>(device).m_write[N].set_callback(std::forward<Object>(cb)); }
+	template <unsigned N, class Object> devcb_base &set_write_callback(Object &&cb) { return m_write[N].set_callback(std::forward<Object>(cb)); }
 
 	DECLARE_READ8_MEMBER( data_r );
 	DECLARE_WRITE8_MEMBER( data_w );

@@ -45,7 +45,7 @@ public:
 	DECLARE_WRITE_LINE_MEMBER(rowclock_w);
 	DECLARE_WRITE_LINE_MEMBER(test_w);
 
-	void set_gfxregion(const char *tag);
+	void set_gfxregion(const char *tag) { m_gfxtag = tag; }
 
 	void decodmd1_io_map(address_map &map);
 	void decodmd1_map(address_map &map);

@@ -20,8 +20,8 @@ public:
 	decospr_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
 	// configuration
-	void set_gfxdecode_tag(const char *tag);
-	void set_gfx_region(int gfxregion);
+	void set_gfxdecode_tag(const char *tag) { m_gfxdecode.set_tag(tag); }
+	void set_gfx_region(int gfxregion) { m_gfxregion = gfxregion; }
 	void set_pri_callback(decospr_pri_cb_delegate callback) { m_pri_cb = callback; }
 	void set_col_callback(decospr_col_cb_delegate callback) { m_col_cb = callback; }
 	void set_is_bootleg(bool is_bootleg) { m_is_bootleg = is_bootleg; }

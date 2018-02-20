@@ -11,7 +11,7 @@ class deco_zoomspr_device : public device_t
 public:
 	deco_zoomspr_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
-	void set_gfxdecode_tag(const char *tag);
+	void set_gfxdecode_tag(const char *tag) { m_gfxdecode.set_tag(tag); }
 
 	void dragngun_draw_sprites(bitmap_rgb32 &bitmap, const rectangle &cliprect, const uint32_t *spritedata, uint32_t* dragngun_sprite_layout_0_ram, uint32_t* dragngun_sprite_layout_1_ram, uint32_t* dragngun_sprite_lookup_0_ram, uint32_t* dragngun_sprite_lookup_1_ram, uint32_t dragngun_sprite_ctrl, bitmap_ind8 &pri_bitmap, bitmap_rgb32 &temp_bitmap);
 

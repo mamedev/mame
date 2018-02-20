@@ -81,60 +81,10 @@ vsystem_spr_device::vsystem_spr_device(const machine_config &mconfig, const char
 {
 }
 
-//-------------------------------------------------
-//  set_gfxdecode_tag: Set the tag of the
-//  gfx decoder
-//-------------------------------------------------
-
-void vsystem_spr_device::set_gfxdecode_tag(const char *tag)
-{
-	m_gfxdecode.set_tag(tag);
-}
-
 uint32_t vsystem_spr_device::tile_callback_noindirect(uint32_t tile)
 {
 	return tile;
 }
-
-
-void vsystem_spr_device::set_tile_indirect_cb(vsystem_tile_indirection_delegate newtilecb)
-{
-	m_newtilecb = newtilecb;
-}
-
-
-void vsystem_spr_device::set_offsets(int xoffs, int yoffs)
-{
-	m_xoffs = xoffs;
-	m_yoffs = yoffs;
-}
-
-void vsystem_spr_device::set_pdraw(bool pdraw)
-{
-	m_pdraw = pdraw;
-}
-
-void vsystem_spr_device::set_gfx_region(int gfx_region)
-{
-	m_gfx_region = gfx_region;
-}
-
-void vsystem_spr_device::CG10103_set_pal_base(int pal_base)
-{
-	m_pal_base = pal_base;
-}
-
-
-void vsystem_spr_device::set_pal_mask(int pal_mask)
-{
-	m_pal_mask = pal_mask;
-}
-
-void vsystem_spr_device::CG10103_set_transpen(int transpen)
-{
-	m_transpen = transpen;
-}
-
 
 void vsystem_spr_device::device_start()
 {

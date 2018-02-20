@@ -42,8 +42,8 @@ DECLARE_DEVICE_TYPE(DOOYONG_RAM_TILEMAP, dooyong_ram_tilemap_device)
 class dooyong_tilemap_device_base : public device_t
 {
 public:
-	void set_gfxdecode_tag(char const *tag);
-	void set_gfxnum(int gfxnum);
+	void set_gfxdecode_tag(char const *tag) { m_gfxdecode.set_tag(tag); }
+	void set_gfxnum(int gfxnum) { m_gfxnum = gfxnum; }
 
 	void draw(screen_device &screen, bitmap_ind16 &dest, rectangle const &cliprect, uint32_t flags, uint8_t priority);
 
@@ -71,10 +71,15 @@ class dooyong_rom_tilemap_device : public dooyong_tilemap_device_base
 public:
 	dooyong_rom_tilemap_device(machine_config const &mconfig, char const *tag, device_t *owner, uint32_t clock);
 
-	void set_tilerom_tag(char const *tag);
-	void set_tilerom_offset(int offset);
-	void set_transparent_pen(unsigned pen);
-	void set_primella_code_bits(unsigned bits);
+	void set_tilerom_tag(char const *tag) { m_tilerom.set_tag(tag); }
+	void set_tilerom_offset(int offset) { m_tilerom_offset = offset; }
+	void set_transparent_pen(unsigned pen) { m_transparent_pen = pen; }
+	void set_primella_code_bits(unsigned bits)
+	{
+		m_primella_code_mask = (1U << bits) - 1U;
+		m_primella_color_mask = ((1U << 14) - 1) & ~m_primella_code_mask;
+		m_primella_color_shift = bits;
+	}
 
 	DECLARE_WRITE8_MEMBER(ctrl_w);
 
@@ -111,8 +116,8 @@ class rshark_rom_tilemap_device : public dooyong_rom_tilemap_device
 public:
 	rshark_rom_tilemap_device(machine_config const &mconfig, char const *tag, device_t *owner, uint32_t clock);
 
-	void set_colorrom_tag(char const *tag);
-	void set_colorrom_offset(int offset);
+	void set_colorrom_tag(char const *tag) { m_colorrom.set_tag(tag); }
+	void set_colorrom_offset(int offset) { m_colorrom_offset = offset; }
 
 protected:
 	virtual void device_start() override;

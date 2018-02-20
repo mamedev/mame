@@ -9,29 +9,29 @@
 
 
 #define MCFG_DECO146_IN_PORTA_CB(_devcb) \
-	devcb = &deco_146_base_device::set_port_a_cb(*device, DEVCB_##_devcb);
+	devcb = &downcast<deco_146_base_device &>(*device).set_port_a_cb(DEVCB_##_devcb);
 
 #define MCFG_DECO146_IN_PORTB_CB(_devcb) \
-	devcb = &deco_146_base_device::set_port_b_cb(*device, DEVCB_##_devcb);
+	devcb = &downcast<deco_146_base_device &>(*device).set_port_b_cb(DEVCB_##_devcb);
 
 #define MCFG_DECO146_IN_PORTC_CB(_devcb) \
-	devcb = &deco_146_base_device::set_port_c_cb(*device, DEVCB_##_devcb);
+	devcb = &downcast<deco_146_base_device &>(*device).set_port_c_cb(DEVCB_##_devcb);
 
 #define MCFG_DECO146_SOUNDLATCH_IRQ_CB(_devcb) \
-	devcb = &deco_146_base_device::set_soundlatch_irq_callback(*device, DEVCB_##_devcb);
+	devcb = &downcast<deco_146_base_device &>(*device).set_soundlatch_irq_callback(DEVCB_##_devcb);
 
 // there are some standard ways the chip gets hooked up, so have them here ready to use
 #define MCFG_DECO146_SET_INTERFACE_SCRAMBLE( a9,a8,a7,a6,a5,a4,a3,a2,a1,a0 ) \
-	deco_146_base_device::set_interface_scramble(*device, a9,a8,a7,a6,a5,a4,a3,a2,a1,a0);
+	downcast<deco_146_base_device &>(*device).set_interface_scramble(a9,a8,a7,a6,a5,a4,a3,a2,a1,a0);
 
 #define MCFG_DECO146_SET_INTERFACE_SCRAMBLE_REVERSE \
-	deco_146_base_device::set_interface_scramble(*device, 0,1,2,3,4,5,6,7,8,9);
+	downcast<deco_146_base_device &>(*device).set_interface_scramble(0,1,2,3,4,5,6,7,8,9);
 
 #define MCFG_DECO146_SET_INTERFACE_SCRAMBLE_INTERLEAVE \
-	deco_146_base_device::set_interface_scramble(*device, 4,5,3,6,2,7,1,8,0,9 );
+	downcast<deco_146_base_device &>(*device).set_interface_scramble(4,5,3,6,2,7,1,8,0,9 );
 
 #define MCFG_DECO146_SET_USE_MAGIC_ADDRESS_XOR \
-	deco_146_base_device::set_use_magic_read_address_xor(*device, 1 );
+	downcast<deco_146_base_device &>(*device).set_use_magic_read_address_xor(1);
 
 
 
@@ -82,14 +82,25 @@ public:
 	void write_data(address_space &space, uint16_t address, uint16_t data, uint16_t mem_mask, uint8_t &csflags);
 	uint16_t read_data(uint16_t address, uint16_t mem_mask, uint8_t &csflags);
 
-	template<class Object> static devcb_base &set_port_a_cb(device_t &device, Object &&object) { return downcast<deco_146_base_device &>(device).m_port_a_r.set_callback(std::forward<Object>(object)); }
-	template<class Object> static devcb_base &set_port_b_cb(device_t &device, Object &&object) { return downcast<deco_146_base_device &>(device).m_port_b_r.set_callback(std::forward<Object>(object)); }
-	template<class Object> static devcb_base &set_port_c_cb(device_t &device, Object &&object) { return downcast<deco_146_base_device &>(device).m_port_c_r.set_callback(std::forward<Object>(object)); }
-	static void set_interface_scramble(device_t &device,uint8_t a9, uint8_t a8, uint8_t a7, uint8_t a6, uint8_t a5, uint8_t a4, uint8_t a3,uint8_t a2,uint8_t a1,uint8_t a0);
-	static void set_use_magic_read_address_xor(device_t &device, int use_xor);
+	template<class Object> devcb_base &set_port_a_cb(Object &&object) { return m_port_a_r.set_callback(std::forward<Object>(object)); }
+	template<class Object> devcb_base &set_port_b_cb(Object &&object) { return m_port_b_r.set_callback(std::forward<Object>(object)); }
+	template<class Object> devcb_base &set_port_c_cb(Object &&object) { return m_port_c_r.set_callback(std::forward<Object>(object)); }
+	void set_interface_scramble(uint8_t a9, uint8_t a8, uint8_t a7, uint8_t a6, uint8_t a5, uint8_t a4, uint8_t a3,uint8_t a2,uint8_t a1,uint8_t a0)
+	{
+		m_external_addrswap[9] = a9;
+		m_external_addrswap[8] = a8;
+		m_external_addrswap[7] = a7;
+		m_external_addrswap[6] = a6;
+		m_external_addrswap[5] = a5;
+		m_external_addrswap[4] = a4;
+		m_external_addrswap[3] = a3;
+		m_external_addrswap[2] = a2;
+		m_external_addrswap[1] = a1;
+		m_external_addrswap[0] = a0;
+	}
+	void set_use_magic_read_address_xor(int use_xor) { m_magic_read_address_xor_enabled = use_xor; }
 
-	template <class Object> static devcb_base &set_soundlatch_irq_callback(device_t &device, Object &&cb)
-		{ return downcast<deco_146_base_device &>(device).m_soundlatch_irq_cb.set_callback(std::forward<Object>(cb)); }
+	template <class Object> devcb_base &set_soundlatch_irq_callback(Object &&cb) { return m_soundlatch_irq_cb.set_callback(std::forward<Object>(cb)); }
 
 	DECLARE_READ8_MEMBER( soundlatch_r );
 

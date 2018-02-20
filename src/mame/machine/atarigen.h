@@ -34,15 +34,15 @@
 
 #define MCFG_ATARI_SOUND_COMM_ADD(_tag, _soundcpu, _intcb) \
 	MCFG_DEVICE_ADD(_tag, ATARI_SOUND_COMM, 0) \
-	atari_sound_comm_device::static_set_sound_cpu(*device, _soundcpu); \
-	devcb = &atari_sound_comm_device::static_set_main_int_cb(*device, DEVCB_##_intcb);
+	downcast<atari_sound_comm_device &>(*device).set_sound_cpu(_soundcpu); \
+	devcb = &downcast<atari_sound_comm_device &>(*device).set_main_int_cb(DEVCB_##_intcb);
 
 
 
 #define MCFG_ATARI_VAD_ADD(_tag, _screen, _intcb) \
 	MCFG_DEVICE_ADD(_tag, ATARI_VAD, 0) \
 	MCFG_VIDEO_SET_SCREEN(_screen) \
-	devcb = &atari_vad_device::static_set_scanline_int_cb(*device, DEVCB_##_intcb);
+	devcb = &downcast<atari_vad_device &>(*device).set_scanline_int_cb(DEVCB_##_intcb);
 
 #define MCFG_ATARI_VAD_PLAYFIELD(_class, _gfxtag, _getinfo) \
 	{ std::string fulltag(device->tag()); fulltag.append(":playfield"); device_t *device; \
@@ -102,9 +102,9 @@ public:
 	// construction/destruction
 	atari_sound_comm_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
-	// static configuration helpers
-	static void static_set_sound_cpu(device_t &device, const char *cputag);
-	template<class _Object> static devcb_base &static_set_main_int_cb(device_t &device, _Object object) { return downcast<atari_sound_comm_device &>(device).m_main_int_cb.set_callback(object); }
+	// configuration helpers
+	void set_sound_cpu(const char *cputag) { m_sound_cpu_tag = cputag; }
+	template<class _Object> devcb_base &set_main_int_cb(_Object object) { return m_main_int_cb.set_callback(object); }
 
 	// getters
 	DECLARE_READ_LINE_MEMBER(main_to_sound_ready) { return m_main_to_sound_ready ? ASSERT_LINE : CLEAR_LINE; }
@@ -175,8 +175,8 @@ public:
 	// construction/destruction
 	atari_vad_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
-	// static configuration helpers
-	template<class _Object> static devcb_base &static_set_scanline_int_cb(device_t &device, _Object object) { return downcast<atari_vad_device &>(device).m_scanline_int_cb.set_callback(object); }
+	// configuration helpers
+	template<class _Object> devcb_base &set_scanline_int_cb(_Object object) { return m_scanline_int_cb.set_callback(object); }
 
 	// getters
 	tilemap_device &alpha() const { return *m_alpha_tilemap; }

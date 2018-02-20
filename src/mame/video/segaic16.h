@@ -102,8 +102,8 @@ public:
 	segaic16_video_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
 	// configuration
-	void set_gfxdecode_tag(const char *tag);
-	void set_pagelatch_cb(segaic16_video_pagelatch_delegate newtilecb);
+	void set_gfxdecode_tag(const char *tag) { m_gfxdecode.set_tag(tag); }
+	void set_pagelatch_cb(segaic16_video_pagelatch_delegate newtilecb) { m_pagelatch_cb = newtilecb; }
 
 	uint8_t m_display_enable;
 	optional_shared_ptr<uint16_t> m_tileram;

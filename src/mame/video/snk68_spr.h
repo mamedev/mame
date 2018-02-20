@@ -23,9 +23,9 @@ public:
 	snk68_spr_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
 	// static configuration
-	void set_gfxdecode_tag(const char *tag);
-	void set_tile_indirect_cb(snk68_tile_indirection_delegate newtilecb);
-	void set_no_partial();
+	void set_gfxdecode_tag(const char *tag) { m_gfxdecode.set_tag(tag); }
+	void set_tile_indirect_cb(snk68_tile_indirection_delegate newtilecb) { m_newtilecb = newtilecb; }
+	void set_no_partial() { m_partialupdates = 0; }
 
 	DECLARE_READ16_MEMBER(spriteram_r);
 	DECLARE_WRITE16_MEMBER(spriteram_w);

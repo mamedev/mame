@@ -76,17 +76,6 @@ atari_rle_objects_device::atari_rle_objects_device(const machine_config &mconfig
 
 
 //-------------------------------------------------
-//  set_config: Set the tag of the
-//  sound CPU
-//-------------------------------------------------
-
-void atari_rle_objects_device::set_config(const atari_rle_objects_config &config)
-{
-	static_cast<atari_rle_objects_config &>(*this) = config;
-}
-
-
-//-------------------------------------------------
 //  control_write: Write handler for MO control
 //  bits.
 //-------------------------------------------------

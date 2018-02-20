@@ -41,11 +41,6 @@ todo:
 #include "decmxc06.h"
 #include "screen.h"
 
-void deco_mxc06_device::set_gfx_region(int region)
-{
-	m_gfxregion = region;
-}
-
 
 DEFINE_DEVICE_TYPE(DECO_MXC06, deco_mxc06_device, "deco_mxc06", "DECO MXC06 Sprite")
 
@@ -57,17 +52,6 @@ deco_mxc06_device::deco_mxc06_device(const machine_config &mconfig, const char *
 	, m_gfxdecode(*this, finder_base::DUMMY_TAG)
 {
 }
-
-//-------------------------------------------------
-//  set_gfxdecode_tag: Set the tag of the
-//  gfx decoder
-//-------------------------------------------------
-
-void deco_mxc06_device::set_gfxdecode_tag(const char *tag)
-{
-	m_gfxdecode.set_tag(tag);
-}
-
 
 /* this implementation was originally from Mad Motor */
 void deco_mxc06_device::draw_sprites( bitmap_ind16 &bitmap, const rectangle &cliprect, uint16_t* spriteram, int pri_mask, int pri_val, int col_mask )

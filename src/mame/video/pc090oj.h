@@ -11,8 +11,8 @@ public:
 	pc090oj_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
 	// configuration
-	void set_gfxdecode_tag(const char *tag);
-	void set_palette_tag(const char *tag);
+	void set_gfxdecode_tag(const char *tag) { m_gfxdecode.set_tag(tag); }
+	void set_palette_tag(const char *tag) { m_palette.set_tag(tag); }
 	void set_gfx_region(int gfxregion) { m_gfxnum = gfxregion; }
 	void set_usebuffer(int use_buf) { m_use_buffer = use_buf; }
 	void set_offsets(int x_offset, int y_offset)

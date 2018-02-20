@@ -23,8 +23,13 @@ public:
 	deco_bac06_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
 	// configuration
-	void set_gfxdecode_tag(const char *tag);
-	void set_gfx_region_wide(int region8x8, int region16x16, int wide);
+	void set_gfxdecode_tag(const char *tag) { m_gfxdecode.set_tag(tag); }
+	void set_gfx_region_wide(int region8x8, int region16x16, int wide)
+	{
+		m_gfxregion8x8 = region8x8;
+		m_gfxregion16x16 = region16x16;
+		m_wide = wide;
+	}
 	void disable_8x8() { m_supports_8x8 = false; }
 	void disable_16x16() { m_supports_16x16 = false; }
 	void disable_rc_scroll() { m_supports_rc_scroll = false; }

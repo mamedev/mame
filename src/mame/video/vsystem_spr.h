@@ -32,14 +32,18 @@ class vsystem_spr_device : public device_t
 {
 public:
 	// configuration
-	void set_gfxdecode_tag(const char *tag);
-	void set_offsets(int xoffs, int yoffs);
-	void set_pdraw(bool pdraw);
-	void set_tile_indirect_cb(vsystem_tile_indirection_delegate newtilecb);
-	void set_gfx_region(int gfx_region);
-	void CG10103_set_pal_base(int pal_base);
-	void set_pal_mask(int pal_mask);
-	void CG10103_set_transpen(int transpen);
+	void set_gfxdecode_tag(const char *tag) { m_gfxdecode.set_tag(tag); }
+	void set_offsets(int xoffs, int yoffs)
+	{
+		m_xoffs = xoffs;
+		m_yoffs = yoffs;
+	}
+	void set_pdraw(bool pdraw) { m_pdraw = pdraw; }
+	void set_tile_indirect_cb(vsystem_tile_indirection_delegate newtilecb) { m_newtilecb = newtilecb; }
+	void set_gfx_region(int gfx_region) { m_gfx_region = gfx_region; }
+	void CG10103_set_pal_base(int pal_base) { m_pal_base = pal_base; }
+	void set_pal_mask(int pal_mask) { m_pal_mask = pal_mask; }
+	void CG10103_set_transpen(int transpen) { m_transpen = transpen; }
 
 	vsystem_spr_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 

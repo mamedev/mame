@@ -16,7 +16,7 @@
 class avgdvg_device : public device_t
 {
 public:
-	void set_vector_tag(const char *tag);
+	void set_vector_tag(const char *tag) { m_vector.set_tag(tag); }
 
 	DECLARE_CUSTOM_INPUT_MEMBER(done_r);
 	DECLARE_WRITE8_MEMBER(go_w);
@@ -26,8 +26,8 @@ public:
 	DECLARE_WRITE16_MEMBER(reset_word_w);
 
 	/* Tempest and Quantum use this capability */
-	void set_flip_x(int flip);
-	void set_flip_y(int flip);
+	void set_flip_x(int flip) { flip_x = flip; }
+	void set_flip_y(int flip) { flip_y = flip; }
 
 	TIMER_CALLBACK_MEMBER(vg_set_halt_callback);
 	TIMER_CALLBACK_MEMBER(run_state_machine);

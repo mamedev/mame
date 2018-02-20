@@ -11,7 +11,7 @@ class k007121_device : public device_t
 public:
 	k007121_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
-	void set_palette_tag(const char *tag);
+	void set_palette_tag(const char *tag) { m_palette.set_tag(tag); }
 
 	uint8_t ctrlram_r(int offset);
 	DECLARE_WRITE8_MEMBER( ctrl_w );

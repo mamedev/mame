@@ -26,7 +26,11 @@ class k053250ps_device :  public device_t,
 public:
 	k053250ps_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
-	void set_offsets(int offx, int offy);
+	void set_offsets(int offx, int offy)
+	{
+		m_offx = offx;
+		m_offy = offy;
+	}
 	template<class _cb> devcb_base &set_dmairq_cb(_cb cb) { return m_dmairq_cb.set_callback(cb); }
 
 	DECLARE_READ16_MEMBER(reg_r);

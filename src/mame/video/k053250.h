@@ -23,7 +23,11 @@ class k053250_device :  public device_t,
 public:
 	k053250_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
-	void set_offsets(int offx, int offy);
+	void set_offsets(int offx, int offy)
+	{
+		m_offx = offx;
+		m_offy = offy;
+	}
 
 	DECLARE_READ16_MEMBER(reg_r);
 	DECLARE_WRITE16_MEMBER(reg_w);

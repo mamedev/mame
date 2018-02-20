@@ -81,7 +81,7 @@ public:
 	atari_rle_objects_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
 	// configuration helpers
-	void set_config(const atari_rle_objects_config &config);
+	void set_config(const atari_rle_objects_config &config) { static_cast<atari_rle_objects_config &>(*this) = config; }
 
 	// control handlers
 	DECLARE_WRITE8_MEMBER(control_write);

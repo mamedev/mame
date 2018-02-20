@@ -105,12 +105,6 @@ uint16_t igs017_igs031_device::palette_callback_straight(uint16_t bgr)
 }
 
 
-void igs017_igs031_device::set_palette_scramble_cb(igs017_igs031_palette_scramble_delegate newtilecb)
-{
-	m_palette_scramble_cb = newtilecb;
-}
-
-
 void igs017_igs031_device::device_start()
 {
 	m_palette_scramble_cb.bind_relative_to(*owner());

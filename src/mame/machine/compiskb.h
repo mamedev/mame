@@ -20,7 +20,7 @@
 //**************************************************************************
 
 #define MCFG_COMPIS_KEYBOARD_OUT_TX_HANDLER(_devcb) \
-	devcb = &compis_keyboard_device::set_out_tx_handler(*device, DEVCB_##_devcb);
+	devcb = &downcast<compis_keyboard_device &>(*device).set_out_tx_handler(DEVCB_##_devcb);
 
 
 
@@ -37,7 +37,7 @@ public:
 	// construction/destruction
 	compis_keyboard_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
-	template <class Object> static devcb_base &set_out_tx_handler(device_t &device, Object &&cb) { return downcast<compis_keyboard_device &>(device).m_out_tx_handler.set_callback(std::forward<Object>(cb)); }
+	template <class Object> devcb_base &set_out_tx_handler(Object &&cb) { return m_out_tx_handler.set_callback(std::forward<Object>(cb)); }
 
 	DECLARE_WRITE_LINE_MEMBER( si_w );
 

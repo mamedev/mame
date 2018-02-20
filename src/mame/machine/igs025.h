@@ -10,7 +10,7 @@
 typedef device_delegate<void (void)> igs025_execute_external;
 
 #define MCFG_IGS025_SET_EXTERNAL_EXECUTE( _class, _method) \
-	igs025_device::set_external_cb(*device, igs025_execute_external(&_class::_method, #_class "::" #_method, nullptr, (_class *)nullptr));
+	downcast<igs025_device &>(*device).set_external_cb(igs025_execute_external(&_class::_method, #_class "::" #_method, nullptr, (_class *)nullptr));
 
 class igs025_device : public device_t
 {
@@ -25,7 +25,7 @@ public:
 
 
 	igs025_execute_external m_execute_external;
-	static void set_external_cb(device_t &device,igs025_execute_external newcb);
+	void set_external_cb(igs025_execute_external newcb) { m_execute_external = newcb; }
 
 	DECLARE_WRITE16_MEMBER( olds_w );
 	DECLARE_WRITE16_MEMBER( drgw2_d80000_protection_w );

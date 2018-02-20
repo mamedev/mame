@@ -32,11 +32,6 @@ segas24_tile_device::segas24_tile_device(const machine_config &mconfig, const ch
 }
 
 
-void segas24_tile_device::set_tile_mask(uint16_t _tile_mask)
-{
-	tile_mask = _tile_mask;
-}
-
 const gfx_layout segas24_tile_device::char_layout = {
 	8, 8,
 	SYS24_TILES,
