@@ -658,7 +658,7 @@ ROM_START( raidenkb ) /* Korean bootleg board. ROMs for main, sub, audiocpu, cha
 	ROM_LOAD( "82s147.h7", 0x0000, 0x0200, NO_DUMP )
 ROM_END
 
-ROM_START( raidenb )/* Different hardware, Main & Sub CPU code not encrypted. */
+ROM_START( raidenb )/* Different hardware, Main & Sub CPU code not encrypted. https://www.youtube.com/watch?v=_FF4N9mBxao */
 	ROM_REGION( 0x100000, "maincpu", 0 ) /* v30 main cpu */
 	ROM_LOAD16_BYTE( "1.u0253", 0x0a0000, 0x10000, CRC(a4b12785) SHA1(446314e82ce01315cb3e3d1f323eaa2ad6fb48dd) )
 	ROM_LOAD16_BYTE( "2.u0252", 0x0a0001, 0x10000, CRC(17640bd5) SHA1(5bbc99900426b1a072b52537ae9a50220c378a0d) )
