@@ -23,6 +23,7 @@ public:
 	duet16_state(const machine_config &mconfig, device_type type, const char *tag) :
 		driver_device(mconfig, type, tag),
 		m_maincpu(*this, "maincpu"),
+		m_pic(*this, "pic"),
 		m_chrrom(*this, "char"),
 		m_vram(*this, "vram")
 	{ }
@@ -30,20 +31,33 @@ public:
 	void duet16(machine_config &config);
 
 private:
+	DECLARE_READ8_MEMBER(pic_r);
+	DECLARE_WRITE8_MEMBER(pic_w);
 	MC6845_UPDATE_ROW(crtc_update_row);
 	void duet16_io(address_map &map);
 	void duet16_mem(address_map &map);
 	required_device<cpu_device> m_maincpu;
+	required_device<pic8259_device> m_pic;
 	required_memory_region m_chrrom;
 	required_shared_ptr<u16> m_vram;
 };
+
+READ8_MEMBER(duet16_state::pic_r)
+{
+	return m_pic->read(space, offset ^ 1, mem_mask);
+}
+
+WRITE8_MEMBER(duet16_state::pic_w)
+{
+	m_pic->write(space, offset ^ 1, data, mem_mask);
+}
 
 ADDRESS_MAP_START(duet16_state::duet16_mem)
 	AM_RANGE(0x00000, 0x9ffff) AM_RAM
 	AM_RANGE(0xb8000, 0xbffff) AM_RAM
 	AM_RANGE(0xc0000, 0xc0fff) AM_RAM AM_SHARE("vram")
 	AM_RANGE(0xf8000, 0xf801f) AM_DEVREADWRITE8("dmac", am9517a_device, read, write, 0xff00)
-	AM_RANGE(0xf8020, 0xf8023) AM_DEVREADWRITE8("pic", pic8259_device, read, write, 0x00ff)
+	AM_RANGE(0xf8020, 0xf8023) AM_READWRITE8(pic_r, pic_w, 0x00ff)
 	AM_RANGE(0xf8040, 0xf804f) AM_DEVREADWRITE8("ptm", ptm6840_device, read, write, 0x00ff)
 	AM_RANGE(0xf8060, 0xf8067) AM_DEVREADWRITE8("bgpit", pit8253_device, read, write, 0x00ff)
 	AM_RANGE(0xf8080, 0xf8087) AM_DEVREADWRITE8("sio", upd7201_new_device, ba_cd_r, ba_cd_w, 0x00ff)
