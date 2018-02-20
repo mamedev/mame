@@ -24,6 +24,10 @@ public:
 		driver_device(mconfig, type, tag),
 		m_maincpu(*this, "maincpu"),
 		m_pic(*this, "pic"),
+		m_fdc(*this, "fdc"),
+		m_dmac(*this, "dmac"),
+		m_fd0(*this, "fdc:0"),
+		m_fd1(*this, "fdc:1"),
 		m_chrrom(*this, "char"),
 		m_vram(*this, "vram")
 	{ }
@@ -33,11 +37,19 @@ public:
 private:
 	DECLARE_READ8_MEMBER(pic_r);
 	DECLARE_WRITE8_MEMBER(pic_w);
+	DECLARE_READ8_MEMBER(dma_mem_r);
+	DECLARE_WRITE8_MEMBER(dma_mem_w);
+	DECLARE_WRITE8_MEMBER(fdcctrl_w);
+	DECLARE_WRITE_LINE_MEMBER(hrq_w);
 	MC6845_UPDATE_ROW(crtc_update_row);
 	void duet16_io(address_map &map);
 	void duet16_mem(address_map &map);
 	required_device<cpu_device> m_maincpu;
 	required_device<pic8259_device> m_pic;
+	required_device<upd765a_device> m_fdc;
+	required_device<am9517a_device> m_dmac;
+	required_device<floppy_connector> m_fd0;
+	required_device<floppy_connector> m_fd1;
 	required_memory_region m_chrrom;
 	required_shared_ptr<u16> m_vram;
 };
@@ -50,6 +62,30 @@ READ8_MEMBER(duet16_state::pic_r)
 WRITE8_MEMBER(duet16_state::pic_w)
 {
 	m_pic->write(space, offset ^ 1, data);
+}
+
+WRITE8_MEMBER(duet16_state::fdcctrl_w)
+{
+	m_fd0->get_device()->mon_w(!BIT(data, 0));
+	m_fd1->get_device()->mon_w(!BIT(data, 0));
+	if(!BIT(data, 1))
+		m_fdc->soft_reset();
+}
+
+READ8_MEMBER(duet16_state::dma_mem_r)
+{
+	return m_maincpu->space(AS_PROGRAM).read_byte(offset);
+}
+
+WRITE8_MEMBER(duet16_state::dma_mem_w)
+{
+	m_maincpu->space(AS_PROGRAM).write_byte(offset, data);
+}
+
+WRITE_LINE_MEMBER(duet16_state::hrq_w)
+{
+	m_maincpu->set_input_line(INPUT_LINE_HALT, state);
+	m_dmac->hack_w(state);
 }
 
 ADDRESS_MAP_START(duet16_state::duet16_mem)
@@ -66,6 +102,7 @@ ADDRESS_MAP_START(duet16_state::duet16_mem)
 	AM_RANGE(0xf80c0, 0xf80c1) AM_DEVREADWRITE8("crtc", h46505_device, status_r, address_w, 0x00ff)
 	AM_RANGE(0xf80c2, 0xf80c3) AM_DEVREADWRITE8("crtc", h46505_device, register_r, register_w, 0x00ff)
 	AM_RANGE(0xf8100, 0xf8103) AM_DEVICE8("fdc", upd765a_device, map, 0x00ff)
+	AM_RANGE(0xf8220, 0xf8221) AM_WRITE8(fdcctrl_w, 0x00ff)
 	AM_RANGE(0xfe000, 0xfffff) AM_ROM AM_REGION("rom", 0)
 ADDRESS_MAP_END
 
@@ -96,6 +133,10 @@ MC6845_UPDATE_ROW(duet16_state::crtc_update_row)
 	}
 }
 
+static SLOT_INTERFACE_START( duet16_floppies )
+	SLOT_INTERFACE( "525qd", FLOPPY_525_QD )
+SLOT_INTERFACE_END
+
 MACHINE_CONFIG_START(duet16_state::duet16)
 	MCFG_CPU_ADD("maincpu", I8086, 24_MHz_XTAL / 3)
 	MCFG_CPU_PROGRAM_MAP(duet16_mem)
@@ -109,13 +150,12 @@ MACHINE_CONFIG_START(duet16_state::duet16)
 	MCFG_PIC8259_OUT_INT_CB(INPUTLINE("maincpu", 0))
 
 	MCFG_DEVICE_ADD("dmac", AM9517A, 20_MHz_XTAL / 4)
-	/*MCFG_AM9517A_OUT_HRQ_CB(WRITELINE(olyboss_state, hrq_w))
-	MCFG_AM9517A_IN_MEMR_CB(READ8(olyboss_state, dma_mem_r))
-	MCFG_AM9517A_OUT_MEMW_CB(WRITE8(olyboss_state, dma_mem_w))
-	MCFG_AM9517A_IN_IOR_0_CB(READ8(olyboss_state, fdcdma_r))
-	MCFG_AM9517A_OUT_IOW_0_CB(WRITE8(olyboss_state, fdcdma_w))
-	MCFG_AM9517A_OUT_IOW_2_CB(WRITE8(olyboss_state, crtcdma_w))
-	MCFG_AM9517A_OUT_TC_CB(WRITELINE(olyboss_state, tc_w))*/
+	MCFG_AM9517A_OUT_HREQ_CB(WRITELINE(duet16_state, hrq_w))
+	MCFG_AM9517A_IN_MEMR_CB(READ8(duet16_state, dma_mem_r))
+	MCFG_AM9517A_OUT_MEMW_CB(WRITE8(duet16_state, dma_mem_w))
+	MCFG_AM9517A_IN_IOR_0_CB(DEVREAD8("fdc", upd765a_device, mdma_r))
+	MCFG_AM9517A_OUT_IOW_0_CB(DEVWRITE8("fdc", upd765a_device, mdma_w))
+	MCFG_AM9517A_OUT_EOP_CB(DEVWRITELINE("fdc", upd765a_device, tc_line_w))
 
 	MCFG_DEVICE_ADD("bgpit", PIT8253, 0)
 	MCFG_PIT8253_CLK0(8_MHz_XTAL / 13)
@@ -146,7 +186,12 @@ MACHINE_CONFIG_START(duet16_state::duet16)
 	MCFG_INPUT_MERGER_OUTPUT_HANDLER(DEVWRITELINE("pic", pic8259_device, ir5_w)) // INT2
 
 	MCFG_DEVICE_ADD("fdc", UPD765A, 0)
+	MCFG_UPD765_DRQ_CALLBACK(DEVWRITELINE("dmac", am9517a_device, dreq0_w))
 	MCFG_UPD765_INTRQ_CALLBACK(DEVWRITELINE("pic", pic8259_device, ir3_w)) // INT4
+	MCFG_FLOPPY_DRIVE_ADD("fdc:0", duet16_floppies, "525qd", floppy_image_device::default_floppy_formats)
+	MCFG_SLOT_FIXED(true)
+	MCFG_FLOPPY_DRIVE_ADD("fdc:1", duet16_floppies, "525qd", floppy_image_device::default_floppy_formats)
+	MCFG_SLOT_FIXED(true)
 
 	MCFG_DEVICE_ADD("crtc", H46505, 2000000)
 	MCFG_MC6845_CHAR_WIDTH(8)
