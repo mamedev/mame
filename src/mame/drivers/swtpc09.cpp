@@ -177,8 +177,8 @@ MACHINE_CONFIG_START(swtpc09_state::swtpc09_base)
 
 	MCFG_DEVICE_ADD("ptm", PTM6840, 2000000)
 	MCFG_PTM6840_EXTERNAL_CLOCKS(50, 0, 50)
-	MCFG_PTM6840_OUT0_CB(WRITELINE(swtpc09_state, ptm_o1_callback))
-	MCFG_PTM6840_OUT2_CB(WRITELINE(swtpc09_state, ptm_o3_callback))
+	MCFG_PTM6840_O1_CB(WRITELINE(swtpc09_state, ptm_o1_callback))
+	MCFG_PTM6840_O3_CB(WRITELINE(swtpc09_state, ptm_o3_callback))
 	MCFG_PTM6840_IRQ_CB(WRITELINE(swtpc09_state, ptm_irq))
 
 	MCFG_RS232_PORT_ADD("rs232", default_rs232_devices, "terminal")

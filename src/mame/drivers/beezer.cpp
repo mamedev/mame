@@ -78,9 +78,9 @@ public:
 	DECLARE_READ8_MEMBER(via_audio_pa_r);
 	DECLARE_WRITE8_MEMBER(via_audio_pa_w);
 	DECLARE_WRITE8_MEMBER(via_audio_pb_w);
-	DECLARE_WRITE_LINE_MEMBER(ptm_out0_w);
-	DECLARE_WRITE_LINE_MEMBER(ptm_out1_w);
-	DECLARE_WRITE_LINE_MEMBER(ptm_out2_w);
+	DECLARE_WRITE_LINE_MEMBER(ptm_o1_w);
+	DECLARE_WRITE_LINE_MEMBER(ptm_o2_w);
+	DECLARE_WRITE_LINE_MEMBER(ptm_o3_w);
 	DECLARE_WRITE_LINE_MEMBER(dmod_clr_w);
 	DECLARE_WRITE_LINE_MEMBER(dmod_data_w);
 
@@ -332,12 +332,12 @@ WRITE8_MEMBER( beezer_state::via_audio_pb_w )
 	m_ch_sign[0] = BIT(data, 7);
 }
 
-WRITE_LINE_MEMBER( beezer_state::ptm_out0_w )
+WRITE_LINE_MEMBER( beezer_state::ptm_o1_w )
 {
 	m_ch_sign[1] = state;
 }
 
-WRITE_LINE_MEMBER( beezer_state::ptm_out1_w )
+WRITE_LINE_MEMBER( beezer_state::ptm_o2_w )
 {
 	// on rising edge, enable noise input to ptm c3
 	if (m_ch_sign[2] == 0 && state == 1)
@@ -346,7 +346,7 @@ WRITE_LINE_MEMBER( beezer_state::ptm_out1_w )
 	m_ch_sign[2] = state;
 }
 
-WRITE_LINE_MEMBER( beezer_state::ptm_out2_w )
+WRITE_LINE_MEMBER( beezer_state::ptm_o3_w )
 {
 	m_ch_sign[3] = state;
 }
@@ -517,9 +517,9 @@ MACHINE_CONFIG_START(beezer_state::beezer)
 	MCFG_VIA6522_IRQ_HANDLER(DEVWRITELINE("audio_irqs", input_merger_device, in_w<0>))
 
 	MCFG_DEVICE_ADD("ptm", PTM6840, XTAL(4'000'000) / 4)
-	MCFG_PTM6840_OUT0_CB(WRITELINE(beezer_state, ptm_out0_w))
-	MCFG_PTM6840_OUT1_CB(WRITELINE(beezer_state, ptm_out1_w))
-	MCFG_PTM6840_OUT2_CB(WRITELINE(beezer_state, ptm_out2_w))
+	MCFG_PTM6840_O1_CB(WRITELINE(beezer_state, ptm_o1_w))
+	MCFG_PTM6840_O2_CB(WRITELINE(beezer_state, ptm_o2_w))
+	MCFG_PTM6840_O3_CB(WRITELINE(beezer_state, ptm_o3_w))
 	MCFG_PTM6840_IRQ_CB(DEVWRITELINE("audio_irqs", input_merger_device, in_w<1>))
 	// schematics show an input labeled VCO to channel 2, but the source is unknown
 

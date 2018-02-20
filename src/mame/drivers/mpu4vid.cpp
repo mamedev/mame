@@ -1310,9 +1310,9 @@ MACHINE_CONFIG_START(mpu4vid_state::mpu4_vid)
 
 	MCFG_DEVICE_ADD("6840ptm_68k", PTM6840, VIDEO_MASTER_CLOCK / 10) /* 68k E clock */
 	MCFG_PTM6840_EXTERNAL_CLOCKS(0, 0, 0)
-	MCFG_PTM6840_OUT0_CB(WRITELINE(mpu4vid_state, vid_o1_callback))
-	MCFG_PTM6840_OUT1_CB(WRITELINE(mpu4vid_state, vid_o2_callback))
-	MCFG_PTM6840_OUT2_CB(WRITELINE(mpu4vid_state, vid_o3_callback))
+	MCFG_PTM6840_O1_CB(WRITELINE(mpu4vid_state, vid_o1_callback))
+	MCFG_PTM6840_O2_CB(WRITELINE(mpu4vid_state, vid_o2_callback))
+	MCFG_PTM6840_O3_CB(WRITELINE(mpu4vid_state, vid_o3_callback))
 	MCFG_PTM6840_IRQ_CB(WRITELINE(mpu4vid_state, cpu1_ptm_irq))
 	/* Present on all video cards */
 	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")

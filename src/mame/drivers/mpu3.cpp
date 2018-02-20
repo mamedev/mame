@@ -857,9 +857,9 @@ MACHINE_CONFIG_START(mpu3_state::mpu3base)
 	/* 6840 PTM */
 	MCFG_DEVICE_ADD("ptm_ic2", PTM6840, MPU3_MASTER_CLOCK)
 	MCFG_PTM6840_EXTERNAL_CLOCKS(0, 0, 0)
-	MCFG_PTM6840_OUT0_CB(WRITELINE(mpu3_state, ic2_o1_callback))
-	MCFG_PTM6840_OUT1_CB(WRITELINE(mpu3_state, ic2_o2_callback))
-	MCFG_PTM6840_OUT2_CB(WRITELINE(mpu3_state, ic2_o3_callback))
+	MCFG_PTM6840_O1_CB(WRITELINE(mpu3_state, ic2_o1_callback))
+	MCFG_PTM6840_O2_CB(WRITELINE(mpu3_state, ic2_o2_callback))
+	MCFG_PTM6840_O3_CB(WRITELINE(mpu3_state, ic2_o3_callback))
 	MCFG_PTM6840_IRQ_CB(WRITELINE(mpu3_state, cpu0_irq))
 
 	MCFG_DEVICE_ADD("pia_ic3", PIA6821, 0)

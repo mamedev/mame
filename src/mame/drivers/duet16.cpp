@@ -216,7 +216,7 @@ MACHINE_CONFIG_START(duet16_state::duet16)
 
 	MCFG_DEVICE_ADD("itm", PTM6840, 0)
 	MCFG_PTM6840_EXTERNAL_CLOCKS(0.0, 0.0, (8_MHz_XTAL / 8).dvalue()) // C3 = 1MHz
-	MCFG_PTM6840_OUT2_CB(DEVWRITELINE("itm", ptm6840_device, set_c1)) // C1 = C2 = O3
+	MCFG_PTM6840_O3_CB(DEVWRITELINE("itm", ptm6840_device, set_c1)) // C1 = C2 = O3
 	MCFG_DEVCB_CHAIN_OUTPUT(DEVWRITELINE("itm", ptm6840_device, set_c2))
 	MCFG_PTM6840_IRQ_CB(DEVWRITELINE("pic", pic8259_device, ir0_w)) // INT6
 
