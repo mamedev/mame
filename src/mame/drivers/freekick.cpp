@@ -23,7 +23,7 @@ Notes:
   there isn't a sound CPU and that program isn't executed. Instead, the main
   CPU reads the sound program through an 8255 PPI and plays sounds directly.
 - Gigas: according to a photo of a genuine board:
-    Sega Game ID#: 834-6167
+    Sega Game ID#: "834-6167 // GIGAS"
     NEC MC-8123 with Sega security number 317-5002
 - Gigas MarkII: according to a photo of a genuine board:
     Sega Game ID#: "834-6167-01 // GIGAS 2"
@@ -1236,7 +1236,7 @@ ROM_START( countrunb2 )
 	ROM_LOAD( "24s10n.7h", 0x0500, 0x0100, CRC(c77d0077) SHA1(4cbbf625ad5e45d00ca6aebe9566538ff0a3348d) )
 ROM_END
 
-ROM_START( gigas ) /* From an actual Sega board 834-6167 with MC-8123: 317-5002 */
+ROM_START( gigas ) /* From an actual Sega board "834-6167 // GIGAS" with MC-8123: 317-5002 */
 /* The MC-8123 is located on a small daughterboard which plugs into the z80 socket;
  * the daughterboard also has an input for the spinner control the game uses
  * An empty socket marked 27256 is at location 10n */
@@ -1333,7 +1333,7 @@ ROM_START( oigas )
 ROM_END
 
 //Gigas Mark II is a romswap/upgrade to gigas, and uses the same MC-8123 (317-5002).
-ROM_START( gigasm2 ) /* From an actual Sega board "834-6167-01 // GIGAS 2" w/MC-8123: 317-5002 */
+ROM_START( gigasm2 ) /* From an actual Sega board "834-6167-01 // GIGAS 2" with MC-8123: 317-5002 */
 /* The MC-8123 is located on a small daughterboard which plugs into the z80 socket;
  * the daughterboard also has an input for the spinner control the game uses
  * An empty socket marked 27256 is at location 10n */
