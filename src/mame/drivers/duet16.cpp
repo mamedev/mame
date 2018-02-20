@@ -27,6 +27,7 @@ public:
 		m_fdc(*this, "fdc"),
 		m_dmac(*this, "dmac"),
 		m_fd(*this, "fdc:%u", 0),
+		m_pal(*this, "palette"),
 		m_chrrom(*this, "char"),
 		m_vram(*this, "vram")
 	{ }
@@ -41,6 +42,7 @@ private:
 	DECLARE_READ8_MEMBER(dmapg_r);
 	DECLARE_WRITE8_MEMBER(dmapg_w);
 	DECLARE_WRITE8_MEMBER(fdcctrl_w);
+	DECLARE_WRITE8_MEMBER(pal_w);
 	DECLARE_WRITE_LINE_MEMBER(hrq_w);
 	MC6845_UPDATE_ROW(crtc_update_row);
 	void duet16_io(address_map &map);
@@ -50,6 +52,7 @@ private:
 	required_device<upd765a_device> m_fdc;
 	required_device<am9517a_device> m_dmac;
 	required_device_array<floppy_connector, 2> m_fd;
+	required_device<palette_device> m_pal;
 	required_memory_region m_chrrom;
 	required_shared_ptr<u16> m_vram;
 	u8 m_dmapg;
@@ -119,6 +122,7 @@ ADDRESS_MAP_START(duet16_state::duet16_mem)
 	AM_RANGE(0xf80c0, 0xf80c1) AM_DEVREADWRITE8("crtc", h46505_device, status_r, address_w, 0x00ff)
 	AM_RANGE(0xf80c2, 0xf80c3) AM_DEVREADWRITE8("crtc", h46505_device, register_r, register_w, 0x00ff)
 	AM_RANGE(0xf8100, 0xf8103) AM_DEVICE8("fdc", upd765a_device, map, 0x00ff)
+	AM_RANGE(0xf8160, 0xf818f) AM_WRITE8(pal_w, 0xffff)
 	AM_RANGE(0xf8220, 0xf8221) AM_WRITE8(fdcctrl_w, 0x00ff)
 	AM_RANGE(0xfe000, 0xfffff) AM_ROM AM_REGION("rom", 0)
 ADDRESS_MAP_END
@@ -126,9 +130,15 @@ ADDRESS_MAP_END
 ADDRESS_MAP_START(duet16_state::duet16_io)
 ADDRESS_MAP_END
 
+WRITE8_MEMBER(duet16_state::pal_w)
+{
+	int entry = (BIT(offset, 0) ? 2 : 0) | (BIT(offset, 5) ? 0 : 4);
+	m_pal->set_pen_color(entry, pal1bit(BIT(data, 1)), pal1bit(BIT(data, 2)), pal1bit(BIT(data, 0)));
+	m_pal->set_pen_color(entry + 1, pal1bit(BIT(data, 5)), pal1bit(BIT(data, 6)), pal1bit(BIT(data, 4)));
+}
+
 MC6845_UPDATE_ROW(duet16_state::crtc_update_row)
 {
-	const rgb_t fg = 0xffffffff;
 	const rgb_t bg = 0;
 	u32 *p = &bitmap.pix32(y);
 
@@ -136,8 +146,9 @@ MC6845_UPDATE_ROW(duet16_state::crtc_update_row)
 	{
 		u16 offset = (ma + i) & 0x1fff;
 		u8 chr = m_vram[offset] & 0xff;
-		//u8 attr = m_vram[offset] >> 8;
+		u8 attr = m_vram[offset] >> 8;
 		u8 data = m_chrrom->base()[(chr * 16) + ra];
+		rgb_t fg = m_pal->pen_color(attr & 7);
 
 		*p = (data & 0x80) ? fg : bg; p++;
 		*p = (data & 0x40) ? fg : bg; p++;
@@ -149,6 +160,24 @@ MC6845_UPDATE_ROW(duet16_state::crtc_update_row)
 		*p = (data & 0x01) ? fg : bg; p++;
 	}
 }
+
+static const gfx_layout duet16_charlayout =
+{
+	8, 16,                   /* 8 x 16 characters */
+	512,                    /* 512 characters */
+	1,                  /* 1 bits per pixel */
+	{ 0 },                  /* no bitplanes */
+	/* x offsets */
+	{ STEP8(0,1) },
+	/* y offsets */
+	{ STEP16(0,8) },
+	8*16                 /* every char takes 8 bytes */
+};
+
+static GFXDECODE_START(duet16)
+	GFXDECODE_ENTRY( "char", 0x0000, duet16_charlayout, 0, 1 )
+GFXDECODE_END
+
 
 static SLOT_INTERFACE_START( duet16_floppies )
 	SLOT_INTERFACE( "525qd", FLOPPY_525_QD )
@@ -213,6 +242,10 @@ MACHINE_CONFIG_START(duet16_state::duet16)
 	MCFG_DEVICE_ADD("crtc", H46505, 2000000)
 	MCFG_MC6845_CHAR_WIDTH(8)
 	MCFG_MC6845_UPDATE_ROW_CB(duet16_state, crtc_update_row)
+
+	MCFG_PALETTE_ADD("palette", 8)
+
+	MCFG_GFXDECODE_ADD("gfxdecode", "palette", duet16)
 
 	MCFG_SCREEN_ADD("screen", RASTER)
 	MCFG_SCREEN_REFRESH_RATE(60)
