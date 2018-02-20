@@ -21,7 +21,9 @@ class duet16_state : public driver_device
 public:
 	duet16_state(const machine_config &mconfig, device_type type, const char *tag) :
 		driver_device(mconfig, type, tag),
-		m_maincpu(*this, "maincpu")
+		m_maincpu(*this, "maincpu"),
+		m_chrrom(*this, "char"),
+		m_vram(*this, "vram")
 	{ }
 
 	void duet16(machine_config &config);
@@ -31,12 +33,16 @@ private:
 	void duet16_io(address_map &map);
 	void duet16_mem(address_map &map);
 	required_device<cpu_device> m_maincpu;
+	required_memory_region m_chrrom;
+	required_shared_ptr<u16> m_vram;
 };
 
 ADDRESS_MAP_START(duet16_state::duet16_mem)
 	AM_RANGE(0x00000, 0x9ffff) AM_RAM
 	AM_RANGE(0xb8000, 0xbffff) AM_RAM
 	AM_RANGE(0xc0000, 0xc0fff) AM_RAM AM_SHARE("vram")
+	AM_RANGE(0xf8000, 0xf801f) AM_DEVREADWRITE8("dmac", am9517a_device, read, write, 0xff00)
+	AM_RANGE(0xf8040, 0xf804f) AM_DEVREADWRITE8("ptm", ptm6840_device, read, write, 0x00ff)
 	AM_RANGE(0xf8060, 0xf8067) AM_DEVREADWRITE8("bgpit", pit8253_device, read, write, 0x00ff)
 	AM_RANGE(0xf8080, 0xf8087) AM_DEVREADWRITE8("sio", upd7201_new_device, ba_cd_r, ba_cd_w, 0x00ff)
 	AM_RANGE(0xf80a0, 0xf80a1) AM_DEVREADWRITE8("kbusart", i8251_device, data_r, data_w, 0x00ff)
@@ -51,7 +57,26 @@ ADDRESS_MAP_END
 
 MC6845_UPDATE_ROW(duet16_state::crtc_update_row)
 {
+	const rgb_t fg = 0xffffffff;
+	const rgb_t bg = 0;
+	u32 *p = &bitmap.pix32(y);
 
+	for(int i = 0; i < x_count; i++)
+	{
+		u16 offset = (ma + i) & 0x1fff;
+		u8 chr = m_vram[offset] & 0xff;
+		//u8 attr = m_vram[offset] >> 8;
+		u8 data = m_chrrom->base()[(chr * 16) + ra];
+
+		*p = (data & 0x80) ? fg : bg; p++;
+		*p = (data & 0x40) ? fg : bg; p++;
+		*p = (data & 0x20) ? fg : bg; p++;
+		*p = (data & 0x10) ? fg : bg; p++;
+		*p = (data & 0x08) ? fg : bg; p++;
+		*p = (data & 0x04) ? fg : bg; p++;
+		*p = (data & 0x02) ? fg : bg; p++;
+		*p = (data & 0x01) ? fg : bg; p++;
+	}
 }
 
 MACHINE_CONFIG_START(duet16_state::duet16)
@@ -83,6 +108,8 @@ MACHINE_CONFIG_START(duet16_state::duet16)
 	MCFG_DEVCB_CHAIN_OUTPUT(DEVWRITELINE("sio", upd7201_new_device, rxcb_w))
 	MCFG_PIT8253_OUT2_HANDLER(DEVWRITELINE("kbusart", i8251_device, write_txc))
 	MCFG_DEVCB_CHAIN_OUTPUT(DEVWRITELINE("kbusart", i8251_device, write_rxc))
+
+	MCFG_DEVICE_ADD("ptm", PTM6840, 0)
 
 	MCFG_DEVICE_ADD("sio", UPD7201_NEW, 8_MHz_XTAL / 2)
 
