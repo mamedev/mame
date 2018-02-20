@@ -963,5 +963,5 @@ COMP( 1998, ti73,       0,      0,      ti73,    ti82,  ti85_state,  0,     "Tex
 COMP( 1999, ti83p,      0,      0,      ti83p,   ti82,  ti85_state,  0,     "Texas Instruments", "TI-83 Plus (Boot Code 1.00)",                  MACHINE_NO_SOUND_HW | MACHINE_NOT_WORKING )
 COMP( 2001, ti83pse,    0,      0,      ti83pse, ti82,  ti85_state,  0,     "Texas Instruments", "TI-83 Plus Silver Edition (Boot Code 1.00)",   MACHINE_NO_SOUND_HW | MACHINE_NOT_WORKING )
 COMP( 2004, ti84p,      0,      0,      ti84p,   ti82,  ti85_state,  0,     "Texas Instruments", "TI-84 Plus (Boot Code 1.00)",                  MACHINE_NO_SOUND_HW | MACHINE_NOT_WORKING )
-COMP( 200?, ti84pv2,    ti84p,  0,      ti84pv2, ti82,  ti85_state,  0,     "Texas Instruments", "TI-84 Plus (Boot Code 1.02)",                  MACHINE_NO_SOUND_HW | MACHINE_NOT_WORKING )
+COMP( 200?, ti84pv2,    ti84p,  0,      ti84p,   ti82,  ti85_state,  0,     "Texas Instruments", "TI-84 Plus (Boot Code 1.02)",                  MACHINE_NO_SOUND_HW | MACHINE_NOT_WORKING )
 COMP( 2004, ti84pse,    0,      0,      ti84pse, ti82,  ti85_state,  0,     "Texas Instruments", "TI-84 Plus Silver Edition (Boot Code 1.00)",   MACHINE_NO_SOUND_HW | MACHINE_NOT_WORKING )
