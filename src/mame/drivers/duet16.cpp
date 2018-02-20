@@ -38,6 +38,8 @@ private:
 	DECLARE_WRITE8_MEMBER(pic_w);
 	DECLARE_READ8_MEMBER(dma_mem_r);
 	DECLARE_WRITE8_MEMBER(dma_mem_w);
+	DECLARE_READ8_MEMBER(dmapg_r);
+	DECLARE_WRITE8_MEMBER(dmapg_w);
 	DECLARE_WRITE8_MEMBER(fdcctrl_w);
 	DECLARE_WRITE_LINE_MEMBER(hrq_w);
 	MC6845_UPDATE_ROW(crtc_update_row);
@@ -50,6 +52,7 @@ private:
 	required_device_array<floppy_connector, 2> m_fd;
 	required_memory_region m_chrrom;
 	required_shared_ptr<u16> m_vram;
+	u8 m_dmapg;
 };
 
 READ8_MEMBER(duet16_state::pic_r)
@@ -64,7 +67,7 @@ WRITE8_MEMBER(duet16_state::pic_w)
 
 WRITE8_MEMBER(duet16_state::fdcctrl_w)
 {
-	floppy_image_device *f = m_fd[BIT(data, 2) ? 0 : 1]->get_device();
+	floppy_image_device *f = m_fd[BIT(data, 2) ? 1 : 0]->get_device();
 	m_fdc->set_floppy(f);
 
 	m_fd[0]->get_device()->mon_w(!BIT(data, 0));
@@ -77,12 +80,22 @@ WRITE8_MEMBER(duet16_state::fdcctrl_w)
 
 READ8_MEMBER(duet16_state::dma_mem_r)
 {
-	return m_maincpu->space(AS_PROGRAM).read_byte(offset);
+	return m_maincpu->space(AS_PROGRAM).read_byte((m_dmapg << 16) | offset);
 }
 
 WRITE8_MEMBER(duet16_state::dma_mem_w)
 {
-	m_maincpu->space(AS_PROGRAM).write_byte(offset, data);
+	m_maincpu->space(AS_PROGRAM).write_byte((m_dmapg << 16) | offset, data);
+}
+
+READ8_MEMBER(duet16_state::dmapg_r)
+{
+	return m_dmapg;
+}
+
+WRITE8_MEMBER(duet16_state::dmapg_w)
+{
+	m_dmapg = data & 0xf;
 }
 
 WRITE_LINE_MEMBER(duet16_state::hrq_w)
@@ -95,6 +108,7 @@ ADDRESS_MAP_START(duet16_state::duet16_mem)
 	AM_RANGE(0x00000, 0x9ffff) AM_RAM
 	AM_RANGE(0xb8000, 0xbffff) AM_RAM
 	AM_RANGE(0xc0000, 0xc0fff) AM_RAM AM_SHARE("vram")
+	AM_RANGE(0xf8000, 0xf801f) AM_READWRITE8(dmapg_r, dmapg_w, 0x00ff)
 	AM_RANGE(0xf8000, 0xf801f) AM_DEVREADWRITE8("dmac", am9517a_device, read, write, 0xff00)
 	AM_RANGE(0xf8020, 0xf8023) AM_READWRITE8(pic_r, pic_w, 0x00ff)
 	AM_RANGE(0xf8040, 0xf804f) AM_DEVREADWRITE8("itm", ptm6840_device, read, write, 0x00ff)
