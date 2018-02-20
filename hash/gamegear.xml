@@ -3492,6 +3492,19 @@ a certain item) -->
 			</dataarea>
 		</part>
 	</software>
+	
+	<software name="strtbatl" cloneof="jangpun2">
+		<description>Street Battle (US, SMS Mode, prototype)</description>
+		<year>1993</year>
+		<publisher>Innovation Tech</publisher>
+		<part name="cart" interface="gamegear_cart">
+			<feature name="slot" value="codemasters" />
+			<feature name="pin_42" value="sms_mode" />
+			<dataarea name="rom" size="524288">
+				<rom name="street battle [proto] [sms-gg].sms" size="524288" crc="01a2d595" sha1="434a9a21a2662bff1cd2246528eebce8a5116c1b" offset="000000" />
+			</dataarea>
+		</part>
+	</software>
 
 	<software name="jeopardy">
 		<description>Jeopardy! (USA)</description>
