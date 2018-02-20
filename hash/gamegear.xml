@@ -1939,6 +1939,28 @@ a certain item) -->
 		</part>
 	</software>
 
+	<software name="drsc">
+		<description>David Robinson's Supreme Court (non-playable demo)</description>
+		<year>1991</year>
+		<publisher>Sega</publisher>
+		<part name="cart" interface="gamegear_cart">
+			<dataarea name="rom" size="262144">
+				<rom name="david robinson's supreme court [demo] [proto].gg" size="262144" crc="696f446d" sha1="4bc01fa1c8d1a2b374e9e7d3e2ac75fbfef6ad1f" offset="000000" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="drsch" cloneof="drsc">
+		<description>David Robinson's Supreme Court (non-playable demo, hack)</description>
+		<year>1991</year>
+		<publisher>Sega</publisher>
+		<part name="cart" interface="gamegear_cart">
+			<dataarea name="rom" size="262144">
+				<rom name="david robinson's supreme court [demo] [proto, hacked].gg" size="262144" crc="8953d729" sha1="54aa1bca28596f8335efdc123923d03353b513e2" offset="000000" />
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="deepduck">
 		<description>Deep Duck Trouble Starring Donald Duck (Euro, USA)</description>
 		<year>1994</year>
@@ -8547,6 +8569,17 @@ a certain item) -->
 		<part name="cart" interface="gamegear_cart">
 			<dataarea name="rom" size="131072">
 				<rom name="super off road (usa, europe).bin" size="131072" crc="e8b42b1f" sha1="c5ee89f785c44784867c3b33fd6466fc72e9042c" offset="000000" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="superoffp" cloneof="superoff">
+		<description>Super Off Road (prototype)</description>
+		<year>1992</year>
+		<publisher>Virgin Interactive</publisher>
+		<part name="cart" interface="gamegear_cart">
+			<dataarea name="rom" size="131072">
+				<rom name="super off road [proto].gg" size="131072" crc="a1160814" sha1="5703edeffd93ef20f8ab88ea5160c7ffb41c7a47" offset="000000" />
 			</dataarea>
 		</part>
 	</software>
