@@ -71,7 +71,7 @@ static INPUT_PORTS_START( blocktax )
 INPUT_PORTS_END
 
 MACHINE_CONFIG_START(blocktax_state::blocktax)
-	MCFG_CPU_ADD("maincpu", I80C51, 10_MHz_XTAL) /* P89C51RD2HBA (80C51 with internal flash rom) */
+	MCFG_CPU_ADD("maincpu", I80C51, 30_MHz_XTAL/2) /* P89C51RD2HBA (80C51 with internal flash rom) */
 
 	MCFG_SCREEN_ADD("screen", RASTER)
 	MCFG_SCREEN_REFRESH_RATE(60)
@@ -86,7 +86,7 @@ MACHINE_CONFIG_START(blocktax_state::blocktax)
 
 	MCFG_SPEAKER_STANDARD_MONO("speaker")
 
-	MCFG_OKIM6295_ADD("oki", 10_MHz_XTAL/8, PIN7_HIGH) // clock frequency & pin 7 not verified
+	MCFG_OKIM6295_ADD("oki", 30_MHz_XTAL/16, PIN7_HIGH) // clock frequency & pin 7 not verified
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 1.00)
 MACHINE_CONFIG_END
 
