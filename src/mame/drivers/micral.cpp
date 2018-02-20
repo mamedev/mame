@@ -99,7 +99,7 @@ private:
 
 READ8_MEMBER( micral_state::status_r )
 {
-	return m_uart->get_output_pin(AY31015_DAV) | 4;
+	return m_uart->dav_r() | 4;
 }
 
 READ8_MEMBER( micral_state::unk_r )
@@ -109,9 +109,9 @@ READ8_MEMBER( micral_state::unk_r )
 
 READ8_MEMBER( micral_state::keyin_r )
 {
-	m_uart->set_input_pin(AY31015_RDAV, 0);
+	m_uart->write_rdav(0);
 	u8 result = m_uart->get_received_data();
-	m_uart->set_input_pin(AY31015_RDAV, 1);
+	m_uart->write_rdav(1);
 	return result;
 }
 
@@ -358,16 +358,16 @@ MACHINE_RESET_MEMBER( micral_state, micral )
 	m_maincpu->set_state_int(Z80_PC, 0xf800);
 
 	// no idea if these are hard-coded, or programmable
-	m_uart->set_input_pin(AY31015_XR, 0);
-	m_uart->set_input_pin(AY31015_XR, 1);
-	m_uart->set_input_pin(AY31015_SWE, 0);
-	m_uart->set_input_pin(AY31015_NP, 1);
-	m_uart->set_input_pin(AY31015_TSB, 0);
-	m_uart->set_input_pin(AY31015_NB1, 1);
-	m_uart->set_input_pin(AY31015_NB2, 1);
-	m_uart->set_input_pin(AY31015_EPS, 1);
-	m_uart->set_input_pin(AY31015_CS, 1);
-	m_uart->set_input_pin(AY31015_CS, 0);
+	m_uart->write_xr(0);
+	m_uart->write_xr(1);
+	m_uart->write_swe(0);
+	m_uart->write_np(1);
+	m_uart->write_tsb(0);
+	m_uart->write_nb1(1);
+	m_uart->write_nb2(1);
+	m_uart->write_eps(1);
+	m_uart->write_cs(1);
+	m_uart->write_cs(0);
 }
 
 MACHINE_CONFIG_START(micral_state::micral)

@@ -85,14 +85,14 @@ private:
 
 READ8_MEMBER( hpz80unk_state::port00_r )
 {
-	return (m_uart1->get_output_pin(AY31015_DAV) << 1) | (m_uart1->get_output_pin(AY31015_TBMT)) | 0xfc;
+	return (m_uart1->dav_r() << 1) | (m_uart1->tbmt_r()) | 0xfc;
 }
 
 READ8_MEMBER( hpz80unk_state::port01_r )
 {
-	m_uart1->set_input_pin(AY31015_RDAV, 0);
+	m_uart1->write_rdav(0);
 	uint8_t result = m_uart1->get_received_data();
-	m_uart1->set_input_pin(AY31015_RDAV, 1);
+	m_uart1->write_rdav(1);
 	return result;
 }
 
@@ -109,14 +109,14 @@ READ8_MEMBER( hpz80unk_state::port02_r )
 
 READ8_MEMBER( hpz80unk_state::port03_r )
 {
-	return (m_uart2->get_output_pin(AY31015_DAV) << 1) | (m_uart2->get_output_pin(AY31015_TBMT)) | 0xfc;
+	return (m_uart2->dav_r() << 1) | (m_uart2->tbmt_r()) | 0xfc;
 }
 
 READ8_MEMBER( hpz80unk_state::port04_r )
 {
-	m_uart2->set_input_pin(AY31015_RDAV, 0);
+	m_uart2->write_rdav(0);
 	uint8_t result = m_uart2->get_received_data();
-	m_uart2->set_input_pin(AY31015_RDAV, 1);
+	m_uart2->write_rdav(1);
 	return result;
 }
 
@@ -127,7 +127,7 @@ WRITE8_MEMBER( hpz80unk_state::port04_w )
 
 READ8_MEMBER( hpz80unk_state::port0d_r )
 {
-	return (m_uart3->get_output_pin(AY31015_DAV) << 1) | (m_uart3->get_output_pin(AY31015_TBMT)) | 0xfc;
+	return (m_uart3->dav_r() << 1) | (m_uart3->tbmt_r()) | 0xfc;
 }
 
 WRITE8_MEMBER( hpz80unk_state::port0e_w )
@@ -180,38 +180,38 @@ void hpz80unk_state::machine_reset()
 	m_maincpu->set_pc(0xc000);
 
 	// no idea if these are hard-coded, or programmable
-	m_uart1->set_input_pin(AY31015_XR, 0);
-	m_uart1->set_input_pin(AY31015_XR, 1);
-	m_uart1->set_input_pin(AY31015_SWE, 0);
-	m_uart1->set_input_pin(AY31015_NP, 1);
-	m_uart1->set_input_pin(AY31015_TSB, 0);
-	m_uart1->set_input_pin(AY31015_NB1, 1);
-	m_uart1->set_input_pin(AY31015_NB2, 1);
-	m_uart1->set_input_pin(AY31015_EPS, 1);
-	m_uart1->set_input_pin(AY31015_CS, 1);
-	m_uart1->set_input_pin(AY31015_CS, 0);
+	m_uart1->write_xr(0);
+	m_uart1->write_xr(1);
+	m_uart1->write_swe(0);
+	m_uart1->write_np(1);
+	m_uart1->write_tsb(0);
+	m_uart1->write_nb1(1);
+	m_uart1->write_nb2(1);
+	m_uart1->write_eps(1);
+	m_uart1->write_cs(1);
+	m_uart1->write_cs(0);
 
-	m_uart2->set_input_pin(AY31015_XR, 0);
-	m_uart2->set_input_pin(AY31015_XR, 1);
-	m_uart2->set_input_pin(AY31015_SWE, 0);
-	m_uart2->set_input_pin(AY31015_NP, 1);
-	m_uart2->set_input_pin(AY31015_TSB, 0);
-	m_uart2->set_input_pin(AY31015_NB1, 1);
-	m_uart2->set_input_pin(AY31015_NB2, 1);
-	m_uart2->set_input_pin(AY31015_EPS, 1);
-	m_uart2->set_input_pin(AY31015_CS, 1);
-	m_uart2->set_input_pin(AY31015_CS, 0);
+	m_uart2->write_xr(0);
+	m_uart2->write_xr(1);
+	m_uart2->write_swe(0);
+	m_uart2->write_np(1);
+	m_uart2->write_tsb(0);
+	m_uart2->write_nb1(1);
+	m_uart2->write_nb2(1);
+	m_uart2->write_eps(1);
+	m_uart2->write_cs(1);
+	m_uart2->write_cs(0);
 
-	m_uart3->set_input_pin(AY31015_XR, 0);
-	m_uart3->set_input_pin(AY31015_XR, 1);
-	m_uart3->set_input_pin(AY31015_SWE, 0);
-	m_uart3->set_input_pin(AY31015_NP, 1);
-	m_uart3->set_input_pin(AY31015_TSB, 0);
-	m_uart3->set_input_pin(AY31015_NB1, 1);
-	m_uart3->set_input_pin(AY31015_NB2, 1);
-	m_uart3->set_input_pin(AY31015_EPS, 1);
-	m_uart3->set_input_pin(AY31015_CS, 1);
-	m_uart3->set_input_pin(AY31015_CS, 0);
+	m_uart3->write_xr(0);
+	m_uart3->write_xr(1);
+	m_uart3->write_swe(0);
+	m_uart3->write_np(1);
+	m_uart3->write_tsb(0);
+	m_uart3->write_nb1(1);
+	m_uart3->write_nb2(1);
+	m_uart3->write_eps(1);
+	m_uart3->write_cs(1);
+	m_uart3->write_cs(0);
 	// this should be rom/ram banking
 }
 

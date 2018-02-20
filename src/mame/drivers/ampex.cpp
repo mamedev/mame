@@ -91,10 +91,10 @@ WRITE8_MEMBER(ampex_state::write_5840)
 
 READ8_MEMBER(ampex_state::read_5841)
 {
-	u8 result = m_uart->get_output_pin(AY31015_DAV) << 3;
-	result |= m_uart->get_output_pin(AY31015_OR) << 4;
-	result |= m_uart->get_output_pin(AY31015_PE) << 5;
-	result |= m_uart->get_output_pin(AY31015_FE) << 6;
+	u8 result = m_uart->dav_r() << 3;
+	result |= m_uart->or_r() << 4;
+	result |= m_uart->pe_r() << 5;
+	result |= m_uart->fe_r() << 6;
 	return result;
 }
 
@@ -118,9 +118,9 @@ WRITE8_MEMBER(ampex_state::write_5842)
 
 READ8_MEMBER(ampex_state::read_5843)
 {
-	m_uart->set_input_pin(AY31015_RDAV, 0);
+	m_uart->write_rdav(0);
 	u8 data = m_uart->get_received_data();
-	m_uart->set_input_pin(AY31015_RDAV, 1);
+	m_uart->write_rdav(1);
 	return data;
 }
 
@@ -190,7 +190,7 @@ void ampex_state::machine_start()
 	m_attr_readback = false;
 	m_paged_ram = std::make_unique<u16[]>(0x1800 * 4);
 
-	m_uart->set_input_pin(AY31015_SWE, 0);
+	m_uart->write_swe(0);
 
 	save_item(NAME(m_page));
 	save_item(NAME(m_attr));
