@@ -190,7 +190,8 @@ public:
 	void raster_init(memory_region *texture_rom);
 	void geo_init(memory_region *polygon_rom);
 	DECLARE_READ32_MEMBER(maxx_r);
-	DECLARE_WRITE32_MEMBER(mode_w);
+	DECLARE_READ32_MEMBER(render_mode_r);
+	DECLARE_WRITE32_MEMBER(render_mode_w);
 	DECLARE_WRITE32_MEMBER(model2o_tex_w0);
 	DECLARE_WRITE32_MEMBER(model2o_tex_w1);
 	DECLARE_READ16_MEMBER(lumaram_r);
@@ -294,6 +295,7 @@ protected:
 	virtual void video_start() override;
 	
 private:
+	bool m_render_unk;
 	bool m_render_mode;
 };
 

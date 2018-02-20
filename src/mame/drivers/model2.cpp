@@ -1392,12 +1392,20 @@ WRITE32_MEMBER(model2_state::copro_w)
 }
 #endif
 
-WRITE32_MEMBER(model2_state::mode_w)
+READ32_MEMBER(model2_state::render_mode_r)
+{
+	return (m_render_unk << 14) | (m_render_mode << 2);
+}
+
+WRITE32_MEMBER(model2_state::render_mode_w)
 {
 	// ---- -x-- (1) 60 Hz mode
 	//           (0) 30 Hz mode - skytargt, desert, vstriker, vcop
 	// ---- ---x Test Mode (Host can "access memories that are always being reloaded")
 	m_render_mode = bool(BIT(data,2));
+
+	// undocumented, unknown purpose
+	m_render_unk = bool(BIT(data,14));
 //	osd_printf_debug("Mode = %08X\n", data);
 }
 
@@ -1490,9 +1498,14 @@ ADDRESS_MAP_START(model2_state::model2_base_mem)
 	// "extra" data
 	AM_RANGE(0x06000000, 0x06ffffff) AM_ROM AM_REGION("user1", 0x1000000)
 
-	AM_RANGE(0x10000000, 0x101fffff) AM_WRITE(mode_w)
+	AM_RANGE(0x10000000, 0x101fffff) AM_READWRITE(render_mode_r,render_mode_w)
+//	AM_RANGE(0x10200000, 0x103fffff) renderer status register
 	AM_RANGE(0x10400000, 0x105fffff) AM_READ(polygon_count_r)
-
+//	AM_RANGE(0x10600000, 0x107fffff) polygon data ping
+//	AM_RANGE(0x10800000, 0x109fffff) polygon data pong
+//	AM_RANGE(0x10a00000, 0x10bfffff) fill memory ping
+//	AM_RANGE(0x10c00000, 0x10dfffff) fill memory pong
+	
 	// format is xGGGGGBBBBBRRRRR (512x400)
 	AM_RANGE(0x11600000, 0x1167ffff) AM_RAM AM_SHARE("fbvram1") // framebuffer A (last bronx title screen)
 	AM_RANGE(0x11680000, 0x116fffff) AM_RAM AM_SHARE("fbvram2") // framebuffer B
@@ -1647,6 +1660,7 @@ ADDRESS_MAP_START(model2_state::model2b_crx_mem)
 	AM_RANGE(0x01c00000, 0x01c0001f) AM_READ8(model2_crx_in_r, 0x00ff00ff)
 	AM_RANGE(0x01c00000, 0x01c00003) AM_WRITE(ctrl0_w)
 	AM_RANGE(0x01c00008, 0x01c0000b) AM_WRITENOP
+	AM_RANGE(0x01c00010, 0x01c00013) AM_WRITENOP // gunblade
 	AM_RANGE(0x01c00014, 0x01c00017) AM_WRITE(hotd_lightgun_w)
 	AM_RANGE(0x01c0001c, 0x01c0001f) AM_WRITE(analog_2b_w)
 	AM_RANGE(0x01c00040, 0x01c00043) AM_WRITENOP
