@@ -22,8 +22,8 @@ class decocomn_device : public device_t,
 public:
 	decocomn_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
-	// static configuration
-	static void static_set_palette_tag(device_t &device, const char *tag);
+	// configuration
+	void set_palette_tag(const char *tag);
 
 	DECLARE_WRITE16_MEMBER( buffered_palette_w );
 	DECLARE_WRITE16_MEMBER( palette_dma_w );
@@ -56,6 +56,6 @@ DECLARE_DEVICE_TYPE(DECOCOMN, decocomn_device)
 	MCFG_DEVICE_ADD(_tag, DECOCOMN, 0)
 
 #define MCFG_DECOCOMN_PALETTE(_palette_tag) \
-	decocomn_device::static_set_palette_tag(*device, "^" _palette_tag);
+	downcast<decocomn_device &>(*device).set_palette_tag("^" _palette_tag);
 
 #endif // MAME_VIDEO_DECOCOMN_H

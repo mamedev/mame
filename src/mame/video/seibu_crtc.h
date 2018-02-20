@@ -17,19 +17,19 @@
 //**************************************************************************
 
 #define MCFG_SEIBU_CRTC_DECRYPT_KEY_CB(_devcb) \
-	devcb = &seibu_crtc_device::set_decrypt_key_callback(*device, DEVCB_##_devcb);
+	devcb = &downcast<seibu_crtc_device &>(*device).set_decrypt_key_callback(DEVCB_##_devcb);
 
 #define MCFG_SEIBU_CRTC_LAYER_EN_CB(_devcb) \
-	devcb = &seibu_crtc_device::set_layer_en_callback(*device, DEVCB_##_devcb);
+	devcb = &downcast<seibu_crtc_device &>(*device).set_layer_en_callback(DEVCB_##_devcb);
 
 #define MCFG_SEIBU_CRTC_LAYER_SCROLL_CB(_devcb) \
-	devcb = &seibu_crtc_device::set_layer_scroll_callback(*device, DEVCB_##_devcb);
+	devcb = &downcast<seibu_crtc_device &>(*device).set_layer_scroll_callback(DEVCB_##_devcb);
 
 #define MCFG_SEIBU_CRTC_LAYER_SCROLL_BASE_CB(_devcb) \
-	devcb = &seibu_crtc_device::set_layer_scroll_base_callback(*device, DEVCB_##_devcb);
+	devcb = &downcast<seibu_crtc_device &>(*device).set_layer_scroll_base_callback(DEVCB_##_devcb);
 
 #define MCFG_SEIBU_CRTC_REG_1A_CB(_devcb) \
-	devcb = &seibu_crtc_device::set_reg_1a_callback(*device, DEVCB_##_devcb);
+	devcb = &downcast<seibu_crtc_device &>(*device).set_reg_1a_callback(DEVCB_##_devcb);
 
 
 //**************************************************************************
@@ -46,11 +46,11 @@ public:
 	// construction/destruction
 	seibu_crtc_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
-	template <class Object> static devcb_base &set_decrypt_key_callback(device_t &device, Object &&cb) { return downcast<seibu_crtc_device &>(device).m_decrypt_key_cb.set_callback(std::forward<Object>(cb)); }
-	template <class Object> static devcb_base &set_layer_en_callback(device_t &device, Object &&cb) { return downcast<seibu_crtc_device &>(device).m_layer_en_cb.set_callback(std::forward<Object>(cb)); }
-	template <class Object> static devcb_base &set_layer_scroll_callback(device_t &device, Object &&cb) { return downcast<seibu_crtc_device &>(device).m_layer_scroll_cb.set_callback(std::forward<Object>(cb)); }
-	template <class Object> static devcb_base &set_reg_1a_callback(device_t &device, Object &&cb) { return downcast<seibu_crtc_device &>(device).m_reg_1a_cb.set_callback(std::forward<Object>(cb)); }
-	template <class Object> static devcb_base &set_layer_scroll_base_callback(device_t &device, Object &&cb) { return downcast<seibu_crtc_device &>(device).m_layer_scroll_base_cb.set_callback(std::forward<Object>(cb)); }
+	template <class Object> devcb_base &set_decrypt_key_callback(Object &&cb) { return m_decrypt_key_cb.set_callback(std::forward<Object>(cb)); }
+	template <class Object> devcb_base &set_layer_en_callback(Object &&cb) { return m_layer_en_cb.set_callback(std::forward<Object>(cb)); }
+	template <class Object> devcb_base &set_layer_scroll_callback(Object &&cb) { return m_layer_scroll_cb.set_callback(std::forward<Object>(cb)); }
+	template <class Object> devcb_base &set_reg_1a_callback(Object &&cb) { return m_reg_1a_cb.set_callback(std::forward<Object>(cb)); }
+	template <class Object> devcb_base &set_layer_scroll_base_callback(Object &&cb) { return m_layer_scroll_base_cb.set_callback(std::forward<Object>(cb)); }
 
 	// I/O operations
 	DECLARE_WRITE16_MEMBER( write );

@@ -249,6 +249,7 @@ struct raster_state
 {
 	uint32_t              mode;               /* bit 0 = Test Mode, bit 2 = Switch 60Hz(1)/30Hz(0) operation */
 	uint16_t *            texture_rom;        /* Texture ROM pointer */
+	uint32_t              texture_rom_mask;   /* Texture ROM mask */ 
 	int16_t               viewport[4];        /* View port (startx,starty,endx,endy) */
 	int16_t               center[4][2];       /* Centers (eye 0[x,y],1[x,y],2[x,y],3[x,y]) */
 	uint16_t              center_sel;         /* Selected center */
@@ -275,11 +276,12 @@ struct raster_state
  *
  *******************************************/
 
-void model2_state::model2_3d_init( uint16_t *texture_rom )
+void model2_state::raster_init( memory_region *texture_rom )
 {
 	m_raster = auto_alloc_clear(machine(), <raster_state>());
 
-	m_raster->texture_rom = texture_rom;
+	m_raster->texture_rom = (uint16_t *)texture_rom->base();
+	m_raster->texture_rom_mask = (texture_rom->bytes() / 2) - 1;
 }
 
 /*******************************************
@@ -291,6 +293,14 @@ void model2_state::model2_3d_init( uint16_t *texture_rom )
 WRITE32_MEMBER(model2_state::model2_3d_zclip_w)
 {
 	m_raster->master_z_clip = data;
+}
+
+// TODO: only Sky Target seems to use this for unknown purpose
+READ32_MEMBER(model2_state::polygon_count_r)
+{
+//	printf("%08x\n",m_raster->tri_list_index);
+	
+	return m_raster->tri_list_index;
 }
 
 /*******************************************
@@ -345,7 +355,7 @@ static void model2_3d_process_quad( raster_state *raster, uint32_t attr )
 	if ( raster->command_buffer[0] & 0x800000 )
 		tp = &raster->texture_ram[raster->command_buffer[0] & 0xFFFF];
 	else
-		tp = &raster->texture_rom[raster->command_buffer[0] & 0x7FFFFF];
+		tp = &raster->texture_rom[raster->command_buffer[0] & raster->texture_rom_mask];
 
 	object.v[0].pv = *tp++;
 	object.v[0].pu = *tp++;
@@ -363,7 +373,7 @@ static void model2_3d_process_quad( raster_state *raster, uint32_t attr )
 	if ( raster->command_buffer[1] & 0x800000 )
 		th = &raster->texture_ram[raster->command_buffer[1] & 0xFFFF];
 	else
-		th = &raster->texture_rom[raster->command_buffer[1] & 0x7FFFFF];
+		th = &raster->texture_rom[raster->command_buffer[1] & raster->texture_rom_mask];
 
 	object.texheader[0] = *th++;
 	object.texheader[1] = *th++;
@@ -583,7 +593,7 @@ static void model2_3d_process_triangle( raster_state *raster, uint32_t attr )
 	if ( raster->command_buffer[0] & 0x800000 )
 		tp = &raster->texture_ram[raster->command_buffer[0] & 0xFFFF];
 	else
-		tp = &raster->texture_rom[raster->command_buffer[0] & 0x7FFFFF];
+		tp = &raster->texture_rom[raster->command_buffer[0] & raster->texture_rom_mask];
 
 	object.v[0].pv = *tp++;
 	object.v[0].pu = *tp++;
@@ -599,7 +609,7 @@ static void model2_3d_process_triangle( raster_state *raster, uint32_t attr )
 	if ( raster->command_buffer[1] & 0x800000 )
 		th = &raster->texture_ram[raster->command_buffer[1] & 0xFFFF];
 	else
-		th = &raster->texture_rom[raster->command_buffer[1] & 0x7FFFFF];
+		th = &raster->texture_rom[raster->command_buffer[1] & raster->texture_rom_mask];
 
 	object.texheader[0] = *th++;
 	object.texheader[1] = *th++;
@@ -790,11 +800,11 @@ void model2_renderer::model2_3d_render(triangle *tri, const rectangle &cliprect)
 	renderer = (tri->texheader[0] >> 13) & 7;
 
 	/* calculate and clip to viewport */
-	// TODO: correct? seems to be right for all cases
-	//rectangle vp(tri->viewport[0] - 8, tri->viewport[2] - 8, (384-tri->viewport[3])+90, (384-tri->viewport[1])+90);
-	rectangle vp(tri->viewport[0] - 8, tri->viewport[2] - tri->viewport[0], tri->viewport[1] - 127, tri->viewport[3] - tri->viewport[1]);
+	rectangle vp(tri->viewport[0] - 8, tri->viewport[2] - 8, (384-tri->viewport[3])+90, (384-tri->viewport[1])+90);
+	// TODO: this seems to be more accurate but it breaks in some cases
+	//rectangle vp(tri->viewport[0] - 8, tri->viewport[2] - tri->viewport[0], tri->viewport[1] - 90, tri->viewport[3] - tri->viewport[1]);
 	vp &= cliprect;
-
+	
 	extra.state = &m_state;
 	extra.lumabase = ((tri->texheader[1] & 0xFF) << 7) + ((tri->luma >> 5) ^ 0x7);
 	extra.colorbase = (tri->texheader[3] >> 6) & 0x3FF;
@@ -1174,7 +1184,8 @@ struct geo_state
 {
 	raster_state *          raster;
 	uint32_t              mode;                   /* bit 0 = Enable Specular, bit 1 = Calculate Normals */
-	uint32_t *            polygon_rom;            /* Polygon ROM pointer */
+	uint32_t *          polygon_rom;            /* Polygon ROM pointer */
+	uint32_t            polygon_rom_mask;		/* Polygon ROM mask */
 	float               matrix[12];             /* Current Transformation Matrix */
 	poly_vertex         focus;                  /* Focus (x,y) */
 	poly_vertex         light;                  /* Light Vector */
@@ -1193,13 +1204,14 @@ struct geo_state
  *
  *******************************************/
 
-void model2_state::geo_init( uint32_t *polygon_rom )
+void model2_state::geo_init(memory_region *polygon_rom)
 {
 	m_geo = auto_alloc_clear(machine(), <geo_state>());
 	m_geo->state = this;
 
 	m_geo->raster = m_raster;
-	m_geo->polygon_rom = polygon_rom;
+	m_geo->polygon_rom = (uint32_t *)polygon_rom->base();
+	m_geo->polygon_rom_mask = (polygon_rom->bytes() / 4) - 1;
 }
 
 /*******************************************
@@ -1957,17 +1969,17 @@ static uint32_t * geo_object_data( geo_state *geo, uint32_t opcode, uint32_t *in
 	if ( oba & 0x01000000 )
 	{
 		/* Fast polygon RAM */
-		obp = &geo->polygon_ram0[oba & 0x7FFF];
+		obp = &geo->polygon_ram1[oba & 0x7FFF];
 	}
 	else if ( oba & 0x00800000 )
 	{
 		/* Polygon ROM */
-		obp = &geo->polygon_rom[oba & 0x7FFFFF];
+		obp = &geo->polygon_rom[oba & geo->polygon_rom_mask];
 	}
 	else
 	{
 		/* Slow Polygon RAM */
-		obp = &geo->polygon_ram1[oba & 0x7FFF];
+		obp = &geo->polygon_ram0[oba & 0x7FFF];
 	}
 
 	switch( geo->mode & 3 )
@@ -2123,12 +2135,12 @@ static uint32_t * geo_polygon_data( geo_state *geo, uint32_t opcode, uint32_t *i
 	if ( address & 0x01000000 )
 	{
 		/* Fast polygon RAM */
-		p = &geo->polygon_ram0[address & 0x7FFF];
+		p = &geo->polygon_ram1[address & 0x7FFF];
 	}
 	else
 	{
 		/* Slow Polygon RAM */
-		p = &geo->polygon_ram1[address & 0x7FFF];
+		p = &geo->polygon_ram0[address & 0x7FFF];
 	}
 
 	/* read the count */
@@ -2339,7 +2351,7 @@ static uint32_t * geo_test( geo_state *geo, uint32_t opcode, uint32_t *input )
 		{
 			data = geo->polygon_rom[address++];
 
-			address &= 0x7FFFFF;
+			address &= geo->polygon_rom_mask;
 
 			sum_even += data >> 16;
 			sum_even &= 0xFFFF;
@@ -2510,7 +2522,7 @@ static uint32_t * geo_code_jump( geo_state *geo, uint32_t opcode, uint32_t *inpu
 }
 
 static uint32_t * geo_process_command( geo_state *geo, uint32_t opcode, uint32_t *input, bool *end_code )
-{
+{	
 	switch( (opcode >> 23) & 0x1f )
 	{
 		case 0x00: input = geo_nop( geo, opcode, input );                   break;
@@ -2594,10 +2606,10 @@ void model2_state::video_start()
 	m_poly = auto_alloc(machine(), model2_renderer(*this));
 
 	/* initialize the hardware rasterizer */
-	model2_3d_init( (uint16_t*)memregion("user3")->base() );
+	raster_init( memregion("user3") );
 
 	/* initialize the geometry engine */
-	geo_init( (uint32_t*)memregion("user2")->base() );
+	geo_init( memregion("user2") );
 
 	/* init various video-related pointers */
 	m_palram = make_unique_clear<uint16_t[]>(0x4000/2);
@@ -2645,6 +2657,6 @@ uint32_t model2_state::screen_update_model2(screen_device &screen, bitmap_rgb32 
 		tile->draw(screen, m_sys24_bitmap, cliprect, (layer<<1) | 1, 0, 0);
 
 	copybitmap_trans(bitmap, m_sys24_bitmap, 0, 0, 0, 0, cliprect, 0);
-	
+
 	return 0;
 }

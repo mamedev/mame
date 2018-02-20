@@ -13,9 +13,9 @@ class k007420_device : public device_t
 public:
 	k007420_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
-	static void static_set_palette_tag(device_t &device, const char *tag);
-	static void static_set_bank_limit(device_t &device, int limit) { downcast<k007420_device &>(device).m_banklimit = limit; }
-	static void static_set_callback(device_t &device, k007420_delegate callback) { downcast<k007420_device &>(device).m_callback = callback; }
+	void set_palette_tag(const char *tag);
+	void set_bank_limit(int limit) { m_banklimit = limit; }
+	void set_callback(k007420_delegate callback) { m_callback = callback; }
 
 	DECLARE_READ8_MEMBER( read );
 	DECLARE_WRITE8_MEMBER( write );
@@ -42,13 +42,13 @@ DECLARE_DEVICE_TYPE(K007420, k007420_device)
 	MCFG_DEVICE_ADD(_tag, K007420, 0)
 
 #define MCFG_K007420_PALETTE(_palette_tag) \
-	k007420_device::static_set_palette_tag(*device, "^" _palette_tag);
+	downcast<k007420_device &>(*device).set_palette_tag("^" _palette_tag);
 
 #define MCFG_K007420_BANK_LIMIT(_limit) \
-	k007420_device::static_set_bank_limit(*device, _limit);
+	downcast<k007420_device &>(*device).set_bank_limit(_limit);
 
 #define MCFG_K007420_CALLBACK_OWNER(_class, _method) \
-	k007420_device::static_set_callback(*device, k007420_delegate(&_class::_method, #_class "::" #_method, this));
+	downcast<k007420_device &>(*device).set_callback(k007420_delegate(&_class::_method, #_class "::" #_method, this));
 
 // function definition for a callback
 #define K007420_CALLBACK_MEMBER(_name)     void _name(int *code, int *color)

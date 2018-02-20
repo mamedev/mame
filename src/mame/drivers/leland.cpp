@@ -1508,55 +1508,63 @@ ROM_START( dangerz )
 ROM_END
 
 
+/*
+For Baseball: The Season II, the label format is:
+------------------------
+|(C)1987 Cinematronics | -> Copyright & Manufacturer
+|P/N 03-14115-00       | -> Part number with revision
+|BASEBALL II     U101  | -> Game name & ROM PCB location
+------------------------
+*/
 ROM_START( basebal2 )
 	ROM_REGION( 0x38000, "master", 0 )
-	ROM_LOAD( "14115-00.101",   0x00000, 0x02000, CRC(05231fee) SHA1(d2f4f81309d344576aadb39c209240b901476ac2) )
-	ROM_LOAD( "14116-00.102",   0x10000, 0x02000, CRC(e1482ea3) SHA1(a55b8c99428fefd033ac481944b370a4c82ac134) )
-	ROM_CONTINUE(               0x1c000, 0x02000 )
-	ROM_LOAD( "14117-01.103",   0x12000, 0x02000, CRC(677181dd) SHA1(afc3f33c50551efe5087a3a90f672fe95e3b9087) )
-	ROM_CONTINUE(               0x1e000, 0x02000 )
-	ROM_LOAD( "14118-01.104",   0x14000, 0x02000, CRC(5f570264) SHA1(09bf8ec7e40292e3764d51988d5ed613920869ec) )
-	ROM_CONTINUE(               0x20000, 0x02000 )
-	ROM_LOAD( "14119-01.105",   0x16000, 0x02000, CRC(90822145) SHA1(52c872e69055589936d5804334255ffc70a5892e) )
-	ROM_CONTINUE(               0x22000, 0x02000 )
-	ROM_LOAD( "14120-00.106",   0x18000, 0x02000, CRC(4d2b7217) SHA1(c67cd8361077653f04fc02e8218fd933591d1e45) )
-	ROM_CONTINUE(               0x24000, 0x02000 )
-	ROM_LOAD( "14121-01.107",   0x1a000, 0x02000, CRC(b987b97c) SHA1(d9fb7142cbb29ce4389f38416584037a398d3fe2) )
-	ROM_CONTINUE(               0x26000, 0x02000 )
-	/* Extra banks ( referred to as the "top" board). Probably an add-on */
-	ROM_LOAD( "14122-01.u2t",   0x28000, 0x02000, CRC(a89882d8) SHA1(fb17b527c65f5de271fa756d7e682449c76bd4ad) )
-	ROM_RELOAD(                 0x30000, 0x02000 )
-	ROM_LOAD( "14123-01.u3t",   0x2a000, 0x02000, CRC(f9c51e5a) SHA1(a4ed976b9490457b54f2ac6528cf9f4d04732808) )
-	ROM_RELOAD(                 0x32000, 0x02000 )
+	ROM_LOAD( "03-14115-00.u101",   0x00000, 0x02000, CRC(05231fee) SHA1(d2f4f81309d344576aadb39c209240b901476ac2) )
+	ROM_LOAD( "03-14116-00.u102",   0x10000, 0x02000, CRC(e1482ea3) SHA1(a55b8c99428fefd033ac481944b370a4c82ac134) )
+	ROM_CONTINUE(                   0x1c000, 0x02000 )
+	ROM_LOAD( "03-14117-01.u103",   0x12000, 0x02000, CRC(677181dd) SHA1(afc3f33c50551efe5087a3a90f672fe95e3b9087) )
+	ROM_CONTINUE(                   0x1e000, 0x02000 )
+	ROM_LOAD( "03-14118-01.u104",   0x14000, 0x02000, CRC(5f570264) SHA1(09bf8ec7e40292e3764d51988d5ed613920869ec) )
+	ROM_CONTINUE(                   0x20000, 0x02000 )
+	ROM_LOAD( "03-14119-01.u105",   0x16000, 0x02000, CRC(90822145) SHA1(52c872e69055589936d5804334255ffc70a5892e) )
+	ROM_CONTINUE(                   0x22000, 0x02000 )
+	ROM_LOAD( "03-14120-00.u106",   0x18000, 0x02000, CRC(4d2b7217) SHA1(c67cd8361077653f04fc02e8218fd933591d1e45) )
+	ROM_CONTINUE(                   0x24000, 0x02000 )
+	ROM_LOAD( "03-14121-01.u107",   0x1a000, 0x02000, CRC(b987b97c) SHA1(d9fb7142cbb29ce4389f38416584037a398d3fe2) )
+	ROM_CONTINUE(                   0x26000, 0x02000 )
+	/* Extra banks ( referred to as the "top" board) */
+	ROM_LOAD( "03-14122-01.u2t",    0x28000, 0x02000, CRC(a89882d8) SHA1(fb17b527c65f5de271fa756d7e682449c76bd4ad) )
+	ROM_RELOAD(                     0x30000, 0x02000 )
+	ROM_LOAD( "03-14123-01.u3t",    0x2a000, 0x02000, CRC(f9c51e5a) SHA1(a4ed976b9490457b54f2ac6528cf9f4d04732808) )
+	ROM_RELOAD(                     0x32000, 0x02000 )
 
 	ROM_REGION( 0x28000, "slave", 0 )
-	ROM_LOAD( "14100-01.u3",  0x00000, 0x02000, CRC(1dffbdaf) SHA1(15630a84c6034a13449cd481bcb6a93bdf009d1f) )
-	ROM_LOAD( "14101-01.u4",  0x10000, 0x02000, CRC(c585529c) SHA1(208807c1f8761675903fcf3c590ba3920e980a8b) )
-	ROM_CONTINUE(             0x1c000, 0x02000 )
-	ROM_LOAD( "14102-01.u5",  0x12000, 0x02000, CRC(ace3f918) SHA1(d393f28d0b8c6faf4d76180208deb023f94277fc) )
-	ROM_CONTINUE(             0x1e000, 0x02000 )
-	ROM_LOAD( "14103-01.u6",  0x14000, 0x02000, CRC(cd41cf7a) SHA1(bed00824399cea55017d3cc026ae65ddf7edf5e5) )
-	ROM_CONTINUE(             0x20000, 0x02000 )
-	ROM_LOAD( "14104-01.u7",  0x16000, 0x02000, CRC(9b169e78) SHA1(16ced9610cef997d21668230a5eed6bdfc1df4bd) )
-	ROM_CONTINUE(             0x22000, 0x02000 )
-	ROM_LOAD( "14105-01.u8",  0x18000, 0x02000, CRC(ec596b43) SHA1(230cdfe0ab4dfd837b3fd66acc961a93e196ce2d) )
-	ROM_CONTINUE(             0x24000, 0x02000 )
-	ROM_LOAD( "14106-01.u9",  0x1a000, 0x02000, CRC(b9656baa) SHA1(41b25ee6127981b703859c07f730e94f5694faff) )
-	ROM_CONTINUE(             0x26000, 0x02000 )
+	ROM_LOAD( "03-14100-01.u3",  0x00000, 0x02000, CRC(1dffbdaf) SHA1(15630a84c6034a13449cd481bcb6a93bdf009d1f) )
+	ROM_LOAD( "03-14101-01.u4",  0x10000, 0x02000, CRC(c585529c) SHA1(208807c1f8761675903fcf3c590ba3920e980a8b) )
+	ROM_CONTINUE(                0x1c000, 0x02000 )
+	ROM_LOAD( "03-14102-01.u5",  0x12000, 0x02000, CRC(ace3f918) SHA1(d393f28d0b8c6faf4d76180208deb023f94277fc) )
+	ROM_CONTINUE(                0x1e000, 0x02000 )
+	ROM_LOAD( "03-14103-01.u6",  0x14000, 0x02000, CRC(cd41cf7a) SHA1(bed00824399cea55017d3cc026ae65ddf7edf5e5) )
+	ROM_CONTINUE(                0x20000, 0x02000 )
+	ROM_LOAD( "03-14104-01.u7",  0x16000, 0x02000, CRC(9b169e78) SHA1(16ced9610cef997d21668230a5eed6bdfc1df4bd) )
+	ROM_CONTINUE(                0x22000, 0x02000 )
+	ROM_LOAD( "03-14105-01.u8",  0x18000, 0x02000, CRC(ec596b43) SHA1(230cdfe0ab4dfd837b3fd66acc961a93e196ce2d) )
+	ROM_CONTINUE(                0x24000, 0x02000 )
+	ROM_LOAD( "03-14106-01.u9",  0x1a000, 0x02000, CRC(b9656baa) SHA1(41b25ee6127981b703859c07f730e94f5694faff) )
+	ROM_CONTINUE(                0x26000, 0x02000 )
 
 	ROM_REGION( 0x0c000, "gfx1", 0 )
-	ROM_LOAD( "14112-00.u93", 0x00000, 0x04000, CRC(8ccb1404) SHA1(28ef5a7da1b9edf7ecbba0fd473599df5d181602) )
-	ROM_LOAD( "14113-00.u94", 0x04000, 0x04000, CRC(9941a55b) SHA1(6917b70bb2a7a23c0517fde43e9375a7dbd64c18) )
-	ROM_LOAD( "14114-00.u95", 0x08000, 0x04000, CRC(b68baf47) SHA1(ea1d5efe696af56ef5b9161c00957b2a9c7ce372) )
+	ROM_LOAD( "03-14112-00.u93", 0x00000, 0x04000, CRC(8ccb1404) SHA1(28ef5a7da1b9edf7ecbba0fd473599df5d181602) )
+	ROM_LOAD( "03-14113-00.u94", 0x04000, 0x04000, CRC(9941a55b) SHA1(6917b70bb2a7a23c0517fde43e9375a7dbd64c18) )
+	ROM_LOAD( "03-14114-00.u95", 0x08000, 0x04000, CRC(b68baf47) SHA1(ea1d5efe696af56ef5b9161c00957b2a9c7ce372) )
 
 	ROM_REGION( 0x20000, "user1", 0 )   /* Ordering: 70/92/69/91/68/90/67/89 */
 	/* U70 = Empty */
-	ROM_LOAD( "14111-01.u92",  0x04000, 0x4000, CRC(2508a9ad) SHA1(f0a56d1b8dbe57b16dc1b3d21980149bbdcd0068) )
-	ROM_LOAD( "14109-00.u69",  0x08000, 0x4000, CRC(b123a28e) SHA1(8d244db422aee9117e901e7d150cdefcbf96dd53) )
+	ROM_LOAD( "03-14111-01.u92",  0x04000, 0x4000, CRC(2508a9ad) SHA1(f0a56d1b8dbe57b16dc1b3d21980149bbdcd0068) )
+	ROM_LOAD( "03-14109-00.u69",  0x08000, 0x4000, CRC(b123a28e) SHA1(8d244db422aee9117e901e7d150cdefcbf96dd53) )
 	/* U91 = Empty */
-	ROM_LOAD( "14108-01.u68",  0x10000, 0x4000, CRC(a1a51383) SHA1(6b734c5d82fb8159768f8849a26f5569cab2f074) )
-	ROM_LOAD( "14110-01.u90",  0x14000, 0x4000, CRC(ef01d997) SHA1(693bc42b0aaa436f2734efbe2cfb8c98ad4858c6) )
-	ROM_LOAD( "14107-00.u67",  0x18000, 0x4000, CRC(976334e6) SHA1(5b2534f5ba697bd5bad0aef9cefbb7d1c421c06b) )
+	ROM_LOAD( "03-14108-01.u68",  0x10000, 0x4000, CRC(a1a51383) SHA1(6b734c5d82fb8159768f8849a26f5569cab2f074) )
+	ROM_LOAD( "03-14110-01.u90",  0x14000, 0x4000, CRC(ef01d997) SHA1(693bc42b0aaa436f2734efbe2cfb8c98ad4858c6) )
+	ROM_LOAD( "03-14107-00.u67",  0x18000, 0x4000, CRC(976334e6) SHA1(5b2534f5ba697bd5bad0aef9cefbb7d1c421c06b) )
 	/* 89 = Empty */
 
 	ROM_REGION16_BE( 0x80, "eeprom", 0 )
@@ -1579,7 +1587,7 @@ ROM_START( dblplay )
 	ROM_CONTINUE(               0x24000, 0x02000 )
 	ROM_LOAD( "15024-01.107",   0x1a000, 0x02000, CRC(02afcf52) SHA1(686332740733d92f87fb004de85be4cb9cbaabc0) )
 	ROM_CONTINUE(               0x26000, 0x02000 )
-	/* Extra banks ( referred to as the "top" board). Probably an add-on */
+	/* Extra banks ( referred to as the "top" board) */
 	ROM_LOAD( "15025-01.u2t",   0x28000, 0x02000, CRC(1c959895) SHA1(efd40c1775f8283162602fdb490bfc18ee784a12) )
 	ROM_RELOAD(                 0x30000, 0x02000 )
 	ROM_LOAD( "15026-01.u3t",   0x2a000, 0x02000, CRC(ed5196d6) SHA1(03dbc4fa30cee9e2cc132d1fa1e45ac9f503705a) )
@@ -1622,6 +1630,14 @@ ROM_START( dblplay )
 ROM_END
 
 
+/*
+For Strike Zone, the label format is:
+------------------------
+|(C)1988 Leland Corp.  | -> Copyright & Manufacturer
+|P/N 03-15007-01       | -> Part number with revision
+|STRIKE ZONE     U67   | -> Game name & ROM PCB location
+------------------------
+*/
 ROM_START( strkzone )
 	ROM_REGION( 0x38000, "master", 0 )
 	ROM_LOAD( "strkzone.101",   0x00000, 0x04000, CRC(8d83a611) SHA1(d17114559c8d60e3107895bdcb1886cc843b624c) )
@@ -1637,7 +1653,7 @@ ROM_START( strkzone )
 	ROM_CONTINUE(               0x24000, 0x02000 )
 	ROM_LOAD( "strkzone.107",   0x1a000, 0x02000, CRC(1b4b6c2d) SHA1(9cd5e5ce7bc3088f14b6cbbd7c2d5b5e69a7bc11) )
 	ROM_CONTINUE(               0x26000, 0x02000 )
-	/* Extra banks ( referred to as the "top" board). Probably an add-on */
+	/* Extra banks ( referred to as the "top" board) */
 	ROM_LOAD( "strkzone.u2t",   0x28000, 0x02000, CRC(8e0af06f) SHA1(ad277433a2c97c388e626a0ce9119466dff85d37) )
 	ROM_RELOAD(                 0x30000, 0x02000 )
 	ROM_LOAD( "strkzone.u3t",   0x2a000, 0x02000, CRC(909d35f3) SHA1(2ec51b1591990cf13b71d6c343bfe9540d3c2b69) )
@@ -1671,8 +1687,8 @@ ROM_START( strkzone )
 	ROM_LOAD( "strkzone.u69",  0x08000, 0x4000, CRC(b123a28e) SHA1(8d244db422aee9117e901e7d150cdefcbf96dd53) )
 	/* U91 = Empty */
 	ROM_LOAD( "strkzone.u68",  0x10000, 0x4000, CRC(a1a51383) SHA1(6b734c5d82fb8159768f8849a26f5569cab2f074) )
-	ROM_LOAD( "strkzone.u90",  0x14000, 0x4000, CRC(ef01d997) SHA1(693bc42b0aaa436f2734efbe2cfb8c98ad4858c6) )
-	ROM_LOAD( "strkzone.u67",  0x18000, 0x4000, CRC(976334e6) SHA1(5b2534f5ba697bd5bad0aef9cefbb7d1c421c06b) )
+	ROM_LOAD( "strkzone.u90",  0x14000, 0x4000, CRC(ef01d997) SHA1(693bc42b0aaa436f2734efbe2cfb8c98ad4858c6) ) /* 03-15008-01 ?? */
+	ROM_LOAD( "strkzone.u67",  0x18000, 0x4000, CRC(976334e6) SHA1(5b2534f5ba697bd5bad0aef9cefbb7d1c421c06b) ) /* 03-15007-01 ?? */
 	/* 89 = Empty */
 
 	ROM_REGION16_BE( 0x80, "eeprom", 0 )

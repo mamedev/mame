@@ -50,7 +50,7 @@ public:
 	virtual void device_reset() override;
 	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr) override;
 
-	static void set_gtia_tag(device_t &device, const char *tag) { downcast<antic_device &>(device).m_gtia_tag = tag; }
+	void set_gtia_tag(const char *tag) { m_gtia_tag = tag; }
 
 	DECLARE_READ8_MEMBER( read );
 	DECLARE_WRITE8_MEMBER( write );
@@ -212,7 +212,7 @@ DECLARE_DEVICE_TYPE(ATARI_ANTIC, antic_device)
 
 
 #define MCFG_ANTIC_GTIA(_tag) \
-		antic_device::set_gtia_tag(*device, _tag);
+		downcast<antic_device &>(*device).set_gtia_tag(_tag);
 
 #define MCFG_SCREEN_VISIBLE_AREA_ANTIC() \
 		MCFG_SCREEN_VISIBLE_AREA(antic_device::MIN_X, antic_device::MAX_X, antic_device::MIN_Y, antic_device::MAX_Y)

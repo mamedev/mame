@@ -187,8 +187,8 @@ public:
 	DECLARE_WRITE32_MEMBER(model2_5881prot_w);
 	int first_read;
 
-	void model2_3d_init(uint16_t *texture_rom);
-	void geo_init(uint32_t *polygon_rom);
+	void raster_init(memory_region *texture_rom);
+	void geo_init(memory_region *polygon_rom);
 	DECLARE_READ32_MEMBER(maxx_r);
 	DECLARE_WRITE32_MEMBER(mode_w);
 	DECLARE_WRITE32_MEMBER(model2o_tex_w0);
@@ -292,6 +292,9 @@ public:
 	
 protected:
 	virtual void video_start() override;
+	
+private:
+	bool m_render_mode;
 };
 
 
@@ -345,7 +348,7 @@ public:
 	model2_renderer(model2_state& state)
 		: poly_manager<float, m2_poly_extra_data, 4, 32768>(state.machine())
 		, m_state(state)
-		, m_destmap(state.m_screen->width(), state.m_screen->height())
+		, m_destmap(512, 512)
 	{
 		m_renderfuncs[0] = &model2_renderer::model2_3d_render_0;
 		m_renderfuncs[1] = &model2_renderer::model2_3d_render_1;

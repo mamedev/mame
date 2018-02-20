@@ -16,7 +16,7 @@
 
 #define MCFG_DECODMD_TYPE3_ADD(_tag, _region) \
 	MCFG_DEVICE_ADD(_tag, DECODMD3, 0) \
-	decodmd_type3_device::static_set_gfxregion(*device, _region);
+	downcast<decodmd_type3_device &>(*device).set_gfxregion(_region);
 
 class decodmd_type3_device : public device_t
 {
@@ -33,7 +33,7 @@ public:
 	DECLARE_WRITE16_MEMBER(crtc_register_w);
 	DECLARE_READ16_MEMBER(crtc_status_r);
 
-	static void static_set_gfxregion(device_t &device, const char *tag);
+	void set_gfxregion(const char *tag);
 
 	void decodmd3_map(address_map &map);
 protected:

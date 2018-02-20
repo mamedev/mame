@@ -90,23 +90,23 @@ pc090oj_device::pc090oj_device(const machine_config &mconfig, const char *tag, d
 }
 
 //-------------------------------------------------
-//  static_set_gfxdecode_tag: Set the tag of the
+//  set_gfxdecode_tag: Set the tag of the
 //  gfx decoder
 //-------------------------------------------------
 
-void pc090oj_device::static_set_gfxdecode_tag(device_t &device, const char *tag)
+void pc090oj_device::set_gfxdecode_tag(const char *tag)
 {
-	downcast<pc090oj_device &>(device).m_gfxdecode.set_tag(tag);
+	m_gfxdecode.set_tag(tag);
 }
 
 //-------------------------------------------------
-//  static_set_palette_tag: Set the tag of the
+//  set_palette_tag: Set the tag of the
 //  palette device
 //-------------------------------------------------
 
-void pc090oj_device::static_set_palette_tag(device_t &device, const char *tag)
+void pc090oj_device::set_palette_tag(const char *tag)
 {
-	downcast<pc090oj_device &>(device).m_palette.set_tag(tag);
+	m_palette.set_tag(tag);
 }
 
 //-------------------------------------------------

@@ -14,7 +14,7 @@
 	MCFG_DEVICE_ADD(_tag, K053250, 0) \
 	MCFG_GFX_PALETTE(_palette_tag) \
 	MCFG_VIDEO_SET_SCREEN(_screen_tag) \
-	k053250_device::static_set_offsets(*device, offx, offy);
+	downcast<k053250_device &>(*device).set_offsets(offx, offy);
 
 class k053250_device :  public device_t,
 						public device_gfx_interface,
@@ -23,7 +23,7 @@ class k053250_device :  public device_t,
 public:
 	k053250_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
-	static void static_set_offsets(device_t &device, int offx, int offy);
+	void set_offsets(int offx, int offy);
 
 	DECLARE_READ16_MEMBER(reg_r);
 	DECLARE_WRITE16_MEMBER(reg_w);

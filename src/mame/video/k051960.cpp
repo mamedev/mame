@@ -145,22 +145,20 @@ k051960_device::k051960_device(const machine_config &mconfig, const char *tag, d
 {
 }
 
-void k051960_device::set_plane_order(device_t &device, int order)
+void k051960_device::set_plane_order(int order)
 {
-	k051960_device &dev = downcast<k051960_device &>(device);
-
 	switch (order)
 	{
 		case K051960_PLANEORDER_BASE:
-			device_gfx_interface::static_set_info(dev, gfxinfo);
+			device_gfx_interface::static_set_info(*this, gfxinfo);
 			break;
 
 		case K051960_PLANEORDER_MIA:
-			device_gfx_interface::static_set_info(dev, gfxinfo_reverse);
+			device_gfx_interface::static_set_info(*this, gfxinfo_reverse);
 			break;
 
 		case K051960_PLANEORDER_GRADIUS3:
-			device_gfx_interface::static_set_info(dev, gfxinfo_gradius3);
+			device_gfx_interface::static_set_info(*this, gfxinfo_gradius3);
 			break;
 
 		default:
@@ -172,10 +170,9 @@ void k051960_device::set_plane_order(device_t &device, int order)
 //  set_screen_tag - set screen we are attached to
 //-------------------------------------------------
 
-void k051960_device::set_screen_tag(device_t &device, const char *tag)
+void k051960_device::set_screen_tag(const char *tag)
 {
-	k051960_device &dev = dynamic_cast<k051960_device &>(device);
-	dev.m_screen.set_tag(tag);
+	m_screen.set_tag(tag);
 }
 
 //-------------------------------------------------

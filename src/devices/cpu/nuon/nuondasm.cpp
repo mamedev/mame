@@ -53,11 +53,15 @@
   0000 01vv vvvn nnnn                                                                    [alu] add #v/5u, rn
   0000 11mm m00n nn00                                                                    [alu] add_sv vm, vn
   0000 11nn nnn0 0011                                                                    [alu] abs rn
+  0001 10vv vvvn nnnn                                                                    [alu] eor #v/5s, rn
   0001 11mm mmmn nnnn                                                                    [alu] cmp rm, rn
   0010 00vv vvvn nnnn                                                                    [alu] cmp #v/5u, rn
   0010 01mm mmmn nnnn                                                                    [alu] and rm, rn
+  0010 10mm mmmn nnnn                                                                    [alu] or rm, rn
+  0010 11mm mmmn nnnn                                                                    [alu] eor rm, rn
   0011 00nn nnnd dddd                                                                    [alu] asl #(32 - (d/5u) & 31, rn
   0011 01nn nnnd dddd                                                                    [alu] asr #d/5u, rn
+  0011 10nn nnnd dddd                                                                    [alu] lsr #d/5u, rn
   0011 11nn nnnd dddd                                                                    [alu] btst #d/5u, rn
 
   f100 10mm mmmn nnnn                                                                    [mem] ld_s (rm), rn
@@ -77,12 +81,14 @@
   f111 00cc ccc1 0101                                                                    [ecu] rti cc, (rzi2), nop
   f111 01mm mmmn n0ab                                                                    [rcu] addr rm, rx
   f111 01vv vvvn n1ab                                                                    [rcu] addr #v/5s << 16, rx
+  f111 1000 000n n1ab                                                                    [rcu] modulo rx
   f111 1001 0000 01ab                                                                    [rcu] dec_only
 
   1000 0001 0000 0000                                                                    [???] nop/pad
   1000 0011 0000 0000                                                                    [???] breakpoint
 
   1000 1xxx xxxx xxxx . xxxx xxxx xxxx xxxx . 0000 01ww wwwn nnnn                        [alu] add #xw/32s, rn
+  1000 1xxx xxxx xxxx . xxxx xxxx xxxx xxxx . 0001 10ww wwwn nnnn                        [alu] eor #xw/32s, rn
   1000 1xxx xxxx xxxx . xxxx xxxx xxxx xxxx . 0010 00ww wwwn nnnn                        [alu] cmp #xw/32s, rn
   1000 1xxx xxxx xxxx . xxxx xxxx xxxx xxxx . f101 11nn nnnw wwww                        [mem] mv_s #xw/32s, rn
   1000 1xxx xxxx xxxx . xxxx xxxx xxxx x0CC . f110 10cc cvvv vvvv                        [ecu] bra cC, pc + #xv/31s << 1      (asm only wants 28 bits?)
@@ -97,6 +103,12 @@
   1000 1xxx xxxx xxxx . xxxx xxxx xxxx xxxx . 1001 10nn nnnv vvvv . 1011 0010 1000 0000  [alu] cmp rn, #xv/32s
   1000 1xxx xxxx xxxx . xxxx xxxx xxxx xxxx . 1001 10ww wwwm mmmm . 1011 0011 001n nnnn  [alu] and #xw/32s, rm, rn
   1000 1xxx xxxx xxxx . xxxx xxxx xxxx xxxx . 1001 10nn nnnm mmmm . 1011 0011 011w wwww  [alu] and #xw/32s, >>rm, rn
+  1000 1xxx xxxx xxxx . xxxx xxxx xxxx xxxx . 1001 10ww wwwn nnnn . 1011 0100 0010 0000  [alu] ftst #xw/32s, rn
+  1000 1xxx xxxx xxxx . xxxx xxxx xxxx xxxx . 1001 10nn nnnm mmmm . 1011 0100 011w wwww  [alu] ftst #xw/32s, >>rm, rn
+  1000 1xxx xxxx xxxx . xxxx xxxx xxxx xxxx . 1001 10ww wwwm mmmm . 1011 0101 001n nnnn  [alu] or #xw/32s, rm, rn
+  1000 1xxx xxxx xxxx . xxxx xxxx xxxx xxxx . 1001 10nn nnnm mmmm . 1011 0101 011w wwww  [alu] or #xw/32s, >>rm, rn
+  1000 1xxx xxxx xxxx . xxxx xxxx xxxx xxxx . 1001 10ww wwwm mmmm . 1011 0110 001n nnnn  [alu] eor #xw/32s, rm, rn
+  1000 1xxx xxxx xxxx . xxxx xxxx xxxx xxxx . 1001 10nn nnnm mmmm . 1011 0110 011w wwww  [alu] eor #xw/32s, >>rm, rn
   1000 1xxx xxxx xxxx . xxxx xxxx xxxx xxxx . 1001 10ww wwwm mmmm . 1011 1100 001n nnnn  [alu] addwc #xw/32s, rm, rn
   1000 1xxx xxxx xxxx . xxxx xxxx xxxx xxxx . 1001 10vv vvvn nnnn . 1011 1110 0010 0000  [alu] cmpwc #xv/32s, rn
   1000 1xxx xxxx xxxx . xxxx xxxx xxxx xxxx . 1001 10nn nnnv vvvv . 1011 1110 1000 0000  [alu] cmpwc rn, #xv/32s
@@ -115,10 +127,42 @@
   1001 00cc cccv vvvv . 101f 1101 0www wwww                                              [ecu] jsr cc, 20300000 + wv/12u << 1, nop
   1001 00cc cccn nnnn . 101f 1110 8000 0000                                              [ecu] jmp cc, (rn)
   1001 00cc cccn nnnn . 101f 1111 0000 0000                                              [ecu] jsr cc, (rn), nop
+
+  1001 01mm mmmn nnnn . 101f 0000 00oo oooo                                              [mem] ld_b 20000000 + om/11u, rn
+  1001 01mm mmmn nnnn . 101f 0000 01oo oooo                                              [mem] ld_b 20100000 + om/11u, rn
+  1001 01mm mmmn nnnn . 101f 0000 10oo oooo                                              [mem] ld_b 20500000 + om/11u, rn
+  1001 01mm mmmn nnnn . 101f 0001 00oo oooo                                              [mem] ld_w 20000000 + om/11u << 1, rn
+  1001 01mm mmmn nnnn . 101f 0001 01oo oooo                                              [mem] ld_w 20100000 + om/11u << 1, rn
+  1001 01mm mmmn nnnn . 101f 0001 10oo oooo                                              [mem] ld_w 20500000 + om/11u << 1, rn
   1001 01mm mmmn nnnn . 101f 0010 00oo oooo                                              [mem] ld_s 20000000 + om/11u << 2, rn
   1001 01mm mmmn nnnn . 101f 0010 01oo oooo                                              [mem] ld_s 20100000 + om/11u << 2, rn
   1001 01mm mmmn nnnn . 101f 0010 10oo oooo                                              [mem] ld_s 20500000 + om/11u << 2, rn
+  1001 01mm mmmn nn00 . 101f 0011 00oo oooo                                              [mem] ld_sv 20000000 + om/11u << 3, vn
+  1001 01mm mmmn nn00 . 101f 0011 01oo oooo                                              [mem] ld_sv 20100000 + om/11u << 3, vn
+  1001 01mm mmmn nn00 . 101f 0011 10oo oooo                                              [mem] ld_sv 20500000 + om/11u << 3, vn
+  1001 01mm mmmn nn01 . 101f 0011 00oo oooo                                              [mem] ld_v 20000000 + om/11u << 4, vn
+  1001 01mm mmmn nn01 . 101f 0011 01oo oooo                                              [mem] ld_v 20100000 + om/11u << 4, vn
+  1001 01mm mmmn nn01 . 101f 0011 10oo oooo                                              [mem] ld_v 20500000 + om/11u << 4, vn
+  1001 01mm mmmn nn10 . 101f 0011 00oo oooo                                              [mem] ld_p 20000000 + om/11u << 1, vn
+  1001 01mm mmmn nn10 . 101f 0011 01oo oooo                                              [mem] ld_p 20100000 + om/11u << 1, vn
+  1001 01mm mmmn nn10 . 101f 0011 10oo oooo                                              [mem] ld_p 20500000 + om/11u << 1, vn
+  1001 01mm mmmn nn11 . 101f 0011 00oo oooo                                              [mem] ld_pz 20000000 + om/11u << 1, vn
+  1001 01mm mmmn nn11 . 101f 0011 01oo oooo                                              [mem] ld_pz 20100000 + om/11u << 1, vn
+  1001 01mm mmmn nn11 . 101f 0011 10oo oooo                                              [mem] ld_pz 20500000 + om/11u << 1, vn
+  1001 0100 000n nnnn . 101f 0100 0000 0000                                              [mem] ld_b (rm), rn
+  1001 01mm mmmn nnnn . 101f 0100 0000 001u                                              [mem] ld_b (xy), rn
+  1001 0100 000n nnnn . 101f 0100 0000 0100                                              [mem] ld_w (rm), rn
+  1001 01mm mmmn nnnn . 101f 0100 0000 011u                                              [mem] ld_w (xy), rn
   1001 0100 000n nnnn . 101f 0100 0000 101u                                              [mem] ld_s (xy), rn
+  1001 0100 000n nn00 . 101f 0100 0000 1100                                              [mem] ld_sv (rm), rn
+  1001 01mm mmmn nn00 . 101f 0100 0000 111u                                              [mem] ld_sv (xy), rn
+  1001 0100 000n nn00 . 101f 0100 0001 0000                                              [mem] ld_v (rm), rn
+  1001 01mm mmmn nn00 . 101f 0100 0001 001u                                              [mem] ld_v (xy), rn
+  1001 0100 000n nn00 . 101f 0100 0001 0100                                              [mem] ld_p (rm), rn
+  1001 01mm mmmn nn00 . 101f 0100 0001 011u                                              [mem] ld_p (xy), rn
+  1001 0100 000n nn00 . 101f 0100 0001 1000                                              [mem] ld_pz (rm), rn
+  1001 01mm mmmn nn00 . 101f 0100 0001 101u                                              [mem] ld_pz (xy), rn
+  1001 01mm mmmn nn00 . 101f 0101 0000 0000                                              [mem] mirror rm, rn
   1001 01nn nnnv vvvv . 101f 0110 0www wwww                                              [mem] mv_s #wv/12s, rn
   1001 01mm mmmn nnnn . 101f 1010 00oo oooo                                              [mem] st_s rn, 20000000 + om/11u << 2
   1001 01mm mmmn nnnn . 101f 1010 01oo oooo                                              [mem] st_s rn, 20100000 + om/11u << 2
@@ -130,6 +174,7 @@
   1001 01nn nnnm mm00 . 101f 1100 0001 0000                                              [mem] st_v vm, (rn)
   1001 0100 000n nn00 . 101f 1100 0001 001u                                              [mem] st_v vn, (xy)
   1001 01mm mmmv vvvv . 101f 111o ooow wwww                                              [mem] st_s #wv/10u, 20500000 + om/9 << 4
+
   1001 10oo ooom mmmm . 1011 0000 000n nnnn                                              [alu] add ro, rm, rn
   1001 10vv vvvm mmmm . 1011 0000 001n nnnn                                              [alu] add #v/5u, rm, rn
   1001 10vv vvvn nnnn . 1011 0000 010w wwww                                              [alu] add #wv/10u, rn
@@ -148,12 +193,36 @@
   1001 10oo ooon nnnn . 1011 0011 100d dddd                                              [alu] and ro, >>#d/5s, rn
   1001 10oo ooom mmmm . 1011 0011 101n nnnn                                              [alu] and ro, >>rm, rn
   1001 10oo ooom mmmm . 1011 0011 110n nnnn                                              [alu] and ro, <>rm, rn
+  1001 10mm mmmn nnnn . 1011 0100 0000 0000                                              [alu] ftst rm, rn
+  1001 10vv vvvn nnnn . 1011 0100 0010 0000                                              [alu] ftst #v/5s, rn
+  1001 10vv vvvn nnnn . 1011 0100 010d dddd                                              [alu] ftst #v/5s, <>#d/5s, rn
+  1001 10nn nnnm mmmm . 1011 0100 011v vvvv                                              [alu] ftst #v/5s, >>rm, rn
+  1001 10oo ooon nnnn . 1011 0100 100d dddd                                              [alu] ftst ro, >>#d/5s, rn
+  1001 10oo ooom mmmm . 1011 0100 101n nnnn                                              [alu] ftst ro, >>rm, rn
+  1001 10oo ooom mmmm . 1011 0100 110n nnnn                                              [alu] ftst ro, <>rm, rn
+  1001 10oo ooom mmmm . 1011 0101 000n nnnn                                              [alu] or ro, rm, rn
+  1001 10oo ooom mmmm . 1011 0101 001n nnnn                                              [alu] or #v/5s, rm, rn
+  1001 10vv vvvn nnnn . 1011 0101 010d dddd                                              [alu] or #v/5s, <>#d/5s, rn
+  1001 10nn nnnm mmmm . 1011 0101 011v vvvv                                              [alu] or #v/5s, >>rm, rn
+  1001 10oo ooon nnnn . 1011 0101 100d dddd                                              [alu] or ro, >>#d/5s, rn
+  1001 10oo ooom mmmm . 1011 0101 101n nnnn                                              [alu] or ro, >>rm, rn
+  1001 10oo ooom mmmm . 1011 0101 110n nnnn                                              [alu] or ro, <>rm, rn
+  1001 10oo ooom mmmm . 1011 0110 000n nnnn                                              [alu] eor ro, rm, rn
+  1001 10oo ooom mmmm . 1011 0110 001n nnnn                                              [alu] eor #v/5s, rm, rn
+  1001 10vv vvvn nnnn . 1011 0110 010d dddd                                              [alu] eor #v/5s, <>#d/5s, rn
+  1001 10nn nnnm mmmm . 1011 0110 011v vvvv                                              [alu] eor #v/5s, >>rm, rn
+  1001 10oo ooon nnnn . 1011 0110 100d dddd                                              [alu] eor ro, >>#d/5s, rn
+  1001 10oo ooom mmmm . 1011 0110 101n nnnn                                              [alu] eor ro, >>rm, rn
+  1001 10oo ooom mmmm . 1011 0110 110n nnnn                                              [alu] eor ro, <>rm, rn
   1001 10mm mmmo oooo . 1011 0111 000n nnnn                                              [alu] as >>ro, rm, rn
   1001 10mm mmmn nnnn . 1011 0111 001d dddd                                              [alu] asl #(32 - (d/5u) & 31, rm, rn
   1001 10mm mmmn nnnn . 1011 0111 010d dddd                                              [alu] asr #d/5u, rm, rn
+  1001 10mm mmmo oooo . 1011 0111 011n nnnn                                              [alu] ls >>ro, rm, rn
+  1001 10mm mmmn nnnn . 1011 0111 100d dddd                                              [alu] lsr #d/5u, rm, rn
   1001 10nn nnnm mmmm . 1011 1000 000v vvvv                                              [alu] bits #v/5u, >>rm, rn
   1001 10nn nnnd dddd . 1011 1000 001v vvvv                                              [alu] bits #v/5u, >>#d/5u, rn
   1001 10oo ooom mmmm . 1011 1000 010n nnnn                                              [alu] butt ro, rm, rn
+  1001 10nn nnnm mmmm . 1011 1001 1000 0000                                              [alu] msb rm, rn
   1001 10oo ooom mmmm . 1011 1100 000n nnnn                                              [alu] addwc ro, rm, rn
   1001 10vv vvvm mmmm . 1011 1100 001n nnnn                                              [alu] addwc #v/5u, rm, rn
   1001 10vv vvvn nnnn . 1011 1100 010w wwww                                              [alu] addwc #wv/10u, rn
@@ -165,6 +234,9 @@
   1001 10nn nnnv vvvv . 1011 1110 1000 0000                                              [alu] cmpwc rm, #v/5u
   1001 10mm mmmn nnnn . 1011 1110 101d dddd                                              [alu] cmpwc rm, >>#d/5s, rn
   1001 11oo ooom mm00 . 101f 1100 000n nnnn                                              [mul] dotp ro, vm, >>svshift, rn
+  1001 11oo ooom mm00 . 101f 1100 1ssn nnnn                                              [mul] dotp ro, vm, >>#svs, rn
+  1001 11oo o00m mm00 . 101f 1101 000n nnnn                                              [mul] dotp vo, vm, >>svshift, rn
+  1001 11oo o00m mm00 . 101f 1101 1ssn nnnn                                              [mul] dotp vo, vm, >>#svs, rn
   1001 11mm mmmo oooo . 101f 1110 100n nnnn                                              [mul] addm ro, rm, rn
 */
 
@@ -264,10 +336,16 @@ std::string nuon_disassembler::dec(u16 opc, std::string r) const
 	return r;
 }
 
-std::string nuon_disassembler::xy(u32 sel) const
+std::string nuon_disassembler::xy(u16 sel) const
 {
 	static const char *const regs[2] = { "(uv)", "(xy)" };
 	return regs[sel];
+}
+
+u32 nuon_disassembler::svs(u16 sel) const
+{
+	static const u32 shifts[4] = { 16, 24, 32, 30 };
+	return shifts[sel];
 }
 
 bool nuon_disassembler::m(u16 val, u16 mask, u16 test) const
@@ -331,11 +409,15 @@ std::string nuon_disassembler::parse_packet(const data_buffer &opcodes, offs_t &
 		if(m(opc1, 0xfc00, 0x0400)) return util::string_format("add #%s, r%d", u2x(b(opc1, 5, 5, 0), 5), b(opc1, 0, 5, 0));
 		if(m(opc1, 0xfc63, 0x0c00)) return util::string_format("add_sv v%d, v%d", b(opc1, 7, 3, 0), b(opc1, 2, 3, 0));
 		if(m(opc1, 0xfc1f, 0x0c03)) return util::string_format("abs r%d", b(opc1, 5, 5, 0));
+		if(m(opc1, 0xfc00, 0x1800)) return util::string_format("eor #%s, r%d", s2x(b(opc1, 5, 5, 0), 5), b(opc1, 0, 5, 0));
 		if(m(opc1, 0xfc00, 0x1c00)) return util::string_format("cmp r%d, r%d", b(opc1, 5, 5, 0), b(opc1, 0, 5, 0));
 		if(m(opc1, 0xfc00, 0x2000)) return util::string_format("cmp #%s, r%d", u2x(b(opc1, 5, 5, 0), 5), b(opc1, 0, 5, 0));
 		if(m(opc1, 0xfc00, 0x2400)) return util::string_format("and r%d, r%d", b(opc1, 5, 5, 0), b(opc1, 0, 5, 0));
+		if(m(opc1, 0xfc00, 0x2800)) return util::string_format("or r%d, r%d", b(opc1, 5, 5, 0), b(opc1, 0, 5, 0));
+		if(m(opc1, 0xfc00, 0x2c00)) return util::string_format("eor r%d, r%d", b(opc1, 5, 5, 0), b(opc1, 0, 5, 0));
 		if(m(opc1, 0xfc00, 0x3000)) return util::string_format("asl #%d, r%d", (32 - b(opc1, 0, 5, 0)) & 31, b(opc1, 5, 5, 0));
 		if(m(opc1, 0xfc00, 0x3400)) return util::string_format("asr #%d, r%d", b(opc1, 0, 5, 0), b(opc1, 5, 5, 0));
+		if(m(opc1, 0xfc00, 0x3800)) return util::string_format("asr #%d, r%d", b(opc1, 0, 5, 0), b(opc1, 5, 5, 0));
 		if(m(opc1, 0xfc00, 0x3c00)) return util::string_format("btst #%d, r%d", b(opc1, 0, 5, 0), b(opc1, 5, 5, 0));
 
 		return util::string_format("?%04x", opc1);
@@ -368,6 +450,7 @@ std::string nuon_disassembler::parse_packet(const data_buffer &opcodes, offs_t &
 		// 16-bits rcu
 		if(m(opc1, 0x7c04, 0x7400)) return dec(opc1, util::string_format("addr r%d, %s", b(opc1, 5, 5, 0), rx(b(opc1, 3, 2, 0))));
 		if(m(opc1, 0x7c04, 0x7404)) return dec(opc1, util::string_format("addr %s << 16, %s", u2x(b(opc1, 5, 5, 0), 5), rx(b(opc1, 3, 2, 0))));
+		if(m(opc1, 0x7fe4, 0x7804)) return dec(opc1, util::string_format("modulo %s", rx(b(opc1, 3, 2, 0))));
 		if(m(opc1, 0x7ffc, 0x7904)) return dec(opc1);
 		
 		return util::string_format("?%04x", opc1);
@@ -406,10 +489,41 @@ std::string nuon_disassembler::parse_packet(const data_buffer &opcodes, offs_t &
 		if(m(opc1, 0xfc00, 0x9000) && m(opc2, 0xefff, 0xaf00)) return util::string_format("jsr %s(r%d), nop", cc(b(opc1, 5, 5, 0), true), b(opc1, 0, 5, 0));
 
 		// 32-bit mem instructions
+		if(m(opc1, 0xfc00, 0x9400) && m(opc2, 0xefc0, 0xa000)) return util::string_format("ld_b %s, r%d", reg(0x20000000 | b(opc2, 0, 6, 5) | b(opc1, 5, 5, 0)), b(opc1, 0, 5, 0));
+		if(m(opc1, 0xfc00, 0x9400) && m(opc2, 0xefc0, 0xa040)) return util::string_format("ld_b %s, r%d", reg(0x20100000 | b(opc2, 0, 6, 5) | b(opc1, 5, 5, 0)), b(opc1, 0, 5, 0));
+		if(m(opc1, 0xfc00, 0x9400) && m(opc2, 0xefc0, 0xa080)) return util::string_format("ld_b %s, r%d", reg(0x20500000 | b(opc2, 0, 6, 5) | b(opc1, 5, 5, 0)), b(opc1, 0, 5, 0));
+		if(m(opc1, 0xfc00, 0x9400) && m(opc2, 0xefc0, 0xa100)) return util::string_format("ld_w %s, r%d", reg(0x20000000 | b(opc2, 0, 6, 6) | b(opc1, 5, 5, 1)), b(opc1, 0, 5, 0));
+		if(m(opc1, 0xfc00, 0x9400) && m(opc2, 0xefc0, 0xa140)) return util::string_format("ld_w %s, r%d", reg(0x20100000 | b(opc2, 0, 6, 6) | b(opc1, 5, 5, 1)), b(opc1, 0, 5, 0));
+		if(m(opc1, 0xfc00, 0x9400) && m(opc2, 0xefc0, 0xa180)) return util::string_format("ld_w %s, r%d", reg(0x20500000 | b(opc2, 0, 6, 6) | b(opc1, 5, 5, 1)), b(opc1, 0, 5, 0));
 		if(m(opc1, 0xfc00, 0x9400) && m(opc2, 0xefc0, 0xa200)) return util::string_format("ld_s %s, r%d", reg(0x20000000 | b(opc2, 0, 6, 7) | b(opc1, 5, 5, 2)), b(opc1, 0, 5, 0));
 		if(m(opc1, 0xfc00, 0x9400) && m(opc2, 0xefc0, 0xa240)) return util::string_format("ld_s %s, r%d", reg(0x20100000 | b(opc2, 0, 6, 7) | b(opc1, 5, 5, 2)), b(opc1, 0, 5, 0));
 		if(m(opc1, 0xfc00, 0x9400) && m(opc2, 0xefc0, 0xa280)) return util::string_format("ld_s %s, r%d", reg(0x20500000 | b(opc2, 0, 6, 7) | b(opc1, 5, 5, 2)), b(opc1, 0, 5, 0));
+		if(m(opc1, 0xfc03, 0x9400) && m(opc2, 0xefc0, 0xa300)) return util::string_format("ld_sv %s, v%d", reg(0x20000000 | b(opc2, 0, 6, 8) | b(opc1, 5, 5, 3)), b(opc1, 2, 3, 0));
+		if(m(opc1, 0xfc03, 0x9400) && m(opc2, 0xefc0, 0xa340)) return util::string_format("ld_sv %s, v%d", reg(0x20100000 | b(opc2, 0, 6, 8) | b(opc1, 5, 5, 3)), b(opc1, 2, 3, 0));
+		if(m(opc1, 0xfc03, 0x9400) && m(opc2, 0xefc0, 0xa380)) return util::string_format("ld_sv %s, v%d", reg(0x20500000 | b(opc2, 0, 6, 8) | b(opc1, 5, 5, 3)), b(opc1, 2, 3, 0));
+		if(m(opc1, 0xfc03, 0x9401) && m(opc2, 0xefc0, 0xa300)) return util::string_format("ld_v %s, v%d", reg(0x20000000 | b(opc2, 0, 6, 9) | b(opc1, 5, 5, 4)), b(opc1, 2, 3, 0));
+		if(m(opc1, 0xfc03, 0x9401) && m(opc2, 0xefc0, 0xa340)) return util::string_format("ld_v %s, v%d", reg(0x20100000 | b(opc2, 0, 6, 9) | b(opc1, 5, 5, 4)), b(opc1, 2, 3, 0));
+		if(m(opc1, 0xfc03, 0x9401) && m(opc2, 0xefc0, 0xa380)) return util::string_format("ld_v %s, v%d", reg(0x20500000 | b(opc2, 0, 6, 9) | b(opc1, 5, 5, 4)), b(opc1, 2, 3, 0));
+		if(m(opc1, 0xfc03, 0x9402) && m(opc2, 0xefc0, 0xa300)) return util::string_format("ld_p %s, v%d", reg(0x20000000 | b(opc2, 0, 6, 6) | b(opc1, 5, 5, 1)), b(opc1, 2, 3, 0));
+		if(m(opc1, 0xfc03, 0x9402) && m(opc2, 0xefc0, 0xa340)) return util::string_format("ld_p %s, v%d", reg(0x20100000 | b(opc2, 0, 6, 6) | b(opc1, 5, 5, 1)), b(opc1, 2, 3, 0));
+		if(m(opc1, 0xfc03, 0x9402) && m(opc2, 0xefc0, 0xa380)) return util::string_format("ld_p %s, v%d", reg(0x20500000 | b(opc2, 0, 6, 6) | b(opc1, 5, 5, 1)), b(opc1, 2, 3, 0));
+		if(m(opc1, 0xfc03, 0x9403) && m(opc2, 0xefc0, 0xa300)) return util::string_format("ld_pz %s, v%d", reg(0x20000000 | b(opc2, 0, 6, 6) | b(opc1, 5, 5, 1)), b(opc1, 2, 3, 0));
+		if(m(opc1, 0xfc03, 0x9403) && m(opc2, 0xefc0, 0xa340)) return util::string_format("ld_pz %s, v%d", reg(0x20100000 | b(opc2, 0, 6, 6) | b(opc1, 5, 5, 1)), b(opc1, 2, 3, 0));
+		if(m(opc1, 0xfc03, 0x9403) && m(opc2, 0xefc0, 0xa380)) return util::string_format("ld_pz %s, v%d", reg(0x20500000 | b(opc2, 0, 6, 6) | b(opc1, 5, 5, 1)), b(opc1, 2, 3, 0));
+		if(m(opc1, 0xfc00, 0x9400) && m(opc2, 0xefff, 0xa400)) return util::string_format("ld_b r%d, r%d", b(opc1, 5, 5, 0), b(opc1, 0, 5, 0));
+		if(m(opc1, 0xffe0, 0x9400) && m(opc2, 0xeffe, 0xa402)) return util::string_format("ld_b %s, r%d", xy(b(opc2, 0, 1, 0)), b(opc1, 0, 5, 0));
+		if(m(opc1, 0xfc00, 0x9400) && m(opc2, 0xefff, 0xa404)) return util::string_format("ld_w r%d, r%d", b(opc1, 5, 5, 0), b(opc1, 0, 5, 0));
+		if(m(opc1, 0xffe0, 0x9400) && m(opc2, 0xeffe, 0xa406)) return util::string_format("ld_w %s, r%d", xy(b(opc2, 0, 1, 0)), b(opc1, 0, 5, 0));
 		if(m(opc1, 0xffe0, 0x9400) && m(opc2, 0xeffe, 0xa40a)) return util::string_format("ld_s %s, r%d", xy(b(opc2, 0, 1, 0)), b(opc1, 0, 5, 0));
+		if(m(opc1, 0xfc03, 0x9400) && m(opc2, 0xefff, 0xa40c)) return util::string_format("ld_sv r%d, %d", b(opc1, 5, 5, 0), b(opc1, 2, 3, 0));
+		if(m(opc1, 0xffe3, 0x9400) && m(opc2, 0xeffe, 0xa40e)) return util::string_format("ld_sv %s, v%d", xy(b(opc2, 0, 1, 0)), b(opc1, 2, 3, 0));
+		if(m(opc1, 0xfc03, 0x9400) && m(opc2, 0xefff, 0xa410)) return util::string_format("ld_v r%d, %d", b(opc1, 5, 5, 0), b(opc1, 2, 3, 0));
+		if(m(opc1, 0xffe3, 0x9400) && m(opc2, 0xeffe, 0xa412)) return util::string_format("ld_v %s, v%d", xy(b(opc2, 0, 1, 0)), b(opc1, 2, 3, 0));
+		if(m(opc1, 0xfc03, 0x9400) && m(opc2, 0xefff, 0xa414)) return util::string_format("ld_p r%d, %d", b(opc1, 5, 5, 0), b(opc1, 2, 3, 0));
+		if(m(opc1, 0xffe3, 0x9400) && m(opc2, 0xeffe, 0xa416)) return util::string_format("ld_p %s, v%d", xy(b(opc2, 0, 1, 0)), b(opc1, 2, 3, 0));
+		if(m(opc1, 0xfc03, 0x9400) && m(opc2, 0xefff, 0xa418)) return util::string_format("ld_pz r%d, %d", b(opc1, 5, 5, 0), b(opc1, 2, 3, 0));
+		if(m(opc1, 0xffe3, 0x9400) && m(opc2, 0xeffe, 0xa41a)) return util::string_format("ld_pz %s, v%d", xy(b(opc2, 0, 1, 0)), b(opc1, 2, 3, 0));
+		if(m(opc1, 0xfc00, 0x9400) && m(opc2, 0xefff, 0xa500)) return util::string_format("mirror r%d, r%d", b(opc1, 5, 5, 0), b(opc1, 0, 5, 0));
 		if(m(opc1, 0xfc00, 0x9400) && m(opc2, 0xef80, 0xa600)) return util::string_format("mv_s #%s, %s", s2x(b(opc2, 0, 7, 5) | b(opc1, 0, 5, 0), 12), b(opc1, 5, 5, 0));
 		if(m(opc1, 0xfc00, 0x9400) && m(opc2, 0xefc0, 0xaa00)) return util::string_format("st_s r%d, %s", b(opc1, 0, 5, 0), reg(0x20000000 | b(opc2, 0, 6, 7) | b(opc1, 5, 5, 2)));
 		if(m(opc1, 0xfc00, 0x9400) && m(opc2, 0xefc0, 0xaa40)) return util::string_format("st_s r%d, %s", b(opc1, 0, 5, 0), reg(0x20100000 | b(opc2, 0, 6, 7) | b(opc1, 5, 5, 2)));
@@ -438,15 +552,39 @@ std::string nuon_disassembler::parse_packet(const data_buffer &opcodes, offs_t &
 		if(m(opc1, 0xfc00, 0x9800) && m(opc2, 0xffe0, 0xb320)) return util::string_format("and #%s, r%d, r%d", u2x(b(opc1, 5, 5, 0), 5), b(opc1, 0, 5, 0), b(opc2, 0, 5, 0));
 		if(m(opc1, 0xfc00, 0x9800) && m(opc2, 0xffe0, 0xb340)) return util::string_format("and #%s, <>#%d, r%d", u2x(b(opc1, 5, 5, 0), 5), s2x(b(opc2, 0, 5, 0), 5), b(opc1, 0, 5, 0));
 		if(m(opc1, 0xfc00, 0x9800) && m(opc2, 0xffe0, 0xb360)) return util::string_format("and #%s, >>r%d, r%d", u2x(b(opc2, 0, 5, 0), 5), b(opc1, 0, 5, 0), b(opc1, 5, 5, 0));
-		if(m(opc1, 0xfc00, 0x9800) && m(opc2, 0xffe0, 0xb380)) return util::string_format("and r%d, <>#%d, r%d", b(opc1, 5, 5, 0), s2x(b(opc2, 0, 5, 0), 5), b(opc1, 0, 5, 0));
+		if(m(opc1, 0xfc00, 0x9800) && m(opc2, 0xffe0, 0xb380)) return util::string_format("and r%d, >>#%d, r%d", b(opc1, 5, 5, 0), s2x(b(opc2, 0, 5, 0), 5), b(opc1, 0, 5, 0));
 		if(m(opc1, 0xfc00, 0x9800) && m(opc2, 0xffe0, 0xb3a0)) return util::string_format("and r%d, >>r%d, r%d", b(opc1, 5, 5, 0), b(opc1, 0, 5, 0), b(opc2, 0, 5, 0));
 		if(m(opc1, 0xfc00, 0x9800) && m(opc2, 0xffe0, 0xb3c0)) return util::string_format("and r%d, <>r%d, r%d", b(opc1, 5, 5, 0), b(opc1, 0, 5, 0), b(opc2, 0, 5, 0));
+		if(m(opc1, 0xfc00, 0x9800) && m(opc2, 0xffe0, 0xb400)) return util::string_format("ftst r%d, r%d", b(opc1, 5, 5, 0), b(opc1, 0, 5, 0));
+		if(m(opc1, 0xfc00, 0x9800) && m(opc2, 0xffe0, 0xb420)) return util::string_format("ftst #%s, r%d", s2x(b(opc1, 5, 5, 0), 5), b(opc1, 0, 5, 0), b(opc2, 0, 5, 0));
+		if(m(opc1, 0xfc00, 0x9800) && m(opc2, 0xffe0, 0xb440)) return util::string_format("ftst #%s, <>#%d, r%d", s2x(b(opc1, 5, 5, 0), 5), s2x(b(opc2, 0, 5, 0), 5), b(opc1, 0, 5, 0));
+		if(m(opc1, 0xfc00, 0x9800) && m(opc2, 0xffe0, 0xb460)) return util::string_format("ftst #%s, >>r%d, r%d", s2x(b(opc2, 0, 5, 0), 5), b(opc1, 0, 5, 0), b(opc1, 5, 5, 0));
+		if(m(opc1, 0xfc00, 0x9800) && m(opc2, 0xffe0, 0xb480)) return util::string_format("ftst r%d, <>#%d, r%d", b(opc1, 5, 5, 0), s2x(b(opc2, 0, 5, 0), 5), b(opc1, 0, 5, 0));
+		if(m(opc1, 0xfc00, 0x9800) && m(opc2, 0xffe0, 0xb4a0)) return util::string_format("ftst r%d, >>r%d, r%d", b(opc1, 5, 5, 0), b(opc1, 0, 5, 0), b(opc2, 0, 5, 0));
+		if(m(opc1, 0xfc00, 0x9800) && m(opc2, 0xffe0, 0xb4c0)) return util::string_format("ftst r%d, <>r%d, r%d", b(opc1, 5, 5, 0), b(opc1, 0, 5, 0), b(opc2, 0, 5, 0));
+		if(m(opc1, 0xfc00, 0x9800) && m(opc2, 0xffe0, 0xb500)) return util::string_format("or r%d, r%d, r%d", b(opc1, 5, 5, 0), b(opc1, 0, 5, 0), b(opc2, 0, 5, 0));
+		if(m(opc1, 0xfc00, 0x9800) && m(opc2, 0xffe0, 0xb520)) return util::string_format("or #%s, r%d, r%d", s2x(b(opc1, 5, 5, 0), 5), b(opc1, 0, 5, 0), b(opc2, 0, 5, 0));
+		if(m(opc1, 0xfc00, 0x9800) && m(opc2, 0xffe0, 0xb540)) return util::string_format("or #%s, <>#%d, r%d", s2x(b(opc1, 5, 5, 0), 5), s2x(b(opc2, 0, 5, 0), 5), b(opc1, 0, 5, 0));
+		if(m(opc1, 0xfc00, 0x9800) && m(opc2, 0xffe0, 0xb560)) return util::string_format("or #%s, >>r%d, r%d", s2x(b(opc2, 0, 5, 0), 5), b(opc1, 0, 5, 0), b(opc1, 5, 5, 0));
+		if(m(opc1, 0xfc00, 0x9800) && m(opc2, 0xffe0, 0xb580)) return util::string_format("or r%d, <>#%d, r%d", b(opc1, 5, 5, 0), s2x(b(opc2, 0, 5, 0), 5), b(opc1, 0, 5, 0));
+		if(m(opc1, 0xfc00, 0x9800) && m(opc2, 0xffe0, 0xb5a0)) return util::string_format("or r%d, >>r%d, r%d", b(opc1, 5, 5, 0), b(opc1, 0, 5, 0), b(opc2, 0, 5, 0));
+		if(m(opc1, 0xfc00, 0x9800) && m(opc2, 0xffe0, 0xb5c0)) return util::string_format("or r%d, <>r%d, r%d", b(opc1, 5, 5, 0), b(opc1, 0, 5, 0), b(opc2, 0, 5, 0));
+		if(m(opc1, 0xfc00, 0x9800) && m(opc2, 0xffe0, 0xb600)) return util::string_format("eor r%d, r%d, r%d", b(opc1, 5, 5, 0), b(opc1, 0, 5, 0), b(opc2, 0, 5, 0));
+		if(m(opc1, 0xfc00, 0x9800) && m(opc2, 0xffe0, 0xb620)) return util::string_format("eor #%s, r%d, r%d", s2x(b(opc1, 5, 5, 0), 5), b(opc1, 0, 5, 0), b(opc2, 0, 5, 0));
+		if(m(opc1, 0xfc00, 0x9800) && m(opc2, 0xffe0, 0xb640)) return util::string_format("eor #%s, <>#%d, r%d", s2x(b(opc1, 5, 5, 0), 5), s2x(b(opc2, 0, 5, 0), 5), b(opc1, 0, 5, 0));
+		if(m(opc1, 0xfc00, 0x9800) && m(opc2, 0xffe0, 0xb660)) return util::string_format("eor #%s, >>r%d, r%d", s2x(b(opc2, 0, 5, 0), 5), b(opc1, 0, 5, 0), b(opc1, 5, 5, 0));
+		if(m(opc1, 0xfc00, 0x9800) && m(opc2, 0xffe0, 0xb680)) return util::string_format("eor r%d, <>#%d, r%d", b(opc1, 5, 5, 0), s2x(b(opc2, 0, 5, 0), 5), b(opc1, 0, 5, 0));
+		if(m(opc1, 0xfc00, 0x9800) && m(opc2, 0xffe0, 0xb6a0)) return util::string_format("eor r%d, >>r%d, r%d", b(opc1, 5, 5, 0), b(opc1, 0, 5, 0), b(opc2, 0, 5, 0));
+		if(m(opc1, 0xfc00, 0x9800) && m(opc2, 0xffe0, 0xb6c0)) return util::string_format("eor r%d, <>r%d, r%d", b(opc1, 5, 5, 0), b(opc1, 0, 5, 0), b(opc2, 0, 5, 0));
 		if(m(opc1, 0xfc00, 0x9800) && m(opc2, 0xffe0, 0xb700)) return util::string_format("as >>r%d, r%d, r%d", b(opc1, 0, 5, 0), b(opc1, 5, 5, 0), b(opc2, 0, 5, 0));
 		if(m(opc1, 0xfc00, 0x9800) && m(opc2, 0xffe0, 0xb720)) return util::string_format("asl #%s, r%d, r%d", u2x((32-b(opc2, 0, 5, 0)) & 31, 5), b(opc1, 5, 5, 0), b(opc1, 0, 5, 0));
 		if(m(opc1, 0xfc00, 0x9800) && m(opc2, 0xffe0, 0xb740)) return util::string_format("asr #%s, r%d, r%d", u2x(b(opc2, 0, 5, 0), 5), b(opc1, 5, 5, 0), b(opc1, 0, 5, 0));
+		if(m(opc1, 0xfc00, 0x9800) && m(opc2, 0xffe0, 0xb760)) return util::string_format("ls >>r%d, r%d, r%d", b(opc1, 0, 5, 0), b(opc1, 5, 5, 0), b(opc2, 0, 5, 0));
+		if(m(opc1, 0xfc00, 0x9800) && m(opc2, 0xffe0, 0xb780)) return util::string_format("lsr #%s, r%d, r%d", u2x(b(opc2, 0, 5, 0), 5), b(opc1, 5, 5, 0), b(opc1, 0, 5, 0));
 		if(m(opc1, 0xfc00, 0x9800) && m(opc2, 0xffe0, 0xb800)) return util::string_format("bits #%s, >>r%d, r%d", u2x(b(opc2, 0, 5, 0), 5), b(opc1, 0, 5, 0), b(opc1, 5, 5, 0));
 		if(m(opc1, 0xfc00, 0x9800) && m(opc2, 0xffe0, 0xb820)) return util::string_format("bits #%s, >>#%d, r%d", u2x(b(opc2, 0, 5, 0), 5), b(opc1, 0, 5, 0), b(opc1, 5, 5, 0));
 		if(m(opc1, 0xfc00, 0x9800) && m(opc2, 0xffe0, 0xb840)) return util::string_format("butt r%d, r%d, r%d", b(opc1, 5, 5, 0), b(opc1, 0, 5, 0), b(opc2, 0, 5, 0));
+		if(m(opc1, 0xfc00, 0x9800) && m(opc2, 0xffff, 0xb980)) return util::string_format("msb r%d, r%d", b(opc1, 0, 5, 0), b(opc1, 5, 5, 0));
 		if(m(opc1, 0xfc00, 0x9800) && m(opc2, 0xffe0, 0xbc00)) return util::string_format("addwc r%d, r%d, r%d", b(opc1, 5, 5, 0), b(opc1, 0, 5, 0), b(opc2, 0, 5, 0));
 		if(m(opc1, 0xfc00, 0x9800) && m(opc2, 0xffe0, 0xbc20)) return util::string_format("addwc #%s, r%d, r%d", u2x(b(opc1, 5, 5, 0), 5), b(opc1, 0, 5, 0), b(opc2, 0, 5, 0));
 		if(m(opc1, 0xfc00, 0x9800) && m(opc2, 0xffe0, 0xbc40)) return util::string_format("addwc #%s, r%d", u2x(b(opc2, 0, 5, 5) | b(opc1, 5, 5, 0), 10), b(opc1, 0, 5, 0));
@@ -460,6 +598,9 @@ std::string nuon_disassembler::parse_packet(const data_buffer &opcodes, offs_t &
 
 		// 32-bits mul instructions
 		if(m(opc1, 0xfc03, 0x9c00) && m(opc2, 0xefe0, 0xac00)) return util::string_format("dotp r%d, v%d, >>svshift, r%d", b(opc1, 5, 5, 0), b(opc1, 2, 3, 0), b(opc2, 0, 5, 0));
+		if(m(opc1, 0xfc03, 0x9c00) && m(opc2, 0xef80, 0xac80)) return util::string_format("dotp r%d, v%d, >>#%d, r%d", b(opc1, 5, 5, 0), b(opc1, 2, 3, 0), svs(b(opc2, 5, 2, 0)), b(opc2, 0, 5, 0));
+		if(m(opc1, 0xfc03, 0x9c00) && m(opc2, 0xefe0, 0xad00)) return util::string_format("dotp v%d, v%d, >>svshift, r%d", b(opc1, 7, 3, 0), b(opc1, 2, 3, 0), b(opc2, 0, 5, 0));
+		if(m(opc1, 0xfc03, 0x9c00) && m(opc2, 0xef80, 0xad80)) return util::string_format("dotp v%d, v%d, >>#%d, r%d", b(opc1, 7, 3, 0), b(opc1, 2, 3, 0), svs(b(opc2, 5, 2, 0)), b(opc2, 0, 5, 0));
 		if(m(opc1, 0xfc00, 0x9c00) && m(opc2, 0xefe0, 0xae80)) return util::string_format("addm r%d, r%d, r%d", b(opc1, 0, 5, 0), b(opc1, 5, 5, 0), b(opc2, 0, 5, 0));
 
 		return util::string_format("?%04x %04x", opc1, opc2);
@@ -476,6 +617,10 @@ std::string nuon_disassembler::parse_packet(const data_buffer &opcodes, offs_t &
 			pc += 6;
 			if(m(opc3, 0xfc00, 0x0400))
 				return util::string_format("add #%s, r%d",
+										   s2x(b(opc1, 0, 11, 21) | b(opc2, 0, 16, 5) | b(opc3, 5, 5, 0), 32),
+										   b(opc1, 0, 5, 0));
+			if(m(opc3, 0xfc00, 0x1800))
+				return util::string_format("eor #%s, r%d",
 										   s2x(b(opc1, 0, 11, 21) | b(opc2, 0, 16, 5) | b(opc3, 5, 5, 0), 32),
 										   b(opc1, 0, 5, 0));
 			if(m(opc3, 0xfc00, 0x2000))
@@ -552,11 +697,35 @@ std::string nuon_disassembler::parse_packet(const data_buffer &opcodes, offs_t &
 										   b(opc3, 5, 5, 0),
 										   s2x(b(opc1, 0, 11, 21) | b(opc2, 0, 16, 5) | b(opc3, 0, 5, 0), 32));
 			if(m(opc3, 0xfc00, 0x9800) && m(opc4, 0xffe0, 0xb320))
-				return util::string_format("add #%s, r%d, r%d",
+				return util::string_format("and #%s, r%d, r%d",
 										   s2x(b(opc1, 0, 11, 21) | b(opc2, 0, 16, 5) | b(opc3, 0, 5, 0), 32),
 										   b(opc3, 5, 5, 0), b(opc4, 0, 5, 0));
 			if(m(opc3, 0xfc00, 0x9800) && m(opc4, 0xffe0, 0xb360))
-				return util::string_format("add #%s, >>r%d, r%d",
+				return util::string_format("and #%s, >>r%d, r%d",
+										   s2x(b(opc1, 0, 11, 21) | b(opc2, 0, 16, 5) | b(opc3, 0, 5, 0), 32),
+										   b(opc3, 5, 5, 0), b(opc4, 0, 5, 0));
+			if(m(opc3, 0xfc00, 0x9800) && m(opc4, 0xffe0, 0xb420))
+				return util::string_format("ftst #%s, r%d",
+										   s2x(b(opc1, 0, 11, 21) | b(opc2, 0, 16, 5) | b(opc3, 0, 5, 0), 32),
+										   b(opc3, 5, 5, 0));
+			if(m(opc3, 0xfc00, 0x9800) && m(opc4, 0xffe0, 0xb460))
+				return util::string_format("ftst #%s, >>r%d, r%d",
+										   s2x(b(opc1, 0, 11, 21) | b(opc2, 0, 16, 5) | b(opc3, 0, 5, 0), 32),
+										   b(opc3, 5, 5, 0), b(opc4, 0, 5, 0));
+			if(m(opc3, 0xfc00, 0x9800) && m(opc4, 0xffe0, 0xb520))
+				return util::string_format("or #%s, r%d, r%d",
+										   s2x(b(opc1, 0, 11, 21) | b(opc2, 0, 16, 5) | b(opc3, 0, 5, 0), 32),
+										   b(opc3, 5, 5, 0), b(opc4, 0, 5, 0));
+			if(m(opc3, 0xfc00, 0x9800) && m(opc4, 0xffe0, 0xb560))
+				return util::string_format("or #%s, >>r%d, r%d",
+										   s2x(b(opc1, 0, 11, 21) | b(opc2, 0, 16, 5) | b(opc3, 0, 5, 0), 32),
+										   b(opc3, 5, 5, 0), b(opc4, 0, 5, 0));
+			if(m(opc3, 0xfc00, 0x9800) && m(opc4, 0xffe0, 0xb620))
+				return util::string_format("eor #%s, r%d, r%d",
+										   s2x(b(opc1, 0, 11, 21) | b(opc2, 0, 16, 5) | b(opc3, 0, 5, 0), 32),
+										   b(opc3, 5, 5, 0), b(opc4, 0, 5, 0));
+			if(m(opc3, 0xfc00, 0x9800) && m(opc4, 0xffe0, 0xb660))
+				return util::string_format("eor #%s, >>r%d, r%d",
 										   s2x(b(opc1, 0, 11, 21) | b(opc2, 0, 16, 5) | b(opc3, 0, 5, 0), 32),
 										   b(opc3, 5, 5, 0), b(opc4, 0, 5, 0));
 			if(m(opc3, 0xfc00, 0x9800) && m(opc4, 0xffe0, 0xbc20))

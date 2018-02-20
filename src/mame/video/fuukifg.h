@@ -12,8 +12,8 @@ class fuukivid_device : public device_t,
 public:
 	fuukivid_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
-	// static configuration
-	static void static_set_gfxdecode_tag(device_t &device, const char *tag);
+	// configuration
+	void set_gfxdecode_tag(const char *tag);
 
 	void draw_sprites(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect, int flip_screen, uint32_t* tilebank);
 	std::unique_ptr<uint16_t[]> m_sprram;
@@ -44,6 +44,6 @@ private:
 DECLARE_DEVICE_TYPE(FUUKI_VIDEO, fuukivid_device)
 
 #define MCFG_FUUKI_VIDEO_GFXDECODE(_gfxtag) \
-	fuukivid_device::static_set_gfxdecode_tag(*device, "^" _gfxtag);
+	downcast<fuukivid_device &>(*device).set_gfxdecode_tag("^" _gfxtag);
 
 #endif // MAME_VIDEO_FUUKIFH_H

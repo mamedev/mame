@@ -16,7 +16,7 @@
 
 #define MCFG_DECODMD_TYPE1_ADD(_tag, _region) \
 	MCFG_DEVICE_ADD(_tag, DECODMD1, 0) \
-	decodmd_type1_device::static_set_gfxregion(*device, _region);
+	downcast<decodmd_type1_device &>(*device).set_gfxregion(_region);
 
 class decodmd_type1_device : public device_t
 {
@@ -45,7 +45,7 @@ public:
 	DECLARE_WRITE_LINE_MEMBER(rowclock_w);
 	DECLARE_WRITE_LINE_MEMBER(test_w);
 
-	static void static_set_gfxregion(device_t &device, const char *tag);
+	void set_gfxregion(const char *tag);
 
 	void decodmd1_io_map(address_map &map);
 	void decodmd1_map(address_map &map);

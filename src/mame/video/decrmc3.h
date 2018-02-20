@@ -32,19 +32,19 @@
 #define MCFG_DECO_RMC3_MODIFY MCFG_DEVICE_MODIFY
 
 #define MCFG_DECO_RMC3_SET_PALETTE_SIZE(_entries) \
-	deco_rmc3_device::static_set_entries(*device, _entries);
+	downcast<deco_rmc3_device &>(*device).set_entries(_entries);
 
 #define MCFG_DECO_RMC3_INDIRECT_ENTRIES(_entries) \
-	deco_rmc3_device::static_set_indirect_entries(*device, _entries);
+	downcast<deco_rmc3_device &>(*device).set_indirect_entries( _entries);
 
 // other standard palettes
 #define MCFG_DECO_RMC3_ADD_PROMS(_tag, _region, _entries) \
 	MCFG_DECO_RMC3_ADD(_tag, _entries) \
-	deco_rmc3_device::static_set_prom_region(*device, "^" _region); \
-	deco_rmc3_device::static_set_init(*device, deco_rmc3_palette_init_delegate(FUNC(deco_rmc3_device::palette_init_proms), downcast<deco_rmc3_device *>(device)));
+	downcast<deco_rmc3_device &>(*device).set_prom_region("^" _region); \
+	downcast<deco_rmc3_device &>(*device).set_init(deco_rmc3_palette_init_delegate(FUNC(deco_rmc3_device::palette_init_proms), downcast<deco_rmc3_device *>(device)));
 
 //#define MCFG_DECO_RMC3_INIT_OWNER(_class, _method)
-//  deco_rmc3_device::static_set_init(*device, deco_rmc3_palette_init_delegate(&_class::PALETTE_INIT_NAME(_method), #_class "::palette_init_" #_method, this));
+//  downcast<deco_rmc3_device &>(*device).set_init(deco_rmc3_palette_init_delegate(&_class::PALETTE_INIT_NAME(_method), #_class "::palette_init_" #_method, this));
 
 //**************************************************************************
 //  TYPE DEFINITIONS
@@ -61,13 +61,13 @@ public:
 	// construction/destruction
 	deco_rmc3_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock);
 
-	// static configuration
-	static void static_set_init(device_t &device, deco_rmc3_palette_init_delegate init);
-	static void static_set_membits(device_t &device, int membits);
-	static void static_set_endianness(device_t &device, endianness_t endianness);
-	static void static_set_entries(device_t &device, u32 entries);
-	static void static_set_indirect_entries(device_t &device, u32 entries);
-	static void static_set_prom_region(device_t &device, const char *region);
+	// configuration
+	void set_init(deco_rmc3_palette_init_delegate init);
+	void set_membits(int membits);
+	void set_endianness(endianness_t endianness);
+	void set_entries(u32 entries);
+	void set_indirect_entries(u32 entries);
+	void set_prom_region(const char *region);
 
 	// palette RAM accessors
 	memory_array &basemem() { return m_paletteram; }

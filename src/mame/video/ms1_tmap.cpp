@@ -56,24 +56,24 @@ megasys1_tilemap_device::megasys1_tilemap_device(const machine_config &mconfig, 
 {
 }
 
-void megasys1_tilemap_device::static_set_8x8_scroll_factor(device_t &device, int scroll_factor)
+void megasys1_tilemap_device::set_8x8_scroll_factor(int scroll_factor)
 {
-	downcast<megasys1_tilemap_device &>(device).m_8x8_scroll_factor = scroll_factor;
+	m_8x8_scroll_factor = scroll_factor;
 }
 
-void megasys1_tilemap_device::static_set_16x16_scroll_factor(device_t &device, int scroll_factor)
+void megasys1_tilemap_device::set_16x16_scroll_factor(int scroll_factor)
 {
-	downcast<megasys1_tilemap_device &>(device).m_16x16_scroll_factor = scroll_factor;
+	m_16x16_scroll_factor = scroll_factor;
 }
 
-void megasys1_tilemap_device::static_set_bits_per_color_code(device_t &device, int bits)
+void megasys1_tilemap_device::set_bits_per_color_code(int bits)
 {
-	downcast<megasys1_tilemap_device &>(device).m_bits_per_color_code = bits;
+	m_bits_per_color_code = bits;
 }
 
-void megasys1_tilemap_device::static_set_colorbase(device_t &device, uint16_t colorbase)
+void megasys1_tilemap_device::set_colorbase(uint16_t colorbase)
 {
-	downcast<megasys1_tilemap_device &>(device).m_colorbase = colorbase;
+	m_colorbase = colorbase;
 }
 
 

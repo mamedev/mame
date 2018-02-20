@@ -88,13 +88,13 @@ public:
 	uint32_t update_screen(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 
 
-	template <class Object> static devcb_base &static_set_vblank_callback(device_t &device, Object &&cb)
+	template <class Object> devcb_base &set_vblank_callback(Object &&cb)
 	{
-		return downcast<ygv608_device &>(device).m_vblank_handler.set_callback(std::forward<Object>(cb));
+		return m_vblank_handler.set_callback(std::forward<Object>(cb));
 	}
-	template <class Object> static devcb_base &static_set_raster_callback(device_t &device, Object &&cb)
+	template <class Object> devcb_base &set_raster_callback(Object &&cb)
 	{
-		return downcast<ygv608_device &>(device).m_raster_handler.set_callback(std::forward<Object>(cb));
+		return m_raster_handler.set_callback(std::forward<Object>(cb));
 	}
 
 	void regs_map(address_map &map);
@@ -321,10 +321,10 @@ DECLARE_DEVICE_TYPE(YGV608, ygv608_device)
 	MCFG_GFX_PALETTE(_palette_tag)
 
 #define MCFG_YGV608_VBLANK_HANDLER( _intcallb ) \
-	devcb = &ygv608_device::static_set_vblank_callback( *device, DEVCB_##_intcallb );
+	devcb = &downcast<ygv608_device &>(*device).set_vblank_callback(DEVCB_##_intcallb);
 
 #define MCFG_YGV608_RASTER_HANDLER( _intcallb ) \
-	devcb = &ygv608_device::static_set_raster_callback( *device, DEVCB_##_intcallb );
+	devcb = &downcast<ygv608_device &>(*device).set_raster_callback(DEVCB_##_intcallb);
 
 
 #endif

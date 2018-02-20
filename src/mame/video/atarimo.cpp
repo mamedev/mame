@@ -154,24 +154,23 @@ atari_motion_objects_device::atari_motion_objects_device(const machine_config &m
 }
 
 //-------------------------------------------------
-//  static_set_gfxdecode_tag: Set the tag of the
+//  set_gfxdecode_tag: Set the tag of the
 //  gfx decoder
 //-------------------------------------------------
 
-void atari_motion_objects_device::static_set_gfxdecode_tag(device_t &device, const char *tag)
+void atari_motion_objects_device::set_gfxdecode_tag(const char *tag)
 {
-	downcast<atari_motion_objects_device &>(device).m_gfxdecode.set_tag(tag);
+	m_gfxdecode.set_tag(tag);
 }
 
 //-------------------------------------------------
-//  static_set_config: Set the tag of the
+//  set_config: Set the tag of the
 //  sound CPU
 //-------------------------------------------------
 
-void atari_motion_objects_device::static_set_config(device_t &device, const atari_motion_objects_config &config)
+void atari_motion_objects_device::set_config(const atari_motion_objects_config &config)
 {
-	atari_motion_objects_device &target = downcast<atari_motion_objects_device &>(device);
-	static_cast<atari_motion_objects_config &>(target) = config;
+	static_cast<atari_motion_objects_config &>(*this) = config;
 }
 
 

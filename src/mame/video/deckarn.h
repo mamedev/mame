@@ -14,9 +14,9 @@ public:
 	void draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprect, uint16_t* spriteram, int size, int priority);
 	void set_flip_screen(bool flip) { m_flip_screen = flip; }
 
-	// static configuration
-	static void static_set_gfxdecode_tag(device_t &device, const char *tag);
-	static void set_gfx_region(device_t &device, int region);
+	// configuration
+	void set_gfxdecode_tag(const char *tag);
+	void set_gfx_region(int region);
 
 protected:
 	virtual void device_start() override;
@@ -31,9 +31,9 @@ private:
 DECLARE_DEVICE_TYPE(DECO_KARNOVSPRITES, deco_karnovsprites_device)
 
 #define MCFG_DECO_KARNOVSPRITES_GFXDECODE(_gfxtag) \
-	deco_karnovsprites_device::static_set_gfxdecode_tag(*device, "^" _gfxtag);
+	downcast<deco_karnovsprites_device &>(*device).set_gfxdecode_tag("^" _gfxtag);
 
 #define MCFG_DECO_KARNOVSPRITES_GFX_REGION(_region) \
-	deco_karnovsprites_device::set_gfx_region(*device, _region);
+	downcast<deco_karnovsprites_device &>(*device).set_gfx_region(_region);
 
 #endif // MAME_VIDEO_DECKARN_H

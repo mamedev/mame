@@ -30,7 +30,9 @@ private:
 	s32 s2i(u32 val, int bits) const;
 	std::string cc(u16 val, bool comma) const;
 	std::string rx(u16 sel) const;
-	std::string xy(u32 sel) const;
+	std::string xy(u16 sel) const;
+	u32 svs(u16 sel) const;
+
 	std::string dec(u16 opc, std::string r = "") const;
 	std::string reg(u32 adr) const;
 

@@ -8,13 +8,13 @@
 #include <memory>
 
 #define MCFG_BAC06_BOOTLEG_DISABLE_8x8 \
-	deco_bac06_device::disable_8x8(*device);
+	downcast<deco_bac06_device &>(*device).disable_8x8();
 
 #define MCFG_BAC06_BOOTLEG_DISABLE_16x16 \
-	deco_bac06_device::disable_16x16(*device);
+	downcast<deco_bac06_device &>(*device).disable_16x16();
 
 #define MCFG_BAC06_BOOTLEG_DISABLE_RC_SCROLL \
-	deco_bac06_device::disable_rc_scroll(*device);
+	downcast<deco_bac06_device &>(*device).disable_rc_scroll();
 
 
 class deco_bac06_device : public device_t
@@ -22,9 +22,12 @@ class deco_bac06_device : public device_t
 public:
 	deco_bac06_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
-	// static configuration
-	static void static_set_gfxdecode_tag(device_t &device, const char *tag);
-	static void set_gfx_region_wide(device_t &device, int region8x8, int region16x16, int wide);
+	// configuration
+	void set_gfxdecode_tag(const char *tag);
+	void set_gfx_region_wide(int region8x8, int region16x16, int wide);
+	void disable_8x8() { m_supports_8x8 = false; }
+	void disable_16x16() { m_supports_16x16 = false; }
+	void disable_rc_scroll() { m_supports_rc_scroll = false; }
 
 	std::unique_ptr<uint16_t[]> m_pf_data;
 	std::unique_ptr<uint16_t[]> m_pf_rowscroll;
@@ -39,24 +42,6 @@ public:
 	bool    m_supports_8x8;
 	bool    m_supports_16x16;
 	bool    m_supports_rc_scroll;
-
-	static void disable_8x8(device_t &device)
-	{
-		deco_bac06_device &dev = downcast<deco_bac06_device &>(device);
-		dev.m_supports_8x8 = false;
-	}
-
-	static void disable_16x16(device_t &device)
-	{
-		deco_bac06_device &dev = downcast<deco_bac06_device &>(device);
-		dev.m_supports_16x16 = false;
-	}
-
-	static void disable_rc_scroll(device_t &device)
-	{
-		deco_bac06_device &dev = downcast<deco_bac06_device &>(device);
-		dev.m_supports_rc_scroll = false;
-	}
 
 	void create_tilemaps(int region8x8,int region16x16);
 	uint16_t m_pf_control_0[8];
@@ -159,9 +144,9 @@ private:
 DECLARE_DEVICE_TYPE(DECO_BAC06, deco_bac06_device)
 
 #define MCFG_DECO_BAC06_GFXDECODE(_gfxtag) \
-	deco_bac06_device::static_set_gfxdecode_tag(*device, "^" _gfxtag);
+	downcast<deco_bac06_device &>(*device).set_gfxdecode_tag("^" _gfxtag);
 
 #define MCFG_DECO_BAC06_GFX_REGION_WIDE(_8x8, _16x16, _wide) \
-	deco_bac06_device::set_gfx_region_wide(*device, _8x8, _16x16, _wide);
+	downcast<deco_bac06_device &>(*device).set_gfx_region_wide(_8x8, _16x16, _wide);
 
 #endif // MAME_VIDEO_DECOBAC06_H

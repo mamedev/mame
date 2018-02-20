@@ -90,12 +90,6 @@ void ptm6840_device::device_start()
 	m_out_cb[2].resolve_safe();
 	m_irq_cb.resolve_safe();
 
-	for (auto & elem : m_external_clock)
-	{
-		if ( elem == 0 )
-			elem = 1;
-	}
-
 	m_timer[0] = timer_alloc(0);
 	m_timer[1] = timer_alloc(1);
 	m_timer[2] = timer_alloc(2);
@@ -225,7 +219,6 @@ void ptm6840_device::subtract_from_counter(int counter, int count)
 	if (m_enabled[counter])
 	{
 		attotime duration = attotime::from_hz(clk) * m_counter[counter];
-
 		if (counter == 2)
 		{
 			duration *= m_t3_divisor;
@@ -382,26 +375,22 @@ void ptm6840_device::reload_count(int idx)
 	// Set the timer
 	LOG("MC6840: reload_count(%d): clock = %f  count = %d\n", idx, clk, count);
 
-	attotime duration = attotime::from_hz(clk) * count;
-	if (idx == 2)
+	if (clk == 0.0)
 	{
-		duration *= m_t3_divisor;
-	}
-
-	LOG("MC6840: reload_count(%d): output = %f\n", idx, duration.as_double());
-
-#if 0
-	if (!(m_control_reg[idx] & INTERNAL_CLK_EN))
-	{
-		if (!m_external_clock[idx])
-		{
-			m_enabled[idx] = 0;
-			m_timer[idx]->enable(false);
-		}
+		m_enabled[idx] = 0;
+		m_timer[idx]->enable(false);
 	}
 	else
-#endif
 	{
+		attotime duration = attotime::from_hz(clk) * count;
+
+		if (idx == 2)
+		{
+			duration *= m_t3_divisor;
+		}
+
+		LOG("MC6840: reload_count(%d): output = %f\n", idx, duration.as_double());
+
 		m_enabled[idx] = 1;
 		m_timer[idx]->adjust(duration);
 		m_timer[idx]->enable(true);

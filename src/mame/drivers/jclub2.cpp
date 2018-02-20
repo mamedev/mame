@@ -1155,7 +1155,7 @@ MACHINE_CONFIG_START(jclub2o_state::jclub2o)
 	MCFG_PALETTE_FORMAT(xBBBBBGGGGGRRRRR)
 
 	MCFG_DEVICE_ADD("st0020", ST0020_SPRITES, 0)
-	st0020_device::static_set_is_jclub2(*device, 1);
+	MCFG_ST0020_IS_JCLUB2(1)
 	MCFG_ST0020_SPRITES_PALETTE("palette")
 
 	// layout
@@ -1190,8 +1190,8 @@ MACHINE_CONFIG_START(jclub2_state::jclub2)
 
 	// NOT an ST0020 but instead ST0032, ram format isn't compatible at least
 	MCFG_DEVICE_ADD("st0020", ST0020_SPRITES, 0)
-	st0020_device::static_set_is_st0032(*device, 1);
-	st0020_device::static_set_is_jclub2(*device, 1); // offsets
+	MCFG_ST0020_IS_ST0032(1)
+	MCFG_ST0020_IS_JCLUB2(1) // offsets
 	MCFG_ST0020_SPRITES_PALETTE("palette")
 
 	// layout

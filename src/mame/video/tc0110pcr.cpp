@@ -30,13 +30,13 @@ tc0110pcr_device::tc0110pcr_device(const machine_config &mconfig, const char *ta
 }
 
 //-------------------------------------------------
-//  static_set_palette_tag: Set the tag of the
+//  set_palette_tag: Set the tag of the
 //  palette device
 //-------------------------------------------------
 
-void tc0110pcr_device::static_set_palette_tag(device_t &device, const char *tag)
+void tc0110pcr_device::set_palette_tag(const char *tag)
 {
-	downcast<tc0110pcr_device &>(device).m_palette.set_tag(tag);
+	m_palette.set_tag(tag);
 }
 
 //-------------------------------------------------

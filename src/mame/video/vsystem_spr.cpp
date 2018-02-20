@@ -82,13 +82,13 @@ vsystem_spr_device::vsystem_spr_device(const machine_config &mconfig, const char
 }
 
 //-------------------------------------------------
-//  static_set_gfxdecode_tag: Set the tag of the
+//  set_gfxdecode_tag: Set the tag of the
 //  gfx decoder
 //-------------------------------------------------
 
-void vsystem_spr_device::static_set_gfxdecode_tag(device_t &device, const char *tag)
+void vsystem_spr_device::set_gfxdecode_tag(const char *tag)
 {
-	downcast<vsystem_spr_device &>(device).m_gfxdecode.set_tag(tag);
+	m_gfxdecode.set_tag(tag);
 }
 
 uint32_t vsystem_spr_device::tile_callback_noindirect(uint32_t tile)
@@ -97,56 +97,42 @@ uint32_t vsystem_spr_device::tile_callback_noindirect(uint32_t tile)
 }
 
 
-// static
-void vsystem_spr_device::set_tile_indirect_cb(device_t &device,vsystem_tile_indirection_delegate newtilecb)
+void vsystem_spr_device::set_tile_indirect_cb(vsystem_tile_indirection_delegate newtilecb)
 {
-	vsystem_spr_device &dev = downcast<vsystem_spr_device &>(device);
-	dev.m_newtilecb = newtilecb;
+	m_newtilecb = newtilecb;
 }
 
 
-// static
-void vsystem_spr_device::set_offsets(device_t &device, int xoffs, int yoffs)
+void vsystem_spr_device::set_offsets(int xoffs, int yoffs)
 {
-	vsystem_spr_device &dev = downcast<vsystem_spr_device &>(device);
-	dev.m_xoffs = xoffs;
-	dev.m_yoffs = yoffs;
+	m_xoffs = xoffs;
+	m_yoffs = yoffs;
 }
 
-// static
-void vsystem_spr_device::set_pdraw(device_t &device, bool pdraw)
+void vsystem_spr_device::set_pdraw(bool pdraw)
 {
-	vsystem_spr_device &dev = downcast<vsystem_spr_device &>(device);
-	dev.m_pdraw = pdraw;
+	m_pdraw = pdraw;
 }
 
-// static
-void vsystem_spr_device::set_gfx_region(device_t &device, int gfx_region)
+void vsystem_spr_device::set_gfx_region(int gfx_region)
 {
-	vsystem_spr_device &dev = downcast<vsystem_spr_device &>(device);
-	dev.m_gfx_region = gfx_region;
+	m_gfx_region = gfx_region;
 }
 
-// static
-void vsystem_spr_device::CG10103_set_pal_base(device_t &device, int pal_base)
+void vsystem_spr_device::CG10103_set_pal_base(int pal_base)
 {
-	vsystem_spr_device &dev = downcast<vsystem_spr_device &>(device);
-	dev.m_pal_base = pal_base;
+	m_pal_base = pal_base;
 }
 
 
-// static
-void vsystem_spr_device::set_pal_mask(device_t &device, int pal_mask)
+void vsystem_spr_device::set_pal_mask(int pal_mask)
 {
-	vsystem_spr_device &dev = downcast<vsystem_spr_device &>(device);
-	dev.m_pal_mask = pal_mask;
+	m_pal_mask = pal_mask;
 }
 
-// static
-void vsystem_spr_device::CG10103_set_transpen(device_t &device, int transpen)
+void vsystem_spr_device::CG10103_set_transpen(int transpen)
 {
-	vsystem_spr_device &dev = downcast<vsystem_spr_device &>(device);
-	dev.m_transpen = transpen;
+	m_transpen = transpen;
 }
 
 

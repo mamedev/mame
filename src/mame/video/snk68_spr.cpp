@@ -24,26 +24,23 @@ void snk68_spr_device::tile_callback_noindirect(int &tile, int& fx, int& fy, int
 
 
 //-------------------------------------------------
-//  static_set_gfxdecode_tag: Set the tag of the
+//  set_gfxdecode_tag: Set the tag of the
 //  gfx decoder
 //-------------------------------------------------
 
-void snk68_spr_device::static_set_gfxdecode_tag(device_t &device, const char *tag)
+void snk68_spr_device::set_gfxdecode_tag(const char *tag)
 {
-	downcast<snk68_spr_device &>(device).m_gfxdecode.set_tag(tag);
+	m_gfxdecode.set_tag(tag);
 }
 
-// static
-void snk68_spr_device::set_tile_indirect_cb(device_t &device,snk68_tile_indirection_delegate newtilecb)
+void snk68_spr_device::set_tile_indirect_cb(snk68_tile_indirection_delegate newtilecb)
 {
-	snk68_spr_device &dev = downcast<snk68_spr_device &>(device);
-	dev.m_newtilecb = newtilecb;
+	m_newtilecb = newtilecb;
 }
 
-void snk68_spr_device::static_set_no_partial(device_t &device)
+void snk68_spr_device::set_no_partial()
 {
-	snk68_spr_device &dev = downcast<snk68_spr_device &>(device);
-	dev.m_partialupdates = 0;
+	m_partialupdates = 0;
 }
 
 void snk68_spr_device::device_start()

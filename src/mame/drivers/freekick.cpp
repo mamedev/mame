@@ -23,7 +23,10 @@ Notes:
   there isn't a sound CPU and that program isn't executed. Instead, the main
   CPU reads the sound program through an 8255 PPI and plays sounds directly.
 - Gigas: according to a photo of a genuine board:
-    Sega Game ID#: 834-6167
+    Sega Game ID#: "834-6167 // GIGAS"
+    NEC MC-8123 with Sega security number 317-5002
+- Gigas MarkII: according to a photo of a genuine board:
+    Sega Game ID#: "834-6167-01 // GIGAS 2"
     NEC MC-8123 with Sega security number 317-5002
 
 TODO:
@@ -968,7 +971,7 @@ ROM_START( pbillrdsa ) /* all ROMs were HN4827128G-25, except 17, HN27256G-25, C
 	ROM_LOAD( "19", 0xc000, 0x4000, CRC(2335e6dd) SHA1(82352b6f4abea88aad3a96ca63cccccb6e278f48) ) /* encrypted */
 
 	ROM_REGION( 0x2000, "maincpu:key", 0 ) /* MC8123 key */
-	ROM_LOAD( "317-0030.key", 0x0000, 0x2000, CRC(9223f06d) SHA1(51a22a4c80fe273526bde68918c13c6476cec383) )
+	ROM_LOAD( "317-5008.key", 0x0000, 0x2000, CRC(9223f06d) SHA1(51a22a4c80fe273526bde68918c13c6476cec383) ) /* same key as 317-0030 */
 
 	ROM_REGION( 0xc000, "gfx1", 0 ) /* GFX */
 	ROM_LOAD( "pb.4", 0x000000, 0x04000, CRC(2f4d4dd3) SHA1(ee4facabf591c235c270db4f4d3f612b8c474e57) )
@@ -1233,7 +1236,7 @@ ROM_START( countrunb2 )
 	ROM_LOAD( "24s10n.7h", 0x0500, 0x0100, CRC(c77d0077) SHA1(4cbbf625ad5e45d00ca6aebe9566538ff0a3348d) )
 ROM_END
 
-ROM_START( gigas ) /* From an actual Sega board 834-6167 with mc-8123: 317-5002 */
+ROM_START( gigas ) /* From an actual Sega board "834-6167 // GIGAS" with MC-8123: 317-5002 */
 /* The MC-8123 is located on a small daughterboard which plugs into the z80 socket;
  * the daughterboard also has an input for the spinner control the game uses
  * An empty socket marked 27256 is at location 10n */
@@ -1329,8 +1332,38 @@ ROM_START( oigas )
 	ROM_LOAD( "3.pr", 0x0500, 0x0100, CRC(28b5ee4c) SHA1(e21b9c38f433dca1e8894619b1d9f0389a81b48a) )
 ROM_END
 
-//gigas MarkII is a romswap/upgrade to gigas, and uses the same mc8123 (317-5002).
-//the original, mc8123-protected version of gigas MarkII is undumped, we only have the bootleg below.
+//Gigas Mark II is a romswap/upgrade to gigas, and uses the same MC-8123 (317-5002).
+ROM_START( gigasm2 ) /* From an actual Sega board "834-6167-01 // GIGAS 2" with MC-8123: 317-5002 */
+/* The MC-8123 is located on a small daughterboard which plugs into the z80 socket;
+ * the daughterboard also has an input for the spinner control the game uses
+ * An empty socket marked 27256 is at location 10n */
+	ROM_REGION( 0x10000, "maincpu", 0 )
+	ROM_LOAD( "18.8n",   0x00000, 0x4000, CRC(32e83d80) SHA1(c1b5e995f32e775e9b73c56395a27f6a9f40d156) )
+	ROM_LOAD( "17.8r",   0x04000, 0x8000, CRC(460dadd2) SHA1(9f0ee949f391bcc7c1b9911a5385eb1cbf9d0e4d) ) /* 27256 */
+
+	ROM_REGION( 0x2000, "maincpu:key", 0 ) /* MC8123 key */
+	ROM_LOAD( "317-5002.key", 0x0000, 0x2000, CRC(86a7e5f6) SHA1(3ff3a17c02eb5610182b6febfada4e8eca0c5eea) )
+
+	ROM_REGION( 0xc000, "gfx1", 0 ) /* GFX */
+	ROM_LOAD( "14.3k", 0x00000, 0x04000, CRC(20b3405f) SHA1(32120d7b40e74648eb4ac4ab3ad3d2125033f6b1) )
+	ROM_LOAD( "15.3h", 0x04000, 0x04000, CRC(d04ecfa8) SHA1(10bfb1d075da768f31a8c34cdfe1a1bf01e89f94) )
+	ROM_LOAD( "16.3g", 0x08000, 0x04000, CRC(33776801) SHA1(29952818038a08c98b95ac801b8929cf1647049c) )
+
+	ROM_REGION( 0xc000, "gfx2", 0 ) /* GFX */
+	ROM_LOAD( "11.3p", 0x00000, 0x04000, CRC(f64cbd1e) SHA1(f8d9b110cdac6ef524e35bec9a5d406651cd7bab) )
+	ROM_LOAD( "13.3l", 0x04000, 0x04000, CRC(ac1e7b4b) SHA1(9e4ff4119a3ae59434eae82fa4b2ce5badb62c68) )
+	ROM_LOAD( "12.3n", 0x08000, 0x04000, CRC(a6ad9ce2) SHA1(db0338385208df9e9cf43efc11383412dec493e6) )
+
+	ROM_REGION( 0x0600, "proms", 0 ) /* not dumped yet; assumed to be the same */
+	ROM_LOAD( "3a.bin", 0x0000, 0x0100, CRC(a784e71f) SHA1(1741ce98d719bad6cc5ea42337ef897f2435bbab) )
+	ROM_LOAD( "4d.bin", 0x0100, 0x0100, CRC(376df30c) SHA1(cc95920cd1c133da1becc7d92f4b187b56a90ec7) )
+	ROM_LOAD( "4a.bin", 0x0200, 0x0100, CRC(4edff5bd) SHA1(305efc7ad7f86635489a655e214e216ac02b904d) )
+	ROM_LOAD( "3d.bin", 0x0300, 0x0100, CRC(fe201a4e) SHA1(15f8ecfcf6c63ffbf9777bec9b203c319ba1b96c) )
+	ROM_LOAD( "3b.bin", 0x0400, 0x0100, CRC(5796cc4a) SHA1(39576c4e48fd7ac52fc652a1ae0573db3d878878) )
+	ROM_LOAD( "3c.bin", 0x0500, 0x0100, CRC(28b5ee4c) SHA1(e21b9c38f433dca1e8894619b1d9f0389a81b48a) )
+ROM_END
+
+//bootleg of Gigas MarkII without the MC-8123
 ROM_START( gigasm2b )
 	ROM_REGION( 2*0xc000, "maincpu", 0 )
 	ROM_LOAD( "8.rom", 0x0c000, 0x4000, CRC(c00a4a6c) SHA1(0d1bb849c9bfe4e92ad70e4ef19da494c0bd7ba8) )
@@ -1341,14 +1374,14 @@ ROM_START( gigasm2b )
 	ROM_CONTINUE(      0x08000, 0x4000 )
 
 	ROM_REGION( 0xc000, "gfx1", 0 ) /* GFX */
-	ROM_LOAD( "4.rom", 0x00000, 0x04000, CRC(20b3405f) SHA1(32120d7b40e74648eb4ac4ab3ad3d2125033f6b1) )
-	ROM_LOAD( "5.rom", 0x04000, 0x04000, CRC(d04ecfa8) SHA1(10bfb1d075da768f31a8c34cdfe1a1bf01e89f94) )
-	ROM_LOAD( "6.rom", 0x08000, 0x04000, CRC(33776801) SHA1(29952818038a08c98b95ac801b8929cf1647049c) )
+	ROM_LOAD( "4.rom", 0x00000, 0x04000, CRC(20b3405f) SHA1(32120d7b40e74648eb4ac4ab3ad3d2125033f6b1) ) // == 14.3k
+	ROM_LOAD( "5.rom", 0x04000, 0x04000, CRC(d04ecfa8) SHA1(10bfb1d075da768f31a8c34cdfe1a1bf01e89f94) ) // == 15.3h
+	ROM_LOAD( "6.rom", 0x08000, 0x04000, CRC(33776801) SHA1(29952818038a08c98b95ac801b8929cf1647049c) ) // == 16.3g
 
 	ROM_REGION( 0xc000, "gfx2", 0 ) /* GFX */
-	ROM_LOAD( "1.rom", 0x00000, 0x04000, CRC(f64cbd1e) SHA1(f8d9b110cdac6ef524e35bec9a5d406651cd7bab) )
-	ROM_LOAD( "3.rom", 0x04000, 0x04000, CRC(c228df19) SHA1(584f269f7de2d531f2b038b4b7318f813c329f7f) )
-	ROM_LOAD( "2.rom", 0x08000, 0x04000, CRC(a6ad9ce2) SHA1(db0338385208df9e9cf43efc11383412dec493e6) )
+	ROM_LOAD( "1.rom", 0x00000, 0x04000, CRC(f64cbd1e) SHA1(f8d9b110cdac6ef524e35bec9a5d406651cd7bab) ) // == 11.3p
+	ROM_LOAD( "3.rom", 0x04000, 0x04000, CRC(c228df19) SHA1(584f269f7de2d531f2b038b4b7318f813c329f7f) ) // 14 bytes different from 13.3l, all in bit 2, low here and high in the non-bootleg set. Which one is correct?
+	ROM_LOAD( "2.rom", 0x08000, 0x04000, CRC(a6ad9ce2) SHA1(db0338385208df9e9cf43efc11383412dec493e6) ) // == 12.3n
 
 	ROM_REGION( 0x0600, "proms", 0 )
 	ROM_LOAD( "1.pr", 0x0000, 0x0100, CRC(a784e71f) SHA1(1741ce98d719bad6cc5ea42337ef897f2435bbab) )
@@ -1430,7 +1463,8 @@ DRIVER_INIT_MEMBER(freekick_state,gigas)
 GAME( 1986, gigas,      0,        gigasm,    gigas,    freekick_state, gigas,    ROT270, "Sega",                         "Gigas (MC-8123, 317-5002)",            MACHINE_SUPPORTS_SAVE )
 GAME( 1986, gigasb,     gigas,    gigas,     gigas,    freekick_state, gigasb,   ROT270, "bootleg",                      "Gigas (bootleg)",                      MACHINE_SUPPORTS_SAVE )
 GAME( 1986, oigas,      gigas ,   oigas,     gigas,    freekick_state, gigasb,   ROT270, "bootleg",                      "Oigas (bootleg)",                      MACHINE_SUPPORTS_SAVE )
-GAME( 1986, gigasm2b,   0,        gigas,     gigasm2,  freekick_state, gigasb,   ROT270, "bootleg",                      "Gigas Mark II (bootleg)",              MACHINE_SUPPORTS_SAVE )
+GAME( 1986, gigasm2,    0,        gigasm,    gigasm2,  freekick_state, gigas,    ROT270, "Sega",                         "Gigas Mark II (MC-8123, 317-5002)",    MACHINE_SUPPORTS_SAVE )
+GAME( 1986, gigasm2b,   gigasm2,  gigas,     gigasm2,  freekick_state, gigasb,   ROT270, "bootleg",                      "Gigas Mark II (bootleg)",              MACHINE_SUPPORTS_SAVE )
 GAME( 1986, omega,      0,        omega,     omega,    freekick_state, gigas,    ROT270, "Nihon System",                 "Omega",                                MACHINE_SUPPORTS_SAVE )
 GAME( 1987, pbillrd,    0,        pbillrd,   pbillrd,  freekick_state, 0,        ROT0,   "Nihon System",                 "Perfect Billiard",                     MACHINE_SUPPORTS_SAVE )
 GAME( 1987, pbillrds,   pbillrd,  pbillrdm,  pbillrd,  freekick_state, pbillrds, ROT0,   "Nihon System",                 "Perfect Billiard (MC-8123, 317-0030)", MACHINE_SUPPORTS_SAVE )
