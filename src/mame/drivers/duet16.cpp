@@ -5,6 +5,7 @@
 #include "cpu/i86/i86.h"
 #include "cpu/mcs48/mcs48.h"
 #include "machine/i8251.h"
+#include "machine/input_merger.h"
 #include "machine/pit8253.h"
 #include "machine/pic8259.h"
 #include "machine/upd765.h"
@@ -42,6 +43,7 @@ ADDRESS_MAP_START(duet16_state::duet16_mem)
 	AM_RANGE(0xb8000, 0xbffff) AM_RAM
 	AM_RANGE(0xc0000, 0xc0fff) AM_RAM AM_SHARE("vram")
 	AM_RANGE(0xf8000, 0xf801f) AM_DEVREADWRITE8("dmac", am9517a_device, read, write, 0xff00)
+	AM_RANGE(0xf8020, 0xf8023) AM_DEVREADWRITE8("pic", pic8259_device, read, write, 0x00ff)
 	AM_RANGE(0xf8040, 0xf804f) AM_DEVREADWRITE8("ptm", ptm6840_device, read, write, 0x00ff)
 	AM_RANGE(0xf8060, 0xf8067) AM_DEVREADWRITE8("bgpit", pit8253_device, read, write, 0x00ff)
 	AM_RANGE(0xf8080, 0xf8087) AM_DEVREADWRITE8("sio", upd7201_new_device, ba_cd_r, ba_cd_w, 0x00ff)
@@ -80,18 +82,18 @@ MC6845_UPDATE_ROW(duet16_state::crtc_update_row)
 }
 
 MACHINE_CONFIG_START(duet16_state::duet16)
-	MCFG_CPU_ADD("maincpu", I8086, 24_MHz_XTAL/3)
+	MCFG_CPU_ADD("maincpu", I8086, 24_MHz_XTAL / 3)
 	MCFG_CPU_PROGRAM_MAP(duet16_mem)
 	MCFG_CPU_IO_MAP(duet16_io)
 	MCFG_CPU_IRQ_ACKNOWLEDGE_DEVICE("pic", pic8259_device, inta_cb)
 
-	MCFG_CPU_ADD("i8741", I8741, 5_MHz_XTAL)
+	MCFG_CPU_ADD("i8741", I8741, 20_MHz_XTAL / 4)
 	MCFG_DEVICE_DISABLE()
 
 	MCFG_DEVICE_ADD("pic", PIC8259, 0)
 	MCFG_PIC8259_OUT_INT_CB(INPUTLINE("maincpu", 0))
 
-	MCFG_DEVICE_ADD("dmac", AM9517A, 5_MHz_XTAL)
+	MCFG_DEVICE_ADD("dmac", AM9517A, 20_MHz_XTAL / 4)
 	/*MCFG_AM9517A_OUT_HRQ_CB(WRITELINE(olyboss_state, hrq_w))
 	MCFG_AM9517A_IN_MEMR_CB(READ8(olyboss_state, dma_mem_r))
 	MCFG_AM9517A_OUT_MEMW_CB(WRITE8(olyboss_state, dma_mem_w))
@@ -104,18 +106,29 @@ MACHINE_CONFIG_START(duet16_state::duet16)
 	MCFG_PIT8253_CLK0(8_MHz_XTAL / 13)
 	MCFG_PIT8253_CLK1(8_MHz_XTAL / 13)
 	MCFG_PIT8253_CLK2(8_MHz_XTAL / 13)
+	MCFG_PIT8253_OUT0_HANDLER(DEVWRITELINE("sio", upd7201_new_device, txca_w)) // TODO: selected through LS153
+	MCFG_DEVCB_CHAIN_OUTPUT(DEVWRITELINE("sio", upd7201_new_device, rxca_w))
 	MCFG_PIT8253_OUT1_HANDLER(DEVWRITELINE("sio", upd7201_new_device, txcb_w))
 	MCFG_DEVCB_CHAIN_OUTPUT(DEVWRITELINE("sio", upd7201_new_device, rxcb_w))
 	MCFG_PIT8253_OUT2_HANDLER(DEVWRITELINE("kbusart", i8251_device, write_txc))
 	MCFG_DEVCB_CHAIN_OUTPUT(DEVWRITELINE("kbusart", i8251_device, write_rxc))
 
 	MCFG_DEVICE_ADD("ptm", PTM6840, 0)
+	MCFG_PTM6840_IRQ_CB(DEVWRITELINE("pic", pic8259_device, ir0_w)) // INT6
 
 	MCFG_DEVICE_ADD("sio", UPD7201_NEW, 8_MHz_XTAL / 2)
+	MCFG_Z80SIO_OUT_INT_CB(DEVWRITELINE("pic", pic8259_device, ir1_w)) // INT5
 
 	MCFG_DEVICE_ADD("kbusart", I8251, 8_MHz_XTAL / 4)
+	MCFG_I8251_RTS_HANDLER(DEVWRITELINE("kbusart", i8251_device, write_cts))
+	MCFG_I8251_RXRDY_HANDLER(DEVWRITELINE("kbint", input_merger_device, in_w<0>))
+	MCFG_I8251_TXRDY_HANDLER(DEVWRITELINE("kbint", input_merger_device, in_w<1>))
+
+	MCFG_INPUT_MERGER_ANY_HIGH("kbint")
+	MCFG_INPUT_MERGER_OUTPUT_HANDLER(DEVWRITELINE("pic", pic8259_device, ir5_w)) // INT2
 
 	MCFG_DEVICE_ADD("fdc", UPD765A, 0)
+	MCFG_UPD765_INTRQ_CALLBACK(DEVWRITELINE("pic", pic8259_device, ir3_w)) // INT4
 
 	MCFG_DEVICE_ADD("crtc", H46505, 2000000)
 	MCFG_MC6845_CHAR_WIDTH(8)
