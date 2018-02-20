@@ -38,24 +38,22 @@
  *
  *************************************/
 
+void cyberbal2p_state::update_interrupts()
+{
+	m_maincpu->set_input_line(1, m_video_int_state ? ASSERT_LINE : CLEAR_LINE);
+	m_maincpu->set_input_line(3, m_sound_int_state ? ASSERT_LINE : CLEAR_LINE);
+}
+
 void cyberbal_state::update_interrupts()
 {
-	if (m_extracpu != nullptr)
-	{
-		m_maincpu->set_input_line(1, m_sound_int_state ? ASSERT_LINE : CLEAR_LINE);
-		m_extracpu->set_input_line(1, m_video_int_state ? ASSERT_LINE : CLEAR_LINE);
-	}
-	else
-	{
-		m_maincpu->set_input_line(1, m_video_int_state ? ASSERT_LINE : CLEAR_LINE);
-		m_maincpu->set_input_line(3, m_sound_int_state ? ASSERT_LINE : CLEAR_LINE);
-	}
+	m_maincpu->set_input_line(1, m_sound_int_state ? ASSERT_LINE : CLEAR_LINE);
+	m_extracpu->set_input_line(1, m_video_int_state ? ASSERT_LINE : CLEAR_LINE);
 }
 
 
-MACHINE_START_MEMBER(cyberbal_state,cyberbal2p)
+void cyberbal_state::machine_start()
 {
-	atarigen_state::machine_start();
+	cyberbal_base_state::machine_start();
 
 	save_item(NAME(m_fast_68k_int));
 	save_item(NAME(m_io_68k_int));
@@ -63,19 +61,15 @@ MACHINE_START_MEMBER(cyberbal_state,cyberbal2p)
 	save_item(NAME(m_sound_data_from_6502));
 	save_item(NAME(m_sound_data_from_68k_ready));
 	save_item(NAME(m_sound_data_from_6502_ready));
-}
-
-MACHINE_START_MEMBER(cyberbal_state,cyberbal)
-{
-	MACHINE_START_CALL_MEMBER(cyberbal2p);
 
 	membank("soundbank")->configure_entries(0, 4, memregion("audiocpu")->base(), 0x1000);
 }
 
 
-MACHINE_RESET_MEMBER(cyberbal_state,cyberbal)
+void cyberbal_state::machine_reset()
 {
-	atarigen_state::machine_reset();
+
+	cyberbal_base_state::machine_reset();
 	scanline_timer_reset(*m_lscreen, 8);
 
 	cyberbal_sound_reset();
@@ -85,9 +79,9 @@ MACHINE_RESET_MEMBER(cyberbal_state,cyberbal)
 }
 
 
-MACHINE_RESET_MEMBER(cyberbal_state,cyberbal2p)
+void cyberbal2p_state::machine_reset()
 {
-	atarigen_state::machine_reset();
+	cyberbal_base_state::machine_reset();
 	scanline_timer_reset(*m_screen, 8);
 }
 
@@ -99,7 +93,7 @@ MACHINE_RESET_MEMBER(cyberbal_state,cyberbal2p)
  *
  *************************************/
 
-READ16_MEMBER(cyberbal_state::sound_state_r)
+READ16_MEMBER(cyberbal2p_state::sound_state_r)
 {
 	int temp = 0xffff;
 	if (m_jsa->main_to_sound_ready()) temp ^= 0xffff;
@@ -227,7 +221,7 @@ ADDRESS_MAP_END
  *
  *************************************/
 
-ADDRESS_MAP_START(cyberbal_state::cyberbal2p_map)
+ADDRESS_MAP_START(cyberbal2p_state::cyberbal2p_map)
 	AM_RANGE(0x000000, 0x07ffff) AM_ROM
 	AM_RANGE(0xfc0000, 0xfc0003) AM_READ_PORT("IN0")
 	AM_RANGE(0xfc2000, 0xfc2003) AM_READ_PORT("IN1")
@@ -415,9 +409,6 @@ MACHINE_CONFIG_START(cyberbal_state::cyberbal)
 
 	MCFG_QUANTUM_TIME(attotime::from_hz(600))
 
-	MCFG_MACHINE_START_OVERRIDE(cyberbal_state,cyberbal)
-	MCFG_MACHINE_RESET_OVERRIDE(cyberbal_state,cyberbal)
-
 	MCFG_EEPROM_2804_ADD("eeprom")
 	MCFG_EEPROM_28XX_LOCK_AFTER_WRITE(true)
 
@@ -457,8 +448,6 @@ MACHINE_CONFIG_START(cyberbal_state::cyberbal)
 	MCFG_SCREEN_UPDATE_DRIVER(cyberbal_state, screen_update_cyberbal_right)
 	MCFG_SCREEN_PALETTE("rpalette")
 
-	MCFG_VIDEO_START_OVERRIDE(cyberbal_state,cyberbal)
-
 	/* sound hardware */
 	MCFG_ATARI_SOUND_COMM_ADD("soundcomm", "audiocpu", WRITELINE(cyberbal_state, sound_int_write_line))
 	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
@@ -486,15 +475,12 @@ MACHINE_CONFIG_START(cyberbal_state::cyberbalt)
 MACHINE_CONFIG_END
 
 
-MACHINE_CONFIG_START(cyberbal_state::cyberbal2p)
+MACHINE_CONFIG_START(cyberbal2p_state::cyberbal2p)
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", M68000, ATARI_CLOCK_14MHz/2)
 	MCFG_CPU_PROGRAM_MAP(cyberbal2p_map)
-	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", cyberbal_state, video_int_gen)
-
-	MCFG_MACHINE_START_OVERRIDE(cyberbal_state,cyberbal2p)
-	MCFG_MACHINE_RESET_OVERRIDE(cyberbal_state,cyberbal2p)
+	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", cyberbal2p_state, video_int_gen)
 
 	MCFG_EEPROM_2816_ADD("eeprom")
 	MCFG_EEPROM_28XX_LOCK_AFTER_WRITE(true)
@@ -506,9 +492,9 @@ MACHINE_CONFIG_START(cyberbal_state::cyberbal2p)
 	MCFG_PALETTE_ADD("palette", 2048)
 	MCFG_PALETTE_FORMAT(IRRRRRGGGGGBBBBB)
 
-	MCFG_TILEMAP_ADD_STANDARD("playfield", "gfxdecode", 2, cyberbal_state, get_playfield_tile_info, 16,8, SCAN_ROWS, 64,64)
-	MCFG_TILEMAP_ADD_STANDARD_TRANSPEN("alpha", "gfxdecode", 2, cyberbal_state, get_alpha_tile_info, 16,8, SCAN_ROWS, 64,32, 0)
-	MCFG_ATARI_MOTION_OBJECTS_ADD("mob", "screen", cyberbal_state::s_mob_config)
+	MCFG_TILEMAP_ADD_STANDARD("playfield", "gfxdecode", 2, cyberbal2p_state, get_playfield_tile_info, 16,8, SCAN_ROWS, 64,64)
+	MCFG_TILEMAP_ADD_STANDARD_TRANSPEN("alpha", "gfxdecode", 2, cyberbal2p_state, get_alpha_tile_info, 16,8, SCAN_ROWS, 64,32, 0)
+	MCFG_ATARI_MOTION_OBJECTS_ADD("mob", "screen", cyberbal2p_state::s_mob_config)
 	MCFG_ATARI_MOTION_OBJECTS_GFXDECODE("gfxdecode")
 
 	MCFG_SCREEN_ADD("screen", RASTER)
@@ -516,15 +502,13 @@ MACHINE_CONFIG_START(cyberbal_state::cyberbal2p)
 	/* note: these parameters are from published specs, not derived */
 	/* the board uses an SOS-2 chip to generate video signals */
 	MCFG_SCREEN_RAW_PARAMS(ATARI_CLOCK_14MHz, 456*2, 0, 336*2, 262, 0, 240)
-	MCFG_SCREEN_UPDATE_DRIVER(cyberbal_state, screen_update_cyberbal2p)
+	MCFG_SCREEN_UPDATE_DRIVER(cyberbal2p_state, screen_update_cyberbal2p)
 	MCFG_SCREEN_PALETTE("palette")
-
-	MCFG_VIDEO_START_OVERRIDE(cyberbal_state,cyberbal2p)
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
 
-	MCFG_ATARI_JSA_II_ADD("jsa", WRITELINE(cyberbal_state, sound_int_write_line))
+	MCFG_ATARI_JSA_II_ADD("jsa", WRITELINE(cyberbal2p_state, sound_int_write_line))
 	MCFG_ATARI_JSA_TEST_PORT("IN2", 15)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 MACHINE_CONFIG_END
@@ -1074,15 +1058,15 @@ DRIVER_INIT_MEMBER(cyberbal_state,cyberbalt)
  *
  *************************************/
 
-GAMEL(1988, cyberbal,    0,        cyberbal,   cyberbal,   cyberbal_state, 0, ROT0, "Atari Games", "Cyberball (rev 4)", 0, layout_dualhsxs )
-GAMEL(1988, cyberbal2,   cyberbal, cyberbal,   cyberbal,   cyberbal_state, 0, ROT0, "Atari Games", "Cyberball (rev 2)", 0, layout_dualhsxs )
-GAMEL(1988, cyberbal1,   cyberbal, cyberbal,   cyberbal,   cyberbal_state, 0, ROT0, "Atari Games", "Cyberball (rev 1)", 0, layout_dualhsxs )
-GAMEL(1988, cyberbalp,   cyberbal, cyberbal,   cyberbal,   cyberbal_state, 0, ROT0, "Atari Games", "Cyberball (prototype)", 0, layout_dualhsxs )
+GAMEL(1988, cyberbal,    0,        cyberbal,   cyberbal,   cyberbal_state,   0,          ROT0, "Atari Games", "Cyberball (rev 4)", 0, layout_dualhsxs )
+GAMEL(1988, cyberbal2,   cyberbal, cyberbal,   cyberbal,   cyberbal_state,   0,          ROT0, "Atari Games", "Cyberball (rev 2)", 0, layout_dualhsxs )
+GAMEL(1988, cyberbal1,   cyberbal, cyberbal,   cyberbal,   cyberbal_state,   0,          ROT0, "Atari Games", "Cyberball (rev 1)", 0, layout_dualhsxs )
+GAMEL(1988, cyberbalp,   cyberbal, cyberbal,   cyberbal,   cyberbal_state,   0,          ROT0, "Atari Games", "Cyberball (prototype)", 0, layout_dualhsxs )
 
-GAME( 1989, cyberbal2p,  cyberbal, cyberbal2p, cyberbal2p, cyberbal_state, 0, ROT0, "Atari Games", "Cyberball 2072 (2 player, rev 4)", 0 )
-GAME( 1989, cyberbal2p3, cyberbal, cyberbal2p, cyberbal2p, cyberbal_state, 0, ROT0, "Atari Games", "Cyberball 2072 (2 player, rev 3)", 0 )
-GAME( 1989, cyberbal2p2, cyberbal, cyberbal2p, cyberbal2p, cyberbal_state, 0, ROT0, "Atari Games", "Cyberball 2072 (2 player, rev 2)", 0 )
-GAME( 1989, cyberbal2p1, cyberbal, cyberbal2p, cyberbal2p, cyberbal_state, 0, ROT0, "Atari Games", "Cyberball 2072 (2 player, rev 1)", 0 )
+GAME( 1989, cyberbal2p,  cyberbal, cyberbal2p, cyberbal2p, cyberbal2p_state, 0,          ROT0, "Atari Games", "Cyberball 2072 (2 player, rev 4)", 0 )
+GAME( 1989, cyberbal2p3, cyberbal, cyberbal2p, cyberbal2p, cyberbal2p_state, 0,          ROT0, "Atari Games", "Cyberball 2072 (2 player, rev 3)", 0 )
+GAME( 1989, cyberbal2p2, cyberbal, cyberbal2p, cyberbal2p, cyberbal2p_state, 0,          ROT0, "Atari Games", "Cyberball 2072 (2 player, rev 2)", 0 )
+GAME( 1989, cyberbal2p1, cyberbal, cyberbal2p, cyberbal2p, cyberbal2p_state, 0,          ROT0, "Atari Games", "Cyberball 2072 (2 player, rev 1)", 0 )
 
-GAMEL(1989, cyberbalt,   cyberbal, cyberbalt,  cyberbal,   cyberbal_state, cyberbalt,  ROT0, "Atari Games", "Tournament Cyberball 2072 (rev 2)", 0, layout_dualhsxs )
-GAMEL(1989, cyberbalt1,  cyberbal, cyberbalt,  cyberbal,   cyberbal_state, cyberbalt,  ROT0, "Atari Games", "Tournament Cyberball 2072 (rev 1)", 0, layout_dualhsxs )
+GAMEL(1989, cyberbalt,   cyberbal, cyberbalt,  cyberbal,   cyberbal_state,   cyberbalt,  ROT0, "Atari Games", "Tournament Cyberball 2072 (rev 2)", 0, layout_dualhsxs )
+GAMEL(1989, cyberbalt1,  cyberbal, cyberbalt,  cyberbal,   cyberbal_state,   cyberbalt,  ROT0, "Atari Games", "Tournament Cyberball 2072 (rev 1)", 0, layout_dualhsxs )
