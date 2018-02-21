@@ -14,19 +14,19 @@ class seibuspi_state : public driver_device
 {
 public:
 	seibuspi_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag),
-		m_maincpu(*this, "maincpu"),
-		m_audiocpu(*this, "audiocpu"),
-		m_mainram(*this, "mainram"),
-		m_z80_rom(*this, "audiocpu"),
-		m_eeprom(*this, "eeprom"),
-		m_soundfifo(*this, "soundfifo%u", 1),
-		m_oki(*this, "oki%u", 1),
-		m_gfxdecode(*this, "gfxdecode"),
-		m_palette(*this, "palette"),
-		m_key(*this, "KEY.%u", 0),
-		m_special(*this, "SPECIAL"),
-		m_z80_bank(*this, "z80_bank")
+		: driver_device(mconfig, type, tag)
+		, m_maincpu(*this, "maincpu")
+		, m_audiocpu(*this, "audiocpu")
+		, m_mainram(*this, "mainram")
+		, m_z80_rom(*this, "audiocpu")
+		, m_eeprom(*this, "eeprom")
+		, m_soundfifo(*this, "soundfifo%u", 1)
+		, m_oki(*this, "oki%u", 1)
+		, m_gfxdecode(*this, "gfxdecode")
+		, m_palette(*this, "palette")
+		, m_key(*this, "KEY.%u", 0)
+		, m_special(*this, "SPECIAL")
+		, m_z80_bank(*this, "z80_bank")
 	{ }
 
 	required_device<cpu_device> m_maincpu;
