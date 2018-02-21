@@ -19,7 +19,7 @@
 	MCFG_DEVICE_ADD(_tag, SEGAM1AUDIO, 0)
 
 #define MCFG_SEGAM1AUDIO_RXD_HANDLER(_devcb) \
-	devcb = &segam1audio_device::set_rxd_handler(*device, DEVCB_##_devcb);
+	devcb = &downcast<segam1audio_device &>(*device).set_rxd_handler(DEVCB_##_devcb);
 
 
 //**************************************************************************
@@ -32,8 +32,8 @@ public:
 	// construction/destruction
 	segam1audio_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
-	// static configuration
-	template <class Object> static devcb_base &set_rxd_handler(device_t &device, Object &&cb) { return downcast<segam1audio_device &>(device).m_rxd_handler.set_callback(std::forward<Object>(cb)); }
+	// configuration
+	template <class Object> devcb_base &set_rxd_handler(Object &&cb) { return m_rxd_handler.set_callback(std::forward<Object>(cb)); }
 
 	DECLARE_WRITE16_MEMBER(m1_snd_mpcm_bnk1_w);
 	DECLARE_WRITE16_MEMBER(m1_snd_mpcm_bnk2_w);

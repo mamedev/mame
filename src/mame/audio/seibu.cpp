@@ -87,17 +87,6 @@ seibu_sound_device::seibu_sound_device(const machine_config &mconfig, const char
 {
 }
 
-void seibu_sound_device::static_set_cpu_tag(device_t &device, const char *tag)
-{
-	downcast<seibu_sound_device &>(device).m_sound_cpu.set_tag(tag);
-	downcast<seibu_sound_device &>(device).m_sound_rom.set_tag(tag);
-}
-
-void seibu_sound_device::static_set_rombank_tag(device_t &device, const char *tag)
-{
-	downcast<seibu_sound_device &>(device).m_rom_bank.set_tag(tag);
-}
-
 //-------------------------------------------------
 //  device_start - device-specific startup
 //-------------------------------------------------

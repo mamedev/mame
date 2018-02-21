@@ -97,12 +97,6 @@ void s11c_bg_device::device_reset()
 	m_cpu->set_input_line(INPUT_LINE_RESET,PULSE_LINE);
 }
 
-void s11c_bg_device::static_set_romregion(device_t &device, const char *tag)
-{
-	s11c_bg_device &cpuboard = downcast<s11c_bg_device &>(device);
-	cpuboard.m_regiontag = tag;
-}
-
 WRITE_LINE_MEMBER( s11c_bg_device::ym2151_irq_w)
 {
 	if(state == CLEAR_LINE)

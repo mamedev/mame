@@ -17,18 +17,18 @@
 #include "machine/timer.h"
 
 #define MCFG_DCS2_AUDIO_DRAM_IN_MB(_dram_in_mb) \
-	dcs_audio_device::static_set_dram_in_mb(*device, _dram_in_mb);
+	downcast<dcs_audio_device &>(*device).set_dram_in_mb(_dram_in_mb);
 
 #define MCFG_DCS2_AUDIO_POLLING_OFFSET(_polling_offset) \
-	dcs_audio_device::static_set_polling_offset(*device, _polling_offset);
+	downcast<dcs_audio_device &>(*device).set_polling_offset(_polling_offset);
 
 
 class dcs_audio_device : public device_t
 {
 public:
 	// for dcs2 (int dram_in_mb, offs_t polling_offset)
-	static void static_set_dram_in_mb(device_t &device, int dram_in_mb) { downcast<dcs_audio_device &>(device).m_dram_in_mb = dram_in_mb; }
-	static void static_set_polling_offset(device_t &device, offs_t polling_offset) { downcast<dcs_audio_device &>(device).m_polling_offset = polling_offset; }
+	void set_dram_in_mb(int dram_in_mb) { m_dram_in_mb = dram_in_mb; }
+	void set_polling_offset(offs_t polling_offset) { m_polling_offset = polling_offset; }
 
 	void set_auto_ack(int state);
 
