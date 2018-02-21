@@ -878,12 +878,9 @@ Notes:
 
 #include "cpu/i386/i386.h"
 #include "cpu/z80/z80.h"
-#include "machine/7200fifo.h"
 #include "machine/ds2404.h"
-#include "machine/eepromser.h"
 #include "machine/intelfsh.h"
 #include "machine/seibuspi.h"
-#include "sound/okim6295.h"
 #include "sound/ymf271.h"
 #include "sound/ymz280b.h"
 #include "video/seibu_crtc.h"
