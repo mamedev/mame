@@ -178,7 +178,7 @@ void devcb_read_base::devcb_reset()
 devcb_read_base &devcb_read_base::chain_alloc()
 {
 	// set up the chained callback pointer
-	m_chain.reset(new devcb_read_base(device, defmask, true));
+	m_chain.reset(new devcb_read_base(m_device, m_defmask, true));
 	return *m_chain;
 }
 
