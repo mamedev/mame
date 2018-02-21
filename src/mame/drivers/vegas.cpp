@@ -2450,9 +2450,9 @@ GAME( 2000, nbagold ,   0,        nbagold,  nbashowt, vegas_state, nbanfl,   ROT
 
 
 /* Durango + Denver SIO + Voodoo 3 */
-GAMEL( 1998, sf2049,     0,        sf2049,   sf2049,   vegas_state, sf2049,   ROT0, "Atari Games",   "San Francisco Rush 2049", MACHINE_NO_SOUND | MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE, layout_sf2049 )
-GAMEL( 1998, sf2049se,   sf2049,   sf2049se, sf2049se, vegas_state, sf2049se, ROT0, "Atari Games",   "San Francisco Rush 2049: Special Edition", MACHINE_NO_SOUND | MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE, layout_sf2049 )
-GAMEL( 1998, sf2049te,   sf2049,   sf2049te, sf2049se, vegas_state, sf2049te, ROT0, "Atari Games",   "San Francisco Rush 2049: Tournament Edition", MACHINE_NO_SOUND | MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE, layout_sf2049 )
+GAMEL( 1999, sf2049,     0,        sf2049,   sf2049,   vegas_state, sf2049,   ROT0, "Atari Games",   "San Francisco Rush 2049", MACHINE_NO_SOUND | MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE, layout_sf2049 )
+GAMEL( 2003, sf2049se,   sf2049,   sf2049se, sf2049se, vegas_state, sf2049se, ROT0, "Atari Games",   "San Francisco Rush 2049: Special Edition", MACHINE_NO_SOUND | MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE, layout_sf2049 )
+GAMEL( 2000, sf2049te,   sf2049,   sf2049te, sf2049se, vegas_state, sf2049te, ROT0, "Atari Games",   "San Francisco Rush 2049: Tournament Edition", MACHINE_NO_SOUND | MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE, layout_sf2049 )
 GAMEL( 2001, sf2049tea,  sf2049,   sf2049te, sf2049se, vegas_state, sf2049te, ROT0, "Atari Games",   "San Francisco Rush 2049: Tournament Edition Unlocked", MACHINE_NO_SOUND | MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE, layout_sf2049 )
 
 /* Durango + Vegas SIO + Voodoo 3 */
