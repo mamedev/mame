@@ -1253,4 +1253,4 @@ GAME( 2002, gamshara,  0,        ns10_gamshara, namcos10, namcos10_state, gamsha
 GAME( 2002, gamsharaj, gamshara, ns10_gamshara, namcos10, namcos10_state, gamshara, ROT0, "Mitchell", "Gamshara (Japan, 10021 Ver.A)", MACHINE_NOT_WORKING | MACHINE_NO_SOUND )
 GAME( 2003, nflclsfb,  0,        ns10_nflclsfb, namcos10, namcos10_state, nflclsfb, ROT0, "Namco", "NFL Classic Football (US, NCF3 Ver.A.)", MACHINE_NOT_WORKING | MACHINE_NO_SOUND )
 GAME( 2003, konotako,  0,        ns10_konotako, namcos10, namcos10_state, konotako, ROT0, "Mitchell", "Kono Tako (10021 Ver.A)", MACHINE_NOT_WORKING | MACHINE_NO_SOUND)
-GAME( 2002, sekaikh,   0,        namcos10_memn, namcos10, namcos10_state, 0,        ROT0, "Namco", "Sekai Kaseki Hakken (Japan, SKH1 Ver.A)", MACHINE_NOT_WORKING | MACHINE_NO_SOUND)
+GAME( 2004, sekaikh,   0,        namcos10_memn, namcos10, namcos10_state, 0,        ROT0, "Namco", "Sekai Kaseki Hakken (Japan, SKH1 Ver.A)", MACHINE_NOT_WORKING | MACHINE_NO_SOUND)
