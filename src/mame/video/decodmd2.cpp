@@ -187,9 +187,3 @@ void decodmd_type2_device::device_reset()
 	m_rambank->set_entry(0);
 	m_busy = false;
 }
-
-void decodmd_type2_device::static_set_gfxregion(device_t &device, const char *tag)
-{
-	decodmd_type2_device &cpuboard = downcast<decodmd_type2_device &>(device);
-	cpuboard.m_gfxtag = tag;
-}

@@ -18,7 +18,7 @@ public:
 
 	int vrender0_ProcessPacket(uint32_t PacketPtr, uint16_t *Dest, uint8_t *TEXTURE);
 
-	static void set_cpu_tag(device_t &device, const char *tag) { downcast<vr0video_device &>(device).m_cpu.set_tag(tag); }
+	void set_cpu_tag(const char *tag) { m_cpu.set_tag(tag); }
 
 protected:
 	// device-level overrides
@@ -63,6 +63,6 @@ DECLARE_DEVICE_TYPE(VIDEO_VRENDER0, vr0video_device)
 
 
 #define MCFG_VIDEO_VRENDER0_CPU(_tag) \
-	vr0video_device::set_cpu_tag(*device, "^" _tag);
+	downcast<vr0video_device &>(*device).set_cpu_tag("^" _tag);
 
 #endif // MAME_VIDEO_VRENDER0_H

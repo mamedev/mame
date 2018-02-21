@@ -45,6 +45,13 @@ protected:
 	void stream_generate(sound_stream &stream, stream_sample_t **inputs, stream_sample_t **outputs, int samples);
 
 private:
+	enum
+	{
+		TIMER_A,
+		TIMER_B,
+		TIMER_IRQ_SYNC
+	};
+
 	void irq_handler(int irq);
 	void timer_handler(int c, int count, int clock);
 	void update_request() { m_stream->update(); }
@@ -56,7 +63,7 @@ private:
 
 	// internal state
 	sound_stream *  m_stream;
-	emu_timer *     m_timer[2];
+	emu_timer *     m_timer[3];
 	void *          m_chip;
 	devcb_write_line m_irq_handler;
 

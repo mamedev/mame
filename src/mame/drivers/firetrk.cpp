@@ -14,7 +14,7 @@
 
 #include "superbug.lh"
 
-#define MASTER_CLOCK (XTAL(12'096'000))
+static constexpr XTAL MASTER_CLOCK = 12.096_MHz_XTAL;
 
 
 void firetrk_state::set_service_mode(int enable)

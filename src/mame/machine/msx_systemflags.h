@@ -14,7 +14,7 @@ DECLARE_DEVICE_TYPE(MSX_SYSTEMFLAGS, msx_systemflags_device)
 
 #define MCFG_MSX_SYSTEMFLAGS_ADD(_tag, _initial_value) \
 	MCFG_DEVICE_ADD(_tag, MSX_SYSTEMFLAGS, 0) \
-	msx_systemflags_device::set_initial_value(*device, _initial_value);
+	downcast<msx_systemflags_device &>(*device).set_initial_value(_initial_value);
 
 
 class msx_systemflags_device : public device_t
@@ -22,8 +22,8 @@ class msx_systemflags_device : public device_t
 public:
 	msx_systemflags_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
-	// static configuration helpers
-	static void set_initial_value(device_t &device, uint8_t initial_value) { dynamic_cast<msx_systemflags_device &>(device).m_initial_value = initial_value; }
+	// configuration helpers
+	void set_initial_value(uint8_t initial_value) { m_initial_value = initial_value; }
 
 	DECLARE_READ8_MEMBER(read);
 	DECLARE_WRITE8_MEMBER(write);

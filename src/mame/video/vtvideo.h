@@ -21,11 +21,11 @@ class vt100_video_device : public device_t,
 public:
 	vt100_video_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
-	template <class Object> static devcb_base &set_ram_rd_callback(device_t &device, Object &&cb) { return downcast<vt100_video_device &>(device).m_read_ram.set_callback(std::forward<Object>(cb)); }
-	template <class Object> static devcb_base &set_vert_freq_intr_wr_callback(device_t &device, Object &&cb) { return downcast<vt100_video_device &>(device).m_write_vert_freq_intr.set_callback(std::forward<Object>(cb)); }
-	template <class Object> static devcb_base &set_lba7_wr_callback(device_t &device, Object &&cb) { return downcast<vt100_video_device &>(device).m_write_lba7.set_callback(std::forward<Object>(cb)); }
+	template <class Object> devcb_base &set_ram_rd_callback(Object &&cb) { return m_read_ram.set_callback(std::forward<Object>(cb)); }
+	template <class Object> devcb_base &set_vert_freq_intr_wr_callback(Object &&cb) { return m_write_vert_freq_intr.set_callback(std::forward<Object>(cb)); }
+	template <class Object> devcb_base &set_lba7_wr_callback(Object &&cb) { return m_write_lba7.set_callback(std::forward<Object>(cb)); }
 
-	static void set_chargen_tag(device_t &device, const char *tag) { downcast<vt100_video_device &>(device).m_char_rom.set_tag(tag); }
+	void set_chargen_tag(const char *tag) { m_char_rom.set_tag(tag); }
 
 	DECLARE_READ_LINE_MEMBER(lba7_r);
 	DECLARE_WRITE8_MEMBER(dc012_w);
@@ -108,15 +108,15 @@ DECLARE_DEVICE_TYPE(RAINBOW_VIDEO, rainbow_video_device)
 #define MCFG_VT_SET_SCREEN MCFG_VIDEO_SET_SCREEN
 
 #define MCFG_VT_CHARGEN(_tag) \
-	vt100_video_device::set_chargen_tag(*device, "^" _tag);
+	downcast<vt100_video_device &>(*device).set_chargen_tag("^" _tag);
 
 #define MCFG_VT_VIDEO_RAM_CALLBACK(_read) \
-	devcb = &vt100_video_device::set_ram_rd_callback(*device, DEVCB_##_read);
+	devcb = &downcast<vt100_video_device &>(*device).set_ram_rd_callback(DEVCB_##_read);
 
 #define MCFG_VT_VIDEO_VERT_FREQ_INTR_CALLBACK(_write) \
-	devcb = &vt100_video_device::set_vert_freq_intr_wr_callback(*device, DEVCB_##_write);
+	devcb = &downcast<vt100_video_device &>(*device).set_vert_freq_intr_wr_callback(DEVCB_##_write);
 
 #define MCFG_VT_VIDEO_LBA7_CALLBACK(_write) \
-	devcb = &vt100_video_device::set_lba7_wr_callback(*device, DEVCB_##_write);
+	devcb = &downcast<vt100_video_device &>(*device).set_lba7_wr_callback(DEVCB_##_write);
 
 #endif // MAME_VIDEO_VTVIDEO_H

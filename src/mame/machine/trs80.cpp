@@ -126,13 +126,13 @@ READ8_MEMBER( trs80_state::trs80m4_ea_r )
     d2..d0 Not used */
 
 	uint8_t data=7;
-	m_ay31015->set_input_pin(AY31015_SWE, 0);
-	data |= m_ay31015->get_output_pin(AY31015_TBMT) ? 0x40 : 0;
-	data |= m_ay31015->get_output_pin(AY31015_DAV ) ? 0x80 : 0;
-	data |= m_ay31015->get_output_pin(AY31015_OR  ) ? 0x20 : 0;
-	data |= m_ay31015->get_output_pin(AY31015_FE  ) ? 0x10 : 0;
-	data |= m_ay31015->get_output_pin(AY31015_PE  ) ? 0x08 : 0;
-	m_ay31015->set_input_pin(AY31015_SWE, 1);
+	m_ay31015->write_swe(0);
+	data |= m_ay31015->tbmt_r() ? 0x40 : 0;
+	data |= m_ay31015->dav_r( ) ? 0x80 : 0;
+	data |= m_ay31015->or_r(  ) ? 0x20 : 0;
+	data |= m_ay31015->fe_r(  ) ? 0x10 : 0;
+	data |= m_ay31015->pe_r(  ) ? 0x08 : 0;
+	m_ay31015->write_swe(1);
 
 	return data;
 }
@@ -141,8 +141,8 @@ READ8_MEMBER( trs80_state::trs80m4_eb_r )
 {
 /* UART received data */
 	uint8_t data = m_ay31015->get_received_data();
-	m_ay31015->set_input_pin(AY31015_RDAV, 0);
-	m_ay31015->set_input_pin(AY31015_RDAV, 1);
+	m_ay31015->write_rdav(0);
+	m_ay31015->write_rdav(1);
 	return data;
 }
 
@@ -166,13 +166,13 @@ READ8_MEMBER( trs80_state::sys80_f9_r )
     d0 Data Available */
 
 	uint8_t data = 70;
-	m_ay31015->set_input_pin(AY31015_SWE, 0);
-	data |= m_ay31015->get_output_pin(AY31015_TBMT) ? 0 : 0x80;
-	data |= m_ay31015->get_output_pin(AY31015_DAV ) ? 0x01 : 0;
-	data |= m_ay31015->get_output_pin(AY31015_OR  ) ? 0x02 : 0;
-	data |= m_ay31015->get_output_pin(AY31015_FE  ) ? 0x04 : 0;
-	data |= m_ay31015->get_output_pin(AY31015_PE  ) ? 0x08 : 0;
-	m_ay31015->set_input_pin(AY31015_SWE, 1);
+	m_ay31015->write_swe(0);
+	data |= m_ay31015->tbmt_r() ? 0 : 0x80;
+	data |= m_ay31015->dav_r( ) ? 0x01 : 0;
+	data |= m_ay31015->or_r(  ) ? 0x02 : 0;
+	data |= m_ay31015->fe_r(  ) ? 0x04 : 0;
+	data |= m_ay31015->pe_r(  ) ? 0x08 : 0;
+	m_ay31015->write_swe(1);
 
 	return data;
 }
@@ -464,13 +464,13 @@ WRITE8_MEMBER( trs80_state::trs80m4_ea_w )
     d0 Data-Terminal-Ready (DTR), pin 20 */
 
 	{
-		m_ay31015->set_input_pin(AY31015_CS, 0);
-		m_ay31015->set_input_pin(AY31015_NB1, BIT(data, 6));
-		m_ay31015->set_input_pin(AY31015_NB2, BIT(data, 5));
-		m_ay31015->set_input_pin(AY31015_TSB, BIT(data, 4));
-		m_ay31015->set_input_pin(AY31015_EPS, BIT(data, 7));
-		m_ay31015->set_input_pin(AY31015_NP,  BIT(data, 3));
-		m_ay31015->set_input_pin(AY31015_CS, 1);
+		m_ay31015->write_cs(0);
+		m_ay31015->write_nb1(BIT(data, 6));
+		m_ay31015->write_nb2(BIT(data, 5));
+		m_ay31015->write_tsb(BIT(data, 4));
+		m_ay31015->write_eps(BIT(data, 7));
+		m_ay31015->write_np(BIT(data, 3));
+		m_ay31015->write_cs(1);
 	}
 	else
 	{

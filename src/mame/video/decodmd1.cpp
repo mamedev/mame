@@ -266,12 +266,6 @@ void decodmd_type1_device::device_reset()
 	m_frameswap = false;
 }
 
-void decodmd_type1_device::static_set_gfxregion(device_t &device, const char *tag)
-{
-	decodmd_type1_device &cpuboard = downcast<decodmd_type1_device &>(device);
-	cpuboard.m_gfxtag = tag;
-}
-
 uint32_t decodmd_type1_device::screen_update( screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect )
 {
 	uint8_t ptr = 0;

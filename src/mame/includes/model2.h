@@ -187,10 +187,11 @@ public:
 	DECLARE_WRITE32_MEMBER(model2_5881prot_w);
 	int first_read;
 
-	void model2_3d_init(uint16_t *texture_rom);
-	void geo_init(uint32_t *polygon_rom);
+	void raster_init(memory_region *texture_rom);
+	void geo_init(memory_region *polygon_rom);
 	DECLARE_READ32_MEMBER(maxx_r);
-	DECLARE_WRITE32_MEMBER(mode_w);
+	DECLARE_READ32_MEMBER(render_mode_r);
+	DECLARE_WRITE32_MEMBER(render_mode_w);
 	DECLARE_WRITE32_MEMBER(model2o_tex_w0);
 	DECLARE_WRITE32_MEMBER(model2o_tex_w1);
 	DECLARE_READ16_MEMBER(lumaram_r);
@@ -287,6 +288,15 @@ public:
 	void model2o_mem(address_map &map);
 	void rchase2_iocpu_map(address_map &map);
 	void rchase2_ioport_map(address_map &map);
+	
+	uint8_t m_gamma_table[256];
+	
+protected:
+	virtual void video_start() override;
+	
+private:
+	bool m_render_unk;
+	bool m_render_mode;
 };
 
 
@@ -331,16 +341,16 @@ static inline uint16_t get_texel( uint32_t base_x, uint32_t base_y, int x, int y
 
 struct triangle;
 
-class model2_renderer : public poly_manager<float, m2_poly_extra_data, 10, 32768>
+class model2_renderer : public poly_manager<float, m2_poly_extra_data, 4, 32768>
 {
 public:
 	typedef void (model2_renderer::*scanline_render_func)(int32_t scanline, const extent_t& extent, const m2_poly_extra_data& object, int threadid);
 
 public:
 	model2_renderer(model2_state& state)
-		: poly_manager<float, m2_poly_extra_data, 10, 32768>(state.machine())
+		: poly_manager<float, m2_poly_extra_data, 4, 32768>(state.machine())
 		, m_state(state)
-		, m_destmap(state.m_screen->width(), state.m_screen->height())
+		, m_destmap(512, 512)
 	{
 		m_renderfuncs[0] = &model2_renderer::model2_3d_render_0;
 		m_renderfuncs[1] = &model2_renderer::model2_3d_render_1;

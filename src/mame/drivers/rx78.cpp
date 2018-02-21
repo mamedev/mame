@@ -82,8 +82,12 @@ public:
 		, m_cart(*this, "cartslot")
 		, m_ram(*this, RAM_TAG)
 		, m_palette(*this, "palette")
-		{ }
+	{ }
 
+	DECLARE_DRIVER_INIT(rx78);
+	void rx78(machine_config &config);
+
+protected:
 	DECLARE_READ8_MEMBER( key_r );
 	DECLARE_READ8_MEMBER( cass_r );
 	DECLARE_READ8_MEMBER( vram_r );
@@ -96,19 +100,18 @@ public:
 	DECLARE_WRITE8_MEMBER( vdp_bg_reg_w );
 	DECLARE_WRITE8_MEMBER( vdp_pri_mask_w );
 	DECLARE_DEVICE_IMAGE_LOAD_MEMBER( rx78_cart );
-	DECLARE_DRIVER_INIT(rx78);
 	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 
-	void rx78(machine_config &config);
+	virtual void machine_reset() override;
 	void rx78_io(address_map &map);
 	void rx78_mem(address_map &map);
+
 private:
 	uint8_t m_vram_read_bank;
 	uint8_t m_vram_write_bank;
 	uint8_t m_pal_reg[7];
 	uint8_t m_pri_mask;
 	uint8_t m_key_mux;
-	virtual void machine_reset() override;
 	required_device<cpu_device> m_maincpu;
 	required_device<cassette_image_device> m_cass;
 	required_device<generic_slot_device> m_cart;

@@ -68,14 +68,14 @@ WRITE8_MEMBER( cm1800_state::port00_w )
 
 READ8_MEMBER( cm1800_state::port01_r )
 {
-	return (m_uart->get_output_pin(AY31015_DAV)) | (m_uart->get_output_pin(AY31015_TBMT) << 2);
+	return (m_uart->dav_r()) | (m_uart->tbmt_r() << 2);
 }
 
 READ8_MEMBER( cm1800_state::port00_r )
 {
-	m_uart->set_input_pin(AY31015_RDAV, 0);
+	m_uart->write_rdav(0);
 	u8 result = m_uart->get_received_data();
-	m_uart->set_input_pin(AY31015_RDAV, 1);
+	m_uart->write_rdav(1);
 	return result;
 }
 
@@ -98,16 +98,16 @@ INPUT_PORTS_END
 
 void cm1800_state::machine_reset()
 {
-	m_uart->set_input_pin(AY31015_XR, 0);
-	m_uart->set_input_pin(AY31015_XR, 1);
-	m_uart->set_input_pin(AY31015_SWE, 0);
-	m_uart->set_input_pin(AY31015_NP, 1);
-	m_uart->set_input_pin(AY31015_TSB, 0);
-	m_uart->set_input_pin(AY31015_NB1, 1);
-	m_uart->set_input_pin(AY31015_NB2, 1);
-	m_uart->set_input_pin(AY31015_EPS, 1);
-	m_uart->set_input_pin(AY31015_CS, 1);
-	m_uart->set_input_pin(AY31015_CS, 0);
+	m_uart->write_xr(0);
+	m_uart->write_xr(1);
+	m_uart->write_swe(0);
+	m_uart->write_np(1);
+	m_uart->write_tsb(0);
+	m_uart->write_nb1(1);
+	m_uart->write_nb2(1);
+	m_uart->write_eps(1);
+	m_uart->write_cs(1);
+	m_uart->write_cs(0);
 }
 
 MACHINE_CONFIG_START(cm1800_state::cm1800)

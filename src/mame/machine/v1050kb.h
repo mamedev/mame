@@ -21,7 +21,7 @@
 //**************************************************************************
 
 #define MCFG_V1050_KEYBOARD_OUT_TX_HANDLER(_devcb) \
-	devcb = &v1050_keyboard_device::set_out_tx_handler(*device, DEVCB_##_devcb);
+	devcb = &downcast<v1050_keyboard_device &>(*device).set_out_tx_handler(DEVCB_##_devcb);
 
 
 
@@ -40,7 +40,7 @@ public:
 	// device flags
 	static constexpr feature_type imperfect_features() { return feature::KEYBOARD; }
 
-	template <class Object> static devcb_base &set_out_tx_handler(device_t &device, Object &&cb) { return downcast<v1050_keyboard_device &>(device).m_out_tx_handler.set_callback(std::forward<Object>(cb)); }
+	template <class Object> devcb_base &set_out_tx_handler(Object &&cb) { return m_out_tx_handler.set_callback(std::forward<Object>(cb)); }
 
 	DECLARE_WRITE_LINE_MEMBER( si_w );
 

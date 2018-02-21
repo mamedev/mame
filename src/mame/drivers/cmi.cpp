@@ -268,7 +268,7 @@ private:
 	double  m_freq;
 	bool    m_active;
 
-	int     m_ptm_out0;
+	int     m_ptm_o1;
 
 	int     m_pia_0_irqa;
 	int     m_pia_0_irqb;
@@ -293,7 +293,7 @@ private:
 	DECLARE_WRITE_LINE_MEMBER( pia_1_irqb );
 
 	DECLARE_WRITE_LINE_MEMBER( ptm_irq );
-	DECLARE_WRITE_LINE_MEMBER( ptm_out0 );
+	DECLARE_WRITE_LINE_MEMBER( ptm_o1 );
 };
 
 DEFINE_DEVICE_TYPE(CMI01A_CHANNEL_CARD, cmi01a_device, "cmi_01a", "Fairlight CMI-01A Channel Card")
@@ -330,7 +330,7 @@ MACHINE_CONFIG_START(cmi01a_device::device_add_mconfig)
 
 	MCFG_DEVICE_ADD("cmi01a_ptm", PTM6840, 2000000) // ptm_cmi01a_config
 	MCFG_PTM6840_EXTERNAL_CLOCKS(250000, 500000, 500000)
-	MCFG_PTM6840_OUT0_CB(WRITELINE(cmi01a_device, ptm_out0))
+	MCFG_PTM6840_O1_CB(WRITELINE(cmi01a_device, ptm_o1))
 	MCFG_PTM6840_IRQ_CB(WRITELINE(cmi01a_device, ptm_irq))
 MACHINE_CONFIG_END
 
@@ -393,7 +393,7 @@ void cmi01a_device::device_reset()
 	m_freq = 0.0;
 	m_active = false;
 
-	m_ptm_out0 = 0;
+	m_ptm_o1 = 0;
 }
 
 class cmi_state : public driver_device
@@ -528,7 +528,7 @@ public:
 	DECLARE_WRITE8_MEMBER( cmi02_w );
 	DECLARE_WRITE8_MEMBER( master_tune_w );
 	DECLARE_WRITE_LINE_MEMBER( cmi02_ptm_irq );
-	DECLARE_WRITE_LINE_MEMBER( cmi02_ptm_o1 );
+	DECLARE_WRITE_LINE_MEMBER( cmi02_ptm_o2 );
 
 	// Alphanumeric keyboard
 	DECLARE_READ8_MEMBER( ank_col_r );
@@ -1819,7 +1819,7 @@ void cmi01a_device::zx_timer_cb()
 	if (m_zx_flag == 0)
 	{
 		/* Low to high transition - clock flip flop */
-		int op = m_ptm_out0;
+		int op = m_ptm_o1;
 
 		/* Set /ZCINT */
 		if (op != m_zx_ff)
@@ -1929,9 +1929,9 @@ void cmi01a_device::update_wave_addr(int inc)
 	/* Zero crossing interrupt is a pulse */
 }
 
-WRITE_LINE_MEMBER( cmi01a_device::ptm_out0 )
+WRITE_LINE_MEMBER( cmi01a_device::ptm_o1 )
 {
-	m_ptm_out0 = state;
+	m_ptm_o1 = state;
 }
 
 READ_LINE_MEMBER( cmi01a_device::eosi_r )
@@ -1986,7 +1986,7 @@ WRITE8_MEMBER( cmi01a_device::write )
 		{
 			/* PTM addressing is a little funky */
 			int a0 = offset & 1;
-			int a1 = (m_ptm_out0 && BIT(offset, 3)) || (!BIT(offset, 3) && BIT(offset, 2));
+			int a1 = (m_ptm_o1 && BIT(offset, 3)) || (!BIT(offset, 3) && BIT(offset, 2));
 			int a2 = BIT(offset, 1);
 
 			//printf("CH%d PTM W: [%x] = %02x\n", m_channel, (a2 << 2) | (a1 << 1) | a0, data);
@@ -2042,7 +2042,7 @@ READ8_MEMBER( cmi01a_device::read )
 		case 0x10: case 0x11: case 0x12: case 0x13: case 0x14: case 0x15: case 0x16: case 0x17:
 		{
 			int a0 = offset & 1;
-			int a1 = (m_ptm_out0 && BIT(offset, 3)) || (!BIT(offset, 3) && BIT(offset, 2));
+			int a1 = (m_ptm_o1 && BIT(offset, 3)) || (!BIT(offset, 3) && BIT(offset, 2));
 			int a2 = BIT(offset, 1);
 
 			data = m_ptm->read(space, (a2 << 2) | (a1 << 1) | a0);
@@ -2068,7 +2068,7 @@ WRITE_LINE_MEMBER( cmi_state::cmi02_ptm_irq )
 	set_interrupt(CPU_1, IRQ_TIMINT_LEVEL, m_cmi02_ptm_irq ? ASSERT_LINE : CLEAR_LINE);
 }
 
-WRITE_LINE_MEMBER( cmi_state::cmi02_ptm_o1 )
+WRITE_LINE_MEMBER( cmi_state::cmi02_ptm_o2 )
 {
 	m_cmi02_ptm->set_c1(state);
 	m_cmi02_ptm->set_c3(state);
@@ -2824,7 +2824,7 @@ MACHINE_CONFIG_START(cmi_state::cmi2x)
 	MCFG_DEVICE_ADD("cmi02_pia_2", PIA6821, 0) // pia_cmi02_2_config
 
 	MCFG_DEVICE_ADD("cmi02_ptm", PTM6840, 2000000) // ptm_cmi02_config TODO
-	MCFG_PTM6840_OUT1_CB(WRITELINE(cmi_state, cmi02_ptm_o1))
+	MCFG_PTM6840_O2_CB(WRITELINE(cmi_state, cmi02_ptm_o2))
 	MCFG_PTM6840_IRQ_CB(WRITELINE(cmi_state, cmi02_ptm_irq))
 
 	MCFG_DEVICE_ADD("mkbd_acia_clock", CLOCK, XTAL(1'843'200) / 12)

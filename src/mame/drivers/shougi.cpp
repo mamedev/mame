@@ -99,16 +99,9 @@ public:
 		m_videoram(*this, "videoram")
 	{ }
 
-	// devices/pointers
-	required_device<cpu_device> m_maincpu;
-	required_device<cpu_device> m_subcpu;
-	required_device<alpha_8201_device> m_alpha_8201;
+	void shougi(machine_config &config);
 
-	required_shared_ptr<uint8_t> m_videoram;
-
-	uint8_t m_nmi_enabled;
-	int m_r;
-
+protected:
 	DECLARE_WRITE_LINE_MEMBER(nmi_enable_w);
 	DECLARE_READ8_MEMBER(semaphore_r);
 
@@ -118,10 +111,20 @@ public:
 	INTERRUPT_GEN_MEMBER(vblank_nmi);
 
 	virtual void machine_start() override;
-	void shougi(machine_config &config);
 	void main_map(address_map &map);
 	void readport_sub(address_map &map);
 	void sub_map(address_map &map);
+
+private:
+	// devices/pointers
+	required_device<cpu_device> m_maincpu;
+	required_device<cpu_device> m_subcpu;
+	required_device<alpha_8201_device> m_alpha_8201;
+
+	required_shared_ptr<uint8_t> m_videoram;
+
+	uint8_t m_nmi_enabled;
+	int m_r;
 };
 
 

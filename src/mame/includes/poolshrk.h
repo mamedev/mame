@@ -5,6 +5,10 @@
     Atari Pool Shark hardware
 
 *************************************************************************/
+#ifndef MAME_INCLUDES_POOLSHRK_H
+#define MAME_INCLUDES_POOLSHRK_H
+
+#pragma once
 
 #include "machine/watchdog.h"
 #include "sound/discrete.h"
@@ -14,8 +18,8 @@
 class poolshrk_state : public driver_device
 {
 public:
-	poolshrk_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag),
+	poolshrk_state(const machine_config &mconfig, device_type type, const char *tag) :
+		driver_device(mconfig, type, tag),
 		m_maincpu(*this, "maincpu"),
 		m_watchdog(*this, "watchdog"),
 		m_gfxdecode(*this, "gfxdecode"),
@@ -23,21 +27,13 @@ public:
 		m_discrete(*this, "discrete"),
 		m_playfield_ram(*this, "playfield_ram"),
 		m_hpos_ram(*this, "hpos_ram"),
-		m_vpos_ram(*this, "vpos_ram") { }
+		m_vpos_ram(*this, "vpos_ram")
+	{ }
 
-	required_device<cpu_device> m_maincpu;
-	required_device<watchdog_timer_device> m_watchdog;
-	required_device<gfxdecode_device> m_gfxdecode;
-	required_device<palette_device> m_palette;
-	required_device<discrete_device> m_discrete;
+	DECLARE_DRIVER_INIT(poolshrk);
+	void poolshrk(machine_config &config);
 
-	required_shared_ptr<uint8_t> m_playfield_ram;
-	required_shared_ptr<uint8_t> m_hpos_ram;
-	required_shared_ptr<uint8_t> m_vpos_ram;
-
-	tilemap_t* m_bg_tilemap;
-	int m_da_latch;
-
+protected:
 	DECLARE_WRITE8_MEMBER(da_latch_w);
 	DECLARE_WRITE8_MEMBER(led_w);
 	DECLARE_WRITE8_MEMBER(watchdog_w);
@@ -50,15 +46,29 @@ public:
 
 	TILE_GET_INFO_MEMBER(get_tile_info);
 
-	DECLARE_DRIVER_INIT(poolshrk);
-	virtual void video_start() override;
 	DECLARE_PALETTE_INIT(poolshrk);
 
 	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
-	void poolshrk(machine_config &config);
+	virtual void video_start() override;
 	void poolshrk_cpu_map(address_map &map);
+
+private:
+	required_device<cpu_device> m_maincpu;
+	required_device<watchdog_timer_device> m_watchdog;
+	required_device<gfxdecode_device> m_gfxdecode;
+	required_device<palette_device> m_palette;
+	required_device<discrete_device> m_discrete;
+
+	required_shared_ptr<uint8_t> m_playfield_ram;
+	required_shared_ptr<uint8_t> m_hpos_ram;
+	required_shared_ptr<uint8_t> m_vpos_ram;
+
+	tilemap_t* m_bg_tilemap;
+	int m_da_latch;
 };
 
 
 /*----------- defined in audio/poolshrk.c -----------*/
 DISCRETE_SOUND_EXTERN( poolshrk );
+
+#endif // MAME_INCLUDES_POOLSHRK_H

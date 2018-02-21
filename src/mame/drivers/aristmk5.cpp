@@ -472,15 +472,15 @@ class aristmk5_state : public archimedes_state
 public:
 	aristmk5_state(const machine_config &mconfig, device_type type, const char *tag)
 		: archimedes_state(mconfig, type, tag)
+		, m_hopper(*this, "hopper")
 		, m_eeprom(*this, "eeprom%d", 0)
 		, m_rtc(*this, "rtc")
 		, m_nvram(*this, "nvram")
-		, m_hopper(*this, "hopper")
 		, m_sram(*this, "sram")
 		, m_p1(*this, "P1")
 		, m_p2(*this, "P2")
 		, m_extra_ports(*this, "EXTRA")
-		 { }
+	 { }
 
 	DECLARE_WRITE32_MEMBER(Ns5w48);
 	DECLARE_READ32_MEMBER(Ns5x58);
@@ -507,29 +507,37 @@ public:
 	DECLARE_WRITE_LINE_MEMBER(uart_irq_callback);
 
 	DECLARE_DRIVER_INIT(aristmk5);
-	virtual void machine_start() override;
-	virtual void machine_reset() override;
-	TIMER_CALLBACK_MEMBER(mk5_VSYNC_callback);
-	TIMER_CALLBACK_MEMBER(mk5_2KHz_callback);
-	TIMER_CALLBACK_MEMBER(spi_timer);
+	void aristmk5(machine_config &config);
+	void aristmk5_touch(machine_config &config);
+	void aristmk5_usa(machine_config &config);
+	void aristmk5_usa_touch(machine_config &config);
 
 	INPUT_CHANGED_MEMBER(coin_start);
 	CUSTOM_INPUT_MEMBER(coin_r);
 	CUSTOM_INPUT_MEMBER(coin_usa_r);
 	CUSTOM_INPUT_MEMBER(hopper_r);
 
-	void aristmk5(machine_config &config);
-	void aristmk5_touch(machine_config &config);
-	void aristmk5_usa_touch(machine_config &config);
-	void aristmk5_usa(machine_config &config);
+protected:
+	virtual void machine_start() override;
+	virtual void machine_reset() override;
+	TIMER_CALLBACK_MEMBER(mk5_VSYNC_callback);
+	TIMER_CALLBACK_MEMBER(mk5_2KHz_callback);
+	TIMER_CALLBACK_MEMBER(spi_timer);
+
 	void aristmk5_drame_map(address_map &map);
 	void aristmk5_map(address_map &map);
 	void aristmk5_usa_map(address_map &map);
+
+	required_device<ticket_dispenser_device> m_hopper;
+
+	uint8_t         m_hopper_test;
+	uint64_t        m_coin_start_cycles;
+	uint8_t         m_coin_div;
+
 private:
 	required_device_array<eeprom_serial_93cxx_device, 2> m_eeprom;
 	required_device<ds1302_device> m_rtc;
 	required_device<nvram_device> m_nvram;
-	required_device<ticket_dispenser_device> m_hopper;
 	required_memory_region m_sram;
 	required_ioport m_p1;
 	required_ioport m_p2;
@@ -540,9 +548,6 @@ private:
 	emu_timer *     m_spi_timer;
 	uint8_t         m_sram_bank;
 	uint8_t         m_ldor_shift_reg;
-	uint8_t         m_hopper_test;
-	uint64_t        m_coin_start_cycles;
-	uint8_t         m_coin_div;
 	uint8_t         m_spi_mux;
 	uint8_t         m_spi_latch;
 	uint8_t         m_spi_bits;

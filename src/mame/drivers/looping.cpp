@@ -106,8 +106,8 @@ L056-6    9A          "      "      VLI-8-4 7A         "
 class looping_state : public driver_device
 {
 public:
-	looping_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag),
+	looping_state(const machine_config &mconfig, device_type type, const char *tag) :
+		driver_device(mconfig, type, tag),
 		m_videoram(*this, "videoram"),
 		m_colorram(*this, "colorram"),
 		m_spriteram(*this, "spriteram"),
@@ -117,17 +117,13 @@ public:
 		m_gfxdecode(*this, "gfxdecode"),
 		m_palette(*this, "palette"),
 		m_soundlatch(*this, "soundlatch"),
-		m_watchdog(*this, "watchdog") { }
+		m_watchdog(*this, "watchdog")
+	{ }
 
-	/* memory pointers */
-	required_shared_ptr<uint8_t> m_videoram;
-	required_shared_ptr<uint8_t> m_colorram;
-	required_shared_ptr<uint8_t> m_spriteram;
-	uint8_t m_cop_port_l;
+	DECLARE_DRIVER_INIT(looping);
+	void looping(machine_config &config);
 
-	/* tilemaps */
-	tilemap_t * m_bg_tilemap;
-
+protected:
 	DECLARE_WRITE_LINE_MEMBER(flip_screen_x_w);
 	DECLARE_WRITE_LINE_MEMBER(flip_screen_y_w);
 	DECLARE_WRITE8_MEMBER(looping_videoram_w);
@@ -151,15 +147,30 @@ public:
 	DECLARE_WRITE8_MEMBER(looping_sound_sw);
 	DECLARE_WRITE_LINE_MEMBER(ay_enable_w);
 	DECLARE_WRITE_LINE_MEMBER(speech_enable_w);
-	DECLARE_DRIVER_INIT(looping);
 	TILE_GET_INFO_MEMBER(get_tile_info);
-	virtual void machine_start() override;
-	virtual void machine_reset() override;
-	virtual void video_start() override;
 	DECLARE_PALETTE_INIT(looping);
 	uint32_t screen_update_looping(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	INTERRUPT_GEN_MEMBER(looping_interrupt);
 	void draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprect);
+
+	virtual void machine_start() override;
+	virtual void machine_reset() override;
+	virtual void video_start() override;
+	void looping_io_map(address_map &map);
+	void looping_map(address_map &map);
+	void looping_sound_io_map(address_map &map);
+	void looping_sound_map(address_map &map);
+
+private:
+	/* memory pointers */
+	required_shared_ptr<uint8_t> m_videoram;
+	required_shared_ptr<uint8_t> m_colorram;
+	required_shared_ptr<uint8_t> m_spriteram;
+	uint8_t m_cop_port_l;
+
+	/* tilemaps */
+	tilemap_t * m_bg_tilemap;
+
 	required_device<cpu_device> m_maincpu;
 	required_device<cpu_device> m_audiocpu;
 	required_device<dac_byte_interface> m_dac;
@@ -167,11 +178,6 @@ public:
 	required_device<palette_device> m_palette;
 	required_device<generic_latch_8_device> m_soundlatch;
 	required_device<watchdog_timer_device> m_watchdog;
-	void looping(machine_config &config);
-	void looping_io_map(address_map &map);
-	void looping_map(address_map &map);
-	void looping_sound_io_map(address_map &map);
-	void looping_sound_map(address_map &map);
 };
 
 

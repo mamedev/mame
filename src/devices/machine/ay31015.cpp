@@ -208,22 +208,22 @@ void ay31015_device::device_reset()
 inline uint8_t ay31015_device::get_si()
 {
 	if (!m_read_si_cb.isnull())
-		m_pins[AY31015_SI] = m_read_si_cb();
+		m_pins[SI] = m_read_si_cb();
 
-	return m_pins[AY31015_SI];
+	return m_pins[SI];
 }
 
 
 inline void ay31015_device::set_so( int data )
 {
-	m_pins[AY31015_SO] = data ? 1 : 0;
+	m_pins[SO] = data ? 1 : 0;
 
 	if (!m_write_so_cb.isnull())
-		m_write_so_cb(m_pins[AY31015_SO]);
+		m_write_so_cb(m_pins[SO]);
 }
 
 
-inline void ay31015_device::update_status_pin(uint8_t reg_bit, ay31015_output_pin_t pin, devcb_write_line &write_cb)
+inline void ay31015_device::update_status_pin(uint8_t reg_bit, ay31015_device::output_pin pin, devcb_write_line &write_cb)
 {
 	int new_value = (m_status_reg & reg_bit) ? 1 : 0;
 
@@ -243,16 +243,16 @@ inline void ay31015_device::update_status_pin(uint8_t reg_bit, ay31015_output_pi
 void ay31015_device::update_status_pins()
 {
 	/* Should status pins be updated? */
-	if (!m_pins[AY31015_SWE])
+	if (!m_pins[SWE])
 	{
-		update_status_pin(STATUS_PE, AY31015_PE, m_write_pe_cb);
-		update_status_pin(STATUS_FE, AY31015_FE, m_write_fe_cb);
-		update_status_pin(STATUS_OR, AY31015_OR, m_write_or_cb);
-		update_status_pin(STATUS_DAV, AY31015_DAV, m_write_dav_cb);
-		update_status_pin(STATUS_TBMT, AY31015_TBMT, m_write_tbmt_cb);
+		update_status_pin(STATUS_PE, PE, m_write_pe_cb);
+		update_status_pin(STATUS_FE, FE, m_write_fe_cb);
+		update_status_pin(STATUS_OR, OR, m_write_or_cb);
+		update_status_pin(STATUS_DAV, DAV, m_write_dav_cb);
+		update_status_pin(STATUS_TBMT, TBMT, m_write_tbmt_cb);
 	}
 
-	update_status_pin(STATUS_EOC, AY31015_EOC, m_write_eoc_cb);
+	update_status_pin(STATUS_EOC, EOC, m_write_eoc_cb);
 }
 
 void ay31015_device::device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr)
@@ -573,7 +573,7 @@ void ay31015_device::internal_reset()
 	m_tx_data = 0;
 	m_rx_state = PREP_TIME;
 	m_tx_state = IDLE;
-	m_pins[AY31015_SI] = 1;
+	m_pins[SI] = 1;
 	set_so(1);
 
 	m_rx_data = 0;
@@ -598,7 +598,7 @@ void ay51013_device::internal_reset()
 	m_tx_data = 0;
 	m_rx_state = PREP_TIME;
 	m_tx_state = IDLE;
-	m_pins[AY31015_SI] = 1;
+	m_pins[SI] = 1;
 	set_so(1);
 	// no m_rx_data = 0 in this case
 }
@@ -611,11 +611,11 @@ void ay31015_device::transfer_control_pins()
 {
 	uint8_t control = 0;
 
-	control |= m_pins[AY31015_NP ] ? CONTROL_NP  : 0;
-	control |= m_pins[AY31015_TSB] ? CONTROL_TSB : 0;
-	control |= m_pins[AY31015_NB1] ? CONTROL_NB1 : 0;
-	control |= m_pins[AY31015_NB2] ? CONTROL_NB2 : 0;
-	control |= m_pins[AY31015_EPS] ? CONTROL_EPS : 0;
+	control |= m_pins[NP ] ? CONTROL_NP  : 0;
+	control |= m_pins[TSB] ? CONTROL_TSB : 0;
+	control |= m_pins[NB1] ? CONTROL_NB1 : 0;
+	control |= m_pins[NB2] ? CONTROL_NB2 : 0;
+	control |= m_pins[EPS] ? CONTROL_EPS : 0;
 
 	if (m_control_reg != control)
 	{
@@ -628,50 +628,50 @@ void ay31015_device::transfer_control_pins()
 /*-------------------------------------------------
  ay31015_set_input_pin - set an input pin
 -------------------------------------------------*/
-void ay31015_device::set_input_pin( ay31015_input_pin_t pin, int data )
+void ay31015_device::set_input_pin( ay31015_device::input_pin pin, int data )
 {
 	data = data ? 1 : 0;
 
 	switch (pin)
 	{
-	case AY31015_RCP:
+	case RCP:
 		if (!m_pins[pin] && data)
 			rx_process();
 		m_pins[pin] = data;
 		break;
-	case AY31015_TCP:
+	case TCP:
 		if (m_pins[pin] && !data)
 			tx_process();
 		m_pins[pin] = data;
 		break;
-	case AY31015_SWE:
+	case SWE:
 		m_pins[pin] = data;
 		update_status_pins();
 		break;
-	case AY31015_RDAV:
+	case RDAV:
 		m_pins[pin] = data;
 		if (!data)
 		{
 			m_status_reg &= ~STATUS_DAV;
-			m_pins[AY31015_DAV] = 0;
+			m_pins[DAV] = 0;
 		}
 		break;
-	case AY31015_SI:
+	case SI:
 		m_pins[pin] = data;
 		break;
-	case AY31015_XR:
+	case XR:
 		m_pins[pin] = data;
 		if (data)
 			internal_reset();
 		break;
-	case AY31015_CS:
-	case AY31015_NP:
-	case AY31015_TSB:
-	case AY31015_NB1:
-	case AY31015_NB2:
-	case AY31015_EPS:
+	case CS:
+	case NP:
+	case TSB:
+	case NB1:
+	case NB2:
+	case EPS:
 		m_pins[pin] = data;
-		if (m_pins[AY31015_CS])
+		if (m_pins[CS])
 			transfer_control_pins();
 		break;
 	}
@@ -682,7 +682,7 @@ void ay31015_device::set_input_pin( ay31015_input_pin_t pin, int data )
  ay31015_get_output_pin - get the status of an output pin
 -------------------------------------------------*/
 
-int ay31015_device::get_output_pin( ay31015_output_pin_t pin )
+int ay31015_device::get_output_pin( ay31015_device::output_pin pin )
 {
 	return m_pins[pin];
 }

@@ -35,16 +35,6 @@ dooyong_tilemap_device_base::dooyong_tilemap_device_base(
 {
 }
 
-void dooyong_tilemap_device_base::static_set_gfxdecode_tag(device_t &device, char const *tag)
-{
-	downcast<dooyong_tilemap_device_base &>(device).m_gfxdecode.set_tag(tag);
-}
-
-void dooyong_tilemap_device_base::static_set_gfxnum(device_t &device, int gfxnum)
-{
-	downcast<dooyong_tilemap_device_base &>(device).m_gfxnum = gfxnum;
-}
-
 void dooyong_tilemap_device_base::draw(screen_device &screen, bitmap_ind16 &dest, rectangle const &cliprect, uint32_t flags, uint8_t priority)
 {
 	m_tilemap->draw(screen, dest, cliprect, flags, priority);
@@ -81,29 +71,6 @@ dooyong_rom_tilemap_device::dooyong_rom_tilemap_device(
 	, m_primella_color_shift(10)
 	, m_registers{ 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 }
 {
-}
-
-void dooyong_rom_tilemap_device::static_set_tilerom_tag(device_t &device, char const *tag)
-{
-	downcast<dooyong_rom_tilemap_device &>(device).m_tilerom.set_tag(tag);
-}
-
-void dooyong_rom_tilemap_device::static_set_tilerom_offset(device_t &device, int offset)
-{
-	downcast<dooyong_rom_tilemap_device &>(device).m_tilerom_offset = offset;
-}
-
-void dooyong_rom_tilemap_device::static_set_transparent_pen(device_t &device, unsigned pen)
-{
-	downcast<dooyong_rom_tilemap_device &>(device).m_transparent_pen = pen;
-}
-
-void dooyong_rom_tilemap_device::static_set_primella_code_bits(device_t &device, unsigned bits)
-{
-	dooyong_rom_tilemap_device &tilemap_device(downcast<dooyong_rom_tilemap_device &>(device));
-	tilemap_device.m_primella_code_mask = (1U << bits) - 1U;
-	tilemap_device.m_primella_color_mask = ((1U << 14) - 1) & ~tilemap_device.m_primella_code_mask;
-	tilemap_device.m_primella_color_shift = bits;
 }
 
 WRITE8_MEMBER(dooyong_rom_tilemap_device::ctrl_w)
@@ -209,16 +176,6 @@ rshark_rom_tilemap_device::rshark_rom_tilemap_device(machine_config const &mconf
 	, m_colorrom_offset(0)
 {
 	m_rows = 32;
-}
-
-void rshark_rom_tilemap_device::static_set_colorrom_tag(device_t &device, char const *tag)
-{
-	downcast<rshark_rom_tilemap_device &>(device).m_colorrom.set_tag(tag);
-}
-
-void rshark_rom_tilemap_device::static_set_colorrom_offset(device_t &device, int offset)
-{
-	downcast<rshark_rom_tilemap_device &>(device).m_colorrom_offset = offset;
 }
 
 void rshark_rom_tilemap_device::device_start()

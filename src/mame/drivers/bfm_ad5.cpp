@@ -13,6 +13,7 @@
 
 #include "emu.h"
 #include "includes/bfm_ad5.h"
+#include "includes/bfm_sc4.h"
 #include "machine/mcf5206e.h"
 #include "machine/bfm_sc45_helper.h"
 #include "speaker.h"

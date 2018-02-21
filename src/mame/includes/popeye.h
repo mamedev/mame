@@ -11,9 +11,7 @@ public:
 		m_maincpu(*this, "maincpu"),
 		m_gfxdecode(*this, "gfxdecode"),
 		m_palette(*this, "palette"),
-		m_background_pos(*this, "background_pos"),
-		m_palettebank(*this, "palettebank"),
-		m_spriteram(*this, "spriteram"),
+		m_dmasource(*this, "dmasource"),
 		m_videoram(*this, "videoram"),
 		m_colorram(*this, "colorram"),
 		m_color_prom(*this, "proms"),
@@ -27,18 +25,19 @@ protected:
 	required_device<cpu_device> m_maincpu;
 	required_device<gfxdecode_device> m_gfxdecode;
 	required_device<palette_device> m_palette;
-	required_shared_ptr<uint8_t> m_background_pos;
-	required_shared_ptr<uint8_t> m_palettebank;
-	required_shared_ptr<uint8_t> m_spriteram;
+	required_shared_ptr<uint8_t> m_dmasource;
 	required_shared_ptr<uint8_t> m_videoram;
 	required_shared_ptr<uint8_t> m_colorram;
 	required_region_ptr<uint8_t> m_color_prom;
 	required_region_ptr<uint8_t> m_color_prom_spr;
 
-	uint8_t m_background_ram[0x1000];
 	std::unique_ptr<bitmap_ind16> m_sprite_bitmap;
+	std::vector<uint8_t> m_sprite_ram;
+	std::vector<uint8_t> m_background_ram;
+	uint8_t m_background_scroll[3];
 	tilemap_t *m_fg_tilemap;
-	uint8_t m_last_palette;
+	uint8_t m_palette_bank;
+	uint8_t m_palette_bank_cache;
 	int   m_field;
 	uint8_t m_prot0;
 	uint8_t m_prot1;
@@ -95,7 +94,7 @@ protected:
 	virtual DECLARE_WRITE8_MEMBER(background_w) override;
 };
 
-class tpp2np_state : public tpp2_state
+class tpp2_noalu_state : public tpp2_state
 {
 	using tpp2_state::tpp2_state;
 protected:

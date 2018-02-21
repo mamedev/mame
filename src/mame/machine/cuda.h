@@ -32,22 +32,22 @@
 	MCFG_DEVICE_REMOVE(CUDA_TAG)
 
 #define MCFG_CUDA_TYPE(_type) \
-	cuda_device::static_set_type(*device, _type);
+	downcast<cuda_device &>(*device).set_type(_type);
 
 #define MCFG_CUDA_REMOVE() \
 	MCFG_DEVICE_REMOVE(CUDA_TAG)
 
 #define MCFG_CUDA_RESET_CALLBACK(_cb) \
-	devcb = &cuda_device::set_reset_cb(*device, DEVCB_##_cb);
+	devcb = &downcast<cuda_device &>(*device).set_reset_cb(DEVCB_##_cb);
 
 #define MCFG_CUDA_LINECHANGE_CALLBACK(_cb) \
-	devcb = &cuda_device::set_linechange_cb(*device, DEVCB_##_cb);
+	devcb = &downcast<cuda_device &>(*device).set_linechange_cb(DEVCB_##_cb);
 
 #define MCFG_CUDA_VIA_CLOCK_CALLBACK(_cb) \
-	devcb = &cuda_device::set_via_clock_cb(*device, DEVCB_##_cb);
+	devcb = &downcast<cuda_device &>(*device).set_via_clock_cb(DEVCB_##_cb);
 
 #define MCFG_CUDA_VIA_DATA_CALLBACK(_cb) \
-	devcb = &cuda_device::set_via_data_cb(*device, DEVCB_##_cb);
+	devcb = &downcast<cuda_device &>(*device).set_via_data_cb(DEVCB_##_cb);
 
 //**************************************************************************
 //  TYPE DEFINITIONS
@@ -62,7 +62,7 @@ public:
 	cuda_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
 	// inline configuration helpers
-	static void static_set_type(device_t &device, int type);
+	void set_type(int type) { rom_offset = type; }
 
 	// device_config_nvram_interface overrides
 	virtual void nvram_default() override;
@@ -96,10 +96,10 @@ public:
 
 	int rom_offset;
 
-	template<class _Object> static devcb_base &set_reset_cb(device_t &device, _Object wr) { return downcast<cuda_device &>(device).write_reset.set_callback(wr); }
-	template<class _Object> static devcb_base &set_linechange_cb(device_t &device, _Object wr) { return downcast<cuda_device &>(device).write_linechange.set_callback(wr); }
-	template<class _Object> static devcb_base &set_via_clock_cb(device_t &device, _Object wr) { return downcast<cuda_device &>(device).write_via_clock.set_callback(wr); }
-	template<class _Object> static devcb_base &set_via_data_cb(device_t &device, _Object wr) { return downcast<cuda_device &>(device).write_via_data.set_callback(wr); }
+	template <class Object> devcb_base &set_reset_cb(Object &&wr) { return write_reset.set_callback(std::forward<Object>(wr)); }
+	template <class Object> devcb_base &set_linechange_cb(Object &&wr) { return write_linechange.set_callback(std::forward<Object>(wr)); }
+	template <class Object> devcb_base &set_via_clock_cb(Object &&wr) { return write_via_clock.set_callback(std::forward<Object>(wr)); }
+	template <class Object> devcb_base &set_via_data_cb(Object &&wr) { return write_via_data.set_callback(std::forward<Object>(wr)); }
 
 	devcb_write_line write_reset, write_linechange, write_via_clock, write_via_data;
 

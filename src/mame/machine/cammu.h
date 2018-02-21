@@ -7,10 +7,10 @@
 #pragma once
 
 #define MCFG_CAMMU_SSW_CB(_sswcb) \
-	devcb = &cammu_device::static_set_ssw_callback(*device, DEVCB_##_sswcb);
+	devcb = &downcast<cammu_device &>(*device).set_ssw_callback(DEVCB_##_sswcb);
 
 #define MCFG_CAMMU_EXCEPTION_CB(_exceptioncb) \
-	devcb = &cammu_device::static_set_exception_callback(*device, DEVCB_##_exceptioncb);
+	devcb = &downcast<cammu_device &>(*device).set_exception_callback(DEVCB_##_exceptioncb);
 
 #define MCFG_CAMMU_LINK(_tag) \
 	cammu_c3_device::static_add_linked(*device, _tag);
@@ -18,8 +18,8 @@
 class cammu_device : public device_t, public device_memory_interface
 {
 public:
-	template <class Object> static devcb_base &static_set_ssw_callback(device_t &device, Object &&cb) { return downcast<cammu_device &>(device).m_ssw_func.set_callback(std::forward<Object>(cb)); }
-	template <class Object> static devcb_base &static_set_exception_callback(device_t &device, Object &&cb) { return downcast<cammu_device &>(device).m_exception_func.set_callback(std::forward<Object>(cb)); }
+	template <class Object> devcb_base &set_ssw_callback(Object &&cb) { return m_ssw_func.set_callback(std::forward<Object>(cb)); }
+	template <class Object> devcb_base &set_exception_callback(Object &&cb) { return m_exception_func.set_callback(std::forward<Object>(cb)); }
 
 	static const u32 CAMMU_PAGE_SIZE = 0x1000;
 	static const u32 CAMMU_PAGE_MASK = (CAMMU_PAGE_SIZE - 1);

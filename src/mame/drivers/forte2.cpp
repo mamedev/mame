@@ -52,18 +52,22 @@ public:
 		m_maincpu(*this, "maincpu")
 	{ }
 
-	required_device<cpu_device> m_maincpu;
+	DECLARE_DRIVER_INIT(pesadelo);
+	void pesadelo(machine_config &config);
 
-	uint8_t m_input_mask;
+protected:
+	virtual void machine_start() override;
+	virtual void machine_reset() override;
+	void io_mem(address_map &map);
+	void program_mem(address_map &map);
 
 	DECLARE_READ8_MEMBER(forte2_ay8910_read_input);
 	DECLARE_WRITE8_MEMBER(forte2_ay8910_set_input_mask);
-	DECLARE_DRIVER_INIT(pesadelo);
-	virtual void machine_start() override;
-	virtual void machine_reset() override;
-	void pesadelo(machine_config &config);
-	void io_mem(address_map &map);
-	void program_mem(address_map &map);
+
+private:
+	required_device<cpu_device> m_maincpu;
+
+	uint8_t m_input_mask;
 };
 
 

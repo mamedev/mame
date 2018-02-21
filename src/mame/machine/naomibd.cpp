@@ -79,13 +79,6 @@ naomi_board::naomi_board(const machine_config &mconfig, device_type type, const 
 	eeprom_tag = nullptr;
 }
 
-void naomi_board::static_set_eeprom_tag(device_t &device, const char *_eeprom_tag)
-{
-	naomi_board &dev = downcast<naomi_board &>(device);
-	dev.eeprom_tag = _eeprom_tag;
-}
-
-
 void naomi_board::device_start()
 {
 	naomi_g1_device::device_start();

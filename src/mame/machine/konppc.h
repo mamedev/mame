@@ -6,10 +6,10 @@
 #pragma once
 
 #define MCFG_KONPPC_CGBOARD_NUMBER(_num) \
-	konppc_device::static_set_num_boards(*device, _num);
+	downcast<konppc_device &>(*device).set_num_boards(_num);
 
 #define MCFG_KONPPC_CGBOARD_TYPE(_cgtype) \
-	konppc_device::static_set_cbboard_type(*device, konppc_device::CGBOARD_TYPE_##_cgtype);
+	downcast<konppc_device &>(*device).set_cbboard_type(konppc_device::CGBOARD_TYPE_##_cgtype);
 
 class konppc_device :  public device_t
 {
@@ -25,8 +25,8 @@ public:
 	// construction/destruction
 	konppc_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
-	static void static_set_num_boards(device_t &device, int num) { downcast<konppc_device &>(device).num_cgboards = num; }
-	static void static_set_cbboard_type(device_t &device, int cgtype) { downcast<konppc_device &>(device).cgboard_type = cgtype; }
+	void set_num_boards(int num) { num_cgboards = num; }
+	void set_cbboard_type(int cgtype) { cgboard_type = cgtype; }
 
 	void set_cgboard_id(int board_id);
 	int get_cgboard_id(void);

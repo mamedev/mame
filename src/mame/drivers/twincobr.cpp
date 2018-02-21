@@ -730,7 +730,7 @@ MACHINE_CONFIG_START(twincobr_state::fshark)
 	MCFG_ADDRESSABLE_LATCH_Q0_OUT_CB(WRITELINE(twincobr_state, dsp_int_w))
 
 	MCFG_DEVICE_MODIFY("scu")
-	toaplan_scu_device::static_set_xoffsets(*device, 32, 14);
+	MCFG_TOAPLAN_SCU_SET_XOFFSETS(32, 14)
 MACHINE_CONFIG_END
 
 

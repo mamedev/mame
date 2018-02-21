@@ -16,12 +16,6 @@ fuukivid_device::fuukivid_device(const machine_config &mconfig, const char *tag,
 {
 }
 
-void fuukivid_device::static_set_gfxdecode_tag(device_t &device, const char *tag)
-{
-	downcast<fuukivid_device &>(device).m_gfxdecode.set_tag(tag);
-}
-
-
 void fuukivid_device::device_start()
 {
 	m_sprram = make_unique_clear<uint16_t[]>(0x2000 / 2);

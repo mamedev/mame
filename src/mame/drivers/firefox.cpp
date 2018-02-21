@@ -46,8 +46,8 @@ but requires a special level III player for proper control. Video: CAV. Audio: A
 class firefox_state : public driver_device
 {
 public:
-	firefox_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag),
+	firefox_state(const machine_config &mconfig, device_type type, const char *tag) :
+		driver_device(mconfig, type, tag),
 		m_laserdisc(*this, "laserdisc") ,
 		m_tileram(*this, "tileram"),
 		m_spriteram(*this, "spriteram"),
@@ -59,23 +59,14 @@ public:
 		m_screen(*this, "screen"),
 		m_palette(*this, "palette"),
 		m_soundlatch(*this, "soundlatch"),
-		m_soundlatch2(*this, "soundlatch2") { }
+		m_soundlatch2(*this, "soundlatch2")
+	{ }
 
-	required_device<phillips_22vp931_device> m_laserdisc;
-	required_shared_ptr<unsigned char> m_tileram;
-	required_shared_ptr<uint8_t> m_spriteram;
-	required_shared_ptr<unsigned char> m_sprite_palette;
-	required_shared_ptr<unsigned char> m_tile_palette;
-	int m_n_disc_lock;
-	int m_n_disc_data;
-	int m_n_disc_read_data;
-	x2212_device *m_nvram_1c;
-	x2212_device *m_nvram_1d;
-	tilemap_t *m_bgtiles;
-	int m_control_num;
-	uint8_t m_sound_to_main_flag;
-	uint8_t m_main_to_sound_flag;
-	int m_sprite_bank;
+	DECLARE_CUSTOM_INPUT_MEMBER(mainflag_r);
+	DECLARE_CUSTOM_INPUT_MEMBER(soundflag_r);
+	void firefox(machine_config &config);
+
+protected:
 	DECLARE_READ8_MEMBER(firefox_disc_status_r);
 	DECLARE_READ8_MEMBER(firefox_disc_data_r);
 	DECLARE_WRITE8_MEMBER(firefox_disc_read_w);
@@ -108,18 +99,27 @@ public:
 	DECLARE_WRITE_LINE_MEMBER(led3_w);
 	DECLARE_WRITE_LINE_MEMBER(coin_counter_right_w);
 	DECLARE_WRITE_LINE_MEMBER(coin_counter_left_w);
-	DECLARE_CUSTOM_INPUT_MEMBER(mainflag_r);
-	DECLARE_CUSTOM_INPUT_MEMBER(soundflag_r);
 	DECLARE_READ8_MEMBER(riot_porta_r);
 	DECLARE_WRITE8_MEMBER(riot_porta_w);
 	DECLARE_WRITE_LINE_MEMBER(riot_irq);
 	TILE_GET_INFO_MEMBER(bgtile_get_info);
-	virtual void machine_start() override;
-	virtual void video_start() override;
 	uint32_t screen_update_firefox(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 	TIMER_DEVICE_CALLBACK_MEMBER(video_timer_callback);
 	void set_rgba( int start, int index, unsigned char *palette_ram );
 	void firq_gen(phillips_22vp931_device &laserdisc, int state);
+
+	virtual void machine_start() override;
+	virtual void video_start() override;
+	void audio_map(address_map &map);
+	void main_map(address_map &map);
+
+private:
+	required_device<phillips_22vp931_device> m_laserdisc;
+	required_shared_ptr<unsigned char> m_tileram;
+	required_shared_ptr<uint8_t> m_spriteram;
+	required_shared_ptr<unsigned char> m_sprite_palette;
+	required_shared_ptr<unsigned char> m_tile_palette;
+
 	required_device<cpu_device> m_maincpu;
 	required_device<cpu_device> m_audiocpu;
 	required_device<gfxdecode_device> m_gfxdecode;
@@ -127,9 +127,17 @@ public:
 	required_device<palette_device> m_palette;
 	required_device<generic_latch_8_device> m_soundlatch;
 	required_device<generic_latch_8_device> m_soundlatch2;
-	void firefox(machine_config &config);
-	void audio_map(address_map &map);
-	void main_map(address_map &map);
+
+	int m_n_disc_lock;
+	int m_n_disc_data;
+	int m_n_disc_read_data;
+	x2212_device *m_nvram_1c;
+	x2212_device *m_nvram_1d;
+	tilemap_t *m_bgtiles;
+	int m_control_num;
+	uint8_t m_sound_to_main_flag;
+	uint8_t m_main_to_sound_flag;
+	int m_sprite_bank;
 };
 
 

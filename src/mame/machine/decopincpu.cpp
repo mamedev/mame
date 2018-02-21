@@ -294,12 +294,6 @@ void decocpu_type1_device::device_start()
 	m_cpu->space(AS_PROGRAM).install_rom(0x4000,0xffff,ROM+0x4000);
 }
 
-void decocpu_type1_device::static_set_cpuregion(device_t &device, const char *tag)
-{
-	decocpu_type1_device &cpuboard = downcast<decocpu_type1_device &>(device);
-	cpuboard.m_cputag = tag;
-}
-
 decocpu_type2_device::decocpu_type2_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
 	: decocpu_type2_device(mconfig, DECOCPU2, tag, owner, clock)
 {}

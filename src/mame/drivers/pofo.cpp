@@ -90,21 +90,15 @@ public:
 		m_keylatch(0xff)
 	{ }
 
-	required_device<cpu_device> m_maincpu;
-	required_device<hd61830_device> m_lcdc;
-	required_device<pcd3311_device> m_dtmf;
-	required_device<portfolio_memory_card_slot_device> m_ccm;
-	required_device<portfolio_expansion_slot_device> m_exp;
-	required_device<timer_device> m_timer_tick;
-	required_device<nvram_device> m_nvram;
-	required_device<ram_device> m_ram;
-	required_region_ptr<uint8_t> m_rom;
-	required_region_ptr<uint8_t> m_char_rom;
-	required_ioport_array<8> m_y;
-	required_ioport m_battery;
+	void portfolio(machine_config &config);
 
+protected:
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
+
+	void portfolio_io(address_map &map);
+	void portfolio_lcdc(address_map &map);
+	void portfolio_mem(address_map &map);
 
 	void check_interrupt();
 	void trigger_interrupt(int level);
@@ -147,22 +141,32 @@ public:
 	DECLARE_WRITE_LINE_MEMBER( eint_w );
 	DECLARE_WRITE_LINE_MEMBER( wake_w );
 
-	uint8_t m_ip;
-	uint8_t m_ie;
-	uint16_t m_counter;
-	uint8_t m_keylatch;
-	int m_rom_b;
-
 	DECLARE_PALETTE_INIT(portfolio);
 	TIMER_DEVICE_CALLBACK_MEMBER(keyboard_tick);
 	TIMER_DEVICE_CALLBACK_MEMBER(system_tick);
 	TIMER_DEVICE_CALLBACK_MEMBER(counter_tick);
 	DECLARE_READ8_MEMBER(hd61830_rd_r);
 	IRQ_CALLBACK_MEMBER(portfolio_int_ack);
-	void portfolio(machine_config &config);
-	void portfolio_io(address_map &map);
-	void portfolio_lcdc(address_map &map);
-	void portfolio_mem(address_map &map);
+
+private:
+	required_device<cpu_device> m_maincpu;
+	required_device<hd61830_device> m_lcdc;
+	required_device<pcd3311_device> m_dtmf;
+	required_device<portfolio_memory_card_slot_device> m_ccm;
+	required_device<portfolio_expansion_slot_device> m_exp;
+	required_device<timer_device> m_timer_tick;
+	required_device<nvram_device> m_nvram;
+	required_device<ram_device> m_ram;
+	required_region_ptr<uint8_t> m_rom;
+	required_region_ptr<uint8_t> m_char_rom;
+	required_ioport_array<8> m_y;
+	required_ioport m_battery;
+
+	uint8_t m_ip;
+	uint8_t m_ie;
+	uint16_t m_counter;
+	uint8_t m_keylatch;
+	int m_rom_b;
 };
 
 

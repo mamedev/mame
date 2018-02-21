@@ -5,6 +5,10 @@
     Atari Return of the Jedi hardware
 
 *************************************************************************/
+#ifndef MAME_INCLUDES_JEDI_H
+#define MAME_INCLUDES_JEDI_H
+
+#pragma once
 
 #include "screen.h"
 
@@ -21,8 +25,8 @@
 class jedi_state : public driver_device
 {
 public:
-	jedi_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag),
+	jedi_state(const machine_config &mconfig, device_type type, const char *tag) :
+		driver_device(mconfig, type, tag),
 		m_nvram(*this, "nvram") ,
 		m_backgroundram(*this, "backgroundram"),
 		m_paletteram(*this, "paletteram"),
@@ -36,6 +40,49 @@ public:
 		m_screen(*this, "screen")
 	{ }
 
+	DECLARE_CUSTOM_INPUT_MEMBER(jedi_audio_comm_stat_r);
+	void jedi(machine_config &config);
+
+protected:
+	DECLARE_WRITE8_MEMBER(main_irq_ack_w);
+	DECLARE_WRITE8_MEMBER(rom_banksel_w);
+	DECLARE_READ8_MEMBER(a2d_data_r);
+	DECLARE_WRITE8_MEMBER(a2d_select_w);
+	DECLARE_WRITE_LINE_MEMBER(coin_counter_left_w);
+	DECLARE_WRITE_LINE_MEMBER(coin_counter_right_w);
+	DECLARE_WRITE8_MEMBER(nvram_data_w);
+	DECLARE_WRITE8_MEMBER(nvram_enable_w);
+	DECLARE_WRITE8_MEMBER(jedi_vscroll_w);
+	DECLARE_WRITE8_MEMBER(jedi_hscroll_w);
+	DECLARE_WRITE8_MEMBER(irq_ack_w);
+	DECLARE_WRITE_LINE_MEMBER(audio_reset_w);
+	DECLARE_WRITE8_MEMBER(jedi_audio_latch_w);
+	DECLARE_READ8_MEMBER(audio_latch_r);
+	DECLARE_READ8_MEMBER(jedi_audio_ack_latch_r);
+	DECLARE_WRITE8_MEMBER(audio_ack_latch_w);
+	DECLARE_WRITE8_MEMBER(speech_strobe_w);
+	DECLARE_READ8_MEMBER(speech_ready_r);
+	DECLARE_WRITE8_MEMBER(speech_reset_w);
+	virtual void machine_start() override;
+	virtual void machine_reset() override;
+	virtual void sound_start() override;
+	virtual void sound_reset() override;
+	DECLARE_VIDEO_START(jedi);
+	DECLARE_WRITE_LINE_MEMBER(foreground_bank_w);
+	DECLARE_WRITE_LINE_MEMBER(video_off_w);
+	uint32_t screen_update_jedi(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
+	TIMER_CALLBACK_MEMBER(generate_interrupt);
+	TIMER_CALLBACK_MEMBER(delayed_audio_latch_w);
+	void get_pens(pen_t *pens);
+	void do_pen_lookup(bitmap_rgb32 &bitmap, const rectangle &cliprect);
+	void draw_background_and_text(bitmap_rgb32 &bitmap, const rectangle &cliprect);
+	void draw_sprites(bitmap_rgb32 &bitmap, const rectangle &cliprect);
+	void jedi_audio(machine_config &config);
+	void jedi_video(machine_config &config);
+	void audio_map(address_map &map);
+	void main_map(address_map &map);
+
+private:
 	required_shared_ptr<uint8_t> m_nvram;
 
 	/* machine state */
@@ -60,46 +107,10 @@ public:
 	required_shared_ptr<uint8_t> m_audio_comm_stat;
 	required_shared_ptr<uint8_t> m_speech_data;
 	uint8_t  m_speech_strobe_state;
-	DECLARE_WRITE8_MEMBER(main_irq_ack_w);
-	DECLARE_WRITE8_MEMBER(rom_banksel_w);
-	DECLARE_READ8_MEMBER(a2d_data_r);
-	DECLARE_WRITE8_MEMBER(a2d_select_w);
-	DECLARE_WRITE_LINE_MEMBER(coin_counter_left_w);
-	DECLARE_WRITE_LINE_MEMBER(coin_counter_right_w);
-	DECLARE_WRITE8_MEMBER(nvram_data_w);
-	DECLARE_WRITE8_MEMBER(nvram_enable_w);
-	DECLARE_WRITE8_MEMBER(jedi_vscroll_w);
-	DECLARE_WRITE8_MEMBER(jedi_hscroll_w);
-	DECLARE_CUSTOM_INPUT_MEMBER(jedi_audio_comm_stat_r);
-	DECLARE_WRITE8_MEMBER(irq_ack_w);
-	DECLARE_WRITE_LINE_MEMBER(audio_reset_w);
-	DECLARE_WRITE8_MEMBER(jedi_audio_latch_w);
-	DECLARE_READ8_MEMBER(audio_latch_r);
-	DECLARE_READ8_MEMBER(jedi_audio_ack_latch_r);
-	DECLARE_WRITE8_MEMBER(audio_ack_latch_w);
-	DECLARE_WRITE8_MEMBER(speech_strobe_w);
-	DECLARE_READ8_MEMBER(speech_ready_r);
-	DECLARE_WRITE8_MEMBER(speech_reset_w);
-	virtual void machine_start() override;
-	virtual void machine_reset() override;
-	virtual void sound_start() override;
-	virtual void sound_reset() override;
-	DECLARE_VIDEO_START(jedi);
-	DECLARE_WRITE_LINE_MEMBER(foreground_bank_w);
-	DECLARE_WRITE_LINE_MEMBER(video_off_w);
-	uint32_t screen_update_jedi(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
-	TIMER_CALLBACK_MEMBER(generate_interrupt);
-	TIMER_CALLBACK_MEMBER(delayed_audio_latch_w);
-	void get_pens(pen_t *pens);
-	void do_pen_lookup(bitmap_rgb32 &bitmap, const rectangle &cliprect);
-	void draw_background_and_text(bitmap_rgb32 &bitmap, const rectangle &cliprect);
-	void draw_sprites(bitmap_rgb32 &bitmap, const rectangle &cliprect);
+
 	required_device<cpu_device> m_maincpu;
 	required_device<cpu_device> m_audiocpu;
 	required_device<screen_device> m_screen;
-	void jedi(machine_config &config);
-	void jedi_audio(machine_config &config);
-	void jedi_video(machine_config &config);
-	void audio_map(address_map &map);
-	void main_map(address_map &map);
 };
+
+#endif // MAME_INCLUDES_JEDI_H

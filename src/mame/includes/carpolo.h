@@ -7,6 +7,10 @@
     driver by Zsolt Vasvari
 
 ****************************************************************************/
+#ifndef MAME_INCLUDES_CARPOLO_H
+#define MAME_INCLUDES_CARPOLO_H
+
+#pragma once
 
 #include "machine/6821pia.h"
 #include "machine/7474.h"
@@ -16,8 +20,8 @@
 class carpolo_state : public driver_device
 {
 public:
-	carpolo_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag),
+	carpolo_state(const machine_config &mconfig, device_type type, const char *tag) :
+		driver_device(mconfig, type, tag),
 		m_alpharam(*this, "alpharam"),
 		m_spriteram(*this, "spriteram"),
 		m_maincpu(*this, "maincpu"),
@@ -37,8 +41,17 @@ public:
 		m_ttl7474_1a_2(*this, "7474_1a_2"),
 		m_gfxdecode(*this, "gfxdecode"),
 		m_palette(*this, "palette")
-		{}
+	{ }
 
+	DECLARE_DRIVER_INIT(carpolo);
+	void carpolo(machine_config &config);
+
+protected:
+	virtual void machine_start() override;
+	virtual void machine_reset() override;
+	virtual void video_start() override;
+
+private:
 	required_shared_ptr<uint8_t> m_alpharam;
 	required_shared_ptr<uint8_t> m_spriteram;
 	uint8_t m_ball_screen_collision_cause;
@@ -75,6 +88,7 @@ public:
 	std::unique_ptr<bitmap_ind16> m_sprite_goal_collision_bitmap1;
 	std::unique_ptr<bitmap_ind16> m_sprite_goal_collision_bitmap2;
 	std::unique_ptr<bitmap_ind16> m_sprite_border_collision_bitmap;
+
 	DECLARE_READ8_MEMBER(carpolo_ball_screen_collision_cause_r);
 	DECLARE_READ8_MEMBER(carpolo_car_ball_collision_x_r);
 	DECLARE_READ8_MEMBER(carpolo_car_ball_collision_y_r);
@@ -89,10 +103,6 @@ public:
 	DECLARE_WRITE8_MEMBER(carpolo_car_ball_interrupt_clear_w);
 	DECLARE_WRITE8_MEMBER(carpolo_car_border_interrupt_clear_w);
 	DECLARE_WRITE8_MEMBER(carpolo_timer_interrupt_clear_w);
-	DECLARE_DRIVER_INIT(carpolo);
-	virtual void machine_start() override;
-	virtual void machine_reset() override;
-	virtual void video_start() override;
 	DECLARE_PALETTE_INIT(carpolo);
 	uint32_t screen_update_carpolo(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	DECLARE_WRITE_LINE_MEMBER(screen_vblank_carpolo);
@@ -130,6 +140,7 @@ public:
 	int check_sprite_sprite_collision(int x1, int y1, int code1, int flipy1,
 										int x2, int y2, int code2, int flipy2,
 										int *col_x, int *col_y);
-										void carpolo(machine_config &config);
-										void main_map(address_map &map);
+	void main_map(address_map &map);
 };
+
+#endif // MAME_INCLUDES_CARPOLO_H

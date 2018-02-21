@@ -2072,8 +2072,6 @@ MACHINE_CONFIG_START(seibuspi_state::sys386f)
 
 	/* sound hardware */
 	 // Single PCBs only output mono sound
-	MCFG_DEVICE_REMOVE("lspeaker")
-	MCFG_DEVICE_REMOVE("rspeaker")
 	MCFG_SPEAKER_STANDARD_MONO("mono")
 
 	MCFG_SOUND_ADD("ymz", YMZ280B, XTAL(16'384'000))

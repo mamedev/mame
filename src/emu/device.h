@@ -330,6 +330,8 @@ class device_t : public delegate_late_bind
 	friend class simple_list<device_t>;
 	friend class running_machine;
 	friend class finder_base;
+	friend class devcb_read_base;
+	friend class devcb_write_base;
 
 	class subdevice_list
 	{
@@ -477,6 +479,8 @@ public:
 	// owned object helpers
 	subdevice_list &subdevices() { return m_subdevices; }
 	const subdevice_list &subdevices() const { return m_subdevices; }
+	const std::list<devcb_read_base *> input_callbacks() const { return m_input_callbacks; }
+	const std::list<devcb_write_base *> output_callbacks() const { return m_output_callbacks; }
 
 	// device-relative tag lookups
 	std::string subtag(const char *tag) const;
@@ -613,6 +617,8 @@ private:
 	bool                    m_started;              // true if the start function has succeeded
 	finder_base *           m_auto_finder_list;     // list of objects to auto-find
 	mutable std::vector<rom_entry>  m_rom_entries;
+	std::list<devcb_read_base *> m_input_callbacks;
+	std::list<devcb_write_base *> m_output_callbacks;
 
 	// string formatting buffer for logerror
 	mutable util::ovectorstream m_string_buffer;

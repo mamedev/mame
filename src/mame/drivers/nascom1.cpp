@@ -199,13 +199,13 @@ READ8_MEMBER( nascom_state::nascom1_port_02_r )
 {
 	uint8_t data = 0x31;
 
-	m_hd6402->set_input_pin(AY31015_SWE, 0);
-	data |= m_hd6402->get_output_pin(AY31015_OR  ) ? 0x02 : 0;
-	data |= m_hd6402->get_output_pin(AY31015_PE  ) ? 0x04 : 0;
-	data |= m_hd6402->get_output_pin(AY31015_FE  ) ? 0x08 : 0;
-	data |= m_hd6402->get_output_pin(AY31015_TBMT) ? 0x40 : 0;
-	data |= m_hd6402->get_output_pin(AY31015_DAV ) ? 0x80 : 0;
-	m_hd6402->set_input_pin(AY31015_SWE, 1);
+	m_hd6402->write_swe(0);
+	data |= m_hd6402->or_r(  ) ? 0x02 : 0;
+	data |= m_hd6402->pe_r(  ) ? 0x04 : 0;
+	data |= m_hd6402->fe_r(  ) ? 0x08 : 0;
+	data |= m_hd6402->tbmt_r() ? 0x40 : 0;
+	data |= m_hd6402->dav_r( ) ? 0x80 : 0;
+	m_hd6402->write_swe(1);
 
 	return data;
 }
@@ -335,15 +335,15 @@ image_init_result nascom2_state::load_cart(device_image_interface &image, generi
 void nascom_state::machine_reset()
 {
 	// Set up hd6402 pins
-	m_hd6402->set_input_pin(AY31015_SWE, 1);
+	m_hd6402->write_swe(1);
 
-	m_hd6402->set_input_pin(AY31015_CS, 0);
-	m_hd6402->set_input_pin(AY31015_NP, 1);
-	m_hd6402->set_input_pin(AY31015_NB1, 1);
-	m_hd6402->set_input_pin(AY31015_NB2, 1);
-	m_hd6402->set_input_pin(AY31015_EPS, 1);
-	m_hd6402->set_input_pin(AY31015_TSB, 1);
-	m_hd6402->set_input_pin(AY31015_CS, 1);
+	m_hd6402->write_cs(0);
+	m_hd6402->write_np(1);
+	m_hd6402->write_nb1(1);
+	m_hd6402->write_nb2(1);
+	m_hd6402->write_eps(1);
+	m_hd6402->write_tsb(1);
+	m_hd6402->write_cs(1);
 }
 
 DRIVER_INIT_MEMBER( nascom_state, nascom )

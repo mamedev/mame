@@ -503,10 +503,10 @@ void sapi1_state::kbd_put(u8 data)
 READ8_MEMBER(sapi1_state::uart_status_r)
 {
 	uint8_t result = 0;
-	result |= m_uart->get_output_pin(AY31015_TBMT) || m_uart->get_output_pin(AY31015_DAV);
-	result |= m_uart->get_output_pin(AY31015_OR) << 1;
-	result |= m_uart->get_output_pin(AY31015_FE) << 2;
-	result |= m_uart->get_output_pin(AY31015_PE) << 3;
+	result |= m_uart->tbmt_r() || m_uart->dav_r();
+	result |= m_uart->or_r() << 1;
+	result |= m_uart->fe_r() << 2;
+	result |= m_uart->pe_r() << 3;
 	// RD4 = RI (= SI)
 	result |= m_v24->dcd_r() << 5;
 	result |= m_v24->dsr_r() << 6;
@@ -528,25 +528,25 @@ WRITE8_MEMBER(sapi1_state::modem_control_w)
 
 READ8_MEMBER(sapi1_state::uart_ready_r)
 {
-	return (m_uart->get_output_pin(AY31015_DAV) << 7) | (m_uart->get_output_pin(AY31015_TBMT) << 6) | 0x3f;
+	return (m_uart->dav_r() << 7) | (m_uart->tbmt_r() << 6) | 0x3f;
 }
 
 WRITE8_MEMBER(sapi1_state::uart_mode_w)
 {
-	m_uart->set_input_pin(AY31015_NP, BIT(data, 0));
-	m_uart->set_input_pin(AY31015_TSB, BIT(data, 1));
-	m_uart->set_input_pin(AY31015_NB1, BIT(data, 3));
-	m_uart->set_input_pin(AY31015_NB2, BIT(data, 2));
-	m_uart->set_input_pin(AY31015_EPS, BIT(data, 4));
-	m_uart->set_input_pin(AY31015_CS, 1);
-	m_uart->set_input_pin(AY31015_CS, 0);
+	m_uart->write_np(BIT(data, 0));
+	m_uart->write_tsb(BIT(data, 1));
+	m_uart->write_nb1(BIT(data, 3));
+	m_uart->write_nb2(BIT(data, 2));
+	m_uart->write_eps(BIT(data, 4));
+	m_uart->write_cs(1);
+	m_uart->write_cs(0);
 }
 
 READ8_MEMBER(sapi1_state::uart_data_r)
 {
-	m_uart->set_input_pin(AY31015_RDAV, 0);
+	m_uart->write_rdav(0);
 	uint8_t result = m_uart->get_received_data();
-	m_uart->set_input_pin(AY31015_RDAV, 1);
+	m_uart->write_rdav(1);
 	return result;
 }
 
@@ -557,8 +557,8 @@ WRITE8_MEMBER(sapi1_state::uart_data_w)
 
 WRITE8_MEMBER(sapi1_state::uart_reset_w)
 {
-	m_uart->set_input_pin(AY31015_XR, 0);
-	m_uart->set_input_pin(AY31015_XR, 1);
+	m_uart->write_xr(0);
+	m_uart->write_xr(1);
 }
 
 /**************************************
@@ -611,7 +611,7 @@ DRIVER_INIT_MEMBER( sapi1_state, sapizps3a )
 {
 	uint8_t *RAM = memregion("maincpu")->base();
 	m_bank1->configure_entries(0, 2, &RAM[0x0000], 0xf800);
-	m_uart->set_input_pin(AY31015_SWE, 0);
+	m_uart->write_swe(0);
 }
 
 DRIVER_INIT_MEMBER( sapi1_state, sapizps3b )

@@ -5,30 +5,6 @@
 
 DEFINE_DEVICE_TYPE(DC_CONTROLLER, dc_controller_device, "dcctrl", "Dreamcast Controller")
 
-void dc_controller_device::static_set_port_tag(device_t &device, int port, const char *tag)
-{
-	dc_controller_device &ctrl = downcast<dc_controller_device &>(device);
-	ctrl.port_tag[port] = tag;
-}
-
-void dc_controller_device::static_set_id(device_t &device, const char *id)
-{
-	dc_controller_device &ctrl = downcast<dc_controller_device &>(device);
-	ctrl.id = id;
-}
-
-void dc_controller_device::static_set_license(device_t &device, const char *license)
-{
-	dc_controller_device &ctrl = downcast<dc_controller_device &>(device);
-	ctrl.license = license;
-}
-
-void dc_controller_device::static_set_versions(device_t &device, const char *versions)
-{
-	dc_controller_device &ctrl = downcast<dc_controller_device &>(device);
-	ctrl.versions = versions;
-}
-
 dc_controller_device::dc_controller_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
 	maple_device(mconfig, DC_CONTROLLER, tag, owner, clock)
 {

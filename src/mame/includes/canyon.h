@@ -5,6 +5,10 @@
     Atari Canyon Bomber hardware
 
 *************************************************************************/
+#ifndef MAME_INCLUDES_CANYON_H
+#define MAME_INCLUDES_CANYON_H
+
+#pragma once
 
 #include "machine/74259.h"
 #include "machine/watchdog.h"
@@ -24,16 +28,38 @@
 class canyon_state : public driver_device
 {
 public:
-	canyon_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag),
+	canyon_state(const machine_config &mconfig, device_type type, const char *tag) :
+		driver_device(mconfig, type, tag),
 		m_videoram(*this, "videoram"),
 		m_outlatch(*this, "outlatch"),
 		m_discrete(*this, "discrete"),
 		m_maincpu(*this, "maincpu"),
 		m_watchdog(*this, "watchdog"),
 		m_gfxdecode(*this, "gfxdecode"),
-		m_palette(*this, "palette") { }
+		m_palette(*this, "palette")
+	{ }
 
+	void canyon(machine_config &config);
+
+protected:
+	DECLARE_READ8_MEMBER(canyon_switches_r);
+	DECLARE_READ8_MEMBER(canyon_options_r);
+	DECLARE_WRITE8_MEMBER(output_latch_w);
+	DECLARE_WRITE_LINE_MEMBER(led1_w);
+	DECLARE_WRITE_LINE_MEMBER(led2_w);
+	DECLARE_WRITE8_MEMBER(canyon_videoram_w);
+	TILE_GET_INFO_MEMBER(get_bg_tile_info);
+	DECLARE_PALETTE_INIT(canyon);
+	uint32_t screen_update_canyon(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	DECLARE_WRITE8_MEMBER(canyon_motor_w);
+	DECLARE_WRITE8_MEMBER(canyon_explode_w);
+	void draw_sprites( bitmap_ind16 &bitmap, const rectangle &cliprect );
+	void draw_bombs( bitmap_ind16 &bitmap, const rectangle &cliprect );
+
+	virtual void video_start() override;
+	void main_map(address_map &map);
+
+private:
 	/* memory pointers */
 	required_shared_ptr<uint8_t> m_videoram;
 
@@ -42,28 +68,15 @@ public:
 
 	/* video-related */
 	tilemap_t  *m_bg_tilemap;
-	DECLARE_READ8_MEMBER(canyon_switches_r);
-	DECLARE_READ8_MEMBER(canyon_options_r);
-	DECLARE_WRITE8_MEMBER(output_latch_w);
-	DECLARE_WRITE_LINE_MEMBER(led1_w);
-	DECLARE_WRITE_LINE_MEMBER(led2_w);
-	DECLARE_WRITE8_MEMBER(canyon_videoram_w);
-	TILE_GET_INFO_MEMBER(get_bg_tile_info);
-	virtual void video_start() override;
-	DECLARE_PALETTE_INIT(canyon);
-	uint32_t screen_update_canyon(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
-	DECLARE_WRITE8_MEMBER(canyon_motor_w);
-	DECLARE_WRITE8_MEMBER(canyon_explode_w);
-	void draw_sprites( bitmap_ind16 &bitmap, const rectangle &cliprect );
-	void draw_bombs( bitmap_ind16 &bitmap, const rectangle &cliprect );
+
 	required_device<cpu_device> m_maincpu;
 	required_device<watchdog_timer_device> m_watchdog;
 	required_device<gfxdecode_device> m_gfxdecode;
 	required_device<palette_device> m_palette;
-	void canyon(machine_config &config);
-	void main_map(address_map &map);
 };
 
 
 /*----------- defined in audio/canyon.c -----------*/
 DISCRETE_SOUND_EXTERN( canyon );
+
+#endif // MAME_INCLUDES_CANYON_H

@@ -154,6 +154,10 @@ void tpp2_state::decrypt_rom()
 
 INTERRUPT_GEN_MEMBER(tnx1_state::popeye_interrupt)
 {
+	std::copy(&m_dmasource[0], &m_dmasource[m_dmasource.bytes()], m_sprite_ram.begin());
+	std::copy(&m_dmasource[0], &m_dmasource[3], m_background_scroll);
+	m_palette_bank = m_dmasource[3];
+
 	m_field ^= 1;
 	/* NMIs are enabled by the I register?? How can that be? */
 	if (device.state().state_int(Z80_I) & 1)    /* skyskipr: 0/1, popeye: 2/3 but also 0/1 */
@@ -198,9 +202,7 @@ ADDRESS_MAP_START(tnx1_state::maincpu_program_map)
 	AM_RANGE(0x0000, 0x7fff) AM_ROM
 	AM_RANGE(0x8000, 0x87ff) AM_RAM
 	AM_RANGE(0x8800, 0x8bff) AM_WRITENOP // Attempts to initialize this area with 00 on boot
-	AM_RANGE(0x8c00, 0x8c02) AM_RAM AM_SHARE("background_pos")
-	AM_RANGE(0x8c03, 0x8c03) AM_RAM AM_SHARE("palettebank")
-	AM_RANGE(0x8c04, 0x8e7f) AM_RAM AM_SHARE("spriteram")
+	AM_RANGE(0x8c00, 0x8e7f) AM_RAM AM_SHARE("dmasource")
 	AM_RANGE(0x8e80, 0x8fff) AM_RAM
 	AM_RANGE(0xa000, 0xa3ff) AM_WRITE(popeye_videoram_w) AM_SHARE("videoram")
 	AM_RANGE(0xa400, 0xa7ff) AM_WRITE(popeye_colorram_w) AM_SHARE("colorram")
@@ -210,12 +212,12 @@ ADDRESS_MAP_END
 
 ADDRESS_MAP_START(tpp2_state::maincpu_program_map)
 	AM_IMPORT_FROM(tpp1_state::maincpu_program_map)
-	//AM_RANGE(0x8000, 0x87ff) AM_NOP // 7f (normally unpopulated)
+	AM_RANGE(0x8000, 0x87ff) AM_UNMAP // 7f (unpopulated)
 	AM_RANGE(0x8800, 0x8bff) AM_RAM // 7h
 	AM_RANGE(0xc000, 0xdfff) AM_WRITE(background_w)
 ADDRESS_MAP_END
 
-ADDRESS_MAP_START(tpp2np_state::maincpu_program_map)
+ADDRESS_MAP_START(tpp2_noalu_state::maincpu_program_map)
 	AM_IMPORT_FROM(tpp2_state::maincpu_program_map)
 	AM_RANGE(0xe000, 0xe000) AM_READUNMAP AM_WRITENOP // game still writes level number
 	AM_RANGE(0xe001, 0xe001) AM_READNOP AM_WRITEUNMAP // game still reads status but then discards it
@@ -819,12 +821,12 @@ ROM_START( popeyejo )
 ROM_END
 
 
-GAME( 1981, skyskipr, 0,      config, skyskipr, tnx1_state,     0, ROT0, "Nintendo", "Sky Skipper",                          MACHINE_SUPPORTS_SAVE )
-GAME( 1982, popeye,   0,      config, popeye,   tpp2_state,     0, ROT0, "Nintendo", "Popeye (revision D)",                  MACHINE_SUPPORTS_SAVE )
-GAME( 1982, popeyeu,  popeye, config, popeye,   tpp2np_state,   0, ROT0, "Nintendo", "Popeye (revision D not protected)",    MACHINE_SUPPORTS_SAVE )
-GAME( 1982, popeyef,  popeye, config, popeyef,  tpp2np_state,   0, ROT0, "Nintendo", "Popeye (revision F)",                  MACHINE_SUPPORTS_SAVE )
-GAME( 1982, popeyebl, popeye, config, popeye,   popeyebl_state, 0, ROT0, "bootleg",  "Popeye (bootleg set 1)",               MACHINE_SUPPORTS_SAVE )
-GAME( 1982, popeyeb2, popeye, config, popeye,   popeyebl_state, 0, ROT0, "bootleg",  "Popeye (bootleg set 2)",               MACHINE_SUPPORTS_SAVE )
-GAME( 1982, popeyeb3, popeye, config, popeye,   tpp2np_state,   0, ROT0, "bootleg",  "Popeye (bootleg set 3)",               MACHINE_SUPPORTS_SAVE )
-GAME( 1982, popeyej,  popeye, config, popeye,   tpp1_state,     0, ROT0, "Nintendo", "Popeye (Japan)",                       MACHINE_SUPPORTS_SAVE )
-GAME( 1982, popeyejo, popeye, config, popeye,   tpp1_state,     0, ROT0, "Nintendo", "Popeye (Japan, Older)",                MACHINE_SUPPORTS_SAVE )
+GAME( 1981, skyskipr, 0,        config,  skyskipr, tnx1_state,       0, ROT0, "Nintendo", "Sky Skipper",                          MACHINE_SUPPORTS_SAVE )
+GAME( 1982, popeye,   0,        config,  popeye,   tpp2_state,       0, ROT0, "Nintendo", "Popeye (revision D)",                  MACHINE_SUPPORTS_SAVE )
+GAME( 1982, popeyeu,  popeye,   config,  popeye,   tpp2_noalu_state, 0, ROT0, "Nintendo", "Popeye (revision D not protected)",    MACHINE_SUPPORTS_SAVE )
+GAME( 1982, popeyef,  popeye,   config,  popeyef,  tpp2_noalu_state, 0, ROT0, "Nintendo", "Popeye (revision F)",                  MACHINE_SUPPORTS_SAVE )
+GAME( 1982, popeyebl, popeye,   config,  popeye,   popeyebl_state,   0, ROT0, "bootleg",  "Popeye (bootleg set 1)",               MACHINE_SUPPORTS_SAVE )
+GAME( 1982, popeyeb2, popeye,   config,  popeye,   popeyebl_state,   0, ROT0, "bootleg",  "Popeye (bootleg set 2)",               MACHINE_SUPPORTS_SAVE )
+GAME( 1982, popeyeb3, popeye,   config,  popeye,   tpp2_noalu_state, 0, ROT0, "bootleg",  "Popeye (bootleg set 3)",               MACHINE_SUPPORTS_SAVE )
+GAME( 1982, popeyej,  popeye,   config,  popeye,   tpp1_state,       0, ROT0, "Nintendo", "Popeye (Japan)",                       MACHINE_SUPPORTS_SAVE )
+GAME( 1982, popeyejo, popeye,   config,  popeye,   tpp1_state,       0, ROT0, "Nintendo", "Popeye (Japan, Older)",                MACHINE_SUPPORTS_SAVE )

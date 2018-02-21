@@ -48,7 +48,7 @@ TIMER_CALLBACK_MEMBER(z80ne_state::z80ne_cassette_tc)
 		m_cass_data.input.level = cass_ws;
 		m_cass_data.input.bit = ((m_cass_data.input.length < m_cass_data.wave_filter) || (m_cass_data.input.length > 0x20)) ? 1 : 0;
 		m_cass_data.input.length = 0;
-		m_ay31015->set_input_pin(AY31015_SI, m_cass_data.input.bit);
+		m_ay31015->write_si(m_cass_data.input.bit);
 	}
 	m_cass_data.input.level = cass_ws;
 
@@ -63,7 +63,7 @@ TIMER_CALLBACK_MEMBER(z80ne_state::z80ne_cassette_tc)
 		else
 		{
 			m_cass_data.output.level=1;
-			cass_ws = m_ay31015->get_output_pin(AY31015_SO);
+			cass_ws = m_ay31015->so_r();
 			m_cass_data.wave_length = cass_ws ? m_cass_data.wave_short : m_cass_data.wave_long;
 		}
 		cassette_device_image()->output(m_cass_data.output.level ? -1.0 : +1.0);
@@ -275,13 +275,13 @@ MACHINE_RESET_MEMBER(z80ne_state,z80ne_base)
 	m_cass_data.input.length = 0;
 	m_cass_data.input.bit = 1;
 
-	m_ay31015->set_input_pin(AY31015_CS, 0);
-	m_ay31015->set_input_pin(AY31015_NB1, 1);
-	m_ay31015->set_input_pin(AY31015_NB2, 1);
-	m_ay31015->set_input_pin(AY31015_TSB, 1);
-	m_ay31015->set_input_pin(AY31015_EPS, 1);
-	m_ay31015->set_input_pin(AY31015_NP, m_io_lx_385->read() & 0x80 ? 1 : 0);
-	m_ay31015->set_input_pin(AY31015_CS, 1);
+	m_ay31015->write_cs(0);
+	m_ay31015->write_nb1(1);
+	m_ay31015->write_nb2(1);
+	m_ay31015->write_tsb(1);
+	m_ay31015->write_eps(1);
+	m_ay31015->write_np(m_io_lx_385->read() & 0x80 ? 1 : 0);
+	m_ay31015->write_cs(1);
 	m_ay31015->set_receiver_clock(m_cass_data.speed * 16.0);
 	m_ay31015->set_transmitter_clock(m_cass_data.speed * 16.0);
 
@@ -491,14 +491,14 @@ READ8_MEMBER(z80ne_state::lx385_ctrl_r)
 	/* set unused bits high */
 	uint8_t data = 0xc0;
 
-	m_ay31015->set_input_pin(AY31015_SWE, 0);
-	data |= (m_ay31015->get_output_pin(AY31015_OR  ) ? 0x01 : 0);
-	data |= (m_ay31015->get_output_pin(AY31015_FE  ) ? 0x02 : 0);
-	data |= (m_ay31015->get_output_pin(AY31015_PE  ) ? 0x04 : 0);
-	data |= (m_ay31015->get_output_pin(AY31015_TBMT) ? 0x08 : 0);
-	data |= (m_ay31015->get_output_pin(AY31015_DAV ) ? 0x10 : 0);
-	data |= (m_ay31015->get_output_pin(AY31015_EOC ) ? 0x20 : 0);
-	m_ay31015->set_input_pin(AY31015_SWE, 1);
+	m_ay31015->write_swe(0);
+	data |= (m_ay31015->or_r(  ) ? 0x01 : 0);
+	data |= (m_ay31015->fe_r(  ) ? 0x02 : 0);
+	data |= (m_ay31015->pe_r(  ) ? 0x04 : 0);
+	data |= (m_ay31015->tbmt_r() ? 0x08 : 0);
+	data |= (m_ay31015->dav_r( ) ? 0x10 : 0);
+	data |= (m_ay31015->eoc_r( ) ? 0x20 : 0);
+	m_ay31015->write_swe(1);
 
 	return data;
 }
@@ -533,14 +533,14 @@ WRITE8_MEMBER(z80ne_state::lx385_ctrl_w)
 	/* UART Reset and RDAV */
 	if (uart_reset)
 	{
-		m_ay31015->set_input_pin(AY31015_XR, 1);
-		m_ay31015->set_input_pin(AY31015_XR, 0);
+		m_ay31015->write_xr(1);
+		m_ay31015->write_xr(0);
 	}
 
 	if (uart_rdav)
 	{
-		m_ay31015->set_input_pin(AY31015_RDAV, 1);
-		m_ay31015->set_input_pin(AY31015_RDAV, 0);
+		m_ay31015->write_rdav(1);
+		m_ay31015->write_rdav(0);
 	}
 
 	if (!changed_bits) return;

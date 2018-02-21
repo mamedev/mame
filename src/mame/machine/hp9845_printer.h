@@ -16,13 +16,13 @@
 #include "imagedev/bitbngr.h"
 
 #define MCFG_9845PRT_IRL_HANDLER(_devcb)                                \
-	devcb = &hp9845_printer_device::set_irl_handler(*device , DEVCB_##_devcb);
+	devcb = &downcast<hp9845_printer_device &>(*device).set_irl_handler(DEVCB_##_devcb);
 
 #define MCFG_9845PRT_FLG_HANDLER(_devcb)                                \
-	devcb = &hp9845_printer_device::set_flg_handler(*device , DEVCB_##_devcb);
+	devcb = &downcast<hp9845_printer_device &>(*device).set_flg_handler(DEVCB_##_devcb);
 
 #define MCFG_9845PRT_STS_HANDLER(_devcb)                                \
-	devcb = &hp9845_printer_device::set_sts_handler(*device , DEVCB_##_devcb);
+	devcb = &downcast<hp9845_printer_device &>(*device).set_sts_handler(DEVCB_##_devcb);
 
 class hp9845_printer_device : public device_t
 {
@@ -30,10 +30,10 @@ public:
 	// construction/destruction
 	hp9845_printer_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
-	// static configuration helpers
-	template <class Object> static devcb_base &set_irl_handler(device_t &device, Object &&cb) { return downcast<hp9845_printer_device &>(device).m_irl_handler.set_callback(std::forward<Object>(cb)); }
-	template <class Object> static devcb_base &set_flg_handler(device_t &device, Object &&cb) { return downcast<hp9845_printer_device &>(device).m_flg_handler.set_callback(std::forward<Object>(cb)); }
-	template <class Object> static devcb_base &set_sts_handler(device_t &device, Object &&cb) { return downcast<hp9845_printer_device &>(device).m_sts_handler.set_callback(std::forward<Object>(cb)); }
+	// configuration helpers
+	template <class Object> devcb_base &set_irl_handler(Object &&cb) { return m_irl_handler.set_callback(std::forward<Object>(cb)); }
+	template <class Object> devcb_base &set_flg_handler(Object &&cb) { return m_flg_handler.set_callback(std::forward<Object>(cb)); }
+	template <class Object> devcb_base &set_sts_handler(Object &&cb) { return m_sts_handler.set_callback(std::forward<Object>(cb)); }
 
 	// device-level overrides
 	virtual const tiny_rom_entry *device_rom_region() const override;

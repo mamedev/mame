@@ -21,9 +21,9 @@ public:
 	DECLARE_READ16_MEMBER(mem_r);
 	DECLARE_WRITE16_MEMBER(mem_w);
 
-	static void static_set_wakeup_addr(device_t &device, uint32_t wakeup) { downcast<isbc_215g_device &>(device).m_wakeup = wakeup; }
-	static void static_set_maincpu_tag(device_t &device, const char *maincpu_tag) { downcast<isbc_215g_device &>(device).m_maincpu_tag = maincpu_tag; }
-	template<class _Object> static devcb_base &static_set_irq_callback(device_t &device, _Object object) { return downcast<isbc_215g_device &>(device).m_out_irq_func.set_callback(object); }
+	void set_wakeup_addr(uint32_t wakeup) { m_wakeup = wakeup; }
+	void set_maincpu_tag(const char *maincpu_tag) { m_maincpu_tag = maincpu_tag; }
+	template <class Object> devcb_base &set_irq_callback(Object &&cb) { return m_out_irq_func.set_callback(std::forward<Object>(cb)); }
 
 	void isbc_215g_io(address_map &map);
 	void isbc_215g_mem(address_map &map);
@@ -68,11 +68,11 @@ private:
 
 #define MCFG_ISBC_215_ADD(_tag, _wakeup, _maincpu_tag) \
 	MCFG_DEVICE_ADD(_tag, ISBC_215G, 0) \
-	isbc_215g_device::static_set_wakeup_addr(*device, _wakeup); \
-	isbc_215g_device::static_set_maincpu_tag(*device, _maincpu_tag);
+	downcast<isbc_215g_device &>(*device).set_wakeup_addr(_wakeup); \
+	downcast<isbc_215g_device &>(*device).set_maincpu_tag(_maincpu_tag);
 
 #define MCFG_ISBC_215_IRQ(_irq_line) \
-	devcb = &isbc_215g_device::static_set_irq_callback(*device, DEVCB_##_irq_line);
+	devcb = &downcast<isbc_215g_device &>(*device).set_irq_callback(DEVCB_##_irq_line);
 
 DECLARE_DEVICE_TYPE(ISBC_215G, isbc_215g_device)
 

@@ -7,14 +7,14 @@
 #pragma once
 
 #define MCFG_INTERPRO_SGA_BERR_CB(_out_berr) \
-	devcb = &interpro_sga_device::static_set_out_berr_callback(*device, DEVCB_##_out_berr);
+	devcb = &downcast<interpro_sga_device &>(*device).set_out_berr_callback(DEVCB_##_out_berr);
 
 class interpro_sga_device : public device_t
 {
 public:
 	interpro_sga_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
-	template<class _Object> static devcb_base &static_set_out_berr_callback(device_t &device, _Object object) { return downcast<interpro_sga_device &>(device).out_berr_func.set_callback(object); }
+	template <class Object> devcb_base &set_out_berr_callback(Object &&cb) { return out_berr_func.set_callback(std::forward<Object>(cb)); }
 
 	virtual void map(address_map &map);
 

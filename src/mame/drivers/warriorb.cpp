@@ -174,7 +174,7 @@ WRITE8_MEMBER(warriorb_state::coin_control_w)
 
 WRITE8_MEMBER(warriorb_state::sound_bankswitch_w)
 {
-	membank("z80bank")->set_entry(data & 7);
+	m_z80bank->set_entry(data & 7);
 }
 
 WRITE16_MEMBER(warriorb_state::sound_w)
@@ -194,17 +194,17 @@ READ16_MEMBER(warriorb_state::sound_r)
 }
 
 
-WRITE8_MEMBER(warriorb_state::pancontrol)
+WRITE8_MEMBER(warriorb_state::pancontrol_w)
 {
 	filter_volume_device *flt = nullptr;
 	offset &= 3;
 
 	switch (offset)
 	{
-		case 0: flt = m_2610_1l; break;
-		case 1: flt = m_2610_1r; break;
-		case 2: flt = m_2610_2l; break;
-		case 3: flt = m_2610_2r; break;
+		case 0: flt = m_2610_l[0]; break;
+		case 1: flt = m_2610_r[0]; break;
+		case 2: flt = m_2610_l[1]; break;
+		case 3: flt = m_2610_r[1]; break;
 	}
 
 	m_pandata[offset] = (data << 1) + data;   /* original volume*3 */
@@ -215,8 +215,8 @@ WRITE8_MEMBER(warriorb_state::pancontrol)
 
 WRITE16_MEMBER(warriorb_state::tc0100scn_dual_screen_w)
 {
-	m_tc0100scn_1->word_w(space, offset, data, mem_mask);
-	m_tc0100scn_2->word_w(space, offset, data, mem_mask);
+	m_tc0100scn[0]->word_w(space, offset, data, mem_mask);
+	m_tc0100scn[1]->word_w(space, offset, data, mem_mask);
 }
 
 /***********************************************************
@@ -263,7 +263,7 @@ ADDRESS_MAP_START(warriorb_state::z80_sound_map)
 	AM_RANGE(0xe000, 0xe003) AM_DEVREADWRITE("ymsnd", ym2610_device, read, write)
 	AM_RANGE(0xe200, 0xe200) AM_READNOP AM_DEVWRITE("tc0140syt", tc0140syt_device, slave_port_w)
 	AM_RANGE(0xe201, 0xe201) AM_DEVREADWRITE("tc0140syt", tc0140syt_device, slave_comm_r, slave_comm_w)
-	AM_RANGE(0xe400, 0xe403) AM_WRITE(pancontrol) /* pan */
+	AM_RANGE(0xe400, 0xe403) AM_WRITE(pancontrol_w) /* pan */
 	AM_RANGE(0xea00, 0xea00) AM_READNOP
 	AM_RANGE(0xee00, 0xee00) AM_WRITENOP /* ? */
 	AM_RANGE(0xf000, 0xf000) AM_WRITENOP /* ? */
@@ -421,7 +421,7 @@ GFXDECODE_END
 
 void warriorb_state::machine_start()
 {
-	membank("z80bank")->configure_entries(0, 8, memregion("audiocpu")->base(), 0x4000);
+	m_z80bank->configure_entries(0, 8, memregion("audiocpu")->base(), 0x4000);
 
 	save_item(NAME(m_pandata));
 }
@@ -587,7 +587,7 @@ MACHINE_CONFIG_START(warriorb_state::warriorb)
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
 
-	MCFG_SOUND_ADD("ymsnd", YM2610, 16000000/2)
+	MCFG_SOUND_ADD("ymsnd", YM2610B, 16000000/2)
 	MCFG_YM2610_IRQ_HANDLER(INPUTLINE("audiocpu", 0))
 	MCFG_SOUND_ROUTE(0, "lspeaker",  0.25)
 	MCFG_SOUND_ROUTE(0, "rspeaker", 0.25)
@@ -791,7 +791,7 @@ ROM_END
 /* Working Games */
 
 //    YEAR, NAME,      PARENT,  MACHINE,  INPUT,    STATE,          INIT,MONITOR,COMPANY,FULLNAME,          FLAGS
-GAME( 1989, sagaia,    darius2, darius2d, sagaia,   warriorb_state, 0,   ROT0,   "Taito Corporation Japan", "Sagaia (dual screen) (World)", MACHINE_SUPPORTS_SAVE )
-GAME( 1989, darius2d,  darius2, darius2d, darius2d, warriorb_state, 0,   ROT0,   "Taito Corporation",       "Darius II (dual screen) (Japan, Rev 2)", MACHINE_SUPPORTS_SAVE )
-GAME( 1989, darius2do, darius2, darius2d, darius2d, warriorb_state, 0,   ROT0,   "Taito Corporation",       "Darius II (dual screen) (Japan, Rev 1)", MACHINE_SUPPORTS_SAVE )
+GAME( 1989, sagaia,    darius2, darius2d, sagaia,   warriorb_state, 0,   ROT0,   "Taito Corporation Japan", "Sagaia (dual screen) (World)", MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_SOUND )
+GAME( 1989, darius2d,  darius2, darius2d, darius2d, warriorb_state, 0,   ROT0,   "Taito Corporation",       "Darius II (dual screen) (Japan, Rev 2)", MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_SOUND )
+GAME( 1989, darius2do, darius2, darius2d, darius2d, warriorb_state, 0,   ROT0,   "Taito Corporation",       "Darius II (dual screen) (Japan, Rev 1)", MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_SOUND )
 GAME( 1991, warriorb,  0,       warriorb, warriorb, warriorb_state, 0,   ROT0,   "Taito Corporation",       "Warrior Blade - Rastan Saga Episode III (Japan)", MACHINE_SUPPORTS_SAVE )

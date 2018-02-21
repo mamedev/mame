@@ -384,17 +384,6 @@ cuda_device::cuda_device(const machine_config &mconfig, const char *tag, device_
 }
 
 //-------------------------------------------------
-//  static_set_type - configuration helper to set
-//  the chip type
-//-------------------------------------------------
-
-void cuda_device::static_set_type(device_t &device, int type)
-{
-	cuda_device &cuda = downcast<cuda_device &>(device);
-	cuda.rom_offset = type;
-}
-
-//-------------------------------------------------
 //  device_start - device-specific startup
 //-------------------------------------------------
 

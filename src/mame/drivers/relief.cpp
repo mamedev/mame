@@ -49,7 +49,7 @@ void relief_state::update_interrupts()
  *
  *************************************/
 
-MACHINE_RESET_MEMBER(relief_state,relief)
+void relief_state::machine_reset()
 {
 	atarigen_state::machine_reset();
 
@@ -273,8 +273,6 @@ MACHINE_CONFIG_START(relief_state::relief)
 	MCFG_CPU_ADD("maincpu", M68000, ATARI_CLOCK_14MHz/2)
 	MCFG_CPU_PROGRAM_MAP(main_map)
 
-	MCFG_MACHINE_RESET_OVERRIDE(relief_state,relief)
-
 	MCFG_EEPROM_2816_ADD("eeprom")
 	MCFG_EEPROM_28XX_LOCK_AFTER_WRITE(true)
 
@@ -285,7 +283,7 @@ MACHINE_CONFIG_START(relief_state::relief)
 	MCFG_PALETTE_ADD("palette", 2048)
 	MCFG_PALETTE_FORMAT(IRRRRRGGGGGBBBBB)
 
-	MCFG_ATARI_VAD_ADD("vad", "screen", WRITELINE(atarigen_state, scanline_int_write_line))
+	MCFG_ATARI_VAD_ADD("vad", "screen", WRITELINE(relief_state, scanline_int_write_line))
 	MCFG_ATARI_VAD_PLAYFIELD(relief_state, "gfxdecode", get_playfield_tile_info)
 	MCFG_ATARI_VAD_PLAYFIELD2(relief_state, "gfxdecode", get_playfield2_tile_info)
 	MCFG_ATARI_VAD_MOB(relief_state::s_mob_config, "gfxdecode")
@@ -297,8 +295,6 @@ MACHINE_CONFIG_START(relief_state::relief)
 	MCFG_SCREEN_RAW_PARAMS(ATARI_CLOCK_14MHz/2, 456, 0, 336, 262, 0, 240)
 	MCFG_SCREEN_UPDATE_DRIVER(relief_state, screen_update_relief)
 	MCFG_SCREEN_PALETTE("palette")
-
-	MCFG_VIDEO_START_OVERRIDE(relief_state,relief)
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")

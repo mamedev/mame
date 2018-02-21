@@ -511,24 +511,25 @@ Registers:
  *
  *************************************/
 
-static inline void count_states(struct micro_t &micro, int states)
+inline void victory_state::micro_t::count_states(int states)
 {
-	attotime state_time = MICRO_STATE_CLOCK_PERIOD * states;
+	attotime const state_time = MICRO_STATE_CLOCK_PERIOD * states;
 
-	if (!micro.timer)
+	if (!timer)
 	{
-		micro.timer->adjust(attotime::never);
-		micro.timer_active = 1;
-		micro.endtime = state_time;
+		// FIXME: how is dereferencing the timer when it's null supposed to be a good idea?
+		timer->adjust(attotime::never);
+		timer_active = 1;
+		endtime = state_time;
 	}
-	else if (micro.timer->elapsed() > micro.endtime)
+	else if (timer->elapsed() > endtime)
 	{
-		micro.timer->adjust(attotime::never);
-		micro.timer_active = 1;
-		micro.endtime = state_time;
+		timer->adjust(attotime::never);
+		timer_active = 1;
+		endtime = state_time;
 	}
 	else
-		micro.endtime += state_time;
+		endtime += state_time;
 }
 
 
@@ -560,7 +561,7 @@ int victory_state::command2()
 	if (micro.cmd & 0x40)
 		m_rram[addr] = micro.r;
 
-	count_states(micro, 3);
+	micro.count_states(3);
 	return 0;
 }
 
@@ -667,7 +668,7 @@ int victory_state::command3()
 		}
 	}
 
-	count_states(micro, 3 + (2 + 2 * ycount) * xcount);
+	micro.count_states(3 + (2 + 2 * ycount) * xcount);
 
 	return micro.cmd & 0x80;
 }
@@ -704,7 +705,7 @@ int victory_state::command4()
 
 	if (LOG_MICROCODE) logerror("================= EXECUTE BEGIN\n");
 
-	count_states(micro, 4);
+	micro.count_states(4);
 
 	micro.pc = micro.yp << 1;
 	do
@@ -869,7 +870,7 @@ int victory_state::command5()
 
 	micro.xp = x;
 
-	count_states(micro, 3 + 2 * (0x100 - (micro.i & 0xff)));
+	micro.count_states(3 + 2 * (0x100 - (micro.i & 0xff)));
 
 	return micro.cmd & 0x80;
 }
@@ -919,7 +920,7 @@ int victory_state::command6()
 			m_rram[daddr] = m_rram[saddr];
 	}
 
-	count_states(micro, 3 + 2 * (64 - (micro.r & 31) * 2));
+	micro.count_states(3 + 2 * (64 - (micro.r & 31) * 2));
 
 	return micro.cmd & 0x80;
 }
@@ -999,7 +1000,7 @@ int victory_state::command7()
 		if (m_fgcoll) update_irq();
 	}
 
-	count_states(micro, 4);
+	micro.count_states(4);
 
 	return micro.cmd & 0x80;
 }

@@ -1922,6 +1922,12 @@ void validity_checker::validate_devices()
 		device.findit(true, true);
 		device.findit(false, true);
 
+		// validate callbacks
+		for (auto &cb : device.input_callbacks())
+			cb->validity_check(*this);
+		for (auto &cb : device.output_callbacks())
+			cb->validity_check(*this);
+
 		// validate the device tag
 		validate_tag(device.basetag());
 

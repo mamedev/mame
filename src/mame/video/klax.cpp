@@ -69,10 +69,6 @@ const atari_motion_objects_config klax_state::s_mob_config =
 	0                   /* resulting value to indicate "special" */
 };
 
-VIDEO_START_MEMBER(klax_state,klax)
-{
-}
-
 
 
 /*************************************

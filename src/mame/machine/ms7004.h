@@ -19,10 +19,10 @@
 //**************************************************************************
 
 #define MCFG_MS7004_TX_HANDLER(_cb) \
-	devcb = &ms7004_device::set_tx_handler(*device, DEVCB_##_cb);
+	devcb = &downcast<ms7004_device &>(*device).set_tx_handler(DEVCB_##_cb);
 
 #define MCFG_MS7004_RTS_HANDLER(_cb) \
-	devcb = &ms7004_device::set_rts_handler(*device, DEVCB_##_cb);
+	devcb = &downcast<ms7004_device &>(*device).set_rts_handler(DEVCB_##_cb);
 
 
 //**************************************************************************
@@ -37,8 +37,8 @@ public:
 	// construction/destruction
 	ms7004_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
-	template <class Object> static devcb_base &set_tx_handler(device_t &device, Object &&wr) { return downcast<ms7004_device &>(device).m_tx_handler.set_callback(std::forward<Object>(wr)); }
-	template <class Object> static devcb_base &set_rts_handler(device_t &device, Object &&wr) { return downcast<ms7004_device &>(device).m_rts_handler.set_callback(std::forward<Object>(wr)); }
+	template <class Object> devcb_base &set_tx_handler(Object &&wr) { return m_tx_handler.set_callback(std::forward<Object>(wr)); }
+	template <class Object> devcb_base &set_rts_handler(Object &&wr) { return m_rts_handler.set_callback(std::forward<Object>(wr)); }
 
 	DECLARE_WRITE_LINE_MEMBER( write_rxd );
 
