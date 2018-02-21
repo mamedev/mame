@@ -63,16 +63,6 @@ kaneko16_sprite_device::kaneko16_sprite_device(
 	m_priority.sprite[3] = 8;   // above all
 }
 
-//-------------------------------------------------
-//  static_set_gfxdecode_tag: Set the tag of the
-//  gfx decoder
-//-------------------------------------------------
-
-void kaneko16_sprite_device::set_gfxdecode_tag(const char *tag)
-{
-	m_gfxdecode.set_tag(tag);
-}
-
 void kaneko16_sprite_device::device_start()
 {
 	m_first_sprite = std::make_unique<struct kan_tempsprite[]>(0x400);
@@ -93,27 +83,6 @@ void kaneko16_sprite_device::device_reset()
 	m_sprite_flipx = 0;
 	m_sprite_flipy = 0;
 }
-
-void kaneko16_sprite_device::set_priorities(int pri0, int pri1, int pri2, int pri3)
-{
-	m_priority.sprite[0] = pri0;
-	m_priority.sprite[1] = pri1;
-	m_priority.sprite[2] = pri2;
-	m_priority.sprite[3] = pri3;
-}
-
-
-void kaneko16_sprite_device::set_fliptype(int fliptype)
-{
-	m_sprite_fliptype = fliptype;
-}
-
-void kaneko16_sprite_device::set_offsets(int xoffs, int yoffs)
-{
-	m_sprite_xoffs = xoffs;
-	m_sprite_yoffs = yoffs;
-}
-
 
 /***************************************************************************
 

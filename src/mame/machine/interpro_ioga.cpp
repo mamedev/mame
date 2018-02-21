@@ -193,14 +193,6 @@ sapphire_ioga_device::sapphire_ioga_device(const machine_config &mconfig, const 
 {
 }
 
-void interpro_ioga_device::static_set_memory(device_t &device, const char *const tag, const int spacenum)
-{
-	interpro_ioga_device &ioga = dynamic_cast<interpro_ioga_device &>(device);
-
-	ioga.m_memory_tag = tag;
-	ioga.m_memory_spacenum = spacenum;
-}
-
 void interpro_ioga_device::device_start()
 {
 	assert_always(m_memory_tag != nullptr, "memory tag and address space number must be configured");

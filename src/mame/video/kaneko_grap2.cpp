@@ -24,22 +24,6 @@ kaneko_grap2_device::kaneko_grap2_device(const machine_config &mconfig, const ch
 }
 
 
-void kaneko_grap2_device::set_chipnum(int chipnum)
-{
-	m_chipnum = chipnum;
-}
-
-//-------------------------------------------------
-//  set_palette_tag: Set the tag of the
-//  palette device
-//-------------------------------------------------
-
-void kaneko_grap2_device::set_palette_tag(const char *tag)
-{
-	m_palette.set_tag(tag);
-}
-
-
 void kaneko_grap2_device::device_start()
 {
 	m_framebuffer = make_unique_clear<uint16_t[]>(0x80000/2);

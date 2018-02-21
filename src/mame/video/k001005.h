@@ -104,7 +104,7 @@ class k001005_device : public device_t, public device_video_interface
 public:
 	k001005_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
-	void set_texel_chip(const char *tag);
+	void set_texel_chip(const char *tag) { m_k001006_tag = tag; }
 
 	void draw(bitmap_rgb32 &bitmap, const rectangle &cliprect);
 	void swap_buffers();

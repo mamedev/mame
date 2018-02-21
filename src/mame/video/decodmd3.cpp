@@ -183,8 +183,3 @@ void decodmd_type3_device::device_reset()
 	m_rombank->configure_entry(0, &ROM[0]);
 	m_rombank->set_entry(0);
 }
-
-void decodmd_type3_device::set_gfxregion(const char *tag)
-{
-	m_gfxtag = tag;
-}

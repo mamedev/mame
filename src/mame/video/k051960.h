@@ -62,7 +62,7 @@ public:
 	// static configuration
 	void set_k051960_callback(k051960_cb_delegate callback) { m_k051960_cb = callback; }
 	void set_plane_order(int order);
-	void set_screen_tag(const char *tag);
+	void set_screen_tag(const char *tag) { m_screen.set_tag(tag); }
 
 	/*
 	The callback is passed:

@@ -9,8 +9,8 @@
 class vs920a_text_tilemap_device : public device_t
 {
 public:
-	void set_gfxdecode_tag(const char *tag);
-	void set_gfx_region(int gfxregion);
+	void set_gfxdecode_tag(const char *tag) { m_gfxdecode.set_tag(tag); }
+	void set_gfx_region(int gfxregion) { m_gfx_region = gfxregion; }
 
 	vs920a_text_tilemap_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 

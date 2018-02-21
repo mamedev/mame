@@ -11,7 +11,7 @@ public:
 	tc0080vco_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
 	// configuration
-	void set_gfxdecode_tag(const char *tag);
+	void set_gfxdecode_tag(const char *tag) { m_gfxdecode.set_tag(tag); }
 	void set_gfx_region(int gfxnum) { m_gfxnum = gfxnum; }
 	void set_tx_region(int txnum) { m_txnum = txnum; }
 	void set_offsets(int x_offset, int y_offset)

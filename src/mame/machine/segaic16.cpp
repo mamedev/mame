@@ -212,31 +212,6 @@ sega_315_5195_mapper_device::sega_315_5195_mapper_device(const machine_config &m
 
 
 //-------------------------------------------------
-//  static_set_cputag - configuration helper
-//  to set the tag of the CPU device
-//-------------------------------------------------
-
-void sega_315_5195_mapper_device::static_set_cputag(device_t &device, const char *cpu)
-{
-	sega_315_5195_mapper_device &mapper = downcast<sega_315_5195_mapper_device &>(device);
-	mapper.m_cpu.set_tag(cpu);
-	mapper.m_cpuregion.set_tag(cpu);
-}
-
-
-//-------------------------------------------------
-//  static_set_mapper - configuration helper
-//  to set the mapper function
-//-------------------------------------------------
-
-void sega_315_5195_mapper_device::static_set_mapper(device_t &device, mapper_delegate callback)
-{
-	sega_315_5195_mapper_device &mapper = downcast<sega_315_5195_mapper_device &>(device);
-	mapper.m_mapper = callback;
-}
-
-
-//-------------------------------------------------
 //  write - handle a write to the memory mapper
 //-------------------------------------------------
 
@@ -944,18 +919,6 @@ sega_315_5250_compare_timer_device::sega_315_5250_compare_timer_device(const mac
 	: device_t(mconfig, SEGA_315_5250_COMPARE_TIMER, tag, owner, clock)
 	, m_sound_write(*this)
 {
-}
-
-
-//-------------------------------------------------
-//  static_set_timer_ack - configuration helper
-//  to set the timer acknowledge function
-//-------------------------------------------------
-
-void sega_315_5250_compare_timer_device::static_set_timer_ack(device_t &device, timer_ack_delegate callback)
-{
-	sega_315_5250_compare_timer_device &timer = downcast<sega_315_5250_compare_timer_device &>(device);
-	timer.m_timer_ack = callback;
 }
 
 

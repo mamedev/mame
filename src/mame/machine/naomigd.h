@@ -9,14 +9,18 @@
 
 #define MCFG_NAOMI_GDROM_BOARD_ADD(_tag, _image_tag, _pic_tag, _eeprom_tag, _irq_cb) \
 	MCFG_NAOMI_BOARD_ADD(_tag, NAOMI_GDROM_BOARD, _eeprom_tag, _irq_cb) \
-	naomi_gdrom_board::static_set_tags(*device, _image_tag, _pic_tag);
+	downcast<naomi_gdrom_board &>(*device).set_tags(_image_tag, _pic_tag);
 
 class naomi_gdrom_board : public naomi_board
 {
 public:
 	naomi_gdrom_board(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
-	static void static_set_tags(device_t &device, const char *_image_tag, const char *_pic_tag);
+	void set_tags(const char *_image_tag, const char *_pic_tag)
+	{
+		image_tag = _image_tag;
+		pic_tag = _pic_tag;
+	}
 
 	uint8_t *memory(uint32_t &size) { size = dimm_data_size; return dimm_data; }
 

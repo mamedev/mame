@@ -13,7 +13,7 @@ class k007420_device : public device_t
 public:
 	k007420_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
-	void set_palette_tag(const char *tag);
+	void set_palette_tag(const char *tag) { m_palette.set_tag(tag); }
 	void set_bank_limit(int limit) { m_banklimit = limit; }
 	void set_callback(k007420_delegate callback) { m_callback = callback; }
 

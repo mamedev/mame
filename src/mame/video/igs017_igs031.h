@@ -24,7 +24,7 @@ public:
 	igs017_igs031_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
 
-	void set_palette_scramble_cb(igs017_igs031_palette_scramble_delegate newtilecb);
+	void set_palette_scramble_cb(igs017_igs031_palette_scramble_delegate newtilecb) { m_palette_scramble_cb = newtilecb; }
 
 	void set_text_reverse_bits()
 	{

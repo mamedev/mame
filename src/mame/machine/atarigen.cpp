@@ -71,17 +71,6 @@ atari_sound_comm_device::atari_sound_comm_device(const machine_config &mconfig, 
 
 
 //-------------------------------------------------
-//  static_set_sound_cpu: Set the tag of the
-//  sound CPU
-//-------------------------------------------------
-
-void atari_sound_comm_device::static_set_sound_cpu(device_t &device, const char *cputag)
-{
-	downcast<atari_sound_comm_device &>(device).m_sound_cpu_tag = cputag;
-}
-
-
-//-------------------------------------------------
 //  device_start: Start up the device
 //-------------------------------------------------
 

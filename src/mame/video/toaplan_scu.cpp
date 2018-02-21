@@ -35,12 +35,6 @@ toaplan_scu_device::toaplan_scu_device(const machine_config &mconfig, const char
 {
 }
 
-void toaplan_scu_device::set_xoffsets(int xoffs, int xoffs_flipped)
-{
-	m_xoffs = xoffs;
-	m_xoffs_flipped = xoffs_flipped;
-}
-
 void toaplan_scu_device::device_start()
 {
 }

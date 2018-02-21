@@ -41,38 +41,6 @@ vsystem_spr2_device::vsystem_spr2_device(const machine_config &mconfig, const ch
 {
 }
 
-//-------------------------------------------------
-//  set_gfxdecode_tag: Set the tag of the
-//  gfx decoder
-//-------------------------------------------------
-
-void vsystem_spr2_device::set_gfxdecode_tag(const char *tag)
-{
-	m_gfxdecode.set_tag(tag);
-}
-
-
-void vsystem_spr2_device::set_tile_indirect_cb(vsystem_tile2_indirection_delegate newtilecb)
-{
-	m_newtilecb = newtilecb;
-}
-
-void vsystem_spr2_device::set_pritype(int pritype)
-{
-	m_pritype = pritype;
-}
-
-void vsystem_spr2_device::set_gfx_region(int gfx_region)
-{
-	m_gfx_region = gfx_region;
-}
-
-void vsystem_spr2_device::set_offsets(int xoffs, int yoffs)
-{
-	m_xoffs = xoffs;
-	m_yoffs = yoffs;
-}
-
 uint32_t vsystem_spr2_device::tile_callback_noindirect(uint32_t tile)
 {
 	return tile;

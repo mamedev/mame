@@ -74,16 +74,6 @@ deco_ace_device::deco_ace_device(const machine_config &mconfig, const char *tag,
 }
 
 //-------------------------------------------------
-//  set_palette_tag: Set the tag of the
-//  palette device
-//-------------------------------------------------
-
-void deco_ace_device::set_palette_tag(const char *tag)
-{
-	m_palette.set_tag(tag);
-}
-
-//-------------------------------------------------
 //  device_start - device-specific startup
 //-------------------------------------------------
 

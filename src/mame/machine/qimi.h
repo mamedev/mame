@@ -19,7 +19,7 @@
 //**************************************************************************
 
 #define MCFG_QIMI_EXTINT_CALLBACK(_write) \
-	devcb = &qimi_device::set_exting_wr_callback(*device, DEVCB_##_write);
+	devcb = &downcast<qimi_device &>(*device).set_exting_wr_callback(DEVCB_##_write);
 
 
 
@@ -35,7 +35,7 @@ public:
 	// construction/destruction
 	qimi_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
-	template <class Object> static devcb_base &set_exting_wr_callback(device_t &device, Object &&cb) { return downcast<qimi_device &>(device).m_write_extint.set_callback(std::forward<Object>(cb)); }
+	template <class Object> devcb_base &set_exting_wr_callback(Object &&cb) { return m_write_extint.set_callback(std::forward<Object>(cb)); }
 
 	// optional information overrides
 	virtual ioport_constructor device_input_ports() const override;

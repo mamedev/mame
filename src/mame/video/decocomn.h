@@ -23,7 +23,7 @@ public:
 	decocomn_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
 	// configuration
-	void set_palette_tag(const char *tag);
+	void set_palette_tag(const char *tag) { m_palette.set_tag(tag); }
 
 	DECLARE_WRITE16_MEMBER( buffered_palette_w );
 	DECLARE_WRITE16_MEMBER( palette_dma_w );

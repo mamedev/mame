@@ -15,8 +15,8 @@ public:
 	void set_flip_screen(bool flip) { m_flip_screen = flip; }
 
 	// configuration
-	void set_gfxdecode_tag(const char *tag);
-	void set_gfx_region(int region);
+	void set_gfxdecode_tag(const char *tag) { m_gfxdecode.set_tag(tag); }
+	void set_gfx_region(int region) { m_gfxregion = region; }
 
 protected:
 	virtual void device_start() override;

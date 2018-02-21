@@ -30,8 +30,8 @@ public:
 
 	int m_chipnum; // used to decide where we write the palette
 
-	void set_chipnum(int chipnum);
-	void set_palette_tag(const char *tag);
+	void set_chipnum(int chipnum) { m_chipnum = chipnum; }
+	void set_palette_tag(const char *tag) { m_palette.set_tag(tag); }
 
 	DECLARE_READ16_MEMBER(galpani3_regs1_r);
 	DECLARE_WRITE16_MEMBER(galpani3_regs1_go_w);

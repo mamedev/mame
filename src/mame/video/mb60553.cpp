@@ -57,18 +57,6 @@ void mb60553_zooming_tilemap_device::device_reset()
 }
 
 
-void mb60553_zooming_tilemap_device::set_gfx_region(int gfxregion)
-{
-	m_gfx_region = gfxregion;
-}
-
-void mb60553_zooming_tilemap_device::set_gfxdecode_tag(const char *tag)
-{
-	m_gfxdecode.set_tag(tag);
-}
-
-
-
 /*** Fujitsu MB60553 (screen tilemap) **********************************************/
 
 /*

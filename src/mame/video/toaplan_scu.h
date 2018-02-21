@@ -13,7 +13,11 @@ public:
 	toaplan_scu_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
 	// configuration
-	void set_xoffsets(int xoffs, int xoffs_flipped);
+	void set_xoffsets(int xoffs, int xoffs_flipped)
+	{
+		m_xoffs = xoffs;
+		m_xoffs_flipped = xoffs_flipped;
+	}
 
 	void draw_sprites_to_tempbitmap(const rectangle &cliprect, uint16_t* spriteram, uint32_t bytes );
 	void copy_sprites_from_tempbitmap(bitmap_ind16 &bitmap, const rectangle &cliprect, int priority);

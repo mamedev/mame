@@ -35,7 +35,7 @@ public:
 	DECLARE_READ8_MEMBER(status_r);
 	DECLARE_WRITE8_MEMBER(status_w);
 
-	void set_gfxregion(const char *tag);
+	void set_gfxregion(const char *tag) { m_gfxtag = tag; }
 
 	void decodmd2_map(address_map &map);
 protected:

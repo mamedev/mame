@@ -389,23 +389,6 @@ segaic16_video_device::segaic16_video_device(const machine_config &mconfig, cons
 	m_pagelatch_cb =  segaic16_video_pagelatch_delegate(FUNC(segaic16_video_device::tilemap_16b_fill_latch), this);
 }
 
-void segaic16_video_device::set_pagelatch_cb(segaic16_video_pagelatch_delegate newtilecb)
-{
-	m_pagelatch_cb = newtilecb;
-}
-
-
-//-------------------------------------------------
-//  set_gfxdecode_tag: Set the tag of the
-//  gfx decoder
-//-------------------------------------------------
-
-void segaic16_video_device::set_gfxdecode_tag(const char *tag)
-{
-	m_gfxdecode.set_tag(tag);
-}
-
-
 void segaic16_video_device::device_start()
 {
 	if(!m_gfxdecode->started())

@@ -35,18 +35,6 @@ st0020_device::st0020_device(const machine_config &mconfig, const char *tag, dev
 	m_is_jclub2 = 0;
 }
 
-
-void st0020_device::set_is_st0032(int is_st0032)
-{
-	m_is_st0032 = is_st0032;
-}
-
-void st0020_device::set_is_jclub2(int is_jclub2)
-{
-	m_is_jclub2 = is_jclub2;
-}
-
-
 void st0020_device::device_reset()
 {
 	m_gfxram_bank = 0;

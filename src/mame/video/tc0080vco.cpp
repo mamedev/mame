@@ -111,16 +111,6 @@ tc0080vco_device::tc0080vco_device(const machine_config &mconfig, const char *ta
 }
 
 //-------------------------------------------------
-//  set_gfxdecode_tag: Set the tag of the
-//  gfx decoder
-//-------------------------------------------------
-
-void tc0080vco_device::set_gfxdecode_tag(const char *tag)
-{
-	m_gfxdecode.set_tag(tag);
-}
-
-//-------------------------------------------------
 //  device_start - device-specific startup
 //-------------------------------------------------
 

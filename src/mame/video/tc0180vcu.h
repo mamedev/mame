@@ -11,7 +11,7 @@ public:
 	tc0180vcu_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
 	// configuration
-	void set_gfxdecode_tag(const char *tag);
+	void set_gfxdecode_tag(const char *tag) { m_gfxdecode.set_tag(tag); }
 	void set_bg_colorbase(int color) { m_bg_color_base = color; }
 	void set_fg_colorbase(int color) { m_fg_color_base = color; }
 	void set_tx_colorbase(int color) { m_tx_color_base = color; }

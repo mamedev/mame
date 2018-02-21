@@ -61,19 +61,6 @@ void vs920a_text_tilemap_device::device_reset()
 {
 }
 
-
-void vs920a_text_tilemap_device::set_gfx_region(int gfxregion)
-{
-	m_gfx_region = gfxregion;
-}
-
-void vs920a_text_tilemap_device::set_gfxdecode_tag(const char *tag)
-{
-	m_gfxdecode.set_tag(tag);
-}
-
-
-
 TILE_GET_INFO_MEMBER(vs920a_text_tilemap_device::get_tile_info)
 {
 	int data;

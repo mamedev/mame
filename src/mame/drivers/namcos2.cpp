@@ -1683,12 +1683,12 @@ via software as INT1
 
 MACHINE_CONFIG_START(namcos2_state::configure_c148_standard)
 	MCFG_NAMCO_C148_ADD("master_intc","maincpu",true)
-	namco_c148_device::link_c148_device(*device,"slave_intc");
+	MCFG_NAMCO_C148_LINK("slave_intc")
 	MCFG_NAMCO_C148_EXT1_CB(WRITE8(namcos2_state, sound_reset_w))
 	MCFG_NAMCO_C148_EXT2_CB(WRITE8(namcos2_state, system_reset_w))
 
 	MCFG_NAMCO_C148_ADD("slave_intc","slave",false)
-	namco_c148_device::link_c148_device(*device,"master_intc");
+	MCFG_NAMCO_C148_LINK("master_intc")
 
 MACHINE_CONFIG_END
 

@@ -62,12 +62,12 @@ public:
 	deco_rmc3_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock);
 
 	// configuration
-	void set_init(deco_rmc3_palette_init_delegate init);
-	void set_membits(int membits);
-	void set_endianness(endianness_t endianness);
-	void set_entries(u32 entries);
-	void set_indirect_entries(u32 entries);
-	void set_prom_region(const char *region);
+	void set_init(deco_rmc3_palette_init_delegate init) { m_init = init; }
+//	void set_membits(int membits);
+//	void set_endianness(endianness_t endianness);
+	void set_entries(u32 entries) { m_entries = entries; }
+	void set_indirect_entries(u32 entries) { m_indirect_entries = entries; }
+	void set_prom_region(const char *region) { m_prom_region.set_tag(region); }
 
 	// palette RAM accessors
 	memory_array &basemem() { return m_paletteram; }

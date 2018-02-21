@@ -154,27 +154,6 @@ atari_motion_objects_device::atari_motion_objects_device(const machine_config &m
 }
 
 //-------------------------------------------------
-//  set_gfxdecode_tag: Set the tag of the
-//  gfx decoder
-//-------------------------------------------------
-
-void atari_motion_objects_device::set_gfxdecode_tag(const char *tag)
-{
-	m_gfxdecode.set_tag(tag);
-}
-
-//-------------------------------------------------
-//  set_config: Set the tag of the
-//  sound CPU
-//-------------------------------------------------
-
-void atari_motion_objects_device::set_config(const atari_motion_objects_config &config)
-{
-	static_cast<atari_motion_objects_config &>(*this) = config;
-}
-
-
-//-------------------------------------------------
 //  draw: Render the motion objects to the
 //  destination bitmap.
 //-------------------------------------------------

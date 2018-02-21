@@ -12,8 +12,8 @@ public:
 	st0020_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
 	// configuration
-	void set_is_st0032(int is_st0032);
-	void set_is_jclub2(int is_jclub2);
+	void set_is_st0032(int is_st0032) { m_is_st0032 = is_st0032; }
+	void set_is_jclub2(int is_jclub2) { m_is_jclub2 = is_jclub2; }
 
 	void update_screen(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect, bool update_visible_area);
 

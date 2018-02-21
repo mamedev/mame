@@ -21,17 +21,6 @@ deco_zoomspr_device::deco_zoomspr_device(const machine_config &mconfig, const ch
 {
 }
 
-//-------------------------------------------------
-//  set_gfxdecode_tag: Set the tag of the
-//  gfx decoder
-//-------------------------------------------------
-
-void deco_zoomspr_device::set_gfxdecode_tag(const char *tag)
-{
-	m_gfxdecode.set_tag(tag);
-}
-
-
 void deco_zoomspr_device::device_start()
 {
 }

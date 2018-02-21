@@ -6,11 +6,6 @@
 #include "emu.h"
 #include "deckarn.h"
 
-void deco_karnovsprites_device::set_gfx_region(int region)
-{
-	m_gfxregion = region;
-}
-
 DEFINE_DEVICE_TYPE(DECO_KARNOVSPRITES, deco_karnovsprites_device, "deco_karnovsprites", "DECO Karnov Sprites")
 
 deco_karnovsprites_device::deco_karnovsprites_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
@@ -18,16 +13,6 @@ deco_karnovsprites_device::deco_karnovsprites_device(const machine_config &mconf
 	, m_gfxregion(0)
 	, m_gfxdecode(*this, finder_base::DUMMY_TAG)
 {
-}
-
-//-------------------------------------------------
-//  set_gfxdecode_tag: Set the tag of the
-//  gfx decoder
-//-------------------------------------------------
-
-void deco_karnovsprites_device::set_gfxdecode_tag(const char *tag)
-{
-	m_gfxdecode.set_tag(tag);
 }
 
 void deco_karnovsprites_device::device_start()
