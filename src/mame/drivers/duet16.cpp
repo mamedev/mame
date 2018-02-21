@@ -30,6 +30,7 @@ public:
 		m_dmac(*this, "dmac"),
 		m_fd(*this, "fdc:%u", 0),
 		m_pal(*this, "palette"),
+		m_chrpal(*this, "chrpal"),
 		m_rtc(*this, "rtc"),
 		m_screen(*this, "screen"),
 		m_chrrom(*this, "char"),
@@ -71,6 +72,7 @@ private:
 	required_device<am9517a_device> m_dmac;
 	required_device_array<floppy_connector, 2> m_fd;
 	required_device<palette_device> m_pal;
+	required_device<palette_device> m_chrpal;
 	required_device<msm58321_device> m_rtc;
 	required_device<screen_device> m_screen;
 	required_memory_region m_chrrom;
@@ -202,21 +204,24 @@ MC6845_UPDATE_ROW(duet16_state::crtc_update_row)
 			else
 				data = bitswap<8>(data, 3, 3, 2, 2, 1, 1, 0, 0);
 		}
+		if(BIT(attr, 4) && (m_screen->frame_number() & 32)) // ~1.7 Hz
+			data = 0;
 		if(BIT(attr, 3))
 			data ^= 0xff;
-		if((i == cursor_x) && (m_screen->frame_number() & 32)) // blink rate?
-			data = 0xff;
 		if(BIT(attr, 5) && (ra > 12)) // underline start?
+		{
+			attr |= 7;
 			data = 0xff;
-		if(BIT(attr, 4) && (m_screen->frame_number() & 32)) // blink rate?
-			data = 0;
+		}
+		if((i == cursor_x) && (m_screen->frame_number() & 16)) // ~3.4 Hz
+			data ^= 0xff;
 
-		rgb_t fg = rgb_t(pal1bit(BIT(attr, 1)), pal1bit(BIT(attr, 2)), pal1bit(BIT(attr, 0)));
+		rgb_t fg = m_chrpal->pen_color(attr & 7);
 
 		for(int xi = 0; xi < 8; xi++)
 		{
 			rgb_t color;
-			if(data & (0x80 >> xi) && BIT(m_dispctrl, 1))
+			if((data & (0x80 >> xi)) && BIT(m_dispctrl, 1))
 				color = fg;
 			else if(BIT(m_dispctrl, 0))
 				color = m_pal->pen_color((BIT(g2, xi) << 2) | (BIT(g1, xi) << 1) | BIT(g0, xi));
@@ -402,8 +407,9 @@ MACHINE_CONFIG_START(duet16_state::duet16)
 	MCFG_MC6845_UPDATE_ROW_CB(duet16_state, crtc_update_row)
 
 	MCFG_PALETTE_ADD("palette", 8)
+	MCFG_PALETTE_ADD_3BIT_GRB("chrpal")
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", duet16)
+	MCFG_GFXDECODE_ADD("gfxdecode", "chrpal", duet16)
 
 	MCFG_SCREEN_ADD("screen", RASTER)
 	MCFG_SCREEN_REFRESH_RATE(60)
