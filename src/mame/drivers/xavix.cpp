@@ -355,6 +355,7 @@ void xavix_state::handle_palette(screen_device &screen, bitmap_ind16 &bitmap, co
 void xavix_state::draw_tilemap(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect, int which)
 {
 	int alt_tileaddressing = 0;
+	int alt_tileaddressing2 = 0;
 
 	int ydimension = 0;
 	int xdimension = 0;
@@ -417,6 +418,9 @@ void xavix_state::draw_tilemap(screen_device &screen, bitmap_ind16 &bitmap, cons
 	else
 		alt_tileaddressing = 0;
 
+	if (tileregs[0x7] & 0x02)
+		alt_tileaddressing2 = 1;
+
 	if (tileregs[0x7] & 0x80)
 	{
 		// there's a tilemap register to specify base in main ram, although in the monster truck test mode it points to an unmapped region
@@ -460,11 +464,23 @@ void xavix_state::draw_tilemap(screen_device &screen, bitmap_ind16 &bitmap, cons
 
 				if (!alt_tileaddressing)
 				{
-					basereg = 0;
-					gfxbase = (m_spr_attra[(basereg * 2) + 1] << 16) | (m_spr_attra[(basereg * 2)] << 8);
+					if (!alt_tileaddressing2)
+					{
+						basereg = 0;
+						gfxbase = (m_spr_attra[(basereg * 2) + 1] << 16) | (m_spr_attra[(basereg * 2)] << 8);
 
-					tile = tile * (offset_multiplier * bpp);
-					tile += gfxbase;
+						tile = tile * (offset_multiplier * bpp);
+						tile += gfxbase;
+					}
+					else
+					{
+						// fixed multiplier? or just different? only seen this in 16x8 tile mode at the moment.
+						tile = tile * 8;		
+						basereg = (tile & 0xf0000) >> 16;
+						tile &= 0xffff;
+						gfxbase = (m_spr_attra[(basereg * 2) + 1] << 16) | (m_spr_attra[(basereg * 2)] << 8);
+						tile+= gfxbase;
+					}
 				}
 				else
 				{
@@ -638,8 +654,15 @@ void xavix_state::draw_sprites(screen_device &screen, bitmap_ind16 &bitmap, cons
 				tile = tile * 8;
 		}
 
-		if (m_alt_addressing)
+		if (m_alt_addressing==1)
 			tile += m_alt_addressing_base;
+		else if (m_alt_addressing == 2)
+		{
+			int basereg = (tile & 0xf0000) >> 16;
+			tile &= 0xffff;
+			int gfxbase = (m_spr_attra[(basereg * 2) + 1] << 16) | (m_spr_attra[(basereg * 2)] << 8);
+			tile+= gfxbase;
+		}
 
 		ypos = 0xff - ypos;
 
@@ -1737,14 +1760,12 @@ DRIVER_INIT_MEMBER(xavix_state, rad_box)
 {
 	DRIVER_INIT_CALL(xavix);
 	m_alt_addressing = 2;
-	m_alt_addressing_base = 0x20000;
 }
 
 DRIVER_INIT_MEMBER(xavix_state, rad_crdn)
 {
 	DRIVER_INIT_CALL(xavix);
 	m_alt_addressing = 2;
-	m_alt_addressing_base = 0x00000;
 }
 
 /***************************************************************************
