@@ -118,7 +118,7 @@ PALETTE_INIT_MEMBER(tpp1_state, palette_init)
 		m_color_prom[i + 0x20] = m_color_prom[color + 0x20];
 	}
 
-	m_last_palette = -1;
+	m_palette_bank_cache = -1;
 
 	update_palette();
 }
@@ -132,16 +132,16 @@ PALETTE_INIT_MEMBER(tnx1_state, palette_init)
 		m_color_prom_spr[i] = m_color_prom_spr[color];
 	}
 
-	m_last_palette = -1;
+	m_palette_bank_cache = -1;
 
 	update_palette();
 }
 
 void tnx1_state::update_palette()
 {
-	if ((*m_palettebank ^ m_last_palette) & 0x08)
+	if ((m_palette_bank ^ m_palette_bank_cache) & 0x08)
 	{
-		uint8_t *color_prom = m_color_prom + 16 * ((*m_palettebank & 0x08) >> 3);
+		uint8_t *color_prom = m_color_prom + 16 * ((m_palette_bank & 0x08) >> 3);
 
 #if USE_NEW_COLOR
 		std::vector<rgb_t> rgb;
@@ -178,9 +178,9 @@ void tnx1_state::update_palette()
 #endif
 	}
 
-	if ((*m_palettebank ^ m_last_palette) & 0x08)
+	if ((m_palette_bank ^ m_palette_bank_cache) & 0x08)
 	{
-		uint8_t *color_prom = m_color_prom + 32 + 16 * ((*m_palettebank & 0x08) >> 3);
+		uint8_t *color_prom = m_color_prom + 32 + 16 * ((m_palette_bank & 0x08) >> 3);
 
 		/* characters */
 #if USE_NEW_COLOR
@@ -216,9 +216,9 @@ void tnx1_state::update_palette()
 #endif
 	}
 
-	if ((*m_palettebank ^ m_last_palette) & 0x07)
+	if ((m_palette_bank ^ m_palette_bank_cache) & 0x07)
 	{
-		uint8_t *color_prom = m_color_prom_spr + 32 * (*m_palettebank & 0x07);
+		uint8_t *color_prom = m_color_prom_spr + 32 * (m_palette_bank & 0x07);
 
 #if USE_NEW_COLOR
 		/* sprites */
@@ -251,7 +251,7 @@ void tnx1_state::update_palette()
 #endif
 	}
 
-	m_last_palette = *m_palettebank;
+	m_palette_bank_cache = m_palette_bank;
 }
 
 WRITE8_MEMBER(tnx1_state::background_w)
@@ -305,6 +305,9 @@ TILE_GET_INFO_MEMBER(tnx1_state::get_fg_tile_info)
 
 void tnx1_state::video_start()
 {
+	m_background_ram.resize(0x1000);
+	m_sprite_ram.resize(0x400);
+
 	m_sprite_bitmap = std::make_unique<bitmap_ind16>(512, 512);
 
 	m_fg_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(tnx1_state::get_fg_tile_info),this), TILEMAP_SCAN_ROWS, 16, 16, 32, 32);
@@ -313,8 +316,11 @@ void tnx1_state::video_start()
 	m_field = 0;
 
 	save_item(NAME(m_field));
-	save_item(NAME(m_last_palette));
+	save_item(NAME(m_palette_bank));
+	save_item(NAME(m_palette_bank_cache));
 	save_item(NAME(m_background_ram));
+	save_item(NAME(m_background_scroll));
+	save_item(NAME(m_sprite_ram));
 }
 
 void tnx1_state::draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprect)
@@ -333,9 +339,9 @@ void tnx1_state::draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprect)
 			int flipy;
 		} attributes[64] = { 0 };
 
-		for (int offs = 0; offs < m_spriteram.bytes(); offs += 4)
+		for (int offs = 4; offs < m_dmasource.bytes(); offs += 4)
 		{
-			int sy = 0x200 - (m_spriteram[offs + 1] * 2);
+			int sy = 0x200 - (m_sprite_ram[offs + 1] * 2);
 			int row = y - sy;
 			if (flip_screen())
 			{
@@ -357,15 +363,15 @@ void tnx1_state::draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprect)
 				* bit 0 /
 				*/
 
-				struct attribute_memory *a = &attributes[m_spriteram[offs] >> 2];
-				a->sx = m_spriteram[offs] * 2;
+				struct attribute_memory *a = &attributes[m_sprite_ram[offs] >> 2];
+				a->sx = m_sprite_ram[offs] * 2;
 				a->row = row;
-				a->code = ((m_spriteram[offs + 2] & 0x7f)
-					+ ((m_spriteram[offs + 3] & 0x10) << 3)
-					+ ((m_spriteram[offs + 3] & 0x04) << 6)) ^ 0x1ff;
-				a->color = (m_spriteram[offs + 3] & 0x07);
-				a->flipx = (m_spriteram[offs + 2] & 0x80) ? 0xf : 0;
-				a->flipy = (m_spriteram[offs + 3] & 0x08) ? 0xf : 0;
+				a->code = ((m_sprite_ram[offs + 2] & 0x7f)
+					+ ((m_sprite_ram[offs + 3] & 0x10) << 3)
+					+ ((m_sprite_ram[offs + 3] & 0x04) << 6)) ^ 0x1ff;
+				a->color = (m_sprite_ram[offs + 3] & 0x07);
+				a->flipx = (m_sprite_ram[offs + 2] & 0x80) ? 0xf : 0;
+				a->flipy = (m_sprite_ram[offs + 3] & 0x08) ? 0xf : 0;
 			}
 		}
 
@@ -418,7 +424,7 @@ void tnx1_state::draw_background(bitmap_ind16 &bitmap, const rectangle &cliprect
 		if (flip_screen())
 			sy ^= 0x1ff;
 
-		sy -= 0x200 - (2 * m_background_pos[1]);
+		sy -= 0x200 - (2 * m_background_scroll[1]);
 
 		for (int x = cliprect.min_x; x <= cliprect.max_x; x++)
 		{
@@ -427,7 +433,7 @@ void tnx1_state::draw_background(bitmap_ind16 &bitmap, const rectangle &cliprect
 			else
 			{
 				// TODO: confirm the memory layout
-				int sx = x + (2 * (m_background_pos[0] | ((m_background_pos[2] & 1) << 8))) + 0x70;
+				int sx = x + (2 * (m_background_scroll[0] | ((m_background_scroll[2] & 1) << 8))) + 0x70;
 				int shift = (sx & 0x200) / 0x80;
 
 				bitmap.pix16(y, x) = (m_background_ram[((sx / 8) & 0x3f) + ((sy / 8) * 0x40)] >> shift) & 0xf;
@@ -444,7 +450,7 @@ void tpp1_state::draw_background(bitmap_ind16 &bitmap, const rectangle &cliprect
 		if (flip_screen())
 			sy ^= 0x1ff;
 
-		sy -= 0x200 - (2 * m_background_pos[1]);
+		sy -= 0x200 - (2 * m_background_scroll[1]);
 
 		for (int x = cliprect.min_x; x <= cliprect.max_x; x++)
 		{
@@ -453,7 +459,7 @@ void tpp1_state::draw_background(bitmap_ind16 &bitmap, const rectangle &cliprect
 			else
 			{
 				// TODO: confirm the memory layout
-				int sx = x + (2 * m_background_pos[0]) + 0x70;
+				int sx = x + (2 * m_background_scroll[0]) + 0x70;
 				int shift = (sy & 4);
 
 				bitmap.pix16(y, x) = (m_background_ram[((sx / 8) & 0x3f) + ((sy / 8) * 0x40)] >> shift) & 0xf;
@@ -470,7 +476,7 @@ void tpp2_state::draw_background(bitmap_ind16 &bitmap, const rectangle &cliprect
 		if (flip_screen())
 			sy ^= 0x1ff;
 
-		sy -= 0x200 - (2 * m_background_pos[1]);
+		sy -= 0x200 - (2 * m_background_scroll[1]);
 
 		for (int x = cliprect.min_x; x <= cliprect.max_x; x++)
 		{
@@ -479,7 +485,7 @@ void tpp2_state::draw_background(bitmap_ind16 &bitmap, const rectangle &cliprect
 			else
 			{
 				// TODO: confirm the memory layout
-				int sx = x + (2 * m_background_pos[0]) + 0x72;
+				int sx = x + (2 * m_background_scroll[0]) + 0x72;
 				int shift = (sy & 4);
 
 				bitmap.pix16(y, x) = (m_background_ram[((sx / 8) & 0x3f) + ((sy / 8) * 0x40)] >> shift) & 0xf;
