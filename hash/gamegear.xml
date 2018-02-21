@@ -1939,6 +1939,28 @@ a certain item) -->
 		</part>
 	</software>
 
+	<software name="drsc">
+		<description>David Robinson's Supreme Court (non-playable demo)</description>
+		<year>1991</year>
+		<publisher>Sega</publisher>
+		<part name="cart" interface="gamegear_cart">
+			<dataarea name="rom" size="262144">
+				<rom name="david robinson's supreme court [demo] [proto].gg" size="262144" crc="696f446d" sha1="4bc01fa1c8d1a2b374e9e7d3e2ac75fbfef6ad1f" offset="000000" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="drsch" cloneof="drsc">
+		<description>David Robinson's Supreme Court (non-playable demo, hack)</description>
+		<year>1991</year>
+		<publisher>Sega</publisher>
+		<part name="cart" interface="gamegear_cart">
+			<dataarea name="rom" size="262144">
+				<rom name="david robinson's supreme court [demo] [proto, hacked].gg" size="262144" crc="8953d729" sha1="54aa1bca28596f8335efdc123923d03353b513e2" offset="000000" />
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="deepduck">
 		<description>Deep Duck Trouble Starring Donald Duck (Euro, USA)</description>
 		<year>1994</year>
@@ -3467,6 +3489,19 @@ a certain item) -->
 			<feature name="pin_42" value="sms_mode" />
 			<dataarea name="rom" size="262144">
 				<rom name="jang pung ii (k) [s].bin" size="262144" crc="76c5bdfb" sha1="2b3bb8fd76fe706d7e564b372d2d71dfce53cb1b" offset="000000" />
+			</dataarea>
+		</part>
+	</software>
+	
+	<software name="strtbatl" cloneof="jangpun2">
+		<description>Street Battle (US, SMS Mode, prototype)</description>
+		<year>1993</year>
+		<publisher>Innovation Tech</publisher>
+		<part name="cart" interface="gamegear_cart">
+			<feature name="slot" value="codemasters" />
+			<feature name="pin_42" value="sms_mode" />
+			<dataarea name="rom" size="524288">
+				<rom name="street battle [proto] [sms-gg].sms" size="524288" crc="01a2d595" sha1="434a9a21a2662bff1cd2246528eebce8a5116c1b" offset="000000" />
 			</dataarea>
 		</part>
 	</software>
@@ -5677,6 +5712,17 @@ a certain item) -->
 			<feature name="slot" value="eeprom" />
 			<dataarea name="rom" size="524288">
 				<rom name="mpr-18562.ic1" size="524288" crc="4ed45bda" sha1="127a7e6706f6d9b129d5cf0dd2bb417e9b108748" offset="000000" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="offtwall">
+		<description>Off The Wall (prototype)</description>
+		<year>1993</year>
+		<publisher>Tengen</publisher>
+		<part name="cart" interface="gamegear_cart">
+			<dataarea name="rom" size="262144">
+				<rom name="off the wall [proto].gg" size="262144" crc="71fe9c80" sha1="27146e93e62a6cf5fc998fb9a2563b51b21334b4" offset="000000" />
 			</dataarea>
 		</part>
 	</software>
@@ -8536,6 +8582,17 @@ a certain item) -->
 		<part name="cart" interface="gamegear_cart">
 			<dataarea name="rom" size="131072">
 				<rom name="super off road (usa, europe).bin" size="131072" crc="e8b42b1f" sha1="c5ee89f785c44784867c3b33fd6466fc72e9042c" offset="000000" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="superoffp" cloneof="superoff">
+		<description>Super Off Road (prototype)</description>
+		<year>1992</year>
+		<publisher>Virgin Interactive</publisher>
+		<part name="cart" interface="gamegear_cart">
+			<dataarea name="rom" size="131072">
+				<rom name="super off road [proto].gg" size="131072" crc="a1160814" sha1="5703edeffd93ef20f8ab88ea5160c7ffb41c7a47" offset="000000" />
 			</dataarea>
 		</part>
 	</software>
