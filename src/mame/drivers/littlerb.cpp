@@ -40,15 +40,15 @@ LITTLE ROBIN  TCH S.A.
      CPU: MC68000 series @ 16.000MHz/2 (known to use 10MHz or 12MHz parts)
      OSC: 40.000MHz, 16.000MHz & 6.000MHz
 Graphics: TMS34010 (surface scratched, stamped B)
-     RAM: 2 Fijitsu 84256A-70L 32K SRAM
+     RAM: 2 Fujitsu 84256A-70L 32K SRAM
           4 Samsung KM44C256CP-10 256K x 4bit CMOS DRAM
           U35, U36, U40 & U41 unknown ZIP style RAM
-     DSW: 2 8-switch dipswitch bankcs
+     DSW: 2 8-switch dipswitch banks
    Other: TDA2003 10Watt Amp
           ST 555N General Purpose Single Bipolar Timer
           Bt478KPJ35 Brooktree 80Mhz 265-Word Color Palette PS/2 RAMDAC
           VR1 volume resistor pot
-          U48 is an unknown surface scratched socketted QFP68 part stamped A
+          U48 is an unknown surface scratched socketed QFP68 part stamped A
 
 
 Dip sw.1
