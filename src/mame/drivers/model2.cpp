@@ -712,7 +712,7 @@ CUSTOM_INPUT_MEMBER(model2_state::srallyc_gearbox_r)
 
 */
 
-
+// simulate this so that it passes the initial checks
 CUSTOM_INPUT_MEMBER(model2_state::rchase2_devices_r)
 {
 	uint8_t res;
