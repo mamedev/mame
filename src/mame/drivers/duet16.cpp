@@ -268,8 +268,8 @@ WRITE_LINE_MEMBER(duet16_state::rtc_busy_w)
 READ8_MEMBER(duet16_state::rtc_r)
 {
 	u8 ret;
-	m_rtc->read_w(ASSERT_LINE);
 	m_rtc->cs2_w(ASSERT_LINE);
+	m_rtc->read_w(ASSERT_LINE);
 	ret = m_rtc_d;
 	m_rtc->read_w(CLEAR_LINE);
 	m_rtc->cs2_w(CLEAR_LINE);
@@ -278,12 +278,12 @@ READ8_MEMBER(duet16_state::rtc_r)
 
 WRITE8_MEMBER(duet16_state::rtc_w)
 {
-	m_rtc->write_w(ASSERT_LINE);
-	m_rtc->cs2_w(ASSERT_LINE);
 	m_rtc->d0_w(data & 1 ? ASSERT_LINE : CLEAR_LINE);
 	m_rtc->d1_w(data & 2 ? ASSERT_LINE : CLEAR_LINE);
 	m_rtc->d2_w(data & 4 ? ASSERT_LINE : CLEAR_LINE);
 	m_rtc->d3_w(data & 8 ? ASSERT_LINE : CLEAR_LINE);
+	m_rtc->cs2_w(ASSERT_LINE);
+	m_rtc->write_w(ASSERT_LINE);
 	m_rtc->write_w(CLEAR_LINE);
 	m_rtc->cs2_w(CLEAR_LINE);
 }
@@ -293,17 +293,17 @@ READ8_MEMBER(duet16_state::rtc_stat_r)
 	m_rtc_irq = false;
 	if(!m_itm_irq)
 		m_pic->ir0_w(CLEAR_LINE);
-	return (m_rtc_busy ? 0 : 0x80);
+	return (m_rtc_busy ? 0x80 : 0);
 }
 
 WRITE8_MEMBER(duet16_state::rtc_addr_w)
 {
-	m_rtc->address_write_w(ASSERT_LINE);
-	m_rtc->cs2_w(ASSERT_LINE);
 	m_rtc->d0_w(data & 1 ? ASSERT_LINE : CLEAR_LINE);
 	m_rtc->d1_w(data & 2 ? ASSERT_LINE : CLEAR_LINE);
 	m_rtc->d2_w(data & 4 ? ASSERT_LINE : CLEAR_LINE);
 	m_rtc->d3_w(data & 8 ? ASSERT_LINE : CLEAR_LINE);
+	m_rtc->cs2_w(ASSERT_LINE);
+	m_rtc->address_write_w(ASSERT_LINE);
 	m_rtc->address_write_w(CLEAR_LINE);
 	m_rtc->cs2_w(CLEAR_LINE);
 }
@@ -423,7 +423,7 @@ MACHINE_CONFIG_START(duet16_state::duet16)
 	MCFG_MSM58321_D2_HANDLER(WRITELINE(duet16_state, rtc_d2_w))
 	MCFG_MSM58321_D3_HANDLER(WRITELINE(duet16_state, rtc_d3_w))
 	MCFG_MSM58321_BUSY_HANDLER(WRITELINE(duet16_state, rtc_busy_w))
-	MCFG_MSM58321_YEAR0(2000)
+	MCFG_MSM58321_YEAR0(1980)
 	MCFG_MSM58321_DEFAULT_24H(true)
 MACHINE_CONFIG_END
 
