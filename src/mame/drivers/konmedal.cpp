@@ -670,6 +670,6 @@ ROM_END
 
 GAME( 1995, tsukande,    0, tsukande, konmedal,  konmedal_state, 0, ROT0, "Konami", "Tsukande Toru Chicchi", MACHINE_NOT_WORKING)
 GAME( 1995, ddboy,       0, ddboy,    konmedal,  konmedal_state, 0, ROT0, "Konami", "Dam Dam Boy (on dedicated PCB)", MACHINE_NOT_WORKING)
-GAME( 1995, ddboya,  ddboy, ddboy,    konmedal,  konmedal_state, 0, ROT0, "Konami", "Dam Dam Boy (on Tsukande Tori Chicchi PCB)", MACHINE_NOT_WORKING)
+GAME( 1995, ddboya,  ddboy, ddboy,    konmedal,  konmedal_state, 0, ROT0, "Konami", "Dam Dam Boy (on Tsukande Toru Chicchi PCB)", MACHINE_NOT_WORKING)
 GAME( 1993, shuriboy,    0, shuriboy, konmedal,  konmedal_state, 0, ROT0, "Konami", "Shuriken Boy", MACHINE_NOT_WORKING)
 
