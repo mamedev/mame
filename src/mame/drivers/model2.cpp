@@ -433,6 +433,11 @@ MACHINE_RESET_MEMBER(model2_state,model2_common)
 		m_timers[i]->reset();
 
 	m_uart->write_cts(0);
+	
+	// initialize bufferram to a sane default
+	// TODO: HW can probably parse this at will somehow ...
+	for (i=0;i<0x20000/4;i++)
+		m_bufferram[i] = 0x07800f0f;
 }
 
 MACHINE_RESET_MEMBER(model2_state,model2o)
