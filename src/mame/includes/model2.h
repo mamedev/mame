@@ -130,7 +130,6 @@ public:
 	uint32_t m_geo_iop_data;
 	int m_to_68k;
 
-	int m_maxxstate;
 	uint32_t m_geo_read_start_address;
 	uint32_t m_geo_write_start_address;
 	model2_renderer *m_poly;
@@ -156,8 +155,6 @@ public:
 	DECLARE_WRITE32_MEMBER(ctrl0_w);
 	DECLARE_WRITE32_MEMBER(analog_2b_w);
 	DECLARE_READ32_MEMBER(fifoctl_r);
-	DECLARE_READ32_MEMBER(model2o_fifoctrl_r);
-	DECLARE_READ8_MEMBER(model2o_in_r);
 	DECLARE_READ32_MEMBER(videoctl_r);
 	DECLARE_WRITE32_MEMBER(videoctl_w);
 	DECLARE_WRITE32_MEMBER(rchase2_devices_w);
@@ -177,7 +174,6 @@ public:
 	DECLARE_WRITE32_MEMBER(geo_w);
 	DECLARE_READ8_MEMBER(hotd_lightgun_r);
 	DECLARE_WRITE32_MEMBER(hotd_lightgun_w);
-	DECLARE_READ32_MEMBER(daytona_unk_r);
 	DECLARE_READ32_MEMBER(model2_irq_r);
 	DECLARE_WRITE32_MEMBER(model2_irq_w);
 	DECLARE_READ32_MEMBER(model2_serial_r);
@@ -189,7 +185,6 @@ public:
 
 	void raster_init(memory_region *texture_rom);
 	void geo_init(memory_region *polygon_rom);
-	DECLARE_READ32_MEMBER(maxx_r);
 	DECLARE_READ32_MEMBER(render_mode_r);
 	DECLARE_WRITE32_MEMBER(render_mode_w);
 	DECLARE_WRITE32_MEMBER(model2o_tex_w0);
@@ -216,7 +211,6 @@ public:
 	DECLARE_DRIVER_INIT(pltkids);
 	DECLARE_DRIVER_INIT(rchase2);
 	DECLARE_DRIVER_INIT(genprot);
-	DECLARE_DRIVER_INIT(daytonam);
 	DECLARE_DRIVER_INIT(manxttdx);
 	DECLARE_DRIVER_INIT(srallyc);
 	DECLARE_DRIVER_INIT(doa);
@@ -256,24 +250,8 @@ public:
 
 	void model2_timers(machine_config &config);
 	void model2_screen(machine_config &config);
-	void daytona(machine_config &config);
-	void indy500(machine_config &config);
-	void manxtt(machine_config &config);
-	void manxttdx(machine_config &config);
-	void model2a(machine_config &config);
-	void model2a_0229(machine_config &config);
-	void model2a_5881(machine_config &config);
-	void model2b(machine_config &config);
-	void model2b_0229(machine_config &config);
-	void model2b_5881(machine_config &config);
-	void model2c(machine_config &config);
-	void model2c_5881(machine_config &config);
-	void model2o(machine_config &config);
-	void overrev2c(machine_config &config);
-	void rchase2(machine_config &config);
+
 	void sj25_0207_01(machine_config &config);
-	void srallyc(machine_config &config);
-	void stcc(machine_config &config);
 	void copro_sharc_map(address_map &map);
 	void copro_tgp_map(address_map &map);
 	void copro_tgpx4_map(address_map &map);
@@ -282,12 +260,6 @@ public:
 	void geo_sharc_map(address_map &map);
 	void model2_base_mem(address_map &map);
 	void model2_snd(address_map &map);
-	void model2a_crx_mem(address_map &map);
-	void model2b_crx_mem(address_map &map);
-	void model2c_crx_mem(address_map &map);
-	void model2o_mem(address_map &map);
-	void rchase2_iocpu_map(address_map &map);
-	void rchase2_ioport_map(address_map &map);
 	
 	uint8_t m_gamma_table[256];
 	
@@ -299,6 +271,113 @@ private:
 	bool m_render_mode;
 };
 
+/*****************************
+ *
+ * Model 2
+ *
+ *****************************/
+ 
+class model2o_state : public model2_state
+{
+public:
+	model2o_state(const machine_config &mconfig, device_type type, const char *tag)
+		: model2_state(mconfig, type, tag)
+	{}
+
+	DECLARE_READ32_MEMBER(daytona_unk_r);
+	DECLARE_READ8_MEMBER(model2o_in_r);
+	DECLARE_READ32_MEMBER(fifoctrl_r);
+
+	void daytona(machine_config &config);	
+	void model2o(machine_config &config);
+	void model2o_mem(address_map &map);
+};
+
+/*****************************
+ *
+ * Daytona To The Maxx
+ *
+ *****************************/
+
+class model2o_maxx_state : public model2o_state
+{
+public:
+	model2o_maxx_state(const machine_config &mconfig, device_type type, const char *tag)
+		: model2o_state(mconfig, type, tag)
+	{}
+
+	DECLARE_READ32_MEMBER(maxx_r);
+	void daytona_maxx(machine_config &config);
+	void model2o_maxx_mem(address_map &map);
+
+private:
+	int m_maxxstate;	
+};
+
+/*****************************
+ *
+ * Model 2A
+ *
+ *****************************/
+
+class model2a_state : public model2_state
+{
+public:
+	model2a_state(const machine_config &mconfig, device_type type, const char *tag)
+		: model2_state(mconfig, type, tag)
+	{}
+	
+	void manxtt(machine_config &config);
+	void manxttdx(machine_config &config);
+	void model2a(machine_config &config);
+	void model2a_0229(machine_config &config);
+	void model2a_5881(machine_config &config);
+	void srallyc(machine_config &config);
+	void model2a_crx_mem(address_map &map);
+};
+
+/*****************************
+ *
+ * Model 2B
+ *
+ *****************************/
+
+class model2b_state : public model2_state
+{
+public:
+	model2b_state(const machine_config &mconfig, device_type type, const char *tag)
+		: model2_state(mconfig, type, tag)
+	{}
+
+	void model2b(machine_config &config);
+	void model2b_0229(machine_config &config);
+	void model2b_5881(machine_config &config);
+	void indy500(machine_config &config);
+	void rchase2(machine_config &config);
+	void model2b_crx_mem(address_map &map);
+	void rchase2_iocpu_map(address_map &map);
+	void rchase2_ioport_map(address_map &map);
+};
+
+/*****************************
+ *
+ * Model 2C
+ *
+ *****************************/
+
+class model2c_state : public model2_state
+{
+public:
+	model2c_state(const machine_config &mconfig, device_type type, const char *tag)
+		: model2_state(mconfig, type, tag)
+	{}
+	
+	void model2c(machine_config &config);
+	void model2c_5881(machine_config &config);
+	void overrev2c(machine_config &config);
+	void stcc(machine_config &config);
+	void model2c_crx_mem(address_map &map);
+};
 
 /*****************************
  *

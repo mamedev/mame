@@ -1164,7 +1164,7 @@ READ32_MEMBER(model2_state::sonic_unk_r)
 }
 #endif
 
-READ32_MEMBER(model2_state::daytona_unk_r)
+READ32_MEMBER(model2o_state::daytona_unk_r)
 {
 	return 0x00400000;
 }
@@ -1342,9 +1342,7 @@ WRITE32_MEMBER(model2_state::model2_5881prot_w)
 
 
 /* Daytona "To The MAXX" PIC protection simulation */
-
-
-READ32_MEMBER(model2_state::maxx_r)
+READ32_MEMBER(model2o_maxx_state::maxx_r)
 {
 	uint32_t *ROM = (uint32_t *)memregion("maincpu")->base();
 
@@ -1557,12 +1555,12 @@ READ8_MEMBER(model2_state::virtuacop_lightgun_offscreen_r)
 }
 
 /* Apparently original Model 2 doesn't have fifo control? */
-READ32_MEMBER(model2_state::model2o_fifoctrl_r)
+READ32_MEMBER(model2o_state::fifoctrl_r)
 {
 	return 0xffffffff;
 }
 
-READ8_MEMBER(model2_state::model2o_in_r)
+READ8_MEMBER(model2o_state::model2o_in_r)
 {
 	// TODO: original model 2 actually uses a separate board for inputs, which transmits them to dual-port RAM
 	switch (offset)
@@ -1579,7 +1577,7 @@ READ8_MEMBER(model2_state::model2o_in_r)
 }
 
 /* original Model 2 overrides */
-ADDRESS_MAP_START(model2_state::model2o_mem)
+ADDRESS_MAP_START(model2o_state::model2o_mem)
 	AM_IMPORT_FROM(model2_base_mem)
 
 	AM_RANGE(0x00200000, 0x0021ffff) AM_RAM
@@ -1590,7 +1588,7 @@ ADDRESS_MAP_START(model2_state::model2o_mem)
 	AM_RANGE(0x00884000, 0x00887fff) AM_READWRITE(copro_fifo_r, copro_fifo_w)
 
 	AM_RANGE(0x00980000, 0x00980003) AM_READWRITE(copro_ctl1_r,copro_ctl1_w)
-	AM_RANGE(0x00980004, 0x00980007) AM_READ(model2o_fifoctrl_r)
+	AM_RANGE(0x00980004, 0x00980007) AM_READ(fifoctrl_r)
 	AM_RANGE(0x00980008, 0x0098000b) AM_WRITE(geo_ctl1_w)
 	AM_RANGE(0x009c0000, 0x009cffff) AM_READWRITE(model2_serial_r, model2_serial_w)
 
@@ -1605,6 +1603,11 @@ ADDRESS_MAP_START(model2_state::model2o_mem)
 	AM_RANGE(0x01c80000, 0x01c80003) AM_READWRITE(model2_serial_r, model2_serial_w)
 ADDRESS_MAP_END
 
+ADDRESS_MAP_START(model2o_maxx_state::model2o_maxx_mem)
+	AM_IMPORT_FROM(model2o_mem)
+	AM_RANGE(0x00240000,0x0024ffff) AM_READ(maxx_r)
+ADDRESS_MAP_END
+
 /* TODO: read by Sonic the Fighters (bit 1), unknown purpose */
 READ32_MEMBER(model2_state::copro_status_r)
 {
@@ -1615,7 +1618,7 @@ READ32_MEMBER(model2_state::copro_status_r)
 }
 
 /* 2A-CRX overrides */
-ADDRESS_MAP_START(model2_state::model2a_crx_mem)
+ADDRESS_MAP_START(model2a_state::model2a_crx_mem)
 	AM_IMPORT_FROM(model2_base_mem)
 
 	AM_RANGE(0x00200000, 0x0023ffff) AM_RAM
@@ -1643,7 +1646,7 @@ ADDRESS_MAP_START(model2_state::model2a_crx_mem)
 ADDRESS_MAP_END
 
 /* 2B-CRX overrides */
-ADDRESS_MAP_START(model2_state::model2b_crx_mem)
+ADDRESS_MAP_START(model2b_state::model2b_crx_mem)
 	AM_IMPORT_FROM(model2_base_mem)
 
 	AM_RANGE(0x00200000, 0x0023ffff) AM_RAM
@@ -1681,7 +1684,7 @@ ADDRESS_MAP_START(model2_state::model2b_crx_mem)
 ADDRESS_MAP_END
 
 /* 2C-CRX overrides */
-ADDRESS_MAP_START(model2_state::model2c_crx_mem)
+ADDRESS_MAP_START(model2c_state::model2c_crx_mem)
 	AM_IMPORT_FROM(model2_base_mem)
 
 	AM_RANGE(0x00200000, 0x0023ffff) AM_RAM
@@ -2206,7 +2209,7 @@ MACHINE_CONFIG_START(model2_state::model2_screen)
 MACHINE_CONFIG_END
 
 /* original Model 2 */
-MACHINE_CONFIG_START(model2_state::model2o)
+MACHINE_CONFIG_START(model2o_state::model2o)
 	MCFG_CPU_ADD("maincpu", I960, 25000000)
 	MCFG_CPU_PROGRAM_MAP(model2o_mem)
 	MCFG_TIMER_DRIVER_ADD_SCANLINE("scantimer", model2_state, model2_interrupt, "screen", 0, 1)
@@ -2286,13 +2289,23 @@ MACHINE_CONFIG_START(model2_state::sj25_0207_01)
 	MCFG_DEVICE_ADD("driveadc", MSM6253, 0)
 MACHINE_CONFIG_END
 
-MACHINE_CONFIG_START(model2_state::daytona)
+MACHINE_CONFIG_START(model2o_state::daytona)
 	model2o(config);
 	sj25_0207_01(config);
 MACHINE_CONFIG_END
 
+
+MACHINE_CONFIG_START(model2o_maxx_state::daytona_maxx)
+	daytona(config);
+	
+	MCFG_CPU_MODIFY("maincpu")
+	MCFG_CPU_PROGRAM_MAP(model2o_maxx_mem)
+MACHINE_CONFIG_END
+
+
+
 /* 2A-CRX */
-MACHINE_CONFIG_START(model2_state::model2a)
+MACHINE_CONFIG_START(model2a_state::model2a)
 	MCFG_CPU_ADD("maincpu", I960, 25000000)
 	MCFG_CPU_PROGRAM_MAP(model2a_crx_mem)
 	MCFG_TIMER_DRIVER_ADD_SCANLINE("scantimer", model2_state, model2_interrupt, "screen", 0, 1)
@@ -2332,12 +2345,12 @@ MACHINE_CONFIG_START(model2_state::model2a)
 	MCFG_M2COMM_ADD("m2comm")
 MACHINE_CONFIG_END
 
-MACHINE_CONFIG_START(model2_state::manxtt)
+MACHINE_CONFIG_START(model2a_state::manxtt)
 	model2a(config);
 	MCFG_MACHINE_START_OVERRIDE(model2_state,srallyc)
 MACHINE_CONFIG_END
 
-MACHINE_CONFIG_START(model2_state::manxttdx) /* Includes a Model 1 Sound board for additional sounds - Deluxe version only */
+MACHINE_CONFIG_START(model2a_state::manxttdx) /* Includes a Model 1 Sound board for additional sounds - Deluxe version only */
 	manxtt(config);
 	MCFG_SEGAM1AUDIO_ADD(M1AUDIO_TAG)
 	MCFG_SEGAM1AUDIO_RXD_HANDLER(DEVWRITELINE("uart", i8251_device, write_rxd))
@@ -2352,26 +2365,26 @@ uint16_t model2_state::crypt_read_callback(uint32_t addr)
 	return ((dat&0xff00)>>8)|((dat&0x00ff)<<8);
 }
 
-MACHINE_CONFIG_START(model2_state::model2a_5881)
+MACHINE_CONFIG_START(model2a_state::model2a_5881)
 	model2a(config);
 	MCFG_DEVICE_ADD("315_5881", SEGA315_5881_CRYPT, 0)
 	MCFG_SET_READ_CALLBACK(model2_state, crypt_read_callback)
 MACHINE_CONFIG_END
 
-MACHINE_CONFIG_START(model2_state::model2a_0229)
+MACHINE_CONFIG_START(model2a_state::model2a_0229)
 	model2a(config);
 	MCFG_DEVICE_ADD("317_0229", SEGA315_5838_COMP, 0)
 //  MCFG_SET_5838_READ_CALLBACK(model2_state, crypt_read_callback)
 MACHINE_CONFIG_END
 
-MACHINE_CONFIG_START(model2_state::srallyc)
+MACHINE_CONFIG_START(model2a_state::srallyc)
 	model2a(config);
 	MCFG_MACHINE_START_OVERRIDE(model2_state,srallyc)
 	sj25_0207_01(config);
 MACHINE_CONFIG_END
 
 /* 2B-CRX */
-MACHINE_CONFIG_START(model2_state::model2b)
+MACHINE_CONFIG_START(model2b_state::model2b)
 	MCFG_CPU_ADD("maincpu", I960, 25000000)
 	MCFG_CPU_PROGRAM_MAP(model2b_crx_mem)
 	MCFG_TIMER_DRIVER_ADD_SCANLINE("scantimer", model2_state, model2_interrupt, "screen", 0, 1)
@@ -2415,35 +2428,35 @@ MACHINE_CONFIG_START(model2_state::model2b)
 MACHINE_CONFIG_END
 
 
-MACHINE_CONFIG_START(model2_state::model2b_5881)
+MACHINE_CONFIG_START(model2b_state::model2b_5881)
 	model2b(config);
 	MCFG_DEVICE_ADD("315_5881", SEGA315_5881_CRYPT, 0)
 	MCFG_SET_READ_CALLBACK(model2_state, crypt_read_callback)
 MACHINE_CONFIG_END
 
-MACHINE_CONFIG_START(model2_state::model2b_0229)
+MACHINE_CONFIG_START(model2b_state::model2b_0229)
 	model2b(config);
 	MCFG_DEVICE_ADD("317_0229", SEGA315_5838_COMP, 0)
 //  MCFG_SET_5838_READ_CALLBACK(model2_state, crypt_read_callback)
 MACHINE_CONFIG_END
 
-MACHINE_CONFIG_START(model2_state::indy500)
+MACHINE_CONFIG_START(model2b_state::indy500)
 	model2b(config);
 	MCFG_MACHINE_START_OVERRIDE(model2_state,srallyc)
 MACHINE_CONFIG_END
 
 
-ADDRESS_MAP_START(model2_state::rchase2_iocpu_map)
+ADDRESS_MAP_START(model2b_state::rchase2_iocpu_map)
 	AM_RANGE(0x0000, 0x7fff) AM_ROM
 	AM_RANGE(0x8000, 0x9fff) AM_RAM
 ADDRESS_MAP_END
 
-ADDRESS_MAP_START(model2_state::rchase2_ioport_map)
+ADDRESS_MAP_START(model2b_state::rchase2_ioport_map)
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	AM_RANGE(0x00, 0x07) AM_DEVREADWRITE("ioexp", cxd1095_device, read, write)
 ADDRESS_MAP_END
 
-MACHINE_CONFIG_START(model2_state::rchase2)
+MACHINE_CONFIG_START(model2b_state::rchase2)
 	model2b(config);
 	MCFG_CPU_ADD("iocpu", Z80, 4000000)
 	MCFG_CPU_PROGRAM_MAP(rchase2_iocpu_map)
@@ -2458,7 +2471,7 @@ ADDRESS_MAP_START(model2_state::copro_tgpx4_map)
 ADDRESS_MAP_END
 
 /* 2C-CRX */
-MACHINE_CONFIG_START(model2_state::model2c)
+MACHINE_CONFIG_START(model2c_state::model2c)
 	MCFG_CPU_ADD("maincpu", I960, 25000000)
 	MCFG_CPU_PROGRAM_MAP(model2c_crx_mem)
 	MCFG_TIMER_DRIVER_ADD_SCANLINE("scantimer", model2_state, model2c_interrupt, "screen", 0, 1)
@@ -2494,7 +2507,7 @@ MACHINE_CONFIG_START(model2_state::model2c)
 	MCFG_M2COMM_ADD("m2comm")
 MACHINE_CONFIG_END
 
-MACHINE_CONFIG_START(model2_state::stcc)
+MACHINE_CONFIG_START(model2c_state::stcc)
 	model2c(config);
 	MCFG_DSBZ80_ADD(DSBZ80_TAG)
 	MCFG_SOUND_ROUTE(0, "lspeaker", 1.0)
@@ -2504,13 +2517,13 @@ MACHINE_CONFIG_START(model2_state::stcc)
 	MCFG_I8251_TXD_HANDLER(DEVWRITELINE(DSBZ80_TAG, dsbz80_device, write_txd))
 MACHINE_CONFIG_END
 
-MACHINE_CONFIG_START(model2_state::model2c_5881)
+MACHINE_CONFIG_START(model2c_state::model2c_5881)
 	model2c(config);
 	MCFG_DEVICE_ADD("315_5881", SEGA315_5881_CRYPT, 0)
 	MCFG_SET_READ_CALLBACK(model2_state, crypt_read_callback)
 MACHINE_CONFIG_END
 
-MACHINE_CONFIG_START(model2_state::overrev2c)
+MACHINE_CONFIG_START(model2c_state::overrev2c)
 	model2c(config);
 	MCFG_MACHINE_START_OVERRIDE(model2_state,srallyc)
 MACHINE_CONFIG_END
@@ -6050,12 +6063,6 @@ DRIVER_INIT_MEMBER(model2_state,zerogun)
 	ROM[0x700/4] = 0x08000004;
 }
 
-DRIVER_INIT_MEMBER(model2_state,daytonam)
-{
-	DRIVER_INIT_CALL(srallyc);
-	m_maincpu->space(AS_PROGRAM).install_read_handler(0x240000, 0x24ffff, read32_delegate(FUNC(model2_state::maxx_r),this));
-}
-
 DRIVER_INIT_MEMBER(model2_state,sgt24h)
 {
 //  DRIVER_INIT_CALL(genprot);
@@ -6086,80 +6093,80 @@ DRIVER_INIT_MEMBER(model2_state,srallyc)
 
 
 // Model 2 (TGPs, Model 1 sound board)
-GAME( 1994, daytona,         0, daytona, daytona, model2_state,  srallyc,  ROT0, "Sega",   "Daytona USA (Japan, Revision A)", MACHINE_NOT_WORKING|MACHINE_IMPERFECT_GRAPHICS )
-GAME( 1994, daytonase, daytona, daytona, daytona, model2_state,  srallyc,  ROT0, "Sega",   "Daytona USA Special Edition (Japan, Revision A)", MACHINE_NOT_WORKING|MACHINE_IMPERFECT_GRAPHICS )
-GAME( 1993, daytona93, daytona, daytona, daytona, model2_state,  srallyc,  ROT0, "Sega",   "Daytona USA (Japan)", MACHINE_NOT_WORKING|MACHINE_IMPERFECT_GRAPHICS )
-GAME( 1994, daytonas,  daytona, daytona, daytona, model2_state,  srallyc,  ROT0, "Sega",   "Daytona USA (With Saturn Adverts)", MACHINE_NOT_WORKING|MACHINE_IMPERFECT_GRAPHICS )
-GAME( 1994, daytonat,  daytona, daytona, daytona, model2_state,  srallyc,  ROT0, "hack (Kyle Hodgetts)", "Daytona USA (Japan, Turbo hack, set 1)", MACHINE_NOT_WORKING|MACHINE_IMPERFECT_GRAPHICS )
-GAME( 1994, daytonata, daytona, daytona, daytona, model2_state,  srallyc,  ROT0, "hack (Kyle Hodgetts)", "Daytona USA (Japan, Turbo hack, set 2)", MACHINE_NOT_WORKING|MACHINE_IMPERFECT_GRAPHICS )
-GAME( 2001, daytonam,  daytona, daytona, daytona, model2_state,  daytonam, ROT0, "hack (Kyle Hodgetts)", "Daytona USA (Japan, To The MAXX)", MACHINE_NOT_WORKING|MACHINE_IMPERFECT_GRAPHICS )
-GAME( 1994, desert,          0, model2o, desert,  model2_state,  0,        ROT0, "Sega / Martin Marietta", "Desert Tank", MACHINE_NOT_WORKING|MACHINE_IMPERFECT_GRAPHICS )
-GAME( 1994, vcop,            0, model2o, vcop,    model2_state,  0,        ROT0, "Sega",   "Virtua Cop (Revision B)", MACHINE_NOT_WORKING|MACHINE_IMPERFECT_GRAPHICS )
-GAME( 1994, vcopa,        vcop, model2o, vcop,    model2_state,  0,        ROT0, "Sega",   "Virtua Cop (Revision A)", MACHINE_NOT_WORKING|MACHINE_IMPERFECT_GRAPHICS )
+GAME( 1994, daytona,   0,       daytona,     daytona, model2o_state,       srallyc, ROT0, "Sega", "Daytona USA (Japan, Revision A)", MACHINE_NOT_WORKING|MACHINE_IMPERFECT_GRAPHICS )
+GAME( 1994, daytonase, daytona, daytona,     daytona, model2o_state,       srallyc, ROT0, "Sega", "Daytona USA Special Edition (Japan, Revision A)", MACHINE_NOT_WORKING|MACHINE_IMPERFECT_GRAPHICS )
+GAME( 1993, daytona93, daytona, daytona,     daytona, model2o_state,       srallyc, ROT0, "Sega", "Daytona USA (Japan)", MACHINE_NOT_WORKING|MACHINE_IMPERFECT_GRAPHICS )
+GAME( 1994, daytonas,  daytona, daytona,     daytona, model2o_state,       srallyc, ROT0, "Sega", "Daytona USA (With Saturn Adverts)", MACHINE_NOT_WORKING|MACHINE_IMPERFECT_GRAPHICS )
+GAME( 1994, daytonat,  daytona, daytona,     daytona, model2o_state,       srallyc, ROT0, "hack (Kyle Hodgetts)", "Daytona USA (Japan, Turbo hack, set 1)", MACHINE_NOT_WORKING|MACHINE_IMPERFECT_GRAPHICS )
+GAME( 1994, daytonata, daytona, daytona,     daytona, model2o_state,       srallyc, ROT0, "hack (Kyle Hodgetts)", "Daytona USA (Japan, Turbo hack, set 2)", MACHINE_NOT_WORKING|MACHINE_IMPERFECT_GRAPHICS )
+GAME( 2001, daytonam,  daytona, daytona_maxx,daytona, model2o_maxx_state,  srallyc, ROT0, "hack (Kyle Hodgetts)", "Daytona USA (Japan, To The MAXX)", MACHINE_NOT_WORKING|MACHINE_IMPERFECT_GRAPHICS )
+GAME( 1994, desert,    0,       model2o,     desert,  model2o_state,       0,       ROT0, "Sega / Martin Marietta", "Desert Tank", MACHINE_NOT_WORKING|MACHINE_IMPERFECT_GRAPHICS )
+GAME( 1994, vcop,      0,       model2o,     vcop,    model2o_state,       0,       ROT0, "Sega", "Virtua Cop (Revision B)", MACHINE_NOT_WORKING|MACHINE_IMPERFECT_GRAPHICS )
+GAME( 1994, vcopa,     vcop,    model2o,     vcop,    model2o_state,       0,       ROT0, "Sega", "Virtua Cop (Revision A)", MACHINE_NOT_WORKING|MACHINE_IMPERFECT_GRAPHICS )
 
 // Model 2A-CRX (TGPs, SCSP sound board)
-GAME( 1994, vf2,              0, model2a,      model2,   model2_state, 0,       ROT0, "Sega",   "Virtua Fighter 2 (Version 2.1)", MACHINE_NOT_WORKING|MACHINE_IMPERFECT_GRAPHICS )
-GAME( 1994, vf2b,           vf2, model2a,      model2,   model2_state, 0,       ROT0, "Sega",   "Virtua Fighter 2 (Revision B)", MACHINE_NOT_WORKING|MACHINE_IMPERFECT_GRAPHICS )
-GAME( 1994, vf2a,           vf2, model2a,      model2,   model2_state, 0,       ROT0, "Sega",   "Virtua Fighter 2 (Revision A)", MACHINE_NOT_WORKING|MACHINE_IMPERFECT_GRAPHICS )
-GAME( 1994, vf2o,           vf2, model2a,      model2,   model2_state, 0,       ROT0, "Sega",   "Virtua Fighter 2", MACHINE_NOT_WORKING|MACHINE_IMPERFECT_GRAPHICS )
-GAME( 1995, manxtt,           0, manxttdx,     manxtt,   model2_state, 0,       ROT0, "Sega",   "Manx TT Superbike - DX (Revision D)", MACHINE_NOT_WORKING|MACHINE_IMPERFECT_GRAPHICS )
-GAME( 1995, manxttc,          0, manxtt,       manxtt,   model2_state, 0,       ROT0, "Sega",   "Manx TT Superbike - Twin (Revision C)", MACHINE_NOT_WORKING|MACHINE_IMPERFECT_GRAPHICS )
-GAME( 1995, srallyc,          0, srallyc,      srallyc,  model2_state, srallyc, ROT0, "Sega",   "Sega Rally Championship - Twin/DX (Revision C)", MACHINE_NOT_WORKING|MACHINE_IMPERFECT_GRAPHICS )
-GAME( 1995, srallycb,   srallyc, srallyc,      srallyc,  model2_state, srallyc, ROT0, "Sega",   "Sega Rally Championship - Twin/DX (Revision B)", MACHINE_NOT_WORKING|MACHINE_IMPERFECT_GRAPHICS )
-GAME( 1995, srallycdx,  srallyc, srallyc,      srallyc,  model2_state, srallyc, ROT0, "Sega",   "Sega Rally Championship - DX (Revision A)", MACHINE_NOT_WORKING|MACHINE_IMPERFECT_GRAPHICS )
-GAME( 1995, srallycdxa, srallyc, srallyc,      srallyc,  model2_state, srallyc, ROT0, "Sega",   "Sega Rally Championship - DX", MACHINE_NOT_WORKING|MACHINE_IMPERFECT_GRAPHICS )
-GAME( 1995, vcop2,            0, model2a,      vcop2,    model2_state, 0,       ROT0, "Sega",   "Virtua Cop 2", MACHINE_NOT_WORKING|MACHINE_IMPERFECT_GRAPHICS )
-GAME( 1995, skytargt,         0, model2a,      skytargt, model2_state, 0,       ROT0, "Sega",   "Sky Target", MACHINE_NOT_WORKING|MACHINE_IMPERFECT_GRAPHICS )
-GAME( 1996, doaa,           doa, model2a_0229, model2,   model2_state, doa,     ROT0, "Sega",   "Dead or Alive (Model 2A, Revision A)", MACHINE_NOT_WORKING|MACHINE_IMPERFECT_GRAPHICS )
-GAME( 1997, zeroguna,   zerogun, model2a_5881, model2,   model2_state, zerogun, ROT0, "Psikyo", "Zero Gunner (Export, Model 2A)", MACHINE_NOT_WORKING|MACHINE_IMPERFECT_GRAPHICS )
-GAME( 1997, zerogunaj,  zerogun, model2a_5881, model2,   model2_state, zerogun, ROT0, "Psikyo", "Zero Gunner (Japan, Model 2A)", MACHINE_NOT_WORKING|MACHINE_IMPERFECT_GRAPHICS )
-GAME( 1997, motoraid,         0, manxtt,       manxtt,   model2_state, 0,       ROT0, "Sega",   "Motor Raid - Twin", MACHINE_NOT_WORKING|MACHINE_IMPERFECT_GRAPHICS )
-GAME( 1997, motoraiddx,motoraid, manxtt,       manxtt,   model2_state, 0,       ROT0, "Sega",   "Motor Raid - Twin/DX", MACHINE_NOT_WORKING|MACHINE_IMPERFECT_GRAPHICS )
-GAME( 1998, dynamcop,         0, model2a_5881, model2,   model2_state, genprot, ROT0, "Sega",   "Dynamite Cop (Export, Model 2A)", MACHINE_NOT_WORKING|MACHINE_IMPERFECT_GRAPHICS )
-GAME( 1998, dyndeka2,  dynamcop, model2a_5881, model2,   model2_state, genprot, ROT0, "Sega",   "Dynamite Deka 2 (Japan, Model 2A)", MACHINE_NOT_WORKING|MACHINE_IMPERFECT_GRAPHICS )
-GAME( 1998, pltkidsa,   pltkids, model2a_5881, model2,   model2_state, pltkids, ROT0, "Psikyo", "Pilot Kids (Model 2A)", MACHINE_NOT_WORKING|MACHINE_IMPERFECT_GRAPHICS )
+GAME( 1994, vf2,       0,       model2a,      model2,   model2a_state, 0,       ROT0, "Sega",   "Virtua Fighter 2 (Version 2.1)", MACHINE_NOT_WORKING|MACHINE_IMPERFECT_GRAPHICS )
+GAME( 1994, vf2b,      vf2,     model2a,      model2,   model2a_state, 0,       ROT0, "Sega",   "Virtua Fighter 2 (Revision B)", MACHINE_NOT_WORKING|MACHINE_IMPERFECT_GRAPHICS )
+GAME( 1994, vf2a,      vf2,     model2a,      model2,   model2a_state, 0,       ROT0, "Sega",   "Virtua Fighter 2 (Revision A)", MACHINE_NOT_WORKING|MACHINE_IMPERFECT_GRAPHICS )
+GAME( 1994, vf2o,      vf2,     model2a,      model2,   model2a_state, 0,       ROT0, "Sega",   "Virtua Fighter 2", MACHINE_NOT_WORKING|MACHINE_IMPERFECT_GRAPHICS )
+GAME( 1995, manxtt,    0,       manxttdx,     manxtt,   model2a_state, 0,       ROT0, "Sega",   "Manx TT Superbike - DX (Revision D)", MACHINE_NOT_WORKING|MACHINE_IMPERFECT_GRAPHICS )
+GAME( 1995, manxttc,   0,       manxtt,       manxtt,   model2a_state, 0,       ROT0, "Sega",   "Manx TT Superbike - Twin (Revision C)", MACHINE_NOT_WORKING|MACHINE_IMPERFECT_GRAPHICS )
+GAME( 1995, srallyc,   0,       srallyc,      srallyc,  model2a_state, srallyc, ROT0, "Sega",   "Sega Rally Championship - Twin/DX (Revision C)", MACHINE_NOT_WORKING|MACHINE_IMPERFECT_GRAPHICS )
+GAME( 1995, srallycb,  srallyc, srallyc,      srallyc,  model2a_state, srallyc, ROT0, "Sega",   "Sega Rally Championship - Twin/DX (Revision B)", MACHINE_NOT_WORKING|MACHINE_IMPERFECT_GRAPHICS )
+GAME( 1995, srallycdx, srallyc, srallyc,      srallyc,  model2a_state, srallyc, ROT0, "Sega",   "Sega Rally Championship - DX (Revision A)", MACHINE_NOT_WORKING|MACHINE_IMPERFECT_GRAPHICS )
+GAME( 1995, srallycdxa,srallyc, srallyc,      srallyc,  model2a_state, srallyc, ROT0, "Sega",   "Sega Rally Championship - DX", MACHINE_NOT_WORKING|MACHINE_IMPERFECT_GRAPHICS )
+GAME( 1995, vcop2,     0,       model2a,      vcop2,    model2a_state, 0,       ROT0, "Sega",   "Virtua Cop 2", MACHINE_NOT_WORKING|MACHINE_IMPERFECT_GRAPHICS )
+GAME( 1995, skytargt,  0,       model2a,      skytargt, model2a_state, 0,       ROT0, "Sega",   "Sky Target", MACHINE_NOT_WORKING|MACHINE_IMPERFECT_GRAPHICS )
+GAME( 1996, doaa,      doa,     model2a_0229, model2,   model2a_state, doa,     ROT0, "Sega",   "Dead or Alive (Model 2A, Revision A)", MACHINE_NOT_WORKING|MACHINE_IMPERFECT_GRAPHICS )
+GAME( 1997, zeroguna,  zerogun, model2a_5881, model2,   model2a_state, zerogun, ROT0, "Psikyo", "Zero Gunner (Export, Model 2A)", MACHINE_NOT_WORKING|MACHINE_IMPERFECT_GRAPHICS )
+GAME( 1997, zerogunaj, zerogun, model2a_5881, model2,   model2a_state, zerogun, ROT0, "Psikyo", "Zero Gunner (Japan, Model 2A)", MACHINE_NOT_WORKING|MACHINE_IMPERFECT_GRAPHICS )
+GAME( 1997, motoraid,  0,       manxtt,       manxtt,   model2a_state, 0,       ROT0, "Sega",   "Motor Raid - Twin", MACHINE_NOT_WORKING|MACHINE_IMPERFECT_GRAPHICS )
+GAME( 1997, motoraiddx,motoraid,manxtt,       manxtt,   model2a_state, 0,       ROT0, "Sega",   "Motor Raid - Twin/DX", MACHINE_NOT_WORKING|MACHINE_IMPERFECT_GRAPHICS )
+GAME( 1998, dynamcop,  0,       model2a_5881, model2,   model2a_state, genprot, ROT0, "Sega",   "Dynamite Cop (Export, Model 2A)", MACHINE_NOT_WORKING|MACHINE_IMPERFECT_GRAPHICS )
+GAME( 1998, dyndeka2,  dynamcop,model2a_5881, model2,   model2a_state, genprot, ROT0, "Sega",   "Dynamite Deka 2 (Japan, Model 2A)", MACHINE_NOT_WORKING|MACHINE_IMPERFECT_GRAPHICS )
+GAME( 1998, pltkidsa,  pltkids, model2a_5881, model2,   model2a_state, pltkids, ROT0, "Psikyo", "Pilot Kids (Model 2A)", MACHINE_NOT_WORKING|MACHINE_IMPERFECT_GRAPHICS )
 
 // Model 2B-CRX (SHARC, SCSP sound board)
-GAME( 1994, rchase2,          0, rchase2,      rchase2, model2_state, rchase2,  ROT0, "Sega",   "Rail Chase 2 (Revision A)", MACHINE_NOT_WORKING|MACHINE_IMPERFECT_GRAPHICS )
-GAME( 1994, vstriker,         0, model2b,      model2,  model2_state, 0,        ROT0, "Sega",   "Virtua Striker (Revision A)", MACHINE_NOT_WORKING|MACHINE_IMPERFECT_GRAPHICS )
-GAME( 1994, vstrikero, vstriker, model2b,      model2,  model2_state, 0,        ROT0, "Sega",   "Virtua Striker", MACHINE_NOT_WORKING|MACHINE_IMPERFECT_GRAPHICS )
-GAME( 1995, fvipers,          0, model2b,      model2,  model2_state, 0,        ROT0, "Sega",   "Fighting Vipers (Revision D)", MACHINE_NOT_WORKING|MACHINE_IMPERFECT_GRAPHICS )
-GAME( 1995, fvipersb,   fvipers, model2b,      model2,  model2_state, 0,        ROT0, "Sega",   "Fighting Vipers (Revision B)", MACHINE_NOT_WORKING|MACHINE_IMPERFECT_GRAPHICS )
-GAME( 1995, gunblade,         0, model2b,      model2,  model2_state, 0,        ROT0, "Sega",   "Gunblade NY (Revision A)", MACHINE_NOT_WORKING|MACHINE_IMPERFECT_GRAPHICS )
-GAME( 1995, indy500,          0, indy500,      srallyc, model2_state, 0,        ROT0, "Sega",   "INDY 500 Twin (Revision A, Newer)", MACHINE_NOT_WORKING|MACHINE_IMPERFECT_GRAPHICS )
-GAME( 1995, indy500d,   indy500, indy500,      srallyc, model2_state, 0,        ROT0, "Sega",   "INDY 500 Deluxe (Revision A)", MACHINE_NOT_WORKING|MACHINE_IMPERFECT_GRAPHICS )
-GAME( 1995, indy500to,  indy500, indy500,      srallyc, model2_state, 0,        ROT0, "Sega",   "INDY 500 Twin (Revision A)", MACHINE_NOT_WORKING|MACHINE_IMPERFECT_GRAPHICS )
-GAME( 1995, von,              0, model2b,      model2,  model2_state, 0,        ROT0, "Sega",   "Cyber Troopers Virtual-On (USA, Revision B)", MACHINE_NOT_WORKING|MACHINE_IMPERFECT_GRAPHICS )
-GAME( 1995, vonj,           von, model2b,      model2,  model2_state, 0,        ROT0, "Sega",   "Cyber Troopers Virtual-On (Japan, Revision B)", MACHINE_NOT_WORKING|MACHINE_IMPERFECT_GRAPHICS )
-GAME( 1996, schamp,           0, model2b,      model2,  model2_state, 0,        ROT0, "Sega",   "Sonic Championship (USA)", MACHINE_NOT_WORKING|MACHINE_IMPERFECT_GRAPHICS )
-GAME( 1996, sfight,      schamp, model2b,      model2,  model2_state, 0,        ROT0, "Sega",   "Sonic the Fighters (Japan)", MACHINE_NOT_WORKING|MACHINE_IMPERFECT_GRAPHICS )
-GAME( 1996, lastbrnx,         0, model2b,      model2,  model2_state, 0,        ROT0, "Sega",   "Last Bronx (Export, Revision A)", MACHINE_NOT_WORKING|MACHINE_IMPERFECT_GRAPHICS )
-GAME( 1996, lastbrnxu, lastbrnx, model2b,      model2,  model2_state, 0,        ROT0, "Sega",   "Last Bronx (USA, Revision A)", MACHINE_NOT_WORKING|MACHINE_IMPERFECT_GRAPHICS )
-GAME( 1996, lastbrnxj, lastbrnx, model2b,      model2,  model2_state, 0,        ROT0, "Sega",   "Last Bronx (Japan, Revision A)", MACHINE_NOT_WORKING|MACHINE_IMPERFECT_GRAPHICS )
-GAME( 1996, doa,              0, model2b_0229, model2,  model2_state, doa,      ROT0, "Sega",   "Dead or Alive (Model 2B, Revision B)", MACHINE_NOT_WORKING|MACHINE_IMPERFECT_GRAPHICS )
-GAME( 1996, sgt24h,           0, indy500,      srallyc, model2_state, sgt24h,   ROT0, "Jaleco", "Super GT 24h", MACHINE_NOT_WORKING|MACHINE_IMPERFECT_GRAPHICS )
-GAME( 1996, dynabb,           0, model2b,      dynabb,  model2_state, 0,        ROT0, "Sega",   "Dynamite Baseball", MACHINE_NOT_WORKING|MACHINE_IMPERFECT_GRAPHICS )
-GAME( 1997, dynabb97,         0, model2b,      dynabb,  model2_state, 0,        ROT0, "Sega",   "Dynamite Baseball 97 (Revision A)", MACHINE_NOT_WORKING|MACHINE_IMPERFECT_GRAPHICS )
-GAME( 1997, overrevb,   overrev, indy500,      srallyc, model2_state, 0,        ROT0, "Jaleco", "Over Rev (Model 2B, Revision B)", MACHINE_NOT_WORKING|MACHINE_IMPERFECT_GRAPHICS )
-GAME( 1997, zerogun,          0, model2b_5881, model2,  model2_state, zerogun,  ROT0, "Psikyo", "Zero Gunner (Export, Model 2B)", MACHINE_NOT_WORKING|MACHINE_IMPERFECT_GRAPHICS )
-GAME( 1997, zerogunj,   zerogun, model2b_5881, model2,  model2_state, zerogun,  ROT0, "Psikyo", "Zero Gunner (Japan, Model 2B)", MACHINE_NOT_WORKING|MACHINE_IMPERFECT_GRAPHICS )
-GAME( 1998, dynamcopb, dynamcop, model2b_5881, model2,  model2_state, genprot,  ROT0, "Sega",   "Dynamite Cop (Export, Model 2B)", MACHINE_NOT_WORKING|MACHINE_IMPERFECT_GRAPHICS )
-GAME( 1998, dyndeka2b, dynamcop, model2b_5881, model2,  model2_state, genprot,  ROT0, "Sega",   "Dynamite Deka 2 (Japan, Model 2B)", MACHINE_NOT_WORKING|MACHINE_IMPERFECT_GRAPHICS )
-GAME( 1998, pltkids,          0, model2b_5881, model2,  model2_state, pltkids,  ROT0, "Psikyo", "Pilot Kids (Model 2B, Revision A)", MACHINE_NOT_WORKING|MACHINE_IMPERFECT_GRAPHICS )
+GAME( 1994, rchase2,   0,        rchase2,      rchase2, model2b_state, rchase2,  ROT0, "Sega",   "Rail Chase 2 (Revision A)", MACHINE_NOT_WORKING|MACHINE_IMPERFECT_GRAPHICS )
+GAME( 1994, vstriker,  0,        model2b,      model2,  model2b_state, 0,        ROT0, "Sega",   "Virtua Striker (Revision A)", MACHINE_NOT_WORKING|MACHINE_IMPERFECT_GRAPHICS )
+GAME( 1994, vstrikero, vstriker, model2b,      model2,  model2b_state, 0,        ROT0, "Sega",   "Virtua Striker", MACHINE_NOT_WORKING|MACHINE_IMPERFECT_GRAPHICS )
+GAME( 1995, fvipers,   0,        model2b,      model2,  model2b_state, 0,        ROT0, "Sega",   "Fighting Vipers (Revision D)", MACHINE_NOT_WORKING|MACHINE_IMPERFECT_GRAPHICS )
+GAME( 1995, fvipersb,  fvipers,  model2b,      model2,  model2b_state, 0,        ROT0, "Sega",   "Fighting Vipers (Revision B)", MACHINE_NOT_WORKING|MACHINE_IMPERFECT_GRAPHICS )
+GAME( 1995, gunblade,  0,        model2b,      model2,  model2b_state, 0,        ROT0, "Sega",   "Gunblade NY (Revision A)", MACHINE_NOT_WORKING|MACHINE_IMPERFECT_GRAPHICS )
+GAME( 1995, indy500,   0,        indy500,      srallyc, model2b_state, 0,        ROT0, "Sega",   "INDY 500 Twin (Revision A, Newer)", MACHINE_NOT_WORKING|MACHINE_IMPERFECT_GRAPHICS )
+GAME( 1995, indy500d,  indy500,  indy500,      srallyc, model2b_state, 0,        ROT0, "Sega",   "INDY 500 Deluxe (Revision A)", MACHINE_NOT_WORKING|MACHINE_IMPERFECT_GRAPHICS )
+GAME( 1995, indy500to, indy500,  indy500,      srallyc, model2b_state, 0,        ROT0, "Sega",   "INDY 500 Twin (Revision A)", MACHINE_NOT_WORKING|MACHINE_IMPERFECT_GRAPHICS )
+GAME( 1995, von,       0,        model2b,      model2,  model2b_state, 0,        ROT0, "Sega",   "Cyber Troopers Virtual-On (USA, Revision B)", MACHINE_NOT_WORKING|MACHINE_IMPERFECT_GRAPHICS )
+GAME( 1995, vonj,      von,      model2b,      model2,  model2b_state, 0,        ROT0, "Sega",   "Cyber Troopers Virtual-On (Japan, Revision B)", MACHINE_NOT_WORKING|MACHINE_IMPERFECT_GRAPHICS )
+GAME( 1996, schamp,    0,        model2b,      model2,  model2b_state, 0,        ROT0, "Sega",   "Sonic Championship (USA)", MACHINE_NOT_WORKING|MACHINE_IMPERFECT_GRAPHICS )
+GAME( 1996, sfight,    schamp,   model2b,      model2,  model2b_state, 0,        ROT0, "Sega",   "Sonic the Fighters (Japan)", MACHINE_NOT_WORKING|MACHINE_IMPERFECT_GRAPHICS )
+GAME( 1996, lastbrnx,  0,        model2b,      model2,  model2b_state, 0,        ROT0, "Sega",   "Last Bronx (Export, Revision A)", MACHINE_NOT_WORKING|MACHINE_IMPERFECT_GRAPHICS )
+GAME( 1996, lastbrnxu, lastbrnx, model2b,      model2,  model2b_state, 0,        ROT0, "Sega",   "Last Bronx (USA, Revision A)", MACHINE_NOT_WORKING|MACHINE_IMPERFECT_GRAPHICS )
+GAME( 1996, lastbrnxj, lastbrnx, model2b,      model2,  model2b_state, 0,        ROT0, "Sega",   "Last Bronx (Japan, Revision A)", MACHINE_NOT_WORKING|MACHINE_IMPERFECT_GRAPHICS )
+GAME( 1996, doa,       0,        model2b_0229, model2,  model2b_state, doa,      ROT0, "Sega",   "Dead or Alive (Model 2B, Revision B)", MACHINE_NOT_WORKING|MACHINE_IMPERFECT_GRAPHICS )
+GAME( 1996, sgt24h,    0,        indy500,      srallyc, model2b_state, sgt24h,   ROT0, "Jaleco", "Super GT 24h", MACHINE_NOT_WORKING|MACHINE_IMPERFECT_GRAPHICS )
+GAME( 1996, dynabb,    0,        model2b,      dynabb,  model2b_state, 0,        ROT0, "Sega",   "Dynamite Baseball", MACHINE_NOT_WORKING|MACHINE_IMPERFECT_GRAPHICS )
+GAME( 1997, dynabb97,  0,        model2b,      dynabb,  model2b_state, 0,        ROT0, "Sega",   "Dynamite Baseball 97 (Revision A)", MACHINE_NOT_WORKING|MACHINE_IMPERFECT_GRAPHICS )
+GAME( 1997, overrevb,  overrev,  indy500,      srallyc, model2b_state, 0,        ROT0, "Jaleco", "Over Rev (Model 2B, Revision B)", MACHINE_NOT_WORKING|MACHINE_IMPERFECT_GRAPHICS )
+GAME( 1997, zerogun,   0,        model2b_5881, model2,  model2b_state, zerogun,  ROT0, "Psikyo", "Zero Gunner (Export, Model 2B)", MACHINE_NOT_WORKING|MACHINE_IMPERFECT_GRAPHICS )
+GAME( 1997, zerogunj,  zerogun,  model2b_5881, model2,  model2b_state, zerogun,  ROT0, "Psikyo", "Zero Gunner (Japan, Model 2B)", MACHINE_NOT_WORKING|MACHINE_IMPERFECT_GRAPHICS )
+GAME( 1998, dynamcopb, dynamcop, model2b_5881, model2,  model2b_state, genprot,  ROT0, "Sega",   "Dynamite Cop (Export, Model 2B)", MACHINE_NOT_WORKING|MACHINE_IMPERFECT_GRAPHICS )
+GAME( 1998, dyndeka2b, dynamcop, model2b_5881, model2,  model2b_state, genprot,  ROT0, "Sega",   "Dynamite Deka 2 (Japan, Model 2B)", MACHINE_NOT_WORKING|MACHINE_IMPERFECT_GRAPHICS )
+GAME( 1998, pltkids,   0,        model2b_5881, model2,  model2b_state, pltkids,  ROT0, "Psikyo", "Pilot Kids (Model 2B, Revision A)", MACHINE_NOT_WORKING|MACHINE_IMPERFECT_GRAPHICS )
 
 // Model 2C-CRX (TGPx4, SCSP sound board)
-GAME( 1996, skisuprg,         0, model2c,      model2,   model2_state, 0,       ROT0, "Sega",   "Sega Ski Super G", MACHINE_NOT_WORKING|MACHINE_IMPERFECT_GRAPHICS|MACHINE_UNEMULATED_PROTECTION )
-GAME( 1996, stcc,             0,    stcc,      model2,   model2_state, 0,       ROT0, "Sega",   "Sega Touring Car Championship", MACHINE_NOT_WORKING|MACHINE_IMPERFECT_GRAPHICS )
-GAME( 1996, stccb,         stcc,    stcc,      model2,   model2_state, 0,       ROT0, "Sega",   "Sega Touring Car Championship (Revision B)", MACHINE_NOT_WORKING|MACHINE_IMPERFECT_GRAPHICS )
-GAME( 1996, stcca,         stcc,    stcc,      model2,   model2_state, 0,       ROT0, "Sega",   "Sega Touring Car Championship (Revision A)", MACHINE_NOT_WORKING|MACHINE_IMPERFECT_GRAPHICS )
-GAME( 1996, waverunr,         0, model2c,      model2,   model2_state, 0,       ROT0, "Sega",   "Wave Runner (Japan, Revision A)", MACHINE_NOT_WORKING|MACHINE_IMPERFECT_GRAPHICS )
-GAME( 1997, bel,              0, model2c,      bel,      model2_state, 0,       ROT0, "Sega / EPL Productions", "Behind Enemy Lines", MACHINE_NOT_WORKING|MACHINE_IMPERFECT_GRAPHICS )
-GAME( 1997, hotd,             0, model2c,      vcop2,    model2_state, 0,       ROT0, "Sega",   "The House of the Dead", MACHINE_NOT_WORKING|MACHINE_IMPERFECT_GRAPHICS )
-GAME( 1997, overrev,          0, overrev2c,    srallyc,  model2_state, 0,       ROT0, "Jaleco", "Over Rev (Model 2C, Revision A)", MACHINE_NOT_WORKING|MACHINE_IMPERFECT_GRAPHICS )
-GAME( 1997, rascot2,          0, model2c,      model2,   model2_state, 0,       ROT0, "Sega",   "Royal Ascot II", MACHINE_NOT_WORKING|MACHINE_IMPERFECT_GRAPHICS )
-GAME( 1997, segawski,         0, model2c,      model2,   model2_state, 0,       ROT0, "Sega",   "Sega Water Ski (Japan, Revision A)", MACHINE_NOT_WORKING|MACHINE_IMPERFECT_GRAPHICS )
-GAME( 1997, topskatr,         0, model2c,      model2,   model2_state, 0,       ROT0, "Sega",   "Top Skater (Export, Revision A)", MACHINE_NOT_WORKING|MACHINE_IMPERFECT_GRAPHICS )
-GAME( 1997, topskatru, topskatr, model2c,      model2,   model2_state, 0,       ROT0, "Sega",   "Top Skater (USA, Revision A)", MACHINE_NOT_WORKING|MACHINE_IMPERFECT_GRAPHICS )
-GAME( 1997, topskatruo,topskatr, model2c,      model2,   model2_state, 0,       ROT0, "Sega",   "Top Skater (USA)", MACHINE_NOT_WORKING|MACHINE_IMPERFECT_GRAPHICS )
-GAME( 1997, topskatrj, topskatr, model2c,      model2,   model2_state, 0,       ROT0, "Sega",   "Top Skater (Japan)", MACHINE_NOT_WORKING|MACHINE_IMPERFECT_GRAPHICS )
-GAME( 1998, dynamcopc, dynamcop, model2c_5881, model2,   model2_state, genprot, ROT0, "Sega",   "Dynamite Cop (USA, Model 2C)", MACHINE_NOT_WORKING|MACHINE_IMPERFECT_GRAPHICS )
+GAME( 1996, skisuprg,  0,        model2c,      model2,   model2c_state, 0,       ROT0, "Sega",   "Sega Ski Super G", MACHINE_NOT_WORKING|MACHINE_IMPERFECT_GRAPHICS|MACHINE_UNEMULATED_PROTECTION )
+GAME( 1996, stcc,      0,        stcc,         model2,   model2c_state, 0,       ROT0, "Sega",   "Sega Touring Car Championship", MACHINE_NOT_WORKING|MACHINE_IMPERFECT_GRAPHICS )
+GAME( 1996, stccb,     stcc,     stcc,         model2,   model2c_state, 0,       ROT0, "Sega",   "Sega Touring Car Championship (Revision B)", MACHINE_NOT_WORKING|MACHINE_IMPERFECT_GRAPHICS )
+GAME( 1996, stcca,     stcc,     stcc,         model2,   model2c_state, 0,       ROT0, "Sega",   "Sega Touring Car Championship (Revision A)", MACHINE_NOT_WORKING|MACHINE_IMPERFECT_GRAPHICS )
+GAME( 1996, waverunr,  0,        model2c,      model2,   model2c_state, 0,       ROT0, "Sega",   "Wave Runner (Japan, Revision A)", MACHINE_NOT_WORKING|MACHINE_IMPERFECT_GRAPHICS )
+GAME( 1997, bel,       0,        model2c,      bel,      model2c_state, 0,       ROT0, "Sega / EPL Productions", "Behind Enemy Lines", MACHINE_NOT_WORKING|MACHINE_IMPERFECT_GRAPHICS )
+GAME( 1997, hotd,      0,        model2c,      vcop2,    model2c_state, 0,       ROT0, "Sega",   "The House of the Dead", MACHINE_NOT_WORKING|MACHINE_IMPERFECT_GRAPHICS )
+GAME( 1997, overrev,   0,        overrev2c,    srallyc,  model2c_state, 0,       ROT0, "Jaleco", "Over Rev (Model 2C, Revision A)", MACHINE_NOT_WORKING|MACHINE_IMPERFECT_GRAPHICS )
+GAME( 1997, rascot2,   0,        model2c,      model2,   model2c_state, 0,       ROT0, "Sega",   "Royal Ascot II", MACHINE_NOT_WORKING|MACHINE_IMPERFECT_GRAPHICS )
+GAME( 1997, segawski,  0,        model2c,      model2,   model2c_state, 0,       ROT0, "Sega",   "Sega Water Ski (Japan, Revision A)", MACHINE_NOT_WORKING|MACHINE_IMPERFECT_GRAPHICS )
+GAME( 1997, topskatr,  0,        model2c,      model2,   model2c_state, 0,       ROT0, "Sega",   "Top Skater (Export, Revision A)", MACHINE_NOT_WORKING|MACHINE_IMPERFECT_GRAPHICS )
+GAME( 1997, topskatru, topskatr, model2c,      model2,   model2c_state, 0,       ROT0, "Sega",   "Top Skater (USA, Revision A)", MACHINE_NOT_WORKING|MACHINE_IMPERFECT_GRAPHICS )
+GAME( 1997, topskatruo,topskatr, model2c,      model2,   model2c_state, 0,       ROT0, "Sega",   "Top Skater (USA)", MACHINE_NOT_WORKING|MACHINE_IMPERFECT_GRAPHICS )
+GAME( 1997, topskatrj, topskatr, model2c,      model2,   model2c_state, 0,       ROT0, "Sega",   "Top Skater (Japan)", MACHINE_NOT_WORKING|MACHINE_IMPERFECT_GRAPHICS )
+GAME( 1998, dynamcopc, dynamcop, model2c_5881, model2,   model2c_state, genprot, ROT0, "Sega",   "Dynamite Cop (USA, Model 2C)", MACHINE_NOT_WORKING|MACHINE_IMPERFECT_GRAPHICS )
