@@ -3298,7 +3298,7 @@ GAME( 1989, aafbb,    aafb,    lelandi,  teamqb, leland_state,   aafbb,    ROT27
 
 /* huge master banks, large slave banks, 80186 sound */
 GAME( 1989, offroad,    0,       lelandi,  offroad, leland_state,    offroad,  ROT0,   "Leland Corporation", "Ironman Ivan Stewart's Super Off-Road (rev 4)", 0 )
-GAME( 1989, offroad3,   offroad, lelandi,  offroad, leland_state,    offroad,  ROT0,   "Leland Corporation", "Ironman Ivan Stewart's Super Off-Road (rev 3)", MACHINE_NOT_WORKING )
+GAME( 1989, offroad3,   offroad, lelandi,  offroad, leland_state,    offroad,  ROT0,   "Leland Corporation", "Ironman Ivan Stewart's Super Off-Road (rev 3)", 0 )
 GAME( 1989, offroadt,   0,       lelandi,  offroad, leland_state,    offroadt, ROT0,   "Leland Corporation", "Ironman Ivan Stewart's Super Off-Road Track-Pak", 0 )
 GAME( 1989, offroadt2p, offroadt,lelandi,  offroadt2p, leland_state, offroadt, ROT0,   "Leland Corporation", "Ironman Ivan Stewart's Super Off-Road Track-Pak (rev 4, 2 Players)", 0 )
 GAME( 1990, pigout,     0,       lelandi,  pigout, leland_state,     pigout,   ROT0,   "Leland Corporation", "Pig Out: Dine Like a Swine! (set 1)", 0 )
