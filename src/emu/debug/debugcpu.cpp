@@ -2582,7 +2582,7 @@ void device_debug::prepare_for_step_overout(offs_t pc)
 		// if we need to skip additional instructions, advance as requested
 		while (extraskip-- > 0) {
 			u32 result = buffer.disassemble_info(pc);
-			pc += buffer.next_pc_wrap(pc, result & util::disasm_interface::LENGTHMASK);
+			pc = buffer.next_pc_wrap(pc, result & util::disasm_interface::LENGTHMASK);
 		}
 		m_stepaddr = pc;
 	}
