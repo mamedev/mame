@@ -6981,6 +6981,36 @@
 		</part>
 	</software>
 
+	<software name="alienbrd">
+		<description>Alien Breed</description>
+		<year>1993</year>
+		<publisher>Team17 Software</publisher>
+		<info name="developer" value="Team 17 Software" />
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size = "1474560">
+				<rom name="Alien Breed [Team 17] [1993] [3.5HD] [Disk 1 of 1].img" size="1474560" crc="290b4415" sha1="0f9d5322520b8de908dd7dce1980bd9e322f6685" offset="0"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="aliencrn">
+		<description>Alien Carnage</description>
+		<year>1994</year>
+		<publisher>Apogee Software</publisher>
+		<info name="developer" value="Interactive Binary Illusions / Sub Zer0 Software" />
+		<info name="version" value="1.0" />
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size = "1474560">
+				<rom name="Alien Carnage [Apogee Software] [1994] [3.5HD] [Disk 1 of 2].img" size="1474560" crc="9c472b18" sha1="f30a2478fca5b85104e55ee5cf82625128a139b5" offset="0"/>
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_3_5">
+			<dataarea name="flop" size = "1474560">
+				<rom name="Alien Carnage [Apogee Software] [1994] [3.5HD] [Disk 2 of 2].img" size="1474560" crc="aeedf7b3" sha1="e9042334af6f6724a199560e71cc8f4e7b45969f" offset="0"/>
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="amazon">
 		<description>Amazon - Guardians of Eden</description>
 		<year>1992</year>
@@ -7114,6 +7144,50 @@
 		</part>
 	</software>
 
+	<software name="batmanrn">
+		<description>Batman Returns</description>
+		<year>1992</year>
+		<publisher>Konami</publisher>
+		<info name="developer" value="Spirit of Discovery" />
+		<info name="usage" value="Mouse Required" />
+		<info name="version" value="1.6" />
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size = "1474560">
+				<rom name="Batman Returns [Konami] [1992] [3.5HD] [Disk 1 of 7].img" size="1474560" crc="4f28b64d" sha1="b383e9180a267c538b9f5c7a275fe2a743189b99" offset="0"/>
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_3_5">
+			<dataarea name="flop" size = "1474560">
+				<rom name="Batman Returns [Konami] [1992] [3.5HD] [Disk 2 of 7].img" size="1474560" crc="4c1c73a2" sha1="c4940b70c7b43c7da760f05e3f2bc4728893ad94" offset="0"/>
+			</dataarea>
+		</part>
+		<part name="flop3" interface="floppy_3_5">
+			<dataarea name="flop" size = "1474560">
+				<rom name="Batman Returns [Konami] [1992] [3.5HD] [Disk 3 of 7].img" size="1474560" crc="4b7f6ad4" sha1="7f785a8deb190123a7c891f84dff5824b85fc218" offset="0"/>
+			</dataarea>
+		</part>
+		<part name="flop4" interface="floppy_3_5">
+			<dataarea name="flop" size = "1474560">
+				<rom name="Batman Returns [Konami] [1992] [3.5HD] [Disk 4 of 7].img" size="1474560" crc="1316f073" sha1="77dad77137e571cc0b07bca0e29ac75f12e2b09f" offset="0"/>
+			</dataarea>
+		</part>
+		<part name="flop5" interface="floppy_3_5">
+			<dataarea name="flop" size = "1474560">
+				<rom name="Batman Returns [Konami] [1992] [3.5HD] [Disk 5 of 7].img" size="1474560" crc="58925f32" sha1="68cc7cd7b6f5366c076619ccb9d63e7dbbcf49a4" offset="0"/>
+			</dataarea>
+		</part>
+		<part name="flop6" interface="floppy_3_5">
+			<dataarea name="flop" size = "1474560">
+				<rom name="Batman Returns [Konami] [1992] [3.5HD] [Disk 6 of 7].img" size="1474560" crc="25315f03" sha1="4258c7f04089c2bc735224fcff30396e05df5d5f" offset="0"/>
+			</dataarea>
+		</part>
+		<part name="flop7" interface="floppy_3_5">
+			<dataarea name="flop" size = "1474560">
+				<rom name="Batman Returns [Konami] [1992] [3.5HD] [Disk 7 of 7].img" size="1474560" crc="bbcb1008" sha1="20dcc177d7dbb74583a2302b1c24c452d57815a0" offset="0"/>
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="bibadv">
 		<description>Bible Adventures</description>
 		<year>1992</year>
@@ -7174,6 +7248,24 @@
 		<part name="flop2" interface="floppy_3_5">
 			<dataarea name="flop" size = "1474560">
 				<rom name="Blake Stone - Aliens of Gold (2.1) [Apogee Software] [1994] [3.5HD] [Disk 2 of 2].img" size="1474560" crc="c241071f" sha1="6579c53898a6ced800caa18a3059b2468e259073" offset="0"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="plnstrik">
+		<description>Blake Stone: Planet Strike</description>
+		<year>1994</year>
+		<publisher>Apogee Software</publisher>
+		<info name="developer" value="JAM Productions" />
+		<info name="version" value="1.0" />
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size = "1474560">
+				<rom name="Blake Stone - Planet Strike [Apogee Software] [1994] [3.5HD] [Disk 1 of 2].img" size="1474560" crc="70847143" sha1="f62138cbef21c90628a2c72556278349de5516c1" offset="0"/>
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_3_5">
+			<dataarea name="flop" size = "1474560">
+				<rom name="Blake Stone - Planet Strike [Apogee Software] [1994] [3.5HD] [Disk 2 of 2].img" size="1474560" crc="fbe4f08b" sha1="afeb9458c07517554b95fc44ecaf45e385f5d614" offset="0"/>
 			</dataarea>
 		</part>
 	</software>
@@ -7971,6 +8063,19 @@
 		</part>
 	</software>
 
+	<software name="epdeepsea">
+		<description>Epic Pinball: Deep Sea</description>
+		<year>1994</year>
+		<publisher>B&amp;N Companies</publisher>
+		<info name="developer" value="Epic MegaGames" />
+		<info name="version" value="2.1" />
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size = "737280">
+				<rom name="Pinball Deep Sea [B&amp;N Companies] [1994] [3.5DD] [Disk 1 of 1].img" size="737280" crc="caae0723" sha1="625694111fc8cf946d2009caa3c6ca927e0c6779" offset="0"/>
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="epicpin1">
 		<description>Epic Pinball Pack 1 (v2.1)</description>
 		<year>1994</year>
@@ -8172,6 +8277,18 @@
 		<part name="flop8" interface="floppy_3_5">
 			<dataarea name="flop" size = "1474560">
 				<rom name="The Hand of Fate [1994] [Virgin] [DE] [3.5HD] [Disk 8 of 8].img" size="1474560" crc="ee9bfc16" sha1="52fed013a128433583c40bb8fcc3ada9b28597d3" offset="0"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="firenice">
+		<description>Fire and Ice</description>
+		<year>1993</year>
+		<publisher>Renegade Software</publisher>
+		<info name="developer" value="Graftgold" />
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size = "1474560">
+				<rom name="Fire and Ice [Graftgold] [1993] [3.5HD] [Disk 1 of 1].img" size="1474560" crc="305fdafd" sha1="dfcb64d8bb43c146300c63c154fe1f3c00544518" offset="0"/>
 			</dataarea>
 		</part>
 	</software>
