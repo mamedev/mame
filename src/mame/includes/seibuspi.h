@@ -21,7 +21,6 @@ public:
 		m_mainram(*this, "mainram"),
 		m_z80_rom(*this, "audiocpu"),
 		m_eeprom(*this, "eeprom"),
-		m_soundflash(*this, "soundflash%u", 1),
 		m_soundfifo(*this, "soundfifo%u", 1),
 		m_oki(*this, "oki%u", 1),
 		m_gfxdecode(*this, "gfxdecode"),
@@ -36,7 +35,6 @@ public:
 	required_shared_ptr<uint32_t> m_mainram;
 	optional_memory_region m_z80_rom;
 	optional_device<eeprom_serial_93cxx_device> m_eeprom;
-	optional_device_array<intel_e28f008sa_device, 2> m_soundflash;
 	optional_device_array<fifo7200_device, 2> m_soundfifo;
 	optional_device_array<okim6295_device, 2> m_oki;
 	required_device<gfxdecode_device> m_gfxdecode;
