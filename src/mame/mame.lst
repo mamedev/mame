@@ -8843,6 +8843,9 @@ blockout                        // TA-0029 (c) 1989 + California Dreams
 blockout2                       // TA-0029 (c) 1989 + California Dreams
 blockoutj                       // TA-0029 (c) 1989 + California Dreams (Japan)
 
+@source:blocktax.cpp
+blocktax                        // (c)2002 TAX / Game Revival
+
 @source:bloodbro.cpp
 bloodbro                        // (c) 1990 Tad
 bloodbroj                       // (c) 1990 Tad
