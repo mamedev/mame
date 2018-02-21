@@ -407,7 +407,7 @@ MACHINE_CONFIG_START(duet16_state::duet16)
 	MCFG_MC6845_UPDATE_ROW_CB(duet16_state, crtc_update_row)
 
 	MCFG_PALETTE_ADD("palette", 8)
-	MCFG_PALETTE_ADD_3BIT_GRB("chrpal")
+	MCFG_PALETTE_ADD_3BIT_BRG("chrpal")
 
 	MCFG_GFXDECODE_ADD("gfxdecode", "chrpal", duet16)
 
