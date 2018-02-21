@@ -234,8 +234,8 @@ public:
 	LC7535_VOLUME_CHANGED(volume_main_changed);
 	LC7535_VOLUME_CHANGED(volume_gun_changed);
 	
-	DECLARE_WRITE8_MEMBER(sound_bankswitch_w);
-	DECLARE_WRITE8_MEMBER(lockload_okibank_w); // lockload
+	DECLARE_WRITE8_MEMBER(lockload_okibank_lo_w);
+	DECLARE_WRITE8_MEMBER(lockload_okibank_hi_w); // lockload
 
 	DECLARE_DRIVER_INIT(dragngun);
 	DECLARE_DRIVER_INIT(dragngunj);
