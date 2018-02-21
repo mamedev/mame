@@ -244,7 +244,7 @@ class devcb_read_base : public devcb_base
 {
 protected:
 	// construction/destruction
-	devcb_read_base(device_t &device, u64 defmask);
+	devcb_read_base(device_t &device, u64 defmask, bool chained = false);
 
 public:
 	// callback configuration
@@ -300,7 +300,7 @@ class devcb_write_base : public devcb_base
 {
 protected:
 	// construction/destruction
-	devcb_write_base(device_t &device, u64 defmask);
+	devcb_write_base(device_t &device, u64 defmask, bool chained = false);
 
 public:
 	// callback configuration

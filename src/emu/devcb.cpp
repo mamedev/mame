@@ -145,11 +145,12 @@ void devcb_base::resolve_space()
 //  devcb_read_base - constructor
 //-------------------------------------------------
 
-devcb_read_base::devcb_read_base(device_t &device, u64 defmask)
+devcb_read_base::devcb_read_base(device_t &device, u64 defmask, bool chained)
 	: devcb_base(device, defmask),
 		m_adapter(&devcb_read_base::read_unresolved_adapter)
 {
-	device.m_input_callbacks.push_back(this);
+	if (!chained)
+		device.m_input_callbacks.push_back(this);
 }
 
 
@@ -177,7 +178,7 @@ void devcb_read_base::devcb_reset()
 devcb_read_base &devcb_read_base::chain_alloc()
 {
 	// set up the chained callback pointer
-	m_chain.reset(new devcb_read_base(m_device, m_defmask));
+	m_chain.reset(new devcb_read_base(*this));
 	return *m_chain;
 }
 
@@ -465,11 +466,12 @@ void devcb_read_base::validity_check(validity_checker &valid) const
 //  devcb_write_base - constructor
 //-------------------------------------------------
 
-devcb_write_base::devcb_write_base(device_t &device, u64 defmask)
+devcb_write_base::devcb_write_base(device_t &device, u64 defmask, bool chained)
 	: devcb_base(device, defmask),
 		m_adapter(&devcb_write_base::write_unresolved_adapter)
 {
-	device.m_output_callbacks.push_back(this);
+	if (!chained)
+		device.m_output_callbacks.push_back(this);
 }
 
 
@@ -497,7 +499,7 @@ void devcb_write_base::devcb_reset()
 devcb_write_base &devcb_write_base::chain_alloc()
 {
 	// set up the chained callback pointer
-	m_chain.reset(new devcb_write_base(m_device, m_defmask));
+	m_chain.reset(new devcb_write_base(m_device, m_defmask, true));
 	return *m_chain;
 }
 
@@ -628,6 +630,8 @@ void devcb_write_base::validity_check(validity_checker &valid) const
 	switch (m_type)
 	{
 	case CALLBACK_NONE:
+		break;
+
 	case CALLBACK_CONSTANT:
 	case CALLBACK_LOG:
 	case CALLBACK_IOPORT:
