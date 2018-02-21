@@ -715,7 +715,20 @@ CUSTOM_INPUT_MEMBER(model2_state::srallyc_gearbox_r)
 
 CUSTOM_INPUT_MEMBER(model2_state::rchase2_devices_r)
 {
-	return 0xff;
+	uint8_t res;
+
+	res = 0xff;
+	
+	if(m_cmd_data == 0xe0 || m_cmd_data == 0x0e)
+		res &= ~1;
+	if(m_cmd_data == 0xd0 || m_cmd_data == 0x0d)
+		res &= ~2;
+	if(m_cmd_data == 0xb0 || m_cmd_data == 0x0b)
+		res &= ~4;
+	if(m_cmd_data == 0x70 || m_cmd_data == 0x07)
+		res &= ~8;
+	
+	return res;
 }
 
 WRITE32_MEMBER(model2_state::rchase2_devices_w)
