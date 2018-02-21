@@ -24,7 +24,7 @@ public:
 
 	// static configuration
 	void set_gfxdecode_tag(const char *tag) { m_gfxdecode.set_tag(tag); }
-	void set_tile_indirect_cb(snk68_tile_indirection_delegate newtilecb) { m_newtilecb = newtilecb; }
+	template <typename Object> void set_tile_indirect_cb(Object &&cb) { m_newtilecb = std::forward<Object>(cb); }
 	void set_no_partial() { m_partialupdates = 0; }
 
 	DECLARE_READ16_MEMBER(spriteram_r);

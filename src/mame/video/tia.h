@@ -54,9 +54,9 @@ class tia_video_device :    public device_t,
 public:
 	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 
-	template<class _Object> devcb_base &set_read_input_port_callback(_Object object) { return m_read_input_port_cb.set_callback(object); }
-	template<class _Object> devcb_base &set_databus_contents_callback(_Object object) { return m_databus_contents_cb.set_callback(object); }
-	template<class _Object> devcb_base &set_vsync_callback(_Object object) { return m_vsync_cb.set_callback(object); }
+	template <class Object> devcb_base &set_read_input_port_callback(Object &&cb) { return m_read_input_port_cb.set_callback(std::forward<Object>(cb)); }
+	template <class Object> devcb_base &set_databus_contents_callback(Object &&cb) { return m_databus_contents_cb.set_callback(std::forward<Object>(cb)); }
+	template <class Object> devcb_base &set_vsync_callback(Object &&cb) { return m_vsync_cb.set_callback(std::forward<Object>(cb)); }
 
 	DECLARE_READ8_MEMBER( read );
 	DECLARE_WRITE8_MEMBER( write );

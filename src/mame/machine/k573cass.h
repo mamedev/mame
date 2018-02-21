@@ -173,14 +173,14 @@ public:
 	konami573_cassette_y_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
 	// configuration helpers
-	template<class _Object> devcb_base &set_d0_handler(_Object object) { return m_d0_handler.set_callback(object); }
-	template<class _Object> devcb_base &set_d1_handler(_Object object) { return m_d1_handler.set_callback(object); }
-	template<class _Object> devcb_base &set_d2_handler(_Object object) { return m_d2_handler.set_callback(object); }
-	template<class _Object> devcb_base &set_d3_handler(_Object object) { return m_d3_handler.set_callback(object); }
-	template<class _Object> devcb_base &set_d4_handler(_Object object) { return m_d4_handler.set_callback(object); }
-	template<class _Object> devcb_base &set_d5_handler(_Object object) { return m_d5_handler.set_callback(object); }
-	template<class _Object> devcb_base &set_d6_handler(_Object object) { return m_d6_handler.set_callback(object); }
-	template<class _Object> devcb_base &set_d7_handler(_Object object) { return m_d7_handler.set_callback(object); }
+	template <class Object> devcb_base &set_d0_handler(Object &&cb) { return m_d0_handler.set_callback(std::forward<Object>(cb)); }
+	template <class Object> devcb_base &set_d1_handler(Object &&cb) { return m_d1_handler.set_callback(std::forward<Object>(cb)); }
+	template <class Object> devcb_base &set_d2_handler(Object &&cb) { return m_d2_handler.set_callback(std::forward<Object>(cb)); }
+	template <class Object> devcb_base &set_d3_handler(Object &&cb) { return m_d3_handler.set_callback(std::forward<Object>(cb)); }
+	template <class Object> devcb_base &set_d4_handler(Object &&cb) { return m_d4_handler.set_callback(std::forward<Object>(cb)); }
+	template <class Object> devcb_base &set_d5_handler(Object &&cb) { return m_d5_handler.set_callback(std::forward<Object>(cb)); }
+	template <class Object> devcb_base &set_d6_handler(Object &&cb) { return m_d6_handler.set_callback(std::forward<Object>(cb)); }
+	template <class Object> devcb_base &set_d7_handler(Object &&cb) { return m_d7_handler.set_callback(std::forward<Object>(cb)); }
 
 	virtual DECLARE_READ_LINE_MEMBER(read_line_secflash_sda) override;
 	virtual DECLARE_WRITE_LINE_MEMBER(write_line_d0) override;

@@ -39,7 +39,7 @@ public:
 		m_yoffs = yoffs;
 	}
 	void set_pdraw(bool pdraw) { m_pdraw = pdraw; }
-	void set_tile_indirect_cb(vsystem_tile_indirection_delegate newtilecb) { m_newtilecb = newtilecb; }
+	template <typename Object> void set_tile_indirect_cb(Object &&cb) { m_newtilecb = std::forward<Object>(cb); }
 	void set_gfx_region(int gfx_region) { m_gfx_region = gfx_region; }
 	void CG10103_set_pal_base(int pal_base) { m_pal_base = pal_base; }
 	void set_pal_mask(int pal_mask) { m_pal_mask = pal_mask; }

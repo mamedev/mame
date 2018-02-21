@@ -36,8 +36,8 @@ class mackbd_device :  public device_t
 {
 public:
 	// config helper
-	template<class _Object> devcb_base &set_clkout_handler(_Object object) { return m_clkout_handler.set_callback(object); }
-	template<class _Object> devcb_base &set_dataout_handler(_Object object) { return m_dataout_handler.set_callback(object); }
+	template <class Object> devcb_base &set_clkout_handler(Object &&cb) { return m_clkout_handler.set_callback(std::forward<Object>(cb)); }
+	template <class Object> devcb_base &set_dataout_handler(Object &&cb) { return m_dataout_handler.set_callback(std::forward<Object>(cb)); }
 
 	// construction/destruction
 	mackbd_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);

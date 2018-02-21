@@ -41,7 +41,7 @@ public:
 	// construction/destruction
 	abc80_keyboard_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
-	template<class _Object> devcb_base &set_keydown_wr_callback(_Object object) { return m_write_keydown.set_callback(object); }
+	template <class Object> devcb_base &set_keydown_wr_callback(Object &&cb) { return m_write_keydown.set_callback(std::forward<Object>(cb)); }
 
 	uint8_t data_r();
 

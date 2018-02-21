@@ -14,7 +14,7 @@ class interpro_sga_device : public device_t
 public:
 	interpro_sga_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
-	template<class _Object> devcb_base &set_out_berr_callback(_Object object) { return out_berr_func.set_callback(object); }
+	template <class Object> devcb_base &set_out_berr_callback(Object &&cb) { return out_berr_func.set_callback(std::forward<Object>(cb)); }
 
 	virtual void map(address_map &map);
 

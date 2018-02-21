@@ -23,7 +23,7 @@ public:
 
 	void set_wakeup_addr(uint32_t wakeup) { m_wakeup = wakeup; }
 	void set_maincpu_tag(const char *maincpu_tag) { m_maincpu_tag = maincpu_tag; }
-	template<class _Object> devcb_base &set_irq_callback(_Object object) { return m_out_irq_func.set_callback(object); }
+	template <class Object> devcb_base &set_irq_callback(Object &&cb) { return m_out_irq_func.set_callback(std::forward<Object>(cb)); }
 
 	void isbc_215g_io(address_map &map);
 	void isbc_215g_mem(address_map &map);

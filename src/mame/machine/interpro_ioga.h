@@ -106,15 +106,15 @@ protected:
 	};
 
 public:
-	template<class _Object> devcb_base &set_out_nmi_callback(_Object object) { return m_out_nmi_func.set_callback(object); }
-	template<class _Object> devcb_base &set_out_irq_callback(_Object object) { return m_out_irq_func.set_callback(object); }
-	template<class _Object> devcb_base &set_out_ivec_callback(_Object object) { return m_out_ivec_func.set_callback(object); }
-	template<class _Object> devcb_base &set_dma_r_callback(int channel, _Object object) { return m_dma_channel[channel].device_r.set_callback(object); }
-	template<class _Object> devcb_base &set_dma_w_callback(int channel, _Object object) { return m_dma_channel[channel].device_w.set_callback(object); }
-	template<class _Object> devcb_base &set_serial_dma_r_callback(int channel, _Object object) { return m_serial_dma_channel[channel].device_r.set_callback(object); }
-	template<class _Object> devcb_base &set_serial_dma_w_callback(int channel, _Object object) { return m_serial_dma_channel[channel].device_w.set_callback(object); }
-	template<class _Object> devcb_base &set_fdc_tc_callback(_Object object) { return m_fdc_tc_func.set_callback(object); }
-	template<class _Object> devcb_base &set_eth_ca_callback(_Object object) { return m_eth_ca_func.set_callback(object); }
+	template <class Object> devcb_base &set_out_nmi_callback(Object &&cb) { return m_out_nmi_func.set_callback(std::forward<Object>(cb)); }
+	template <class Object> devcb_base &set_out_irq_callback(Object &&cb) { return m_out_irq_func.set_callback(std::forward<Object>(cb)); }
+	template <class Object> devcb_base &set_out_ivec_callback(Object &&cb) { return m_out_ivec_func.set_callback(std::forward<Object>(cb)); }
+	template <class Object> devcb_base &set_dma_r_callback(int channel, Object &&cb) { return m_dma_channel[channel].device_r.set_callback(std::forward<Object>(cb)); }
+	template <class Object> devcb_base &set_dma_w_callback(int channel, Object &&cb) { return m_dma_channel[channel].device_w.set_callback(std::forward<Object>(cb)); }
+	template <class Object> devcb_base &set_serial_dma_r_callback(int channel, Object &&cb) { return m_serial_dma_channel[channel].device_r.set_callback(std::forward<Object>(cb)); }
+	template <class Object> devcb_base &set_serial_dma_w_callback(int channel, Object &&cb) { return m_serial_dma_channel[channel].device_w.set_callback(std::forward<Object>(cb)); }
+	template <class Object> devcb_base &set_fdc_tc_callback(Object &&cb) { return m_fdc_tc_func.set_callback(std::forward<Object>(cb)); }
+	template <class Object> devcb_base &set_eth_ca_callback(Object &&cb) { return m_eth_ca_func.set_callback(std::forward<Object>(cb)); }
 
 	void set_memory(const char *const tag, const int spacenum)
 	{

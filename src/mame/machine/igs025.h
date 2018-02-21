@@ -23,9 +23,7 @@ public:
 	uint32_t m_kb_game_id;
 	uint32_t m_kb_region;
 
-
-	igs025_execute_external m_execute_external;
-	void set_external_cb(igs025_execute_external newcb) { m_execute_external = newcb; }
+	template <typename Object> void set_external_cb(Object &&newcb) { m_execute_external = std::forward<Object>(newcb); }
 
 	DECLARE_WRITE16_MEMBER( olds_w );
 	DECLARE_WRITE16_MEMBER( drgw2_d80000_protection_w );
@@ -36,6 +34,7 @@ protected:
 	virtual void device_start() override;
 	virtual void device_reset() override;
 
+	igs025_execute_external m_execute_external;
 
 	uint16_t        m_kb_prot_hold;
 	uint16_t        m_kb_prot_hilo;

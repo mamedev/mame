@@ -38,7 +38,7 @@ public:
 		m_maincpu_tag = maintag;
 		m_subcpu_tag = subtag;
 	}
-	template<class _Object> devcb_base &set_subres_cb(_Object object) { return m_subres_cb.set_callback(object); }
+	template <class Object> devcb_base &set_subres_cb(Object &&cb) { return m_subres_cb.set_callback(std::forward<Object>(cb)); }
 
 	DECLARE_READ8_MEMBER(main_r);
 	DECLARE_READ8_MEMBER(sub_r);

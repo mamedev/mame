@@ -104,7 +104,7 @@ public:
 
 	// configuration helpers
 	void set_sound_cpu(const char *cputag) { m_sound_cpu_tag = cputag; }
-	template<class _Object> devcb_base &set_main_int_cb(_Object object) { return m_main_int_cb.set_callback(object); }
+	template <class Object> devcb_base &set_main_int_cb(Object &&cb) { return m_main_int_cb.set_callback(std::forward<Object>(cb)); }
 
 	// getters
 	DECLARE_READ_LINE_MEMBER(main_to_sound_ready) { return m_main_to_sound_ready ? ASSERT_LINE : CLEAR_LINE; }
@@ -176,7 +176,7 @@ public:
 	atari_vad_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
 	// configuration helpers
-	template<class _Object> devcb_base &set_scanline_int_cb(_Object object) { return m_scanline_int_cb.set_callback(object); }
+	template<class Object> devcb_base &set_scanline_int_cb(Object &&cb) { return m_scanline_int_cb.set_callback(std::forward<Object>(cb)); }
 
 	// getters
 	tilemap_device &alpha() const { return *m_alpha_tilemap; }

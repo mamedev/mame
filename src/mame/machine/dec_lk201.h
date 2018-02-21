@@ -60,7 +60,7 @@ public:
 	DECLARE_READ8_MEMBER(timer_r);
 	DECLARE_WRITE8_MEMBER(timer_w);
 
-	template<class _Object> devcb_base &set_tx_handler(_Object wr) { return m_tx_handler.set_callback(wr); }
+	template <class Object> devcb_base &set_tx_handler(Object &&wr) { return m_tx_handler.set_callback(std::forward<Object>(wr)); }
 
 	void lk201_map(address_map &map);
 protected:

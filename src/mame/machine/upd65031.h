@@ -55,13 +55,13 @@ public:
 	// construction/destruction
 	upd65031_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
-	template<class _Object> devcb_base &set_kb_rd_callback(_Object object) { return m_read_kb.set_callback(object); }
-	template<class _Object> devcb_base &set_int_wr_callback(_Object object) { return m_write_int.set_callback(object); }
-	template<class _Object> devcb_base &set_nmi_wr_callback(_Object object) { return m_write_nmi.set_callback(object); }
-	template<class _Object> devcb_base &set_spkr_wr_callback(_Object object) { return m_write_spkr.set_callback(object); }
+	template <class Object> devcb_base &set_kb_rd_callback(Object &&cb) { return m_read_kb.set_callback(std::forward<Object>(cb)); }
+	template <class Object> devcb_base &set_int_wr_callback(Object &&cb) { return m_write_int.set_callback(std::forward<Object>(cb)); }
+	template <class Object> devcb_base &set_nmi_wr_callback(Object &&cb) { return m_write_nmi.set_callback(std::forward<Object>(cb)); }
+	template <class Object> devcb_base &set_spkr_wr_callback(Object &&cb) { return m_write_spkr.set_callback(std::forward<Object>(cb)); }
 
-	void set_screen_update_callback(upd65031_screen_update_delegate callback) { m_screen_update_cb = callback; }
-	void set_memory_update_callback(upd65031_memory_update_delegate callback) { m_out_mem_cb = callback; }
+	template <class Object> void set_screen_update_callback(Object &&cb) { m_screen_update_cb = std::forward<Object>(cb); }
+	template <class Object> void set_memory_update_callback(Object &&cb) { m_out_mem_cb = std::forward<Object>(cb); }
 
 	DECLARE_READ8_MEMBER( read );
 	DECLARE_WRITE8_MEMBER( write );

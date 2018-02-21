@@ -36,8 +36,8 @@ public:
 	// construction/destruction
 	km035_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
-	template<class _Object> devcb_base &set_tx_handler(_Object wr) { return m_tx_handler.set_callback(wr); }
-	template<class _Object> devcb_base &set_rts_handler(_Object wr) { return m_rts_handler.set_callback(wr); }
+	template <class Object> devcb_base &set_tx_handler(Object &&wr) { return m_tx_handler.set_callback(std::forward<Object>(wr)); }
+	template <class Object> devcb_base &set_rts_handler(Object &&wr) { return m_rts_handler.set_callback(std::forward<Object>(wr)); }
 
 	DECLARE_WRITE_LINE_MEMBER( write_rxd );
 

@@ -53,8 +53,8 @@ public:
 
 	void link_c148_device(const char *tag) { m_linked_c148_tag = tag; }
 
-	template<class _Object> devcb_base &set_out_ext1_callback(_Object object) { return m_out_ext1_cb.set_callback(object); }
-	template<class _Object> devcb_base &set_out_ext2_callback(_Object object) { return m_out_ext2_cb.set_callback(object); }
+	template <class Object> devcb_base &set_out_ext1_callback(Object &&cb) { return m_out_ext1_cb.set_callback(std::forward<Object>(cb)); }
+	template <class Object> devcb_base &set_out_ext2_callback(Object &&cb) { return m_out_ext2_cb.set_callback(std::forward<Object>(cb)); }
 
 	devcb_write8 m_out_ext1_cb;
 	devcb_write8 m_out_ext2_cb;

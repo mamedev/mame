@@ -28,11 +28,11 @@ class lc89510_temp_device : public device_t
 public:
 	void set_is_neoCD(bool new_is_neoCD) { is_neoCD = new_is_neoCD; }
 
-	void set_type1_interrupt_callback(interrupt_delegate interrupt_callback) { type1_interrupt_callback = interrupt_callback; }
-	void set_type2_interrupt_callback(interrupt_delegate interrupt_callback) { type2_interrupt_callback = interrupt_callback; }
-	void set_type3_interrupt_callback(interrupt_delegate interrupt_callback) { type3_interrupt_callback = interrupt_callback; }
+	template <typename Object> void set_type1_interrupt_callback(Object &&callback) { type1_interrupt_callback = std::forward<Object>(callback); }
+	template <typename Object> void set_type2_interrupt_callback(Object &&callback) { type2_interrupt_callback = std::forward<Object>(callback); }
+	template <typename Object> void set_type3_interrupt_callback(Object &&callback) { type3_interrupt_callback = std::forward<Object>(callback); }
 
-	void set_CDC_Do_DMA(segacd_dma_delegate new_segacd_dma_callback) { segacd_dma_callback = new_segacd_dma_callback; }
+	template <typename Object> void set_CDC_Do_DMA(Object &&callback) { segacd_dma_callback = std::forward<Object>(callback); }
 
 
 	lc89510_temp_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);

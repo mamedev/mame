@@ -23,7 +23,7 @@ class st0016_cpu_device : public z80_device, public device_gfx_interface
 public:
 	st0016_cpu_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t);
 
-	void set_dma_offs_callback(st0016_dma_offs_delegate callback) { m_dma_offs_cb = callback; }
+	template <typename Object> void set_dma_offs_callback(Object &&callback) { m_dma_offs_cb = std::forward<Object>(callback); }
 
 	DECLARE_WRITE8_MEMBER(st0016_sprite_bank_w);
 	DECLARE_WRITE8_MEMBER(st0016_palette_bank_w);

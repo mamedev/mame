@@ -74,27 +74,27 @@ public:
 	sega_315_5296_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
 	// configuration helpers
-	template<class _Object> devcb_base &set_in_pa_callback(_Object object) { return m_in_pa_cb.set_callback(object); }
-	template<class _Object> devcb_base &set_in_pb_callback(_Object object) { return m_in_pb_cb.set_callback(object); }
-	template<class _Object> devcb_base &set_in_pc_callback(_Object object) { return m_in_pc_cb.set_callback(object); }
-	template<class _Object> devcb_base &set_in_pd_callback(_Object object) { return m_in_pd_cb.set_callback(object); }
-	template<class _Object> devcb_base &set_in_pe_callback(_Object object) { return m_in_pe_cb.set_callback(object); }
-	template<class _Object> devcb_base &set_in_pf_callback(_Object object) { return m_in_pf_cb.set_callback(object); }
-	template<class _Object> devcb_base &set_in_pg_callback(_Object object) { return m_in_pg_cb.set_callback(object); }
-	template<class _Object> devcb_base &set_in_ph_callback(_Object object) { return m_in_ph_cb.set_callback(object); }
+	template <class Object> devcb_base &set_in_pa_callback(Object &&cb) { return m_in_pa_cb.set_callback(std::forward<Object>(cb)); }
+	template <class Object> devcb_base &set_in_pb_callback(Object &&cb) { return m_in_pb_cb.set_callback(std::forward<Object>(cb)); }
+	template <class Object> devcb_base &set_in_pc_callback(Object &&cb) { return m_in_pc_cb.set_callback(std::forward<Object>(cb)); }
+	template <class Object> devcb_base &set_in_pd_callback(Object &&cb) { return m_in_pd_cb.set_callback(std::forward<Object>(cb)); }
+	template <class Object> devcb_base &set_in_pe_callback(Object &&cb) { return m_in_pe_cb.set_callback(std::forward<Object>(cb)); }
+	template <class Object> devcb_base &set_in_pf_callback(Object &&cb) { return m_in_pf_cb.set_callback(std::forward<Object>(cb)); }
+	template <class Object> devcb_base &set_in_pg_callback(Object &&cb) { return m_in_pg_cb.set_callback(std::forward<Object>(cb)); }
+	template <class Object> devcb_base &set_in_ph_callback(Object &&cb) { return m_in_ph_cb.set_callback(std::forward<Object>(cb)); }
 
-	template<class _Object> devcb_base &set_out_pa_callback(_Object object) { return m_out_pa_cb.set_callback(object); }
-	template<class _Object> devcb_base &set_out_pb_callback(_Object object) { return m_out_pb_cb.set_callback(object); }
-	template<class _Object> devcb_base &set_out_pc_callback(_Object object) { return m_out_pc_cb.set_callback(object); }
-	template<class _Object> devcb_base &set_out_pd_callback(_Object object) { return m_out_pd_cb.set_callback(object); }
-	template<class _Object> devcb_base &set_out_pe_callback(_Object object) { return m_out_pe_cb.set_callback(object); }
-	template<class _Object> devcb_base &set_out_pf_callback(_Object object) { return m_out_pf_cb.set_callback(object); }
-	template<class _Object> devcb_base &set_out_pg_callback(_Object object) { return m_out_pg_cb.set_callback(object); }
-	template<class _Object> devcb_base &set_out_ph_callback(_Object object) { return m_out_ph_cb.set_callback(object); }
+	template <class Object> devcb_base &set_out_pa_callback(Object &&cb) { return m_out_pa_cb.set_callback(std::forward<Object>(cb)); }
+	template <class Object> devcb_base &set_out_pb_callback(Object &&cb) { return m_out_pb_cb.set_callback(std::forward<Object>(cb)); }
+	template <class Object> devcb_base &set_out_pc_callback(Object &&cb) { return m_out_pc_cb.set_callback(std::forward<Object>(cb)); }
+	template <class Object> devcb_base &set_out_pd_callback(Object &&cb) { return m_out_pd_cb.set_callback(std::forward<Object>(cb)); }
+	template <class Object> devcb_base &set_out_pe_callback(Object &&cb) { return m_out_pe_cb.set_callback(std::forward<Object>(cb)); }
+	template <class Object> devcb_base &set_out_pf_callback(Object &&cb) { return m_out_pf_cb.set_callback(std::forward<Object>(cb)); }
+	template <class Object> devcb_base &set_out_pg_callback(Object &&cb) { return m_out_pg_cb.set_callback(std::forward<Object>(cb)); }
+	template <class Object> devcb_base &set_out_ph_callback(Object &&cb) { return m_out_ph_cb.set_callback(std::forward<Object>(cb)); }
 
-	template<class _Object> devcb_base &set_out_cnt0_callback(_Object object) { return m_out_cnt0_cb.set_callback(object); }
-	template<class _Object> devcb_base &set_out_cnt1_callback(_Object object) { return m_out_cnt1_cb.set_callback(object); }
-	template<class _Object> devcb_base &set_out_cnt2_callback(_Object object) { return m_out_cnt2_cb.set_callback(object); }
+	template <class Object> devcb_base &set_out_cnt0_callback(Object &&cb) { return m_out_cnt0_cb.set_callback(std::forward<Object>(cb)); }
+	template <class Object> devcb_base &set_out_cnt1_callback(Object &&cb) { return m_out_cnt1_cb.set_callback(std::forward<Object>(cb)); }
+	template <class Object> devcb_base &set_out_cnt2_callback(Object &&cb) { return m_out_cnt2_cb.set_callback(std::forward<Object>(cb)); }
 
 	DECLARE_READ8_MEMBER( read );
 	DECLARE_WRITE8_MEMBER( write );

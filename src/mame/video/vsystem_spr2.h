@@ -22,7 +22,7 @@ class vsystem_spr2_device : public device_t
 public:
 	// configuration
 	void set_gfxdecode_tag(const char *tag) { m_gfxdecode.set_tag(tag); }
-	void set_tile_indirect_cb(vsystem_tile2_indirection_delegate newtilecb) { m_newtilecb = newtilecb; }
+	template <typename Object> void set_tile_indirect_cb(Object &&cb) { m_newtilecb = std::forward<Object>(cb); }
 	void set_pritype(int pritype) { m_pritype = pritype; }
 	void set_gfx_region(int gfx_region) { m_gfx_region = gfx_region; }
 	void set_offsets(int xoffs, int yoffs)

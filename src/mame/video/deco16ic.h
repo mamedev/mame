@@ -35,8 +35,8 @@ public:
 	// configuration
 	void set_gfxdecode_tag(const char *tag) { m_gfxdecode.set_tag(tag); }
 //	void set_palette_tag(const char *tag);
-	void set_bank1_callback(deco16_bank_cb_delegate callback) { m_bank1_cb = callback; }
-	void set_bank2_callback(deco16_bank_cb_delegate callback) { m_bank2_cb = callback; }
+	template <typename Object> void set_bank1_callback(Object &&cb) { m_bank1_cb = std::forward<Object>(cb); }
+	template <typename Object> void set_bank2_callback(Object &&cb) { m_bank2_cb = std::forward<Object>(cb); }
 	void set_split(int split) { m_split = split; }
 	void set_pf1_size(int size) { m_pf1_size = size; }
 	void set_pf2_size(int size) { m_pf2_size = size; }

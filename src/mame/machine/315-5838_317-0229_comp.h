@@ -21,15 +21,8 @@ public:
 	// construction/destruction
 	sega_315_5838_comp_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
-	void set_read_cb_ch1(sega_dec_read_delegate readcb)
-	{
-		m_channel[0].m_read_ch = readcb;
-	}
-
-	void set_read_cb_ch2(sega_dec_read_delegate readcb)
-	{
-		m_channel[1].m_read_ch = readcb;
-	}
+	template <typename Object> void set_read_cb_ch1(Object &&readcb) { m_channel[0].m_read_ch = std::forward<Object>(readcb); }
+	template <typename Object> void set_read_cb_ch2(Object &&readcb) { m_channel[1].m_read_ch = std::forward<Object>(readcb); }
 
 	DECLARE_READ32_MEMBER(decathlt_prot1_r);
 	DECLARE_READ32_MEMBER(decathlt_prot2_r);

@@ -28,10 +28,7 @@ public:
 
 	sega_m2_read_delegate m_read;
 
-	void set_read_cb(sega_m2_read_delegate readcb)
-	{
-		m_read = readcb;
-	}
+	template <typename Object> void set_read_cb(Object &&readcb) { m_read = std::forward<Object>(readcb); }
 
 protected:
 	virtual void device_start() override;
