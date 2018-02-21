@@ -6,7 +6,6 @@
 
 ******************************************************************************/
 
-#include "machine/intelfsh.h"
 #include "machine/eepromser.h"
 #include "machine/7200fifo.h"
 #include "sound/okim6295.h"
