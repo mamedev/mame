@@ -361,8 +361,8 @@ ADDRESS_MAP_END
 
 ADDRESS_MAP_START(ti85_state::ti83p_asic_mem)
 	AM_RANGE(0x0000, 0x3fff) AM_DEVREADWRITE("membank1", address_map_bank_device, read8, write8)
-	AM_RANGE(0x4000, 0x7fff) AM_DEVREADWRITE("membank2", address_map_bank_device, read8, write8)
-	AM_RANGE(0x8000, 0xbfff) AM_DEVREADWRITE("membank3", address_map_bank_device, read8, write8)
+	AM_RANGE(0x4000, 0x7fff) AM_DEVWRITE("membank2", address_map_bank_device, write8) AM_READ(ti83p_membank2_r)
+	AM_RANGE(0x8000, 0xbfff) AM_DEVWRITE("membank3", address_map_bank_device, write8) AM_READ(ti83p_membank3_r)
 	AM_RANGE(0xc000, 0xffff) AM_DEVREADWRITE("membank4", address_map_bank_device, read8, write8)
 ADDRESS_MAP_END
 

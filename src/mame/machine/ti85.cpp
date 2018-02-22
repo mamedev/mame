@@ -269,6 +269,49 @@ MACHINE_RESET_MEMBER(ti85_state,ti85)
 	m_PCR = 0xc0;
 }
 
+READ8_MEMBER(ti85_state::ti83p_membank2_r)
+{
+	/// http://wikiti.brandonw.net/index.php?title=83Plus:State_of_the_calculator_at_boot
+	/// should only trigger when fetching opcodes
+	if (m_booting && !machine().side_effect_disabled())
+	{
+		m_booting = false;
+
+		if (m_model == TI83P)
+		{
+			update_ti83p_memory();
+		}
+		else
+		{
+			update_ti83pse_memory();
+		}
+	}
+
+	return m_membank2->read8(space, offset);
+}
+
+READ8_MEMBER(ti85_state::ti83p_membank3_r)
+{
+	/// http://wikiti.brandonw.net/index.php?title=83Plus:State_of_the_calculator_at_boot
+	/// should only trigger when fetching opcodes
+	/// should be using port 6 instead of 4
+	if (m_booting && (m_ti83p_port4 & 1) && !machine().side_effect_disabled())
+	{
+		m_booting = false;
+
+		if (m_model == TI83P)
+		{
+			update_ti83p_memory();
+		}
+		else
+		{
+			update_ti83pse_memory();
+		}
+	}
+
+	return m_membank3->read8(space, offset);
+}
+
 MACHINE_RESET_MEMBER(ti85_state,ti83p)
 {
 	m_PCR = 0x00;
