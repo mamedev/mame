@@ -471,7 +471,7 @@ static const dasm_table_entry dasm_table[] =
 	{ "x86_64",          le,  0, []() -> util::disasm_interface * { i386_unidasm.mode = 64; return new i386_disassembler(&i386_unidasm); } },
 	{ "xavix",           le,  0, []() -> util::disasm_interface * { return new xavix_disassembler; } },
 	{ "z180",            le,  0, []() -> util::disasm_interface * { return new z180_disassembler; } },
-	{ "z8",              le,  0, []() -> util::disasm_interface * { return new z8_disassembler; } },
+	{ "z8",              be,  0, []() -> util::disasm_interface * { return new z8_disassembler; } },
 	{ "z80",             le,  0, []() -> util::disasm_interface * { return new z80_disassembler; } },
 	{ "z8000",           be,  0, []() -> util::disasm_interface * { return new z8000_disassembler(&z8000_unidasm); } },
 };
