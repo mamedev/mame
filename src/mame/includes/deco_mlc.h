@@ -13,77 +13,77 @@ class deco_mlc_state : public driver_device
 public:
 	deco_mlc_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag),
-		m_deco146(*this, "ioprot"),
-		m_mlc_ram(*this, "mlc_ram"),
-		m_irq_ram(*this, "irq_ram"),
-		m_mlc_clip_ram(*this, "mlc_clip_ram"),
-		m_mlc_vram(*this, "mlc_vram"),
 		m_maincpu(*this, "maincpu"),
 		m_eeprom(*this, "eeprom"),
 		m_ymz(*this, "ymz"),
 		m_gfxdecode(*this, "gfxdecode"),
 		m_screen(*this, "screen"),
 		m_palette(*this, "palette"),
-		m_generic_paletteram_32(*this, "paletteram"),
+		m_deco146(*this, "ioprot"),
+		m_mainram(*this, "mainram"),
+		m_irq_ram(*this, "irq_ram"),
+		m_clip_ram(*this, "clip_ram"),
+		m_vram(*this, "vram"),
 		m_gfx2(*this,"gfx2")
 		{ }
-
-	optional_device<deco146_device> m_deco146;
-	required_shared_ptr<uint32_t> m_mlc_ram;
-	required_shared_ptr<uint32_t> m_irq_ram;
-	required_shared_ptr<uint32_t> m_mlc_clip_ram;
-	required_shared_ptr<uint32_t> m_mlc_vram;
-	timer_device *m_raster_irq_timer;
-	int m_mainCpuIsArm;
-	uint32_t m_mlc_raster_table_1[4*256];
-	uint32_t m_mlc_raster_table_2[4*256];
-	uint32_t m_mlc_raster_table_3[4*256];
-	uint32_t m_vbl_i;
-	int m_lastScanline[9];
-	uint32_t m_colour_mask;
-
-	std::unique_ptr<uint16_t[]> m_mlc_spriteram;
-	std::unique_ptr<uint16_t[]> m_mlc_spriteram_spare;
-	std::unique_ptr<uint16_t[]> m_mlc_buffered_spriteram;
-	DECLARE_READ32_MEMBER(mlc_440008_r);
-	DECLARE_READ32_MEMBER(mlc_44001c_r);
-	DECLARE_WRITE32_MEMBER(mlc_44001c_w);
-
-	DECLARE_WRITE32_MEMBER(avengrs_palette_w);
-	DECLARE_READ32_MEMBER(mlc_200000_r);
-	DECLARE_READ32_MEMBER(mlc_200004_r);
-	DECLARE_READ32_MEMBER(mlc_200070_r);
-	DECLARE_READ32_MEMBER(mlc_20007c_r);
-	DECLARE_READ32_MEMBER(mlc_scanline_r);
-	DECLARE_WRITE32_MEMBER(mlc_irq_w);
-	DECLARE_READ32_MEMBER(mlc_vram_r);
-	DECLARE_READ32_MEMBER(avengrgs_speedup_r);
-	DECLARE_WRITE32_MEMBER(avengrs_eprom_w);
-	DECLARE_READ32_MEMBER(mlc_spriteram_r);
-	DECLARE_WRITE32_MEMBER(mlc_spriteram_w);
-
-
-
-	DECLARE_DRIVER_INIT(mlc);
-	DECLARE_DRIVER_INIT(avengrgs);
-	DECLARE_MACHINE_RESET(mlc);
-	DECLARE_VIDEO_START(mlc);
-	uint32_t screen_update_mlc(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
-	DECLARE_WRITE_LINE_MEMBER(screen_vblank_mlc);
-	TIMER_DEVICE_CALLBACK_MEMBER(interrupt_gen);
-	void draw_sprites( const rectangle &cliprect, int scanline, uint32_t* dest);
-	void descramble_sound(  );
+		
 	required_device<cpu_device> m_maincpu;
 	required_device<eeprom_serial_93cxx_device> m_eeprom;
 	required_device<ymz280b_device> m_ymz;
 	required_device<gfxdecode_device> m_gfxdecode;
 	required_device<screen_device> m_screen;
 	required_device<palette_device> m_palette;
-	required_shared_ptr<uint32_t> m_generic_paletteram_32;
+	optional_device<deco146_device> m_deco146;
+
+	required_shared_ptr<uint32_t> m_mainram;
+	required_shared_ptr<uint32_t> m_irq_ram;
+	required_shared_ptr<uint32_t> m_clip_ram;
+	required_shared_ptr<uint32_t> m_vram;
+
 	required_region_ptr<uint8_t> m_gfx2;
+
+	timer_device *m_raster_irq_timer;
+	int m_irqLevel;
+	uint32_t m_mlc_raster_table_1[4*256];
+	uint32_t m_mlc_raster_table_2[4*256];
+	uint32_t m_mlc_raster_table_3[4*256];
+	uint32_t m_vbl_i;
+	int m_lastScanline[9];
+	uint32_t m_colour_mask;
+	uint32_t m_shadow_mask;
+
+	std::unique_ptr<uint16_t[]> m_spriteram;
+	std::unique_ptr<uint16_t[]> m_spriteram_spare;
+	std::unique_ptr<uint16_t[]> m_buffered_spriteram;
+
+	DECLARE_READ32_MEMBER(mlc_440008_r);
+	DECLARE_READ32_MEMBER(mlc_44001c_r);
+	DECLARE_WRITE32_MEMBER(mlc_44001c_w);
+
+	DECLARE_READ32_MEMBER(mlc_200000_r);
+	DECLARE_READ32_MEMBER(mlc_200004_r);
+	DECLARE_READ32_MEMBER(mlc_200070_r);
+	DECLARE_READ32_MEMBER(mlc_20007c_r);
+	DECLARE_READ32_MEMBER(mlc_scanline_r);
+	DECLARE_WRITE32_MEMBER(irq_ram_w);
+	DECLARE_READ32_MEMBER(avengrgs_speedup_r);
+	DECLARE_WRITE32_MEMBER(eeprom_w);
+	DECLARE_READ32_MEMBER(spriteram_r);
+	DECLARE_WRITE32_MEMBER(spriteram_w);
 
 	DECLARE_READ16_MEMBER( sh96_protection_region_0_146_r );
 	DECLARE_WRITE16_MEMBER( sh96_protection_region_0_146_w );
+
+	DECLARE_DRIVER_INIT(mlc);
+	DECLARE_DRIVER_INIT(avengrgs);
+	DECLARE_MACHINE_RESET(mlc);
+	DECLARE_VIDEO_START(mlc);
+	uint32_t screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
+	DECLARE_WRITE_LINE_MEMBER(screen_vblank_mlc);
+	TIMER_DEVICE_CALLBACK_MEMBER(interrupt_gen);
+	void draw_sprites( const rectangle &cliprect, int scanline, uint32_t* dest);
+	void descramble_sound(  );
+
 	void mlc(machine_config &config);
 	void mlc_6bpp(machine_config &config);
 	void avengrgs(machine_config &config);

@@ -89,11 +89,17 @@
         Stadium Hero contains a '146' protection chip on the ROM/CPU pcb, but
         it is barely used by the game (only checked at startup).  See decoprot.c
 
-    Driver todo:
+    Driver TODO:
         stadhr96 - protection? issues (or 156 co-processor? or timing?)
         avengrgs - doesn't generate enough line interrupts?
         ddream95 seems to have a dual screen mode(??)
         hoops** - crash entering test mode (regression from 0.113 era?)
+        skullfng - slowdowns not verified from real PCB, Random hangs sometimes
+
+    Graphic TODO:
+        blending, raster effect features isn't fully emulated currently
+        Not verified : Can sprites effect 8bpp and alpha blending simultaneously?
+        Not verified what palette highest bits actually doing
 
     Driver by Bryan McPhail, bmcphail@tendril.co.uk, thank you to Avedis and The Guru.
 
@@ -108,6 +114,7 @@
 #include "cpu/sh/sh2.h"
 #include "speaker.h"
 
+#include <algorithm>
 
 /***************************************************************************/
 
@@ -163,7 +170,7 @@ READ32_MEMBER(deco_mlc_state::mlc_scanline_r)
 }
 
 
-WRITE32_MEMBER(deco_mlc_state::avengrs_eprom_w)
+WRITE32_MEMBER(deco_mlc_state::eeprom_w)
 {
 	if (ACCESSING_BITS_8_15) {
 		uint8_t ebyte=(data>>8)&0xff;
@@ -182,30 +189,44 @@ WRITE32_MEMBER(deco_mlc_state::avengrs_eprom_w)
 		logerror("%s:  eprom_w %08x mask %08x\n",machine().describe_context(),data,mem_mask);
 }
 
-WRITE32_MEMBER(deco_mlc_state::avengrs_palette_w)
-{
-	COMBINE_DATA(&m_generic_paletteram_32[offset]);
-	/* x bbbbb ggggg rrrrr */
-	m_palette->set_pen_color(offset,pal5bit(m_generic_paletteram_32[offset] >> 0),pal5bit(m_generic_paletteram_32[offset] >> 5),pal5bit(m_generic_paletteram_32[offset] >> 10));
-}
-
-
 TIMER_DEVICE_CALLBACK_MEMBER(deco_mlc_state::interrupt_gen)
 {
 //  logerror("hit scanline IRQ %d (%08x)\n", m_screen->vpos(), info.i);
-	m_maincpu->set_input_line(m_mainCpuIsArm ? ARM_IRQ_LINE : 1, HOLD_LINE);
+	m_maincpu->set_input_line(m_irqLevel, HOLD_LINE);
 }
 
-WRITE32_MEMBER(deco_mlc_state::mlc_irq_w)
+WRITE32_MEMBER(deco_mlc_state::irq_ram_w)
 {
 //  int scanline=m_screen->vpos();
 	COMBINE_DATA(&m_irq_ram[offset]);
 
+	/*
+	TODO : Accurate this from real PCB
+	Word 0 : Used but Unknown
+		skullfng : 0x00000cf3
+		hoops**  : 0xffffdfff
+		avengrgs : 0x00000cd3
+		stadhr96 : 0x000028f3
+
+	Word 1 : 0xc0 at shadow, 0x00 at alpha, Other bits unknown
+		skullfng : 0x000000c0 or 0x00000000
+		hoops**  : 0xfffffffc
+		avengrgs : 0xffffffff
+		stadhr96 : 0x0000fcc0
+
+	Word 2 : Used but unknown
+		skullfng : 0x00200008
+		hoops**  : 0x00000000
+		avengrgs : 0x00000000
+		stadhr96 : 0x00200008
+
+	Word 3 : Unknown(Always 0)
+	*/
 
 	switch (offset*4)
 	{
 	case 0x10: /* IRQ ack.  Value written doesn't matter */
-		m_maincpu->set_input_line(m_mainCpuIsArm ? ARM_IRQ_LINE : 1, CLEAR_LINE);
+		m_maincpu->set_input_line(m_irqLevel, CLEAR_LINE);
 		return;
 	case 0x14: /* Prepare scanline interrupt */
 		if(m_irq_ram[0x14/4] == -1) // TODO: likely to be anything that doesn't fit into the screen v-pos range.
@@ -223,15 +244,7 @@ WRITE32_MEMBER(deco_mlc_state::mlc_irq_w)
 }
 
 
-
-READ32_MEMBER(deco_mlc_state::mlc_vram_r)
-{
-	return m_mlc_vram[offset]&0xffff;
-}
-
-
-
-READ32_MEMBER( deco_mlc_state::mlc_spriteram_r )
+READ32_MEMBER( deco_mlc_state::spriteram_r )
 {
 	uint32_t retdata = 0;
 
@@ -242,14 +255,14 @@ READ32_MEMBER( deco_mlc_state::mlc_spriteram_r )
 
 	if (ACCESSING_BITS_0_15)
 	{
-		retdata |= m_mlc_spriteram[offset];
+		retdata |= m_spriteram[offset];
 	}
 
 	return retdata;
 }
 
 
-WRITE32_MEMBER( deco_mlc_state::mlc_spriteram_w )
+WRITE32_MEMBER( deco_mlc_state::spriteram_w )
 {
 	if (ACCESSING_BITS_16_31)
 	{
@@ -258,7 +271,7 @@ WRITE32_MEMBER( deco_mlc_state::mlc_spriteram_w )
 	if (ACCESSING_BITS_0_15)
 	{
 		data &=0x0000ffff;
-		COMBINE_DATA(&m_mlc_spriteram[offset]);
+		COMBINE_DATA(&m_spriteram[offset]);
 	}
 }
 
@@ -284,45 +297,45 @@ WRITE16_MEMBER( deco_mlc_state::sh96_protection_region_0_146_w )
 
 ADDRESS_MAP_START(deco_mlc_state::avengrgs_map)
 	AM_RANGE(0x0000000, 0x00fffff) AM_ROM AM_MIRROR(0xff000000)
-	AM_RANGE(0x0100000, 0x011ffff) AM_RAM AM_SHARE("mlc_ram") AM_MIRROR(0xff000000)
+	AM_RANGE(0x0100000, 0x011ffff) AM_RAM AM_SHARE("mainram") AM_MIRROR(0xff000000)
 	AM_RANGE(0x0200000, 0x0200003) AM_READ(mlc_200000_r) AM_MIRROR(0xff000000)
 	AM_RANGE(0x0200004, 0x0200007) AM_READ(mlc_200004_r) AM_MIRROR(0xff000000)
 	AM_RANGE(0x0200070, 0x0200073) AM_READ(mlc_200070_r) AM_MIRROR(0xff000000)
 	AM_RANGE(0x0200074, 0x0200077) AM_READ(mlc_scanline_r) AM_MIRROR(0xff000000)
 	AM_RANGE(0x020007c, 0x020007f) AM_READ(mlc_20007c_r) AM_MIRROR(0xff000000)
-	AM_RANGE(0x0200000, 0x020007f) AM_WRITE(mlc_irq_w) AM_SHARE("irq_ram") AM_MIRROR(0xff000000)
-	AM_RANGE(0x0200080, 0x02000ff) AM_RAM AM_SHARE("mlc_clip_ram") AM_MIRROR(0xff000000)
-	AM_RANGE(0x0204000, 0x0206fff) AM_READWRITE( mlc_spriteram_r, mlc_spriteram_w ) AM_MIRROR(0xff000000)
-	AM_RANGE(0x0280000, 0x029ffff) AM_RAM AM_SHARE("mlc_vram") AM_MIRROR(0xff000000)
-	AM_RANGE(0x0300000, 0x0307fff) AM_RAM_WRITE(avengrs_palette_w) AM_SHARE("paletteram") AM_MIRROR(0xff000000)
+	AM_RANGE(0x0200000, 0x020007f) AM_WRITE(irq_ram_w) AM_SHARE("irq_ram") AM_MIRROR(0xff000000)
+	AM_RANGE(0x0200080, 0x02000ff) AM_RAM AM_SHARE("clip_ram") AM_MIRROR(0xff000000)
+	AM_RANGE(0x0204000, 0x0206fff) AM_READWRITE( spriteram_r, spriteram_w ) AM_MIRROR(0xff000000)
+	AM_RANGE(0x0280000, 0x029ffff) AM_RAM AM_SHARE("vram") AM_MIRROR(0xff000000)
+	AM_RANGE(0x0300000, 0x0307fff) AM_DEVREADWRITE16("palette", palette_device, read16, write16, 0x0000ffff).cswidth(32) AM_SHARE("palette") AM_MIRROR(0xff000000)
 	AM_RANGE(0x0400000, 0x0400003) AM_READ_PORT("INPUTS") AM_MIRROR(0xff000000)
 	AM_RANGE(0x0440000, 0x0440003) AM_READ_PORT("INPUTS2") AM_MIRROR(0xff000000)
 	AM_RANGE(0x0440004, 0x0440007) AM_READ_PORT("INPUTS3") AM_MIRROR(0xff000000)
 	AM_RANGE(0x0440008, 0x044000b) AM_READ(mlc_440008_r) AM_MIRROR(0xff000000)
 	AM_RANGE(0x044001c, 0x044001f) AM_READWRITE(mlc_44001c_r, mlc_44001c_w) AM_MIRROR(0xff000000)
-	AM_RANGE(0x0500000, 0x0500003) AM_WRITE(avengrs_eprom_w) AM_MIRROR(0xff000000)
+	AM_RANGE(0x0500000, 0x0500003) AM_WRITE(eeprom_w) AM_MIRROR(0xff000000)
 	AM_RANGE(0x0600000, 0x0600007) AM_DEVREADWRITE8("ymz", ymz280b_device, read, write, 0xff000000) AM_MIRROR(0xff000000)
 ADDRESS_MAP_END
 
 ADDRESS_MAP_START(deco_mlc_state::decomlc_map)
 	AM_RANGE(0x0000000, 0x00fffff) AM_ROM
-	AM_RANGE(0x0100000, 0x011ffff) AM_RAM AM_SHARE("mlc_ram")
+	AM_RANGE(0x0100000, 0x011ffff) AM_RAM AM_SHARE("mainram")
 	AM_RANGE(0x0200000, 0x0200003) AM_READ(mlc_200000_r)
 	AM_RANGE(0x0200004, 0x0200007) AM_READ(mlc_200004_r)
 	AM_RANGE(0x0200070, 0x0200073) AM_READ(mlc_200070_r)
 	AM_RANGE(0x0200074, 0x0200077) AM_READ(mlc_scanline_r)
 	AM_RANGE(0x020007c, 0x020007f) AM_READ(mlc_20007c_r)
-	AM_RANGE(0x0200000, 0x020007f) AM_WRITE(mlc_irq_w) AM_SHARE("irq_ram")
-	AM_RANGE(0x0200080, 0x02000ff) AM_RAM AM_SHARE("mlc_clip_ram")
-	AM_RANGE(0x0204000, 0x0206fff) AM_READWRITE( mlc_spriteram_r, mlc_spriteram_w )
-	AM_RANGE(0x0280000, 0x029ffff) AM_RAM AM_SHARE("mlc_vram")
-	AM_RANGE(0x0300000, 0x0307fff) AM_RAM_WRITE(avengrs_palette_w) AM_SHARE("paletteram")
+	AM_RANGE(0x0200000, 0x020007f) AM_WRITE(irq_ram_w) AM_SHARE("irq_ram")
+	AM_RANGE(0x0200080, 0x02000ff) AM_RAM AM_SHARE("clip_ram")
+	AM_RANGE(0x0204000, 0x0206fff) AM_READWRITE( spriteram_r, spriteram_w )
+	AM_RANGE(0x0280000, 0x029ffff) AM_RAM AM_SHARE("vram")
+	AM_RANGE(0x0300000, 0x0307fff) AM_DEVREADWRITE16("palette", palette_device, read16, write16, 0x0000ffff).cswidth(32) AM_SHARE("palette")
 	AM_RANGE(0x0400000, 0x0400003) AM_READ_PORT("INPUTS")
 	AM_RANGE(0x0440000, 0x0440003) AM_READ_PORT("INPUTS2")
 	AM_RANGE(0x0440004, 0x0440007) AM_READ_PORT("INPUTS3")
 	AM_RANGE(0x0440008, 0x044000b) AM_READ(mlc_440008_r)
 	AM_RANGE(0x044001c, 0x044001f) AM_READWRITE(mlc_44001c_r, mlc_44001c_w)
-	AM_RANGE(0x0500000, 0x0500003) AM_WRITE(avengrs_eprom_w)
+	AM_RANGE(0x0500000, 0x0500003) AM_WRITE(eeprom_w)
 	AM_RANGE(0x0600000, 0x0600007) AM_DEVREADWRITE8("ymz", ymz280b_device, read, write, 0xff000000)
 	AM_RANGE(0x070f000, 0x070ffff) AM_READWRITE16(sh96_protection_region_0_146_r, sh96_protection_region_0_146_w, 0xffff0000)
 ADDRESS_MAP_END
@@ -510,12 +523,14 @@ MACHINE_CONFIG_START(deco_mlc_state::avengrgs)
 	MCFG_SCREEN_REFRESH_RATE(58)
 	MCFG_SCREEN_SIZE(40*8, 32*8)
 	MCFG_SCREEN_VISIBLE_AREA(0*8, 40*8-1, 1*8, 31*8-1)
-	MCFG_SCREEN_UPDATE_DRIVER(deco_mlc_state, screen_update_mlc)
+	MCFG_SCREEN_UPDATE_DRIVER(deco_mlc_state, screen_update)
 	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE(deco_mlc_state, screen_vblank_mlc))
 	MCFG_SCREEN_VIDEO_ATTRIBUTES(VIDEO_UPDATE_SCANLINE)
 
 	MCFG_GFXDECODE_ADD("gfxdecode", "palette", deco_mlc)
 	MCFG_PALETTE_ADD("palette", 2048)
+	MCFG_PALETTE_FORMAT(xBBBBBGGGGGRRRRR)
+	MCFG_PALETTE_MEMBITS(16)
 
 	MCFG_VIDEO_START_OVERRIDE(deco_mlc_state,mlc)
 
@@ -543,12 +558,14 @@ MACHINE_CONFIG_START(deco_mlc_state::mlc)
 	MCFG_SCREEN_REFRESH_RATE(58)
 	MCFG_SCREEN_SIZE(40*8, 32*8)
 	MCFG_SCREEN_VISIBLE_AREA(0*8, 40*8-1, 1*8, 31*8-1)
-	MCFG_SCREEN_UPDATE_DRIVER(deco_mlc_state, screen_update_mlc)
+	MCFG_SCREEN_UPDATE_DRIVER(deco_mlc_state, screen_update)
 	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE(deco_mlc_state, screen_vblank_mlc))
 	MCFG_SCREEN_VIDEO_ATTRIBUTES(VIDEO_UPDATE_SCANLINE)
 
 	MCFG_GFXDECODE_ADD("gfxdecode", "palette", deco_mlc)
 	MCFG_PALETTE_ADD("palette", 2048)
+	MCFG_PALETTE_FORMAT(xBBBBBGGGGGRRRRR)
+	MCFG_PALETTE_MEMBITS(16)
 
 	MCFG_VIDEO_START_OVERRIDE(deco_mlc_state,mlc)
 
@@ -595,7 +612,7 @@ Notes:
         mode, reading as 8 bit gave a good read. Others read in 16 bit mode)
 */
 
-ROM_START( avengrgs )
+ROM_START( avengrgs ) // America/Europe Version 1.0, 1996.01.18
 	ROM_REGION( 0x100000, "maincpu", 0 )
 	ROM_LOAD32_WORD_SWAP( "sf_00-0.7k", 0x000002, 0x80000, CRC(7d20e2df) SHA1(e8be1751029aea74680ac00cd7f3cf84e1adfc56) )
 	ROM_LOAD32_WORD_SWAP( "sf_01-0.7l", 0x000000, 0x80000, CRC(f37c0a01) SHA1(8c4e28cde9e93457197b1849e6c9ef9516b5732f) )
@@ -626,7 +643,7 @@ ROM_START( avengrgs )
 	ROM_LOAD( "avengrgs.nv",  0x00, 0x80, CRC(c0e84b4e) SHA1(e7afca68cc5fa69ded32bc0a1dcc6a59fe7f081b) )
 ROM_END
 
-ROM_START( avengrgsj )
+ROM_START( avengrgsj ) // Japan Version 1.2, 1996.01.17
 	ROM_REGION( 0x100000, "maincpu", 0 )
 	ROM_LOAD32_WORD_SWAP( "sd_00-2.7k", 0x000002, 0x80000, CRC(136be46a) SHA1(7679f5f78f7983d43ecdb9bdd04e45792a13d9f2) )
 	ROM_LOAD32_WORD_SWAP( "sd_01-2.7l", 0x000000, 0x80000, CRC(9d87f576) SHA1(dd20cd060d020d81f4e012be10d0211be7526641) )
@@ -873,7 +890,7 @@ void deco_mlc_state::descramble_sound(  )
 	/* the same as simpl156 / heavy smash? */
 	uint8_t *rom = memregion("ymz")->base();
 	int length = memregion("ymz")->bytes();
-	std::vector<uint8_t> buf1(length);
+	std::vector<uint8_t> buf(length);
 
 	uint32_t x;
 
@@ -888,15 +905,15 @@ void deco_mlc_state::descramble_sound(  )
 							7, 6, 5, 4,
 							3, 2, 1 );
 
-		buf1[addr] = rom[x];
+		buf[addr] = rom[x];
 	}
 
-	memcpy(rom,&buf1[0],length);
+	std::copy(buf.begin(),buf.end(),&rom[0]);
 }
 
 READ32_MEMBER(deco_mlc_state::avengrgs_speedup_r)
 {
-	uint32_t a=m_mlc_ram[0x89a0/4];
+	uint32_t a=m_mainram[0x89a0/4];
 	uint32_t p=m_maincpu->pc();
 
 	if ((p==0x3234 || p==0x32dc) && (a&1)) m_maincpu->spin_until_interrupt();
@@ -913,12 +930,12 @@ DRIVER_INIT_MEMBER(deco_mlc_state,avengrgs)
 	dynamic_cast<sh2_device *>(m_maincpu.target())->sh2drc_add_pcflush(0x3234);
 	dynamic_cast<sh2_device *>(m_maincpu.target())->sh2drc_add_pcflush(0x32dc);
 
-	dynamic_cast<sh2_device *>(m_maincpu.target())->sh2drc_add_fastram(0x0100000, 0x01088ff, 0, &m_mlc_ram[0]);
-	dynamic_cast<sh2_device *>(m_maincpu.target())->sh2drc_add_fastram(0x0108a00, 0x011ffff, 0, &m_mlc_ram[0x8a00/4]);
-	dynamic_cast<sh2_device *>(m_maincpu.target())->sh2drc_add_fastram(0x0200080, 0x02000ff, 0, &m_mlc_clip_ram[0]);
-	dynamic_cast<sh2_device *>(m_maincpu.target())->sh2drc_add_fastram(0x0280000, 0x029ffff, 0, &m_mlc_vram[0]);
+	dynamic_cast<sh2_device *>(m_maincpu.target())->sh2drc_add_fastram(0x0100000, 0x01088ff, 0, &m_mainram[0]);
+	dynamic_cast<sh2_device *>(m_maincpu.target())->sh2drc_add_fastram(0x0108a00, 0x011ffff, 0, &m_mainram[0x8a00/4]);
+	dynamic_cast<sh2_device *>(m_maincpu.target())->sh2drc_add_fastram(0x0200080, 0x02000ff, 0, &m_clip_ram[0]);
+	dynamic_cast<sh2_device *>(m_maincpu.target())->sh2drc_add_fastram(0x0280000, 0x029ffff, 0, &m_vram[0]);
 
-	m_mainCpuIsArm = 0;
+	m_irqLevel = 1;
 	m_maincpu->space(AS_PROGRAM).install_read_handler(0x01089a0, 0x01089a3, read32_delegate(FUNC(deco_mlc_state::avengrgs_speedup_r),this));
 	descramble_sound();
 }
@@ -929,21 +946,21 @@ DRIVER_INIT_MEMBER(deco_mlc_state,mlc)
 	    effective clock rate here to compensate otherwise we have slowdowns in
 	    Skull Fang where there probably shouldn't be. */
 	m_maincpu->set_clock_scale(2.0f);
-	m_mainCpuIsArm = 1;
+	m_irqLevel = ARM_IRQ_LINE;
 	deco156_decrypt(machine());
 	descramble_sound();
 }
 
 /***************************************************************************/
 
-GAME( 1995, avengrgs, 0,        avengrgs, mlc, deco_mlc_state, avengrgs, ROT0,   "Data East Corporation", "Avengers In Galactic Storm (US)", 0 )
-GAME( 1995, avengrgsj,avengrgs, avengrgs, mlc, deco_mlc_state, avengrgs, ROT0,   "Data East Corporation", "Avengers In Galactic Storm (Japan)", 0 )
-GAME( 1996, stadhr96, 0,        mlc_6bpp, mlc, deco_mlc_state, mlc,      ROT0,   "Data East Corporation", "Stadium Hero '96 (World, EAJ)", MACHINE_IMPERFECT_GRAPHICS ) // Rom labels are EAJ  ^^
-GAME( 1996, stadhr96u,stadhr96, mlc_6bpp, mlc, deco_mlc_state, mlc,      ROT0,   "Data East Corporation", "Stadium Hero '96 (USA, EAH)", MACHINE_IMPERFECT_GRAPHICS ) // Rom labels are EAH  ^^
-GAME( 1996, stadhr96j,stadhr96, mlc_6bpp, mlc, deco_mlc_state, mlc,      ROT0,   "Data East Corporation", "Stadium Hero '96 (Japan, EAD)", MACHINE_IMPERFECT_GRAPHICS ) // Rom labels are EAD (this isn't a Konami region code!)
-GAME( 1996, skullfng, 0,        mlc_6bpp, mlc, deco_mlc_state, mlc,      ROT270, "Data East Corporation", "Skull Fang (World)", 0 ) /* Version 1.13, Europe, Master 96.02.19 */
-GAME( 1996, skullfngj,skullfng, mlc_6bpp, mlc, deco_mlc_state, mlc,      ROT270, "Data East Corporation", "Skull Fang (Japan)", 0 ) /* Version 1.09, Japan, Master 96.02.08 */
-GAME( 1996, skullfnga,skullfng, mlc_6bpp, mlc, deco_mlc_state, mlc,      ROT270, "Data East Corporation", "Skull Fang (Asia)", 0 ) /* Version 1.13, Asia, Master 96.02.19 */
-GAME( 1996, hoops96,  0,        mlc_5bpp, mlc, deco_mlc_state, mlc,      ROT0,   "Data East Corporation", "Hoops '96 (Europe/Asia 2.0)", 0 )
-GAME( 1995, ddream95, hoops96,  mlc_5bpp, mlc, deco_mlc_state, mlc,      ROT0,   "Data East Corporation", "Dunk Dream '95 (Japan 1.4, EAM)", 0 )
-GAME( 1995, hoops95,  hoops96,  mlc_5bpp, mlc, deco_mlc_state, mlc,      ROT0,   "Data East Corporation", "Hoops (Europe/Asia 1.7)", 0 )
+GAME( 1995, avengrgs, 0,        avengrgs, mlc, deco_mlc_state, avengrgs, ROT0,   "Data East Corporation", "Avengers In Galactic Storm (US/Europe 1.0)", MACHINE_IMPERFECT_GRAPHICS )
+GAME( 1995, avengrgsj,avengrgs, avengrgs, mlc, deco_mlc_state, avengrgs, ROT0,   "Data East Corporation", "Avengers In Galactic Storm (Japan 1.2)",     MACHINE_IMPERFECT_GRAPHICS )
+GAME( 1996, stadhr96, 0,        mlc_6bpp, mlc, deco_mlc_state, mlc,      ROT0,   "Data East Corporation", "Stadium Hero '96 (Europe, EAJ)",             MACHINE_IMPERFECT_GRAPHICS ) // Rom labels are EAJ  ^^
+GAME( 1996, stadhr96u,stadhr96, mlc_6bpp, mlc, deco_mlc_state, mlc,      ROT0,   "Data East Corporation", "Stadium Hero '96 (USA, EAH)",                MACHINE_IMPERFECT_GRAPHICS ) // Rom labels are EAH  ^^
+GAME( 1996, stadhr96j,stadhr96, mlc_6bpp, mlc, deco_mlc_state, mlc,      ROT0,   "Data East Corporation", "Stadium Hero '96 (Japan, EAD)",              MACHINE_IMPERFECT_GRAPHICS ) // Rom labels are EAD (this isn't a Konami region code!)
+GAME( 1996, skullfng, 0,        mlc_6bpp, mlc, deco_mlc_state, mlc,      ROT270, "Data East Corporation", "Skull Fang (Europe 1.13)",                   MACHINE_IMPERFECT_GRAPHICS | MACHINE_NOT_WORKING ) /* Version 1.13, Europe, Master 96.02.19 13:45 */
+GAME( 1996, skullfngj,skullfng, mlc_6bpp, mlc, deco_mlc_state, mlc,      ROT270, "Data East Corporation", "Skull Fang (Japan 1.09)",                    MACHINE_IMPERFECT_GRAPHICS | MACHINE_NOT_WORKING ) /* Version 1.09, Japan, Master 96.02.08 14:39 */
+GAME( 1996, skullfnga,skullfng, mlc_6bpp, mlc, deco_mlc_state, mlc,      ROT270, "Data East Corporation", "Skull Fang (Asia 1.13)",                     MACHINE_IMPERFECT_GRAPHICS | MACHINE_NOT_WORKING ) /* Version 1.13, Asia, Master 96.02.19 13:49 */
+GAME( 1996, hoops96,  0,        mlc_5bpp, mlc, deco_mlc_state, mlc,      ROT0,   "Data East Corporation", "Hoops '96 (Europe/Asia 2.0)",                MACHINE_IMPERFECT_GRAPHICS )
+GAME( 1995, ddream95, hoops96,  mlc_5bpp, mlc, deco_mlc_state, mlc,      ROT0,   "Data East Corporation", "Dunk Dream '95 (Japan 1.4, EAM)",            MACHINE_IMPERFECT_GRAPHICS )
+GAME( 1995, hoops95,  hoops96,  mlc_5bpp, mlc, deco_mlc_state, mlc,      ROT0,   "Data East Corporation", "Hoops (Europe/Asia 1.7)",                    MACHINE_IMPERFECT_GRAPHICS )
