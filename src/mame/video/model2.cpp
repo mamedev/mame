@@ -2606,10 +2606,10 @@ void model2_state::video_start()
 	m_poly = auto_alloc(machine(), model2_renderer(*this));
 
 	/* initialize the hardware rasterizer */
-	raster_init( memregion("user3") );
+	raster_init( memregion("textures") );
 
 	/* initialize the geometry engine */
-	geo_init( memregion("user2") );
+	geo_init( memregion("polygons") );
 
 	/* init various video-related pointers */
 	m_palram = make_unique_clear<uint16_t[]>(0x4000/2);
