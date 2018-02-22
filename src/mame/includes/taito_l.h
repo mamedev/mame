@@ -1,6 +1,7 @@
 // license:BSD-3-Clause
 // copyright-holders:Olivier Galibert
 #include "machine/74157.h"
+#include "machine/bankdev.h"
 #include "machine/timer.h"
 #include "machine/upd4701.h"
 #include "sound/msm5205.h"
@@ -15,10 +16,11 @@ public:
 		, m_main_cpu(*this, "maincpu")
 		, m_upd4701(*this, "upd4701")
 		, m_main_prg(*this, "maincpu")
-		, m_main_bnk(*this, "bank1")
-		, m_ram_bnks(*this, "bank%u", 2)
+		, m_main_bnk(*this, "mainbank")
+		, m_ram_bnks(*this, "rambank%u", 1)
 		, m_gfxdecode(*this, "gfxdecode")
 		, m_palette(*this, "palette")
+		, m_vram(*this, "vram")
 	{
 	}
 
@@ -28,30 +30,22 @@ public:
 	u8 *       m_shared_ram;
 
 	/* video-related */
-	tilemap_t *m_bg18_tilemap;
-	tilemap_t *m_bg19_tilemap;
-	tilemap_t *m_ch1a_tilemap;
-	u8 m_buff_spriteram[SPRITERAM_SIZE];
+	tilemap_t *m_bg_tilemap[2];
+	tilemap_t *m_tx_tilemap;
+	std::unique_ptr<u8[]> m_buff_spriteram;
 	int m_cur_ctrl;
 	int m_horshoes_gfxbank;
 	int m_bankc[4];
 	int m_flipscreen;
 
 	/* misc */
-	void (taitol_state::*m_current_notifier[4])(int);
-	u8 *m_current_base[4];
-
 	int m_cur_rombank;
 	int m_cur_rambank[4];
 	int m_irq_adr_table[3];
 	int m_irq_enable;
 	int m_last_irq_level;
 	int m_high;
-
-	/* memory buffers */
-	u8 m_rambanks[0x1000 * 12];
-	u8 m_palette_ram[0x1000];
-	u8 m_empty_ram[0x1000];
+	
 	DECLARE_WRITE8_MEMBER(irq_adr_w);
 	DECLARE_READ8_MEMBER(irq_adr_r);
 	DECLARE_WRITE8_MEMBER(irq_enable_w);
@@ -60,10 +54,6 @@ public:
 	DECLARE_READ8_MEMBER(rombankswitch_r);
 	DECLARE_WRITE8_MEMBER(rambankswitch_w);
 	DECLARE_READ8_MEMBER(rambankswitch_r);
-	DECLARE_WRITE8_MEMBER(bank0_w);
-	DECLARE_WRITE8_MEMBER(bank1_w);
-	DECLARE_WRITE8_MEMBER(bank2_w);
-	DECLARE_WRITE8_MEMBER(bank3_w);
 	DECLARE_WRITE8_MEMBER(coin_control_w);
 	DECLARE_WRITE8_MEMBER(mcu_control_w);
 	DECLARE_READ8_MEMBER(mcu_control_r);
@@ -71,9 +61,9 @@ public:
 	DECLARE_READ8_MEMBER(taitol_bankc_r);
 	DECLARE_WRITE8_MEMBER(taitol_control_w);
 	DECLARE_READ8_MEMBER(taitol_control_r);
-	TILE_GET_INFO_MEMBER(get_bg18_tile_info);
-	TILE_GET_INFO_MEMBER(get_bg19_tile_info);
-	TILE_GET_INFO_MEMBER(get_ch1a_tile_info);
+	DECLARE_WRITE8_MEMBER(vram_w);
+	template<int Offset> TILE_GET_INFO_MEMBER(get_tile_info);
+	TILE_GET_INFO_MEMBER(get_tx_tile_info);
 	DECLARE_MACHINE_START(taito_l);
 	DECLARE_VIDEO_START(taito_l);
 	DECLARE_MACHINE_RESET(taito_l);
@@ -81,35 +71,24 @@ public:
 	DECLARE_WRITE_LINE_MEMBER(screen_vblank_taitol);
 	TIMER_DEVICE_CALLBACK_MEMBER(vbl_interrupt);
 	IRQ_CALLBACK_MEMBER(irq_callback);
-	void taitol_chardef14_m(int offset);
-	void taitol_chardef15_m(int offset);
-	void taitol_chardef16_m(int offset);
-	void taitol_chardef17_m(int offset);
-	void taitol_chardef1c_m(int offset);
-	void taitol_chardef1d_m(int offset);
-	void taitol_chardef1e_m(int offset);
-	void taitol_chardef1f_m(int offset);
-	void taitol_bg18_m(int offset);
-	void taitol_bg19_m(int offset);
-	void taitol_char1a_m(int offset);
-	void taitol_obj1b_m(int offset);
 	void draw_sprites(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
-	void palette_notifier(int addr);
-	void bank_w(address_space &space, offs_t offset, u8 data, int banknum);
 	void l_system_video(machine_config &config);
 
 	void common_banks_map(address_map &map);
+	void tc0090lvc_map(address_map &map);
 protected:
 	virtual void state_register();
 	virtual void taito_machine_reset();
 
-	required_device<cpu_device>         m_main_cpu;
-	optional_device<upd4701_device>     m_upd4701;
-	required_region_ptr<u8>             m_main_prg;
-	required_memory_bank                m_main_bnk;
-	required_memory_bank_array<4>       m_ram_bnks;
-	required_device<gfxdecode_device>   m_gfxdecode;
-	required_device<palette_device>     m_palette;
+	required_device<cpu_device>                       m_main_cpu;
+	optional_device<upd4701_device>                   m_upd4701;
+	required_memory_region                            m_main_prg;
+	required_memory_bank                              m_main_bnk;
+	required_device_array<address_map_bank_device, 4> m_ram_bnks;
+	required_device<gfxdecode_device>                 m_gfxdecode;
+	required_device<palette_device>                   m_palette;
+
+	required_shared_ptr<u8>                           m_vram;
 };
 
 
@@ -120,7 +99,7 @@ public:
 		: taitol_state(mconfig, type, tag)
 		, m_audio_cpu(*this, "audiocpu")
 		, m_audio_prg(*this, "audiocpu")
-		, m_audio_bnk(*this, "bank7")
+		, m_audio_bnk(*this, "audiobank")
 	{
 	}
 
@@ -141,7 +120,7 @@ protected:
 	virtual void taito_machine_reset() override;
 
 	required_device<cpu_device> m_audio_cpu;
-	required_region_ptr<u8>     m_audio_prg;
+	required_memory_region      m_audio_prg;
 	optional_memory_bank        m_audio_bnk;
 };
 
@@ -152,10 +131,9 @@ public:
 	fhawk_state(const machine_config &mconfig, device_type type, const char *tag)
 		: taitol_2cpu_state(mconfig, type, tag)
 		, m_slave_prg(*this, "slave")
-		, m_slave_bnk(*this, "bank6")
+		, m_slave_bnk(*this, "slavebank")
 		, m_cur_rombank2(0)
 		, m_high2(0)
-		, m_cur_audio_bnk(0)
 	{
 	}
 
@@ -171,12 +149,11 @@ protected:
 	virtual void state_register() override;
 	virtual void taito_machine_reset() override;
 
-	required_region_ptr<u8>     m_slave_prg;
+	required_memory_region      m_slave_prg;
 	required_memory_bank        m_slave_bnk;
 
 	u8  m_cur_rombank2;
 	u8  m_high2;
-	u8  m_cur_audio_bnk;
 };
 
 
