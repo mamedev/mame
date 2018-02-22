@@ -18,36 +18,48 @@ TODO:
 #include "softlist.h"
 #include "speaker.h"
 
-class tvboy_state : public a2600_state
+class tvboy_state : public a2600_base_state
 {
 public:
 	tvboy_state(const machine_config &mconfig, device_type type, const char *tag)
-		: a2600_state(mconfig, type, tag)
+		: a2600_base_state(mconfig, type, tag)
 		, m_crom(*this, "crom")
-		, m_rom(*this, "mainrom") { }
-
-	DECLARE_WRITE8_MEMBER(bank_write);
+		, m_rom(*this, "mainrom")
+	{ }
 
 	void tvboyii(machine_config &config);
 
+protected:
+	virtual void machine_start() override;
+	virtual void machine_reset() override;
+
+	DECLARE_WRITE8_MEMBER(bank_write);
+
 	void rom_map(address_map &map);
 	void tvboy_mem(address_map &map);
-private:
-	required_device<address_map_bank_device> m_crom;
-	required_region_ptr<uint8_t> m_rom;
 
-	virtual void machine_reset() override;
+private:
+	required_memory_bank m_crom;
+	required_region_ptr<uint8_t> m_rom;
 };
 
-void tvboy_state::machine_reset() {
-	m_crom->set_bank(0);
-	a2600_state::machine_reset();
+void tvboy_state::machine_start()
+{
+	a2600_base_state::machine_start();
+	m_crom->configure_entries(0, m_rom.bytes() / 0x1000, &m_rom[0], 0x1000);
 }
 
-WRITE8_MEMBER(tvboy_state::bank_write) {
+void tvboy_state::machine_reset()
+{
+	m_crom->set_entry(0);
+	a2600_base_state::machine_reset();
+}
+
+WRITE8_MEMBER(tvboy_state::bank_write)
+{
 	logerror("banking (?) write %04x, %02x\n", offset, data);
-	if ((offset & 0xFF00) == 0x0800)
-		m_crom->set_bank(data);
+	if ((offset & 0xff00) == 0x0800)
+		m_crom->set_entry(data);
 }
 
 ADDRESS_MAP_START(tvboy_state::tvboy_mem) // 6507 has 13-bit address space, 0x0000 - 0x1fff
@@ -59,11 +71,7 @@ ADDRESS_MAP_START(tvboy_state::tvboy_mem) // 6507 has 13-bit address space, 0x00
 	AM_RANGE(0x0280, 0x029f) AM_MIRROR(0x0d00) AM_DEVREADWRITE("riot", riot6532_device, read, write)
 #endif
 	AM_RANGE(0x1000, 0x1fff) AM_WRITE(bank_write)
-	AM_RANGE(0x1000, 0x1fff) AM_DEVICE("crom", address_map_bank_device, amap8)
-ADDRESS_MAP_END
-
-ADDRESS_MAP_START(tvboy_state::rom_map)
-	AM_RANGE(0x00000, 0x7ffff) AM_ROM AM_REGION("mainrom", 0)
+	AM_RANGE(0x1000, 0x1fff) AM_ROMBANK("crom")
 ADDRESS_MAP_END
 
 #define MASTER_CLOCK_PAL    3546894
@@ -73,13 +81,6 @@ MACHINE_CONFIG_START(tvboy_state::tvboyii)
 	MCFG_CPU_ADD("maincpu", M6507, MASTER_CLOCK_PAL / 3)
 	MCFG_CPU_PROGRAM_MAP(tvboy_mem)
 	MCFG_M6502_DISABLE_DIRECT()
-
-	MCFG_DEVICE_ADD("crom", ADDRESS_MAP_BANK, 0)
-	MCFG_DEVICE_PROGRAM_MAP(rom_map)
-	MCFG_ADDRESS_MAP_BANK_ENDIANNESS(ENDIANNESS_LITTLE)
-	MCFG_ADDRESS_MAP_BANK_DATA_WIDTH(8)
-	MCFG_ADDRESS_MAP_BANK_ADDR_WIDTH(19)
-	MCFG_ADDRESS_MAP_BANK_STRIDE(0x1000)
 
 	/* video hardware */
 	MCFG_DEVICE_ADD("tia_video", TIA_PAL_VIDEO, 0)
