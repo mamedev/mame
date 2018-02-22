@@ -523,7 +523,6 @@ READ32_MEMBER(ms32_state::ms32_read_inputs3)
 WRITE32_MEMBER(ms32_state::ms32_sound_w)
 {
 	m_soundlatch->write(space, 0, data & 0xff);
-	m_audiocpu->set_input_line(INPUT_LINE_NMI, ASSERT_LINE);
 
 	// give the Z80 time to respond
 	m_maincpu->spin_until_time(attotime::from_usec(40));
@@ -1656,14 +1655,13 @@ TIMER_DEVICE_CALLBACK_MEMBER(ms32_state::ms32_interrupt)
 
 READ8_MEMBER(ms32_state::latch_r)
 {
-	m_audiocpu->set_input_line(INPUT_LINE_NMI, CLEAR_LINE);
 	return m_soundlatch->read(space,0)^0xff;
 }
 
 WRITE8_MEMBER(ms32_state::ms32_snd_bank_w)
 {
-	membank("bank4")->set_entry((data >> 0) & 0x0F);
-	membank("bank5")->set_entry((data >> 4) & 0x0F);
+	m_z80bank[0]->set_entry((data >> 0) & 0x0F);
+	m_z80bank[1]->set_entry((data >> 4) & 0x0F);
 }
 
 WRITE8_MEMBER(ms32_state::to_main_w)
@@ -1682,8 +1680,8 @@ ADDRESS_MAP_START(ms32_state::ms32_sound_map)
 	AM_RANGE(0x3f70, 0x3f70) AM_WRITENOP   // watchdog? banking? very noisy
 	AM_RANGE(0x3f80, 0x3f80) AM_WRITE(ms32_snd_bank_w)
 	AM_RANGE(0x4000, 0x7fff) AM_RAM
-	AM_RANGE(0x8000, 0xbfff) AM_ROMBANK("bank4")
-	AM_RANGE(0xc000, 0xffff) AM_ROMBANK("bank5")
+	AM_RANGE(0x8000, 0xbfff) AM_ROMBANK("z80bank1")
+	AM_RANGE(0xc000, 0xffff) AM_ROMBANK("z80bank2")
 ADDRESS_MAP_END
 
 
@@ -1691,8 +1689,9 @@ ADDRESS_MAP_END
 
 void ms32_state::machine_reset()
 {
-	membank("bank4")->set_entry(0);
-	membank("bank5")->set_entry(1);
+	for (int bank = 0; bank < 2; bank++)
+		m_z80bank[bank]->set_entry(bank);
+
 	irq_init();
 }
 
@@ -1707,7 +1706,7 @@ MACHINE_CONFIG_START(ms32_state::ms32)
 
 	MCFG_TIMER_DRIVER_ADD_SCANLINE("scantimer", ms32_state, ms32_interrupt, "screen", 0, 1)
 
-	MCFG_CPU_ADD("audiocpu", Z80, 4000000)
+	MCFG_CPU_ADD("audiocpu", Z80, 4000000) // Unverified; it's possibly higher than 4MHz
 	MCFG_CPU_PROGRAM_MAP(ms32_sound_map)
 
 	MCFG_QUANTUM_TIME(attotime::from_hz(60000))
@@ -1726,12 +1725,16 @@ MACHINE_CONFIG_START(ms32_state::ms32)
 
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_MONO("mono")
+	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
 
 	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
+	MCFG_GENERIC_LATCH_DATA_PENDING_CB(INPUTLINE("audiocpu", INPUT_LINE_NMI))
 
 	MCFG_SOUND_ADD("ymf", YMF271, 16934400)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
+	MCFG_SOUND_ROUTE(0, "lspeaker", 1.0)
+	MCFG_SOUND_ROUTE(1, "rspeaker", 1.0)
+//	MCFG_SOUND_ROUTE(2, "lspeaker", 1.0) Output 2/3 not used?
+//	MCFG_SOUND_ROUTE(3, "rspeaker", 1.0)
 
 MACHINE_CONFIG_END
 
@@ -2496,8 +2499,9 @@ ROM_END
 void ms32_state::configure_banks()
 {
 	save_item(NAME(m_to_main));
-	membank("bank4")->configure_entries(0, 16, memregion("audiocpu")->base() + 0x4000, 0x4000);
-	membank("bank5")->configure_entries(0, 16, memregion("audiocpu")->base() + 0x4000, 0x4000);
+	for (int bank = 0; bank < 2; bank++)
+		m_z80bank[bank]->configure_entries(0, 16, memregion("audiocpu")->base() + 0x4000, 0x4000);
+
 }
 
 DRIVER_INIT_MEMBER(ms32_state,ms32_common)
@@ -2570,22 +2574,22 @@ DRIVER_INIT_MEMBER(ms32_state,bnstars)
 
 
 
-GAME( 1994, hayaosi2,  0,        ms32, hayaosi2, ms32_state, ss92046_01, ROT0,   "Jaleco",        "Hayaoshi Quiz Grand Champion Taikai", MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND )
-GAME( 1994, hayaosi3,  0,        ms32, hayaosi3, ms32_state, ss92046_01, ROT0,   "Jaleco",        "Hayaoshi Quiz Nettou Namahousou (ver 1.5)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND )
-GAME( 1994, bbbxing,   0,        ms32, bbbxing,  ms32_state, ss92046_01, ROT0,   "Jaleco",        "Best Bout Boxing (ver 1.3)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND )
-GAME( 1994, suchie2,   0,        ms32, suchie2,  ms32_state, suchie2,    ROT0,   "Jaleco",        "Idol Janshi Suchie-Pai II (ver 1.1)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
-GAME( 1994, suchie2o,  suchie2,  ms32, suchie2,  ms32_state, suchie2,    ROT0,   "Jaleco",        "Idol Janshi Suchie-Pai II (ver 1.0)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
-GAME( 1995, desertwr,  0,        ms32, desertwr, ms32_state, ss91022_10, ROT270, "Jaleco",        "Desert War / Wangan Sensou (ver 1.0)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
-GAME( 1995, gametngk,  0,        ms32, gametngk, ms32_state, ss91022_10, ROT270, "Jaleco",        "The Game Paradise - Master of Shooting! / Game Tengoku - The Game Paradise (ver 1.0)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
-GAME( 1995, tetrisp,   0,        ms32, tetrisp,  ms32_state, ss92046_01, ROT0,   "Jaleco / BPS",  "Tetris Plus (ver 1.0)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
-GAME( 1995, p47aces,   0,        ms32, p47aces,  ms32_state, ss92048_01, ROT0,   "Jaleco",         "P-47 Aces", MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
-GAME( 1995, akiss,     0,        ms32, suchie2,  ms32_state, kirarast,   ROT0,   "Jaleco",         "Mahjong Angel Kiss (ver 1.0)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
-GAME( 1996, gratia,    0,        ms32, gratia,   ms32_state, ss92047_01, ROT0,   "Jaleco",         "Gratia - Second Earth (ver 1.0, 92047-01 version)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
-GAME( 1996, gratiaa,   gratia,   ms32, gratia,   ms32_state, ss91022_10, ROT0,   "Jaleco",         "Gratia - Second Earth (ver 1.0, 91022-10 version)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
-GAME( 1996, kirarast,  0,        ms32, kirarast, ms32_state, kirarast,   ROT0,   "Jaleco",         "Ryuusei Janshi Kirara Star", MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
-GAME( 1997, tp2m32,    tetrisp2, ms32, tp2m32,   ms32_state, ss91022_10, ROT0,   "Jaleco",         "Tetris Plus 2 (ver 1.0, MegaSystem 32 Version)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
-GAME( 1997, bnstars,   bnstars1, ms32, suchie2,  ms32_state, bnstars,    ROT0,   "Jaleco",         "Vs. Janshi Brandnew Stars (Ver 1.1, MegaSystem32 Version)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
-GAME( 1996, wpksocv2,  0,        ms32, wpksocv2, ms32_state, ss92046_01, ROT0,   "Jaleco",         "World PK Soccer V2 (ver 1.1)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
+GAME( 1994, hayaosi2,  0,        ms32, hayaosi2, ms32_state, ss92046_01, ROT0,   "Jaleco",        "Hayaoshi Quiz Grand Champion Taikai", MACHINE_IMPERFECT_GRAPHICS )
+GAME( 1994, hayaosi3,  0,        ms32, hayaosi3, ms32_state, ss92046_01, ROT0,   "Jaleco",        "Hayaoshi Quiz Nettou Namahousou (ver 1.5)", MACHINE_IMPERFECT_GRAPHICS )
+GAME( 1994, bbbxing,   0,        ms32, bbbxing,  ms32_state, ss92046_01, ROT0,   "Jaleco",        "Best Bout Boxing (ver 1.3)", MACHINE_IMPERFECT_GRAPHICS )
+GAME( 1994, suchie2,   0,        ms32, suchie2,  ms32_state, suchie2,    ROT0,   "Jaleco",        "Idol Janshi Suchie-Pai II (ver 1.1)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE )
+GAME( 1994, suchie2o,  suchie2,  ms32, suchie2,  ms32_state, suchie2,    ROT0,   "Jaleco",        "Idol Janshi Suchie-Pai II (ver 1.0)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE )
+GAME( 1995, desertwr,  0,        ms32, desertwr, ms32_state, ss91022_10, ROT270, "Jaleco",        "Desert War / Wangan Sensou (ver 1.0)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE )
+GAME( 1995, gametngk,  0,        ms32, gametngk, ms32_state, ss91022_10, ROT270, "Jaleco",        "The Game Paradise - Master of Shooting! / Game Tengoku - The Game Paradise (ver 1.0)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE )
+GAME( 1995, tetrisp,   0,        ms32, tetrisp,  ms32_state, ss92046_01, ROT0,   "Jaleco / BPS",  "Tetris Plus (ver 1.0)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE )
+GAME( 1995, p47aces,   0,        ms32, p47aces,  ms32_state, ss92048_01, ROT0,   "Jaleco",         "P-47 Aces", MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE )
+GAME( 1995, akiss,     0,        ms32, suchie2,  ms32_state, kirarast,   ROT0,   "Jaleco",         "Mahjong Angel Kiss (ver 1.0)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE )
+GAME( 1996, gratia,    0,        ms32, gratia,   ms32_state, ss92047_01, ROT0,   "Jaleco",         "Gratia - Second Earth (ver 1.0, 92047-01 version)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE )
+GAME( 1996, gratiaa,   gratia,   ms32, gratia,   ms32_state, ss91022_10, ROT0,   "Jaleco",         "Gratia - Second Earth (ver 1.0, 91022-10 version)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE )
+GAME( 1996, kirarast,  0,        ms32, kirarast, ms32_state, kirarast,   ROT0,   "Jaleco",         "Ryuusei Janshi Kirara Star", MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE )
+GAME( 1997, tp2m32,    tetrisp2, ms32, tp2m32,   ms32_state, ss91022_10, ROT0,   "Jaleco",         "Tetris Plus 2 (ver 1.0, MegaSystem 32 Version)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE )
+GAME( 1997, bnstars,   bnstars1, ms32, suchie2,  ms32_state, bnstars,    ROT0,   "Jaleco",         "Vs. Janshi Brandnew Stars (Ver 1.1, MegaSystem32 Version)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE )
+GAME( 1996, wpksocv2,  0,        ms32, wpksocv2, ms32_state, ss92046_01, ROT0,   "Jaleco",         "World PK Soccer V2 (ver 1.1)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE )
 
 /* these boot and show something */
 GAME( 1994, f1superb, 0,        f1superb, f1superb, ms32_state, f1superb, ROT0,   "Jaleco",        "F1 Super Battle", MACHINE_NOT_WORKING | MACHINE_NO_SOUND | MACHINE_SUPPORTS_SAVE )

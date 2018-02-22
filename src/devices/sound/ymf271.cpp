@@ -13,7 +13,6 @@
     - Src B and Src NOTE bits
     - statusreg Busy flag
     - timer register 0x11
-    - ch2/ch3 (4 speakers)
     - PFM (FM using external PCM waveform)
     - detune (should be same as on other Yamaha chips)
     - Acc On bit (some sound effects in viprp1?). The documentation says
@@ -24,6 +23,8 @@
 
 #include "emu.h"
 #include "ymf271.h"
+
+#include <algorithm>
 
 #define STD_CLOCK       (16934400)
 
@@ -452,7 +453,7 @@ void ymf271_device::update_pcm(int slotnum, int32_t *mixp, int length)
 	int i;
 	int64_t final_volume;
 	int16_t sample;
-	int64_t ch0_vol, ch1_vol; //, ch2_vol, ch3_vol;
+	int64_t ch0_vol, ch1_vol, ch2_vol, ch3_vol;
 
 	YMF271Slot *slot = &m_slots[slotnum];
 
@@ -490,15 +491,15 @@ void ymf271_device::update_pcm(int slotnum, int32_t *mixp, int length)
 		if (slot->bits == 8)
 		{
 			// 8bit
-			sample = ymf271_read_memory(slot->startaddr + (slot->stepptr>>16))<<8;
+			sample = read_byte(slot->startaddr + (slot->stepptr>>16))<<8;
 		}
 		else
 		{
 			// 12bit
 			if (slot->stepptr & 0x10000)
-				sample = ymf271_read_memory(slot->startaddr + (slot->stepptr>>17)*3 + 2)<<8 | ((ymf271_read_memory(slot->startaddr + (slot->stepptr>>17)*3 + 1) << 4) & 0xf0);
+				sample = read_byte(slot->startaddr + (slot->stepptr>>17)*3 + 2)<<8 | ((read_byte(slot->startaddr + (slot->stepptr>>17)*3 + 1) << 4) & 0xf0);
 			else
-				sample = ymf271_read_memory(slot->startaddr + (slot->stepptr>>17)*3)<<8 | (ymf271_read_memory(slot->startaddr + (slot->stepptr>>17)*3 + 1) & 0xf0);
+				sample = read_byte(slot->startaddr + (slot->stepptr>>17)*3)<<8 | (read_byte(slot->startaddr + (slot->stepptr>>17)*3 + 1) & 0xf0);
 		}
 
 		update_envelope(slot);
@@ -508,14 +509,18 @@ void ymf271_device::update_pcm(int slotnum, int32_t *mixp, int length)
 
 		ch0_vol = (final_volume * m_lut_attenuation[slot->ch0_level]) >> 16;
 		ch1_vol = (final_volume * m_lut_attenuation[slot->ch1_level]) >> 16;
-//      ch2_vol = (final_volume * m_lut_attenuation[slot->ch2_level]) >> 16;
-//      ch3_vol = (final_volume * m_lut_attenuation[slot->ch3_level]) >> 16;
+		ch2_vol = (final_volume * m_lut_attenuation[slot->ch2_level]) >> 16;
+		ch3_vol = (final_volume * m_lut_attenuation[slot->ch3_level]) >> 16;
 
 		if (ch0_vol > 65536) ch0_vol = 65536;
 		if (ch1_vol > 65536) ch1_vol = 65536;
-
+		if (ch2_vol > 65536) ch2_vol = 65536;
+		if (ch3_vol > 65536) ch3_vol = 65536;
+		
 		*mixp++ += (sample * ch0_vol) >> 16;
 		*mixp++ += (sample * ch1_vol) >> 16;
+		*mixp++ += (sample * ch2_vol) >> 16;
+		*mixp++ += (sample * ch3_vol) >> 16;
 
 		// go to next step
 		slot->stepptr += slot->step;
@@ -567,12 +572,12 @@ void ymf271_device::sound_stream_update(sound_stream &stream, stream_sample_t **
 	int op;
 	int32_t *mixp;
 
-	memset(m_mix_buffer.get(), 0, sizeof(m_mix_buffer[0])*samples*2);
+	std::fill(m_mix_buffer.begin(), m_mix_buffer.end(), 0);
 
 	for (j = 0; j < 12; j++)
 	{
 		YMF271Group *slot_group = &m_groups[j];
-		mixp = m_mix_buffer.get();
+		mixp = &m_mix_buffer[0];
 
 		if (slot_group->pfm && slot_group->sync != 3)
 		{
@@ -590,7 +595,7 @@ void ymf271_device::sound_stream_update(sound_stream &stream, stream_sample_t **
 				int slot2 = j + (1*12);
 				int slot3 = j + (2*12);
 				int slot4 = j + (3*12);
-				mixp = m_mix_buffer.get();
+				mixp = &m_mix_buffer[0];
 
 				if (m_slots[slot1].active)
 				{
@@ -804,6 +809,14 @@ void ymf271_device::sound_stream_update(sound_stream &stream, stream_sample_t **
 									(output2 * m_lut_attenuation[m_slots[slot2].ch1_level]) +
 									(output3 * m_lut_attenuation[m_slots[slot3].ch1_level]) +
 									(output4 * m_lut_attenuation[m_slots[slot4].ch1_level])) >> 16;
+						*mixp++ += ((output1 * m_lut_attenuation[m_slots[slot1].ch2_level]) +
+									(output2 * m_lut_attenuation[m_slots[slot2].ch2_level]) +
+									(output3 * m_lut_attenuation[m_slots[slot3].ch2_level]) +
+									(output4 * m_lut_attenuation[m_slots[slot4].ch2_level])) >> 16;
+						*mixp++ += ((output1 * m_lut_attenuation[m_slots[slot1].ch3_level]) +
+									(output2 * m_lut_attenuation[m_slots[slot2].ch3_level]) +
+									(output3 * m_lut_attenuation[m_slots[slot3].ch3_level]) +
+									(output4 * m_lut_attenuation[m_slots[slot4].ch3_level])) >> 16;
 					}
 				}
 				break;
@@ -817,7 +830,7 @@ void ymf271_device::sound_stream_update(sound_stream &stream, stream_sample_t **
 					int slot1 = j + ((op + 0) * 12);
 					int slot3 = j + ((op + 2) * 12);
 
-					mixp = m_mix_buffer.get();
+					mixp = &m_mix_buffer[0];
 					if (m_slots[slot1].active)
 					{
 						for (i = 0; i < samples; i++)
@@ -867,6 +880,10 @@ void ymf271_device::sound_stream_update(sound_stream &stream, stream_sample_t **
 										(output3 * m_lut_attenuation[m_slots[slot3].ch0_level])) >> 16;
 							*mixp++ += ((output1 * m_lut_attenuation[m_slots[slot1].ch1_level]) +
 										(output3 * m_lut_attenuation[m_slots[slot3].ch1_level])) >> 16;
+							*mixp++ += ((output1 * m_lut_attenuation[m_slots[slot1].ch2_level]) +
+										(output3 * m_lut_attenuation[m_slots[slot3].ch2_level])) >> 16;
+							*mixp++ += ((output1 * m_lut_attenuation[m_slots[slot1].ch3_level]) +
+										(output3 * m_lut_attenuation[m_slots[slot3].ch3_level])) >> 16;
 						}
 					}
 				}
@@ -879,7 +896,7 @@ void ymf271_device::sound_stream_update(sound_stream &stream, stream_sample_t **
 				int slot1 = j + (0*12);
 				int slot2 = j + (1*12);
 				int slot3 = j + (2*12);
-				mixp = m_mix_buffer.get();
+				mixp = &m_mix_buffer[0];
 
 				if (m_slots[slot1].active)
 				{
@@ -979,10 +996,16 @@ void ymf271_device::sound_stream_update(sound_stream &stream, stream_sample_t **
 						*mixp++ += ((output1 * m_lut_attenuation[m_slots[slot1].ch1_level]) +
 									(output2 * m_lut_attenuation[m_slots[slot2].ch1_level]) +
 									(output3 * m_lut_attenuation[m_slots[slot3].ch1_level])) >> 16;
+						*mixp++ += ((output1 * m_lut_attenuation[m_slots[slot1].ch2_level]) +
+									(output2 * m_lut_attenuation[m_slots[slot2].ch2_level]) +
+									(output3 * m_lut_attenuation[m_slots[slot3].ch2_level])) >> 16;
+						*mixp++ += ((output1 * m_lut_attenuation[m_slots[slot1].ch3_level]) +
+									(output2 * m_lut_attenuation[m_slots[slot2].ch3_level]) +
+									(output3 * m_lut_attenuation[m_slots[slot3].ch3_level])) >> 16;
 					}
 				}
 
-				mixp = m_mix_buffer.get();
+				mixp = &m_mix_buffer[0];
 				update_pcm(j + (3*12), mixp, samples);
 				break;
 			}
@@ -999,11 +1022,13 @@ void ymf271_device::sound_stream_update(sound_stream &stream, stream_sample_t **
 		}
 	}
 
-	mixp = m_mix_buffer.get();
+	mixp = &m_mix_buffer[0];
 	for (i = 0; i < samples; i++)
 	{
 		outputs[0][i] = (*mixp++)>>2;
 		outputs[1][i] = (*mixp++)>>2;
+		outputs[2][i] = (*mixp++)>>2;
+		outputs[3][i] = (*mixp++)>>2;
 	}
 }
 
@@ -1036,6 +1061,7 @@ void ymf271_device::write_register(int slotnum, int reg, uint8_t data)
 			{
 				if (slot->active)
 				{
+					//calculate_status_end(slotnum,true); status changes if keyoff? verify this from real hardware.
 					slot->env_state = ENV_RELEASE;
 				}
 			}
@@ -1325,24 +1351,6 @@ void ymf271_device::device_timer(emu_timer &timer, device_timer_id id, int param
 	}
 }
 
-uint8_t ymf271_device::ymf271_read_memory(uint32_t offset)
-{
-	if (m_ext_read_handler.isnull())
-	{
-		if (offset < m_mem_size)
-			return m_mem_base[offset];
-
-		/* 8MB chip limit (shouldn't happen) */
-		else if (offset > 0x7fffff)
-			return ymf271_read_memory(offset & 0x7fffff);
-
-		else
-			return 0;
-	}
-	else
-		return m_ext_read_handler(offset);
-}
-
 void ymf271_device::ymf271_write_timer(uint8_t address, uint8_t data)
 {
 	if ((address & 0xf0) == 0)
@@ -1433,8 +1441,8 @@ void ymf271_device::ymf271_write_timer(uint8_t address, uint8_t data)
 
 			case 0x17:
 				m_ext_address = (m_ext_address + 1) & 0x7fffff;
-				if (!m_ext_rw && !m_ext_write_handler.isnull())
-					m_ext_write_handler(m_ext_address, data);
+				if (!m_ext_rw)
+					space(0).write_byte(m_ext_address, data);
 				break;
 
 			case 0x20:
@@ -1513,7 +1521,7 @@ READ8_MEMBER( ymf271_device::read )
 
 			uint8_t ret = m_ext_readlatch;
 			m_ext_address = (m_ext_address + 1) & 0x7fffff;
-			m_ext_readlatch = ymf271_read_memory(m_ext_address);
+			m_ext_readlatch = read_byte(m_ext_address);
 			return ret;
 		}
 
@@ -1721,6 +1729,7 @@ void ymf271_device::init_state()
 	save_item(NAME(m_ext_address));
 	save_item(NAME(m_ext_rw));
 	save_item(NAME(m_ext_readlatch));
+	save_item(NAME(m_master_clock));
 }
 
 //-------------------------------------------------
@@ -1732,18 +1741,14 @@ void ymf271_device::device_start()
 	m_timA = timer_alloc(0);
 	m_timB = timer_alloc(1);
 
-	m_mem_size = m_mem_base.bytes();
-
 	m_irq_handler.resolve();
 
-	m_ext_read_handler.resolve();
-	m_ext_write_handler.resolve();
-
+	m_master_clock = clock();
 	init_tables();
 	init_state();
-
-	m_stream = machine().sound().stream_alloc(*this, 0, 2, clock()/384);
-	m_mix_buffer = std::make_unique<int32_t[]>(44100*2);
+	
+	m_mix_buffer.resize(m_master_clock/(384/4));
+	m_stream = machine().sound().stream_alloc(*this, 0, 4, m_master_clock/384);
 }
 
 //-------------------------------------------------
@@ -1777,8 +1782,22 @@ void ymf271_device::device_reset()
 
 void ymf271_device::device_clock_changed()
 {
-	m_stream->set_sample_rate(clock() / 384);
+	uint32_t old_clock = m_master_clock;
+	m_master_clock = clock();
+
+	if (m_master_clock != old_clock)
+	{
+		if (old_clock < m_master_clock)
+			m_mix_buffer.resize(m_master_clock/(384/4));
+
+		m_stream->set_sample_rate(m_master_clock / 384);
+	}
 	calculate_clock_correction();
+}
+
+void ymf271_device::rom_bank_updated()
+{
+	m_stream->update();
 }
 
 DEFINE_DEVICE_TYPE(YMF271, ymf271_device, "ymf271", "Yamaha YMF271 OPX")
@@ -1786,6 +1805,7 @@ DEFINE_DEVICE_TYPE(YMF271, ymf271_device, "ymf271", "Yamaha YMF271 OPX")
 ymf271_device::ymf271_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
 	: device_t(mconfig, YMF271, tag, owner, clock)
 	, device_sound_interface(mconfig, *this)
+	, device_rom_interface(mconfig, *this, 23)
 	, m_timerA(0)
 	, m_timerB(0)
 	, m_irqstate(0)
@@ -1794,15 +1814,11 @@ ymf271_device::ymf271_device(const machine_config &mconfig, const char *tag, dev
 	, m_ext_address(0)
 	, m_ext_rw(0)
 	, m_ext_readlatch(0)
-	, m_mem_base(*this, DEVICE_SELF)
-	, m_mem_size(0)
+	, m_master_clock(0)
 	, m_timA(nullptr)
 	, m_timB(nullptr)
 	, m_stream(nullptr)
-	, m_mix_buffer(nullptr)
 	, m_irq_handler(*this)
-	, m_ext_read_handler(*this)
-	, m_ext_write_handler(*this)
 {
 	memset(m_slots, 0, sizeof(m_slots));
 	memset(m_groups, 0, sizeof(m_groups));
