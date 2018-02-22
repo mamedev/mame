@@ -2678,6 +2678,18 @@ Known PC Booter Games Not Dumped, Or Dumped and Lost when Demonlord's Site went 
 		</part>
 	</software>
 
+	<software name="aspstud">
+		<description>ASP: A Statistical Package for Business, Economics, and the Social Sciences (Student Version)</description>
+		<year>1992</year>
+		<publisher>Dellen/MacMillan Publishing</publisher>
+		<info name="developer" value="DMC Software" />
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size = "737280">
+				<rom name="Macmillan-College-Software-ASP-Student-Copy.img" size="737280" crc="b9a9b269" sha1="2386046c3849b4bc6b839df4247002cb84fc63d2" offset="0"/>
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="croschex">
 		<description>Award Software's Cross-chex</description>
 		<year>198?</year>
@@ -2918,6 +2930,24 @@ Known PC Booter Games Not Dumped, Or Dumped and Lost when Demonlord's Site went 
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size = "368640">
 				<rom name="[PC] Label Magic [5.25].img" size="368640" crc="e1475b1d" sha1="abd775ca1022d17bfb00bc6ea6a847b7340e7ce7" offset="0"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="amstelb2">
+		<description>Lotus Amstel Beta Build 2</description>
+		<year>1989</year>
+		<publisher>Lotus Development</publisher>
+		<part name="flop1" interface="floppy_3_5">
+			<feature name="part_id" value="System and Runtime Disk"/>
+			<dataarea name="flop" size = "737280">
+				<rom name="Lotus-Amstel-1.img" size="737280" crc="4cc7ba66" sha1="1a02c6a850082f4c1ecd688cefc13a5e5121fa44" offset="0"/>
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_3_5">
+			<feature name="part_id" value="Printgraph, Translate &amp; Help Disk"/>
+			<dataarea name="flop" size = "737280">
+				<rom name="Lotus-Amstel-2.img" size="737280" crc="6ba54dce" sha1="8d5be21d71f30372271e336c7526b7febde6a74e" offset="0"/>
 			</dataarea>
 		</part>
 	</software>
@@ -6430,6 +6460,30 @@ has been replaced with an all-zero block. -->
 		<part name="flop1" interface="floppy_3_5">
 			<dataarea name="flop" size = "737280">
 				<rom name="[PC] The Adventures of Captain Comic [3.5DD] [Disk 1 of 1].img" size="737280" crc="d6e6c920" sha1="57b2273a52f3b519768027fcf603ca6fce981e4a" offset="0"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="airbrang">
+		<description>Airborne Ranger</description>
+		<year>1988</year>
+		<publisher>Microprose</publisher>
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size = "737280">
+				<rom name="Airborne Ranger (USA) (3.5'').img" size="737280" crc="d8495223" sha1="af09811b6d3d66fc913c24285331dea78f819785" offset="0"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="alf">
+		<description>Alf - The First Adventure</description>
+		<year>1988</year>
+		<publisher>Box Office</publisher>
+		<info name="developer" value="Alien Productions" />
+		<info name="version" value="3.2" />
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size = "368640">
+				<rom name="Alf - The First Adventure (USA).img" size="368640" crc="c4697935" sha1="418e7c654cfdfdf843cecf70580e0bba0375077d" offset="0"/>
 			</dataarea>
 		</part>
 	</software>

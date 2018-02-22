@@ -6948,6 +6948,47 @@
 		</part>
 	</software>
 
+	<software name="beamish">
+		<description>The Adventures of Willy Beamish</description>
+		<year>1991</year>
+		<publisher>Dynamix</publisher>
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size = "1228800">
+				<rom name="Adventures of Willy Beamish, The (USA) (Disk 1).img" size="1228800" crc="14de4d9f" sha1="da84ae0ff1149fc4318a132512f49be45f647c97" offset="0"/>
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_5_25">
+			<dataarea name="flop" size = "1228800">
+				<rom name="Adventures of Willy Beamish, The (USA) (Disk 2).img" size="1228800" crc="b2ab99e6" sha1="2a6d08d8d2fcf390c61d3a2c6ab9021ea2938ee5" offset="0"/>
+			</dataarea>
+		</part>
+		<part name="flop3" interface="floppy_5_25">
+			<dataarea name="flop" size = "1228800">
+				<rom name="Adventures of Willy Beamish, The (USA) (Disk 3).img" size="1228800" crc="593d9fed" sha1="539520a6eea8a42dff9fa9b1aac7c83c549295be" offset="0"/>
+			</dataarea>
+		</part>
+		<part name="flop4" interface="floppy_5_25">
+			<dataarea name="flop" size = "1228800">
+				<rom name="Adventures of Willy Beamish, The (USA) (Disk 4).img" size="1228800" crc="43c0a0ed" sha1="9e4ada18abfd7f131ce3117877c354d168cc69cc" offset="0"/>
+			</dataarea>
+		</part>
+		<part name="flop5" interface="floppy_5_25">
+			<dataarea name="flop" size = "1228800">
+				<rom name="Adventures of Willy Beamish, The (USA) (Disk 5).img" size="1228800" crc="c642e2bb" sha1="51f5bf901e8998846f8984c1dfb6abf4ad95b1ca" offset="0"/>
+			</dataarea>
+		</part>
+		<part name="flop6" interface="floppy_5_25">
+			<dataarea name="flop" size = "1228800">
+				<rom name="Adventures of Willy Beamish, The (USA) (Disk 6).img" size="1228800" crc="520c5f48" sha1="24a64422d0a496ec1849ccfe19b34e6274c0283d" offset="0"/>
+			</dataarea>
+		</part>
+		<part name="flop7" interface="floppy_5_25">
+			<dataarea name="flop" size = "1228800">
+				<rom name="Adventures of Willy Beamish, The (USA) (Disk 7).img" size="1228800" crc="e7f4633a" sha1="0dfc6e80f9046a0754aa4b6c2a854e14614d0b48" offset="0"/>
+			</dataarea>
+		</part>
+	</software>
+
 	<!-- installer hangs -->
 	<software name="a4netwrk" supported="no">
 		<description>AIV Networks (German)</description>
