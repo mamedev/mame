@@ -15,8 +15,15 @@ Notes:
  Banbam has a Fujitsu MB8841 4-Bit MCU for protection labeled SUN 8212.
  Its internal ROM has been imaged, manually typed, and decoded as sun-8212.ic3.
  Pettan Pyuu is a clone of Banbam although with different levels / play fields.
+ 
+ Protection currently fails on both Pettan Pyuu and Banbam if you play either
+ game to Round 11. When you get there, the music still plays but all you see is
+ "ERR-43" in red text at the bottom left of the screen and the game is no longer
+ playable.  Also, in some earlier rounds you notice the background graphics are
+ also not producing logical playfields as bits of graphics are in different
+ locations.
 
-*****************************************************************************/
+******************************************************************************/
 
 #include "emu.h"
 #include "includes/strnskil.h"
