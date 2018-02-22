@@ -45,30 +45,24 @@ public:
 		m_subcpu(*this,"sub"),
 		m_seta001(*this, "spritegen"),
 		m_x1(*this, "x1snd"),
-		m_soundlatch(*this, "soundlatch"),
-		m_soundlatch2(*this, "soundlatch2"),
+		m_soundlatch(*this, "soundlatch%u", 1),
 		m_upd4701(*this, "upd4701"),
 		m_buttonmux(*this, "buttonmux"),
 		m_adc(*this, "adc"),
 		m_dsw(*this, "DSW"),
-		m_rot(*this, {"ROT1", "ROT2"}),
+		m_rot(*this, "ROT%u", 1),
 		m_gun_inputs(*this, {"GUNX1", "GUNY1", "GUNX2", "GUNY2"}),
 		m_p1(*this, "P1"),
 		m_p2(*this, "P2"),
 		m_coins(*this, "COINS"),
 		m_extra_port(*this, "EXTRA"),
-		m_track1_x(*this, "TRACK1_X"),
-		m_track1_y(*this, "TRACK1_Y"),
-		m_track2_x(*this, "TRACK2_X"),
-		m_track2_y(*this, "TRACK2_Y"),
+		m_track_x(*this, "TRACK%u_X", 1),
+		m_track_y(*this, "TRACK%u_Y", 1),
 		m_sharedram(*this,"sharedram"),
 		m_vregs(*this,"vregs"),
-		m_vram_0(*this,"vram_0"),
-		m_vctrl_0(*this,"vctrl_0"),
-		m_vram_2(*this,"vram_2"),
-		m_vctrl_2(*this,"vctrl_2"),
-		m_paletteram(*this,"paletteram"),
-		m_paletteram2(*this,"paletteram2"),
+		m_vram(*this,"vram_%u", 0),
+		m_vctrl(*this,"vctrl_%u", 0),
+		m_paletteram(*this,"paletteram%u", 1),
 		m_subbank(*this,"subbank"),
 		m_gfxdecode(*this, "gfxdecode"),
 		m_palette(*this, "palette") { }
@@ -78,8 +72,7 @@ public:
 	optional_device<cpu_device> m_subcpu;
 	required_device<seta001_device> m_seta001;
 	optional_device<x1_010_device> m_x1;
-	optional_device<generic_latch_8_device> m_soundlatch;
-	optional_device<generic_latch_8_device> m_soundlatch2;
+	optional_device_array<generic_latch_8_device, 2> m_soundlatch;
 	optional_device<upd4701_device> m_upd4701;
 	optional_device<hc157_device> m_buttonmux;
 	optional_device<adc083x_device> m_adc;
@@ -91,19 +84,14 @@ public:
 	optional_ioport m_p2;
 	optional_ioport m_coins;
 	optional_ioport m_extra_port;
-	optional_ioport m_track1_x;
-	optional_ioport m_track1_y;
-	optional_ioport m_track2_x;
-	optional_ioport m_track2_y;
+	optional_ioport_array<2> m_track_x;
+	optional_ioport_array<2> m_track_y;
 
 	optional_shared_ptr<uint8_t> m_sharedram;
 	optional_shared_ptr<uint16_t> m_vregs;
-	optional_shared_ptr<uint16_t> m_vram_0;
-	optional_shared_ptr<uint16_t> m_vctrl_0;
-	optional_shared_ptr<uint16_t> m_vram_2;
-	optional_shared_ptr<uint16_t> m_vctrl_2;
-	optional_shared_ptr<uint16_t> m_paletteram;
-	optional_shared_ptr<uint16_t> m_paletteram2;
+	optional_shared_ptr_array<uint16_t, 2> m_vram;
+	optional_shared_ptr_array<uint16_t, 2> m_vctrl;
+	optional_shared_ptr_array<uint16_t, 2> m_paletteram;
 
 	optional_memory_bank m_subbank;
 
@@ -111,10 +99,7 @@ public:
 	required_device<palette_device> m_palette;
 
 	int m_tiles_offset;
-	tilemap_t *m_tilemap_0;
-	tilemap_t *m_tilemap_1; // Layer 0
-	tilemap_t *m_tilemap_2;
-	tilemap_t *m_tilemap_3; // Layer 1
+	tilemap_t *m_tilemap[2][2]; // Max 2 Layers, 2 Tilemap banks for each layers
 	int m_tilemaps_flip;
 	int m_samples_bank;
 	int m_color_mode_shift;
@@ -137,16 +122,15 @@ public:
 
 	uint16_t m_magspeed_lights[3];
 
-	uint16_t m_pairslove_protram[0x200];
-	uint16_t m_pairslove_protram_old[0x200];
-	uint16_t m_downtown_protection[0x200/2];
+	std::unique_ptr<uint16_t[]> m_pairslove_protram;
+	std::unique_ptr<uint16_t[]> m_pairslove_protram_old;
+	std::unique_ptr<uint16_t[]> m_downtown_protection;
 
 	uint16_t m_kiwame_row_select;
 
 	DECLARE_READ16_MEMBER(metafox_protection_r);
 	DECLARE_WRITE16_MEMBER(seta_vregs_w);
-	DECLARE_WRITE16_MEMBER(seta_vram_0_w);
-	DECLARE_WRITE16_MEMBER(seta_vram_2_w);
+	template<int Layer> DECLARE_WRITE16_MEMBER(vram_w);
 	DECLARE_WRITE16_MEMBER(twineagl_tilebank_w);
 	DECLARE_WRITE16_MEMBER(timer_regs_w);
 	DECLARE_READ16_MEMBER(sharedram_68000_r);
@@ -200,12 +184,9 @@ public:
 	DECLARE_DRIVER_INIT(blandia);
 	DECLARE_DRIVER_INIT(kiwame);
 	DECLARE_DRIVER_INIT(eightfrc);
-	TILE_GET_INFO_MEMBER(twineagl_get_tile_info_0);
-	TILE_GET_INFO_MEMBER(twineagl_get_tile_info_1);
-	TILE_GET_INFO_MEMBER(get_tile_info_0);
-	TILE_GET_INFO_MEMBER(get_tile_info_1);
-	TILE_GET_INFO_MEMBER(get_tile_info_2);
-	TILE_GET_INFO_MEMBER(get_tile_info_3);
+	DECLARE_DRIVER_INIT(pairlove);
+	template<int Offset> TILE_GET_INFO_MEMBER(twineagl_get_tile_info);
+	template<int Layer, int Offset> TILE_GET_INFO_MEMBER(get_tile_info);
 	DECLARE_VIDEO_START(seta_no_layers);
 	DECLARE_VIDEO_START(kyustrkr_no_layers);
 	DECLARE_VIDEO_START(twineagl_1_layer);
@@ -244,8 +225,6 @@ public:
 	TIMER_DEVICE_CALLBACK_MEMBER(calibr50_interrupt);
 	TIMER_DEVICE_CALLBACK_MEMBER(crazyfgt_interrupt);
 	void seta_coin_lockout_w(int data);
-	inline void twineagl_tile_info( tile_data &tileinfo, int tile_index, int offset );
-	inline void get_tile_info( tile_data &tileinfo, int tile_index, int layer, int offset );
 	void set_pens();
 	void usclssic_set_pens();
 	void draw_tilemap_palette_effect(bitmap_ind16 &bitmap, const rectangle &cliprect, tilemap_t *tilemap, int scrollx, int scrolly, int gfxnum, int flipscreen);
