@@ -78,7 +78,6 @@ Is there another alt program rom set labeled 9 & 10?
 #include "machine/gen_latch.h"
 #include "machine/watchdog.h"
 #include "sound/2203intf.h"
-#include "sound/ym2151.h"
 #include "sound/okim6295.h"
 #include "video/kan_pand.h"
 #include "machine/kaneko_hit.h"
@@ -91,39 +90,37 @@ class sandscrp_state : public driver_device
 {
 public:
 	sandscrp_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag),
-		m_maincpu(*this, "maincpu"),
-		m_audiocpu(*this, "audiocpu"),
-		m_pandora(*this, "pandora"),
-		m_view2_0(*this, "view2_0"),
-		m_soundlatch(*this, "soundlatch"),
-		m_soundlatch2(*this, "soundlatch2")
+		: driver_device(mconfig, type, tag)
+		, m_maincpu(*this, "maincpu")
+		, m_audiocpu(*this, "audiocpu")
+		, m_pandora(*this, "pandora")
+		, m_view2(*this, "view2")
+		, m_soundlatch(*this, "soundlatch%u", 1)
+		, m_audiobank(*this, "audiobank")
 		{ }
 
 	required_device<cpu_device> m_maincpu;
 	required_device<cpu_device> m_audiocpu;
 	required_device<kaneko_pandora_device> m_pandora;
-	required_device<kaneko_view2_tilemap_device> m_view2_0;
-	required_device<generic_latch_8_device> m_soundlatch;
-	required_device<generic_latch_8_device> m_soundlatch2;
+	required_device<kaneko_view2_tilemap_device> m_view2;
+	required_device_array<generic_latch_8_device, 2> m_soundlatch;
+
+	required_memory_bank m_audiobank;
 
 	uint8_t m_sprite_irq;
 	uint8_t m_unknown_irq;
 	uint8_t m_vblank_irq;
-	uint8_t m_latch1_full;
-	uint8_t m_latch2_full;
+	uint8_t m_latch_full[2];
 
 	DECLARE_READ16_MEMBER(irq_cause_r);
 	DECLARE_WRITE16_MEMBER(irq_cause_w);
 	DECLARE_WRITE16_MEMBER(coincounter_w);
+	template<int Latch> DECLARE_READ8_MEMBER(soundlatch_r);
+	template<int Latch> DECLARE_WRITE8_MEMBER(soundlatch_w);
 	DECLARE_READ16_MEMBER(latchstatus_word_r);
 	DECLARE_WRITE16_MEMBER(latchstatus_word_w);
-	DECLARE_READ16_MEMBER(soundlatch_word_r);
-	DECLARE_WRITE16_MEMBER(soundlatch_word_w);
 	DECLARE_WRITE8_MEMBER(bankswitch_w);
 	DECLARE_READ8_MEMBER(latchstatus_r);
-	DECLARE_READ8_MEMBER(soundlatch_r);
-	DECLARE_WRITE8_MEMBER(soundlatch_w);
 
 	virtual void machine_start() override;
 
@@ -146,15 +143,21 @@ uint32_t sandscrp_state::screen_update(screen_device &screen, bitmap_ind16 &bitm
 
 	screen.priority().fill(0, cliprect);
 
-	m_view2_0->kaneko16_prepare(bitmap, cliprect);
+	m_view2->kaneko16_prepare(bitmap, cliprect);
 
-	for ( int i = 0; i < 8; i++ )
+	for ( int l = 0; l < 4; l++ )
 	{
-		m_view2_0->render_tilemap_chip(screen,bitmap,cliprect,i);
+		m_view2->render_tilemap_chip(screen,bitmap,cliprect,l);
 	}
 
 	// copy sprite bitmap to screen
 	m_pandora->update(bitmap, cliprect);
+	
+	for ( int h = 4; h < 8; h++ ) // high bit of tile priority : above sprites
+	{
+		m_view2->render_tilemap_chip(screen,bitmap,cliprect,h);
+	}
+	
 	return 0;
 }
 
@@ -163,13 +166,12 @@ uint32_t sandscrp_state::screen_update(screen_device &screen, bitmap_ind16 &bitm
 
 void sandscrp_state::machine_start()
 {
-	membank("bank1")->configure_entries(0, 8, memregion("audiocpu")->base(), 0x4000);
+	m_audiobank->configure_entries(0, 8, memregion("audiocpu")->base(), 0x4000);
 
 	save_item(NAME(m_sprite_irq));
 	save_item(NAME(m_unknown_irq));
 	save_item(NAME(m_vblank_irq));
-	save_item(NAME(m_latch1_full));
-	save_item(NAME(m_latch2_full));
+	save_item(NAME(m_latch_full));
 }
 
 
@@ -246,34 +248,31 @@ WRITE16_MEMBER(sandscrp_state::coincounter_w)
 
 READ16_MEMBER(sandscrp_state::latchstatus_word_r)
 {
-	return  (m_latch1_full ? 0x80 : 0) |
-			(m_latch2_full ? 0x40 : 0) ;
+	return  (m_latch_full[0] ? 0x80 : 0) |
+			(m_latch_full[1] ? 0x40 : 0) ;
 }
 
 WRITE16_MEMBER(sandscrp_state::latchstatus_word_w)
 {
 	if (ACCESSING_BITS_0_7)
 	{
-		m_latch1_full = data & 0x80;
-		m_latch2_full = data & 0x40;
+		m_latch_full[0] = data & 0x80;
+		m_latch_full[1] = data & 0x40;
 	}
 }
 
-READ16_MEMBER(sandscrp_state::soundlatch_word_r)
+template<int Latch>
+READ8_MEMBER(sandscrp_state::soundlatch_r)
 {
-	m_latch2_full = 0;
-	return m_soundlatch2->read(space,0);
+	m_latch_full[Latch] = 0;
+	return m_soundlatch[Latch]->read(space,0);
 }
 
-WRITE16_MEMBER(sandscrp_state::soundlatch_word_w)
+template<int Latch>
+WRITE8_MEMBER(sandscrp_state::soundlatch_w)
 {
-	if (ACCESSING_BITS_0_7)
-	{
-		m_latch1_full = 1;
-		m_soundlatch->write(space, 0, data & 0xff);
-		m_audiocpu->set_input_line(INPUT_LINE_NMI, PULSE_LINE);
-		m_maincpu->spin_until_time(attotime::from_usec(100)); // Allow the other cpu to reply
-	}
+	m_latch_full[Latch] = 1;
+	m_soundlatch[Latch]->write(space,0,data);
 }
 
 ADDRESS_MAP_START(sandscrp_state::sandscrp)
@@ -282,8 +281,8 @@ ADDRESS_MAP_START(sandscrp_state::sandscrp)
 
 	AM_RANGE(0x700000, 0x70ffff) AM_RAM     // RAM
 	AM_RANGE(0x200000, 0x20001f) AM_DEVREADWRITE("calc1_mcu", kaneko_hit_device, kaneko_hit_r,kaneko_hit_w)
-	AM_RANGE(0x300000, 0x30001f) AM_DEVREADWRITE("view2_0", kaneko_view2_tilemap_device,  kaneko_tmap_regs_r, kaneko_tmap_regs_w)
-	AM_RANGE(0x400000, 0x403fff) AM_DEVREADWRITE("view2_0", kaneko_view2_tilemap_device,  kaneko_tmap_vram_r, kaneko_tmap_vram_w )
+	AM_RANGE(0x300000, 0x30001f) AM_DEVREADWRITE("view2", kaneko_view2_tilemap_device,  kaneko_tmap_regs_r, kaneko_tmap_regs_w)
+	AM_RANGE(0x400000, 0x403fff) AM_DEVREADWRITE("view2", kaneko_view2_tilemap_device,  kaneko_tmap_vram_r, kaneko_tmap_vram_w )
 	AM_RANGE(0x500000, 0x501fff) AM_DEVREADWRITE("pandora", kaneko_pandora_device, spriteram_LSB_r, spriteram_LSB_w ) // sprites
 	AM_RANGE(0x600000, 0x600fff) AM_RAM_DEVWRITE("palette", palette_device, write16) AM_SHARE("palette")    // Palette
 	AM_RANGE(0xa00000, 0xa00001) AM_WRITE(coincounter_w)  // Coin Counters (Lockout unused)
@@ -293,7 +292,7 @@ ADDRESS_MAP_START(sandscrp_state::sandscrp)
 	AM_RANGE(0xb00006, 0xb00007) AM_READ_PORT("UNK")
 	AM_RANGE(0xec0000, 0xec0001) AM_DEVREAD("watchdog", watchdog_timer_device, reset16_r)
 	AM_RANGE(0x800000, 0x800001) AM_READ(irq_cause_r)  // IRQ Cause
-	AM_RANGE(0xe00000, 0xe00001) AM_READWRITE(soundlatch_word_r, soundlatch_word_w)   // From/To Sound CPU
+	AM_RANGE(0xe00000, 0xe00001) AM_READWRITE8(soundlatch_r<1>, soundlatch_w<0>, 0x00ff)   // From/To Sound CPU
 	AM_RANGE(0xe40000, 0xe40001) AM_READWRITE(latchstatus_word_r, latchstatus_word_w) //
 ADDRESS_MAP_END
 
@@ -305,30 +304,18 @@ ADDRESS_MAP_END
 
 WRITE8_MEMBER(sandscrp_state::bankswitch_w)
 {
-	membank("bank1")->set_entry(data & 7);
+	m_audiobank->set_entry(data & 7);
 }
 
 READ8_MEMBER(sandscrp_state::latchstatus_r)
 {
-	return  (m_latch2_full ? 0x80 : 0) |    // swapped!?
-			(m_latch1_full ? 0x40 : 0) ;
-}
-
-READ8_MEMBER(sandscrp_state::soundlatch_r)
-{
-	m_latch1_full = 0;
-	return m_soundlatch->read(space,0);
-}
-
-WRITE8_MEMBER(sandscrp_state::soundlatch_w)
-{
-	m_latch2_full = 1;
-	m_soundlatch2->write(space,0,data);
+	return  (m_latch_full[1] ? 0x80 : 0) |    // swapped!?
+			(m_latch_full[0] ? 0x40 : 0) ;
 }
 
 ADDRESS_MAP_START(sandscrp_state::sandscrp_soundmem)
 	AM_RANGE(0x0000, 0x7fff) AM_ROM     // ROM
-	AM_RANGE(0x8000, 0xbfff) AM_ROMBANK("bank1")    // Banked ROM
+	AM_RANGE(0x8000, 0xbfff) AM_ROMBANK("audiobank")    // Banked ROM
 	AM_RANGE(0xc000, 0xdfff) AM_RAM     // RAM
 ADDRESS_MAP_END
 
@@ -337,8 +324,8 @@ ADDRESS_MAP_START(sandscrp_state::sandscrp_soundport)
 	AM_RANGE(0x00, 0x00) AM_WRITE(bankswitch_w)    // ROM Bank
 	AM_RANGE(0x02, 0x03) AM_DEVREADWRITE("ymsnd", ym2203_device, read, write)        // PORTA/B read
 	AM_RANGE(0x04, 0x04) AM_DEVWRITE("oki", okim6295_device, write)     // OKIM6295
-	AM_RANGE(0x06, 0x06) AM_WRITE(soundlatch_w)    //
-	AM_RANGE(0x07, 0x07) AM_READ(soundlatch_r)     //
+	AM_RANGE(0x06, 0x06) AM_WRITE(soundlatch_w<1>)    //
+	AM_RANGE(0x07, 0x07) AM_READ(soundlatch_r<0>)     //
 	AM_RANGE(0x08, 0x08) AM_READ(latchstatus_r)    //
 ADDRESS_MAP_END
 
@@ -502,7 +489,7 @@ MACHINE_CONFIG_START(sandscrp_state::sandscrp)
 	MCFG_PALETTE_ADD("palette", 2048)
 	MCFG_PALETTE_FORMAT(xGGGGGRRRRRBBBBB)
 
-	MCFG_DEVICE_ADD("view2_0", KANEKO_TMAP, 0)
+	MCFG_DEVICE_ADD("view2", KANEKO_TMAP, 0)
 	MCFG_KANEKO_TMAP_GFX_REGION(1)
 	MCFG_KANEKO_TMAP_OFFSET(0x5b, 0, 256, 224)
 	MCFG_KANEKO_TMAP_GFXDECODE("gfxdecode")
@@ -516,7 +503,9 @@ MACHINE_CONFIG_START(sandscrp_state::sandscrp)
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
 
-	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
+	MCFG_GENERIC_LATCH_8_ADD("soundlatch1")
+	MCFG_GENERIC_LATCH_DATA_PENDING_CB(INPUTLINE("audiocpu", INPUT_LINE_NMI))
+
 	MCFG_GENERIC_LATCH_8_ADD("soundlatch2")
 
 	MCFG_OKIM6295_ADD("oki", 12000000/6, PIN7_HIGH)
