@@ -192,8 +192,6 @@ WRITE16_MEMBER(qdrmfgp_state::sndram_w)
 	if (ACCESSING_BITS_0_7)
 	{
 		m_sndram[offset] = data & 0xff;
-		if (offset >= 0x40000)
-			m_sndram[offset+0xc00000-0x900000] = data & 0xff;
 	}
 }
 
