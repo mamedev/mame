@@ -115,14 +115,12 @@ public:
 	DECLARE_READ16_MEMBER(irq_cause_r);
 	DECLARE_WRITE16_MEMBER(irq_cause_w);
 	DECLARE_WRITE16_MEMBER(coincounter_w);
+	template<int Latch> DECLARE_READ8_MEMBER(soundlatch_r);
+	template<int Latch> DECLARE_WRITE8_MEMBER(soundlatch_w);
 	DECLARE_READ16_MEMBER(latchstatus_word_r);
 	DECLARE_WRITE16_MEMBER(latchstatus_word_w);
-	DECLARE_READ16_MEMBER(soundlatch_word_r);
-	DECLARE_WRITE16_MEMBER(soundlatch_word_w);
 	DECLARE_WRITE8_MEMBER(bankswitch_w);
 	DECLARE_READ8_MEMBER(latchstatus_r);
-	DECLARE_READ8_MEMBER(soundlatch_r);
-	DECLARE_WRITE8_MEMBER(soundlatch_w);
 
 	virtual void machine_start() override;
 
@@ -141,24 +139,23 @@ public:
 
 uint32_t sandscrp_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
-	int i;
 	bitmap.fill(0, cliprect);
 
 	screen.priority().fill(0, cliprect);
 
 	m_view2->kaneko16_prepare(bitmap, cliprect);
 
-	for ( i = 0; i < 4; i++ )
+	for ( int l = 0; l < 4; l++ )
 	{
-		m_view2->render_tilemap_chip(screen,bitmap,cliprect,i);
+		m_view2->render_tilemap_chip(screen,bitmap,cliprect,l);
 	}
 
 	// copy sprite bitmap to screen
 	m_pandora->update(bitmap, cliprect);
 	
-	for ( i = 4; i < 8; i++ ) // high bit of tile priority : above sprites
+	for ( int h = 4; h < 8; h++ ) // high bit of tile priority : above sprites
 	{
-		m_view2->render_tilemap_chip(screen,bitmap,cliprect,i);
+		m_view2->render_tilemap_chip(screen,bitmap,cliprect,h);
 	}
 	
 	return 0;
@@ -264,20 +261,18 @@ WRITE16_MEMBER(sandscrp_state::latchstatus_word_w)
 	}
 }
 
-READ16_MEMBER(sandscrp_state::soundlatch_word_r)
+template<int Latch>
+READ8_MEMBER(sandscrp_state::soundlatch_r)
 {
-	m_latch_full[1] = 0;
-	return m_soundlatch[1]->read(space,0);
+	m_latch_full[Latch] = 0;
+	return m_soundlatch[Latch]->read(space,0);
 }
 
-WRITE16_MEMBER(sandscrp_state::soundlatch_word_w)
+template<int Latch>
+WRITE8_MEMBER(sandscrp_state::soundlatch_w)
 {
-	if (ACCESSING_BITS_0_7)
-	{
-		m_latch_full[0] = 1;
-		m_soundlatch[0]->write(space, 0, data & 0xff);
-		m_maincpu->spin_until_time(attotime::from_usec(100)); // Allow the other cpu to reply
-	}
+	m_latch_full[Latch] = 1;
+	m_soundlatch[Latch]->write(space,0,data);
 }
 
 ADDRESS_MAP_START(sandscrp_state::sandscrp)
@@ -297,7 +292,7 @@ ADDRESS_MAP_START(sandscrp_state::sandscrp)
 	AM_RANGE(0xb00006, 0xb00007) AM_READ_PORT("UNK")
 	AM_RANGE(0xec0000, 0xec0001) AM_DEVREAD("watchdog", watchdog_timer_device, reset16_r)
 	AM_RANGE(0x800000, 0x800001) AM_READ(irq_cause_r)  // IRQ Cause
-	AM_RANGE(0xe00000, 0xe00001) AM_READWRITE(soundlatch_word_r, soundlatch_word_w)   // From/To Sound CPU
+	AM_RANGE(0xe00000, 0xe00001) AM_READWRITE8(soundlatch_r<1>, soundlatch_w<0>, 0x00ff)   // From/To Sound CPU
 	AM_RANGE(0xe40000, 0xe40001) AM_READWRITE(latchstatus_word_r, latchstatus_word_w) //
 ADDRESS_MAP_END
 
@@ -318,18 +313,6 @@ READ8_MEMBER(sandscrp_state::latchstatus_r)
 			(m_latch_full[0] ? 0x40 : 0) ;
 }
 
-READ8_MEMBER(sandscrp_state::soundlatch_r)
-{
-	m_latch_full[0] = 0;
-	return m_soundlatch[0]->read(space,0);
-}
-
-WRITE8_MEMBER(sandscrp_state::soundlatch_w)
-{
-	m_latch_full[1] = 1;
-	m_soundlatch[1]->write(space,0,data);
-}
-
 ADDRESS_MAP_START(sandscrp_state::sandscrp_soundmem)
 	AM_RANGE(0x0000, 0x7fff) AM_ROM     // ROM
 	AM_RANGE(0x8000, 0xbfff) AM_ROMBANK("audiobank")    // Banked ROM
@@ -341,8 +324,8 @@ ADDRESS_MAP_START(sandscrp_state::sandscrp_soundport)
 	AM_RANGE(0x00, 0x00) AM_WRITE(bankswitch_w)    // ROM Bank
 	AM_RANGE(0x02, 0x03) AM_DEVREADWRITE("ymsnd", ym2203_device, read, write)        // PORTA/B read
 	AM_RANGE(0x04, 0x04) AM_DEVWRITE("oki", okim6295_device, write)     // OKIM6295
-	AM_RANGE(0x06, 0x06) AM_WRITE(soundlatch_w)    //
-	AM_RANGE(0x07, 0x07) AM_READ(soundlatch_r)     //
+	AM_RANGE(0x06, 0x06) AM_WRITE(soundlatch_w<1>)    //
+	AM_RANGE(0x07, 0x07) AM_READ(soundlatch_r<0>)     //
 	AM_RANGE(0x08, 0x08) AM_READ(latchstatus_r)    //
 ADDRESS_MAP_END
 
