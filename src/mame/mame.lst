@@ -9864,9 +9864,7 @@ racjamdx                        // G?676 (c)1997 Japan JAA
 @source:coco12.cpp
 coco                            // Color Computer
 coco2                           // Color Computer 2
-coco2dw1                        // Color Computer 2 (HDBDOS-BECKER)
 coco2b                          // Color Computer 2B (uses M6847T1 video chip)
-coco2bdw1                       // Color Computer 2B (uses M6847T1 video chip; HDBDOS-BECKER)
 cocoe                           // Color Computer (Extended BASIC 1.0)
 cp400                           // Prológica CP400
 cp400c2                         // Prológica CP400 Color II
