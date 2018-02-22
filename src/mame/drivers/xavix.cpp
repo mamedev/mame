@@ -510,8 +510,9 @@ void xavix_state::draw_tilemap(screen_device &screen, bitmap_ind16 &bitmap, cons
 
 							/* 0x03 = bass fishing company logo, 0x01 = xavix logo, title, 0x04 = menu background
 
-							   0x05 = card night title (ntsc) 0x01 = xavix logo, menu background, 0x08 = card night title (pal)           (potentially buggy, code flow seems wrong)
+							   0x05 = card night title (ntsc) 0x01 = xavix logo, menu background, 0x08 = card night title (pal)  (potentially buggy, code flow seems wrong)
 
+							   0x0e = boxing (instruction stuff) also needs palette settings.. also some bits on same layer using different bank? (0xd) or just disabled?
 
 							*/
 							   
