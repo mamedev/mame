@@ -48,8 +48,10 @@ public:
 	DECLARE_WRITE_LINE_MEMBER( horizontal_sync );
 	DECLARE_WRITE_LINE_MEMBER( field_sync );
 
+	void coco2bdw1(machine_config &config);
 	void coco2b(machine_config &config);
 	void cd6809(machine_config &config);
+	void coco2dw1(machine_config &config);
 	void coco2(machine_config &config);
 	void t4426(machine_config &config);
 	void cp400(machine_config &config);
