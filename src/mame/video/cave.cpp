@@ -33,8 +33,8 @@ Note:   if MAME_DEBUG is defined, pressing:
 
     [ 1024 Zooming Sprites ]
 
-        There are 2 sprite RAMs. A hardware register's bit selects
-        the one to display (sprites double buffering).
+        There are 2 or 4 0x4000 Sprite RAM Areas. A hardware register's
+        bit selects an area to display (sprites double buffering).
 
         The sprites are NOT tile based: the "tile" size and start address
         is selectable for each sprite with a 16 pixel granularity.
@@ -57,8 +57,6 @@ Note:   if MAME_DEBUG is defined, pressing:
 #define SPRITE_FLIPX_CAVE           0x01
 #define SPRITE_FLIPY_CAVE           0x02
 #define SPRITE_VISIBLE_CAVE         0x04
-
-#define SWAP(X,Y) { int temp = X; X = Y; Y = temp; }
 
 
 /***************************************************************************
@@ -218,10 +216,11 @@ void cave_state::set_pens(int chip)
 
 ***************************************************************************/
 
-inline void cave_state::get_tile_info( tile_data &tileinfo, int tile_index, int GFX )
+template<int Chip>
+TILE_GET_INFO_MEMBER(cave_state::get_tile_info)
 {
-	uint16_t *VRAM = m_vram[GFX];
-	int TDIM = m_tiledim[GFX];
+	uint16_t *VRAM = m_vram[Chip];
+	int TDIM = m_tiledim[Chip];
 	uint32_t code, color, pri, tile;
 
 	if (TDIM)
@@ -245,7 +244,7 @@ inline void cave_state::get_tile_info( tile_data &tileinfo, int tile_index, int 
 		code  = (code & 0x00ffffff);
 	}
 
-	SET_TILE_INFO_MEMBER(GFX, code, color, 0 );
+	SET_TILE_INFO_MEMBER(Chip, code, color, 0 );
 	tileinfo.category = pri;
 }
 
@@ -294,64 +293,6 @@ TILE_GET_INFO_MEMBER(cave_state::sailormn_get_tile_info_2)
 }
 
 
-inline void cave_state::vram_w( address_space &space, ATTR_UNUSED offs_t offset, ATTR_UNUSED uint16_t data, ATTR_UNUSED uint16_t mem_mask, int GFX )
-{
-	uint16_t *VRAM = m_vram[GFX];
-	tilemap_t *TILEMAP = m_tilemap[GFX];
-
-	if ((VRAM[offset] & mem_mask) == (data & mem_mask))
-		return;
-
-	COMBINE_DATA(&VRAM[offset]);
-	offset /= 2;
-	if (offset < 0x1000 / 4)    // 16x16 tilemap
-	{
-		offset = (offset % (512 / 16)) * 2 + (offset / (512 / 16)) * (512 / 8) * 2;
-		TILEMAP->mark_tile_dirty(offset + 0);
-		TILEMAP->mark_tile_dirty(offset + 1);
-		TILEMAP->mark_tile_dirty(offset + 0 + 512 / 8);
-		TILEMAP->mark_tile_dirty(offset + 1 + 512 / 8);
-	}
-	else if (offset >= 0x4000 / 4)      // 8x8 tilemap
-		TILEMAP->mark_tile_dirty(offset - 0x4000 / 4);
-}
-
-/*  Some games, that only ever use the 8x8 tiles and no line scroll,
-    use mirror ram. For example in donpachi, writes to 400000-403fff
-    and 408000-407fff both go to the 8x8 tilemap ram. Use this function
-    in this cases. Note that the get_tile_info function looks in the
-    4000-7fff range for tiles, so we have to write the data there. */
-inline void cave_state::vram_8x8_w( address_space &space, ATTR_UNUSED offs_t offset, ATTR_UNUSED uint16_t data, ATTR_UNUSED uint16_t mem_mask, int GFX )
-{
-	uint16_t *VRAM = m_vram[GFX];
-	tilemap_t *TILEMAP = m_tilemap[GFX];
-
-	offset %= 0x4000 / 2;
-	if ((VRAM[offset] & mem_mask) == (data & mem_mask))
-		return;
-
-	COMBINE_DATA(&VRAM[offset + 0x0000 / 2]);
-	COMBINE_DATA(&VRAM[offset + 0x4000 / 2]);
-	TILEMAP->mark_tile_dirty(offset / 2);
-}
-
-
-TILE_GET_INFO_MEMBER(cave_state::get_tile_info_0){ get_tile_info(tileinfo, tile_index, 0); }
-TILE_GET_INFO_MEMBER(cave_state::get_tile_info_1){ get_tile_info(tileinfo, tile_index, 1); }
-TILE_GET_INFO_MEMBER(cave_state::get_tile_info_2){ get_tile_info(tileinfo, tile_index, 2); }
-TILE_GET_INFO_MEMBER(cave_state::get_tile_info_3){ get_tile_info(tileinfo, tile_index, 3); }
-
-WRITE16_MEMBER(cave_state::cave_vram_0_w){ vram_w(space, offset, data, mem_mask, 0); }
-WRITE16_MEMBER(cave_state::cave_vram_1_w){ vram_w(space, offset, data, mem_mask, 1); }
-WRITE16_MEMBER(cave_state::cave_vram_2_w){ vram_w(space, offset, data, mem_mask, 2); }
-WRITE16_MEMBER(cave_state::cave_vram_3_w){ vram_w(space, offset, data, mem_mask, 3); }
-
-WRITE16_MEMBER(cave_state::cave_vram_0_8x8_w){ vram_8x8_w(space, offset, data, mem_mask, 0); }
-WRITE16_MEMBER(cave_state::cave_vram_1_8x8_w){ vram_8x8_w(space, offset, data, mem_mask, 1); }
-WRITE16_MEMBER(cave_state::cave_vram_2_8x8_w){ vram_8x8_w(space, offset, data, mem_mask, 2); }
-WRITE16_MEMBER(cave_state::cave_vram_3_8x8_w){ vram_8x8_w(space, offset, data, mem_mask, 3); }
-
-
 /***************************************************************************
 
                             Video Init Routines
@@ -385,7 +326,7 @@ void cave_state::cave_vh_start( int num )
 	switch (num)
 	{
 		case 4:
-			m_tilemap[3] = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(cave_state::get_tile_info_3),this), TILEMAP_SCAN_ROWS, 8, 8, 512 / 8, 512 / 8);
+			m_tilemap[3] = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(cave_state::get_tile_info<3>),this), TILEMAP_SCAN_ROWS, 8, 8, 512 / 8, 512 / 8);
 			m_tilemap[3]->set_transparent_pen(0);
 			m_tilemap[3]->set_scroll_rows(1);
 			m_tilemap[3]->set_scroll_cols(1);
@@ -393,7 +334,7 @@ void cave_state::cave_vh_start( int num )
 			save_item(NAME(m_old_tiledim[3]));
 
 		case 3:
-			m_tilemap[2] = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(cave_state::get_tile_info_2),this), TILEMAP_SCAN_ROWS, 8, 8, 512 / 8, 512 / 8);
+			m_tilemap[2] = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(cave_state::get_tile_info<2>),this), TILEMAP_SCAN_ROWS, 8, 8, 512 / 8, 512 / 8);
 			m_tilemap[2]->set_transparent_pen(0);
 			m_tilemap[2]->set_scroll_rows(1);
 			m_tilemap[2]->set_scroll_cols(1);
@@ -401,7 +342,7 @@ void cave_state::cave_vh_start( int num )
 			save_item(NAME(m_old_tiledim[2]));
 
 		case 2:
-			m_tilemap[1] = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(cave_state::get_tile_info_1),this), TILEMAP_SCAN_ROWS, 8, 8, 512 / 8, 512 / 8);
+			m_tilemap[1] = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(cave_state::get_tile_info<1>),this), TILEMAP_SCAN_ROWS, 8, 8, 512 / 8, 512 / 8);
 			m_tilemap[1]->set_transparent_pen(0);
 			m_tilemap[1]->set_scroll_rows(1);
 			m_tilemap[1]->set_scroll_cols(1);
@@ -409,7 +350,7 @@ void cave_state::cave_vh_start( int num )
 			save_item(NAME(m_old_tiledim[1]));
 
 		case 1:
-			m_tilemap[0] = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(cave_state::get_tile_info_0),this), TILEMAP_SCAN_ROWS, 8, 8, 512 / 8, 512 / 8);
+			m_tilemap[0] = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(cave_state::get_tile_info<0>),this), TILEMAP_SCAN_ROWS, 8, 8, 512 / 8, 512 / 8);
 			m_tilemap[0]->set_transparent_pen(0);
 			m_tilemap[0]->set_scroll_rows(1);
 			m_tilemap[0]->set_scroll_cols(1);
@@ -499,10 +440,10 @@ VIDEO_START_MEMBER(cave_state,sailormn_3_layers)
 
 void cave_state::get_sprite_info_cave(int chip)
 {
+	chip %= 4;
 	pen_t base_pal = 0;
-	const char *region[4] = { "sprites0", "sprites1", "sprites2", "sprites3" };
-	const uint8_t *base_gfx = memregion(region[chip])->base();
-	int code_max = memregion(region[chip])->bytes() / (16*16);
+	const uint8_t *base_gfx = m_spriteregion[chip]->base();
+	int code_max = m_spriteregion[chip]->bytes() / (16*16);
 
 	uint16_t *source;
 	uint16_t *finish;
@@ -514,13 +455,9 @@ void cave_state::get_sprite_info_cave(int chip)
 	int max_x = m_screen->width();
 	int max_y = m_screen->height();
 
-	source = m_spriteram[chip] + ((m_spriteram[chip].bytes() / 2) / 2) * m_spriteram_bank[chip%4];
+	source = m_spriteram[chip] + (0x4000 / 2) * m_spriteram_bank[chip];
 
-	if (m_videoregs[chip][4] & 0x02)
-		if (m_spriteram_2[chip])
-			source = m_spriteram_2[chip] + ((m_spriteram[chip].bytes() / 2) / 2) * m_spriteram_bank[chip];
-
-	finish = source + ((m_spriteram[chip].bytes() / 2) / 2);
+	finish = source + (0x4000 / 2);
 
 
 	for (; source < finish; source += 8)
@@ -628,10 +565,10 @@ void cave_state::get_sprite_info_cave(int chip)
 
 void cave_state::get_sprite_info_donpachi(int chip)
 {
+	chip %= 4;
 	pen_t base_pal = 0;
-	const char *region[4] = { "sprites0", "sprites1", "sprites2", "sprites3" };
-	const uint8_t *base_gfx = memregion(region[chip])->base();
-	int code_max = memregion(region[chip])->bytes() / (16*16);
+	const uint8_t *base_gfx = m_spriteregion[chip]->base();
+	int code_max = m_spriteregion[chip]->bytes() / (16*16);
 
 	uint16_t *source;
 	uint16_t *finish;
@@ -643,14 +580,10 @@ void cave_state::get_sprite_info_donpachi(int chip)
 
 	int max_x = m_screen->width();
 	int max_y = m_screen->height();
+	
+	source = m_spriteram[chip] + (0x4000 / 2) * m_spriteram_bank[chip];
 
-	source = m_spriteram[chip] + ((m_spriteram[chip].bytes() / 2) / 2) * m_spriteram_bank[chip%4];
-
-	if (m_videoregs[chip][4] & 0x02)
-		if (m_spriteram_2[chip])
-			source = m_spriteram_2[chip] + ((m_spriteram[chip].bytes() / 2) / 2) * m_spriteram_bank[chip];
-
-	finish = source + ((m_spriteram[chip].bytes() / 2) / 2);
+	finish = source + (0x4000 / 2);
 
 	for (; source < finish; source += 8)
 	{
@@ -1386,8 +1319,8 @@ void cave_state::sprite_draw_donpachi_zbuf( int chip, int priority )
 
         ..
 
-        8.w     fedc ba98 7654 321-
-                ---- ---- ---- ---0     Sprite RAM Bank
+        8.w     fedc ba98 7654 32--
+                ---- ---- ---- --10     Sprite RAM Bank
 
         There are more!
 
@@ -1632,6 +1565,7 @@ uint32_t cave_state::screen_update_cave(screen_device &screen, bitmap_rgb32 &bit
 
 void cave_state::cave_get_sprite_info(int chip)
 {
+	int spriteram_bankmax = m_spriteram[chip].bytes() / 0x4000;
 	if (m_videoregs[chip] == nullptr)
 		return;
 
@@ -1642,13 +1576,13 @@ void cave_state::cave_get_sprite_info(int chip)
 			m_spriteram_bank[chip] = m_spriteram_bank_delay[chip];
 			(this->*m_get_sprite_info)(chip);
 		}
-		m_spriteram_bank_delay[chip] = m_videoregs[chip][4] & 1;
+		m_spriteram_bank_delay[chip] = (m_videoregs[chip][4] & 3) % spriteram_bankmax;
 	}
 	else
 	{
 		if (machine().video().skip_this_frame() == 0)
 		{
-			m_spriteram_bank[chip] = m_videoregs[chip][4] & 1;
+			m_spriteram_bank[chip] = (m_videoregs[chip][4] & 3) % spriteram_bankmax;
 			(this->*m_get_sprite_info)(chip);
 		}
 	}
