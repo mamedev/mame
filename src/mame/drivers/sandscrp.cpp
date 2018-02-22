@@ -78,7 +78,6 @@ Is there another alt program rom set labeled 9 & 10?
 #include "machine/gen_latch.h"
 #include "machine/watchdog.h"
 #include "sound/2203intf.h"
-#include "sound/ym2151.h"
 #include "sound/okim6295.h"
 #include "video/kan_pand.h"
 #include "machine/kaneko_hit.h"
@@ -95,7 +94,7 @@ public:
 		, m_maincpu(*this, "maincpu")
 		, m_audiocpu(*this, "audiocpu")
 		, m_pandora(*this, "pandora")
-		, m_view2_0(*this, "view2_0")
+		, m_view2(*this, "view2")
 		, m_soundlatch(*this, "soundlatch%u", 1)
 		, m_audiobank(*this, "audiobank")
 		{ }
@@ -103,7 +102,7 @@ public:
 	required_device<cpu_device> m_maincpu;
 	required_device<cpu_device> m_audiocpu;
 	required_device<kaneko_pandora_device> m_pandora;
-	required_device<kaneko_view2_tilemap_device> m_view2_0;
+	required_device<kaneko_view2_tilemap_device> m_view2;
 	required_device_array<generic_latch_8_device, 2> m_soundlatch;
 
 	required_memory_bank m_audiobank;
@@ -147,11 +146,11 @@ uint32_t sandscrp_state::screen_update(screen_device &screen, bitmap_ind16 &bitm
 
 	screen.priority().fill(0, cliprect);
 
-	m_view2_0->kaneko16_prepare(bitmap, cliprect);
+	m_view2->kaneko16_prepare(bitmap, cliprect);
 
 	for ( i = 0; i < 4; i++ )
 	{
-		m_view2_0->render_tilemap_chip(screen,bitmap,cliprect,i);
+		m_view2->render_tilemap_chip(screen,bitmap,cliprect,i);
 	}
 
 	// copy sprite bitmap to screen
@@ -159,7 +158,7 @@ uint32_t sandscrp_state::screen_update(screen_device &screen, bitmap_ind16 &bitm
 	
 	for ( i = 4; i < 8; i++ ) // high bit of tile priority : above sprites
 	{
-		m_view2_0->render_tilemap_chip(screen,bitmap,cliprect,i);
+		m_view2->render_tilemap_chip(screen,bitmap,cliprect,i);
 	}
 	
 	return 0;
@@ -287,8 +286,8 @@ ADDRESS_MAP_START(sandscrp_state::sandscrp)
 
 	AM_RANGE(0x700000, 0x70ffff) AM_RAM     // RAM
 	AM_RANGE(0x200000, 0x20001f) AM_DEVREADWRITE("calc1_mcu", kaneko_hit_device, kaneko_hit_r,kaneko_hit_w)
-	AM_RANGE(0x300000, 0x30001f) AM_DEVREADWRITE("view2_0", kaneko_view2_tilemap_device,  kaneko_tmap_regs_r, kaneko_tmap_regs_w)
-	AM_RANGE(0x400000, 0x403fff) AM_DEVREADWRITE("view2_0", kaneko_view2_tilemap_device,  kaneko_tmap_vram_r, kaneko_tmap_vram_w )
+	AM_RANGE(0x300000, 0x30001f) AM_DEVREADWRITE("view2", kaneko_view2_tilemap_device,  kaneko_tmap_regs_r, kaneko_tmap_regs_w)
+	AM_RANGE(0x400000, 0x403fff) AM_DEVREADWRITE("view2", kaneko_view2_tilemap_device,  kaneko_tmap_vram_r, kaneko_tmap_vram_w )
 	AM_RANGE(0x500000, 0x501fff) AM_DEVREADWRITE("pandora", kaneko_pandora_device, spriteram_LSB_r, spriteram_LSB_w ) // sprites
 	AM_RANGE(0x600000, 0x600fff) AM_RAM_DEVWRITE("palette", palette_device, write16) AM_SHARE("palette")    // Palette
 	AM_RANGE(0xa00000, 0xa00001) AM_WRITE(coincounter_w)  // Coin Counters (Lockout unused)
@@ -507,7 +506,7 @@ MACHINE_CONFIG_START(sandscrp_state::sandscrp)
 	MCFG_PALETTE_ADD("palette", 2048)
 	MCFG_PALETTE_FORMAT(xGGGGGRRRRRBBBBB)
 
-	MCFG_DEVICE_ADD("view2_0", KANEKO_TMAP, 0)
+	MCFG_DEVICE_ADD("view2", KANEKO_TMAP, 0)
 	MCFG_KANEKO_TMAP_GFX_REGION(1)
 	MCFG_KANEKO_TMAP_OFFSET(0x5b, 0, 256, 224)
 	MCFG_KANEKO_TMAP_GFXDECODE("gfxdecode")
