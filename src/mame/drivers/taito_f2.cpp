@@ -3668,8 +3668,6 @@ MACHINE_CONFIG_START(taitof2_state::driftout)
 
 	/* video hardware */
 	MCFG_GFXDECODE_MODIFY("gfxdecode", pivot)
-	MCFG_PALETTE_MODIFY("palette")
-	MCFG_PALETTE_FORMAT(RRRRGGGGBBBBRGBx)
 
 	MCFG_VIDEO_START_OVERRIDE(taitof2_state,taitof2_driftout)
 	MCFG_SCREEN_MODIFY("screen")
