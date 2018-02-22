@@ -278,6 +278,7 @@ MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(dragon64_state::dragon64h)
 	dragon64(config);
+	// Replace M6809 with HD6309
 	MCFG_CPU_REPLACE(MAINCPU_TAG, HD6309E, DERIVED_CLOCK(1, 1))
 	MCFG_CPU_PROGRAM_MAP(dragon_mem)
 	MCFG_RAM_DEFAULT_SIZE("64K")
@@ -372,6 +373,7 @@ MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(dragon64_state::tanodr64h)
 	tanodr64(config);
+	// Replace M6809 CPU with HD6309 CPU
 	MCFG_CPU_REPLACE(MAINCPU_TAG, HD6309E, DERIVED_CLOCK(1, 1))
 	MCFG_CPU_PROGRAM_MAP(dragon_mem)
 	MCFG_RAM_DEFAULT_SIZE("64K")
@@ -440,10 +442,10 @@ ROM_END
 //    YEAR     NAME        PARENT    COMPAT  MACHINE     INPUT       CLASS               INIT    COMPANY                          FULLNAME                       FLAGS
 COMP( 1982,    dragon32,   0,        0,      dragon32,   dragon,     dragon_state,       0,      "Dragon Data Ltd",               "Dragon 32",                   0 )
 COMP( 1983,    dragon64,   dragon32, 0,      dragon64,   dragon,     dragon64_state,     0,      "Dragon Data Ltd",               "Dragon 64",                   0 )
-COMP( 19??,    dragon64h,  dragon32, 0,      dragon64h,  dragon,     dragon64_state,     0,      "Dragon Data Ltd",               "Dragon 64",                   MACHINE_UNOFFICIAL )
+COMP( 19??,    dragon64h,  dragon32, 0,      dragon64h,  dragon,     dragon64_state,     0,      "Dragon Data Ltd",               "Dragon 64 (HD6309E CPU)",                   MACHINE_UNOFFICIAL )
 COMP( 1985,    dragon200,  dragon32, 0,      dragon64,   dragon,     dragon64_state,     0,      "Eurohard S.A.",                 "Dragon 200",                  0 )
 COMP( 1985,    dragon200e, dragon32, 0,      dragon200e, dragon200e, dragon200e_state,   0,      "Eurohard S.A.",                 "Dragon 200-E",                MACHINE_NOT_WORKING )
 COMP( 1985,    d64plus,    dragon32, 0,      d64plus,    dragon,     d64plus_state,      0,      "Dragon Data Ltd / Compusense",  "Dragon 64 Plus",              0 )
 COMP( 1983,    tanodr64,   dragon32, 0,      tanodr64,   dragon,     dragon64_state,     0,      "Dragon Data Ltd / Tano Ltd",    "Tano Dragon 64 (NTSC)",       0 )
-COMP( 19??,    tanodr64h,  dragon32, 0,      tanodr64h,  dragon,     dragon64_state,     0,      "Dragon Data Ltd / Tano Ltd",    "Tano Dragon 64 (NTSC)",       MACHINE_UNOFFICIAL )
+COMP( 19??,    tanodr64h,  dragon32, 0,      tanodr64h,  dragon,     dragon64_state,     0,      "Dragon Data Ltd / Tano Ltd",    "Tano Dragon 64 (NTSC; HD6309E CPU)",       MACHINE_UNOFFICIAL )
 COMP( 1984,    dgnalpha,   dragon32, 0,      dgnalpha,   dragon,     dragon_alpha_state, 0,      "Dragon Data Ltd",               "Dragon Professional (Alpha)", 0 )
