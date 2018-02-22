@@ -2171,14 +2171,6 @@ MACHINE_RESET_MEMBER(pc9801_state,pc9821)
 	m_pc9821_window_bank = 0x08;
 }
 
-void pc9801_state::device_reset_after_children()
-{
-	driver_device::device_reset_after_children();
-	ata_mass_storage_device *ide0 = machine().device<ata_mass_storage_device>("ide1:0:hdd");
-	if(ide0)
-		ide0->identify_device_buffer()[47] = 0;
-}
-
 INTERRUPT_GEN_MEMBER(pc9801_state::vrtc_irq)
 {
 	m_pic1->ir2_w(1);
