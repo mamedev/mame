@@ -51,8 +51,8 @@ public:
 		m_sound_rom.set_tag(tag);
 	}
 	void set_rombank_tag(const char *tag) { m_rom_bank.set_tag(tag); }
-	template<class Object> devcb_base &set_ym_read_callback(Object&& object)  { return m_ym_read_cb.set_callback(std::forward<Object>(object)); }
-	template<class Object> devcb_base &set_ym_write_callback(Object&& object) { return m_ym_write_cb.set_callback(std::forward<Object>(object)); }
+	template<class Object> devcb_base &set_ym_read_callback(Object &&object)  { return m_ym_read_cb.set_callback(std::forward<Object>(object)); }
+	template<class Object> devcb_base &set_ym_write_callback(Object &&object) { return m_ym_write_cb.set_callback(std::forward<Object>(object)); }
 
 	DECLARE_READ8_MEMBER( main_r );
 	DECLARE_WRITE8_MEMBER( main_w );

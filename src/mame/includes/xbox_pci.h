@@ -80,7 +80,7 @@ public:
 	mcpx_smbus_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 	void register_device(int address, std::function<int(int command, int rw, int data)> callback) { if (address < 128) smbusst.devices[address] = callback; }
 
-	template<class Object> devcb_base &set_interrupt_handler(Object object) { return m_interrupt_handler.set_callback(object); }
+	template<class Object> devcb_base &set_interrupt_handler(Object &&cb) { return m_interrupt_handler.set_callback(std::forward<Object>(cb)); }
 
 	DECLARE_READ32_MEMBER(smbus_r);
 	DECLARE_WRITE32_MEMBER(smbus_w);
@@ -121,7 +121,7 @@ public:
 	void set_hack_callback(std::function<void(void)> hack) { hack_callback = hack; }
 	void plug_usb_device(int port, ohci_function *function);
 
-	template<class Object> devcb_base &set_interrupt_handler(Object object) { return m_interrupt_handler.set_callback(object); }
+	template<class Object> devcb_base &set_interrupt_handler(Object &&cb) { return m_interrupt_handler.set_callback(std::forward<Object>(cb)); }
 
 	DECLARE_READ32_MEMBER(ohci_r);
 	DECLARE_WRITE32_MEMBER(ohci_w);
@@ -274,7 +274,7 @@ class mcpx_ide_device : public pci_device {
 public:
 	mcpx_ide_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
-	template<class Object> devcb_base &set_interrupt_handler(Object object) { return m_interrupt_handler.set_callback(object); }
+	template<class Object> devcb_base &set_interrupt_handler(Object &&cb) { return m_interrupt_handler.set_callback(std::forward<Object>(cb)); }
 
 protected:
 	virtual void device_start() override;
@@ -317,7 +317,7 @@ public:
 	void set_cpu_tag(const char *cpu_tag);
 	nv2a_renderer *debug_get_renderer() { return nvidia_nv2a; }
 
-	template<class Object> devcb_base &set_interrupt_handler(Object object) { return m_interrupt_handler.set_callback(object); }
+	template<class Object> devcb_base &set_interrupt_handler(Object &&cb) { return m_interrupt_handler.set_callback(std::forward<Object>(cb)); }
 
 	DECLARE_READ32_MEMBER(geforce_r);
 	DECLARE_WRITE32_MEMBER(geforce_w);

@@ -31,7 +31,7 @@ public:
 	svision_sound_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
 	// configuration
-	template<typename Object> void set_irq_callback(Object&& callback) { m_irq_cb = std::forward<Object>(callback); }
+	template<typename Object> void set_irq_callback(Object &&callback) { m_irq_cb = std::forward<Object>(callback); }
 
 	DECLARE_WRITE8_MEMBER( sounddma_w );
 	DECLARE_WRITE8_MEMBER( noise_w );

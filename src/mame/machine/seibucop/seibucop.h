@@ -76,7 +76,7 @@ public:
 
 	uint8_t fade_table(int v);
 
-	template<class Object> devcb_base &set_m_videoramout_cb(Object object) { return m_videoramout_cb.set_callback(object); }
+	template<class Object> devcb_base &set_m_videoramout_cb(Object &&cb) { return m_videoramout_cb.set_callback(std::forward<Object>(cb)); }
 
 	// Number Conversion
 
