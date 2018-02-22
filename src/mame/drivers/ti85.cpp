@@ -931,26 +931,6 @@ ROM_START (ti84p)
 	ROMX_LOAD( "ti84pv255mp.bin", 0x00000, 0x100000, CRC(4af31251) SHA1(8f67269346644b87e7cd0f353f5f4030e787cf57), ROM_BIOS(8) )
 ROM_END
 
-ROM_START (ti84pv2)
-	ROM_REGION (0x100000, "flash",0)
-	ROM_DEFAULT_BIOS("v255mp")
-	ROM_SYSTEM_BIOS( 0, "v221", "V 2.21" )
-	ROMX_LOAD( "ti84pv221.bin", 0x00000, 0x100000, CRC(5a23a22e) SHA1(2e1dcf163c0a0ea725ed9e264ba12c3cae67c969), ROM_BIOS(1) )
-	ROM_SYSTEM_BIOS( 1, "v222", "V 2.22" )
-	ROMX_LOAD( "ti84pv222.bin", 0x00000, 0x100000, CRC(c8ce69f1) SHA1(aba6291dd020d375093bd56174416462f0e44130), ROM_BIOS(2) )
-	ROM_SYSTEM_BIOS( 2, "v230", "V 2.30" )
-	ROMX_LOAD( "ti84pv230.bin", 0x00000, 0x100000, CRC(bb444f01) SHA1(f75c1866f27ff29ce8e113ff676ccdc6a53553d6), ROM_BIOS(3) )
-	ROM_SYSTEM_BIOS( 3, "v240", "V 2.40" )
-	ROMX_LOAD( "ti84pv240.bin", 0x00000, 0x100000, CRC(387d78ff) SHA1(4ea9c7d56ce545fc3a4fb19f13dcc53638bf439f), ROM_BIOS(4) )
-	ROM_SYSTEM_BIOS( 4, "v241", "V 2.41" )
-	ROMX_LOAD( "ti84pv241.bin", 0x00000, 0x100000, CRC(2d0f8f6d) SHA1(5048cebac3814ed56e82c9d6f094be8ffaa15e10), ROM_BIOS(5) )
-	ROM_SYSTEM_BIOS( 5, "v243", "V 2.43" )
-	ROMX_LOAD( "ti84pv243.bin", 0x00000, 0x100000, CRC(7742ac1d) SHA1(dc02d658412e7f00205906bdf8ba6b252a193506), ROM_BIOS(6) )
-	ROM_SYSTEM_BIOS( 6, "v253mp", "V 2.53MP" )
-	ROMX_LOAD( "ti84pv253mp.bin", 0x00000, 0x100000, CRC(f1dd49b8) SHA1(c9b592f3451778df1a4ada76cdd2f859c6c5df26), ROM_BIOS(7) )
-	ROM_SYSTEM_BIOS( 7, "v255mp", "V 2.55MP" )
-	ROMX_LOAD( "ti84pv255mp.bin", 0x00000, 0x100000, CRC(3f8574a6) SHA1(0f88e719512f2691fff6c8bcc89292158086f841), ROM_BIOS(8) )
-ROM_END
 
 //    YEAR  NAME        PARENT  COMPAT  MACHINE  INPUT  STATE        INIT   COMPANY              FULLNAME                                        FLAGS
 COMP( 1990, ti81,       0,      0,      ti81,    ti81,  ti85_state,  0,     "Texas Instruments", "TI-81",                                        MACHINE_NO_SOUND_HW )
@@ -963,5 +943,4 @@ COMP( 1998, ti73,       0,      0,      ti73,    ti82,  ti85_state,  0,     "Tex
 COMP( 1999, ti83p,      0,      0,      ti83p,   ti82,  ti85_state,  0,     "Texas Instruments", "TI-83 Plus (Boot Code 1.00)",                  MACHINE_NO_SOUND_HW | MACHINE_NOT_WORKING )
 COMP( 2001, ti83pse,    0,      0,      ti83pse, ti82,  ti85_state,  0,     "Texas Instruments", "TI-83 Plus Silver Edition (Boot Code 1.00)",   MACHINE_NO_SOUND_HW | MACHINE_NOT_WORKING )
 COMP( 2004, ti84p,      0,      0,      ti84p,   ti82,  ti85_state,  0,     "Texas Instruments", "TI-84 Plus (Boot Code 1.00)",                  MACHINE_NO_SOUND_HW | MACHINE_NOT_WORKING )
-COMP( 200?, ti84pv2,    ti84p,  0,      ti84p,   ti82,  ti85_state,  0,     "Texas Instruments", "TI-84 Plus (Boot Code 1.02)",                  MACHINE_NO_SOUND_HW | MACHINE_NOT_WORKING )
 COMP( 2004, ti84pse,    0,      0,      ti84pse, ti82,  ti85_state,  0,     "Texas Instruments", "TI-84 Plus Silver Edition (Boot Code 1.00)",   MACHINE_NO_SOUND_HW | MACHINE_NOT_WORKING )
