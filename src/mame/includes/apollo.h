@@ -685,7 +685,7 @@ DECLARE_DEVICE_TYPE(APOLLO_MONO19I, apollo_graphics_19i)
 //**************************************************************************
 
 #define MCFG_APOLLO_STDIO_TX_CALLBACK(_cb) \
-	devcb = &apollo_stdio_device::set_tx_cb(*device, DEVCB_##_cb);
+	devcb = &downcast<apollo_stdio_device &>(*device).set_tx_cb(DEVCB_##_cb);
 
 //**************************************************************************
 //  TYPE DEFINITIONS
@@ -700,9 +700,9 @@ public:
 	apollo_stdio_device(const machine_config &mconfig, const char *tag,
 			device_t *owner, uint32_t clock);
 
-	template<class _Object> static devcb_base &set_tx_cb(device_t &device, _Object object)
+	template<class Object> devcb_base &set_tx_cb(Object &&object)
 	{
-		return downcast<apollo_stdio_device &> (device).m_tx_w.set_callback(object);
+		return m_tx_w.set_callback(std::forward<Object>(object));
 	}
 
 	devcb_write_line m_tx_w;

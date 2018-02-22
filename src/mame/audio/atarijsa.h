@@ -38,22 +38,22 @@ DECLARE_DEVICE_TYPE(ATARI_JSA_IIIS, atari_jsa_iiis_device)
 
 #define MCFG_ATARI_JSA_I_ADD(_tag, _intcb) \
 	MCFG_DEVICE_ADD(_tag, ATARI_JSA_I, 0) \
-	devcb = &atari_jsa_i_device::static_set_main_int_cb(*device, DEVCB_##_intcb);
+	devcb = &downcast<atari_jsa_base_device &>(*device).set_main_int_cb(DEVCB_##_intcb);
 
 #define MCFG_ATARI_JSA_II_ADD(_tag, _intcb) \
 	MCFG_DEVICE_ADD(_tag, ATARI_JSA_II, 0) \
-	devcb = &atari_jsa_ii_device::static_set_main_int_cb(*device, DEVCB_##_intcb);
+	devcb = &downcast<atari_jsa_base_device &>(*device).set_main_int_cb(DEVCB_##_intcb);
 
 #define MCFG_ATARI_JSA_III_ADD(_tag, _intcb) \
 	MCFG_DEVICE_ADD(_tag, ATARI_JSA_III, 0) \
-	devcb = &atari_jsa_iii_device::static_set_main_int_cb(*device, DEVCB_##_intcb);
+	devcb = &downcast<atari_jsa_base_device &>(*device).set_main_int_cb(DEVCB_##_intcb);
 
 #define MCFG_ATARI_JSA_IIIS_ADD(_tag, _intcb) \
 	MCFG_DEVICE_ADD(_tag, ATARI_JSA_IIIS, 0) \
-	devcb = &atari_jsa_iiis_device::static_set_main_int_cb(*device, DEVCB_##_intcb);
+	devcb = &downcast<atari_jsa_base_device &>(*device).set_main_int_cb(DEVCB_##_intcb);
 
 #define MCFG_ATARI_JSA_TEST_PORT(_port, _bitnum) \
-	devcb = &atari_jsa_base_device::static_set_test_read_cb(*device, DEVCB_IOPORT(_port)); \
+	devcb = &downcast<atari_jsa_base_device &>(*device).set_test_read_cb(DEVCB_IOPORT(_port)); \
 	MCFG_DEVCB_RSHIFT(_bitnum);
 
 
@@ -83,9 +83,9 @@ protected:
 	atari_jsa_base_device(const machine_config &mconfig, device_type devtype, const char *tag, device_t *owner, uint32_t clock, int channels);
 
 public:
-	// static configuration
-	template <class Object> static devcb_base &static_set_test_read_cb(device_t &device, Object &&cb) { return downcast<atari_jsa_base_device &>(device).m_test_read_cb.set_callback(std::forward<Object>(cb)); }
-	template <class Object> static devcb_base &static_set_main_int_cb(device_t &device, Object &&cb) { return downcast<atari_jsa_base_device &>(device).m_main_int_cb.set_callback(std::forward<Object>(cb)); }
+	// configuration
+	template <class Object> devcb_base &set_test_read_cb(Object &&cb) { return m_test_read_cb.set_callback(std::forward<Object>(cb)); }
+	template <class Object> devcb_base &set_main_int_cb(Object &&cb) { return m_main_int_cb.set_callback(std::forward<Object>(cb)); }
 
 	// getters
 	m6502_device &soundcpu() const { return *m_jsacpu; }

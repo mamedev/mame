@@ -104,12 +104,6 @@ void wpcsnd_device::device_reset()
 	m_reply_available = false;
 }
 
-void wpcsnd_device::static_set_romregion(device_t &device, const char *tag)
-{
-	wpcsnd_device &cpuboard = downcast<wpcsnd_device &>(device);
-	cpuboard.m_rom.set_tag(tag);
-}
-
 WRITE_LINE_MEMBER( wpcsnd_device::ym2151_irq_w)
 {
 	m_cpu->set_input_line(M6809_FIRQ_LINE,state ? ASSERT_LINE : CLEAR_LINE);

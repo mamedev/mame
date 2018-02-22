@@ -125,7 +125,7 @@ enum {
 };
 
 #define MCFG_NB1413M3_TYPE(_type) \
-	nb1413m3_device::set_type(*device, _type);
+	downcast<nb1413m3_device &>(*device).set_type(_type);
 
 class nb1413m3_device : public device_t
 {
@@ -133,8 +133,8 @@ public:
 	nb1413m3_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 	~nb1413m3_device() {}
 
-	// (static) configuration helpers
-	static void set_type(device_t &device, int type) { downcast<nb1413m3_device &>(device).m_nb1413m3_type = type; }
+	// configuration helpers
+	void set_type(int type) { m_nb1413m3_type = type; }
 
 	enum
 	{

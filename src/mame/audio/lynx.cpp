@@ -114,12 +114,6 @@ lynx2_sound_device::lynx2_sound_device(const machine_config &mconfig, const char
 {
 }
 
-void lynx_sound_device::set_timer_delegate(device_t &device, timer_delegate cb)
-{
-	lynx_sound_device &dev = downcast<lynx_sound_device &>(device);
-	dev.m_timer_delegate = cb;
-}
-
 //-------------------------------------------------
 //  device_start - device-specific startup
 //-------------------------------------------------

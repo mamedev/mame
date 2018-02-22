@@ -12,7 +12,7 @@
 #pragma once
 
 #define MCFG_TVC_SOUND_SNDINT_CALLBACK(_write) \
-	devcb = &tvc_sound_device::set_sndint_wr_callback(*device, DEVCB_##_write);
+	devcb = &downcast<tvc_sound_device &>(*device).set_sndint_wr_callback(DEVCB_##_write);
 
 //**************************************************************************
 //  TYPE DEFINITIONS
@@ -26,7 +26,7 @@ public:
 	// construction/destruction
 	tvc_sound_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
-	template <class Object> static devcb_base &set_sndint_wr_callback(device_t &device, Object &&cb) { return downcast<tvc_sound_device &>(device).m_write_sndint.set_callback(std::forward<Object>(cb)); }
+	template <class Object> devcb_base &set_sndint_wr_callback(Object &&cb) { return m_write_sndint.set_callback(std::forward<Object>(cb)); }
 
 	DECLARE_WRITE8_MEMBER(write);
 	void reset_divider();
