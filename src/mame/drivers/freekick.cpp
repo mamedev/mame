@@ -1351,10 +1351,10 @@ ROM_START( gigasm2 ) /* From an actual Sega board "834-6167-01 // GIGAS 2" with 
 
 	ROM_REGION( 0xc000, "gfx2", 0 ) /* GFX */
 	ROM_LOAD( "11.3p", 0x00000, 0x04000, CRC(f64cbd1e) SHA1(f8d9b110cdac6ef524e35bec9a5d406651cd7bab) )
-	ROM_LOAD( "13.3l", 0x04000, 0x04000, CRC(ac1e7b4b) SHA1(9e4ff4119a3ae59434eae82fa4b2ce5badb62c68) )
+	ROM_LOAD( "13.3l", 0x04000, 0x04000, CRC(c228df19) SHA1(584f269f7de2d531f2b038b4b7318f813c329f7f) )
 	ROM_LOAD( "12.3n", 0x08000, 0x04000, CRC(a6ad9ce2) SHA1(db0338385208df9e9cf43efc11383412dec493e6) )
 
-	ROM_REGION( 0x0600, "proms", 0 ) /* not dumped yet; assumed to be the same */
+	ROM_REGION( 0x0600, "proms", 0 )
 	ROM_LOAD( "3a.bin", 0x0000, 0x0100, CRC(a784e71f) SHA1(1741ce98d719bad6cc5ea42337ef897f2435bbab) )
 	ROM_LOAD( "4d.bin", 0x0100, 0x0100, CRC(376df30c) SHA1(cc95920cd1c133da1becc7d92f4b187b56a90ec7) )
 	ROM_LOAD( "4a.bin", 0x0200, 0x0100, CRC(4edff5bd) SHA1(305efc7ad7f86635489a655e214e216ac02b904d) )
@@ -1380,7 +1380,7 @@ ROM_START( gigasm2b )
 
 	ROM_REGION( 0xc000, "gfx2", 0 ) /* GFX */
 	ROM_LOAD( "1.rom", 0x00000, 0x04000, CRC(f64cbd1e) SHA1(f8d9b110cdac6ef524e35bec9a5d406651cd7bab) ) // == 11.3p
-	ROM_LOAD( "3.rom", 0x04000, 0x04000, CRC(c228df19) SHA1(584f269f7de2d531f2b038b4b7318f813c329f7f) ) // 14 bytes different from 13.3l, all in bit 2, low here and high in the non-bootleg set. Which one is correct?
+	ROM_LOAD( "3.rom", 0x04000, 0x04000, CRC(c228df19) SHA1(584f269f7de2d531f2b038b4b7318f813c329f7f) ) // == 13.3l
 	ROM_LOAD( "2.rom", 0x08000, 0x04000, CRC(a6ad9ce2) SHA1(db0338385208df9e9cf43efc11383412dec493e6) ) // == 12.3n
 
 	ROM_REGION( 0x0600, "proms", 0 )
