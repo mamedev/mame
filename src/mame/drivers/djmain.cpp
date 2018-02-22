@@ -100,7 +100,7 @@ READ32_MEMBER(djmain_state::sndram_r)
 {
 	uint32_t data = 0;
 
-	offset |= 0x80000 * m_sndram_bank;
+	offset |= 0x20000 * m_sndram_bank;
 	if (ACCESSING_BITS_24_31)
 		data |= m_sndram[offset * 4] << 24;
 
@@ -118,7 +118,7 @@ READ32_MEMBER(djmain_state::sndram_r)
 
 WRITE32_MEMBER(djmain_state::sndram_w)
 {
-	offset |= 0x80000 * m_sndram_bank;
+	offset |= 0x20000 * m_sndram_bank;
 	if (ACCESSING_BITS_24_31)
 		m_sndram[offset * 4] = data >> 24;
 
