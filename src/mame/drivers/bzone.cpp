@@ -234,9 +234,9 @@ void bzone_state::machine_start()
 }
 
 
-MACHINE_START_MEMBER(bzone_state,redbaron)
+void redbaron_state::machine_start()
 {
-	save_item(NAME(m_analog_data));
+	bzone_state::machine_start();
 	save_item(NAME(m_rb_input_select));
 }
 
@@ -281,12 +281,12 @@ WRITE8_MEMBER(bzone_state::bzone_coin_counter_w)
  *
  *************************************/
 
-READ8_MEMBER(bzone_state::redbaron_joy_r)
+READ8_MEMBER(redbaron_state::redbaron_joy_r)
 {
-	return ioport(m_rb_input_select ? "FAKE1" : "FAKE2")->read();
+	return m_fake_ports[m_rb_input_select ? 0 : 1]->read();
 }
 
-WRITE8_MEMBER(bzone_state::redbaron_joysound_w)
+WRITE8_MEMBER(redbaron_state::redbaron_joysound_w)
 {
 	m_rb_input_select = data & 1;
 	m_redbaronsound->sounds_w(space, offset, data);
@@ -320,7 +320,7 @@ ADDRESS_MAP_START(bzone_state::bzone_map)
 	AM_RANGE(0x3000, 0x7fff) AM_ROM
 ADDRESS_MAP_END
 
-ADDRESS_MAP_START(bzone_state::redbaron_map)
+ADDRESS_MAP_START(redbaron_state::redbaron_map)
 	ADDRESS_MAP_GLOBAL_MASK(0x7fff)
 	AM_RANGE(0x0000, 0x03ff) AM_RAM
 	AM_RANGE(0x0800, 0x0800) AM_READ_PORT("IN0")
@@ -570,14 +570,12 @@ MACHINE_CONFIG_END
 
 
 
-MACHINE_CONFIG_START(bzone_state::redbaron)
+MACHINE_CONFIG_START(redbaron_state::redbaron)
 	bzone_base(config);
 
 	/* basic machine hardware */
 	MCFG_CPU_MODIFY("maincpu")
 	MCFG_CPU_PROGRAM_MAP(redbaron_map)
-
-	MCFG_MACHINE_START_OVERRIDE(bzone_state,redbaron)
 
 	MCFG_ATARIVGEAROM_ADD("earom")
 
@@ -586,12 +584,11 @@ MACHINE_CONFIG_START(bzone_state::redbaron)
 	MCFG_SCREEN_REFRESH_RATE(BZONE_CLOCK_3KHZ / 12 / 4)
 	MCFG_SCREEN_VISIBLE_AREA(0, 520, 0, 400)
 
-
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
 
 	MCFG_SOUND_ADD("pokey", POKEY, 1500000)
-	MCFG_POKEY_ALLPOT_R_CB(READ8(bzone_state, redbaron_joy_r))
+	MCFG_POKEY_ALLPOT_R_CB(READ8(redbaron_state, redbaron_joy_r))
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 
 	MCFG_SOUND_ADD("custom", REDBARON, 0)
@@ -883,9 +880,9 @@ DRIVER_INIT_MEMBER(bzone_state,bradley)
  *
  *************************************/
 
-GAMEL(1980, bzone,     0,        bzone,    bzone,    bzone_state, 0,       ROT0, "Atari", "Battle Zone (rev 2)",          MACHINE_SUPPORTS_SAVE, layout_bzone )
-GAMEL(1980, bzonea,    bzone,    bzone,    bzone,    bzone_state, 0,       ROT0, "Atari", "Battle Zone (rev 1)",          MACHINE_SUPPORTS_SAVE, layout_bzone )
-GAMEL(1980, bzonec,    bzone,    bzone,    bzone,    bzone_state, 0,       ROT0, "Atari", "Battle Zone (cocktail)",       MACHINE_SUPPORTS_SAVE|MACHINE_NO_COCKTAIL, layout_bzone )
-GAME( 1980, bradley,   0,        bzone,    bradley,  bzone_state, bradley, ROT0, "Atari", "Bradley Trainer",              MACHINE_SUPPORTS_SAVE )
-GAMEL(1980, redbaron,  0,        redbaron, redbaron, bzone_state, 0,       ROT0, "Atari", "Red Baron (Revised Hardware)", MACHINE_SUPPORTS_SAVE, layout_redbaron )
-GAMEL(1980, redbarona, redbaron, redbaron, redbaron, bzone_state, 0,       ROT0, "Atari", "Red Baron",                    MACHINE_SUPPORTS_SAVE, layout_redbaron )
+GAMEL(1980, bzone,     0,        bzone,    bzone,    bzone_state,    0,       ROT0, "Atari", "Battle Zone (rev 2)",          MACHINE_SUPPORTS_SAVE, layout_bzone )
+GAMEL(1980, bzonea,    bzone,    bzone,    bzone,    bzone_state,    0,       ROT0, "Atari", "Battle Zone (rev 1)",          MACHINE_SUPPORTS_SAVE, layout_bzone )
+GAMEL(1980, bzonec,    bzone,    bzone,    bzone,    bzone_state,    0,       ROT0, "Atari", "Battle Zone (cocktail)",       MACHINE_SUPPORTS_SAVE|MACHINE_NO_COCKTAIL, layout_bzone )
+GAME( 1980, bradley,   0,        bzone,    bradley,  bzone_state,    bradley, ROT0, "Atari", "Bradley Trainer",              MACHINE_SUPPORTS_SAVE )
+GAMEL(1980, redbaron,  0,        redbaron, redbaron, redbaron_state, 0,       ROT0, "Atari", "Red Baron (Revised Hardware)", MACHINE_SUPPORTS_SAVE, layout_redbaron )
+GAMEL(1980, redbarona, redbaron, redbaron, redbaron, redbaron_state, 0,       ROT0, "Atari", "Red Baron",                    MACHINE_SUPPORTS_SAVE, layout_redbaron )

@@ -510,7 +510,7 @@ static GFXDECODE_START( ladybug )
 	GFXDECODE_ENTRY( "gfx2", 0, spritelayout2, 4*8, 16 )
 GFXDECODE_END
 
-MACHINE_START_MEMBER(ladybug_state,ladybug)
+void ladybug_state::machine_start()
 {
 }
 
@@ -519,8 +519,6 @@ MACHINE_CONFIG_START(ladybug_state::ladybug)
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", Z80, 4000000)   /* 4 MHz */
 	MCFG_CPU_PROGRAM_MAP(ladybug_map)
-
-	MCFG_MACHINE_START_OVERRIDE(ladybug_state,ladybug)
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
@@ -538,8 +536,6 @@ MACHINE_CONFIG_START(ladybug_state::ladybug)
 
 	MCFG_DEVICE_ADD("videolatch", LS259, 0) // L5 on video board or H3 on single board
 	MCFG_ADDRESSABLE_LATCH_Q0_OUT_CB(WRITELINE(ladybug_state, flipscreen_w)) // no other outputs used
-
-	MCFG_VIDEO_START_OVERRIDE(ladybug_state,ladybug)
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")

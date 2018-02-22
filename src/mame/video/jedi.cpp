@@ -30,7 +30,7 @@
  *
  *************************************/
 
-VIDEO_START_MEMBER(jedi_state,jedi)
+void jedi_state::video_start()
 {
 	/* register for saving */
 	save_item(NAME(m_vscroll));
@@ -367,6 +367,4 @@ MACHINE_CONFIG_START(jedi_state::jedi_video)
 	MCFG_SCREEN_SIZE(64*8, 262) /* verify vert size */
 	MCFG_SCREEN_VISIBLE_AREA(0*8, 37*8-1, 0*8, 30*8-1)
 	MCFG_SCREEN_UPDATE_DRIVER(jedi_state, screen_update_jedi)
-
-	MCFG_VIDEO_START_OVERRIDE(jedi_state,jedi)
 MACHINE_CONFIG_END

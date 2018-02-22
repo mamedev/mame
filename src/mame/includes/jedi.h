@@ -67,7 +67,7 @@ protected:
 	virtual void machine_reset() override;
 	virtual void sound_start() override;
 	virtual void sound_reset() override;
-	DECLARE_VIDEO_START(jedi);
+	virtual void video_start() override;
 	DECLARE_WRITE_LINE_MEMBER(foreground_bank_w);
 	DECLARE_WRITE_LINE_MEMBER(video_off_w);
 	uint32_t screen_update_jedi(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);

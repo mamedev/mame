@@ -460,7 +460,6 @@ MACHINE_CONFIG_START(appoooh_state::appoooh)
 	MCFG_PALETTE_ADD("palette", 32*8+32*8)
 
 	MCFG_PALETTE_INIT_OWNER(appoooh_state,appoooh)
-	MCFG_VIDEO_START_OVERRIDE(appoooh_state,appoooh)
 MACHINE_CONFIG_END
 
 
@@ -483,7 +482,6 @@ MACHINE_CONFIG_START(appoooh_state::robowres)
 	MCFG_PALETTE_ADD("palette", 32*8+32*8)
 
 	MCFG_PALETTE_INIT_OWNER(appoooh_state,robowres)
-	MCFG_VIDEO_START_OVERRIDE(appoooh_state,appoooh)
 MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(appoooh_state::robowrese)

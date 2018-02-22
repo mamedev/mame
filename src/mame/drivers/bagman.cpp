@@ -80,13 +80,12 @@ void bagman_state::machine_start()
 	save_item(NAME(m_video_enable));
 }
 
-MACHINE_START_MEMBER(bagman_state, squaitsa)
+void squaitsa_state::machine_start()
 {
 	bagman_state::machine_start();
-	save_item(NAME(m_p1_res));
-	save_item(NAME(m_p1_old_val));
-	save_item(NAME(m_p2_res));
-	save_item(NAME(m_p2_old_val));
+
+	save_item(NAME(m_res));
+	save_item(NAME(m_old_val));
 }
 
 
@@ -315,8 +314,7 @@ static INPUT_PORTS_START( squaitsa )
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_START1 )
 	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_JOYSTICK_LEFT ) PORT_2WAY
 	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_JOYSTICK_RIGHT ) PORT_2WAY
-	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_SPECIAL ) // special handling for the p1 dial
-	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_SPECIAL ) // ^
+	PORT_BIT( 0x60, IP_ACTIVE_LOW, IPT_SPECIAL ) PORT_CUSTOM_MEMBER(DEVICE_SELF, squaitsa_state, dial_input_r<0>, nullptr)
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_BUTTON1 )
 
 	PORT_START("P2")
@@ -325,8 +323,7 @@ static INPUT_PORTS_START( squaitsa )
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_START2 )
 	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_JOYSTICK_LEFT ) PORT_2WAY PORT_COCKTAIL
 	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_JOYSTICK_RIGHT ) PORT_2WAY PORT_COCKTAIL
-	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_SPECIAL ) // special handling for the p2 dial
-	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_SPECIAL ) // ^
+	PORT_BIT( 0x60, IP_ACTIVE_LOW, IPT_SPECIAL ) PORT_CUSTOM_MEMBER(DEVICE_SELF, squaitsa_state, dial_input_r<1>, nullptr)
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_COCKTAIL
 
 	PORT_START("DSW")
@@ -400,44 +397,22 @@ GFXDECODE_END
 
 /* squaitsa doesn't map the dial directly, instead it polls the results of the dial through an external circuitry.
    I don't know if the following is correct, there can possibly be multiple solutions for the same problem. */
-READ8_MEMBER(bagman_state::dial_input_p1_r)
+template <unsigned N> CUSTOM_INPUT_MEMBER(squaitsa_state::dial_input_r)
 {
-	uint8_t dial_val;
+	uint8_t const dial_val = m_dial[N]->read();
 
-	dial_val = ioport("DIAL_P1")->read();
-
-	if(m_p1_res != 0x60)
-		m_p1_res = 0x60;
-	else if(dial_val > m_p1_old_val)
-		m_p1_res = 0x40;
-	else if(dial_val < m_p1_old_val)
-		m_p1_res = 0x20;
+	if(m_res[N] != 0x03)
+		m_res[N] = 0x03;
+	else if(dial_val > m_old_val[N])
+		m_res[N] = 0x02;
+	else if(dial_val < m_old_val[N])
+		m_res[N] = 0x01;
 	else
-		m_p1_res = 0x60;
+		m_res[N] = 0x03;
 
-	m_p1_old_val = dial_val;
+	m_old_val[N] = dial_val;
 
-	return (ioport("P1")->read() & 0x9f) | (m_p1_res);
-}
-
-READ8_MEMBER(bagman_state::dial_input_p2_r)
-{
-	uint8_t dial_val;
-
-	dial_val = ioport("DIAL_P2")->read();
-
-	if(m_p2_res != 0x60)
-		m_p2_res = 0x60;
-	else if(dial_val > m_p2_old_val)
-		m_p2_res = 0x40;
-	else if(dial_val < m_p2_old_val)
-		m_p2_res = 0x20;
-	else
-		m_p2_res = 0x60;
-
-	m_p2_old_val = dial_val;
-
-	return (ioport("P2")->read() & 0x9f) | (m_p2_res);
+	return m_res[N];
 }
 
 INTERRUPT_GEN_MEMBER(bagman_state::vblank_irq)
@@ -625,16 +600,6 @@ MACHINE_CONFIG_START(bagman_state::botanic)
 
 	MCFG_SOUND_ADD("ay2", AY8910, 1500000)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.40)
-MACHINE_CONFIG_END
-
-MACHINE_CONFIG_START(bagman_state::squaitsa)
-	botanic(config);
-	MCFG_MACHINE_START_OVERRIDE(bagman_state, squaitsa)
-
-	MCFG_SOUND_MODIFY("aysnd")
-	MCFG_AY8910_PORT_A_READ_CB(READ8(bagman_state, dial_input_p1_r))
-	MCFG_AY8910_PORT_B_READ_CB(READ8(bagman_state, dial_input_p2_r))
-
 MACHINE_CONFIG_END
 
 
@@ -1093,21 +1058,21 @@ ROM_START( squaitsa )
 ROM_END
 
 
-GAME( 1982, bagman,   0,       bagman,   bagman,   bagman_state, 0,       ROT270, "Valadon Automation", "Bagman", MACHINE_SUPPORTS_SAVE )
-GAME( 1982, bagnard,  bagman,  bagman,   bagman,   bagman_state, 0,       ROT270, "Valadon Automation", "Le Bagnard (set 1)", MACHINE_SUPPORTS_SAVE )
-GAME( 1982, bagnarda, bagman,  bagman,   bagman,   bagman_state, 0,       ROT270, "Valadon Automation", "Le Bagnard (set 2)", MACHINE_SUPPORTS_SAVE )
-GAME( 1982, bagnardi, bagman,  bagman,   bagman,   bagman_state, 0,       ROT90,  "Valadon Automation (Itisa license)", "Le Bagnard (Itisa, Spain)", MACHINE_SUPPORTS_SAVE )
-GAME( 1982, bagmans,  bagman,  bagman,   bagmans,  bagman_state, 0,       ROT270, "Valadon Automation (Stern Electronics license)", "Bagman (Stern Electronics, set 1)", MACHINE_SUPPORTS_SAVE )
-GAME( 1982, bagmans2, bagman,  bagman,   bagman,   bagman_state, 0,       ROT270, "Valadon Automation (Stern Electronics license)", "Bagman (Stern Electronics, set 2)", MACHINE_SUPPORTS_SAVE )
-GAME( 1982, bagmanj,  bagman,  bagman,   bagman,   bagman_state, 0,       ROT270, "Valadon Automation (Taito license)", "Bagman (Taito)", MACHINE_SUPPORTS_SAVE ) // title screen actually doesn't mention Valadon, only Stern and Taito
+GAME( 1982, bagman,   0,       bagman,   bagman,   bagman_state,   0,       ROT270, "Valadon Automation", "Bagman", MACHINE_SUPPORTS_SAVE )
+GAME( 1982, bagnard,  bagman,  bagman,   bagman,   bagman_state,   0,       ROT270, "Valadon Automation", "Le Bagnard (set 1)", MACHINE_SUPPORTS_SAVE )
+GAME( 1982, bagnarda, bagman,  bagman,   bagman,   bagman_state,   0,       ROT270, "Valadon Automation", "Le Bagnard (set 2)", MACHINE_SUPPORTS_SAVE )
+GAME( 1982, bagnardi, bagman,  bagman,   bagman,   bagman_state,   0,       ROT90,  "Valadon Automation (Itisa license)", "Le Bagnard (Itisa, Spain)", MACHINE_SUPPORTS_SAVE )
+GAME( 1982, bagmans,  bagman,  bagman,   bagmans,  bagman_state,   0,       ROT270, "Valadon Automation (Stern Electronics license)", "Bagman (Stern Electronics, set 1)", MACHINE_SUPPORTS_SAVE )
+GAME( 1982, bagmans2, bagman,  bagman,   bagman,   bagman_state,   0,       ROT270, "Valadon Automation (Stern Electronics license)", "Bagman (Stern Electronics, set 2)", MACHINE_SUPPORTS_SAVE )
+GAME( 1982, bagmanj,  bagman,  bagman,   bagman,   bagman_state,   0,       ROT270, "Valadon Automation (Taito license)", "Bagman (Taito)", MACHINE_SUPPORTS_SAVE ) // title screen actually doesn't mention Valadon, only Stern and Taito
 
-GAME( 1984, sbagman,  0,       sbagman,  sbagman,  bagman_state, 0,       ROT270, "Valadon Automation", "Super Bagman", MACHINE_SUPPORTS_SAVE )
-GAME( 1984, sbagmani, sbagman, sbagmani, sbagman,  bagman_state, 0,       ROT90,  "Valadon Automation (Itisa license)", "Super Bagman (Itisa, Spain)", MACHINE_WRONG_COLORS | MACHINE_SUPPORTS_SAVE ) // different color PROMs, needs correct decoding
-GAME( 1984, sbagmans, sbagman, sbagman,  sbagman,  bagman_state, 0,       ROT270, "Valadon Automation (Stern Electronics license)", "Super Bagman (Stern Electronics)", MACHINE_SUPPORTS_SAVE )
+GAME( 1984, sbagman,  0,       sbagman,  sbagman,  bagman_state,   0,       ROT270, "Valadon Automation", "Super Bagman", MACHINE_SUPPORTS_SAVE )
+GAME( 1984, sbagmani, sbagman, sbagmani, sbagman,  bagman_state,   0,       ROT90,  "Valadon Automation (Itisa license)", "Super Bagman (Itisa, Spain)", MACHINE_WRONG_COLORS | MACHINE_SUPPORTS_SAVE ) // different color PROMs, needs correct decoding
+GAME( 1984, sbagmans, sbagman, sbagman,  sbagman,  bagman_state,   0,       ROT270, "Valadon Automation (Stern Electronics license)", "Super Bagman (Stern Electronics)", MACHINE_SUPPORTS_SAVE )
 
-GAME( 1983, pickin,   0,       pickin,   pickin,   bagman_state, 0,       ROT270, "Valadon Automation", "Pickin'", MACHINE_SUPPORTS_SAVE )
+GAME( 1983, pickin,   0,       pickin,   pickin,   bagman_state,   0,       ROT270, "Valadon Automation", "Pickin'", MACHINE_SUPPORTS_SAVE )
 
-GAME( 1983, botanic,  0,       botanic,  botanici, bagman_state, 0,       ROT90,  "Itisa",                              "Botanic (English / Spanish)", MACHINE_SUPPORTS_SAVE )
-GAME( 1984, botanicf, botanic, botanic,  botanicf, bagman_state, 0,       ROT270, "Itisa (Valadon Automation license)", "Botanic (French)", MACHINE_SUPPORTS_SAVE )
+GAME( 1983, botanic,  0,       botanic,  botanici, bagman_state,   0,       ROT90,  "Itisa",                              "Botanic (English / Spanish)", MACHINE_SUPPORTS_SAVE )
+GAME( 1984, botanicf, botanic, botanic,  botanicf, bagman_state,   0,       ROT270, "Itisa (Valadon Automation license)", "Botanic (French)", MACHINE_SUPPORTS_SAVE )
 
-GAME( 1984, squaitsa, 0,       squaitsa, squaitsa, bagman_state, 0,       ROT0,   "Itisa", "Squash (Itisa)", MACHINE_SUPPORTS_SAVE )
+GAME( 1984, squaitsa, 0,       botanic,  squaitsa, squaitsa_state, 0,       ROT0,   "Itisa", "Squash (Itisa)", MACHINE_SUPPORTS_SAVE )

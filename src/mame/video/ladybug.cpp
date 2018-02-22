@@ -139,7 +139,7 @@ TILE_GET_INFO_MEMBER(ladybug_state::get_grid_tile_info)
 	}
 }
 
-VIDEO_START_MEMBER(ladybug_state,ladybug)
+void ladybug_state::video_start()
 {
 	m_bg_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(ladybug_state::get_bg_tile_info),this), TILEMAP_SCAN_ROWS, 8, 8, 32, 32);
 	m_bg_tilemap->set_scroll_rows(32);

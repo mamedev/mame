@@ -52,10 +52,11 @@ public:
 		m_riot(*this, "riot")
 	{ }
 
-	required_shared_ptr<uint8_t> m_riot_ram;
-	uint16_t m_current_screen_height;
+	void a2600(machine_config &config);
+	void a2600p(machine_config &config);
 
-	DECLARE_MACHINE_START(a2600);
+protected:
+	virtual void machine_start() override;
 	DECLARE_WRITE8_MEMBER(switch_A_w);
 	DECLARE_READ8_MEMBER(switch_A_r);
 	DECLARE_WRITE8_MEMBER(switch_B_w);
@@ -72,11 +73,13 @@ public:
 	DECLARE_READ8_MEMBER(cart_over_all_r);
 	DECLARE_WRITE8_MEMBER(cart_over_all_w);
 
-	void a2600p(machine_config &config);
-	void a2600(machine_config &config);
 	void a2600_cartslot(machine_config &config);
 	void a2600_mem(address_map &map);
-protected:
+
+private:
+	required_shared_ptr<uint8_t> m_riot_ram;
+	uint16_t m_current_screen_height;
+
 	required_device<vcs_control_port_device> m_joy1;
 	required_device<vcs_control_port_device> m_joy2;
 	optional_device<vcs_cart_slot_device> m_cart;

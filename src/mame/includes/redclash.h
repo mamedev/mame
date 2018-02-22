@@ -5,6 +5,10 @@
     Zero Hour / Red Clash
 
 *************************************************************************/
+#ifndef MAME_INCLUDES_REDCLASH_H
+#define MAME_INCLUDES_REDCLASH_H
+
+#pragma once
 
 #include "includes/ladybug.h"
 
@@ -12,13 +16,30 @@ class redclash_state : public ladybug_state
 {
 public:
 	redclash_state(const machine_config &mconfig, device_type type, const char *tag)
-		: ladybug_state(mconfig, type, tag), m_sub(*this, "sub") { }
+		: ladybug_state(mconfig, type, tag)
+		, m_grid_data(*this, "grid_data")
+		, m_sub(*this, "sub")
+	{ }
 
+	uint8_t      m_grid_color;
+	int        m_star_speed;
+	uint8_t      m_stars_enable;
+	uint8_t      m_stars_speed;
+	uint32_t     m_stars_state;
+	uint16_t     m_stars_offset;
+	uint8_t      m_stars_count;
+
+	tilemap_t    *m_grid_tilemap;   // ladybug
+
+	optional_shared_ptr<uint8_t> m_grid_data;
 	optional_device<cpu_device> m_sub;
 	tilemap_t    *m_fg_tilemap; // redclash
 	int        m_gfxbank;   // redclash only
 
 	/* misc */
+	uint8_t      m_sound_low;
+	uint8_t      m_sound_high;
+	uint8_t      m_weird_value[8];
 	uint8_t      m_sraider_0x30;
 	uint8_t      m_sraider_0x38;
 
@@ -71,3 +92,5 @@ public:
 	void sraider_cpu2_map(address_map &map);
 	void zerohour_map(address_map &map);
 };
+
+#endif // MAME_INCLUDES_REDCLASH_H

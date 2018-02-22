@@ -221,8 +221,6 @@ MACHINE_CONFIG_START(batman_state::batman)
 	MCFG_SCREEN_UPDATE_DRIVER(batman_state, screen_update_batman)
 	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_VIDEO_START_OVERRIDE(batman_state,batman)
-
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
 

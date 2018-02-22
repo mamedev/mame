@@ -284,7 +284,7 @@ WRITE8_MEMBER(a2600_state::cart_over_tia_w)
 	m_tia->write(space, offset, data);
 }
 
-MACHINE_START_MEMBER(a2600_state,a2600)
+void a2600_state::machine_start()
 {
 	m_current_screen_height = m_screen->height();
 	memset(m_riot_ram, 0x00, 0x80);
@@ -499,8 +499,6 @@ MACHINE_CONFIG_START(a2600_state::a2600)
 	MCFG_M6502_DISABLE_DIRECT()
 	MCFG_CPU_PROGRAM_MAP(a2600_mem)
 
-	MCFG_MACHINE_START_OVERRIDE(a2600_state,a2600)
-
 	/* video hardware */
 	MCFG_DEVICE_ADD("tia_video", TIA_NTSC_VIDEO, 0)
 	MCFG_TIA_READ_INPUT_PORT_CB(READ16(a2600_state, a2600_read_input_port))
@@ -547,8 +545,6 @@ MACHINE_CONFIG_START(a2600_state::a2600p)
 	MCFG_CPU_ADD("maincpu", M6507, MASTER_CLOCK_PAL / 3)
 	MCFG_CPU_PROGRAM_MAP(a2600_mem)
 	MCFG_M6502_DISABLE_DIRECT()
-
-	MCFG_MACHINE_START_OVERRIDE(a2600_state,a2600)
 
 	/* video hardware */
 	MCFG_DEVICE_ADD("tia_video", TIA_PAL_VIDEO, 0)
