@@ -276,6 +276,13 @@ MACHINE_CONFIG_START(dragon64_state::dragon64)
 	MCFG_SOFTWARE_LIST_ADD("dragon_os9_list", "dragon_os9")
 MACHINE_CONFIG_END
 
+MACHINE_CONFIG_START(dragon64_state::dragon64h)
+	dragon64(config);
+	MCFG_CPU_REPLACE(MAINCPU_TAG, HD6309E, DERIVED_CLOCK(1, 1))
+	MCFG_CPU_PROGRAM_MAP(dragon_mem)
+	MCFG_RAM_DEFAULT_SIZE("64K")
+MACHINE_CONFIG_END
+
 MACHINE_CONFIG_START(dragon200e_state::dragon200e)
 	dragon64(config);
 	// video hardware
@@ -361,13 +368,6 @@ MACHINE_CONFIG_START(dragon64_state::tanodr64)
 	// cartridge
 	MCFG_DEVICE_MODIFY(CARTRIDGE_TAG)
 	MCFG_DEVICE_SLOT_INTERFACE(dragon_cart, "sdtandy_fdc", false)
-MACHINE_CONFIG_END
-
-MACHINE_CONFIG_START(dragon64_state::dragon64h)
-	dragon64(config);
-	MCFG_CPU_REPLACE(MAINCPU_TAG, HD6309E, DERIVED_CLOCK(1, 1))
-	MCFG_CPU_PROGRAM_MAP(dragon_mem)
-	MCFG_RAM_DEFAULT_SIZE("64K")
 MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(dragon64_state::tanodr64h)
