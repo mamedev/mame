@@ -281,7 +281,7 @@ void jchan_state::video_start()
 	save_pointer(NAME(m_sprite_regs32[1].get()), 0x40/4);
 }
 
-region_ptr
+
 uint32_t jchan_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
 	int x,y;
@@ -313,15 +313,15 @@ uint32_t jchan_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap,
 	
 	bitmap_ind8 *tile_primap = &screen.priority();
 
-	// TODO : verify sprite-tile priorities from real hardware
-	for (y=0;y<240;y++)
+	// TODO : verify sprite-tile priorities from real hardware, Check what 15 bit of palette actually working
+	for (y=cliprect.min_y;y<=cliprect.max_y;y++)
 	{
 		src1 = &m_sprite_bitmap[0]->pix16(y);
 		src2 = &m_sprite_bitmap[1]->pix16(y);
 		tilepri = &tile_primap->pix8(y);
 		dst =  &bitmap.pix16(y);
 
-		for (x=0;x<320;x++)
+		for (x=cliprect.min_x;x<=cliprect.max_x;x++)
 		{
 			pixdata1 = src1[x];
 			pixdata2 = src2[x];
