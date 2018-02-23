@@ -4139,6 +4139,7 @@ files {
 	MAME_DIR .. "src/mame/drivers/ladybug.cpp",
 	MAME_DIR .. "src/mame/includes/ladybug.h",
 	MAME_DIR .. "src/mame/video/ladybug.cpp",
+	MAME_DIR .. "src/mame/video/ladybug.h",
 	MAME_DIR .. "src/mame/drivers/mrdo.cpp",
 	MAME_DIR .. "src/mame/includes/mrdo.h",
 	MAME_DIR .. "src/mame/video/mrdo.cpp",
