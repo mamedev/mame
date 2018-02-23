@@ -1,8 +1,10 @@
-#include "machine/eepromser.h"
-
 // license:BSD-3-Clause
 // copyright-holders:Nicola Salmoria, Couriersud
 // thanks-to: Marc Lafontaine
+
+#include "machine/eepromser.h"
+#include "video/resnet.h"
+
 class tnx1_state : public driver_device
 {
 public:
@@ -30,6 +32,12 @@ protected:
 	required_shared_ptr<uint8_t> m_colorram;
 	required_region_ptr<uint8_t> m_color_prom;
 	required_region_ptr<uint8_t> m_color_prom_spr;
+
+	static const res_net_decode_info mb7051_decode_info;
+	static const res_net_decode_info mb7052_decode_info;
+	static const res_net_info txt_mb7051_net_info;
+	static const res_net_info bak_mb7051_net_info;
+	static const res_net_info obj_mb7052_net_info;
 
 	std::unique_ptr<bitmap_ind16> m_sprite_bitmap;
 	std::vector<uint8_t> m_sprite_ram;

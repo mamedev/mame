@@ -10,7 +10,6 @@
 ***************************************************************************/
 
 #include "emu.h"
-#include "video/resnet.h"
 #include "includes/popeye.h"
 
 #define USE_NEW_COLOR (1)
@@ -55,7 +54,7 @@
 
 ***************************************************************************/
 
-static const res_net_decode_info popeye_7051_decode_info =
+const res_net_decode_info tnx1_state::mb7051_decode_info =
 {
 	1,      /*  one prom 5 lines */
 	0,      /*  start at 0 */
@@ -66,7 +65,7 @@ static const res_net_decode_info popeye_7051_decode_info =
 	{0x07,0x07,0x03 }       /*  masks */
 };
 
-static const res_net_decode_info popeye_7052_decode_info =
+const res_net_decode_info tnx1_state::mb7052_decode_info =
 {
 	1,      /*  two 4 bit proms */
 	0,      /*  start at 0 */
@@ -77,34 +76,33 @@ static const res_net_decode_info popeye_7052_decode_info =
 	{0x07,0x07,0x03}        /*  masks */
 };
 
-static const res_net_info popeye_7051_txt_net_info =
+const res_net_info tnx1_state::txt_mb7051_net_info =
 {
 	RES_NET_VCC_5V | RES_NET_VBIAS_5V | RES_NET_VIN_MB7051 | RES_NET_MONITOR_SANYO_EZV20,
 	{
 		{ RES_NET_AMP_DARLINGTON, 470, 0, 3, { 1000, 470, 220 } },
 		{ RES_NET_AMP_DARLINGTON, 470, 0, 3, { 1000, 470, 220 } },
-		{ RES_NET_AMP_DARLINGTON, 680, 0, 2, {  470, 220,   0 } }  /*  popeye */
+		{ RES_NET_AMP_DARLINGTON, 680, 0, 2, {  470, 220,   0 } }
 	}
 };
 
-static const res_net_info popeye_7051_bck_net_info =
+const res_net_info tnx1_state::bak_mb7051_net_info =
 {
 	RES_NET_VCC_5V | RES_NET_VBIAS_5V | RES_NET_VIN_MB7051 | RES_NET_MONITOR_SANYO_EZV20,
 	{
 		{ RES_NET_AMP_DARLINGTON, 470, 0, 3, { 1200, 680, 470 } },
 		{ RES_NET_AMP_DARLINGTON, 470, 0, 3, { 1200, 680, 470 } },
-		{ RES_NET_AMP_DARLINGTON, 680, 0, 2, {  680, 470,   0 } }  /*  popeye */
+		{ RES_NET_AMP_DARLINGTON, 680, 0, 2, {  680, 470,   0 } }
 	}
 };
 
-
-static const res_net_info popeye_7052_obj_net_info =
+const res_net_info tnx1_state::obj_mb7052_net_info =
 {
 	RES_NET_VCC_5V | RES_NET_VBIAS_5V | RES_NET_VIN_MB7052 |  RES_NET_MONITOR_SANYO_EZV20,
 	{
 		{ RES_NET_AMP_DARLINGTON, 470, 0, 3, { 1000, 470, 220 } },
 		{ RES_NET_AMP_DARLINGTON, 470, 0, 3, { 1000, 470, 220 } },
-		{ RES_NET_AMP_DARLINGTON, 680, 0, 2, {  470, 220,   0 } }  /*  popeye */
+		{ RES_NET_AMP_DARLINGTON, 680, 0, 2, {  470, 220,   0 } }
 	}
 };
 
@@ -146,7 +144,7 @@ void tnx1_state::update_palette()
 #if USE_NEW_COLOR
 		std::vector<rgb_t> rgb;
 
-		compute_res_net_all(rgb, color_prom, popeye_7051_decode_info, popeye_7051_bck_net_info);
+		compute_res_net_all(rgb, color_prom, mb7051_decode_info, bak_mb7051_net_info);
 		m_palette->set_pen_colors(0, rgb);
 #else
 		for (int i = 0; i < 16; i++)
@@ -186,9 +184,9 @@ void tnx1_state::update_palette()
 #if USE_NEW_COLOR
 		for (int i = 0; i < 16; i++)
 		{
-			int r = compute_res_net((color_prom[i] >> 0) & 0x07, 0, popeye_7051_txt_net_info);
-			int g = compute_res_net((color_prom[i] >> 3) & 0x07, 1, popeye_7051_txt_net_info);
-			int b = compute_res_net((color_prom[i] >> 6) & 0x03, 2, popeye_7051_txt_net_info);
+			int r = compute_res_net((color_prom[i] >> 0) & 0x07, 0, txt_mb7051_net_info);
+			int g = compute_res_net((color_prom[i] >> 3) & 0x07, 1, txt_mb7051_net_info);
+			int b = compute_res_net((color_prom[i] >> 6) & 0x03, 2, txt_mb7051_net_info);
 			m_palette->set_pen_color(16 + (2 * i) + 0, rgb_t(0, 0, 0));
 			m_palette->set_pen_color(16 + (2 * i) + 1, rgb_t(r, g, b));
 		}
@@ -223,7 +221,7 @@ void tnx1_state::update_palette()
 #if USE_NEW_COLOR
 		/* sprites */
 		std::vector<rgb_t> rgb;
-		compute_res_net_all(rgb, color_prom, popeye_7052_decode_info, popeye_7052_obj_net_info);
+		compute_res_net_all(rgb, color_prom, mb7052_decode_info, obj_mb7052_net_info);
 		m_palette->set_pen_colors(48, rgb);
 #else
 		for (int i = 0; i < 32; i++)
