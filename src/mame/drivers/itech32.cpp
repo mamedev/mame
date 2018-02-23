@@ -2137,7 +2137,7 @@ ROM_START( hardyard )   /* Version 1.2 (3-tier board set: P/N 1059 Rev 3,  P/N 1
 	ROM_LOAD32_BYTE( "footbal_5.grom6.itfb5",  0x400001, 0x100000, CRC(9b19b873) SHA1(4393dce2fd6e1f3c2b855759a985e1e068959e0a) ) /* MASK ROM, socket silkscreened GROM6/ITFB5 */
 	ROM_LOAD32_BYTE( "footbal_6.grom11.itfb6", 0x400002, 0x100000, CRC(58694394) SHA1(9b0742d136de9870f50a1f47347071a21283067b) ) /* MASK ROM, socket silkscreened GROM11/ITFB6 */
 	ROM_LOAD32_BYTE( "footbal_7.grom16.itfb7", 0x400003, 0x100000, CRC(9b7a2d1a) SHA1(e4aa8d5f76b26d16cabaf88dfa1bfba8052fe99d) ) /* MASK ROM, socket silkscreened GROM16/ITFB7 */
-	ROM_LOAD32_BYTE( "itbf-8.grom2.itfb8",     0x800000, 0x020000, CRC(a1656bf8) SHA1(4df05a1cdf5d636956d1c3d1f4f1988b254608d5) ) /* EPROM, socket silkscreened GROM2/ITFB8 */
+	ROM_LOAD32_BYTE( "itfb-8.grom2.itfb8",     0x800000, 0x020000, CRC(a1656bf8) SHA1(4df05a1cdf5d636956d1c3d1f4f1988b254608d5) ) /* EPROM, socket silkscreened GROM2/ITFB8 */
 	ROM_LOAD32_BYTE( "itfb-9.grom7.itfb9",     0x800001, 0x020000, CRC(2afa9e10) SHA1(d422447fd2fc2f9350af472eb1f1223383a1a259) ) /* EPROM, socket silkscreened GROM7/ITFB9 */
 	ROM_LOAD32_BYTE( "itfb-10.grom12.itfb10",  0x800002, 0x020000, CRC(d5d15b38) SHA1(f414c19d8d88f916fbfa24fc3e16cea2e0acce08) ) /* EPROM, socket silkscreened GROM12/ITFB10 */
 	ROM_LOAD32_BYTE( "itfb-11.grom17.itfb11",  0x800003, 0x020000, CRC(cd4f0df0) SHA1(632eb0cf27d7bf3df09d03f373a3195dd5a702b8) ) /* EPROM, socket silkscreened GROM17/ITFB11 */
@@ -2169,7 +2169,7 @@ ROM_START( hardyard11 )   /* Version 1.1 (3-tier board set: P/N 1059 Rev 3,  P/N
 	ROM_LOAD32_BYTE( "footbal_5.grom6.itfb5",  0x400001, 0x100000, CRC(9b19b873) SHA1(4393dce2fd6e1f3c2b855759a985e1e068959e0a) ) /* MASK ROM, socket silkscreened GROM6/ITFB5 */
 	ROM_LOAD32_BYTE( "footbal_6.grom11.itfb6", 0x400002, 0x100000, CRC(58694394) SHA1(9b0742d136de9870f50a1f47347071a21283067b) ) /* MASK ROM, socket silkscreened GROM11/ITFB6 */
 	ROM_LOAD32_BYTE( "footbal_7.grom16.itfb7", 0x400003, 0x100000, CRC(9b7a2d1a) SHA1(e4aa8d5f76b26d16cabaf88dfa1bfba8052fe99d) ) /* MASK ROM, socket silkscreened GROM16/ITFB7 */
-	ROM_LOAD32_BYTE( "itbf-8.grom2.itfb8",     0x800000, 0x020000, CRC(a1656bf8) SHA1(4df05a1cdf5d636956d1c3d1f4f1988b254608d5) ) /* EPROM, socket silkscreened GROM2/ITFB8 */
+	ROM_LOAD32_BYTE( "itfb-8.grom2.itfb8",     0x800000, 0x020000, CRC(a1656bf8) SHA1(4df05a1cdf5d636956d1c3d1f4f1988b254608d5) ) /* EPROM, socket silkscreened GROM2/ITFB8 */
 	ROM_LOAD32_BYTE( "itfb-9.grom7.itfb9",     0x800001, 0x020000, CRC(2afa9e10) SHA1(d422447fd2fc2f9350af472eb1f1223383a1a259) ) /* EPROM, socket silkscreened GROM7/ITFB9 */
 	ROM_LOAD32_BYTE( "itfb-10.grom12.itfb10",  0x800002, 0x020000, CRC(d5d15b38) SHA1(f414c19d8d88f916fbfa24fc3e16cea2e0acce08) ) /* EPROM, socket silkscreened GROM12/ITFB10 */
 	ROM_LOAD32_BYTE( "itfb-11.grom17.itfb11",  0x800003, 0x020000, CRC(cd4f0df0) SHA1(632eb0cf27d7bf3df09d03f373a3195dd5a702b8) ) /* EPROM, socket silkscreened GROM17/ITFB11 */
@@ -2201,7 +2201,7 @@ ROM_START( hardyard10 ) /* Version 1.0 (3-tier board set: P/N 1059 Rev 3, P/N 10
 	ROM_LOAD32_BYTE( "footbal_5.grom6.itfb5",  0x400001, 0x100000, CRC(9b19b873) SHA1(4393dce2fd6e1f3c2b855759a985e1e068959e0a) ) /* MASK ROM, socket silkscreened GROM6/ITFB5 */
 	ROM_LOAD32_BYTE( "footbal_6.grom11.itfb6", 0x400002, 0x100000, CRC(58694394) SHA1(9b0742d136de9870f50a1f47347071a21283067b) ) /* MASK ROM, socket silkscreened GROM11/ITFB6 */
 	ROM_LOAD32_BYTE( "footbal_7.grom16.itfb7", 0x400003, 0x100000, CRC(9b7a2d1a) SHA1(e4aa8d5f76b26d16cabaf88dfa1bfba8052fe99d) ) /* MASK ROM, socket silkscreened GROM16/ITFB7 */
-	ROM_LOAD32_BYTE( "itbf-8.grom2.itfb8",     0x800000, 0x020000, CRC(a1656bf8) SHA1(4df05a1cdf5d636956d1c3d1f4f1988b254608d5) ) /* EPROM, socket silkscreened GROM2/ITFB8 */
+	ROM_LOAD32_BYTE( "itfb-8.grom2.itfb8",     0x800000, 0x020000, CRC(a1656bf8) SHA1(4df05a1cdf5d636956d1c3d1f4f1988b254608d5) ) /* EPROM, socket silkscreened GROM2/ITFB8 */
 	ROM_LOAD32_BYTE( "itfb-9.grom7.itfb9",     0x800001, 0x020000, CRC(2afa9e10) SHA1(d422447fd2fc2f9350af472eb1f1223383a1a259) ) /* EPROM, socket silkscreened GROM7/ITFB9 */
 	ROM_LOAD32_BYTE( "itfb-10.grom12.itfb10",  0x800002, 0x020000, CRC(d5d15b38) SHA1(f414c19d8d88f916fbfa24fc3e16cea2e0acce08) ) /* EPROM, socket silkscreened GROM12/ITFB10 */
 	ROM_LOAD32_BYTE( "itfb-11.grom17.itfb11",  0x800003, 0x020000, CRC(cd4f0df0) SHA1(632eb0cf27d7bf3df09d03f373a3195dd5a702b8) ) /* EPROM, socket silkscreened GROM17/ITFB11 */

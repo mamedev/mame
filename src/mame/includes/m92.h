@@ -8,7 +8,6 @@
 
 #include "video/bufsprite.h"
 #include "sound/okim6295.h"
-#include "machine/gen_latch.h"
 #include "machine/pic8259.h"
 #include "machine/timer.h"
 #include "screen.h"
@@ -40,8 +39,7 @@ public:
 			m_gfxdecode(*this, "gfxdecode"),
 			m_screen(*this, "screen"),
 			m_palette(*this, "palette"),
-			m_upd71059c(*this, "upd71059c"),
-			m_soundlatch(*this, "soundlatch")
+			m_upd71059c(*this, "upd71059c")
 	{ }
 
 	required_device<buffered_spriteram16_device> m_spriteram;
@@ -54,10 +52,8 @@ public:
 	required_device<screen_device> m_screen;
 	required_device<palette_device> m_palette;
 	required_device<pic8259_device> m_upd71059c;
-	optional_device<generic_latch_8_device> m_soundlatch;
 
 	emu_timer *m_spritebuffer_timer;
-	uint16_t m_sound_status;
 	uint32_t m_raster_irq_position;
 	uint16_t m_videocontrol;
 	uint8_t m_sprite_buffer_busy;
@@ -71,11 +67,6 @@ public:
 	DECLARE_WRITE16_MEMBER(m92_eeprom_w);
 	DECLARE_WRITE16_MEMBER(m92_coincounter_w);
 	DECLARE_WRITE16_MEMBER(m92_bankswitch_w);
-	DECLARE_WRITE16_MEMBER(m92_soundlatch_w);
-	DECLARE_READ16_MEMBER(m92_sound_status_r);
-	DECLARE_READ16_MEMBER(m92_soundlatch_r);
-	DECLARE_WRITE16_MEMBER(m92_sound_irq_ack_w);
-	DECLARE_WRITE16_MEMBER(m92_sound_status_w);
 	DECLARE_WRITE16_MEMBER(m92_sound_reset_w);
 	DECLARE_WRITE16_MEMBER(m92_spritecontrol_w);
 	DECLARE_WRITE16_MEMBER(m92_videocontrol_w);
@@ -94,7 +85,6 @@ public:
 	DECLARE_DRIVER_INIT(m92);
 	DECLARE_DRIVER_INIT(m92_bank);
 	TILE_GET_INFO_MEMBER(get_pf_tile_info);
-	DECLARE_MACHINE_START(m92);
 	DECLARE_MACHINE_RESET(m92);
 	DECLARE_VIDEO_START(m92);
 	DECLARE_VIDEO_START(ppan);

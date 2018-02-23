@@ -698,19 +698,16 @@ INTERRUPT_GEN_MEMBER(m90_state::bomblord_fake_nmi)
 		m_audio->sample_w(space,0,sample);
 }
 
-INTERRUPT_GEN_MEMBER(m90_state::m90_interrupt)
+WRITE_LINE_MEMBER(m90_state::dynablsb_vblank_int_w)
 {
-	device.execute().pulse_input_line(NEC_INPUT_LINE_INTP0, device.execute().minimum_quantum_time());
+	if (state)
+		m_maincpu->set_input_line_and_vector(0, HOLD_LINE, 0x60/4);
 }
 
-INTERRUPT_GEN_MEMBER(m90_state::dynablsb_interrupt)
+WRITE_LINE_MEMBER(m90_state::bomblord_vblank_int_w)
 {
-	device.execute().set_input_line_and_vector(0, HOLD_LINE, 0x60/4);
-}
-
-INTERRUPT_GEN_MEMBER(m90_state::bomblord_interrupt)
-{
-	device.execute().set_input_line_and_vector(0, HOLD_LINE, 0x50/4);
+	if (state)
+		m_maincpu->set_input_line_and_vector(0, HOLD_LINE, 0x50/4);
 }
 
 
@@ -720,7 +717,6 @@ MACHINE_CONFIG_START(m90_state::m90)
 	MCFG_CPU_ADD("maincpu", V35, XTAL(32'000'000)/2)
 	MCFG_CPU_PROGRAM_MAP(m90_main_cpu_map)
 	MCFG_CPU_IO_MAP(m90_main_cpu_io_map)
-	MCFG_CPU_VBLANK_INT_DRIVER("screen", m90_state,  m90_interrupt)
 
 	MCFG_CPU_ADD("soundcpu", Z80, XTAL(3'579'545)) /* verified on pcb */
 	MCFG_CPU_PROGRAM_MAP(m90_sound_cpu_map)
@@ -737,6 +733,7 @@ MACHINE_CONFIG_START(m90_state::m90)
 	MCFG_SCREEN_VISIBLE_AREA(6*8, 54*8-1, 17*8, 47*8-1)
 	MCFG_SCREEN_UPDATE_DRIVER(m90_state, screen_update_m90)
 	MCFG_SCREEN_PALETTE("palette")
+	MCFG_SCREEN_VBLANK_CALLBACK(INPUTLINE("maincpu", NEC_INPUT_LINE_INTP0))
 
 	MCFG_GFXDECODE_ADD("gfxdecode", "palette", m90)
 	MCFG_PALETTE_ADD("palette", 512)
@@ -824,7 +821,6 @@ MACHINE_CONFIG_START(m90_state::bomblord)
 	MCFG_CPU_REPLACE("maincpu", V30, 32000000/4)
 	MCFG_CPU_PROGRAM_MAP(bomblord_main_cpu_map)
 	MCFG_CPU_IO_MAP(m90_main_cpu_io_map)
-	MCFG_CPU_VBLANK_INT_DRIVER("screen", m90_state,  bomblord_interrupt)
 
 	MCFG_CPU_MODIFY("soundcpu")
 	MCFG_CPU_IO_MAP(m99_sound_cpu_io_map)
@@ -833,6 +829,7 @@ MACHINE_CONFIG_START(m90_state::bomblord)
 	MCFG_SCREEN_MODIFY("screen")
 	MCFG_SCREEN_VISIBLE_AREA(10*8, 50*8-1, 17*8, 47*8-1)
 	MCFG_SCREEN_UPDATE_DRIVER(m90_state, screen_update_bomblord)
+	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE(m90_state, bomblord_vblank_int_w))
 
 	MCFG_VIDEO_START_OVERRIDE(m90_state,bomblord)
 MACHINE_CONFIG_END
@@ -843,7 +840,6 @@ MACHINE_CONFIG_START(m90_state::dynablsb)
 	MCFG_CPU_REPLACE("maincpu", V30, 32000000/4)
 	MCFG_CPU_PROGRAM_MAP(dynablsb_main_cpu_map)
 	MCFG_CPU_IO_MAP(dynablsb_main_cpu_io_map)
-	MCFG_CPU_VBLANK_INT_DRIVER("screen", m90_state,  dynablsb_interrupt)
 
 	MCFG_CPU_MODIFY("soundcpu")
 	MCFG_CPU_IO_MAP(dynablsb_sound_cpu_io_map)
@@ -854,6 +850,7 @@ MACHINE_CONFIG_START(m90_state::dynablsb)
 	MCFG_SCREEN_SIZE(320, 240)
 	MCFG_SCREEN_VISIBLE_AREA(0, 319, 0, 239)
 	MCFG_SCREEN_UPDATE_DRIVER(m90_state, screen_update_dynablsb)
+	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE(m90_state, dynablsb_vblank_int_w))
 
 	MCFG_VIDEO_START_OVERRIDE(m90_state,dynablsb)
 

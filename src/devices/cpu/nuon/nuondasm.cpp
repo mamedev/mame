@@ -64,12 +64,14 @@
   0011 10nn nnnd dddd                                                                    [alu] lsr #d/5u, rn
   0011 11nn nnnd dddd                                                                    [alu] btst #d/5u, rn
 
+  f100 00nn nnnm mmmm                                                                    [mul] mul rm, rn, >>acshift, rn
   f100 10mm mmmn nnnn                                                                    [mem] ld_s (rm), rn
   f100 11mm mmmn nnnn                                                                    [mem] st_s rn, (rm)
   f101 00mm mmmn nnnn                                                                    [mem] ld_s 20500000 + m/5u << 4, rn
   f101 01mm mmmn nnnn                                                                    [mem] st_s rn, 20500000 + m/5u << 4
   f101 10mm mmmn nnnn                                                                    [mem] mv_s rn, rm
   f101 11mm mmmv vvvv                                                                    [mem] mv_s #v/5u, rm
+  f110 00nn n00m mm00                                                                    [mem] mv_v vm, vn
   f110 10cc crrr rrrr                                                                    [ecu] bra cc1, pc + r/7s << 1
   f110 11rr rrrr rrrr                                                                    [ecu] bra pc + r/10s<< 1
   f111 0000 0000 0001                                                                    [ecu] halt
@@ -81,6 +83,7 @@
   f111 00cc ccc1 0101                                                                    [ecu] rti cc, (rzi2), nop
   f111 01mm mmmn n0ab                                                                    [rcu] addr rm, rx
   f111 01vv vvvn n1ab                                                                    [rcu] addr #v/5s << 16, rx
+  f111 10mm mmmn n0ab                                                                    [rcu] mvr rm, rx
   f111 1000 000n n1ab                                                                    [rcu] modulo rx
   f111 1001 0000 01ab                                                                    [rcu] dec_only
 
@@ -94,6 +97,7 @@
   1000 1xxx xxxx xxxx . xxxx xxxx xxxx x0CC . f110 10cc cvvv vvvv                        [ecu] bra cC, pc + #xv/31s << 1      (asm only wants 28 bits?)
   1000 1xxx xxxx xxxx . xxxx xxxx xxxx x1CC . f110 10cc cvvv vvvv                        [ecu] bra cC, pc + #xv/31s << 1, nop (asm only wants 28 bits?)
   1000 1xxx xxxx xxxx . vvvv vvvv vvvv vvvv . f111 01ww wwwn n1ab                        [rcu] addr #xwv/32s, rx
+  1000 1xxx xxxx xxxx . vvvv vvvv vvvv vvvv . f111 10ww wwwn n0ab                        [rcu] mvr #xwv/32s, rx
 
   1000 1xxx xxxx xxxx . xxxx xxx0 0000 0000 . 1001 00cc cccv vvvv . 101f 0100 wwww wwww  [ecu] jsr cc, #xwv/31u << 1
   1000 1xxx xxxx xxxx . xxxx xxxx xxx0 0qmm . 1001 01oo ooov vvvv . 101f 111p pppw wwww  [mem] st_s #xwv/32u, 20000000 + qpom/12u << 2  
@@ -233,6 +237,32 @@
   1001 10vv vvvn nnnn . 1011 1110 011d dddd                                              [alu] cmpwc #v/5u, >>#d/5s, rn
   1001 10nn nnnv vvvv . 1011 1110 1000 0000                                              [alu] cmpwc rm, #v/5u
   1001 10mm mmmn nnnn . 1011 1110 101d dddd                                              [alu] cmpwc rm, >>#d/5s, rn
+
+  1001 11mm mmmo oooo . 101f 0000 000n nnnn                                              [mul] mul ro, rm, >>acshift, rn
+  1001 11nn nnnm mmmm . 101f 0000 1ddd dddd                                              [mul] mul rm, rn, >>#d/7s, rn
+  1001 11nn nnnm mmmm . 101f 0001 000o oooo                                              [mul] mul rm, rn, >>ro, rn
+  1001 11mm mmmv vvvv . 101f 0001 100n nnnn                                              [mul] mul #v/5u, rm, >>acshift, rn
+  1001 11nn nnnv vvvv . 101f 0010 0ddd dddd                                              [mul] mul #v/5u, rn, >>#d/7s, rn
+  1001 11nn nnnv vvvv . 101f 0010 100m mmmm                                              [mul] mul #v/5u, rn, >>rm, rn
+
+  1001 11oo ooom mm00 . 101f 0100 000n nn00                                              [mul] mul_sv ro, vm, >>svshift, vn
+  1001 11oo ooom mm00 . 101f 0100 1ssn nn00                                              [mul] mul_sv ro, vm, >>svs, vn
+  1001 11mm m000 0000 . 101f 0101 000n nn00                                              [mul] mul_sv ru, vm, >>svshift, vn
+  1001 11mm m000 0000 . 101f 0101 1ssn nn00                                              [mul] mul_sv ru, vm, >>svs, vn
+  1001 11mm m000 0000 . 101f 0110 000n nn00                                              [mul] mul_sv rv, vm, >>svshift, vn
+  1001 11mm m000 0000 . 101f 0110 1ssn nn00                                              [mul] mul_sv rv, vm, >>svs, vn
+  1001 11mm m00o oo00 . 101f 0111 000n nn00                                              [mul] mul_sv vo, vm, >>svshift, vn
+  1001 11mm m00o oo00 . 101f 0111 1ssn nn00                                              [mul] mul_sv vo, vm, >>svs, vn
+
+  1001 11oo ooom mm00 . 101f 1000 000n nn00                                              [mul] mul_p ro, vm, >>svshift, vn
+  1001 11oo ooom mm00 . 101f 1000 1ssn nn00                                              [mul] mul_p ro, vm, >>svs, vn
+  1001 11mm m000 0000 . 101f 1001 000n nn00                                              [mul] mul_p ru, vm, >>svshift, vn
+  1001 11mm m000 0000 . 101f 1001 1ssn nn00                                              [mul] mul_p ru, vm, >>svs, vn
+  1001 11mm m000 0000 . 101f 1010 000n nn00                                              [mul] mul_p rv, vm, >>svshift, vn
+  1001 11mm m000 0000 . 101f 1010 1ssn nn00                                              [mul] mul_p rv, vm, >>svs, vn
+  1001 11mm m00o oo00 . 101f 1011 000n nn00                                              [mul] mul_p vo, vm, >>svshift, vn
+  1001 11mm m00o oo00 . 101f 1011 1ssn nn00                                              [mul] mul_p vo, vm, >>svs, vn
+
   1001 11oo ooom mm00 . 101f 1100 000n nnnn                                              [mul] dotp ro, vm, >>svshift, rn
   1001 11oo ooom mm00 . 101f 1100 1ssn nnnn                                              [mul] dotp ro, vm, >>#svs, rn
   1001 11oo o00m mm00 . 101f 1101 000n nnnn                                              [mul] dotp vo, vm, >>svshift, rn
@@ -428,6 +458,9 @@ std::string nuon_disassembler::parse_packet(const data_buffer &opcodes, offs_t &
 		cont = !(opc1 & 0x8000);
 		pc += 2;
 
+		// 16-bits mul
+		if(m(opc1, 0x7c00, 0x4000)) return util::string_format("mul r%d, r%d, >>acshift, r%d", b(opc1, 0, 5, 0), b(opc1, 5, 5, 0), b(opc1, 5, 5, 0));
+
 		// 16-bits mem
 		if(m(opc1, 0x7c00, 0x4800)) return util::string_format("ld_s (r%d), r%d", b(opc1, 5, 5, 0), b(opc1, 0, 5, 0));
 		if(m(opc1, 0x7c00, 0x4c00)) return util::string_format("st_s r%d, (r%d)", b(opc1, 0, 5, 0), b(opc1, 5, 5, 0));
@@ -437,6 +470,7 @@ std::string nuon_disassembler::parse_packet(const data_buffer &opcodes, offs_t &
 		if(m(opc1, 0x7c00, 0x5c00)) return util::string_format("mv_s #%s, (r%d)", u2x(b(opc1, 0, 5, 0), 5), b(opc1, 5, 5, 0));
 		if(m(opc1, 0x7c00, 0x6800)) return util::string_format("bra %s%s", cc(b(opc1, 7, 3, 2), true), reg(bpc + s2i(b(opc1, 0, 7, 1), 8)));
 		if(m(opc1, 0x7c00, 0x6c00)) return util::string_format("bra %s%s", cc(b(opc1, 7, 3, 2), true), reg(bpc + s2i(b(opc1, 0, 7, 1), 8)));
+		if(m(opc1, 0x7c63, 0x7900)) return util::string_format("mv_v v%d, v%d", b(opc1, 2, 3, 0), b(opc1, 7, 3, 0));
 
 		// 16-bits ecu
 		if(m(opc1, 0x7fff, 0x7001)) return util::string_format("halt");
@@ -450,6 +484,7 @@ std::string nuon_disassembler::parse_packet(const data_buffer &opcodes, offs_t &
 		// 16-bits rcu
 		if(m(opc1, 0x7c04, 0x7400)) return dec(opc1, util::string_format("addr r%d, %s", b(opc1, 5, 5, 0), rx(b(opc1, 3, 2, 0))));
 		if(m(opc1, 0x7c04, 0x7404)) return dec(opc1, util::string_format("addr %s << 16, %s", u2x(b(opc1, 5, 5, 0), 5), rx(b(opc1, 3, 2, 0))));
+		if(m(opc1, 0x7c04, 0x7800)) return dec(opc1, util::string_format("mvr r%d, %s", b(opc1, 5, 5, 0), rx(b(opc1, 3, 2, 0))));
 		if(m(opc1, 0x7fe4, 0x7804)) return dec(opc1, util::string_format("modulo %s", rx(b(opc1, 3, 2, 0))));
 		if(m(opc1, 0x7ffc, 0x7904)) return dec(opc1);
 		
@@ -597,6 +632,28 @@ std::string nuon_disassembler::parse_packet(const data_buffer &opcodes, offs_t &
 		if(m(opc1, 0xfc00, 0x9800) && m(opc2, 0xffe0, 0xbea0)) return util::string_format("cmpwc r%d, >>#%d, r%d", b(opc1, 5, 5, 0), s2x(b(opc2, 0, 5, 0), 5), b(opc1, 0, 5, 0));
 
 		// 32-bits mul instructions
+		if(m(opc1, 0xfc00, 0x9c00) && m(opc2, 0xefe0, 0xa000)) return util::string_format("mul r%d, r%d, >>acshift, r%d", b(opc1, 0, 5, 0), b(opc1, 5, 5, 0), b(opc2, 0, 5, 0));
+		if(m(opc1, 0xfc00, 0x9c00) && m(opc2, 0xef80, 0xa080)) return util::string_format("mul r%d, r%d, >>%d, r%d", b(opc1, 0, 5, 0), b(opc1, 5, 5, 0), s2i(b(opc2, 0, 7, 0), 7), b(opc1, 5, 5, 0));
+		if(m(opc1, 0xfc00, 0x9c00) && m(opc2, 0xefe0, 0xa100)) return util::string_format("mul r%d, r%d, >>acshift, r%d", b(opc1, 0, 5, 0), b(opc1, 5, 5, 0), b(opc2, 0, 5, 0), b(opc1, 5, 5, 0));
+		if(m(opc1, 0xfc00, 0x9c00) && m(opc2, 0xefe0, 0xa180)) return util::string_format("mul #%s, r%d, >>acshift, r%d", u2x(b(opc1, 0, 5, 0), 5), b(opc1, 5, 5, 0), b(opc2, 0, 5, 0));
+		if(m(opc1, 0xfc00, 0x9c00) && m(opc2, 0xef80, 0xa200)) return util::string_format("mul #%s, r%d, >>%d, r%d", u2x(b(opc1, 0, 5, 0), 5), b(opc1, 5, 5, 0), s2i(b(opc2, 0, 7, 0), 7), b(opc1, 5, 5, 0));
+		if(m(opc1, 0xfc00, 0x9c00) && m(opc2, 0xefe0, 0xa280)) return util::string_format("mul #%s, r%d, >>acshift, r%d", u2x(b(opc1, 0, 5, 0), 5), b(opc1, 5, 5, 0), b(opc2, 0, 5, 0), b(opc1, 5, 5, 0));
+		if(m(opc1, 0xfc03, 0x9c00) && m(opc2, 0xefe3, 0xa400)) return util::string_format("mul_sv r%d, v%d, >>svshift, v%d", b(opc1, 5, 5, 0), b(opc1, 2, 3, 0), b(opc2, 2, 3, 0));
+		if(m(opc1, 0xfc03, 0x9c00) && m(opc2, 0xef83, 0xa480)) return util::string_format("mul_sv r%d, v%d, >>#%d, v%d", b(opc1, 5, 5, 0), b(opc1, 2, 3, 0), svs(b(opc2, 5, 2, 0)), b(opc2, 2, 3, 0));
+		if(m(opc1, 0xfc7f, 0x9c00) && m(opc2, 0xefe3, 0xa500)) return util::string_format("mul_sv ru v%d, >>svshift, v%d", b(opc1, 7, 3, 0), b(opc2, 2, 3, 0));
+		if(m(opc1, 0xfc7f, 0x9c00) && m(opc2, 0xef83, 0xa580)) return util::string_format("mul_sv ru, v%d, >>#%d, v%d", b(opc1, 7, 3, 0), svs(b(opc2, 5, 2, 0)), b(opc2, 2, 3, 0));
+		if(m(opc1, 0xfc7f, 0x9c00) && m(opc2, 0xefe3, 0xa600)) return util::string_format("mul_sv rv v%d, >>svshift, v%d", b(opc1, 7, 3, 0), b(opc2, 2, 3, 0));
+		if(m(opc1, 0xfc7f, 0x9c00) && m(opc2, 0xef83, 0xa680)) return util::string_format("mul_sv rv, v%d, >>#%d, v%d", b(opc1, 7, 3, 0), svs(b(opc2, 5, 2, 0)), b(opc2, 2, 3, 0));
+		if(m(opc1, 0xfc63, 0x9c00) && m(opc2, 0xefe3, 0xa700)) return util::string_format("mul_sv v%d, v%d, >>svshift, v%d", b(opc1, 2, 3, 0), b(opc1, 7, 3, 0), b(opc2, 2, 3, 0));
+		if(m(opc1, 0xfc63, 0x9c00) && m(opc2, 0xef83, 0xa780)) return util::string_format("mul_sv v%d, v%d, >>#%d, v%d", b(opc1, 2, 3, 0), b(opc1, 7, 3, 0), svs(b(opc2, 5, 2, 0)), b(opc2, 2, 3, 0));
+		if(m(opc1, 0xfc03, 0x9c00) && m(opc2, 0xefe3, 0xa800)) return util::string_format("mul_p r%d, v%d, >>svshift, v%d", b(opc1, 5, 5, 0), b(opc1, 2, 3, 0), b(opc2, 2, 3, 0));
+		if(m(opc1, 0xfc03, 0x9c00) && m(opc2, 0xef83, 0xa880)) return util::string_format("mul_p r%d, v%d, >>#%d, v%d", b(opc1, 5, 5, 0), b(opc1, 2, 3, 0), svs(b(opc2, 5, 2, 0)), b(opc2, 2, 3, 0));
+		if(m(opc1, 0xfc7f, 0x9c00) && m(opc2, 0xefe3, 0xa900)) return util::string_format("mul_p ru v%d, >>svshift, v%d", b(opc1, 7, 3, 0), b(opc2, 2, 3, 0));
+		if(m(opc1, 0xfc7f, 0x9c00) && m(opc2, 0xef83, 0xa980)) return util::string_format("mul_p ru, v%d, >>#%d, v%d", b(opc1, 7, 3, 0), svs(b(opc2, 5, 2, 0)), b(opc2, 2, 3, 0));
+		if(m(opc1, 0xfc7f, 0x9c00) && m(opc2, 0xefe3, 0xaa00)) return util::string_format("mul_p rv v%d, >>svshift, v%d", b(opc1, 7, 3, 0), b(opc2, 2, 3, 0));
+		if(m(opc1, 0xfc7f, 0x9c00) && m(opc2, 0xef83, 0xaa80)) return util::string_format("mul_p rv, v%d, >>#%d, v%d", b(opc1, 7, 3, 0), svs(b(opc2, 5, 2, 0)), b(opc2, 2, 3, 0));
+		if(m(opc1, 0xfc63, 0x9c00) && m(opc2, 0xefe3, 0xab00)) return util::string_format("mul_p v%d, v%d, >>svshift, v%d", b(opc1, 2, 3, 0), b(opc1, 7, 3, 0), b(opc2, 2, 3, 0));
+		if(m(opc1, 0xfc63, 0x9c00) && m(opc2, 0xef83, 0xab80)) return util::string_format("mul_p v%d, v%d, >>#%d, v%d", b(opc1, 2, 3, 0), b(opc1, 7, 3, 0), svs(b(opc2, 5, 2, 0)), b(opc2, 2, 3, 0));
 		if(m(opc1, 0xfc03, 0x9c00) && m(opc2, 0xefe0, 0xac00)) return util::string_format("dotp r%d, v%d, >>svshift, r%d", b(opc1, 5, 5, 0), b(opc1, 2, 3, 0), b(opc2, 0, 5, 0));
 		if(m(opc1, 0xfc03, 0x9c00) && m(opc2, 0xef80, 0xac80)) return util::string_format("dotp r%d, v%d, >>#%d, r%d", b(opc1, 5, 5, 0), b(opc1, 2, 3, 0), svs(b(opc2, 5, 2, 0)), b(opc2, 0, 5, 0));
 		if(m(opc1, 0xfc03, 0x9c00) && m(opc2, 0xefe0, 0xad00)) return util::string_format("dotp v%d, v%d, >>svshift, r%d", b(opc1, 7, 3, 0), b(opc1, 2, 3, 0), b(opc2, 0, 5, 0));
@@ -654,6 +711,10 @@ std::string nuon_disassembler::parse_packet(const data_buffer &opcodes, offs_t &
 			// 32+16-bits rcu
 			if(m(opc3, 0x7c40, 0x7404))
 				return dec(opc3, util::string_format("addr #%s, %s",
+													 s2x(b(opc1, 0, 11, 21) | b(opc2, 5, 5, 16) | b(opc2, 0, 16, 0), 32),
+													 rx(b(opc3, 3, 2, 0))));
+			if(m(opc3, 0x7c40, 0x7800))
+				return dec(opc3, util::string_format("mvr #%s, %s",
 													 s2x(b(opc1, 0, 11, 21) | b(opc2, 5, 5, 16) | b(opc2, 0, 16, 0), 32),
 													 rx(b(opc3, 3, 2, 0))));
 

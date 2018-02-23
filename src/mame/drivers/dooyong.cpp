@@ -104,6 +104,9 @@ protected:
 	{
 	}
 
+	void sound_2151_4mhz(machine_config &config);
+	void bluehawk_sound_map(address_map &map);
+
 	required_device<cpu_device> m_maincpu;
 	required_device<cpu_device> m_audiocpu;
 	required_device<gfxdecode_device> m_gfxdecode;
@@ -112,9 +115,6 @@ protected:
 	optional_device<dooyong_rom_tilemap_device> m_bg2;
 	optional_device<dooyong_rom_tilemap_device> m_fg;
 	optional_device<dooyong_rom_tilemap_device> m_fg2;
-
-	void sound_2151_4mhz(machine_config &config);
-	void bluehawk_sound_map(address_map &map);
 };
 
 class dooyong_z80_state : public dooyong_state
@@ -127,6 +127,11 @@ public:
 	{
 	}
 
+	void bluehawk(machine_config &config);
+	void flytiger(machine_config &config);
+	void primella(machine_config &config);
+
+protected:
 	enum
 	{
 		SPRITE_12BIT = 0x01,
@@ -218,15 +223,12 @@ public:
 		save_item(NAME(m_tx_pri));
 	}
 
+	void draw_sprites(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect, unsigned extensions = 0);
+
 	void sound_2151(machine_config &config);
-	void bluehawk(machine_config &config);
-	void flytiger(machine_config &config);
-	void primella(machine_config &config);
 	void bluehawk_map(address_map &map);
 	void flytiger_map(address_map &map);
 	void primella_map(address_map &map);
-protected:
-	void draw_sprites(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect, unsigned extensions = 0);
 
 	std::unique_ptr<uint8_t[]> m_paletteram_flytiger;
 	uint8_t m_sprites_disabled = 0;
@@ -246,6 +248,11 @@ public:
 	{
 	}
 
+	void lastday(machine_config &config);
+	void gulfstrm(machine_config &config);
+	void pollux(machine_config &config);
+
+protected:
 	DECLARE_WRITE8_MEMBER(lastday_ctrl_w);
 	DECLARE_WRITE8_MEMBER(pollux_ctrl_w);
 	DECLARE_WRITE_LINE_MEMBER(irqhandler_2203_1);
@@ -294,15 +301,14 @@ public:
 	}
 
 	void sound_2203(machine_config &config);
-	void pollux(machine_config &config);
-	void lastday(machine_config &config);
-	void gulfstrm(machine_config &config);
-	void gulfstrm_map(address_map &map);
+
 	void lastday_map(address_map &map);
-	void lastday_sound_map(address_map &map);
+	void gulfstrm_map(address_map &map);
 	void pollux_map(address_map &map);
+
+	void lastday_sound_map(address_map &map);
 	void pollux_sound_map(address_map &map);
-protected:
+
 	int m_interrupt_line_1 = 0;
 	int m_interrupt_line_2 = 0;
 };
@@ -310,7 +316,7 @@ protected:
 
 class dooyong_68k_state : public dooyong_state
 {
-public:
+protected:
 	dooyong_68k_state(const machine_config &mconfig, device_type type, const char *tag)
 		: dooyong_state(mconfig, type, tag)
 		, m_spriteram(*this, "spriteram")
@@ -333,10 +339,6 @@ public:
 
 	TIMER_DEVICE_CALLBACK_MEMBER(scanline);
 
-	void popbingo_map(address_map &map);
-	void rshark_map(address_map &map);
-	void superx_map(address_map &map);
-protected:
 	void draw_sprites(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 
 	uint16_t m_bg2_priority = 0;
@@ -352,16 +354,22 @@ public:
 	{
 	}
 
+	void rshark(machine_config &config);
+	void superx(machine_config &config);
+
+protected:
 	uint32_t screen_update_rshark(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 
-	DECLARE_VIDEO_START(rshark)
+	virtual void video_start() override
 	{
 		/* Register for save/restore */
 		save_item(NAME(m_bg2_priority));
 	}
+
 	void dooyong_68k(machine_config &config);
-	void superx(machine_config &config);
-	void rshark(machine_config &config);
+
+	void rshark_map(address_map &map);
+	void superx_map(address_map &map);
 };
 
 
@@ -376,9 +384,12 @@ public:
 	{
 	}
 
+	void popbingo(machine_config &config);
+
+protected:
 	uint32_t screen_update_popbingo(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 
-	DECLARE_VIDEO_START(popbingo)
+	virtual void video_start() override
 	{
 		m_screen->register_screen_bitmap(m_bg_bitmap);
 		m_screen->register_screen_bitmap(m_bg2_bitmap);
@@ -387,8 +398,9 @@ public:
 		save_item(NAME(m_bg2_priority)); // Not used atm
 	}
 
-		void popbingo(machine_config &config);
-protected:
+	void popbingo_map(address_map &map);
+
+private:
 	bitmap_ind16 m_bg_bitmap;
 	bitmap_ind16 m_bg2_bitmap;
 
@@ -895,7 +907,7 @@ ADDRESS_MAP_START(dooyong_z80_state::primella_map)
 	AM_RANGE(0xfc08, 0xfc0f) AM_DEVWRITE("fg", dooyong_rom_tilemap_device, ctrl_w)
 ADDRESS_MAP_END
 
-ADDRESS_MAP_START(dooyong_68k_state::rshark_map)
+ADDRESS_MAP_START(rshark_state::rshark_map)
 	ADDRESS_MAP_GLOBAL_MASK(0xfffff)    /* super-x needs this and is similar */
 	AM_RANGE(0x000000, 0x03ffff) AM_ROM
 	AM_RANGE(0x040000, 0x04cfff) AM_RAM
@@ -913,7 +925,7 @@ ADDRESS_MAP_START(dooyong_68k_state::rshark_map)
 	AM_RANGE(0x0cc010, 0x0cc01f) AM_DEVWRITE8("fg2", dooyong_rom_tilemap_device, ctrl_w, 0x00ff)
 ADDRESS_MAP_END
 
-ADDRESS_MAP_START(dooyong_68k_state::superx_map)
+ADDRESS_MAP_START(rshark_state::superx_map)
 	ADDRESS_MAP_GLOBAL_MASK(0xfffff)
 	AM_RANGE(0x000000, 0x03ffff) AM_ROM
 	AM_RANGE(0x0d0000, 0x0dcfff) AM_RAM
@@ -931,7 +943,7 @@ ADDRESS_MAP_START(dooyong_68k_state::superx_map)
 	AM_RANGE(0x08c010, 0x08c01f) AM_DEVWRITE8("fg2", dooyong_rom_tilemap_device, ctrl_w, 0x00ff)
 ADDRESS_MAP_END
 
-ADDRESS_MAP_START(dooyong_68k_state::popbingo_map)
+ADDRESS_MAP_START(popbingo_state::popbingo_map)
 	ADDRESS_MAP_GLOBAL_MASK(0xfffff)
 	AM_RANGE(0x000000, 0x03ffff) AM_ROM
 	AM_RANGE(0x040000, 0x04cfff) AM_RAM
@@ -1470,7 +1482,7 @@ MACHINE_CONFIG_START(dooyong_z80_state::sound_2151)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.60)
 MACHINE_CONFIG_END
 
-MACHINE_CONFIG_START(dooyong_state::sound_2151_4mhz )
+MACHINE_CONFIG_START(dooyong_state::sound_2151_4mhz)
 	MCFG_SPEAKER_STANDARD_MONO("mono")
 
 	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
@@ -1494,7 +1506,7 @@ MACHINE_CONFIG_START(dooyong_z80_ym2203_state::lastday)
 	MCFG_CPU_ADD("audiocpu", Z80, 16_MHz_XTAL/4)  /* 4MHz verified for Last Day / D-day */
 	MCFG_CPU_PROGRAM_MAP(lastday_sound_map)
 
-	MCFG_MACHINE_START_OVERRIDE(dooyong_z80_state, cpu_z80)
+	MCFG_MACHINE_START_OVERRIDE(dooyong_z80_ym2203_state, cpu_z80)
 	MCFG_MACHINE_RESET_OVERRIDE(dooyong_z80_ym2203_state, sound_ym2203)
 
 
@@ -1547,7 +1559,7 @@ MACHINE_CONFIG_START(dooyong_z80_ym2203_state::gulfstrm)
 	MCFG_CPU_ADD("audiocpu", Z80, 8000000)  /* ??? */
 	MCFG_CPU_PROGRAM_MAP(lastday_sound_map)
 
-	MCFG_MACHINE_START_OVERRIDE(dooyong_z80_state, cpu_z80)
+	MCFG_MACHINE_START_OVERRIDE(dooyong_z80_ym2203_state, cpu_z80)
 	MCFG_MACHINE_RESET_OVERRIDE(dooyong_z80_ym2203_state, sound_ym2203)
 
 	/* video hardware */
@@ -1586,7 +1598,7 @@ MACHINE_CONFIG_START(dooyong_z80_ym2203_state::pollux)
 	MCFG_CPU_ADD("audiocpu", Z80, 16_MHz_XTAL/4)  /* 4Mhz */
 	MCFG_CPU_PROGRAM_MAP(pollux_sound_map)
 
-	MCFG_MACHINE_START_OVERRIDE(dooyong_z80_state, cpu_z80)
+	MCFG_MACHINE_START_OVERRIDE(dooyong_z80_ym2203_state, cpu_z80)
 	MCFG_MACHINE_RESET_OVERRIDE(dooyong_z80_ym2203_state, sound_ym2203)
 
 	/* video hardware */
@@ -1748,7 +1760,7 @@ MACHINE_CONFIG_START(rshark_state::dooyong_68k)
 
 	// basic machine hardware
 	MCFG_CPU_ADD("maincpu", M68000, 8_MHz_XTAL)  // 8MHz measured on Super-X
-	MCFG_TIMER_DRIVER_ADD_SCANLINE("scantimer", dooyong_68k_state, scanline, "screen", 0, 1)
+	MCFG_TIMER_DRIVER_ADD_SCANLINE("scantimer", rshark_state, scanline, "screen", 0, 1)
 
 	MCFG_CPU_ADD("audiocpu", Z80, 8_MHz_XTAL/2)  // 4MHz measured on Super-X
 	MCFG_CPU_PROGRAM_MAP(bluehawk_sound_map)
@@ -1777,20 +1789,20 @@ MACHINE_CONFIG_START(rshark_state::dooyong_68k)
 	MCFG_RSHARK_ROM_TILEMAP_ADD("fg2", "gfxdecode", 1, "gfx2", 0x00000, "gfx6", 0x00000)
 	MCFG_DOOYONG_ROM_TILEMAP_TRANSPARENT_PEN(15);
 
-	MCFG_VIDEO_START_OVERRIDE(rshark_state, rshark)
-
 	// sound hardware
 	sound_2151_4mhz(config);
 MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(rshark_state::rshark)
 	dooyong_68k(config);
+
 	MCFG_CPU_MODIFY("maincpu")
 	MCFG_CPU_PROGRAM_MAP(rshark_map)
 MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(rshark_state::superx)
 	dooyong_68k(config);
+
 	MCFG_CPU_MODIFY("maincpu")
 	MCFG_CPU_PROGRAM_MAP(superx_map)
 MACHINE_CONFIG_END
@@ -1800,7 +1812,7 @@ MACHINE_CONFIG_START(popbingo_state::popbingo)
 	// basic machine hardware
 	MCFG_CPU_ADD("maincpu", M68000, 20_MHz_XTAL/2)   // 10MHz measured
 	MCFG_CPU_PROGRAM_MAP(popbingo_map)
-	MCFG_TIMER_DRIVER_ADD_SCANLINE("scantimer", dooyong_68k_state, scanline, "screen", 0, 1)
+	MCFG_TIMER_DRIVER_ADD_SCANLINE("scantimer", popbingo_state, scanline, "screen", 0, 1)
 
 	MCFG_CPU_ADD("audiocpu", Z80, 16_MHz_XTAL/4)     // 4MHz measured
 	MCFG_CPU_PROGRAM_MAP(bluehawk_sound_map)
@@ -1825,8 +1837,6 @@ MACHINE_CONFIG_START(popbingo_state::popbingo)
 	MCFG_DOOYONG_ROM_TILEMAP_PRIMELLA_CODE_BITS(11)
 	MCFG_DOOYONG_ROM_TILEMAP_ADD("bg2", "gfxdecode", 2, "gfx3", 0x00000)
 	MCFG_DOOYONG_ROM_TILEMAP_PRIMELLA_CODE_BITS(11)
-
-	MCFG_VIDEO_START_OVERRIDE(popbingo_state, popbingo)
 
 	// sound hardware
 	sound_2151_4mhz(config);
