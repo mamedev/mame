@@ -194,8 +194,8 @@ MC6845_UPDATE_ROW(duet16_state::crtc_update_row)
 		u8 g2 = gvram[goffset];
 		u8 g1 = gvram[goffset + 0x08000];
 		u8 g0 = gvram[goffset + 0x10000];
-		u8 chr = m_cvram[coffset] & 0xff;
 		u8 attr = m_cvram[coffset] >> 8;
+		u8 chr = m_cvram[coffset & ~BIT(attr, 6)] & 0xff;
 		u8 data = m_chrrom->base()[(chr * 16) + ra + (BIT(m_dispctrl, 3) * 0x1000)];
 		if(BIT(attr, 6))
 		{
@@ -213,7 +213,7 @@ MC6845_UPDATE_ROW(duet16_state::crtc_update_row)
 			attr |= 7;
 			data = 0xff;
 		}
-		if((i == cursor_x) && (m_screen->frame_number() & 16)) // ~3.4 Hz
+		if(((i & ~BIT(attr, 6)) == cursor_x) && (m_screen->frame_number() & 16)) // ~3.4 Hz
 			data ^= 0xff;
 
 		rgb_t fg = m_chrpal->pen_color(attr & 7);
