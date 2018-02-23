@@ -58,9 +58,8 @@ public:
 	uint32_t screen_update_dynablsb(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	INTERRUPT_GEN_MEMBER(fake_nmi);
 	INTERRUPT_GEN_MEMBER(bomblord_fake_nmi);
-	INTERRUPT_GEN_MEMBER(m90_interrupt);
-	INTERRUPT_GEN_MEMBER(dynablsb_interrupt);
-	INTERRUPT_GEN_MEMBER(bomblord_interrupt);
+	DECLARE_WRITE_LINE_MEMBER(dynablsb_vblank_int_w);
+	DECLARE_WRITE_LINE_MEMBER(bomblord_vblank_int_w);
 	inline void get_tile_info(tile_data &tileinfo,int tile_index,int layer,int page_mask);
 	inline void bomblord_get_tile_info(tile_data &tileinfo,int tile_index,int layer);
 	inline void dynablsb_get_tile_info(tile_data &tileinfo,int tile_index,int layer);
