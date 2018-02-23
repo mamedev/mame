@@ -248,17 +248,6 @@ protected:
 	emu_timer *m_blit_timer;
 	emu_timer *m_line_timer;
 	emu_timer *m_done_timer;
-
-private:
-	struct gt_line_args
-	{
-		u16 clip;
-		s16 x1;
-		s16 y1;
-		s16 x2;
-		s16 y2;
-	}
-	m_line_args;
 };
 
 class single_gt_device_base : public gt_device_base

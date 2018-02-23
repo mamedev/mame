@@ -147,7 +147,7 @@ ADDRESS_MAP_START(gt_device_base::map)
     #define GT_FIFO_LW_ENB          0x08
     #define GT_FIFO_LW_INTR         0x40
     #define GT_FIFO_HW_INTR         0x80
-*/
+ */
 ADDRESS_MAP_END
 
 ADDRESS_MAP_START(single_gt_device_base::map)
