@@ -8,9 +8,9 @@ msgid ""
 msgstr ""
 "Project-Id-Version: MAME\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2018-01-28 14:02+1100\n"
+"POT-Creation-Date: 2018-01-31 13:07+1100\n"
 "PO-Revision-Date: 2017-11-30 08:07-0300\n"
-"Last-Translator: Katananja\n"
+"Last-Translator: Ashura-X\Katananja\n"
 "Language-Team: MAME Language Team\n"
 "Language: pt_BR\n"
 "MIME-Version: 1.0\n"
@@ -1743,7 +1743,7 @@ msgstr "Salvar/Restaurar Automático"
 
 #: src/frontend/mame/ui/submenu.cpp:67
 msgid "Rewind capacity"
-msgstr ""
+msgstr "Capacidade de retroceder"
 
 #: src/frontend/mame/ui/submenu.cpp:68
 msgid "Bilinear snapshot"
@@ -2167,29 +2167,31 @@ msgstr "Precisa de CHD\tNão\n"
 
 #: src/frontend/mame/ui/selgame.cpp:970
 msgid "ROM Audit Result\tOK\n"
-msgstr "Condição da ROM\tBOA\n"
+msgstr "Resultado da Auditoria da ROM\tBOA\n"
 
 #: src/frontend/mame/ui/selgame.cpp:972
 msgid "ROM Audit Result\tBAD\n"
-msgstr "Condição da ROM\tRUIM\n"
+msgstr "Resultado da Auditoria da ROM\tRUIM\n"
 
 #: src/frontend/mame/ui/selgame.cpp:975
 msgid "Samples Audit Result\tNone Needed\n"
-msgstr "Condição da ROM\tNenhuma Necessária\n"
+msgstr "Resultado da Auditoria das Amostras\tNenhuma Necessária\n"
 
 #: src/frontend/mame/ui/selgame.cpp:977
 msgid "Samples Audit Result\tOK\n"
-msgstr "Condição das Amostras\tBOA\n"
+msgstr "Resultado da Auditoria das Amostras\tBOA\n"
 
 #: src/frontend/mame/ui/selgame.cpp:979
 msgid "Samples Audit Result\tBAD\n"
-msgstr "Condição das Amostras\tRUIM\n"
+msgstr "Resultado da Auditoria das Amostras\tRUIM\n"
 
 #: src/frontend/mame/ui/selgame.cpp:983
 msgid ""
 "ROM Audit \tDisabled\n"
 "Samples Audit \tDisabled\n"
 msgstr ""
+"Auditoria da ROM  \tDesativada\n"
+"Auditoria das Amostras \tDesativada\n"
 
 #: src/frontend/mame/ui/selgame.cpp:1167
 #, c-format
@@ -2434,7 +2436,7 @@ msgstr "[criar]"
 #: src/frontend/mame/ui/filesel.cpp:419
 #, c-format
 msgid "Error accessing %s"
-msgstr ""
+msgstr "Erro acessando %s"
 
 #: src/frontend/mame/ui/filesel.cpp:515
 msgid "Select access mode"
@@ -2800,21 +2802,21 @@ msgstr "Localizador de Trapaças"
 
 #: plugins/portname/init.lua:89
 msgid "Save input names to file"
-msgstr ""
+msgstr "Salvar nomes de entrada para o arquivo"
 
 #: plugins/portname/init.lua:115 plugins/portname/init.lua:120
 #: plugins/portname/init.lua:136
 msgid "Failed to save input name file"
-msgstr ""
+msgstr "Erro ao salvar nomes de entrada ao arquivo"
 
 #: plugins/portname/init.lua:153
 #, lua-format
 msgid "Input port name file saved to %s"
-msgstr ""
+msgstr "Arquivo de nome de portas de entrada salvo para %s"
 
 #: plugins/portname/init.lua:158
 msgid "Input ports"
-msgstr ""
+msgstr "Portas de entrada"
 
 #~ msgid ""
 #~ "ROM Audit Disabled\t\n"
