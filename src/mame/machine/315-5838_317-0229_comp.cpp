@@ -331,12 +331,14 @@ READ32_MEMBER(sega_315_5838_comp_device::doa_prot_r)
 
 	if (offset == 0x7ff8/4)
 	{
-		retval = m_protram[m_protstate] | m_protram[m_protstate+1]<<8;
+		// PC=2c20
+		retval = m_protram[m_protstate+1] | m_protram[m_protstate]<<8;
 		m_protstate+=2;
 		printf("doa_prot_read %08x %08x %08x\n", offset*4, retval, mem_mask);
 	}
 	else if (offset == 0x400c/4) // todo, is this actually part of the protection? it's in the address range, but decathlete doesn't have it afaik.
 	{
+		// this actually looks a busy status flag
 		m_prot_a = !m_prot_a;
 		if (m_prot_a)
 			retval = 0xffff;
