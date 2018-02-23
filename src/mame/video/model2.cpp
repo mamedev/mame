@@ -804,7 +804,7 @@ void model2_renderer::model2_3d_render(triangle *tri, const rectangle &cliprect)
 	// TODO: this seems to be more accurate but it breaks in some cases
 	//rectangle vp(tri->viewport[0] - 8, tri->viewport[2] - tri->viewport[0], tri->viewport[1] - 90, tri->viewport[3] - tri->viewport[1]);
 	vp &= cliprect;
-	
+
 	extra.state = &m_state;
 	extra.lumabase = ((tri->texheader[1] & 0xFF) << 7) + ((tri->luma >> 5) ^ 0x7);
 	extra.colorbase = (tri->texheader[3] >> 6) & 0x3FF;

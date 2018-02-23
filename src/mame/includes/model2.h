@@ -144,7 +144,7 @@ public:
 	uint8_t m_lightgun_mux;
 
 	DECLARE_READ8_MEMBER(model2_crx_in_r);
-	DECLARE_CUSTOM_INPUT_MEMBER(srallyc_gearbox_r);
+	DECLARE_CUSTOM_INPUT_MEMBER(daytona_gearbox_r);
 	DECLARE_CUSTOM_INPUT_MEMBER(rchase2_devices_r);
 	DECLARE_READ32_MEMBER(timers_r);
 	DECLARE_WRITE32_MEMBER(timers_w);
