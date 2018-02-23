@@ -17,7 +17,7 @@
   Instructions are built out of packets, which is a sub-instruction
   for a specific execution unit.  Each packet except the 16-bits alu
   ones also have a bit to tell whether another packet follows for the
-  same instruction.  17-bits alu packets are always at the end when
+  same instruction.  16-bits alu packets are always at the end when
   present, the order or the packets seems otherwise free.  There are
   complicated instruction alignment, size and resource sharing
   constraints the disassembler does not care about.
