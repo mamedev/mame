@@ -18,13 +18,14 @@
 #define MCFG_SR_SLOT_ADD(_srtag, _tag, _slot_intf, _def_slot, _fixed) \
 	MCFG_DEVICE_ADD(_tag, SR_SLOT, 0) \
 	MCFG_DEVICE_SLOT_INTERFACE(_slot_intf, _def_slot, _fixed) \
-	sr_slot_device::static_set_sr_slot(*device, _srtag, _tag);
+	downcast<sr_slot_device &>(*device).set_sr_slot(_srtag, _tag);
 
 #define MCFG_SR_SLOT_REMOVE(_tag)    \
 	MCFG_DEVICE_REMOVE(_tag)
 
-#define MCFG_SR_MEMORY(_tag, _data_spacenum, _io_spacenum) \
-	sr_device::static_set_memory(*device, _tag, _data_spacenum, _io_spacenum);
+#define MCFG_SR_MEMORY(_tag, _main_spacenum, _io_spacenum) \
+	downcast<sr_device &>(*device).set_memory(_tag, _main_spacenum, _io_spacenum);
+
 
 class sr_slot_device : public device_t, public device_slot_interface
 {
@@ -33,7 +34,7 @@ public:
 	sr_slot_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock);
 
 	// inline configuration
-	static void static_set_sr_slot(device_t &device, const char *tag, const char *slot_tag);
+	void set_sr_slot(const char *tag, const char *slot_tag);
 
 protected:
 	sr_slot_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, u32 clock);
@@ -59,7 +60,7 @@ public:
 	template <class Object> static devcb_base &set_out_irq1_callback(device_t &device, Object &&cb) { return downcast<sr_device &>(device).m_out_irq1_cb.set_callback(std::forward<Object>(cb)); }
 	template <class Object> static devcb_base &set_out_irq2_callback(device_t &device, Object &&cb) { return downcast<sr_device &>(device).m_out_irq2_cb.set_callback(std::forward<Object>(cb)); }
 
-	static void static_set_memory(device_t &device, const char *const tag, const int data_spacenum, const int io_spacenum);
+	void set_memory(const char *const tag, const int main_spacenum, const int io_spacenum);
 
 	static const u32 SR_BASE = 0x87000000;
 	static const u32 SR_SIZE = 0x08000000;
@@ -80,7 +81,7 @@ public:
 		offs_t end = start + (SR_SIZE - 1);
 
 		// install the device address map
-		m_data_space->install_device(start, end, device, map);
+		m_main_space->install_device(start, end, device, map);
 		m_io_space->install_device(start, end, device, map);
 
 		m_slot_count++;
@@ -94,7 +95,7 @@ protected:
 	virtual void device_reset() override;
 
 	// internal state
-	address_space *m_data_space;
+	address_space *m_main_space;
 	address_space *m_io_space;
 
 	devcb_write_line m_out_irq0_cb;
@@ -106,7 +107,7 @@ private:
 	int m_slot_count;
 
 	const char *m_memory_tag;
-	int m_data_spacenum;
+	int m_main_spacenum;
 	int m_io_spacenum;
 };
 
@@ -117,6 +118,7 @@ public:
 	virtual ~device_sr_card_interface();
 
 	void set_sr_device();
+	void irq(int status);
 
 	// inline configuration
 	static void static_set_sr_tag(device_t &device, const char *tag, const char *slot_tag);
