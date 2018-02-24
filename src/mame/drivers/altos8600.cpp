@@ -1,5 +1,6 @@
 // license:BSD-3-Clause
 // copyright-holders:Carl
+// 20MB HDD image CHS 512,5,17
 
 #include "emu.h"
 #include "cpu/i86/i86.h"
@@ -115,11 +116,39 @@ private:
 void altos8600_state::machine_start()
 {
 	m_mode = 0;
+	save_item(NAME(m_mmuaddr));
+	save_item(NAME(m_romport));
+	save_item(NAME(m_dmamplex));
+	save_item(NAME(m_mmuflags));
+	save_item(NAME(m_mmuerr));
+	save_item(NAME(m_mode));
+	save_item(NAME(m_mmueaddr));
+	save_item(NAME(m_cpuif));
+	save_item(NAME(m_user));
+	save_item(NAME(m_nmiinh));
+	save_item(NAME(m_nmistat));
+	save_item(NAME(m_lba));
+	save_item(NAME(m_head));
+	save_item(NAME(m_sect));
+	save_item(NAME(m_cyl));
+	save_item(NAME(m_curcyl));
+	save_item(NAME(m_secoff));
+	save_item(NAME(m_cmd));
+	save_item(NAME(m_stat));
+	save_item(NAME(m_cylhi));
+	save_item(NAME(m_sechi));
+	save_item(NAME(m_sector));
+
+	if(m_hdd->get_hard_disk_file())
+		m_geom = hard_disk_get_info(m_hdd->get_hard_disk_file());
+	else
+		m_geom = nullptr;
 }
 
 void altos8600_state::machine_reset()
 {
 	m_mode = (m_mode & 0x10) | 2;
+	m_romport[0] = 0x80;
 	m_cpuif = false;
 	m_user = false;
 	m_nmiinh = true;
@@ -409,7 +438,7 @@ WRITE8_MEMBER(altos8600_state::romport_w)
 	switch(offset)
 	{
 		case 1:
-			m_romport[0] = data;
+			//m_romport[0] = data;
 			break;
 		case 3:
 			m_romport[1] = data;
@@ -776,4 +805,4 @@ ROM_START(altos8600)
 	ROMX_LOAD("11753_1.5_hi.bin", 0x0001, 0x1000, CRC(9b5e812c) SHA1(c2ef24859edd48d2096db47e16855c9bc01dae75), ROM_SKIP(1) | ROM_BIOS(1))
 ROM_END
 
-COMP(1981, altos8600, 0, 0, altos8600, 0, altos8600_state, 0, "Altos Computer Systems", "ACS8600", MACHINE_NOT_WORKING | MACHINE_NO_SOUND_HW)
+COMP(1981, altos8600, 0, 0, altos8600, 0, altos8600_state, 0, "Altos Computer Systems", "ACS8600", MACHINE_NO_SOUND_HW)
