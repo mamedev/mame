@@ -1280,70 +1280,6 @@ WRITE32_MEMBER(model2_state::model2_serial_w)
 	}
 }
 
-/* Protection handling */
-
-
-READ32_MEMBER(model2_state::model2_5881prot_r)
-{
-	uint32_t retval = 0;
-
-	if (offset == 0x0000/4)
-	{
-		// status: bit 0 = 1 for busy, 0 for ready
-		retval = 0;   // we're always ready
-	}
-	else if (offset == 0x000e/4)
-	{
-		if (first_read == 1)
-		{
-			// the RAM based schemes expect a dummy value before the start of the stream
-			// to match the previous simulation (dynamite cop) I use 0x0000 here
-			first_read = 0;
-			retval = 0;
-		}
-		else
-		{
-			uint8_t* base;
-			retval = m_cryptdevice->do_decrypt(base);
-			retval = ((retval & 0xff00) >> 8) | ((retval & 0x00ff) << 8);
-			retval <<= 16;
-		}
-	}
-	else logerror("Unhandled Protection READ @ %x mask %x (PC=%x)\n", offset, mem_mask, m_maincpu->pc());
-
-	logerror("model2_5881prot_r %08x: %08x (%08x)\n", offset*4, retval, mem_mask);
-
-	return retval;
-}
-
-WRITE32_MEMBER(model2_state::model2_5881prot_w)
-{
-	logerror("model2_5881prot_w %08x: %08x (%08x)\n", offset*4, data, mem_mask);
-
-
-	if (offset == 0x0008/4)
-	{
-		// Zero Gunner uses this, it's encrypted data in prot.RAM consists of several small chunks, selected using low address
-		// so far this is only known game with 315-5881 which uses not 0 offset in prot.RAM
-		if (mem_mask == 0x0000ffff)
-			m_cryptdevice->set_addr_low(data&0xffff);
-		else if (mem_mask == 0xffff0000)
-		{
-			m_cryptdevice->set_addr_high(0);
-			if (data != 0)
-				printf("model2_5881prot_w not zero high address %08x (%08x)\n", data, mem_mask);
-		}
-		first_read = 1;
-	}
-	else if (offset == 0x000c/4)
-	{
-		printf("subkey %08x (%08x)\n", data, mem_mask);
-		m_cryptdevice->set_subkey(data&0xffff);
-	}
-	else printf("Unhandled Protection WRITE %x @ %x mask %x (PC=%x)\n", data, offset, mem_mask, m_maincpu->pc());
-
-}
-
 
 
 /* Daytona "To The MAXX" PIC protection simulation */
@@ -1529,6 +1465,12 @@ ADDRESS_MAP_START(model2_state::model2_base_mem)
 	AM_RANGE(0x12800000, 0x1281ffff) AM_READWRITE16(lumaram_r,lumaram_w,0x0000ffff) // polygon "luma" RAM
 ADDRESS_MAP_END
 
+/* common map for 5881 protection */
+ADDRESS_MAP_START(model2_state::model2_5881_mem)
+	AM_RANGE(0x01d80000,0x01d8ffff) AM_RAM
+	AM_RANGE(0x01d90000,0x01d9ffff) AM_DEVICE16("315_5881", sega_315_5881_crypt_device, iomap_le, 0xffffffff)
+ADDRESS_MAP_END
+
 READ8_MEMBER(model2_state::virtuacop_lightgun_r)
 {
 	uint8_t res;
@@ -1650,6 +1592,11 @@ ADDRESS_MAP_START(model2a_state::model2a_crx_mem)
 	AM_RANGE(0x01c80000, 0x01c80003) AM_READWRITE(model2_serial_r, model2_serial_w)
 ADDRESS_MAP_END
 
+ADDRESS_MAP_START(model2a_state::model2a_5881_mem)
+	AM_IMPORT_FROM(model2a_crx_mem)
+	AM_IMPORT_FROM(model2_5881_mem)
+ADDRESS_MAP_END
+
 /* 2B-CRX overrides */
 ADDRESS_MAP_START(model2b_state::model2b_crx_mem)
 	AM_IMPORT_FROM(model2_base_mem)
@@ -1688,6 +1635,11 @@ ADDRESS_MAP_START(model2b_state::model2b_crx_mem)
 	AM_RANGE(0x01c80000, 0x01c80003) AM_READWRITE(model2_serial_r, model2_serial_w)
 ADDRESS_MAP_END
 
+ADDRESS_MAP_START(model2b_state::model2b_5881_mem)
+	AM_IMPORT_FROM(model2b_crx_mem)
+	AM_IMPORT_FROM(model2_5881_mem)
+ADDRESS_MAP_END
+
 /* 2C-CRX overrides */
 ADDRESS_MAP_START(model2c_state::model2c_crx_mem)
 	AM_IMPORT_FROM(model2_base_mem)
@@ -1713,6 +1665,11 @@ ADDRESS_MAP_START(model2c_state::model2c_crx_mem)
 	AM_RANGE(0x01c00014, 0x01c00017) AM_WRITE(hotd_lightgun_w)
 	AM_RANGE(0x01c0001c, 0x01c0001f) AM_WRITE(analog_2b_w)
 	AM_RANGE(0x01c80000, 0x01c80003) AM_READWRITE(model2_serial_r, model2_serial_w )
+ADDRESS_MAP_END
+
+ADDRESS_MAP_START(model2c_state::model2c_5881_mem)
+	AM_IMPORT_FROM(model2c_crx_mem)
+	AM_IMPORT_FROM(model2_5881_mem)
 ADDRESS_MAP_END
 
 /* Input definitions */
@@ -2404,6 +2361,10 @@ uint16_t model2_state::crypt_read_callback(uint32_t addr)
 
 MACHINE_CONFIG_START(model2a_state::model2a_5881)
 	model2a(config);
+	
+	MCFG_CPU_MODIFY("maincpu")
+	MCFG_CPU_PROGRAM_MAP(model2a_5881_mem)
+
 	MCFG_DEVICE_ADD("315_5881", SEGA315_5881_CRYPT, 0)
 	MCFG_SET_READ_CALLBACK(model2_state, crypt_read_callback)
 MACHINE_CONFIG_END
@@ -2467,6 +2428,10 @@ MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(model2b_state::model2b_5881)
 	model2b(config);
+	
+	MCFG_CPU_MODIFY("maincpu")
+	MCFG_CPU_PROGRAM_MAP(model2b_5881_mem)
+
 	MCFG_DEVICE_ADD("315_5881", SEGA315_5881_CRYPT, 0)
 	MCFG_SET_READ_CALLBACK(model2_state, crypt_read_callback)
 MACHINE_CONFIG_END
@@ -2556,6 +2521,10 @@ MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(model2c_state::model2c_5881)
 	model2c(config);
+
+	MCFG_CPU_MODIFY("maincpu")
+	MCFG_CPU_PROGRAM_MAP(model2c_5881_mem)
+	
 	MCFG_DEVICE_ADD("315_5881", SEGA315_5881_CRYPT, 0)
 	MCFG_SET_READ_CALLBACK(model2_state, crypt_read_callback)
 MACHINE_CONFIG_END
@@ -6077,17 +6046,8 @@ ROM_START( desert ) /* Desert Tank, Model 2 */
 	MODEL2_CPU_BOARD
 ROM_END
 
-DRIVER_INIT_MEMBER(model2_state,genprot)
-{
-	//std::string key = parameter(":315_5881:key");
-	m_maincpu->space(AS_PROGRAM).install_ram(0x01d80000, 0x01d8ffff);
-	m_maincpu->space(AS_PROGRAM).install_readwrite_handler(0x01d90000, 0x01d9ffff, read32_delegate(FUNC(model2_state::model2_5881prot_r), this), write32_delegate(FUNC(model2_state::model2_5881prot_w), this));
-}
-
 DRIVER_INIT_MEMBER(model2_state,pltkids)
 {
-	DRIVER_INIT_CALL(genprot);
-
 	// fix bug in program: it destroys the interrupt table and never fixes it
 	uint32_t *ROM = (uint32_t *)memregion("maincpu")->base();
 	ROM[0x730/4] = 0x08000004;
@@ -6095,8 +6055,6 @@ DRIVER_INIT_MEMBER(model2_state,pltkids)
 
 DRIVER_INIT_MEMBER(model2_state,zerogun)
 {
-	DRIVER_INIT_CALL(genprot);
-
 	// fix bug in program: it destroys the interrupt table and never fixes it
 	uint32_t *ROM = (uint32_t *)memregion("maincpu")->base();
 	ROM[0x700/4] = 0x08000004;
@@ -6104,8 +6062,6 @@ DRIVER_INIT_MEMBER(model2_state,zerogun)
 
 DRIVER_INIT_MEMBER(model2_state,sgt24h)
 {
-//  DRIVER_INIT_CALL(genprot);
-
 	uint32_t *ROM = (uint32_t *)memregion("maincpu")->base();
 	ROM[0x56578/4] = 0x08000004;
 	//ROM[0x5b3e8/4] = 0x08000004;
@@ -6161,8 +6117,8 @@ GAME( 1997, zeroguna,  zerogun, model2a_5881, model2,   model2a_state, zerogun, 
 GAME( 1997, zerogunaj, zerogun, model2a_5881, model2,   model2a_state, zerogun, ROT0, "Psikyo", "Zero Gunner (Japan, Model 2A)", MACHINE_NOT_WORKING|MACHINE_IMPERFECT_GRAPHICS )
 GAME( 1997, motoraid,  0,       manxtt,       motoraid, model2a_state, 0,       ROT0, "Sega",   "Motor Raid - Twin", MACHINE_NOT_WORKING|MACHINE_IMPERFECT_GRAPHICS )
 GAME( 1997, motoraiddx,motoraid,manxtt,       motoraid, model2a_state, 0,       ROT0, "Sega",   "Motor Raid - Twin/DX", MACHINE_NOT_WORKING|MACHINE_IMPERFECT_GRAPHICS )
-GAME( 1998, dynamcop,  0,       model2a_5881, model2,   model2a_state, genprot, ROT0, "Sega",   "Dynamite Cop (Export, Model 2A)", MACHINE_NOT_WORKING|MACHINE_IMPERFECT_GRAPHICS )
-GAME( 1998, dyndeka2,  dynamcop,model2a_5881, model2,   model2a_state, genprot, ROT0, "Sega",   "Dynamite Deka 2 (Japan, Model 2A)", MACHINE_NOT_WORKING|MACHINE_IMPERFECT_GRAPHICS )
+GAME( 1998, dynamcop,  0,       model2a_5881, model2,   model2a_state, 0,       ROT0, "Sega",   "Dynamite Cop (Export, Model 2A)", MACHINE_NOT_WORKING|MACHINE_IMPERFECT_GRAPHICS )
+GAME( 1998, dyndeka2,  dynamcop,model2a_5881, model2,   model2a_state, 0,       ROT0, "Sega",   "Dynamite Deka 2 (Japan, Model 2A)", MACHINE_NOT_WORKING|MACHINE_IMPERFECT_GRAPHICS )
 GAME( 1998, pltkidsa,  pltkids, model2a_5881, model2,   model2a_state, pltkids, ROT0, "Psikyo", "Pilot Kids (Model 2A)", MACHINE_NOT_WORKING|MACHINE_IMPERFECT_GRAPHICS )
 
 // Model 2B-CRX (SHARC, SCSP sound board)
@@ -6189,8 +6145,8 @@ GAME( 1997, dynabb97,  0,        model2b,      dynabb,    model2b_state, 0,     
 GAME( 1997, overrevb,  overrev,  indy500,      srallyc,   model2b_state, 0,        ROT0, "Jaleco", "Over Rev (Model 2B, Revision B)", MACHINE_NOT_WORKING|MACHINE_IMPERFECT_GRAPHICS )
 GAME( 1997, zerogun,   0,        model2b_5881, model2,    model2b_state, zerogun,  ROT0, "Psikyo", "Zero Gunner (Export, Model 2B)", MACHINE_NOT_WORKING|MACHINE_IMPERFECT_GRAPHICS )
 GAME( 1997, zerogunj,  zerogun,  model2b_5881, model2,    model2b_state, zerogun,  ROT0, "Psikyo", "Zero Gunner (Japan, Model 2B)", MACHINE_NOT_WORKING|MACHINE_IMPERFECT_GRAPHICS )
-GAME( 1998, dynamcopb, dynamcop, model2b_5881, model2,    model2b_state, genprot,  ROT0, "Sega",   "Dynamite Cop (Export, Model 2B)", MACHINE_NOT_WORKING|MACHINE_IMPERFECT_GRAPHICS )
-GAME( 1998, dyndeka2b, dynamcop, model2b_5881, model2,    model2b_state, genprot,  ROT0, "Sega",   "Dynamite Deka 2 (Japan, Model 2B)", MACHINE_NOT_WORKING|MACHINE_IMPERFECT_GRAPHICS )
+GAME( 1998, dynamcopb, dynamcop, model2b_5881, model2,    model2b_state, 0,        ROT0, "Sega",   "Dynamite Cop (Export, Model 2B)", MACHINE_NOT_WORKING|MACHINE_IMPERFECT_GRAPHICS )
+GAME( 1998, dyndeka2b, dynamcop, model2b_5881, model2,    model2b_state, 0,        ROT0, "Sega",   "Dynamite Deka 2 (Japan, Model 2B)", MACHINE_NOT_WORKING|MACHINE_IMPERFECT_GRAPHICS )
 GAME( 1998, pltkids,   0,        model2b_5881, model2,    model2b_state, pltkids,  ROT0, "Psikyo", "Pilot Kids (Model 2B, Revision A)", MACHINE_NOT_WORKING|MACHINE_IMPERFECT_GRAPHICS )
 
 // Model 2C-CRX (TGPx4, SCSP sound board)
@@ -6208,4 +6164,4 @@ GAME( 1997, topskatr,  0,        model2c,      model2,   model2c_state, 0,      
 GAME( 1997, topskatru, topskatr, model2c,      model2,   model2c_state, 0,       ROT0, "Sega",   "Top Skater (USA, Revision A)", MACHINE_NOT_WORKING|MACHINE_IMPERFECT_GRAPHICS )
 GAME( 1997, topskatruo,topskatr, model2c,      model2,   model2c_state, 0,       ROT0, "Sega",   "Top Skater (USA)", MACHINE_NOT_WORKING|MACHINE_IMPERFECT_GRAPHICS )
 GAME( 1997, topskatrj, topskatr, model2c,      model2,   model2c_state, 0,       ROT0, "Sega",   "Top Skater (Japan)", MACHINE_NOT_WORKING|MACHINE_IMPERFECT_GRAPHICS )
-GAME( 1998, dynamcopc, dynamcop, model2c_5881, model2,   model2c_state, genprot, ROT0, "Sega",   "Dynamite Cop (USA, Model 2C)", MACHINE_NOT_WORKING|MACHINE_IMPERFECT_GRAPHICS )
+GAME( 1998, dynamcopc, dynamcop, model2c_5881, model2,   model2c_state, 0,       ROT0, "Sega",   "Dynamite Cop (USA, Model 2C)", MACHINE_NOT_WORKING|MACHINE_IMPERFECT_GRAPHICS )
