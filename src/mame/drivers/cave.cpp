@@ -2947,6 +2947,22 @@ void cave_state::unpack_sprites(int chip)
 }
 
 
+/* 4 bits -> 8 bits. Even and odd pixels are not swapped */
+void cave_state::ddp_unpack_sprites(int chip)
+{
+	const uint32_t len    =   m_spriteregion[chip]->bytes();
+	uint8_t *rgn          =   m_spriteregion[chip]->base();
+	uint8_t *src          =   rgn + len / 2 - 1;
+	uint8_t *dst          =   rgn + len - 1;
+
+	while(dst > src)
+	{
+		uint8_t data = *src--;
+		*dst-- = data & 0xf;     *dst-- = data >> 4;
+	}
+}
+
+
 /* 2 pages of 4 bits -> 8 bits */
 void cave_state::esprade_unpack_sprites(int chip)
 {
@@ -5155,7 +5171,7 @@ DRIVER_INIT_MEMBER(cave_state,ddonpach)
 {
 	init_cave();
 
-	unpack_sprites(0);
+	ddp_unpack_sprites(0);
 	m_spritetype[0] = 1;    // "different" sprites (no zooming?)
 	m_time_vblank_irq = 90;
 }
@@ -5164,7 +5180,7 @@ DRIVER_INIT_MEMBER(cave_state,donpachi)
 {
 	init_cave();
 
-	unpack_sprites(0);
+	ddp_unpack_sprites(0);
 	m_spritetype[0] = 1;    // "different" sprites (no zooming?)
 	m_time_vblank_irq = 90;
 }

@@ -258,6 +258,7 @@ public:
 	DECLARE_WRITE_LINE_MEMBER(sound_irq_gen);
 	void update_irq_state();
 	void unpack_sprites(int chip);
+	void ddp_unpack_sprites(int chip);
 	void esprade_unpack_sprites(int chip);
 	void sailormn_unpack_tiles(int chip);
 
