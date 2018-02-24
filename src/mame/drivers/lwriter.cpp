@@ -253,10 +253,10 @@ READ16_MEMBER(lwriter_state::bankedarea_r)
 	}
 	else if (offset <= 0x01ffff)
 	{
-		if ((offset > 0x7ff) && !machine().side_effect_disabled()) { logerror("Attempt to read banked area (with overlay off) past end of SRAM from offset %08X!\n",offset<<1); }
+		if ((offset > 0x7ff) && !machine().side_effects_disabled()) { logerror("Attempt to read banked area (with overlay off) past end of SRAM from offset %08X!\n",offset<<1); }
 		return m_sram_ptr[offset&0x7FF];
 	}
-	if(!machine().side_effect_disabled()) { logerror("Attempt to read banked area (with overlay off) past end of SRAM from offset %08X! Returning 0xFFFF!\n",offset<<1); }
+	if(!machine().side_effects_disabled()) { logerror("Attempt to read banked area (with overlay off) past end of SRAM from offset %08X! Returning 0xFFFF!\n",offset<<1); }
 	return 0xFFFF;
 }
 
@@ -264,16 +264,16 @@ WRITE16_MEMBER(lwriter_state::bankedarea_w)
 {
 	if (m_overlay)
 	{
-		if(!machine().side_effect_disabled()) { logerror("Attempt to write banked area (with overlay ON) with data %04X to offset %08X IGNORED!\n",data, offset<<1); }
+		if(!machine().side_effects_disabled()) { logerror("Attempt to write banked area (with overlay ON) with data %04X to offset %08X IGNORED!\n",data, offset<<1); }
 		return;
 	}
 	else if (offset <= 0x01ffff)
 	{
-		if ((offset > 0x7ff) && !machine().side_effect_disabled()) { logerror("Attempt to write banked area (with overlay off) with data %04X to offset %08X!\n",data, offset<<1); }
+		if ((offset > 0x7ff) && !machine().side_effects_disabled()) { logerror("Attempt to write banked area (with overlay off) with data %04X to offset %08X!\n",data, offset<<1); }
 		COMBINE_DATA(&m_sram_ptr[offset&0x7FF]);
 		return;
 	}
-	if(!machine().side_effect_disabled()) { logerror("Attempt to write banked area (with overlay off) with data %04X to offset %08X IGNORED!\n", data, offset<<1); }
+	if(!machine().side_effects_disabled()) { logerror("Attempt to write banked area (with overlay off) with data %04X to offset %08X IGNORED!\n", data, offset<<1); }
 }
 
 /* 4 diagnostic LEDs, plus 4 i/o lines for the printer */

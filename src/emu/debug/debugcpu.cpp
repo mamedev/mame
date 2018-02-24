@@ -835,7 +835,7 @@ u64 debugger_cpu::expression_read_memory(void *param, const char *name, expressi
 			if (memory->has_space(AS_PROGRAM + (spacenum - EXPSPACE_PROGRAM_LOGICAL)))
 			{
 				address_space &space = memory->space(AS_PROGRAM + (spacenum - EXPSPACE_PROGRAM_LOGICAL));
-				auto dis = m_machine.disable_side_effect(disable_se);
+				auto dis = m_machine.disable_side_effects(disable_se);
 				return read_memory(space, address, size, true);
 			}
 			break;
@@ -859,7 +859,7 @@ u64 debugger_cpu::expression_read_memory(void *param, const char *name, expressi
 			if (memory->has_space(AS_PROGRAM + (spacenum - EXPSPACE_PROGRAM_PHYSICAL)))
 			{
 				address_space &space = memory->space(AS_PROGRAM + (spacenum - EXPSPACE_PROGRAM_PHYSICAL));
-				auto dis = m_machine.disable_side_effect(disable_se);
+				auto dis = m_machine.disable_side_effects(disable_se);
 				return read_memory(space, address, size, false);
 			}
 			break;
@@ -877,7 +877,7 @@ u64 debugger_cpu::expression_read_memory(void *param, const char *name, expressi
 				device = get_visible_cpu();
 				memory = &device->memory();
 			}
-			auto dis = m_machine.disable_side_effect(disable_se);
+			auto dis = m_machine.disable_side_effects(disable_se);
 			return expression_read_program_direct(memory->space(AS_PROGRAM), (spacenum == EXPSPACE_OPCODE), address, size);
 			break;
 		}
@@ -894,7 +894,7 @@ u64 debugger_cpu::expression_read_memory(void *param, const char *name, expressi
 				device = get_visible_cpu();
 				memory = &device->memory();
 			}
-			auto dis = m_machine.disable_side_effect(disable_se);
+			auto dis = m_machine.disable_side_effects(disable_se);
 			return expression_read_program_direct(memory->space(AS_OPCODES), (spacenum == EXPSPACE_OPCODE), address, size);
 			break;
 		}
@@ -1040,7 +1040,7 @@ void debugger_cpu::expression_write_memory(void *param, const char *name, expres
 			if (memory->has_space(AS_PROGRAM + (spacenum - EXPSPACE_PROGRAM_LOGICAL)))
 			{
 				address_space &space = memory->space(AS_PROGRAM + (spacenum - EXPSPACE_PROGRAM_LOGICAL));
-				auto dis = m_machine.disable_side_effect(disable_se);
+				auto dis = m_machine.disable_side_effects(disable_se);
 				write_memory(space, address, data, size, true);
 			}
 			break;
@@ -1059,7 +1059,7 @@ void debugger_cpu::expression_write_memory(void *param, const char *name, expres
 			if (memory->has_space(AS_PROGRAM + (spacenum - EXPSPACE_PROGRAM_PHYSICAL)))
 			{
 				address_space &space = memory->space(AS_PROGRAM + (spacenum - EXPSPACE_PROGRAM_PHYSICAL));
-				auto dis = m_machine.disable_side_effect(disable_se);
+				auto dis = m_machine.disable_side_effects(disable_se);
 				write_memory(space, address, data, size, false);
 			}
 			break;
@@ -1072,7 +1072,7 @@ void debugger_cpu::expression_write_memory(void *param, const char *name, expres
 				device = get_visible_cpu();
 				memory = &device->memory();
 			}
-			auto dis = m_machine.disable_side_effect(disable_se);
+			auto dis = m_machine.disable_side_effects(disable_se);
 			expression_write_program_direct(memory->space(AS_PROGRAM), (spacenum == EXPSPACE_OPCODE), address, size, data);
 			break;
 		}
@@ -1085,7 +1085,7 @@ void debugger_cpu::expression_write_memory(void *param, const char *name, expres
 				device = get_visible_cpu();
 				memory = &device->memory();
 			}
-			auto dis = m_machine.disable_side_effect(disable_se);
+			auto dis = m_machine.disable_side_effects(disable_se);
 			expression_write_program_direct(memory->space(AS_OPCODES), (spacenum == EXPSPACE_OPCODE), address, size, data);
 			break;
 		}
@@ -2726,7 +2726,7 @@ void device_debug::watchpoint_check(address_space& space, int type, offs_t addre
 void debugger_cpu::watchpoint_check(address_space& space, int type, offs_t address, u64 value_to_write, u64 mem_mask, std::vector<device_debug::watchpoint *> &wplist)
 {
 	// if we're within debugger code, don't stop
-	if (m_within_instruction_hook || m_machine.side_effect_disabled())
+	if (m_within_instruction_hook || m_machine.side_effects_disabled())
 		return;
 
 	m_within_instruction_hook = true;

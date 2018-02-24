@@ -433,7 +433,7 @@ WRITE16_MEMBER( st_state::berr_w )
 
 READ16_MEMBER( st_state::berr_r )
 {
-	if(!machine().side_effect_disabled()) {
+	if(!machine().side_effects_disabled()) {
 		m_maincpu->set_input_line(M68K_LINE_BUSERROR, ASSERT_LINE);
 		m_maincpu->set_input_line(M68K_LINE_BUSERROR, CLEAR_LINE);
 	}

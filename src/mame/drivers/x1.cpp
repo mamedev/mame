@@ -1006,7 +1006,7 @@ WRITE8_MEMBER( x1_state::x1turboz_4096_palette_w )
 
 READ8_MEMBER( x1_state::x1_ex_gfxram_r )
 {
-	if (!machine().side_effect_disabled())
+	if (!machine().side_effects_disabled())
 	{
 		m_iobank->set_bank(0); // any read disables the extended mode
 		return m_iobank->read8(space, offset);

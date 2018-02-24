@@ -273,7 +273,7 @@ READ8_MEMBER(ti85_state::ti83p_membank2_r)
 {
 	/// http://wikiti.brandonw.net/index.php?title=83Plus:State_of_the_calculator_at_boot
 	/// should only trigger when fetching opcodes
-	if (m_booting && !machine().side_effect_disabled())
+	if (m_booting && !machine().side_effects_disabled())
 	{
 		m_booting = false;
 
@@ -295,7 +295,7 @@ READ8_MEMBER(ti85_state::ti83p_membank3_r)
 	/// http://wikiti.brandonw.net/index.php?title=83Plus:State_of_the_calculator_at_boot
 	/// should only trigger when fetching opcodes
 	/// should be using port 6 instead of 4
-	if (m_booting && (m_ti83p_port4 & 1) && !machine().side_effect_disabled())
+	if (m_booting && (m_ti83p_port4 & 1) && !machine().side_effects_disabled())
 	{
 		m_booting = false;
 

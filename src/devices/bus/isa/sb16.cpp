@@ -16,7 +16,7 @@ DEFINE_DEVICE_TYPE(ISA16_SB16, sb16_lle_device, "sb16", "SoundBlaster 16 Audio A
 
 READ8_MEMBER( sb16_lle_device::dsp_data_r )
 {
-	if(!machine().side_effect_disabled())
+	if(!machine().side_effects_disabled())
 		m_data_in = false;
 
 	return m_in_byte;

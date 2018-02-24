@@ -44,7 +44,7 @@ READ8_MEMBER(taito_sj_security_mcu_device::data_r)
 	else
 	{
 		// ZLREAD
-		if (!machine().side_effect_disabled())
+		if (!machine().side_effects_disabled())
 			m_zaccept = true;
 		return m_mcu_data;
 	}

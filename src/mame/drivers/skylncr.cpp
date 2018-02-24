@@ -446,7 +446,7 @@ READ_LINE_MEMBER(skylncr_state::mbutrfly_prot_r)
 
 READ8_MEMBER(skylncr_state::bdream97_opcode_r)
 {
-	auto dis = machine().disable_side_effect();
+	auto dis = machine().disable_side_effects();
 	return m_maincpu->space(AS_PROGRAM).read_byte(offset) ^ 0x80;
 }
 

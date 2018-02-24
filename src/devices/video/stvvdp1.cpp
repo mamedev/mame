@@ -175,7 +175,7 @@ READ16_MEMBER( saturn_state::saturn_vdp1_regs_r )
 
 			return modr;
 		default:
-			if(!machine().side_effect_disabled())
+			if(!machine().side_effects_disabled())
 				logerror("%s VDP1: Read from Registers, Offset %04x\n", machine().describe_context(), offset*2);
 			break;
 	}

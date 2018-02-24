@@ -100,7 +100,7 @@ READ8_MEMBER(stv_state::stv_ioga_r)
 	uint8_t res;
 
 	res = 0xff;
-	if(offset & 0x20 && !machine().side_effect_disabled())
+	if(offset & 0x20 && !machine().side_effects_disabled())
 		printf("Reading from mirror %08x?\n",offset);
 
 	offset &= 0x1f; // mirror?
@@ -131,7 +131,7 @@ READ8_MEMBER(stv_state::stv_ioga_r)
 
 WRITE8_MEMBER(stv_state::stv_ioga_w)
 {
-	if(offset & 0x20 && !machine().side_effect_disabled())
+	if(offset & 0x20 && !machine().side_effects_disabled())
 		printf("Writing to mirror %08x %02x?\n",offset,data);
 
 	offset &= 0x1f; // mirror?
@@ -304,7 +304,7 @@ READ32_MEMBER(stv_state::critcrsh_ioga_r32)
 		res |= critcrsh_ioga_r(space,offset*4+3);
 	if(ACCESSING_BITS_8_15 || ACCESSING_BITS_24_31)
 		if(!(ACCESSING_BITS_16_23 || ACCESSING_BITS_0_7))
-			if(!machine().side_effect_disabled())
+			if(!machine().side_effects_disabled())
 				printf("Warning: IOGA reads from odd offset %02x %08x!\n",offset*4,mem_mask);
 
 	return res;
@@ -321,7 +321,7 @@ READ32_MEMBER(stv_state::stvmp_ioga_r32)
 		res |= stvmp_ioga_r(space,offset*4+3);
 	if(ACCESSING_BITS_8_15 || ACCESSING_BITS_24_31)
 		if(!(ACCESSING_BITS_16_23 || ACCESSING_BITS_0_7))
-			if(!machine().side_effect_disabled())
+			if(!machine().side_effects_disabled())
 				printf("Warning: IOGA reads from odd offset %02x %08x!\n",offset*4,mem_mask);
 
 	return res;
@@ -335,7 +335,7 @@ WRITE32_MEMBER(stv_state::stvmp_ioga_w32)
 		stvmp_ioga_w(space,offset*4+3,data);
 	if(ACCESSING_BITS_8_15 || ACCESSING_BITS_24_31)
 		if(!(ACCESSING_BITS_16_23 || ACCESSING_BITS_0_7))
-			if(!machine().side_effect_disabled())
+			if(!machine().side_effects_disabled())
 				printf("Warning: IOGA writes to odd offset %02x (%08x) -> %08x!",offset*4,mem_mask,data);
 }
 
@@ -350,7 +350,7 @@ READ32_MEMBER(stv_state::magzun_ioga_r32)
 		res |= magzun_ioga_r(space,offset*4+3);
 	if(ACCESSING_BITS_8_15 || ACCESSING_BITS_24_31)
 		if(!(ACCESSING_BITS_16_23 || ACCESSING_BITS_0_7))
-			if(!machine().side_effect_disabled())
+			if(!machine().side_effects_disabled())
 				printf("Warning: IOGA reads from odd offset %02x %08x!\n",offset*4,mem_mask);
 
 	return res;
@@ -364,7 +364,7 @@ WRITE32_MEMBER(stv_state::magzun_ioga_w32)
 		magzun_ioga_w(space,offset*4+3,data);
 	if(ACCESSING_BITS_8_15 || ACCESSING_BITS_24_31)
 		if(!(ACCESSING_BITS_16_23 || ACCESSING_BITS_0_7))
-			if(!machine().side_effect_disabled())
+			if(!machine().side_effects_disabled())
 				printf("Warning: IOGA writes to odd offset %02x (%08x) -> %08x!",offset*4,mem_mask,data);
 }
 

@@ -634,7 +634,7 @@ READ8_MEMBER( mainboard8_device::read )
 	uint8_t value = 0;
 	const char* what;
 
-	if (machine().side_effect_disabled())
+	if (machine().side_effects_disabled())
 	{
 		return debugger_read(space, offset);
 	}
@@ -832,7 +832,7 @@ WRITE8_MEMBER( mainboard8_device::write )
 	m_latched_data = data;
 	m_pending_write = true;
 
-	if (machine().side_effect_disabled())
+	if (machine().side_effects_disabled())
 	{
 		return debugger_write(space, offset, data);
 	}

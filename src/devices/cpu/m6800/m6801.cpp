@@ -847,7 +847,7 @@ READ8_MEMBER( m6801_cpu_device::m6801_io_r )
 		break;
 
 	case IO_P3DATA:
-		if (!machine().side_effect_disabled())
+		if (!machine().side_effects_disabled())
 		{
 			if (m_p3csr_is3_flag_read)
 			{
@@ -868,7 +868,7 @@ READ8_MEMBER( m6801_cpu_device::m6801_io_r )
 			data = (m_io->read_byte(M6801_PORT3) & (m_port3_ddr ^ 0xff))
 				| (m_port3_data & m_port3_ddr);
 
-		if (!machine().side_effect_disabled())
+		if (!machine().side_effects_disabled())
 		{
 			m_port3_latched = 0;
 
@@ -893,7 +893,7 @@ READ8_MEMBER( m6801_cpu_device::m6801_io_r )
 		break;
 
 	case IO_CH:
-		if(!(m_pending_tcsr&TCSR_TOF) && !machine().side_effect_disabled())
+		if(!(m_pending_tcsr&TCSR_TOF) && !machine().side_effects_disabled())
 		{
 			m_tcsr &= ~TCSR_TOF;
 			MODIFIED_tcsr;
@@ -906,7 +906,7 @@ READ8_MEMBER( m6801_cpu_device::m6801_io_r )
 		// HACK there should be a break here, but Coleco Adam won't boot with it present, proper fix required to the free-running counter
 
 	case IO_OCRH:
-		if(!(m_pending_tcsr&TCSR_OCF) && !machine().side_effect_disabled())
+		if(!(m_pending_tcsr&TCSR_OCF) && !machine().side_effects_disabled())
 		{
 			m_tcsr &= ~TCSR_OCF;
 			MODIFIED_tcsr;
@@ -915,7 +915,7 @@ READ8_MEMBER( m6801_cpu_device::m6801_io_r )
 		break;
 
 	case IO_OCRL:
-		if(!(m_pending_tcsr&TCSR_OCF) && !machine().side_effect_disabled())
+		if(!(m_pending_tcsr&TCSR_OCF) && !machine().side_effects_disabled())
 		{
 			m_tcsr &= ~TCSR_OCF;
 			MODIFIED_tcsr;
@@ -924,7 +924,7 @@ READ8_MEMBER( m6801_cpu_device::m6801_io_r )
 		break;
 
 	case IO_ICRH:
-		if(!(m_pending_tcsr&TCSR_ICF) && !machine().side_effect_disabled())
+		if(!(m_pending_tcsr&TCSR_ICF) && !machine().side_effects_disabled())
 		{
 			m_tcsr &= ~TCSR_ICF;
 			MODIFIED_tcsr;
@@ -937,7 +937,7 @@ READ8_MEMBER( m6801_cpu_device::m6801_io_r )
 		break;
 
 	case IO_P3CSR:
-		if ((m_p3csr & M6801_P3CSR_IS3_FLAG) && !machine().side_effect_disabled())
+		if ((m_p3csr & M6801_P3CSR_IS3_FLAG) && !machine().side_effects_disabled())
 		{
 			m_p3csr_is3_flag_read = 1;
 		}
@@ -950,7 +950,7 @@ READ8_MEMBER( m6801_cpu_device::m6801_io_r )
 		break;
 
 	case IO_TRCSR:
-		if (!machine().side_effect_disabled())
+		if (!machine().side_effects_disabled())
 		{
 			if (m_trcsr & M6801_TRCSR_TDRE)
 			{
@@ -972,7 +972,7 @@ READ8_MEMBER( m6801_cpu_device::m6801_io_r )
 		break;
 
 	case IO_RDR:
-		if (!machine().side_effect_disabled())
+		if (!machine().side_effects_disabled())
 		{
 			if (m_trcsr_read_orfe)
 			{

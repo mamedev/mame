@@ -837,7 +837,7 @@ void cmi_state::video_write(int offset)
 
 READ8_MEMBER( cmi_state::video_r )
 {
-	if (machine().side_effect_disabled())
+	if (machine().side_effects_disabled())
 		return m_video_data;
 
 	m_video_data = m_video_ram[m_y_pos * (512 / 8) + (m_x_pos / 8)];
@@ -883,7 +883,7 @@ WRITE8_MEMBER( cmi_state::vram_w )
 
 READ8_MEMBER( cmi_state::vram_r )
 {
-	if (machine().side_effect_disabled())
+	if (machine().side_effects_disabled())
 		return m_video_ram[offset];
 
 	/* Latch the current video position */
@@ -947,7 +947,7 @@ template<int cpunum> WRITE8_MEMBER( cmi_state::map_w )
 
 template<int cpunum> READ8_MEMBER( cmi_state::irq_ram_r )
 {
-	if (machine().side_effect_disabled())
+	if (machine().side_effects_disabled())
 		return m_scratch_ram[cpunum][0xf8 + offset];
 
 	if (m_m6809_bs_hack_cnt > 0 && m_m6809_bs_hack_cpu == cpunum)
@@ -1580,7 +1580,7 @@ WRITE8_MEMBER( cmi_state::fdc_w )
 
 READ8_MEMBER( cmi_state::fdc_r )
 {
-	if (machine().side_effect_disabled())
+	if (machine().side_effects_disabled())
 		return 0;
 
 	if (offset == 0)
@@ -2002,7 +2002,7 @@ WRITE8_MEMBER( cmi01a_device::write )
 
 READ8_MEMBER( cmi01a_device::read )
 {
-	if (machine().side_effect_disabled())
+	if (machine().side_effects_disabled())
 		return 0;
 
 	uint8_t data = 0;
@@ -2076,7 +2076,7 @@ WRITE_LINE_MEMBER( cmi_state::cmi02_ptm_o2 )
 
 READ8_MEMBER( cmi_state::cmi02_r )
 {
-	if (machine().side_effect_disabled())
+	if (machine().side_effects_disabled())
 		return 0;
 
 	if (offset <= 0x1f)

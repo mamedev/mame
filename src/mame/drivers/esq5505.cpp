@@ -350,7 +350,7 @@ READ16_MEMBER(esq5505_state::lower_r)
 		m_ram = (uint16_t *)(void *)memshare("osram")->ptr();
 	}
 
-	if (!machine().side_effect_disabled() && m_maincpu->get_fc() == 0x6)  // supervisor mode = ROM
+	if (!machine().side_effects_disabled() && m_maincpu->get_fc() == 0x6)  // supervisor mode = ROM
 	{
 		return m_rom[offset];
 	}

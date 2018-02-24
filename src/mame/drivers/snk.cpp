@@ -286,7 +286,7 @@ TODO:
 
 READ8_MEMBER(snk_state::snk_cpuA_nmi_trigger_r)
 {
-	if(!machine().side_effect_disabled())
+	if(!machine().side_effects_disabled())
 	{
 		m_maincpu->set_input_line(INPUT_LINE_NMI, ASSERT_LINE);
 	}
@@ -300,7 +300,7 @@ WRITE8_MEMBER(snk_state::snk_cpuA_nmi_ack_w)
 
 READ8_MEMBER(snk_state::snk_cpuB_nmi_trigger_r)
 {
-	if(!machine().side_effect_disabled())
+	if(!machine().side_effects_disabled())
 	{
 		m_subcpu->set_input_line(INPUT_LINE_NMI, ASSERT_LINE);
 	}

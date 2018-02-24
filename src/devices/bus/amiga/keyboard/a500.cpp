@@ -442,7 +442,7 @@ WRITE8_MEMBER( a500_kbd_device::latch_w )
 
 READ8_MEMBER( a500_kbd_device::counter_r )
 {
-	if (!machine().side_effect_disabled())
+	if (!machine().side_effects_disabled())
 	{
 		m_control &= ~COUNTER_OVERFLOW;
 		update_irqs();

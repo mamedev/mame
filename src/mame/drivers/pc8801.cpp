@@ -1075,7 +1075,7 @@ READ8_MEMBER(pc8801_state::pc8801_mem_r)
 
 		if(m_misc_ctrl & 0x40)
 		{
-			if(!machine().side_effect_disabled())
+			if(!machine().side_effects_disabled())
 				m_vram_sel = 3;
 
 			if(m_alu_ctrl2 & 0x80)
@@ -1137,7 +1137,7 @@ WRITE8_MEMBER(pc8801_state::pc8801_mem_w)
 	{
 		if(m_misc_ctrl & 0x40)
 		{
-			if(!machine().side_effect_disabled())
+			if(!machine().side_effects_disabled())
 				m_vram_sel = 3;
 
 			if(m_alu_ctrl2 & 0x80)

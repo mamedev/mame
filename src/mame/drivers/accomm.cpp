@@ -220,7 +220,7 @@ void accomm_state::video_start()
 
 WRITE8_MEMBER(accomm_state::ch00switch_w)
 {
-	if (!machine().side_effect_disabled())
+	if (!machine().side_effects_disabled())
 		m_ch00rom_enabled = false;
 }
 

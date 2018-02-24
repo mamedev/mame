@@ -511,7 +511,7 @@ READ8_MEMBER(altos8600_state::get_slave_ack)
 
 void altos8600_state::seterr(offs_t offset, u16 mem_mask, u16 err_mask)
 {
-	if(machine().side_effect_disabled())
+	if(machine().side_effects_disabled())
 		return;
 	logerror("Fault at %05x type %04x\n", offset << 1, err_mask);
 	if(!m_nmiinh)
@@ -604,7 +604,7 @@ WRITE16_MEMBER(altos8600_state::xtraram_w)
 
 READ16_MEMBER(altos8600_state::cpuio_r)
 {
-	if(m_user && !machine().side_effect_disabled())
+	if(m_user && !machine().side_effects_disabled())
 	{
 		m_pic1->ir0_w(ASSERT_LINE);
 		return 0;
@@ -614,7 +614,7 @@ READ16_MEMBER(altos8600_state::cpuio_r)
 
 WRITE16_MEMBER(altos8600_state::cpuio_w)
 {
-	if(m_user && !machine().side_effect_disabled())
+	if(m_user && !machine().side_effects_disabled())
 	{
 		m_pic1->ir0_w(ASSERT_LINE);
 		return;

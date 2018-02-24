@@ -141,7 +141,7 @@ WRITE8_MEMBER( decwriter_state::la120_LED_w )
 READ8_MEMBER( decwriter_state::la120_NVR_r )
 {
 	// one wait state inserted
-	if (!machine().side_effect_disabled())
+	if (!machine().side_effects_disabled())
 		m_maincpu->adjust_icount(-1);
 
 	return (m_nvm->data_r() << 7) | 0x7e;
@@ -150,7 +150,7 @@ READ8_MEMBER( decwriter_state::la120_NVR_r )
 WRITE8_MEMBER( decwriter_state::la120_NVR_w )
 {
 	// one wait state inserted
-	if (!machine().side_effect_disabled())
+	if (!machine().side_effects_disabled())
 		m_maincpu->adjust_icount(-1);
 
 	// ER1400 has negative logic, but 7406 inverters are used

@@ -369,7 +369,7 @@ void intellec4_state::bus_cycle(mcs40_cpu_device_base::phase step, u8 sync, u8 d
 
 READ8_MEMBER(intellec4_state::pm_read)
 {
-	if (!machine().side_effect_disabled())
+	if (!machine().side_effects_disabled())
 	{
 		// always causes data to be latched
 		u16 const addr((u16(m_ram_page) << 8) | ((offset >> 1) & 0x00ffU));

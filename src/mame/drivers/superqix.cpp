@@ -314,7 +314,7 @@ READ8_MEMBER(superqix_state::z80_ay2_iob_r)
 
 READ8_MEMBER(superqix_state::z80_semaphore_assert_r)
 {
-	if(!machine().side_effect_disabled())
+	if(!machine().side_effects_disabled())
 	{
 		machine().scheduler().synchronize(timer_expired_delegate(FUNC(superqix_state::z80_semaphore_assert_cb), this));
 	}
@@ -411,7 +411,7 @@ READ8_MEMBER(superqix_state::mcu_port3_r)
 
 READ8_MEMBER(superqix_state_base::nmi_ack_r)
 {
-	if(!machine().side_effect_disabled())
+	if(!machine().side_effects_disabled())
 	{
 		m_maincpu->set_input_line(INPUT_LINE_NMI, CLEAR_LINE);
 	}
@@ -877,7 +877,7 @@ WRITE8_MEMBER(hotsmash_state::hotsmash_Z80_mcu_w)
 
 READ8_MEMBER(hotsmash_state::hotsmash_Z80_mcu_r)
 {
-	if(!machine().side_effect_disabled())
+	if(!machine().side_effects_disabled())
 	{
 		//if ((m_fromZ80 != 0x04) && (m_fromZ80 != 0x08))
 		//  logerror("%s: z80 read from MCU %02x; Z80HasWritten: %d; MCUHasWritten: %d (and will be 0 after this)\n",machine().describe_context(),m_fromMCU, m_Z80HasWritten, m_MCUHasWritten);
