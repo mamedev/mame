@@ -11332,6 +11332,9 @@ kdynastg                        // (c) 1999 EZ Graphics
 xfiles                          // (c) 1999 dgPIX Entertainment Inc
 xfilesk                         // (c) 1999 dgPIX Entertainment Inc (censored for the Korean market)
 
+@source:diablo1300.cpp
+diablo				//
+
 @source:didact.cpp
 md6802                          //
 mp68a                           //
