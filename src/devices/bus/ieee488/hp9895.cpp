@@ -503,7 +503,7 @@ READ8_MEMBER(hp9895_device::phi_reg_r)
 	return (uint8_t)reg;
 }
 
-WRITE16_MEMBER(hp9895_device::z80_m1_w)
+WRITE8_MEMBER(hp9895_device::z80_m1_w)
 {
 	// Every M1 cycle of Z80 clears the IRQ line
 	if (m_cpu_irq) {
@@ -886,7 +886,7 @@ MACHINE_CONFIG_START(hp9895_device::device_add_mconfig)
 	MCFG_CPU_ADD("cpu" , Z80 , 4000000)
 	MCFG_CPU_PROGRAM_MAP(z80_program_map)
 	MCFG_CPU_IO_MAP(z80_io_map)
-	MCFG_Z80_SET_REFRESH_CALLBACK(WRITE16(hp9895_device , z80_m1_w))
+	MCFG_Z80_SET_REFRESH_CALLBACK(WRITE8(hp9895_device , z80_m1_w))
 
 	MCFG_DEVICE_ADD("phi" , PHI , 0)
 	MCFG_PHI_EOI_WRITE_CB(WRITELINE(hp9895_device , phi_eoi_w))
