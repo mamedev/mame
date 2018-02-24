@@ -107,9 +107,6 @@ public:
 
 	virtual error write(void const *buffer, std::uint64_t offset, std::uint32_t count, std::uint32_t &actual) override
 	{
-		if (m_listening) {
-			return error::NONE;
-		}
 		ssize_t const result = ::write(m_sock, buffer, count);
 		if (result < 0)
 			return errno_to_file_error(errno);
