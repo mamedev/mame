@@ -122,6 +122,7 @@ void tnx1_state::driver_start()
 	save_item(NAME(m_prot0));
 	save_item(NAME(m_prot1));
 	save_item(NAME(m_prot_shift));
+	save_item(NAME(m_nmi_enabled));
 }
 
 void tnx1_state::decrypt_rom()
@@ -152,16 +153,23 @@ void tpp2_state::decrypt_rom()
 	memcpy(rom,&buffer[0],len);
 }
 
-INTERRUPT_GEN_MEMBER(tnx1_state::popeye_interrupt)
+WRITE8_MEMBER(tnx1_state::refresh_w)
 {
-	std::copy(&m_dmasource[0], &m_dmasource[m_dmasource.bytes()], m_sprite_ram.begin());
-	std::copy(&m_dmasource[0], &m_dmasource[3], m_background_scroll);
-	m_palette_bank = m_dmasource[3];
+	m_nmi_enabled = ((offset >> 8) & 1) != 0;
+}
 
-	m_field ^= 1;
-	/* NMIs are enabled by the I register?? How can that be? */
-	if (device.state().state_int(Z80_I) & 1)    /* skyskipr: 0/1, popeye: 2/3 but also 0/1 */
-		device.execute().set_input_line(INPUT_LINE_NMI, PULSE_LINE);
+WRITE_LINE_MEMBER(tnx1_state::screen_vblank)
+{
+	if (state)
+	{
+		std::copy(&m_dmasource[0], &m_dmasource[m_dmasource.bytes()], m_sprite_ram.begin());
+		std::copy(&m_dmasource[0], &m_dmasource[3], m_background_scroll);
+		m_palette_bank = m_dmasource[3];
+
+		m_field ^= 1;
+		if (m_nmi_enabled)
+			m_maincpu->set_input_line(INPUT_LINE_NMI, PULSE_LINE);
+	}
 }
 
 
@@ -478,7 +486,7 @@ MACHINE_CONFIG_START(tnx1_state::config)
 	MCFG_CPU_ADD("maincpu", Z80, XTAL(8'000'000)/2)   /* 4 MHz */
 	MCFG_CPU_PROGRAM_MAP(maincpu_program_map)
 	MCFG_CPU_IO_MAP(maincpu_io_map)
-	MCFG_CPU_VBLANK_INT_DRIVER("screen", tnx1_state,  popeye_interrupt)
+	MCFG_Z80_SET_REFRESH_CALLBACK(WRITE8(tnx1_state, refresh_w))
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
@@ -488,6 +496,7 @@ MACHINE_CONFIG_START(tnx1_state::config)
 	MCFG_SCREEN_VISIBLE_AREA(0*16, 32*16-1, 2*16, 30*16-1)
 	MCFG_SCREEN_UPDATE_DRIVER(tnx1_state, screen_update)
 	MCFG_SCREEN_PALETTE("palette")
+	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE(tnx1_state, screen_vblank))
 
 	MCFG_GFXDECODE_ADD("gfxdecode", "palette", popeye)
 	MCFG_PALETTE_ADD("palette", 16+16*2+8*4)

@@ -51,7 +51,9 @@ protected:
 	uint8_t m_prot1;
 	uint8_t m_prot_shift;
 	uint8_t m_dswbit;
+	bool m_nmi_enabled;
 
+	DECLARE_WRITE8_MEMBER(refresh_w);
 	DECLARE_READ8_MEMBER(protection_r);
 	DECLARE_WRITE8_MEMBER(protection_w);
 	DECLARE_WRITE8_MEMBER(popeye_videoram_w);
@@ -63,7 +65,7 @@ protected:
 	virtual void video_start() override;
 	virtual DECLARE_PALETTE_INIT(palette_init);
 	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
-	INTERRUPT_GEN_MEMBER(popeye_interrupt);
+	DECLARE_WRITE_LINE_MEMBER(screen_vblank);
 	void update_palette();
 	virtual void decrypt_rom();
 	virtual void draw_background(bitmap_ind16 &bitmap, const rectangle &cliprect);
