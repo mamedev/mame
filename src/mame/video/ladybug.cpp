@@ -98,7 +98,7 @@ void ladybug_video_device::device_start()
 {
 	m_spr_ram = std::make_unique<u8 []>(0x0400);
 	m_bg_ram = std::make_unique<u8 []>(0x0800);
-	std::fill_n(m_spr_ram.get(), 0x0800, 0);
+	std::fill_n(m_spr_ram.get(), 0x0400, 0);
 	std::fill_n(m_bg_ram.get(), 0x0800, 0);
 
 	m_bg_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(ladybug_video_device::get_bg_tile_info), this), TILEMAP_SCAN_ROWS, 8, 8, 32, 32);
