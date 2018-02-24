@@ -1,36 +1,36 @@
 // license:BSD-3-Clause
 // copyright-holders: Gabriele D'Antona
-/* 
-	Olympia BOSS
-	Made in Germany around 1981
-	
-	The BOSS series was not a great success, as its members differed too much to be compatible:
-	First they were 8085 based, later machines used a Z80A.
-	
-	Other distinguishing features were the capacity of the disk drives:
-	
-	BOSS A: Two 128K floppy drives
-	BOSS B: Two 256K disk drives
-	BOSS C: Two 600K disk drives
-	BOSS D: One 600K disk drive, one 5 MB harddisk
-	BOSS M: M for multipost, up to four BOSS machines linked together for up to 20MB shared harddisk space
-	
-	Olympia favoured the French Prologue operating system over CPM (cf. Olympia People PC) and supplied BAL
-	as a programming language with it.
-		
-	Video is 80x28
-	
-	There are no service manuals available (or no documentation in general), so everything is guesswork.
+/*
+    Olympia BOSS
+    Made in Germany around 1981
 
-	- Ports 0x80 and 0x81 seem to be related to the graphics chip and cursor position
-	The rom outs value 0x81 to port 0x81 and then the sequence <column> <row> (?) to port 0x80
+    The BOSS series was not a great success, as its members differed too much to be compatible:
+    First they were 8085 based, later machines used a Z80A.
 
-	- The machine boots up and shows "BOSS .." on the screen. Every keystroke is repeated on screen.
-	If you press <return>, the machine seems to go into a boot sequence (from the HD, probably)
-	
-	The harddisk controller is based on a MSC-9056.
-	
-	Links: http://www.old-computers.com/museum/computer.asp?c=95
+    Other distinguishing features were the capacity of the disk drives:
+
+    BOSS A: Two 128K floppy drives
+    BOSS B: Two 256K disk drives
+    BOSS C: Two 600K disk drives
+    BOSS D: One 600K disk drive, one 5 MB harddisk
+    BOSS M: M for multipost, up to four BOSS machines linked together for up to 20MB shared harddisk space
+
+    Olympia favoured the French Prologue operating system over CPM (cf. Olympia People PC) and supplied BAL
+    as a programming language with it.
+
+    Video is 80x28
+
+    There are no service manuals available (or no documentation in general), so everything is guesswork.
+
+    - Ports 0x80 and 0x81 seem to be related to the graphics chip and cursor position
+    The rom outs value 0x81 to port 0x81 and then the sequence <column> <row> (?) to port 0x80
+
+    - The machine boots up and shows "BOSS .." on the screen. Every keystroke is repeated on screen.
+    If you press <return>, the machine seems to go into a boot sequence (from the HD, probably)
+
+    The harddisk controller is based on a MSC-9056.
+
+    Links: http://www.old-computers.com/museum/computer.asp?c=95
 */
 
 #include "emu.h"
@@ -48,7 +48,7 @@
 
 #define UPD3301_TAG     "upd3301"
 #define I8257_TAG       "i8257"
-#define SCREEN_TAG		"screen"
+#define SCREEN_TAG      "screen"
 
 //**************************************************************************
 //  TYPE DEFINITIONS
@@ -127,7 +127,7 @@ private:
 
 	bool m_keybhit;
 	u8 m_keystroke;
-	void keyboard_put(u8 data);	
+	void keyboard_put(u8 data);
 	void keyboard85_put(u8 data);
 	u8 m_fdcctrl, m_fdctype;
 	u8 m_channel, m_vchrmap, m_vchrpage;
@@ -245,7 +245,7 @@ WRITE8_MEMBER( olyboss_state::vchrram_w )
 
 WRITE_LINE_MEMBER( olyboss_state::romdis_w )
 {
-	m_romen = state ? false : true; 
+	m_romen = state ? false : true;
 }
 
 IRQ_CALLBACK_MEMBER( olyboss_state::irq_cb )
@@ -269,7 +269,7 @@ UPD3301_DRAW_CHARACTER_MEMBER( olyboss_state::olyboss_display_pixels )
 	int i;
 
 	//if (lc >= 8) return;
-	if (csr) 
+	if (csr)
 	{
 		data = 0xff;
 	}
@@ -566,7 +566,7 @@ ROM_START( bossb85 )
 	ROM_LOAD( "olympia_boss_graphics_251-461.bin", 0x0000, 0x800, CRC(56149540) SHA1(b2b893bd219308fc98a38528beb7ddae391c7609) )
 ROM_END
 
-ROM_START( olybossb )											// verified: BOSS B uses the same ROMs as D, so C is safe to assume as well
+ROM_START( olybossb )                                           // verified: BOSS B uses the same ROMs as D, so C is safe to assume as well
 	ROM_REGION(0x800, "mainrom", ROMREGION_ERASEFF)
 	ROM_LOAD( "olympia_boss_system_251-462.bin", 0x0000, 0x800, CRC(01b99609) SHA1(07b764c36337c12f7b40aa309b0805ceed8b22e2) )
 
@@ -595,9 +595,9 @@ ROM_END
 //  SYSTEM DRIVERS
 //**************************************************************************
 
-//   YEAR  NAME			PARENT	COMPAT	MACHINE		INPUT		CLASS			INIT		COMPANY						FULLNAME			FLAGS
-COMP(1981, bossa85,		olybossd,	0,		bossa85,	olyboss,	olyboss_state,	0,	"Olympia International",	"Olympia BOSS A 8085",	MACHINE_NOT_WORKING | MACHINE_NO_SOUND )
-COMP(1981, bossb85,		olybossd,	0,		bossb85,	olyboss,	olyboss_state,	0,	"Olympia International",	"Olympia BOSS B 8085",	MACHINE_NOT_WORKING | MACHINE_NO_SOUND )
-COMP(1981, olybossb,	olybossd,	0,		olybossb,	olyboss,	olyboss_state,	0,	"Olympia International",	"Olympia BOSS B",	MACHINE_NOT_WORKING | MACHINE_NO_SOUND )
-COMP(1981, olybossc,	olybossd,	0,		olybossc,	olyboss,	olyboss_state,	0,	"Olympia International",	"Olympia BOSS C",	MACHINE_NOT_WORKING | MACHINE_NO_SOUND )
-COMP(1981, olybossd,	0,			0,		olybossd,	olyboss,	olyboss_state,	0,	"Olympia International",	"Olympia BOSS D",	MACHINE_NOT_WORKING | MACHINE_NO_SOUND )
+//   YEAR  NAME         PARENT      COMPAT  MACHINE     INPUT       CLASS           INIT  COMPANY                     FULLNAME                FLAGS
+COMP(1981, bossa85,     olybossd,   0,      bossa85,    olyboss,    olyboss_state,  0,    "Olympia International",    "Olympia BOSS A 8085",  MACHINE_NOT_WORKING | MACHINE_NO_SOUND )
+COMP(1981, bossb85,     olybossd,   0,      bossb85,    olyboss,    olyboss_state,  0,    "Olympia International",    "Olympia BOSS B 8085",  MACHINE_NOT_WORKING | MACHINE_NO_SOUND )
+COMP(1981, olybossb,    olybossd,   0,      olybossb,   olyboss,    olyboss_state,  0,    "Olympia International",    "Olympia BOSS B",       MACHINE_NOT_WORKING | MACHINE_NO_SOUND )
+COMP(1981, olybossc,    olybossd,   0,      olybossc,   olyboss,    olyboss_state,  0,    "Olympia International",    "Olympia BOSS C",       MACHINE_NOT_WORKING | MACHINE_NO_SOUND )
+COMP(1981, olybossd,    0,          0,      olybossd,   olyboss,    olyboss_state,  0,    "Olympia International",    "Olympia BOSS D",       MACHINE_NOT_WORKING | MACHINE_NO_SOUND )

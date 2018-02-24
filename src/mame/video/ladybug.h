@@ -36,7 +36,7 @@ private:
 	required_device<gfxdecode_device>   m_gfxdecode;
 	std::unique_ptr<u8 []>              m_spr_ram;
 	std::unique_ptr<u8 []>              m_bg_ram;
-	tilemap_t	                        *m_bg_tilemap;
+	tilemap_t                           *m_bg_tilemap;
 };
 
 

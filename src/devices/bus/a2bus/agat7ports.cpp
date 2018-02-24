@@ -161,12 +161,12 @@ void a2bus_agat7_ports_device::write_c0nx(uint8_t offset, uint8_t data)
 }
 
 /*
- * 0	ODD
- * 1	EVEN
- * 4	INIT
- * 5	STROBE
- * 6	/INIT
- * 7	/STROBE
+ * 0    ODD
+ * 1    EVEN
+ * 4    INIT
+ * 5    STROBE
+ * 6    /INIT
+ * 7    /STROBE
  */
 WRITE8_MEMBER(a2bus_agat7_ports_device::write_portb)
 {
@@ -175,13 +175,13 @@ WRITE8_MEMBER(a2bus_agat7_ports_device::write_portb)
 }
 
 /*
- * 1	dip CNTRLESC (0: CPA-80, FX-85, Gemini.  1: D100)
- * 2	dip ALF0
- * 3	dip A/BR (0: level, BUSY/READY.  1: edge, ACK)
- * 4	dip INVD (1: data are sent inverted)
- * 5	dip ALF1 (00: KOI-8, 01: GOST, 10: CPA-80, 11: FX-85)
- * 6	dip ABRLEV (0: BUSY, /ACK.  1: READY, ACK)
- * 7	ready signal from device
+ * 1    dip CNTRLESC (0: CPA-80, FX-85, Gemini.  1: D100)
+ * 2    dip ALF0
+ * 3    dip A/BR (0: level, BUSY/READY.  1: edge, ACK)
+ * 4    dip INVD (1: data are sent inverted)
+ * 5    dip ALF1 (00: KOI-8, 01: GOST, 10: CPA-80, 11: FX-85)
+ * 6    dip ABRLEV (0: BUSY, /ACK.  1: READY, ACK)
+ * 7    ready signal from device
  */
 READ8_MEMBER(a2bus_agat7_ports_device::read_portc)
 {

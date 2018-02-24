@@ -45,7 +45,7 @@ public:
 
 	/* memory pointers */
 	required_shared_ptr<uint16_t> m_spriteram;
-	
+
 	/* memory regions */
 	required_memory_bank m_z80bank;
 

@@ -73,12 +73,12 @@ public:
 	// on the real hardware (e.g. Model 2's interrupt control registers)
 	void i960_noburst() { m_bursting = 0; }
 
-	void i960_stall() 
-	{ 
+	void i960_stall()
+	{
 		m_stalled = true;
 		m_IP = m_PIP;
 	}
-	
+
 protected:
 	enum { I960_RCACHE_SIZE = 4 };
 

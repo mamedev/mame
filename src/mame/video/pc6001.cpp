@@ -108,7 +108,7 @@ uint8_t pc6001_state::pc6001_get_char_rom(uint8_t ch, int line)
 	return gfx[ch*16+line];
 }
 #endif
- 
+
 void pc6001_state::video_start()
 {
 	#if 0
@@ -131,7 +131,7 @@ void pc6001mk2_state::video_start()
 
 void pc6001sr_state::video_start()
 {
-//	m_video_ram = auto_alloc_array_clear(machine(), uint8_t, 0x4000);
+//  m_video_ram = auto_alloc_array_clear(machine(), uint8_t, 0x4000);
 	m_gvram = auto_alloc_array_clear(machine(), uint8_t, 320*256*8); // TODO: size
 	save_pointer(NAME(m_gvram), 320*256*8);
 }
@@ -574,12 +574,12 @@ uint32_t pc6001sr_state::screen_update_pc6001sr(screen_device &screen, bitmap_in
 			for(x=0;x<320;x+=2)
 			{
 				uint32_t vram_addr;
-				
+
 				if(x >= 256)
 					vram_addr = 0x1a00 + (x-256)+y*64;
 				else
 					vram_addr = x+y*256;
-				
+
 				color = (m_gvram[vram_addr] & 0xf0) >> 4;
 
 				if (cliprect.contains(x, y+0))

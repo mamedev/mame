@@ -45,7 +45,7 @@ public:
 	int m_irq_enable;
 	int m_last_irq_level;
 	int m_high;
-	
+
 	DECLARE_WRITE8_MEMBER(irq_adr_w);
 	DECLARE_READ8_MEMBER(irq_adr_r);
 	DECLARE_WRITE8_MEMBER(irq_enable_w);

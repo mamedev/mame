@@ -1889,7 +1889,7 @@ DRIVER_INIT_MEMBER(rohga_state,hangzo)
 {
 	const uint8_t *src = memregion("gfx2")->base();
 	uint8_t *dst = memregion("gfx1")->base();
-	
+
 	std::copy(&src[0], &src[0x20000], &dst[0]);
 	std::copy(&src[0x80000], &src[0xa0000], &dst[0x20000]);
 }

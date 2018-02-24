@@ -45,7 +45,7 @@ public:
 	required_region_ptr<uint8_t> m_main_bios;
 	required_region_ptr<uint8_t> m_video_bios;
 	required_region_ptr<uint8_t> m_ex_bios;
-	
+
 	uint8_t *m_shadow_ram;
 
 	DECLARE_READ8_MEMBER(bios_r);
@@ -77,13 +77,13 @@ static uint32_t sis_pcm_r(device_t *busdevice, device_t *device, int function, i
 		// Device ID / Vendor ID
 		return 0x04961039;
 	}
-	
+
 	if(reg == 8)
 	{
 		// Device Class Code / Device Revision Identification
 		return 0x06000002;
 	}
-	
+
 	// Device Header Type
 	if(reg == 0xc)
 		return 0;
@@ -106,7 +106,7 @@ static void sis_pcm_w(device_t *busdevice, device_t *device, int function, int r
 	if(reg == 0x44)
 	{
 
-		/* 
+		/*
 		 * reg 0x45
 		 * shadow RAM control
 		 * xxxx ---- <reserved>
@@ -117,7 +117,7 @@ static void sis_pcm_w(device_t *busdevice, device_t *device, int function, int r
 		 */
 		if(ACCESSING_BITS_8_15)
 			state->m_pci_shadow_reg = (data & 0xff00) | (state->m_pci_shadow_reg & 0x00ff);
-		
+
 		/*
 		 * shadow RAM enable:
 		 * bit 7: 0xf8000-0xfffff shadow RAM enable
@@ -126,7 +126,7 @@ static void sis_pcm_w(device_t *busdevice, device_t *device, int function, int r
 		 */
 		if(ACCESSING_BITS_0_7) // reg 0x44
 			state->m_pci_shadow_reg = (data & 0x00ff) | (state->m_pci_shadow_reg & 0xff00);
-			
+
 		//printf("%04x\n",state->m_pci_shadow_reg);
 	}
 }
@@ -134,9 +134,9 @@ static void sis_pcm_w(device_t *busdevice, device_t *device, int function, int r
 READ8_MEMBER(photoply_state::bios_r)
 {
 	uint8_t bit_mask = (offset & 0x38000) >> 15;
-	
+
 	if((m_pci_shadow_reg & 0x200) == 0x200)
-	{	
+	{
 		if(m_pci_shadow_reg & (1 << bit_mask))
 			return m_shadow_ram[offset];
 	}
@@ -168,7 +168,7 @@ READ8_MEMBER(photoply_state::bios_r)
 
 WRITE8_MEMBER(photoply_state::bios_w)
 {
-//	return m_bios[offset];
+//  return m_bios[offset];
 
 	if((m_pci_shadow_reg & 0x100) == 0)
 	{
@@ -193,8 +193,8 @@ WRITE8_MEMBER(photoply_state::eeprom_w)
 ADDRESS_MAP_START(photoply_state::photoply_map)
 	AM_RANGE(0x00000000, 0x0009ffff) AM_RAM
 	AM_RANGE(0x000a0000, 0x000bffff) AM_DEVREADWRITE8("vga", cirrus_gd5446_device, mem_r, mem_w, 0xffffffff)
-//	AM_RANGE(0x000c0000, 0x000c7fff) AM_RAM AM_REGION("video_bios", 0)
-//	AM_RANGE(0x000c8000, 0x000cffff) AM_RAM AM_REGION("ex_bios", 0)
+//  AM_RANGE(0x000c0000, 0x000c7fff) AM_RAM AM_REGION("video_bios", 0)
+//  AM_RANGE(0x000c8000, 0x000cffff) AM_RAM AM_REGION("ex_bios", 0)
 	AM_RANGE(0x000c0000, 0x000fffff) AM_READWRITE8(bios_r,bios_w,0xffffffff)
 	AM_RANGE(0x00100000, 0x07ffffff) AM_RAM // 64MB RAM, guess!
 	AM_RANGE(0xfffe0000, 0xffffffff) AM_ROM AM_REGION("bios", 0)
@@ -209,15 +209,15 @@ ADDRESS_MAP_START(photoply_state::photoply_io)
 	AM_RANGE(0x0170, 0x0177) AM_DEVREADWRITE("ide2", ide_controller_32_device, read_cs0, write_cs0)
 	AM_RANGE(0x01f0, 0x01f7) AM_DEVREADWRITE("ide", ide_controller_32_device, read_cs0, write_cs0)
 	AM_RANGE(0x0200, 0x0203) AM_WRITE8(eeprom_w, 0x00ff0000)
-//	AM_RANGE(0x0278, 0x027f) AM_RAM //parallel port 2
+//  AM_RANGE(0x0278, 0x027f) AM_RAM //parallel port 2
 	AM_RANGE(0x0370, 0x0377) AM_DEVREADWRITE("ide2", ide_controller_32_device, read_cs1, write_cs1)
-//	AM_RANGE(0x0378, 0x037f) AM_RAM //parallel port
+//  AM_RANGE(0x0378, 0x037f) AM_RAM //parallel port
 	AM_RANGE(0x03b0, 0x03bf) AM_DEVREADWRITE8("vga", cirrus_gd5446_device, port_03b0_r, port_03b0_w, 0xffffffff)
 	AM_RANGE(0x03c0, 0x03cf) AM_DEVREADWRITE8("vga", cirrus_gd5446_device, port_03c0_r, port_03c0_w, 0xffffffff)
 	AM_RANGE(0x03d0, 0x03df) AM_DEVREADWRITE8("vga", cirrus_gd5446_device, port_03d0_r, port_03d0_w, 0xffffffff)
 
 	AM_RANGE(0x03f0, 0x03f7) AM_DEVREADWRITE("ide", ide_controller_32_device, read_cs1, write_cs1)
-	
+
 	AM_RANGE(0x0cf8, 0x0cff) AM_DEVREADWRITE("pcibus", pci_bus_legacy_device, read, write)
 
 ADDRESS_MAP_END
@@ -229,8 +229,8 @@ static INPUT_PORTS_START( photoply )
 	PORT_START("pc_keyboard_0")
 	PORT_BIT ( 0x0001, 0x0000, IPT_UNUSED )     /* unused scancode 0 */
 	AT_KEYB_HELPER( 0x0002, "Esc",          KEYCODE_Q           ) /* Esc                         01  81 */
-	AT_KEYB_HELPER( 0x0004, "1",            KEYCODE_1           ) 
-	AT_KEYB_HELPER( 0x0008, "2",            KEYCODE_2           ) 
+	AT_KEYB_HELPER( 0x0004, "1",            KEYCODE_1           )
+	AT_KEYB_HELPER( 0x0008, "2",            KEYCODE_2           )
 
 	PORT_START("pc_keyboard_1")
 	AT_KEYB_HELPER( 0x0020, "Y",            KEYCODE_Y           ) /* Y                           15  95 */
@@ -307,7 +307,7 @@ MACHINE_CONFIG_START(photoply_state::photoply)
 
 	MCFG_PCI_BUS_LEGACY_ADD("pcibus", 0)
 	MCFG_PCI_BUS_LEGACY_DEVICE(5, nullptr, sis_pcm_r, sis_pcm_w)
-	
+
 	MCFG_SCREEN_ADD("screen", RASTER)
 	MCFG_SCREEN_RAW_PARAMS(XTAL(25'174'800),900,0,640,526,0,480)
 	MCFG_SCREEN_UPDATE_DEVICE("vga", cirrus_gd5446_device, screen_update)
@@ -327,9 +327,9 @@ ROM_START(photoply)
 
 	ROM_REGION(0x8000, "ex_bios", ROMREGION_ERASE00 ) /* multifunction board with a ESS AudioDrive chip,  M27128A */
 	ROM_LOAD("enhanced bios.bin", 0x000000, 0x4000, CRC(a216404e) SHA1(c9067cf87d5c8106de00866bb211eae3a6c02c65) )
-//	ROM_RELOAD(                   0x004000, 0x4000 )
-//	ROM_RELOAD(                   0x008000, 0x4000 )
-//	ROM_RELOAD(                   0x00c000, 0x4000 )
+//  ROM_RELOAD(                   0x004000, 0x4000 )
+//  ROM_RELOAD(                   0x008000, 0x4000 )
+//  ROM_RELOAD(                   0x00c000, 0x4000 )
 
 	ROM_REGION(0x8000, "video_bios", 0 )
 	ROM_LOAD("vga.bin", 0x000000, 0x8000, CRC(7a859659) SHA1(ff667218261969c48082ec12aa91088a01b0cb2a) )

@@ -423,7 +423,7 @@ MACHINE_CONFIG_START(gts80b_state::gts80b_s)
 MACHINE_CONFIG_END
 
 //static MACHINE_CONFIG_START( gts80b_ss )
-//static 	gts80b(config);
+//static    gts80b(config);
 //  MCFG_SOUND_ADD("r1sound", GOTTLIEB_SOUND_REV1, 0)
 //  //MCFG_SOUND_ADD("r1sound", GOTTLIEB_SOUND_REV1_WITH_VOTRAX, 0)  // votrax crashes
 //  MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 1.0)

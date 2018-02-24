@@ -5,7 +5,7 @@
     xavix.c
 
     6502 with custom opcodes
-	integrated gfx / sound / coprocessor?
+    integrated gfx / sound / coprocessor?
 
 ***************************************************************************/
 

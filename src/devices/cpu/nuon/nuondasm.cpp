@@ -139,9 +139,9 @@
   1000 1xxx xxxx xxxx . xxxx xxx0 0000 0000 . 1001 00cc cccv vvvv . 101f 0100 wwww wwww  [ecu] jsr cc, #xwv/31u << 1
   1000 1xxx xxxx xxxx . xxxx xxx0 0000 0000 . 1001 00cc cccv vvvv . 101f 1010 wwww wwww  [ecu] jmp cc, #xwv/31u << 1, nop
   1000 1xxx xxxx xxxx . xxxx xxx0 0000 0000 . 1001 00cc cccv vvvv . 101f 1100 wwww wwww  [ecu] jsr cc, #xwv/31u << 1, nop
-  1000 1xxx xxxx xxxx . xxxx xxxx xxx0 0qmm . 1001 01oo ooov vvvv . 101f 111p pppw wwww  [mem] st_s #xwv/32u, 20000000 + qpom/12u << 2  
-  1000 1xxx xxxx xxxx . xxxx xxxx xxx0 1qmm . 1001 01oo ooov vvvv . 101f 111p pppw wwww  [mem] st_s #xwv/32u, 20100000 + qpom/12u << 2  
-  1000 1xxx xxxx xxxx . xxxx xxxx xxx1 0qmm . 1001 01oo ooov vvvv . 101f 111p pppw wwww  [mem] st_s #xwv/32u, 20500000 + qpom/12u << 2  
+  1000 1xxx xxxx xxxx . xxxx xxxx xxx0 0qmm . 1001 01oo ooov vvvv . 101f 111p pppw wwww  [mem] st_s #xwv/32u, 20000000 + qpom/12u << 2
+  1000 1xxx xxxx xxxx . xxxx xxxx xxx0 1qmm . 1001 01oo ooov vvvv . 101f 111p pppw wwww  [mem] st_s #xwv/32u, 20100000 + qpom/12u << 2
+  1000 1xxx xxxx xxxx . xxxx xxxx xxx1 0qmm . 1001 01oo ooov vvvv . 101f 111p pppw wwww  [mem] st_s #xwv/32u, 20500000 + qpom/12u << 2
   1000 1xxx xxxx xxxx . xxxx xxxx xxxx xxxx . 1001 10ww wwwm mmmm . 101f 0000 001n nnnn  [alu] add #xw/32s, rm, rn
   1000 1xxx xxxx xxxx . xxxx xxxx xxxx xxxx . 1001 10ww wwwm mmmm . 101f 0001 001n nnnn  [alu] add #xw/32s, rm, rn
   1000 1xxx xxxx xxxx . xxxx xxxx xxxx xxxx . 1001 10mm mmmw wwww . 101f 0001 100n nnnn  [alu] add rm, #xw/32s, rn
@@ -444,7 +444,7 @@ const nuon_disassembler::reginfo nuon_disassembler::reginfos[] = {
 	{ 0x20501320, "vldzeros"        },
 	{ 0x20501330, "vlddebug1"       },
 	{ 0x20501340, "vlddebug3"       },
-	{ 0x20501340, "vlddebug3"       },	
+	{ 0x20501340, "vlddebug3"       },
 };
 
 u32 nuon_disassembler::opcode_alignment() const
@@ -668,7 +668,7 @@ std::string nuon_disassembler::parse_packet(const data_buffer &opcodes, offs_t &
 		if(m(opc1, 0x7fe4, 0x7804)) return dec(opc1, util::string_format("modulo %s", rx(b(opc1, 3, 2, 0))));
 		if(m(opc1, 0x7ffc, 0x7904)) return dec(opc1);
 		if(m(opc1, 0x7fe4, 0x7a04)) return dec(opc1, util::string_format("range %s", rx(b(opc1, 3, 2, 0))));
-		
+
 		return util::string_format("?%04x", opc1);
 	}
 
@@ -678,7 +678,7 @@ std::string nuon_disassembler::parse_packet(const data_buffer &opcodes, offs_t &
 		cont = m(opc1, 0x0100, 0x0000);
 		if(m(opc1, 0xfeff, 0x8000)) return util::string_format("nop");
 		if(m(opc1, 0xfeff, 0x8200)) return util::string_format("breakpoint");
-		
+
 		return util::string_format("?%04x", opc1);
 	}
 
@@ -989,7 +989,7 @@ std::string nuon_disassembler::parse_packet(const data_buffer &opcodes, offs_t &
 										   b(opc3, 0, 5, 0), b(opc4, 0, 5, 0));
 			if(m(opc3, 0xfc00, 0x9800) && m(opc4, 0xefe0, 0xa180))
 				return util::string_format("sub r%d, #%s, r%d",
-										   b(opc3, 5, 5, 0), 
+										   b(opc3, 5, 5, 0),
 										   s2x(b(opc1, 0, 11, 21) | b(opc2, 0, 16, 5) | b(opc3, 0, 5, 0), 32),
 										   b(opc4, 0, 5, 0));
 			if(m(opc3, 0xfc00, 0x9800) && m(opc4, 0xefff, 0xa280))

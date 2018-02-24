@@ -30,7 +30,7 @@ public:
 		m_bgram(*this, "bgram", 32),
 		m_f1superb_extraram(*this, "f1sb_extraram", 32),
 		m_z80bank(*this, "z80bank%u", 1) { }
-		
+
 	required_device<cpu_device> m_maincpu;
 	required_device<cpu_device> m_audiocpu;
 	required_device<gfxdecode_device> m_gfxdecode;

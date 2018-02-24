@@ -31,7 +31,7 @@ public:
 	// probably set by a register somewhere either on TMS side or 68k side
 	void set_bpp(int bpp)
 	{
-		m_bpp_mode = bpp;	
+		m_bpp_mode = bpp;
 	}
 
 	void megaphx_tms_map(address_map &map);

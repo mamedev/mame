@@ -695,10 +695,10 @@ Zurukamashi Ver 2.0                                           Nikkonren Kikaku  
 		</part>
 	</software>
 
-	<!-- 
+	<!--
 	The program disk backup option (needed in order to actually be able to save the game) seems to require a destination disk with 78 writable tracks,
 	instead of the usual 77. Creating an empty MFI image and using it as the target works, and the saves persist between MAME sessions.
-	
+
 	The game is playable, but some locations (e.g. the caves after the starting area) should probably have a smaller visible area.
 	Something wrong with the layer drawing code, perhaps?
 	-->

@@ -1,6 +1,6 @@
 // license:BSD-3-Clause
 // copyright-holders:Aaron Giles, Angelo Salese
-/*************************************************************************************** 
+/***************************************************************************************
 
  Badlands - Playmark Bootleg support
 
@@ -11,9 +11,9 @@
  - fix sound;
  - inputs (coins & accelerators);
  - any way to disable sprites in service mode?
- 
+
 ========================================================================================
- 
+
  Year: 1989
  Producer: Playmark
 
@@ -54,18 +54,18 @@ uint32_t badlandsbl_state::screen_update_badlandsbl(screen_device &screen, bitma
 	// TODO: is this derived from something else?
 	{
 		gfx_element *gfx = m_gfxdecode->gfx(1);
-		
+
 		for(int count=0;count<(0x100-0x10)/2;count+=4)
 		{
 			if((m_spriteram[count+3] & 0xff) == 0xff)
 				return 0;
-		
+
 			uint16 tile = m_spriteram[count];
 			int y = (511 - 14) - (m_spriteram[count+1] & 0x1ff);
 			int x = (m_spriteram[count+2] >> 7) - 7;
 			int color = (m_spriteram[count+3] >> 8) & 7;
 			int h = (m_spriteram[count+3] & 0xf) + 1;
-			
+
 			for(int yi=0;yi<h;yi++)
 				gfx->transpen(bitmap,cliprect,tile+yi,color,0,0,x,y+yi*8,0);
 		}
@@ -136,7 +136,7 @@ ADDRESS_MAP_START(badlandsbl_state::bootleg_audio_map)
 	AM_RANGE(0x2000, 0x2005) AM_RAM AM_SHARE("b_sharedram")
 	AM_RANGE(0x2006, 0x3fff) AM_RAM
 	AM_RANGE(0x4000, 0xcfff) AM_ROM AM_REGION("audiorom", 0x4000)
-	AM_RANGE(0xd400, 0xd400) AM_WRITE(bootleg_main_irq_w) 
+	AM_RANGE(0xd400, 0xd400) AM_WRITE(bootleg_main_irq_w)
 	AM_RANGE(0xd800, 0xd801) AM_DEVREADWRITE("ymsnd", ym2151_device, read, write)
 	AM_RANGE(0xe000, 0xffff) AM_NOP // either RAM mirror or left-over
 ADDRESS_MAP_END
@@ -175,7 +175,7 @@ static const gfx_layout pflayout_bootleg =
 	4,
 	{ RGN_FRAC(0,4), RGN_FRAC(1,4), RGN_FRAC(2,4), RGN_FRAC(3,4) },
 //  TODO: service mode and (most of) in-game uses this arrangement
-//	{ RGN_FRAC(1,4), RGN_FRAC(3,4), RGN_FRAC(0,4), RGN_FRAC(2,4) },
+//  { RGN_FRAC(1,4), RGN_FRAC(3,4), RGN_FRAC(0,4), RGN_FRAC(2,4) },
 	{ 0, 1, 2, 3, 4, 5, 6, 7 },
 	{ 0*8, 1*8, 2*8, 3*8, 4*8, 5*8, 6*8, 7*8 },
 	8*8
@@ -227,8 +227,8 @@ MACHINE_CONFIG_START(badlandsbl_state::badlandsb)
 	MCFG_CPU_PROGRAM_MAP(bootleg_audio_map)
 	MCFG_TIMER_DRIVER_ADD_SCANLINE("scantimer", badlandsbl_state, bootleg_sound_scanline, "screen", 0, 1)
 
-//	MCFG_QUANTUM_PERFECT_CPU("maincpu")
-	
+//  MCFG_QUANTUM_PERFECT_CPU("maincpu")
+
 	MCFG_MACHINE_START_OVERRIDE(badlands_state,badlands)
 
 	MCFG_EEPROM_2816_ADD("eeprom")
@@ -241,8 +241,8 @@ MACHINE_CONFIG_START(badlandsbl_state::badlandsb)
 	MCFG_PALETTE_MEMBITS(8)
 
 	MCFG_TILEMAP_ADD_STANDARD("playfield", "gfxdecode", 2, badlands_state, get_playfield_tile_info, 8,8, SCAN_ROWS, 64,32)
-//	MCFG_ATARI_MOTION_OBJECTS_ADD("mob", "screen", badlands_state::s_mob_config)
-//	MCFG_ATARI_MOTION_OBJECTS_GFXDECODE("gfxdecode")
+//  MCFG_ATARI_MOTION_OBJECTS_ADD("mob", "screen", badlands_state::s_mob_config)
+//  MCFG_ATARI_MOTION_OBJECTS_GFXDECODE("gfxdecode")
 
 	MCFG_SCREEN_ADD("screen", RASTER)
 	MCFG_SCREEN_VIDEO_ATTRIBUTES(VIDEO_UPDATE_BEFORE_VBLANK)

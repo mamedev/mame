@@ -624,7 +624,7 @@ MACHINE_CONFIG_START(hyperscan_state::hyperscan)
 	MCFG_CPU_PROGRAM_MAP(spg290_mem)
 
 	MCFG_SOFTWARE_LIST_ADD("cd_list","hyperscan")
-	
+
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
 	MCFG_SCREEN_REFRESH_RATE(50)

@@ -156,7 +156,7 @@ protected:
 	uint8_t m_global_volume;      // volume index set with the OPT command
 	uint8_t m_filter_type;        // interpolation filter type set with the OPT command
 	uint8_t m_output_level;       // flag stating if a voltage follower is connected
-	
+
 	int       m_dadr;
 	offs_t    m_dadr_start_offset;
 	offs_t    m_dadr_end_offset;

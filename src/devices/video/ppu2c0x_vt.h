@@ -92,9 +92,9 @@ private:
 	palette_device *m_palette;
 
 	uint8_t m_201x_regs[0x20];
-	
+
 	uint8_t m_2012_2017_descramble[0x6];
-	
+
 	vtxx_pal_mode m_pal_mode = PAL_MODE_VT0x;
 
 	void set_2010_reg(uint8_t data);

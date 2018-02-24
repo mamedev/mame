@@ -9661,7 +9661,7 @@ ROM_START( sf2amf2 )
 	ROM_LOAD( "fun-u210.bin", 0x00000, 0x40000, CRC(6cfffb11) SHA1(995526183ffd35f92e9096500a3fe6237faaa2dd) )
 ROM_END
 
-ROM_START( sf2rules ) // 
+ROM_START( sf2rules ) //
 	ROM_REGION( CODE_SIZE, "maincpu", 0 )      /* 68000 code */
 	ROM_LOAD16_BYTE( "prh2.u222",          0x000000, 0x80000, CRC(fff85f9b) SHA1(5e5bc7da471fe15011b91f8c27823fbdace3eac1) )
 	ROM_LOAD16_BYTE( "prl1.u196",          0x000001, 0x80000, CRC(65c28bc9) SHA1(4f9c0e5062f00f115c3b471c7649d0b537cb3575) )

@@ -5,7 +5,7 @@
  * includes/galaxy.h
  *
  ****************************************************************************/
- 
+
 #ifndef MAME_INCLUDES_GALAXY_H
 #define MAME_INCLUDES_GALAXY_H
 

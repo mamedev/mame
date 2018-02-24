@@ -3170,7 +3170,7 @@ MACHINE_CONFIG_START(taitof2_state::growl)
 	MCFG_VIDEO_START_OVERRIDE(taitof2_state,taitof2_growl)
 	MCFG_SCREEN_MODIFY("screen")
 	MCFG_SCREEN_UPDATE_DRIVER(taitof2_state, screen_update_taitof2_pri)
-	
+
 	MCFG_PALETTE_MODIFY("palette")
 	MCFG_PALETTE_FORMAT(RRRRGGGGBBBBRGBx)
 
@@ -3276,7 +3276,7 @@ MACHINE_CONFIG_START(taitof2_state::koshien)
 	MCFG_VIDEO_START_OVERRIDE(taitof2_state,taitof2_koshien)
 	MCFG_SCREEN_MODIFY("screen")
 	MCFG_SCREEN_UPDATE_DRIVER(taitof2_state, screen_update_taitof2_pri)
-	
+
 	MCFG_PALETTE_MODIFY("palette")
 	MCFG_PALETTE_FORMAT(RRRRGGGGBBBBRGBx)
 

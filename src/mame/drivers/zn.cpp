@@ -2127,7 +2127,7 @@ DRIVER_INIT_MEMBER(zn_state,nbajamex)
 {
 	m_nbajamex_sram = std::make_unique<uint8_t[]>(0x8000);
 	machine().device<nvram_device>("71256")->set_base(m_nbajamex_sram.get(), 0x8000);
-	
+
 	save_pointer(NAME(m_nbajamex_sram.get()), 0x8000);
 
 	save_item(NAME(m_nbajamex_rombank));

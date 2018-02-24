@@ -516,7 +516,7 @@ void ymf271_device::update_pcm(int slotnum, int32_t *mixp, int length)
 		if (ch1_vol > 65536) ch1_vol = 65536;
 		if (ch2_vol > 65536) ch2_vol = 65536;
 		if (ch3_vol > 65536) ch3_vol = 65536;
-		
+
 		*mixp++ += (sample * ch0_vol) >> 16;
 		*mixp++ += (sample * ch1_vol) >> 16;
 		*mixp++ += (sample * ch2_vol) >> 16;
@@ -1746,7 +1746,7 @@ void ymf271_device::device_start()
 	m_master_clock = clock();
 	init_tables();
 	init_state();
-	
+
 	m_mix_buffer.resize(m_master_clock/(384/4));
 	m_stream = machine().sound().stream_alloc(*this, 0, 4, m_master_clock/384);
 }

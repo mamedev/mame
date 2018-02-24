@@ -45,7 +45,7 @@ void ppu_vt03_device::set_new_pen(int i)
 	if((i < 0x20) && ((i & 0x3) == 0)) {
 		m_palette->set_pen_color(i & 0x7f, rgb_t(0, 0, 0));
 	} else {
-		if(m_pal_mode == PAL_MODE_NEW_RGB) {		
+		if(m_pal_mode == PAL_MODE_NEW_RGB) {
 			uint16_t rgbval = (m_newpal[i&0x7f] & 0xff) | ((m_newpal[(i&0x7f)+0x80] & 0xff)<<8);
 			uint8_t blue = (rgbval & 0x001f) << 3;
 			uint8_t green = (rgbval & 0x3e0) >> 2;
@@ -91,7 +91,7 @@ void ppu_vt03_device::set_new_pen(int i)
 			if (nPhase == 0) Y += fChroma;        // Phase 0 is the upper bound of the waveform
 			if (nPhase ==13) Y -= fChroma;        // Phase 13 is the lower bound of the waveform
 			if (nPhase >=14) Y = 0.0;             // Phases 14 and 15 always black
-			
+
 			float V = sin(fPhase) *C *1.05; // 1.05 needed to get closer to EmuVT palette's color levels in phases 1-12
 			float U = cos(fPhase) *C *1.05;
 			float R = Y + 1.1400*V + 0.0000*U;
@@ -106,11 +106,11 @@ void ppu_vt03_device::set_new_pen(int i)
 			int RV = R *255.0;
 			int GV = G *255.0;
 			int BV = B *255.0;
-			
+
 			m_palette->set_pen_color(i & 0x7f, rgb_t(RV, GV ,BV));
 		}
 	}
-	
+
 
 }
 
@@ -186,7 +186,7 @@ void ppu_vt03_device::device_reset()
 		set_201x_reg(i, 0x00);
 
 	init_palette(*m_palette, 0);
-	
+
 	m_read_bg4_bg3 = 0;
 	m_va34 = 0;
 }
@@ -234,7 +234,7 @@ void ppu_vt03_device::make_sprite_pixel_data(uint8_t &pixel_data, int flipx)
 			pixel_data |= (((m_extplanebuf[0] & 1) << 5) | ((m_extplanebuf[1] & 1) << 6));
 			m_extplanebuf[0] = m_extplanebuf[0] >> 1;
 			m_extplanebuf[1] = m_extplanebuf[1] >> 1;
-			
+
 			if(is16pix) {
 				uint8_t pix0 = pixel_data & 0x03;
 				uint8_t pix1 = (pixel_data >> 5) & 0x03;

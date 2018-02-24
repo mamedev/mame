@@ -1394,9 +1394,9 @@ ROM_END
 
 // Nokia Data WS286
 //ROM_START(nws286 ) // Computer is grey with Nokia logo.
-//	ROM_REGION(0x20000,"bios", 0)
-//	ROM_LOAD16_BYTE( "RYS_103_1002_R8A_3C00_IC-POS_71.BIN", 0x18000, 0x4000, NO_DUMP)
-//	ROM_LOAD16_BYTE( "RYS_103_1003_R8A_8600_IC-POS_69.BIN", 0x18001, 0x4000, NO_DUMP)
+//  ROM_REGION(0x20000,"bios", 0)
+//  ROM_LOAD16_BYTE( "RYS_103_1002_R8A_3C00_IC-POS_71.BIN", 0x18000, 0x4000, NO_DUMP)
+//  ROM_LOAD16_BYTE( "RYS_103_1003_R8A_8600_IC-POS_69.BIN", 0x18001, 0x4000, NO_DUMP)
 //ROM_END
 
 /***************************************************************************

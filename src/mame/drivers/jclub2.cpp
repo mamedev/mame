@@ -184,7 +184,7 @@ public:
 		m_soundcpu(*this, "soundcpu"),
 		m_soundbank(*this, "soundbank")
 	{ }
-	
+
 	required_device<cpu_device> m_soundcpu;
 	required_memory_bank m_soundbank;
 
@@ -204,7 +204,7 @@ public:
 	DECLARE_WRITE32_MEMBER(cmd1_word_w);
 	DECLARE_WRITE32_MEMBER(cmd2_word_w);
 	DECLARE_READ32_MEMBER(cmd_stat_word_r);
-	
+
 	DECLARE_DRIVER_INIT(jclub2o);
 
 	void jclub2o(machine_config &config);

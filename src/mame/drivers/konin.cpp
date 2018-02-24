@@ -101,7 +101,7 @@ ADDRESS_MAP_START(konin_state::konin_io)
 	ADDRESS_MAP_UNMAP_HIGH
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	AM_RANGE(0x24, 0x24) AM_WRITE(picu_b_w)
-	
+
 	;map(0x80, 0x83).lrw8("ioppi_rw", [this](address_space &space, offs_t offset, u8 mem_mask) { return m_ioppi->read(space, offset^3, mem_mask); }, [this](address_space &space, offs_t offset, u8 data, u8 mem_mask) { m_ioppi->write(space, offset^3, data, mem_mask); });
 	AM_RANGE(0xf6, 0xf6) AM_DEVREADWRITE("uart", i8251_device, status_r, control_w)
 	AM_RANGE(0xf7, 0xf7) AM_DEVREADWRITE("uart", i8251_device, data_r, data_w)

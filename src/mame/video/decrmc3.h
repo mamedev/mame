@@ -63,8 +63,8 @@ public:
 
 	// configuration
 	void set_init(deco_rmc3_palette_init_delegate init) { m_init = init; }
-//	void set_membits(int membits);
-//	void set_endianness(endianness_t endianness);
+//  void set_membits(int membits);
+//  void set_endianness(endianness_t endianness);
 	void set_entries(u32 entries) { m_entries = entries; }
 	void set_indirect_entries(u32 entries) { m_indirect_entries = entries; }
 	void set_prom_region(const char *region) { m_prom_region.set_tag(region); }

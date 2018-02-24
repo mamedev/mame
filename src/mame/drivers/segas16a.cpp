@@ -2088,7 +2088,7 @@ MACHINE_CONFIG_END
 
 /*
 static MACHINE_CONFIG_START( system16a_i8751_no7751 )
-	system16a_i8751(config);
+    system16a_i8751(config);
     MCFG_DEVICE_REMOVE("n7751")
     MCFG_DEVICE_REMOVE("dac")
     MCFG_DEVICE_REMOVE("vref")

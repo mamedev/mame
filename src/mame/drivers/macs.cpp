@@ -99,7 +99,7 @@ public:
 	optional_device<st0016_cpu_device> m_maincpu;
 	optional_device<generic_slot_device> m_cart1;
 	optional_device<generic_slot_device> m_cart2;
-	
+
 	required_memory_bank_array<2> m_rombank;
 	required_memory_bank_array<2> m_rambank;
 

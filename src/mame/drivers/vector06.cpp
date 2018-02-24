@@ -42,7 +42,7 @@ ADDRESS_MAP_END
 ADDRESS_MAP_START(vector06_state::vector06_io)
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	ADDRESS_MAP_UNMAP_HIGH
-    ;
+	;
 	map(0x00, 0x03).lrw8("ppi8255_rw", [this](address_space &space, offs_t offset, u8 mem_mask) -> u8 { return m_ppi8255->read(space, offset^3, mem_mask); }, [this](address_space &space, offs_t offset, u8 data, u8 mem_mask) { m_ppi8255->write(space, offset^3, data, mem_mask); });
 	map(0x04, 0x07).lrw8("ppi8255_2_rw", [this](address_space &space, offs_t offset, u8 mem_mask) -> u8 { return m_ppi8255_2->read(space, offset^3, mem_mask); }, [this](address_space &space, offs_t offset, u8 data, u8 mem_mask) { m_ppi8255_2->write(space, offset^3, data, mem_mask); });
 	map(0x08, 0x0b).lrw8("pit8253_rw", [this](address_space &space, offs_t offset, u8 mem_mask) -> u8 { return m_pit8253->read(space, offset^3, mem_mask); }, [this](address_space &space, offs_t offset, u8 data, u8 mem_mask) { m_pit8253->write(space, offset^3, data, mem_mask); });

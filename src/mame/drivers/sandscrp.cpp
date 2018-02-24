@@ -152,12 +152,12 @@ uint32_t sandscrp_state::screen_update(screen_device &screen, bitmap_ind16 &bitm
 
 	// copy sprite bitmap to screen
 	m_pandora->update(bitmap, cliprect);
-	
+
 	for ( int h = 4; h < 8; h++ ) // high bit of tile priority : above sprites
 	{
 		m_view2->render_tilemap_chip(screen,bitmap,cliprect,h);
 	}
-	
+
 	return 0;
 }
 

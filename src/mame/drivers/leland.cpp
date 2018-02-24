@@ -2282,7 +2282,7 @@ ROM_START( offroad3 )
 	ROM_LOAD16_BYTE( "03-22118-02.u27t", 0x0e0001, 0x10000, NO_DUMP )
 	ROM_LOAD16_BYTE( "03-22115-02.u15t", 0x0e0000, 0x10000, CRC(448648ae) SHA1(d9600fe080e10a7e6ebf7e83a1fe89c6047549a5) )
 
-	// the following 03 rev ROMs are loaded over the 02 rev ROMs. They shall be removed when the missing 02 rev ROMs dumps surface. 
+	// the following 03 rev ROMs are loaded over the 02 rev ROMs. They shall be removed when the missing 02 rev ROMs dumps surface.
 	ROM_LOAD16_BYTE( "03-22116-03.u25t", 0x040001, 0x10000, CRC(95bb31d3) SHA1(e7bc43b63126fd33663865b2e41bacc58e962628) )
 	ROM_LOAD16_BYTE( "03-22113-03.u13t", 0x040000, 0x10000, CRC(71b28df6) SHA1(caf8e4c98a1650dbaedf83f4d38da920d0976f78) )
 	ROM_LOAD16_BYTE( "03-22117-03.u26t", 0x060001, 0x10000, CRC(703d81ce) SHA1(caf5363fb468a461a260e0ec636b0a7a8dc9cd3d) )

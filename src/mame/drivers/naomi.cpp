@@ -2729,7 +2729,7 @@ MACHINE_CONFIG_END
 MACHINE_CONFIG_START(naomi_state::naomi_base)
 	naomi_aw_base(config);
 
-    MCFG_CPU_MODIFY("maincpu")
+	MCFG_CPU_MODIFY("maincpu")
 	MCFG_CPU_PROGRAM_MAP(naomi_map)
 	MCFG_CPU_IO_MAP(naomi_port)
 
@@ -2801,10 +2801,10 @@ MACHINE_CONFIG_END
  */
 /*
 MACHINE_CONFIG_START((naomi2_state::naomi2)
-	naomi(config);
+    naomi(config);
     MCFG_CPU_MODIFY("maincpu")
     MCFG_CPU_PROGRAM_MAP(naomi2_map)
-	MCFG_CPU_IO_MAP(naomi_port)
+    MCFG_CPU_IO_MAP(naomi_port)
 MACHINE_CONFIG_END
 */
 /*

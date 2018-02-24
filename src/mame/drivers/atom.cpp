@@ -867,7 +867,7 @@ MACHINE_CONFIG_END
 -------------------------------------------------*/
 
 //static MACHINE_CONFIG_START( prophet2 )
-//	atom(config);
+//  atom(config);
 //  /* basic machine hardware */
 //  MCFG_CPU_MODIFY(SY6502_TAG)
 //  MCFG_CPU_PROGRAM_MAP(prophet_mem)
@@ -891,7 +891,7 @@ MACHINE_CONFIG_END
 -------------------------------------------------*/
 
 //static MACHINE_CONFIG_START( prophet3 )
-//	atom(config);
+//  atom(config);
 //  /* basic machine hardware */
 //  MCFG_CPU_MODIFY(SY6502_TAG)
 //  MCFG_CPU_PROGRAM_MAP(prophet_mem)
@@ -909,7 +909,7 @@ MACHINE_CONFIG_END
 -------------------------------------------------*/
 
 //static MACHINE_CONFIG_START( atommc )
-//	atom(config);
+//  atom(config);
 //  /* Software lists */
 //  MCFG_SOFTWARE_LIST_ADD("mmc_list","atom_mmc")
 //  MCFG_SOFTWARE_LIST_REMOVE("flop_list")

@@ -249,7 +249,7 @@ struct raster_state
 {
 	uint32_t              mode;               /* bit 0 = Test Mode, bit 2 = Switch 60Hz(1)/30Hz(0) operation */
 	uint16_t *            texture_rom;        /* Texture ROM pointer */
-	uint32_t              texture_rom_mask;   /* Texture ROM mask */ 
+	uint32_t              texture_rom_mask;   /* Texture ROM mask */
 	int16_t               viewport[4];        /* View port (startx,starty,endx,endy) */
 	int16_t               center[4][2];       /* Centers (eye 0[x,y],1[x,y],2[x,y],3[x,y]) */
 	uint16_t              center_sel;         /* Selected center */
@@ -298,8 +298,8 @@ WRITE32_MEMBER(model2_state::model2_3d_zclip_w)
 // TODO: only Sky Target seems to use this for unknown purpose
 READ32_MEMBER(model2_state::polygon_count_r)
 {
-//	printf("%08x\n",m_raster->tri_list_index);
-	
+//  printf("%08x\n",m_raster->tri_list_index);
+
 	return m_raster->tri_list_index;
 }
 
@@ -1185,7 +1185,7 @@ struct geo_state
 	raster_state *          raster;
 	uint32_t              mode;                   /* bit 0 = Enable Specular, bit 1 = Calculate Normals */
 	uint32_t *          polygon_rom;            /* Polygon ROM pointer */
-	uint32_t            polygon_rom_mask;		/* Polygon ROM mask */
+	uint32_t            polygon_rom_mask;       /* Polygon ROM mask */
 	float               matrix[12];             /* Current Transformation Matrix */
 	poly_vertex         focus;                  /* Focus (x,y) */
 	poly_vertex         light;                  /* Light Vector */
@@ -2568,7 +2568,7 @@ void model2_state::geo_parse( void )
 	uint32_t *input = &m_bufferram[address];
 	uint32_t  opcode;
 	bool end_code = false;
-	
+
 	while( end_code == false && (input - m_bufferram) < 0x20000/4  )
 	{
 		/* read in the opcode */
@@ -2615,15 +2615,15 @@ void model2_state::video_start()
 	m_palram = make_unique_clear<uint16_t[]>(0x4000/2);
 	m_colorxlat = make_unique_clear<uint16_t[]>(0xc000/2);
 	m_lumaram = make_unique_clear<uint16_t[]>(0x10000/2);
-	
+
 	// convert (supposedly) 3d sRGB color space into linear
-	// TODO: might be slightly different algorithm (Daytona USA road/cars, VF2 character skins) 
+	// TODO: might be slightly different algorithm (Daytona USA road/cars, VF2 character skins)
 	for(int i=0;i<256;i++)
 	{
 		double raw_value;
 		raw_value = 255.0 * pow((double)(i) / 255.0,2.2);
 		m_gamma_table[i] = (uint8_t)raw_value;
-//		printf("%02x: %02x %lf\n",i,m_gamma_table[i],raw_value);
+//      printf("%02x: %02x %lf\n",i,m_gamma_table[i],raw_value);
 	}
 }
 
@@ -2631,7 +2631,7 @@ uint32_t model2_state::screen_update_model2(screen_device &screen, bitmap_rgb32 
 {
 	//logerror("--- frame ---\n");
 	int layer;
-	
+
 	bitmap.fill(m_palette->pen(0), cliprect);
 	m_sys24_bitmap.fill(0, cliprect);
 

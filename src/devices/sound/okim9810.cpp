@@ -6,10 +6,10 @@
 
     OKI MSM9810 ADPCM(2) sound chip.
 
-	TODO:
-		Serial input/output are not verified
-		8-bit Non-linear PCM Algorithm aren't implemented
-		DADR Command is correct?
+    TODO:
+        Serial input/output are not verified
+        8-bit Non-linear PCM Algorithm aren't implemented
+        DADR Command is correct?
 
 ***************************************************************************/
 
@@ -116,7 +116,7 @@ void okim9810_device::device_start()
 	save_item(NAME(m_global_volume));
 	save_item(NAME(m_filter_type));
 	save_item(NAME(m_output_level));
-	
+
 	save_item(NAME(m_dadr));
 	save_item(NAME(m_dadr_start_offset));
 	save_item(NAME(m_dadr_end_offset));
@@ -459,7 +459,7 @@ WRITE8_MEMBER( okim9810_device::write )
 void okim9810_device::write_tmp_register(uint8_t data)
 {
 	m_TMP_register = data;
-	
+
 	if (m_dadr < 7)
 	{
 		switch (m_dadr)

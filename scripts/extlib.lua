@@ -6,7 +6,7 @@ local extlibs = {
 --      3rdparty       system        3rdparty
 --      lib name:      lib name,     include dir
 --
-	asio       = { "asio",      "3rdparty/asio/include" },	
+	asio       = { "asio",      "3rdparty/asio/include" },
 	expat      = { "expat",     "3rdparty/expat/lib" },
 	zlib       = { "z",         "3rdparty/zlib" },
 	jpeg       = { "jpeg",      "3rdparty/libjpeg" },
