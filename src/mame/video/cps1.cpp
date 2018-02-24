@@ -145,6 +145,7 @@ Street Fighter II': Champion Edition (World 920513)                91635B-2   S9
 Street Fighter II': Champion Edition (USA 920313)                  91635B-2   S9263B   BPRG1   IOB1  92631C-6     CPS-B-21  DL-0921-10014  C632    IOC1
 Street Fighter II': Champion Edition (USA 920513)                  91635B-2   S9263B   BPRG1   IOB1  92631C-6     CPS-B-21  DL-0921-10014  C632    IOC1
 Street Fighter II': Champion Edition (USA 920803)                  91635B-2   S9263B   BPRG1   IOB1  92631C-6     CPS-B-21  DL-0921-10014  C632    IOC1
+Street Fighter II': Champion Edition (Taiwan 920313)               91635B-2   S9263B   BPRG1   IOB1  92631C-6     CPS-B-21  DL-0921-10014  C632    IOC1
 Street Fighter II': Champion Edition (Japan 920322)                91634B-2   S9263B   BPRG1   IOB1  92631C-6     CPS-B-21  DL-0921-10014  C632    IOC1
 Street Fighter II': Champion Edition (Japan 920513)                91634B-2   S9263B   BPRG1   IOB1  92631C-6     CPS-B-21  DL-0921-10014  C632    IOC1
 Street Fighter II': Champion Edition (Japan 920803)                91634B-2   S9263B   BPRG1   IOB1  92631C-6     CPS-B-21  DL-0921-10014  C632    IOC1
@@ -1529,11 +1530,11 @@ static const struct CPS1config cps1_config_table[]=
 	{"sf2ceua",     CPS_B_21_DEF, mapper_S9263B, 0x36 },
 	{"sf2ceub",     CPS_B_21_DEF, mapper_S9263B, 0x36 },
 	{"sf2ceuc",     CPS_B_21_DEF, mapper_S9263B, 0x36 },
+	{"sf2cet",      CPS_B_21_DEF, mapper_S9263B, 0x36 },
 	{"sf2ceja",     CPS_B_21_DEF, mapper_S9263B, 0x36 },
 	{"sf2cejb",     CPS_B_21_DEF, mapper_S9263B, 0x36 },
 	{"sf2cejc",     CPS_B_21_DEF, mapper_S9263B, 0x36 },
 	{"sf2bhh",      CPS_B_21_DEF, mapper_S9263B, 0x36 },
-	{"sf2bhh2",     CPS_B_21_DEF, mapper_S9263B, 0x36 },
 	{"sf2rb",       CPS_B_21_DEF, mapper_S9263B, 0x36 },
 	{"sf2rb2",      CPS_B_21_DEF, mapper_S9263B, 0x36 },
 	{"sf2rb3",      CPS_B_21_DEF, mapper_S9263B, 0x36 },
