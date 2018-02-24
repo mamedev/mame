@@ -139,6 +139,7 @@ public:
 	int          m_soundbuf_wptr;
 	int          m_soundbuf_rptr;
 	uint8_t      m_soundbuf_data[32];
+	bool         m_soundbuf_empty;
 	//uint8_t    m_sound_flag1;
 	//uint8_t    m_sound_flag2;
 

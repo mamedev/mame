@@ -233,7 +233,7 @@ READ16_MEMBER(cave_state::soundflags_ack_r)
 //  return  ((m_sound_flag1 | m_sound_flag2) ? 1 : 0) |
 //          ((m_soundbuf_wptr != m_soundbuf_rptr) ? 0 : 2) ;
 
-	return ((m_soundbuf_wptr != m_soundbuf_rptr) ? 0 : 2) ;
+	return m_soundbuf_empty ? 2 : 0;
 }
 
 /* Main CPU: write a 16 bit sound latch and generate a NMI on the sound CPU */
@@ -262,10 +262,11 @@ READ8_MEMBER(cave_state::soundlatch_hi_r)
 /* Main CPU: read the latch written by the sound CPU (acknowledge) */
 READ16_MEMBER(cave_state::soundlatch_ack_r)
 {
-	if (m_soundbuf_wptr != m_soundbuf_rptr)
+	if (!m_soundbuf_empty)
 	{
 		uint8_t data = m_soundbuf_data[m_soundbuf_rptr];
 		m_soundbuf_rptr = (m_soundbuf_rptr + 1) & 0x1f;
+		m_soundbuf_empty = m_soundbuf_rptr == m_soundbuf_wptr;
 		return data;
 	}
 	else
@@ -279,10 +280,11 @@ READ16_MEMBER(cave_state::soundlatch_ack_r)
 /* Sound CPU: write latch for the main CPU (acknowledge) */
 WRITE8_MEMBER(cave_state::soundlatch_ack_w)
 {
-	if (m_soundbuf_wptr != m_soundbuf_rptr)
+	if (m_soundbuf_empty || (m_soundbuf_wptr != m_soundbuf_rptr))
 	{
 		m_soundbuf_data[m_soundbuf_wptr] = data;
 		m_soundbuf_wptr = (m_soundbuf_wptr + 1) & 0x1f;
+		m_soundbuf_empty = false;
 	}
 	else
 		logerror("CPU #2 - PC %04X: Sound Buffer 2 Overflow Error\n", m_audiocpu->pc());
@@ -2035,6 +2037,7 @@ MACHINE_START_MEMBER(cave_state,cave)
 	save_item(NAME(m_soundbuf_wptr));
 	save_item(NAME(m_soundbuf_rptr));
 	save_item(NAME(m_soundbuf_data));
+	save_item(NAME(m_soundbuf_empty));
 
 	save_item(NAME(m_vblank_irq));
 	save_item(NAME(m_sound_irq));
@@ -2047,6 +2050,7 @@ MACHINE_RESET_MEMBER(cave_state,cave)
 	std::fill(std::begin(m_soundbuf_data), std::end(m_soundbuf_data), 0);
 	m_soundbuf_wptr = 0;
 	m_soundbuf_rptr = 0;
+	m_soundbuf_empty = true;
 
 	m_vblank_irq = 0;
 	m_sound_irq = 0;
