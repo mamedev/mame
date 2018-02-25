@@ -77,7 +77,6 @@ public:
 	DECLARE_MACHINE_START(hyprduel);
 	DECLARE_MACHINE_START(magerror);
 	TIMER_CALLBACK_MEMBER(vblank_end_callback);
-	TIMER_CALLBACK_MEMBER(magerror_irq_callback);
 	DECLARE_WRITE_LINE_MEMBER(vdp_blit_end_w);
 	TIMER_DEVICE_CALLBACK_MEMBER(interrupt);
 	
@@ -97,7 +96,6 @@ private:
 	required_shared_ptr_array<uint16_t, 3> m_sharedram;
 
 	/* misc */
-	emu_timer *m_magerror_irq_timer;
 	emu_timer *m_vblank_end_timer;
 	int       m_blitter_bit;
 	int       m_requested_int;
@@ -247,11 +245,6 @@ WRITE16_MEMBER(hyprduel_state::hyprduel_cpusync_trigger2_w)
 			m_cpu_trigger = 1002;
 		}
 	}
-}
-
-TIMER_CALLBACK_MEMBER(hyprduel_state::magerror_irq_callback)
-{
-	m_subcpu->set_input_line(1, HOLD_LINE);
 }
 
 WRITE_LINE_MEMBER(hyprduel_state::vdp_blit_end_w)
@@ -475,12 +468,6 @@ MACHINE_START_MEMBER(hyprduel_state,hyprduel)
 	m_vblank_end_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(hyprduel_state::vblank_end_callback), this));
 }
 
-MACHINE_START_MEMBER(hyprduel_state,magerror)
-{
-	MACHINE_START_CALL_MEMBER(hyprduel);
-	m_magerror_irq_timer->adjust(attotime::zero, 0, attotime::from_hz(968));        /* tempo? */
-}
-
 MACHINE_CONFIG_START(hyprduel_state::i4220_config)
 	MCFG_DEVICE_ADD("vdp", I4220, XTAL(26'666'000))
 	MCFG_I4100_GFXDECODE("gfxdecode")
@@ -490,7 +477,7 @@ MACHINE_CONFIG_START(hyprduel_state::i4220_config)
 	MCFG_SCREEN_VIDEO_ATTRIBUTES(VIDEO_UPDATE_SCANLINE)
 	MCFG_SCREEN_REFRESH_RATE(60) // Unknown/Unverified
 	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
-	MCFG_SCREEN_SIZE(320, 240)
+	MCFG_SCREEN_SIZE(320, 224)
 	MCFG_SCREEN_VISIBLE_AREA(0, 320-1, FIRST_VISIBLE_LINE, LAST_VISIBLE_LINE)
 	MCFG_SCREEN_UPDATE_DEVICE("vdp", imagetek_i4100_device, screen_update)
 	MCFG_SCREEN_PALETTE(":vdp:palette")
@@ -534,8 +521,9 @@ MACHINE_CONFIG_START(hyprduel_state::magerror)
 
 	MCFG_CPU_ADD("sub", M68000,20000000/2)      /* 10MHz */
 	MCFG_CPU_PROGRAM_MAP(magerror_map2)
+	MCFG_CPU_PERIODIC_INT_DRIVER(hyprduel_state, irq1_line_hold, 968)        /* tempo? */
 
-	MCFG_MACHINE_START_OVERRIDE(hyprduel_state,magerror)
+	MCFG_MACHINE_START_OVERRIDE(hyprduel_state,hyprduel)
 
 	/* video hardware */
 	i4220_config(config);
@@ -614,10 +602,11 @@ DRIVER_INIT_MEMBER(hyprduel_state,hyprduel)
 DRIVER_INIT_MEMBER(hyprduel_state,magerror)
 {
 	m_int_num = 0x01;
-	m_magerror_irq_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(hyprduel_state::magerror_irq_callback),this));
 }
 
 
 GAME( 1993, hyprduel, 0,        hyprduel, hyprduel, hyprduel_state, hyprduel, ROT0, "Technosoft", "Hyper Duel (Japan set 1)", MACHINE_SUPPORTS_SAVE )
 GAME( 1993, hyprduel2,hyprduel, hyprduel, hyprduel, hyprduel_state, hyprduel, ROT0, "Technosoft", "Hyper Duel (Japan set 2)", MACHINE_SUPPORTS_SAVE )
-GAME( 1994, magerror, 0,        magerror, magerror, hyprduel_state, magerror, ROT0, "Technosoft / Jaleco", "Magical Error wo Sagase", MACHINE_SUPPORTS_SAVE )
+// TODO : Doesn't boot(or crash), it has timer/irq issue on imagetek_i4100 device?
+// Remove MACHINE_NOT_WORKING tags when magerror bootable again
+GAME( 1994, magerror, 0,        magerror, magerror, hyprduel_state, magerror, ROT0, "Technosoft / Jaleco", "Magical Error wo Sagase", MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE )
