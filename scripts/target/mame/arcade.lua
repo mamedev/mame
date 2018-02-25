@@ -2557,8 +2557,6 @@ files {
 createMAMEProjects(_target, _subtarget, "metro")
 files {
 	MAME_DIR .. "src/mame/drivers/hyprduel.cpp",
-	MAME_DIR .. "src/mame/includes/hyprduel.h",
-	MAME_DIR .. "src/mame/video/hyprduel.cpp",
 	MAME_DIR .. "src/mame/drivers/metro.cpp",
 	MAME_DIR .. "src/mame/includes/metro.h",
 	MAME_DIR .. "src/mame/video/metro.cpp",

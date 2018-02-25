@@ -342,7 +342,7 @@ WRITE16_MEMBER(imagetek_i4100_device::vram_0_w){ COMBINE_DATA(&m_vram_0[offset])
 WRITE16_MEMBER(imagetek_i4100_device::vram_1_w){ COMBINE_DATA(&m_vram_1[offset]); }
 WRITE16_MEMBER(imagetek_i4100_device::vram_2_w){ COMBINE_DATA(&m_vram_2[offset]); }
 
-/* This game uses almost only the blitter to write to the tilemaps.
+/* Some game uses almost only the blitter to write to the tilemaps.
    The CPU can only access a "window" of 512x256 pixels in the upper
    left corner of the big tilemap */
 // TODO: Puzzlet, Sankokushi & Lady Killer contradicts with aformentioned description (more like RMW?)
@@ -1056,7 +1056,7 @@ void imagetek_i4100_device::draw_tilemap( screen_device &screen, bitmap_ind16 &b
 	sx += m_tilemap_scrolldx[layer] * (m_screen_flip ? 1 : -1);
 	sy += m_tilemap_scrolldy[layer] * (m_screen_flip ? 1 : -1);
 
-	for (y = 0; y < scrheight; y++)
+	for (y = cliprect.min_y; y <= cliprect.max_y; y++)
 	{
 		int scrolly = (sy+y-wy)&(windowheight-1);
 		int x;
@@ -1070,7 +1070,7 @@ void imagetek_i4100_device::draw_tilemap( screen_device &screen, bitmap_ind16 &b
 			dst = &bitmap.pix16(y);
 			priority_baseaddr = &priority_bitmap.pix8(y);
 
-			for (x = 0; x < scrwidth; x++)
+			for (x = cliprect.min_x; x <= cliprect.max_x; x++)
 			{
 				int scrollx = (sx+x-wx)&(windowwidth-1);
 				int srccol = (wx+scrollx)&(width-1);
@@ -1094,7 +1094,7 @@ void imagetek_i4100_device::draw_tilemap( screen_device &screen, bitmap_ind16 &b
 			dst = &bitmap.pix16(scrheight-y-1);
 			priority_baseaddr = &priority_bitmap.pix8(scrheight-y-1);
 
-			for (x = 0; x < scrwidth; x++)
+			for (x = cliprect.min_x; x <= cliprect.max_x; x++)
 			{
 				int scrollx = (sx+x-wx)&(windowwidth-1);
 				int srccol = (wx+scrollx)&(width-1);
