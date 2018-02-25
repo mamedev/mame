@@ -1280,18 +1280,25 @@ inline uint16_t gime_device::get_lines_per_row(void)
 			case MODE_AG:
 			case MODE_AG|MODE_GM0:
 			case MODE_AG|MODE_GM1:
-				lines_per_row = 3;
-				break;
-
 			case MODE_AG|MODE_GM1|MODE_GM0:
 			case MODE_AG|MODE_GM2:
-				lines_per_row = 2;
-				break;
-
 			case MODE_AG|MODE_GM2|MODE_GM0:
 			case MODE_AG|MODE_GM2|MODE_GM1:
 			case MODE_AG|MODE_GM2|MODE_GM1|MODE_GM0:
-				lines_per_row = 1;
+				switch (m_sam_state & (SAM_STATE_V0|SAM_STATE_V1|SAM_STATE_V2))
+				{
+				case 0:
+					lines_per_row = 12;
+					break;
+				case SAM_STATE_V1:
+					lines_per_row = 3;
+					break;
+				case SAM_STATE_V2:
+					lines_per_row = 2;
+					break;
+				default:
+					lines_per_row = 1;
+				}
 				break;
 
 			default:
