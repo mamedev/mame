@@ -565,7 +565,8 @@ MACHINE_CONFIG_START(angelkds_state::angelkds)
 	MCFG_SOUND_ROUTE(3, "mono", 0.45)
 MACHINE_CONFIG_END
 
-MACHINE_CONFIG_DERIVED(angelkds_state::spcpostn, angelkds)
+MACHINE_CONFIG_START(angelkds_state::spcpostn)
+	angelkds(config);
 	/* encryption */
 	MCFG_CPU_REPLACE("maincpu", SEGA_317_0005, XTAL(6'000'000))
 	MCFG_CPU_PROGRAM_MAP(main_map)

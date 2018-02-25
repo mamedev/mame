@@ -108,7 +108,7 @@ osd_interface &running_machine::osd() const
 
 running_machine::running_machine(const machine_config &_config, machine_manager &manager)
 	: primary_screen(nullptr),
-		m_side_effect_disabled(0),
+		m_side_effects_disabled(0),
 		debug_flags(0),
 		m_config(_config),
 		m_system(_config.gamedrv()),
@@ -223,6 +223,10 @@ void running_machine::start()
 	// initialize the streams engine before the sound devices start
 	m_sound = std::make_unique<sound_manager>(*this);
 
+	// resolve objects that can be used by memory maps
+	for (device_t &device : device_iterator(root_device()))
+		device.resolve_pre_map();
+
 	// configure the address spaces, load ROMs (which needs
 	// width/endianess of the spaces), then populate memory (which
 	// needs rom bases), and finally initialize CPUs (which needs
@@ -250,6 +254,10 @@ void running_machine::start()
 	m_render->resolve_tags();
 
 	manager().create_custom(*this);
+
+	// resolve objects that are created by memory maps
+	for (device_t &device : device_iterator(root_device()))
+		device.resolve_post_map();
 
 	// register callbacks for the devices, then start them
 	add_notifier(MACHINE_NOTIFY_RESET, machine_notify_delegate(&running_machine::reset_all_devices, this));
@@ -1007,10 +1015,6 @@ void running_machine::logfile_callback(const char *buffer)
 
 void running_machine::start_all_devices()
 {
-	// resolve objects first to avoid messy start order dependencies
-	for (device_t &device : device_iterator(root_device()))
-		device.resolve_objects();
-
 	m_dummy_space.start();
 
 	// iterate through the devices

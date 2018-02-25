@@ -433,7 +433,7 @@ WRITE16_MEMBER( st_state::berr_w )
 
 READ16_MEMBER( st_state::berr_r )
 {
-	if(!machine().side_effect_disabled()) {
+	if(!machine().side_effects_disabled()) {
 		m_maincpu->set_input_line(M68K_LINE_BUSERROR, ASSERT_LINE);
 		m_maincpu->set_input_line(M68K_LINE_BUSERROR, CLEAR_LINE);
 	}
@@ -2351,7 +2351,8 @@ MACHINE_CONFIG_END
 //  MACHINE_CONFIG( megaste )
 //-------------------------------------------------
 
-MACHINE_CONFIG_DERIVED(megaste_state::megaste, ste)
+MACHINE_CONFIG_START(megaste_state::megaste)
+	ste(config);
 	MCFG_CPU_MODIFY(M68000_TAG)
 	MCFG_CPU_PROGRAM_MAP(megaste_map)
 	MCFG_DEVICE_ADD(RP5C15_TAG, RP5C15, XTAL(32'768))
@@ -2454,7 +2455,8 @@ MACHINE_CONFIG_END
 //  MACHINE_CONFIG( tt030 )
 //-------------------------------------------------
 
-MACHINE_CONFIG_DERIVED(ste_state::tt030, ste)
+MACHINE_CONFIG_START(ste_state::tt030)
+	ste(config);
 MACHINE_CONFIG_END
 
 
@@ -2462,7 +2464,8 @@ MACHINE_CONFIG_END
 //  MACHINE_CONFIG( falcon )
 //-------------------------------------------------
 
-MACHINE_CONFIG_DERIVED(ste_state::falcon, ste)
+MACHINE_CONFIG_START(ste_state::falcon)
+	ste(config);
 MACHINE_CONFIG_END
 
 
@@ -2470,7 +2473,8 @@ MACHINE_CONFIG_END
 //  MACHINE_CONFIG( falcon40 )
 //-------------------------------------------------
 
-MACHINE_CONFIG_DERIVED(ste_state::falcon40, ste)
+MACHINE_CONFIG_START(ste_state::falcon40)
+	ste(config);
 MACHINE_CONFIG_END
 
 

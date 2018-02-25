@@ -50,20 +50,16 @@
 class sburners_state : public driver_device
 {
 public:
-	sburners_state(const machine_config &mconfig, device_type type, const char *tag)
-	: driver_device(mconfig, type, tag),
+	sburners_state(const machine_config &mconfig, device_type type, const char *tag) :
+		driver_device(mconfig, type, tag),
 		m_maincpu(*this, "maincpu"),
 		m_video(*this, "fixfreq")
 	{
 	}
 
-	// devices
-	required_device<netlist_mame_device> m_maincpu;
-	required_device<fixedfreq_device> m_video;
-
 	void sburners(machine_config &config);
-protected:
 
+protected:
 	// driver_device overrides
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
@@ -71,7 +67,9 @@ protected:
 	virtual void video_start() override;
 
 private:
-
+	// devices
+	required_device<netlist_mame_device> m_maincpu;
+	required_device<fixedfreq_device> m_video;
 };
 
 

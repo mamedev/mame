@@ -1907,7 +1907,8 @@ MACHINE_CONFIG_START(seattle_state::seattle_common)
 MACHINE_CONFIG_END
 
 
-MACHINE_CONFIG_DERIVED(seattle_state::phoenixsa, seattle_common)
+MACHINE_CONFIG_START(seattle_state::phoenixsa)
+	seattle_common(config);
 	MCFG_CPU_REPLACE("maincpu", R4700LE, SYSTEM_CLOCK*2)
 	MCFG_MIPS3_ICACHE_SIZE(16384)
 	MCFG_MIPS3_DCACHE_SIZE(16384)
@@ -1919,7 +1920,8 @@ MACHINE_CONFIG_DERIVED(seattle_state::phoenixsa, seattle_common)
 MACHINE_CONFIG_END
 
 
-MACHINE_CONFIG_DERIVED(seattle_state::seattle150, seattle_common)
+MACHINE_CONFIG_START(seattle_state::seattle150)
+	seattle_common(config);
 	MCFG_CPU_REPLACE("maincpu", R5000LE, SYSTEM_CLOCK*3)
 	MCFG_MIPS3_ICACHE_SIZE(16384)
 	MCFG_MIPS3_DCACHE_SIZE(16384)
@@ -1927,13 +1929,15 @@ MACHINE_CONFIG_DERIVED(seattle_state::seattle150, seattle_common)
 MACHINE_CONFIG_END
 
 
-MACHINE_CONFIG_DERIVED(seattle_state::seattle150_widget, seattle150)
+MACHINE_CONFIG_START(seattle_state::seattle150_widget)
+	seattle150(config);
 	MCFG_SMC91C94_ADD("ethernet")
 	MCFG_SMC91C94_IRQ_CALLBACK(WRITELINE(seattle_state, ethernet_interrupt))
 MACHINE_CONFIG_END
 
 
-MACHINE_CONFIG_DERIVED(seattle_state::seattle200, seattle_common)
+MACHINE_CONFIG_START(seattle_state::seattle200)
+	seattle_common(config);
 	MCFG_CPU_REPLACE("maincpu", R5000LE, SYSTEM_CLOCK*4)
 	MCFG_MIPS3_ICACHE_SIZE(16384)
 	MCFG_MIPS3_DCACHE_SIZE(16384)
@@ -1941,12 +1945,14 @@ MACHINE_CONFIG_DERIVED(seattle_state::seattle200, seattle_common)
 MACHINE_CONFIG_END
 
 
-MACHINE_CONFIG_DERIVED(seattle_state::seattle200_widget, seattle200)
+MACHINE_CONFIG_START(seattle_state::seattle200_widget)
+	seattle200(config);
 	MCFG_SMC91C94_ADD("ethernet")
 	MCFG_SMC91C94_IRQ_CALLBACK(WRITELINE(seattle_state, ethernet_interrupt))
 MACHINE_CONFIG_END
 
-MACHINE_CONFIG_DERIVED(seattle_state::flagstaff, seattle_common)
+MACHINE_CONFIG_START(seattle_state::flagstaff)
+	seattle_common(config);
 	MCFG_CPU_REPLACE("maincpu", R5000LE, SYSTEM_CLOCK*4)
 	MCFG_MIPS3_ICACHE_SIZE(16384)
 	MCFG_MIPS3_DCACHE_SIZE(16384)
@@ -1965,7 +1971,8 @@ MACHINE_CONFIG_END
 
 // Per game configurations
 
-MACHINE_CONFIG_DERIVED(seattle_state::wg3dh, phoenixsa)
+MACHINE_CONFIG_START(seattle_state::wg3dh)
+	phoenixsa(config);
 	MCFG_DEVICE_ADD("dcs", DCS2_AUDIO_2115, 0)
 	MCFG_DCS2_AUDIO_DRAM_IN_MB(2)
 	MCFG_DCS2_AUDIO_POLLING_OFFSET(0x3839)
@@ -1978,7 +1985,8 @@ MACHINE_CONFIG_DERIVED(seattle_state::wg3dh, phoenixsa)
 MACHINE_CONFIG_END
 
 
-MACHINE_CONFIG_DERIVED(seattle_state::mace, seattle150)
+MACHINE_CONFIG_START(seattle_state::mace)
+	seattle150(config);
 	MCFG_DEVICE_ADD("dcs", DCS2_AUDIO_2115, 0)
 	MCFG_DCS2_AUDIO_DRAM_IN_MB(2)
 	MCFG_DCS2_AUDIO_POLLING_OFFSET(0x3839)
@@ -1990,7 +1998,8 @@ MACHINE_CONFIG_DERIVED(seattle_state::mace, seattle150)
 	MCFG_MIDWAY_IOASIC_IRQ_CALLBACK(WRITELINE(seattle_state, ioasic_irq))
 MACHINE_CONFIG_END
 
-MACHINE_CONFIG_DERIVED(seattle_state::sfrush, flagstaff)
+MACHINE_CONFIG_START(seattle_state::sfrush)
+	flagstaff(config);
 	MCFG_DEVICE_ADD("cage", ATARI_CAGE_SEATTLE, 0)
 	MCFG_ATARI_CAGE_SPEEDUP(0x5236)
 	MCFG_ATARI_CAGE_IRQ_CALLBACK(DEVWRITE8("ioasic",midway_ioasic_device,cage_irq_handler))
@@ -2003,7 +2012,8 @@ MACHINE_CONFIG_DERIVED(seattle_state::sfrush, flagstaff)
 	MCFG_MIDWAY_IOASIC_AUX_OUT_CB(WRITE32(seattle_state, wheel_board_w))
 MACHINE_CONFIG_END
 
-MACHINE_CONFIG_DERIVED(seattle_state::sfrushrk, flagstaff)
+MACHINE_CONFIG_START(seattle_state::sfrushrk)
+	flagstaff(config);
 	MCFG_DEVICE_ADD("cage", ATARI_CAGE_SEATTLE, 0)
 	MCFG_ATARI_CAGE_SPEEDUP(0x5329)
 	MCFG_ATARI_CAGE_IRQ_CALLBACK(DEVWRITE8("ioasic",midway_ioasic_device,cage_irq_handler))
@@ -2016,12 +2026,14 @@ MACHINE_CONFIG_DERIVED(seattle_state::sfrushrk, flagstaff)
 	MCFG_MIDWAY_IOASIC_AUX_OUT_CB(WRITE32(seattle_state, wheel_board_w))
 MACHINE_CONFIG_END
 
-MACHINE_CONFIG_DERIVED(seattle_state::sfrushrkw, sfrushrk)
+MACHINE_CONFIG_START(seattle_state::sfrushrkw)
+	sfrushrk(config);
 	MCFG_DEVICE_MODIFY("ioasic")
 	MCFG_MIDWAY_IOASIC_SHUFFLE(MIDWAY_IOASIC_STANDARD)
 MACHINE_CONFIG_END
 
-MACHINE_CONFIG_DERIVED(seattle_state::calspeed, seattle150_widget)
+MACHINE_CONFIG_START(seattle_state::calspeed)
+	seattle150_widget(config);
 	MCFG_DEVICE_ADD("dcs", DCS2_AUDIO_2115, 0)
 	MCFG_DCS2_AUDIO_DRAM_IN_MB(2)
 	MCFG_DCS2_AUDIO_POLLING_OFFSET(0x39c0)
@@ -2034,7 +2046,8 @@ MACHINE_CONFIG_DERIVED(seattle_state::calspeed, seattle150_widget)
 	MCFG_MIDWAY_IOASIC_AUTO_ACK(1)
 MACHINE_CONFIG_END
 
-MACHINE_CONFIG_DERIVED(seattle_state::vaportrx, seattle200_widget)
+MACHINE_CONFIG_START(seattle_state::vaportrx)
+	seattle200_widget(config);
 	MCFG_DEVICE_ADD("dcs", DCS2_AUDIO_2115, 0)
 	MCFG_DCS2_AUDIO_DRAM_IN_MB(2)
 	MCFG_DCS2_AUDIO_POLLING_OFFSET(0x39c2)
@@ -2046,7 +2059,8 @@ MACHINE_CONFIG_DERIVED(seattle_state::vaportrx, seattle200_widget)
 	MCFG_MIDWAY_IOASIC_IRQ_CALLBACK(WRITELINE(seattle_state, ioasic_irq))
 MACHINE_CONFIG_END
 
-MACHINE_CONFIG_DERIVED(seattle_state::biofreak, seattle150)
+MACHINE_CONFIG_START(seattle_state::biofreak)
+	seattle150(config);
 	MCFG_DEVICE_ADD("dcs", DCS2_AUDIO_2115, 0)
 	MCFG_DCS2_AUDIO_DRAM_IN_MB(2)
 	MCFG_DCS2_AUDIO_POLLING_OFFSET(0x3835)
@@ -2058,7 +2072,8 @@ MACHINE_CONFIG_DERIVED(seattle_state::biofreak, seattle150)
 	MCFG_MIDWAY_IOASIC_IRQ_CALLBACK(WRITELINE(seattle_state, ioasic_irq))
 MACHINE_CONFIG_END
 
-MACHINE_CONFIG_DERIVED(seattle_state::blitz, seattle150)
+MACHINE_CONFIG_START(seattle_state::blitz)
+	seattle150(config);
 	MCFG_DEVICE_ADD("dcs", DCS2_AUDIO_2115, 0)
 	MCFG_DCS2_AUDIO_DRAM_IN_MB(2)
 	MCFG_DCS2_AUDIO_POLLING_OFFSET(0x39c2)
@@ -2070,7 +2085,8 @@ MACHINE_CONFIG_DERIVED(seattle_state::blitz, seattle150)
 	MCFG_MIDWAY_IOASIC_IRQ_CALLBACK(WRITELINE(seattle_state, ioasic_irq))
 MACHINE_CONFIG_END
 
-MACHINE_CONFIG_DERIVED(seattle_state::blitz99, seattle150)
+MACHINE_CONFIG_START(seattle_state::blitz99)
+	seattle150(config);
 	MCFG_DEVICE_ADD("dcs", DCS2_AUDIO_2115, 0)
 	MCFG_DCS2_AUDIO_DRAM_IN_MB(2)
 	MCFG_DCS2_AUDIO_POLLING_OFFSET(0x0afb)
@@ -2082,7 +2098,8 @@ MACHINE_CONFIG_DERIVED(seattle_state::blitz99, seattle150)
 	MCFG_MIDWAY_IOASIC_IRQ_CALLBACK(WRITELINE(seattle_state, ioasic_irq))
 MACHINE_CONFIG_END
 
-MACHINE_CONFIG_DERIVED(seattle_state::blitz2k, seattle150)
+MACHINE_CONFIG_START(seattle_state::blitz2k)
+	seattle150(config);
 	MCFG_DEVICE_ADD("dcs", DCS2_AUDIO_2115, 0)
 	MCFG_DCS2_AUDIO_DRAM_IN_MB(2)
 	MCFG_DCS2_AUDIO_POLLING_OFFSET(0x0b5d)
@@ -2094,7 +2111,8 @@ MACHINE_CONFIG_DERIVED(seattle_state::blitz2k, seattle150)
 	MCFG_MIDWAY_IOASIC_IRQ_CALLBACK(WRITELINE(seattle_state, ioasic_irq))
 MACHINE_CONFIG_END
 
-MACHINE_CONFIG_DERIVED(seattle_state::carnevil, seattle150)
+MACHINE_CONFIG_START(seattle_state::carnevil)
+	seattle150(config);
 	MCFG_DEVICE_ADD("dcs", DCS2_AUDIO_2115, 0)
 	MCFG_DCS2_AUDIO_DRAM_IN_MB(2)
 	MCFG_DCS2_AUDIO_POLLING_OFFSET(0x0af7)
@@ -2106,7 +2124,8 @@ MACHINE_CONFIG_DERIVED(seattle_state::carnevil, seattle150)
 	MCFG_MIDWAY_IOASIC_IRQ_CALLBACK(WRITELINE(seattle_state, ioasic_irq))
 MACHINE_CONFIG_END
 
-MACHINE_CONFIG_DERIVED(seattle_state::hyprdriv, seattle200_widget)
+MACHINE_CONFIG_START(seattle_state::hyprdriv)
+	seattle200_widget(config);
 	MCFG_DEVICE_ADD("dcs", DCS2_AUDIO_2115, 0)
 	MCFG_DCS2_AUDIO_DRAM_IN_MB(2)
 	MCFG_DCS2_AUDIO_POLLING_OFFSET(0x0af7)

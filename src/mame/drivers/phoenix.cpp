@@ -475,7 +475,8 @@ MACHINE_CONFIG_START(phoenix_state::phoenix)
 MACHINE_CONFIG_END
 
 
-MACHINE_CONFIG_DERIVED(phoenix_state::pleiads, phoenix)
+MACHINE_CONFIG_START(phoenix_state::pleiads)
+	phoenix(config);
 
 	/* basic machine hardware */
 	MCFG_CPU_MODIFY("maincpu")
@@ -542,7 +543,8 @@ MACHINE_CONFIG_END
 
 
 /* Uses a Z80 */
-MACHINE_CONFIG_DERIVED(phoenix_state::condor, phoenix)
+MACHINE_CONFIG_START(phoenix_state::condor)
+	phoenix(config);
 
 	/* basic machine hardware */
 	/* FIXME: Verify clock. This is most likely 11MHz/2 */

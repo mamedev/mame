@@ -477,7 +477,7 @@ void segaorun_state::memory_mapper(sega_315_5195_mapper_device &mapper, uint8_t 
 //  port on the memory mapper is read
 //-------------------------------------------------
 
-uint8_t segaorun_state::mapper_sound_r()
+READ8_MEMBER(segaorun_state::mapper_sound_r)
 {
 	return 0;
 }
@@ -488,7 +488,7 @@ uint8_t segaorun_state::mapper_sound_r()
 //  port on the memory mapper is written
 //-------------------------------------------------
 
-void segaorun_state::mapper_sound_w(uint8_t data)
+WRITE8_MEMBER(segaorun_state::mapper_sound_w)
 {
 	synchronize(TID_SOUND_WRITE, data);
 }
@@ -1208,7 +1208,9 @@ MACHINE_CONFIG_START(segaorun_state::outrun_base)
 	MCFG_I8255_IN_PORTC_CB(READ8(segaorun_state, unknown_portc_r))
 	MCFG_I8255_OUT_PORTC_CB(WRITE8(segaorun_state, video_control_w))
 
-	MCFG_SEGA_315_5195_MAPPER_ADD("mapper", "maincpu", segaorun_state, memory_mapper, mapper_sound_r, mapper_sound_w)
+	MCFG_SEGA_315_5195_MAPPER_ADD("mapper", "maincpu", segaorun_state, memory_mapper)
+	MCFG_SEGA_315_5195_SOUND_READ_CALLBACK(READ8(segaorun_state, mapper_sound_r))
+	MCFG_SEGA_315_5195_SOUND_WRITE_CALLBACK(WRITE8(segaorun_state, mapper_sound_w))
 
 	// video hardware
 	MCFG_GFXDECODE_ADD("gfxdecode", "palette", segaorun)
@@ -1244,7 +1246,8 @@ MACHINE_CONFIG_END
 //  GAME-SPECIFIC MACHINE DRIVERS
 //**************************************************************************
 
-MACHINE_CONFIG_DERIVED(segaorun_state::outrundx, outrun_base)
+MACHINE_CONFIG_START(segaorun_state::outrundx)
+	outrun_base(config);
 
 	// basic machine hardware
 	MCFG_TIMER_DRIVER_ADD_PERIODIC("bankmotor", segaorun_state, bankmotor_update, attotime::from_msec(10))
@@ -1253,13 +1256,15 @@ MACHINE_CONFIG_DERIVED(segaorun_state::outrundx, outrun_base)
 	MCFG_SEGA_OUTRUN_SPRITES_ADD("sprites")
 MACHINE_CONFIG_END
 
-MACHINE_CONFIG_DERIVED(segaorun_state::outrun, outrundx)
+MACHINE_CONFIG_START(segaorun_state::outrun)
+	outrundx(config);
 
 	// basic machine hardware
 	MCFG_NVRAM_ADD_0FILL("nvram")
 MACHINE_CONFIG_END
 
-MACHINE_CONFIG_DERIVED(segaorun_state::outrun_fd1094, outrun)
+MACHINE_CONFIG_START(segaorun_state::outrun_fd1094)
+	outrun(config);
 
 	// basic machine hardware
 	MCFG_CPU_REPLACE("maincpu", FD1094, MASTER_CLOCK/4)
@@ -1267,7 +1272,8 @@ MACHINE_CONFIG_DERIVED(segaorun_state::outrun_fd1094, outrun)
 	MCFG_CPU_OPCODES_MAP(decrypted_opcodes_map)
 MACHINE_CONFIG_END
 
-MACHINE_CONFIG_DERIVED(segaorun_state::outrun_fd1089a, outrun)
+MACHINE_CONFIG_START(segaorun_state::outrun_fd1089a)
+	outrun(config);
 
 	// basic machine hardware
 	MCFG_CPU_REPLACE("maincpu", FD1089A, MASTER_CLOCK/4)
@@ -1275,7 +1281,8 @@ MACHINE_CONFIG_DERIVED(segaorun_state::outrun_fd1089a, outrun)
 MACHINE_CONFIG_END
 
 
-MACHINE_CONFIG_DERIVED(segaorun_state::shangon, outrun_base)
+MACHINE_CONFIG_START(segaorun_state::shangon)
+	outrun_base(config);
 
 	// basic machine hardware
 	MCFG_DEVICE_REMOVE("i8255")
@@ -1297,7 +1304,8 @@ MACHINE_CONFIG_DERIVED(segaorun_state::shangon, outrun_base)
 	MCFG_SEGA_SYS16B_SPRITES_ADD("sprites")
 MACHINE_CONFIG_END
 
-MACHINE_CONFIG_DERIVED(segaorun_state::shangon_fd1089b, shangon)
+MACHINE_CONFIG_START(segaorun_state::shangon_fd1089b)
+	shangon(config);
 
 	// basic machine hardware
 	MCFG_CPU_REPLACE("maincpu", FD1089B, MASTER_CLOCK/4)

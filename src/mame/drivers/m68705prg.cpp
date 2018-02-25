@@ -239,28 +239,32 @@ MACHINE_CONFIG_START(m68705prg_state_base::m68705prg)
 	MCFG_DEFAULT_LAYOUT(layout_m68705prg)
 MACHINE_CONFIG_END
 
-template<> MACHINE_CONFIG_DERIVED(p3prg_state::prg, m68705prg)
+template<> MACHINE_CONFIG_START(p3prg_state::prg)
+	m68705prg(config);
 	MCFG_CPU_ADD("mcu", M68705P3, 1_MHz_XTAL)
 	MCFG_M68705_PORTB_W_CB(WRITE8(p3prg_state, pb_w))
 
 	MCFG_MACHINE_RESET_OVERRIDE(p3prg_state, m68705prg)
 MACHINE_CONFIG_END
 
-template<> MACHINE_CONFIG_DERIVED(p5prg_state::prg, m68705prg)
+template<> MACHINE_CONFIG_START(p5prg_state::prg)
+	m68705prg(config);
 	MCFG_CPU_ADD("mcu", M68705P5, 1_MHz_XTAL)
 	MCFG_M68705_PORTB_W_CB(WRITE8(p5prg_state, pb_w))
 
 	MCFG_MACHINE_RESET_OVERRIDE(p5prg_state, m68705prg)
 MACHINE_CONFIG_END
 
-template<> MACHINE_CONFIG_DERIVED(r3prg_state::prg, m68705prg)
+template<> MACHINE_CONFIG_START(r3prg_state::prg)
+	m68705prg(config);
 	MCFG_CPU_ADD("mcu", M68705R3, 1_MHz_XTAL)
 	MCFG_M68705_PORTB_W_CB(WRITE8(r3prg_state, pb_w))
 
 	MCFG_MACHINE_RESET_OVERRIDE(r3prg_state, m68705prg)
 MACHINE_CONFIG_END
 
-template<> MACHINE_CONFIG_DERIVED(u3prg_state::prg, m68705prg)
+template<> MACHINE_CONFIG_START(u3prg_state::prg)
+	m68705prg(config);
 	MCFG_CPU_ADD("mcu", M68705U3, 1_MHz_XTAL)
 	MCFG_M68705_PORTB_W_CB(WRITE8(u3prg_state, pb_w))
 

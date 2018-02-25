@@ -428,7 +428,8 @@ MACHINE_CONFIG_START(policetr_state::policetr)
 MACHINE_CONFIG_END
 
 
-MACHINE_CONFIG_DERIVED(policetr_state::sshooter, policetr)
+MACHINE_CONFIG_START(policetr_state::sshooter)
+	policetr(config);
 
 	/* basic machine hardware */
 	MCFG_CPU_MODIFY("maincpu")

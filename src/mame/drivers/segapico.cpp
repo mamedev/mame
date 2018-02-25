@@ -389,7 +389,7 @@ MACHINE_START_MEMBER(pico_state,pico)
 }
 
 MACHINE_CONFIG_START(pico_state::pico)
-	MCFG_FRAGMENT_ADD( md_ntsc )
+	md_ntsc(config);
 
 	MCFG_CPU_MODIFY("maincpu")
 	MCFG_CPU_PROGRAM_MAP(pico_mem)
@@ -410,7 +410,7 @@ MACHINE_CONFIG_START(pico_state::pico)
 MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(pico_state::picopal)
-	MCFG_FRAGMENT_ADD( md_pal )
+	md_pal(config);
 
 	MCFG_CPU_MODIFY("maincpu")
 	MCFG_CPU_PROGRAM_MAP(pico_mem)
@@ -603,7 +603,7 @@ MACHINE_START_MEMBER(copera_state,copera)
 }
 
 MACHINE_CONFIG_START(copera_state::copera)
-	MCFG_FRAGMENT_ADD( md_ntsc )
+	md_ntsc(config);
 
 	MCFG_CPU_MODIFY("maincpu")
 	MCFG_CPU_PROGRAM_MAP(copera_mem)

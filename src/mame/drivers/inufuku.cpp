@@ -356,8 +356,8 @@ MACHINE_CONFIG_START(inufuku_state::inufuku)
 	MCFG_SCREEN_PALETTE("palette")
 
 	MCFG_DEVICE_ADD("vsystem_spr", VSYSTEM_SPR, 0)
-	vsystem_spr_device::set_offsets(*device, 0,1); // reference videos confirm at least the +1 against tilemaps in 3on3dunk (the highscore header text and black box are meant to be 1 pixel misaligned, although there is currently a priority bug there too)
-	vsystem_spr_device::set_pdraw(*device, true);
+	MCFG_VSYSTEM_SPR_SET_OFFSETS(0,1) // reference videos confirm at least the +1 against tilemaps in 3on3dunk (the highscore header text and black box are meant to be 1 pixel misaligned, although there is currently a priority bug there too)
+	MCFG_VSYSTEM_SPR_SET_PDRAW(true)
 	MCFG_VSYSTEM_SPR_SET_TILE_INDIRECT( inufuku_state, inufuku_tile_callback )
 	MCFG_VSYSTEM_SPR_SET_GFXREGION(2)
 	MCFG_VSYSTEM_SPR_GFXDECODE("gfxdecode")
@@ -381,7 +381,8 @@ MACHINE_CONFIG_START(inufuku_state::inufuku)
 MACHINE_CONFIG_END
 
 
-MACHINE_CONFIG_DERIVED(inufuku_state::_3on3dunk, inufuku)
+MACHINE_CONFIG_START(inufuku_state::_3on3dunk)
+	inufuku(config);
 	MCFG_GFXDECODE_MODIFY("gfxdecode", _3on3dunk)
 MACHINE_CONFIG_END
 

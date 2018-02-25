@@ -50,8 +50,6 @@ public:
 	DECLARE_WRITE32_MEMBER( write );
 	DECLARE_READ32_MEMBER( read );
 
-	void kram_map(address_map &map);
-	void microprg_map(address_map &map);
 protected:
 	// device-level overrides
 	virtual void device_validity_check(validity_checker &valid) const override;
@@ -110,6 +108,9 @@ private:
 	uint32_t read_dword(offs_t address);
 	void write_dword(offs_t address, uint32_t data);
 	void write_microprg_data(offs_t address, uint16_t data);
+
+	void kram_map(address_map &map);
+	void microprg_map(address_map &map);
 };
 
 // device type definition

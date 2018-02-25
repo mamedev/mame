@@ -715,7 +715,8 @@ MACHINE_CONFIG_START(twin16_state::twin16)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", 0.20)
 MACHINE_CONFIG_END
 
-MACHINE_CONFIG_DERIVED(twin16_state::devilw, twin16)
+MACHINE_CONFIG_START(twin16_state::devilw)
+	twin16(config);
 	MCFG_QUANTUM_TIME(attotime::from_hz(60000)) // watchdog reset otherwise
 MACHINE_CONFIG_END
 
@@ -769,12 +770,14 @@ MACHINE_CONFIG_START(fround_state::fround)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", 0.20)
 MACHINE_CONFIG_END
 
-MACHINE_CONFIG_DERIVED(twin16_state::miaj, twin16)
+MACHINE_CONFIG_START(twin16_state::miaj)
+	twin16(config);
 	MCFG_SCREEN_MODIFY("screen")
 	MCFG_SCREEN_RAW_PARAMS(XTAL(18'432'000)/2, 576, 1*8, 39*8, 264, 2*8, 30*8)
 MACHINE_CONFIG_END
 
-MACHINE_CONFIG_DERIVED(cuebrickj_state::cuebrickj, twin16)
+MACHINE_CONFIG_START(cuebrickj_state::cuebrickj)
+	twin16(config);
 	MCFG_SCREEN_MODIFY("screen")
 	MCFG_SCREEN_RAW_PARAMS(XTAL(18'432'000)/2, 576, 1*8, 39*8, 264, 2*8, 30*8)
 	MCFG_NVRAM_ADD_0FILL("nvram")

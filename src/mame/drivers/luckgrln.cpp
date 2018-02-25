@@ -996,7 +996,8 @@ MACHINE_CONFIG_START(luckgrln_state::luckgrln)
 
 MACHINE_CONFIG_END
 
-MACHINE_CONFIG_DERIVED(luckgrln_state::_7smash, luckgrln)
+MACHINE_CONFIG_START(luckgrln_state::_7smash)
+	luckgrln(config);
 	MCFG_CPU_MODIFY("maincpu")
 	MCFG_CPU_PROGRAM_MAP(_7smash_map)
 	MCFG_CPU_IO_MAP(_7smash_io)

@@ -75,16 +75,21 @@ public:
 		, m_in(*this, "IN%u", 1)
 	{ }
 
-	required_device<v9938_device> m_v9938;
-	uint8_t m_mux_data;
+	void big10(machine_config &config);
+
+protected:
+	void main_io(address_map &map);
+	void main_map(address_map &map);
+
 	DECLARE_READ8_MEMBER(mux_r);
 	DECLARE_WRITE8_MEMBER(mux_w);
+
+private:
+	required_device<v9938_device> m_v9938;
+	uint8_t m_mux_data;
 	required_device<cpu_device> m_maincpu;
 	required_device<ticket_dispenser_device> m_hopper;
 	required_ioport_array<6> m_in;
-	void big10(machine_config &config);
-	void main_io(address_map &map);
-	void main_map(address_map &map);
 };
 
 

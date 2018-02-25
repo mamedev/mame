@@ -92,6 +92,7 @@ avt.cpp
 aztarac.cpp
 backfire.cpp
 badlands.cpp
+badlandsbl.cpp
 bagman.cpp
 bailey.cpp
 balsente.cpp
@@ -141,6 +142,7 @@ blmbycar.cpp
 blockade.cpp
 blockhl.cpp
 blockout.cpp
+blocktax.cpp
 bloodbro.cpp
 blstroid.cpp
 blueprnt.cpp

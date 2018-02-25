@@ -612,7 +612,8 @@ MACHINE_CONFIG_START(xerox820_state::xerox820)
 	MCFG_SOFTWARE_LIST_ADD("flop_list", "xerox820")
 MACHINE_CONFIG_END
 
-MACHINE_CONFIG_DERIVED(bigboard_state::bigboard, xerox820)
+MACHINE_CONFIG_START(bigboard_state::bigboard)
+	xerox820(config);
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
 	MCFG_SOUND_ADD("beeper", BEEP, 950)
@@ -714,7 +715,8 @@ MACHINE_CONFIG_START(xerox820ii_state::xerox820ii)
 	MCFG_SOFTWARE_LIST_ADD("flop_list", "xerox820ii")
 MACHINE_CONFIG_END
 
-MACHINE_CONFIG_DERIVED(xerox820ii_state::xerox168, xerox820ii)
+MACHINE_CONFIG_START(xerox820ii_state::xerox168)
+	xerox820ii(config);
 	MCFG_CPU_ADD(I8086_TAG, I8086, 4770000)
 	MCFG_CPU_PROGRAM_MAP(xerox168_mem)
 
@@ -724,7 +726,8 @@ MACHINE_CONFIG_DERIVED(xerox820ii_state::xerox168, xerox820ii)
 	MCFG_RAM_EXTRA_OPTIONS("320K")
 MACHINE_CONFIG_END
 
-MACHINE_CONFIG_DERIVED(xerox820_state::mk83, xerox820)
+MACHINE_CONFIG_START(xerox820_state::mk83)
+	xerox820(config);
 	MCFG_CPU_MODIFY(Z80_TAG)
 	MCFG_CPU_PROGRAM_MAP(mk83_mem)
 MACHINE_CONFIG_END

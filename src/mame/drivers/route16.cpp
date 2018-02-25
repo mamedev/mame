@@ -631,7 +631,8 @@ MACHINE_CONFIG_START(route16_state::route16)
 MACHINE_CONFIG_END
 
 
-MACHINE_CONFIG_DERIVED(route16_state::routex, route16)
+MACHINE_CONFIG_START(route16_state::routex)
+	route16(config);
 
 	/* basic machine hardware */
 	MCFG_CPU_MODIFY("cpu1")
@@ -639,7 +640,8 @@ MACHINE_CONFIG_DERIVED(route16_state::routex, route16)
 MACHINE_CONFIG_END
 
 
-MACHINE_CONFIG_DERIVED(route16_state::stratvox, route16)
+MACHINE_CONFIG_START(route16_state::stratvox)
+	route16(config);
 
 	/* basic machine hardware */
 	MCFG_CPU_MODIFY("cpu1")
@@ -679,7 +681,8 @@ MACHINE_CONFIG_DERIVED(route16_state::stratvox, route16)
 MACHINE_CONFIG_END
 
 
-MACHINE_CONFIG_DERIVED(route16_state::speakres, stratvox)
+MACHINE_CONFIG_START(route16_state::speakres)
+	stratvox(config);
 
 	/* basic machine hardware */
 	MCFG_CPU_MODIFY("cpu1")
@@ -689,7 +692,8 @@ MACHINE_CONFIG_DERIVED(route16_state::speakres, stratvox)
 MACHINE_CONFIG_END
 
 
-MACHINE_CONFIG_DERIVED(route16_state::spacecho, speakres)
+MACHINE_CONFIG_START(route16_state::spacecho)
+	speakres(config);
 
 	/* basic machine hardware */
 	MCFG_CPU_MODIFY("cpu2")
@@ -697,7 +701,8 @@ MACHINE_CONFIG_DERIVED(route16_state::spacecho, speakres)
 MACHINE_CONFIG_END
 
 
-MACHINE_CONFIG_DERIVED(route16_state::ttmahjng, route16)
+MACHINE_CONFIG_START(route16_state::ttmahjng)
+	route16(config);
 	MCFG_CPU_MODIFY("cpu1")
 	MCFG_CPU_PROGRAM_MAP(ttmahjng_cpu1_map)
 	MCFG_DEVICE_REMOVE_ADDRESS_MAP(AS_IO)

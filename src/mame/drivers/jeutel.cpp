@@ -203,7 +203,7 @@ MACHINE_CONFIG_START(jeutel_state::jeutel)
 	MCFG_DEFAULT_LAYOUT(layout_jeutel)
 
 	/* Sound */
-	MCFG_FRAGMENT_ADD( genpin_audio )
+	genpin_audio(config);
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")

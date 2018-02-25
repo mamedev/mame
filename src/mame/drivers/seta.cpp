@@ -1393,6 +1393,8 @@ Note: on screen copyright is (c)1998 Coinmaster.
 #include "jockeyc.lh"
 #include "setaroul.lh"
 
+#include <algorithm>
+
 #if __uPD71054_TIMER
 // this mess should be replaced with pit8254, see madshark
 
@@ -1575,11 +1577,11 @@ WRITE16_MEMBER(seta_state::sub_ctrl_w)
 			break;
 
 		case 4/2:   // not sure
-			if (ACCESSING_BITS_0_7) if(m_soundlatch != nullptr) m_soundlatch->write(space, 0, data & 0xff);
+			if (ACCESSING_BITS_0_7) if(m_soundlatch[0] != nullptr) m_soundlatch[0]->write(space, 0, data & 0xff);
 			break;
 
 		case 6/2:   // not sure
-			if (ACCESSING_BITS_0_7) if(m_soundlatch2 != nullptr) m_soundlatch2->write(space, 0, data & 0xff);
+			if (ACCESSING_BITS_0_7) if(m_soundlatch[1] != nullptr) m_soundlatch[1]->write(space, 0, data & 0xff);
 			break;
 	}
 
@@ -1620,6 +1622,19 @@ WRITE_LINE_MEMBER(seta_state::screen_vblank_seta_buffer_sprites)
 	{
 		m_seta001->setac_eof();
 	}
+}
+
+
+/*
+
+ VRAM Handler
+
+*/
+template<int Layer>
+WRITE16_MEMBER(seta_state::vram_w)
+{
+	COMBINE_DATA(&m_vram[Layer][offset]);
+	m_tilemap[Layer][(offset >> 12) & 1]->mark_tile_dirty(offset & 0x7ff);
 }
 
 
@@ -1688,9 +1703,9 @@ ADDRESS_MAP_START(seta_state::tndrcade_map)
 	AM_RANGE(0x200000, 0x200001) AM_WRITE(ipl1_ack_w)
 	AM_RANGE(0x280000, 0x280001) AM_WRITENOP                        // ? 0 / 1 (sub cpu related?)
 	AM_RANGE(0x300000, 0x300001) AM_WRITENOP                        // ? 0 / 1
-	AM_RANGE(0x380000, 0x3803ff) AM_RAM AM_SHARE("paletteram") // Palette
-/**/AM_RANGE(0x400000, 0x400001) AM_WRITENOP                        // ? $4000
-/**/AM_RANGE(0x600000, 0x6005ff) AM_RAM AM_DEVREADWRITE("spritegen", seta001_device, spriteylow_r16, spriteylow_w16)     // Sprites Y
+	AM_RANGE(0x380000, 0x3803ff) AM_RAM AM_SHARE("paletteram1") // Palette
+	AM_RANGE(0x400000, 0x400001) AM_WRITENOP                        // ? $4000
+	AM_RANGE(0x600000, 0x6005ff) AM_RAM AM_DEVREADWRITE("spritegen", seta001_device, spriteylow_r16, spriteylow_w16)     // Sprites Y
 	AM_RANGE(0x600600, 0x600607) AM_RAM AM_DEVREADWRITE("spritegen", seta001_device, spritectrl_r16, spritectrl_w16)
 
 	AM_RANGE(0x800000, 0x800007) AM_WRITE(sub_ctrl_w)               // Sub CPU Control?
@@ -1714,9 +1729,9 @@ ADDRESS_MAP_START(seta_state::downtown_map)
 	AM_RANGE(0x400000, 0x400007) AM_WRITE(twineagl_tilebank_w)      // special tile banking to animate water in twineagl
 	AM_RANGE(0x500000, 0x500001) AM_WRITENOP                        // ?
 	AM_RANGE(0x600000, 0x600003) AM_READ(seta_dsw_r)                // DSW
-	AM_RANGE(0x700000, 0x7003ff) AM_RAM AM_SHARE("paletteram")  // Palette
+	AM_RANGE(0x700000, 0x7003ff) AM_RAM AM_SHARE("paletteram1")  // Palette
 	AM_RANGE(0x800000, 0x800005) AM_WRITEONLY AM_SHARE("vctrl_0")// VRAM Ctrl
-	AM_RANGE(0x900000, 0x903fff) AM_RAM_WRITE(seta_vram_0_w) AM_SHARE("vram_0") // VRAM
+	AM_RANGE(0x900000, 0x903fff) AM_RAM_WRITE(vram_w<0>) AM_SHARE("vram_0") // VRAM
 	AM_RANGE(0xa00000, 0xa00007) AM_WRITE(sub_ctrl_w)               // Sub CPU Control?
 	AM_RANGE(0xb00000, 0xb00fff) AM_READWRITE(sharedram_68000_r,sharedram_68000_w)  // Shared RAM
 	AM_RANGE(0xc00000, 0xc00001) AM_WRITENOP                        // ? $4000
@@ -1739,9 +1754,9 @@ ADDRESS_MAP_START(seta_state::calibr50_map)
 	AM_RANGE(0x400000, 0x400001) AM_DEVREAD("watchdog", watchdog_timer_device, reset16_r)
 	AM_RANGE(0x500000, 0x500001) AM_WRITENOP                        // ?
 	AM_RANGE(0x600000, 0x600003) AM_READ(seta_dsw_r)                // DSW
-	AM_RANGE(0x700000, 0x7003ff) AM_RAM AM_SHARE("paletteram")  // Palette
+	AM_RANGE(0x700000, 0x7003ff) AM_RAM AM_SHARE("paletteram1")  // Palette
 	AM_RANGE(0x800000, 0x800005) AM_WRITEONLY AM_SHARE("vctrl_0")// VRAM Ctrl
-	AM_RANGE(0x900000, 0x903fff) AM_RAM_WRITE(seta_vram_0_w) AM_SHARE("vram_0") // VRAM
+	AM_RANGE(0x900000, 0x903fff) AM_RAM_WRITE(vram_w<0>) AM_SHARE("vram_0") // VRAM
 
 	AM_RANGE(0x904000, 0x904fff) AM_RAM                             //
 	AM_RANGE(0xa00000, 0xa00001) AM_READ_PORT("P1")                 // X1-004
@@ -1750,12 +1765,12 @@ ADDRESS_MAP_START(seta_state::calibr50_map)
 	AM_RANGE(0xa00010, 0xa00017) AM_DEVREAD8("upd4701", upd4701_device, read_xy, 0x00ff)
 	AM_RANGE(0xa00018, 0xa00019) AM_DEVREAD8("upd4701", upd4701_device, reset_xy, 0x00ff)
 
-/**/AM_RANGE(0xd00000, 0xd005ff) AM_RAM AM_DEVREADWRITE("spritegen", seta001_device, spriteylow_r16, spriteylow_w16)     // Sprites Y
+	AM_RANGE(0xd00000, 0xd005ff) AM_RAM AM_DEVREADWRITE("spritegen", seta001_device, spriteylow_r16, spriteylow_w16)     // Sprites Y
 	AM_RANGE(0xd00600, 0xd00607) AM_RAM AM_DEVREADWRITE("spritegen", seta001_device, spritectrl_r16, spritectrl_w16)
 	AM_RANGE(0xe00000, 0xe03fff) AM_RAM AM_DEVREADWRITE("spritegen", seta001_device, spritecode_r16, spritecode_w16)     // Sprites Code + X + Attr
 	AM_RANGE(0xb00000, 0xb00001) AM_DEVREAD8("soundlatch2", generic_latch_8_device, read, 0x00ff) // From Sub CPU
-	AM_RANGE(0xb00000, 0xb00001) AM_DEVWRITE8("soundlatch", generic_latch_8_device, write, 0x00ff) // To Sub CPU
-/**/AM_RANGE(0xc00000, 0xc00001) AM_RAM                             // ? $4000
+	AM_RANGE(0xb00000, 0xb00001) AM_DEVWRITE8("soundlatch1", generic_latch_8_device, write, 0x00ff) // To Sub CPU
+	AM_RANGE(0xc00000, 0xc00001) AM_RAM                             // ? $4000
 
 	AM_RANGE(0xff0000, 0xffffff) AM_RAM                             // RAM
 ADDRESS_MAP_END
@@ -1779,12 +1794,12 @@ READ16_MEMBER(seta_state::usclssic_dsw_r)
 
 CUSTOM_INPUT_MEMBER(seta_state::usclssic_trackball_x_r)
 {
-	return (m_usclssic_port_select ? m_track2_x : m_track1_x)->read();
+	return m_track_x[m_usclssic_port_select ? 1 : 0]->read();
 }
 
 CUSTOM_INPUT_MEMBER(seta_state::usclssic_trackball_y_r)
 {
-	return (m_usclssic_port_select ? m_track2_y : m_track1_y)->read();
+	return m_track_y[m_usclssic_port_select ? 1 : 0]->read();
 }
 
 
@@ -1811,19 +1826,19 @@ ADDRESS_MAP_START(seta_state::usclssic_map)
 	AM_RANGE(0xff0000, 0xffffff) AM_RAM                                 // RAM
 	AM_RANGE(0x800000, 0x8005ff) AM_RAM AM_DEVREADWRITE("spritegen", seta001_device, spriteylow_r16, spriteylow_w16) // Sprites Y
 	AM_RANGE(0x800600, 0x800607) AM_RAM AM_DEVREADWRITE("spritegen", seta001_device, spritectrl_r16, spritectrl_w16)
-/**/AM_RANGE(0x900000, 0x900001) AM_RAM                                 // ? $4000
+	AM_RANGE(0x900000, 0x900001) AM_RAM                                 // ? $4000
 	AM_RANGE(0xa00000, 0xa00005) AM_RAM AM_SHARE("vctrl_0")         // VRAM Ctrl
-/**/AM_RANGE(0xb00000, 0xb003ff) AM_RAM AM_SHARE("paletteram")  // Palette
+	AM_RANGE(0xb00000, 0xb003ff) AM_RAM AM_SHARE("paletteram1")  // Palette
 	AM_RANGE(0xb40000, 0xb40007) AM_DEVREAD8("upd4701", upd4701_device, read_xy, 0x00ff)
 	AM_RANGE(0xb40000, 0xb40001) AM_WRITE8(usclssic_lockout_w, 0x00ff)  // Coin Lockout + Tiles Banking
 	AM_RANGE(0xb4000a, 0xb4000b) AM_WRITE(ipl1_ack_w)
 	AM_RANGE(0xb40010, 0xb40011) AM_READ_PORT("COINS")                  // Coins
-	AM_RANGE(0xb40010, 0xb40011) AM_DEVWRITE8("soundlatch", generic_latch_8_device, write, 0x00ff) // To Sub CPU
+	AM_RANGE(0xb40010, 0xb40011) AM_DEVWRITE8("soundlatch1", generic_latch_8_device, write, 0x00ff) // To Sub CPU
 	AM_RANGE(0xb40018, 0xb4001f) AM_READ(usclssic_dsw_r)                // 2 DSWs
 	AM_RANGE(0xb40018, 0xb40019) AM_DEVWRITE("watchdog", watchdog_timer_device, reset16_w)
 	AM_RANGE(0xb80000, 0xb80001) AM_READ(ipl2_ack_r)
 	AM_RANGE(0xc00000, 0xc03fff) AM_RAM AM_DEVREADWRITE("spritegen", seta001_device, spritecode_r16, spritecode_w16)         // Sprites Code + X + Attr
-	AM_RANGE(0xd00000, 0xd03fff) AM_RAM_WRITE(seta_vram_0_w) AM_SHARE("vram_0") // VRAM
+	AM_RANGE(0xd00000, 0xd03fff) AM_RAM_WRITE(vram_w<0>) AM_SHARE("vram_0") // VRAM
 	AM_RANGE(0xd04000, 0xd04fff) AM_RAM                                 //
 	AM_RANGE(0xe00000, 0xe00fff) AM_RAM                                 // NVRAM? (odd bytes)
 ADDRESS_MAP_END
@@ -1841,13 +1856,13 @@ ADDRESS_MAP_START(seta_state::atehate_map)
 	AM_RANGE(0x300000, 0x300001) AM_WRITENOP                        // ? 0 (irq ack lev 2?)
 	AM_RANGE(0x500000, 0x500001) AM_WRITENOP                        // ? (end of lev 1: bit 4 goes 1,0,1)
 	AM_RANGE(0x600000, 0x600003) AM_READ(seta_dsw_r)                // DSW
-	AM_RANGE(0x700000, 0x7003ff) AM_RAM AM_SHARE("paletteram")  // Palette
+	AM_RANGE(0x700000, 0x7003ff) AM_RAM AM_SHARE("paletteram1")  // Palette
 	AM_RANGE(0xa00000, 0xa005ff) AM_RAM AM_DEVREADWRITE("spritegen", seta001_device, spriteylow_r16, spriteylow_w16)     // Sprites Y
 	AM_RANGE(0xa00600, 0xa00607) AM_RAM AM_DEVREADWRITE("spritegen", seta001_device, spritectrl_r16, spritectrl_w16)
 	AM_RANGE(0xb00000, 0xb00001) AM_READ_PORT("P1")                 // P1
 	AM_RANGE(0xb00002, 0xb00003) AM_READ_PORT("P2")                 // P2
 	AM_RANGE(0xb00004, 0xb00005) AM_READ_PORT("COINS")              // Coins
-/**/AM_RANGE(0xc00000, 0xc00001) AM_RAM                             // ? 0x4000
+	AM_RANGE(0xc00000, 0xc00001) AM_RAM                             // ? 0x4000
 	AM_RANGE(0xe00000, 0xe03fff) AM_RAM AM_DEVREADWRITE("spritegen", seta001_device, spritecode_r16, spritecode_w16)     // Sprites Code + X + Attr
 ADDRESS_MAP_END
 
@@ -1867,17 +1882,17 @@ ADDRESS_MAP_START(seta_state::blandia_map)
 	AM_RANGE(0x500000, 0x500005) AM_RAM_WRITE(seta_vregs_w) AM_SHARE("vregs")   // (gundhara) Coin Lockout + Video Registers
 	AM_RANGE(0x600000, 0x600003) AM_READ(seta_dsw_r)                // DSW
 	AM_RANGE(0x700000, 0x7003ff) AM_RAM                             // (rezon,jjsquawk)
-	AM_RANGE(0x700400, 0x700fff) AM_RAM AM_SHARE("paletteram")  // Palette
+	AM_RANGE(0x700400, 0x700fff) AM_RAM AM_SHARE("paletteram1")  // Palette
 	AM_RANGE(0x703c00, 0x7047ff) AM_RAM AM_SHARE("paletteram2") // 2nd Palette for the palette offset effect
-/**/AM_RANGE(0x800000, 0x8005ff) AM_RAM AM_DEVREADWRITE("spritegen", seta001_device, spriteylow_r16, spriteylow_w16)     // Sprites Y
+	AM_RANGE(0x800000, 0x8005ff) AM_RAM AM_DEVREADWRITE("spritegen", seta001_device, spriteylow_r16, spriteylow_w16)     // Sprites Y
 	AM_RANGE(0x800600, 0x800607) AM_RAM AM_DEVREADWRITE("spritegen", seta001_device, spritectrl_r16, spritectrl_w16)
 	AM_RANGE(0x880000, 0x880001) AM_RAM                             // ? 0xc000
 	AM_RANGE(0x900000, 0x903fff) AM_RAM AM_DEVREADWRITE("spritegen", seta001_device, spritecode_r16, spritecode_w16)     // Sprites Code + X + Attr
-/**/AM_RANGE(0xa00000, 0xa00005) AM_RAM AM_SHARE("vctrl_0")     // VRAM 0&1 Ctrl
-/**/AM_RANGE(0xa80000, 0xa80005) AM_RAM AM_SHARE("vctrl_2")     // VRAM 2&3 Ctrl
-	AM_RANGE(0xb00000, 0xb03fff) AM_RAM_WRITE(seta_vram_0_w) AM_SHARE("vram_0") // VRAM 0&1
+	AM_RANGE(0xa00000, 0xa00005) AM_RAM AM_SHARE("vctrl_0")     // VRAM 0&1 Ctrl
+	AM_RANGE(0xa80000, 0xa80005) AM_RAM AM_SHARE("vctrl_1")     // VRAM 2&3 Ctrl
+	AM_RANGE(0xb00000, 0xb03fff) AM_RAM_WRITE(vram_w<0>) AM_SHARE("vram_0") // VRAM 0&1
 	AM_RANGE(0xb04000, 0xb0ffff) AM_RAM                             // (jjsquawk)
-	AM_RANGE(0xb80000, 0xb83fff) AM_RAM_WRITE(seta_vram_2_w) AM_SHARE("vram_2") // VRAM 2&3
+	AM_RANGE(0xb80000, 0xb83fff) AM_RAM_WRITE(vram_w<1>) AM_SHARE("vram_1") // VRAM 2&3
 	AM_RANGE(0xb84000, 0xb8ffff) AM_RAM                             // (jjsquawk)
 	AM_RANGE(0xc00000, 0xc03fff) AM_DEVREADWRITE("x1snd", x1_010_device, word_r, word_w)   // Sound
 	AM_RANGE(0xd00000, 0xd00007) AM_WRITENOP                        // ?
@@ -1902,17 +1917,17 @@ ADDRESS_MAP_START(seta_state::blandiap_map)
 	AM_RANGE(0x500000, 0x500005) AM_RAM_WRITE(seta_vregs_w) AM_SHARE("vregs") // (gundhara) Coin Lockout + Video Registers
 	AM_RANGE(0x600000, 0x600003) AM_READ(seta_dsw_r)                // DSW
 	AM_RANGE(0x700000, 0x7003ff) AM_RAM                             // (rezon,jjsquawk)
-	AM_RANGE(0x700400, 0x700fff) AM_RAM AM_SHARE("paletteram")  // Palette
+	AM_RANGE(0x700400, 0x700fff) AM_RAM AM_SHARE("paletteram1")  // Palette
 	AM_RANGE(0x703c00, 0x7047ff) AM_RAM AM_SHARE("paletteram2") // 2nd Palette for the palette offset effect
-	AM_RANGE(0x800000, 0x803fff) AM_RAM_WRITE(seta_vram_0_w) AM_SHARE("vram_0") // VRAM 0&1
+	AM_RANGE(0x800000, 0x803fff) AM_RAM_WRITE(vram_w<0>) AM_SHARE("vram_0") // VRAM 0&1
 	AM_RANGE(0x804000, 0x80ffff) AM_RAM                             // (jjsquawk)
-	AM_RANGE(0x880000, 0x883fff) AM_RAM_WRITE(seta_vram_2_w) AM_SHARE("vram_2") // VRAM 2&3
+	AM_RANGE(0x880000, 0x883fff) AM_RAM_WRITE(vram_w<1>) AM_SHARE("vram_1") // VRAM 2&3
 	AM_RANGE(0x884000, 0x88ffff) AM_RAM                             // (jjsquawk)
-/**/AM_RANGE(0x900000, 0x900005) AM_RAM AM_SHARE("vctrl_0")     // VRAM 0&1 Ctrl
-/**/AM_RANGE(0x980000, 0x980005) AM_RAM AM_SHARE("vctrl_2")     // VRAM 2&3 Ctrl
-/**/AM_RANGE(0xa00000, 0xa005ff) AM_RAM AM_DEVREADWRITE("spritegen", seta001_device, spriteylow_r16, spriteylow_w16)     // Sprites Y
+	AM_RANGE(0x900000, 0x900005) AM_RAM AM_SHARE("vctrl_0")     // VRAM 0&1 Ctrl
+	AM_RANGE(0x980000, 0x980005) AM_RAM AM_SHARE("vctrl_1")     // VRAM 2&3 Ctrl
+	AM_RANGE(0xa00000, 0xa005ff) AM_RAM AM_DEVREADWRITE("spritegen", seta001_device, spriteylow_r16, spriteylow_w16)     // Sprites Y
 	AM_RANGE(0xa00600, 0xa00607) AM_RAM AM_DEVREADWRITE("spritegen", seta001_device, spritectrl_r16, spritectrl_w16)
-/**/AM_RANGE(0xa80000, 0xa80001) AM_RAM                             // ? 0x4000
+	AM_RANGE(0xa80000, 0xa80001) AM_RAM                             // ? 0x4000
 	AM_RANGE(0xb00000, 0xb03fff) AM_RAM AM_DEVREADWRITE("spritegen", seta001_device, spritecode_r16, spritecode_w16)     // Sprites Code + X + Attr
 	AM_RANGE(0xc00000, 0xc03fff) AM_DEVREADWRITE("x1snd", x1_010_device, word_r, word_w)   // Sound
 	AM_RANGE(0xd00000, 0xd00007) AM_WRITENOP                        // ?
@@ -1973,17 +1988,17 @@ ADDRESS_MAP_START(seta_state::wrofaero_map)
 
 	AM_RANGE(0x600000, 0x600003) AM_READ(seta_dsw_r)                // DSW
 	AM_RANGE(0x700000, 0x7003ff) AM_RAM                             // (rezon,jjsquawk)
-	AM_RANGE(0x700400, 0x700fff) AM_RAM AM_SHARE("paletteram")  // Palette
+	AM_RANGE(0x700400, 0x700fff) AM_RAM AM_SHARE("paletteram1")  // Palette
 	AM_RANGE(0x701000, 0x70ffff) AM_RAM                             //
-	AM_RANGE(0x800000, 0x803fff) AM_RAM_WRITE(seta_vram_0_w) AM_SHARE("vram_0") // VRAM 0&1
+	AM_RANGE(0x800000, 0x803fff) AM_RAM_WRITE(vram_w<0>) AM_SHARE("vram_0") // VRAM 0&1
 	AM_RANGE(0x804000, 0x80ffff) AM_RAM                             // (jjsquawk)
-	AM_RANGE(0x880000, 0x883fff) AM_RAM_WRITE(seta_vram_2_w) AM_SHARE("vram_2") // VRAM 2&3
+	AM_RANGE(0x880000, 0x883fff) AM_RAM_WRITE(vram_w<1>) AM_SHARE("vram_1") // VRAM 2&3
 	AM_RANGE(0x884000, 0x88ffff) AM_RAM                             // (jjsquawk)
-/**/AM_RANGE(0x900000, 0x900005) AM_RAM AM_SHARE("vctrl_0")     // VRAM 0&1 Ctrl
-/**/AM_RANGE(0x980000, 0x980005) AM_RAM AM_SHARE("vctrl_2")     // VRAM 2&3 Ctrl
-/**/AM_RANGE(0xa00000, 0xa005ff) AM_RAM AM_DEVREADWRITE("spritegen", seta001_device, spriteylow_r16, spriteylow_w16)     // Sprites Y
+	AM_RANGE(0x900000, 0x900005) AM_RAM AM_SHARE("vctrl_0")     // VRAM 0&1 Ctrl
+	AM_RANGE(0x980000, 0x980005) AM_RAM AM_SHARE("vctrl_1")     // VRAM 2&3 Ctrl
+	AM_RANGE(0xa00000, 0xa005ff) AM_RAM AM_DEVREADWRITE("spritegen", seta001_device, spriteylow_r16, spriteylow_w16)     // Sprites Y
 	AM_RANGE(0xa00600, 0xa00607) AM_RAM AM_DEVREADWRITE("spritegen", seta001_device, spritectrl_r16, spritectrl_w16)
-/**/AM_RANGE(0xa80000, 0xa80001) AM_RAM                             // ? 0x4000
+	AM_RANGE(0xa80000, 0xa80001) AM_RAM                             // ? 0x4000
 	AM_RANGE(0xb00000, 0xb03fff) AM_RAM AM_DEVREADWRITE("spritegen", seta001_device, spritecode_r16, spritecode_w16)     // Sprites Code + X + Attr
 	AM_RANGE(0xc00000, 0xc03fff) AM_DEVREADWRITE("x1snd", x1_010_device, word_r, word_w)   // Sound
 #if __uPD71054_TIMER
@@ -2020,20 +2035,20 @@ ADDRESS_MAP_START(seta_state::zingzipbl_map)
 
 	//AM_RANGE(0x600000, 0x600003) AM_READ(seta_dsw_r)              // DSW
 	AM_RANGE(0x700000, 0x7003ff) AM_RAM                             // (rezon,jjsquawk)
-	AM_RANGE(0x700400, 0x700fff) AM_RAM AM_SHARE("paletteram")  // Palette
+	AM_RANGE(0x700400, 0x700fff) AM_RAM AM_SHARE("paletteram1")  // Palette
 	AM_RANGE(0x701000, 0x70ffff) AM_RAM                             //
-	AM_RANGE(0x800000, 0x803fff) AM_RAM_WRITE(seta_vram_0_w) AM_SHARE("vram_0") // VRAM 0&1
+	AM_RANGE(0x800000, 0x803fff) AM_RAM_WRITE(vram_w<0>) AM_SHARE("vram_0") // VRAM 0&1
 	AM_RANGE(0x804000, 0x80ffff) AM_RAM                             // (jjsquawk)
-	AM_RANGE(0x880000, 0x883fff) AM_RAM_WRITE(seta_vram_2_w) AM_SHARE("vram_2") // VRAM 2&3
+	AM_RANGE(0x880000, 0x883fff) AM_RAM_WRITE(vram_w<1>) AM_SHARE("vram_1") // VRAM 2&3
 	AM_RANGE(0x884000, 0x88ffff) AM_RAM                             // (jjsquawk)
-/**/AM_RANGE(0x900000, 0x900005) AM_RAM AM_SHARE("vctrl_0")     // VRAM 0&1 Ctrl
+	AM_RANGE(0x900000, 0x900005) AM_RAM AM_SHARE("vctrl_0")     // VRAM 0&1 Ctrl
 
 	AM_RANGE(0x902010, 0x902013) AM_READ(zingzipbl_unknown_r )
 
-/**/AM_RANGE(0x980000, 0x980005) AM_RAM AM_SHARE("vctrl_2")     // VRAM 2&3 Ctrl
-/**/AM_RANGE(0xa00000, 0xa005ff) AM_RAM AM_DEVREADWRITE("spritegen", seta001_device, spriteylow_r16, spriteylow_w16)     // Sprites Y
+	AM_RANGE(0x980000, 0x980005) AM_RAM AM_SHARE("vctrl_1")     // VRAM 2&3 Ctrl
+	AM_RANGE(0xa00000, 0xa005ff) AM_RAM AM_DEVREADWRITE("spritegen", seta001_device, spriteylow_r16, spriteylow_w16)     // Sprites Y
 	AM_RANGE(0xa00600, 0xa00607) AM_RAM AM_DEVREADWRITE("spritegen", seta001_device, spritectrl_r16, spritectrl_w16)
-/**/AM_RANGE(0xa80000, 0xa80001) AM_RAM                             // ? 0x4000
+	AM_RANGE(0xa80000, 0xa80001) AM_RAM                             // ? 0x4000
 	AM_RANGE(0xb00000, 0xb03fff) AM_RAM AM_DEVREADWRITE("spritegen", seta001_device, spritecode_r16, spritecode_w16)     // Sprites Code + X + Attr
 	AM_RANGE(0xc00000, 0xc03fff) AM_RAM // soundram on original
 #if __uPD71054_TIMER
@@ -2057,16 +2072,16 @@ ADDRESS_MAP_START(seta_state::jjsquawb_map)
 
 	AM_RANGE(0x600000, 0x600003) AM_READ(seta_dsw_r)                // DSW
 	AM_RANGE(0x700000, 0x70b3ff) AM_RAM                             // RZ: (rezon,jjsquawk)
-	AM_RANGE(0x70b400, 0x70bfff) AM_RAM AM_SHARE("paletteram")  // Palette
+	AM_RANGE(0x70b400, 0x70bfff) AM_RAM AM_SHARE("paletteram1")  // Palette
 	AM_RANGE(0x70c000, 0x70ffff) AM_RAM                             //
-	AM_RANGE(0x800000, 0x803fff) AM_RAM_WRITE(seta_vram_0_w) AM_SHARE("vram_0") // VRAM 0
-	AM_RANGE(0x804000, 0x807fff) AM_RAM_WRITE(seta_vram_2_w) AM_SHARE("vram_2") // VRAM 2
+	AM_RANGE(0x800000, 0x803fff) AM_RAM_WRITE(vram_w<0>) AM_SHARE("vram_0") // VRAM 0
+	AM_RANGE(0x804000, 0x807fff) AM_RAM_WRITE(vram_w<1>) AM_SHARE("vram_1") // VRAM 2
 	AM_RANGE(0x884000, 0x88ffff) AM_RAM                             // (jjsquawk)
 	AM_RANGE(0x908000, 0x908005) AM_RAM AM_SHARE("vctrl_0")     // VRAM 0&1 Ctrl
-	AM_RANGE(0x909000, 0x909005) AM_RAM AM_SHARE("vctrl_2")     // VRAM 2&3 Ctrl
+	AM_RANGE(0x909000, 0x909005) AM_RAM AM_SHARE("vctrl_1")     // VRAM 2&3 Ctrl
 	AM_RANGE(0xa0a000, 0xa0a5ff) AM_RAM AM_DEVREADWRITE("spritegen", seta001_device, spriteylow_r16, spriteylow_w16)     // RZ: Sprites Y
 	AM_RANGE(0xa0a600, 0xa0a607) AM_RAM AM_DEVREADWRITE("spritegen", seta001_device, spritectrl_r16, spritectrl_w16)
-// AM_RANGE(0xa80000, 0xa80001) AM_RAM                              // ? 0x4000
+//  AM_RANGE(0xa80000, 0xa80001) AM_RAM                              // ? 0x4000
 	AM_RANGE(0xb0c000, 0xb0ffff) AM_RAM AM_DEVREADWRITE("spritegen", seta001_device, spritecode_r16, spritecode_w16)     // RZ: Sprites Code + X + Attr
 	AM_RANGE(0xc00000, 0xc03fff) AM_DEVREADWRITE("x1snd", x1_010_device, word_r, word_w)   // Sound
 #if __uPD71054_TIMER
@@ -2096,10 +2111,10 @@ ADDRESS_MAP_START(seta_state::orbs_map)
 	AM_RANGE(0x8000f0, 0x8000f1) AM_RAM                             // NVRAM
 	AM_RANGE(0x800100, 0x8001ff) AM_RAM                             // NVRAM
 	AM_RANGE(0xa00000, 0xa03fff) AM_DEVREADWRITE("x1snd", x1_010_device, word_r, word_w)   // Sound
-	AM_RANGE(0xb00000, 0xb003ff) AM_RAM AM_SHARE("paletteram")  // Palette
+	AM_RANGE(0xb00000, 0xb003ff) AM_RAM AM_SHARE("paletteram1")  // Palette
 	AM_RANGE(0xc00000, 0xc03fff) AM_RAM AM_DEVREADWRITE("spritegen", seta001_device, spritecode_r16, spritecode_w16)     // Sprites Code + X + Attr
-/**/AM_RANGE(0xd00000, 0xd00001) AM_RAM                             // ? 0x4000
-/**/AM_RANGE(0xe00000, 0xe005ff) AM_RAM AM_DEVREADWRITE("spritegen", seta001_device, spriteylow_r16, spriteylow_w16)     // Sprites Y
+	AM_RANGE(0xd00000, 0xd00001) AM_RAM                             // ? 0x4000
+	AM_RANGE(0xe00000, 0xe005ff) AM_RAM AM_DEVREADWRITE("spritegen", seta001_device, spriteylow_r16, spriteylow_w16)     // Sprites Y
 	AM_RANGE(0xe00600, 0xe00607) AM_RAM AM_DEVREADWRITE("spritegen", seta001_device, spritectrl_r16, spritectrl_w16)
 ADDRESS_MAP_END
 
@@ -2177,10 +2192,10 @@ ADDRESS_MAP_START(seta_state::keroppi_map)
 	AM_RANGE(0x900000, 0x900001) AM_WRITENOP                        // ?
 	AM_RANGE(0x900002, 0x900003) AM_WRITE(keroppi_prize_w)          //
 	AM_RANGE(0xa00000, 0xa03fff) AM_DEVREADWRITE("x1snd", x1_010_device, word_r, word_w)   // Sound
-	AM_RANGE(0xb00000, 0xb003ff) AM_RAM AM_SHARE("paletteram")  // Palette
+	AM_RANGE(0xb00000, 0xb003ff) AM_RAM AM_SHARE("paletteram1")  // Palette
 	AM_RANGE(0xc00000, 0xc03fff) AM_RAM AM_DEVREADWRITE("spritegen", seta001_device, spritecode_r16, spritecode_w16)     // Sprites Code + X + Attr
-/**/AM_RANGE(0xd00000, 0xd00001) AM_RAM                             // ? 0x4000
-/**/AM_RANGE(0xe00000, 0xe005ff) AM_RAM AM_DEVREADWRITE("spritegen", seta001_device, spriteylow_r16, spriteylow_w16)     // Sprites Y
+	AM_RANGE(0xd00000, 0xd00001) AM_RAM                             // ? 0x4000
+	AM_RANGE(0xe00000, 0xe005ff) AM_RAM AM_DEVREADWRITE("spritegen", seta001_device, spriteylow_r16, spriteylow_w16)     // Sprites Y
 	AM_RANGE(0xe00600, 0xe00607) AM_RAM AM_DEVREADWRITE("spritegen", seta001_device, spritectrl_r16, spritectrl_w16)
 ADDRESS_MAP_END
 
@@ -2208,10 +2223,10 @@ ADDRESS_MAP_START(seta_state::blockcar_map)
 	AM_RANGE(0x500002, 0x500003) AM_READ_PORT("P2")                 // P2
 	AM_RANGE(0x500004, 0x500005) AM_READ_PORT("COINS")              // Coins
 	AM_RANGE(0xa00000, 0xa03fff) AM_DEVREADWRITE("x1snd", x1_010_device, word_r, word_w)   // Sound
-	AM_RANGE(0xb00000, 0xb003ff) AM_RAM AM_SHARE("paletteram")  // Palette
+	AM_RANGE(0xb00000, 0xb003ff) AM_RAM AM_SHARE("paletteram1")  // Palette
 	AM_RANGE(0xc00000, 0xc03fff) AM_RAM AM_DEVREADWRITE("spritegen", seta001_device, spritecode_r16, spritecode_w16) // Sprites Code + X + Attr
-/**/AM_RANGE(0xd00000, 0xd00001) AM_RAM // ? 0x4000
-/**/AM_RANGE(0xe00000, 0xe005ff) AM_RAM AM_DEVREADWRITE("spritegen", seta001_device, spriteylow_r16, spriteylow_w16) // Sprites Y
+	AM_RANGE(0xd00000, 0xd00001) AM_RAM // ? 0x4000
+	AM_RANGE(0xe00000, 0xe005ff) AM_RAM AM_DEVREADWRITE("spritegen", seta001_device, spriteylow_r16, spriteylow_w16) // Sprites Y
 	AM_RANGE(0xe00600, 0xe00607) AM_RAM AM_DEVREADWRITE("spritegen", seta001_device, spritectrl_r16, spritectrl_w16)
 ADDRESS_MAP_END
 
@@ -2230,10 +2245,10 @@ ADDRESS_MAP_START(seta_state::blockcarb_map)
 	AM_RANGE(0x500008, 0x500009) AM_DEVWRITE8("oki", okim6295_device, write, 0x00ff)
 	//AM_RANGE(0x50000c, 0x50000d) // ??
 	AM_RANGE(0xa00000, 0xa03fff) AM_NOP   // Sound - not on this bootleg
-	AM_RANGE(0xb00000, 0xb003ff) AM_RAM AM_SHARE("paletteram")  // Palette
+	AM_RANGE(0xb00000, 0xb003ff) AM_RAM AM_SHARE("paletteram1")  // Palette
 	AM_RANGE(0xc00000, 0xc03fff) AM_RAM AM_DEVREADWRITE("spritegen", seta001_device, spritecode_r16, spritecode_w16) // Sprites Code + X + Attr
-/**/AM_RANGE(0xd00000, 0xd00001) AM_RAM // ? 0x4000
-/**/AM_RANGE(0xe00000, 0xe005ff) AM_RAM AM_DEVREADWRITE("spritegen", seta001_device, spriteylow_r16, spriteylow_w16) // Sprites Y
+	AM_RANGE(0xd00000, 0xd00001) AM_RAM // ? 0x4000
+	AM_RANGE(0xe00000, 0xe005ff) AM_RAM AM_DEVREADWRITE("spritegen", seta001_device, spriteylow_r16, spriteylow_w16) // Sprites Y
 	AM_RANGE(0xe00600, 0xe00607) AM_RAM AM_DEVREADWRITE("spritegen", seta001_device, spritectrl_r16, spritectrl_w16)
 ADDRESS_MAP_END
 
@@ -2251,14 +2266,14 @@ ADDRESS_MAP_START(seta_state::daioh_map)
 	AM_RANGE(0x500006, 0x500007) AM_READ_PORT("EXTRA")              // Buttons 4,5,6
 	AM_RANGE(0x600000, 0x600003) AM_READ(seta_dsw_r             )   // DSW
 	AM_RANGE(0x700000, 0x7003ff) AM_RAM
-	AM_RANGE(0x700400, 0x700fff) AM_RAM AM_SHARE("paletteram")  // Palette
+	AM_RANGE(0x700400, 0x700fff) AM_RAM AM_SHARE("paletteram1")  // Palette
 	AM_RANGE(0x701000, 0x70ffff) AM_RAM                             //
-	AM_RANGE(0x800000, 0x803fff) AM_RAM_WRITE(seta_vram_0_w) AM_SHARE("vram_0") // VRAM 0&1
+	AM_RANGE(0x800000, 0x803fff) AM_RAM_WRITE(vram_w<0>) AM_SHARE("vram_0") // VRAM 0&1
 	AM_RANGE(0x804000, 0x80ffff) AM_RAM                             //
-	AM_RANGE(0x880000, 0x883fff) AM_RAM_WRITE(seta_vram_2_w) AM_SHARE("vram_2") // VRAM 2&3
+	AM_RANGE(0x880000, 0x883fff) AM_RAM_WRITE(vram_w<1>) AM_SHARE("vram_1") // VRAM 2&3
 	AM_RANGE(0x884000, 0x88ffff) AM_RAM                             //
 	AM_RANGE(0x900000, 0x900005) AM_RAM AM_SHARE("vctrl_0")     // VRAM 0&1 Ctrl
-	AM_RANGE(0x980000, 0x980005) AM_RAM AM_SHARE("vctrl_2")     // VRAM 2&3 Ctrl
+	AM_RANGE(0x980000, 0x980005) AM_RAM AM_SHARE("vctrl_1")     // VRAM 2&3 Ctrl
 	AM_RANGE(0xa00000, 0xa005ff) AM_RAM AM_DEVREADWRITE("spritegen", seta001_device, spriteylow_r16, spriteylow_w16) // Sprites Y
 	AM_RANGE(0xa00600, 0xa00607) AM_RAM AM_DEVREADWRITE("spritegen", seta001_device, spritectrl_r16, spritectrl_w16)
 
@@ -2285,14 +2300,14 @@ ADDRESS_MAP_START(seta_state::daiohp_map)
 	AM_RANGE(0x500006, 0x500007) AM_READ_PORT("EXTRA")              // Buttons 4,5,6
 	AM_RANGE(0x600000, 0x600003) AM_READ(seta_dsw_r             )   // DSW
 	AM_RANGE(0x700000, 0x7003ff) AM_RAM
-	AM_RANGE(0x700400, 0x700fff) AM_RAM AM_SHARE("paletteram")  // Palette
+	AM_RANGE(0x700400, 0x700fff) AM_RAM AM_SHARE("paletteram1")  // Palette
 	AM_RANGE(0x701000, 0x70ffff) AM_RAM                             //
-	AM_RANGE(0x800000, 0x803fff) AM_RAM_WRITE(seta_vram_0_w) AM_SHARE("vram_0") // VRAM 0&1
+	AM_RANGE(0x800000, 0x803fff) AM_RAM_WRITE(vram_w<0>) AM_SHARE("vram_0") // VRAM 0&1
 	AM_RANGE(0x804000, 0x80ffff) AM_RAM                             //
-	AM_RANGE(0x880000, 0x883fff) AM_RAM_WRITE(seta_vram_2_w) AM_SHARE("vram_2") // VRAM 2&3
+	AM_RANGE(0x880000, 0x883fff) AM_RAM_WRITE(vram_w<1>) AM_SHARE("vram_1") // VRAM 2&3
 	AM_RANGE(0x884000, 0x88ffff) AM_RAM                             //
 	AM_RANGE(0x900000, 0x900005) AM_RAM AM_SHARE("vctrl_0")     // VRAM 0&1 Ctrl
-	AM_RANGE(0x980000, 0x980005) AM_RAM AM_SHARE("vctrl_2")     // VRAM 2&3 Ctrl
+	AM_RANGE(0x980000, 0x980005) AM_RAM AM_SHARE("vctrl_1")     // VRAM 2&3 Ctrl
 	AM_RANGE(0xa00000, 0xa005ff) AM_RAM AM_DEVREADWRITE("spritegen", seta001_device, spriteylow_r16, spriteylow_w16) // Sprites Y
 	AM_RANGE(0xa00600, 0xa00607) AM_RAM AM_DEVREADWRITE("spritegen", seta001_device, spritectrl_r16, spritectrl_w16)
 
@@ -2319,16 +2334,16 @@ ADDRESS_MAP_START(seta_state::drgnunit_map)
 	AM_RANGE(0x300000, 0x300001) AM_WRITENOP                        // ? IRQ Ack
 	AM_RANGE(0x500000, 0x500001) AM_RAM_WRITE(seta_vregs_w) AM_SHARE("vregs")   // Coin Lockout + Video Registers
 	AM_RANGE(0x600000, 0x600003) AM_READ(seta_dsw_r)                // DSW
-	AM_RANGE(0x700000, 0x7003ff) AM_RAM AM_SHARE("paletteram")  // Palette
+	AM_RANGE(0x700000, 0x7003ff) AM_RAM AM_SHARE("paletteram1")  // Palette
 	AM_RANGE(0x800000, 0x800005) AM_RAM AM_SHARE("vctrl_0")     // VRAM Ctrl
-	AM_RANGE(0x900000, 0x903fff) AM_RAM_WRITE(seta_vram_0_w) AM_SHARE("vram_0") // VRAM
+	AM_RANGE(0x900000, 0x903fff) AM_RAM_WRITE(vram_w<0>) AM_SHARE("vram_0") // VRAM
 	AM_RANGE(0x904000, 0x90ffff) AM_WRITENOP                        // unused (qzkklogy)
 	AM_RANGE(0xb00000, 0xb00001) AM_READ_PORT("P1")                 // P1
 	AM_RANGE(0xb00002, 0xb00003) AM_READ_PORT("P2")                 // P2
 	AM_RANGE(0xb00004, 0xb00005) AM_READ_PORT("COINS")              // Coins
 	AM_RANGE(0xb00006, 0xb00007) AM_READNOP                         // unused (qzkklogy)
-/**/AM_RANGE(0xc00000, 0xc00001) AM_RAM                             // ? $4000
-/**/AM_RANGE(0xd00000, 0xd005ff) AM_RAM AM_DEVREADWRITE("spritegen", seta001_device, spriteylow_r16, spriteylow_w16)     // Sprites Y
+	AM_RANGE(0xc00000, 0xc00001) AM_RAM                             // ? $4000
+	AM_RANGE(0xd00000, 0xd005ff) AM_RAM AM_DEVREADWRITE("spritegen", seta001_device, spriteylow_r16, spriteylow_w16)     // Sprites Y
 	AM_RANGE(0xd00600, 0xd00607) AM_RAM AM_DEVREADWRITE("spritegen", seta001_device, spritectrl_r16, spritectrl_w16)
 	AM_RANGE(0xe00000, 0xe03fff) AM_RAM AM_DEVREADWRITE("spritegen", seta001_device, spritecode_r16, spritecode_w16)     // Sprites Code + X + Attr
 ADDRESS_MAP_END
@@ -2493,7 +2508,7 @@ ADDRESS_MAP_START(setaroul_state::setaroul_map)
 
 	AM_RANGE(0xdc0000, 0xdc3fff) AM_DEVREADWRITE("x1snd", x1_010_device, word_r, word_w)   // Sound
 
-	AM_RANGE(0xe00000, 0xe03fff) AM_RAM_WRITE(seta_vram_0_w) AM_SHARE("vram_0")
+	AM_RANGE(0xe00000, 0xe03fff) AM_RAM_WRITE(vram_w<0>) AM_SHARE("vram_0")
 	AM_RANGE(0xe40000, 0xe40005) AM_RAM AM_SHARE("vctrl_0")     // VRAM Ctrl
 	AM_RANGE(0xf00000, 0xf03fff) AM_READWRITE(spritecode_r, spritecode_w)
 	AM_RANGE(0xf40000, 0xf40bff) AM_WRITE(spriteylow_w)
@@ -2519,17 +2534,17 @@ ADDRESS_MAP_START(seta_state::extdwnhl_map)
 	AM_RANGE(0x40000c, 0x40000d) AM_DEVREADWRITE("watchdog", watchdog_timer_device, reset16_r, reset16_w)    // Watchdog (extdwnhl (R) & sokonuke (W) MUST RETURN $FFFF)
 	AM_RANGE(0x500000, 0x500003) AM_RAM_WRITE(seta_vregs_w) AM_SHARE("vregs")   // Coin Lockout + Video Registers
 	AM_RANGE(0x500004, 0x500007) AM_NOP                             // IRQ Ack  (extdwnhl (R) & sokonuke (W))
-	AM_RANGE(0x600400, 0x600fff) AM_RAM AM_SHARE("paletteram")  // Palette
+	AM_RANGE(0x600400, 0x600fff) AM_RAM AM_SHARE("paletteram1")  // Palette
 	AM_RANGE(0x601000, 0x610bff) AM_RAM                             //
-	AM_RANGE(0x800000, 0x803fff) AM_RAM_WRITE(seta_vram_0_w) AM_SHARE("vram_0") // VRAM 0&1
+	AM_RANGE(0x800000, 0x803fff) AM_RAM_WRITE(vram_w<0>) AM_SHARE("vram_0") // VRAM 0&1
 	AM_RANGE(0x804000, 0x80ffff) AM_RAM                             //
-	AM_RANGE(0x880000, 0x883fff) AM_RAM_WRITE(seta_vram_2_w) AM_SHARE("vram_2") // VRAM 2&3
+	AM_RANGE(0x880000, 0x883fff) AM_RAM_WRITE(vram_w<1>) AM_SHARE("vram_1") // VRAM 2&3
 	AM_RANGE(0x884000, 0x88ffff) AM_RAM                             //
-/**/AM_RANGE(0x900000, 0x900005) AM_RAM AM_SHARE("vctrl_0")     // VRAM 0&1 Ctrl
-/**/AM_RANGE(0x980000, 0x980005) AM_RAM AM_SHARE("vctrl_2")     // VRAM 2&3 Ctrl
-/**/AM_RANGE(0xa00000, 0xa005ff) AM_RAM AM_DEVREADWRITE("spritegen", seta001_device, spriteylow_r16, spriteylow_w16)     // Sprites Y
+	AM_RANGE(0x900000, 0x900005) AM_RAM AM_SHARE("vctrl_0")     // VRAM 0&1 Ctrl
+	AM_RANGE(0x980000, 0x980005) AM_RAM AM_SHARE("vctrl_1")     // VRAM 2&3 Ctrl
+	AM_RANGE(0xa00000, 0xa005ff) AM_RAM AM_DEVREADWRITE("spritegen", seta001_device, spriteylow_r16, spriteylow_w16)     // Sprites Y
 	AM_RANGE(0xa00600, 0xa00607) AM_RAM AM_DEVREADWRITE("spritegen", seta001_device, spritectrl_r16, spritectrl_w16)
-/**/AM_RANGE(0xa80000, 0xa80001) AM_RAM                             // ? 0x4000
+	AM_RANGE(0xa80000, 0xa80001) AM_RAM                             // ? 0x4000
 	AM_RANGE(0xb00000, 0xb03fff) AM_RAM AM_DEVREADWRITE("spritegen", seta001_device, spritecode_r16, spritecode_w16)     // Sprites Code + X + Attr
 	AM_RANGE(0xb04000, 0xb13fff) AM_RAM                             //
 	AM_RANGE(0xe00000, 0xe03fff) AM_DEVREADWRITE("x1snd", x1_010_device, word_r, word_w)   // Sound
@@ -2552,14 +2567,14 @@ ADDRESS_MAP_START(seta_state::kamenrid_map)
 	AM_RANGE(0x600004, 0x600005) AM_WRITE(ipl1_ack_w)
 	AM_RANGE(0x600006, 0x600007) AM_WRITE(ipl2_ack_w)
 	AM_RANGE(0x700000, 0x7003ff) AM_RAM                             // Palette RAM (tested)
-	AM_RANGE(0x700400, 0x700fff) AM_RAM AM_SHARE("paletteram")  // Palette
+	AM_RANGE(0x700400, 0x700fff) AM_RAM AM_SHARE("paletteram1")  // Palette
 	AM_RANGE(0x701000, 0x703fff) AM_RAM                             // Palette
-	AM_RANGE(0x800000, 0x803fff) AM_RAM_WRITE(seta_vram_0_w) AM_SHARE("vram_0") // VRAM 0&1
+	AM_RANGE(0x800000, 0x803fff) AM_RAM_WRITE(vram_w<0>) AM_SHARE("vram_0") // VRAM 0&1
 	AM_RANGE(0x804000, 0x807fff) AM_RAM // tested
-	AM_RANGE(0x880000, 0x883fff) AM_RAM_WRITE(seta_vram_2_w) AM_SHARE("vram_2") // VRAM 2&3
+	AM_RANGE(0x880000, 0x883fff) AM_RAM_WRITE(vram_w<1>) AM_SHARE("vram_1") // VRAM 2&3
 	AM_RANGE(0x884000, 0x887fff) AM_RAM // tested
 	AM_RANGE(0x900000, 0x900005) AM_RAM AM_SHARE("vctrl_0")     // VRAM 0&1 Ctrl
-	AM_RANGE(0x980000, 0x980005) AM_RAM AM_SHARE("vctrl_2")     // VRAM 2&3 Ctrl
+	AM_RANGE(0x980000, 0x980005) AM_RAM AM_SHARE("vctrl_1")     // VRAM 2&3 Ctrl
 	AM_RANGE(0xa00000, 0xa005ff) AM_RAM AM_DEVREADWRITE("spritegen", seta001_device, spriteylow_r16, spriteylow_w16)     // Sprites Y
 	AM_RANGE(0xa00600, 0xa00607) AM_RAM AM_DEVREADWRITE("spritegen", seta001_device, spritectrl_r16, spritectrl_w16)
 	AM_RANGE(0xa80000, 0xa80001) AM_RAM                             // ? $4000
@@ -2581,11 +2596,11 @@ ADDRESS_MAP_START(seta_state::madshark_map)
 	AM_RANGE(0x600000, 0x600005) AM_RAM_WRITE(seta_vregs_w) AM_SHARE("vregs")   // ? Coin Lockout + Video Registers
 	AM_RANGE(0x600004, 0x600005) AM_WRITE(ipl1_ack_w)
 	AM_RANGE(0x600006, 0x600007) AM_WRITE(ipl2_ack_w)
-	AM_RANGE(0x700400, 0x700fff) AM_RAM AM_SHARE("paletteram")  // Palette
-	AM_RANGE(0x800000, 0x803fff) AM_RAM_WRITE(seta_vram_0_w) AM_SHARE("vram_0") // VRAM 0&1
-	AM_RANGE(0x880000, 0x883fff) AM_RAM_WRITE(seta_vram_2_w) AM_SHARE("vram_2") // VRAM 2&3
+	AM_RANGE(0x700400, 0x700fff) AM_RAM AM_SHARE("paletteram1")  // Palette
+	AM_RANGE(0x800000, 0x803fff) AM_RAM_WRITE(vram_w<0>) AM_SHARE("vram_0") // VRAM 0&1
+	AM_RANGE(0x880000, 0x883fff) AM_RAM_WRITE(vram_w<1>) AM_SHARE("vram_1") // VRAM 2&3
 	AM_RANGE(0x900000, 0x900005) AM_RAM AM_SHARE("vctrl_0")     // VRAM 0&1 Ctrl
-	AM_RANGE(0x980000, 0x980005) AM_RAM AM_SHARE("vctrl_2")     // VRAM 2&3 Ctrl
+	AM_RANGE(0x980000, 0x980005) AM_RAM AM_SHARE("vctrl_1")     // VRAM 2&3 Ctrl
 
 	AM_RANGE(0xa00000, 0xa005ff) AM_RAM AM_DEVREADWRITE("spritegen", seta001_device, spriteylow_r16, spriteylow_w16)     // Sprites Y
 	AM_RANGE(0xa00600, 0xa00607) AM_RAM AM_DEVREADWRITE("spritegen", seta001_device, spritectrl_r16, spritectrl_w16)
@@ -2621,14 +2636,14 @@ ADDRESS_MAP_START(seta_state::magspeed_map)
 	AM_RANGE(0x600000, 0x600005) AM_WRITE(magspeed_lights_w)        // Lights
 	AM_RANGE(0x600006, 0x600007) AM_WRITENOP                        // ?
 	AM_RANGE(0x700000, 0x7003ff) AM_RAM                             // Palette RAM (tested)
-	AM_RANGE(0x700400, 0x700fff) AM_RAM AM_SHARE("paletteram")      // Palette
+	AM_RANGE(0x700400, 0x700fff) AM_RAM AM_SHARE("paletteram1")      // Palette
 	AM_RANGE(0x701000, 0x703fff) AM_RAM                             // Palette RAM (tested)
-	AM_RANGE(0x800000, 0x803fff) AM_RAM_WRITE(seta_vram_0_w) AM_SHARE("vram_0") // VRAM 0&1
+	AM_RANGE(0x800000, 0x803fff) AM_RAM_WRITE(vram_w<0>) AM_SHARE("vram_0") // VRAM 0&1
 	AM_RANGE(0x804000, 0x807fff) AM_RAM                             // tested
-	AM_RANGE(0x880000, 0x883fff) AM_RAM_WRITE(seta_vram_2_w) AM_SHARE("vram_2") // VRAM 2&3
+	AM_RANGE(0x880000, 0x883fff) AM_RAM_WRITE(vram_w<1>) AM_SHARE("vram_1") // VRAM 2&3
 	AM_RANGE(0x884000, 0x887fff) AM_RAM                             // tested
 	AM_RANGE(0x900000, 0x900005) AM_RAM AM_SHARE("vctrl_0")         // VRAM 0&1 Ctrl
-	AM_RANGE(0x980000, 0x980005) AM_RAM AM_SHARE("vctrl_2")         // VRAM 2&3 Ctrl
+	AM_RANGE(0x980000, 0x980005) AM_RAM AM_SHARE("vctrl_1")         // VRAM 2&3 Ctrl
 	AM_RANGE(0xa00000, 0xa005ff) AM_RAM AM_DEVREADWRITE("spritegen", seta001_device, spriteylow_r16, spriteylow_w16)     // Sprites Y
 	AM_RANGE(0xa00600, 0xa00607) AM_RAM AM_DEVREADWRITE("spritegen", seta001_device, spritectrl_r16, spritectrl_w16)
 	AM_RANGE(0xa80000, 0xa80001) AM_RAM                             // ? $4000
@@ -2658,10 +2673,10 @@ ADDRESS_MAP_START(seta_state::krzybowl_map)
 	AM_RANGE(0x8000f0, 0x8000f1) AM_RAM                             // NVRAM
 	AM_RANGE(0x800100, 0x8001ff) AM_RAM                             // NVRAM
 	AM_RANGE(0xa00000, 0xa03fff) AM_DEVREADWRITE("x1snd", x1_010_device, word_r, word_w)   // Sound
-	AM_RANGE(0xb00000, 0xb003ff) AM_RAM AM_SHARE("paletteram")  // Palette
+	AM_RANGE(0xb00000, 0xb003ff) AM_RAM AM_SHARE("paletteram1")  // Palette
 	AM_RANGE(0xc00000, 0xc03fff) AM_RAM AM_DEVREADWRITE("spritegen", seta001_device, spritecode_r16, spritecode_w16)     // Sprites Code + X + Attr
-/**/AM_RANGE(0xd00000, 0xd00001) AM_RAM                             // ? 0x4000
-/**/AM_RANGE(0xe00000, 0xe005ff) AM_RAM AM_DEVREADWRITE("spritegen", seta001_device, spriteylow_r16, spriteylow_w16)     // Sprites Y
+	AM_RANGE(0xd00000, 0xd00001) AM_RAM                             // ? 0x4000
+	AM_RANGE(0xe00000, 0xe005ff) AM_RAM AM_DEVREADWRITE("spritegen", seta001_device, spriteylow_r16, spriteylow_w16)     // Sprites Y
 	AM_RANGE(0xe00600, 0xe00607) AM_RAM AM_DEVREADWRITE("spritegen", seta001_device, spritectrl_r16, spritectrl_w16)
 ADDRESS_MAP_END
 
@@ -2694,15 +2709,15 @@ ADDRESS_MAP_START(seta_state::msgundam_map)
 	AM_RANGE(0x400004, 0x400005) AM_WRITE(ipl2_ack_w)               // Lev 4 IRQ Ack
 	AM_RANGE(0x500000, 0x500005) AM_RAM_WRITE(msgundam_vregs_w) AM_SHARE("vregs")   // Coin Lockout + Video Registers
 	AM_RANGE(0x600000, 0x600003) AM_READ(seta_dsw_r)                // DSW
-	AM_RANGE(0x700400, 0x700fff) AM_RAM AM_SHARE("paletteram")  // Palette
+	AM_RANGE(0x700400, 0x700fff) AM_RAM AM_SHARE("paletteram1")  // Palette
 	AM_RANGE(0x800000, 0x8005ff) AM_RAM AM_DEVREADWRITE("spritegen", seta001_device, spriteylow_r16, spriteylow_w16)     // Sprites Y
 	AM_RANGE(0x800600, 0x800607) AM_RAM AM_DEVREADWRITE("spritegen", seta001_device, spritectrl_r16, spritectrl_w16)
 	AM_RANGE(0x880000, 0x880001) AM_RAM                             // ? 0x4000
 	AM_RANGE(0x900000, 0x903fff) AM_RAM AM_DEVREADWRITE("spritegen", seta001_device, spritecode_r16, spritecode_w16)     // Sprites Code + X + Attr
-	AM_RANGE(0xa00000, 0xa03fff) AM_RAM_WRITE(seta_vram_0_w) AM_SHARE("vram_0") // VRAM 0&1
-	AM_RANGE(0xa80000, 0xa83fff) AM_RAM_WRITE(seta_vram_2_w) AM_SHARE("vram_2") // VRAM 2&3
+	AM_RANGE(0xa00000, 0xa03fff) AM_RAM_WRITE(vram_w<0>) AM_SHARE("vram_0") // VRAM 0&1
+	AM_RANGE(0xa80000, 0xa83fff) AM_RAM_WRITE(vram_w<1>) AM_SHARE("vram_1") // VRAM 2&3
 	AM_RANGE(0xb00000, 0xb00005) AM_RAM AM_SHARE("vctrl_0")     // VRAM 0&1 Ctrl
-	AM_RANGE(0xb80000, 0xb80005) AM_RAM AM_SHARE("vctrl_2")     // VRAM 2&3 Ctrl
+	AM_RANGE(0xb80000, 0xb80005) AM_RAM AM_SHARE("vctrl_1")     // VRAM 2&3 Ctrl
 	AM_RANGE(0xc00000, 0xc03fff) AM_DEVREADWRITE("x1snd", x1_010_device, word_r, word_w)   // Sound
 	AM_RANGE(0xd00000, 0xd00007) AM_DEVREADWRITE8("pit", pit8254_device, read, write, 0x00ff)
 ADDRESS_MAP_END
@@ -2724,15 +2739,15 @@ ADDRESS_MAP_START(seta_state::oisipuzl_map)
 	AM_RANGE(0x400000, 0x400001) AM_WRITENOP                        // ? IRQ Ack
 	AM_RANGE(0x500000, 0x500005) AM_RAM_WRITE(seta_vregs_w) AM_SHARE("vregs")   // Coin Lockout + Video Registers
 	AM_RANGE(0x700000, 0x703fff) AM_DEVREADWRITE("x1snd", x1_010_device, word_r, word_w)   // Sound
-	AM_RANGE(0x800000, 0x803fff) AM_RAM_WRITE(seta_vram_0_w) AM_SHARE("vram_0") // VRAM 0&1
-	AM_RANGE(0x880000, 0x883fff) AM_RAM_WRITE(seta_vram_2_w) AM_SHARE("vram_2") // VRAM 2&3
-/**/AM_RANGE(0x900000, 0x900005) AM_RAM AM_SHARE("vctrl_0")     // VRAM 0&1 Ctrl
-/**/AM_RANGE(0x980000, 0x980005) AM_RAM AM_SHARE("vctrl_2")     // VRAM 2&3 Ctrl
-/**/AM_RANGE(0xa00000, 0xa005ff) AM_RAM AM_DEVREADWRITE("spritegen", seta001_device, spriteylow_r16, spriteylow_w16)     // Sprites Y
+	AM_RANGE(0x800000, 0x803fff) AM_RAM_WRITE(vram_w<0>) AM_SHARE("vram_0") // VRAM 0&1
+	AM_RANGE(0x880000, 0x883fff) AM_RAM_WRITE(vram_w<1>) AM_SHARE("vram_1") // VRAM 2&3
+	AM_RANGE(0x900000, 0x900005) AM_RAM AM_SHARE("vctrl_0")     // VRAM 0&1 Ctrl
+	AM_RANGE(0x980000, 0x980005) AM_RAM AM_SHARE("vctrl_1")     // VRAM 2&3 Ctrl
+	AM_RANGE(0xa00000, 0xa005ff) AM_RAM AM_DEVREADWRITE("spritegen", seta001_device, spriteylow_r16, spriteylow_w16)     // Sprites Y
 	AM_RANGE(0xa00600, 0xa00607) AM_RAM AM_DEVREADWRITE("spritegen", seta001_device, spritectrl_r16, spritectrl_w16)
-/**/AM_RANGE(0xa80000, 0xa80001) AM_RAM                             // ? 0x4000
+	AM_RANGE(0xa80000, 0xa80001) AM_RAM                             // ? 0x4000
 	AM_RANGE(0xb00000, 0xb03fff) AM_RAM AM_DEVREADWRITE("spritegen", seta001_device, spritecode_r16, spritecode_w16)     // Sprites Code + X + Attr
-	AM_RANGE(0xc00400, 0xc00fff) AM_RAM AM_SHARE("paletteram")  // Palette
+	AM_RANGE(0xc00400, 0xc00fff) AM_RAM AM_SHARE("paletteram1")  // Palette
 ADDRESS_MAP_END
 
 
@@ -2753,15 +2768,15 @@ ADDRESS_MAP_START(seta_state::triplfun_map)
 	AM_RANGE(0x400000, 0x400001) AM_WRITENOP                        // ? IRQ Ack
 	AM_RANGE(0x500000, 0x500005) AM_RAM_WRITE(seta_vregs_w) AM_SHARE("vregs")   // Coin Lockout + Video Registers
 	AM_RANGE(0x500006, 0x500007) AM_DEVREADWRITE8("oki", okim6295_device, read, write, 0x00ff) // tfun sound
-	AM_RANGE(0x800000, 0x803fff) AM_RAM_WRITE(seta_vram_0_w) AM_SHARE("vram_0") // VRAM 0&1
-	AM_RANGE(0x880000, 0x883fff) AM_RAM_WRITE(seta_vram_2_w) AM_SHARE("vram_2") // VRAM 2&3
-/**/AM_RANGE(0x900000, 0x900005) AM_RAM AM_SHARE("vctrl_0")     // VRAM 0&1 Ctrl
-/**/AM_RANGE(0x980000, 0x980005) AM_RAM AM_SHARE("vctrl_2")     // VRAM 2&3 Ctrl
-/**/AM_RANGE(0xa00000, 0xa005ff) AM_RAM AM_DEVREADWRITE("spritegen", seta001_device, spriteylow_r16, spriteylow_w16)     // Sprites Y
+	AM_RANGE(0x800000, 0x803fff) AM_RAM_WRITE(vram_w<0>) AM_SHARE("vram_0") // VRAM 0&1
+	AM_RANGE(0x880000, 0x883fff) AM_RAM_WRITE(vram_w<1>) AM_SHARE("vram_1") // VRAM 2&3
+	AM_RANGE(0x900000, 0x900005) AM_RAM AM_SHARE("vctrl_0")     // VRAM 0&1 Ctrl
+	AM_RANGE(0x980000, 0x980005) AM_RAM AM_SHARE("vctrl_1")     // VRAM 2&3 Ctrl
+	AM_RANGE(0xa00000, 0xa005ff) AM_RAM AM_DEVREADWRITE("spritegen", seta001_device, spriteylow_r16, spriteylow_w16)     // Sprites Y
 	AM_RANGE(0xa00600, 0xa00607) AM_RAM AM_DEVREADWRITE("spritegen", seta001_device, spritectrl_r16, spritectrl_w16)
-/**/AM_RANGE(0xa80000, 0xa80001) AM_RAM                             // ? 0x4000
+	AM_RANGE(0xa80000, 0xa80001) AM_RAM                             // ? 0x4000
 	AM_RANGE(0xb00000, 0xb03fff) AM_RAM AM_DEVREADWRITE("spritegen", seta001_device, spritecode_r16, spritecode_w16)     // Sprites Code + X + Attr
-	AM_RANGE(0xc00400, 0xc00fff) AM_RAM AM_SHARE("paletteram")  // Palette
+	AM_RANGE(0xc00400, 0xc00fff) AM_RAM AM_SHARE("paletteram1")  // Palette
 ADDRESS_MAP_END
 
 
@@ -2801,10 +2816,10 @@ ADDRESS_MAP_START(seta_state::kiwame_map)
 	AM_RANGE(0x000000, 0x07ffff) AM_ROM                             // ROM
 	AM_RANGE(0x200000, 0x20ffff) AM_RAM AM_SHARE("nvram")                            // RAM
 	AM_RANGE(0x800000, 0x803fff) AM_RAM AM_DEVREADWRITE("spritegen", seta001_device, spritecode_r16, spritecode_w16)     // Sprites Code + X + Attr
-/**/AM_RANGE(0x900000, 0x900001) AM_RAM                             // ? 0x4000
-/**/AM_RANGE(0xa00000, 0xa005ff) AM_RAM AM_DEVREADWRITE("spritegen", seta001_device, spriteylow_r16, spriteylow_w16)     // Sprites Y
+	AM_RANGE(0x900000, 0x900001) AM_RAM                             // ? 0x4000
+	AM_RANGE(0xa00000, 0xa005ff) AM_RAM AM_DEVREADWRITE("spritegen", seta001_device, spriteylow_r16, spriteylow_w16)     // Sprites Y
 	AM_RANGE(0xa00600, 0xa00607) AM_RAM AM_DEVREADWRITE("spritegen", seta001_device, spritectrl_r16, spritectrl_w16)
-	AM_RANGE(0xb00000, 0xb003ff) AM_RAM AM_SHARE("paletteram")  // Palette
+	AM_RANGE(0xb00000, 0xb003ff) AM_RAM AM_SHARE("paletteram1")  // Palette
 	AM_RANGE(0xc00000, 0xc03fff) AM_DEVREADWRITE("x1snd", x1_010_device, word_r, word_w)   // Sound
 	AM_RANGE(0xd00000, 0xd00009) AM_READ(kiwame_input_r)            // mahjong panel
 	AM_RANGE(0xe00000, 0xe00003) AM_READ(seta_dsw_r)                // DSW
@@ -2837,15 +2852,15 @@ ADDRESS_MAP_START(seta_state::thunderl_map)
 	AM_RANGE(0x400000, 0x40ffff) AM_WRITE(thunderl_protection_w)    // Protection (not in wits)
 	AM_RANGE(0x500000, 0x500001) AM_RAM_WRITE(seta_vregs_w) AM_SHARE("vregs")   // Coin Lockout
 	AM_RANGE(0x600000, 0x600003) AM_READ(seta_dsw_r)                // DSW
-	AM_RANGE(0x700000, 0x7003ff) AM_RAM AM_SHARE("paletteram")  // Palette
+	AM_RANGE(0x700000, 0x7003ff) AM_RAM AM_SHARE("paletteram1")  // Palette
 	AM_RANGE(0xb00000, 0xb00001) AM_READ_PORT("P1")                 // P1
 	AM_RANGE(0xb00002, 0xb00003) AM_READ_PORT("P2")                 // P2
 	AM_RANGE(0xb00004, 0xb00005) AM_READ_PORT("COINS")              // Coins
 	AM_RANGE(0xb0000c, 0xb0000d) AM_READ(thunderl_protection_r  )   // Protection (not in wits)
 	AM_RANGE(0xb00008, 0xb00009) AM_READ_PORT("P3")                 // P3 (wits)
 	AM_RANGE(0xb0000a, 0xb0000b) AM_READ_PORT("P4")                 // P4 (wits)
-/**/AM_RANGE(0xc00000, 0xc00001) AM_RAM                             // ? 0x4000
-/**/AM_RANGE(0xd00000, 0xd005ff) AM_RAM AM_DEVREADWRITE("spritegen", seta001_device, spriteylow_r16, spriteylow_w16)     // Sprites Y
+	AM_RANGE(0xc00000, 0xc00001) AM_RAM                             // ? 0x4000
+	AM_RANGE(0xd00000, 0xd005ff) AM_RAM AM_DEVREADWRITE("spritegen", seta001_device, spriteylow_r16, spriteylow_w16)     // Sprites Y
 	AM_RANGE(0xd00600, 0xd00607) AM_RAM AM_DEVREADWRITE("spritegen", seta001_device, spritectrl_r16, spritectrl_w16)
 	AM_RANGE(0xe00000, 0xe03fff) AM_RAM AM_DEVREADWRITE("spritegen", seta001_device, spritecode_r16, spritecode_w16)     // Sprites Code + X + Attr
 	AM_RANGE(0xe04000, 0xe07fff) AM_RAM                             // (wits)
@@ -2861,15 +2876,15 @@ ADDRESS_MAP_START(seta_state::thunderlbl_map)
 //  AM_RANGE(0x400000, 0x40ffff) AM_WRITE(thunderl_protection_w)    // Protection (not in wits)
 	AM_RANGE(0x500000, 0x500001) AM_RAM_WRITE(seta_vregs_w) AM_SHARE("vregs")   // Coin Lockout
 	AM_RANGE(0x600000, 0x600003) AM_READ(seta_dsw_r)                // DSW
-	AM_RANGE(0x700000, 0x7003ff) AM_RAM AM_SHARE("paletteram")  // Palette
+	AM_RANGE(0x700000, 0x7003ff) AM_RAM AM_SHARE("paletteram1")  // Palette
 	AM_RANGE(0xb00000, 0xb00001) AM_READ_PORT("P1")                 // P1
 	AM_RANGE(0xb00002, 0xb00003) AM_READ_PORT("P2")                 // P2
 	AM_RANGE(0xb00004, 0xb00005) AM_READ_PORT("COINS")              // Coins
 //  AM_RANGE(0xb0000c, 0xb0000d) AM_READ(thunderl_protection_r  )   // Protection (not in wits)
-	AM_RANGE(0xb00008, 0xb00009) AM_READ_PORT("P3") AM_DEVWRITE8("soundlatch", generic_latch_8_device, write, 0xff00) // P3 (wits)
+	AM_RANGE(0xb00008, 0xb00009) AM_READ_PORT("P3") AM_DEVWRITE8("soundlatch1", generic_latch_8_device, write, 0xff00) // P3 (wits)
 	AM_RANGE(0xb0000a, 0xb0000b) AM_READ_PORT("P4")                 // P4 (wits)
-/**/AM_RANGE(0xc00000, 0xc00001) AM_RAM                             // ? 0x4000
-/**/AM_RANGE(0xd00000, 0xd005ff) AM_RAM AM_DEVREADWRITE("spritegen", seta001_device, spriteylow_r16, spriteylow_w16)     // Sprites Y
+	AM_RANGE(0xc00000, 0xc00001) AM_RAM                             // ? 0x4000
+	AM_RANGE(0xd00000, 0xd005ff) AM_RAM AM_DEVREADWRITE("spritegen", seta001_device, spriteylow_r16, spriteylow_w16)     // Sprites Y
 	AM_RANGE(0xd00600, 0xd00607) AM_RAM AM_DEVREADWRITE("spritegen", seta001_device, spritectrl_r16, spritectrl_w16)
 	AM_RANGE(0xe00000, 0xe03fff) AM_RAM AM_DEVREADWRITE("spritegen", seta001_device, spritecode_r16, spritecode_w16)     // Sprites Code + X + Attr
 	AM_RANGE(0xe04000, 0xe07fff) AM_RAM                             // (wits)
@@ -2888,16 +2903,16 @@ ADDRESS_MAP_START(seta_state::wiggie_map)
 	AM_RANGE(0x400000, 0x40ffff) AM_WRITE(thunderl_protection_w)    // Protection (not in wits)
 	AM_RANGE(0x500000, 0x500001) AM_RAM_WRITE(seta_vregs_w) AM_SHARE("vregs")   // Coin Lockout
 	AM_RANGE(0x600000, 0x600003) AM_READ(seta_dsw_r)                // DSW
-	AM_RANGE(0x700000, 0x7003ff) AM_RAM AM_SHARE("paletteram")  // Palette
+	AM_RANGE(0x700000, 0x7003ff) AM_RAM AM_SHARE("paletteram1")  // Palette
 	AM_RANGE(0xb00000, 0xb00001) AM_READ_PORT("P1")                 // P1
 	AM_RANGE(0xb00002, 0xb00003) AM_READ_PORT("P2")                 // P2
 	AM_RANGE(0xb00004, 0xb00005) AM_READ_PORT("COINS")              // Coins
 	AM_RANGE(0xb0000c, 0xb0000d) AM_READ(thunderl_protection_r)     // Protection (not in wits)
 	AM_RANGE(0xb00008, 0xb00009) AM_READ_PORT("P3")                 // P3 (wits)
-	AM_RANGE(0xb00008, 0xb00009) AM_DEVWRITE8("soundlatch", generic_latch_8_device, write, 0xff00)
+	AM_RANGE(0xb00008, 0xb00009) AM_DEVWRITE8("soundlatch1", generic_latch_8_device, write, 0xff00)
 	AM_RANGE(0xb0000a, 0xb0000b) AM_READ_PORT("P4")                 // P4 (wits)
-/**/AM_RANGE(0xc00000, 0xc00001) AM_RAM                             // ? 0x4000
-/**/AM_RANGE(0xd00000, 0xd005ff) AM_RAM AM_DEVREADWRITE("spritegen", seta001_device, spriteylow_r16, spriteylow_w16)     // Sprites Y
+	AM_RANGE(0xc00000, 0xc00001) AM_RAM                             // ? 0x4000
+	AM_RANGE(0xd00000, 0xd005ff) AM_RAM AM_DEVREADWRITE("spritegen", seta001_device, spriteylow_r16, spriteylow_w16)     // Sprites Y
 	AM_RANGE(0xd00600, 0xd00607) AM_RAM AM_DEVREADWRITE("spritegen", seta001_device, spritectrl_r16, spritectrl_w16)
 	AM_RANGE(0xe00000, 0xe03fff) AM_RAM AM_DEVREADWRITE("spritegen", seta001_device, spritecode_r16, spritecode_w16)     // Sprites Code + X + Attr
 	AM_RANGE(0xe04000, 0xe07fff) AM_RAM // (wits)
@@ -2907,7 +2922,7 @@ ADDRESS_MAP_START(seta_state::wiggie_sound_map)
 	AM_RANGE(0x0000, 0x7fff) AM_ROM
 	AM_RANGE(0x8000, 0x87ff) AM_RAM
 	AM_RANGE(0x9800, 0x9800) AM_DEVREADWRITE("oki", okim6295_device, read, write)
-	AM_RANGE(0xa000, 0xa000) AM_DEVREAD("soundlatch", generic_latch_8_device, read)
+	AM_RANGE(0xa000, 0xa000) AM_DEVREAD("soundlatch1", generic_latch_8_device, read)
 ADDRESS_MAP_END
 
 
@@ -2918,7 +2933,7 @@ ADDRESS_MAP_END
 ADDRESS_MAP_START(seta_state::umanclub_map)
 	AM_RANGE(0x000000, 0x03ffff) AM_ROM                             // ROM
 	AM_RANGE(0x200000, 0x20ffff) AM_RAM                             // RAM
-	AM_RANGE(0x300000, 0x3003ff) AM_RAM AM_SHARE("paletteram")  // Palette
+	AM_RANGE(0x300000, 0x3003ff) AM_RAM AM_SHARE("paletteram1")  // Palette
 	AM_RANGE(0x300400, 0x300fff) AM_RAM                             //
 	AM_RANGE(0x400000, 0x400001) AM_READ_PORT("P1")                 // P1
 	AM_RANGE(0x400002, 0x400003) AM_READ_PORT("P2")                 // P2
@@ -2929,7 +2944,7 @@ ADDRESS_MAP_START(seta_state::umanclub_map)
 	AM_RANGE(0x600000, 0x600003) AM_READ(seta_dsw_r)                // DSW
 	AM_RANGE(0xa00000, 0xa005ff) AM_RAM AM_DEVREADWRITE("spritegen", seta001_device, spriteylow_r16, spriteylow_w16)     // Sprites Y
 	AM_RANGE(0xa00600, 0xa00607) AM_RAM AM_DEVREADWRITE("spritegen", seta001_device, spritectrl_r16, spritectrl_w16)
-/**/AM_RANGE(0xa80000, 0xa80001) AM_RAM                             // ? 0x4000
+	AM_RANGE(0xa80000, 0xa80001) AM_RAM                             // ? 0x4000
 	AM_RANGE(0xb00000, 0xb03fff) AM_RAM AM_DEVREADWRITE("spritegen", seta001_device, spritecode_r16, spritecode_w16)     // Sprites Code + X + Attr
 	AM_RANGE(0xc00000, 0xc03fff) AM_DEVREADWRITE("x1snd", x1_010_device, word_r, word_w)   // Sound
 ADDRESS_MAP_END
@@ -2942,7 +2957,7 @@ ADDRESS_MAP_END
 WRITE8_MEMBER(seta_state::utoukond_sound_control_w)
 {
 	if (!BIT(data, 6))
-		m_soundlatch->acknowledge_w(space, 0, 0);
+		m_soundlatch[0]->acknowledge_w(space, 0, 0);
 
 	// other bits used for banking? (low nibble seems to always be 2)
 }
@@ -2955,15 +2970,15 @@ ADDRESS_MAP_START(seta_state::utoukond_map)
 	AM_RANGE(0x400004, 0x400005) AM_READ_PORT("COINS")              // Coins
 	AM_RANGE(0x500000, 0x500005) AM_RAM_WRITE(seta_vregs_w) AM_SHARE("vregs")   // ? Coin Lockout + Video Registers
 	AM_RANGE(0x600000, 0x600003) AM_READ(seta_dsw_r)                // DSW
-	AM_RANGE(0x700400, 0x700fff) AM_RAM AM_SHARE("paletteram")  // Palette
-	AM_RANGE(0x800000, 0x803fff) AM_RAM_WRITE(seta_vram_0_w) AM_SHARE("vram_0") // VRAM 0&1
-	AM_RANGE(0x880000, 0x883fff) AM_RAM_WRITE(seta_vram_2_w) AM_SHARE("vram_2") // VRAM 2&3
+	AM_RANGE(0x700400, 0x700fff) AM_RAM AM_SHARE("paletteram1")  // Palette
+	AM_RANGE(0x800000, 0x803fff) AM_RAM_WRITE(vram_w<0>) AM_SHARE("vram_0") // VRAM 0&1
+	AM_RANGE(0x880000, 0x883fff) AM_RAM_WRITE(vram_w<1>) AM_SHARE("vram_1") // VRAM 2&3
 	AM_RANGE(0x900000, 0x900005) AM_WRITEONLY AM_SHARE("vctrl_0")// VRAM 0&1 Ctrl
-	AM_RANGE(0x980000, 0x980005) AM_WRITEONLY AM_SHARE("vctrl_2")// VRAM 2&3 Ctrl
+	AM_RANGE(0x980000, 0x980005) AM_WRITEONLY AM_SHARE("vctrl_1")// VRAM 2&3 Ctrl
 	AM_RANGE(0xa00000, 0xa005ff) AM_RAM AM_DEVREADWRITE("spritegen", seta001_device, spriteylow_r16, spriteylow_w16)     // Sprites Y
 	AM_RANGE(0xa00600, 0xa00607) AM_RAM AM_DEVREADWRITE("spritegen", seta001_device, spritectrl_r16, spritectrl_w16)
 	AM_RANGE(0xb00000, 0xb03fff) AM_RAM AM_DEVREADWRITE("spritegen", seta001_device, spritecode_r16, spritecode_w16)     // Sprites Code + X + Attr
-	AM_RANGE(0xc00000, 0xc00001) AM_DEVWRITE8("soundlatch", generic_latch_8_device, write, 0x00ff)
+	AM_RANGE(0xc00000, 0xc00001) AM_DEVWRITE8("soundlatch1", generic_latch_8_device, write, 0x00ff)
 	AM_RANGE(0xe00000, 0xe00001) AM_WRITENOP                        // ? ack
 ADDRESS_MAP_END
 
@@ -2999,7 +3014,7 @@ ADDRESS_MAP_START(seta_state::pairlove_map)
 	AM_RANGE(0x500004, 0x500005) AM_READ_PORT("COINS")              // Coins
 	AM_RANGE(0x900000, 0x9001ff) AM_READWRITE(pairlove_prot_r,pairlove_prot_w)
 	AM_RANGE(0xa00000, 0xa03fff) AM_DEVREADWRITE("x1snd", x1_010_device, word_r, word_w)   // Sound
-	AM_RANGE(0xb00000, 0xb00fff) AM_RAM AM_SHARE("paletteram")  // Palette
+	AM_RANGE(0xb00000, 0xb00fff) AM_RAM AM_SHARE("paletteram1")  // Palette
 	AM_RANGE(0xc00000, 0xc03fff) AM_RAM AM_DEVREADWRITE("spritegen", seta001_device, spritecode_r16, spritecode_w16)     // Sprites Code + X + Attr
 	AM_RANGE(0xd00000, 0xd00001) AM_RAM                             // ? 0x4000
 	AM_RANGE(0xe00000, 0xe005ff) AM_RAM AM_DEVREADWRITE("spritegen", seta001_device, spriteylow_r16, spriteylow_w16)     // Sprites Y
@@ -3021,13 +3036,13 @@ ADDRESS_MAP_START(seta_state::crazyfgt_map)
 	AM_RANGE(0x610006, 0x610007) AM_WRITENOP
 	AM_RANGE(0x620000, 0x620003) AM_WRITENOP    // protection
 	AM_RANGE(0x630000, 0x630003) AM_READ(seta_dsw_r)
-	AM_RANGE(0x640400, 0x640fff) AM_WRITEONLY AM_SHARE("paletteram")    // Palette
+	AM_RANGE(0x640400, 0x640fff) AM_WRITEONLY AM_SHARE("paletteram1")    // Palette
 	AM_RANGE(0x650000, 0x650003) AM_DEVWRITE8("ymsnd", ym3812_device, write, 0x00ff)
 	AM_RANGE(0x658000, 0x658001) AM_DEVWRITE8("oki", okim6295_device, write, 0x00ff)
 	AM_RANGE(0x670000, 0x670001) AM_READNOP     // watchdog?
-	AM_RANGE(0x800000, 0x803fff) AM_WRITE(seta_vram_2_w) AM_SHARE("vram_2") // VRAM 2
-	AM_RANGE(0x880000, 0x883fff) AM_WRITE(seta_vram_0_w) AM_SHARE("vram_0") // VRAM 0
-	AM_RANGE(0x900000, 0x900005) AM_RAM AM_SHARE("vctrl_2") // VRAM 2&3 Ctrl
+	AM_RANGE(0x800000, 0x803fff) AM_WRITE(vram_w<1>) AM_SHARE("vram_1") // VRAM 2
+	AM_RANGE(0x880000, 0x883fff) AM_WRITE(vram_w<0>) AM_SHARE("vram_0") // VRAM 0
+	AM_RANGE(0x900000, 0x900005) AM_RAM AM_SHARE("vctrl_1") // VRAM 2&3 Ctrl
 	AM_RANGE(0x980000, 0x980005) AM_RAM AM_SHARE("vctrl_0") // VRAM 0&1 Ctrl
 	AM_RANGE(0xa00000, 0xa005ff) AM_RAM AM_DEVREADWRITE("spritegen", seta001_device, spriteylow_r16, spriteylow_w16) // Sprites Y
 	AM_RANGE(0xa00600, 0xa00607) AM_RAM AM_DEVREADWRITE("spritegen", seta001_device, spritectrl_r16, spritectrl_w16)
@@ -3214,7 +3229,7 @@ ADDRESS_MAP_START(jockeyc_state::jockeyc_map)
 	AM_RANGE(0x900000, 0x903fff) AM_DEVREADWRITE("x1snd", x1_010_device, word_r, word_w)  // Sound
 
 	AM_RANGE(0xa00000, 0xa00005) AM_WRITEONLY AM_SHARE("vctrl_0")   // VRAM 0&1 Ctrl
-	AM_RANGE(0xb00000, 0xb03fff) AM_RAM_WRITE(seta_vram_0_w) AM_SHARE("vram_0") // VRAM 0&1
+	AM_RANGE(0xb00000, 0xb03fff) AM_RAM_WRITE(vram_w<0>) AM_SHARE("vram_0") // VRAM 0&1
 	AM_RANGE(0xb04000, 0xb0ffff) AM_WRITENOP // likely left-over
 
 	AM_RANGE(0xc00000, 0xc00001) AM_RAM     // ? 0x4000
@@ -3296,7 +3311,7 @@ ADDRESS_MAP_START(jockeyc_state::inttoote_map)
 	AM_RANGE(0x900000, 0x903fff) AM_DEVREADWRITE("x1snd", x1_010_device, word_r, word_w)   // Sound
 
 	AM_RANGE(0xa00000, 0xa00005) AM_WRITEONLY AM_SHARE("vctrl_0")   // VRAM 0&1 Ctrl
-	AM_RANGE(0xb00000, 0xb03fff) AM_RAM_WRITE(seta_vram_0_w) AM_SHARE("vram_0") // VRAM 0&1
+	AM_RANGE(0xb00000, 0xb03fff) AM_RAM_WRITE(vram_w<0>) AM_SHARE("vram_0") // VRAM 0&1
 
 	AM_RANGE(0xc00000, 0xc00001) AM_RAM     // ? 0x4000
 
@@ -3319,10 +3334,7 @@ ADDRESS_MAP_END
 
 WRITE8_MEMBER(seta_state::sub_bankswitch_w)
 {
-	uint8_t *rom = memregion("sub")->base();
-	int bank = data >> 4;
-
-	membank("bank1")->set_base(&rom[bank * 0x4000 + 0xc000]);
+	m_subbank->set_entry(data >> 4);
 }
 
 WRITE8_MEMBER(seta_state::sub_bankswitch_lockout_w)
@@ -3341,7 +3353,7 @@ READ8_MEMBER(seta_state::ff_r){return 0xff;}
 ADDRESS_MAP_START(seta_state::tndrcade_sub_map)
 	AM_RANGE(0x0000, 0x01ff) AM_RAM                             // RAM
 	AM_RANGE(0x0800, 0x0800) AM_READ(ff_r)                      // ? (bits 0/1/2/3: 1 -> do test 0-ff/100-1e0/5001-57ff/banked rom)
-	//AM_RANGE(0x0800, 0x0800) AM_DEVREAD("soundlatch", generic_latch_8_device, read)             //
+	//AM_RANGE(0x0800, 0x0800) AM_DEVREAD("soundlatch1", generic_latch_8_device, read)             //
 	//AM_RANGE(0x0801, 0x0801) AM_DEVREAD("soundlatch2", generic_latch_8_device, read)            //
 	AM_RANGE(0x1000, 0x1000) AM_READ_PORT("P1")                 // P1
 	AM_RANGE(0x1000, 0x1000) AM_WRITE(sub_bankswitch_lockout_w) // ROM Bank + Coin Lockout
@@ -3351,7 +3363,7 @@ ADDRESS_MAP_START(seta_state::tndrcade_sub_map)
 	AM_RANGE(0x3000, 0x3001) AM_DEVWRITE("ym2", ym3812_device, write)
 	AM_RANGE(0x5000, 0x57ff) AM_RAM AM_SHARE("sharedram")       // Shared RAM
 	AM_RANGE(0x6000, 0x7fff) AM_ROM                             // ROM
-	AM_RANGE(0x8000, 0xbfff) AM_ROMBANK("bank1")                        // Banked ROM
+	AM_RANGE(0x8000, 0xbfff) AM_ROMBANK("subbank")                        // Banked ROM
 	AM_RANGE(0xc000, 0xffff) AM_ROM                             // ROM
 ADDRESS_MAP_END
 
@@ -3362,7 +3374,7 @@ ADDRESS_MAP_END
 
 ADDRESS_MAP_START(seta_state::twineagl_sub_map)
 	AM_RANGE(0x0000, 0x01ff) AM_RAM                         // RAM
-	AM_RANGE(0x0800, 0x0800) AM_DEVREAD("soundlatch", generic_latch_8_device, read)         //
+	AM_RANGE(0x0800, 0x0800) AM_DEVREAD("soundlatch1", generic_latch_8_device, read)         //
 	AM_RANGE(0x0801, 0x0801) AM_DEVREAD("soundlatch2", generic_latch_8_device, read)            //
 	AM_RANGE(0x1000, 0x1000) AM_READ_PORT("P1")             // P1
 	AM_RANGE(0x1000, 0x1000) AM_WRITE(sub_bankswitch_lockout_w) // ROM Bank + Coin Lockout
@@ -3370,7 +3382,7 @@ ADDRESS_MAP_START(seta_state::twineagl_sub_map)
 	AM_RANGE(0x1002, 0x1002) AM_READ_PORT("COINS")          // Coins
 	AM_RANGE(0x5000, 0x57ff) AM_RAM AM_SHARE("sharedram")       // Shared RAM
 	AM_RANGE(0x7000, 0x7fff) AM_ROM                         // ROM
-	AM_RANGE(0x8000, 0xbfff) AM_ROMBANK("bank1")                    // Banked ROM
+	AM_RANGE(0x8000, 0xbfff) AM_ROMBANK("subbank")                    // Banked ROM
 	AM_RANGE(0xc000, 0xffff) AM_ROM                         // ROM
 ADDRESS_MAP_END
 
@@ -3404,13 +3416,13 @@ READ8_MEMBER(seta_state::downtown_ip_r)
 
 ADDRESS_MAP_START(seta_state::downtown_sub_map)
 	AM_RANGE(0x0000, 0x01ff) AM_RAM                         // RAM
-	AM_RANGE(0x0800, 0x0800) AM_DEVREAD("soundlatch", generic_latch_8_device, read)         //
+	AM_RANGE(0x0800, 0x0800) AM_DEVREAD("soundlatch1", generic_latch_8_device, read)         //
 	AM_RANGE(0x0801, 0x0801) AM_DEVREAD("soundlatch2", generic_latch_8_device, read)            //
 	AM_RANGE(0x1000, 0x1007) AM_READ(downtown_ip_r)         // Input Ports
 	AM_RANGE(0x1000, 0x1000) AM_WRITE(sub_bankswitch_lockout_w) // ROM Bank + Coin Lockout
 	AM_RANGE(0x5000, 0x57ff) AM_RAM AM_SHARE("sharedram")       // Shared RAM
 	AM_RANGE(0x7000, 0x7fff) AM_ROM                         // ROM
-	AM_RANGE(0x8000, 0xbfff) AM_ROMBANK("bank1")                    // Banked ROM
+	AM_RANGE(0x8000, 0xbfff) AM_ROMBANK("subbank")                    // Banked ROM
 	AM_RANGE(0xc000, 0xffff) AM_ROM                         // ROM
 ADDRESS_MAP_END
 
@@ -3432,7 +3444,7 @@ WRITE8_MEMBER(seta_state::calibr50_sub_bankswitch_w)
 
 	// Bit 3: NMICLR
 	if (!BIT(data, 3))
-		m_soundlatch->acknowledge_w(space, 0, 0);
+		m_soundlatch[0]->acknowledge_w(space, 0, 0);
 
 	// Bit 2: IRQCLR
 	if (!BIT(data, 2))
@@ -3443,15 +3455,15 @@ WRITE8_MEMBER(seta_state::calibr50_sub_bankswitch_w)
 
 WRITE8_MEMBER(seta_state::calibr50_soundlatch2_w)
 {
-	m_soundlatch2->write(space,0,data);
+	m_soundlatch[1]->write(space,0,data);
 	m_subcpu->spin_until_time(attotime::from_usec(50));  // Allow the other cpu to reply
 }
 
 ADDRESS_MAP_START(seta_state::calibr50_sub_map)
 	AM_RANGE(0x0000, 0x1fff) AM_DEVREADWRITE("x1snd", x1_010_device, read ,write) // Sound
-	AM_RANGE(0x4000, 0x4000) AM_DEVREAD("soundlatch", generic_latch_8_device, read)             // From Main CPU
+	AM_RANGE(0x4000, 0x4000) AM_DEVREAD("soundlatch1", generic_latch_8_device, read)             // From Main CPU
 	AM_RANGE(0x4000, 0x4000) AM_WRITE(calibr50_sub_bankswitch_w)        // Bankswitching
-	AM_RANGE(0x8000, 0xbfff) AM_ROMBANK("bank1")                        // Banked ROM
+	AM_RANGE(0x8000, 0xbfff) AM_ROMBANK("subbank")                        // Banked ROM
 	AM_RANGE(0xc000, 0xffff) AM_ROM                             // ROM
 	AM_RANGE(0xc000, 0xc000) AM_WRITE(calibr50_soundlatch2_w)   // To Main CPU
 ADDRESS_MAP_END
@@ -3463,7 +3475,7 @@ ADDRESS_MAP_END
 
 ADDRESS_MAP_START(seta_state::metafox_sub_map)
 	AM_RANGE(0x0000, 0x01ff) AM_RAM                         // RAM
-	AM_RANGE(0x0800, 0x0800) AM_DEVREAD("soundlatch", generic_latch_8_device, read)         //
+	AM_RANGE(0x0800, 0x0800) AM_DEVREAD("soundlatch1", generic_latch_8_device, read)         //
 	AM_RANGE(0x0801, 0x0801) AM_DEVREAD("soundlatch2", generic_latch_8_device, read)            //
 	AM_RANGE(0x1000, 0x1000) AM_READ_PORT("COINS")          // Coins
 	AM_RANGE(0x1000, 0x1000) AM_WRITE(sub_bankswitch_lockout_w) // ROM Bank + Coin Lockout
@@ -3472,7 +3484,7 @@ ADDRESS_MAP_START(seta_state::metafox_sub_map)
 	AM_RANGE(0x1006, 0x1006) AM_READ_PORT("P2")             // P2
 	AM_RANGE(0x5000, 0x57ff) AM_RAM AM_SHARE("sharedram")       // Shared RAM
 	AM_RANGE(0x7000, 0x7fff) AM_ROM                         // ROM
-	AM_RANGE(0x8000, 0xbfff) AM_ROMBANK("bank1")                    // Banked ROM
+	AM_RANGE(0x8000, 0xbfff) AM_ROMBANK("subbank")                    // Banked ROM
 	AM_RANGE(0xc000, 0xffff) AM_ROM                         // ROM
 ADDRESS_MAP_END
 
@@ -3491,7 +3503,7 @@ ADDRESS_MAP_START(seta_state::utoukond_sound_io_map)
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	AM_RANGE(0x00, 0x03) AM_DEVREADWRITE("ymsnd", ym3438_device, read, write)
 	AM_RANGE(0x80, 0x80) AM_WRITE(utoukond_sound_control_w)
-	AM_RANGE(0xc0, 0xc0) AM_DEVREAD("soundlatch", generic_latch_8_device, read)
+	AM_RANGE(0xc0, 0xc0) AM_DEVREAD("soundlatch1", generic_latch_8_device, read)
 ADDRESS_MAP_END
 
 
@@ -7837,7 +7849,7 @@ MACHINE_CONFIG_START(seta_state::twineagl)
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
 
-	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
+	MCFG_GENERIC_LATCH_8_ADD("soundlatch1")
 	MCFG_GENERIC_LATCH_8_ADD("soundlatch2")
 
 	MCFG_SOUND_ADD("x1snd", X1_010, 16000000)   /* 16 MHz */
@@ -7883,7 +7895,7 @@ MACHINE_CONFIG_START(seta_state::downtown)
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
 
-	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
+	MCFG_GENERIC_LATCH_8_ADD("soundlatch1")
 	MCFG_GENERIC_LATCH_8_ADD("soundlatch2")
 
 	MCFG_SOUND_ADD("x1snd", X1_010, 16000000)   /* 16 MHz */
@@ -7967,12 +7979,12 @@ MACHINE_CONFIG_START(seta_state::usclssic)
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
 
-	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
+	MCFG_GENERIC_LATCH_8_ADD("soundlatch1")
 	MCFG_GENERIC_LATCH_DATA_PENDING_CB(INPUTLINE("sub", INPUT_LINE_NMI))
 	MCFG_GENERIC_LATCH_SEPARATE_ACKNOWLEDGE(true)
 
 	MCFG_SOUND_ADD("x1snd", X1_010, 16000000)   /* 16 MHz */
-	MCFG_X1_010_ADDRESS(0x1000)
+	MCFG_X1_010_ADDRESS_XOR(0x1000)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 MACHINE_CONFIG_END
 
@@ -8025,14 +8037,14 @@ MACHINE_CONFIG_START(seta_state::calibr50)
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
 
-	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
+	MCFG_GENERIC_LATCH_8_ADD("soundlatch1")
 	MCFG_GENERIC_LATCH_DATA_PENDING_CB(INPUTLINE("sub", INPUT_LINE_NMI))
 	MCFG_GENERIC_LATCH_SEPARATE_ACKNOWLEDGE(true)
 
 	MCFG_GENERIC_LATCH_8_ADD("soundlatch2")
 
 	MCFG_SOUND_ADD("x1snd", X1_010, 16000000)   /* 16 MHz */
-	MCFG_X1_010_ADDRESS(0x1000)
+	MCFG_X1_010_ADDRESS_XOR(0x1000)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
 MACHINE_CONFIG_END
 
@@ -8075,7 +8087,7 @@ MACHINE_CONFIG_START(seta_state::metafox)
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
 
-	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
+	MCFG_GENERIC_LATCH_8_ADD("soundlatch1")
 	MCFG_GENERIC_LATCH_8_ADD("soundlatch2")
 
 	MCFG_SOUND_ADD("x1snd", X1_010, 16000000)   /* 16 MHz */
@@ -8253,10 +8265,11 @@ ADDRESS_MAP_START(seta_state::blockcarb_sound_portmap)
 	ADDRESS_MAP_UNMAP_HIGH
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
 //  AM_RANGE(0x00, 0x01) AM_MIRROR(0x3e) AM_DEVREADWRITE("ymsnd", ym2151_device, read, write)
-//  AM_RANGE(0xc0, 0xc0) AM_MIRROR(0x3f) AM_DEVREAD("soundlatch", generic_latch_8_device, read)
+//  AM_RANGE(0xc0, 0xc0) AM_MIRROR(0x3f) AM_DEVREAD("soundlatch1", generic_latch_8_device, read)
 ADDRESS_MAP_END
 
-MACHINE_CONFIG_DERIVED(seta_state::blockcarb, blockcar)
+MACHINE_CONFIG_START(seta_state::blockcarb)
+	blockcar(config);
 
 	/* basic machine hardware */
 	MCFG_CPU_MODIFY("maincpu")
@@ -8649,7 +8662,8 @@ MACHINE_CONFIG_END
                                 Zombie Raid
 ***************************************************************************/
 
-MACHINE_CONFIG_DERIVED(seta_state::zombraid, gundhara)
+MACHINE_CONFIG_START(seta_state::zombraid)
+	gundhara(config);
 
 	/* basic machine hardware */
 	MCFG_CPU_MODIFY("maincpu")
@@ -8863,7 +8877,8 @@ MACHINE_CONFIG_START(seta_state::keroppij)
 	MCFG_SOUND_ROUTE(1, "rspeaker", 1.0)
 MACHINE_CONFIG_END
 
-MACHINE_CONFIG_DERIVED(seta_state::keroppi, keroppij)
+MACHINE_CONFIG_START(seta_state::keroppi)
+	keroppij(config);
 	MCFG_GFXDECODE_MODIFY("gfxdecode", tndrcade)
 MACHINE_CONFIG_END
 
@@ -9259,11 +9274,12 @@ ADDRESS_MAP_START(seta_state::thunderlbl_sound_portmap)
 	ADDRESS_MAP_UNMAP_HIGH
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	AM_RANGE(0x00, 0x01) AM_MIRROR(0x3e) AM_DEVREADWRITE("ymsnd", ym2151_device, read, write)
-	AM_RANGE(0xc0, 0xc0) AM_MIRROR(0x3f) AM_DEVREAD("soundlatch", generic_latch_8_device, read)
+	AM_RANGE(0xc0, 0xc0) AM_MIRROR(0x3f) AM_DEVREAD("soundlatch1", generic_latch_8_device, read)
 ADDRESS_MAP_END
 
 
-MACHINE_CONFIG_DERIVED(seta_state::thunderlbl, thunderl)
+MACHINE_CONFIG_START(seta_state::thunderlbl)
+	thunderl(config);
 
 	/* basic machine hardware */
 	MCFG_CPU_MODIFY("maincpu")
@@ -9280,7 +9296,7 @@ MACHINE_CONFIG_DERIVED(seta_state::thunderlbl, thunderl)
 	MCFG_YM2151_ADD("ymsnd", 10000000/2)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 
-	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
+	MCFG_GENERIC_LATCH_8_ADD("soundlatch1")
 	MCFG_GENERIC_LATCH_DATA_PENDING_CB(INPUTLINE("audiocpu", 0))
 MACHINE_CONFIG_END
 
@@ -9319,11 +9335,12 @@ MACHINE_CONFIG_START(seta_state::wiggie)
 	MCFG_OKIM6295_ADD("oki", 1000000, PIN7_HIGH)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 
-	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
+	MCFG_GENERIC_LATCH_8_ADD("soundlatch1")
 	MCFG_GENERIC_LATCH_DATA_PENDING_CB(INPUTLINE("audiocpu", 0))
 MACHINE_CONFIG_END
 
-MACHINE_CONFIG_DERIVED(seta_state::superbar, wiggie)
+MACHINE_CONFIG_START(seta_state::superbar)
+	wiggie(config);
 
 	MCFG_GFXDECODE_MODIFY("gfxdecode", superbar)
 MACHINE_CONFIG_END
@@ -9434,7 +9451,7 @@ MACHINE_CONFIG_START(seta_state::utoukond)
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
 
-	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
+	MCFG_GENERIC_LATCH_8_ADD("soundlatch1")
 	MCFG_GENERIC_LATCH_DATA_PENDING_CB(INPUTLINE("audiocpu", 0))
 	MCFG_GENERIC_LATCH_SEPARATE_ACKNOWLEDGE(true)
 
@@ -9545,7 +9562,8 @@ MACHINE_CONFIG_START(seta_state::zingzip)
 MACHINE_CONFIG_END
 
 
-MACHINE_CONFIG_DERIVED(seta_state::zingzipbl, zingzip)
+MACHINE_CONFIG_START(seta_state::zingzipbl)
+	zingzip(config);
 	MCFG_GFXDECODE_MODIFY("gfxdecode", zingzipbl)
 
 	MCFG_DEVICE_REMOVE("maincpu")
@@ -9726,7 +9744,8 @@ MACHINE_CONFIG_END
                              International Toote
 ***************************************************************************/
 
-MACHINE_CONFIG_DERIVED(jockeyc_state::inttoote, jockeyc)
+MACHINE_CONFIG_START(jockeyc_state::inttoote)
+	jockeyc(config);
 	MCFG_DEVICE_REMOVE("maincpu")
 	MCFG_CPU_ADD("maincpu", M68000, XTAL(16'000'000)) // TMP68HC000N-16
 	MCFG_CPU_PROGRAM_MAP(inttoote_map)
@@ -11693,6 +11712,21 @@ READ16_MEMBER(seta_state::twineagl_debug_r)
 	return 0;
 }
 
+DRIVER_INIT_MEMBER(seta_state,bank6502)
+{
+	uint8_t *rom = memregion("sub")->base();
+	uint32_t max = (memregion("sub")->bytes() - 0xc000) / 0x4000;
+
+	if (max > 1) // if 6502 ROM is bankswitched(size is larger than 0x4000)
+	{
+		m_subbank->configure_entries(0, max, &rom[0xc000], 0x4000);
+		if (max < 16)
+			m_subbank->configure_entries(max, 16-max, &rom[0xc000], 0x4000); // Unverified : Bankswitching is Mirrored?
+	}
+	else
+		m_subbank->configure_entries(0, 16, &rom[0xc000], 0); // Not bankswitched : for avoid crashing when accessing bank functions
+}
+
 /* Extra RAM ? Check code at 0x00ba90 */
 /* 2000F8 = A3 enables it, 2000F8 = 00 disables? see downtown too */
 READ16_MEMBER(seta_state::twineagl_200100_r)
@@ -11713,6 +11747,7 @@ WRITE16_MEMBER(seta_state::twineagl_200100_w)
 
 DRIVER_INIT_MEMBER(seta_state,twineagl)
 {
+	DRIVER_INIT_CALL(bank6502);
 	/* debug? */
 	m_maincpu->space(AS_PROGRAM).install_read_handler(0x800000, 0x8000ff, read16_delegate(FUNC(seta_state::twineagl_debug_r),this));
 
@@ -11746,6 +11781,11 @@ WRITE16_MEMBER(seta_state::downtown_protection_w)
 
 DRIVER_INIT_MEMBER(seta_state,downtown)
 {
+	DRIVER_INIT_CALL(bank6502);
+
+	m_downtown_protection = make_unique_clear<uint16_t[]>(0x200/2);
+	save_pointer(NAME(m_downtown_protection.get()),0x200/2);
+
 	m_maincpu->space(AS_PROGRAM).install_readwrite_handler(0x200000, 0x2001ff, read16_delegate(FUNC(seta_state::downtown_protection_r),this), write16_delegate(FUNC(seta_state::downtown_protection_w),this));
 }
 
@@ -11766,6 +11806,7 @@ READ16_MEMBER(seta_state::arbalest_debug_r)
 
 DRIVER_INIT_MEMBER(seta_state,arbalest)
 {
+	DRIVER_INIT_CALL(bank6502);
 	m_maincpu->space(AS_PROGRAM).install_read_handler(0x80000, 0x8000f, read16_delegate(FUNC(seta_state::arbalest_debug_r),this));
 }
 
@@ -11794,6 +11835,7 @@ READ16_MEMBER(seta_state::metafox_protection_r)
 
 DRIVER_INIT_MEMBER(seta_state,metafox)
 {
+	DRIVER_INIT_CALL(bank6502);
 	m_maincpu->space(AS_PROGRAM).install_read_handler(0x21c000, 0x21ffff,read16_delegate(FUNC(seta_state::metafox_protection_r),this));
 }
 
@@ -11816,7 +11858,7 @@ DRIVER_INIT_MEMBER(seta_state,blandia)
 		buf[rpos] = rom[rpos*2+1];
 	}
 
-	memcpy( rom, &buf[0], rom_size );
+	std::copy( buf.begin(), buf.end(), &rom[0] );
 
 	rom = memregion("gfx3")->base() + 0x40000;
 
@@ -11825,7 +11867,7 @@ DRIVER_INIT_MEMBER(seta_state,blandia)
 		buf[rpos] = rom[rpos*2+1];
 	}
 
-	memcpy( rom, &buf[0], rom_size );
+	std::copy( buf.begin(), buf.end(), &rom[0] );
 }
 
 
@@ -11852,6 +11894,14 @@ DRIVER_INIT_MEMBER(seta_state,rezon)
 	m_maincpu->space(AS_PROGRAM).nop_read(0x500006, 0x500007);   // irq ack?
 }
 
+DRIVER_INIT_MEMBER(seta_state,pairlove)
+{
+	m_pairslove_protram = make_unique_clear<uint16_t[]>(0x200/2);
+	m_pairslove_protram_old = make_unique_clear<uint16_t[]>(0x200/2);
+	save_pointer(NAME(m_pairslove_protram.get()), 0x200/2);
+	save_pointer(NAME(m_pairslove_protram_old.get()), 0x200/2);
+}
+
 DRIVER_INIT_MEMBER(seta_state,wiggie)
 {
 	uint8_t *src;
@@ -11863,7 +11913,7 @@ DRIVER_INIT_MEMBER(seta_state,wiggie)
 	len = memregion("maincpu")->bytes();
 	for (i = 0;i < len;i += 16)
 	{
-		memcpy(temp,&src[i],16);
+		std::copy(&src[i],&src[i+16],std::begin(temp));
 		for (j = 0;j < 16;j++)
 		{
 			static const int convtable[16] =
@@ -11913,8 +11963,8 @@ DRIVER_INIT_MEMBER(jockeyc_state,inttoote)
 ***************************************************************************/
 
 /* 68000 + 65C02 */
-GAME( 1987, tndrcade,  0,        tndrcade,  tndrcade,  seta_state,     0,         ROT270, "Seta (Taito license)",      "Thundercade / Twin Formation" , 0) // Title/License: DSW
-GAME( 1987, tndrcadej, tndrcade, tndrcade,  tndrcadj,  seta_state,     0,         ROT270, "Seta (Taito license)",      "Tokusyu Butai U.A.G. (Japan)" , 0) // License: DSW
+GAME( 1987, tndrcade,  0,        tndrcade,  tndrcade,  seta_state,     bank6502,  ROT270, "Seta (Taito license)",      "Thundercade / Twin Formation" , 0) // Title/License: DSW
+GAME( 1987, tndrcadej, tndrcade, tndrcade,  tndrcadj,  seta_state,     bank6502,  ROT270, "Seta (Taito license)",      "Tokusyu Butai U.A.G. (Japan)" , 0) // License: DSW
 
 GAME( 1988, twineagl,  0,        twineagl,  twineagl,  seta_state,     twineagl,  ROT270, "Seta (Taito license)",      "Twin Eagle - Revenge Joe's Brother" , 0) // Country/License: DSW
 
@@ -11923,9 +11973,9 @@ GAME( 1989, downtown2, downtown, downtown,  downtown,  seta_state,     downtown,
 GAME( 1989, downtownj, downtown, downtown,  downtown,  seta_state,     downtown,  ROT270, "Seta",                      "DownTown / Mokugeki (joystick hack)" , 0) // Country/License: DSW
 GAME( 1989, downtownp, downtown, downtown,  downtown,  seta_state,     downtown,  ROT270, "Seta",                      "DownTown / Mokugeki (prototype)" , 0) // Country/License: DSW
 
-GAME( 1989, usclssic,  0,        usclssic,  usclssic,  seta_state,     0,         ROT270, "Seta",                      "U.S. Classic" , 0) // Country/License: DSW
+GAME( 1989, usclssic,  0,        usclssic,  usclssic,  seta_state,     bank6502,  ROT270, "Seta",                      "U.S. Classic" , 0) // Country/License: DSW
 
-GAME( 1989, calibr50,  0,        calibr50,  calibr50,  seta_state,     0,         ROT270, "Athena / Seta",             "Caliber 50" , 0) // Country/License: DSW
+GAME( 1989, calibr50,  0,        calibr50,  calibr50,  seta_state,     bank6502,  ROT270, "Athena / Seta",             "Caliber 50" , 0) // Country/License: DSW
 
 GAME( 1989, arbalest,  0,        metafox,   arbalest,  seta_state,     arbalest,  ROT270, "Seta",                      "Arbalester" , 0) // Country/License: DSW
 
@@ -11954,7 +12004,7 @@ GAME( 1992, rezont,    rezon,    rezon,     rezont,    seta_state,     rezon,   
 
 GAME( 1991, stg,       0,        drgnunit,  stg,       seta_state,     0,         ROT270, "Athena / Tecmo",            "Strike Gunner S.T.G", 0 )
 
-GAME( 1991, pairlove,  0,        pairlove,  pairlove,  seta_state,     0,         ROT270, "Athena",                    "Pairs Love", 0 )
+GAME( 1991, pairlove,  0,        pairlove,  pairlove,  seta_state,     pairlove,  ROT270, "Athena",                    "Pairs Love", 0 )
 
 GAME( 1992, blandia,   0,        blandia,   blandia,   seta_state,     blandia,   ROT0,   "Allumer",                   "Blandia", MACHINE_IMPERFECT_GRAPHICS )
 GAME( 1992, blandiap,  blandia,  blandiap,  blandia,   seta_state,     0,         ROT0,   "Allumer",                   "Blandia (prototype)", MACHINE_IMPERFECT_GRAPHICS )
@@ -11968,7 +12018,7 @@ GAME( 1992, neobattl,  0,        umanclub,  neobattl,  seta_state,     0,       
 
 GAME( 1992, umanclub,  0,        umanclub,  umanclub,  seta_state,     0,         ROT0,   "Banpresto / Tsuburaya Productions", "Ultraman Club - Tatakae! Ultraman Kyoudai!!", 0 )
 
-GAME( 1992, zingzip,   0,        zingzip,   zingzip,   seta_state,     0,         ROT270, "Allumer / Tecmo",           "Zing Zing Zip", 0 )
+GAME( 1992, zingzip,   0,        zingzip,   zingzip,   seta_state,     0,         ROT270, "Allumer / Tecmo",           "Zing Zing Zip", 0 ) // This set has Chinese Characters in Title screen, it distributed for Chinese market/or Title: DSW?
 GAME( 1992, zingzipbl, zingzip,  zingzipbl, zingzip,   seta_state,     0,         ROT270, "bootleg",                   "Zing Zing Zip (bootleg)", MACHINE_NOT_WORKING )
 
 GAME( 1993, atehate,   0,        atehate,   atehate,   seta_state,     0,         ROT0,   "Athena",                    "Athena no Hatena ?", 0 )

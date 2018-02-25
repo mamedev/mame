@@ -699,7 +699,8 @@ MACHINE_CONFIG_START(dacholer_state::dacholer)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.30)
 MACHINE_CONFIG_END
 
-MACHINE_CONFIG_DERIVED(dacholer_state::itaten, dacholer)
+MACHINE_CONFIG_START(dacholer_state::itaten)
+	dacholer(config);
 	MCFG_CPU_MODIFY("maincpu")
 	MCFG_CPU_PROGRAM_MAP(itaten_main_map)
 

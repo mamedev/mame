@@ -78,16 +78,17 @@ TODO:
 class caswin_state : public driver_device
 {
 public:
-	caswin_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag),
+	caswin_state(const machine_config &mconfig, device_type type, const char *tag) :
+		driver_device(mconfig, type, tag),
 		m_sc0_vram(*this, "sc0_vram"),
 		m_sc0_attr(*this, "sc0_attr"),
 		m_maincpu(*this, "maincpu"),
-		m_gfxdecode(*this, "gfxdecode") { }
+		m_gfxdecode(*this, "gfxdecode")
+	{ }
 
-	required_shared_ptr<uint8_t> m_sc0_vram;
-	required_shared_ptr<uint8_t> m_sc0_attr;
-	tilemap_t *m_sc0_tilemap;
+	void vvillage(machine_config &config);
+
+protected:
 	DECLARE_WRITE8_MEMBER(sc0_vram_w);
 	DECLARE_WRITE8_MEMBER(sc0_attr_w);
 	DECLARE_WRITE8_MEMBER(vvillage_scroll_w);
@@ -96,14 +97,19 @@ public:
 	DECLARE_WRITE8_MEMBER(vvillage_output_w);
 	DECLARE_WRITE8_MEMBER(vvillage_lamps_w);
 	TILE_GET_INFO_MEMBER(get_sc0_tile_info);
-	virtual void video_start() override;
 	DECLARE_PALETTE_INIT(caswin);
 	uint32_t screen_update_vvillage(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
-	required_device<cpu_device> m_maincpu;
-	required_device<gfxdecode_device> m_gfxdecode;
-	void vvillage(machine_config &config);
+
+	virtual void video_start() override;
 	void vvillage_io(address_map &map);
 	void vvillage_mem(address_map &map);
+
+private:
+	required_shared_ptr<uint8_t> m_sc0_vram;
+	required_shared_ptr<uint8_t> m_sc0_attr;
+	tilemap_t *m_sc0_tilemap;
+	required_device<cpu_device> m_maincpu;
+	required_device<gfxdecode_device> m_gfxdecode;
 };
 
 
@@ -326,10 +332,10 @@ PALETTE_INIT_MEMBER(caswin_state, caswin)
 
 MACHINE_CONFIG_START(caswin_state::vvillage)
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", Z80,4000000)         /* ? MHz */
+	MCFG_CPU_ADD("maincpu", Z80, 4000000)         /* ? MHz */
 	MCFG_CPU_PROGRAM_MAP(vvillage_mem)
 	MCFG_CPU_IO_MAP(vvillage_io)
-	MCFG_CPU_VBLANK_INT_DRIVER("screen", caswin_state,  irq0_line_hold)
+	MCFG_CPU_VBLANK_INT_DRIVER("screen", caswin_state, irq0_line_hold)
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)

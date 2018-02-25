@@ -2405,7 +2405,7 @@ MACHINE_CONFIG_START(p500_state::p500_ntsc)
 	MCFG_QUICKLOAD_ADD("quickload", p500_state, p500, "p00,prg", CBM_QUICKLOAD_DELAY_SECONDS)
 
 	// internal ram
-	MCFG_FRAGMENT_ADD(_128k)
+	_128k(config);
 
 	// software list
 	MCFG_SOFTWARE_LIST_ADD("cart_list", "cbm2_cart")
@@ -2518,7 +2518,7 @@ MACHINE_CONFIG_START(p500_state::p500_pal)
 	MCFG_QUICKLOAD_ADD("quickload", p500_state, p500, "p00,prg", CBM_QUICKLOAD_DELAY_SECONDS)
 
 	// internal ram
-	MCFG_FRAGMENT_ADD(_128k)
+	_128k(config);
 
 	// software list
 	MCFG_SOFTWARE_LIST_ADD("cart_list", "cbm2_cart")
@@ -2641,8 +2641,9 @@ MACHINE_CONFIG_END
 //  MACHINE_CONFIG( b128 )
 //-------------------------------------------------
 
-MACHINE_CONFIG_DERIVED(cbm2_state::b128, cbm2lp_ntsc)
-	MCFG_FRAGMENT_ADD(_128k)
+MACHINE_CONFIG_START(cbm2_state::b128)
+	cbm2lp_ntsc(config);
+	_128k(config);
 MACHINE_CONFIG_END
 
 
@@ -2650,8 +2651,9 @@ MACHINE_CONFIG_END
 //  MACHINE_CONFIG( b256 )
 //-------------------------------------------------
 
-MACHINE_CONFIG_DERIVED(cbm2_state::b256, cbm2lp_ntsc)
-	MCFG_FRAGMENT_ADD(_256k)
+MACHINE_CONFIG_START(cbm2_state::b256)
+	cbm2lp_ntsc(config);
+	_256k(config);
 MACHINE_CONFIG_END
 
 
@@ -2659,7 +2661,8 @@ MACHINE_CONFIG_END
 //  MACHINE_CONFIG( cbm2lp_pal )
 //-------------------------------------------------
 
-MACHINE_CONFIG_DERIVED(cbm2_state::cbm2lp_pal, cbm2lp_ntsc)
+MACHINE_CONFIG_START(cbm2_state::cbm2lp_pal)
+	cbm2lp_ntsc(config);
 	MCFG_MACHINE_START_OVERRIDE(cbm2_state, cbm2_pal)
 
 	MCFG_DEVICE_MODIFY(MOS6526_TAG)
@@ -2671,8 +2674,9 @@ MACHINE_CONFIG_END
 //  MACHINE_CONFIG( cbm610 )
 //-------------------------------------------------
 
-MACHINE_CONFIG_DERIVED(cbm2_state::cbm610, cbm2lp_pal)
-	MCFG_FRAGMENT_ADD(_128k)
+MACHINE_CONFIG_START(cbm2_state::cbm610)
+	cbm2lp_pal(config);
+	_128k(config);
 MACHINE_CONFIG_END
 
 
@@ -2680,8 +2684,9 @@ MACHINE_CONFIG_END
 //  MACHINE_CONFIG( cbm620 )
 //-------------------------------------------------
 
-MACHINE_CONFIG_DERIVED(cbm2_state::cbm620, cbm2lp_pal)
-	MCFG_FRAGMENT_ADD(_256k)
+MACHINE_CONFIG_START(cbm2_state::cbm620)
+	cbm2lp_pal(config);
+	_256k(config);
 MACHINE_CONFIG_END
 
 
@@ -2689,7 +2694,8 @@ MACHINE_CONFIG_END
 //  MACHINE_CONFIG( cbm2hp_ntsc )
 //-------------------------------------------------
 
-MACHINE_CONFIG_DERIVED(cbm2_state::cbm2hp_ntsc, cbm2lp_ntsc)
+MACHINE_CONFIG_START(cbm2_state::cbm2hp_ntsc)
+	cbm2lp_ntsc(config);
 	MCFG_DEVICE_MODIFY(MOS6525_2_TAG)
 	MCFG_TPI6525_IN_PC_CB(READ8(cbm2hp_state, tpi2_pc_r))
 MACHINE_CONFIG_END
@@ -2699,8 +2705,9 @@ MACHINE_CONFIG_END
 //  MACHINE_CONFIG( b128hp )
 //-------------------------------------------------
 
-MACHINE_CONFIG_DERIVED(cbm2hp_state::b128hp, cbm2hp_ntsc)
-	MCFG_FRAGMENT_ADD(_128k)
+MACHINE_CONFIG_START(cbm2hp_state::b128hp)
+	cbm2hp_ntsc(config);
+	_128k(config);
 MACHINE_CONFIG_END
 
 
@@ -2708,8 +2715,9 @@ MACHINE_CONFIG_END
 //  MACHINE_CONFIG( b256hp )
 //-------------------------------------------------
 
-MACHINE_CONFIG_DERIVED(cbm2hp_state::b256hp, cbm2hp_ntsc)
-	MCFG_FRAGMENT_ADD(_256k)
+MACHINE_CONFIG_START(cbm2hp_state::b256hp)
+	cbm2hp_ntsc(config);
+	_256k(config);
 MACHINE_CONFIG_END
 
 
@@ -2717,7 +2725,8 @@ MACHINE_CONFIG_END
 //  MACHINE_CONFIG( bx256hp )
 //-------------------------------------------------
 
-MACHINE_CONFIG_DERIVED(cbm2hp_state::bx256hp, b256hp)
+MACHINE_CONFIG_START(cbm2hp_state::bx256hp)
+	b256hp(config);
 	MCFG_MACHINE_START_OVERRIDE(cbm2_state, cbm2x_ntsc)
 
 	MCFG_CPU_ADD(EXT_I8088_TAG, I8088, XTAL(12'000'000))
@@ -2749,7 +2758,8 @@ MACHINE_CONFIG_END
 //  MACHINE_CONFIG( cbm2hp_pal )
 //-------------------------------------------------
 
-MACHINE_CONFIG_DERIVED(cbm2_state::cbm2hp_pal, cbm2hp_ntsc)
+MACHINE_CONFIG_START(cbm2_state::cbm2hp_pal)
+	cbm2hp_ntsc(config);
 	MCFG_MACHINE_START_OVERRIDE(cbm2_state, cbm2_pal)
 
 	// devices
@@ -2765,8 +2775,9 @@ MACHINE_CONFIG_END
 //  MACHINE_CONFIG( cbm710 )
 //-------------------------------------------------
 
-MACHINE_CONFIG_DERIVED(cbm2hp_state::cbm710, cbm2hp_pal)
-	MCFG_FRAGMENT_ADD(_128k)
+MACHINE_CONFIG_START(cbm2hp_state::cbm710)
+	cbm2hp_pal(config);
+	_128k(config);
 MACHINE_CONFIG_END
 
 
@@ -2774,8 +2785,9 @@ MACHINE_CONFIG_END
 //  MACHINE_CONFIG( cbm720 )
 //-------------------------------------------------
 
-MACHINE_CONFIG_DERIVED(cbm2hp_state::cbm720, cbm2hp_pal)
-	MCFG_FRAGMENT_ADD(_256k)
+MACHINE_CONFIG_START(cbm2hp_state::cbm720)
+	cbm2hp_pal(config);
+	_256k(config);
 MACHINE_CONFIG_END
 
 
@@ -2783,7 +2795,8 @@ MACHINE_CONFIG_END
 //  MACHINE_CONFIG( cbm730 )
 //-------------------------------------------------
 
-MACHINE_CONFIG_DERIVED(cbm2hp_state::cbm730, cbm720)
+MACHINE_CONFIG_START(cbm2hp_state::cbm730)
+	cbm720(config);
 	MCFG_MACHINE_START_OVERRIDE(cbm2_state, cbm2x_pal)
 
 	MCFG_CPU_ADD(EXT_I8088_TAG, I8088, XTAL(12'000'000))

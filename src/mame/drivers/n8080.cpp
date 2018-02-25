@@ -527,7 +527,7 @@ MACHINE_CONFIG_START(n8080_state::spacefev)
 	MCFG_TIMER_DRIVER_ADD_SCANLINE("rst2", n8080_state, rst2_tick, "screen", 240, 256)
 
 	/* sound hardware */
-	MCFG_FRAGMENT_ADD( spacefev_sound )
+	spacefev_sound(config);
 MACHINE_CONFIG_END
 
 
@@ -558,11 +558,12 @@ MACHINE_CONFIG_START(n8080_state::sheriff)
 	MCFG_TIMER_DRIVER_ADD_SCANLINE("rst2", n8080_state, rst2_tick, "screen", 240, 256)
 
 	/* sound hardware */
-	MCFG_FRAGMENT_ADD( sheriff_sound )
+	sheriff_sound(config);
 MACHINE_CONFIG_END
 
 
-MACHINE_CONFIG_DERIVED(n8080_state::westgun2, sheriff)
+MACHINE_CONFIG_START(n8080_state::westgun2)
+	sheriff(config);
 
 	/* basic machine hardware */
 	MCFG_CPU_REPLACE("maincpu", I8080, XTAL(19'968'000) / 10)
@@ -602,7 +603,7 @@ MACHINE_CONFIG_START(n8080_state::helifire)
 	MCFG_TIMER_DRIVER_ADD_SCANLINE("rst2", n8080_state, rst2_tick, "screen", 240, 256)
 
 	/* sound hardware */
-	MCFG_FRAGMENT_ADD( helifire_sound )
+	helifire_sound(config);
 MACHINE_CONFIG_END
 
 

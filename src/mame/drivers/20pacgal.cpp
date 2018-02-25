@@ -402,7 +402,7 @@ MACHINE_CONFIG_START(_20pacgal_state::_20pacgal)
 	MCFG_WATCHDOG_ADD("watchdog")
 
 	/* video hardware */
-	MCFG_FRAGMENT_ADD(_20pacgal_video)
+	_20pacgal_video(config);
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("speaker")
@@ -417,7 +417,8 @@ MACHINE_CONFIG_START(_20pacgal_state::_20pacgal)
 MACHINE_CONFIG_END
 
 
-MACHINE_CONFIG_DERIVED(_25pacman_state::_25pacman, _20pacgal)
+MACHINE_CONFIG_START(_25pacman_state::_25pacman)
+	_20pacgal(config);
 
 	/* basic machine hardware */
 	MCFG_CPU_MODIFY("maincpu")

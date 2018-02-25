@@ -72,7 +72,7 @@ WRITE16_MEMBER(skullxbo_state::skullxbo_halt_until_hblank_0_w)
 }
 
 
-MACHINE_RESET_MEMBER(skullxbo_state,skullxbo)
+void skullxbo_state::machine_reset()
 {
 	atarigen_state::machine_reset();
 	scanline_timer_reset(*m_screen, 8);
@@ -230,10 +230,9 @@ MACHINE_CONFIG_START(skullxbo_state::skullxbo)
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", M68000, ATARI_CLOCK_14MHz/2)
 	MCFG_CPU_PROGRAM_MAP(main_map)
-	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", atarigen_state, video_int_gen)
+	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", skullxbo_state, video_int_gen)
 
 	MCFG_TIMER_DRIVER_ADD("scan_timer", skullxbo_state, scanline_timer)
-	MCFG_MACHINE_RESET_OVERRIDE(skullxbo_state,skullxbo)
 
 	MCFG_EEPROM_2816_ADD("eeprom")
 	MCFG_EEPROM_28XX_LOCK_AFTER_WRITE(true)
@@ -258,12 +257,10 @@ MACHINE_CONFIG_START(skullxbo_state::skullxbo)
 	MCFG_SCREEN_UPDATE_DRIVER(skullxbo_state, screen_update_skullxbo)
 	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_VIDEO_START_OVERRIDE(skullxbo_state,skullxbo)
-
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
 
-	MCFG_ATARI_JSA_II_ADD("jsa", WRITELINE(atarigen_state, sound_int_write_line))
+	MCFG_ATARI_JSA_II_ADD("jsa", WRITELINE(skullxbo_state, sound_int_write_line))
 	MCFG_ATARI_JSA_TEST_PORT("FF5802", 7)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 MACHINE_CONFIG_END

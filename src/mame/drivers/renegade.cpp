@@ -470,7 +470,7 @@ MACHINE_CONFIG_START(renegade_state::renegade)
 	MCFG_CPU_PROGRAM_MAP(renegade_map)
 	MCFG_TIMER_DRIVER_ADD_SCANLINE("scantimer", renegade_state, interrupt, "screen", 0, 1)
 
-	MCFG_CPU_ADD("audiocpu", M6809, 12000000/8)
+	MCFG_CPU_ADD("audiocpu", MC6809, 12000000/2) // HD68A09P
 	MCFG_CPU_PROGRAM_MAP(renegade_sound_map)    /* IRQs are caused by the main CPU */
 
 	MCFG_DEVICE_ADD("mcu", TAITO68705_MCU, 12000000/4) // ?
@@ -505,7 +505,8 @@ MACHINE_CONFIG_START(renegade_state::renegade)
 MACHINE_CONFIG_END
 
 
-MACHINE_CONFIG_DERIVED(renegade_state::kuniokunb, renegade)
+MACHINE_CONFIG_START(renegade_state::kuniokunb)
+	renegade(config);
 	MCFG_CPU_MODIFY("maincpu")
 	MCFG_CPU_PROGRAM_MAP(renegade_nomcu_map)
 

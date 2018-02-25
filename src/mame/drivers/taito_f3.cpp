@@ -34,7 +34,6 @@
 
 #include "emu.h"
 #include "includes/taito_f3.h"
-#include "audio/taito_en.h"
 
 #include "cpu/m68000/m68000.h"
 #include "machine/eepromser.h"
@@ -121,8 +120,7 @@ WRITE32_MEMBER(taito_f3_state::f3_sound_reset_1_w)
 WRITE32_MEMBER(taito_f3_state::f3_sound_bankswitch_w)
 {
 	if (m_f3_game==KIRAMEKI) {
-		uint16_t *rom = (uint16_t *)memregion("taito_en:audiocpu")->base();
-		uint32_t idx;
+		int idx;
 
 		idx = (offset << 1) & 0x1e;
 		if (ACCESSING_BITS_0_15)
@@ -133,7 +131,7 @@ WRITE32_MEMBER(taito_f3_state::f3_sound_bankswitch_w)
 
 		/* Banks are 0x20000 bytes each, divide by two to get data16
 		pointer rather than byte pointer */
-		membank("taito_en:bank2")->set_base(&rom[(idx*0x20000)/2 + 0x80000]);
+		m_taito_en->set_bank(1,idx);
 
 	} else {
 		logerror("Sound bankswitch in unsupported game\n");
@@ -493,30 +491,35 @@ MACHINE_CONFIG_END
  of the games change the registers during the game (to do so would probably require
  monitor recalibration.)
 */
-MACHINE_CONFIG_DERIVED(taito_f3_state::f3_224a, f3)
+MACHINE_CONFIG_START(taito_f3_state::f3_224a)
+	f3(config);
 	MCFG_SCREEN_MODIFY("screen")
 	MCFG_SCREEN_VISIBLE_AREA(46, 40*8-1 + 46, 31, 31+224-1)
 MACHINE_CONFIG_END
 
-MACHINE_CONFIG_DERIVED(taito_f3_state::f3_224b, f3)
+MACHINE_CONFIG_START(taito_f3_state::f3_224b)
+	f3(config);
 	MCFG_SCREEN_MODIFY("screen")
 	MCFG_SCREEN_VISIBLE_AREA(46, 40*8-1 + 46, 32, 32+224-1)
 MACHINE_CONFIG_END
 
-MACHINE_CONFIG_DERIVED(taito_f3_state::f3_224c, f3)
+MACHINE_CONFIG_START(taito_f3_state::f3_224c)
+	f3(config);
 	MCFG_SCREEN_MODIFY("screen")
 	MCFG_SCREEN_VISIBLE_AREA(46, 40*8-1 + 46, 24, 24+224-1)
 MACHINE_CONFIG_END
 
 /* recalh and gseeker need a default EEPROM to work */
-MACHINE_CONFIG_DERIVED(taito_f3_state::f3_eeprom, f3)
+MACHINE_CONFIG_START(taito_f3_state::f3_eeprom)
+	f3(config);
 
 	MCFG_DEVICE_REMOVE("eeprom")
 	MCFG_EEPROM_SERIAL_93C46_ADD("eeprom")
 	MCFG_EEPROM_SERIAL_DATA(recalh_eeprom, 128) //TODO: convert this into ROM
 MACHINE_CONFIG_END
 
-MACHINE_CONFIG_DERIVED(taito_f3_state::f3_224b_eeprom, f3_224b)
+MACHINE_CONFIG_START(taito_f3_state::f3_224b_eeprom)
+	f3_224b(config);
 
 	MCFG_DEVICE_REMOVE("eeprom")
 	MCFG_EEPROM_SERIAL_93C46_ADD("eeprom")

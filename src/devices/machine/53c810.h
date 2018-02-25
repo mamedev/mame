@@ -99,7 +99,6 @@ private:
 };
 
 // device type definition
-extern const device_type LSI53C810;
 DECLARE_DEVICE_TYPE(LSI53C810, lsi53c810_device)
 
 

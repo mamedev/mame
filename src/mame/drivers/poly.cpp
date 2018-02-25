@@ -187,8 +187,8 @@ MACHINE_CONFIG_START(poly_state::poly)
 
 	MCFG_DEVICE_ADD("ptm", PTM6840, XTAL(12'057'600) / 3)
 	MCFG_PTM6840_EXTERNAL_CLOCKS(0, 0, 0)
-	MCFG_PTM6840_OUT1_CB(WRITELINE(poly_state, ptm_o2_callback))
-	MCFG_PTM6840_OUT2_CB(WRITELINE(poly_state, ptm_o3_callback))
+	MCFG_PTM6840_O2_CB(WRITELINE(poly_state, ptm_o2_callback))
+	MCFG_PTM6840_O3_CB(WRITELINE(poly_state, ptm_o3_callback))
 	MCFG_PTM6840_IRQ_CB(INPUTLINE("maincpu", M6809_IRQ_LINE))
 
 	MCFG_DEVICE_ADD("acia", ACIA6850, 0)

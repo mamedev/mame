@@ -381,7 +381,8 @@ MACHINE_CONFIG_START(crospang_state::crospang)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 MACHINE_CONFIG_END
 
-MACHINE_CONFIG_DERIVED(crospang_state::bestri, crospang)
+MACHINE_CONFIG_START(crospang_state::bestri)
+	crospang(config);
 
 	/* basic machine hardware */
 	MCFG_CPU_MODIFY("maincpu")
@@ -389,7 +390,8 @@ MACHINE_CONFIG_DERIVED(crospang_state::bestri, crospang)
 
 MACHINE_CONFIG_END
 
-MACHINE_CONFIG_DERIVED(crospang_state::bestria, crospang)
+MACHINE_CONFIG_START(crospang_state::bestria)
+	crospang(config);
 
 	/* basic machine hardware */
 	MCFG_CPU_MODIFY("maincpu")

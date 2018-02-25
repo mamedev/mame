@@ -5,16 +5,16 @@
     m6502_vtscr.cpp
 
     6502 with VRT VTxx instruction scrambling
-    
+
     Scrambling in newer NES-based VTxx systems (FC pocket, etc) seems to be
     enabled with a write of 5 to 0x411E, then is activated at the next jump?
     When enabled, opcodes are to be XORed with 0xA1
-    
-    Another form of scrambling is used in the VRT VT1682, this is not yet 
+
+    Another form of scrambling is used in the VRT VT1682, this is not yet
     implemented at all in MAME (it's used for the MiWi2 and InterAct consoles).
     This is simpler, permanently activated and consists of swapping opcode bits
     7 and 2.
-    
+
 ***************************************************************************/
 
 #include "emu.h"
@@ -64,7 +64,7 @@ uint8_t m6502_vtscr::mi_decrypt::read_sync(uint16_t adr)
 	{
 		res = descramble(res);
 	}
-	
+
 	if(toggle_scramble(res))
 	{
 		m_scramble_en = m_next_scramble;

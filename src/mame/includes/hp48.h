@@ -191,11 +191,11 @@ public:
 	// construction/destruction
 	hp48_port_image_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
-	static void set_port_config(device_t &device, int port, int module, int max_size)
+	void set_port_config(int port, int module, int max_size)
 	{
-		downcast<hp48_port_image_device &>(device).m_port = port;
-		downcast<hp48_port_image_device &>(device).m_module = module;
-		downcast<hp48_port_image_device &>(device).m_max_size = max_size;
+		m_port = port;
+		m_module = module;
+		m_max_size = max_size;
 	}
 
 	// image-level overrides
@@ -231,6 +231,6 @@ DECLARE_DEVICE_TYPE(HP48_PORT, hp48_port_image_device)
 
 #define MCFG_HP48_PORT_ADD(_tag, _port, _module, _max_size) \
 	MCFG_DEVICE_ADD(_tag, HP48_PORT, 0) \
-	hp48_port_image_device::set_port_config(*device, _port, _module, _max_size);
+	downcast<hp48_port_image_device &>(*device).set_port_config(_port, _module, _max_size);
 
 #endif // MAME_INCLUDES_HP84_H

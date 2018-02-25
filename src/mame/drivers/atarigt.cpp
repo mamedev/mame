@@ -805,8 +805,8 @@ MACHINE_CONFIG_START(atarigt_state::atarigt)
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", M68EC020, ATARI_CLOCK_50MHz/2)
 	MCFG_CPU_PROGRAM_MAP(main_map)
-	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", atarigen_state, video_int_gen)
-	MCFG_CPU_PERIODIC_INT_DRIVER(atarigen_state, scanline_int_gen, 250)
+	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", atarigt_state, video_int_gen)
+	MCFG_CPU_PERIODIC_INT_DRIVER(atarigt_state, scanline_int_gen, 250)
 
 	MCFG_MACHINE_RESET_OVERRIDE(atarigt_state,atarigt)
 
@@ -833,21 +833,24 @@ MACHINE_CONFIG_START(atarigt_state::atarigt)
 
 MACHINE_CONFIG_END
 
-MACHINE_CONFIG_DERIVED(atarigt_state::tmek, atarigt)
+MACHINE_CONFIG_START(atarigt_state::tmek)
+	atarigt(config);
 	/* sound hardware */
 	MCFG_DEVICE_ADD("cage", ATARI_CAGE, 0)
 	MCFG_ATARI_CAGE_SPEEDUP(0x4fad)
 	MCFG_ATARI_CAGE_IRQ_CALLBACK(WRITE8(atarigt_state,cage_irq_callback))
 MACHINE_CONFIG_END
 
-MACHINE_CONFIG_DERIVED(atarigt_state::primrage, atarigt)
+MACHINE_CONFIG_START(atarigt_state::primrage)
+	atarigt(config);
 	/* sound hardware */
 	MCFG_DEVICE_ADD("cage", ATARI_CAGE, 0)
 	MCFG_ATARI_CAGE_SPEEDUP(0x42f2)
 	MCFG_ATARI_CAGE_IRQ_CALLBACK(WRITE8(atarigt_state,cage_irq_callback))
 MACHINE_CONFIG_END
 
-MACHINE_CONFIG_DERIVED(atarigt_state::primrage20, atarigt)
+MACHINE_CONFIG_START(atarigt_state::primrage20)
+	atarigt(config);
 	/* sound hardware */
 	MCFG_DEVICE_ADD("cage", ATARI_CAGE, 0)
 	MCFG_ATARI_CAGE_SPEEDUP(0x48a4)

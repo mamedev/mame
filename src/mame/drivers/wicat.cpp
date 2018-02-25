@@ -410,7 +410,7 @@ WRITE8_MEMBER( wicat_state::via_b_w )
 
 READ16_MEMBER( wicat_state::invalid_r )
 {
-	if(!machine().side_effect_disabled())
+	if(!machine().side_effects_disabled())
 	{
 		m_maincpu->set_buserror_details(0x300000+offset*2-2,0,m_maincpu->get_fc());
 		m_maincpu->set_input_line(M68K_LINE_BUSERROR, ASSERT_LINE);
@@ -421,7 +421,7 @@ READ16_MEMBER( wicat_state::invalid_r )
 
 WRITE16_MEMBER( wicat_state::invalid_w )
 {
-	if(!machine().side_effect_disabled())
+	if(!machine().side_effects_disabled())
 	{
 		m_maincpu->set_buserror_details(0x300000+offset*2-2,1,m_maincpu->get_fc());
 		m_maincpu->set_input_line(M68K_LINE_BUSERROR, ASSERT_LINE);

@@ -721,7 +721,8 @@ MACHINE_CONFIG_START(twincobr_state::twincobr)
 MACHINE_CONFIG_END
 
 
-MACHINE_CONFIG_DERIVED(twincobr_state::fshark, twincobr)
+MACHINE_CONFIG_START(twincobr_state::fshark)
+	twincobr(config);
 	MCFG_DEVICE_MODIFY("mainlatch")
 	MCFG_ADDRESSABLE_LATCH_Q6_OUT_CB(NOOP)
 
@@ -729,11 +730,12 @@ MACHINE_CONFIG_DERIVED(twincobr_state::fshark, twincobr)
 	MCFG_ADDRESSABLE_LATCH_Q0_OUT_CB(WRITELINE(twincobr_state, dsp_int_w))
 
 	MCFG_DEVICE_MODIFY("scu")
-	toaplan_scu_device::static_set_xoffsets(*device, 32, 14);
+	MCFG_TOAPLAN_SCU_SET_XOFFSETS(32, 14)
 MACHINE_CONFIG_END
 
 
-MACHINE_CONFIG_DERIVED(twincobr_state::fsharkbt, fshark)
+MACHINE_CONFIG_START(twincobr_state::fsharkbt)
+	fshark(config);
 
 	MCFG_CPU_ADD("mcu", I8741, XTAL(28'000'000)/16)
 	/* Program Map is internal to the CPU */

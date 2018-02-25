@@ -2536,13 +2536,15 @@ MACHINE_CONFIG_START(seta2_state::seta2)
 MACHINE_CONFIG_END
 
 
-MACHINE_CONFIG_DERIVED(seta2_state::mj4simai, seta2)
+MACHINE_CONFIG_START(seta2_state::mj4simai)
+	seta2(config);
 	MCFG_MACHINE_START_OVERRIDE(seta2_state, mj4simai)
 
 MACHINE_CONFIG_END
 
 
-MACHINE_CONFIG_DERIVED(seta2_state::gundamex, seta2)
+MACHINE_CONFIG_START(seta2_state::gundamex)
+	seta2(config);
 	MCFG_CPU_MODIFY("maincpu")
 	MCFG_CPU_PROGRAM_MAP(gundamex_map)
 
@@ -2558,7 +2560,8 @@ MACHINE_CONFIG_DERIVED(seta2_state::gundamex, seta2)
 MACHINE_CONFIG_END
 
 
-MACHINE_CONFIG_DERIVED(seta2_state::grdians, seta2)
+MACHINE_CONFIG_START(seta2_state::grdians)
+	seta2(config);
 	MCFG_CPU_MODIFY("maincpu")
 	MCFG_CPU_PROGRAM_MAP(grdians_map)
 
@@ -2568,7 +2571,8 @@ MACHINE_CONFIG_DERIVED(seta2_state::grdians, seta2)
 MACHINE_CONFIG_END
 
 
-MACHINE_CONFIG_DERIVED(seta2_state::myangel, seta2)
+MACHINE_CONFIG_START(seta2_state::myangel)
+	seta2(config);
 	MCFG_CPU_MODIFY("maincpu")
 	MCFG_CPU_PROGRAM_MAP(myangel_map)
 
@@ -2580,7 +2584,8 @@ MACHINE_CONFIG_DERIVED(seta2_state::myangel, seta2)
 MACHINE_CONFIG_END
 
 
-MACHINE_CONFIG_DERIVED(seta2_state::myangel2, seta2)
+MACHINE_CONFIG_START(seta2_state::myangel2)
+	seta2(config);
 	MCFG_CPU_MODIFY("maincpu")
 	MCFG_CPU_PROGRAM_MAP(myangel2_map)
 
@@ -2592,7 +2597,8 @@ MACHINE_CONFIG_DERIVED(seta2_state::myangel2, seta2)
 MACHINE_CONFIG_END
 
 
-MACHINE_CONFIG_DERIVED(seta2_state::pzlbowl, seta2)
+MACHINE_CONFIG_START(seta2_state::pzlbowl)
+	seta2(config);
 	MCFG_CPU_MODIFY("maincpu")
 	MCFG_CPU_PROGRAM_MAP(pzlbowl_map)
 
@@ -2602,7 +2608,8 @@ MACHINE_CONFIG_DERIVED(seta2_state::pzlbowl, seta2)
 MACHINE_CONFIG_END
 
 
-MACHINE_CONFIG_DERIVED(seta2_state::penbros, seta2)
+MACHINE_CONFIG_START(seta2_state::penbros)
+	seta2(config);
 	MCFG_CPU_MODIFY("maincpu")
 	MCFG_CPU_PROGRAM_MAP(penbros_map)
 
@@ -2611,7 +2618,8 @@ MACHINE_CONFIG_DERIVED(seta2_state::penbros, seta2)
 	MCFG_SCREEN_VISIBLE_AREA(0, 0x140-1, 0x80, 0x160-1)
 MACHINE_CONFIG_END
 
-MACHINE_CONFIG_DERIVED(seta2_state::ablastb, penbros)
+MACHINE_CONFIG_START(seta2_state::ablastb)
+	penbros(config);
 	MCFG_CPU_REPLACE("maincpu", M68000, XTAL(16'000'000)) // TMP68HC000P-16
 	MCFG_CPU_PROGRAM_MAP(ablastb_map)
 	MCFG_CPU_VBLANK_INT_DRIVER("screen", seta2_state, irq2_line_hold)
@@ -2619,7 +2627,8 @@ MACHINE_CONFIG_DERIVED(seta2_state::ablastb, penbros)
 	MCFG_DEVICE_REMOVE("tmp68301")
 MACHINE_CONFIG_END
 
-MACHINE_CONFIG_DERIVED(seta2_state::reelquak, seta2)
+MACHINE_CONFIG_START(seta2_state::reelquak)
+	seta2(config);
 	MCFG_CPU_MODIFY("maincpu")
 	MCFG_CPU_PROGRAM_MAP(reelquak_map)
 
@@ -2637,7 +2646,8 @@ MACHINE_CONFIG_DERIVED(seta2_state::reelquak, seta2)
 MACHINE_CONFIG_END
 
 
-MACHINE_CONFIG_DERIVED(seta2_state::samshoot, seta2)
+MACHINE_CONFIG_START(seta2_state::samshoot)
+	seta2(config);
 	MCFG_CPU_MODIFY("maincpu")
 	MCFG_CPU_PROGRAM_MAP(samshoot_map)
 	MCFG_CPU_PERIODIC_INT_DRIVER(seta2_state, samshoot_interrupt, 60)
@@ -2653,7 +2663,8 @@ MACHINE_CONFIG_DERIVED(seta2_state::samshoot, seta2)
 MACHINE_CONFIG_END
 
 
-MACHINE_CONFIG_DERIVED(staraudi_state::staraudi, seta2)
+MACHINE_CONFIG_START(staraudi_state::staraudi)
+	seta2(config);
 	MCFG_CPU_MODIFY("maincpu")
 	MCFG_CPU_PROGRAM_MAP(staraudi_map)
 
@@ -2669,7 +2680,8 @@ MACHINE_CONFIG_DERIVED(staraudi_state::staraudi, seta2)
 MACHINE_CONFIG_END
 
 
-MACHINE_CONFIG_DERIVED(seta2_state::telpacfl, seta2)
+MACHINE_CONFIG_START(seta2_state::telpacfl)
+	seta2(config);
 	MCFG_CPU_MODIFY("maincpu")
 	MCFG_CPU_PROGRAM_MAP(telpacfl_map)
 
@@ -2760,7 +2772,8 @@ MACHINE_CONFIG_START(seta2_state::funcube)
 MACHINE_CONFIG_END
 
 
-MACHINE_CONFIG_DERIVED(seta2_state::funcube2, funcube)
+MACHINE_CONFIG_START(seta2_state::funcube2)
+	funcube(config);
 	MCFG_CPU_MODIFY("maincpu")
 	MCFG_CPU_PROGRAM_MAP(funcube2_map)
 
@@ -2773,7 +2786,8 @@ MACHINE_CONFIG_DERIVED(seta2_state::funcube2, funcube)
 MACHINE_CONFIG_END
 
 
-MACHINE_CONFIG_DERIVED(seta2_state::funcube3, funcube2)
+MACHINE_CONFIG_START(seta2_state::funcube3)
+	funcube2(config);
 	// video hardware
 	MCFG_SCREEN_MODIFY("screen")
 	MCFG_SCREEN_VISIBLE_AREA(0x0, 0x140-1, 0x80-0x40, 0x170-1-0x40)

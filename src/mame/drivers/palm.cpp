@@ -426,7 +426,8 @@ ROM_START( spt1740 )
 	ROM_RELOAD(0x000000, 0x004000)
 ROM_END
 
-MACHINE_CONFIG_DERIVED(palm_state::pilot1k, palm)
+MACHINE_CONFIG_START(palm_state::pilot1k)
+	palm(config);
 
 	/* internal ram */
 	MCFG_RAM_ADD(RAM_TAG)
@@ -434,7 +435,8 @@ MACHINE_CONFIG_DERIVED(palm_state::pilot1k, palm)
 	MCFG_RAM_EXTRA_OPTIONS("512K,1M,2M,4M,8M")
 MACHINE_CONFIG_END
 
-MACHINE_CONFIG_DERIVED(palm_state::pilot5k, palm)
+MACHINE_CONFIG_START(palm_state::pilot5k)
+	palm(config);
 
 	/* internal ram */
 	MCFG_RAM_ADD(RAM_TAG)
@@ -442,7 +444,8 @@ MACHINE_CONFIG_DERIVED(palm_state::pilot5k, palm)
 	MCFG_RAM_EXTRA_OPTIONS("1M,2M,4M,8M")
 MACHINE_CONFIG_END
 
-MACHINE_CONFIG_DERIVED(palm_state::palmpro, palm)
+MACHINE_CONFIG_START(palm_state::palmpro)
+	palm(config);
 
 	/* internal ram */
 	MCFG_RAM_ADD(RAM_TAG)
@@ -450,7 +453,8 @@ MACHINE_CONFIG_DERIVED(palm_state::palmpro, palm)
 	MCFG_RAM_EXTRA_OPTIONS("2M,4M,8M")
 MACHINE_CONFIG_END
 
-MACHINE_CONFIG_DERIVED(palm_state::palmiii, palm)
+MACHINE_CONFIG_START(palm_state::palmiii)
+	palm(config);
 
 	/* internal ram */
 	MCFG_RAM_ADD(RAM_TAG)
@@ -458,7 +462,8 @@ MACHINE_CONFIG_DERIVED(palm_state::palmiii, palm)
 	MCFG_RAM_EXTRA_OPTIONS("4M,8M")
 MACHINE_CONFIG_END
 
-MACHINE_CONFIG_DERIVED(palm_state::palmv, palm)
+MACHINE_CONFIG_START(palm_state::palmv)
+	palm(config);
 
 	/* internal ram */
 	MCFG_RAM_ADD(RAM_TAG)
@@ -466,7 +471,8 @@ MACHINE_CONFIG_DERIVED(palm_state::palmv, palm)
 	MCFG_RAM_EXTRA_OPTIONS("4M,8M")
 MACHINE_CONFIG_END
 
-MACHINE_CONFIG_DERIVED(palm_state::palmvx, palm)
+MACHINE_CONFIG_START(palm_state::palmvx)
+	palm(config);
 
 	/* internal ram */
 	MCFG_RAM_ADD(RAM_TAG)

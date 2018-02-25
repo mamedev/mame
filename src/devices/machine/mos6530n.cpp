@@ -581,7 +581,7 @@ WRITE8_MEMBER( mos6530_device_base::pb_ddr_w )
 
 READ8_MEMBER( mos6530_device_base::timer_off_r )
 {
-	if (machine().side_effect_disabled())
+	if (machine().side_effects_disabled())
 		return 0;
 
 	return timer_r(false);
@@ -589,7 +589,7 @@ READ8_MEMBER( mos6530_device_base::timer_off_r )
 
 READ8_MEMBER( mos6530_device_base::timer_on_r )
 {
-	if (machine().side_effect_disabled())
+	if (machine().side_effects_disabled())
 		return 0;
 
 	return timer_r(true);
@@ -626,7 +626,7 @@ READ8_MEMBER( mos6530_device_base::irq_r )
 {
 	uint8_t data = get_irq_flags();
 
-	if (!machine().side_effect_disabled()) {
+	if (!machine().side_effects_disabled()) {
 		if (m_irq_edge) {
 			m_irq_edge = false;
 			update_irq();

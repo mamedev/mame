@@ -664,7 +664,7 @@ void tms3556_device::interrupt_start_vblank(void)
 //  interrupt - scanline handler
 //-------------------------------------------------
 
-void tms3556_device::interrupt(running_machine &machine)
+void tms3556_device::interrupt()
 {
 	/* check for start of vblank */
 	if (m_scanline == 310)  /*no idea what the real value is*/

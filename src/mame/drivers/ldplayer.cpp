@@ -628,7 +628,8 @@ MACHINE_CONFIG_START(ldplayer_state::ldplayer_ntsc)
 MACHINE_CONFIG_END
 
 
-MACHINE_CONFIG_DERIVED(ldv1000_state::ldv1000, ldplayer_ntsc)
+MACHINE_CONFIG_START(ldv1000_state::ldv1000)
+	ldplayer_ntsc(config);
 	MCFG_LASERDISC_LDV1000_ADD("laserdisc")
 	MCFG_LASERDISC_GET_DISC(laserdisc_device::get_disc_delegate(&ldplayer_state::get_disc_static, device))
 	MCFG_LASERDISC_SCREEN_ADD_NTSC("screen", "laserdisc")
@@ -640,7 +641,8 @@ MACHINE_CONFIG_DERIVED(ldv1000_state::ldv1000, ldplayer_ntsc)
 MACHINE_CONFIG_END
 
 
-MACHINE_CONFIG_DERIVED(pr8210_state::pr8210, ldplayer_ntsc)
+MACHINE_CONFIG_START(pr8210_state::pr8210)
+	ldplayer_ntsc(config);
 	MCFG_LASERDISC_PR8210_ADD("laserdisc")
 	MCFG_LASERDISC_GET_DISC(laserdisc_device::get_disc_delegate(&ldplayer_state::get_disc_static, device))
 	MCFG_LASERDISC_SCREEN_ADD_NTSC("screen", "laserdisc")

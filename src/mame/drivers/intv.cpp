@@ -496,12 +496,14 @@ MACHINE_CONFIG_START(intv_state::intv)
 	MCFG_SOFTWARE_LIST_COMPATIBLE_ADD("ecs_list", "intvecs")
 MACHINE_CONFIG_END
 
-MACHINE_CONFIG_DERIVED(intv_state::intv2, intv)
+MACHINE_CONFIG_START(intv_state::intv2)
+	intv(config);
 	MCFG_CPU_MODIFY( "maincpu" )
 	MCFG_CPU_PROGRAM_MAP(intv2_mem)
 MACHINE_CONFIG_END
 
-MACHINE_CONFIG_DERIVED(intv_state::intvoice, intv)
+MACHINE_CONFIG_START(intv_state::intvoice)
+	intv(config);
 	MCFG_CPU_MODIFY( "maincpu" )
 	MCFG_CPU_PROGRAM_MAP(intvoice_mem)
 
@@ -509,7 +511,8 @@ MACHINE_CONFIG_DERIVED(intv_state::intvoice, intv)
 	MCFG_DEVICE_ADD("voice", INTV_ROM_VOICE, 0)
 MACHINE_CONFIG_END
 
-MACHINE_CONFIG_DERIVED(intv_state::intvecs, intv)
+MACHINE_CONFIG_START(intv_state::intvecs)
+	intv(config);
 	MCFG_CPU_MODIFY( "maincpu" )
 	MCFG_CPU_PROGRAM_MAP(intvecs_mem)
 
@@ -530,7 +533,8 @@ MACHINE_CONFIG_DERIVED(intv_state::intvecs, intv)
 	MCFG_SOFTWARE_LIST_COMPATIBLE_ADD("intv_list", "intv")
 MACHINE_CONFIG_END
 
-MACHINE_CONFIG_DERIVED(intv_state::intvkbd, intv)
+MACHINE_CONFIG_START(intv_state::intvkbd)
+	intv(config);
 	MCFG_CPU_MODIFY( "maincpu" )
 	MCFG_CPU_PROGRAM_MAP(intvkbd_mem)
 

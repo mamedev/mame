@@ -369,7 +369,8 @@ static GFXDECODE_START( specpls3 )
 GFXDECODE_END
 
 
-MACHINE_CONFIG_DERIVED(spectrum_state::spectrum_plus3, spectrum_128)
+MACHINE_CONFIG_START(spectrum_state::spectrum_plus3)
+	spectrum_128(config);
 	MCFG_CPU_MODIFY("maincpu")
 	MCFG_CPU_PROGRAM_MAP(spectrum_plus3_mem)
 	MCFG_CPU_IO_MAP(spectrum_plus3_io)

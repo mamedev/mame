@@ -58,18 +58,6 @@ ROM_START( mie )
 	ROM_LOAD( "315-6146.bin", 0x000, 0x800, CRC(9b197e35) SHA1(864d14d58732dd4e2ee538ccc71fa8df7013ba06))
 ROM_END
 
-void mie_device::static_set_gpio_name(device_t &device, int entry, const char *name)
-{
-	mie_device &mie = downcast<mie_device &>(device);
-	mie.gpio_name[entry] = name;
-}
-
-void mie_device::static_set_jvs_name(device_t &device, const char *name)
-{
-	mie_device &mie = downcast<mie_device &>(device);
-	mie.jvs_name = name;
-}
-
 const tiny_rom_entry *mie_device::device_rom_region() const
 {
 	return ROM_NAME(mie);

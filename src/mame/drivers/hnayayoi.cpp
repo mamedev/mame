@@ -584,7 +584,8 @@ MACHINE_CONFIG_START(hnayayoi_state::hnayayoi)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 MACHINE_CONFIG_END
 
-MACHINE_CONFIG_DERIVED(hnayayoi_state::hnfubuki, hnayayoi)
+MACHINE_CONFIG_START(hnayayoi_state::hnfubuki)
+	hnayayoi(config);
 	MCFG_CPU_MODIFY("maincpu")
 	MCFG_CPU_PROGRAM_MAP(hnfubuki_map)
 	MCFG_DEVICE_REMOVE_ADDRESS_MAP(AS_IO)
@@ -593,7 +594,8 @@ MACHINE_CONFIG_DERIVED(hnayayoi_state::hnfubuki, hnayayoi)
 	MCFG_ADDRESSABLE_LATCH_Q4_OUT_CB(WRITELINE(hnayayoi_state, nmi_enable_w))
 MACHINE_CONFIG_END
 
-MACHINE_CONFIG_DERIVED(hnayayoi_state::untoucha, hnayayoi)
+MACHINE_CONFIG_START(hnayayoi_state::untoucha)
+	hnayayoi(config);
 	MCFG_CPU_MODIFY("maincpu")
 	MCFG_CPU_PROGRAM_MAP(untoucha_map)
 	MCFG_CPU_IO_MAP(untoucha_io_map)

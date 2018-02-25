@@ -335,17 +335,6 @@ egret_device::egret_device(const machine_config &mconfig, const char *tag, devic
 }
 
 //-------------------------------------------------
-//  static_set_type - configuration helper to set
-//  the chip type
-//-------------------------------------------------
-
-void egret_device::static_set_type(device_t &device, int type)
-{
-	egret_device &egret = downcast<egret_device &>(device);
-	egret.rom_offset = type;
-}
-
-//-------------------------------------------------
 //  device_start - device-specific startup
 //-------------------------------------------------
 

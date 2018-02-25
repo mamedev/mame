@@ -144,9 +144,9 @@ MACHINE_CONFIG_START(su2000_state::su2000)
 #endif
 
 	/* Video hardware */
-	MCFG_FRAGMENT_ADD(pcvideo_vga)
+	pcvideo_vga(config);
 
-	MCFG_FRAGMENT_ADD(pcat_common)
+	pcat_common(config);
 
 	MCFG_DEVICE_REMOVE("rtc")
 	MCFG_DS12885_ADD("rtc")

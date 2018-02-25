@@ -978,7 +978,7 @@ READ16_MEMBER(x68k_state::x68k_rom0_r)
 {
 	/* this location contains the address of some expansion device ROM, if no ROM exists,
 	   then access causes a bus error */
-	if((m_options->read() & 0x02) && !machine().side_effect_disabled())
+	if((m_options->read() & 0x02) && !machine().side_effects_disabled())
 		set_bus_error((offset << 1) + 0xbffffc, 0, mem_mask);
 	return 0xff;
 }
@@ -987,7 +987,7 @@ WRITE16_MEMBER(x68k_state::x68k_rom0_w)
 {
 	/* this location contains the address of some expansion device ROM, if no ROM exists,
 	   then access causes a bus error */
-	if((m_options->read() & 0x02) && !machine().side_effect_disabled())
+	if((m_options->read() & 0x02) && !machine().side_effects_disabled())
 		set_bus_error((offset << 1) + 0xbffffc, 1, mem_mask);
 }
 
@@ -995,7 +995,7 @@ READ16_MEMBER(x68k_state::x68k_emptyram_r)
 {
 	/* this location is unused RAM, access here causes a bus error
 	   Often a method for detecting amount of installed RAM, is to read or write at 1MB intervals, until a bus error occurs */
-	if((m_options->read() & 0x02) && !machine().side_effect_disabled())
+	if((m_options->read() & 0x02) && !machine().side_effects_disabled())
 		set_bus_error((offset << 1), 0, mem_mask);
 	return 0xff;
 }
@@ -1004,14 +1004,14 @@ WRITE16_MEMBER(x68k_state::x68k_emptyram_w)
 {
 	/* this location is unused RAM, access here causes a bus error
 	   Often a method for detecting amount of installed RAM, is to read or write at 1MB intervals, until a bus error occurs */
-	if((m_options->read() & 0x02) && !machine().side_effect_disabled())
+	if((m_options->read() & 0x02) && !machine().side_effects_disabled())
 		set_bus_error((offset << 1), 1, mem_mask);
 }
 
 READ16_MEMBER(x68k_state::x68k_exp_r)
 {
 	/* These are expansion devices, if not present, they cause a bus error */
-	if((m_options->read() & 0x02) && !machine().side_effect_disabled())
+	if((m_options->read() & 0x02) && !machine().side_effects_disabled())
 		set_bus_error((offset << 1) + 0xeafa00, 0, mem_mask);
 	return 0xff;
 }
@@ -1019,7 +1019,7 @@ READ16_MEMBER(x68k_state::x68k_exp_r)
 WRITE16_MEMBER(x68k_state::x68k_exp_w)
 {
 	/* These are expansion devices, if not present, they cause a bus error */
-	if((m_options->read() & 0x02) && !machine().side_effect_disabled())
+	if((m_options->read() & 0x02) && !machine().side_effects_disabled())
 		set_bus_error((offset << 1) + 0xeafa00, 1, mem_mask);
 }
 
@@ -1746,7 +1746,8 @@ MACHINE_CONFIG_START(x68k_state::x68000)
 	MCFG_X68KHDC_ADD( "x68k_hdc" )
 MACHINE_CONFIG_END
 
-MACHINE_CONFIG_DERIVED(x68k_state::x68ksupr, x68000)
+MACHINE_CONFIG_START(x68k_state::x68ksupr)
+	x68000(config);
 	MCFG_DEVICE_REMOVE("x68k_hdc")
 
 	MCFG_CPU_MODIFY("maincpu")
@@ -1767,12 +1768,14 @@ MACHINE_CONFIG_DERIVED(x68k_state::x68ksupr, x68000)
 	MCFG_MB89352A_DRQ_CB(WRITELINE(x68k_state, x68k_scsi_drq))
 MACHINE_CONFIG_END
 
-MACHINE_CONFIG_DERIVED(x68k_state::x68kxvi, x68ksupr)
+MACHINE_CONFIG_START(x68k_state::x68kxvi)
+	x68ksupr(config);
 	MCFG_CPU_MODIFY("maincpu")
 	MCFG_CPU_CLOCK(16000000)  /* 16 MHz */
 MACHINE_CONFIG_END
 
-MACHINE_CONFIG_DERIVED(x68k_state::x68030, x68ksupr)
+MACHINE_CONFIG_START(x68k_state::x68030)
+	x68ksupr(config);
 	MCFG_CPU_REPLACE("maincpu", M68030, 25000000)  /* 25 MHz 68EC030 */
 	MCFG_CPU_PROGRAM_MAP(x68030_map)
 	MCFG_CPU_IRQ_ACKNOWLEDGE_DRIVER(x68k_state,x68k_int_ack)

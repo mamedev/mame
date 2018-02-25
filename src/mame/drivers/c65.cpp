@@ -224,7 +224,7 @@ READ8_MEMBER(c65_state::vic4567_dummy_r)
 			return m_VIC3_ControlB;
 	}
 
-	if(!machine().side_effect_disabled())
+	if(!machine().side_effects_disabled())
 		printf("%02x\n",offset); // TODO: PC
 	return res;
 }

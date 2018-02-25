@@ -972,7 +972,7 @@ void segas16b_state::memory_mapper(sega_315_5195_mapper_device &mapper, uint8_t 
 //  memory mapper chip
 //-------------------------------------------------
 
-uint8_t segas16b_state::mapper_sound_r()
+READ8_MEMBER(segas16b_state::mapper_sound_r)
 {
 	return 0;
 }
@@ -983,17 +983,17 @@ uint8_t segas16b_state::mapper_sound_r()
 //  memory mapper chip
 //-------------------------------------------------
 
-void segas16b_state::mapper_sound_w(uint8_t data)
+WRITE8_MEMBER(segas16b_state::mapper_sound_w)
 {
 	if (m_soundlatch != nullptr)
-		m_soundlatch->write(m_soundcpu->space(AS_PROGRAM), 0, data & 0xff);
+		m_soundlatch->write(space, 0, data);
 	if (m_soundcpu != nullptr)
 		m_soundcpu->set_input_line(0, HOLD_LINE);
 }
 
 WRITE16_MEMBER( segas16b_state::sound_w16 )
 {
-	mapper_sound_w(data);
+	mapper_sound_w(space, 0, data & 0xff);
 }
 
 //**************************************************************************
@@ -3713,7 +3713,9 @@ MACHINE_CONFIG_START(segas16b_state::system16b)
 
 	MCFG_NVRAM_ADD_0FILL("nvram")
 
-	MCFG_SEGA_315_5195_MAPPER_ADD("mapper", "maincpu", segas16b_state, memory_mapper, mapper_sound_r, mapper_sound_w)
+	MCFG_SEGA_315_5195_MAPPER_ADD("mapper", "maincpu", segas16b_state, memory_mapper)
+	MCFG_SEGA_315_5195_SOUND_READ_CALLBACK(READ8(segas16b_state, mapper_sound_r))
+	MCFG_SEGA_315_5195_SOUND_WRITE_CALLBACK(WRITE8(segas16b_state, mapper_sound_w))
 
 	// video hardware
 	MCFG_GFXDECODE_ADD("gfxdecode", "palette", segas16b)
@@ -3741,33 +3743,38 @@ MACHINE_CONFIG_START(segas16b_state::system16b)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.48)
 MACHINE_CONFIG_END
 
-MACHINE_CONFIG_DERIVED(segas16b_state::system16b_mc8123, system16b)
+MACHINE_CONFIG_START(segas16b_state::system16b_mc8123)
+	system16b(config);
 	MCFG_CPU_REPLACE("soundcpu", MC8123, MASTER_CLOCK_10MHz/2)
 	MCFG_CPU_PROGRAM_MAP(sound_map)
 	MCFG_CPU_IO_MAP(sound_portmap)
 	MCFG_CPU_OPCODES_MAP(sound_decrypted_opcodes_map)
 MACHINE_CONFIG_END
 
-MACHINE_CONFIG_DERIVED(segas16b_state::system16b_fd1089a, system16b)
+MACHINE_CONFIG_START(segas16b_state::system16b_fd1089a)
+	system16b(config);
 	MCFG_CPU_REPLACE("maincpu", FD1089A, MASTER_CLOCK_10MHz)
 	MCFG_CPU_PROGRAM_MAP(system16b_map)
 	MCFG_CPU_VBLANK_INT_DRIVER("screen", segas16b_state, irq4_line_hold)
 MACHINE_CONFIG_END
 
-MACHINE_CONFIG_DERIVED(segas16b_state::system16b_fd1089b, system16b)
+MACHINE_CONFIG_START(segas16b_state::system16b_fd1089b)
+	system16b(config);
 	MCFG_CPU_REPLACE("maincpu", FD1089B, MASTER_CLOCK_10MHz)
 	MCFG_CPU_PROGRAM_MAP(system16b_map)
 	MCFG_CPU_VBLANK_INT_DRIVER("screen", segas16b_state, irq4_line_hold)
 MACHINE_CONFIG_END
 
-MACHINE_CONFIG_DERIVED(segas16b_state::system16b_fd1094, system16b)
+MACHINE_CONFIG_START(segas16b_state::system16b_fd1094)
+	system16b(config);
 	MCFG_CPU_REPLACE("maincpu", FD1094, MASTER_CLOCK_10MHz)
 	MCFG_CPU_PROGRAM_MAP(system16b_map)
 	MCFG_CPU_OPCODES_MAP(decrypted_opcodes_map)
 	MCFG_CPU_VBLANK_INT_DRIVER("screen", segas16b_state, irq4_line_hold)
 MACHINE_CONFIG_END
 
-MACHINE_CONFIG_DERIVED(segas16b_state::aceattacb_fd1094, system16b_fd1094)
+MACHINE_CONFIG_START(segas16b_state::aceattacb_fd1094)
+	system16b_fd1094(config);
 	// 834-6602 I/O board
 	MCFG_DEVICE_ADD("upd4701a1", UPD4701A, 0)
 	MCFG_DEVICE_ADD("upd4701a2", UPD4701A, 0)
@@ -3777,7 +3784,8 @@ MACHINE_CONFIG_DERIVED(segas16b_state::aceattacb_fd1094, system16b_fd1094)
 MACHINE_CONFIG_END
 
 
-MACHINE_CONFIG_DERIVED(segas16b_state::system16b_i8751, system16b)
+MACHINE_CONFIG_START(segas16b_state::system16b_i8751)
+	system16b(config);
 	MCFG_CPU_MODIFY("maincpu")
 	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", segas16b_state, i8751_main_cpu_vblank)
 
@@ -3796,19 +3804,23 @@ MACHINE_CONFIG_START(segas16b_state::rom_5797_fragment)
 	MCFG_SEGA_315_5250_COMPARE_TIMER_ADD("cmptimer_2")
 MACHINE_CONFIG_END
 
-MACHINE_CONFIG_DERIVED(segas16b_state::system16b_5797, system16b)
-	MCFG_FRAGMENT_ADD(rom_5797_fragment)
+MACHINE_CONFIG_START(segas16b_state::system16b_5797)
+	system16b(config);
+	rom_5797_fragment(config);
 MACHINE_CONFIG_END
 
-MACHINE_CONFIG_DERIVED(segas16b_state::system16b_i8751_5797, system16b_i8751)
-	MCFG_FRAGMENT_ADD(rom_5797_fragment)
+MACHINE_CONFIG_START(segas16b_state::system16b_i8751_5797)
+	system16b_i8751(config);
+	rom_5797_fragment(config);
 MACHINE_CONFIG_END
 
-MACHINE_CONFIG_DERIVED(segas16b_state::system16b_fd1094_5797, system16b_fd1094)
-	MCFG_FRAGMENT_ADD(rom_5797_fragment)
+MACHINE_CONFIG_START(segas16b_state::system16b_fd1094_5797)
+	system16b_fd1094(config);
+	rom_5797_fragment(config);
 MACHINE_CONFIG_END
 
-MACHINE_CONFIG_DERIVED(segas16b_state::system16b_split, system16b)
+MACHINE_CONFIG_START(segas16b_state::system16b_split)
+	system16b(config);
 	MCFG_CPU_MODIFY("maincpu")
 	MCFG_CPU_PROGRAM_MAP(system16b_bootleg_map)
 	MCFG_CPU_OPCODES_MAP(decrypted_opcodes_map_x)
@@ -3842,7 +3854,8 @@ void segas16b_state::tilemap_16b_fpointbl_fill_latch(int i, uint16_t* latched_pa
 //  printf("%02x returning latched page select %04x scrollx %04x scrolly %04x\n", i, latched_pageselect[i], latched_xscroll[i], latched_yscroll[i]);
 }
 
-MACHINE_CONFIG_DERIVED(segas16b_state::fpointbl, system16b)
+MACHINE_CONFIG_START(segas16b_state::fpointbl)
+	system16b(config);
 
 	MCFG_DEVICE_REMOVE("mapper")
 	MCFG_DEVICE_REMOVE("sprites")
@@ -3863,7 +3876,8 @@ MACHINE_CONFIG_DERIVED(segas16b_state::fpointbl, system16b)
 
 MACHINE_CONFIG_END
 
-MACHINE_CONFIG_DERIVED(segas16b_state::fpointbla, fpointbl)
+MACHINE_CONFIG_START(segas16b_state::fpointbla)
+	fpointbl(config);
 	MCFG_CPU_MODIFY("maincpu")
 	MCFG_CPU_PROGRAM_MAP(map_fpointbla)
 	MCFG_CPU_OPCODES_MAP(decrypted_opcodes_map_fpointbla)
@@ -3926,7 +3940,8 @@ MACHINE_CONFIG_END
 //  GAME-SPECIFIC MACHINE DRIVERS
 //**************************************************************************
 
-MACHINE_CONFIG_DERIVED(segas16b_state::atomicp, system16b) // 10MHz CPU Clock verified
+MACHINE_CONFIG_START(segas16b_state::atomicp) // 10MHz CPU Clock verified
+	system16b(config);
 
 	// basic machine hardware
 	MCFG_DEVICE_REMOVE("soundcpu")
@@ -3942,7 +3957,8 @@ MACHINE_CONFIG_DERIVED(segas16b_state::atomicp, system16b) // 10MHz CPU Clock ve
 MACHINE_CONFIG_END
 
 
-MACHINE_CONFIG_DERIVED(segas16b_state::system16c, system16b)
+MACHINE_CONFIG_START(segas16b_state::system16c)
+	system16b(config);
 	MCFG_CPU_MODIFY("maincpu")
 	MCFG_CPU_PROGRAM_MAP(system16c_map)
 MACHINE_CONFIG_END
@@ -9717,7 +9733,8 @@ void isgsm_state::machine_reset()
 }
 
 
-MACHINE_CONFIG_DERIVED(isgsm_state::isgsm, system16b)
+MACHINE_CONFIG_START(isgsm_state::isgsm)
+	system16b(config);
 	// basic machine hardware
 
 	MCFG_DEVICE_REMOVE("maincpu")

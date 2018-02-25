@@ -437,7 +437,7 @@ MACHINE_CONFIG_START(pg685_state::pg675)
 	// sound hardware
 
 	// devices
-	MCFG_FRAGMENT_ADD(pg685_module)
+	pg685_module(config);
 
 	MCFG_DEVICE_ADD("mainuart", I8251, XTAL(12'288'000) / 6) // divider guessed
 
@@ -486,8 +486,8 @@ MACHINE_CONFIG_START(pg685_state::pg685)
 	// sound hardware
 
 	// devices
-	MCFG_FRAGMENT_ADD(pg685_backplane)
-	MCFG_FRAGMENT_ADD(pg685_module)
+	pg685_backplane(config);
+	pg685_module(config);
 
 	MCFG_DEVICE_ADD("mainuart", I8251, XTAL(12'288'000) / 6) // divider guessed
 
@@ -537,8 +537,8 @@ MACHINE_CONFIG_START(pg685_state::pg685oua12)
 	// sound hardware
 
 	// devices
-	MCFG_FRAGMENT_ADD(pg685_backplane)
-	MCFG_FRAGMENT_ADD(pg685_module)
+	pg685_backplane(config);
+	pg685_module(config);
 
 	MCFG_DEVICE_ADD("mainuart", I8251, 12288000 / 6) // wrong
 

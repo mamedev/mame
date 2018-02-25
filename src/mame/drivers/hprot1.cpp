@@ -334,7 +334,8 @@ MACHINE_CONFIG_START(hprot1_state::hprot1)
 	/* TODO: emulate the ADM695AN chip (watchdog/brownout reset)*/
 MACHINE_CONFIG_END
 
-MACHINE_CONFIG_DERIVED(hprot1_state::hprotr8a, hprot1)
+MACHINE_CONFIG_START(hprot1_state::hprotr8a)
+	hprot1(config);
 	MCFG_CPU_REPLACE("maincpu", I80C31, 11059200) // value of X1 cristal on the PCB
 	MCFG_CPU_PROGRAM_MAP(i80c31_prg)
 	MCFG_CPU_IO_MAP(i80c31_io)
@@ -350,7 +351,8 @@ MACHINE_CONFIG_DERIVED(hprot1_state::hprotr8a, hprot1)
 	/* TODO: add an I2C interface (the board has GND/VCC/SDA/SCL pins available in a connector) */
 MACHINE_CONFIG_END
 
-MACHINE_CONFIG_DERIVED(hprot1_state::hprot2r6, hprot1)
+MACHINE_CONFIG_START(hprot1_state::hprot2r6)
+	hprot1(config);
 	MCFG_CPU_REPLACE("maincpu", I80C31, 11059200) // value of X1 cristal on the PCB
 	MCFG_CPU_PROGRAM_MAP(i80c31_prg)
 	MCFG_CPU_IO_MAP(i80c31_io)

@@ -1005,21 +1005,24 @@ MACHINE_CONFIG_START(galgames_state::galgames_base)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 MACHINE_CONFIG_END
 
-MACHINE_CONFIG_DERIVED(galgames_state::galgbios, galgames_base)
+MACHINE_CONFIG_START(galgames_state::galgbios)
+	galgames_base(config);
 	MCFG_GALGAMES_EMPTY_CART_ADD("cart1", 1)
 	MCFG_GALGAMES_EMPTY_CART_ADD("cart2", 2)
 	MCFG_GALGAMES_EMPTY_CART_ADD("cart3", 3)
 	MCFG_GALGAMES_EMPTY_CART_ADD("cart4", 4)
 MACHINE_CONFIG_END
 
-MACHINE_CONFIG_DERIVED(galgames_state::galgame2, galgames_base)
+MACHINE_CONFIG_START(galgames_state::galgame2)
+	galgames_base(config);
 	MCFG_GALGAMES_STARPAK2_CART_ADD("cart1", 1)
 	MCFG_GALGAMES_EMPTY_CART_ADD("cart2", 2)
 	MCFG_GALGAMES_EMPTY_CART_ADD("cart3", 3)
 	MCFG_GALGAMES_EMPTY_CART_ADD("cart4", 4)
 MACHINE_CONFIG_END
 
-MACHINE_CONFIG_DERIVED(galgames_state::galgame3, galgames_base)
+MACHINE_CONFIG_START(galgames_state::galgame3)
+	galgames_base(config);
 	MCFG_GALGAMES_STARPAK3_CART_ADD("cart1", 1)
 	MCFG_GALGAMES_EMPTY_CART_ADD("cart2", 2)
 	MCFG_GALGAMES_EMPTY_CART_ADD("cart3", 3)

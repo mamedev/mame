@@ -116,7 +116,7 @@ void k051649_device::device_clock_changed()
 	uint32_t old_rate = m_rate;
 	m_rate = clock()/16;
 	m_mclock = clock();
-	
+
 	if (old_rate < m_rate)
 	{
 		m_mixer_buffer.resize(2 * m_rate, 0);

@@ -422,7 +422,8 @@ MACHINE_CONFIG_START(shangkid_state::chinhero)
 MACHINE_CONFIG_END
 
 
-MACHINE_CONFIG_DERIVED(shangkid_state::shangkid, chinhero)
+MACHINE_CONFIG_START(shangkid_state::shangkid)
+	chinhero(config);
 
 	/* basic machine hardware */
 	MCFG_CPU_MODIFY("maincpu")

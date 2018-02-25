@@ -970,7 +970,8 @@ MACHINE_CONFIG_START(magicfly_state::magicfly)
 MACHINE_CONFIG_END
 
 
-MACHINE_CONFIG_DERIVED(magicfly_state::_7mezzo, magicfly)
+MACHINE_CONFIG_START(magicfly_state::_7mezzo)
+	magicfly(config);
 
 	/* video hardware */
 	MCFG_VIDEO_START_OVERRIDE(magicfly_state, 7mezzo)
@@ -978,7 +979,8 @@ MACHINE_CONFIG_DERIVED(magicfly_state::_7mezzo, magicfly)
 MACHINE_CONFIG_END
 
 
-MACHINE_CONFIG_DERIVED(magicfly_state::bchance, magicfly)
+MACHINE_CONFIG_START(magicfly_state::bchance)
+	magicfly(config);
 
 	/* video hardware */
 	MCFG_PALETTE_MODIFY("palette")

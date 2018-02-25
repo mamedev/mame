@@ -517,7 +517,8 @@ MACHINE_CONFIG_START(missb2_state::missb2)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.4)
 MACHINE_CONFIG_END
 
-MACHINE_CONFIG_DERIVED(missb2_state::bublpong, missb2)
+MACHINE_CONFIG_START(missb2_state::bublpong)
+	missb2(config);
 	MCFG_GFXDECODE_MODIFY("gfxdecode", bublpong)
 MACHINE_CONFIG_END
 

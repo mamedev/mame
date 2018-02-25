@@ -2585,7 +2585,8 @@ MACHINE_CONFIG_START(ssv_state::ssv)
 MACHINE_CONFIG_END
 
 
-MACHINE_CONFIG_DERIVED(ssv_state::drifto94, ssv)
+MACHINE_CONFIG_START(ssv_state::drifto94)
+	ssv(config);
 
 	/* basic machine hardware */
 	MCFG_CPU_MODIFY("maincpu")
@@ -2605,7 +2606,8 @@ MACHINE_CONFIG_DERIVED(ssv_state::drifto94, ssv)
 MACHINE_CONFIG_END
 
 
-MACHINE_CONFIG_DERIVED(ssv_state::gdfs, ssv)
+MACHINE_CONFIG_START(ssv_state::gdfs)
+	ssv(config);
 
 	/* basic machine hardware */
 	MCFG_CPU_MODIFY("maincpu")
@@ -2628,7 +2630,8 @@ MACHINE_CONFIG_DERIVED(ssv_state::gdfs, ssv)
 MACHINE_CONFIG_END
 
 
-MACHINE_CONFIG_DERIVED(ssv_state::hypreact, ssv)
+MACHINE_CONFIG_START(ssv_state::hypreact)
+	ssv(config);
 
 	/* basic machine hardware */
 	MCFG_CPU_MODIFY("maincpu")
@@ -2642,7 +2645,8 @@ MACHINE_CONFIG_DERIVED(ssv_state::hypreact, ssv)
 MACHINE_CONFIG_END
 
 
-MACHINE_CONFIG_DERIVED(ssv_state::hypreac2, ssv)
+MACHINE_CONFIG_START(ssv_state::hypreac2)
+	ssv(config);
 
 	/* basic machine hardware */
 	MCFG_CPU_MODIFY("maincpu")
@@ -2656,7 +2660,8 @@ MACHINE_CONFIG_DERIVED(ssv_state::hypreac2, ssv)
 MACHINE_CONFIG_END
 
 
-MACHINE_CONFIG_DERIVED(ssv_state::janjans1, ssv)
+MACHINE_CONFIG_START(ssv_state::janjans1)
+	ssv(config);
 
 	/* basic machine hardware */
 	MCFG_CPU_MODIFY("maincpu")
@@ -2668,7 +2673,8 @@ MACHINE_CONFIG_DERIVED(ssv_state::janjans1, ssv)
 MACHINE_CONFIG_END
 
 
-MACHINE_CONFIG_DERIVED(ssv_state::keithlcy, ssv)
+MACHINE_CONFIG_START(ssv_state::keithlcy)
+	ssv(config);
 
 	/* basic machine hardware */
 	MCFG_CPU_MODIFY("maincpu")
@@ -2680,7 +2686,8 @@ MACHINE_CONFIG_DERIVED(ssv_state::keithlcy, ssv)
 MACHINE_CONFIG_END
 
 
-MACHINE_CONFIG_DERIVED(ssv_state::meosism, ssv)
+MACHINE_CONFIG_START(ssv_state::meosism)
+	ssv(config);
 
 	/* basic machine hardware */
 	MCFG_CPU_MODIFY("maincpu")
@@ -2696,7 +2703,8 @@ MACHINE_CONFIG_DERIVED(ssv_state::meosism, ssv)
 MACHINE_CONFIG_END
 
 
-MACHINE_CONFIG_DERIVED(ssv_state::mslider, ssv)
+MACHINE_CONFIG_START(ssv_state::mslider)
+	ssv(config);
 
 	/* basic machine hardware */
 	MCFG_CPU_MODIFY("maincpu")
@@ -2708,7 +2716,8 @@ MACHINE_CONFIG_DERIVED(ssv_state::mslider, ssv)
 MACHINE_CONFIG_END
 
 
-MACHINE_CONFIG_DERIVED(ssv_state::ryorioh, ssv)
+MACHINE_CONFIG_START(ssv_state::ryorioh)
+	ssv(config);
 
 	/* basic machine hardware */
 	MCFG_CPU_MODIFY("maincpu")
@@ -2721,7 +2730,8 @@ MACHINE_CONFIG_DERIVED(ssv_state::ryorioh, ssv)
 	MCFG_SCREEN_VISIBLE_AREA(0, (0xcb-0x23)*2-1, 0, (0xfe - 0x0e)-1)
 MACHINE_CONFIG_END
 
-MACHINE_CONFIG_DERIVED(ssv_state::vasara, ssv)
+MACHINE_CONFIG_START(ssv_state::vasara)
+	ssv(config);
 
 	/* basic machine hardware */
 	MCFG_CPU_MODIFY("maincpu")
@@ -2734,7 +2744,8 @@ MACHINE_CONFIG_DERIVED(ssv_state::vasara, ssv)
 	MCFG_SCREEN_VISIBLE_AREA(0, (0xcc-0x24)*2-1, 0,(0xfe - 0x0e)-1)
 MACHINE_CONFIG_END
 
-MACHINE_CONFIG_DERIVED(ssv_state::srmp4, ssv)
+MACHINE_CONFIG_START(ssv_state::srmp4)
+	ssv(config);
 
 	/* basic machine hardware */
 	MCFG_CPU_MODIFY("maincpu")
@@ -2748,7 +2759,8 @@ MACHINE_CONFIG_DERIVED(ssv_state::srmp4, ssv)
 MACHINE_CONFIG_END
 
 
-MACHINE_CONFIG_DERIVED(ssv_state::srmp7, ssv)
+MACHINE_CONFIG_START(ssv_state::srmp7)
+	ssv(config);
 
 	/* basic machine hardware */
 	MCFG_CPU_MODIFY("maincpu")
@@ -2762,7 +2774,8 @@ MACHINE_CONFIG_DERIVED(ssv_state::srmp7, ssv)
 MACHINE_CONFIG_END
 
 
-MACHINE_CONFIG_DERIVED(ssv_state::stmblade, ssv)
+MACHINE_CONFIG_START(ssv_state::stmblade)
+	ssv(config);
 
 	/* basic machine hardware */
 	MCFG_CPU_MODIFY("maincpu")
@@ -2782,7 +2795,8 @@ MACHINE_CONFIG_DERIVED(ssv_state::stmblade, ssv)
 MACHINE_CONFIG_END
 
 
-MACHINE_CONFIG_DERIVED(ssv_state::survarts, ssv)
+MACHINE_CONFIG_START(ssv_state::survarts)
+	ssv(config);
 
 	/* basic machine hardware */
 	MCFG_CPU_MODIFY("maincpu")
@@ -2796,7 +2810,8 @@ MACHINE_CONFIG_DERIVED(ssv_state::survarts, ssv)
 MACHINE_CONFIG_END
 
 
-MACHINE_CONFIG_DERIVED(ssv_state::dynagear, survarts)
+MACHINE_CONFIG_START(ssv_state::dynagear)
+	survarts(config);
 
 	/* basic machine hardware */
 	/* video hardware */
@@ -2805,7 +2820,8 @@ MACHINE_CONFIG_DERIVED(ssv_state::dynagear, survarts)
 MACHINE_CONFIG_END
 
 
-MACHINE_CONFIG_DERIVED(ssv_state::eaglshot, ssv)
+MACHINE_CONFIG_START(ssv_state::eaglshot)
+	ssv(config);
 
 	/* basic machine hardware */
 	MCFG_CPU_MODIFY("maincpu")
@@ -2829,7 +2845,8 @@ MACHINE_CONFIG_DERIVED(ssv_state::eaglshot, ssv)
 MACHINE_CONFIG_END
 
 
-MACHINE_CONFIG_DERIVED(ssv_state::sxyreact, ssv)
+MACHINE_CONFIG_START(ssv_state::sxyreact)
+	ssv(config);
 
 	/* basic machine hardware */
 	MCFG_CPU_MODIFY("maincpu")
@@ -2844,7 +2861,8 @@ MACHINE_CONFIG_DERIVED(ssv_state::sxyreact, ssv)
 	MCFG_SCREEN_VISIBLE_AREA(0, (0xcb - 0x22)*2-1, 0, (0xfe - 0x0e)-1)
 MACHINE_CONFIG_END
 
-MACHINE_CONFIG_DERIVED(ssv_state::sxyreac2, ssv)
+MACHINE_CONFIG_START(ssv_state::sxyreac2)
+	ssv(config);
 
 	/* basic machine hardware */
 	MCFG_CPU_MODIFY("maincpu")
@@ -2859,7 +2877,8 @@ MACHINE_CONFIG_DERIVED(ssv_state::sxyreac2, ssv)
 	MCFG_SCREEN_VISIBLE_AREA(0, (0xcb - 0x23)*2-1, 0, (0xfe - 0x0e)-1)
 MACHINE_CONFIG_END
 
-MACHINE_CONFIG_DERIVED(ssv_state::cairblad, ssv)
+MACHINE_CONFIG_START(ssv_state::cairblad)
+	ssv(config);
 
 	/* basic machine hardware */
 	MCFG_CPU_MODIFY("maincpu")
@@ -2874,7 +2893,8 @@ MACHINE_CONFIG_DERIVED(ssv_state::cairblad, ssv)
 	MCFG_SCREEN_VISIBLE_AREA(0, (0xcb - 0x22)*2-1, 0, (0xfe - 0x0e)-1)
 MACHINE_CONFIG_END
 
-MACHINE_CONFIG_DERIVED(ssv_state::twineag2, ssv)
+MACHINE_CONFIG_START(ssv_state::twineag2)
+	ssv(config);
 
 	/* basic machine hardware */
 	MCFG_CPU_MODIFY("maincpu")
@@ -2894,7 +2914,8 @@ MACHINE_CONFIG_DERIVED(ssv_state::twineag2, ssv)
 MACHINE_CONFIG_END
 
 
-MACHINE_CONFIG_DERIVED(ssv_state::ultrax, ssv)
+MACHINE_CONFIG_START(ssv_state::ultrax)
+	ssv(config);
 
 	/* basic machine hardware */
 	MCFG_CPU_MODIFY("maincpu")
@@ -2907,7 +2928,8 @@ MACHINE_CONFIG_DERIVED(ssv_state::ultrax, ssv)
 	MCFG_SCREEN_VISIBLE_AREA(0, (0xd4 - 0x2c)*2-1, 0, (0x102 - 0x12)-1)
 MACHINE_CONFIG_END
 
-MACHINE_CONFIG_DERIVED(ssv_state::jsk, ssv)
+MACHINE_CONFIG_START(ssv_state::jsk)
+	ssv(config);
 
 	/* basic machine hardware */
 	MCFG_CPU_MODIFY("maincpu")

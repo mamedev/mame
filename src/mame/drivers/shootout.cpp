@@ -337,7 +337,8 @@ MACHINE_CONFIG_START(shootout_state::shootouj)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.00)
 MACHINE_CONFIG_END
 
-MACHINE_CONFIG_DERIVED(shootout_state::shootouk, shootouj)
+MACHINE_CONFIG_START(shootout_state::shootouk)
+	shootouj(config);
 	/* the Korean 'bootleg' has the usual DECO222 style encryption */
 	MCFG_DEVICE_REMOVE("maincpu")
 	MCFG_CPU_ADD("maincpu", DECO_222, XTAL(12'000'000) / 6) // 2 MHz? (Assuming the same XTAL as DE-0219 pcb)

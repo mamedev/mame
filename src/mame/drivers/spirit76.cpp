@@ -139,7 +139,7 @@ MACHINE_CONFIG_START(spirit76_state::spirit76)
 //  MCFG_PIA_IRQB_HANDLER(INPUTLINE("maincpu", M6800_IRQ_LINE))
 
 	/* sound hardware */
-	MCFG_FRAGMENT_ADD( genpin_audio )
+	genpin_audio(config);
 MACHINE_CONFIG_END
 
 

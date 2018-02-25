@@ -848,11 +848,13 @@ MACHINE_CONFIG_START(maygay1b_state::maygay_m1)
 	MCFG_DEFAULT_LAYOUT(layout_maygay1b)
 MACHINE_CONFIG_END
 
-MACHINE_CONFIG_DERIVED(maygay1b_state::maygay_m1_no_oki, maygay_m1)
+MACHINE_CONFIG_START(maygay1b_state::maygay_m1_no_oki)
+	maygay_m1(config);
 	MCFG_DEVICE_REMOVE("msm6376")
 MACHINE_CONFIG_END
 
-MACHINE_CONFIG_DERIVED(maygay1b_state::maygay_m1_nec, maygay_m1)
+MACHINE_CONFIG_START(maygay1b_state::maygay_m1_nec)
+	maygay_m1(config);
 	MCFG_CPU_MODIFY("maincpu")
 	MCFG_CPU_PROGRAM_MAP(m1_nec_memmap)
 

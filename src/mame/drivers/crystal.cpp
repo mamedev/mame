@@ -1515,17 +1515,20 @@ MACHINE_CONFIG_START(crystal_state::crystal)
 MACHINE_CONFIG_END
 
 
-MACHINE_CONFIG_DERIVED(crystal_state::trivrus, crystal)
+MACHINE_CONFIG_START(crystal_state::trivrus)
+	crystal(config);
 	MCFG_CPU_MODIFY("maincpu")
 	MCFG_CPU_PROGRAM_MAP(trivrus_mem)
 MACHINE_CONFIG_END
 
-MACHINE_CONFIG_DERIVED(crystal_state::crospuzl, crystal)
+MACHINE_CONFIG_START(crystal_state::crospuzl)
+	crystal(config);
 	MCFG_CPU_MODIFY("maincpu")
 	MCFG_CPU_PROGRAM_MAP(crospuzl_mem)
 MACHINE_CONFIG_END
 
-MACHINE_CONFIG_DERIVED(crystal_state::crzyddz2, crystal)
+MACHINE_CONFIG_START(crystal_state::crzyddz2)
+	crystal(config);
 	MCFG_CPU_MODIFY("maincpu")
 	MCFG_CPU_PROGRAM_MAP(crzyddz2_mem)
 MACHINE_CONFIG_END

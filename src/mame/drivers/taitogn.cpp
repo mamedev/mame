@@ -757,31 +757,36 @@ MACHINE_CONFIG_START(taitogn_state::coh3002t)
 	MCFG_ZSG2_EXT_READ_HANDLER(DEVREAD32(DEVICE_SELF_OWNER, taitogn_state, zsg2_ext_r))
 MACHINE_CONFIG_END
 
-MACHINE_CONFIG_DERIVED(taitogn_state::coh3002t_t1, coh3002t)
+MACHINE_CONFIG_START(taitogn_state::coh3002t_t1)
+	coh3002t(config);
 	MCFG_DEVICE_MODIFY("pccard")
 	MCFG_SLOT_DEFAULT_OPTION("taitopccard1")
 MACHINE_CONFIG_END
 
-MACHINE_CONFIG_DERIVED(taitogn_state::coh3002t_t2, coh3002t)
+MACHINE_CONFIG_START(taitogn_state::coh3002t_t2)
+	coh3002t(config);
 	MCFG_DEVICE_MODIFY("pccard")
 	MCFG_SLOT_DEFAULT_OPTION("taitopccard2")
 MACHINE_CONFIG_END
 
-MACHINE_CONFIG_DERIVED(taitogn_state::coh3002t_t1_mp, coh3002t_t1)
+MACHINE_CONFIG_START(taitogn_state::coh3002t_t1_mp)
+	coh3002t_t1(config);
 
 	/* basic machine hardware */
 	MCFG_CPU_MODIFY( "maincpu" )
 	MCFG_CPU_PROGRAM_MAP(taitogn_mp_map)
 MACHINE_CONFIG_END
 
-MACHINE_CONFIG_DERIVED(taitogn_state::coh3002t_t2_mp, coh3002t_t2)
+MACHINE_CONFIG_START(taitogn_state::coh3002t_t2_mp)
+	coh3002t_t2(config);
 
 	/* basic machine hardware */
 	MCFG_CPU_MODIFY( "maincpu" )
 	MCFG_CPU_PROGRAM_MAP(taitogn_mp_map)
 MACHINE_CONFIG_END
 
-MACHINE_CONFIG_DERIVED(taitogn_state::coh3002t_cf, coh3002t)
+MACHINE_CONFIG_START(taitogn_state::coh3002t_cf)
+	coh3002t(config);
 	MCFG_DEVICE_MODIFY("pccard")
 	MCFG_SLOT_DEFAULT_OPTION("taitocf")
 MACHINE_CONFIG_END

@@ -113,10 +113,6 @@ public:
 	template <class Object> static devcb_base &set_write_h_callback(device_t &device, Object &&cb) { return downcast<ucom4_cpu_device &>(device).m_write_h.set_callback(std::forward<Object>(cb)); }
 	template <class Object> static devcb_base &set_write_i_callback(device_t &device, Object &&cb) { return downcast<ucom4_cpu_device &>(device).m_write_i.set_callback(std::forward<Object>(cb)); }
 
-	void data_64x4(address_map &map);
-	void data_96x4(address_map &map);
-	void program_1k(address_map &map);
-	void program_2k(address_map &map);
 protected:
 	// construction/destruction
 	ucom4_cpu_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, u32 clock, int family, int stack_levels, int prgwidth, address_map_constructor program, int datawidth, address_map_constructor data);
@@ -142,6 +138,12 @@ protected:
 
 	// device_state_interface overrides
 	virtual void state_string_export(const device_state_entry &entry, std::string &str) const override;
+
+	// memorymaps
+	void program_1k(address_map &map);
+	void program_2k(address_map &map);
+	void data_64x4(address_map &map);
+	void data_96x4(address_map &map);
 
 	address_space_config m_program_config;
 	address_space_config m_data_config;

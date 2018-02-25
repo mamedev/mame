@@ -285,6 +285,8 @@ WRITE_LINE_MEMBER( m50458_device::set_cs_line )
 
 WRITE_LINE_MEMBER( m50458_device::set_clock_line )
 {
+	(void)m_clock_line;
+
 	if (m_reset_line == CLEAR_LINE)
 	{
 		if(state == 1)

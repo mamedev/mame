@@ -447,7 +447,6 @@ public:
 
 	MC6845_UPDATE_ROW( vdc_update_row );
 
-	void mos8563_videoram_map(address_map &map);
 protected:
 	mos8563_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock);
 
@@ -493,6 +492,8 @@ protected:
 	emu_timer *m_block_copy_timer;
 
 	DECLARE_PALETTE_INIT(mos8563);
+
+	void mos8563_videoram_map(address_map &map);
 };
 
 class mos8568_device : public mos8563_device

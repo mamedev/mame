@@ -29,8 +29,6 @@ public:
 	// construction/destruction
 	s100_djdma_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
-	void djdma_io(address_map &map);
-	void djdma_mem(address_map &map);
 protected:
 	// device-level overrides
 	virtual void device_start() override;
@@ -39,6 +37,10 @@ protected:
 	// optional information overrides
 	virtual void device_add_mconfig(machine_config &config) override;
 	virtual const tiny_rom_entry *device_rom_region() const override;
+
+private:
+	void djdma_io(address_map &map);
+	void djdma_mem(address_map &map);
 };
 
 

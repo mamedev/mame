@@ -352,7 +352,8 @@ MACHINE_CONFIG_START(espial_state::espial)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
 MACHINE_CONFIG_END
 
-MACHINE_CONFIG_DERIVED(espial_state::netwars, espial)
+MACHINE_CONFIG_START(espial_state::netwars)
+	espial(config);
 
 	/* basic machine hardware */
 

@@ -439,7 +439,8 @@ MACHINE_CONFIG_START(bking_state::bking)
 	MCFG_SOUND_ROUTE_EX(0, "dac", 1.0, DAC_VREF_POS_INPUT) MCFG_SOUND_ROUTE_EX(0, "dac", -1.0, DAC_VREF_NEG_INPUT)
 MACHINE_CONFIG_END
 
-MACHINE_CONFIG_DERIVED(bking_state::bking3, bking)
+MACHINE_CONFIG_START(bking_state::bking3)
+	bking(config);
 
 	/* basic machine hardware */
 	MCFG_CPU_MODIFY("main_cpu")

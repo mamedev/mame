@@ -350,7 +350,7 @@ READ16_MEMBER(esq5505_state::lower_r)
 		m_ram = (uint16_t *)(void *)memshare("osram")->ptr();
 	}
 
-	if (!machine().side_effect_disabled() && m_maincpu->get_fc() == 0x6)  // supervisor mode = ROM
+	if (!machine().side_effects_disabled() && m_maincpu->get_fc() == 0x6)  // supervisor mode = ROM
 	{
 		return m_rom[offset];
 	}
@@ -659,7 +659,8 @@ MACHINE_CONFIG_START(esq5505_state::vfx)
 	MCFG_SOUND_ROUTE_EX(7, "pump", 1.0, 7)
 MACHINE_CONFIG_END
 
-MACHINE_CONFIG_DERIVED(esq5505_state::eps, vfx)
+MACHINE_CONFIG_START(esq5505_state::eps)
+	vfx(config);
 	MCFG_CPU_MODIFY( "maincpu" )
 	MCFG_CPU_PROGRAM_MAP(eps_map)
 
@@ -681,7 +682,8 @@ MACHINE_CONFIG_DERIVED(esq5505_state::eps, vfx)
 	MCFG_HD63450_DMA_WRITE_0_CB(WRITE8(esq5505_state, fdc_write_byte))
 MACHINE_CONFIG_END
 
-MACHINE_CONFIG_DERIVED(esq5505_state::vfxsd, vfx)
+MACHINE_CONFIG_START(esq5505_state::vfxsd)
+	vfx(config);
 	MCFG_CPU_MODIFY( "maincpu" )
 	MCFG_CPU_PROGRAM_MAP(vfxsd_map)
 
@@ -739,7 +741,8 @@ MACHINE_CONFIG_START(esq5505_state::vfx32)
 	MCFG_FLOPPY_DRIVE_ADD("wd1772:0", ensoniq_floppies, "35dd", esq5505_state::floppy_formats)
 MACHINE_CONFIG_END
 
-MACHINE_CONFIG_DERIVED(esq5505_state::sq1, vfx)
+MACHINE_CONFIG_START(esq5505_state::sq1)
+	vfx(config);
 	MCFG_CPU_MODIFY( "maincpu" )
 	MCFG_CPU_PROGRAM_MAP(sq1_map)
 

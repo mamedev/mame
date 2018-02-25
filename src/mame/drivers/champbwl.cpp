@@ -230,7 +230,7 @@ READ8_MEMBER(champbwl_state::trackball_r)
 
 READ8_MEMBER(champbwl_state::trackball_reset_r)
 {
-	if (!machine().side_effect_disabled())
+	if (!machine().side_effects_disabled())
 	{
 		m_last_trackball_val[0] = m_fakex->read();
 		m_last_trackball_val[1] = m_fakey->read();

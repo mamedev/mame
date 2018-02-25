@@ -578,7 +578,8 @@ ADDRESS_MAP_START(taitob_state::spacedxo_map)
 	AM_RANGE(0x000000, 0x07ffff) AM_ROM
 	AM_RANGE(0x100000, 0x100001) AM_READNOP AM_DEVWRITE8("tc0140syt", tc0140syt_device, master_port_w, 0xff00)
 	AM_RANGE(0x100002, 0x100003) AM_DEVREADWRITE8("tc0140syt", tc0140syt_device, master_comm_r, master_comm_w, 0xff00)
-	AM_RANGE(0x200000, 0x20000f) AM_DEVREAD8("tc0220ioc", tc0220ioc_device, read, 0x00ff) AM_WRITE(spacedxo_tc0220ioc_w)
+	AM_RANGE(0x200000, 0x20000f) AM_DEVREAD8("tc0220ioc", tc0220ioc_device, read, 0x00ff)
+	AM_RANGE(0x200000, 0x20000f) AM_WRITE(spacedxo_tc0220ioc_w)
 	AM_RANGE(0x210000, 0x210001) AM_READ_PORT("IN3")
 	AM_RANGE(0x220000, 0x220001) AM_READ_PORT("IN4")
 	AM_RANGE(0x230000, 0x230001) AM_READ_PORT("IN5")
@@ -2020,7 +2021,8 @@ MACHINE_CONFIG_START(taitob_state::masterw)
 MACHINE_CONFIG_END
 
 
-MACHINE_CONFIG_DERIVED(taitob_state::tetrist, rastsag2) /* Nastar conversion kit with slightly different memory map */
+MACHINE_CONFIG_START(taitob_state::tetrist) /* Nastar conversion kit with slightly different memory map */
+	rastsag2(config);
 
 	MCFG_CPU_MODIFY("maincpu")
 	MCFG_CPU_PROGRAM_MAP(tetrist_map)
@@ -2030,7 +2032,8 @@ MACHINE_CONFIG_DERIVED(taitob_state::tetrist, rastsag2) /* Nastar conversion kit
 MACHINE_CONFIG_END
 
 
-MACHINE_CONFIG_DERIVED(taitob_state::tetrista, masterw) /* Master of Weapon conversion kit with slightly different memory map */
+MACHINE_CONFIG_START(taitob_state::tetrista) /* Master of Weapon conversion kit with slightly different memory map */
+	masterw(config);
 
 	MCFG_CPU_MODIFY("maincpu")
 	MCFG_CPU_PROGRAM_MAP(tetrista_map)

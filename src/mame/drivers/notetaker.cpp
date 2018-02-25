@@ -319,8 +319,8 @@ READ16_MEMBER( notetaker_state::ReadOPStatus_r ) // 74ls368 hex inverter at #l7 
 	data |= (m_outfifo_count >= 1) ? 0 : 0x08; // m_FIFOOutRdy is true if the fifo has at least 1 word in it, false otherwise
 	data |= (m_outfifo_count < 16) ? 0 : 0x04; // m_FIFOInRdy is true if the fifo has less than 16 words in it, false otherwise
 	// note /SWE is permanently enabled, so we don't enable it here for HD6402 reading
-	data |= m_kbduart->get_output_pin(AY31015_DAV ) ? 0 : 0x02; // DR - pin 19
-	data |= m_kbduart->get_output_pin(AY31015_TBMT) ? 0 : 0x01; // TBRE - pin 22
+	data |= m_kbduart->dav_r( ) ? 0 : 0x02; // DR - pin 19
+	data |= m_kbduart->tbmt_r() ? 0 : 0x01; // TBRE - pin 22
 #ifdef DEBUG_READOPSTATUS
 	logerror("ReadOPStatus read, returning %04x\n", data);
 #endif
@@ -334,25 +334,25 @@ WRITE16_MEMBER( notetaker_state::LoadKeyData_w )
 
 WRITE16_MEMBER( notetaker_state::LoadKeyCtlReg_w )
 {
-	m_kbduart->set_input_pin(AY31015_CS, 0);
-	m_kbduart->set_input_pin(AY31015_NP,  BIT(data, 4)); // PI - pin 35
-	m_kbduart->set_input_pin(AY31015_TSB, BIT(data, 3)); // SBS - pin 36
-	m_kbduart->set_input_pin(AY31015_NB2, BIT(data, 2)); // CLS2 - pin 37
-	m_kbduart->set_input_pin(AY31015_NB1, BIT(data, 1)); // CLS1 - pin 38
-	m_kbduart->set_input_pin(AY31015_EPS, BIT(data, 0)); // EPE - pin 39
-	m_kbduart->set_input_pin(AY31015_CS, 1);
+	m_kbduart->write_cs(0);
+	m_kbduart->write_np(BIT(data, 4)); // PI - pin 35
+	m_kbduart->write_tsb(BIT(data, 3)); // SBS - pin 36
+	m_kbduart->write_nb2(BIT(data, 2)); // CLS2 - pin 37
+	m_kbduart->write_nb1(BIT(data, 1)); // CLS1 - pin 38
+	m_kbduart->write_eps(BIT(data, 0)); // EPE - pin 39
+	m_kbduart->write_cs(1);
 }
 
 WRITE16_MEMBER( notetaker_state::KeyDataReset_w )
 {
-	m_kbduart->set_input_pin(AY31015_RDAV, 0); // DDR - pin 18
-	m_kbduart->set_input_pin(AY31015_RDAV, 1); // ''
+	m_kbduart->write_rdav(0); // DDR - pin 18
+	m_kbduart->write_rdav(1); // ''
 }
 
 WRITE16_MEMBER( notetaker_state::KeyChipReset_w )
 {
-	m_kbduart->set_input_pin(AY31015_XR, 0); // MR - pin 21
-	m_kbduart->set_input_pin(AY31015_XR, 1); // ''
+	m_kbduart->write_xr(0); // MR - pin 21
+	m_kbduart->write_xr(1); // ''
 }
 
 /* FIFO (DAC) Stuff and ADC stuff */
@@ -457,8 +457,8 @@ READ16_MEMBER( notetaker_state::ReadEIAStatus_r ) // 74ls368 hex inverter at #f1
 {
 	uint16_t data = 0xFFFC;
 	// note /SWE is permanently enabled, so we don't enable it here for HD6402 reading
-	data |= m_eiauart->get_output_pin(AY31015_DAV ) ? 0 : 0x02; // DR - pin 19
-	data |= m_eiauart->get_output_pin(AY31015_TBMT) ? 0 : 0x01; // TBRE - pin 22
+	data |= m_eiauart->dav_r( ) ? 0 : 0x02; // DR - pin 19
+	data |= m_eiauart->tbmt_r() ? 0 : 0x01; // TBRE - pin 22
 	return data;
 }
 
@@ -469,25 +469,25 @@ WRITE16_MEMBER( notetaker_state::LoadEIAData_w )
 
 WRITE16_MEMBER( notetaker_state::LoadEIACtlReg_w )
 {
-	m_eiauart->set_input_pin(AY31015_CS, 0);
-	m_eiauart->set_input_pin(AY31015_NP,  BIT(data, 4)); // PI - pin 35
-	m_eiauart->set_input_pin(AY31015_TSB, BIT(data, 3)); // SBS - pin 36
-	m_eiauart->set_input_pin(AY31015_NB2, BIT(data, 2)); // CLS2 - pin 37
-	m_eiauart->set_input_pin(AY31015_NB1, BIT(data, 1)); // CLS1 - pin 38
-	m_eiauart->set_input_pin(AY31015_EPS, BIT(data, 0)); // EPE - pin 39
-	m_eiauart->set_input_pin(AY31015_CS, 1);
+	m_eiauart->write_cs(0);
+	m_eiauart->write_np(BIT(data, 4)); // PI - pin 35
+	m_eiauart->write_tsb(BIT(data, 3)); // SBS - pin 36
+	m_eiauart->write_nb2(BIT(data, 2)); // CLS2 - pin 37
+	m_eiauart->write_nb1(BIT(data, 1)); // CLS1 - pin 38
+	m_eiauart->write_eps(BIT(data, 0)); // EPE - pin 39
+	m_eiauart->write_cs(1);
 }
 
 WRITE16_MEMBER( notetaker_state::EIADataReset_w )
 {
-	m_eiauart->set_input_pin(AY31015_RDAV, 0); // DDR - pin 18
-	m_eiauart->set_input_pin(AY31015_RDAV, 1); // ''
+	m_eiauart->write_rdav(0); // DDR - pin 18
+	m_eiauart->write_rdav(1); // ''
 }
 
 WRITE16_MEMBER( notetaker_state::EIAChipReset_w )
 {
-	m_eiauart->set_input_pin(AY31015_XR, 0); // MR - pin 21
-	m_eiauart->set_input_pin(AY31015_XR, 1); // ''
+	m_eiauart->write_xr(0); // MR - pin 21
+	m_eiauart->write_xr(1); // ''
 }
 
 
@@ -757,9 +757,9 @@ void notetaker_state::machine_start()
 	// FDC: /DDEN is tied permanently LOW so MFM mode is ALWAYS ON
 	m_fdc->dden_w(0);
 	// Keyboard UART: /SWE is tied permanently LOW
-	m_kbduart->set_input_pin(AY31015_SWE, 0); // status word outputs are permanently enabled (pin 16 SFD(SWE) tied low, active)
+	m_kbduart->write_swe(0); // status word outputs are permanently enabled (pin 16 SFD(SWE) tied low, active)
 	// EIA UART: /SWE is tied permanently LOW
-	m_eiauart->set_input_pin(AY31015_SWE, 0); // status word outputs are permanently enabled (pin 16 SFD(SWE) tied low, active)
+	m_eiauart->write_swe(0); // status word outputs are permanently enabled (pin 16 SFD(SWE) tied low, active)
 	// savestate stuff
 	// TODO: add me!
 }
@@ -775,11 +775,11 @@ void notetaker_state::machine_reset()
 void notetaker_state::ip_reset()
 {
 	// reset the Keyboard UART
-	m_kbduart->set_input_pin(AY31015_XR, 0); // MR - pin 21
-	m_kbduart->set_input_pin(AY31015_XR, 1); // ''
+	m_kbduart->write_xr(0); // MR - pin 21
+	m_kbduart->write_xr(1); // ''
 	// reset the EIA UART
-	m_eiauart->set_input_pin(AY31015_XR, 0); // MR - pin 21
-	m_eiauart->set_input_pin(AY31015_XR, 1); // ''
+	m_eiauart->write_xr(0); // MR - pin 21
+	m_eiauart->write_xr(1); // ''
 	// reset the IPConReg latch at #f1
 	m_BootSeqDone = 0;
 	m_ProcLock = 0;

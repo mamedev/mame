@@ -269,7 +269,7 @@ READ16_MEMBER(interpro_state::sreg_error_r)
 	const u16 result = m_sreg_error;
 
 	// clear error register on read
-	if (!machine().side_effect_disabled())
+	if (!machine().side_effects_disabled())
 		m_sreg_error = 0;
 
 	return result;
@@ -278,7 +278,7 @@ READ16_MEMBER(interpro_state::sreg_error_r)
 READ32_MEMBER(interpro_state::unmapped_r)
 {
 	// check if non-existent memory errors are enabled
-	if (!machine().side_effect_disabled())
+	if (!machine().side_effects_disabled())
 		if (m_arbga->tctrl_r(space, offset, mem_mask) & interpro_arbga_device::TCTRL_ENNEM)
 		{
 			// flag non-existent memory error in system error register
@@ -575,7 +575,8 @@ MACHINE_CONFIG_START(interpro_state::interpro)
 	MCFG_DEFAULT_LAYOUT(layout_interpro)
 MACHINE_CONFIG_END
 
-MACHINE_CONFIG_DERIVED(turquoise_state::turquoise, interpro)
+MACHINE_CONFIG_START(turquoise_state::turquoise)
+	interpro(config);
 	MCFG_CPU_ADD(INTERPRO_CPU_TAG, CLIPPER_C300, XTAL(12'500'000))
 	MCFG_CPU_PROGRAM_MAP(c300_insn_map)
 	MCFG_CPU_DATA_MAP(c300_data_map)
@@ -616,8 +617,8 @@ MACHINE_CONFIG_DERIVED(turquoise_state::turquoise, interpro)
 	MCFG_FLOPPY_DRIVE_SOUND(false)
 
 	// serial controllers and ports
-	MCFG_FRAGMENT_ADD(interpro_serial1)
-	MCFG_FRAGMENT_ADD(interpro_serial2)
+	interpro_serial1(config);
+	interpro_serial2(config);
 
 	// scsi controller
 	MCFG_NSCSI_ADD(INTERPRO_SCSI_TAG ":7", turquoise_scsi_devices, INTERPRO_SCSI_ADAPTER_TAG, true)
@@ -631,13 +632,14 @@ MACHINE_CONFIG_DERIVED(turquoise_state::turquoise, interpro)
 	// i/o gate array
 	MCFG_DEVICE_ADD(INTERPRO_IOGA_TAG, TURQUOISE_IOGA, 0)
 	MCFG_INTERPRO_IOGA_MEMORY(INTERPRO_MMU_TAG "_d", 0)
-	MCFG_FRAGMENT_ADD(ioga)
+	ioga(config);
 
 	MCFG_DEVICE_MODIFY(INTERPRO_SRBUS_TAG)
 	MCFG_SR_MEMORY(INTERPRO_MMU_TAG "_d", 0, 1)
 MACHINE_CONFIG_END
 
-MACHINE_CONFIG_DERIVED(sapphire_state::sapphire, interpro)
+MACHINE_CONFIG_START(sapphire_state::sapphire)
+	interpro(config);
 	MCFG_CPU_ADD(INTERPRO_CPU_TAG, CLIPPER_C400, XTAL(12'500'000))
 	MCFG_CPU_PROGRAM_MAP(c400_insn_map)
 	MCFG_CPU_DATA_MAP(c400_data_map)
@@ -664,8 +666,8 @@ MACHINE_CONFIG_DERIVED(sapphire_state::sapphire, interpro)
 	MCFG_FLOPPY_DRIVE_SOUND(false)
 
 	// serial controllers and ports
-	MCFG_FRAGMENT_ADD(interpro_serial1)
-	MCFG_FRAGMENT_ADD(interpro_serial2)
+	interpro_serial1(config);
+	interpro_serial2(config);
 
 	// scsi controller
 	MCFG_NSCSI_ADD(INTERPRO_SCSI_TAG ":7", sapphire_scsi_devices, INTERPRO_SCSI_ADAPTER_TAG, true)
@@ -679,7 +681,7 @@ MACHINE_CONFIG_DERIVED(sapphire_state::sapphire, interpro)
 	// i/o gate array
 	MCFG_DEVICE_ADD(INTERPRO_IOGA_TAG, SAPPHIRE_IOGA, 0)
 	MCFG_INTERPRO_IOGA_MEMORY(INTERPRO_MMU_TAG, 0)
-	MCFG_FRAGMENT_ADD(ioga)
+	ioga(config);
 
 	// flash memory
 	MCFG_DEVICE_ADD(INTERPRO_FLASH_TAG "_lo", INTEL_28F010, 0)
@@ -690,27 +692,32 @@ MACHINE_CONFIG_DERIVED(sapphire_state::sapphire, interpro)
 	MCFG_SR_MEMORY(INTERPRO_MMU_TAG, 0, 1)
 MACHINE_CONFIG_END
 
-MACHINE_CONFIG_DERIVED(turquoise_state::ip2000, turquoise)
+MACHINE_CONFIG_START(turquoise_state::ip2000)
+	turquoise(config);
 	//MCFG_DEVICE_MODIFY(INTERPRO_CPU_TAG)
 	//MCFG_DEVICE_CLOCK(XTAL(40'000'000))
 MACHINE_CONFIG_END
 
-MACHINE_CONFIG_DERIVED(sapphire_state::ip2400, sapphire)
+MACHINE_CONFIG_START(sapphire_state::ip2400)
+	sapphire(config);
 	//MCFG_DEVICE_MODIFY(INTERPRO_CPU_TAG)
 	//MCFG_DEVICE_CLOCK(XTAL(40'000'000))
 MACHINE_CONFIG_END
 
-MACHINE_CONFIG_DERIVED(sapphire_state::ip2500, sapphire)
+MACHINE_CONFIG_START(sapphire_state::ip2500)
+	sapphire(config);
 	//MCFG_DEVICE_MODIFY(INTERPRO_CPU_TAG)
 	//MCFG_DEVICE_CLOCK(XTAL(50'000'000))
 MACHINE_CONFIG_END
 
-MACHINE_CONFIG_DERIVED(sapphire_state::ip2700, sapphire)
+MACHINE_CONFIG_START(sapphire_state::ip2700)
+	sapphire(config);
 	//MCFG_DEVICE_MODIFY(INTERPRO_CPU_TAG)
 	//MCFG_DEVICE_CLOCK(XTAL_70MHz)
 MACHINE_CONFIG_END
 
-MACHINE_CONFIG_DERIVED(sapphire_state::ip2800, sapphire)
+MACHINE_CONFIG_START(sapphire_state::ip2800)
+	sapphire(config);
 	//MCFG_DEVICE_MODIFY(INTERPRO_CPU_TAG)
 	//MCFG_DEVICE_CLOCK(XTAL_80MHz)
 MACHINE_CONFIG_END

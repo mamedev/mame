@@ -862,7 +862,8 @@ MACHINE_CONFIG_START(m10_state::m10)
 
 MACHINE_CONFIG_END
 
-MACHINE_CONFIG_DERIVED(m10_state::m11, m10)
+MACHINE_CONFIG_START(m10_state::m11)
+	m10(config);
 
 	/* basic machine hardware */
 	MCFG_CPU_MODIFY("maincpu")
@@ -906,7 +907,8 @@ MACHINE_CONFIG_START(m10_state::m15)
 MACHINE_CONFIG_END
 
 
-MACHINE_CONFIG_DERIVED(m10_state::headoni, m15)
+MACHINE_CONFIG_START(m10_state::headoni)
+	m15(config);
 	MCFG_CPU_MODIFY("maincpu")
 	MCFG_CPU_CLOCK(11730000/16)
 MACHINE_CONFIG_END

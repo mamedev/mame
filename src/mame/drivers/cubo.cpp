@@ -1054,7 +1054,7 @@ MACHINE_CONFIG_START(cubo_state::cubo)
 	MCFG_AKIKO_SDA_WRITE_HANDLER(DEVWRITELINE("i2cmem", i2cmem_device, write_sda))
 
 	// video hardware
-	MCFG_FRAGMENT_ADD(pal_video)
+	pal_video(config);
 	MCFG_DEVICE_MODIFY("screen")
 	MCFG_SCREEN_UPDATE_DRIVER(amiga_state, screen_update_amiga_aga)
 	MCFG_SCREEN_NO_PALETTE

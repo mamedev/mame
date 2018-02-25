@@ -284,38 +284,44 @@ MACHINE_CONFIG_START(primo_state::primoa32)
 	MCFG_GENERIC_EXTENSIONS("bin,rom")
 MACHINE_CONFIG_END
 
-MACHINE_CONFIG_DERIVED(primo_state::primoa48, primoa32)
+MACHINE_CONFIG_START(primo_state::primoa48)
+	primoa32(config);
 	MCFG_CPU_MODIFY("maincpu")
 	MCFG_CPU_PROGRAM_MAP(primo48_mem)
 MACHINE_CONFIG_END
 
-MACHINE_CONFIG_DERIVED(primo_state::primoa64, primoa32)
+MACHINE_CONFIG_START(primo_state::primoa64)
+	primoa32(config);
 	MCFG_CPU_MODIFY("maincpu")
 	MCFG_CPU_PROGRAM_MAP(primo64_mem)
 MACHINE_CONFIG_END
 
-MACHINE_CONFIG_DERIVED(primo_state::primob32, primoa32)
+MACHINE_CONFIG_START(primo_state::primob32)
+	primoa32(config);
 	MCFG_CPU_MODIFY("maincpu")
 	MCFG_CPU_IO_MAP(primob_port)
 
 	MCFG_MACHINE_RESET_OVERRIDE(primo_state, primob)
 MACHINE_CONFIG_END
 
-MACHINE_CONFIG_DERIVED(primo_state::primob48, primoa48)
+MACHINE_CONFIG_START(primo_state::primob48)
+	primoa48(config);
 	MCFG_CPU_MODIFY("maincpu")
 	MCFG_CPU_IO_MAP(primob_port)
 
 	MCFG_MACHINE_RESET_OVERRIDE(primo_state, primob)
 MACHINE_CONFIG_END
 
-MACHINE_CONFIG_DERIVED(primo_state::primob64, primoa64)
+MACHINE_CONFIG_START(primo_state::primob64)
+	primoa64(config);
 	MCFG_CPU_MODIFY("maincpu")
 	MCFG_CPU_IO_MAP(primob_port)
 
 	MCFG_MACHINE_RESET_OVERRIDE(primo_state, primob)
 MACHINE_CONFIG_END
 
-MACHINE_CONFIG_DERIVED(primo_state::primoc64, primoa64)
+MACHINE_CONFIG_START(primo_state::primoc64)
+	primoa64(config);
 	MCFG_CPU_MODIFY("maincpu")
 	MCFG_CPU_IO_MAP(primob_port)
 

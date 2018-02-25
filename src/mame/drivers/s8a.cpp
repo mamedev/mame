@@ -289,7 +289,7 @@ MACHINE_CONFIG_START(s8a_state::s8a)
 	MCFG_DEFAULT_LAYOUT(layout_s8a)
 
 	/* Sound */
-	MCFG_FRAGMENT_ADD( genpin_audio )
+	genpin_audio(config);
 
 	/* Devices */
 	MCFG_DEVICE_ADD("pia21", PIA6821, 0)

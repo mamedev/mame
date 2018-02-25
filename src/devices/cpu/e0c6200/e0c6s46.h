@@ -92,8 +92,6 @@ public:
 
 	u32 screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 
-	void e0c6s46_data(address_map &map);
-	void e0c6s46_program(address_map &map);
 protected:
 	// device-level overrides
 	virtual void device_start() override;
@@ -104,6 +102,9 @@ protected:
 	virtual void execute_set_input(int line, int state) override;
 	virtual void execute_one() override;
 	virtual bool check_interrupt() override;
+
+	void e0c6s46_data(address_map &map);
+	void e0c6s46_program(address_map &map);
 
 private:
 	required_shared_ptr<u8> m_vram1;

@@ -1348,7 +1348,7 @@ MACHINE_CONFIG_START(kc85_state::kc85)
 	MCFG_I8085A_SOD(WRITELINE(kc85_state,kc85_sod_w))
 
 	/* video hardware */
-	MCFG_FRAGMENT_ADD(kc85_video)
+	kc85_video(config);
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
@@ -1398,7 +1398,7 @@ MACHINE_CONFIG_START(pc8201_state::pc8201)
 	MCFG_I8085A_SOD(WRITELINE(kc85_state,kc85_sod_w))
 
 	/* video hardware */
-	MCFG_FRAGMENT_ADD(kc85_video)
+	kc85_video(config);
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
@@ -1443,7 +1443,8 @@ MACHINE_CONFIG_START(pc8201_state::pc8201)
 	MCFG_RAM_EXTRA_OPTIONS("32K,64K,96K")
 MACHINE_CONFIG_END
 
-MACHINE_CONFIG_DERIVED(pc8201_state::pc8300, pc8201)
+MACHINE_CONFIG_START(pc8201_state::pc8300)
+	pc8201(config);
 	MCFG_RAM_MODIFY(RAM_TAG)
 	MCFG_RAM_DEFAULT_SIZE("32K")
 	MCFG_RAM_EXTRA_OPTIONS("64K,96K")
@@ -1458,7 +1459,7 @@ MACHINE_CONFIG_START(trsm100_state::trsm100)
 	MCFG_I8085A_SOD(WRITELINE(kc85_state,kc85_sod_w))
 
 	/* video hardware */
-	MCFG_FRAGMENT_ADD(kc85_video)
+	kc85_video(config);
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
@@ -1498,7 +1499,8 @@ MACHINE_CONFIG_START(trsm100_state::trsm100)
 	MCFG_RAM_EXTRA_OPTIONS("16K,24K,32K")
 MACHINE_CONFIG_END
 
-MACHINE_CONFIG_DERIVED(trsm100_state::tandy102, trsm100)
+MACHINE_CONFIG_START(trsm100_state::tandy102)
+	trsm100(config);
 	MCFG_RAM_MODIFY(RAM_TAG)
 	MCFG_RAM_DEFAULT_SIZE("24K")
 	MCFG_RAM_EXTRA_OPTIONS("32K")
@@ -1513,7 +1515,7 @@ MACHINE_CONFIG_START(tandy200_state::tandy200)
 	MCFG_I8085A_SOD(WRITELINE(tandy200_state,kc85_sod_w))
 
 	/* video hardware */
-	MCFG_FRAGMENT_ADD(tandy200_video)
+	tandy200_video(config);
 
 	/* TP timer */
 	MCFG_TIMER_DRIVER_ADD_PERIODIC("tp", tandy200_state, tandy200_tp_tick, attotime::from_hz(XTAL(4'915'200)/2/8192))

@@ -923,7 +923,8 @@ MACHINE_CONFIG_START(astrof_state::base)
 MACHINE_CONFIG_END
 
 
-MACHINE_CONFIG_DERIVED(astrof_state::astrof, base)
+MACHINE_CONFIG_START(astrof_state::astrof)
+	base(config);
 
 	/* basic machine hardware */
 	MCFG_CPU_MODIFY("maincpu")
@@ -936,11 +937,12 @@ MACHINE_CONFIG_DERIVED(astrof_state::astrof, base)
 	MCFG_SCREEN_UPDATE_DRIVER(astrof_state, screen_update_astrof)
 
 	/* audio hardware */
-	MCFG_FRAGMENT_ADD(astrof_audio)
+	astrof_audio(config);
 MACHINE_CONFIG_END
 
 
-MACHINE_CONFIG_DERIVED(astrof_state::abattle, astrof)
+MACHINE_CONFIG_START(astrof_state::abattle)
+	astrof(config);
 
 	/* basic machine hardware */
 
@@ -949,7 +951,8 @@ MACHINE_CONFIG_DERIVED(astrof_state::abattle, astrof)
 MACHINE_CONFIG_END
 
 
-MACHINE_CONFIG_DERIVED(astrof_state::spfghmk2, base)
+MACHINE_CONFIG_START(astrof_state::spfghmk2)
+	base(config);
 
 	/* basic machine hardware */
 	MCFG_CPU_MODIFY("maincpu")
@@ -962,11 +965,12 @@ MACHINE_CONFIG_DERIVED(astrof_state::spfghmk2, base)
 	MCFG_SCREEN_UPDATE_DRIVER(astrof_state, screen_update_astrof)
 
 	/* audio hardware */
-	MCFG_FRAGMENT_ADD(spfghmk2_audio)
+	spfghmk2_audio(config);
 MACHINE_CONFIG_END
 
 
-MACHINE_CONFIG_DERIVED(astrof_state::tomahawk, base)
+MACHINE_CONFIG_START(astrof_state::tomahawk)
+	base(config);
 
 	/* basic machine hardware */
 	MCFG_CPU_MODIFY("maincpu")
@@ -979,7 +983,7 @@ MACHINE_CONFIG_DERIVED(astrof_state::tomahawk, base)
 	MCFG_SCREEN_UPDATE_DRIVER(astrof_state, screen_update_tomahawk)
 
 	/* audio hardware */
-	MCFG_FRAGMENT_ADD(tomahawk_audio)
+	tomahawk_audio(config);
 MACHINE_CONFIG_END
 
 

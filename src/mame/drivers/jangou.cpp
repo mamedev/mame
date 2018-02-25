@@ -891,7 +891,8 @@ MACHINE_CONFIG_START(jangou_state::jangou)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.60)
 MACHINE_CONFIG_END
 
-MACHINE_CONFIG_DERIVED(jangou_state::jngolady, jangou)
+MACHINE_CONFIG_START(jangou_state::jngolady)
+	jangou(config);
 
 	/* basic machine hardware */
 
@@ -917,7 +918,8 @@ MACHINE_CONFIG_DERIVED(jangou_state::jngolady, jangou)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.80)
 MACHINE_CONFIG_END
 
-MACHINE_CONFIG_DERIVED(jangou_state::cntrygrl, jangou)
+MACHINE_CONFIG_START(jangou_state::cntrygrl)
+	jangou(config);
 
 	/* basic machine hardware */
 
@@ -935,7 +937,8 @@ MACHINE_CONFIG_DERIVED(jangou_state::cntrygrl, jangou)
 	MCFG_DEVICE_REMOVE("soundlatch")
 MACHINE_CONFIG_END
 
-MACHINE_CONFIG_DERIVED(jangou_state::roylcrdn, jangou)
+MACHINE_CONFIG_START(jangou_state::roylcrdn)
+	jangou(config);
 
 	/* basic machine hardware */
 

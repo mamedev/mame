@@ -5,7 +5,7 @@
     m6502_vtscr.h
 
     6502 with VRT VTxx instruction scrambling
-    
+
 ***************************************************************************/
 
 #ifndef MAME_CPU_M6502_VTSCR_H
@@ -26,13 +26,13 @@ public:
 protected:
 	class mi_decrypt : public mi_default_normal {
 	public:
-		
+
 		bool m_scramble_en = false;
 		bool m_next_scramble = false;
-		
+
 		virtual ~mi_decrypt() {}
 		virtual uint8_t read_sync(uint16_t adr) override;
-		
+
 		uint8_t descramble(uint8_t op);
 		bool toggle_scramble(uint8_t op);
 

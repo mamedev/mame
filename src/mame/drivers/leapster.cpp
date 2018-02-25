@@ -341,9 +341,9 @@ ROM_START(leapster)
 	ROM_SYSTEM_BIOS( 0,  "uni15",   "Universal 1.5" )    /* 152-10346 Leapster BaseROM Universal v1.5      - Sep 04 2003 10:46:47 */
 	ROM_LOAD_BIOS( 0, "155-10072-a.bin"   , 0x00000, 0x200000, CRC(af05e5a0) SHA1(d4468d060543ba7e44785041093bc98bcd9afa07) )
 	ROM_SYSTEM_BIOS( 1,  "uk21",    "UK 2.1" )           /* 152-11452 Leapster BaseROM UK v2.1             - Aug 30 2005 16:01:46 */
-	ROM_LOAD_BIOS( 1, "leapster2_1004.bin", 0x00000, 0x800000, CRC(b466e14d) SHA1(910c234f03e76b7de55b8aa0a0c62fd1daae4910) ) 
+	ROM_LOAD_BIOS( 1, "leapster2_1004.bin", 0x00000, 0x800000, CRC(b466e14d) SHA1(910c234f03e76b7de55b8aa0a0c62fd1daae4910) )
 	ROM_SYSTEM_BIOS( 2,  "ger21",   "German 2.1" )       /* 152-11435 Leapster BaseROM German v2.1         - Oct 21 2005 18:53:59 */
-	ROM_LOAD_BIOS( 2, "leapster2_1006.bin", 0x00000, 0x800000, CRC(a69ed8ca) SHA1(e6aacba0c39b1465f344c2b07ff1cbd8a395adac) ) 
+	ROM_LOAD_BIOS( 2, "leapster2_1006.bin", 0x00000, 0x800000, CRC(a69ed8ca) SHA1(e6aacba0c39b1465f344c2b07ff1cbd8a395adac) )
 ROM_END
 
 ROM_START(leapstertv)

@@ -38,11 +38,17 @@ class bowltry_state : public driver_device
 {
 public:
 	bowltry_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag),
-			m_maincpu(*this, "maincpu")
+		: driver_device(mconfig, type, tag)
+		, m_maincpu(*this, "maincpu")
 	{ }
 
+	void bowltry(machine_config &config);
+
+protected:
+	void bowltry_map(address_map &map);
+
 	uint32_t screen_update_bowltry(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
+
 	int m_test_x;
 	int m_test_y;
 	int m_start_offs;
@@ -52,11 +58,7 @@ public:
 	uint16_t m_hack[2];
 #endif
 
-void bowltry(machine_config &config);
-void bowltry_map(address_map &map);
-protected:
 	required_device<cpu_device> m_maincpu;
-public:
 };
 
 #if HACK_ENABLED

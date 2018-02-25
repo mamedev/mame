@@ -455,12 +455,14 @@ MACHINE_CONFIG_START(vtech2_state::laser350)
 MACHINE_CONFIG_END
 
 
-MACHINE_CONFIG_DERIVED(vtech2_state::laser500, laser350)
+MACHINE_CONFIG_START(vtech2_state::laser500)
+	laser350(config);
 	MCFG_MACHINE_RESET_OVERRIDE(vtech2_state, laser500 )
 MACHINE_CONFIG_END
 
 
-MACHINE_CONFIG_DERIVED(vtech2_state::laser700, laser350)
+MACHINE_CONFIG_START(vtech2_state::laser700)
+	laser350(config);
 	MCFG_MACHINE_RESET_OVERRIDE(vtech2_state, laser700 )
 
 	/* Second 5.25" floppy drive */

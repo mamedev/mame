@@ -1166,12 +1166,14 @@ MACHINE_CONFIG_START(missile_state::missile)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 MACHINE_CONFIG_END
 
-MACHINE_CONFIG_DERIVED(missile_state::missilea, missile)
+MACHINE_CONFIG_START(missile_state::missilea)
+	missile(config);
 
 	MCFG_DEVICE_REMOVE("pokey")
 MACHINE_CONFIG_END
 
-MACHINE_CONFIG_DERIVED(missile_state::missileb, missilea)
+MACHINE_CONFIG_START(missile_state::missileb)
+	missilea(config);
 
 	MCFG_CPU_MODIFY("maincpu")
 	MCFG_CPU_PROGRAM_MAP(bootleg_main_map)

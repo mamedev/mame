@@ -358,7 +358,7 @@ MACHINE_CONFIG_START(gts3a_state::gts3a)
 	MCFG_MC6845_UPDATE_ROW_CB(gts3a_state, crtc_update_row)
 
 	/* Sound */
-	MCFG_FRAGMENT_ADD( genpin_audio )
+	genpin_audio(config);
 
 	MCFG_DEVICE_ADD("u4", VIA6522, XTAL(4'000'000) / 2)
 	MCFG_VIA6522_IRQ_HANDLER(INPUTLINE("maincpu", M65C02_IRQ_LINE))

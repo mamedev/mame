@@ -1592,7 +1592,8 @@ MACHINE_CONFIG_START(segac2_state::segac)
 MACHINE_CONFIG_END
 
 
-MACHINE_CONFIG_DERIVED(segac2_state::segac2, segac)
+MACHINE_CONFIG_START(segac2_state::segac2)
+	segac(config);
 
 	/* basic machine hardware */
 	MCFG_DEVICE_MODIFY("io")

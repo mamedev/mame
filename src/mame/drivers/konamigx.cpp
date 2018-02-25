@@ -1692,17 +1692,20 @@ MACHINE_CONFIG_START(konamigx_state::konamigx)
 	MCFG_SOUND_ROUTE(1, "rspeaker", 1.0)
 MACHINE_CONFIG_END
 
-MACHINE_CONFIG_DERIVED(konamigx_state::konamigx_bios, konamigx)
+MACHINE_CONFIG_START(konamigx_state::konamigx_bios)
+	konamigx(config);
 	MCFG_DEVICE_MODIFY("k056832")
 	MCFG_K056832_CONFIG("gfx1", K056832_BPP_4, 0, 0, "k055555")
 MACHINE_CONFIG_END
 
-MACHINE_CONFIG_DERIVED(konamigx_state::gokuparo, konamigx)
+MACHINE_CONFIG_START(konamigx_state::gokuparo)
+	konamigx(config);
 	MCFG_DEVICE_MODIFY("k055673")
 	MCFG_K055673_CONFIG("gfx2", K055673_LAYOUT_GX, -46, -23)
 MACHINE_CONFIG_END
 
-MACHINE_CONFIG_DERIVED(konamigx_state::sexyparo, konamigx)
+MACHINE_CONFIG_START(konamigx_state::sexyparo)
+	konamigx(config);
 	MCFG_DEVICE_MODIFY("k056832")
 	MCFG_K056832_CB(konamigx_state, alpha_tile_callback)
 
@@ -1710,12 +1713,14 @@ MACHINE_CONFIG_DERIVED(konamigx_state::sexyparo, konamigx)
 	MCFG_K055673_CONFIG("gfx2", K055673_LAYOUT_GX, -42, -23)
 MACHINE_CONFIG_END
 
-MACHINE_CONFIG_DERIVED(konamigx_state::tbyahhoo, konamigx)
+MACHINE_CONFIG_START(konamigx_state::tbyahhoo)
+	konamigx(config);
 	MCFG_DEVICE_MODIFY("k056832")
 	MCFG_K056832_CONFIG("gfx1", K056832_BPP_5, 0, 0, "k055555")
 MACHINE_CONFIG_END
 
-MACHINE_CONFIG_DERIVED(konamigx_state::dragoonj, konamigx)
+MACHINE_CONFIG_START(konamigx_state::dragoonj)
+	konamigx(config);
 	MCFG_SCREEN_MODIFY("screen")
 	MCFG_VIDEO_START_OVERRIDE(konamigx_state, dragoonj)
 
@@ -1730,7 +1735,8 @@ MACHINE_CONFIG_DERIVED(konamigx_state::dragoonj, konamigx)
 	MCFG_K055673_CONFIG("gfx2", K055673_LAYOUT_RNG, -53, -23)
 MACHINE_CONFIG_END
 
-MACHINE_CONFIG_DERIVED(konamigx_state::le2, konamigx)
+MACHINE_CONFIG_START(konamigx_state::le2)
+	konamigx(config);
 	MCFG_VIDEO_START_OVERRIDE(konamigx_state, le2)
 	MCFG_TIMER_DRIVER_ADD_SCANLINE("scantimer", konamigx_state, konamigx_type2_scanline, "screen", 0, 1)
 
@@ -1742,7 +1748,8 @@ MACHINE_CONFIG_DERIVED(konamigx_state::le2, konamigx)
 	MCFG_K055673_CONFIG("gfx2", K055673_LAYOUT_LE2, -46, -23)
 MACHINE_CONFIG_END
 
-MACHINE_CONFIG_DERIVED(konamigx_state::konamigx_6bpp, konamigx)
+MACHINE_CONFIG_START(konamigx_state::konamigx_6bpp)
+	konamigx(config);
 	MCFG_VIDEO_START_OVERRIDE(konamigx_state, konamigx_6bpp)
 
 	MCFG_DEVICE_MODIFY("k056832")
@@ -1752,7 +1759,8 @@ MACHINE_CONFIG_DERIVED(konamigx_state::konamigx_6bpp, konamigx)
 	MCFG_K055673_CONFIG("gfx2", K055673_LAYOUT_GX, -46, -23)
 MACHINE_CONFIG_END
 
-MACHINE_CONFIG_DERIVED(konamigx_state::salmndr2, konamigx)
+MACHINE_CONFIG_START(konamigx_state::salmndr2)
+	konamigx(config);
 	MCFG_DEVICE_MODIFY("k056832")
 	MCFG_K056832_CONFIG("gfx1", K056832_BPP_6, 1, 0, "none")
 
@@ -1761,7 +1769,8 @@ MACHINE_CONFIG_DERIVED(konamigx_state::salmndr2, konamigx)
 	MCFG_K055673_CONFIG("gfx2", K055673_LAYOUT_GX6, -48, -23)
 MACHINE_CONFIG_END
 
-MACHINE_CONFIG_DERIVED(konamigx_state::opengolf, konamigx)
+MACHINE_CONFIG_START(konamigx_state::opengolf)
+	konamigx(config);
 	MCFG_SCREEN_MODIFY("screen")
 	MCFG_SCREEN_RAW_PARAMS(8000000, 384+24+64+40, 0, 383, 224+16+8+16, 0, 223)
 	MCFG_SCREEN_VISIBLE_AREA(40, 40+384-1, 16, 16+224-1)
@@ -1779,7 +1788,8 @@ MACHINE_CONFIG_DERIVED(konamigx_state::opengolf, konamigx)
 	MCFG_ADC083X_INPUT_CB(konamigx_state, adc0834_callback)
 MACHINE_CONFIG_END
 
-MACHINE_CONFIG_DERIVED(konamigx_state::racinfrc, konamigx)
+MACHINE_CONFIG_START(konamigx_state::racinfrc)
+	konamigx(config);
 	MCFG_SCREEN_MODIFY("screen")
 	//MCFG_SCREEN_RAW_PARAMS(6000000, 384+24+64+40, 0, 383, 224+16+8+16, 0, 223)
 	//MCFG_SCREEN_VISIBLE_AREA(32, 32+384-1, 16, 16+224-1)
@@ -1803,7 +1813,8 @@ MACHINE_CONFIG_DERIVED(konamigx_state::racinfrc, konamigx)
 	MCFG_ADC083X_INPUT_CB(konamigx_state, adc0834_callback)
 MACHINE_CONFIG_END
 
-MACHINE_CONFIG_DERIVED(konamigx_state::gxtype3, konamigx)
+MACHINE_CONFIG_START(konamigx_state::gxtype3)
+	konamigx(config);
 
 	MCFG_DEVICE_MODIFY("maincpu")
 	MCFG_CPU_PROGRAM_MAP(gx_type3_map)
@@ -1843,7 +1854,8 @@ MACHINE_CONFIG_DERIVED(konamigx_state::gxtype3, konamigx)
 	MCFG_SCREEN_UPDATE_DRIVER(konamigx_state, screen_update_konamigx_right)
 MACHINE_CONFIG_END
 
-MACHINE_CONFIG_DERIVED(konamigx_state::gxtype4, konamigx)
+MACHINE_CONFIG_START(konamigx_state::gxtype4)
+	konamigx(config);
 
 	MCFG_DEVICE_MODIFY("maincpu")
 	MCFG_CPU_PROGRAM_MAP(gx_type4_map)
@@ -1884,7 +1896,8 @@ MACHINE_CONFIG_DERIVED(konamigx_state::gxtype4, konamigx)
 	MCFG_K055673_CONFIG("gfx2", K055673_LAYOUT_GX6, -79, -24) // -23 looks better in intro
 MACHINE_CONFIG_END
 
-MACHINE_CONFIG_DERIVED(konamigx_state::gxtype4_vsn, gxtype4)
+MACHINE_CONFIG_START(konamigx_state::gxtype4_vsn)
+	gxtype4(config);
 	MCFG_DEFAULT_LAYOUT(layout_dualhsxs)
 
 	//MCFG_SCREEN_MODIFY("screen")
@@ -1908,14 +1921,16 @@ MACHINE_CONFIG_DERIVED(konamigx_state::gxtype4_vsn, gxtype4)
 	MCFG_K055673_CONFIG("gfx2", K055673_LAYOUT_GX6, -132, -23)
 MACHINE_CONFIG_END
 
-MACHINE_CONFIG_DERIVED(konamigx_state::gxtype4sd2, gxtype4)
+MACHINE_CONFIG_START(konamigx_state::gxtype4sd2)
+	gxtype4(config);
 	MCFG_VIDEO_START_OVERRIDE(konamigx_state, konamigx_type4_sd2)
 
 	MCFG_DEVICE_MODIFY("k055673")
 	MCFG_K055673_CONFIG("gfx2", K055673_LAYOUT_GX6, -81, -23)
 MACHINE_CONFIG_END
 
-MACHINE_CONFIG_DERIVED(konamigx_state::winspike, konamigx)
+MACHINE_CONFIG_START(konamigx_state::winspike)
+	konamigx(config);
 	//MCFG_SCREEN_MODIFY("screen")
 	//MCFG_SCREEN_VISIBLE_AREA(38, 38+384-1, 16, 16+224-1)
 

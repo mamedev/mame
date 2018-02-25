@@ -74,6 +74,9 @@ public:
 		, m_crtc(*this, "mc6845")
 	{ }
 
+	void a6809(machine_config &config);
+
+protected:
 	void kbd_put(u8 data);
 	DECLARE_READ8_MEMBER(videoram_r);
 	DECLARE_WRITE8_MEMBER(a6809_address_w);
@@ -82,13 +85,14 @@ public:
 	DECLARE_MACHINE_RESET(a6809);
 	TIMER_DEVICE_CALLBACK_MEMBER(a6809_c);
 	TIMER_DEVICE_CALLBACK_MEMBER(a6809_p);
+
+	void a6809_io(address_map &map);
+	void a6809_mem(address_map &map);
+
+private:
 	required_shared_ptr<uint8_t> m_p_videoram;
 	uint16_t m_start_address;
 	uint16_t m_cursor_address;
-	void a6809(machine_config &config);
-	void a6809_io(address_map &map);
-	void a6809_mem(address_map &map);
-private:
 	uint8_t m_cass_data[4];
 	bool m_cass_state;
 	bool m_cassold;

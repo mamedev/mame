@@ -1341,27 +1341,6 @@ deco_146_base_device::deco_146_base_device(const machine_config &mconfig, device
 	m_external_addrswap[9] = 9;
 }
 
-void deco_146_base_device::set_interface_scramble(device_t &device,uint8_t a9, uint8_t a8, uint8_t a7, uint8_t a6, uint8_t a5, uint8_t a4, uint8_t a3,uint8_t a2,uint8_t a1,uint8_t a0)
-{
-	deco_146_base_device &dev = downcast<deco_146_base_device &>(device);
-	dev.m_external_addrswap[9] = a9;
-	dev.m_external_addrswap[8] = a8;
-	dev.m_external_addrswap[7] = a7;
-	dev.m_external_addrswap[6] = a6;
-	dev.m_external_addrswap[5] = a5;
-	dev.m_external_addrswap[4] = a4;
-	dev.m_external_addrswap[3] = a3;
-	dev.m_external_addrswap[2] = a2;
-	dev.m_external_addrswap[1] = a1;
-	dev.m_external_addrswap[0] = a0;
-}
-
-void deco_146_base_device::set_use_magic_read_address_xor(device_t &device, int use_xor)
-{
-	deco_146_base_device &dev = downcast<deco_146_base_device &>(device);
-	dev.m_magic_read_address_xor_enabled = use_xor;
-}
-
 void deco_146_base_device::device_start()
 {
 	for (int i=0;i<0x80;i++)

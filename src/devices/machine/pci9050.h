@@ -32,6 +32,20 @@ class pci9050_device : public pci_device
 public:
 	pci9050_device(const machine_config &mconfig, const char *tag, device_t *device, uint32_t clock);
 
+	template <class Object> static devcb_base &set_user_input_callback(device_t &device, Object &&cb) { return downcast<pci9050_device &>(device).m_user_input_handler.set_callback(std::forward<Object>(cb)); }
+	template <class Object> static devcb_base &set_user_output_callback(device_t &device, Object &&cb) { return downcast<pci9050_device &>(device).m_user_output_handler.set_callback(std::forward<Object>(cb)); }
+
+	void set_map(int id, const address_map_constructor &map, device_t *device);
+
+protected:
+	virtual void device_start() override;
+	virtual void device_reset() override;
+
+	void postload(void);
+
+private:
+	void map(address_map &map);
+
 	// PCI9050 I/O register space handlers
 	DECLARE_READ32_MEMBER( lasrr_r  );
 	DECLARE_WRITE32_MEMBER(lasrr_w  );
@@ -51,20 +65,6 @@ public:
 	DECLARE_WRITE32_MEMBER(intcsr_w );
 	DECLARE_READ32_MEMBER( cntrl_r  );
 	DECLARE_WRITE32_MEMBER(cntrl_w  );
-
-	template <class Object> static devcb_base &set_user_input_callback(device_t &device, Object &&cb) { return downcast<pci9050_device &>(device).m_user_input_handler.set_callback(std::forward<Object>(cb)); }
-	template <class Object> static devcb_base &set_user_output_callback(device_t &device, Object &&cb) { return downcast<pci9050_device &>(device).m_user_output_handler.set_callback(std::forward<Object>(cb)); }
-
-	void set_map(int id, const address_map_constructor &map, device_t *device);
-
-protected:
-	virtual void device_start() override;
-	virtual void device_reset() override;
-
-	void postload(void);
-
-private:
-	void map(address_map &map);
 
 	const char *m_names[4];
 	device_t *m_devices[4];

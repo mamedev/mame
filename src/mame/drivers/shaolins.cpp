@@ -225,7 +225,8 @@ MACHINE_CONFIG_START(shaolins_state::shaolins)
 MACHINE_CONFIG_END
 
 #if 0 // a bootleg board was found with downgraded sound hardware, but is otherwise the same
-static MACHINE_CONFIG_DERIVED( shaolinb, shaolins )
+static MACHINE_CONFIG_START( shaolinb )
+	shaolins(config);
 
 	MCFG_SOUND_REPLACE("sn1", SN76489, MASTER_CLOCK/12) /* only type verified on pcb */
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)

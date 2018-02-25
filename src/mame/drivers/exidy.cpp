@@ -832,40 +832,44 @@ MACHINE_CONFIG_START(exidy_state::base)
 MACHINE_CONFIG_END
 
 
-MACHINE_CONFIG_DERIVED(exidy_state::sidetrac, base)
+MACHINE_CONFIG_START(exidy_state::sidetrac)
+	base(config);
 
 	/* basic machine hardware */
 	MCFG_CPU_MODIFY("maincpu")
 	MCFG_CPU_PROGRAM_MAP(sidetrac_map)
 
 	/* audio hardware */
-	MCFG_FRAGMENT_ADD(spectar_audio)
+	spectar_audio(config);
 MACHINE_CONFIG_END
 
 
-MACHINE_CONFIG_DERIVED(exidy_state::targ, base)
+MACHINE_CONFIG_START(exidy_state::targ)
+	base(config);
 
 	/* basic machine hardware */
 	MCFG_CPU_MODIFY("maincpu")
 	MCFG_CPU_PROGRAM_MAP(targ_map)
 
 	/* audio hardware */
-	MCFG_FRAGMENT_ADD(targ_audio)
+	targ_audio(config);
 MACHINE_CONFIG_END
 
 
-MACHINE_CONFIG_DERIVED(exidy_state::spectar, base)
+MACHINE_CONFIG_START(exidy_state::spectar)
+	base(config);
 
 	/* basic machine hardware */
 	MCFG_CPU_MODIFY("maincpu")
 	MCFG_CPU_PROGRAM_MAP(spectar_map)
 
 	/* audio hardware */
-	MCFG_FRAGMENT_ADD(spectar_audio)
+	spectar_audio(config);
 MACHINE_CONFIG_END
 
 
-MACHINE_CONFIG_DERIVED(exidy_state::rallys, spectar)
+MACHINE_CONFIG_START(exidy_state::rallys)
+	spectar(config);
 
 	/* basic machine hardware */
 	MCFG_CPU_MODIFY("maincpu")
@@ -873,7 +877,8 @@ MACHINE_CONFIG_DERIVED(exidy_state::rallys, spectar)
 MACHINE_CONFIG_END
 
 
-MACHINE_CONFIG_DERIVED(exidy_state::venture, base)
+MACHINE_CONFIG_START(exidy_state::venture)
+	base(config);
 
 	/* basic machine hardware */
 	MCFG_CPU_MODIFY("maincpu")
@@ -882,11 +887,12 @@ MACHINE_CONFIG_DERIVED(exidy_state::venture, base)
 	MCFG_QUANTUM_TIME(attotime::from_hz(600))
 
 	/* audio hardware */
-	MCFG_FRAGMENT_ADD(venture_audio)
+	venture_audio(config);
 MACHINE_CONFIG_END
 
 
-MACHINE_CONFIG_DERIVED(exidy_state::teetert, venture)
+MACHINE_CONFIG_START(exidy_state::teetert)
+	venture(config);
 
 	/* basic machine hardware */
 	MCFG_CPU_MODIFY("maincpu")
@@ -897,18 +903,20 @@ MACHINE_CONFIG_DERIVED(exidy_state::teetert, venture)
 MACHINE_CONFIG_END
 
 
-MACHINE_CONFIG_DERIVED(exidy_state::mtrap, venture)
+MACHINE_CONFIG_START(exidy_state::mtrap)
+	venture(config);
 
 	/* basic machine hardware */
 
 	MCFG_QUANTUM_TIME(attotime::from_hz(1920))
 
 	/* audio hardware */
-	MCFG_FRAGMENT_ADD(mtrap_cvsd_audio)
+	mtrap_cvsd_audio(config);
 MACHINE_CONFIG_END
 
 
-MACHINE_CONFIG_DERIVED(exidy_state::pepper2, venture)
+MACHINE_CONFIG_START(exidy_state::pepper2)
+	venture(config);
 
 	/* basic machine hardware */
 	MCFG_CPU_MODIFY("maincpu")
@@ -916,7 +924,8 @@ MACHINE_CONFIG_DERIVED(exidy_state::pepper2, venture)
 MACHINE_CONFIG_END
 
 
-MACHINE_CONFIG_DERIVED(exidy_state::fax, pepper2)
+MACHINE_CONFIG_START(exidy_state::fax)
+	pepper2(config);
 
 	/* basic machine hardware */
 	MCFG_CPU_MODIFY("maincpu")

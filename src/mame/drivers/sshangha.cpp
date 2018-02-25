@@ -443,7 +443,8 @@ MACHINE_CONFIG_START(sshangha_state::sshangha)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", 0.27)
 MACHINE_CONFIG_END
 
-MACHINE_CONFIG_DERIVED(sshangha_state::sshanghb, sshangha)
+MACHINE_CONFIG_START(sshangha_state::sshanghb)
+	sshangha(config);
 
 	MCFG_CPU_MODIFY("maincpu")
 	MCFG_CPU_PROGRAM_MAP(sshanghb_map)

@@ -33,6 +33,9 @@
 
 #define HD63484_DISPLAY_PIXELS_MEMBER(_name) void _name(bitmap_ind16 &bitmap, const rectangle &cliprect, int y, int x, uint16_t data)
 
+#define MCFG_HD63484_EXTERNAL_SKEW(_val) \
+	hd63484_device::static_set_external_skew(*device, _val);
+
 
 // ======================> hd63484_device
 
@@ -48,6 +51,7 @@ public:
 
 	static void static_set_display_callback(device_t &device, display_delegate &&cb) { downcast<hd63484_device &>(device).m_display_cb = std::move(cb); }
 	static void static_set_auto_configure_screen(device_t &device, bool auto_configure_screen) { downcast<hd63484_device &>(device).m_auto_configure_screen = auto_configure_screen; }
+	static void static_set_external_skew(device_t &device, int skew) { downcast<hd63484_device &>(device).m_external_skew = skew; }
 
 	DECLARE_WRITE16_MEMBER( address16_w );
 	DECLARE_WRITE16_MEMBER( data16_w );
@@ -115,6 +119,7 @@ private:
 
 	display_delegate  m_display_cb;
 	bool m_auto_configure_screen;
+	int m_external_skew;
 
 	uint8_t m_ar;
 	uint8_t m_vreg[0x100];

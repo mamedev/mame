@@ -1782,7 +1782,8 @@ MACHINE_CONFIG_END
 
 
 /* as above, but in a casino cabinet */
-MACHINE_CONFIG_DERIVED(mcr_dpoker_state::mcr_90009_dp, mcr_90009)
+MACHINE_CONFIG_START(mcr_dpoker_state::mcr_90009_dp)
+	mcr_90009(config);
 
 	/* basic machine hardware */
 	MCFG_TIMER_DRIVER_ADD("coinin", mcr_dpoker_state, coin_in_callback)
@@ -1791,7 +1792,8 @@ MACHINE_CONFIG_END
 
 
 /* 90010 CPU board plus 90908/90913/91483 sound board */
-MACHINE_CONFIG_DERIVED(mcr_state::mcr_90010, mcr_90009)
+MACHINE_CONFIG_START(mcr_state::mcr_90010)
+	mcr_90009(config);
 
 	/* basic machine hardware */
 	MCFG_CPU_MODIFY("maincpu")
@@ -1806,7 +1808,8 @@ MACHINE_CONFIG_END
 
 
 /* as above, plus 8-track tape */
-MACHINE_CONFIG_DERIVED(mcr_state::mcr_90010_tt, mcr_90010)
+MACHINE_CONFIG_START(mcr_state::mcr_90010_tt)
+	mcr_90010(config);
 
 	/* sound hardware */
 	MCFG_SOUND_ADD("samples", SAMPLES, 0)
@@ -1818,7 +1821,8 @@ MACHINE_CONFIG_END
 
 
 /* 91475 CPU board plus 90908/90913/91483 sound board plus cassette interface */
-MACHINE_CONFIG_DERIVED(mcr_state::mcr_91475, mcr_90010)
+MACHINE_CONFIG_START(mcr_state::mcr_91475)
+	mcr_90010(config);
 
 	/* video hardware */
 	MCFG_PALETTE_MODIFY("palette")
@@ -1835,7 +1839,8 @@ MACHINE_CONFIG_END
 
 
 /* 91490 CPU board plus 90908/90913/91483 sound board */
-MACHINE_CONFIG_DERIVED(mcr_state::mcr_91490, mcr_90010)
+MACHINE_CONFIG_START(mcr_state::mcr_91490)
+	mcr_90010(config);
 
 	/* basic machine hardware */
 	MCFG_CPU_MODIFY("maincpu")
@@ -1849,7 +1854,8 @@ MACHINE_CONFIG_END
 
 
 /* 91490 CPU board plus 90908/90913/91483 sound board plus Squawk n' Talk sound board */
-MACHINE_CONFIG_DERIVED(mcr_state::mcr_91490_snt, mcr_91490)
+MACHINE_CONFIG_START(mcr_state::mcr_91490_snt)
+	mcr_91490(config);
 
 	/* basic machine hardware */
 	MCFG_SOUND_ADD("snt", MIDWAY_SQUAWK_N_TALK, 0)
@@ -1859,7 +1865,8 @@ MACHINE_CONFIG_END
 
 
 /* 91490 CPU board plus 90908/90913/91483 sound board plus Squawk n' Talk sound board plus IPU */
-MACHINE_CONFIG_DERIVED(mcr_nflfoot_state::mcr_91490_ipu, mcr_91490_snt)
+MACHINE_CONFIG_START(mcr_nflfoot_state::mcr_91490_ipu)
+	mcr_91490_snt(config);
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("ipu", Z80, 7372800/2)
@@ -1886,7 +1893,8 @@ MACHINE_CONFIG_END
 
 
 /* 91490 CPU board plus 90908/90913/91483 sound board plus Turbo Cheap Squeak sound board */
-MACHINE_CONFIG_DERIVED(mcr_state::mcr_91490_tcs, mcr_91490)
+MACHINE_CONFIG_START(mcr_state::mcr_91490_tcs)
+	mcr_91490(config);
 
 	/* basic machine hardware */
 	MCFG_SOUND_ADD("tcs", MIDWAY_TURBO_CHEAP_SQUEAK, 0)

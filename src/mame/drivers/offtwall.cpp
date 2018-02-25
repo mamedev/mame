@@ -45,19 +45,6 @@ void offtwall_state::update_interrupts()
 
 /*************************************
  *
- *  Initialization
- *
- *************************************/
-
-MACHINE_RESET_MEMBER(offtwall_state,offtwall)
-{
-	atarigen_state::machine_reset();
-}
-
-
-
-/*************************************
- *
  *  I/O handling
  *
  *************************************/
@@ -367,8 +354,6 @@ MACHINE_CONFIG_START(offtwall_state::offtwall)
 	MCFG_CPU_ADD("maincpu", M68000, ATARI_CLOCK_14MHz/2)
 	MCFG_CPU_PROGRAM_MAP(main_map)
 
-	MCFG_MACHINE_RESET_OVERRIDE(offtwall_state,offtwall)
-
 	MCFG_EEPROM_2816_ADD("eeprom")
 	MCFG_EEPROM_28XX_LOCK_AFTER_WRITE(true)
 
@@ -379,7 +364,7 @@ MACHINE_CONFIG_START(offtwall_state::offtwall)
 	MCFG_PALETTE_ADD("palette", 2048)
 	MCFG_PALETTE_FORMAT(IRRRRRGGGGGBBBBB)
 
-	MCFG_ATARI_VAD_ADD("vad", "screen", WRITELINE(atarigen_state, scanline_int_write_line))
+	MCFG_ATARI_VAD_ADD("vad", "screen", WRITELINE(offtwall_state, scanline_int_write_line))
 	MCFG_ATARI_VAD_PLAYFIELD(offtwall_state, "gfxdecode", get_playfield_tile_info)
 	MCFG_ATARI_VAD_MOB(offtwall_state::s_mob_config, "gfxdecode")
 
@@ -391,12 +376,10 @@ MACHINE_CONFIG_START(offtwall_state::offtwall)
 	MCFG_SCREEN_UPDATE_DRIVER(offtwall_state, screen_update_offtwall)
 	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_VIDEO_START_OVERRIDE(offtwall_state,offtwall)
-
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
 
-	MCFG_ATARI_JSA_III_ADD("jsa", WRITELINE(atarigen_state, sound_int_write_line))
+	MCFG_ATARI_JSA_III_ADD("jsa", WRITELINE(offtwall_state, sound_int_write_line))
 	MCFG_ATARI_JSA_TEST_PORT("260010", 6)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 	MCFG_DEVICE_REMOVE("jsa:oki1")

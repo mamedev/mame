@@ -66,8 +66,8 @@ private:
 
 	enum : u8 {
 		RX_IDLE,
-		RX_ESC,
-		RX_BELL
+		RX_COMMAND,
+		RX_FLAGS
 	};
 
 	enum : u8 {

@@ -112,37 +112,27 @@ TODO:
 /* It runs in IM 0, thus needs an opcode on the data bus */
 void dynax_state::sprtmtch_update_irq()
 {
-	int irq = (m_sound_irq ? 0x08 : 0) | ((m_vblank_irq) ? 0x10 : 0) | ((m_blitter_irq && m_blitter_irq_mask) ? 0x20 : 0) ;
-	m_maincpu->set_input_line_and_vector(0, irq ? ASSERT_LINE : CLEAR_LINE, 0xc7 | irq); /* rst $xx */
+	m_mainirq->rst4_w(m_blitter_irq && m_blitter_irq_mask);
 }
 
 WRITE8_MEMBER(dynax_state::dynax_vblank_ack_w)
 {
-	m_vblank_irq = 0;
-	sprtmtch_update_irq();
+	m_mainirq->rst2_w(0);
 }
 
 WRITE_LINE_MEMBER(dynax_state::blitter_ack_w)
 {
 	m_blitter_irq_mask = state;
-
-	// this must be acknowledged somewhere else
 	if (!m_blitter_irq_mask)
+	{
 		m_blitter_irq = 0;
-
-	sprtmtch_update_irq();
+		m_mainirq->rst4_w(0);
+	}
 }
 
 INTERRUPT_GEN_MEMBER(dynax_state::sprtmtch_vblank_interrupt)
 {
-	m_vblank_irq = 1;
-	sprtmtch_update_irq();
-}
-
-WRITE_LINE_MEMBER(dynax_state::sprtmtch_sound_callback)
-{
-	m_sound_irq = state;
-	sprtmtch_update_irq();
+	m_mainirq->rst2_w(1);
 }
 
 
@@ -153,42 +143,38 @@ WRITE_LINE_MEMBER(dynax_state::sprtmtch_sound_callback)
 /* It runs in IM 0, thus needs an opcode on the data bus */
 void dynax_state::jantouki_update_irq()
 {
-	int irq = ((m_blitter_irq && m_blitter_irq_mask) ? 0x08 : 0) | ((m_blitter2_irq && m_blitter2_irq_mask) ? 0x10 : 0) | ((m_vblank_irq) ? 0x20 : 0) ;
-	m_maincpu->set_input_line_and_vector(0, irq ? ASSERT_LINE : CLEAR_LINE, 0xc7 | irq); /* rst $xx */
+	m_mainirq->rst1_w(m_blitter_irq && m_blitter_irq_mask);
+	m_mainirq->rst2_w(m_blitter2_irq && m_blitter2_irq_mask);
 }
 
 WRITE8_MEMBER(dynax_state::jantouki_vblank_ack_w)
 {
-	m_vblank_irq = 0;
-	jantouki_update_irq();
+	m_mainirq->rst4_w(0);
 }
 
 WRITE_LINE_MEMBER(dynax_state::jantouki_blitter_ack_w)
 {
 	m_blitter_irq_mask = state;
-
-	// this must be acknowledged somewhere else
 	if (!m_blitter_irq_mask)
+	{
 		m_blitter_irq = 0;
-
-	jantouki_update_irq();
+		m_mainirq->rst1_w(0);
+	}
 }
 
 WRITE_LINE_MEMBER(dynax_state::jantouki_blitter2_ack_w)
 {
 	m_blitter2_irq_mask = state;
-
-	// this must be acknowledged somewhere else
 	if (!m_blitter2_irq_mask)
+	{
 		m_blitter2_irq = 0;
-
-	jantouki_update_irq();
+		m_mainirq->rst2_w(0);
+	}
 }
 
 INTERRUPT_GEN_MEMBER(dynax_state::jantouki_vblank_interrupt)
 {
-	m_vblank_irq = 1;
-	jantouki_update_irq();
+	m_mainirq->rst4_w(1);
 }
 
 
@@ -196,28 +182,14 @@ INTERRUPT_GEN_MEMBER(dynax_state::jantouki_vblank_interrupt)
                             Jantouki - Sound CPU
 ***************************************************************************/
 
-void dynax_state::jantouki_sound_update_irq()
-{
-	int irq = ((m_sound_irq) ? 0x08 : 0) | ((m_soundlatch_irq) ? 0x10 : 0) | ((m_sound_vblank_irq) ? 0x20 : 0) ;
-	m_soundcpu->set_input_line_and_vector(0, irq ? ASSERT_LINE : CLEAR_LINE, 0xc7 | irq); /* rst $xx */
-}
-
 INTERRUPT_GEN_MEMBER(dynax_state::jantouki_sound_vblank_interrupt)
 {
-	m_sound_vblank_irq = 1;
-	jantouki_sound_update_irq();
+	m_soundirq->rst4_w(1);
 }
 
 WRITE8_MEMBER(dynax_state::jantouki_sound_vblank_ack_w)
 {
-	m_sound_vblank_irq = 0;
-	jantouki_sound_update_irq();
-}
-
-WRITE_LINE_MEMBER(dynax_state::jantouki_sound_callback)
-{
-	m_sound_irq = state;
-	jantouki_sound_update_irq();
+	m_soundirq->rst4_w(0);
 }
 
 
@@ -879,16 +851,8 @@ ADDRESS_MAP_END
 
 READ8_MEMBER(dynax_state::jantouki_soundlatch_ack_r)
 {
-	return (m_soundlatch_ack) ? 0x80 : 0;
-}
-
-WRITE8_MEMBER(dynax_state::jantouki_soundlatch_w)
-{
-	m_soundlatch_ack = 1;
-	m_soundlatch_full = 1;
-	m_soundlatch_irq = 1;
-	m_latch = data;
-	jantouki_sound_update_irq();
+	machine().scheduler().synchronize();
+	return m_soundlatch->pending_r() ? 0x80 : 0;
 }
 
 READ8_MEMBER(dynax_state::jantouki_blitter_busy_r)
@@ -906,7 +870,7 @@ ADDRESS_MAP_START(dynax_state::jantouki_io_map)
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
 //  AM_RANGE( 0x40, 0x41 ) AM_WRITENOP   // CRT Controller
 	AM_RANGE( 0x48, 0x48 ) AM_WRITE(jantouki_rombank_w)     // BANK ROM Select
-	AM_RANGE( 0x49, 0x49 ) AM_WRITE(jantouki_soundlatch_w)  // To Sound CPU
+	AM_RANGE( 0x49, 0x49 ) AM_DEVWRITE("soundlatch", generic_latch_8_device, write)  // To Sound CPU
 	AM_RANGE( 0x4a, 0x4a ) AM_READ(jantouki_soundlatch_ack_r)   // Soundlatch status
 	AM_RANGE( 0x4b, 0x4b ) AM_WRITE(dynax_blit2_dest_w)     // Destination Layer 2
 	AM_RANGE( 0x4d, 0x4d ) AM_WRITE(dynax_blit_dest_w)      // Destination Layer
@@ -935,22 +899,9 @@ ADDRESS_MAP_END
                             Jantouki - Sound CPU
 ***************************************************************************/
 
-WRITE8_MEMBER(dynax_state::jantouki_soundlatch_ack_w)
-{
-	m_soundlatch_ack = data;
-	m_soundlatch_irq = 0;
-	jantouki_sound_update_irq();
-}
-
-READ8_MEMBER(dynax_state::jantouki_soundlatch_r)
-{
-	m_soundlatch_full = 0;
-	return m_latch;
-}
-
 READ8_MEMBER(dynax_state::jantouki_soundlatch_status_r)
 {
-	return (m_soundlatch_full) ? 0 : 0x80;
+	return m_soundlatch->pending_r() ? 0 : 0x80;
 }
 
 ADDRESS_MAP_START(dynax_state::jantouki_sound_io_map)
@@ -963,8 +914,8 @@ ADDRESS_MAP_START(dynax_state::jantouki_sound_io_map)
 	AM_RANGE( 0x30, 0x30 ) AM_WRITE(adpcm_reset_w)      // MSM5205 reset
 	AM_RANGE( 0x40, 0x40 ) AM_WRITE(adpcm_data_w)               // MSM5205 data
 	AM_RANGE( 0x50, 0x50 ) AM_READ(jantouki_soundlatch_status_r)    // Soundlatch status
-	AM_RANGE( 0x60, 0x60 ) AM_WRITE(jantouki_soundlatch_ack_w)      // Soundlatch status
-	AM_RANGE( 0x70, 0x70 ) AM_READ(jantouki_soundlatch_r)           // From Main CPU
+	AM_RANGE( 0x60, 0x60 ) AM_DEVWRITE("soundlatch", generic_latch_8_device, acknowledge_w)
+	AM_RANGE( 0x70, 0x70 ) AM_DEVREAD("soundlatch", generic_latch_8_device, read) // From Main CPU
 ADDRESS_MAP_END
 
 
@@ -4094,14 +4045,10 @@ MACHINE_START_MEMBER(dynax_state,dynax)
 	m_blitter_irq_mask = 1;
 	m_blitter2_irq_mask = 1;
 
-	save_item(NAME(m_sound_irq));
-	save_item(NAME(m_vblank_irq));
 	save_item(NAME(m_blitter_irq));
 	save_item(NAME(m_blitter_irq_mask));
 	save_item(NAME(m_blitter2_irq));
 	save_item(NAME(m_blitter2_irq_mask));
-	save_item(NAME(m_soundlatch_irq));
-	save_item(NAME(m_sound_vblank_irq));
 
 	save_item(NAME(m_input_sel));
 	save_item(NAME(m_dsw_sel));
@@ -4113,10 +4060,6 @@ MACHINE_START_MEMBER(dynax_state,dynax)
 	save_item(NAME(m_resetkludge));
 	save_item(NAME(m_toggle));
 	save_item(NAME(m_toggle_cpu1));
-	save_item(NAME(m_yarunara_clk_toggle));
-	save_item(NAME(m_soundlatch_ack));
-	save_item(NAME(m_soundlatch_full));
-	save_item(NAME(m_latch));
 	save_item(NAME(m_rombank));
 	save_item(NAME(m_tenkai_p5_val));
 	save_item(NAME(m_tenkai_6c));
@@ -4130,12 +4073,8 @@ MACHINE_RESET_MEMBER(dynax_state,dynax)
 	if (m_msm != nullptr)
 		MACHINE_RESET_CALL_MEMBER(adpcm);
 
-	m_sound_irq = 0;
-	m_vblank_irq = 0;
 	m_blitter_irq = 0;
 	m_blitter2_irq = 0;
-	m_soundlatch_irq = 0;
-	m_sound_vblank_irq = 0;
 
 	m_input_sel = 0;
 	m_dsw_sel = 0;
@@ -4147,10 +4086,6 @@ MACHINE_RESET_MEMBER(dynax_state,dynax)
 	m_resetkludge = 0;
 	m_toggle = 0;
 	m_toggle_cpu1 = 0;
-	m_yarunara_clk_toggle = 0;
-	m_soundlatch_ack = 0;
-	m_soundlatch_full = 0;
-	m_latch = 0;
 	m_rombank = 0;
 	m_tenkai_p5_val = 0;
 	m_tenkai_6c = 0;
@@ -4188,15 +4123,19 @@ MACHINE_CONFIG_START(dynax_state::cdracula)
 	MCFG_CPU_PROGRAM_MAP(cdracula_mem_map)
 	MCFG_CPU_IO_MAP(cdracula_io_map)
 	MCFG_CPU_VBLANK_INT_DRIVER("screen", dynax_state,  sprtmtch_vblank_interrupt)   /* IM 0 needs an opcode on the data bus */
+	MCFG_CPU_IRQ_ACKNOWLEDGE_DEVICE("mainirq", rst_pos_buffer_device, inta_cb)
 
 	MCFG_MACHINE_START_OVERRIDE(dynax_state,dynax)
 	MCFG_MACHINE_RESET_OVERRIDE(dynax_state,dynax)
 
 //  MCFG_NVRAM_ADD_0FILL("nvram")    // no battery
 
+	MCFG_DEVICE_ADD("mainirq", RST_POS_BUFFER, 0)
+	MCFG_RST_BUFFER_INT_CALLBACK(INPUTLINE("maincpu", 0))
+
 	MCFG_DEVICE_ADD("mainlatch", LS259, 0)
 	MCFG_ADDRESSABLE_LATCH_Q1_OUT_CB(WRITELINE(dynax_state, flipscreen_w))       // Flip Screen
-	MCFG_ADDRESSABLE_LATCH_Q4_OUT_CB(WRITELINE(dynax_state, jantouki_blitter_ack_w))   // Blitter IRQ Ack
+	MCFG_ADDRESSABLE_LATCH_Q4_OUT_CB(WRITELINE(dynax_state, blitter_ack_w))      // Blitter IRQ Ack
 	MCFG_ADDRESSABLE_LATCH_Q5_OUT_CB(WRITELINE(dynax_state, blit_palbank_w))     // Layers Palettes (High Bit)
 
 	/* video hardware */
@@ -4232,11 +4171,15 @@ MACHINE_CONFIG_START(dynax_state::hanamai)
 	MCFG_CPU_PROGRAM_MAP(sprtmtch_mem_map)
 	MCFG_CPU_IO_MAP(hanamai_io_map)
 	MCFG_CPU_VBLANK_INT_DRIVER("screen", dynax_state,  sprtmtch_vblank_interrupt)   /* IM 0 needs an opcode on the data bus */
+	MCFG_CPU_IRQ_ACKNOWLEDGE_DEVICE("mainirq", rst_pos_buffer_device, inta_cb)
 
 	MCFG_MACHINE_START_OVERRIDE(dynax_state,hanamai)
 	MCFG_MACHINE_RESET_OVERRIDE(dynax_state,dynax)
 
 	MCFG_NVRAM_ADD_0FILL("nvram")
+
+	MCFG_DEVICE_ADD("mainirq", RST_POS_BUFFER, 0)
+	MCFG_RST_BUFFER_INT_CALLBACK(INPUTLINE("maincpu", 0))
 
 	MCFG_DEVICE_ADD("mainlatch", LS259, 0)
 	MCFG_ADDRESSABLE_LATCH_Q0_OUT_CB(DEVWRITELINE("msm", msm5205_device, reset_w)) MCFG_DEVCB_INVERT  // MSM5205 reset
@@ -4269,7 +4212,7 @@ MACHINE_CONFIG_START(dynax_state::hanamai)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.20)
 
 	MCFG_SOUND_ADD("ym2203", YM2203, 22000000 / 8)
-	MCFG_YM2203_IRQ_HANDLER(WRITELINE(dynax_state, sprtmtch_sound_callback))
+	MCFG_YM2203_IRQ_HANDLER(DEVWRITELINE("mainirq", rst_pos_buffer_device, rst1_w))
 	MCFG_AY8910_PORT_A_READ_CB(IOPORT("DSW1"))
 	MCFG_AY8910_PORT_B_READ_CB(IOPORT("DSW0"))
 	MCFG_SOUND_ROUTE(0, "mono", 0.20)
@@ -4296,6 +4239,7 @@ MACHINE_CONFIG_START(dynax_state::hnoridur)
 	MCFG_CPU_PROGRAM_MAP(hnoridur_mem_map)
 	MCFG_CPU_IO_MAP(hnoridur_io_map)
 	MCFG_CPU_VBLANK_INT_DRIVER("screen", dynax_state,  sprtmtch_vblank_interrupt)   /* IM 0 needs an opcode on the data bus */
+	MCFG_CPU_IRQ_ACKNOWLEDGE_DEVICE("mainirq", rst_pos_buffer_device, inta_cb)
 
 	MCFG_MACHINE_START_OVERRIDE(dynax_state,dynax)
 	MCFG_MACHINE_RESET_OVERRIDE(dynax_state,dynax)
@@ -4307,6 +4251,9 @@ MACHINE_CONFIG_START(dynax_state::hnoridur)
 	MCFG_ADDRESS_MAP_BANK_STRIDE(0x8000)
 
 	MCFG_NVRAM_ADD_0FILL("nvram")
+
+	MCFG_DEVICE_ADD("mainirq", RST_POS_BUFFER, 0)
+	MCFG_RST_BUFFER_INT_CALLBACK(INPUTLINE("maincpu", 0))
 
 	MCFG_DEVICE_ADD("mainlatch", LS259, 0) // IC25
 	MCFG_ADDRESSABLE_LATCH_Q0_OUT_CB(WRITELINE(dynax_state, flipscreen_w))
@@ -4359,6 +4306,7 @@ MACHINE_CONFIG_START(dynax_state::hjingi)
 	MCFG_CPU_PROGRAM_MAP(hjingi_mem_map)
 	MCFG_CPU_IO_MAP(hjingi_io_map)
 	MCFG_CPU_VBLANK_INT_DRIVER("screen", dynax_state,  sprtmtch_vblank_interrupt)   /* IM 0 needs an opcode on the data bus */
+	MCFG_CPU_IRQ_ACKNOWLEDGE_DEVICE("mainirq", rst_pos_buffer_device, inta_cb)
 
 	MCFG_MACHINE_START_OVERRIDE(dynax_state,hjingi)
 	MCFG_MACHINE_RESET_OVERRIDE(dynax_state,dynax)
@@ -4370,6 +4318,9 @@ MACHINE_CONFIG_START(dynax_state::hjingi)
 	MCFG_ADDRESS_MAP_BANK_STRIDE(0x8000)
 
 	MCFG_NVRAM_ADD_0FILL("nvram")
+
+	MCFG_DEVICE_ADD("mainirq", RST_POS_BUFFER, 0)
+	MCFG_RST_BUFFER_INT_CALLBACK(INPUTLINE("maincpu", 0))
 
 	MCFG_DEVICE_ADD("mainlatch", LS259, 0)
 	MCFG_ADDRESSABLE_LATCH_Q0_OUT_CB(WRITELINE(dynax_state, flipscreen_w))
@@ -4424,11 +4375,15 @@ MACHINE_CONFIG_START(dynax_state::sprtmtch)
 	MCFG_CPU_PROGRAM_MAP(sprtmtch_mem_map)
 	MCFG_CPU_IO_MAP(sprtmtch_io_map)
 	MCFG_CPU_VBLANK_INT_DRIVER("screen", dynax_state,  sprtmtch_vblank_interrupt)   /* IM 0 needs an opcode on the data bus */
+	MCFG_CPU_IRQ_ACKNOWLEDGE_DEVICE("mainirq", rst_pos_buffer_device, inta_cb)
 
 	MCFG_MACHINE_START_OVERRIDE(dynax_state,hanamai)
 	MCFG_MACHINE_RESET_OVERRIDE(dynax_state,dynax)
 
 	MCFG_NVRAM_ADD_0FILL("nvram")
+
+	MCFG_DEVICE_ADD("mainirq", RST_POS_BUFFER, 0)
+	MCFG_RST_BUFFER_INT_CALLBACK(INPUTLINE("maincpu", 0))
 
 	MCFG_DEVICE_ADD("mainlatch", LS259, 0) // UF12 on Intergirl
 	MCFG_ADDRESSABLE_LATCH_Q1_OUT_CB(WRITELINE(dynax_state, flipscreen_w))
@@ -4455,7 +4410,7 @@ MACHINE_CONFIG_START(dynax_state::sprtmtch)
 	MCFG_SPEAKER_STANDARD_MONO("mono")
 
 	MCFG_SOUND_ADD("ym2203", YM2203, 22000000 / 8)
-	MCFG_YM2203_IRQ_HANDLER(WRITELINE(dynax_state, sprtmtch_sound_callback))
+	MCFG_YM2203_IRQ_HANDLER(DEVWRITELINE("mainirq", rst_pos_buffer_device, rst1_w))
 	MCFG_AY8910_PORT_A_READ_CB(IOPORT("DSW0"))
 	MCFG_AY8910_PORT_B_READ_CB(IOPORT("DSW1"))
 	MCFG_SOUND_ROUTE(0, "mono", 0.20)
@@ -4518,7 +4473,8 @@ MACHINE_CONFIG_END
                             Mahjong Dial Q2
 ***************************************************************************/
 
-MACHINE_CONFIG_DERIVED(dynax_state::mjdialq2, mjfriday)
+MACHINE_CONFIG_START(dynax_state::mjdialq2)
+	mjfriday(config);
 
 	/* basic machine hardware */
 	MCFG_CPU_MODIFY("maincpu")
@@ -4530,29 +4486,13 @@ MACHINE_CONFIG_END
                     Yarunara / Quiz TV Q&Q / Mahjong Angels
 ***************************************************************************/
 
-/* the old code here didn't work..
-  what was it trying to do?
-  set an irq and clear it before its even taken? */
-
-INTERRUPT_GEN_MEMBER(dynax_state::yarunara_clock_interrupt)
-{
-	m_yarunara_clk_toggle ^= 1;
-
-	if (m_yarunara_clk_toggle == 1)
-		m_sound_irq = 0;
-	else
-		m_sound_irq = 1;
-
-	sprtmtch_update_irq();
-}
-
-MACHINE_CONFIG_DERIVED(dynax_state::yarunara, hnoridur)
+MACHINE_CONFIG_START(dynax_state::yarunara)
+	hnoridur(config);
 
 	/* basic machine hardware */
 	MCFG_CPU_MODIFY("maincpu")
 	MCFG_CPU_PROGRAM_MAP(yarunara_mem_map)
 	MCFG_CPU_IO_MAP(yarunara_io_map)
-	MCFG_CPU_PERIODIC_INT_DRIVER(dynax_state, yarunara_clock_interrupt,  60)    // RTC
 
 	MCFG_DEVICE_MODIFY("bankdev")
 	MCFG_DEVICE_PROGRAM_MAP(yarunara_banked_map)
@@ -4566,15 +4506,18 @@ MACHINE_CONFIG_DERIVED(dynax_state::yarunara, hnoridur)
 
 	/* devices */
 	MCFG_DEVICE_ADD("rtc", MSM6242, XTAL(32'768))
+	MCFG_MSM6242_OUT_INT_HANDLER(DEVWRITELINE("mainirq", rst_pos_buffer_device, rst1_w))
 MACHINE_CONFIG_END
 
-MACHINE_CONFIG_DERIVED(dynax_state::mjangels, yarunara)
+MACHINE_CONFIG_START(dynax_state::mjangels)
+	yarunara(config);
 	MCFG_DEVICE_MODIFY("bankdev")
 	MCFG_DEVICE_PROGRAM_MAP(mjangels_banked_map)
 	MCFG_ADDRESS_MAP_BANK_ADDR_WIDTH(21)
 MACHINE_CONFIG_END
 
-MACHINE_CONFIG_DERIVED(dynax_state::quiztvqq, mjangels)
+MACHINE_CONFIG_START(dynax_state::quiztvqq)
+	mjangels(config);
 
 	/* basic machine hardware */
 	MCFG_CPU_MODIFY("maincpu")
@@ -4586,7 +4529,8 @@ MACHINE_CONFIG_END
                             Mahjong Campus Hunting
 ***************************************************************************/
 
-MACHINE_CONFIG_DERIVED(dynax_state::mcnpshnt, hnoridur)
+MACHINE_CONFIG_START(dynax_state::mcnpshnt)
+	hnoridur(config);
 	MCFG_CPU_MODIFY("maincpu")
 	MCFG_CPU_PROGRAM_MAP(mcnpshnt_mem_map)
 	MCFG_CPU_IO_MAP(mcnpshnt_io_map)
@@ -4599,7 +4543,8 @@ MACHINE_CONFIG_END
                             7jigen
 ***************************************************************************/
 
-MACHINE_CONFIG_DERIVED(dynax_state::nanajign, hnoridur)
+MACHINE_CONFIG_START(dynax_state::nanajign)
+	hnoridur(config);
 	MCFG_CPU_MODIFY("maincpu")
 	MCFG_CPU_PROGRAM_MAP(nanajign_mem_map)
 	MCFG_CPU_IO_MAP(nanajign_io_map)
@@ -4634,16 +4579,24 @@ MACHINE_CONFIG_START(dynax_state::jantouki)
 	MCFG_CPU_PROGRAM_MAP(jantouki_mem_map)
 	MCFG_CPU_IO_MAP(jantouki_io_map)
 	MCFG_CPU_VBLANK_INT_DRIVER("top", dynax_state,  jantouki_vblank_interrupt)  /* IM 0 needs an opcode on the data bus */
+	MCFG_CPU_IRQ_ACKNOWLEDGE_DEVICE("mainirq", rst_pos_buffer_device, inta_cb)
 
 	MCFG_CPU_ADD("soundcpu",Z80,22000000 / 4)   /* 5.5MHz */
 	MCFG_CPU_PROGRAM_MAP(jantouki_sound_mem_map)
 	MCFG_CPU_IO_MAP(jantouki_sound_io_map)
 	MCFG_CPU_VBLANK_INT_DRIVER("top", dynax_state,  jantouki_sound_vblank_interrupt)    /* IM 0 needs an opcode on the data bus */
+	MCFG_CPU_IRQ_ACKNOWLEDGE_DEVICE("soundirq", rst_pos_buffer_device, inta_cb)
 
 	MCFG_MACHINE_START_OVERRIDE(dynax_state,jantouki)
 	MCFG_MACHINE_RESET_OVERRIDE(dynax_state,dynax)
 
 	MCFG_NVRAM_ADD_0FILL("nvram")
+
+	MCFG_DEVICE_ADD("mainirq", RST_POS_BUFFER, 0)
+	MCFG_RST_BUFFER_INT_CALLBACK(INPUTLINE("maincpu", 0))
+
+	MCFG_DEVICE_ADD("soundirq", RST_POS_BUFFER, 0)
+	MCFG_RST_BUFFER_INT_CALLBACK(INPUTLINE("soundcpu", 0))
 
 	MCFG_DEVICE_ADD("mainlatch", LS259, 0)
 	MCFG_ADDRESSABLE_LATCH_Q0_OUT_CB(WRITELINE(dynax_state, coincounter_0_w))  // Coin Counter
@@ -4651,6 +4604,10 @@ MACHINE_CONFIG_START(dynax_state::jantouki)
 	MCFG_ADDRESSABLE_LATCH_Q5_OUT_CB(WRITELINE(dynax_state, blit_palbank_w))
 	MCFG_ADDRESSABLE_LATCH_Q6_OUT_CB(WRITELINE(dynax_state, jantouki_blitter_ack_w)) // Blitter IRQ Ack
 	MCFG_ADDRESSABLE_LATCH_Q7_OUT_CB(WRITELINE(dynax_state, jantouki_blitter2_ack_w))    // Blitter 2 IRQ Ack
+
+	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
+	MCFG_GENERIC_LATCH_DATA_PENDING_CB(DEVWRITELINE("soundirq", rst_pos_buffer_device, rst2_w))
+	MCFG_GENERIC_LATCH_SEPARATE_ACKNOWLEDGE(true)
 
 	/* video hardware */
 	MCFG_PALETTE_ADD("palette", 512)
@@ -4682,7 +4639,7 @@ MACHINE_CONFIG_START(dynax_state::jantouki)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.20)
 
 	MCFG_SOUND_ADD("ym2203", YM2203, 22000000 / 8)
-	MCFG_YM2203_IRQ_HANDLER(WRITELINE(dynax_state, jantouki_sound_callback))
+	MCFG_YM2203_IRQ_HANDLER(DEVWRITELINE("soundirq", rst_pos_buffer_device, rst1_w))
 	MCFG_SOUND_ROUTE(0, "mono", 0.20)
 	MCFG_SOUND_ROUTE(1, "mono", 0.20)
 	MCFG_SOUND_ROUTE(2, "mono", 0.20)
@@ -4697,7 +4654,8 @@ MACHINE_CONFIG_START(dynax_state::jantouki)
 	MCFG_DEVICE_ADD("rtc", MSM6242, XTAL(32'768))
 MACHINE_CONFIG_END
 
-MACHINE_CONFIG_DERIVED(dynax_state::janyuki, jantouki)
+MACHINE_CONFIG_START(dynax_state::janyuki)
+	jantouki(config);
 	MCFG_PALETTE_MODIFY("palette")
 	MCFG_PALETTE_INIT_OWNER(dynax_state,janyuki)         // static palette
 MACHINE_CONFIG_END
@@ -4720,7 +4678,8 @@ void dynax_state::mjelctrn_update_irq()
 	cpu.trg2(1);
 }
 
-MACHINE_CONFIG_DERIVED(dynax_state::mjelctrn, hnoridur)
+MACHINE_CONFIG_START(dynax_state::mjelctrn)
+	hnoridur(config);
 	MCFG_CPU_REPLACE("maincpu", TMPZ84C015, XTAL(22'000'000) / 4)
 	MCFG_CPU_PROGRAM_MAP(nanajign_mem_map)
 	MCFG_CPU_IO_MAP(mjelctrn_io_map)
@@ -4734,13 +4693,16 @@ MACHINE_CONFIG_DERIVED(dynax_state::mjelctrn, hnoridur)
 	MCFG_ADDRESSABLE_LATCH_Q2_OUT_CB(WRITELINE(dynax_state, layer_half2_w))
 	// Q3, Q4 seem to be related to wrap around enable
 
+	MCFG_DEVICE_REMOVE("mainirq")
+
 	MCFG_SCREEN_MODIFY("screen")
 	MCFG_SCREEN_VBLANK_CALLBACK(DEVWRITELINE("maincpu", tmpz84c015_device, trg0)) MCFG_DEVCB_INVERT
 
 	MCFG_VIDEO_START_OVERRIDE(dynax_state,mjelctrn)
 MACHINE_CONFIG_END
 
-MACHINE_CONFIG_DERIVED(dynax_state::mjembase, mjelctrn)
+MACHINE_CONFIG_START(dynax_state::mjembase)
+	mjelctrn(config);
 	MCFG_CPU_MODIFY("maincpu")
 	MCFG_CPU_IO_MAP(mjembase_io_map)
 	MCFG_TMPZ84C015_IN_PA_CB(IOPORT("DSW1"))
@@ -4764,7 +4726,8 @@ MACHINE_CONFIG_END
     0x40 is vblank
     0x46 is a periodic irq? */
 
-MACHINE_CONFIG_DERIVED(dynax_state::neruton, mjelctrn)
+MACHINE_CONFIG_START(dynax_state::neruton)
+	mjelctrn(config);
 	MCFG_VIDEO_START_OVERRIDE(dynax_state,neruton)
 MACHINE_CONFIG_END
 
@@ -4854,13 +4817,15 @@ MACHINE_CONFIG_START(dynax_state::tenkai)
 	MCFG_MSM6242_OUT_INT_HANDLER(INPUTLINE("maincpu", INPUT_LINE_IRQ2))
 MACHINE_CONFIG_END
 
-MACHINE_CONFIG_DERIVED(dynax_state::majrjhdx, tenkai)
+MACHINE_CONFIG_START(dynax_state::majrjhdx)
+	tenkai(config);
 	MCFG_PALETTE_MODIFY("palette")
 	MCFG_PALETTE_ENTRIES(512)
 	MCFG_PALETTE_INIT_OWNER(dynax_state,sprtmtch)            // static palette
 MACHINE_CONFIG_END
 
-MACHINE_CONFIG_DERIVED(dynax_state::mjreach, tenkai)
+MACHINE_CONFIG_START(dynax_state::mjreach)
+	tenkai(config);
 	MCFG_DEVICE_MODIFY("mainlatch")
 	MCFG_ADDRESSABLE_LATCH_Q0_OUT_CB(WRITELINE(dynax_state, flipscreen_w)) // not inverted
 MACHINE_CONFIG_END

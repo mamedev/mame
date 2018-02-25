@@ -441,7 +441,8 @@ MACHINE_CONFIG_START(z80ne_state::z80ne)
 	//MCFG_SOFTWARE_LIST_ADD("cass_list","z80ne_cass")
 MACHINE_CONFIG_END
 
-MACHINE_CONFIG_DERIVED(z80ne_state::z80net, z80ne)
+MACHINE_CONFIG_START(z80ne_state::z80net)
+	z80ne(config);
 
 	MCFG_CPU_MODIFY("z80ne")
 	MCFG_CPU_PROGRAM_MAP(z80net_mem)

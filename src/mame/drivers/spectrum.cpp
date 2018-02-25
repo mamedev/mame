@@ -699,7 +699,8 @@ MACHINE_CONFIG_START(spectrum_state::spectrum_common)
 	MCFG_SOFTWARE_LIST_ADD("cass_list", "spectrum_cass")
 MACHINE_CONFIG_END
 
-MACHINE_CONFIG_DERIVED(spectrum_state::spectrum, spectrum_common)
+MACHINE_CONFIG_START(spectrum_state::spectrum)
+	spectrum_common(config);
 
 	/* internal ram */
 	MCFG_RAM_ADD(RAM_TAG)               // This configuration is verified only for the original ZX Spectrum.

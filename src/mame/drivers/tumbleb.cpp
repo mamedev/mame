@@ -2265,12 +2265,14 @@ MACHINE_CONFIG_START(tumbleb_state::htchctch)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 MACHINE_CONFIG_END
 
-MACHINE_CONFIG_DERIVED(tumbleb_state::cookbib, htchctch)
+MACHINE_CONFIG_START(tumbleb_state::cookbib)
+	htchctch(config);
 	MCFG_SCREEN_MODIFY("screen")
 	MCFG_SCREEN_UPDATE_DRIVER(tumbleb_state, screen_update_semicom_altoffsets)
 MACHINE_CONFIG_END
 
-MACHINE_CONFIG_DERIVED(tumbleb_state::chokchok, htchctch)
+MACHINE_CONFIG_START(tumbleb_state::chokchok)
+	htchctch(config);
 	MCFG_PALETTE_MODIFY("palette")
 	MCFG_PALETTE_FORMAT(xxxxBBBBGGGGRRRR)
 	// some PCBs have left factory with a 3.57mhz while some have a 4.096 which matches other games, assuming the former are factory errors
@@ -2280,7 +2282,8 @@ MACHINE_CONFIG_DERIVED(tumbleb_state::chokchok, htchctch)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 MACHINE_CONFIG_END
 
-MACHINE_CONFIG_DERIVED(tumbleb_state::cookbib_mcu, htchctch)
+MACHINE_CONFIG_START(tumbleb_state::cookbib_mcu)
+	htchctch(config);
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("protection", I8052, 16000000)  // AT89C52
@@ -2292,7 +2295,8 @@ MACHINE_CONFIG_DERIVED(tumbleb_state::cookbib_mcu, htchctch)
 	MCFG_SCREEN_UPDATE_DRIVER(tumbleb_state, screen_update_semicom_altoffsets)
 MACHINE_CONFIG_END
 
-MACHINE_CONFIG_DERIVED(tumbleb_state::bcstory, htchctch)
+MACHINE_CONFIG_START(tumbleb_state::bcstory)
+	htchctch(config);
 	MCFG_SCREEN_MODIFY("screen")
 	MCFG_SCREEN_UPDATE_DRIVER(tumbleb_state, screen_update_bcstory)
 
@@ -2301,19 +2305,22 @@ MACHINE_CONFIG_DERIVED(tumbleb_state::bcstory, htchctch)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.10)
 MACHINE_CONFIG_END
 
-MACHINE_CONFIG_DERIVED(tumbleb_state::semibase, bcstory)
+MACHINE_CONFIG_START(tumbleb_state::semibase)
+	bcstory(config);
 	MCFG_SCREEN_MODIFY("screen")
 	MCFG_SCREEN_UPDATE_DRIVER(tumbleb_state, screen_update_semibase)
 MACHINE_CONFIG_END
 
-MACHINE_CONFIG_DERIVED(tumbleb_state::sdfight, bcstory)
+MACHINE_CONFIG_START(tumbleb_state::sdfight)
+	bcstory(config);
 	MCFG_VIDEO_START_OVERRIDE(tumbleb_state,sdfight)
 	MCFG_SCREEN_MODIFY("screen")
 	MCFG_SCREEN_UPDATE_DRIVER(tumbleb_state, screen_update_sdfight)
 MACHINE_CONFIG_END
 
 
-MACHINE_CONFIG_DERIVED(tumbleb_state::metlsavr, cookbib)
+MACHINE_CONFIG_START(tumbleb_state::metlsavr)
+	cookbib(config);
 	MCFG_PALETTE_MODIFY("palette")
 	MCFG_PALETTE_FORMAT(xxxxBBBBGGGGRRRR)
 

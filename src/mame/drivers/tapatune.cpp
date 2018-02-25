@@ -533,7 +533,8 @@ MACHINE_CONFIG_START(tapatune_state::tapatune_base)
 	MCFG_SOUND_ROUTE(1, "rspeaker", 1.0)
 MACHINE_CONFIG_END
 
-MACHINE_CONFIG_DERIVED(tapatune_state::tapatune, tapatune_base)
+MACHINE_CONFIG_START(tapatune_state::tapatune)
+	tapatune_base(config);
 	MCFG_CPU_ADD("videocpu", M68000, XTAL(24'000'000) / 2)
 	MCFG_CPU_PROGRAM_MAP(video_map)
 

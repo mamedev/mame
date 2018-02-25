@@ -436,7 +436,8 @@ MACHINE_CONFIG_START(cybiko_state::cybikov1)
 	MCFG_QUICKLOAD_ADD("quickload", cybiko_state, cybiko, "bin,nv", 0)
 MACHINE_CONFIG_END
 
-MACHINE_CONFIG_DERIVED(cybiko_state::cybikov2, cybikov1)
+MACHINE_CONFIG_START(cybiko_state::cybikov2)
+	cybikov1(config);
 	// cpu
 	MCFG_CPU_REPLACE("maincpu", H8S2246, XTAL(11'059'200))
 	MCFG_CPU_PROGRAM_MAP(cybikov2_mem)
@@ -461,7 +462,8 @@ MACHINE_CONFIG_DERIVED(cybiko_state::cybikov2, cybikov1)
 	MCFG_H8_SCI_TX_CALLBACK(DEVWRITELINE(":debug_serial", rs232_port_device, write_txd))
 MACHINE_CONFIG_END
 
-MACHINE_CONFIG_DERIVED(cybiko_state::cybikoxt, cybikov1)
+MACHINE_CONFIG_START(cybiko_state::cybikoxt)
+	cybikov1(config);
 	// cpu
 	MCFG_CPU_REPLACE("maincpu", H8S2323, XTAL(18'432'000))
 	MCFG_CPU_PROGRAM_MAP(cybikoxt_mem )

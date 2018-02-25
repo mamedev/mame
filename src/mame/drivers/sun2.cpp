@@ -212,7 +212,7 @@ READ16_MEMBER( sun2_state::tl_mmu_r )
 {
 	uint8_t fc = m_maincpu->get_fc();
 
-	if ((fc == 3) && !machine().side_effect_disabled())
+	if ((fc == 3) && !machine().side_effects_disabled())
 	{
 		if (offset & 0x4)   // set for CPU space
 		{
@@ -271,7 +271,7 @@ READ16_MEMBER( sun2_state::tl_mmu_r )
 	}
 
 	// debugger hack
-	if (machine().side_effect_disabled() && (offset >= (0xef0000>>1)) && (offset <= (0xef8000>>1)))
+	if (machine().side_effects_disabled() && (offset >= (0xef0000>>1)) && (offset <= (0xef8000>>1)))
 	{
 		return m_rom_ptr[offset & 0x3fff];
 	}
@@ -291,7 +291,7 @@ READ16_MEMBER( sun2_state::tl_mmu_r )
 		uint32_t tmp = (m_pagemap[entry] & 0xfff) << 10;
 		tmp |= (offset & 0x3ff);
 
-	//  if (!machine().side_effect_disabled())
+	//  if (!machine().side_effects_disabled())
 	//      printf("sun2: Translated addr: %08x, type %d (page %d page entry %08x, orig virt %08x, FC %d)\n", tmp << 1, (m_pagemap[entry] >> 22) & 7, entry, m_pagemap[entry], offset<<1, fc);
 
 		switch ((m_pagemap[entry] >> 22) & 7)
@@ -334,10 +334,10 @@ READ16_MEMBER( sun2_state::tl_mmu_r )
 	}
 	else
 	{
-		if (!machine().side_effect_disabled()) printf("sun2: pagemap entry not valid!\n");
+		if (!machine().side_effects_disabled()) printf("sun2: pagemap entry not valid!\n");
 	}
 
-	if (!machine().side_effect_disabled()) printf("sun2: Unmapped read @ %08x (FC %d, mask %04x, PC=%x, seg %x)\n", offset<<1, fc, mem_mask, m_maincpu->pc(), offset>>15);
+	if (!machine().side_effects_disabled()) printf("sun2: Unmapped read @ %08x (FC %d, mask %04x, PC=%x, seg %x)\n", offset<<1, fc, mem_mask, m_maincpu->pc(), offset>>15);
 
 	return 0xffff;
 }
@@ -437,7 +437,7 @@ WRITE16_MEMBER( sun2_state::tl_mmu_w )
 		uint32_t tmp = (m_pagemap[entry] & 0xfff) << 10;
 		tmp |= (offset & 0x3ff);
 
-		//if (!machine().side_effect_disabled()) printf("sun2: Translated addr: %08x, type %d (page entry %08x, orig virt %08x)\n", tmp << 1, (m_pagemap[entry] >> 22) & 7, m_pagemap[entry], offset<<1);
+		//if (!machine().side_effects_disabled()) printf("sun2: Translated addr: %08x, type %d (page entry %08x, orig virt %08x)\n", tmp << 1, (m_pagemap[entry] >> 22) & 7, m_pagemap[entry], offset<<1);
 
 		switch ((m_pagemap[entry] >> 22) & 7)
 		{
@@ -461,7 +461,7 @@ WRITE16_MEMBER( sun2_state::tl_mmu_w )
 	}
 	else
 	{
-		if (!machine().side_effect_disabled()) printf("sun2: pagemap entry not valid!\n");
+		if (!machine().side_effects_disabled()) printf("sun2: pagemap entry not valid!\n");
 	}
 
 	printf("sun2: Unmapped write %04x (FC %d, mask %04x, PC=%x) to %08x\n", data, fc, mem_mask, m_maincpu->pc(), offset<<1);

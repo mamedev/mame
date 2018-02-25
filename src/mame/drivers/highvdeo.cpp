@@ -1177,7 +1177,8 @@ MACHINE_CONFIG_START(highvdeo_state::tv_vcf)
 
 MACHINE_CONFIG_END
 
-MACHINE_CONFIG_DERIVED(highvdeo_state::tv_ncf, tv_vcf)
+MACHINE_CONFIG_START(highvdeo_state::tv_ncf)
+	tv_vcf(config);
 
 	MCFG_CPU_MODIFY("maincpu")
 	MCFG_CPU_PROGRAM_MAP(tv_ncf_map)
@@ -1185,7 +1186,8 @@ MACHINE_CONFIG_DERIVED(highvdeo_state::tv_ncf, tv_vcf)
 
 MACHINE_CONFIG_END
 
-MACHINE_CONFIG_DERIVED(highvdeo_state::nyjoker, tv_vcf)
+MACHINE_CONFIG_START(highvdeo_state::nyjoker)
+	tv_vcf(config);
 
 	MCFG_CPU_MODIFY("maincpu")
 	MCFG_CPU_PROGRAM_MAP(nyjoker_map)
@@ -1193,7 +1195,8 @@ MACHINE_CONFIG_DERIVED(highvdeo_state::nyjoker, tv_vcf)
 
 MACHINE_CONFIG_END
 
-MACHINE_CONFIG_DERIVED(highvdeo_state::tv_tcf, tv_vcf)
+MACHINE_CONFIG_START(highvdeo_state::tv_tcf)
+	tv_vcf(config);
 
 	MCFG_CPU_MODIFY("maincpu")
 	MCFG_CPU_PROGRAM_MAP(tv_tcf_map)
@@ -1206,7 +1209,8 @@ MACHINE_CONFIG_DERIVED(highvdeo_state::tv_tcf, tv_vcf)
 	MCFG_PALETTE_FORMAT(RRRRRGGGGGGBBBBB)
 MACHINE_CONFIG_END
 
-MACHINE_CONFIG_DERIVED(highvdeo_state::newmcard, tv_tcf)
+MACHINE_CONFIG_START(highvdeo_state::newmcard)
+	tv_tcf(config);
 
 	MCFG_CPU_MODIFY("maincpu")
 	MCFG_CPU_PROGRAM_MAP(newmcard_map)
@@ -1216,7 +1220,8 @@ MACHINE_CONFIG_DERIVED(highvdeo_state::newmcard, tv_tcf)
 	MCFG_SCREEN_VISIBLE_AREA(0, 320-1, 0, 200-1)
 MACHINE_CONFIG_END
 
-MACHINE_CONFIG_DERIVED(highvdeo_state::ciclone, tv_tcf)
+MACHINE_CONFIG_START(highvdeo_state::ciclone)
+	tv_tcf(config);
 
 	MCFG_DEVICE_REMOVE("maincpu")
 

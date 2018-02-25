@@ -82,7 +82,7 @@ ADDRESS_MAP_END
                                 Zero Point
 ***************************************************************************/
 
-WRITE16_MEMBER(unico_state::zeropnt_sound_bank_w)
+WRITE16_MEMBER(zeropnt_state::zeropnt_sound_bank_w)
 {
 	if (ACCESSING_BITS_8_15)
 	{
@@ -101,9 +101,9 @@ WRITE16_MEMBER(unico_state::zeropnt_sound_bank_w)
 }
 
 /* Light Gun - need to wiggle the input slightly otherwise fire doesn't work */
-READ16_MEMBER(unico_state::unico_gunx_0_msb_r)
+READ16_MEMBER(zeropnt_state::unico_gunx_0_msb_r)
 {
-	int x=ioport("X0")->read();
+	int x=m_gun_axes[X0]->read();
 
 	x=x*384/256; /* On screen pixel X */
 	if (x<0x160) x=0x30 + (x*0xd0/0x15f);
@@ -112,18 +112,18 @@ READ16_MEMBER(unico_state::unico_gunx_0_msb_r)
 	return ((x&0xff) ^ (m_screen->frame_number()&1))<<8;
 }
 
-READ16_MEMBER(unico_state::unico_guny_0_msb_r)
+READ16_MEMBER(zeropnt_state::unico_guny_0_msb_r)
 {
-	int y=ioport("Y0")->read();
+	int y=m_gun_axes[Y0]->read();
 
 	y=0x18+((y*0xe0)/0xff);
 
 	return ((y&0xff) ^ (m_screen->frame_number()&1))<<8;
 }
 
-READ16_MEMBER(unico_state::unico_gunx_1_msb_r)
+READ16_MEMBER(zeropnt_state::unico_gunx_1_msb_r)
 {
-	int x=ioport("X1")->read();
+	int x=m_gun_axes[X1]->read();
 
 	x=x*384/256; /* On screen pixel X */
 	if (x<0x160) x=0x30 + (x*0xd0/0x15f);
@@ -132,16 +132,16 @@ READ16_MEMBER(unico_state::unico_gunx_1_msb_r)
 	return ((x&0xff) ^ (m_screen->frame_number()&1))<<8;
 }
 
-READ16_MEMBER(unico_state::unico_guny_1_msb_r)
+READ16_MEMBER(zeropnt_state::unico_guny_1_msb_r)
 {
-	int y=ioport("Y1")->read();
+	int y=m_gun_axes[Y1]->read();
 
 	y=0x18+((y*0xe0)/0xff);
 
 	return ((y&0xff) ^ (m_screen->frame_number()&1))<<8;
 }
 
-ADDRESS_MAP_START(unico_state::zeropnt_map)
+ADDRESS_MAP_START(zeropnt_state::zeropnt_map)
 	AM_RANGE(0x000000, 0x0fffff) AM_ROM // ROM
 	AM_RANGE(0xef0000, 0xefffff) AM_RAM // RAM
 	AM_RANGE(0x800030, 0x800031) AM_WRITENOP    // ? 0
@@ -169,12 +169,12 @@ ADDRESS_MAP_END
                                 Zero Point 2
 ***************************************************************************/
 
-READ32_MEMBER(unico_state::zeropnt2_gunx_0_msb_r){ return (unico_gunx_0_msb_r(space,0,0xffff)-0x0800) << 16; }
-READ32_MEMBER(unico_state::zeropnt2_guny_0_msb_r){ return (unico_guny_0_msb_r(space,0,0xffff)+0x0800) << 16; }
-READ32_MEMBER(unico_state::zeropnt2_gunx_1_msb_r){ return (unico_gunx_1_msb_r(space,0,0xffff)-0x0800) << 16; }
-READ32_MEMBER(unico_state::zeropnt2_guny_1_msb_r){ return (unico_guny_1_msb_r(space,0,0xffff)+0x0800) << 16; }
+READ32_MEMBER(zeropnt2_state::zeropnt2_gunx_0_msb_r) { return (unico_gunx_0_msb_r(space,0,0xffff)-0x0800) << 16; }
+READ32_MEMBER(zeropnt2_state::zeropnt2_guny_0_msb_r) { return (unico_guny_0_msb_r(space,0,0xffff)+0x0800) << 16; }
+READ32_MEMBER(zeropnt2_state::zeropnt2_gunx_1_msb_r) { return (unico_gunx_1_msb_r(space,0,0xffff)-0x0800) << 16; }
+READ32_MEMBER(zeropnt2_state::zeropnt2_guny_1_msb_r) { return (unico_guny_1_msb_r(space,0,0xffff)+0x0800) << 16; }
 
-WRITE32_MEMBER(unico_state::zeropnt2_sound_bank_w)
+WRITE32_MEMBER(zeropnt2_state::zeropnt2_sound_bank_w)
 {
 	if (ACCESSING_BITS_24_31)
 	{
@@ -185,7 +185,7 @@ WRITE32_MEMBER(unico_state::zeropnt2_sound_bank_w)
 	}
 }
 
-WRITE32_MEMBER(unico_state::zeropnt2_leds_w)
+WRITE32_MEMBER(zeropnt2_state::zeropnt2_leds_w)
 {
 	if (ACCESSING_BITS_16_23)
 	{
@@ -195,7 +195,7 @@ WRITE32_MEMBER(unico_state::zeropnt2_leds_w)
 	}
 }
 
-WRITE32_MEMBER(unico_state::zeropnt2_eeprom_w)
+WRITE32_MEMBER(zeropnt2_state::zeropnt2_eeprom_w)
 {
 	if (data & ~0xfe00000)
 		logerror("%s - Unknown EEPROM bit written %04X\n",machine().describe_context(),data);
@@ -213,7 +213,7 @@ WRITE32_MEMBER(unico_state::zeropnt2_eeprom_w)
 	}
 }
 
-ADDRESS_MAP_START(unico_state::zeropnt2_map)
+ADDRESS_MAP_START(zeropnt2_state::zeropnt2_map)
 	AM_RANGE(0x000000, 0x1fffff) AM_ROM                                             // ROM
 	AM_RANGE(0x800018, 0x80001b) AM_READ_PORT("SYSTEM")
 	AM_RANGE(0x800024, 0x800027) AM_DEVREADWRITE8("oki1", okim6295_device, read, write, 0x00ff0000)   // Sound
@@ -561,10 +561,6 @@ GFXDECODE_END
 
 ***************************************************************************/
 
-MACHINE_RESET_MEMBER(unico_state,unico)
-{
-}
-
 
 /***************************************************************************
                                 Burglar X
@@ -573,11 +569,9 @@ MACHINE_RESET_MEMBER(unico_state,unico)
 MACHINE_CONFIG_START(unico_state::burglarx)
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", M68000, XTAL(32'000'000)/2) /* 16MHz */
+	MCFG_CPU_ADD("maincpu", M68000, 32_MHz_XTAL/2) /* 16MHz */
 	MCFG_CPU_PROGRAM_MAP(burglarx_map)
 	MCFG_CPU_VBLANK_INT_DRIVER("screen", unico_state,  irq2_line_hold)
-
-	MCFG_MACHINE_RESET_OVERRIDE(unico_state,unico)
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
@@ -591,8 +585,6 @@ MACHINE_CONFIG_START(unico_state::burglarx)
 	MCFG_GFXDECODE_ADD("gfxdecode", "palette", unico)
 	MCFG_PALETTE_ADD("palette", 8192)
 
-	MCFG_VIDEO_START_OVERRIDE(unico_state,unico)
-
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
 
@@ -600,7 +592,7 @@ MACHINE_CONFIG_START(unico_state::burglarx)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "lspeaker", 0.40)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", 0.40)
 
-	MCFG_OKIM6295_ADD("oki", XTAL(32'000'000)/32, PIN7_HIGH) // clock frequency & pin 7 not verified
+	MCFG_OKIM6295_ADD("oki", 32_MHz_XTAL/32, PIN7_HIGH) // clock frequency & pin 7 not verified
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "lspeaker", 0.80)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", 0.80)
 MACHINE_CONFIG_END
@@ -611,19 +603,12 @@ MACHINE_CONFIG_END
                                 Zero Point
 ***************************************************************************/
 
-MACHINE_RESET_MEMBER(unico_state,zeropt)
-{
-	MACHINE_RESET_CALL_MEMBER(unico);
-}
-
-MACHINE_CONFIG_START(unico_state::zeropnt)
+MACHINE_CONFIG_START(zeropnt_state::zeropnt)
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", M68000, XTAL(32'000'000)/2) /* 16MHz */
+	MCFG_CPU_ADD("maincpu", M68000, 32_MHz_XTAL/2) /* 16MHz */
 	MCFG_CPU_PROGRAM_MAP(zeropnt_map)
 	MCFG_CPU_VBLANK_INT_DRIVER("screen", unico_state,  irq2_line_hold)
-
-	MCFG_MACHINE_RESET_OVERRIDE(unico_state,zeropt)
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
@@ -631,13 +616,11 @@ MACHINE_CONFIG_START(unico_state::zeropnt)
 	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
 	MCFG_SCREEN_SIZE(384, 224)
 	MCFG_SCREEN_VISIBLE_AREA(0, 384-1, 0, 224-1)
-	MCFG_SCREEN_UPDATE_DRIVER(unico_state, screen_update_unico)
+	MCFG_SCREEN_UPDATE_DRIVER(zeropnt_state, screen_update_unico)
 	MCFG_SCREEN_PALETTE("palette")
 
 	MCFG_GFXDECODE_ADD("gfxdecode", "palette", unico)
 	MCFG_PALETTE_ADD("palette", 8192)
-
-	MCFG_VIDEO_START_OVERRIDE(unico_state,unico)
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
@@ -646,7 +629,7 @@ MACHINE_CONFIG_START(unico_state::zeropnt)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "lspeaker", 0.40)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", 0.40)
 
-	MCFG_OKIM6295_ADD("oki", XTAL(32'000'000)/32, PIN7_HIGH) // clock frequency & pin 7 not verified
+	MCFG_OKIM6295_ADD("oki", 32_MHz_XTAL/32, PIN7_HIGH) // clock frequency & pin 7 not verified
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "lspeaker", 0.80)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", 0.80)
 MACHINE_CONFIG_END
@@ -657,14 +640,12 @@ MACHINE_CONFIG_END
                                 Zero Point 2
 ***************************************************************************/
 
-MACHINE_CONFIG_START(unico_state::zeropnt2)
+MACHINE_CONFIG_START(zeropnt2_state::zeropnt2)
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", M68EC020, XTAL(32'000'000)/2) /* 16MHz */
+	MCFG_CPU_ADD("maincpu", M68EC020, 32_MHz_XTAL/2) /* 16MHz */
 	MCFG_CPU_PROGRAM_MAP(zeropnt2_map)
-	MCFG_CPU_VBLANK_INT_DRIVER("screen", unico_state,  irq2_line_hold)
-
-	MCFG_MACHINE_RESET_OVERRIDE(unico_state,zeropt)
+	MCFG_CPU_VBLANK_INT_DRIVER("screen", unico_state, irq2_line_hold)
 
 	MCFG_EEPROM_SERIAL_93C46_8BIT_ADD("eeprom")
 
@@ -674,13 +655,11 @@ MACHINE_CONFIG_START(unico_state::zeropnt2)
 	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
 	MCFG_SCREEN_SIZE(384, 224)
 	MCFG_SCREEN_VISIBLE_AREA(0, 384-1, 0, 224-1)
-	MCFG_SCREEN_UPDATE_DRIVER(unico_state, screen_update_unico)
+	MCFG_SCREEN_UPDATE_DRIVER(zeropnt2_state, screen_update_unico)
 	MCFG_SCREEN_PALETTE("palette")
 
 	MCFG_GFXDECODE_ADD("gfxdecode", "palette", unico)
 	MCFG_PALETTE_ADD("palette", 8192)
-
-	MCFG_VIDEO_START_OVERRIDE(unico_state,unico)
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
@@ -689,7 +668,7 @@ MACHINE_CONFIG_START(unico_state::zeropnt2)
 	MCFG_SOUND_ROUTE(0, "lspeaker", 0.70)
 	MCFG_SOUND_ROUTE(1, "rspeaker", 0.70)
 
-	MCFG_OKIM6295_ADD("oki1", XTAL(32'000'000)/32, PIN7_HIGH) // clock frequency & pin 7 not verified
+	MCFG_OKIM6295_ADD("oki1", 32_MHz_XTAL/32, PIN7_HIGH) // clock frequency & pin 7 not verified
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "lspeaker", 0.40)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", 0.40)
 
@@ -1050,8 +1029,8 @@ ROM_END
 
 ***************************************************************************/
 
-GAME( 1997, burglarx, 0,       burglarx, burglarx, unico_state, 0, ROT0, "Unico", "Burglar X" ,         0 )
-GAME( 1998, zeropnt,  0,       zeropnt,  zeropnt,  unico_state, 0, ROT0, "Unico", "Zero Point (set 1)", 0 )
-GAME( 1998, zeropnta, zeropnt, zeropnt,  zeropnt,  unico_state, 0, ROT0, "Unico", "Zero Point (set 2)", 0 )
-GAME( 1998, zeropntj, zeropnt, zeropnt,  zeropnt,  unico_state, 0, ROT0, "Unico", "Zero Point (Japan)", 0 )
-GAME( 1999, zeropnt2, 0,       zeropnt2, zeropnt2, unico_state, 0, ROT0, "Unico", "Zero Point 2",       0 )
+GAME( 1997, burglarx, 0,       burglarx, burglarx, unico_state,    0, ROT0, "Unico", "Burglar X" ,         0 )
+GAME( 1998, zeropnt,  0,       zeropnt,  zeropnt,  zeropnt_state,  0, ROT0, "Unico", "Zero Point (set 1)", 0 )
+GAME( 1998, zeropnta, zeropnt, zeropnt,  zeropnt,  zeropnt_state,  0, ROT0, "Unico", "Zero Point (set 2)", 0 )
+GAME( 1998, zeropntj, zeropnt, zeropnt,  zeropnt,  zeropnt_state,  0, ROT0, "Unico", "Zero Point (Japan)", 0 )
+GAME( 1999, zeropnt2, 0,       zeropnt2, zeropnt2, zeropnt2_state, 0, ROT0, "Unico", "Zero Point 2",       0 )

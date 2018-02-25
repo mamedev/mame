@@ -100,7 +100,7 @@ static INPUT_PORTS_START( pce )
 	// pachinko controller paddle maps here (!?) with this arrangement
 	//PORT_BIT( 0xff, 0x00, IPT_PADDLE ) PORT_MINMAX(0,0x5f) PORT_SENSITIVITY(15) PORT_KEYDELTA(15) PORT_CENTERDELTA(0) PORT_CODE_DEC(KEYCODE_N) PORT_CODE_INC(KEYCODE_M)
 
-	
+
 	PORT_START("JOY_P.2")
 	/* II is left of I on the original pad so we map them in reverse order */
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_BUTTON2 ) PORT_NAME("P3 Button I") PORT_PLAYER(3)    PORT_CONDITION("JOY_TYPE", 0x0030, EQUALS, 0x0000)
@@ -347,13 +347,15 @@ MACHINE_CONFIG_START(pce_state::pce_common)
 MACHINE_CONFIG_END
 
 
-MACHINE_CONFIG_DERIVED(pce_state::pce, pce_common)
+MACHINE_CONFIG_START(pce_state::pce)
+	pce_common(config);
 	MCFG_PCE_CARTRIDGE_ADD("cartslot", pce_cart, nullptr)
 	MCFG_SOFTWARE_LIST_ADD("cart_list","pce")
 MACHINE_CONFIG_END
 
 
-MACHINE_CONFIG_DERIVED(pce_state::tg16, pce_common)
+MACHINE_CONFIG_START(pce_state::tg16)
+	pce_common(config);
 	MCFG_TG16_CARTRIDGE_ADD("cartslot", pce_cart, nullptr)
 	MCFG_SOFTWARE_LIST_ADD("cart_list","tg16")
 MACHINE_CONFIG_END

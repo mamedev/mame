@@ -56,7 +56,7 @@ public:
 		: driver_device(mconfig, type, tag)
 		, m_maincpu(*this, Z80_TAG)
 		, m_usart_l(*this, I8251_L_TAG)
-		, m_usart_r(*this, I8251_L_TAG)
+		, m_usart_r(*this, I8251_R_TAG)
 		{ }
 
 	DECLARE_READ8_MEMBER(ff_r);
@@ -220,7 +220,8 @@ MACHINE_CONFIG_START(horizon_state::horizon)
 	MCFG_SOFTWARE_LIST_ADD("flop_list", "horizon")
 MACHINE_CONFIG_END
 
-MACHINE_CONFIG_DERIVED(horizon_state::horizon2mhz, horizon)
+MACHINE_CONFIG_START(horizon_state::horizon2mhz)
+	horizon(config);
 	MCFG_CPU_MODIFY("z80")
 	MCFG_CPU_CLOCK(XTAL(4'000'000) / 2)
 

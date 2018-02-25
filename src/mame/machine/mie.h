@@ -13,15 +13,15 @@
 
 #define MCFG_MIE_ADD(_tag, _clock, _host_tag, _host_port, g0, g1, g2, g3, g4, g5, g6, g7) \
 	MCFG_MAPLE_DEVICE_ADD(_tag "_maple", MIE, _clock, _host_tag, _host_port) \
-	mie_device::static_set_gpio_name(*device, 0, g0);   \
-	mie_device::static_set_gpio_name(*device, 1, g1);   \
-	mie_device::static_set_gpio_name(*device, 2, g2);   \
-	mie_device::static_set_gpio_name(*device, 3, g3);   \
-	mie_device::static_set_gpio_name(*device, 4, g4);   \
-	mie_device::static_set_gpio_name(*device, 5, g5);   \
-	mie_device::static_set_gpio_name(*device, 6, g6);   \
-	mie_device::static_set_gpio_name(*device, 7, g7); \
-	mie_device::static_set_jvs_name(*device, _tag); \
+	downcast<mie_device &>(*device).set_gpio_name(0, g0);   \
+	downcast<mie_device &>(*device).set_gpio_name(1, g1);   \
+	downcast<mie_device &>(*device).set_gpio_name(2, g2);   \
+	downcast<mie_device &>(*device).set_gpio_name(3, g3);   \
+	downcast<mie_device &>(*device).set_gpio_name(4, g4);   \
+	downcast<mie_device &>(*device).set_gpio_name(5, g5);   \
+	downcast<mie_device &>(*device).set_gpio_name(6, g6);   \
+	downcast<mie_device &>(*device).set_gpio_name(7, g7); \
+	downcast<mie_device &>(*device).set_jvs_name(_tag); \
 	MCFG_DEVICE_ADD(_tag, MIE_JVS, _clock)
 
 class mie_jvs_device;
@@ -33,8 +33,8 @@ class mie_device : public maple_device
 public:
 	mie_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
-	static void static_set_gpio_name(device_t &device, int entry, const char *name);
-	static void static_set_jvs_name(device_t &device, const char *name);
+	void set_gpio_name(int entry, const char *name) { gpio_name[entry] = name; }
+	void set_jvs_name(const char *name) { jvs_name = name; }
 
 	DECLARE_READ8_MEMBER(control_r);
 	DECLARE_WRITE8_MEMBER(control_w);

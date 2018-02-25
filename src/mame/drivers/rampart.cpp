@@ -65,7 +65,7 @@ void rampart_state::scanline_update(screen_device &screen, int scanline)
  *
  *************************************/
 
-MACHINE_RESET_MEMBER(rampart_state,rampart)
+void rampart_state::machine_reset()
 {
 	atarigen_state::machine_reset();
 	scanline_timer_reset(*m_screen, 32);
@@ -341,11 +341,9 @@ MACHINE_CONFIG_START(rampart_state::rampart)
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", M68000, MASTER_CLOCK/2)
 	MCFG_CPU_PROGRAM_MAP(main_map)
-	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", atarigen_state, video_int_gen)
+	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", rampart_state, video_int_gen)
 
 	MCFG_SLAPSTIC_ADD("slapstic", 118)
-
-	MCFG_MACHINE_RESET_OVERRIDE(rampart_state,rampart)
 
 	MCFG_EEPROM_2816_ADD("eeprom")
 	MCFG_EEPROM_28XX_LOCK_AFTER_WRITE(true)
@@ -369,8 +367,6 @@ MACHINE_CONFIG_START(rampart_state::rampart)
 	MCFG_SCREEN_RAW_PARAMS(MASTER_CLOCK/2, 456, 0+12, 336+12, 262, 0, 240)
 	MCFG_SCREEN_UPDATE_DRIVER(rampart_state, screen_update_rampart)
 	MCFG_SCREEN_PALETTE("palette")
-
-	MCFG_VIDEO_START_OVERRIDE(rampart_state,rampart)
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")

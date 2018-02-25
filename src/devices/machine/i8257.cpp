@@ -231,7 +231,7 @@ inline void i8257_device::dma_write()
 		}
 		break;
 	}
-	LOGTFR(" channel %d Offset %04x: %02x\n", m_channel, offset, m_temp);
+	LOGTFR(" channel %d Offset %04x: %02x %04x\n", m_current_channel, offset, m_temp, m_channel[m_current_channel].m_count);
 }
 
 

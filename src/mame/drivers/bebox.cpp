@@ -240,7 +240,8 @@ MACHINE_CONFIG_START(bebox_state::bebox)
 	MCFG_RAM_EXTRA_OPTIONS("8M,16M")
 MACHINE_CONFIG_END
 
-MACHINE_CONFIG_DERIVED(bebox_state::bebox2, bebox)
+MACHINE_CONFIG_START(bebox_state::bebox2)
+	bebox(config);
 	MCFG_CPU_REPLACE("ppc1", PPC603E, 133000000)    /* 133 MHz */
 	MCFG_CPU_PROGRAM_MAP(bebox_mem)
 

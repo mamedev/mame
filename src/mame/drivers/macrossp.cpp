@@ -580,7 +580,8 @@ MACHINE_CONFIG_START(macrossp_state::macrossp)
 	MCFG_SOUND_ROUTE(1, "rspeaker", 0.1)
 MACHINE_CONFIG_END
 
-MACHINE_CONFIG_DERIVED(macrossp_state::quizmoon, macrossp)
+MACHINE_CONFIG_START(macrossp_state::quizmoon)
+	macrossp(config);
 
 	MCFG_SCREEN_MODIFY("screen")
 	MCFG_SCREEN_VISIBLE_AREA(0, 24*16-1, 0*8, 14*16-1)

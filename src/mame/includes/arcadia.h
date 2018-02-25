@@ -5,9 +5,10 @@
  * includes/arcadia.h
  *
  ****************************************************************************/
-
 #ifndef MAME_INCLUDES_ARCADIA_H
 #define MAME_INCLUDES_ARCADIA_H
+
+#pragma once
 
 #include "cpu/s2650/s2650.h"
 #include "audio/arcadia.h"
@@ -30,8 +31,8 @@
 class arcadia_state : public driver_device
 {
 public:
-	arcadia_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag),
+	arcadia_state(const machine_config &mconfig, device_type type, const char *tag) :
+		driver_device(mconfig, type, tag),
 		m_custom(*this, "custom"),
 		m_panel(*this, "panel"),
 		m_controller1_col1(*this, "controller1_col1"),
@@ -47,11 +48,30 @@ public:
 		m_cart(*this, "cartslot"),
 		m_gfxdecode(*this, "gfxdecode"),
 		m_palette(*this, "palette"),
-		m_screen(*this, "screen")  { }
+		m_screen(*this, "screen")
+	{ }
 
+	DECLARE_DRIVER_INIT(arcadia);
+	void arcadia(machine_config &config);
+
+protected:
 	DECLARE_READ_LINE_MEMBER(vsync_r);
 	DECLARE_READ8_MEMBER(video_r);
 	DECLARE_WRITE8_MEMBER(video_w);
+
+	virtual void machine_start() override;
+	virtual void video_start() override;
+	DECLARE_PALETTE_INIT(arcadia);
+	uint32_t screen_update_arcadia(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	INTERRUPT_GEN_MEMBER(video_line);
+	void arcadia_mem(address_map &map);
+
+	void draw_char(uint8_t *ch, int charcode, int y, int x);
+	void vh_draw_line(int y, uint8_t chars1[16]);
+	int sprite_collision(int n1, int n2);
+	void draw_sprites();
+
+private:
 	int m_line;
 	int m_charline;
 	int m_shift;
@@ -96,16 +116,7 @@ public:
 		} d;
 	} m_reg;
 	std::unique_ptr<bitmap_ind16> m_bitmap;
-	DECLARE_DRIVER_INIT(arcadia);
-	virtual void machine_start() override;
-	virtual void video_start() override;
-	DECLARE_PALETTE_INIT(arcadia);
-	uint32_t screen_update_arcadia(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
-	INTERRUPT_GEN_MEMBER(video_line);
 
-	void arcadia(machine_config &config);
-	void arcadia_mem(address_map &map);
-protected:
 	required_device<arcadia_sound_device> m_custom;
 	required_ioport m_panel;
 	required_ioport m_controller1_col1;
@@ -118,14 +129,11 @@ protected:
 	required_ioport m_controller2_extra;
 	required_ioport m_joysticks;
 
-	void draw_char(uint8_t *ch, int charcode, int y, int x);
-	void vh_draw_line(int y, uint8_t chars1[16]);
-	int sprite_collision(int n1, int n2);
-	void draw_sprites();
 	required_device<cpu_device> m_maincpu;
 	required_device<arcadia_cart_slot_device> m_cart;
 	required_device<gfxdecode_device> m_gfxdecode;
 	required_device<palette_device> m_palette;
 	required_device<screen_device> m_screen;
 };
+
 #endif // MAME_INCLUDES_ARCADIA_H

@@ -484,7 +484,8 @@ DRIVER_INIT_MEMBER(konamigv_state,simpbowl)
 	m_flash8[3] = machine().device<fujitsu_29f016a_device>("flash3");
 }
 
-MACHINE_CONFIG_DERIVED(konamigv_state::simpbowl, konamigv)
+MACHINE_CONFIG_START(konamigv_state::simpbowl)
+	konamigv(config);
 	MCFG_CPU_MODIFY( "maincpu" )
 	MCFG_CPU_PROGRAM_MAP( simpbowl_map )
 
@@ -523,7 +524,8 @@ WRITE16_MEMBER(konamigv_state::btc_trackball_w)
 	}
 }
 
-MACHINE_CONFIG_DERIVED(konamigv_state::btchamp, konamigv)
+MACHINE_CONFIG_START(konamigv_state::btchamp)
+	konamigv(config);
 	MCFG_CPU_MODIFY( "maincpu" )
 	MCFG_CPU_PROGRAM_MAP( btchamp_map )
 
@@ -580,7 +582,8 @@ WRITE16_MEMBER(konamigv_state::tokimeki_serial_w)
 
 }
 
-MACHINE_CONFIG_DERIVED(konamigv_state::tmosh, konamigv)
+MACHINE_CONFIG_START(konamigv_state::tmosh)
+	konamigv(config);
 	MCFG_CPU_MODIFY( "maincpu" )
 	MCFG_CPU_PROGRAM_MAP( tmosh_map )
 MACHINE_CONFIG_END
@@ -595,7 +598,8 @@ CD:
     A01
 */
 
-MACHINE_CONFIG_DERIVED(konamigv_state::kdeadeye, konamigv)
+MACHINE_CONFIG_START(konamigv_state::kdeadeye)
+	konamigv(config);
 	MCFG_CPU_MODIFY( "maincpu" )
 	MCFG_CPU_PROGRAM_MAP( kdeadeye_map )
 

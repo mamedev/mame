@@ -22,11 +22,11 @@ DEFINE_DEVICE_TYPE(TMS1370, tms1370_cpu_device, "tms1370", "TMS1370") // high vo
 
 
 // internal memory maps
-ADDRESS_MAP_START(tms1k_base_device::program_11bit_8)
+ADDRESS_MAP_START(tms1100_cpu_device::program_11bit_8)
 	AM_RANGE(0x000, 0x7ff) AM_ROM
 ADDRESS_MAP_END
 
-ADDRESS_MAP_START(tms1k_base_device::data_128x4)
+ADDRESS_MAP_START(tms1100_cpu_device::data_128x4)
 	AM_RANGE(0x00, 0x7f) AM_RAM
 ADDRESS_MAP_END
 

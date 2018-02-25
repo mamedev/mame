@@ -676,7 +676,8 @@ MACHINE_CONFIG_START(fastfred_state::fastfred)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
 MACHINE_CONFIG_END
 
-MACHINE_CONFIG_DERIVED(fastfred_state::jumpcoas, fastfred)
+MACHINE_CONFIG_START(fastfred_state::jumpcoas)
+	fastfred(config);
 
 	/* basic machine hardware */
 	MCFG_CPU_MODIFY("maincpu")
@@ -692,7 +693,8 @@ MACHINE_CONFIG_DERIVED(fastfred_state::jumpcoas, fastfred)
 	MCFG_DEVICE_REMOVE("ay8910.2")
 MACHINE_CONFIG_END
 
-MACHINE_CONFIG_DERIVED(fastfred_state::imago, fastfred)
+MACHINE_CONFIG_START(fastfred_state::imago)
+	fastfred(config);
 
 	/* basic machine hardware */
 	MCFG_CPU_MODIFY("maincpu")

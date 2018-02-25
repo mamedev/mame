@@ -244,7 +244,7 @@ MACHINE_CONFIG_START(spectra_state::spectra)
 	MCFG_DEFAULT_LAYOUT(layout_spectra)
 
 	/* Sound */
-	MCFG_FRAGMENT_ADD( genpin_audio )
+	genpin_audio(config);
 
 	MCFG_SPEAKER_STANDARD_MONO("mono")
 	MCFG_SOUND_ADD("snsnd", SN76477, 0)

@@ -14,7 +14,7 @@
 
 #include "superbug.lh"
 
-#define MASTER_CLOCK (XTAL(12'096'000))
+static constexpr XTAL MASTER_CLOCK = 12.096_MHz_XTAL;
 
 
 void firetrk_state::set_service_mode(int enable)
@@ -881,7 +881,8 @@ MACHINE_CONFIG_START(firetrk_state::firetrk)
 MACHINE_CONFIG_END
 
 
-MACHINE_CONFIG_DERIVED(firetrk_state::superbug, firetrk)
+MACHINE_CONFIG_START(firetrk_state::superbug)
+	firetrk(config);
 
 	/* basic machine hardware */
 	MCFG_CPU_MODIFY("maincpu")
@@ -905,7 +906,8 @@ MACHINE_CONFIG_DERIVED(firetrk_state::superbug, firetrk)
 MACHINE_CONFIG_END
 
 
-MACHINE_CONFIG_DERIVED(firetrk_state::montecar, firetrk)
+MACHINE_CONFIG_START(firetrk_state::montecar)
+	firetrk(config);
 
 	/* basic machine hardware */
 	MCFG_CPU_MODIFY("maincpu")

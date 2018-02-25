@@ -1503,7 +1503,8 @@ MACHINE_CONFIG_START(socrates_state::socrates)
 	MCFG_SOFTWARE_LIST_ADD("cart_list", "socrates")
 MACHINE_CONFIG_END
 
-MACHINE_CONFIG_DERIVED(socrates_state::socrates_pal, socrates)
+MACHINE_CONFIG_START(socrates_state::socrates_pal)
+	socrates(config);
 	MCFG_CPU_REPLACE("maincpu", Z80, XTAL(26'601'712)/8)
 	MCFG_CPU_PROGRAM_MAP(z80_mem)
 	MCFG_CPU_IO_MAP(z80_io)

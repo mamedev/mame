@@ -496,7 +496,8 @@ MACHINE_CONFIG_START(xain_state::xsleena)
 MACHINE_CONFIG_END
 
 
-MACHINE_CONFIG_DERIVED(xain_state::xsleenab, xsleena)
+MACHINE_CONFIG_START(xain_state::xsleenab)
+	xsleena(config);
 	MCFG_CPU_MODIFY("maincpu")
 	MCFG_CPU_PROGRAM_MAP(bootleg_map)
 

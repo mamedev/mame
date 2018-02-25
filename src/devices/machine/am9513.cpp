@@ -1164,7 +1164,7 @@ void am9513_device::internal_write(u16 data)
 
 void am9513_device::advance_dpr()
 {
-	if (machine().side_effect_disabled())
+	if (machine().side_effects_disabled())
 		return;
 
 	if (bus_is_16_bit() || !BIT(m_status, 0))

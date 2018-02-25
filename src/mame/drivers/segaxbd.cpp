@@ -466,7 +466,7 @@ void segaxbd_state::timer_ack_callback()
 //  sound_data_w - write data to the sound CPU
 //-------------------------------------------------
 
-void segaxbd_state::sound_data_w(uint8_t data)
+WRITE8_MEMBER(segaxbd_state::sound_data_w)
 {
 	synchronize(TID_SOUND_WRITE, data);
 }
@@ -1714,7 +1714,7 @@ MACHINE_CONFIG_START(segaxbd_state::xboard_base_mconfig )
 
 	MCFG_SEGA_315_5250_COMPARE_TIMER_ADD("cmptimer_main")
 	MCFG_SEGA_315_5250_TIMER_ACK(segaxbd_state, timer_ack_callback)
-	MCFG_SEGA_315_5250_SOUND_WRITE(segaxbd_state, sound_data_w)
+	MCFG_SEGA_315_5250_SOUND_WRITE_CALLBACK(WRITE8(segaxbd_state, sound_data_w))
 
 	MCFG_SEGA_315_5250_COMPARE_TIMER_ADD("cmptimer_subx")
 

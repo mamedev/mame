@@ -480,7 +480,8 @@ MACHINE_CONFIG_START(lvcards_state::lvcards)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
 MACHINE_CONFIG_END
 
-MACHINE_CONFIG_DERIVED(lvcards_state::lvpoker, lvcards)
+MACHINE_CONFIG_START(lvcards_state::lvpoker)
+	lvcards(config);
 
 	// basic machine hardware
 	MCFG_NVRAM_ADD_1FILL("nvram")
@@ -490,7 +491,8 @@ MACHINE_CONFIG_DERIVED(lvcards_state::lvpoker, lvcards)
 	MCFG_MACHINE_RESET_OVERRIDE(lvcards_state,lvpoker)
 MACHINE_CONFIG_END
 
-MACHINE_CONFIG_DERIVED(lvcards_state::ponttehk, lvcards)
+MACHINE_CONFIG_START(lvcards_state::ponttehk)
+	lvcards(config);
 
 	// basic machine hardware
 	MCFG_NVRAM_ADD_1FILL("nvram")

@@ -42,9 +42,15 @@ public:
 	{
 	}
 
-public:
-	DECLARE_DRIVER_INIT(zorba);
-	DECLARE_MACHINE_RESET(zorba);
+	DECLARE_INPUT_CHANGED_MEMBER(printer_type);
+	void zorba(machine_config &config);
+
+protected:
+	virtual void machine_start() override;
+	virtual void machine_reset() override;
+
+	void zorba_io(address_map &map);
+	void zorba_mem(address_map &map);
 
 	// Memory banking control
 	DECLARE_READ8_MEMBER(ram_r);
@@ -78,11 +84,7 @@ public:
 	// Printer port glue
 	DECLARE_WRITE_LINE_MEMBER(printer_fault_w);
 	DECLARE_WRITE_LINE_MEMBER(printer_select_w);
-	DECLARE_INPUT_CHANGED_MEMBER(printer_type);
 
-	void zorba(machine_config &config);
-	void zorba_io(address_map &map);
-	void zorba_mem(address_map &map);
 private:
 	required_ioport                     m_config_port;
 

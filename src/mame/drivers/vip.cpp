@@ -767,7 +767,8 @@ MACHINE_CONFIG_END
 //  MACHINE_CONFIG( vp111 )
 //-------------------------------------------------
 
-MACHINE_CONFIG_DERIVED(vip_state::vp111, vip)
+MACHINE_CONFIG_START(vip_state::vp111)
+	vip(config);
 	// internal ram
 	MCFG_RAM_MODIFY(RAM_TAG)
 	MCFG_RAM_DEFAULT_SIZE("1K")

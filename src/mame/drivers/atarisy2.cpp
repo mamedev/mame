@@ -1224,7 +1224,7 @@ MACHINE_CONFIG_START(atarisy2_state::atarisy2)
 	MCFG_VIDEO_START_OVERRIDE(atarisy2_state,atarisy2)
 
 	/* sound hardware */
-	MCFG_ATARI_SOUND_COMM_ADD("soundcomm", "audiocpu", WRITELINE(atarigen_state, sound_int_write_line))
+	MCFG_ATARI_SOUND_COMM_ADD("soundcomm", "audiocpu", WRITELINE(atarisy2_state, sound_int_write_line))
 	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
 	MCFG_YM2151_ADD("ymsnd", SOUND_CLOCK/4)
 	MCFG_SOUND_ROUTE(0, "lspeaker", 0.60)
@@ -1244,12 +1244,14 @@ MACHINE_CONFIG_START(atarisy2_state::atarisy2)
 MACHINE_CONFIG_END
 
 
-MACHINE_CONFIG_DERIVED(atarisy2_state::paperboy, atarisy2)
+MACHINE_CONFIG_START(atarisy2_state::paperboy)
+	atarisy2(config);
 	MCFG_SLAPSTIC_ADD("slapstic", 105)
 MACHINE_CONFIG_END
 
 
-MACHINE_CONFIG_DERIVED(atarisy2_state::_720, atarisy2)
+MACHINE_CONFIG_START(atarisy2_state::_720)
+	atarisy2(config);
 	/* without the default EEPROM, 720 hangs at startup due to communication
 	   issues with the sound CPU; temporarily increasing the sound CPU frequency
 	   to ~2.2MHz "fixes" the problem */
@@ -1258,7 +1260,8 @@ MACHINE_CONFIG_DERIVED(atarisy2_state::_720, atarisy2)
 MACHINE_CONFIG_END
 
 
-MACHINE_CONFIG_DERIVED(atarisy2_state::ssprint, atarisy2)
+MACHINE_CONFIG_START(atarisy2_state::ssprint)
+	atarisy2(config);
 	MCFG_SLAPSTIC_ADD("slapstic", 108)
 
 	/* sound hardware */
@@ -1266,7 +1269,8 @@ MACHINE_CONFIG_DERIVED(atarisy2_state::ssprint, atarisy2)
 MACHINE_CONFIG_END
 
 
-MACHINE_CONFIG_DERIVED(atarisy2_state::csprint, atarisy2)
+MACHINE_CONFIG_START(atarisy2_state::csprint)
+	atarisy2(config);
 	MCFG_SLAPSTIC_ADD("slapstic", 109)
 
 	/* sound hardware */
@@ -1274,7 +1278,8 @@ MACHINE_CONFIG_DERIVED(atarisy2_state::csprint, atarisy2)
 MACHINE_CONFIG_END
 
 
-MACHINE_CONFIG_DERIVED(atarisy2_state::apb, atarisy2)
+MACHINE_CONFIG_START(atarisy2_state::apb)
+	atarisy2(config);
 	MCFG_SLAPSTIC_ADD("slapstic", 110)
 MACHINE_CONFIG_END
 

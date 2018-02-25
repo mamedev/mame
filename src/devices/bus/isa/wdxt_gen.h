@@ -40,7 +40,6 @@ public:
 	// construction/destruction
 	wdxt_gen_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
-	void wd1015_io(address_map &map);
 protected:
 	// device-level overrides
 	virtual void device_start() override;
@@ -66,6 +65,8 @@ private:
 	DECLARE_WRITE8_MEMBER( wd1015_p1_w );
 	DECLARE_READ8_MEMBER( wd1015_p2_r );
 	DECLARE_WRITE8_MEMBER( wd1015_p2_w );
+
+	void wd1015_io(address_map &map);
 
 	required_device<cpu_device> m_maincpu;
 	required_device<wd11c00_17_device> m_host;

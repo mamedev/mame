@@ -400,7 +400,7 @@ MACHINE_CONFIG_START(flicker_state::flicker)
 	MCFG_DEFAULT_LAYOUT(layout_flicker)
 
 	// sound
-	MCFG_FRAGMENT_ADD(genpin_audio)
+	genpin_audio(config);
 MACHINE_CONFIG_END
 
 

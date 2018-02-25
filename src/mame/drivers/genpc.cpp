@@ -79,13 +79,15 @@ MACHINE_CONFIG_START(genpc_state::pcmda)
 MACHINE_CONFIG_END
 
 
-MACHINE_CONFIG_DERIVED(genpc_state::pcherc, pcmda)
+MACHINE_CONFIG_START(genpc_state::pcherc)
+	pcmda(config);
 	MCFG_DEVICE_MODIFY("isa1")
 	MCFG_DEVICE_SLOT_INTERFACE(pc_isa8_cards, "hercules", false)
 MACHINE_CONFIG_END
 
 
-MACHINE_CONFIG_DERIVED(genpc_state::pccga, pcmda)
+MACHINE_CONFIG_START(genpc_state::pccga)
+	pcmda(config);
 	MCFG_DEVICE_MODIFY("mb")
 	MCFG_DEVICE_INPUT_DEFAULTS(cga)
 	MCFG_DEVICE_MODIFY("isa1")
@@ -93,7 +95,8 @@ MACHINE_CONFIG_DERIVED(genpc_state::pccga, pcmda)
 MACHINE_CONFIG_END
 
 
-MACHINE_CONFIG_DERIVED(genpc_state::pcega, pccga)
+MACHINE_CONFIG_START(genpc_state::pcega)
+	pccga(config);
 	MCFG_DEVICE_MODIFY("isa1")
 	MCFG_DEVICE_SLOT_INTERFACE(pc_isa8_cards, "ega", false)
 	MCFG_DEVICE_MODIFY("mb")
@@ -101,7 +104,8 @@ MACHINE_CONFIG_DERIVED(genpc_state::pcega, pccga)
 MACHINE_CONFIG_END
 
 
-MACHINE_CONFIG_DERIVED(genpc_state::pcvga, pcega)
+MACHINE_CONFIG_START(genpc_state::pcvga)
+	pcega(config);
 	MCFG_DEVICE_MODIFY("isa1")
 	MCFG_DEVICE_SLOT_INTERFACE(pc_isa8_cards, "vga", false)
 MACHINE_CONFIG_END

@@ -110,7 +110,6 @@ public:
 	static constexpr int TOP_ERASE = 13;
 	static constexpr int VERTICAL_SYNC = 3;
 
-	void memmap(address_map &map);
 protected:
 	// construction/destruction
 	v99x8_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock, int model);
@@ -214,6 +213,8 @@ private:
 	void report_vdp_command(uint8_t Op);
 	uint8_t command_unit_w(uint8_t Op);
 	void update_command();
+
+	void memmap(address_map &map);
 
 	// general
 	int m_offset_x, m_offset_y, m_visible_y, m_mode;

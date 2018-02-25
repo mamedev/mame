@@ -444,7 +444,8 @@ MACHINE_CONFIG_START(appoooh_state::appoooh_common)
 MACHINE_CONFIG_END
 
 
-MACHINE_CONFIG_DERIVED(appoooh_state::appoooh, appoooh_common)
+MACHINE_CONFIG_START(appoooh_state::appoooh)
+	appoooh_common(config);
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
@@ -459,11 +460,11 @@ MACHINE_CONFIG_DERIVED(appoooh_state::appoooh, appoooh_common)
 	MCFG_PALETTE_ADD("palette", 32*8+32*8)
 
 	MCFG_PALETTE_INIT_OWNER(appoooh_state,appoooh)
-	MCFG_VIDEO_START_OVERRIDE(appoooh_state,appoooh)
 MACHINE_CONFIG_END
 
 
-MACHINE_CONFIG_DERIVED(appoooh_state::robowres, appoooh_common)
+MACHINE_CONFIG_START(appoooh_state::robowres)
+	appoooh_common(config);
 
 	MCFG_DEVICE_MODIFY("maincpu")
 	MCFG_CPU_OPCODES_MAP(decrypted_opcodes_map)
@@ -481,10 +482,10 @@ MACHINE_CONFIG_DERIVED(appoooh_state::robowres, appoooh_common)
 	MCFG_PALETTE_ADD("palette", 32*8+32*8)
 
 	MCFG_PALETTE_INIT_OWNER(appoooh_state,robowres)
-	MCFG_VIDEO_START_OVERRIDE(appoooh_state,appoooh)
 MACHINE_CONFIG_END
 
-MACHINE_CONFIG_DERIVED(appoooh_state::robowrese, robowres)
+MACHINE_CONFIG_START(appoooh_state::robowrese)
+	robowres(config);
 
 	MCFG_CPU_REPLACE("maincpu", SEGA_315_5179,18432000/6) /* ??? the main xtal is 18.432 MHz */
 	MCFG_CPU_PROGRAM_MAP(main_map)

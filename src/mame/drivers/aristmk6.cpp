@@ -44,14 +44,9 @@ public:
 		m_vram(*this, "vram")
 	{ }
 
-	u32 m_test_x,m_test_y,m_start_offs;
-	u8 m_type;
+	void aristmk6(machine_config &config);
 
-	u8 irl0pend, irl0en;
-	u8 irl1pend, irl1en;
-	u8 irl2pend, irl2en;    // UARTs ?
-	u8 irl3pend0, irl3en0;
-	u8 irl3pend1, irl3en1;
+protected:
 	void testIrq();
 
 	DECLARE_READ8_MEMBER(irqpend_r);
@@ -59,18 +54,31 @@ public:
 	DECLARE_READ8_MEMBER(test_r);
 	DECLARE_WRITE64_MEMBER(eeprom_w);
 	DECLARE_READ64_MEMBER(hwver_r);
+	uint32_t screen_update_aristmk6(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
+
 	virtual void video_start() override;
 	virtual void machine_reset() override;
-	uint32_t screen_update_aristmk6(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
+	void aristmk6_map(address_map &map);
+	void aristmk6_port(address_map &map);
+
+private:
+#if 0
+	u32 m_test_x,m_test_y,m_start_offs;
+	u8 m_type;
+#endif
+
+	u8 irl0pend, irl0en;
+	u8 irl1pend, irl1en;
+	u8 irl2pend, irl2en;    // UARTs ?
+	u8 irl3pend0, irl3en0;
+	u8 irl3pend1, irl3en1;
+
 	required_device<cpu_device> m_maincpu;
 	required_device<ns16550_device> m_uart0;
 	required_device<ns16550_device> m_uart1;
 	required_device<eeprom_serial_93cxx_device> m_eeprom0;
 	required_device<palette_device> m_palette;
 	required_shared_ptr<uint64_t> m_vram;
-	void aristmk6(machine_config &config);
-	void aristmk6_map(address_map &map);
-	void aristmk6_port(address_map &map);
 };
 
 
@@ -318,7 +326,7 @@ static INPUT_PORTS_START( aristmk6 )
 INPUT_PORTS_END
 
 // ?
-#define ARISTMK6_CPU_CLOCK XTAL(200'000'000)
+static constexpr XTAL ARISTMK6_CPU_CLOCK = 200_MHz_XTAL;
 // ?
 
 MACHINE_CONFIG_START(aristmk6_state::aristmk6)
@@ -340,8 +348,8 @@ MACHINE_CONFIG_START(aristmk6_state::aristmk6)
 	MCFG_CPU_FORCE_NO_DRC()
 //  MCFG_DEVICE_DISABLE()
 
-	MCFG_DEVICE_ADD( "uart0", NS16550, XTAL(8'000'000) )
-	MCFG_DEVICE_ADD( "uart1", NS16550, XTAL(8'000'000) )
+	MCFG_DEVICE_ADD( "uart0", NS16550, 8_MHz_XTAL )
+	MCFG_DEVICE_ADD( "uart1", NS16550, 8_MHz_XTAL )
 
 	MCFG_EEPROM_SERIAL_93C56_ADD("eeprom0")
 	MCFG_EEPROM_SERIAL_DEFAULT_VALUE(0xFF)

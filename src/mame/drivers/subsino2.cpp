@@ -2380,7 +2380,8 @@ MACHINE_CONFIG_START(subsino2_state::bishjan)
 	// SS9904
 MACHINE_CONFIG_END
 
-MACHINE_CONFIG_DERIVED(subsino2_state::new2001, bishjan)
+MACHINE_CONFIG_START(subsino2_state::new2001)
+	bishjan(config);
 	MCFG_CPU_MODIFY("maincpu")
 	MCFG_CPU_PROGRAM_MAP( new2001_map )
 
@@ -2389,7 +2390,8 @@ MACHINE_CONFIG_DERIVED(subsino2_state::new2001, bishjan)
 	MCFG_SCREEN_VISIBLE_AREA( 0, 640-1, 0, 256-16-1 )
 MACHINE_CONFIG_END
 
-MACHINE_CONFIG_DERIVED(subsino2_state::humlan, bishjan)
+MACHINE_CONFIG_START(subsino2_state::humlan)
+	bishjan(config);
 	MCFG_CPU_REPLACE("maincpu", H83044, XTAL(48'000'000) / 3)
 	MCFG_CPU_PROGRAM_MAP( humlan_map )
 	MCFG_CPU_VBLANK_INT_DRIVER("screen", subsino2_state, irq0_line_hold)
@@ -2504,12 +2506,14 @@ MACHINE_CONFIG_START(subsino2_state::xplan)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 MACHINE_CONFIG_END
 
-MACHINE_CONFIG_DERIVED(subsino2_state::xtrain, xplan)
+MACHINE_CONFIG_START(subsino2_state::xtrain)
+	xplan(config);
 	MCFG_CPU_MODIFY("maincpu")
 	MCFG_CPU_IO_MAP(xtrain_io)
 MACHINE_CONFIG_END
 
-MACHINE_CONFIG_DERIVED(subsino2_state::expcard, xplan)
+MACHINE_CONFIG_START(subsino2_state::expcard)
+	xplan(config);
 	MCFG_CPU_MODIFY("maincpu")
 	MCFG_CPU_IO_MAP(expcard_io)
 MACHINE_CONFIG_END

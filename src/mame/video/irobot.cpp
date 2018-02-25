@@ -78,7 +78,7 @@ WRITE8_MEMBER(irobot_state::irobot_paletteram_w)
 }
 
 
-void irobot_state::_irobot_poly_clear(uint8_t *bitmap_base)
+void irobot_state::irobot_poly_clear(uint8_t *bitmap_base)
 {
 	memset(bitmap_base, 0, BITMAP_WIDTH * m_screen->height());
 }
@@ -86,7 +86,7 @@ void irobot_state::_irobot_poly_clear(uint8_t *bitmap_base)
 void irobot_state::irobot_poly_clear()
 {
 	uint8_t *bitmap_base = m_bufsel ? m_polybitmap2.get() : m_polybitmap1.get();
-	_irobot_poly_clear(bitmap_base);
+	irobot_poly_clear(bitmap_base);
 }
 
 
@@ -103,8 +103,8 @@ void irobot_state::video_start()
 	m_polybitmap2 = std::make_unique<uint8_t[]>(BITMAP_WIDTH * height);
 
 	/* clear the bitmaps so we start with valid palette look-up values for drawing */
-	_irobot_poly_clear(m_polybitmap1.get());
-	_irobot_poly_clear(m_polybitmap2.get());
+	irobot_poly_clear(m_polybitmap1.get());
+	irobot_poly_clear(m_polybitmap2.get());
 
 	/* Set clipping */
 	m_ir_xmin = m_ir_ymin = 0;

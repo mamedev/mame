@@ -1037,7 +1037,7 @@ MACHINE_CONFIG_START(v1050_state::v1050)
 	MCFG_TIMER_DRIVER_ADD_PERIODIC("keyboard", v1050_state, v1050_keyboard_tick, attotime::from_hz(60))
 
 	// video hardware
-	MCFG_FRAGMENT_ADD(v1050_video)
+	v1050_video(config);
 
 	// devices
 	MCFG_DEVICE_ADD(UPB8214_TAG, I8214, 16_MHz_XTAL/4)

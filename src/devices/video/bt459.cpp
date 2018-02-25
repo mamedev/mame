@@ -100,17 +100,17 @@ u8 bt459_device::get_component(rgb_t *arr, int index)
 	switch (m_address_rgb)
 	{
 	case 0: // red component
-		if (!machine().side_effect_disabled())
+		if (!machine().side_effects_disabled())
 			m_address_rgb = 1;
 		return (m_command_2 & CR2524) == CR2524_RED ? arr[index].g() : arr[index].r();
 
 	case 1: // green component
-		if (!machine().side_effect_disabled())
+		if (!machine().side_effects_disabled())
 			m_address_rgb = 2;
 		return arr[index].g();
 
 	case 2: // blue component
-		if (!machine().side_effect_disabled())
+		if (!machine().side_effects_disabled())
 		{
 			m_address_rgb = 0;
 			m_address = (m_address + 1) & ADDRESS_MASK;
@@ -147,7 +147,7 @@ void bt459_device::set_component(rgb_t *arr, int index, u8 data)
 READ8_MEMBER(bt459_device::address_lo_r)
 {
 	// reset component pointer and return address register lsb
-	if (!machine().side_effect_disabled())
+	if (!machine().side_effects_disabled())
 		m_address_rgb = 0;
 	return m_address & ADDRESS_LSB;
 }
@@ -162,7 +162,7 @@ WRITE8_MEMBER(bt459_device::address_lo_w)
 READ8_MEMBER(bt459_device::address_hi_r)
 {
 	// reset component pointer and return address register msb
-	if (!machine().side_effect_disabled())
+	if (!machine().side_effects_disabled())
 		m_address_rgb = 0;
 	return (m_address & ADDRESS_MSB) >> 8;
 }

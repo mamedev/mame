@@ -674,7 +674,7 @@ READ8_MEMBER(sigmab98_state::vregs_r)
 	switch (offset)
 	{
 		default:
-			if (!machine().side_effect_disabled())
+			if (!machine().side_effects_disabled())
 				logerror("%s: unknown video reg read: %02x\n", machine().describe_context(), offset);
 			return m_vregs[offset];
 	}
@@ -2852,19 +2852,22 @@ MACHINE_CONFIG_START(sigmab98_state::sigmab98)
 	MCFG_SOUND_ROUTE(1, "rspeaker", 1.0)
 MACHINE_CONFIG_END
 
-MACHINE_CONFIG_DERIVED(sigmab98_state::dodghero, sigmab98)
+MACHINE_CONFIG_START(sigmab98_state::dodghero)
+	sigmab98(config);
 	MCFG_CPU_MODIFY("maincpu")
 	MCFG_CPU_PROGRAM_MAP( dodghero_mem_map )
 	MCFG_CPU_IO_MAP( dodghero_io_map )
 MACHINE_CONFIG_END
 
-MACHINE_CONFIG_DERIVED(sigmab98_state::gegege, sigmab98)
+MACHINE_CONFIG_START(sigmab98_state::gegege)
+	sigmab98(config);
 	MCFG_CPU_MODIFY("maincpu")
 	MCFG_CPU_PROGRAM_MAP( gegege_mem_map )
 	MCFG_CPU_IO_MAP( gegege_io_map )
 MACHINE_CONFIG_END
 
-MACHINE_CONFIG_DERIVED(sigmab98_state::dashhero, sigmab98)
+MACHINE_CONFIG_START(sigmab98_state::dashhero)
+	sigmab98(config);
 	MCFG_CPU_MODIFY("maincpu")
 	MCFG_CPU_PROGRAM_MAP( gegege_mem_map )
 	MCFG_CPU_IO_MAP( dashhero_io_map )
@@ -3005,13 +3008,15 @@ MACHINE_CONFIG_START(sigmab98_state::sammymdl)
 	MCFG_SOUND_ROUTE(1, "rspeaker", 0.80)
 MACHINE_CONFIG_END
 
-MACHINE_CONFIG_DERIVED(sigmab98_state::animalc, sammymdl)
+MACHINE_CONFIG_START(sigmab98_state::animalc)
+	sammymdl(config);
 	MCFG_CPU_MODIFY("maincpu")
 	MCFG_CPU_PROGRAM_MAP( animalc_map )
 	MCFG_CPU_IO_MAP( animalc_io )
 MACHINE_CONFIG_END
 
-MACHINE_CONFIG_DERIVED(sigmab98_state::gocowboy, sammymdl)
+MACHINE_CONFIG_START(sigmab98_state::gocowboy)
+	sammymdl(config);
 	MCFG_CPU_MODIFY("maincpu")
 	MCFG_CPU_PROGRAM_MAP( gocowboy_map )
 	MCFG_CPU_IO_MAP( gocowboy_io )
@@ -3021,25 +3026,29 @@ MACHINE_CONFIG_DERIVED(sigmab98_state::gocowboy, sammymdl)
 	MCFG_TICKET_DISPENSER_ADD("hopper_large", attotime::from_msec(1000), TICKET_MOTOR_ACTIVE_LOW, TICKET_STATUS_ACTIVE_LOW )
 MACHINE_CONFIG_END
 
-MACHINE_CONFIG_DERIVED(sigmab98_state::haekaka, sammymdl)
+MACHINE_CONFIG_START(sigmab98_state::haekaka)
+	sammymdl(config);
 	MCFG_CPU_MODIFY("maincpu")
 	MCFG_CPU_PROGRAM_MAP( haekaka_map )
 	MCFG_CPU_IO_MAP( haekaka_io )
 MACHINE_CONFIG_END
 
-MACHINE_CONFIG_DERIVED(sigmab98_state::itazuram, sammymdl)
+MACHINE_CONFIG_START(sigmab98_state::itazuram)
+	sammymdl(config);
 	MCFG_CPU_MODIFY("maincpu")
 	MCFG_CPU_PROGRAM_MAP( itazuram_map )
 	MCFG_CPU_IO_MAP( itazuram_io )
 MACHINE_CONFIG_END
 
-MACHINE_CONFIG_DERIVED(sigmab98_state::pyenaget, sammymdl)
+MACHINE_CONFIG_START(sigmab98_state::pyenaget)
+	sammymdl(config);
 	MCFG_CPU_MODIFY("maincpu")
 	MCFG_CPU_PROGRAM_MAP( haekaka_map )
 	MCFG_CPU_IO_MAP( pyenaget_io )
 MACHINE_CONFIG_END
 
-MACHINE_CONFIG_DERIVED(sigmab98_state::tdoboon, sammymdl)
+MACHINE_CONFIG_START(sigmab98_state::tdoboon)
+	sammymdl(config);
 	MCFG_CPU_MODIFY("maincpu")
 	MCFG_CPU_PROGRAM_MAP( tdoboon_map )
 	MCFG_CPU_IO_MAP( tdoboon_io )

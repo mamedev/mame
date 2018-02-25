@@ -1820,7 +1820,8 @@ MACHINE_CONFIG_END
 //  MACHINE_CONFIG( c128 )
 //-------------------------------------------------
 
-MACHINE_CONFIG_DERIVED(c128_state::c128, ntsc)
+MACHINE_CONFIG_START(c128_state::c128)
+	ntsc(config);
 	MCFG_CBM_IEC_ADD("c1571")
 	MCFG_CBM_IEC_BUS_SRQ_CALLBACK(WRITELINE(c128_state, iec_srq_w))
 	MCFG_CBM_IEC_BUS_DATA_CALLBACK(WRITELINE(c128_state, iec_data_w))
@@ -1831,7 +1832,8 @@ MACHINE_CONFIG_END
 //  MACHINE_CONFIG( c128dcr )
 //-------------------------------------------------
 
-MACHINE_CONFIG_DERIVED(c128_state::c128dcr, ntsc)
+MACHINE_CONFIG_START(c128_state::c128dcr)
+	ntsc(config);
 	MCFG_CBM_IEC_ADD("c1571") // TODO c1571cr
 	MCFG_CBM_IEC_BUS_SRQ_CALLBACK(WRITELINE(c128_state, iec_srq_w))
 	MCFG_CBM_IEC_BUS_DATA_CALLBACK(WRITELINE(c128_state, iec_data_w))
@@ -1842,7 +1844,8 @@ MACHINE_CONFIG_END
 //  MACHINE_CONFIG( c128d81 )
 //-------------------------------------------------
 
-MACHINE_CONFIG_DERIVED(c128_state::c128d81, ntsc)
+MACHINE_CONFIG_START(c128_state::c128d81)
+	ntsc(config);
 	MCFG_CBM_IEC_ADD(nullptr)
 	MCFG_CBM_IEC_BUS_SRQ_CALLBACK(WRITELINE(c128_state, iec_srq_w))
 	MCFG_CBM_IEC_BUS_DATA_CALLBACK(WRITELINE(c128_state, iec_data_w))
@@ -1991,7 +1994,8 @@ MACHINE_CONFIG_END
 //  MACHINE_CONFIG( c128pal )
 //-------------------------------------------------
 
-MACHINE_CONFIG_DERIVED(c128_state::c128pal, pal)
+MACHINE_CONFIG_START(c128_state::c128pal)
+	pal(config);
 	MCFG_CBM_IEC_ADD("c1571")
 	MCFG_CBM_IEC_BUS_SRQ_CALLBACK(WRITELINE(c128_state, iec_srq_w))
 	MCFG_CBM_IEC_BUS_DATA_CALLBACK(WRITELINE(c128_state, iec_data_w))
@@ -2002,7 +2006,8 @@ MACHINE_CONFIG_END
 //  MACHINE_CONFIG( c128dcrp )
 //-------------------------------------------------
 
-MACHINE_CONFIG_DERIVED(c128_state::c128dcrp, pal)
+MACHINE_CONFIG_START(c128_state::c128dcrp)
+	pal(config);
 	MCFG_CBM_IEC_ADD("c1571") // TODO c1571cr
 	MCFG_CBM_IEC_BUS_SRQ_CALLBACK(WRITELINE(c128_state, iec_srq_w))
 	MCFG_CBM_IEC_BUS_DATA_CALLBACK(WRITELINE(c128_state, iec_data_w))

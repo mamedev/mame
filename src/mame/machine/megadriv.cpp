@@ -893,7 +893,7 @@ MACHINE_CONFIG_START(md_base_state::md_ntsc)
 	MCFG_MACHINE_START_OVERRIDE(md_base_state,megadriv)
 	MCFG_MACHINE_RESET_OVERRIDE(md_base_state,megadriv)
 
-	MCFG_FRAGMENT_ADD(megadriv_timers)
+	megadriv_timers(config);
 
 	MCFG_DEVICE_ADD("gen_vdp", SEGA315_5313, 0)
 	MCFG_SEGA315_5313_IS_PAL(false)
@@ -926,7 +926,7 @@ MACHINE_CONFIG_START(md_base_state::md_ntsc)
 MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(md_cons_state::dcat16_megadriv_base)
-	MCFG_FRAGMENT_ADD( md_ntsc )
+	md_ntsc(config);
 
 	MCFG_CPU_MODIFY("maincpu")
 	MCFG_CPU_PROGRAM_MAP(dcat16_megadriv_map)
@@ -949,7 +949,7 @@ MACHINE_CONFIG_START(md_base_state::md_pal)
 	MCFG_MACHINE_START_OVERRIDE(md_base_state,megadriv)
 	MCFG_MACHINE_RESET_OVERRIDE(md_base_state,megadriv)
 
-	MCFG_FRAGMENT_ADD(megadriv_timers)
+	megadriv_timers(config);
 
 	MCFG_DEVICE_ADD("gen_vdp", SEGA315_5313, 0)
 	MCFG_SEGA315_5313_IS_PAL(true)

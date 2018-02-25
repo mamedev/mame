@@ -35,7 +35,7 @@
 //**************************************************************************
 
 #define MCFG_LK201_TX_HANDLER(_cb) \
-	devcb = &lk201_device::set_tx_handler(*device, DEVCB_##_cb);
+	devcb = &downcast<lk201_device &>(*device).set_tx_handler(DEVCB_##_cb);
 
 //**************************************************************************
 //  TYPE DEFINITIONS
@@ -60,7 +60,7 @@ public:
 	DECLARE_READ8_MEMBER(timer_r);
 	DECLARE_WRITE8_MEMBER(timer_w);
 
-	template<class _Object> static devcb_base &set_tx_handler(device_t &device, _Object wr) { return downcast<lk201_device &>(device).m_tx_handler.set_callback(wr); }
+	template <class Object> devcb_base &set_tx_handler(Object &&wr) { return m_tx_handler.set_callback(std::forward<Object>(wr)); }
 
 	void lk201_map(address_map &map);
 protected:

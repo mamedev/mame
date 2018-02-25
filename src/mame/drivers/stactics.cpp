@@ -341,7 +341,7 @@ MACHINE_CONFIG_START(stactics_state::stactics)
 	MCFG_ADDRESSABLE_LATCH_Q6_OUT_CB(WRITELINE(stactics_state, barrier_lamp_w))
 
 	/* video hardware */
-	MCFG_FRAGMENT_ADD(stactics_video)
+	stactics_video(config);
 
 	/* audio hardware */
 MACHINE_CONFIG_END

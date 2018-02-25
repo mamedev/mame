@@ -694,7 +694,8 @@ WRITE8_MEMBER( thunderx_state::banking_callback )
 	m_rombank->set_entry(data & 0x0f);
 }
 
-MACHINE_CONFIG_DERIVED(thunderx_state::thunderx, scontra)
+MACHINE_CONFIG_START(thunderx_state::thunderx)
+	scontra(config);
 
 	/* basic machine hardware */
 	MCFG_DEVICE_MODIFY("maincpu")     /* 052001 (verified on pcb) */
@@ -711,7 +712,8 @@ MACHINE_CONFIG_DERIVED(thunderx_state::thunderx, scontra)
 	MCFG_DEVICE_REMOVE("k007232")
 MACHINE_CONFIG_END
 
-MACHINE_CONFIG_DERIVED(thunderx_state::gbusters, scontra)
+MACHINE_CONFIG_START(thunderx_state::gbusters)
+	scontra(config);
 
 	/* basic machine hardware */
 	MCFG_DEVICE_MODIFY("maincpu")     /* 052526 */

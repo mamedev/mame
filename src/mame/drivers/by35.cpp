@@ -1094,7 +1094,7 @@ MACHINE_CONFIG_START(by35_state::by35)
 	MCFG_DEFAULT_LAYOUT(layout_by35)
 
 	/* Sound */
-	MCFG_FRAGMENT_ADD( genpin_audio )
+	genpin_audio(config);
 
 	/* Devices */
 	MCFG_DEVICE_ADD("pia_u10", PIA6821, 0)
@@ -1143,13 +1143,15 @@ MACHINE_CONFIG_START(by35_state::as2888_audio)
 MACHINE_CONFIG_END
 
 
-MACHINE_CONFIG_DERIVED(by35_state::as2888, by35)
+MACHINE_CONFIG_START(by35_state::as2888)
+	by35(config);
 
-	MCFG_FRAGMENT_ADD( as2888_audio  )
+	as2888_audio(config);
 MACHINE_CONFIG_END
 
 
-MACHINE_CONFIG_DERIVED(by35_state::nuovo, by35)
+MACHINE_CONFIG_START(by35_state::nuovo)
+	by35(config);
 
 	MCFG_CPU_REPLACE("maincpu", M6802, 2000000) // ? MHz ?  Large crystal next to CPU, schematics don't indicate speed.
 	MCFG_CPU_PROGRAM_MAP(nuovo_map)

@@ -2012,7 +2012,7 @@ WRITE8_MEMBER( tms5220_device::data_w )
 void tms5220_device::data_w(uint8_t data)
 {
 	// prevent debugger from changing the internal state
-	if (machine().side_effect_disabled()) return;
+	if (machine().side_effects_disabled()) return;
 
 #ifdef DEBUG_RS_WS
 	logerror("tms5220_data_w: data %02x\n", data);
@@ -2050,7 +2050,7 @@ READ8_MEMBER( tms5220_device::status_r )
 uint8_t tms5220_device::status_r()
 {
 	// prevent debugger from changing the internal state
-	if (machine().side_effect_disabled()) return 0;
+	if (machine().side_effects_disabled()) return 0;
 
 	if (!m_true_timing)
 	{

@@ -429,7 +429,7 @@ MACHINE_CONFIG_START(atarig1_state::atarig1)
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", M68000, ATARI_CLOCK_14MHz)
 	MCFG_CPU_PROGRAM_MAP(main_map)
-	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", atarigen_state, video_int_gen)
+	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", atarig1_state, video_int_gen)
 
 	MCFG_MACHINE_START_OVERRIDE(atarig1_state,atarig1)
 	MCFG_MACHINE_RESET_OVERRIDE(atarig1_state,atarig1)
@@ -460,48 +460,55 @@ MACHINE_CONFIG_START(atarig1_state::atarig1)
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
 
-	MCFG_ATARI_JSA_II_ADD("jsa", WRITELINE(atarigen_state, sound_int_write_line))
+	MCFG_ATARI_JSA_II_ADD("jsa", WRITELINE(atarig1_state, sound_int_write_line))
 	MCFG_ATARI_JSA_TEST_PORT("IN0", 14)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 MACHINE_CONFIG_END
 
 
-MACHINE_CONFIG_DERIVED(atarig1_state::hydra, atarig1)
+MACHINE_CONFIG_START(atarig1_state::hydra)
+	atarig1(config);
 	MCFG_ATARIRLE_ADD("rle", modesc_hydra)
 	MCFG_SLAPSTIC_ADD("slapstic", 116)
 MACHINE_CONFIG_END
 
 
-MACHINE_CONFIG_DERIVED(atarig1_state::hydrap, hydra)
+MACHINE_CONFIG_START(atarig1_state::hydrap)
+	hydra(config);
 	MCFG_DEVICE_REMOVE("slapstic")
 MACHINE_CONFIG_END
 
 
-MACHINE_CONFIG_DERIVED(atarig1_state::pitfight9, atarig1)
+MACHINE_CONFIG_START(atarig1_state::pitfight9)
+	atarig1(config);
 	MCFG_ATARIRLE_ADD("rle", modesc_pitfight)
 	MCFG_SLAPSTIC_ADD("slapstic", 114)
 MACHINE_CONFIG_END
 
 
-MACHINE_CONFIG_DERIVED(atarig1_state::pitfight7, atarig1)
+MACHINE_CONFIG_START(atarig1_state::pitfight7)
+	atarig1(config);
 	MCFG_ATARIRLE_ADD("rle", modesc_pitfight)
 	MCFG_SLAPSTIC_ADD("slapstic", 112)
 MACHINE_CONFIG_END
 
 
-MACHINE_CONFIG_DERIVED(atarig1_state::pitfight, atarig1)
+MACHINE_CONFIG_START(atarig1_state::pitfight)
+	atarig1(config);
 	MCFG_ATARIRLE_ADD("rle", modesc_pitfight)
 	MCFG_SLAPSTIC_ADD("slapstic", 111)
 MACHINE_CONFIG_END
 
 
-MACHINE_CONFIG_DERIVED(atarig1_state::pitfightj, atarig1)
+MACHINE_CONFIG_START(atarig1_state::pitfightj)
+	atarig1(config);
 	MCFG_ATARIRLE_ADD("rle", modesc_pitfight)
 	MCFG_SLAPSTIC_ADD("slapstic", 113)
 MACHINE_CONFIG_END
 
 
-MACHINE_CONFIG_DERIVED(atarig1_state::pitfightb, atarig1)
+MACHINE_CONFIG_START(atarig1_state::pitfightb)
+	atarig1(config);
 	MCFG_ATARIRLE_ADD("rle", modesc_pitfight)
 MACHINE_CONFIG_END
 

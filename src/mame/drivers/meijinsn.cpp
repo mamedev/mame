@@ -73,23 +73,36 @@ SOFT  PSG & VOICE  BY M.C & S.H
 class meijinsn_state : public driver_device
 {
 public:
-	meijinsn_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag),
+	meijinsn_state(const machine_config &mconfig, device_type type, const char *tag) :
+		driver_device(mconfig, type, tag),
 		m_maincpu(*this,"maincpu"),
 		m_soundlatch(*this, "soundlatch"),
 		m_videoram(*this, "videoram"),
-		m_shared_ram(*this, "shared_ram"){ }
+		m_shared_ram(*this, "shared_ram")
+	{ }
 
+	void meijinsn(machine_config &config);
+
+protected:
+	DECLARE_WRITE16_MEMBER(sound_w);
+	DECLARE_READ16_MEMBER(alpha_mcu_r);
+	DECLARE_PALETTE_INIT(meijinsn);
+	uint32_t screen_update_meijinsn(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	TIMER_DEVICE_CALLBACK_MEMBER(meijinsn_interrupt);
+
+	virtual void machine_start() override;
+	virtual void machine_reset() override;
+	virtual void video_start() override;
+	void meijinsn_map(address_map &map);
+	void meijinsn_sound_io_map(address_map &map);
+	void meijinsn_sound_map(address_map &map);
+
+private:
 	required_device<cpu_device> m_maincpu;
 	required_device<generic_latch_8_device> m_soundlatch;
 	/* memory pointers */
 	required_shared_ptr<uint16_t> m_videoram;
 	required_shared_ptr<uint16_t> m_shared_ram;
-
-	/* video-related */
-	tilemap_t  *m_bg_tilemap;
-	tilemap_t  *m_fg_tilemap;
-	uint8_t    m_bg_bank;
 
 	/* misc */
 	uint8_t m_deposits1;
@@ -97,19 +110,6 @@ public:
 	uint8_t m_credits;
 	uint8_t m_coinvalue;
 	int m_mcu_latch;
-
-	DECLARE_WRITE16_MEMBER(sound_w);
-	DECLARE_READ16_MEMBER(alpha_mcu_r);
-	virtual void machine_start() override;
-	virtual void machine_reset() override;
-	virtual void video_start() override;
-	DECLARE_PALETTE_INIT(meijinsn);
-	uint32_t screen_update_meijinsn(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
-	TIMER_DEVICE_CALLBACK_MEMBER(meijinsn_interrupt);
-	void meijinsn(machine_config &config);
-	void meijinsn_map(address_map &map);
-	void meijinsn_sound_io_map(address_map &map);
-	void meijinsn_sound_map(address_map &map);
 };
 
 

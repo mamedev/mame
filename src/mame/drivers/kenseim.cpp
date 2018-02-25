@@ -473,7 +473,8 @@ static const z80_daisy_config daisy_chain_gamecpu[] =
 	{ nullptr }
 };
 
-MACHINE_CONFIG_DERIVED(kenseim_state::kenseim, cps1_12MHz)
+MACHINE_CONFIG_START(kenseim_state::kenseim)
+	cps1_12MHz(config);
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("gamecpu", TMPZ84C011, XTAL(16'000'000)/2) // tmpz84c011-8

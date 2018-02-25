@@ -673,7 +673,7 @@ MACHINE_CONFIG_START(jpmsys5_state::jpmsys5v)
 	/* 6840 PTM */
 	MCFG_DEVICE_ADD("6840ptm", PTM6840, 1000000)
 	MCFG_PTM6840_EXTERNAL_CLOCKS(0, 0, 0)
-	MCFG_PTM6840_OUT0_CB(WRITELINE(jpmsys5_state, u26_o1_callback))
+	MCFG_PTM6840_O1_CB(WRITELINE(jpmsys5_state, u26_o1_callback))
 	MCFG_PTM6840_IRQ_CB(WRITELINE(jpmsys5_state, ptm_irq))
 MACHINE_CONFIG_END
 
@@ -877,7 +877,7 @@ MACHINE_CONFIG_START(jpmsys5_state::jpmsys5_ym)
 	/* 6840 PTM */
 	MCFG_DEVICE_ADD("6840ptm", PTM6840, 1000000)
 	MCFG_PTM6840_EXTERNAL_CLOCKS(0, 0, 0)
-	MCFG_PTM6840_OUT0_CB(WRITELINE(jpmsys5_state, u26_o1_callback))
+	MCFG_PTM6840_O1_CB(WRITELINE(jpmsys5_state, u26_o1_callback))
 	MCFG_PTM6840_IRQ_CB(WRITELINE(jpmsys5_state, ptm_irq))
 	MCFG_DEFAULT_LAYOUT(layout_jpmsys5)
 
@@ -929,7 +929,7 @@ MACHINE_CONFIG_START(jpmsys5_state::jpmsys5)
 	/* 6840 PTM */
 	MCFG_DEVICE_ADD("6840ptm", PTM6840, 1000000)
 	MCFG_PTM6840_EXTERNAL_CLOCKS(0, 0, 0)
-	MCFG_PTM6840_OUT0_CB(WRITELINE(jpmsys5_state, u26_o1_callback))
+	MCFG_PTM6840_O1_CB(WRITELINE(jpmsys5_state, u26_o1_callback))
 	MCFG_PTM6840_IRQ_CB(WRITELINE(jpmsys5_state, ptm_irq))
 	MCFG_DEFAULT_LAYOUT(layout_jpmsys5)
 

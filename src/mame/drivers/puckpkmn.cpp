@@ -276,7 +276,7 @@ ADDRESS_MAP_START(md_boot_state::puckpkmna_map)
 ADDRESS_MAP_END
 
 MACHINE_CONFIG_START(md_boot_state::puckpkmn)
-	MCFG_FRAGMENT_ADD(md_ntsc)
+	md_ntsc(config);
 
 	MCFG_CPU_MODIFY("maincpu")
 	MCFG_CPU_PROGRAM_MAP(puckpkmn_map)
@@ -290,14 +290,16 @@ MACHINE_CONFIG_START(md_boot_state::puckpkmn)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker",0.25)
 MACHINE_CONFIG_END
 
-MACHINE_CONFIG_DERIVED(md_boot_state::puckpkmna, puckpkmn)
+MACHINE_CONFIG_START(md_boot_state::puckpkmna)
+	puckpkmn(config);
 
 	MCFG_CPU_MODIFY("maincpu")
 	MCFG_CPU_PROGRAM_MAP(puckpkmna_map)
 
 MACHINE_CONFIG_END
 
-MACHINE_CONFIG_DERIVED(md_boot_state::jzth, puckpkmn)
+MACHINE_CONFIG_START(md_boot_state::jzth)
+	puckpkmn(config);
 
 	MCFG_CPU_MODIFY("maincpu")
 	MCFG_CPU_PROGRAM_MAP(jzth_map)

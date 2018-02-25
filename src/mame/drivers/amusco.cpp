@@ -591,7 +591,8 @@ MACHINE_CONFIG_START(amusco_state::amusco)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.80)
 MACHINE_CONFIG_END
 
-MACHINE_CONFIG_DERIVED(amusco_state::draw88pkr, amusco)
+MACHINE_CONFIG_START(amusco_state::draw88pkr)
+	amusco(config);
 	//MCFG_DEVICE_MODIFY("ppi_outputs") // Some bits are definitely different
 MACHINE_CONFIG_END
 

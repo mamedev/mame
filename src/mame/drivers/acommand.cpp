@@ -99,10 +99,10 @@ public:
 	TIMER_DEVICE_CALLBACK_MEMBER(acommand_scanline);
 
 
-	void acommand(machine_config &config);	
+	void acommand(machine_config &config);
 	void acommand_map(address_map &map);
 protected:
-//	virtual void video_start() override;
+//  virtual void video_start() override;
 
 private:
 	required_shared_ptr<uint16_t> m_spriteram;

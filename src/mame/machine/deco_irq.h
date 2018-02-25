@@ -20,25 +20,25 @@
 
 #define MCFG_DECO_IRQ_ADD(_tag, _screen_tag) \
 	MCFG_DEVICE_ADD(_tag, DECO_IRQ, 0) \
-	deco_irq_device::set_screen_tag(*device, "^" _screen_tag);
+	downcast<deco_irq_device &>(*device).set_screen_tag("^" _screen_tag);
 
 #define MCFG_DECO_IRQ_LIGHTGUN1_CB(_devcb) \
-	devcb = &deco_irq_device::set_lightgun1_callback(*device, DEVCB_##_devcb);
+	devcb = &downcast<deco_irq_device &>(*device).set_lightgun1_callback(DEVCB_##_devcb);
 
 #define MCFG_DECO_IRQ_LIGHTGUN2_CB(_devcb) \
-	devcb = &deco_irq_device::set_lightgun2_callback(*device, DEVCB_##_devcb);
+	devcb = &downcast<deco_irq_device &>(*device).set_lightgun2_callback(DEVCB_##_devcb);
 
 #define MCFG_DECO_IRQ_LIGHTGUN_IRQ_CB(_devcb) \
-	devcb = &deco_irq_device::set_lightgun_irq_callback(*device, DEVCB_##_devcb);
+	devcb = &downcast<deco_irq_device &>(*device).set_lightgun_irq_callback(DEVCB_##_devcb);
 
 #define MCFG_DECO_IRQ_RASTER1_IRQ_CB(_devcb) \
-	devcb = &deco_irq_device::set_raster1_irq_callback(*device, DEVCB_##_devcb);
+	devcb = &downcast<deco_irq_device &>(*device).set_raster1_irq_callback(DEVCB_##_devcb);
 
 #define MCFG_DECO_IRQ_RASTER2_IRQ_CB(_devcb) \
-	devcb = &deco_irq_device::set_raster2_irq_callback(*device, DEVCB_##_devcb);
+	devcb = &downcast<deco_irq_device &>(*device).set_raster2_irq_callback(DEVCB_##_devcb);
 
 #define MCFG_DECO_IRQ_VBLANK_IRQ_CB(_devcb) \
-	devcb = &deco_irq_device::set_vblank_irq_callback(*device, DEVCB_##_devcb);
+	devcb = &downcast<deco_irq_device &>(*device).set_vblank_irq_callback(DEVCB_##_devcb);
 
 
 //**************************************************************************
@@ -52,26 +52,20 @@ public:
 	deco_irq_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
 	// configuration
-	template <class Object> static devcb_base &set_lightgun1_callback(device_t &device, Object &&cb)
-	{ return downcast<deco_irq_device &>(device).m_lightgun1_cb.set_callback(std::forward<Object>(cb)); }
+	template <class Object> devcb_base &set_lightgun1_callback(Object &&cb) { return m_lightgun1_cb.set_callback(std::forward<Object>(cb)); }
 
-	template <class Object> static devcb_base &set_lightgun2_callback(device_t &device, Object &&cb)
-	{ return downcast<deco_irq_device &>(device).m_lightgun2_cb.set_callback(std::forward<Object>(cb)); }
+	template <class Object> devcb_base &set_lightgun2_callback(Object &&cb) { return m_lightgun2_cb.set_callback(std::forward<Object>(cb)); }
 
-	template <class Object> static devcb_base &set_lightgun_irq_callback(device_t &device, Object &&cb)
-	{ return downcast<deco_irq_device &>(device).m_lightgun_irq_cb.set_callback(std::forward<Object>(cb)); }
+	template <class Object> devcb_base &set_lightgun_irq_callback(Object &&cb) { return m_lightgun_irq_cb.set_callback(std::forward<Object>(cb)); }
 
-	template <class Object> static devcb_base &set_raster1_irq_callback(device_t &device, Object &&cb)
-	{ return downcast<deco_irq_device &>(device).m_raster1_irq_cb.set_callback(std::forward<Object>(cb)); }
+	template <class Object> devcb_base &set_raster1_irq_callback(Object &&cb) { return m_raster1_irq_cb.set_callback(std::forward<Object>(cb)); }
 
-	template <class Object> static devcb_base &set_raster2_irq_callback(device_t &device, Object &&cb)
-	{ return downcast<deco_irq_device &>(device).m_raster2_irq_cb.set_callback(std::forward<Object>(cb)); }
+	template <class Object> devcb_base &set_raster2_irq_callback(Object &&cb) { return m_raster2_irq_cb.set_callback(std::forward<Object>(cb)); }
 
-	template <class Object> static devcb_base &set_vblank_irq_callback(device_t &device, Object &&cb)
-	{ return downcast<deco_irq_device &>(device).m_vblank_irq_cb.set_callback(std::forward<Object>(cb)); }
+	template <class Object> devcb_base &set_vblank_irq_callback(Object &&cb) { return m_vblank_irq_cb.set_callback(std::forward<Object>(cb)); }
 
-	// static configuration
-	static void set_screen_tag(device_t &device, const char *tag);
+	// configuration
+	void set_screen_tag(const char *tag) { m_screen.set_tag(tag); }
 
 	TIMER_CALLBACK_MEMBER(scanline_callback);
 

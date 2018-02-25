@@ -742,12 +742,14 @@ MACHINE_CONFIG_START(warpwarp_state::geebee)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 MACHINE_CONFIG_END
 
-MACHINE_CONFIG_DERIVED(warpwarp_state::geebeeb, geebee)
+MACHINE_CONFIG_START(warpwarp_state::geebeeb)
+	geebee(config);
 	MCFG_DEVICE_MODIFY("latch")
 	MCFG_ADDRESSABLE_LATCH_Q4_OUT_CB(NOOP) // remove coin lockout
 MACHINE_CONFIG_END
 
-MACHINE_CONFIG_DERIVED(warpwarp_state::navarone, geebee)
+MACHINE_CONFIG_START(warpwarp_state::navarone)
+	geebee(config);
 
 	/* basic machine hardware */
 	MCFG_GFXDECODE_MODIFY("gfxdecode", 2k)
@@ -796,7 +798,8 @@ MACHINE_CONFIG_START(warpwarp_state::bombbee)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 MACHINE_CONFIG_END
 
-MACHINE_CONFIG_DERIVED(warpwarp_state::warpwarp, bombbee)
+MACHINE_CONFIG_START(warpwarp_state::warpwarp)
+	bombbee(config);
 
 	/* basic machine hardware */
 	MCFG_CPU_MODIFY("maincpu")

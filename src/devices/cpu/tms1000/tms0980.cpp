@@ -30,6 +30,16 @@ DEFINE_DEVICE_TYPE(TMS0980, tms0980_cpu_device, "tms0980", "TMS0980") // 28-pin 
 DEFINE_DEVICE_TYPE(TMS1980, tms1980_cpu_device, "tms1980", "TMS1980") // 28-pin DIP, 7 O pins, 10 R pins, high voltage
 
 
+// internal memory maps
+ADDRESS_MAP_START(tms0980_cpu_device::program_11bit_9)
+	AM_RANGE(0x000, 0x7ff) AM_ROM
+ADDRESS_MAP_END
+
+ADDRESS_MAP_START(tms0980_cpu_device::data_144x4)
+	AM_RANGE(0x00, 0x7f) AM_RAM
+	AM_RANGE(0x80, 0x8f) AM_RAM AM_MIRROR(0x70) // DAM
+ADDRESS_MAP_END
+
 
 // device definitions
 tms0980_cpu_device::tms0980_cpu_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock)

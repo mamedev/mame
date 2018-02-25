@@ -1075,7 +1075,7 @@ READ8_MEMBER(pc8801_state::pc8801_mem_r)
 
 		if(m_misc_ctrl & 0x40)
 		{
-			if(!machine().side_effect_disabled())
+			if(!machine().side_effects_disabled())
 				m_vram_sel = 3;
 
 			if(m_alu_ctrl2 & 0x80)
@@ -1137,7 +1137,7 @@ WRITE8_MEMBER(pc8801_state::pc8801_mem_w)
 	{
 		if(m_misc_ctrl & 0x40)
 		{
-			if(!machine().side_effect_disabled())
+			if(!machine().side_effects_disabled())
 				m_vram_sel = 3;
 
 			if(m_alu_ctrl2 & 0x80)
@@ -2655,15 +2655,18 @@ MACHINE_CONFIG_START(pc8801_state::pc8801)
 	MCFG_TIMER_DRIVER_ADD_PERIODIC("rtc_timer", pc8801_state, pc8801_rtc_irq, attotime::from_hz(600))
 MACHINE_CONFIG_END
 
-MACHINE_CONFIG_DERIVED(pc8801_state::pc8801fh, pc8801)
+MACHINE_CONFIG_START(pc8801_state::pc8801fh)
+	pc8801(config);
 	MCFG_MACHINE_RESET_OVERRIDE(pc8801_state, pc8801_clock_speed )
 MACHINE_CONFIG_END
 
-MACHINE_CONFIG_DERIVED(pc8801_state::pc8801ma, pc8801)
+MACHINE_CONFIG_START(pc8801_state::pc8801ma)
+	pc8801(config);
 	MCFG_MACHINE_RESET_OVERRIDE(pc8801_state, pc8801_dic )
 MACHINE_CONFIG_END
 
-MACHINE_CONFIG_DERIVED(pc8801_state::pc8801mc, pc8801)
+MACHINE_CONFIG_START(pc8801_state::pc8801mc)
+	pc8801(config);
 	MCFG_MACHINE_RESET_OVERRIDE(pc8801_state, pc8801_cdrom )
 MACHINE_CONFIG_END
 

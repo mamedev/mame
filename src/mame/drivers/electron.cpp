@@ -237,7 +237,8 @@ MACHINE_CONFIG_START(electron_state::electron)
 MACHINE_CONFIG_END
 
 
-MACHINE_CONFIG_DERIVED(electron_state::btm2105, electron)
+MACHINE_CONFIG_START(electron_state::btm2105)
+	electron(config);
 	MCFG_SCREEN_MODIFY("screen")
 	MCFG_SCREEN_COLOR(rgb_t::amber())
 

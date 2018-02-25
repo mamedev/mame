@@ -478,7 +478,8 @@ MACHINE_CONFIG_START(n64_mess_state::n64)
 	MCFG_SOFTWARE_LIST_ADD("cart_list", "n64")
 MACHINE_CONFIG_END
 
-MACHINE_CONFIG_DERIVED(n64_mess_state::n64dd, n64)
+MACHINE_CONFIG_START(n64_mess_state::n64dd)
+	n64(config);
 	MCFG_CPU_MODIFY("maincpu")
 	MCFG_CPU_PROGRAM_MAP(n64dd_map)
 

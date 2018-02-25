@@ -389,7 +389,8 @@ MACHINE_RESET_MEMBER(blmbycar_state,watrball)
 	m_retvalue = 0;
 }
 
-MACHINE_CONFIG_DERIVED(blmbycar_state::watrball, blmbycar)
+MACHINE_CONFIG_START(blmbycar_state::watrball)
+	blmbycar(config);
 
 	/* basic machine hardware */
 	MCFG_CPU_MODIFY("maincpu")

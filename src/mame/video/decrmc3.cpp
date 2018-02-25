@@ -30,34 +30,6 @@ deco_rmc3_device::deco_rmc3_device(const machine_config &mconfig, const char *ta
 
 
 //**************************************************************************
-//  INITIALIZATION AND CONFIGURATION
-//**************************************************************************
-
-void deco_rmc3_device::static_set_init(device_t &device, deco_rmc3_palette_init_delegate init)
-{
-	downcast<deco_rmc3_device &>(device).m_init = init;
-}
-
-
-void deco_rmc3_device::static_set_entries(device_t &device, u32 entries)
-{
-	downcast<deco_rmc3_device &>(device).m_entries = entries;
-}
-
-
-void deco_rmc3_device::static_set_indirect_entries(device_t &device, u32 entries)
-{
-	downcast<deco_rmc3_device &>(device).m_indirect_entries = entries;
-}
-
-void deco_rmc3_device::static_set_prom_region(device_t &device, const char *region)
-{
-	downcast<deco_rmc3_device &>(device).m_prom_region.set_tag(region);
-}
-
-
-
-//**************************************************************************
 //  GENERIC WRITE HANDLERS
 //**************************************************************************
 

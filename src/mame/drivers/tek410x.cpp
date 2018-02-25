@@ -108,7 +108,8 @@ MACHINE_CONFIG_START(tek4107a_state::tek4107a)
 	MCFG_GFXDECODE_ADD("gfxdecode", "palette", tek4107a)
 MACHINE_CONFIG_END
 
-MACHINE_CONFIG_DERIVED(tek4107a_state::tek4109a, tek4107a)
+MACHINE_CONFIG_START(tek4107a_state::tek4109a)
+	tek4107a(config);
 	/* video hardware */
 	MCFG_PALETTE_MODIFY("palette")
 	MCFG_PALETTE_ENTRIES(4096)

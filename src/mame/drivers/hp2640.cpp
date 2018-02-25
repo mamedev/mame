@@ -148,7 +148,7 @@ public:
 	DECLARE_READ8_MEMBER(async_status_r);
 	DECLARE_WRITE8_MEMBER(async_control_w);
 	DECLARE_WRITE8_MEMBER(async_data_w);
-	DECLARE_WRITE8_MEMBER(async_status_change);
+	DECLARE_WRITE_LINE_MEMBER(async_dav_w);
 	DECLARE_WRITE_LINE_MEMBER(async_txd_w);
 
 	TIMER_DEVICE_CALLBACK_MEMBER(timer_beep_exp);
@@ -256,10 +256,10 @@ void hp2645_state::machine_reset()
 	m_blanking = true;
 	m_dma_on = true;
 	m_eop = true;
-	m_uart->set_input_pin(AY31015_XR , 1);
-	m_uart->set_input_pin(AY31015_SWE , 0);
-	m_uart->set_input_pin(AY31015_CS , 1);
-	m_uart->set_input_pin(AY31015_NB2 , 1);
+	m_uart->write_xr(1);
+	m_uart->write_swe(0);
+	m_uart->write_cs(1);
+	m_uart->write_nb2(1);
 	m_async_control = 0;
 	m_uart->set_receiver_clock(0);
 	m_uart->set_transmitter_clock(0);
@@ -439,7 +439,7 @@ TIMER_DEVICE_CALLBACK_MEMBER(hp2645_state::timer_cursor_blink_inh)
 READ8_MEMBER(hp2645_state::async_data_r)
 {
 	uint8_t res = m_uart->get_received_data();
-	m_uart->set_input_pin(AY31015_RDAV , 0);
+	m_uart->write_rdav(0);
 	LOG("ASYNC RX=%02x\n" , res);
 	// Update datacomm IRQ
 	update_async_irq();
@@ -450,16 +450,16 @@ READ8_MEMBER(hp2645_state::async_status_r)
 {
 	uint8_t res = 0;
 
-	if (m_uart->get_output_pin(AY31015_DAV)) {
+	if (m_uart->dav_r()) {
 		BIT_SET(res, 0);
 	}
-	if (m_uart->get_output_pin(AY31015_TBMT)) {
+	if (m_uart->tbmt_r()) {
 		BIT_SET(res, 1);
 	}
-	if (m_uart->get_output_pin(AY31015_OR)) {
+	if (m_uart->or_r()) {
 		BIT_SET(res, 2);
 	}
-	if (m_uart->get_output_pin(AY31015_PE)) {
+	if (m_uart->pe_r()) {
 		BIT_SET(res, 3);
 	}
 	if (m_rs232->dcd_r()) {
@@ -485,14 +485,14 @@ WRITE8_MEMBER(hp2645_state::async_data_w)
 	m_uart->set_transmit_data(data);
 }
 
-WRITE8_MEMBER(hp2645_state::async_status_change)
+WRITE_LINE_MEMBER(hp2645_state::async_dav_w)
 {
 	update_async_irq();
 }
 
 WRITE_LINE_MEMBER(hp2645_state::async_txd_w)
 {
-	m_rs232->write_txd(!BIT(m_async_control , 6) && m_uart->get_output_pin(AY31015_SO));
+	m_rs232->write_txd(!BIT(m_async_control , 6) && m_uart->so_r());
 }
 
 TIMER_DEVICE_CALLBACK_MEMBER(hp2645_state::timer_beep_exp)
@@ -716,13 +716,13 @@ void hp2645_state::update_async_control(uint8_t new_control)
 		}
 		m_uart->set_receiver_clock(rxc_txc_freq);
 		m_uart->set_transmitter_clock(rxc_txc_freq);
-		m_uart->set_input_pin(AY31015_TSB , new_rate_idx == 1);
+		m_uart->write_tsb(new_rate_idx == 1);
 		LOG("ASYNC freq=%f\n" , rxc_txc_freq);
 	}
 	if (diff & 0x30) {
-		m_uart->set_input_pin(AY31015_NP , BIT(new_control , 5));
-		m_uart->set_input_pin(AY31015_NB1 , BIT(new_control , 5));
-		m_uart->set_input_pin(AY31015_EPS , BIT(new_control , 4));
+		m_uart->write_np(BIT(new_control , 5));
+		m_uart->write_nb1(BIT(new_control , 5));
+		m_uart->write_eps(BIT(new_control , 4));
 	}
 	// Update TxD
 	async_txd_w(0);
@@ -730,7 +730,7 @@ void hp2645_state::update_async_control(uint8_t new_control)
 
 void hp2645_state::update_async_irq()
 {
-	m_datacom_irq = m_uart->get_output_pin(AY31015_DAV);
+	m_datacom_irq = m_uart->dav_r();
 	LOG("ASYNC IRQ=%d\n" , m_datacom_irq);
 	update_irq();
 }
@@ -1006,7 +1006,7 @@ MACHINE_CONFIG_START(hp2645_state::hp2645)
 	MCFG_DEVICE_ADD("uart", AY31015, 0)
 	MCFG_AY31015_READ_SI_CB(DEVREADLINE("rs232" , rs232_port_device , rxd_r))
 	MCFG_AY31015_WRITE_SO_CB(WRITELINE(hp2645_state , async_txd_w))
-	MCFG_AY31015_STATUS_CHANGED_CB(WRITE8(hp2645_state , async_status_change))
+	MCFG_AY31015_WRITE_DAV_CB(WRITELINE(hp2645_state , async_dav_w))
 
 	// Beep
 	MCFG_SPEAKER_STANDARD_MONO("mono")

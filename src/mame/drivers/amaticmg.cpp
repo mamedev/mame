@@ -881,7 +881,8 @@ INTERRUPT_GEN_MEMBER(amaticmg_state::amaticmg2_irq)
 }
 
 
-MACHINE_CONFIG_DERIVED(amaticmg_state::amaticmg2, amaticmg)
+MACHINE_CONFIG_START(amaticmg_state::amaticmg2)
+	amaticmg(config);
 
 	MCFG_CPU_MODIFY("maincpu")
 	MCFG_CPU_IO_MAP(amaticmg2_portmap)
@@ -899,7 +900,8 @@ MACHINE_CONFIG_DERIVED(amaticmg_state::amaticmg2, amaticmg)
 MACHINE_CONFIG_END
 
 
-MACHINE_CONFIG_DERIVED(amaticmg_state::amaticmg4, amaticmg)
+MACHINE_CONFIG_START(amaticmg_state::amaticmg4)
+	amaticmg(config);
 
 	MCFG_CPU_MODIFY("maincpu")
 	MCFG_CPU_IO_MAP(amaticmg4_portmap)

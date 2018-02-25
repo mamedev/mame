@@ -482,7 +482,7 @@ MACHINE_CONFIG_START(play_1_state::play_1)
 	MCFG_CLOCK_SIGNAL_HANDLER(WRITELINE(play_1_state, clock_w))
 
 	/* Sound */
-	MCFG_FRAGMENT_ADD( genpin_audio )
+	genpin_audio(config);
 	MCFG_SPEAKER_STANDARD_MONO("mono")
 	MCFG_SOUND_ADD("speaker", SPEAKER_SOUND, 0)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
@@ -490,7 +490,8 @@ MACHINE_CONFIG_START(play_1_state::play_1)
 	MCFG_CLOCK_SIGNAL_HANDLER(DEVWRITELINE("speaker", speaker_sound_device, level_w))
 MACHINE_CONFIG_END
 
-MACHINE_CONFIG_DERIVED(play_1_state::chance, play_1)
+MACHINE_CONFIG_START(play_1_state::chance)
+	play_1(config);
 	MCFG_CPU_MODIFY("maincpu")
 	MCFG_CPU_PROGRAM_MAP(chance_map)
 MACHINE_CONFIG_END

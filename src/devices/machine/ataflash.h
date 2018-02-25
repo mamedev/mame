@@ -8,7 +8,6 @@
 #include "pccard.h"
 #include "machine/idehd.h"
 
-extern const device_type ATA_FLASH_PCCARD;
 DECLARE_DEVICE_TYPE(ATA_FLASH_PCCARD, ata_flash_pccard_device)
 
 class ata_flash_pccard_device : public ide_hdd_device, public pccard_interface

@@ -1173,7 +1173,8 @@ MACHINE_CONFIG_START(ampoker2_state::ampoker2)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.30)
 MACHINE_CONFIG_END
 
-MACHINE_CONFIG_DERIVED(ampoker2_state::sigma2k, ampoker2)
+MACHINE_CONFIG_START(ampoker2_state::sigma2k)
+	ampoker2(config);
 
 	/* video hardware */
 	MCFG_GFXDECODE_MODIFY("gfxdecode", sigma2k)

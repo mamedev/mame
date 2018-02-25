@@ -1456,10 +1456,11 @@ MACHINE_CONFIG_END
 
 
 //-------------------------------------------------
-//  MACHINE_CONFIG_DERIVED( ntsc, m5 )
+//  MACHINE_CONFIG_START( ntsc )
 //-------------------------------------------------
 
-MACHINE_CONFIG_DERIVED(m5_state::ntsc, m5)
+MACHINE_CONFIG_START(m5_state::ntsc)
+	m5(config);
 	// video hardware
 	MCFG_DEVICE_ADD( "tms9928a", TMS9928A, XTAL(10'738'635) / 2 )
 	MCFG_TMS9928A_VRAM_SIZE(0x4000)
@@ -1470,10 +1471,11 @@ MACHINE_CONFIG_END
 
 
 //-------------------------------------------------
-//  MACHINE_CONFIG_DERIVED( pal, m5 )
+//  MACHINE_CONFIG_START( pal )
 //-------------------------------------------------
 
-MACHINE_CONFIG_DERIVED(m5_state::pal, m5)
+MACHINE_CONFIG_START(m5_state::pal)
+	m5(config);
 	// video hardware
 	MCFG_DEVICE_ADD( "tms9928a", TMS9929A, XTAL(10'738'635) / 2 )
 	MCFG_TMS9928A_VRAM_SIZE(0x4000)
@@ -1487,7 +1489,8 @@ MACHINE_CONFIG_END
 //-------------------------------------------------
 
 
-MACHINE_CONFIG_DERIVED(brno_state::brno, m5)
+MACHINE_CONFIG_START(brno_state::brno)
+	m5(config);
 
 	// basic machine hardware
 	MCFG_CPU_MODIFY(Z80_TAG)

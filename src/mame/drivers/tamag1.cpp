@@ -20,25 +20,27 @@
 class tamag1_state : public driver_device
 {
 public:
-	tamag1_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag),
+	tamag1_state(const machine_config &mconfig, device_type type, const char *tag) :
+		driver_device(mconfig, type, tag),
 		m_maincpu(*this, "maincpu"),
 		m_speaker(*this, "speaker"),
 		m_out_x(*this, "%u.%u", 0U, 0U)
 	{ }
 
-	required_device<e0c6s46_device> m_maincpu;
-	required_device<speaker_sound_device> m_speaker;
-	output_finder<16, 40> m_out_x;
-
-	DECLARE_WRITE8_MEMBER(speaker_w);
-	DECLARE_PALETTE_INIT(tama);
 	DECLARE_INPUT_CHANGED_MEMBER(input_changed);
-	E0C6S46_PIXEL_UPDATE(pixel_update);
 	void tama(machine_config &config);
 
 protected:
+	DECLARE_WRITE8_MEMBER(speaker_w);
+	DECLARE_PALETTE_INIT(tama);
+	E0C6S46_PIXEL_UPDATE(pixel_update);
+
 	virtual void machine_start() override;
+
+private:
+	required_device<e0c6s46_device> m_maincpu;
+	required_device<speaker_sound_device> m_speaker;
+	output_finder<16, 40> m_out_x;
 };
 
 void tamag1_state::machine_start()

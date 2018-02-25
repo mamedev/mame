@@ -39,7 +39,6 @@ sns_rom_sgb_device::sns_rom_sgb_device(const machine_config &mconfig, device_typ
 	m_joy3(0),
 	m_joy4(0),
 	m_vram_offs(0),
-	m_mlt_req(0),
 	m_lcd_row(0),
 	m_packetsize(0),
 	m_bios_disabled(false)

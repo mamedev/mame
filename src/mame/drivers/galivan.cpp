@@ -521,7 +521,8 @@ MACHINE_CONFIG_START(galivan_state::ninjemak)
 MACHINE_CONFIG_END
 
 
-MACHINE_CONFIG_DERIVED(galivan_state::youmab, ninjemak)
+MACHINE_CONFIG_START(galivan_state::youmab)
+	ninjemak(config);
 
 	MCFG_DEVICE_REMOVE("nb1414m4")
 MACHINE_CONFIG_END

@@ -107,6 +107,6 @@ protected:
 
 
 // device type definition
-extern const device_type MOS6529;
+DECLARE_DEVICE_TYPE(MOS6529, mos6529_device)
 
 #endif // MAME_MACHINE_MOS6529_H

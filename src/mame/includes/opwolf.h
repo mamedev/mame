@@ -27,8 +27,8 @@ public:
 		TIMER_CCHIP
 	};
 
-	opwolf_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag),
+	opwolf_state(const machine_config &mconfig, device_type type, const char *tag) :
+		driver_device(mconfig, type, tag),
 		m_cchip_ram(*this, "cchip_ram"),
 		m_maincpu(*this, "maincpu"),
 		m_audiocpu(*this, "audiocpu"),
@@ -36,8 +36,57 @@ public:
 		m_pc080sn(*this, "pc080sn"),
 		m_pc090oj(*this, "pc090oj"),
 		m_msm1(*this, "msm1"),
-		m_msm2(*this, "msm2") { }
+		m_msm2(*this, "msm2")
+	{ }
 
+	DECLARE_CUSTOM_INPUT_MEMBER(opwolf_gun_x_r);
+	DECLARE_CUSTOM_INPUT_MEMBER(opwolf_gun_y_r);
+	DECLARE_DRIVER_INIT(opwolf);
+	DECLARE_DRIVER_INIT(opwolfb);
+	DECLARE_DRIVER_INIT(opwolfp);
+	void opwolf(machine_config &config);
+	void opwolfb(machine_config &config);
+	void opwolfp(machine_config &config);
+
+protected:
+	DECLARE_READ16_MEMBER(cchip_r);
+	DECLARE_WRITE16_MEMBER(cchip_w);
+	DECLARE_READ16_MEMBER(opwolf_in_r);
+	DECLARE_READ16_MEMBER(opwolf_dsw_r);
+	DECLARE_READ16_MEMBER(opwolf_lightgun_r);
+	DECLARE_READ8_MEMBER(z80_input1_r);
+	DECLARE_READ8_MEMBER(z80_input2_r);
+	DECLARE_WRITE8_MEMBER(opwolf_adpcm_d_w);
+	DECLARE_WRITE8_MEMBER(opwolf_adpcm_e_w);
+	DECLARE_WRITE16_MEMBER(opwolf_cchip_status_w);
+	DECLARE_WRITE16_MEMBER(opwolf_cchip_bank_w);
+	DECLARE_WRITE16_MEMBER(opwolf_cchip_data_w);
+	DECLARE_READ16_MEMBER(opwolf_cchip_status_r);
+	DECLARE_READ16_MEMBER(opwolf_cchip_data_r);
+	DECLARE_WRITE16_MEMBER(opwolf_spritectrl_w);
+	DECLARE_WRITE8_MEMBER(sound_bankswitch_w);
+	DECLARE_WRITE8_MEMBER(opwolf_adpcm_b_w);
+	DECLARE_WRITE8_MEMBER(opwolf_adpcm_c_w);
+
+	virtual void machine_start() override;
+	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr) override;
+	DECLARE_MACHINE_RESET(opwolf);
+	uint32_t screen_update_opwolf(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	TIMER_CALLBACK_MEMBER(opwolf_timer_callback);
+	TIMER_CALLBACK_MEMBER(cchip_timer);
+	void updateDifficulty(int mode);
+	void opwolf_cchip_init();
+	void opwolf_msm5205_vck(msm5205_device *device, int chip);
+	DECLARE_WRITE_LINE_MEMBER(opwolf_msm5205_vck_1);
+	DECLARE_WRITE_LINE_MEMBER(opwolf_msm5205_vck_2);
+
+	void opwolf_map(address_map &map);
+	void opwolf_sound_z80_map(address_map &map);
+	void opwolfb_map(address_map &map);
+	void opwolfb_sub_z80_map(address_map &map);
+	void opwolfp_map(address_map &map);
+
+private:
 	/* memory pointers */
 	optional_shared_ptr<uint8_t> m_cchip_ram;
 
@@ -93,54 +142,6 @@ public:
 	required_device<pc090oj_device> m_pc090oj;
 	required_device<msm5205_device> m_msm1;
 	required_device<msm5205_device> m_msm2;
-	DECLARE_READ16_MEMBER(cchip_r);
-	DECLARE_WRITE16_MEMBER(cchip_w);
-	DECLARE_READ16_MEMBER(opwolf_in_r);
-	DECLARE_READ16_MEMBER(opwolf_dsw_r);
-	DECLARE_READ16_MEMBER(opwolf_lightgun_r);
-	DECLARE_READ8_MEMBER(z80_input1_r);
-	DECLARE_READ8_MEMBER(z80_input2_r);
-	DECLARE_WRITE8_MEMBER(opwolf_adpcm_d_w);
-	DECLARE_WRITE8_MEMBER(opwolf_adpcm_e_w);
-	DECLARE_WRITE16_MEMBER(opwolf_cchip_status_w);
-	DECLARE_WRITE16_MEMBER(opwolf_cchip_bank_w);
-	DECLARE_WRITE16_MEMBER(opwolf_cchip_data_w);
-	DECLARE_READ16_MEMBER(opwolf_cchip_status_r);
-	DECLARE_READ16_MEMBER(opwolf_cchip_data_r);
-	DECLARE_WRITE16_MEMBER(opwolf_spritectrl_w);
-	DECLARE_WRITE8_MEMBER(sound_bankswitch_w);
-	DECLARE_WRITE8_MEMBER(opwolf_adpcm_b_w);
-	DECLARE_WRITE8_MEMBER(opwolf_adpcm_c_w);
-	DECLARE_DRIVER_INIT(opwolf);
-	DECLARE_DRIVER_INIT(opwolfb);
-	DECLARE_DRIVER_INIT(opwolfp);
-
-
-	DECLARE_CUSTOM_INPUT_MEMBER(opwolf_gun_x_r);
-	DECLARE_CUSTOM_INPUT_MEMBER(opwolf_gun_y_r);
-
-
-	virtual void machine_start() override;
-	DECLARE_MACHINE_RESET(opwolf);
-	uint32_t screen_update_opwolf(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
-	TIMER_CALLBACK_MEMBER(opwolf_timer_callback);
-	TIMER_CALLBACK_MEMBER(cchip_timer);
-	void updateDifficulty( int mode );
-	void opwolf_cchip_init(  );
-	void opwolf_msm5205_vck(msm5205_device *device, int chip);
-	DECLARE_WRITE_LINE_MEMBER(opwolf_msm5205_vck_1);
-	DECLARE_WRITE_LINE_MEMBER(opwolf_msm5205_vck_2);
-
-	void opwolfb(machine_config &config);
-	void opwolfp(machine_config &config);
-	void opwolf(machine_config &config);
-	void opwolf_map(address_map &map);
-	void opwolf_sound_z80_map(address_map &map);
-	void opwolfb_map(address_map &map);
-	void opwolfb_sub_z80_map(address_map &map);
-	void opwolfp_map(address_map &map);
-protected:
-	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr) override;
 };
 
 

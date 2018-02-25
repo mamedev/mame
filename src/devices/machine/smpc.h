@@ -79,20 +79,6 @@ public:
 	DECLARE_READ8_MEMBER( read );
 	DECLARE_WRITE8_MEMBER( write );
 
-	DECLARE_WRITE8_MEMBER( ireg_w );
-	DECLARE_WRITE8_MEMBER( command_register_w );
-	DECLARE_READ8_MEMBER( oreg_r );
-	DECLARE_READ8_MEMBER( status_register_r );
-	DECLARE_WRITE8_MEMBER( status_flag_w );
-	DECLARE_READ8_MEMBER( status_flag_r );
-	DECLARE_READ8_MEMBER( pdr1_r );
-	DECLARE_READ8_MEMBER( pdr2_r );
-	DECLARE_WRITE8_MEMBER( pdr1_w );
-	DECLARE_WRITE8_MEMBER( pdr2_w );
-	DECLARE_WRITE8_MEMBER( ddr1_w );
-	DECLARE_WRITE8_MEMBER( ddr2_w );
-	DECLARE_WRITE8_MEMBER( iosel_w );
-	DECLARE_WRITE8_MEMBER( exle_w );
 	DECLARE_INPUT_CHANGED_MEMBER( trigger_nmi_r );
 
 	void m68k_reset_trigger();
@@ -121,7 +107,6 @@ public:
 	static void static_set_region_code(device_t &device, uint8_t rgn);
 	static void static_set_control_port_tags(device_t &device, const char *tag1, const char *tag2);
 
-	void smpc_regs(address_map &map);
 protected:
 	// device-level overrides
 //  virtual void device_validity_check(validity_checker &valid) const override;
@@ -218,6 +203,23 @@ private:
 	saturn_control_port_device *m_ctrl2;
 
 	screen_device *m_screen;
+
+	void smpc_regs(address_map &map);
+
+	DECLARE_WRITE8_MEMBER( ireg_w );
+	DECLARE_WRITE8_MEMBER( command_register_w );
+	DECLARE_READ8_MEMBER( oreg_r );
+	DECLARE_READ8_MEMBER( status_register_r );
+	DECLARE_WRITE8_MEMBER( status_flag_w );
+	DECLARE_READ8_MEMBER( status_flag_r );
+	DECLARE_READ8_MEMBER( pdr1_r );
+	DECLARE_READ8_MEMBER( pdr2_r );
+	DECLARE_WRITE8_MEMBER( pdr1_w );
+	DECLARE_WRITE8_MEMBER( pdr2_w );
+	DECLARE_WRITE8_MEMBER( ddr1_w );
+	DECLARE_WRITE8_MEMBER( ddr2_w );
+	DECLARE_WRITE8_MEMBER( iosel_w );
+	DECLARE_WRITE8_MEMBER( exle_w );
 };
 
 

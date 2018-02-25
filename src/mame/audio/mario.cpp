@@ -419,20 +419,27 @@ void mario_state::set_ea(int ea)
 void mario_state::sound_start()
 {
 	device_t *audiocpu = machine().device("audiocpu");
-
-#if USE_8039
 	uint8_t *SND = memregion("audiocpu")->base();
 
+#if USE_8039
 	SND[0x1001] = 0x01;
 #endif
 
 	m_eabank = nullptr;
 	if (audiocpu != nullptr && audiocpu->type() != Z80)
 	{
+
 		m_eabank = "bank1";
 		audiocpu->memory().space(AS_PROGRAM).install_read_bank(0x000, 0x7ff, "bank1");
-		membank("bank1")->configure_entry(0, memregion("audiocpu")->base());
-		membank("bank1")->configure_entry(1, memregion("audiocpu")->base() + 0x1000);
+		membank("bank1")->configure_entry(0, &SND[0]);
+		membank("bank1")->configure_entry(1, &SND[0x1000]);
+
+#if !USE_8039
+		// Hack to bootstrap MCU program into external MB1
+		SND[0x0000] = 0xf5;
+		SND[0x0001] = 0x04;
+		SND[0x0002] = 0x00;
+#endif
 	}
 
 	save_item(NAME(m_last));

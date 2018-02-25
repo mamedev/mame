@@ -133,7 +133,7 @@ ADDRESS_MAP_START(pgm_012_025_state::drgw2_mem)
 ADDRESS_MAP_END
 
 MACHINE_CONFIG_START(pgm_012_025_state::pgm_012_025_drgw2)
-	MCFG_FRAGMENT_ADD(pgmbase)
+	pgmbase(config);
 
 	MCFG_CPU_MODIFY("maincpu")
 	MCFG_CPU_PROGRAM_MAP(drgw2_mem)

@@ -1091,7 +1091,8 @@ MACHINE_CONFIG_START(gnw_mmouse_state::gnw_mmouse)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
 MACHINE_CONFIG_END
 
-MACHINE_CONFIG_DERIVED(gnw_mmouse_state::gnw_egg, gnw_mmouse)
+MACHINE_CONFIG_START(gnw_mmouse_state::gnw_egg)
+	gnw_mmouse(config);
 
 	/* video hardware */
 	MCFG_SCREEN_MODIFY("screen")
@@ -1099,7 +1100,8 @@ MACHINE_CONFIG_DERIVED(gnw_mmouse_state::gnw_egg, gnw_mmouse)
 	MCFG_SCREEN_VISIBLE_AREA(0, 1694-1, 0, 1080-1)
 MACHINE_CONFIG_END
 
-MACHINE_CONFIG_DERIVED(gnw_mmouse_state::nupogodi, gnw_mmouse)
+MACHINE_CONFIG_START(gnw_mmouse_state::nupogodi)
+	gnw_mmouse(config);
 
 	/* basic machine hardware */
 	MCFG_CPU_REPLACE("maincpu", KB1013VK12, 32.768_kHz_XTAL)
@@ -1115,7 +1117,8 @@ MACHINE_CONFIG_DERIVED(gnw_mmouse_state::nupogodi, gnw_mmouse)
 	MCFG_SCREEN_VISIBLE_AREA(0, 1715-1, 0, 1080-1)
 MACHINE_CONFIG_END
 
-MACHINE_CONFIG_DERIVED(gnw_mmouse_state::exospace, nupogodi)
+MACHINE_CONFIG_START(gnw_mmouse_state::exospace)
+	nupogodi(config);
 
 	/* video hardware */
 	MCFG_SCREEN_MODIFY("screen")
@@ -1839,7 +1842,8 @@ MACHINE_CONFIG_START(tgaunt_state::tgaunt)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
 MACHINE_CONFIG_END
 
-MACHINE_CONFIG_DERIVED(tgaunt_state::trobhood, tgaunt)
+MACHINE_CONFIG_START(tgaunt_state::trobhood)
+	tgaunt(config);
 
 	/* video hardware */
 	MCFG_SCREEN_MODIFY("screen")
@@ -3476,6 +3480,101 @@ MACHINE_CONFIG_START(tsonic_state::tsonic)
 	MCFG_SPEAKER_STANDARD_MONO("mono")
 	MCFG_SOUND_ADD("speaker", SPEAKER_SOUND, 0)
 	MCFG_SPEAKER_LEVELS(4, tsonic_speaker_levels)
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
+MACHINE_CONFIG_END
+
+
+
+
+
+/***************************************************************************
+
+  Tiger Robocop 3 (model 78-514)
+  * Sharp SM510 under epoxy (die label MC6)
+  * lcd screen with custom segments, 1-bit sound
+
+***************************************************************************/
+
+class trobocop3_state : public hh_sm510_state
+{
+public:
+	trobocop3_state(const machine_config &mconfig, device_type type, const char *tag)
+		: hh_sm510_state(mconfig, type, tag)
+	{
+		m_inp_lines = 6;
+		m_inp_fixed = 6;
+	}
+
+	void trobocop3(machine_config &config);
+};
+
+// config
+
+static INPUT_PORTS_START( trobocop3 )
+	PORT_START("IN.0") // S1
+	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_JOYSTICK_UP ) PORT_CHANGED_MEMBER(DEVICE_SELF, hh_sm510_state, input_changed, nullptr) PORT_NAME("Jump/Fly")
+	PORT_BIT( 0x0b, IP_ACTIVE_HIGH, IPT_UNUSED )
+
+	PORT_START("IN.1") // S2
+	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_JOYSTICK_RIGHT ) PORT_CHANGED_MEMBER(DEVICE_SELF, hh_sm510_state, input_changed, nullptr)
+	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_JOYSTICK_LEFT ) PORT_CHANGED_MEMBER(DEVICE_SELF, hh_sm510_state, input_changed, nullptr) PORT_NAME("Rescue")
+	PORT_BIT( 0x09, IP_ACTIVE_HIGH, IPT_UNUSED )
+
+	PORT_START("IN.2") // S3
+	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_JOYSTICK_DOWN ) PORT_CHANGED_MEMBER(DEVICE_SELF, hh_sm510_state, input_changed, nullptr) PORT_NAME("P1 Down/Pick")
+	PORT_BIT( 0x0d, IP_ACTIVE_HIGH, IPT_UNUSED )
+
+	PORT_START("IN.3") // S4
+	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_BUTTON3 ) PORT_CHANGED_MEMBER(DEVICE_SELF, hh_sm510_state, input_changed, nullptr) PORT_NAME("Shoot Right")
+	PORT_BIT( 0x0d, IP_ACTIVE_HIGH, IPT_UNUSED )
+
+	PORT_START("IN.4") // S5
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_BUTTON1 ) PORT_CHANGED_MEMBER(DEVICE_SELF, hh_sm510_state, input_changed, nullptr) PORT_NAME("Shoot Up")
+	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_BUTTON2 ) PORT_CHANGED_MEMBER(DEVICE_SELF, hh_sm510_state, input_changed, nullptr) PORT_NAME("Shoot Left")
+	PORT_BIT( 0x0c, IP_ACTIVE_HIGH, IPT_UNUSED )
+
+	PORT_START("IN.5") // S6
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_SELECT ) PORT_CHANGED_MEMBER(DEVICE_SELF, hh_sm510_state, input_changed, nullptr) PORT_NAME("Pause")
+	PORT_BIT( 0x0e, IP_ACTIVE_HIGH, IPT_UNUSED )
+
+	PORT_START("IN.6") // GND!
+	PORT_BIT( 0x07, IP_ACTIVE_HIGH, IPT_UNUSED )
+	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_START ) PORT_CHANGED_MEMBER(DEVICE_SELF, hh_sm510_state, input_changed, nullptr) PORT_NAME("Power On/Start")
+
+	PORT_START("BA")
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_VOLUME_DOWN ) PORT_NAME("Sound")
+
+	PORT_START("B")
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_POWER_OFF )
+
+	PORT_START("ACL")
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_SERVICE1 ) PORT_CHANGED_MEMBER(DEVICE_SELF, hh_sm510_state, acl_button, nullptr) PORT_NAME("ACL")
+INPUT_PORTS_END
+
+MACHINE_CONFIG_START(trobocop3_state::trobocop3)
+
+	/* basic machine hardware */
+	MCFG_CPU_ADD("maincpu", SM510, 32.768_kHz_XTAL)
+	MCFG_SM510_R_MASK_OPTION(SM510_R_CONTROL_OUTPUT)
+	MCFG_SM510_WRITE_SEGS_CB(WRITE16(hh_sm510_state, sm510_lcd_segment_w))
+	MCFG_SM510_READ_K_CB(READ8(hh_sm510_state, input_r))
+	MCFG_SM510_WRITE_S_CB(WRITE8(hh_sm510_state, input_w))
+	MCFG_SM510_WRITE_R_CB(WRITE8(hh_sm510_state, piezo_r1_w))
+	MCFG_SM510_READ_BA_CB(IOPORT("BA"))
+	MCFG_SM510_READ_B_CB(IOPORT("B"))
+
+	/* video hardware */
+	MCFG_SCREEN_SVG_ADD("screen", "svg")
+	MCFG_SCREEN_REFRESH_RATE(50)
+	MCFG_SCREEN_SIZE(1464, 1080)
+	MCFG_SCREEN_VISIBLE_AREA(0, 1464-1, 0, 1080-1)
+
+	MCFG_TIMER_DRIVER_ADD_PERIODIC("display_decay", hh_sm510_state, display_decay_tick, attotime::from_msec(1))
+	MCFG_DEFAULT_LAYOUT(layout_svg)
+
+	/* sound hardware */
+	MCFG_SPEAKER_STANDARD_MONO("mono")
+	MCFG_SOUND_ADD("speaker", SPEAKER_SOUND, 0)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
 MACHINE_CONFIG_END
 
@@ -5369,6 +5468,15 @@ ROM_START( tsonic )
 ROM_END
 
 
+ROM_START( trobocop3 )
+	ROM_REGION( 0x1000, "maincpu", 0 )
+	ROM_LOAD( "mc6", 0x0000, 0x1000, CRC(07b44e4c) SHA1(3165c85e16c062d2d9d0c0f1b1f6bd6079b4de15) )
+
+	ROM_REGION( 612103, "svg", 0)
+	ROM_LOAD( "trobocop3.svg", 0, 612103, CRC(9a162642) SHA1(b775f64e4616c4fc8d2c139938f148c9666e646a) )
+ROM_END
+
+
 ROM_START( tdummies )
 	ROM_REGION( 0x1000, "maincpu", 0 )
 	ROM_LOAD( "me0", 0x0000, 0x1000, CRC(29efae4a) SHA1(0b26913a3fd2fde2b39549f0f7cbc3daaa41eb50) )
@@ -5558,6 +5666,7 @@ CONS( 1991, tbtoads,     0,          0, tbtoads,     tbtoads,     tbtoads_state,
 CONS( 1991, thook,       0,          0, thook,       thook,       thook_state,       0, "Tiger Electronics", "Hook (handheld)", MACHINE_SUPPORTS_SAVE )
 CONS( 1992, tbttf,       0,          0, tbttf,       tbttf,       tbttf_state,       0, "Tiger Electronics", "Back to the Future (handheld)", MACHINE_SUPPORTS_SAVE )
 CONS( 1992, tsonic,      0,          0, tsonic,      tsonic,      tsonic_state,      0, "Tiger Electronics (licensed from Sega)", "Sonic The Hedgehog (handheld)", MACHINE_SUPPORTS_SAVE )
+CONS( 1992, trobocop3,   0,          0, trobocop3,   trobocop3,   trobocop3_state,   0, "Tiger Electronics", "Robocop 3 (handheld)", MACHINE_SUPPORTS_SAVE )
 CONS( 1993, tdummies,    0,          0, tdummies,    tdummies,    tdummies_state,    0, "Tiger Electronics", "The Incredible Crash Dummies (handheld)", MACHINE_SUPPORTS_SAVE )
 CONS( 1993, tsfight2,    0,          0, tsfight2,    tsfight2,    tsfight2_state,    0, "Tiger Electronics (licensed from Capcom)", "Street Fighter II (handheld)", MACHINE_SUPPORTS_SAVE )
 CONS( 1993, tsonic2,     0,          0, tsonic2,     tsonic2,     tsonic2_state,     0, "Tiger Electronics (licensed from Sega)", "Sonic The Hedgehog 2 (handheld)", MACHINE_SUPPORTS_SAVE )

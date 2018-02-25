@@ -471,7 +471,8 @@ MACHINE_CONFIG_START(apricot_state::apricot)
 	MCFG_EXPANSION_SLOT_ADD("exp:2", apricot_expansion_cards, nullptr)
 MACHINE_CONFIG_END
 
-MACHINE_CONFIG_DERIVED(apricot_state::apricotxi, apricot)
+MACHINE_CONFIG_START(apricot_state::apricotxi)
+	apricot(config);
 MACHINE_CONFIG_END
 
 

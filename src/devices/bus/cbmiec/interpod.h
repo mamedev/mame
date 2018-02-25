@@ -49,7 +49,6 @@ public:
 	// construction/destruction
 	interpod_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
-	void interpod_mem(address_map &map);
 protected:
 	// device-level overrides
 	virtual void device_start() override;
@@ -59,11 +58,14 @@ protected:
 	virtual const tiny_rom_entry *device_rom_region() const override;
 	virtual void device_add_mconfig(machine_config &config) override;
 
+private:
 	required_device<cpu_device> m_maincpu;
 	required_device<via6522_device> m_via;
 	required_device<mos6532_new_device> m_riot;
 	required_device<acia6850_device> m_acia;
 	required_device<ieee488_device> m_ieee;
+
+	void interpod_mem(address_map &map);
 };
 
 

@@ -714,7 +714,8 @@ MACHINE_CONFIG_START(bingor_state::bingor)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
 MACHINE_CONFIG_END
 
-MACHINE_CONFIG_DERIVED(bingor_state::bingor2, bingor)
+MACHINE_CONFIG_START(bingor_state::bingor2)
+	bingor(config);
 	MCFG_CPU_MODIFY("maincpu")
 	MCFG_CPU_PROGRAM_MAP(bingor2_map)
 MACHINE_CONFIG_END

@@ -79,14 +79,14 @@ void vixen_state::update_interrupt()
 
 READ8_MEMBER( vixen_state::opram_r )
 {
-	if (!machine().side_effect_disabled())
+	if (!machine().side_effects_disabled())
 		membank("bank3")->set_entry(0); // read videoram
 	return m_program->read_byte(offset);
 }
 
 READ8_MEMBER( vixen_state::oprom_r )
 {
-	if (!machine().side_effect_disabled())
+	if (!machine().side_effects_disabled())
 		membank("bank3")->set_entry(1); // read rom
 	return m_rom[offset];
 }

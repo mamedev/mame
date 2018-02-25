@@ -111,8 +111,10 @@ ADDRESS_MAP_START(amstrad_pc_state::pc200_io)
 	AM_RANGE(0x0078, 0x0079) AM_READWRITE8(pc1640_mouse_x_r, pc1640_mouse_x_w, 0xffff)
 	AM_RANGE(0x007a, 0x007b) AM_READWRITE8(pc1640_mouse_y_r, pc1640_mouse_y_w, 0xffff)
 	AM_RANGE(0x0200, 0x0207) AM_DEVREADWRITE8("pc_joy", pc_joy_device, joy_port_r, joy_port_w, 0xffff)
-	AM_RANGE(0x0278, 0x027b) AM_READ8(pc200_port278_r, 0xffff) AM_DEVWRITE8("lpt_2", pc_lpt_device, write, 0x00ff)
-	AM_RANGE(0x0378, 0x037b) AM_READ8(pc200_port378_r, 0xffff) AM_DEVWRITE8("lpt_1", pc_lpt_device, write, 0x00ff)
+	AM_RANGE(0x0278, 0x027b) AM_READ8(pc200_port278_r, 0xffff)
+	AM_RANGE(0x0278, 0x027b) AM_DEVWRITE8("lpt_2", pc_lpt_device, write, 0x00ff)
+	AM_RANGE(0x0378, 0x037b) AM_READ8(pc200_port378_r, 0xffff)
+	AM_RANGE(0x0378, 0x037b) AM_DEVWRITE8("lpt_1", pc_lpt_device, write, 0x00ff)
 	AM_RANGE(0x03bc, 0x03bf) AM_DEVREADWRITE8("lpt_0", pc_lpt_device, read, write, 0x00ff)
 ADDRESS_MAP_END
 
@@ -516,12 +518,14 @@ MACHINE_CONFIG_START(amstrad_pc_state::pc200)
 	MCFG_RAM_EXTRA_OPTIONS("512K")
 MACHINE_CONFIG_END
 
-MACHINE_CONFIG_DERIVED(amstrad_pc_state::pc2086, pc200)
+MACHINE_CONFIG_START(amstrad_pc_state::pc2086)
+	pc200(config);
 	MCFG_CPU_MODIFY("maincpu")
 	MCFG_CPU_PROGRAM_MAP(pc2086_map)
 MACHINE_CONFIG_END
 
-MACHINE_CONFIG_DERIVED(amstrad_pc_state::ppc640, pc200)
+MACHINE_CONFIG_START(amstrad_pc_state::ppc640)
+	pc200(config);
 	MCFG_CPU_REPLACE("maincpu", V30, 8000000)
 	MCFG_CPU_PROGRAM_MAP(ppc640_map)
 	MCFG_CPU_IO_MAP(ppc512_io)
@@ -533,7 +537,8 @@ MACHINE_CONFIG_DERIVED(amstrad_pc_state::ppc640, pc200)
 	MCFG_MC146818_ADD( "rtc", XTAL(32'768) )
 MACHINE_CONFIG_END
 
-MACHINE_CONFIG_DERIVED(amstrad_pc_state::ppc512, ppc640)
+MACHINE_CONFIG_START(amstrad_pc_state::ppc512)
+	ppc640(config);
 	MCFG_DEVICE_MODIFY(RAM_TAG)
 	MCFG_RAM_DEFAULT_SIZE("512K")
 	MCFG_RAM_EXTRA_OPTIONS("640K")

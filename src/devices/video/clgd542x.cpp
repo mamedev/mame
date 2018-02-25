@@ -1263,7 +1263,7 @@ READ8_MEMBER(cirrus_gd5428_device::mem_r)
 	if(vga.sequencer.data[4] & 4)
 	{
 		int data;
-		if (!machine().side_effect_disabled())
+		if (!machine().side_effects_disabled())
 		{
 			vga.gc.latch[0]=vga.memory[(offset+addr) % vga.svga_intf.vram_size];
 			vga.gc.latch[1]=vga.memory[((offset+addr)+0x10000) % vga.svga_intf.vram_size];

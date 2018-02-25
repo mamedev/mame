@@ -581,7 +581,7 @@ MACHINE_CONFIG_START(st_mp200_state::st_mp200)
 	MCFG_DEFAULT_LAYOUT(layout_st_mp200)
 
 	/* Sound */
-	MCFG_FRAGMENT_ADD( genpin_audio )
+	genpin_audio(config);
 
 	/* Devices */
 	MCFG_DEVICE_ADD("pia_u10", PIA6821, 0)
@@ -606,7 +606,8 @@ MACHINE_CONFIG_START(st_mp200_state::st_mp200)
 	MCFG_TIMER_DRIVER_ADD_PERIODIC("timer_d", st_mp200_state, u11_timer, attotime::from_hz(634)) // 555 timer*2
 MACHINE_CONFIG_END
 
-MACHINE_CONFIG_DERIVED(st_mp200_state::st_mp201, st_mp200)
+MACHINE_CONFIG_START(st_mp200_state::st_mp201)
+	st_mp200(config);
 	MCFG_SPEAKER_STANDARD_MONO("mono")
 	MCFG_SOUND_ADD("speech", S14001A, S14001_CLOCK)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.00)

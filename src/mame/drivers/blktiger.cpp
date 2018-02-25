@@ -343,7 +343,8 @@ MACHINE_CONFIG_START(blktiger_state::blktiger)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.15)
 MACHINE_CONFIG_END
 
-MACHINE_CONFIG_DERIVED(blktiger_state::blktigerbl, blktiger)
+MACHINE_CONFIG_START(blktiger_state::blktigerbl)
+	blktiger(config);
 	MCFG_CPU_MODIFY("maincpu")
 	MCFG_CPU_IO_MAP(blktigerbl_io_map)
 

@@ -537,7 +537,7 @@ void via6522_device::output_pb()
 READ8_MEMBER( via6522_device::read )
 {
 	int val = 0;
-	if (machine().side_effect_disabled())
+	if (machine().side_effects_disabled())
 		return 0;
 
 	offset &= 0xf;

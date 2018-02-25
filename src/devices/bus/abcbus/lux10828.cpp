@@ -587,7 +587,7 @@ WRITE8_MEMBER( luxor_55_10828_device::ctrl_w )
 
 	*/
 
-	if (machine().side_effect_disabled())
+	if (machine().side_effects_disabled())
 		return;
 
 	// drive selection
@@ -639,7 +639,7 @@ WRITE8_MEMBER( luxor_55_10828_device::status_w )
 
 	*/
 
-	if (machine().side_effect_disabled())
+	if (machine().side_effects_disabled())
 		return;
 
 	m_status = data & 0xfe;
@@ -655,7 +655,7 @@ WRITE8_MEMBER( luxor_55_10828_device::status_w )
 
 READ8_MEMBER( luxor_55_10828_device::fdc_r )
 {
-	if (machine().side_effect_disabled())
+	if (machine().side_effects_disabled())
 		return 0xff;
 
 	uint8_t data = 0xff;
@@ -683,7 +683,7 @@ READ8_MEMBER( luxor_55_10828_device::fdc_r )
 
 WRITE8_MEMBER( luxor_55_10828_device::fdc_w )
 {
-	if (machine().side_effect_disabled())
+	if (machine().side_effects_disabled())
 		return;
 
 	m_fdc->gen_w(offset, data);

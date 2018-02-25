@@ -1655,7 +1655,8 @@ MACHINE_CONFIG_START(cps_state::fcrash)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
 MACHINE_CONFIG_END
 
-MACHINE_CONFIG_DERIVED(cps_state::cawingbl, fcrash)
+MACHINE_CONFIG_START(cps_state::cawingbl)
+	fcrash(config);
 	/* basic machine hardware */
 	MCFG_CPU_MODIFY("maincpu")
 	MCFG_CPU_VBLANK_INT_DRIVER("screen", cps_state,  irq6_line_hold) /* needed to write to scroll values */
@@ -1755,7 +1756,8 @@ MACHINE_CONFIG_START(cps_state::sf2mdt)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
 MACHINE_CONFIG_END
 
-MACHINE_CONFIG_DERIVED(cps_state::sf2b, sf2mdt)
+MACHINE_CONFIG_START(cps_state::sf2b)
+	sf2mdt(config);
 	MCFG_CPU_MODIFY("maincpu")
 	MCFG_CPU_PROGRAM_MAP(sf2b_map)
 MACHINE_CONFIG_END
@@ -2380,7 +2382,8 @@ ROM_START( sgyxz )
 	ROM_LOAD( "sgyxz_snd1.bin", 0x00000, 0x40000,  CRC(c15ac0f2) SHA1(8d9e5519d9820e4ac4f70555088c80e64d052c9d) )
 ROM_END
 
-MACHINE_CONFIG_DERIVED(cps_state::wofabl, sgyxz)
+MACHINE_CONFIG_START(cps_state::wofabl)
+	sgyxz(config);
 
 	MCFG_CPU_MODIFY("maincpu")
 	MCFG_CPU_PROGRAM_MAP(wofabl_map)

@@ -39,7 +39,6 @@ public:
 	// construction/destruction
 	c1581_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
-	void c1581_mem(address_map &map);
 protected:
 	c1581_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock);
 
@@ -73,6 +72,8 @@ private:
 	DECLARE_WRITE8_MEMBER( cia_pa_w );
 	DECLARE_READ8_MEMBER( cia_pb_r );
 	DECLARE_WRITE8_MEMBER( cia_pb_w );
+
+	void c1581_mem(address_map &map);
 
 	DECLARE_FLOPPY_FORMATS( floppy_formats );
 

@@ -820,7 +820,8 @@ MACHINE_CONFIG_START(oric_state::oric)
 	MCFG_ORICEXT_ADD( "ext", oricext_intf, nullptr, "maincpu", WRITELINE(oric_state, ext_irq_w))
 MACHINE_CONFIG_END
 
-MACHINE_CONFIG_DERIVED(oric_state::prav8d, oric)
+MACHINE_CONFIG_START(oric_state::prav8d)
+	oric(config);
 MACHINE_CONFIG_END
 
 FLOPPY_FORMATS_MEMBER( telestrat_state::floppy_formats )
@@ -831,7 +832,8 @@ static SLOT_INTERFACE_START( telestrat_floppies )
 	SLOT_INTERFACE( "3dsdd", FLOPPY_3_DSDD )
 SLOT_INTERFACE_END
 
-MACHINE_CONFIG_DERIVED(telestrat_state::telstrat, oric)
+MACHINE_CONFIG_START(telestrat_state::telstrat)
+	oric(config);
 	MCFG_CPU_MODIFY( "maincpu" )
 	MCFG_CPU_PROGRAM_MAP(telestrat_mem)
 

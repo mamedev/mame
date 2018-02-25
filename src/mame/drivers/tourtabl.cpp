@@ -21,17 +21,21 @@
 class tourtabl_state : public driver_device
 {
 public:
-	tourtabl_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag),
-		m_maincpu(*this, "maincpu") { }
+	tourtabl_state(const machine_config &mconfig, device_type type, const char *tag) :
+		driver_device(mconfig, type, tag),
+		m_maincpu(*this, "maincpu")
+	{ }
 
-	required_device<cpu_device> m_maincpu;
+	void tourtabl(machine_config &config);
 
+protected:
 	DECLARE_WRITE8_MEMBER(tourtabl_led_w);
 	DECLARE_READ16_MEMBER(tourtabl_read_input_port);
 	DECLARE_READ8_MEMBER(tourtabl_get_databus_contents);
-	void tourtabl(machine_config &config);
 	void main_map(address_map &map);
+
+private:
+	required_device<cpu_device> m_maincpu;
 };
 
 

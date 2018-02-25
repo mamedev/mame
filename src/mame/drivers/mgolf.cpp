@@ -18,14 +18,42 @@ public:
 		TIMER_INTERRUPT
 	};
 
-	mgolf_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag),
+	mgolf_state(const machine_config &mconfig, device_type type, const char *tag) :
+		driver_device(mconfig, type, tag),
 		m_maincpu(*this, "maincpu"),
 		m_gfxdecode(*this, "gfxdecode"),
 		m_screen(*this, "screen"),
 		m_palette(*this, "palette"),
-		m_video_ram(*this, "video_ram") { }
+		m_video_ram(*this, "video_ram")
+	{ }
 
+	void mgolf(machine_config &config);
+
+protected:
+	DECLARE_WRITE8_MEMBER(vram_w);
+	DECLARE_READ8_MEMBER(wram_r);
+	DECLARE_READ8_MEMBER(dial_r);
+	DECLARE_READ8_MEMBER(misc_r);
+	DECLARE_WRITE8_MEMBER(wram_w);
+
+	TILE_GET_INFO_MEMBER(get_tile_info);
+
+	DECLARE_PALETTE_INIT(mgolf);
+
+	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+
+	TIMER_CALLBACK_MEMBER(interrupt_callback);
+
+	void update_plunger();
+	double calc_plunger_pos();
+
+	virtual void machine_start() override;
+	virtual void machine_reset() override;
+	virtual void video_start() override;
+	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr) override;
+	void cpu_map(address_map &map);
+
+private:
 	/* devices */
 	required_device<cpu_device> m_maincpu;
 	required_device<gfxdecode_device> m_gfxdecode;
@@ -44,31 +72,6 @@ public:
 	attotime m_time_pushed;
 	attotime m_time_released;
 	emu_timer *m_interrupt_timer;
-
-	DECLARE_WRITE8_MEMBER(vram_w);
-	DECLARE_READ8_MEMBER(wram_r);
-	DECLARE_READ8_MEMBER(dial_r);
-	DECLARE_READ8_MEMBER(misc_r);
-	DECLARE_WRITE8_MEMBER(wram_w);
-
-	TILE_GET_INFO_MEMBER(get_tile_info);
-
-	virtual void machine_start() override;
-	virtual void machine_reset() override;
-	virtual void video_start() override;
-	DECLARE_PALETTE_INIT(mgolf);
-
-	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
-
-	TIMER_CALLBACK_MEMBER(interrupt_callback);
-
-	void update_plunger(  );
-	double calc_plunger_pos();
-
-	void mgolf(machine_config &config);
-	void cpu_map(address_map &map);
-protected:
-	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr) override;
 };
 
 

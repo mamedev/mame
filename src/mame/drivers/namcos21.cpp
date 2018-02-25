@@ -1873,12 +1873,12 @@ TIMER_DEVICE_CALLBACK_MEMBER(namcos21_state::screen_scanline)
 
 MACHINE_CONFIG_START(namcos21_state::configure_c148_standard)
 	MCFG_NAMCO_C148_ADD("master_intc","maincpu",true)
-	namco_c148_device::link_c148_device(*device,"slave_intc");
+	MCFG_NAMCO_C148_LINK("slave_intc")
 	MCFG_NAMCO_C148_EXT1_CB(WRITE8(namcos21_state, sound_reset_w))
 	MCFG_NAMCO_C148_EXT2_CB(WRITE8(namcos21_state, system_reset_w))
 
 	MCFG_NAMCO_C148_ADD("slave_intc","slave",false)
-	namco_c148_device::link_c148_device(*device,"master_intc");
+	MCFG_NAMCO_C148_LINK("master_intc")
 
 MACHINE_CONFIG_END
 
@@ -1927,7 +1927,7 @@ MACHINE_CONFIG_START(namcos21_state::namcos21)
 	MCFG_SCREEN_UPDATE_DRIVER(namcos21_state, screen_update_namcos21)
 	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_FRAGMENT_ADD(configure_c148_standard)
+	configure_c148_standard(config);
 	MCFG_NAMCO_C139_ADD("sci")
 
 	MCFG_GFXDECODE_ADD("gfxdecode", "palette", namcos21)
@@ -1983,7 +1983,7 @@ MACHINE_CONFIG_START(namcos21_state::driveyes)
 
 	MCFG_DEVICE_ADD("gearbox", NAMCOIO_GEARBOX, 0)
 
-	MCFG_FRAGMENT_ADD(configure_c148_standard)
+	configure_c148_standard(config);
 	MCFG_NAMCO_C139_ADD("sci")
 
 	MCFG_SCREEN_ADD("screen", RASTER)
@@ -2038,7 +2038,7 @@ MACHINE_CONFIG_START(namcos21_state::winrun)
 	MCFG_CPU_ADD("gpu", M68000,12288000) /* graphics coprocessor */
 	MCFG_CPU_PROGRAM_MAP(winrun_gpu_map)
 
-	MCFG_FRAGMENT_ADD(configure_c148_standard)
+	configure_c148_standard(config);
 	MCFG_NAMCO_C148_ADD("gpu_intc","gpu",false)
 	MCFG_NAMCO_C139_ADD("sci")
 

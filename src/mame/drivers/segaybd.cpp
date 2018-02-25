@@ -1382,7 +1382,8 @@ MACHINE_CONFIG_END
 
 
 // irq at 0x28 is from MB8421, and irq at 0x38 probably from MB89372?
-MACHINE_CONFIG_DERIVED(segaybd_state::yboard_link, yboard)
+MACHINE_CONFIG_START(segaybd_state::yboard_link)
+	yboard(config);
 
 	// basic machine hardware
 	MCFG_CPU_MODIFY("maincpu")
@@ -1397,7 +1398,8 @@ MACHINE_CONFIG_DERIVED(segaybd_state::yboard_link, yboard)
 	MCFG_MB8421_INTR_HANDLER(WRITELINE(segaybd_state, mb8421_intr))
 MACHINE_CONFIG_END
 
-MACHINE_CONFIG_DERIVED(segaybd_state::yboard_deluxe, yboard)
+MACHINE_CONFIG_START(segaybd_state::yboard_deluxe)
+	yboard(config);
 
 	// basic machine hardware
 	MCFG_CPU_ADD("motorcpu", Z80, XTAL(16'000'000)/2 ) // 8 Mhz(guessed)
