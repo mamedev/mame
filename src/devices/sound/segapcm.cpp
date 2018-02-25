@@ -6,6 +6,7 @@
 
 #include "emu.h"
 #include "segapcm.h"
+#include <algorithm>
 
 
 // device type definition
@@ -21,9 +22,6 @@ segapcm_device::segapcm_device(const machine_config &mconfig, const char *tag, d
 		device_sound_interface(mconfig, *this),
 		device_rom_interface(mconfig, *this, 21),
 		m_ram(nullptr),
-		m_bank(0),
-		m_bankshift(0),
-		m_bankmask(0),
 		m_stream(nullptr)
 {
 }
@@ -35,25 +33,36 @@ segapcm_device::segapcm_device(const machine_config &mconfig, const char *tag, d
 
 void segapcm_device::device_start()
 {
-	int mask;
-
-	m_ram = std::make_unique<uint8_t[]>(0x800);
-
-	memset(m_ram.get(), 0xff, 0x800);
-
-	m_bankshift = (uint8_t) m_bank;
-	mask = m_bank >> 16;
-	if (!mask)
-		mask = BANK_MASK7 >> 16;
-
-	m_bankmask = mask & (0x1fffff >> m_bankshift);
-
 	m_stream = stream_alloc(0, 2, clock() / 128);
+	
+	m_ram = std::make_unique<uint8_t[]>(0x800);
+	
+	std::fill(&m_ram[0], &m_ram[0x800], 0xff);
 
 	save_item(NAME(m_low));
 	save_pointer(NAME(m_ram.get()), 0x800);
 }
 
+
+//-------------------------------------------------
+//  device_post_load - device-specific post-load
+//-------------------------------------------------
+
+void segapcm_device::device_post_load()
+{
+	device_clock_changed();
+}
+
+
+//-------------------------------------------------
+//  device_clock_changed - called if the clock
+//  changes
+//-------------------------------------------------
+
+void segapcm_device::device_clock_changed()
+{
+	m_stream->set_sample_rate(clock() / 128);
+}
 
 
 //-------------------------------------------------
@@ -94,18 +103,18 @@ void segapcm_device::sound_stream_update(sound_stream &stream, stream_sample_t *
 	// 0x85     current address (16-23)
 	// 0x86     bit 0: channel disable?
 	//          bit 1: loop disable
-	//          other bits: bank
+	//          bit 3-7: bank
 	// 0x87     ?
 
 	/* loop over channels */
 	for (int ch = 0; ch < 16; ch++)
 	{
-		uint8_t *regs = m_ram.get()+8*ch;
+		uint8_t *regs = &m_ram[8*ch];
 
 		/* only process active channels */
 		if (!(regs[0x86]&1))
 		{
-			int offset = (regs[0x86] & m_bankmask) << m_bankshift;
+			int offset = (regs[0x86] & 0xf8) << 13;
 			uint32_t addr = (regs[0x85] << 16) | (regs[0x84] << 8) | m_low[ch];
 			uint32_t loop = (regs[0x05] << 16) | (regs[0x04] << 8);
 			uint8_t end = regs[6] + 1;

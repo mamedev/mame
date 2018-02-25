@@ -129,6 +129,11 @@ public:
 	template<int Chip> DECLARE_WRITE8_MEMBER(okim6295_bank_w);
 	template<int Chip> DECLARE_WRITE8_MEMBER(okim6295_nmk112_bank_w);
 
+	void segapcm_bank_w(uint32_t bank){
+			m_segapcm_bankshift = bank & 0xff;
+			m_segapcm_bankmask = bank >> 16;
+	}
+
 private:
 	struct rom_block {
 		offs_t start_address;
@@ -162,6 +167,9 @@ private:
 	uint32_t m_okim6295_nmk112_enable[2];
 	uint32_t m_okim6295_bank[2];
 	uint32_t m_okim6295_nmk112_bank[2][4];
+
+	uint32_t m_segapcm_bankmask;
+	uint32_t m_segapcm_bankshift;
 
 	uint8_t rom_r(int chip, uint8_t type, offs_t offset);
 	uint32_t handle_data_block(uint32_t address);
@@ -206,6 +214,7 @@ public:
 
 private:
 	std::vector<uint8_t> m_file_data;
+	required_device<vgmplay_device> m_vgmplay;
 	required_device<bitbanger_device> m_file;
 	required_device<ym2612_device>  m_ym2612;
 	required_device<ym2151_device>  m_ym2151;
@@ -987,6 +996,10 @@ uint8_t vgmplay_device::rom_r(int chip, uint8_t type, offs_t offset)
 
 READ8_MEMBER(vgmplay_device::segapcm_rom_r)
 {
+	if (m_segapcm_bankshift)
+	{
+		offset = (((offset >> 13) & m_segapcm_bankmask) << m_segapcm_bankshift) + (offset & 0xffff);
+	}
 	return rom_r(0, 0x80, offset);
 }
 
@@ -1072,6 +1085,7 @@ READ8_MEMBER(vgmplay_device::c352_rom_r)
 
 vgmplay_state::vgmplay_state(const machine_config &mconfig, device_type type, const char *tag)
 	: driver_device(mconfig, type, tag)
+	, m_vgmplay(*this, "vgmplay")
 	, m_file(*this, "file")
 	, m_ym2612(*this, "ym2612")
 	, m_ym2151(*this, "ym2151")
@@ -1193,9 +1207,15 @@ void vgmplay_state::machine_start()
 			m_ym2612->set_unscaled_clock(r32(0x2c));
 		if(version >= 0x110 && r32(0x30))
 			m_ym2151->set_unscaled_clock(r32(0x30));
-
+			
 		if(version >= 0x151 && r32(0x38))
 			m_segapcm->set_unscaled_clock(r32(0x38));
+
+		if(version >= 0x151 && r32(0x3c))
+		{
+			uint32_t bank = r32(0x3c);
+			m_vgmplay->segapcm_bank_w(bank);
+		}
 
 		if (data_start > 0x40)
 		{
@@ -1620,7 +1640,6 @@ MACHINE_CONFIG_START(vgmplay_state::vgmplay)
 	MCFG_SOUND_ROUTE(0, "rspeaker", 0.5)
 
 	MCFG_SOUND_ADD("segapcm", SEGAPCM, 4000000)
-	MCFG_SEGAPCM_BANK(BANK_512) // Should be configurable for yboard...
 	MCFG_DEVICE_ADDRESS_MAP(0, segapcm_map)
 	MCFG_SOUND_ROUTE(0, "lspeaker", 1)
 	MCFG_SOUND_ROUTE(1, "rspeaker", 1)

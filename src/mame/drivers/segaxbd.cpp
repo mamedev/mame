@@ -316,7 +316,6 @@ segaxbd_state::segaxbd_state(const machine_config &mconfig, device_type type, co
 	palette_init();
 }
 
-
 void segaxbd_state::device_start()
 {
 	if(!m_segaic16road->started())
@@ -1012,7 +1011,6 @@ ADDRESS_MAP_START(segaxbd_state::sub_map)
 ADDRESS_MAP_END
 
 
-
 //**************************************************************************
 //  Z80 SOUND CPU ADDRESS MAPS
 //**************************************************************************
@@ -1030,7 +1028,6 @@ ADDRESS_MAP_START(segaxbd_state::sound_portmap)
 	AM_RANGE(0x00, 0x01) AM_MIRROR(0x3e) AM_DEVREADWRITE("ymsnd", ym2151_device, read, write)
 	AM_RANGE(0x40, 0x40) AM_MIRROR(0x3f) AM_READ(sound_data_r)
 ADDRESS_MAP_END
-
 
 
 //**************************************************************************
@@ -1052,7 +1049,6 @@ ADDRESS_MAP_START(segaxbd_state::smgp_sound2_portmap)
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	AM_RANGE(0x40, 0x40) AM_MIRROR(0x3f) AM_READ(sound_data_r)
 ADDRESS_MAP_END
-
 
 
 //**************************************************************************
@@ -1757,7 +1753,6 @@ MACHINE_CONFIG_START(segaxbd_state::xboard_base_mconfig )
 	MCFG_SOUND_ROUTE(1, "rspeaker", 0.43)
 
 	MCFG_SEGAPCM_ADD("pcm", SOUND_CLOCK/4)
-	MCFG_SEGAPCM_BANK(BANK_512)
 	MCFG_SOUND_ROUTE(0, "lspeaker", 1.0)
 	MCFG_SOUND_ROUTE(1, "rspeaker", 1.0)
 MACHINE_CONFIG_END
@@ -1937,10 +1932,14 @@ MACHINE_CONFIG_START(segaxbd_smgp_fd1094_state::device_add_mconfig)
 	MCFG_SPEAKER_STANDARD_STEREO("rearleft", "rearright")
 
 	MCFG_SEGAPCM_ADD("pcm2", SOUND_CLOCK/4)
-	MCFG_SEGAPCM_BANK(BANK_512)
 	MCFG_SOUND_ROUTE(0, "rearleft", 1.0)
 	MCFG_SOUND_ROUTE(1, "rearright", 1.0)
 MACHINE_CONFIG_END
+
+void segaxbd_smgp_fd1094_state::device_start()
+{
+	segaxbd_state::device_start();
+}
 
 MACHINE_CONFIG_START(segaxbd_new_state::sega_smgp_fd1094)
 	MCFG_DEVICE_ADD("mainpcb", SEGA_XBD_SMGP_FD1094, 0)
@@ -1978,10 +1977,14 @@ MACHINE_CONFIG_START(segaxbd_smgp_state::device_add_mconfig)
 	MCFG_SPEAKER_STANDARD_STEREO("rearleft", "rearright")
 
 	MCFG_SEGAPCM_ADD("pcm2", SOUND_CLOCK/4)
-	MCFG_SEGAPCM_BANK(BANK_512)
 	MCFG_SOUND_ROUTE(0, "rearleft", 1.0)
 	MCFG_SOUND_ROUTE(1, "rearright", 1.0)
 MACHINE_CONFIG_END
+
+void segaxbd_smgp_state::device_start()
+{
+	segaxbd_state::device_start();
+}
 
 MACHINE_CONFIG_START(segaxbd_new_state::sega_smgp)
 	MCFG_DEVICE_ADD("mainpcb", SEGA_XBD_SMGP, 0)
@@ -2013,6 +2016,14 @@ MACHINE_CONFIG_END
 //  ROM DEFINITIONS
 //**************************************************************************
 
+
+#define SEGAPCM_LOAD_64K(name,offset,checksum)\
+ROM_LOAD( name,     offset, 0x10000, checksum)\
+ROM_RELOAD( offset+0x10000, 0x10000)
+
+#define SEGAPCM_LOAD_128K(name,offset,checksum)\
+ROM_LOAD( name,     offset, 0x10000, checksum)\
+ROM_CONTINUE( offset+0x20000, 0x10000)
 
 //*************************************************************************************************************************
 //*************************************************************************************************************************
@@ -2083,10 +2094,10 @@ ROM_START( aburner )
 	ROM_REGION( 0x10000, "mainpcb:soundcpu", 0 ) // sound CPU
 	ROM_LOAD( "epr-10923.17", 0x00000, 0x10000, CRC(6888eb8f) SHA1(8f8fffb214842a5d356e33f5a97099bc6407384f) )
 
-	ROM_REGION( 0x80000, "mainpcb:pcm", ROMREGION_ERASEFF ) // Sega PCM sound data
-	ROM_LOAD( "mpr-10931.11", 0x00000, 0x20000, CRC(9209068f) SHA1(01f3dda1c066d00080c55f2c86c506b6b2407f98) )
-	ROM_LOAD( "mpr-10930.12", 0x20000, 0x20000, CRC(6493368b) SHA1(328aff19ff1d1344e9115f519d3962390c4e5ba4) )
-	ROM_LOAD( "epr-10929.13", 0x40000, 0x20000, CRC(6c07c78d) SHA1(3868b1824f43e4f2b4fbcd9274bfb3000c889d12) )
+	ROM_REGION( 0x100000, "mainpcb:pcm", ROMREGION_ERASEFF ) // Sega PCM sound data
+	SEGAPCM_LOAD_128K( "mpr-10931.11", 0x00000, CRC(9209068f) SHA1(01f3dda1c066d00080c55f2c86c506b6b2407f98) )
+	SEGAPCM_LOAD_128K( "mpr-10930.12", 0x40000, CRC(6493368b) SHA1(328aff19ff1d1344e9115f519d3962390c4e5ba4) )
+	SEGAPCM_LOAD_128K( "epr-10929.13", 0x80000, CRC(6c07c78d) SHA1(3868b1824f43e4f2b4fbcd9274bfb3000c889d12) )
 ROM_END
 
 
@@ -2134,10 +2145,10 @@ ROM_START( aburner2 )
 	ROM_REGION( 0x10000, "mainpcb:soundcpu", 0 ) // sound CPU
 	ROM_LOAD( "epr-11112.17",    0x00000, 0x10000, CRC(d777fc6d) SHA1(46ce1c3875437044c0a172960d560d6acd6eaa92) )
 
-	ROM_REGION( 0x80000, "mainpcb:pcm", ROMREGION_ERASEFF ) // Sega PCM sound data
-	ROM_LOAD( "mpr-10931.11", 0x00000, 0x20000, CRC(9209068f) SHA1(01f3dda1c066d00080c55f2c86c506b6b2407f98) )
-	ROM_LOAD( "mpr-10930.12", 0x20000, 0x20000, CRC(6493368b) SHA1(328aff19ff1d1344e9115f519d3962390c4e5ba4) )
-	ROM_LOAD( "epr-11102.13", 0x40000, 0x20000, CRC(6c07c78d) SHA1(3868b1824f43e4f2b4fbcd9274bfb3000c889d12) )
+	ROM_REGION( 0x100000, "mainpcb:pcm", ROMREGION_ERASEFF ) // Sega PCM sound data
+	SEGAPCM_LOAD_128K( "mpr-10931.11", 0x00000, CRC(9209068f) SHA1(01f3dda1c066d00080c55f2c86c506b6b2407f98) )
+	SEGAPCM_LOAD_128K( "mpr-10930.12", 0x40000, CRC(6493368b) SHA1(328aff19ff1d1344e9115f519d3962390c4e5ba4) )
+	SEGAPCM_LOAD_128K( "epr-10929.13", 0x80000, CRC(6c07c78d) SHA1(3868b1824f43e4f2b4fbcd9274bfb3000c889d12) )
 ROM_END
 
 //*************************************************************************************************************************
@@ -2183,10 +2194,10 @@ ROM_START( aburner2g )
 	ROM_REGION( 0x10000, "mainpcb:soundcpu", 0 ) // sound CPU
 	ROM_LOAD( "epr-11112.17",    0x00000, 0x10000, CRC(d777fc6d) SHA1(46ce1c3875437044c0a172960d560d6acd6eaa92) )
 
-	ROM_REGION( 0x80000, "mainpcb:pcm", ROMREGION_ERASEFF ) // Sega PCM sound data
-	ROM_LOAD( "mpr-10931.11", 0x00000, 0x20000, CRC(9209068f) SHA1(01f3dda1c066d00080c55f2c86c506b6b2407f98) ) // There is known to exist German Sample roms
-	ROM_LOAD( "mpr-10930.12", 0x20000, 0x20000, CRC(6493368b) SHA1(328aff19ff1d1344e9115f519d3962390c4e5ba4) )
-	ROM_LOAD( "epr-10929.13", 0x40000, 0x20000, CRC(6c07c78d) SHA1(3868b1824f43e4f2b4fbcd9274bfb3000c889d12) )
+	ROM_REGION( 0x100000, "mainpcb:pcm", ROMREGION_ERASEFF ) // Sega PCM sound data
+	SEGAPCM_LOAD_128K( "mpr-10931.11", 0x00000, CRC(9209068f) SHA1(01f3dda1c066d00080c55f2c86c506b6b2407f98) ) // There is known to exist German Sample roms
+	SEGAPCM_LOAD_128K( "mpr-10930.12", 0x40000, CRC(6493368b) SHA1(328aff19ff1d1344e9115f519d3962390c4e5ba4) )
+	SEGAPCM_LOAD_128K( "epr-10929.13", 0x80000, CRC(6c07c78d) SHA1(3868b1824f43e4f2b4fbcd9274bfb3000c889d12) )
 ROM_END
 
 
@@ -2250,10 +2261,10 @@ ROM_START( loffire )
 	ROM_REGION( 0x10000, "mainpcb:soundcpu", 0 ) // sound CPU
 	ROM_LOAD( "epr-12798.17", 0x00000, 0x10000, CRC(0587738d) SHA1(24c79b0c73616d5532a49a2c9121dfabe3a80c7d) )
 
-	ROM_REGION( 0x80000, "mainpcb:pcm", ROMREGION_ERASEFF ) // Sega PCM sound data
-	ROM_LOAD( "epr-12799.11", 0x00000, 0x20000, CRC(bc60181c) SHA1(3c89161348db7cafb5636ab4eaba91fbd3541f90) )
-	ROM_LOAD( "epr-12800.12", 0x20000, 0x20000, CRC(1158c1a3) SHA1(e1d664a203eed5a0130b39ced7bea8328f06f107) )
-	ROM_LOAD( "epr-12801.13", 0x40000, 0x20000, CRC(2d6567c4) SHA1(542be9d8e91cf2df18d95f4e259cfda0560697cb) )
+	ROM_REGION( 0x100000, "mainpcb:pcm", ROMREGION_ERASEFF ) // Sega PCM sound data
+	SEGAPCM_LOAD_128K( "epr-12799.11", 0x00000, CRC(bc60181c) SHA1(3c89161348db7cafb5636ab4eaba91fbd3541f90) )
+	SEGAPCM_LOAD_128K( "epr-12800.12", 0x40000, CRC(1158c1a3) SHA1(e1d664a203eed5a0130b39ced7bea8328f06f107) )
+	SEGAPCM_LOAD_128K( "epr-12801.13", 0x80000, CRC(2d6567c4) SHA1(542be9d8e91cf2df18d95f4e259cfda0560697cb) )
 ROM_END
 
 ROM_START( loffired )
@@ -2296,10 +2307,10 @@ ROM_START( loffired )
 	ROM_REGION( 0x10000, "mainpcb:soundcpu", 0 ) // sound CPU
 	ROM_LOAD( "epr-12798.17", 0x00000, 0x10000, CRC(0587738d) SHA1(24c79b0c73616d5532a49a2c9121dfabe3a80c7d) )
 
-	ROM_REGION( 0x80000, "mainpcb:pcm", ROMREGION_ERASEFF ) // Sega PCM sound data
-	ROM_LOAD( "epr-12799.11", 0x00000, 0x20000, CRC(bc60181c) SHA1(3c89161348db7cafb5636ab4eaba91fbd3541f90) )
-	ROM_LOAD( "epr-12800.12", 0x20000, 0x20000, CRC(1158c1a3) SHA1(e1d664a203eed5a0130b39ced7bea8328f06f107) )
-	ROM_LOAD( "epr-12801.13", 0x40000, 0x20000, CRC(2d6567c4) SHA1(542be9d8e91cf2df18d95f4e259cfda0560697cb) )
+	ROM_REGION( 0x100000, "mainpcb:pcm", ROMREGION_ERASEFF ) // Sega PCM sound data
+	SEGAPCM_LOAD_128K( "epr-12799.11", 0x00000, CRC(bc60181c) SHA1(3c89161348db7cafb5636ab4eaba91fbd3541f90) )
+	SEGAPCM_LOAD_128K( "epr-12800.12", 0x40000, CRC(1158c1a3) SHA1(e1d664a203eed5a0130b39ced7bea8328f06f107) )
+	SEGAPCM_LOAD_128K( "epr-12801.13", 0x80000, CRC(2d6567c4) SHA1(542be9d8e91cf2df18d95f4e259cfda0560697cb) )
 ROM_END
 
 //*************************************************************************************************************************
@@ -2350,10 +2361,10 @@ ROM_START( loffireu )
 	ROM_REGION( 0x10000, "mainpcb:soundcpu", 0 ) // sound CPU
 	ROM_LOAD( "epr-12798.17", 0x00000, 0x10000, CRC(0587738d) SHA1(24c79b0c73616d5532a49a2c9121dfabe3a80c7d) )
 
-	ROM_REGION( 0x80000, "mainpcb:pcm", ROMREGION_ERASEFF ) // Sega PCM sound data
-	ROM_LOAD( "epr-12799.11", 0x00000, 0x20000, CRC(bc60181c) SHA1(3c89161348db7cafb5636ab4eaba91fbd3541f90) )
-	ROM_LOAD( "epr-12800.12", 0x20000, 0x20000, CRC(1158c1a3) SHA1(e1d664a203eed5a0130b39ced7bea8328f06f107) )
-	ROM_LOAD( "epr-12801.13", 0x40000, 0x20000, CRC(2d6567c4) SHA1(542be9d8e91cf2df18d95f4e259cfda0560697cb) )
+	ROM_REGION( 0x100000, "mainpcb:pcm", ROMREGION_ERASEFF ) // Sega PCM sound data
+	SEGAPCM_LOAD_128K( "epr-12799.11", 0x00000, CRC(bc60181c) SHA1(3c89161348db7cafb5636ab4eaba91fbd3541f90) )
+	SEGAPCM_LOAD_128K( "epr-12800.12", 0x40000, CRC(1158c1a3) SHA1(e1d664a203eed5a0130b39ced7bea8328f06f107) )
+	SEGAPCM_LOAD_128K( "epr-12801.13", 0x80000, CRC(2d6567c4) SHA1(542be9d8e91cf2df18d95f4e259cfda0560697cb) )
 ROM_END
 
 ROM_START( loffireud )
@@ -2396,10 +2407,10 @@ ROM_START( loffireud )
 	ROM_REGION( 0x10000, "mainpcb:soundcpu", 0 ) // sound CPU
 	ROM_LOAD( "epr-12798.17", 0x00000, 0x10000, CRC(0587738d) SHA1(24c79b0c73616d5532a49a2c9121dfabe3a80c7d) )
 
-	ROM_REGION( 0x80000, "mainpcb:pcm", ROMREGION_ERASEFF ) // Sega PCM sound data
-	ROM_LOAD( "epr-12799.11", 0x00000, 0x20000, CRC(bc60181c) SHA1(3c89161348db7cafb5636ab4eaba91fbd3541f90) )
-	ROM_LOAD( "epr-12800.12", 0x20000, 0x20000, CRC(1158c1a3) SHA1(e1d664a203eed5a0130b39ced7bea8328f06f107) )
-	ROM_LOAD( "epr-12801.13", 0x40000, 0x20000, CRC(2d6567c4) SHA1(542be9d8e91cf2df18d95f4e259cfda0560697cb) )
+	ROM_REGION( 0x100000, "mainpcb:pcm", ROMREGION_ERASEFF ) // Sega PCM sound data
+	SEGAPCM_LOAD_128K( "epr-12799.11", 0x00000, CRC(bc60181c) SHA1(3c89161348db7cafb5636ab4eaba91fbd3541f90) )
+	SEGAPCM_LOAD_128K( "epr-12800.12", 0x40000, CRC(1158c1a3) SHA1(e1d664a203eed5a0130b39ced7bea8328f06f107) )
+	SEGAPCM_LOAD_128K( "epr-12801.13", 0x80000, CRC(2d6567c4) SHA1(542be9d8e91cf2df18d95f4e259cfda0560697cb) )
 ROM_END
 
 //*************************************************************************************************************************
@@ -2453,10 +2464,10 @@ ROM_START( loffirej )
 	ROM_REGION( 0x10000, "mainpcb:soundcpu", 0 ) // sound CPU
 	ROM_LOAD( "epr-12798.17", 0x00000, 0x10000, CRC(0587738d) SHA1(24c79b0c73616d5532a49a2c9121dfabe3a80c7d) )
 
-	ROM_REGION( 0x80000, "mainpcb:pcm", ROMREGION_ERASEFF ) // Sega PCM sound data
-	ROM_LOAD( "epr-12799.11", 0x00000, 0x20000, CRC(bc60181c) SHA1(3c89161348db7cafb5636ab4eaba91fbd3541f90) )
-	ROM_LOAD( "epr-12800.12", 0x20000, 0x20000, CRC(1158c1a3) SHA1(e1d664a203eed5a0130b39ced7bea8328f06f107) )
-	ROM_LOAD( "epr-12801.13", 0x40000, 0x20000, CRC(2d6567c4) SHA1(542be9d8e91cf2df18d95f4e259cfda0560697cb) )
+	ROM_REGION( 0x100000, "mainpcb:pcm", ROMREGION_ERASEFF ) // Sega PCM sound data
+	SEGAPCM_LOAD_128K( "epr-12799.11", 0x00000, CRC(bc60181c) SHA1(3c89161348db7cafb5636ab4eaba91fbd3541f90) )
+	SEGAPCM_LOAD_128K( "epr-12800.12", 0x40000, CRC(1158c1a3) SHA1(e1d664a203eed5a0130b39ced7bea8328f06f107) )
+	SEGAPCM_LOAD_128K( "epr-12801.13", 0x80000, CRC(2d6567c4) SHA1(542be9d8e91cf2df18d95f4e259cfda0560697cb) )
 ROM_END
 
 ROM_START( loffirejd )
@@ -2499,10 +2510,10 @@ ROM_START( loffirejd )
 	ROM_REGION( 0x10000, "mainpcb:soundcpu", 0 ) // sound CPU
 	ROM_LOAD( "epr-12798.17", 0x00000, 0x10000, CRC(0587738d) SHA1(24c79b0c73616d5532a49a2c9121dfabe3a80c7d) )
 
-	ROM_REGION( 0x80000, "mainpcb:pcm", ROMREGION_ERASEFF ) // Sega PCM sound data
-	ROM_LOAD( "epr-12799.11", 0x00000, 0x20000, CRC(bc60181c) SHA1(3c89161348db7cafb5636ab4eaba91fbd3541f90) )
-	ROM_LOAD( "epr-12800.12", 0x20000, 0x20000, CRC(1158c1a3) SHA1(e1d664a203eed5a0130b39ced7bea8328f06f107) )
-	ROM_LOAD( "epr-12801.13", 0x40000, 0x20000, CRC(2d6567c4) SHA1(542be9d8e91cf2df18d95f4e259cfda0560697cb) )
+	ROM_REGION( 0x100000, "mainpcb:pcm", ROMREGION_ERASEFF ) // Sega PCM sound data
+	SEGAPCM_LOAD_128K( "epr-12799.11", 0x00000, CRC(bc60181c) SHA1(3c89161348db7cafb5636ab4eaba91fbd3541f90) )
+	SEGAPCM_LOAD_128K( "epr-12800.12", 0x40000, CRC(1158c1a3) SHA1(e1d664a203eed5a0130b39ced7bea8328f06f107) )
+	SEGAPCM_LOAD_128K( "epr-12801.13", 0x80000, CRC(2d6567c4) SHA1(542be9d8e91cf2df18d95f4e259cfda0560697cb) )
 ROM_END
 
 //*************************************************************************************************************************
@@ -2558,10 +2569,10 @@ ROM_START( thndrbld )
 	ROM_REGION( 0x10000, "mainpcb:soundcpu", 0 ) // sound CPU
 	ROM_LOAD( "epr-11396.ic17", 0x00000, 0x10000, CRC(d37b54a4) SHA1(c230fe7241a1f13ca13506d1492f348f506c40a7) )
 
-	ROM_REGION( 0x80000, "mainpcb:pcm", ROMREGION_ERASEFF ) // Sega PCM sound data
-	ROM_LOAD( "epr-11317.ic11", 0x00000, 0x20000, CRC(d4e7ac1f) SHA1(ec5d6e4949938adf56e5613801ae56ff2c3dede5) )
-	ROM_LOAD( "epr-11318.ic12", 0x20000, 0x20000, CRC(70d3f02c) SHA1(391aac2bc5673e06150de27e19c7c6359da8ca82) )
-	ROM_LOAD( "epr-11319.ic13", 0x40000, 0x20000, CRC(50d9242e) SHA1(a106371bf680c3088ec61f07fc5c4ce467973c15) )
+	ROM_REGION( 0x100000, "mainpcb:pcm", ROMREGION_ERASEFF ) // Sega PCM sound data
+	SEGAPCM_LOAD_128K( "epr-11317.ic11", 0x00000, CRC(d4e7ac1f) SHA1(ec5d6e4949938adf56e5613801ae56ff2c3dede5) )
+	SEGAPCM_LOAD_128K( "epr-11318.ic12", 0x40000, CRC(70d3f02c) SHA1(391aac2bc5673e06150de27e19c7c6359da8ca82) )
+	SEGAPCM_LOAD_128K( "epr-11319.ic13", 0x80000, CRC(50d9242e) SHA1(a106371bf680c3088ec61f07fc5c4ce467973c15) )
 ROM_END
 
 ROM_START( thndrbldd )
@@ -2606,10 +2617,10 @@ ROM_START( thndrbldd )
 	ROM_REGION( 0x10000, "mainpcb:soundcpu", 0 ) // sound CPU
 	ROM_LOAD( "epr-11396.ic17", 0x00000, 0x10000, CRC(d37b54a4) SHA1(c230fe7241a1f13ca13506d1492f348f506c40a7) )
 
-	ROM_REGION( 0x80000, "mainpcb:pcm", ROMREGION_ERASEFF ) // Sega PCM sound data
-	ROM_LOAD( "epr-11317.ic11", 0x00000, 0x20000, CRC(d4e7ac1f) SHA1(ec5d6e4949938adf56e5613801ae56ff2c3dede5) )
-	ROM_LOAD( "epr-11318.ic12", 0x20000, 0x20000, CRC(70d3f02c) SHA1(391aac2bc5673e06150de27e19c7c6359da8ca82) )
-	ROM_LOAD( "epr-11319.ic13", 0x40000, 0x20000, CRC(50d9242e) SHA1(a106371bf680c3088ec61f07fc5c4ce467973c15) )
+	ROM_REGION( 0x100000, "mainpcb:pcm", ROMREGION_ERASEFF ) // Sega PCM sound data
+	SEGAPCM_LOAD_128K( "epr-11317.ic11", 0x00000, CRC(d4e7ac1f) SHA1(ec5d6e4949938adf56e5613801ae56ff2c3dede5) )
+	SEGAPCM_LOAD_128K( "epr-11318.ic12", 0x40000, CRC(70d3f02c) SHA1(391aac2bc5673e06150de27e19c7c6359da8ca82) )
+	SEGAPCM_LOAD_128K( "epr-11319.ic13", 0x80000, CRC(50d9242e) SHA1(a106371bf680c3088ec61f07fc5c4ce467973c15) )
 ROM_END
 
 //*************************************************************************************************************************
@@ -2660,10 +2671,10 @@ ROM_START( thndrbld1 )
 	ROM_REGION( 0x10000, "mainpcb:soundcpu", 0 ) // sound CPU
 	ROM_LOAD( "epr-11312.ic17",   0x00000, 0x10000, CRC(3b974ed2) SHA1(cf18a2d0f01643c747a884bf00e5b7037ba2e64a) )
 
-	ROM_REGION( 0x80000, "mainpcb:pcm", ROMREGION_ERASEFF ) // Sega PCM sound data
-	ROM_LOAD( "epr-11317.ic11", 0x00000, 0x20000, CRC(d4e7ac1f) SHA1(ec5d6e4949938adf56e5613801ae56ff2c3dede5) )
-	ROM_LOAD( "epr-11318.ic12", 0x20000, 0x20000, CRC(70d3f02c) SHA1(391aac2bc5673e06150de27e19c7c6359da8ca82) )
-	ROM_LOAD( "epr-11319.ic13", 0x40000, 0x20000, CRC(50d9242e) SHA1(a106371bf680c3088ec61f07fc5c4ce467973c15) )
+	ROM_REGION( 0x100000, "mainpcb:pcm", ROMREGION_ERASEFF ) // Sega PCM sound data
+	SEGAPCM_LOAD_128K( "epr-11317.ic11", 0x00000, CRC(d4e7ac1f) SHA1(ec5d6e4949938adf56e5613801ae56ff2c3dede5) )
+	SEGAPCM_LOAD_128K( "epr-11318.ic12", 0x40000, CRC(70d3f02c) SHA1(391aac2bc5673e06150de27e19c7c6359da8ca82) )
+	SEGAPCM_LOAD_128K( "epr-11319.ic13", 0x80000, CRC(50d9242e) SHA1(a106371bf680c3088ec61f07fc5c4ce467973c15) )
 ROM_END
 
 
@@ -2718,10 +2729,10 @@ ROM_START( lastsurv )
 	ROM_REGION( 0x10000, "mainpcb:soundcpu", 0 ) // sound CPU
 	ROM_LOAD( "epr-12054.ic17", 0x00000, 0x10000, CRC(e9b39216) SHA1(142764b40b4db69ff08d28338d1b12b1dd1ed0a0) )
 
-	ROM_REGION( 0x80000, "mainpcb:pcm", ROMREGION_ERASEFF ) // Sega PCM sound data
-	ROM_LOAD( "epr-12058.ic11", 0x00000, 0x20000, CRC(4671cb46) SHA1(03ecaa4409a5b86a558313d4ccfb2334f79cff17) )
-	ROM_LOAD( "epr-12059.ic12", 0x20000, 0x20000, CRC(8c99aff4) SHA1(818418e4e92f601b09fcaa0979802a2c2c85b435) )
-	ROM_LOAD( "epr-12060.ic13", 0x40000, 0x20000, CRC(7ed382b3) SHA1(c87306d1b9edb8b4b97aee4af1317526750e2da2) )
+	ROM_REGION( 0x100000, "mainpcb:pcm", ROMREGION_ERASEFF ) // Sega PCM sound data
+	SEGAPCM_LOAD_128K( "epr-12058.ic11", 0x00000, CRC(4671cb46) SHA1(03ecaa4409a5b86a558313d4ccfb2334f79cff17) )
+	SEGAPCM_LOAD_128K( "epr-12059.ic12", 0x40000, CRC(8c99aff4) SHA1(818418e4e92f601b09fcaa0979802a2c2c85b435) )
+	SEGAPCM_LOAD_128K( "epr-12060.ic13", 0x80000, CRC(7ed382b3) SHA1(c87306d1b9edb8b4b97aee4af1317526750e2da2) )
 ROM_END
 
 ROM_START( lastsurvd )
@@ -2766,10 +2777,10 @@ ROM_START( lastsurvd )
 	ROM_REGION( 0x10000, "mainpcb:soundcpu", 0 ) // sound CPU
 	ROM_LOAD( "epr-12054.ic17", 0x00000, 0x10000, CRC(e9b39216) SHA1(142764b40b4db69ff08d28338d1b12b1dd1ed0a0) )
 
-	ROM_REGION( 0x80000, "mainpcb:pcm", ROMREGION_ERASEFF ) // Sega PCM sound data
-	ROM_LOAD( "epr-12058.ic11", 0x00000, 0x20000, CRC(4671cb46) SHA1(03ecaa4409a5b86a558313d4ccfb2334f79cff17) )
-	ROM_LOAD( "epr-12059.ic12", 0x20000, 0x20000, CRC(8c99aff4) SHA1(818418e4e92f601b09fcaa0979802a2c2c85b435) )
-	ROM_LOAD( "epr-12060.ic13", 0x40000, 0x20000, CRC(7ed382b3) SHA1(c87306d1b9edb8b4b97aee4af1317526750e2da2) )
+	ROM_REGION( 0x100000, "mainpcb:pcm", ROMREGION_ERASEFF ) // Sega PCM sound data
+	SEGAPCM_LOAD_128K( "epr-12058.ic11", 0x00000, CRC(4671cb46) SHA1(03ecaa4409a5b86a558313d4ccfb2334f79cff17) )
+	SEGAPCM_LOAD_128K( "epr-12059.ic12", 0x40000, CRC(8c99aff4) SHA1(818418e4e92f601b09fcaa0979802a2c2c85b435) )
+	SEGAPCM_LOAD_128K( "epr-12060.ic13", 0x80000, CRC(7ed382b3) SHA1(c87306d1b9edb8b4b97aee4af1317526750e2da2) )
 ROM_END
 
 //*************************************************************************************************************************
@@ -2821,10 +2832,10 @@ ROM_START( rachero )
 	ROM_REGION( 0x10000, "mainpcb:soundcpu", 0 ) // sound CPU
 	ROM_LOAD( "epr-12859.ic17",    0x00000, 0x10000, CRC(d57881da) SHA1(75b7f331ea8c2e33d6236e0c8fc8dabe5eef8160) )
 
-	ROM_REGION( 0x80000, "mainpcb:pcm", ROMREGION_ERASEFF ) // Sega PCM sound data
-	ROM_LOAD( "epr-12876.ic11",    0x00000, 0x20000, CRC(f72a34a0) SHA1(28f7d077c24352557da3a91a7e49b0c5b79f2a2e) )
-	ROM_LOAD( "epr-12877.ic12",    0x20000, 0x20000, CRC(18c1b6d2) SHA1(860cbb96999ab76c40ce96996bba70c42d845abc) )
-	ROM_LOAD( "epr-12878.ic13",    0x40000, 0x20000, CRC(7c212c15) SHA1(360b332d2fb32d88949ff8b357a863ffaaca39c2) )
+	ROM_REGION( 0x100000, "mainpcb:pcm", ROMREGION_ERASEFF ) // Sega PCM sound data
+	SEGAPCM_LOAD_128K( "epr-12876.ic11",    0x00000, CRC(f72a34a0) SHA1(28f7d077c24352557da3a91a7e49b0c5b79f2a2e) )
+	SEGAPCM_LOAD_128K( "epr-12877.ic12",    0x40000, CRC(18c1b6d2) SHA1(860cbb96999ab76c40ce96996bba70c42d845abc) )
+	SEGAPCM_LOAD_128K( "epr-12878.ic13",    0x80000, CRC(7c212c15) SHA1(360b332d2fb32d88949ff8b357a863ffaaca39c2) )
 ROM_END
 
 ROM_START( racherod )
@@ -2867,10 +2878,10 @@ ROM_START( racherod )
 	ROM_REGION( 0x10000, "mainpcb:soundcpu", 0 ) // sound CPU
 	ROM_LOAD( "epr-12859.ic17",    0x00000, 0x10000, CRC(d57881da) SHA1(75b7f331ea8c2e33d6236e0c8fc8dabe5eef8160) )
 
-	ROM_REGION( 0x80000, "mainpcb:pcm", ROMREGION_ERASEFF ) // Sega PCM sound data
-	ROM_LOAD( "epr-12876.ic11",    0x00000, 0x20000, CRC(f72a34a0) SHA1(28f7d077c24352557da3a91a7e49b0c5b79f2a2e) )
-	ROM_LOAD( "epr-12877.ic12",    0x20000, 0x20000, CRC(18c1b6d2) SHA1(860cbb96999ab76c40ce96996bba70c42d845abc) )
-	ROM_LOAD( "epr-12878.ic13",    0x40000, 0x20000, CRC(7c212c15) SHA1(360b332d2fb32d88949ff8b357a863ffaaca39c2) )
+	ROM_REGION( 0x100000, "mainpcb:pcm", ROMREGION_ERASEFF ) // Sega PCM sound data
+	SEGAPCM_LOAD_128K( "epr-12876.ic11",    0x00000, CRC(f72a34a0) SHA1(28f7d077c24352557da3a91a7e49b0c5b79f2a2e) )
+	SEGAPCM_LOAD_128K( "epr-12877.ic12",    0x40000, CRC(18c1b6d2) SHA1(860cbb96999ab76c40ce96996bba70c42d845abc) )
+	SEGAPCM_LOAD_128K( "epr-12878.ic13",    0x80000, CRC(7c212c15) SHA1(360b332d2fb32d88949ff8b357a863ffaaca39c2) )
 ROM_END
 
 //*************************************************************************************************************************
@@ -2962,18 +2973,18 @@ ROM_START( smgp )
 	ROM_REGION( 0x10000, "mainpcb:soundcpu", 0 ) // sound CPU
 	ROM_LOAD( "epr-12436.17",    0x00000, 0x10000, CRC(16ec5f0a) SHA1(307b7388b5c36fd4bc2a61f7941db44858e03c5c) )
 
-	ROM_REGION( 0x80000, "mainpcb:pcm", ROMREGION_ERASEFF ) // Sega PCM sound data
-	ROM_LOAD( "mpr-12437.11",    0x00000, 0x20000, CRC(a1c7e712) SHA1(fa7fa8c39690ae5dab8b28af5aeed5ffae2cd6de) )
-	ROM_LOAD( "mpr-12438.12",    0x20000, 0x20000, CRC(6573d46b) SHA1(c4a4a0ea35250eff28a5bfd5e9cd372f52fd1308) )
-	ROM_LOAD( "mpr-12439.13",    0x40000, 0x20000, CRC(13bf6de5) SHA1(92228a05ec33d606491a1da98c4989f69cddbb49) ) // not used in deluxe
+	ROM_REGION( 0x100000, "mainpcb:pcm", ROMREGION_ERASEFF ) // Sega PCM sound data
+	SEGAPCM_LOAD_128K( "mpr-12437.11",    0x00000, CRC(a1c7e712) SHA1(fa7fa8c39690ae5dab8b28af5aeed5ffae2cd6de) )
+	SEGAPCM_LOAD_128K( "mpr-12438.12",    0x40000, CRC(6573d46b) SHA1(c4a4a0ea35250eff28a5bfd5e9cd372f52fd1308) )
+	SEGAPCM_LOAD_128K( "mpr-12439.13",    0x80000, CRC(13bf6de5) SHA1(92228a05ec33d606491a1da98c4989f69cddbb49) ) // not used in deluxe
 
 	ROM_REGION( 0x10000, "mainpcb:soundcpu2", 0 ) // z80 on extra sound board
 	ROM_LOAD( "epr-12535.8",     0x00000, 0x10000, CRC(80453597) SHA1(d3fee7bb4a8964f5cf1cdae80fc3dde06c947839) ) // taken from deluxe cabinet dump
 
-	ROM_REGION( 0x80000, "mainpcb:pcm2", ROMREGION_ERASEFF ) // Sega PCM sound data on extra sound board (same as on main board..)
-	ROM_LOAD( "mpr-12437.20",    0x00000, 0x20000, CRC(a1c7e712) SHA1(fa7fa8c39690ae5dab8b28af5aeed5ffae2cd6de) ) // taken from deluxe cabinet dump
-	ROM_LOAD( "mpr-12438.21",    0x20000, 0x20000, CRC(6573d46b) SHA1(c4a4a0ea35250eff28a5bfd5e9cd372f52fd1308) ) // "
-	ROM_LOAD( "mpr-12439.22",    0x40000, 0x20000, CRC(13bf6de5) SHA1(92228a05ec33d606491a1da98c4989f69cddbb49) ) // "
+	ROM_REGION( 0x100000, "mainpcb:pcm2", ROMREGION_ERASEFF ) // Sega PCM sound data on extra sound board (same as on main board..)
+	SEGAPCM_LOAD_128K( "mpr-12437.20",    0x00000, CRC(a1c7e712) SHA1(fa7fa8c39690ae5dab8b28af5aeed5ffae2cd6de) ) // taken from deluxe cabinet dump
+	SEGAPCM_LOAD_128K( "mpr-12438.21",    0x40000, CRC(6573d46b) SHA1(c4a4a0ea35250eff28a5bfd5e9cd372f52fd1308) ) // "
+	SEGAPCM_LOAD_128K( "mpr-12439.22",    0x80000, CRC(13bf6de5) SHA1(92228a05ec33d606491a1da98c4989f69cddbb49) ) // "
 
 	ROM_REGION( 0x10000, "mainpcb:commcpu", 0 ) // z80 on network board
 	ROM_LOAD( "epr-12587.14",    0x00000, 0x08000, CRC(2afe648b) SHA1(b5bf86f3acbcc23c136185110acecf2c971294fa) )
@@ -3020,18 +3031,18 @@ ROM_START( smgpd )
 	ROM_REGION( 0x10000, "mainpcb:soundcpu", 0 ) // sound CPU
 	ROM_LOAD( "epr-12436.17",    0x00000, 0x10000, CRC(16ec5f0a) SHA1(307b7388b5c36fd4bc2a61f7941db44858e03c5c) )
 
-	ROM_REGION( 0x80000, "mainpcb:pcm", ROMREGION_ERASEFF ) // Sega PCM sound data
-	ROM_LOAD( "mpr-12437.11",    0x00000, 0x20000, CRC(a1c7e712) SHA1(fa7fa8c39690ae5dab8b28af5aeed5ffae2cd6de) )
-	ROM_LOAD( "mpr-12438.12",    0x20000, 0x20000, CRC(6573d46b) SHA1(c4a4a0ea35250eff28a5bfd5e9cd372f52fd1308) )
-	ROM_LOAD( "mpr-12439.13",    0x40000, 0x20000, CRC(13bf6de5) SHA1(92228a05ec33d606491a1da98c4989f69cddbb49) ) // not used in deluxe
+	ROM_REGION( 0x100000, "mainpcb:pcm", ROMREGION_ERASEFF ) // Sega PCM sound data
+	SEGAPCM_LOAD_128K( "mpr-12437.11",    0x00000, CRC(a1c7e712) SHA1(fa7fa8c39690ae5dab8b28af5aeed5ffae2cd6de) )
+	SEGAPCM_LOAD_128K( "mpr-12438.12",    0x40000, CRC(6573d46b) SHA1(c4a4a0ea35250eff28a5bfd5e9cd372f52fd1308) )
+	SEGAPCM_LOAD_128K( "mpr-12439.13",    0x80000, CRC(13bf6de5) SHA1(92228a05ec33d606491a1da98c4989f69cddbb49) ) // not used in deluxe
 
 	ROM_REGION( 0x10000, "mainpcb:soundcpu2", 0 ) // z80 on extra sound board
 	ROM_LOAD( "epr-12535.8",     0x00000, 0x10000, CRC(80453597) SHA1(d3fee7bb4a8964f5cf1cdae80fc3dde06c947839) ) // taken from deluxe cabinet dump
 
-	ROM_REGION( 0x80000, "mainpcb:pcm2", ROMREGION_ERASEFF ) // Sega PCM sound data on extra sound board (same as on main board..)
-	ROM_LOAD( "mpr-12437.20",    0x00000, 0x20000, CRC(a1c7e712) SHA1(fa7fa8c39690ae5dab8b28af5aeed5ffae2cd6de) ) // taken from deluxe cabinet dump
-	ROM_LOAD( "mpr-12438.21",    0x20000, 0x20000, CRC(6573d46b) SHA1(c4a4a0ea35250eff28a5bfd5e9cd372f52fd1308) ) // "
-	ROM_LOAD( "mpr-12439.22",    0x40000, 0x20000, CRC(13bf6de5) SHA1(92228a05ec33d606491a1da98c4989f69cddbb49) ) // "
+	ROM_REGION( 0x100000, "mainpcb:pcm2", ROMREGION_ERASEFF ) // Sega PCM sound data on extra sound board (same as on main board..)
+	SEGAPCM_LOAD_128K( "mpr-12437.20",    0x00000, CRC(a1c7e712) SHA1(fa7fa8c39690ae5dab8b28af5aeed5ffae2cd6de) ) // taken from deluxe cabinet dump
+	SEGAPCM_LOAD_128K( "mpr-12438.21",    0x40000, CRC(6573d46b) SHA1(c4a4a0ea35250eff28a5bfd5e9cd372f52fd1308) ) // "
+	SEGAPCM_LOAD_128K( "mpr-12439.22",    0x80000, CRC(13bf6de5) SHA1(92228a05ec33d606491a1da98c4989f69cddbb49) ) // "
 
 	ROM_REGION( 0x10000, "mainpcb:commcpu", 0 ) // z80 on network board
 	ROM_LOAD( "epr-12587.14",    0x00000, 0x08000, CRC(2afe648b) SHA1(b5bf86f3acbcc23c136185110acecf2c971294fa) )
@@ -3086,18 +3097,18 @@ ROM_START( smgp6 )
 	ROM_REGION( 0x10000, "mainpcb:soundcpu", 0 ) // sound CPU
 	ROM_LOAD( "epr-12436.17",    0x00000, 0x10000, CRC(16ec5f0a) SHA1(307b7388b5c36fd4bc2a61f7941db44858e03c5c) )
 
-	ROM_REGION( 0x80000, "mainpcb:pcm", ROMREGION_ERASEFF ) // Sega PCM sound data
-	ROM_LOAD( "mpr-12437.11",    0x00000, 0x20000, CRC(a1c7e712) SHA1(fa7fa8c39690ae5dab8b28af5aeed5ffae2cd6de) )
-	ROM_LOAD( "mpr-12438.12",    0x20000, 0x20000, CRC(6573d46b) SHA1(c4a4a0ea35250eff28a5bfd5e9cd372f52fd1308) )
-	ROM_LOAD( "mpr-12439.13",    0x40000, 0x20000, CRC(13bf6de5) SHA1(92228a05ec33d606491a1da98c4989f69cddbb49) ) // not used in deluxe
+	ROM_REGION( 0x100000, "mainpcb:pcm", ROMREGION_ERASEFF ) // Sega PCM sound data
+	SEGAPCM_LOAD_128K( "mpr-12437.11",    0x00000, CRC(a1c7e712) SHA1(fa7fa8c39690ae5dab8b28af5aeed5ffae2cd6de) )
+	SEGAPCM_LOAD_128K( "mpr-12438.12",    0x40000, CRC(6573d46b) SHA1(c4a4a0ea35250eff28a5bfd5e9cd372f52fd1308) )
+	SEGAPCM_LOAD_128K( "mpr-12439.13",    0x80000, CRC(13bf6de5) SHA1(92228a05ec33d606491a1da98c4989f69cddbb49) ) // not used in deluxe
 
 	ROM_REGION( 0x10000, "mainpcb:soundcpu2", 0 ) // z80 on extra sound board
 	ROM_LOAD( "epr-12535.8",     0x00000, 0x10000, CRC(80453597) SHA1(d3fee7bb4a8964f5cf1cdae80fc3dde06c947839) ) // taken from deluxe cabinet dump
 
-	ROM_REGION( 0x80000, "mainpcb:pcm2", ROMREGION_ERASEFF ) // Sega PCM sound data on extra sound board (same as on main board..)
-	ROM_LOAD( "mpr-12437.20",    0x00000, 0x20000, CRC(a1c7e712) SHA1(fa7fa8c39690ae5dab8b28af5aeed5ffae2cd6de) ) // taken from deluxe cabinet dump
-	ROM_LOAD( "mpr-12438.21",    0x20000, 0x20000, CRC(6573d46b) SHA1(c4a4a0ea35250eff28a5bfd5e9cd372f52fd1308) ) // "
-	ROM_LOAD( "mpr-12439.22",    0x40000, 0x20000, CRC(13bf6de5) SHA1(92228a05ec33d606491a1da98c4989f69cddbb49) ) // "
+	ROM_REGION( 0x100000, "mainpcb:pcm2", ROMREGION_ERASEFF ) // Sega PCM sound data on extra sound board (same as on main board..)
+	SEGAPCM_LOAD_128K( "mpr-12437.20",    0x00000, CRC(a1c7e712) SHA1(fa7fa8c39690ae5dab8b28af5aeed5ffae2cd6de) ) // taken from deluxe cabinet dump
+	SEGAPCM_LOAD_128K( "mpr-12438.21",    0x40000, CRC(6573d46b) SHA1(c4a4a0ea35250eff28a5bfd5e9cd372f52fd1308) ) // "
+	SEGAPCM_LOAD_128K( "mpr-12439.22",    0x80000, CRC(13bf6de5) SHA1(92228a05ec33d606491a1da98c4989f69cddbb49) ) // "
 
 	ROM_REGION( 0x10000, "mainpcb:commcpu", 0 ) // z80 on network board
 	ROM_LOAD( "epr-12587.14",    0x00000, 0x08000, CRC(2afe648b) SHA1(b5bf86f3acbcc23c136185110acecf2c971294fa) ) // taken from twin cabinet dump
@@ -3144,18 +3155,18 @@ ROM_START( smgp6d )
 	ROM_REGION( 0x10000, "mainpcb:soundcpu", 0 ) // sound CPU
 	ROM_LOAD( "epr-12436.17",    0x00000, 0x10000, CRC(16ec5f0a) SHA1(307b7388b5c36fd4bc2a61f7941db44858e03c5c) )
 
-	ROM_REGION( 0x80000, "mainpcb:pcm", ROMREGION_ERASEFF ) // Sega PCM sound data
-	ROM_LOAD( "mpr-12437.11",    0x00000, 0x20000, CRC(a1c7e712) SHA1(fa7fa8c39690ae5dab8b28af5aeed5ffae2cd6de) )
-	ROM_LOAD( "mpr-12438.12",    0x20000, 0x20000, CRC(6573d46b) SHA1(c4a4a0ea35250eff28a5bfd5e9cd372f52fd1308) )
-	ROM_LOAD( "mpr-12439.13",    0x40000, 0x20000, CRC(13bf6de5) SHA1(92228a05ec33d606491a1da98c4989f69cddbb49) ) // not used in deluxe
+	ROM_REGION( 0x100000, "mainpcb:pcm", ROMREGION_ERASEFF ) // Sega PCM sound data
+	SEGAPCM_LOAD_128K( "mpr-12437.11",    0x00000, CRC(a1c7e712) SHA1(fa7fa8c39690ae5dab8b28af5aeed5ffae2cd6de) )
+	SEGAPCM_LOAD_128K( "mpr-12438.12",    0x40000, CRC(6573d46b) SHA1(c4a4a0ea35250eff28a5bfd5e9cd372f52fd1308) )
+	SEGAPCM_LOAD_128K( "mpr-12439.13",    0x80000, CRC(13bf6de5) SHA1(92228a05ec33d606491a1da98c4989f69cddbb49) ) // not used in deluxe
 
 	ROM_REGION( 0x10000, "mainpcb:soundcpu2", 0 ) // z80 on extra sound board
 	ROM_LOAD( "epr-12535.8",     0x00000, 0x10000, CRC(80453597) SHA1(d3fee7bb4a8964f5cf1cdae80fc3dde06c947839) ) // taken from deluxe cabinet dump
 
-	ROM_REGION( 0x80000, "mainpcb:pcm2", ROMREGION_ERASEFF ) // Sega PCM sound data on extra sound board (same as on main board..)
-	ROM_LOAD( "mpr-12437.20",    0x00000, 0x20000, CRC(a1c7e712) SHA1(fa7fa8c39690ae5dab8b28af5aeed5ffae2cd6de) ) // taken from deluxe cabinet dump
-	ROM_LOAD( "mpr-12438.21",    0x20000, 0x20000, CRC(6573d46b) SHA1(c4a4a0ea35250eff28a5bfd5e9cd372f52fd1308) ) // "
-	ROM_LOAD( "mpr-12439.22",    0x40000, 0x20000, CRC(13bf6de5) SHA1(92228a05ec33d606491a1da98c4989f69cddbb49) ) // "
+	ROM_REGION( 0x100000, "mainpcb:pcm2", ROMREGION_ERASEFF ) // Sega PCM sound data on extra sound board (same as on main board..)
+	SEGAPCM_LOAD_128K( "mpr-12437.20",    0x00000, CRC(a1c7e712) SHA1(fa7fa8c39690ae5dab8b28af5aeed5ffae2cd6de) ) // taken from deluxe cabinet dump
+	SEGAPCM_LOAD_128K( "mpr-12438.21",    0x40000, CRC(6573d46b) SHA1(c4a4a0ea35250eff28a5bfd5e9cd372f52fd1308) ) // "
+	SEGAPCM_LOAD_128K( "mpr-12439.22",    0x80000, CRC(13bf6de5) SHA1(92228a05ec33d606491a1da98c4989f69cddbb49) ) // "
 
 	ROM_REGION( 0x10000, "mainpcb:commcpu", 0 ) // z80 on network board
 	ROM_LOAD( "epr-12587.14",    0x00000, 0x08000, CRC(2afe648b) SHA1(b5bf86f3acbcc23c136185110acecf2c971294fa) ) // taken from twin cabinet dump
@@ -3260,18 +3271,18 @@ ROM_START( smgp5 )
 	ROM_REGION( 0x10000, "mainpcb:soundcpu", 0 ) // sound CPU
 	ROM_LOAD( "epr-12436.17",    0x00000, 0x10000, CRC(16ec5f0a) SHA1(307b7388b5c36fd4bc2a61f7941db44858e03c5c) )
 
-	ROM_REGION( 0x80000, "mainpcb:pcm", ROMREGION_ERASEFF ) // Sega PCM sound data
-	ROM_LOAD( "mpr-12437.11",    0x00000, 0x20000, CRC(a1c7e712) SHA1(fa7fa8c39690ae5dab8b28af5aeed5ffae2cd6de) )
-	ROM_LOAD( "mpr-12438.12",    0x20000, 0x20000, CRC(6573d46b) SHA1(c4a4a0ea35250eff28a5bfd5e9cd372f52fd1308) )
-	ROM_LOAD( "mpr-12439.13",    0x40000, 0x20000, CRC(13bf6de5) SHA1(92228a05ec33d606491a1da98c4989f69cddbb49) ) // not used in deluxe
+	ROM_REGION( 0x100000, "mainpcb:pcm", ROMREGION_ERASEFF ) // Sega PCM sound data
+	SEGAPCM_LOAD_128K( "mpr-12437.11",    0x00000, CRC(a1c7e712) SHA1(fa7fa8c39690ae5dab8b28af5aeed5ffae2cd6de) )
+	SEGAPCM_LOAD_128K( "mpr-12438.12",    0x40000, CRC(6573d46b) SHA1(c4a4a0ea35250eff28a5bfd5e9cd372f52fd1308) )
+	SEGAPCM_LOAD_128K( "mpr-12439.13",    0x80000, CRC(13bf6de5) SHA1(92228a05ec33d606491a1da98c4989f69cddbb49) ) // not used in deluxe
 
 	ROM_REGION( 0x10000, "mainpcb:soundcpu2", 0 ) // z80 on extra sound board
 	ROM_LOAD( "epr-12535.8",     0x00000, 0x10000, CRC(80453597) SHA1(d3fee7bb4a8964f5cf1cdae80fc3dde06c947839) )
 
-	ROM_REGION( 0x80000, "mainpcb:pcm2", ROMREGION_ERASEFF ) // Sega PCM sound data on extra sound board (same as on main board..)
-	ROM_LOAD( "mpr-12437.20",    0x00000, 0x20000, CRC(a1c7e712) SHA1(fa7fa8c39690ae5dab8b28af5aeed5ffae2cd6de) )
-	ROM_LOAD( "mpr-12438.21",    0x20000, 0x20000, CRC(6573d46b) SHA1(c4a4a0ea35250eff28a5bfd5e9cd372f52fd1308) )
-	ROM_LOAD( "mpr-12439.22",    0x40000, 0x20000, CRC(13bf6de5) SHA1(92228a05ec33d606491a1da98c4989f69cddbb49) )
+	ROM_REGION( 0x100000, "mainpcb:pcm2", ROMREGION_ERASEFF ) // Sega PCM sound data on extra sound board (same as on main board..)
+	SEGAPCM_LOAD_128K( "mpr-12437.20",    0x00000, CRC(a1c7e712) SHA1(fa7fa8c39690ae5dab8b28af5aeed5ffae2cd6de) )
+	SEGAPCM_LOAD_128K( "mpr-12438.21",    0x40000, CRC(6573d46b) SHA1(c4a4a0ea35250eff28a5bfd5e9cd372f52fd1308) )
+	SEGAPCM_LOAD_128K( "mpr-12439.22",    0x80000, CRC(13bf6de5) SHA1(92228a05ec33d606491a1da98c4989f69cddbb49) )
 
 	ROM_REGION( 0x10000, "mainpcb:commcpu", 0 ) // z80 on network board
 	ROM_LOAD( "epr-12587.14",    0x00000, 0x08000, CRC(2afe648b) SHA1(b5bf86f3acbcc23c136185110acecf2c971294fa) ) // taken from twin cabinet dump
@@ -3318,18 +3329,18 @@ ROM_START( smgp5d )
 	ROM_REGION( 0x10000, "mainpcb:soundcpu", 0 ) // sound CPU
 	ROM_LOAD( "epr-12436.17",    0x00000, 0x10000, CRC(16ec5f0a) SHA1(307b7388b5c36fd4bc2a61f7941db44858e03c5c) )
 
-	ROM_REGION( 0x80000, "mainpcb:pcm", ROMREGION_ERASEFF ) // Sega PCM sound data
-	ROM_LOAD( "mpr-12437.11",    0x00000, 0x20000, CRC(a1c7e712) SHA1(fa7fa8c39690ae5dab8b28af5aeed5ffae2cd6de) )
-	ROM_LOAD( "mpr-12438.12",    0x20000, 0x20000, CRC(6573d46b) SHA1(c4a4a0ea35250eff28a5bfd5e9cd372f52fd1308) )
-	ROM_LOAD( "mpr-12439.13",    0x40000, 0x20000, CRC(13bf6de5) SHA1(92228a05ec33d606491a1da98c4989f69cddbb49) ) // not used in deluxe
+	ROM_REGION( 0x100000, "mainpcb:pcm", ROMREGION_ERASEFF ) // Sega PCM sound data
+	SEGAPCM_LOAD_128K( "mpr-12437.11",    0x00000, CRC(a1c7e712) SHA1(fa7fa8c39690ae5dab8b28af5aeed5ffae2cd6de) )
+	SEGAPCM_LOAD_128K( "mpr-12438.12",    0x40000, CRC(6573d46b) SHA1(c4a4a0ea35250eff28a5bfd5e9cd372f52fd1308) )
+	SEGAPCM_LOAD_128K( "mpr-12439.13",    0x80000, CRC(13bf6de5) SHA1(92228a05ec33d606491a1da98c4989f69cddbb49) ) // not used in deluxe
 
 	ROM_REGION( 0x10000, "mainpcb:soundcpu2", 0 ) // z80 on extra sound board
 	ROM_LOAD( "epr-12535.8",     0x00000, 0x10000, CRC(80453597) SHA1(d3fee7bb4a8964f5cf1cdae80fc3dde06c947839) )
 
-	ROM_REGION( 0x80000, "mainpcb:pcm2", ROMREGION_ERASEFF ) // Sega PCM sound data on extra sound board (same as on main board..)
-	ROM_LOAD( "mpr-12437.20",    0x00000, 0x20000, CRC(a1c7e712) SHA1(fa7fa8c39690ae5dab8b28af5aeed5ffae2cd6de) )
-	ROM_LOAD( "mpr-12438.21",    0x20000, 0x20000, CRC(6573d46b) SHA1(c4a4a0ea35250eff28a5bfd5e9cd372f52fd1308) )
-	ROM_LOAD( "mpr-12439.22",    0x40000, 0x20000, CRC(13bf6de5) SHA1(92228a05ec33d606491a1da98c4989f69cddbb49) )
+	ROM_REGION( 0x100000, "mainpcb:pcm2", ROMREGION_ERASEFF ) // Sega PCM sound data on extra sound board (same as on main board..)
+	SEGAPCM_LOAD_128K( "mpr-12437.20",    0x00000, CRC(a1c7e712) SHA1(fa7fa8c39690ae5dab8b28af5aeed5ffae2cd6de) )
+	SEGAPCM_LOAD_128K( "mpr-12438.21",    0x40000, CRC(6573d46b) SHA1(c4a4a0ea35250eff28a5bfd5e9cd372f52fd1308) )
+	SEGAPCM_LOAD_128K( "mpr-12439.22",    0x80000, CRC(13bf6de5) SHA1(92228a05ec33d606491a1da98c4989f69cddbb49) )
 
 	ROM_REGION( 0x10000, "mainpcb:commcpu", 0 ) // z80 on network board
 	ROM_LOAD( "epr-12587.14",    0x00000, 0x08000, CRC(2afe648b) SHA1(b5bf86f3acbcc23c136185110acecf2c971294fa) ) // taken from twin cabinet dump
@@ -3383,18 +3394,18 @@ ROM_START( smgpu )
 	ROM_REGION( 0x10000, "mainpcb:soundcpu", 0 ) // sound CPU
 	ROM_LOAD( "epr-12436.17",    0x00000, 0x10000, CRC(16ec5f0a) SHA1(307b7388b5c36fd4bc2a61f7941db44858e03c5c) )
 
-	ROM_REGION( 0x80000, "mainpcb:pcm", ROMREGION_ERASEFF ) // Sega PCM sound data
-	ROM_LOAD( "mpr-12437.11",    0x00000, 0x20000, CRC(a1c7e712) SHA1(fa7fa8c39690ae5dab8b28af5aeed5ffae2cd6de) )
-	ROM_LOAD( "mpr-12438.12",    0x20000, 0x20000, CRC(6573d46b) SHA1(c4a4a0ea35250eff28a5bfd5e9cd372f52fd1308) )
-	ROM_LOAD( "mpr-12439.13",    0x40000, 0x20000, CRC(13bf6de5) SHA1(92228a05ec33d606491a1da98c4989f69cddbb49) ) // not used in deluxe
+	ROM_REGION( 0x100000, "mainpcb:pcm", ROMREGION_ERASEFF ) // Sega PCM sound data
+	SEGAPCM_LOAD_128K( "mpr-12437.11",    0x00000, CRC(a1c7e712) SHA1(fa7fa8c39690ae5dab8b28af5aeed5ffae2cd6de) )
+	SEGAPCM_LOAD_128K( "mpr-12438.12",    0x40000, CRC(6573d46b) SHA1(c4a4a0ea35250eff28a5bfd5e9cd372f52fd1308) )
+	SEGAPCM_LOAD_128K( "mpr-12439.13",    0x80000, CRC(13bf6de5) SHA1(92228a05ec33d606491a1da98c4989f69cddbb49) ) // not used in deluxe
 
 	ROM_REGION( 0x10000, "mainpcb:soundcpu2", 0 ) // z80 on extra sound board
 	ROM_LOAD( "epr-12535.8",     0x00000, 0x10000, CRC(80453597) SHA1(d3fee7bb4a8964f5cf1cdae80fc3dde06c947839) ) // taken from deluxe cabinet dump
 
-	ROM_REGION( 0x80000, "mainpcb:pcm2", ROMREGION_ERASEFF ) // Sega PCM sound data on extra sound board (same as on main board..)
-	ROM_LOAD( "mpr-12437.20",    0x00000, 0x20000, CRC(a1c7e712) SHA1(fa7fa8c39690ae5dab8b28af5aeed5ffae2cd6de) ) // taken from deluxe cabinet dump
-	ROM_LOAD( "mpr-12438.21",    0x20000, 0x20000, CRC(6573d46b) SHA1(c4a4a0ea35250eff28a5bfd5e9cd372f52fd1308) ) // "
-	ROM_LOAD( "mpr-12439.22",    0x40000, 0x20000, CRC(13bf6de5) SHA1(92228a05ec33d606491a1da98c4989f69cddbb49) ) // "
+	ROM_REGION( 0x100000, "mainpcb:pcm2", ROMREGION_ERASEFF ) // Sega PCM sound data on extra sound board (same as on main board..)
+	SEGAPCM_LOAD_128K( "mpr-12437.20",    0x00000, CRC(a1c7e712) SHA1(fa7fa8c39690ae5dab8b28af5aeed5ffae2cd6de) ) // taken from deluxe cabinet dump
+	SEGAPCM_LOAD_128K( "mpr-12438.21",    0x40000, CRC(6573d46b) SHA1(c4a4a0ea35250eff28a5bfd5e9cd372f52fd1308) ) // "
+	SEGAPCM_LOAD_128K( "mpr-12439.22",    0x80000, CRC(13bf6de5) SHA1(92228a05ec33d606491a1da98c4989f69cddbb49) ) // "
 
 	ROM_REGION( 0x10000, "mainpcb:commcpu", 0 ) // z80 on network board
 	ROM_LOAD( "epr-12587.14",    0x00000, 0x08000, CRC(2afe648b) SHA1(b5bf86f3acbcc23c136185110acecf2c971294fa) ) // taken from twin cabinet dump
@@ -3441,18 +3452,18 @@ ROM_START( smgpud )
 	ROM_REGION( 0x10000, "mainpcb:soundcpu", 0 ) // sound CPU
 	ROM_LOAD( "epr-12436.17",    0x00000, 0x10000, CRC(16ec5f0a) SHA1(307b7388b5c36fd4bc2a61f7941db44858e03c5c) )
 
-	ROM_REGION( 0x80000, "mainpcb:pcm", ROMREGION_ERASEFF ) // Sega PCM sound data
-	ROM_LOAD( "mpr-12437.11",    0x00000, 0x20000, CRC(a1c7e712) SHA1(fa7fa8c39690ae5dab8b28af5aeed5ffae2cd6de) )
-	ROM_LOAD( "mpr-12438.12",    0x20000, 0x20000, CRC(6573d46b) SHA1(c4a4a0ea35250eff28a5bfd5e9cd372f52fd1308) )
-	ROM_LOAD( "mpr-12439.13",    0x40000, 0x20000, CRC(13bf6de5) SHA1(92228a05ec33d606491a1da98c4989f69cddbb49) ) // not used in deluxe
+	ROM_REGION( 0x100000, "mainpcb:pcm", ROMREGION_ERASEFF ) // Sega PCM sound data
+	SEGAPCM_LOAD_128K( "mpr-12437.11",    0x00000, CRC(a1c7e712) SHA1(fa7fa8c39690ae5dab8b28af5aeed5ffae2cd6de) )
+	SEGAPCM_LOAD_128K( "mpr-12438.12",    0x40000, CRC(6573d46b) SHA1(c4a4a0ea35250eff28a5bfd5e9cd372f52fd1308) )
+	SEGAPCM_LOAD_128K( "mpr-12439.13",    0x80000, CRC(13bf6de5) SHA1(92228a05ec33d606491a1da98c4989f69cddbb49) ) // not used in deluxe
 
 	ROM_REGION( 0x10000, "mainpcb:soundcpu2", 0 ) // z80 on extra sound board
 	ROM_LOAD( "epr-12535.8",     0x00000, 0x10000, CRC(80453597) SHA1(d3fee7bb4a8964f5cf1cdae80fc3dde06c947839) ) // taken from deluxe cabinet dump
 
-	ROM_REGION( 0x80000, "mainpcb:pcm2", ROMREGION_ERASEFF ) // Sega PCM sound data on extra sound board (same as on main board..)
-	ROM_LOAD( "mpr-12437.20",    0x00000, 0x20000, CRC(a1c7e712) SHA1(fa7fa8c39690ae5dab8b28af5aeed5ffae2cd6de) ) // taken from deluxe cabinet dump
-	ROM_LOAD( "mpr-12438.21",    0x20000, 0x20000, CRC(6573d46b) SHA1(c4a4a0ea35250eff28a5bfd5e9cd372f52fd1308) ) // "
-	ROM_LOAD( "mpr-12439.22",    0x40000, 0x20000, CRC(13bf6de5) SHA1(92228a05ec33d606491a1da98c4989f69cddbb49) ) // "
+	ROM_REGION( 0x100000, "mainpcb:pcm2", ROMREGION_ERASEFF ) // Sega PCM sound data on extra sound board (same as on main board..)
+	SEGAPCM_LOAD_128K( "mpr-12437.20",    0x00000, CRC(a1c7e712) SHA1(fa7fa8c39690ae5dab8b28af5aeed5ffae2cd6de) ) // taken from deluxe cabinet dump
+	SEGAPCM_LOAD_128K( "mpr-12438.21",    0x40000, CRC(6573d46b) SHA1(c4a4a0ea35250eff28a5bfd5e9cd372f52fd1308) ) // "
+	SEGAPCM_LOAD_128K( "mpr-12439.22",    0x80000, CRC(13bf6de5) SHA1(92228a05ec33d606491a1da98c4989f69cddbb49) ) // "
 
 	ROM_REGION( 0x10000, "mainpcb:commcpu", 0 ) // z80 on network board
 	ROM_LOAD( "epr-12587.14",    0x00000, 0x08000, CRC(2afe648b) SHA1(b5bf86f3acbcc23c136185110acecf2c971294fa) ) // taken from twin cabinet dump
@@ -3507,18 +3518,18 @@ ROM_START( smgpu1 )
 	ROM_REGION( 0x10000, "mainpcb:soundcpu", 0 ) // sound CPU
 	ROM_LOAD( "epr-12436.17",    0x00000, 0x10000, CRC(16ec5f0a) SHA1(307b7388b5c36fd4bc2a61f7941db44858e03c5c) )
 
-	ROM_REGION( 0x80000, "mainpcb:pcm", ROMREGION_ERASEFF ) // Sega PCM sound data
-	ROM_LOAD( "mpr-12437.11",    0x00000, 0x20000, CRC(a1c7e712) SHA1(fa7fa8c39690ae5dab8b28af5aeed5ffae2cd6de) )
-	ROM_LOAD( "mpr-12438.12",    0x20000, 0x20000, CRC(6573d46b) SHA1(c4a4a0ea35250eff28a5bfd5e9cd372f52fd1308) )
-	ROM_LOAD( "mpr-12439.13",    0x40000, 0x20000, CRC(13bf6de5) SHA1(92228a05ec33d606491a1da98c4989f69cddbb49) ) // not used in deluxe
+	ROM_REGION( 0x100000, "mainpcb:pcm", ROMREGION_ERASEFF ) // Sega PCM sound data
+	SEGAPCM_LOAD_128K( "mpr-12437.11",    0x00000, CRC(a1c7e712) SHA1(fa7fa8c39690ae5dab8b28af5aeed5ffae2cd6de) )
+	SEGAPCM_LOAD_128K( "mpr-12438.12",    0x40000, CRC(6573d46b) SHA1(c4a4a0ea35250eff28a5bfd5e9cd372f52fd1308) )
+	SEGAPCM_LOAD_128K( "mpr-12439.13",    0x80000, CRC(13bf6de5) SHA1(92228a05ec33d606491a1da98c4989f69cddbb49) ) // not used in deluxe
 
 	ROM_REGION( 0x10000, "mainpcb:soundcpu2", 0 ) // z80 on extra sound board
 	ROM_LOAD( "epr-12535.8",     0x00000, 0x10000, CRC(80453597) SHA1(d3fee7bb4a8964f5cf1cdae80fc3dde06c947839) ) // taken from deluxe cabinet dump
 
-	ROM_REGION( 0x80000, "mainpcb:pcm2", ROMREGION_ERASEFF ) // Sega PCM sound data on extra sound board (same as on main board..)
-	ROM_LOAD( "mpr-12437.20",    0x00000, 0x20000, CRC(a1c7e712) SHA1(fa7fa8c39690ae5dab8b28af5aeed5ffae2cd6de) ) // taken from deluxe cabinet dump
-	ROM_LOAD( "mpr-12438.21",    0x20000, 0x20000, CRC(6573d46b) SHA1(c4a4a0ea35250eff28a5bfd5e9cd372f52fd1308) ) // "
-	ROM_LOAD( "mpr-12439.22",    0x40000, 0x20000, CRC(13bf6de5) SHA1(92228a05ec33d606491a1da98c4989f69cddbb49) ) // "
+	ROM_REGION( 0x100000, "mainpcb:pcm2", ROMREGION_ERASEFF ) // Sega PCM sound data on extra sound board (same as on main board..)
+	SEGAPCM_LOAD_128K( "mpr-12437.20",    0x00000, CRC(a1c7e712) SHA1(fa7fa8c39690ae5dab8b28af5aeed5ffae2cd6de) ) // taken from deluxe cabinet dump
+	SEGAPCM_LOAD_128K( "mpr-12438.21",    0x40000, CRC(6573d46b) SHA1(c4a4a0ea35250eff28a5bfd5e9cd372f52fd1308) ) // "
+	SEGAPCM_LOAD_128K( "mpr-12439.22",    0x80000, CRC(13bf6de5) SHA1(92228a05ec33d606491a1da98c4989f69cddbb49) ) // "
 
 	ROM_REGION( 0x10000, "mainpcb:commcpu", 0 ) // z80 on network board
 	ROM_LOAD( "epr-12587.14",    0x00000, 0x08000, CRC(2afe648b) SHA1(b5bf86f3acbcc23c136185110acecf2c971294fa) ) // taken from twin cabinet dump
@@ -3565,18 +3576,18 @@ ROM_START( smgpu1d )
 	ROM_REGION( 0x10000, "mainpcb:soundcpu", 0 ) // sound CPU
 	ROM_LOAD( "epr-12436.17",    0x00000, 0x10000, CRC(16ec5f0a) SHA1(307b7388b5c36fd4bc2a61f7941db44858e03c5c) )
 
-	ROM_REGION( 0x80000, "mainpcb:pcm", ROMREGION_ERASEFF ) // Sega PCM sound data
-	ROM_LOAD( "mpr-12437.11",    0x00000, 0x20000, CRC(a1c7e712) SHA1(fa7fa8c39690ae5dab8b28af5aeed5ffae2cd6de) )
-	ROM_LOAD( "mpr-12438.12",    0x20000, 0x20000, CRC(6573d46b) SHA1(c4a4a0ea35250eff28a5bfd5e9cd372f52fd1308) )
-	ROM_LOAD( "mpr-12439.13",    0x40000, 0x20000, CRC(13bf6de5) SHA1(92228a05ec33d606491a1da98c4989f69cddbb49) ) // not used in deluxe
+	ROM_REGION( 0x100000, "mainpcb:pcm", ROMREGION_ERASEFF ) // Sega PCM sound data
+	SEGAPCM_LOAD_128K( "mpr-12437.11",    0x00000, CRC(a1c7e712) SHA1(fa7fa8c39690ae5dab8b28af5aeed5ffae2cd6de) )
+	SEGAPCM_LOAD_128K( "mpr-12438.12",    0x40000, CRC(6573d46b) SHA1(c4a4a0ea35250eff28a5bfd5e9cd372f52fd1308) )
+	SEGAPCM_LOAD_128K( "mpr-12439.13",    0x80000, CRC(13bf6de5) SHA1(92228a05ec33d606491a1da98c4989f69cddbb49) ) // not used in deluxe
 
 	ROM_REGION( 0x10000, "mainpcb:soundcpu2", 0 ) // z80 on extra sound board
 	ROM_LOAD( "epr-12535.8",     0x00000, 0x10000, CRC(80453597) SHA1(d3fee7bb4a8964f5cf1cdae80fc3dde06c947839) ) // taken from deluxe cabinet dump
 
-	ROM_REGION( 0x80000, "mainpcb:pcm2", ROMREGION_ERASEFF ) // Sega PCM sound data on extra sound board (same as on main board..)
-	ROM_LOAD( "mpr-12437.20",    0x00000, 0x20000, CRC(a1c7e712) SHA1(fa7fa8c39690ae5dab8b28af5aeed5ffae2cd6de) ) // taken from deluxe cabinet dump
-	ROM_LOAD( "mpr-12438.21",    0x20000, 0x20000, CRC(6573d46b) SHA1(c4a4a0ea35250eff28a5bfd5e9cd372f52fd1308) ) // "
-	ROM_LOAD( "mpr-12439.22",    0x40000, 0x20000, CRC(13bf6de5) SHA1(92228a05ec33d606491a1da98c4989f69cddbb49) ) // "
+	ROM_REGION( 0x100000, "mainpcb:pcm2", ROMREGION_ERASEFF ) // Sega PCM sound data on extra sound board (same as on main board..)
+	SEGAPCM_LOAD_128K( "mpr-12437.20",    0x00000, CRC(a1c7e712) SHA1(fa7fa8c39690ae5dab8b28af5aeed5ffae2cd6de) ) // taken from deluxe cabinet dump
+	SEGAPCM_LOAD_128K( "mpr-12438.21",    0x40000, CRC(6573d46b) SHA1(c4a4a0ea35250eff28a5bfd5e9cd372f52fd1308) ) // "
+	SEGAPCM_LOAD_128K( "mpr-12439.22",    0x80000, CRC(13bf6de5) SHA1(92228a05ec33d606491a1da98c4989f69cddbb49) ) // "
 
 	ROM_REGION( 0x10000, "mainpcb:commcpu", 0 ) // z80 on network board
 	ROM_LOAD( "epr-12587.14",    0x00000, 0x08000, CRC(2afe648b) SHA1(b5bf86f3acbcc23c136185110acecf2c971294fa) ) // taken from twin cabinet dump
@@ -3673,18 +3684,18 @@ ROM_START( smgpu2 )
 	ROM_REGION( 0x10000, "mainpcb:soundcpu", 0 ) // sound CPU
 	ROM_LOAD( "epr-12436.17",    0x00000, 0x10000, CRC(16ec5f0a) SHA1(307b7388b5c36fd4bc2a61f7941db44858e03c5c) )
 
-	ROM_REGION( 0x80000, "mainpcb:pcm", ROMREGION_ERASEFF ) // Sega PCM sound data
-	ROM_LOAD( "mpr-12437.11",    0x00000, 0x20000, CRC(a1c7e712) SHA1(fa7fa8c39690ae5dab8b28af5aeed5ffae2cd6de) )
-	ROM_LOAD( "mpr-12438.12",    0x20000, 0x20000, CRC(6573d46b) SHA1(c4a4a0ea35250eff28a5bfd5e9cd372f52fd1308) )
-	ROM_LOAD( "mpr-12439.13",    0x40000, 0x20000, CRC(13bf6de5) SHA1(92228a05ec33d606491a1da98c4989f69cddbb49) ) // not used in deluxe
+	ROM_REGION( 0x100000, "mainpcb:pcm", ROMREGION_ERASEFF ) // Sega PCM sound data
+	SEGAPCM_LOAD_128K( "mpr-12437.11",    0x00000, CRC(a1c7e712) SHA1(fa7fa8c39690ae5dab8b28af5aeed5ffae2cd6de) )
+	SEGAPCM_LOAD_128K( "mpr-12438.12",    0x40000, CRC(6573d46b) SHA1(c4a4a0ea35250eff28a5bfd5e9cd372f52fd1308) )
+	SEGAPCM_LOAD_128K( "mpr-12439.13",    0x80000, CRC(13bf6de5) SHA1(92228a05ec33d606491a1da98c4989f69cddbb49) ) // not used in deluxe
 
 	ROM_REGION( 0x10000, "mainpcb:soundcpu2", 0 ) // z80 on extra sound board
 	ROM_LOAD( "epr-12535.8",     0x00000, 0x10000, CRC(80453597) SHA1(d3fee7bb4a8964f5cf1cdae80fc3dde06c947839) ) // taken from deluxe cabinet dump
 
-	ROM_REGION( 0x80000, "mainpcb:pcm2", ROMREGION_ERASEFF ) // Sega PCM sound data on extra sound board (same as on main board..)
-	ROM_LOAD( "mpr-12437.20",    0x00000, 0x20000, CRC(a1c7e712) SHA1(fa7fa8c39690ae5dab8b28af5aeed5ffae2cd6de) ) // taken from deluxe cabinet dump
-	ROM_LOAD( "mpr-12438.21",    0x20000, 0x20000, CRC(6573d46b) SHA1(c4a4a0ea35250eff28a5bfd5e9cd372f52fd1308) ) // "
-	ROM_LOAD( "mpr-12439.22",    0x40000, 0x20000, CRC(13bf6de5) SHA1(92228a05ec33d606491a1da98c4989f69cddbb49) ) // "
+	ROM_REGION( 0x100000, "mainpcb:pcm2", ROMREGION_ERASEFF ) // Sega PCM sound data on extra sound board (same as on main board..)
+	SEGAPCM_LOAD_128K( "mpr-12437.20",    0x00000, CRC(a1c7e712) SHA1(fa7fa8c39690ae5dab8b28af5aeed5ffae2cd6de) ) // taken from deluxe cabinet dump
+	SEGAPCM_LOAD_128K( "mpr-12438.21",    0x40000, CRC(6573d46b) SHA1(c4a4a0ea35250eff28a5bfd5e9cd372f52fd1308) ) // "
+	SEGAPCM_LOAD_128K( "mpr-12439.22",    0x80000, CRC(13bf6de5) SHA1(92228a05ec33d606491a1da98c4989f69cddbb49) ) // "
 
 	ROM_REGION( 0x10000, "mainpcb:commcpu", 0 ) // z80 on network board
 	ROM_LOAD( "epr-12587.14",    0x00000, 0x08000, CRC(2afe648b) SHA1(b5bf86f3acbcc23c136185110acecf2c971294fa) )
@@ -3731,18 +3742,18 @@ ROM_START( smgpu2d )
 	ROM_REGION( 0x10000, "mainpcb:soundcpu", 0 ) // sound CPU
 	ROM_LOAD( "epr-12436.17",    0x00000, 0x10000, CRC(16ec5f0a) SHA1(307b7388b5c36fd4bc2a61f7941db44858e03c5c) )
 
-	ROM_REGION( 0x80000, "mainpcb:pcm", ROMREGION_ERASEFF ) // Sega PCM sound data
-	ROM_LOAD( "mpr-12437.11",    0x00000, 0x20000, CRC(a1c7e712) SHA1(fa7fa8c39690ae5dab8b28af5aeed5ffae2cd6de) )
-	ROM_LOAD( "mpr-12438.12",    0x20000, 0x20000, CRC(6573d46b) SHA1(c4a4a0ea35250eff28a5bfd5e9cd372f52fd1308) )
-	ROM_LOAD( "mpr-12439.13",    0x40000, 0x20000, CRC(13bf6de5) SHA1(92228a05ec33d606491a1da98c4989f69cddbb49) ) // not used in deluxe
+	ROM_REGION( 0x100000, "mainpcb:pcm", ROMREGION_ERASEFF ) // Sega PCM sound data
+	SEGAPCM_LOAD_128K( "mpr-12437.11",    0x00000, CRC(a1c7e712) SHA1(fa7fa8c39690ae5dab8b28af5aeed5ffae2cd6de) )
+	SEGAPCM_LOAD_128K( "mpr-12438.12",    0x40000, CRC(6573d46b) SHA1(c4a4a0ea35250eff28a5bfd5e9cd372f52fd1308) )
+	SEGAPCM_LOAD_128K( "mpr-12439.13",    0x80000, CRC(13bf6de5) SHA1(92228a05ec33d606491a1da98c4989f69cddbb49) ) // not used in deluxe
 
 	ROM_REGION( 0x10000, "mainpcb:soundcpu2", 0 ) // z80 on extra sound board
 	ROM_LOAD( "epr-12535.8",     0x00000, 0x10000, CRC(80453597) SHA1(d3fee7bb4a8964f5cf1cdae80fc3dde06c947839) ) // taken from deluxe cabinet dump
 
-	ROM_REGION( 0x80000, "mainpcb:pcm2", ROMREGION_ERASEFF ) // Sega PCM sound data on extra sound board (same as on main board..)
-	ROM_LOAD( "mpr-12437.20",    0x00000, 0x20000, CRC(a1c7e712) SHA1(fa7fa8c39690ae5dab8b28af5aeed5ffae2cd6de) ) // taken from deluxe cabinet dump
-	ROM_LOAD( "mpr-12438.21",    0x20000, 0x20000, CRC(6573d46b) SHA1(c4a4a0ea35250eff28a5bfd5e9cd372f52fd1308) ) // "
-	ROM_LOAD( "mpr-12439.22",    0x40000, 0x20000, CRC(13bf6de5) SHA1(92228a05ec33d606491a1da98c4989f69cddbb49) ) // "
+	ROM_REGION( 0x100000, "mainpcb:pcm2", ROMREGION_ERASEFF ) // Sega PCM sound data on extra sound board (same as on main board..)
+	SEGAPCM_LOAD_128K( "mpr-12437.20",    0x00000, CRC(a1c7e712) SHA1(fa7fa8c39690ae5dab8b28af5aeed5ffae2cd6de) ) // taken from deluxe cabinet dump
+	SEGAPCM_LOAD_128K( "mpr-12438.21",    0x40000, CRC(6573d46b) SHA1(c4a4a0ea35250eff28a5bfd5e9cd372f52fd1308) ) // "
+	SEGAPCM_LOAD_128K( "mpr-12439.22",    0x80000, CRC(13bf6de5) SHA1(92228a05ec33d606491a1da98c4989f69cddbb49) ) // "
 
 	ROM_REGION( 0x10000, "mainpcb:commcpu", 0 ) // z80 on network board
 	ROM_LOAD( "epr-12587.14",    0x00000, 0x08000, CRC(2afe648b) SHA1(b5bf86f3acbcc23c136185110acecf2c971294fa) )
@@ -3796,18 +3807,18 @@ ROM_START( smgpj )
 	ROM_REGION( 0x10000, "mainpcb:soundcpu", 0 ) // sound CPU
 	ROM_LOAD( "epr-12436.17",    0x00000, 0x10000, CRC(16ec5f0a) SHA1(307b7388b5c36fd4bc2a61f7941db44858e03c5c) )
 
-	ROM_REGION( 0x80000, "mainpcb:pcm", ROMREGION_ERASEFF ) // Sega PCM sound data
-	ROM_LOAD( "mpr-12437.11",    0x00000, 0x20000, CRC(a1c7e712) SHA1(fa7fa8c39690ae5dab8b28af5aeed5ffae2cd6de) )
-	ROM_LOAD( "mpr-12438.12",    0x20000, 0x20000, CRC(6573d46b) SHA1(c4a4a0ea35250eff28a5bfd5e9cd372f52fd1308) )
-	ROM_LOAD( "mpr-12439.13",    0x40000, 0x20000, CRC(13bf6de5) SHA1(92228a05ec33d606491a1da98c4989f69cddbb49) ) // not used in deluxe
+	ROM_REGION( 0x100000, "mainpcb:pcm", ROMREGION_ERASEFF ) // Sega PCM sound data
+	SEGAPCM_LOAD_128K( "mpr-12437.11",    0x00000, CRC(a1c7e712) SHA1(fa7fa8c39690ae5dab8b28af5aeed5ffae2cd6de) )
+	SEGAPCM_LOAD_128K( "mpr-12438.12",    0x40000, CRC(6573d46b) SHA1(c4a4a0ea35250eff28a5bfd5e9cd372f52fd1308) )
+	SEGAPCM_LOAD_128K( "mpr-12439.13",    0x80000, CRC(13bf6de5) SHA1(92228a05ec33d606491a1da98c4989f69cddbb49) ) // not used in deluxe
 
 	ROM_REGION( 0x10000, "mainpcb:soundcpu2", 0 ) // z80 on extra sound board
 	ROM_LOAD( "epr-12535.8",     0x00000, 0x10000, CRC(80453597) SHA1(d3fee7bb4a8964f5cf1cdae80fc3dde06c947839) ) // taken from deluxe cabinet dump
 
-	ROM_REGION( 0x80000, "mainpcb:pcm2", ROMREGION_ERASEFF ) // Sega PCM sound data on extra sound board (same as on main board..)
-	ROM_LOAD( "mpr-12437.20",    0x00000, 0x20000, CRC(a1c7e712) SHA1(fa7fa8c39690ae5dab8b28af5aeed5ffae2cd6de) ) // taken from deluxe cabinet dump
-	ROM_LOAD( "mpr-12438.21",    0x20000, 0x20000, CRC(6573d46b) SHA1(c4a4a0ea35250eff28a5bfd5e9cd372f52fd1308) ) // "
-	ROM_LOAD( "mpr-12439.22",    0x40000, 0x20000, CRC(13bf6de5) SHA1(92228a05ec33d606491a1da98c4989f69cddbb49) ) // "
+	ROM_REGION( 0x100000, "mainpcb:pcm2", ROMREGION_ERASEFF ) // Sega PCM sound data on extra sound board (same as on main board..)
+	SEGAPCM_LOAD_128K( "mpr-12437.20",    0x00000, CRC(a1c7e712) SHA1(fa7fa8c39690ae5dab8b28af5aeed5ffae2cd6de) ) // taken from deluxe cabinet dump
+	SEGAPCM_LOAD_128K( "mpr-12438.21",    0x40000, CRC(6573d46b) SHA1(c4a4a0ea35250eff28a5bfd5e9cd372f52fd1308) ) // "
+	SEGAPCM_LOAD_128K( "mpr-12439.22",    0x80000, CRC(13bf6de5) SHA1(92228a05ec33d606491a1da98c4989f69cddbb49) ) // "
 
 	ROM_REGION( 0x10000, "mainpcb:commcpu", 0 ) // z80 on network board
 	ROM_LOAD( "epr-12587.14",    0x00000, 0x08000, CRC(2afe648b) SHA1(b5bf86f3acbcc23c136185110acecf2c971294fa) ) // taken from twin cabinet dump
@@ -3855,18 +3866,18 @@ ROM_START( smgpjd )
 	ROM_REGION( 0x10000, "mainpcb:soundcpu", 0 ) // sound CPU
 	ROM_LOAD( "epr-12436.17",    0x00000, 0x10000, CRC(16ec5f0a) SHA1(307b7388b5c36fd4bc2a61f7941db44858e03c5c) )
 
-	ROM_REGION( 0x80000, "mainpcb:pcm", ROMREGION_ERASEFF ) // Sega PCM sound data
-	ROM_LOAD( "mpr-12437.11",    0x00000, 0x20000, CRC(a1c7e712) SHA1(fa7fa8c39690ae5dab8b28af5aeed5ffae2cd6de) )
-	ROM_LOAD( "mpr-12438.12",    0x20000, 0x20000, CRC(6573d46b) SHA1(c4a4a0ea35250eff28a5bfd5e9cd372f52fd1308) )
-	ROM_LOAD( "mpr-12439.13",    0x40000, 0x20000, CRC(13bf6de5) SHA1(92228a05ec33d606491a1da98c4989f69cddbb49) ) // not used in deluxe
+	ROM_REGION( 0x100000, "mainpcb:pcm", ROMREGION_ERASEFF ) // Sega PCM sound data
+	SEGAPCM_LOAD_128K( "mpr-12437.11",    0x00000, CRC(a1c7e712) SHA1(fa7fa8c39690ae5dab8b28af5aeed5ffae2cd6de) )
+	SEGAPCM_LOAD_128K( "mpr-12438.12",    0x40000, CRC(6573d46b) SHA1(c4a4a0ea35250eff28a5bfd5e9cd372f52fd1308) )
+	SEGAPCM_LOAD_128K( "mpr-12439.13",    0x80000, CRC(13bf6de5) SHA1(92228a05ec33d606491a1da98c4989f69cddbb49) ) // not used in deluxe
 
 	ROM_REGION( 0x10000, "mainpcb:soundcpu2", 0 ) // z80 on extra sound board
 	ROM_LOAD( "epr-12535.8",     0x00000, 0x10000, CRC(80453597) SHA1(d3fee7bb4a8964f5cf1cdae80fc3dde06c947839) ) // taken from deluxe cabinet dump
 
-	ROM_REGION( 0x80000, "mainpcb:pcm2", ROMREGION_ERASEFF ) // Sega PCM sound data on extra sound board (same as on main board..)
-	ROM_LOAD( "mpr-12437.20",    0x00000, 0x20000, CRC(a1c7e712) SHA1(fa7fa8c39690ae5dab8b28af5aeed5ffae2cd6de) ) // taken from deluxe cabinet dump
-	ROM_LOAD( "mpr-12438.21",    0x20000, 0x20000, CRC(6573d46b) SHA1(c4a4a0ea35250eff28a5bfd5e9cd372f52fd1308) ) // "
-	ROM_LOAD( "mpr-12439.22",    0x40000, 0x20000, CRC(13bf6de5) SHA1(92228a05ec33d606491a1da98c4989f69cddbb49) ) // "
+	ROM_REGION( 0x100000, "mainpcb:pcm2", ROMREGION_ERASEFF ) // Sega PCM sound data on extra sound board (same as on main board..)
+	SEGAPCM_LOAD_128K( "mpr-12437.20",    0x00000, CRC(a1c7e712) SHA1(fa7fa8c39690ae5dab8b28af5aeed5ffae2cd6de) ) // taken from deluxe cabinet dump
+	SEGAPCM_LOAD_128K( "mpr-12438.21",    0x40000, CRC(6573d46b) SHA1(c4a4a0ea35250eff28a5bfd5e9cd372f52fd1308) ) // "
+	SEGAPCM_LOAD_128K( "mpr-12439.22",    0x80000, CRC(13bf6de5) SHA1(92228a05ec33d606491a1da98c4989f69cddbb49) ) // "
 
 	ROM_REGION( 0x10000, "mainpcb:commcpu", 0 ) // z80 on network board
 	ROM_LOAD( "epr-12587.14",    0x00000, 0x08000, CRC(2afe648b) SHA1(b5bf86f3acbcc23c136185110acecf2c971294fa) ) // taken from twin cabinet dump
@@ -3921,18 +3932,18 @@ ROM_START( smgpja )
 	ROM_REGION( 0x10000, "mainpcb:soundcpu", 0 ) // sound CPU
 	ROM_LOAD( "epr-12436.17",    0x00000, 0x10000, CRC(16ec5f0a) SHA1(307b7388b5c36fd4bc2a61f7941db44858e03c5c) )
 
-	ROM_REGION( 0x80000, "mainpcb:pcm", ROMREGION_ERASEFF ) // Sega PCM sound data
-	ROM_LOAD( "mpr-12437.11",    0x00000, 0x20000, CRC(a1c7e712) SHA1(fa7fa8c39690ae5dab8b28af5aeed5ffae2cd6de) )
-	ROM_LOAD( "mpr-12438.12",    0x20000, 0x20000, CRC(6573d46b) SHA1(c4a4a0ea35250eff28a5bfd5e9cd372f52fd1308) )
-	ROM_LOAD( "mpr-12439.13",    0x40000, 0x20000, CRC(13bf6de5) SHA1(92228a05ec33d606491a1da98c4989f69cddbb49) ) // not used in deluxe
+	ROM_REGION( 0x100000, "mainpcb:pcm", ROMREGION_ERASEFF ) // Sega PCM sound data
+	SEGAPCM_LOAD_128K( "mpr-12437.11",    0x00000, CRC(a1c7e712) SHA1(fa7fa8c39690ae5dab8b28af5aeed5ffae2cd6de) )
+	SEGAPCM_LOAD_128K( "mpr-12438.12",    0x40000, CRC(6573d46b) SHA1(c4a4a0ea35250eff28a5bfd5e9cd372f52fd1308) )
+	SEGAPCM_LOAD_128K( "mpr-12439.13",    0x80000, CRC(13bf6de5) SHA1(92228a05ec33d606491a1da98c4989f69cddbb49) ) // not used in deluxe
 
 	ROM_REGION( 0x10000, "mainpcb:soundcpu2", 0 ) // z80 on extra sound board
 	ROM_LOAD( "epr-12535.8",     0x00000, 0x10000, CRC(80453597) SHA1(d3fee7bb4a8964f5cf1cdae80fc3dde06c947839) ) // taken from deluxe cabinet dump
 
-	ROM_REGION( 0x80000, "mainpcb:pcm2", ROMREGION_ERASEFF ) // Sega PCM sound data on extra sound board (same as on main board..)
-	ROM_LOAD( "mpr-12437.20",    0x00000, 0x20000, CRC(a1c7e712) SHA1(fa7fa8c39690ae5dab8b28af5aeed5ffae2cd6de) ) // taken from deluxe cabinet dump
-	ROM_LOAD( "mpr-12438.21",    0x20000, 0x20000, CRC(6573d46b) SHA1(c4a4a0ea35250eff28a5bfd5e9cd372f52fd1308) ) // "
-	ROM_LOAD( "mpr-12439.22",    0x40000, 0x20000, CRC(13bf6de5) SHA1(92228a05ec33d606491a1da98c4989f69cddbb49) ) // "
+	ROM_REGION( 0x100000, "mainpcb:pcm2", ROMREGION_ERASEFF ) // Sega PCM sound data on extra sound board (same as on main board..)
+	SEGAPCM_LOAD_128K( "mpr-12437.20",    0x00000, CRC(a1c7e712) SHA1(fa7fa8c39690ae5dab8b28af5aeed5ffae2cd6de) ) // taken from deluxe cabinet dump
+	SEGAPCM_LOAD_128K( "mpr-12438.21",    0x40000, CRC(6573d46b) SHA1(c4a4a0ea35250eff28a5bfd5e9cd372f52fd1308) ) // "
+	SEGAPCM_LOAD_128K( "mpr-12439.22",    0x80000, CRC(13bf6de5) SHA1(92228a05ec33d606491a1da98c4989f69cddbb49) ) // "
 
 	ROM_REGION( 0x10000, "mainpcb:commcpu", 0 ) // z80 on network board
 	ROM_LOAD( "epr-12587.14",    0x00000, 0x08000, CRC(2afe648b) SHA1(b5bf86f3acbcc23c136185110acecf2c971294fa) ) // taken from twin cabinet dump
@@ -3991,10 +4002,10 @@ ROM_START( abcop )
 	ROM_REGION( 0x10000, "mainpcb:soundcpu", 0 ) // sound CPU
 	ROM_LOAD( "epr-13560.ic17",    0x00000, 0x10000, CRC(83050925) SHA1(118710e5789c7999bb7326df4d7bd207cbffdfd4) )
 
-	ROM_REGION( 0x80000, "mainpcb:pcm", ROMREGION_ERASEFF ) // Sega PCM sound data
-	ROM_LOAD( "opr-13563.ic11",    0x00000, 0x20000, CRC(4083e74f) SHA1(e48c7ce0aa3406af0bbf79c169a8157693c97041) )
-	ROM_LOAD( "opr-13562.ic12",    0x20000, 0x20000, CRC(3cc3968f) SHA1(d25647f6a3fa939ba30e03e7334362ef0749b23a) )
-	ROM_LOAD( "opr-13561.ic13",    0x40000, 0x20000, CRC(80a7c02a) SHA1(7e8c1b9ba270d8657dbe90ed8be2e4b6463e5928) )
+	ROM_REGION( 0x100000, "mainpcb:pcm", ROMREGION_ERASEFF ) // Sega PCM sound data
+	SEGAPCM_LOAD_128K( "opr-13563.ic11",    0x00000, CRC(4083e74f) SHA1(e48c7ce0aa3406af0bbf79c169a8157693c97041) )
+	SEGAPCM_LOAD_128K( "opr-13562.ic12",    0x40000, CRC(3cc3968f) SHA1(d25647f6a3fa939ba30e03e7334362ef0749b23a) )
+	SEGAPCM_LOAD_128K( "opr-13561.ic13",    0x80000, CRC(80a7c02a) SHA1(7e8c1b9ba270d8657dbe90ed8be2e4b6463e5928) )
 ROM_END
 
 ROM_START( abcopd )
@@ -4037,10 +4048,10 @@ ROM_START( abcopd )
 	ROM_REGION( 0x10000, "mainpcb:soundcpu", 0 ) // sound CPU
 	ROM_LOAD( "epr-13560.ic17",    0x00000, 0x10000, CRC(83050925) SHA1(118710e5789c7999bb7326df4d7bd207cbffdfd4) )
 
-	ROM_REGION( 0x80000, "mainpcb:pcm", ROMREGION_ERASEFF ) // Sega PCM sound data
-	ROM_LOAD( "opr-13563.ic11",    0x00000, 0x20000, CRC(4083e74f) SHA1(e48c7ce0aa3406af0bbf79c169a8157693c97041) )
-	ROM_LOAD( "opr-13562.ic12",    0x20000, 0x20000, CRC(3cc3968f) SHA1(d25647f6a3fa939ba30e03e7334362ef0749b23a) )
-	ROM_LOAD( "opr-13561.ic13",    0x40000, 0x20000, CRC(80a7c02a) SHA1(7e8c1b9ba270d8657dbe90ed8be2e4b6463e5928) )
+	ROM_REGION( 0x100000, "mainpcb:pcm", ROMREGION_ERASEFF ) // Sega PCM sound data
+	SEGAPCM_LOAD_128K( "opr-13563.ic11",    0x00000, CRC(4083e74f) SHA1(e48c7ce0aa3406af0bbf79c169a8157693c97041) )
+	SEGAPCM_LOAD_128K( "opr-13562.ic12",    0x40000, CRC(3cc3968f) SHA1(d25647f6a3fa939ba30e03e7334362ef0749b23a) )
+	SEGAPCM_LOAD_128K( "opr-13561.ic13",    0x80000, CRC(80a7c02a) SHA1(7e8c1b9ba270d8657dbe90ed8be2e4b6463e5928) )
 ROM_END
 
 //*************************************************************************************************************************
@@ -4090,10 +4101,10 @@ ROM_START( abcopj )
 	ROM_REGION( 0x10000, "mainpcb:soundcpu", 0 ) // sound CPU
 	ROM_LOAD( "epr-13560.ic17",    0x00000, 0x10000, CRC(83050925) SHA1(118710e5789c7999bb7326df4d7bd207cbffdfd4) )
 
-	ROM_REGION( 0x80000, "mainpcb:pcm", ROMREGION_ERASEFF ) // Sega PCM sound data
-	ROM_LOAD( "opr-13563.ic11",    0x00000, 0x20000, CRC(4083e74f) SHA1(e48c7ce0aa3406af0bbf79c169a8157693c97041) )
-	ROM_LOAD( "opr-13562.ic12",    0x20000, 0x20000, CRC(3cc3968f) SHA1(d25647f6a3fa939ba30e03e7334362ef0749b23a) )
-	ROM_LOAD( "opr-13561.ic13",    0x40000, 0x20000, CRC(80a7c02a) SHA1(7e8c1b9ba270d8657dbe90ed8be2e4b6463e5928) )
+	ROM_REGION( 0x100000, "mainpcb:pcm", ROMREGION_ERASEFF ) // Sega PCM sound data
+	SEGAPCM_LOAD_128K( "opr-13563.ic11",    0x00000, CRC(4083e74f) SHA1(e48c7ce0aa3406af0bbf79c169a8157693c97041) )
+	SEGAPCM_LOAD_128K( "opr-13562.ic12",    0x40000, CRC(3cc3968f) SHA1(d25647f6a3fa939ba30e03e7334362ef0749b23a) )
+	SEGAPCM_LOAD_128K( "opr-13561.ic13",    0x80000, CRC(80a7c02a) SHA1(7e8c1b9ba270d8657dbe90ed8be2e4b6463e5928) )
 ROM_END
 
 ROM_START( abcopjd )
@@ -4136,10 +4147,10 @@ ROM_START( abcopjd )
 	ROM_REGION( 0x10000, "mainpcb:soundcpu", 0 ) // sound CPU
 	ROM_LOAD( "epr-13560.ic17",    0x00000, 0x10000, CRC(83050925) SHA1(118710e5789c7999bb7326df4d7bd207cbffdfd4) )
 
-	ROM_REGION( 0x80000, "mainpcb:pcm", ROMREGION_ERASEFF ) // Sega PCM sound data
-	ROM_LOAD( "opr-13563.ic11",    0x00000, 0x20000, CRC(4083e74f) SHA1(e48c7ce0aa3406af0bbf79c169a8157693c97041) )
-	ROM_LOAD( "opr-13562.ic12",    0x20000, 0x20000, CRC(3cc3968f) SHA1(d25647f6a3fa939ba30e03e7334362ef0749b23a) )
-	ROM_LOAD( "opr-13561.ic13",    0x40000, 0x20000, CRC(80a7c02a) SHA1(7e8c1b9ba270d8657dbe90ed8be2e4b6463e5928) )
+	ROM_REGION( 0x100000, "mainpcb:pcm", ROMREGION_ERASEFF ) // Sega PCM sound data
+	SEGAPCM_LOAD_128K( "opr-13563.ic11",    0x00000, CRC(4083e74f) SHA1(e48c7ce0aa3406af0bbf79c169a8157693c97041) )
+	SEGAPCM_LOAD_128K( "opr-13562.ic12",    0x40000, CRC(3cc3968f) SHA1(d25647f6a3fa939ba30e03e7334362ef0749b23a) )
+	SEGAPCM_LOAD_128K( "opr-13561.ic13",    0x80000, CRC(80a7c02a) SHA1(7e8c1b9ba270d8657dbe90ed8be2e4b6463e5928) )
 ROM_END
 
 
@@ -4194,10 +4205,10 @@ ROM_START( gpriders )
 	ROM_REGION( 0x10000, "mainpcb:soundcpu", 0 ) // sound CPU
 	ROM_LOAD( "epr-13388.ic17",    0x00000, 0x10000, CRC(706581e4) SHA1(51c9dbf2bf0d6b8826de24cd33596f5c95136870) )
 
-	ROM_REGION( 0x80000, "mainpcb:pcm", ROMREGION_ERASEFF ) // Sega PCM sound data
-	ROM_LOAD( "epr-13391.ic11",    0x00000, 0x20000, CRC(8c30c867) SHA1(0d735291b1311890938f8a1143fae6af9feb2a69) )
-	ROM_LOAD( "epr-13390.ic12",    0x20000, 0x20000, CRC(8c93cd05) SHA1(bb08094abac6c104eddf14f634e9791f03122946) )
-	ROM_LOAD( "epr-13389.ic13",    0x40000, 0x20000, CRC(4e4c758e) SHA1(181750dfcdd6d5b28b063c980c251991163d9474) )
+	ROM_REGION( 0x100000, "mainpcb:pcm", ROMREGION_ERASEFF ) // Sega PCM sound data
+	SEGAPCM_LOAD_128K( "epr-13391.ic11",    0x00000, CRC(8c30c867) SHA1(0d735291b1311890938f8a1143fae6af9feb2a69) )
+	SEGAPCM_LOAD_128K( "epr-13390.ic12",    0x40000, CRC(8c93cd05) SHA1(bb08094abac6c104eddf14f634e9791f03122946) )
+	SEGAPCM_LOAD_128K( "epr-13389.ic13",    0x80000, CRC(4e4c758e) SHA1(181750dfcdd6d5b28b063c980c251991163d9474) )
 ROM_END
 
 // Twin setup
@@ -4244,10 +4255,10 @@ ROM_START( gprider )
 	ROM_REGION( 0x10000, "mainpcb:soundcpu", 0 ) // sound CPU
 	ROM_LOAD( "epr-13388.ic17",    0x00000, 0x10000, CRC(706581e4) SHA1(51c9dbf2bf0d6b8826de24cd33596f5c95136870) )
 
-	ROM_REGION( 0x80000, "mainpcb:pcm", ROMREGION_ERASEFF ) // Sega PCM sound data
-	ROM_LOAD( "epr-13391.ic11",    0x00000, 0x20000, CRC(8c30c867) SHA1(0d735291b1311890938f8a1143fae6af9feb2a69) )
-	ROM_LOAD( "epr-13390.ic12",    0x20000, 0x20000, CRC(8c93cd05) SHA1(bb08094abac6c104eddf14f634e9791f03122946) )
-	ROM_LOAD( "epr-13389.ic13",    0x40000, 0x20000, CRC(4e4c758e) SHA1(181750dfcdd6d5b28b063c980c251991163d9474) )
+	ROM_REGION( 0x100000, "mainpcb:pcm", ROMREGION_ERASEFF ) // Sega PCM sound data
+	SEGAPCM_LOAD_128K( "epr-13391.ic11",    0x00000, CRC(8c30c867) SHA1(0d735291b1311890938f8a1143fae6af9feb2a69) )
+	SEGAPCM_LOAD_128K( "epr-13390.ic12",    0x40000, CRC(8c93cd05) SHA1(bb08094abac6c104eddf14f634e9791f03122946) )
+	SEGAPCM_LOAD_128K( "epr-13389.ic13",    0x80000, CRC(4e4c758e) SHA1(181750dfcdd6d5b28b063c980c251991163d9474) )
 
 	ROM_REGION( 0x80000, "subpcb:maincpu", 0 ) // 68000 code
 	ROM_LOAD16_BYTE( "epr-13409.ic58", 0x00000, 0x20000, CRC(9abb81b6) SHA1(f6308f3ec99ee66677e86f6a915e4dff8557d25f) )
@@ -4291,10 +4302,10 @@ ROM_START( gprider )
 	ROM_REGION( 0x10000, "subpcb:soundcpu", 0 ) // sound CPU
 	ROM_LOAD( "epr-13388.ic17",    0x00000, 0x10000, CRC(706581e4) SHA1(51c9dbf2bf0d6b8826de24cd33596f5c95136870) )
 
-	ROM_REGION( 0x80000, "subpcb:pcm", ROMREGION_ERASEFF ) // Sega PCM sound data
-	ROM_LOAD( "epr-13391.ic11",    0x00000, 0x20000, CRC(8c30c867) SHA1(0d735291b1311890938f8a1143fae6af9feb2a69) )
-	ROM_LOAD( "epr-13390.ic12",    0x20000, 0x20000, CRC(8c93cd05) SHA1(bb08094abac6c104eddf14f634e9791f03122946) )
-	ROM_LOAD( "epr-13389.ic13",    0x40000, 0x20000, CRC(4e4c758e) SHA1(181750dfcdd6d5b28b063c980c251991163d9474) )
+	ROM_REGION( 0x100000, "subpcb:pcm", ROMREGION_ERASEFF ) // Sega PCM sound data
+	SEGAPCM_LOAD_128K( "epr-13391.ic11",    0x00000, CRC(8c30c867) SHA1(0d735291b1311890938f8a1143fae6af9feb2a69) )
+	SEGAPCM_LOAD_128K( "epr-13390.ic12",    0x40000, CRC(8c93cd05) SHA1(bb08094abac6c104eddf14f634e9791f03122946) )
+	SEGAPCM_LOAD_128K( "epr-13389.ic13",    0x80000, CRC(4e4c758e) SHA1(181750dfcdd6d5b28b063c980c251991163d9474) )
 ROM_END
 
 
@@ -4347,10 +4358,10 @@ ROM_START( gpriderus )
 	ROM_REGION( 0x10000, "mainpcb:soundcpu", 0 ) // sound CPU
 	ROM_LOAD( "epr-13388.ic17",    0x00000, 0x10000, CRC(706581e4) SHA1(51c9dbf2bf0d6b8826de24cd33596f5c95136870) )
 
-	ROM_REGION( 0x80000, "mainpcb:pcm", ROMREGION_ERASEFF ) // Sega PCM sound data
-	ROM_LOAD( "epr-13391.ic11",    0x00000, 0x20000, CRC(8c30c867) SHA1(0d735291b1311890938f8a1143fae6af9feb2a69) )
-	ROM_LOAD( "epr-13390.ic12",    0x20000, 0x20000, CRC(8c93cd05) SHA1(bb08094abac6c104eddf14f634e9791f03122946) )
-	ROM_LOAD( "epr-13389.ic13",    0x40000, 0x20000, CRC(4e4c758e) SHA1(181750dfcdd6d5b28b063c980c251991163d9474) )
+	ROM_REGION( 0x100000, "mainpcb:pcm", ROMREGION_ERASEFF ) // Sega PCM sound data
+	SEGAPCM_LOAD_128K( "epr-13391.ic11",    0x00000, CRC(8c30c867) SHA1(0d735291b1311890938f8a1143fae6af9feb2a69) )
+	SEGAPCM_LOAD_128K( "epr-13390.ic12",    0x40000, CRC(8c93cd05) SHA1(bb08094abac6c104eddf14f634e9791f03122946) )
+	SEGAPCM_LOAD_128K( "epr-13389.ic13",    0x80000, CRC(4e4c758e) SHA1(181750dfcdd6d5b28b063c980c251991163d9474) )
 ROM_END
 
 // twin setup
@@ -4397,10 +4408,10 @@ ROM_START( gprideru )
 	ROM_REGION( 0x10000, "mainpcb:soundcpu", 0 ) // sound CPU
 	ROM_LOAD( "epr-13388.ic17",    0x00000, 0x10000, CRC(706581e4) SHA1(51c9dbf2bf0d6b8826de24cd33596f5c95136870) )
 
-	ROM_REGION( 0x80000, "mainpcb:pcm", ROMREGION_ERASEFF ) // Sega PCM sound data
-	ROM_LOAD( "epr-13391.ic11",    0x00000, 0x20000, CRC(8c30c867) SHA1(0d735291b1311890938f8a1143fae6af9feb2a69) )
-	ROM_LOAD( "epr-13390.ic12",    0x20000, 0x20000, CRC(8c93cd05) SHA1(bb08094abac6c104eddf14f634e9791f03122946) )
-	ROM_LOAD( "epr-13389.ic13",    0x40000, 0x20000, CRC(4e4c758e) SHA1(181750dfcdd6d5b28b063c980c251991163d9474) )
+	ROM_REGION( 0x100000, "mainpcb:pcm", ROMREGION_ERASEFF ) // Sega PCM sound data
+	SEGAPCM_LOAD_128K( "epr-13391.ic11",    0x00000, CRC(8c30c867) SHA1(0d735291b1311890938f8a1143fae6af9feb2a69) )
+	SEGAPCM_LOAD_128K( "epr-13390.ic12",    0x40000, CRC(8c93cd05) SHA1(bb08094abac6c104eddf14f634e9791f03122946) )
+	SEGAPCM_LOAD_128K( "epr-13389.ic13",    0x80000, CRC(4e4c758e) SHA1(181750dfcdd6d5b28b063c980c251991163d9474) )
 
 	ROM_REGION( 0x80000, "subpcb:maincpu", 0 ) // 68000 code
 	ROM_LOAD16_BYTE( "epr-13407.ic58", 0x00000, 0x20000, CRC(03553ebd) SHA1(041a71a2dce2ad56360f500cb11e29a629020160) )
@@ -4444,10 +4455,10 @@ ROM_START( gprideru )
 	ROM_REGION( 0x10000, "subpcb:soundcpu", 0 ) // sound CPU
 	ROM_LOAD( "epr-13388.ic17",    0x00000, 0x10000, CRC(706581e4) SHA1(51c9dbf2bf0d6b8826de24cd33596f5c95136870) )
 
-	ROM_REGION( 0x80000, "subpcb:pcm", ROMREGION_ERASEFF ) // Sega PCM sound data
-	ROM_LOAD( "epr-13391.ic11",    0x00000, 0x20000, CRC(8c30c867) SHA1(0d735291b1311890938f8a1143fae6af9feb2a69) )
-	ROM_LOAD( "epr-13390.ic12",    0x20000, 0x20000, CRC(8c93cd05) SHA1(bb08094abac6c104eddf14f634e9791f03122946) )
-	ROM_LOAD( "epr-13389.ic13",    0x40000, 0x20000, CRC(4e4c758e) SHA1(181750dfcdd6d5b28b063c980c251991163d9474) )
+	ROM_REGION( 0x100000, "subpcb:pcm", ROMREGION_ERASEFF ) // Sega PCM sound data
+	SEGAPCM_LOAD_128K( "epr-13391.ic11",    0x00000, CRC(8c30c867) SHA1(0d735291b1311890938f8a1143fae6af9feb2a69) )
+	SEGAPCM_LOAD_128K( "epr-13390.ic12",    0x40000, CRC(8c93cd05) SHA1(bb08094abac6c104eddf14f634e9791f03122946) )
+	SEGAPCM_LOAD_128K( "epr-13389.ic13",    0x80000, CRC(4e4c758e) SHA1(181750dfcdd6d5b28b063c980c251991163d9474) )
 ROM_END
 
 //*************************************************************************************************************************
@@ -4499,10 +4510,10 @@ ROM_START( gpriderjs )
 	ROM_REGION( 0x10000, "mainpcb:soundcpu", 0 ) // sound CPU
 	ROM_LOAD( "epr-13388.ic17",    0x00000, 0x10000, CRC(706581e4) SHA1(51c9dbf2bf0d6b8826de24cd33596f5c95136870) )
 
-	ROM_REGION( 0x80000, "mainpcb:pcm", ROMREGION_ERASEFF ) // Sega PCM sound data
-	ROM_LOAD( "epr-13391.ic11",    0x00000, 0x20000, CRC(8c30c867) SHA1(0d735291b1311890938f8a1143fae6af9feb2a69) )
-	ROM_LOAD( "epr-13390.ic12",    0x20000, 0x20000, CRC(8c93cd05) SHA1(bb08094abac6c104eddf14f634e9791f03122946) )
-	ROM_LOAD( "epr-13389.ic13",    0x40000, 0x20000, CRC(4e4c758e) SHA1(181750dfcdd6d5b28b063c980c251991163d9474) )
+	ROM_REGION( 0x100000, "mainpcb:pcm", ROMREGION_ERASEFF ) // Sega PCM sound data
+	SEGAPCM_LOAD_128K( "epr-13391.ic11",    0x00000, CRC(8c30c867) SHA1(0d735291b1311890938f8a1143fae6af9feb2a69) )
+	SEGAPCM_LOAD_128K( "epr-13390.ic12",    0x40000, CRC(8c93cd05) SHA1(bb08094abac6c104eddf14f634e9791f03122946) )
+	SEGAPCM_LOAD_128K( "epr-13389.ic13",    0x80000, CRC(4e4c758e) SHA1(181750dfcdd6d5b28b063c980c251991163d9474) )
 ROM_END
 
 // twin setup
@@ -4549,10 +4560,10 @@ ROM_START( gpriderj )
 	ROM_REGION( 0x10000, "mainpcb:soundcpu", 0 ) // sound CPU
 	ROM_LOAD( "epr-13388.ic17",    0x00000, 0x10000, CRC(706581e4) SHA1(51c9dbf2bf0d6b8826de24cd33596f5c95136870) )
 
-	ROM_REGION( 0x80000, "mainpcb:pcm", ROMREGION_ERASEFF ) // Sega PCM sound data
-	ROM_LOAD( "epr-13391.ic11",    0x00000, 0x20000, CRC(8c30c867) SHA1(0d735291b1311890938f8a1143fae6af9feb2a69) )
-	ROM_LOAD( "epr-13390.ic12",    0x20000, 0x20000, CRC(8c93cd05) SHA1(bb08094abac6c104eddf14f634e9791f03122946) )
-	ROM_LOAD( "epr-13389.ic13",    0x40000, 0x20000, CRC(4e4c758e) SHA1(181750dfcdd6d5b28b063c980c251991163d9474) )
+	ROM_REGION( 0x100000, "mainpcb:pcm", ROMREGION_ERASEFF ) // Sega PCM sound data
+	SEGAPCM_LOAD_128K( "epr-13391.ic11",    0x00000, CRC(8c30c867) SHA1(0d735291b1311890938f8a1143fae6af9feb2a69) )
+	SEGAPCM_LOAD_128K( "epr-13390.ic12",    0x40000, CRC(8c93cd05) SHA1(bb08094abac6c104eddf14f634e9791f03122946) )
+	SEGAPCM_LOAD_128K( "epr-13389.ic13",    0x80000, CRC(4e4c758e) SHA1(181750dfcdd6d5b28b063c980c251991163d9474) )
 
 	ROM_REGION( 0x80000, "subpcb:maincpu", 0 ) // 68000 code
 	ROM_LOAD16_BYTE( "epr-13387.ic58", 0x00000, 0x20000, CRC(a1e8b2c5) SHA1(22b70a9074263af808bb9dffee29cbcff7e304e3) )
@@ -4596,10 +4607,10 @@ ROM_START( gpriderj )
 	ROM_REGION( 0x10000, "subpcb:soundcpu", 0 ) // sound CPU
 	ROM_LOAD( "epr-13388.ic17",    0x00000, 0x10000, CRC(706581e4) SHA1(51c9dbf2bf0d6b8826de24cd33596f5c95136870) )
 
-	ROM_REGION( 0x80000, "subpcb:pcm", ROMREGION_ERASEFF ) // Sega PCM sound data
-	ROM_LOAD( "epr-13391.ic11",    0x00000, 0x20000, CRC(8c30c867) SHA1(0d735291b1311890938f8a1143fae6af9feb2a69) )
-	ROM_LOAD( "epr-13390.ic12",    0x20000, 0x20000, CRC(8c93cd05) SHA1(bb08094abac6c104eddf14f634e9791f03122946) )
-	ROM_LOAD( "epr-13389.ic13",    0x40000, 0x20000, CRC(4e4c758e) SHA1(181750dfcdd6d5b28b063c980c251991163d9474) )
+	ROM_REGION( 0x100000, "subpcb:pcm", ROMREGION_ERASEFF ) // Sega PCM sound data
+	SEGAPCM_LOAD_128K( "epr-13391.ic11",    0x00000, CRC(8c30c867) SHA1(0d735291b1311890938f8a1143fae6af9feb2a69) )
+	SEGAPCM_LOAD_128K( "epr-13390.ic12",    0x40000, CRC(8c93cd05) SHA1(bb08094abac6c104eddf14f634e9791f03122946) )
+	SEGAPCM_LOAD_128K( "epr-13389.ic13",    0x80000, CRC(4e4c758e) SHA1(181750dfcdd6d5b28b063c980c251991163d9474) )
 ROM_END
 
 //*************************************************************************************************************************
@@ -4635,7 +4646,7 @@ ROM_START( rascot )
 	// is this really a sound rom, or a terminal / link rom? accesses unexpected addresses
 	ROM_LOAD( "epr-14221a",    0x00000, 0x10000, CRC(0d429ac4) SHA1(9cd4c7e858874f372eb3e409ba37964f1ebf07d5) )
 
-	ROM_REGION( 0x80000, "mainpcb:pcm", ROMREGION_ERASEFF ) // Sega PCM sound data
+	ROM_REGION( 0x100000, "mainpcb:pcm", ROMREGION_ERASEFF ) // Sega PCM sound data
 	// none??
 ROM_END
 
