@@ -65,7 +65,6 @@ protected:
 private:
 	std::unique_ptr<uint8_t[]> m_ram;
 	uint8_t m_low[16];
-	int m_bank;
 	int m_bankshift;
 	int m_bankmask;
 	sound_stream* m_stream;
