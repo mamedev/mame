@@ -165,6 +165,7 @@ public:
 		m_floppy(*this, "fdc:%u", 0),
 		m_i8088(*this, "i8088"),
 		m_beep(*this, "beeper"),
+		m_pic(*this, "pic8259"),
 		m_keycols(*this, "COL.%u", 0),
 		m_palette(*this, "palette"),
 		m_vram(*this, "vram"),
@@ -214,6 +215,7 @@ protected:
 	required_device_array<floppy_connector, 2> m_floppy;
 	optional_device<cpu_device> m_i8088;
 	required_device<beep_device> m_beep;
+	optional_device<pic8259_device> m_pic;
 	required_ioport_array<16> m_keycols;
 
 private:
@@ -339,7 +341,8 @@ READ8_MEMBER(alphatp_34_state::comm88_r)
 {
 	if(!offset)
 		return (m_85_da ? 0 : 1) | (m_88_da ? 0 : 0x80);
-	m_i8088->set_input_line(INPUT_LINE_TEST, ASSERT_LINE);
+	if(m_i8088)
+		m_i8088->set_input_line(INPUT_LINE_TEST, ASSERT_LINE);
 	m_85_da = false;
 	return m_85_data;
 }
@@ -347,6 +350,8 @@ READ8_MEMBER(alphatp_34_state::comm88_r)
 WRITE8_MEMBER(alphatp_34_state::comm88_w)
 {
 	m_88_data = data;
+	if(m_pic)
+		m_pic->ir2_w(ASSERT_LINE);
 	m_88_da = true;
 }
 
@@ -354,6 +359,7 @@ READ8_MEMBER(alphatp_34_state::comm85_r)
 {
 	if(!offset)
 		return m_88_da ? 0 : 1;
+	m_pic->ir2_w(CLEAR_LINE);
 	m_88_da = false;
 	return m_88_data;
 }
@@ -409,8 +415,9 @@ READ_LINE_MEMBER(alphatp_34_state::kbd_matrix_r)
 
 WRITE8_MEMBER(alphatp_34_state::kbd_matrix_w)
 {
-	if ((data & 0x80) && (!m_kbdclk))
+	if (data & 0x80)
 	{
+		data--; // FIXME: the p30 kbc program doesn't clock the keyboard but gets the wrong value from t0
 		const ioport_value tmp_read = m_keycols[(data >> 3) & 0xf]->read() & (1 << (data & 0x7));
 		m_kbdread = (tmp_read != 0) ? 1 : 0;
 	}
