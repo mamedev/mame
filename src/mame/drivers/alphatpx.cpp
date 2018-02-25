@@ -72,6 +72,7 @@
 #include "machine/i8251.h"
 #include "machine/wd_fdc.h"
 #include "machine/pic8259.h"
+#include "machine/pit8253.h"
 #include "video/tms9927.h"
 #include "sound/beep.h"
 #include "screen.h"
@@ -189,6 +190,10 @@ public:
 	DECLARE_WRITE8_MEMBER(beep_w);
 	DECLARE_WRITE8_MEMBER(bank_w);
 	DECLARE_READ8_MEMBER(start88_r);
+	DECLARE_READ8_MEMBER(comm85_r);
+	DECLARE_WRITE8_MEMBER(comm85_w);
+	DECLARE_READ8_MEMBER(comm88_r);
+	DECLARE_WRITE8_MEMBER(comm88_w);
 
 	void alphatp3(machine_config &config);
 	void alphatp30(machine_config &config);
@@ -219,6 +224,8 @@ private:
 	required_shared_ptr<u8> m_ram;
 	floppy_image_device *m_curfloppy;
 	bool m_fdc_irq, m_fdc_drq, m_fdc_hld;
+	u8 m_85_data, m_88_data;
+	bool m_88_da, m_85_da, m_88_started;
 };
 
 //**************************************************************************
@@ -279,9 +286,10 @@ ADDRESS_MAP_START(alphatp_34_state::alphatp3_io)
 	ADDRESS_MAP_UNMAP_HIGH
 	AM_RANGE(0x04, 0x04) AM_DEVREADWRITE("uart", i8251_device, data_r, data_w)
 	AM_RANGE(0x05, 0x05) AM_DEVREADWRITE("uart", i8251_device, status_r, control_w)
+	AM_RANGE(0x08, 0x09) AM_READWRITE(comm88_r, comm88_w)
 	AM_RANGE(0x10, 0x11) AM_DEVREADWRITE("kbdmcu", i8041_device, upi41_master_r, upi41_master_w)
 	AM_RANGE(0x12, 0x12) AM_WRITE(beep_w)
-	AM_RANGE(0x40, 0x40) AM_READ(start88_r)
+	AM_RANGE(0x40, 0x41) AM_READ(start88_r)
 	AM_RANGE(0x50, 0x53) AM_READWRITE(fdc_r, fdc_w)
 	AM_RANGE(0x54, 0x54) AM_READWRITE(fdc_stat_r, fdc_cmd_w)
 	AM_RANGE(0x78, 0x78) AM_WRITE(bank_w)
@@ -294,18 +302,57 @@ ADDRESS_MAP_END
 
 ADDRESS_MAP_START(alphatp_34_state::alphatp30_8088_io)
 	AM_RANGE(0xffe0, 0xffe1) AM_DEVREADWRITE("pic8259", pic8259_device, read, write)
+	AM_RANGE(0xffe4, 0xffe7) AM_DEVREADWRITE("pit", pit8253_device, read, write)
+	AM_RANGE(0xffe9, 0xffea) AM_READWRITE(comm85_r, comm85_w)
 ADDRESS_MAP_END
 
 READ8_MEMBER(alphatp_34_state::start88_r)
 {
-	if(m_i8088)
-		m_i8088->resume(SUSPEND_REASON_DISABLE);
+	if(!offset)
+	{
+		if(m_i8088 && !m_88_started)
+		{
+			m_i8088->resume(SUSPEND_REASON_DISABLE);
+			m_88_started = true;
+		}
+		m_i8088->set_input_line(INPUT_LINE_TEST, ASSERT_LINE);
+	}
+	else
+		m_i8088->set_input_line(INPUT_LINE_TEST, CLEAR_LINE);
 	return 0;
 }
 
 WRITE8_MEMBER(alphatp_34_state::bank_w)
 {
 	m_bankdev->set_bank(BIT(data, 6));
+}
+
+READ8_MEMBER(alphatp_34_state::comm88_r)
+{
+	if(!offset)
+		return (m_85_da ? 0 : 1) | (m_88_da ? 0 : 0x80);
+	m_85_da = false;
+	return m_85_data;
+}
+
+WRITE8_MEMBER(alphatp_34_state::comm88_w)
+{
+	m_88_data = data;
+	m_88_da = true;
+}
+
+READ8_MEMBER(alphatp_34_state::comm85_r)
+{
+	if(!offset)
+		return m_88_da ? 0 : 1;
+	m_88_da = false;
+	return m_88_data;
+}
+
+WRITE8_MEMBER(alphatp_34_state::comm85_w)
+{
+	m_85_data = data;
+	m_85_da = true;
 }
 
 //**************************************************************************
@@ -1097,6 +1144,7 @@ void alphatp_34_state::machine_reset()
 	m_kbdread = 1;
 	m_kbdclk = 1;   m_fdc_irq = m_fdc_drq = m_fdc_hld = 0;
 	m_curfloppy = nullptr;
+	m_88_da = m_85_da = m_88_started = false;
 }
 MACHINE_CONFIG_START(alphatp_34_state::alphatp3)
 	MCFG_CPU_ADD("maincpu", I8085A, XTAL(6'000'000))
@@ -1160,6 +1208,11 @@ MACHINE_CONFIG_START(alphatp_34_state::alphatp30)
 	MCFG_DEVICE_ADD("pic8259", PIC8259, 0)
 	MCFG_PIC8259_OUT_INT_CB(INPUTLINE("i8088", 0))
 	MCFG_PIC8259_IN_SP_CB(GND)
+
+	MCFG_DEVICE_ADD("pit", PIT8253, 0)
+	MCFG_PIT8253_CLK0(1000000)  // 15Mhz osc with unknown divisor
+	MCFG_PIT8253_CLK1(1000000)
+	MCFG_PIT8253_CLK2(1000000)
 MACHINE_CONFIG_END
 
 //**************************************************************************
