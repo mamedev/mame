@@ -20,7 +20,7 @@
 	MCFG_DEVICE_REPLACE(_tag, ZSG2, _clock)
 
 #define MCFG_ZSG2_EXT_READ_HANDLER(_devcb) \
-	devcb = &zsg2_device::set_ext_read_handler(*device, DEVCB_##_devcb);
+	devcb = &downcast<zsg2_device &>(*device).set_ext_read_handler(DEVCB_##_devcb);
 
 
 // ======================> zsg2_device
@@ -31,8 +31,8 @@ class zsg2_device : public device_t,
 public:
 	zsg2_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
-	// static configuration helpers
-	template <class Object> static devcb_base &set_ext_read_handler(device_t &device, Object &&cb) { return downcast<zsg2_device &>(device).m_ext_read_handler.set_callback(std::forward<Object>(cb)); }
+	// configuration helpers
+	template <class Object> devcb_base &set_ext_read_handler(Object &&cb) { return m_ext_read_handler.set_callback(std::forward<Object>(cb)); }
 
 	DECLARE_READ16_MEMBER(read);
 	DECLARE_WRITE16_MEMBER(write);

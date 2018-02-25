@@ -20,7 +20,7 @@
 	MCFG_DEVICE_REPLACE(_tag, RF5C68, _clock)
 
 #define MCFG_RF5C68_SAMPLE_END_CB(_class, _method) \
-	rf5c68_device::set_end_callback(*device, rf5c68_device::sample_end_cb_delegate(&_class::_method, #_class "::" #_method, this));
+	downcast<rf5c68_device &>(*device).set_end_callback(rf5c68_device::sample_end_cb_delegate(&_class::_method, #_class "::" #_method, this));
 
 //**************************************************************************
 //  TYPE DEFINITIONS
@@ -39,7 +39,7 @@ public:
 
 	rf5c68_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
-	static void set_end_callback(device_t &device, sample_end_cb_delegate &&cb) { downcast<rf5c68_device &>(device).m_sample_end_cb = std::move(cb); }
+	template <typename Object> void set_end_callback(Object &&cb) { m_sample_end_cb = std::forward<Object>(cb); }
 
 	DECLARE_READ8_MEMBER( rf5c68_r );
 	DECLARE_WRITE8_MEMBER( rf5c68_w );

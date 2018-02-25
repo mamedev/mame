@@ -1301,7 +1301,7 @@ WRITE8_MEMBER( inder_state::ppic_w )
 {
 	// pc4 - READY line back to cpu board, but not used
 	if (BIT(data, 5) != BIT(m_portc, 5))
-		m_msm->set_prescaler_selector(*m_msm, BIT(data, 5) ? msm5205_device::S48_4B : msm5205_device::S96_4B); // S1 pin
+		m_msm->set_prescaler_selector(BIT(data, 5) ? msm5205_device::S48_4B : msm5205_device::S96_4B); // S1 pin
 	m_7a->clock_w(BIT(data, 6));
 	m_7a->preset_w(!BIT(data, 7));
 	m_9a->preset_w(!BIT(data, 7));

@@ -31,7 +31,7 @@
 
 #define MCFG_CDP1863_ADD(_tag, _clock, _clock2) \
 	MCFG_DEVICE_ADD(_tag, CDP1863, _clock) \
-	cdp1863_device::static_set_clock2(*device, _clock2);
+	downcast<cdp1863_device &>(*device).set_clock2(_clock2);
 
 
 
@@ -49,8 +49,8 @@ public:
 	cdp1863_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
 	// inline configuration helpers
-	static void static_set_clock2(device_t &device, int clock2);
-	static void static_set_clock2(device_t &device, const XTAL &xtal) { xtal.validate("selecting cdp1863 clock"); static_set_clock2(device, xtal.value()); }
+	void set_clock2(int clock2) { m_clock2 = clock2; }
+	void set_clock2(const XTAL &xtal) { xtal.validate("selecting cdp1863 clock"); set_clock2(xtal.value()); }
 
 	DECLARE_WRITE8_MEMBER( str_w );
 	void str_w(uint8_t data);

@@ -52,17 +52,6 @@ void c352_device::rom_bank_updated()
 	m_stream->update();
 }
 
-//-------------------------------------------------
-//  static_set_dividder - configuration helper to
-//  set the divider setting
-//-------------------------------------------------
-
-void c352_device::static_set_divider(device_t &device, int setting)
-{
-	c352_device &c352 = downcast<c352_device &>(device);
-	c352.m_divider = setting;
-}
-
 void c352_device::fetch_sample(c352_voice_t* v)
 {
 	v->last_sample = v->sample;

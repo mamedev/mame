@@ -56,17 +56,6 @@ asc_device::asc_device(const machine_config &mconfig, const char *tag, device_t 
 
 
 //-------------------------------------------------
-//  static_set_type - configuration helper to set
-//  the chip type
-//-------------------------------------------------
-
-void asc_device::static_set_type(device_t &device, asc_type type)
-{
-	asc_device &asc = downcast<asc_device &>(device);
-	asc.m_chip_type = type;
-}
-
-//-------------------------------------------------
 //  device_start - device-specific startup
 //-------------------------------------------------
 
