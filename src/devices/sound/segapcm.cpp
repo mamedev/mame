@@ -7,6 +7,7 @@
 #include "emu.h"
 #include "segapcm.h"
 
+#include <algorithm>
 
 // device type definition
 DEFINE_DEVICE_TYPE(SEGAPCM, segapcm_device, "segapcm", "Sega PCM")
@@ -22,8 +23,8 @@ segapcm_device::segapcm_device(const machine_config &mconfig, const char *tag, d
 		device_rom_interface(mconfig, *this, 21),
 		m_ram(nullptr),
 		m_bank(0),
-		m_bankshift(0),
-		m_bankmask(0),
+		m_bankshift(12),
+		m_bankmask(0x70),
 		m_stream(nullptr)
 {
 }
@@ -35,18 +36,9 @@ segapcm_device::segapcm_device(const machine_config &mconfig, const char *tag, d
 
 void segapcm_device::device_start()
 {
-	int mask;
-
 	m_ram = std::make_unique<uint8_t[]>(0x800);
 
-	memset(m_ram.get(), 0xff, 0x800);
-
-	m_bankshift = (uint8_t) m_bank;
-	mask = m_bank >> 16;
-	if (!mask)
-		mask = BANK_MASK7 >> 16;
-
-	m_bankmask = mask & (0x1fffff >> m_bankshift);
+	std::fill(&m_ram[0], &m_ram[0x800], 0xff);
 
 	m_stream = stream_alloc(0, 2, clock() / 128);
 
