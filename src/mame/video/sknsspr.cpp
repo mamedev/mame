@@ -25,7 +25,7 @@ DEFINE_DEVICE_TYPE(SKNS_SPRITE, sknsspr_device, "sknsspr", "SKNS Sprite")
 sknsspr_device::sknsspr_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
 	: device_t(mconfig, SKNS_SPRITE, tag, owner, clock)
 	, device_video_interface(mconfig, *this)
-	, device_rom_interface(mconfig, *this, 32)
+	, device_rom_interface(mconfig, *this, 27) // TODO : Unknown address bits; maybe 27?
 {
 }
 
@@ -52,23 +52,23 @@ int sknsspr_device::skns_rle_decode ( int romoffset, int size )
 	int decodeoffset = 0;
 
 	while(size>0) {
-		uint8_t code = read_byte(romoffset++);
+		uint8_t code = read_byte((romoffset++) % (1<<27));
 		size -= (code & 0x7f) + 1;
 		if(code & 0x80) { /* (code & 0x7f) normal values will follow */
 			code &= 0x7f;
 			do {
-				m_decodebuffer[(decodeoffset++)%SUPRNOVA_DECODE_BUFFER_SIZE] = read_byte(romoffset++);
+				m_decodebuffer[(decodeoffset++)%SUPRNOVA_DECODE_BUFFER_SIZE] = read_byte((romoffset++) % (1<<27));
 				code--;
 			} while(code != 0xff);
 		} else {  /* repeat next value (code & 0x7f) times */
-			uint8_t val = read_byte(romoffset++);
+			uint8_t val = read_byte((romoffset++) % (1<<27));
 			do {
 				m_decodebuffer[(decodeoffset++)%SUPRNOVA_DECODE_BUFFER_SIZE] = val;
 				code--;
 			} while(code != 0xff);
 		}
 	}
-	return romoffset;
+	return romoffset % (1<<27);
 }
 
 void sknsspr_device::skns_sprite_kludge(int x, int y)
