@@ -284,12 +284,14 @@ ADDRESS_MAP_END
 
 ADDRESS_MAP_START(alphatp_34_state::alphatp3_io)
 	ADDRESS_MAP_UNMAP_HIGH
+	//AM_RANGE(0x00, 0x00) AM_READ // unknown
 	AM_RANGE(0x04, 0x04) AM_DEVREADWRITE("uart", i8251_device, data_r, data_w)
 	AM_RANGE(0x05, 0x05) AM_DEVREADWRITE("uart", i8251_device, status_r, control_w)
 	AM_RANGE(0x08, 0x09) AM_READWRITE(comm88_r, comm88_w)
 	AM_RANGE(0x10, 0x11) AM_DEVREADWRITE("kbdmcu", i8041_device, upi41_master_r, upi41_master_w)
 	AM_RANGE(0x12, 0x12) AM_WRITE(beep_w)
 	AM_RANGE(0x40, 0x41) AM_READ(start88_r)
+	//AM_RANGE(0x42, 0x42) AM_WRITE // unknown
 	AM_RANGE(0x50, 0x53) AM_READWRITE(fdc_r, fdc_w)
 	AM_RANGE(0x54, 0x54) AM_READWRITE(fdc_stat_r, fdc_cmd_w)
 	AM_RANGE(0x78, 0x78) AM_WRITE(bank_w)
@@ -297,10 +299,16 @@ ADDRESS_MAP_END
 
 ADDRESS_MAP_START(alphatp_34_state::alphatp30_8088_map)
 	AM_RANGE(0x00000, 0x1ffff) AM_RAM
+	//AM_RANGE(0xe0000, 0xeffff) AM_READWRITE // unknown possibly gfx ext
 	AM_RANGE(0xfe000, 0xfffff) AM_ROM AM_REGION("16bit", 0)
 ADDRESS_MAP_END
 
 ADDRESS_MAP_START(alphatp_34_state::alphatp30_8088_io)
+	//AM_RANGE(0x008a, 0x008a) AM_READ // unknown
+	//AM_RANGE(0xf800, 0xf800) AM_WRITE // unknown possibly gfx ext
+	//AM_RANGE(0xf900, 0xf900) AM_WRITE // unknown possibly gfx ext
+	//AM_RANGE(0xfa00, 0xfa01) AM_WRITE // unknown possibly gfx ext
+	//AM_RANGE(0xfb00, 0xfb0f) AM_WRITE // unknown possibly gfx ext
 	AM_RANGE(0xffe0, 0xffe1) AM_DEVREADWRITE("pic8259", pic8259_device, read, write)
 	AM_RANGE(0xffe4, 0xffe7) AM_DEVREADWRITE("pit", pit8253_device, read, write)
 	AM_RANGE(0xffe9, 0xffea) AM_READWRITE(comm85_r, comm85_w)
@@ -331,6 +339,7 @@ READ8_MEMBER(alphatp_34_state::comm88_r)
 {
 	if(!offset)
 		return (m_85_da ? 0 : 1) | (m_88_da ? 0 : 0x80);
+	m_i8088->set_input_line(INPUT_LINE_TEST, ASSERT_LINE);
 	m_85_da = false;
 	return m_85_data;
 }
@@ -353,6 +362,7 @@ WRITE8_MEMBER(alphatp_34_state::comm85_w)
 {
 	m_85_data = data;
 	m_85_da = true;
+	m_i8088->set_input_line(INPUT_LINE_TEST, CLEAR_LINE);
 }
 
 //**************************************************************************
@@ -1213,6 +1223,7 @@ MACHINE_CONFIG_START(alphatp_34_state::alphatp30)
 	MCFG_PIT8253_CLK0(1000000)  // 15Mhz osc with unknown divisor
 	MCFG_PIT8253_CLK1(1000000)
 	MCFG_PIT8253_CLK2(1000000)
+	MCFG_PIT8253_OUT0_HANDLER(DEVWRITELINE("pic8259", pic8259_device, ir0_w))
 MACHINE_CONFIG_END
 
 //**************************************************************************
