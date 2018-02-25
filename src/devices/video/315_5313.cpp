@@ -169,16 +169,6 @@ sega315_5313_device::sega315_5313_device(const machine_config &mconfig, const ch
 }
 
 //-------------------------------------------------
-//  static_set_palette_tag: Set the tag of the
-//  palette device
-//-------------------------------------------------
-
-void sega315_5313_device::static_set_palette_tag(device_t &device, const char *tag)
-{
-	downcast<sega315_5313_device &>(device).m_palette.set_tag(tag);
-}
-
-//-------------------------------------------------
 //  device_add_mconfig
 //  add machine configuration
 //-------------------------------------------------
@@ -199,21 +189,6 @@ TIMER_CALLBACK_MEMBER(sega315_5313_device::irq4_on_timer_callback)
 {
 	m_lv4irqline_callback(true);
 }
-
-void sega315_5313_device::set_alt_timing(device_t &device, int use_alt_timing)
-{
-	sega315_5313_device &dev = downcast<sega315_5313_device &>(device);
-	dev.m_use_alt_timing = use_alt_timing;
-}
-
-void sega315_5313_device::set_palwrite_base(device_t &device, int palwrite_base)
-{
-	sega315_5313_device &dev = downcast<sega315_5313_device &>(device);
-	dev.m_palwrite_base = palwrite_base;
-}
-
-
-
 
 void sega315_5313_device::device_start()
 {

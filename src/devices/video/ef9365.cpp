@@ -208,78 +208,68 @@ ef9365_device::ef9365_device(const machine_config &mconfig, const char *tag, dev
 }
 
 //-------------------------------------------------
-//  static_set_palette_tag: Set the tag of the
-//  palette device
+//  set_nb_of_bitplanes: Set the number of bitplanes
 //-------------------------------------------------
 
-void ef9365_device::static_set_palette_tag(device_t &device, const char *tag)
-{
-	downcast<ef9365_device &>(device).m_palette.set_tag(tag);
-}
-
-//-------------------------------------------------
-//  static_set_nb_of_bitplanes: Set the number of bitplanes
-//-------------------------------------------------
-
-void ef9365_device::static_set_nb_bitplanes(device_t &device, int nb_bitplanes )
+void ef9365_device::set_nb_bitplanes(int nb_bitplanes)
 {
 	if( nb_bitplanes > 0 && nb_bitplanes <= 8 )
 	{
-		downcast<ef9365_device &>(device).nb_of_bitplanes = nb_bitplanes;
-		downcast<ef9365_device &>(device).nb_of_colors = pow(2,nb_bitplanes);
+		nb_of_bitplanes = nb_bitplanes;
+		nb_of_colors = pow(2, nb_bitplanes);
 	}
 }
 
 //-------------------------------------------------
-//  static_set_display_mode: Set the display mode
+//  set_display_mode: Set the display mode
 //-------------------------------------------------
 
-void ef9365_device::static_set_display_mode(device_t &device, int display_mode )
+void ef9365_device::set_display_mode(int display_mode)
 {
 	switch(display_mode)
 	{
 	case DISPLAY_MODE_256x256:
-		downcast<ef9365_device &>(device).bitplane_xres = 256;
-		downcast<ef9365_device &>(device).bitplane_yres = 256;
-		downcast<ef9365_device &>(device).vsync_scanline_pos = 250;
-		downcast<ef9365_device &>(device).overflow_mask_x = 0xFF00;
-		downcast<ef9365_device &>(device).overflow_mask_y = 0xFF00;
+		bitplane_xres = 256;
+		bitplane_yres = 256;
+		vsync_scanline_pos = 250;
+		overflow_mask_x = 0xFF00;
+		overflow_mask_y = 0xFF00;
 		break;
 	case DISPLAY_MODE_512x512:
-		downcast<ef9365_device &>(device).bitplane_xres = 512;
-		downcast<ef9365_device &>(device).bitplane_yres = 512;
-		downcast<ef9365_device &>(device).vsync_scanline_pos = 506;
-		downcast<ef9365_device &>(device).overflow_mask_x = 0xFE00;
-		downcast<ef9365_device &>(device).overflow_mask_y = 0xFE00;
+		bitplane_xres = 512;
+		bitplane_yres = 512;
+		vsync_scanline_pos = 506;
+		overflow_mask_x = 0xFE00;
+		overflow_mask_y = 0xFE00;
 		break;
 	case DISPLAY_MODE_512x256:
-		downcast<ef9365_device &>(device).bitplane_xres = 512;
-		downcast<ef9365_device &>(device).bitplane_yres = 256;
-		downcast<ef9365_device &>(device).vsync_scanline_pos = 250;
-		downcast<ef9365_device &>(device).overflow_mask_x = 0xFE00;
-		downcast<ef9365_device &>(device).overflow_mask_y = 0xFF00;
+		bitplane_xres = 512;
+		bitplane_yres = 256;
+		vsync_scanline_pos = 250;
+		overflow_mask_x = 0xFE00;
+		overflow_mask_y = 0xFF00;
 		break;
 	case DISPLAY_MODE_128x128:
-		downcast<ef9365_device &>(device).bitplane_xres = 128;
-		downcast<ef9365_device &>(device).bitplane_yres = 128;
-		downcast<ef9365_device &>(device).vsync_scanline_pos = 124;
-		downcast<ef9365_device &>(device).overflow_mask_x = 0xFF80;
-		downcast<ef9365_device &>(device).overflow_mask_y = 0xFF80;
+		bitplane_xres = 128;
+		bitplane_yres = 128;
+		vsync_scanline_pos = 124;
+		overflow_mask_x = 0xFF80;
+		overflow_mask_y = 0xFF80;
 		break;
 	case DISPLAY_MODE_64x64:
-		downcast<ef9365_device &>(device).bitplane_xres = 64;
-		downcast<ef9365_device &>(device).bitplane_yres = 64;
-		downcast<ef9365_device &>(device).vsync_scanline_pos = 62;
-		downcast<ef9365_device &>(device).overflow_mask_x = 0xFFC0;
-		downcast<ef9365_device &>(device).overflow_mask_y = 0xFFC0;
+		bitplane_xres = 64;
+		bitplane_yres = 64;
+		vsync_scanline_pos = 62;
+		overflow_mask_x = 0xFFC0;
+		overflow_mask_y = 0xFFC0;
 		break;
 	default:
-		downcast<ef9365_device &>(device).logerror("Invalid EF9365 Display mode: %02x\n", display_mode);
-		downcast<ef9365_device &>(device).bitplane_xres = 256;
-		downcast<ef9365_device &>(device).bitplane_yres = 256;
-		downcast<ef9365_device &>(device).vsync_scanline_pos = 250;
-		downcast<ef9365_device &>(device).overflow_mask_x = 0xFF00;
-		downcast<ef9365_device &>(device).overflow_mask_y = 0xFF00;
+		logerror("Invalid EF9365 Display mode: %02x\n", display_mode);
+		bitplane_xres = 256;
+		bitplane_yres = 256;
+		vsync_scanline_pos = 250;
+		overflow_mask_x = 0xFF00;
+		overflow_mask_y = 0xFF00;
 		break;
 	}
 }

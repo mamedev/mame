@@ -19,10 +19,10 @@
 	MCFG_DEVICE_ADD( _tag, KS0066_F05, 0 )
 
 #define MCFG_HD44780_LCD_SIZE(_lines, _chars) \
-	hd44780_device::static_set_lcd_size(*device, _lines, _chars);
+	downcast<hd44780_device &>(*device).set_lcd_size(_lines, _chars);
 
 #define MCFG_HD44780_PIXEL_UPDATE_CB(_class, _method) \
-	hd44780_device::static_set_pixel_update_cb(*device, hd44780_device::pixel_update_delegate(&_class::_method, #_class "::" #_method, this));
+	downcast<hd44780_device &>(*device).set_pixel_update_cb(hd44780_device::pixel_update_delegate(&_class::_method, #_class "::" #_method, this));
 
 //**************************************************************************
 //  TYPE DEFINITIONS
@@ -42,8 +42,8 @@ public:
 	hd44780_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
 	// static configuration helpers
-	static void static_set_lcd_size(device_t &device, int _lines, int _chars) { hd44780_device &dev=downcast<hd44780_device &>(device); dev.m_lines = _lines; dev.m_chars = _chars; }
-	static void static_set_pixel_update_cb(device_t &device, pixel_update_delegate &&cb) { downcast<hd44780_device &>(device).m_pixel_update_cb = std::move(cb); }
+	void set_lcd_size(int lines, int chars) { m_lines = lines; m_chars = chars; }
+	template <typename Object> void set_pixel_update_cb(Object &&cb) { m_pixel_update_cb = std::forward<Object>(cb); }
 
 	// device interface
 	virtual DECLARE_WRITE8_MEMBER(write);

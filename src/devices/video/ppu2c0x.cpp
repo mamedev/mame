@@ -106,12 +106,6 @@ device_memory_interface::space_config_vector ppu2c0x_device::memory_space_config
 }
 
 
-// static
-void ppu2c0x_device::set_nmi_delegate(device_t &device, nmi_delegate &&cb)
-{
-	ppu2c0x_device &dev = downcast<ppu2c0x_device &>(device);
-	dev.m_nmi_callback_proc = std::move(cb);
-}
 //-------------------------------------------------
 //  ppu2c0x_device - constructor
 //-------------------------------------------------

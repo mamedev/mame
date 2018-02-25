@@ -59,16 +59,16 @@
 #define MCFG_PPU2C0X_SET_SCREEN MCFG_VIDEO_SET_SCREEN
 
 #define MCFG_PPU2C0X_CPU(_tag) \
-	ppu2c0x_device::set_cpu_tag(*device, "^" _tag);
+	downcast<ppu2c0x_device &>(*device).set_cpu_tag("^" _tag);
 
 #define MCFG_PPU2C0X_COLORBASE(_color) \
-	ppu2c0x_device::set_color_base(*device, _color);
+	downcast<ppu2c0x_device &>(*device).set_color_base(_color);
 
 #define MCFG_PPU2C0X_SET_NMI(_class, _method) \
-	ppu2c0x_device::set_nmi_delegate(*device, ppu2c0x_device::nmi_delegate(&_class::_method, #_class "::" #_method, nullptr, (_class *)nullptr));
+	downcast<ppu2c0x_device &>(*device).set_nmi_delegate(ppu2c0x_device::nmi_delegate(&_class::_method, #_class "::" #_method, nullptr, (_class *)nullptr));
 
 #define MCFG_PPU2C0X_IGNORE_SPRITE_WRITE_LIMIT \
-	ppu2c0x_device::use_sprite_write_limitation_disable(*device);
+	downcast<ppu2c0x_device &>(*device).use_sprite_write_limitation_disable();
 
 ///*************************************************************************
 //  TYPE DEFINITIONS
@@ -107,9 +107,9 @@ public:
 	virtual DECLARE_READ8_MEMBER( palette_read );
 	virtual DECLARE_WRITE8_MEMBER( palette_write );
 
-	static void set_cpu_tag(device_t &device, const char *tag) { downcast<ppu2c0x_device &>(device).m_cpu.set_tag(tag); }
-	static void set_color_base(device_t &device, int colorbase) { downcast<ppu2c0x_device &>(device).m_color_base = colorbase; }
-	static void set_nmi_delegate(device_t &device, nmi_delegate &&cb);
+	void set_cpu_tag(const char *tag) { m_cpu.set_tag(tag); }
+	void set_color_base(int colorbase) { m_color_base = colorbase; }
+	template <typename Object> void set_nmi_delegate(Object &&cb) { m_nmi_callback_proc = std::forward<Object>(cb); }
 
 	/* routines */
 	virtual void init_palette(palette_device &palette, int first_entry);
@@ -153,11 +153,7 @@ public:
 	//  void update_screen(bitmap_t &bitmap, const rectangle &cliprect);
 
 	// some bootleg / clone hardware appears to ignore this
-	static void use_sprite_write_limitation_disable(device_t &device)
-	{
-		ppu2c0x_device &dev = downcast<ppu2c0x_device &>(device);
-		dev.m_use_sprite_write_limitation = false;
-	}
+	void use_sprite_write_limitation_disable() { m_use_sprite_write_limitation = false; }
 	uint16_t get_vram_dest();
 	void set_vram_dest(uint16_t dest);
 

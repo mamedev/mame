@@ -35,16 +35,6 @@ TODO:
 // device type definition
 DEFINE_DEVICE_TYPE(MB_VCU, mb_vcu_device, "mb_vcu", "Mazer Blazer custom VCU")
 
-//-------------------------------------------------
-//  static_set_palette_tag: Set the tag of the
-//  palette device
-//-------------------------------------------------
-
-void mb_vcu_device::static_set_palette_tag(device_t &device, const char *tag)
-{
-	downcast<mb_vcu_device &>(device).m_palette.set_tag(tag);
-}
-
 
 ADDRESS_MAP_START(mb_vcu_device::mb_vcu_vram)
 	AM_RANGE(0x00000,0x7ffff) AM_RAM // enough for a 256x256x4 x 2 pages of framebuffer with 4 layers (TODO: doubled for simplicity)

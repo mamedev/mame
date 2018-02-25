@@ -10,7 +10,7 @@
 	MCFG_DEVICE_ADD(_tag, EPIC12, 0)
 
 #define MCFG_EPIC12_SET_MAINRAMSIZE( _rgn ) \
-	epic12_device::set_mainramsize(*device, _rgn);
+	downcast<epic12_device &>(*device).set_mainramsize(_rgn);
 
 
 class epic12_device : public device_t, public device_video_interface
@@ -25,11 +25,10 @@ public:
 
 	inline uint16_t READ_NEXT_WORD(offs_t *addr);
 
-	static void set_mainramsize(device_t &device, int ramsize)
+	void set_mainramsize(int ramsize)
 	{
-		epic12_device &dev = downcast<epic12_device &>(device);
-		dev.m_main_ramsize = ramsize;
-		dev.m_main_rammask = ramsize-1;
+		m_main_ramsize = ramsize;
+		m_main_rammask = ramsize-1;
 	}
 
 	static void *blit_request_callback(void *param, int threadid);

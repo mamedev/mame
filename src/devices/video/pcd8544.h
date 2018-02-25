@@ -22,7 +22,7 @@
 	MCFG_DEVICE_ADD( _tag, PCD8544, 0 )
 
 #define MCFG_PCD8544_SCREEN_UPDATE_CALLBACK(_class, _method) \
-	pcd8544_device::static_set_screen_update_cb(*device, pcd8544_device::screen_update_delegate(&_class::_method, #_class "::" #_method, this));
+	downcast<pcd8544_device &>(*device).set_screen_update_cb(pcd8544_device::screen_update_delegate(&_class::_method, #_class "::" #_method, this));
 
 
 // ======================> pcd8544_device
@@ -34,7 +34,7 @@ public:
 
 	// construction/destruction
 	pcd8544_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
-	static void static_set_screen_update_cb(device_t &device, screen_update_delegate &&cb) { downcast<pcd8544_device &>(device).m_screen_update_cb = std::move(cb); }
+	template <typename Object> void set_screen_update_cb(Object &&cb) { m_screen_update_cb = std::forward<Object>(cb); }
 
 	// device interface
 	DECLARE_WRITE_LINE_MEMBER(sdin_w);

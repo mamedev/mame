@@ -16,7 +16,7 @@
 	MCFG_DEVICE_ADD( _tag, NT7534, 0 )
 
 #define MCFG_NT7534_PIXEL_UPDATE_CB(_class, _method) \
-	nt7534_device::static_set_pixel_update_cb(*device, nt7534_device::pixel_update_delegate(&_class::_method, #_class "::" #_method, this));
+	downcast<nt7534_device &>(*device).set_pixel_update_cb(nt7534_device::pixel_update_delegate(&_class::_method, #_class "::" #_method, this));
 
 //**************************************************************************
 //  TYPE DEFINITIONS
@@ -35,7 +35,7 @@ public:
 	// construction/destruction
 	nt7534_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
-	static void static_set_pixel_update_cb(device_t &device, pixel_update_delegate &&cb) { downcast<nt7534_device &>(device).m_pixel_update_cb = std::move(cb); }
+	template <typename Object> void set_pixel_update_cb(Object &&cb) { m_pixel_update_cb = std::forward<Object>(cb); }
 
 	// device interface
 	virtual DECLARE_WRITE8_MEMBER(write);
