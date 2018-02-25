@@ -253,33 +253,6 @@ MACHINE_CONFIG_END
 
 
 //-------------------------------------------------
-//  static_set_gfxdecode_tag: Set the tag of the
-//  gfx decoder
-//-------------------------------------------------
-
-void imagetek_i4100_device::static_set_gfxdecode_tag(device_t &device, const char *tag)
-{
-	downcast<imagetek_i4100_device &>(device).m_gfxdecode.set_tag(tag);
-}
-
-
-void imagetek_i4100_device::static_set_tmap_xoffsets(device_t &device, int x1, int x2, int x3)
-{
-	downcast<imagetek_i4100_device &>(device).m_tilemap_scrolldx[0] = x1;
-	downcast<imagetek_i4100_device &>(device).m_tilemap_scrolldx[1] = x2;
-	downcast<imagetek_i4100_device &>(device).m_tilemap_scrolldx[2] = x3;
-}
-
-
-void imagetek_i4100_device::static_set_tmap_yoffsets(device_t &device, int y1, int y2, int y3)
-{
-	downcast<imagetek_i4100_device &>(device).m_tilemap_scrolldy[0] = y1;
-	downcast<imagetek_i4100_device &>(device).m_tilemap_scrolldy[1] = y2;
-	downcast<imagetek_i4100_device &>(device).m_tilemap_scrolldy[2] = y3;
-}
-
-
-//-------------------------------------------------
 //  device_start - device-specific startup
 //-------------------------------------------------
 
