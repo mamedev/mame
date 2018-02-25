@@ -47,6 +47,16 @@ void segapcm_device::device_start()
 }
 
 
+//-------------------------------------------------
+//  device_clock_changed - called if the clock
+//  changes
+//-------------------------------------------------
+
+void segapcm_device::device_clock_changed()
+{
+	m_stream->set_sample_rate(clock() / 128);
+}
+
 
 //-------------------------------------------------
 //  rom_bank_updated - the rom bank has changed
