@@ -66,7 +66,7 @@
 #include "emu.h"
 #include "imagetek_i4100.h"
 
-
+#include <algorithm>
 
 //**************************************************************************
 //  GLOBAL VARIABLES
@@ -1052,11 +1052,38 @@ void imagetek_i4100_device::draw_tilemap( screen_device &screen, bitmap_ind16 &b
 
 	int windowwidth  = width >> 2;
 	int windowheight = height >> 3;
+	
+	int dx = m_tilemap_scrolldx[layer] * (m_screen_flip ? 1 : -1);
+	int dy = m_tilemap_scrolldy[layer] * (m_screen_flip ? 1 : -1);
 
-	sx += m_tilemap_scrolldx[layer] * (m_screen_flip ? 1 : -1);
-	sy += m_tilemap_scrolldy[layer] * (m_screen_flip ? 1 : -1);
+	sx += dx;
+	sy += dy;
 
-	for (y = cliprect.min_y; y <= cliprect.max_y; y++)
+	int min_x, max_x, min_y, max_y;
+	
+	if (dx != 0)
+	{
+		min_x = 0;
+		max_x = scrwidth-1;
+	}
+	else
+	{
+		min_x = cliprect.min_x;
+		max_x = cliprect.max_x;
+	}
+
+	if (dy != 0)
+	{
+		min_y = 0;
+		max_y = scrheight-1;
+	}
+	else
+	{
+		min_y = cliprect.min_y;
+		max_y = cliprect.max_y;
+	}
+	
+	for (y = min_y; y <= max_y; y++)
 	{
 		int scrolly = (sy+y-wy)&(windowheight-1);
 		int x;
@@ -1070,7 +1097,7 @@ void imagetek_i4100_device::draw_tilemap( screen_device &screen, bitmap_ind16 &b
 			dst = &bitmap.pix16(y);
 			priority_baseaddr = &priority_bitmap.pix8(y);
 
-			for (x = cliprect.min_x; x <= cliprect.max_x; x++)
+			for (x = min_x; x <= max_x; x++)
 			{
 				int scrollx = (sx+x-wx)&(windowwidth-1);
 				int srccol = (wx+scrollx)&(width-1);
@@ -1094,7 +1121,7 @@ void imagetek_i4100_device::draw_tilemap( screen_device &screen, bitmap_ind16 &b
 			dst = &bitmap.pix16(scrheight-y-1);
 			priority_baseaddr = &priority_bitmap.pix8(scrheight-y-1);
 
-			for (x = cliprect.min_x; x <= cliprect.max_x; x++)
+			for (x = min_x; x <= max_x; x++)
 			{
 				int scrollx = (sx+x-wx)&(windowwidth-1);
 				int srccol = (wx+scrollx)&(width-1);
