@@ -38976,6 +38976,7 @@ xsleenaj                        // TA-0019 (c) 1986
 
 @source:xavix.cpp
 taitons1                        //
+namcons2                        //
 rad_ping                        //
 rad_mtrk                        //
 rad_mtrkp                       //
@@ -38986,9 +38987,12 @@ rad_crdn                        //
 rad_crdnp                       //
 rad_bass                        //
 rad_bassp                       //
+rad_snow                        //
+rad_snowp                       //
 eka_strt                        //
 xavtenni                        //
 ttv_sw                          //
+ttv_lotr                        //
 
 @source:xbox.cpp
 xbox                            //
