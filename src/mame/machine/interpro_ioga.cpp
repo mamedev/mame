@@ -897,7 +897,7 @@ READ32_MEMBER(interpro_ioga_device::error_businfo_r)
 	const u32 result = m_error_businfo;
 
 	// clear register after reading
-	if (!machine().side_effect_disabled())
+	if (!machine().side_effects_disabled())
 		m_error_businfo = 0;
 
 	return result;
@@ -1096,7 +1096,7 @@ READ32_MEMBER(interpro_ioga_device::mouse_status_r)
 	LOGMASKED(LOG_MOUSE, "mouse_status_r status 0x%08x mask 0x%08x (%s)\n", result, mem_mask, machine().describe_context());
 
 	// clear xpos and ypos fields
-	if (!machine().side_effect_disabled())
+	if (!machine().side_effects_disabled())
 		m_mouse_status &= ~(MOUSE_XPOS | MOUSE_YPOS);
 
 	return result;

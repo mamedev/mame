@@ -1453,7 +1453,7 @@ MACHINE_CONFIG_START(taitol_state::l_system_video)
 
 	MCFG_GFXDECODE_ADD("gfxdecode", "palette", taito_l)
 	MCFG_PALETTE_ADD("palette", 256)
-	MCFG_PALETTE_FORMAT(xRGBRRRRGGGGBBBB_bit0)
+	MCFG_PALETTE_FORMAT(xxxxBBBBGGGGRRRR)
 
 	MCFG_VIDEO_START_OVERRIDE(taitol_state, taito_l)
 

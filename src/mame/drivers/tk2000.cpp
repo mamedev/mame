@@ -174,7 +174,7 @@ uint32_t tk2000_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap
 // most softswitches don't care about read vs write, so handle them here
 void tk2000_state::do_io(address_space &space, int offset)
 {
-	if(machine().side_effect_disabled())
+	if(machine().side_effects_disabled())
 	{
 		return;
 	}

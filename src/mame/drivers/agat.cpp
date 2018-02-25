@@ -19,7 +19,7 @@
     - video: vertical raster splits (used at least by Rapira)
     - what is the state of devices at init and reset?
     - what do floating bus reads do?
-    - ignore debugger reads -- use side_effect_disabled()
+    - ignore debugger reads -- use side_effects_disabled()
     - softlists
 
     To do (agat7):
@@ -351,7 +351,7 @@ READ8_MEMBER(agat7_state::keyb_strobe_r)
 {
 	// reads any key down, clears strobe
 	uint8_t rv = m_transchar | (m_anykeydown ? 0x80 : 0x00);
-	if (!machine().side_effect_disabled())
+	if (!machine().side_effects_disabled())
 		m_strobe = 0;
 	return rv;
 }
@@ -364,7 +364,7 @@ WRITE8_MEMBER(agat7_state::keyb_strobe_w)
 
 READ8_MEMBER(agat7_state::cassette_toggle_r)
 {
-	if (!machine().side_effect_disabled())
+	if (!machine().side_effects_disabled())
 		cassette_toggle_w(space, offset, 0);
 	return read_floatingbus();
 }
@@ -377,7 +377,7 @@ WRITE8_MEMBER(agat7_state::cassette_toggle_w)
 
 READ8_MEMBER(agat7_state::speaker_toggle_r)
 {
-	if (!machine().side_effect_disabled())
+	if (!machine().side_effects_disabled())
 		speaker_toggle_w(space, offset, 0);
 	return read_floatingbus();
 }
@@ -390,7 +390,7 @@ WRITE8_MEMBER(agat7_state::speaker_toggle_w)
 
 READ8_MEMBER(agat7_state::interrupts_on_r)
 {
-	if (!machine().side_effect_disabled())
+	if (!machine().side_effects_disabled())
 		interrupts_on_w(space, offset, 0);
 	return read_floatingbus();
 }
@@ -402,7 +402,7 @@ WRITE8_MEMBER(agat7_state::interrupts_on_w)
 
 READ8_MEMBER(agat7_state::interrupts_off_r)
 {
-	if (!machine().side_effect_disabled())
+	if (!machine().side_effects_disabled())
 		interrupts_off_w(space, offset, 0);
 	return read_floatingbus();
 }
@@ -447,7 +447,7 @@ READ8_MEMBER(agat7_state::flags_r)
 
 READ8_MEMBER(agat7_state::controller_strobe_r)
 {
-	if (!machine().side_effect_disabled())
+	if (!machine().side_effects_disabled())
 		controller_strobe_w(space, offset, 0);
 	return read_floatingbus();
 }
@@ -462,7 +462,7 @@ WRITE8_MEMBER(agat7_state::controller_strobe_w)
 
 READ8_MEMBER(agat7_state::c080_r)
 {
-	if (!machine().side_effect_disabled())
+	if (!machine().side_effects_disabled())
 	{
 		int slot;
 
@@ -504,7 +504,7 @@ READ8_MEMBER(agat7_state::c100_r)
 
 	if (m_slotdevice[slotnum] != nullptr)
 	{
-		if ((m_slotdevice[slotnum]->take_c800()) && (!machine().side_effect_disabled()))
+		if ((m_slotdevice[slotnum]->take_c800()) && (!machine().side_effects_disabled()))
 		{
 			m_cnxx_slot = slotnum;
 		}
@@ -527,7 +527,7 @@ WRITE8_MEMBER(agat7_state::c100_w)
 
 	if (m_slotdevice[slotnum] != nullptr)
 	{
-		if ((m_slotdevice[slotnum]->take_c800()) && (!machine().side_effect_disabled()))
+		if ((m_slotdevice[slotnum]->take_c800()) && (!machine().side_effects_disabled()))
 		{
 			m_cnxx_slot = slotnum;
 		}
@@ -542,7 +542,7 @@ READ8_MEMBER(agat7_state::c800_r)
 
 	if (offset == 0x7ff)
 	{
-		if (!machine().side_effect_disabled())
+		if (!machine().side_effects_disabled())
 		{
 			m_cnxx_slot = -1;
 		}
@@ -564,7 +564,7 @@ WRITE8_MEMBER(agat7_state::c800_w)
 
 	if (offset == 0x7ff)
 	{
-		if (!machine().side_effect_disabled())
+		if (!machine().side_effects_disabled())
 		{
 			m_cnxx_slot = -1;
 		}

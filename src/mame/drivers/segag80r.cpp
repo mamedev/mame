@@ -177,7 +177,7 @@ READ8_MEMBER(segag80r_state::g80r_opcode_r)
 	uint8_t op = m_maincpu->space(AS_PROGRAM).read_byte(offset);
 
 	// writes via opcode $32 (LD $(XXYY),A) get scrambled
-	if (!machine().side_effect_disabled())
+	if (!machine().side_effects_disabled())
 		m_scrambled_write_pc = (op == 0x32) ? offset : 0xffff;
 
 	return op;

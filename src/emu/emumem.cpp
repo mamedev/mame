@@ -719,7 +719,7 @@ private:
 	template<typename UintType>
 	UintType unmap_r(address_space &space, offs_t offset, UintType mask)
 	{
-		if (m_space.log_unmap() && !m_space.m_manager.machine().side_effect_disabled())
+		if (m_space.log_unmap() && !m_space.m_manager.machine().side_effects_disabled())
 		{
 			m_space.device().logerror(
 					m_space.is_octal()
@@ -791,7 +791,7 @@ private:
 	template<typename UintType>
 	void unmap_w(address_space &space, offs_t offset, UintType data, UintType mask)
 	{
-		if (m_space.log_unmap() && !m_space.m_manager.machine().side_effect_disabled())
+		if (m_space.log_unmap() && !m_space.m_manager.machine().side_effects_disabled())
 		{
 			m_space.device().logerror(
 					m_space.is_octal()

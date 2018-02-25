@@ -83,7 +83,7 @@ void MODEL2_FUNC_NAME(int32_t scanline, const extent_t& extent, const m2_poly_ex
 
 	// fix luma overflow
 	luma = std::min((int)luma,0x3f);
-	
+
 	color = state->m_palram[(color + 0x1000)] & 0x7fff;
 
 	colortable_r += ((color >>  0) & 0x1f) << 8;
@@ -187,8 +187,8 @@ void MODEL2_FUNC_NAME(int32_t scanline, const extent_t& extent, const m2_poly_ex
 		luma = std::min((int)luma,0x3f);
 		// (Again) Virtua Striker seem to lookup colortable with a reversed endianness (stadium ads)
 		// TODO: it breaks Mexican flag colors tho ...
-//		luma^= 1;
-		
+//      luma^= 1;
+
 		/* we have the 6 bits of luma information along with 5 bits per color component */
 		/* now build and index into the master color lookup table and extract the raw RGB values */
 		tr = colortable_r[(luma)] & 0xff;
@@ -197,7 +197,7 @@ void MODEL2_FUNC_NAME(int32_t scanline, const extent_t& extent, const m2_poly_ex
 		tr = gamma_value[tr];
 		tg = gamma_value[tg];
 		tb = gamma_value[tb];
-		
+
 		p[x] = rgb_t(tr, tg, tb);
 	}
 }

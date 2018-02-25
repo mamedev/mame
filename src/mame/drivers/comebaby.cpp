@@ -238,7 +238,7 @@ MACHINE_CONFIG_START(comebaby_state::comebaby)
 	MCFG_CPU_ADD("maincpu", PENTIUM, (66666666*19)/2) /* Actually a Celeron */
 	MCFG_CPU_PROGRAM_MAP(comebaby_map)
 	MCFG_CPU_IO_MAP(comebaby_io)
-	
+
 	pcat_common(config);
 
 	/* video hardware */

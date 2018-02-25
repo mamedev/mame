@@ -541,14 +541,14 @@ WRITE16_MEMBER(hp_ipc_state::mem_w)
 
 READ16_MEMBER(hp_ipc_state::trap_r)
 {
-	if (!machine().side_effect_disabled()) set_bus_error((offset << 1) & 0xFFFFFF, 0, mem_mask);
+	if (!machine().side_effects_disabled()) set_bus_error((offset << 1) & 0xFFFFFF, 0, mem_mask);
 
 	return 0xffff;
 }
 
 WRITE16_MEMBER(hp_ipc_state::trap_w)
 {
-	if (!machine().side_effect_disabled()) set_bus_error((offset << 1) & 0xFFFFFF, 1, mem_mask);
+	if (!machine().side_effects_disabled()) set_bus_error((offset << 1) & 0xFFFFFF, 1, mem_mask);
 }
 
 
@@ -559,7 +559,7 @@ READ16_MEMBER(hp_ipc_state::ram_r)
 
 	if (ram_address < m_lowest_ram_addr)
 	{
-		if (!machine().side_effect_disabled()) set_bus_error((offset << 1) + 0x800000, 0, mem_mask);
+		if (!machine().side_effects_disabled()) set_bus_error((offset << 1) + 0x800000, 0, mem_mask);
 	}
 	else if (ram_address < 0x3c0000)
 	{
@@ -576,7 +576,7 @@ WRITE16_MEMBER(hp_ipc_state::ram_w)
 
 	if (ram_address < m_lowest_ram_addr)
 	{
-		if (!machine().side_effect_disabled()) set_bus_error((offset << 1) + 0x800000, 1, mem_mask);
+		if (!machine().side_effects_disabled()) set_bus_error((offset << 1) + 0x800000, 1, mem_mask);
 	}
 	else if (ram_address < 0x3c0000)
 	{

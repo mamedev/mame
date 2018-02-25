@@ -28,7 +28,7 @@ To Do:
   but then hangs.
   *cgangpzl, cgangpzlj, exvania, exvaniaj, knckheadjp, quiztou
 - xday2: unemulated printer and RTC devices (check test mode game options), also battery always returns NG
-  
+
 - X-Day 2:
     Rom board  M112
     Rom board custom Key chip i.d. C394
@@ -36,7 +36,7 @@ To Do:
     Game also has a large L.E.D. type score board with several displays for various scores. (connects to rom board)
     Game uses coin-type battery on rom board. (not suicide)
     Game won't startup unless printer is connected and with paper.
-	
+
 
 The board has a 28c16 EEPROM
 
@@ -562,7 +562,7 @@ ADDRESS_MAP_START(namcona1_state::namcona1_main_map)
 	AM_RANGE(0xf00000, 0xf01fff) AM_RAM_WRITE(paletteram_w) AM_SHARE("paletteram")
 	AM_RANGE(0xf40000, 0xf7ffff) AM_READWRITE(gfxram_r, gfxram_w) AM_SHARE("cgram")
 	AM_RANGE(0xff0000, 0xffbfff) AM_RAM_WRITE(videoram_w) AM_SHARE("videoram")
-	AM_RANGE(0xffd000, 0xffdfff) AM_RAM 						/* unknown */
+	AM_RANGE(0xffd000, 0xffdfff) AM_RAM                         /* unknown */
 	AM_RANGE(0xffe000, 0xffefff) AM_RAM AM_SHARE("scroll")      /* scroll registers */
 	AM_RANGE(0xfff000, 0xffffff) AM_RAM AM_SHARE("spriteram")   /* spriteram */
 ADDRESS_MAP_END
@@ -973,7 +973,7 @@ MACHINE_CONFIG_START(namcona1_state::namcona1)
 	MCFG_SCREEN_REFRESH_RATE(60)
 	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500) /* not accurate */)
 	MCFG_SCREEN_SIZE(40*8, 32*8)
-//	MCFG_SCREEN_VISIBLE_AREA(8, 38*8-1-8, 4*8, 32*8-1)
+//  MCFG_SCREEN_VISIBLE_AREA(8, 38*8-1-8, 4*8, 32*8-1)
 	MCFG_SCREEN_VISIBLE_AREA(0, 38*8-1, 4*8, 32*8-1)
 	MCFG_SCREEN_UPDATE_DRIVER(namcona1_state, screen_update)
 	MCFG_SCREEN_PALETTE("palette")
@@ -996,8 +996,8 @@ MACHINE_CONFIG_START(namcona2_state::namcona2)
 	namcona1(config);
 
 	/* basic machine hardware */
-//	MCFG_CPU_MODIFY("maincpu")
-//	MCFG_CPU_PROGRAM_MAP(namcona2_main_map)
+//  MCFG_CPU_MODIFY("maincpu")
+//  MCFG_CPU_PROGRAM_MAP(namcona2_main_map)
 
 	MCFG_CPU_REPLACE("mcu", NAMCO_C70, MASTER_CLOCK/4)
 	MCFG_CPU_PROGRAM_MAP(namcona1_mcu_map)

@@ -26,7 +26,7 @@ public:
 		m_vram(*this, "vram"),
 		m_gfx2(*this,"gfx2")
 		{ }
-		
+
 	required_device<cpu_device> m_maincpu;
 	required_device<eeprom_serial_93cxx_device> m_eeprom;
 	required_device<ymz280b_device> m_ymz;

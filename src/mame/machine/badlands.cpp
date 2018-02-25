@@ -2,13 +2,13 @@
 // copyright-holders:Aaron Giles
 /***************************************************************
 
-	Badlands
-	
-	functions required by both badlands.cpp and 
-	badlandsbl.cpp drivers.
+    Badlands
 
-	Eventually this file will be nuked once both i/o and 
-	gfx_layout systems are properly state-ized.
+    functions required by both badlands.cpp and
+    badlandsbl.cpp drivers.
+
+    Eventually this file will be nuked once both i/o and
+    gfx_layout systems are properly state-ized.
 
 ***************************************************************/
 
@@ -24,7 +24,7 @@
  *************************************/
 
 // TODO: doesn't link?
-#ifdef UNUSED_FUNCTION 
+#ifdef UNUSED_FUNCTION
 const gfx_layout badlands_molayout =
 {
 	16,8,

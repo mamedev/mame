@@ -1006,7 +1006,7 @@ MACHINE_CONFIG_END
 //-------------------------------------------------
 
 static MACHINE_CONFIG_START( megaopd )
-static 	ql(config);
+static  ql(config);
     // internal ram
     MCFG_RAM_MODIFY(RAM_TAG)
     MCFG_RAM_DEFAULT_SIZE("256K")

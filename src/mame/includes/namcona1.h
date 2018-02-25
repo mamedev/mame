@@ -71,7 +71,7 @@ public:
 	DECLARE_DRIVER_INIT(exvania);
 	DECLARE_DRIVER_INIT(emeraldj);
 	DECLARE_DRIVER_INIT(swcourtb);
-	
+
 	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 
 	TIMER_DEVICE_CALLBACK_MEMBER(interrupt);
@@ -170,12 +170,12 @@ public:
 	namcona2_state(const machine_config &mconfig, device_type type, const char *tag)
 		: namcona1_state(mconfig, type, tag)
 	{}
-	
+
 	DECLARE_DRIVER_INIT(knckhead);
 	DECLARE_DRIVER_INIT(emeralda);
 	DECLARE_DRIVER_INIT(numanath);
 	DECLARE_DRIVER_INIT(quiztou);
-	
+
 	void namcona2(machine_config &config);
 };
 
@@ -186,11 +186,11 @@ public:
 		: namcona2_state(mconfig, type, tag),
 		m_rtc(*this, "rtc")
 	{}
-	
+
 	static constexpr feature_type unemulated_features() { return feature::PRINTER; }
 
 	required_device <msm6242_device> m_rtc;
-	
+
 	DECLARE_READ8_MEMBER(printer_r);
 	DECLARE_WRITE8_MEMBER(printer_w);
 

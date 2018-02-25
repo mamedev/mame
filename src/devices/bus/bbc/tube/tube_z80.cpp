@@ -145,7 +145,7 @@ WRITE8_MEMBER(bbc_tube_z80_device::host_w)
 
 READ8_MEMBER(bbc_tube_z80_device::opcode_r)
 {
-	if (!machine().side_effect_disabled())
+	if (!machine().side_effects_disabled())
 	{
 		if (offset == 0x0066 && m_z80->input_state(INPUT_LINE_NMI))
 			m_rom_enabled = true;

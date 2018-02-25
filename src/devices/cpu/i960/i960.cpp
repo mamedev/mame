@@ -616,14 +616,14 @@ void i960_cpu_device::execute_burst_stall_op(uint32_t opcode)
 	int i;
 	// in case opcode uses an operand call effective address function to fix IP register
 	(void)get_ea(opcode);
-	
+
 	// check if our data is ready
 	for(i=m_stall_state.index ; i<m_stall_state.size ;i++)
 	{
 		// count down 1 icount for every read
 		m_icount--;
 		m_r[m_stall_state.t2+i] = i960_read_dword_unaligned(m_stall_state.t1);
-		
+
 		// if the host returned stall just save the index and try again on a later moment
 		if(m_stalled == true)
 		{
@@ -631,7 +631,7 @@ void i960_cpu_device::execute_burst_stall_op(uint32_t opcode)
 			return;
 		}
 	}
-	
+
 	// clear stall burst mode
 	m_stall_state.burst_mode = false;
 	// now that we are done we might as well check if there's a pending irq too
@@ -642,7 +642,7 @@ void i960_cpu_device::execute_op(uint32_t opcode)
 {
 	uint32_t t1, t2;
 	double t1f, t2f;
-	
+
 	switch(opcode >> 24) {
 		case 0x08: // b
 			m_icount--;
@@ -2074,7 +2074,7 @@ void i960_cpu_device::execute_run()
 	// delay checking irqs if we are in burst stall mode
 	if(m_stall_state.burst_mode == false)
 		check_irqs();
-	
+
 	while(m_icount > 0) {
 		m_PIP = m_IP;
 		debugger_instruction_hook(this, m_IP);
@@ -2190,7 +2190,7 @@ void i960_cpu_device::device_start()
 	save_item(NAME(m_stall_state.t2));
 	save_item(NAME(m_stall_state.burst_mode));
 
-	
+
 	state_add( I960_SAT,  "sat", m_SAT).formatstr("%08X");
 	state_add( I960_PRCB, "prcb", m_PRCB).formatstr("%08X");
 	state_add( I960_PC,   "pc", m_PC).formatstr("%08X");

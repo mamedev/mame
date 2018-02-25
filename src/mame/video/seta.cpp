@@ -382,7 +382,7 @@ TILE_GET_INFO_MEMBER(seta_state::twineagl_get_tile_info)
 	SET_TILE_INFO_MEMBER(1, (code & 0x3fff), attr & 0x1f, TILE_FLIPXY((code & 0xc000) >> 14) );
 }
 
-template<int Layer, int Offset> 
+template<int Layer, int Offset>
 TILE_GET_INFO_MEMBER(seta_state::get_tile_info)
 {
 	int gfx = 1 + Layer;
@@ -482,7 +482,7 @@ VIDEO_START_MEMBER(seta_state,seta_1_layer)
 			16,16, 64,32 );
 
 	m_color_mode_shift = 4;
-	
+
 	for (int bank = 0; bank < 2; bank++)
 		m_tilemap[0][bank]->set_transparent_pen(0);
 }
@@ -519,7 +519,7 @@ VIDEO_START_MEMBER(seta_state,twineagl_1_layer)
 	m_tilemap[0][1] = &machine().tilemap().create(
 			*m_gfxdecode, tilemap_get_info_delegate(FUNC(seta_state::twineagl_get_tile_info<0x1000>),this), TILEMAP_SCAN_ROWS,
 			16,16, 64,32 );
-			
+
 	for (int bank = 0; bank < 2; bank++)
 		m_tilemap[0][bank]->set_transparent_pen(0);
 }

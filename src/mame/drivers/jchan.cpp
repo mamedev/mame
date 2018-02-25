@@ -307,7 +307,7 @@ uint32_t jchan_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap,
 		m_sprite_bitmap[chip]->fill(0, cliprect);
 		m_spritegen[chip]->skns_draw_sprites(*m_sprite_bitmap[chip], cliprect, m_sprite_ram32[chip].get(), 0x4000, m_sprite_regs32[chip].get() );
 	}
-	
+
 	bitmap_ind8 *tile_primap = &screen.priority();
 
 	// TODO : verify sprite-tile priorities from real hardware, Check what 15 bit of palette actually working

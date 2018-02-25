@@ -27,7 +27,7 @@ public:
 		m_paletteram(*this, "palette"),
 		m_paletteram_ext(*this, "palette_ext")
 	{ }
-	
+
 	/* devices */
 	required_device<cpu_device> m_maincpu;
 	required_device<cpu_device> m_audiocpu;

@@ -203,22 +203,22 @@ WRITE32_MEMBER(deco_mlc_state::irq_ram_w)
 	/*
 	TODO : Accurate this from real PCB
 	Word 0 : Used but Unknown
-		skullfng : 0x00000cf3
-		hoops**  : 0xffffdfff
-		avengrgs : 0x00000cd3
-		stadhr96 : 0x000028f3
+	    skullfng : 0x00000cf3
+	    hoops**  : 0xffffdfff
+	    avengrgs : 0x00000cd3
+	    stadhr96 : 0x000028f3
 
 	Word 1 : 0xc0 at shadow, 0x00 at alpha, Other bits unknown
-		skullfng : 0x000000c0 or 0x00000000
-		hoops**  : 0xfffffffc
-		avengrgs : 0xffffffff
-		stadhr96 : 0x0000fcc0
+	    skullfng : 0x000000c0 or 0x00000000
+	    hoops**  : 0xfffffffc
+	    avengrgs : 0xffffffff
+	    stadhr96 : 0x0000fcc0
 
 	Word 2 : Used but unknown
-		skullfng : 0x00200008
-		hoops**  : 0x00000000
-		avengrgs : 0x00000000
-		stadhr96 : 0x00200008
+	    skullfng : 0x00200008
+	    hoops**  : 0x00000000
+	    avengrgs : 0x00000000
+	    stadhr96 : 0x00200008
 
 	Word 3 : Unknown(Always 0)
 	*/

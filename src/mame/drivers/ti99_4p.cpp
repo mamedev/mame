@@ -458,7 +458,7 @@ READ16_MEMBER( ti99_4p_state::memread )
 	int addr_off8k = m_addr_buf & 0x1fff;
 
 	// If we use the debugger, decode the address now (normally done in setaddress)
-	if (machine().side_effect_disabled())
+	if (machine().side_effects_disabled())
 	{
 		m_addr_buf = offset << 1;
 		m_decode = decode_address(m_addr_buf);
@@ -501,7 +501,7 @@ READ16_MEMBER( ti99_4p_state::memread )
 		break;
 
 	case SGCPU_PEB:
-		if (machine().side_effect_disabled()) return debugger_read(space, offset);
+		if (machine().side_effects_disabled()) return debugger_read(space, offset);
 		// The byte from the odd address has already been read into the latch
 		// Reading the even address now
 		m_peribox->readz(space, m_addr_buf, &hbyte);
@@ -519,7 +519,7 @@ WRITE16_MEMBER( ti99_4p_state::memwrite )
 	int address = 0;
 
 	// If we use the debugger, decode the address now (normally done in setaddress)
-	if (machine().side_effect_disabled())
+	if (machine().side_effects_disabled())
 	{
 		m_addr_buf = offset << 1;
 		m_decode = decode_address(m_addr_buf);
@@ -563,7 +563,7 @@ WRITE16_MEMBER( ti99_4p_state::memwrite )
 		break;
 
 	case SGCPU_PEB:
-		if (machine().side_effect_disabled()) { debugger_write(space, offset, data); return; }
+		if (machine().side_effects_disabled()) { debugger_write(space, offset, data); return; }
 
 		// Writing the even address now (addr)
 		// The databus multiplexer puts the even value into the latch and outputs the odd value now.

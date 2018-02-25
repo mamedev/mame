@@ -67,7 +67,7 @@ public:
 	void badlands(machine_config &config);
 	void audio_map(address_map &map);
 	void main_map(address_map &map);
-	
+
 private:
 	uint8_t           m_pedal_value[2];
 	uint8_t           m_playfield_tile_bank;
@@ -81,7 +81,7 @@ public:
 		  m_b_sharedram(*this, "b_sharedram"),
 		  m_spriteram(*this, "spriteram")
 	{}
-	
+
 	DECLARE_READ8_MEMBER(bootleg_shared_r);
 	DECLARE_WRITE8_MEMBER(bootleg_shared_w);
 	DECLARE_WRITE8_MEMBER(bootleg_main_irq_w);
@@ -93,14 +93,14 @@ public:
 	void bootleg_map(address_map &map);
 	void bootleg_audio_map(address_map &map);
 	uint32_t screen_update_badlandsbl(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
-	
+
 protected:
 	virtual void machine_reset() override;
-	
+
 private:
 	required_shared_ptr<uint8_t> m_b_sharedram;
 	required_shared_ptr<uint16_t> m_spriteram;
-	
+
 	uint8_t m_sound_response;
 };
 

@@ -147,11 +147,11 @@ READ8_MEMBER(ccs_state::memory_read)
 		result = m_rom[offset & 0x7ff];
 
 		// wait state forced for 4 MHz operation
-		if (!machine().side_effect_disabled())
+		if (!machine().side_effects_disabled())
 			m_maincpu->adjust_icount(-1);
 	}
 
-	if (!machine().side_effect_disabled())
+	if (!machine().side_effects_disabled())
 		m_power_on_status |= m_power_on_status >> 1;
 
 	return result;

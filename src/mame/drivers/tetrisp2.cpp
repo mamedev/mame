@@ -561,7 +561,7 @@ WRITE16_MEMBER( stepstag_state::stepstag_main2pc_w )
 
 READ16_MEMBER(stepstag_state::unknown_read_0xc00000)
 {
-	return machine().rand();	// 3
+	return machine().rand();    // 3
 }
 
 READ16_MEMBER(stepstag_state::unknown_read_0xffff00)
@@ -657,10 +657,10 @@ ADDRESS_MAP_START(stepstag_state::stepstag_map)
 	AM_RANGE(0x600000, 0x60ffff) AM_RAM_WRITE(tetrisp2_vram_rot_w) AM_SHARE("vram_rot")         // Rotation
 	AM_RANGE(0x900000, 0x903fff) AM_READWRITE(rockn_nvram_r, tetrisp2_nvram_w) AM_SHARE("nvram") // NVRAM
 //  AM_RANGE(0x904000, 0x907fff) AM_READWRITE(rockn_nvram_r, tetrisp2_nvram_w)                  // NVRAM (mirror)
-	AM_RANGE(0xa00000, 0xa00001) AM_READNOP	 AM_WRITE(stepstag_neon_w)	// Neon??
+	AM_RANGE(0xa00000, 0xa00001) AM_READNOP  AM_WRITE(stepstag_neon_w)  // Neon??
 	AM_RANGE(0xa10000, 0xa10001) AM_READ_PORT("RHYTHM") AM_WRITE(stepstag_step_leds_w)          // I/O
-	AM_RANGE(0xa20000, 0xa20001) AM_READNOP AM_WRITE(stepstag_button_leds_w)                 	// I/O
-	AM_RANGE(0xa30000, 0xa30001) AM_READWRITE(rockn_soundvolume_r, rockn_soundvolume_w)			// Sound Volume
+	AM_RANGE(0xa20000, 0xa20001) AM_READNOP AM_WRITE(stepstag_button_leds_w)                    // I/O
+	AM_RANGE(0xa30000, 0xa30001) AM_READWRITE(rockn_soundvolume_r, rockn_soundvolume_w)         // Sound Volume
 	AM_RANGE(0xa42000, 0xa42001) AM_READ( stepstag_pc2main_r )
 	AM_RANGE(0xa44000, 0xa44001) AM_READNOP     // watchdog
 	AM_RANGE(0xa48000, 0xa48001) AM_WRITE(stepstag_main2pc_w)                                   // PC Comm
@@ -1331,71 +1331,71 @@ static INPUT_PORTS_START( vjdash )
 	PORT_BIT( 0x0020, IP_ACTIVE_LOW, IPT_UNKNOWN )
 	PORT_BIT( 0x0040, IP_ACTIVE_LOW, IPT_UNKNOWN )
 	PORT_BIT( 0x0080, IP_ACTIVE_LOW, IPT_UNKNOWN )
-	PORT_BIT( 0x0100, IP_ACTIVE_LOW, IPT_JOYSTICK_UP    ) PORT_PLAYER(1)   	// P1 up
-	PORT_BIT( 0x0200, IP_ACTIVE_LOW, IPT_JOYSTICK_DOWN  ) PORT_PLAYER(1)  	// P1 down
-	PORT_BIT( 0x0400, IP_ACTIVE_LOW, IPT_JOYSTICK_LEFT  ) PORT_PLAYER(1)   	// P1 left
+	PORT_BIT( 0x0100, IP_ACTIVE_LOW, IPT_JOYSTICK_UP    ) PORT_PLAYER(1)    // P1 up
+	PORT_BIT( 0x0200, IP_ACTIVE_LOW, IPT_JOYSTICK_DOWN  ) PORT_PLAYER(1)    // P1 down
+	PORT_BIT( 0x0400, IP_ACTIVE_LOW, IPT_JOYSTICK_LEFT  ) PORT_PLAYER(1)    // P1 left
 	PORT_BIT( 0x0800, IP_ACTIVE_LOW, IPT_JOYSTICK_RIGHT ) PORT_PLAYER(1)    // P1 right
 	PORT_BIT( 0x1000, IP_ACTIVE_LOW, IPT_UNKNOWN )
 	PORT_BIT( 0x2000, IP_ACTIVE_LOW, IPT_UNKNOWN )
 	PORT_BIT( 0x4000, IP_ACTIVE_LOW, IPT_UNKNOWN )
 	PORT_BIT( 0x8000, IP_ACTIVE_LOW, IPT_UNKNOWN )
 
-/*	PORT_DIPNAME( 0x0001, 0x0001, "DIPSW debug_2-0_INPUTS") // pour debug temperarement
-	PORT_DIPSETTING(      0x0001, DEF_STR( Off ) )
-	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
-	PORT_DIPNAME( 0x0002, 0x0002, "DIPSW debug_2-1")
-	PORT_DIPSETTING(      0x0002, DEF_STR( Off ) )
-	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
-	PORT_DIPNAME( 0x0004, 0x0004, "DIPSW debug_2-2")
-	PORT_DIPSETTING(      0x0004, DEF_STR( Off ) )
-	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
-	PORT_DIPNAME( 0x0008, 0x0008, "DIPSW debug_2-3")
-	PORT_DIPSETTING(      0x0008, DEF_STR( Off ) )
-	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
-	PORT_DIPNAME( 0x0010, 0x0010, "DIPSW debug_2-4")
-	PORT_DIPSETTING(      0x0010, DEF_STR( Off ) )
-	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
-	PORT_DIPNAME( 0x0020, 0x0020, "DIPSW debug_2-5")
-	PORT_DIPSETTING(      0x0020, DEF_STR( Off ) )
-	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
-	PORT_DIPNAME( 0x0040, 0x0040, "DIPSW debug_2-6")
-	PORT_DIPSETTING(      0x0040, DEF_STR( Off ) )
-	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
-	PORT_DIPNAME( 0x0080, 0x0080, "DIPSW debug_2-7")
-	PORT_DIPSETTING(      0x0080, DEF_STR( Off ) )
-	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
+/*  PORT_DIPNAME( 0x0001, 0x0001, "DIPSW debug_2-0_INPUTS") // pour debug temperarement
+    PORT_DIPSETTING(      0x0001, DEF_STR( Off ) )
+    PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
+    PORT_DIPNAME( 0x0002, 0x0002, "DIPSW debug_2-1")
+    PORT_DIPSETTING(      0x0002, DEF_STR( Off ) )
+    PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
+    PORT_DIPNAME( 0x0004, 0x0004, "DIPSW debug_2-2")
+    PORT_DIPSETTING(      0x0004, DEF_STR( Off ) )
+    PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
+    PORT_DIPNAME( 0x0008, 0x0008, "DIPSW debug_2-3")
+    PORT_DIPSETTING(      0x0008, DEF_STR( Off ) )
+    PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
+    PORT_DIPNAME( 0x0010, 0x0010, "DIPSW debug_2-4")
+    PORT_DIPSETTING(      0x0010, DEF_STR( Off ) )
+    PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
+    PORT_DIPNAME( 0x0020, 0x0020, "DIPSW debug_2-5")
+    PORT_DIPSETTING(      0x0020, DEF_STR( Off ) )
+    PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
+    PORT_DIPNAME( 0x0040, 0x0040, "DIPSW debug_2-6")
+    PORT_DIPSETTING(      0x0040, DEF_STR( Off ) )
+    PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
+    PORT_DIPNAME( 0x0080, 0x0080, "DIPSW debug_2-7")
+    PORT_DIPSETTING(      0x0080, DEF_STR( Off ) )
+    PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
 
-	PORT_DIPNAME(0x0100, 0x0100, "DIPSW debug_2_8")
-	PORT_DIPSETTING(      0x0100, DEF_STR( Off ) )
-	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
-	PORT_DIPNAME(0x0200, 0x0200, "DIPSW debug_2_9")
-	PORT_DIPSETTING(      0x0200, DEF_STR( Off ) )
-	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
-	PORT_DIPNAME(    0x0400, 0x0400, "DIPSW debug_2_a")
-	PORT_DIPSETTING(      0x0400, DEF_STR( Off ) )
-	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
-	PORT_DIPNAME(    0x0800, 0x0800, "DIPSW debug_2_b")
-	PORT_DIPSETTING(      0x0800, DEF_STR( Off ) )
-	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
-	PORT_DIPNAME(    0x1000, 0x1000, "DIPSW debug_2_c")
-	PORT_DIPSETTING(      0x1000, DEF_STR( Off ) )
-	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
-	PORT_DIPNAME(    0x2000, 0x2000, "DIPSW debug_2_d")
-	PORT_DIPSETTING(      0x2000, DEF_STR( Off ) )
-	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
-	PORT_DIPNAME(    0x4000, 0x4000, "DIPSW debug_2_e")
-	PORT_DIPSETTING(      0x4000, DEF_STR( Off ) )
-	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
-	PORT_DIPNAME(    0x8000, 0x8000, "DIPSW debug_2_f")
-	PORT_DIPSETTING(      0x8000, DEF_STR( Off ) )
-	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
+    PORT_DIPNAME(0x0100, 0x0100, "DIPSW debug_2_8")
+    PORT_DIPSETTING(      0x0100, DEF_STR( Off ) )
+    PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
+    PORT_DIPNAME(0x0200, 0x0200, "DIPSW debug_2_9")
+    PORT_DIPSETTING(      0x0200, DEF_STR( Off ) )
+    PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
+    PORT_DIPNAME(    0x0400, 0x0400, "DIPSW debug_2_a")
+    PORT_DIPSETTING(      0x0400, DEF_STR( Off ) )
+    PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
+    PORT_DIPNAME(    0x0800, 0x0800, "DIPSW debug_2_b")
+    PORT_DIPSETTING(      0x0800, DEF_STR( Off ) )
+    PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
+    PORT_DIPNAME(    0x1000, 0x1000, "DIPSW debug_2_c")
+    PORT_DIPSETTING(      0x1000, DEF_STR( Off ) )
+    PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
+    PORT_DIPNAME(    0x2000, 0x2000, "DIPSW debug_2_d")
+    PORT_DIPSETTING(      0x2000, DEF_STR( Off ) )
+    PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
+    PORT_DIPNAME(    0x4000, 0x4000, "DIPSW debug_2_e")
+    PORT_DIPSETTING(      0x4000, DEF_STR( Off ) )
+    PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
+    PORT_DIPNAME(    0x8000, 0x8000, "DIPSW debug_2_f")
+    PORT_DIPSETTING(      0x8000, DEF_STR( Off ) )
+    PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
 */
 	PORT_START("COINS") // $be0004.w
 	PORT_BIT( 0x0001, IP_ACTIVE_LOW, IPT_UNKNOWN  )
 	PORT_BIT( 0x0002, IP_ACTIVE_HIGH, IPT_UNKNOWN )
 	PORT_BIT( 0x0004, IP_ACTIVE_HIGH, IPT_UNKNOWN )
 	PORT_BIT( 0x0008, IP_ACTIVE_LOW, IPT_UNKNOWN  )
-	PORT_SERVICE( 0x0010, IP_ACTIVE_LOW )			// service mode
+	PORT_SERVICE( 0x0010, IP_ACTIVE_LOW )           // service mode
 	PORT_BIT( 0x0020, IP_ACTIVE_LOW, IPT_SERVICE1 ) // service coin
 	PORT_BIT( 0x0040, IP_ACTIVE_LOW, IPT_COIN1    ) // coin
 	PORT_BIT( 0x0080, IP_ACTIVE_LOW, IPT_UNKNOWN  )
@@ -1448,7 +1448,7 @@ static INPUT_PORTS_START( vjdash )
 	PORT_DIPNAME( 0x0040, 0x0040, "DIPSW 1-7")
 	PORT_DIPSETTING(      0x0040, DEF_STR( Off ) )
 	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
-	PORT_DIPNAME( 0x0080, 0x0080, "DIPSW 1-8")		//Free Play
+	PORT_DIPNAME( 0x0080, 0x0080, "DIPSW 1-8")      //Free Play
 	PORT_DIPSETTING(      0x0080, DEF_STR( Off ) )
 	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
 
@@ -1464,13 +1464,13 @@ static INPUT_PORTS_START( vjdash )
 	PORT_DIPNAME( 0x0800, 0x0800, "DIPSW 2-4")
 	PORT_DIPSETTING(      0x0800, DEF_STR( Off ) )
 	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
-	PORT_DIPNAME( 0x1000, 0x1000, "DIPSW 2-5")		//Volume
+	PORT_DIPNAME( 0x1000, 0x1000, "DIPSW 2-5")      //Volume
 	PORT_DIPSETTING(      0x1000, DEF_STR( Off ) )
 	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
-	PORT_DIPNAME( 0x2000, 0x2000, "DIPSW 2-6")		//Volume
+	PORT_DIPNAME( 0x2000, 0x2000, "DIPSW 2-6")      //Volume
 	PORT_DIPSETTING(      0x2000, DEF_STR( Off ) )
 	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
-	PORT_DIPNAME( 0x4000, 0x4000, "DIPSW 2-7")		//Volume
+	PORT_DIPNAME( 0x4000, 0x4000, "DIPSW 2-7")      //Volume
 	PORT_DIPSETTING(      0x4000, DEF_STR( Off ) )
 	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
 	PORT_DIPNAME( 0x8000, 0x8000, "DIPSW 2-8: ?")
@@ -1933,7 +1933,7 @@ MACHINE_CONFIG_START(stepstag_state::stepstag)
 	MCFG_SOUND_ROUTE(1, "rspeaker", 1.0)
 MACHINE_CONFIG_END
 
-MACHINE_CONFIG_START(stepstag_state::vjdash)   	// 4 Screens
+MACHINE_CONFIG_START(stepstag_state::vjdash)    // 4 Screens
 	MCFG_CPU_ADD("maincpu", M68000, 12000000 )
 	MCFG_CPU_PROGRAM_MAP(vjdash_map)
 	MCFG_CPU_VBLANK_INT_DRIVER("screen", tetrisp2_state,  irq2_line_hold) // lev 4 triggered by system timer
@@ -2647,15 +2647,15 @@ ROM_START( vjdash )
 	ROM_LOAD16_BYTE( "vjdash4_ver1.2.11", 0x00000, 0x80000, NO_DUMP )
 	ROM_LOAD16_BYTE( "vjdash4_ver1.2.14", 0x00001, 0x80000, NO_DUMP )
 
-	ROM_REGION( 0x0c00000, "sprites_left", ROMREGION_ERASE )	// left screen sprites
+	ROM_REGION( 0x0c00000, "sprites_left", ROMREGION_ERASE )    // left screen sprites
 	ROM_LOAD( "vjdash-01", 0x000000, 0x400000, NO_DUMP )
 	ROM_LOAD( "vjdash-02", 0x400000, 0x400000, NO_DUMP )
 
-	ROM_REGION( 0x1800000, "sprites_mid", ROMREGION_ERASE )		// middle screen sprites
+	ROM_REGION( 0x1800000, "sprites_mid", ROMREGION_ERASE )     // middle screen sprites
 	ROM_LOAD( "vjdash-03", 0x000000, 0x400000, NO_DUMP )
 	ROM_LOAD( "vjdash-04", 0x400000, 0x400000, NO_DUMP )
 
-	ROM_REGION( 0x0c00000, "sprites_right", ROMREGION_ERASE )	// right screen sprites
+	ROM_REGION( 0x0c00000, "sprites_right", ROMREGION_ERASE )   // right screen sprites
 	ROM_LOAD( "vjdash-01", 0x000000, 0x400000, NO_DUMP )
 	ROM_LOAD( "vjdash-02", 0x400000, 0x400000, NO_DUMP )
 

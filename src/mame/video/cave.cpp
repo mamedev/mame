@@ -580,7 +580,7 @@ void cave_state::get_sprite_info_donpachi(int chip)
 
 	int max_x = m_screen->width();
 	int max_y = m_screen->height();
-	
+
 	source = m_spriteram[chip] + (0x4000 / 2) * m_spriteram_bank[chip];
 
 	finish = source + (0x4000 / 2);

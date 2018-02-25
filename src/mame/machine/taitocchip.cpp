@@ -122,7 +122,7 @@ ADDRESS_MAP_END
 
 READ8_MEMBER(taito_cchip_device::asic_r)
 {
-	if ((offset != 0x001) && (!machine().side_effect_disabled())) // prevent logerror spam for now
+	if ((offset != 0x001) && (!machine().side_effects_disabled())) // prevent logerror spam for now
 		logerror("%s: asic_r %04x\n", machine().describe_context(), offset);
 	if (offset<0x200) // 400-5ff is asic 'ram'
 		return m_asic_ram[offset&3];

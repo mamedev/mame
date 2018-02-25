@@ -447,7 +447,7 @@ void devcb_read_base::validity_check(validity_checker &valid) const
 	case CALLBACK_INPUTLINE:
 	case CALLBACK_ASSERTLINE:
 	case CALLBACK_CLEARLINE:
-	case CALLBACK_HOLDLINE:		
+	case CALLBACK_HOLDLINE:
 		throw emu_fatalerror("Device read callbacks can't be connected to input lines\n");
 		break;
 	}

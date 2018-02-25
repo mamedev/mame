@@ -123,7 +123,7 @@ public:
 			m_cop_ram(*this, "cop_ram"),
 			m_st0016_bank(*this, "st0016_bank")
 			{ }
-			
+
 	required_device<palette_device> m_palette;
 	required_device<st0016_cpu_device> m_maincpu;
 	required_device<cpu_device> m_subcpu;

@@ -853,14 +853,14 @@ MACHINE_CONFIG_START(bnstars_state::bnstars)
 	MCFG_SOUND_ADD("ymf1", YMF271, 16934400)
 	MCFG_SOUND_ROUTE(0, "lspeaker", 1.0)
 	MCFG_SOUND_ROUTE(1, "rspeaker", 1.0)
-//	MCFG_SOUND_ROUTE(2, "lspeaker", 1.0) Output 2/3 not used?
-//	MCFG_SOUND_ROUTE(3, "rspeaker", 1.0)
+//  MCFG_SOUND_ROUTE(2, "lspeaker", 1.0) Output 2/3 not used?
+//  MCFG_SOUND_ROUTE(3, "rspeaker", 1.0)
 
 	MCFG_SOUND_ADD("ymf2", YMF271, 16934400)
 	MCFG_SOUND_ROUTE(0, "lspeaker", 1.0)
 	MCFG_SOUND_ROUTE(1, "rspeaker", 1.0)
-//	MCFG_SOUND_ROUTE(2, "lspeaker", 1.0) Output 2/3 not used?
-//	MCFG_SOUND_ROUTE(3, "rspeaker", 1.0)
+//  MCFG_SOUND_ROUTE(2, "lspeaker", 1.0) Output 2/3 not used?
+//  MCFG_SOUND_ROUTE(3, "rspeaker", 1.0)
 
 MACHINE_CONFIG_END
 

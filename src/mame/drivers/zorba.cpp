@@ -314,7 +314,7 @@ void zorba_state::machine_reset()
 
 READ8_MEMBER( zorba_state::ram_r )
 {
-	if (!machine().side_effect_disabled())
+	if (!machine().side_effects_disabled())
 		m_read_bank->set_entry(0);
 	return 0;
 }
@@ -326,7 +326,7 @@ WRITE8_MEMBER( zorba_state::ram_w )
 
 READ8_MEMBER( zorba_state::rom_r )
 {
-	if (!machine().side_effect_disabled())
+	if (!machine().side_effects_disabled())
 		m_read_bank->set_entry(1);
 	return 0;
 }

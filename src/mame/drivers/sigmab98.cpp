@@ -674,7 +674,7 @@ READ8_MEMBER(sigmab98_state::vregs_r)
 	switch (offset)
 	{
 		default:
-			if (!machine().side_effect_disabled())
+			if (!machine().side_effects_disabled())
 				logerror("%s: unknown video reg read: %02x\n", machine().describe_context(), offset);
 			return m_vregs[offset];
 	}

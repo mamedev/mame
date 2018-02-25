@@ -1326,13 +1326,13 @@ void cop400_cpu_device::set_flags(uint8_t flags)
 
 uint8_t cop400_cpu_device::get_m() const
 {
-	auto dis = machine().disable_side_effect();
+	auto dis = machine().disable_side_effects();
 	return RAM_R(B);
 }
 
 void cop400_cpu_device::set_m(uint8_t m)
 {
-	auto dis = machine().disable_side_effect();
+	auto dis = machine().disable_side_effects();
 	RAM_W(B, m);
 }
 

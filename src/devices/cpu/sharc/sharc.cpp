@@ -259,10 +259,10 @@ READ32_MEMBER( adsp21062_device::iop_r)
 		{
 			return m_core->dma_status;
 		}
-		default:        
-		if(!machine().side_effect_disabled())
+		default:
+		if(!machine().side_effects_disabled())
 			fatalerror("sharc_iop_r: Unimplemented IOP reg %02X at %08X\n", offset, m_core->pc);
-		
+
 		return 0;
 	}
 }

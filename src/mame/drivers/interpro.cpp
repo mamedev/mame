@@ -269,7 +269,7 @@ READ16_MEMBER(interpro_state::sreg_error_r)
 	const u16 result = m_sreg_error;
 
 	// clear error register on read
-	if (!machine().side_effect_disabled())
+	if (!machine().side_effects_disabled())
 		m_sreg_error = 0;
 
 	return result;
@@ -278,7 +278,7 @@ READ16_MEMBER(interpro_state::sreg_error_r)
 READ32_MEMBER(interpro_state::unmapped_r)
 {
 	// check if non-existent memory errors are enabled
-	if (!machine().side_effect_disabled())
+	if (!machine().side_effects_disabled())
 		if (m_arbga->tctrl_r(space, offset, mem_mask) & interpro_arbga_device::TCTRL_ENNEM)
 		{
 			// flag non-existent memory error in system error register

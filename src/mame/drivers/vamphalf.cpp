@@ -100,7 +100,7 @@ public:
 	optional_shared_ptr<uint16_t> m_wram;
 	optional_shared_ptr<uint32_t> m_tiles32;
 	optional_shared_ptr<uint32_t> m_wram32;
-	
+
 	optional_memory_region_array<2> m_okiregion;
 	optional_memory_bank m_okibank;
 
@@ -1866,7 +1866,7 @@ ROM_START( dtfamily )
 	ROM_LOAD32_WORD( "romu02", 0x800002, 0x200000, CRC(80830961) SHA1(b318e9e3a4d1d7dca61d7d4c9ee01f605e2b2f4a) )
 	/* roml03 empty */
 	/* romu03 empty */
-	
+
 	/* $00000-$20000 stays the same in all sound banks, */
 	/* the second half of the bank is what gets switched */
 	ROM_REGION( 0x80000, "oki1", 0 ) /* Oki Samples */
@@ -2332,7 +2332,7 @@ ROM_START( finalgdr ) /* version 2.20.5915, Korea only */
 	ROM_LOAD32_WORD( "romh00", 0x000002, 0x200000, CRC(f28578a5) SHA1(a5c7b17aff101f1f4f52657d0567a6c9d12a178d) )
 	/* roml01 empty */
 	/* romh01 empty */
-	
+
 	/* $00000-$20000 stays the same in all sound banks, */
 	/* the second half of the bank is what gets switched */
 	ROM_REGION( 0x80000, "oki1", 0 ) /* Oki Samples */
@@ -2440,7 +2440,7 @@ ROM_START( mrkickera )
 	ROM_LOAD32_WORD( "romh00", 0x000002, 0x200000, CRC(b6337d4a) SHA1(2f46e2933af7fd0f71083900d5e6e4f602ab4c66) )
 	/* roml01 empty */
 	/* romh01 empty */
-	
+
 	/* $00000-$20000 stays the same in all sound banks, */
 	/* the second half of the bank is what gets switched */
 	ROM_REGION( 0x80000, "oki1", 0 ) /* Oki Samples */
@@ -2464,7 +2464,7 @@ ROM_START( mrkicker )
 	/* romh02 empty */
 	/* roml03 empty */
 	/* romh03 empty */
-	
+
 	/* $00000-$20000 stays the same in all sound banks, */
 	/* the second half of the bank is what gets switched */
 	ROM_REGION( 0x80000, "oki1", 0 ) /* Oki Samples */
@@ -2532,7 +2532,7 @@ ROM_START( aoh )
 
 	ROM_REGION( 0x40000, "oki_1", 0 ) /* Oki Samples */
 	ROM_LOAD( "rom3", 0x00000, 0x40000, CRC(db8cb455) SHA1(6723b4018208d554bd1bf1e0640b72d2f4f47302) )
-	
+
 	/* $00000-$20000 stays the same in all sound banks, */
 	/* the second half of the bank is what gets switched */
 	ROM_REGION( 0x80000, "oki2", 0 ) /* Oki Samples */
@@ -2574,7 +2574,7 @@ ROM_START( boonggab )
 	/* romu04 empty */
 	/* roml09 empty */
 	/* romu09 empty */
-	
+
 	/* $00000-$20000 stays the same in all sound banks, */
 	/* the second half of the bank is what gets switched */
 	ROM_REGION( 0x100000, "oki1", 0 ) /* Oki Samples */

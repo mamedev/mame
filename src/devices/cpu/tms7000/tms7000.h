@@ -63,7 +63,7 @@ public:
 	template<class Object>
 	static devcb_base &set_port_write_cb(device_t &device, int p, Object &&object) { return downcast<tms7000_device &>(device).m_port_out_cb[p].set_callback(std::move(object)); }
 
-	DECLARE_READ8_MEMBER(tms7000_unmapped_rf_r) { if (!machine().side_effect_disabled()) logerror("'%s' (%04X): unmapped_rf_r @ $%04x\n", tag(), m_pc, offset + 0x80); return 0; };
+	DECLARE_READ8_MEMBER(tms7000_unmapped_rf_r) { if (!machine().side_effects_disabled()) logerror("'%s' (%04X): unmapped_rf_r @ $%04x\n", tag(), m_pc, offset + 0x80); return 0; };
 	DECLARE_WRITE8_MEMBER(tms7000_unmapped_rf_w) { logerror("'%s' (%04X): unmapped_rf_w @ $%04x = $%02x\n", tag(), m_pc, offset + 0x80, data); };
 
 	DECLARE_READ8_MEMBER(tms7000_pf_r);
@@ -349,7 +349,7 @@ public:
 	DECLARE_WRITE8_MEMBER(dockbus_data_w);
 
 	// access I/O port E if databus is disabled
-	DECLARE_READ8_MEMBER(e_bus_data_r) { return machine().side_effect_disabled() ? 0xff : ((m_control & 0x20) ? 0xff : m_port_in_cb[4]()); }
+	DECLARE_READ8_MEMBER(e_bus_data_r) { return machine().side_effects_disabled() ? 0xff : ((m_control & 0x20) ? 0xff : m_port_in_cb[4]()); }
 	DECLARE_WRITE8_MEMBER(e_bus_data_w) { if (~m_control & 0x20) m_port_out_cb[4](data); }
 
 	void tms70c46_mem(address_map &map);

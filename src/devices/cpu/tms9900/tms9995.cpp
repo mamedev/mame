@@ -437,7 +437,7 @@ uint16_t tms9995_device::read_workspace_register_debug(int reg)
 	}
 	else
 	{
-		auto dis = machine().disable_side_effect();
+		auto dis = machine().disable_side_effects();
 		value = (m_prgspace->read_byte(addrb) << 8) & 0xff00;
 		value |= m_prgspace->read_byte(addrb+1);
 	}
@@ -457,7 +457,7 @@ void tms9995_device::write_workspace_register_debug(int reg, uint16_t data)
 	}
 	else
 	{
-		auto dis = machine().disable_side_effect();
+		auto dis = machine().disable_side_effects();
 		m_prgspace->write_byte(addrb, (data >> 8) & 0xff);
 		m_prgspace->write_byte(addrb+1, data & 0xff);
 	}

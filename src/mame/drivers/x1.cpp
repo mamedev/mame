@@ -1006,7 +1006,7 @@ WRITE8_MEMBER( x1_state::x1turboz_4096_palette_w )
 
 READ8_MEMBER( x1_state::x1_ex_gfxram_r )
 {
-	if (!machine().side_effect_disabled())
+	if (!machine().side_effects_disabled())
 	{
 		m_iobank->set_bank(0); // any read disables the extended mode
 		return m_iobank->read8(space, offset);
@@ -1388,7 +1388,7 @@ ADDRESS_MAP_START(x1_state::x1turbo_io_banks)
 	AM_RANGE(0x1000, 0x12ff)                   AM_WRITE(x1turboz_4096_palette_w)
 
 	AM_RANGE(0x1f80, 0x1f80) AM_MIRROR(0x000f) AM_DEVREADWRITE("dma", z80dma_device, read, write)
-    AM_RANGE(0x1f90, 0x1f93)                   AM_DEVREADWRITE("sio", z80sio0_device, ba_cd_r, ba_cd_w)
+	AM_RANGE(0x1f90, 0x1f93)                   AM_DEVREADWRITE("sio", z80sio0_device, ba_cd_r, ba_cd_w)
 	AM_RANGE(0x1f98, 0x1f9f)                   AM_READWRITE(ext_sio_ctc_r, ext_sio_ctc_w)
 	AM_RANGE(0x1fb0, 0x1fb0)                   AM_READWRITE(x1turbo_pal_r, x1turbo_pal_w)       // Z only!
 	AM_RANGE(0x1fb8, 0x1fbf)                   AM_READWRITE(x1turbo_txpal_r, x1turbo_txpal_w)   // Z only!

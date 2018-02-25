@@ -100,7 +100,7 @@ READ8_MEMBER(stv_state::stv_ioga_r)
 	uint8_t res;
 
 	res = 0xff;
-	if(offset & 0x20 && !machine().side_effect_disabled())
+	if(offset & 0x20 && !machine().side_effects_disabled())
 		printf("Reading from mirror %08x?\n",offset);
 
 	offset &= 0x1f; // mirror?
@@ -131,7 +131,7 @@ READ8_MEMBER(stv_state::stv_ioga_r)
 
 WRITE8_MEMBER(stv_state::stv_ioga_w)
 {
-	if(offset & 0x20 && !machine().side_effect_disabled())
+	if(offset & 0x20 && !machine().side_effects_disabled())
 		printf("Writing to mirror %08x %02x?\n",offset,data);
 
 	offset &= 0x1f; // mirror?
@@ -304,7 +304,7 @@ READ32_MEMBER(stv_state::critcrsh_ioga_r32)
 		res |= critcrsh_ioga_r(space,offset*4+3);
 	if(ACCESSING_BITS_8_15 || ACCESSING_BITS_24_31)
 		if(!(ACCESSING_BITS_16_23 || ACCESSING_BITS_0_7))
-			if(!machine().side_effect_disabled())
+			if(!machine().side_effects_disabled())
 				printf("Warning: IOGA reads from odd offset %02x %08x!\n",offset*4,mem_mask);
 
 	return res;
@@ -321,7 +321,7 @@ READ32_MEMBER(stv_state::stvmp_ioga_r32)
 		res |= stvmp_ioga_r(space,offset*4+3);
 	if(ACCESSING_BITS_8_15 || ACCESSING_BITS_24_31)
 		if(!(ACCESSING_BITS_16_23 || ACCESSING_BITS_0_7))
-			if(!machine().side_effect_disabled())
+			if(!machine().side_effects_disabled())
 				printf("Warning: IOGA reads from odd offset %02x %08x!\n",offset*4,mem_mask);
 
 	return res;
@@ -335,7 +335,7 @@ WRITE32_MEMBER(stv_state::stvmp_ioga_w32)
 		stvmp_ioga_w(space,offset*4+3,data);
 	if(ACCESSING_BITS_8_15 || ACCESSING_BITS_24_31)
 		if(!(ACCESSING_BITS_16_23 || ACCESSING_BITS_0_7))
-			if(!machine().side_effect_disabled())
+			if(!machine().side_effects_disabled())
 				printf("Warning: IOGA writes to odd offset %02x (%08x) -> %08x!",offset*4,mem_mask,data);
 }
 
@@ -350,7 +350,7 @@ READ32_MEMBER(stv_state::magzun_ioga_r32)
 		res |= magzun_ioga_r(space,offset*4+3);
 	if(ACCESSING_BITS_8_15 || ACCESSING_BITS_24_31)
 		if(!(ACCESSING_BITS_16_23 || ACCESSING_BITS_0_7))
-			if(!machine().side_effect_disabled())
+			if(!machine().side_effects_disabled())
 				printf("Warning: IOGA reads from odd offset %02x %08x!\n",offset*4,mem_mask);
 
 	return res;
@@ -364,7 +364,7 @@ WRITE32_MEMBER(stv_state::magzun_ioga_w32)
 		magzun_ioga_w(space,offset*4+3,data);
 	if(ACCESSING_BITS_8_15 || ACCESSING_BITS_24_31)
 		if(!(ACCESSING_BITS_16_23 || ACCESSING_BITS_0_7))
-			if(!machine().side_effect_disabled())
+			if(!machine().side_effects_disabled())
 				printf("Warning: IOGA writes to odd offset %02x (%08x) -> %08x!",offset*4,mem_mask,data);
 }
 
@@ -3584,7 +3584,7 @@ ROM_START( patocar )
 ROM_END
 
 ROM_START( sackids )
-//	STV_BIOS
+//  STV_BIOS
 
 	// wants it's own specific bios, marked "CKBP1.13J0001024" at 0x800
 	// PC=06004150 is where it compares this
@@ -3593,15 +3593,15 @@ ROM_START( sackids )
 	ROM_LOAD16_WORD_SWAP( "epr-20091.ic8",   0x000000, 0x080000, BAD_DUMP CRC(59ed40f4) SHA1(eff0f54c70bce05ff3a289bf30b1027e1c8cd117) )
 
 	ROM_REGION32_BE( 0x3000000, "cart", ROMREGION_ERASE00 ) /* SH2 code */
-    ROM_LOAD16_WORD_SWAP( "ic22.bin",     0x0200000, 0x200000, CRC(4d9d1870) SHA1(c702964af2767b0db4ca1d6c7d07356e675d5efd) )
-    ROM_LOAD16_WORD_SWAP( "ic24.bin",     0x0400000, 0x200000, CRC(39fca3e5) SHA1(29be552f58b69f8f3f237ca14f13af3673559123) )
-    ROM_LOAD16_WORD_SWAP( "ic26.bin",     0x0600000, 0x200000, CRC(f38c79b6) SHA1(a470a22ef3d735c9929f70ef5441547a07a480e8) )
-    ROM_LOAD16_WORD_SWAP( "ic28.bin",     0x0800000, 0x200000, CRC(63d09f3c) SHA1(e470e5af52f9ee70bf160ff58a5cbafd7e674073) )
-    ROM_LOAD16_WORD_SWAP( "ic30.bin",     0x0a00000, 0x200000, CRC(f89811ba) SHA1(8fa8b4b09430456bce63e45686640c7bcdde90e9) )
-    ROM_LOAD16_WORD_SWAP( "ic32.bin",     0x0c00000, 0x200000, CRC(1db6c26b) SHA1(2e14b7b021bce145f989295fdc6effcd799f00a4) )
-    ROM_LOAD16_WORD_SWAP( "ic34.bin",     0x0e00000, 0x200000, CRC(0f3622c8) SHA1(69337114d6902675018371101f0fba01902de54a) )
-    ROM_LOAD16_WORD_SWAP( "ic36.bin",     0x1000000, 0x200000, CRC(9a4109e5) SHA1(ba59caac5f5a80fc52c507d8a47f322a380aa9a1) ) // empty / FF filled
-	
+	ROM_LOAD16_WORD_SWAP( "ic22.bin",     0x0200000, 0x200000, CRC(4d9d1870) SHA1(c702964af2767b0db4ca1d6c7d07356e675d5efd) )
+	ROM_LOAD16_WORD_SWAP( "ic24.bin",     0x0400000, 0x200000, CRC(39fca3e5) SHA1(29be552f58b69f8f3f237ca14f13af3673559123) )
+	ROM_LOAD16_WORD_SWAP( "ic26.bin",     0x0600000, 0x200000, CRC(f38c79b6) SHA1(a470a22ef3d735c9929f70ef5441547a07a480e8) )
+	ROM_LOAD16_WORD_SWAP( "ic28.bin",     0x0800000, 0x200000, CRC(63d09f3c) SHA1(e470e5af52f9ee70bf160ff58a5cbafd7e674073) )
+	ROM_LOAD16_WORD_SWAP( "ic30.bin",     0x0a00000, 0x200000, CRC(f89811ba) SHA1(8fa8b4b09430456bce63e45686640c7bcdde90e9) )
+	ROM_LOAD16_WORD_SWAP( "ic32.bin",     0x0c00000, 0x200000, CRC(1db6c26b) SHA1(2e14b7b021bce145f989295fdc6effcd799f00a4) )
+	ROM_LOAD16_WORD_SWAP( "ic34.bin",     0x0e00000, 0x200000, CRC(0f3622c8) SHA1(69337114d6902675018371101f0fba01902de54a) )
+	ROM_LOAD16_WORD_SWAP( "ic36.bin",     0x1000000, 0x200000, CRC(9a4109e5) SHA1(ba59caac5f5a80fc52c507d8a47f322a380aa9a1) ) // empty / FF filled
+
 	ROM_REGION32_BE( 0x3000000, "abus", ROMREGION_ERASE00 ) /* SH2 code */
 ROM_END
 

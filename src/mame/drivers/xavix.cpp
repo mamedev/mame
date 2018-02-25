@@ -7,7 +7,7 @@
     CPU is an M6502 derivative with added opcodes for far-call handling
 
     Notes from http://www.videogameconsolelibrary.com/pg00-xavix.htm#page=reviews (thanks Guru!)
-	(** this isn't entirely accurate, XaviX Tennis appears to be Super Xavix, see other notes in driver)
+    (** this isn't entirely accurate, XaviX Tennis appears to be Super Xavix, see other notes in driver)
 
     XaviXPORT arrived on the scene with 3 game titles (XaviX Tennis, XaviX Bowling and XaviX Baseball) using their
     original XaviX Multiprocessor.  This proprietary chip is reported to contain an 8-bit high speed central processing
@@ -21,9 +21,9 @@
     SSD COMPANY LIMITED is already working on their next chip called "XaviX II" that is said to be a 32-bit RISC processor
     with 3D capabilities.
 
-	Important addresses
+    Important addresses
 
-	0x18340 in Monster Truck is the self-test mode, shows me which registers need to retain their values etc.
+    0x18340 in Monster Truck is the self-test mode, shows me which registers need to retain their values etc.
 
 ***************************************************************************/
 
@@ -220,7 +220,7 @@ private:
 	required_shared_ptr<uint8_t> m_palram2;
 
 	required_shared_ptr<uint8_t> m_spr_attra;
-	
+
 	required_device<palette_device> m_palette;
 
 	required_ioport m_in0;
@@ -321,13 +321,13 @@ void xavix_state::handle_palette(screen_device &screen, bitmap_ind16 &bitmap, co
 		int h_raw = (dat & 0x001f) >> 0;
 
 		//if (h_raw > 24)
-		//	logerror("hraw >24 (%02x)\n", h_raw);
+		//  logerror("hraw >24 (%02x)\n", h_raw);
 
 		//if (l_raw > 17)
-		//	logerror("lraw >17 (%02x)\n", l_raw);
+		//  logerror("lraw >17 (%02x)\n", l_raw);
 
 		//if (sl_raw > 7)
-		//	logerror("sl_raw >5 (%02x)\n", sl_raw);
+		//  logerror("sl_raw >5 (%02x)\n", sl_raw);
 
 		double l = (double)l_raw / 17.0f;
 		double s = (double)sl_raw / 7.0f;
@@ -515,7 +515,7 @@ void xavix_state::draw_tilemap(screen_device &screen, bitmap_ind16 &bitmap, cons
 							   0x0e = boxing (instruction stuff) also needs palette settings.. also some bits on same layer using different bank? (0xd) or just disabled?
 
 							*/
-							   
+
 						}
 						else
 						{
@@ -734,7 +734,7 @@ void xavix_state::draw_sprites(screen_device &screen, bitmap_ind16 &bitmap, cons
 		/*
 		if ((m_spr_ypos[i] != 0x81) && (m_spr_ypos[i] != 0x80) && (m_spr_ypos[i] != 0x00))
 		{
-			logerror("sprite with enable? %02x attr0 %02x attr1 %02x attr3 %02x attr5 %02x attr6 %02x attr7 %02x\n", m_spr_ypos[i], m_spr_attr0[i], m_spr_attr1[i], m_spr_xpos[i], m_spr_addr_lo[i], m_spr_addr_md[i], m_spr_addr_hi[i] );
+		    logerror("sprite with enable? %02x attr0 %02x attr1 %02x attr3 %02x attr5 %02x attr6 %02x attr7 %02x\n", m_spr_ypos[i], m_spr_attr0[i], m_spr_attr1[i], m_spr_xpos[i], m_spr_addr_lo[i], m_spr_addr_md[i], m_spr_addr_hi[i] );
 		}
 		*/
 	}
@@ -783,7 +783,7 @@ void xavix_state::draw_tile(screen_device &screen, bitmap_ind16 &bitmap, const r
 				uint16_t* rowptr;
 
 				rowptr = &bitmap.pix16(row);
-				
+
 				if (opaque)
 				{
 					rowptr[col] = (dat + (pal << 4)) & 0xff;
@@ -929,20 +929,20 @@ WRITE8_MEMBER(xavix_state::xavix_7900_w)
 TIMER_DEVICE_CALLBACK_MEMBER(xavix_state::scanline_cb)
 {
 /*
-	int scanline = param;
+    int scanline = param;
 
-	if (scanline == 200)
-	{
-		if (m_irq_enable_data != 0)
-			m_maincpu->set_input_line(INPUT_LINE_IRQ0,HOLD_LINE);
-	}
+    if (scanline == 200)
+    {
+        if (m_irq_enable_data != 0)
+            m_maincpu->set_input_line(INPUT_LINE_IRQ0,HOLD_LINE);
+    }
 */
 }
 
 INTERRUPT_GEN_MEMBER(xavix_state::interrupt)
 {
-	//	if (m_irq_enable_data != 0)
-	//		m_maincpu->set_input_line(INPUT_LINE_IRQ0,HOLD_LINE);
+	//  if (m_irq_enable_data != 0)
+	//      m_maincpu->set_input_line(INPUT_LINE_IRQ0,HOLD_LINE);
 
 	// this logic is clearly VERY wrong
 
@@ -1231,7 +1231,7 @@ WRITE8_MEMBER(xavix_state::tmap1_regs_w)
 	/*
 	   0x0 pointer to address where tile data is
 	       it gets set to 0x40 in monster truck test mode, which is outside of ram but test mode requires a fixed 'column scan' layout
-		   so that might be special
+	       so that might be special
 
 	   0x1 pointer to middle tile bits (if needed, depends on mode) (usually straight after the ram needed for above)
 
@@ -1246,52 +1246,52 @@ WRITE8_MEMBER(xavix_state::tmap1_regs_w)
 	   0x7 could be mode (16x16, 8x8 etc.)
 	        0x00 is disabled?
 	        0x80 means 16x16 tiles
-			0x81 might be 8x8 tiles
-			0x93 course / mode select bg / ingame (weird addressing?)
+	        0x81 might be 8x8 tiles
+	        0x93 course / mode select bg / ingame (weird addressing?)
 
 
 	 */
 
 	/*
 	    6aff base registers
-		-- ingame
+	    -- ingame
 
-		ae 80
-		02 80
-		02 90
-		02 a0
-		02 b0
-		02 c0
-		02 d0
-		02 e0
+	    ae 80
+	    02 80
+	    02 90
+	    02 a0
+	    02 b0
+	    02 c0
+	    02 d0
+	    02 e0
 
-		02 00
-		04 80
-		04 90
-		04 a0
-		04 b0
-		04 c0
-		04 d0
-		04 e0
+	    02 00
+	    04 80
+	    04 90
+	    04 a0
+	    04 b0
+	    04 c0
+	    04 d0
+	    04 e0
 
-		-- menu
-		af 80
-		27 80
-		27 90
-		27 a0
-		27 b0
-		27 c0
-		27 d0
-		27 e0
+	    -- menu
+	    af 80
+	    27 80
+	    27 90
+	    27 a0
+	    27 b0
+	    27 c0
+	    27 d0
+	    27 e0
 
-		27 00
-		00 80
-		00 90
-		00 a0
-		00 b0
-		00 c0
-		00 d0
-		00 e0
+	    27 00
+	    00 80
+	    00 90
+	    00 a0
+	    00 b0
+	    00 c0
+	    00 d0
+	    00 e0
 	*/
 
 
@@ -1351,7 +1351,7 @@ ADDRESS_MAP_START(xavix_state::xavix_map)
 
 	// this might not be a real area, the tilemap base register gets set to 0x40 in monster truck service mode, and expects a fixed layout.
 	// As that would point at this address maybe said layout is being read from here, or maybe it's just a magic tilemap register value that doesn't read address space at all.
-	AM_RANGE(0x004000, 0x0041ff) AM_READ(xavix_4000_r)	
+	AM_RANGE(0x004000, 0x0041ff) AM_READ(xavix_4000_r)
 
 	// 6xxx ranges are the video hardware
 	// appears to be 256 sprites (shares will be renamed once their purpose is known)
@@ -1367,14 +1367,14 @@ ADDRESS_MAP_START(xavix_state::xavix_map)
 	AM_RANGE(0x006900, 0x0069ff) AM_RAM AM_SHARE("palram2") // startup (taitons1)
 	AM_RANGE(0x006a00, 0x006a1f) AM_RAM AM_SHARE("spr_attra") // test mode, pass flag 0x20
 
-	
+
 	AM_RANGE(0x006fc0, 0x006fc0) AM_WRITE(xavix_6fc0_w) // startup (maybe this is a mirror of tmap1_regs_w)
 
 	AM_RANGE(0x006fc8, 0x006fcf) AM_WRITE(tmap1_regs_w) // video registers
 
 	AM_RANGE(0x006fd0, 0x006fd7) AM_READWRITE(tmap2_regs_r, tmap2_regs_w)
 	AM_RANGE(0x006fd8, 0x006fd8) AM_WRITE(xavix_6fd8_w) // startup (mirror of tmap2_regs_w?)
-	
+
 	AM_RANGE(0x006fe0, 0x006fe0) AM_READWRITE(vid_dma_trigger_r, vid_dma_trigger_w) // after writing to 6fe1/6fe2 and 6fe5/6fe6 rad_mtrk writes 0x43/0x44 here then polls on 0x40   (see function call at c273) write values are hardcoded, similar code at 18401
 	AM_RANGE(0x006fe1, 0x006fe2) AM_WRITE(vid_dma_params_1_w)
 	AM_RANGE(0x006fe5, 0x006fe6) AM_WRITE(vid_dma_params_2_w)
@@ -1382,7 +1382,7 @@ ADDRESS_MAP_START(xavix_state::xavix_map)
 	// function in rad_mtrk at 0184b7 uses this
 	AM_RANGE(0x006fe8, 0x006fe8) AM_RAM // r/w tested
 	AM_RANGE(0x006fe9, 0x006fe9) AM_RAM // r/w tested
-	//AM_RANGE(0x006fea, 0x006fea) AM_WRITENOP 
+	//AM_RANGE(0x006fea, 0x006fea) AM_WRITENOP
 
 	AM_RANGE(0x006ff0, 0x006ff0) AM_READWRITE(xavix_6ff0_r, xavix_6ff0_w) // r/w tested
 	//AM_RANGE(0x006ff1, 0x006ff1) AM_WRITENOP // startup - cleared in interrupt 0
@@ -1400,10 +1400,10 @@ ADDRESS_MAP_START(xavix_state::xavix_map)
 	AM_RANGE(0x0075f5, 0x0075f5) AM_READ(xavix_75f5_r) // related to 75f1 (read after writing there - rad_mtrk)
 
 	// taitons1 after 75f7/75f8
-	AM_RANGE(0x0075f6, 0x0075f6) AM_READWRITE(xavix_75f6_r, xavix_75f6_w) // r/w tested 
+	AM_RANGE(0x0075f6, 0x0075f6) AM_READWRITE(xavix_75f6_r, xavix_75f6_w) // r/w tested
 	// taitons1 written as a pair
 	AM_RANGE(0x0075f7, 0x0075f7) AM_WRITE(xavix_75f7_w)
-	AM_RANGE(0x0075f8, 0x0075f8) AM_READWRITE(xavix_75f8_r, xavix_75f8_w) // r/w tested 
+	AM_RANGE(0x0075f8, 0x0075f8) AM_READWRITE(xavix_75f8_r, xavix_75f8_w) // r/w tested
 	// taitons1 written after 75f6, then read
 	AM_RANGE(0x0075f9, 0x0075f9) AM_READWRITE(xavix_75f9_r, xavix_75f9_w)
 	// at another time
@@ -1436,7 +1436,7 @@ ADDRESS_MAP_START(xavix_state::xavix_map)
 	// GPIO stuff
 	AM_RANGE(0x007a00, 0x007a00) AM_READ(xavix_io_0_r)
 	AM_RANGE(0x007a01, 0x007a01) AM_READ(xavix_io_1_r) //AM_WRITENOP // startup (taitons1)
-	//AM_RANGE(0x007a02, 0x007a02) AM_WRITENOP // startup, gets set to 20, 7a00 is then also written with 20 
+	//AM_RANGE(0x007a02, 0x007a02) AM_WRITENOP // startup, gets set to 20, 7a00 is then also written with 20
 	//AM_RANGE(0x007a03, 0x007a03) AM_READNOP AM_WRITENOP // startup (gets set to 84 which is the same as the bits checked on 7a01, possible port direction register?)
 
 	//AM_RANGE(0x007a80, 0x007a80) AM_WRITENOP
@@ -1451,7 +1451,7 @@ ADDRESS_MAP_START(xavix_state::xavix_map)
 	// this is a multiplication chip
 	AM_RANGE(0x007ff2, 0x007ff4) AM_WRITE(mult_param_w)
 	AM_RANGE(0x007ff5, 0x007ff6) AM_READ(mult_r)
-	
+
 	// maybe irq enable, written after below
 	AM_RANGE(0x007ff9, 0x007ff9) AM_WRITE(irq_enable_w)
 	// an IRQ vector (nmi?)
@@ -1462,7 +1462,7 @@ ADDRESS_MAP_START(xavix_state::xavix_map)
 	AM_RANGE(0x007fff, 0x007fff) AM_WRITE(irq_vector1_hi_w)
 
 //  rom is installed in init due to different rom sizes and mirroring required
-//	AM_RANGE(0x008000, 0x7fffff) AM_ROM AM_REGION("bios", 0x008000) AM_MIRROR(0x800000) // rad_mtrk relies on rom mirroring
+//  AM_RANGE(0x008000, 0x7fffff) AM_ROM AM_REGION("bios", 0x008000) AM_MIRROR(0x800000) // rad_mtrk relies on rom mirroring
 ADDRESS_MAP_END
 
 static INPUT_PORTS_START( xavix )
@@ -1601,7 +1601,7 @@ static INPUT_PORTS_START( rad_boxp )
 	PORT_INCLUDE(rad_box)
 
 	PORT_MODIFY("REGION") // PAL/NTSC flag
-	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_SPECIAL ) 
+	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_SPECIAL )
 INPUT_PORTS_END
 
 
@@ -1718,7 +1718,7 @@ typedef device_delegate<uint8_t (int which, int half)> xavix_interrupt_vector_de
 
 uint8_t xavix_state::get_vectors(int which, int half)
 {
-//	logerror("get_vectors %d %d\n", which, half);
+//  logerror("get_vectors %d %d\n", which, half);
 
 	if (which == 0) // irq?
 	{
@@ -1895,7 +1895,7 @@ CONS (200?, eka_strt,  0,          0,  xavix,  xavix,    xavix_state, xavix, "Ta
 
    According to sources XaviX Tennis should be a standard XaviX CPU, but at the very least makes significantly more use of custom opcodes than the above titles
    which only appears to use the call far / return far for extended memory space.
-   
+
    Furthermore it also seems to require some regular 6502 opcodes to be replaced with custom ones, yet the other games expect these to act normally.  This
    leads me to believe that XaviX Tennis is almost certainly a Super XaviX title.
 
@@ -1903,7 +1903,7 @@ CONS (200?, eka_strt,  0,          0,  xavix,  xavix,    xavix_state, xavix, "Ta
 
    Radica Monster truck die is marked SSD PL7351 with SSD98 also printed on the die
    Radia Ping Pong      die is marked SSD PA7270 with SSD97 also printed on the die (otherwise looks identical to Monster Truck)
-	
+
    Boxing, Baseball 2 and Card Night all have the SSD98 logo
    Boxing, Bass Fishin' and Card Night are all PA7351-107.  Baseball 2 looks like PL7351-181.
 

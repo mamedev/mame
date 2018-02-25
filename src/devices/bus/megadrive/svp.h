@@ -54,7 +54,7 @@ protected:
 	virtual DECLARE_WRITE16_MEMBER(write_xst);
 	virtual DECLARE_WRITE16_MEMBER(write_pmc);
 	virtual DECLARE_WRITE16_MEMBER(write_al);
-	
+
 private:
 	required_device<device_t> m_svp;
 	required_ioport m_test_ipt;

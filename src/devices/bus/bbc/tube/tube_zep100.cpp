@@ -171,7 +171,7 @@ READ8_MEMBER(bbc_tube_zep100_device::io_r)
 {
 	uint8_t data = 0xff;
 
-	if (!machine().side_effect_disabled())
+	if (!machine().side_effects_disabled())
 		m_rom_enabled = !BIT(offset, 2);
 
 	data = m_ppi->read(space, offset & 0x03);

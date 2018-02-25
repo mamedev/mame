@@ -4,12 +4,12 @@
 ABC CAD Mouse/Hi-res video card
 
 The ABC CAD was an innovative electronics CAD accessory invented by
-Marek Gorczyca, Betronex Elektronik AB 1983 to overcome the limitations 
+Marek Gorczyca, Betronex Elektronik AB 1983 to overcome the limitations
 in the ABC80 microcomputer graphics which was very popular in Sweden at the time.
 
-The mouse feature is in the form of a small box with a handle sticking out at the front. 
-The handle can be manipulated in one direction by turning it around its internal pivot 
-point left and right. The other dimension in handled by pulling and pushing the handle. 
+The mouse feature is in the form of a small box with a handle sticking out at the front.
+The handle can be manipulated in one direction by turning it around its internal pivot
+point left and right. The other dimension in handled by pulling and pushing the handle.
 One button is available on the top of the handle.
 
 The mouse is connected via the ABC bus, but also passes through the

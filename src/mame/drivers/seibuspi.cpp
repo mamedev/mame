@@ -1895,8 +1895,8 @@ MACHINE_CONFIG_START(seibuspi_state::spi)
 
 	MCFG_SOUND_ROUTE(0, "lspeaker", 1.0)
 	MCFG_SOUND_ROUTE(1, "rspeaker", 1.0)
-//	MCFG_SOUND_ROUTE(2, "lspeaker", 1.0) Output 2/3 not used?
-//	MCFG_SOUND_ROUTE(3, "rspeaker", 1.0)
+//  MCFG_SOUND_ROUTE(2, "lspeaker", 1.0) Output 2/3 not used?
+//  MCFG_SOUND_ROUTE(3, "rspeaker", 1.0)
 MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(seibuspi_state::ejanhs)
@@ -1938,7 +1938,7 @@ MACHINE_CONFIG_START(seibuspi_state::sxx2e)
 	MCFG_DEVICE_REMOVE("soundflash2")
 
 	MCFG_DEVICE_REMOVE("soundfifo2")
-	
+
 	/* sound hardware */
 	 // Single PCBs only output mono sound, SXX2E : unverified
 	MCFG_DEVICE_REMOVE("lspeaker")

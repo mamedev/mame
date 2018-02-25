@@ -6,7 +6,7 @@
 main CPU is
 
   PHILIPS
- 
+
 P89C51RD2HBA
 1C7415
 AeD0118 G

@@ -179,9 +179,6 @@ public:
 	DECLARE_READ32_MEMBER(model2_serial_r);
 	DECLARE_WRITE32_MEMBER(model2o_serial_w);
 	DECLARE_WRITE32_MEMBER(model2_serial_w);
-	DECLARE_READ32_MEMBER(model2_5881prot_r);
-	DECLARE_WRITE32_MEMBER(model2_5881prot_w);
-	int first_read;
 
 	void raster_init(memory_region *texture_rom);
 	void geo_init(memory_region *polygon_rom);
@@ -210,7 +207,6 @@ public:
 	DECLARE_DRIVER_INIT(overrev);
 	DECLARE_DRIVER_INIT(pltkids);
 	DECLARE_DRIVER_INIT(rchase2);
-	DECLARE_DRIVER_INIT(genprot);
 	DECLARE_DRIVER_INIT(manxttdx);
 	DECLARE_DRIVER_INIT(srallyc);
 	DECLARE_DRIVER_INIT(doa);
@@ -259,13 +255,14 @@ public:
 	void drive_map(address_map &map);
 	void geo_sharc_map(address_map &map);
 	void model2_base_mem(address_map &map);
+	void model2_5881_mem(address_map &map);
 	void model2_snd(address_map &map);
-	
+
 	uint8_t m_gamma_table[256];
-	
+
 protected:
 	virtual void video_start() override;
-	
+
 private:
 	bool m_render_unk;
 	bool m_render_mode;
@@ -276,7 +273,7 @@ private:
  * Model 2
  *
  *****************************/
- 
+
 class model2o_state : public model2_state
 {
 public:
@@ -288,7 +285,7 @@ public:
 	DECLARE_READ8_MEMBER(model2o_in_r);
 	DECLARE_READ32_MEMBER(fifoctrl_r);
 
-	void daytona(machine_config &config);	
+	void daytona(machine_config &config);
 	void model2o(machine_config &config);
 	void model2o_mem(address_map &map);
 };
@@ -311,7 +308,7 @@ public:
 	void model2o_maxx_mem(address_map &map);
 
 private:
-	int m_maxxstate;	
+	int m_maxxstate;
 };
 
 /*****************************
@@ -326,7 +323,7 @@ public:
 	model2a_state(const machine_config &mconfig, device_type type, const char *tag)
 		: model2_state(mconfig, type, tag)
 	{}
-	
+
 	void manxtt(machine_config &config);
 	void manxttdx(machine_config &config);
 	void model2a(machine_config &config);
@@ -334,6 +331,7 @@ public:
 	void model2a_5881(machine_config &config);
 	void srallyc(machine_config &config);
 	void model2a_crx_mem(address_map &map);
+	void model2a_5881_mem(address_map &map);
 };
 
 /*****************************
@@ -355,6 +353,8 @@ public:
 	void indy500(machine_config &config);
 	void rchase2(machine_config &config);
 	void model2b_crx_mem(address_map &map);
+	void model2b_5881_mem(address_map &map);
+	// TODO: split into own class
 	void rchase2_iocpu_map(address_map &map);
 	void rchase2_ioport_map(address_map &map);
 };
@@ -371,12 +371,13 @@ public:
 	model2c_state(const machine_config &mconfig, device_type type, const char *tag)
 		: model2_state(mconfig, type, tag)
 	{}
-	
+
 	void model2c(machine_config &config);
 	void model2c_5881(machine_config &config);
 	void overrev2c(machine_config &config);
 	void stcc(machine_config &config);
 	void model2c_crx_mem(address_map &map);
+	void model2c_5881_mem(address_map &map);
 };
 
 /*****************************

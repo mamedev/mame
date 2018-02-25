@@ -34,7 +34,7 @@ public:
 
 	// configuration
 	void set_gfxdecode_tag(const char *tag) { m_gfxdecode.set_tag(tag); }
-//	void set_palette_tag(const char *tag);
+//  void set_palette_tag(const char *tag);
 	template <typename Object> void set_bank1_callback(Object &&cb) { m_bank1_cb = std::forward<Object>(cb); }
 	template <typename Object> void set_bank2_callback(Object &&cb) { m_bank2_cb = std::forward<Object>(cb); }
 	void set_split(int split) { m_split = split; }

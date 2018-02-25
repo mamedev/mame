@@ -145,7 +145,7 @@ READ8_MEMBER(bbc_tube_arm_device::ram_r)
 WRITE8_MEMBER(bbc_tube_arm_device::ram_w)
 {
 	/* clear ROM select on first write */
-	if (!machine().side_effect_disabled()) m_rom_select = false;
+	if (!machine().side_effects_disabled()) m_rom_select = false;
 
 	m_ram->pointer()[offset] = data;
 }

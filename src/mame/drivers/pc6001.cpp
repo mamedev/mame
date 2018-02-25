@@ -12,42 +12,42 @@
     - cassette handling requires a decap of the MCU. It could be possible to
       do some tight synch between the master CPU and a code simulation, but maybe
       it's not worth the effort...
-    - Identify and hook-up the FDC device, apparently PC-6001 and PC-6601 doesn't 
-	  even use the same thing;
+    - Identify and hook-up the FDC device, apparently PC-6001 and PC-6601 doesn't
+      even use the same thing;
     - PC-6601: mon r-0 type games doesn't seem to work at all on this system?
-    - PC-6001SR: get it to boot, also implement MK-2 compatibility mode (it changes 
-	  the memory map to behave like the older versions)
+    - PC-6001SR: get it to boot, also implement MK-2 compatibility mode (it changes
+      the memory map to behave like the older versions)
     - Hookup MC6847 for vanilla PC-6001 and fix video bugs for that device;
-	- upd7752 voice speech device needs to be properly emulated (device is currently a skeleton),
-	  Chrith game is a good test case, it's supposed to talk before title screen;
+    - upd7752 voice speech device needs to be properly emulated (device is currently a skeleton),
+      Chrith game is a good test case, it's supposed to talk before title screen;
 
     TODO (game specific):
     - (several AX* games, namely Galaxy Mission Part 1/2 and others): inputs doesn't work;
-    - AX6 - Demo: When AY-based speech talks, other emus emulates the screen drawing to be 
-	   a solid green (plain PC-6001) or solid white (Mk2 version), but according to an 
-	   original video reference, that screen should actually some kind of weird garbage on it;
-    - AX6 - Powered Knight: doesn't work too well, according to the asm code it asks the 
-       player to press either 'B' or 'C' then a number but nothing is shown on screen, 
-	   other emus behaves the same, bad dump?
+    - AX6 - Demo: When AY-based speech talks, other emus emulates the screen drawing to be
+       a solid green (plain PC-6001) or solid white (Mk2 version), but according to an
+       original video reference, that screen should actually some kind of weird garbage on it;
+    - AX6 - Powered Knight: doesn't work too well, according to the asm code it asks the
+       player to press either 'B' or 'C' then a number but nothing is shown on screen,
+       other emus behaves the same, bad dump?
     - Dawn Patrol (cart): presumably too slow;
     (Mk2 mode 5 games)
     - 3D Golf Simulation Super Version: gameplay / inputs seems broken
     - American Truck: Screen is offset at the loading screen, loading bug?
-    - Castle Excellent: copyright text drawing is quite bogus, scans text in vertical 
+    - Castle Excellent: copyright text drawing is quite bogus, scans text in vertical
        instead of horizontal?
-    - Dezeni Land (ALL versions) / Hurry Fox 1/2: asks you to "load something", can't do it 
-	   with current cassette kludge, also, for Dezeni Land(s) keyboard irqs doesn't seem to 
-	   work too well with halt opcode execution?
+    - Dezeni Land (ALL versions) / Hurry Fox 1/2: asks you to "load something", can't do it
+       with current cassette kludge, also, for Dezeni Land(s) keyboard irqs doesn't seem to
+       work too well with halt opcode execution?
     - Dezeni Land 1/4: dies after loading of main program;
     - Dezeni Land 2: dies at the "load something" screen with presumably wrong stack opcodes
     - (MyCom BASIC games with multiple files): most of them refuses to run ... how to load them?
-    - Grobda: when "get ready" speech plays, screen should be full white but instead it's all 
-	   black, same issue as AX-6 Demo?
+    - Grobda: when "get ready" speech plays, screen should be full white but instead it's all
+       black, same issue as AX-6 Demo?
     - Pac-Man / Tiny Xevious 2: gameplay is too fast
     - Salad no Kunino Tomato-Hime: can't start a play
     - Space Harrier: inputs doesn't work properly
-    - The Black Onyx: dies when it attempts to save the character, that obviously means saving 
-	   on the tape;
+    - The Black Onyx: dies when it attempts to save the character, that obviously means saving
+       on the tape;
     - Yakyukyo / Punchball Mario: waits for an irq, check which one;
 
 =================================================================================================
@@ -163,7 +163,7 @@ inline void pc6001_state::ppi_control_hack_w(uint8_t data)
 
 	#ifdef UNUSED_FUNCTION
 	// this switch-case is overwritten below anyway!?
-	switch(data) 
+	switch(data)
 	{
 		case 0x08: m_port_c_8255 |= 0x88; break;
 		case 0x09: m_port_c_8255 &= 0xf7; break;
@@ -172,7 +172,7 @@ inline void pc6001_state::ppi_control_hack_w(uint8_t data)
 		default: break;
 	}
 	#endif
-	
+
 	m_port_c_8255 |= 0xa8;
 }
 
@@ -572,9 +572,9 @@ void pc6001mk2_state::vram_bank_change(uint8_t vram_bank)
 {
 	uint32_t bank_base_values[8] = { 0x8000, 0xc000, 0xc000, 0xe000, 0x0000, 0x8000, 0x4000, 0xa000 };
 	uint8_t vram_bank_index = ((vram_bank & 0x60) >> 4) | ((vram_bank & 2) >> 1);
-//	uint8_t *work_ram = m_region_maincpu->base();
+//  uint8_t *work_ram = m_region_maincpu->base();
 
-//	bit 2 of vram_bank sets up 4 color mode
+//  bit 2 of vram_bank sets up 4 color mode
 	set_videoram_bank(0x28000 + bank_base_values[vram_bank_index]);
 
 //  popmessage("%02x",vram_bank);
@@ -598,7 +598,7 @@ inline void pc6001mk2_state::refresh_crtc_params()
 	int y_height;
 
 	y_height = (m_exgfx_bitmap_mode || m_exgfx_2bpp_mode) ? 200 : 240;
-	
+
 	visarea.set(0, (320) - 1, 0, (y_height) - 1);
 
 	m_screen->configure(m_screen->width(), m_screen->height(), visarea, m_screen->frame_period().attoseconds());
@@ -728,7 +728,7 @@ ADDRESS_MAP_END
  *
  ****************************************/
 
-// disk device placeholder 
+// disk device placeholder
 // TODO: identify & hook-up this FDC
 READ8_MEMBER(pc6601_state::fdc_r)
 {
@@ -743,7 +743,7 @@ ADDRESS_MAP_START(pc6601_state::pc6601_io)
 	ADDRESS_MAP_UNMAP_HIGH
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	AM_IMPORT_FROM( pc6001mk2_io )
-	
+
 	// these are disk related
 //  AM_RANGE(0xb1
 //  AM_RANGE(0xb2
@@ -840,12 +840,12 @@ WRITE8_MEMBER(pc6001sr_state::sr_work_ram0_w)
 	{
 		uint32_t real_offs = (m_bitmap_xoffs*16+m_bitmap_yoffs)*256;
 		real_offs += offset;
-		
+
 		m_gvram[real_offs] = data;
 		return;
 	}
 
-	SR_WRAM_BANK_W(0); 
+	SR_WRAM_BANK_W(0);
 }
 WRITE8_MEMBER(pc6001sr_state::sr_work_ram1_w){ SR_WRAM_BANK_W(1); }
 WRITE8_MEMBER(pc6001sr_state::sr_work_ram2_w){ SR_WRAM_BANK_W(2); }
@@ -861,7 +861,7 @@ WRITE8_MEMBER(pc6001sr_state::sr_mode_w)
 	m_sr_text_mode = bool(BIT(data,3));
 	m_sr_text_rows = data & 4 ? 20 : 25;
 	// bit 1: bus request
-	
+
 	if(data & 1)
 		assert("PC-6001SR in Mk-2 compatibility mode not yet supported!\n");
 }
@@ -951,7 +951,7 @@ ADDRESS_MAP_START(pc6001sr_state::pc6001sr_io)
 	AM_RANGE(0xc9, 0xc9) AM_WRITE(sr_vram_bank_w)
 	AM_RANGE(0xce, 0xce) AM_WRITE(sr_bitmap_yoffs_w)
 	AM_RANGE(0xcf, 0xcf) AM_WRITE(sr_bitmap_xoffs_w)
-	
+
 	AM_RANGE(0xd0, 0xdf) AM_READWRITE(fdc_r,fdc_w) // disk device
 
 	AM_RANGE(0xe0, 0xe3) AM_MIRROR(0x0c) AM_DEVREADWRITE("upd7752", upd7752_device, read, write)
@@ -1131,7 +1131,7 @@ INTERRUPT_GEN_MEMBER(pc6001_state::vrtc_irq)
 INTERRUPT_GEN_MEMBER(pc6001sr_state::sr_vrtc_irq)
 {
 	m_kludge ^= 1;
-	
+
 	// TODO: it is unclear who is responsible of the "Joystick IRQ" vs VRTC
 	if(m_kludge)
 	{
@@ -1310,7 +1310,7 @@ TIMER_DEVICE_CALLBACK_MEMBER(pc6001_state::keyboard_callback)
 //  uint8_t p1_key = m_io_p1->read();
 
 	if(m_cas_switch == 0)
-	{	
+	{
 		if((key1 != m_old_key1) || (key2 != m_old_key2) || (key3 != m_old_key3))
 		{
 			m_cur_keycode = check_keyboard_press();
@@ -1344,7 +1344,7 @@ inline void pc6001_state::set_videoram_bank(uint32_t offs)
 void pc6001_state::machine_reset()
 {
 	set_videoram_bank(0xc000);
-	
+
 	if (m_cart->exists())
 		m_maincpu->space(AS_PROGRAM).install_read_handler(0x4000, 0x5fff, read8_delegate(FUNC(generic_slot_device::read_rom),(generic_slot_device*)m_cart));
 
@@ -1359,7 +1359,7 @@ void pc6001_state::machine_reset()
 	m_timer_irq_mask = 1;
 	m_timer_irq_mask2 = 1;
 	// timer irq vector is fixed in plain PC-6001
-	m_timer_irq_vector = 0x06; 
+	m_timer_irq_vector = 0x06;
 	set_timer_divider(3);
 }
 
@@ -1392,7 +1392,7 @@ void pc6001mk2_state::machine_reset()
 		m_gfx_bank_on = 0;
 	}
 
-//	refresh_crtc_params();
+//  refresh_crtc_params();
 }
 
 void pc6001sr_state::machine_reset()
@@ -1431,7 +1431,7 @@ void pc6001sr_state::machine_reset()
 		m_sr_bank_w[6] = 0x0c;
 		m_sr_bank_w[7] = 0x0e;
 
-//		m_gfx_bank_on = 0;
+//      m_gfx_bank_on = 0;
 	}
 }
 
@@ -1538,8 +1538,8 @@ MACHINE_CONFIG_START(pc6001mk2_state::pc6001mk2)
 	MCFG_CPU_MODIFY("maincpu")
 	MCFG_CPU_PROGRAM_MAP(pc6001mk2_map)
 	MCFG_CPU_IO_MAP(pc6001mk2_io)
-	
-//	MCFG_MACHINE_RESET_OVERRIDE(pc6001mk2_state,pc6001mk2)
+
+//  MCFG_MACHINE_RESET_OVERRIDE(pc6001mk2_state,pc6001mk2)
 
 	MCFG_SCREEN_MODIFY("screen")
 	MCFG_SCREEN_UPDATE_DRIVER(pc6001mk2_state, screen_update_pc6001mk2)
@@ -1577,7 +1577,7 @@ MACHINE_CONFIG_START(pc6001sr_state::pc6001sr)
 	MCFG_CPU_VBLANK_INT_DRIVER("screen", pc6001sr_state,  sr_vrtc_irq)
 	MCFG_CPU_IRQ_ACKNOWLEDGE_DRIVER(pc6001_state, irq_callback)
 
-//	MCFG_MACHINE_RESET_OVERRIDE(pc6001sr_state,pc6001sr)
+//  MCFG_MACHINE_RESET_OVERRIDE(pc6001sr_state,pc6001sr)
 
 	MCFG_SCREEN_MODIFY("screen")
 	MCFG_SCREEN_UPDATE_DRIVER(pc6001sr_state, screen_update_pc6001sr)

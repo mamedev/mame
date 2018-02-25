@@ -600,7 +600,7 @@ WRITE8_MEMBER(kurukuru_state::kurukuru_adpcm_reset_w)
 
 READ8_MEMBER(kurukuru_state::kurukuru_adpcm_timer_irqack_r)
 {
-	if (!machine().side_effect_disabled())
+	if (!machine().side_effects_disabled())
 		m_soundirq->rst30_w(0);
 	return 0;
 }

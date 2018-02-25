@@ -53,8 +53,8 @@ private:
 	required_device<ladybug_video_device> m_video;
 
 	required_ioport m_port_dsw0;
-	required_ioport m_p1_control;
-	required_ioport m_p2_control;
+	optional_ioport m_p1_control;
+	optional_ioport m_p2_control;
 };
 
 

@@ -320,7 +320,7 @@ WRITE8_MEMBER(gei_state::geimulti_bank_w)
 template <unsigned N>
 READ8_MEMBER(gei_state::banksel_r)
 {
-	if (!machine().side_effect_disabled())
+	if (!machine().side_effects_disabled())
 		m_rombank->set_entry(N);
 	return 0x03;
 }
