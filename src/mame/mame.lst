@@ -29957,7 +29957,6 @@ acrobatm                        // UPL-91073 (c) 1991 UPL + Taito license
 airattck                        // (c) 1996 Comad
 airattcka                       // (c) 1996 Comad
 arcadian                        // (c) 1994 NMK
-atombjt                         // bootleg
 bigbang                         // UPL-93091 (c) 1993 NMK
 bioship                         // UPL-90062 (c) 1990 UPL + American Sammy license
 bjtwin                          // UPL-93087 (c) 1993 NMK
@@ -32037,6 +32036,7 @@ potgoldu                        // (c) 200? U.S. Games
 potgoldu580                     // (c) 200? U.S. Games
 
 @source:powerbal.cpp
+atombjt                         // bootleg
 hotminda                        // (c) 1995
 magicstk                        // (c) 1995
 powerbal                        // (c) 1994
