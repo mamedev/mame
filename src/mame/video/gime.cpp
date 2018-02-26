@@ -1294,6 +1294,7 @@ inline uint16_t gime_device::get_lines_per_row(void)
 					lines_per_row = 3;
 					break;
 				case SAM_STATE_V2:
+				case SAM_STATE_V1|SAM_STATE_V0:
 					lines_per_row = 2;
 					break;
 				default:
