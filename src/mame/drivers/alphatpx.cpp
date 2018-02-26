@@ -167,6 +167,7 @@ public:
 		m_beep(*this, "beeper"),
 		m_pic(*this, "pic8259"),
 		m_keycols(*this, "COL.%u", 0),
+		m_scncfg(*this, "SCREEN"),
 		m_palette(*this, "palette"),
 		m_vram(*this, "vram"),
 		m_gfx(*this, "gfx"),
@@ -195,6 +196,10 @@ public:
 	DECLARE_WRITE8_MEMBER(comm85_w);
 	DECLARE_READ8_MEMBER(comm88_r);
 	DECLARE_WRITE8_MEMBER(comm88_w);
+	DECLARE_READ8_MEMBER(gfxext_r);
+	DECLARE_WRITE8_MEMBER(gfxext_w);
+	DECLARE_WRITE8_MEMBER(gfxext1_w);
+	DECLARE_WRITE8_MEMBER(gfxext2_w);
 
 	void alphatp3(machine_config &config);
 	void alphatp30(machine_config &config);
@@ -217,6 +222,7 @@ protected:
 	required_device<beep_device> m_beep;
 	optional_device<pic8259_device> m_pic;
 	required_ioport_array<16> m_keycols;
+	required_ioport m_scncfg;
 
 private:
 	uint8_t m_kbdclk, m_kbdread, m_kbdport2;
@@ -228,6 +234,8 @@ private:
 	bool m_fdc_irq, m_fdc_drq, m_fdc_hld;
 	u8 m_85_data, m_88_data;
 	bool m_88_da, m_85_da, m_88_started;
+	u8 m_gfxext1, m_gfxext2;
+	u8 m_vramext[32768];
 };
 
 //**************************************************************************
@@ -301,14 +309,14 @@ ADDRESS_MAP_END
 
 ADDRESS_MAP_START(alphatp_34_state::alphatp30_8088_map)
 	AM_RANGE(0x00000, 0x1ffff) AM_RAM
-	//AM_RANGE(0xe0000, 0xeffff) AM_READWRITE // unknown possibly gfx ext
+	AM_RANGE(0xe0000, 0xeffff) AM_READWRITE(gfxext_r, gfxext_w)
 	AM_RANGE(0xfe000, 0xfffff) AM_ROM AM_REGION("16bit", 0)
 ADDRESS_MAP_END
 
 ADDRESS_MAP_START(alphatp_34_state::alphatp30_8088_io)
 	//AM_RANGE(0x008a, 0x008a) AM_READ // unknown
-	//AM_RANGE(0xf800, 0xf800) AM_WRITE // unknown possibly gfx ext
-	//AM_RANGE(0xf900, 0xf900) AM_WRITE // unknown possibly gfx ext
+	AM_RANGE(0xf800, 0xf800) AM_WRITE(gfxext1_w)
+	AM_RANGE(0xf900, 0xf900) AM_WRITE(gfxext2_w)
 	//AM_RANGE(0xfa00, 0xfa01) AM_WRITE // unknown possibly gfx ext
 	//AM_RANGE(0xfb00, 0xfb0f) AM_WRITE // unknown possibly gfx ext
 	AM_RANGE(0xffe0, 0xffe1) AM_DEVREADWRITE("pic8259", pic8259_device, read, write)
@@ -369,6 +377,49 @@ WRITE8_MEMBER(alphatp_34_state::comm85_w)
 	m_85_data = data;
 	m_85_da = true;
 	m_i8088->set_input_line(INPUT_LINE_TEST, CLEAR_LINE);
+}
+
+WRITE8_MEMBER(alphatp_34_state::gfxext1_w)
+{
+	m_gfxext1 = data;
+}
+
+WRITE8_MEMBER(alphatp_34_state::gfxext2_w)
+{
+	m_gfxext2 = data;
+}
+
+READ8_MEMBER(alphatp_34_state::gfxext_r)
+{
+	switch(m_gfxext1)
+	{
+		case 0x33:
+			return m_vramext[/*((m_gfxext2 & 0x18) << 10) |*/ (offset >> 3)];
+	}
+	logerror("gfxext read offset %x %x\n", offset, m_gfxext1);
+	return 0;
+}
+
+WRITE8_MEMBER(alphatp_34_state::gfxext_w)
+{
+	switch(m_gfxext1)
+	{
+		case 5:
+		{
+			u8 mask = 1 << (offset & 7);
+			m_vramext[offset >> 3] &= ~mask;
+			m_vramext[offset >> 3] |= data & mask;
+			break;
+		}
+		case 6:
+			m_vramext[((m_gfxext2 & 0x18) << 10) | (offset >> 3)] |= 1 << (offset & 7);
+			break;
+		case 0x33:
+			m_vramext[((m_gfxext2 & 0x18) << 10) | (offset >> 3)] = data;
+			break;
+		default:
+			logerror("gfxext write offset %x %x %x\n", offset, data, m_gfxext1);
+	}
 }
 
 //**************************************************************************
@@ -774,6 +825,12 @@ PORT_START("COL.15")
 	PORT_BIT(0x0008, IP_ACTIVE_HIGH, IPT_UNKNOWN)
 	PORT_BIT(0x0010, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("F1")          PORT_CODE(KEYCODE_F1)       PORT_CHAR(UCHAR_MAMEKEY(F1))    // 7Dh -> 85H func. F1 ok
 	PORT_BIT(0x0080, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("SM")          PORT_CODE(KEYCODE_NUMLOCK)  PORT_CHAR(UCHAR_MAMEKEY(NUMLOCK))// SM (typewriter) mode key */
+
+PORT_START("SCREEN")
+	PORT_CONFNAME(0x01, 0x00, "Screen")
+	PORT_CONFSETTING(0x00, "Main")
+	PORT_CONFSETTING(0x01, "Extension")
+
 INPUT_PORTS_END
 
 //**************************************************************************
@@ -843,6 +900,7 @@ uint32_t alphatp_34_state::screen_update(screen_device &screen, bitmap_rgb32 &bi
 	int start = m_crtc->upscroll_offset();
 	rectangle cursor;
 	m_crtc->cursor_bounds(cursor);
+	bool scrext = m_scncfg->read() ? true : false;
 	for (int y = 0; y < 24; y++)
 	{
 		int vramy = (start + y) % 24;
@@ -853,9 +911,20 @@ uint32_t alphatp_34_state::screen_update(screen_device &screen, bitmap_rgb32 &bi
 			bool cursoren = cursor.contains(x * 8, y * 12);
 			for (int line = 0; line < 12; line++)
 			{
-				uint8_t data = m_gfx[((code & 0x7f) * 16) + line];
-				if (cursoren)
-					data ^= 0xff;
+				u8 data = 0;
+				if(scrext)
+				{
+					offs_t offset = (((vramy * 12) + line) * 128) + x;
+					if(offset < 32768) // There's 32KB of vram so the last 32 lines can't fit?
+						data = m_vramext[offset];
+					code = 0;
+				}
+				else
+				{
+					data = m_gfx[((code & 0x7f) * 16) + line];
+					if (cursoren)
+						data ^= 0xff;
+				}
 				bitmap.pix32(y * 12 + line, x * 8 + 0) = pen[BIT(data, 0) ^ BIT(code, 7)];
 				bitmap.pix32(y * 12 + line, x * 8 + 1) = pen[BIT(data, 1) ^ BIT(code, 7)];
 				bitmap.pix32(y * 12 + line, x * 8 + 2) = pen[BIT(data, 2) ^ BIT(code, 7)];
@@ -1151,7 +1220,7 @@ void alphatp_34_state::machine_start()
 {
 	// setup banking
 	membank("ram_0000")->set_base(m_ram.target());
-
+	save_item(NAME(m_vramext));
 
 	m_kbdclk = 0;   // must be initialized here b/c mcs48_reset() causes write of 0xff to all ports
 }
