@@ -408,8 +408,6 @@ void xavix_state::draw_tilemap(screen_device &screen, bitmap_ind16 &bitmap, cons
 		opaque = 0;
 	}
 
-	//printf("draw tilemap %d, regs base0 %02x base1 %02x base2 %02x tilesize,bpp %02x scrollx %02x scrolly %02x pal %02x mode %02x\n", which, tileregs[0x0], tileregs[0x1], tileregs[0x2], tileregs[0x3], tileregs[0x4], tileregs[0x5], tileregs[0x6], tileregs[0x7]);
-
 	switch (tileregs[0x3] & 0x30)
 	{
 	case 0x00:
@@ -467,6 +465,8 @@ void xavix_state::draw_tilemap(screen_device &screen, bitmap_ind16 &bitmap, cons
 
 	if (tileregs[0x7] & 0x80)
 	{
+		//printf("draw tilemap %d, regs base0 %02x base1 %02x base2 %02x tilesize,bpp %02x scrollx %02x scrolly %02x pal %02x mode %02x\n", which, tileregs[0x0], tileregs[0x1], tileregs[0x2], tileregs[0x3], tileregs[0x4], tileregs[0x5], tileregs[0x6], tileregs[0x7]);
+
 		// there's a tilemap register to specify base in main ram, although in the monster truck test mode it points to an unmapped region
 		// and expected a fixed layout, we handle that in the memory map at the moment
 		int count;
@@ -478,6 +478,7 @@ void xavix_state::draw_tilemap(screen_device &screen, bitmap_ind16 &bitmap, cons
 			{
 				int bpp, pal, scrolly, scrollx;
 				int tile = 0;
+				int extraattr = 0;
 
 				// the register being 0 probably isn't the condition here
 				if (tileregs[0x0] != 0x00) tile |= mainspace.read_byte((tileregs[0x0] << 8) + count);
@@ -485,7 +486,7 @@ void xavix_state::draw_tilemap(screen_device &screen, bitmap_ind16 &bitmap, cons
 
 				// at the very least boxing leaves unwanted bits set in ram after changing between mode 0x8a and 0x82, expecting them to not be used
 				if (tileregs[0x7] & 0x08)
-					tile |= mainspace.read_byte((tileregs[0x2] << 8) + count) << 16;
+					extraattr = mainspace.read_byte((tileregs[0x2] << 8) + count);
 
 				count++;
 
@@ -521,37 +522,17 @@ void xavix_state::draw_tilemap(screen_device &screen, bitmap_ind16 &bitmap, cons
 					}
 					else
 					{
+						tile = tile * 8;
+						basereg = (tile & 0x70000) >> 16;
+						tile &= 0xffff;
+						gfxbase = (m_spr_attra[(basereg * 2) + 1] << 16) | (m_spr_attra[(basereg * 2)] << 8);
+						tile += gfxbase;
+
 						if (tileregs[0x7] & 0x08)
 						{
-							// seems to be an alt mode where there more tile data comes from an additional attribute table including palette and the banking indirection is changed
-							tile = tile * 8; // << 3
-
-							// boxing suggests this check happens here
-							if ((tile & 0xffff) == 0)
-								continue;
-
-							tile &= 0x0ffff;
-
-							// how we use the banking bits is not clear..
-							tile += hackx * 0x10000;
-
-							/* 0x03 = bass fishing company logo, 0x01 = xavix logo, title, 0x04 = menu background
-
-							   0x05 = card night title (ntsc) 0x01 = xavix logo, menu background, 0x08 = card night title (pal)  (potentially buggy, code flow seems wrong)
-
-							   0x0e = boxing (instruction stuff) also needs palette settings.. also some bits on same layer using different bank? (0xd) or just disabled?
-
-							*/
-
-						}
-						else
-						{
-							// fixed multiplier? or just different? only seen this in 16x8 tile mode at the moment.
-							tile = tile * 8;
-							basereg = (tile & 0xf0000) >> 16;
-							tile &= 0xffff;
-							gfxbase = (m_spr_attra[(basereg * 2) + 1] << 16) | (m_spr_attra[(basereg * 2)] << 8);
-							tile += gfxbase;
+							// make use of the extraattr stuff?
+							pal = (extraattr & 0xf0)>>4;
+							// low bits are priority?
 						}
 					}
 				}
@@ -1334,9 +1315,9 @@ WRITE8_MEMBER(xavix_state::xavix_6fd8_w) // also related to tilemap 2?
 {
 	// possibly just a mirror of tmap2_regs_w, at least it writes 0x04 here which would be the correct
 	// base address to otherwise write at tmap2_regs_w offset 0
-	tmap2_regs_w(space,offset,data);
+//	tmap2_regs_w(space,offset,data);
 
-	//logerror("%s: xavix_6fd8_w data %02x\n", machine().describe_context(), data);
+	logerror("%s: xavix_6fd8_w data %02x\n", machine().describe_context(), data);
 }
 
 WRITE8_MEMBER(xavix_state::tmap2_regs_w)
