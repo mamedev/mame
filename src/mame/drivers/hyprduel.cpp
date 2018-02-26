@@ -608,6 +608,4 @@ DRIVER_INIT_MEMBER(hyprduel_state,magerror)
 
 GAME( 1993, hyprduel, 0,        hyprduel, hyprduel, hyprduel_state, hyprduel, ROT0, "Technosoft", "Hyper Duel (Japan set 1)", MACHINE_SUPPORTS_SAVE )
 GAME( 1993, hyprduel2,hyprduel, hyprduel, hyprduel, hyprduel_state, hyprduel, ROT0, "Technosoft", "Hyper Duel (Japan set 2)", MACHINE_SUPPORTS_SAVE )
-// TODO : Doesn't boot(or crash), it has timer/irq issue on imagetek_i4100 device?
-// Remove MACHINE_NOT_WORKING tags when magerror bootable again
-GAME( 1994, magerror, 0,        magerror, magerror, hyprduel_state, magerror, ROT0, "Technosoft / Jaleco", "Magical Error wo Sagase", MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE )
+GAME( 1994, magerror, 0,        magerror, magerror, hyprduel_state, magerror, ROT0, "Technosoft / Jaleco", "Magical Error wo Sagase", MACHINE_SUPPORTS_SAVE )
