@@ -292,6 +292,7 @@ ADDRESS_MAP_START(hyprduel_state::magerror_map)
 	AM_RANGE(0x800000, 0x87ffff) AM_DEVICE("vdp", imagetek_i4220_device, v2_map)
 	AM_RANGE(0x8788a2, 0x8788a3) AM_READWRITE(irq_cause_r, irq_cause_w)   /* IRQ Cause, Acknowledge */
 	AM_RANGE(0x8788a4, 0x8788a5) AM_RAM AM_SHARE("irq_enable")      /* IRQ Enable */
+	AM_RANGE(0xc00000, 0xc1ffff) AM_RAM AM_SHARE("sharedram1")
 	AM_RANGE(0xe00000, 0xe00001) AM_READ_PORT("SERVICE") AM_WRITENOP
 	AM_RANGE(0xe00002, 0xe00003) AM_READ_PORT("DSW")
 	AM_RANGE(0xe00004, 0xe00005) AM_READ_PORT("P1_P2")
