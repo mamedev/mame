@@ -101,6 +101,14 @@ public:
 		m_gfx(*this, "gfx"),
 		m_ram(*this, "ram")
 	{ }
+	void alphatp1(machine_config &config);
+	void alphatp2(machine_config &config);
+	void alphatp2u(machine_config &config);
+protected:
+	virtual void machine_start() override;
+	virtual void machine_reset() override;
+
+private:
 
 	uint32_t screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 
@@ -120,16 +128,9 @@ public:
 	DECLARE_WRITE8_MEMBER(beep_w);
 	DECLARE_WRITE8_MEMBER(bank_w);
 
-	void alphatp1(machine_config &config);
-	void alphatp2(machine_config &config);
-	void alphatp2u(machine_config &config);
-
 	void alphatp2_io(address_map &map);
 	void alphatp2_map(address_map &map);
 	void alphatp2_mem(address_map &map);
-protected:
-	virtual void machine_start() override;
-	virtual void machine_reset() override;
 
 	required_device<address_map_bank_device> m_bankdev;
 	required_device<i8041_device> m_kbdmcu;
@@ -139,7 +140,6 @@ protected:
 	required_device<beep_device> m_beep;
 	required_ioport_array<16> m_keycols;
 
-private:
 	uint8_t m_kbdclk, m_kbdread, m_kbdport2;
 	required_device<palette_device> m_palette;
 	required_shared_ptr<u8> m_vram;
@@ -174,6 +174,13 @@ public:
 		m_ram(*this, "ram")
 	{ }
 
+	void alphatp3(machine_config &config);
+	void alphatp30(machine_config &config);
+protected:
+	virtual void machine_start() override;
+	virtual void machine_reset() override;
+private:
+
 	uint32_t screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 
 	DECLARE_READ_LINE_MEMBER(kbd_matrix_r);
@@ -201,17 +208,13 @@ public:
 	DECLARE_WRITE8_MEMBER(gfxext1_w);
 	DECLARE_WRITE8_MEMBER(gfxext2_w);
 
-	void alphatp3(machine_config &config);
-	void alphatp30(machine_config &config);
+	u8* vramext_addr_xlate(offs_t offset);
 
 	void alphatp30_8088_io(address_map &map);
 	void alphatp30_8088_map(address_map &map);
 	void alphatp3_io(address_map &map);
 	void alphatp3_map(address_map &map);
 	void alphatp3_mem(address_map &map);
-protected:
-	virtual void machine_start() override;
-	virtual void machine_reset() override;
 
 	required_device<address_map_bank_device> m_bankdev;
 	required_device<i8041_device> m_kbdmcu;
@@ -224,7 +227,6 @@ protected:
 	required_ioport_array<16> m_keycols;
 	required_ioport m_scncfg;
 
-private:
 	uint8_t m_kbdclk, m_kbdread, m_kbdport2;
 	required_device<palette_device> m_palette;
 	required_shared_ptr<u8> m_vram;
@@ -234,8 +236,9 @@ private:
 	bool m_fdc_irq, m_fdc_drq, m_fdc_hld;
 	u8 m_85_data, m_88_data;
 	bool m_88_da, m_85_da, m_88_started;
-	u8 m_gfxext1, m_gfxext2;
-	u8 m_vramext[32768];
+	u8 m_gfxext1, m_gfxext2, m_vramlatch;
+	u8 m_vramext[371*80];
+	u8 m_vramchr[256*12];  // these are one 32K ram region but with complex mapping
 };
 
 //**************************************************************************
@@ -389,12 +392,24 @@ WRITE8_MEMBER(alphatp_34_state::gfxext2_w)
 	m_gfxext2 = data;
 }
 
+u8* alphatp_34_state::vramext_addr_xlate(offs_t offset)
+{
+	offset = offset >> 3;
+	int bank = offset >> 7;
+	int offs = offset & 0x7f;
+	if(offs < 80)
+		return &m_vramext[(((((m_gfxext2 & 0xf8) << 2) + bank) * 80) + offs) % (371*80)];
+	else
+		return &m_vramchr[((bank * 48) + (offs - 80)) % (256*12)];
+}
+
 READ8_MEMBER(alphatp_34_state::gfxext_r)
 {
 	switch(m_gfxext1)
 	{
 		case 0x33:
-			return m_vramext[/*((m_gfxext2 & 0x18) << 10) |*/ (offset >> 3)];
+			m_vramlatch = *vramext_addr_xlate(offset);
+			return 0;
 	}
 	logerror("gfxext read offset %x %x\n", offset, m_gfxext1);
 	return 0;
@@ -407,15 +422,16 @@ WRITE8_MEMBER(alphatp_34_state::gfxext_w)
 		case 5:
 		{
 			u8 mask = 1 << (offset & 7);
-			m_vramext[offset >> 3] &= ~mask;
-			m_vramext[offset >> 3] |= data & mask;
+			u8 *addr = vramext_addr_xlate(offset);
+			*addr &= ~mask;
+			*addr |= data & mask;
 			break;
 		}
 		case 6:
-			m_vramext[((m_gfxext2 & 0x18) << 10) | (offset >> 3)] |= 1 << (offset & 7);
+			*vramext_addr_xlate(offset) ^= 1 << (offset & 7);
 			break;
 		case 0x33:
-			m_vramext[((m_gfxext2 & 0x18) << 10) | (offset >> 3)] = data;
+			*vramext_addr_xlate(offset) = m_vramlatch;
 			break;
 		default:
 			logerror("gfxext write offset %x %x %x\n", offset, data, m_gfxext1);
@@ -914,8 +930,8 @@ uint32_t alphatp_34_state::screen_update(screen_device &screen, bitmap_rgb32 &bi
 				u8 data = 0;
 				if(scrext)
 				{
-					offs_t offset = (((vramy * 12) + line) * 128) + x;
-					if(offset < 32768) // There's 32KB of vram so the last 32 lines can't fit?
+					offs_t offset = (((vramy * 12) + line) * 80) + x;
+					if(offset < (371 * 80))
 						data = m_vramext[offset];
 					code = 0;
 				}
@@ -1012,7 +1028,7 @@ WRITE8_MEMBER(alphatp_12_state::fdc_cmd_w)
 {
 	floppy_image_device *floppy = nullptr;
 
-	logerror("%02x to fdc_cmd_w: motor %d side %d\n", data, (data & 0x10)>>4, (data & 4)>>2);
+	//logerror("%02x to fdc_cmd_w: motor %d side %d\n", data, (data & 0x10)>>4, (data & 4)>>2);
 
 	// select drive
 	if (!(data & 0x80))
@@ -1091,7 +1107,7 @@ WRITE8_MEMBER(alphatp_34_state::fdc_cmd_w)
 {
 	floppy_image_device *floppy = nullptr;
 
-	logerror("%02x to fdc_cmd_w: motor %d side %d\n", data, (data & 0x10)>>4, (data & 4)>>2);
+	//logerror("%02x to fdc_cmd_w: motor %d side %d\n", data, (data & 0x10)>>4, (data & 4)>>2);
 
 	// select drive
 	if (!(data & 0x80))
