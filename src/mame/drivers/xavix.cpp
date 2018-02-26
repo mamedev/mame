@@ -25,13 +25,33 @@
 	
 	To access service mode in Monster Truck hold Horn and Nitro on startup
 
+	There are multiple revisions of the CPU hardware, the SSD 2000 / SSD 2002 chips definitely add more opcodes
+	(thanks to Sean Riddle for this table)
 
-	Some games have Serial EEPROMs
+	name						PCB ID		ROM width	TSOP pads	ROM size		SEEPROM			die markings
 
-	Nostalgia 24LC04
-	XaviXTennis 24C08
-	Jedi 24C02
-	LOTR 24C02
+	Play TV Ping Pong			8028		x8			48			1M				no				SSD 97 PA7270-107
+
+	Play TV Bass Fishin'		71008		x8			40			1M				no				SSD 98 PA7351-107
+	Play TV Boxing				72039		x8			48			2M				no				SSD 98 PA7351-107
+	Play TV Card Night			71063		x8			40			1M				no				SSD 98 PA7351-107
+
+	Play TV Baseball 2			72042		x8			48			2M				no				SSD 98 PL7351-181
+	Play TV Monster Truck		74026		x8			48			4M				no				SSD 98 PL7351-181
+	Radica/EA Madden Football	74021		x8			48			not dumped		no				SSD 98 PL7351-181
+	Play TV Snowboarder Blue	71023		x8			40			1M				no				SSD 98 PL7351-181
+	Namco Nostalgia 2			CGSJ		x8			48			1M				24LC04			SSD 98 PL7351-181
+
+	Star Wars Saga Lightsaber	SWSA		x8			48			8M				24C02			SSD 2000 NEC 85605-621
+	Lord of the Rings			LORA		x8			48			8M				24C02			SSD 2000 NEC 85605-621
+	MX Rebel Dirt				MTXA		x8			48			8M				24C04			SSD 2000 NEC 85605-621
+
+	XaviXTennis					SGM6446		x16			48			8M				24C08			SSD 2002 NEC 85054-611
+
+	Real Swing Golf				74037		x16			48			not dumped		
+	Play TV Football 2			L7278		x16			48			not dumped		
+	XaviXBowling				SGM644C		x16			48			not dumped		
+	Basketball					75029		x16			48			not dumped		
 
 ***************************************************************************/
 
@@ -1944,30 +1964,14 @@ CONS (200?, eka_strt,  0,          0,  xavix,  xavix,    xavix_state, xavix, "Ta
 
 /* The 'XaviXPORT' isn't a real console, more of a TV adapter, all the actual hardware (CPU including video hw, sound hw) is in the cartridges and controllers
    and can vary between games, see notes at top of driver.
-
-   According to sources XaviX Tennis should be a standard XaviX CPU, but at the very least makes significantly more use of custom opcodes than the above titles
-   which only appears to use the call far / return far for extended memory space.
-
-   Furthermore it also seems to require some regular 6502 opcodes to be replaced with custom ones, yet the other games expect these to act normally.  This
-   leads me to believe that XaviX Tennis is almost certainly a Super XaviX title.
-
-   The CPU die on XaviX Tennis is internally marked as NEC 85054-611 and is very different to the two below
-
-   Radica Monster truck die is marked SSD PL7351 with SSD98 also printed on the die
-   Radia Ping Pong      die is marked SSD PA7270 with SSD97 also printed on the die (otherwise looks identical to Monster Truck)
-
-   Boxing, Baseball 2 and Card Night all have the SSD98 logo
-   Boxing, Bass Fishin' and Card Night are all PA7351-107.  Baseball 2 looks like PL7351-181.
-
-   Star Wars Saga Edition also seems to be making use of additional opcodes, meaning it could also be Super Xavix, or something in-between (unless they're
-   caused by the bad dump, but it looks intentional)
-
 */
 
 ROM_START( xavtenni )
 	ROM_REGION( 0x800000, "bios", ROMREGION_ERASE00 )
 	ROM_LOAD( "xavixtennis.bin", 0x000000, 0x800000, CRC(23a1d918) SHA1(2241c59e8ea8328013e55952ebf9060ea0a4675b) )
 ROM_END
+
+/* Tiger games have extended opcodes too */
 
 
 ROM_START( ttv_sw )
@@ -1980,7 +1984,14 @@ ROM_START( ttv_lotr )
 	ROM_LOAD( "lotr.bin", 0x000000, 0x800000, CRC(a034ecd5) SHA1(264a9d4327af0a075841ad6129db67d82cf741f1) )
 ROM_END
 
+ROM_START( ttv_mx )
+	ROM_REGION( 0x800000, "bios", ROMREGION_ERASE00 )
+	ROM_LOAD( "mxdirtrebel.bin", 0x000000, 0x800000, CRC(e64bf1a1) SHA1(137f97d7d857697a13e0c8984509994dc7bc5fc5) )
+ROM_END
+
 
 CONS( 2004, xavtenni,  0,   0,  xavix,  xavix, xavix_state, xavix, "SSD Company LTD",         "XaviX Tennis (XaviXPORT)", MACHINE_IS_SKELETON )
+
 CONS( 2005, ttv_sw,    0,   0,  xavix,  xavix, xavix_state, xavix, "Tiger / SSD Company LTD", "Star Wars Saga Edition - Lightsaber Battle Game", MACHINE_IS_SKELETON )
 CONS( 2005, ttv_lotr,  0,   0,  xavix,  xavix, xavix_state, xavix, "Tiger / SSD Company LTD", "Lord Of The Rings - Warrior of Middle-Earth", MACHINE_IS_SKELETON )
+CONS( 2005, ttv_mx,    0,   0,  xavix,  xavix, xavix_state, xavix, "Tiger / SSD Company LTD", "MX Dirt Rebel", MACHINE_IS_SKELETON )
