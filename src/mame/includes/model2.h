@@ -264,12 +264,15 @@ public:
 	void debug_init();
 	void debug_commands( int ref, const std::vector<std::string> &params );
 	void debug_geo_dasm_command(int ref, const std::vector<std::string> &params);
+	void debug_tri_dump_command(int ref, const std::vector<std::string> &params);
 	void debug_help_command(int ref, const std::vector<std::string> &params);
 	
 protected:
 	virtual void video_start() override;
 
 private:
+	void tri_list_dump(FILE *dst);
+
 	bool m_render_unk;
 	bool m_render_mode;
 };

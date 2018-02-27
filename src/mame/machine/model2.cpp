@@ -13,6 +13,7 @@
 #include "debug/debugcmd.h"
 #include "debugger.h"
 
+struct raster_state;
  
 void model2_state::debug_init()
 {
@@ -30,6 +31,8 @@ void model2_state::debug_commands(int ref, const std::vector<std::string> &param
 	
 	if (params[0] == "geodasm")
 		debug_geo_dasm_command(ref, params);
+	else if(params[0] == "trilist")
+		debug_tri_dump_command(ref, params);
 	else
 		debug_help_command(ref, params);
 }
@@ -40,6 +43,7 @@ void model2_state::debug_help_command(int ref, const std::vector<std::string> &p
 	
 	con.printf("Available Sega Model 2 commands:\n");
 	con.printf("  m2 geodasm,<filename> -- dump current geometrizer DASM in <filename>\n");
+	con.printf("  m2 trilist,<filename> -- dump current parsed triangles in <filename>\n");
 	con.printf("  m2 help -- this list\n");
 }
 
@@ -255,4 +259,35 @@ void model2_state::debug_geo_dasm_command(int ref, const std::vector<std::string
 	con.printf("Data dumped successfully\n");
 }
 
+/*****************************************
+ *
+ * Sorted Triangles dumping
+ *
+ ****************************************/
 
+void model2_state::debug_tri_dump_command(int ref, const std::vector<std::string> &params)
+{
+	debugger_console &con = machine().debugger().console();
+	FILE *f;
+	
+	if (params.size() < 2)
+	{
+		con.printf("Error: not enough parameters for m2 trilist command\n");
+		return;
+	}
+	
+	if (params[1].empty() || params[1].length() > 127)
+	{
+		con.printf("Error: invalid filename parameter for m2 trilist command\n");
+		return;
+	}
+
+	if((f = fopen( params[1].c_str(), "w" )) == nullptr)
+	{
+		con.printf("Error: while opening %s for writing\n",params[1].c_str());
+		return;
+	}
+
+	tri_list_dump(f);
+	con.printf("Data dumped successfully\n");	
+}
