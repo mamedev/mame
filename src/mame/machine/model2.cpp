@@ -12,8 +12,6 @@
 #include "debug/debugcon.h"
 #include "debug/debugcmd.h"
 #include "debugger.h"
-
-struct raster_state;
  
 void model2_state::debug_init()
 {

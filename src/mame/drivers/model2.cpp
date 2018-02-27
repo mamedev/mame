@@ -246,7 +246,8 @@ uint32_t model2_state::copro_fifoout_pop(address_space &space,uint32_t offset, u
 		// @seealso http://www.mameworld.info/ubbthreads/showflat.php?Cat=&Number=358069&page=&view=&sb=5&o=&vc=1
 		m_maincpu->spin_until_time(attotime::from_usec(25));
 
-		return 0;
+		// fix ld rN, (rN) case, ask desert, pltkids, zerogun ...
+		return 0x00884000;
 	}
 
 	r = m_copro_fifoout_data[m_copro_fifoout_rpos++];
