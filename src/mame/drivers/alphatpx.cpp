@@ -169,6 +169,7 @@ public:
 		m_keycols(*this, "COL.%u", 0),
 		m_scncfg(*this, "SCREEN"),
 		m_palette(*this, "palette"),
+		m_gfxdecode(*this, "gfxdecode"),
 		m_vram(*this, "vram"),
 		m_gfx(*this, "gfx"),
 		m_ram(*this, "ram")
@@ -207,6 +208,7 @@ private:
 	DECLARE_WRITE8_MEMBER(gfxext_w);
 	DECLARE_WRITE8_MEMBER(gfxext1_w);
 	DECLARE_WRITE8_MEMBER(gfxext2_w);
+	DECLARE_WRITE8_MEMBER(gfxext3_w);
 
 	u8* vramext_addr_xlate(offs_t offset);
 
@@ -229,6 +231,7 @@ private:
 
 	uint8_t m_kbdclk, m_kbdread, m_kbdport2;
 	required_device<palette_device> m_palette;
+	required_device<gfxdecode_device> m_gfxdecode;
 	required_shared_ptr<u8> m_vram;
 	required_region_ptr<u8> m_gfx;
 	required_shared_ptr<u8> m_ram;
@@ -237,6 +240,7 @@ private:
 	u8 m_85_data, m_88_data;
 	bool m_88_da, m_85_da, m_88_started;
 	u8 m_gfxext1, m_gfxext2, m_vramlatch;
+	u16 m_gfxext3;
 	u8 m_vramext[371*80];
 	u8 m_vramchr[256*12];  // these are one 32K ram region but with complex mapping
 };
@@ -320,7 +324,7 @@ ADDRESS_MAP_START(alphatp_34_state::alphatp30_8088_io)
 	//AM_RANGE(0x008a, 0x008a) AM_READ // unknown
 	AM_RANGE(0xf800, 0xf800) AM_WRITE(gfxext1_w)
 	AM_RANGE(0xf900, 0xf900) AM_WRITE(gfxext2_w)
-	//AM_RANGE(0xfa00, 0xfa01) AM_WRITE // unknown possibly gfx ext
+	AM_RANGE(0xfa00, 0xfa01) AM_WRITE(gfxext3_w)
 	//AM_RANGE(0xfb00, 0xfb0f) AM_WRITE // unknown possibly gfx ext
 	AM_RANGE(0xffe0, 0xffe1) AM_DEVREADWRITE("pic8259", pic8259_device, read, write)
 	AM_RANGE(0xffe4, 0xffe7) AM_DEVREADWRITE("pit", pit8253_device, read, write)
@@ -392,6 +396,12 @@ WRITE8_MEMBER(alphatp_34_state::gfxext2_w)
 	m_gfxext2 = data;
 }
 
+WRITE8_MEMBER(alphatp_34_state::gfxext3_w)
+{
+	u16 mask = 0xff << (offset ? 0 : 8);
+	m_gfxext3 = (m_gfxext3 & mask) | (data << (offset * 8));
+}
+
 u8* alphatp_34_state::vramext_addr_xlate(offs_t offset)
 {
 	offset = offset >> 3;
@@ -400,7 +410,7 @@ u8* alphatp_34_state::vramext_addr_xlate(offs_t offset)
 	if(offs < 80)
 		return &m_vramext[(((((m_gfxext2 & 0xf8) << 2) + bank) * 80) + offs) % (371*80)];
 	else
-		return &m_vramchr[((bank * 48) + (offs - 80)) % (256*12)];
+		return &m_vramchr[(((((m_gfxext2 & 0x8) << 2) ^ bank) * 48) + (offs - 80)) % (256*12)];
 }
 
 READ8_MEMBER(alphatp_34_state::gfxext_r)
@@ -421,6 +431,8 @@ WRITE8_MEMBER(alphatp_34_state::gfxext_w)
 	{
 		case 5:
 		{
+			if(m_gfxext3 == 0xe0f)
+				data = ~data;
 			u8 mask = 1 << (offset & 7);
 			u8 *addr = vramext_addr_xlate(offset);
 			*addr &= ~mask;
@@ -436,6 +448,8 @@ WRITE8_MEMBER(alphatp_34_state::gfxext_w)
 		default:
 			logerror("gfxext write offset %x %x %x\n", offset, data, m_gfxext1);
 	}
+	if((offset & 0x3ff) > 0x280)
+		m_gfxdecode->gfx(1)->mark_dirty(((uintptr_t)vramext_addr_xlate(offset) - (uintptr_t)m_vramchr) / 12);
 }
 
 //**************************************************************************
@@ -864,6 +878,17 @@ static const gfx_layout charlayout =
 	8*16
 };
 
+static const gfx_layout extcharlayout =
+{
+	8, 12,
+	256,
+	1,
+	{ 0 },
+	{ 7, 6, 5, 4, 3, 2, 1, 0 },
+	{ 0*8, 1*8, 2*8, 3*8, 4*8, 5*8, 6*8, 7*8, 8*8, 9*8, 10*8, 11*8 },
+	8*12
+};
+
 //**************************************************************************
 //  VIDEO - Alphatronic P1, P2, P2S, P2U and Hell 2069
 //**************************************************************************
@@ -1239,6 +1264,8 @@ void alphatp_34_state::machine_start()
 	save_item(NAME(m_vramext));
 
 	m_kbdclk = 0;   // must be initialized here b/c mcs48_reset() causes write of 0xff to all ports
+	if(m_i8088)
+		m_gfxdecode->set_gfx(1, std::make_unique<gfx_element>(m_palette, extcharlayout, &m_vramchr[0], 0, 1, 0));
 }
 
 void alphatp_34_state::machine_reset()
