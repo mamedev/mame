@@ -267,7 +267,7 @@ protected:
 
 	bool image_checkhash();
 
-	const software_part *find_software_item(const std::string &identifier, bool restrict_to_interface, software_list_device **device = nullptr) const;
+	const software_part *find_software_item(const std::string &identifier, bool restrict_to_interface, bool restrict_to_filter, software_list_device **device = nullptr) const;
 	std::string software_get_default_slot(const char *default_card_slot) const;
 
 	void add_format(std::unique_ptr<image_device_format> &&format);

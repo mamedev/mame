@@ -107,6 +107,53 @@ bool software_part::matches_interface(const char *interface_list) const
 	return (interfaces.find(our_interface) != -1);
 }
 
+//-------------------------------------------------
+//  is_compatible - determine if we are compatible
+//  with the given filter
+//-------------------------------------------------
+
+software_compatibility software_part::is_compatible(const char *filter) const
+{
+	// get the softlist filter; if null, assume compatible
+	if (filter == nullptr)
+		return SOFTWARE_IS_COMPATIBLE;
+
+	// copy the comma-delimited string and ensure it ends with a final comma
+	std::string filt = std::string(filter).append(",");
+
+	// get the incompatibility filter and test against it first if it exists
+	const char *incompatibility = feature("incompatibility");
+	if (incompatibility != nullptr)
+	{
+		// copy the comma-delimited string and ensure it ends with a final comma
+		std::string incomp = std::string(incompatibility).append(",");
+
+		// iterate over filter items and see if they exist in the list; if so, it's incompatible
+		for (int start = 0, end = filt.find_first_of(',', start); end != -1; start = end + 1, end = filt.find_first_of(',', start))
+		{
+			std::string token(filt, start, end - start + 1);
+			if (incomp.find(token) != -1)
+				return SOFTWARE_IS_INCOMPATIBLE;
+		}
+	}
+
+	// get the compatibility feature; if null, assume compatible
+	const char *compatibility = feature("compatibility");
+	if (compatibility == nullptr)
+		return SOFTWARE_IS_COMPATIBLE;
+
+	// copy the comma-delimited string and ensure it ends with a final comma
+	std::string comp = std::string(compatibility).append(",");
+
+	// iterate over filter items and see if they exist in the compatibility list; if so, it's compatible
+	for (int start = 0, end = filt.find_first_of(',', start); end != -1; start = end + 1, end = filt.find_first_of(',', start))
+	{
+		std::string token(filt, start, end - start + 1);
+		if (comp.find(token) != -1)
+			return SOFTWARE_IS_COMPATIBLE;
+	}
+	return SOFTWARE_NOT_COMPATIBLE;
+}
 
 //**************************************************************************
 //  SOFTWARE INFO
@@ -134,7 +181,7 @@ software_info::software_info(std::string &&name, std::string &&parent, const std
 //  optional interface match
 //-------------------------------------------------
 
-const software_part *software_info::find_part(const std::string &part_name, const char *interface) const
+const software_part *software_info::find_part(const std::string &part_name, const char *interface, const char *filter) const
 {
 	// look for the part by name and match against the interface if provided
 	auto iter = std::find_if(
@@ -145,7 +192,8 @@ const software_part *software_info::find_part(const std::string &part_name, cons
 			// try to match the part_name (or all parts if part_name is empty), and then try
 			// to match the interface (or all interfaces if interface is nullptr)
 			return (part_name.empty() || part_name == part.name())
-				&& (interface == nullptr || part.matches_interface(interface));
+				&& (interface == nullptr || part.matches_interface(interface))
+				&& (filter == nullptr || (part.is_compatible(filter) == SOFTWARE_IS_COMPATIBLE));
 		});
 
 	return iter != m_partdata.end()
