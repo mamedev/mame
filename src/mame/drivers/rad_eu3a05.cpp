@@ -20,6 +20,12 @@
     Tetris
     Space Invaders
 
+	Possible other games on this hardawre
+
+	ConnecTV Football (aka ConnecTV International Football)
+	 - Soccer game, not the same as Play TV Football, or Play TV Soccer
+	   (it has the same XTAL etc. as this driver at least)
+
     ---
     The XaviX ones seem to have a XaviX logo on the external packaging while the
     ones for this driver don't seem to have any specific marking.

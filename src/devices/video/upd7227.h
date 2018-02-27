@@ -19,7 +19,7 @@
 
 #define MCFG_UPD7227_ADD(_tag, _sx, _sy) \
 	MCFG_DEVICE_ADD(_tag, UPD7227, 0) \
-	upd7227_device::static_set_offsets(*device, _sx, _sy);
+	downcast<upd7227_device &>(*device).set_offsets(_sx, _sy);
 
 
 
@@ -37,7 +37,7 @@ public:
 	upd7227_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
 	// inline configuration helpers
-	static void static_set_offsets(device_t &device, int sx, int sy);
+	void set_offsets(int sx, int sy) { m_sx = sx; m_sy = sy; }
 
 	DECLARE_WRITE_LINE_MEMBER( cs_w );
 	DECLARE_WRITE_LINE_MEMBER( cd_w );

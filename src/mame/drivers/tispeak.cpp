@@ -139,9 +139,9 @@ Note that they are interchangeable, eg. you can use a French module on a US Spea
 
     French:
     - No.1: Les Mots de Base: VSM: 16KB CD2353 (1st release was called "Module No. 1 de Jacques Capelovici")
-    - No.2: Les Mots Difficilies: VSM: 16KB? CD62177*
+    - No.2: Les Mots Difficiles (aka Les Mots de Base): VSM: 16KB CD62177A
     - No.3: Les Animaux Familiers: VSM: 16KB? CD62047*
-    - No.4: Les Magasins De La Rue: VSM: 16KB CD62048
+    - No.4: Les Magasins de la Rue: VSM: 16KB CD62048
     - No.5: Les Extra-Terrestres: VSM: 16KB? CD62178*
 
     Italian:
@@ -191,9 +191,9 @@ Speak & Read modules:
     - Who's Who at the Zoo: VSM: 16KB CD2397
     - A Dog on a Log: VSM: 16KB CD3534(rev.A)
     - The Seal That Could Fly: VSM: 16KB CD3535
-    - A Ghost in the House: VSM: 16KB CD3536*
+    - A Ghost in the House: VSM: 16KB CD3536
     - On the Track: VSM: 16KB CD3538
-    - The Third Circle: VSM: 16KB CD3539*
+    - The Third Circle: VSM: 16KB CD3539
     - The Millionth Knight: VSM: 16KB CD3540
 
 

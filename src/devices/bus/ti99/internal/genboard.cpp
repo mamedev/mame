@@ -1519,7 +1519,7 @@ void geneve_mapper_device::device_reset()
 
 	// Allow for configuring the VRAM size
 	uint32_t videoram = (machine().root_device().ioport("VRAM")->read()!=0)? 0x30000 : 0x20000;
-	v99x8_device::static_set_vram_size(*m_video.target(), videoram);
+	downcast<v99x8_device &>(*m_video.target()).set_vram_size(videoram);
 	LOGMASKED(LOG_SETTING, "Video RAM set to %d KiB\n", videoram / 1024);
 }
 

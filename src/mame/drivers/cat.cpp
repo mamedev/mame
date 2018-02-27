@@ -91,6 +91,11 @@ Canon cat credits easter egg:
 * hit EXPLAIN (use front + N) and the credits screen will be displayed
 
 Canon Cat credits details: (WIP)
+Jef Raskin
+John "Sandy" Bumgarner
+Charles Springer
+Jonathan Sand
+Terry Holmes - wrote tForth, the language in which the cat is programmed
 Scott Kim - responsible for fonts on swyft and cat
 Ralph Voorhees - Model construction and mockups (swyft 'flat cat')
 

@@ -90,19 +90,19 @@
 //***************************************************************************
 
 #define MCFG_MOS6566_CPU(_tag) \
-	mos6566_device::static_set_cpu_tag(*device, "^" _tag);
+	downcast<mos6566_device &>(*device).set_cpu_tag("^" _tag);
 
 #define MCFG_MOS6566_IRQ_CALLBACK(_write) \
-	devcb = &mos6566_device::set_irq_wr_callback(*device, DEVCB_##_write);
+	devcb = &downcast<mos6566_device &>(*device).set_irq_wr_callback(DEVCB_##_write);
 
 #define MCFG_MOS6566_BA_CALLBACK(_write) \
-	devcb = &mos6566_device::set_ba_wr_callback(*device, DEVCB_##_write);
+	devcb = &downcast<mos6566_device &>(*device).set_ba_wr_callback(DEVCB_##_write);
 
 #define MCFG_MOS6566_AEC_CALLBACK(_write) \
-	devcb = &mos6566_device::set_aec_wr_callback(*device, DEVCB_##_write);
+	devcb = &downcast<mos6566_device &>(*device).set_aec_wr_callback(DEVCB_##_write);
 
 #define MCFG_MOS8564_K_CALLBACK(_write) \
-	devcb = &mos6566_device::set_k_wr_callback(*device, DEVCB_##_write);
+	devcb = &downcast<mos6566_device &>(*device).set_k_wr_callback(DEVCB_##_write);
 
 
 
@@ -212,11 +212,11 @@ public:
 	// construction/destruction
 	mos6566_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
-	static void static_set_cpu_tag(device_t &device, const char *tag) { downcast<mos6566_device &>(device).m_cpu.set_tag(tag); }
-	template <class Object> static devcb_base &set_irq_wr_callback(device_t &device, Object &&cb) { return downcast<mos6566_device &>(device).m_write_irq.set_callback(std::forward<Object>(cb)); }
-	template <class Object> static devcb_base &set_ba_wr_callback(device_t &device, Object &&cb) { return downcast<mos6566_device &>(device).m_write_ba.set_callback(std::forward<Object>(cb)); }
-	template <class Object> static devcb_base &set_aec_wr_callback(device_t &device, Object &&cb) { return downcast<mos6566_device &>(device).m_write_aec.set_callback(std::forward<Object>(cb)); }
-	template <class Object> static devcb_base &set_k_wr_callback(device_t &device, Object &&cb) { return downcast<mos6566_device &>(device).m_write_k.set_callback(std::forward<Object>(cb)); }
+	void set_cpu_tag(const char *tag) { m_cpu.set_tag(tag); }
+	template <class Object> devcb_base &set_irq_wr_callback(Object &&cb) { return m_write_irq.set_callback(std::forward<Object>(cb)); }
+	template <class Object> devcb_base &set_ba_wr_callback(Object &&cb) { return m_write_ba.set_callback(std::forward<Object>(cb)); }
+	template <class Object> devcb_base &set_aec_wr_callback(Object &&cb) { return m_write_aec.set_callback(std::forward<Object>(cb)); }
+	template <class Object> devcb_base &set_k_wr_callback(Object &&cb) { return m_write_k.set_callback(std::forward<Object>(cb)); }
 
 	virtual space_config_vector memory_space_config() const override;
 

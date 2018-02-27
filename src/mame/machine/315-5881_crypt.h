@@ -20,6 +20,16 @@ public:
 	// construction/destruction
 	sega_315_5881_crypt_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
+	DECLARE_READ16_MEMBER(ready_r);
+	DECLARE_WRITE16_MEMBER(subkey_le_w);	
+	DECLARE_WRITE16_MEMBER(subkey_be_w);
+	DECLARE_WRITE16_MEMBER(addrlo_w);
+	DECLARE_WRITE16_MEMBER(addrhi_w);
+	DECLARE_READ16_MEMBER(decrypt_le_r);
+	DECLARE_READ16_MEMBER(decrypt_be_r);
+	
+	void iomap_64be(address_map &map);
+	void iomap_le(address_map &map);
 
 	uint16_t do_decrypt(uint8_t *&base);
 	void set_addr_low(uint16_t data);
@@ -35,6 +45,8 @@ protected:
 	virtual void device_reset() override;
 
 private:
+
+	bool first_read;
 
 	enum {
 //        BUFFER_SIZE = 32768, LINE_SIZE = 512,

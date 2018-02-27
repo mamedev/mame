@@ -235,7 +235,6 @@ public:
 	void pci_device_set_reg(uint32_t value);
 	void configure_fast_ram();
 	void interleave_vroms();
-	DECLARE_DRIVER_INIT(genprot);
 	DECLARE_DRIVER_INIT(lemans24);
 	DECLARE_DRIVER_INIT(vs298);
 	DECLARE_DRIVER_INIT(vs299);
@@ -335,9 +334,6 @@ public:
 	void tap_reset();
 	void tap_set_asic_ids();
 
-	DECLARE_READ64_MEMBER(model3_5881prot_r);
-	DECLARE_WRITE64_MEMBER(model3_5881prot_w);
-	int first_read;
 	uint16_t crypt_read_callback(uint32_t addr);
 
 	void model3_21_5881(machine_config &config);
@@ -347,6 +343,7 @@ public:
 	void model3_20(machine_config &config);
 	void model3_21(machine_config &config);
 	void scud(machine_config &config);
+	void model3_5881_mem(address_map &map);
 	void model3_10_mem(address_map &map);
 	void model3_mem(address_map &map);
 	void model3_snd(address_map &map);

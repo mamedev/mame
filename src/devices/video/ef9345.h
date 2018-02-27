@@ -15,7 +15,7 @@
 
 
 #define MCFG_EF9345_PALETTE(_palette_tag) \
-	ef9345_device::static_set_palette_tag(*device, "^" _palette_tag);
+	downcast<ef9345_device &>(*device).set_palette_tag("^" _palette_tag);
 
 //**************************************************************************
 //  TYPE DEFINITIONS
@@ -31,8 +31,8 @@ public:
 	// construction/destruction
 	ef9345_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
-	// static configuration
-	static void static_set_palette_tag(device_t &device, const char *tag);
+	// configuration
+	void set_palette_tag(const char *tag) { m_palette.set_tag(tag); }
 
 	// device interface
 	DECLARE_READ8_MEMBER( data_r );

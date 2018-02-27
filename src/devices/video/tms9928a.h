@@ -34,15 +34,15 @@
 //  MCFG_DEVICE_ADD(_tag, _variant, XTAL(10'738'635) / 2 )
 
 #define MCFG_TMS9928A_VRAM_SIZE(_size) \
-	tms9928a_device::set_vram_size(*device, _size);
+	downcast<tms9928a_device &>(*device).set_vram_size(_size);
 
 #define MCFG_TMS9928A_OUT_INT_LINE_CB(_devcb) \
-	devcb = &tms9928a_device::set_out_int_line_callback(*device, DEVCB_##_devcb);
+	devcb = &downcast<tms9928a_device &>(*device).set_out_int_line_callback(DEVCB_##_devcb);
 
 #define MCFG_TMS9928A_SET_SCREEN MCFG_VIDEO_SET_SCREEN
 
 #define MCFG_TMS9928A_OUT_GROMCLK_CB(_devcb) \
-	devcb = &tms9928a_device::set_out_gromclk_callback(*device, DEVCB_##_devcb);
+	devcb = &downcast<tms9928a_device &>(*device).set_out_gromclk_callback(DEVCB_##_devcb);
 
 
 #define MCFG_TMS9928A_SCREEN_ADD_NTSC(_screen_tag) \
@@ -88,9 +88,9 @@ public:
 	// construction/destruction
 	tms9928a_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
-	static void set_vram_size(device_t &device, int vram_size) { downcast<tms9928a_device &>(device).m_vram_size = vram_size; }
-	template <class Object> static devcb_base &set_out_int_line_callback(device_t &device, Object &&cb) { return downcast<tms9928a_device &>(device).m_out_int_line_cb.set_callback(std::forward<Object>(cb)); }
-	template <class Object> static devcb_base &set_out_gromclk_callback(device_t &device, Object &&cb) { return downcast<tms9928a_device &>(device).m_out_gromclk_cb.set_callback(std::forward<Object>(cb)); }
+	void set_vram_size(int vram_size) { m_vram_size = vram_size; }
+	template <class Object> devcb_base &set_out_int_line_callback(Object &&cb) { return m_out_int_line_cb.set_callback(std::forward<Object>(cb)); }
+	template <class Object> devcb_base &set_out_gromclk_callback(Object &&cb) { return m_out_gromclk_cb.set_callback(std::forward<Object>(cb)); }
 
 	DECLARE_READ8_MEMBER( read );
 	DECLARE_WRITE8_MEMBER( write );
