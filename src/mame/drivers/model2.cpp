@@ -390,6 +390,9 @@ MACHINE_START_MEMBER(model2_state,model2)
 	m_port_1c00010 = 0;
 	m_port_1c00012 = 1;
 	m_port_1c00014 = 2;
+	
+	// initialize custom debugger pool, @see machine/model2.cpp
+	debug_init();
 }
 
 MACHINE_START_MEMBER(model2_state,srallyc)
