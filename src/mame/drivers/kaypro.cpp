@@ -233,14 +233,14 @@ MACHINE_CONFIG_START(kaypro_state::kayproii)
 
 	MCFG_RS232_PORT_ADD("serial", default_rs232_devices, nullptr)
 	MCFG_RS232_RXD_HANDLER(DEVWRITELINE("sio", z80sio_device, rxa_w))
-	MCFG_DEVCB_CHAIN_OUTPUT(DEVWRITELINE("sio", z80sio_device, synca_w))
+	MCFG_DEVCB_CHAIN_OUTPUT(DEVWRITELINE("sio", z80sio_device, synca_w)) // TODO: confirm this is connected
 	MCFG_RS232_CTS_HANDLER(DEVWRITELINE("sio", z80sio_device, ctsa_w))
 	MCFG_RS232_DCD_HANDLER(DEVWRITELINE("sio", z80sio_device, dcda_w))
 
 	MCFG_DEVICE_ADD("brg", COM8116, XTAL(5'068'800)) // WD1943, SMC8116
-	MCFG_COM8116_FR_HANDLER(DEVWRITELINE("sio", z80sio_device, rxca_w))
+	MCFG_COM8116_FT_HANDLER(DEVWRITELINE("sio", z80sio_device, rxca_w))
 	MCFG_DEVCB_CHAIN_OUTPUT(DEVWRITELINE("sio", z80sio_device, txca_w))
-	MCFG_COM8116_FT_HANDLER(DEVWRITELINE("sio", z80sio_device, rxtxcb_w))
+	MCFG_COM8116_FR_HANDLER(DEVWRITELINE("sio", z80sio_device, rxtxcb_w))
 
 	MCFG_DEVICE_ADD("z80pio_g", Z80PIO, 20_MHz_XTAL / 8)
 	MCFG_Z80PIO_OUT_INT_CB(INPUTLINE("maincpu", INPUT_LINE_IRQ0))
