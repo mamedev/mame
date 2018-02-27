@@ -141,10 +141,8 @@ inline void i8257_device::set_tc(int state)
 inline void i8257_device::set_dack()
 {
 	LOG("%s\n", FUNCNAME);
-	m_out_dack_0_cb(m_current_channel != 0);
-	m_out_dack_1_cb(m_current_channel != 1);
-	m_out_dack_2_cb(m_current_channel != 2);
-	m_out_dack_3_cb(m_current_channel != 3);
+	for (int ch = 0; ch < 4; ch++)
+		m_out_dack_cb[ch](m_current_channel != ch);
 }
 
 
@@ -162,21 +160,7 @@ inline void i8257_device::dma_read()
 	case MODE_TRANSFER_VERIFY:
 	case MODE_TRANSFER_WRITE:
 		LOGTFR(" - MODE TRANSFER VERIFY/WRITE");
-		switch(m_current_channel)
-		{
-			case 0:
-				m_temp = m_in_ior_0_cb(offset);
-				break;
-			case 1:
-				m_temp = m_in_ior_1_cb(offset);
-				break;
-			case 2:
-				m_temp = m_in_ior_2_cb(offset);
-				break;
-			case 3:
-				m_temp = m_in_ior_3_cb(offset);
-				break;
-		}
+		m_temp = m_in_ior_cb[m_current_channel](offset);
 		break;
 
 	case MODE_TRANSFER_READ:
@@ -214,21 +198,7 @@ inline void i8257_device::dma_write()
 
 	case MODE_TRANSFER_READ:
 		LOGTFR(" - MODE TRANSFER READ");
-		switch(m_current_channel)
-		{
-			case 0:
-				m_out_iow_0_cb(offset, m_temp);
-				break;
-			case 1:
-				m_out_iow_1_cb(offset, m_temp);
-				break;
-			case 2:
-				m_out_iow_2_cb(offset, m_temp);
-				break;
-			case 3:
-				m_out_iow_3_cb(offset, m_temp);
-				break;
-		}
+		m_out_iow_cb[m_current_channel](offset, m_temp);
 		break;
 	}
 	LOGTFR(" channel %d Offset %04x: %02x %04x\n", m_current_channel, offset, m_temp, m_channel[m_current_channel].m_count);
@@ -301,18 +271,9 @@ i8257_device::i8257_device(const machine_config &mconfig, const char *tag, devic
 		m_out_tc_cb(*this),
 		m_in_memr_cb(*this),
 		m_out_memw_cb(*this),
-		m_in_ior_0_cb(*this),
-		m_in_ior_1_cb(*this),
-		m_in_ior_2_cb(*this),
-		m_in_ior_3_cb(*this),
-		m_out_iow_0_cb(*this),
-		m_out_iow_1_cb(*this),
-		m_out_iow_2_cb(*this),
-		m_out_iow_3_cb(*this),
-		m_out_dack_0_cb(*this),
-		m_out_dack_1_cb(*this),
-		m_out_dack_2_cb(*this),
-		m_out_dack_3_cb(*this)
+		m_in_ior_cb{{*this}, {*this}, {*this}, {*this}},
+		m_out_iow_cb{{*this}, {*this}, {*this}, {*this}},
+		m_out_dack_cb{{*this}, {*this}, {*this}, {*this}}
 {
 }
 
@@ -332,18 +293,12 @@ void i8257_device::device_start()
 	m_out_tc_cb.resolve_safe();
 	m_in_memr_cb.resolve_safe(0);
 	m_out_memw_cb.resolve_safe();
-	m_in_ior_0_cb.resolve_safe(0);
-	m_in_ior_1_cb.resolve_safe(0);
-	m_in_ior_2_cb.resolve_safe(0);
-	m_in_ior_3_cb.resolve_safe(0);
-	m_out_iow_0_cb.resolve_safe();
-	m_out_iow_1_cb.resolve_safe();
-	m_out_iow_2_cb.resolve_safe();
-	m_out_iow_3_cb.resolve_safe();
-	m_out_dack_0_cb.resolve_safe();
-	m_out_dack_1_cb.resolve_safe();
-	m_out_dack_2_cb.resolve_safe();
-	m_out_dack_3_cb.resolve_safe();
+	for (auto &cb : m_in_ior_cb)
+		cb.resolve_safe(0);
+	for (auto &cb : m_out_iow_cb)
+		cb.resolve_safe();
+	for (auto &cb : m_out_dack_cb)
+		cb.resolve_safe();
 
 	// state saving
 	save_item(NAME(m_msb));
