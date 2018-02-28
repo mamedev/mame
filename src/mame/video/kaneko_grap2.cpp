@@ -48,16 +48,15 @@ MACHINE_CONFIG_END
 void kaneko_grap2_device::device_start()
 {
 	m_framebuffer = make_unique_clear<uint16_t[]>(0x80000/2);
-	m_framebuffer_palette = make_unique_clear<uint16_t[]>(0x200/2);
+	m_framebuffer_palette = make_unique_clear<uint16_t[]>(0x101);
 	m_framebuffer_unk1 = make_unique_clear<uint16_t[]>(0x400/2);
 	m_framebuffer_unk2 = make_unique_clear<uint16_t[]>(0x400/2);
 
 	save_pointer(NAME(m_framebuffer.get()), 0x80000/2);
-	save_pointer(NAME(m_framebuffer_palette.get()), 0x200/2);
+	save_pointer(NAME(m_framebuffer_palette.get()), 0x101);
 	save_pointer(NAME(m_framebuffer_unk1.get()), 0x400/2);
 	save_pointer(NAME(m_framebuffer_unk2.get()), 0x400/2);
 
-	save_item(NAME(m_framebuffer_bgcol));
 	save_item(NAME(m_framebuffer_scrolly));
 	save_item(NAME(m_framebuffer_scrollx));
 	save_item(NAME(m_framebuffer_enable));
@@ -70,7 +69,6 @@ void kaneko_grap2_device::device_start()
 
 void kaneko_grap2_device::device_reset()
 {
-	m_framebuffer_bgcol = 0;
 	m_framebuffer_scrolly = 0;
 	m_framebuffer_scrollx = 0;
 	m_framebuffer_enable = 0;
@@ -183,28 +181,11 @@ WRITE16_MEMBER(kaneko_grap2_device::framebuffer1_palette_w)
 /* definitely looks like a cycling bg colour used for the girls */
 WRITE16_MEMBER(kaneko_grap2_device::framebuffer1_bgcol_w)
 {
-	COMBINE_DATA(&m_framebuffer_bgcol);
-	set_color_555(0x100, 5, 10, 0, m_framebuffer_bgcol);
+	COMBINE_DATA(&m_framebuffer_palette[0x100]);
+	set_color_555(0x100, 5, 10, 0, m_framebuffer_palette[0x100]);
 }
 
-uint32_t kaneko_grap2_device::pen_r(uint32_t dst, int pen)
+uint32_t kaneko_grap2_device::pen_r(int pen)
 {
-	int alpha = 0xff;
-	uint32_t pal = m_palette->pens()[pen];
-	if (pen & 0x100)
-	{
-		alpha = (m_framebuffer_bgcol & 0x8000) ? m_framebuffer_bright2 : m_framebuffer_bright1;
-	}
-	else
-	{
-		alpha = (m_framebuffer_palette[pen] & 0x8000) ? m_framebuffer_bright2 : m_framebuffer_bright1;
-	}
-	if (alpha)
-	{
-		if (alpha == 0xff)
-			return pal;
-		else
-			return alpha_blend_r32(dst, pal, alpha);
-	}
-	return dst;
+	return m_palette->pens()[pen];
 }
