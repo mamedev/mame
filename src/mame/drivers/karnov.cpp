@@ -866,19 +866,15 @@ ADDRESS_MAP_START(karnov_state::chelnovjbl_mcu_map)
 	AM_RANGE(0x0000, 0x1fff) AM_ROM
 ADDRESS_MAP_END
 
-ADDRESS_MAP_START(karnov_state::chelnovjbl_mcu_io_map)
-	//internal port
-//  AM_RANGE(MCS51_PORT_P1, MCS51_PORT_P1) AM_READWRITE(p1_r, p1_w)
-//  AM_RANGE(MCS51_PORT_P3, MCS51_PORT_P3) AM_READWRITE(p3_r, p3_w)
-ADDRESS_MAP_END
-
 
 MACHINE_CONFIG_START(karnov_state::chelnovjbl)
 	karnov(config);
 	MCFG_CPU_ADD("mcu", I8031, 2000000) // ??mhz
 	MCFG_CPU_PROGRAM_MAP(chelnovjbl_mcu_map)
-	MCFG_CPU_IO_MAP(chelnovjbl_mcu_io_map)
-
+//  MCFG_MCS51_PORT_P1_IN_CB(READ8(karnov_state, p1_r))
+//  MCFG_MCS51_PORT_P1_OUT_CB(WRITE8(karnov_state, p1_w))
+//  MCFG_MCS51_PORT_P3_IN_CB(READ8(karnov_state, p3_r))
+//  MCFG_MCS51_PORT_P3_OUT_CB(WRITE8(karnov_state, p3_w))
 MACHINE_CONFIG_END
 
 

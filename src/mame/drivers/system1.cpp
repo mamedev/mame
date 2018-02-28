@@ -393,6 +393,8 @@ void system1_state::machine_start()
 	save_item(NAME(m_videomode_prev));
 	save_item(NAME(m_mcu_control));
 	save_item(NAME(m_nob_maincpu_latch));
+	save_item(NAME(m_nob_mcu_latch));
+	save_item(NAME(m_nob_mcu_status));
 }
 
 
@@ -657,15 +659,30 @@ TIMER_DEVICE_CALLBACK_MEMBER(system1_state::mcu_t0_callback)
  *
  *************************************/
 
+READ8_MEMBER(system1_state::nob_mcu_latch_r)
+{
+	return m_nob_mcu_latch;
+}
+
+WRITE8_MEMBER(system1_state::nob_mcu_latch_w)
+{
+	m_nob_mcu_latch = data;
+}
+
+WRITE8_MEMBER(system1_state::nob_mcu_status_w)
+{
+	m_nob_mcu_status = data;
+}
+
 WRITE8_MEMBER(system1_state::nob_mcu_control_p2_w)
 {
 	/* bit 0 triggers a read from MCU port 0 */
 	if (((m_mcu_control ^ data) & 0x01) && !(data & 0x01))
-		*m_nob_mcu_latch = m_nob_maincpu_latch;
+		m_nob_mcu_latch = m_nob_maincpu_latch;
 
 	/* bit 1 triggers a write from MCU port 0 */
 	if (((m_mcu_control ^ data) & 0x02) && !(data & 0x02))
-		m_nob_maincpu_latch = *m_nob_mcu_latch;
+		m_nob_maincpu_latch = m_nob_mcu_latch;
 
 	/* bit 2 is toggled once near the end of an IRQ */
 	if (((m_mcu_control ^ data) & 0x04) && !(data & 0x04))
@@ -697,7 +714,7 @@ WRITE8_MEMBER(system1_state::nob_maincpu_latch_w)
 
 READ8_MEMBER(system1_state::nob_mcu_status_r)
 {
-	return *m_nob_mcu_status;
+	return m_nob_mcu_status;
 }
 
 
@@ -833,17 +850,7 @@ ADDRESS_MAP_END
  *************************************/
 
 ADDRESS_MAP_START(system1_state::mcu_io_map)
-	ADDRESS_MAP_UNMAP_HIGH
 	AM_RANGE(0x0000, 0xffff) AM_READWRITE(mcu_io_r, mcu_io_w)
-	AM_RANGE(MCS51_PORT_P1, MCS51_PORT_P1) AM_WRITE(mcu_control_w)
-ADDRESS_MAP_END
-
-
-ADDRESS_MAP_START(system1_state::nob_mcu_io_map)
-	ADDRESS_MAP_UNMAP_HIGH
-	AM_RANGE(MCS51_PORT_P0, MCS51_PORT_P0) AM_RAM AM_SHARE("nob_mcu_latch")
-	AM_RANGE(MCS51_PORT_P1, MCS51_PORT_P1) AM_WRITEONLY AM_SHARE("nob_mcu_status")
-	AM_RANGE(MCS51_PORT_P2, MCS51_PORT_P2) AM_WRITE(nob_mcu_control_p2_w)
 ADDRESS_MAP_END
 
 
@@ -2437,6 +2444,7 @@ MACHINE_CONFIG_START(system1_state::mcu)
 
 	MCFG_CPU_ADD("mcu", I8751, SOUND_CLOCK)
 	MCFG_CPU_IO_MAP(mcu_io_map)
+	MCFG_MCS51_PORT_P1_OUT_CB(WRITE8(system1_state, mcu_control_w))
 	MCFG_CPU_VBLANK_INT_DRIVER("screen", system1_state, mcu_irq_assert)
 
 	MCFG_TIMER_DRIVER_ADD_PERIODIC("mcu_t0", system1_state, mcu_t0_callback, attotime::from_usec(2500))
@@ -2458,7 +2466,10 @@ MACHINE_CONFIG_START(system1_state::nobm)
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("mcu", I8751, SOUND_CLOCK)
-	MCFG_CPU_IO_MAP(nob_mcu_io_map)
+	MCFG_MCS51_PORT_P0_IN_CB(READ8(system1_state, nob_mcu_latch_r))
+	MCFG_MCS51_PORT_P0_OUT_CB(WRITE8(system1_state, nob_mcu_latch_w))
+	MCFG_MCS51_PORT_P1_OUT_CB(WRITE8(system1_state, nob_mcu_status_w))
+	MCFG_MCS51_PORT_P2_OUT_CB(WRITE8(system1_state, nob_mcu_control_p2_w))
 MACHINE_CONFIG_END
 
 

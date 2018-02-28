@@ -128,8 +128,10 @@ public:
 	DECLARE_WRITE8_MEMBER(nimbus_pc8031_w);
 	DECLARE_READ8_MEMBER(nimbus_pc8031_iou_r);
 	DECLARE_WRITE8_MEMBER(nimbus_pc8031_iou_w);
-	DECLARE_READ8_MEMBER(nimbus_pc8031_port_r);
-	DECLARE_WRITE8_MEMBER(nimbus_pc8031_port_w);
+	DECLARE_READ8_MEMBER(nimbus_pc8031_port1_r);
+	DECLARE_WRITE8_MEMBER(nimbus_pc8031_port1_w);
+	DECLARE_READ8_MEMBER(nimbus_pc8031_port3_r);
+	DECLARE_WRITE8_MEMBER(nimbus_pc8031_port3_w);
 	DECLARE_READ8_MEMBER(nimbus_iou_r);
 	DECLARE_WRITE8_MEMBER(nimbus_iou_w);
 	DECLARE_WRITE8_MEMBER(nimbus_sound_ay8910_porta_w);

@@ -761,13 +761,6 @@ READ8_MEMBER(maygay1b_state::mcu_port2_r)
 	return ret;
 }
 
-ADDRESS_MAP_START(maygay1b_state::maygay_mcu_io)
-	AM_RANGE(MCS51_PORT_P0, MCS51_PORT_P0) AM_READWRITE( mcu_port0_r, mcu_port0_w )
-	AM_RANGE(MCS51_PORT_P1, MCS51_PORT_P1) AM_WRITE( mcu_port1_w )
-	AM_RANGE(MCS51_PORT_P2, MCS51_PORT_P2) AM_READWRITE( mcu_port2_r, mcu_port2_w )
-	AM_RANGE(MCS51_PORT_P3, MCS51_PORT_P3) AM_WRITE( mcu_port3_w )
-ADDRESS_MAP_END
-
 
 // machine driver for maygay m1 board /////////////////////////////////
 
@@ -777,8 +770,12 @@ MACHINE_CONFIG_START(maygay1b_state::maygay_m1)
 	MCFG_CPU_PROGRAM_MAP(m1_memmap)
 
 	MCFG_CPU_ADD("mcu", I80C51, 2000000) //  EP840034.A-P-80C51AVW
-	MCFG_CPU_IO_MAP(maygay_mcu_io)
-
+	MCFG_MCS51_PORT_P0_IN_CB(READ8(maygay1b_state, mcu_port0_r))
+	MCFG_MCS51_PORT_P0_OUT_CB(WRITE8(maygay1b_state, mcu_port0_w))
+	MCFG_MCS51_PORT_P1_OUT_CB(WRITE8(maygay1b_state, mcu_port1_w))
+	MCFG_MCS51_PORT_P2_IN_CB(READ8(maygay1b_state, mcu_port2_r))
+	MCFG_MCS51_PORT_P2_OUT_CB(WRITE8(maygay1b_state, mcu_port2_w))
+	MCFG_MCS51_PORT_P3_OUT_CB(WRITE8(maygay1b_state, mcu_port3_w))
 
 	MCFG_DEVICE_ADD("duart68681", MC68681, M1_DUART_CLOCK)
 	MCFG_MC68681_IRQ_CALLBACK(WRITELINE(maygay1b_state, duart_irq_handler))

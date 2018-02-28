@@ -44,6 +44,10 @@ public:
 		, m_dac1(*this, "dac1")
 	{ }
 
+	void atari_s2(machine_config &config);
+	void atari_s3(machine_config &config);
+
+protected:
 	DECLARE_WRITE8_MEMBER(sound0_w);
 	DECLARE_WRITE8_MEMBER(sound1_w);
 	DECLARE_WRITE8_MEMBER(lamp_w) { };
@@ -53,10 +57,10 @@ public:
 	DECLARE_WRITE8_MEMBER(display_w);
 	TIMER_DEVICE_CALLBACK_MEMBER(irq);
 	TIMER_DEVICE_CALLBACK_MEMBER(timer_s);
-	void atari_s2(machine_config &config);
-	void atari_s3(machine_config &config);
+
 	void atari_s2_map(address_map &map);
 	void atari_s3_map(address_map &map);
+
 private:
 	bool m_timer_sb;
 	uint8_t m_timer_s[5];
@@ -354,9 +358,11 @@ WRITE8_MEMBER( atari_s2_state::sol0_w )
 
 WRITE8_MEMBER( atari_s2_state::display_w )
 {
-	static const uint8_t patterns[16] = { 0x3f, 0x06, 0x5b, 0x4f, 0x66, 0x6d, 0x7c, 0x07, 0x7f, 0x67, 0, 0, 0, 0, 0, 0 }; // 4511
-	if (offset<7)
+	static constexpr uint8_t patterns[16] = { 0x3f, 0x06, 0x5b, 0x4f, 0x66, 0x6d, 0x7c, 0x07, 0x7f, 0x67, 0, 0, 0, 0, 0, 0 }; // 4511
+	if (offset < 7)
+	{
 		m_segment[offset] = patterns[data&15];
+	}
 	else
 	{
 		data &= 7;

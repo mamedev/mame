@@ -1014,10 +1014,7 @@ ADDRESS_MAP_END
 //**************************************************************************
 
 ADDRESS_MAP_START(segas16a_state::mcu_io_map)
-	ADDRESS_MAP_UNMAP_HIGH
 	AM_RANGE(0x0000, 0xffff) AM_READWRITE(mcu_io_r, mcu_io_w)
-	AM_RANGE(MCS51_PORT_P1, MCS51_PORT_P1) AM_READNOP AM_WRITE(mcu_control_w)
-	AM_RANGE(MCS51_PORT_P3, MCS51_PORT_P3) AM_READNOP   // read during jb int0
 ADDRESS_MAP_END
 
 
@@ -2060,6 +2057,7 @@ MACHINE_CONFIG_START(segas16a_state::system16a_i8751)
 
 	MCFG_CPU_ADD("mcu", I8751, 8000000)
 	MCFG_CPU_IO_MAP(mcu_io_map)
+	MCFG_MCS51_PORT_P1_OUT_CB(WRITE8(segas16a_state, mcu_control_w))
 	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", segas16a_state, mcu_irq_assert)
 MACHINE_CONFIG_END
 

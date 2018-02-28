@@ -38,7 +38,6 @@ public:
 	DECLARE_WRITE8_MEMBER(ay2_port_a_w);
 	DECLARE_WRITE8_MEMBER(ay2_port_b_w);
 	DECLARE_READ8_MEMBER(keyboard_r);
-	DECLARE_READ8_MEMBER(port_r);
 	void marywu(machine_config &config);
 	void io_map(address_map &map);
 	void program_map(address_map &map);
@@ -138,17 +137,6 @@ WRITE8_MEMBER( marywu_state::multiplex_7seg_w )
 	m_selected_7seg_module = data;
 }
 
-READ8_MEMBER( marywu_state::port_r )
-{
-//TODO: figure out what each bit is mapped to in the 80c31 ports P1 and P3
-	switch(offset){
-		//case 1:
-	//  return (1 << 6);
-	default:
-		return 0x00;
-	}
-}
-
 READ8_MEMBER( marywu_state::keyboard_r )
 {
 	switch(m_selected_7seg_module % 8){
@@ -181,7 +169,6 @@ ADDRESS_MAP_START(marywu_state::io_map)
 	AM_RANGE(0x9003, 0x9003) AM_MIRROR(0x0ffc) AM_DEVREADWRITE("ay2", ay8910_device, data_r, data_w)
 	AM_RANGE(0xb000, 0xb001) AM_MIRROR(0x0ffe) AM_DEVREADWRITE("i8279", i8279_device, read, write)
 	AM_RANGE(0xf000, 0xf000) AM_NOP /* TODO: Investigate this. There's something going on at this address range. */
-	AM_RANGE(MCS51_PORT_P0, MCS51_PORT_P3) AM_READ(port_r)
 ADDRESS_MAP_END
 
 MACHINE_CONFIG_START(marywu_state::marywu)
@@ -189,6 +176,7 @@ MACHINE_CONFIG_START(marywu_state::marywu)
 	MCFG_CPU_ADD("maincpu", I80C31, XTAL(10'738'635)) //actual CPU is a Winbond w78c31b-24
 	MCFG_CPU_PROGRAM_MAP(program_map)
 	MCFG_CPU_IO_MAP(io_map)
+	//TODO: figure out what each bit is mapped to in the 80c31 ports P1 and P3
 
 	/* Keyboard & display interface */
 	MCFG_DEVICE_ADD("i8279", I8279, XTAL(10'738'635)) /* should it be perhaps a fraction of the XTAL clock ? */

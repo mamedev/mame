@@ -75,8 +75,6 @@ ADDRESS_MAP_START(piggypas_state::piggypas_io)
 	AM_RANGE(0x1000, 0x1000) AM_DEVREADWRITE("oki", okim6295_device, read, write)
 	AM_RANGE(0x1800, 0x1801) AM_DEVWRITE("hd44780", hd44780_device, write)
 	AM_RANGE(0x1802, 0x1803) AM_DEVREAD("hd44780", hd44780_device, read)
-
-	AM_RANGE(MCS51_PORT_P3, MCS51_PORT_P3) AM_READ_PORT("IN2")
 ADDRESS_MAP_END
 
 
@@ -133,6 +131,7 @@ MACHINE_CONFIG_START(piggypas_state::piggypas)
 	MCFG_CPU_ADD("maincpu", I80C31, XTAL(8'448'000)) // OKI M80C31F or M80C154S
 	MCFG_CPU_PROGRAM_MAP(piggypas_map)
 	MCFG_CPU_IO_MAP(piggypas_io)
+	MCFG_MCS51_PORT_P3_IN_CB(IOPORT("IN2"))
 	MCFG_MCS51_SERIAL_TX_CB(WRITE8(piggypas_state, mcs51_tx_callback))
 //  MCFG_CPU_VBLANK_INT_DRIVER("screen", piggypas_state,  irq0_line_hold)
 

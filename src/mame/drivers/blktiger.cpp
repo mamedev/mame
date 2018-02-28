@@ -127,15 +127,6 @@ ADDRESS_MAP_START(blktiger_state::blktiger_sound_map)
 	AM_RANGE(0xe002, 0xe003) AM_DEVREADWRITE("ym2", ym2203_device, read, write)
 ADDRESS_MAP_END
 
-ADDRESS_MAP_START(blktiger_state::blktiger_mcu_map)
-	AM_RANGE(0x0000, 0x0fff) AM_ROM
-ADDRESS_MAP_END
-
-ADDRESS_MAP_START(blktiger_state::blktiger_mcu_io_map)
-	AM_RANGE(MCS51_PORT_P0,MCS51_PORT_P0) AM_READWRITE(blktiger_from_main_r,blktiger_to_main_w)
-	AM_RANGE(MCS51_PORT_P1,MCS51_PORT_P3) AM_WRITENOP   /* other ports unknown */
-ADDRESS_MAP_END
-
 
 
 static INPUT_PORTS_START( blktiger )
@@ -307,8 +298,9 @@ MACHINE_CONFIG_START(blktiger_state::blktiger)
 	MCFG_CPU_PROGRAM_MAP(blktiger_sound_map)
 
 	MCFG_CPU_ADD("mcu", I8751, XTAL(24'000'000)/4) /* ??? */
-	MCFG_CPU_PROGRAM_MAP(blktiger_mcu_map)
-	MCFG_CPU_IO_MAP(blktiger_mcu_io_map)
+	MCFG_MCS51_PORT_P0_IN_CB(READ8(blktiger_state, blktiger_from_main_r))
+	MCFG_MCS51_PORT_P0_OUT_CB(WRITE8(blktiger_state, blktiger_to_main_w))
+	// other ports unknown
 	//MCFG_CPU_VBLANK_INT_DRIVER("screen", blktiger_state,  irq0_line_hold)
 
 	MCFG_WATCHDOG_ADD("watchdog")

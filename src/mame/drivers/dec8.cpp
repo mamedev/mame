@@ -804,114 +804,71 @@ ADDRESS_MAP_END
 
 */
 
-READ8_MEMBER(dec8_state::dec8_mcu_from_main_r)
+READ8_MEMBER(dec8_state::i8751_port0_r)
 {
-	switch (offset)
-	{
-		case 0:
-			return m_i8751_port0;
-		case 1:
-			return m_i8751_port1;
-		case 2:
-			return 0xff;
-		case 3:
-			return m_coin_port->read();
-	}
-
-	return 0xff; //compile safe.
+	return m_i8751_port0;
 }
 
-WRITE8_MEMBER(dec8_state::dec8_mcu_to_main_w)
+WRITE8_MEMBER(dec8_state::i8751_port0_w)
 {
-	// Outputs P0 and P1 are latched
-	if (offset==0) m_i8751_port0=data;
-	else if (offset==1) m_i8751_port1=data;
+	m_i8751_port0 = data;
+}
 
+READ8_MEMBER(dec8_state::i8751_port1_r)
+{
+	return m_i8751_port1;
+}
+
+WRITE8_MEMBER(dec8_state::i8751_port1_w)
+{
+	m_i8751_port1 = data;
+}
+
+WRITE8_MEMBER(dec8_state::gondo_mcu_to_main_w)
+{
 	// P2 - controls latches for main CPU communication
-	if (offset==2 && (data&0x10)==0)
+	if ((data&0x10)==0)
 		m_i8751_port0 = m_i8751_value>>8;
-	if (offset==2 && (data&0x20)==0)
+	if ((data&0x20)==0)
 		m_i8751_port1 = m_i8751_value&0xff;
-	if (offset==2 && (data&0x40)==0)
+	if ((data&0x40)==0)
 		m_i8751_return = (m_i8751_return & 0xff) | (m_i8751_port0 << 8);
-	if (offset==2 && (data&0x80)==0)
+	if ((data&0x80)==0)
 		m_i8751_return = (m_i8751_return & 0xff00) | m_i8751_port1;
 
 	// P2 - IRQ to main CPU
-	if (offset==2 && (data&4)==0)
+	if ((data&4)==0)
 		m_maincpu->set_input_line(M6809_IRQ_LINE, ASSERT_LINE);
 }
-
-ADDRESS_MAP_START(dec8_state::dec8_mcu_io_map)
-	AM_RANGE(MCS51_PORT_P0,MCS51_PORT_P3) AM_READWRITE(dec8_mcu_from_main_r, dec8_mcu_to_main_w)
-ADDRESS_MAP_END
 
 /*
     Super Real Darwin is similar but only appears to have a single port
 */
 
-READ8_MEMBER(dec8_state::srdarwin_mcu_from_main_r)
-{
-	uint8_t ret = 0;
-
-
-	switch (offset)
-	{
-		case 0:
-			ret = m_i8751_port0;
-			break;
-
-		case 1:
-			ret = 0x00;
-			logerror("%s: srdarwin_mcu_from_main_r %02x %02x\n", machine().describe_context(), offset, ret);
-			break;
-
-		case 2:
-			ret = 0xff;
-			break;
-		case 3:
-			ret = m_coin_port->read();
-			break;
-	}
-
-	return ret;
-}
-
 WRITE8_MEMBER(dec8_state::srdarwin_mcu_to_main_w)
 {
-	// Outputs P0 and P1 are latched
-	if (offset==0) m_i8751_port0=data;
-	else if (offset == 1)
-	{
-		logerror("%s: srdarwin_mcu_to_main_w %02x %02x\n", machine().describe_context(), offset, data);
-	}
-
 	// P2 - controls latches for main CPU communication
-	if (offset == 2 && (data & 0x10) == 0)
+	if ((data & 0x10) == 0)
 	{
 		m_i8751_port0 = m_i8751_value >> 8;
 	}
-	if (offset == 2 && (data & 0x20) == 0)
+	if ((data & 0x20) == 0)
 	{
 		m_i8751_port0 =  m_i8751_value & 0xff;
 	}
-	if (offset==2 && (data&0x40)==0)
+	if ((data&0x40)==0)
 		m_i8751_return = (m_i8751_return & 0xff) | (m_i8751_port0 << 8);
-	if (offset==2 && (data&0x80)==0)
+	if ((data&0x80)==0)
 		m_i8751_return = (m_i8751_return & 0xff00) | m_i8751_port0;
 
 	// P2 - IRQ to main CPU
-	if (offset==2 && (data&0x04)==0)
+	if ((data&0x04)==0)
 		m_maincpu->set_input_line(M6809_IRQ_LINE, ASSERT_LINE);
 
 	// guess, toggled after above.
-	if (offset==2 && (data&0x02)==0)
+	if ((data&0x02)==0)
 		m_maincpu->set_input_line(M6809_IRQ_LINE, CLEAR_LINE);
 }
-
-ADDRESS_MAP_START(dec8_state::srdarwin_mcu_io_map)
-	AM_RANGE(MCS51_PORT_P0,MCS51_PORT_P3) AM_READWRITE(srdarwin_mcu_from_main_r, srdarwin_mcu_to_main_w)
-ADDRESS_MAP_END
 
 /******************************************************************************/
 
@@ -2072,8 +2029,12 @@ MACHINE_CONFIG_START(dec8_state::gondo)
 								/* NMIs are caused by the main CPU */
 
 	MCFG_CPU_ADD("mcu", I8751, XTAL(8'000'000))
-	MCFG_CPU_IO_MAP(dec8_mcu_io_map)
-
+	MCFG_MCS51_PORT_P0_IN_CB(READ8(dec8_state, i8751_port0_r))
+	MCFG_MCS51_PORT_P0_OUT_CB(WRITE8(dec8_state, i8751_port0_w))
+	MCFG_MCS51_PORT_P1_IN_CB(READ8(dec8_state, i8751_port1_r))
+	MCFG_MCS51_PORT_P1_OUT_CB(WRITE8(dec8_state, i8751_port1_w))
+	MCFG_MCS51_PORT_P2_OUT_CB(WRITE8(dec8_state, gondo_mcu_to_main_w))
+	MCFG_MCS51_PORT_P3_IN_CB(IOPORT("I8751"))
 
 	/* video hardware */
 	MCFG_BUFFERED_SPRITERAM8_ADD("spriteram")
@@ -2126,8 +2087,12 @@ MACHINE_CONFIG_START(dec8_state::garyoret)
 								/* NMIs are caused by the main CPU */
 
 	MCFG_CPU_ADD("mcu", I8751, XTAL(8'000'000))
-	MCFG_CPU_IO_MAP(dec8_mcu_io_map)
-
+	MCFG_MCS51_PORT_P0_IN_CB(READ8(dec8_state, i8751_port0_r))
+	MCFG_MCS51_PORT_P0_OUT_CB(WRITE8(dec8_state, i8751_port0_w))
+	MCFG_MCS51_PORT_P1_IN_CB(READ8(dec8_state, i8751_port1_r))
+	MCFG_MCS51_PORT_P1_OUT_CB(WRITE8(dec8_state, i8751_port1_w))
+	MCFG_MCS51_PORT_P2_OUT_CB(WRITE8(dec8_state, gondo_mcu_to_main_w))
+	MCFG_MCS51_PORT_P3_IN_CB(IOPORT("I8751"))
 
 	/* video hardware */
 	MCFG_BUFFERED_SPRITERAM8_ADD("spriteram")
@@ -2180,8 +2145,12 @@ MACHINE_CONFIG_START(dec8_state::ghostb)
 								/* NMIs are caused by the main CPU */
 
 	MCFG_CPU_ADD("mcu", I8751, 3000000*4)
-	MCFG_CPU_IO_MAP(dec8_mcu_io_map)
-
+	MCFG_MCS51_PORT_P0_IN_CB(READ8(dec8_state, i8751_port0_r))
+	MCFG_MCS51_PORT_P0_OUT_CB(WRITE8(dec8_state, i8751_port0_w))
+	MCFG_MCS51_PORT_P1_IN_CB(READ8(dec8_state, i8751_port1_r))
+	MCFG_MCS51_PORT_P1_OUT_CB(WRITE8(dec8_state, i8751_port1_w))
+	MCFG_MCS51_PORT_P2_OUT_CB(WRITE8(dec8_state, gondo_mcu_to_main_w))
+	MCFG_MCS51_PORT_P3_IN_CB(IOPORT("I8751"))
 
 	/* video hardware */
 	MCFG_BUFFERED_SPRITERAM8_ADD("spriteram")
@@ -2359,7 +2328,10 @@ MACHINE_CONFIG_START(dec8_state::srdarwin)
 								/* NMIs are caused by the main CPU */
 
 	MCFG_CPU_ADD("mcu", I8751, XTAL(8'000'000)) /* unknown frequency */
-	MCFG_CPU_IO_MAP(srdarwin_mcu_io_map)
+	MCFG_MCS51_PORT_P0_IN_CB(READ8(dec8_state, i8751_port0_r))
+	MCFG_MCS51_PORT_P0_OUT_CB(WRITE8(dec8_state, i8751_port0_w))
+	MCFG_MCS51_PORT_P2_OUT_CB(WRITE8(dec8_state, srdarwin_mcu_to_main_w))
+	MCFG_MCS51_PORT_P3_IN_CB(IOPORT("I8751"))
 
 	MCFG_QUANTUM_PERFECT_CPU("maincpu") /* needed for stability with emulated MCU or sometimes commands get missed and game crashes at bosses */
 
