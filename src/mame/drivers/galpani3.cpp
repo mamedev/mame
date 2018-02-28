@@ -181,10 +181,6 @@ void galpani3_state::video_start()
 
 uint32_t galpani3_state::screen_update_galpani3(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
 {
-	int x,y;
-	uint16_t* src1;
-	uint32_t* dst;
-	uint16_t pixdata1;
 	const pen_t *paldata = m_palette->pens();
 	
 	bitmap.fill(m_grap2[0]->pen_r(0x100), cliprect);
@@ -229,7 +225,7 @@ uint32_t galpani3_state::screen_update_galpani3(screen_device &screen, bitmap_rg
 				{
 					if ((sprdat & 0xc000) == 0x0000)
 					{
-						dst[drawx] = sprdat & 0x3fff;
+						dst[drawx] = paldata[sprdat & 0x3fff];
 					}
 					if (m_grap2[2]->m_framebuffer_enable)
 					{
@@ -237,7 +233,7 @@ uint32_t galpani3_state::screen_update_galpani3(screen_device &screen, bitmap_rg
 					}
 					if ((sprdat & 0xc000) == 0x4000)
 					{
-						dst[drawx] = sprdat & 0x3fff;
+						dst[drawx] = paldata[sprdat & 0x3fff];
 					}
 					if (dat1 && m_grap2[0]->m_framebuffer_enable)
 					{
@@ -245,7 +241,7 @@ uint32_t galpani3_state::screen_update_galpani3(screen_device &screen, bitmap_rg
 					}
 					if ((sprdat & 0xc000) == 0x8000)
 					{
-						dst[drawx] = sprdat & 0x3fff;
+						dst[drawx] = paldata[sprdat & 0x3fff];
 					}
 					if (dat2 && m_grap2[1]->m_framebuffer_enable)
 					{
@@ -253,19 +249,19 @@ uint32_t galpani3_state::screen_update_galpani3(screen_device &screen, bitmap_rg
 					}
 					if ((sprdat & 0xc000) == 0xc000)
 					{
-						dst[drawx] = sprdat & 0x3fff;
+						dst[drawx] = paldata[sprdat & 0x3fff];
 					}
 				}
 				else if (pridat==0xcf) // the girl
 				{
 					if ((sprdat & 0xc000) == 0x0000)
 					{
-						dst[drawx] = sprdat & 0x3fff;
+						dst[drawx] = paldata[sprdat & 0x3fff];
 					}
 					FB_DRAW_PIXEL(0, 0x100);
 					if ((sprdat & 0xc000) == 0x4000)
 					{
-						dst[drawx] = sprdat & 0x3fff;
+						dst[drawx] = paldata[sprdat & 0x3fff];
 					}
 					if (m_grap2[1]->m_framebuffer_enable)
 					{
@@ -273,7 +269,7 @@ uint32_t galpani3_state::screen_update_galpani3(screen_device &screen, bitmap_rg
 					}
 					if ((sprdat & 0xc000) == 0x8000)
 					{
-						dst[drawx] = sprdat & 0x3fff;
+						dst[drawx] = paldata[sprdat & 0x3fff];
 					}
 					if (dat3 && m_grap2[2]->m_framebuffer_enable)
 					{
@@ -281,7 +277,7 @@ uint32_t galpani3_state::screen_update_galpani3(screen_device &screen, bitmap_rg
 					}
 					if ((sprdat & 0xc000) == 0xc000)
 					{
-						dst[drawx] = sprdat & 0x3fff;
+						dst[drawx] = paldata[sprdat & 0x3fff];
 					}
 				}
 				else
@@ -291,7 +287,7 @@ uint32_t galpani3_state::screen_update_galpani3(screen_device &screen, bitmap_rg
 					   enable -- see fading in intro */
 					if ((sprdat & 0xc000) == 0x0000)
 					{
-						dst[drawx] = sprdat & 0x3fff;
+						dst[drawx] = paldata[sprdat & 0x3fff];
 					}
 					if (dat1 && m_grap2[0]->m_framebuffer_enable)
 					{
@@ -299,7 +295,7 @@ uint32_t galpani3_state::screen_update_galpani3(screen_device &screen, bitmap_rg
 					}
 					if ((sprdat & 0xc000) == 0x4000)
 					{
-						dst[drawx] = sprdat & 0x3fff;
+						dst[drawx] = paldata[sprdat & 0x3fff];
 					}
 					if (dat2 && m_grap2[1]->m_framebuffer_enable)
 					{
@@ -307,7 +303,7 @@ uint32_t galpani3_state::screen_update_galpani3(screen_device &screen, bitmap_rg
 					}
 					if ((sprdat & 0xc000) == 0x8000)
 					{
-						dst[drawx] = sprdat & 0x3fff;
+						dst[drawx] = paldata[sprdat & 0x3fff];
 					}
 					if (dat3 && m_grap2[2]->m_framebuffer_enable)
 					{
@@ -315,7 +311,7 @@ uint32_t galpani3_state::screen_update_galpani3(screen_device &screen, bitmap_rg
 					}
 					if ((sprdat & 0xc000) == 0xc000)
 					{
-						dst[drawx] = sprdat & 0x3fff;
+						dst[drawx] = paldata[sprdat & 0x3fff];
 					}
 				}
 
