@@ -142,7 +142,7 @@ device_memory_interface::space_config_vector diablo1300_cpu_device::memory_space
 }
 
 //-------------------------------------------------
-//  disaassemble - call the disadiablobly
+//  disassemble - call the disassembly
 //  helper function
 //-------------------------------------------------
 

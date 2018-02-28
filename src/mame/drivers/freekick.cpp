@@ -936,7 +936,7 @@ ROM_START( pbillrd )
 	ROM_LOAD( "82s129.3c", 0x0500, 0x0100, CRC(cc1657e5) SHA1(358f20dce376c2389009f9673ce38b297af863f6) )
 ROM_END
 
-ROM_START( pbillrds ) /* Encrytped with a Sega MC-8123 (317-0030) CPU module, Sega ID# 836-6304 PERFECT BILLIARD */
+ROM_START( pbillrds ) /* Encrypted with a Sega MC-8123 (317-0030) CPU module, Sega ID# 836-6304 PERFECT BILLIARD */
 	ROM_REGION( 0x10000, "maincpu", 0 ) /* Z80 Code */
 	ROM_LOAD( "epr-10626.8n",  0x0000, 0x4000, CRC(51d725e6) SHA1(d7007c983530780e7fa3686cb7a6d7c382c802fa) ) /* encrypted */
 	ROM_LOAD( "epr-10625.8r",  0x4000, 0x8000, CRC(8977c724) SHA1(f00835a04dc6fa7d8c1e382dace515f2aa7d6f44) ) /* encrypted */
