@@ -14,13 +14,13 @@
 #define K054539_CB_MEMBER(_name)   void _name(double left, double right)
 
 #define MCFG_K054539_APAN_CB(_class, _method) \
-		k054539_device::set_analog_callback(*device, k054539_device::cb_delegate(&_class::_method, #_class "::" #_method, this));
+	downcast<k054539_device &>(*device).set_analog_callback(k054539_device::cb_delegate(&_class::_method, #_class "::" #_method, this));
 
 #define MCFG_K054539_REGION_OVERRRIDE(_region) \
-		k054539_device::set_override(*device, "^" _region);
+	downcast<k054539_device &>(*device).set_override("^" _region);
 
 #define MCFG_K054539_TIMER_HANDLER(_devcb) \
-		devcb = &k054539_device::set_timer_handler(*device, DEVCB_##_devcb);
+	devcb = &downcast<k054539_device &>(*device).set_timer_handler(DEVCB_##_devcb);
 
 
 class k054539_device : public device_t,
@@ -41,9 +41,9 @@ public:
 	// construction/destruction
 	k054539_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
-	// static configuration helpers
-	static void set_analog_callback(device_t &device, cb_delegate &&cb) { downcast<k054539_device &>(device).m_apan_cb = std::move(cb); }
-	template <class Object> static devcb_base &set_timer_handler(device_t &device, Object &&cb) { return downcast<k054539_device &>(device).m_timer_handler.set_callback(std::forward<Object>(cb)); }
+	// configuration helpers
+	template <typename Object> void set_analog_callback(Object &&cb) { m_apan_cb = std::forward<Object>(cb); }
+	template <class Object> devcb_base &set_timer_handler(Object &&cb) { return m_timer_handler.set_callback(std::forward<Object>(cb)); }
 
 
 	DECLARE_WRITE8_MEMBER(write);

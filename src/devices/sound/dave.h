@@ -32,13 +32,13 @@
 
 
 #define MCFG_DAVE_IRQ_CALLBACK(_write) \
-	devcb = &dave_device::set_irq_wr_callback(*device, DEVCB_##_write);
+	devcb = &downcast<dave_device &>(*device).set_irq_wr_callback(DEVCB_##_write);
 
 #define MCFG_DAVE_LH_CALLBACK(_write) \
-	devcb = &dave_device::set_lh_wr_callback(*device, DEVCB_##_write);
+	devcb = &downcast<dave_device &>(*device).set_lh_wr_callback(DEVCB_##_write);
 
 #define MCFG_DAVE_RH_CALLBACK(_write) \
-	devcb = &dave_device::set_rh_wr_callback(*device, DEVCB_##_write);
+	devcb = &downcast<dave_device &>(*device).set_rh_wr_callback(DEVCB_##_write);
 
 
 
@@ -55,9 +55,9 @@ class dave_device : public device_t,
 public:
 	dave_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
-	template <class Object> static devcb_base &set_irq_wr_callback(device_t &device, Object &&cb) { return downcast<dave_device &>(device).m_write_irq.set_callback(std::forward<Object>(cb)); }
-	template <class Object> static devcb_base &set_lh_wr_callback(device_t &device, Object &&cb) { return downcast<dave_device &>(device).m_write_lh.set_callback(std::forward<Object>(cb)); }
-	template <class Object> static devcb_base &set_rh_wr_callback(device_t &device, Object &&cb) { return downcast<dave_device &>(device).m_write_rh.set_callback(std::forward<Object>(cb)); }
+	template <class Object> devcb_base &set_irq_wr_callback(Object &&cb) { return m_write_irq.set_callback(std::forward<Object>(cb)); }
+	template <class Object> devcb_base &set_lh_wr_callback(Object &&cb) { return m_write_lh.set_callback(std::forward<Object>(cb)); }
+	template <class Object> devcb_base &set_rh_wr_callback(Object &&cb) { return m_write_rh.set_callback(std::forward<Object>(cb)); }
 
 	virtual void z80_program_map(address_map &map);
 	virtual void z80_io_map(address_map &map);

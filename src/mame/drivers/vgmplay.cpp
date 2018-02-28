@@ -1248,8 +1248,8 @@ void vgmplay_state::machine_start()
 				uint8_t type = r8(0x78);
 				if (type & 0x10)
 				{
-					ay8910_device::set_psg_type(*m_ay8910[0], ay8910_device::PSG_TYPE_YM);
-					ay8910_device::set_psg_type(*m_ay8910[1], ay8910_device::PSG_TYPE_YM);
+					m_ay8910[0]->set_psg_type(ay8910_device::PSG_TYPE_YM);
+					m_ay8910[1]->set_psg_type(ay8910_device::PSG_TYPE_YM);
 				}
 			}
 			if(version >= 0x151 && r8(0x79)) {
@@ -1261,8 +1261,8 @@ void vgmplay_state::machine_start()
 					to_set |= AY8910_SINGLE_OUTPUT;
 				if (flags & 4)
 					to_set |= AY8910_DISCRETE_OUTPUT;
-				ay8910_device::set_flags(*m_ay8910[0], to_set);
-				ay8910_device::set_flags(*m_ay8910[1], to_set);
+				m_ay8910[0]->set_flags(to_set);
+				m_ay8910[1]->set_flags(to_set);
 			}
 			if(version >= 0x151 && r8(0x7a)) {
 				uint8_t flags = r8(0x7a);
@@ -1273,8 +1273,8 @@ void vgmplay_state::machine_start()
 					to_set |= AY8910_SINGLE_OUTPUT;
 				if (flags & 4)
 					to_set |= AY8910_DISCRETE_OUTPUT;
-				ay8910_device::set_flags(*m_ym2203[0], to_set);
-				ay8910_device::set_flags(*m_ym2203[1], to_set);
+				m_ym2203[0]->set_flags(to_set);
+				m_ym2203[1]->set_flags(to_set);
 			}
 		}
 
@@ -1306,13 +1306,13 @@ void vgmplay_state::machine_start()
 					m_okim6295_clock[0] &= ~0x80000000;
 					m_okim6295_pin7[0] = 1;
 				}
-				okim6295_device::static_set_pin7(*m_okim6295[0], m_okim6295_pin7[0]);
+				m_okim6295[0]->config_pin7(m_okim6295_pin7[0]);
 				m_okim6295[0]->set_unscaled_clock(m_okim6295_clock[0] & ~0xc0000000);
 				if (m_okim6295_clock[0] & 0x40000000) {
 					m_okim6295_clock[0] &= ~0x40000000;
 					m_okim6295_clock[1] = m_okim6295_clock[0];
 					m_okim6295_pin7[1] = m_okim6295_pin7[0];
-					okim6295_device::static_set_pin7(*m_okim6295[1], m_okim6295_pin7[1]);
+					m_okim6295[1]->config_pin7(m_okim6295_pin7[1]);
 					m_okim6295[1]->set_unscaled_clock(m_okim6295_clock[1]);
 				}
 			}
@@ -1349,7 +1349,7 @@ void vgmplay_state::machine_start()
 		if (data_start > 0xc0)
 		{
 			if(version >= 0x171 && r8(0xd6)) {
-				c352_device::static_set_divider(*m_c352, r8(0xd6) * 4);
+				m_c352->set_divider(r8(0xd6) * 4);
 			}
 			if(version >= 0x171 && r32(0xdc)) {
 				m_c352->set_unscaled_clock(r32(0xdc));
@@ -1408,7 +1408,7 @@ WRITE8_MEMBER(vgmplay_state::okim6295_pin7_w)
 	if ((data & mem_mask) != (m_okim6295_pin7[Chip] & mem_mask))
 	{
 		COMBINE_DATA(&m_okim6295_pin7[Chip]);
-		okim6295_device::static_set_pin7(*m_okim6295[Chip], m_okim6295_pin7[Chip]);
+		m_okim6295[Chip]->config_pin7(m_okim6295_pin7[Chip]);
 	}
 }
 

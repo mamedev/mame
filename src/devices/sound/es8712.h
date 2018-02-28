@@ -16,7 +16,7 @@
 #define MCFG_ES8712_REPLACE(_tag, _clock) \
 	MCFG_DEVICE_REPLACE(_tag, ES8712, _clock)
 #define MCFG_ES8712_RESET_HANDLER(_devcb) \
-	devcb = &es8712_device::set_reset_handler(*device, DEVCB_##_devcb);
+	devcb = &downcast<es8712_device &>(*device).set_reset_handler(DEVCB_##_devcb);
 
 
 //**************************************************************************
@@ -31,8 +31,8 @@ class es8712_device : public device_t, public device_sound_interface
 public:
 	es8712_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
-	// static configuration
-	template <class Object> static devcb_base &set_reset_handler(device_t &device, Object &&cb) { return downcast<es8712_device &>(device).m_reset_handler.set_callback(std::forward<Object>(cb)); }
+	// configuration
+	template <class Object> devcb_base &set_reset_handler(Object &&cb) { return m_reset_handler.set_callback(std::forward<Object>(cb)); }
 
 	DECLARE_WRITE8_MEMBER(write);
 	DECLARE_READ8_MEMBER(read);

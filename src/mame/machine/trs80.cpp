@@ -613,7 +613,7 @@ WRITE8_MEMBER( trs80_state::trs80_ff_w )
 	{
 		init = 1;
 		static int16_t speaker_levels[4] = { 0, -32768, 0, 32767 };
-		m_speaker->static_set_levels(*m_speaker, 4, speaker_levels);
+		m_speaker->set_levels(4, speaker_levels);
 
 	}
 	/* Speaker for System-80 MK II - only sounds if relay is off */

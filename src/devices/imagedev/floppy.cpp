@@ -1107,7 +1107,7 @@ void floppy_sound_device::device_start()
 {
 	// What kind of drive do we have?
 	bool is525 = strstr(tag(), "525") != nullptr;
-	static_set_samples_names(*this, is525? floppy525_sample_names : floppy35_sample_names);
+	set_samples_names(is525? floppy525_sample_names : floppy35_sample_names);
 
 	m_motor_on = false;
 

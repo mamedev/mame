@@ -10,7 +10,7 @@ class sp0250_device : public device_t, public device_sound_interface
 public:
 	sp0250_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
-	template <class Object> static devcb_base &set_drq_callback(device_t &device, Object &&cb) { return downcast<sp0250_device &>(device).m_drq.set_callback(std::forward<Object>(cb)); }
+	template <class Object> devcb_base &set_drq_callback(Object &&cb) { return m_drq.set_callback(std::forward<Object>(cb)); }
 
 	DECLARE_WRITE8_MEMBER( write );
 	uint8_t drq_r();
@@ -50,6 +50,6 @@ private:
 DECLARE_DEVICE_TYPE(SP0250, sp0250_device)
 
 #define MCFG_SP0250_DRQ_CALLBACK(_write) \
-	devcb = &sp0250_device::set_drq_callback(*device, DEVCB_##_write);
+	devcb = &downcast<sp0250_device &>(*device).set_drq_callback(DEVCB_##_write);
 
 #endif // MAME_SOUND_SP0250_H
