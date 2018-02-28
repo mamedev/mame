@@ -165,7 +165,7 @@ TODO: - Distinguish door switches using manual
 
 #include "video/awpvid.h"       //Fruit Machines Only
 
-#define MPU3_MASTER_CLOCK (XTAL(4'000'000))
+static constexpr XTAL MPU3_MASTER_CLOCK = 4_MHz_XTAL;
 
 /* Lookup table for CHR data */
 
@@ -184,6 +184,9 @@ public:
 		, m_reels(*this, "reel%u", 0U)
 		, m_meters(*this, "meters")
 		, m_vfd(*this, "vfd")
+		, m_triac(*this, "triac%u", 0U)
+		, m_digit(*this, "digit%u", 0U)
+		, m_lamp(*this, "lamp%u", 0U)
 	{ }
 
 	DECLARE_DRIVER_INIT(m3hprvpr);
@@ -224,7 +227,6 @@ protected:
 	void ic11_update();
 	void ic21_output(int data);
 	void ic21_setup();
-	void mpu3_config_common();
 
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
@@ -265,6 +267,9 @@ private:
 	required_device_array<stepper_device, 4> m_reels;
 	required_device<meters_device> m_meters;
 	optional_device<roc10937_device> m_vfd;
+	output_finder<8> m_triac;
+	output_finder<8> m_digit;
+	output_finder<8 * 8> m_lamp;
 };
 
 #define DISPLAY_PORT 0
@@ -274,14 +279,11 @@ private:
 
 void mpu3_state::update_triacs()
 {
-	int i,triacdata;
+	int const triacdata = m_triac_ic3 + (m_triac_ic4 << 8) + (m_triac_ic5 << 9);
 
-	triacdata=m_triac_ic3 + (m_triac_ic4 << 8) + (m_triac_ic5 << 9);
-
-	for (i = 0; i < 8; i++)
-	{
-		output().set_indexed_value("triac", i, triacdata & (1 << i));
-	}
+	// FIXME: m_triac_ic4 and m_triac_ic5 won't be used because they're shifted past what's checked here
+	for (int i = 0; i < 8; i++)
+		m_triac[i] = BIT(triacdata, i);
 }
 
 /* called if board is reset */
@@ -352,18 +354,17 @@ void mpu3_state::ic11_update()
 			if (m_IC11G1)
 			{
 				if ( m_IC11GA )  m_input_strobe |= 0x01;
-				else                    m_input_strobe &= ~0x01;
+				else             m_input_strobe &= ~0x01;
 
 				if ( m_IC11GB )  m_input_strobe |= 0x02;
-				else                    m_input_strobe &= ~0x02;
+				else             m_input_strobe &= ~0x02;
 
 				if ( m_IC11GC )  m_input_strobe |= 0x04;
-				else                    m_input_strobe &= ~0x04;
+				else             m_input_strobe &= ~0x04;
 			}
 		}
 	}
-	else
-	if ((m_IC11G2A)||(m_IC11G2B)||(!m_IC11G1))
+	else if ((m_IC11G2A)||(m_IC11G2B)||(!m_IC11G1))
 	{
 		m_input_strobe = 0x00;
 	}
@@ -487,32 +488,31 @@ READ8_MEMBER(mpu3_state::pia_ic4_porta_r)
 /*  IC4, 7 seg leds */
 WRITE8_MEMBER(mpu3_state::pia_ic4_porta_w)
 {
-	int meter,swizzle;
 	LOG(("%s: IC4 PIA Port A Set to %2x (DISPLAY PORT)\n", machine().describe_context(),data));
 	m_ic4_input_a=data;
 	switch (m_disp_func)
 	{
-		case DISPLAY_PORT:
+	case DISPLAY_PORT:
 		if(m_ic11_active)
 		{
 			if(m_led_strobe != m_input_strobe)
 			{
-				swizzle = ((m_ic4_input_a & 0x01) << 2)+(m_ic4_input_a & 0x02)+((m_ic4_input_a & 0x4) >> 2)+(m_ic4_input_a & 0x08)+((m_ic4_input_a & 0x10) << 2)+(m_ic4_input_a & 0x20)+((m_ic4_input_a & 0x40) >> 2);
-				output().set_digit_value(7 - m_input_strobe,swizzle);
+				int const swizzle = ((m_ic4_input_a & 0x01) << 2)+(m_ic4_input_a & 0x02)+((m_ic4_input_a & 0x4) >> 2)+(m_ic4_input_a & 0x08)+((m_ic4_input_a & 0x10) << 2)+(m_ic4_input_a & 0x20)+((m_ic4_input_a & 0x40) >> 2);
+				m_digit[7 - m_input_strobe] = swizzle;
 			}
 			m_led_strobe = m_input_strobe;
 		}
 		break;
 
-		case METER_PORT:
-		for (meter = 0; meter < 6; meter ++)
+	case METER_PORT:
+		for (int meter = 0; meter < 6; meter ++)
 		{
-			swizzle = ((m_ic4_input_a ^ 0xff) & 0x3f);
-			m_meters->update(meter, (swizzle & (1 << meter)));
+			int const swizzle = ((m_ic4_input_a ^ 0xff) & 0x3f);
+			m_meters->update(meter, swizzle & (1 << meter));
 		}
 		break;
 
-		case BWB_FUNCTIONALITY:
+	case BWB_FUNCTIONALITY:
 			//Need to find a game to work this out, MFME has a specific option for it, but I see no activity there.
 		break;
 
@@ -522,8 +522,7 @@ WRITE8_MEMBER(mpu3_state::pia_ic4_porta_w)
 WRITE8_MEMBER(mpu3_state::pia_ic4_portb_w)
 {
 	LOG(("%s: IC4 PIA Port B Set to %2x (Lamp)\n", machine().describe_context(),data));
-	int i;
-	if(m_ic11_active)
+	if (m_ic11_active)
 	{
 		if (m_lamp_strobe != m_input_strobe)
 		{
@@ -531,10 +530,9 @@ WRITE8_MEMBER(mpu3_state::pia_ic4_portb_w)
 			// As a consequence, the lamp column data can change before the input strobe (effectively writing 0 to the previous strobe)
 			// without causing the relevant lamps to black out.
 
-			for (i = 0; i < 8; i++)
-			{
-				output().set_lamp_value((8*m_input_strobe)+i, ((data  & (1 << i)) !=0));
-			}
+			for (int i = 0; i < 8; i++)
+				m_lamp[(m_input_strobe << 3)|i] = BIT(data, i);
+
 			m_lamp_strobe = m_input_strobe;
 		}
 	}
@@ -734,14 +732,13 @@ static INPUT_PORTS_START( mpu3 )
 INPUT_PORTS_END
 
 /* Common configurations */
-void mpu3_state::mpu3_config_common()
-{
-	m_ic21_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(mpu3_state::ic21_timeout),this));
-}
-
 void mpu3_state::machine_start()
 {
-	mpu3_config_common();
+	m_ic21_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(mpu3_state::ic21_timeout),this));
+
+	m_triac.resolve();
+	m_digit.resolve();
+	m_lamp.resolve();
 }
 /*
 Characteriser (CHR)

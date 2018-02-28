@@ -63,19 +63,22 @@ public:
 		m_ldv1000(*this, "ld_ldv1000"),
 		m_pr7820(*this, "ld_pr7820"),
 		m_22vp932(*this, "ld_22vp932"),
-		m_videoram(*this, "videoram")
+		m_videoram(*this, "videoram"),
+		m_digits(*this, "digit%u", 0U)
 	{
 	}
 
-	required_device<cpu_device> m_maincpu;
-	optional_device<speaker_sound_device> m_speaker;
-	optional_device<gfxdecode_device> m_gfxdecode;
-	optional_device<palette_device> m_palette;
-	optional_device<pioneer_ldv1000_device> m_ldv1000;
-	optional_device<pioneer_pr7820_device> m_pr7820;
-	optional_device<phillips_22vp932_device> m_22vp932;
-	optional_shared_ptr<uint8_t> m_videoram;
+	DECLARE_CUSTOM_INPUT_MEMBER(laserdisc_status_r);
+	DECLARE_CUSTOM_INPUT_MEMBER(laserdisc_command_r);
+	DECLARE_DRIVER_INIT(fixed);
+	DECLARE_DRIVER_INIT(variable);
 
+	void dlair_base(machine_config &config);
+	void dlair_pr7820(machine_config &config);
+	void dleuro(machine_config &config);
+	void dlair_ldv1000(machine_config &config);
+
+protected:
 	void laserdisc_data_w(uint8_t data)
 	{
 		if (m_ldv1000 != nullptr) m_ldv1000->data_w(data);
@@ -115,30 +118,35 @@ public:
 		return CLEAR_LINE;
 	}
 
-	uint8_t m_last_misc;
-	uint8_t m_laserdisc_data;
 	DECLARE_WRITE8_MEMBER(misc_w);
 	DECLARE_WRITE8_MEMBER(dleuro_misc_w);
 	DECLARE_WRITE8_MEMBER(led_den1_w);
 	DECLARE_WRITE8_MEMBER(led_den2_w);
 	DECLARE_READ8_MEMBER(laserdisc_r);
 	DECLARE_WRITE8_MEMBER(laserdisc_w);
-	DECLARE_CUSTOM_INPUT_MEMBER(laserdisc_status_r);
-	DECLARE_CUSTOM_INPUT_MEMBER(laserdisc_command_r);
-	DECLARE_DRIVER_INIT(fixed);
-	DECLARE_DRIVER_INIT(variable);
-	DECLARE_MACHINE_START(dlair);
-	DECLARE_MACHINE_RESET(dlair);
+	virtual void machine_start() override;
+	virtual void machine_reset() override;
 	DECLARE_PALETTE_INIT(dleuro);
 	uint32_t screen_update_dleuro(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	DECLARE_WRITE_LINE_MEMBER(write_speaker);
-	void dlair_base(machine_config &config);
-	void dlair_pr7820(machine_config &config);
-	void dleuro(machine_config &config);
-	void dlair_ldv1000(machine_config &config);
+
 	void dleuro_io_map(address_map &map);
 	void dleuro_map(address_map &map);
 	void dlus_map(address_map &map);
+
+private:
+	required_device<cpu_device> m_maincpu;
+	optional_device<speaker_sound_device> m_speaker;
+	optional_device<gfxdecode_device> m_gfxdecode;
+	optional_device<palette_device> m_palette;
+	optional_device<pioneer_ldv1000_device> m_ldv1000;
+	optional_device<pioneer_pr7820_device> m_pr7820;
+	optional_device<phillips_22vp932_device> m_22vp932;
+	optional_shared_ptr<uint8_t> m_videoram;
+	output_finder<16> m_digits;
+
+	uint8_t m_last_misc;
+	uint8_t m_laserdisc_data;
 };
 
 
@@ -239,12 +247,16 @@ uint32_t dlair_state::screen_update_dleuro(screen_device &screen, bitmap_ind16 &
  *
  *************************************/
 
-MACHINE_START_MEMBER(dlair_state,dlair)
+void dlair_state::machine_start()
 {
+	m_digits.resolve();
+
+	save_item(NAME(m_last_misc));
+	save_item(NAME(m_laserdisc_data));
 }
 
 
-MACHINE_RESET_MEMBER(dlair_state,dlair)
+void dlair_state::machine_reset()
 {
 #if 0
 
@@ -317,13 +329,13 @@ WRITE8_MEMBER(dlair_state::dleuro_misc_w)
 
 WRITE8_MEMBER(dlair_state::led_den1_w)
 {
-	output().set_digit_value(0 + (offset & 7), led_map[data & 0x0f]);
+	m_digits[0 | (offset & 7)] = led_map[data & 0x0f];
 }
 
 
 WRITE8_MEMBER(dlair_state::led_den2_w)
 {
-	output().set_digit_value(8 + (offset & 7), led_map[data & 0x0f]);
+	m_digits[8 | (offset & 7)] = led_map[data & 0x0f];
 }
 
 
@@ -721,9 +733,6 @@ MACHINE_CONFIG_START(dlair_state::dlair_base)
 	MCFG_CPU_PROGRAM_MAP(dlus_map)
 	MCFG_CPU_PERIODIC_INT_DRIVER(dlair_state, irq0_line_hold,  (double)MASTER_CLOCK_US/8/16/16/16/16)
 
-	MCFG_MACHINE_START_OVERRIDE(dlair_state,dlair)
-	MCFG_MACHINE_RESET_OVERRIDE(dlair_state,dlair)
-
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
 
@@ -770,9 +779,6 @@ MACHINE_CONFIG_START(dlair_state::dleuro)
 
 	MCFG_WATCHDOG_ADD("watchdog")
 	MCFG_WATCHDOG_TIME_INIT(attotime::from_hz(MASTER_CLOCK_EURO/(16*16*16*16*16*8)))
-
-	MCFG_MACHINE_START_OVERRIDE(dlair_state,dlair)
-	MCFG_MACHINE_RESET_OVERRIDE(dlair_state,dlair)
 
 	MCFG_LASERDISC_22VP932_ADD("ld_22vp932")
 	MCFG_LASERDISC_OVERLAY_DRIVER(256, 256, dlair_state, screen_update_dleuro)

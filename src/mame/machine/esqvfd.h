@@ -33,7 +33,7 @@ public:
 	uint32_t conv_segments(uint16_t segin);
 
 protected:
-	esqvfd_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock);
+	esqvfd_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock, int rows, int cols);
 
 	static constexpr uint8_t AT_NORMAL      = 0x00;
 	static constexpr uint8_t AT_BOLD        = 0x01;
@@ -47,7 +47,7 @@ protected:
 
 	int m_cursx, m_cursy;
 	int m_savedx, m_savedy;
-	int m_rows, m_cols;
+	int const m_rows, m_cols;
 	uint8_t m_curattr;
 	uint8_t m_lastchar;
 	uint8_t m_chars[2][40];

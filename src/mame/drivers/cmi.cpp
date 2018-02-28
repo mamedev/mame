@@ -447,6 +447,7 @@ public:
 		, m_keypad_a_port(*this, "KEYPAD_A")
 		, m_keypad_b_port(*this, "KEYPAD_B")
 		, m_key_mux_ports{ { *this, "KEY_%u_0", 0 }, { *this, "KEY_%u_1", 0 }, { *this, "KEY_%u_2", 0 }, { *this, "KEY_%u_3", 0 } }
+		, m_digit(*this, "digit%u", 0U)
 		, m_cmi07_ram(*this, "cmi07_ram")
 	{
 	}
@@ -547,9 +548,7 @@ public:
 	DECLARE_WRITE_LINE_MEMBER( cmi10_u20_cb2_w );
 	DECLARE_WRITE_LINE_MEMBER( cmi10_u21_cb2_w );
 	DECLARE_READ8_MEMBER( cmi10_u21_a_r );
-	DECLARE_WRITE16_MEMBER( cmi_iix_update_dp1 );
-	DECLARE_WRITE16_MEMBER( cmi_iix_update_dp2 );
-	DECLARE_WRITE16_MEMBER( cmi_iix_update_dp3 );
+	template <unsigned N> DECLARE_WRITE16_MEMBER( cmi_iix_update_dp );
 
 	DECLARE_WRITE_LINE_MEMBER( msm5832_irq );
 	DECLARE_WRITE_LINE_MEMBER( mkbd_kbd_acia_int );
@@ -564,8 +563,8 @@ public:
 	void maincpu2_map(address_map &map);
 	void midicpu_map(address_map &map);
 	void muskeys_map(address_map &map);
-protected:
 
+protected:
 	required_device<mc6809e_device> m_maincpu1;
 	required_device<mc6809e_device> m_maincpu2;
 	required_device<m6802_cpu_device> m_muskeyscpu;
@@ -625,6 +624,8 @@ protected:
 	required_ioport m_keypad_b_port;
 
 	required_ioport_array<3> m_key_mux_ports[4];
+
+	output_finder<12> m_digit;
 
 	required_shared_ptr<uint8_t> m_cmi07_ram;
 
@@ -2506,19 +2507,9 @@ WRITE_LINE_MEMBER( cmi_state::cmi10_u20_cb2_w )
 	m_dp3->wr_w(state);
 }
 
-WRITE16_MEMBER( cmi_state::cmi_iix_update_dp1 )
+template <unsigned N> WRITE16_MEMBER( cmi_state::cmi_iix_update_dp )
 {
-	output().set_digit_value(0 + (offset ^ 3), data);
-}
-
-WRITE16_MEMBER( cmi_state::cmi_iix_update_dp2 )
-{
-	output().set_digit_value(4 + (offset ^ 3), data);
-}
-
-WRITE16_MEMBER( cmi_state::cmi_iix_update_dp3 )
-{
-	output().set_digit_value(8 + (offset ^ 3), data);
+	m_digit[(N << 2) | ((offset ^ 3) & 3)] = data;
 }
 
 /* Begin Conversion */
@@ -2700,6 +2691,8 @@ void cmi_state::machine_reset()
 
 void cmi_state::machine_start()
 {
+	m_digit.resolve();
+
 	m_q133_rom = (uint8_t *)m_q133_region->base();
 
 	// allocate timers for the built-in two channel timer
@@ -2776,11 +2769,11 @@ MACHINE_CONFIG_START(cmi_state::cmi2x)
 
 	/* alpha-numeric display */
 	MCFG_DEVICE_ADD("dp1", DL1416T, 0)
-	MCFG_DL1416_UPDATE_HANDLER(WRITE16(cmi_state, cmi_iix_update_dp1))
+	MCFG_DL1416_UPDATE_HANDLER(WRITE16(cmi_state, cmi_iix_update_dp<0>))
 	MCFG_DEVICE_ADD("dp2", DL1416T, 0)
-	MCFG_DL1416_UPDATE_HANDLER(WRITE16(cmi_state, cmi_iix_update_dp2))
+	MCFG_DL1416_UPDATE_HANDLER(WRITE16(cmi_state, cmi_iix_update_dp<1>))
 	MCFG_DEVICE_ADD("dp3", DL1416T, 0)
-	MCFG_DL1416_UPDATE_HANDLER(WRITE16(cmi_state, cmi_iix_update_dp3))
+	MCFG_DL1416_UPDATE_HANDLER(WRITE16(cmi_state, cmi_iix_update_dp<2>))
 
 	/* video hardware */
 	MCFG_SCREEN_ADD_MONOCHROME("screen", RASTER, rgb_t::green())

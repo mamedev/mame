@@ -12,6 +12,9 @@
 #include "debug/debugcon.h"
 #include "debug/debugcmd.h"
 #include "debugger.h"
+
+#include <fstream>
+
  
 void model2_state::debug_init()
 {
@@ -54,59 +57,57 @@ void model2_state::debug_help_command(int ref, const std::vector<std::string> &p
 void model2_state::debug_geo_dasm_command(int ref, const std::vector<std::string> &params)
 {
 	debugger_console &con = machine().debugger().console();
-	FILE *f;
-	
+
 	if (params.size() < 2)
 	{
 		con.printf("Error: not enough parameters for m2 geodasm command\n");
 		return;
 	}
-	
+
 	if (params[1].empty() || params[1].length() > 127)
 	{
 		con.printf("Error: invalid filename parameter for m2 geodasm command\n");
 		return;
 	}
 
-	if((f = fopen( params[1].c_str(), "w" )) == nullptr)
+	std::ofstream f(params[1]);
+	if (!f)
 	{
 		con.printf("Error: while opening %s for writing\n",params[1].c_str());
 		return;
 	}
-		
-	int ptr;
-	bool end_code = false;
-	
+
 	// print some basic info on top
-	fprintf(f, "Dump Header info:\n");
-	fprintf(f, "GEO address: %08x %08x\n",m_geo_read_start_address+0x900000,m_geo_write_start_address+0x900000);
-	fprintf(f, "Screen Info: %lld %d %d\n",m_screen->frame_number(),m_screen->hpos(),m_screen->vpos());
-	fprintf(f, "====================\n");
+	util::stream_format(f, "Dump Header info:\n");
+	util::stream_format(f, "GEO address: %08x %08x\n",m_geo_read_start_address+0x900000,m_geo_write_start_address+0x900000);
+	util::stream_format(f, "Screen Info: %d %d %d\n",m_screen->frame_number(),m_screen->hpos(),m_screen->vpos());
+	util::stream_format(f, "====================\n");
 
-	ptr = m_geo_read_start_address/4;
+	int ptr = m_geo_read_start_address/4;
+	bool end_code = false;
 
-	while(end_code == false && ptr < 0x20000/4)
+	while (!end_code && ptr < 0x20000/4)
 	{
 		uint32_t opcode;
 		uint32_t attr;
-		
-		fprintf(f, "%08x: \t",ptr*4+0x900000);
+
+		util::stream_format(f, "%08x: \t",ptr*4+0x900000);
 		opcode = m_bufferram[ptr++];
-		
+
 		// parse jump opcode
 		if(opcode & 0x80000000)
 		{
 			// exit if the operand is illegal
 			if(opcode & ~0x8001ffff)
 			{
-				fprintf(f, "(illegal jump)");
+				util::stream_format(f, "(illegal jump)");
 				end_code = true;
 			}
 			else
 			{
 				// jump and print into dasm
 				ptr = (opcode & 0x1ffff) / 4;
-				fprintf(f, "jump %08x",opcode & 0x1ffff);
+				util::stream_format(f, "jump %08x",opcode & 0x1ffff);
 			}
 		}
 		else
@@ -117,16 +118,16 @@ void model2_state::debug_geo_dasm_command(int ref, const std::vector<std::string
 			{
 				// nop
 				case 0x00: 
-					fprintf(f, "nop");
+					util::stream_format(f, "nop");
 					break;
 				// object data display
 				case 0x01: 
-					fprintf(f, "object data  (point:%08x header:%08x start:%08x count:%08x)",m_bufferram[ptr],m_bufferram[ptr+1],m_bufferram[ptr+2],m_bufferram[ptr+3]);
+					util::stream_format(f, "object data  (point:%08x header:%08x start:%08x count:%08x)",m_bufferram[ptr],m_bufferram[ptr+1],m_bufferram[ptr+2],m_bufferram[ptr+3]);
 					ptr+=4;
 					break;
 				// direct object data display
 				case 0x02: 
-					fprintf(f, "direct data  (point:%08x header:%08x)",m_bufferram[ptr],m_bufferram[ptr+1]);
+					util::stream_format(f, "direct data  (point:%08x header:%08x)",m_bufferram[ptr],m_bufferram[ptr+1]);
 					ptr+=2;
 					// skip first point
 					ptr+=6;
@@ -144,7 +145,7 @@ void model2_state::debug_geo_dasm_command(int ref, const std::vector<std::string
 					break;
 				// set display window
 				case 0x03:
-					fprintf(f, "window data  (");
+					util::stream_format(f, "window data  (");
 					for(attr=0;attr<6;attr++)
 					{
 						int x,y;
@@ -155,105 +156,105 @@ void model2_state::debug_geo_dasm_command(int ref, const std::vector<std::string
 						if(y & 0x800)
 							y = -( 0x800 - (y & 0x7FF) );
 
-						fprintf(f,"%d [%d,%d] ",attr,x,y);
+						util::stream_format(f,"%d [%d,%d] ",attr,x,y);
 					}
-					fprintf(f, ")");
+					util::stream_format(f, ")");
 					ptr+=6;
 					break;
 				// set texture color data to RAM
 				case 0x04: 
-					fprintf(f, "texture data  (start:%08x count:%08x)",m_bufferram[ptr],m_bufferram[ptr+1]);
+					util::stream_format(f, "texture data  (start:%08x count:%08x)",m_bufferram[ptr],m_bufferram[ptr+1]);
 					ptr+=(2+m_bufferram[ptr+1]);
 					break;
 				// set polygon data to RAM
 				case 0x05: 
 					attr = m_bufferram[ptr+1];
-					fprintf(f, "polygon data  (start:%08x count:%08x)",m_bufferram[ptr],attr);
+					util::stream_format(f, "polygon data  (start:%08x count:%08x)",m_bufferram[ptr],attr);
 					ptr+=(2+attr);
 					break;
 				// set texture params
 				case 0x06: 
 					attr = m_bufferram[ptr+1];
-					fprintf(f, "texture param  (start:%08x count:%08x)",m_bufferram[ptr],attr);
+					util::stream_format(f, "texture param  (start:%08x count:%08x)",m_bufferram[ptr],attr);
 					ptr+=(2+attr*2);
 					break;
 				// set mode
 				case 0x07: 
-					fprintf(f, "mode  (%08x)",m_bufferram[ptr]);
+					util::stream_format(f, "mode  (%08x)",m_bufferram[ptr]);
 					ptr++;
 					break;
 				// set z-sort mode
 				case 0x08: 
-					fprintf(f, "zsort  (%08x)",m_bufferram[ptr]);
+					util::stream_format(f, "zsort  (%08x)",m_bufferram[ptr]);
 					ptr++;
 					break;
 				// set focus
 				case 0x09: 
-					fprintf(f, "focus  [%f,%f]",u2f(m_bufferram[ptr]),u2f(m_bufferram[ptr+1]));
+					util::stream_format(f, "focus  [%f,%f]",u2f(m_bufferram[ptr]),u2f(m_bufferram[ptr+1]));
 					ptr+=2;
 					break;
 				// set parallel light
 				case 0x0a:
-					fprintf(f, "light  [%f,%f,%f]",u2f(m_bufferram[ptr]),u2f(m_bufferram[ptr+1]),u2f(m_bufferram[ptr+2]));
+					util::stream_format(f, "light  [%f,%f,%f]",u2f(m_bufferram[ptr]),u2f(m_bufferram[ptr+1]),u2f(m_bufferram[ptr+2]));
 					ptr+=3;
 					break;
 				// set transform matrix
 				case 0x0B: 
-					fprintf(f, "matrix ");
+					util::stream_format(f, "matrix ");
 					for(attr=0;attr<12;attr+=3)
-						fprintf(f,"[%f,%f,%f] ",u2f(m_bufferram[ptr]),u2f(m_bufferram[ptr+1]),u2f(m_bufferram[ptr+2]));
+						util::stream_format(f,"[%f,%f,%f] ",u2f(m_bufferram[ptr]),u2f(m_bufferram[ptr+1]),u2f(m_bufferram[ptr+2]));
 					
 					ptr+=12;
 					break;
 				// set translate matrix
 				case 0x0C: 
-					fprintf(f, "translate  [%f,%f,%f]",u2f(m_bufferram[ptr]),u2f(m_bufferram[ptr+1]),u2f(m_bufferram[ptr+2]));
+					util::stream_format(f, "translate  [%f,%f,%f]",u2f(m_bufferram[ptr]),u2f(m_bufferram[ptr+1]),u2f(m_bufferram[ptr+2]));
 					ptr+=3;
 					break;
 				// debug
 				case 0x0D:
-					fprintf(f, "debug  (%08x %08x)",m_bufferram[ptr],m_bufferram[ptr+1]);
+					util::stream_format(f, "debug  (%08x %08x)",m_bufferram[ptr],m_bufferram[ptr+1]);
 					ptr+=2;
 					break;
 				// test
 				case 0x0E: 
-					fprintf(f, "test  (blocks:%08x)",m_bufferram[ptr+32]);
+					util::stream_format(f, "test  (blocks:%08x)",m_bufferram[ptr+32]);
 					ptr+=32;
 					ptr+=m_bufferram[ptr]*3;
 					break;
 				// end code
 				case 0x0F: 
-					fprintf(f, "end");
+					util::stream_format(f, "end");
 					end_code = true;
 					break;
 				// dummy
 				case 0x10: 
-					fprintf(f, "dummy");
+					util::stream_format(f, "dummy");
 					ptr++;
 					break;
 				// log data
 				case 0x14: 
 					attr = m_bufferram[ptr+1];
-					fprintf(f, "log  (start:%08x count:%08x)",m_bufferram[ptr],attr);
+					util::stream_format(f, "log  (start:%08x count:%08x)",m_bufferram[ptr],attr);
 					ptr+=2+attr;
 					break;
 				// set lod mode
 				case 0x16: 
-					fprintf(f, "lod  (%f)",u2f(m_bufferram[ptr]));
+					util::stream_format(f, "lod  (%f)",u2f(m_bufferram[ptr]));
 					ptr++;
 					break;
 				// unknown opcode
 				default:
-					fprintf(f, "unk %02x",(opcode >> 23) & 0x1f);
+					util::stream_format(f, "unk %02x",(opcode >> 23) & 0x1f);
 					break;
 			}
 		}
 		
 		// append the raw opcode and new line here
-		fprintf(f,"\t%08x\n",opcode);
+		util::stream_format(f,"\t%08x\n",opcode);
 	}
-	
-	fclose( f );
+
+	f.close();
 	con.printf("Data dumped successfully\n");
 }
 

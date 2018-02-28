@@ -2137,8 +2137,8 @@ MACHINE_CONFIG_START(a400_state::atari_common_nodac)
 	MCFG_POKEY_POT7_R_CB(IOPORT("analog_7"))
 	MCFG_POKEY_SERIN_R_CB(DEVREAD8("fdc", atari_fdc_device, serin_r))
 	MCFG_POKEY_SEROUT_W_CB(DEVWRITE8("fdc", atari_fdc_device, serout_w))
-	MCFG_POKEY_KEYBOARD_CB(atari_common_state, a800_keyboard)
-	MCFG_POKEY_INTERRUPT_CB(atari_common_state, interrupt_cb)
+	MCFG_POKEY_KEYBOARD_CB(a400_state, a800_keyboard)
+	MCFG_POKEY_INTERRUPT_CB(a400_state, interrupt_cb)
 
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 1.0)
 MACHINE_CONFIG_END
@@ -2350,8 +2350,8 @@ MACHINE_CONFIG_START(a400_state::a5200)
 	MCFG_SOUND_MODIFY("pokey")
 	MCFG_POKEY_SERIN_R_CB(NOOP)
 	MCFG_POKEY_SEROUT_W_CB(NOOP)
-	MCFG_POKEY_KEYBOARD_CB(atari_common_state, a5200_keypads)
-	MCFG_POKEY_INTERRUPT_CB(atari_common_state, interrupt_cb)
+	MCFG_POKEY_KEYBOARD_CB(a400_state, a5200_keypads)
+	MCFG_POKEY_INTERRUPT_CB(a400_state, interrupt_cb)
 
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 1.0)
 

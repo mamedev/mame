@@ -60,7 +60,17 @@ public:
 	tk80_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag)
 		, m_maincpu(*this, "maincpu")
+		, m_digit(*this, "digit%u", 0U)
 	{ }
+
+	void ics8080(machine_config &config);
+	void tk80(machine_config &config);
+	void mikrolab(machine_config &config);
+	void nd80z(machine_config &config);
+	void tk85(machine_config &config);
+
+protected:
+	virtual void machine_start() override;
 
 	DECLARE_READ8_MEMBER(key_matrix_r);
 	DECLARE_READ8_MEMBER(nd80z_key_r);
@@ -69,34 +79,45 @@ public:
 	DECLARE_WRITE8_MEMBER(mikrolab_serial_w);
 	DECLARE_READ8_MEMBER(display_r);
 	DECLARE_WRITE8_MEMBER(display_w);
-	uint8_t m_term_data;
-	uint8_t m_keyb_press;
-	uint8_t m_keyb_press_flag;
-	uint8_t m_shift_press_flag;
-	uint8_t m_ppi_portc;
-	required_device<cpu_device> m_maincpu;
-	void ics8080(machine_config &config);
-	void tk80(machine_config &config);
-	void mikrolab(machine_config &config);
-	void nd80z(machine_config &config);
-	void tk85(machine_config &config);
+
 	void ics8080_mem(address_map &map);
 	void mikrolab_io(address_map &map);
 	void nd80z_io(address_map &map);
 	void tk80_io(address_map &map);
 	void tk80_mem(address_map &map);
 	void tk85_mem(address_map &map);
+
+private:
+	uint8_t m_term_data;
+	uint8_t m_keyb_press;
+	uint8_t m_keyb_press_flag;
+	uint8_t m_shift_press_flag;
+	uint8_t m_ppi_portc;
+
+	required_device<cpu_device> m_maincpu;
+	output_finder<8> m_digit;
 };
 
 
+void tk80_state::machine_start()
+{
+	m_digit.resolve();
+
+	save_item(NAME(m_term_data));
+	save_item(NAME(m_keyb_press));
+	save_item(NAME(m_keyb_press_flag));
+	save_item(NAME(m_shift_press_flag));
+	save_item(NAME(m_ppi_portc));
+}
+
 READ8_MEMBER( tk80_state::display_r )
 {
-	return output().get_digit_value(offset);
+	return m_digit[offset & 0x7];
 }
 
 WRITE8_MEMBER( tk80_state::display_w )
 {
-	output().set_digit_value(offset, data);
+	m_digit[offset & 0x7] = data;
 }
 
 ADDRESS_MAP_START(tk80_state::tk80_mem)
@@ -204,7 +225,7 @@ INPUT_PORTS_END
 
 READ8_MEMBER( tk80_state::key_matrix_r )
 {
-// PA0-7 keyscan in
+	// PA0-7 keyscan in
 
 	uint8_t data = 0xff;
 
@@ -220,16 +241,14 @@ READ8_MEMBER( tk80_state::key_matrix_r )
 
 READ8_MEMBER( tk80_state::nd80z_key_r )
 {
-// PA0-7 keyscan in
+	// PA0-7 keyscan in
 
 	uint8_t data = 0xff, row = m_ppi_portc & 7;
 	if (row == 6)
 		data &= ioport("X0")->read();
-	else
-	if (row == 5)
+	else if (row == 5)
 		data &= ioport("X1")->read();
-	else
-	if (row == 3)
+	else if (row == 3)
 		data &= ioport("X2")->read();
 
 	return data;
@@ -237,7 +256,7 @@ READ8_MEMBER( tk80_state::nd80z_key_r )
 
 READ8_MEMBER( tk80_state::serial_r )
 {
-// PB0 - serial in
+	// PB0 - serial in
 	//printf("B R\n");
 
 	return 0;
@@ -245,17 +264,17 @@ READ8_MEMBER( tk80_state::serial_r )
 
 WRITE8_MEMBER( tk80_state::serial_w )
 {
-// PC0 - serial out
-// PC4-6 keyscan out
-// PC7 - display on/off
+	// PC0 - serial out
+	// PC4-6 keyscan out
+	// PC7 - display on/off
 	m_ppi_portc = data ^ 0x70;
 }
 
 WRITE8_MEMBER( tk80_state::mikrolab_serial_w )
 {
-// PC0 - serial out
-// PC4-6 keyscan out
-// PC7 - display on/off
+	// PC0 - serial out
+	// PC4-6 keyscan out
+	// PC7 - display on/off
 	m_ppi_portc = data;
 }
 
@@ -290,7 +309,7 @@ MACHINE_CONFIG_START(tk80_state::mikrolab)
 MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(tk80_state::nd80z)
-	MCFG_CPU_ADD("maincpu", Z80, XTAL(1'000'000)) // Sharp LH0080A, can't see writing on xtal
+	MCFG_CPU_ADD("maincpu", Z80, 1e6 ) // Sharp LH0080A, can't see writing on xtal
 	MCFG_CPU_PROGRAM_MAP(tk85_mem)
 	MCFG_CPU_IO_MAP(nd80z_io)
 
@@ -355,8 +374,8 @@ ROM_END
 /* Driver */
 
 //    YEAR  NAME      PARENT  COMPAT  MACHINE   INPUT     CLASS       INIT  COMPANY      FULLNAME              FLAGS
-COMP( 1976, tk80,     0,      0,      tk80,     tk80,     tk80_state, 0,    "NEC",       "TK-80",              MACHINE_NO_SOUND_HW )
-COMP( 1980, nectk85,  tk80,   0,      tk85,     tk80,     tk80_state, 0,    "NEC",       "TK-85",              MACHINE_NO_SOUND_HW )
-COMP( 19??, nd80z,    tk80,   0,      nd80z,    tk80,     tk80_state, 0,    "Chunichi",  "ND-80Z",             MACHINE_NO_SOUND_HW )
-COMP( 19??, mikrolab, tk80,   0,      mikrolab, mikrolab, tk80_state, 0,    "<unknown>", "Mikrolab KR580IK80", MACHINE_NO_SOUND_HW )
-COMP( 19??, ics8080,  tk80,   0,      ics8080,  ics8080,  tk80_state, 0,    "<unknown>", "ICS8080",            MACHINE_NOT_WORKING | MACHINE_NO_SOUND_HW )
+COMP( 1976, tk80,     0,      0,      tk80,     tk80,     tk80_state, 0,    "NEC",       "TK-80",              MACHINE_SUPPORTS_SAVE | MACHINE_NO_SOUND_HW )
+COMP( 1980, nectk85,  tk80,   0,      tk85,     tk80,     tk80_state, 0,    "NEC",       "TK-85",              MACHINE_SUPPORTS_SAVE | MACHINE_NO_SOUND_HW )
+COMP( 19??, nd80z,    tk80,   0,      nd80z,    tk80,     tk80_state, 0,    "Chunichi",  "ND-80Z",             MACHINE_SUPPORTS_SAVE | MACHINE_NO_SOUND_HW )
+COMP( 19??, mikrolab, tk80,   0,      mikrolab, mikrolab, tk80_state, 0,    "<unknown>", "Mikrolab KR580IK80", MACHINE_SUPPORTS_SAVE | MACHINE_NO_SOUND_HW )
+COMP( 19??, ics8080,  tk80,   0,      ics8080,  ics8080,  tk80_state, 0,    "<unknown>", "ICS8080",            MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE | MACHINE_NO_SOUND_HW )

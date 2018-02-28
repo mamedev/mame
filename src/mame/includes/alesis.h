@@ -59,28 +59,32 @@ private:
 class alesis_state : public driver_device
 {
 public:
-	alesis_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag),
-			m_lcdc(*this, "hd44780"),
-			m_cassette(*this, "cassette"),
-			m_maincpu(*this, "maincpu"),
-			m_col1(*this, "COL1"),
-			m_col2(*this, "COL2"),
-			m_col3(*this, "COL3"),
-			m_col4(*this, "COL4"),
-			m_col5(*this, "COL5"),
-			m_col6(*this, "COL6"),
-			m_select(*this, "SELECT")
+	alesis_state(const machine_config &mconfig, device_type type, const char *tag) :
+		driver_device(mconfig, type, tag),
+		m_lcdc(*this, "hd44780"),
+		m_cassette(*this, "cassette"),
+		m_maincpu(*this, "maincpu"),
+		m_col1(*this, "COL1"),
+		m_col2(*this, "COL2"),
+		m_col3(*this, "COL3"),
+		m_col4(*this, "COL4"),
+		m_col5(*this, "COL5"),
+		m_col6(*this, "COL6"),
+		m_select(*this, "SELECT"),
+		m_track_led(*this, "track_led%u", 1U)
 	{ }
 
-	required_device<hd44780_device> m_lcdc;
-	optional_device<cassette_image_device> m_cassette;
+	DECLARE_DRIVER_INIT(hr16);
+	void mmt8(machine_config &config);
+	void hr16(machine_config &config);
+	void sr16(machine_config &config);
 
+protected:
 	DECLARE_PALETTE_INIT(alesis);
+	virtual void machine_start() override;
 	virtual void machine_reset() override;
 
 	void update_lcd_symbols(bitmap_ind16 &bitmap, uint8_t pos, uint8_t y, uint8_t x, int state);
-	DECLARE_DRIVER_INIT(hr16);
 	DECLARE_WRITE8_MEMBER( led_w );
 	DECLARE_WRITE8_MEMBER( mmt8_led_w );
 	DECLARE_READ8_MEMBER( mmt8_led_r );
@@ -94,19 +98,21 @@ public:
 	DECLARE_WRITE8_MEMBER( sr16_lcd_w );
 	HD44780_PIXEL_UPDATE(sr16_pixel_update);
 
-	void mmt8(machine_config &config);
-	void hr16(machine_config &config);
-	void sr16(machine_config &config);
 	void hr16_io(address_map &map);
 	void hr16_mem(address_map &map);
 	void mmt8_io(address_map &map);
 	void sr16_io(address_map &map);
 	void sr16_mem(address_map &map);
+
 private:
 	uint8_t       m_kb_matrix;
 	uint8_t       m_leds;
 	uint8_t       m_lcd_digits[5];
+
+	required_device<hd44780_device> m_lcdc;
+	optional_device<cassette_image_device> m_cassette;
 	required_device<cpu_device> m_maincpu;
+
 	required_ioport m_col1;
 	required_ioport m_col2;
 	required_ioport m_col3;
@@ -114,6 +120,7 @@ private:
 	required_ioport m_col5;
 	required_ioport m_col6;
 	optional_ioport m_select;
+	output_finder<8> m_track_led;
 };
 
 // device type definition

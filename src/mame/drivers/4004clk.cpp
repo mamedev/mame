@@ -21,18 +21,24 @@
 class nixieclock_state : public driver_device
 {
 public:
-	nixieclock_state(const machine_config &mconfig, device_type type, const char *tag) : driver_device(mconfig, type, tag) { }
+	nixieclock_state(const machine_config &mconfig, device_type type, const char *tag)
+		: driver_device(mconfig, type, tag)
+		, m_nixie_out(*this, "nixie%u", 0U)
+		, m_neon_out(*this, "neon%u", 0U)
+	{ }
 
+	void _4004clk(machine_config &config);
+
+protected:
 	DECLARE_WRITE8_MEMBER( nixie_w );
 	DECLARE_WRITE8_MEMBER( neon_w );
 
-	void _4004clk(machine_config &config);
 	void _4004clk_mem(address_map &map);
 	void _4004clk_mp(address_map &map);
 	void _4004clk_rom(address_map &map);
 	void _4004clk_rp(address_map &map);
 	void _4004clk_stat(address_map &map);
-protected:
+
 	virtual void machine_start() override;
 
 private:
@@ -52,36 +58,28 @@ private:
 				10;
 	}
 
-	void output_set_nixie_value(int index, int value)
-	{
-		output().set_indexed_value("nixie", index, value);
-	}
-
-	void output_set_neon_value(int index, int value)
-	{
-		output().set_indexed_value("neon", index, value);
-	}
-
 	uint16_t m_nixie[16];
+	output_finder<6> m_nixie_out;
+	output_finder<4> m_neon_out;
 };
 
 WRITE8_MEMBER(nixieclock_state::nixie_w)
 {
 	m_nixie[offset >> 4] = data;
-	output_set_nixie_value(5, nixie_to_num(((m_nixie[2] & 3)<<8) | (m_nixie[1] << 4) | m_nixie[0]));
-	output_set_nixie_value(4, nixie_to_num((m_nixie[4] << 6) | (m_nixie[3] << 2) | (m_nixie[2] >>2)));
-	output_set_nixie_value(3, nixie_to_num(((m_nixie[7] & 3)<<8) | (m_nixie[6] << 4) | m_nixie[5]));
-	output_set_nixie_value(2, nixie_to_num((m_nixie[9] << 6) | (m_nixie[8] << 2) | (m_nixie[7] >>2)));
-	output_set_nixie_value(1, nixie_to_num(((m_nixie[12] & 3)<<8) | (m_nixie[11] << 4) | m_nixie[10]));
-	output_set_nixie_value(0, nixie_to_num((m_nixie[14] << 6) | (m_nixie[13] << 2) | (m_nixie[12] >>2)));
+	m_nixie_out[5] = nixie_to_num(((m_nixie[2] & 3)<<8) | (m_nixie[1] << 4) | m_nixie[0]);
+	m_nixie_out[4] = nixie_to_num((m_nixie[4] << 6) | (m_nixie[3] << 2) | (m_nixie[2] >>2));
+	m_nixie_out[3] = nixie_to_num(((m_nixie[7] & 3)<<8) | (m_nixie[6] << 4) | m_nixie[5]);
+	m_nixie_out[2] = nixie_to_num((m_nixie[9] << 6) | (m_nixie[8] << 2) | (m_nixie[7] >>2));
+	m_nixie_out[1] = nixie_to_num(((m_nixie[12] & 3)<<8) | (m_nixie[11] << 4) | m_nixie[10]);
+	m_nixie_out[0] = nixie_to_num((m_nixie[14] << 6) | (m_nixie[13] << 2) | (m_nixie[12] >>2));
 }
 
 WRITE8_MEMBER(nixieclock_state::neon_w)
 {
-	output_set_neon_value(0, BIT(data,3));
-	output_set_neon_value(1, BIT(data,2));
-	output_set_neon_value(2, BIT(data,1));
-	output_set_neon_value(3, BIT(data,0));
+	m_neon_out[0] = BIT(data,3);
+	m_neon_out[1] = BIT(data,2);
+	m_neon_out[2] = BIT(data,1);
+	m_neon_out[3] = BIT(data,0);
 }
 
 ADDRESS_MAP_START(nixieclock_state::_4004clk_rom)
@@ -125,6 +123,9 @@ INPUT_PORTS_END
 
 void nixieclock_state::machine_start()
 {
+	m_nixie_out.resolve();
+	m_neon_out.resolve();
+
 	/* register for state saving */
 	save_pointer(NAME(m_nixie), 6);
 }
@@ -132,7 +133,7 @@ void nixieclock_state::machine_start()
 MACHINE_CONFIG_START(nixieclock_state::_4004clk)
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", I4004, XTAL(5'000'000) / 8)
+	MCFG_CPU_ADD("maincpu", I4004, 5_MHz_XTAL / 8);
 	MCFG_I4004_ROM_MAP(_4004clk_rom)
 	MCFG_I4004_RAM_MEMORY_MAP(_4004clk_mem)
 	MCFG_I4004_ROM_PORTS_MAP(_4004clk_rp)

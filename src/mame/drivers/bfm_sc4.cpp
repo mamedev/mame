@@ -445,28 +445,28 @@ READ16_MEMBER(sc4_state::sc4_mem_r)
 	return 0x0000;
 }
 
+void bfm_sc45_state::machine_start()
+{
+	m_lamps.resolve();
+	m_matrix.resolve();
+	m_digits.resolve();
+}
+
 WRITE8_MEMBER(bfm_sc45_state::mux_output_w)
 {
-	int i;
-	int off = offset<<3;
+	int const off = offset<<3;
 
-	for (i=0; i<8; i++)
-		output().set_lamp_value(off+i, ((data & (1 << i)) != 0));
-
-
-	output().set_indexed_value("matrix", off+i, ((data & (1 << i)) != 0));
+	for (int i=0; i<8; i++)
+		m_lamps[off+i] = BIT(data, i);
 }
 
 WRITE8_MEMBER(bfm_sc45_state::mux_output2_w)
 {
-	int i;
-	int off = offset<<3;
+	int const off = offset<<3;
 
 	// some games use this as a matrix port (luckb etc.)
-	for (i=0; i<8; i++)
-	{
-		output().set_indexed_value("matrix", off+i, ((data & (1 << i)) != 0));
-	}
+	for (int i=0; i<8; i++)
+		m_matrix[off+i] = BIT(data, i);
 
 	// others drive 7-segs with it..  so rendering it there as well in our debug layouts
 
@@ -474,28 +474,24 @@ WRITE8_MEMBER(bfm_sc45_state::mux_output2_w)
 	{
 		m_segment_34_cache[offset] = data;
 
-		uint16_t short_data;
-		uint8_t byte_data_first_segment;
-		uint8_t byte_data_second_segment;
 		for (int digit = 0; digit < 32; digit += 2)
 		{
-			short_data = (m_segment_34_cache[digit + 1] << 8) | m_segment_34_cache[digit];
-			byte_data_first_segment = (short_data >> 1) & 15;
-			byte_data_second_segment = (short_data >> 6) & 15;
-			output().set_digit_value(digit, SEGMENT_34_ENCODING_LOOKUP[byte_data_first_segment]);
-			output().set_digit_value(digit + 1, SEGMENT_34_ENCODING_LOOKUP[byte_data_second_segment]);
+			uint16_t const short_data = (m_segment_34_cache[digit + 1] << 8) | m_segment_34_cache[digit];
+			uint8_t byte_data_first_segment = (short_data >> 1) & 15;
+			uint8_t const byte_data_second_segment = (short_data >> 6) & 15;
+			m_digits[digit] = SEGMENT_34_ENCODING_LOOKUP[byte_data_first_segment];
+			m_digits[digit + 1] = SEGMENT_34_ENCODING_LOOKUP[byte_data_second_segment];
 
 			if (digit == 0 || digit == 2)
 			{
 				byte_data_first_segment = (short_data >> 11) & 15;
-				output().set_digit_value((digit / 2) + 32, SEGMENT_34_ENCODING_LOOKUP[byte_data_first_segment]);
+				m_digits[(digit / 2) + 32] = SEGMENT_34_ENCODING_LOOKUP[byte_data_first_segment];
 			}
 		}
 	}
 	else
 	{
-		uint8_t bf7segdata = bitswap<8>(data,0,7,6,5,4,3,2,1);
-		output().set_digit_value(offset, bf7segdata);
+		m_digits[offset] = bitswap<8>(data,0,7,6,5,4,3,2,1);
 	}
 }
 
@@ -805,16 +801,20 @@ uint16_t sc4_state::bfm_sc4_68307_portb_r(address_space &space, bool dedicated, 
 	}
 }
 
-MACHINE_RESET_MEMBER(sc4_state,sc4)
+void sc4_state::machine_reset()
 {
+	bfm_sc45_state::machine_reset();
+
 	m_dochk41 = true;
 
 	sec.reset();
 }
 
 
-MACHINE_START_MEMBER(sc4_state,sc4)
+void sc4_state::machine_start()
 {
+	bfm_sc45_state::machine_start();
+
 	m_nvram->set_base(m_mainram, sizeof(m_mainram));
 
 	m_maincpu->set_port_callbacks(
@@ -896,9 +896,6 @@ MACHINE_CONFIG_START(sc4_state::sc4_common)
 	MCFG_MC68307_SERIAL_A_TX_CALLBACK(WRITELINE(sc4_state, m68307_duart_txa))
 	MCFG_MC68307_SERIAL_INPORT_CALLBACK(READ8(sc4_state, m68307_duart_input_r))
 	MCFG_MC68307_SERIAL_OUTPORT_CALLBACK(WRITE8(sc4_state, m68307_duart_output_w))
-
-	MCFG_MACHINE_START_OVERRIDE(sc4_state, sc4 )
-	MCFG_MACHINE_RESET_OVERRIDE(sc4_state, sc4 )
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
@@ -1245,11 +1242,11 @@ MACHINE_CONFIG_START(sc4_state::sc4_no_reels)
 	sc4_common(config);
 MACHINE_CONFIG_END
 
-MACHINE_START_MEMBER(sc4_adder4_state,adder4)
+void sc4_adder4_state::machine_start()
 {
-	m_adder4cpuregion = (uint32_t*)memregion( "adder4" )->base();
+	sc4_state::machine_start();
+
 	m_adder4ram = make_unique_clear<uint32_t[]>(0x10000);
-	MACHINE_START_CALL_MEMBER(sc4);
 }
 
 MACHINE_CONFIG_START(sc4_adder4_state::sc4_adder4)
@@ -1257,8 +1254,6 @@ MACHINE_CONFIG_START(sc4_adder4_state::sc4_adder4)
 
 	MCFG_CPU_ADD("adder4", M68340, 25175000)     // 68340 (CPU32 core)
 	MCFG_CPU_PROGRAM_MAP(sc4_adder4_map)
-
-	MCFG_MACHINE_START_OVERRIDE(sc4_adder4_state, adder4 )
 MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(sc4_state::sc4dmd)
@@ -1268,8 +1263,6 @@ MACHINE_CONFIG_START(sc4_state::sc4dmd)
 	//MCFG_DEFAULT_LAYOUT(layout_sc4_dmd)
 	MCFG_DEVICE_ADD("dm01", BFM_DM01, 0)
 	MCFG_BFM_DM01_BUSY_CB(WRITELINE(sc4_state, bfmdm01_busy))
-
-	MCFG_MACHINE_START_OVERRIDE(sc4_state, sc4 )
 
 	MCFG_STARPOINT_RM20_48STEP_ADD("reel1")
 	MCFG_STEPPER_OPTIC_CALLBACK(WRITELINE(sc4_state, reel1_optic_cb))

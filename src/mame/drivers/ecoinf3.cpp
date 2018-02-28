@@ -23,42 +23,40 @@
 
 #include "ecoinf3.lh"
 
+#include <algorithm>
+
 
 class ecoinf3_state : public driver_device
 {
 public:
-	ecoinf3_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag),
+	ecoinf3_state(const machine_config &mconfig, device_type type, const char *tag) :
+		driver_device(mconfig, type, tag),
 		m_maincpu(*this, "maincpu"),
-		m_reel0(*this, "reel0"),
-		m_reel1(*this, "reel1"),
-		m_reel2(*this, "reel2"),
-		m_reel3(*this, "reel3")
+		m_reels(*this, "reel%u", 0U),
+		m_lamp_outputs(*this, "lamp%u", 0U),
+		m_vfd_outputs(*this, "vfd%u", 0U)
 	{
-		strobe_amount = 0;
-		strobe_addr = 0;
-		m_percent_mux = 0;
 	}
 
-	required_device<z180_device> m_maincpu;
-	required_device<stepper_device> m_reel0;
-	required_device<stepper_device> m_reel1;
-	required_device<stepper_device> m_reel2;
-	required_device<stepper_device> m_reel3;
+	DECLARE_DRIVER_INIT(ecoinf3);
+	DECLARE_DRIVER_INIT(ecoinf3_swap);
+	void ecoinf3_pyramid(machine_config &config);
 
-	uint16_t m_lamps[16];
-	uint16_t m_chars[14];
-	void update_display();
+protected:
+	virtual void machine_start() override
+	{
+		m_lamp_outputs.resolve();
+		m_vfd_outputs.resolve();
 
-	int strobe_addr;
-	int strobe_amount;
-	int m_optic_pattern;
-	DECLARE_WRITE_LINE_MEMBER(reel0_optic_cb) { if (state) m_optic_pattern |= 0x01; else m_optic_pattern &= ~0x01; }
-	DECLARE_WRITE_LINE_MEMBER(reel1_optic_cb) { if (state) m_optic_pattern |= 0x02; else m_optic_pattern &= ~0x02; }
-	DECLARE_WRITE_LINE_MEMBER(reel2_optic_cb) { if (state) m_optic_pattern |= 0x04; else m_optic_pattern &= ~0x04; }
-	DECLARE_WRITE_LINE_MEMBER(reel3_optic_cb) { if (state) m_optic_pattern |= 0x08; else m_optic_pattern &= ~0x08; }
+		save_item(NAME(m_lamps));
+		save_item(NAME(m_chars));
+		save_item(NAME(m_strobe_addr));
+		save_item(NAME(m_strobe_amount));
+		save_item(NAME(m_optic_pattern));
+		save_item(NAME(m_percent_mux));
+	}
 
-	int m_percent_mux;
+	template <unsigned N> DECLARE_WRITE_LINE_MEMBER(reel_optic_cb) { if (state) m_optic_pattern |= (1 << N); else m_optic_pattern &= ~(1 << N); }
 
 	DECLARE_READ8_MEMBER(ppi8255_intf_a_read_a) { int ret = 0x00; logerror("%04x - ppi8255_intf_a_read_a %02x\n", m_maincpu->pcbase(), ret); return ret; }
 	DECLARE_READ8_MEMBER(ppi8255_intf_a_read_b)
@@ -170,16 +168,12 @@ public:
 	}
 	DECLARE_READ8_MEMBER(ppi8255_intf_h_read_c) { int ret = 0x00; logerror("%04x - ppi8255_intf_h_read_c %02x\n", m_maincpu->pcbase(), ret); return ret; }
 
-	void update_lamps(void)
+	void update_lamps()
 	{
 		for (int i=0; i<16; i++)
 		{
-			for (int bit=0;bit<16;bit++)
-			{
-				int data = ((m_lamps[i] << bit)&0x8000)>>15;
-
-				output().set_indexed_value("lamp", (i*16)+bit, data );
-			}
+			for (int bit=0; bit<16; bit++)
+				m_lamp_outputs[(i << 4) | bit] = BIT(m_lamps[i], 15 - bit);
 		}
 
 	}
@@ -187,20 +181,20 @@ public:
 	DECLARE_WRITE8_MEMBER(ppi8255_intf_a_write_a_strobedat0)
 	{
 	//  logerror("%04x - ppi8255_intf_a_(used)write_a %02x (STROBEDAT?)\n", m_maincpu->pcbase(), data);
-		if (strobe_amount)
+		if (m_strobe_amount)
 		{
-			m_lamps[strobe_addr] = (m_lamps[strobe_addr] &0xff00) | (data & 0x00ff);
-			strobe_amount--;
+			m_lamps[m_strobe_addr] = (m_lamps[m_strobe_addr] & 0xff00) | (data & 0x00ff);
+			m_strobe_amount--;
 		}
 	}
 
 	DECLARE_WRITE8_MEMBER(ppi8255_intf_a_write_b_strobedat1)
 	{
 	//  logerror("%04x - ppi8255_intf_a_(used)write_b %02x (STROBEDAT?)\n", m_maincpu->pcbase(), data);
-		if (strobe_amount)
+		if (m_strobe_amount)
 		{
-			m_lamps[strobe_addr] = (m_lamps[strobe_addr] &0x00ff) | (data << 8);
-			strobe_amount--;
+			m_lamps[m_strobe_addr] = (m_lamps[m_strobe_addr] & 0x00ff) | (data << 8);
+			m_strobe_amount--;
 		}
 	}
 	DECLARE_WRITE8_MEMBER(ppi8255_intf_a_write_c_strobe)
@@ -208,11 +202,11 @@ public:
 		if (data>=0xf0)
 		{
 		//  logerror("%04x - ppi8255_intf_a_(used)write_c %02x (STROBE?)\n", m_maincpu->pcbase(), data);
-			strobe_addr = data & 0xf;
+			m_strobe_addr = data & 0xf;
 
 			// hack, it writes values for the lamps, then writes 0x00 afterwards, probably giving the bulbs power, then removing the power
 			// before switching the strobe to the next line?
-			strobe_amount = 2;
+			m_strobe_amount = 2;
 
 			update_lamps();
 		}
@@ -230,22 +224,22 @@ public:
 	DECLARE_WRITE8_MEMBER(ppi8255_intf_d_write_a_reel01)
 	{
 //      logerror("%04x - ppi8255_intf_d_(used)write_a %02x\n", m_maincpu->pcbase(), data);
-		m_reel0->update( data    &0x0f);
-		m_reel1->update((data>>4)&0x0f);
+		m_reels[0]->update( data    &0x0f);
+		m_reels[1]->update((data>>4)&0x0f);
 
-		awp_draw_reel(machine(),"reel1", *m_reel0);
-		awp_draw_reel(machine(),"reel2", *m_reel1);
+		awp_draw_reel(machine(),"reel1", *m_reels[0]);
+		awp_draw_reel(machine(),"reel2", *m_reels[1]);
 	}
 
 	DECLARE_WRITE8_MEMBER(ppi8255_intf_d_write_b_reel23)
 	{
 //      logerror("%04x - ppi8255_intf_d_(used)write_b %02x\n", m_maincpu->pcbase(), data);
 
-		m_reel2->update( data    &0x0f);
-		m_reel3->update((data>>4)&0x0f);
+		m_reels[2]->update( data    &0x0f);
+		m_reels[3]->update((data>>4)&0x0f);
 
-		awp_draw_reel(machine(),"reel3", *m_reel2);
-		awp_draw_reel(machine(),"reel4", *m_reel3);
+		awp_draw_reel(machine(),"reel3", *m_reels[2]);
+		awp_draw_reel(machine(),"reel4", *m_reels[3]);
 	}
 
 	DECLARE_WRITE8_MEMBER(ppi8255_intf_d_write_c) { logerror("%04x - ppi8255_intf_d_(used)write_c %02x\n", m_maincpu->pcbase(), data);}
@@ -271,12 +265,23 @@ public:
 	DECLARE_WRITE8_MEMBER(ppi8255_intf_h_write_b) { logerror("%04x - ppi8255_intf_h_(used)write_b %02x\n", m_maincpu->pcbase(), data); }
 	DECLARE_WRITE8_MEMBER(ppi8255_intf_h_write_c) { logerror("%04x - ppi8255_intf_h_(used)write_c %02x\n", m_maincpu->pcbase(), data); }
 
-
-	DECLARE_DRIVER_INIT(ecoinf3);
-	DECLARE_DRIVER_INIT(ecoinf3_swap);
-	void ecoinf3_pyramid(machine_config &config);
 	void pyramid_memmap(address_map &map);
 	void pyramid_portmap(address_map &map);
+
+private:
+	required_device<z180_device> m_maincpu;
+	required_device_array<stepper_device, 4> m_reels;
+	output_finder<16 * 16> m_lamp_outputs;
+	output_finder<14> m_vfd_outputs;
+
+	uint16_t m_lamps[16];
+	uint16_t m_chars[14];
+
+	int m_strobe_addr = 0;
+	int m_strobe_amount = 0;
+	int m_optic_pattern = 0;
+
+	int m_percent_mux = 0;
 };
 
 
@@ -357,14 +362,6 @@ static uint32_t set_display(uint32_t segin)
 	return bitswap<32>(segin, 31,30,29,28,27,26,25,24,23,22,21,20,19,18,17,16,11,9,15,13,12,8,10,14,7,6,5,4,3,2,1,0);
 }
 
-void ecoinf3_state::update_display()
-{
-	for (int i =0; i<14; i++)
-	{
-		output().set_indexed_value("vfd", i, set_display(m_chars[i]) );
-	}
-}
-
 // is the 2 digit bank display part of this, or multiplexed elsewhere
 WRITE8_MEMBER(ecoinf3_state::ppi8255_intf_e_write_a_alpha_display)
 {
@@ -427,8 +424,7 @@ WRITE8_MEMBER(ecoinf3_state::ppi8255_intf_e_write_a_alpha_display)
 		send_buffer = data;
 	}
 
-	update_display();
-
+	std::transform(std::begin(m_chars), std::end(m_chars), std::begin(m_vfd_outputs), set_display);
 }
 
 ADDRESS_MAP_START(ecoinf3_state::pyramid_memmap)
@@ -743,13 +739,13 @@ MACHINE_CONFIG_START(ecoinf3_state::ecoinf3_pyramid)
 	MCFG_I8255_OUT_PORTC_CB(WRITE8(ecoinf3_state, ppi8255_intf_h_write_c))
 
 	MCFG_ECOIN_200STEP_ADD("reel0")
-	MCFG_STEPPER_OPTIC_CALLBACK(WRITELINE(ecoinf3_state, reel0_optic_cb))
+	MCFG_STEPPER_OPTIC_CALLBACK(WRITELINE(ecoinf3_state, reel_optic_cb<0>))
 	MCFG_ECOIN_200STEP_ADD("reel1")
-	MCFG_STEPPER_OPTIC_CALLBACK(WRITELINE(ecoinf3_state, reel1_optic_cb))
+	MCFG_STEPPER_OPTIC_CALLBACK(WRITELINE(ecoinf3_state, reel_optic_cb<1>))
 	MCFG_ECOIN_200STEP_ADD("reel2")
-	MCFG_STEPPER_OPTIC_CALLBACK(WRITELINE(ecoinf3_state, reel2_optic_cb))
+	MCFG_STEPPER_OPTIC_CALLBACK(WRITELINE(ecoinf3_state, reel_optic_cb<2>))
 	MCFG_ECOIN_200STEP_ADD("reel3")
-	MCFG_STEPPER_OPTIC_CALLBACK(WRITELINE(ecoinf3_state, reel3_optic_cb))
+	MCFG_STEPPER_OPTIC_CALLBACK(WRITELINE(ecoinf3_state, reel_optic_cb<3>))
 MACHINE_CONFIG_END
 
 
