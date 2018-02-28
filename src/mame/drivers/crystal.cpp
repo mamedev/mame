@@ -339,6 +339,10 @@ public:
 	void crystal(machine_config &config);
 	void crzyddz2(machine_config &config);
 	void trivrus(machine_config &config);
+	void crospuzl_mem(address_map &map);
+	void crystal_mem(address_map &map);
+	void crzyddz2_mem(address_map &map);
+	void trivrus_mem(address_map &map);
 };
 
 void crystal_state::IntReq( int num )
@@ -646,12 +650,14 @@ WRITE32_MEMBER(crystal_state::DMA1_w)
 }
 
 
-static ADDRESS_MAP_START( crystal_mem, AS_PROGRAM, 32, crystal_state )
+ADDRESS_MAP_START(crystal_state::crystal_mem)
 	AM_RANGE(0x00000000, 0x0001ffff) AM_ROM AM_WRITENOP
 
 	AM_RANGE(0x01200000, 0x0120000f) AM_READ(Input_r)
 	AM_RANGE(0x01280000, 0x01280003) AM_WRITE(Banksw_w)
 	AM_RANGE(0x01400000, 0x0140ffff) AM_RAM AM_SHARE("nvram")
+
+	AM_RANGE(0x01800000, 0x0180ffff) AM_RAM AM_SHARE("sysregs")
 
 	AM_RANGE(0x01800800, 0x01800803) AM_READWRITE(DMA0_r, DMA0_w)
 	AM_RANGE(0x01800810, 0x01800813) AM_READWRITE(DMA1_r, DMA1_w)
@@ -664,18 +670,16 @@ static ADDRESS_MAP_START( crystal_mem, AS_PROGRAM, 32, crystal_state )
 	AM_RANGE(0x01801418, 0x0180141b) AM_READWRITE(Timer3_r, Timer3_w)
 	AM_RANGE(0x01802004, 0x01802007) AM_READWRITE(PIO_r, PIO_w)
 
-	AM_RANGE(0x01800000, 0x0180ffff) AM_RAM AM_SHARE("sysregs")
 	AM_RANGE(0x02000000, 0x027fffff) AM_RAM AM_SHARE("workram")
 
-	AM_RANGE(0x030000a4, 0x030000a7) AM_READWRITE(FlipCount_r, FlipCount_w)
-
 	AM_RANGE(0x03000000, 0x0300ffff) AM_RAM AM_SHARE("vidregs")
+	AM_RANGE(0x030000a4, 0x030000a7) AM_READWRITE(FlipCount_r, FlipCount_w)
 	AM_RANGE(0x03800000, 0x03ffffff) AM_RAM AM_SHARE("textureram")
 	AM_RANGE(0x04000000, 0x047fffff) AM_RAM AM_SHARE("frameram")
 	AM_RANGE(0x04800000, 0x04800fff) AM_DEVREADWRITE("vrender", vrender0_device, vr0_snd_read, vr0_snd_write)
 
-	AM_RANGE(0x05000000, 0x05000003) AM_READWRITE(FlashCmd_r, FlashCmd_w)
 	AM_RANGE(0x05000000, 0x05ffffff) AM_ROMBANK("bank1")
+	AM_RANGE(0x05000000, 0x05000003) AM_READWRITE(FlashCmd_r, FlashCmd_w)
 
 	AM_RANGE(0x44414F4C, 0x44414F7F) AM_RAM AM_SHARE("reset_patch")
 ADDRESS_MAP_END
@@ -704,7 +708,7 @@ WRITE32_MEMBER(crystal_state::trivrus_input_w)
 		m_trivrus_input = data & 0xff;
 }
 
-static ADDRESS_MAP_START( trivrus_mem, AS_PROGRAM, 32, crystal_state )
+ADDRESS_MAP_START(crystal_state::trivrus_mem)
 	AM_RANGE(0x00000000, 0x0007ffff) AM_ROM AM_WRITENOP
 
 //  0x01280000 & 0x0000ffff (written at boot)
@@ -717,6 +721,8 @@ static ADDRESS_MAP_START( trivrus_mem, AS_PROGRAM, 32, crystal_state )
 //  0x0150001c & 0x000000ff = year - 2000
 	AM_RANGE(0x01600000, 0x01607fff) AM_RAM AM_SHARE("nvram")
 
+	AM_RANGE(0x01800000, 0x0180ffff) AM_RAM AM_SHARE("sysregs")
+
 	AM_RANGE(0x01800800, 0x01800803) AM_READWRITE(DMA0_r, DMA0_w)
 	AM_RANGE(0x01800810, 0x01800813) AM_READWRITE(DMA1_r, DMA1_w)
 
@@ -728,31 +734,30 @@ static ADDRESS_MAP_START( trivrus_mem, AS_PROGRAM, 32, crystal_state )
 	AM_RANGE(0x01801418, 0x0180141b) AM_READWRITE(Timer3_r, Timer3_w)
 	AM_RANGE(0x01802004, 0x01802007) AM_READWRITE(PIO_r, PIO_w)
 
-	AM_RANGE(0x01800000, 0x0180ffff) AM_RAM AM_SHARE("sysregs")
 	AM_RANGE(0x02000000, 0x027fffff) AM_RAM AM_SHARE("workram")
 
-	AM_RANGE(0x030000a4, 0x030000a7) AM_READWRITE(FlipCount_r, FlipCount_w)
 
 	AM_RANGE(0x03000000, 0x0300ffff) AM_RAM AM_SHARE("vidregs")
+	AM_RANGE(0x030000a4, 0x030000a7) AM_READWRITE(FlipCount_r, FlipCount_w)
 	AM_RANGE(0x03800000, 0x03ffffff) AM_RAM AM_SHARE("textureram")
 	AM_RANGE(0x04000000, 0x047fffff) AM_RAM AM_SHARE("frameram")
 	AM_RANGE(0x04800000, 0x04800fff) AM_DEVREADWRITE("vrender", vrender0_device, vr0_snd_read, vr0_snd_write)
 
-	AM_RANGE(0x05000000, 0x05000003) AM_READWRITE(FlashCmd_r, FlashCmd_w)
 	AM_RANGE(0x05000000, 0x05ffffff) AM_ROMBANK("bank1")
+	AM_RANGE(0x05000000, 0x05000003) AM_READWRITE(FlashCmd_r, FlashCmd_w)
 
 //  AM_RANGE(0x44414F4C, 0x44414F7F) AM_RAM AM_SHARE("reset_patch")
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( crospuzl_mem, AS_PROGRAM, 32, crystal_state )
+ADDRESS_MAP_START(crystal_state::crospuzl_mem)
+	AM_IMPORT_FROM( trivrus_mem )
+
 	AM_RANGE(0x01500000, 0x01500003) AM_READ(FlashCmd_r)
 	AM_RANGE(0x01500100, 0x01500103) AM_WRITE(FlashCmd_w)
 	AM_RANGE(0x01510000, 0x01510003) AM_READ_PORT("IN0")
 	AM_RANGE(0x01511000, 0x01511003) AM_READ_PORT("IN1")
 	AM_RANGE(0x01512000, 0x01512003) AM_READ_PORT("IN2")
 	AM_RANGE(0x01513000, 0x01513003) AM_READ_PORT("IN3")
-	AM_IMPORT_FROM( trivrus_mem )
-
 ADDRESS_MAP_END
 
 // Crazy Dou Di Zhu II
@@ -796,13 +801,15 @@ crzyddz2    in      out
 	return 0xffffff00 | data | m_crzyddz2_prot;
 }
 
-static ADDRESS_MAP_START( crzyddz2_mem, AS_PROGRAM, 32, crystal_state )
+ADDRESS_MAP_START(crystal_state::crzyddz2_mem)
 	AM_RANGE(0x00000000, 0x00ffffff) AM_ROM AM_WRITENOP
 
 	AM_RANGE(0x01280000, 0x01280003) AM_WRITE(Banksw_w)
 	AM_RANGE(0x01400000, 0x0140ffff) AM_RAM AM_SHARE("nvram")
 	AM_RANGE(0x01500000, 0x01500003) AM_READ_PORT("P1_P2")
 	AM_RANGE(0x01500004, 0x01500007) AM_READ(crzyddz2_key_r)
+
+	AM_RANGE(0x01800000, 0x0180ffff) AM_RAM AM_SHARE("sysregs")
 
 	AM_RANGE(0x01800800, 0x01800803) AM_READWRITE(DMA0_r, DMA0_w)
 	AM_RANGE(0x01800810, 0x01800813) AM_READWRITE(DMA1_r, DMA1_w)
@@ -815,18 +822,17 @@ static ADDRESS_MAP_START( crzyddz2_mem, AS_PROGRAM, 32, crystal_state )
 	AM_RANGE(0x01801418, 0x0180141b) AM_READWRITE(Timer3_r, Timer3_w)
 	AM_RANGE(0x01802004, 0x01802007) AM_READWRITE(PIO_r, crzyddz2_PIO_w)
 
-	AM_RANGE(0x01800000, 0x0180ffff) AM_RAM AM_SHARE("sysregs")
 	AM_RANGE(0x02000000, 0x027fffff) AM_RAM AM_SHARE("workram")
 
-	AM_RANGE(0x030000a4, 0x030000a7) AM_READWRITE(FlipCount_r, FlipCount_w)
 
 	AM_RANGE(0x03000000, 0x0300ffff) AM_RAM AM_SHARE("vidregs")
+	AM_RANGE(0x030000a4, 0x030000a7) AM_READWRITE(FlipCount_r, FlipCount_w)
 	AM_RANGE(0x03800000, 0x03ffffff) AM_RAM AM_SHARE("textureram")
 	AM_RANGE(0x04000000, 0x047fffff) AM_RAM AM_SHARE("frameram")
 	AM_RANGE(0x04800000, 0x04800fff) AM_DEVREADWRITE("vrender", vrender0_device, vr0_snd_read, vr0_snd_write)
 
-	AM_RANGE(0x05000000, 0x05000003) AM_READWRITE(FlashCmd_r, FlashCmd_w)
 	AM_RANGE(0x05000000, 0x05ffffff) AM_ROMBANK("bank1")
+	AM_RANGE(0x05000000, 0x05000003) AM_READWRITE(FlashCmd_r, FlashCmd_w)
 
 //  AM_RANGE(0x44414F4C, 0x44414F7F) AM_RAM AM_SHARE("reset_patch")
 ADDRESS_MAP_END
@@ -1509,17 +1515,20 @@ MACHINE_CONFIG_START(crystal_state::crystal)
 MACHINE_CONFIG_END
 
 
-MACHINE_CONFIG_DERIVED(crystal_state::trivrus, crystal)
+MACHINE_CONFIG_START(crystal_state::trivrus)
+	crystal(config);
 	MCFG_CPU_MODIFY("maincpu")
 	MCFG_CPU_PROGRAM_MAP(trivrus_mem)
 MACHINE_CONFIG_END
 
-MACHINE_CONFIG_DERIVED(crystal_state::crospuzl, crystal)
+MACHINE_CONFIG_START(crystal_state::crospuzl)
+	crystal(config);
 	MCFG_CPU_MODIFY("maincpu")
 	MCFG_CPU_PROGRAM_MAP(crospuzl_mem)
 MACHINE_CONFIG_END
 
-MACHINE_CONFIG_DERIVED(crystal_state::crzyddz2, crystal)
+MACHINE_CONFIG_START(crystal_state::crzyddz2)
+	crystal(config);
 	MCFG_CPU_MODIFY("maincpu")
 	MCFG_CPU_PROGRAM_MAP(crzyddz2_mem)
 MACHINE_CONFIG_END
@@ -1639,10 +1648,53 @@ ROM_START( psattack )
 ROM_END
 
 ROM_START( ddz )
-	ROM_REGION( 0x400000, "maincpu", 0 )
+	ROM_REGION( 0xc00000, "maincpu", 0 )
 	ROM_LOAD("ddz.001.rom",  0x000000, 0x400000, CRC(b379f823) SHA1(531885b35d668d22c75a9759994f4aca6eacb046) )
-	ROM_LOAD("ddz.002.rom",  0x000000, 0x400000, CRC(285c744d) SHA1(2f8bc70825e55e3114015cb263e786df35cde275) )
-	ROM_LOAD("ddz.003.rom",  0x000000, 0x400000, CRC(61c9b5c9) SHA1(0438417398403456a1c49408881797a94aa86f49) )
+	ROM_LOAD("ddz.002.rom",  0x400000, 0x400000, CRC(285c744d) SHA1(2f8bc70825e55e3114015cb263e786df35cde275) )
+	ROM_LOAD("ddz.003.rom",  0x800000, 0x400000, CRC(61c9b5c9) SHA1(0438417398403456a1c49408881797a94aa86f49) )
+
+	// keep driver happy
+	ROM_REGION32_LE( 0x3000000, "user1", ROMREGION_ERASEFF )
+	ROM_REGION( 0x1000000, "user2",   ROMREGION_ERASEFF )
+ROM_END
+
+
+/*
+招级疯斗 - "Zhaoji Fengdou" - "Crazy Class"
+
+Haze's notes:
+
+fwiw, it's probably same PCB as the non-working 'ddz' in MAME, but different game.
+
+there's some kind of encryption/scrambling going on, at the very least
+
+Code:
+
+
+Offset      0  1  2  3  4  5  6  7   8  9  A  B  C  D  E  F
+
+0007BE60   00 00 00 99 03 AD AF 00  00 00 82 00 03 AD 64 63      ™ ­¯   ‚  ­dc
+0007BE70   62 61 39 38 37 36 35 34  33 32 31 30 00 4E 61 4E   ba9876543210 NaN
+0007BE80   00 66 6E 49 02 0E 85 06  02 0E 84 04 02 0E 83 EA    fnI  …   „   ƒê
+0007BE90   02 0E 83 D6 02 0E 83 C8  02 0E 84 58 02 0E 84 12     ƒÖ  ƒÈ  „X  „
+0007BEA0   66 65 28 00 30 00 65 73  61 62 20 64 61 62 20 3A   fe( 0 esab dab :
+0007BEB0   66 74 6E 69 72 70 66 76  20 6E 69 20 67 75 62 00   ftnirpfv ni gub
+0007BEC0   46 45 44 43 42 41 39 38  37 36 35 34 33 32 31 30   FEDCBA9876543210
+0007BED0   00 29 6C 6C 75 6E 2E 00  00 00 8F 8E 02 0E 89 DC    )llun.    Ž  ‰Ü
+
+
+if you reverse the letters you get 'bug in vfprintf : bad base'
+
+so I suspect the data is in reverse order and maybe some blocks scrambled about.
+*/
+
+
+ROM_START( crzclass ) // PCB marked MAH-JONG
+	ROM_REGION( 0xc00000, "maincpu", 0 )
+	ROM_LOAD("tjf-mahjong-rom1.bin",  0x000000, 0x400000, CRC(0a8af816) SHA1(9f292e847873078ed2b7584f463633cf9086c7e8) ) // SHARP LH28F320BJD-TTL80
+	ROM_LOAD("tjf-mahjong-rom2.bin",  0x400000, 0x400000, CRC(2a04e84a) SHA1(189b16fd4314fd2a5f8a1214618b5db83f8ac59a) ) // SHARP LH28F320BJD-TTL80
+	ROM_LOAD("tjf-mahjong-rom3.bin",  0x800000, 0x400000, CRC(1cacf3f9) SHA1(e6c88c98aeb7df4098f8e20f412018617005724d) ) // SHARP LH28F320BJD-TTL80
+	// rom4 not populated
 
 	// keep driver happy
 	ROM_REGION32_LE( 0x3000000, "user1", ROMREGION_ERASEFF )
@@ -1869,3 +1921,4 @@ GAME( 200?, crospuzl, 0,        crospuzl, crospuzl, crystal_state, 0,        ROT
 GAME( 2004, psattack, 0,        crystal,  crystal,  crystal_state, psattack, ROT0, "Uniana",              "P's Attack",                           MACHINE_IS_SKELETON )
 // looks like the same kind of hw from strings in the ROM, but scrambled / encrypted?
 GAME( 200?, ddz,      0,        crystal,  crystal,  crystal_state, 0,        ROT0, "IGS?",                "Dou Di Zhu",                           MACHINE_IS_SKELETON )
+GAME( 200?, crzclass, 0,        crystal,  crystal,  crystal_state, 0,        ROT0, "TJF",                 "Zhaoji Fengdou",                       MACHINE_IS_SKELETON ) // 'Crazy Class'

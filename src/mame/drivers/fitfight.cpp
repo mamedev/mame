@@ -130,7 +130,7 @@ WRITE16_MEMBER(fitfight_state::fitfight_700000_w)
 		m_fof_700000_data = data;
 }
 
-static ADDRESS_MAP_START( fitfight_main_map, AS_PROGRAM, 16, fitfight_state )
+ADDRESS_MAP_START(fitfight_state::fitfight_main_map)
 	AM_RANGE(0x000000, 0x0fffff) AM_ROM
 
 	AM_RANGE(0x100000, 0x100001) AM_WRITEONLY AM_SHARE("fof_100000")
@@ -183,7 +183,7 @@ static ADDRESS_MAP_START( fitfight_main_map, AS_PROGRAM, 16, fitfight_state )
 	AM_RANGE(0xff0000, 0xffffff) AM_RAM // hot mind uses RAM here (mirror?)
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( bbprot_main_map, AS_PROGRAM, 16, fitfight_state )
+ADDRESS_MAP_START(fitfight_state::bbprot_main_map)
 	AM_RANGE(0x000000, 0x0fffff) AM_ROM
 
 	AM_RANGE(0x100000, 0x100001) AM_WRITEONLY AM_SHARE("fof_100000")
@@ -217,7 +217,7 @@ ADDRESS_MAP_END
 
 /* 7810 (?) sound cpu */
 
-static ADDRESS_MAP_START( snd_mem, AS_PROGRAM, 8, fitfight_state )
+ADDRESS_MAP_START(fitfight_state::snd_mem)
 	AM_RANGE(0x0000, 0x3fff) AM_ROM
 	AM_RANGE(0x4000, 0x7fff) AM_ROMBANK("bank1")    /* ??? External ROM */
 	AM_RANGE(0x8000, 0x87ff) AM_RAM

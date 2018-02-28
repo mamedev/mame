@@ -164,6 +164,9 @@ public:
 	DECLARE_WRITE8_MEMBER(pd_w);
 	DECLARE_WRITE8_MEMBER(pf_w);
 
+	void upd_internal_128_ram_map(address_map &map);
+	void upd_internal_256_ram_map(address_map &map);
+	void upd_internal_4096_rom_map(address_map &map);
 protected:
 	// flags
 	enum

@@ -117,6 +117,7 @@ public:
 	DECLARE_DRIVER_INIT(seibucats);
 
 	void seibucats(machine_config &config);
+	void seibucats_map(address_map &map);
 protected:
 	// driver_device overrides
 	virtual void machine_start() override;
@@ -162,8 +163,10 @@ WRITE16_MEMBER(seibucats_state::aux_rtc_w)
 {
 }
 
-static ADDRESS_MAP_START( seibucats_map, AS_PROGRAM, 32, seibucats_state )
+ADDRESS_MAP_START(seibucats_state::seibucats_map)
 	// TODO: map devices
+	AM_RANGE(0x00000000, 0x0003ffff) AM_RAM AM_SHARE("mainram")
+
 	AM_RANGE(0x00000010, 0x00000013) AM_READ8(spi_status_r, 0x000000ff)
 	AM_RANGE(0x00000400, 0x00000403) AM_WRITE16(input_select_w, 0x0000ffff)
 	AM_RANGE(0x00000404, 0x00000407) AM_WRITE16(output_latch_w, 0x0000ffff)
@@ -174,7 +177,6 @@ static ADDRESS_MAP_START( seibucats_map, AS_PROGRAM, 32, seibucats_state )
 
 	AM_RANGE(0x00000600, 0x00000607) AM_READ16(input_mux_r, 0x0000ffff)
 
-	AM_RANGE(0x00000000, 0x0003ffff) AM_RAM AM_SHARE("mainram")
 	AM_RANGE(0x00200000, 0x003fffff) AM_ROM AM_REGION("ipl", 0) AM_WRITENOP // emjjoshi attempts to write there?
 	// following are likely to be Seibu CATS specific
 	AM_RANGE(0x01200000, 0x01200007) AM_DEVREADWRITE8("ymz", ymz280b_device, read, write, 0x000000ff)

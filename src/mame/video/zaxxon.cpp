@@ -123,6 +123,7 @@ void zaxxon_state::video_start_common(tilemap_get_info_delegate fg_tile_info)
 	m_bg_color = 0;
 	m_bg_position = 0;
 	m_fg_color = 0;
+	m_flip_screen = false;
 	m_congo_fg_bank = 0;
 	m_congo_color_bank = 0;
 	memset(m_congo_custom, 0, sizeof(m_congo_custom));
@@ -139,6 +140,7 @@ void zaxxon_state::video_start_common(tilemap_get_info_delegate fg_tile_info)
 	save_item(NAME(m_bg_color));
 	save_item(NAME(m_bg_position));
 	save_item(NAME(m_fg_color));
+	save_item(NAME(m_flip_screen));
 }
 
 
@@ -178,8 +180,8 @@ VIDEO_START_MEMBER(zaxxon_state,congo)
 WRITE_LINE_MEMBER(zaxxon_state::flipscreen_w)
 {
 	/* low bit controls flip; background and sprite flip are handled at render time */
-	flip_screen_set_no_update(!state);
-	m_fg_tilemap->set_flip(flip_screen() ? (TILEMAP_FLIPX | TILEMAP_FLIPY) : 0);
+	m_flip_screen = !state;
+	m_fg_tilemap->set_flip(m_flip_screen ? (TILEMAP_FLIPX | TILEMAP_FLIPY) : 0);
 }
 
 
@@ -304,13 +306,13 @@ void zaxxon_state::draw_background(bitmap_ind16 &bitmap, const rectangle &clipre
 		int colorbase = m_bg_color + (m_congo_color_bank << 8);
 		int xmask = pixmap.width() - 1;
 		int ymask = pixmap.height() - 1;
-		int flipmask = flip_screen() ? 0xff : 0x00;
-		int flipoffs = flip_screen() ? 0x38 : 0x40;
+		int flipmask = m_flip_screen ? 0xff : 0x00;
+		int flipoffs = m_flip_screen ? 0x38 : 0x40;
 		int x, y;
 
 		/* the starting X value is offset by 1 pixel (normal) or 7 pixels */
 		/* (flipped) due to a delay in the loading */
-		if (!flip_screen())
+		if (!m_flip_screen)
 			flipoffs -= 1;
 		else
 			flipoffs += 7;
@@ -415,7 +417,7 @@ void zaxxon_state::draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprect,
 {
 	uint8_t *spriteram = m_spriteram;
 	gfx_element *gfx = m_gfxdecode->gfx(2);
-	int flip = flip_screen();
+	int flip = m_flip_screen;
 	int flipmask = flip ? 0xff : 0x00;
 	int offs;
 

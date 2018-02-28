@@ -82,6 +82,9 @@ public:
 	u32 screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 
 	void micral(machine_config &config);
+	void io_kbd(address_map &map);
+	void mem_kbd(address_map &map);
+	void mem_map(address_map &map);
 private:
 	u16 s_curpos;
 	u8 s_command;
@@ -96,7 +99,7 @@ private:
 
 READ8_MEMBER( micral_state::status_r )
 {
-	return m_uart->get_output_pin(AY31015_DAV) | 4;
+	return m_uart->dav_r() | 4;
 }
 
 READ8_MEMBER( micral_state::unk_r )
@@ -106,9 +109,9 @@ READ8_MEMBER( micral_state::unk_r )
 
 READ8_MEMBER( micral_state::keyin_r )
 {
-	m_uart->set_input_pin(AY31015_RDAV, 0);
+	m_uart->write_rdav(0);
 	u8 result = m_uart->get_received_data();
-	m_uart->set_input_pin(AY31015_RDAV, 1);
+	m_uart->write_rdav(1);
 	return result;
 }
 
@@ -144,7 +147,7 @@ WRITE8_MEMBER( micral_state::video_w )
 }
 
 
-static ADDRESS_MAP_START( mem_map, AS_PROGRAM, 8, micral_state )
+ADDRESS_MAP_START(micral_state::mem_map)
 	ADDRESS_MAP_UNMAP_HIGH
 	AM_RANGE(0x0000, 0xf7ff) AM_RAM
 	AM_RANGE(0xf800, 0xfeff) AM_ROM
@@ -157,7 +160,7 @@ static ADDRESS_MAP_START( mem_map, AS_PROGRAM, 8, micral_state )
 	AM_RANGE(0xfffd, 0xffff) // more unknown ports
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( mem_kbd, AS_PROGRAM, 8, micral_state )
+ADDRESS_MAP_START(micral_state::mem_kbd)
 	ADDRESS_MAP_UNMAP_HIGH
 	AM_RANGE(0x0000, 0x03ff) AM_ROM
 	AM_RANGE(0x8000, 0x8000) AM_RAM // byte returned to main cpu after receiving irq
@@ -177,7 +180,7 @@ static ADDRESS_MAP_START( mem_kbd, AS_PROGRAM, 8, micral_state )
 	AM_RANGE(0xa000, 0xa000) AM_READ_PORT("X13")
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( io_kbd, AS_IO, 8, micral_state )
+ADDRESS_MAP_START(micral_state::io_kbd)
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	AM_RANGE(0x00, 0x00) AM_READ_PORT("X14")
 ADDRESS_MAP_END
@@ -355,16 +358,16 @@ MACHINE_RESET_MEMBER( micral_state, micral )
 	m_maincpu->set_state_int(Z80_PC, 0xf800);
 
 	// no idea if these are hard-coded, or programmable
-	m_uart->set_input_pin(AY31015_XR, 0);
-	m_uart->set_input_pin(AY31015_XR, 1);
-	m_uart->set_input_pin(AY31015_SWE, 0);
-	m_uart->set_input_pin(AY31015_NP, 1);
-	m_uart->set_input_pin(AY31015_TSB, 0);
-	m_uart->set_input_pin(AY31015_NB1, 1);
-	m_uart->set_input_pin(AY31015_NB2, 1);
-	m_uart->set_input_pin(AY31015_EPS, 1);
-	m_uart->set_input_pin(AY31015_CS, 1);
-	m_uart->set_input_pin(AY31015_CS, 0);
+	m_uart->write_xr(0);
+	m_uart->write_xr(1);
+	m_uart->write_swe(0);
+	m_uart->write_np(1);
+	m_uart->write_tsb(0);
+	m_uart->write_nb1(1);
+	m_uart->write_nb2(1);
+	m_uart->write_eps(1);
+	m_uart->write_cs(1);
+	m_uart->write_cs(0);
 }
 
 MACHINE_CONFIG_START(micral_state::micral)

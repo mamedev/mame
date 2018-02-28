@@ -72,7 +72,7 @@ DEFINE_DEVICE_TYPE(M37720S1, m37720s1_device, "m37720s1", "M37720S1")
 
 // M37702M2: 512 bytes internal RAM, 16K internal mask ROM
 // (M37702E2: same with EPROM instead of mask ROM)
-DEVICE_ADDRESS_MAP_START( map, 16, m37702m2_device )
+ADDRESS_MAP_START(m37702m2_device::map)
 	AM_RANGE(0x000000, 0x00007f) AM_READWRITE8(m37710_internal_r, m37710_internal_w, 0xffff)
 	AM_RANGE(0x000080, 0x00027f) AM_RAM
 	AM_RANGE(0x00c000, 0x00ffff) AM_ROM AM_REGION(M37710_INTERNAL_ROM_REGION, 0)
@@ -80,20 +80,20 @@ ADDRESS_MAP_END
 
 
 // M37702S1: 512 bytes internal RAM, no internal ROM
-DEVICE_ADDRESS_MAP_START( map, 16, m37702s1_device )
+ADDRESS_MAP_START(m37702s1_device::map)
 	AM_RANGE(0x000000, 0x00007f) AM_READWRITE8(m37710_internal_r, m37710_internal_w, 0xffff)
 	AM_RANGE(0x000080, 0x00027f) AM_RAM
 ADDRESS_MAP_END
 
 
 // M37710S4: 2048 bytes internal RAM, no internal ROM
-DEVICE_ADDRESS_MAP_START( map, 16, m37710s4_device )
+ADDRESS_MAP_START(m37710s4_device::map)
 	AM_RANGE(0x000000, 0x00007f) AM_READWRITE8(m37710_internal_r, m37710_internal_w, 0xffff)
 	AM_RANGE(0x000080, 0x00087f) AM_RAM
 ADDRESS_MAP_END
 
 // M37720S1: 512 bytes internal RAM, no internal ROM, built-in DMA
-DEVICE_ADDRESS_MAP_START( map, 16, m37720s1_device )
+ADDRESS_MAP_START(m37720s1_device::map)
 	AM_RANGE(0x000000, 0x00007f) AM_READWRITE8(m37710_internal_r, m37710_internal_w, 0xffff)
 	AM_RANGE(0x000080, 0x00027f) AM_RAM
 ADDRESS_MAP_END
@@ -101,7 +101,7 @@ ADDRESS_MAP_END
 // many other combinations of RAM and ROM size exist
 
 
-m37710_cpu_device::m37710_cpu_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock, address_map_delegate map_delegate)
+m37710_cpu_device::m37710_cpu_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock, address_map_constructor map_delegate)
 	: cpu_device(mconfig, type, tag, owner, clock)
 	, m_program_config("program", ENDIANNESS_LITTLE, 16, 24, 0, map_delegate)
 	, m_io_config("io", ENDIANNESS_LITTLE, 8, 16, 0)
@@ -116,24 +116,24 @@ m37702m2_device::m37702m2_device(const machine_config &mconfig, const char *tag,
 
 
 m37702m2_device::m37702m2_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock)
-	: m37710_cpu_device(mconfig, type, tag, owner, clock, address_map_delegate(FUNC(m37702m2_device::map), this))
+	: m37710_cpu_device(mconfig, type, tag, owner, clock, address_map_constructor(FUNC(m37702m2_device::map), this))
 {
 }
 
 
 m37702s1_device::m37702s1_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-	: m37710_cpu_device(mconfig, M37702S1, tag, owner, clock, address_map_delegate(FUNC(m37702s1_device::map), this))
+	: m37710_cpu_device(mconfig, M37702S1, tag, owner, clock, address_map_constructor(FUNC(m37702s1_device::map), this))
 {
 }
 
 
 m37710s4_device::m37710s4_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-	: m37710_cpu_device(mconfig, M37710S4, tag, owner, clock, address_map_delegate(FUNC(m37710s4_device::map), this))
+	: m37710_cpu_device(mconfig, M37710S4, tag, owner, clock, address_map_constructor(FUNC(m37710s4_device::map), this))
 {
 }
 
 m37720s1_device::m37720s1_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-	: m37710_cpu_device(mconfig, M37720S1, tag, owner, clock, address_map_delegate(FUNC(m37720s1_device::map), this))
+	: m37710_cpu_device(mconfig, M37720S1, tag, owner, clock, address_map_constructor(FUNC(m37720s1_device::map), this))
 {
 }
 

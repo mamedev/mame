@@ -79,4 +79,11 @@ public:
 	void toki(machine_config &config);
 	void jujuba(machine_config &config);
 	void tokib(machine_config &config);
+	void jujuba_audio_map(address_map &map);
+	void jujuba_audio_opcodes_map(address_map &map);
+	void toki_audio_map(address_map &map);
+	void toki_audio_opcodes_map(address_map &map);
+	void toki_map(address_map &map);
+	void tokib_audio_map(address_map &map);
+	void tokib_map(address_map &map);
 };

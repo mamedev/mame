@@ -49,7 +49,7 @@ WRITE16_MEMBER(blstroid_state::blstroid_halt_until_hblank_0_w)
 }
 
 
-MACHINE_RESET_MEMBER(blstroid_state,blstroid)
+void blstroid_state::machine_reset()
 {
 	atarigen_state::machine_reset();
 	scanline_timer_reset(*m_screen, 8);
@@ -64,7 +64,7 @@ MACHINE_RESET_MEMBER(blstroid_state,blstroid)
  *************************************/
 
 /* full map verified from schematics */
-static ADDRESS_MAP_START( main_map, AS_PROGRAM, 16, blstroid_state )
+ADDRESS_MAP_START(blstroid_state::main_map)
 	ADDRESS_MAP_UNMAP_HIGH
 	ADDRESS_MAP_GLOBAL_MASK(0x83ffff)
 	AM_RANGE(0x000000, 0x03ffff) AM_MIRROR(0x000000) AM_ROM
@@ -179,9 +179,7 @@ MACHINE_CONFIG_START(blstroid_state::blstroid)
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", M68000, ATARI_CLOCK_14MHz/2)
 	MCFG_CPU_PROGRAM_MAP(main_map)
-	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", atarigen_state, video_int_gen)
-
-	MCFG_MACHINE_RESET_OVERRIDE(blstroid_state,blstroid)
+	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", blstroid_state, video_int_gen)
 
 	MCFG_EEPROM_2804_ADD("eeprom")
 	MCFG_EEPROM_28XX_LOCK_AFTER_WRITE(true)
@@ -211,7 +209,7 @@ MACHINE_CONFIG_START(blstroid_state::blstroid)
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
 
-	MCFG_ATARI_JSA_I_ADD("jsa", WRITELINE(atarigen_state, sound_int_write_line))
+	MCFG_ATARI_JSA_I_ADD("jsa", WRITELINE(blstroid_state, sound_int_write_line))
 	MCFG_ATARI_JSA_TEST_PORT("IN0", 7)
 	MCFG_SOUND_ROUTE(0, "lspeaker", 1.0)
 	MCFG_SOUND_ROUTE(1, "rspeaker", 1.0)

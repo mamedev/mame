@@ -857,7 +857,7 @@ WRITE8_MEMBER(itech8_state::ninclown_palette_w)
  *************************************/
 
 /*------ common layout with TMS34061 at 0000 ------*/
-static ADDRESS_MAP_START( tmslo_map, AS_PROGRAM, 8, itech8_state )
+ADDRESS_MAP_START(itech8_state::tmslo_map)
 	AM_RANGE(0x0000, 0x0fff) AM_READWRITE(tms34061_r, tms34061_w)
 	AM_RANGE(0x1100, 0x1100) AM_WRITENOP
 	AM_RANGE(0x1120, 0x1120) AM_WRITE(sound_data_w)
@@ -873,7 +873,7 @@ ADDRESS_MAP_END
 
 
 /*------ common layout with TMS34061 at 1000 ------*/
-static ADDRESS_MAP_START( tmshi_map, AS_PROGRAM, 8, itech8_state )
+ADDRESS_MAP_START(itech8_state::tmshi_map)
 	AM_RANGE(0x1000, 0x1fff) AM_READWRITE(tms34061_r, tms34061_w)
 	AM_RANGE(0x0100, 0x0100) AM_WRITENOP
 	AM_RANGE(0x0120, 0x0120) AM_WRITE(sound_data_w)
@@ -889,7 +889,7 @@ ADDRESS_MAP_END
 
 
 /*------ Golden Tee Golf II 1992 layout ------*/
-static ADDRESS_MAP_START( gtg2_map, AS_PROGRAM, 8, itech8_state )
+ADDRESS_MAP_START(itech8_state::gtg2_map)
 	AM_RANGE(0x0100, 0x0100) AM_READ_PORT("40") AM_WRITE(nmi_ack_w)
 	AM_RANGE(0x0120, 0x0120) AM_READ_PORT("60") AM_WRITE(page_w)
 	AM_RANGE(0x0140, 0x015f) AM_WRITE(palette_w)
@@ -904,7 +904,7 @@ static ADDRESS_MAP_START( gtg2_map, AS_PROGRAM, 8, itech8_state )
 ADDRESS_MAP_END
 
 /*------ Ninja Clowns layout ------*/
-static ADDRESS_MAP_START( ninclown_map, AS_PROGRAM, 16, itech8_state )
+ADDRESS_MAP_START(itech8_state::ninclown_map)
 	AM_RANGE(0x000000, 0x00007f) AM_RAM AM_REGION("maincpu", 0)
 	AM_RANGE(0x000080, 0x003fff) AM_RAM AM_SHARE("nvram")
 	AM_RANGE(0x004000, 0x03ffff) AM_ROM
@@ -928,7 +928,7 @@ ADDRESS_MAP_END
  *************************************/
 
 /*------ YM2203-based sound ------*/
-static ADDRESS_MAP_START( sound2203_map, AS_PROGRAM, 8, itech8_state )
+ADDRESS_MAP_START(itech8_state::sound2203_map)
 	AM_RANGE(0x0000, 0x0000) AM_WRITENOP
 	AM_RANGE(0x1000, 0x1000) AM_READ(sound_data_r)
 	AM_RANGE(0x2000, 0x2001) AM_MIRROR(0x0002) AM_DEVREADWRITE("ymsnd", ym2203_device, read, write)
@@ -939,7 +939,7 @@ ADDRESS_MAP_END
 
 
 /*------ YM2608B-based sound ------*/
-static ADDRESS_MAP_START( sound2608b_map, AS_PROGRAM, 8, itech8_state )
+ADDRESS_MAP_START(itech8_state::sound2608b_map)
 	AM_RANGE(0x1000, 0x1000) AM_WRITENOP
 	AM_RANGE(0x2000, 0x2000) AM_READ(sound_data_r)
 	AM_RANGE(0x4000, 0x4003) AM_DEVREADWRITE("ymsnd", ym2608_device, read, write)
@@ -949,7 +949,7 @@ ADDRESS_MAP_END
 
 
 /*------ YM3812-based sound ------*/
-static ADDRESS_MAP_START( sound3812_map, AS_PROGRAM, 8, itech8_state )
+ADDRESS_MAP_START(itech8_state::sound3812_map)
 	AM_RANGE(0x0000, 0x0000) AM_WRITENOP
 	AM_RANGE(0x1000, 0x1000) AM_READ(sound_data_r)
 	AM_RANGE(0x2000, 0x2001) AM_DEVREADWRITE("ymsnd", ym3812_device, read, write)
@@ -961,7 +961,7 @@ ADDRESS_MAP_END
 
 
 /*------ external YM3812-based sound board ------*/
-static ADDRESS_MAP_START( sound3812_external_map, AS_PROGRAM, 8, itech8_state )
+ADDRESS_MAP_START(itech8_state::sound3812_external_map)
 	AM_RANGE(0x0000, 0x0000) AM_WRITENOP
 	AM_RANGE(0x1000, 0x1000) AM_READ(sound_data_r)
 	AM_RANGE(0x2000, 0x2001) AM_DEVREADWRITE("ymsnd", ym3812_device, read, write)
@@ -979,12 +979,12 @@ ADDRESS_MAP_END
  *
  *************************************/
 
-static ADDRESS_MAP_START( slikz80_mem_map, AS_PROGRAM, 8, itech8_state )
+ADDRESS_MAP_START(itech8_state::slikz80_mem_map)
 	AM_RANGE(0x0000, 0x7ff) AM_ROM
 ADDRESS_MAP_END
 
 
-static ADDRESS_MAP_START( slikz80_io_map, AS_IO, 8, itech8_state )
+ADDRESS_MAP_START(itech8_state::slikz80_io_map)
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	AM_RANGE(0x00, 0x00) AM_READWRITE(slikz80_port_r, slikz80_port_w)
 ADDRESS_MAP_END
@@ -1699,7 +1699,8 @@ MACHINE_CONFIG_START(itech8_state::itech8_core_lo)
 MACHINE_CONFIG_END
 
 
-MACHINE_CONFIG_DERIVED(itech8_state::itech8_core_hi, itech8_core_lo)
+MACHINE_CONFIG_START(itech8_state::itech8_core_hi)
+	itech8_core_lo(config);
 
 	/* basic machine hardware */
 	MCFG_CPU_MODIFY("maincpu")
@@ -1780,10 +1781,11 @@ MACHINE_CONFIG_END
 
 /************* full drivers ******************/
 
-MACHINE_CONFIG_DERIVED(itech8_state::wfortune, itech8_core_hi)
+MACHINE_CONFIG_START(itech8_state::wfortune)
+	itech8_core_hi(config);
 
 	/* basic machine hardware */
-	MCFG_FRAGMENT_ADD(itech8_sound_ym2203)
+	itech8_sound_ym2203(config);
 
 	/* video hardware */
 	MCFG_SCREEN_MODIFY("screen")
@@ -1794,10 +1796,11 @@ MACHINE_CONFIG_DERIVED(itech8_state::wfortune, itech8_core_hi)
 MACHINE_CONFIG_END
 
 
-MACHINE_CONFIG_DERIVED(itech8_state::grmatch, itech8_core_hi)
+MACHINE_CONFIG_START(itech8_state::grmatch)
+	itech8_core_hi(config);
 
 	/* basic machine hardware */
-	MCFG_FRAGMENT_ADD(itech8_sound_ym2608b)
+	itech8_sound_ym2608b(config);
 
 	/* video hardware */
 	MCFG_SCREEN_MODIFY("screen")
@@ -1810,10 +1813,11 @@ MACHINE_CONFIG_DERIVED(itech8_state::grmatch, itech8_core_hi)
 MACHINE_CONFIG_END
 
 
-MACHINE_CONFIG_DERIVED(itech8_state::stratab_hi, itech8_core_hi)
+MACHINE_CONFIG_START(itech8_state::stratab_hi)
+	itech8_core_hi(config);
 
 	/* basic machine hardware */
-	MCFG_FRAGMENT_ADD(itech8_sound_ym2203)
+	itech8_sound_ym2203(config);
 
 	/* video hardware */
 	MCFG_SCREEN_MODIFY("screen")
@@ -1823,10 +1827,11 @@ MACHINE_CONFIG_DERIVED(itech8_state::stratab_hi, itech8_core_hi)
 MACHINE_CONFIG_END
 
 
-MACHINE_CONFIG_DERIVED(itech8_state::stratab_lo, itech8_core_lo)
+MACHINE_CONFIG_START(itech8_state::stratab_lo)
+	itech8_core_lo(config);
 
 	/* basic machine hardware */
-	MCFG_FRAGMENT_ADD(itech8_sound_ym2203)
+	itech8_sound_ym2203(config);
 
 	/* video hardware */
 	MCFG_SCREEN_MODIFY("screen")
@@ -1835,10 +1840,11 @@ MACHINE_CONFIG_DERIVED(itech8_state::stratab_lo, itech8_core_lo)
 MACHINE_CONFIG_END
 
 
-MACHINE_CONFIG_DERIVED(itech8_state::slikshot_hi, itech8_core_hi)
+MACHINE_CONFIG_START(itech8_state::slikshot_hi)
+	itech8_core_hi(config);
 
 	/* basic machine hardware */
-	MCFG_FRAGMENT_ADD(itech8_sound_ym2203)
+	itech8_sound_ym2203(config);
 
 	MCFG_CPU_ADD("sub", Z80, CLOCK_8MHz/2)
 	MCFG_CPU_PROGRAM_MAP(slikz80_mem_map)
@@ -1852,10 +1858,11 @@ MACHINE_CONFIG_DERIVED(itech8_state::slikshot_hi, itech8_core_hi)
 MACHINE_CONFIG_END
 
 
-MACHINE_CONFIG_DERIVED(itech8_state::slikshot_lo, itech8_core_lo)
+MACHINE_CONFIG_START(itech8_state::slikshot_lo)
+	itech8_core_lo(config);
 
 	/* basic machine hardware */
-	MCFG_FRAGMENT_ADD(itech8_sound_ym2203)
+	itech8_sound_ym2203(config);
 
 	MCFG_CPU_ADD("sub", Z80, CLOCK_8MHz/2)
 	MCFG_CPU_PROGRAM_MAP(slikz80_mem_map)
@@ -1869,10 +1876,11 @@ MACHINE_CONFIG_DERIVED(itech8_state::slikshot_lo, itech8_core_lo)
 MACHINE_CONFIG_END
 
 
-MACHINE_CONFIG_DERIVED(itech8_state::slikshot_lo_noz80, itech8_core_lo)
+MACHINE_CONFIG_START(itech8_state::slikshot_lo_noz80)
+	itech8_core_lo(config);
 
 	/* basic machine hardware */
-	MCFG_FRAGMENT_ADD(itech8_sound_ym2203)
+	itech8_sound_ym2203(config);
 
 	/* video hardware */
 	MCFG_SCREEN_MODIFY("screen")
@@ -1881,7 +1889,8 @@ MACHINE_CONFIG_DERIVED(itech8_state::slikshot_lo_noz80, itech8_core_lo)
 MACHINE_CONFIG_END
 
 
-MACHINE_CONFIG_DERIVED(itech8_state::sstrike, slikshot_lo)
+MACHINE_CONFIG_START(itech8_state::sstrike)
+	slikshot_lo(config);
 
 	/* basic machine hardware */
 	MCFG_MACHINE_START_OVERRIDE(itech8_state,sstrike)
@@ -1889,10 +1898,11 @@ MACHINE_CONFIG_DERIVED(itech8_state::sstrike, slikshot_lo)
 MACHINE_CONFIG_END
 
 
-MACHINE_CONFIG_DERIVED(itech8_state::hstennis_hi, itech8_core_hi)
+MACHINE_CONFIG_START(itech8_state::hstennis_hi)
+	itech8_core_hi(config);
 
 	/* basic machine hardware */
-	MCFG_FRAGMENT_ADD(itech8_sound_ym3812)
+	itech8_sound_ym3812(config);
 
 	/* video hardware */
 	MCFG_SCREEN_MODIFY("screen")
@@ -1901,10 +1911,11 @@ MACHINE_CONFIG_DERIVED(itech8_state::hstennis_hi, itech8_core_hi)
 MACHINE_CONFIG_END
 
 
-MACHINE_CONFIG_DERIVED(itech8_state::hstennis_lo, itech8_core_lo)
+MACHINE_CONFIG_START(itech8_state::hstennis_lo)
+	itech8_core_lo(config);
 
 	/* basic machine hardware */
-	MCFG_FRAGMENT_ADD(itech8_sound_ym3812)
+	itech8_sound_ym3812(config);
 
 	/* video hardware */
 	MCFG_SCREEN_MODIFY("screen")
@@ -1913,10 +1924,11 @@ MACHINE_CONFIG_DERIVED(itech8_state::hstennis_lo, itech8_core_lo)
 MACHINE_CONFIG_END
 
 
-MACHINE_CONFIG_DERIVED(itech8_state::rimrockn, itech8_core_hi)
+MACHINE_CONFIG_START(itech8_state::rimrockn)
+	itech8_core_hi(config);
 
 	/* basic machine hardware */
-	MCFG_FRAGMENT_ADD(itech8_sound_ym3812_external)
+	itech8_sound_ym3812_external(config);
 
 	MCFG_CPU_REPLACE("maincpu", HD6309, CLOCK_12MHz)
 	MCFG_CPU_PROGRAM_MAP(tmshi_map)
@@ -1929,10 +1941,11 @@ MACHINE_CONFIG_DERIVED(itech8_state::rimrockn, itech8_core_hi)
 MACHINE_CONFIG_END
 
 
-MACHINE_CONFIG_DERIVED(itech8_state::ninclown, itech8_core_hi)
+MACHINE_CONFIG_START(itech8_state::ninclown)
+	itech8_core_hi(config);
 
 	/* basic machine hardware */
-	MCFG_FRAGMENT_ADD(itech8_sound_ym3812_external)
+	itech8_sound_ym3812_external(config);
 
 	MCFG_CPU_REPLACE("maincpu", M68000, CLOCK_12MHz)
 	MCFG_CPU_PROGRAM_MAP(ninclown_map)
@@ -1946,10 +1959,11 @@ MACHINE_CONFIG_DERIVED(itech8_state::ninclown, itech8_core_hi)
 MACHINE_CONFIG_END
 
 
-MACHINE_CONFIG_DERIVED(itech8_state::gtg2, itech8_core_lo)
+MACHINE_CONFIG_START(itech8_state::gtg2)
+	itech8_core_lo(config);
 
 	/* basic machine hardware */
-	MCFG_FRAGMENT_ADD(itech8_sound_ym3812_external)
+	itech8_sound_ym3812_external(config);
 
 	MCFG_CPU_MODIFY("maincpu")
 	MCFG_CPU_PROGRAM_MAP(gtg2_map)

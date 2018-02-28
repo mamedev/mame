@@ -12,31 +12,31 @@
 	MCFG_DEVICE_ADD(_tag, NAMCO_51XX, _clock)
 
 #define MCFG_NAMCO_51XX_INPUT_0_CB(_devcb) \
-	devcb = &namco_51xx_device::set_input_callback<0>(*device, DEVCB_##_devcb);
+	devcb = &downcast<namco_51xx_device &>(*device).set_input_callback<0>(DEVCB_##_devcb);
 
 #define MCFG_NAMCO_51XX_INPUT_1_CB(_devcb) \
-	devcb = &namco_51xx_device::set_input_callback<1>(*device, DEVCB_##_devcb);
+	devcb = &downcast<namco_51xx_device &>(*device).set_input_callback<1>(DEVCB_##_devcb);
 
 #define MCFG_NAMCO_51XX_INPUT_2_CB(_devcb) \
-	devcb = &namco_51xx_device::set_input_callback<2>(*device, DEVCB_##_devcb);
+	devcb = &downcast<namco_51xx_device &>(*device).set_input_callback<2>(DEVCB_##_devcb);
 
 #define MCFG_NAMCO_51XX_INPUT_3_CB(_devcb) \
-	devcb = &namco_51xx_device::set_input_callback<3>(*device, DEVCB_##_devcb);
+	devcb = &downcast<namco_51xx_device &>(*device).set_input_callback<3>(DEVCB_##_devcb);
 
 #define MCFG_NAMCO_51XX_OUTPUT_0_CB(_devcb) \
-	devcb = &namco_51xx_device::set_output_callback<0>(*device, DEVCB_##_devcb);
+	devcb = &downcast<namco_51xx_device &>(*device).set_output_callback<0>(DEVCB_##_devcb);
 
 #define MCFG_NAMCO_51XX_OUTPUT_1_CB(_devcb) \
-	devcb = &namco_51xx_device::set_output_callback<1>(*device, DEVCB_##_devcb);
+	devcb = &downcast<namco_51xx_device &>(*device).set_output_callback<1>(DEVCB_##_devcb);
 
 class namco_51xx_device : public device_t
 {
 public:
 	namco_51xx_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
-	template <unsigned N, class Object> static devcb_base &set_input_callback(device_t &device, Object &&cb) { return downcast<namco_51xx_device &>(device).m_in[N].set_callback(std::forward<Object>(cb)); }
+	template <unsigned N, class Object> devcb_base &set_input_callback(Object &&cb) { return m_in[N].set_callback(std::forward<Object>(cb)); }
 
-	template <unsigned N, class Object> static devcb_base &set_output_callback(device_t &device, Object &&cb) { return downcast<namco_51xx_device &>(device).m_out[N].set_callback(std::forward<Object>(cb)); }
+	template <unsigned N, class Object> devcb_base &set_output_callback(Object &&cb) { return m_out[N].set_callback(std::forward<Object>(cb)); }
 
 	DECLARE_WRITE8_MEMBER( write );
 	DECLARE_READ8_MEMBER( read );

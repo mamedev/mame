@@ -133,7 +133,7 @@ READ16_MEMBER(isbc_215g_device::io_r)
 			break;
 		case 0x0c:
 			// reset channel 2
-			if(machine().side_effect_disabled()) // reading this is bad
+			if(machine().side_effects_disabled()) // reading this is bad
 				break;
 			m_dmac->sel_w(1);
 			m_dmac->ca_w(1);
@@ -295,7 +295,7 @@ WRITE16_MEMBER(isbc_215g_device::io_w)
 READ16_MEMBER(isbc_215g_device::mem_r)
 {
 	// XXX: hack to permit debugger to disassemble rom
-	if(machine().side_effect_disabled() && (offset < 0x1fff))
+	if(machine().side_effects_disabled() && (offset < 0x1fff))
 		return m_dmac->space(AS_IO).read_word_unaligned(offset*2);
 
 	switch(offset)
@@ -316,11 +316,11 @@ WRITE16_MEMBER(isbc_215g_device::mem_w)
 	m_maincpu_mem->write_word_unaligned(offset*2, data, mem_mask);
 }
 
-static ADDRESS_MAP_START(isbc_215g_mem, AS_PROGRAM, 16, isbc_215g_device)
+ADDRESS_MAP_START(isbc_215g_device::isbc_215g_mem)
 	AM_RANGE(0x00000, 0xfffff) AM_READWRITE(mem_r, mem_w)
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START(isbc_215g_io, AS_IO, 16, isbc_215g_device)
+ADDRESS_MAP_START(isbc_215g_device::isbc_215g_io)
 	AM_RANGE(0x0000, 0x3fff) AM_ROM AM_REGION("i8089", 0)
 	AM_RANGE(0x4000, 0x47ff) AM_MIRROR(0x3800) AM_RAM
 	AM_RANGE(0x8000, 0x8039) AM_MIRROR(0x3fc0) AM_READWRITE(io_r, io_w)

@@ -111,7 +111,7 @@ READ8_MEMBER(bombjack_state::soundlatch_read_and_clear)
 	// An extra flip-flop is used to clear the LS273 after reading it through a LS245
 	// (this flip-flop is then cleared in sync with the sound CPU clock)
 	uint8_t res = m_soundlatch->read(space, 0);
-	if (!machine().side_effect_disabled())
+	if (!machine().side_effects_disabled())
 		m_soundlatch->clear_w(space, 0, 0);
 	return res;
 }
@@ -128,7 +128,7 @@ WRITE8_MEMBER(bombjack_state::irq_mask_w)
 	m_nmi_mask = data & 1;
 }
 
-static ADDRESS_MAP_START( main_map, AS_PROGRAM, 8, bombjack_state )
+ADDRESS_MAP_START(bombjack_state::main_map)
 	AM_RANGE(0x0000, 0x7fff) AM_ROM
 	AM_RANGE(0x8000, 0x8fff) AM_RAM
 	AM_RANGE(0x9000, 0x93ff) AM_RAM_WRITE(bombjack_videoram_w) AM_SHARE("videoram")
@@ -149,13 +149,13 @@ static ADDRESS_MAP_START( main_map, AS_PROGRAM, 8, bombjack_state )
 	AM_RANGE(0xc000, 0xdfff) AM_ROM
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( audio_map, AS_PROGRAM, 8, bombjack_state )
+ADDRESS_MAP_START(bombjack_state::audio_map)
 	AM_RANGE(0x0000, 0x1fff) AM_ROM
 	AM_RANGE(0x4000, 0x43ff) AM_RAM
 	AM_RANGE(0x6000, 0x6000) AM_READ(soundlatch_read_and_clear)
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( audio_io_map, AS_IO, 8, bombjack_state )
+ADDRESS_MAP_START(bombjack_state::audio_io_map)
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	AM_RANGE(0x00, 0x01) AM_DEVWRITE("ay1", ay8910_device, address_data_w)
 	AM_RANGE(0x10, 0x11) AM_DEVWRITE("ay2", ay8910_device, address_data_w)

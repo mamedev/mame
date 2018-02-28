@@ -93,6 +93,7 @@ public:
 	uint32_t screen_update_safarir(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	void safarir(machine_config &config);
 	void safarir_audio(machine_config &config);
+	void main_map(address_map &map);
 };
 
 
@@ -341,7 +342,7 @@ void safarir_state::machine_start()
  *
  *************************************/
 
-static ADDRESS_MAP_START( main_map, AS_PROGRAM, 8, safarir_state )
+ADDRESS_MAP_START(safarir_state::main_map)
 	AM_RANGE(0x0000, 0x17ff) AM_ROM
 	AM_RANGE(0x2000, 0x27ff) AM_READWRITE(ram_r, ram_w) AM_SHARE("ram")
 	AM_RANGE(0x2800, 0x2800) AM_MIRROR(0x03ff) AM_READNOP AM_WRITE(ram_bank_w)
@@ -421,7 +422,7 @@ MACHINE_CONFIG_START(safarir_state::safarir)
 	MCFG_SCREEN_PALETTE("palette")
 
 	/* audio hardware */
-	MCFG_FRAGMENT_ADD(safarir_audio)
+	safarir_audio(config);
 MACHINE_CONFIG_END
 
 

@@ -88,7 +88,7 @@ PALETTE_INIT_MEMBER(electron_state, electron)
 	palette.set_pen_colors(0, electron_palette, ARRAY_LENGTH(electron_palette));
 }
 
-static ADDRESS_MAP_START(electron_mem, AS_PROGRAM, 8, electron_state )
+ADDRESS_MAP_START(electron_state::electron_mem)
 	AM_RANGE(0x0000, 0x7fff) AM_READWRITE(electron_mem_r, electron_mem_w)           /* 32KB of RAM */
 	AM_RANGE(0x8000, 0xbfff) AM_READWRITE(electron_paged_r, electron_paged_w)       /* Banked ROM pages */
 	AM_RANGE(0xc000, 0xfbff) AM_ROM AM_REGION("mos", 0x0000)                        /* OS ROM */
@@ -237,7 +237,8 @@ MACHINE_CONFIG_START(electron_state::electron)
 MACHINE_CONFIG_END
 
 
-MACHINE_CONFIG_DERIVED(electron_state::btm2105, electron)
+MACHINE_CONFIG_START(electron_state::btm2105)
+	electron(config);
 	MCFG_SCREEN_MODIFY("screen")
 	MCFG_SCREEN_COLOR(rgb_t::amber())
 

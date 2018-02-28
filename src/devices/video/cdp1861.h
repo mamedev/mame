@@ -34,13 +34,13 @@
 //**************************************************************************
 
 #define MCFG_CDP1861_IRQ_CALLBACK(_write) \
-	devcb = &cdp1861_device::set_irq_wr_callback(*device, DEVCB_##_write);
+	devcb = &downcast<cdp1861_device &>(*device).set_irq_wr_callback(DEVCB_##_write);
 
 #define MCFG_CDP1861_DMA_OUT_CALLBACK(_write) \
-	devcb = &cdp1861_device::set_dma_out_wr_callback(*device, DEVCB_##_write);
+	devcb = &downcast<cdp1861_device &>(*device).set_dma_out_wr_callback(DEVCB_##_write);
 
 #define MCFG_CDP1861_EFX_CALLBACK(_write) \
-	devcb = &cdp1861_device::set_efx_wr_callback(*device, DEVCB_##_write);
+	devcb = &downcast<cdp1861_device &>(*device).set_efx_wr_callback(DEVCB_##_write);
 
 
 #define MCFG_CDP1861_SCREEN_ADD(_cdptag, _tag, _clock) \
@@ -88,9 +88,9 @@ public:
 	// construction/destruction
 	cdp1861_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
-	template <class Object> static devcb_base &set_irq_wr_callback(device_t &device, Object &&cb) { return downcast<cdp1861_device &>(device).m_write_irq.set_callback(std::forward<Object>(cb)); }
-	template <class Object> static devcb_base &set_dma_out_wr_callback(device_t &device, Object &&cb) { return downcast<cdp1861_device &>(device).m_write_dma_out.set_callback(std::forward<Object>(cb)); }
-	template <class Object> static devcb_base &set_efx_wr_callback(device_t &device, Object &&cb) { return downcast<cdp1861_device &>(device).m_write_efx.set_callback(std::forward<Object>(cb)); }
+	template <class Object> devcb_base &set_irq_wr_callback(Object &&cb) { return m_write_irq.set_callback(std::forward<Object>(cb)); }
+	template <class Object> devcb_base &set_dma_out_wr_callback(Object &&cb) { return m_write_dma_out.set_callback(std::forward<Object>(cb)); }
+	template <class Object> devcb_base &set_efx_wr_callback(Object &&cb) { return m_write_efx.set_callback(std::forward<Object>(cb)); }
 
 	DECLARE_WRITE8_MEMBER( dma_w );
 	DECLARE_WRITE_LINE_MEMBER( disp_on_w );

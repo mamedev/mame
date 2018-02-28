@@ -210,6 +210,7 @@ public:
 	TILE_GET_INFO_MEMBER(get_bg_tile_info);
 
 	void nevada(machine_config &config);
+	void nevada_map(address_map &map);
 };
 
 /*
@@ -511,7 +512,7 @@ U40 MC68681 Pin27 OP4  JCM Bill Acceptor  (J4-6, J4-7 Control)
     00E000x0 68681 CS  UART U18 RS1..RS4 REGISTER (A4..A7 ON RS1..RS4)  Data bus on D15..D8
 */
 /***************************************************************************/
-static ADDRESS_MAP_START( nevada_map, AS_PROGRAM, 16,nevada_state )
+ADDRESS_MAP_START(nevada_state::nevada_map)
 	AM_RANGE(0x00000000, 0x0000ffff) AM_RAM AM_SHARE("ram62256")
 	AM_RANGE(0x00010000, 0x00021fff) AM_RAM AM_SHARE("backup")
 	AM_RANGE(0x00900000, 0x00900001) AM_DEVWRITE8("crtc",mc6845_device, address_w,0x00ff )

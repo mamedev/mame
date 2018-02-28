@@ -30,7 +30,6 @@ class mikrosha_state : public radio86_state
 public:
 	mikrosha_state(const machine_config &mconfig, device_type type, const char *tag)
 		: radio86_state(mconfig, type, tag)
-		, m_cart(*this, "cartslot")
 	{ }
 
 	DECLARE_WRITE_LINE_MEMBER(mikrosha_pit_out2);
@@ -38,8 +37,8 @@ public:
 	DECLARE_MACHINE_RESET(mikrosha);
 
 	void mikrosha(machine_config &config);
-protected:
-	required_device<generic_slot_device> m_cart;
+	void mikrosha_io(address_map &map);
+	void mikrosha_mem(address_map &map);
 };
 
 MACHINE_RESET_MEMBER(mikrosha_state,mikrosha)
@@ -50,7 +49,7 @@ MACHINE_RESET_MEMBER(mikrosha_state,mikrosha)
 }
 
 /* Address maps */
-static ADDRESS_MAP_START(mikrosha_mem, AS_PROGRAM, 8, mikrosha_state )
+ADDRESS_MAP_START(mikrosha_state::mikrosha_mem)
 	AM_RANGE( 0x0000, 0x0fff ) AM_RAMBANK("bank1") // First bank
 	AM_RANGE( 0x1000, 0x7fff ) AM_RAM // RAM
 	AM_RANGE( 0xc000, 0xc003 ) AM_DEVREADWRITE("ppi8255_1", i8255_device, read, write) AM_MIRROR(0x07fc)
@@ -62,7 +61,7 @@ static ADDRESS_MAP_START(mikrosha_mem, AS_PROGRAM, 8, mikrosha_state )
 	AM_RANGE( 0xf800, 0xffff ) AM_ROM  // System ROM
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( mikrosha_io , AS_IO, 8, mikrosha_state )
+ADDRESS_MAP_START(mikrosha_state::mikrosha_io)
 	ADDRESS_MAP_UNMAP_HIGH
 	AM_RANGE( 0x00, 0xff ) AM_READWRITE(radio_io_r,radio_io_w)
 ADDRESS_MAP_END

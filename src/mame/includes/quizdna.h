@@ -49,4 +49,9 @@ public:
 	void gakupara(machine_config &config);
 	void quizdna(machine_config &config);
 	void gekiretu(machine_config &config);
+	void gakupara_io_map(address_map &map);
+	void gekiretu_io_map(address_map &map);
+	void gekiretu_map(address_map &map);
+	void quizdna_io_map(address_map &map);
+	void quizdna_map(address_map &map);
 };

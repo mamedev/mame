@@ -39,9 +39,6 @@ public:
 	// construction/destruction
 	sed1330_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
-	// optional information overrides
-	virtual const tiny_rom_entry *device_rom_region() const override;
-
 	DECLARE_READ8_MEMBER( status_r );
 	DECLARE_WRITE8_MEMBER( command_w );
 
@@ -58,14 +55,8 @@ protected:
 	// device_memory_interface overrides
 	virtual space_config_vector memory_space_config() const override;
 
-	inline uint8_t readbyte(offs_t address);
-	inline void writebyte(offs_t address, uint8_t m_data);
-	inline void increment_csr();
-
-	void draw_text_scanline(bitmap_ind16 &bitmap, const rectangle &cliprect, int y, uint16_t va);
-	void draw_graphics_scanline(bitmap_ind16 &bitmap, const rectangle &cliprect, int y, uint16_t va);
-	void update_graphics(bitmap_ind16 &bitmap, const rectangle &cliprect);
-	void update_text(bitmap_ind16 &bitmap, const rectangle &cliprect);
+	// optional information overrides
+	virtual const tiny_rom_entry *device_rom_region() const override;
 
 private:
 	int m_bf;                   // busy flag
@@ -114,6 +105,17 @@ private:
 
 	// address space configurations
 	const address_space_config      m_space_config;
+
+	inline uint8_t readbyte(offs_t address);
+	inline void writebyte(offs_t address, uint8_t m_data);
+	inline void increment_csr();
+
+	void draw_text_scanline(bitmap_ind16 &bitmap, const rectangle &cliprect, int y, uint16_t va);
+	void draw_graphics_scanline(bitmap_ind16 &bitmap, const rectangle &cliprect, int y, uint16_t va);
+	void update_graphics(bitmap_ind16 &bitmap, const rectangle &cliprect);
+	void update_text(bitmap_ind16 &bitmap, const rectangle &cliprect);
+
+	void sed1330(address_map &map);
 };
 
 

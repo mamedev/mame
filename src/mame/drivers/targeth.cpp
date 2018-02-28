@@ -138,11 +138,11 @@ READ8_MEMBER(targeth_state::shareram_r)
 }
 
 
-static ADDRESS_MAP_START( mcu_hostmem_map, 0, 8, targeth_state )
+ADDRESS_MAP_START(targeth_state::mcu_hostmem_map)
 	AM_RANGE(0x8000, 0xffff) AM_READWRITE(shareram_r, shareram_w) // confirmed that 0x8000 - 0xffff is a window into 68k shared RAM
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( main_map, AS_PROGRAM, 16, targeth_state )
+ADDRESS_MAP_START(targeth_state::main_map)
 	AM_RANGE(0x000000, 0x0fffff) AM_ROM
 	AM_RANGE(0x100000, 0x103fff) AM_RAM_WRITE(vram_w) AM_SHARE("videoram")  /* Video RAM */
 	AM_RANGE(0x108000, 0x108007) AM_WRITEONLY AM_SHARE("vregs") /* Video Registers */
@@ -167,7 +167,7 @@ static ADDRESS_MAP_START( main_map, AS_PROGRAM, 16, targeth_state )
 ADDRESS_MAP_END
 
 
-static ADDRESS_MAP_START( oki_map, 0, 8, targeth_state )
+ADDRESS_MAP_START(targeth_state::oki_map)
 	AM_RANGE(0x00000, 0x2ffff) AM_ROM
 	AM_RANGE(0x30000, 0x3ffff) AM_ROMBANK("okibank")
 ADDRESS_MAP_END

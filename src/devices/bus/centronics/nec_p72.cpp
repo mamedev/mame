@@ -36,7 +36,7 @@ const tiny_rom_entry *nec_p72_device::device_rom_region() const
 //  ADDRESS_MAP( p72_mem )
 //-------------------------------------------------
 
-static ADDRESS_MAP_START( p72_mem, AS_PROGRAM, 16, nec_p72_device )
+ADDRESS_MAP_START(nec_p72_device::p72_mem)
 	AM_RANGE(0x000000, 0x0fffff) AM_ROM /* 1Mbyte firmware */
 	//AM_RANGE(0x100000, 0x1fffff) AM_RAM /* 1Mbyte external RAM */ /* TODO might be 2x1Mbit */
 	// [RH] 29 August 2016: Commented out because the NEC V33 only has 20 address lines, and

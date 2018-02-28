@@ -10,10 +10,10 @@ typedef device_delegate<uint16_t (uint32_t)> sega_dec_read_delegate;
 DECLARE_DEVICE_TYPE(SEGA315_5838_COMP, sega_315_5838_comp_device)
 
 #define MCFG_SET_5838_READ_CALLBACK_CH1( _class, _method) \
-	sega_315_5838_comp_device::set_read_cb_ch1(*device, sega_m2_read_delegate(&_class::_method, #_class "::" #_method, nullptr, (_class *)nullptr));
+	downcast<sega_315_5838_comp_device &>(*device).set_read_cb_ch1(sega_m2_read_delegate(&_class::_method, #_class "::" #_method, nullptr, (_class *)nullptr));
 
 #define MCFG_SET_5838_READ_CALLBACK_CH2( _class, _method) \
-	sega_315_5838_comp_device::set_read_cb_ch2(*device, sega_m2_read_delegate(&_class::_method, #_class "::" #_method, nullptr, (_class *)nullptr));
+	downcast<sega_315_5838_comp_device &>(*device).set_read_cb_ch2(sega_m2_read_delegate(&_class::_method, #_class "::" #_method, nullptr, (_class *)nullptr));
 
 class sega_315_5838_comp_device :  public device_t
 {
@@ -21,17 +21,8 @@ public:
 	// construction/destruction
 	sega_315_5838_comp_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
-	static void set_read_cb_ch1(device_t &device,sega_dec_read_delegate readcb)
-	{
-		sega_315_5838_comp_device &dev = downcast<sega_315_5838_comp_device &>(device);
-		dev.m_channel[0].m_read_ch = readcb;
-	}
-
-	static void set_read_cb_ch2(device_t &device,sega_dec_read_delegate readcb)
-	{
-		sega_315_5838_comp_device &dev = downcast<sega_315_5838_comp_device &>(device);
-		dev.m_channel[1].m_read_ch = readcb;
-	}
+	template <typename Object> void set_read_cb_ch1(Object &&readcb) { m_channel[0].m_read_ch = std::forward<Object>(readcb); }
+	template <typename Object> void set_read_cb_ch2(Object &&readcb) { m_channel[1].m_read_ch = std::forward<Object>(readcb); }
 
 	DECLARE_READ32_MEMBER(decathlt_prot1_r);
 	DECLARE_READ32_MEMBER(decathlt_prot2_r);

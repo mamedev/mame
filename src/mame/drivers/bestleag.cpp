@@ -74,6 +74,7 @@ public:
 	void draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprect);
 	void bestleag(machine_config &config);
 	void bestleaw(machine_config &config);
+	void bestleag_map(address_map &map);
 };
 
 
@@ -249,7 +250,7 @@ WRITE16_MEMBER(bestleag_state::oki_bank_w)
 
 /* Memory Map */
 
-static ADDRESS_MAP_START( bestleag_map, AS_PROGRAM, 16, bestleag_state )
+ADDRESS_MAP_START(bestleag_state::bestleag_map)
 	AM_RANGE(0x000000, 0x03ffff) AM_ROM
 	AM_RANGE(0x0d2000, 0x0d3fff) AM_NOP // left over from the original game (only read / written in memory test)
 	AM_RANGE(0x0e0000, 0x0e3fff) AM_RAM_WRITE(bgram_w) AM_SHARE("bgram")
@@ -401,7 +402,8 @@ MACHINE_CONFIG_START(bestleag_state::bestleag)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", 1.00)
 MACHINE_CONFIG_END
 
-MACHINE_CONFIG_DERIVED(bestleag_state::bestleaw, bestleag)
+MACHINE_CONFIG_START(bestleag_state::bestleaw)
+	bestleag(config);
 	MCFG_SCREEN_MODIFY("screen")
 	MCFG_SCREEN_UPDATE_DRIVER(bestleag_state, screen_update_bestleaw)
 MACHINE_CONFIG_END

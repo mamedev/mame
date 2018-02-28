@@ -619,7 +619,7 @@ MACHINE_RESET_MEMBER(ppking_state, ppking)
 	m_mcu[0].state = 0;
 }
 
-static ADDRESS_MAP_START( ppking_cpu1_map, AS_PROGRAM, 8, ppking_state )
+ADDRESS_MAP_START(ppking_state::ppking_cpu1_map)
 	AM_RANGE(0x0000, 0xbfff) AM_ROM
 	AM_RANGE(0xc000, 0xcbff) AM_RAM AM_SHARE("spriteram")
 	AM_RANGE(0xcc00, 0xcfff) AM_WRITE(ppking_video_registers_w)
@@ -631,13 +631,13 @@ static ADDRESS_MAP_START( ppking_cpu1_map, AS_PROGRAM, 8, ppking_state )
 ADDRESS_MAP_END
 
 
-static ADDRESS_MAP_START( ppking_cpu3_map, AS_PROGRAM, 8, ppking_state )
+ADDRESS_MAP_START(ppking_state::ppking_cpu3_map)
 	AM_RANGE(0x1000, 0x1fff) AM_WRITE(ppking_adpcm_w)
 	AM_RANGE(0x2000, 0x2fff) AM_READ(adpcm_command_r)
 	AM_RANGE(0x8000, 0xffff) AM_ROM AM_WRITENOP
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( ppking_cpu1_io, AS_IO, 8, ppking_state )
+ADDRESS_MAP_START(ppking_state::ppking_cpu1_io)
 //  ADDRESS_MAP_GLOBAL_MASK(0xff)
 	AM_RANGE(0xc000, 0xc007) AM_DEVWRITE("mainlatch", ls259_device, write_d0)
 //  AM_RANGE(0xc004, 0xc004) AM_NOP // WRITE(ppking_irq_patch_w)
@@ -646,7 +646,7 @@ static ADDRESS_MAP_START( ppking_cpu1_io, AS_IO, 8, ppking_state )
 	AM_RANGE(0xc0c0, 0xc0c1) AM_READ(ppking_qxcomu_r) AM_WRITE(ppking_qxcomu_w)
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( ppking_cpu2_io, AS_IO, 8, ppking_state )
+ADDRESS_MAP_START(ppking_state::ppking_cpu2_io)
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	AM_RANGE(0x00, 0x01) AM_DEVREADWRITE("ymsnd", ym2203_device, read, write)
 	AM_RANGE(0x20, 0x21) AM_READ(ppking_qx1_r) AM_WRITE(ppking_qx1_w)
@@ -658,7 +658,7 @@ ADDRESS_MAP_END
 
 
 
-static ADDRESS_MAP_START( gladiatr_cpu1_map, AS_PROGRAM, 8, gladiatr_state )
+ADDRESS_MAP_START(gladiatr_state::gladiatr_cpu1_map)
 	AM_RANGE(0x0000, 0x5fff) AM_ROM
 	AM_RANGE(0x6000, 0xbfff) AM_ROMBANK("bank1")
 	AM_RANGE(0xc000, 0xcbff) AM_RAM AM_SHARE("spriteram")
@@ -670,26 +670,26 @@ static ADDRESS_MAP_START( gladiatr_cpu1_map, AS_PROGRAM, 8, gladiatr_state )
 	AM_RANGE(0xf000, 0xf7ff) AM_RAM AM_SHARE("nvram") /* battery backed RAM */
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( cpu2_map, AS_PROGRAM, 8, gladiatr_state )
+ADDRESS_MAP_START(gladiatr_state_base::cpu2_map)
 	AM_RANGE(0x0000, 0x7fff) AM_ROM
 	AM_RANGE(0x8000, 0x83ff) AM_RAM
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( gladiatr_cpu3_map, AS_PROGRAM, 8, gladiatr_state )
+ADDRESS_MAP_START(gladiatr_state::gladiatr_cpu3_map)
 	AM_RANGE(0x1000, 0x1fff) AM_WRITE(gladiator_adpcm_w)
 	AM_RANGE(0x2000, 0x2fff) AM_READ(adpcm_command_r)
 	AM_RANGE(0x4000, 0xffff) AM_ROMBANK("bank2") AM_WRITENOP
 ADDRESS_MAP_END
 
 
-static ADDRESS_MAP_START( gladiatr_cpu1_io, AS_IO, 8, gladiatr_state )
-	AM_RANGE(0xc004, 0xc004) AM_WRITE(gladiatr_irq_patch_w) /* !!! patch to 2nd CPU IRQ !!! */
+ADDRESS_MAP_START(gladiatr_state::gladiatr_cpu1_io)
 	AM_RANGE(0xc000, 0xc007) AM_DEVWRITE("mainlatch", ls259_device, write_d0)
+	AM_RANGE(0xc004, 0xc004) AM_WRITE(gladiatr_irq_patch_w) /* !!! patch to 2nd CPU IRQ !!! */
 	AM_RANGE(0xc09e, 0xc09f) AM_DEVREADWRITE("ucpu", upi41_cpu_device, upi41_master_r, upi41_master_w)
 	AM_RANGE(0xc0bf, 0xc0bf) AM_NOP // watchdog_reset_w doesn't work
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( gladiatr_cpu2_io, AS_IO, 8, gladiatr_state )
+ADDRESS_MAP_START(gladiatr_state::gladiatr_cpu2_io)
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	AM_RANGE(0x00, 0x01) AM_DEVREADWRITE("ymsnd", ym2203_device, read, write)
 	AM_RANGE(0x20, 0x21) AM_DEVREADWRITE("csnd", upi41_cpu_device, upi41_master_r, upi41_master_w)

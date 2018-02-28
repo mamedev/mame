@@ -233,6 +233,47 @@ public:
 	{
 	}
 
+	DECLARE_DRIVER_INIT(bfcobra);
+	void bfcobra(machine_config &config);
+
+protected:
+	DECLARE_READ8_MEMBER(chipset_r);
+	DECLARE_WRITE8_MEMBER(chipset_w);
+	DECLARE_WRITE8_MEMBER(rombank_w);
+	DECLARE_READ8_MEMBER(fdctrl_r);
+	DECLARE_READ8_MEMBER(fddata_r);
+	DECLARE_WRITE8_MEMBER(fdctrl_w);
+	DECLARE_READ8_MEMBER(int_latch_r);
+	DECLARE_READ8_MEMBER(meter_r);
+	DECLARE_WRITE8_MEMBER(meter_w);
+	DECLARE_READ8_MEMBER(latch_r);
+	DECLARE_WRITE8_MEMBER(latch_w);
+	DECLARE_READ8_MEMBER(upd_r);
+	DECLARE_WRITE8_MEMBER(upd_w);
+	DECLARE_WRITE_LINE_MEMBER(z80_acia_irq);
+	DECLARE_WRITE_LINE_MEMBER(m6809_data_irq);
+	DECLARE_WRITE_LINE_MEMBER(data_acia_tx_w);
+	DECLARE_WRITE_LINE_MEMBER(write_acia_clock);
+	virtual void machine_reset() override;
+	virtual void video_start() override;
+	uint32_t screen_update_bfcobra(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
+	INTERRUPT_GEN_MEMBER(timer_irq);
+	INTERRUPT_GEN_MEMBER(vblank_gen);
+	void RunBlit(address_space &space);
+	void update_irqs();
+	void reset_fdc();
+	void exec_w_phase(uint8_t data);
+	void init_ram();
+	void command_phase(struct fdc_t &fdc, uint8_t data);
+	inline uint8_t* blitter_get_addr(uint32_t addr);
+	inline void z80_bank(int num, int data);
+
+	void m6809_prog_map(address_map &map);
+	void ramdac_map(address_map &map);
+	void z80_io_map(address_map &map);
+	void z80_prog_map(address_map &map);
+
+private:
 	uint8_t m_bank_data[4];
 	std::unique_ptr<uint8_t[]> m_work_ram;
 	std::unique_ptr<uint8_t[]> m_video_ram;
@@ -259,37 +300,6 @@ public:
 	uint8_t m_col6bit[256];
 	struct bf_blitter_t m_blitter;
 	struct fdc_t m_fdc;
-	DECLARE_READ8_MEMBER(chipset_r);
-	DECLARE_WRITE8_MEMBER(chipset_w);
-	DECLARE_WRITE8_MEMBER(rombank_w);
-	DECLARE_READ8_MEMBER(fdctrl_r);
-	DECLARE_READ8_MEMBER(fddata_r);
-	DECLARE_WRITE8_MEMBER(fdctrl_w);
-	DECLARE_READ8_MEMBER(int_latch_r);
-	DECLARE_READ8_MEMBER(meter_r);
-	DECLARE_WRITE8_MEMBER(meter_w);
-	DECLARE_READ8_MEMBER(latch_r);
-	DECLARE_WRITE8_MEMBER(latch_w);
-	DECLARE_READ8_MEMBER(upd_r);
-	DECLARE_WRITE8_MEMBER(upd_w);
-	DECLARE_WRITE_LINE_MEMBER(z80_acia_irq);
-	DECLARE_WRITE_LINE_MEMBER(m6809_data_irq);
-	DECLARE_WRITE_LINE_MEMBER(data_acia_tx_w);
-	DECLARE_WRITE_LINE_MEMBER(write_acia_clock);
-	DECLARE_DRIVER_INIT(bfcobra);
-	virtual void machine_reset() override;
-	virtual void video_start() override;
-	uint32_t screen_update_bfcobra(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
-	INTERRUPT_GEN_MEMBER(timer_irq);
-	INTERRUPT_GEN_MEMBER(vblank_gen);
-	void RunBlit(address_space &space);
-	void update_irqs();
-	void reset_fdc();
-	void exec_w_phase(uint8_t data);
-	void init_ram();
-	void command_phase(struct fdc_t &fdc, uint8_t data);
-	inline uint8_t* blitter_get_addr(uint32_t addr);
-	inline void z80_bank(int num, int data);
 	required_device<cpu_device> m_maincpu;
 	required_device<cpu_device> m_audiocpu;
 	required_device<acia6850_device> m_acia6850_0;
@@ -298,7 +308,6 @@ public:
 	required_device<upd7759_device> m_upd7759;
 	required_device<palette_device> m_palette;
 	required_device<meters_device> m_meters;
-	void bfcobra(machine_config &config);
 };
 
 
@@ -1253,14 +1262,14 @@ void bfcobra_state::machine_reset()
 
 ***************************************************************************/
 
-static ADDRESS_MAP_START( z80_prog_map, AS_PROGRAM, 8, bfcobra_state )
+ADDRESS_MAP_START(bfcobra_state::z80_prog_map)
 	AM_RANGE(0x0000, 0x3fff) AM_ROMBANK("bank4")
 	AM_RANGE(0x4000, 0x7fff) AM_RAMBANK("bank1")
 	AM_RANGE(0x8000, 0xbfff) AM_RAMBANK("bank2")
 	AM_RANGE(0xc000, 0xffff) AM_RAMBANK("bank3")
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( z80_io_map, AS_IO, 8, bfcobra_state )
+ADDRESS_MAP_START(bfcobra_state::z80_io_map)
 ADDRESS_MAP_GLOBAL_MASK(0xff)
 	AM_RANGE(0x00, 0x23) AM_READWRITE(chipset_r, chipset_w)
 	AM_RANGE(0x24, 0x25) AM_DEVWRITE("acia6850_0", acia6850_device, write)
@@ -1275,7 +1284,7 @@ ADDRESS_MAP_GLOBAL_MASK(0xff)
 ADDRESS_MAP_END
 
 
-static ADDRESS_MAP_START( ramdac_map, 0, 8, bfcobra_state )
+ADDRESS_MAP_START(bfcobra_state::ramdac_map)
 	AM_RANGE(0x000, 0x3ff) AM_DEVREADWRITE("ramdac", ramdac_device, ramdac_pal_r, ramdac_rgb666_w)
 ADDRESS_MAP_END
 
@@ -1389,7 +1398,7 @@ WRITE8_MEMBER(bfcobra_state::upd_w)
 	m_upd7759->start_w(data & 0x40 ? 0 : 1);
 }
 
-static ADDRESS_MAP_START( m6809_prog_map, AS_PROGRAM, 8, bfcobra_state )
+ADDRESS_MAP_START(bfcobra_state::m6809_prog_map)
 	AM_RANGE(0x0000, 0x1fff) AM_RAM AM_SHARE("nvram")
 	AM_RANGE(0x2000, 0x2000) AM_RAM     // W 'B', 6F
 	AM_RANGE(0x2200, 0x2200) AM_RAM     // W 'F'

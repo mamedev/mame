@@ -9,7 +9,7 @@
     Board Info:
 
         CPU   : 68EC020 68000
-        SOUND : Ensoniq
+        SOUND : Ensoniq ES5505 + ES5510
         OSC.  : 40.000MHz 16.000MHz 30.47618MHz
 
         * This board (K11J0717A) uses following chips:
@@ -115,7 +115,7 @@ WRITE32_MEMBER(gunbustr_state::gunbustr_gun_w)
              MEMORY STRUCTURES
 ***********************************************************/
 
-static ADDRESS_MAP_START( gunbustr_map, AS_PROGRAM, 32, gunbustr_state )
+ADDRESS_MAP_START(gunbustr_state::gunbustr_map)
 	AM_RANGE(0x000000, 0x0fffff) AM_ROM
 	AM_RANGE(0x200000, 0x21ffff) AM_RAM AM_SHARE("ram")                                     /* main CPUA ram */
 	AM_RANGE(0x300000, 0x301fff) AM_RAM AM_SHARE("spriteram")               /* Sprite ram */

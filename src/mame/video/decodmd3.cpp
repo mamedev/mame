@@ -122,7 +122,7 @@ MC6845_UPDATE_ROW( decodmd_type3_device::crtc_update_row )
 	}
 }
 
-static ADDRESS_MAP_START( decodmd3_map, AS_PROGRAM, 16, decodmd_type3_device )
+ADDRESS_MAP_START(decodmd_type3_device::decodmd3_map)
 	AM_RANGE(0x00000000, 0x000fffff) AM_ROMBANK("dmdrom")
 	AM_RANGE(0x00800000, 0x0080ffff) AM_RAMBANK("dmdram")
 	AM_RANGE(0x00c00010, 0x00c00011) AM_READWRITE(crtc_status_r,crtc_address_w)
@@ -182,10 +182,4 @@ void decodmd_type3_device::device_reset()
 	m_rambank->set_entry(0);
 	m_rombank->configure_entry(0, &ROM[0]);
 	m_rombank->set_entry(0);
-}
-
-void decodmd_type3_device::static_set_gfxregion(device_t &device, const char *tag)
-{
-	decodmd_type3_device &cpuboard = downcast<decodmd_type3_device &>(device);
-	cpuboard.m_gfxtag = tag;
 }

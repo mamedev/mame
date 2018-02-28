@@ -377,7 +377,7 @@ WRITE_LINE_MEMBER(topspeed_state::z80ctc_to0)
                       MEMORY STRUCTURES
 ***********************************************************/
 
-static ADDRESS_MAP_START( cpua_map, AS_PROGRAM, 16, topspeed_state )
+ADDRESS_MAP_START(topspeed_state::cpua_map)
 	AM_RANGE(0x000000, 0x0fffff) AM_ROM
 	AM_RANGE(0x400000, 0x40ffff) AM_RAM AM_SHARE("sharedram")
 	AM_RANGE(0x500000, 0x503fff) AM_RAM_DEVWRITE("palette", palette_device, write16) AM_SHARE("palette")
@@ -399,7 +399,7 @@ static ADDRESS_MAP_START( cpua_map, AS_PROGRAM, 16, topspeed_state )
 	AM_RANGE(0xe00000, 0xe0ffff) AM_RAM AM_SHARE("spritemap")
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( cpub_map, AS_PROGRAM, 16, topspeed_state )
+ADDRESS_MAP_START(topspeed_state::cpub_map)
 	AM_RANGE(0x000000, 0x01ffff) AM_ROM
 	AM_RANGE(0x400000, 0x40ffff) AM_RAM AM_SHARE("sharedram")
 	AM_RANGE(0x880000, 0x880001) AM_READ8(input_bypass_r, 0x00ff) AM_DEVWRITE8("tc0040ioc", tc0040ioc_device, portreg_w, 0x00ff)
@@ -410,7 +410,7 @@ ADDRESS_MAP_END
 
 /***************************************************************************/
 
-static ADDRESS_MAP_START( z80_prg, AS_PROGRAM, 8, topspeed_state )
+ADDRESS_MAP_START(topspeed_state::z80_prg)
 	AM_RANGE(0x0000, 0x3fff) AM_ROM
 	AM_RANGE(0x4000, 0x7fff) AM_ROMBANK("sndbank")
 	AM_RANGE(0x8000, 0x8fff) AM_RAM
@@ -421,7 +421,7 @@ static ADDRESS_MAP_START( z80_prg, AS_PROGRAM, 8, topspeed_state )
 	AM_RANGE(0xd000, 0xdfff) AM_WRITE(volume_w)
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( z80_io, AS_IO, 8, topspeed_state )
+ADDRESS_MAP_START(topspeed_state::z80_io)
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	AM_RANGE(0x00, 0x00) AM_DEVREADWRITE("ctc", z80ctc_device, read, write)
 ADDRESS_MAP_END

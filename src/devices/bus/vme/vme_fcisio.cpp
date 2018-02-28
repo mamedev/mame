@@ -161,10 +161,10 @@ DEFINE_DEVICE_TYPE(VME_FCISIO1, vme_fcisio1_card_device, "fcisio1", "Force Compu
 #define CPU_CLOCK XTAL(20'000'000) /* HCJ */
 #define DUSCC_CLOCK XTAL(14'745'600) /* HCJ */
 
-static ADDRESS_MAP_START (fcisio1_mem, AS_PROGRAM, 16, vme_fcisio1_card_device)
+ADDRESS_MAP_START(vme_fcisio1_card_device::fcisio1_mem)
 	ADDRESS_MAP_UNMAP_HIGH
-	AM_RANGE (0x000000, 0x000007) AM_ROM AM_READ (bootvect_r)       /* Vectors mapped from System EPROM */
 	AM_RANGE (0x000000, 0x01ffff) AM_RAM /* SRAM */
+	AM_RANGE (0x000000, 0x000007) AM_ROM AM_READ (bootvect_r)       /* Vectors mapped from System EPROM */
 	AM_RANGE (0xe00000, 0xe001ff) AM_DEVREADWRITE8("duscc0", duscc68562_device, read, write, 0x00ff)
 	AM_RANGE (0xe20000, 0xe201ff) AM_DEVREADWRITE8("duscc1", duscc68562_device, read, write, 0x00ff)
 	AM_RANGE (0xe40000, 0xe401ff) AM_DEVREADWRITE8("duscc2", duscc68562_device, read, write, 0x00ff)

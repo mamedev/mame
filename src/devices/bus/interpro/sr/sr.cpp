@@ -2,8 +2,7 @@
 // copyright-holders:Patrick Mackinlay
 
 /*
- * An initial very primitive emulation of the SR bus for the Intergraph
- * InterPro.
+ * Shared Resource (SR) Bus emulation for Intergraph InterPro systems.
  *
  * The bus is referred to by several different names at different places
  * in the system code, such as SR, SR bus, SRX, SRX/C bus, CBUS and some
@@ -270,12 +269,10 @@ sr_slot_device::sr_slot_device(const machine_config &mconfig, const char *tag, d
 {
 }
 
-void sr_slot_device::static_set_sr_slot(device_t &device, const char *tag, const char *slot_tag)
+void sr_slot_device::set_sr_slot(const char *tag, const char *slot_tag)
 {
-	sr_slot_device &sr_card = dynamic_cast<sr_slot_device &>(device);
-
-	sr_card.m_sr_tag = tag;
-	sr_card.m_sr_slot_tag = slot_tag;
+	m_sr_tag = tag;
+	m_sr_slot_tag = slot_tag;
 }
 
 void sr_slot_device::device_start()
@@ -297,13 +294,11 @@ sr_device::sr_device(const machine_config &mconfig, const char *tag, device_t *o
 {
 }
 
-void sr_device::static_set_memory(device_t &device, const char *const tag, const int data_spacenum, const int io_spacenum)
+void sr_device::set_memory(const char *const tag, const int main_spacenum, const int io_spacenum)
 {
-	sr_device &sr = dynamic_cast<sr_device &>(device);
-
-	sr.m_memory_tag = tag;
-	sr.m_data_spacenum = data_spacenum;
-	sr.m_io_spacenum = io_spacenum;
+	m_memory_tag = tag;
+	m_main_spacenum = main_spacenum;
+	m_io_spacenum = io_spacenum;
 }
 
 void sr_device::device_start()
@@ -313,7 +308,7 @@ void sr_device::device_start()
 	// get the memory spaces
 	device_memory_interface *memory;
 	siblingdevice(m_memory_tag)->interface(memory);
-	m_data_space = &memory->space(m_data_spacenum);
+	m_main_space = &memory->space(m_main_spacenum);
 	m_io_space = &memory->space(m_io_spacenum);
 
 	// resolve callbacks
@@ -358,6 +353,12 @@ void device_sr_card_interface::set_sr_device()
 
 	// install the card in the next available slot
 	m_sr->install_card(*this, &device_sr_card_interface::map);
+}
+
+void device_sr_card_interface::irq(int state)
+{
+	// FIXME: hard-wire to irq0 for now
+	m_sr->irq0_w(state);
 }
 
 sr_card_device_base::sr_card_device_base(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, u32 clock, const char *idprom_region)

@@ -216,6 +216,7 @@ mvme147_state(const machine_config &mconfig, device_type type, const char *tag)
 	virtual void machine_start () override;
 	virtual void machine_reset () override;
 	void mvme147(machine_config &config);
+	void mvme147_mem(address_map &map);
 protected:
 
 private:
@@ -234,10 +235,10 @@ private:
 	uint8_t   m_vc_cntl_conf;
 };
 
-static ADDRESS_MAP_START (mvme147_mem, AS_PROGRAM, 32, mvme147_state)
+ADDRESS_MAP_START(mvme147_state::mvme147_mem)
 	ADDRESS_MAP_UNMAP_HIGH
-	AM_RANGE (0x00000000, 0x00000007) AM_ROM AM_READ  (bootvect_r)       /* ROM mirror just during reset */
 	AM_RANGE (0x00000000, 0x00000007) AM_RAM AM_WRITE (bootvect_w)       /* After first write we act as RAM */
+	AM_RANGE (0x00000000, 0x00000007) AM_ROM AM_READ  (bootvect_r)       /* ROM mirror just during reset */
 	AM_RANGE (0x00000008, 0x003fffff) AM_RAM /* 4 Mb RAM */
 	AM_RANGE (0xff800000, 0xff9fffff) AM_ROM AM_REGION("roms", 0x800000) //AM_MIRROR(0x00780000) /* ROM/EEPROM bank 1 - 147bug */
 	AM_RANGE (0xffa00000, 0xffbfffff) AM_ROM AM_REGION("roms", 0xa00000) //AM_MIRROR(0x00780000) /* ROM/EEPROM bank 2 - unpopulated */

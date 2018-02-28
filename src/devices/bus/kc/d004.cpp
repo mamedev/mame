@@ -22,12 +22,12 @@
     IMPLEMENTATION
 ***************************************************************************/
 
-static ADDRESS_MAP_START(kc_d004_mem, AS_PROGRAM, 8, kc_d004_device)
+ADDRESS_MAP_START(kc_d004_device::kc_d004_mem)
 	AM_RANGE(0x0000, 0xfbff) AM_RAM
 	AM_RANGE(0xfc00, 0xffff) AM_RAM     AM_SHARE("koppelram")
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START(kc_d004_io, AS_IO, 8, kc_d004_device)
+ADDRESS_MAP_START(kc_d004_device::kc_d004_io)
 	ADDRESS_MAP_UNMAP_HIGH
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	AM_RANGE(0xf0, 0xf1) AM_DEVICE(UPD765_TAG, upd765a_device, map)
@@ -38,15 +38,15 @@ static ADDRESS_MAP_START(kc_d004_io, AS_IO, 8, kc_d004_device)
 	AM_RANGE(0xfc, 0xff) AM_DEVREADWRITE(Z80CTC_TAG, z80ctc_device, read, write)
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START(kc_d004_gide_io, AS_IO, 8, kc_d004_gide_device)
+ADDRESS_MAP_START(kc_d004_gide_device::kc_d004_gide_io)
 	ADDRESS_MAP_UNMAP_HIGH
+	AM_RANGE(0x0000, 0xffff) AM_READWRITE(gide_r, gide_w)
 	AM_RANGE(0x00f0, 0x00f1) AM_MIRROR(0xff00)  AM_DEVICE(UPD765_TAG, upd765a_device, map)
 	AM_RANGE(0x00f2, 0x00f3) AM_MIRROR(0xff00)  AM_DEVREADWRITE(UPD765_TAG, upd765a_device, mdma_r, mdma_w)
 	AM_RANGE(0x00f4, 0x00f4) AM_MIRROR(0xff00)  AM_READ(hw_input_gate_r)
 	AM_RANGE(0x00f6, 0x00f7) AM_MIRROR(0xff00)  AM_WRITE(fdd_select_w)
 	AM_RANGE(0x00f8, 0x00f9) AM_MIRROR(0xff00)  AM_WRITE(hw_terminal_count_w)
 	AM_RANGE(0x00fc, 0x00ff) AM_MIRROR(0xff00)  AM_DEVREADWRITE(Z80CTC_TAG, z80ctc_device, read, write)
-	AM_RANGE(0x0000, 0xffff) AM_READWRITE(gide_r, gide_w)
 ADDRESS_MAP_END
 
 FLOPPY_FORMATS_MEMBER( kc_d004_device::floppy_formats )

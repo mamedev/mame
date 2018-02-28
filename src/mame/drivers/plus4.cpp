@@ -156,6 +156,8 @@ public:
 	uint8_t m_kb;
 
 	void plus4(machine_config &config);
+	void plus4_mem(address_map &map);
+	void ted_videoram_map(address_map &map);
 };
 
 
@@ -480,7 +482,7 @@ READ8_MEMBER( plus4_state::ted_videoram_r )
 //  ADDRESS_MAP( plus4_mem )
 //-------------------------------------------------
 
-static ADDRESS_MAP_START( plus4_mem, AS_PROGRAM, 8, plus4_state )
+ADDRESS_MAP_START(plus4_state::plus4_mem)
 	AM_RANGE(0x0000, 0xffff) AM_READWRITE(read, write)
 ADDRESS_MAP_END
 
@@ -489,7 +491,7 @@ ADDRESS_MAP_END
 //  ADDRESS_MAP( ted_videoram_map )
 //-------------------------------------------------
 
-static ADDRESS_MAP_START( ted_videoram_map, 0, 8, plus4_state )
+ADDRESS_MAP_START(plus4_state::ted_videoram_map)
 	AM_RANGE(0x0000, 0xffff) AM_READ(ted_videoram_r)
 ADDRESS_MAP_END
 
@@ -976,7 +978,8 @@ MACHINE_CONFIG_END
 //  MACHINE_CONFIG( plus4p )
 //-------------------------------------------------
 
-MACHINE_CONFIG_DERIVED(c16_state::plus4p, plus4)
+MACHINE_CONFIG_START(c16_state::plus4p)
+	plus4(config);
 	MCFG_DEVICE_MODIFY(MOS7501_TAG)
 	MCFG_DEVICE_CLOCK(XTAL(17'734'470)/20)
 
@@ -997,7 +1000,8 @@ MACHINE_CONFIG_END
 //  MACHINE_CONFIG( plus4n )
 //-------------------------------------------------
 
-MACHINE_CONFIG_DERIVED(c16_state::plus4n, plus4)
+MACHINE_CONFIG_START(c16_state::plus4n)
+	plus4(config);
 	MCFG_DEVICE_MODIFY(MOS7501_TAG)
 	MCFG_DEVICE_CLOCK(XTAL(14'318'181)/16)
 
@@ -1018,7 +1022,8 @@ MACHINE_CONFIG_END
 //  MACHINE_CONFIG( c16n )
 //-------------------------------------------------
 
-MACHINE_CONFIG_DERIVED(c16_state::c16n, plus4n)
+MACHINE_CONFIG_START(c16_state::c16n)
+	plus4n(config);
 	MCFG_CPU_MODIFY(MOS7501_TAG)
 	MCFG_M7501_PORT_CALLBACKS(READ8(c16_state, cpu_r), WRITE8(plus4_state, cpu_w))
 	MCFG_M7501_PORT_PULLS(0x00, 0xc0)
@@ -1040,7 +1045,8 @@ MACHINE_CONFIG_END
 //  MACHINE_CONFIG( c16p )
 //-------------------------------------------------
 
-MACHINE_CONFIG_DERIVED(c16_state::c16p, plus4p)
+MACHINE_CONFIG_START(c16_state::c16p)
+	plus4p(config);
 	MCFG_CPU_MODIFY(MOS7501_TAG)
 	MCFG_M7501_PORT_CALLBACKS(READ8(c16_state, cpu_r), WRITE8(plus4_state, cpu_w))
 	MCFG_M7501_PORT_PULLS(0x00, 0xc0)
@@ -1062,7 +1068,8 @@ MACHINE_CONFIG_END
 //  MACHINE_CONFIG( c232 )
 //-------------------------------------------------
 
-MACHINE_CONFIG_DERIVED(c16_state::c232, c16p)
+MACHINE_CONFIG_START(c16_state::c232)
+	c16p(config);
 	MCFG_DEVICE_MODIFY(RAM_TAG)
 	MCFG_RAM_DEFAULT_SIZE("32K")
 MACHINE_CONFIG_END
@@ -1072,7 +1079,8 @@ MACHINE_CONFIG_END
 //  MACHINE_CONFIG( v364 )
 //-------------------------------------------------
 
-MACHINE_CONFIG_DERIVED(c16_state::v364, plus4n)
+MACHINE_CONFIG_START(c16_state::v364)
+	plus4n(config);
 	MCFG_SOUND_ADD(T6721A_TAG, T6721A, XTAL(640'000))
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
 
@@ -1175,11 +1183,11 @@ ROM_START( plus4p )
 
 	ROM_DEFAULT_BIOS("r5")
 	ROM_SYSTEM_BIOS( 0, "r3", "Revision 3" )
-	ROMX_LOAD( "318004-03.u4", 0x4000, 0x4000, CRC(77bab934) SHA1(97814dab9d757fe5a3a61d357a9a81da588a9783), ROM_BIOS(1) )
+	ROMX_LOAD( "318004-03.u24", 0x4000, 0x4000, CRC(77bab934) SHA1(97814dab9d757fe5a3a61d357a9a81da588a9783), ROM_BIOS(1) )
 	ROM_SYSTEM_BIOS( 1, "r4", "Revision 4" )
-	ROMX_LOAD( "318004-04.u4", 0x4000, 0x4000, CRC(be54ed79) SHA1(514ad3c29d01a2c0a3b143d9c1d4143b1912b793), ROM_BIOS(2) )
+	ROMX_LOAD( "318004-04.u24", 0x4000, 0x4000, CRC(be54ed79) SHA1(514ad3c29d01a2c0a3b143d9c1d4143b1912b793), ROM_BIOS(2) )
 	ROM_SYSTEM_BIOS( 2, "r5", "Revision 5" )
-	ROMX_LOAD( "318004-05.u4", 0x4000, 0x4000, CRC(71c07bd4) SHA1(7c7e07f016391174a557e790c4ef1cbe33512cdb), ROM_BIOS(3) )
+	ROMX_LOAD( "318004-05.u24", 0x4000, 0x4000, CRC(71c07bd4) SHA1(7c7e07f016391174a557e790c4ef1cbe33512cdb), ROM_BIOS(3) )
 
 	ROM_REGION( 0x8000, "function", 0 )
 	ROM_LOAD( "317053-01.u25", 0x0000, 0x4000, CRC(4fd1d8cb) SHA1(3b69f6e7cb4c18bb08e203fb18b7dabfa853390f) )

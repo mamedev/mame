@@ -431,7 +431,7 @@ READ8_MEMBER(spectrum_state::spectrum_port_ula_r)
 
 /* Memory Maps */
 
-static ADDRESS_MAP_START (spectrum_mem, AS_PROGRAM, 8, spectrum_state )
+ADDRESS_MAP_START(spectrum_state::spectrum_mem)
 	AM_RANGE(0x0000, 0x3fff) AM_READWRITE(spectrum_rom_r, spectrum_rom_w)
 	AM_RANGE(0x4000, 0x5aff) AM_RAM AM_SHARE("video_ram")
 //  AM_RANGE(0x5b00, 0x7fff) AM_RAM
@@ -440,7 +440,7 @@ ADDRESS_MAP_END
 
 /* ports are not decoded full.
 The function decodes the ports appropriately */
-static ADDRESS_MAP_START (spectrum_io, AS_IO, 8, spectrum_state )
+ADDRESS_MAP_START(spectrum_state::spectrum_io)
 	AM_RANGE(0x00, 0x00) AM_READWRITE(spectrum_port_fe_r, spectrum_port_fe_w) AM_SELECT(0xfffe)
 	AM_RANGE(0x01, 0x01) AM_READ(spectrum_port_ula_r) AM_MIRROR(0xfffe)
 ADDRESS_MAP_END
@@ -699,7 +699,8 @@ MACHINE_CONFIG_START(spectrum_state::spectrum_common)
 	MCFG_SOFTWARE_LIST_ADD("cass_list", "spectrum_cass")
 MACHINE_CONFIG_END
 
-MACHINE_CONFIG_DERIVED(spectrum_state::spectrum, spectrum_common)
+MACHINE_CONFIG_START(spectrum_state::spectrum)
+	spectrum_common(config);
 
 	/* internal ram */
 	MCFG_RAM_ADD(RAM_TAG)               // This configuration is verified only for the original ZX Spectrum.

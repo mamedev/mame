@@ -50,10 +50,11 @@ public:
 
 	required_device<cpu_device> m_maincpu;
 	void pitchhit(machine_config &config);
+	void main_map(address_map &map);
 };
 
 
-static ADDRESS_MAP_START( main_map, AS_PROGRAM, 8, nsg6809_state )
+ADDRESS_MAP_START(nsg6809_state::main_map)
 	AM_RANGE(0x0000, 0x1fff) AM_RAM
 	AM_RANGE(0x2800, 0x280f) AM_DEVREADWRITE("via", via6522_device, read, write)
 	AM_RANGE(0x3000, 0x3003) AM_DEVREADWRITE("acia", mos6551_device, read, write)

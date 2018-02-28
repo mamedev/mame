@@ -56,18 +56,6 @@ WRITE8_MEMBER(yunsung8_state::bankswitch_w)
 		logerror("CPU #0 - PC %04X: Bank %02X\n", m_maincpu->pc(), data);
 }
 
-READ8_MEMBER(yunsung8_state::sound_command_r)
-{
-	m_audiocpu->set_input_line(0, CLEAR_LINE);
-	return m_soundlatch->read(space, 0);
-}
-
-WRITE8_MEMBER(yunsung8_state::sound_command_w)
-{
-	m_soundlatch->write(space, 0, data);
-	m_audiocpu->set_input_line(0, ASSERT_LINE);
-}
-
 WRITE8_MEMBER(yunsung8_state::main_irq_ack_w)
 {
 	m_maincpu->set_input_line(0, CLEAR_LINE);
@@ -82,20 +70,20 @@ WRITE8_MEMBER(yunsung8_state::main_irq_ack_w)
     d000-dfff   Tiles   ""
 */
 
-static ADDRESS_MAP_START( main_map, AS_PROGRAM, 8, yunsung8_state )
+ADDRESS_MAP_START(yunsung8_state::main_map)
+	AM_RANGE(0x0000, 0x7fff) AM_ROM
 	AM_RANGE(0x0001, 0x0001) AM_WRITE(bankswitch_w)    // ROM Bank (again?)
 	AM_RANGE(0x8000, 0xbfff) AM_ROMBANK("mainbank")    // Banked ROM
-	AM_RANGE(0x0000, 0xbfff) AM_ROM
 	AM_RANGE(0xc000, 0xdfff) AM_READWRITE(videoram_r, videoram_w) // Video RAM (Banked)
 	AM_RANGE(0xe000, 0xffff) AM_RAM
 ADDRESS_MAP_END
 
 
-static ADDRESS_MAP_START( port_map, AS_IO, 8, yunsung8_state )
+ADDRESS_MAP_START(yunsung8_state::port_map)
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	AM_RANGE(0x00, 0x00) AM_READ_PORT("SYSTEM") AM_WRITE(videobank_w)  // video RAM bank
 	AM_RANGE(0x01, 0x01) AM_READ_PORT("P1") AM_WRITE(bankswitch_w) // ROM Bank + Layers Enable
-	AM_RANGE(0x02, 0x02) AM_READ_PORT("P2") AM_WRITE(sound_command_w) // To Sound CPU
+	AM_RANGE(0x02, 0x02) AM_READ_PORT("P2") AM_DEVWRITE("soundlatch", generic_latch_8_device, write) // To Sound CPU
 	AM_RANGE(0x03, 0x03) AM_READ_PORT("DSW1")
 	AM_RANGE(0x04, 0x04) AM_READ_PORT("DSW2")
 	AM_RANGE(0x06, 0x06) AM_WRITE(flipscreen_w)    // Flip Screen
@@ -124,14 +112,14 @@ WRITE8_MEMBER(yunsung8_state::sound_bankswitch_w)
 
 
 
-static ADDRESS_MAP_START( sound_map, AS_PROGRAM, 8, yunsung8_state )
+ADDRESS_MAP_START(yunsung8_state::sound_map)
 	AM_RANGE(0x0000, 0x7fff) AM_ROM
 	AM_RANGE(0x8000, 0xbfff) AM_ROMBANK("soundbank")      // Banked ROM
 	AM_RANGE(0xe000, 0xe000) AM_WRITE(sound_bankswitch_w) // ROM Bank
 	AM_RANGE(0xe400, 0xe400) AM_DEVWRITE("adpcm_select", ls157_device, ba_w)
 	AM_RANGE(0xec00, 0xec01) AM_DEVWRITE("ymsnd", ym3812_device, write)
 	AM_RANGE(0xf000, 0xf7ff) AM_RAM
-	AM_RANGE(0xf800, 0xf800) AM_READ(sound_command_r) // From Main CPU
+	AM_RANGE(0xf800, 0xf800) AM_DEVREAD("soundlatch", generic_latch_8_device, read) // From Main CPU
 ADDRESS_MAP_END
 
 
@@ -375,6 +363,7 @@ MACHINE_CONFIG_START(yunsung8_state::yunsung8)
 	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
 
 	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
+	MCFG_GENERIC_LATCH_DATA_PENDING_CB(INPUTLINE("audiocpu", 0))
 
 	MCFG_SOUND_ADD("ymsnd", YM3812, XTAL(16'000'000)/4)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "lspeaker", 1.0)

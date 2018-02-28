@@ -162,6 +162,9 @@ public:
 	void glcolor(machine_config &config);
 	void prestige(machine_config &config);
 	void gl7007sl(machine_config &config);
+	void glcolor_io(address_map &map);
+	void prestige_io(address_map &map);
+	void prestige_mem(address_map &map);
 };
 
 
@@ -320,7 +323,7 @@ WRITE8_MEMBER( prestige_state::lcdc_w )
 }
 
 
-static ADDRESS_MAP_START(prestige_mem, AS_PROGRAM, 8, prestige_state)
+ADDRESS_MAP_START(prestige_state::prestige_mem)
 	AM_RANGE(0x0000, 0x3fff) AM_ROMBANK("bank1")
 	AM_RANGE(0x4000, 0x7fff) AM_ROMBANK("bank2")
 	AM_RANGE(0x8000, 0xbfff) AM_ROMBANK("bank3")
@@ -328,7 +331,7 @@ static ADDRESS_MAP_START(prestige_mem, AS_PROGRAM, 8, prestige_state)
 	AM_RANGE(0xe000, 0xffff) AM_RAMBANK("bank5")
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( prestige_io , AS_IO, 8, prestige_state)
+ADDRESS_MAP_START(prestige_state::prestige_io)
 	ADDRESS_MAP_UNMAP_HIGH
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	AM_RANGE(0x04, 0x05) AM_READWRITE(mouse_r, mouse_w)
@@ -338,7 +341,7 @@ static ADDRESS_MAP_START( prestige_io , AS_IO, 8, prestige_state)
 	AM_RANGE(0x50, 0x56) AM_READWRITE(bankswitch_r, bankswitch_w)
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( glcolor_io , AS_IO, 8, prestige_state)
+ADDRESS_MAP_START(prestige_state::glcolor_io)
 	ADDRESS_MAP_UNMAP_HIGH
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	AM_RANGE(0x30, 0x3f) AM_WRITE(lcdc_w)
@@ -764,7 +767,8 @@ MACHINE_CONFIG_START(prestige_state::prestige_base)
 	MCFG_RAM_EXTRA_OPTIONS("64K")
 MACHINE_CONFIG_END
 
-MACHINE_CONFIG_DERIVED(prestige_state::glcolor, prestige_base)
+MACHINE_CONFIG_START(prestige_state::glcolor)
+	prestige_base(config);
 	MCFG_CPU_MODIFY("maincpu")
 	MCFG_CPU_IO_MAP(glcolor_io)
 
@@ -782,41 +786,48 @@ MACHINE_CONFIG_DERIVED(prestige_state::glcolor, prestige_base)
 	MCFG_SOFTWARE_LIST_COMPATIBLE_ADD("snotec_cart", "snotec")
 MACHINE_CONFIG_END
 
-MACHINE_CONFIG_DERIVED(prestige_state::glmcolor, glcolor)
+MACHINE_CONFIG_START(prestige_state::glmcolor)
+	glcolor(config);
 	MCFG_CPU_MODIFY("maincpu")
 	MCFG_CPU_IO_MAP(prestige_io)
 MACHINE_CONFIG_END
 
-MACHINE_CONFIG_DERIVED(prestige_state::snotec, glcolor)
+MACHINE_CONFIG_START(prestige_state::snotec)
+	glcolor(config);
 	MCFG_SOFTWARE_LIST_REMOVE("cart_list")
 	MCFG_SOFTWARE_LIST_REMOVE("snotec_cart")
 	MCFG_SOFTWARE_LIST_ADD("cart_list", "snotec")
 	MCFG_SOFTWARE_LIST_COMPATIBLE_ADD("glcolor_cart", "glcolor")
 MACHINE_CONFIG_END
 
-MACHINE_CONFIG_DERIVED(prestige_state::prestige, prestige_base)
+MACHINE_CONFIG_START(prestige_state::prestige)
+	prestige_base(config);
 	MCFG_SOFTWARE_LIST_COMPATIBLE_ADD("gl6000sl_cart", "gl6000sl")
 	MCFG_SOFTWARE_LIST_COMPATIBLE_ADD("misterx_cart", "misterx")
 	MCFG_SOFTWARE_LIST_COMPATIBLE_ADD("gl2000_cart", "gl2000")
 MACHINE_CONFIG_END
 
-MACHINE_CONFIG_DERIVED(prestige_state::gl6000sl, prestige_base)
+MACHINE_CONFIG_START(prestige_state::gl6000sl)
+	prestige_base(config);
 	MCFG_SOFTWARE_LIST_ADD("cart_list", "gl6000sl")
 	MCFG_SOFTWARE_LIST_COMPATIBLE_ADD("misterx_cart", "misterx")
 	MCFG_SOFTWARE_LIST_COMPATIBLE_ADD("gl2000_cart", "gl2000")
 MACHINE_CONFIG_END
 
-MACHINE_CONFIG_DERIVED(prestige_state::gl7007sl, prestige_base)
+MACHINE_CONFIG_START(prestige_state::gl7007sl)
+	prestige_base(config);
 	MCFG_SOFTWARE_LIST_COMPATIBLE_ADD("gl6000sl_cart", "gl6000sl")
 	MCFG_SOFTWARE_LIST_COMPATIBLE_ADD("gl2000_cart", "gl2000")
 	MCFG_SOFTWARE_LIST_COMPATIBLE_ADD("misterx_cart", "misterx")
 MACHINE_CONFIG_END
 
-MACHINE_CONFIG_DERIVED(prestige_state::gjmovie, prestige_base)
+MACHINE_CONFIG_START(prestige_state::gjmovie)
+	prestige_base(config);
 	MCFG_SOFTWARE_LIST_ADD("cart_list", "gjmovie")
 MACHINE_CONFIG_END
 
-MACHINE_CONFIG_DERIVED(prestige_state::princ, prestige_base)
+MACHINE_CONFIG_START(prestige_state::princ)
+	prestige_base(config);
 	MCFG_DEVICE_REMOVE("cartslot")
 	MCFG_GENERIC_CARTSLOT_ADD("cartslot", generic_plain_slot, "princ_cart")
 	MCFG_SOFTWARE_LIST_ADD("cart_list", "princ")

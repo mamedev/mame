@@ -22,13 +22,13 @@
 #define MCFG_PTM6840_EXTERNAL_CLOCKS(_clk0, _clk1, _clk2) \
 	ptm6840_device::set_external_clocks(*device, _clk0, _clk1, _clk2);
 
-#define MCFG_PTM6840_OUT0_CB(_devcb) \
+#define MCFG_PTM6840_O1_CB(_devcb) \
 	devcb = &ptm6840_device::set_out_callback(*device, 0, DEVCB_##_devcb);
 
-#define MCFG_PTM6840_OUT1_CB(_devcb) \
+#define MCFG_PTM6840_O2_CB(_devcb) \
 	devcb = &ptm6840_device::set_out_callback(*device, 1, DEVCB_##_devcb);
 
-#define MCFG_PTM6840_OUT2_CB(_devcb) \
+#define MCFG_PTM6840_O3_CB(_devcb) \
 	devcb = &ptm6840_device::set_out_callback(*device, 2, DEVCB_##_devcb);
 
 #define MCFG_PTM6840_IRQ_CB(_devcb) \

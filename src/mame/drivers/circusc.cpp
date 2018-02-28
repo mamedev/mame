@@ -152,7 +152,7 @@ WRITE_LINE_MEMBER(circusc_state::irq_mask_w)
 		m_maincpu->set_input_line(M6809_IRQ_LINE, CLEAR_LINE);
 }
 
-static ADDRESS_MAP_START( circusc_map, AS_PROGRAM, 8, circusc_state )
+ADDRESS_MAP_START(circusc_state::circusc_map)
 	AM_RANGE(0x0000, 0x0007) AM_MIRROR(0x03f8) AM_DEVWRITE("mainlatch", ls259_device, write_d0)
 	AM_RANGE(0x0400, 0x0400) AM_MIRROR(0x03ff) AM_DEVWRITE("watchdog", watchdog_timer_device, reset_w) /* WDOG */
 	AM_RANGE(0x0800, 0x0800) AM_MIRROR(0x03ff) AM_DEVWRITE("soundlatch", generic_latch_8_device, write)              /* SOUND DATA */
@@ -173,7 +173,7 @@ static ADDRESS_MAP_START( circusc_map, AS_PROGRAM, 8, circusc_state )
 	AM_RANGE(0x6000, 0xffff) AM_ROM
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( sound_map, AS_PROGRAM, 8, circusc_state )
+ADDRESS_MAP_START(circusc_state::sound_map)
 	AM_RANGE(0x0000, 0x3fff) AM_ROM
 	AM_RANGE(0x4000, 0x43ff) AM_MIRROR(0x1c00) AM_RAM
 	AM_RANGE(0x6000, 0x6000) AM_MIRROR(0x1fff) AM_DEVREAD("soundlatch", generic_latch_8_device, read)       /* CS0 */

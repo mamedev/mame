@@ -277,7 +277,7 @@ WRITE8_MEMBER(mhavoc_state::dual_pokey_w)
  *
  *************************************/
 
-static ADDRESS_MAP_START( alpha_map, AS_PROGRAM, 8, mhavoc_state )
+ADDRESS_MAP_START(mhavoc_state::alpha_map)
 	AM_RANGE(0x0000, 0x01ff) AM_RAM
 	AM_RANGE(0x0200, 0x07ff) AM_RAMBANK("bank1") AM_SHARE("zram0")
 	AM_RANGE(0x0800, 0x09ff) AM_RAM
@@ -329,7 +329,7 @@ a15 a14 a13 a12 a11 a10 a09 a08 a07 a06 a05 a04 a03 a02 a01 a00
 1   x   *   *   *   *   *   *   *   *   *   *   *   *   *   *      R  ROM 27128 @9S
 */
 
-static ADDRESS_MAP_START( gamma_map, AS_PROGRAM, 8, mhavoc_state )
+ADDRESS_MAP_START(mhavoc_state::gamma_map)
 	AM_RANGE(0x0000, 0x07ff) AM_RAM AM_MIRROR(0x1800)                   /* Program RAM (2K) */
 	AM_RANGE(0x2000, 0x203f) AM_READWRITE(quad_pokeyn_r, quad_pokeyn_w) AM_MIRROR(0x07C0) /* Quad Pokey read/write  */
 	AM_RANGE(0x2800, 0x2800) AM_READ_PORT("IN1") AM_MIRROR(0x07ff)      /* Gamma Input Port */
@@ -353,7 +353,7 @@ ADDRESS_MAP_END
  *
  *************************************/
 
-static ADDRESS_MAP_START( alphaone_map, AS_PROGRAM, 8, mhavoc_state )
+ADDRESS_MAP_START(mhavoc_state::alphaone_map)
 	AM_RANGE(0x0000, 0x01ff) AM_RAM
 	AM_RANGE(0x0200, 0x07ff) AM_RAMBANK("bank1") AM_SHARE("zram0")
 	AM_RANGE(0x0800, 0x09ff) AM_RAM
@@ -580,14 +580,16 @@ MACHINE_CONFIG_START(mhavoc_state::mhavoc)
 MACHINE_CONFIG_END
 
 
-MACHINE_CONFIG_DERIVED(mhavoc_state::mhavocrv, mhavoc)
+MACHINE_CONFIG_START(mhavoc_state::mhavocrv)
+	mhavoc(config);
 
 	MCFG_SOUND_ADD("tms", TMS5220, MHAVOC_CLOCK/2/9)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 MACHINE_CONFIG_END
 
 
-MACHINE_CONFIG_DERIVED(mhavoc_state::alphaone, mhavoc)
+MACHINE_CONFIG_START(mhavoc_state::alphaone)
+	mhavoc(config);
 
 	/* basic machine hardware */
 	MCFG_CPU_MODIFY("alpha")

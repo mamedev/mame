@@ -39,7 +39,7 @@ lev 7 : 0x7c : 0000 05be - xxx
 
 /* some regions might be too large */
 
-static ADDRESS_MAP_START( bigstrkb_map, AS_PROGRAM, 16, bigstrkb_state )
+ADDRESS_MAP_START(bigstrkb_state::bigstrkb_map)
 	AM_RANGE(0x000000, 0x07ffff) AM_ROM
 //  AM_RANGE(0x0c0000, 0x0cffff) AM_READWRITE_LEGACY(megasys1_vregs_C_r, megasys1_vregs_C_w) AM_SHARE("megasys1_vregs")
 

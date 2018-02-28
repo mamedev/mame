@@ -144,19 +144,22 @@
 class manohman_state : public driver_device
 {
 public:
-	manohman_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag),
+	manohman_state(const machine_config &mconfig, device_type type, const char *tag) :
+		driver_device(mconfig, type, tag),
 		m_maincpu(*this, "maincpu"),
 		m_duart(*this, "duart"),
 		m_pit(*this, "pit")
 	{ }
 
+	void manohman(machine_config &config);
+
+protected:
+	virtual void machine_start() override;
+	void mem_map(address_map &map);
+
 	IRQ_CALLBACK_MEMBER(iack_handler);
 
-	void manohman(machine_config &config);
 private:
-	virtual void machine_start() override;
-
 	required_device<cpu_device> m_maincpu;
 	required_device<mc68681_device> m_duart;
 	required_device<pit68230_device> m_pit;
@@ -179,7 +182,7 @@ IRQ_CALLBACK_MEMBER(manohman_state::iack_handler)
 *           Memory Map Definition            *
 *********************************************/
 
-static ADDRESS_MAP_START( mem_map, AS_PROGRAM, 16, manohman_state )
+ADDRESS_MAP_START(manohman_state::mem_map)
 	AM_RANGE(0x000000, 0x01ffff) AM_ROM
 	AM_RANGE(0x100000, 0x10003f) AM_DEVREADWRITE8("pit", pit68230_device, read, write, 0x00ff)
 	AM_RANGE(0x200000, 0x20001f) AM_DEVREADWRITE8("duart", mc68681_device, read, write, 0x00ff)

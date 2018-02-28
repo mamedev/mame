@@ -330,7 +330,7 @@ WRITE8_MEMBER(goldstar_state::p2_lamps_w)
 }
 
 
-static ADDRESS_MAP_START( goldstar_map, AS_PROGRAM, 8, goldstar_state )
+ADDRESS_MAP_START(goldstar_state::goldstar_map)
 	AM_RANGE(0x0000, 0xb7ff) AM_ROM
 	AM_RANGE(0xb800, 0xbfff) AM_RAM AM_SHARE("nvram")
 	AM_RANGE(0xc000, 0xc7ff) AM_ROM
@@ -362,13 +362,13 @@ static ADDRESS_MAP_START( goldstar_map, AS_PROGRAM, 8, goldstar_state )
 	AM_RANGE(0xfe00, 0xfe00) AM_READWRITE(protection_r,protection_w)
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( goldstar_readport, AS_IO, 8, goldstar_state )
+ADDRESS_MAP_START(goldstar_state::goldstar_readport)
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	AM_RANGE(0x10, 0x10) AM_READ_PORT("DSW6")
 ADDRESS_MAP_END
 
 
-static ADDRESS_MAP_START( star100_map, AS_PROGRAM, 8, sanghopm_state )
+ADDRESS_MAP_START(sanghopm_state::star100_map)
 	AM_RANGE(0x0000, 0xbfff) AM_ROM
 
 	AM_RANGE(0xc800, 0xcfff) AM_RAM_WRITE(fg_vidram_w) AM_SHARE("fg_vidram")    // videoram 1
@@ -423,7 +423,7 @@ WRITE8_MEMBER(sanghopm_state::enable_w)
 	m_enable_reg = data;
 }
 
-static ADDRESS_MAP_START( star100_readport, AS_IO, 8, sanghopm_state )
+ADDRESS_MAP_START(sanghopm_state::star100_readport)
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
 
 	AM_RANGE(0x08, 0x08) AM_DEVREADWRITE("aysnd", ay8910_device, data_r, data_w)
@@ -482,7 +482,7 @@ ADDRESS_MAP_END
   E1:  W    Reels enable/disable register
  */
 
-static ADDRESS_MAP_START( ramdac_map, 0, 8, goldstar_state )
+ADDRESS_MAP_START(goldstar_state::ramdac_map)
 	AM_RANGE(0x000, 0x3ff) AM_DEVREADWRITE("ramdac", ramdac_device, ramdac_pal_r, ramdac_rgb666_w)
 ADDRESS_MAP_END
 
@@ -601,7 +601,7 @@ WRITE8_MEMBER(goldstar_state::ncb3_port81_w)
 }
 
 
-static ADDRESS_MAP_START( ncb3_map, AS_PROGRAM, 8, cb3_state )
+ADDRESS_MAP_START(cb3_state::ncb3_map)
 	AM_RANGE(0x0000, 0xb7ff) AM_ROM
 	AM_RANGE(0xb800, 0xbfff) AM_RAM AM_SHARE("nvram")
 	AM_RANGE(0xc000, 0xc7ff) AM_ROM
@@ -616,8 +616,8 @@ static ADDRESS_MAP_START( ncb3_map, AS_PROGRAM, 8, cb3_state )
 
 	AM_RANGE(0xf800, 0xf803) AM_DEVREADWRITE("ppi8255_0", i8255_device, read, write)    /* Input Ports */
 	AM_RANGE(0xf810, 0xf813) AM_DEVREADWRITE("ppi8255_1", i8255_device, read, write)    /* Input Ports */
-	AM_RANGE(0xf822, 0xf822) AM_WRITE(goldstar_fa00_w) // hack (connected to ppi output port?, needed for colour banking)
 	AM_RANGE(0xf820, 0xf823) AM_DEVREADWRITE("ppi8255_2", i8255_device, read, write)    /* Input/Output Ports */
+	AM_RANGE(0xf822, 0xf822) AM_WRITE(goldstar_fa00_w) // hack (connected to ppi output port?, needed for colour banking)
 
 	AM_RANGE(0xf830, 0xf830) AM_DEVREADWRITE("aysnd", ay8910_device, data_r, data_w)
 	AM_RANGE(0xf840, 0xf840) AM_DEVWRITE("aysnd", ay8910_device, address_w)
@@ -626,7 +626,7 @@ static ADDRESS_MAP_START( ncb3_map, AS_PROGRAM, 8, cb3_state )
 	AM_RANGE(0xf870, 0xf870) AM_DEVWRITE("snsnd", sn76489_device, write)    /* guess... device is initialized, but doesn't seems to be used.*/
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( ncb3_readwriteport, AS_IO, 8, goldstar_state )
+ADDRESS_MAP_START(goldstar_state::ncb3_readwriteport)
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
 //  AM_RANGE(0x00, 0x00) AM_READ(ncb3_unkread_r)    // read from 0x00 when controls set 1 is used...
 //  AM_RANGE(0x02, 0x02) AM_READ(ncb3_unkread_r)    // read from 0x02 when controls set 2 is used...
@@ -669,7 +669,7 @@ ADDRESS_MAP_END
 */
 
 
-static ADDRESS_MAP_START( wcherry_map, AS_PROGRAM, 8, goldstar_state )
+ADDRESS_MAP_START(goldstar_state::wcherry_map)
 	AM_RANGE(0x0000, 0xb7ff) AM_ROM
 	AM_RANGE(0xb800, 0xbfff) AM_RAM AM_SHARE("nvram")
 	AM_RANGE(0xc000, 0xc7ff) AM_ROM
@@ -698,7 +698,7 @@ static ADDRESS_MAP_START( wcherry_map, AS_PROGRAM, 8, goldstar_state )
 	AM_RANGE(0xf800, 0xffff) AM_RAM
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( wcherry_readwriteport, AS_IO, 8, goldstar_state )
+ADDRESS_MAP_START(goldstar_state::wcherry_readwriteport)
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	ADDRESS_MAP_END
 
@@ -723,7 +723,7 @@ static ADDRESS_MAP_START( wcherry_readwriteport, AS_IO, 8, goldstar_state )
 */
 
 
-static ADDRESS_MAP_START( cm_map, AS_PROGRAM, 8, goldstar_state )
+ADDRESS_MAP_START(goldstar_state::cm_map)
 	AM_RANGE(0x0000, 0xcfff) AM_ROM AM_WRITENOP
 
 	AM_RANGE(0xd000, 0xd7ff) AM_RAM AM_SHARE("nvram")
@@ -746,7 +746,7 @@ static ADDRESS_MAP_START( cm_map, AS_PROGRAM, 8, goldstar_state )
 ADDRESS_MAP_END
 
 
-static ADDRESS_MAP_START( nfm_map, AS_PROGRAM, 8, goldstar_state )
+ADDRESS_MAP_START(goldstar_state::nfm_map)
 	AM_RANGE(0x0000, 0xd7ff) AM_ROM AM_WRITENOP
 
 	AM_RANGE(0xd800, 0xdfff) AM_RAM AM_SHARE("nvram")
@@ -793,7 +793,7 @@ WRITE8_MEMBER(goldstar_state::cm_coincount_w)
 		popmessage("counters: %02X", data);
 }
 
-static ADDRESS_MAP_START( cm_portmap, AS_IO, 8, cmaster_state )
+ADDRESS_MAP_START(cmaster_state::cm_portmap)
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	AM_RANGE(0x01, 0x01) AM_DEVREAD("aysnd", ay8910_device, data_r)
 	AM_RANGE(0x02, 0x03) AM_DEVWRITE("aysnd", ay8910_device, data_address_w)
@@ -807,7 +807,7 @@ static ADDRESS_MAP_START( cm_portmap, AS_IO, 8, cmaster_state )
 ADDRESS_MAP_END
 
 
-static ADDRESS_MAP_START( pkrmast_portmap, AS_IO, 8, goldstar_state )
+ADDRESS_MAP_START(goldstar_state::pkrmast_portmap)
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
 
 	AM_RANGE(0x04, 0x04) AM_DEVREAD("aysnd", ay8910_device, data_r)
@@ -830,7 +830,7 @@ static ADDRESS_MAP_START( pkrmast_portmap, AS_IO, 8, goldstar_state )
 ADDRESS_MAP_END
 
 
-static ADDRESS_MAP_START( cmast91_portmap, AS_IO, 8, goldstar_state )
+ADDRESS_MAP_START(goldstar_state::cmast91_portmap)
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	AM_RANGE(0x00, 0x03) AM_DEVREADWRITE("ppi8255_0", i8255_device, read, write)    /* Input Ports */
 	AM_RANGE(0x10, 0x13) AM_DEVREADWRITE("ppi8255_1", i8255_device, read, write)    /* DIP switches */
@@ -839,7 +839,7 @@ static ADDRESS_MAP_START( cmast91_portmap, AS_IO, 8, goldstar_state )
 ADDRESS_MAP_END
 
 
-static ADDRESS_MAP_START( amcoe1_portmap, AS_IO, 8, cmaster_state )
+ADDRESS_MAP_START(cmaster_state::amcoe1_portmap)
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	AM_RANGE(0x01, 0x01) AM_DEVREAD("aysnd", ay8910_device, data_r)
 	AM_RANGE(0x02, 0x03) AM_DEVWRITE("aysnd", ay8910_device, data_address_w)
@@ -852,7 +852,7 @@ static ADDRESS_MAP_START( amcoe1_portmap, AS_IO, 8, cmaster_state )
 	AM_RANGE(0x20, 0x20) AM_DEVREADWRITE("oki", okim6295_device, read, write)
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( amcoe2_portmap, AS_IO, 8, cmaster_state )
+ADDRESS_MAP_START(cmaster_state::amcoe2_portmap)
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	AM_RANGE(0x01, 0x01) AM_DEVREAD("aysnd", ay8910_device, data_r)
 	AM_RANGE(0x02, 0x03) AM_DEVWRITE("aysnd", ay8910_device, data_address_w)
@@ -865,7 +865,7 @@ static ADDRESS_MAP_START( amcoe2_portmap, AS_IO, 8, cmaster_state )
 ADDRESS_MAP_END
 
 
-static ADDRESS_MAP_START( lucky8_map, AS_PROGRAM, 8, goldstar_state )
+ADDRESS_MAP_START(goldstar_state::lucky8_map)
 	AM_RANGE(0x0000, 0x7fff) AM_ROM
 	AM_RANGE(0x8000, 0x87ff) AM_RAM AM_SHARE("nvram")
 	AM_RANGE(0x8800, 0x8fff) AM_RAM_WRITE(goldstar_fg_vidram_w) AM_SHARE("fg_vidram")
@@ -889,7 +889,7 @@ static ADDRESS_MAP_START( lucky8_map, AS_PROGRAM, 8, goldstar_state )
 	AM_RANGE(0xf800, 0xffff) AM_RAM
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( flaming7_map, AS_PROGRAM, 8, goldstar_state )
+ADDRESS_MAP_START(goldstar_state::flaming7_map)
 	AM_RANGE(0x0000, 0x7fff) AM_ROM
 	AM_RANGE(0x8000, 0x87ff) AM_RAM AM_SHARE("nvram")
 	AM_RANGE(0x8800, 0x8fff) AM_RAM_WRITE(goldstar_fg_vidram_w) AM_SHARE("fg_vidram")
@@ -948,7 +948,7 @@ ADDRESS_MAP_END
 
     AY8910 ports are OK.
 */
-static ADDRESS_MAP_START( mbstar_map, AS_PROGRAM, 8, goldstar_state )
+ADDRESS_MAP_START(goldstar_state::mbstar_map)
 	AM_RANGE(0x0000, 0x7fff) AM_ROM
 	AM_RANGE(0x8000, 0x87ff) AM_RAM AM_SHARE("nvram")
 	AM_RANGE(0x8800, 0x8fff) AM_RAM_WRITE(goldstar_fg_vidram_w) AM_SHARE("fg_vidram")
@@ -999,7 +999,7 @@ WRITE8_MEMBER(wingco_state::fl7w4_outc802_w)
 	m_fl7w4_id->write((data >> 6) & 0x01);
 }
 
-static ADDRESS_MAP_START( magodds_map, AS_PROGRAM, 8, wingco_state )
+ADDRESS_MAP_START(wingco_state::magodds_map)
 	AM_RANGE(0x0000, 0x7fff) AM_ROM
 	// where does the extra rom data map?? it seems like it should come straight after the existing rom, but it can't if this is a plain z80?
 	AM_RANGE(0x8000, 0x87ff) AM_RAM AM_SHARE("nvram")
@@ -1023,7 +1023,7 @@ static ADDRESS_MAP_START( magodds_map, AS_PROGRAM, 8, wingco_state )
 	AM_RANGE(0xc000, 0xffff) AM_ROM AM_REGION("maincpu",0xc000)
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( kkotnoli_map, AS_PROGRAM, 8, goldstar_state )
+ADDRESS_MAP_START(goldstar_state::kkotnoli_map)
 	AM_RANGE(0x0000, 0x7fff) AM_ROM
 	AM_RANGE(0x8000, 0x87ff) AM_RAM /* definitely no NVRAM */
 	AM_RANGE(0x8800, 0x8fff) AM_RAM_WRITE(goldstar_fg_vidram_w) AM_SHARE("fg_vidram")
@@ -1062,7 +1062,7 @@ ADDRESS_MAP_END
 //  popmessage("Output: %02X", data);
 //}
 
-static ADDRESS_MAP_START( ladylinr_map, AS_PROGRAM, 8, goldstar_state )
+ADDRESS_MAP_START(goldstar_state::ladylinr_map)
 	AM_RANGE(0x0000, 0x7fff) AM_ROM
 	AM_RANGE(0x8000, 0x87ff) AM_RAM AM_SHARE("nvram")
 	AM_RANGE(0x8800, 0x8fff) AM_RAM_WRITE(goldstar_fg_vidram_w) AM_SHARE("fg_vidram")
@@ -1083,7 +1083,7 @@ static ADDRESS_MAP_START( ladylinr_map, AS_PROGRAM, 8, goldstar_state )
 	AM_RANGE(0xf800, 0xffff) AM_RAM
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( wcat3_map, AS_PROGRAM, 8, goldstar_state )
+ADDRESS_MAP_START(goldstar_state::wcat3_map)
 	AM_RANGE(0x0000, 0x7fff) AM_ROM
 	AM_RANGE(0x8000, 0x87ff) AM_RAM AM_SHARE("nvram")
 	AM_RANGE(0x8800, 0x8fff) AM_RAM_WRITE(goldstar_fg_vidram_w) AM_SHARE("fg_vidram")
@@ -1109,7 +1109,7 @@ ADDRESS_MAP_END
 
 
 /* newer / more capable hw */
-static ADDRESS_MAP_START( unkch_map, AS_PROGRAM, 8, unkch_state )
+ADDRESS_MAP_START(unkch_state::unkch_map)
 	AM_RANGE(0x0000, 0x9fff) AM_ROM
 	AM_RANGE(0xc000, 0xc1ff) AM_RAM_DEVWRITE("palette", palette_device, write8) AM_SHARE("palette")
 	AM_RANGE(0xc800, 0xc9ff) AM_RAM_DEVWRITE("palette", palette_device, write8_ext) AM_SHARE("palette_ext")
@@ -1195,7 +1195,7 @@ WRITE8_MEMBER(unkch_state::unkcm_0x03_w)
 }
 
 
-static ADDRESS_MAP_START( unkch_portmap, AS_IO, 8, unkch_state )
+ADDRESS_MAP_START(unkch_state::unkch_portmap)
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
 
 	AM_RANGE(0x01, 0x01) AM_WRITE(coincount_w)
@@ -1213,7 +1213,7 @@ static ADDRESS_MAP_START( unkch_portmap, AS_IO, 8, unkch_state )
 ADDRESS_MAP_END
 
 
-static ADDRESS_MAP_START( megaline_map, AS_PROGRAM, 8, unkch_state )
+ADDRESS_MAP_START(unkch_state::megaline_map)
 /* Reels stuff are there just as placeholder, and obviously in wrong offset */
 	AM_RANGE(0x0000, 0x9fff) AM_ROM
 
@@ -1243,7 +1243,7 @@ ADDRESS_MAP_END
   AY8910?: 60 - 80
 
 */
-static ADDRESS_MAP_START( megaline_portmap, AS_IO, 8, goldstar_state )
+ADDRESS_MAP_START(goldstar_state::megaline_portmap)
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	AM_RANGE(0xa0, 0xa0) AM_DEVWRITE("sn1", sn76489_device, write)                      /* SN76489 #1 */
 	AM_RANGE(0xc0, 0xc0) AM_DEVWRITE("sn2", sn76489_device, write)                      /* SN76489 #2 */
@@ -1255,7 +1255,7 @@ static ADDRESS_MAP_START( megaline_portmap, AS_IO, 8, goldstar_state )
 ADDRESS_MAP_END
 
 
-static ADDRESS_MAP_START( bonusch_map, AS_PROGRAM, 8, unkch_state )
+ADDRESS_MAP_START(unkch_state::bonusch_map)
 /* Reels stuff and RAM are there just as placeholder, and obviously in wrong offset */
 
 	AM_RANGE(0x0000, 0xbfff) AM_ROM     // ok
@@ -1296,7 +1296,7 @@ ADDRESS_MAP_END
   60h = R
 
 */
-static ADDRESS_MAP_START( bonusch_portmap, AS_IO, 8, goldstar_state )
+ADDRESS_MAP_START(goldstar_state::bonusch_portmap)
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	AM_RANGE(0x10, 0x10) AM_READ_PORT("IN0")
 	AM_RANGE(0x20, 0x20) AM_READ_PORT("IN1")
@@ -8134,11 +8134,13 @@ MACHINE_CONFIG_START(goldstar_state::goldstbl)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 MACHINE_CONFIG_END
 
-MACHINE_CONFIG_DERIVED(goldstar_state::moonlght, goldstbl)
+MACHINE_CONFIG_START(goldstar_state::moonlght)
+	goldstbl(config);
 	MCFG_GFXDECODE_MODIFY("gfxdecode", ml)
 MACHINE_CONFIG_END
 
-MACHINE_CONFIG_DERIVED(goldstar_state::goldfrui, goldstbl)
+MACHINE_CONFIG_START(goldstar_state::goldfrui)
+	goldstbl(config);
 	MCFG_GFXDECODE_MODIFY("gfxdecode", goldfrui)
 MACHINE_CONFIG_END
 
@@ -8329,23 +8331,28 @@ MACHINE_CONFIG_START(cb3_state::ncb3)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
 MACHINE_CONFIG_END
 
-MACHINE_CONFIG_DERIVED(cb3_state::cb3c, ncb3)
+MACHINE_CONFIG_START(cb3_state::cb3c)
+	ncb3(config);
 	MCFG_GFXDECODE_MODIFY("gfxdecode", cb3c)
 MACHINE_CONFIG_END
 
-MACHINE_CONFIG_DERIVED(cb3_state::cb3e, ncb3)
+MACHINE_CONFIG_START(cb3_state::cb3e)
+	ncb3(config);
 	MCFG_GFXDECODE_MODIFY("gfxdecode", cb3e)
 MACHINE_CONFIG_END
 
-MACHINE_CONFIG_DERIVED(cb3_state::chrygld, ncb3)
+MACHINE_CONFIG_START(cb3_state::chrygld)
+	ncb3(config);
 	MCFG_GFXDECODE_MODIFY("gfxdecode", chry10)
 MACHINE_CONFIG_END
 
-MACHINE_CONFIG_DERIVED(cb3_state::cherrys, ncb3)
+MACHINE_CONFIG_START(cb3_state::cherrys)
+	ncb3(config);
 	MCFG_GFXDECODE_MODIFY("gfxdecode", cherrys)
 MACHINE_CONFIG_END
 
-MACHINE_CONFIG_DERIVED(cb3_state::cm97, ncb3)
+MACHINE_CONFIG_START(cb3_state::cm97)
+	ncb3(config);
 	MCFG_GFXDECODE_MODIFY("gfxdecode", cm97)
 MACHINE_CONFIG_END
 
@@ -8441,7 +8448,8 @@ MACHINE_CONFIG_START(cmaster_state::cm)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
 MACHINE_CONFIG_END
 
-MACHINE_CONFIG_DERIVED(cmaster_state::cmasterc, cm)
+MACHINE_CONFIG_START(cmaster_state::cmasterc)
+	cm(config);
 	MCFG_GFXDECODE_MODIFY("gfxdecode", cmasterc)
 MACHINE_CONFIG_END
 
@@ -8605,12 +8613,14 @@ MACHINE_CONFIG_START(wingco_state::bingowng)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
 MACHINE_CONFIG_END
 
-MACHINE_CONFIG_DERIVED(wingco_state::bingownga, bingowng)
+MACHINE_CONFIG_START(wingco_state::bingownga)
+	bingowng(config);
 	MCFG_GFXDECODE_MODIFY("gfxdecode", bingownga)
 MACHINE_CONFIG_END
 
 
-MACHINE_CONFIG_DERIVED(wingco_state::flam7_w4, lucky8)
+MACHINE_CONFIG_START(wingco_state::flam7_w4)
+	lucky8(config);
 	/* basic machine hardware */
 	MCFG_CPU_MODIFY("maincpu")
 	MCFG_CPU_PROGRAM_MAP(flaming7_map)
@@ -8621,7 +8631,8 @@ MACHINE_CONFIG_DERIVED(wingco_state::flam7_w4, lucky8)
 	MCFG_DS2401_ADD("fl7w4_id")
 MACHINE_CONFIG_END
 
-MACHINE_CONFIG_DERIVED(wingco_state::flaming7, lucky8)
+MACHINE_CONFIG_START(wingco_state::flaming7)
+	lucky8(config);
 	/* basic machine hardware */
 	MCFG_CPU_MODIFY("maincpu")
 	MCFG_CPU_PROGRAM_MAP(flaming7_map)
@@ -8635,7 +8646,8 @@ MACHINE_CONFIG_DERIVED(wingco_state::flaming7, lucky8)
 	MCFG_DS2401_ADD("fl7w4_id")
 MACHINE_CONFIG_END
 
-MACHINE_CONFIG_DERIVED(wingco_state::flam7_tw, lucky8)
+MACHINE_CONFIG_START(wingco_state::flam7_tw)
+	lucky8(config);
 	/* basic machine hardware */
 	MCFG_CPU_MODIFY("maincpu")
 	MCFG_CPU_PROGRAM_MAP(flaming7_map)
@@ -8649,7 +8661,8 @@ MACHINE_CONFIG_DERIVED(wingco_state::flam7_tw, lucky8)
 	MCFG_DS2401_ADD("fl7w4_id")
 MACHINE_CONFIG_END
 
-MACHINE_CONFIG_DERIVED(wingco_state::mbstar, lucky8)
+MACHINE_CONFIG_START(wingco_state::mbstar)
+	lucky8(config);
 	/* basic machine hardware */
 	MCFG_CPU_MODIFY("maincpu")
 	MCFG_CPU_PROGRAM_MAP(mbstar_map)
@@ -8919,7 +8932,8 @@ MACHINE_CONFIG_END
 
 
 /* diff with cm machine driver: gfxdecode, OKI, portmap & tilemaps rect size/position */
-MACHINE_CONFIG_DERIVED(cmaster_state::amcoe1a, amcoe1)
+MACHINE_CONFIG_START(cmaster_state::amcoe1a)
+	amcoe1(config);
 
 	/* video hardware */
 	MCFG_SCREEN_MODIFY("screen")
@@ -8970,7 +8984,8 @@ MACHINE_CONFIG_START(cmaster_state::amcoe2)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 2.00) /* analyzed for clips */
 MACHINE_CONFIG_END
 
-MACHINE_CONFIG_DERIVED(cmaster_state::nfm, amcoe2)
+MACHINE_CONFIG_START(cmaster_state::nfm)
+	amcoe2(config);
 
 	/* basic machine hardware */
 	MCFG_CPU_MODIFY("maincpu")

@@ -30,6 +30,11 @@ public:
 
 	void mt420(machine_config &config);
 	void mt5510(machine_config &config);
+	void mt420_io_map(address_map &map);
+	void mt420_mem_map(address_map &map);
+	void mt420_vram_map(address_map &map);
+	void mt5510_io_map(address_map &map);
+	void mt5510_mem_map(address_map &map);
 private:
 	required_device<cpu_device> m_maincpu;
 	optional_region_ptr<u8> m_p_chargen;
@@ -45,16 +50,16 @@ READ8_MEMBER(microterm_state::c000_r)
 	return machine().rand() & 0x80;
 }
 
-static ADDRESS_MAP_START( mt420_mem_map, AS_PROGRAM, 8, microterm_state )
+ADDRESS_MAP_START(microterm_state::mt420_mem_map)
 	AM_RANGE(0x0000, 0x7fff) AM_ROM AM_REGION("maincpu", 0)
 	AM_RANGE(0x9000, 0x9000) AM_WRITENOP
 	AM_RANGE(0xc000, 0xc000) AM_READ(c000_r) AM_WRITENOP
-	AM_RANGE(0xeff8, 0xefff) AM_DEVREADWRITE("avdc", scn2674_device, read, write)
 	AM_RANGE(0xe000, 0xefff) AM_RAM
+	AM_RANGE(0xeff8, 0xefff) AM_DEVREADWRITE("avdc", scn2674_device, read, write)
 	AM_RANGE(0xf000, 0xf7ff) AM_RAM
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( mt420_io_map, AS_IO, 8, microterm_state )
+ADDRESS_MAP_START(microterm_state::mt420_io_map)
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	AM_RANGE(0xe0, 0xef) AM_DEVREADWRITE("duart", scn2681_device, read, write)
 	AM_RANGE(0xf0, 0xf3) AM_DEVREADWRITE("aci", mc2661_device, read, write)
@@ -64,17 +69,17 @@ SCN2674_DRAW_CHARACTER_MEMBER(microterm_state::draw_character)
 {
 }
 
-static ADDRESS_MAP_START( mt420_vram_map, 0, 8, microterm_state )
+ADDRESS_MAP_START(microterm_state::mt420_vram_map)
 	AM_RANGE(0x0000, 0x3fff) AM_NOP
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( mt5510_mem_map, AS_PROGRAM, 8, microterm_state )
+ADDRESS_MAP_START(microterm_state::mt5510_mem_map)
 	AM_RANGE(0x0000, 0x7fff) AM_ROM AM_REGION("maincpu", 0) AM_WRITENOP
 	AM_RANGE(0x8000, 0xbfff) AM_RAM
 	AM_RANGE(0xc000, 0xffff) AM_RAM
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( mt5510_io_map, AS_IO, 8, microterm_state )
+ADDRESS_MAP_START(microterm_state::mt5510_io_map)
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	AM_RANGE(0x60, 0x6f) AM_DEVREADWRITE("duart", scn2681_device, read, write)
 ADDRESS_MAP_END

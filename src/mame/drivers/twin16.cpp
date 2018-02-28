@@ -164,7 +164,7 @@ WRITE8_MEMBER(twin16_state::upd_start_w)
 
 /* Memory Maps */
 
-static ADDRESS_MAP_START( sound_map, AS_PROGRAM, 8, twin16_state )
+ADDRESS_MAP_START(twin16_state::sound_map)
 	AM_RANGE(0x0000, 0x7fff) AM_ROM
 	AM_RANGE(0x8000, 0x87ff) AM_RAM
 	AM_RANGE(0x9000, 0x9000) AM_WRITE(upd_reset_w)
@@ -176,7 +176,7 @@ static ADDRESS_MAP_START( sound_map, AS_PROGRAM, 8, twin16_state )
 	AM_RANGE(0xf000, 0xf000) AM_READ(upd_busy_r) // miaj writes 0 to it
 	ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( main_map, AS_PROGRAM, 16, twin16_state )
+ADDRESS_MAP_START(twin16_state::main_map)
 	AM_RANGE(0x000000, 0x03ffff) AM_ROM
 	AM_RANGE(0x040000, 0x043fff) AM_RAM AM_SHARE("comram")
 //  AM_RANGE(0x044000, 0x04ffff) AM_NOP             // miaj
@@ -200,7 +200,7 @@ static ADDRESS_MAP_START( main_map, AS_PROGRAM, 16, twin16_state )
 	AM_RANGE(0x140000, 0x143fff) AM_RAM AM_SHARE("spriteram")
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( sub_map, AS_PROGRAM, 16, twin16_state )
+ADDRESS_MAP_START(twin16_state::sub_map)
 	AM_RANGE(0x000000, 0x03ffff) AM_ROM
 	AM_RANGE(0x040000, 0x043fff) AM_RAM AM_SHARE("comram")
 //  AM_RANGE(0x044000, 0x04ffff) AM_NOP             // miaj
@@ -216,7 +216,7 @@ static ADDRESS_MAP_START( sub_map, AS_PROGRAM, 16, twin16_state )
 	AM_RANGE(0x780000, 0x79ffff) AM_RAM AM_SHARE("sprite_gfx_ram")
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( fround_map, AS_PROGRAM, 16, fround_state )
+ADDRESS_MAP_START(fround_state::fround_map)
 	AM_RANGE(0x000000, 0x03ffff) AM_ROM
 	AM_RANGE(0x040000, 0x043fff) AM_RAM AM_SHARE("comram")
 	AM_RANGE(0x060000, 0x063fff) AM_RAM
@@ -715,7 +715,8 @@ MACHINE_CONFIG_START(twin16_state::twin16)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", 0.20)
 MACHINE_CONFIG_END
 
-MACHINE_CONFIG_DERIVED(twin16_state::devilw, twin16)
+MACHINE_CONFIG_START(twin16_state::devilw)
+	twin16(config);
 	MCFG_QUANTUM_TIME(attotime::from_hz(60000)) // watchdog reset otherwise
 MACHINE_CONFIG_END
 
@@ -769,12 +770,14 @@ MACHINE_CONFIG_START(fround_state::fround)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", 0.20)
 MACHINE_CONFIG_END
 
-MACHINE_CONFIG_DERIVED(twin16_state::miaj, twin16)
+MACHINE_CONFIG_START(twin16_state::miaj)
+	twin16(config);
 	MCFG_SCREEN_MODIFY("screen")
 	MCFG_SCREEN_RAW_PARAMS(XTAL(18'432'000)/2, 576, 1*8, 39*8, 264, 2*8, 30*8)
 MACHINE_CONFIG_END
 
-MACHINE_CONFIG_DERIVED(cuebrickj_state::cuebrickj, twin16)
+MACHINE_CONFIG_START(cuebrickj_state::cuebrickj)
+	twin16(config);
 	MCFG_SCREEN_MODIFY("screen")
 	MCFG_SCREEN_RAW_PARAMS(XTAL(18'432'000)/2, 576, 1*8, 39*8, 264, 2*8, 30*8)
 	MCFG_NVRAM_ADD_0FILL("nvram")

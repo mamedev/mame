@@ -348,19 +348,77 @@ void cli_frontend::listxml(const std::vector<std::string> &args)
 
 void cli_frontend::listfull(const std::vector<std::string> &args)
 {
-	const char *gamename = args.empty() ? nullptr : args[0].c_str();
+	bool const iswild((1U != args.size()) || core_iswildstr(args[0].c_str()));
+	std::vector<bool> matched(args.size(), false);
+	auto const included = [&args, &matched] (char const *name) -> bool
+	{
+		if (args.empty())
+			return true;
 
-	// determine which drivers to output; return an error if none found
-	driver_enumerator drivlist(m_options, gamename);
-	if (drivlist.count() == 0)
-		throw emu_fatalerror(EMU_ERR_NO_SUCH_GAME, "No matching systems found for '%s'", gamename);
+		bool result = false;
+		auto it = matched.begin();
+		for (std::string const &pat : args)
+		{
+			if (!core_strwildcmp(pat.c_str(), name))
+			{
+				result = true;
+				*it = true;
+			}
+			++it;
+		}
+		return result;
+	};
 
-	// print the header
-	osd_printf_info("Name:             Description:\n");
+	bool first = true;
+	auto const list_system_name = [&first] (device_type const &type)
+	{
+		// print the header
+		if (first)
+			osd_printf_info("Name:             Description:\n");
+		first = false;
 
-	// iterate through drivers and output the info
+		osd_printf_info("%-17s \"%s\"\n", type.shortname(), type.fullname());
+	};
+
+	// determine which drivers to output
+	driver_enumerator drivlist(m_options);
 	while (drivlist.next())
-		osd_printf_info("%-18s\"%s\"\n", drivlist.driver().name, drivlist.driver().type.fullname());
+	{
+		if (included(drivlist.driver().name))
+		{
+			list_system_name(drivlist.driver().type);
+
+			// if it wasn't a wildcard, there can only be one
+			if (!iswild)
+				break;
+		}
+	}
+
+	// try devices as well
+	if (iswild || first)
+	{
+		for (device_type type : registered_device_types)
+		{
+			if (included(type.shortname()))
+			{
+				list_system_name(type);
+
+				// if it wasn't a wildcard, there can only be one
+				if (!iswild)
+					break;
+			}
+		}
+	}
+
+	// return an error if none found
+	auto it = matched.begin();
+	for (std::string const &pat : args)
+	{
+		if (!*it)
+			throw emu_fatalerror(EMU_ERR_NO_SUCH_GAME, "No matching systems found for '%s'", pat.c_str());
+
+		++it;
+	}
 }
 
 
@@ -1510,7 +1568,7 @@ const cli_frontend::info_command_struct *cli_frontend::find_command(const std::s
 	static const info_command_struct s_info_commands[] =
 	{
 		{ CLICOMMAND_LISTXML,           0, -1, &cli_frontend::listxml,          "[pattern] ..." },
-		{ CLICOMMAND_LISTFULL,          0,  1, &cli_frontend::listfull,         "[system name]" },
+		{ CLICOMMAND_LISTFULL,          0, -1, &cli_frontend::listfull,         "[pattern] ..." },
 		{ CLICOMMAND_LISTSOURCE,        0,  1, &cli_frontend::listsource,       "[system name]" },
 		{ CLICOMMAND_LISTCLONES,        0,  1, &cli_frontend::listclones,       "[system name]" },
 		{ CLICOMMAND_LISTBROTHERS,      0,  1, &cli_frontend::listbrothers,     "[system name]" },

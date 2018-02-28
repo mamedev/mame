@@ -19,7 +19,7 @@ protected:
 	virtual void device_reset() override;
 
 private:
-	DECLARE_ADDRESS_MAP(map, 32);
+	void map(address_map &map);
 };
 
 DECLARE_DEVICE_TYPE(SB0400, sb0400_device)

@@ -594,6 +594,11 @@ public:
 	static void ncr5390(device_t *device);
 	void sun4c(machine_config &config);
 	void sun4(machine_config &config);
+	void sun4_mem(address_map &map);
+	void sun4c_mem(address_map &map);
+	void type0space_map(address_map &map);
+	void type1space_map(address_map &map);
+	void type1space_s4_map(address_map &map);
 protected:
 	required_device<mb86901_device> m_maincpu;
 
@@ -719,7 +724,7 @@ uint32_t sun4_state::read_insn_data_4c(uint8_t asi, address_space &space, uint32
 	}
 	else
 	{
-		if (!machine().side_effect_disabled())
+		if (!machine().side_effects_disabled())
 		{
 			printf("sun4c: INVALID PTE entry %d %08x accessed!  vaddr=%x PC=%x\n", entry, m_pagemap[entry], offset <<2, m_maincpu->pc());
 			//m_maincpu->trap(SPARC_DATA_ACCESS_EXCEPTION);
@@ -786,7 +791,7 @@ READ32_MEMBER( sun4_state::sun4c_mmu_r )
 	uint32_t retval = 0;
 
 	// make debugger fetches emulate supervisor program for best compatibility with boot PROM execution
-	if (machine().side_effect_disabled()) asi = 9;
+	if (machine().side_effects_disabled()) asi = 9;
 
 	// supervisor program fetches in boot state are special
 	if ((!(m_system_enable & ENA_NOTBOOT)) && (asi == 9))
@@ -865,7 +870,7 @@ READ32_MEMBER( sun4_state::sun4c_mmu_r )
 		return read_insn_data_4c(asi, space, offset, mem_mask);
 
 	default:
-		if (!machine().side_effect_disabled()) printf("sun4c: ASI %d unhandled read @ %x (PC=%x)\n", asi, offset<<2, m_maincpu->pc());
+		if (!machine().side_effects_disabled()) printf("sun4c: ASI %d unhandled read @ %x (PC=%x)\n", asi, offset<<2, m_maincpu->pc());
 		return 0;
 	}
 
@@ -1010,7 +1015,7 @@ uint32_t sun4_state::read_insn_data(uint8_t asi, address_space &space, uint32_t 
 	}
 	else
 	{
-		if (!machine().side_effect_disabled())
+		if (!machine().side_effects_disabled())
 		{
 			printf("sun4: INVALID PTE entry %d %08x accessed!  vaddr=%x PC=%x\n", entry, m_pagemap[entry], offset <<2, m_maincpu->pc());
 			//m_maincpu->trap(SPARC_DATA_ACCESS_EXCEPTION);
@@ -1067,7 +1072,7 @@ READ32_MEMBER( sun4_state::sun4_mmu_r )
 	int page;
 
 	// make debugger fetches emulate supervisor program for best compatibility with boot PROM execution
-	if (machine().side_effect_disabled()) asi = 9;
+	if (machine().side_effects_disabled()) asi = 9;
 
 	// supervisor program fetches in boot state are special
 	if ((!(m_system_enable & ENA_NOTBOOT)) && (asi == 9))
@@ -1146,7 +1151,7 @@ READ32_MEMBER( sun4_state::sun4_mmu_r )
 		return read_insn_data(asi, space, offset, mem_mask);
 
 	default:
-		if (!machine().side_effect_disabled()) printf("sun4: ASI %d unhandled read @ %x (PC=%x)\n", asi, offset<<2, m_maincpu->pc());
+		if (!machine().side_effects_disabled()) printf("sun4: ASI %d unhandled read @ %x (PC=%x)\n", asi, offset<<2, m_maincpu->pc());
 		return 0;
 	}
 
@@ -1326,11 +1331,11 @@ void sun4_state::fcodes_command(int ref, const std::vector<std::string> &params)
 #endif
 }
 
-static ADDRESS_MAP_START(sun4_mem, AS_PROGRAM, 32, sun4_state)
+ADDRESS_MAP_START(sun4_state::sun4_mem)
 	AM_RANGE(0x00000000, 0xffffffff) AM_READWRITE( sun4_mmu_r, sun4_mmu_w )
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START(sun4c_mem, AS_PROGRAM, 32, sun4_state)
+ADDRESS_MAP_START(sun4_state::sun4c_mem)
 	AM_RANGE(0x00000000, 0xffffffff) AM_READWRITE( sun4c_mmu_r, sun4c_mmu_w )
 ADDRESS_MAP_END
 
@@ -1455,11 +1460,11 @@ WRITE32_MEMBER( sun4_state::ram_w )
 	}
 }
 
-static ADDRESS_MAP_START(type0space_map, AS_PROGRAM, 32, sun4_state)
+ADDRESS_MAP_START(sun4_state::type0space_map)
 	AM_RANGE(0x00000000, 0x03ffffff) AM_READWRITE(ram_r, ram_w)
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START(type1space_map, AS_PROGRAM, 32, sun4_state)
+ADDRESS_MAP_START(sun4_state::type1space_map)
 	AM_RANGE(0x00000000, 0x0000000f) AM_DEVREADWRITE8(SCC1_TAG, z80scc_device, ba_cd_inv_r, ba_cd_inv_w, 0xff00ff00)
 	AM_RANGE(0x01000000, 0x0100000f) AM_DEVREADWRITE8(SCC2_TAG, z80scc_device, ba_cd_inv_r, ba_cd_inv_w, 0xff00ff00)
 	AM_RANGE(0x02000000, 0x020007ff) AM_DEVREADWRITE8(TIMEKEEPER_TAG, timekeeper_device, read, write, 0xffffffff)
@@ -1474,14 +1479,14 @@ static ADDRESS_MAP_START(type1space_map, AS_PROGRAM, 32, sun4_state)
 	AM_RANGE(0x0e800000, 0x0e8fffff) AM_RAM AM_SHARE("bw2_vram")
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START(type1space_s4_map, AS_PROGRAM, 32, sun4_state)
+ADDRESS_MAP_START(sun4_state::type1space_s4_map)
 	AM_RANGE(0x00000000, 0x0000000f) AM_DEVREADWRITE8(SCC1_TAG, z80scc_device, ba_cd_inv_r, ba_cd_inv_w, 0xff00ff00)
 	AM_RANGE(0x01000000, 0x0100000f) AM_DEVREADWRITE8(SCC2_TAG, z80scc_device, ba_cd_inv_r, ba_cd_inv_w, 0xff00ff00)
 ADDRESS_MAP_END
 
 READ8_MEMBER( sun4_state::fdc_r )
 {
-	if (machine().side_effect_disabled())
+	if (machine().side_effects_disabled())
 		return 0;
 
 	switch(offset)

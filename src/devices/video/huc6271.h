@@ -34,8 +34,8 @@ public:
 	huc6271_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
 	// I/O operations
-	DECLARE_ADDRESS_MAP(regs, 16);
 	//void data_transfer(uint32_t offset, uint32_t data);
+	void regs(address_map &map);
 
 protected:
 	// device-level overrides
@@ -45,6 +45,8 @@ protected:
 
 private:
 	const address_space_config      m_data_space_config;
+
+	void data_map(address_map &map);
 };
 
 

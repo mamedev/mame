@@ -106,6 +106,8 @@ public:
 
 	void hammer(machine_config &config);
 	void livequiz(machine_config &config);
+	void hammer_map(address_map &map);
+	void livequiz_map(address_map &map);
 };
 
 
@@ -194,7 +196,7 @@ WRITE16_MEMBER(midas_state::livequiz_coin_w)
 #endif
 }
 
-static ADDRESS_MAP_START( livequiz_map, AS_PROGRAM, 16, midas_state )
+ADDRESS_MAP_START(midas_state::livequiz_map)
 	AM_RANGE(0x000000, 0x1fffff) AM_ROM
 
 	AM_RANGE(0x900000, 0x900001) AM_READ_PORT("DSW_PLAYER1")
@@ -265,7 +267,7 @@ WRITE16_MEMBER(midas_state::hammer_motor_w)
 #endif
 }
 
-static ADDRESS_MAP_START( hammer_map, AS_PROGRAM, 16, midas_state )
+ADDRESS_MAP_START(midas_state::hammer_map)
 	AM_RANGE(0x000000, 0x1fffff) AM_ROM
 
 	AM_RANGE(0x900000, 0x900001) AM_READ_PORT("DSW")

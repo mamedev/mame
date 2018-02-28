@@ -1691,7 +1691,7 @@ void debugger_commands::execute_save(int ref, const std::vector<std::string> &pa
 	}
 
 	/* now write the data out */
-	auto dis = space->device().machine().disable_side_effect();
+	auto dis = space->device().machine().disable_side_effects();
 	switch (space->addr_shift())
 	{
 	case -3:
@@ -1917,7 +1917,7 @@ void debugger_commands::execute_dump(int ref, const std::vector<std::string> &pa
 	else if(shift < 0)
 		width >>= -shift;
 
-	auto dis = space->device().machine().disable_side_effect();
+	auto dis = space->device().machine().disable_side_effects();
 	bool be = space->endianness() == ENDIANNESS_BIG;
 
 	for (offs_t i = offset; i <= endoffset; i += rowsize)
@@ -1987,7 +1987,7 @@ void debugger_commands::execute_dump(int ref, const std::vector<std::string> &pa
 						break;
 					}
 					for (unsigned int b = 0; b != width; b++) {
-						u8 byte = data >> (8 * (be ? (width-i-b) : b));
+						u8 byte = data >> (8 * (be ? (width-1-b) : b));
 						util::stream_format(output, "%c", (byte >= 32 && byte < 127) ? byte : '.');
 					}
 				}

@@ -53,7 +53,7 @@ public:
 	DECLARE_WRITE8_MEMBER( reg_w );
 	DECLARE_READ8_MEMBER( initptr_r );
 
-	void interrupt(running_machine &machine);
+	void interrupt();
 
 	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 
@@ -64,6 +64,7 @@ protected:
 	// device_config_memory_interface overrides
 	virtual space_config_vector memory_space_config() const override;
 
+private:
 	// address space configurations
 	const address_space_config      m_space_config;
 
@@ -79,7 +80,8 @@ protected:
 	void draw_line(bitmap_ind16 &bmp, int line);
 	void interrupt_start_vblank(void);
 
-private:
+	void tms3556(address_map &map);
+
 	enum dma_mode_tt : u8 { dma_read, dma_write };
 
 	static constexpr uint8_t MODE_OFF    = 0;
@@ -117,7 +119,6 @@ private:
 
 
 // device type definition
-extern const device_type TMS3556;
 DECLARE_DEVICE_TYPE(TMS3556, tms3556_device)
 
 #endif // MAME_VIDEO_TMS3556_H

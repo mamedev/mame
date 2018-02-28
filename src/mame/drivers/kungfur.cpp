@@ -97,6 +97,7 @@ public:
 	required_device<msm5205_device> m_adpcm1;
 	required_device<msm5205_device> m_adpcm2;
 	void kungfur(machine_config &config);
+	void kungfur_map(address_map &map);
 };
 
 
@@ -222,7 +223,7 @@ WRITE_LINE_MEMBER(kungfur_state::kfr_adpcm2_int)
 }
 
 
-static ADDRESS_MAP_START( kungfur_map, AS_PROGRAM, 8, kungfur_state )
+ADDRESS_MAP_START(kungfur_state::kungfur_map)
 	AM_RANGE(0x0000, 0x07ff) AM_RAM
 	AM_RANGE(0x4000, 0x4000) AM_WRITE(kungfur_adpcm1_w)
 	AM_RANGE(0x4004, 0x4004) AM_WRITE(kungfur_adpcm2_w)

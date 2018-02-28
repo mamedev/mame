@@ -40,6 +40,13 @@ public:
 
 	DECLARE_READ16_MEMBER(pc_bios_r);
 
+protected:
+	a2bus_pcxporter_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock);
+
+	virtual void device_start() override;
+	virtual void device_reset() override;
+	virtual void device_add_mconfig(machine_config &config) override;
+
 	// overrides of standard a2bus slot functions
 	virtual uint8_t read_c0nx(uint8_t offset) override;
 	virtual void write_c0nx(uint8_t offset, uint8_t data) override;
@@ -48,21 +55,7 @@ public:
 	virtual uint8_t read_c800(uint16_t offset) override;
 	virtual void write_c800(uint16_t offset, uint8_t data) override;
 
-	DECLARE_READ8_MEMBER( kbd_6502_r );
-	DECLARE_WRITE8_MEMBER( kbd_6502_w );
-
-	DECLARE_WRITE_LINE_MEMBER( pc_speaker_set_spkrdata );
-
-	DECLARE_WRITE8_MEMBER(pc_page_w);
-	DECLARE_WRITE8_MEMBER(nmi_enable_w);
-
-protected:
-	a2bus_pcxporter_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock);
-
-	virtual void device_start() override;
-	virtual void device_reset() override;
-	virtual void device_add_mconfig(machine_config &config) override;
-
+private:
 	required_device<v30_device> m_v30;
 	required_device<pic8259_device>  m_pic8259;
 	required_device<am9517a_device>  m_dma8237;
@@ -81,7 +74,15 @@ protected:
 
 	uint8_t m_nmi_enabled;
 
-private:
+	uint8_t m_ram[768*1024];
+	uint8_t m_c800_ram[0x400];
+	uint8_t m_regs[0x400];
+	uint32_t m_offset;
+	address_space *m_pcmem_space, *m_pcio_space;
+	bool m_reset_during_halt;
+
+	uint8_t m_6845_reg;
+
 	// interface to the keyboard
 	DECLARE_WRITE_LINE_MEMBER( keyboard_clock_w );
 	DECLARE_WRITE_LINE_MEMBER( keyboard_data_w );
@@ -105,16 +106,18 @@ private:
 	DECLARE_WRITE_LINE_MEMBER( pc_dack2_w );
 	DECLARE_WRITE_LINE_MEMBER( pc_dack3_w );
 
-	uint8_t m_ram[768*1024];
-	uint8_t m_c800_ram[0x400];
-	uint8_t m_regs[0x400];
-	uint32_t m_offset;
-	address_space *m_pcmem_space, *m_pcio_space;
-	bool m_reset_during_halt;
+	DECLARE_READ8_MEMBER( kbd_6502_r );
+	DECLARE_WRITE8_MEMBER( kbd_6502_w );
 
-	uint8_t m_6845_reg;
+	DECLARE_WRITE_LINE_MEMBER( pc_speaker_set_spkrdata );
+
+	DECLARE_WRITE8_MEMBER(pc_page_w);
+	DECLARE_WRITE8_MEMBER(nmi_enable_w);
 
 	void pc_select_dma_channel(int channel, bool state);
+
+	void pc_io(address_map &map);
+	void pc_map(address_map &map);
 };
 
 // device type definition

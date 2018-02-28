@@ -8,8 +8,8 @@
 
 #pragma once
 
-#ifndef _PES_H_
-#define _PES_H_
+#ifndef MAME_INCLUDES_PES_H
+#define MAME_INCLUDES_PES_H
 
 #include "machine/terminal.h"
 #include "sound/tms5220.h"
@@ -49,7 +49,9 @@ public:
 	DECLARE_READ8_MEMBER(data_to_i8031);
 	DECLARE_WRITE8_MEMBER(data_from_i8031);
 	void pes(machine_config &config);
+	void i80c31_io(address_map &map);
+	void i80c31_mem(address_map &map);
 };
 
 
-#endif  // _PES_H_
+#endif // MAME_INCLUDES_PES_H

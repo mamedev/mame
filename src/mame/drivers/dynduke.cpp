@@ -80,7 +80,7 @@ Also, implemented conditional port for Coin Mode (SW1:1)
 
 /* Memory Maps */
 
-static ADDRESS_MAP_START( master_map, AS_PROGRAM, 16, dynduke_state )
+ADDRESS_MAP_START(dynduke_state::master_map)
 	AM_RANGE(0x00000, 0x06fff) AM_RAM
 	AM_RANGE(0x07000, 0x07fff) AM_RAM AM_SHARE("spriteram")
 	AM_RANGE(0x08000, 0x080ff) AM_RAM AM_SHARE("scroll_ram")
@@ -94,7 +94,7 @@ static ADDRESS_MAP_START( master_map, AS_PROGRAM, 16, dynduke_state )
 	AM_RANGE(0xa0000, 0xfffff) AM_ROM
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( slave_map, AS_PROGRAM, 16, dynduke_state )
+ADDRESS_MAP_START(dynduke_state::slave_map)
 	AM_RANGE(0x00000, 0x05fff) AM_RAM
 	AM_RANGE(0x06000, 0x067ff) AM_RAM_WRITE(background_w) AM_SHARE("back_data")
 	AM_RANGE(0x06800, 0x06fff) AM_RAM_WRITE(foreground_w) AM_SHARE("fore_data")
@@ -106,7 +106,7 @@ static ADDRESS_MAP_START( slave_map, AS_PROGRAM, 16, dynduke_state )
 ADDRESS_MAP_END
 
 /* Memory map used by DlbDyn - probably an addressing PAL is different */
-static ADDRESS_MAP_START( masterj_map, AS_PROGRAM, 16, dynduke_state )
+ADDRESS_MAP_START(dynduke_state::masterj_map)
 	AM_RANGE(0x00000, 0x06fff) AM_RAM
 	AM_RANGE(0x07000, 0x07fff) AM_RAM AM_SHARE("spriteram")
 	AM_RANGE(0x08000, 0x087ff) AM_RAM_WRITE(text_w) AM_SHARE("videoram")
@@ -120,7 +120,8 @@ static ADDRESS_MAP_START( masterj_map, AS_PROGRAM, 16, dynduke_state )
 	AM_RANGE(0xa0000, 0xfffff) AM_ROM
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( sound_map, AS_PROGRAM, 8, dynduke_state )
+ADDRESS_MAP_START(dynduke_state::sound_map)
+	AM_RANGE(0x0000, 0xffff) AM_DEVREAD("sei80bu", sei80bu_device, data_r)
 	AM_RANGE(0x2000, 0x27ff) AM_RAM
 	AM_RANGE(0x4000, 0x4000) AM_DEVWRITE("seibu_sound", seibu_sound_device, pending_w)
 	AM_RANGE(0x4001, 0x4001) AM_DEVWRITE("seibu_sound", seibu_sound_device, irq_clear_w)
@@ -134,14 +135,13 @@ static ADDRESS_MAP_START( sound_map, AS_PROGRAM, 8, dynduke_state )
 	AM_RANGE(0x4018, 0x4019) AM_DEVWRITE("seibu_sound", seibu_sound_device, main_data_w)
 	AM_RANGE(0x401b, 0x401b) AM_DEVWRITE("seibu_sound", seibu_sound_device, coin_w)
 	AM_RANGE(0x6000, 0x6000) AM_DEVREADWRITE("oki", okim6295_device, read, write)
-	AM_RANGE(0x0000, 0xffff) AM_DEVREAD("sei80bu", sei80bu_device, data_r)
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( sound_decrypted_opcodes_map, AS_OPCODES, 8, dynduke_state )
+ADDRESS_MAP_START(dynduke_state::sound_decrypted_opcodes_map)
 	AM_RANGE(0x0000, 0xffff) AM_DEVREAD("sei80bu", sei80bu_device, opcode_r)
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( sei80bu_encrypted_full_map, AS_PROGRAM, 8, dynduke_state )
+ADDRESS_MAP_START(dynduke_state::sei80bu_encrypted_full_map)
 	AM_RANGE(0x0000, 0x7fff) AM_ROM AM_REGION("audiocpu", 0)
 	AM_RANGE(0x8000, 0xffff) AM_ROMBANK("seibu_bank1")
 ADDRESS_MAP_END
@@ -316,7 +316,7 @@ MACHINE_CONFIG_START(dynduke_state::dynduke)
 
 	MCFG_CPU_ADD("audiocpu", Z80, 14318180/4)
 	MCFG_CPU_PROGRAM_MAP(sound_map)
-	MCFG_CPU_DECRYPTED_OPCODES_MAP(sound_decrypted_opcodes_map)
+	MCFG_CPU_OPCODES_MAP(sound_decrypted_opcodes_map)
 
 	MCFG_DEVICE_ADD("sei80bu", SEI80BU, 0)
 	MCFG_DEVICE_PROGRAM_MAP(sei80bu_encrypted_full_map)
@@ -357,7 +357,8 @@ MACHINE_CONFIG_START(dynduke_state::dynduke)
 	MCFG_SEIBU_SOUND_YM_WRITE_CB(DEVWRITE8("ymsnd", ym3812_device, write))
 MACHINE_CONFIG_END
 
-MACHINE_CONFIG_DERIVED(dynduke_state::dbldyn, dynduke)
+MACHINE_CONFIG_START(dynduke_state::dbldyn)
+	dynduke(config);
 
 	MCFG_CPU_MODIFY("maincpu")
 	MCFG_CPU_PROGRAM_MAP(masterj_map)

@@ -105,6 +105,9 @@ public:
 
 	void ravens(machine_config &config);
 	void ravens2(machine_config &config);
+	void ravens2_io(address_map &map);
+	void ravens_io(address_map &map);
+	void ravens_mem(address_map &map);
 private:
 	uint8_t m_term_char;
 	uint8_t m_term_data;
@@ -203,21 +206,21 @@ MACHINE_RESET_MEMBER( ravens_state, ravens2 )
 }
 
 
-static ADDRESS_MAP_START( ravens_mem, AS_PROGRAM, 8, ravens_state )
+ADDRESS_MAP_START(ravens_state::ravens_mem)
 	ADDRESS_MAP_UNMAP_HIGH
 	AM_RANGE( 0x0000, 0x07ff) AM_ROM
 	AM_RANGE( 0x0800, 0x1fff) AM_RAM
 	AM_RANGE( 0x2000, 0x7FFF) AM_RAM // for quickload, optional
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( ravens_io, AS_IO, 8, ravens_state )
+ADDRESS_MAP_START(ravens_state::ravens_io)
 	ADDRESS_MAP_UNMAP_HIGH
 	AM_RANGE(0x09, 0x09) AM_WRITE(leds_w) // LED output port
 	AM_RANGE(0x10, 0x15) AM_WRITE(display_w) // 6-led display
 	AM_RANGE(0x17, 0x17) AM_READ(port17_r) // pushbuttons
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( ravens2_io, AS_IO, 8, ravens_state )
+ADDRESS_MAP_START(ravens_state::ravens2_io)
 	ADDRESS_MAP_UNMAP_HIGH
 	AM_RANGE(0x07, 0x07) AM_READ(port07_r)
 	AM_RANGE(0x1b, 0x1b) AM_WRITE(port1b_w)

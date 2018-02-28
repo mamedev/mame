@@ -67,6 +67,19 @@ public:
 	void install_smgp(void);
 	void install_gprider(void);
 
+	void decrypted_opcodes_map(address_map &map);
+	void main_map(address_map &map);
+	void rascot_z80_map(address_map &map);
+	void rascot_z80_portmap(address_map &map);
+	void smgp_airdrive_map(address_map &map);
+	void smgp_airdrive_portmap(address_map &map);
+	void smgp_comm_map(address_map &map);
+	void smgp_comm_portmap(address_map &map);
+	void smgp_sound2_map(address_map &map);
+	void smgp_sound2_portmap(address_map &map);
+	void sound_map(address_map &map);
+	void sound_portmap(address_map &map);
+	void sub_map(address_map &map);
 protected:
 	// timer IDs
 	enum
@@ -90,7 +103,7 @@ protected:
 
 		// compare/timer chip callbacks
 	void timer_ack_callback();
-	void sound_data_w(uint8_t data);
+	DECLARE_WRITE8_MEMBER(sound_data_w);
 
 	DECLARE_WRITE8_MEMBER(pc_0_w);
 	DECLARE_WRITE8_MEMBER(pd_0_w);

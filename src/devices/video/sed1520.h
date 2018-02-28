@@ -14,7 +14,7 @@
 
 #define MCFG_SED1520_ADD( _tag, _cb ) \
 	MCFG_DEVICE_ADD( _tag, SED1520, 0 ) \
-	sed1520_device::static_set_screen_update_cb(*device, _cb);
+	downcast<sed1520_device &>(*device).set_screen_update_cb(_cb);
 
 //**************************************************************************
 //  TYPE DEFINITIONS
@@ -33,8 +33,8 @@ public:
 	// construction/destruction
 	sed1520_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
-	// static configuration helpers
-	static void static_set_screen_update_cb(device_t &device, screen_update_func _cb) { downcast<sed1520_device &>(device).m_screen_update_func = _cb; }
+	// sconfiguration helpers
+	template <typename Object> void set_screen_update_cb(Object &&cb) { m_screen_update_func = std::forward<Object>(cb); }
 
 	// device interface
 	virtual DECLARE_WRITE8_MEMBER(write);

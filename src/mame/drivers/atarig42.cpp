@@ -39,7 +39,7 @@ void atarig42_state::update_interrupts()
 }
 
 
-MACHINE_START_MEMBER(atarig42_state,atarig42)
+void atarig42_state::machine_start()
 {
 	atarigen_state::machine_start();
 
@@ -51,7 +51,7 @@ MACHINE_START_MEMBER(atarig42_state,atarig42)
 }
 
 
-MACHINE_RESET_MEMBER(atarig42_state,atarig42)
+void atarig42_state::machine_reset()
 {
 	atarigen_state::machine_reset();
 	scanline_timer_reset(*m_screen, 8);
@@ -128,7 +128,7 @@ WRITE16_MEMBER(atarig42_state::mo_command_w)
  *
  *************************************/
 
-void atarig42_state::roadriot_sloop_tweak(int offset)
+void atarig42_0x200_state::roadriot_sloop_tweak(int offset)
 {
 /*
     sequence 1:
@@ -240,7 +240,7 @@ void atarig42_state::roadriot_sloop_tweak(int offset)
 }
 
 
-READ16_MEMBER(atarig42_state::roadriot_sloop_data_r)
+READ16_MEMBER(atarig42_0x200_state::roadriot_sloop_data_r)
 {
 	roadriot_sloop_tweak(offset);
 	if (offset < 0x78000/2)
@@ -250,7 +250,7 @@ READ16_MEMBER(atarig42_state::roadriot_sloop_data_r)
 }
 
 
-WRITE16_MEMBER(atarig42_state::roadriot_sloop_data_w)
+WRITE16_MEMBER(atarig42_0x200_state::roadriot_sloop_data_w)
 {
 	roadriot_sloop_tweak(offset);
 }
@@ -263,7 +263,7 @@ WRITE16_MEMBER(atarig42_state::roadriot_sloop_data_w)
  *
  *************************************/
 
-void atarig42_state::guardians_sloop_tweak(int offset)
+void atarig42_0x400_state::guardians_sloop_tweak(int offset)
 {
 	uint32_t *last_accesses = m_last_accesses;
 
@@ -297,7 +297,7 @@ void atarig42_state::guardians_sloop_tweak(int offset)
 }
 
 
-READ16_MEMBER(atarig42_state::guardians_sloop_data_r)
+READ16_MEMBER(atarig42_0x400_state::guardians_sloop_data_r)
 {
 	guardians_sloop_tweak(offset);
 	if (offset < 0x78000/2)
@@ -307,7 +307,7 @@ READ16_MEMBER(atarig42_state::guardians_sloop_data_r)
 }
 
 
-WRITE16_MEMBER(atarig42_state::guardians_sloop_data_w)
+WRITE16_MEMBER(atarig42_0x400_state::guardians_sloop_data_w)
 {
 	guardians_sloop_tweak(offset);
 }
@@ -320,7 +320,7 @@ WRITE16_MEMBER(atarig42_state::guardians_sloop_data_w)
  *
  *************************************/
 
-static ADDRESS_MAP_START( main_map, AS_PROGRAM, 16, atarig42_state )
+ADDRESS_MAP_START(atarig42_state::main_map)
 	AM_RANGE(0x000000, 0x080001) AM_ROM
 	AM_RANGE(0xe00000, 0xe00001) AM_READ_PORT("IN0")
 	AM_RANGE(0xe00002, 0xe00003) AM_READ_PORT("IN1")
@@ -339,11 +339,11 @@ static ADDRESS_MAP_START( main_map, AS_PROGRAM, 16, atarig42_state )
 	AM_RANGE(0xf80000, 0xf80003) AM_DEVWRITE("asic65", asic65_device, data_w)
 	AM_RANGE(0xfa0000, 0xfa0fff) AM_DEVREADWRITE8("eeprom", eeprom_parallel_28xx_device, read, write, 0x00ff)
 	AM_RANGE(0xfc0000, 0xfc0fff) AM_RAM_DEVWRITE("palette", palette_device, write16) AM_SHARE("palette")
+	AM_RANGE(0xff0000, 0xffffff) AM_RAM
 	AM_RANGE(0xff0000, 0xff0fff) AM_RAM AM_SHARE("rle")
 	AM_RANGE(0xff2000, 0xff5fff) AM_DEVWRITE("playfield", tilemap_device, write16) AM_SHARE("playfield")
 	AM_RANGE(0xff6000, 0xff6fff) AM_DEVWRITE("alpha", tilemap_device, write16) AM_SHARE("alpha")
 	AM_RANGE(0xff7000, 0xff7001) AM_WRITE(mo_command_w) AM_SHARE("mo_command")
-	AM_RANGE(0xff0000, 0xffffff) AM_RAM
 ADDRESS_MAP_END
 
 
@@ -527,10 +527,7 @@ MACHINE_CONFIG_START(atarig42_state::atarig42)
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", M68000, ATARI_CLOCK_14MHz)
 	MCFG_CPU_PROGRAM_MAP(main_map)
-	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", atarigen_state, video_int_gen)
-
-	MCFG_MACHINE_START_OVERRIDE(atarig42_state,atarig42)
-	MCFG_MACHINE_RESET_OVERRIDE(atarig42_state,atarig42)
+	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", atarig42_state, video_int_gen)
 
 	MCFG_EEPROM_2816_ADD("eeprom")
 	MCFG_EEPROM_28XX_LOCK_AFTER_WRITE(true)
@@ -558,19 +555,21 @@ MACHINE_CONFIG_START(atarig42_state::atarig42)
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
 
-	MCFG_ATARI_JSA_III_ADD("jsa", WRITELINE(atarigen_state, sound_int_write_line))
+	MCFG_ATARI_JSA_III_ADD("jsa", WRITELINE(atarig42_state, sound_int_write_line))
 	MCFG_ATARI_JSA_TEST_PORT("IN2", 6)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 MACHINE_CONFIG_END
 
-MACHINE_CONFIG_DERIVED(atarig42_state::atarig42_0x200, atarig42)
+MACHINE_CONFIG_START(atarig42_0x200_state::atarig42_0x200)
+	atarig42(config);
 	MCFG_ATARIRLE_ADD("rle", modesc_0x200)
 
 	/* ASIC65 */
 	MCFG_ASIC65_ADD("asic65", ASIC65_ROMBASED)
 MACHINE_CONFIG_END
 
-MACHINE_CONFIG_DERIVED(atarig42_state::atarig42_0x400, atarig42)
+MACHINE_CONFIG_START(atarig42_0x400_state::atarig42_0x400)
+	atarig42(config);
 	MCFG_ATARIRLE_ADD("rle", modesc_0x400)
 
 	/* ASIC65 */
@@ -824,12 +823,12 @@ ROM_END
  *
  *************************************/
 
-DRIVER_INIT_MEMBER(atarig42_state,roadriot)
+DRIVER_INIT_MEMBER(atarig42_0x200_state,roadriot)
 {
 	m_playfield_base = 0x400;
 
 	address_space &main = m_maincpu->space(AS_PROGRAM);
-	main.install_readwrite_handler(0x000000, 0x07ffff, read16_delegate(FUNC(atarig42_state::roadriot_sloop_data_r),this), write16_delegate(FUNC(atarig42_state::roadriot_sloop_data_w),this));
+	main.install_readwrite_handler(0x000000, 0x07ffff, read16_delegate(FUNC(atarig42_0x200_state::roadriot_sloop_data_r),this), write16_delegate(FUNC(atarig42_0x200_state::roadriot_sloop_data_w),this));
 	m_sloop_base = (uint16_t *)memregion("maincpu")->base();
 
 	/*
@@ -855,7 +854,7 @@ DRIVER_INIT_MEMBER(atarig42_state,roadriot)
 }
 
 
-DRIVER_INIT_MEMBER(atarig42_state,guardian)
+DRIVER_INIT_MEMBER(atarig42_0x400_state,guardian)
 {
 	m_playfield_base = 0x000;
 
@@ -864,7 +863,7 @@ DRIVER_INIT_MEMBER(atarig42_state,guardian)
 	*(uint16_t *)&memregion("maincpu")->base()[0x80000] = 0x4E75;
 
 	address_space &main = m_maincpu->space(AS_PROGRAM);
-	main.install_readwrite_handler(0x000000, 0x07ffff, read16_delegate(FUNC(atarig42_state::guardians_sloop_data_r),this), write16_delegate(FUNC(atarig42_state::guardians_sloop_data_w),this));
+	main.install_readwrite_handler(0x000000, 0x07ffff, read16_delegate(FUNC(atarig42_0x400_state::guardians_sloop_data_r),this), write16_delegate(FUNC(atarig42_0x400_state::guardians_sloop_data_w),this));
 	m_sloop_base = (uint16_t *)memregion("maincpu")->base();
 
 	/*
@@ -897,7 +896,7 @@ DRIVER_INIT_MEMBER(atarig42_state,guardian)
  *
  *************************************/
 
-GAME( 1991, roadriot,  0,        atarig42_0x200, roadriot, atarig42_state, roadriot, ROT0, "Atari Games", "Road Riot 4WD (set 1, 04 Dec 1991)", MACHINE_UNEMULATED_PROTECTION )
-GAME( 1991, roadriota, roadriot, atarig42_0x200, roadriot, atarig42_state, roadriot, ROT0, "Atari Games", "Road Riot 4WD (set 2, 13 Nov 1991)", MACHINE_UNEMULATED_PROTECTION )
-GAME( 1991, roadriotb, roadriot, atarig42_0x200, roadriot, atarig42_state, roadriot, ROT0, "Atari Games", "Road Riot 4WD (set 3, 04 Jun 1991)", MACHINE_UNEMULATED_PROTECTION )
-GAME( 1992, guardian,  0,        atarig42_0x400, guardian, atarig42_state, guardian, ROT0, "Atari Games", "Guardians of the 'Hood", 0 )
+GAME( 1991, roadriot,  0,        atarig42_0x200, roadriot, atarig42_0x200_state, roadriot, ROT0, "Atari Games", "Road Riot 4WD (set 1, 04 Dec 1991)", MACHINE_UNEMULATED_PROTECTION )
+GAME( 1991, roadriota, roadriot, atarig42_0x200, roadriot, atarig42_0x200_state, roadriot, ROT0, "Atari Games", "Road Riot 4WD (set 2, 13 Nov 1991)", MACHINE_UNEMULATED_PROTECTION )
+GAME( 1991, roadriotb, roadriot, atarig42_0x200, roadriot, atarig42_0x200_state, roadriot, ROT0, "Atari Games", "Road Riot 4WD (set 3, 04 Jun 1991)", MACHINE_UNEMULATED_PROTECTION )
+GAME( 1992, guardian,  0,        atarig42_0x400, guardian, atarig42_0x400_state, guardian, ROT0, "Atari Games", "Guardians of the 'Hood", 0 )

@@ -130,7 +130,7 @@ WRITE8_MEMBER(starwars_state::esb_slapstic_w)
  *
  *************************************/
 
-static ADDRESS_MAP_START( main_map, AS_PROGRAM, 8, starwars_state )
+ADDRESS_MAP_START(starwars_state::main_map)
 	AM_RANGE(0x0000, 0x2fff) AM_RAM AM_SHARE("vectorram") AM_REGION("maincpu", 0)
 	AM_RANGE(0x3000, 0x3fff) AM_ROM                             /* vector_rom */
 	AM_RANGE(0x4300, 0x431f) AM_READ_PORT("IN0")
@@ -160,10 +160,10 @@ static ADDRESS_MAP_START( main_map, AS_PROGRAM, 8, starwars_state )
 	AM_RANGE(0x8000, 0xffff) AM_ROM                             /* rest of main_rom */
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( esb_main_map, AS_PROGRAM, 8, starwars_state )
+ADDRESS_MAP_START(starwars_state::esb_main_map)
+	AM_IMPORT_FROM(main_map)
 	AM_RANGE(0x8000, 0x9fff) AM_READWRITE(esb_slapstic_r, esb_slapstic_w)
 	AM_RANGE(0xa000, 0xffff) AM_ROMBANK("bank2")
-	AM_IMPORT_FROM(main_map)
 ADDRESS_MAP_END
 
 
@@ -173,7 +173,7 @@ ADDRESS_MAP_END
  *
  *************************************/
 
-static ADDRESS_MAP_START( sound_map, AS_PROGRAM, 8, starwars_state )
+ADDRESS_MAP_START(starwars_state::sound_map)
 	AM_RANGE(0x0000, 0x07ff) AM_DEVWRITE("mainlatch", generic_latch_8_device, write)
 	AM_RANGE(0x0800, 0x0fff) AM_DEVREAD("soundlatch", generic_latch_8_device, read) /* SIN Read */
 	AM_RANGE(0x1000, 0x107f) AM_RAM                         /* 6532 ram */
@@ -370,7 +370,8 @@ MACHINE_CONFIG_START(starwars_state::starwars)
 MACHINE_CONFIG_END
 
 
-MACHINE_CONFIG_DERIVED(starwars_state::esb, starwars)
+MACHINE_CONFIG_START(starwars_state::esb)
+	starwars(config);
 	MCFG_CPU_MODIFY("maincpu")
 	MCFG_CPU_PROGRAM_MAP(esb_main_map)
 

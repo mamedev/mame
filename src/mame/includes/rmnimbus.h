@@ -128,8 +128,10 @@ public:
 	DECLARE_WRITE8_MEMBER(nimbus_pc8031_w);
 	DECLARE_READ8_MEMBER(nimbus_pc8031_iou_r);
 	DECLARE_WRITE8_MEMBER(nimbus_pc8031_iou_w);
-	DECLARE_READ8_MEMBER(nimbus_pc8031_port_r);
-	DECLARE_WRITE8_MEMBER(nimbus_pc8031_port_w);
+	DECLARE_READ8_MEMBER(nimbus_pc8031_port1_r);
+	DECLARE_WRITE8_MEMBER(nimbus_pc8031_port1_w);
+	DECLARE_READ8_MEMBER(nimbus_pc8031_port3_r);
+	DECLARE_WRITE8_MEMBER(nimbus_pc8031_port3_w);
 	DECLARE_READ8_MEMBER(nimbus_iou_r);
 	DECLARE_WRITE8_MEMBER(nimbus_iou_w);
 	DECLARE_WRITE8_MEMBER(nimbus_sound_ay8910_porta_w);
@@ -230,6 +232,10 @@ public:
 	} m_nimbus_mouse;
 
 	void nimbus(machine_config &config);
+	void nimbus_io(address_map &map);
+	void nimbus_iocpu_io(address_map &map);
+	void nimbus_iocpu_mem(address_map &map);
+	void nimbus_mem(address_map &map);
 private:
 	void debug_command(int ref, const std::vector<std::string> &params);
 	void video_debug(int ref, const std::vector<std::string> &params);

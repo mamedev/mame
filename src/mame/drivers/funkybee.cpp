@@ -99,7 +99,7 @@ WRITE_LINE_MEMBER(funkybee_state::coin_counter_2_w)
 	machine().bookkeeping().coin_counter_w(1, state);
 }
 
-static ADDRESS_MAP_START( funkybee_map, AS_PROGRAM, 8, funkybee_state )
+ADDRESS_MAP_START(funkybee_state::funkybee_map)
 	AM_RANGE(0x0000, 0x4fff) AM_ROM
 	AM_RANGE(0x8000, 0x87ff) AM_RAM
 	AM_RANGE(0xa000, 0xbfff) AM_RAM_WRITE(funkybee_videoram_w) AM_SHARE("videoram")
@@ -112,7 +112,7 @@ static ADDRESS_MAP_START( funkybee_map, AS_PROGRAM, 8, funkybee_state )
 	AM_RANGE(0xf802, 0xf802) AM_READ_PORT("IN2")
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( io_map, AS_IO, 8, funkybee_state )
+ADDRESS_MAP_START(funkybee_state::io_map)
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	AM_RANGE(0x00, 0x01) AM_DEVWRITE("aysnd", ay8910_device, address_data_w)
 	AM_RANGE(0x02, 0x02) AM_DEVREAD("aysnd", ay8910_device, data_r)

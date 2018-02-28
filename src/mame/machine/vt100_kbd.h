@@ -21,7 +21,7 @@
 //**************************************************************************
 
 #define MCFG_VT100_KEYBOARD_INT_CALLBACK(_devcb) \
-	devcb = &vt100_keyboard_device::set_int_callback(*device, DEVCB_##_devcb);
+	devcb = &downcast<vt100_keyboard_device &>(*device).set_int_callback(DEVCB_##_devcb);
 
 
 //**************************************************************************
@@ -36,8 +36,8 @@ public:
 	// construction/destruction
 	vt100_keyboard_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock);
 
-	// static configuration
-	template <class Object> static devcb_base &set_int_callback(device_t &device, Object &&cb) { return downcast<vt100_keyboard_device &>(device).m_int_cb.set_callback(std::forward<Object>(cb)); }
+	// configuration
+	template <class Object> devcb_base &set_int_callback(Object &&cb) { return m_int_cb.set_callback(std::forward<Object>(cb)); }
 
 	// accessors (for now)
 	void control_w(u8 data);

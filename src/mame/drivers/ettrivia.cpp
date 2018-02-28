@@ -76,6 +76,8 @@ public:
 	required_device<gfxdecode_device> m_gfxdecode;
 	required_device_array<ay8912_device, 3> m_ay;
 	void ettrivia(machine_config &config);
+	void cpu_map(address_map &map);
+	void io_map(address_map &map);
 };
 
 
@@ -153,7 +155,7 @@ WRITE8_MEMBER(ettrivia_state::b800_w)
 	m_b800_prev = data;
 }
 
-static ADDRESS_MAP_START( cpu_map, AS_PROGRAM, 8, ettrivia_state )
+ADDRESS_MAP_START(ettrivia_state::cpu_map)
 	AM_RANGE(0x0000, 0x7fff) AM_ROM
 	AM_RANGE(0x8000, 0x87ff) AM_RAM AM_SHARE("nvram")
 	AM_RANGE(0x9000, 0x9000) AM_WRITE(ettrivia_control_w)
@@ -165,7 +167,7 @@ static ADDRESS_MAP_START( cpu_map, AS_PROGRAM, 8, ettrivia_state )
 	AM_RANGE(0xe000, 0xe7ff) AM_RAM_WRITE(ettrivia_bg_w) AM_SHARE("bg_videoram")
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( io_map, AS_IO, 8, ettrivia_state )
+ADDRESS_MAP_START(ettrivia_state::io_map)
 	AM_RANGE(0x0000, 0xffff) AM_READ(ettrivia_question_r)
 ADDRESS_MAP_END
 

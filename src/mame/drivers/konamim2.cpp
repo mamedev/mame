@@ -281,6 +281,12 @@ public:
 	required_device<cpu_device> m_subcpu;
 	void m2(machine_config &config);
 	void _3do_m2(machine_config &config);
+	void _3do_m2_main(address_map &map);
+	void _3do_m2_main_m(address_map &map);
+	void _3do_m2_main_s(address_map &map);
+	void m2_main(address_map &map);
+	void m2_main_m(address_map &map);
+	void m2_main_s(address_map &map);
 };
 
 
@@ -1164,7 +1170,7 @@ READ8_MEMBER(konamim2_state::id7_r)
 	return 0x07;
 }
 
-static ADDRESS_MAP_START( m2_main, AS_PROGRAM, 64, konamim2_state )
+ADDRESS_MAP_START(konamim2_state::m2_main)
 	AM_RANGE(0x00000000, 0x0000007f) AM_RAM // ???
 	AM_RANGE(0x00010040, 0x00010047) AM_READWRITE(irq_enable_r, irq_enable_w)
 	AM_RANGE(0x00010050, 0x00010057) AM_READ(irq_active_r)
@@ -1203,30 +1209,30 @@ static ADDRESS_MAP_START( m2_main, AS_PROGRAM, 64, konamim2_state )
 	AM_RANGE(0xfff00000, 0xffffffff) AM_ROM AM_REGION("boot", 0) AM_SHARE("share2")
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( m2_main_m, AS_PROGRAM, 64, konamim2_state )
+ADDRESS_MAP_START(konamim2_state::m2_main_m)
 	AM_IMPORT_FROM( m2_main )
 	AM_RANGE(0x10000000, 0x10000007) AM_READ(cpu_r<true>)
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( m2_main_s, AS_PROGRAM, 64, konamim2_state )
+ADDRESS_MAP_START(konamim2_state::m2_main_s)
 	AM_IMPORT_FROM( m2_main )
 	AM_RANGE(0x10000000, 0x10000007) AM_READ(cpu_r<false>)
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( 3do_m2_main, AS_PROGRAM, 64, konamim2_state )
+ADDRESS_MAP_START(konamim2_state::_3do_m2_main)
 //  ADDRESS_MAP_UNMAP_HIGH
 	AM_IMPORT_FROM( m2_main )
 
 //  AM_RANGE(0x00000000, 0x000cffff) devices?
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( 3do_m2_main_m, AS_PROGRAM, 64, konamim2_state )
-	AM_IMPORT_FROM( 3do_m2_main )
+ADDRESS_MAP_START(konamim2_state::_3do_m2_main_m)
+	AM_IMPORT_FROM( _3do_m2_main )
 	AM_RANGE(0x10000000, 0x10000007) AM_READ(cpu_r<true>)
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( 3do_m2_main_s, AS_PROGRAM, 64, konamim2_state )
-	AM_IMPORT_FROM( 3do_m2_main )
+ADDRESS_MAP_START(konamim2_state::_3do_m2_main_s)
+	AM_IMPORT_FROM( _3do_m2_main )
 	AM_RANGE(0x10000000, 0x10000007) AM_READ(cpu_r<false>)
 ADDRESS_MAP_END
 
@@ -1319,12 +1325,13 @@ MACHINE_CONFIG_START(konamim2_state::m2)
 
 MACHINE_CONFIG_END
 
-MACHINE_CONFIG_DERIVED(konamim2_state::_3do_m2, m2)
+MACHINE_CONFIG_START(konamim2_state::_3do_m2)
+	m2(config);
 	MCFG_CPU_MODIFY("maincpu")
-	MCFG_CPU_PROGRAM_MAP(3do_m2_main_m)
+	MCFG_CPU_PROGRAM_MAP(_3do_m2_main_m)
 
 	MCFG_CPU_MODIFY("sub")
-	MCFG_CPU_PROGRAM_MAP(3do_m2_main_s)
+	MCFG_CPU_PROGRAM_MAP(_3do_m2_main_s)
 
 	MCFG_SOFTWARE_LIST_ADD("cd_list","3do_m2")
 MACHINE_CONFIG_END

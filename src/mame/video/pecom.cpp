@@ -43,7 +43,7 @@ WRITE8_MEMBER(pecom_state::pecom_cdp1869_w)
 	}
 }
 
-static ADDRESS_MAP_START( cdp1869_page_ram, 0, 8, pecom_state )
+ADDRESS_MAP_START(pecom_state::cdp1869_page_ram)
 	AM_RANGE(0x000, 0x3ff) AM_MIRROR(0x400) AM_RAM
 ADDRESS_MAP_END
 
@@ -79,7 +79,7 @@ WRITE_LINE_MEMBER(pecom_state::pecom_prd_w)
 	m_dma = !m_dma;
 }
 
-VIDEO_START_MEMBER(pecom_state,pecom)
+void pecom_state::video_start()
 {
 	/* allocate memory */
 	m_charram = std::make_unique<uint8_t[]>(PECOM_CHAR_RAM_SIZE);
@@ -92,8 +92,6 @@ VIDEO_START_MEMBER(pecom_state,pecom)
 
 MACHINE_CONFIG_START(pecom_state::pecom_video)
 	MCFG_CDP1869_SCREEN_PAL_ADD(CDP1869_TAG, SCREEN_TAG, cdp1869_device::DOT_CLK_PAL)
-
-	MCFG_VIDEO_START_OVERRIDE(pecom_state,pecom)
 
 	MCFG_SPEAKER_STANDARD_MONO("mono")
 

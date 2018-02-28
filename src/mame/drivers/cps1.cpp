@@ -535,7 +535,7 @@ All PRGx go to B-board. Provision for up to 4MB of ROM space, which was never us
 
 */
 
-static ADDRESS_MAP_START( main_map, AS_PROGRAM, 16, cps_state )
+ADDRESS_MAP_START(cps_state::main_map)
 	AM_RANGE(0x000000, 0x3fffff) AM_ROM
 	AM_RANGE(0x800000, 0x800007) AM_READ_PORT("IN1")            /* Player input ports */
 	/* forgottn, willow, cawing, nemo, varth read from 800010. Probably debug input leftover from development */
@@ -556,12 +556,12 @@ ADDRESS_MAP_END
 /* Forgotten Worlds has a NEC uPD4701AC on the B-board handling dial inputs from the CN-MOWS connector. */
 /* The memory mapping is handled by PAL LWIO */
 
-static ADDRESS_MAP_START( forgottn_map, AS_PROGRAM, 16, cps_state )
+ADDRESS_MAP_START(cps_state::forgottn_map)
+	AM_IMPORT_FROM(main_map)
 	AM_RANGE(0x800040, 0x800041) AM_DEVWRITE8("upd4701", upd4701_device, reset_x, 0x00ff)
 	AM_RANGE(0x800048, 0x800049) AM_DEVWRITE8("upd4701", upd4701_device, reset_y, 0x00ff)
 	AM_RANGE(0x800052, 0x800055) AM_DEVREAD8("upd4701", upd4701_device, read_x, 0x00ff)
 	AM_RANGE(0x80005a, 0x80005d) AM_DEVREAD8("upd4701", upd4701_device, read_y, 0x00ff)
-	AM_IMPORT_FROM(main_map)
 ADDRESS_MAP_END
 
 /*
@@ -587,7 +587,7 @@ SOUNDA15   = pin13 =   (  I1 )
 /SOUNDCE   = pin12 = ! ( !I0 & (!I1 | ( I1 & !I2)) )
 */
 
-static ADDRESS_MAP_START( sub_map, AS_PROGRAM, 8, cps_state )
+ADDRESS_MAP_START(cps_state::sub_map)
 	AM_RANGE(0x0000, 0x7fff) AM_ROM
 	AM_RANGE(0x8000, 0xbfff) AM_ROMBANK("bank1")
 	AM_RANGE(0xd000, 0xd7ff) AM_RAM
@@ -599,7 +599,7 @@ static ADDRESS_MAP_START( sub_map, AS_PROGRAM, 8, cps_state )
 	AM_RANGE(0xf00a, 0xf00a) AM_DEVREAD("soundlatch2", generic_latch_8_device, read) /* Sound timer fade */
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( qsound_main_map, AS_PROGRAM, 16, cps_state )
+ADDRESS_MAP_START(cps_state::qsound_main_map)
 	AM_RANGE(0x000000, 0x1fffff) AM_ROM
 	AM_RANGE(0x800000, 0x800007) AM_READ_PORT("IN1")            /* Player input ports */
 	AM_RANGE(0x800018, 0x80001f) AM_READ(cps1_dsw_r)            /* System input ports / Dip Switches */
@@ -617,7 +617,7 @@ static ADDRESS_MAP_START( qsound_main_map, AS_PROGRAM, 16, cps_state )
 	AM_RANGE(0xff0000, 0xffffff) AM_RAM AM_SHARE("mainram")
 ADDRESS_MAP_END
 
-ADDRESS_MAP_START( qsound_sub_map, AS_PROGRAM, 8, cps_state )   // used by cps2.c too
+ADDRESS_MAP_START(cps_state::qsound_sub_map)   // used by cps2.c too
 	AM_RANGE(0x0000, 0x7fff) AM_ROM
 	AM_RANGE(0x8000, 0xbfff) AM_ROMBANK("bank1")    /* banked (contains music data) */
 	AM_RANGE(0xc000, 0xcfff) AM_RAM AM_SHARE("qsound_ram1")
@@ -627,11 +627,11 @@ ADDRESS_MAP_START( qsound_sub_map, AS_PROGRAM, 8, cps_state )   // used by cps2.
 	AM_RANGE(0xf000, 0xffff) AM_RAM AM_SHARE("qsound_ram2")
 ADDRESS_MAP_END
 
-ADDRESS_MAP_START( qsound_decrypted_opcodes_map, AS_OPCODES, 8, cps_state )
+ADDRESS_MAP_START(cps_state::qsound_decrypted_opcodes_map)
 	AM_RANGE(0x0000, 0x7fff) AM_ROMBANK("decrypted")
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( sf2m3_map, AS_PROGRAM, 16, cps_state )
+ADDRESS_MAP_START(cps_state::sf2m3_map)
 	AM_RANGE(0x000000, 0x3fffff) AM_ROM
 	AM_RANGE(0x800010, 0x800011) AM_READ_PORT("IN1")            /* Player input ports */
 	AM_RANGE(0x800028, 0x80002f) AM_READ(cps1_hack_dsw_r)            /* System input ports / Dip Switches */
@@ -647,7 +647,7 @@ static ADDRESS_MAP_START( sf2m3_map, AS_PROGRAM, 16, cps_state )
 	AM_RANGE(0xff0000, 0xffffff) AM_RAM
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( sf2m10_map, AS_PROGRAM, 16, cps_state )
+ADDRESS_MAP_START(cps_state::sf2m10_map)
 	AM_RANGE(0x000000, 0x3fffff) AM_ROM
 	AM_RANGE(0x800000, 0x800007) AM_READ_PORT("IN1")
 	AM_RANGE(0x800018, 0x80001f) AM_READ(cps1_hack_dsw_r)
@@ -1947,6 +1947,15 @@ static INPUT_PORTS_START( sf2accp2 )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
 	PORT_DIPNAME( 0x02, 0x00, "Ryu special rapid multiple shots" )   PORT_DIPLOCATION("SW(C):2")
 	PORT_DIPSETTING(    0x02, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+INPUT_PORTS_END
+
+INPUT_PORTS_START( sf2bhh )
+	PORT_INCLUDE( sf2 )
+
+	PORT_MODIFY("DSWC")
+	PORT_DIPNAME( 0x01, 0x01, "Turbo Mode" )   PORT_DIPLOCATION("SW(C):1")
+	PORT_DIPSETTING(    0x01, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
 INPUT_PORTS_END
 
@@ -3377,7 +3386,8 @@ MACHINE_CONFIG_START(cps_state::cps1_10MHz)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.30)
 MACHINE_CONFIG_END
 
-MACHINE_CONFIG_DERIVED(cps_state::forgottn, cps1_10MHz)
+MACHINE_CONFIG_START(cps_state::forgottn)
+	cps1_10MHz(config);
 	MCFG_CPU_MODIFY("maincpu")
 	MCFG_CPU_PROGRAM_MAP(forgottn_map)
 
@@ -3386,20 +3396,23 @@ MACHINE_CONFIG_DERIVED(cps_state::forgottn, cps1_10MHz)
 	MCFG_UPD4701_PORTY("DIAL1")
 MACHINE_CONFIG_END
 
-MACHINE_CONFIG_DERIVED(cps_state::cps1_12MHz, cps1_10MHz)
+MACHINE_CONFIG_START(cps_state::cps1_12MHz)
+	cps1_10MHz(config);
 
 	/* basic machine hardware */
 	MCFG_CPU_MODIFY("maincpu")
 	MCFG_CPU_CLOCK( XTAL(12'000'000) )    /* verified on pcb */
 MACHINE_CONFIG_END
 
-MACHINE_CONFIG_DERIVED(cps_state::pang3, cps1_12MHz)
+MACHINE_CONFIG_START(cps_state::pang3)
+	cps1_12MHz(config);
 
 	/* basic machine hardware */
 	MCFG_EEPROM_SERIAL_93C46_ADD("eeprom")
 MACHINE_CONFIG_END
 
-MACHINE_CONFIG_DERIVED(cps_state::ganbare, cps1_10MHz)
+MACHINE_CONFIG_START(cps_state::ganbare)
+	cps1_10MHz(config);
 
 	/* basic machine hardware */
 	MCFG_CPU_MODIFY("maincpu")
@@ -3408,7 +3421,8 @@ MACHINE_CONFIG_DERIVED(cps_state::ganbare, cps1_10MHz)
 	MCFG_M48T35_ADD("m48t35")
 MACHINE_CONFIG_END
 
-MACHINE_CONFIG_DERIVED(cps_state::qsound, cps1_12MHz)
+MACHINE_CONFIG_START(cps_state::qsound)
+	cps1_12MHz(config);
 
 	/* basic machine hardware */
 	MCFG_CPU_REPLACE("maincpu", M68000, XTAL(12'000'000) )    /* verified on pcb */
@@ -3418,7 +3432,7 @@ MACHINE_CONFIG_DERIVED(cps_state::qsound, cps1_12MHz)
 
 	MCFG_CPU_REPLACE("audiocpu", Z80, XTAL(8'000'000))  /* verified on pcb */
 	MCFG_CPU_PROGRAM_MAP(qsound_sub_map)
-	MCFG_CPU_DECRYPTED_OPCODES_MAP(qsound_decrypted_opcodes_map)
+	MCFG_CPU_OPCODES_MAP(qsound_decrypted_opcodes_map)
 	MCFG_CPU_PERIODIC_INT_DRIVER(cps_state, irq0_line_hold, 250) // measured (cps2.c)
 
 	MCFG_MACHINE_START_OVERRIDE(cps_state, qsound)
@@ -3439,18 +3453,21 @@ MACHINE_CONFIG_DERIVED(cps_state::qsound, cps1_12MHz)
 	MCFG_SOUND_ROUTE(1, "rspeaker", 1.0)
 MACHINE_CONFIG_END
 
-MACHINE_CONFIG_DERIVED(cps_state::wofhfh, cps1_12MHz)
+MACHINE_CONFIG_START(cps_state::wofhfh)
+	cps1_12MHz(config);
 
 	/* basic machine hardware */
 	MCFG_EEPROM_SERIAL_93C46_8BIT_ADD("eeprom")
 MACHINE_CONFIG_END
 
-MACHINE_CONFIG_DERIVED(cps_state::sf2m3, cps1_12MHz)
+MACHINE_CONFIG_START(cps_state::sf2m3)
+	cps1_12MHz(config);
 	MCFG_CPU_MODIFY("maincpu")
 	MCFG_CPU_PROGRAM_MAP(sf2m3_map)
 MACHINE_CONFIG_END
 
-MACHINE_CONFIG_DERIVED(cps_state::sf2m10, cps1_12MHz)
+MACHINE_CONFIG_START(cps_state::sf2m10)
+	cps1_12MHz(config);
 	MCFG_CPU_MODIFY("maincpu")
 	MCFG_CPU_PROGRAM_MAP(sf2m10_map)
 MACHINE_CONFIG_END
@@ -8967,6 +8984,52 @@ ROM_START( sf2ceuc )
 	ROM_LOAD( "c632.ic1",     0x0000, 0x0117, CRC(0fbd9270) SHA1(d7e737b20c44d41e29ca94be56114b31934dde81) )
 ROM_END
 
+/* B-Board 91635B-2 */
+ROM_START( sf2cet )
+	ROM_REGION( CODE_SIZE, "maincpu", 0 )      /* 68000 code */
+	ROM_LOAD16_WORD_SWAP( "s92t_23a.8f", 0x000000, 0x80000, CRC(d7c28ade) SHA1(4fe8201d8861f9ea9c62fd97b7396bc180a9f3ce) )
+	ROM_LOAD16_WORD_SWAP( "s92_22a.7f",  0x080000, 0x80000, CRC(99f1cca4) SHA1(64111eba81d743fc3fd51d7a89cd0b2eefcc900d) )
+	ROM_LOAD16_WORD_SWAP( "s92_21a.6f",  0x100000, 0x80000, CRC(925a7877) SHA1(1960dca35f0ca6f2b399a9fccfbc0132ac6425d1) )
+
+	ROM_REGION( 0x600000, "gfx", 0 )
+	ROMX_LOAD( "s92-1m.3a",  0x000000, 0x80000, CRC(03b0d852) SHA1(f370f25c96ad2b94f8c53d6b7139100285a25bef) , ROM_GROUPWORD | ROM_SKIP(6) )
+	ROMX_LOAD( "s92-3m.5a",  0x000002, 0x80000, CRC(840289ec) SHA1(2fb42a242f60ba7e74009b5a90eb26e035ba1e82) , ROM_GROUPWORD | ROM_SKIP(6) )
+	ROMX_LOAD( "s92-2m.4a",  0x000004, 0x80000, CRC(cdb5f027) SHA1(4c7d944fef200fdfcaf57758b901b5511188ed2e) , ROM_GROUPWORD | ROM_SKIP(6) )
+	ROMX_LOAD( "s92-4m.6a",  0x000006, 0x80000, CRC(e2799472) SHA1(27d3796429338d82a8de246a0ea06dd487a87768) , ROM_GROUPWORD | ROM_SKIP(6) )
+	ROMX_LOAD( "s92-5m.7a",  0x200000, 0x80000, CRC(ba8a2761) SHA1(4b696d66c51611e43522bed752654314e76d33b6) , ROM_GROUPWORD | ROM_SKIP(6) )
+	ROMX_LOAD( "s92-7m.9a",  0x200002, 0x80000, CRC(e584bfb5) SHA1(ebdf1f5e2638eed3a65dda82b1ed9151a355f4c9) , ROM_GROUPWORD | ROM_SKIP(6) )
+	ROMX_LOAD( "s92-6m.8a",  0x200004, 0x80000, CRC(21e3f87d) SHA1(4a4961bb68c3a1ce15f9d393d9c03ecb2466cc29) , ROM_GROUPWORD | ROM_SKIP(6) )
+	ROMX_LOAD( "s92-8m.10a", 0x200006, 0x80000, CRC(befc47df) SHA1(520390420da3a0271ba90b0a933e65143265e5cf) , ROM_GROUPWORD | ROM_SKIP(6) )
+	ROMX_LOAD( "s92-10m.3c", 0x400000, 0x80000, CRC(960687d5) SHA1(2868c31121b1c7564e9767b9a19cdbf655c7ed1d) , ROM_GROUPWORD | ROM_SKIP(6) )
+	ROMX_LOAD( "s92-12m.5c", 0x400002, 0x80000, CRC(978ecd18) SHA1(648a59706b93c84b4206a968ecbdc3e834c476f6) , ROM_GROUPWORD | ROM_SKIP(6) )
+	ROMX_LOAD( "s92-11m.4c", 0x400004, 0x80000, CRC(d6ec9a0a) SHA1(ed6143f8737013b6ef1684e37c05e037e7a80dae) , ROM_GROUPWORD | ROM_SKIP(6) )
+	ROMX_LOAD( "s92-13m.6c", 0x400006, 0x80000, CRC(ed2c67f6) SHA1(0083c0ffaf6fe7659ff0cf822be4346cd6e61329) , ROM_GROUPWORD | ROM_SKIP(6) )
+
+	ROM_REGION( 0x18000, "audiocpu", 0 ) /* 64k for the audio CPU (+banks) */
+	ROM_LOAD( "s92_09.11a",  0x00000, 0x08000, CRC(08f6b60e) SHA1(8258fcaca4ac419312531eec67079b97f471179c) )
+	ROM_CONTINUE(            0x10000, 0x08000 )
+
+	ROM_REGION( 0x40000, "oki", 0 ) /* Samples */
+	ROM_LOAD( "s92_18.11c",  0x00000, 0x20000, CRC(7f162009) SHA1(346bf42992b4c36c593e21901e22c87ae4a7d86d) )
+	ROM_LOAD( "s92_19.12c",  0x20000, 0x20000, CRC(beade53f) SHA1(277c397dc12752719ec6b47d2224750bd1c07f79) )
+
+	ROM_REGION( 0x0200, "aboardplds", 0 )
+	ROM_LOAD( "buf1",         0x0000, 0x0117, CRC(eb122de7) SHA1(b26b5bfe258e3e184f069719f9fd008d6b8f6b9b) )
+	ROM_LOAD( "ioa1",         0x0000, 0x0117, CRC(59c7ee3b) SHA1(fbb887c5b4f5cb8df77cec710eaac2985bc482a6) )
+	ROM_LOAD( "prg1",         0x0000, 0x0117, CRC(f1129744) SHA1(a5300f301c1a08a7da768f0773fa0fe3f683b237) )
+	ROM_LOAD( "rom1",         0x0000, 0x0117, CRC(41dc73b9) SHA1(7d4c9f1693c821fbf84e32dd6ef62ddf14967845) )
+	ROM_LOAD( "sou1",         0x0000, 0x0117, CRC(84f4b2fe) SHA1(dcc9e86cc36316fe42eace02d6df75d08bc8bb6d) )
+
+	ROM_REGION( 0x0200, "bboardplds", 0 )
+	ROM_LOAD( "s9263b.1a",    0x0000, 0x0117, CRC(0a7ecfe0) SHA1(f75e7eed4604fcf68273197fe3dd7f0d7a313ada) )
+	ROM_LOAD( "iob1.12d",     0x0000, 0x0117, CRC(3abc0700) SHA1(973043aa46ec6d5d1db20dc9d5937005a0f9f6ae) )
+	ROM_LOAD( "bprg1.11d",    0x0000, 0x0117, CRC(31793da7) SHA1(400fa7ac517421c978c1ee7773c30b9ed0c5d3f3) )
+
+	ROM_REGION( 0x0200, "cboardplds", 0 )
+	ROM_LOAD( "ioc1.ic7",     0x0000, 0x0104, CRC(a399772d) SHA1(55471189db573dd61e3087d12c55564291672c77) )
+	ROM_LOAD( "c632.ic1",     0x0000, 0x0117, CRC(0fbd9270) SHA1(d7e737b20c44d41e29ca94be56114b31934dde81) )
+ROM_END
+
 /* B-Board 91634B-2 */
 ROM_START( sf2ceja )
 	ROM_REGION( CODE_SIZE, "maincpu", 0 )      /* 68000 code */
@@ -9596,6 +9659,45 @@ ROM_START( sf2amf2 )
 
 	ROM_REGION( 0x40000, "oki", 0 ) /* Samples */
 	ROM_LOAD( "fun-u210.bin", 0x00000, 0x40000, CRC(6cfffb11) SHA1(995526183ffd35f92e9096500a3fe6237faaa2dd) )
+ROM_END
+
+ROM_START( sf2rules ) //
+	ROM_REGION( CODE_SIZE, "maincpu", 0 )      /* 68000 code */
+	ROM_LOAD16_BYTE( "prh2.u222",          0x000000, 0x80000, CRC(fff85f9b) SHA1(5e5bc7da471fe15011b91f8c27823fbdace3eac1) )
+	ROM_LOAD16_BYTE( "prl1.u196",          0x000001, 0x80000, CRC(65c28bc9) SHA1(4f9c0e5062f00f115c3b471c7649d0b537cb3575) )
+
+	ROM_REGION( 0x600000, "gfx", 0 )
+	ROMX_LOAD( "ycecmkr001.u70", 0x000000, 0x80000, CRC(a258de13) SHA1(2e477948c4c8a2fb7cfdc4a739766bc4a4e01c49), ROM_GROUPWORD | ROM_SKIP(6) )
+	ROM_CONTINUE(                   0x000004, 0x80000)
+	ROMX_LOAD( "ycecmkr003.u69", 0x000002, 0x80000, CRC(c781bf87) SHA1(034baa9807c2ce8dc800200963a38cd9262b21fb), ROM_GROUPWORD | ROM_SKIP(6) )
+	ROM_CONTINUE(                   0x000006, 0x80000)
+	ROMX_LOAD( "ycecmkr002.u68", 0x200000, 0x80000, CRC(5726cab8) SHA1(0b2243a9a7184d53d42ddab7a8c51b63001c2f56), ROM_GROUPWORD | ROM_SKIP(6) )
+	ROM_CONTINUE(                   0x200004, 0x80000)
+	ROMX_LOAD( "ycecdwc011.u64", 0x200002, 0x80000, CRC(bc90c12f) SHA1(ecdb776239b22bd56b7c3a87c9e561f650a4dfea), ROM_GROUPWORD | ROM_SKIP(6) )
+	ROM_CONTINUE(                   0x200006, 0x80000)
+	ROMX_LOAD( "ycecdwc012.u19", 0x400000, 0x80000, CRC(187667cc) SHA1(fae65bf23f49a32903fda8080659ccf8d42b911f), ROM_GROUPWORD | ROM_SKIP(6) )
+	ROM_CONTINUE(                   0x400004, 0x80000)
+	ROMX_LOAD( "ycecdwc013.u18", 0x400002, 0x80000, CRC(5b585071) SHA1(ad3371b1ba0441c67d9fcbb23b09464710e4e28a), ROM_GROUPWORD | ROM_SKIP(6) )
+	ROM_CONTINUE(                   0x400006, 0x80000)
+	/* extra gfx layer roms loaded over the former ones to remove the capcom copyright logo */
+	ROMX_LOAD( "grp1.u31",    0x400004, 0x10000, CRC(6de44671) SHA1(dc6abba639e0c27033e391c7438d88dc89a93351), ROM_SKIP(7) )  // different
+	ROM_CONTINUE(             0x400000, 0x10000 )
+	ROMX_LOAD( "grp3.u29",    0x400006, 0x10000, CRC(e8f14362) SHA1(a20eb75e322011e2a8d8bf2acebe713bef3d3941), ROM_SKIP(7) )  // different
+	ROM_CONTINUE(             0x400002, 0x10000 )
+	ROMX_LOAD( "grp2.u30",    0x400005, 0x10000, CRC(bf0cd819) SHA1(f04a098fce07949277268327871c5e5520e3bb3c), ROM_SKIP(7) )  // different
+	ROM_CONTINUE(             0x400001, 0x10000 )
+	ROMX_LOAD( "grp4.u28",    0x400007, 0x10000, CRC(76f9f91f) SHA1(58a34062d2c8378558a7f1629140330279af9a43), ROM_SKIP(7) )  // different
+	ROM_CONTINUE(             0x400003, 0x10000 )
+
+	ROM_REGION( 0x18000, "audiocpu", 0 ) /* 64k for the audio CPU (+banks) */
+	ROM_LOAD( "sound.u191", 0x00000, 0x08000, CRC(a4823a1b) SHA1(7b6bf59dfd578bfbbdb64c27988796783442d659) )
+	ROM_CONTINUE(      0x10000, 0x08000 )
+
+	ROM_REGION( 0x20000, "user1", 0 ) /* unknown (bootleg priority?) */
+	ROM_LOAD( "conv.u133", 0x00000, 0x10000, CRC(13ea1c44) SHA1(5b05fe4c3920e33d94fac5f59e09ff14b3e427fe) )
+
+	ROM_REGION( 0x40000, "oki", 0 ) /* Samples */
+	ROM_LOAD( "voice.u210", 0x00000, 0x40000, CRC(6cfffb11) SHA1(995526183ffd35f92e9096500a3fe6237faaa2dd) )
 ROM_END
 
 ROM_START( sf2dkot2 )
@@ -12649,6 +12751,7 @@ GAME( 1992, sf2rk,       sf2,      cps1_10MHz, sf2hack,  cps_state,   sf2hack,  
 GAME( 1991, sf2qp1,      sf2,      cps1_10MHz, sf2,      cps_state,   cps1,     ROT0,   "bootleg", "Street Fighter II: The World Warrior (Quicken Pt-I, bootleg)", MACHINE_SUPPORTS_SAVE )     // 910214 - based on World version
 GAME( 1991, sf2qp2,      sf2,      cps1_10MHz, sf2,      cps_state,   cps1,     ROT0,   "bootleg", "Street Fighter II: The World Warrior (Quicken, bootleg)", MACHINE_SUPPORTS_SAVE )          // 910522 - based on USA Rev.I? version
 GAME( 1991, sf2thndr,    sf2,      cps1_10MHz, sf2,      cps_state,   sf2thndr, ROT0,   "bootleg", "Street Fighter II: The World Warrior (Thunder Edition, bootleg)", MACHINE_SUPPORTS_SAVE )  // 910214 - based on World version
+GAME( 1992, sf2rules,    sf2,      cps1_10MHz, sf2hack,  cps_state,   sf2hack,  ROT0,   "bootleg", "Street Fighter II: The World Warrior (bootleg with rules screen)", MACHINE_SUPPORTS_SAVE )     // 910214 - based on World version, shows the rules of the game instead of the warning screen
 GAME( 1991, 3wonders,    0,        cps1_10MHz, 3wonders, cps_state,   cps1,     ROT0,   "Capcom", "Three Wonders (World 910520)", MACHINE_SUPPORTS_SAVE )  // "ETC"
 GAME( 1991, 3wondersr1,  3wonders, cps1_10MHz, 3wonders, cps_state,   cps1,     ROT0,   "Capcom", "Three Wonders (World 910513)", MACHINE_SUPPORTS_SAVE )  // "ETC"
 GAME( 1991, 3wondersu,   3wonders, cps1_10MHz, 3wonders, cps_state,   cps1,     ROT0,   "Capcom", "Three Wonders (USA 910520)", MACHINE_SUPPORTS_SAVE )
@@ -12676,10 +12779,12 @@ GAME( 1992, sf2ceea,     sf2ce,    cps1_12MHz, sf2,      cps_state,   cps1,     
 GAME( 1992, sf2ceua,     sf2ce,    cps1_12MHz, sf2,      cps_state,   cps1,     ROT0,   "Capcom", "Street Fighter II': Champion Edition (USA 920313)", MACHINE_SUPPORTS_SAVE )
 GAME( 1992, sf2ceub,     sf2ce,    cps1_12MHz, sf2,      cps_state,   cps1,     ROT0,   "Capcom", "Street Fighter II': Champion Edition (USA 920513)", MACHINE_SUPPORTS_SAVE )
 GAME( 1992, sf2ceuc,     sf2ce,    cps1_12MHz, sf2,      cps_state,   cps1,     ROT0,   "Capcom", "Street Fighter II': Champion Edition (USA 920803)", MACHINE_SUPPORTS_SAVE )
+GAME( 1992, sf2cet,      sf2ce,    cps1_12MHz, sf2,      cps_state,   cps1,     ROT0,   "Capcom", "Street Fighter II': Champion Edition (Taiwan 920313)", MACHINE_SUPPORTS_SAVE )
 GAME( 1992, sf2ceja,     sf2ce,    cps1_12MHz, sf2,      cps_state,   cps1,     ROT0,   "Capcom", "Street Fighter II': Champion Edition (Japan 920322)", MACHINE_SUPPORTS_SAVE )
 GAME( 1992, sf2cejb,     sf2ce,    cps1_12MHz, sf2,      cps_state,   cps1,     ROT0,   "Capcom", "Street Fighter II': Champion Edition (Japan 920513)", MACHINE_SUPPORTS_SAVE )
 GAME( 1992, sf2cejc,     sf2ce,    cps1_12MHz, sf2,      cps_state,   cps1,     ROT0,   "Capcom", "Street Fighter II': Champion Edition (Japan 920803)", MACHINE_SUPPORTS_SAVE )
-GAME( 1992, sf2bhh,      sf2ce,    cps1_12MHz, sf2,      cps_state,   sf2rb,    ROT0,   "bootleg", "Street Fighter II': Champion Edition (Hung Hsi, bootleg)", MACHINE_SUPPORTS_SAVE )
+GAME( 1992, sf2bhh,      sf2ce,    cps1_12MHz, sf2bhh,   cps_state,   sf2rb,    ROT0,   "bootleg", "Street Fighter II': Champion Edition (Hung Hsi, bootleg)", MACHINE_SUPPORTS_SAVE ) // derived from sf2cet, was on actual Capcom hw with changed, unlabeled ROMs. Has turbo mode.
+GAME( 1992, sf2cebltw,   sf2ce,    cps1_12MHz, sf2bhh,   cps_state,   cps1,     ROT0,   "bootleg", "Street Fighter II': Champion Edition ('Taiwan' bootleg with PAL)", MACHINE_SUPPORTS_SAVE ) // 'Taiwan', similar to sf2bhh but without Hung Hsi copyright
 GAME( 1992, sf2rb,       sf2ce,    cps1_12MHz, sf2,      cps_state,   sf2rb,    ROT0,   "bootleg", "Street Fighter II': Champion Edition (Rainbow, bootleg, set 1)", MACHINE_SUPPORTS_SAVE )           // 920322 - based on World version
 GAME( 1992, sf2rb2,      sf2ce,    cps1_12MHz, sf2,      cps_state,   sf2rb2,   ROT0,   "bootleg", "Street Fighter II': Champion Edition (Rainbow, bootleg, set 2)", MACHINE_SUPPORTS_SAVE )           // 920322 - based on World version
 GAME( 1992, sf2rb3,      sf2ce,    cps1_12MHz, sf2,      cps_state,   cps1,     ROT0,   "bootleg", "Street Fighter II': Champion Edition (Rainbow, bootleg, set 3)", MACHINE_SUPPORTS_SAVE )           // 920322 - based on World version
@@ -12692,7 +12797,6 @@ GAME( 1992, sf2amf,      sf2ce,    cps1_12MHz, sf2amf,   cps_state,   sf2hack,  
 GAME( 1992, sf2amf2,     sf2ce,    cps1_12MHz, sf2hack,  cps_state,   sf2hack,  ROT0,   "bootleg", "Street Fighter II': Champion Edition (L735 Test Rom, bootleg)", MACHINE_SUPPORTS_SAVE )     // 920313 - based on World version
 GAME( 1992, sf2dkot2,    sf2ce,    cps1_12MHz, sf2,      cps_state,   cps1,     ROT0,   "bootleg", "Street Fighter II': Champion Edition (Double K.O. Turbo II, bootleg)", MACHINE_SUPPORTS_SAVE ) // 902140 !!! - based on USA version
 GAME( 1992, sf2ceblp,    sf2ce,    cps1_10MHz, sf2,      cps_state,   sf2ceblp, ROT0,   "bootleg", "Street Fighter II': Champion Edition (protected bootleg on non-dash board)", MACHINE_SUPPORTS_SAVE )          // 920313 - based on USA version
-GAME( 1992, sf2cebltw,   sf2ce,    cps1_12MHz, sf2,      cps_state,   cps1,     ROT0,   "bootleg", "Street Fighter II': Champion Edition ('Taiwan' bootleg with PAL)", MACHINE_SUPPORTS_SAVE ) // 'Taiwan'
 GAME( 1992, sf2m2,       sf2ce,    cps1_12MHz, sf2m2,    cps_state,   sf2hack,  ROT0,   "bootleg", "Street Fighter II': Champion Edition (M2, bootleg)", MACHINE_SUPPORTS_SAVE )               // 920313 - based on World version
 GAME( 1992, sf2m3,       sf2ce,    sf2m3,      sf2,      cps_state,   cps1,     ROT0,   "bootleg", "Street Fighter II': Champion Edition (M3, bootleg)", MACHINE_SUPPORTS_SAVE )               // 920313 - based on USA version
 GAME( 1992, sf2m4,       sf2ce,    cps1_12MHz, sf2m4,    cps_state,   sf2hack,  ROT0,   "bootleg", "Street Fighter II': Champion Edition (M4, bootleg)", MACHINE_SUPPORTS_SAVE )               // 920322 - based on Japan version
@@ -12726,7 +12830,7 @@ GAME( 1992, sf2hfu,      sf2hf,    cps1_12MHz, sf2,      cps_state,   cps1,     
 GAME( 1992, sf2hfj,      sf2hf,    cps1_12MHz, sf2j,     cps_state,   cps1,     ROT0,   "Capcom", "Street Fighter II' Turbo: Hyper Fighting (Japan 921209)", MACHINE_SUPPORTS_SAVE )
 GAME( 1993, dino,        0,        qsound,     dino,     cps_state,   dino,     ROT0,   "Capcom", "Cadillacs and Dinosaurs (World 930201)", MACHINE_SUPPORTS_SAVE )    // "ETC"
 GAME( 1993, dinou,       dino,     qsound,     dino,     cps_state,   dino,     ROT0,   "Capcom", "Cadillacs and Dinosaurs (USA 930201)", MACHINE_SUPPORTS_SAVE )
-GAME( 1993, dinoa,       dino,     qsound,     dino,     cps_state,   dino,     ROT0,   "Capcom", "Cadillacs and Dinosaurs (Asia TW 930223)", MACHINE_SUPPORTS_SAVE ) // Title screen shows "distributed by Hung Hsi Enterprise". Hung Hsi produced some sf2 bootlegs.
+GAME( 1993, dinoa,       dino,     qsound,     dino,     cps_state,   dino,     ROT0,   "Capcom", "Cadillacs and Dinosaurs (Asia TW 930223)", MACHINE_SUPPORTS_SAVE ) // Title screen shows "distributed by Hung Hsi Enterprise".
 GAME( 1993, dinoj,       dino,     qsound,     dino,     cps_state,   dino,     ROT0,   "Capcom", "Cadillacs: Kyouryuu Shin Seiki (Japan 930201)", MACHINE_SUPPORTS_SAVE )
 GAME( 1993, dinohunt,    dino,     wofhfh,     dinoh,    cps_state,   dinohunt, ROT0,   "bootleg", "Dinosaur Hunter (Chinese bootleg of Cadillacs and Dinosaurs)", MACHINE_SUPPORTS_SAVE )  // 930223 -  based on Asia TW version
 GAME( 1993, punisher,    0,        qsound,     punisher, cps_state,   punisher, ROT0,   "Capcom", "The Punisher (World 930422)", MACHINE_SUPPORTS_SAVE )   // "ETC"

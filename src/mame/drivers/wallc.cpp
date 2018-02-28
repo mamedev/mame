@@ -72,13 +72,6 @@ public:
 	DECLARE_WRITE8_MEMBER(unkitpkr_out1_w);
 	DECLARE_WRITE8_MEMBER(unkitpkr_out2_w);
 
-	TILE_GET_INFO_MEMBER(get_bg_tile_info);
-	TILE_GET_INFO_MEMBER(get_bg_tile_info_unkitpkr);
-	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
-
-	DECLARE_PALETTE_INIT(wallc);
-	DECLARE_PALETTE_INIT(unkitpkr);
-	DECLARE_VIDEO_START(unkitpkr);
 	DECLARE_DRIVER_INIT(wallc);
 	DECLARE_DRIVER_INIT(wallca);
 	DECLARE_DRIVER_INIT(sidam);
@@ -86,6 +79,10 @@ public:
 
 	void unkitpkr(machine_config &config);
 	void wallc(machine_config &config);
+	void wallca(machine_config &config);
+
+	void unkitpkr_map(address_map &map);
+	void wallc_map(address_map &map);
 protected:
 	virtual void video_start() override;
 
@@ -96,6 +93,14 @@ private:
 	required_shared_ptr<uint8_t> m_videoram;
 
 	tilemap_t *m_bg_tilemap;
+
+	TILE_GET_INFO_MEMBER(get_bg_tile_info);
+	TILE_GET_INFO_MEMBER(get_bg_tile_info_unkitpkr);
+	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+
+	DECLARE_PALETTE_INIT(wallc);
+	DECLARE_PALETTE_INIT(unkitpkr);
+	DECLARE_VIDEO_START(unkitpkr);
 };
 
 
@@ -259,7 +264,7 @@ WRITE8_MEMBER(wallc_state::unkitpkr_out2_w)
 {
 }
 
-static ADDRESS_MAP_START( wallc_map, AS_PROGRAM, 8, wallc_state )
+ADDRESS_MAP_START(wallc_state::wallc_map)
 	AM_RANGE(0x0000, 0x7fff) AM_ROM
 	AM_RANGE(0x8000, 0x83ff) AM_RAM_WRITE(videoram_w) AM_MIRROR(0xc00) AM_SHARE("videoram")   /* 2114, 2114 */
 	AM_RANGE(0xa000, 0xa3ff) AM_RAM     /* 2114, 2114 */
@@ -276,7 +281,7 @@ static ADDRESS_MAP_START( wallc_map, AS_PROGRAM, 8, wallc_state )
 	AM_RANGE(0xb600, 0xb600) AM_DEVWRITE("aysnd", ay8912_device, data_w)
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( unkitpkr_map, AS_PROGRAM, 8, wallc_state )
+ADDRESS_MAP_START(wallc_state::unkitpkr_map)
 	AM_RANGE(0x0000, 0x7fff) AM_ROM
 	AM_RANGE(0x8000, 0x83ff) AM_RAM_WRITE(videoram_w) AM_MIRROR(0xc00) AM_SHARE("videoram")   /* 2114, 2114 */
 	AM_RANGE(0xa000, 0xa3ff) AM_RAM     /* 2114, 2114 */
@@ -472,7 +477,7 @@ DRIVER_INIT_MEMBER(wallc_state, wallca)
 
 MACHINE_CONFIG_START(wallc_state::wallc)
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", Z80, 12288000 / 4)  /* 3.072 MHz ? */
+	MCFG_CPU_ADD("maincpu", Z80, 12.288_MHz_XTAL / 4)  /* 3.072 MHz ? */
 	MCFG_CPU_PROGRAM_MAP(wallc_map)
 	MCFG_CPU_VBLANK_INT_DRIVER("screen", wallc_state, irq0_line_hold)
 
@@ -495,8 +500,14 @@ MACHINE_CONFIG_START(wallc_state::wallc)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.30)
 MACHINE_CONFIG_END
 
+MACHINE_CONFIG_START(wallc_state::wallca)
+	wallc(config);
+	MCFG_CPU_MODIFY("maincpu")
+	MCFG_CPU_CLOCK(12_MHz_XTAL / 4)
+MACHINE_CONFIG_END
 
-MACHINE_CONFIG_DERIVED(wallc_state::unkitpkr, wallc)
+MACHINE_CONFIG_START(wallc_state::unkitpkr)
+	wallc(config);
 
 	MCFG_CPU_MODIFY("maincpu")
 	MCFG_CPU_PROGRAM_MAP(unkitpkr_map)
@@ -563,17 +574,17 @@ ROM_END
 
 /*
 
-It use a epoxy brick like wallc
+It uses an epoxy brick like wallc
 Inside the brick there are:
 - 74245
 - 74368
 - Pal16r4
 
 74368 is a tristate not, it's used to:
--nagate D0 that goes to the CPU if A15 is low
--nagate D1 that goes to the CPU if A15 is low
--nagate D2 that goes to the CPU if A15 is low
--nagate D3 that goes to the CPU if A15 is low
+-negate D0 that goes to the CPU if A15 is low
+-negate D1 that goes to the CPU if A15 is low
+-negate D2 that goes to the CPU if A15 is low
+-negate D3 that goes to the CPU if A15 is low
 
 -negate cpu clk to feed the pal clk ALWAYS
 -negate A15 to feed 74245 /EN ALWAYS
@@ -672,7 +683,7 @@ DRIVER_INIT_MEMBER(wallc_state, sidam)
   Unknown Italian Poker
   Seems a brute hack of an unknown game.
 
-  The "conforme alla legge n." string is overwritting the hands table:
+  The "conforme alla legge n." string is overwriting the hands table:
 
   "CONFORME"   = Royal Flush
   (blank line) = Straight Flush
@@ -739,7 +750,7 @@ DRIVER_INIT_MEMBER(wallc_state, unkitpkr)
 
 //    YEAR  NAME      PARENT  MACHINE   INPUT     STATE        INIT      ROT      COMPANY             FULLNAME                              FLAGS
 GAME( 1984, wallc,    0,      wallc,    wallc,    wallc_state, wallc,    ROT0,   "Midcoin",          "Wall Crash (set 1)",                  MACHINE_SUPPORTS_SAVE )
-GAME( 1984, wallca,   wallc,  wallc,    wallc,    wallc_state, wallca,   ROT0,   "Midcoin",          "Wall Crash (set 2)",                  MACHINE_SUPPORTS_SAVE )
+GAME( 1984, wallca,   wallc,  wallca,   wallc,    wallc_state, wallca,   ROT0,   "Midcoin",          "Wall Crash (set 2)",                  MACHINE_SUPPORTS_SAVE )
 GAME( 1984, brkblast, wallc,  wallc,    wallc,    wallc_state, wallca,   ROT0,   "bootleg (Fadesa)", "Brick Blast (bootleg of Wall Crash)", MACHINE_SUPPORTS_SAVE ) // Spanish bootleg board, Fadesa stickers / text on various components
 
 GAME( 1984, sidampkr, 0,      wallc,    wallc,    wallc_state, sidam,    ROT270, "Sidam",            "unknown Sidam Poker",                 MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE )

@@ -206,7 +206,7 @@ void spacefb_state::machine_reset()
  *
  *************************************/
 
-static ADDRESS_MAP_START( spacefb_main_map, AS_PROGRAM, 8, spacefb_state )
+ADDRESS_MAP_START(spacefb_state::spacefb_main_map)
 	AM_RANGE(0x0000, 0x3fff) AM_ROM
 	AM_RANGE(0x4000, 0x7fff) AM_NOP
 	AM_RANGE(0x8000, 0x83ff) AM_MIRROR(0x3c00) AM_RAM AM_SHARE("videoram")
@@ -215,7 +215,7 @@ static ADDRESS_MAP_START( spacefb_main_map, AS_PROGRAM, 8, spacefb_state )
 ADDRESS_MAP_END
 
 
-static ADDRESS_MAP_START( spacefb_audio_map, AS_PROGRAM, 8, spacefb_state )
+ADDRESS_MAP_START(spacefb_state::spacefb_audio_map)
 	ADDRESS_MAP_GLOBAL_MASK(0x3ff)
 	AM_RANGE(0x0000, 0x03ff) AM_ROM
 ADDRESS_MAP_END
@@ -228,7 +228,7 @@ ADDRESS_MAP_END
  *
  *************************************/
 
-static ADDRESS_MAP_START( spacefb_main_io_map, AS_IO, 8, spacefb_state )
+ADDRESS_MAP_START(spacefb_state::spacefb_main_io_map)
 	ADDRESS_MAP_GLOBAL_MASK(0x7)
 	AM_RANGE(0x00, 0x00) AM_READ_PORT("P1")
 	AM_RANGE(0x01, 0x01) AM_READ_PORT("P2")
@@ -352,7 +352,7 @@ MACHINE_CONFIG_START(spacefb_state::spacefb)
 	MCFG_SCREEN_UPDATE_DRIVER(spacefb_state, screen_update)
 
 	/* audio hardware */
-	MCFG_FRAGMENT_ADD(spacefb_audio)
+	spacefb_audio(config);
 
 MACHINE_CONFIG_END
 

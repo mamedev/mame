@@ -72,7 +72,7 @@ INPUT_CHANGED_MEMBER(kopunch_state::right_coin_inserted)
 
 ********************************************************/
 
-static ADDRESS_MAP_START( kopunch_map, AS_PROGRAM, 8, kopunch_state )
+ADDRESS_MAP_START(kopunch_state::kopunch_map)
 	AM_RANGE(0x0000, 0x1fff) AM_ROM
 	AM_RANGE(0x2000, 0x23ff) AM_RAM
 	AM_RANGE(0x6000, 0x63ff) AM_RAM_WRITE(vram_fg_w) AM_SHARE("vram_fg")
@@ -81,7 +81,7 @@ static ADDRESS_MAP_START( kopunch_map, AS_PROGRAM, 8, kopunch_state )
 	AM_RANGE(0x7400, 0x7bff) AM_RAM // more unused vram? or accidental writes?
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( kopunch_io_map, AS_IO, 8, kopunch_state )
+ADDRESS_MAP_START(kopunch_state::kopunch_io_map)
 	AM_RANGE(0x30, 0x33) AM_DEVREADWRITE("ppi8255_0", i8255_device, read, write)
 	AM_RANGE(0x34, 0x37) AM_DEVREADWRITE("ppi8255_1", i8255_device, read, write)
 	AM_RANGE(0x38, 0x3b) AM_DEVREADWRITE("ppi8255_2", i8255_device, read, write)

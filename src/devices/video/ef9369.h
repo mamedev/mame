@@ -39,7 +39,7 @@
 	MCFG_DEVICE_ADD(_tag, EF9369, 0) \
 
 #define MCFG_EF9369_COLOR_UPDATE_CB(_class, _method) \
-	ef9369_device::set_color_update_callback(*device, ef9369_device::color_update_delegate(&_class::_method, #_class "::" #_method, this));
+	downcast<ef9369_device &>(*device).set_color_update_callback(ef9369_device::color_update_delegate(&_class::_method, #_class "::" #_method, this));
 
 
 //**************************************************************************
@@ -59,7 +59,7 @@ public:
 	ef9369_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
 	// configuration
-	static void set_color_update_callback(device_t &device, color_update_delegate &&cb) { downcast<ef9369_device &>(device).m_color_update_cb = std::move(cb); }
+	template <typename Object> void set_color_update_callback(Object &&cb) { m_color_update_cb = std::forward<Object>(cb); }
 
 	DECLARE_READ8_MEMBER(data_r);
 	DECLARE_WRITE8_MEMBER(data_w);

@@ -77,6 +77,9 @@ public:
 	DECLARE_READ8_MEMBER(coin_r);
 	void at486(machine_config &config);
 	static void cdrom(device_t *device);
+	void at32_io(address_map &map);
+	void at32_map(address_map &map);
+	void dbank_map(address_map &map);
 };
 
 WRITE8_MEMBER(mtxl_state::bank_w)
@@ -101,7 +104,7 @@ WRITE8_MEMBER(mtxl_state::key_w)
 	m_multikey->write_dq((data & 0x20) ? ASSERT_LINE : CLEAR_LINE);
 }
 
-static ADDRESS_MAP_START( at32_map, AS_PROGRAM, 32, mtxl_state )
+ADDRESS_MAP_START(mtxl_state::at32_map)
 	ADDRESS_MAP_UNMAP_HIGH
 	#ifndef REAL_PCI_CHIPSET
 	AM_RANGE(0x00000000, 0x0009ffff) AM_RAMBANK("bank10")
@@ -112,14 +115,14 @@ static ADDRESS_MAP_START( at32_map, AS_PROGRAM, 32, mtxl_state )
 	#endif
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( at32_io, AS_IO, 32, mtxl_state )
+ADDRESS_MAP_START(mtxl_state::at32_io)
 	ADDRESS_MAP_UNMAP_HIGH
 	#ifndef REAL_PCI_CHIPSET
 	AM_RANGE(0x0000, 0x001f) AM_DEVREADWRITE8("mb:dma8237_1", am9517a_device, read, write, 0xffffffff)
 	AM_RANGE(0x0020, 0x003f) AM_DEVREADWRITE8("mb:pic8259_master", pic8259_device, read, write, 0xffffffff)
 	AM_RANGE(0x0040, 0x005f) AM_DEVREADWRITE8("mb:pit8254", pit8254_device, read, write, 0xffffffff)
-	AM_RANGE(0x0060, 0x0063) AM_DEVREADWRITE8("mb", at_mb_device, portb_r, portb_w, 0x0000ff00)
 	AM_RANGE(0x0060, 0x0067) AM_DEVREADWRITE8("kbdc", kbdc8042_device, data_r, data_w, 0xffffffff)
+	AM_RANGE(0x0060, 0x0063) AM_DEVREADWRITE8("mb", at_mb_device, portb_r, portb_w, 0x0000ff00)
 	AM_RANGE(0x0070, 0x007f) AM_DEVREADWRITE8("mb:rtc", mc146818_device, read, write, 0xffffffff)
 	AM_RANGE(0x0080, 0x009f) AM_DEVREADWRITE8("mb", at_mb_device, page8_r, page8_w, 0xffffffff)
 	AM_RANGE(0x00a0, 0x00bf) AM_DEVREADWRITE8("mb:pic8259_slave", pic8259_device, read, write, 0xffffffff)
@@ -135,7 +138,7 @@ static ADDRESS_MAP_START( at32_io, AS_IO, 32, mtxl_state )
 	#endif
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( dbank_map, AS_PROGRAM, 32, mtxl_state )
+ADDRESS_MAP_START(mtxl_state::dbank_map)
 	AM_RANGE(0x000000, 0x0fffff) AM_ROM AM_REGION("ioboard", 0)
 	AM_RANGE(0x100000, 0x17ffff) AM_DEVREADWRITE8("flash", intelfsh8_device, read, write, 0xffffffff)
 ADDRESS_MAP_END

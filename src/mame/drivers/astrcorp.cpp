@@ -97,6 +97,10 @@ public:
 	void showhand(machine_config &config);
 	void speeddrp(machine_config &config);
 	void showhanc(machine_config &config);
+	void showhanc_map(address_map &map);
+	void showhand_map(address_map &map);
+	void skilldrp_map(address_map &map);
+	void speeddrp_map(address_map &map);
 };
 
 /***************************************************************************
@@ -307,7 +311,7 @@ READ16_MEMBER(astrocorp_state::astrocorp_unk_r)
 }
 
 
-static ADDRESS_MAP_START( showhand_map, AS_PROGRAM, 16, astrocorp_state )
+ADDRESS_MAP_START(astrocorp_state::showhand_map)
 	AM_RANGE( 0x000000, 0x01ffff ) AM_ROM
 	AM_RANGE( 0x050000, 0x050fff ) AM_RAM AM_SHARE("spriteram")
 	AM_RANGE( 0x052000, 0x052001 ) AM_WRITE(astrocorp_draw_sprites_w)
@@ -319,10 +323,11 @@ static ADDRESS_MAP_START( showhand_map, AS_PROGRAM, 16, astrocorp_state )
 	AM_RANGE( 0x070000, 0x073fff ) AM_RAM AM_SHARE("nvram") // battery
 	AM_RANGE( 0x080000, 0x080001 ) AM_WRITE(astrocorp_sound_bank_w)
 	AM_RANGE( 0x0a0000, 0x0a0001 ) AM_WRITE(astrocorp_screen_enable_w)
-	AM_RANGE( 0x0d0000, 0x0d0001 ) AM_READ(astrocorp_unk_r) AM_DEVWRITE8("oki", okim6295_device, write, 0xff00)
+	AM_RANGE( 0x0d0000, 0x0d0001 ) AM_READ(astrocorp_unk_r)
+	AM_RANGE( 0x0d0000, 0x0d0001 ) AM_DEVWRITE8("oki", okim6295_device, write, 0xff00)
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( showhanc_map, AS_PROGRAM, 16, astrocorp_state )
+ADDRESS_MAP_START(astrocorp_state::showhanc_map)
 	AM_RANGE( 0x000000, 0x01ffff ) AM_ROM
 	AM_RANGE( 0x060000, 0x0601ff ) AM_RAM_DEVWRITE("palette", palette_device, write16) AM_SHARE("palette")
 	AM_RANGE( 0x070000, 0x070001 ) AM_WRITE(astrocorp_sound_bank_w)
@@ -334,10 +339,11 @@ static ADDRESS_MAP_START( showhanc_map, AS_PROGRAM, 16, astrocorp_state )
 	AM_RANGE( 0x08e000, 0x08e001 ) AM_READ_PORT("EEPROMIN")
 	AM_RANGE( 0x090000, 0x093fff ) AM_RAM AM_SHARE("nvram") // battery
 	AM_RANGE( 0x0a0000, 0x0a0001 ) AM_WRITE(astrocorp_screen_enable_w)
-	AM_RANGE( 0x0e0000, 0x0e0001 ) AM_READ(astrocorp_unk_r) AM_DEVWRITE8("oki", okim6295_device, write, 0xff00)
+	AM_RANGE( 0x0e0000, 0x0e0001 ) AM_READ(astrocorp_unk_r)
+	AM_RANGE( 0x0e0000, 0x0e0001 ) AM_DEVWRITE8("oki", okim6295_device, write, 0xff00)
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( skilldrp_map, AS_PROGRAM, 16, astrocorp_state )
+ADDRESS_MAP_START(astrocorp_state::skilldrp_map)
 	AM_RANGE( 0x000000, 0x03ffff ) AM_ROM
 	AM_RANGE( 0x200000, 0x200fff ) AM_RAM AM_SHARE("spriteram")
 	AM_RANGE( 0x202000, 0x202001 ) AM_WRITE(astrocorp_draw_sprites_w)
@@ -352,7 +358,7 @@ static ADDRESS_MAP_START( skilldrp_map, AS_PROGRAM, 16, astrocorp_state )
 	AM_RANGE( 0x600000, 0x600001 ) AM_DEVREADWRITE8("oki", okim6295_device, read, write, 0x00ff)
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( speeddrp_map, AS_PROGRAM, 16, astrocorp_state )
+ADDRESS_MAP_START(astrocorp_state::speeddrp_map)
 	AM_RANGE( 0x000000, 0x01ffff ) AM_ROM
 	AM_RANGE( 0x280000, 0x283fff ) AM_RAM AM_SHARE("nvram") // battery
 	AM_RANGE( 0x380000, 0x380fff ) AM_RAM AM_SHARE("spriteram")
@@ -532,7 +538,8 @@ MACHINE_CONFIG_START(astrocorp_state::showhand)
 MACHINE_CONFIG_END
 
 
-MACHINE_CONFIG_DERIVED(astrocorp_state::showhanc, showhand)
+MACHINE_CONFIG_START(astrocorp_state::showhanc)
+	showhand(config);
 	MCFG_CPU_MODIFY("maincpu")
 	MCFG_CPU_PROGRAM_MAP(showhanc_map)
 MACHINE_CONFIG_END
@@ -586,7 +593,8 @@ MACHINE_CONFIG_START(astrocorp_state::skilldrp)
 MACHINE_CONFIG_END
 
 
-MACHINE_CONFIG_DERIVED(astrocorp_state::speeddrp, skilldrp)
+MACHINE_CONFIG_START(astrocorp_state::speeddrp)
+	skilldrp(config);
 	MCFG_CPU_MODIFY("maincpu")
 	MCFG_CPU_PROGRAM_MAP(speeddrp_map)
 MACHINE_CONFIG_END

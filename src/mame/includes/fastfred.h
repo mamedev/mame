@@ -14,16 +14,11 @@ class fastfred_state : public galaxold_state
 public:
 	fastfred_state(const machine_config &mconfig, device_type type, const char *tag)
 		: galaxold_state(mconfig, type, tag),
-			m_gfxdecode(*this, "gfxdecode"),
-			m_palette(*this, "palette"),
 			m_videoram(*this, "videoram"),
 			m_spriteram(*this, "spriteram"),
 			m_attributesram(*this, "attributesram"),
 			m_background_color(*this, "bgcolor"),
 			m_imago_fg_videoram(*this, "imago_fg_vram") { }
-
-	required_device<gfxdecode_device> m_gfxdecode;
-	required_device<palette_device> m_palette;
 
 	required_shared_ptr<uint8_t> m_videoram;
 	required_shared_ptr<uint8_t> m_spriteram;
@@ -94,4 +89,8 @@ public:
 	void jumpcoas(machine_config &config);
 	void imago(machine_config &config);
 	void fastfred(machine_config &config);
+	void fastfred_map(address_map &map);
+	void imago_map(address_map &map);
+	void jumpcoas_map(address_map &map);
+	void sound_map(address_map &map);
 };

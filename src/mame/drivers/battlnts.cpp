@@ -61,7 +61,7 @@ WRITE8_MEMBER(battlnts_state::battlnts_bankswitch_w)
  *
  *************************************/
 
-static ADDRESS_MAP_START( battlnts_map, AS_PROGRAM, 8, battlnts_state )
+ADDRESS_MAP_START(battlnts_state::battlnts_map)
 	AM_RANGE(0x0000, 0x1fff) AM_DEVREADWRITE("k007342", k007342_device, read, write)    /* Color RAM + Video RAM */
 	AM_RANGE(0x2000, 0x21ff) AM_DEVREADWRITE("k007420", k007420_device, read, write)    /* Sprite RAM */
 	AM_RANGE(0x2200, 0x23ff) AM_DEVREADWRITE("k007342", k007342_device, scroll_r, scroll_w)      /* Scroll RAM */
@@ -81,7 +81,7 @@ static ADDRESS_MAP_START( battlnts_map, AS_PROGRAM, 8, battlnts_state )
 	AM_RANGE(0x8000, 0xffff) AM_ROM                             /* ROM 777e02.bin */
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( battlnts_sound_map, AS_PROGRAM, 8, battlnts_state )
+ADDRESS_MAP_START(battlnts_state::battlnts_sound_map)
 	AM_RANGE(0x0000, 0x7fff) AM_ROM                         /* ROM 777c01.rom */
 	AM_RANGE(0x8000, 0x87ff) AM_RAM                         /* RAM */
 	AM_RANGE(0xa000, 0xa001) AM_DEVREADWRITE("ym1", ym3812_device, read, write)      /* YM3812 (chip 1) */

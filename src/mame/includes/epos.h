@@ -46,4 +46,8 @@ public:
 	required_device<palette_device> m_palette;
 	void epos(machine_config &config);
 	void dealer(machine_config &config);
+	void dealer_io_map(address_map &map);
+	void dealer_map(address_map &map);
+	void epos_io_map(address_map &map);
+	void epos_map(address_map &map);
 };

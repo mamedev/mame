@@ -76,7 +76,6 @@ private:
 
 
 // device type definition
-extern const device_type NEWBRAIN_EIM;
 DECLARE_DEVICE_TYPE(NEWBRAIN_EIM, newbrain_eim_device)
 
 #endif // MAME_BUS_NEWBRAIN_EIM_H

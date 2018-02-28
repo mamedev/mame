@@ -90,6 +90,9 @@ public:
 	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 
 	void sm7238(machine_config &config);
+	void sm7238_io(address_map &map);
+	void sm7238_mem(address_map &map);
+	void videobank_map(address_map &map);
 private:
 	void recompute_parameters();
 
@@ -122,7 +125,7 @@ private:
 	required_device<screen_device> m_screen;
 };
 
-static ADDRESS_MAP_START( sm7238_mem, AS_PROGRAM, 8, sm7238_state )
+ADDRESS_MAP_START(sm7238_state::sm7238_mem)
 	ADDRESS_MAP_UNMAP_HIGH
 	AM_RANGE (0x0000, 0x9fff) AM_ROM
 	AM_RANGE (0xa000, 0xa7ff) AM_RAM
@@ -133,12 +136,12 @@ static ADDRESS_MAP_START( sm7238_mem, AS_PROGRAM, 8, sm7238_state )
 	AM_RANGE (0xe000, 0xffff) AM_DEVICE("videobank", address_map_bank_device, amap8)
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( videobank_map, AS_PROGRAM, 8, sm7238_state )
+ADDRESS_MAP_START(sm7238_state::videobank_map)
 	AM_RANGE (0x0000, 0x1fff) AM_RAM AM_SHARE("videoram")
 	AM_RANGE (0x2000, 0x2fff) AM_MIRROR(0x1000) AM_WRITE(vmem_w)
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( sm7238_io, AS_IO, 8, sm7238_state )
+ADDRESS_MAP_START(sm7238_state::sm7238_io)
 	ADDRESS_MAP_UNMAP_HIGH
 //  AM_RANGE (0x40, 0x4f) AM_RAM // LUT
 	AM_RANGE (0xa0, 0xa0) AM_DEVREADWRITE("i8251line", i8251_device, data_r, data_w)

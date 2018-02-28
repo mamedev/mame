@@ -27,20 +27,20 @@ DEFINE_DEVICE_TYPE(HUC6271, huc6271_device, "huc6271", "Hudson HuC6271 \"Rainbow
 //  huc6271_device - constructor
 //-------------------------------------------------
 
-static ADDRESS_MAP_START( data_map, AS_DATA, 32, huc6271_device )
+ADDRESS_MAP_START(huc6271_device::data_map)
 	AM_RANGE(0x000000, 0x0fffff) AM_RAM
 ADDRESS_MAP_END
 
 huc6271_device::huc6271_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
 	: device_t(mconfig, HUC6271, tag, owner, clock)
 	, device_memory_interface(mconfig, *this)
-	, m_data_space_config("data", ENDIANNESS_LITTLE, 32, 32, 0, nullptr, *ADDRESS_MAP_NAME(data_map))
+	, m_data_space_config("data", ENDIANNESS_LITTLE, 32, 32, 0, address_map_constructor(), address_map_constructor(FUNC(huc6271_device::data_map), this))
 {
 }
 
 
 
-DEVICE_ADDRESS_MAP_START( regs, 16, huc6271_device )
+ADDRESS_MAP_START(huc6271_device::regs)
 	AM_RANGE(0x00, 0x01) AM_WRITENOP // hscroll
 	AM_RANGE(0x02, 0x03) AM_WRITENOP // control
 	AM_RANGE(0x04, 0x05) AM_WRITENOP // hsync

@@ -122,7 +122,7 @@ void i8212_device::device_reset()
 
 READ8_MEMBER(i8212_device::read)
 {
-	if (!machine().side_effect_disabled())
+	if (!machine().side_effects_disabled())
 	{
 		// clear interrupt line
 		m_write_int(CLEAR_LINE);

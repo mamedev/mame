@@ -88,6 +88,8 @@ public:
 	void europc(machine_config &config);
 	void europc2(machine_config &config);
 	void euroxt(machine_config &config);
+	void europc_io(address_map &map);
+	void europc_map(address_map &map);
 };
 
 /*
@@ -494,15 +496,15 @@ static INPUT_PORTS_START( europc )
 	PORT_BIT(0xfffe, IP_ACTIVE_HIGH, IPT_UNUSED)
 INPUT_PORTS_END
 
-static ADDRESS_MAP_START( europc_map, AS_PROGRAM, 8, europc_pc_state )
+ADDRESS_MAP_START(europc_pc_state::europc_map)
 	ADDRESS_MAP_UNMAP_HIGH
 	AM_RANGE(0xf0000, 0xfffff) AM_ROM AM_REGION("bios", 0)
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START(europc_io, AS_IO, 8, europc_pc_state )
+ADDRESS_MAP_START(europc_pc_state::europc_io)
 	ADDRESS_MAP_UNMAP_HIGH
-	AM_RANGE(0x0060, 0x0063) AM_READWRITE(europc_pio_r, europc_pio_w)
 	AM_RANGE(0x0000, 0x00ff) AM_DEVICE("mb", pc_noppi_mb_device, map)
+	AM_RANGE(0x0060, 0x0063) AM_READWRITE(europc_pio_r, europc_pio_w)
 	AM_RANGE(0x0250, 0x025f) AM_READWRITE(europc_jim_r, europc_jim_w)
 	AM_RANGE(0x02e0, 0x02e0) AM_READ(europc_jim2_r)
 ADDRESS_MAP_END
@@ -546,13 +548,15 @@ MACHINE_CONFIG_START(europc_pc_state::europc)
 MACHINE_CONFIG_END
 
 //Euro PC II
-MACHINE_CONFIG_DERIVED(europc_pc_state::europc2, europc)
+MACHINE_CONFIG_START(europc_pc_state::europc2)
+	europc(config);
 	MCFG_DEVICE_MODIFY(RAM_TAG)
 	MCFG_RAM_DEFAULT_SIZE("768K") // could be configured by the BIOS as 640K, 640K+128K EMS or 512K+256K EMS
 MACHINE_CONFIG_END
 
 //Euro XT
-MACHINE_CONFIG_DERIVED(europc_pc_state::euroxt, europc)
+MACHINE_CONFIG_START(europc_pc_state::euroxt)
+	europc(config);
 	MCFG_DEVICE_MODIFY(RAM_TAG)
 	MCFG_RAM_DEFAULT_SIZE("768K")
 	MCFG_DEVICE_MODIFY("isa2")

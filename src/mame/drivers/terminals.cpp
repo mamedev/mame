@@ -21,12 +21,13 @@ public:
 	{ }
 
 		void terminals(machine_config &config);
+		void mem_map(address_map &map);
 private:
 	required_device<cpu_device> m_maincpu;
 	//required_region_ptr<u8> m_p_chargen;
 };
 
-static ADDRESS_MAP_START( mem_map, AS_PROGRAM, 8, terminals_state )
+ADDRESS_MAP_START(terminals_state::mem_map)
 ADDRESS_MAP_END
 
 static INPUT_PORTS_START( terminals )

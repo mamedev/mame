@@ -208,7 +208,7 @@ WRITE8_MEMBER(capbowl_state::sndcmd_w)
  *
  *************************************/
 
-static ADDRESS_MAP_START( capbowl_map, AS_PROGRAM, 8, capbowl_state )
+ADDRESS_MAP_START(capbowl_state::capbowl_map)
 	AM_RANGE(0x0000, 0x3fff) AM_ROMBANK("bank1")
 	AM_RANGE(0x4000, 0x4000) AM_WRITEONLY AM_SHARE("rowaddress")
 	AM_RANGE(0x4800, 0x4800) AM_WRITE(capbowl_rom_select_w)
@@ -222,7 +222,7 @@ static ADDRESS_MAP_START( capbowl_map, AS_PROGRAM, 8, capbowl_state )
 ADDRESS_MAP_END
 
 
-static ADDRESS_MAP_START( bowlrama_map, AS_PROGRAM, 8, capbowl_state )
+ADDRESS_MAP_START(capbowl_state::bowlrama_map)
 	AM_RANGE(0x0000, 0x001f) AM_READWRITE(bowlrama_blitter_r, bowlrama_blitter_w)
 	AM_RANGE(0x4000, 0x4000) AM_WRITEONLY AM_SHARE("rowaddress")
 	AM_RANGE(0x5000, 0x57ff) AM_RAM AM_SHARE("nvram")
@@ -242,7 +242,7 @@ ADDRESS_MAP_END
  *
  *************************************/
 
-static ADDRESS_MAP_START( sound_map, AS_PROGRAM, 8, capbowl_state )
+ADDRESS_MAP_START(capbowl_state::sound_map)
 	AM_RANGE(0x0000, 0x07ff) AM_RAM
 	AM_RANGE(0x1000, 0x1001) AM_DEVREADWRITE("ymsnd", ym2203_device, read, write)
 	AM_RANGE(0x2000, 0x2000) AM_WRITENOP /* watchdog */
@@ -363,7 +363,8 @@ MACHINE_CONFIG_START(capbowl_state::capbowl)
 MACHINE_CONFIG_END
 
 
-MACHINE_CONFIG_DERIVED(capbowl_state::bowlrama, capbowl)
+MACHINE_CONFIG_START(capbowl_state::bowlrama)
+	capbowl(config);
 
 	/* basic machine hardware */
 

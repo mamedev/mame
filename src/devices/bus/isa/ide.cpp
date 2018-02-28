@@ -24,11 +24,11 @@ WRITE8_MEMBER(isa16_ide_device::ide16_alt_w )
 	m_ide->write_cs1(6/2, data, 0xff);
 }
 
-DEVICE_ADDRESS_MAP_START(map, 16, isa16_ide_device)
+ADDRESS_MAP_START(isa16_ide_device::map)
 	AM_RANGE(0x0, 0x7) AM_DEVREADWRITE("ide", ide_controller_device, read_cs0, write_cs0)
 ADDRESS_MAP_END
 
-DEVICE_ADDRESS_MAP_START(alt_map, 8, isa16_ide_device)
+ADDRESS_MAP_START(isa16_ide_device::alt_map)
 	AM_RANGE(0x6, 0x6) AM_READWRITE(ide16_alt_r, ide16_alt_w)
 ADDRESS_MAP_END
 
@@ -122,10 +122,10 @@ void isa16_ide_device::device_reset()
 {
 	m_is_primary = (ioport("DSW")->read() & 1) ? false : true;
 	if (m_is_primary) {
-		m_isa->install_device(0x01f0, 0x01f7, *this, &isa16_ide_device::map, 16);
+		m_isa->install_device(0x01f0, 0x01f7, *this, &isa16_ide_device::map);
 		m_isa->install_device(0x03f0, 0x03f7, *this, &isa16_ide_device::alt_map);
 	} else {
-		m_isa->install_device(0x0170, 0x0177, *this, &isa16_ide_device::map, 16);
+		m_isa->install_device(0x0170, 0x0177, *this, &isa16_ide_device::map);
 		m_isa->install_device(0x0370, 0x0377, *this, &isa16_ide_device::alt_map);
 	}
 }

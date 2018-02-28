@@ -82,8 +82,12 @@ public:
 		, m_cart(*this, "cartslot")
 		, m_ram(*this, RAM_TAG)
 		, m_palette(*this, "palette")
-		{ }
+	{ }
 
+	DECLARE_DRIVER_INIT(rx78);
+	void rx78(machine_config &config);
+
+protected:
 	DECLARE_READ8_MEMBER( key_r );
 	DECLARE_READ8_MEMBER( cass_r );
 	DECLARE_READ8_MEMBER( vram_r );
@@ -96,17 +100,18 @@ public:
 	DECLARE_WRITE8_MEMBER( vdp_bg_reg_w );
 	DECLARE_WRITE8_MEMBER( vdp_pri_mask_w );
 	DECLARE_DEVICE_IMAGE_LOAD_MEMBER( rx78_cart );
-	DECLARE_DRIVER_INIT(rx78);
 	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 
-	void rx78(machine_config &config);
+	virtual void machine_reset() override;
+	void rx78_io(address_map &map);
+	void rx78_mem(address_map &map);
+
 private:
 	uint8_t m_vram_read_bank;
 	uint8_t m_vram_write_bank;
 	uint8_t m_pal_reg[7];
 	uint8_t m_pri_mask;
 	uint8_t m_key_mux;
-	virtual void machine_reset() override;
 	required_device<cpu_device> m_maincpu;
 	required_device<cassette_image_device> m_cass;
 	required_device<generic_slot_device> m_cart;
@@ -270,7 +275,7 @@ WRITE8_MEMBER( rx78_state::vdp_pri_mask_w )
 }
 
 
-static ADDRESS_MAP_START(rx78_mem, AS_PROGRAM, 8, rx78_state)
+ADDRESS_MAP_START(rx78_state::rx78_mem)
 	ADDRESS_MAP_UNMAP_HIGH
 	AM_RANGE(0x0000, 0x1fff) AM_ROM AM_REGION("roms", 0)
 	//AM_RANGE(0x2000, 0x5fff)      // mapped by the cartslot
@@ -279,7 +284,7 @@ static ADDRESS_MAP_START(rx78_mem, AS_PROGRAM, 8, rx78_state)
 	AM_RANGE(0xec00, 0xffff) AM_READWRITE(vram_r, vram_w)
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START(rx78_io, AS_IO, 8, rx78_state)
+ADDRESS_MAP_START(rx78_state::rx78_io)
 	ADDRESS_MAP_UNMAP_HIGH
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
 //  AM_RANGE(0xe2, 0xe2) AM_READNOP AM_WRITENOP //printer

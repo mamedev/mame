@@ -257,6 +257,8 @@ public:
 	required_device<cpu_device> m_maincpu;
 	void swisspkr(machine_config &config);
 	void moviecrd(machine_config &config);
+	void moviecrd_map(address_map &map);
+	void swisspkr_map(address_map &map);
 };
 
 
@@ -305,7 +307,7 @@ READ16_MEMBER(goldngam_state::unk_r)
 	return test1;
 }
 
-static ADDRESS_MAP_START( swisspkr_map, AS_PROGRAM, 16, goldngam_state )
+ADDRESS_MAP_START(goldngam_state::swisspkr_map)
 	AM_RANGE(0x000000, 0x03ffff) AM_ROM
 	AM_RANGE(0x200000, 0x20ffff) AM_RAM
 	AM_RANGE(0x400002, 0x400003) AM_NOP // hopper status read ?
@@ -355,7 +357,7 @@ ADDRESS_MAP_END
 
 */
 
-static ADDRESS_MAP_START( moviecrd_map, AS_PROGRAM, 16, goldngam_state )
+ADDRESS_MAP_START(goldngam_state::moviecrd_map)
 	AM_RANGE(0x000000, 0x07ffff) AM_ROM
 	AM_RANGE(0x200000, 0x20ffff) AM_RAM
 	AM_RANGE(0xc00000, 0xc3ffff) AM_RAM AM_SHARE("videoram")
@@ -577,7 +579,8 @@ MACHINE_CONFIG_START(goldngam_state::swisspkr)
 MACHINE_CONFIG_END
 
 
-MACHINE_CONFIG_DERIVED(goldngam_state::moviecrd, swisspkr)
+MACHINE_CONFIG_START(goldngam_state::moviecrd)
+	swisspkr(config);
 
 	/* basic machine hardware */
 	MCFG_CPU_MODIFY("maincpu")

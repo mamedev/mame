@@ -206,6 +206,7 @@ psoldier dip locations still need verification.
 
 #include "cpu/nec/nec.h"
 #include "cpu/nec/v25.h"
+#include "machine/gen_latch.h"
 #include "machine/irem_cpu.h"
 #include "sound/ym2151.h"
 #include "sound/iremga20.h"
@@ -213,11 +214,6 @@ psoldier dip locations still need verification.
 
 
 /*****************************************************************************/
-
-MACHINE_START_MEMBER(m92_state,m92)
-{
-	save_item(NAME(m_sound_status));
-}
 
 MACHINE_RESET_MEMBER(m92_state,m92)
 {
@@ -301,42 +297,6 @@ CUSTOM_INPUT_MEMBER(m92_state::m92_sprite_busy_r)
 
 /*****************************************************************************/
 
-WRITE16_MEMBER(m92_state::m92_soundlatch_w)
-{
-	if (m_soundcpu)
-		m_soundcpu->set_input_line(NEC_INPUT_LINE_INTP1, ASSERT_LINE);
-
-	m_soundlatch->write(space, 0, data & 0xff);
-}
-
-READ16_MEMBER(m92_state::m92_sound_status_r)
-{
-//logerror("%06x: read sound status\n",m_maincpu->pc());
-	m_upd71059c->ir3_w(0);
-	return m_sound_status;
-}
-
-READ16_MEMBER(m92_state::m92_soundlatch_r)
-{
-	if (m_soundcpu)
-		m_soundcpu->set_input_line(NEC_INPUT_LINE_INTP1, CLEAR_LINE);
-
-	return m_soundlatch->read(space, offset) | 0xff00;
-}
-
-WRITE16_MEMBER(m92_state::m92_sound_irq_ack_w)
-{
-	if (m_soundcpu)
-		m_soundcpu->set_input_line(NEC_INPUT_LINE_INTP1, CLEAR_LINE);
-}
-
-WRITE16_MEMBER(m92_state::m92_sound_status_w)
-{
-	COMBINE_DATA(&m_sound_status);
-	m_upd71059c->ir3_w(1);
-
-}
-
 WRITE16_MEMBER(m92_state::m92_sound_reset_w)
 {
 	if (m_soundcpu)
@@ -346,7 +306,7 @@ WRITE16_MEMBER(m92_state::m92_sound_reset_w)
 /*****************************************************************************/
 
 /* appears to be an earlier board */
-static ADDRESS_MAP_START( lethalth_map, AS_PROGRAM, 16, m92_state )
+ADDRESS_MAP_START(m92_state::lethalth_map)
 	AM_RANGE(0x00000, 0x7ffff) AM_ROM
 	AM_RANGE(0x80000, 0x8ffff) AM_RAM_WRITE(m92_vram_w) AM_SHARE("vram_data")
 	AM_RANGE(0xe0000, 0xeffff) AM_RAM /* System ram */
@@ -357,7 +317,7 @@ static ADDRESS_MAP_START( lethalth_map, AS_PROGRAM, 16, m92_state )
 	AM_RANGE(0xffff0, 0xfffff) AM_ROM AM_REGION("maincpu", 0x7fff0)
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( m92_map, AS_PROGRAM, 16, m92_state )
+ADDRESS_MAP_START(m92_state::m92_map)
 	AM_RANGE(0x00000, 0x9ffff) AM_ROM
 	AM_RANGE(0xa0000, 0xbffff) AM_ROMBANK("bank1")
 	AM_RANGE(0xc0000, 0xcffff) AM_ROM AM_REGION("maincpu", 0x00000) /* Mirror used by In The Hunt as protection */
@@ -370,13 +330,13 @@ static ADDRESS_MAP_START( m92_map, AS_PROGRAM, 16, m92_state )
 	AM_RANGE(0xffff0, 0xfffff) AM_ROM AM_REGION("maincpu", 0x7fff0)
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( m92_portmap, AS_IO, 16, m92_state )
+ADDRESS_MAP_START(m92_state::m92_portmap)
 	AM_RANGE(0x00, 0x01) AM_READ_PORT("P1_P2")
 	AM_RANGE(0x02, 0x03) AM_READ_PORT("COINS_DSW3")
 	AM_RANGE(0x04, 0x05) AM_READ_PORT("DSW")
 	AM_RANGE(0x06, 0x07) AM_READ_PORT("P3_P4")
-	AM_RANGE(0x08, 0x09) AM_READ(m92_sound_status_r)    /* answer from sound CPU */
-	AM_RANGE(0x00, 0x01) AM_WRITE(m92_soundlatch_w)
+	AM_RANGE(0x08, 0x09) AM_DEVREAD8("soundlatch2", generic_latch_8_device, read, 0x00ff)   // answer from sound CPU
+	AM_RANGE(0x00, 0x01) AM_DEVWRITE8("soundlatch", generic_latch_8_device, write, 0x00ff)
 	AM_RANGE(0x02, 0x03) AM_WRITE(m92_coincounter_w)
 	AM_RANGE(0x40, 0x43) AM_DEVREADWRITE8("upd71059c", pic8259_device, read, write, 0x00ff)
 	AM_RANGE(0x80, 0x87) AM_WRITE(m92_pf1_control_w)
@@ -391,12 +351,11 @@ WRITE16_MEMBER(m92_state::oki_bank_w)
 	m_oki->set_rom_bank((data+1) & 0x3); // +1?
 }
 
-static ADDRESS_MAP_START( ppan_portmap, AS_IO, 16, m92_state )
+ADDRESS_MAP_START(m92_state::ppan_portmap)
 	AM_RANGE(0x00, 0x01) AM_READ_PORT("P1_P2")
 	AM_RANGE(0x02, 0x03) AM_READ_PORT("COINS_DSW3")
 	AM_RANGE(0x04, 0x05) AM_READ_PORT("DSW")
 	AM_RANGE(0x06, 0x07) AM_READ_PORT("P3_P4")
-	AM_RANGE(0x08, 0x09) AM_READ(m92_sound_status_r)    /* answer from sound CPU */
 	AM_RANGE(0x10, 0x11) AM_WRITE(oki_bank_w)
 	AM_RANGE(0x18, 0x19) AM_DEVREADWRITE8("oki", okim6295_device, read, write, 0x00ff)
 	AM_RANGE(0x02, 0x03) AM_WRITE(m92_coincounter_w)
@@ -410,13 +369,13 @@ ADDRESS_MAP_END
 
 /******************************************************************************/
 
-static ADDRESS_MAP_START( sound_map, AS_PROGRAM, 16, m92_state )
+ADDRESS_MAP_START(m92_state::sound_map)
 	AM_RANGE(0x00000, 0x1ffff) AM_ROM
 	AM_RANGE(0xa0000, 0xa3fff) AM_RAM
 	AM_RANGE(0xa8000, 0xa803f) AM_DEVREADWRITE8("irem", iremga20_device, irem_ga20_r, irem_ga20_w, 0x00ff)
 	AM_RANGE(0xa8040, 0xa8043) AM_DEVREADWRITE8("ymsnd", ym2151_device, read, write, 0x00ff)
-	AM_RANGE(0xa8044, 0xa8045) AM_READWRITE(m92_soundlatch_r, m92_sound_irq_ack_w)
-	AM_RANGE(0xa8046, 0xa8047) AM_WRITE(m92_sound_status_w)
+	AM_RANGE(0xa8044, 0xa8045) AM_DEVREADWRITE8("soundlatch", generic_latch_8_device, read, acknowledge_w, 0x00ff)
+	AM_RANGE(0xa8046, 0xa8047) AM_DEVWRITE8("soundlatch2", generic_latch_8_device, write, 0x00ff)
 	AM_RANGE(0xffff0, 0xfffff) AM_ROM AM_REGION("soundcpu", 0x1fff0)
 ADDRESS_MAP_END
 
@@ -941,7 +900,6 @@ MACHINE_CONFIG_START(m92_state::m92)
 	MCFG_DEVICE_ADD("upd71059c", PIC8259, 0)
 	MCFG_PIC8259_OUT_INT_CB(INPUTLINE("maincpu", 0))
 
-	MCFG_MACHINE_START_OVERRIDE(m92_state,m92)
 	MCFG_MACHINE_RESET_OVERRIDE(m92_state,m92)
 
 	MCFG_TIMER_DRIVER_ADD_SCANLINE("scantimer", m92_state, m92_scanline_interrupt, "screen", 0, 1)
@@ -967,6 +925,11 @@ MACHINE_CONFIG_START(m92_state::m92)
 	MCFG_SPEAKER_STANDARD_MONO("mono")
 
 	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
+	MCFG_GENERIC_LATCH_DATA_PENDING_CB(INPUTLINE("soundcpu", NEC_INPUT_LINE_INTP1))
+	MCFG_GENERIC_LATCH_SEPARATE_ACKNOWLEDGE(true)
+
+	MCFG_GENERIC_LATCH_8_ADD("soundlatch2")
+	MCFG_GENERIC_LATCH_DATA_PENDING_CB(DEVWRITELINE("upd71059c", pic8259_device, ir3_w))
 
 	MCFG_YM2151_ADD("ymsnd", XTAL(14'318'181)/4)
 	MCFG_YM2151_IRQ_HANDLER(INPUTLINE("soundcpu", NEC_INPUT_LINE_INTP0))
@@ -978,49 +941,58 @@ MACHINE_CONFIG_START(m92_state::m92)
 MACHINE_CONFIG_END
 
 
-MACHINE_CONFIG_DERIVED(m92_state::gunforce, m92)
+MACHINE_CONFIG_START(m92_state::gunforce)
+	m92(config);
 	MCFG_CPU_MODIFY("soundcpu")
 	MCFG_V25_CONFIG(gunforce_decryption_table)
 MACHINE_CONFIG_END
 
-MACHINE_CONFIG_DERIVED(m92_state::bmaster, m92)
+MACHINE_CONFIG_START(m92_state::bmaster)
+	m92(config);
 	MCFG_CPU_MODIFY("soundcpu")
 	MCFG_V25_CONFIG(bomberman_decryption_table)
 MACHINE_CONFIG_END
 
-MACHINE_CONFIG_DERIVED(m92_state::lethalth, m92)
+MACHINE_CONFIG_START(m92_state::lethalth)
+	m92(config);
 	MCFG_CPU_MODIFY("maincpu")
 	MCFG_CPU_PROGRAM_MAP(lethalth_map)
 	MCFG_CPU_MODIFY("soundcpu")
 	MCFG_V25_CONFIG(lethalth_decryption_table)
 MACHINE_CONFIG_END
 
-MACHINE_CONFIG_DERIVED(m92_state::uccops, m92)
+MACHINE_CONFIG_START(m92_state::uccops)
+	m92(config);
 	MCFG_CPU_MODIFY("soundcpu")
 	MCFG_V25_CONFIG(dynablaster_decryption_table)
 MACHINE_CONFIG_END
 
-MACHINE_CONFIG_DERIVED(m92_state::mysticri, m92)
+MACHINE_CONFIG_START(m92_state::mysticri)
+	m92(config);
 	MCFG_CPU_MODIFY("soundcpu")
 	MCFG_V25_CONFIG(mysticri_decryption_table)
 MACHINE_CONFIG_END
 
-MACHINE_CONFIG_DERIVED(m92_state::majtitl2, m92)
+MACHINE_CONFIG_START(m92_state::majtitl2)
+	m92(config);
 	MCFG_CPU_MODIFY("soundcpu")
 	MCFG_V25_CONFIG(majtitl2_decryption_table)
 MACHINE_CONFIG_END
 
-MACHINE_CONFIG_DERIVED(m92_state::hook, m92)
+MACHINE_CONFIG_START(m92_state::hook)
+	m92(config);
 	MCFG_CPU_MODIFY("soundcpu")
 	MCFG_V25_CONFIG(hook_decryption_table)
 MACHINE_CONFIG_END
 
-MACHINE_CONFIG_DERIVED(m92_state::ppan, m92)
+MACHINE_CONFIG_START(m92_state::ppan)
+	m92(config);
 	MCFG_CPU_MODIFY("maincpu")
 	MCFG_CPU_IO_MAP(ppan_portmap)
 
 	MCFG_DEVICE_REMOVE("soundcpu")
 	MCFG_DEVICE_REMOVE("soundlatch")
+	MCFG_DEVICE_REMOVE("soundlatch2")
 	MCFG_DEVICE_REMOVE("ymsnd")
 	MCFG_DEVICE_REMOVE("irem")
 
@@ -1033,24 +1005,28 @@ MACHINE_CONFIG_DERIVED(m92_state::ppan, m92)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 MACHINE_CONFIG_END
 
-MACHINE_CONFIG_DERIVED(m92_state::rtypeleo, m92)
+MACHINE_CONFIG_START(m92_state::rtypeleo)
+	m92(config);
 	MCFG_CPU_MODIFY("soundcpu")
 	MCFG_V25_CONFIG(rtypeleo_decryption_table)
 MACHINE_CONFIG_END
 
 
-MACHINE_CONFIG_DERIVED(m92_state::inthunt, m92)
+MACHINE_CONFIG_START(m92_state::inthunt)
+	m92(config);
 	MCFG_CPU_MODIFY("soundcpu")
 	MCFG_V25_CONFIG(inthunt_decryption_table)
 MACHINE_CONFIG_END
 
 
-MACHINE_CONFIG_DERIVED(m92_state::nbbatman, m92)
+MACHINE_CONFIG_START(m92_state::nbbatman)
+	m92(config);
 	MCFG_CPU_MODIFY("soundcpu")
 	MCFG_V25_CONFIG(leagueman_decryption_table)
 MACHINE_CONFIG_END
 
-MACHINE_CONFIG_DERIVED(m92_state::nbbatman2bl, m92)
+MACHINE_CONFIG_START(m92_state::nbbatman2bl)
+	m92(config);
 	MCFG_DEVICE_REMOVE("soundcpu")
 	MCFG_DEVICE_REMOVE("ymsnd")
 	MCFG_DEVICE_REMOVE("irem")
@@ -1060,23 +1036,28 @@ MACHINE_CONFIG_DERIVED(m92_state::nbbatman2bl, m92)
 	/* 8951 MCU as sound CPU */
 	/* OKI6295 (AD-65) as sound */
 
+	MCFG_DEVICE_MODIFY("soundlatch")
+	MCFG_GENERIC_LATCH_DATA_PENDING_CB(NOOP)
 MACHINE_CONFIG_END
 
-MACHINE_CONFIG_DERIVED(m92_state::psoldier, m92)
+MACHINE_CONFIG_START(m92_state::psoldier)
+	m92(config);
 	MCFG_CPU_MODIFY("soundcpu")
 	MCFG_V25_CONFIG(psoldier_decryption_table)
 	/* video hardware */
 	MCFG_GFXDECODE_MODIFY("gfxdecode", psoldier)
 MACHINE_CONFIG_END
 
-MACHINE_CONFIG_DERIVED(m92_state::dsoccr94j, m92)
+MACHINE_CONFIG_START(m92_state::dsoccr94j)
+	m92(config);
 	MCFG_CPU_MODIFY("soundcpu")
 	MCFG_V25_CONFIG(dsoccr94_decryption_table)
 	/* video hardware */
 	MCFG_GFXDECODE_MODIFY("gfxdecode", psoldier)
 MACHINE_CONFIG_END
 
-MACHINE_CONFIG_DERIVED(m92_state::gunforc2, m92)
+MACHINE_CONFIG_START(m92_state::gunforc2)
+	m92(config);
 	MCFG_CPU_MODIFY("soundcpu")
 	MCFG_V25_CONFIG(lethalth_decryption_table)
 MACHINE_CONFIG_END

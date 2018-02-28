@@ -191,6 +191,19 @@ public:
 	void expcard(machine_config &config);
 	void xplan(machine_config &config);
 	void xtrain(machine_config &config);
+	void bishjan_map(address_map &map);
+	void expcard_io(address_map &map);
+	void humlan_map(address_map &map);
+	void mtrain_io(address_map &map);
+	void mtrain_map(address_map &map);
+	void new2001_base_map(address_map &map);
+	void new2001_map(address_map &map);
+	void ramdac_map(address_map &map);
+	void saklove_io(address_map &map);
+	void saklove_map(address_map &map);
+	void xplan_io(address_map &map);
+	void xplan_map(address_map &map);
+	void xtrain_io(address_map &map);
 private:
 	inline void ss9601_get_tile_info(layer_t *l, tile_data &tileinfo, tilemap_memory_index tile_index);
 };
@@ -907,7 +920,7 @@ WRITE16_MEMBER(subsino2_state::bishjan_outputs_w)
 }
 
 
-static ADDRESS_MAP_START( bishjan_map, AS_PROGRAM, 16, subsino2_state )
+ADDRESS_MAP_START(subsino2_state::bishjan_map)
 	ADDRESS_MAP_GLOBAL_MASK(0xffffff)
 
 	AM_RANGE( 0x000000, 0x07ffff ) AM_ROM AM_REGION("maincpu", 0)
@@ -956,7 +969,7 @@ static ADDRESS_MAP_START( bishjan_map, AS_PROGRAM, 16, subsino2_state )
 	AM_RANGE( 0xc00008, 0xc00009 ) AM_READ_PORT("RESET") AM_WRITE(bishjan_outputs_w ) AM_SHARE("outputs16")
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( ramdac_map, 0, 8, subsino2_state )
+ADDRESS_MAP_START(subsino2_state::ramdac_map)
 	AM_RANGE(0x000, 0x3ff) AM_DEVREADWRITE("ramdac", ramdac_device, ramdac_pal_r, ramdac_rgb666_w)
 ADDRESS_MAP_END
 
@@ -995,7 +1008,7 @@ WRITE16_MEMBER(subsino2_state::new2001_outputs_w)
 }
 
 // Same as bishjan (except for i/o and lo2 usage like xplan)
-static ADDRESS_MAP_START( new2001_base_map, AS_PROGRAM, 16, subsino2_state )
+ADDRESS_MAP_START(subsino2_state::new2001_base_map)
 	ADDRESS_MAP_GLOBAL_MASK(0xffffff)
 
 	AM_RANGE( 0x000000, 0x07ffff ) AM_ROM AM_REGION("maincpu", 0)
@@ -1048,9 +1061,9 @@ static ADDRESS_MAP_START( new2001_base_map, AS_PROGRAM, 16, subsino2_state )
 	AM_RANGE( 0xc00006, 0xc00007 ) AM_READ(bishjan_serial_r )
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( new2001_map, AS_PROGRAM, 16, subsino2_state )
-	AM_RANGE( 0xc00008, 0xc00009 ) AM_WRITE(new2001_outputs_w ) AM_SHARE("outputs16")
+ADDRESS_MAP_START(subsino2_state::new2001_map)
 	AM_IMPORT_FROM(new2001_base_map)
+	AM_RANGE( 0xc00008, 0xc00009 ) AM_WRITE(new2001_outputs_w ) AM_SHARE("outputs16")
 ADDRESS_MAP_END
 
 /***************************************************************************
@@ -1084,9 +1097,9 @@ WRITE16_MEMBER(subsino2_state::humlan_outputs_w)
 //  popmessage("0: %04x", m_outputs16[0]);
 }
 
-static ADDRESS_MAP_START( humlan_map, AS_PROGRAM, 16, subsino2_state )
-	AM_RANGE( 0xc00008, 0xc00009 ) AM_WRITE(humlan_outputs_w ) AM_SHARE("outputs16")
+ADDRESS_MAP_START(subsino2_state::humlan_map)
 	AM_IMPORT_FROM(new2001_base_map)
+	AM_RANGE( 0xc00008, 0xc00009 ) AM_WRITE(humlan_outputs_w ) AM_SHARE("outputs16")
 ADDRESS_MAP_END
 
 /***************************************************************************
@@ -1218,7 +1231,7 @@ READ8_MEMBER(subsino2_state::mtrain_prot_r)
 	return "SUBSION"[offset];
 }
 
-static ADDRESS_MAP_START( mtrain_map, AS_PROGRAM, 8, subsino2_state )
+ADDRESS_MAP_START(subsino2_state::mtrain_map)
 	AM_RANGE( 0x00000, 0x06fff ) AM_ROM
 
 	AM_RANGE( 0x07800, 0x07fff ) AM_RAM AM_SHARE("nvram")   // battery
@@ -1253,7 +1266,7 @@ static ADDRESS_MAP_START( mtrain_map, AS_PROGRAM, 8, subsino2_state )
 	AM_RANGE( 0x0a000, 0x0ffff ) AM_ROM
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( mtrain_io, AS_IO, 8, subsino2_state )
+ADDRESS_MAP_START(subsino2_state::mtrain_io)
 	AM_RANGE( 0x0000, 0x003f ) AM_RAM // internal regs
 ADDRESS_MAP_END
 
@@ -1286,7 +1299,7 @@ WRITE8_MEMBER(subsino2_state::saklove_outputs_w)
 //  popmessage("0: %02x - 1: %02x - 2: %02x - 3: %02x", m_outputs[0], m_outputs[1], m_outputs[2], m_outputs[3]);
 }
 
-static ADDRESS_MAP_START( saklove_map, AS_PROGRAM, 8, subsino2_state )
+ADDRESS_MAP_START(subsino2_state::saklove_map)
 	AM_RANGE(0x00000, 0x07fff) AM_RAM AM_SHARE("nvram") // battery
 
 	// read lo (L1)   (only half tilemap?)
@@ -1311,7 +1324,7 @@ static ADDRESS_MAP_START( saklove_map, AS_PROGRAM, 8, subsino2_state )
 	AM_RANGE(0xe0000, 0xfffff) AM_ROM AM_REGION("maincpu",0)
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( saklove_io, AS_IO, 8, subsino2_state )
+ADDRESS_MAP_START(subsino2_state::saklove_io)
 	AM_RANGE(0x0000, 0x0000) AM_WRITE(ss9601_scrollctrl_w )
 
 	AM_RANGE(0x0020, 0x0020) AM_DEVREADWRITE("oki", okim6295_device, read, write)
@@ -1376,7 +1389,7 @@ WRITE8_MEMBER(subsino2_state::xplan_outputs_w)
 //  popmessage("0: %02x - 1: %02x - 2: %02x - 3: %02x", m_outputs[0], m_outputs[1], m_outputs[2], m_outputs[3]);
 }
 
-static ADDRESS_MAP_START( xplan_map, AS_PROGRAM, 8, subsino2_state )
+ADDRESS_MAP_START(subsino2_state::xplan_map)
 	AM_RANGE(0x00000, 0x07fff) AM_RAM AM_SHARE("nvram") // battery
 
 	// write both (L1, byte_lo2)
@@ -1410,7 +1423,7 @@ static ADDRESS_MAP_START( xplan_map, AS_PROGRAM, 8, subsino2_state )
 	AM_RANGE(0xc0000, 0xfffff) AM_ROM AM_REGION("maincpu",0)
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( xplan_io, AS_IO, 8, subsino2_state )
+ADDRESS_MAP_START(subsino2_state::xplan_io)
 	AM_RANGE(0x0000, 0x0000) AM_DEVREADWRITE("oki", okim6295_device, read, write)
 
 	AM_RANGE(0x0020, 0x0020) AM_WRITE(ss9601_byte_lo2_w )
@@ -1479,18 +1492,18 @@ WRITE8_MEMBER(subsino2_state::xtrain_outputs_w)
 //  popmessage("0: %02x - 1: %02x - 2: %02x - 3: %02x", m_outputs[0], m_outputs[1], m_outputs[2], m_outputs[3]);
 }
 
-static ADDRESS_MAP_START( expcard_io, AS_IO, 8, subsino2_state )
+ADDRESS_MAP_START(subsino2_state::expcard_io)
+	AM_IMPORT_FROM( xplan_io )
+
 	// 306 = d, 307 = c, 308 = b, 309 = a
 	AM_RANGE(0x0306, 0x0309) AM_WRITE(expcard_outputs_w ) AM_SHARE("outputs")
-
-	AM_IMPORT_FROM( xplan_io )
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( xtrain_io, AS_IO, 8, subsino2_state )
+ADDRESS_MAP_START(subsino2_state::xtrain_io)
+	AM_IMPORT_FROM( xplan_io )
+
 	// 306 = d, 307 = c, 308 = b, 309 = a
 	AM_RANGE(0x0306, 0x0309) AM_WRITE(xtrain_outputs_w ) AM_SHARE("outputs")
-
-	AM_IMPORT_FROM( xplan_io )
 ADDRESS_MAP_END
 
 
@@ -2367,7 +2380,8 @@ MACHINE_CONFIG_START(subsino2_state::bishjan)
 	// SS9904
 MACHINE_CONFIG_END
 
-MACHINE_CONFIG_DERIVED(subsino2_state::new2001, bishjan)
+MACHINE_CONFIG_START(subsino2_state::new2001)
+	bishjan(config);
 	MCFG_CPU_MODIFY("maincpu")
 	MCFG_CPU_PROGRAM_MAP( new2001_map )
 
@@ -2376,7 +2390,8 @@ MACHINE_CONFIG_DERIVED(subsino2_state::new2001, bishjan)
 	MCFG_SCREEN_VISIBLE_AREA( 0, 640-1, 0, 256-16-1 )
 MACHINE_CONFIG_END
 
-MACHINE_CONFIG_DERIVED(subsino2_state::humlan, bishjan)
+MACHINE_CONFIG_START(subsino2_state::humlan)
+	bishjan(config);
 	MCFG_CPU_REPLACE("maincpu", H83044, XTAL(48'000'000) / 3)
 	MCFG_CPU_PROGRAM_MAP( humlan_map )
 	MCFG_CPU_VBLANK_INT_DRIVER("screen", subsino2_state, irq0_line_hold)
@@ -2491,12 +2506,14 @@ MACHINE_CONFIG_START(subsino2_state::xplan)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 MACHINE_CONFIG_END
 
-MACHINE_CONFIG_DERIVED(subsino2_state::xtrain, xplan)
+MACHINE_CONFIG_START(subsino2_state::xtrain)
+	xplan(config);
 	MCFG_CPU_MODIFY("maincpu")
 	MCFG_CPU_IO_MAP(xtrain_io)
 MACHINE_CONFIG_END
 
-MACHINE_CONFIG_DERIVED(subsino2_state::expcard, xplan)
+MACHINE_CONFIG_START(subsino2_state::expcard)
+	xplan(config);
 	MCFG_CPU_MODIFY("maincpu")
 	MCFG_CPU_IO_MAP(expcard_io)
 MACHINE_CONFIG_END

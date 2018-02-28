@@ -170,7 +170,7 @@ WRITE8_MEMBER(lsasquad_state::lsasquad_bankswitch_w)
 	/* other bits unknown */
 }
 
-static ADDRESS_MAP_START( lsasquad_map, AS_PROGRAM, 8, lsasquad_state )
+ADDRESS_MAP_START(lsasquad_state::lsasquad_map)
 	AM_RANGE(0x0000, 0x7fff) AM_ROM
 	AM_RANGE(0x8000, 0x9fff) AM_ROMBANK("bank1")
 	AM_RANGE(0xa000, 0xbfff) AM_RAM /* SRAM */
@@ -192,7 +192,7 @@ static ADDRESS_MAP_START( lsasquad_map, AS_PROGRAM, 8, lsasquad_state )
 	AM_RANGE(0xee00, 0xee00) AM_DEVREADWRITE("bmcu", taito68705_mcu_device, data_r, data_w)
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( lsasquad_sound_map, AS_PROGRAM, 8, lsasquad_state )
+ADDRESS_MAP_START(lsasquad_state::lsasquad_sound_map)
 	AM_RANGE(0x0000, 0x7fff) AM_ROM
 	AM_RANGE(0x8000, 0x87ff) AM_RAM
 	AM_RANGE(0xa000, 0xa001) AM_DEVREADWRITE("ymsnd", ym2203_device, read, write)
@@ -207,7 +207,7 @@ ADDRESS_MAP_END
 
 
 
-static ADDRESS_MAP_START( storming_map, AS_PROGRAM, 8, lsasquad_state )
+ADDRESS_MAP_START(lsasquad_state::storming_map)
 	AM_RANGE(0x0000, 0x7fff) AM_ROM
 	AM_RANGE(0x8000, 0x9fff) AM_ROMBANK("bank1")
 	AM_RANGE(0xa000, 0xbfff) AM_RAM /* SRAM */
@@ -371,7 +371,7 @@ INPUT_PORTS_END
 
 /* DAIKAIJU */
 
-static ADDRESS_MAP_START( daikaiju_map, AS_PROGRAM, 8, lsasquad_state )
+ADDRESS_MAP_START(lsasquad_state::daikaiju_map)
 	AM_RANGE(0x0000, 0x7fff) AM_ROM
 	AM_RANGE(0x8000, 0x9fff) AM_ROMBANK("bank1")
 	AM_RANGE(0xa000, 0xbfff) AM_RAM /* SRAM */
@@ -390,7 +390,7 @@ static ADDRESS_MAP_START( daikaiju_map, AS_PROGRAM, 8, lsasquad_state )
 	AM_RANGE(0xee00, 0xee00) AM_DEVREADWRITE("bmcu", taito68705_mcu_device, data_r, data_w)
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( daikaiju_sound_map, AS_PROGRAM, 8, lsasquad_state )
+ADDRESS_MAP_START(lsasquad_state::daikaiju_sound_map)
 	AM_RANGE(0x0000, 0x7fff) AM_ROM
 	AM_RANGE(0x8000, 0x87ff) AM_RAM
 	AM_RANGE(0xa000, 0xa001) AM_DEVREADWRITE("ymsnd", ym2203_device, read, write)
@@ -606,7 +606,8 @@ MACHINE_CONFIG_START(lsasquad_state::lsasquad)
 	MCFG_SOUND_ROUTE(3, "mono", 0.63)
 MACHINE_CONFIG_END
 
-MACHINE_CONFIG_DERIVED(lsasquad_state::storming, lsasquad)
+MACHINE_CONFIG_START(lsasquad_state::storming)
+	lsasquad(config);
 
 	MCFG_CPU_MODIFY("maincpu")
 	MCFG_CPU_PROGRAM_MAP(storming_map)

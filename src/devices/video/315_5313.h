@@ -12,42 +12,42 @@
 
 
 #define MCFG_SEGA315_5313_IS_PAL(_bool) \
-	sega315_5313_device::set_signal_type(*device, _bool);
+	downcast<sega315_5313_device &>(*device).set_signal_type(_bool);
 
 #define MCFG_SEGA315_5313_INT_CB(_devcb) \
-	devcb = &sega315_5313_device::set_int_callback(*device, DEVCB_##_devcb);
+	devcb = &downcast<sega315_5313_device &>(*device).set_int_callback(DEVCB_##_devcb);
 
 #define MCFG_SEGA315_5313_PAUSE_CB(_devcb) \
-	devcb = &sega315_5313_device::set_pause_callback(*device, DEVCB_##_devcb);
+	devcb = &downcast<sega315_5313_device &>(*device).set_pause_callback(DEVCB_##_devcb);
 
 #define MCFG_SEGA315_5313_SND_IRQ_CALLBACK(_write) \
-	devcb = &sega315_5313_device::set_sndirqline_callback(*device, DEVCB_##_write);
+	devcb = &downcast<sega315_5313_device &>(*device).set_sndirqline_callback(DEVCB_##_write);
 
 #define MCFG_SEGA315_5313_LV6_IRQ_CALLBACK(_write) \
-	devcb = &sega315_5313_device::set_lv6irqline_callback(*device, DEVCB_##_write);
+	devcb = &downcast<sega315_5313_device &>(*device).set_lv6irqline_callback(DEVCB_##_write);
 
 #define MCFG_SEGA315_5313_LV4_IRQ_CALLBACK(_write) \
-	devcb = &sega315_5313_device::set_lv4irqline_callback(*device, DEVCB_##_write);
+	devcb = &downcast<sega315_5313_device &>(*device).set_lv4irqline_callback(DEVCB_##_write);
 
 #define MCFG_SEGA315_5313_ALT_TIMING(_data) \
-	sega315_5313_device::set_alt_timing(*device, _data);
+	downcast<sega315_5313_device &>(*device).set_alt_timing(_data);
 
 #define MCFG_SEGA315_5313_PAL_WRITE_BASE(_data) \
-	sega315_5313_device::set_palwrite_base(*device, _data);
+	downcast<sega315_5313_device &>(*device).set_palwrite_base(_data);
 
 #define MCFG_SEGA315_5313_PALETTE(_palette_tag) \
-	sega315_5313_device::static_set_palette_tag(*device, "^" _palette_tag);
+	downcast<sega315_5313_device &>(*device).set_palette_tag("^" _palette_tag);
 
 
 // Temporary solution while 32x VDP mixing and scanline interrupting is moved outside MD VDP
 #define MCFG_SEGA315_5313_32X_SCANLINE_CB(_class, _method) \
-	sega315_5313_device::set_md_32x_scanline(*device, sega315_5313_device::md_32x_scanline_delegate(&_class::_method, #_class "::" #_method, this));
+	downcast<sega315_5313_device &>(*device).set_md_32x_scanline(sega315_5313_device::md_32x_scanline_delegate(&_class::_method, #_class "::" #_method, this));
 
 #define MCFG_SEGA315_5313_32X_INTERRUPT_CB(_class, _method) \
-	sega315_5313_device::set_md_32x_interrupt(*device, sega315_5313_device::md_32x_interrupt_delegate(&_class::_method, #_class "::" #_method, this));
+	downcast<sega315_5313_device &>(*device).set_md_32x_interrupt(sega315_5313_device::md_32x_interrupt_delegate(&_class::_method, #_class "::" #_method, this));
 
 #define MCFG_SEGA315_5313_32X_SCANLINE_HELPER_CB(_class, _method) \
-	sega315_5313_device::set_md_32x_scanline_helper(*device, sega315_5313_device::md_32x_scanline_helper_delegate(&_class::_method, #_class "::" #_method, this));
+	downcast<sega315_5313_device &>(*device).set_md_32x_scanline_helper(sega315_5313_device::md_32x_scanline_helper_delegate(&_class::_method, #_class "::" #_method, this));
 
 
 class sega315_5313_device : public sega315_5124_device
@@ -59,16 +59,16 @@ public:
 
 	sega315_5313_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
-	template <class Object> static devcb_base &set_sndirqline_callback(device_t &device, Object &&cb) { return downcast<sega315_5313_device &>(device).m_sndirqline_callback.set_callback(std::forward<Object>(cb)); }
-	template <class Object> static devcb_base &set_lv6irqline_callback(device_t &device, Object &&cb) { return downcast<sega315_5313_device &>(device).m_lv6irqline_callback.set_callback(std::forward<Object>(cb)); }
-	template <class Object> static devcb_base &set_lv4irqline_callback(device_t &device, Object &&cb) { return downcast<sega315_5313_device &>(device).m_lv4irqline_callback.set_callback(std::forward<Object>(cb)); }
-	static void set_alt_timing(device_t &device, int use_alt_timing);
-	static void set_palwrite_base(device_t &device, int palwrite_base);
-	static void static_set_palette_tag(device_t &device, const char *tag);
+	template <class Object> devcb_base &set_sndirqline_callback(Object &&cb) { return m_sndirqline_callback.set_callback(std::forward<Object>(cb)); }
+	template <class Object> devcb_base &set_lv6irqline_callback(Object &&cb) { return m_lv6irqline_callback.set_callback(std::forward<Object>(cb)); }
+	template <class Object> devcb_base &set_lv4irqline_callback(Object &&cb) { return m_lv4irqline_callback.set_callback(std::forward<Object>(cb)); }
+	void set_alt_timing(int use_alt_timing) { m_use_alt_timing = use_alt_timing; }
+	void set_palwrite_base(int palwrite_base) { m_palwrite_base = palwrite_base; }
+	void set_palette_tag(const char *tag) { m_palette.set_tag(tag); }
 
-	static void set_md_32x_scanline(device_t &device, md_32x_scanline_delegate &&cb) { downcast<sega315_5313_device &>(device).m_32x_scanline_func = std::move(cb); }
-	static void set_md_32x_interrupt(device_t &device, md_32x_interrupt_delegate &&cb) { downcast<sega315_5313_device &>(device).m_32x_interrupt_func = std::move(cb); }
-	static void set_md_32x_scanline_helper(device_t &device, md_32x_scanline_helper_delegate &&cb) { downcast<sega315_5313_device &>(device).m_32x_scanline_helper_func = std::move(cb); }
+	template <typename Object> void set_md_32x_scanline(Object &&cb) { m_32x_scanline_func = std::forward<Object>(cb); }
+	template <typename Object> void set_md_32x_interrupt(Object &&cb) { m_32x_interrupt_func = std::forward<Object>(cb); }
+	template <typename Object> void set_md_32x_scanline_helper(Object &&cb) { m_32x_scanline_helper_func = std::forward<Object>(cb); }
 
 	int m_use_alt_timing; // use MAME scanline timer instead, render only one scanline to a single line buffer, to be rendered by a partial update call.. experimental
 

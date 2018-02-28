@@ -128,6 +128,7 @@ public:
 	virtual void machine_start () override;
 	virtual void machine_reset () override;
 	void lwriter(machine_config &config);
+	void maincpu_map(address_map &map);
 private:
 	required_device<cpu_device> m_maincpu;
 	required_device<scc8530_device> m_scc;
@@ -200,7 +201,7 @@ The ADB bit-bang transceiver MCU connects to the VIA CB1 (adbclk) and CB2 (adbda
 as well as PA0 (ST1), PA2 (ST2) and PA3 (ADB /INT)
 */
 
-static ADDRESS_MAP_START (maincpu_map, AS_PROGRAM, 16, lwriter_state)
+ADDRESS_MAP_START(lwriter_state::maincpu_map)
 	ADDRESS_MAP_UNMAP_HIGH
 	AM_RANGE(0x000000, 0x1fffff) AM_READWRITE(bankedarea_r, bankedarea_w)
 	AM_RANGE(0x200000, 0x2fffff) AM_ROM AM_REGION("rom", 0) // 1MB ROM
@@ -252,10 +253,10 @@ READ16_MEMBER(lwriter_state::bankedarea_r)
 	}
 	else if (offset <= 0x01ffff)
 	{
-		if ((offset > 0x7ff) && !machine().side_effect_disabled()) { logerror("Attempt to read banked area (with overlay off) past end of SRAM from offset %08X!\n",offset<<1); }
+		if ((offset > 0x7ff) && !machine().side_effects_disabled()) { logerror("Attempt to read banked area (with overlay off) past end of SRAM from offset %08X!\n",offset<<1); }
 		return m_sram_ptr[offset&0x7FF];
 	}
-	if(!machine().side_effect_disabled()) { logerror("Attempt to read banked area (with overlay off) past end of SRAM from offset %08X! Returning 0xFFFF!\n",offset<<1); }
+	if(!machine().side_effects_disabled()) { logerror("Attempt to read banked area (with overlay off) past end of SRAM from offset %08X! Returning 0xFFFF!\n",offset<<1); }
 	return 0xFFFF;
 }
 
@@ -263,16 +264,16 @@ WRITE16_MEMBER(lwriter_state::bankedarea_w)
 {
 	if (m_overlay)
 	{
-		if(!machine().side_effect_disabled()) { logerror("Attempt to write banked area (with overlay ON) with data %04X to offset %08X IGNORED!\n",data, offset<<1); }
+		if(!machine().side_effects_disabled()) { logerror("Attempt to write banked area (with overlay ON) with data %04X to offset %08X IGNORED!\n",data, offset<<1); }
 		return;
 	}
 	else if (offset <= 0x01ffff)
 	{
-		if ((offset > 0x7ff) && !machine().side_effect_disabled()) { logerror("Attempt to write banked area (with overlay off) with data %04X to offset %08X!\n",data, offset<<1); }
+		if ((offset > 0x7ff) && !machine().side_effects_disabled()) { logerror("Attempt to write banked area (with overlay off) with data %04X to offset %08X!\n",data, offset<<1); }
 		COMBINE_DATA(&m_sram_ptr[offset&0x7FF]);
 		return;
 	}
-	if(!machine().side_effect_disabled()) { logerror("Attempt to write banked area (with overlay off) with data %04X to offset %08X IGNORED!\n", data, offset<<1); }
+	if(!machine().side_effects_disabled()) { logerror("Attempt to write banked area (with overlay off) with data %04X to offset %08X IGNORED!\n", data, offset<<1); }
 }
 
 /* 4 diagnostic LEDs, plus 4 i/o lines for the printer */

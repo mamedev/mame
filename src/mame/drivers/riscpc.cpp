@@ -73,6 +73,7 @@ public:
 	void sarpc_j233(machine_config &config);
 	void a7000(machine_config &config);
 	void a7000p(machine_config &config);
+	void a7000_mem(address_map &map);
 };
 
 
@@ -757,7 +758,7 @@ WRITE32_MEMBER( riscpc_state::a7000_iomd_w )
 	}
 }
 
-static ADDRESS_MAP_START( a7000_mem, AS_PROGRAM, 32, riscpc_state)
+ADDRESS_MAP_START(riscpc_state::a7000_mem)
 	AM_RANGE(0x00000000, 0x003fffff) AM_MIRROR(0x00800000) AM_ROM AM_REGION("user1", 0)
 //  AM_RANGE(0x01000000, 0x01ffffff) AM_NOP //expansion ROM
 //  AM_RANGE(0x02000000, 0x02ffffff) AM_RAM //VRAM
@@ -850,7 +851,8 @@ MACHINE_CONFIG_START(riscpc_state::a7000)
 	MCFG_PALETTE_ADD("palette", 0x200)
 MACHINE_CONFIG_END
 
-MACHINE_CONFIG_DERIVED(riscpc_state::a7000p, a7000)
+MACHINE_CONFIG_START(riscpc_state::a7000p)
+	a7000(config);
 	MCFG_CPU_MODIFY("maincpu") // ARM7500FE
 	MCFG_CPU_CLOCK(XTAL(48'000'000))
 MACHINE_CONFIG_END

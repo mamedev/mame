@@ -80,6 +80,7 @@ public:
 	DECLARE_PALETTE_INIT(lbeach);
 	uint32_t screen_update_lbeach(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	void lbeach(machine_config &config);
+	void lbeach_map(address_map &map);
 };
 
 
@@ -215,10 +216,10 @@ READ8_MEMBER(lbeach_state::lbeach_in2_r)
 	return (ioport("IN2")->read() & 0x3f) | d6 | d7;
 }
 
-static ADDRESS_MAP_START( lbeach_map, AS_PROGRAM, 8, lbeach_state )
+ADDRESS_MAP_START(lbeach_state::lbeach_map)
 	AM_RANGE(0x0000, 0x00ff) AM_RAM AM_SHARE("nvram")
-	AM_RANGE(0x4000, 0x4000) AM_READ(lbeach_in1_r)
 	AM_RANGE(0x4000, 0x41ff) AM_RAM_WRITE(lbeach_bg_vram_w) AM_SHARE("bg_vram")
+	AM_RANGE(0x4000, 0x4000) AM_READ(lbeach_in1_r)
 	AM_RANGE(0x4200, 0x43ff) AM_RAM
 	AM_RANGE(0x4400, 0x47ff) AM_RAM_WRITE(lbeach_fg_vram_w) AM_SHARE("fg_vram")
 	AM_RANGE(0x8000, 0x8000) AM_READ(lbeach_in2_r)

@@ -124,6 +124,8 @@ public:
 	DECLARE_WRITE8_MEMBER(ksm_ppi_portc_w);
 
 	void ksm(machine_config &config);
+	void ksm_io(address_map &map);
+	void ksm_mem(address_map &map);
 private:
 	uint32_t draw_scanline(uint16_t *p, uint16_t offset, uint8_t scanline);
 	rectangle m_tmpclip;
@@ -157,14 +159,14 @@ private:
 	required_region_ptr<u8> m_p_chargen;
 };
 
-static ADDRESS_MAP_START( ksm_mem, AS_PROGRAM, 8, ksm_state )
+ADDRESS_MAP_START(ksm_state::ksm_mem)
 	ADDRESS_MAP_UNMAP_HIGH
 	AM_RANGE (0x0000, 0x0fff) AM_ROM
 	AM_RANGE (0x2000, 0x20ff) AM_RAM AM_MIRROR(0x0700)
 	AM_RANGE (0xc000, 0xffff) AM_RAM AM_SHARE("videoram")
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( ksm_io, AS_IO, 8, ksm_state )
+ADDRESS_MAP_START(ksm_state::ksm_io)
 	ADDRESS_MAP_UNMAP_HIGH
 	AM_RANGE (0x5e, 0x5f) AM_DEVREADWRITE("pic8259", pic8259_device, read, write)
 	AM_RANGE (0x6e, 0x6e) AM_DEVREADWRITE("i8251kbd", i8251_device, data_r, data_w)

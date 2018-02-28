@@ -290,7 +290,7 @@ WRITE8_MEMBER(warpwarp_state::warpwarp_out0_w)
 
 
 
-static ADDRESS_MAP_START( geebee_map, AS_PROGRAM, 8, warpwarp_state )
+ADDRESS_MAP_START(warpwarp_state::geebee_map)
 	AM_RANGE(0x0000, 0x1fff) AM_ROM
 	AM_RANGE(0x2000, 0x23ff) AM_MIRROR(0x400) AM_RAM_WRITE(geebee_videoram_w) AM_SHARE("geebee_videoram") // mirror used by kaitei due to a bug
 	AM_RANGE(0x3000, 0x37ff) AM_ROM AM_REGION("gfx1", 0) // 3000-33ff in geebee
@@ -300,14 +300,14 @@ static ADDRESS_MAP_START( geebee_map, AS_PROGRAM, 8, warpwarp_state )
 	AM_RANGE(0x7000, 0x7007) AM_MIRROR(0x0ff8) AM_DEVWRITE("latch", ls259_device, write_d0)
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( geebee_port_map, AS_IO, 8, warpwarp_state )
+ADDRESS_MAP_START(warpwarp_state::geebee_port_map)
 	AM_RANGE(0x50, 0x53) AM_READ(geebee_in_r)
 	AM_RANGE(0x60, 0x6f) AM_WRITE(geebee_out6_w)
 	AM_RANGE(0x70, 0x77) AM_MIRROR(0x08) AM_DEVWRITE("latch", ls259_device, write_d0)
 ADDRESS_MAP_END
 
 
-static ADDRESS_MAP_START( bombbee_map, AS_PROGRAM, 8, warpwarp_state )
+ADDRESS_MAP_START(warpwarp_state::bombbee_map)
 	AM_RANGE(0x0000, 0x1fff) AM_ROM
 	AM_RANGE(0x2000, 0x23ff) AM_RAM
 	AM_RANGE(0x4000, 0x47ff) AM_RAM_WRITE(warpwarp_videoram_w) AM_SHARE("videoram")
@@ -318,7 +318,7 @@ static ADDRESS_MAP_START( bombbee_map, AS_PROGRAM, 8, warpwarp_state )
 	AM_RANGE(0x6030, 0x6037) AM_MIRROR(0x0008) AM_DEVWRITE("latch", ls259_device, write_d0)
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( warpwarp_map, AS_PROGRAM, 8, warpwarp_state )
+ADDRESS_MAP_START(warpwarp_state::warpwarp_map)
 	AM_RANGE(0x0000, 0x3fff) AM_ROM
 	AM_RANGE(0x8000, 0x83ff) AM_RAM
 	AM_RANGE(0x4000, 0x47ff) AM_RAM_WRITE(warpwarp_videoram_w) AM_SHARE("videoram")
@@ -742,12 +742,14 @@ MACHINE_CONFIG_START(warpwarp_state::geebee)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 MACHINE_CONFIG_END
 
-MACHINE_CONFIG_DERIVED(warpwarp_state::geebeeb, geebee)
+MACHINE_CONFIG_START(warpwarp_state::geebeeb)
+	geebee(config);
 	MCFG_DEVICE_MODIFY("latch")
 	MCFG_ADDRESSABLE_LATCH_Q4_OUT_CB(NOOP) // remove coin lockout
 MACHINE_CONFIG_END
 
-MACHINE_CONFIG_DERIVED(warpwarp_state::navarone, geebee)
+MACHINE_CONFIG_START(warpwarp_state::navarone)
+	geebee(config);
 
 	/* basic machine hardware */
 	MCFG_GFXDECODE_MODIFY("gfxdecode", 2k)
@@ -796,7 +798,8 @@ MACHINE_CONFIG_START(warpwarp_state::bombbee)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 MACHINE_CONFIG_END
 
-MACHINE_CONFIG_DERIVED(warpwarp_state::warpwarp, bombbee)
+MACHINE_CONFIG_START(warpwarp_state::warpwarp)
+	bombbee(config);
 
 	/* basic machine hardware */
 	MCFG_CPU_MODIFY("maincpu")
@@ -817,6 +820,18 @@ ROM_START( geebee )
 	ROM_REGION( 0x800, "gfx1", 0 )
 	ROM_LOAD( "geebee.3a",    0x0000, 0x0400, CRC(f257b21b) SHA1(c788fd923438f1bffbff9ff3cd4c5c8b547c0c14) )
 	ROM_RELOAD(               0x0400, 0x0400 )
+ROM_END
+
+ROM_START( geebeea )
+	ROM_REGION( 0x10000, "maincpu", 0 )
+	ROM_LOAD( "132",    0x0000, 0x0400, CRC(23252fc7) SHA1(433f0f435ff741a789942194356aaec53192608a) )
+	ROM_LOAD( "133",    0x0400, 0x0400, CRC(0bc4d4ca) SHA1(46028ce1dbf46e49b921cfabec78cded914af358) )
+	ROM_LOAD( "134",    0x0800, 0x0400, CRC(7899b4c1) SHA1(70f609f9873f1a4d9c8a90361c7519bdd24ad9ea) )
+	ROM_LOAD( "135",    0x0c00, 0x0400, CRC(0b6e6fcb) SHA1(e7c3e8a13e3d2be6cfb6675fb57cc4a2fda6bec2) )
+
+	ROM_REGION( 0x800, "gfx1", 0 )
+	ROM_LOAD( "a_136",  0x0000, 0x0400, CRC(bd01437d) SHA1(4324c68472f762a13f978e54b3c4a7984cc7195a) )
+	ROM_RELOAD(         0x0400, 0x0400 )
 ROM_END
 
 ROM_START( geebeeb )
@@ -997,6 +1012,7 @@ DRIVER_INIT_MEMBER(warpwarp_state,warpwarp)
 
 /* B & W games */
 GAMEL(1978, geebee,     0,        geebee,   geebee,    warpwarp_state, geebee,   ROT90, "Namco", "Gee Bee (Japan)", MACHINE_SUPPORTS_SAVE, layout_geebee )
+GAMEL(1978, geebeea,    geebee,   geebeeb,  geebeeb,   warpwarp_state, geebee,   ROT90, "Namco (Alca license)", "Gee Bee (UK)", MACHINE_SUPPORTS_SAVE, layout_geebee )
 GAMEL(1978, geebeeb,    geebee,   geebeeb,  geebeeb,   warpwarp_state, geebee,   ROT90, "Namco (F.lli Bertolino license)", "Gee Bee (Europe)", MACHINE_SUPPORTS_SAVE, layout_geebee ) // Fratelli Bertolino
 GAMEL(1978, geebeeg,    geebee,   geebee,   geebee,    warpwarp_state, geebee,   ROT90, "Namco (Gremlin license)", "Gee Bee (US)", MACHINE_SUPPORTS_SAVE, layout_geebee )
 

@@ -134,6 +134,10 @@ public:
 	DECLARE_PALETTE_INIT(flipjack);
 	uint32_t screen_update_flipjack(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 	void flipjack(machine_config &config);
+	void flipjack_main_io_map(address_map &map);
+	void flipjack_main_map(address_map &map);
+	void flipjack_sound_io_map(address_map &map);
+	void flipjack_sound_map(address_map &map);
 };
 
 
@@ -301,7 +305,7 @@ INPUT_CHANGED_MEMBER(flipjack_state::flipjack_coin)
 }
 
 
-static ADDRESS_MAP_START( flipjack_main_map, AS_PROGRAM, 8, flipjack_state )
+ADDRESS_MAP_START(flipjack_state::flipjack_main_map)
 	AM_RANGE(0x0000, 0x1fff) AM_ROM
 	AM_RANGE(0x2000, 0x3fff) AM_ROMBANK("bank1")
 	AM_RANGE(0x4000, 0x5fff) AM_RAM
@@ -318,12 +322,12 @@ static ADDRESS_MAP_START( flipjack_main_map, AS_PROGRAM, 8, flipjack_state )
 	AM_RANGE(0xe000, 0xffff) AM_RAM AM_SHARE("fb_ram")
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( flipjack_main_io_map, AS_IO, 8, flipjack_state )
+ADDRESS_MAP_START(flipjack_state::flipjack_main_io_map)
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	AM_RANGE(0xff, 0xff) AM_WRITE(flipjack_bank_w)
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( flipjack_sound_map, AS_PROGRAM, 8, flipjack_state )
+ADDRESS_MAP_START(flipjack_state::flipjack_sound_map)
 	AM_RANGE(0x0000, 0x1fff) AM_ROM
 	AM_RANGE(0x2000, 0x27ff) AM_RAM
 	AM_RANGE(0x4000, 0x4000) AM_DEVREADWRITE("ay2", ay8910_device, data_r, data_w)
@@ -332,7 +336,7 @@ static ADDRESS_MAP_START( flipjack_sound_map, AS_PROGRAM, 8, flipjack_state )
 	AM_RANGE(0xa000, 0xa000) AM_DEVWRITE("ay1", ay8910_device, address_w)
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( flipjack_sound_io_map, AS_IO, 8, flipjack_state )
+ADDRESS_MAP_START(flipjack_state::flipjack_sound_io_map)
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	AM_RANGE(0x00, 0x00) AM_WRITE(flipjack_sound_nmi_ack_w)
 ADDRESS_MAP_END

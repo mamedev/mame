@@ -347,6 +347,12 @@ public:
 	void souledge(machine_config &config);
 	void tekken(machine_config &config);
 	void tekken2(machine_config &config);
+	void c76_io_map(address_map &map);
+	void c76_map(address_map &map);
+	void namcos11_map(address_map &map);
+	void ptblank2ua_map(address_map &map);
+	void rom8_64_map(address_map &map);
+	void rom8_map(address_map &map);
 protected:
 	virtual void driver_start() override;
 
@@ -458,7 +464,7 @@ WRITE16_MEMBER( namcos11_state::c76_shared_w )
 	COMBINE_DATA( &m_sharedram.target()[ offset ] );
 }
 
-static ADDRESS_MAP_START( namcos11_map, AS_PROGRAM, 32, namcos11_state )
+ADDRESS_MAP_START(namcos11_state::namcos11_map)
 	AM_RANGE(0x1fa04000, 0x1fa0ffff) AM_READWRITE16(c76_shared_r, c76_shared_w, 0xffffffff) /* shared ram with C76 */
 	AM_RANGE(0x1fa20000, 0x1fa2001f) AM_DEVREADWRITE16("keycus", ns11_keycus_device, read, write, 0xffffffff)
 	AM_RANGE(0x1fa30000, 0x1fa30fff) AM_DEVREADWRITE8("at28c16", at28c16_device, read, write, 0x00ff00ff) /* eeprom */
@@ -466,7 +472,7 @@ static ADDRESS_MAP_START( namcos11_map, AS_PROGRAM, 32, namcos11_state )
 	AM_RANGE(0x1fbf6000, 0x1fbf6003) AM_WRITENOP /* ?? */
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( rom8_map, AS_PROGRAM, 32, namcos11_state )
+ADDRESS_MAP_START(namcos11_state::rom8_map)
 	AM_IMPORT_FROM(namcos11_map)
 
 	AM_RANGE(0x1f000000, 0x1f0fffff) AM_ROMBANK("bank1")
@@ -480,7 +486,7 @@ static ADDRESS_MAP_START( rom8_map, AS_PROGRAM, 32, namcos11_state )
 	AM_RANGE(0x1fa10020, 0x1fa1002f) AM_WRITE16(rom8_w, 0xffffffff)
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( rom8_64_map, AS_PROGRAM, 32, namcos11_state )
+ADDRESS_MAP_START(namcos11_state::rom8_64_map)
 	AM_IMPORT_FROM(namcos11_map)
 
 	AM_RANGE(0x1f000000, 0x1f0fffff) AM_ROMBANK("bank1")
@@ -495,14 +501,14 @@ static ADDRESS_MAP_START( rom8_64_map, AS_PROGRAM, 32, namcos11_state )
 	AM_RANGE(0x1fa10020, 0x1fa1002f) AM_READNOP AM_WRITE16(rom8_64_w, 0xffffffff)
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( ptblank2ua_map, AS_PROGRAM, 32, namcos11_state )
+ADDRESS_MAP_START(namcos11_state::ptblank2ua_map)
+	AM_IMPORT_FROM(rom8_64_map)
+
 	AM_RANGE(0x1f780000, 0x1f78000f) AM_READ16(lightgun_r, 0xffffffff)
 	AM_RANGE(0x1f788000, 0x1f788003) AM_WRITE16(lightgun_w, 0xffffffff)
-
-	AM_IMPORT_FROM(rom8_64_map)
 ADDRESS_MAP_END
 
-ADDRESS_MAP_START( c76_map, AS_PROGRAM, 16, namcos11_state )
+ADDRESS_MAP_START(namcos11_state::c76_map)
 	AM_RANGE(0x002000, 0x002fff) AM_DEVREADWRITE("c352", c352_device, read, write)
 	AM_RANGE(0x001000, 0x001001) AM_READ_PORT("PLAYER4")
 	AM_RANGE(0x001002, 0x001003) AM_READ_PORT("SWITCH")
@@ -516,7 +522,8 @@ ADDRESS_MAP_START( c76_map, AS_PROGRAM, 16, namcos11_state )
 	AM_RANGE(0x301000, 0x301001) AM_WRITENOP
 ADDRESS_MAP_END
 
-ADDRESS_MAP_START( c76_io_map, AS_IO, 8, namcos11_state )
+ADDRESS_MAP_START(namcos11_state::c76_io_map)
+	AM_RANGE(M37710_ADC0_H, M37710_ADC7_H) AM_READNOP
 	AM_RANGE(M37710_ADC0_L, M37710_ADC0_L) AM_READ_PORT("ADC0")
 	AM_RANGE(M37710_ADC1_L, M37710_ADC1_L) AM_READ_PORT("ADC1")
 	AM_RANGE(M37710_ADC2_L, M37710_ADC2_L) AM_READ_PORT("ADC2")
@@ -525,7 +532,6 @@ ADDRESS_MAP_START( c76_io_map, AS_IO, 8, namcos11_state )
 	AM_RANGE(M37710_ADC5_L, M37710_ADC5_L) AM_READ_PORT("ADC5")
 	AM_RANGE(M37710_ADC6_L, M37710_ADC6_L) AM_READ_PORT("ADC6")
 	AM_RANGE(M37710_ADC7_L, M37710_ADC7_L) AM_READ_PORT("ADC7")
-	AM_RANGE(M37710_ADC0_H, M37710_ADC7_H) AM_READNOP
 ADDRESS_MAP_END
 
 READ16_MEMBER(namcos11_state::c76_speedup_r)
@@ -621,7 +627,8 @@ MACHINE_CONFIG_START(namcos11_state::coh110)
 	MCFG_AT28C16_ADD( "at28c16", nullptr )
 MACHINE_CONFIG_END
 
-MACHINE_CONFIG_DERIVED(namcos11_state::coh100, coh110)
+MACHINE_CONFIG_START(namcos11_state::coh100)
+	coh110(config);
 	MCFG_CPU_REPLACE( "maincpu", CXD8530AQ, XTAL(67'737'600) )
 	MCFG_CPU_PROGRAM_MAP( namcos11_map )
 
@@ -631,7 +638,8 @@ MACHINE_CONFIG_DERIVED(namcos11_state::coh100, coh110)
 	MCFG_PSXGPU_REPLACE( "maincpu", "gpu", CXD8538Q, 0x200000, XTAL(53'693'175) )
 MACHINE_CONFIG_END
 
-MACHINE_CONFIG_DERIVED(namcos11_state::tekken, coh100)
+MACHINE_CONFIG_START(namcos11_state::tekken)
+	coh100(config);
 	MCFG_CPU_MODIFY( "maincpu" )
 	MCFG_CPU_PROGRAM_MAP( rom8_map )
 
@@ -639,74 +647,85 @@ MACHINE_CONFIG_DERIVED(namcos11_state::tekken, coh100)
 	MCFG_DEVICE_ADD( "keycus", KEYCUS_C406, 0 )
 MACHINE_CONFIG_END
 
-MACHINE_CONFIG_DERIVED(namcos11_state::tekken2o, coh100)
+MACHINE_CONFIG_START(namcos11_state::tekken2o)
+	coh100(config);
 	MCFG_CPU_MODIFY( "maincpu" )
 	MCFG_CPU_PROGRAM_MAP( rom8_map )
 
 	MCFG_DEVICE_ADD( "keycus", KEYCUS_C406, 0 )
 MACHINE_CONFIG_END
 
-MACHINE_CONFIG_DERIVED(namcos11_state::tekken2, coh110)
+MACHINE_CONFIG_START(namcos11_state::tekken2)
+	coh110(config);
 	MCFG_CPU_MODIFY( "maincpu" )
 	MCFG_CPU_PROGRAM_MAP( rom8_map )
 
 	MCFG_DEVICE_ADD( "keycus", KEYCUS_C406, 0 )
 MACHINE_CONFIG_END
 
-MACHINE_CONFIG_DERIVED(namcos11_state::souledge, coh110)
+MACHINE_CONFIG_START(namcos11_state::souledge)
+	coh110(config);
 	MCFG_CPU_MODIFY( "maincpu" )
 	MCFG_CPU_PROGRAM_MAP( rom8_map )
 
 	MCFG_DEVICE_ADD( "keycus", KEYCUS_C409, 0 )
 MACHINE_CONFIG_END
 
-MACHINE_CONFIG_DERIVED(namcos11_state::dunkmnia, coh110)
+MACHINE_CONFIG_START(namcos11_state::dunkmnia)
+	coh110(config);
 	MCFG_CPU_MODIFY( "maincpu" )
 	MCFG_CPU_PROGRAM_MAP( rom8_map )
 
 	MCFG_DEVICE_ADD( "keycus", KEYCUS_C410, 0 )
 MACHINE_CONFIG_END
 
-MACHINE_CONFIG_DERIVED(namcos11_state::primglex, coh110)
+MACHINE_CONFIG_START(namcos11_state::primglex)
+	coh110(config);
 	MCFG_CPU_MODIFY( "maincpu" )
 	MCFG_CPU_PROGRAM_MAP( rom8_map )
 
 	MCFG_DEVICE_ADD( "keycus", KEYCUS_C411, 0 )
 MACHINE_CONFIG_END
 
-MACHINE_CONFIG_DERIVED(namcos11_state::xevi3dg, coh110)
+MACHINE_CONFIG_START(namcos11_state::xevi3dg)
+	coh110(config);
 	MCFG_CPU_MODIFY( "maincpu" )
 	MCFG_CPU_PROGRAM_MAP( rom8_map )
 
 	MCFG_DEVICE_ADD( "keycus", KEYCUS_C430, 0 )
 MACHINE_CONFIG_END
 
-MACHINE_CONFIG_DERIVED(namcos11_state::danceyes, coh110)
+MACHINE_CONFIG_START(namcos11_state::danceyes)
+	coh110(config);
 	MCFG_CPU_MODIFY( "maincpu" )
 	MCFG_CPU_PROGRAM_MAP( rom8_map )
 
 	MCFG_DEVICE_ADD( "keycus", KEYCUS_C431, 0 )
 MACHINE_CONFIG_END
 
-MACHINE_CONFIG_DERIVED(namcos11_state::pocketrc, coh110)
+MACHINE_CONFIG_START(namcos11_state::pocketrc)
+	coh110(config);
 	MCFG_CPU_MODIFY( "maincpu" )
 	MCFG_CPU_PROGRAM_MAP( rom8_map )
 
 	MCFG_DEVICE_ADD( "keycus", KEYCUS_C432, 0 )
 MACHINE_CONFIG_END
 
-MACHINE_CONFIG_DERIVED(namcos11_state::starswep, coh110)
+MACHINE_CONFIG_START(namcos11_state::starswep)
+	coh110(config);
 	MCFG_DEVICE_ADD( "keycus", KEYCUS_C442, 0 )
 MACHINE_CONFIG_END
 
-MACHINE_CONFIG_DERIVED(namcos11_state::myangel3, coh110)
+MACHINE_CONFIG_START(namcos11_state::myangel3)
+	coh110(config);
 	MCFG_CPU_MODIFY( "maincpu" )
 	MCFG_CPU_PROGRAM_MAP( rom8_64_map )
 
 	MCFG_DEVICE_ADD( "keycus", KEYCUS_C443, 0 )
 MACHINE_CONFIG_END
 
-MACHINE_CONFIG_DERIVED(namcos11_state::ptblank2ua, coh110)
+MACHINE_CONFIG_START(namcos11_state::ptblank2ua)
+	coh110(config);
 	MCFG_CPU_MODIFY( "maincpu" )
 	MCFG_CPU_PROGRAM_MAP( ptblank2ua_map )
 

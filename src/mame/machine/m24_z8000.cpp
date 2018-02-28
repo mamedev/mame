@@ -40,27 +40,29 @@ const tiny_rom_entry *m24_z8000_device::device_rom_region() const
 	return ROM_NAME( m24_z8000 );
 }
 
-static ADDRESS_MAP_START(z8000_prog, AS_PROGRAM, 16, m24_z8000_device)
+ADDRESS_MAP_START(m24_z8000_device::z8000_prog)
+	AM_RANGE(0x00000, 0xfffff) AM_READWRITE(pmem_r, pmem_w)
+
 	AM_RANGE(0x40000, 0x43fff) AM_ROM AM_REGION("z8000", 0)
 	AM_RANGE(0x50000, 0x53fff) AM_ROM AM_REGION("z8000", 0)
 	AM_RANGE(0x70000, 0x73fff) AM_ROM AM_REGION("z8000", 0)
-	AM_RANGE(0x00000, 0xfffff) AM_READWRITE(pmem_r, pmem_w)
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START(z8000_data, AS_DATA, 16, m24_z8000_device)
+ADDRESS_MAP_START(m24_z8000_device::z8000_data)
+	AM_RANGE(0x00000, 0xfffff) AM_READWRITE(dmem_r, dmem_w)
+
 	AM_RANGE(0x40000, 0x43fff) AM_ROM AM_REGION("z8000", 0)
 	AM_RANGE(0x70000, 0x73fff) AM_ROM AM_REGION("z8000", 0)
-	AM_RANGE(0x00000, 0xfffff) AM_READWRITE(dmem_r, dmem_w)
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START(z8000_io, AS_IO, 16, m24_z8000_device)
+ADDRESS_MAP_START(m24_z8000_device::z8000_io)
 	AM_RANGE(0x0080, 0x0081) AM_WRITE8(irqctl_w, 0x00ff)
 	AM_RANGE(0x00a0, 0x00a1) AM_WRITE8(serctl_w, 0x00ff)
 	AM_RANGE(0x00c0, 0x00c1) AM_DEVREADWRITE8("i8251", i8251_device, data_r, data_w, 0x00ff)
 	AM_RANGE(0x00c2, 0x00c3) AM_DEVREADWRITE8("i8251", i8251_device, status_r, control_w, 0x00ff)
 	AM_RANGE(0x0120, 0x0127) AM_DEVREADWRITE8("pit8253", pit8253_device, read, write, 0x00ff)
-	AM_RANGE(0x80c0, 0x80c1) AM_READWRITE8(handshake_r, handshake_w, 0x00ff)
 	AM_RANGE(0x8000, 0x83ff) AM_READWRITE(i86_io_r, i86_io_w)
+	AM_RANGE(0x80c0, 0x80c1) AM_READWRITE8(handshake_r, handshake_w, 0x00ff)
 ADDRESS_MAP_END
 
 MACHINE_CONFIG_START(m24_z8000_device::device_add_mconfig)

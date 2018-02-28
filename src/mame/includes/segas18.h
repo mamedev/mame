@@ -62,8 +62,8 @@ public:
 
 	// memory mapping
 	void memory_mapper(sega_315_5195_mapper_device &mapper, uint8_t index);
-	uint8_t mapper_sound_r();
-	void mapper_sound_w(uint8_t data);
+	DECLARE_READ8_MEMBER(mapper_sound_r);
+	DECLARE_WRITE8_MEMBER(mapper_sound_w);
 
 	// read/write handlers
 	DECLARE_WRITE8_MEMBER( rom_5874_bank_w );
@@ -108,6 +108,11 @@ public:
 	void system18_fd1094_i8751(machine_config &config);
 	void lghost(machine_config &config);
 	void system18_i8751(machine_config &config);
+	void decrypted_opcodes_map(address_map &map);
+	void mcu_io_map(address_map &map);
+	void sound_map(address_map &map);
+	void sound_portmap(address_map &map);
+	void system18_map(address_map &map);
 protected:
 	// timer IDs
 	enum

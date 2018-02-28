@@ -17,6 +17,7 @@ Year + Game          Board#
 94  Paradise         YS-1600
 94  Paradise Deluxe  YS-1604
 95  Target Ball      YS-2002
+96  Target Ball '96  YS-2002
 96  Penky            YS951004
 96  Torus            YS-0402? Looks identical
 98  Mad Ball         YS-0402
@@ -28,8 +29,6 @@ paradise: I'm not sure it's working correctly:
 
 - The high scores table can't be entered !?
 
-
-Known to exist but not dumped is Target Ball '96
 
 penky: we need to delay the irqs at startup or it won't boot. Either one of
        ports 0x2003.r or 0x2005.w starts up the irq timer (confirmed via trojan)
@@ -129,7 +128,7 @@ WRITE8_MEMBER(paradise_state::torus_coin_counter_w)
 	machine().bookkeeping().coin_counter_w(0, data ^ 0xff);
 }
 
-static ADDRESS_MAP_START( base_map, AS_PROGRAM, 8, paradise_state )
+ADDRESS_MAP_START(paradise_state::base_map)
 	AM_RANGE(0x0000, 0x7fff) AM_ROM /* ROM */
 	AM_RANGE(0x8000, 0xbfff) AM_ROMBANK("prgbank")    /* ROM (banked) */
 	AM_RANGE(0xc000, 0xc7ff) AM_RAM_WRITE(vram_2_w) AM_SHARE("vram_2") /* Background */
@@ -137,27 +136,27 @@ static ADDRESS_MAP_START( base_map, AS_PROGRAM, 8, paradise_state )
 	AM_RANGE(0xd000, 0xd7ff) AM_RAM_WRITE(vram_0_w) AM_SHARE("vram_0") /* Foreground */
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( paradise_map, AS_PROGRAM, 8, paradise_state )
+ADDRESS_MAP_START(paradise_state::paradise_map)
+	AM_IMPORT_FROM(base_map)
 	AM_RANGE(0xd800, 0xd8ff) AM_RAM // RAM
 	AM_RANGE(0xd900, 0xe0ff) AM_RAM AM_SHARE("spriteram")   // Sprites
 	AM_RANGE(0xe100, 0xffff) AM_RAM // RAM
-	AM_IMPORT_FROM(base_map)
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( tgtball_map, AS_PROGRAM, 8, paradise_state )
+ADDRESS_MAP_START(paradise_state::tgtball_map)
+	AM_IMPORT_FROM(base_map)
 	AM_RANGE(0xd800, 0xd8ff) AM_RAM // RAM
 	AM_RANGE(0xd900, 0xd9ff) AM_RAM AM_SHARE("spriteram")   // Sprites
 	AM_RANGE(0xda00, 0xffff) AM_RAM // RAM
-	AM_IMPORT_FROM(base_map)
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( torus_map, AS_PROGRAM, 8, paradise_state )
+ADDRESS_MAP_START(paradise_state::torus_map)
+	AM_IMPORT_FROM(base_map)
 	AM_RANGE(0xd800, 0xdfff) AM_RAM AM_SHARE("spriteram")   // Sprites
 	AM_RANGE(0xe000, 0xffff) AM_RAM // RAM
-	AM_IMPORT_FROM(base_map)
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( torus_io_map, AS_IO, 8, paradise_state )
+ADDRESS_MAP_START(paradise_state::torus_io_map)
 	AM_RANGE(0x0000, 0x17ff) AM_RAM_WRITE(palette_w) AM_SHARE("paletteram")    // Palette
 	AM_RANGE(0x1800, 0x1800) AM_WRITE(priority_w)  // Layers priority
 	AM_RANGE(0x2001, 0x2001) AM_WRITE(flipscreen_w)    // Flip Screen
@@ -172,10 +171,10 @@ static ADDRESS_MAP_START( torus_io_map, AS_IO, 8, paradise_state )
 	AM_RANGE(0x8000, 0xffff) AM_RAM_WRITE(pixmap_w) AM_SHARE("videoram")   // Pixmap
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( paradise_io_map, AS_IO, 8, paradise_state )
+ADDRESS_MAP_START(paradise_state::paradise_io_map)
+	AM_IMPORT_FROM(torus_io_map)
 	AM_RANGE(0x2007, 0x2007) AM_WRITE(paradise_okibank_w)   // OKI 1 samples bank
 	AM_RANGE(0x2030, 0x2030) AM_DEVREADWRITE("oki2", okim6295_device, read, write)  // OKI 1
-	AM_IMPORT_FROM(torus_io_map)
 ADDRESS_MAP_END
 
 
@@ -758,14 +757,16 @@ MACHINE_CONFIG_START(paradise_state::paradise)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
 MACHINE_CONFIG_END
 
-MACHINE_CONFIG_DERIVED(paradise_state::tgtball, paradise)
+MACHINE_CONFIG_START(paradise_state::tgtball)
+	paradise(config);
 
 	/* basic machine hardware */
 	MCFG_CPU_MODIFY("maincpu")
 	MCFG_CPU_PROGRAM_MAP(tgtball_map)
 MACHINE_CONFIG_END
 
-MACHINE_CONFIG_DERIVED(paradise_state::torus, paradise)
+MACHINE_CONFIG_START(paradise_state::torus)
+	paradise(config);
 
 	/* basic machine hardware */
 	MCFG_CPU_MODIFY("maincpu")
@@ -779,7 +780,8 @@ MACHINE_CONFIG_DERIVED(paradise_state::torus, paradise)
 	MCFG_DEVICE_REMOVE("oki2")
 MACHINE_CONFIG_END
 
-MACHINE_CONFIG_DERIVED(paradise_state::madball, torus)
+MACHINE_CONFIG_START(paradise_state::madball)
+	torus(config);
 
 	MCFG_GFXDECODE_MODIFY("gfxdecode", madball)
 
@@ -787,7 +789,8 @@ MACHINE_CONFIG_DERIVED(paradise_state::madball, torus)
 	MCFG_SCREEN_UPDATE_DRIVER(paradise_state, screen_update_madball)
 MACHINE_CONFIG_END
 
-MACHINE_CONFIG_DERIVED(paradise_state::penky, paradise)
+MACHINE_CONFIG_START(paradise_state::penky)
+	paradise(config);
 
 	/* basic machine hardware */
 	MCFG_CPU_MODIFY("maincpu")
@@ -796,7 +799,8 @@ MACHINE_CONFIG_DERIVED(paradise_state::penky, paradise)
 MACHINE_CONFIG_END
 
 
-MACHINE_CONFIG_DERIVED(paradise_state::penkyi, penky)
+MACHINE_CONFIG_START(paradise_state::penkyi)
+	penky(config);
 
 	// TODO add ticket dispenser
 
@@ -892,55 +896,55 @@ ROM_START( paradise )
 ROM_END
 
 ROM_START( paradisea )
-		ROM_REGION( 0x40000, "maincpu", 0 )     /* Z80 Code */
-		ROM_LOAD( "a-19.U128", 0x00000, 0x40000, CRC(d47ecb7e) SHA1(74e7a33f2fc4c7c830c53c50541c3d0efd152e98) )
+	ROM_REGION( 0x40000, "maincpu", 0 )     /* Z80 Code */
+	ROM_LOAD( "a-19.U128", 0x00000, 0x40000, CRC(d47ecb7e) SHA1(74e7a33f2fc4c7c830c53c50541c3d0efd152e98) )
 
-		ROM_REGION( 0x80000, "gfx1", ROMREGION_INVERT)  /* 16x16x8 Sprites */
-		ROM_LOAD( "a-19.u114", 0x00000, 0x40000, CRC(c748ba3b) SHA1(ad23bda4e001ca539f849c1ca256de5daf7c233b) )
-		ROM_LOAD( "a-19.u115", 0x40000, 0x40000, CRC(0d517bbb) SHA1(5bf7c5036f3d660901e26f14baaea1a3c0327dfe) )
+	ROM_REGION( 0x80000, "gfx1", ROMREGION_INVERT)  /* 16x16x8 Sprites */
+	ROM_LOAD( "a-19.u114", 0x00000, 0x40000, CRC(c748ba3b) SHA1(ad23bda4e001ca539f849c1ca256de5daf7c233b) )
+	ROM_LOAD( "a-19.u115", 0x40000, 0x40000, CRC(0d517bbb) SHA1(5bf7c5036f3d660901e26f14baaea1a3c0327dfe) )
 
-		ROM_REGION( 0x20000, "gfx2", ROMREGION_INVERT)  /* 8x8x4 Background */
-		ROM_LOAD( "a-19.u94", 0x00000, 0x20000, CRC(e3a99209) SHA1(5db79dc1a38d93b458b043499a58516285c65aa8) )
+	ROM_REGION( 0x20000, "gfx2", ROMREGION_INVERT)  /* 8x8x4 Background */
+	ROM_LOAD( "a-19.u94", 0x00000, 0x20000, CRC(e3a99209) SHA1(5db79dc1a38d93b458b043499a58516285c65aa8) )
 
-		ROM_REGION( 0x100000, "gfx3", ROMREGION_INVERT) /* 8x8x8 Foreground */
-		ROM_LOAD( "a-19.u92", 0x00000, 0x80000, CRC(633d24f0) SHA1(26b25ec1014fba1a3d0d2bdba0c867c57034647d) )
-		ROM_LOAD( "a-19.u93", 0x80000, 0x80000, CRC(bbf5c632) SHA1(9d31e136f014c2dd7dd988c3aee0adfcfea91bc9) )
+	ROM_REGION( 0x100000, "gfx3", ROMREGION_INVERT) /* 8x8x8 Foreground */
+	ROM_LOAD( "a-19.u92", 0x00000, 0x80000, CRC(633d24f0) SHA1(26b25ec1014fba1a3d0d2bdba0c867c57034647d) )
+	ROM_LOAD( "a-19.u93", 0x80000, 0x80000, CRC(bbf5c632) SHA1(9d31e136f014c2dd7dd988c3aee0adfcfea91bc9) )
 
-		ROM_REGION( 0x40000, "gfx4", ROMREGION_INVERT)  /* 8x8x8 Midground */
-		ROM_LOAD( "a-19.u110", 0x00000, 0x20000, CRC(9807a7e6) SHA1(30e2a741a93954cfe672c61c93a990d0c3b25145) )
-		ROM_LOAD( "a-19.u111", 0x20000, 0x20000, CRC(bc9f93f0) SHA1(dd4cfc849a0c0f918ac0dfeb7f00a67aae5a1c13) )
+	ROM_REGION( 0x40000, "gfx4", ROMREGION_INVERT)  /* 8x8x8 Midground */
+	ROM_LOAD( "a-19.u110", 0x00000, 0x20000, CRC(9807a7e6) SHA1(30e2a741a93954cfe672c61c93a990d0c3b25145) )
+	ROM_LOAD( "a-19.u111", 0x20000, 0x20000, CRC(bc9f93f0) SHA1(dd4cfc849a0c0f918ac0dfeb7f00a67aae5a1c13) )
 
-		ROM_REGION( 0x40000, "oki1", 0 )    /* Samples */
-		ROM_LOAD( "a-19.u85", 0x00000, 0x40000, CRC(bf3c3065) SHA1(54dd7ffea2fb3f31ed575e982b82691cddc2581a) )
+	ROM_REGION( 0x40000, "oki1", 0 )    /* Samples */
+	ROM_LOAD( "a-19.u85", 0x00000, 0x40000, CRC(bf3c3065) SHA1(54dd7ffea2fb3f31ed575e982b82691cddc2581a) )
 
-		ROM_REGION( 0x80000, "oki2", 0 )    /* Samples (banked) */
-		ROM_LOAD( "a-19.u113", 0x00000, 0x80000, CRC(53de6025) SHA1(c94b3778b57ff7f46ce4cff661841019fb187d5d) )
+	ROM_REGION( 0x80000, "oki2", 0 )    /* Samples (banked) */
+	ROM_LOAD( "a-19.u113", 0x00000, 0x80000, CRC(53de6025) SHA1(c94b3778b57ff7f46ce4cff661841019fb187d5d) )
 ROM_END
 
 ROM_START( paradisee ) /* YS-1600 PCB. All labels are simply labeled "Escape" */
-		ROM_REGION( 0x40000, "maincpu", 0 )     /* Z80 Code */
-		ROM_LOAD( "escape.U128", 0x00000, 0x40000, CRC(19b4e854) SHA1(7d7292017df67b7ed3a3e0059334866890c58b83) )
+	ROM_REGION( 0x40000, "maincpu", 0 )     /* Z80 Code */
+	ROM_LOAD( "escape.U128", 0x00000, 0x40000, CRC(19b4e854) SHA1(7d7292017df67b7ed3a3e0059334866890c58b83) )
 
-		ROM_REGION( 0x80000, "gfx1", ROMREGION_INVERT)  /* 16x16x8 Sprites */
-		ROM_LOAD( "escape.u114", 0x00000, 0x40000, CRC(c748ba3b) SHA1(ad23bda4e001ca539f849c1ca256de5daf7c233b) )
-		ROM_LOAD( "escape.u115", 0x40000, 0x40000, CRC(0d517bbb) SHA1(5bf7c5036f3d660901e26f14baaea1a3c0327dfe) )
+	ROM_REGION( 0x80000, "gfx1", ROMREGION_INVERT)  /* 16x16x8 Sprites */
+	ROM_LOAD( "escape.u114", 0x00000, 0x40000, CRC(c748ba3b) SHA1(ad23bda4e001ca539f849c1ca256de5daf7c233b) )
+	ROM_LOAD( "escape.u115", 0x40000, 0x40000, CRC(0d517bbb) SHA1(5bf7c5036f3d660901e26f14baaea1a3c0327dfe) )
 
-		ROM_REGION( 0x20000, "gfx2", ROMREGION_INVERT)  /* 8x8x4 Background */
-		ROM_LOAD( "escape.u94", 0x00000, 0x20000, CRC(e3a99209) SHA1(5db79dc1a38d93b458b043499a58516285c65aa8) )
+	ROM_REGION( 0x20000, "gfx2", ROMREGION_INVERT)  /* 8x8x4 Background */
+	ROM_LOAD( "escape.u94", 0x00000, 0x20000, CRC(e3a99209) SHA1(5db79dc1a38d93b458b043499a58516285c65aa8) )
 
-		ROM_REGION( 0x100000, "gfx3", ROMREGION_INVERT) /* 8x8x8 Foreground */
-		ROM_LOAD( "escape.u92", 0x00000, 0x80000, CRC(633d24f0) SHA1(26b25ec1014fba1a3d0d2bdba0c867c57034647d) )
-		ROM_LOAD( "escape.u93", 0x80000, 0x80000, CRC(bbf5c632) SHA1(9d31e136f014c2dd7dd988c3aee0adfcfea91bc9) )
+	ROM_REGION( 0x100000, "gfx3", ROMREGION_INVERT) /* 8x8x8 Foreground */
+	ROM_LOAD( "escape.u92", 0x00000, 0x80000, CRC(633d24f0) SHA1(26b25ec1014fba1a3d0d2bdba0c867c57034647d) )
+	ROM_LOAD( "escape.u93", 0x80000, 0x80000, CRC(bbf5c632) SHA1(9d31e136f014c2dd7dd988c3aee0adfcfea91bc9) )
 
-		ROM_REGION( 0x40000, "gfx4", ROMREGION_INVERT)  /* 8x8x8 Midground */
-		ROM_LOAD( "escape.u110", 0x00000, 0x20000, CRC(9807a7e6) SHA1(30e2a741a93954cfe672c61c93a990d0c3b25145) )
-		ROM_LOAD( "escape.u111", 0x20000, 0x20000, CRC(bc9f93f0) SHA1(dd4cfc849a0c0f918ac0dfeb7f00a67aae5a1c13) )
+	ROM_REGION( 0x40000, "gfx4", ROMREGION_INVERT)  /* 8x8x8 Midground */
+	ROM_LOAD( "escape.u110", 0x00000, 0x20000, CRC(9807a7e6) SHA1(30e2a741a93954cfe672c61c93a990d0c3b25145) )
+	ROM_LOAD( "escape.u111", 0x20000, 0x20000, CRC(bc9f93f0) SHA1(dd4cfc849a0c0f918ac0dfeb7f00a67aae5a1c13) )
 
-		ROM_REGION( 0x40000, "oki1", 0 )    /* Samples */
-		ROM_LOAD( "escape.u85", 0x00000, 0x40000, CRC(bf3c3065) SHA1(54dd7ffea2fb3f31ed575e982b82691cddc2581a) )
+	ROM_REGION( 0x40000, "oki1", 0 )    /* Samples */
+	ROM_LOAD( "escape.u85", 0x00000, 0x40000, CRC(bf3c3065) SHA1(54dd7ffea2fb3f31ed575e982b82691cddc2581a) )
 
-		ROM_REGION( 0x80000, "oki2", 0 )    /* Samples (banked) */
-		ROM_LOAD( "escape.u113", 0x00000, 0x80000, CRC(53de6025) SHA1(c94b3778b57ff7f46ce4cff661841019fb187d5d) )
+	ROM_REGION( 0x80000, "oki2", 0 )    /* Samples (banked) */
+	ROM_LOAD( "escape.u113", 0x00000, 0x80000, CRC(53de6025) SHA1(c94b3778b57ff7f46ce4cff661841019fb187d5d) )
 ROM_END
 
 ROM_START( paradlx )
@@ -1039,7 +1043,33 @@ Notes:
 
 ***************************************************************************/
 
-ROM_START( tgtball )
+ROM_START( tgtbal96 ) /* mainly a title screen hack?? But original Yun Sung PCB and rom labels */
+	ROM_REGION( 0x40000, "maincpu", 0 )     /* Z80 Code */
+	ROM_LOAD( "bc7.u128", 0x00000, 0x40000, CRC(3ae07ee5) SHA1(830890e5fe93fa85f306df06c5b84c7f2aa266c8) )
+
+	ROM_REGION( 0x80000, "gfx1", ROMREGION_INVERT)  /* 16x16x8 Sprites */
+	ROM_LOAD( "yunsung.u114", 0x00000, 0x40000, CRC(3dbe1872) SHA1(754f90123a3944ca548fc66ee65a93615155bf30) )
+	ROM_LOAD( "yunsung.u115", 0x40000, 0x40000, CRC(30f49dac) SHA1(b70d37973bd03069c48641d6c0804be6f9aa6553) )
+
+	ROM_REGION( 0x20000, "gfx2", ROMREGION_ERASEFF) /* 8x8x4 Background */
+	/* not for this game? */
+
+	ROM_REGION( 0x100000, "gfx3", ROMREGION_INVERT) /* 8x8x8 Foreground */
+	ROM_LOAD( "bc10.u92", 0x00000, 0x80000, CRC(2f511f93) SHA1(4d4b543e981855fdd42b9902c8d85a56dc2bb8a6) ) /* Slide show reveals the title screen added a newer copyright and the '96 */
+	ROM_LOAD( "bc11.u93", 0x80000, 0x80000, CRC(c5acf1e0) SHA1(6306a231cfe6fb5ebc86ea7adf122331b8b830ca) ) /* otherwise the graphics appear to be the same as the tgtballn below */
+
+	ROM_REGION( 0x100000, "gfx4", ROMREGION_INVERT) /* 8x8x8 Midground */
+	ROM_LOAD( "bc8.u110", 0x00000, 0x80000,  CRC(f97d754e) SHA1(0fb32d77d79ee0f438bafbfb09836278b587acca) )
+	ROM_LOAD( "bc9.u111", 0x80000, 0x80000,  CRC(ee0728c0) SHA1(6a2a782f744c7d9318a63acc060046de01fc9ee5) )
+
+	ROM_REGION( 0x40000, "oki1", 0 )    /* Samples */
+	ROM_LOAD( "yunsung.u85", 0x00000, 0x20000, CRC(cdf3336b) SHA1(98029d6d5d8ffb3b24ae2bcf950618a7d5b404c3) )
+
+	ROM_REGION( 0x80000, "oki2", 0 )    /* Samples (banked) */
+	ROM_LOAD( "yunsung.u113", 0x00000, 0x40000, CRC(150a6cc6) SHA1(b435fcf8ba48006f506db6b63ba54a30a6b3eade) )
+ROM_END
+
+ROM_START( tgtballn )
 	ROM_REGION( 0x40000, "maincpu", 0 )     /* Z80 Code */
 	ROM_LOAD( "rom7.u128", 0x00000, 0x40000, CRC(8dbeab12) SHA1(7181c23459990aecbe2d13377aaf19f65108eac6) )
 
@@ -1065,7 +1095,7 @@ ROM_START( tgtball )
 	ROM_LOAD( "yunsung.u113", 0x00000, 0x40000, CRC(150a6cc6) SHA1(b435fcf8ba48006f506db6b63ba54a30a6b3eade) )
 ROM_END
 
-ROM_START( tgtballa )
+ROM_START( tgtball )
 	ROM_REGION( 0x40000, "maincpu", 0 )     /* Z80 Code */
 	ROM_LOAD( "yunsung.u128", 0x00000, 0x40000, CRC(cb0f3d46) SHA1(b56c4abbd4248074c1559a0f1902d2ea11cb01a8) )
 
@@ -1383,8 +1413,9 @@ GAME( 1994,  paradisea, paradise, paradise, paradise, paradise_state, paradise, 
 GAME( 1994,  paradisee, paradise, paradise, paradise, paradise_state, paradise, ROT90, "Yun Sung (Escape license)", "Paradise (Escape)", MACHINE_SUPPORTS_SAVE )
 GAME( 199?,  paradlx,  0,         paradise, paradise, paradise_state, paradise, ROT90, "Yun Sung", "Paradise Deluxe", MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE ) // year not shown, but should be >=1994
 GAME( 199?,  para2dx,  0,         paradise, para2dx,  paradise_state, paradise, ROT90, "Yun Sung", "Paradise 2 Deluxe", MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE ) // year not shown, but should be >=1994
-GAME( 1995,  tgtball,  0,         tgtball,  tgtball,  paradise_state, tgtball,  ROT0,  "Yun Sung", "Target Ball (Nude)", MACHINE_SUPPORTS_SAVE )
-GAME( 1995,  tgtballa, tgtball,   tgtball,  tgtball,  paradise_state, tgtball,  ROT0,  "Yun Sung", "Target Ball", MACHINE_SUPPORTS_SAVE )
+GAME( 1996,  tgtbal96, 0,         tgtball,  tgtball,  paradise_state, tgtball,  ROT0,  "Yun Sung", "Target Ball '96", MACHINE_SUPPORTS_SAVE ) // With nudity
+GAME( 1995,  tgtball,  tgtbal96,  tgtball,  tgtball,  paradise_state, tgtball,  ROT0,  "Yun Sung", "Target Ball", MACHINE_SUPPORTS_SAVE )
+GAME( 1995,  tgtballn, tgtbal96,  tgtball,  tgtball,  paradise_state, tgtball,  ROT0,  "Yun Sung", "Target Ball (With Nudity)", MACHINE_SUPPORTS_SAVE )
 GAME( 1996,  penky,    0,         penky,    penky,    paradise_state, tgtball,  ROT0,  "Yun Sung", "Penky", MACHINE_SUPPORTS_SAVE )
 GAME( 1996,  penkyi,   penky,     penkyi,   penkyi,   paradise_state, tgtball,  ROT0,  "Yun Sung (Impeuropex license)", "Penky (Italian)", MACHINE_SUPPORTS_SAVE )
 GAME( 1996,  torus,    0,         torus,    torus,    paradise_state, torus,    ROT90, "Yun Sung", "Torus", MACHINE_SUPPORTS_SAVE )

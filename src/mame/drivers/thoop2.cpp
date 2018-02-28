@@ -116,12 +116,12 @@ READ8_MEMBER(thoop2_state::shareram_r)
 }
 
 
-static ADDRESS_MAP_START( mcu_hostmem_map, 0, 8, thoop2_state )
+ADDRESS_MAP_START(thoop2_state::mcu_hostmem_map)
 	AM_RANGE(0x8000, 0xffff) AM_READWRITE(shareram_r, shareram_w) // confirmed that 0x8000 - 0xffff is a window into 68k shared RAM
 ADDRESS_MAP_END
 
 
-static ADDRESS_MAP_START( thoop2_map, AS_PROGRAM, 16, thoop2_state )
+ADDRESS_MAP_START(thoop2_state::thoop2_map)
 	AM_RANGE(0x000000, 0x0fffff) AM_ROM                                                 /* ROM */
 	AM_RANGE(0x100000, 0x101fff) AM_RAM_WRITE(vram_w) AM_SHARE("videoram")   /* Video RAM */
 	AM_RANGE(0x108000, 0x108007) AM_WRITEONLY AM_SHARE("vregs")                 /* Video Registers */
@@ -133,7 +133,7 @@ static ADDRESS_MAP_START( thoop2_map, AS_PROGRAM, 16, thoop2_state )
 	AM_RANGE(0x700004, 0x700005) AM_READ_PORT("P1")
 	AM_RANGE(0x700006, 0x700007) AM_READ_PORT("P2")
 	AM_RANGE(0x700008, 0x700009) AM_READ_PORT("SYSTEM")
-	AM_RANGE(0x70000a, 0x70000b) AM_SELECT(0x000070) AM_DEVWRITE8_MOD("outlatch", ls259_device, write_d0, rshift<3>, 0x00ff)
+	;map(0x70000a, 0x70000b).select(0x000070).lw8("outlatch_w", [this](address_space &space, offs_t offset, u8 data, u8 mem_mask){ m_outlatch->write_d0(space, offset >> 3, data, mem_mask); }).umask16(0x00ff);
 	AM_RANGE(0x70000c, 0x70000d) AM_WRITE8(OKIM6295_bankswitch_w, 0x00ff)               /* OKI6295 bankswitch */
 	AM_RANGE(0x70000e, 0x70000f) AM_DEVREADWRITE8("oki", okim6295_device, read, write, 0x00ff)                  /* OKI6295 data register */
 	AM_RANGE(0xfe0000, 0xfe7fff) AM_RAM                                          /* Work RAM */
@@ -141,7 +141,7 @@ static ADDRESS_MAP_START( thoop2_map, AS_PROGRAM, 16, thoop2_state )
 ADDRESS_MAP_END
 
 
-static ADDRESS_MAP_START( oki_map, 0, 8, thoop2_state )
+ADDRESS_MAP_START(thoop2_state::oki_map)
 	AM_RANGE(0x00000, 0x2ffff) AM_ROM
 	AM_RANGE(0x30000, 0x3ffff) AM_ROMBANK("okibank")
 ADDRESS_MAP_END

@@ -340,9 +340,11 @@ READ8_MEMBER(lethal_state::gunsaux_r)
 	return res;
 }
 
-static ADDRESS_MAP_START( le_main, AS_PROGRAM, 8, lethal_state )
+ADDRESS_MAP_START(lethal_state::le_main)
 	AM_RANGE(0x0000, 0x1fff) AM_ROMBANK("bank1")
 	AM_RANGE(0x2000, 0x3fff) AM_RAM             // work RAM
+	AM_RANGE(0x4000, 0x7fff) AM_DEVICE("bank4000", address_map_bank_device, amap8)
+	AM_RANGE(0x4000, 0x43ff) AM_UNMAP // first 0x400 bytes of palette RAM are inaccessible
 	AM_RANGE(0x4000, 0x403f) AM_DEVWRITE("k056832", k056832_device, write)
 	AM_RANGE(0x4040, 0x404f) AM_DEVWRITE("k056832", k056832_device, b_w)
 	AM_RANGE(0x4080, 0x4080) AM_READNOP     // watchdog
@@ -355,12 +357,10 @@ static ADDRESS_MAP_START( le_main, AS_PROGRAM, 8, lethal_state )
 	AM_RANGE(0x40d9, 0x40d9) AM_READ_PORT("INPUTS")
 	AM_RANGE(0x40db, 0x40db) AM_READ(gunsaux_r)     // top X bit of guns
 	AM_RANGE(0x40dc, 0x40dc) AM_WRITE(le_bankswitch_w)
-	AM_RANGE(0x4000, 0x43ff) AM_UNMAP // first 0x400 bytes of palette RAM are inaccessible
-	AM_RANGE(0x4000, 0x7fff) AM_DEVICE("bank4000", address_map_bank_device, amap8)
 	AM_RANGE(0x8000, 0xffff) AM_ROM AM_REGION("maincpu", 0x38000)
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( bank4000_map, AS_PROGRAM, 8, lethal_state )
+ADDRESS_MAP_START(lethal_state::bank4000_map)
 	// VRD = 0 or 1, CBNK = 0
 	AM_RANGE(0x0840, 0x084f) AM_MIRROR(0x8000) AM_DEVREADWRITE("k053244", k05324x_device, k053244_r, k053244_w)
 	AM_RANGE(0x0880, 0x089f) AM_MIRROR(0x8000) AM_DEVREADWRITE("k054000", k054000_device, read, write)
@@ -380,7 +380,7 @@ static ADDRESS_MAP_START( bank4000_map, AS_PROGRAM, 8, lethal_state )
 	AM_RANGE(0x4000, 0x7fff) AM_MIRROR(0x8000) AM_RAM_DEVWRITE("palette", palette_device, write8) AM_SHARE("palette")
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( le_sound, AS_PROGRAM, 8, lethal_state )
+ADDRESS_MAP_START(lethal_state::le_sound)
 	AM_RANGE(0x0000, 0xefff) AM_ROM
 	AM_RANGE(0xf000, 0xf7ff) AM_RAM
 	AM_RANGE(0xf800, 0xfa2f) AM_DEVREADWRITE("k054539", k054539_device, read, write)
@@ -542,7 +542,8 @@ MACHINE_CONFIG_START(lethal_state::lethalen)
 	MCFG_SOUND_ROUTE(1, "rspeaker", 1.0)
 MACHINE_CONFIG_END
 
-MACHINE_CONFIG_DERIVED(lethal_state::lethalej, lethalen)
+MACHINE_CONFIG_START(lethal_state::lethalej)
+	lethalen(config);
 
 	MCFG_SCREEN_MODIFY("screen")
 	MCFG_SCREEN_VISIBLE_AREA(224, 512-1, 16, 240-1)

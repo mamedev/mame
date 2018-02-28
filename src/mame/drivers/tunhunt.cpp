@@ -129,7 +129,7 @@ READ8_MEMBER(tunhunt_state::dsw2_4r)
  *
  *************************************/
 
-static ADDRESS_MAP_START( main_map, AS_PROGRAM, 8, tunhunt_state )
+ADDRESS_MAP_START(tunhunt_state::main_map)
 	ADDRESS_MAP_GLOBAL_MASK(0x7fff)
 	AM_RANGE(0x0000, 0x03ff) AM_RAM AM_SHARE("workram") /* Work RAM */
 	AM_RANGE(0x1080, 0x10ff) AM_WRITEONLY
@@ -271,7 +271,7 @@ GFXDECODE_END
 MACHINE_CONFIG_START(tunhunt_state::tunhunt)
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", M6502, XTAL(12'096'000)/6)        /* ??? */
+	MCFG_CPU_ADD("maincpu", M6502, 12.096_MHz_XTAL/6)        /* ??? */
 	MCFG_CPU_PROGRAM_MAP(main_map)
 	MCFG_CPU_PERIODIC_INT_DRIVER(tunhunt_state, irq0_line_hold,  4*60)  /* 48V, 112V, 176V, 240V */
 
@@ -292,12 +292,12 @@ MACHINE_CONFIG_START(tunhunt_state::tunhunt)
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
 
-	MCFG_SOUND_ADD("pokey1", POKEY, XTAL(12'096'000)/10)
+	MCFG_SOUND_ADD("pokey1", POKEY, 12.096_MHz_XTAL/10)
 	MCFG_POKEY_ALLPOT_R_CB(IOPORT("DSW"))
 	MCFG_POKEY_OUTPUT_RC(RES_K(1), CAP_U(0.047), 5.0)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
 
-	MCFG_SOUND_ADD("pokey2", POKEY, XTAL(12'096'000)/10)
+	MCFG_SOUND_ADD("pokey2", POKEY, 12.096_MHz_XTAL/10)
 	MCFG_POKEY_POT0_R_CB(IOPORT("IN1"))
 	MCFG_POKEY_POT1_R_CB(IOPORT("IN2"))
 	MCFG_POKEY_POT2_R_CB(READ8(tunhunt_state, dsw2_0r))

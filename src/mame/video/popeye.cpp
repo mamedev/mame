@@ -10,7 +10,6 @@
 ***************************************************************************/
 
 #include "emu.h"
-#include "video/resnet.h"
 #include "includes/popeye.h"
 
 #define USE_NEW_COLOR (1)
@@ -55,7 +54,7 @@
 
 ***************************************************************************/
 
-static const res_net_decode_info popeye_7051_decode_info =
+const res_net_decode_info tnx1_state::mb7051_decode_info =
 {
 	1,      /*  one prom 5 lines */
 	0,      /*  start at 0 */
@@ -66,7 +65,7 @@ static const res_net_decode_info popeye_7051_decode_info =
 	{0x07,0x07,0x03 }       /*  masks */
 };
 
-static const res_net_decode_info popeye_7052_decode_info =
+const res_net_decode_info tnx1_state::mb7052_decode_info =
 {
 	1,      /*  two 4 bit proms */
 	0,      /*  start at 0 */
@@ -77,39 +76,38 @@ static const res_net_decode_info popeye_7052_decode_info =
 	{0x07,0x07,0x03}        /*  masks */
 };
 
-static const res_net_info popeye_7051_txt_net_info =
+const res_net_info tnx1_state::txt_mb7051_net_info =
 {
 	RES_NET_VCC_5V | RES_NET_VBIAS_5V | RES_NET_VIN_MB7051 | RES_NET_MONITOR_SANYO_EZV20,
 	{
 		{ RES_NET_AMP_DARLINGTON, 470, 0, 3, { 1000, 470, 220 } },
 		{ RES_NET_AMP_DARLINGTON, 470, 0, 3, { 1000, 470, 220 } },
-		{ RES_NET_AMP_DARLINGTON, 680, 0, 2, {  470, 220,   0 } }  /*  popeye */
+		{ RES_NET_AMP_DARLINGTON, 680, 0, 2, {  470, 220,   0 } }
 	}
 };
 
-static const res_net_info popeye_7051_bck_net_info =
+const res_net_info tnx1_state::bak_mb7051_net_info =
 {
 	RES_NET_VCC_5V | RES_NET_VBIAS_5V | RES_NET_VIN_MB7051 | RES_NET_MONITOR_SANYO_EZV20,
 	{
 		{ RES_NET_AMP_DARLINGTON, 470, 0, 3, { 1200, 680, 470 } },
 		{ RES_NET_AMP_DARLINGTON, 470, 0, 3, { 1200, 680, 470 } },
-		{ RES_NET_AMP_DARLINGTON, 680, 0, 2, {  680, 470,   0 } }  /*  popeye */
+		{ RES_NET_AMP_DARLINGTON, 680, 0, 2, {  680, 470,   0 } }
 	}
 };
 
-
-static const res_net_info popeye_7052_obj_net_info =
+const res_net_info tnx1_state::obj_mb7052_net_info =
 {
 	RES_NET_VCC_5V | RES_NET_VBIAS_5V | RES_NET_VIN_MB7052 |  RES_NET_MONITOR_SANYO_EZV20,
 	{
 		{ RES_NET_AMP_DARLINGTON, 470, 0, 3, { 1000, 470, 220 } },
 		{ RES_NET_AMP_DARLINGTON, 470, 0, 3, { 1000, 470, 220 } },
-		{ RES_NET_AMP_DARLINGTON, 680, 0, 2, {  470, 220,   0 } }  /*  popeye */
+		{ RES_NET_AMP_DARLINGTON, 680, 0, 2, {  470, 220,   0 } }
 	}
 };
 
 
-PALETTE_INIT_MEMBER(popeye_state, tpp1)
+PALETTE_INIT_MEMBER(tpp1_state, palette_init)
 {
 	/* Two of the PROM address pins are tied together */
 	for (int i = 0; i < 0x20; i++)
@@ -118,26 +116,12 @@ PALETTE_INIT_MEMBER(popeye_state, tpp1)
 		m_color_prom[i + 0x20] = m_color_prom[color + 0x20];
 	}
 
-	m_last_palette = -1;
+	m_palette_bank_cache = -1;
 
 	update_palette();
 }
 
-PALETTE_INIT_MEMBER(popeye_state,popeyebl)
-{
-	/* Two of the PROM address pins are tied together */
-	for (int i = 0; i < 0x20; i++)
-	{
-		int color = (i & 0xf) | ((i & 0x8) << 1);
-		m_color_prom[i + 0x20] = m_color_prom[color + 0x20];
-	}
-
-	m_last_palette = -1;
-
-	update_palette();
-}
-
-PALETTE_INIT_MEMBER(popeye_state, tnx1)
+PALETTE_INIT_MEMBER(tnx1_state, palette_init)
 {
 	/* Two of the PROM address pins are tied together and one is not connected... */
 	for (int i = 0;i < 0x100;i++)
@@ -146,21 +130,21 @@ PALETTE_INIT_MEMBER(popeye_state, tnx1)
 		m_color_prom_spr[i] = m_color_prom_spr[color];
 	}
 
-	m_last_palette = -1;
+	m_palette_bank_cache = -1;
 
 	update_palette();
 }
 
-void popeye_state::update_palette()
+void tnx1_state::update_palette()
 {
-	if ((*m_palettebank ^ m_last_palette) & 0x08)
+	if ((m_palette_bank ^ m_palette_bank_cache) & 0x08)
 	{
-		uint8_t *color_prom = m_color_prom + 16 * ((*m_palettebank & 0x08) >> 3);
+		uint8_t *color_prom = m_color_prom + 16 * ((m_palette_bank & 0x08) >> 3);
 
 #if USE_NEW_COLOR
 		std::vector<rgb_t> rgb;
 
-		compute_res_net_all(rgb, color_prom, popeye_7051_decode_info, popeye_7051_bck_net_info);
+		compute_res_net_all(rgb, color_prom, mb7051_decode_info, bak_mb7051_net_info);
 		m_palette->set_pen_colors(0, rgb);
 #else
 		for (int i = 0; i < 16; i++)
@@ -192,17 +176,17 @@ void popeye_state::update_palette()
 #endif
 	}
 
-	if ((*m_palettebank ^ m_last_palette) & 0x08)
+	if ((m_palette_bank ^ m_palette_bank_cache) & 0x08)
 	{
-		uint8_t *color_prom = m_color_prom + 32 + 16 * ((*m_palettebank & 0x08) >> 3);
+		uint8_t *color_prom = m_color_prom + 32 + 16 * ((m_palette_bank & 0x08) >> 3);
 
 		/* characters */
 #if USE_NEW_COLOR
 		for (int i = 0; i < 16; i++)
 		{
-			int r = compute_res_net((color_prom[i] >> 0) & 0x07, 0, popeye_7051_txt_net_info);
-			int g = compute_res_net((color_prom[i] >> 3) & 0x07, 1, popeye_7051_txt_net_info);
-			int b = compute_res_net((color_prom[i] >> 6) & 0x03, 2, popeye_7051_txt_net_info);
+			int r = compute_res_net((color_prom[i] >> 0) & 0x07, 0, txt_mb7051_net_info);
+			int g = compute_res_net((color_prom[i] >> 3) & 0x07, 1, txt_mb7051_net_info);
+			int b = compute_res_net((color_prom[i] >> 6) & 0x03, 2, txt_mb7051_net_info);
 			m_palette->set_pen_color(16 + (2 * i) + 0, rgb_t(0, 0, 0));
 			m_palette->set_pen_color(16 + (2 * i) + 1, rgb_t(r, g, b));
 		}
@@ -230,14 +214,14 @@ void popeye_state::update_palette()
 #endif
 	}
 
-	if ((*m_palettebank ^ m_last_palette) & 0x07)
+	if ((m_palette_bank ^ m_palette_bank_cache) & 0x07)
 	{
-		uint8_t *color_prom = m_color_prom_spr + 32 * (*m_palettebank & 0x07);
+		uint8_t *color_prom = m_color_prom_spr + 32 * (m_palette_bank & 0x07);
 
 #if USE_NEW_COLOR
 		/* sprites */
 		std::vector<rgb_t> rgb;
-		compute_res_net_all(rgb, color_prom, popeye_7052_decode_info, popeye_7052_obj_net_info);
+		compute_res_net_all(rgb, color_prom, mb7052_decode_info, obj_mb7052_net_info);
 		m_palette->set_pen_colors(48, rgb);
 #else
 		for (int i = 0; i < 32; i++)
@@ -265,51 +249,51 @@ void popeye_state::update_palette()
 #endif
 	}
 
-	m_last_palette = *m_palettebank;
+	m_palette_bank_cache = m_palette_bank;
 }
 
-WRITE8_MEMBER(popeye_state::tnx1_bitmap_w)
+WRITE8_MEMBER(tnx1_state::background_w)
 {
 	// TODO: confirm the memory layout
 	bool lsn = (data & 0x80) == 0;
 	if (lsn)
 	{
-		m_bitmapram[offset] = (m_bitmapram[offset] & 0xf0) | (data & 0xf);
+		m_background_ram[offset] = (m_background_ram[offset] & 0xf0) | (data & 0xf);
 	}
 	else
 	{
-		m_bitmapram[offset] = (m_bitmapram[offset] & 0x0f) | (data << 4);
+		m_background_ram[offset] = (m_background_ram[offset] & 0x0f) | (data << 4);
 	}
 }
 
-WRITE8_MEMBER(popeye_state::tpp2_bitmap_w)
+WRITE8_MEMBER(tpp2_state::background_w)
 {
 	// TODO: confirm the memory layout
 	bool lsn = (offset & 0x40) == 0;
 	offset = (offset & 0x3f) | ((offset & ~0x7f) >> 1);
 	if (lsn)
 	{
-		m_bitmapram[offset] = (m_bitmapram[offset] & 0xf0) | (data & 0xf);
+		m_background_ram[offset] = (m_background_ram[offset] & 0xf0) | (data & 0xf);
 	}
 	else
 	{
-		m_bitmapram[offset] = (m_bitmapram[offset] & 0x0f) | (data << 4);
+		m_background_ram[offset] = (m_background_ram[offset] & 0x0f) | (data << 4);
 	}
 }
 
-WRITE8_MEMBER(popeye_state::popeye_videoram_w)
+WRITE8_MEMBER(tnx1_state::popeye_videoram_w)
 {
 	m_videoram[offset] = data;
 	m_fg_tilemap->mark_tile_dirty(offset);
 }
 
-WRITE8_MEMBER(popeye_state::popeye_colorram_w)
+WRITE8_MEMBER(tnx1_state::popeye_colorram_w)
 {
 	m_colorram[offset] = data;
 	m_fg_tilemap->mark_tile_dirty(offset);
 }
 
-TILE_GET_INFO_MEMBER(popeye_state::get_fg_tile_info)
+TILE_GET_INFO_MEMBER(tnx1_state::get_fg_tile_info)
 {
 	int code = m_videoram[tile_index];
 	int color = m_colorram[tile_index] & 0x0f;
@@ -317,37 +301,27 @@ TILE_GET_INFO_MEMBER(popeye_state::get_fg_tile_info)
 	SET_TILE_INFO_MEMBER(0, code, color, 0);
 }
 
-void popeye_state::video_start()
+void tnx1_state::video_start()
 {
+	m_background_ram.resize(0x1000);
+	m_sprite_ram.resize(0x400);
+
 	m_sprite_bitmap = std::make_unique<bitmap_ind16>(512, 512);
 
-	m_fg_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(popeye_state::get_fg_tile_info),this), TILEMAP_SCAN_ROWS, 16, 16, 32, 32);
+	m_fg_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(tnx1_state::get_fg_tile_info),this), TILEMAP_SCAN_ROWS, 16, 16, 32, 32);
 	m_fg_tilemap->set_transparent_pen(0);
 
 	m_field = 0;
 
 	save_item(NAME(m_field));
-	save_item(NAME(m_last_palette));
-	save_item(NAME(*m_sprite_bitmap));
-	save_item(NAME(m_bitmapram));
+	save_item(NAME(m_palette_bank));
+	save_item(NAME(m_palette_bank_cache));
+	save_item(NAME(m_background_ram));
+	save_item(NAME(m_background_scroll));
+	save_item(NAME(m_sprite_ram));
 }
 
-VIDEO_START_MEMBER(popeye_state,tpp1)
-{
-	m_sprite_bitmap = std::make_unique<bitmap_ind16>(512, 512);
-
-	m_fg_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(popeye_state::get_fg_tile_info),this), TILEMAP_SCAN_ROWS, 16, 16, 32, 32);
-	m_fg_tilemap->set_transparent_pen(0);
-
-	m_field = 0;
-
-	save_item(NAME(m_field));
-	save_item(NAME(m_last_palette));
-	save_item(NAME(*m_sprite_bitmap));
-	save_item(NAME(m_bitmapram));
-}
-
-void popeye_state::draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprect)
+void tnx1_state::draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
 	m_sprite_bitmap->fill(0, cliprect);
 
@@ -363,9 +337,9 @@ void popeye_state::draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprect)
 			int flipy;
 		} attributes[64] = { 0 };
 
-		for (int offs = 0; offs < m_spriteram.bytes(); offs += 4)
+		for (int offs = 4; offs < m_dmasource.bytes(); offs += 4)
 		{
-			int sy = 0x200 - (m_spriteram[offs + 1] * 2);
+			int sy = 0x200 - (m_sprite_ram[offs + 1] * 2);
 			int row = y - sy;
 			if (flip_screen())
 			{
@@ -377,7 +351,7 @@ void popeye_state::draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprect)
 			{
 				/*
 				* offs+3:
-				* bit 7 ?
+				* bit 7 ? TODO: figure out why olive oil and wimpy have some of these bits set
 				* bit 6 ?
 				* bit 5 ?
 				* bit 4 MSB of sprite code
@@ -387,15 +361,15 @@ void popeye_state::draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprect)
 				* bit 0 /
 				*/
 
-				struct attribute_memory *a = &attributes[m_spriteram[offs] >> 2];
-				a->sx = m_spriteram[offs] * 2;
+				struct attribute_memory *a = &attributes[m_sprite_ram[offs] >> 2];
+				a->sx = m_sprite_ram[offs] * 2;
 				a->row = row;
-				a->code = ((m_spriteram[offs + 2] & 0x7f)
-					+ ((m_spriteram[offs + 3] & 0x10) << 3)
-					+ ((m_spriteram[offs + 3] & 0x04) << 6)) ^ 0x1ff;
-				a->color = (m_spriteram[offs + 3] & 0x07);
-				a->flipx = (m_spriteram[offs + 2] & 0x80) ? 0xf : 0;
-				a->flipy = (m_spriteram[offs + 3] & 0x08) ? 0xf : 0;
+				a->code = ((m_sprite_ram[offs + 2] & 0x7f)
+					+ ((m_sprite_ram[offs + 3] & 0x10) << 3)
+					+ ((m_sprite_ram[offs + 3] & 0x04) << 6)) ^ 0x1ff;
+				a->color = (m_sprite_ram[offs + 3] & 0x07);
+				a->flipx = (m_sprite_ram[offs + 2] & 0x80) ? 0xf : 0;
+				a->flipy = (m_sprite_ram[offs + 3] & 0x08) ? 0xf : 0;
 			}
 		}
 
@@ -430,7 +404,7 @@ void popeye_state::draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprect)
 	copybitmap_trans(bitmap, *m_sprite_bitmap, 0, 0, 0, 0, cliprect, 0);
 }
 
-void popeye_state::draw_field(bitmap_ind16 &bitmap, const rectangle &cliprect)
+void tnx1_state::draw_field(bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
 	int x;
 	int y;
@@ -440,68 +414,88 @@ void popeye_state::draw_field(bitmap_ind16 &bitmap, const rectangle &cliprect)
 			bitmap.pix(y, x) = 0;
 }
 
-uint32_t popeye_state::screen_update_tnx1(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
+void tnx1_state::draw_background(bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
-	update_palette();
-
 	for (int y = cliprect.min_y; y <= cliprect.max_y; y++)
 	{
 		int sy = y;
 		if (flip_screen())
 			sy ^= 0x1ff;
 
-		sy -= 0x200 - (2 * m_background_pos[1]);
+		sy -= 0x200 - (2 * m_background_scroll[1]);
 
 		for (int x = cliprect.min_x; x <= cliprect.max_x; x++)
 		{
 			if (sy < 0)
-				bitmap.pix16(y, x) = m_bitmapram[0x3f] & 0xf; // TODO: find out exactly where the data is fetched from
+				bitmap.pix16(y, x) = m_background_ram[0] & 0xf; // TODO: find out exactly where the data is fetched from
 			else
 			{
 				// TODO: confirm the memory layout
-				int sx = x + (2 * (m_background_pos[0] | ((m_background_pos[2] & 1) << 8))) + 0x70;
+				int sx = x + (2 * (m_background_scroll[0] | ((m_background_scroll[2] & 1) << 8))) + 0x70;
 				int shift = (sx & 0x200) / 0x80;
 
-				bitmap.pix16(y, x) = (m_bitmapram[((sx / 8) & 0x3f) + ((sy / 8) * 0x40)] >> shift) & 0xf;
+				bitmap.pix16(y, x) = (m_background_ram[((sx / 8) & 0x3f) + ((sy / 8) * 0x40)] >> shift) & 0xf;
 			}
 		}
 	}
-
-	draw_sprites(bitmap, cliprect);
-	m_fg_tilemap->draw(screen, bitmap, cliprect, 0, 0);
-#if USE_INTERLACE
-	draw_field(bitmap, cliprect);
-#endif
-	return 0;
 }
 
-uint32_t popeye_state::screen_update_tpp1(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
+void tpp1_state::draw_background(bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
-	update_palette();
-
 	for (int y = cliprect.min_y; y <= cliprect.max_y; y++)
 	{
 		int sy = y;
 		if (flip_screen())
 			sy ^= 0x1ff;
 
-		sy -= 0x200 - (2 * m_background_pos[1]);
+		sy -= 0x200 - (2 * m_background_scroll[1]);
 
 		for (int x = cliprect.min_x; x <= cliprect.max_x; x++)
 		{
 			if (sy < 0)
-				bitmap.pix16(y, x) = m_bitmapram[0x3f] & 0xf; // TODO: find out exactly where the data is fetched from
+				bitmap.pix16(y, x) = m_background_ram[0] & 0xf; // TODO: find out exactly where the data is fetched from
 			else
 			{
 				// TODO: confirm the memory layout
-				int sx = x + (2 * m_background_pos[0]) + 0x70;
+				int sx = x + (2 * m_background_scroll[0]) + 0x70;
 				int shift = (sy & 4);
 
-				bitmap.pix16(y, x) = (m_bitmapram[((sx / 8) & 0x3f) + ((sy / 8) * 0x40)] >> shift) & 0xf;
+				bitmap.pix16(y, x) = (m_background_ram[((sx / 8) & 0x3f) + ((sy / 8) * 0x40)] >> shift) & 0xf;
 			}
 		}
 	}
+}
 
+void tpp2_state::draw_background(bitmap_ind16 &bitmap, const rectangle &cliprect)
+{
+	for (int y = cliprect.min_y; y <= cliprect.max_y; y++)
+	{
+		int sy = y;
+		if (flip_screen())
+			sy ^= 0x1ff;
+
+		sy -= 0x200 - (2 * m_background_scroll[1]);
+
+		for (int x = cliprect.min_x; x <= cliprect.max_x; x++)
+		{
+			if (sy < 0)
+				bitmap.pix16(y, x) = m_background_ram[((sy & 0x100) / 8) * 0x40] & 0xf;
+			else
+			{
+				// TODO: confirm the memory layout
+				int sx = x + (2 * m_background_scroll[0]) + 0x72;
+				int shift = (sy & 4);
+
+				bitmap.pix16(y, x) = (m_background_ram[((sx / 8) & 0x3f) + ((sy / 8) * 0x40)] >> shift) & 0xf;
+			}
+		}
+	}
+}
+
+uint32_t tnx1_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
+{
+	update_palette();
+	draw_background(bitmap, cliprect);
 	draw_sprites(bitmap, cliprect);
 	m_fg_tilemap->draw(screen, bitmap, cliprect, 0, 0);
 #if USE_INTERLACE

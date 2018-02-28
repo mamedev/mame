@@ -13,7 +13,7 @@
 
 #include "logmacro.h"
 
-static ADDRESS_MAP_START( coldfire_regs_map, 0, 32, mcf5206e_peripheral_device )
+ADDRESS_MAP_START(mcf5206e_peripheral_device::coldfire_regs_map)
 
 
 	AM_RANGE(0x014, 0x017) AM_READWRITE8(ICR1_ICR2_ICR3_ICR4_r,    ICR1_ICR2_ICR3_ICR4_w,    0xffffffff)
@@ -825,7 +825,7 @@ DEFINE_DEVICE_TYPE(MCF5206E_PERIPHERAL, mcf5206e_peripheral_device, "mcf5206e_pe
 mcf5206e_peripheral_device::mcf5206e_peripheral_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
 	: device_t(mconfig, MCF5206E_PERIPHERAL, tag, owner, clock),
 		device_memory_interface(mconfig, *this),
-		m_space_config("coldfire_regs", ENDIANNESS_BIG, 32,10, 0, nullptr, *ADDRESS_MAP_NAME(coldfire_regs_map))
+		m_space_config("coldfire_regs", ENDIANNESS_BIG, 32,10, 0, address_map_constructor(), address_map_constructor(FUNC(mcf5206e_peripheral_device::coldfire_regs_map), this))
 
 {
 }

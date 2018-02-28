@@ -142,7 +142,7 @@ READ8_MEMBER(bbc_state::bbc_fe_r)
 	return 0xfe;
 }
 
-static ADDRESS_MAP_START( bbca_mem, AS_PROGRAM, 8, bbc_state )
+ADDRESS_MAP_START(bbc_state::bbca_mem)
 	ADDRESS_MAP_UNMAP_HIGH                                                                                      /*  Hardware marked with a # is not present in a Model A        */
 
 	AM_RANGE(0x0000, 0x3fff) AM_READ_BANK("bank1") AM_WRITE(bbc_memorya1_w)                                     /*    0000-3fff                 Regular Ram                     */
@@ -170,7 +170,7 @@ static ADDRESS_MAP_START( bbca_mem, AS_PROGRAM, 8, bbc_state )
 ADDRESS_MAP_END
 
 
-static ADDRESS_MAP_START( bbc_base, AS_PROGRAM, 8, bbc_state )
+ADDRESS_MAP_START(bbc_state::bbc_base)
 	ADDRESS_MAP_UNMAP_HIGH
 
 	AM_RANGE(0xc000, 0xfbff) AM_READ_BANK("bank7")                                                              /*    c000-fbff                 OS ROM                          */
@@ -193,7 +193,9 @@ static ADDRESS_MAP_START( bbc_base, AS_PROGRAM, 8, bbc_state )
 ADDRESS_MAP_END
 
 
-static ADDRESS_MAP_START( bbcb_mem, AS_PROGRAM, 8, bbc_state )
+ADDRESS_MAP_START(bbc_state::bbcb_mem)
+	AM_IMPORT_FROM(bbc_base)
+
 	AM_RANGE(0x0000, 0x3fff) AM_READ_BANK("bank1") AM_WRITE(bbc_memorya1_w)                                     /*    0000-3fff                 Regular Ram                     */
 	AM_RANGE(0x4000, 0x7fff) AM_READ_BANK("bank3") AM_WRITE(bbc_memoryb3_w)                                     /*    4000-7fff                 Regular Ram                     */
 	AM_RANGE(0x8000, 0xbfff) AM_READ_BANK("bank4") AM_WRITE(bbc_memoryb4_w)                                     /*    8000-bfff                 Paged ROM                       */
@@ -201,22 +203,23 @@ static ADDRESS_MAP_START( bbcb_mem, AS_PROGRAM, 8, bbc_state )
 																																																							/* W: fe30-fe3f  84LS161        Paged ROM selector              */
 	AM_RANGE(0xfe80, 0xfe83) AM_DEVICE("i8271", i8271_device, map)                                              /*    fe80-fe83  8271 FDC       Floppy disc controller          */
 	AM_RANGE(0xfe84, 0xfe9f) AM_DEVREADWRITE("i8271", i8271_device, data_r, data_w)                             /*    fe84-fe9f  8271 FDC       Floppy disc controller          */
-	AM_IMPORT_FROM(bbc_base)
 ADDRESS_MAP_END
 
 
-static ADDRESS_MAP_START( bbcb_nofdc_mem, AS_PROGRAM, 8, bbc_state )
+ADDRESS_MAP_START(bbc_state::bbcb_nofdc_mem)
+	AM_IMPORT_FROM(bbc_base)
+
 	AM_RANGE(0x0000, 0x3fff) AM_READ_BANK("bank1") AM_WRITE(bbc_memorya1_w)                                     /*    0000-3fff                 Regular Ram                     */
 	AM_RANGE(0x4000, 0x7fff) AM_READ_BANK("bank3") AM_WRITE(bbc_memoryb3_w)                                     /*    4000-7fff                 Regular Ram                     */
 	AM_RANGE(0x8000, 0xbfff) AM_READ_BANK("bank4") AM_WRITE(bbc_memoryb4_w)                                     /*    8000-bfff                 Paged ROM                       */
 	AM_RANGE(0xfe30, 0xfe3f) AM_READWRITE(bbc_fe_r, bbc_page_selectb_w)                                         /* R: fe30-fe3f  NC             Not Connected                   */
 																																																							/* W: fe30-fe3f  84LS161        Paged ROM selector              */
 	AM_RANGE(0xfe80, 0xfe83) AM_NOP                                                                             /*    fe80-fe9f                 Floppy disc controller          */
-	AM_IMPORT_FROM(bbc_base)
 ADDRESS_MAP_END
 
 
-static ADDRESS_MAP_START( bbcbp_mem, AS_PROGRAM, 8, bbc_state )
+ADDRESS_MAP_START(bbc_state::bbcbp_mem)
+	AM_IMPORT_FROM(bbc_base)
 	AM_RANGE(0x0000, 0x2fff) AM_READ_BANK("bank1") AM_WRITE(bbc_memorybp1_w)                    /*    0000-2fff                 Regular Ram                     */
 	AM_RANGE(0x3000, 0x7fff) AM_READ_BANK("bank2") AM_WRITE(bbc_memorybp2_w)                    /*    3000-7fff                 Video/Shadow Ram                */
 	AM_RANGE(0x8000, 0xafff) AM_READ_BANK("bank4") AM_WRITE(bbc_memorybp4_w)                    /*    8000-afff                 Paged ROM or 12K of SWRAM       */
@@ -226,11 +229,11 @@ static ADDRESS_MAP_START( bbcbp_mem, AS_PROGRAM, 8, bbc_state )
 	AM_RANGE(0xfe80, 0xfe83) AM_READWRITE(bbc_fe_r, bbc_wd1770_status_w)                        /*    fe80-fe83  1770 FDC       Drive control register          */
 	AM_RANGE(0xfe84, 0xfe9f) AM_DEVREADWRITE("wd1770", wd1770_device, read, write)              /*    fe84-fe9f  1770 FDC       Floppy disc controller          */
 	AM_RANGE(0xfee0, 0xfeff) AM_DEVREADWRITE("tube", bbc_tube_slot_device, host_r, host_w)      /*    fee0-feff  Tube ULA       Tube system interface           */
-	AM_IMPORT_FROM(bbc_base)
 ADDRESS_MAP_END
 
 
-static ADDRESS_MAP_START( bbcbp128_mem, AS_PROGRAM, 8, bbc_state )
+ADDRESS_MAP_START(bbc_state::bbcbp128_mem)
+	AM_IMPORT_FROM(bbc_base)
 	AM_RANGE(0x0000, 0x2fff) AM_READ_BANK("bank1") AM_WRITE(bbc_memorybp1_w)                    /*    0000-2fff                 Regular Ram                     */
 	AM_RANGE(0x3000, 0x7fff) AM_READ_BANK("bank2") AM_WRITE(bbc_memorybp2_w)                    /*    3000-7fff                 Video/Shadow Ram                */
 	AM_RANGE(0x8000, 0xafff) AM_READ_BANK("bank4") AM_WRITE(bbc_memorybp4_128_w)                /*    8000-afff                 Paged ROM or 12K of SWRAM       */
@@ -240,11 +243,11 @@ static ADDRESS_MAP_START( bbcbp128_mem, AS_PROGRAM, 8, bbc_state )
 	AM_RANGE(0xfe80, 0xfe83) AM_READWRITE(bbc_fe_r, bbc_wd1770_status_w)                        /*    fe80-fe83  1770 FDC       Drive control register          */
 	AM_RANGE(0xfe84, 0xfe9f) AM_DEVREADWRITE("wd1770", wd1770_device, read, write)              /*    fe84-fe9f  1770 FDC       Floppy disc controller          */
 	AM_RANGE(0xfee0, 0xfeff) AM_DEVREADWRITE("tube", bbc_tube_slot_device, host_r, host_w)      /*    fee0-feff  Tube ULA       Tube system interface           */
-	AM_IMPORT_FROM(bbc_base)
 ADDRESS_MAP_END
 
 
-static ADDRESS_MAP_START( reutapm_mem, AS_PROGRAM, 8, bbc_state )
+ADDRESS_MAP_START(bbc_state::reutapm_mem)
+	AM_IMPORT_FROM(bbc_base)
 	AM_RANGE(0x0000, 0x2fff) AM_READ_BANK("bank1") AM_WRITE(bbc_memorybp1_w)                    /*    0000-2fff                 Regular Ram                     */
 	AM_RANGE(0x3000, 0x7fff) AM_READ_BANK("bank2") AM_WRITE(bbc_memorybp2_w)                    /*    3000-7fff                 Video/Shadow Ram                */
 	AM_RANGE(0x8000, 0xafff) AM_READ_BANK("bank4") AM_WRITE(bbc_memorybp4_w)                    /*    8000-afff                 Paged ROM or 12K of SWRAM       */
@@ -254,7 +257,6 @@ static ADDRESS_MAP_START( reutapm_mem, AS_PROGRAM, 8, bbc_state )
 	AM_RANGE(0xfe80, 0xfe83) AM_NOP                                                             /*    fe80-fe83  1770 FDC       Drive control register          */
 	AM_RANGE(0xfe84, 0xfe9f) AM_NOP                                                             /*    fe84-fe9f  1770 FDC       Floppy disc controller          */
 	AM_RANGE(0xfee0, 0xfeff) AM_READ(bbc_fe_r)                                                  /*    fee0-feff  Tube ULA       Tube system interface           */
-	AM_IMPORT_FROM(bbc_base)
 ADDRESS_MAP_END
 
 /******************************************************************************
@@ -281,7 +283,7 @@ ADDRESS_MAP_END
 ******************************************************************************/
 
 
-static ADDRESS_MAP_START(bbcm_mem, AS_PROGRAM, 8, bbc_state )
+ADDRESS_MAP_START(bbc_state::bbcm_mem)
 	AM_RANGE(0x0000, 0x2fff) AM_READ_BANK("bank1") AM_WRITE(bbc_memorybm1_w)                    /*    0000-2fff                 Regular Ram                     */
 	AM_RANGE(0x3000, 0x7fff) AM_READ_BANK("bank2") AM_WRITE(bbc_memorybm2_w)                    /*    3000-7fff                 Video/Shadow Ram                */
 	AM_RANGE(0x8000, 0x8fff) AM_READ_BANK("bank4") AM_WRITE(bbc_memorybm4_w)                    /*    8000-8fff                 Paged ROM/RAM or 4K of RAM ANDY */
@@ -936,11 +938,12 @@ MACHINE_CONFIG_START(bbc_state::bbca)
 	MCFG_VIA6522_IRQ_HANDLER(DEVWRITELINE("irqs", input_merger_device, in_w<1>))
 
 	/* EPROM sockets */
-	MCFG_FRAGMENT_ADD(bbc_eprom_sockets)
+	bbc_eprom_sockets(config);
 MACHINE_CONFIG_END
 
 
-MACHINE_CONFIG_DERIVED(bbc_state::bbcb, bbca)
+MACHINE_CONFIG_START(bbc_state::bbcb)
+	bbca(config);
 	/* basic machine hardware */
 	MCFG_CPU_MODIFY( "maincpu" )
 	MCFG_CPU_PROGRAM_MAP(bbcb_nofdc_mem)
@@ -1015,7 +1018,8 @@ MACHINE_CONFIG_DERIVED(bbc_state::bbcb, bbca)
 MACHINE_CONFIG_END
 
 
-MACHINE_CONFIG_DERIVED(bbc_state::bbcb_de, bbcb)
+MACHINE_CONFIG_START(bbc_state::bbcb_de)
+	bbcb(config);
 	/* basic machine hardware */
 	MCFG_CPU_MODIFY("maincpu")
 	MCFG_CPU_PROGRAM_MAP(bbcb_mem)
@@ -1036,7 +1040,8 @@ MACHINE_CONFIG_DERIVED(bbc_state::bbcb_de, bbcb)
 MACHINE_CONFIG_END
 
 
-MACHINE_CONFIG_DERIVED(bbc_state::bbcb_us, bbcb)
+MACHINE_CONFIG_START(bbc_state::bbcb_us)
+	bbcb(config);
 	/* basic machine hardware */
 	MCFG_CPU_MODIFY("maincpu")
 	MCFG_CPU_PROGRAM_MAP(bbcb_mem)
@@ -1063,7 +1068,8 @@ MACHINE_CONFIG_DERIVED(bbc_state::bbcb_us, bbcb)
 MACHINE_CONFIG_END
 
 
-MACHINE_CONFIG_DERIVED(bbc_state::bbcbp, bbcb)
+MACHINE_CONFIG_START(bbc_state::bbcbp)
+	bbcb(config);
 	/* basic machine hardware */
 	MCFG_CPU_MODIFY( "maincpu" )  /* M6512 */
 	MCFG_CPU_PROGRAM_MAP(bbcbp_mem)
@@ -1084,7 +1090,8 @@ MACHINE_CONFIG_DERIVED(bbc_state::bbcbp, bbcb)
 MACHINE_CONFIG_END
 
 
-MACHINE_CONFIG_DERIVED(bbc_state::bbcbp128, bbcbp)
+MACHINE_CONFIG_START(bbc_state::bbcbp128)
+	bbcbp(config);
 	/* basic machine hardware */
 	MCFG_CPU_MODIFY( "maincpu" )  /* M6512 */
 	MCFG_CPU_PROGRAM_MAP(bbcbp128_mem)
@@ -1101,7 +1108,8 @@ MACHINE_CONFIG_END
 ****************************************************************************/
 
 
-MACHINE_CONFIG_DERIVED(torch240_state::torchf, bbcb)
+MACHINE_CONFIG_START(torch240_state::torchf)
+	bbcb(config);
 	/* basic machine hardware */
 	MCFG_CPU_MODIFY("maincpu")
 	MCFG_CPU_PROGRAM_MAP(bbcb_mem)
@@ -1126,7 +1134,8 @@ MACHINE_CONFIG_DERIVED(torch240_state::torchf, bbcb)
 MACHINE_CONFIG_END
 
 
-MACHINE_CONFIG_DERIVED(torch240_state::torchh10, torchf)
+MACHINE_CONFIG_START(torch240_state::torchh10)
+	torchf(config);
 	/* fdc */
 	MCFG_DEVICE_REMOVE("i8271:1")
 
@@ -1135,7 +1144,8 @@ MACHINE_CONFIG_DERIVED(torch240_state::torchh10, torchf)
 MACHINE_CONFIG_END
 
 
-MACHINE_CONFIG_DERIVED(torch240_state::torchh21, torchf)
+MACHINE_CONFIG_START(torch240_state::torchh21)
+	torchf(config);
 	/* fdc */
 	MCFG_DEVICE_REMOVE("i8271:1")
 
@@ -1151,7 +1161,8 @@ MACHINE_CONFIG_END
 ****************************************************************************/
 
 
-MACHINE_CONFIG_DERIVED(bbc_state::abc110, bbcbp)
+MACHINE_CONFIG_START(bbc_state::abc110)
+	bbcbp(config);
 	/* fdc */
 	MCFG_DEVICE_REMOVE("wd1770:1")
 
@@ -1183,7 +1194,8 @@ MACHINE_CONFIG_DERIVED(bbc_state::abc110, bbcbp)
 MACHINE_CONFIG_END
 
 
-MACHINE_CONFIG_DERIVED(bbc_state::acw443, bbcbp)
+MACHINE_CONFIG_START(bbc_state::acw443)
+	bbcbp(config);
 	/* fdc */
 	MCFG_DEVICE_REMOVE("wd1770:1")
 
@@ -1207,7 +1219,8 @@ MACHINE_CONFIG_DERIVED(bbc_state::acw443, bbcbp)
 MACHINE_CONFIG_END
 
 
-MACHINE_CONFIG_DERIVED(bbc_state::abc310, bbcbp)
+MACHINE_CONFIG_START(bbc_state::abc310)
+	bbcbp(config);
 	/* fdc */
 	MCFG_DEVICE_REMOVE("wd1770:1")
 
@@ -1234,7 +1247,8 @@ MACHINE_CONFIG_END
 ****************************************************************************/
 
 
-MACHINE_CONFIG_DERIVED(bbc_state::reutapm, bbcbp)
+MACHINE_CONFIG_START(bbc_state::reutapm)
+	bbcbp(config);
 	/* basic machine hardware */
 	MCFG_CPU_MODIFY( "maincpu" )  /* M6512 */
 	MCFG_CPU_PROGRAM_MAP(reutapm_mem)
@@ -1270,7 +1284,8 @@ MACHINE_CONFIG_END
 ****************************************************************************/
 
 
-MACHINE_CONFIG_DERIVED(bbc_state::econx25, bbcbp)
+MACHINE_CONFIG_START(bbc_state::econx25)
+	bbcbp(config);
 	/* sound hardware */
 	MCFG_DEVICE_REMOVE("vsm")
 	MCFG_DEVICE_REMOVE("tms5220")
@@ -1453,7 +1468,8 @@ MACHINE_CONFIG_START(bbc_state::bbcm)
 MACHINE_CONFIG_END
 
 
-MACHINE_CONFIG_DERIVED(bbc_state::bbcmt, bbcm)
+MACHINE_CONFIG_START(bbc_state::bbcmt)
+	bbcm(config);
 	/* Add 65C102 co-processor */
 	MCFG_DEVICE_MODIFY("intube")
 	MCFG_SLOT_DEFAULT_OPTION("65c102")
@@ -1461,7 +1477,8 @@ MACHINE_CONFIG_DERIVED(bbc_state::bbcmt, bbcm)
 MACHINE_CONFIG_END
 
 
-MACHINE_CONFIG_DERIVED(bbc_state::bbcmaiv, bbcm)
+MACHINE_CONFIG_START(bbc_state::bbcmaiv)
+	bbcm(config);
 	/* Add 65C102 co-processor */
 	MCFG_DEVICE_MODIFY("intube")
 	MCFG_SLOT_DEFAULT_OPTION("65c102")
@@ -1474,7 +1491,8 @@ MACHINE_CONFIG_DERIVED(bbc_state::bbcmaiv, bbcm)
 MACHINE_CONFIG_END
 
 
-MACHINE_CONFIG_DERIVED(bbc_state::bbcmet, bbcm)
+MACHINE_CONFIG_START(bbc_state::bbcmet)
+	bbcm(config);
 	/* printer */
 	MCFG_DEVICE_REMOVE("centronics")
 	MCFG_DEVICE_REMOVE("cent_data_out")
@@ -1510,7 +1528,8 @@ MACHINE_CONFIG_DERIVED(bbc_state::bbcmet, bbcm)
 MACHINE_CONFIG_END
 
 
-MACHINE_CONFIG_DERIVED(bbc_state::bbcm512, bbcm)
+MACHINE_CONFIG_START(bbc_state::bbcm512)
+	bbcm(config);
 	/* Add Intel 80186 co-processor */
 	MCFG_DEVICE_MODIFY("intube")
 	MCFG_SLOT_DEFAULT_OPTION("80186")
@@ -1518,7 +1537,8 @@ MACHINE_CONFIG_DERIVED(bbc_state::bbcm512, bbcm)
 MACHINE_CONFIG_END
 
 
-MACHINE_CONFIG_DERIVED(bbc_state::bbcmarm, bbcm)
+MACHINE_CONFIG_START(bbc_state::bbcmarm)
+	bbcm(config);
 	/* Add ARM co-processor */
 	MCFG_DEVICE_MODIFY("extube")
 	MCFG_SLOT_DEFAULT_OPTION("arm")
@@ -1526,7 +1546,8 @@ MACHINE_CONFIG_DERIVED(bbc_state::bbcmarm, bbcm)
 MACHINE_CONFIG_END
 
 
-MACHINE_CONFIG_DERIVED(bbc_state::discmate, bbcm)
+MACHINE_CONFIG_START(bbc_state::discmate)
+	bbcm(config);
 	/* Add Sony CDK-3000PII Auto Disc Loader */
 
 	/* Add interface boards connected to cassette and RS423 */
@@ -1541,7 +1562,8 @@ MACHINE_CONFIG_DERIVED(bbc_state::discmate, bbcm)
 MACHINE_CONFIG_END
 
 
-MACHINE_CONFIG_DERIVED(bbc_state::cfa3000, bbcm)
+MACHINE_CONFIG_START(bbc_state::cfa3000)
+	bbcm(config);
 	MCFG_MACHINE_START_OVERRIDE(bbc_state, cfa3000)
 
 	/* fdc */
@@ -1579,7 +1601,8 @@ MACHINE_CONFIG_END
 ****************************************************************************/
 
 
-MACHINE_CONFIG_DERIVED(bbc_state::bbcmc, bbcm)
+MACHINE_CONFIG_START(bbc_state::bbcmc)
+	bbcm(config);
 	/* cassette */
 	MCFG_DEVICE_REMOVE("cassette")
 
@@ -1624,7 +1647,8 @@ MACHINE_CONFIG_DERIVED(bbc_state::bbcmc, bbcm)
 MACHINE_CONFIG_END
 
 
-MACHINE_CONFIG_DERIVED(bbc_state::pro128s, bbcmc)
+MACHINE_CONFIG_START(bbc_state::pro128s)
+	bbcmc(config);
 	/* software lists */
 	MCFG_SOFTWARE_LIST_REMOVE("flop_ls_mc")
 	MCFG_SOFTWARE_LIST_REMOVE("flop_ls_pro128s")
@@ -1641,13 +1665,15 @@ MACHINE_CONFIG_END
 
 /* Both LTM machines used a 9" Hantarex MT3000 green monitor */
 
-MACHINE_CONFIG_DERIVED(bbc_state::ltmpbp, bbcbp)
+MACHINE_CONFIG_START(bbc_state::ltmpbp)
+	bbcbp(config);
 	/* basic machine hardware */
 	MCFG_MACHINE_RESET_OVERRIDE(bbc_state, ltmpbp)
 MACHINE_CONFIG_END
 
 
-MACHINE_CONFIG_DERIVED(bbc_state::ltmpm, bbcm)
+MACHINE_CONFIG_START(bbc_state::ltmpm)
+	bbcm(config);
 	/* basic machine hardware */
 	MCFG_MACHINE_RESET_OVERRIDE(bbc_state, ltmpm)
 MACHINE_CONFIG_END

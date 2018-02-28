@@ -9,22 +9,22 @@
 	MCFG_DEVICE_ADD(_tag, NAMCO_62XX, _clock)
 
 #define MCFG_NAMCO_62XX_INPUT_0_CB(_devcb) \
-	devcb = &namco_62xx_device::set_input_callback<0>(*device, DEVCB_##_devcb);
+	devcb = &downcast<namco_62xx_device &>(*device).set_input_callback<0>(DEVCB_##_devcb);
 
 #define MCFG_NAMCO_62XX_INPUT_1_CB(_devcb) \
-	devcb = &namco_62xx_device::set_input_callback<1>(*device, DEVCB_##_devcb);
+	devcb = &downcast<namco_62xx_device &>(*device).set_input_callback<1>(DEVCB_##_devcb);
 
 #define MCFG_NAMCO_62XX_INPUT_2_CB(_devcb) \
-	devcb = &namco_62xx_device::set_input_callback<2>(*device, DEVCB_##_devcb);
+	devcb = &downcast<namco_62xx_device &>(*device).set_input_callback<2>(DEVCB_##_devcb);
 
 #define MCFG_NAMCO_62XX_INPUT_3_CB(_devcb) \
-	devcb = &namco_62xx_device::set_input_callback<3>(*device, DEVCB_##_devcb);
+	devcb = &downcast<namco_62xx_device &>(*device).set_input_callback<3>(DEVCB_##_devcb);
 
 #define MCFG_NAMCO_62XX_OUTPUT_0_CB(_devcb) \
-	devcb = &namco_62xx_device::set_output_callback<0>(*device, DEVCB_##_devcb);
+	devcb = &downcast<namco_62xx_device &>(*device).set_output_callback<0>(DEVCB_##_devcb);
 
 #define MCFG_NAMCO_62XX_OUTPUT_1_CB(_devcb) \
-	devcb = &namco_62xx_device::set_output_callback<1>(*device, DEVCB_##_devcb);
+	devcb = &downcast<namco_62xx_device &>(*device).set_output_callback<1>(DEVCB_##_devcb);
 
 
 class namco_62xx_device : public device_t
@@ -32,9 +32,9 @@ class namco_62xx_device : public device_t
 public:
 	namco_62xx_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
-	template <unsigned N, class Object> static devcb_base &set_input_callback(device_t &device, Object &&cb) { return downcast<namco_62xx_device &>(device).m_in[N].set_callback(std::forward<Object>(cb)); }
+	template <unsigned N, class Object> devcb_base &set_input_callback(Object &&cb) { return m_in[N].set_callback(std::forward<Object>(cb)); }
 
-	template <unsigned N, class Object> static devcb_base &set_output_callback(device_t &device, Object &&cb) { return downcast<namco_62xx_device &>(device).m_out[N].set_callback(std::forward<Object>(cb)); }
+	template <unsigned N, class Object> devcb_base &set_output_callback(Object &&cb) { return m_out[N].set_callback(std::forward<Object>(cb)); }
 
 protected:
 	// device-level overrides

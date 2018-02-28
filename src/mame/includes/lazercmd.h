@@ -80,4 +80,8 @@ public:
 	void bbonk(machine_config &config);
 	void medlanes(machine_config &config);
 	void lazercmd(machine_config &config);
+	void bbonk_map(address_map &map);
+	void lazercmd_map(address_map &map);
+	void lazercmd_portmap(address_map &map);
+	void medlanes_map(address_map &map);
 };

@@ -67,6 +67,8 @@ public:
 	DECLARE_DRIVER_INIT(odin);
 	DECLARE_DRIVER_INIT(wolfman);
 	void peyper(machine_config &config);
+	void peyper_io(address_map &map);
+	void peyper_map(address_map &map);
 private:
 	uint8_t m_digit;
 	uint8_t m_disp_layout[36];
@@ -195,13 +197,13 @@ CUSTOM_INPUT_MEMBER(peyper_state::wolfman_replay_hs_r)
 }
 
 
-static ADDRESS_MAP_START( peyper_map, AS_PROGRAM, 8, peyper_state )
+ADDRESS_MAP_START(peyper_state::peyper_map)
 	ADDRESS_MAP_UNMAP_HIGH
 	AM_RANGE(0x0000, 0x5FFF) AM_ROM
 	AM_RANGE(0x6000, 0x67FF) AM_RAM AM_SHARE("nvram")
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( peyper_io, AS_IO, 8, peyper_state )
+ADDRESS_MAP_START(peyper_state::peyper_io)
 	ADDRESS_MAP_UNMAP_HIGH
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	AM_RANGE(0x00, 0x01) AM_DEVREADWRITE("i8279", i8279_device, read, write)
@@ -591,7 +593,7 @@ MACHINE_CONFIG_START(peyper_state::peyper)
 	MCFG_DEFAULT_LAYOUT(layout_peyper)
 
 	/* Sound */
-	MCFG_FRAGMENT_ADD( genpin_audio )
+	genpin_audio(config);
 	MCFG_SPEAKER_STANDARD_MONO("ayvol")
 	MCFG_SOUND_ADD("ay1", AY8910, 2500000)
 	MCFG_AY8910_PORT_A_WRITE_CB(WRITE8(peyper_state, p1a_w))

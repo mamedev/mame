@@ -234,13 +234,19 @@ Who Dunit            1988  6809
 ***************************************************************************/
 
 #include "emu.h"
+#include "includes/exidy440.h"
+
 #include "cpu/m6809/m6809.h"
 #include "machine/nvram.h"
-#include "includes/exidy440.h"
+#include "speaker.h"
 
 
 /* constants */
+
 #define MAIN_CPU_CLOCK      (EXIDY440_MASTER_CLOCK / 8)
+#define EXIDY440_AUDIO_CLOCK    (XTAL(12'979'200) / 4)
+#define EXIDY440_MC3418_CLOCK   (EXIDY440_AUDIO_CLOCK / 4 / 16)
+#define EXIDY440_MC3417_CLOCK   (EXIDY440_AUDIO_CLOCK / 4 / 32)
 
 
 
@@ -421,13 +427,13 @@ READ8_MEMBER(exidy440_state::claypign_protection_r)
 }
 
 
-READ8_MEMBER(exidy440_state::topsecex_input_port_5_r)
+READ8_MEMBER(topsecex_state::topsecex_input_port_5_r)
 {
 	return (ioport("AN1")->read() & 1) ? 0x01 : 0x02;
 }
 
 
-WRITE8_MEMBER(exidy440_state::topsecex_yscroll_w)
+WRITE8_MEMBER(topsecex_state::topsecex_yscroll_w)
 {
 	m_topsecex_yscroll = data;
 }
@@ -462,7 +468,7 @@ void exidy440_state::machine_reset()
  *
  *************************************/
 
-static ADDRESS_MAP_START( exidy440_map, AS_PROGRAM, 8, exidy440_state )
+ADDRESS_MAP_START(exidy440_state::exidy440_map)
 	AM_RANGE(0x0000, 0x1fff) AM_RAM AM_SHARE("imageram")
 	AM_RANGE(0x2000, 0x209f) AM_RAM_WRITE(exidy440_spriteram_w) AM_SHARE("spriteram")
 	AM_RANGE(0x20a0, 0x29ff) AM_RAM
@@ -482,6 +488,27 @@ static ADDRESS_MAP_START( exidy440_map, AS_PROGRAM, 8, exidy440_state )
 	AM_RANGE(0x3000, 0x3fff) AM_RAM
 	AM_RANGE(0x4000, 0x7fff) AM_READ_BANK("bank1") AM_WRITE(bankram_w)
 	AM_RANGE(0x8000, 0xffff) AM_ROM
+ADDRESS_MAP_END
+
+
+/*************************************
+ *
+ *  Audio CPU memory handlers
+ *
+ *************************************/
+
+ADDRESS_MAP_START(exidy440_state::exidy440_audio_map)
+	AM_RANGE(0x0000, 0x7fff) AM_NOP
+	AM_RANGE(0x8000, 0x801f) AM_MIRROR(0x03e0) AM_DEVREADWRITE("custom", exidy440_sound_device, m6844_r, m6844_w)
+	AM_RANGE(0x8400, 0x840f) AM_MIRROR(0x03f0) AM_DEVREADWRITE("custom", exidy440_sound_device, sound_volume_r, sound_volume_w)
+	AM_RANGE(0x8800, 0x8800) AM_MIRROR(0x03ff) AM_DEVREAD("custom", exidy440_sound_device, sound_command_r) AM_WRITENOP
+	AM_RANGE(0x8c00, 0x93ff) AM_NOP
+	AM_RANGE(0x9400, 0x9403) AM_MIRROR(0x03fc) AM_READNOP AM_DEVWRITE("custom", exidy440_sound_device, sound_banks_w)
+	AM_RANGE(0x9800, 0x9800) AM_MIRROR(0x03ff) AM_READNOP AM_DEVWRITE("custom", exidy440_sound_device, sound_interrupt_clear_w)
+	AM_RANGE(0x9c00, 0x9fff) AM_NOP
+	AM_RANGE(0xa000, 0xbfff) AM_RAM
+	AM_RANGE(0xc000, 0xdfff) AM_NOP
+	AM_RANGE(0xe000, 0xffff) AM_ROM
 ADDRESS_MAP_END
 
 
@@ -1002,19 +1029,40 @@ MACHINE_CONFIG_START(exidy440_state::exidy440)
 	MCFG_NVRAM_ADD_0FILL("nvram")
 
 	/* video hardware */
-	MCFG_FRAGMENT_ADD(exidy440_video)
+	exidy440_video(config);
 
 	/* audio hardware */
-	MCFG_FRAGMENT_ADD(exidy440_audio)
+	MCFG_CPU_ADD("audiocpu", MC6809, EXIDY440_AUDIO_CLOCK)
+	MCFG_CPU_PROGRAM_MAP(exidy440_audio_map)
+	MCFG_CPU_VBLANK_INT_DRIVER("screen", driver_device, irq0_line_assert)
+
+	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
+
+	MCFG_SOUND_ADD("custom", EXIDY440, EXIDY440_MC3418_CLOCK)
+	MCFG_SOUND_ROUTE(0, "lspeaker", 1.0)
+	MCFG_SOUND_ROUTE(1, "rspeaker", 1.0)
+
+//  MCFG_SOUND_ADD("cvsd1", MC3418, EXIDY440_MC3418_CLOCK)
+//  MCFG_SOUND_ROUTE(ALL_OUTPUTS, "lspeaker", 1.0)
+
+//  MCFG_SOUND_ADD("cvsd2", MC3418, EXIDY440_MC3418_CLOCK)
+//  MCFG_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", 1.0)
+
+//  MCFG_SOUND_ADD("cvsd3", MC3417, EXIDY440_MC3417_CLOCK)
+//  MCFG_SOUND_ROUTE(ALL_OUTPUTS, "lspeaker", 1.0)
+
+//  MCFG_SOUND_ADD("cvsd4", MC3417, EXIDY440_MC3417_CLOCK)
+//  MCFG_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", 1.0)
 MACHINE_CONFIG_END
 
 
-MACHINE_CONFIG_DERIVED(exidy440_state::topsecex, exidy440)
+MACHINE_CONFIG_START(topsecex_state::topsecex)
+	exidy440(config);
 
 	/* basic machine hardware */
 
 	/* video hardware */
-	MCFG_FRAGMENT_ADD(topsecex_video)
+	topsecex_video(config);
 MACHINE_CONFIG_END
 
 
@@ -2005,16 +2053,16 @@ DRIVER_INIT_MEMBER(exidy440_state,claypign)
 }
 
 
-DRIVER_INIT_MEMBER(exidy440_state,topsecex)
+DRIVER_INIT_MEMBER(topsecex_state,topsecex)
 {
 	DRIVER_INIT_CALL(exidy440);
 
 	/* extra input ports and scrolling */
-	m_maincpu->space(AS_PROGRAM).install_read_handler(0x2ec5, 0x2ec5, read8_delegate(FUNC(exidy440_state::topsecex_input_port_5_r),this));
+	m_maincpu->space(AS_PROGRAM).install_read_handler(0x2ec5, 0x2ec5, read8_delegate(FUNC(topsecex_state::topsecex_input_port_5_r),this));
 	m_maincpu->space(AS_PROGRAM).install_read_port(0x2ec6, 0x2ec6, "AN0");
 	m_maincpu->space(AS_PROGRAM).install_read_port(0x2ec7, 0x2ec7, "IN4");
 
-	m_maincpu->space(AS_PROGRAM).install_write_handler(0x2ec1, 0x2ec1, write8_delegate(FUNC(exidy440_state::topsecex_yscroll_w),this));
+	m_maincpu->space(AS_PROGRAM).install_write_handler(0x2ec1, 0x2ec1, write8_delegate(FUNC(topsecex_state::topsecex_yscroll_w),this));
 }
 
 
@@ -2078,7 +2126,7 @@ GAME( 1985, catch22,  combat,   exidy440, catch22,  exidy440_state, exidy440, RO
 GAME( 1985, cracksht, 0,        exidy440, cracksht, exidy440_state, exidy440, ROT0, "Exidy", "Crackshot (version 2.0)",          0 )
 GAME( 1986, claypign, 0,        exidy440, claypign, exidy440_state, claypign, ROT0, "Exidy", "Clay Pigeon (version 2.0)",        0 )
 GAME( 1986, chiller,  0,        exidy440, chiller,  exidy440_state, exidy440, ROT0, "Exidy", "Chiller (version 3.0)",            0 )
-GAME( 1986, topsecex, 0,        topsecex, topsecex, exidy440_state, topsecex, ROT0, "Exidy", "Top Secret (Exidy) (version 1.0)", 0 )
+GAME( 1986, topsecex, 0,        topsecex, topsecex, topsecex_state, topsecex, ROT0, "Exidy", "Top Secret (Exidy) (version 1.0)", 0 )
 GAME( 1987, hitnmiss, 0,        exidy440, hitnmiss, exidy440_state, exidy440, ROT0, "Exidy", "Hit 'n Miss (version 3.0)",        0 )
 GAME( 1987, hitnmiss2,hitnmiss, exidy440, hitnmiss, exidy440_state, exidy440, ROT0, "Exidy", "Hit 'n Miss (version 2.0)",        0 )
 GAME( 1988, whodunit, 0,        exidy440, whodunit, exidy440_state, exidy440, ROT0, "Exidy", "Who Dunit (version 9.0)",          0 )

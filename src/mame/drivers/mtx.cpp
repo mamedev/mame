@@ -46,14 +46,14 @@
     ADDRESS_MAP( mtx_mem )
 -------------------------------------------------*/
 
-static ADDRESS_MAP_START( mtx_mem, AS_PROGRAM, 8, mtx_state )
+ADDRESS_MAP_START(mtx_state::mtx_mem)
 ADDRESS_MAP_END
 
 /*-------------------------------------------------
     ADDRESS_MAP( mtx_io )
 -------------------------------------------------*/
 
-static ADDRESS_MAP_START( mtx_io, AS_IO, 8, mtx_state )
+ADDRESS_MAP_START(mtx_state::mtx_io)
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	AM_RANGE(0x00, 0x00) AM_READWRITE(mtx_strobe_r, mtx_bankswitch_w)
 	AM_RANGE(0x01, 0x01) AM_DEVREADWRITE("tms9929a", tms9929a_device, vram_read, vram_write)
@@ -81,7 +81,7 @@ ADDRESS_MAP_END
     ADDRESS_MAP( rs128_io )
 -------------------------------------------------*/
 
-static ADDRESS_MAP_START( rs128_io, AS_IO, 8, mtx_state )
+ADDRESS_MAP_START(mtx_state::rs128_io)
 	AM_IMPORT_FROM(mtx_io)
 	AM_RANGE(0x0c, 0x0f) AM_DEVREADWRITE(Z80DART_TAG, z80dart_device, cd_ba_r, cd_ba_w)
 ADDRESS_MAP_END
@@ -348,10 +348,11 @@ MACHINE_CONFIG_START(mtx_state::mtx512)
 MACHINE_CONFIG_END
 
 /*-------------------------------------------------
-    MACHINE_CONFIG_DERIVED( mtx500, mtx512 )
+    MACHINE_CONFIG_START( mtx500 )
 -------------------------------------------------*/
 
-MACHINE_CONFIG_DERIVED(mtx_state::mtx500, mtx512)
+MACHINE_CONFIG_START(mtx_state::mtx500)
+	mtx512(config);
 
 	/* internal ram */
 	MCFG_RAM_MODIFY(RAM_TAG)
@@ -360,10 +361,11 @@ MACHINE_CONFIG_DERIVED(mtx_state::mtx500, mtx512)
 MACHINE_CONFIG_END
 
 /*-------------------------------------------------
-    MACHINE_CONFIG_DERIVED( rs128, mtx512 )
+    MACHINE_CONFIG_START( rs128 )
 -------------------------------------------------*/
 
-MACHINE_CONFIG_DERIVED(mtx_state::rs128, mtx512)
+MACHINE_CONFIG_START(mtx_state::rs128)
+	mtx512(config);
 
 	/* basic machine hardware */
 	MCFG_CPU_MODIFY(Z80_TAG)

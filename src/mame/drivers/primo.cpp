@@ -117,31 +117,31 @@ Interrupts:
 #include "formats/primoptp.h"
 
 
-static ADDRESS_MAP_START( primoa_port, AS_IO, 8, primo_state )
+ADDRESS_MAP_START(primo_state::primoa_port)
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	AM_RANGE( 0x00, 0x3f ) AM_READWRITE(primo_be_1_r, primo_ki_1_w )
 	AM_RANGE( 0xfd, 0xfd ) AM_WRITE(primo_FD_w )
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( primob_port, AS_IO, 8, primo_state )
+ADDRESS_MAP_START(primo_state::primob_port)
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	AM_RANGE( 0x00, 0x3f ) AM_READWRITE(primo_be_1_r, primo_ki_1_w )
 	AM_RANGE( 0x40, 0x7f ) AM_READWRITE(primo_be_2_r, primo_ki_2_w )
 	AM_RANGE( 0xfd, 0xfd ) AM_WRITE(primo_FD_w )
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( primo32_mem, AS_PROGRAM, 8, primo_state )
+ADDRESS_MAP_START(primo_state::primo32_mem)
 	AM_RANGE( 0x0000, 0x3fff ) AM_RAMBANK("bank1")
 	AM_RANGE( 0x4000, 0x7fff ) AM_RAM AM_MIRROR ( 0x8000 )
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( primo48_mem, AS_PROGRAM, 8, primo_state )
+ADDRESS_MAP_START(primo_state::primo48_mem)
 	AM_RANGE( 0x0000, 0x3fff ) AM_RAMBANK("bank1")
 	AM_RANGE( 0x4000, 0x7fff ) AM_RAM
 	AM_RANGE( 0x8000, 0xbfff ) AM_RAM AM_MIRROR ( 0x4000 )
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( primo64_mem, AS_PROGRAM, 8, primo_state )
+ADDRESS_MAP_START(primo_state::primo64_mem)
 	AM_RANGE( 0x0000, 0x3fff ) AM_RAMBANK("bank1")
 	AM_RANGE( 0x4000, 0xffff ) AM_RAM
 ADDRESS_MAP_END
@@ -284,38 +284,44 @@ MACHINE_CONFIG_START(primo_state::primoa32)
 	MCFG_GENERIC_EXTENSIONS("bin,rom")
 MACHINE_CONFIG_END
 
-MACHINE_CONFIG_DERIVED(primo_state::primoa48, primoa32)
+MACHINE_CONFIG_START(primo_state::primoa48)
+	primoa32(config);
 	MCFG_CPU_MODIFY("maincpu")
 	MCFG_CPU_PROGRAM_MAP(primo48_mem)
 MACHINE_CONFIG_END
 
-MACHINE_CONFIG_DERIVED(primo_state::primoa64, primoa32)
+MACHINE_CONFIG_START(primo_state::primoa64)
+	primoa32(config);
 	MCFG_CPU_MODIFY("maincpu")
 	MCFG_CPU_PROGRAM_MAP(primo64_mem)
 MACHINE_CONFIG_END
 
-MACHINE_CONFIG_DERIVED(primo_state::primob32, primoa32)
+MACHINE_CONFIG_START(primo_state::primob32)
+	primoa32(config);
 	MCFG_CPU_MODIFY("maincpu")
 	MCFG_CPU_IO_MAP(primob_port)
 
 	MCFG_MACHINE_RESET_OVERRIDE(primo_state, primob)
 MACHINE_CONFIG_END
 
-MACHINE_CONFIG_DERIVED(primo_state::primob48, primoa48)
+MACHINE_CONFIG_START(primo_state::primob48)
+	primoa48(config);
 	MCFG_CPU_MODIFY("maincpu")
 	MCFG_CPU_IO_MAP(primob_port)
 
 	MCFG_MACHINE_RESET_OVERRIDE(primo_state, primob)
 MACHINE_CONFIG_END
 
-MACHINE_CONFIG_DERIVED(primo_state::primob64, primoa64)
+MACHINE_CONFIG_START(primo_state::primob64)
+	primoa64(config);
 	MCFG_CPU_MODIFY("maincpu")
 	MCFG_CPU_IO_MAP(primob_port)
 
 	MCFG_MACHINE_RESET_OVERRIDE(primo_state, primob)
 MACHINE_CONFIG_END
 
-MACHINE_CONFIG_DERIVED(primo_state::primoc64, primoa64)
+MACHINE_CONFIG_START(primo_state::primoc64)
+	primoa64(config);
 	MCFG_CPU_MODIFY("maincpu")
 	MCFG_CPU_IO_MAP(primob_port)
 

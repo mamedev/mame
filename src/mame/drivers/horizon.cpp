@@ -56,13 +56,15 @@ public:
 		: driver_device(mconfig, type, tag)
 		, m_maincpu(*this, Z80_TAG)
 		, m_usart_l(*this, I8251_L_TAG)
-		, m_usart_r(*this, I8251_L_TAG)
+		, m_usart_r(*this, I8251_R_TAG)
 		{ }
 
 	DECLARE_READ8_MEMBER(ff_r);
 
 	void horizon(machine_config &config);
 	void horizon2mhz(machine_config &config);
+	void horizon_io(address_map &map);
+	void horizon_mem(address_map &map);
 private:
 	virtual void machine_reset() override;
 	required_device<cpu_device> m_maincpu;
@@ -80,7 +82,7 @@ private:
 //  ADDRESS_MAP( horizon_mem )
 //-------------------------------------------------
 
-static ADDRESS_MAP_START( horizon_mem, AS_PROGRAM, 8, horizon_state )
+ADDRESS_MAP_START(horizon_state::horizon_mem)
 	AM_RANGE(0x0000, 0xe7ff) AM_RAM
 	AM_RANGE(0xe800, 0xe9ff) AM_ROM AM_REGION("roms", 0)
 	AM_RANGE(0xea01, 0xea01)
@@ -98,7 +100,7 @@ ADDRESS_MAP_END
 //  ADDRESS_MAP( horizon_io )
 //-------------------------------------------------
 
-static ADDRESS_MAP_START( horizon_io, AS_IO, 8, horizon_state )
+ADDRESS_MAP_START(horizon_state::horizon_io)
 ADDRESS_MAP_END
 
 
@@ -218,7 +220,8 @@ MACHINE_CONFIG_START(horizon_state::horizon)
 	MCFG_SOFTWARE_LIST_ADD("flop_list", "horizon")
 MACHINE_CONFIG_END
 
-MACHINE_CONFIG_DERIVED(horizon_state::horizon2mhz, horizon)
+MACHINE_CONFIG_START(horizon_state::horizon2mhz)
+	horizon(config);
 	MCFG_CPU_MODIFY("z80")
 	MCFG_CPU_CLOCK(XTAL(4'000'000) / 2)
 

@@ -241,7 +241,7 @@ WRITE32_MEMBER(policetr_state::speedup_w)
  *
  *************************************/
 
-static ADDRESS_MAP_START( policetr_map, AS_PROGRAM, 32, policetr_state )
+ADDRESS_MAP_START(policetr_state::policetr_map)
 	AM_RANGE(0x00000000, 0x0001ffff) AM_RAM AM_SHARE("rambase")
 	AM_RANGE(0x00200000, 0x0020000f) AM_WRITE(policetr_video_w)
 	AM_RANGE(0x00400000, 0x00400003) AM_READ(policetr_video_r)
@@ -260,7 +260,7 @@ static ADDRESS_MAP_START( policetr_map, AS_PROGRAM, 32, policetr_state )
 ADDRESS_MAP_END
 
 
-static ADDRESS_MAP_START( sshooter_map, AS_PROGRAM, 32, policetr_state )
+ADDRESS_MAP_START(policetr_state::sshooter_map)
 	AM_RANGE(0x00000000, 0x0001ffff) AM_RAM AM_SHARE("rambase")
 	AM_RANGE(0x00200000, 0x00200003) AM_WRITE(policetr_bsmt2000_data_w)
 	AM_RANGE(0x00300000, 0x00300003) AM_WRITE(policetr_palette_offset_w)
@@ -428,7 +428,8 @@ MACHINE_CONFIG_START(policetr_state::policetr)
 MACHINE_CONFIG_END
 
 
-MACHINE_CONFIG_DERIVED(policetr_state::sshooter, policetr)
+MACHINE_CONFIG_START(policetr_state::sshooter)
+	policetr(config);
 
 	/* basic machine hardware */
 	MCFG_CPU_MODIFY("maincpu")

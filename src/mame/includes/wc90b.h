@@ -72,4 +72,7 @@ public:
 	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	void draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprect, int priority );
 	void wc90b(machine_config &config);
+	void sound_cpu(address_map &map);
+	void wc90b_map1(address_map &map);
+	void wc90b_map2(address_map &map);
 };

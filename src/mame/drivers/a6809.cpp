@@ -74,6 +74,9 @@ public:
 		, m_crtc(*this, "mc6845")
 	{ }
 
+	void a6809(machine_config &config);
+
+protected:
 	void kbd_put(u8 data);
 	DECLARE_READ8_MEMBER(videoram_r);
 	DECLARE_WRITE8_MEMBER(a6809_address_w);
@@ -82,11 +85,14 @@ public:
 	DECLARE_MACHINE_RESET(a6809);
 	TIMER_DEVICE_CALLBACK_MEMBER(a6809_c);
 	TIMER_DEVICE_CALLBACK_MEMBER(a6809_p);
+
+	void a6809_io(address_map &map);
+	void a6809_mem(address_map &map);
+
+private:
 	required_shared_ptr<uint8_t> m_p_videoram;
 	uint16_t m_start_address;
 	uint16_t m_cursor_address;
-	void a6809(machine_config &config);
-private:
 	uint8_t m_cass_data[4];
 	bool m_cass_state;
 	bool m_cassold;
@@ -98,7 +104,7 @@ private:
 };
 
 
-static ADDRESS_MAP_START(a6809_mem, AS_PROGRAM, 8, a6809_state)
+ADDRESS_MAP_START(a6809_state::a6809_mem)
 	ADDRESS_MAP_UNMAP_HIGH
 	AM_RANGE(0x0000,0x03ff) AM_RAM
 	AM_RANGE(0x0400,0x07ff) AM_RAM AM_SHARE("videoram")
@@ -109,7 +115,7 @@ static ADDRESS_MAP_START(a6809_mem, AS_PROGRAM, 8, a6809_state)
 	AM_RANGE(0xf800,0xffff) AM_ROM AM_REGION("maincpu", 0)
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( a6809_io, AS_IO, 8, a6809_state)
+ADDRESS_MAP_START(a6809_state::a6809_io)
 	ADDRESS_MAP_UNMAP_HIGH
 ADDRESS_MAP_END
 

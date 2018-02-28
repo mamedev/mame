@@ -61,4 +61,9 @@ public:
 	void mcatadv_draw_tilemap_part( screen_device &screen, uint16_t* current_scroll, uint16_t* current_videoram1, int i, tilemap_t* current_tilemap, bitmap_ind16 &bitmap, const rectangle &cliprect );
 	void nost(machine_config &config);
 	void mcatadv(machine_config &config);
+	void mcatadv_map(address_map &map);
+	void mcatadv_sound_io_map(address_map &map);
+	void mcatadv_sound_map(address_map &map);
+	void nost_sound_io_map(address_map &map);
+	void nost_sound_map(address_map &map);
 };

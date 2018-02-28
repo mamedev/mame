@@ -45,6 +45,7 @@ public:
 	MC6845_UPDATE_ROW(crtc_update_row);
 
 	void ec65(machine_config &config);
+	void ec65_mem(address_map &map);
 private:
 	virtual void machine_reset() override;
 	required_device<via6522_device> m_via_0;
@@ -63,9 +64,10 @@ public:
 	{
 	}
 	void ec65k(machine_config &config);
+	void ec65k_mem(address_map &map);
 };
 
-static ADDRESS_MAP_START(ec65_mem, AS_PROGRAM, 8, ec65_state)
+ADDRESS_MAP_START(ec65_state::ec65_mem)
 	ADDRESS_MAP_UNMAP_HIGH
 	AM_RANGE(0x0000, 0xdfff) AM_RAM
 	AM_RANGE(0xe000, 0xe003) AM_DEVREADWRITE(PIA6821_TAG, pia6821_device, read, write)
@@ -80,7 +82,7 @@ static ADDRESS_MAP_START(ec65_mem, AS_PROGRAM, 8, ec65_state)
 	AM_RANGE(0xf000, 0xffff) AM_ROM
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START(ec65k_mem, AS_PROGRAM, 8, ec65_state)
+ADDRESS_MAP_START(ec65k_state::ec65k_mem)
 	ADDRESS_MAP_UNMAP_HIGH
 	AM_RANGE(0x0000, 0xe7ff) AM_RAM
 	AM_RANGE(0xe800, 0xefff) AM_RAM AM_SHARE("videoram")

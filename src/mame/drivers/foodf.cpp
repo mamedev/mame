@@ -138,14 +138,14 @@ TIMER_DEVICE_CALLBACK_MEMBER(foodf_state::scanline_update_timer)
 }
 
 
-MACHINE_START_MEMBER(foodf_state,foodf)
+void foodf_state::machine_start()
 {
 	atarigen_state::machine_start();
 	save_item(NAME(m_whichport));
 }
 
 
-MACHINE_RESET_MEMBER(foodf_state,foodf)
+void foodf_state::machine_reset()
 {
 	timer_device *scan_timer = machine().device<timer_device>("scan_timer");
 	scan_timer->adjust(m_screen->time_until_pos(0));
@@ -207,7 +207,7 @@ WRITE16_MEMBER(foodf_state::analog_w)
  *************************************/
 
 // complete memory map derived from schematics
-static ADDRESS_MAP_START( main_map, AS_PROGRAM, 16, foodf_state )
+ADDRESS_MAP_START(foodf_state::main_map)
 	ADDRESS_MAP_UNMAP_HIGH
 	AM_RANGE(0x000000, 0x00ffff) AM_MIRROR(0x3e0000) AM_ROM
 	AM_RANGE(0x014000, 0x014fff) AM_MIRROR(0x3e3000) AM_RAM
@@ -340,10 +340,7 @@ MACHINE_CONFIG_START(foodf_state::foodf)
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", M68000, MASTER_CLOCK/2)
 	MCFG_CPU_PROGRAM_MAP(main_map)
-	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", atarigen_state, video_int_gen)
-
-	MCFG_MACHINE_START_OVERRIDE(foodf_state,foodf)
-	MCFG_MACHINE_RESET_OVERRIDE(foodf_state,foodf)
+	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", foodf_state, video_int_gen)
 
 	MCFG_X2212_ADD_AUTOSAVE("nvram")
 
@@ -362,8 +359,6 @@ MACHINE_CONFIG_START(foodf_state::foodf)
 	MCFG_SCREEN_RAW_PARAMS(MASTER_CLOCK/2, 384, 0, 256, 259, 0, 224)
 	MCFG_SCREEN_UPDATE_DRIVER(foodf_state, screen_update_foodf)
 	MCFG_SCREEN_PALETTE("palette")
-
-	MCFG_VIDEO_START_OVERRIDE(foodf_state,foodf)
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")

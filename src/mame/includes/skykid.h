@@ -59,4 +59,7 @@ public:
 	INTERRUPT_GEN_MEMBER(mcu_vblank_irq);
 	void draw_sprites(bitmap_ind16 &bitmap,const rectangle &cliprect);
 	void skykid(machine_config &config);
+	void mcu_map(address_map &map);
+	void mcu_port_map(address_map &map);
+	void skykid_map(address_map &map);
 };

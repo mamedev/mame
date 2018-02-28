@@ -165,6 +165,11 @@ public:
 	bool m_mcu_repeat;
 	void quizpun(machine_config &config);
 	void quizpun2(machine_config &config);
+	void quizpun2_cop_map(address_map &map);
+	void quizpun2_io_map(address_map &map);
+	void quizpun2_map(address_map &map);
+	void quizpun2_sound_io_map(address_map &map);
+	void quizpun2_sound_map(address_map &map);
 };
 
 /***************************************************************************
@@ -318,7 +323,7 @@ WRITE8_MEMBER(quizpun2_state::soundlatch_w)
 	m_audiocpu->set_input_line(INPUT_LINE_NMI, PULSE_LINE);
 }
 
-static ADDRESS_MAP_START( quizpun2_map, AS_PROGRAM, 8, quizpun2_state )
+ADDRESS_MAP_START(quizpun2_state::quizpun2_map)
 	AM_RANGE( 0x0000, 0x7fff ) AM_ROM
 	AM_RANGE( 0x8000, 0x9fff ) AM_ROMBANK("bank1")
 
@@ -329,7 +334,7 @@ static ADDRESS_MAP_START( quizpun2_map, AS_PROGRAM, 8, quizpun2_state )
 	AM_RANGE( 0xe000, 0xffff ) AM_RAM
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( quizpun2_io_map, AS_IO, 8, quizpun2_state )
+ADDRESS_MAP_START(quizpun2_state::quizpun2_io_map)
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	AM_RANGE( 0x40, 0x40 ) AM_WRITE(irq_ack)
 	AM_RANGE( 0x50, 0x50 ) AM_WRITE(soundlatch_w)
@@ -341,7 +346,7 @@ static ADDRESS_MAP_START( quizpun2_io_map, AS_IO, 8, quizpun2_state )
 	AM_RANGE( 0xe0, 0xe0 ) AM_READWRITE(quizpun_protection_r, quizpun_protection_w)
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( quizpun2_cop_map, AS_PROGRAM, 8, quizpun2_state )
+ADDRESS_MAP_START(quizpun2_state::quizpun2_cop_map)
 	AM_RANGE( 0x000, 0x3ff ) AM_ROM AM_REGION("cop", 0)
 ADDRESS_MAP_END
 
@@ -466,12 +471,12 @@ WRITE8_MEMBER(quizpun2_state::quizpun_68705_port_c_w)
                             Memory Maps - Sound CPU
 ***************************************************************************/
 
-static ADDRESS_MAP_START( quizpun2_sound_map, AS_PROGRAM, 8, quizpun2_state )
+ADDRESS_MAP_START(quizpun2_state::quizpun2_sound_map)
 	AM_RANGE( 0x0000, 0xf7ff ) AM_ROM
 	AM_RANGE( 0xf800, 0xffff ) AM_RAM
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( quizpun2_sound_io_map, AS_IO, 8, quizpun2_state )
+ADDRESS_MAP_START(quizpun2_state::quizpun2_sound_io_map)
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	AM_RANGE( 0x00, 0x00 ) AM_WRITENOP  // IRQ end
 	AM_RANGE( 0x20, 0x20 ) AM_WRITENOP  // NMI end
@@ -609,7 +614,8 @@ MACHINE_CONFIG_START(quizpun2_state::quizpun2)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 MACHINE_CONFIG_END
 
-MACHINE_CONFIG_DERIVED(quizpun2_state::quizpun, quizpun2)
+MACHINE_CONFIG_START(quizpun2_state::quizpun)
+	quizpun2(config);
 	MCFG_DEVICE_REMOVE("cop")
 
 	MCFG_CPU_ADD("mcu", M68705P5, XTAL(4'000'000)) // xtal is 4MHz, divided by 4 internally

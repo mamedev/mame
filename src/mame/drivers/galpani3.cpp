@@ -124,6 +124,7 @@ public:
 	TIMER_DEVICE_CALLBACK_MEMBER(galpani3_vblank);
 	int gp3_is_alpha_pen(int pen);
 	void galpani3(machine_config &config);
+	void galpani3_map(address_map &map);
 };
 
 
@@ -465,7 +466,7 @@ WRITE16_MEMBER(galpani3_state::galpani3_priority_buffer_scrolly_w)
 
 
 
-static ADDRESS_MAP_START( galpani3_map, AS_PROGRAM, 16, galpani3_state )
+ADDRESS_MAP_START(galpani3_state::galpani3_map)
 	AM_RANGE(0x000000, 0x17ffff) AM_ROM
 
 	AM_RANGE(0x200000, 0x20ffff) AM_RAM // area [B] - Work RAM
@@ -528,15 +529,15 @@ MACHINE_CONFIG_START(galpani3_state::galpani3)
 	MCFG_DEVICE_ADD("spritegen", SKNS_SPRITE, 0)
 
 	MCFG_DEVICE_ADD("grap2_0", KANEKO_GRAP2, 0)
-	kaneko_grap2_device::set_chipnum(*device, 0);
+	MCFG_KANEKO_GRAP2_CHIPNUM(0)
 	MCFG_KANEKO_GRAP2_PALETTE("palette")
 
 	MCFG_DEVICE_ADD("grap2_1", KANEKO_GRAP2, 0)
-	kaneko_grap2_device::set_chipnum(*device, 1);
+	MCFG_KANEKO_GRAP2_CHIPNUM(1)
 	MCFG_KANEKO_GRAP2_PALETTE("palette")
 
 	MCFG_DEVICE_ADD("grap2_2", KANEKO_GRAP2, 0)
-	kaneko_grap2_device::set_chipnum(*device, 2);
+	MCFG_KANEKO_GRAP2_CHIPNUM(2)
 	MCFG_KANEKO_GRAP2_PALETTE("palette")
 
 

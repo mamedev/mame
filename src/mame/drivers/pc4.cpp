@@ -61,13 +61,13 @@ WRITE8_MEMBER( pc4_state::beep_w )
 	m_beep->set_state(data&0x40);
 }
 
-static ADDRESS_MAP_START(pc4_mem, AS_PROGRAM, 8, pc4_state)
+ADDRESS_MAP_START(pc4_state::pc4_mem)
 	AM_RANGE(0x0000, 0x3fff) AM_ROM
 	AM_RANGE(0x4000, 0x7fff) AM_ROMBANK("rombank")
 	AM_RANGE(0x8000, 0xffff) AM_RAM
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START(pc4_io, AS_IO, 8, pc4_state)
+ADDRESS_MAP_START(pc4_state::pc4_io)
 	ADDRESS_MAP_UNMAP_HIGH
 	AM_RANGE(0x0000, 0x000f) AM_DEVREADWRITE("rtc", rp5c01_device, read, write)
 	AM_RANGE(0x1000, 0x1000) AM_WRITE(beep_w)

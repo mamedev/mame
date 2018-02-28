@@ -12,13 +12,19 @@ public:
 		: driver_device(mconfig, type, tag),
 		m_maincpu(*this,"maincpu"),
 		m_subcpu(*this, "sub"),
-		m_screen(*this, "screen")
+		m_screen(*this, "screen"),
+		m_mainbank(*this, "mainbank")
 	{ }
 
 	int mux_port;
 	// uint32_t m_st0016_rom_bank;
 
-	optional_device<st0016_cpu_device> m_maincpu;
+	required_device<st0016_cpu_device> m_maincpu;
+	optional_device<cpu_device> m_subcpu;
+	required_device<screen_device> m_screen;
+
+	required_memory_bank m_mainbank;
+
 	DECLARE_READ8_MEMBER(mux_r);
 	DECLARE_WRITE8_MEMBER(mux_select_w);
 	DECLARE_READ32_MEMBER(latch32_r);
@@ -35,9 +41,12 @@ public:
 	DECLARE_VIDEO_START(st0016);
 	uint32_t screen_update_st0016(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	TIMER_DEVICE_CALLBACK_MEMBER(st0016_int);
-	optional_device<cpu_device> m_subcpu;
-	required_device<screen_device> m_screen;
 	void st0016(machine_config &config);
 	void renju(machine_config &config);
 	void mayjinsn(machine_config &config);
+	void renju_mem(address_map &map);
+	void st0016_io(address_map &map);
+	void st0016_m2_io(address_map &map);
+	void st0016_mem(address_map &map);
+	void v810_mem(address_map &map);
 };

@@ -82,4 +82,9 @@ public:
 	void silkworm(machine_config &config);
 	void gemini(machine_config &config);
 	void rygar(machine_config &config);
+	void gemini_map(address_map &map);
+	void rygar_map(address_map &map);
+	void rygar_sound_map(address_map &map);
+	void silkworm_map(address_map &map);
+	void tecmo_sound_map(address_map &map);
 };

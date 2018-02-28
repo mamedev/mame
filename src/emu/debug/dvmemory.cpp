@@ -759,7 +759,7 @@ bool debug_view_memory::read(u8 size, offs_t offs, u64 &data)
 	// if no raw data, just use the standard debug routines
 	if (source.m_space)
 	{
-		auto dis = machine().disable_side_effect();
+		auto dis = machine().disable_side_effects();
 
 		bool ismapped = offs <= m_maxaddr;
 		if (ismapped && !m_no_translation)
@@ -842,7 +842,7 @@ void debug_view_memory::write(u8 size, offs_t offs, u64 data)
 	// if no raw data, just use the standard debug routines
 	if (source.m_space)
 	{
-		auto dis = machine().disable_side_effect();
+		auto dis = machine().disable_side_effects();
 
 		switch (size)
 		{

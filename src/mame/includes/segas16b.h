@@ -69,8 +69,8 @@ public:
 
 	// memory mapping
 	void memory_mapper(sega_315_5195_mapper_device &mapper, uint8_t index);
-	uint8_t mapper_sound_r();
-	void mapper_sound_w(uint8_t data);
+	DECLARE_READ8_MEMBER(mapper_sound_r);
+	DECLARE_WRITE8_MEMBER(mapper_sound_w);
 
 	// main CPU read/write handlers
 	DECLARE_WRITE16_MEMBER( rom_5704_bank_w );
@@ -156,6 +156,22 @@ public:
 	void system16b_fd1094(machine_config &config);
 	void fpointbl(machine_config &config);
 	void lockonph(machine_config &config);
+	void decrypted_opcodes_map(address_map &map);
+	void decrypted_opcodes_map_fpointbla(address_map &map);
+	void decrypted_opcodes_map_x(address_map &map);
+	void fpointbl_map(address_map &map);
+	void fpointbl_sound_map(address_map &map);
+	void lockonph_map(address_map &map);
+	void lockonph_sound_iomap(address_map &map);
+	void lockonph_sound_map(address_map &map);
+	void map_fpointbla(address_map &map);
+	void mcu_io_map(address_map &map);
+	void sound_decrypted_opcodes_map(address_map &map);
+	void sound_map(address_map &map);
+	void sound_portmap(address_map &map);
+	void system16b_bootleg_map(address_map &map);
+	void system16b_map(address_map &map);
+	void system16c_map(address_map &map);
 protected:
 	// internal types
 	typedef delegate<void ()> i8751_sim_delegate;
@@ -348,4 +364,5 @@ public:
 	bool            m_rle_latched;
 	uint8_t           m_rle_byte;
 	void isgsm(machine_config &config);
+	void isgsm_map(address_map &map);
 };

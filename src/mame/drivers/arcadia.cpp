@@ -124,7 +124,7 @@ anything in hardware. No cartridge has been found which uses them.
 #include "softlist.h"
 #include "speaker.h"
 
-static ADDRESS_MAP_START( arcadia_mem, AS_PROGRAM, 8, arcadia_state )
+ADDRESS_MAP_START(arcadia_state::arcadia_mem)
 	AM_RANGE( 0x0000, 0x0fff) AM_DEVREAD("cartslot", arcadia_cart_slot_device, read_rom)
 	AM_RANGE( 0x1800, 0x1aff) AM_READWRITE(video_r, video_w)
 ADDRESS_MAP_END

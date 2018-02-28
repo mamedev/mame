@@ -116,13 +116,13 @@ ROM_START( taito_cchip )
 ROM_END
 
 
-static ADDRESS_MAP_START( cchip_ram_bank, AS_PROGRAM, 8, taito_cchip_device )
+ADDRESS_MAP_START(taito_cchip_device::cchip_ram_bank)
 	AM_RANGE(0x0000, 0x1fff) AM_RAM AM_SHARE("upd4464") // upd4464
 ADDRESS_MAP_END
 
 READ8_MEMBER(taito_cchip_device::asic_r)
 {
-	if ((offset != 0x001) && (!machine().side_effect_disabled())) // prevent logerror spam for now
+	if ((offset != 0x001) && (!machine().side_effects_disabled())) // prevent logerror spam for now
 		logerror("%s: asic_r %04x\n", machine().describe_context(), offset);
 	if (offset<0x200) // 400-5ff is asic 'ram'
 		return m_asic_ram[offset&3];
@@ -153,7 +153,7 @@ WRITE8_MEMBER(taito_cchip_device::mem_w)
 	return m_upd4464_bank->write8(space,offset,data);
 }
 
-static ADDRESS_MAP_START( cchip_map, AS_PROGRAM, 8, taito_cchip_device )
+ADDRESS_MAP_START(taito_cchip_device::cchip_map)
 	//AM_RANGE(0x0000, 0x0fff) AM_ROM // internal ROM of uPD7811
 	AM_RANGE(0x1000, 0x13ff) AM_DEVICE("upd4464_bank", address_map_bank_device, amap8)
 	AM_RANGE(0x1400, 0x17ff) AM_READWRITE(asic_r, asic_w)

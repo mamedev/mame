@@ -47,6 +47,7 @@ public:
 	DECLARE_WRITE8_MEMBER( output_data_w );
 
 	void zexall(machine_config &config);
+	void z80_mem(address_map &map);
 private:
 	required_device<cpu_device> m_maincpu;
 	required_device<generic_terminal_device> m_terminal;
@@ -135,11 +136,11 @@ WRITE8_MEMBER( zexall_state::output_data_w )
  Address Maps
 ******************************************************************************/
 
-static ADDRESS_MAP_START(z80_mem, AS_PROGRAM, 8, zexall_state)
+ADDRESS_MAP_START(zexall_state::z80_mem)
+	AM_RANGE(0x0000, 0xffff) AM_RAM AM_SHARE("main_ram")
 	AM_RANGE(0xfffd, 0xfffd) AM_READWRITE(output_ack_r, output_ack_w)
 	AM_RANGE(0xfffe, 0xfffe) AM_READWRITE(output_req_r, output_req_w)
 	AM_RANGE(0xffff, 0xffff) AM_READWRITE(output_data_r, output_data_w)
-	AM_RANGE(0x0000, 0xffff) AM_RAM AM_SHARE("main_ram")
 ADDRESS_MAP_END
 
 

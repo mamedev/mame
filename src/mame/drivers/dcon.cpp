@@ -38,7 +38,7 @@ READ8_MEMBER(dcon_state::sdgndmps_sound_comms_r)
 	return m_seibu_sound->main_r(space, offset);
 }
 
-static ADDRESS_MAP_START( dcon_map, AS_PROGRAM, 16, dcon_state )
+ADDRESS_MAP_START(dcon_state::dcon_map)
 	AM_RANGE(0x00000, 0x7ffff) AM_ROM
 	AM_RANGE(0x80000, 0x8bfff) AM_RAM
 
@@ -59,9 +59,9 @@ static ADDRESS_MAP_START( dcon_map, AS_PROGRAM, 16, dcon_state )
 	AM_RANGE(0xe0004, 0xe0005) AM_READ_PORT("SYSTEM")
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( sdgndmps_map, AS_PROGRAM, 16, dcon_state )
-	AM_RANGE(0xa0000, 0xa000d) AM_READ8(sdgndmps_sound_comms_r, 0x00ff)
+ADDRESS_MAP_START(dcon_state::sdgndmps_map)
 	AM_IMPORT_FROM(dcon_map)
+	AM_RANGE(0xa0000, 0xa000d) AM_READ8(sdgndmps_sound_comms_r, 0x00ff)
 ADDRESS_MAP_END
 
 /******************************************************************************/

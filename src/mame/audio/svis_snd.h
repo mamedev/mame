@@ -19,7 +19,7 @@
 #define SVISION_SND_IRQ_MEMBER(_name)   void _name(void)
 
 #define SVISION_SND_IRQ_CB(_class, _method) \
-	svision_sound_device::set_irq_callback(*device, svision_sound_device::irq_delegate(&_class::_method, #_class "::" #_method, this));
+	downcast<svision_sound_device &>(*device).set_irq_callback(svision_sound_device::irq_delegate(&_class::_method, #_class "::" #_method, this));
 
 // ======================> svision_sound_device
 
@@ -30,8 +30,8 @@ public:
 
 	svision_sound_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
-	// static configuration
-	static void set_irq_callback(device_t &device, irq_delegate callback) { downcast<svision_sound_device &>(device).m_irq_cb = callback; }
+	// configuration
+	template<typename Object> void set_irq_callback(Object &&callback) { m_irq_cb = std::forward<Object>(callback); }
 
 	DECLARE_WRITE8_MEMBER( sounddma_w );
 	DECLARE_WRITE8_MEMBER( noise_w );

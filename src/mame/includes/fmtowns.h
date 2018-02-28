@@ -282,6 +282,8 @@ class towns_state : public driver_device
 
 	DECLARE_READ8_MEMBER(towns_gfx_high_r);
 	DECLARE_WRITE8_MEMBER(towns_gfx_high_w);
+	DECLARE_READ8_MEMBER(towns_gfx_packed_r);
+	DECLARE_WRITE8_MEMBER(towns_gfx_packed_w);
 	DECLARE_READ8_MEMBER(towns_gfx_r);
 	DECLARE_WRITE8_MEMBER(towns_gfx_w);
 	DECLARE_READ8_MEMBER(towns_video_cff80_r);
@@ -349,6 +351,11 @@ class towns_state : public driver_device
 	void townsftv(machine_config &config);
 	void townshr(machine_config &config);
 	void townssj(machine_config &config);
+	void marty_mem(address_map &map);
+	void towns16_io(address_map &map);
+	void towns_io(address_map &map);
+	void towns_mem(address_map &map);
+	void ux_mem(address_map &map);
 private:
 	static const device_timer_id TIMER_FREERUN = 1;
 	static const device_timer_id TIMER_INTERVAL2 = 2;

@@ -373,6 +373,6 @@ private:
 
 
 // device type definition
-extern const device_type CORVUS_HDC;
+DECLARE_DEVICE_TYPE(CORVUS_HDC, corvus_hdc_device)
 
 #endif // MAME_MACHINE_CORVUSHD_H

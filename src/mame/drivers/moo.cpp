@@ -299,7 +299,7 @@ WRITE16_MEMBER(moo_state::moobl_oki_bank_w)
 	m_oki->set_rom_bank(data & 0x0f);
 }
 
-static ADDRESS_MAP_START( moo_map, AS_PROGRAM, 16, moo_state )
+ADDRESS_MAP_START(moo_state::moo_map)
 	AM_RANGE(0x000000, 0x07ffff) AM_ROM
 	AM_RANGE(0x0c0000, 0x0c003f) AM_DEVWRITE("k056832", k056832_device, word_w)
 	AM_RANGE(0x0c2000, 0x0c2007) AM_DEVWRITE("k053246", k053247_device, k053246_word_w)
@@ -333,7 +333,7 @@ static ADDRESS_MAP_START( moo_map, AS_PROGRAM, 16, moo_state )
 #endif
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( moobl_map, AS_PROGRAM, 16, moo_state )
+ADDRESS_MAP_START(moo_state::moobl_map)
 	AM_RANGE(0x000000, 0x07ffff) AM_ROM
 	AM_RANGE(0x0c0000, 0x0c003f) AM_DEVWRITE("k056832", k056832_device, word_w)
 	AM_RANGE(0x0c2000, 0x0c2007) AM_DEVWRITE("k053246", k053247_device, k053246_word_w)
@@ -359,7 +359,7 @@ static ADDRESS_MAP_START( moobl_map, AS_PROGRAM, 16, moo_state )
 	AM_RANGE(0x1c0000, 0x1c1fff) AM_RAM_DEVWRITE("palette", palette_device, write16) AM_SHARE("palette")
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( bucky_map, AS_PROGRAM, 16, moo_state )
+ADDRESS_MAP_START(moo_state::bucky_map)
 	AM_RANGE(0x000000, 0x07ffff) AM_ROM
 	AM_RANGE(0x080000, 0x08ffff) AM_RAM
 	AM_RANGE(0x090000, 0x09ffff) AM_RAM AM_SHARE("spriteram")   /* Sprite RAM */
@@ -395,7 +395,7 @@ static ADDRESS_MAP_START( bucky_map, AS_PROGRAM, 16, moo_state )
 #endif
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( sound_map, AS_PROGRAM, 8, moo_state )
+ADDRESS_MAP_START(moo_state::sound_map)
 	AM_RANGE(0x0000, 0x7fff) AM_ROM
 	AM_RANGE(0x8000, 0xbfff) AM_ROMBANK("bank1")
 	AM_RANGE(0xc000, 0xdfff) AM_RAM
@@ -602,7 +602,8 @@ MACHINE_CONFIG_START(moo_state::moobl)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", 1.0)
 MACHINE_CONFIG_END
 
-MACHINE_CONFIG_DERIVED(moo_state::bucky, moo)
+MACHINE_CONFIG_START(moo_state::bucky)
+	moo(config);
 
 	MCFG_CPU_MODIFY("maincpu")
 	MCFG_CPU_PROGRAM_MAP(bucky_map)

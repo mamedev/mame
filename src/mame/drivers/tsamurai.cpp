@@ -143,7 +143,7 @@ WRITE_LINE_MEMBER(tsamurai_state::coin2_counter_w)
 }
 
 
-static ADDRESS_MAP_START( main_map, AS_PROGRAM, 8, tsamurai_state )
+ADDRESS_MAP_START(tsamurai_state::main_map)
 	AM_RANGE(0x0000, 0xbfff) AM_ROM
 	AM_RANGE(0xc000, 0xcfff) AM_RAM
 
@@ -173,7 +173,7 @@ static ADDRESS_MAP_START( main_map, AS_PROGRAM, 8, tsamurai_state )
 	AM_RANGE(0xfc00, 0xfc07) AM_DEVWRITE("mainlatch", ls259_device, write_d0)
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( m660_map, AS_PROGRAM, 8, tsamurai_state )
+ADDRESS_MAP_START(tsamurai_state::m660_map)
 	AM_RANGE(0x0000, 0xbfff) AM_ROM
 	AM_RANGE(0xc000, 0xcfff) AM_RAM
 
@@ -204,19 +204,19 @@ static ADDRESS_MAP_START( m660_map, AS_PROGRAM, 8, tsamurai_state )
 	AM_RANGE(0xfc00, 0xfc07) AM_DEVWRITE("mainlatch", ls259_device, write_d0)
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( z80_io_map, AS_IO, 8, tsamurai_state )
+ADDRESS_MAP_START(tsamurai_state::z80_io_map)
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	AM_RANGE(0x00, 0x01) AM_DEVWRITE("aysnd", ay8910_device, address_data_w)
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( z80_m660_io_map, AS_IO, 8, tsamurai_state )
+ADDRESS_MAP_START(tsamurai_state::z80_m660_io_map)
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	AM_RANGE(0x00, 0x00) AM_WRITENOP        /* ? */
 	AM_RANGE(0x01, 0x01) AM_WRITENOP        /* Written continuously. Increments with level. */
 	AM_RANGE(0x02, 0x02) AM_WRITENOP        /* Always follows above with 0x01 data */
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( vsgongf_audio_io_map, AS_IO, 8, tsamurai_state )
+ADDRESS_MAP_START(tsamurai_state::vsgongf_audio_io_map)
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	AM_RANGE(0x00, 0x01) AM_DEVWRITE("aysnd", ay8910_device, address_data_w)
 ADDRESS_MAP_END
@@ -237,7 +237,7 @@ READ8_MEMBER(tsamurai_state::m660_sound_command3_r)
 }
 
 /*******************************************************************************/
-static ADDRESS_MAP_START( sound1_map, AS_PROGRAM, 8, tsamurai_state )
+ADDRESS_MAP_START(tsamurai_state::sound1_map)
 	AM_RANGE(0x0000, 0x3fff) AM_ROM
 	AM_RANGE(0x6000, 0x6000) AM_READ(sound_command1_r)
 	AM_RANGE(0x6001, 0x6001) AM_WRITENOP /* ? - probably clear IRQ */
@@ -247,7 +247,7 @@ ADDRESS_MAP_END
 
 /*******************************************************************************/
 
-static ADDRESS_MAP_START( sound2_map, AS_PROGRAM, 8, tsamurai_state )
+ADDRESS_MAP_START(tsamurai_state::sound2_map)
 	AM_RANGE(0x0000, 0x3fff) AM_ROM
 	AM_RANGE(0x6000, 0x6000) AM_READ(sound_command2_r)
 	AM_RANGE(0x6001, 0x6001) AM_WRITENOP /* ? - probably clear IRQ */
@@ -257,7 +257,7 @@ ADDRESS_MAP_END
 
 /*******************************************************************************/
 
-static ADDRESS_MAP_START( sound1_m660_map, AS_PROGRAM, 8, tsamurai_state )
+ADDRESS_MAP_START(tsamurai_state::sound1_m660_map)
 	AM_RANGE(0x0000, 0x3fff) AM_ROM
 	AM_RANGE(0xc000, 0xc000) AM_READ(sound_command1_r)
 	AM_RANGE(0xc001, 0xc001) AM_WRITENOP /* ? - probably clear IRQ */
@@ -267,7 +267,7 @@ ADDRESS_MAP_END
 
 /*******************************************************************************/
 
-static ADDRESS_MAP_START( sound2_m660_map, AS_PROGRAM, 8, tsamurai_state )
+ADDRESS_MAP_START(tsamurai_state::sound2_m660_map)
 	AM_RANGE(0x0000, 0x3fff) AM_ROM
 	AM_RANGE(0xc000, 0xc000) AM_READ(sound_command2_r)
 	AM_RANGE(0xc001, 0xc001) AM_WRITENOP /* ? - probably clear IRQ */
@@ -277,7 +277,7 @@ ADDRESS_MAP_END
 
 /*******************************************************************************/
 
-static ADDRESS_MAP_START( sound3_m660_map, AS_PROGRAM, 8, tsamurai_state )
+ADDRESS_MAP_START(tsamurai_state::sound3_m660_map)
 	AM_RANGE(0x0000, 0x7fff) AM_ROM
 	AM_RANGE(0xc000, 0xc000) AM_READ(m660_sound_command3_r)
 	AM_RANGE(0xc001, 0xc001) AM_WRITENOP /* ? - probably clear IRQ */
@@ -285,7 +285,7 @@ static ADDRESS_MAP_START( sound3_m660_map, AS_PROGRAM, 8, tsamurai_state )
 	AM_RANGE(0xfffc, 0xffff) AM_RAM /* CPU writes here - music data */
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( sound3_m660_io_map, AS_IO, 8, tsamurai_state )
+ADDRESS_MAP_START(tsamurai_state::sound3_m660_io_map)
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	AM_RANGE(0x00, 0x01) AM_DEVWRITE("aysnd", ay8910_device, address_data_w)
 ADDRESS_MAP_END
@@ -332,7 +332,7 @@ WRITE8_MEMBER(tsamurai_state::vsgongf_sound_command_w)
 	m_audiocpu->set_input_line(INPUT_LINE_NMI, PULSE_LINE);
 }
 
-static ADDRESS_MAP_START( vsgongf_map, AS_PROGRAM, 8, tsamurai_state )
+ADDRESS_MAP_START(tsamurai_state::vsgongf_map)
 	AM_RANGE(0x0000, 0x7fff) AM_ROM
 	AM_RANGE(0xa003, 0xa003) AM_READONLY
 	AM_RANGE(0xa006, 0xa006) AM_READ(vsgongf_a006_r) /* protection */
@@ -356,7 +356,7 @@ static ADDRESS_MAP_START( vsgongf_map, AS_PROGRAM, 8, tsamurai_state )
 	AM_RANGE(0xfc00, 0xfc07) AM_DEVWRITE("mainlatch", ls259_device, write_d0)
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( sound_vsgongf_map, AS_PROGRAM, 8, tsamurai_state )
+ADDRESS_MAP_START(tsamurai_state::sound_vsgongf_map)
 	AM_RANGE(0x0000, 0x3fff) AM_ROM
 	AM_RANGE(0x6000, 0x63ff) AM_RAM /* work RAM */
 	AM_RANGE(0x8000, 0x8000) AM_DEVREAD("soundlatch", generic_latch_8_device, read) AM_WRITE(vsgongf_sound_nmi_enable_w) /* NMI enable */

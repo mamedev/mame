@@ -79,6 +79,8 @@ public:
 	DECLARE_MACHINE_RESET(s9);
 	DECLARE_DRIVER_INIT(s9);
 	void s9(machine_config &config);
+	void s9_audio_map(address_map &map);
+	void s9_main_map(address_map &map);
 private:
 	uint8_t m_sound_data;
 	uint8_t m_strobe;
@@ -97,7 +99,7 @@ private:
 	required_device<pia6821_device> m_pia30;
 };
 
-static ADDRESS_MAP_START( s9_main_map, AS_PROGRAM, 8, s9_state )
+ADDRESS_MAP_START(s9_state::s9_main_map)
 	ADDRESS_MAP_GLOBAL_MASK(0x7fff)
 	AM_RANGE(0x0000, 0x07ff) AM_RAM AM_SHARE("nvram")
 	AM_RANGE(0x2100, 0x2103) AM_DEVREADWRITE("pia21", pia6821_device, read, write) // sound+solenoids
@@ -108,7 +110,7 @@ static ADDRESS_MAP_START( s9_main_map, AS_PROGRAM, 8, s9_state )
 	AM_RANGE(0x4000, 0x7fff) AM_ROM AM_REGION("roms", 0)
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( s9_audio_map, AS_PROGRAM, 8, s9_state )
+ADDRESS_MAP_START(s9_state::s9_audio_map)
 	AM_RANGE(0x0000, 0x07ff) AM_RAM
 	AM_RANGE(0x2000, 0x2003) AM_DEVREADWRITE("pias", pia6821_device, read, write)
 	AM_RANGE(0x8000, 0xffff) AM_ROM AM_REGION("audioroms", 0)
@@ -321,7 +323,7 @@ MACHINE_CONFIG_START(s9_state::s9)
 	MCFG_DEFAULT_LAYOUT(layout_s9)
 
 	/* Sound */
-	MCFG_FRAGMENT_ADD( genpin_audio )
+	genpin_audio(config);
 
 	/* Devices */
 	MCFG_DEVICE_ADD("pia21", PIA6821, 0)

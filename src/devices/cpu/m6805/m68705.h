@@ -98,7 +98,7 @@ protected:
 			u32 clock,
 			device_type type,
 			u32 addr_width,
-			address_map_delegate internal_map);
+			address_map_constructor internal_map);
 
 	template <offs_t B> DECLARE_READ8_MEMBER(eprom_r);
 	template <offs_t B> DECLARE_WRITE8_MEMBER(eprom_w);
@@ -191,7 +191,7 @@ public:
 	DECLARE_WRITE8_MEMBER(pc_w) { port_input_w<2>(space, offset, data, mem_mask); }
 
 protected:
-	DECLARE_ADDRESS_MAP(p_map, 8);
+	void p_map(address_map &map);
 
 	m68705p_device(
 			machine_config const &mconfig,
@@ -217,7 +217,7 @@ public:
 	DECLARE_WRITE8_MEMBER(pd_w) { port_input_w<3>(space, offset, data, mem_mask); } // TODO: PD6 is also /INT2
 
 protected:
-	DECLARE_ADDRESS_MAP(u_map, 8);
+	void u_map(address_map &map);
 
 	m68705u_device(
 			machine_config const &mconfig,
@@ -225,7 +225,7 @@ protected:
 			device_t *owner,
 			u32 clock,
 			device_type type,
-			address_map_delegate internal_map);
+			address_map_constructor internal_map);
 	m68705u_device(
 			machine_config const &mconfig,
 			char const *tag,
@@ -247,7 +247,7 @@ public:
 	// TODO: voltage inputs for ADC (shared with digital port D pins)
 
 protected:
-	DECLARE_ADDRESS_MAP(r_map, 8);
+	void r_map(address_map &map);
 
 	m68705r_device(
 			machine_config const &mconfig,

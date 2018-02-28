@@ -1,9 +1,8 @@
 // license:BSD-3-Clause
 // copyright-holders:Wilbert Pol, Curt Coder
 
-#ifndef __CRVISION__
-#define __CRVISION__
-
+#ifndef MAME_INCLUDES_CRVISION_H
+#define MAME_INCLUDES_CRVISION_H
 
 #include "cpu/m6502/m6502.h"
 #include "imagedev/cassette.h"
@@ -67,6 +66,7 @@ public:
 
 	void creativision(machine_config &config);
 	void ntsc(machine_config &config);
+	void crvision_map(address_map &map);
 protected:
 	virtual void machine_start() override;
 };
@@ -110,8 +110,9 @@ public:
 	DECLARE_WRITE_LINE_MEMBER( pia_cb2_w );
 
 	void lasr2001(machine_config &config);
+	void lasr2001_map(address_map &map);
 protected:
 	virtual void machine_start() override;
 };
 
-#endif // __CRVISION__
+#endif // MAME_INCLUDES_CRVISION_H

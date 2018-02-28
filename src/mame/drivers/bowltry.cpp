@@ -38,11 +38,17 @@ class bowltry_state : public driver_device
 {
 public:
 	bowltry_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag),
-			m_maincpu(*this, "maincpu")
+		: driver_device(mconfig, type, tag)
+		, m_maincpu(*this, "maincpu")
 	{ }
 
+	void bowltry(machine_config &config);
+
+protected:
+	void bowltry_map(address_map &map);
+
 	uint32_t screen_update_bowltry(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
+
 	int m_test_x;
 	int m_test_y;
 	int m_start_offs;
@@ -52,10 +58,7 @@ public:
 	uint16_t m_hack[2];
 #endif
 
-void bowltry(machine_config &config);
-protected:
 	required_device<cpu_device> m_maincpu;
-public:
 };
 
 #if HACK_ENABLED
@@ -74,14 +77,14 @@ WRITE16_MEMBER(bowltry_state::hack_w)
 }
 #endif
 
-static ADDRESS_MAP_START( bowltry_map, AS_PROGRAM, 16, bowltry_state )
+ADDRESS_MAP_START(bowltry_state::bowltry_map)
 	ADDRESS_MAP_UNMAP_HIGH
 	AM_RANGE( 0x000000, 0x07ffff ) AM_ROM AM_REGION("maincpu", 0)
 	AM_RANGE( 0x080000, 0x083fff ) AM_RAM
+	AM_RANGE( 0x600000, 0x60ffff ) AM_RAM
 #if HACK_ENABLED
 	AM_RANGE( 0x60e090, 0x60e093 ) AM_READWRITE(hack_r,hack_w)
 #endif
-	AM_RANGE( 0x600000, 0x60ffff ) AM_RAM
 
 ADDRESS_MAP_END
 

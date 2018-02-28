@@ -2,8 +2,8 @@
 // copyright-holders:Curt Coder
 #pragma once
 
-#ifndef __NEWBRAIN__
-#define __NEWBRAIN__
+#ifndef MAME_INCLUDES_NEWBRAIN_H
+#define MAME_INCLUDES_NEWBRAIN_H
 
 
 #include "bus/newbrain/exp.h"
@@ -74,6 +74,8 @@ public:
 	void newbrain_ad(machine_config &config);
 	void newbrain_md(machine_config &config);
 	void newbrain_video(machine_config &config);
+	void newbrain_iorq(address_map &map);
+	void newbrain_mreq(address_map &map);
 protected:
 	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr) override;
 	virtual void machine_start() override;

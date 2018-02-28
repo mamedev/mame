@@ -290,17 +290,6 @@ READ8_MEMBER(barata_state::port2_r)
 	return 0;
 }
 
-/*************************
-* Memory Map Information *
-*************************/
-
-static ADDRESS_MAP_START( i8051_io_port, AS_IO, 8, barata_state )
-	AM_RANGE(MCS51_PORT_P0,   MCS51_PORT_P0  ) AM_WRITE(port0_w)
-	AM_RANGE(MCS51_PORT_P1,   MCS51_PORT_P1  ) AM_READ_PORT("PORT1")
-	AM_RANGE(MCS51_PORT_P2,   MCS51_PORT_P2  ) AM_READWRITE(port2_r, port2_w)
-	AM_RANGE(MCS51_PORT_P3,   MCS51_PORT_P3  ) AM_WRITE(fpga_w)
-ADDRESS_MAP_END
-
 /************************
 *    Machine Drivers    *
 ************************/
@@ -308,7 +297,11 @@ ADDRESS_MAP_END
 MACHINE_CONFIG_START(barata_state::barata)
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", I8051, CPU_CLOCK)
-	MCFG_CPU_IO_MAP(i8051_io_port)
+	MCFG_MCS51_PORT_P0_OUT_CB(WRITE8(barata_state, port0_w))
+	MCFG_MCS51_PORT_P1_IN_CB(IOPORT("PORT1"))
+	MCFG_MCS51_PORT_P2_IN_CB(READ8(barata_state, port2_r))
+	MCFG_MCS51_PORT_P2_OUT_CB(WRITE8(barata_state, port2_w))
+	MCFG_MCS51_PORT_P3_OUT_CB(WRITE8(barata_state, fpga_w))
 
 	MCFG_DEFAULT_LAYOUT( layout_barata )
 

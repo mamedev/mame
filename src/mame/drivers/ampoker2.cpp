@@ -591,13 +591,13 @@ WRITE8_MEMBER(ampoker2_state::ampoker2_watchdog_reset_w)
 * Memory map information *
 *************************/
 
-static ADDRESS_MAP_START( ampoker2_map, AS_PROGRAM, 8, ampoker2_state )
+ADDRESS_MAP_START(ampoker2_state::ampoker2_map)
 	AM_RANGE(0x0000, 0xbfff) AM_ROM
 	AM_RANGE(0xc000, 0xcfff) AM_RAM AM_SHARE("nvram")
 	AM_RANGE(0xe000, 0xefff) AM_RAM_WRITE(ampoker2_videoram_w) AM_SHARE("videoram")
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( ampoker2_io_map, AS_IO, 8, ampoker2_state )
+ADDRESS_MAP_START(ampoker2_state::ampoker2_io_map)
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	AM_RANGE(0x08, 0x0f) AM_WRITENOP                /* inexistent in the real hardware */
 	AM_RANGE(0x10, 0x10) AM_READ_PORT("IN0")
@@ -1173,7 +1173,8 @@ MACHINE_CONFIG_START(ampoker2_state::ampoker2)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.30)
 MACHINE_CONFIG_END
 
-MACHINE_CONFIG_DERIVED(ampoker2_state::sigma2k, ampoker2)
+MACHINE_CONFIG_START(ampoker2_state::sigma2k)
+	ampoker2(config);
 
 	/* video hardware */
 	MCFG_GFXDECODE_MODIFY("gfxdecode", sigma2k)

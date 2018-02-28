@@ -105,7 +105,7 @@ read only
     3C001       INIT L/INIT H
 */
 
-static ADDRESS_MAP_START( pgc_map, AS_PROGRAM, 8, isa8_pgc_device )
+ADDRESS_MAP_START(isa8_pgc_device::pgc_map)
 	ADDRESS_MAP_UNMAP_HIGH
 	AM_RANGE(0x00000, 0x07fff) AM_ROM
 	AM_RANGE(0x08000, 0x0ffff) AM_ROM AM_REGION("maincpu", 0x8000)
@@ -117,7 +117,7 @@ static ADDRESS_MAP_START( pgc_map, AS_PROGRAM, 8, isa8_pgc_device )
 	AM_RANGE(0xf8000, 0xfffff) AM_ROM AM_REGION("maincpu", 0x8000)
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( pgc_io, AS_IO, 8, isa8_pgc_device )
+ADDRESS_MAP_START(isa8_pgc_device::pgc_io)
 	ADDRESS_MAP_UNMAP_HIGH
 ADDRESS_MAP_END
 

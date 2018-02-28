@@ -70,6 +70,8 @@ public:
 	required_device<palette_device> m_palette;
 
 	void esh(machine_config &config);
+	void z80_0_io(address_map &map);
+	void z80_0_mem(address_map &map);
 protected:
 	//virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr) override;
 };
@@ -208,7 +210,7 @@ WRITE8_MEMBER(esh_state::nmi_line_w)
 
 
 /* PROGRAM MAPS */
-static ADDRESS_MAP_START( z80_0_mem, AS_PROGRAM, 8, esh_state )
+ADDRESS_MAP_START(esh_state::z80_0_mem)
 	AM_RANGE(0x0000,0x3fff) AM_ROM
 	AM_RANGE(0xe000,0xe7ff) AM_RAM AM_SHARE("nvram")
 	AM_RANGE(0xf000,0xf3ff) AM_RAM AM_SHARE("tile_ram")
@@ -217,7 +219,7 @@ ADDRESS_MAP_END
 
 
 /* IO MAPS */
-static ADDRESS_MAP_START( z80_0_io, AS_IO, 8, esh_state )
+ADDRESS_MAP_START(esh_state::z80_0_io)
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	AM_RANGE(0xf0,0xf0) AM_READ_PORT("IN0")
 	AM_RANGE(0xf1,0xf1) AM_READ_PORT("IN1")

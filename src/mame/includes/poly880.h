@@ -2,8 +2,8 @@
 // copyright-holders:Curt Coder
 #pragma once
 
-#ifndef __POLY880__
-#define __POLY880__
+#ifndef MAME_INCLUDES_POLY880_H
+#define MAME_INCLUDES_POLY880_H
 
 
 #include "cpu/z80/z80.h"
@@ -54,6 +54,8 @@ public:
 	uint8_t m_digit;
 	uint8_t m_segment;
 	void poly880(machine_config &config);
+	void poly880_io(address_map &map);
+	void poly880_mem(address_map &map);
 };
 
 #endif

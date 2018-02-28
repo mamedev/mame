@@ -104,6 +104,7 @@ public:
 	K056832_CB_MEMBER(piratesh_tile_callback);
 	K055673_CB_MEMBER(piratesh_sprite_callback);
 	void piratesh(machine_config &config);
+	void piratesh_map(address_map &map);
 };
 
 
@@ -382,7 +383,7 @@ WRITE16_MEMBER(piratesh_state::control3_w)
 }
 
 
-static ADDRESS_MAP_START( piratesh_map, AS_PROGRAM, 16, piratesh_state )
+ADDRESS_MAP_START(piratesh_state::piratesh_map)
 	AM_RANGE(0x000000, 0x07ffff) AM_ROM
 	AM_RANGE(0x080000, 0x083fff) AM_RAM AM_SHARE("nvram")
 	AM_RANGE(0x084000, 0x087fff) AM_RAM

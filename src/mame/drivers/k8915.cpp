@@ -33,6 +33,8 @@ public:
 	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 
 	void k8915(machine_config &config);
+	void io_map(address_map &map);
+	void mem_map(address_map &map);
 private:
 	uint8_t m_framecnt;
 	virtual void machine_reset() override;
@@ -51,14 +53,14 @@ WRITE8_MEMBER( k8915_state::k8915_a8_w )
 		membank("boot")->set_entry(1); // rom at 0000
 }
 
-static ADDRESS_MAP_START(mem_map, AS_PROGRAM, 8, k8915_state)
+ADDRESS_MAP_START(k8915_state::mem_map)
 	ADDRESS_MAP_UNMAP_HIGH
 	AM_RANGE(0x0000, 0x0fff) AM_RAMBANK("boot")
 	AM_RANGE(0x1000, 0x17ff) AM_RAM AM_SHARE("videoram")
 	AM_RANGE(0x1800, 0xffff) AM_RAM
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START(io_map, AS_IO, 8, k8915_state)
+ADDRESS_MAP_START(k8915_state::io_map)
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	AM_RANGE(0x50, 0x53) AM_DEVREADWRITE("sio", z80sio_device, ba_cd_r, ba_cd_w)
 	AM_RANGE(0x58, 0x5b) AM_DEVREADWRITE("ctc", z80ctc_device, read, write)

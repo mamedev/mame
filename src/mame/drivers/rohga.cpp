@@ -14,9 +14,6 @@
 
     Todo:  Sprite priority errors in Nitro Ball.
 
-    Todo:  There is some kind of full-screen flash in Rohga when you die,
-        not emulated.
-
     Schmeiser Robo runs on a slightly modified Rohga pcb.
 
     Emulation by Bryan McPhail, mish@tendril.co.uk
@@ -107,6 +104,13 @@
 
     TODO:
         nitrobal : blending, priority function wrong
+        wizdfire : Wizard Fire and Dark Seal 2 use the same mask ROM for
+    ADPCM speech samples. Sample banks 0/1 are used for the Japanese
+    version and 2/3 are used for the English version, whose ROM loading
+    currently works around this by swapping the banks. It seems likely that
+    the ROM's highest-order address line is not software-controlled, but
+    either pulled high or grounded by an optional jumper. The PCB should
+    be examined to determine what part it actually connects to.
 
 ***************************************************************************/
 
@@ -116,11 +120,10 @@
 #include "cpu/m68000/m68000.h"
 #include "cpu/h6280/h6280.h"
 #include "machine/decocrpt.h"
-#include "machine/gen_latch.h"
 #include "sound/ym2151.h"
-#include "sound/okim6295.h"
 #include "screen.h"
 #include "speaker.h"
+#include <algorithm>
 
 
 READ16_MEMBER(rohga_state::rohga_irq_ack_r)
@@ -139,13 +142,31 @@ WRITE16_MEMBER(rohga_state::wizdfire_irq_ack_w)
 
 /**********************************************************************************/
 
-static ADDRESS_MAP_START( rohga_map, AS_PROGRAM, 16, rohga_state )
+READ16_MEMBER( rohga_state::ioprot_r )
+{
+	int real_address = 0 + (offset *2);
+	int deco146_addr = bitswap<32>(real_address, /* NC */31,30,29,28,27,26,25,24,23,22,21,20,19,18, 13,12,11,/**/      17,16,15,14,    10,9,8, 7,6,5,4, 3,2,1,0) & 0x7fff;
+	uint8_t cs = 0;
+	uint16_t data = m_ioprot->read_data( deco146_addr, mem_mask, cs );
+	return data;
+}
+
+WRITE16_MEMBER( rohga_state::ioprot_w )
+{
+	int real_address = 0 + (offset *2);
+	int deco146_addr = bitswap<32>(real_address, /* NC */31,30,29,28,27,26,25,24,23,22,21,20,19,18, 13,12,11,/**/      17,16,15,14,    10,9,8, 7,6,5,4, 3,2,1,0) & 0x7fff;
+	uint8_t cs = 0;
+	m_ioprot->write_data( space, deco146_addr, data, mem_mask, cs );
+}
+
+
+ADDRESS_MAP_START(rohga_state::rohga_map)
 	AM_RANGE(0x000000, 0x1fffff) AM_ROM
 
 	AM_RANGE(0x200000, 0x20000f) AM_DEVWRITE("tilegen1", deco16ic_device, pf_control_w)
 	AM_RANGE(0x240000, 0x24000f) AM_DEVWRITE("tilegen2", deco16ic_device, pf_control_w)
 
-	AM_RANGE(0x280000, 0x283fff) AM_READWRITE(wf_protection_region_0_104_r,wf_protection_region_0_104_w) AM_SHARE("prot16ram") /* Protection device */
+	AM_RANGE(0x280000, 0x283fff) AM_READWRITE(ioprot_r,ioprot_w) AM_SHARE("prot16ram") /* Protection device */
 
 	AM_RANGE(0x2c0000, 0x2c0001) AM_READ_PORT("DSW3")
 
@@ -166,30 +187,13 @@ static ADDRESS_MAP_START( rohga_map, AS_PROGRAM, 16, rohga_state )
 	AM_RANGE(0x3cc000, 0x3ccfff) AM_MIRROR(0x1000) AM_RAM AM_SHARE("pf3_rowscroll")
 	AM_RANGE(0x3ce000, 0x3cefff) AM_MIRROR(0x1000) AM_RAM AM_SHARE("pf4_rowscroll")
 
-	AM_RANGE(0x3d0000, 0x3d07ff) AM_RAM AM_SHARE("spriteram")
+	AM_RANGE(0x3d0000, 0x3d07ff) AM_RAM AM_SHARE("spriteram1")
 	AM_RANGE(0x3e0000, 0x3e1fff) AM_RAM_DEVWRITE("deco_common", decocomn_device, buffered_palette_w) AM_SHARE("paletteram")
 	AM_RANGE(0x3f0000, 0x3f3fff) AM_RAM /* Main ram */
 ADDRESS_MAP_END
 
-READ16_MEMBER( rohga_state::wf_protection_region_0_104_r )
-{
-	int real_address = 0 + (offset *2);
-	int deco146_addr = bitswap<32>(real_address, /* NC */31,30,29,28,27,26,25,24,23,22,21,20,19,18, 13,12,11,/**/      17,16,15,14,    10,9,8, 7,6,5,4, 3,2,1,0) & 0x7fff;
-	uint8_t cs = 0;
-	uint16_t data = m_deco104->read_data( deco146_addr, mem_mask, cs );
-	return data;
-}
 
-WRITE16_MEMBER( rohga_state::wf_protection_region_0_104_w )
-{
-	int real_address = 0 + (offset *2);
-	int deco146_addr = bitswap<32>(real_address, /* NC */31,30,29,28,27,26,25,24,23,22,21,20,19,18, 13,12,11,/**/      17,16,15,14,    10,9,8, 7,6,5,4, 3,2,1,0) & 0x7fff;
-	uint8_t cs = 0;
-	m_deco104->write_data( space, deco146_addr, data, mem_mask, cs );
-}
-
-
-static ADDRESS_MAP_START( wizdfire_map, AS_PROGRAM, 16, rohga_state )
+ADDRESS_MAP_START(rohga_state::wizdfire_map)
 	AM_RANGE(0x000000, 0x1fffff) AM_ROM
 
 	AM_RANGE(0x200000, 0x200fff) AM_DEVREADWRITE("tilegen1", deco16ic_device, pf1_data_r, pf1_data_w)
@@ -208,38 +212,20 @@ static ADDRESS_MAP_START( wizdfire_map, AS_PROGRAM, 16, rohga_state )
 	AM_RANGE(0x320002, 0x320003) AM_WRITENOP /* ? */
 	AM_RANGE(0x320004, 0x320005) AM_WRITE(wizdfire_irq_ack_w) /* VBL IRQ ack */
 
-	AM_RANGE(0x340000, 0x3407ff) AM_RAM AM_SHARE("spriteram")
-	AM_RANGE(0x350000, 0x350001) AM_DEVWRITE("spriteram", buffered_spriteram16_device, write) /* Triggers DMA for spriteram */
+	AM_RANGE(0x340000, 0x3407ff) AM_RAM AM_SHARE("spriteram1")
+	AM_RANGE(0x350000, 0x350001) AM_DEVWRITE("spriteram1", buffered_spriteram16_device, write) /* Triggers DMA for spriteram */
 	AM_RANGE(0x360000, 0x3607ff) AM_RAM AM_SHARE("spriteram2")
 	AM_RANGE(0x370000, 0x370001) AM_DEVWRITE("spriteram2", buffered_spriteram16_device, write) /* Triggers DMA for spriteram */
 
 	AM_RANGE(0x380000, 0x381fff) AM_RAM_DEVWRITE("deco_common", decocomn_device, buffered_palette_w) AM_SHARE("paletteram")
 	AM_RANGE(0x390008, 0x390009) AM_DEVWRITE("deco_common", decocomn_device, palette_dma_w)
 
-	AM_RANGE(0xfe4000, 0xfe7fff) AM_READWRITE(wf_protection_region_0_104_r,wf_protection_region_0_104_w) AM_SHARE("prot16ram") /* Protection device */
 	AM_RANGE(0xfdc000, 0xffffff) AM_RAM
+	AM_RANGE(0xfe4000, 0xfe7fff) AM_READWRITE(ioprot_r,ioprot_w) AM_SHARE("prot16ram") /* Protection device */
 ADDRESS_MAP_END
 
 
-READ16_MEMBER( rohga_state::nb_protection_region_0_146_r )
-{
-	int real_address = 0 + (offset *2);
-	int deco146_addr = bitswap<32>(real_address, /* NC */31,30,29,28,27,26,25,24,23,22,21,20,19,18, 13,12,11,/**/      17,16,15,14,    10,9,8, 7,6,5,4, 3,2,1,0) & 0x7fff;
-	uint8_t cs = 0;
-	uint16_t data = m_deco146->read_data( deco146_addr, mem_mask, cs );
-	return data;
-}
-
-WRITE16_MEMBER( rohga_state::nb_protection_region_0_146_w )
-{
-	int real_address = 0 + (offset *2);
-	int deco146_addr = bitswap<32>(real_address, /* NC */31,30,29,28,27,26,25,24,23,22,21,20,19,18, 13,12,11,/**/      17,16,15,14,    10,9,8, 7,6,5,4, 3,2,1,0) & 0x7fff;
-	uint8_t cs = 0;
-	m_deco146->write_data( space, deco146_addr, data, mem_mask, cs );
-}
-
-
-static ADDRESS_MAP_START( nitrobal_map, AS_PROGRAM, 16, rohga_state )
+ADDRESS_MAP_START(rohga_state::nitrobal_map)
 	AM_RANGE(0x000000, 0x1fffff) AM_ROM
 
 	AM_RANGE(0x200000, 0x200fff) AM_MIRROR(0x1000) AM_DEVREADWRITE("tilegen1", deco16ic_device, pf1_data_r, pf1_data_w)
@@ -259,8 +245,8 @@ static ADDRESS_MAP_START( nitrobal_map, AS_PROGRAM, 16, rohga_state )
 	AM_RANGE(0x320002, 0x320003) AM_WRITENOP /* ? */
 	AM_RANGE(0x320004, 0x320005) AM_WRITE(wizdfire_irq_ack_w) /* VBL IRQ ack */
 
-	AM_RANGE(0x340000, 0x3407ff) AM_RAM AM_SHARE("spriteram")
-	AM_RANGE(0x350000, 0x350001) AM_DEVWRITE("spriteram", buffered_spriteram16_device, write) /* Triggers DMA for spriteram */
+	AM_RANGE(0x340000, 0x3407ff) AM_RAM AM_SHARE("spriteram1")
+	AM_RANGE(0x350000, 0x350001) AM_DEVWRITE("spriteram1", buffered_spriteram16_device, write) /* Triggers DMA for spriteram */
 	AM_RANGE(0x360000, 0x3607ff) AM_RAM AM_SHARE("spriteram2")
 	AM_RANGE(0x370000, 0x370001) AM_DEVWRITE("spriteram2", buffered_spriteram16_device, write) /* Triggers DMA for spriteram */
 
@@ -268,16 +254,17 @@ static ADDRESS_MAP_START( nitrobal_map, AS_PROGRAM, 16, rohga_state )
 	AM_RANGE(0x390008, 0x390009) AM_DEVWRITE("deco_common", decocomn_device, palette_dma_w)
 
 	AM_RANGE(0xfec000, 0xff3fff) AM_RAM
-	AM_RANGE(0xff4000, 0xff7fff) AM_READWRITE(nb_protection_region_0_146_r,nb_protection_region_0_146_w) AM_SHARE("prot16ram") /* Protection device */
+	AM_RANGE(0xff4000, 0xff7fff) AM_READWRITE(ioprot_r,ioprot_w) AM_SHARE("prot16ram") /* Protection device */
 
-AM_RANGE(0xff8000, 0xffffff) AM_RAM
+	AM_RANGE(0xff8000, 0xffffff) AM_RAM
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( hotb_base_map, AS_PROGRAM, 16, rohga_state )
+
+ADDRESS_MAP_START(rohga_state::hotb_base_map)
 	AM_RANGE(0x000000, 0x0fffff) AM_ROM
 	AM_RANGE(0x200000, 0x20000f) AM_DEVWRITE("tilegen1", deco16ic_device, pf_control_w)
 	AM_RANGE(0x240000, 0x24000f) AM_DEVWRITE("tilegen2", deco16ic_device, pf_control_w)
-	AM_RANGE(0x280000, 0x283fff) AM_READWRITE(wf_protection_region_0_104_r,wf_protection_region_0_104_w) AM_SHARE("prot16ram") /* Protection device */
+	AM_RANGE(0x280000, 0x283fff) AM_READWRITE(ioprot_r,ioprot_w) AM_SHARE("prot16ram") /* Protection device */
 
 	AM_RANGE(0x2c0000, 0x2c0001) AM_READ_PORT("DSW3")
 	AM_RANGE(0x300000, 0x300001) AM_READ_PORT("DSW3")  AM_WRITE(rohga_buffer_spriteram16_w) /* write 1 for sprite dma */
@@ -297,44 +284,30 @@ static ADDRESS_MAP_START( hotb_base_map, AS_PROGRAM, 16, rohga_state )
 	AM_RANGE(0x3cc000, 0x3ccfff) AM_MIRROR(0x1000) AM_RAM AM_SHARE("pf3_rowscroll")
 	AM_RANGE(0x3ce000, 0x3cefff) AM_MIRROR(0x1000) AM_RAM AM_SHARE("pf4_rowscroll")
 
-	AM_RANGE(0x3d0000, 0x3d07ff) AM_RAM AM_SHARE("spriteram")
+	AM_RANGE(0x3d0000, 0x3d07ff) AM_RAM AM_SHARE("spriteram1")
 	AM_RANGE(0x3e0000, 0x3e1fff) AM_MIRROR(0x2000) AM_RAM_DEVWRITE("deco_common", decocomn_device, buffered_palette_w) AM_SHARE("paletteram")
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( schmeisr_map, AS_PROGRAM, 16, rohga_state )
+ADDRESS_MAP_START(rohga_state::schmeisr_map)
 	AM_IMPORT_FROM(hotb_base_map)
 	AM_RANGE(0xff0000, 0xff7fff) AM_RAM /* Main ram */
 ADDRESS_MAP_END
 
-
-
-static ADDRESS_MAP_START( hangzo_map, AS_PROGRAM, 16, rohga_state )
+ADDRESS_MAP_START(rohga_state::hangzo_map)
 	AM_IMPORT_FROM(hotb_base_map)
 	AM_RANGE(0x3f0000, 0x3f3fff) AM_RAM /* Main ram */
 ADDRESS_MAP_END
 
 /******************************************************************************/
 
-static ADDRESS_MAP_START( rohga_sound_map, AS_PROGRAM, 8, rohga_state )
+ADDRESS_MAP_START(rohga_state::sound_map)
 	AM_RANGE(0x000000, 0x00ffff) AM_ROM
 	AM_RANGE(0x100000, 0x100001) AM_NOP
 	AM_RANGE(0x110000, 0x110001) AM_DEVREADWRITE("ymsnd", ym2151_device,read,write)
 	AM_RANGE(0x120000, 0x120001) AM_DEVREADWRITE("oki1", okim6295_device, read, write)
 	AM_RANGE(0x130000, 0x130001) AM_DEVREADWRITE("oki2", okim6295_device, read, write)
-	AM_RANGE(0x140000, 0x140000) AM_DEVREAD("ioprot104", deco104_device, soundlatch_r)
-	AM_RANGE(0x1f0000, 0x1f1fff) AM_RAMBANK("bank8")
-	AM_RANGE(0x1fec00, 0x1fec01) AM_DEVWRITE("audiocpu", h6280_device, timer_w)
-	AM_RANGE(0x1ff400, 0x1ff403) AM_DEVWRITE("audiocpu", h6280_device, irq_status_w)
-ADDRESS_MAP_END
-
-static ADDRESS_MAP_START( nitrobal_sound_map, AS_PROGRAM, 8, rohga_state )
-	AM_RANGE(0x000000, 0x00ffff) AM_ROM
-	AM_RANGE(0x100000, 0x100001) AM_NOP
-	AM_RANGE(0x110000, 0x110001) AM_DEVREADWRITE("ymsnd", ym2151_device,read,write)
-	AM_RANGE(0x120000, 0x120001) AM_DEVREADWRITE("oki1", okim6295_device, read, write)
-	AM_RANGE(0x130000, 0x130001) AM_DEVREADWRITE("oki2", okim6295_device, read, write)
-	AM_RANGE(0x140000, 0x140000) AM_DEVREAD("ioprot", deco146_device, soundlatch_r)
-	AM_RANGE(0x1f0000, 0x1f1fff) AM_RAMBANK("bank8")
+	AM_RANGE(0x140000, 0x140000) AM_DEVREAD("ioprot", deco_146_base_device, soundlatch_r)
+	AM_RANGE(0x1f0000, 0x1f1fff) AM_RAM
 	AM_RANGE(0x1fec00, 0x1fec01) AM_DEVWRITE("audiocpu", h6280_device, timer_w)
 	AM_RANGE(0x1ff400, 0x1ff403) AM_DEVWRITE("audiocpu", h6280_device, irq_status_w)
 ADDRESS_MAP_END
@@ -792,9 +765,9 @@ static const gfx_layout charlayout =
 	RGN_FRAC(1,2),
 	4,
 	{ RGN_FRAC(1,2)+8, RGN_FRAC(1,2), 8, 0 },
-	{ 0, 1, 2, 3, 4, 5, 6, 7 },
-	{ 0*16, 1*16, 2*16, 3*16, 4*16, 5*16, 6*16, 7*16 },
-	16*8    /* every char takes 8 consecutive bytes */
+	{ STEP8(0,1) },
+	{ STEP8(0,8*2) },
+	8*8*2    /* every char takes 16 consecutive bytes */
 };
 
 static const gfx_layout spritelayout =
@@ -803,11 +776,9 @@ static const gfx_layout spritelayout =
 	RGN_FRAC(1,1),
 	4,
 	{ 16, 0, 24, 8 },
-	{ 64*8+0, 64*8+1, 64*8+2, 64*8+3, 64*8+4, 64*8+5, 64*8+6, 64*8+7,
-		0, 1, 2, 3, 4, 5, 6, 7 },
-	{ 0*32, 1*32, 2*32, 3*32, 4*32, 5*32, 6*32, 7*32,
-			8*32, 9*32, 10*32, 11*32, 12*32, 13*32, 14*32, 15*32 },
-	128*8
+	{ STEP16(16*8*4,1), STEP8(0,1) },
+	{ STEP16(0,8*4) },
+	16*16*4
 };
 
 static const gfx_layout spritelayout_6bpp =
@@ -816,22 +787,9 @@ static const gfx_layout spritelayout_6bpp =
 	4096*8,
 	6,
 	{ 0x400000*8+8, 0x400000*8, 0x200000*8+8, 0x200000*8, 8, 0 },
-	{ 32*8+0, 32*8+1, 32*8+2, 32*8+3, 32*8+4, 32*8+5, 32*8+6, 32*8+7, 0,1,2,3,4,5,6,7 },
-	{ 0*16, 1*16, 2*16, 3*16, 4*16, 5*16, 6*16, 7*16,
-			8*16, 9*16, 10*16, 11*16, 12*16, 13*16, 14*16, 15*16 },
-	64*8
-};
-
-static const gfx_layout spritelayout2 =
-{
-	16,16,
-	4096*8,
-	4,
-	{ 0x200000*8+8, 0x200000*8, 8, 0 },
-	{ 32*8+0, 32*8+1, 32*8+2, 32*8+3, 32*8+4, 32*8+5, 32*8+6, 32*8+7, 0,1,2,3,4,5,6,7 },
-	{ 0*16, 1*16, 2*16, 3*16, 4*16, 5*16, 6*16, 7*16,
-			8*16, 9*16, 10*16, 11*16, 12*16, 13*16, 14*16, 15*16 },
-	64*8
+	{ STEP16(16*8*2,1), STEP8(0,1) },
+	{ STEP16(0,8*2) },
+	16*16*2
 };
 
 static const gfx_layout tilelayout =
@@ -840,11 +798,9 @@ static const gfx_layout tilelayout =
 	RGN_FRAC(1,2),
 	4,
 	{ RGN_FRAC(1,2)+8, RGN_FRAC(1,2), 8, 0 },
-	{ 32*8+0, 32*8+1, 32*8+2, 32*8+3, 32*8+4, 32*8+5, 32*8+6, 32*8+7,
-		0, 1, 2, 3, 4, 5, 6, 7 },
-	{ 0*16, 1*16, 2*16, 3*16, 4*16, 5*16, 6*16, 7*16,
-			8*16, 9*16, 10*16, 11*16, 12*16, 13*16, 14*16, 15*16 },
-	64*8
+	{ STEP16(16*8*2,1), STEP8(0,1) },
+	{ STEP16(0,8*2) },
+	16*16*2
 };
 
 static GFXDECODE_START( rohga )
@@ -866,15 +822,15 @@ static GFXDECODE_START( schmeisr )
 	GFXDECODE_ENTRY( "gfx1", 0, charlayout,          0, 32 )    /* Characters 8x8 */
 	GFXDECODE_ENTRY( "gfx2", 0, tilelayout,          0, 32 )    /* Tiles 16x16 */
 	GFXDECODE_ENTRY( "gfx3", 0, tilelayout,        512, 32 )    /* Tiles 16x16 */
-	GFXDECODE_ENTRY( "gfx4", 0, spritelayout2,    1024, 64 )    /* Sprites 16x16 */
+	GFXDECODE_ENTRY( "gfx4", 0, spritelayout,     1024, 64 )    /* Sprites 16x16 */
 GFXDECODE_END
 
 /**********************************************************************************/
 
 WRITE8_MEMBER(rohga_state::sound_bankswitch_w)
 {
-	m_oki1->set_rom_bank(BIT(data, 0));
-	m_oki2->set_rom_bank(BIT(data, 1));
+	m_oki[0]->set_rom_bank(BIT(data, 0));
+	m_oki[1]->set_rom_bank(BIT(data, 1));
 }
 
 /**********************************************************************************/
@@ -919,10 +875,10 @@ MACHINE_CONFIG_START(rohga_state::rohga)
 	MCFG_CPU_VBLANK_INT_DRIVER("screen", rohga_state,  irq6_line_assert)
 
 	MCFG_CPU_ADD("audiocpu", H6280, 32220000/4/3) /* verified on pcb (8.050Mhz is XIN on pin 10 of H6280 */
-	MCFG_CPU_PROGRAM_MAP(rohga_sound_map)
+	MCFG_CPU_PROGRAM_MAP(sound_map)
 
 	/* video hardware */
-	MCFG_BUFFERED_SPRITERAM16_ADD("spriteram")
+	MCFG_BUFFERED_SPRITERAM16_ADD("spriteram1")
 
 	MCFG_SCREEN_ADD("screen", RASTER)
 	MCFG_SCREEN_REFRESH_RATE(58)
@@ -976,7 +932,7 @@ MACHINE_CONFIG_START(rohga_state::rohga)
 	MCFG_DECO_SPRITE_GFX_REGION(3)
 	MCFG_DECO_SPRITE_GFXDECODE("gfxdecode")
 
-	MCFG_DECO104_ADD("ioprot104")
+	MCFG_DECO104_ADD("ioprot")
 	MCFG_DECO146_IN_PORTA_CB(IOPORT("INPUTS"))
 	MCFG_DECO146_IN_PORTB_CB(IOPORT("SYSTEM"))
 	MCFG_DECO146_IN_PORTC_CB(IOPORT("DSW"))
@@ -1008,10 +964,10 @@ MACHINE_CONFIG_START(rohga_state::wizdfire)
 	MCFG_CPU_VBLANK_INT_DRIVER("screen", rohga_state,  irq6_line_assert)
 
 	MCFG_CPU_ADD("audiocpu", H6280,32220000/4/3) /* verified on pcb (8.050Mhz is XIN on pin 10 of H6280 */
-	MCFG_CPU_PROGRAM_MAP(rohga_sound_map)
+	MCFG_CPU_PROGRAM_MAP(sound_map)
 
 	/* video hardware */
-	MCFG_BUFFERED_SPRITERAM16_ADD("spriteram")
+	MCFG_BUFFERED_SPRITERAM16_ADD("spriteram1")
 	MCFG_BUFFERED_SPRITERAM16_ADD("spriteram2")
 
 	MCFG_SCREEN_ADD("screen", RASTER)
@@ -1067,7 +1023,7 @@ MACHINE_CONFIG_START(rohga_state::wizdfire)
 	MCFG_DECO_SPRITE_GFX_REGION(4)
 	MCFG_DECO_SPRITE_GFXDECODE("gfxdecode")
 
-	MCFG_DECO104_ADD("ioprot104")
+	MCFG_DECO104_ADD("ioprot")
 	MCFG_DECO146_IN_PORTA_CB(IOPORT("INPUTS"))
 	MCFG_DECO146_IN_PORTB_CB(IOPORT("SYSTEM"))
 	MCFG_DECO146_IN_PORTC_CB(IOPORT("DSW"))
@@ -1102,10 +1058,10 @@ MACHINE_CONFIG_START(rohga_state::nitrobal)
 	MCFG_CPU_VBLANK_INT_DRIVER("screen", rohga_state,  irq6_line_assert)
 
 	MCFG_CPU_ADD("audiocpu", H6280,32220000/4/3) /* verified on pcb (8.050Mhz is XIN on pin 10 of H6280 */
-	MCFG_CPU_PROGRAM_MAP(nitrobal_sound_map)
+	MCFG_CPU_PROGRAM_MAP(sound_map)
 
 	/* video hardware */
-	MCFG_BUFFERED_SPRITERAM16_ADD("spriteram")
+	MCFG_BUFFERED_SPRITERAM16_ADD("spriteram1")
 	MCFG_BUFFERED_SPRITERAM16_ADD("spriteram2")
 
 	MCFG_SCREEN_ADD("screen", RASTER)
@@ -1197,10 +1153,10 @@ MACHINE_CONFIG_START(rohga_state::schmeisr)
 	MCFG_CPU_VBLANK_INT_DRIVER("screen", rohga_state,  irq6_line_assert)
 
 	MCFG_CPU_ADD("audiocpu", H6280,32220000/4/3) /* verified on pcb (8.050Mhz is XIN on pin 10 of H6280 */
-	MCFG_CPU_PROGRAM_MAP(rohga_sound_map)
+	MCFG_CPU_PROGRAM_MAP(sound_map)
 
 	/* video hardware */
-	MCFG_BUFFERED_SPRITERAM16_ADD("spriteram")
+	MCFG_BUFFERED_SPRITERAM16_ADD("spriteram1")
 
 	MCFG_SCREEN_ADD("screen", RASTER)
 	MCFG_SCREEN_REFRESH_RATE(58)
@@ -1254,7 +1210,7 @@ MACHINE_CONFIG_START(rohga_state::schmeisr)
 	MCFG_DECO_SPRITE_GFX_REGION(3)
 	MCFG_DECO_SPRITE_GFXDECODE("gfxdecode")
 
-	MCFG_DECO104_ADD("ioprot104")
+	MCFG_DECO104_ADD("ioprot")
 	MCFG_DECO146_IN_PORTA_CB(IOPORT("INPUTS"))
 	MCFG_DECO146_IN_PORTB_CB(IOPORT("SYSTEM"))
 	MCFG_DECO146_IN_PORTC_CB(IOPORT("DSW"))
@@ -1280,7 +1236,8 @@ MACHINE_CONFIG_END
 
 
 
-MACHINE_CONFIG_DERIVED(rohga_state::hangzo, schmeisr)
+MACHINE_CONFIG_START(rohga_state::hangzo)
+	schmeisr(config);
 
 	/* basic machine hardware */
 	MCFG_CPU_MODIFY("maincpu")
@@ -1592,7 +1549,6 @@ ROM_START( wizdfire )
 	ROM_LOAD16_BYTE( "mas09", 0x000000, 0x080000,  CRC(5f6deb41) SHA1(850d0e157b4355e866ec770a2012293b2c55648f) )
 
 	ROM_REGION(0x100000, "oki1", 0 ) /* Oki samples */
-	// hack, sample banks 0/1 are used for the Japanese version and 2/3 are used for the English version, I can't find the bankswitch, so swap the halves.
 	ROM_LOAD( "mas10",  0x80000,  0x80000,  CRC(f4b4c8a1) SHA1(c9e80c55e42a78e358b6b14dadc3be7b28bd5d62) )
 	ROM_CONTINUE(0x00000, 0x80000)
 
@@ -1638,7 +1594,6 @@ ROM_START( wizdfireu )
 	ROM_LOAD16_BYTE( "mas09", 0x000000, 0x080000,  CRC(5f6deb41) SHA1(850d0e157b4355e866ec770a2012293b2c55648f) )
 
 	ROM_REGION(0x100000, "oki1", 0 ) /* Oki samples */
-	// hack, sample banks 0/1 are used for the Japanese version and 2/3 are used for the English version, I can't find the bankswitch, so swap the halves
 	ROM_LOAD( "mas10",  0x80000,  0x80000,  CRC(f4b4c8a1) SHA1(c9e80c55e42a78e358b6b14dadc3be7b28bd5d62) )
 	ROM_CONTINUE(0x00000, 0x80000)
 
@@ -1850,10 +1805,10 @@ ROM_START( schmeisr )
 	ROM_LOAD( "sr008.18d",  0x100000, 0x100000,  CRC(a74cbc90) SHA1(1aabfec7cd64e7097aa55f0ddc5a2c9e1e25618a) )
 
 	ROM_REGION( 0x400000, "gfx4", 0 )
-	ROM_LOAD( "sr004.19a", 0x000000, 0x100000,  CRC(e25434a1) SHA1(136ebb36e9b6caeac885423e8f365008ddcea778) )
-	ROM_LOAD( "sr005.20a", 0x100000, 0x100000,  CRC(1630033b) SHA1(e2a5fd7f8839db9d5b41d3cada598a6c07a97368) )
-	ROM_LOAD( "sr009.19d", 0x200000, 0x100000,  CRC(7b9d982f) SHA1(55d89ee68ceaf3ca8059177721b6c9a16103b1b4) )
-	ROM_LOAD( "sr010.20d", 0x300000, 0x100000,  CRC(6e9e5352) SHA1(357659ff5ab9ce94df3313e9a60125769c7fe10a) )
+	ROM_LOAD16_BYTE( "sr004.19a", 0x000001, 0x100000,  CRC(e25434a1) SHA1(136ebb36e9b6caeac885423e8f365008ddcea778) )
+	ROM_LOAD16_BYTE( "sr005.20a", 0x200001, 0x100000,  CRC(1630033b) SHA1(e2a5fd7f8839db9d5b41d3cada598a6c07a97368) )
+	ROM_LOAD16_BYTE( "sr009.19d", 0x000000, 0x100000,  CRC(7b9d982f) SHA1(55d89ee68ceaf3ca8059177721b6c9a16103b1b4) )
+	ROM_LOAD16_BYTE( "sr010.20d", 0x200000, 0x100000,  CRC(6e9e5352) SHA1(357659ff5ab9ce94df3313e9a60125769c7fe10a) )
 
 	ROM_REGION(0x80000, "oki2", 0 ) /* Oki samples */
 	ROM_LOAD( "sr011.14p", 0x00000,  0x80000,  CRC(81805616) SHA1(cdca2eb6d12924b9b578b4ce95d5816c7d82f345) )
@@ -1890,10 +1845,10 @@ ROM_START( hangzo ) /* Found on a Data East DE-0353-3 PCB */
 	ROM_LOAD( "BK23H 12.10.18D.574200",  0x100000, 0x080000,  CRC(6a725fb2) SHA1(f4da4da62eb7e3ec2f1a54b57eaf94dc748dec68) )
 
 	ROM_REGION( 0x400000, "gfx4", 0 )
-	ROM_LOAD( "OBJ01L 12.10.19A.27C4000", 0x000000, 0x080000,  CRC(c141e310) SHA1(81eb0b977aaf44a110a663416e385ca617de8f28) ) /* 6bpp sprites */
-	ROM_LOAD( "OBJ01H 12.10.20A.27C4000", 0x100000, 0x080000,  CRC(6a7b4252) SHA1(4bd588bc96c07cc9367afdeab4976af6f8dcc823) )
-	ROM_LOAD( "OBJ23L 12.10.19D.27C4000", 0x200000, 0x080000,  CRC(0db6df6c) SHA1(fe7ef7b5a279656d9e46334c4833ab8911caa5db) )
-	ROM_LOAD( "OBJ23H 12.10.20D.27C4000", 0x300000, 0x080000,  CRC(165031a1) SHA1(0e88fe45fd78d352fdbd398c1d98feefe1b43917) )
+	ROM_LOAD16_BYTE( "OBJ01L 12.10.19A.27C4000", 0x000001, 0x080000,  CRC(c141e310) SHA1(81eb0b977aaf44a110a663416e385ca617de8f28) ) /* 4bpp sprites */
+	ROM_LOAD16_BYTE( "OBJ01H 12.10.20A.27C4000", 0x200001, 0x080000,  CRC(6a7b4252) SHA1(4bd588bc96c07cc9367afdeab4976af6f8dcc823) )
+	ROM_LOAD16_BYTE( "OBJ23L 12.10.19D.27C4000", 0x000000, 0x080000,  CRC(0db6df6c) SHA1(fe7ef7b5a279656d9e46334c4833ab8911caa5db) )
+	ROM_LOAD16_BYTE( "OBJ23H 12.10.20D.27C4000", 0x200000, 0x080000,  CRC(165031a1) SHA1(0e88fe45fd78d352fdbd398c1d98feefe1b43917) )
 
 	ROM_REGION(0x80000, "oki2", 0 ) /* Oki samples */
 	ROM_LOAD( "PCM16K 11.5.14P.574000", 0x00000,  0x80000,  CRC(5b95c6c7) SHA1(587e7f87d085af3a5d24f317fffc1716c8027e43) )
@@ -1930,25 +1885,21 @@ DRIVER_INIT_MEMBER(rohga_state,nitrobal)
 	deco74_decrypt_gfx(machine(), "gfx3");
 }
 
-DRIVER_INIT_MEMBER(rohga_state,schmeisr)
-{
-	const uint8_t *src = memregion("gfx2")->base();
-	uint8_t *dst = memregion("gfx1")->base();
-
-	memcpy(dst, src, 0x20000);
-	memcpy(dst + 0x20000, src + 0x80000, 0x20000);
-
-	deco74_decrypt_gfx(machine(), "gfx1");
-	deco74_decrypt_gfx(machine(), "gfx2");
-}
-
 DRIVER_INIT_MEMBER(rohga_state,hangzo)
 {
 	const uint8_t *src = memregion("gfx2")->base();
 	uint8_t *dst = memregion("gfx1")->base();
 
-	memcpy(dst, src, 0x20000);
-	memcpy(dst + 0x20000, src + 0x80000, 0x20000);
+	std::copy(&src[0], &src[0x20000], &dst[0]);
+	std::copy(&src[0x80000], &src[0xa0000], &dst[0x20000]);
+}
+
+DRIVER_INIT_MEMBER(rohga_state,schmeisr)
+{
+	DRIVER_INIT_CALL(hangzo);
+
+	deco74_decrypt_gfx(machine(), "gfx1");
+	deco74_decrypt_gfx(machine(), "gfx2");
 }
 
 GAME( 1991, rohga,     0,        rohga,    rohga,    rohga_state, rohga,    ROT0,   "Data East Corporation", "Rohga Armor Force (Asia/Europe v5.0)", MACHINE_SUPPORTS_SAVE )

@@ -38,25 +38,25 @@ MACHINE_CONFIG_END
 
 DEFINE_DEVICE_TYPE(VOODOO_PCI, voodoo_pci_device, "voodoo_pci", "Voodoo PCI")
 
-DEVICE_ADDRESS_MAP_START(config_map, 32, voodoo_pci_device)
+ADDRESS_MAP_START(voodoo_pci_device::config_map)
+	AM_IMPORT_FROM(pci_device::config_map)
 	AM_RANGE(0x40, 0x5f) AM_READWRITE  (pcictrl_r,  pcictrl_w)
-	AM_INHERIT_FROM(pci_device::config_map)
 ADDRESS_MAP_END
 
 // VOODOO_1 & VOODOO_2 map
-DEVICE_ADDRESS_MAP_START(voodoo_reg_map, 32, voodoo_pci_device)
+ADDRESS_MAP_START(voodoo_pci_device::voodoo_reg_map)
 	AM_RANGE(0x0, 0x00ffffff) AM_DEVREADWRITE("voodoo", voodoo_device, voodoo_r, voodoo_w)
 ADDRESS_MAP_END
 // VOODOO_BANSHEE and VOODOO_3 maps
-DEVICE_ADDRESS_MAP_START(banshee_reg_map, 32, voodoo_pci_device)
+ADDRESS_MAP_START(voodoo_pci_device::banshee_reg_map)
 	AM_RANGE(0x0, 0x01ffffff) AM_DEVREADWRITE("voodoo", voodoo_banshee_device, banshee_r, banshee_w)
 ADDRESS_MAP_END
 
-DEVICE_ADDRESS_MAP_START(lfb_map, 32, voodoo_pci_device)
+ADDRESS_MAP_START(voodoo_pci_device::lfb_map)
 	AM_RANGE(0x0, 0x01ffffff) AM_DEVREADWRITE("voodoo", voodoo_banshee_device, banshee_fb_r, banshee_fb_w)
 ADDRESS_MAP_END
 
-DEVICE_ADDRESS_MAP_START(io_map, 32, voodoo_pci_device)
+ADDRESS_MAP_START(voodoo_pci_device::io_map)
 	AM_RANGE(0x000, 0x0ff) AM_DEVREADWRITE("voodoo", voodoo_banshee_device, banshee_io_r, banshee_io_w)
 ADDRESS_MAP_END
 
@@ -73,9 +73,9 @@ void voodoo_pci_device::set_cpu_tag(const char *_cpu_tag)
 
 void voodoo_pci_device::device_start()
 {
-	voodoo_device::static_set_cpu_tag(*m_voodoo, m_cpu_tag);
-	voodoo_device::static_set_fbmem(*m_voodoo, m_fbmem);
-	voodoo_device::static_set_tmumem(*m_voodoo, m_tmumem0, m_tmumem1);
+	m_voodoo->set_cpu_tag(m_cpu_tag);
+	m_voodoo->set_fbmem(m_fbmem);
+	m_voodoo->set_tmumem(m_tmumem0, m_tmumem1);
 	switch (m_type) {
 		//void set_ids(uint32_t main_id, uint8_t revision, uint32_t pclass, uint32_t subsystem_id);
 		case TYPE_VOODOO_1:

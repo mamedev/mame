@@ -91,25 +91,25 @@ DEFINE_DEVICE_TYPE(PIC1655,  pic1655_device,  "pic1655",  "PIC1655")
  *  Internal Memory Maps
  ****************************************************************************/
 
-static ADDRESS_MAP_START( pic16c5x_rom_9, AS_PROGRAM, 16, pic16c5x_device )
+ADDRESS_MAP_START(pic16c5x_device::pic16c5x_rom_9)
 	AM_RANGE(0x000, 0x1ff) AM_ROM
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( pic16c5x_ram_5, AS_DATA, 8, pic16c5x_device )
+ADDRESS_MAP_START(pic16c5x_device::pic16c5x_ram_5)
 	AM_RANGE(0x00, 0x07) AM_RAM
 	AM_RANGE(0x08, 0x0f) AM_RAM
 	AM_RANGE(0x10, 0x1f) AM_RAM
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( pic16c5x_rom_10, AS_PROGRAM, 16, pic16c5x_device )
+ADDRESS_MAP_START(pic16c5x_device::pic16c5x_rom_10)
 	AM_RANGE(0x000, 0x3ff) AM_ROM
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( pic16c5x_rom_11, AS_PROGRAM, 16, pic16c5x_device )
+ADDRESS_MAP_START(pic16c5x_device::pic16c5x_rom_11)
 	AM_RANGE(0x000, 0x7ff) AM_ROM
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( pic16c5x_ram_7, AS_DATA, 8, pic16c5x_device )
+ADDRESS_MAP_START(pic16c5x_device::pic16c5x_ram_7)
 	AM_RANGE(0x00, 0x07) AM_RAM AM_MIRROR(0x60)
 	AM_RANGE(0x08, 0x0f) AM_RAM AM_MIRROR(0x60)
 	AM_RANGE(0x10, 0x1f) AM_RAM
@@ -122,9 +122,9 @@ ADDRESS_MAP_END
 pic16c5x_device::pic16c5x_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock, int program_width, int data_width, int picmodel)
 	: cpu_device(mconfig, type, tag, owner, clock)
 	, m_program_config("program", ENDIANNESS_LITTLE, 16, program_width, -1
-	, ( ( program_width == 9 ) ? ADDRESS_MAP_NAME(pic16c5x_rom_9) : ( ( program_width == 10 ) ? ADDRESS_MAP_NAME(pic16c5x_rom_10) : ADDRESS_MAP_NAME(pic16c5x_rom_11) )))
+					   , ( ( program_width == 9 ) ? address_map_constructor(FUNC(pic16c5x_device::pic16c5x_rom_9), this): ( ( program_width == 10 ) ? address_map_constructor(FUNC(pic16c5x_device::pic16c5x_rom_10), this) : address_map_constructor(FUNC(pic16c5x_device::pic16c5x_rom_11), this) )))
 	, m_data_config("data", ENDIANNESS_LITTLE, 8, data_width, 0
-	, ( ( data_width == 5 ) ? ADDRESS_MAP_NAME(pic16c5x_ram_5) : ADDRESS_MAP_NAME(pic16c5x_ram_7) ) )
+					, ( ( data_width == 5 ) ? address_map_constructor(FUNC(pic16c5x_device::pic16c5x_ram_5), this) : address_map_constructor(FUNC(pic16c5x_device::pic16c5x_ram_7), this) ) )
 	, m_reset_vector((program_width == 9) ? 0x1ff : ((program_width == 10) ? 0x3ff : 0x7ff))
 	, m_picmodel(picmodel)
 	, m_temp_config(0)

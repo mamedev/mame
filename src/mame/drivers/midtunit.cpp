@@ -44,7 +44,7 @@
  *
  *************************************/
 
-static ADDRESS_MAP_START( main_map, AS_PROGRAM, 16, midtunit_state )
+ADDRESS_MAP_START(midtunit_state::main_map)
 	ADDRESS_MAP_UNMAP_HIGH
 	AM_RANGE(0x00000000, 0x003fffff) AM_READWRITE(midtunit_vram_r, midtunit_vram_w)
 	AM_RANGE(0x01000000, 0x013fffff) AM_RAM
@@ -621,7 +621,8 @@ MACHINE_CONFIG_START(midtunit_state::tunit_core)
 MACHINE_CONFIG_END
 
 
-MACHINE_CONFIG_DERIVED(midtunit_state::tunit_adpcm, tunit_core)
+MACHINE_CONFIG_START(midtunit_state::tunit_adpcm)
+	tunit_core(config);
 
 	/* basic machine hardware */
 	MCFG_SPEAKER_STANDARD_MONO("speaker")
@@ -630,7 +631,8 @@ MACHINE_CONFIG_DERIVED(midtunit_state::tunit_adpcm, tunit_core)
 MACHINE_CONFIG_END
 
 
-MACHINE_CONFIG_DERIVED(midtunit_state::tunit_dcs, tunit_core)
+MACHINE_CONFIG_START(midtunit_state::tunit_dcs)
+	tunit_core(config);
 
 	/* basic machine hardware */
 	MCFG_DEVICE_ADD("dcs", DCS_AUDIO_2K, 0)

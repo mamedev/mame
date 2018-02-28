@@ -363,7 +363,7 @@ WRITE8_MEMBER(ninjaw_state::coin_control_w)
 
 WRITE8_MEMBER(ninjaw_state::sound_bankswitch_w)
 {
-	membank("z80bank")->set_entry(data & 7);
+	m_z80bank->set_entry(data & 7);
 }
 
 WRITE16_MEMBER(ninjaw_state::sound_w)
@@ -397,10 +397,10 @@ WRITE8_MEMBER(ninjaw_state::pancontrol_w)
 
 	switch (offset)
 	{
-		case 0: flt = m_2610_1l; break;
-		case 1: flt = m_2610_1r; break;
-		case 2: flt = m_2610_2l; break;
-		case 3: flt = m_2610_2r; break;
+		case 0: flt = m_2610_l[0]; break;
+		case 1: flt = m_2610_r[0]; break;
+		case 2: flt = m_2610_l[1]; break;
+		case 3: flt = m_2610_r[1]; break;
 	}
 
 	m_pandata[offset] = (float)data * (100.f / 255.0f);
@@ -411,16 +411,16 @@ WRITE8_MEMBER(ninjaw_state::pancontrol_w)
 
 WRITE16_MEMBER(ninjaw_state::tc0100scn_triple_screen_w)
 {
-	m_tc0100scn_1->word_w(space, offset, data, mem_mask);
-	m_tc0100scn_2->word_w(space, offset, data, mem_mask);
-	m_tc0100scn_3->word_w(space, offset, data, mem_mask);
+	m_tc0100scn[0]->word_w(space, offset, data, mem_mask);
+	m_tc0100scn[1]->word_w(space, offset, data, mem_mask);
+	m_tc0100scn[2]->word_w(space, offset, data, mem_mask);
 }
 
 /***********************************************************
              MEMORY STRUCTURES
 ***********************************************************/
 
-static ADDRESS_MAP_START( ninjaw_master_map, AS_PROGRAM, 16, ninjaw_state )
+ADDRESS_MAP_START(ninjaw_state::ninjaw_master_map)
 	AM_RANGE(0x000000, 0x0bffff) AM_ROM
 	AM_RANGE(0x0c0000, 0x0cffff) AM_RAM                                                     /* main ram */
 	AM_RANGE(0x200000, 0x200003) AM_DEVREADWRITE8("tc0040ioc", tc0040ioc_device, read, write, 0x00ff)
@@ -442,7 +442,7 @@ ADDRESS_MAP_END
 // NB there could be conflicts between which cpu writes what to the
 // palette, as our interleaving won't match the original board.
 
-static ADDRESS_MAP_START( ninjaw_slave_map, AS_PROGRAM, 16, ninjaw_state )
+ADDRESS_MAP_START(ninjaw_state::ninjaw_slave_map)
 	AM_RANGE(0x000000, 0x05ffff) AM_ROM
 	AM_RANGE(0x080000, 0x08ffff) AM_RAM /* main ram */
 	AM_RANGE(0x200000, 0x200003) AM_DEVREADWRITE8("tc0040ioc", tc0040ioc_device, read, write, 0x00ff)
@@ -454,7 +454,7 @@ static ADDRESS_MAP_START( ninjaw_slave_map, AS_PROGRAM, 16, ninjaw_state )
 	AM_RANGE(0x360000, 0x360007) AM_DEVREADWRITE("tc0110pcr_3", tc0110pcr_device, word_r, step1_word_w)        /* palette (3rd screen) */
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( darius2_master_map, AS_PROGRAM, 16, ninjaw_state )
+ADDRESS_MAP_START(ninjaw_state::darius2_master_map)
 	AM_RANGE(0x000000, 0x0bffff) AM_ROM
 	AM_RANGE(0x0c0000, 0x0cffff) AM_RAM                         /* main ram */
 	AM_RANGE(0x200000, 0x200003) AM_DEVREADWRITE8("tc0040ioc", tc0040ioc_device, read, write, 0x00ff)
@@ -473,7 +473,7 @@ static ADDRESS_MAP_START( darius2_master_map, AS_PROGRAM, 16, ninjaw_state )
 	AM_RANGE(0x360000, 0x360007) AM_DEVREADWRITE("tc0110pcr_3", tc0110pcr_device, word_r, step1_word_w)        /* palette (3rd screen) */
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( darius2_slave_map, AS_PROGRAM, 16, ninjaw_state )
+ADDRESS_MAP_START(ninjaw_state::darius2_slave_map)
 	AM_RANGE(0x000000, 0x05ffff) AM_ROM
 	AM_RANGE(0x080000, 0x08ffff) AM_RAM                                                     /* main ram */
 	AM_RANGE(0x200000, 0x200003) AM_DEVREADWRITE8("tc0040ioc", tc0040ioc_device, read, write, 0x00ff)
@@ -485,7 +485,7 @@ ADDRESS_MAP_END
 
 /***************************************************************************/
 
-static ADDRESS_MAP_START( sound_map, AS_PROGRAM, 8, ninjaw_state )
+ADDRESS_MAP_START(ninjaw_state::sound_map)
 	AM_RANGE(0x0000, 0x3fff) AM_ROM
 	AM_RANGE(0x4000, 0x7fff) AM_ROMBANK("z80bank")
 	AM_RANGE(0xc000, 0xdfff) AM_RAM
@@ -712,7 +712,7 @@ void ninjaw_state::postload()
 
 void ninjaw_state::machine_start()
 {
-	membank("z80bank")->configure_entries(0, 8, memregion("audiocpu")->base(), 0x4000);
+	m_z80bank->configure_entries(0, 8, memregion("audiocpu")->base(), 0x4000);
 
 	save_item(NAME(m_cpua_ctrl));
 	save_item(NAME(m_pandata));
@@ -1245,8 +1245,8 @@ ROM_END
 /* Working Games */
 
 //    YEAR, NAME,     PARENT, MACHINE, INPUT,   STATE         INIT,MONITOR,COMPANY,                     FULLNAME,FLAGS
-GAME( 1987, ninjaw,   0,      ninjaw,  ninjaw,  ninjaw_state, 0,   ROT0,   "Taito Corporation Japan",   "The Ninja Warriors (World, later version)", MACHINE_SUPPORTS_SAVE )
-GAME( 1987, ninjaw1,  ninjaw, ninjaw,  ninjaw,  ninjaw_state, 0,   ROT0,   "Taito Corporation Japan",   "The Ninja Warriors (World, earlier version)", MACHINE_SUPPORTS_SAVE )
-GAME( 1987, ninjawj,  ninjaw, ninjaw,  ninjawj, ninjaw_state, 0,   ROT0,   "Taito Corporation",         "The Ninja Warriors (Japan)", MACHINE_SUPPORTS_SAVE )
-GAME( 1987, ninjawu,  ninjaw, ninjaw,  ninjawj, ninjaw_state, 0,   ROT0,   "Taito Corporation America (licensed to Romstar)", "The Ninja Warriors (US, Romstar license)", MACHINE_SUPPORTS_SAVE ) /* Uses same coinage as World, see notes */
-GAME( 1989, darius2,  0,      darius2, darius2, ninjaw_state, 0,   ROT0,   "Taito Corporation",         "Darius II (triple screen) (Japan)", MACHINE_SUPPORTS_SAVE )
+GAME( 1987, ninjaw,   0,      ninjaw,  ninjaw,  ninjaw_state, 0,   ROT0,   "Taito Corporation Japan",   "The Ninja Warriors (World, later version)", MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_SOUND )
+GAME( 1987, ninjaw1,  ninjaw, ninjaw,  ninjaw,  ninjaw_state, 0,   ROT0,   "Taito Corporation Japan",   "The Ninja Warriors (World, earlier version)", MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_SOUND )
+GAME( 1987, ninjawj,  ninjaw, ninjaw,  ninjawj, ninjaw_state, 0,   ROT0,   "Taito Corporation",         "The Ninja Warriors (Japan)", MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_SOUND )
+GAME( 1987, ninjawu,  ninjaw, ninjaw,  ninjawj, ninjaw_state, 0,   ROT0,   "Taito Corporation America (licensed to Romstar)", "The Ninja Warriors (US, Romstar license)", MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_SOUND ) /* Uses same coinage as World, see notes */
+GAME( 1989, darius2,  0,      darius2, darius2, ninjaw_state, 0,   ROT0,   "Taito Corporation",         "Darius II (triple screen) (Japan)", MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_SOUND )

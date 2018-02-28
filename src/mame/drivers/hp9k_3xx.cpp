@@ -142,6 +142,15 @@ public:
 	void hp9k380(machine_config &config);
 	void hp9k320(machine_config &config);
 	void hp9k332(machine_config &config);
+	void hp9k310_map(address_map &map);
+	void hp9k320_map(address_map &map);
+	void hp9k330_map(address_map &map);
+	void hp9k332_map(address_map &map);
+	void hp9k370_map(address_map &map);
+	void hp9k380_map(address_map &map);
+	void hp9k382_map(address_map &map);
+	void hp9k3xx_common(address_map &map);
+	void iocpu_map(address_map &map);
 private:
 	bool m_in_buserr;
 	bool m_hil_read;
@@ -174,7 +183,7 @@ uint32_t hp9k3xx_state::hp_medres_update(screen_device &screen, bitmap_rgb32 &bi
 }
 
 // shared mappings for all 9000/3xx systems
-static ADDRESS_MAP_START(hp9k3xx_common, AS_PROGRAM, 32, hp9k3xx_state)
+ADDRESS_MAP_START(hp9k3xx_state::hp9k3xx_common)
 	AM_RANGE(0x00000000, 0x0001ffff) AM_ROM AM_REGION("maincpu",0) AM_WRITE(led_w)  // writes to 1fffc are the LED
 
 	AM_RANGE(0x00428000, 0x00428003) AM_DEVREADWRITE8(IOCPU_TAG, upi41_cpu_device, upi41_master_r, upi41_master_w, 0x00ff00ff)
@@ -190,7 +199,7 @@ static ADDRESS_MAP_START(hp9k3xx_common, AS_PROGRAM, 32, hp9k3xx_state)
 ADDRESS_MAP_END
 
 // 9000/310 - has onboard video that the graphics card used in other 3xxes conflicts with
-static ADDRESS_MAP_START(hp9k310_map, AS_PROGRAM, 16, hp9k3xx_state)
+ADDRESS_MAP_START(hp9k3xx_state::hp9k310_map)
 	AM_RANGE(0x000000, 0x01ffff) AM_ROM AM_REGION("maincpu",0) AM_WRITENOP  // writes to 1fffc are the LED
 
 	AM_RANGE(0x00428000, 0x00428003) AM_DEVREADWRITE8(IOCPU_TAG, upi41_cpu_device, upi41_master_r, upi41_master_w, 0x00ff)
@@ -205,61 +214,61 @@ static ADDRESS_MAP_START(hp9k310_map, AS_PROGRAM, 16, hp9k3xx_state)
 ADDRESS_MAP_END
 
 // 9000/320
-static ADDRESS_MAP_START(hp9k320_map, AS_PROGRAM, 32, hp9k3xx_state)
+ADDRESS_MAP_START(hp9k3xx_state::hp9k320_map)
+	AM_IMPORT_FROM(hp9k3xx_common)
+
 	AM_RANGE(0xffe00000, 0xffefffff) AM_READWRITE(buserror_r, buserror_w)
 	AM_RANGE(0xfff00000, 0xffffffff) AM_RAM
-
-	AM_IMPORT_FROM(hp9k3xx_common)
 ADDRESS_MAP_END
 
 // 9000/330 and 9000/340
-static ADDRESS_MAP_START(hp9k330_map, AS_PROGRAM, 32, hp9k3xx_state)
+ADDRESS_MAP_START(hp9k3xx_state::hp9k330_map)
+	AM_IMPORT_FROM(hp9k3xx_common)
+
 	AM_RANGE(0xffb00000, 0xffbfffff) AM_READWRITE(buserror_r, buserror_w)
 	AM_RANGE(0xffc00000, 0xffffffff) AM_RAM
-
-	AM_IMPORT_FROM(hp9k3xx_common)
 ADDRESS_MAP_END
 
 // 9000/332, with built-in medium-res video
-static ADDRESS_MAP_START(hp9k332_map, AS_PROGRAM, 32, hp9k3xx_state)
+ADDRESS_MAP_START(hp9k3xx_state::hp9k332_map)
+	AM_IMPORT_FROM(hp9k3xx_common)
+
 	AM_RANGE(0x00200000, 0x002fffff) AM_RAM AM_SHARE("vram")    // 98544 mono framebuffer
 	AM_RANGE(0x00560000, 0x00563fff) AM_ROM AM_REGION("graphics", 0x0000)   // 98544 mono ROM
 
 	AM_RANGE(0xffb00000, 0xffbfffff) AM_READWRITE(buserror_r, buserror_w)
 	AM_RANGE(0xffc00000, 0xffffffff) AM_RAM
-
-	AM_IMPORT_FROM(hp9k3xx_common)
 ADDRESS_MAP_END
 
 // 9000/370 - 8 MB RAM standard
-static ADDRESS_MAP_START(hp9k370_map, AS_PROGRAM, 32, hp9k3xx_state)
+ADDRESS_MAP_START(hp9k3xx_state::hp9k370_map)
+	AM_IMPORT_FROM(hp9k3xx_common)
+
 	AM_RANGE(0xff700000, 0xff7fffff) AM_READWRITE(buserror_r, buserror_w)
 	AM_RANGE(0xff800000, 0xffffffff) AM_RAM
-
-	AM_IMPORT_FROM(hp9k3xx_common)
 ADDRESS_MAP_END
 
 // 9000/380 - '040
-static ADDRESS_MAP_START(hp9k380_map, AS_PROGRAM, 32, hp9k3xx_state)
+ADDRESS_MAP_START(hp9k3xx_state::hp9k380_map)
+	AM_IMPORT_FROM(hp9k3xx_common)
+
 	AM_RANGE(0x0051a000, 0x0051afff) AM_READWRITE(buserror_r, buserror_w)   // no "Alpha display"
 
 	AM_RANGE(0xc0000000, 0xff7fffff) AM_READWRITE(buserror_r, buserror_w)
 	AM_RANGE(0xff800000, 0xffffffff) AM_RAM
-
-	AM_IMPORT_FROM(hp9k3xx_common)
 ADDRESS_MAP_END
 
 // 9000/382 - onboard VGA compatible video (where?)
-static ADDRESS_MAP_START(hp9k382_map, AS_PROGRAM, 32, hp9k3xx_state)
+ADDRESS_MAP_START(hp9k3xx_state::hp9k382_map)
+	AM_IMPORT_FROM(hp9k3xx_common)
+
 	AM_RANGE(0xffb00000, 0xffbfffff) AM_READWRITE(buserror_r, buserror_w)
 	AM_RANGE(0xffc00000, 0xffffffff) AM_RAM
 
 	AM_RANGE(0x0051a000, 0x0051afff) AM_READWRITE(buserror_r, buserror_w)   // no "Alpha display"
-
-	AM_IMPORT_FROM(hp9k3xx_common)
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START(iocpu_map, AS_PROGRAM, 8, hp9k3xx_state)
+ADDRESS_MAP_START(hp9k3xx_state::iocpu_map)
 ADDRESS_MAP_END
 
 uint32_t hp9k3xx_state::screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
@@ -425,7 +434,8 @@ MACHINE_CONFIG_START(hp9k3xx_state::hp9k320)
 	MCFG_DIO32_SLOT_ADD("diobus", "sl3", dio16_cards, nullptr, false)
 MACHINE_CONFIG_END
 
-MACHINE_CONFIG_DERIVED(hp9k3xx_state::hp9k330, hp9k320)
+MACHINE_CONFIG_START(hp9k3xx_state::hp9k330)
+	hp9k320(config);
 	/* basic machine hardware */
 	MCFG_CPU_REPLACE(MAINCPU_TAG, M68020PMMU, 16670000)
 	MCFG_CPU_PROGRAM_MAP(hp9k330_map)
@@ -460,25 +470,29 @@ MACHINE_CONFIG_START(hp9k3xx_state::hp9k332)
 	MCFG_SCREEN_REFRESH_RATE(70)
 MACHINE_CONFIG_END
 
-MACHINE_CONFIG_DERIVED(hp9k3xx_state::hp9k340, hp9k320)
+MACHINE_CONFIG_START(hp9k3xx_state::hp9k340)
+	hp9k320(config);
 	/* basic machine hardware */
 	MCFG_CPU_REPLACE(MAINCPU_TAG, M68030, 16670000)
 	MCFG_CPU_PROGRAM_MAP(hp9k330_map)
 MACHINE_CONFIG_END
 
-MACHINE_CONFIG_DERIVED(hp9k3xx_state::hp9k370, hp9k320)
+MACHINE_CONFIG_START(hp9k3xx_state::hp9k370)
+	hp9k320(config);
 	/* basic machine hardware */
 	MCFG_CPU_REPLACE(MAINCPU_TAG, M68030, 33000000)
 	MCFG_CPU_PROGRAM_MAP(hp9k370_map)
 MACHINE_CONFIG_END
 
-MACHINE_CONFIG_DERIVED(hp9k3xx_state::hp9k380, hp9k320)
+MACHINE_CONFIG_START(hp9k3xx_state::hp9k380)
+	hp9k320(config);
 	/* basic machine hardware */
 	MCFG_CPU_REPLACE(MAINCPU_TAG, M68040, 25000000)
 	MCFG_CPU_PROGRAM_MAP(hp9k380_map)
 MACHINE_CONFIG_END
 
-MACHINE_CONFIG_DERIVED(hp9k3xx_state::hp9k382, hp9k320)
+MACHINE_CONFIG_START(hp9k3xx_state::hp9k382)
+	hp9k320(config);
 	/* basic machine hardware */
 	MCFG_CPU_REPLACE(MAINCPU_TAG, M68040, 25000000)
 	MCFG_CPU_PROGRAM_MAP(hp9k382_map)

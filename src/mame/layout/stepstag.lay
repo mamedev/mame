@@ -42,14 +42,14 @@
 
 	<view name="Stepping Stage Custom">
 		<screen index="0">
-			<bounds x="0" y="0" width="9" height="12" />
+			<bounds x="0" y="0" width="9" height="13.2" />
 			<orientation rotate="270" />
 		</screen>
 		<screen index="1">
-			<bounds x="9.1" y="0" width="16" height="12" />
+			<bounds x="9.1" y="0" width="16" height="13.2" />
 		</screen>
 		<screen index="2">
-			<bounds x="25.2" y="0" width="9" height="12" />
+			<bounds x="25.2" y="0" width="9" height="13.2" />
 			<orientation rotate="270" />
 		</screen>
 	</view>

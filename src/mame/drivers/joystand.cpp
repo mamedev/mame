@@ -204,6 +204,7 @@ public:
 	virtual void machine_reset() override;
 	INTERRUPT_GEN_MEMBER(joystand_interrupt);
 	void joystand(machine_config &config);
+	void joystand_map(address_map &map);
 };
 
 const rgb_t joystand_state::BG15_TRANSPARENT = 0x99999999;
@@ -444,7 +445,7 @@ WRITE16_MEMBER(joystand_state::cart_w)
 	bg15_tiles_dirty = true;
 }
 
-static ADDRESS_MAP_START( joystand_map, AS_PROGRAM, 16, joystand_state )
+ADDRESS_MAP_START(joystand_state::joystand_map)
 	AM_RANGE(0x000000, 0x07ffff) AM_ROM
 	AM_RANGE(0x100000, 0x13ffff) AM_RAM
 	AM_RANGE(0x200000, 0x200003) AM_DEVWRITE8("ym2413", ym2413_device, write, 0x00ff)

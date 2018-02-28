@@ -125,7 +125,7 @@ WRITE8_MEMBER(bladestl_state::bladestl_speech_ctrl_w)
  *
  *************************************/
 
-static ADDRESS_MAP_START( main_map, AS_PROGRAM, 8, bladestl_state )
+ADDRESS_MAP_START(bladestl_state::main_map)
 	AM_RANGE(0x0000, 0x1fff) AM_DEVREADWRITE("k007342", k007342_device, read, write)    /* Color RAM + Video RAM */
 	AM_RANGE(0x2000, 0x21ff) AM_DEVREADWRITE("k007420", k007420_device, read, write)    /* Sprite RAM */
 	AM_RANGE(0x2200, 0x23ff) AM_DEVREADWRITE("k007342", k007342_device, scroll_r, scroll_w)  /* Scroll RAM */
@@ -147,7 +147,7 @@ static ADDRESS_MAP_START( main_map, AS_PROGRAM, 8, bladestl_state )
 	AM_RANGE(0x8000, 0xffff) AM_ROM
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( sound_map, AS_PROGRAM, 8, bladestl_state )
+ADDRESS_MAP_START(bladestl_state::sound_map)
 	AM_RANGE(0x0000, 0x07ff) AM_RAM
 	AM_RANGE(0x1000, 0x1001) AM_DEVREADWRITE("ymsnd", ym2203_device, read, write)    /* YM2203 */
 	AM_RANGE(0x3000, 0x3000) AM_WRITE(bladestl_speech_ctrl_w)   /* UPD7759 */

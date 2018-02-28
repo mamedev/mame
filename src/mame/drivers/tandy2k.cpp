@@ -307,7 +307,7 @@ WRITE8_MEMBER( tandy2k_state::addr_ctrl_w )
 
 // Memory Maps
 
-static ADDRESS_MAP_START( tandy2k_mem, AS_PROGRAM, 16, tandy2k_state )
+ADDRESS_MAP_START(tandy2k_state::tandy2k_mem)
 	ADDRESS_MAP_UNMAP_HIGH
 //  AM_RANGE(0x00000, 0xdffff) AM_RAM
 	AM_RANGE(0xe0000, 0xf7fff) AM_RAM AM_SHARE("hires_ram")
@@ -315,7 +315,7 @@ static ADDRESS_MAP_START( tandy2k_mem, AS_PROGRAM, 16, tandy2k_state )
 	AM_RANGE(0xfc000, 0xfdfff) AM_MIRROR(0x2000) AM_ROM AM_REGION(I80186_TAG, 0)
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( tandy2k_io, AS_IO, 16, tandy2k_state )
+ADDRESS_MAP_START(tandy2k_state::tandy2k_io)
 	ADDRESS_MAP_UNMAP_HIGH
 	AM_RANGE(0x00000, 0x00001) AM_MIRROR(0x8) AM_READWRITE8(enable_r, enable_w, 0x00ff)
 	AM_RANGE(0x00002, 0x00003) AM_MIRROR(0x8) AM_WRITE8(dma_mux_w, 0x00ff)
@@ -323,8 +323,8 @@ static ADDRESS_MAP_START( tandy2k_io, AS_IO, 16, tandy2k_state )
 	AM_RANGE(0x00010, 0x00013) AM_MIRROR(0xc) AM_DEVREADWRITE8(I8251A_TAG, i8251_device, data_r, data_w, 0x00ff)
 	AM_RANGE(0x00030, 0x00033) AM_MIRROR(0xc) AM_DEVICE8(I8272A_TAG, i8272a_device, map, 0x00ff)
 	AM_RANGE(0x00040, 0x00047) AM_MIRROR(0x8) AM_DEVREADWRITE8(I8253_TAG, pit8253_device, read, write, 0x00ff)
-	AM_RANGE(0x00052, 0x00053) AM_MIRROR(0x8) AM_READ8(kbint_clr_r, 0x00ff)
 	AM_RANGE(0x00050, 0x00057) AM_MIRROR(0x8) AM_DEVREADWRITE8(I8255A_TAG, i8255_device, read, write, 0x00ff)
+	AM_RANGE(0x00052, 0x00053) AM_MIRROR(0x8) AM_READ8(kbint_clr_r, 0x00ff)
 	AM_RANGE(0x00060, 0x00063) AM_MIRROR(0xc) AM_DEVREADWRITE8(I8259A_0_TAG, pic8259_device, read, write, 0x00ff)
 	AM_RANGE(0x00070, 0x00073) AM_MIRROR(0xc) AM_DEVREADWRITE8(I8259A_1_TAG, pic8259_device, read, write, 0x00ff)
 	AM_RANGE(0x00080, 0x00081) AM_MIRROR(0xe) AM_DEVREADWRITE8(I8272A_TAG, i8272a_device, mdma_r, mdma_w, 0x00ff)
@@ -336,14 +336,14 @@ static ADDRESS_MAP_START( tandy2k_io, AS_IO, 16, tandy2k_state )
 //  AM_RANGE(0x0ff00, 0x0ffff) AM_READWRITE(i186_internal_port_r, i186_internal_port_w)
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( tandy2k_hd_io, AS_IO, 16, tandy2k_state )
+ADDRESS_MAP_START(tandy2k_state::tandy2k_hd_io)
 	AM_IMPORT_FROM(tandy2k_io)
 //  AM_RANGE(0x000e0, 0x000ff) AM_WRITE8(hdc_dack_w, 0x00ff)
 //  AM_RANGE(0x0026c, 0x0026d) AM_DEVREADWRITE8(WD1010_TAG, wd1010_device, hdc_reset_r, hdc_reset_w, 0x00ff)
 //  AM_RANGE(0x0026e, 0x0027f) AM_DEVREADWRITE8(WD1010_TAG, wd1010_device, wd1010_r, wd1010_w, 0x00ff)
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( vpac_mem, 0, 8, tandy2k_state )
+ADDRESS_MAP_START(tandy2k_state::vpac_mem)
 	AM_RANGE(0x0000, 0x3fff) AM_READ(videoram_r)
 ADDRESS_MAP_END
 
@@ -881,7 +881,8 @@ MACHINE_CONFIG_START(tandy2k_state::tandy2k)
 	MCFG_RAM_EXTRA_OPTIONS("256K,384K,512K,640K,768K,896K")
 MACHINE_CONFIG_END
 
-MACHINE_CONFIG_DERIVED(tandy2k_state::tandy2k_hd, tandy2k)
+MACHINE_CONFIG_START(tandy2k_state::tandy2k_hd)
+	tandy2k(config);
 	// basic machine hardware
 	MCFG_CPU_MODIFY(I80186_TAG)
 	MCFG_CPU_IO_MAP(tandy2k_hd_io)

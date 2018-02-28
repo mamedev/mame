@@ -170,7 +170,7 @@ WRITE8_MEMBER(tp84_state::tp84_sh_irqtrigger_w)
 
 
 
-static ADDRESS_MAP_START( tp84_cpu1_map, AS_PROGRAM, 8, tp84_state )
+ADDRESS_MAP_START(tp84_state::tp84_cpu1_map)
 	AM_RANGE(0x2000, 0x2000) AM_DEVWRITE("watchdog", watchdog_timer_device, reset_w)
 	AM_RANGE(0x2800, 0x2800) AM_READ_PORT("SYSTEM") AM_WRITEONLY AM_SHARE("palette_bank")
 	AM_RANGE(0x2820, 0x2820) AM_READ_PORT("P1")
@@ -190,7 +190,7 @@ static ADDRESS_MAP_START( tp84_cpu1_map, AS_PROGRAM, 8, tp84_state )
 	AM_RANGE(0x8000, 0xffff) AM_ROM
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( tp84b_cpu1_map, AS_PROGRAM, 8, tp84_state )
+ADDRESS_MAP_START(tp84_state::tp84b_cpu1_map)
 	AM_RANGE(0x0000, 0x03ff) AM_RAM AM_SHARE("bg_videoram")
 	AM_RANGE(0x0400, 0x07ff) AM_RAM AM_SHARE("fg_videoram")
 	AM_RANGE(0x0800, 0x0bff) AM_RAM AM_SHARE("bg_colorram")
@@ -217,7 +217,7 @@ WRITE8_MEMBER(tp84_state::sub_irq_mask_w)
 }
 
 
-static ADDRESS_MAP_START( cpu2_map, AS_PROGRAM, 8, tp84_state )
+ADDRESS_MAP_START(tp84_state::cpu2_map)
 //  AM_RANGE(0x0000, 0x0000) AM_RAM /* Watch dog ?*/
 	AM_RANGE(0x2000, 0x2000) AM_READ(tp84_scanline_r) /* beam position */
 	AM_RANGE(0x4000, 0x4000) AM_WRITE(sub_irq_mask_w)
@@ -228,7 +228,7 @@ static ADDRESS_MAP_START( cpu2_map, AS_PROGRAM, 8, tp84_state )
 ADDRESS_MAP_END
 
 
-static ADDRESS_MAP_START( audio_map, AS_PROGRAM, 8, tp84_state )
+ADDRESS_MAP_START(tp84_state::audio_map)
 	AM_RANGE(0x0000, 0x3fff) AM_ROM
 	AM_RANGE(0x4000, 0x43ff) AM_RAM
 	AM_RANGE(0x6000, 0x6000) AM_DEVREAD("soundlatch", generic_latch_8_device, read)
@@ -390,7 +390,8 @@ MACHINE_CONFIG_START(tp84_state::tp84)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 MACHINE_CONFIG_END
 
-MACHINE_CONFIG_DERIVED(tp84_state::tp84b, tp84)
+MACHINE_CONFIG_START(tp84_state::tp84b)
+	tp84(config);
 	MCFG_CPU_MODIFY("cpu1")
 	MCFG_CPU_PROGRAM_MAP(tp84b_cpu1_map)
 MACHINE_CONFIG_END

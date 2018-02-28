@@ -130,7 +130,7 @@ WRITE32_MEMBER(superchs_state::superchs_stick_w)
              MEMORY STRUCTURES
 ***********************************************************/
 
-static ADDRESS_MAP_START( superchs_map, AS_PROGRAM, 32, superchs_state )
+ADDRESS_MAP_START(superchs_state::superchs_map)
 	AM_RANGE(0x000000, 0x0fffff) AM_ROM
 	AM_RANGE(0x100000, 0x11ffff) AM_RAM AM_SHARE("ram")
 	AM_RANGE(0x140000, 0x141fff) AM_RAM AM_SHARE("spriteram")
@@ -144,7 +144,7 @@ static ADDRESS_MAP_START( superchs_map, AS_PROGRAM, 32, superchs_state )
 	AM_RANGE(0x340000, 0x340003) AM_READWRITE(superchs_stick_r, superchs_stick_w)   /* stick int request */
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( superchs_cpub_map, AS_PROGRAM, 16, superchs_state )
+ADDRESS_MAP_START(superchs_state::superchs_cpub_map)
 	AM_RANGE(0x000000, 0x03ffff) AM_ROM
 	AM_RANGE(0x200000, 0x20ffff) AM_RAM
 	AM_RANGE(0x600000, 0x60ffff) AM_DEVWRITE("tc0480scp", tc0480scp_device, word_w) /* Only written upon errors */
@@ -152,7 +152,7 @@ static ADDRESS_MAP_START( superchs_cpub_map, AS_PROGRAM, 16, superchs_state )
 	AM_RANGE(0xa00000, 0xa001ff) AM_RAM /* Extra road control?? */
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( chase3_cpub_map, AS_PROGRAM, 16, superchs_state )
+ADDRESS_MAP_START(superchs_state::chase3_cpub_map)
 	AM_RANGE(0x000000, 0x03ffff) AM_ROM
 	AM_RANGE(0x200000, 0x20ffff) AM_RAM
 	AM_RANGE(0x400000, 0x40ffff) AM_RAM
@@ -286,7 +286,8 @@ MACHINE_CONFIG_START(superchs_state::superchs)
 	MCFG_DEVICE_ADD("taito_en", TAITO_EN, 0)
 MACHINE_CONFIG_END
 
-MACHINE_CONFIG_DERIVED(superchs_state::chase3, superchs)
+MACHINE_CONFIG_START(superchs_state::chase3)
+	superchs(config);
 
 	MCFG_CPU_MODIFY("sub")
 	MCFG_CPU_PROGRAM_MAP(chase3_cpub_map)

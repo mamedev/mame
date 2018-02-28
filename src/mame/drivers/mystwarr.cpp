@@ -292,7 +292,7 @@ WRITE16_MEMBER(mystwarr_state::k053247_scattered_word_w)
 
 /* 68000 memory handlers */
 /* Mystic Warriors */
-static ADDRESS_MAP_START( mystwarr_map, AS_PROGRAM, 16, mystwarr_state )
+ADDRESS_MAP_START(mystwarr_state::mystwarr_map)
 	AM_RANGE(0x000000, 0x1fffff) AM_ROM // main program
 	AM_RANGE(0x200000, 0x20ffff) AM_RAM AM_SHARE("gx_workram")
 	AM_RANGE(0x400000, 0x40ffff) AM_READWRITE(k053247_scattered_word_r,k053247_scattered_word_w) AM_SHARE("spriteram")
@@ -319,7 +319,7 @@ static ADDRESS_MAP_START( mystwarr_map, AS_PROGRAM, 16, mystwarr_state )
 ADDRESS_MAP_END
 
 /* Metamorphic Force */
-static ADDRESS_MAP_START( metamrph_map, AS_PROGRAM, 16, mystwarr_state )
+ADDRESS_MAP_START(mystwarr_state::metamrph_map)
 	AM_RANGE(0x000000, 0x1fffff) AM_ROM // main program
 	AM_RANGE(0x200000, 0x20ffff) AM_RAM AM_SHARE("gx_workram")
 	AM_RANGE(0x210000, 0x210fff) AM_DEVREADWRITE("k055673", k055673_device,k053247_word_r,k053247_word_w)
@@ -350,7 +350,7 @@ static ADDRESS_MAP_START( metamrph_map, AS_PROGRAM, 16, mystwarr_state )
 ADDRESS_MAP_END
 
 /* Violent Storm */
-static ADDRESS_MAP_START( viostorm_map, AS_PROGRAM, 16, mystwarr_state )
+ADDRESS_MAP_START(mystwarr_state::viostorm_map)
 	AM_RANGE(0x000000, 0x1fffff) AM_ROM     // main program
 	AM_RANGE(0x200000, 0x20ffff) AM_RAM AM_SHARE("gx_workram")
 	AM_RANGE(0x210000, 0x210fff) AM_DEVREADWRITE("k055673", k055673_device, k053247_word_r,k053247_word_w)
@@ -444,7 +444,7 @@ WRITE16_MEMBER(mystwarr_state::mceeprom_w)
 }
 
 /* Martial Champion */
-static ADDRESS_MAP_START( martchmp_map, AS_PROGRAM, 16, mystwarr_state )
+ADDRESS_MAP_START(mystwarr_state::martchmp_map)
 	AM_RANGE(0x000000, 0x0fffff) AM_ROM                                 // main program
 	AM_RANGE(0x100000, 0x10ffff) AM_RAM AM_SHARE("gx_workram")          // work RAM
 	AM_RANGE(0x300000, 0x3fffff) AM_ROM                                 // data ROM
@@ -473,7 +473,7 @@ static ADDRESS_MAP_START( martchmp_map, AS_PROGRAM, 16, mystwarr_state )
 ADDRESS_MAP_END
 
 /* Ultimate Battler Dadandarn */
-static ADDRESS_MAP_START( dadandrn_map, AS_PROGRAM, 16, mystwarr_state )
+ADDRESS_MAP_START(mystwarr_state::dadandrn_map)
 	AM_RANGE(0x000000, 0x1fffff) AM_ROM                         // main program and data ROM
 	AM_RANGE(0x400000, 0x40ffff) AM_READWRITE(k053247_scattered_word_r,k053247_scattered_word_w) AM_SHARE("spriteram")
 	AM_RANGE(0x410000, 0x411fff) AM_DEVREADWRITE("k056832", k056832_device,ram_word_r,ram_word_w) // tilemap RAM
@@ -509,7 +509,7 @@ ADDRESS_MAP_END
 // a00000 = the 128k tilemap
 // 800000 = the 256k tilemap
 // c00000 = 936 tiles (7fffff window)
-static ADDRESS_MAP_START( gaiapols_map, AS_PROGRAM, 16, mystwarr_state )
+ADDRESS_MAP_START(mystwarr_state::gaiapols_map)
 	AM_RANGE(0x000000, 0x2fffff) AM_ROM                             // main program
 	AM_RANGE(0x400000, 0x40ffff) AM_READWRITE(k053247_scattered_word_r,k053247_scattered_word_w) AM_SHARE("spriteram")
 	AM_RANGE(0x410000, 0x411fff) AM_DEVREADWRITE("k056832", k056832_device,ram_word_r,ram_word_w)     // tilemap RAM
@@ -560,7 +560,7 @@ WRITE8_MEMBER(mystwarr_state::sound_ctrl_w)
    quite similar to xexex/gijoe/asterix's sound.
  */
 
-static ADDRESS_MAP_START( mystwarr_sound_map, AS_PROGRAM, 8, mystwarr_state )
+ADDRESS_MAP_START(mystwarr_state::mystwarr_sound_map)
 	AM_RANGE(0x0000, 0x7fff) AM_ROM
 	AM_RANGE(0x8000, 0xbfff) AM_ROMBANK("z80bank")
 	AM_RANGE(0x0000, 0xbfff) AM_WRITENOP
@@ -575,7 +575,7 @@ static ADDRESS_MAP_START( mystwarr_sound_map, AS_PROGRAM, 8, mystwarr_state )
 ADDRESS_MAP_END
 
 
-static ADDRESS_MAP_START( martchmp_sound_map, AS_PROGRAM, 8, mystwarr_state )
+ADDRESS_MAP_START(mystwarr_state::martchmp_sound_map)
 	AM_RANGE(0x0000, 0x7fff) AM_ROM
 	AM_RANGE(0x8000, 0xbfff) AM_ROMBANK("z80bank")
 	AM_RANGE(0x0000, 0xbfff) AM_WRITENOP
@@ -590,7 +590,7 @@ static ADDRESS_MAP_START( martchmp_sound_map, AS_PROGRAM, 8, mystwarr_state )
 ADDRESS_MAP_END
 
 
-static ADDRESS_MAP_START( mystwarr_k054539_map, 0, 8, mystwarr_state )
+ADDRESS_MAP_START(mystwarr_state::mystwarr_k054539_map)
 	AM_RANGE(0x000000, 0x3fffff) AM_ROM AM_REGION("k054539", 0)
 ADDRESS_MAP_END
 
@@ -1001,7 +1001,8 @@ MACHINE_CONFIG_START(mystwarr_state::mystwarr)
 	MCFG_SOUND_ROUTE(1, "lspeaker", 1.0)
 MACHINE_CONFIG_END
 
-MACHINE_CONFIG_DERIVED(mystwarr_state::viostorm, mystwarr)
+MACHINE_CONFIG_START(mystwarr_state::viostorm)
+	mystwarr(config);
 
 	MCFG_MACHINE_RESET_OVERRIDE(mystwarr_state,viostorm)
 
@@ -1032,7 +1033,8 @@ MACHINE_CONFIG_DERIVED(mystwarr_state::viostorm, mystwarr)
 	MCFG_K055673_CONFIG("gfx2", K055673_LAYOUT_RNG, -62, -23)
 MACHINE_CONFIG_END
 
-MACHINE_CONFIG_DERIVED(mystwarr_state::metamrph, mystwarr)
+MACHINE_CONFIG_START(mystwarr_state::metamrph)
+	mystwarr(config);
 
 	MCFG_MACHINE_RESET_OVERRIDE(mystwarr_state,metamrph)
 
@@ -1065,7 +1067,8 @@ MACHINE_CONFIG_DERIVED(mystwarr_state::metamrph, mystwarr)
 	MCFG_K055673_CONFIG("gfx2", K055673_LAYOUT_RNG, -51, -24)
 MACHINE_CONFIG_END
 
-MACHINE_CONFIG_DERIVED(mystwarr_state::dadandrn, mystwarr)
+MACHINE_CONFIG_START(mystwarr_state::dadandrn)
+	mystwarr(config);
 
 	MCFG_MACHINE_RESET_OVERRIDE(mystwarr_state,dadandrn)
 
@@ -1098,7 +1101,8 @@ MACHINE_CONFIG_DERIVED(mystwarr_state::dadandrn, mystwarr)
 	MCFG_K055673_CONFIG("gfx2", K055673_LAYOUT_GX, -42, -22)
 MACHINE_CONFIG_END
 
-MACHINE_CONFIG_DERIVED(mystwarr_state::gaiapols, mystwarr)
+MACHINE_CONFIG_START(mystwarr_state::gaiapols)
+	mystwarr(config);
 
 	MCFG_MACHINE_RESET_OVERRIDE(mystwarr_state,gaiapols)
 
@@ -1134,7 +1138,8 @@ MACHINE_CONFIG_DERIVED(mystwarr_state::gaiapols, mystwarr)
 	MCFG_K055673_CONFIG("gfx2", K055673_LAYOUT_RNG, -61, -22) // stage2 brick walls
 MACHINE_CONFIG_END
 
-MACHINE_CONFIG_DERIVED(mystwarr_state::martchmp, mystwarr)
+MACHINE_CONFIG_START(mystwarr_state::martchmp)
+	mystwarr(config);
 
 	MCFG_MACHINE_RESET_OVERRIDE(mystwarr_state,martchmp)
 

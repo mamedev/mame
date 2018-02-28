@@ -309,7 +309,7 @@ They can run the same software and accept the same devices and extensions.
 
 /* ------------ address maps ------------ */
 
-static ADDRESS_MAP_START ( to7, AS_PROGRAM, 8, thomson_state )
+ADDRESS_MAP_START(thomson_state::to7)
 
 	AM_RANGE ( 0x0000, 0x3fff ) AM_READ_BANK ( THOM_CART_BANK ) AM_WRITE(to7_cartridge_w ) /* 4 * 16 KB */
 	AM_RANGE ( 0x4000, 0x5fff ) AM_READ_BANK ( THOM_VRAM_BANK ) AM_WRITE(to7_vram_w )
@@ -761,7 +761,8 @@ MACHINE_CONFIG_START(thomson_state::to7)
 	MCFG_SOFTWARE_LIST_ADD("to7_qd_list","to7_qd")
 MACHINE_CONFIG_END
 
-MACHINE_CONFIG_DERIVED(thomson_state::t9000, to7)
+MACHINE_CONFIG_START(thomson_state::t9000)
+	to7(config);
 MACHINE_CONFIG_END
 
 
@@ -819,7 +820,7 @@ In arabic mode, Ctrl+E / Ctrl+X to start / stop typing in-line latin.
 
 **********************************************************************/
 
-static ADDRESS_MAP_START ( to770, AS_PROGRAM, 8, thomson_state )
+ADDRESS_MAP_START(thomson_state::to770)
 
 	AM_RANGE ( 0x0000, 0x3fff ) AM_READ_BANK ( THOM_CART_BANK) AM_WRITE(to7_cartridge_w ) /* 4 * 16 KB */
 	AM_RANGE ( 0x4000, 0x5fff ) AM_READ_BANK ( THOM_VRAM_BANK) AM_WRITE(to770_vram_w )
@@ -923,7 +924,8 @@ INPUT_PORTS_END
 
 /* ------------ driver ------------ */
 
-MACHINE_CONFIG_DERIVED(thomson_state::to770, to7)
+MACHINE_CONFIG_START(thomson_state::to770)
+	to7(config);
 	MCFG_MACHINE_START_OVERRIDE( thomson_state, to770 )
 	MCFG_MACHINE_RESET_OVERRIDE( thomson_state, to770 )
 
@@ -949,7 +951,8 @@ MACHINE_CONFIG_DERIVED(thomson_state::to770, to7)
 	MCFG_SOFTWARE_LIST_COMPATIBLE_ADD("to7_cart_list","to7_cart")
 MACHINE_CONFIG_END
 
-MACHINE_CONFIG_DERIVED(thomson_state::to770a, to770)
+MACHINE_CONFIG_START(thomson_state::to770a)
+	to770(config);
 	MCFG_DEVICE_REMOVE("t770_cart_list")
 	MCFG_SOFTWARE_LIST_ADD("t770a_cart_list","to770a_cart")
 MACHINE_CONFIG_END
@@ -1018,7 +1021,7 @@ Differences include:
 
 **********************************************************************/
 
-static ADDRESS_MAP_START ( mo5, AS_PROGRAM, 8, thomson_state )
+ADDRESS_MAP_START(thomson_state::mo5)
 
 	AM_RANGE ( 0x0000, 0x1fff ) AM_READ_BANK ( THOM_VRAM_BANK ) AM_WRITE(to770_vram_w )
 	AM_RANGE ( 0x2000, 0x9fff ) AM_RAMBANK   ( THOM_BASE_BANK )
@@ -1113,7 +1116,8 @@ INPUT_PORTS_END
 
 /* ------------ driver ------------ */
 
-MACHINE_CONFIG_DERIVED(thomson_state::mo5, to7)
+MACHINE_CONFIG_START(thomson_state::mo5)
+	to7(config);
 	MCFG_MACHINE_START_OVERRIDE( thomson_state, mo5 )
 	MCFG_MACHINE_RESET_OVERRIDE( thomson_state, mo5 )
 
@@ -1158,7 +1162,8 @@ MACHINE_CONFIG_DERIVED(thomson_state::mo5, to7)
 	MCFG_RAM_DEFAULT_SIZE("112K")
 MACHINE_CONFIG_END
 
-MACHINE_CONFIG_DERIVED(thomson_state::mo5e, mo5)
+MACHINE_CONFIG_START(thomson_state::mo5e)
+	mo5(config);
 MACHINE_CONFIG_END
 
 
@@ -1239,7 +1244,7 @@ It was replaced quickly with the improved TO9+.
 
 **********************************************************************/
 
-static ADDRESS_MAP_START ( to9, AS_PROGRAM, 8, thomson_state )
+ADDRESS_MAP_START(thomson_state::to9)
 
 	AM_RANGE ( 0x0000, 0x3fff ) AM_READ_BANK ( THOM_CART_BANK ) AM_WRITE(to9_cartridge_w )/* 4 * 16 KB */
 	AM_RANGE ( 0x4000, 0x5fff ) AM_READ_BANK ( THOM_VRAM_BANK ) AM_WRITE(to770_vram_w )
@@ -1473,7 +1478,8 @@ INPUT_PORTS_END
 
 /* ------------ driver ------------ */
 
-MACHINE_CONFIG_DERIVED(thomson_state::to9, to7)
+MACHINE_CONFIG_START(thomson_state::to9)
+	to7(config);
 	MCFG_MACHINE_START_OVERRIDE( thomson_state, to9 )
 	MCFG_MACHINE_RESET_OVERRIDE( thomson_state, to9 )
 
@@ -1567,7 +1573,7 @@ The TO8D is simply a TO8 with an integrated 3"1/2 floppy drive.
 **********************************************************************/
 
 
-static ADDRESS_MAP_START ( to8, AS_PROGRAM, 8, thomson_state )
+ADDRESS_MAP_START(thomson_state::to8)
 
 	AM_RANGE ( 0x0000, 0x3fff ) AM_READ_BANK ( THOM_CART_BANK) AM_WRITE(to8_cartridge_w ) /* 4 * 16 KB */
 	AM_RANGE ( 0x4000, 0x5fff ) AM_READ_BANK ( THOM_VRAM_BANK) AM_WRITE(to770_vram_w )
@@ -1695,7 +1701,8 @@ INPUT_PORTS_END
 
 /* ------------ driver ------------ */
 
-MACHINE_CONFIG_DERIVED(thomson_state::to8, to7)
+MACHINE_CONFIG_START(thomson_state::to8)
+	to7(config);
 	MCFG_MACHINE_START_OVERRIDE( thomson_state, to8 )
 	MCFG_MACHINE_RESET_OVERRIDE( thomson_state, to8 )
 
@@ -1732,7 +1739,8 @@ MACHINE_CONFIG_DERIVED(thomson_state::to8, to7)
 	MCFG_SOFTWARE_LIST_COMPATIBLE_ADD("to7_qd_list", "to7_qd")
 MACHINE_CONFIG_END
 
-MACHINE_CONFIG_DERIVED(thomson_state::to8d, to8)
+MACHINE_CONFIG_START(thomson_state::to8d)
+	to8(config);
 MACHINE_CONFIG_END
 
 
@@ -1778,7 +1786,7 @@ The differences with the TO8 are:
 
 **********************************************************************/
 
-static ADDRESS_MAP_START ( to9p, AS_PROGRAM, 8, thomson_state )
+ADDRESS_MAP_START(thomson_state::to9p)
 
 	AM_RANGE ( 0x0000, 0x3fff ) AM_READ_BANK ( THOM_CART_BANK) AM_WRITE(to8_cartridge_w ) /* 4 * 16 KB */
 	AM_RANGE ( 0x4000, 0x5fff ) AM_READ_BANK ( THOM_VRAM_BANK) AM_WRITE(to770_vram_w )
@@ -1858,7 +1866,8 @@ INPUT_PORTS_END
 
 /* ------------ driver ------------ */
 
-MACHINE_CONFIG_DERIVED(thomson_state::to9p, to7)
+MACHINE_CONFIG_START(thomson_state::to9p)
+	to7(config);
 	MCFG_MACHINE_START_OVERRIDE( thomson_state, to9p )
 	MCFG_MACHINE_RESET_OVERRIDE( thomson_state, to9p )
 
@@ -1957,7 +1966,7 @@ a PC XT.
 
 **********************************************************************/
 
-static ADDRESS_MAP_START ( mo6, AS_PROGRAM, 8, thomson_state )
+ADDRESS_MAP_START(thomson_state::mo6)
 
 	AM_RANGE ( 0x0000, 0x1fff ) AM_READ_BANK ( THOM_VRAM_BANK) AM_WRITE(to770_vram_w )
 	AM_RANGE ( 0x2000, 0x3fff ) AM_READ_BANK ( TO8_SYS_LO) AM_WRITE(to8_sys_lo_w )
@@ -2207,7 +2216,8 @@ INPUT_PORTS_END
 
 /* ------------ driver ------------ */
 
-MACHINE_CONFIG_DERIVED(thomson_state::mo6, to7)
+MACHINE_CONFIG_START(thomson_state::mo6)
+	to7(config);
 	MCFG_MACHINE_START_OVERRIDE( thomson_state, mo6 )
 	MCFG_MACHINE_RESET_OVERRIDE( thomson_state, mo6 )
 
@@ -2261,7 +2271,8 @@ MACHINE_CONFIG_DERIVED(thomson_state::mo6, to7)
 	MCFG_SOFTWARE_LIST_COMPATIBLE_ADD("mo5_qd_list","mo5_qd")
 MACHINE_CONFIG_END
 
-MACHINE_CONFIG_DERIVED(thomson_state::pro128, mo6)
+MACHINE_CONFIG_START(thomson_state::pro128)
+	mo6(config);
 	MCFG_DEVICE_REMOVE("mo6_cass_list")
 	MCFG_DEVICE_REMOVE("mo6_flop_list")
 
@@ -2310,7 +2321,7 @@ Here are the differences between the MO6 and MO5NR:
 
 **********************************************************************/
 
-static ADDRESS_MAP_START ( mo5nr, AS_PROGRAM, 8, thomson_state )
+ADDRESS_MAP_START(thomson_state::mo5nr)
 
 	AM_RANGE ( 0x0000, 0x1fff ) AM_READ_BANK ( THOM_VRAM_BANK) AM_WRITE(to770_vram_w )
 	AM_RANGE ( 0x2000, 0x3fff ) AM_READ_BANK ( TO8_SYS_LO) AM_WRITE(to8_sys_lo_w )
@@ -2476,7 +2487,8 @@ INPUT_PORTS_END
 
 /* ------------ driver ------------ */
 
-MACHINE_CONFIG_DERIVED(thomson_state::mo5nr, to7)
+MACHINE_CONFIG_START(thomson_state::mo5nr)
+	to7(config);
 	MCFG_MACHINE_START_OVERRIDE( thomson_state, mo5nr )
 	MCFG_MACHINE_RESET_OVERRIDE( thomson_state, mo5nr )
 

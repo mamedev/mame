@@ -17,11 +17,11 @@ cedar_magnet_plane_device::cedar_magnet_plane_device(const machine_config &mconf
 
 
 
-static ADDRESS_MAP_START( cedar_magnet_plane_map, AS_PROGRAM, 8, cedar_magnet_plane_device )
+ADDRESS_MAP_START(cedar_magnet_plane_device::cedar_magnet_plane_map)
 	AM_RANGE(0x0000, 0xffff) AM_RAM AM_SHARE("ram")
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( cedar_magnet_plane_io, AS_IO, 8, cedar_magnet_plane_device )
+ADDRESS_MAP_START(cedar_magnet_plane_device::cedar_magnet_plane_io)
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
 
 	AM_RANGE(0xc0, 0xc3) AM_DEVREADWRITE("z80pio0", z80pio_device, read_alt, write_alt)

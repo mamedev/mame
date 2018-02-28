@@ -350,7 +350,7 @@ WRITE8_MEMBER(playch10_state::time_w)
 /******************************************************************************/
 
 /* BIOS */
-static ADDRESS_MAP_START( bios_map, AS_PROGRAM, 8, playch10_state )
+ADDRESS_MAP_START(playch10_state::bios_map)
 	AM_RANGE(0x0000, 0x3fff) AM_ROM
 	AM_RANGE(0x8000, 0x87ff) AM_RAM // 8V
 	AM_RANGE(0x8800, 0x8fff) AM_READWRITE(ram_8w_r, ram_8w_w) AM_SHARE("ram_8w")    // 8W
@@ -359,7 +359,7 @@ static ADDRESS_MAP_START( bios_map, AS_PROGRAM, 8, playch10_state )
 	AM_RANGE(0xe000, 0xffff) AM_READWRITE(pc10_prot_r, pc10_prot_w)
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( bios_io_map, AS_IO, 8, playch10_state )
+ADDRESS_MAP_START(playch10_state::bios_io_map)
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	AM_RANGE(0x00, 0x00) AM_READ_PORT("BIOS")
 	AM_RANGE(0x01, 0x01) AM_READ_PORT("SW1")
@@ -370,7 +370,7 @@ static ADDRESS_MAP_START( bios_io_map, AS_IO, 8, playch10_state )
 	AM_RANGE(0x10, 0x13) AM_WRITE(time_w)
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( cart_map, AS_PROGRAM, 8, playch10_state )
+ADDRESS_MAP_START(playch10_state::cart_map)
 	AM_RANGE(0x0000, 0x07ff) AM_RAM AM_MIRROR(0x1800) AM_SHARE("work_ram")
 	AM_RANGE(0x2000, 0x3fff) AM_DEVREADWRITE("ppu", ppu2c0x_device, read, write)
 	AM_RANGE(0x4014, 0x4014) AM_WRITE(sprite_dma_w)
@@ -695,11 +695,13 @@ MACHINE_CONFIG_START(playch10_state::playch10)
 	MCFG_RP5H01_ADD("rp5h01")
 MACHINE_CONFIG_END
 
-MACHINE_CONFIG_DERIVED(playch10_state::playchnv, playch10)
+MACHINE_CONFIG_START(playch10_state::playchnv)
+	playch10(config);
 	MCFG_NVRAM_ADD_0FILL("nvram")
 MACHINE_CONFIG_END
 
-MACHINE_CONFIG_DERIVED(playch10_state::playch10_hboard, playch10)
+MACHINE_CONFIG_START(playch10_state::playch10_hboard)
+	playch10(config);
 	MCFG_VIDEO_START_OVERRIDE(playch10_state,playch10_hboard)
 	MCFG_MACHINE_START_OVERRIDE(playch10_state,playch10_hboard)
 MACHINE_CONFIG_END

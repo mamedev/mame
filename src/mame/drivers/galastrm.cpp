@@ -134,7 +134,7 @@ WRITE32_MEMBER(galastrm_state::galastrm_adstick_ctrl_w)
              MEMORY STRUCTURES
 ***********************************************************/
 
-static ADDRESS_MAP_START( galastrm_map, AS_PROGRAM, 32, galastrm_state )
+ADDRESS_MAP_START(galastrm_state::galastrm_map)
 	AM_RANGE(0x000000, 0x0fffff) AM_ROM
 	AM_RANGE(0x200000, 0x21ffff) AM_RAM AM_SHARE("ram")                             /* main CPUA ram */
 	AM_RANGE(0x300000, 0x303fff) AM_RAM AM_SHARE("spriteram")

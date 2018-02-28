@@ -31,20 +31,22 @@ public:
 	DECLARE_WRITE8_MEMBER(speaker_w);
 	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	void tvgame(machine_config &config);
+	void io_map(address_map &map);
+	void mem_map(address_map &map);
 private:
 	required_device<cpu_device> m_maincpu;
 	required_device<speaker_sound_device> m_speaker;
 	required_shared_ptr<uint8_t> m_p_videoram;
 };
 
-static ADDRESS_MAP_START( mem_map, AS_PROGRAM, 8, tvgame_state )
+ADDRESS_MAP_START(tvgame_state::mem_map)
 	ADDRESS_MAP_UNMAP_HIGH
 	AM_RANGE( 0x0000, 0x7fff ) AM_ROM
 	AM_RANGE( 0x8000, 0xbfff ) AM_RAM
 	AM_RANGE( 0xc000, 0xdfff ) AM_RAM AM_SHARE("videoram")
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( io_map, AS_IO, 8, tvgame_state )
+ADDRESS_MAP_START(tvgame_state::io_map)
 	ADDRESS_MAP_GLOBAL_MASK(3)
 	ADDRESS_MAP_UNMAP_HIGH
 	AM_RANGE( 0x0000, 0x0003) AM_DEVREADWRITE("ppi", i8255_device, read, write)

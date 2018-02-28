@@ -485,6 +485,7 @@ public:
 	void bchance(machine_config &config);
 	void magicfly(machine_config &config);
 	void _7mezzo(machine_config &config);
+	void magicfly_map(address_map &map);
 };
 
 
@@ -676,7 +677,7 @@ WRITE8_MEMBER(magicfly_state::mux_port_w)
 *           Memory map information           *
 *********************************************/
 
-static ADDRESS_MAP_START( magicfly_map, AS_PROGRAM, 8, magicfly_state )
+ADDRESS_MAP_START(magicfly_state::magicfly_map)
 	AM_RANGE(0x0000, 0x07ff) AM_RAM AM_SHARE("nvram")    /* MK48Z02B NVRAM */
 	AM_RANGE(0x0800, 0x0800) AM_DEVWRITE("crtc", mc6845_device, address_w)
 	AM_RANGE(0x0801, 0x0801) AM_DEVREADWRITE("crtc", mc6845_device, register_r, register_w)
@@ -969,7 +970,8 @@ MACHINE_CONFIG_START(magicfly_state::magicfly)
 MACHINE_CONFIG_END
 
 
-MACHINE_CONFIG_DERIVED(magicfly_state::_7mezzo, magicfly)
+MACHINE_CONFIG_START(magicfly_state::_7mezzo)
+	magicfly(config);
 
 	/* video hardware */
 	MCFG_VIDEO_START_OVERRIDE(magicfly_state, 7mezzo)
@@ -977,7 +979,8 @@ MACHINE_CONFIG_DERIVED(magicfly_state::_7mezzo, magicfly)
 MACHINE_CONFIG_END
 
 
-MACHINE_CONFIG_DERIVED(magicfly_state::bchance, magicfly)
+MACHINE_CONFIG_START(magicfly_state::bchance)
+	magicfly(config);
 
 	/* video hardware */
 	MCFG_PALETTE_MODIFY("palette")

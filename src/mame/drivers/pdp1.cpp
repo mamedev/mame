@@ -71,7 +71,7 @@ To load and play a game:
  */
 
 
-static ADDRESS_MAP_START(pdp1_map, AS_PROGRAM, 32, pdp1_state )
+ADDRESS_MAP_START(pdp1_state::pdp1_map)
 	AM_RANGE(0x00000, 0x3ffff) AM_RAM
 ADDRESS_MAP_END
 

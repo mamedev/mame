@@ -299,6 +299,11 @@ public:
 	void garogun(machine_config &config);
 	void searchp2(machine_config &config);
 	void _7ordi(machine_config &config);
+	void nmg5_map(address_map &map);
+	void nmg5_sound_map(address_map &map);
+	void pclubys_map(address_map &map);
+	void pclubys_sound_map(address_map &map);
+	void sound_io_map(address_map &map);
 };
 
 
@@ -362,7 +367,7 @@ WRITE8_MEMBER(nmg5_state::oki_banking_w)
 
 ********************************************************************/
 
-static ADDRESS_MAP_START( nmg5_map, AS_PROGRAM, 16, nmg5_state )
+ADDRESS_MAP_START(nmg5_state::nmg5_map)
 	AM_RANGE(0x000000, 0x0fffff) AM_ROM
 	AM_RANGE(0x120000, 0x12ffff) AM_RAM
 	AM_RANGE(0x140000, 0x1407ff) AM_RAM_DEVWRITE("palette", palette_device, write16) AM_SHARE("palette")
@@ -382,7 +387,7 @@ static ADDRESS_MAP_START( nmg5_map, AS_PROGRAM, 16, nmg5_state )
 	AM_RANGE(0x800000, 0x80ffff) AM_RAM AM_SHARE("bitmap")
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( pclubys_map, AS_PROGRAM, 16, nmg5_state )
+ADDRESS_MAP_START(nmg5_state::pclubys_map)
 	AM_RANGE(0x000000, 0x0fffff) AM_ROM
 	AM_RANGE(0x200000, 0x20ffff) AM_RAM
 	AM_RANGE(0x440000, 0x4407ff) AM_RAM_DEVWRITE("palette", palette_device, write16) AM_SHARE("palette")
@@ -407,17 +412,17 @@ ADDRESS_MAP_END
 
 ********************************************************************/
 
-static ADDRESS_MAP_START( nmg5_sound_map, AS_PROGRAM, 8, nmg5_state )
+ADDRESS_MAP_START(nmg5_state::nmg5_sound_map)
 	AM_RANGE(0x0000, 0xdfff) AM_ROM
 	AM_RANGE(0xe000, 0xe7ff) AM_RAM
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( pclubys_sound_map, AS_PROGRAM, 8, nmg5_state )
+ADDRESS_MAP_START(nmg5_state::pclubys_sound_map)
 	AM_RANGE(0x0000, 0xf7ff) AM_ROM
 	AM_RANGE(0xf800, 0xffff) AM_RAM
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( sound_io_map, AS_IO, 8, nmg5_state )
+ADDRESS_MAP_START(nmg5_state::sound_io_map)
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	AM_RANGE(0x00, 0x00) AM_WRITE(oki_banking_w)
 	AM_RANGE(0x10, 0x11) AM_DEVREADWRITE("ymsnd", ym3812_device, read, write)
@@ -1025,7 +1030,8 @@ MACHINE_CONFIG_START(nmg5_state::nmg5)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 MACHINE_CONFIG_END
 
-MACHINE_CONFIG_DERIVED(nmg5_state::garogun, nmg5)
+MACHINE_CONFIG_START(nmg5_state::garogun)
+	nmg5(config);
 
 	/* basic machine hardware */
 
@@ -1037,7 +1043,8 @@ MACHINE_CONFIG_DERIVED(nmg5_state::garogun, nmg5)
 MACHINE_CONFIG_END
 
 
-MACHINE_CONFIG_DERIVED(nmg5_state::pclubys, nmg5)
+MACHINE_CONFIG_START(nmg5_state::pclubys)
+	nmg5(config);
 
 	/* basic machine hardware */
 
@@ -1050,7 +1057,8 @@ MACHINE_CONFIG_DERIVED(nmg5_state::pclubys, nmg5)
 	MCFG_GFXDECODE_MODIFY("gfxdecode", pclubys)
 MACHINE_CONFIG_END
 
-MACHINE_CONFIG_DERIVED(nmg5_state::searchp2, nmg5)
+MACHINE_CONFIG_START(nmg5_state::searchp2)
+	nmg5(config);
 
 	/* basic machine hardware */
 
@@ -1060,7 +1068,8 @@ MACHINE_CONFIG_DERIVED(nmg5_state::searchp2, nmg5)
 	MCFG_GFXDECODE_MODIFY("gfxdecode", pclubys)
 MACHINE_CONFIG_END
 
-MACHINE_CONFIG_DERIVED(nmg5_state::_7ordi, nmg5)
+MACHINE_CONFIG_START(nmg5_state::_7ordi)
+	nmg5(config);
 
 	/* basic machine hardware */
 

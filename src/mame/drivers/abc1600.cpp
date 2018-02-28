@@ -491,7 +491,7 @@ WRITE8_MEMBER( abc1600_state::spec_contr_reg_w )
 //  ADDRESS_MAP( abc1600_mem )
 //-------------------------------------------------
 
-static ADDRESS_MAP_START( abc1600_mem, AS_PROGRAM, 8, abc1600_state )
+ADDRESS_MAP_START(abc1600_state::abc1600_mem)
 	AM_RANGE(0x00000, 0xfffff) AM_DEVICE(ABC1600_MAC_TAG, abc1600_mac_device, map)
 ADDRESS_MAP_END
 
@@ -500,7 +500,7 @@ ADDRESS_MAP_END
 //  ADDRESS_MAP( mac_mem )
 //-------------------------------------------------
 
-static ADDRESS_MAP_START( mac_mem, AS_PROGRAM, 8, abc1600_state )
+ADDRESS_MAP_START(abc1600_state::mac_mem)
 	AM_RANGE(0x000000, 0x0fffff) AM_RAM
 	AM_RANGE(0x100000, 0x17ffff) AM_DEVICE(ABC1600_MOVER_TAG, abc1600_mover_device, vram_map)
 	AM_RANGE(0x1fe000, 0x1fefff) AM_READWRITE(bus_r, bus_w)

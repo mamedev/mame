@@ -577,7 +577,7 @@ WRITE8_MEMBER(midvunit_state::midvplus_xf1_w)
  *
  *************************************/
 
-static ADDRESS_MAP_START( midvunit_map, AS_PROGRAM, 32, midvunit_state )
+ADDRESS_MAP_START(midvunit_state::midvunit_map)
 	AM_RANGE(0x000000, 0x01ffff) AM_RAM AM_SHARE("ram_base")
 	AM_RANGE(0x400000, 0x41ffff) AM_RAM
 	AM_RANGE(0x600000, 0x600000) AM_WRITE(midvunit_dma_queue_w)
@@ -608,7 +608,7 @@ static ADDRESS_MAP_START( midvunit_map, AS_PROGRAM, 32, midvunit_state )
 ADDRESS_MAP_END
 
 
-static ADDRESS_MAP_START( midvplus_map, AS_PROGRAM, 32, midvunit_state )
+ADDRESS_MAP_START(midvunit_state::midvplus_map)
 	AM_RANGE(0x000000, 0x01ffff) AM_RAM AM_SHARE("ram_base")
 	AM_RANGE(0x400000, 0x41ffff) AM_RAM AM_SHARE("fastram_base")
 	AM_RANGE(0x600000, 0x600000) AM_WRITE(midvunit_dma_queue_w)
@@ -1156,27 +1156,31 @@ MACHINE_CONFIG_START(midvunit_state::midvcommon)
 MACHINE_CONFIG_END
 
 
-MACHINE_CONFIG_DERIVED(midvunit_state::midvunit, midvcommon)
+MACHINE_CONFIG_START(midvunit_state::midvunit)
+	midvcommon(config);
 
 	/* sound hardware */
 	MCFG_DEVICE_ADD("dcs", DCS_AUDIO_2K, 0)
 MACHINE_CONFIG_END
 
 
-MACHINE_CONFIG_DERIVED(midvunit_state::crusnwld, midvunit)
+MACHINE_CONFIG_START(midvunit_state::crusnwld)
+	midvunit(config);
 	/* valid values are 450 or 460 */
 	MCFG_DEVICE_ADD("serial_pic", MIDWAY_SERIAL_PIC, 0)
 	MCFG_MIDWAY_SERIAL_PIC_UPPER(450)
 MACHINE_CONFIG_END
 
-MACHINE_CONFIG_DERIVED(midvunit_state::offroadc, midvunit)
+MACHINE_CONFIG_START(midvunit_state::offroadc)
+	midvunit(config);
 	/* valid values are 230 or 234 */
 	MCFG_DEVICE_ADD("serial_pic2", MIDWAY_SERIAL_PIC2, 0)
 	MCFG_MIDWAY_SERIAL_PIC2_UPPER(230)
 	MCFG_MIDWAY_SERIAL_PIC2_YEAR_OFFS(94)
 MACHINE_CONFIG_END
 
-MACHINE_CONFIG_DERIVED(midvunit_state::midvplus, midvcommon)
+MACHINE_CONFIG_START(midvunit_state::midvplus)
+	midvcommon(config);
 
 	/* basic machine hardware */
 	MCFG_CPU_MODIFY("maincpu")
@@ -1260,7 +1264,8 @@ Notes:
                     - labelled 'Offroad 25" U904' for Offroad Challenge
       PAL1      - GAL20V8 labelled 'A-19668'
       PAL2      - PALC22V10
-                    - no label for Cruisin USA
+                    - labelled 'A-19669' for Cruis'n USA rev 2.1
+                    - labelled 'A-19993' for Cruis'n USA rev 4.1 (might work with other revs too, but not 2.x)
                     - labelled 'A-21883 U38' for Offroad Challenge
       PAL3      - TIBPAL20L8
                     - labelled 'A-19670' for Cruis'n USA
@@ -1315,12 +1320,12 @@ ROM_START( crusnusa ) /* Version 4.1, Mon Feb 13 1995 - 16:53:40 */
 	ROM_LOAD32_BYTE( "cusa.u28",     0x800002, 0x80000, CRC(cffa5fb1) SHA1(fb73bc8f65b604c374f88d0ecf06c50ef52f0547) )
 	ROM_LOAD32_BYTE( "cusa.u29",     0x800003, 0x80000, CRC(cbe52c60) SHA1(3f309ce8ef1784c830f4160cfe76dc3a0b438cac) )
 
-	ROM_REGION( 0x0b33, "pals", 0 )
-	ROM_LOAD("a-19993.u38.bin",  0x0000, 0x02dd, CRC(b6323e94) SHA1(a84e04db8838b35ad9d30416b86aba65a29dcd87) ) /* TIBPAL22V10-15BCNT */
-	ROM_LOAD("a-19670.u43.bin",  0x0000, 0x0144, CRC(acafcc97) SHA1(b6f916838d08590a536fe925ec62d66e6ea3dcbc) ) /* TIBPAL20L8-10CNT */
-	ROM_LOAD("a-19668.u52.bin",  0x0000, 0x0157, CRC(7915134e) SHA1(aeb22e46abdc14a9e9b34cfe3b77da3e29b789fe) ) /* GAL20V8B */
-	ROM_LOAD("a-19671.u54.bin",  0x0000, 0x02dd, CRC(b9cce038) SHA1(8d1df026bdac66ea5493e9e51c23f8eb182b024e) ) /* TIBPAL22V10-15BCNT */
-	ROM_LOAD("a-19673.u111.bin", 0x0000, 0x02dd, CRC(8552977d) SHA1(a1a53d797697682b3f18893a90b6bef39ebb069e) ) /* TIBPAL22V10-15BCNT */
+	ROM_REGION( 0x0b33, "pals", 0 ) // all protected
+	ROM_LOAD("a-19993.u38.bin",  0x0000, 0x02dd, BAD_DUMP CRC(b6323e94) SHA1(a84e04db8838b35ad9d30416b86aba65a29dcd87) ) /* TIBPAL22V10-15BCNT */
+	ROM_LOAD("a-19670.u43.bin",  0x0000, 0x0144, BAD_DUMP CRC(acafcc97) SHA1(b6f916838d08590a536fe925ec62d66e6ea3dcbc) ) /* TIBPAL20L8-10CNT */
+	ROM_LOAD("a-19668.u52.bin",  0x0000, 0x0157, BAD_DUMP CRC(7915134e) SHA1(aeb22e46abdc14a9e9b34cfe3b77da3e29b789fe) ) /* GAL20V8B */
+	ROM_LOAD("a-19671.u54.bin",  0x0000, 0x02dd, BAD_DUMP CRC(b9cce038) SHA1(8d1df026bdac66ea5493e9e51c23f8eb182b024e) ) /* TIBPAL22V10-15BCNT */
+	ROM_LOAD("a-19673.u111.bin", 0x0000, 0x02dd, BAD_DUMP CRC(8552977d) SHA1(a1a53d797697682b3f18893a90b6bef39ebb069e) ) /* TIBPAL22V10-15BCNT */
 	ROM_LOAD("a-19672.u114.bin", 0x0000, 0x0001, NO_DUMP ) /* TIBPAL22V10-15BCNT */
 ROM_END
 

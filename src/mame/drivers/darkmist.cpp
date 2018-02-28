@@ -44,7 +44,7 @@ WRITE8_MEMBER(darkmist_state::hw_w)
 	membank("bank1")->set_entry((data&0x80)?1:0);
 }
 
-static ADDRESS_MAP_START( memmap, AS_PROGRAM, 8, darkmist_state )
+ADDRESS_MAP_START(darkmist_state::memmap)
 	AM_RANGE(0x0000, 0x7fff) AM_ROM
 	AM_RANGE(0x8000, 0xbfff) AM_ROMBANK("bank1")
 	AM_RANGE(0xc801, 0xc801) AM_READ_PORT("P1")
@@ -68,7 +68,7 @@ static ADDRESS_MAP_START( memmap, AS_PROGRAM, 8, darkmist_state )
 	AM_RANGE(0xf000, 0xffff) AM_RAM AM_SHARE("spriteram")
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( decrypted_opcodes_map, AS_OPCODES, 8, darkmist_state )
+ADDRESS_MAP_START(darkmist_state::decrypted_opcodes_map)
 	AM_RANGE(0x0000, 0x7fff) AM_ROM AM_SHARE("decrypted_opcodes")
 	AM_RANGE(0x8000, 0xbfff) AM_ROMBANK("bank1")
 ADDRESS_MAP_END
@@ -241,7 +241,7 @@ MACHINE_CONFIG_START(darkmist_state::darkmist)
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", Z80,4000000)         /* ? MHz */
 	MCFG_CPU_PROGRAM_MAP(memmap)
-	MCFG_CPU_DECRYPTED_OPCODES_MAP(decrypted_opcodes_map)
+	MCFG_CPU_OPCODES_MAP(decrypted_opcodes_map)
 	MCFG_TIMER_DRIVER_ADD_SCANLINE("scantimer", darkmist_state, scanline, "screen", 0, 1)
 
 	MCFG_DEVICE_ADD("t5182", T5182, 0)

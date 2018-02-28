@@ -121,46 +121,28 @@ Optional (on expansion card) (Viper)
 class bfm_sc1_state : public driver_device
 {
 public:
-	bfm_sc1_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag),
+	bfm_sc1_state(const machine_config &mconfig, device_type type, const char *tag) :
+		driver_device(mconfig, type, tag),
 		m_maincpu(*this, "maincpu"),
-		m_reel0(*this, "reel0"),
-		m_reel1(*this, "reel1"),
-		m_reel2(*this, "reel2"),
-		m_reel3(*this, "reel3"),
-		m_reel4(*this, "reel4"),
-		m_reel5(*this, "reel5"),
+		m_reels(*this, "reel%u", 0U),
 		m_upd7759(*this, "upd"),
 		m_vfd0(*this, "vfd0"),
-		m_meters(*this, "meters") { }
+		m_meters(*this, "meters")
+	{ }
 
-	int m_mmtr_latch;
-	int m_triac_latch;
-	int m_vfd_latch;  //initialized but not used
-	int m_irq_status;
-	int m_optic_pattern;
-	DECLARE_WRITE_LINE_MEMBER(reel0_optic_cb) { if (state) m_optic_pattern |= 0x01; else m_optic_pattern &= ~0x01; }
-	DECLARE_WRITE_LINE_MEMBER(reel1_optic_cb) { if (state) m_optic_pattern |= 0x02; else m_optic_pattern &= ~0x02; }
-	DECLARE_WRITE_LINE_MEMBER(reel2_optic_cb) { if (state) m_optic_pattern |= 0x04; else m_optic_pattern &= ~0x04; }
-	DECLARE_WRITE_LINE_MEMBER(reel3_optic_cb) { if (state) m_optic_pattern |= 0x08; else m_optic_pattern &= ~0x08; }
-	DECLARE_WRITE_LINE_MEMBER(reel4_optic_cb) { if (state) m_optic_pattern |= 0x10; else m_optic_pattern &= ~0x10; }
-	DECLARE_WRITE_LINE_MEMBER(reel5_optic_cb) { if (state) m_optic_pattern |= 0x20; else m_optic_pattern &= ~0x20; }
-	int m_acia_status;
-	int m_locked;
-	int m_is_timer_enabled;
-	int m_coin_inhibits; //initialized but not used
-	int m_mux1_outputlatch;
-	int m_mux1_datalo;
-	int m_mux1_datahi;
-	int m_mux1_input;
-	int m_mux2_outputlatch;
-	int m_mux2_datalo;
-	int m_mux2_datahi;
-	int m_mux2_input;
-	uint8_t m_sc1_Inputs[64];
-	uint8_t m_codec_data[256];
+	DECLARE_DRIVER_INIT(toppoker);
+	DECLARE_DRIVER_INIT(lotse_bank0);
+	DECLARE_DRIVER_INIT(nocrypt_bank0);
+	DECLARE_DRIVER_INIT(lotse);
+	DECLARE_DRIVER_INIT(clatt);
+	DECLARE_DRIVER_INIT(rou029);
+	DECLARE_DRIVER_INIT(nocrypt);
+	void scorpion1_adder2(machine_config &config);
+	void scorpion1(machine_config &config);
+	void scorpion1_viper(machine_config &config);
 
-	int m_defaultbank;
+protected:
+	template <unsigned N> DECLARE_WRITE_LINE_MEMBER(reel_optic_cb) { if (state) m_optic_pattern |= (1 << N); else m_optic_pattern &= ~(1 << N); }
 	DECLARE_WRITE8_MEMBER(bankswitch_w);
 	DECLARE_READ8_MEMBER(irqlatch_r);
 	DECLARE_WRITE8_MEMBER(reel12_w);
@@ -193,38 +175,51 @@ public:
 
 	void save_state();
 
-	DECLARE_DRIVER_INIT(toppoker);
-	DECLARE_DRIVER_INIT(lotse_bank0);
-	DECLARE_DRIVER_INIT(nocrypt_bank0);
-	DECLARE_DRIVER_INIT(lotse);
-	DECLARE_DRIVER_INIT(clatt);
-	DECLARE_DRIVER_INIT(rou029);
-	DECLARE_DRIVER_INIT(nocrypt);
 	virtual void machine_reset() override;
 	INTERRUPT_GEN_MEMBER(timer_irq);
 	void sc1_common_init(int reels, int decrypt, int defaultbank);
 	void Scorpion1_SetSwitchState(int strobe, int data, int state);
-	int sc1_find_project_string( );
+	int sc1_find_project_string();
+
+	void sc1_adder2(address_map &map);
+	void sc1_base(address_map &map);
+	void sc1_viper(address_map &map);
+
+private:
+	int m_mmtr_latch;
+	int m_triac_latch;
+	int m_vfd_latch;  //initialized but not used
+	int m_irq_status;
+	int m_optic_pattern;
+
+	int m_acia_status;
+	int m_locked;
+	int m_is_timer_enabled;
+	int m_coin_inhibits; //initialized but not used
+	int m_mux1_outputlatch;
+	int m_mux1_datalo;
+	int m_mux1_datahi;
+	int m_mux1_input;
+	int m_mux2_outputlatch;
+	int m_mux2_datalo;
+	int m_mux2_datahi;
+	int m_mux2_input;
+	uint8_t m_sc1_Inputs[64];
+	uint8_t m_codec_data[256];
+
+	int m_defaultbank;
 	required_device<cpu_device> m_maincpu;
-	required_device<stepper_device> m_reel0;
-	required_device<stepper_device> m_reel1;
-	required_device<stepper_device> m_reel2;
-	required_device<stepper_device> m_reel3;
-	required_device<stepper_device> m_reel4;
-	required_device<stepper_device> m_reel5;
+	required_device_array<stepper_device, 6> m_reels;
 	optional_device<upd7759_device> m_upd7759;
 	optional_device<bfm_bd1_device> m_vfd0;
 	required_device<meters_device> m_meters;
-	void scorpion1_adder2(machine_config &config);
-	void scorpion1(machine_config &config);
-	void scorpion1_viper(machine_config &config);
 };
 
 #define VFD_RESET  0x20
 #define VFD_CLOCK1 0x80
 #define VFD_DATA   0x40
 
-#define MASTER_CLOCK    (XTAL(4'000'000))
+static constexpr XTAL MASTER_CLOCK = 4_MHz_XTAL;
 
 
 void bfm_sc1_state::save_state()
@@ -312,11 +307,11 @@ WRITE8_MEMBER(bfm_sc1_state::reel12_w)
 	}
 	else
 	{
-		m_reel0->update((data>>4)&0x0f);
-		m_reel1->update( data    &0x0f);
+		m_reels[0]->update((data>>4)&0x0f);
+		m_reels[1]->update( data    &0x0f);
 	}
-	awp_draw_reel(machine(),"reel1", *m_reel0);
-	awp_draw_reel(machine(),"reel2", *m_reel1);
+	awp_draw_reel(machine(),"reel1", *m_reels[0]);
+	awp_draw_reel(machine(),"reel2", *m_reels[1]);
 }
 
 ///////////////////////////////////////////////////////////////////////////
@@ -329,22 +324,22 @@ WRITE8_MEMBER(bfm_sc1_state::reel34_w)
 	}
 	else
 	{
-		m_reel2->update((data>>4)&0x0f);
-		m_reel3->update( data    &0x0f);
+		m_reels[2]->update((data>>4)&0x0f);
+		m_reels[3]->update( data    &0x0f);
 	}
-	awp_draw_reel(machine(),"reel3", *m_reel2);
-	awp_draw_reel(machine(),"reel4", *m_reel3);
+	awp_draw_reel(machine(),"reel3", *m_reels[2]);
+	awp_draw_reel(machine(),"reel4", *m_reels[3]);
 }
 
 ///////////////////////////////////////////////////////////////////////////
 
 WRITE8_MEMBER(bfm_sc1_state::reel56_w)
 {
-	m_reel4->update((data>>4)&0x0f);
-	m_reel5->update( data    &0x0f);
+	m_reels[4]->update((data>>4)&0x0f);
+	m_reels[5]->update( data    &0x0f);
 
-	awp_draw_reel(machine(),"reel5", *m_reel4);
-	awp_draw_reel(machine(),"reel6", *m_reel5);
+	awp_draw_reel(machine(),"reel5", *m_reels[4]);
+	awp_draw_reel(machine(),"reel6", *m_reels[5]);
 }
 
 ///////////////////////////////////////////////////////////////////////////
@@ -675,7 +670,7 @@ void bfm_sc1_state::machine_reset()
 // scorpion1 board memory map ///////////////////////////////////////////////////////
 /////////////////////////////////////////////////////////////////////////////////////
 
-static ADDRESS_MAP_START( sc1_base, AS_PROGRAM, 8, bfm_sc1_state )
+ADDRESS_MAP_START(bfm_sc1_state::sc1_base)
 
 	AM_RANGE(0x0000, 0x1FFF) AM_RAM AM_SHARE("nvram") //8k RAM
 	AM_RANGE(0x2000, 0x21FF) AM_WRITE(reel34_w)             // reel 2+3 latch
@@ -715,7 +710,7 @@ ADDRESS_MAP_END
 // scorpion1 board + adder2 expansion memory map ////////////////////////////////////
 /////////////////////////////////////////////////////////////////////////////////////
 
-static ADDRESS_MAP_START( sc1_adder2, AS_PROGRAM, 8, bfm_sc1_state )
+ADDRESS_MAP_START(bfm_sc1_state::sc1_adder2)
 	AM_IMPORT_FROM( sc1_base )
 
 	AM_RANGE(0x3E00, 0x3E00) AM_DEVREADWRITE("adder2", bfm_adder2_device, vid_uart_ctrl_r,vid_uart_ctrl_w)  // video uart control reg read
@@ -727,7 +722,7 @@ ADDRESS_MAP_END
 // scorpion1 board + upd7759 soundcard memory map ///////////////////////////////////
 /////////////////////////////////////////////////////////////////////////////////////
 
-static ADDRESS_MAP_START( sc1_viper, AS_PROGRAM, 8, bfm_sc1_state )
+ADDRESS_MAP_START(bfm_sc1_state::sc1_viper)
 	AM_IMPORT_FROM( sc1_base )
 
 	AM_RANGE(0x3404, 0x3404) AM_READ(dipcoin_r ) // coin input on gamecard
@@ -1099,17 +1094,17 @@ MACHINE_CONFIG_START(bfm_sc1_state::scorpion1)
 	MCFG_DEFAULT_LAYOUT(layout_sc1_vfd)
 
 	MCFG_STARPOINT_48STEP_ADD("reel0")
-	MCFG_STEPPER_OPTIC_CALLBACK(WRITELINE(bfm_sc1_state, reel0_optic_cb))
+	MCFG_STEPPER_OPTIC_CALLBACK(WRITELINE(bfm_sc1_state, reel_optic_cb<0>))
 	MCFG_STARPOINT_48STEP_ADD("reel1")
-	MCFG_STEPPER_OPTIC_CALLBACK(WRITELINE(bfm_sc1_state, reel1_optic_cb))
+	MCFG_STEPPER_OPTIC_CALLBACK(WRITELINE(bfm_sc1_state, reel_optic_cb<1>))
 	MCFG_STARPOINT_48STEP_ADD("reel2")
-	MCFG_STEPPER_OPTIC_CALLBACK(WRITELINE(bfm_sc1_state, reel2_optic_cb))
+	MCFG_STEPPER_OPTIC_CALLBACK(WRITELINE(bfm_sc1_state, reel_optic_cb<2>))
 	MCFG_STARPOINT_48STEP_ADD("reel3")
-	MCFG_STEPPER_OPTIC_CALLBACK(WRITELINE(bfm_sc1_state, reel3_optic_cb))
+	MCFG_STEPPER_OPTIC_CALLBACK(WRITELINE(bfm_sc1_state, reel_optic_cb<3>))
 	MCFG_STARPOINT_48STEP_ADD("reel4")
-	MCFG_STEPPER_OPTIC_CALLBACK(WRITELINE(bfm_sc1_state, reel4_optic_cb))
+	MCFG_STEPPER_OPTIC_CALLBACK(WRITELINE(bfm_sc1_state, reel_optic_cb<4>))
 	MCFG_STARPOINT_48STEP_ADD("reel5")
-	MCFG_STEPPER_OPTIC_CALLBACK(WRITELINE(bfm_sc1_state, reel5_optic_cb))
+	MCFG_STEPPER_OPTIC_CALLBACK(WRITELINE(bfm_sc1_state, reel_optic_cb<5>))
 
 	MCFG_DEVICE_ADD("meters", METERS, 0)
 	MCFG_METERS_NUMBER(8)
@@ -1119,7 +1114,8 @@ MACHINE_CONFIG_END
 // machine driver for scorpion1 board + adder2 extension ////////////////////////////
 /////////////////////////////////////////////////////////////////////////////////////
 
-MACHINE_CONFIG_DERIVED(bfm_sc1_state::scorpion1_adder2, scorpion1)
+MACHINE_CONFIG_START(bfm_sc1_state::scorpion1_adder2)
+	scorpion1(config);
 
 	MCFG_CPU_MODIFY("maincpu")
 	MCFG_CPU_PROGRAM_MAP(sc1_adder2)                // setup read and write memorymap
@@ -1133,7 +1129,8 @@ MACHINE_CONFIG_END
 // machine driver for scorpion1 board ///////////////////////////////////////////////
 /////////////////////////////////////////////////////////////////////////////////////
 
-MACHINE_CONFIG_DERIVED(bfm_sc1_state::scorpion1_viper, scorpion1)
+MACHINE_CONFIG_START(bfm_sc1_state::scorpion1_viper)
+	scorpion1(config);
 	MCFG_CPU_MODIFY("maincpu")
 	MCFG_CPU_PROGRAM_MAP(sc1_viper)                 // setup read and write memorymap
 
@@ -1149,12 +1146,12 @@ void bfm_sc1_state::sc1_common_init(int reels, int decrypt, int defaultbank)
 	// setup n default 96 half step reels ///////////////////////////////////////////
 	/*switch (reels)
 	{
-	case 6: m_reel5->configure(&starpoint_interface_48step);
-	case 5: m_reel4->configure(&starpoint_interface_48step);
-	case 4: m_reel3->configure(&starpoint_interface_48step);
-	case 3: m_reel2->configure(&starpoint_interface_48step);
-	case 2: m_reel1->configure(&starpoint_interface_48step);
-	case 1: m_reel0->configure(&starpoint_interface_48step);
+	case 6: m_reels[5]->configure(&starpoint_interface_48step);
+	case 5: m_reels[4]->configure(&starpoint_interface_48step);
+	case 4: m_reels[3]->configure(&starpoint_interface_48step);
+	case 3: m_reels[2]->configure(&starpoint_interface_48step);
+	case 2: m_reels[1]->configure(&starpoint_interface_48step);
+	case 1: m_reels[0]->configure(&starpoint_interface_48step);
 	}*/
 	if (decrypt) bfm_decode_mainrom(machine(),"maincpu", m_codec_data);    // decode main rom
 

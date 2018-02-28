@@ -191,13 +191,13 @@ READ8_MEMBER(exerion_state::exerion_protection_r)
  *
  *************************************/
 
-static ADDRESS_MAP_START( main_map, AS_PROGRAM, 8, exerion_state )
+ADDRESS_MAP_START(exerion_state::main_map)
 	AM_RANGE(0x0000, 0x5fff) AM_ROM
-	AM_RANGE(0x6008, 0x600b) AM_READ(exerion_protection_r)
 	AM_RANGE(0x6000, 0x67ff) AM_RAM AM_SHARE("main_ram")
+	AM_RANGE(0x6008, 0x600b) AM_READ(exerion_protection_r)
 	AM_RANGE(0x8000, 0x87ff) AM_RAM AM_SHARE("videoram")
 	AM_RANGE(0x8800, 0x887f) AM_RAM AM_SHARE("spriteram")
-	AM_RANGE(0x8800, 0x8bff) AM_RAM
+	AM_RANGE(0x8880, 0x8bff) AM_RAM
 	AM_RANGE(0xa000, 0xa000) AM_READ_PORT("IN0")
 	AM_RANGE(0xa800, 0xa800) AM_READ_PORT("DSW0")
 	AM_RANGE(0xb000, 0xb000) AM_READ_PORT("DSW1")
@@ -216,7 +216,7 @@ ADDRESS_MAP_END
  *
  *************************************/
 
-static ADDRESS_MAP_START( sub_map, AS_PROGRAM, 8, exerion_state )
+ADDRESS_MAP_START(exerion_state::sub_map)
 	AM_RANGE(0x0000, 0x1fff) AM_ROM
 	AM_RANGE(0x4000, 0x47ff) AM_RAM
 	AM_RANGE(0x6000, 0x6000) AM_DEVREAD("soundlatch", generic_latch_8_device, read)

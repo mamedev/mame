@@ -92,6 +92,13 @@ public:
 	void superpac_common(machine_config &config);
 	void superpac(machine_config &config);
 	void todruaga(machine_config &config);
+	void mappy_cpu1_map(address_map &map);
+	void mappy_cpu2_map(address_map &map);
+	void phozon_cpu1_map(address_map &map);
+	void phozon_cpu2_map(address_map &map);
+	void phozon_cpu3_map(address_map &map);
+	void superpac_cpu1_map(address_map &map);
+	void superpac_cpu2_map(address_map &map);
 protected:
 	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr) override;
 };

@@ -44,14 +44,9 @@ public:
 		m_vram(*this, "vram")
 	{ }
 
-	u32 m_test_x,m_test_y,m_start_offs;
-	u8 m_type;
+	void aristmk6(machine_config &config);
 
-	u8 irl0pend, irl0en;
-	u8 irl1pend, irl1en;
-	u8 irl2pend, irl2en;    // UARTs ?
-	u8 irl3pend0, irl3en0;
-	u8 irl3pend1, irl3en1;
+protected:
 	void testIrq();
 
 	DECLARE_READ8_MEMBER(irqpend_r);
@@ -59,16 +54,31 @@ public:
 	DECLARE_READ8_MEMBER(test_r);
 	DECLARE_WRITE64_MEMBER(eeprom_w);
 	DECLARE_READ64_MEMBER(hwver_r);
+	uint32_t screen_update_aristmk6(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
+
 	virtual void video_start() override;
 	virtual void machine_reset() override;
-	uint32_t screen_update_aristmk6(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
+	void aristmk6_map(address_map &map);
+	void aristmk6_port(address_map &map);
+
+private:
+#if 0
+	u32 m_test_x,m_test_y,m_start_offs;
+	u8 m_type;
+#endif
+
+	u8 irl0pend, irl0en;
+	u8 irl1pend, irl1en;
+	u8 irl2pend, irl2en;    // UARTs ?
+	u8 irl3pend0, irl3en0;
+	u8 irl3pend1, irl3en1;
+
 	required_device<cpu_device> m_maincpu;
 	required_device<ns16550_device> m_uart0;
 	required_device<ns16550_device> m_uart1;
 	required_device<eeprom_serial_93cxx_device> m_eeprom0;
 	required_device<palette_device> m_palette;
 	required_shared_ptr<uint64_t> m_vram;
-	void aristmk6(machine_config &config);
 };
 
 
@@ -289,7 +299,7 @@ READ64_MEMBER(aristmk6_state::hwver_r)
 	return 0;
 }
 
-static ADDRESS_MAP_START( aristmk6_map, AS_PROGRAM, 64, aristmk6_state )
+ADDRESS_MAP_START(aristmk6_state::aristmk6_map)
 	AM_RANGE(0x00000000, 0x003fffff) AM_ROM AM_REGION("maincpu", 0)
 	AM_RANGE(0x04000000, 0x05ffffff) AM_RAM AM_SHARE("vram") // VRAM 32MB
 	AM_RANGE(0x08000000, 0x0bffffff) AM_ROM AM_REGION("game_rom", 0)
@@ -309,14 +319,14 @@ static ADDRESS_MAP_START( aristmk6_map, AS_PROGRAM, 64, aristmk6_state )
 	AM_RANGE(0x13800000, 0x13800007) AM_READ8(test_r, 0xffffffffffffffffU)
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( aristmk6_port, AS_IO, 64, aristmk6_state )
+ADDRESS_MAP_START(aristmk6_state::aristmk6_port)
 ADDRESS_MAP_END
 
 static INPUT_PORTS_START( aristmk6 )
 INPUT_PORTS_END
 
 // ?
-#define ARISTMK6_CPU_CLOCK XTAL(200'000'000)
+static constexpr XTAL ARISTMK6_CPU_CLOCK = 200_MHz_XTAL;
 // ?
 
 MACHINE_CONFIG_START(aristmk6_state::aristmk6)
@@ -338,8 +348,8 @@ MACHINE_CONFIG_START(aristmk6_state::aristmk6)
 	MCFG_CPU_FORCE_NO_DRC()
 //  MCFG_DEVICE_DISABLE()
 
-	MCFG_DEVICE_ADD( "uart0", NS16550, XTAL(8'000'000) )
-	MCFG_DEVICE_ADD( "uart1", NS16550, XTAL(8'000'000) )
+	MCFG_DEVICE_ADD( "uart0", NS16550, 8_MHz_XTAL )
+	MCFG_DEVICE_ADD( "uart1", NS16550, 8_MHz_XTAL )
 
 	MCFG_EEPROM_SERIAL_93C56_ADD("eeprom0")
 	MCFG_EEPROM_SERIAL_DEFAULT_VALUE(0xFF)

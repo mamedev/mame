@@ -79,10 +79,6 @@ const atari_motion_objects_config xybots_state::s_mob_config =
 	0                   /* resulting value to indicate "special" */
 };
 
-VIDEO_START_MEMBER(xybots_state,xybots)
-{
-}
-
 
 
 /*************************************

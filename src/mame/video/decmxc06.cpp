@@ -41,12 +41,6 @@ todo:
 #include "decmxc06.h"
 #include "screen.h"
 
-void deco_mxc06_device::set_gfx_region(device_t &device, int region)
-{
-	deco_mxc06_device &dev = downcast<deco_mxc06_device &>(device);
-	dev.m_gfxregion = region;
-}
-
 
 DEFINE_DEVICE_TYPE(DECO_MXC06, deco_mxc06_device, "deco_mxc06", "DECO MXC06 Sprite")
 
@@ -58,17 +52,6 @@ deco_mxc06_device::deco_mxc06_device(const machine_config &mconfig, const char *
 	, m_gfxdecode(*this, finder_base::DUMMY_TAG)
 {
 }
-
-//-------------------------------------------------
-//  static_set_gfxdecode_tag: Set the tag of the
-//  gfx decoder
-//-------------------------------------------------
-
-void deco_mxc06_device::static_set_gfxdecode_tag(device_t &device, const char *tag)
-{
-	downcast<deco_mxc06_device &>(device).m_gfxdecode.set_tag(tag);
-}
-
 
 /* this implementation was originally from Mad Motor */
 void deco_mxc06_device::draw_sprites( bitmap_ind16 &bitmap, const rectangle &cliprect, uint16_t* spriteram, int pri_mask, int pri_val, int col_mask )
@@ -101,7 +84,7 @@ void deco_mxc06_device::draw_sprites( bitmap_ind16 &bitmap, const rectangle &cli
 		sx = 240 - sx;
 		sy = 240 - sy;
 
-		if (machine().driver_data()->flip_screen())
+		if (m_flip_screen)
 		{
 			sy = 240 - sy;
 			sx = 240 - sx;
@@ -128,7 +111,8 @@ void deco_mxc06_device::draw_sprites( bitmap_ind16 &bitmap, const rectangle &cli
 
 			code &= ~(h - 1);
 
-			if (flipy)
+			// not affected by flipscreen
+			if (spriteram[offs] & 0x4000)
 				incy = -1;
 			else
 			{
@@ -218,6 +202,9 @@ void deco_mxc06_device::draw_sprites_bootleg( bitmap_ind16 &bitmap, const rectan
 void deco_mxc06_device::device_start()
 {
 	m_priority_type = 0;
+	m_flip_screen = false;
+
+	save_item(NAME(m_flip_screen));
 }
 
 void deco_mxc06_device::device_reset()

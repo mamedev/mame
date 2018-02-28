@@ -235,7 +235,7 @@ WRITE8_MEMBER(taitoh_state::coin_control_w)
 
 ***************************************************************************/
 
-static ADDRESS_MAP_START( syvalion_map, AS_PROGRAM, 16, taitoh_state )
+ADDRESS_MAP_START(taitoh_state::syvalion_map)
 	AM_RANGE(0x000000, 0x07ffff) AM_ROM
 	AM_RANGE(0x100000, 0x10ffff) AM_MIRROR(0x010000) AM_RAM AM_SHARE("m68000_mainram")
 	AM_RANGE(0x200000, 0x200001) AM_READ8(syvalion_input_bypass_r, 0x00ff) AM_DEVWRITE8("tc0040ioc", tc0040ioc_device, portreg_w, 0x00ff)
@@ -246,7 +246,7 @@ static ADDRESS_MAP_START( syvalion_map, AS_PROGRAM, 16, taitoh_state )
 	AM_RANGE(0x500800, 0x500fff) AM_RAM_DEVWRITE("palette", palette_device, write16) AM_SHARE("palette")
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( recordbr_map, AS_PROGRAM, 16, taitoh_state )
+ADDRESS_MAP_START(taitoh_state::recordbr_map)
 	AM_RANGE(0x000000, 0x07ffff) AM_ROM
 	AM_RANGE(0x100000, 0x10ffff) AM_MIRROR(0x010000) AM_RAM AM_SHARE("m68000_mainram")
 	AM_RANGE(0x200000, 0x200003) AM_DEVREADWRITE8("tc0040ioc", tc0040ioc_device, read, write, 0x00ff)
@@ -256,7 +256,7 @@ static ADDRESS_MAP_START( recordbr_map, AS_PROGRAM, 16, taitoh_state )
 	AM_RANGE(0x500800, 0x500fff) AM_RAM_DEVWRITE("palette", palette_device, write16) AM_SHARE("palette")
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( tetristh_map, AS_PROGRAM, 16, taitoh_state )
+ADDRESS_MAP_START(taitoh_state::tetristh_map)
 	AM_RANGE(0x000000, 0x03ffff) AM_ROM
 	AM_RANGE(0x100000, 0x10ffff) AM_MIRROR(0x010000) AM_RAM AM_SHARE("m68000_mainram")
 	AM_RANGE(0x200000, 0x200001) AM_READNOP AM_DEVWRITE8("tc0140syt", tc0140syt_device, master_port_w, 0x00ff)
@@ -266,7 +266,7 @@ static ADDRESS_MAP_START( tetristh_map, AS_PROGRAM, 16, taitoh_state )
 	AM_RANGE(0x500800, 0x500fff) AM_RAM_DEVWRITE("palette", palette_device, write16) AM_SHARE("palette")
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( dleague_map, AS_PROGRAM, 16, taitoh_state )
+ADDRESS_MAP_START(taitoh_state::dleague_map)
 	AM_RANGE(0x000000, 0x05ffff) AM_ROM
 	AM_RANGE(0x100000, 0x10ffff) AM_MIRROR(0x010000) AM_RAM AM_SHARE("m68000_mainram")
 	AM_RANGE(0x200000, 0x20000f) AM_DEVREADWRITE8("tc0220ioc", tc0220ioc_device, read, write, 0x00ff)
@@ -278,7 +278,7 @@ static ADDRESS_MAP_START( dleague_map, AS_PROGRAM, 16, taitoh_state )
 ADDRESS_MAP_END
 
 
-static ADDRESS_MAP_START( sound_map, AS_PROGRAM, 8, taitoh_state )
+ADDRESS_MAP_START(taitoh_state::sound_map)
 	AM_RANGE(0x0000, 0x3fff) AM_ROM
 	AM_RANGE(0x4000, 0x7fff) AM_ROMBANK("z80bank")
 	AM_RANGE(0xc000, 0xdfff) AM_RAM
@@ -747,7 +747,8 @@ MACHINE_CONFIG_START(taitoh_state::recordbr)
 MACHINE_CONFIG_END
 
 
-MACHINE_CONFIG_DERIVED(taitoh_state::tetristh, recordbr)
+MACHINE_CONFIG_START(taitoh_state::tetristh)
+	recordbr(config);
 
 	/* basic machine hardware */
 	MCFG_CPU_MODIFY("maincpu")

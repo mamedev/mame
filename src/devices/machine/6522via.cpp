@@ -147,7 +147,7 @@ uint16_t via6522_device::get_counter1_value()
 // device type definition
 DEFINE_DEVICE_TYPE(VIA6522, via6522_device, "via6522", "6522 VIA")
 
-DEVICE_ADDRESS_MAP_START( map, 8, via6522_device )
+ADDRESS_MAP_START(via6522_device::map)
 	AM_RANGE(0x00, 0x0f) AM_READWRITE(read, write)
 ADDRESS_MAP_END
 
@@ -537,7 +537,7 @@ void via6522_device::output_pb()
 READ8_MEMBER( via6522_device::read )
 {
 	int val = 0;
-	if (machine().side_effect_disabled())
+	if (machine().side_effects_disabled())
 		return 0;
 
 	offset &= 0xf;

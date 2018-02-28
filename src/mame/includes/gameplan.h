@@ -113,6 +113,10 @@ public:
 	void leprechn_video(machine_config &config);
 	void trvquest(machine_config &config);
 	void trvquest_video(machine_config &config);
+	void cpu_map(address_map &map);
+	void gameplan_audio_map(address_map &map);
+	void gameplan_main_map(address_map &map);
+	void leprechn_audio_map(address_map &map);
 protected:
 	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr) override;
 };

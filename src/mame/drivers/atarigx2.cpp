@@ -46,7 +46,7 @@ void atarigx2_state::update_interrupts()
 }
 
 
-MACHINE_RESET_MEMBER(atarigx2_state,atarigx2)
+void atarigx2_state::machine_reset()
 {
 	atarigen_state::machine_reset();
 	scanline_timer_reset(*m_screen, 8);
@@ -1196,18 +1196,18 @@ READ32_MEMBER( atarigx2_state::rrreveng_prot_r )
  *
  *************************************/
 
-static ADDRESS_MAP_START( main_map, AS_PROGRAM, 32, atarigx2_state )
+ADDRESS_MAP_START(atarigx2_state::main_map)
 	ADDRESS_MAP_UNMAP_HIGH
 	AM_RANGE(0x000000, 0x07ffff) AM_ROM
 	AM_RANGE(0xc80000, 0xc80fff) AM_RAM
 	AM_RANGE(0xd00000, 0xd1ffff) AM_READ(a2d_data_r)
 	AM_RANGE(0xd20000, 0xd20fff) AM_DEVREADWRITE8("eeprom", eeprom_parallel_28xx_device, read, write, 0xff00ff00)
 	AM_RANGE(0xd40000, 0xd40fff) AM_RAM_DEVWRITE("palette", palette_device, write32) AM_SHARE("palette")
+	AM_RANGE(0xd70000, 0xd7ffff) AM_RAM
 	AM_RANGE(0xd72000, 0xd75fff) AM_DEVWRITE("playfield", tilemap_device, write32) AM_SHARE("playfield")
 	AM_RANGE(0xd76000, 0xd76fff) AM_DEVWRITE("alpha", tilemap_device, write32) AM_SHARE("alpha")
 	AM_RANGE(0xd78000, 0xd78fff) AM_RAM AM_SHARE("rle")
 	AM_RANGE(0xd7a200, 0xd7a203) AM_WRITE(mo_command_w) AM_SHARE("mo_command")
-	AM_RANGE(0xd70000, 0xd7ffff) AM_RAM
 	AM_RANGE(0xd80000, 0xd9ffff) AM_DEVWRITE("eeprom", eeprom_parallel_28xx_device, unlock_write32)
 	AM_RANGE(0xe06000, 0xe06003) AM_DEVWRITE8("jsa", atari_jsa_iiis_device, main_command_w, 0xff000000)
 	AM_RANGE(0xe08000, 0xe08003) AM_WRITE(latch_w)
@@ -1499,9 +1499,7 @@ MACHINE_CONFIG_START(atarigx2_state::atarigx2)
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", M68EC020, ATARI_CLOCK_14MHz)
 	MCFG_CPU_PROGRAM_MAP(main_map)
-	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", atarigen_state, video_int_gen)
-
-	MCFG_MACHINE_RESET_OVERRIDE(atarigx2_state,atarigx2)
+	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", atarigx2_state, video_int_gen)
 
 	MCFG_EEPROM_2816_ADD("eeprom")
 	MCFG_EEPROM_28XX_LOCK_AFTER_WRITE(true)
@@ -1522,24 +1520,24 @@ MACHINE_CONFIG_START(atarigx2_state::atarigx2)
 	MCFG_SCREEN_UPDATE_DRIVER(atarigx2_state, screen_update_atarigx2)
 	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_VIDEO_START_OVERRIDE(atarigx2_state,atarigx2)
-
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
 
-	MCFG_ATARI_JSA_IIIS_ADD("jsa", WRITELINE(atarigen_state, sound_int_write_line))
+	MCFG_ATARI_JSA_IIIS_ADD("jsa", WRITELINE(atarigx2_state, sound_int_write_line))
 	MCFG_ATARI_JSA_TEST_PORT("SERVICE", 6)
 	MCFG_SOUND_ROUTE(0, "lspeaker", 1.0)
 	MCFG_SOUND_ROUTE(1, "rspeaker", 1.0)
 MACHINE_CONFIG_END
 
 
-MACHINE_CONFIG_DERIVED(atarigx2_state::atarigx2_0x200, atarigx2)
+MACHINE_CONFIG_START(atarigx2_state::atarigx2_0x200)
+	atarigx2(config);
 	MCFG_DEVICE_ADD("xga", ATARI_136094_0072, 0)
 	MCFG_ATARIRLE_ADD("rle", modesc_0x200)
 MACHINE_CONFIG_END
 
-MACHINE_CONFIG_DERIVED(atarigx2_state::atarigx2_0x400, atarigx2)
+MACHINE_CONFIG_START(atarigx2_state::atarigx2_0x400)
+	atarigx2(config);
 	MCFG_DEVICE_ADD("xga", ATARI_136095_0072, 0)
 	MCFG_ATARIRLE_ADD("rle", modesc_0x400)
 MACHINE_CONFIG_END

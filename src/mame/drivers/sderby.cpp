@@ -296,7 +296,7 @@ WRITE16_MEMBER(sderby_state::roulette_out_w)
 *       Memory Maps        *
 ***************************/
 
-static ADDRESS_MAP_START( sderby_map, AS_PROGRAM, 16, sderby_state )
+ADDRESS_MAP_START(sderby_state::sderby_map)
 	AM_RANGE(0x000000, 0x07ffff) AM_ROM
 	AM_RANGE(0x100000, 0x100fff) AM_RAM_WRITE(sderby_videoram_w) AM_SHARE("videoram")       /* bg */
 	AM_RANGE(0x101000, 0x101fff) AM_RAM_WRITE(sderby_md_videoram_w) AM_SHARE("md_videoram") /* mid */
@@ -314,7 +314,7 @@ static ADDRESS_MAP_START( sderby_map, AS_PROGRAM, 16, sderby_state )
 	AM_RANGE(0xffc000, 0xffffff) AM_RAM
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( sderbya_map, AS_PROGRAM, 16, sderby_state )
+ADDRESS_MAP_START(sderby_state::sderbya_map)
 	AM_RANGE(0x000000, 0x07ffff) AM_ROM
 	AM_RANGE(0x100000, 0x100fff) AM_RAM_WRITE(sderby_videoram_w) AM_SHARE("videoram")       /* bg */
 	AM_RANGE(0x101000, 0x101fff) AM_RAM_WRITE(sderby_md_videoram_w) AM_SHARE("md_videoram") /* mid */
@@ -333,7 +333,7 @@ static ADDRESS_MAP_START( sderbya_map, AS_PROGRAM, 16, sderby_state )
 ADDRESS_MAP_END
 
 
-static ADDRESS_MAP_START( luckboom_map, AS_PROGRAM, 16, sderby_state )
+ADDRESS_MAP_START(sderby_state::luckboom_map)
 	AM_RANGE(0x000000, 0x07ffff) AM_ROM
 	AM_RANGE(0x100000, 0x100fff) AM_RAM_WRITE(sderby_videoram_w) AM_SHARE("videoram")       /* bg */
 	AM_RANGE(0x101000, 0x101fff) AM_RAM_WRITE(sderby_md_videoram_w) AM_SHARE("md_videoram") /* mid */
@@ -351,7 +351,7 @@ static ADDRESS_MAP_START( luckboom_map, AS_PROGRAM, 16, sderby_state )
 	AM_RANGE(0xff0000, 0xffffff) AM_RAM
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( spacewin_map, AS_PROGRAM, 16, sderby_state )
+ADDRESS_MAP_START(sderby_state::spacewin_map)
 	AM_RANGE(0x000000, 0x03ffff) AM_ROM
 	AM_RANGE(0x100000, 0x100fff) AM_RAM_WRITE(sderby_videoram_w) AM_SHARE("videoram")       /* bg */
 	AM_RANGE(0x101000, 0x101fff) AM_RAM_WRITE(sderby_md_videoram_w) AM_SHARE("md_videoram") /* mid */
@@ -372,7 +372,7 @@ static ADDRESS_MAP_START( spacewin_map, AS_PROGRAM, 16, sderby_state )
 	AM_RANGE(0x8fc000, 0x8fffff) AM_RAM
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( shinygld_map, AS_PROGRAM, 16, sderby_state )
+ADDRESS_MAP_START(sderby_state::shinygld_map)
 	AM_RANGE(0x000000, 0x03ffff) AM_ROM
 	AM_RANGE(0x100000, 0x100fff) AM_RAM_WRITE(sderby_videoram_w) AM_SHARE("videoram")       /* bg */
 	AM_RANGE(0x101000, 0x101fff) AM_RAM_WRITE(sderby_md_videoram_w) AM_SHARE("md_videoram") /* mid */
@@ -392,7 +392,7 @@ static ADDRESS_MAP_START( shinygld_map, AS_PROGRAM, 16, sderby_state )
 	AM_RANGE(0x7f0000, 0x7fffff) AM_RAM
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( roulette_map, AS_PROGRAM, 16, sderby_state )
+ADDRESS_MAP_START(sderby_state::roulette_map)
 	AM_RANGE(0x000000, 0x03ffff) AM_ROM
 	AM_RANGE(0x440000, 0x440fff) AM_WRITEONLY AM_SHARE("spriteram")
 	AM_RANGE(0x500000, 0x500fff) AM_RAM_WRITE(sderby_videoram_w) AM_SHARE("videoram")           /* bg */

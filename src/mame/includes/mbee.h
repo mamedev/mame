@@ -131,6 +131,21 @@ public:
 	void mbeeic(machine_config &config);
 	void mbeepc(machine_config &config);
 	void mbee128p(machine_config &config);
+	void mbee128_io(address_map &map);
+	void mbee256_io(address_map &map);
+	void mbee256_mem(address_map &map);
+	void mbee56_io(address_map &map);
+	void mbee56_mem(address_map &map);
+	void mbee_io(address_map &map);
+	void mbee_mem(address_map &map);
+	void mbeeic_io(address_map &map);
+	void mbeeic_mem(address_map &map);
+	void mbeepc_io(address_map &map);
+	void mbeepc_mem(address_map &map);
+	void mbeeppc_io(address_map &map);
+	void mbeeppc_mem(address_map &map);
+	void mbeett_io(address_map &map);
+	void mbeett_mem(address_map &map);
 private:
 	uint8_t *m_p_videoram;
 	uint8_t *m_p_gfxram;

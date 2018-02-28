@@ -202,7 +202,7 @@ WRITE8_MEMBER(rpunch_state::upd_data_w)
  *
  *************************************/
 
-static ADDRESS_MAP_START( main_map, AS_PROGRAM, 16, rpunch_state )
+ADDRESS_MAP_START(rpunch_state::main_map)
 	ADDRESS_MAP_GLOBAL_MASK(0xfffff)
 	AM_RANGE(0x000000, 0x03ffff) AM_ROM
 	AM_RANGE(0x040000, 0x04ffff) AM_RAM AM_SHARE("bitmapram")
@@ -229,7 +229,7 @@ ADDRESS_MAP_END
  *
  *************************************/
 
-static ADDRESS_MAP_START( sound_map, AS_PROGRAM, 8, rpunch_state )
+ADDRESS_MAP_START(rpunch_state::sound_map)
 	AM_RANGE(0x0000, 0xefff) AM_ROM
 	AM_RANGE(0xf000, 0xf001) AM_DEVREADWRITE("ymsnd", ym2151_device, read, write)
 	AM_RANGE(0xf200, 0xf200) AM_DEVREAD("soundlatch", generic_latch_8_device, read)
@@ -499,7 +499,8 @@ MACHINE_CONFIG_START(rpunch_state::rpunch)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
 MACHINE_CONFIG_END
 
-MACHINE_CONFIG_DERIVED(rpunch_state::svolley, rpunch)
+MACHINE_CONFIG_START(rpunch_state::svolley)
+	rpunch(config);
 	MCFG_VIDEO_START_OVERRIDE(rpunch_state,svolley)
 MACHINE_CONFIG_END
 

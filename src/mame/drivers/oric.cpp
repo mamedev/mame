@@ -89,6 +89,7 @@ public:
 
 	void oric(machine_config &config);
 	void prav8d(machine_config &config);
+	void oric_mem(address_map &map);
 protected:
 	required_device<cpu_device> m_maincpu;
 	required_device<palette_device> m_palette;
@@ -156,6 +157,7 @@ public:
 	virtual void machine_reset() override;
 
 	void telstrat(machine_config &config);
+	void telestrat_mem(address_map &map);
 protected:
 	enum {
 		P_IRQEN  = 0x01,
@@ -188,18 +190,19 @@ protected:
 };
 
 /* Ram is 64K, with 16K hidden by the rom.  The 300-3ff is also hidden by the i/o */
-static ADDRESS_MAP_START(oric_mem, AS_PROGRAM, 8, oric_state )
+ADDRESS_MAP_START(oric_state::oric_mem)
+	AM_RANGE( 0x0000, 0xffff) AM_RAM AM_SHARE("ram")
 	AM_RANGE( 0x0300, 0x030f) AM_DEVREADWRITE("via6522", via6522_device, read, write) AM_MIRROR(0xf0)
 	AM_RANGE( 0xc000, 0xdfff) AM_READ_BANK("bank_c000_r") AM_WRITE_BANK("bank_c000_w")
 	AM_RANGE( 0xe000, 0xf7ff) AM_READ_BANK("bank_e000_r") AM_WRITE_BANK("bank_e000_w")
 	AM_RANGE( 0xf800, 0xffff) AM_READ_BANK("bank_f800_r") AM_WRITE_BANK("bank_f800_w")
-	AM_RANGE( 0x0000, 0xffff) AM_RAM AM_SHARE("ram")
 ADDRESS_MAP_END
 
 /*
 The telestrat has the memory regions split into 16k blocks.
 Memory region &c000-&ffff can be ram or rom. */
-static ADDRESS_MAP_START(telestrat_mem, AS_PROGRAM, 8, telestrat_state )
+ADDRESS_MAP_START(telestrat_state::telestrat_mem)
+	AM_RANGE( 0x0000, 0xffff) AM_RAM AM_SHARE("ram")
 	AM_RANGE( 0x0300, 0x030f) AM_DEVREADWRITE("via6522", via6522_device, read, write)
 	AM_RANGE( 0x0310, 0x0313) AM_DEVREADWRITE("fdc", fd1793_device, read, write)
 	AM_RANGE( 0x0314, 0x0314) AM_READWRITE(port_314_r, port_314_w)
@@ -207,7 +210,6 @@ static ADDRESS_MAP_START(telestrat_mem, AS_PROGRAM, 8, telestrat_state )
 	AM_RANGE( 0x031c, 0x031f) AM_DEVREADWRITE("acia", mos6551_device, read, write)
 	AM_RANGE( 0x0320, 0x032f) AM_DEVREADWRITE("via6522_2", via6522_device, read, write)
 	AM_RANGE( 0xc000, 0xffff) AM_READ_BANK("bank_c000_r") AM_WRITE_BANK("bank_c000_w")
-	AM_RANGE( 0x0000, 0xffff) AM_RAM AM_SHARE("ram")
 ADDRESS_MAP_END
 
 uint32_t oric_state::screen_update_oric(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
@@ -599,7 +601,7 @@ static INPUT_PORTS_START(oric)
 	PORT_BIT(0x80, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CODE(KEYCODE_RIGHT)       PORT_CHAR(UCHAR_MAMEKEY(RIGHT))
 	PORT_BIT(0x40, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CODE(KEYCODE_DOWN)        PORT_CHAR(UCHAR_MAMEKEY(DOWN))
 	PORT_BIT(0x20, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CODE(KEYCODE_LEFT)        PORT_CHAR(UCHAR_MAMEKEY(LEFT))
-	PORT_BIT(0x10, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CODE(KEYCODE_LSHIFT)      PORT_CHAR(UCHAR_MAMEKEY(LSHIFT))
+	PORT_BIT(0x10, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CODE(KEYCODE_LSHIFT)      PORT_CHAR(UCHAR_SHIFT_1)
 	PORT_BIT(0x08, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CODE(KEYCODE_UP)          PORT_CHAR(UCHAR_MAMEKEY(UP))
 	PORT_BIT(0x04, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CODE(KEYCODE_STOP)        PORT_CHAR('.') PORT_CHAR('>')
 	PORT_BIT(0x02, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CODE(KEYCODE_COMMA)       PORT_CHAR(',') PORT_CHAR('<')
@@ -629,7 +631,7 @@ static INPUT_PORTS_START(oric)
 	PORT_BIT(0x80, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CODE(KEYCODE_EQUALS)      PORT_CHAR('=') PORT_CHAR('+')
 	PORT_BIT(0x40, IP_ACTIVE_LOW, IPT_UNUSED)
 	PORT_BIT(0x20, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("Return") PORT_CODE(KEYCODE_ENTER) PORT_CHAR(13)
-	PORT_BIT(0x10, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CODE(KEYCODE_RSHIFT)      PORT_CHAR(UCHAR_MAMEKEY(RSHIFT))
+	PORT_BIT(0x10, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CODE(KEYCODE_RSHIFT)      PORT_CHAR(UCHAR_SHIFT_1)
 	PORT_BIT(0x08, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CODE(KEYCODE_SLASH)       PORT_CHAR('/') PORT_CHAR('?')
 	PORT_BIT(0x04, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CODE(KEYCODE_0)           PORT_CHAR('0') PORT_CHAR(')')
 	PORT_BIT(0x02, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CODE(KEYCODE_L)           PORT_CHAR('l') PORT_CHAR('L')
@@ -818,7 +820,8 @@ MACHINE_CONFIG_START(oric_state::oric)
 	MCFG_ORICEXT_ADD( "ext", oricext_intf, nullptr, "maincpu", WRITELINE(oric_state, ext_irq_w))
 MACHINE_CONFIG_END
 
-MACHINE_CONFIG_DERIVED(oric_state::prav8d, oric)
+MACHINE_CONFIG_START(oric_state::prav8d)
+	oric(config);
 MACHINE_CONFIG_END
 
 FLOPPY_FORMATS_MEMBER( telestrat_state::floppy_formats )
@@ -829,7 +832,8 @@ static SLOT_INTERFACE_START( telestrat_floppies )
 	SLOT_INTERFACE( "3dsdd", FLOPPY_3_DSDD )
 SLOT_INTERFACE_END
 
-MACHINE_CONFIG_DERIVED(telestrat_state::telstrat, oric)
+MACHINE_CONFIG_START(telestrat_state::telstrat)
+	oric(config);
 	MCFG_CPU_MODIFY( "maincpu" )
 	MCFG_CPU_PROGRAM_MAP(telestrat_mem)
 

@@ -795,7 +795,7 @@ READ8_MEMBER( mos6526_device::read )
 	switch (offset & 0x0f)
 	{
 	case PRA:
-		if (machine().side_effect_disabled())
+		if (machine().side_effects_disabled())
 			return 0xff;
 
 		if (m_ddra != 0xff)
@@ -806,7 +806,7 @@ READ8_MEMBER( mos6526_device::read )
 		break;
 
 	case PRB:
-		if (machine().side_effect_disabled())
+		if (machine().side_effects_disabled())
 			return 0xff;
 
 		if (m_ddrb != 0xff)
@@ -860,7 +860,7 @@ READ8_MEMBER( mos6526_device::read )
 		break;
 
 	case TOD_10THS:
-		if (machine().side_effect_disabled())
+		if (machine().side_effects_disabled())
 			return 0xff;
 
 		data = read_tod(0);
@@ -869,21 +869,21 @@ READ8_MEMBER( mos6526_device::read )
 		break;
 
 	case TOD_SEC:
-		if (machine().side_effect_disabled())
+		if (machine().side_effects_disabled())
 			return 0xff;
 
 		data = read_tod(1);
 		break;
 
 	case TOD_MIN:
-		if (machine().side_effect_disabled())
+		if (machine().side_effects_disabled())
 			return 0xff;
 
 		data = read_tod(2);
 		break;
 
 	case TOD_HR:
-		if (machine().side_effect_disabled())
+		if (machine().side_effects_disabled())
 			return 0xff;
 
 		if (!m_tod_latched)
@@ -902,7 +902,7 @@ READ8_MEMBER( mos6526_device::read )
 	case ICR:
 		data = (m_ir1 << 7) | m_icr;
 
-		if (machine().side_effect_disabled())
+		if (machine().side_effects_disabled())
 			return data;
 
 		m_icr_read = true;

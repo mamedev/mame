@@ -181,7 +181,7 @@ READ8_MEMBER(champbas_state::champbja_protection_r)
 // maincpu
 
 // base map
-static ADDRESS_MAP_START( champbas_map, AS_PROGRAM, 8, champbas_state )
+ADDRESS_MAP_START(champbas_state::champbas_map)
 	AM_RANGE(0x0000, 0x5fff) AM_ROM
 	AM_RANGE(0x7000, 0x7001) AM_DEVWRITE("ay1", ay8910_device, data_address_w)
 	AM_RANGE(0x8000, 0x87ff) AM_RAM_WRITE(tilemap_w) AM_SHARE("vram")
@@ -200,54 +200,54 @@ static ADDRESS_MAP_START( champbas_map, AS_PROGRAM, 8, champbas_state )
 ADDRESS_MAP_END
 
 // base map + ALPHA-8x0x protection
-static ADDRESS_MAP_START( champbasj_map, AS_PROGRAM, 8, champbas_state )
-	AM_RANGE(0x6000, 0x63ff) AM_DEVREADWRITE("alpha_8201", alpha_8201_device, ext_ram_r, ext_ram_w)
+ADDRESS_MAP_START(champbas_state::champbasj_map)
 	AM_IMPORT_FROM( champbas_map )
+	AM_RANGE(0x6000, 0x63ff) AM_DEVREADWRITE("alpha_8201", alpha_8201_device, ext_ram_r, ext_ram_w)
 ADDRESS_MAP_END
 
 // different protection for champbasja
-static ADDRESS_MAP_START( champbasja_map, AS_PROGRAM, 8, champbas_state )
+ADDRESS_MAP_START(champbas_state::champbasja_map)
+	AM_IMPORT_FROM( champbas_map )
 	AM_RANGE(0x6000, 0x63ff) AM_RAM
 	AM_RANGE(0x6800, 0x68ff) AM_READ(champbja_protection_r)
-	AM_IMPORT_FROM( champbas_map )
 ADDRESS_MAP_END
 
 // champbasjb appears to have no protection
-static ADDRESS_MAP_START( champbasjb_map, AS_PROGRAM, 8, champbas_state )
-	AM_RANGE(0x6000, 0x63ff) AM_RAM
+ADDRESS_MAP_START(champbas_state::champbasjb_map)
 	AM_IMPORT_FROM( champbas_map )
+	AM_RANGE(0x6000, 0x63ff) AM_RAM
 ADDRESS_MAP_END
 
 // champbb2
-static ADDRESS_MAP_START( champbb2_map, AS_PROGRAM, 8, champbas_state )
-	AM_RANGE(0x7800, 0x7fff) AM_ROM
+ADDRESS_MAP_START(champbas_state::champbb2_map)
 	AM_IMPORT_FROM( champbasj_map )
+	AM_RANGE(0x7800, 0x7fff) AM_ROM
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( tbasebal_map, AS_PROGRAM, 8, champbas_state )
-	AM_RANGE(0x7800, 0x7fff) AM_ROM
+ADDRESS_MAP_START(champbas_state::tbasebal_map)
 	AM_IMPORT_FROM( champbas_map )
+	AM_RANGE(0x7800, 0x7fff) AM_ROM
 ADDRESS_MAP_END
 
 // more sprites in exctsccr
-static ADDRESS_MAP_START( exctsccr_map, AS_PROGRAM, 8, champbas_state )
+ADDRESS_MAP_START(champbas_state::exctsccr_map)
+	AM_IMPORT_FROM( champbasj_map )
 	AM_RANGE(0x7000, 0x7001) AM_UNMAP // aysnd is controlled by audiocpu
 	AM_RANGE(0x7c00, 0x7fff) AM_RAM
 	AM_RANGE(0xa040, 0xa04f) AM_WRITEONLY AM_SHARE("spriteram2")
-	AM_IMPORT_FROM( champbasj_map )
 ADDRESS_MAP_END
 
 // exctsccrb
-static ADDRESS_MAP_START( exctsccrb_map, AS_PROGRAM, 8, champbas_state )
-	AM_RANGE(0xa040, 0xa04f) AM_WRITEONLY AM_SHARE("spriteram2")
+ADDRESS_MAP_START(champbas_state::exctsccrb_map)
 	AM_IMPORT_FROM( champbasj_map )
+	AM_RANGE(0xa040, 0xa04f) AM_WRITEONLY AM_SHARE("spriteram2")
 ADDRESS_MAP_END
 
 
 // audiocpu
 
 // champbas/champbb2 (note: talbot doesn't have audiocpu)
-static ADDRESS_MAP_START( champbas_sound_map, AS_PROGRAM, 8, champbas_state )
+ADDRESS_MAP_START(champbas_state::champbas_sound_map)
 	AM_RANGE(0x0000, 0x5fff) AM_ROM
 	AM_RANGE(0x6000, 0x6000) AM_MIRROR(0x1fff) AM_DEVREAD("soundlatch", generic_latch_8_device, read)
 	AM_RANGE(0x8000, 0x8000) AM_MIRROR(0x1fff) AM_WRITENOP // 4-bit return code to main CPU (not used)
@@ -257,7 +257,7 @@ static ADDRESS_MAP_START( champbas_sound_map, AS_PROGRAM, 8, champbas_state )
 ADDRESS_MAP_END
 
 // exctsccr
-static ADDRESS_MAP_START( exctsccr_sound_map, AS_PROGRAM, 8, champbas_state )
+ADDRESS_MAP_START(champbas_state::exctsccr_sound_map)
 	AM_RANGE(0x0000, 0x8fff) AM_ROM
 	AM_RANGE(0xa000, 0xa7ff) AM_RAM
 	AM_RANGE(0xc008, 0xc008) AM_DEVWRITE("dac1", dac_byte_interface, write)
@@ -267,7 +267,7 @@ static ADDRESS_MAP_START( exctsccr_sound_map, AS_PROGRAM, 8, champbas_state )
 //  AM_RANGE(0xc00f, 0xc00f) AM_WRITENOP // ?
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( exctsccr_sound_io_map, AS_IO, 8, champbas_state )
+ADDRESS_MAP_START(champbas_state::exctsccr_sound_io_map)
 	ADDRESS_MAP_GLOBAL_MASK( 0x00ff )
 	AM_RANGE(0x82, 0x83) AM_DEVWRITE("ay1", ay8910_device, data_address_w)
 	AM_RANGE(0x86, 0x87) AM_DEVWRITE("ay2", ay8910_device, data_address_w)
@@ -606,7 +606,8 @@ MACHINE_CONFIG_START(champbas_state::champbas)
 	MCFG_SOUND_ROUTE_EX(0, "dac", 1.0, DAC_VREF_POS_INPUT) MCFG_SOUND_ROUTE_EX(0, "dac", -1.0, DAC_VREF_NEG_INPUT)
 MACHINE_CONFIG_END
 
-MACHINE_CONFIG_DERIVED(champbas_state::champbasj, champbas)
+MACHINE_CONFIG_START(champbas_state::champbasj)
+	champbas(config);
 
 	/* basic machine hardware */
 	MCFG_CPU_MODIFY("maincpu")
@@ -621,21 +622,24 @@ MACHINE_CONFIG_DERIVED(champbas_state::champbasj, champbas)
 MACHINE_CONFIG_END
 
 
-MACHINE_CONFIG_DERIVED(champbas_state::champbasja, champbas)
+MACHINE_CONFIG_START(champbas_state::champbasja)
+	champbas(config);
 
 	/* basic machine hardware */
 	MCFG_CPU_MODIFY("maincpu")
 	MCFG_CPU_PROGRAM_MAP(champbasja_map)
 MACHINE_CONFIG_END
 
-MACHINE_CONFIG_DERIVED(champbas_state::champbasjb, champbas)
+MACHINE_CONFIG_START(champbas_state::champbasjb)
+	champbas(config);
 
 	/* basic machine hardware */
 	MCFG_CPU_MODIFY("maincpu")
 	MCFG_CPU_PROGRAM_MAP(champbasjb_map)
 MACHINE_CONFIG_END
 
-MACHINE_CONFIG_DERIVED(champbas_state::champbb2, champbasj)
+MACHINE_CONFIG_START(champbas_state::champbb2)
+	champbasj(config);
 
 	/* basic machine hardware */
 	MCFG_CPU_MODIFY("maincpu")
@@ -643,7 +647,8 @@ MACHINE_CONFIG_DERIVED(champbas_state::champbb2, champbasj)
 MACHINE_CONFIG_END
 
 
-MACHINE_CONFIG_DERIVED(champbas_state::tbasebal, champbas)
+MACHINE_CONFIG_START(champbas_state::tbasebal)
+	champbas(config);
 
 	/* basic machine hardware */
 	MCFG_CPU_MODIFY("maincpu")

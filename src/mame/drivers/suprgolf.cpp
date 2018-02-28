@@ -91,6 +91,8 @@ public:
 
 	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	void suprgolf(machine_config &config);
+	void io_map(address_map &map);
+	void suprgolf_map(address_map &map);
 };
 
 TILE_GET_INFO_MEMBER(suprgolf_state::get_tile_info)
@@ -336,7 +338,7 @@ READ8_MEMBER(suprgolf_state::p2_r)
 	return (ioport("P2")->read() & 0xf0) | ((ioport("P2_ANALOG")->read() & 0xf));
 }
 
-static ADDRESS_MAP_START( suprgolf_map, AS_PROGRAM, 8, suprgolf_state )
+ADDRESS_MAP_START(suprgolf_state::suprgolf_map)
 	AM_RANGE(0x0000, 0x3fff) AM_ROM
 	AM_RANGE(0x4000, 0x7fff) AM_ROMBANK("bank1")
 	AM_RANGE(0x4000, 0x4000) AM_WRITE(rom2_bank_select_w )
@@ -347,7 +349,7 @@ static ADDRESS_MAP_START( suprgolf_map, AS_PROGRAM, 8, suprgolf_state )
 	AM_RANGE(0xf800, 0xffff) AM_RAM
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( io_map, AS_IO, 8, suprgolf_state )
+ADDRESS_MAP_START(suprgolf_state::io_map)
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	AM_RANGE(0x00, 0x03) AM_DEVREADWRITE("ppi8255_0", i8255_device, read, write)
 	AM_RANGE(0x04, 0x07) AM_DEVREADWRITE("ppi8255_1", i8255_device, read, write)

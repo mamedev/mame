@@ -61,6 +61,9 @@ public:
 
 	void monty(machine_config &config);
 	void mmonty(machine_config &config);
+	void mmonty_mem(address_map &map);
+	void monty_io(address_map &map);
+	void monty_mem(address_map &map);
 private:
 	required_device<cpu_device> m_maincpu;
 	required_device<speaker_sound_device> m_speaker;
@@ -76,13 +79,13 @@ private:
 };
 
 
-static ADDRESS_MAP_START( monty_mem, AS_PROGRAM, 8, monty_state )
+ADDRESS_MAP_START(monty_state::monty_mem)
 	AM_RANGE(0x0000, 0xbfff) AM_ROM
 	//AM_RANGE(0x4000, 0x4000) // The main rom checks to see if another program is here on startup
 	AM_RANGE(0xf800, 0xffff) AM_RAM
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( mmonty_mem, AS_PROGRAM, 8, monty_state )
+ADDRESS_MAP_START(monty_state::mmonty_mem)
 	AM_RANGE(0x0000, 0x3fff) AM_ROM
 	//AM_RANGE(0xc000, 0xc000) // The main rom checks to see if another program is here on startup
 	AM_RANGE(0x8000, 0xffff) AM_ROM
@@ -90,7 +93,7 @@ static ADDRESS_MAP_START( mmonty_mem, AS_PROGRAM, 8, monty_state )
 ADDRESS_MAP_END
 
 
-static ADDRESS_MAP_START( monty_io, AS_IO, 8, monty_state )
+ADDRESS_MAP_START(monty_state::monty_io)
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	AM_RANGE(0x00, 0x00) AM_WRITE(ioCommandWrite0_w)
 	AM_RANGE(0x01, 0x01) AM_WRITE(sound_w)
@@ -278,7 +281,8 @@ MACHINE_CONFIG_START(monty_state::monty)
 	MCFG_SED1520_ADD("sed1520_0", monty_screen_update)
 MACHINE_CONFIG_END
 
-MACHINE_CONFIG_DERIVED(monty_state::mmonty, monty)
+MACHINE_CONFIG_START(monty_state::mmonty)
+	monty(config);
 	MCFG_CPU_MODIFY( "maincpu" )
 	MCFG_CPU_PROGRAM_MAP(mmonty_mem)
 MACHINE_CONFIG_END

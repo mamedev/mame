@@ -70,23 +70,23 @@
 
 DEFINE_DEVICE_TYPE(VRC4373, vrc4373_device, "vrc4373", "NEC VRC4373 System Controller")
 
-DEVICE_ADDRESS_MAP_START(config_map, 32, vrc4373_device)
+ADDRESS_MAP_START(vrc4373_device::config_map)
+	AM_IMPORT_FROM(pci_bridge_device::config_map)
 	AM_RANGE(0x40, 0x43) AM_READWRITE  (pcictrl_r,  pcictrl_w)
-	AM_INHERIT_FROM(pci_bridge_device::config_map)
 ADDRESS_MAP_END
 
 // cpu i/f map
-DEVICE_ADDRESS_MAP_START(cpu_map, 32, vrc4373_device)
+ADDRESS_MAP_START(vrc4373_device::cpu_map)
 	AM_RANGE(0x00000000, 0x0000007b) AM_READWRITE(    cpu_if_r,          cpu_if_w)
 ADDRESS_MAP_END
 
 // Target Window 1 map
-DEVICE_ADDRESS_MAP_START(target1_map, 32, vrc4373_device)
+ADDRESS_MAP_START(vrc4373_device::target1_map)
 	AM_RANGE(0x00000000, 0xFFFFFFFF) AM_READWRITE(    target1_r,          target1_w)
 ADDRESS_MAP_END
 
 // Target Window 2 map
-DEVICE_ADDRESS_MAP_START(target2_map, 32, vrc4373_device)
+ADDRESS_MAP_START(vrc4373_device::target2_map)
 	AM_RANGE(0x00000000, 0xFFFFFFFF) AM_READWRITE(    target2_r,          target2_w)
 ADDRESS_MAP_END
 

@@ -114,7 +114,7 @@ WRITE8_MEMBER(redalert_state::redalert_ay8910_latch_2_w)
 	m_ay8910_latch_2 = data;
 }
 
-static ADDRESS_MAP_START( redalert_audio_map, AS_PROGRAM, 8, redalert_state )
+ADDRESS_MAP_START(redalert_state::redalert_audio_map)
 	ADDRESS_MAP_GLOBAL_MASK(0x7fff)
 	AM_RANGE(0x0000, 0x03ff) AM_MIRROR(0x0c00) AM_RAM
 	AM_RANGE(0x1000, 0x1000) AM_MIRROR(0x0ffe) AM_READNOP AM_WRITE(redalert_AY8910_w)
@@ -161,7 +161,7 @@ READ_LINE_MEMBER(redalert_state::sid_callback)
 }
 
 
-static ADDRESS_MAP_START( redalert_voice_map, AS_PROGRAM, 8, redalert_state )
+ADDRESS_MAP_START(redalert_state::redalert_voice_map)
 	AM_RANGE(0x0000, 0x3fff) AM_ROM
 	AM_RANGE(0x4000, 0x7fff) AM_NOP
 	AM_RANGE(0x8000, 0x83ff) AM_MIRROR(0x3c00) AM_RAM
@@ -222,8 +222,8 @@ MACHINE_CONFIG_START(redalert_state::redalert_audio)
 
 	MCFG_SPEAKER_STANDARD_MONO("mono")
 
-	MCFG_FRAGMENT_ADD( redalert_audio_m37b )
-	MCFG_FRAGMENT_ADD( redalert_audio_voice )
+	redalert_audio_m37b(config);
+	redalert_audio_voice(config);
 
 	MCFG_SOUND_START_OVERRIDE( redalert_state, redalert )
 
@@ -239,7 +239,7 @@ MACHINE_CONFIG_START(redalert_state::ww3_audio)
 
 	MCFG_SPEAKER_STANDARD_MONO("mono")
 
-	MCFG_FRAGMENT_ADD( redalert_audio_m37b )
+	redalert_audio_m37b(config);
 
 	MCFG_SOUND_START_OVERRIDE( redalert_state, redalert )
 
@@ -313,7 +313,7 @@ WRITE8_MEMBER(redalert_state::demoneye_ay8910_data_w)
 }
 
 
-static ADDRESS_MAP_START( demoneye_audio_map, AS_PROGRAM, 8, redalert_state )
+ADDRESS_MAP_START(redalert_state::demoneye_audio_map)
 	ADDRESS_MAP_GLOBAL_MASK(0x3fff)
 	AM_RANGE(0x0000, 0x007f) AM_RAM
 	AM_RANGE(0x0500, 0x0503) AM_DEVREADWRITE("sndpia", pia6821_device, read, write)

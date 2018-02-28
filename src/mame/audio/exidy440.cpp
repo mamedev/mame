@@ -13,17 +13,9 @@
 #include "audio/exidy440.h"
 #include "includes/exidy440.h"
 
-#include "cpu/m6809/m6809.h"
-#include "speaker.h"
-
 
 #define SOUND_LOG       0
 #define FADE_TO_ZERO    1
-
-
-#define EXIDY440_AUDIO_CLOCK    (XTAL(12'979'200) / 4)
-#define EXIDY440_MC3418_CLOCK   (EXIDY440_AUDIO_CLOCK / 4 / 16)
-#define EXIDY440_MC3417_CLOCK   (EXIDY440_AUDIO_CLOCK / 4 / 32)
 
 
 /* internal caching */
@@ -844,57 +836,3 @@ void exidy440_sound_device::sound_stream_update(sound_stream &stream, stream_sam
 	/* all done, time to mix it */
 	mix_to_16(samples, outputs[0], outputs[1]);
 }
-
-
-/*************************************
- *
- *  Memory handlers
- *
- *************************************/
-
-static ADDRESS_MAP_START( exidy440_audio_map, AS_PROGRAM, 8, exidy440_sound_device )
-	AM_RANGE(0x0000, 0x7fff) AM_NOP
-	AM_RANGE(0x8000, 0x801f) AM_MIRROR(0x03e0) AM_DEVREADWRITE("custom", exidy440_sound_device, m6844_r, m6844_w)
-	AM_RANGE(0x8400, 0x840f) AM_MIRROR(0x03f0) AM_DEVREADWRITE("custom", exidy440_sound_device, sound_volume_r, sound_volume_w)
-	AM_RANGE(0x8800, 0x8800) AM_MIRROR(0x03ff) AM_DEVREAD("custom", exidy440_sound_device, sound_command_r) AM_WRITENOP
-	AM_RANGE(0x8c00, 0x93ff) AM_NOP
-	AM_RANGE(0x9400, 0x9403) AM_MIRROR(0x03fc) AM_READNOP AM_DEVWRITE("custom", exidy440_sound_device, sound_banks_w)
-	AM_RANGE(0x9800, 0x9800) AM_MIRROR(0x03ff) AM_READNOP AM_DEVWRITE("custom", exidy440_sound_device, sound_interrupt_clear_w)
-	AM_RANGE(0x9c00, 0x9fff) AM_NOP
-	AM_RANGE(0xa000, 0xbfff) AM_RAM
-	AM_RANGE(0xc000, 0xdfff) AM_NOP
-	AM_RANGE(0xe000, 0xffff) AM_ROM
-ADDRESS_MAP_END
-
-
-
-/*************************************
- *
- *  Machine driver
- *
- *************************************/
-
-MACHINE_CONFIG_START(exidy440_state::exidy440_audio)
-
-	MCFG_CPU_ADD("audiocpu", MC6809, EXIDY440_AUDIO_CLOCK)
-	MCFG_CPU_PROGRAM_MAP(exidy440_audio_map)
-	MCFG_CPU_VBLANK_INT_DRIVER("screen", driver_device, irq0_line_assert)
-
-	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
-
-	MCFG_SOUND_ADD("custom", EXIDY440, EXIDY440_MC3418_CLOCK)
-	MCFG_SOUND_ROUTE(0, "lspeaker", 1.0)
-	MCFG_SOUND_ROUTE(1, "rspeaker", 1.0)
-
-//  MCFG_SOUND_ADD("cvsd1", MC3418, EXIDY440_MC3418_CLOCK)
-//  MCFG_SOUND_ROUTE(ALL_OUTPUTS, "lspeaker", 1.0)
-
-//  MCFG_SOUND_ADD("cvsd2", MC3418, EXIDY440_MC3418_CLOCK)
-//  MCFG_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", 1.0)
-
-//  MCFG_SOUND_ADD("cvsd3", MC3417, EXIDY440_MC3417_CLOCK)
-//  MCFG_SOUND_ROUTE(ALL_OUTPUTS, "lspeaker", 1.0)
-
-//  MCFG_SOUND_ADD("cvsd4", MC3417, EXIDY440_MC3417_CLOCK)
-//  MCFG_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", 1.0)
-MACHINE_CONFIG_END

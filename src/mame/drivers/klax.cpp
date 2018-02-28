@@ -65,7 +65,7 @@ WRITE16_MEMBER(klax_state::interrupt_ack_w)
  *
  *************************************/
 
-MACHINE_RESET_MEMBER(klax_state,klax)
+void klax_state::machine_reset()
 {
 	atarigen_state::machine_reset();
 	scanline_timer_reset(*m_screen, 32);
@@ -79,7 +79,7 @@ MACHINE_RESET_MEMBER(klax_state,klax)
  *
  *************************************/
 
-static ADDRESS_MAP_START( klax_map, AS_PROGRAM, 16, klax_state )
+ADDRESS_MAP_START(klax_state::klax_map)
 	AM_RANGE(0x000000, 0x03ffff) AM_ROM
 	AM_RANGE(0x0e0000, 0x0e0fff) AM_DEVREADWRITE8("eeprom", eeprom_parallel_28xx_device, read, write, 0x00ff)
 	AM_RANGE(0x1f0000, 0x1fffff) AM_DEVWRITE("eeprom", eeprom_parallel_28xx_device, unlock_write16)
@@ -96,7 +96,7 @@ static ADDRESS_MAP_START( klax_map, AS_PROGRAM, 16, klax_state )
 	AM_RANGE(0x3f2800, 0x3f3fff) AM_RAM
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( klax2bl_map, AS_PROGRAM, 16, klax_state )
+ADDRESS_MAP_START(klax_state::klax2bl_map)
 	AM_RANGE(0x000000, 0x03ffff) AM_ROM
 	AM_RANGE(0x0e0000, 0x0e0fff) AM_DEVREADWRITE8("eeprom", eeprom_parallel_28xx_device, read, write, 0x00ff)
 	AM_RANGE(0x1f0000, 0x1fffff) AM_DEVWRITE("eeprom", eeprom_parallel_28xx_device, unlock_write16)
@@ -196,9 +196,7 @@ MACHINE_CONFIG_START(klax_state::klax)
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", M68000, ATARI_CLOCK_14MHz/2)
 	MCFG_CPU_PROGRAM_MAP(klax_map)
-	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", atarigen_state, video_int_gen)
-
-	MCFG_MACHINE_RESET_OVERRIDE(klax_state,klax)
+	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", klax_state, video_int_gen)
 
 	MCFG_EEPROM_2816_ADD("eeprom")
 	MCFG_EEPROM_28XX_LOCK_AFTER_WRITE(true)
@@ -223,8 +221,6 @@ MACHINE_CONFIG_START(klax_state::klax)
 	MCFG_SCREEN_UPDATE_DRIVER(klax_state, screen_update_klax)
 	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_VIDEO_START_OVERRIDE(klax_state,klax)
-
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
 
@@ -232,11 +228,13 @@ MACHINE_CONFIG_START(klax_state::klax)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 MACHINE_CONFIG_END
 
-static ADDRESS_MAP_START( bootleg_sound_map, AS_PROGRAM, 8, klax_state )
+ADDRESS_MAP_START(klax_state::bootleg_sound_map)
 	AM_RANGE(0x0000, 0x7fff) AM_ROM
 ADDRESS_MAP_END
 
-MACHINE_CONFIG_DERIVED(klax_state::klax2bl, klax)
+MACHINE_CONFIG_START(klax_state::klax2bl)
+	klax(config);
+
 	MCFG_CPU_MODIFY("maincpu")
 	MCFG_CPU_PROGRAM_MAP(klax2bl_map)
 

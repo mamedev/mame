@@ -68,4 +68,8 @@ public:
 
 	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	void taxidriv(machine_config &config);
+	void cpu2_map(address_map &map);
+	void cpu3_map(address_map &map);
+	void cpu3_port_map(address_map &map);
+	void main_map(address_map &map);
 };

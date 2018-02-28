@@ -309,7 +309,7 @@ WRITE8_MEMBER(wiz_state::wiz_main_nmi_mask_w)
 }
 
 
-static ADDRESS_MAP_START( kungfut_main_map, AS_PROGRAM, 8, wiz_state )
+ADDRESS_MAP_START(wiz_state::kungfut_main_map)
 	AM_RANGE(0x0000, 0xbfff) AM_ROM
 	AM_RANGE(0xc000, 0xc7ff) AM_RAM
 	AM_RANGE(0xd000, 0xd3ff) AM_RAM AM_SHARE("videoram2")
@@ -333,23 +333,23 @@ static ADDRESS_MAP_START( kungfut_main_map, AS_PROGRAM, 8, wiz_state )
 	AM_RANGE(0xf818, 0xf818) AM_WRITE(wiz_bgcolor_w)
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( decrypted_opcodes_map, AS_OPCODES, 8, wiz_state )
+ADDRESS_MAP_START(wiz_state::decrypted_opcodes_map)
 	AM_RANGE(0x0000, 0xbfff) AM_ROM AM_SHARE("decrypted_opcodes")
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( wiz_main_map, AS_PROGRAM, 8, wiz_state )
+ADDRESS_MAP_START(wiz_state::wiz_main_map)
+	AM_IMPORT_FROM( kungfut_main_map )
 	AM_RANGE(0xc800, 0xc801) AM_WRITE(wiz_coin_counter_w)
 	AM_RANGE(0xd400, 0xd400) AM_READ(wiz_protection_r)
 	AM_RANGE(0xf000, 0xf000) AM_WRITE(wiz_sprite_bank_w)
-	AM_IMPORT_FROM( kungfut_main_map )
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( stinger_main_map, AS_PROGRAM, 8, wiz_state )
+ADDRESS_MAP_START(wiz_state::stinger_main_map)
+	AM_IMPORT_FROM( kungfut_main_map )
 //  AM_RANGE(0xf008, 0xf00f) AM_WRITENOP // ?
 	AM_RANGE(0xf800, 0xf800) AM_DEVREAD("watchdog", watchdog_timer_device, reset_r)
 	AM_RANGE(0xf808, 0xf808) AM_WRITE(stinger_explosion_w)
 	AM_RANGE(0xf80a, 0xf80a) AM_WRITE(stinger_shot_w)
-	AM_IMPORT_FROM( kungfut_main_map )
 ADDRESS_MAP_END
 
 
@@ -361,7 +361,7 @@ WRITE8_MEMBER(wiz_state::wiz_sound_nmi_mask_w)
 }
 
 
-static ADDRESS_MAP_START( kungfut_sound_map, AS_PROGRAM, 8, wiz_state )
+ADDRESS_MAP_START(wiz_state::kungfut_sound_map)
 	ADDRESS_MAP_GLOBAL_MASK(0x7fff)
 	AM_RANGE(0x0000, 0x1fff) AM_ROM
 	AM_RANGE(0x2000, 0x23ff) AM_RAM
@@ -371,7 +371,7 @@ static ADDRESS_MAP_START( kungfut_sound_map, AS_PROGRAM, 8, wiz_state )
 	AM_RANGE(0x7000, 0x7000) AM_DEVREAD("soundlatch", generic_latch_8_device, read) AM_WRITE(wiz_sound_nmi_mask_w)
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( stinger_sound_map, AS_PROGRAM, 8, wiz_state )
+ADDRESS_MAP_START(wiz_state::stinger_sound_map)
 	ADDRESS_MAP_GLOBAL_MASK(0x7fff)
 	AM_RANGE(0x0000, 0x1fff) AM_ROM
 	AM_RANGE(0x2000, 0x23ff) AM_RAM
@@ -823,7 +823,8 @@ MACHINE_CONFIG_START(wiz_state::kungfut)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.10)
 MACHINE_CONFIG_END
 
-MACHINE_CONFIG_DERIVED(wiz_state::wiz, kungfut)
+MACHINE_CONFIG_START(wiz_state::wiz)
+	kungfut(config);
 
 	/* basic machine hardware */
 	MCFG_CPU_MODIFY("maincpu")
@@ -836,12 +837,13 @@ MACHINE_CONFIG_DERIVED(wiz_state::wiz, kungfut)
 MACHINE_CONFIG_END
 
 
-MACHINE_CONFIG_DERIVED(wiz_state::stinger, kungfut)
+MACHINE_CONFIG_START(wiz_state::stinger)
+	kungfut(config);
 
 	/* basic machine hardware */
 	MCFG_CPU_MODIFY("maincpu")
 	MCFG_CPU_PROGRAM_MAP(stinger_main_map)
-	MCFG_CPU_DECRYPTED_OPCODES_MAP(decrypted_opcodes_map)
+	MCFG_CPU_OPCODES_MAP(decrypted_opcodes_map)
 
 	/* basic machine hardware */
 	MCFG_CPU_MODIFY("audiocpu")
@@ -861,7 +863,8 @@ MACHINE_CONFIG_DERIVED(wiz_state::stinger, kungfut)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.5)
 MACHINE_CONFIG_END
 
-MACHINE_CONFIG_DERIVED(wiz_state::scion, stinger)
+MACHINE_CONFIG_START(wiz_state::scion)
+	stinger(config);
 
 	MCFG_CPU_MODIFY("maincpu")
 	MCFG_DEVICE_REMOVE_ADDRESS_MAP(AS_OPCODES)

@@ -131,7 +131,7 @@ public:
 	ngp_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag),
 		device_nvram_interface(mconfig, *this),
-		m_tlcs900(*this, "maincpu"),
+		m_maincpu(*this, "maincpu"),
 		m_z80(*this, "soundcpu"),
 		m_t6w28(*this, "t6w28"),
 		m_ldac(*this, "ldac"),
@@ -140,8 +140,7 @@ public:
 		m_mainram(*this, "mainram"),
 		m_k1ge(*this, "k1ge"),
 		m_io_controls(*this, "Controls"),
-		m_io_power(*this, "Power") ,
-		m_maincpu(*this, "maincpu")
+		m_io_power(*this, "Power")
 		{
 			m_flash_chip[0].present = 0;
 			m_flash_chip[0].state = F_READ;
@@ -171,7 +170,7 @@ public:
 		uint8_t   command[2];
 	} m_flash_chip[2];
 
-	required_device<cpu_device> m_tlcs900;
+	required_device<cpu_device> m_maincpu;
 	required_device<cpu_device> m_z80;
 	required_device<t6w28_device> m_t6w28;
 	required_device<dac_byte_interface> m_ldac;
@@ -206,6 +205,9 @@ public:
 	void ngp_common(machine_config &config);
 	void ngp(machine_config &config);
 	void ngpc(machine_config &config);
+	void ngp_mem(address_map &map);
+	void z80_io(address_map &map);
+	void z80_mem(address_map &map);
 protected:
 	bool m_nvram_loaded;
 	required_ioport m_io_controls;
@@ -214,7 +216,6 @@ protected:
 	virtual void nvram_default() override;
 	virtual void nvram_read(emu_file &file) override;
 	virtual void nvram_write(emu_file &file) override;
-	required_device<cpu_device> m_maincpu;
 };
 
 
@@ -550,7 +551,7 @@ WRITE8_MEMBER( ngp_state::flash1_w )
 }
 
 
-static ADDRESS_MAP_START( ngp_mem, AS_PROGRAM, 8, ngp_state )
+ADDRESS_MAP_START(ngp_state::ngp_mem)
 	AM_RANGE( 0x000080, 0x0000bf )  AM_READWRITE(ngp_io_r, ngp_io_w)                        /* ngp/c specific i/o */
 	AM_RANGE( 0x004000, 0x006fff )  AM_RAM AM_SHARE("mainram")                              /* work ram */
 	AM_RANGE( 0x007000, 0x007fff )  AM_RAM AM_SHARE("share1")                               /* shared with sound cpu */
@@ -575,11 +576,11 @@ WRITE8_MEMBER( ngp_state::ngp_z80_comm_w )
 
 WRITE8_MEMBER( ngp_state::ngp_z80_signal_main_w )
 {
-	m_tlcs900->set_input_line(TLCS900_INT5, ASSERT_LINE );
+	m_maincpu->set_input_line(TLCS900_INT5, ASSERT_LINE );
 }
 
 
-static ADDRESS_MAP_START( z80_mem, AS_PROGRAM, 8, ngp_state )
+ADDRESS_MAP_START(ngp_state::z80_mem)
 	AM_RANGE( 0x0000, 0x0fff )  AM_RAM AM_SHARE("share1")                       /* shared with tlcs900 */
 	AM_RANGE( 0x4000, 0x4001 )  AM_DEVWRITE("t6w28", t6w28_device, write )      /* sound chip (right, left) */
 	AM_RANGE( 0x8000, 0x8000 )  AM_READWRITE( ngp_z80_comm_r, ngp_z80_comm_w )  /* main-sound communication */
@@ -592,11 +593,11 @@ WRITE8_MEMBER( ngp_state::ngp_z80_clear_irq )
 	m_z80->set_input_line(0, CLEAR_LINE );
 
 	/* I am not exactly sure what causes the maincpu INT5 signal to be cleared. This will do for now. */
-	m_tlcs900->set_input_line(TLCS900_INT5, CLEAR_LINE );
+	m_maincpu->set_input_line(TLCS900_INT5, CLEAR_LINE );
 }
 
 
-static ADDRESS_MAP_START( z80_io, AS_IO, 8, ngp_state )
+ADDRESS_MAP_START(ngp_state::z80_io)
 	AM_RANGE( 0x0000, 0xffff )  AM_WRITE( ngp_z80_clear_irq )
 ADDRESS_MAP_END
 
@@ -605,7 +606,7 @@ INPUT_CHANGED_MEMBER(ngp_state::power_callback)
 {
 	if ( m_io_reg[0x33] & 0x04 )
 	{
-		m_tlcs900->set_input_line(TLCS900_NMI, (m_io_power->read() & 0x01 ) ? CLEAR_LINE : ASSERT_LINE );
+		m_maincpu->set_input_line(TLCS900_NMI, (m_io_power->read() & 0x01 ) ? CLEAR_LINE : ASSERT_LINE );
 	}
 }
 
@@ -628,13 +629,13 @@ INPUT_PORTS_END
 
 WRITE_LINE_MEMBER( ngp_state::ngp_vblank_pin_w )
 {
-	m_tlcs900->set_input_line(TLCS900_INT4, state ? ASSERT_LINE : CLEAR_LINE );
+	m_maincpu->set_input_line(TLCS900_INT4, state ? ASSERT_LINE : CLEAR_LINE );
 }
 
 
 WRITE_LINE_MEMBER( ngp_state::ngp_hblank_pin_w )
 {
-	m_tlcs900->set_input_line(TLCS900_TIO, state ? ASSERT_LINE : CLEAR_LINE );
+	m_maincpu->set_input_line(TLCS900_TIO, state ? ASSERT_LINE : CLEAR_LINE );
 }
 
 
@@ -732,7 +733,7 @@ void ngp_state::machine_reset()
 
 	if ( m_nvram_loaded )
 	{
-		m_tlcs900->set_state_int(TLCS900_PC, 0xFF1800);
+		m_maincpu->set_state_int(TLCS900_PC, 0xFF1800);
 	}
 }
 
@@ -851,7 +852,8 @@ MACHINE_CONFIG_START(ngp_state::ngp_common)
 MACHINE_CONFIG_END
 
 
-MACHINE_CONFIG_DERIVED(ngp_state::ngp, ngp_common)
+MACHINE_CONFIG_START(ngp_state::ngp)
+	ngp_common(config);
 
 	MCFG_K1GE_ADD( "k1ge", 6.144_MHz_XTAL, "screen", WRITELINE( ngp_state, ngp_vblank_pin_w ), WRITELINE( ngp_state, ngp_hblank_pin_w ) )
 
@@ -869,7 +871,8 @@ MACHINE_CONFIG_DERIVED(ngp_state::ngp, ngp_common)
 MACHINE_CONFIG_END
 
 
-MACHINE_CONFIG_DERIVED(ngp_state::ngpc, ngp_common)
+MACHINE_CONFIG_START(ngp_state::ngpc)
+	ngp_common(config);
 	MCFG_K2GE_ADD( "k1ge", 6.144_MHz_XTAL, "screen", WRITELINE( ngp_state, ngp_vblank_pin_w ), WRITELINE( ngp_state, ngp_hblank_pin_w ) )
 
 	MCFG_SCREEN_MODIFY("screen")

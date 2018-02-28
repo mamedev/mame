@@ -73,6 +73,8 @@ private:
 	DECLARE_READ8_MEMBER( cia_pb_r );
 	DECLARE_WRITE8_MEMBER( cia_pb_w );
 
+	void c1581_mem(address_map &map);
+
 	DECLARE_FLOPPY_FORMATS( floppy_formats );
 
 	required_device<cpu_device> m_maincpu;

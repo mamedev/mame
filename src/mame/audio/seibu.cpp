@@ -87,17 +87,6 @@ seibu_sound_device::seibu_sound_device(const machine_config &mconfig, const char
 {
 }
 
-void seibu_sound_device::static_set_cpu_tag(device_t &device, const char *tag)
-{
-	downcast<seibu_sound_device &>(device).m_sound_cpu.set_tag(tag);
-	downcast<seibu_sound_device &>(device).m_sound_rom.set_tag(tag);
-}
-
-void seibu_sound_device::static_set_rombank_tag(device_t &device, const char *tag)
-{
-	downcast<seibu_sound_device &>(device).m_rom_bank.set_tag(tag);
-}
-
 //-------------------------------------------------
 //  device_start - device-specific startup
 //-------------------------------------------------
@@ -297,7 +286,7 @@ WRITE16_MEMBER( seibu_sound_device::main_mustb_w )
 
 /***************************************************************************/
 
-ADDRESS_MAP_START( seibu_sound_map, AS_PROGRAM, 8, seibu_sound_device )
+ADDRESS_MAP_START(seibu_sound_common::seibu_sound_map)
 	AM_RANGE(0x0000, 0x1fff) AM_ROM
 	AM_RANGE(0x2000, 0x27ff) AM_RAM
 	AM_RANGE(0x4000, 0x4000) AM_DEVWRITE("seibu_sound", seibu_sound_device, pending_w)
