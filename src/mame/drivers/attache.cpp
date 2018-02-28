@@ -1167,7 +1167,7 @@ MACHINE_CONFIG_START(attache_state::attache)
 	MCFG_FLOPPY_DRIVE_ADD("fdc:0", attache_floppies, "525dd", floppy_image_device::default_floppy_formats)
 	MCFG_FLOPPY_DRIVE_ADD("fdc:1", attache_floppies, "525dd", floppy_image_device::default_floppy_formats)
 
-	MCFG_DEVICE_ADD("crtc", TMS9927, 12324000)
+	MCFG_DEVICE_ADD("crtc", TMS9927, 12324000 / 8)
 	MCFG_TMS9927_CHAR_WIDTH(8)
 	MCFG_TMS9927_VSYN_CALLBACK(DEVWRITELINE("ctc", z80ctc_device, trg2))
 
