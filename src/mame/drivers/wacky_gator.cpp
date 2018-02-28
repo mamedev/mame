@@ -32,60 +32,61 @@
 class wackygtr_state : public driver_device
 {
 public:
-	wackygtr_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag),
+	wackygtr_state(const machine_config &mconfig, device_type type, const char *tag) :
+		driver_device(mconfig, type, tag),
 		m_maincpu(*this, "maincpu"),
 		m_msm(*this, "msm"),
 		m_pit8253_0(*this, "pit8253_0"),
 		m_pit8253_1(*this, "pit8253_1"),
 		m_ticket(*this, "ticket"),
-		m_samples(*this, "oki")
+		m_samples(*this, "oki"),
+		m_alligator(*this, "alligator%u", 0U),
+		m_digit(*this, "digit%u", 0U),
+		m_lamp(*this, "lamp%u", 0U)
 	{ }
 
-	required_device<cpu_device> m_maincpu;
-	required_device<msm5205_device> m_msm;
-	required_device<pit8253_device> m_pit8253_0;
-	required_device<pit8253_device> m_pit8253_1;
-	required_device<ticket_dispenser_device> m_ticket;
-	required_memory_region m_samples;
+	DECLARE_CUSTOM_INPUT_MEMBER(alligators_rear_sensors_r);
+	DECLARE_CUSTOM_INPUT_MEMBER(alligators_front_sensors_r);
 
-	DECLARE_DRIVER_INIT(wackygtr);
-	void machine_reset() override;
+	void wackygtr(machine_config &config);
+
+protected:
+	virtual void machine_start() override;
+	virtual void machine_reset() override;
 
 	DECLARE_WRITE_LINE_MEMBER(adpcm_int);
 	DECLARE_WRITE8_MEMBER(sample_ctrl_w);
 	DECLARE_WRITE8_MEMBER(alligators_ctrl1_w);
 	DECLARE_WRITE8_MEMBER(alligators_ctrl2_w);
-	DECLARE_CUSTOM_INPUT_MEMBER(alligators_rear_sensors_r);
-	DECLARE_CUSTOM_INPUT_MEMBER(alligators_front_sensors_r);
 
 	void set_lamps(int p, uint8_t value);
 	DECLARE_WRITE8_MEMBER(status_lamps_w);
-	DECLARE_WRITE8_MEMBER(timing_lamps_0_w)     { set_lamps(8 , data); }
-	DECLARE_WRITE8_MEMBER(timing_lamps_1_w)     { set_lamps(16, data); }
-	DECLARE_WRITE8_MEMBER(timing_lamps_2_w)     { set_lamps(24, data); }
+	template <unsigned N> DECLARE_WRITE8_MEMBER(timing_lamps_w) { set_lamps((N + 1) << 3, data); }
 
 	void set_digits(int p, uint8_t value);
-	DECLARE_WRITE8_MEMBER(disp0_w)              { set_digits(0, data); }
-	DECLARE_WRITE8_MEMBER(disp1_w)              { set_digits(2, data); }
-	DECLARE_WRITE8_MEMBER(disp2_w)              { set_digits(4, data); }
-	DECLARE_WRITE8_MEMBER(disp3_w)              { set_digits(6, data); }
+	template <unsigned N> DECLARE_WRITE8_MEMBER(disp_w) { set_digits(N << 1, data); }
 
 	void pmm8713_ck(int i, int state);
-	DECLARE_WRITE_LINE_MEMBER(alligator0_ck)    { pmm8713_ck(0, state); }
-	DECLARE_WRITE_LINE_MEMBER(alligator1_ck)    { pmm8713_ck(1, state); }
-	DECLARE_WRITE_LINE_MEMBER(alligator2_ck)    { pmm8713_ck(2, state); }
-	DECLARE_WRITE_LINE_MEMBER(alligator3_ck)    { pmm8713_ck(3, state); }
-	DECLARE_WRITE_LINE_MEMBER(alligator4_ck)    { pmm8713_ck(4, state); }
+	template <unsigned N> DECLARE_WRITE_LINE_MEMBER(alligator_ck) { pmm8713_ck(N, state); }
 
 	DECLARE_WRITE8_MEMBER(irq_ack_w)            { m_maincpu->set_input_line(M6809_IRQ_LINE, CLEAR_LINE); }
 	DECLARE_WRITE8_MEMBER(firq_ack_w)           { m_maincpu->set_input_line(M6809_FIRQ_LINE, CLEAR_LINE); }
 
 	TIMER_DEVICE_CALLBACK_MEMBER(nmi_timer)     { m_maincpu->set_input_line(INPUT_LINE_NMI, PULSE_LINE); }
 
-	void wackygtr(machine_config &config);
 	void program_map(address_map &map);
+
 private:
+	required_device<cpu_device> m_maincpu;
+	required_device<msm5205_device> m_msm;
+	required_device<pit8253_device> m_pit8253_0;
+	required_device<pit8253_device> m_pit8253_1;
+	required_device<ticket_dispenser_device> m_ticket;
+	required_memory_region m_samples;
+	output_finder<5> m_alligator;
+	output_finder<8> m_digit;
+	output_finder<32> m_lamp;
+
 	int     m_adpcm_sel;
 	uint16_t  m_adpcm_pos;
 	uint8_t   m_adpcm_ctrl;
@@ -94,10 +95,6 @@ private:
 	int     m_motors_pos[5];
 };
 
-
-DRIVER_INIT_MEMBER(wackygtr_state, wackygtr)
-{
-}
 
 WRITE8_MEMBER(wackygtr_state::status_lamps_w)
 {
@@ -161,7 +158,7 @@ void wackygtr_state::pmm8713_ck(int i, int state)
 		int alligator_state = m_motors_pos[i] / 10;
 		if (alligator_state > 5)    alligator_state = 5;
 		if (alligator_state < 0)    alligator_state = 0;
-		output().set_indexed_value("alligator", i, alligator_state);
+		m_alligator[i] = alligator_state;
 	}
 }
 
@@ -184,6 +181,19 @@ CUSTOM_INPUT_MEMBER(wackygtr_state::alligators_front_sensors_r)
 			((m_motors_pos[4] < 5 || m_motors_pos[4] > 55) ? 0x10 : 0);
 }
 
+void wackygtr_state::machine_start()
+{
+	m_alligator.resolve();
+	m_digit.resolve();
+	m_lamp.resolve();
+
+	save_item(NAME(m_adpcm_sel));
+	save_item(NAME(m_adpcm_pos));
+	save_item(NAME(m_adpcm_ctrl));
+	save_item(NAME(m_alligators_ctrl));
+	save_item(NAME(m_motors_pos));
+}
+
 void wackygtr_state::machine_reset()
 {
 	m_adpcm_pos = 0;
@@ -193,15 +203,15 @@ void wackygtr_state::machine_reset()
 
 void wackygtr_state::set_digits(int p, uint8_t value)
 {
-	static uint8_t bcd2hex[] = { 0x3f, 0x06, 0x5b, 0x4f, 0x66, 0x6d, 0x7d, 0x07, 0x7f, 0x67, 0, 0, 0, 0, 0, 0 };  // not accurate
-	output().set_digit_value(p + 0, bcd2hex[value & 0x0f]);
-	output().set_digit_value(p + 1, bcd2hex[(value >> 4) & 0x0f]);
+	static constexpr uint8_t bcd2hex[] = { 0x3f, 0x06, 0x5b, 0x4f, 0x66, 0x6d, 0x7d, 0x07, 0x7f, 0x67, 0, 0, 0, 0, 0, 0 };  // not accurate
+	m_digit[p + 0] = bcd2hex[value & 0x0f];
+	m_digit[p + 1] = bcd2hex[(value >> 4) & 0x0f];
 }
 
 void wackygtr_state::set_lamps(int p, uint8_t value)
 {
-	for(int i=0; i<8; i++)
-		output().set_lamp_value(p + i, BIT(value, i));
+	for (int i=0; i<8; i++)
+		m_lamp[p + i] = BIT(value, i);
 }
 
 static INPUT_PORTS_START( wackygtr )
@@ -254,10 +264,10 @@ WRITE_LINE_MEMBER(wackygtr_state::adpcm_int)
 ADDRESS_MAP_START(wackygtr_state::program_map)
 	AM_RANGE(0x0200, 0x0200) AM_READNOP AM_WRITE(irq_ack_w)
 	AM_RANGE(0x0400, 0x0400) AM_READNOP AM_WRITE(firq_ack_w)
-	AM_RANGE(0x0600, 0x0600) AM_WRITE(disp0_w)
-	AM_RANGE(0x0800, 0x0800) AM_WRITE(disp1_w)
-	AM_RANGE(0x0a00, 0x0a00) AM_WRITE(disp2_w)
-	AM_RANGE(0x0c00, 0x0c00) AM_WRITE(disp3_w)
+	AM_RANGE(0x0600, 0x0600) AM_WRITE(disp_w<0>)
+	AM_RANGE(0x0800, 0x0800) AM_WRITE(disp_w<1>)
+	AM_RANGE(0x0a00, 0x0a00) AM_WRITE(disp_w<2>)
+	AM_RANGE(0x0c00, 0x0c00) AM_WRITE(disp_w<3>)
 	AM_RANGE(0x0e00, 0x0e00) AM_WRITE(sample_ctrl_w)
 
 	AM_RANGE(0x1000, 0x1001) AM_DEVWRITE("ymsnd", ym2413_device, write)
@@ -300,9 +310,9 @@ MACHINE_CONFIG_START(wackygtr_state::wackygtr)
 	MCFG_I8255_OUT_PORTC_CB(WRITE8(wackygtr_state, alligators_ctrl2_w))
 
 	MCFG_DEVICE_ADD("i8255_1", I8255, 0)
-	MCFG_I8255_OUT_PORTA_CB(WRITE8(wackygtr_state, timing_lamps_0_w))
-	MCFG_I8255_OUT_PORTB_CB(WRITE8(wackygtr_state, timing_lamps_1_w))
-	MCFG_I8255_OUT_PORTC_CB(WRITE8(wackygtr_state, timing_lamps_2_w))
+	MCFG_I8255_OUT_PORTA_CB(WRITE8(wackygtr_state, timing_lamps_w<0>))
+	MCFG_I8255_OUT_PORTB_CB(WRITE8(wackygtr_state, timing_lamps_w<1>))
+	MCFG_I8255_OUT_PORTC_CB(WRITE8(wackygtr_state, timing_lamps_w<2>))
 
 	MCFG_DEVICE_ADD("i8255_2", I8255, 0)
 	MCFG_I8255_IN_PORTA_CB(IOPORT("IN0"))
@@ -311,19 +321,19 @@ MACHINE_CONFIG_START(wackygtr_state::wackygtr)
 
 	MCFG_DEVICE_ADD("pit8253_0", PIT8253, 0)
 	MCFG_PIT8253_CLK0(XTAL(3'579'545)/16)  // this is a guess
-	MCFG_PIT8253_OUT0_HANDLER(WRITELINE(wackygtr_state, alligator0_ck))
+	MCFG_PIT8253_OUT0_HANDLER(WRITELINE(wackygtr_state, alligator_ck<0>))
 	MCFG_PIT8253_CLK1(XTAL(3'579'545)/16)  // this is a guess
-	MCFG_PIT8253_OUT1_HANDLER(WRITELINE(wackygtr_state, alligator1_ck))
+	MCFG_PIT8253_OUT1_HANDLER(WRITELINE(wackygtr_state, alligator_ck<1>))
 	MCFG_PIT8253_CLK2(XTAL(3'579'545)/16)  // this is a guess
-	MCFG_PIT8253_OUT2_HANDLER(WRITELINE(wackygtr_state, alligator2_ck))
+	MCFG_PIT8253_OUT2_HANDLER(WRITELINE(wackygtr_state, alligator_ck<2>))
 
 	MCFG_DEVICE_ADD("pit8253_1", PIT8253, 0)
 	MCFG_PIT8253_CLK0(XTAL(3'579'545)/16)  // this is a guess
 	MCFG_PIT8253_OUT0_HANDLER(INPUTLINE("maincpu", M6809_FIRQ_LINE))
 	MCFG_PIT8253_CLK1(XTAL(3'579'545)/16)  // this is a guess
-	MCFG_PIT8253_OUT1_HANDLER(WRITELINE(wackygtr_state, alligator3_ck))
+	MCFG_PIT8253_OUT1_HANDLER(WRITELINE(wackygtr_state, alligator_ck<3>))
 	MCFG_PIT8253_CLK2(XTAL(3'579'545)/16)  // this is a guess
-	MCFG_PIT8253_OUT2_HANDLER(WRITELINE(wackygtr_state, alligator4_ck))
+	MCFG_PIT8253_OUT2_HANDLER(WRITELINE(wackygtr_state, alligator_ck<4>))
 
 	MCFG_TICKET_DISPENSER_ADD("ticket", attotime::from_msec(200), TICKET_MOTOR_ACTIVE_HIGH, TICKET_STATUS_ACTIVE_HIGH)
 MACHINE_CONFIG_END
@@ -337,4 +347,4 @@ ROM_START( wackygtr )
 	ROM_LOAD("wp3-vo0.2h", 0x0000, 0x10000, CRC(91c7986f) SHA1(bc9fa0d41c1caa0f909a349f511d022b7e42c6cd))
 ROM_END
 
-GAME(1990, wackygtr,    0, wackygtr,  wackygtr, wackygtr_state, wackygtr,  ROT0,   "Data East", "Wacky Gator", MACHINE_IS_SKELETON_MECHANICAL | MACHINE_CLICKABLE_ARTWORK)
+GAME(1990, wackygtr,    0, wackygtr,  wackygtr, wackygtr_state, 0,  ROT0,   "Data East", "Wacky Gator", MACHINE_IS_SKELETON_MECHANICAL | MACHINE_CLICKABLE_ARTWORK)

@@ -763,7 +763,7 @@ if (_OPTIONS["SHADOW_CHECK"]=="1") then
 end
 
 -- only show deprecation warnings when enabled
-if _OPTIONS["DEPRECATED"]~="1" then
+if _OPTIONS["DEPRECATED"]=="0" then
 	buildoptions {
 		"-Wno-deprecated-declarations"
 	}
@@ -933,6 +933,7 @@ end
 		"-Wwrite-strings",
 		"-Wno-sign-compare",
 		"-Wno-conversion",
+		"-Wno-error=deprecated-declarations",
 	}
 -- warnings only applicable to C compiles
 	buildoptions_c {

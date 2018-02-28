@@ -66,12 +66,14 @@ public:
 		m_maincpu(*this, "maincpu"),
 		m_ttl74145(*this, "ic8_7445"),
 		m_cass(*this, "cassette"),
+		m_display(*this, "digit%u", 0U),
 		m_digit(0)
 	{ }
 
 	void acrnsys1(machine_config &config);
 
 protected:
+	virtual void machine_start() override;
 	DECLARE_READ8_MEMBER(ins8154_b1_port_a_r);
 	DECLARE_WRITE8_MEMBER(ins8154_b1_port_a_w);
 	DECLARE_WRITE8_MEMBER(acrnsys1_led_segment_w);
@@ -83,12 +85,24 @@ private:
 	required_device<cpu_device> m_maincpu;
 	required_device<ttl74145_device> m_ttl74145;
 	required_device<cassette_image_device> m_cass;
+	output_finder<9> m_display;
 	uint8_t m_digit;
 	uint8_t m_cass_data[4];
 	bool m_cass_state;
 	bool m_cassold;
 };
 
+
+
+void acrnsys1_state::machine_start()
+{
+	m_display.resolve();
+
+	save_item(NAME(m_digit));
+	save_item(NAME(m_cass_data));
+	save_item(NAME(m_cass_state));
+	save_item(NAME(m_cassold));
+}
 
 
 /***************************************************************************
@@ -157,9 +171,11 @@ TIMER_DEVICE_CALLBACK_MEMBER(acrnsys1_state::acrnsys1_p)
 
 WRITE8_MEMBER( acrnsys1_state::acrnsys1_led_segment_w )
 {
-	uint8_t key_line = m_ttl74145->read();
+	uint16_t const key_line = m_ttl74145->read();
 
-	output().set_digit_value(key_line, data);
+	for (unsigned i = 0U; 9U > i; ++i)
+		if (BIT(key_line, i))
+			m_display[i] = data;
 }
 
 
@@ -286,5 +302,5 @@ ROM_END
     GAME DRIVERS
 ***************************************************************************/
 
-/*    YEAR  NAME      PARENT COMPAT MACHINE   INPUT     STATE           INIT  COMPANY  FULLNAME          FLAGS */
-COMP( 1978, acrnsys1, 0,     0,     acrnsys1, acrnsys1, acrnsys1_state, 0,    "Acorn", "Acorn System 1", 0 )
+//    YEAR  NAME      PARENT COMPAT MACHINE   INPUT     STATE           INIT  COMPANY  FULLNAME          FLAGS
+COMP( 1978, acrnsys1, 0,     0,     acrnsys1, acrnsys1, acrnsys1_state, 0,    "Acorn", "Acorn System 1", MACHINE_SUPPORTS_SAVE )

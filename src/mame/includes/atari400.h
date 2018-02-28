@@ -11,13 +11,15 @@
 
 ******************************************************************************/
 
-#ifndef MAME_INCLUDES_ATARI_H
-#define MAME_INCLUDES_ATARI_H
+#ifndef MAME_INCLUDES_ATARI400_H
+#define MAME_INCLUDES_ATARI400_H
 
 #include "machine/6821pia.h"
 #include "sound/pokey.h"
 #include "video/antic.h"
 #include "video/gtia.h"
+
+#include <algorithm>
 
 
 class atari_common_state : public driver_device
@@ -32,8 +34,9 @@ public:
 		, m_keypad(*this, "keypad.%u", 0)
 		, m_djoy_b(*this, "djoy_b")
 		, m_fake(*this, "fake")
-		{ }
+	{ }
 
+protected:
 	virtual void video_start() override;
 
 	DECLARE_PALETTE_INIT(atari);
@@ -42,7 +45,6 @@ public:
 	POKEY_KEYBOARD_CB_MEMBER(a5200_keypads);
 	POKEY_KEYBOARD_CB_MEMBER(a800_keyboard);
 
-protected:
 	required_device<cpu_device> m_maincpu;
 	required_device<gtia_device> m_gtia;
 	required_device<antic_device> m_antic;
@@ -52,4 +54,4 @@ protected:
 	optional_ioport m_fake;
 };
 
-#endif // MAME_INCLUDES_ATARI_H
+#endif // MAME_INCLUDES_ATARI400_H

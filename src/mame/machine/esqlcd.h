@@ -25,14 +25,15 @@ public:
 
 protected:
 	virtual void device_add_mconfig(machine_config &config) override;
+	virtual void device_start() override;
 	virtual void device_reset() override;
 
 	uint8_t m_lcdpg[4][32];
 	int m_lcdPage;
-	int m_lcdPos,m_lcdSavedPos;
+	int m_lcdPos, m_lcdSavedPos;
+	output_finder<4, 32*7> m_lcdPix;
 
-	uint8_t m_leds[16];
-	uint8_t m_ledsDirty[16];
+	output_finder<16> m_leds;
 
 private:
 	void lcd_reset();
