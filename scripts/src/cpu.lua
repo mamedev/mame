@@ -1110,6 +1110,23 @@ if (CPUS["SSEM"]~=null or _OPTIONS["with-tools"]) then
 	table.insert(disasm_files , MAME_DIR .. "src/devices/cpu/ssem/ssemdasm.h")
 end
 
+------------------------------------------
+-- Diablo Systems printer CPU 
+--@src/devices/cpu/diablo/diablo1300.h,CPUS["DIABLO"] = true
+--------------------------------------------------
+
+if (CPUS["DIABLO"]~=null) then
+	files {
+		MAME_DIR .. "src/devices/cpu/diablo/diablo1300.cpp",
+		MAME_DIR .. "src/devices/cpu/diablo/diablo1300.h",
+	}
+end
+
+if (CPUS["DIABLO"]~=null or _OPTIONS["with-tools"]) then
+	table.insert(disasm_files , MAME_DIR .. "src/devices/cpu/diablo/diablo1300dasm.cpp")
+	table.insert(disasm_files , MAME_DIR .. "src/devices/cpu/ssem/diablo1300dasm.h")
+end
+
 --------------------------------------------------
 -- Fujitsu MB88xx
 --@src/devices/cpu/mb88xx/mb88xx.h,CPUS["MB88XX"] = true
