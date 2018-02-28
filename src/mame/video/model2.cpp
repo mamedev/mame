@@ -1942,6 +1942,11 @@ static uint32_t * geo_object_data( geo_state *geo, uint32_t opcode, uint32_t *in
 		obp = &geo->polygon_ram0[oba & 0x7FFF];
 	}
 
+	// if count == 0 then rolls over to max size
+	// Virtual On & Gunblade NY
+	if(obc == 0)
+		obc = 0xfffff;
+	
 	switch( geo->mode & 3 )
 	{
 		/* Normals present, No Specular */
