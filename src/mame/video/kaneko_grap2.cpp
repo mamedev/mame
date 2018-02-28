@@ -24,6 +24,7 @@ ADDRESS_MAP_START(kaneko_grap2_device::grap2_map)
 	AM_RANGE(0x000c10, 0x000c11) AM_READWRITE(framebuffer1_fbbright1_r, framebuffer1_fbbright1_w )
 	AM_RANGE(0x000c12, 0x000c13) AM_READWRITE(framebuffer1_fbbright2_r, framebuffer1_fbbright2_w )
 	AM_RANGE(0x000c18, 0x000c1b) AM_WRITE(regs1_address_w)
+	AM_RANGE(0x000c1c, 0x000c1d) AM_WRITE(brightreg_w)
 	AM_RANGE(0x000c1e, 0x000c1f) AM_WRITE(regs1_go_w)
 	AM_RANGE(0x000c00, 0x000c1f) AM_READ(regs1_r)
 	AM_RANGE(0x080000, 0x0801ff) AM_READWRITE( pal_r, framebuffer1_palette_w )
@@ -184,4 +185,30 @@ WRITE16_MEMBER(kaneko_grap2_device::framebuffer1_bgcol_w)
 {
 	COMBINE_DATA(&m_framebuffer_bgcol);
 	set_color_555(0x100, 5, 10, 0, m_framebuffer_bgcol);
+}
+
+uint16_t kaneko_grap2_device::pen_r(int pen)
+{
+	if ((m_brightreg & 0x1000) && (m_framebuffer_bright1 != 0xff))
+	{
+		uint32_t pal = m_palette->pens()[pen];
+		int r,g,b;
+		r = (pal & 0x00ff0000)>>16;
+		g = (pal & 0x0000ff00)>>8;
+		b = (pal & 0x000000ff)>>0;
+
+		r = (r * m_framebuffer_bright1) / 0xff;
+		g = (g * m_framebuffer_bright1) / 0xff;
+		b = (b * m_framebuffer_bright1) / 0xff;
+
+		pal = (r & 0x000000ff)<<16;
+		pal |=(g & 0x000000ff)<<8;
+		pal |=(b & 0x000000ff)<<0;
+
+		return pal;
+	}
+	else
+	{
+		return m_palette->pens()[pen];
+	}
 }
