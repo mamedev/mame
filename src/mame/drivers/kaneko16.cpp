@@ -160,15 +160,6 @@ WRITE16_MEMBER(kaneko16_state::kaneko16_coin_lockout_w)
 
 ***************************************************************************/
 
-WRITE16_MEMBER(kaneko16_state::kaneko16_soundlatch_w)
-{
-	if (ACCESSING_BITS_8_15)
-	{
-		m_soundlatch->write(space, 0, (data & 0xff00) >> 8 );
-		m_audiocpu->set_input_line(INPUT_LINE_NMI, PULSE_LINE);
-	}
-}
-
 /* Two identically mapped YM2149 chips */
 template<int Chip>
 READ16_MEMBER(kaneko16_state::kaneko16_ay_YM2149_r)
@@ -193,14 +184,14 @@ template<int Mask>
 WRITE8_MEMBER(kaneko16_state::oki_bank0_w)
 {
 	m_okibank[0]->set_entry(data & Mask);
-//	logerror("%s:Selecting OKI bank %02X\n",machine().describe_context(),data&0xff);
+//	logerror("%s:Selecting OKI1 bank %02X\n",machine().describe_context(),data&0xff);
 }
 
 template<int Mask>
 WRITE8_MEMBER(kaneko16_state::oki_bank1_w)
 {
 	m_okibank[1]->set_entry(data & Mask);
-//	logerror("%s:Selecting OKI bank %02X\n",machine().describe_context(),data&0xff);
+//	logerror("%s:Selecting OKI2 bank %02X\n",machine().describe_context(),data&0xff);
 }
 
 /***************************************************************************
@@ -379,7 +370,8 @@ ADDRESS_MAP_START(kaneko16_state::blazeon)
 	AM_RANGE(0xc00004, 0xc00005) AM_READ_PORT("UNK")
 	AM_RANGE(0xc00006, 0xc00007) AM_READ_PORT("SYSTEM")
 	AM_RANGE(0xd00000, 0xd00001) AM_WRITE(kaneko16_coin_lockout_w)  // Coin Lockout
-	AM_RANGE(0xe00000, 0xe00001) AM_READNOP AM_WRITE(kaneko16_soundlatch_w) // Read = IRQ Ack ?
+	AM_RANGE(0xe00000, 0xe00001) AM_READNOP // Read = IRQ Ack ?
+	AM_RANGE(0xe00000, 0xe00001) AM_DEVWRITE8("soundlatch", generic_latch_8_device, write, 0xff00)
 	AM_RANGE(0xe40000, 0xe40001) AM_READNOP // IRQ Ack ?
 //  AM_RANGE(0xe80000, 0xe80001) AM_READNOP // IRQ Ack ?
 	AM_RANGE(0xec0000, 0xec0001) AM_READNOP // Lev 4 IRQ Ack ?
@@ -1829,7 +1821,7 @@ MACHINE_CONFIG_END
                             Bakuretsu Breaker
 ***************************************************************************/
 
-static ADDRESS_MAP_START( bakubrkr_oki1_map, 0, 8, kaneko16_state )
+ADDRESS_MAP_START(kaneko16_state::bakubrkr_oki1_map)
 	AM_RANGE(0x00000, 0x1ffff) AM_ROM
 	AM_RANGE(0x20000, 0x3ffff) AM_ROMBANK("okibank1")
 ADDRESS_MAP_END
@@ -1953,6 +1945,7 @@ MACHINE_CONFIG_START(kaneko16_state::blazeon)
 	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
 
 	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
+	MCFG_GENERIC_LATCH_DATA_PENDING_CB(INPUTLINE("audiocpu", INPUT_LINE_NMI))
 
 	MCFG_YM2151_ADD("ymsnd", 4000000)
 	MCFG_SOUND_ROUTE(0, "lspeaker", 1.0)
@@ -2007,6 +2000,7 @@ MACHINE_CONFIG_START(kaneko16_state::wingforc)
 	MCFG_SPEAKER_STANDARD_MONO("mono")
 
 	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
+	MCFG_GENERIC_LATCH_DATA_PENDING_CB(INPUTLINE("audiocpu", INPUT_LINE_NMI))
 
 	MCFG_YM2151_ADD("ymsnd", XTAL(16'000'000)/4)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.4)

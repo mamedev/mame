@@ -63,7 +63,6 @@ public:
 	
 	void kaneko16_common_oki_bank_install(int bankno, size_t fixedsize, size_t bankedsize);
 	DECLARE_WRITE16_MEMBER(kaneko16_coin_lockout_w);
-	DECLARE_WRITE16_MEMBER(kaneko16_soundlatch_w);
 	DECLARE_WRITE16_MEMBER(kaneko16_eeprom_w);
 
 	DECLARE_WRITE16_MEMBER(kaneko16_display_enable);
@@ -99,6 +98,7 @@ public:
 	void blazeon(machine_config &config);
 	void mgcrystl(machine_config &config);
 	void bakubrkr(address_map &map);
+	void bakubrkr_oki1_map(address_map &map);
 	void blazeon(address_map &map);
 	void blazeon_soundmem(address_map &map);
 	void blazeon_soundport(address_map &map);
