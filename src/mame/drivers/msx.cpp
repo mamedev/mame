@@ -1338,7 +1338,7 @@ MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(msx_state::msx2_64kb_vram)
 	MCFG_DEVICE_MODIFY("v9938")
-	v9938_device::static_set_vram_size(*device, 0x10000);
+	downcast<v99x8_device &>(*device).set_vram_size(0x10000);
 MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(msx_state::msx)

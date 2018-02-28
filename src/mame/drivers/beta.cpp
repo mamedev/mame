@@ -52,35 +52,39 @@
 class beta_state : public driver_device
 {
 public:
-	beta_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag),
+	beta_state(const machine_config &mconfig, device_type type, const char *tag) :
+		driver_device(mconfig, type, tag),
 		m_maincpu(*this, M6502_TAG),
 		m_speaker(*this, "speaker"),
 		m_eprom(*this, EPROM_TAG),
-		m_q6(*this, "Q6"),
-		m_q7(*this, "Q7"),
-		m_q8(*this, "Q8"),
-		m_q9(*this, "Q9")
+		m_q(*this, "Q%u", 6U),
+		m_digit(*this, "digit%u", 0U)
 	{ }
 
-	required_device<cpu_device> m_maincpu;
-	required_device<speaker_sound_device> m_speaker;
-	required_device<generic_slot_device> m_eprom;
-	required_ioport m_q6;
-	required_ioport m_q7;
-	required_ioport m_q8;
-	required_ioport m_q9;
+	DECLARE_INPUT_CHANGED_MEMBER( trigger_reset );
+	void beta(machine_config &config);
 
+protected:
 	virtual void machine_start() override;
 
 	DECLARE_READ8_MEMBER( riot_pa_r );
 	DECLARE_WRITE8_MEMBER( riot_pa_w );
 	DECLARE_READ8_MEMBER( riot_pb_r );
 	DECLARE_WRITE8_MEMBER( riot_pb_w );
-	DECLARE_INPUT_CHANGED_MEMBER( trigger_reset );
 
 	DECLARE_DEVICE_IMAGE_LOAD_MEMBER( beta_eprom );
 	DECLARE_DEVICE_IMAGE_UNLOAD_MEMBER( beta_eprom );
+
+	TIMER_CALLBACK_MEMBER(led_refresh);
+
+	void beta_mem(address_map &map);
+
+private:
+	required_device<cpu_device> m_maincpu;
+	required_device<speaker_sound_device> m_speaker;
+	required_device<generic_slot_device> m_eprom;
+	required_ioport_array<4> m_q;
+	output_finder<6> m_digit;
 
 	/* EPROM state */
 	int m_eprom_oe;
@@ -95,9 +99,6 @@ public:
 	uint8_t m_segment;
 
 	emu_timer *m_led_refresh_timer;
-	TIMER_CALLBACK_MEMBER(led_refresh);
-	void beta(machine_config &config);
-	void beta_mem(address_map &map);
 };
 
 
@@ -158,9 +159,7 @@ INPUT_PORTS_END
 TIMER_CALLBACK_MEMBER(beta_state::led_refresh)
 {
 	if (m_ls145_p < 6)
-	{
-		output().set_digit_value(m_ls145_p, m_segment);
-	}
+		m_digit[m_ls145_p] = m_segment;
 }
 
 READ8_MEMBER( beta_state::riot_pa_r )
@@ -184,10 +183,12 @@ READ8_MEMBER( beta_state::riot_pa_r )
 
 	switch (m_ls145_p)
 	{
-	case 6: data &= m_q6->read(); break;
-	case 7: data &= m_q7->read(); break;
-	case 8: data &= m_q8->read(); break;
-	case 9: data &= m_q9->read(); break;
+	case 6:
+	case 7:
+	case 8:
+	case 9:
+		data &= m_q[m_ls145_p - 6]->read();
+		break;
 	default:
 		if (!m_eprom_oe && !m_eprom_ce)
 		{
@@ -312,6 +313,8 @@ DEVICE_IMAGE_UNLOAD_MEMBER( beta_state, beta_eprom )
 
 void beta_state::machine_start()
 {
+	m_digit.resolve();
+
 	m_led_refresh_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(beta_state::led_refresh),this));
 
 	m_eprom_rom.resize(0x800);

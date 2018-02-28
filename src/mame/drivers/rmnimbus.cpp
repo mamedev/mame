@@ -97,7 +97,6 @@ ADDRESS_MAP_END
 ADDRESS_MAP_START(rmnimbus_state::nimbus_iocpu_io)
 	ADDRESS_MAP_UNMAP_HIGH
 	AM_RANGE(0x00000, 0x000FF) AM_READWRITE(nimbus_pc8031_iou_r, nimbus_pc8031_iou_w)
-	AM_RANGE(0x20000, 0x20004) AM_READWRITE(nimbus_pc8031_port_r, nimbus_pc8031_port_w)
 ADDRESS_MAP_END
 
 MACHINE_CONFIG_START(rmnimbus_state::nimbus)
@@ -112,6 +111,10 @@ MACHINE_CONFIG_START(rmnimbus_state::nimbus)
 	MCFG_CPU_ADD(IOCPU_TAG, I8031, 11059200)
 	MCFG_CPU_PROGRAM_MAP(nimbus_iocpu_mem)
 	MCFG_CPU_IO_MAP(nimbus_iocpu_io)
+	MCFG_MCS51_PORT_P1_IN_CB(READ8(rmnimbus_state, nimbus_pc8031_port1_r))
+	MCFG_MCS51_PORT_P1_OUT_CB(WRITE8(rmnimbus_state, nimbus_pc8031_port1_w))
+	MCFG_MCS51_PORT_P3_IN_CB(READ8(rmnimbus_state, nimbus_pc8031_port3_r))
+	MCFG_MCS51_PORT_P3_OUT_CB(WRITE8(rmnimbus_state, nimbus_pc8031_port3_w))
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)

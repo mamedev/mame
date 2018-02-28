@@ -565,11 +565,6 @@ void v99x8_device::register_w(uint8_t data)
 		m_cont_reg[17] = (m_cont_reg[17] + 1) & 0x3f;
 }
 
-void v99x8_device::static_set_vram_size(device_t &device, uint32_t vram_size)
-{
-	downcast<v99x8_device &>(device).m_vram_size = vram_size;
-}
-
 /***************************************************************************
 
     Init/stop/reset/Interrupt functions

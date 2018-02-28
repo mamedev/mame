@@ -125,11 +125,6 @@ ADDRESS_MAP_START(mephisto_pinball_state::mephisto_8051_io)
 	AM_RANGE(0x0000, 0x07ff) AM_RAM
 	AM_RANGE(0x0800, 0x0800) AM_WRITE(sound_rombank_w)
 	AM_RANGE(0x1000, 0x1000) AM_DEVWRITE("dac", dac08_device, write)
-	AM_RANGE(MCS51_PORT_P0, MCS51_PORT_P0) AM_NOP // AD0-AD7
-	AM_RANGE(MCS51_PORT_P1, MCS51_PORT_P1) AM_READWRITE(ay8910_read, ay8910_write)
-	AM_RANGE(MCS51_PORT_P2, MCS51_PORT_P2) AM_WRITENOP // A8-A15
-	AM_RANGE(MCS51_PORT_P3, MCS51_PORT_P3) AM_WRITE(t0_t1_w)
-	AM_RANGE(MCS51_PORT_TX, MCS51_PORT_TX) AM_READNOP // from MUART
 ADDRESS_MAP_END
 
 #ifdef UNUSED_DEFINITION
@@ -178,8 +173,11 @@ MACHINE_CONFIG_START(mephisto_pinball_state::mephisto)
 	//MCFG_I8155_OUT_TIMEROUT_CB(WRITELINE(mephisto_pinball_state, clk_shift_w))
 
 	MCFG_CPU_ADD("soundcpu", I8051, XTAL(12'000'000))
-	MCFG_CPU_PROGRAM_MAP(mephisto_8051_map)
-	MCFG_CPU_IO_MAP(mephisto_8051_io)
+	MCFG_CPU_PROGRAM_MAP(mephisto_8051_map) // EA tied high for external program ROM
+	MCFG_MCS51_PORT_P1_IN_CB(READ8(mephisto_pinball_state, ay8910_read))
+	MCFG_MCS51_PORT_P1_OUT_CB(WRITE8(mephisto_pinball_state, ay8910_write))
+	MCFG_MCS51_PORT_P3_OUT_CB(WRITE8(mephisto_pinball_state, t0_t1_w))
+	MCFG_MCS51_SERIAL_RX_CB(NOOP) // from MUART
 
 	MCFG_SPEAKER_STANDARD_MONO("mono")
 

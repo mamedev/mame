@@ -397,22 +397,15 @@ READ8_MEMBER(m72_state::mcu_snd_r)
 	return m_mcu_snd_cmd_latch;
 }
 
-READ8_MEMBER(m72_state::mcu_port_r)
+WRITE8_MEMBER(m72_state::mcu_port1_w)
 {
-	logerror("port read: %02x\n", offset);
-	return 0;
+	m_mcu_sample_latch = data;
+	m_soundcpu->set_input_line(INPUT_LINE_NMI, PULSE_LINE);
 }
 
-WRITE8_MEMBER(m72_state::mcu_port_w)
+WRITE8_MEMBER(m72_state::mcu_port3_w)
 {
-	if (offset == 1)
-	{
-		m_mcu_sample_latch = data;
-		m_soundcpu->set_input_line(INPUT_LINE_NMI, PULSE_LINE);
-	}
-	else
-		logerror("port: %02x %02x\n", offset, data);
-
+	logerror("port3: %02x\n", data);
 }
 
 WRITE8_MEMBER(m72_state::mcu_low_w)
@@ -1121,9 +1114,6 @@ ADDRESS_MAP_START(m72_state::mcu_io_map)
 	AM_RANGE(0x0002, 0x0002) AM_READWRITE(mcu_snd_r, mcu_ack_w)
 	/* shared at b0000 - b0fff on the main cpu */
 	AM_RANGE(0xc000, 0xcfff) AM_READWRITE(mcu_data_r,mcu_data_w )
-
-	/* Ports */
-	AM_RANGE(MCS51_PORT_P0, MCS51_PORT_P3) AM_READWRITE(mcu_port_r, mcu_port_w)
 ADDRESS_MAP_END
 
 #define COIN_MODE_1 \
@@ -1904,6 +1894,8 @@ MACHINE_CONFIG_START(m72_state::m72_8751)
 
 	MCFG_CPU_ADD("mcu",I8751, XTAL(8'000'000)) /* Uses its own XTAL */
 	MCFG_CPU_IO_MAP(mcu_io_map)
+	MCFG_MCS51_PORT_P1_OUT_CB(WRITE8(m72_state, mcu_port1_w))
+	MCFG_MCS51_PORT_P3_OUT_CB(WRITE8(m72_state, mcu_port3_w))
 	MCFG_CPU_VBLANK_INT_DRIVER("screen", m72_state,  mcu_int)
 MACHINE_CONFIG_END
 

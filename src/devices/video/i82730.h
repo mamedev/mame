@@ -21,13 +21,13 @@
 
 #define MCFG_I82730_ADD(_tag, _cpu_tag, _clock) \
 	MCFG_DEVICE_ADD(_tag, I82730, _clock) \
-	i82730_device::set_cpu_tag(*device, this, _cpu_tag);
+	downcast<i82730_device &>(*device).set_cpu_tag(_cpu_tag);
 
 #define MCFG_I82730_SINT_HANDLER(_devcb) \
-	devcb = &i82730_device::set_sint_handler(*device, DEVCB_##_devcb);
+	devcb = &downcast<i82730_device &>(*device).set_sint_handler(DEVCB_##_devcb);
 
 #define MCFG_I82730_UPDATE_ROW_CB(_class, _method) \
-	i82730_device::set_update_row_callback(*device, i82730_device::update_row_delegate(&_class::_method, #_class "::" #_method, this));
+	downcast<i82730_device &>(*device).set_update_row_callback(i82730_device::update_row_delegate(&_class::_method, #_class "::" #_method, this));
 
 
 //**************************************************************************
@@ -49,12 +49,11 @@ public:
 	i82730_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
 	// callbacks
-	template <class Object> static devcb_base &set_sint_handler(device_t &device, Object &&cb)
-	{ return downcast<i82730_device &>(device).m_sint_handler.set_callback(std::forward<Object>(cb)); }
+	template <class Object> devcb_base &set_sint_handler(Object &&cb) { return m_sint_handler.set_callback(std::forward<Object>(cb)); }
 
 	// inline configuration
-	static void set_cpu_tag(device_t &device, device_t *owner, const char *tag);
-	static void set_update_row_callback(device_t &device, update_row_delegate &&cb) { downcast<i82730_device &>(device).m_update_row_cb = std::move(cb); }
+	void set_cpu_tag(const char *tag) { m_cpu_tag = tag; }
+	template <typename Object> void set_update_row_callback(Object &&cb) { m_update_row_cb = std::forward<Object>(cb); }
 
 	uint32_t screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 

@@ -57,7 +57,6 @@ ADDRESS_MAP_END
 ADDRESS_MAP_START(tecnbras_state::i80c31_io)
 	AM_RANGE(0x0100+DMD_OFFSET, 0x0145+DMD_OFFSET) AM_WRITE(set_x_position_w)
 	AM_RANGE(0x06B8, 0x06BC) AM_WRITE(print_column_w)
-	AM_RANGE(MCS51_PORT_P1, MCS51_PORT_P1) AM_NOP /*buzzer ?*/
 ADDRESS_MAP_END
 
 DRIVER_INIT_MEMBER( tecnbras_state, tecnbras )
@@ -107,6 +106,7 @@ MACHINE_CONFIG_START(tecnbras_state::tecnbras)
 	MCFG_CPU_ADD("maincpu", I80C31, XTAL(12'000'000)) /* verified on pcb */
 	MCFG_CPU_PROGRAM_MAP(i80c31_prg)
 	MCFG_CPU_IO_MAP(i80c31_io)
+	MCFG_MCS51_PORT_P1_OUT_CB(NOOP) // buzzer ?
 
 /* TODO: Add an I2C RTC (Phillips PCF8583P)
    pin 6 (SCL): cpu T0/P3.4 (pin 14)

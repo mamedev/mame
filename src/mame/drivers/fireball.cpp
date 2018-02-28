@@ -304,10 +304,6 @@ ADDRESS_MAP_START(fireball_state::fireball_io_map)
 	AM_RANGE(0x04, 0x05)AM_READWRITE(io_04_r,io_04_w)
 	AM_RANGE(0x06, 0x07)AM_READWRITE(io_06_r,io_06_w)
 
-	//internal port
-	AM_RANGE(MCS51_PORT_P1, MCS51_PORT_P1) AM_READWRITE(p1_r, p1_w)
-	AM_RANGE(MCS51_PORT_P3, MCS51_PORT_P3) AM_READWRITE(p3_r, p3_w)
-
 ADDRESS_MAP_END
 
 
@@ -501,6 +497,10 @@ MACHINE_CONFIG_START(fireball_state::fireball)
 	MCFG_CPU_ADD("maincpu", I8031, CPU_CLK) //
 	MCFG_CPU_PROGRAM_MAP(fireball_map)
 	MCFG_CPU_IO_MAP(fireball_io_map)
+	MCFG_MCS51_PORT_P1_IN_CB(READ8(fireball_state, p1_r))
+	MCFG_MCS51_PORT_P1_OUT_CB(WRITE8(fireball_state, p1_w))
+	MCFG_MCS51_PORT_P3_IN_CB(READ8(fireball_state, p3_r))
+	MCFG_MCS51_PORT_P3_OUT_CB(WRITE8(fireball_state, p3_w))
 	MCFG_TIMER_DRIVER_ADD_PERIODIC("int_0", fireball_state, int_0, attotime::from_hz(555))  //9ms from scope reading 111Hz take care of this in the handler
 
 	MCFG_EEPROM_SERIAL_X24C44_ADD("eeprom")

@@ -1131,24 +1131,6 @@ ADDRESS_MAP_START(nmk16_state::bjtwin_map)
 	AM_RANGE(0x0f0000, 0x0fffff) AM_RAM AM_SHARE("mainram")
 ADDRESS_MAP_END
 
-ADDRESS_MAP_START(nmk16_state::atombjt_map)
-	AM_RANGE(0x000000, 0x03ffff) AM_ROM
-	AM_RANGE(0x080014, 0x080015) AM_NOP // always 1 in this bootleg. Flip-screen switch not present according to dip sheet.
-	AM_RANGE(0x088000, 0x0887ff) AM_RAM_DEVWRITE("palette", palette_device, write16) AM_SHARE("palette")
-	AM_RANGE(0x094000, 0x094001) AM_WRITE(nmk_tilebank_w)
-	AM_RANGE(0x094002, 0x094003) AM_WRITENOP    /* IRQ enable? */
-	AM_RANGE(0x09c000, 0x09cfff) AM_MIRROR(0x1000) AM_RAM_WRITE(nmk_bgvideoram_w<0>) AM_SHARE("nmk_bgvideoram0")
-	AM_RANGE(0x0c2010, 0x0c2011) AM_READ_PORT("IN0")
-	AM_RANGE(0x0c2012, 0x0c2013) AM_READ_PORT("IN1")
-	AM_RANGE(0x0c2014, 0x0c2015) AM_READ(atombjt_unkr_r)
-	AM_RANGE(0x0c2016, 0x0c2017) AM_READ_PORT("DSW1")
-	AM_RANGE(0x0c2018, 0x0c2019) AM_READ_PORT("DSW2")
-//  AM_RANGE(0x0c201c, 0x0c201d) // oki banking related?
-	AM_RANGE(0x0c201e, 0x0c201f) AM_DEVREADWRITE8("oki1", okim6295_device, read, write, 0x00ff)
-	AM_RANGE(0x0f0000, 0x0fffff) AM_RAM AM_SHARE("mainram")
-	AM_RANGE(0x100000, 0x101fff) AM_RAM
-ADDRESS_MAP_END
-
 static INPUT_PORTS_START( vandyke )
 	PORT_START("IN0")
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_COIN1 )
@@ -2957,20 +2939,6 @@ static INPUT_PORTS_START( bjtwin )
 	PORT_DIPSETTING(    0x00, DEF_STR( Free_Play ) )
 INPUT_PORTS_END
 
-static INPUT_PORTS_START( atombjt ) // verified with dip sheet
-	PORT_INCLUDE(bjtwin)
-
-	PORT_MODIFY("DSW1")
-	PORT_DIPNAME( 0x01, 0x00, DEF_STR( Unused ) )       PORT_DIPLOCATION("SW1:8")
-	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x01, DEF_STR( On ) )
-
-	PORT_MODIFY("DSW2")
-	PORT_DIPNAME( 0x01, 0x00, DEF_STR( Unused ) )       PORT_DIPLOCATION("SW2:8")
-	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x01, DEF_STR( On ) )
-INPUT_PORTS_END
-
 static INPUT_PORTS_START( nouryoku )
 	PORT_START("IN0")
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_COIN1 )
@@ -3761,36 +3729,6 @@ static GFXDECODE_START( strahl )
 	GFXDECODE_ENTRY( "bgtile", 0, tilelayout, 0x300, 16 ) /* color 0x300-0x3ff */
 	GFXDECODE_ENTRY( "sprites", 0, tilelayout, 0x100, 16 ) /* color 0x100-0x1ff */
 	GFXDECODE_ENTRY( "gfx4", 0, tilelayout, 0x200, 16 ) /* color 0x200-0x2ff */
-GFXDECODE_END
-
-
-
-static const gfx_layout atombjt_charlayout =
-{
-	8,8,
-	RGN_FRAC(1,1),
-	4,
-	{ 0,8,16,24},
-	{ 0,1,2,3,4,5,6,7 },
-	{ 0*32, 1*32, 2*32, 3*32, 4*32, 5*32, 6*32, 7*32 },
-	32*8
-};
-
-static const gfx_layout atombjt_tilelayout =
-{
-	16,16,
-	RGN_FRAC(1,1),
-	4,
-	{ 0,8,16,24},
-	{ 0,1,2,3,4,5,6,7, 512,513,514,515,516,517,518,519 },
-	{ 0*32, 1*32, 2*32, 3*32, 4*32, 5*32, 6*32, 7*32, 256+0*32, 256+1*32, 256+2*32, 256+3*32, 256+4*32, 256+5*32, 256+6*32, 256+7*32 },
-	128*8
-};
-
-static GFXDECODE_START( atombjt )
-	GFXDECODE_ENTRY( "fgtile", 0, atombjt_charlayout, 0x000, 16 ) /* color 0x000-0x0ff */
-	GFXDECODE_ENTRY( "bgtile", 0, atombjt_charlayout, 0x000, 16 ) /* color 0x000-0x0ff */
-	GFXDECODE_ENTRY( "sprites", 0, atombjt_tilelayout, 0x100, 16 ) /* color 0x100-0x1ff */
 GFXDECODE_END
 
 
@@ -4649,36 +4587,6 @@ MACHINE_CONFIG_START(nmk16_state::bjtwin)
 MACHINE_CONFIG_END
 
 
-
-MACHINE_CONFIG_START(nmk16_state::atombjt)
-
-	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", M68000, 10000000) /* there is a 28mhz crystal and a 10mhz crystal near the 12 rated CPU */
-	MCFG_CPU_PROGRAM_MAP(atombjt_map)
-	MCFG_CPU_VBLANK_INT_DRIVER("screen", nmk16_state,  irq6_line_hold) // recoded to use this irq
-
-	/* video hardware */
-	NMK_HACKY_SCREEN_HIRES
-	MCFG_SCREEN_UPDATE_DRIVER(nmk16_state, screen_update_bjtwin)
-
-
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", atombjt)
-	MCFG_PALETTE_ADD("palette", 1024)
-	MCFG_PALETTE_FORMAT(RRRRGGGGBBBBRGBx)
-
-	MCFG_VIDEO_START_OVERRIDE(nmk16_state,bjtwin)
-
-	// the bootleg just has a single OKI
-	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_MONO("mono")
-
-	MCFG_OKIM6295_ADD("oki1", 10000000/8, PIN7_LOW) // divider and pin not verified
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.20)
-	MCFG_DEVICE_ADDRESS_MAP(0, oki1_map)
-MACHINE_CONFIG_END
-
-
-
 TIMER_DEVICE_CALLBACK_MEMBER(nmk16_state::manybloc_scanline)
 {
 	int scanline = param;
@@ -4988,11 +4896,6 @@ DRIVER_INIT_MEMBER(nmk16_state,bjtwin)
 
 	DRIVER_INIT_CALL(nmk);
 
-}
-
-DRIVER_INIT_MEMBER(nmk16_state,atombjt)
-{
-	m_okibank[0]->configure_entries(0, 4, memregion("oki1")->base() + 0x20000, 0x20000);
 }
 
 /* NO NMK004, it has a PIC instead */
@@ -6852,34 +6755,6 @@ ROM_START( bjtwinpa )
 	ROM_LOAD( "bottom.ic27",    0x0c0000, 0x80000, CRC(6ebeb9e4) SHA1(b547b2fbcc0a35d6183dd4f19684b04839690a2b) )
 ROM_END
 
-ROM_START( atombjt ) // based off bjtwina set
-	ROM_REGION( 0x40000, "maincpu", 0 )  /* 68000 code */
-	ROM_LOAD16_BYTE( "22.u67",  0x00000, 0x20000, CRC(bead8c70) SHA1(2694bb0639f6b94119c21faf3810f00ef20b50da) )
-	ROM_LOAD16_BYTE( "21.u66",  0x00001, 0x20000, CRC(73e3d488) SHA1(7deed6e3aeda1902b75746a9b0a2737632425867) )
-
-	ROM_REGION( 0x200000, "gfxtemp", ROMREGION_ERASEFF ) // first half of these is the text tiles (repeated multiple times) second half the bgs
-	ROM_LOAD32_BYTE( "23.u36",  0x000003, 0x80000, CRC(a3fb6b91) SHA1(477f5722a6bb23f089f32b677efbf69e9dce4b74) )
-	ROM_LOAD32_BYTE( "24.u42",  0x000002, 0x80000, CRC(4c30e15f) SHA1(f92185743594e4e4573ac3f6c0c091802a08d5bd) )
-	ROM_LOAD32_BYTE( "25.u39",  0x000001, 0x80000, CRC(ff1af60f) SHA1(4fe626c9d59ab9b945535b2f796f13adc900f1ed) )
-	ROM_LOAD32_BYTE( "26.u45",  0x000000, 0x80000, CRC(6cc4e817) SHA1(70f2ab50e228a029d3157c94fe0a79e7aad010bd) )
-
-	ROM_REGION( 0x100000, "fgtile", 0 )
-	ROM_COPY( "gfxtemp", 0x000000, 0x00000, 0x100000 )
-
-	ROM_REGION( 0x100000, "bgtile", 0 )
-	ROM_COPY( "gfxtemp", 0x100000, 0x00000, 0x100000 )
-
-	ROM_REGION( 0x100000, "sprites", 0 )
-	ROM_LOAD32_BYTE( "27.u86",  0x000003, 0x40000, CRC(5a853e5c) SHA1(dfa4e891f716bbf8a038a14a24276cb690f65230) )
-	ROM_LOAD32_BYTE( "28.u85",  0x000002, 0x40000, CRC(41970bf6) SHA1(85b5677585dbdf96acabb59e6369d62d4c2f0e8e) )
-	ROM_LOAD32_BYTE( "29.u84",  0x000001, 0x40000, CRC(59a7d610) SHA1(0dc39c09f7f55dbd12ddb5e2e4ba9d86a2ba24d8) )
-	ROM_LOAD32_BYTE( "30.u83",  0x000000, 0x40000, CRC(9b2dfebd) SHA1(562ab22dc01a129e1b8c201665bbab0561254c2a) )
-
-	ROM_REGION( 0x80000, "oki1", 0 ) /* OKIM6295 samples */
-	ROM_LOAD( "20.u16",    0x00000, 0x80000, CRC(71c74ff9) SHA1(3c22fb2976ab332e9bb1e208432ca985f274adac) )
-ROM_END
-
-
 ROM_START( nouryoku )
 	ROM_REGION( 0x80000, "maincpu", 0 )     /* 68000 code */
 	ROM_LOAD16_BYTE( "ic76.1",  0x00000, 0x40000, CRC(26075988) SHA1(c3d0eef0417be3f78008c026915fd7e2fd589563) )
@@ -8086,7 +7961,6 @@ GAME( 1993, bjtwin,   0,        bjtwin,   bjtwin,   nmk16_state, bjtwin,   ROT27
 GAME( 1993, bjtwina,  bjtwin,   bjtwin,   bjtwin,   nmk16_state, bjtwin,   ROT270, "NMK",                          "Bombjack Twin (set 2)", MACHINE_NO_COCKTAIL )
 GAME( 1993, bjtwinp,  bjtwin,   bjtwin,   bjtwin,   nmk16_state, 0,        ROT270, "NMK",                          "Bombjack Twin (prototype? with adult pictures, set 1)", MACHINE_NO_COCKTAIL ) // Cheap looking PCB, but Genuine NMK PCB, GFX aren't encrypted (maybe Korean version not proto?)
 GAME( 1993, bjtwinpa, bjtwin,   bjtwin,   bjtwin,   nmk16_state, bjtwin,   ROT270, "NMK",                          "Bombjack Twin (prototype? with adult pictures, set 2)", MACHINE_NO_COCKTAIL ) // same PCB as above, different program revision, GFX are encrypted
-GAME( 1993, atombjt,  bjtwin,   atombjt,  atombjt,  nmk16_state, atombjt,  ROT270, "bootleg (Kyon K.)",            "Atom (bootleg of Bombjack Twin)", MACHINE_NO_COCKTAIL | MACHINE_IMPERFECT_SOUND | MACHINE_NOT_WORKING ) // some non-trivial mods to the gfx and sound hw (playmark hardware?)
 
 
 GAME( 1995, nouryoku, 0,        bjtwin,   nouryoku, nmk16_state, nmk,      ROT0,   "Tecmo",                        "Nouryoku Koujou Iinkai", MACHINE_NO_COCKTAIL )

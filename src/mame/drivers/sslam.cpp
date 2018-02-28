@@ -462,11 +462,6 @@ WRITE8_MEMBER(sslam_state::playmark_snd_control_w)
 //   (data & 0x40) -> always set
 }
 
-ADDRESS_MAP_START(sslam_state::sound_io_map)
-	AM_RANGE(MCS51_PORT_P1, MCS51_PORT_P1) AM_WRITE(playmark_snd_control_w)
-	AM_RANGE(MCS51_PORT_P3, MCS51_PORT_P3) AM_READWRITE(playmark_snd_command_r, playmark_oki_w)
-ADDRESS_MAP_END
-
 /* Input Ports */
 
 static INPUT_PORTS_START( sslam )
@@ -734,7 +729,9 @@ MACHINE_CONFIG_START(sslam_state::powerbls)
 	MCFG_CPU_VBLANK_INT_DRIVER("screen", sslam_state,  irq2_line_hold)
 
 	MCFG_CPU_ADD("audiocpu", I80C51, 12000000)      /* 83C751 */
-	MCFG_CPU_IO_MAP(sound_io_map)
+	MCFG_MCS51_PORT_P1_OUT_CB(WRITE8(sslam_state, playmark_snd_control_w))
+	MCFG_MCS51_PORT_P3_IN_CB(READ8(sslam_state, playmark_snd_command_r))
+	MCFG_MCS51_PORT_P3_OUT_CB(WRITE8(sslam_state, playmark_oki_w))
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)

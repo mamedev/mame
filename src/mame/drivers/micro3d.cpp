@@ -285,7 +285,6 @@ ADDRESS_MAP_START(micro3d_state::soundmem_io)
 	AM_RANGE(0xfe00, 0xfe00) AM_WRITE(micro3d_upd7759_w)
 	AM_RANGE(0xff00, 0xff00) AM_WRITE(micro3d_snd_dac_a)
 	AM_RANGE(0xff01, 0xff01) AM_WRITE(micro3d_snd_dac_b)
-	AM_RANGE(MCS51_PORT_P0, MCS51_PORT_P3) AM_READWRITE(micro3d_sound_io_r, micro3d_sound_io_w)
 ADDRESS_MAP_END
 
 
@@ -324,6 +323,10 @@ MACHINE_CONFIG_START(micro3d_state::micro3d)
 	MCFG_CPU_ADD("audiocpu", I8051, XTAL(11'059'200))
 	MCFG_CPU_PROGRAM_MAP(soundmem_prg)
 	MCFG_CPU_IO_MAP(soundmem_io)
+	MCFG_MCS51_PORT_P1_IN_CB(READ8(micro3d_state, micro3d_sound_p1_r))
+	MCFG_MCS51_PORT_P1_OUT_CB(WRITE8(micro3d_state, micro3d_sound_p1_w))
+	MCFG_MCS51_PORT_P3_IN_CB(READ8(micro3d_state, micro3d_sound_p3_r))
+	MCFG_MCS51_PORT_P3_OUT_CB(WRITE8(micro3d_state, micro3d_sound_p3_w))
 	MCFG_MCS51_SERIAL_TX_CB(WRITE8(micro3d_state, data_from_i8031))
 	MCFG_MCS51_SERIAL_RX_CB(READ8(micro3d_state, data_to_i8031))
 

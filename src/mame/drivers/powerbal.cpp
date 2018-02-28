@@ -32,27 +32,34 @@ public:
 		: playmark_state(mconfig, type, tag)
 	{ }
 
-	/* powerbal-specific */
+	DECLARE_DRIVER_INIT(powerbal);
+	DECLARE_DRIVER_INIT(magicstk);
+
+	void magicstk(machine_config &config);
+	void powerbal(machine_config &config);
+	void atombjt(machine_config &config);
+
+
+private:
 	int         m_tilebank;
 	int         m_bg_yoffset;
 
-	DECLARE_DRIVER_INIT(powerbal);
-	DECLARE_DRIVER_INIT(magicstk);
 	TILE_GET_INFO_MEMBER(powerbal_get_bg_tile_info);
 	DECLARE_MACHINE_START(powerbal);
 	DECLARE_MACHINE_RESET(powerbal);
 	DECLARE_VIDEO_START(powerbal);
+	DECLARE_VIDEO_START(atombjt);
 	uint32_t screen_update_powerbal(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	void draw_sprites_powerbal( bitmap_ind16 &bitmap, const rectangle &cliprect );
 	DECLARE_WRITE16_MEMBER(magicstk_coin_eeprom_w);
 	DECLARE_WRITE16_MEMBER(magicstk_bgvideoram_w);
 	DECLARE_WRITE16_MEMBER(tile_banking_w);
+	DECLARE_WRITE16_MEMBER(atombjt_tile_banking_w);
 	DECLARE_WRITE16_MEMBER(oki_banking);
-	void magicstk(machine_config &config);
-	void powerbal(machine_config &config);
 	void magicstk_main_map(address_map &map);
 	void oki_map(address_map &map);
 	void powerbal_main_map(address_map &map);
+	void atombjt_map(address_map &map);
 };
 
 
@@ -79,6 +86,15 @@ WRITE16_MEMBER(powerbal_state::tile_banking_w)
 	if (((data >> 12) & 0x0f) != m_tilebank)
 	{
 		m_tilebank = (data >> 12) & 0x0f;
+		m_bg_tilemap->mark_all_dirty();
+	}
+}
+
+WRITE16_MEMBER(powerbal_state::atombjt_tile_banking_w)
+{
+	if ((data & 0x0f) != m_tilebank)
+	{
+		m_tilebank = data & 0x0f;
 		m_bg_tilemap->mark_all_dirty();
 	}
 }
@@ -128,6 +144,27 @@ ADDRESS_MAP_START(powerbal_state::powerbal_main_map)
 	AM_RANGE(0x101000, 0x101fff) AM_RAM AM_SHARE("spriteram")
 	AM_RANGE(0x102000, 0x10200d) AM_WRITENOP // not used scroll regs?
 	AM_RANGE(0x103000, 0x103fff) AM_RAM
+ADDRESS_MAP_END
+
+ADDRESS_MAP_START(powerbal_state::atombjt_map)
+	AM_RANGE(0x000000, 0x03ffff) AM_ROM
+	AM_RANGE(0x080008, 0x080009) AM_READNOP // remnant of the original?
+	AM_RANGE(0x080014, 0x080015) AM_NOP // always 1 in this bootleg. Flip-screen switch not present according to dip sheet.
+	AM_RANGE(0x088000, 0x0883ff) AM_RAM_DEVWRITE("palette", palette_device, write16) AM_SHARE("palette")
+	AM_RANGE(0x094000, 0x094001) AM_WRITE(atombjt_tile_banking_w)
+	AM_RANGE(0x094002, 0x094003) AM_NOP    /* IRQ enable? */
+	AM_RANGE(0x09c000, 0x09cfff) AM_MIRROR(0x1000) AM_RAM_WRITE(magicstk_bgvideoram_w) AM_SHARE("videoram1")
+	AM_RANGE(0x0c2010, 0x0c2011) AM_READ_PORT("IN0")
+	AM_RANGE(0x0c2012, 0x0c2013) AM_READ_PORT("IN1")
+	AM_RANGE(0x0c2014, 0x0c2015) AM_READ_PORT("IN2")
+	AM_RANGE(0x0c2016, 0x0c2017) AM_READ_PORT("DSW1")
+	AM_RANGE(0x0c2018, 0x0c2019) AM_READ_PORT("DSW2")
+	AM_RANGE(0x0c201c, 0x0c201d) AM_WRITE(oki_banking)
+	AM_RANGE(0x0c201e, 0x0c201f) AM_DEVREADWRITE8("oki", okim6295_device, read, write, 0x00ff)
+	AM_RANGE(0x0c4000, 0x0c4001) AM_WRITENOP // always 0?
+	AM_RANGE(0x0f0000, 0x0fffff) AM_RAM AM_SHARE("mainram")
+	AM_RANGE(0x100000, 0x100fff) AM_RAM
+	AM_RANGE(0x101000, 0x101fff) AM_RAM AM_SHARE("spriteram")
 ADDRESS_MAP_END
 
 ADDRESS_MAP_START(powerbal_state::oki_map)
@@ -394,6 +431,89 @@ static INPUT_PORTS_START( hotminda )
 	PORT_DIPSETTING(    0xe0, "Easy 9" )
 INPUT_PORTS_END
 
+static INPUT_PORTS_START( atombjt ) // verified with dip sheet
+	PORT_START("IN0")
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_COIN1 )
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_COIN2 )
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_SERVICE1 )
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_START1 )
+	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_START2 )
+	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_UNKNOWN )    /* shown in service mode, but no effect */
+	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_UNKNOWN )    /* Maybe unused */
+	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_UNKNOWN )    /* Maybe unused */
+
+	PORT_START("IN1")
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_JOYSTICK_RIGHT ) PORT_8WAY PORT_PLAYER(1)
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_JOYSTICK_LEFT ) PORT_8WAY PORT_PLAYER(1)
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_JOYSTICK_DOWN ) PORT_8WAY PORT_PLAYER(1)
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_JOYSTICK_UP ) PORT_8WAY PORT_PLAYER(1)
+	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_PLAYER(1)
+	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_BUTTON2 ) PORT_PLAYER(1)
+	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_UNKNOWN )
+
+	PORT_START("IN2")
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_JOYSTICK_RIGHT ) PORT_8WAY PORT_PLAYER(2)
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_JOYSTICK_LEFT ) PORT_8WAY PORT_PLAYER(2)
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_JOYSTICK_DOWN ) PORT_8WAY PORT_PLAYER(2)
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_JOYSTICK_UP ) PORT_8WAY PORT_PLAYER(2)
+	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_PLAYER(2)
+	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_BUTTON2 ) PORT_PLAYER(2)
+	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_UNKNOWN )
+
+	PORT_START("DSW1")
+	PORT_DIPNAME( 0x01, 0x00, DEF_STR( Unused ) )       PORT_DIPLOCATION("SW1:8")
+	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x01, DEF_STR( On ) )
+	PORT_DIPNAME( 0x0e, 0x0e, "Starting level" )        PORT_DIPLOCATION("SW1:7,6,5")
+	PORT_DIPSETTING(    0x08, "Germany" )
+	PORT_DIPSETTING(    0x04, "Thailand" )
+	PORT_DIPSETTING(    0x0c, "Nevada" )
+	PORT_DIPSETTING(    0x0e, DEF_STR( Japan ) )
+	PORT_DIPSETTING(    0x06, DEF_STR( Korea ) )
+	PORT_DIPSETTING(    0x0a, "England" )
+	PORT_DIPSETTING(    0x02, DEF_STR( Hong_Kong ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( China ) )
+	PORT_DIPNAME( 0x30, 0x30, DEF_STR( Difficulty ) )   PORT_DIPLOCATION("SW1:4,3")
+	PORT_DIPSETTING(    0x20, DEF_STR( Easy ) )
+	PORT_DIPSETTING(    0x30, DEF_STR( Normal ) )
+	PORT_DIPSETTING(    0x10, DEF_STR( Hard ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( Hardest ) )
+	PORT_DIPNAME( 0xc0, 0xc0, DEF_STR( Lives ) )        PORT_DIPLOCATION("SW1:2,1")
+	PORT_DIPSETTING(    0x00, "1" )
+	PORT_DIPSETTING(    0x40, "2" )
+	PORT_DIPSETTING(    0xc0, "3" )
+	PORT_DIPSETTING(    0x80, "4" )
+
+	PORT_START("DSW2")
+	PORT_DIPNAME( 0x01, 0x00, DEF_STR( Unused ) )       PORT_DIPLOCATION("SW2:8")
+	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x01, DEF_STR( On ) )
+	PORT_DIPNAME( 0x02, 0x02, DEF_STR( Demo_Sounds ) )  PORT_DIPLOCATION("SW2:7")
+	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x02, DEF_STR( On ) )
+	PORT_DIPNAME( 0x1c, 0x1c, DEF_STR( Coin_B ) )       PORT_DIPLOCATION("SW2:6,5,4")
+	PORT_DIPSETTING(    0x10, DEF_STR( 4C_1C ) )
+	PORT_DIPSETTING(    0x08, DEF_STR( 3C_1C ) )
+	PORT_DIPSETTING(    0x18, DEF_STR( 2C_1C ) )
+	PORT_DIPSETTING(    0x1c, DEF_STR( 1C_1C ) )
+	PORT_DIPSETTING(    0x0c, DEF_STR( 1C_2C ) )
+	PORT_DIPSETTING(    0x14, DEF_STR( 1C_3C ) )
+	PORT_DIPSETTING(    0x04, DEF_STR( 1C_4C ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( Free_Play ) )
+	PORT_DIPNAME( 0xe0, 0xe0, DEF_STR( Coin_A ) )       PORT_DIPLOCATION("SW2:3,2,1")
+	PORT_DIPSETTING(    0x80, DEF_STR( 4C_1C ) )
+	PORT_DIPSETTING(    0x40, DEF_STR( 3C_1C ) )
+	PORT_DIPSETTING(    0xc0, DEF_STR( 2C_1C ) )
+	PORT_DIPSETTING(    0xe0, DEF_STR( 1C_1C ) )
+	PORT_DIPSETTING(    0x60, DEF_STR( 1C_2C ) )
+	PORT_DIPSETTING(    0xa0, DEF_STR( 1C_3C ) )
+	PORT_DIPSETTING(    0x20, DEF_STR( 1C_4C ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( Free_Play ) )
+INPUT_PORTS_END
+
+
 TILE_GET_INFO_MEMBER(powerbal_state::powerbal_get_bg_tile_info)
 {
 	int code = (m_videoram1[tile_index] & 0x07ff) + m_tilebank * 0x800;
@@ -407,23 +527,21 @@ TILE_GET_INFO_MEMBER(powerbal_state::powerbal_get_bg_tile_info)
 
 void powerbal_state::draw_sprites_powerbal(bitmap_ind16 &bitmap, const rectangle &cliprect )
 {
-	uint16_t *spriteram = m_spriteram;
-	int offs;
 	int height = m_gfxdecode->gfx(0)->height();
 
-	for (offs = 4; offs < m_spriteram.bytes() / 2; offs += 4)
+	for (int offs = 4; offs < m_spriteram.bytes() / 2; offs += 4)
 	{
 		int sx, sy, code, color, flipx;
 
-		sy = spriteram[offs + 3 - 4];   /* typical Playmark style... */
+		sy = m_spriteram[offs + 3 - 4];   /* typical Playmark style... */
 		if (sy & 0x8000)
 			return; /* end of list marker */
 
 		flipx = sy & 0x4000;
-		sx = (spriteram[offs + 1] & 0x01ff) - 16 - 7;
+		sx = (m_spriteram[offs + 1] & 0x01ff) - 16 - 7;
 		sy = (256 - 8 - height - sy) & 0xff;
-		code = spriteram[offs + 2];
-		color = (spriteram[offs + 1] & 0xf000) >> 12;
+		code = m_spriteram[offs + 2];
+		color = (m_spriteram[offs + 1] & 0xf000) >> 12;
 
 		m_gfxdecode->gfx(0)->transpen(bitmap,cliprect,
 				code,
@@ -440,6 +558,16 @@ VIDEO_START_MEMBER(powerbal_state,powerbal)
 	m_xoffset = -20;
 
 	m_bg_tilemap->set_scrolly(0, m_bg_yoffset);
+}
+
+VIDEO_START_MEMBER(powerbal_state,atombjt)
+{
+	m_bg_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(powerbal_state::powerbal_get_bg_tile_info),this), TILEMAP_SCAN_COLS, 8, 8, 64, 32);
+
+	m_xoffset = 32;
+	m_yoffset = 8;
+
+	m_bg_tilemap->set_scrollx(0, -64);
 }
 
 uint32_t powerbal_state::screen_update_powerbal(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
@@ -562,6 +690,20 @@ MACHINE_CONFIG_START(powerbal_state::magicstk)
 	MCFG_DEVICE_ADDRESS_MAP(0, oki_map)
 MACHINE_CONFIG_END
 
+MACHINE_CONFIG_START(powerbal_state::atombjt)
+
+	powerbal(config);
+	
+	MCFG_CPU_MODIFY("maincpu")
+	MCFG_CPU_PROGRAM_MAP(atombjt_map)
+	MCFG_CPU_VBLANK_INT_DRIVER("screen", powerbal_state,  irq6_line_hold)
+
+	MCFG_SCREEN_MODIFY("screen")
+	MCFG_SCREEN_SIZE(512, 256) \
+	MCFG_SCREEN_VISIBLE_AREA(0*8, 48*8-1, 2*8, 30*8-1) \
+
+	MCFG_VIDEO_START_OVERRIDE(powerbal_state,atombjt)
+MACHINE_CONFIG_END
 
 /*
 Power Balls
@@ -690,6 +832,28 @@ ROM_START( hotminda )
 	ROM_LOAD( "rom10.rom",       0x00000, 0x40000,  CRC(0bf3a3e5) SHA1(2ae06f37a6bcd20bc5fbaa90d970aba2ebf3cf5a) )
 ROM_END
 
+ROM_START( atombjt ) // based off bjtwina set
+	ROM_REGION( 0x40000, "maincpu", 0 )
+	ROM_LOAD16_BYTE( "22.u67",  0x00000, 0x20000, CRC(bead8c70) SHA1(2694bb0639f6b94119c21faf3810f00ef20b50da) )
+	ROM_LOAD16_BYTE( "21.u66",  0x00001, 0x20000, CRC(73e3d488) SHA1(7deed6e3aeda1902b75746a9b0a2737632425867) )
+
+	ROM_REGION( 0x200000, "gfx1", 0 )
+	ROM_LOAD( "23.u36",  0x000000, 0x80000, CRC(a3fb6b91) SHA1(477f5722a6bb23f089f32b677efbf69e9dce4b74) )
+	ROM_LOAD( "24.u42",  0x080000, 0x80000, CRC(4c30e15f) SHA1(f92185743594e4e4573ac3f6c0c091802a08d5bd) )
+	ROM_LOAD( "25.u39",  0x100000, 0x80000, CRC(ff1af60f) SHA1(4fe626c9d59ab9b945535b2f796f13adc900f1ed) )
+	ROM_LOAD( "26.u45",  0x180000, 0x80000, CRC(6cc4e817) SHA1(70f2ab50e228a029d3157c94fe0a79e7aad010bd) )
+
+	ROM_REGION( 0x100000, "gfx2", 0 )
+	ROM_LOAD( "27.u86",  0x000000, 0x40000, CRC(5a853e5c) SHA1(dfa4e891f716bbf8a038a14a24276cb690f65230) )
+	ROM_LOAD( "28.u85",  0x040000, 0x40000, CRC(41970bf6) SHA1(85b5677585dbdf96acabb59e6369d62d4c2f0e8e) )
+	ROM_LOAD( "29.u84",  0x080000, 0x40000, CRC(59a7d610) SHA1(0dc39c09f7f55dbd12ddb5e2e4ba9d86a2ba24d8) )
+	ROM_LOAD( "30.u83",  0x0c0000, 0x40000, CRC(9b2dfebd) SHA1(562ab22dc01a129e1b8c201665bbab0561254c2a) )
+
+	ROM_REGION( 0x80000, "oki", 0 )
+	ROM_LOAD( "20.u16",    0x00000, 0x80000, CRC(71c74ff9) SHA1(3c22fb2976ab332e9bb1e208432ca985f274adac) )
+ROM_END
+
+
 DRIVER_INIT_MEMBER(powerbal_state,powerbal)
 {
 	m_bg_yoffset = 16;
@@ -706,7 +870,8 @@ DRIVER_INIT_MEMBER(powerbal_state,magicstk)
 *      Game Drivers      *
 *************************/
 
-//    YEAR  NAME      PARENT   MACHINE   INPUT     STATE           INIT      ROT   COMPANY     FULLNAME                       FLAGS
-GAME( 1994, powerbal, 0,       powerbal, powerbal, powerbal_state, powerbal, ROT0, "Playmark", "Power Balls",                 MACHINE_SUPPORTS_SAVE )
-GAME( 1995, magicstk, 0,       magicstk, magicstk, powerbal_state, magicstk, ROT0, "Playmark", "Magic Sticks",                MACHINE_SUPPORTS_SAVE )
-GAME( 1995, hotminda, hotmind, magicstk, hotminda, powerbal_state, magicstk, ROT0, "Playmark", "Hot Mind (adjustable prize)", MACHINE_SUPPORTS_SAVE )
+//    YEAR  NAME      PARENT   MACHINE   INPUT     STATE           INIT      ROT      COMPANY             FULLNAME                           FLAGS
+GAME( 1994, powerbal, 0,       powerbal, powerbal, powerbal_state, powerbal, ROT0,   "Playmark",          "Power Balls",                     MACHINE_SUPPORTS_SAVE )
+GAME( 1995, magicstk, 0,       magicstk, magicstk, powerbal_state, magicstk, ROT0,   "Playmark",          "Magic Sticks",                    MACHINE_SUPPORTS_SAVE )
+GAME( 1995, hotminda, hotmind, magicstk, hotminda, powerbal_state, magicstk, ROT0,   "Playmark",          "Hot Mind (adjustable prize)",     MACHINE_SUPPORTS_SAVE )
+GAME( 1993, atombjt,  bjtwin,  atombjt,  atombjt,  powerbal_state, 0,        ROT270, "bootleg (Kyon K.)", "Atom (bootleg of Bombjack Twin)", MACHINE_NO_COCKTAIL | MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_GRAPHICS | MACHINE_NOT_WORKING ) // some non-trivial mods to the gfx and sound hw wrt nmk16 hw original

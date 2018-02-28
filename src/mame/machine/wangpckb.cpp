@@ -102,9 +102,6 @@ ADDRESS_MAP_START(wangpc_keyboard_device::wangpc_keyboard_io)
 	//AM_RANGE(0x0000, 0xfeff) AM_READNOP
 	AM_RANGE(0x47, 0x58) AM_MIRROR(0xff00) AM_READNOP
 	AM_RANGE(0x00, 0x00) AM_MIRROR(0xff00) AM_DEVWRITE(SN76496_TAG, sn76496_device, write)
-	AM_RANGE(MCS51_PORT_P1, MCS51_PORT_P1) AM_READWRITE(kb_p1_r, kb_p1_w)
-	AM_RANGE(MCS51_PORT_P2, MCS51_PORT_P2) AM_WRITE(kb_p2_w)
-	AM_RANGE(MCS51_PORT_P3, MCS51_PORT_P3) AM_WRITE(kb_p3_w)
 ADDRESS_MAP_END
 
 
@@ -115,6 +112,10 @@ ADDRESS_MAP_END
 MACHINE_CONFIG_START(wangpc_keyboard_device::device_add_mconfig)
 	MCFG_CPU_ADD(I8051_TAG, I8051, XTAL(4'000'000))
 	MCFG_CPU_IO_MAP(wangpc_keyboard_io)
+	MCFG_MCS51_PORT_P1_IN_CB(READ8(wangpc_keyboard_device, kb_p1_r))
+	MCFG_MCS51_PORT_P1_OUT_CB(WRITE8(wangpc_keyboard_device, kb_p1_w))
+	MCFG_MCS51_PORT_P2_OUT_CB(WRITE8(wangpc_keyboard_device, kb_p2_w))
+	MCFG_MCS51_PORT_P3_OUT_CB(WRITE8(wangpc_keyboard_device, kb_p3_w))
 	MCFG_MCS51_SERIAL_TX_CB(WRITE8(wangpc_keyboard_device, mcs51_tx_callback))
 	MCFG_MCS51_SERIAL_RX_CB(READ8(wangpc_keyboard_device, mcs51_rx_callback))
 

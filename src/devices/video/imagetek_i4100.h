@@ -19,16 +19,16 @@
 //**************************************************************************
 
 #define MCFG_I4100_GFXDECODE(gfxtag) \
-	imagetek_i4100_device::static_set_gfxdecode_tag(*device, ("^" gfxtag));
+	downcast<imagetek_i4100_device &>(*device).set_gfxdecode_tag(("^" gfxtag));
 
 #define MCFG_I4100_BLITTER_END_CALLBACK(_devcb) \
-	devcb = &imagetek_i4100_device::static_set_blitter_irq_callback(*device, DEVCB_##_devcb);
+	devcb = &downcast<imagetek_i4100_device &>(*device).set_blitter_irq_callback(DEVCB_##_devcb);
 
 #define MCFG_I4100_TILEMAP_XOFFSETS(_a, _b, _c) \
-	imagetek_i4100_device::static_set_tmap_xoffsets(*device, _a, _b, _c);
+	downcast<imagetek_i4100_device &>(*device).set_tmap_xoffsets(_a, _b, _c);
 
 #define MCFG_I4100_TILEMAP_YOFFSETS(_a, _b, _c) \
-	imagetek_i4100_device::static_set_tmap_yoffsets(*device, _a, _b, _c);
+	downcast<imagetek_i4100_device &>(*device).set_tmap_yoffsets(_a, _b, _c);
 
 
 //**************************************************************************
@@ -46,11 +46,11 @@ public:
 
 	void map(address_map &map);
 
-	static void static_set_gfxdecode_tag(device_t &device, const char *tag);
-	static void static_set_tmap_xoffsets(device_t &device, int x1, int x2, int x3);
-	static void static_set_tmap_yoffsets(device_t &device, int y1, int y2, int y3);
+	void set_gfxdecode_tag(const char *tag) { m_gfxdecode.set_tag(tag); }
+	void set_tmap_xoffsets(int x1, int x2, int x3) { m_tilemap_scrolldx[0] = x1; m_tilemap_scrolldx[1] = x2; m_tilemap_scrolldx[2] = x3; }
+	void set_tmap_yoffsets(int y1, int y2, int y3) { m_tilemap_scrolldy[0] = y1; m_tilemap_scrolldy[1] = y2; m_tilemap_scrolldy[2] = y3; }
 
-	template <class Object> static devcb_base &static_set_blitter_irq_callback(device_t &device, Object &&cb) { return downcast<imagetek_i4100_device &>(device).m_blit_irq_cb.set_callback(std::forward<Object>(cb)); }
+	template <class Object> devcb_base &set_blitter_irq_callback(Object &&cb) { return m_blit_irq_cb.set_callback(std::forward<Object>(cb)); }
 
 	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 

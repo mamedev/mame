@@ -100,5 +100,4 @@ public:
 	void cpu1_port_am(address_map &map);
 	void cpu2_am(address_map &map);
 	void cpu2_port_am(address_map &map);
-	void djboy_mcu_io_map(address_map &map);
 };

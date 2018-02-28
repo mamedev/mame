@@ -51,16 +51,6 @@ ramdac_device::ramdac_device(const machine_config &mconfig, const char *tag, dev
 }
 
 //-------------------------------------------------
-//  static_set_palette_tag: Set the tag of the
-//  palette device
-//-------------------------------------------------
-
-void ramdac_device::static_set_palette_tag(device_t &device, const char *tag)
-{
-	downcast<ramdac_device &>(device).m_palette.set_tag(tag);
-}
-
-//-------------------------------------------------
 //  memory_space_config - return a description of
 //  any address spaces owned by this device
 //-------------------------------------------------

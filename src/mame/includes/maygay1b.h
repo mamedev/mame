@@ -153,5 +153,4 @@ public:
 	void maygay_m1_empire(machine_config &config);
 	void m1_memmap(address_map &map);
 	void m1_nec_memmap(address_map &map);
-	void maygay_mcu_io(address_map &map);
 };

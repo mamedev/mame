@@ -1147,7 +1147,7 @@ void nes_vt_state::do_dma(uint8_t data, bool broken)
 		&& !(m_ppu->get_201x_reg(0x1) & 0x80)) {
 		// Legacy mode for DGUN-2573 compat
 		m_ppu->set_vram_dest(0x3F00);
-		ppu_vt03_device::set_palette_mode(*m_ppu, PAL_MODE_VT0x);
+		m_ppu->set_palette_mode(PAL_MODE_VT0x);
 	}
 	for (int i = 0; i < length; i++)
 	{

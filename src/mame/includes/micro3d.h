@@ -154,8 +154,10 @@ public:
 	DECLARE_CUSTOM_INPUT_MEMBER(botss_hwchk_r);
 	DECLARE_WRITE8_MEMBER(micro3d_snd_dac_a);
 	DECLARE_WRITE8_MEMBER(micro3d_snd_dac_b);
-	DECLARE_WRITE8_MEMBER(micro3d_sound_io_w);
-	DECLARE_READ8_MEMBER(micro3d_sound_io_r);
+	DECLARE_WRITE8_MEMBER(micro3d_sound_p1_w);
+	DECLARE_WRITE8_MEMBER(micro3d_sound_p3_w);
+	DECLARE_READ8_MEMBER(micro3d_sound_p1_r);
+	DECLARE_READ8_MEMBER(micro3d_sound_p3_r);
 	DECLARE_DRIVER_INIT(micro3d);
 	DECLARE_DRIVER_INIT(botss);
 	virtual void machine_reset() override;

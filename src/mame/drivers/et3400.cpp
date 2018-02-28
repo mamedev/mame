@@ -45,39 +45,52 @@ public:
 		, m_displatch(*this, "displatch%u", 1)
 		, m_rs232(*this, "rs232")
 		, m_cass(*this, "cassette")
+		, m_x(*this, "X%u", 0U)
+		, m_digit(*this, "digit%u", 1U)
 	{ }
+
+	DECLARE_WRITE_LINE_MEMBER(reset_key_w);
+	DECLARE_WRITE_LINE_MEMBER(segment_test_w);
+	void et3400(machine_config &config);
+
+protected:
+	virtual void machine_start() override;
 
 	DECLARE_READ8_MEMBER(keypad_r);
 	DECLARE_WRITE8_MEMBER(display_w);
-	template<int digit> DECLARE_WRITE8_MEMBER(led_w);
+	template <int Digit> DECLARE_WRITE8_MEMBER(led_w);
 	DECLARE_READ8_MEMBER(pia_ar);
 	DECLARE_WRITE8_MEMBER(pia_aw);
 	DECLARE_READ8_MEMBER(pia_br);
 	DECLARE_WRITE8_MEMBER(pia_bw);
-	DECLARE_WRITE_LINE_MEMBER(reset_key_w);
-	DECLARE_WRITE_LINE_MEMBER(segment_test_w);
-	void et3400(machine_config &config);
+
 	void mem_map(address_map &map);
+
 private:
 	required_device<cpu_device> m_maincpu;
 	required_device<pia6821_device> m_pia;
 	required_device_array<ls259_device, 6> m_displatch;
 	required_device<rs232_port_device> m_rs232;
 	required_device<cassette_image_device> m_cass;
+	required_ioport_array<3> m_x;
+	output_finder<6> m_digit;
 };
 
+
+
+void et3400_state::machine_start()
+{
+	m_digit.resolve();
+}
 
 
 READ8_MEMBER(et3400_state::keypad_r)
 {
 	uint8_t data = 0xff;
 
-	if (~offset & 4)
-		data &= ioport("X2")->read();
-	if (~offset & 2)
-		data &= ioport("X1")->read();
-	if (~offset & 1)
-		data &= ioport("X0")->read();
+	if (~offset & 4) data &= m_x[2]->read();
+	if (~offset & 2) data &= m_x[1]->read();
+	if (~offset & 1) data &= m_x[0]->read();
 
 	return data;
 }
@@ -90,12 +103,11 @@ WRITE8_MEMBER(et3400_state::display_w)
 		m_displatch[digit - 1]->write_bit(offset & 7, !BIT(data, 0));
 }
 
-template<int digit>
+template <int Digit>
 WRITE8_MEMBER(et3400_state::led_w)
 {
-/* This computer sets each segment, one at a time. */
-	uint8_t segdata = bitswap<8>(~data, 7, 0, 1, 2, 3, 4, 5, 6);
-	output().set_digit_value(digit, segdata);
+	// This computer sets each segment, one at a time.
+	m_digit[Digit - 1] = bitswap<8>(~data, 7, 0, 1, 2, 3, 4, 5, 6);
 }
 
 // d1,2,3 = Baud rate

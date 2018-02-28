@@ -54,8 +54,6 @@ private:
 	DECLARE_WRITE8_MEMBER(p2_write);
 	DECLARE_READ8_MEMBER(p3_read);
 	DECLARE_WRITE8_MEMBER(p3_write);
-
-	void microsoft_natural_io(address_map &map);
 };
 
 

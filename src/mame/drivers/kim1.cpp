@@ -140,18 +140,10 @@ READ8_MEMBER( kim1_state::kim1_u2_read_a )
 {
 	uint8_t data = 0xff;
 
-	switch( ( m_u2_port_b >> 1 ) & 0x0f )
-	{
-	case 0:
-		data = m_row0->read();
-		break;
-	case 1:
-		data = m_row1->read();
-		break;
-	case 2:
-		data = m_row2->read();
-		break;
-	}
+	offs_t const sel = ( m_u2_port_b >> 1 ) & 0x0f;
+	if ( 3U > sel )
+		data = m_row[sel]->read();
+
 	return data;
 }
 
@@ -164,7 +156,7 @@ WRITE8_MEMBER( kim1_state::kim1_u2_write_a )
 	{
 		if ( data & 0x80 )
 		{
-			output().set_digit_value( idx-4, data & 0x7f );
+			m_digit[idx - 4] = data & 0x7f;
 			m_led_time[idx - 4] = 15;
 		}
 	}
@@ -218,13 +210,15 @@ TIMER_DEVICE_CALLBACK_MEMBER(kim1_state::kim1_update_leds)
 		if ( m_led_time[i] )
 			m_led_time[i]--;
 		else
-			output().set_digit_value( i, 0 );
+			m_digit[i] = 0;
 	}
 }
 
 // Register for save states
 void kim1_state::machine_start()
 {
+	m_digit.resolve();
+
 	save_item(NAME(m_u2_port_b));
 	save_item(NAME(m_311_output));
 	save_item(NAME(m_cassette_high_count));

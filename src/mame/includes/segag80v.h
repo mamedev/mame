@@ -41,9 +41,11 @@ public:
 	uint8_t m_spinner_select;
 	uint8_t m_spinner_sign;
 	uint8_t m_spinner_count;
+	offs_t m_scrambled_write_pc;
 	segag80_decrypt_func m_decrypt;
 	int m_min_x;
 	int m_min_y;
+	DECLARE_READ8_MEMBER(g80v_opcode_r);
 	DECLARE_WRITE8_MEMBER(mainram_w);
 	DECLARE_WRITE8_MEMBER(vectorram_w);
 	DECLARE_READ8_MEMBER(mangled_ports_r);
@@ -83,5 +85,6 @@ public:
 	void zektor(machine_config &config);
 	void spacfury(machine_config &config);
 	void main_map(address_map &map);
+	void opcodes_map(address_map &map);
 	void main_portmap(address_map &map);
 };
