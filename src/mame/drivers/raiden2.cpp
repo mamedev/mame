@@ -1066,6 +1066,7 @@ ADDRESS_MAP_START(raiden2_state::raiden2_sound_map)
 	AM_RANGE(0x4001, 0x4001) AM_DEVWRITE("seibu_sound", seibu_sound_device, irq_clear_w)
 	AM_RANGE(0x4002, 0x4002) AM_DEVWRITE("seibu_sound", seibu_sound_device, rst10_ack_w)
 	AM_RANGE(0x4003, 0x4003) AM_DEVWRITE("seibu_sound", seibu_sound_device, rst18_ack_w)
+	AM_RANGE(0x4004, 0x4004) AM_NOP
 	AM_RANGE(0x4008, 0x4009) AM_DEVREADWRITE("seibu_sound", seibu_sound_device, ym_r, ym_w)
 	AM_RANGE(0x4010, 0x4011) AM_DEVREAD("seibu_sound", seibu_sound_device, soundlatch_r)
 	AM_RANGE(0x4012, 0x4012) AM_DEVREAD("seibu_sound", seibu_sound_device, main_data_pending_r)
@@ -1076,8 +1077,6 @@ ADDRESS_MAP_START(raiden2_state::raiden2_sound_map)
 	AM_RANGE(0x6000, 0x6000) AM_DEVREADWRITE("oki1", okim6295_device, read, write)
 	AM_RANGE(0x6002, 0x6002) AM_DEVREADWRITE("oki2", okim6295_device, read, write)
 	AM_RANGE(0x8000, 0xffff) AM_ROMBANK("seibu_bank1")
-	AM_RANGE(0x4004, 0x4004) AM_NOP
-	AM_RANGE(0x401a, 0x401a) AM_NOP
 ADDRESS_MAP_END
 
 ADDRESS_MAP_START(raiden2_state::zeroteam_sound_map)
@@ -1458,7 +1457,8 @@ MACHINE_CONFIG_START(raiden2_state::raiden2)
 	MCFG_SEIBU_SOUND_YM_WRITE_CB(DEVWRITE8("ymsnd", ym2151_device, write))
 MACHINE_CONFIG_END
 
-MACHINE_CONFIG_DERIVED(raiden2_state::xsedae, raiden2)
+MACHINE_CONFIG_START(raiden2_state::xsedae)
+	raiden2(config);
 	MCFG_CPU_MODIFY("maincpu")
 	MCFG_CPU_PROGRAM_MAP(xsedae_mem)
 
@@ -1469,7 +1469,8 @@ MACHINE_CONFIG_DERIVED(raiden2_state::xsedae, raiden2)
 	MCFG_SCREEN_VISIBLE_AREA(0*8, 40*8-1, 0, 32*8-1)
 MACHINE_CONFIG_END
 
-MACHINE_CONFIG_DERIVED(raiden2_state::raidendx, raiden2)
+MACHINE_CONFIG_START(raiden2_state::raidendx)
+	raiden2(config);
 	MCFG_CPU_MODIFY("maincpu")
 	MCFG_CPU_PROGRAM_MAP(raidendx_mem)
 

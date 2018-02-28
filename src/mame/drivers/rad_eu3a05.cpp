@@ -15,16 +15,16 @@
     this is presumably for the bitmap layer on Qix
 
     --
-    Known games on this hardare
+    Known games on this hardware
 
     Tetris
     Space Invaders
 
-    ---
-    Other games that might be on this hardware
+	Possible other games on this hardawre
 
-    Skateboarding
-    + some of the earlier PlayTV games (not Soccer, that's XaviX, see xavix.cpp)
+	ConnecTV Football (aka ConnecTV International Football)
+	 - Soccer game, not the same as Play TV Football, or Play TV Soccer
+	   (it has the same XTAL etc. as this driver at least)
 
     ---
     The XaviX ones seem to have a XaviX logo on the external packaging while the

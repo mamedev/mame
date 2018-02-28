@@ -40,6 +40,8 @@ public:
 		, m_tgp(*this, "tgp")
 		, m_screen(*this, "screen")
 		, m_io_timer(*this, "iotimer")
+		, m_poly_rom(*this, "polygons")
+		, m_tgp_data(*this, "tgp_data")
 		, m_mr2(*this, "mr2")
 		, m_mr(*this, "mr")
 		, m_display_list0(*this, "display_list0")
@@ -212,6 +214,9 @@ private:
 	optional_device<mb86233_cpu_device> m_tgp;
 	required_device<screen_device> m_screen;
 	required_device<timer_device> m_io_timer;
+
+	required_region_ptr<uint32_t> m_poly_rom;
+	optional_region_ptr<uint32_t> m_tgp_data;
 
 	required_shared_ptr<uint16_t> m_mr2;
 	required_shared_ptr<uint16_t> m_mr;
@@ -429,7 +434,6 @@ private:
 	bool    m_render_done;
 
 	std::unique_ptr<uint16_t[]> m_tgp_ram;
-	uint32_t *m_poly_rom;
 	std::unique_ptr<uint32_t[]> m_poly_ram;
 
 	// Rendering helper functions

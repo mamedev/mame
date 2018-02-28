@@ -28,7 +28,7 @@ inder_sb_device::inder_sb_device(const machine_config &mconfig, const char *tag,
 // hacks for test purposes, these are installed over the program rom so we know when irqs are actually taken
 READ8_MEMBER(inder_sb_device::vec_bankswitch_r)
 {
-	if (!machine().side_effect_disabled())
+	if (!machine().side_effects_disabled())
 		m_sounddata_bank->set_entry(m_soundbank[(offset & 6) >> 1] & 7);
 	return m_audiocpu_rom[offset + 0x0020];
 }

@@ -327,7 +327,8 @@ static INPUT_PORTS_START( depthch )
 INPUT_PORTS_END
 
 
-MACHINE_CONFIG_DERIVED(vicdual_state::depthch, vicdual_root)
+MACHINE_CONFIG_START(vicdual_state::depthch)
+	vicdual_root(config);
 
 	/* basic machine hardware */
 	MCFG_CPU_REPLACE("maincpu", I8080, VICDUAL_MAIN_CPU_CLOCK)
@@ -340,7 +341,7 @@ MACHINE_CONFIG_DERIVED(vicdual_state::depthch, vicdual_root)
 
 	/* audio hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
-	MCFG_FRAGMENT_ADD(depthch_audio)
+	depthch_audio(config);
 MACHINE_CONFIG_END
 
 
@@ -414,7 +415,8 @@ static INPUT_PORTS_START( safari )
 INPUT_PORTS_END
 
 
-MACHINE_CONFIG_DERIVED(vicdual_state::safari, vicdual_root)
+MACHINE_CONFIG_START(vicdual_state::safari)
+	vicdual_root(config);
 
 	/* basic machine hardware */
 	MCFG_CPU_MODIFY("maincpu")
@@ -518,7 +520,8 @@ static INPUT_PORTS_START( frogs )
 INPUT_PORTS_END
 
 
-MACHINE_CONFIG_DERIVED(vicdual_state::frogs, vicdual_root)
+MACHINE_CONFIG_START(vicdual_state::frogs)
+	vicdual_root(config);
 
 	/* basic machine hardware */
 	MCFG_CPU_MODIFY("maincpu")
@@ -533,7 +536,7 @@ MACHINE_CONFIG_DERIVED(vicdual_state::frogs, vicdual_root)
 
 	/* audio hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
-	MCFG_FRAGMENT_ADD(frogs_audio)
+	frogs_audio(config);
 MACHINE_CONFIG_END
 
 
@@ -762,7 +765,8 @@ static INPUT_PORTS_START( sspaceat )
 INPUT_PORTS_END
 
 
-MACHINE_CONFIG_DERIVED(vicdual_state::headon, vicdual_root)
+MACHINE_CONFIG_START(vicdual_state::headon)
+	vicdual_root(config);
 
 	/* basic machine hardware */
 	MCFG_CPU_MODIFY("maincpu")
@@ -775,10 +779,11 @@ MACHINE_CONFIG_DERIVED(vicdual_state::headon, vicdual_root)
 
 	/* audio hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
-	MCFG_FRAGMENT_ADD(headon_audio)
+	headon_audio(config);
 MACHINE_CONFIG_END
 
-MACHINE_CONFIG_DERIVED(vicdual_state::headons, headon)
+MACHINE_CONFIG_START(vicdual_state::headons)
+	headon(config);
 
 	/* video hardware */
 	MCFG_SCREEN_MODIFY("screen")
@@ -786,7 +791,8 @@ MACHINE_CONFIG_DERIVED(vicdual_state::headons, headon)
 MACHINE_CONFIG_END
 
 
-MACHINE_CONFIG_DERIVED(vicdual_state::sspaceat, vicdual_root)
+MACHINE_CONFIG_START(vicdual_state::sspaceat)
+	vicdual_root(config);
 
 	/* basic machine hardware */
 	MCFG_CPU_MODIFY("maincpu")
@@ -979,7 +985,8 @@ MACHINE_RESET_MEMBER( vicdual_state, headon2 )
 }
 
 
-MACHINE_CONFIG_DERIVED(vicdual_state::headon2, vicdual_root)
+MACHINE_CONFIG_START(vicdual_state::headon2)
+	vicdual_root(config);
 
 	/* basic machine hardware */
 	MCFG_CPU_MODIFY("maincpu")
@@ -994,10 +1001,11 @@ MACHINE_CONFIG_DERIVED(vicdual_state::headon2, vicdual_root)
 
 	/* audio hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
-	MCFG_FRAGMENT_ADD(headon_audio)
+	headon_audio(config);
 MACHINE_CONFIG_END
 
-MACHINE_CONFIG_DERIVED(vicdual_state::headon2bw, headon2)
+MACHINE_CONFIG_START(vicdual_state::headon2bw)
+	headon2(config);
 
 	/* basic machine hardware */
 	/* video hardware */
@@ -1006,7 +1014,8 @@ MACHINE_CONFIG_DERIVED(vicdual_state::headon2bw, headon2)
 MACHINE_CONFIG_END
 
 
-MACHINE_CONFIG_DERIVED(vicdual_state::digger, vicdual_root)
+MACHINE_CONFIG_START(vicdual_state::digger)
+	vicdual_root(config);
 
 	/* basic machine hardware */
 	MCFG_CPU_MODIFY("maincpu")
@@ -2037,7 +2046,8 @@ static INPUT_PORTS_START( headonn )
 INPUT_PORTS_END
 
 
-MACHINE_CONFIG_DERIVED(vicdual_state::vicdual_dualgame_root, vicdual_root)
+MACHINE_CONFIG_START(vicdual_state::vicdual_dualgame_root)
+	vicdual_root(config);
 
 	/* basic machine hardware */
 	MCFG_CPU_MODIFY("maincpu")
@@ -2050,7 +2060,8 @@ MACHINE_CONFIG_END
 
 
 
-MACHINE_CONFIG_DERIVED(vicdual_state::invho2, vicdual_dualgame_root)
+MACHINE_CONFIG_START(vicdual_state::invho2)
+	vicdual_dualgame_root(config);
 
 	/* basic machine hardware */
 	MCFG_CPU_MODIFY("maincpu")
@@ -2058,13 +2069,14 @@ MACHINE_CONFIG_DERIVED(vicdual_state::invho2, vicdual_dualgame_root)
 
 	/* audio hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
-	MCFG_FRAGMENT_ADD(invinco_audio)
-	MCFG_FRAGMENT_ADD(headon_audio)
+	invinco_audio(config);
+	headon_audio(config);
 MACHINE_CONFIG_END
 
 
 
-MACHINE_CONFIG_DERIVED(vicdual_state::invds, vicdual_dualgame_root)
+MACHINE_CONFIG_START(vicdual_state::invds)
+	vicdual_dualgame_root(config);
 
 	/* basic machine hardware */
 	MCFG_CPU_MODIFY("maincpu")
@@ -2072,10 +2084,11 @@ MACHINE_CONFIG_DERIVED(vicdual_state::invds, vicdual_dualgame_root)
 
 	/* audio hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
-	MCFG_FRAGMENT_ADD(invinco_audio)
+	invinco_audio(config);
 MACHINE_CONFIG_END
 
-MACHINE_CONFIG_DERIVED(vicdual_state::carhntds, vicdual_dualgame_root)
+MACHINE_CONFIG_START(vicdual_state::carhntds)
+	vicdual_dualgame_root(config);
 
 	/* basic machine hardware */
 	MCFG_CPU_MODIFY("maincpu")
@@ -2084,7 +2097,8 @@ MACHINE_CONFIG_DERIVED(vicdual_state::carhntds, vicdual_dualgame_root)
 MACHINE_CONFIG_END
 
 
-MACHINE_CONFIG_DERIVED(vicdual_state::sspacaho, vicdual_dualgame_root)
+MACHINE_CONFIG_START(vicdual_state::sspacaho)
+	vicdual_dualgame_root(config);
 
 	/* basic machine hardware */
 	MCFG_CPU_MODIFY("maincpu")
@@ -2092,11 +2106,12 @@ MACHINE_CONFIG_DERIVED(vicdual_state::sspacaho, vicdual_dualgame_root)
 
 	/* audio hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
-	MCFG_FRAGMENT_ADD(headon_audio)
+	headon_audio(config);
 MACHINE_CONFIG_END
 
 
-MACHINE_CONFIG_DERIVED(vicdual_state::spacetrk, vicdual_dualgame_root)
+MACHINE_CONFIG_START(vicdual_state::spacetrk)
+	vicdual_dualgame_root(config);
 
 	/* basic machine hardware */
 	MCFG_CPU_MODIFY("maincpu")
@@ -2104,7 +2119,8 @@ MACHINE_CONFIG_DERIVED(vicdual_state::spacetrk, vicdual_dualgame_root)
 MACHINE_CONFIG_END
 
 
-MACHINE_CONFIG_DERIVED(vicdual_state::carnival, vicdual_dualgame_root)
+MACHINE_CONFIG_START(vicdual_state::carnival)
+	vicdual_dualgame_root(config);
 
 	/* basic machine hardware */
 	MCFG_CPU_MODIFY("maincpu")
@@ -2114,10 +2130,11 @@ MACHINE_CONFIG_DERIVED(vicdual_state::carnival, vicdual_dualgame_root)
 
 	/* audio hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
-	MCFG_FRAGMENT_ADD(carnival_audio)
+	carnival_audio(config);
 MACHINE_CONFIG_END
 
-MACHINE_CONFIG_DERIVED(vicdual_state::carnivalh, carnival)
+MACHINE_CONFIG_START(vicdual_state::carnivalh)
+	carnival(config);
 
 	/* basic machine hardware */
 	MCFG_CPU_MODIFY("maincpu")
@@ -2125,7 +2142,8 @@ MACHINE_CONFIG_DERIVED(vicdual_state::carnivalh, carnival)
 MACHINE_CONFIG_END
 
 
-MACHINE_CONFIG_DERIVED(vicdual_state::tranqgun, vicdual_dualgame_root)
+MACHINE_CONFIG_START(vicdual_state::tranqgun)
+	vicdual_dualgame_root(config);
 
 	/* basic machine hardware */
 	MCFG_CPU_MODIFY("maincpu")
@@ -2133,11 +2151,12 @@ MACHINE_CONFIG_DERIVED(vicdual_state::tranqgun, vicdual_dualgame_root)
 
 	/* audio hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
-	MCFG_FRAGMENT_ADD(tranqgun_audio)
+	tranqgun_audio(config);
 MACHINE_CONFIG_END
 
 
-MACHINE_CONFIG_DERIVED(vicdual_state::brdrline, vicdual_dualgame_root)
+MACHINE_CONFIG_START(vicdual_state::brdrline)
+	vicdual_dualgame_root(config);
 
 	/* basic machine hardware */
 	MCFG_CPU_MODIFY("maincpu")
@@ -2145,11 +2164,12 @@ MACHINE_CONFIG_DERIVED(vicdual_state::brdrline, vicdual_dualgame_root)
 
 	/* audio hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
-	MCFG_FRAGMENT_ADD(brdrline_audio)
+	brdrline_audio(config);
 MACHINE_CONFIG_END
 
 
-MACHINE_CONFIG_DERIVED(vicdual_state::pulsar, vicdual_dualgame_root)
+MACHINE_CONFIG_START(vicdual_state::pulsar)
+	vicdual_dualgame_root(config);
 
 	/* basic machine hardware */
 	MCFG_CPU_MODIFY("maincpu")
@@ -2157,11 +2177,12 @@ MACHINE_CONFIG_DERIVED(vicdual_state::pulsar, vicdual_dualgame_root)
 
 	/* audio hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
-	MCFG_FRAGMENT_ADD(pulsar_audio)
+	pulsar_audio(config);
 MACHINE_CONFIG_END
 
 
-MACHINE_CONFIG_DERIVED(vicdual_state::heiankyo, vicdual_dualgame_root)
+MACHINE_CONFIG_START(vicdual_state::heiankyo)
+	vicdual_dualgame_root(config);
 
 	/* basic machine hardware */
 	MCFG_CPU_MODIFY("maincpu")
@@ -2169,7 +2190,8 @@ MACHINE_CONFIG_DERIVED(vicdual_state::heiankyo, vicdual_dualgame_root)
 MACHINE_CONFIG_END
 
 
-MACHINE_CONFIG_DERIVED(vicdual_state::alphaho, vicdual_dualgame_root)
+MACHINE_CONFIG_START(vicdual_state::alphaho)
+	vicdual_dualgame_root(config);
 
 	/* basic machine hardware */
 	MCFG_CPU_MODIFY("maincpu")
@@ -2177,7 +2199,8 @@ MACHINE_CONFIG_DERIVED(vicdual_state::alphaho, vicdual_dualgame_root)
 MACHINE_CONFIG_END
 
 
-MACHINE_CONFIG_DERIVED(vicdual_state::headonn, vicdual_dualgame_root)
+MACHINE_CONFIG_START(vicdual_state::headonn)
+	vicdual_dualgame_root(config);
 
 	/* basic machine hardware */
 	MCFG_CPU_MODIFY("maincpu")
@@ -2185,7 +2208,7 @@ MACHINE_CONFIG_DERIVED(vicdual_state::headonn, vicdual_dualgame_root)
 
 	/* audio hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
-	MCFG_FRAGMENT_ADD(headon_audio)
+	headon_audio(config);
 MACHINE_CONFIG_END
 
 
@@ -2305,7 +2328,8 @@ MACHINE_START_MEMBER(vicdual_state,samurai)
 	machine_start();
 }
 
-MACHINE_CONFIG_DERIVED(vicdual_state::samurai, vicdual_root)
+MACHINE_CONFIG_START(vicdual_state::samurai)
+	vicdual_root(config);
 
 	/* basic machine hardware */
 	MCFG_CPU_MODIFY("maincpu")
@@ -2598,7 +2622,8 @@ static INPUT_PORTS_START( invinco )
 INPUT_PORTS_END
 
 
-MACHINE_CONFIG_DERIVED(vicdual_state::invinco, vicdual_root)
+MACHINE_CONFIG_START(vicdual_state::invinco)
+	vicdual_root(config);
 
 	/* basic machine hardware */
 	MCFG_CPU_MODIFY("maincpu")
@@ -2611,7 +2636,7 @@ MACHINE_CONFIG_DERIVED(vicdual_state::invinco, vicdual_root)
 
 	/* audio hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
-	MCFG_FRAGMENT_ADD(invinco_audio)
+	invinco_audio(config);
 MACHINE_CONFIG_END
 
 

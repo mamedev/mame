@@ -500,12 +500,14 @@ MACHINE_CONFIG_START(wallc_state::wallc)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.30)
 MACHINE_CONFIG_END
 
-MACHINE_CONFIG_DERIVED(wallc_state::wallca, wallc)
+MACHINE_CONFIG_START(wallc_state::wallca)
+	wallc(config);
 	MCFG_CPU_MODIFY("maincpu")
 	MCFG_CPU_CLOCK(12_MHz_XTAL / 4)
 MACHINE_CONFIG_END
 
-MACHINE_CONFIG_DERIVED(wallc_state::unkitpkr, wallc)
+MACHINE_CONFIG_START(wallc_state::unkitpkr)
+	wallc(config);
 
 	MCFG_CPU_MODIFY("maincpu")
 	MCFG_CPU_PROGRAM_MAP(unkitpkr_map)

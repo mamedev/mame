@@ -96,7 +96,7 @@ MACHINE_CONFIG_START(at586_state::at586)
 	MCFG_ISA16_SLOT_ADD(":pcibus:1:i82371ab:isabus","isa4", pc_isa16_cards, nullptr, false)
 	MCFG_ISA16_SLOT_ADD(":pcibus:1:i82371ab:isabus","isa5", pc_isa16_cards, nullptr, false)
 
-	MCFG_FRAGMENT_ADD( at_softlists )
+	at_softlists(config);
 MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(at586_state::at586x3)
@@ -122,7 +122,7 @@ MACHINE_CONFIG_START(at586_state::at586x3)
 	MCFG_ISA16_SLOT_ADD(":pcibus:1:i82371sb:isabus","isa4", pc_isa16_cards, nullptr, false)
 	MCFG_ISA16_SLOT_ADD(":pcibus:1:i82371sb:isabus","isa5", pc_isa16_cards, nullptr, false)
 
-	MCFG_FRAGMENT_ADD( at_softlists )
+	at_softlists(config);
 MACHINE_CONFIG_END
 
 ROM_START( at586 )

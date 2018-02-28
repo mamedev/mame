@@ -315,7 +315,7 @@ MACHINE_CONFIG_START(tavernie_state::cpu09)
 	MCFG_DEVICE_ADD("ptm", PTM6840, XTAL(4'000'000) / 4)
 	// all i/o lines connect to the 40-pin expansion connector
 	MCFG_PTM6840_EXTERNAL_CLOCKS(0, 0, 0)
-	MCFG_PTM6840_OUT1_CB(INPUTLINE("maincpu", INPUT_LINE_NMI))
+	MCFG_PTM6840_O2_CB(INPUTLINE("maincpu", INPUT_LINE_NMI))
 	MCFG_PTM6840_IRQ_CB(INPUTLINE("maincpu", M6809_IRQ_LINE))
 
 	MCFG_DEVICE_ADD("acia", ACIA6850, 0)
@@ -331,7 +331,8 @@ MACHINE_CONFIG_START(tavernie_state::cpu09)
 	MCFG_DEVCB_CHAIN_OUTPUT(DEVWRITELINE("acia", acia6850_device, write_rxc))
 MACHINE_CONFIG_END
 
-MACHINE_CONFIG_DERIVED(tavernie_state::ivg09, cpu09)
+MACHINE_CONFIG_START(tavernie_state::ivg09)
+	cpu09(config);
 	/* basic machine hardware */
 	MCFG_CPU_MODIFY("maincpu")
 	MCFG_CPU_PROGRAM_MAP(ivg09_mem)

@@ -58,7 +58,7 @@ ADDRESS_MAP_START(p2000t_state::p2000t_mem)
 	AM_RANGE(0xa000, 0xffff) AM_NOP
 ADDRESS_MAP_END
 
-ADDRESS_MAP_START(p2000t_state::p2000m_mem)
+ADDRESS_MAP_START(p2000m_state::p2000m_mem)
 	AM_RANGE(0x0000, 0x0fff) AM_ROM
 	AM_RANGE(0x1000, 0x4fff) AM_ROM
 	AM_RANGE(0x5000, 0x5fff) AM_RAM AM_SHARE("videoram")
@@ -80,7 +80,7 @@ static const gfx_layout p2000m_charlayout =
 	8 * 10
 };
 
-PALETTE_INIT_MEMBER(p2000t_state,p2000m)
+PALETTE_INIT_MEMBER(p2000m_state,p2000m)
 {
 	palette.set_pen_color(0,rgb_t::white()); /* white */
 	palette.set_pen_color(1,rgb_t::black()); /* black */
@@ -246,12 +246,12 @@ MACHINE_CONFIG_END
 
 
 /* Machine definition */
-MACHINE_CONFIG_START(p2000t_state::p2000m)
+MACHINE_CONFIG_START(p2000m_state::p2000m)
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", Z80, 2500000)
 	MCFG_CPU_PROGRAM_MAP(p2000m_mem)
 	MCFG_CPU_IO_MAP(p2000t_io)
-	MCFG_CPU_VBLANK_INT_DRIVER("screen", p2000t_state,  p2000_interrupt)
+	MCFG_CPU_VBLANK_INT_DRIVER("screen", p2000m_state,  p2000_interrupt)
 	MCFG_QUANTUM_TIME(attotime::from_hz(60))
 
 	/* video hardware */
@@ -260,13 +260,12 @@ MACHINE_CONFIG_START(p2000t_state::p2000m)
 	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500)) /* not accurate */
 	MCFG_SCREEN_SIZE(80 * 12, 24 * 20)
 	MCFG_SCREEN_VISIBLE_AREA(0, 80 * 12 - 1, 0, 24 * 20 - 1)
-	MCFG_VIDEO_START_OVERRIDE(p2000t_state,p2000m)
-	MCFG_SCREEN_UPDATE_DRIVER(p2000t_state, screen_update_p2000m)
+	MCFG_SCREEN_UPDATE_DRIVER(p2000m_state, screen_update_p2000m)
 	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", p2000m )
+	MCFG_GFXDECODE_ADD("gfxdecode", "palette", p2000m)
 	MCFG_PALETTE_ADD("palette", 4)
-	MCFG_PALETTE_INIT_OWNER(p2000t_state,p2000m)
+	MCFG_PALETTE_INIT_OWNER(p2000m_state,p2000m)
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
@@ -292,4 +291,4 @@ ROM_END
 
 //      YEAR    NAME    PARENT  COMPAT  MACHINE     INPUT   STATE         INIT  COMPANY    FULLNAME          FLAGS
 COMP ( 1980,    p2000t, 0,      0,      p2000t,     p2000t, p2000t_state, 0,    "Philips", "Philips P2000T", 0 )
-COMP ( 1980,    p2000m, p2000t, 0,      p2000m,     p2000t, p2000t_state, 0,    "Philips", "Philips P2000M", 0 )
+COMP ( 1980,    p2000m, p2000t, 0,      p2000m,     p2000t, p2000m_state, 0,    "Philips", "Philips P2000M", 0 )

@@ -516,7 +516,8 @@ MACHINE_CONFIG_START(pb1000_state::pb1000)
 	MCFG_SOUND_ROUTE( ALL_OUTPUTS, "mono", 1.00 )
 MACHINE_CONFIG_END
 
-MACHINE_CONFIG_DERIVED(pb1000_state::pb2000c, pb1000)
+MACHINE_CONFIG_START(pb1000_state::pb2000c)
+	pb1000(config);
 	/* basic machine hardware */
 	MCFG_CPU_MODIFY("maincpu")
 	MCFG_CPU_PROGRAM_MAP(pb2000c_mem)

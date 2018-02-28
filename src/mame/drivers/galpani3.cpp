@@ -529,15 +529,15 @@ MACHINE_CONFIG_START(galpani3_state::galpani3)
 	MCFG_DEVICE_ADD("spritegen", SKNS_SPRITE, 0)
 
 	MCFG_DEVICE_ADD("grap2_0", KANEKO_GRAP2, 0)
-	kaneko_grap2_device::set_chipnum(*device, 0);
+	MCFG_KANEKO_GRAP2_CHIPNUM(0)
 	MCFG_KANEKO_GRAP2_PALETTE("palette")
 
 	MCFG_DEVICE_ADD("grap2_1", KANEKO_GRAP2, 0)
-	kaneko_grap2_device::set_chipnum(*device, 1);
+	MCFG_KANEKO_GRAP2_CHIPNUM(1)
 	MCFG_KANEKO_GRAP2_PALETTE("palette")
 
 	MCFG_DEVICE_ADD("grap2_2", KANEKO_GRAP2, 0)
-	kaneko_grap2_device::set_chipnum(*device, 2);
+	MCFG_KANEKO_GRAP2_CHIPNUM(2)
 	MCFG_KANEKO_GRAP2_PALETTE("palette")
 
 

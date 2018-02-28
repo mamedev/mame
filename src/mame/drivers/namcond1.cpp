@@ -389,7 +389,8 @@ MACHINE_CONFIG_START(namcond1_state::namcond1)
 
 MACHINE_CONFIG_END
 
-MACHINE_CONFIG_DERIVED(namcond1_state::abcheck, namcond1)
+MACHINE_CONFIG_START(namcond1_state::abcheck)
+	namcond1(config);
 	MCFG_CPU_REPLACE("maincpu", M68000, XTAL(49'152'000)/4)
 	MCFG_CPU_PROGRAM_MAP(abcheck_map)
 //  MCFG_CPU_VBLANK_INT_DRIVER("screen", namcond1_state,  irq1_line_hold)

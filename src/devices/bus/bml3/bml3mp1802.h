@@ -55,7 +55,6 @@ private:
 };
 
 // device type definition
-extern const device_type BML3BUS_MP1802;
 DECLARE_DEVICE_TYPE(BML3BUS_MP1802, bml3bus_mp1802_device)
 
 #endif // MAME_BUS_BML3_BML3MP1802_H

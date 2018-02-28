@@ -2342,6 +2342,18 @@ end
 
 ---------------------------------------------------
 --
+--@src/devices/machine/rstbuf.h,MACHINES["RSTBUF"] = true
+---------------------------------------------------
+
+if (MACHINES["RSTBUF"]~=null) then
+	files {
+		MAME_DIR .. "src/devices/machine/rstbuf.cpp",
+		MAME_DIR .. "src/devices/machine/rstbuf.h",
+	}
+end
+
+---------------------------------------------------
+--
 --@src/devices/machine/rtc4543.h,MACHINES["RTC4543"] = true
 ---------------------------------------------------
 

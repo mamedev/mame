@@ -32,6 +32,26 @@
 #pragma once
 
 
+#define MCFG_MCS51_PORT_P0_IN_CB(_devcb) \
+	devcb = &mcs51_cpu_device::set_port_in_cb(*device, 0, DEVCB_##_devcb);
+#define MCFG_MCS51_PORT_P0_OUT_CB(_devcb) \
+	devcb = &mcs51_cpu_device::set_port_out_cb(*device, 0, DEVCB_##_devcb);
+
+#define MCFG_MCS51_PORT_P1_IN_CB(_devcb) \
+	devcb = &mcs51_cpu_device::set_port_in_cb(*device, 1, DEVCB_##_devcb);
+#define MCFG_MCS51_PORT_P1_OUT_CB(_devcb) \
+	devcb = &mcs51_cpu_device::set_port_out_cb(*device, 1, DEVCB_##_devcb);
+
+#define MCFG_MCS51_PORT_P2_IN_CB(_devcb) \
+	devcb = &mcs51_cpu_device::set_port_in_cb(*device, 2, DEVCB_##_devcb);
+#define MCFG_MCS51_PORT_P2_OUT_CB(_devcb) \
+	devcb = &mcs51_cpu_device::set_port_out_cb(*device, 2, DEVCB_##_devcb);
+
+#define MCFG_MCS51_PORT_P3_IN_CB(_devcb) \
+	devcb = &mcs51_cpu_device::set_port_in_cb(*device, 3, DEVCB_##_devcb);
+#define MCFG_MCS51_PORT_P3_OUT_CB(_devcb) \
+	devcb = &mcs51_cpu_device::set_port_out_cb(*device, 3, DEVCB_##_devcb);
+
 #define MCFG_MCS51_SERIAL_RX_CB(_devcb) \
 	devcb = &mcs51_cpu_device::set_serial_rx_cb(*device, DEVCB_##_devcb);
 
@@ -59,17 +79,6 @@ enum
 	DS5002FP_PFI_LINE       /* DS5002FP Power fail interrupt */
 };
 
-/* special I/O space ports */
-
-enum
-{
-	MCS51_PORT_P0   = 0x20000,
-	MCS51_PORT_P1   = 0x20001,
-	MCS51_PORT_P2   = 0x20002,
-	MCS51_PORT_P3   = 0x20003,
-	MCS51_PORT_TX   = 0x20004   /* P3.1 */
-};
-
 /* At least CMOS devices may be forced to read from ports configured as output.
  * All you need is a low impedance output connect to the port.
  */
@@ -85,9 +94,11 @@ class mcs51_cpu_device : public cpu_device
 {
 public:
 	// configuration helpers
+	template<class Object> static devcb_base &set_port_in_cb(device_t &device, int n, Object &&cb) { return downcast<mcs51_cpu_device &>(device).m_port_in_cb[n].set_callback(std::forward<Object>(cb)); }
+	template<class Object> static devcb_base &set_port_out_cb(device_t &device, int n, Object &&cb) { return downcast<mcs51_cpu_device &>(device).m_port_out_cb[n].set_callback(std::forward<Object>(cb)); }
 	static void set_port_forced_input(device_t &device, uint8_t port, uint8_t forced_input) { downcast<mcs51_cpu_device &>(device).m_forced_inputs[port] = forced_input; }
-	template<class _Object> static devcb_base & set_serial_rx_cb(device_t &device, _Object object) { return downcast<mcs51_cpu_device &>(device).m_serial_rx_cb.set_callback(object); }
-	template<class _Object> static devcb_base & set_serial_tx_cb(device_t &device, _Object object) { return downcast<mcs51_cpu_device &>(device).m_serial_tx_cb.set_callback(object); }
+	template<class Object> static devcb_base &set_serial_rx_cb(device_t &device, Object &&cb) { return downcast<mcs51_cpu_device &>(device).m_serial_rx_cb.set_callback(std::forward<Object>(cb)); }
+	template<class Object> static devcb_base &set_serial_tx_cb(device_t &device, Object &&cb) { return downcast<mcs51_cpu_device &>(device).m_serial_tx_cb.set_callback(std::forward<Object>(cb)); }
 
 	void data_7bit(address_map &map);
 	void data_8bit(address_map &map);
@@ -115,8 +126,6 @@ protected:
 	virtual space_config_vector memory_space_config() const override;
 
 	// device_state_interface overrides
-	virtual void state_import(const device_state_entry &entry) override;
-	virtual void state_export(const device_state_entry &entry) override;
 	virtual void state_string_export(const device_state_entry &entry, std::string &str) const override;
 
 	// device_disasm_interface overrides
@@ -174,6 +183,9 @@ protected:
 	direct_read_data<0> *m_direct;
 	address_space *m_data;
 	address_space *m_io;
+
+	devcb_read8 m_port_in_cb[4];
+	devcb_write8 m_port_out_cb[4];
 
 	/* Serial Port TX/RX Callbacks */
 	devcb_write8 m_serial_tx_cb;    //Call back function when sending data out of serial port

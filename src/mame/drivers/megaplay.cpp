@@ -661,7 +661,7 @@ MACHINE_RESET_MEMBER(mplay_state,megaplay)
 
 MACHINE_CONFIG_START(mplay_state::megaplay)
 	/* basic machine hardware */
-	MCFG_FRAGMENT_ADD(md_ntsc)
+	md_ntsc(config);
 
 	/* The Megaplay has an extra BIOS cpu which drives an SMS VDP
 	   which includes an SN76496 for sound */

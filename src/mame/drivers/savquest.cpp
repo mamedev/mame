@@ -811,7 +811,7 @@ MACHINE_CONFIG_START(savquest_state::savquest)
 	MCFG_CPU_IO_MAP(savquest_io)
 	MCFG_CPU_IRQ_ACKNOWLEDGE_DEVICE("pic8259_1", pic8259_device, inta_cb)
 
-	MCFG_FRAGMENT_ADD( pcat_common )
+	pcat_common(config);
 	MCFG_DEVICE_REMOVE("rtc")
 	MCFG_DS12885_ADD("rtc")
 
@@ -833,7 +833,7 @@ MACHINE_CONFIG_START(savquest_state::savquest)
 	MCFG_ISA16_SLOT_ADD("isa", "isa1", savquest_isa16_cards, "sb16", false)
 
 	/* video hardware */
-	MCFG_FRAGMENT_ADD( pcvideo_s3_vga )
+	pcvideo_s3_vga(config);
 
 	MCFG_DEVICE_ADD("voodoo", VOODOO_2, STD_VOODOO_2_CLOCK)
 	MCFG_VOODOO_FBMEM(4)

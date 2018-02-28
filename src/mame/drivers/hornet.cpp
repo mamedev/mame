@@ -1076,7 +1076,8 @@ MACHINE_CONFIG_START(hornet_state::hornet)
 	MCFG_KONPPC_CGBOARD_TYPE(HORNET)
 MACHINE_CONFIG_END
 
-MACHINE_CONFIG_DERIVED(hornet_state::hornet_2board, hornet)
+MACHINE_CONFIG_START(hornet_state::hornet_2board)
+	hornet(config);
 
 	MCFG_CPU_ADD("dsp2", ADSP21062, XTAL(36'000'000))
 	MCFG_SHARC_BOOT_MODE(BOOT_MODE_EPROM)
@@ -1133,13 +1134,15 @@ MACHINE_CONFIG_DERIVED(hornet_state::hornet_2board, hornet)
 	MCFG_KONPPC_CGBOARD_TYPE(HORNET)
 MACHINE_CONFIG_END
 
-MACHINE_CONFIG_DERIVED(hornet_state::terabrst, hornet)
+MACHINE_CONFIG_START(hornet_state::terabrst)
+	hornet(config);
 
 	MCFG_CPU_ADD("gn680", M68000, XTAL(32'000'000)/2)   /* 16MHz */
 	MCFG_CPU_PROGRAM_MAP(gn680_memmap)
 MACHINE_CONFIG_END
 
-MACHINE_CONFIG_DERIVED(hornet_state::hornet_2board_v2, hornet_2board)
+MACHINE_CONFIG_START(hornet_state::hornet_2board_v2)
+	hornet_2board(config);
 	MCFG_DEVICE_REMOVE("voodoo0")
 	MCFG_DEVICE_ADD("voodoo0", VOODOO_2, STD_VOODOO_2_CLOCK)
 	MCFG_VOODOO_FBMEM(2)
@@ -1157,7 +1160,8 @@ MACHINE_CONFIG_DERIVED(hornet_state::hornet_2board_v2, hornet_2board)
 	MCFG_VOODOO_VBLANK_CB(WRITELINE(hornet_state,voodoo_vblank_1))
 MACHINE_CONFIG_END
 
-MACHINE_CONFIG_DERIVED(hornet_state::sscope2, hornet_2board_v2)
+MACHINE_CONFIG_START(hornet_state::sscope2)
+	hornet_2board_v2(config);
 
 	MCFG_DS2401_ADD("lan_serial_id")
 	MCFG_EEPROM_SERIAL_93C46_ADD("lan_eeprom")

@@ -263,7 +263,8 @@ MACHINE_CONFIG_START(glass_state::glass)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 MACHINE_CONFIG_END
 
-MACHINE_CONFIG_DERIVED(glass_state::glass_ds5002fp, glass)
+MACHINE_CONFIG_START(glass_state::glass_ds5002fp)
+	glass(config);
 	MCFG_DEVICE_ADD("gaelco_ds5002fp", GAELCO_DS5002FP, XTAL(24'000'000) / 2) /* verified on pcb */
 	MCFG_DEVICE_ADDRESS_MAP(0, mcu_hostmem_map)
 MACHINE_CONFIG_END

@@ -652,7 +652,8 @@ MACHINE_CONFIG_START(esd16_state::esd16)
 MACHINE_CONFIG_END
 
 
-MACHINE_CONFIG_DERIVED(esd16_state::jumppop, esd16)
+MACHINE_CONFIG_START(esd16_state::jumppop)
+	esd16(config);
 
 	/* basic machine hardware */
 
@@ -673,7 +674,8 @@ MACHINE_CONFIG_END
 
 /* The ESD 05-28-99 PCB adds an EEPROM */
 
-MACHINE_CONFIG_DERIVED(esd16_state::hedpanio, esd16)
+MACHINE_CONFIG_START(esd16_state::hedpanio)
+	esd16(config);
 	/* basic machine hardware */
 	MCFG_CPU_MODIFY("maincpu")
 	MCFG_CPU_PROGRAM_MAP(hedpanic_map)
@@ -683,19 +685,22 @@ MACHINE_CONFIG_END
 
 /* The ESD 08-26-1999 PCBs take that further and modify the sprite offsets */
 
-MACHINE_CONFIG_DERIVED(esd16_state::hedpanic, hedpanio)
+MACHINE_CONFIG_START(esd16_state::hedpanic)
+	hedpanio(config);
 	MCFG_DEVICE_MODIFY("spritegen")
 	MCFG_DECO_SPRITE_OFFSETS(-0x18, -0x100)
 MACHINE_CONFIG_END
 
 /* ESD 08-26-1999 PCBs with different memory maps */
 
-MACHINE_CONFIG_DERIVED(esd16_state::mchampdx, hedpanic)
+MACHINE_CONFIG_START(esd16_state::mchampdx)
+	hedpanic(config);
 	MCFG_CPU_MODIFY("maincpu")
 	MCFG_CPU_PROGRAM_MAP(mchampdx_map)
 MACHINE_CONFIG_END
 
-MACHINE_CONFIG_DERIVED(esd16_state::tangtang, hedpanic)
+MACHINE_CONFIG_START(esd16_state::tangtang)
+	hedpanic(config);
 	MCFG_CPU_MODIFY("maincpu")
 	MCFG_CPU_PROGRAM_MAP(tangtang_map)
 MACHINE_CONFIG_END

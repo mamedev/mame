@@ -255,7 +255,7 @@ MACHINE_CONFIG_START(s11b_state::s11b)
 	MCFG_DEFAULT_LAYOUT(layout_s11b)
 
 	/* Sound */
-	MCFG_FRAGMENT_ADD( genpin_audio )
+	genpin_audio(config);
 
 	/* Devices */
 	MCFG_DEVICE_ADD("pia21", PIA6821, 0)

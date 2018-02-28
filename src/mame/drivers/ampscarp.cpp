@@ -6,34 +6,42 @@
 
 Motorola AMPS Car Phone.
 
+Nothing is really known about the hardware. The dump contains MC68HC11 code, but has no vector table. It seems likely that
+whatever MCU type this uses boots from an internal ROM/PROM/EPROM but can also execute a large bankswitched external program.
+
 ************************************************************************************************************************************/
 
 #include "emu.h"
+#include "cpu/mc68hc11/mc68hc11.h"
 
 class ampscarp_state : public driver_device
 {
 public:
 	ampscarp_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag)
-//      , m_maincpu(*this, "maincpu")
+		, m_maincpu(*this, "maincpu")
 	{ }
 
-void ampscarp(machine_config &config);
+	void ampscarp(machine_config &config);
+	void mem_map(address_map &map);
 private:
-//  required_device<cpu_device> m_maincpu;
+	required_device<cpu_device> m_maincpu;
 };
 
-//static ADDRESS_MAP_START( mem_map, AS_PROGRAM, 8, ampscarp_state )
-//ADDRESS_MAP_END
+ADDRESS_MAP_START(ampscarp_state::mem_map)
+	AM_RANGE(0x0000, 0xffff) AM_ROM AM_REGION("maincpu", 0)
+ADDRESS_MAP_END
 
 static INPUT_PORTS_START( ampscarp )
 INPUT_PORTS_END
 
 MACHINE_CONFIG_START(ampscarp_state::ampscarp)
+	MCFG_CPU_ADD("maincpu", MC68HC11, 8'000'000) // type and clock unknown
+	MCFG_CPU_PROGRAM_MAP(mem_map)
 MACHINE_CONFIG_END
 
 ROM_START( ampscarp )
-	ROM_REGION( 0x20000, "maincpu", 0 ) // unknown cpu
+	ROM_REGION( 0x20000, "maincpu", 0 )
 	ROM_LOAD( "motorola_amps_car_phone_dump.bin", 0x0000, 0x20000, CRC(677ec85e) SHA1(219611b6c4b16461705e2df61d79a0f7ac8f529f) )
 ROM_END
 

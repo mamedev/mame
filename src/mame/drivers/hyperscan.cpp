@@ -55,7 +55,7 @@
 #include "emu.h"
 #include "cpu/score/score.h"
 #include "screen.h"
-
+#include "softlist_dev.h"
 
 #define LOG_SPG290_REGISTER_ACCESS  (1)
 
@@ -226,7 +226,7 @@ READ32_MEMBER(hyperscan_state::spg290_regs_r)
 #if LOG_SPG290_REGISTER_ACCESS
 	//else
 	{
-		if (!machine().side_effect_disabled())
+		if (!machine().side_effects_disabled())
 			log_spg290_regs(this,(offset >> 14) & 0xff, (offset<<2) & 0xffff, mem_mask, false);
 	}
 #endif
@@ -389,7 +389,7 @@ WRITE32_MEMBER(hyperscan_state::spg290_regs_w)
 #if LOG_SPG290_REGISTER_ACCESS
 	//else
 	{
-		if (!machine().side_effect_disabled())
+		if (!machine().side_effects_disabled())
 			log_spg290_regs(this,(offset >> 14) & 0xff, (offset<<2) & 0xffff, mem_mask, true, data);
 	}
 #endif
@@ -622,6 +622,8 @@ MACHINE_CONFIG_START(hyperscan_state::hyperscan)
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", SCORE7, XTAL(27'000'000) * 4)   // 108MHz S+core 7
 	MCFG_CPU_PROGRAM_MAP(spg290_mem)
+
+	MCFG_SOFTWARE_LIST_ADD("cd_list","hyperscan")
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)

@@ -774,7 +774,7 @@ MACHINE_CONFIG_START(funkball_state::funkball)
 	MCFG_CPU_IO_MAP(funkball_io)
 	MCFG_CPU_IRQ_ACKNOWLEDGE_DEVICE("pic8259_1", pic8259_device, inta_cb)
 
-	MCFG_FRAGMENT_ADD( pcat_common )
+	pcat_common(config);
 
 	MCFG_PCI_BUS_LEGACY_ADD("pcibus", 0)
 	MCFG_PCI_BUS_LEGACY_DEVICE(7, "voodoo_0", voodoo_0_pci_r, voodoo_0_pci_w)

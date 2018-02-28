@@ -35,7 +35,6 @@ public:
 	DECLARE_READ8_MEMBER( aha1542_r );
 	DECLARE_WRITE8_MEMBER( aha1542_w );
 
-	void z84c0010_mem(address_map &map);
 protected:
 	// device-level overrides
 	virtual void device_start() override;
@@ -45,6 +44,8 @@ protected:
 	virtual const tiny_rom_entry *device_rom_region() const override;
 	virtual void device_add_mconfig(machine_config &config) override;
 
+private:
+	void z84c0010_mem(address_map &map);
 };
 
 // device type definition

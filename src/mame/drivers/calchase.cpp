@@ -679,7 +679,7 @@ MACHINE_CONFIG_START(calchase_state::calchase)
 	MCFG_CPU_IO_MAP(calchase_io)
 	MCFG_CPU_IRQ_ACKNOWLEDGE_DEVICE("pic8259_1", pic8259_device, inta_cb)
 
-	MCFG_FRAGMENT_ADD( pcat_common )
+	pcat_common(config);
 
 	MCFG_IDE_CONTROLLER_32_ADD("ide", ata_devices, "hdd", nullptr, true)
 	MCFG_ATA_INTERFACE_IRQ_HANDLER(DEVWRITELINE("pic8259_2", pic8259_device, ir6_w))
@@ -689,7 +689,7 @@ MACHINE_CONFIG_START(calchase_state::calchase)
 	MCFG_PCI_BUS_LEGACY_DEVICE(7, nullptr, intel82371ab_pci_r, intel82371ab_pci_w)
 
 	/* video hardware */
-	MCFG_FRAGMENT_ADD( pcvideo_trident_vga )
+	pcvideo_trident_vga(config);
 
 	MCFG_DEVICE_REMOVE("rtc")
 	MCFG_DS12885_ADD("rtc")
@@ -711,7 +711,7 @@ MACHINE_CONFIG_START(calchase_state::hostinv)
 	MCFG_CPU_IO_MAP(calchase_io)
 	MCFG_CPU_IRQ_ACKNOWLEDGE_DEVICE("pic8259_1", pic8259_device, inta_cb)
 
-	MCFG_FRAGMENT_ADD( pcat_common )
+	pcat_common(config);
 
 	MCFG_IDE_CONTROLLER_32_ADD("ide", ata_devices, "cdrom", nullptr, true)
 	MCFG_ATA_INTERFACE_IRQ_HANDLER(DEVWRITELINE("pic8259_2", pic8259_device, ir6_w))
@@ -721,7 +721,7 @@ MACHINE_CONFIG_START(calchase_state::hostinv)
 	MCFG_PCI_BUS_LEGACY_DEVICE(7, nullptr, intel82371ab_pci_r, intel82371ab_pci_w)
 
 	/* video hardware */
-	MCFG_FRAGMENT_ADD( pcvideo_trident_vga )
+	pcvideo_trident_vga(config);
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")

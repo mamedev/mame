@@ -1067,7 +1067,8 @@ MACHINE_CONFIG_START(snookr10_state::snookr10)
 
 MACHINE_CONFIG_END
 
-MACHINE_CONFIG_DERIVED(snookr10_state::apple10, snookr10)
+MACHINE_CONFIG_START(snookr10_state::apple10)
+	snookr10(config);
 
 	/* basic machine hardware */
 	MCFG_CPU_MODIFY("maincpu")
@@ -1079,7 +1080,8 @@ MACHINE_CONFIG_DERIVED(snookr10_state::apple10, snookr10)
 
 MACHINE_CONFIG_END
 
-MACHINE_CONFIG_DERIVED(snookr10_state::tenballs, snookr10)
+MACHINE_CONFIG_START(snookr10_state::tenballs)
+	snookr10(config);
 
 	/* basic machine hardware */
 	MCFG_CPU_MODIFY("maincpu")
@@ -1087,7 +1089,8 @@ MACHINE_CONFIG_DERIVED(snookr10_state::tenballs, snookr10)
 
 MACHINE_CONFIG_END
 
-MACHINE_CONFIG_DERIVED(snookr10_state::crystalc, snookr10)
+MACHINE_CONFIG_START(snookr10_state::crystalc)
+	snookr10(config);
 
 	/* basic machine hardware */
 	MCFG_CPU_MODIFY("maincpu")

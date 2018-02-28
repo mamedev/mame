@@ -457,7 +457,7 @@ TIMER_CALLBACK_MEMBER(grchamp_state::soundlatch_clear7_w_cb)
 // RD5000
 READ8_MEMBER(grchamp_state::soundlatch_r)
 {
-	if (!machine().side_effect_disabled())
+	if (!machine().side_effects_disabled())
 	{
 		m_soundlatch_flag = false;
 		m_soundnmi->in_w<1>(0);

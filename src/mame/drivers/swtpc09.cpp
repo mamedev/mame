@@ -177,8 +177,8 @@ MACHINE_CONFIG_START(swtpc09_state::swtpc09_base)
 
 	MCFG_DEVICE_ADD("ptm", PTM6840, 2000000)
 	MCFG_PTM6840_EXTERNAL_CLOCKS(50, 0, 50)
-	MCFG_PTM6840_OUT0_CB(WRITELINE(swtpc09_state, ptm_o1_callback))
-	MCFG_PTM6840_OUT2_CB(WRITELINE(swtpc09_state, ptm_o3_callback))
+	MCFG_PTM6840_O1_CB(WRITELINE(swtpc09_state, ptm_o1_callback))
+	MCFG_PTM6840_O3_CB(WRITELINE(swtpc09_state, ptm_o3_callback))
 	MCFG_PTM6840_IRQ_CB(WRITELINE(swtpc09_state, ptm_irq))
 
 	MCFG_RS232_PORT_ADD("rs232", default_rs232_devices, "terminal")
@@ -201,14 +201,16 @@ MACHINE_CONFIG_START(swtpc09_state::swtpc09_base)
 	MCFG_FLOPPY_DRIVE_ADD("fdc:3", swtpc09_floppies, "dd", swtpc09_state::floppy_formats)
 MACHINE_CONFIG_END
 
-MACHINE_CONFIG_DERIVED(swtpc09_state::swtpc09, swtpc09_base)
+MACHINE_CONFIG_START(swtpc09_state::swtpc09)
+	swtpc09_base(config);
 	MCFG_DEVICE_MODIFY("fdc")
 	MCFG_WD_FDC_INTRQ_CALLBACK(WRITELINE(swtpc09_state, fdc_intrq_w))
 	MCFG_WD_FDC_DRQ_CALLBACK(WRITELINE(swtpc09_state, fdc_drq_w))
 MACHINE_CONFIG_END
 
 /* MPU09, MPID, MPS2 DC4 PIAIDE*/
-MACHINE_CONFIG_DERIVED(swtpc09_state::swtpc09i, swtpc09_base)
+MACHINE_CONFIG_START(swtpc09_state::swtpc09i)
+	swtpc09_base(config);
 	MCFG_DEVICE_MODIFY("bankdev")
 	MCFG_DEVICE_PROGRAM_MAP(flex_dc4_piaide_mem)
 
@@ -223,14 +225,16 @@ MACHINE_CONFIG_DERIVED(swtpc09_state::swtpc09i, swtpc09_base)
 MACHINE_CONFIG_END
 
 
-MACHINE_CONFIG_DERIVED(swtpc09_state::swtpc09u, swtpc09)
+MACHINE_CONFIG_START(swtpc09_state::swtpc09u)
+	swtpc09(config);
 	MCFG_DEVICE_MODIFY("bankdev")
 	MCFG_DEVICE_PROGRAM_MAP(uniflex_dmf2_mem)
 MACHINE_CONFIG_END
 
 
 /* MPU09, MPID, MPS2 DMF3 */
-MACHINE_CONFIG_DERIVED(swtpc09_state::swtpc09d3, swtpc09_base)
+MACHINE_CONFIG_START(swtpc09_state::swtpc09d3)
+	swtpc09_base(config);
 	MCFG_CPU_MODIFY("maincpu")
 	MCFG_CPU_CLOCK(XTAL(8'000'000))
 

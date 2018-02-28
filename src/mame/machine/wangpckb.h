@@ -33,7 +33,7 @@
 	MCFG_DEVICE_ADD(WANGPC_KEYBOARD_TAG, WANGPC_KEYBOARD, 0)
 
 #define MCFG_WANGPCKB_TXD_HANDLER(_devcb) \
-	devcb = &wangpc_keyboard_device::set_txd_handler(*device, DEVCB_##_devcb);
+	devcb = &downcast<wangpc_keyboard_device &>(*device).set_txd_handler(DEVCB_##_devcb);
 
 
 //**************************************************************************
@@ -49,7 +49,7 @@ public:
 	// construction/destruction
 	wangpc_keyboard_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
-	template <class Object> static devcb_base &set_txd_handler(device_t &device, Object &&cb) { return downcast<wangpc_keyboard_device &>(device).m_txd_handler.set_callback(std::forward<Object>(cb)); }
+	template <class Object> devcb_base &set_txd_handler(Object &&cb) { return m_txd_handler.set_callback(std::forward<Object>(cb)); }
 
 	DECLARE_WRITE_LINE_MEMBER( write_rxd );
 

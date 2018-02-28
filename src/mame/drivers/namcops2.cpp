@@ -932,7 +932,8 @@ MACHINE_CONFIG_START(namcops2_state::system246)
 	MCFG_PALETTE_ADD("palette", 65536)
 MACHINE_CONFIG_END
 
-MACHINE_CONFIG_DERIVED(namcops2_state::system256, system246)
+MACHINE_CONFIG_START(namcops2_state::system256)
+	system246(config);
 MACHINE_CONFIG_END
 
 #define SYSTEM246_BIOS  \

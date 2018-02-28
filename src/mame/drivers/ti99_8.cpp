@@ -829,7 +829,8 @@ MACHINE_CONFIG_END
 /*
     TI-99/8 US version (NTSC, 60 Hz)
 */
-MACHINE_CONFIG_DERIVED(ti99_8_state::ti99_8_60hz, ti99_8)
+MACHINE_CONFIG_START(ti99_8_state::ti99_8_60hz)
+	ti99_8(config);
 	// Video hardware
 	MCFG_DEVICE_ADD( TI_VDP_TAG, TMS9118, XTAL(10'738'635) / 2 )
 	MCFG_TMS9928A_VRAM_SIZE(0x4000)
@@ -841,7 +842,8 @@ MACHINE_CONFIG_END
 /*
     TI-99/8 European version (PAL, 50 Hz)
 */
-MACHINE_CONFIG_DERIVED(ti99_8_state::ti99_8_50hz, ti99_8)
+MACHINE_CONFIG_START(ti99_8_state::ti99_8_50hz)
+	ti99_8(config);
 	// Video hardware
 	MCFG_DEVICE_ADD( TI_VDP_TAG, TMS9129, XTAL(10'738'635) / 2 )
 	MCFG_TMS9928A_VRAM_SIZE(0x4000)

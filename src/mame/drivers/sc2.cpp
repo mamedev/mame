@@ -50,7 +50,7 @@ public:
 
 READ8_MEMBER( sc2_state::sc2_beep )
 {
-	//if (!machine().side_effect_disabled())
+	//if (!machine().side_effects_disabled())
 	{
 		m_beep_state = ~m_beep_state;
 

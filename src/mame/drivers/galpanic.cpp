@@ -266,13 +266,14 @@ MACHINE_CONFIG_START(galpanic_state::galpanic)
 MACHINE_CONFIG_END
 
 
-MACHINE_CONFIG_DERIVED(galpanic_state::galpanica, galpanic)
+MACHINE_CONFIG_START(galpanic_state::galpanica)
+	galpanic(config);
 	MCFG_CPU_MODIFY("maincpu")
 	MCFG_CPU_PROGRAM_MAP(galpanica_map)
 
 	/* basic machine hardware */
 	MCFG_DEVICE_ADD("calc1_mcu", KANEKO_HIT, 0)
-	kaneko_hit_device::set_type(*device, 0);
+	MCFG_KANEKO_HIT_TYPE(0)
 
 	/* arm watchdog */
 	MCFG_WATCHDOG_MODIFY("watchdog")

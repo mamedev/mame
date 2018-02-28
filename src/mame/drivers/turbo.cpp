@@ -888,7 +888,7 @@ MACHINE_CONFIG_START(turbo_state::turbo)
 	MCFG_VIDEO_START_OVERRIDE(turbo_state,turbo)
 
 	/* sound hardware */
-	MCFG_FRAGMENT_ADD(turbo_samples)
+	turbo_samples(config);
 MACHINE_CONFIG_END
 
 
@@ -928,7 +928,7 @@ MACHINE_CONFIG_START(turbo_state::subroc3d)
 	MCFG_VIDEO_START_OVERRIDE(turbo_state,turbo)
 
 	/* sound hardware */
-	MCFG_FRAGMENT_ADD(subroc3d_samples)
+	subroc3d_samples(config);
 MACHINE_CONFIG_END
 
 
@@ -976,16 +976,18 @@ MACHINE_CONFIG_START(turbo_state::buckrog)
 	MCFG_VIDEO_START_OVERRIDE(turbo_state,buckrog)
 
 	/* sound hardware */
-	MCFG_FRAGMENT_ADD(buckrog_samples)
+	buckrog_samples(config);
 MACHINE_CONFIG_END
 
-MACHINE_CONFIG_DERIVED(turbo_state::buckrogu, buckrog)
+MACHINE_CONFIG_START(turbo_state::buckrogu)
+	buckrog(config);
 	MCFG_CPU_MODIFY("maincpu")
 	MCFG_DEVICE_REMOVE_ADDRESS_MAP(AS_OPCODES)
 MACHINE_CONFIG_END
 
 
-MACHINE_CONFIG_DERIVED(turbo_state::buckroge, buckrog)
+MACHINE_CONFIG_START(turbo_state::buckroge)
+	buckrog(config);
 
 	/* basic machine hardware */
 	MCFG_CPU_REPLACE("maincpu", SEGA_315_5014, MASTER_CLOCK/4)

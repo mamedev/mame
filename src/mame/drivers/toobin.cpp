@@ -27,7 +27,7 @@
 #include "machine/watchdog.h"
 #include "speaker.h"
 
-#define MASTER_CLOCK        XTAL(32'000'000)
+static constexpr XTAL MASTER_CLOCK = 32_MHz_XTAL;
 
 
 
@@ -42,12 +42,6 @@ void toobin_state::update_interrupts()
 	m_maincpu->set_input_line(1, m_scanline_int_state ? ASSERT_LINE : CLEAR_LINE);
 	m_maincpu->set_input_line(2, m_sound_int_state ? ASSERT_LINE : CLEAR_LINE);
 	m_maincpu->set_input_line(3, m_scanline_int_state && m_sound_int_state ? ASSERT_LINE : CLEAR_LINE);
-}
-
-
-MACHINE_RESET_MEMBER(toobin_state,toobin)
-{
-	atarigen_state::machine_reset();
 }
 
 
@@ -202,8 +196,6 @@ MACHINE_CONFIG_START(toobin_state::toobin)
 	MCFG_CPU_ADD("maincpu", M68010, MASTER_CLOCK/4)
 	MCFG_CPU_PROGRAM_MAP(main_map)
 
-	MCFG_MACHINE_RESET_OVERRIDE(toobin_state,toobin)
-
 	MCFG_EEPROM_2804_ADD("eeprom")
 	MCFG_EEPROM_28XX_LOCK_AFTER_WRITE(true)
 
@@ -224,12 +216,10 @@ MACHINE_CONFIG_START(toobin_state::toobin)
 	MCFG_GFXDECODE_ADD("gfxdecode", "palette", toobin)
 	MCFG_PALETTE_ADD("palette", 1024)
 
-	MCFG_VIDEO_START_OVERRIDE(toobin_state,toobin)
-
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
 
-	MCFG_ATARI_JSA_I_ADD("jsa", WRITELINE(atarigen_state, sound_int_write_line))
+	MCFG_ATARI_JSA_I_ADD("jsa", WRITELINE(toobin_state, sound_int_write_line))
 	MCFG_ATARI_JSA_TEST_PORT("FF9000", 12)
 	MCFG_SOUND_ROUTE(0, "lspeaker", 1.0)
 	MCFG_SOUND_ROUTE(1, "rspeaker", 1.0)

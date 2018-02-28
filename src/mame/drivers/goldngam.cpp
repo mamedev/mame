@@ -579,7 +579,8 @@ MACHINE_CONFIG_START(goldngam_state::swisspkr)
 MACHINE_CONFIG_END
 
 
-MACHINE_CONFIG_DERIVED(goldngam_state::moviecrd, swisspkr)
+MACHINE_CONFIG_START(goldngam_state::moviecrd)
+	swisspkr(config);
 
 	/* basic machine hardware */
 	MCFG_CPU_MODIFY("maincpu")

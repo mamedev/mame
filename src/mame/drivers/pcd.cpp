@@ -168,7 +168,7 @@ WRITE_LINE_MEMBER( pcd_state::i186_timer1_w )
 
 READ8_MEMBER( pcd_state::nmi_io_r )
 {
-	if(machine().side_effect_disabled())
+	if(machine().side_effects_disabled())
 		return 0;
 	logerror("%s: unmapped %s %04x\n", machine().describe_context(), space.name(), offset);
 	m_stat |= 0xfd;
@@ -178,7 +178,7 @@ READ8_MEMBER( pcd_state::nmi_io_r )
 
 WRITE8_MEMBER( pcd_state::nmi_io_w )
 {
-	if(machine().side_effect_disabled())
+	if(machine().side_effects_disabled())
 		return;
 	logerror("%s: unmapped %s %04x\n", machine().describe_context(), space.name(), offset);
 	m_stat |= 0xfd;
@@ -400,7 +400,7 @@ WRITE16_MEMBER(pcd_state::mem_w)
 			reg = m_mmu.regs[((offset >> 10) & 0xff) | ((m_mmu.ctl & 0x18) << 5)];
 		else
 			reg = m_mmu.regs[((offset >> 10) & 0x7f) | ((m_mmu.ctl & 0x1c) << 5)];
-		if(!reg && !machine().side_effect_disabled())
+		if(!reg && !machine().side_effects_disabled())
 		{
 			offset <<= 1;
 			logerror("%s: Null mmu entry %06x\n", machine().describe_context(), offset);
@@ -422,7 +422,7 @@ READ16_MEMBER(pcd_state::mem_r)
 			reg = m_mmu.regs[((offset >> 10) & 0xff) | ((m_mmu.ctl & 0x18) << 5)];
 		else
 			reg = m_mmu.regs[((offset >> 10) & 0x7f) | ((m_mmu.ctl & 0x1c) << 5)];
-		if(!reg && !machine().side_effect_disabled())
+		if(!reg && !machine().side_effects_disabled())
 		{
 			offset <<= 1;
 			logerror("%s: Null mmu entry %06x\n", machine().describe_context(), offset);
@@ -573,7 +573,8 @@ MACHINE_CONFIG_START(pcd_state::pcd)
 	MCFG_SCSIDEV_ADD("scsi:1", "harddisk", OMTI5100, SCSI_ID_0)
 MACHINE_CONFIG_END
 
-MACHINE_CONFIG_DERIVED(pcd_state::pcx, pcd)
+MACHINE_CONFIG_START(pcd_state::pcx)
+	pcd(config);
 	MCFG_CPU_MODIFY("maincpu")
 	MCFG_CPU_IO_MAP(pcx_io)
 

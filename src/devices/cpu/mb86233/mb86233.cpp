@@ -375,9 +375,9 @@ void mb86233_cpu_device::ALU( uint32_t alu)
 		case 0x0F:  /* D = int(D) */
 			switch((m_fpucontrol>>1)&3)
 			{
-				//case 0: GETD().i = floor(GETD().f+0.5f); break;
-				//case 1: GETD().i = ceil(GETD().f); break;
-				case 2: GETD().i = floor(GETD().f); break; // Manx TT
+				//case 0: GETD().i = floorf(GETD().f+0.5f); break;
+				//case 1: GETD().i = ceilf(GETD().f); break;
+				case 2: GETD().i = floorf(GETD().f); break; // Manx TT
 				case 3: GETD().i = (int32_t)GETD().f; break;
 				default: popmessage("TGP uses D = int(D) with FPU control = %02x, contact MAMEdev",m_fpucontrol>>1); break;
 			}

@@ -717,7 +717,7 @@ MACHINE_CONFIG_START(tmc1800_state::tmc1800)
 	MCFG_COSMAC_DMAW_CALLBACK(DEVWRITE8(CDP1861_TAG, cdp1861_device, dma_w))
 
 	// video hardware
-	MCFG_FRAGMENT_ADD(tmc1800_video)
+	tmc1800_video(config);
 
 	// sound hardware
 	MCFG_SPEAKER_STANDARD_MONO("mono")
@@ -748,7 +748,7 @@ MACHINE_CONFIG_START(osc1000b_state::osc1000b)
 	MCFG_COSMAC_Q_CALLBACK(WRITELINE(osc1000b_state, q_w))
 
 	// video hardware
-	MCFG_FRAGMENT_ADD(osc1000b_video)
+	osc1000b_video(config);
 
 	// sound hardware
 	MCFG_SPEAKER_STANDARD_MONO("mono")
@@ -780,7 +780,7 @@ MACHINE_CONFIG_START(tmc2000_state::tmc2000)
 	MCFG_COSMAC_DMAW_CALLBACK(WRITE8(tmc2000_state, dma_w))
 
 	// video hardware
-	MCFG_FRAGMENT_ADD(tmc2000_video)
+	tmc2000_video(config);
 
 	// devices
 	MCFG_QUICKLOAD_ADD("quickload", tmc1800_base_state, tmc1800, "bin", 0)
@@ -806,7 +806,7 @@ MACHINE_CONFIG_START(nano_state::nano)
 	MCFG_COSMAC_DMAW_CALLBACK(DEVWRITE8(CDP1864_TAG, cdp1864_device, dma_w))
 
 	// video hardware
-	MCFG_FRAGMENT_ADD(nano_video)
+	nano_video(config);
 
 	// devices
 	MCFG_QUICKLOAD_ADD("quickload", tmc1800_base_state, tmc1800, "bin", 0)

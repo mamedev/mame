@@ -640,7 +640,8 @@ MACHINE_CONFIG_START(docastle_state::docastle)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
 MACHINE_CONFIG_END
 
-MACHINE_CONFIG_DERIVED(docastle_state::dorunrun, docastle)
+MACHINE_CONFIG_START(docastle_state::dorunrun)
+	docastle(config);
 
 	/* basic machine hardware */
 	MCFG_CPU_MODIFY("maincpu")
@@ -653,7 +654,8 @@ MACHINE_CONFIG_DERIVED(docastle_state::dorunrun, docastle)
 	MCFG_VIDEO_START_OVERRIDE(docastle_state,dorunrun)
 MACHINE_CONFIG_END
 
-MACHINE_CONFIG_DERIVED(docastle_state::idsoccer, docastle)
+MACHINE_CONFIG_START(docastle_state::idsoccer)
+	docastle(config);
 
 	/* basic machine hardware */
 	MCFG_CPU_MODIFY("maincpu")

@@ -110,7 +110,7 @@ SETADDRESS_DBIN_MEMBER( myarc_hfdc_device::setaddress_dbin )
 {
 	// Do not allow setaddress for the debugger. It will mess up the
 	// setaddress/memory access pairs when the CPU enters wait states.
-	if (machine().side_effect_disabled()) return;
+	if (machine().side_effects_disabled()) return;
 
 	// Selection login in the PAL and some circuits on the board
 
@@ -202,7 +202,7 @@ void myarc_hfdc_device::debug_write(offs_t offset, uint8_t data)
 */
 READ8Z_MEMBER(myarc_hfdc_device::readz)
 {
-	if (machine().side_effect_disabled())
+	if (machine().side_effects_disabled())
 	{
 		debug_read(offset, value);
 		return;
@@ -281,7 +281,7 @@ READ8Z_MEMBER(myarc_hfdc_device::readz)
 */
 WRITE8_MEMBER( myarc_hfdc_device::write )
 {
-	if (machine().side_effect_disabled())
+	if (machine().side_effects_disabled())
 	{
 		debug_write(offset, data);
 		return;

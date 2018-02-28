@@ -352,7 +352,7 @@ MACHINE_CONFIG_START(spacefb_state::spacefb)
 	MCFG_SCREEN_UPDATE_DRIVER(spacefb_state, screen_update)
 
 	/* audio hardware */
-	MCFG_FRAGMENT_ADD(spacefb_audio)
+	spacefb_audio(config);
 
 MACHINE_CONFIG_END
 

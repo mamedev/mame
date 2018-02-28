@@ -351,7 +351,7 @@ MACHINE_CONFIG_START(polyplay_state::polyplay_zre)
 MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(polyplay_state::polyplay_zrepp)
-	MCFG_FRAGMENT_ADD( polyplay_zre )
+	polyplay_zre(config);
 
 	/* basic machine hardware */
 	MCFG_CPU_MODIFY(Z80CPU_TAG) /* UB880D */

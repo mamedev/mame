@@ -665,14 +665,16 @@ MACHINE_CONFIG_START(ghosteo_state::ghosteo)
 	MCFG_SOUND_ROUTE(1, "rspeaker", 1.0)
 MACHINE_CONFIG_END
 
-MACHINE_CONFIG_DERIVED(ghosteo_state::bballoon, ghosteo)
+MACHINE_CONFIG_START(ghosteo_state::bballoon)
+	ghosteo(config);
 	MCFG_CPU_MODIFY("maincpu")
 	MCFG_CPU_PROGRAM_MAP(bballoon_map)
 	MCFG_I2CMEM_ADD("i2cmem")
 	MCFG_I2CMEM_DATA_SIZE(256)
 MACHINE_CONFIG_END
 
-MACHINE_CONFIG_DERIVED(ghosteo_state::touryuu, ghosteo)
+MACHINE_CONFIG_START(ghosteo_state::touryuu)
+	ghosteo(config);
 	MCFG_CPU_MODIFY("maincpu")
 	MCFG_CPU_PROGRAM_MAP(touryuu_map)
 	MCFG_I2CMEM_ADD("i2cmem")

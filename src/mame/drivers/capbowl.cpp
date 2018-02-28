@@ -363,7 +363,8 @@ MACHINE_CONFIG_START(capbowl_state::capbowl)
 MACHINE_CONFIG_END
 
 
-MACHINE_CONFIG_DERIVED(capbowl_state::bowlrama, capbowl)
+MACHINE_CONFIG_START(capbowl_state::bowlrama)
+	capbowl(config);
 
 	/* basic machine hardware */
 

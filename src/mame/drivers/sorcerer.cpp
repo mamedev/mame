@@ -481,7 +481,8 @@ MACHINE_CONFIG_START(sorcerer_state::sorcerer)
 	MCFG_RAM_EXTRA_OPTIONS("8K,16K,32K")
 MACHINE_CONFIG_END
 
-MACHINE_CONFIG_DERIVED(sorcerer_state::sorcererd, sorcerer)
+MACHINE_CONFIG_START(sorcerer_state::sorcererd)
+	sorcerer(config);
 	MCFG_CPU_MODIFY("maincpu")
 	MCFG_CPU_PROGRAM_MAP(sorcererd_mem)
 

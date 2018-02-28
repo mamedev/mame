@@ -58,8 +58,11 @@ public:
 		, m_speaker(*this, "speaker")
 		, m_votrax(*this, "votrax")
 		, m_rtc(*this, "rtc")
-	{}
+	{ }
 
+	void aussiebyte(machine_config &config);
+
+protected:
 	DECLARE_READ8_MEMBER(memory_read_byte);
 	DECLARE_WRITE8_MEMBER(memory_write_byte);
 	DECLARE_READ8_MEMBER(io_read_byte);
@@ -90,17 +93,17 @@ public:
 	DECLARE_WRITE_LINE_MEMBER(sio1_rdyb_w);
 	DECLARE_WRITE_LINE_MEMBER(sio2_rdya_w);
 	DECLARE_WRITE_LINE_MEMBER(sio2_rdyb_w);
-	DECLARE_MACHINE_RESET(aussiebyte);
-	DECLARE_DRIVER_INIT(aussiebyte);
 	DECLARE_WRITE_LINE_MEMBER(ctc_z2_w);
 	DECLARE_WRITE8_MEMBER(address_w);
 	DECLARE_WRITE8_MEMBER(register_w);
 	MC6845_UPDATE_ROW(crtc_update_row);
 	MC6845_ON_UPDATE_ADDR_CHANGED(crtc_update_addr);
 
-	void aussiebyte(machine_config &config);
+	virtual void machine_start() override;
+	virtual void machine_reset() override;
 	void aussiebyte_io(address_map &map);
 	void aussiebyte_map(address_map &map);
+
 private:
 	uint8_t crt8002(uint8_t ac_ra, uint8_t ac_chr, uint8_t ac_attr, uint16_t ac_cnt, bool ac_curs);
 	bool m_port15; // rom switched in (0), out (1)

@@ -573,7 +573,7 @@
 			</dataarea>
 		</part>
 	</software>
-	
+
 	<software name="up" supported="no">
 		<description>Up (US)</description>
 		<year>2009</year>
@@ -584,7 +584,7 @@
 				<rom name="500-13563-A - Up (US).bin" size="8388608" crc="1e2a5031" sha1="ab74239918208cc7dfa7377549086b59e6c40818" offset="0" />
 			</dataarea>
 		</part>
-	</software>	
+	</software>
 
 	<software name="scooby" supported="no">
 		<description>Scooby Doo! (US)</description>
@@ -596,7 +596,7 @@
 				<rom name="500-14005-A - Scooby Doo! (US).bin" size="8388608" crc="4cd2c497" sha1="9f06cb4aba2399464a799910be9df1d5678bb23a" offset="0" />
 			</dataarea>
 		</part>
-	</software>	
+	</software>
 
 	<software name="cars2" supported="no">
 		<description>Cars 2 (US)</description>
@@ -608,7 +608,7 @@
 				<rom name="500-14320-A - Cars 2 (US).bin" size="8388608" crc="29af42ba" sha1="01263c4b6b178599eca818a514f9a668bdf9081d" offset="0" />
 			</dataarea>
 		</part>
-	</software>	
+	</software>
 
 	<software name="lernleap" supported="no">
 		<description>Learning with Leap (US)</description>
@@ -620,7 +620,7 @@
 				<rom name="500-10093 - Learning with Leap (US).bin" size="8388608" crc="2c1fcf40" sha1="ee9dbfa8aabda493cc2a34dc82b253122fa96c91" offset="0" />
 			</dataarea>
 		</part>
-	</software>	
+	</software>
 
 	<software name="kinderga" supported="no">
 		<description>Kindergarten (US)</description>
@@ -633,7 +633,7 @@
 			</dataarea>
 		</part>
 	</software>
-	
+
 	<software name="tfcall" supported="no">
 		<description>Thomas and Friends - Calling all Engines! (US)</description>
 		<year>2005</year>
@@ -656,7 +656,7 @@
 			</dataarea>
 		</part>
 	</software>
-	
+
 	<software name="numraid" supported="no">
 		<description>Number Raiders (US)</description>
 		<year>2005</year>
@@ -667,8 +667,8 @@
 				<rom name="500-11993-A - Number Raiders (US).bin" size="4194304" crc="0f6d55cf" sha1="f30e7d55c5222e85aca08819ff613343b91138a4" offset="0" />
 			</dataarea>
 		</part>
-	</software>	
-	
+	</software>
+
 	<software name="scoobsnk" supported="no">
 		<description>Scooby Doo! - Spooky Snacks! (US)</description>
 		<year>2005</year>
@@ -680,7 +680,7 @@
 			</dataarea>
 		</part>
 	</software>
-	
+
 	<software name="anigeni" supported="no">
 		<description>Animal Genius (US)</description>
 		<year>2005</year>
@@ -692,7 +692,7 @@
 			</dataarea>
 		</part>
 	</software>
-	
+
 	<software name="letrpilr" supported="no">
 		<description>Letterpillar (US)</description>
 		<year>2005</year>
@@ -704,7 +704,7 @@
 			</dataarea>
 		</part>
 	</software>
-	
+
 	<software name="createcr" supported="no">
 		<description>Creature Create (US)</description>
 		<year>2006</year>
@@ -739,12 +739,12 @@
 				<rom name="500-13445-A - Ratatouille (US).bin" size="8388608" crc="d0c4de47" sha1="372c61285eee5c8ce2670d12bedb09150fdaaa45" offset="0" />
 			</dataarea>
 		</part>
-	</software>	
-	
+	</software>
 
-	
+
+
 	<!-- L-MAX carts -->
-	
+
 	<software name="numbrun">
 		<description>Numbers on the Run - Counting on Zero (USA, L-MAX)</description>
 		<year>2005?</year>

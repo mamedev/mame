@@ -583,7 +583,8 @@ MACHINE_CONFIG_START(mc10_state::alice32)
 	MCFG_SOFTWARE_LIST_COMPATIBLE_ADD("mc10_cass", "mc10")
 MACHINE_CONFIG_END
 
-MACHINE_CONFIG_DERIVED(mc10_state::alice90, alice32)
+MACHINE_CONFIG_START(mc10_state::alice90)
+	alice32(config);
 	MCFG_CPU_MODIFY("maincpu")
 	MCFG_CPU_PROGRAM_MAP(alice90_mem)
 

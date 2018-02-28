@@ -35,15 +35,6 @@
 #define Z88_SCR_HW_CURS (Z88_SCR_HW_HRS|Z88_SCR_HW_FLS|Z88_SCR_HW_REV)
 #define Z88_SCR_HW_NULL (Z88_SCR_HW_HRS|Z88_SCR_HW_GRY|Z88_SCR_HW_REV)
 
-enum
-{
-	Z88_BANK_ROM = 1,
-	Z88_BANK_RAM,
-	Z88_BANK_CART,
-	Z88_BANK_UNMAP
-};
-
-
 class z88_state : public driver_device
 {
 public:
@@ -54,9 +45,16 @@ public:
 			m_palette(*this, "palette")
 	{ }
 
-	required_device<cpu_device> m_maincpu;
-	required_device<ram_device> m_ram;
-	required_device<palette_device> m_palette;
+	void z88(machine_config &config);
+
+protected:
+	enum
+	{
+		Z88_BANK_ROM = 1,
+		Z88_BANK_RAM,
+		Z88_BANK_CART,
+		Z88_BANK_UNMAP
+	};
 
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
@@ -81,6 +79,16 @@ public:
 	void vh_render_6x8(bitmap_ind16 &bitmap, int x, int y, uint16_t pen0, uint16_t pen1, uint8_t *gfx);
 	void vh_render_line(bitmap_ind16 &bitmap, int x, int y, uint16_t pen);
 
+	DECLARE_PALETTE_INIT(z88);
+
+	void z88_io(address_map &map);
+	void z88_mem(address_map &map);
+
+private:
+	required_device<cpu_device> m_maincpu;
+	required_device<ram_device> m_ram;
+	required_device<palette_device> m_palette;
+
 	struct
 	{
 		uint8_t slot;
@@ -91,10 +99,6 @@ public:
 	uint8_t *               m_bios;
 	uint8_t *               m_ram_base;
 	z88cart_slot_device * m_carts[4];
-	DECLARE_PALETTE_INIT(z88);
-	void z88(machine_config &config);
-	void z88_io(address_map &map);
-	void z88_mem(address_map &map);
 };
 
 #endif /* MAME_INCLUDES_Z88_H */

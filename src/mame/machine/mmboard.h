@@ -29,7 +29,7 @@
 	MCFG_DEVICE_ADD(_tag, MEPHISTO_BUTTONS_BOARD, 0) \
 
 #define MCFG_MEPHISTO_BOARD_DISABLE_LEDS(_val) \
-	mephisto_board_device::static_set_disable_leds(*device, _val);
+	downcast<mephisto_board_device &>(*device).set_disable_leds(_val);
 
 #define MCFG_MEPHISTO_DISPLAY_MODUL_ADD(_tag) \
 	MCFG_DEVICE_ADD(_tag, MEPHISTO_DISPLAY_MODUL, 0)
@@ -47,8 +47,8 @@ public:
 	// construction/destruction
 	mephisto_board_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock);
 
-	// static configuration helpers
-	static void static_set_disable_leds(device_t &device, int _disable_leds) { mephisto_board_device &dev=downcast<mephisto_board_device &>(device); dev.m_disable_leds = _disable_leds; }
+	// configuration helpers
+	void set_disable_leds(int _disable_leds) { m_disable_leds = _disable_leds; }
 
 	DECLARE_READ8_MEMBER(input_r);
 	DECLARE_WRITE8_MEMBER(led_w);

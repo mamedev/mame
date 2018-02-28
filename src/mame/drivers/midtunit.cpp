@@ -621,7 +621,8 @@ MACHINE_CONFIG_START(midtunit_state::tunit_core)
 MACHINE_CONFIG_END
 
 
-MACHINE_CONFIG_DERIVED(midtunit_state::tunit_adpcm, tunit_core)
+MACHINE_CONFIG_START(midtunit_state::tunit_adpcm)
+	tunit_core(config);
 
 	/* basic machine hardware */
 	MCFG_SPEAKER_STANDARD_MONO("speaker")
@@ -630,7 +631,8 @@ MACHINE_CONFIG_DERIVED(midtunit_state::tunit_adpcm, tunit_core)
 MACHINE_CONFIG_END
 
 
-MACHINE_CONFIG_DERIVED(midtunit_state::tunit_dcs, tunit_core)
+MACHINE_CONFIG_START(midtunit_state::tunit_dcs)
+	tunit_core(config);
 
 	/* basic machine hardware */
 	MCFG_DEVICE_ADD("dcs", DCS_AUDIO_2K, 0)

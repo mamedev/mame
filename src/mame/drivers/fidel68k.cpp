@@ -566,14 +566,16 @@ MACHINE_CONFIG_START(fidel68k_state::fex68k)
 	MCFG_SOUND_ROUTE_EX(0, "dac", 1.0, DAC_VREF_POS_INPUT)
 MACHINE_CONFIG_END
 
-MACHINE_CONFIG_DERIVED(fidel68k_state::fex68km2, fex68k)
+MACHINE_CONFIG_START(fidel68k_state::fex68km2)
+	fex68k(config);
 
 	/* basic machine hardware */
 	MCFG_CPU_MODIFY("maincpu")
 	MCFG_CPU_PROGRAM_MAP(fex68km2_map)
 MACHINE_CONFIG_END
 
-MACHINE_CONFIG_DERIVED(fidel68k_state::fex68km3, fex68k)
+MACHINE_CONFIG_START(fidel68k_state::fex68km3)
+	fex68k(config);
 
 	/* basic machine hardware */
 	MCFG_CPU_MODIFY("maincpu")
@@ -600,7 +602,8 @@ MACHINE_CONFIG_START(fidel68k_state::fdes2265)
 	MCFG_SOUND_ROUTE_EX(0, "dac", 1.0, DAC_VREF_POS_INPUT)
 MACHINE_CONFIG_END
 
-MACHINE_CONFIG_DERIVED(fidel68k_state::fdes2325, fdes2265)
+MACHINE_CONFIG_START(fidel68k_state::fdes2325)
+	fdes2265(config);
 
 	/* basic machine hardware */
 	MCFG_CPU_REPLACE("maincpu", M68EC020, 20_MHz_XTAL) // MC68EC020RP25
@@ -640,7 +643,8 @@ MACHINE_CONFIG_START(fidel68k_state::eag)
 	MCFG_SOFTWARE_LIST_ADD("cart_list", "fidel_scc")
 MACHINE_CONFIG_END
 
-MACHINE_CONFIG_DERIVED(fidel68k_state::eagv7, eag)
+MACHINE_CONFIG_START(fidel68k_state::eagv7)
+	eag(config);
 
 	/* basic machine hardware */
 	MCFG_CPU_REPLACE("maincpu", M68020, 20_MHz_XTAL)
@@ -649,21 +653,24 @@ MACHINE_CONFIG_DERIVED(fidel68k_state::eagv7, eag)
 	MCFG_RAM_REMOVE("ram")
 MACHINE_CONFIG_END
 
-MACHINE_CONFIG_DERIVED(fidel68k_state::eagv9, eagv7)
+MACHINE_CONFIG_START(fidel68k_state::eagv9)
+	eagv7(config);
 
 	/* basic machine hardware */
 	MCFG_CPU_REPLACE("maincpu", M68030, 32_MHz_XTAL)
 	MCFG_CPU_PROGRAM_MAP(eagv7_map)
 MACHINE_CONFIG_END
 
-MACHINE_CONFIG_DERIVED(fidel68k_state::eagv10, eagv7)
+MACHINE_CONFIG_START(fidel68k_state::eagv10)
+	eagv7(config);
 
 	/* basic machine hardware */
 	MCFG_CPU_REPLACE("maincpu", M68040, 25_MHz_XTAL)
 	MCFG_CPU_PROGRAM_MAP(eagv11_map)
 MACHINE_CONFIG_END
 
-MACHINE_CONFIG_DERIVED(fidel68k_state::eagv11, eagv7)
+MACHINE_CONFIG_START(fidel68k_state::eagv11)
+	eagv7(config);
 
 	/* basic machine hardware */
 	MCFG_CPU_REPLACE("maincpu", M68EC040, 36_MHz_XTAL*2*2) // wrong! should be M68EC060 @ 72MHz

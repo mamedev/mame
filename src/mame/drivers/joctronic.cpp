@@ -422,7 +422,8 @@ MACHINE_CONFIG_START(joctronic_state::slalom03)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.30)
 MACHINE_CONFIG_END
 
-MACHINE_CONFIG_DERIVED(joctronic_state::bldyrolr, slalom03)
+MACHINE_CONFIG_START(joctronic_state::bldyrolr)
+	slalom03(config);
 	MCFG_CPU_MODIFY("maincpu")
 	MCFG_CPU_PROGRAM_MAP(bldyrolr_maincpu_map)
 MACHINE_CONFIG_END

@@ -433,7 +433,8 @@ MACHINE_CONFIG_START(seicross_state::no_nvram)
 MACHINE_CONFIG_END
 
 
-MACHINE_CONFIG_DERIVED(seicross_state::nvram, no_nvram)
+MACHINE_CONFIG_START(seicross_state::nvram)
+	no_nvram(config);
 
 	/* basic machine hardware */
 	MCFG_CPU_MODIFY("mcu")
@@ -442,7 +443,8 @@ MACHINE_CONFIG_DERIVED(seicross_state::nvram, no_nvram)
 	MCFG_NVRAM_ADD_CUSTOM_DRIVER("nvram", seicross_state, nvram_init)
 MACHINE_CONFIG_END
 
-MACHINE_CONFIG_DERIVED(seicross_state::friskytb, nvram)
+MACHINE_CONFIG_START(seicross_state::friskytb)
+	nvram(config);
 	MCFG_CPU_MODIFY("mcu")
 	MCFG_CPU_OPCODES_MAP(decrypted_opcodes_map)
 MACHINE_CONFIG_END

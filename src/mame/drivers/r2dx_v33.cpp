@@ -857,7 +857,8 @@ MACHINE_CONFIG_START(r2dx_v33_state::nzerotea)
 	MCFG_SEIBU_SOUND_YM_WRITE_CB(DEVWRITE8("ymsnd", ym3812_device, write))
 MACHINE_CONFIG_END
 
-MACHINE_CONFIG_DERIVED(r2dx_v33_state::zerotm2k, nzerotea)
+MACHINE_CONFIG_START(r2dx_v33_state::zerotm2k)
+	nzerotea(config);
 	MCFG_CPU_MODIFY("maincpu")
 	MCFG_CPU_PROGRAM_MAP(zerotm2k_map)
 

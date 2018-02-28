@@ -838,7 +838,8 @@ MACHINE_CONFIG_START(opwolf_state::opwolf)
 MACHINE_CONFIG_END
 
 
-MACHINE_CONFIG_DERIVED(opwolf_state::opwolfp, opwolf)
+MACHINE_CONFIG_START(opwolf_state::opwolfp)
+	opwolf(config);
 
 	/* basic machine hardware */
 	MCFG_CPU_MODIFY("maincpu") /* 8 MHz */

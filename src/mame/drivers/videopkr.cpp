@@ -993,8 +993,6 @@ ADDRESS_MAP_START(videopkr_state::i8751_io_port)
 	AM_RANGE(0xa000, 0xbfff) AM_RAM // video RAM?
 	AM_RANGE(0xc000, 0xc003) AM_DEVREADWRITE("ppi", i8255_device, read, write)
 	AM_RANGE(0xf000, 0xf000) AM_WRITEONLY // ???
-	AM_RANGE(MCS51_PORT_P0, MCS51_PORT_P0) AM_READONLY // ???
-	AM_RANGE(MCS51_PORT_P1, MCS51_PORT_P1) AM_NOP // ???
 ADDRESS_MAP_END
 
 ADDRESS_MAP_START(videopkr_state::i8039_sound_mem)
@@ -1012,11 +1010,6 @@ ADDRESS_MAP_END
 
 ADDRESS_MAP_START(videopkr_state::i8051_sound_port)
 	AM_RANGE(0x0000, 0x1ff) AM_RAM
-	/* ports */
-	AM_RANGE(MCS51_PORT_P0, MCS51_PORT_P0) AM_READWRITE(baby_sound_p0_r, baby_sound_p0_w)
-	AM_RANGE(MCS51_PORT_P1, MCS51_PORT_P1) AM_READWRITE(baby_sound_p1_r, baby_sound_p1_w)
-	AM_RANGE(MCS51_PORT_P2, MCS51_PORT_P2) AM_READ(baby_sound_p2_r) AM_WRITE(baby_sound_p2_w)
-	AM_RANGE(MCS51_PORT_P3, MCS51_PORT_P3) AM_READWRITE(baby_sound_p3_r, baby_sound_p3_w)
 ADDRESS_MAP_END
 
 
@@ -1303,7 +1296,8 @@ MACHINE_CONFIG_START(videopkr_state::videopkr)
 MACHINE_CONFIG_END
 
 
-MACHINE_CONFIG_DERIVED(videopkr_state::blckjack, videopkr)
+MACHINE_CONFIG_START(videopkr_state::blckjack)
+	videopkr(config);
 
 	/* basic machine hardware */
 
@@ -1314,7 +1308,8 @@ MACHINE_CONFIG_DERIVED(videopkr_state::blckjack, videopkr)
 MACHINE_CONFIG_END
 
 
-MACHINE_CONFIG_DERIVED(videopkr_state::videodad, videopkr)
+MACHINE_CONFIG_START(videopkr_state::videodad)
+	videopkr(config);
 
 	/* basic machine hardware */
 	MCFG_CPU_MODIFY("maincpu")
@@ -1330,7 +1325,8 @@ MACHINE_CONFIG_DERIVED(videopkr_state::videodad, videopkr)
 MACHINE_CONFIG_END
 
 
-MACHINE_CONFIG_DERIVED(videopkr_state::babypkr, videopkr)
+MACHINE_CONFIG_START(videopkr_state::babypkr)
+	videopkr(config);
 
 	/* basic machine hardware */
 	MCFG_CPU_MODIFY("maincpu")
@@ -1339,6 +1335,14 @@ MACHINE_CONFIG_DERIVED(videopkr_state::babypkr, videopkr)
 	MCFG_CPU_REPLACE("soundcpu", I8031, CPU_CLOCK )
 	MCFG_CPU_PROGRAM_MAP(i8051_sound_mem)
 	MCFG_CPU_IO_MAP(i8051_sound_port)
+	MCFG_MCS51_PORT_P0_IN_CB(READ8(videopkr_state, baby_sound_p0_r))
+	MCFG_MCS51_PORT_P0_OUT_CB(WRITE8(videopkr_state, baby_sound_p0_w))
+	MCFG_MCS51_PORT_P1_IN_CB(READ8(videopkr_state, baby_sound_p1_r))
+	MCFG_MCS51_PORT_P1_OUT_CB(WRITE8(videopkr_state, baby_sound_p1_w))
+	MCFG_MCS51_PORT_P2_IN_CB(READ8(videopkr_state, baby_sound_p2_r))
+	MCFG_MCS51_PORT_P2_OUT_CB(WRITE8(videopkr_state, baby_sound_p2_w))
+	MCFG_MCS51_PORT_P3_IN_CB(READ8(videopkr_state, baby_sound_p3_r))
+	MCFG_MCS51_PORT_P3_OUT_CB(WRITE8(videopkr_state, baby_sound_p3_w))
 
 	/* video hardware */
 	MCFG_SCREEN_MODIFY("screen")
@@ -1354,7 +1358,8 @@ MACHINE_CONFIG_DERIVED(videopkr_state::babypkr, videopkr)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 0.3)
 MACHINE_CONFIG_END
 
-MACHINE_CONFIG_DERIVED(videopkr_state::fortune1, videopkr)
+MACHINE_CONFIG_START(videopkr_state::fortune1)
+	videopkr(config);
 
 	/* basic machine hardware */
 	MCFG_CPU_MODIFY("maincpu")
@@ -1364,10 +1369,14 @@ MACHINE_CONFIG_DERIVED(videopkr_state::fortune1, videopkr)
 	MCFG_PALETTE_INIT_OWNER(videopkr_state,fortune1)
 MACHINE_CONFIG_END
 
-MACHINE_CONFIG_DERIVED(videopkr_state::bpoker, babypkr)
+MACHINE_CONFIG_START(videopkr_state::bpoker)
+	babypkr(config);
 	MCFG_CPU_REPLACE("maincpu", I8751, XTAL(6'000'000))
 	MCFG_CPU_PROGRAM_MAP(i8751_map)
 	MCFG_CPU_IO_MAP(i8751_io_port)
+	MCFG_MCS51_PORT_P0_IN_CB(NOOP) // ???
+	MCFG_MCS51_PORT_P1_IN_CB(NOOP) // ???
+	MCFG_MCS51_PORT_P1_OUT_CB(NOOP) // ???
 
 	MCFG_DEVICE_ADD("ppi", I8255A, 0)
 	//MCFG_I8255_OUT_PORTA_CB()

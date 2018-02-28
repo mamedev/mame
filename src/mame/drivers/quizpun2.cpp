@@ -614,7 +614,8 @@ MACHINE_CONFIG_START(quizpun2_state::quizpun2)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 MACHINE_CONFIG_END
 
-MACHINE_CONFIG_DERIVED(quizpun2_state::quizpun, quizpun2)
+MACHINE_CONFIG_START(quizpun2_state::quizpun)
+	quizpun2(config);
 	MCFG_DEVICE_REMOVE("cop")
 
 	MCFG_CPU_ADD("mcu", M68705P5, XTAL(4'000'000)) // xtal is 4MHz, divided by 4 internally

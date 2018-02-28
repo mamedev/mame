@@ -19,10 +19,10 @@
 #define CAGE_IRQ_REASON_BUFFER_EMPTY    (2)
 
 #define MCFG_ATARI_CAGE_IRQ_CALLBACK(_write) \
-	devcb = &atari_cage_device::set_irqhandler_callback(*device, DEVCB_##_write);
+	devcb = &downcast<atari_cage_device &>(*device).set_irqhandler_callback(DEVCB_##_write);
 
 #define MCFG_ATARI_CAGE_SPEEDUP(_speedup) \
-	atari_cage_device::static_set_speedup(*device, _speedup);
+	downcast<atari_cage_device &>(*device).set_speedup(_speedup);
 
 class atari_cage_device : public device_t
 {
@@ -30,8 +30,8 @@ public:
 	// construction/destruction
 	atari_cage_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
-	static void static_set_speedup(device_t &device, offs_t speedup) { downcast<atari_cage_device &>(device).m_speedup = speedup; }
-	template <class Object> static devcb_base &set_irqhandler_callback(device_t &device, Object &&cb) { return downcast<atari_cage_device &>(device).m_irqhandler.set_callback(std::forward<Object>(cb)); }
+	void set_speedup(offs_t speedup) { m_speedup = speedup; }
+	template <class Object> devcb_base &set_irqhandler_callback(Object &&cb) { return m_irqhandler.set_callback(std::forward<Object>(cb)); }
 
 	void reset_w(int state);
 

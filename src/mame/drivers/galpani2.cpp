@@ -653,7 +653,7 @@ MACHINE_CONFIG_START(galpani2_state::galpani2)
 	MCFG_PALETTE_INIT_OWNER(galpani2_state,galpani2)
 
 	MCFG_DEVICE_ADD_KC002_SPRITES
-	kaneko16_sprite_device::set_offsets(*device, 0x10000 - 0x16c0 + 0xc00, 0);
+	MCFG_KANEKO16_SPRITE_OFFSETS(0x10000 - 0x16c0 + 0xc00, 0)
 	MCFG_KANEKO16_SPRITE_GFXDECODE("gfxdecode")
 
 

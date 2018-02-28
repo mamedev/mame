@@ -505,7 +505,6 @@ ADDRESS_MAP_END
 
 ADDRESS_MAP_START(artmagic_state::shtstar_guncpu_io_map)
 	AM_RANGE(0xc000, 0xcfff) AM_RAM
-	AM_RANGE(MCS51_PORT_P1, MCS51_PORT_P1) AM_READNOP
 ADDRESS_MAP_END
 
 
@@ -834,7 +833,8 @@ MACHINE_CONFIG_START(artmagic_state::artmagic)
 MACHINE_CONFIG_END
 
 
-MACHINE_CONFIG_DERIVED(artmagic_state::cheesech, artmagic)
+MACHINE_CONFIG_START(artmagic_state::cheesech)
+	artmagic(config);
 
 	MCFG_SOUND_MODIFY("oki")
 	MCFG_SOUND_ROUTES_RESET()
@@ -842,7 +842,8 @@ MACHINE_CONFIG_DERIVED(artmagic_state::cheesech, artmagic)
 MACHINE_CONFIG_END
 
 
-MACHINE_CONFIG_DERIVED(artmagic_state::stonebal, artmagic)
+MACHINE_CONFIG_START(artmagic_state::stonebal)
+	artmagic(config);
 
 	MCFG_CPU_MODIFY("maincpu")
 	MCFG_CPU_PROGRAM_MAP(stonebal_map)
@@ -855,7 +856,8 @@ MACHINE_CONFIG_DERIVED(artmagic_state::stonebal, artmagic)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.45)
 MACHINE_CONFIG_END
 
-MACHINE_CONFIG_DERIVED(artmagic_state::shtstar, artmagic)
+MACHINE_CONFIG_START(artmagic_state::shtstar)
+	artmagic(config);
 
 	MCFG_CPU_MODIFY("maincpu")
 	MCFG_CPU_PROGRAM_MAP(shtstar_map)
@@ -875,7 +877,7 @@ MACHINE_CONFIG_DERIVED(artmagic_state::shtstar, artmagic)
 	MCFG_CPU_ADD("guncpu", I80C31, 6000000)
 	MCFG_CPU_IO_MAP(shtstar_guncpu_io_map)
 	MCFG_CPU_PROGRAM_MAP(shtstar_guncpu_map)
-
+	MCFG_MCS51_PORT_P1_IN_CB(NOOP) // ?
 MACHINE_CONFIG_END
 
 

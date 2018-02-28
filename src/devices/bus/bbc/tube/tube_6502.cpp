@@ -130,7 +130,7 @@ READ8_MEMBER(bbc_tube_6502_device::read)
 
 	if (offset >= 0xfef0 && offset <= 0xfeff)
 	{
-		if (!machine().side_effect_disabled()) m_rom_enabled = false;
+		if (!machine().side_effects_disabled()) m_rom_enabled = false;
 		data = m_ula->parasite_r(space, offset);
 	}
 	else if (m_rom_enabled && (offset >= 0xf000))

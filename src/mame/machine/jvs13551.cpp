@@ -43,12 +43,6 @@ const tiny_rom_entry *sega_837_13551_device::device_rom_region() const
 	return ROM_NAME(jvs13551);
 }
 
-void sega_837_13551_device::static_set_port_tag(device_t &device, int port, const char *tag)
-{
-	sega_837_13551_device &ctrl = downcast<sega_837_13551_device &>(device);
-	ctrl.port_tag[port] = tag;
-}
-
 MACHINE_CONFIG_START(sega_837_13551_device::device_add_mconfig)
 	MCFG_CPU_ADD("iomcu", TMP90PH44, 10000000) // unknown clock
 MACHINE_CONFIG_END

@@ -28,7 +28,7 @@
     INLINE FUNCTIONS
 ***************************************************************************/
 
-inline const atarigen_screen_timer *get_screen_timer(screen_device &screen)
+inline const atarigen_screen_timer *atarigen_state::get_screen_timer(screen_device &screen)
 {
 	atarigen_state *state = screen.machine().driver_data<atarigen_state>();
 	int i;
@@ -67,17 +67,6 @@ atari_sound_comm_device::atari_sound_comm_device(const machine_config &mconfig, 
 		m_timed_int(0),
 		m_ym2151_int(0)
 {
-}
-
-
-//-------------------------------------------------
-//  static_set_sound_cpu: Set the tag of the
-//  sound CPU
-//-------------------------------------------------
-
-void atari_sound_comm_device::static_set_sound_cpu(device_t &device, const char *cputag)
-{
-	downcast<atari_sound_comm_device &>(device).m_sound_cpu_tag = cputag;
 }
 
 

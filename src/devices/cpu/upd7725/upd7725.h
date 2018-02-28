@@ -224,8 +224,6 @@ public:
 };
 
 // device type definition
-extern const device_type UPD7725;
-extern const device_type UPD96050;
 DECLARE_DEVICE_TYPE(UPD7725,  upd7725_device)
 DECLARE_DEVICE_TYPE(UPD96050, upd96050_device)
 

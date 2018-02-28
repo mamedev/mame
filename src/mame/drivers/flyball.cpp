@@ -23,8 +23,8 @@ TODO:
 #include "machine/74259.h"
 #include "screen.h"
 
-#define MASTER_CLOCK    XTAL(12'096'000)
-#define PIXEL_CLOCK     (MASTER_CLOCK / 2)
+static constexpr XTAL MASTER_CLOCK  = 12.096_MHz_XTAL;
+static constexpr XTAL PIXEL_CLOCK   = MASTER_CLOCK / 2;
 
 
 class flyball_state : public driver_device
@@ -37,41 +37,19 @@ public:
 		TIMER_QUARTER
 	};
 
-	flyball_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag),
+	flyball_state(const machine_config &mconfig, device_type type, const char *tag) :
+		driver_device(mconfig, type, tag),
 		m_maincpu(*this, "maincpu"),
 		m_gfxdecode(*this, "gfxdecode"),
 		m_screen(*this, "screen"),
 		m_palette(*this, "palette"),
 		m_outlatch(*this, "outlatch"),
-		m_playfield_ram(*this, "playfield_ram") { }
+		m_playfield_ram(*this, "playfield_ram")
+	{ }
 
-	/* devices */
-	required_device<cpu_device> m_maincpu;
-	required_device<gfxdecode_device> m_gfxdecode;
-	required_device<screen_device> m_screen;
-	required_device<palette_device> m_palette;
-	required_device<f9334_device> m_outlatch;
+	void flyball(machine_config &config);
 
-	/* memory pointers */
-	required_shared_ptr<uint8_t> m_playfield_ram;
-
-	/* video-related */
-	tilemap_t  *m_tmap;
-	uint8_t    m_pitcher_vert;
-	uint8_t    m_pitcher_horz;
-	uint8_t    m_pitcher_pic;
-	uint8_t    m_ball_vert;
-	uint8_t    m_ball_horz;
-
-	/* misc */
-	uint8_t    m_potmask;
-	uint8_t    m_potsense;
-
-	emu_timer *m_pot_assert_timer[64];
-	emu_timer *m_pot_clear_timer;
-	emu_timer *m_quarter_timer;
-
+protected:
 	DECLARE_READ8_MEMBER(input_r);
 	DECLARE_READ8_MEMBER(scanline_r);
 	DECLARE_READ8_MEMBER(potsense_r);
@@ -97,10 +75,35 @@ public:
 	TIMER_CALLBACK_MEMBER(joystick_callback);
 	TIMER_CALLBACK_MEMBER(quarter_callback);
 
-	void flyball(machine_config &config);
 	void flyball_map(address_map &map);
-protected:
 	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr) override;
+
+private:
+	/* devices */
+	required_device<cpu_device> m_maincpu;
+	required_device<gfxdecode_device> m_gfxdecode;
+	required_device<screen_device> m_screen;
+	required_device<palette_device> m_palette;
+	required_device<f9334_device> m_outlatch;
+
+	/* memory pointers */
+	required_shared_ptr<uint8_t> m_playfield_ram;
+
+	/* video-related */
+	tilemap_t  *m_tmap;
+	uint8_t    m_pitcher_vert;
+	uint8_t    m_pitcher_horz;
+	uint8_t    m_pitcher_pic;
+	uint8_t    m_ball_vert;
+	uint8_t    m_ball_horz;
+
+	/* misc */
+	uint8_t    m_potmask;
+	uint8_t    m_potsense;
+
+	emu_timer *m_pot_assert_timer[64];
+	emu_timer *m_pot_clear_timer;
+	emu_timer *m_quarter_timer;
 };
 
 

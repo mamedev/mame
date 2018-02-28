@@ -289,7 +289,8 @@ MACHINE_CONFIG_START(hexion_state::hexion)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.5)
 MACHINE_CONFIG_END
 
-MACHINE_CONFIG_DERIVED(hexion_state::hexionb, hexion)
+MACHINE_CONFIG_START(hexion_state::hexionb)
+	hexion(config);
 	MCFG_CPU_MODIFY("maincpu")
 	MCFG_CPU_PROGRAM_MAP(hexionb_map)
 

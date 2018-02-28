@@ -953,7 +953,8 @@ MACHINE_CONFIG_END
 //  MACHINE_CONFIG( hx20 )
 //-------------------------------------------------
 
-MACHINE_CONFIG_DERIVED(hx20_state::cm6000, hx20)
+MACHINE_CONFIG_START(hx20_state::cm6000)
+	hx20(config);
 	// basic machine hardware
 	MCFG_CPU_MODIFY(HD6301V1_MAIN_TAG)
 	MCFG_CPU_PROGRAM_MAP(cm6000_mem)

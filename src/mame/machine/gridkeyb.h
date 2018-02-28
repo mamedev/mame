@@ -16,7 +16,7 @@
 #define GRIDKEYBCB_DEVPUT(tag, cls, fnc)  grid_keyboard_device::output_delegate((&cls::fnc), (#cls "::" #fnc), (tag), ((cls *)nullptr))
 
 #define MCFG_GRID_KEYBOARD_CB(cb) \
-		grid_keyboard_device::set_keyboard_callback(*device, (GRIDKEYBCB_##cb));
+		downcast<grid_keyboard_device &>(*device).set_keyboard_callback((GRIDKEYBCB_##cb));
 
 
 
@@ -52,7 +52,7 @@ public:
 			device_t *owner,
 			u32 clock);
 
-	template <class Object> static void set_keyboard_callback(device_t &device, Object &&cb) { downcast<grid_keyboard_device &>(device).m_keyboard_cb = std::forward<Object>(cb); }
+	template <class Object> void set_keyboard_callback(Object &&cb) { m_keyboard_cb = std::forward<Object>(cb); }
 
 	virtual ioport_constructor device_input_ports() const override;
 

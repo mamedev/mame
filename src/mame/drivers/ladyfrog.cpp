@@ -343,7 +343,8 @@ MACHINE_CONFIG_START(ladyfrog_state::ladyfrog)
 	MCFG_SOUND_ROUTE_EX(0, "dac", 1.0, DAC_VREF_POS_INPUT) MCFG_SOUND_ROUTE_EX(0, "dac", -1.0, DAC_VREF_NEG_INPUT)
 MACHINE_CONFIG_END
 
-MACHINE_CONFIG_DERIVED(ladyfrog_state::toucheme, ladyfrog)
+MACHINE_CONFIG_START(ladyfrog_state::toucheme)
+	ladyfrog(config);
 	MCFG_VIDEO_START_OVERRIDE(ladyfrog_state,toucheme)
 MACHINE_CONFIG_END
 

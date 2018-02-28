@@ -32,11 +32,8 @@ public:
 		: mw8080bw_state(mconfig, type, tag),
 		m_schaser_effect_555_timer(*this, "schaser_sh_555"),
 		m_claybust_gun_on(*this, "claybust_gun"),
-		m_discrete(*this, "discrete"),
 		m_speaker(*this, "speaker"),
 		m_eeprom(*this, "eeprom"),
-		m_sn(*this, "snsnd"),
-		m_screen(*this, "screen"),
 		m_palette(*this, "palette"),
 		m_gunx(*this, "GUNX"),
 		m_guny(*this, "GUNY")
@@ -45,11 +42,8 @@ public:
 	/* devices/memory pointers */
 	optional_device<timer_device> m_schaser_effect_555_timer;
 	optional_device<timer_device> m_claybust_gun_on;
-	optional_device<discrete_device> m_discrete;
 	optional_device<speaker_sound_device> m_speaker;
 	optional_device<eeprom_serial_93cxx_device> m_eeprom;
-	optional_device<sn76477_device> m_sn;
-	required_device<screen_device> m_screen;
 	optional_device<palette_device> m_palette;
 
 	/* misc game specific */

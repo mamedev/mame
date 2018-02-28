@@ -17,7 +17,7 @@
 #define MCFG_ZS01_ADD( _tag ) \
 	MCFG_DEVICE_ADD( _tag, ZS01, 0 )
 #define MCFG_ZS01_DS2401( ds2401_tag ) \
-	zs01_device::static_set_ds2401_tag( *device, ds2401_tag );
+	downcast<zs01_device &>(*device).set_ds2401_tag( ds2401_tag );
 
 class zs01_device : public device_t,
 	public device_nvram_interface
@@ -27,7 +27,7 @@ public:
 	zs01_device( const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock );
 
 	// inline configuration helpers
-	static void static_set_ds2401_tag( device_t &device, const char *ds2401_tag ) { downcast<zs01_device &>( device ).m_ds2401_tag = ds2401_tag; }
+	void set_ds2401_tag( const char *ds2401_tag ) { m_ds2401_tag = ds2401_tag; }
 
 	DECLARE_WRITE_LINE_MEMBER( write_cs );
 	DECLARE_WRITE_LINE_MEMBER( write_rst );

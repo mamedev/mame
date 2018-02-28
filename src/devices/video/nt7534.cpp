@@ -283,7 +283,7 @@ READ8_MEMBER(nt7534_device::control_read)
 {
 	if (m_data_len == 4)
 	{
-		if (!machine().side_effect_disabled())
+		if (!machine().side_effects_disabled())
 			update_nibble(0, 1);
 
 		if (m_nibble)
@@ -342,7 +342,7 @@ READ8_MEMBER(nt7534_device::data_read)
 
 	if (m_data_len == 4)
 	{
-		if (!machine().side_effect_disabled())
+		if (!machine().side_effects_disabled())
 			update_nibble(1, 1);
 
 		if (m_nibble)

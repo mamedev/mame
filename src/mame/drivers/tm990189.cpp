@@ -88,8 +88,6 @@ public:
 		, m_speaker(*this, "speaker")
 		, m_cass(*this, "cassette")
 		, m_tms9918(*this, "tms9918")
-		, m_maincpu(*this, "maincpu")
-		, m_cassette(*this, "cassette")
 		, m_tms9901_usr(*this, TMS9901_0_TAG)
 		, m_tms9901_sys(*this, TMS9901_1_TAG)
 	{ }
@@ -170,8 +168,6 @@ private:
 	void led_set(int number, bool state);
 	void segment_set(int offset, bool state);
 	void digitsel(int offset, bool state);
-	required_device<cpu_device> m_maincpu;
-	required_device<cassette_image_device> m_cassette;
 	required_device<tms9901_device>     m_tms9901_usr;
 	required_device<tms9901_device>     m_tms9901_sys;
 };
@@ -433,7 +429,7 @@ WRITE_LINE_MEMBER( tm990189_state::sys9901_spkrdrive_w )
 
 WRITE_LINE_MEMBER( tm990189_state::sys9901_tapewdata_w )
 {
-	m_cassette->output(state ? +1.0 : -1.0);
+	m_cass->output(state ? +1.0 : -1.0);
 }
 
 class tm990_189_rs232_image_device :    public device_t,

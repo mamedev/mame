@@ -191,8 +191,6 @@ ADDRESS_MAP_END
 ADDRESS_MAP_START(spinb_state::dmd_io)
 	AM_RANGE(0x0000, 0x1fff) AM_WRITE(dmdram_w)
 	AM_RANGE(0x0000, 0xffff) AM_READ(dmdram_r)
-	AM_RANGE(MCS51_PORT_P1, MCS51_PORT_P1) AM_WRITE(p1_w)
-	AM_RANGE(MCS51_PORT_P3, MCS51_PORT_P3) AM_READWRITE(p3_r, p3_w)
 ADDRESS_MAP_END
 
 static INPUT_PORTS_START( spinb )
@@ -642,6 +640,9 @@ MACHINE_CONFIG_START(spinb_state::spinb)
 	MCFG_CPU_ADD("dmdcpu",I8031, XTAL(16'000'000))
 	MCFG_CPU_PROGRAM_MAP(dmd_mem)
 	MCFG_CPU_IO_MAP(dmd_io)
+	MCFG_MCS51_PORT_P1_OUT_CB(WRITE8(spinb_state, p1_w))
+	MCFG_MCS51_PORT_P3_IN_CB(READ8(spinb_state, p3_r))
+	MCFG_MCS51_PORT_P3_OUT_CB(WRITE8(spinb_state, p3_w))
 
 	MCFG_NVRAM_ADD_1FILL("nvram")
 
@@ -657,7 +658,7 @@ MACHINE_CONFIG_START(spinb_state::spinb)
 	MCFG_PALETTE_INIT_OWNER(spinb_state, spinb)
 
 	/* Sound */
-	MCFG_FRAGMENT_ADD( genpin_audio )
+	genpin_audio(config);
 	MCFG_SPEAKER_STANDARD_MONO("msmavol")
 	MCFG_SOUND_ADD("msm_a", MSM5205, XTAL(384'000))
 	MCFG_MSM5205_VCK_CALLBACK(DEVWRITELINE("ic5a", ttl7474_device, clock_w))
@@ -727,7 +728,8 @@ MACHINE_CONFIG_START(spinb_state::spinb)
 	MCFG_74157_OUT_CB(DEVWRITE8("msm_m", msm5205_device, data_w))
 MACHINE_CONFIG_END
 
-MACHINE_CONFIG_DERIVED(spinb_state::jolypark, spinb)
+MACHINE_CONFIG_START(spinb_state::jolypark)
+	spinb(config);
 	MCFG_SOUND_REPLACE("msm_a", MSM6585, XTAL(640'000))
 	MCFG_MSM6585_VCK_CALLBACK(DEVWRITELINE("ic5a", ttl7474_device, clock_w))
 	MCFG_MSM6585_PRESCALER_SELECTOR(S40)
@@ -738,7 +740,8 @@ MACHINE_CONFIG_DERIVED(spinb_state::jolypark, spinb)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "msmmvol", 1.0)
 MACHINE_CONFIG_END
 
-MACHINE_CONFIG_DERIVED(spinb_state::vrnwrld, jolypark)
+MACHINE_CONFIG_START(spinb_state::vrnwrld)
+	jolypark(config);
 	/* basic machine hardware */
 	MCFG_CPU_MODIFY("maincpu")
 	MCFG_CPU_PROGRAM_MAP(vrnwrld_map)

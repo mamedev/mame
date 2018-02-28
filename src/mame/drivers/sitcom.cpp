@@ -372,7 +372,8 @@ MACHINE_CONFIG_START(sitcom_state::sitcom)
 MACHINE_CONFIG_END
 
 
-MACHINE_CONFIG_DERIVED(sitcom_timer_state::sitcomtmr, sitcom)
+MACHINE_CONFIG_START(sitcom_timer_state::sitcomtmr)
+	sitcom(config);
 	MCFG_DEVICE_ADD("ds2", DL1414T, 0) // remote display
 	MCFG_DL1414_UPDATE_HANDLER(WRITE16(sitcom_state, update_ds<2>))
 

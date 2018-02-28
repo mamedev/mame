@@ -29,8 +29,6 @@ public:
 	// construction/destruction
 	wangpc_tig_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
-	void upd7220_0_map(address_map &map);
-	void upd7220_1_map(address_map &map);
 protected:
 	// device-level overrides
 	virtual void device_start() override;
@@ -50,6 +48,9 @@ private:
 
 	UPD7220_DRAW_TEXT_LINE_MEMBER( hgdc_draw_text );
 	UPD7220_DISPLAY_PIXELS_MEMBER( hgdc_display_pixels );
+
+	void upd7220_0_map(address_map &map);
+	void upd7220_1_map(address_map &map);
 
 	// internal state
 	required_device<upd7220_device> m_hgdc0;

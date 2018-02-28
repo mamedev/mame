@@ -176,8 +176,8 @@ ADDRESS_MAP_END
 
 z8_device::z8_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock, uint32_t rom_size, address_map_constructor map)
 	: cpu_device(mconfig, type, tag, owner, clock)
-	, m_program_config("program", ENDIANNESS_LITTLE, 8, 16, 0, map)
-	, m_data_config("data", ENDIANNESS_LITTLE, 8, 16, 0)
+	, m_program_config("program", ENDIANNESS_BIG, 8, 16, 0, map)
+	, m_data_config("data", ENDIANNESS_BIG, 8, 16, 0)
 	, m_input_cb{{*this}, {*this}, {*this}, {*this}}
 	, m_output_cb{{*this}, {*this}, {*this}, {*this}}
 	, m_rom_size(rom_size)
@@ -539,7 +539,7 @@ void z8_device::stack_push_word(uint16_t src)
 		register_pair_write(Z8_REGISTER_SPH, sp);
 
 		// @SP <- src
-		m_data->write_word(mask_external_address(sp), src);
+		m_data->write_word_unaligned(mask_external_address(sp), src);
 	}
 }
 
@@ -586,7 +586,7 @@ uint16_t z8_device::stack_pop_word()
 	{
 		// @SP <- src
 		uint16_t sp = register_pair_read(Z8_REGISTER_SPH);
-		uint16_t word = m_data->read_word(mask_external_address(sp));
+		uint16_t word = m_data->read_word_unaligned(mask_external_address(sp));
 
 		// SP <- SP + 2 (postincrement)
 		register_pair_write(Z8_REGISTER_SPH, sp + 2);

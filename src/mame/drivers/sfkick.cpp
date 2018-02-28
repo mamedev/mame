@@ -189,11 +189,10 @@ public:
 		m_dsw2(*this, "DSW2")
 	{ }
 
-	std::unique_ptr<uint8_t[]> m_main_mem;
-	int m_bank_cfg;
-	int m_bank[8];
-	int m_input_mux;
-	required_device<v9938_device> m_v9938;
+	DECLARE_DRIVER_INIT(sfkick);
+	void sfkick(machine_config &config);
+
+protected:
 	DECLARE_WRITE8_MEMBER(page0_w);
 	DECLARE_WRITE8_MEMBER(page1_w);
 	DECLARE_WRITE8_MEMBER(page2_w);
@@ -201,11 +200,22 @@ public:
 	DECLARE_READ8_MEMBER(ppi_port_b_r);
 	DECLARE_WRITE8_MEMBER(ppi_port_a_w);
 	DECLARE_WRITE8_MEMBER(ppi_port_c_w);
-	DECLARE_DRIVER_INIT(sfkick);
 	virtual void machine_reset() override;
 	void sfkick_remap_banks();
 	void sfkick_bank_set(int num, int data);
 	DECLARE_WRITE_LINE_MEMBER(irqhandler);
+	void sfkick_io_map(address_map &map);
+	void sfkick_map(address_map &map);
+	void sfkick_sound_io_map(address_map &map);
+	void sfkick_sound_map(address_map &map);
+
+private:
+	std::unique_ptr<uint8_t[]> m_main_mem;
+	int m_bank_cfg;
+	int m_bank[8];
+	int m_input_mux;
+
+	required_device<v9938_device> m_v9938;
 	required_device<cpu_device> m_maincpu;
 	required_device<cpu_device> m_soundcpu;
 	required_memory_region m_region_bios;
@@ -225,11 +235,6 @@ public:
 	required_ioport m_dial;
 	required_ioport m_dsw1;
 	required_ioport m_dsw2;
-	void sfkick(machine_config &config);
-	void sfkick_io_map(address_map &map);
-	void sfkick_map(address_map &map);
-	void sfkick_sound_io_map(address_map &map);
-	void sfkick_sound_map(address_map &map);
 };
 
 

@@ -16,7 +16,14 @@ Notes:
  Its internal ROM has been imaged, manually typed, and decoded as sun-8212.ic3.
  Pettan Pyuu is a clone of Banbam although with different levels / play fields.
 
-*****************************************************************************/
+ Protection currently fails on both Pettan Pyuu and Banbam if you play either
+ game to Round 11. When you get there, the music still plays but all you see is
+ "ERR-43" in red text at the bottom left of the screen and the game is no longer
+ playable.  Also, in some earlier rounds you notice the background graphics are
+ also not producing logical playfields as bits of graphics are in different
+ locations.
+
+******************************************************************************/
 
 #include "emu.h"
 #include "includes/strnskil.h"
@@ -375,7 +382,8 @@ MACHINE_CONFIG_START(strnskil_state::strnskil)
 MACHINE_CONFIG_END
 
 
-MACHINE_CONFIG_DERIVED(strnskil_state::banbam, strnskil)
+MACHINE_CONFIG_START(strnskil_state::banbam)
+	strnskil(config);
 	MCFG_CPU_ADD("mcu", MB8841, 8000000/2)
 //  MCFG_MB88XX_READ_K_CB(READ8(strnskil_state, mcu_portk_r))
 //  MCFG_MB88XX_READ_R0_CB(READ8(strnskil_state, mcu_portr0_r))

@@ -84,16 +84,6 @@ void deco_irq_device::device_reset()
 }
 
 //-------------------------------------------------
-//  set_screen_tag - set screen we are attached to
-//-------------------------------------------------
-
-void deco_irq_device::set_screen_tag(device_t &device, const char *tag)
-{
-	deco_irq_device &dev = dynamic_cast<deco_irq_device &>(device);
-	dev.m_screen.set_tag(tag);
-}
-
-//-------------------------------------------------
 //  scanline_callback - called on each scanline
 //-------------------------------------------------
 

@@ -2143,7 +2143,8 @@ MACHINE_CONFIG_START(a400_state::atari_common_nodac)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 1.0)
 MACHINE_CONFIG_END
 
-MACHINE_CONFIG_DERIVED(a400_state::atari_common, atari_common_nodac)
+MACHINE_CONFIG_START(a400_state::atari_common)
+	atari_common_nodac(config);
 	MCFG_SOUND_ADD("dac", DAC_1BIT, 0) MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 0.03)
 	MCFG_DEVICE_ADD("vref", VOLTAGE_REGULATOR, 0) MCFG_VOLTAGE_REGULATOR_OUTPUT(5.0)
 	MCFG_SOUND_ROUTE_EX(0, "dac", 1.0, DAC_VREF_POS_INPUT)
@@ -2172,7 +2173,8 @@ MACHINE_CONFIG_END
 
 
 // memory map A400 + NTSC screen
-MACHINE_CONFIG_DERIVED(a400_state::a400, atari_common)
+MACHINE_CONFIG_START(a400_state::a400)
+	atari_common(config);
 
 	MCFG_CPU_MODIFY( "maincpu" )
 	MCFG_CPU_PROGRAM_MAP(a400_mem)
@@ -2187,7 +2189,8 @@ MACHINE_CONFIG_END
 
 
 // memory map A400 + PAL screen
-MACHINE_CONFIG_DERIVED(a400_state::a400pal, atari_common)
+MACHINE_CONFIG_START(a400_state::a400pal)
+	atari_common(config);
 
 	MCFG_CPU_MODIFY( "maincpu" )
 	MCFG_CPU_PROGRAM_MAP(a400_mem)
@@ -2202,7 +2205,8 @@ MACHINE_CONFIG_END
 
 
 // memory map A800 + NTSC screen + Right cartslot
-MACHINE_CONFIG_DERIVED(a400_state::a800, atari_common)
+MACHINE_CONFIG_START(a400_state::a800)
+	atari_common(config);
 
 	MCFG_CPU_MODIFY( "maincpu" )
 	MCFG_CPU_PROGRAM_MAP(a400_mem)
@@ -2219,7 +2223,8 @@ MACHINE_CONFIG_END
 
 
 // memory map A800 + PAL screen + Right cartslot
-MACHINE_CONFIG_DERIVED(a400_state::a800pal, atari_common)
+MACHINE_CONFIG_START(a400_state::a800pal)
+	atari_common(config);
 
 	MCFG_CPU_MODIFY( "maincpu" )
 	MCFG_CPU_PROGRAM_MAP(a400_mem)
@@ -2236,7 +2241,8 @@ MACHINE_CONFIG_END
 
 
 // memory map A600XL (same as 800XL but less RAM) + NTSC screen + MMU via PIA portB
-MACHINE_CONFIG_DERIVED(a400_state::a600xl, atari_common)
+MACHINE_CONFIG_START(a400_state::a600xl)
+	atari_common(config);
 
 	MCFG_CPU_MODIFY( "maincpu" )
 	MCFG_CPU_PROGRAM_MAP(a600xl_mem)
@@ -2257,7 +2263,8 @@ MACHINE_CONFIG_END
 
 
 // memory map A800XL + NTSC screen + MMU via PIA portB
-MACHINE_CONFIG_DERIVED(a400_state::a800xl, atari_common)
+MACHINE_CONFIG_START(a400_state::a800xl)
+	atari_common(config);
 
 	MCFG_CPU_MODIFY( "maincpu" )
 	MCFG_CPU_PROGRAM_MAP(a800xl_mem)
@@ -2278,7 +2285,8 @@ MACHINE_CONFIG_END
 
 
 // memory map A800XL + PAL screen + MMU via PIA portB
-MACHINE_CONFIG_DERIVED(a400_state::a800xlpal, a800xl)
+MACHINE_CONFIG_START(a400_state::a800xlpal)
+	a800xl(config);
 
 	MCFG_CPU_MODIFY( "maincpu" )
 	MCFG_CPU_CLOCK( 1773000 )
@@ -2293,7 +2301,8 @@ MACHINE_CONFIG_END
 
 
 // memory map A1200XL+ MMU via PIA portB
-MACHINE_CONFIG_DERIVED(a400_state::a1200xl, a800xl)
+MACHINE_CONFIG_START(a400_state::a1200xl)
+	a800xl(config);
 
 	MCFG_CPU_MODIFY( "maincpu" )
 	MCFG_CPU_PROGRAM_MAP(a1200xl_mem)
@@ -2304,7 +2313,8 @@ MACHINE_CONFIG_END
 
 
 // memory map A130XE (extra RAM only partially emulated)
-MACHINE_CONFIG_DERIVED(a400_state::a130xe, a800xl)
+MACHINE_CONFIG_START(a400_state::a130xe)
+	a800xl(config);
 
 	MCFG_CPU_MODIFY( "maincpu" )
 	MCFG_CPU_PROGRAM_MAP(a130xe_mem)
@@ -2315,7 +2325,8 @@ MACHINE_CONFIG_END
 
 
 // memory map XEGS, only XEGS bankswitch supported
-MACHINE_CONFIG_DERIVED(a400_state::xegs, a800xl)
+MACHINE_CONFIG_START(a400_state::xegs)
+	a800xl(config);
 
 	MCFG_CPU_MODIFY( "maincpu" )
 	MCFG_CPU_PROGRAM_MAP(xegs_mem)
@@ -2328,7 +2339,8 @@ MACHINE_CONFIG_END
 
 
 // memory map A5200, different ports, less RAM
-MACHINE_CONFIG_DERIVED(a400_state::a5200, atari_common_nodac)
+MACHINE_CONFIG_START(a400_state::a5200)
+	atari_common_nodac(config);
 
 	MCFG_CPU_MODIFY( "maincpu" )
 	MCFG_CPU_PROGRAM_MAP(a5200_mem)

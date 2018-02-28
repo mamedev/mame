@@ -44,7 +44,6 @@ public:
 
 	uint32_t update_screen(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 
-	void hd66421(address_map &map);
 protected:
 	// device-level overrides
 	virtual void device_start() override;
@@ -65,6 +64,8 @@ private:
 	uint8_t m_cmd, m_reg[32];
 	int m_x, m_y;
 	required_device<palette_device> m_palette;
+
+	void hd66421(address_map &map);
 
 	DECLARE_PALETTE_INIT(hd66421);
 };

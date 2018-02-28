@@ -28,10 +28,10 @@
 //**************************************************************************
 
 #define MCFG_TANDY2000_KEYBOARD_CLOCK_CALLBACK(_write) \
-	devcb = &tandy2k_keyboard_device::set_clock_wr_callback(*device, DEVCB_##_write);
+	devcb = &downcast<tandy2k_keyboard_device &>(*device).set_clock_wr_callback(DEVCB_##_write);
 
 #define MCFG_TANDY2000_KEYBOARD_DATA_CALLBACK(_write) \
-	devcb = &tandy2k_keyboard_device::set_data_wr_callback(*device, DEVCB_##_write);
+	devcb = &downcast<tandy2k_keyboard_device &>(*device).set_data_wr_callback(DEVCB_##_write);
 
 
 
@@ -47,8 +47,8 @@ public:
 	// construction/destruction
 	tandy2k_keyboard_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
-	template <class Object> static devcb_base &set_clock_wr_callback(device_t &device, Object &&cb) { return downcast<tandy2k_keyboard_device &>(device).m_write_clock.set_callback(std::forward<Object>(cb)); }
-	template <class Object> static devcb_base &set_data_wr_callback(device_t &device, Object &&cb) { return downcast<tandy2k_keyboard_device &>(device).m_write_data.set_callback(std::forward<Object>(cb)); }
+	template <class Object> devcb_base &set_clock_wr_callback(Object &&cb) { return m_write_clock.set_callback(std::forward<Object>(cb)); }
+	template <class Object> devcb_base &set_data_wr_callback(Object &&cb) { return m_write_data.set_callback(std::forward<Object>(cb)); }
 
 	DECLARE_WRITE_LINE_MEMBER( power_w );
 	DECLARE_WRITE_LINE_MEMBER( reset_w );

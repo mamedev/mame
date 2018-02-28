@@ -246,8 +246,7 @@ public:
 		m_s7000_ram(*this, "s7000_ram"),
 		m_sb000_ram(*this, "sb000_ram"),
 		m_sd000_ram(*this, "sd000_ram"),
-		m_sf000_ram(*this, "sf000_ram"),
-		m_io_port(*this, "io_port")
+		m_sf000_ram(*this, "sf000_ram")
 	{
 	}
 
@@ -276,7 +275,6 @@ public:
 	required_shared_ptr<uint8_t> m_sb000_ram;
 	required_shared_ptr<uint8_t> m_sd000_ram;
 	required_shared_ptr<uint8_t> m_sf000_ram;
-	required_shared_ptr<uint8_t> m_io_port;
 
 	tilemap_t *m_bg_tilemap;
 	uint8_t m_wingboard;
@@ -305,8 +303,12 @@ public:
 	uint8_t m_bv_data_bit;
 	uint8_t m_bv_loop_count;
 	uint16_t id023_data;
+	uint8_t m_paldata;
+	uint8_t m_paldata2;
 
 	DECLARE_WRITE8_MEMBER(peplus_bgcolor_w);
+	DECLARE_WRITE8_MEMBER(paldata_w);
+	DECLARE_WRITE8_MEMBER(paldata2_w);
 	DECLARE_WRITE8_MEMBER(peplus_crtc_display_w);
 	DECLARE_WRITE8_MEMBER(peplus_duart_w);
 	DECLARE_WRITE8_MEMBER(peplus_cmos_w);
@@ -446,11 +448,21 @@ WRITE_LINE_MEMBER(peplus_state::crtc_vsync)
 	handle_lightpen();
 }
 
+WRITE8_MEMBER(peplus_state::paldata_w)
+{
+	m_paldata = data;
+}
+
+WRITE8_MEMBER(peplus_state::paldata2_w)
+{
+	m_paldata2 = data;
+}
+
 WRITE8_MEMBER(peplus_state::peplus_crtc_display_w)
 {
 	m_videoram[m_vid_address] = data;
-	m_palette_ram[m_vid_address] = m_io_port[1];
-	m_palette_ram2[m_vid_address] = m_io_port[3];
+	m_palette_ram[m_vid_address] = m_paldata;
+	m_palette_ram2[m_vid_address] = m_paldata2;
 
 	m_bg_tilemap->mark_tile_dirty(m_vid_address);
 
@@ -1055,9 +1067,6 @@ ADDRESS_MAP_START(peplus_state::peplus_iomap)
 
 	// Superboard Data
 	AM_RANGE(0xf000, 0xffff) AM_RAM AM_SHARE("sf000_ram")
-
-	/* Ports start here */
-	AM_RANGE(MCS51_PORT_P0, MCS51_PORT_P3) AM_RAM AM_SHARE("io_port")
 ADDRESS_MAP_END
 
 
@@ -1333,6 +1342,8 @@ MACHINE_CONFIG_START(peplus_state::peplus)
 	MCFG_CPU_ADD("maincpu", I80C32, XTAL(20'000'000)/2) /* 10MHz */
 	MCFG_CPU_PROGRAM_MAP(peplus_map)
 	MCFG_CPU_IO_MAP(peplus_iomap)
+	MCFG_MCS51_PORT_P1_OUT_CB(WRITE8(peplus_state, paldata_w))
+	MCFG_MCS51_PORT_P3_OUT_CB(WRITE8(peplus_state, paldata2_w))
 
 	MCFG_NVRAM_ADD_0FILL("cmos")
 

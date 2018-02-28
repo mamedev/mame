@@ -445,7 +445,7 @@ MACHINE_CONFIG_START(wico_state::wico)
 	MCFG_DEFAULT_LAYOUT(layout_wico)
 
 	/* Sound */
-	MCFG_FRAGMENT_ADD( genpin_audio )
+	genpin_audio(config);
 	MCFG_SPEAKER_STANDARD_MONO("mono")
 	MCFG_SOUND_ADD("sn76494", SN76494, XTAL(10'000'000) / 64)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.75)

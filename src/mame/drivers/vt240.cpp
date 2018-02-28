@@ -385,7 +385,7 @@ WRITE8_MEMBER(vt240_state::vom_w)
 
 READ16_MEMBER(vt240_state::vram_r)
 {
-	if(!BIT(m_reg0, 3) || machine().side_effect_disabled())
+	if(!BIT(m_reg0, 3) || machine().side_effects_disabled())
 	{
 		offset = ((offset & 0x18000) >> 1) | (offset & 0x3fff);
 		return m_video_ram[offset & 0x7fff];
@@ -707,7 +707,8 @@ MACHINE_CONFIG_START(vt240_state::vt240)
 	MCFG_X2212_ADD("x2212")
 MACHINE_CONFIG_END
 
-MACHINE_CONFIG_DERIVED(vt240_state::mc7105, vt240)
+MACHINE_CONFIG_START(vt240_state::mc7105)
+	vt240(config);
 
 	MCFG_DEVICE_REMOVE("lk201")
 	MCFG_DEVICE_ADD("ms7004", MS7004, 0)

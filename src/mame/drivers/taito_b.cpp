@@ -2021,7 +2021,8 @@ MACHINE_CONFIG_START(taitob_state::masterw)
 MACHINE_CONFIG_END
 
 
-MACHINE_CONFIG_DERIVED(taitob_state::tetrist, rastsag2) /* Nastar conversion kit with slightly different memory map */
+MACHINE_CONFIG_START(taitob_state::tetrist) /* Nastar conversion kit with slightly different memory map */
+	rastsag2(config);
 
 	MCFG_CPU_MODIFY("maincpu")
 	MCFG_CPU_PROGRAM_MAP(tetrist_map)
@@ -2031,7 +2032,8 @@ MACHINE_CONFIG_DERIVED(taitob_state::tetrist, rastsag2) /* Nastar conversion kit
 MACHINE_CONFIG_END
 
 
-MACHINE_CONFIG_DERIVED(taitob_state::tetrista, masterw) /* Master of Weapon conversion kit with slightly different memory map */
+MACHINE_CONFIG_START(taitob_state::tetrista) /* Master of Weapon conversion kit with slightly different memory map */
+	masterw(config);
 
 	MCFG_CPU_MODIFY("maincpu")
 	MCFG_CPU_PROGRAM_MAP(tetrista_map)

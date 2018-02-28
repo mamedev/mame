@@ -438,7 +438,8 @@ MACHINE_CONFIG_START(gberet_state::gberet)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 MACHINE_CONFIG_END
 
-MACHINE_CONFIG_DERIVED(gberet_state::mrgoemon, gberet)
+MACHINE_CONFIG_START(gberet_state::mrgoemon)
+	gberet(config);
 
 	/* basic machine hardware */
 	MCFG_CPU_MODIFY("maincpu")

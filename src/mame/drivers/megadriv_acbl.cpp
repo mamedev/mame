@@ -284,7 +284,7 @@ ADDRESS_MAP_START(md_boot_state::md_bootleg_map)
 ADDRESS_MAP_END
 
 MACHINE_CONFIG_START(md_boot_state::md_bootleg)
-	MCFG_FRAGMENT_ADD( md_ntsc )
+	md_ntsc(config);
 
 	MCFG_CPU_MODIFY("maincpu")
 	MCFG_CPU_PROGRAM_MAP(md_bootleg_map)
@@ -679,7 +679,7 @@ INPUT_PORTS_END
  *************************************/
 
 MACHINE_CONFIG_START(md_boot_state::megadrvb)
-	MCFG_FRAGMENT_ADD(md_ntsc)
+	md_ntsc(config);
 	MCFG_MACHINE_START_OVERRIDE(md_boot_state, md_bootleg)
 MACHINE_CONFIG_END
 
@@ -698,7 +698,7 @@ MACHINE_START_MEMBER(md_boot_state, md_6button)
 }
 
 MACHINE_CONFIG_START(md_boot_state::megadrvb_6b)
-	MCFG_FRAGMENT_ADD(md_ntsc)
+	md_ntsc(config);
 	MCFG_MACHINE_START_OVERRIDE(md_boot_state, md_6button)
 MACHINE_CONFIG_END
 

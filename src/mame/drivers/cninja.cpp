@@ -984,7 +984,8 @@ MACHINE_CONFIG_START(cninja_state::stoneage)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.75)
 MACHINE_CONFIG_END
 
-MACHINE_CONFIG_DERIVED(cninja_state::cninjabl2, stoneage)
+MACHINE_CONFIG_START(cninja_state::cninjabl2)
+	stoneage(config);
 	MCFG_CPU_MODIFY("audiocpu")
 	MCFG_CPU_PROGRAM_MAP(cninjabl2_s_map)
 

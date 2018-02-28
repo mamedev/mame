@@ -470,7 +470,8 @@ MACHINE_CONFIG_START(mermaid_state::mermaid)
 
 MACHINE_CONFIG_END
 
-MACHINE_CONFIG_DERIVED(mermaid_state::rougien, mermaid)
+MACHINE_CONFIG_START(mermaid_state::rougien)
+	mermaid(config);
 
 	MCFG_DEVICE_MODIFY("latch1")
 	MCFG_ADDRESSABLE_LATCH_Q2_OUT_CB(WRITELINE(mermaid_state, rougien_sample_playback_w))

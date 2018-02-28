@@ -51,13 +51,13 @@ void eprom_state::update_interrupts()
 	m_maincpu->set_input_line(6, m_sound_int_state ? ASSERT_LINE : CLEAR_LINE);
 }
 
-MACHINE_START_MEMBER(eprom_state,eprom)
+void eprom_state::machine_start()
 {
 	atarigen_state::machine_start();
 	save_item(NAME(m_sync_data));
 }
 
-MACHINE_RESET_MEMBER(eprom_state,eprom)
+void eprom_state::machine_reset()
 {
 	atarigen_state::machine_reset();
 	scanline_timer_reset(*m_screen, 8);
@@ -390,15 +390,12 @@ MACHINE_CONFIG_START(eprom_state::eprom)
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", M68000, ATARI_CLOCK_14MHz/2)
 	MCFG_CPU_PROGRAM_MAP(main_map)
-	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", atarigen_state, video_int_gen)
+	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", eprom_state, video_int_gen)
 
 	MCFG_CPU_ADD("extra", M68000, ATARI_CLOCK_14MHz/2)
 	MCFG_CPU_PROGRAM_MAP(extra_map)
 
 	MCFG_QUANTUM_TIME(attotime::from_hz(6000))
-
-	MCFG_MACHINE_START_OVERRIDE(eprom_state,eprom)
-	MCFG_MACHINE_RESET_OVERRIDE(eprom_state,eprom)
 
 	MCFG_EEPROM_2804_ADD("eeprom")
 	MCFG_EEPROM_28XX_LOCK_AFTER_WRITE(true)
@@ -427,7 +424,7 @@ MACHINE_CONFIG_START(eprom_state::eprom)
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
 
-	MCFG_ATARI_JSA_I_ADD("jsa", WRITELINE(atarigen_state, sound_int_write_line))
+	MCFG_ATARI_JSA_I_ADD("jsa", WRITELINE(eprom_state, sound_int_write_line))
 	MCFG_ATARI_JSA_TEST_PORT("260010", 1)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 	MCFG_DEVICE_REMOVE("jsa:pokey")
@@ -439,12 +436,9 @@ MACHINE_CONFIG_START(eprom_state::klaxp)
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", M68000, ATARI_CLOCK_14MHz/2)
 	MCFG_CPU_PROGRAM_MAP(main_map)
-	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", atarigen_state, video_int_gen)
+	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", eprom_state, video_int_gen)
 
 	MCFG_QUANTUM_TIME(attotime::from_hz(600))
-
-	MCFG_MACHINE_START_OVERRIDE(eprom_state,eprom)
-	MCFG_MACHINE_RESET_OVERRIDE(eprom_state,eprom)
 
 	MCFG_EEPROM_2804_ADD("eeprom")
 	MCFG_EEPROM_28XX_LOCK_AFTER_WRITE(true)
@@ -473,7 +467,7 @@ MACHINE_CONFIG_START(eprom_state::klaxp)
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
 
-	MCFG_ATARI_JSA_II_ADD("jsa", WRITELINE(atarigen_state, sound_int_write_line))
+	MCFG_ATARI_JSA_II_ADD("jsa", WRITELINE(eprom_state, sound_int_write_line))
 	MCFG_ATARI_JSA_TEST_PORT("260010", 1)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 MACHINE_CONFIG_END
@@ -484,12 +478,9 @@ MACHINE_CONFIG_START(eprom_state::guts)
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", M68000, ATARI_CLOCK_14MHz/2)
 	MCFG_CPU_PROGRAM_MAP(guts_map)
-	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", atarigen_state, video_int_gen)
+	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", eprom_state, video_int_gen)
 
 	MCFG_QUANTUM_TIME(attotime::from_hz(600))
-
-	MCFG_MACHINE_START_OVERRIDE(eprom_state,eprom)
-	MCFG_MACHINE_RESET_OVERRIDE(eprom_state,eprom)
 
 	MCFG_EEPROM_2804_ADD("eeprom")
 	MCFG_EEPROM_28XX_LOCK_AFTER_WRITE(true)
@@ -518,7 +509,7 @@ MACHINE_CONFIG_START(eprom_state::guts)
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
 
-	MCFG_ATARI_JSA_II_ADD("jsa", WRITELINE(atarigen_state, sound_int_write_line))
+	MCFG_ATARI_JSA_II_ADD("jsa", WRITELINE(eprom_state, sound_int_write_line))
 	MCFG_ATARI_JSA_TEST_PORT("260010", 1)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 MACHINE_CONFIG_END
@@ -733,34 +724,12 @@ ROM_END
 
 /*************************************
  *
- *  Driver initialization
- *
- *************************************/
-
-DRIVER_INIT_MEMBER(eprom_state,eprom)
-{
-}
-
-
-DRIVER_INIT_MEMBER(eprom_state,klaxp)
-{
-}
-
-
-DRIVER_INIT_MEMBER(eprom_state,guts)
-{
-}
-
-
-
-/*************************************
- *
  *  Game driver(s)
  *
  *************************************/
 
-GAME( 1989, eprom,  0,     eprom, eprom, eprom_state, eprom, ROT0, "Atari Games", "Escape from the Planet of the Robot Monsters (set 1)", MACHINE_SUPPORTS_SAVE )
-GAME( 1989, eprom2, eprom, eprom, eprom, eprom_state, eprom, ROT0, "Atari Games", "Escape from the Planet of the Robot Monsters (set 2)", MACHINE_SUPPORTS_SAVE )
-GAME( 1989, klaxp1, klax,  klaxp, klaxp, eprom_state, klaxp, ROT0, "Atari Games", "Klax (prototype set 1)", MACHINE_SUPPORTS_SAVE )
-GAME( 1989, klaxp2, klax,  klaxp, klaxp, eprom_state, klaxp, ROT0, "Atari Games", "Klax (prototype set 2)", MACHINE_SUPPORTS_SAVE )
-GAME( 1989, guts,   0,     guts,  guts,  eprom_state, guts,  ROT0, "Atari Games", "Guts n' Glory (prototype)", 0 )
+GAME( 1989, eprom,  0,     eprom, eprom, eprom_state, 0, ROT0, "Atari Games", "Escape from the Planet of the Robot Monsters (set 1)", MACHINE_SUPPORTS_SAVE )
+GAME( 1989, eprom2, eprom, eprom, eprom, eprom_state, 0, ROT0, "Atari Games", "Escape from the Planet of the Robot Monsters (set 2)", MACHINE_SUPPORTS_SAVE )
+GAME( 1989, klaxp1, klax,  klaxp, klaxp, eprom_state, 0, ROT0, "Atari Games", "Klax (prototype set 1)", MACHINE_SUPPORTS_SAVE )
+GAME( 1989, klaxp2, klax,  klaxp, klaxp, eprom_state, 0, ROT0, "Atari Games", "Klax (prototype set 2)", MACHINE_SUPPORTS_SAVE )
+GAME( 1989, guts,   0,     guts,  guts,  eprom_state, 0, ROT0, "Atari Games", "Guts n' Glory (prototype)", 0 )

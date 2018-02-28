@@ -258,7 +258,8 @@ static INPUT_PORTS_START( sstrngr2 )
 INPUT_PORTS_END
 
 
-MACHINE_CONFIG_DERIVED(sstrangr_state::sstrngr2, sstrangr)
+MACHINE_CONFIG_START(sstrangr_state::sstrngr2)
+	sstrangr(config);
 
 	/* basic machine hardware */
 

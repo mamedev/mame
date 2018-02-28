@@ -634,7 +634,8 @@ MACHINE_CONFIG_START(bw12_state::common)
 	MCFG_CENTRONICS_OUTPUT_LATCH_ADD("cent_data_out", CENTRONICS_TAG)
 MACHINE_CONFIG_END
 
-MACHINE_CONFIG_DERIVED(bw12_state::bw12, common)
+MACHINE_CONFIG_START(bw12_state::bw12)
+	common(config);
 	/* floppy drives */
 	MCFG_FLOPPY_DRIVE_ADD(UPD765_TAG ":1", bw12_floppies, "525dd", bw12_state::bw12_floppy_formats)
 	MCFG_FLOPPY_DRIVE_ADD(UPD765_TAG ":2", bw12_floppies, "525dd", bw12_state::bw12_floppy_formats)
@@ -647,7 +648,8 @@ MACHINE_CONFIG_DERIVED(bw12_state::bw12, common)
 	MCFG_RAM_DEFAULT_SIZE("64K")
 MACHINE_CONFIG_END
 
-MACHINE_CONFIG_DERIVED(bw12_state::bw14, common)
+MACHINE_CONFIG_START(bw12_state::bw14)
+	common(config);
 	/* floppy drives */
 	MCFG_FLOPPY_DRIVE_ADD(UPD765_TAG ":1", bw14_floppies, "525dd", bw12_state::bw14_floppy_formats)
 	MCFG_FLOPPY_DRIVE_ADD(UPD765_TAG ":2", bw14_floppies, "525dd", bw12_state::bw14_floppy_formats)

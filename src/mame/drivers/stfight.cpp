@@ -492,7 +492,8 @@ MACHINE_CONFIG_START(stfight_state::stfight_base)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
 MACHINE_CONFIG_END
 
-MACHINE_CONFIG_DERIVED(stfight_state::stfight, stfight_base)
+MACHINE_CONFIG_START(stfight_state::stfight)
+	stfight_base(config);
 	MCFG_CPU_MODIFY("maincpu")
 	MCFG_CPU_PROGRAM_MAP(stfight_cpu1_map)
 	MCFG_CPU_OPCODES_MAP(decrypted_opcodes_map)
@@ -502,7 +503,8 @@ MACHINE_CONFIG_DERIVED(stfight_state::stfight, stfight_base)
 MACHINE_CONFIG_END
 
 
-MACHINE_CONFIG_DERIVED(stfight_state::cshooter, stfight_base)
+MACHINE_CONFIG_START(stfight_state::cshooter)
+	stfight_base(config);
 	MCFG_CPU_MODIFY("maincpu")
 	MCFG_CPU_PROGRAM_MAP(cshooter_cpu1_map)
 	MCFG_CPU_VBLANK_INT_DRIVER("airraid_vid:screen", stfight_state,  stfight_vb_interrupt)

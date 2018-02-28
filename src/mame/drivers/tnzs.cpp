@@ -1526,7 +1526,7 @@ MACHINE_CONFIG_START(tnzs_base_state::tnzs_base)
 	MCFG_CPU_PROGRAM_MAP(base_sub_map)
 	MCFG_CPU_VBLANK_INT_DRIVER("screen", tnzs_base_state,  irq0_line_hold)
 
-	MCFG_FRAGMENT_ADD(tnzs_mainbank)
+	tnzs_mainbank(config);
 
 	MCFG_QUANTUM_PERFECT_CPU("maincpu")
 
@@ -1551,7 +1551,8 @@ MACHINE_CONFIG_START(tnzs_base_state::tnzs_base)
 	MCFG_SPEAKER_STANDARD_MONO("speaker")
 MACHINE_CONFIG_END
 
-MACHINE_CONFIG_DERIVED(tnzs_mcu_state::tnzs, tnzs_base)
+MACHINE_CONFIG_START(tnzs_mcu_state::tnzs)
+	tnzs_base(config);
 	MCFG_CPU_ADD("mcu", I8742, 12000000/2)  /* 400KHz ??? - Main board Crystal is 12MHz */
 	MCFG_MCS48_PORT_P1_IN_CB(READ8(tnzs_mcu_state, mcu_port1_r))
 	MCFG_MCS48_PORT_P2_IN_CB(READ8(tnzs_mcu_state, mcu_port2_r))
@@ -1574,7 +1575,8 @@ MACHINE_CONFIG_DERIVED(tnzs_mcu_state::tnzs, tnzs_base)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 0.3)
 MACHINE_CONFIG_END
 
-MACHINE_CONFIG_DERIVED(extrmatn_state::extrmatn, tnzs)
+MACHINE_CONFIG_START(extrmatn_state::extrmatn)
+	tnzs(config);
 	/* basic machine hardware */
 	MCFG_CPU_MODIFY("maincpu")
 	MCFG_CPU_PROGRAM_MAP(prompal_main_map)
@@ -1588,13 +1590,15 @@ MACHINE_CONFIG_DERIVED(extrmatn_state::extrmatn, tnzs)
 	MCFG_PALETTE_INIT_OWNER(tnzs_base_state, prompalette)
 MACHINE_CONFIG_END
 
-MACHINE_CONFIG_DERIVED(extrmatn_state::plumppop, extrmatn)
+MACHINE_CONFIG_START(extrmatn_state::plumppop)
+	extrmatn(config);
 	MCFG_DEVICE_ADD("upd4701", UPD4701A, 0)
 	MCFG_UPD4701_PORTX("AN1")
 	MCFG_UPD4701_PORTY("AN2")
 MACHINE_CONFIG_END
 
-MACHINE_CONFIG_DERIVED(arknoid2_state::arknoid2, plumppop)
+MACHINE_CONFIG_START(arknoid2_state::arknoid2)
+	plumppop(config);
 	/* basic machine hardware */
 	MCFG_CPU_MODIFY("maincpu")
 	MCFG_CPU_VBLANK_INT_DRIVER("screen", arknoid2_state, mcu_interrupt)
@@ -1606,7 +1610,8 @@ MACHINE_CONFIG_DERIVED(arknoid2_state::arknoid2, plumppop)
 	MCFG_DEVICE_DISABLE()
 MACHINE_CONFIG_END
 
-MACHINE_CONFIG_DERIVED(insectx_state::insectx, tnzs_base)
+MACHINE_CONFIG_START(insectx_state::insectx)
+	tnzs_base(config);
 	/* basic machine hardware */
 	MCFG_CPU_MODIFY("sub")
 	MCFG_CPU_PROGRAM_MAP(insectx_sub_map)
@@ -1622,7 +1627,8 @@ MACHINE_CONFIG_DERIVED(insectx_state::insectx, tnzs_base)
 MACHINE_CONFIG_END
 
 
-MACHINE_CONFIG_DERIVED(kageki_state::kageki, tnzs_base)
+MACHINE_CONFIG_START(kageki_state::kageki)
+	tnzs_base(config);
 	/* basic machine hardware */
 	MCFG_CPU_MODIFY("sub")
 	MCFG_CPU_PROGRAM_MAP(kageki_sub_map)
@@ -1642,7 +1648,8 @@ MACHINE_CONFIG_DERIVED(kageki_state::kageki, tnzs_base)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 1.0)
 MACHINE_CONFIG_END
 
-MACHINE_CONFIG_DERIVED(tnzsb_state::tnzsb, tnzs_base)
+MACHINE_CONFIG_START(tnzsb_state::tnzsb)
+	tnzs_base(config);
 	/* basic machine hardware */
 	MCFG_CPU_MODIFY("maincpu")
 	MCFG_CPU_PROGRAM_MAP(tnzsb_main_map)
@@ -1670,7 +1677,8 @@ MACHINE_CONFIG_DERIVED(tnzsb_state::tnzsb, tnzs_base)
 MACHINE_CONFIG_END
 
 
-MACHINE_CONFIG_DERIVED(kabukiz_state::kabukiz, tnzsb)
+MACHINE_CONFIG_START(kabukiz_state::kabukiz)
+	tnzsb(config);
 
 	/* basic machine hardware */
 	MCFG_CPU_MODIFY("sub")
@@ -1690,7 +1698,8 @@ MACHINE_CONFIG_DERIVED(kabukiz_state::kabukiz, tnzsb)
 MACHINE_CONFIG_END
 
 
-MACHINE_CONFIG_DERIVED(jpopnics_state::jpopnics, tnzs_base)
+MACHINE_CONFIG_START(jpopnics_state::jpopnics)
+	tnzs_base(config);
 	/* basic machine hardware */
 	MCFG_CPU_MODIFY("maincpu")
 	MCFG_CPU_PROGRAM_MAP(jpopnics_main_map)

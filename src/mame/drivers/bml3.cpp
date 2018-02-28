@@ -1035,7 +1035,8 @@ MACHINE_CONFIG_START(bml3_state::bml3_common)
 
 MACHINE_CONFIG_END
 
-MACHINE_CONFIG_DERIVED(bml3_state::bml3, bml3_common)
+MACHINE_CONFIG_START(bml3_state::bml3)
+	bml3_common(config);
 	MCFG_CPU_MODIFY( "maincpu" )
 	MCFG_CPU_PROGRAM_MAP(bml3_mem)
 
@@ -1051,14 +1052,16 @@ MACHINE_CONFIG_DERIVED(bml3_state::bml3, bml3_common)
 #endif
 MACHINE_CONFIG_END
 
-MACHINE_CONFIG_DERIVED(bml3_state::bml3mk2, bml3_common)
+MACHINE_CONFIG_START(bml3_state::bml3mk2)
+	bml3_common(config);
 	MCFG_CPU_MODIFY( "maincpu" )
 	MCFG_CPU_PROGRAM_MAP(bml3mk2_mem)
 
 	// TODO: anything to add here?
 MACHINE_CONFIG_END
 
-MACHINE_CONFIG_DERIVED(bml3_state::bml3mk5, bml3_common)
+MACHINE_CONFIG_START(bml3_state::bml3mk5)
+	bml3_common(config);
 	MCFG_CPU_MODIFY( "maincpu" )
 	MCFG_CPU_PROGRAM_MAP(bml3mk5_mem)
 

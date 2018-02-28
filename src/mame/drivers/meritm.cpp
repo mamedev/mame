@@ -1145,13 +1145,15 @@ MACHINE_CONFIG_START(meritm_state::meritm_crt250)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 MACHINE_CONFIG_END
 
-MACHINE_CONFIG_DERIVED(meritm_state::meritm_crt250_questions, meritm_crt250)
+MACHINE_CONFIG_START(meritm_state::meritm_crt250_questions)
+	meritm_crt250(config);
 	MCFG_CPU_MODIFY("maincpu")
 	MCFG_CPU_PROGRAM_MAP(meritm_crt250_questions_map)
 	MCFG_MACHINE_START_OVERRIDE(meritm_state,meritm_crt250_questions)
 MACHINE_CONFIG_END
 
-MACHINE_CONFIG_DERIVED(meritm_state::meritm_crt250_crt252_crt258, meritm_crt250_questions)
+MACHINE_CONFIG_START(meritm_state::meritm_crt250_crt252_crt258)
+	meritm_crt250_questions(config);
 	MCFG_CPU_MODIFY("maincpu")
 	MCFG_CPU_IO_MAP(meritm_crt250_crt258_io_map)
 	MCFG_MACHINE_START_OVERRIDE(meritm_state,meritm_crt250_crt252_crt258)
@@ -1162,7 +1164,8 @@ MACHINE_CONFIG_DERIVED(meritm_state::meritm_crt250_crt252_crt258, meritm_crt250_
 	MCFG_MICROTOUCH_TOUCH_CB(meritm_state, meritm_touch_coord_transform)
 MACHINE_CONFIG_END
 
-MACHINE_CONFIG_DERIVED(meritm_state::meritm_crt260, meritm_crt250)
+MACHINE_CONFIG_START(meritm_state::meritm_crt260)
+	meritm_crt250(config);
 	MCFG_CPU_MODIFY("maincpu")
 	MCFG_CPU_PROGRAM_MAP(meritm_map)
 	MCFG_CPU_IO_MAP(meritm_io_map)

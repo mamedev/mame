@@ -348,7 +348,8 @@ MACHINE_CONFIG_END
     Barricade or is the resolution set by a dip switch?
 */
 
-MACHINE_CONFIG_DERIVED(hitme_state::barricad, hitme)
+MACHINE_CONFIG_START(hitme_state::barricad)
+	hitme(config);
 
 	/* video hardware */
 	MCFG_SCREEN_MODIFY("screen")

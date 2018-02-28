@@ -1246,7 +1246,8 @@ MACHINE_CONFIG_START(multigam_state::multigam)
 	MCFG_SPEAKER_STANDARD_MONO("mono")
 MACHINE_CONFIG_END
 
-MACHINE_CONFIG_DERIVED(multigam_state::multigm3, multigam)
+MACHINE_CONFIG_START(multigam_state::multigm3)
+	multigam(config);
 	MCFG_CPU_MODIFY("maincpu")
 	MCFG_CPU_PROGRAM_MAP(multigm3_map)
 
@@ -1254,12 +1255,14 @@ MACHINE_CONFIG_DERIVED(multigam_state::multigm3, multigam)
 	MCFG_MACHINE_RESET_OVERRIDE(multigam_state, multigm3 )
 MACHINE_CONFIG_END
 
-MACHINE_CONFIG_DERIVED(multigam_state::multigmt, multigam)
+MACHINE_CONFIG_START(multigam_state::multigmt)
+	multigam(config);
 	MCFG_CPU_MODIFY("maincpu")
 	MCFG_CPU_PROGRAM_MAP(multigmt_map)
 MACHINE_CONFIG_END
 
-MACHINE_CONFIG_DERIVED(multigam_state::supergm3, multigam)
+MACHINE_CONFIG_START(multigam_state::supergm3)
+	multigam(config);
 	MCFG_CPU_MODIFY("maincpu")
 	MCFG_CPU_PROGRAM_MAP(supergm3_map)
 

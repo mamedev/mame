@@ -396,7 +396,8 @@ MACHINE_CONFIG_START(oneshot_state::oneshot)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 MACHINE_CONFIG_END
 
-MACHINE_CONFIG_DERIVED(oneshot_state::maddonna, oneshot)
+MACHINE_CONFIG_START(oneshot_state::maddonna)
+	oneshot(config);
 
 	/* basic machine hardware */
 

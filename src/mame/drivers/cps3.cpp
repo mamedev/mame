@@ -2564,51 +2564,57 @@ MACHINE_CONFIG_END
 
 
 /* individual configs for each machine, depending on the SIMMs installed */
-MACHINE_CONFIG_DERIVED(cps3_state::redearth, cps3)
-	MCFG_FRAGMENT_ADD(simm1_64mbit)
-	MCFG_FRAGMENT_ADD(simm3_128mbit)
-	MCFG_FRAGMENT_ADD(simm4_128mbit)
-	MCFG_FRAGMENT_ADD(simm5_32mbit)
+MACHINE_CONFIG_START(cps3_state::redearth)
+	cps3(config);
+	simm1_64mbit(config);
+	simm3_128mbit(config);
+	simm4_128mbit(config);
+	simm5_32mbit(config);
 MACHINE_CONFIG_END
 
-MACHINE_CONFIG_DERIVED(cps3_state::sfiii, cps3)
-	MCFG_FRAGMENT_ADD(simm1_64mbit)
-	MCFG_FRAGMENT_ADD(simm3_128mbit)
-	MCFG_FRAGMENT_ADD(simm4_128mbit)
-	MCFG_FRAGMENT_ADD(simm5_32mbit)
+MACHINE_CONFIG_START(cps3_state::sfiii)
+	cps3(config);
+	simm1_64mbit(config);
+	simm3_128mbit(config);
+	simm4_128mbit(config);
+	simm5_32mbit(config);
 MACHINE_CONFIG_END
 
-MACHINE_CONFIG_DERIVED(cps3_state::sfiii2, cps3)
-	MCFG_FRAGMENT_ADD(simm1_64mbit)
-	MCFG_FRAGMENT_ADD(simm2_64mbit)
-	MCFG_FRAGMENT_ADD(simm3_128mbit)
-	MCFG_FRAGMENT_ADD(simm4_128mbit)
-	MCFG_FRAGMENT_ADD(simm5_128mbit)
+MACHINE_CONFIG_START(cps3_state::sfiii2)
+	cps3(config);
+	simm1_64mbit(config);
+	simm2_64mbit(config);
+	simm3_128mbit(config);
+	simm4_128mbit(config);
+	simm5_128mbit(config);
 MACHINE_CONFIG_END
 
-MACHINE_CONFIG_DERIVED(cps3_state::jojo, cps3)
-	MCFG_FRAGMENT_ADD(simm1_64mbit)
-	MCFG_FRAGMENT_ADD(simm2_64mbit)
-	MCFG_FRAGMENT_ADD(simm3_128mbit)
-	MCFG_FRAGMENT_ADD(simm4_128mbit)
-	MCFG_FRAGMENT_ADD(simm5_32mbit)
+MACHINE_CONFIG_START(cps3_state::jojo)
+	cps3(config);
+	simm1_64mbit(config);
+	simm2_64mbit(config);
+	simm3_128mbit(config);
+	simm4_128mbit(config);
+	simm5_32mbit(config);
 MACHINE_CONFIG_END
 
-MACHINE_CONFIG_DERIVED(cps3_state::sfiii3, cps3)
-	MCFG_FRAGMENT_ADD(simm1_64mbit)
-	MCFG_FRAGMENT_ADD(simm2_64mbit)
-	MCFG_FRAGMENT_ADD(simm3_128mbit)
-	MCFG_FRAGMENT_ADD(simm4_128mbit)
-	MCFG_FRAGMENT_ADD(simm5_128mbit)
-	MCFG_FRAGMENT_ADD(simm6_128mbit)
+MACHINE_CONFIG_START(cps3_state::sfiii3)
+	cps3(config);
+	simm1_64mbit(config);
+	simm2_64mbit(config);
+	simm3_128mbit(config);
+	simm4_128mbit(config);
+	simm5_128mbit(config);
+	simm6_128mbit(config);
 MACHINE_CONFIG_END
 
-MACHINE_CONFIG_DERIVED(cps3_state::jojoba, cps3)
-	MCFG_FRAGMENT_ADD(simm1_64mbit)
-	MCFG_FRAGMENT_ADD(simm2_64mbit)
-	MCFG_FRAGMENT_ADD(simm3_128mbit)
-	MCFG_FRAGMENT_ADD(simm4_128mbit)
-	MCFG_FRAGMENT_ADD(simm5_128mbit)
+MACHINE_CONFIG_START(cps3_state::jojoba)
+	cps3(config);
+	simm1_64mbit(config);
+	simm2_64mbit(config);
+	simm3_128mbit(config);
+	simm4_128mbit(config);
+	simm5_128mbit(config);
 MACHINE_CONFIG_END
 
 

@@ -31,8 +31,8 @@ maybe close to jalmah.cpp?
 class patapata_state : public driver_device
 {
 public:
-	patapata_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag),
+	patapata_state(const machine_config &mconfig, device_type type, const char *tag) :
+		driver_device(mconfig, type, tag),
 		m_bg_videoram(*this, "bg_videoram"),
 		m_fg_videoram(*this, "fg_videoram"),
 		m_vregs(*this, "videoregs"),
@@ -40,6 +40,9 @@ public:
 		m_gfxdecode(*this, "gfxdecode")
 	{ }
 
+	void patapata(machine_config &config);
+
+protected:
 	DECLARE_WRITE16_MEMBER(bg_videoram_w);
 	DECLARE_WRITE16_MEMBER(fg_videoram_w);
 	DECLARE_WRITE8_MEMBER(flipscreen_w);
@@ -48,9 +51,7 @@ public:
 
 	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 
-	void patapata(machine_config &config);
 	void main_map(address_map &map);
-protected:
 	virtual void video_start() override;
 
 private:
@@ -284,7 +285,7 @@ TIMER_DEVICE_CALLBACK_MEMBER(patapata_state::scanline)
 
 MACHINE_CONFIG_START(patapata_state::patapata)
 
-	MCFG_CPU_ADD("maincpu", M68000, XTAL(16'000'000)) // 16 MHz XTAL, 16 MHz CPU
+	MCFG_CPU_ADD("maincpu", M68000, 16_MHz_XTAL) // 16 MHz XTAL, 16 MHz CPU
 	MCFG_CPU_PROGRAM_MAP(main_map)
 	MCFG_CPU_VBLANK_INT_DRIVER("screen", patapata_state,  irq4_line_hold) // 1 + 4 valid? (4 main VBL)
 	MCFG_TIMER_DRIVER_ADD_SCANLINE("scantimer", patapata_state, scanline, "screen", 0, 1)
@@ -304,10 +305,10 @@ MACHINE_CONFIG_START(patapata_state::patapata)
 
 	MCFG_SPEAKER_STANDARD_MONO("mono")
 
-	MCFG_OKIM6295_ADD("oki1", XTAL(16'000'000) / 4, PIN7_LOW) // not verified
+	MCFG_OKIM6295_ADD("oki1", 16_MHz_XTAL / 4, PIN7_LOW) // not verified
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.40)
 
-	MCFG_OKIM6295_ADD("oki2", XTAL(16'000'000) / 4, PIN7_LOW) // not verified
+	MCFG_OKIM6295_ADD("oki2", 16_MHz_XTAL / 4, PIN7_LOW) // not verified
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.40)
 
 	MCFG_DEVICE_ADD("nmk112", NMK112, 0) // or 212? difficult to read (maybe 212 is 2* 112?)

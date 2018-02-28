@@ -2049,7 +2049,8 @@ MACHINE_CONFIG_START(suna8_state::brickzn11)
 	MCFG_SOUND_ROUTE_EX(0, "rdac2", 1.0, DAC_VREF_POS_INPUT) MCFG_SOUND_ROUTE_EX(0, "rdac2", -1.0, DAC_VREF_NEG_INPUT)
 MACHINE_CONFIG_END
 
-MACHINE_CONFIG_DERIVED(suna8_state::brickzn, brickzn11)
+MACHINE_CONFIG_START(suna8_state::brickzn)
+	brickzn11(config);
 	MCFG_CPU_MODIFY("maincpu")
 	MCFG_CPU_PROGRAM_MAP(brickzn_map)
 	MCFG_CPU_IO_MAP(brickzn_io_map)
@@ -2079,7 +2080,8 @@ MACHINE_RESET_MEMBER(suna8_state,hardhea2)
 	hardhea2_rambank_0_w(space,0,0);
 }
 
-MACHINE_CONFIG_DERIVED(suna8_state::hardhea2, brickzn)
+MACHINE_CONFIG_START(suna8_state::hardhea2)
+	brickzn(config);
 	MCFG_DEVICE_REMOVE("maincpu")
 
 	MCFG_CPU_ADD("maincpu", Z80, SUNA8_MASTER_CLOCK / 4)        /* SUNA T568009 */
@@ -2094,7 +2096,8 @@ MACHINE_CONFIG_DERIVED(suna8_state::hardhea2, brickzn)
 	MCFG_PALETTE_ENDIANNESS(ENDIANNESS_BIG)
 MACHINE_CONFIG_END
 
-MACHINE_CONFIG_DERIVED(suna8_state::hardhea2b, hardhea2)
+MACHINE_CONFIG_START(suna8_state::hardhea2b)
+	hardhea2(config);
 	MCFG_DEVICE_REMOVE("maincpu")
 
 	MCFG_CPU_ADD("maincpu", Z80, SUNA8_MASTER_CLOCK / 4)        //bootleg clock not verified (?)

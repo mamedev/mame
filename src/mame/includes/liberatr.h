@@ -5,6 +5,10 @@
     Atari Liberator hardware
 
 *************************************************************************/
+#ifndef MAME_INCLUDES_LIBERATR_H
+#define MAME_INCLUDES_LIBERATR_H
+
+#pragma once
 
 #include "cpu/m6502/m6502.h"
 #include "machine/74259.h"
@@ -17,18 +21,27 @@ class liberatr_state : public driver_device
 {
 public:
 	liberatr_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag),
-			m_earom(*this, "earom"),
-			m_earom_data(0),
-			m_earom_control(0),
-			m_outlatch(*this, "outlatch"),
-			m_screen(*this, "screen"),
-			m_base_ram(*this, "base_ram"),
-			m_planet_frame(*this, "planet_frame"),
-			m_xcoord(*this, "xcoord"),
-			m_ycoord(*this, "ycoord"),
-			m_bitmapram(*this, "bitmapram"),
-			m_colorram(*this, "colorram") { }
+		: driver_device(mconfig, type, tag)
+		, m_earom(*this, "earom")
+		, m_earom_data(0)
+		, m_earom_control(0)
+		, m_outlatch(*this, "outlatch")
+		, m_screen(*this, "screen")
+		, m_base_ram(*this, "base_ram")
+		, m_planet_frame(*this, "planet_frame")
+		, m_xcoord(*this, "xcoord")
+		, m_ycoord(*this, "ycoord")
+		, m_bitmapram(*this, "bitmapram")
+		, m_colorram(*this, "colorram")
+	{ }
+
+	void liberat2(machine_config &config);
+	void liberatr(machine_config &config);
+
+protected:
+	virtual void machine_start() override;
+	virtual void machine_reset() override;
+	virtual void video_start() override;
 
 	DECLARE_WRITE8_MEMBER(output_latch_w);
 	DECLARE_WRITE_LINE_MEMBER(start_led_1_w);
@@ -52,43 +65,10 @@ public:
 	DECLARE_WRITE8_MEMBER( earom_w );
 	DECLARE_WRITE8_MEMBER( earom_control_w );
 
-	void liberat2(machine_config &config);
-	void liberatr(machine_config &config);
 	void liberat2_map(address_map &map);
 	void liberatr_map(address_map &map);
+
 protected:
-	virtual void machine_start() override;
-	virtual void machine_reset() override;
-	virtual void video_start() override;
-
-	// vector and early raster EAROM interface
-	required_device<er2055_device> m_earom;
-	uint8_t               m_earom_data;
-	uint8_t               m_earom_control;
-
-	required_device<ls259_device> m_outlatch;
-
-	struct planet;
-
-	void init_planet(planet &liberatr_planet, uint8_t *planet_rom);
-	void get_pens(pen_t *pens);
-	void draw_planet(bitmap_rgb32 &bitmap, pen_t *pens);
-	void draw_bitmap(bitmap_rgb32 &bitmap, pen_t *pens);
-
-	required_device<screen_device> m_screen;
-	required_shared_ptr<uint8_t> m_base_ram;
-	required_shared_ptr<uint8_t> m_planet_frame;
-	required_shared_ptr<uint8_t> m_xcoord;
-	required_shared_ptr<uint8_t> m_ycoord;
-	required_shared_ptr<uint8_t> m_bitmapram;
-	required_shared_ptr<uint8_t> m_colorram;
-
-	uint8_t       m_trackball_offset;
-	uint8_t       m_ctrld;
-	uint8_t       m_videoram[0x10000];
-
-	bool m_planet_select;
-
 	// The following structure describes the (up to 32) line segments
 	// that make up one horizontal line (latitude) for one display frame of the planet.
 	// Note: this and the following structure is only used to collect the
@@ -120,7 +100,35 @@ protected:
 		uint8_t *frames[256];
 	};
 
+	void init_planet(planet &liberatr_planet, uint8_t *planet_rom);
+	void get_pens(pen_t *pens);
+	void draw_planet(bitmap_rgb32 &bitmap, pen_t *pens);
+	void draw_bitmap(bitmap_rgb32 &bitmap, pen_t *pens);
+
+	// vector and early raster EAROM interface
+	required_device<er2055_device> m_earom;
+	uint8_t               m_earom_data;
+	uint8_t               m_earom_control;
+
+	required_device<ls259_device> m_outlatch;
+
+	required_device<screen_device> m_screen;
+	required_shared_ptr<uint8_t> m_base_ram;
+	required_shared_ptr<uint8_t> m_planet_frame;
+	required_shared_ptr<uint8_t> m_xcoord;
+	required_shared_ptr<uint8_t> m_ycoord;
+	required_shared_ptr<uint8_t> m_bitmapram;
+	required_shared_ptr<uint8_t> m_colorram;
+
+	uint8_t       m_trackball_offset;
+	uint8_t       m_ctrld;
+	uint8_t       m_videoram[0x10000];
+
+	bool m_planet_select;
+
 	// The following array collects the 2 different planet
 	// descriptions, which are selected by planetbit
 	planet m_planets[2];
 };
+
+#endif // MAME_INCLUDES_LIBERATR_H

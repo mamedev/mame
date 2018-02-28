@@ -352,7 +352,8 @@ MACHINE_CONFIG_START(tiamc1_state::tiamc1)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 MACHINE_CONFIG_END
 
-MACHINE_CONFIG_DERIVED(tiamc1_state::kot, tiamc1)
+MACHINE_CONFIG_START(tiamc1_state::kot)
+	tiamc1(config);
 	MCFG_CPU_MODIFY("maincpu")
 	MCFG_CPU_PROGRAM_MAP(kotrybolov_map)
 	MCFG_CPU_IO_MAP(kotrybolov_io_map)

@@ -31,7 +31,6 @@ public:
 	// construction/destruction
 	c64_multiscreen_cartridge_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
-	void multiscreen_mem(address_map &map);
 protected:
 	// device-level overrides
 	virtual void device_start() override;
@@ -47,6 +46,8 @@ protected:
 
 private:
 	uint8_t m_bank;
+
+	void multiscreen_mem(address_map &map);
 };
 
 

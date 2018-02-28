@@ -184,16 +184,6 @@ WRITE16_MEMBER(cyclwarr_state::bigfight_a60000_w)
 	COMBINE_DATA(&m_bigfight_a60000[offset]);
 }
 
-WRITE16_MEMBER(cyclwarr_state::io1_byte_smear_w)
-{
-	m_io[0]->write(space, offset, data & 0xff);
-}
-
-WRITE16_MEMBER(cyclwarr_state::io2_byte_smear_w)
-{
-	m_io[1]->write(space, offset, data & 0xff);
-}
-
 WRITE16_MEMBER(cyclwarr_state::cyclwarr_sound_w)
 {
 	m_soundlatch->write(space, 0, data >> 8);
@@ -296,10 +286,8 @@ ADDRESS_MAP_START(cyclwarr_state::cyclwarr_68000a_map)
 	AM_RANGE(0x0a6000, 0x0a6001) AM_WRITE(bigfight_a60000_w)
 
 	AM_RANGE(0x0b8000, 0x0b8001) AM_WRITE(cyclwarr_sound_w)
-	AM_RANGE(0x0b9000, 0x0b900f) AM_DEVREAD8("io1", cxd1095_device, read, 0x00ff)
-	AM_RANGE(0x0b9000, 0x0b900f) AM_WRITE(io1_byte_smear_w)
-	AM_RANGE(0x0ba000, 0x0ba00f) AM_DEVREAD8("io2", cxd1095_device, read, 0x00ff)
-	AM_RANGE(0x0ba000, 0x0ba00f) AM_WRITE(io2_byte_smear_w)
+	AM_RANGE(0x0b9000, 0x0b900f) AM_DEVREADWRITE8("io1", cxd1095_device, read, write, 0x00ff).cswidth(16)
+	AM_RANGE(0x0ba000, 0x0ba00f) AM_DEVREADWRITE8("io2", cxd1095_device, read, write, 0x00ff).cswidth(16)
 	AM_RANGE(0x0c0000, 0x0c3fff) AM_READWRITE(cyclwarr_sprite_r, cyclwarr_sprite_w) AM_SHARE("spriteram")
 	AM_RANGE(0x0ca000, 0x0ca1ff) AM_WRITE(tatsumi_sprite_control_w) AM_SHARE("sprite_ctlram")
 	AM_RANGE(0x0d0000, 0x0d3fff) AM_RAM_DEVWRITE("palette", palette_device, write16) AM_SHARE("palette")
@@ -317,10 +305,8 @@ ADDRESS_MAP_START(cyclwarr_state::cyclwarr_68000b_map)
 	AM_RANGE(0x0a4000, 0x0a4001) AM_WRITE(bigfight_a40000_w)
 	AM_RANGE(0x0a6000, 0x0a6001) AM_WRITE(bigfight_a60000_w)
 
-	AM_RANGE(0x0b9000, 0x0b900f) AM_DEVREAD8("io1", cxd1095_device, read, 0x00ff)
-	AM_RANGE(0x0b9000, 0x0b900f) AM_WRITE(io1_byte_smear_w)
-	AM_RANGE(0x0ba000, 0x0ba00f) AM_DEVREAD8("io2", cxd1095_device, read, 0x00ff)
-	AM_RANGE(0x0ba000, 0x0ba00f) AM_WRITE(io2_byte_smear_w)
+	AM_RANGE(0x0b9000, 0x0b900f) AM_DEVREADWRITE8("io1", cxd1095_device, read, write, 0x00ff).cswidth(16)
+	AM_RANGE(0x0ba000, 0x0ba00f) AM_DEVREADWRITE8("io2", cxd1095_device, read, write, 0x00ff).cswidth(16)
 	AM_RANGE(0x0c0000, 0x0c3fff) AM_READWRITE(cyclwarr_sprite_r, cyclwarr_sprite_w)
 	AM_RANGE(0x0ca000, 0x0ca1ff) AM_WRITE(tatsumi_sprite_control_w)
 	AM_RANGE(0x0d0000, 0x0d3fff) AM_RAM_DEVWRITE("palette", palette_device, write16) AM_SHARE("palette")
@@ -353,10 +339,8 @@ ADDRESS_MAP_START(cyclwarr_state::bigfight_68000a_map)
 	AM_RANGE(0x0a6000, 0x0a6001) AM_WRITE(bigfight_a60000_w)
 
 	AM_RANGE(0x0b8000, 0x0b8001) AM_WRITE(cyclwarr_sound_w)
-	AM_RANGE(0x0b9000, 0x0b900f) AM_DEVREAD8("io1", cxd1095_device, read, 0x00ff)
-	AM_RANGE(0x0b9000, 0x0b900f) AM_WRITE(io1_byte_smear_w)
-	AM_RANGE(0x0ba000, 0x0ba00f) AM_DEVREAD8("io2", cxd1095_device, read, 0x00ff)
-	AM_RANGE(0x0ba000, 0x0ba00f) AM_WRITE(io2_byte_smear_w)
+	AM_RANGE(0x0b9000, 0x0b900f) AM_DEVREADWRITE8("io1", cxd1095_device, read, write, 0x00ff).cswidth(16)
+	AM_RANGE(0x0ba000, 0x0ba00f) AM_DEVREADWRITE8("io2", cxd1095_device, read, write, 0x00ff).cswidth(16)
 	AM_RANGE(0x0c0000, 0x0c3fff) AM_READWRITE(cyclwarr_sprite_r, cyclwarr_sprite_w) AM_SHARE("spriteram")
 	AM_RANGE(0x0ca000, 0x0ca1ff) AM_WRITE(tatsumi_sprite_control_w) AM_SHARE("sprite_ctlram")
 	AM_RANGE(0x0d0000, 0x0d3fff) AM_RAM_DEVWRITE("palette", palette_device, write16) AM_SHARE("palette")
@@ -372,10 +356,8 @@ ADDRESS_MAP_START(cyclwarr_state::bigfight_68000b_map)
 	AM_RANGE(0x0a4000, 0x0a4001) AM_WRITE(bigfight_a40000_w)
 	AM_RANGE(0x0a6000, 0x0a6001) AM_WRITE(bigfight_a60000_w)
 
-	AM_RANGE(0x0b9000, 0x0b900f) AM_DEVREAD8("io1", cxd1095_device, read, 0x00ff)
-	AM_RANGE(0x0b9000, 0x0b900f) AM_WRITE(io1_byte_smear_w)
-	AM_RANGE(0x0ba000, 0x0ba00f) AM_DEVREAD8("io2", cxd1095_device, read, 0x00ff)
-	AM_RANGE(0x0ba000, 0x0ba00f) AM_WRITE(io2_byte_smear_w)
+	AM_RANGE(0x0b9000, 0x0b900f) AM_DEVREADWRITE8("io1", cxd1095_device, read, write, 0x00ff).cswidth(16)
+	AM_RANGE(0x0ba000, 0x0ba00f) AM_DEVREADWRITE8("io2", cxd1095_device, read, write, 0x00ff).cswidth(16)
 	AM_RANGE(0x0c0000, 0x0c3fff) AM_READWRITE(cyclwarr_sprite_r, cyclwarr_sprite_w)
 	AM_RANGE(0x0ca000, 0x0ca1ff) AM_WRITE(tatsumi_sprite_control_w)
 	AM_RANGE(0x0d0000, 0x0d3fff) AM_RAM_DEVWRITE("palette", palette_device, write16) AM_SHARE("palette")

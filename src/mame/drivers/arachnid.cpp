@@ -455,7 +455,7 @@ MACHINE_CONFIG_START(arachnid_state::arachnid)
 
 	MCFG_DEVICE_ADD(PTM6840_TAG, PTM6840, XTAL(8'000'000) / 4)
 	MCFG_PTM6840_EXTERNAL_CLOCKS(0, 0, 0)
-	MCFG_PTM6840_OUT0_CB(WRITELINE(arachnid_state, ptm_o1_callback))
+	MCFG_PTM6840_O1_CB(WRITELINE(arachnid_state, ptm_o1_callback))
 MACHINE_CONFIG_END
 
 /***************************************************************************

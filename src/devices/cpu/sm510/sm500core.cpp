@@ -21,11 +21,11 @@ DEFINE_DEVICE_TYPE(SM500, sm500_device, "sm500", "SM500") // 1.2K ROM, 4x10x4 RA
 
 
 // internal memory maps
-ADDRESS_MAP_START(sm510_base_device::program_1_2k)
+ADDRESS_MAP_START(sm500_device::program_1_2k)
 	AM_RANGE(0x000, 0x4bf) AM_ROM
 ADDRESS_MAP_END
 
-ADDRESS_MAP_START(sm510_base_device::data_4x10x4)
+ADDRESS_MAP_START(sm500_device::data_4x10x4)
 	AM_RANGE(0x00, 0x09) AM_RAM
 	AM_RANGE(0x10, 0x19) AM_RAM
 	AM_RANGE(0x20, 0x29) AM_RAM

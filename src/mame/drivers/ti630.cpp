@@ -50,8 +50,9 @@ public:
 		, m_lcdc(*this, "hd44780")
 	{ }
 
-	DECLARE_WRITE8_MEMBER(ti630_io_w);
-	DECLARE_READ8_MEMBER(ti630_io_r);
+	DECLARE_WRITE8_MEMBER(i80c31_p1_w);
+	DECLARE_WRITE8_MEMBER(i80c31_p3_w);
+	DECLARE_READ8_MEMBER(i80c31_p1_r);
 	DECLARE_DRIVER_INIT(ti630);
 	DECLARE_PALETTE_INIT(ti630);
 	void ti630(machine_config &config);
@@ -79,8 +80,6 @@ ADDRESS_MAP_START(ti630_state::i80c31_io)
 	AM_RANGE(0x1000,0x1000) /*AM_MIRROR(?)*/ AM_DEVWRITE("hd44780", hd44780_device, data_write)
 	AM_RANGE(0x2000,0x2000) /*AM_MIRROR(?)*/ AM_DEVREAD("hd44780", hd44780_device, control_read)
 	AM_RANGE(0x8000,0xffff) AM_RAM /*TODO: verify the ammont of RAM and the correct address range to which it is mapped. This is just a first reasonable guess that apparently yields good results in the emulation */
-
-	AM_RANGE(MCS51_PORT_P0, MCS51_PORT_P3) AM_READWRITE(ti630_io_r, ti630_io_w)
 ADDRESS_MAP_END
 
 void ti630_state::machine_start()
@@ -91,76 +90,25 @@ void ti630_state::machine_reset()
 {
 }
 
-READ8_MEMBER(ti630_state::ti630_io_r)
+READ8_MEMBER(ti630_state::i80c31_p1_r)
 {
-	switch (offset)
-	{
-		case 0x01:
-		{
-			uint8_t value = 0;
-#if LOG_IO_PORTS
-			printf("P1 read value:%02X\n", value);
-#endif
-			return value;
-		}
-		default:
-#if LOG_IO_PORTS
-			printf("Unhandled I/O Read at offset 0x%02X (return 0)\n", offset);
-#endif
-			return 0;
-	}
+	uint8_t value = 0;
+	if (LOG_IO_PORTS)
+		logerror("P1 read value:%02X\n", value);
+
+	return value;
 }
 
-WRITE8_MEMBER(ti630_state::ti630_io_w)
+WRITE8_MEMBER(ti630_state::i80c31_p1_w)
 {
-	static uint8_t p0=0, p1=0, p2=0, p3=0;
-	switch (offset)
-	{
-		case 0x00:
-		{
-			if (data != p0)
-			{
-				p0=data;
-#if LOG_IO_PORTS
-				printf("Write to P0: %02X\n", data);
-#endif
-			}
-			break;
-		}
-		case 0x01:
-		{
-			if (data != p1)
-			{
-				p1=data;
-#if LOG_IO_PORTS
-				printf("Write to P1: %02X\n", data);
-#endif
-			}
-			break;
-		}
-		case 0x02:
-		{
-			if (data != p2)
-			{
-				p2=data;
-#if LOG_IO_PORTS
-				printf("Write to P2: %02X\n", data);
-#endif
-			}
-			break;
-		}
-		case 0x03:
-		{
-			if (data != p3)
-			{
-				p3=data;
-#if LOG_IO_PORTS
-				printf("Write to P3: %02X\n", data);
-#endif
-			}
-			break;
-		}
-	}
+	if (LOG_IO_PORTS)
+		logerror("Write to P1: %02X\n", data);
+}
+
+WRITE8_MEMBER(ti630_state::i80c31_p3_w)
+{
+	if (LOG_IO_PORTS)
+		logerror("Write to P3: %02X\n", data);
 }
 
 PALETTE_INIT_MEMBER(ti630_state, ti630)
@@ -189,6 +137,9 @@ MACHINE_CONFIG_START(ti630_state::ti630)
 	MCFG_CPU_ADD("maincpu", I80C31, XTAL(10'000'000))
 	MCFG_CPU_PROGRAM_MAP(i80c31_prg)
 	MCFG_CPU_IO_MAP(i80c31_io)
+	MCFG_MCS51_PORT_P1_IN_CB(READ8(ti630_state, i80c31_p1_r))
+	MCFG_MCS51_PORT_P1_OUT_CB(WRITE8(ti630_state, i80c31_p1_w))
+	MCFG_MCS51_PORT_P3_OUT_CB(WRITE8(ti630_state, i80c31_p3_w))
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", LCD)

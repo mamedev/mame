@@ -16,18 +16,6 @@ ADDRESS_MAP_START(maple_dc_device::amap)
 	AM_RANGE(0x8c, 0x8f) AM_WRITE(sb_mdapro_w)
 ADDRESS_MAP_END
 
-void maple_dc_device::static_set_maincpu_tag(device_t &device, const char *maincpu_tag)
-{
-	maple_dc_device &maple_dc = downcast<maple_dc_device &>(device);
-	maple_dc.maincpu_tag = maincpu_tag;
-}
-
-void maple_dc_device::static_set_irq_cb(device_t &device, void (*irq_cb)(running_machine &))
-{
-	maple_dc_device &maple_dc = downcast<maple_dc_device &>(device);
-	maple_dc.irq_cb = irq_cb;
-}
-
 maple_dc_device::maple_dc_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
 	: device_t(mconfig, MAPLE_DC, tag, owner, clock)
 {

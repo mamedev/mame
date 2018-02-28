@@ -24,8 +24,8 @@ TODO:
 #include "quizshow.lh"
 
 
-#define MASTER_CLOCK    XTAL(12'096'000)
-#define PIXEL_CLOCK     (MASTER_CLOCK/2)
+static constexpr XTAL MASTER_CLOCK  = 12.096_MHz_XTAL;
+static constexpr XTAL PIXEL_CLOCK   = MASTER_CLOCK / 2;
 
 #define HTOTAL          ((32+8+4+1) * 8)
 #define HBEND           (0)
@@ -39,8 +39,8 @@ TODO:
 class quizshow_state : public driver_device
 {
 public:
-	quizshow_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag),
+	quizshow_state(const machine_config &mconfig, device_type type, const char *tag) :
+		driver_device(mconfig, type, tag),
 		m_maincpu(*this, "maincpu"),
 		m_dac(*this, "dac"),
 		m_main_ram(*this, "main_ram"),
@@ -48,17 +48,15 @@ public:
 		m_screen(*this, "screen")
 	{ }
 
-	required_device<cpu_device> m_maincpu;
-	required_device<dac_bit_interface> m_dac;
-	required_shared_ptr<uint8_t> m_main_ram;
-	required_device<gfxdecode_device> m_gfxdecode;
-	required_device<screen_device> m_screen;
+	DECLARE_CUSTOM_INPUT_MEMBER(tape_headpos_r);
+	DECLARE_INPUT_CHANGED_MEMBER(category_select);
+	DECLARE_DRIVER_INIT(quizshow);
+	void quizshow(machine_config &config);
 
-	tilemap_t *m_tilemap;
-	uint32_t m_clocks;
-	int m_blink_state;
-	int m_category_enable;
-	int m_tape_head_pos;
+protected:
+	virtual void machine_reset() override;
+	virtual void video_start() override;
+	void mem_map(address_map &map);
 
 	DECLARE_WRITE8_MEMBER(lamps1_w);
 	DECLARE_WRITE8_MEMBER(lamps2_w);
@@ -70,17 +68,23 @@ public:
 	DECLARE_READ_LINE_MEMBER(tape_signal_r);
 	DECLARE_WRITE_LINE_MEMBER(flag_output_w);
 	DECLARE_WRITE8_MEMBER(main_ram_w);
-	DECLARE_CUSTOM_INPUT_MEMBER(tape_headpos_r);
-	DECLARE_INPUT_CHANGED_MEMBER(category_select);
-	DECLARE_DRIVER_INIT(quizshow);
 	TILE_GET_INFO_MEMBER(get_tile_info);
-	virtual void machine_reset() override;
-	virtual void video_start() override;
 	DECLARE_PALETTE_INIT(quizshow);
 	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	TIMER_DEVICE_CALLBACK_MEMBER(clock_timer_cb);
-	void quizshow(machine_config &config);
-	void mem_map(address_map &map);
+
+private:
+	required_device<cpu_device> m_maincpu;
+	required_device<dac_bit_interface> m_dac;
+	required_shared_ptr<uint8_t> m_main_ram;
+	required_device<gfxdecode_device> m_gfxdecode;
+	required_device<screen_device> m_screen;
+
+	tilemap_t *m_tilemap;
+	uint32_t m_clocks;
+	int m_blink_state;
+	int m_category_enable;
+	int m_tape_head_pos;
 };
 
 

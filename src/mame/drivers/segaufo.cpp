@@ -804,7 +804,8 @@ MACHINE_CONFIG_START(ufo_state::newufo)
 	MCFG_SOUND_ROUTE(1, "mono", 0.40)
 MACHINE_CONFIG_END
 
-MACHINE_CONFIG_DERIVED(ufo_state::ufomini, newufo)
+MACHINE_CONFIG_START(ufo_state::ufomini)
+	newufo(config);
 
 	/* basic machine hardware */
 	MCFG_DEVICE_MODIFY("io1")
@@ -814,7 +815,8 @@ MACHINE_CONFIG_DERIVED(ufo_state::ufomini, newufo)
 MACHINE_CONFIG_END
 
 
-MACHINE_CONFIG_DERIVED(ufo_state::ufo21, newufo)
+MACHINE_CONFIG_START(ufo_state::ufo21)
+	newufo(config);
 
 	/* basic machine hardware */
 	MCFG_CPU_MODIFY("maincpu")
@@ -837,7 +839,8 @@ MACHINE_CONFIG_DERIVED(ufo_state::ufo21, newufo)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.75)
 MACHINE_CONFIG_END
 
-MACHINE_CONFIG_DERIVED(ufo_state::ufo800, newufo)
+MACHINE_CONFIG_START(ufo_state::ufo800)
+	newufo(config);
 
 	/* basic machine hardware */
 	MCFG_CPU_MODIFY("maincpu")

@@ -51,6 +51,9 @@ public:
 		, m_io_joy(*this, "JOY")
 	{ }
 
+	void sv8000(machine_config &config);
+
+protected:
 	DECLARE_DEVICE_IMAGE_LOAD_MEMBER( cart );
 
 	DECLARE_READ8_MEMBER( ay_port_a_r );
@@ -67,13 +70,12 @@ public:
 
 	DECLARE_READ8_MEMBER( mc6847_videoram_r );
 
-	void sv8000(machine_config &config);
-	void sv8000_io(address_map &map);
-	void sv8000_mem(address_map &map);
-private:
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
+	void sv8000_io(address_map &map);
+	void sv8000_mem(address_map &map);
 
+private:
 	required_device<cpu_device> m_maincpu;
 	required_device<s68047_device> m_s68047p;
 	required_device<generic_slot_device> m_cart;

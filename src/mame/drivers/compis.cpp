@@ -842,7 +842,8 @@ MACHINE_CONFIG_END
 //  MACHINE_CONFIG( compis2 )
 //-------------------------------------------------
 
-MACHINE_CONFIG_DERIVED(compis_state::compis2, compis)
+MACHINE_CONFIG_START(compis_state::compis2)
+	compis(config);
 	// basic machine hardware
 	MCFG_CPU_MODIFY(I80186_TAG)
 	MCFG_CPU_PROGRAM_MAP(compis2_mem)

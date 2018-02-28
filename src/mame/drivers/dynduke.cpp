@@ -357,7 +357,8 @@ MACHINE_CONFIG_START(dynduke_state::dynduke)
 	MCFG_SEIBU_SOUND_YM_WRITE_CB(DEVWRITE8("ymsnd", ym3812_device, write))
 MACHINE_CONFIG_END
 
-MACHINE_CONFIG_DERIVED(dynduke_state::dbldyn, dynduke)
+MACHINE_CONFIG_START(dynduke_state::dbldyn)
+	dynduke(config);
 
 	MCFG_CPU_MODIFY("maincpu")
 	MCFG_CPU_PROGRAM_MAP(masterj_map)

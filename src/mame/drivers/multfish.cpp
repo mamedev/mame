@@ -1050,7 +1050,8 @@ MACHINE_CONFIG_START(igrosoft_gamble_state::igrosoft_gamble)
 	MCFG_HOPPER_ADD("hopper", attotime::from_msec(100), TICKET_MOTOR_ACTIVE_HIGH, TICKET_STATUS_ACTIVE_HIGH)
 MACHINE_CONFIG_END
 
-MACHINE_CONFIG_DERIVED(igrosoft_gamble_state::rollfr, igrosoft_gamble)
+MACHINE_CONFIG_START(igrosoft_gamble_state::rollfr)
+	igrosoft_gamble(config);
 	MCFG_CPU_MODIFY("maincpu")
 	MCFG_CPU_IO_MAP(rollfr_portmap)
 MACHINE_CONFIG_END

@@ -426,7 +426,7 @@ SLOT_INTERFACE_END
     Machine Driver
 
 ************************************************************/
-MACHINE_RESET_MEMBER( aussiebyte_state, aussiebyte )
+void aussiebyte_state::machine_reset()
 {
 	m_port15 = false;
 	m_port17 = 0;
@@ -447,8 +447,6 @@ MACHINE_CONFIG_START(aussiebyte_state::aussiebyte)
 	MCFG_CPU_PROGRAM_MAP(aussiebyte_map)
 	MCFG_CPU_IO_MAP(aussiebyte_io)
 	MCFG_Z80_DAISY_CHAIN(daisy_chain_intf)
-
-	MCFG_MACHINE_RESET_OVERRIDE(aussiebyte_state, aussiebyte )
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
@@ -543,7 +541,7 @@ MACHINE_CONFIG_START(aussiebyte_state::aussiebyte)
 MACHINE_CONFIG_END
 
 
-DRIVER_INIT_MEMBER( aussiebyte_state, aussiebyte )
+void aussiebyte_state::machine_start()
 {
 	// Main ram is divided into 16k blocks (0-15). The boot rom is block number 16.
 	// For convenience, bank 0 is permanently assigned to C000-FFFF
@@ -578,4 +576,4 @@ ROM_START(aussieby)
 ROM_END
 
 //    YEAR  NAME      PARENT    COMPAT  MACHINE     INPUT        CLASS             INIT        COMPANY         FULLNAME           FLAGS
-COMP( 1984, aussieby,     0,        0,  aussiebyte, aussiebyte,  aussiebyte_state, aussiebyte, "SME Systems",  "Aussie Byte II" , MACHINE_IMPERFECT_GRAPHICS )
+COMP( 1984, aussieby,     0,        0,  aussiebyte, aussiebyte,  aussiebyte_state, 0,          "SME Systems",  "Aussie Byte II" , MACHINE_IMPERFECT_GRAPHICS )

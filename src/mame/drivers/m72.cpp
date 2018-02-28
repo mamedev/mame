@@ -192,7 +192,9 @@ other supported games as well.
 #include "cpu/nec/nec.h"
 #include "cpu/nec/v25.h"
 #include "cpu/z80/z80.h"
+#include "machine/gen_latch.h"
 #include "machine/irem_cpu.h"
+#include "machine/rstbuf.h"
 #include "sound/ym2151.h"
 #include "sound/volt_reg.h"
 #include "speaker.h"
@@ -395,22 +397,15 @@ READ8_MEMBER(m72_state::mcu_snd_r)
 	return m_mcu_snd_cmd_latch;
 }
 
-READ8_MEMBER(m72_state::mcu_port_r)
+WRITE8_MEMBER(m72_state::mcu_port1_w)
 {
-	logerror("port read: %02x\n", offset);
-	return 0;
+	m_mcu_sample_latch = data;
+	m_soundcpu->set_input_line(INPUT_LINE_NMI, PULSE_LINE);
 }
 
-WRITE8_MEMBER(m72_state::mcu_port_w)
+WRITE8_MEMBER(m72_state::mcu_port3_w)
 {
-	if (offset == 1)
-	{
-		m_mcu_sample_latch = data;
-		m_soundcpu->set_input_line(INPUT_LINE_NMI, PULSE_LINE);
-	}
-	else
-		logerror("port: %02x %02x\n", offset, data);
-
+	logerror("port3: %02x\n", data);
 }
 
 WRITE8_MEMBER(m72_state::mcu_low_w)
@@ -982,7 +977,7 @@ ADDRESS_MAP_START(m72_state::m72_portmap)
 	AM_RANGE(0x00, 0x01) AM_READ_PORT("IN0")
 	AM_RANGE(0x02, 0x03) AM_READ_PORT("IN1")
 	AM_RANGE(0x04, 0x05) AM_READ_PORT("DSW")
-	AM_RANGE(0x00, 0x01) AM_DEVWRITE8("m72", m72_audio_device, sound_command_w, 0x00ff)
+	AM_RANGE(0x00, 0x01) AM_DEVWRITE8("soundlatch", generic_latch_8_device, write, 0x00ff)
 	AM_RANGE(0x02, 0x03) AM_WRITE8(port02_w, 0x00ff) /* coin counters, reset sound cpu, other stuff? */
 	AM_RANGE(0x04, 0x05) AM_WRITE(dmaon_w)
 	AM_RANGE(0x06, 0x07) AM_WRITE(irq_line_w)
@@ -998,7 +993,7 @@ ADDRESS_MAP_START(m72_state::m84_portmap)
 	AM_RANGE(0x00, 0x01) AM_READ_PORT("IN0")
 	AM_RANGE(0x02, 0x03) AM_READ_PORT("IN1")
 	AM_RANGE(0x04, 0x05) AM_READ_PORT("DSW")
-	AM_RANGE(0x00, 0x01) AM_DEVWRITE8("m72", m72_audio_device, sound_command_w, 0x00ff)
+	AM_RANGE(0x00, 0x01) AM_DEVWRITE8("soundlatch", generic_latch_8_device, write, 0x00ff)
 	AM_RANGE(0x02, 0x03) AM_WRITE8(rtype2_port02_w, 0x00ff)
 	AM_RANGE(0x40, 0x43) AM_DEVREADWRITE8("upd71059c", pic8259_device, read, write, 0x00ff)
 	AM_RANGE(0x80, 0x81) AM_WRITE(scrolly1_w)
@@ -1011,7 +1006,7 @@ ADDRESS_MAP_START(m72_state::m84_v33_portmap)
 	AM_RANGE(0x00, 0x01) AM_READ_PORT("IN0")
 	AM_RANGE(0x02, 0x03) AM_READ_PORT("IN1")
 	AM_RANGE(0x04, 0x05) AM_READ_PORT("DSW")
-	AM_RANGE(0x00, 0x01) AM_DEVWRITE8("m72", m72_audio_device, sound_command_w, 0x00ff)
+	AM_RANGE(0x00, 0x01) AM_DEVWRITE8("soundlatch", generic_latch_8_device, write, 0x00ff)
 	AM_RANGE(0x02, 0x03) AM_WRITE8(rtype2_port02_w, 0x00ff)
 	AM_RANGE(0x80, 0x81) AM_WRITE(scrolly1_w)
 	AM_RANGE(0x82, 0x83) AM_WRITE(scrollx1_w)
@@ -1026,7 +1021,7 @@ ADDRESS_MAP_START(m72_state::poundfor_portmap)
 	AM_RANGE(0x04, 0x05) AM_READ_PORT("DSW")
 	AM_RANGE(0x08, 0x0f) AM_DEVREAD8("upd4701l", upd4701_device, read_xy, 0x00ff)
 	AM_RANGE(0x08, 0x0f) AM_DEVREAD8("upd4701h", upd4701_device, read_xy, 0xff00)
-	AM_RANGE(0x00, 0x01) AM_DEVWRITE8("m72", m72_audio_device, sound_command_w, 0x00ff)
+	AM_RANGE(0x00, 0x01) AM_DEVWRITE8("soundlatch", generic_latch_8_device, write, 0x00ff)
 	AM_RANGE(0x02, 0x03) AM_WRITE8(poundfor_port02_w, 0x00ff)
 	AM_RANGE(0x40, 0x43) AM_DEVREADWRITE8("upd71059c", pic8259_device, read, write, 0x00ff)
 	AM_RANGE(0x80, 0x81) AM_WRITE(scrolly1_w)
@@ -1039,7 +1034,7 @@ ADDRESS_MAP_START(m72_state::m82_portmap)
 	AM_RANGE(0x00, 0x01) AM_READ_PORT("IN0")
 	AM_RANGE(0x02, 0x03) AM_READ_PORT("IN1")
 	AM_RANGE(0x04, 0x05) AM_READ_PORT("DSW")
-	AM_RANGE(0x00, 0x01) AM_DEVWRITE8("m72", m72_audio_device, sound_command_w, 0x00ff)
+	AM_RANGE(0x00, 0x01) AM_DEVWRITE8("soundlatch", generic_latch_8_device, write, 0x00ff)
 	AM_RANGE(0x02, 0x03) AM_WRITE8(rtype2_port02_w, 0x00ff)
 	AM_RANGE(0x40, 0x43) AM_DEVREADWRITE8("upd71059c", pic8259_device, read, write, 0x00ff)
 	AM_RANGE(0x80, 0x81) AM_WRITE(scrolly1_w)
@@ -1056,7 +1051,7 @@ ADDRESS_MAP_START(m72_state::m81_portmap)
 	AM_RANGE(0x00, 0x01) AM_READ_PORT("IN0")
 	AM_RANGE(0x02, 0x03) AM_READ_PORT("IN1")
 	AM_RANGE(0x04, 0x05) AM_READ_PORT("DSW")
-	AM_RANGE(0x00, 0x01) AM_DEVWRITE8("m72", m72_audio_device, sound_command_w, 0x00ff)
+	AM_RANGE(0x00, 0x01) AM_DEVWRITE8("soundlatch", generic_latch_8_device, write, 0x00ff)
 	AM_RANGE(0x02, 0x03) AM_WRITE8(rtype2_port02_w, 0x00ff)  /* coin counters, reset sound cpu, other stuff? */
 	AM_RANGE(0x04, 0x05) AM_WRITE(dmaon_w)
 	AM_RANGE(0x06, 0x07) AM_WRITE(irq_line_w)
@@ -1082,15 +1077,14 @@ ADDRESS_MAP_START(m72_state::rtype_sound_portmap)
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	AM_RANGE(0x00, 0x01) AM_DEVREADWRITE("ymsnd", ym2151_device, read, write)
 	AM_RANGE(0x02, 0x02) AM_DEVREAD("soundlatch", generic_latch_8_device, read)
-	AM_RANGE(0x06, 0x06) AM_DEVWRITE("m72", m72_audio_device, sound_irq_ack_w)
-	AM_RANGE(0x84, 0x84) AM_DEVREAD("m72", m72_audio_device, sample_r)
+	AM_RANGE(0x06, 0x06) AM_DEVWRITE("soundlatch", generic_latch_8_device, acknowledge_w)
 ADDRESS_MAP_END
 
 ADDRESS_MAP_START(m72_state::sound_portmap)
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	AM_RANGE(0x00, 0x01) AM_DEVREADWRITE("ymsnd", ym2151_device, read, write)
 	AM_RANGE(0x02, 0x02) AM_DEVREAD("soundlatch", generic_latch_8_device, read)
-	AM_RANGE(0x06, 0x06) AM_DEVWRITE("m72", m72_audio_device, sound_irq_ack_w)
+	AM_RANGE(0x06, 0x06) AM_DEVWRITE("soundlatch", generic_latch_8_device, acknowledge_w)
 	AM_RANGE(0x82, 0x82) AM_DEVWRITE("m72", m72_audio_device, sample_w)
 	AM_RANGE(0x84, 0x84) AM_DEVREAD("m72", m72_audio_device, sample_r)
 ADDRESS_MAP_END
@@ -1101,7 +1095,7 @@ ADDRESS_MAP_START(m72_state::rtype2_sound_portmap)
 	AM_RANGE(0x80, 0x80) AM_DEVREAD("soundlatch", generic_latch_8_device, read)
 	AM_RANGE(0x80, 0x81) AM_DEVWRITE("m72", m72_audio_device, rtype2_sample_addr_w)
 	AM_RANGE(0x82, 0x82) AM_DEVWRITE("m72", m72_audio_device, sample_w)
-	AM_RANGE(0x83, 0x83) AM_DEVWRITE("m72", m72_audio_device, sound_irq_ack_w)
+	AM_RANGE(0x83, 0x83) AM_DEVWRITE("soundlatch", generic_latch_8_device, acknowledge_w)
 	AM_RANGE(0x84, 0x84) AM_DEVREAD("m72", m72_audio_device, sample_r)
 //  AM_RANGE(0x87, 0x87) AM_WRITENOP    /* ??? */
 ADDRESS_MAP_END
@@ -1110,8 +1104,7 @@ ADDRESS_MAP_START(m72_state::poundfor_sound_portmap)
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	AM_RANGE(0x10, 0x13) AM_DEVWRITE("m72", m72_audio_device, poundfor_sample_addr_w)
 	AM_RANGE(0x40, 0x41) AM_DEVREADWRITE("ymsnd", ym2151_device, read, write)
-	AM_RANGE(0x42, 0x42) AM_DEVREAD("soundlatch", generic_latch_8_device, read)
-	AM_RANGE(0x42, 0x42) AM_DEVWRITE("m72", m72_audio_device, sound_irq_ack_w)
+	AM_RANGE(0x42, 0x42) AM_DEVREADWRITE("soundlatch", generic_latch_8_device, read, acknowledge_w)
 ADDRESS_MAP_END
 
 ADDRESS_MAP_START(m72_state::mcu_io_map)
@@ -1121,9 +1114,6 @@ ADDRESS_MAP_START(m72_state::mcu_io_map)
 	AM_RANGE(0x0002, 0x0002) AM_READWRITE(mcu_snd_r, mcu_ack_w)
 	/* shared at b0000 - b0fff on the main cpu */
 	AM_RANGE(0xc000, 0xcfff) AM_READWRITE(mcu_data_r,mcu_data_w )
-
-	/* Ports */
-	AM_RANGE(MCS51_PORT_P0, MCS51_PORT_P3) AM_READWRITE(mcu_port_r, mcu_port_w)
 ADDRESS_MAP_END
 
 #define COIN_MODE_1 \
@@ -1844,11 +1834,19 @@ MACHINE_CONFIG_START(m72_state::m72_audio_chips)
 	MCFG_SPEAKER_STANDARD_MONO("speaker")
 
 	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
+	MCFG_GENERIC_LATCH_DATA_PENDING_CB(DEVWRITELINE("soundirq", rst_neg_buffer_device, rst18_w))
+	MCFG_GENERIC_LATCH_SEPARATE_ACKNOWLEDGE(true)
+
+	MCFG_DEVICE_ADD("soundirq", RST_NEG_BUFFER, 0)
+	MCFG_RST_BUFFER_INT_CALLBACK(INPUTLINE("soundcpu", 0))
+
+	MCFG_CPU_MODIFY("soundcpu")
+	MCFG_CPU_IRQ_ACKNOWLEDGE_DEVICE("soundirq", rst_neg_buffer_device, inta_cb)
 
 	MCFG_SOUND_ADD("m72", IREM_M72_AUDIO, 0)
 
 	MCFG_YM2151_ADD("ymsnd", SOUND_CLOCK)
-	MCFG_YM2151_IRQ_HANDLER(DEVWRITELINE("m72", m72_audio_device, ym2151_irq_handler))
+	MCFG_YM2151_IRQ_HANDLER(DEVWRITELINE("soundirq", rst_neg_buffer_device, rst28_w))
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 1.0)
 
 	MCFG_SOUND_ADD("dac", DAC_8BIT_R2R, 0) MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 0.2) // unknown DAC
@@ -1881,35 +1879,42 @@ MACHINE_CONFIG_START(m72_state::m72_base)
 
 	MCFG_VIDEO_START_OVERRIDE(m72_state,m72)
 
-	MCFG_FRAGMENT_ADD(m72_audio_chips)
+	m72_audio_chips(config);
 MACHINE_CONFIG_END
 
-MACHINE_CONFIG_DERIVED(m72_state::m72, m72_base)
+MACHINE_CONFIG_START(m72_state::m72)
+	m72_base(config);
 	MCFG_CPU_MODIFY("soundcpu")
 	MCFG_CPU_PERIODIC_INT_DRIVER(m72_state, fake_nmi, 128*55)   /* clocked by V1? (Vigilante) */
 							/* IRQs are generated by main Z80 and YM2151 */
 MACHINE_CONFIG_END
 
-MACHINE_CONFIG_DERIVED(m72_state::m72_8751, m72_base)
+MACHINE_CONFIG_START(m72_state::m72_8751)
+	m72_base(config);
 
 	MCFG_CPU_ADD("mcu",I8751, XTAL(8'000'000)) /* Uses its own XTAL */
 	MCFG_CPU_IO_MAP(mcu_io_map)
+	MCFG_MCS51_PORT_P1_OUT_CB(WRITE8(m72_state, mcu_port1_w))
+	MCFG_MCS51_PORT_P3_OUT_CB(WRITE8(m72_state, mcu_port3_w))
 	MCFG_CPU_VBLANK_INT_DRIVER("screen", m72_state,  mcu_int)
 MACHINE_CONFIG_END
 
 
-MACHINE_CONFIG_DERIVED(m72_state::rtype, m72_base)
+MACHINE_CONFIG_START(m72_state::rtype)
+	m72_base(config);
 	MCFG_CPU_MODIFY("maincpu")
 	MCFG_CPU_PROGRAM_MAP(rtype_map)
 
 	MCFG_CPU_MODIFY("soundcpu")
 	MCFG_CPU_IO_MAP(rtype_sound_portmap)
 
+	MCFG_DEVICE_REMOVE("m72")
 	MCFG_DEVICE_REMOVE("dac")
 	MCFG_DEVICE_REMOVE("vref")
 MACHINE_CONFIG_END
 
-MACHINE_CONFIG_DERIVED(m72_state::m72_xmultipl, m72_8751)
+MACHINE_CONFIG_START(m72_state::m72_xmultipl)
+	m72_8751(config);
 	MCFG_CPU_MODIFY("maincpu")
 	MCFG_CPU_PROGRAM_MAP(xmultiplm72_map)
 
@@ -1920,7 +1925,8 @@ MACHINE_CONFIG_DERIVED(m72_state::m72_xmultipl, m72_8751)
 MACHINE_CONFIG_END
 
 
-MACHINE_CONFIG_DERIVED(m72_state::m72_dbreed, m72_base)
+MACHINE_CONFIG_START(m72_state::m72_dbreed)
+	m72_base(config);
 	MCFG_CPU_MODIFY("maincpu")
 	MCFG_CPU_PROGRAM_MAP(dbreedm72_map)
 
@@ -1935,7 +1941,8 @@ MACHINE_CONFIG_END
 /****************************************** M81 ***********************************************/
 
 // M81 is closest to M72
-MACHINE_CONFIG_DERIVED(m72_state::m81_hharry, m72_base)
+MACHINE_CONFIG_START(m72_state::m81_hharry)
+	m72_base(config);
 	MCFG_CPU_MODIFY("maincpu")
 	MCFG_CPU_PROGRAM_MAP(hharry_map)
 	MCFG_CPU_IO_MAP(m81_portmap)
@@ -1951,7 +1958,8 @@ MACHINE_CONFIG_DERIVED(m72_state::m81_hharry, m72_base)
 	MCFG_SCREEN_UPDATE_DRIVER(m72_state, screen_update_m81)
 MACHINE_CONFIG_END
 
-MACHINE_CONFIG_DERIVED(m72_state::m81_xmultipl, m81_hharry)
+MACHINE_CONFIG_START(m72_state::m81_xmultipl)
+	m81_hharry(config);
 	/* basic machine hardware */
 	MCFG_CPU_MODIFY("maincpu")
 	MCFG_CPU_PROGRAM_MAP(xmultipl_map)
@@ -1959,7 +1967,8 @@ MACHINE_CONFIG_DERIVED(m72_state::m81_xmultipl, m81_hharry)
 	MCFG_VIDEO_START_OVERRIDE(m72_state,xmultipl) // different offsets
 MACHINE_CONFIG_END
 
-MACHINE_CONFIG_DERIVED(m72_state::m81_dbreed, m81_xmultipl)
+MACHINE_CONFIG_START(m72_state::m81_dbreed)
+	m81_xmultipl(config);
 	MCFG_CPU_MODIFY("maincpu")
 	MCFG_CPU_PROGRAM_MAP(dbreed_map)
 MACHINE_CONFIG_END
@@ -1995,11 +2004,12 @@ MACHINE_CONFIG_START(m72_state::rtype2)
 
 	MCFG_VIDEO_START_OVERRIDE(m72_state,rtype2)
 
-	MCFG_FRAGMENT_ADD(m72_audio_chips)
+	m72_audio_chips(config);
 MACHINE_CONFIG_END
 
 // not m72, different video system (less tiles regions?) (M84? M82?)
-MACHINE_CONFIG_DERIVED(m72_state::hharryu, rtype2)
+MACHINE_CONFIG_START(m72_state::hharryu)
+	rtype2(config);
 	/* basic machine hardware */
 	MCFG_CPU_MODIFY("maincpu")
 	MCFG_CPU_PROGRAM_MAP(hharryu_map)
@@ -2039,10 +2049,11 @@ MACHINE_CONFIG_START(m72_state::cosmccop)
 
 	MCFG_VIDEO_START_OVERRIDE(m72_state,hharryu)
 
-	MCFG_FRAGMENT_ADD(m72_audio_chips)
+	m72_audio_chips(config);
 MACHINE_CONFIG_END
 
-MACHINE_CONFIG_DERIVED(m72_state::kengo, cosmccop)
+MACHINE_CONFIG_START(m72_state::kengo)
+	cosmccop(config);
 	MCFG_CPU_MODIFY("maincpu")
 	MCFG_V25_CONFIG(gunforce_decryption_table)
 MACHINE_CONFIG_END
@@ -2083,7 +2094,7 @@ MACHINE_CONFIG_START(m72_state::m82)
 
 	MCFG_VIDEO_START_OVERRIDE(m72_state,m82)
 
-	MCFG_FRAGMENT_ADD(m72_audio_chips)
+	m72_audio_chips(config);
 MACHINE_CONFIG_END
 
 
@@ -2126,7 +2137,7 @@ MACHINE_CONFIG_START(m72_state::poundfor)
 
 	MCFG_VIDEO_START_OVERRIDE(m72_state,poundfor)
 
-	MCFG_FRAGMENT_ADD(m72_audio_chips)
+	m72_audio_chips(config);
 MACHINE_CONFIG_END
 
 

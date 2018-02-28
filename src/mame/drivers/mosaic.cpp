@@ -303,7 +303,8 @@ MACHINE_CONFIG_START(mosaic_state::mosaic)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
 MACHINE_CONFIG_END
 
-MACHINE_CONFIG_DERIVED(mosaic_state::gfire2, mosaic)
+MACHINE_CONFIG_START(mosaic_state::gfire2)
+	mosaic(config);
 	MCFG_CPU_MODIFY("maincpu")
 	MCFG_CPU_PROGRAM_MAP(gfire2_map)
 	MCFG_CPU_IO_MAP(gfire2_io_map)

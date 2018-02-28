@@ -1309,7 +1309,7 @@ void apple2e_state::cec_lcrom_update()
 // most softswitches don't care about read vs write, so handle them here
 void apple2e_state::do_io(address_space &space, int offset, bool is_iic)
 {
-	if(machine().side_effect_disabled()) return;
+	if(machine().side_effects_disabled()) return;
 
 	// Handle C058-C05F according to IOUDIS
 	if ((offset & 0x58) == 0x58)
@@ -1519,7 +1519,7 @@ void apple2e_state::do_io(address_space &space, int offset, bool is_iic)
 
 READ8_MEMBER(apple2e_state::c000_r)
 {
-	if(machine().side_effect_disabled()) return read_floatingbus();
+	if(machine().side_effects_disabled()) return read_floatingbus();
 
 	switch (offset)
 	{
@@ -1630,7 +1630,7 @@ READ8_MEMBER(apple2e_state::c000_r)
 
 WRITE8_MEMBER(apple2e_state::c000_w)
 {
-	if(machine().side_effect_disabled()) return;
+	if(machine().side_effects_disabled()) return;
 
 	switch (offset)
 	{
@@ -1756,7 +1756,7 @@ WRITE8_MEMBER(apple2e_state::c000_w)
 
 READ8_MEMBER(apple2e_state::c000_iic_r)
 {
-	if(machine().side_effect_disabled()) return read_floatingbus();
+	if(machine().side_effects_disabled()) return read_floatingbus();
 
 	switch (offset)
 	{
@@ -1900,7 +1900,7 @@ READ8_MEMBER(apple2e_state::c000_iic_r)
 
 WRITE8_MEMBER(apple2e_state::c000_iic_w)
 {
-	if(machine().side_effect_disabled()) return;
+	if(machine().side_effects_disabled()) return;
 
 	switch (offset)
 	{
@@ -2098,7 +2098,7 @@ void apple2e_state::update_iic_mouse()
 
 READ8_MEMBER(apple2e_state::c080_r)
 {
-	if(!machine().side_effect_disabled())
+	if(!machine().side_effects_disabled())
 	{
 		int slot;
 
@@ -2175,7 +2175,7 @@ uint8_t apple2e_state::read_slot_rom(int slotbias, int offset)
 
 	if (m_slotdevice[slotnum] != nullptr)
 	{
-		if ((m_cnxx_slot == CNXX_UNCLAIMED) && (m_slotdevice[slotnum]->take_c800()) && (!machine().side_effect_disabled()))
+		if ((m_cnxx_slot == CNXX_UNCLAIMED) && (m_slotdevice[slotnum]->take_c800()) && (!machine().side_effects_disabled()))
 		{
 			m_cnxx_slot = slotnum;
 			update_slotrom_banks();
@@ -2193,7 +2193,7 @@ void apple2e_state::write_slot_rom(int slotbias, int offset, uint8_t data)
 
 	if (m_slotdevice[slotnum] != nullptr)
 	{
-		if ((m_cnxx_slot == CNXX_UNCLAIMED) && (m_slotdevice[slotnum]->take_c800()) && (!machine().side_effect_disabled()))
+		if ((m_cnxx_slot == CNXX_UNCLAIMED) && (m_slotdevice[slotnum]->take_c800()) && (!machine().side_effects_disabled()))
 		{
 			m_cnxx_slot = slotnum;
 			update_slotrom_banks();
@@ -2296,7 +2296,7 @@ READ8_MEMBER(apple2e_state::c800_r)
 
 	if (offset == 0x7ff)
 	{
-		if (!machine().side_effect_disabled())
+		if (!machine().side_effects_disabled())
 		{
 			m_cnxx_slot = CNXX_UNCLAIMED;
 			update_slotrom_banks();
@@ -2320,7 +2320,7 @@ READ8_MEMBER(apple2e_state::c800_int_r)
 		return mig_r(offset-0x600);
 	}
 
-	if ((offset == 0x7ff) && !machine().side_effect_disabled())
+	if ((offset == 0x7ff) && !machine().side_effects_disabled())
 	{
 		m_cnxx_slot = CNXX_UNCLAIMED;
 		m_intc8rom = false;
@@ -2342,7 +2342,7 @@ READ8_MEMBER(apple2e_state::c800_b2_int_r)
 		return mig_r(offset-0x600);
 	}
 
-	if ((offset == 0x7ff) && !machine().side_effect_disabled())
+	if ((offset == 0x7ff) && !machine().side_effects_disabled())
 	{
 		m_cnxx_slot = CNXX_UNCLAIMED;
 		m_intc8rom = false;
@@ -2362,7 +2362,7 @@ WRITE8_MEMBER(apple2e_state::c800_w)
 
 	if (offset == 0x7ff)
 	{
-		if (!machine().side_effect_disabled())
+		if (!machine().side_effects_disabled())
 		{
 			m_cnxx_slot = CNXX_UNCLAIMED;
 			m_intc8rom = false;
@@ -4023,18 +4023,21 @@ MACHINE_CONFIG_START(apple2e_state::apple2e)
 	MCFG_CASSETTE_DEFAULT_STATE(CASSETTE_STOPPED)
 MACHINE_CONFIG_END
 
-MACHINE_CONFIG_DERIVED(apple2e_state::mprof3, apple2e)
+MACHINE_CONFIG_START(apple2e_state::mprof3)
+	apple2e(config);
 	/* internal ram */
 	MCFG_RAM_MODIFY(RAM_TAG)
 	MCFG_RAM_DEFAULT_SIZE("128K")
 MACHINE_CONFIG_END
 
-MACHINE_CONFIG_DERIVED(apple2e_state::apple2ee, apple2e)
+MACHINE_CONFIG_START(apple2e_state::apple2ee)
+	apple2e(config);
 	MCFG_CPU_REPLACE("maincpu", M65C02, 1021800)        /* close to actual CPU frequency of 1.020484 MHz */
 	MCFG_CPU_PROGRAM_MAP(apple2e_map)
 MACHINE_CONFIG_END
 
-MACHINE_CONFIG_DERIVED(apple2e_state::spectred, apple2e)
+MACHINE_CONFIG_START(apple2e_state::spectred)
+	apple2e(config);
 	MCFG_CPU_ADD("keyb_mcu", I8035, XTAL(4'000'000)) /* guessed frequency */
 	MCFG_CPU_PROGRAM_MAP(spectred_keyb_map)
 
@@ -4042,7 +4045,8 @@ MACHINE_CONFIG_DERIVED(apple2e_state::spectred, apple2e)
 		//      and then remove the keyb CPU inherited from apple2e
 MACHINE_CONFIG_END
 
-MACHINE_CONFIG_DERIVED(apple2e_state::tk3000, apple2e)
+MACHINE_CONFIG_START(apple2e_state::tk3000)
+	apple2e(config);
 	MCFG_CPU_REPLACE("maincpu", M65C02, 1021800)        /* close to actual CPU frequency of 1.020484 MHz */
 	MCFG_CPU_PROGRAM_MAP(apple2e_map)
 
@@ -4050,12 +4054,14 @@ MACHINE_CONFIG_DERIVED(apple2e_state::tk3000, apple2e)
 //  MCFG_CPU_PROGRAM_MAP(tk3000_kbd_map)
 MACHINE_CONFIG_END
 
-MACHINE_CONFIG_DERIVED(apple2e_state::apple2ep, apple2e)
+MACHINE_CONFIG_START(apple2e_state::apple2ep)
+	apple2e(config);
 	MCFG_CPU_REPLACE("maincpu", M65C02, 1021800)        /* close to actual CPU frequency of 1.020484 MHz */
 	MCFG_CPU_PROGRAM_MAP(apple2e_map)
 MACHINE_CONFIG_END
 
-MACHINE_CONFIG_DERIVED(apple2e_state::apple2c, apple2ee)
+MACHINE_CONFIG_START(apple2e_state::apple2c)
+	apple2ee(config);
 	MCFG_CPU_REPLACE("maincpu", M65C02, 1021800)        /* close to actual CPU frequency of 1.020484 MHz */
 	MCFG_CPU_PROGRAM_MAP(apple2c_map)
 
@@ -4119,20 +4125,23 @@ static const floppy_interface apple2cp_floppy35_floppy_interface =
 	"floppy_3_5"
 };
 
-MACHINE_CONFIG_DERIVED(apple2e_state::apple2cp, apple2c)
+MACHINE_CONFIG_START(apple2e_state::apple2cp)
+	apple2c(config);
 	MCFG_A2BUS_SLOT_REMOVE("sl4")
 	MCFG_A2BUS_SLOT_REMOVE("sl6")
 	MCFG_IWM_ADD(IICP_IWM_TAG, a2cp_interface)
 	MCFG_LEGACY_FLOPPY_SONY_2_DRIVES_ADD(apple2cp_floppy35_floppy_interface)
 MACHINE_CONFIG_END
 
-MACHINE_CONFIG_DERIVED(apple2e_state::apple2c_iwm, apple2c)
+MACHINE_CONFIG_START(apple2e_state::apple2c_iwm)
+	apple2c(config);
 
 	MCFG_A2BUS_SLOT_REMOVE("sl6")
 	MCFG_A2BUS_ONBOARD_ADD("a2bus", "sl6", A2BUS_IWM_FDC, NOOP)
 MACHINE_CONFIG_END
 
-MACHINE_CONFIG_DERIVED(apple2e_state::apple2c_mem, apple2c)
+MACHINE_CONFIG_START(apple2e_state::apple2c_mem)
+	apple2c(config);
 	MCFG_CPU_REPLACE("maincpu", M65C02, 1021800)        /* close to actual CPU frequency of 1.020484 MHz */
 	MCFG_CPU_PROGRAM_MAP(apple2c_memexp_map)
 
@@ -4161,7 +4170,8 @@ static const floppy_interface floppy_interface =
 	"floppy_5_25"
 };
 
-MACHINE_CONFIG_DERIVED(apple2e_state::laser128, apple2c)
+MACHINE_CONFIG_START(apple2e_state::laser128)
+	apple2c(config);
 	MCFG_CPU_REPLACE("maincpu", M65C02, 1021800)        /* close to actual CPU frequency of 1.020484 MHz */
 	MCFG_CPU_PROGRAM_MAP(laser128_map)
 
@@ -4184,7 +4194,8 @@ MACHINE_CONFIG_DERIVED(apple2e_state::laser128, apple2c)
 	MCFG_RAM_EXTRA_OPTIONS("128K, 384K, 640K, 896K, 1152K")
 MACHINE_CONFIG_END
 
-MACHINE_CONFIG_DERIVED(apple2e_state::laser128ex2, apple2c)
+MACHINE_CONFIG_START(apple2e_state::laser128ex2)
+	apple2c(config);
 	MCFG_CPU_REPLACE("maincpu", M65C02, 1021800)        /* close to actual CPU frequency of 1.020484 MHz */
 	MCFG_CPU_PROGRAM_MAP(laser128_map)
 
@@ -4207,7 +4218,8 @@ MACHINE_CONFIG_DERIVED(apple2e_state::laser128ex2, apple2c)
 	MCFG_RAM_EXTRA_OPTIONS("128K, 384K, 640K, 896K, 1152K")
 MACHINE_CONFIG_END
 
-MACHINE_CONFIG_DERIVED(apple2e_state::ceci, apple2e)
+MACHINE_CONFIG_START(apple2e_state::ceci)
+	apple2e(config);
 	MCFG_A2BUS_SLOT_REMOVE("sl1")
 	MCFG_A2BUS_SLOT_REMOVE("sl2")
 	MCFG_A2BUS_SLOT_REMOVE("sl3")

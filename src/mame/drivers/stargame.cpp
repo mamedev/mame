@@ -118,7 +118,7 @@ MACHINE_CONFIG_START(stargame_state::stargame)
 	MCFG_Z80CTC_ZC0_CB(INPUTLINE("audiocpu", INPUT_LINE_IRQ0))    // SINT - turn on interrupt of the audiocpu
 
 	/* sound hardware */
-	MCFG_FRAGMENT_ADD( genpin_audio )
+	genpin_audio(config);
 	MCFG_SPEAKER_STANDARD_MONO("measnd")
 	MCFG_SOUND_ADD("mea8000", MEA8000, 15000000 / 4)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "measnd", 1.0)

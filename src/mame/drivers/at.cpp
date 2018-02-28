@@ -430,12 +430,14 @@ MACHINE_CONFIG_START(at_state::ibm5170)
 	MCFG_RAM_EXTRA_OPTIONS("2M,4M,8M,15M")
 MACHINE_CONFIG_END
 
-MACHINE_CONFIG_DERIVED(at_state::ibm5170a, ibm5170)
+MACHINE_CONFIG_START(at_state::ibm5170a)
+	ibm5170(config);
 	MCFG_CPU_MODIFY("maincpu")
 	MCFG_CPU_CLOCK(XTAL(16'000'000)/2)
 MACHINE_CONFIG_END
 
-MACHINE_CONFIG_DERIVED(at_state::ews286, ibm5170)
+MACHINE_CONFIG_START(at_state::ews286)
+	ibm5170(config);
 	MCFG_CPU_MODIFY("maincpu")
 	MCFG_CPU_CLOCK(XTAL(16'000'000)/2) // Exact crystal needs to be verified, 8 MHz according to specification
 
@@ -448,19 +450,22 @@ MACHINE_CONFIG_DERIVED(at_state::ews286, ibm5170)
 	MCFG_RAM_DEFAULT_SIZE("640K")
 MACHINE_CONFIG_END
 
-MACHINE_CONFIG_DERIVED(at_state::ec1842, ibm5170)
+MACHINE_CONFIG_START(at_state::ec1842)
+	ibm5170(config);
 	MCFG_CPU_MODIFY("maincpu")
 	MCFG_CPU_CLOCK(12000000)
 MACHINE_CONFIG_END
 
-MACHINE_CONFIG_DERIVED(at_state::ibm5162, ibm5170)
+MACHINE_CONFIG_START(at_state::ibm5162)
+	ibm5170(config);
 	MCFG_CPU_MODIFY("maincpu")
 	MCFG_CPU_CLOCK(6000000)
 	MCFG_DEVICE_MODIFY("isa1")
 	MCFG_DEVICE_SLOT_INTERFACE(pc_isa16_cards, "cga", false)
 MACHINE_CONFIG_END
 
-MACHINE_CONFIG_DERIVED(at_state::ibmps1, ibm5170)
+MACHINE_CONFIG_START(at_state::ibmps1)
+	ibm5170(config);
 	MCFG_MACHINE_START_OVERRIDE(at_state, vrom_fix)
 	MCFG_CPU_MODIFY("maincpu")
 	MCFG_CPU_CLOCK(XTAL(10'000'000))
@@ -472,7 +477,8 @@ MACHINE_CONFIG_DERIVED(at_state::ibmps1, ibm5170)
 	MCFG_DEVICE_SLOT_INTERFACE(pc_at_keyboards, STR_KBD_MICROSOFT_NATURAL, false)
 MACHINE_CONFIG_END
 
-MACHINE_CONFIG_DERIVED(at_state::atvga, ibm5170)
+MACHINE_CONFIG_START(at_state::atvga)
+	ibm5170(config);
 	MCFG_CPU_MODIFY("maincpu")
 	MCFG_CPU_CLOCK(12000000)
 	MCFG_DEVICE_MODIFY("isa1")
@@ -482,7 +488,8 @@ MACHINE_CONFIG_DERIVED(at_state::atvga, ibm5170)
 	MCFG_ISA16_SLOT_ADD("mb:isabus","isa5", pc_isa16_cards, nullptr, false)
 MACHINE_CONFIG_END
 
-MACHINE_CONFIG_DERIVED(at_state::neat, atvga)
+MACHINE_CONFIG_START(at_state::neat)
+	atvga(config);
 	MCFG_CPU_MODIFY("maincpu")
 	MCFG_CPU_IO_MAP(neat_io)
 	MCFG_DEVICE_REMOVE("mb:rtc")  // TODO: move this into the cs8221
@@ -492,12 +499,14 @@ MACHINE_CONFIG_DERIVED(at_state::neat, atvga)
 	MCFG_CS8221_ADD("cs8221", "maincpu", "mb:isa", "bios")
 MACHINE_CONFIG_END
 
-MACHINE_CONFIG_DERIVED(at_state::xb42639, atvga)
+MACHINE_CONFIG_START(at_state::xb42639)
+	atvga(config);
 	MCFG_CPU_MODIFY("maincpu")
 	MCFG_CPU_CLOCK(12500000)
 MACHINE_CONFIG_END
 
-MACHINE_CONFIG_DERIVED(at_state::k286i, ibm5162)
+MACHINE_CONFIG_START(at_state::k286i)
+	ibm5162(config);
 	MCFG_DEVICE_MODIFY("kbd")
 	MCFG_DEVICE_SLOT_INTERFACE(pc_at_keyboards, STR_KBD_MICROSOFT_NATURAL, false)
 	MCFG_ISA16_SLOT_ADD("mb:isabus","isa5", pc_isa16_cards, nullptr, false)
@@ -536,38 +545,44 @@ MACHINE_CONFIG_START(at_state::at386)
 	MCFG_RAM_EXTRA_OPTIONS("2M,4M,8M,15M,16M,32M,64M")
 MACHINE_CONFIG_END
 
-MACHINE_CONFIG_DERIVED(at_state::at386l, at386)
+MACHINE_CONFIG_START(at_state::at386l)
+	at386(config);
 	MCFG_CPU_MODIFY("maincpu")
 	MCFG_CPU_PROGRAM_MAP(at32l_map)
 MACHINE_CONFIG_END
 
-MACHINE_CONFIG_DERIVED(at_state::at486, at386)
+MACHINE_CONFIG_START(at_state::at486)
+	at386(config);
 	MCFG_CPU_REPLACE("maincpu", I486, 25000000)
 	MCFG_CPU_PROGRAM_MAP(at32_map)
 	MCFG_CPU_IO_MAP(at32_io)
 	MCFG_CPU_IRQ_ACKNOWLEDGE_DEVICE("mb:pic8259_master", pic8259_device, inta_cb)
 MACHINE_CONFIG_END
 
-MACHINE_CONFIG_DERIVED(at_state::at486l, at486)
+MACHINE_CONFIG_START(at_state::at486l)
+	at486(config);
 	MCFG_CPU_MODIFY("maincpu")
 	MCFG_CPU_PROGRAM_MAP(at32l_map)
 MACHINE_CONFIG_END
 
-MACHINE_CONFIG_DERIVED(at_state::at386sx, atvga)
+MACHINE_CONFIG_START(at_state::at386sx)
+	atvga(config);
 	MCFG_CPU_REPLACE("maincpu", I386SX, 16000000)     /* 386SX */
 	MCFG_CPU_PROGRAM_MAP(at16_map)
 	MCFG_CPU_IO_MAP(at16_io)
 	MCFG_CPU_IRQ_ACKNOWLEDGE_DEVICE("mb:pic8259_master", pic8259_device, inta_cb)
 MACHINE_CONFIG_END
 
-MACHINE_CONFIG_DERIVED(at_state::ct386sx, at386sx)
+MACHINE_CONFIG_START(at_state::ct386sx)
+	at386sx(config);
 	MCFG_CPU_MODIFY("maincpu")
 	MCFG_CPU_IO_MAP(neat_io)
 	MCFG_CS8221_ADD("cs8221", "maincpu", "mb:isa", "maincpu")
 MACHINE_CONFIG_END
 
 // Commodore PC 30-III
-MACHINE_CONFIG_DERIVED(at_state::pc30iii, ibm5170)
+MACHINE_CONFIG_START(at_state::pc30iii)
+	ibm5170(config);
 	MCFG_CPU_MODIFY("maincpu")
 	MCFG_CPU_CLOCK(6000000) // should be XTAL(24'000'000)/2, but doesn't post with that setting
 	MCFG_DEVICE_MODIFY("isa1")
@@ -575,7 +590,8 @@ MACHINE_CONFIG_DERIVED(at_state::pc30iii, ibm5170)
 MACHINE_CONFIG_END
 
 // Commodore PC 40-III
-MACHINE_CONFIG_DERIVED(at_state::pc40iii, ibm5170)
+MACHINE_CONFIG_START(at_state::pc40iii)
+	ibm5170(config);
 	MCFG_CPU_MODIFY("maincpu")
 	MCFG_CPU_CLOCK(6000000) // should be XTAL(24'000'000)/2, but doesn't post with that setting
 	MCFG_DEVICE_MODIFY("isa1")
@@ -659,7 +675,8 @@ MACHINE_CONFIG_START(megapc_state::megapc)
 	MCFG_SOFTWARE_LIST_ADD("disk_list","megapc")
 MACHINE_CONFIG_END
 
-MACHINE_CONFIG_DERIVED(megapc_state::megapcpl, megapc)
+MACHINE_CONFIG_START(megapc_state::megapcpl)
+	megapc(config);
 	MCFG_CPU_REPLACE("maincpu", I486, 66000000 / 2)
 	MCFG_CPU_PROGRAM_MAP(megapcpl_map)
 	MCFG_CPU_IO_MAP(megapcpl_io)
@@ -771,7 +788,8 @@ MACHINE_CONFIG_START(at_state::comportiii)
 	MCFG_RAM_EXTRA_OPTIONS("1152K,1664K,2176K,2688K,4736K,6784K")
 MACHINE_CONFIG_END
 
-MACHINE_CONFIG_DERIVED(at_state::comportii, ibm5170)
+MACHINE_CONFIG_START(at_state::comportii)
+	ibm5170(config);
 	MCFG_CPU_MODIFY("maincpu")
 	MCFG_CPU_CLOCK(48_MHz_XTAL/6)
 	MCFG_DEVICE_MODIFY("isa2")
@@ -1376,9 +1394,9 @@ ROM_END
 
 // Nokia Data WS286
 //ROM_START(nws286 ) // Computer is grey with Nokia logo.
-//	ROM_REGION(0x20000,"bios", 0)
-//	ROM_LOAD16_BYTE( "RYS_103_1002_R8A_3C00_IC-POS_71.BIN", 0x18000, 0x4000, NO_DUMP)
-//	ROM_LOAD16_BYTE( "RYS_103_1003_R8A_8600_IC-POS_69.BIN", 0x18001, 0x4000, NO_DUMP)
+//  ROM_REGION(0x20000,"bios", 0)
+//  ROM_LOAD16_BYTE( "RYS_103_1002_R8A_3C00_IC-POS_71.BIN", 0x18000, 0x4000, NO_DUMP)
+//  ROM_LOAD16_BYTE( "RYS_103_1003_R8A_8600_IC-POS_69.BIN", 0x18001, 0x4000, NO_DUMP)
 //ROM_END
 
 /***************************************************************************

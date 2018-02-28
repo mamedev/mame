@@ -555,7 +555,8 @@ MACHINE_CONFIG_START(psx1_state::psj)
 	MCFG_PSX_DMA_CHANNEL_WRITE( "maincpu", 3, psxdma_device::write_delegate(&psx1_state::cd_dma_write, this ) )
 MACHINE_CONFIG_END
 
-MACHINE_CONFIG_DERIVED(psx1_state::psu, psj)
+MACHINE_CONFIG_START(psx1_state::psu)
+	psj(config);
 	MCFG_CPU_ADD( "subcpu", HD63705, 4166667 ) // MC68HC05G6
 	MCFG_CPU_PROGRAM_MAP( subcpu_map )
 MACHINE_CONFIG_END

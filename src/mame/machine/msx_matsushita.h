@@ -14,7 +14,7 @@ DECLARE_DEVICE_TYPE(MSX_MATSUSHITA, msx_matsushita_device)
 	MCFG_DEVICE_ADD(_tag, MSX_MATSUSHITA, 0)
 
 #define MCFG_MSX_MATSUSHITA_TURBO_CB(_devcb) \
-	devcb = &msx_matsushita_device::set_turbo_callback(*device, DEVCB_##_devcb);
+	devcb = &downcast<msx_matsushita_device &>(*device).set_turbo_callback(DEVCB_##_devcb);
 
 
 class msx_matsushita_device : public device_t,
@@ -24,8 +24,7 @@ class msx_matsushita_device : public device_t,
 public:
 	msx_matsushita_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
-	template <class Object> static devcb_base &set_turbo_callback(device_t &device, Object &&cb)
-	{ return downcast<msx_matsushita_device &>(device).m_turbo_out_cb.set_callback(std::forward<Object>(cb)); }
+	template <class Object> devcb_base &set_turbo_callback(Object &&cb) { return m_turbo_out_cb.set_callback(std::forward<Object>(cb)); }
 
 	virtual DECLARE_READ8_MEMBER(switched_read) override;
 	virtual DECLARE_WRITE8_MEMBER(switched_write) override;

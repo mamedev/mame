@@ -1058,7 +1058,8 @@ MACHINE_CONFIG_START(polepos_state::topracern)
 	MCFG_SOUND_ROUTE_EX(0, "dac", 1.0, DAC_VREF_POS_INPUT) MCFG_SOUND_ROUTE_EX(0, "dac", -1.0, DAC_VREF_NEG_INPUT)
 MACHINE_CONFIG_END
 
-MACHINE_CONFIG_DERIVED(polepos_state::polepos2bi, topracern)
+MACHINE_CONFIG_START(polepos_state::polepos2bi)
+	topracern(config);
 
 	MCFG_CPU_ADD("soundz80bl", Z80, MASTER_CLOCK/8) /*? MHz */
 	MCFG_CPU_PROGRAM_MAP(sound_z80_bootleg_map)

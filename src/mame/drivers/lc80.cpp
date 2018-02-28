@@ -404,7 +404,8 @@ MACHINE_CONFIG_START(lc80_state::lc80_2)
 MACHINE_CONFIG_END
 
 #if 0
-static MACHINE_CONFIG_DERIVED( sc80, lc80_2 )
+static MACHINE_CONFIG_START( sc80 )
+	lc80_2(config);
 
 	/* basic machine hardware */
 	MCFG_CPU_MODIFY(Z80_TAG)

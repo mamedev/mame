@@ -700,7 +700,8 @@ MACHINE_CONFIG_START(jollyjgr_state::jollyjgr)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.45)
 MACHINE_CONFIG_END
 
-MACHINE_CONFIG_DERIVED(jollyjgr_state::fspider, jollyjgr)
+MACHINE_CONFIG_START(jollyjgr_state::fspider)
+	jollyjgr(config);
 	MCFG_CPU_MODIFY("maincpu")
 	MCFG_CPU_PROGRAM_MAP(fspider_map)
 

@@ -491,7 +491,7 @@ MACHINE_CONFIG_START(abc80_state::abc80)
 	MCFG_Z80_DAISY_CHAIN(abc80_daisy_chain)
 
 	// video hardware
-	MCFG_FRAGMENT_ADD(abc80_video)
+	abc80_video(config);
 
 	// sound hardware
 	MCFG_SPEAKER_STANDARD_MONO("mono")

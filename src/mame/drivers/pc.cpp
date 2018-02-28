@@ -555,13 +555,15 @@ void pc_state::cfg_single_720K(device_t *device)
 }
 
 //Data General One
-MACHINE_CONFIG_DERIVED(pc_state::dgone, pccga)
+MACHINE_CONFIG_START(pc_state::dgone)
+	pccga(config);
 	MCFG_DEVICE_MODIFY("isa2")
 	MCFG_SLOT_OPTION_MACHINE_CONFIG("fdc_xt", cfg_dual_720K)
 MACHINE_CONFIG_END
 
 // Ericsson Information System
-MACHINE_CONFIG_DERIVED(pc_state::epc, pccga)
+MACHINE_CONFIG_START(pc_state::epc)
+	pccga(config);
 	MCFG_DEVICE_REMOVE("maincpu")
 	MCFG_CPU_PC(pc8, epc, I8088, 4772720)
 	MCFG_DEVICE_MODIFY("isa1")
@@ -569,7 +571,8 @@ MACHINE_CONFIG_DERIVED(pc_state::epc, pccga)
 	MCFG_DEVICE_ADD("i8251", I8251, 0) // clock?
 MACHINE_CONFIG_END
 
-MACHINE_CONFIG_DERIVED(pc_state::eppc, pccga)
+MACHINE_CONFIG_START(pc_state::eppc)
+	pccga(config);
 MACHINE_CONFIG_END
 
 // Bondwell BW230
@@ -582,7 +585,8 @@ static INPUT_PORTS_START( bondwell )
 	PORT_DIPSETTING(    0x02, "On (12 MHz)" )
 INPUT_PORTS_END
 
-MACHINE_CONFIG_DERIVED(pc_state::bondwell, pccga)
+MACHINE_CONFIG_START(pc_state::bondwell)
+	pccga(config);
 	MCFG_DEVICE_REMOVE("maincpu")
 	MCFG_CPU_PC(pc8, pc8, I8088, 4772720) // turbo?
 MACHINE_CONFIG_END
@@ -639,7 +643,8 @@ MACHINE_CONFIG_END
 
 
 //MK-88
-MACHINE_CONFIG_DERIVED(pc_state::mk88, poisk2)
+MACHINE_CONFIG_START(pc_state::mk88)
+	poisk2(config);
 	MCFG_DEVICE_MODIFY("isa1")
 	MCFG_SLOT_DEFAULT_OPTION("cga_ec1841")
 MACHINE_CONFIG_END
@@ -672,7 +677,8 @@ MACHINE_CONFIG_END
 
 
 //NCR PC4i
-MACHINE_CONFIG_DERIVED(pc_state::ncrpc4i, pccga)
+MACHINE_CONFIG_START(pc_state::ncrpc4i)
+	pccga(config);
 	//MCFG_DEVICE_MODIFY("mb:isa")
 	MCFG_ISA8_SLOT_ADD("mb:isa", "isa6", pc_isa8_cards, nullptr, false)
 	MCFG_ISA8_SLOT_ADD("mb:isa", "isa7", pc_isa8_cards, nullptr, false)
@@ -740,7 +746,8 @@ static DEVICE_INPUT_DEFAULTS_START( m15 )
 	DEVICE_INPUT_DEFAULTS("DSW0", 0x01, 0x00)
 DEVICE_INPUT_DEFAULTS_END
 
-MACHINE_CONFIG_DERIVED(pc_state::m15, pccga)
+MACHINE_CONFIG_START(pc_state::m15)
+	pccga(config);
 	MCFG_DEVICE_MODIFY("mb")
 	MCFG_DEVICE_INPUT_DEFAULTS(m15)
 	MCFG_DEVICE_MODIFY("isa2")
@@ -752,7 +759,8 @@ MACHINE_CONFIG_END
 
 
 // Atari PC1
-MACHINE_CONFIG_DERIVED(pc_state::ataripc1, pccga)
+MACHINE_CONFIG_START(pc_state::ataripc1)
+	pccga(config);
 	MCFG_DEVICE_MODIFY("isa1")
 	MCFG_SLOT_DEFAULT_OPTION("ega")
 	MCFG_DEVICE_MODIFY("isa2")
@@ -760,7 +768,8 @@ MACHINE_CONFIG_DERIVED(pc_state::ataripc1, pccga)
 MACHINE_CONFIG_END
 
 //Eagle 1600
-MACHINE_CONFIG_DERIVED(pc_state::eagle1600, pccga)
+MACHINE_CONFIG_START(pc_state::eagle1600)
+	pccga(config);
 	MCFG_DEVICE_REMOVE("maincpu")
 	MCFG_CPU_PC(pc16, pc16, I8086, 8000000)
 MACHINE_CONFIG_END
@@ -824,7 +833,8 @@ MACHINE_CONFIG_START(pc_state::laser_turbo_xt)
 MACHINE_CONFIG_END
 
 //Olytext 30
-MACHINE_CONFIG_DERIVED(pc_state::olytext30, pccga)
+MACHINE_CONFIG_START(pc_state::olytext30)
+	pccga(config);
 	MCFG_DEVICE_REMOVE("maincpu")
 	MCFG_CPU_PC(pc8, pc8, V20, XTAL(14'318'181)/3) /* 4,77 MHz */
 	MCFG_DEVICE_MODIFY("isa2")
@@ -838,7 +848,8 @@ MACHINE_CONFIG_DERIVED(pc_state::olytext30, pccga)
 MACHINE_CONFIG_END
 
 // Kaypro 16
-MACHINE_CONFIG_DERIVED(pc_state::kaypro16, pccga)
+MACHINE_CONFIG_START(pc_state::kaypro16)
+	pccga(config);
 	MCFG_DEVICE_MODIFY("isa1")
 	MCFG_SLOT_FIXED(true)
 	MCFG_DEVICE_MODIFY("isa2")

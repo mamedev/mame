@@ -26,23 +26,27 @@ real hardware.
 class imds_state : public driver_device
 {
 public:
-	imds_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag),
+	imds_state(const machine_config &mconfig, device_type type, const char *tag) :
+		driver_device(mconfig, type, tag),
 		m_maincpu(*this, "maincpu"),
 		m_terminal(*this, TERMINAL_TAG)
 	{
 	}
 
-	required_device<cpu_device> m_maincpu;
-	required_device<generic_terminal_device> m_terminal;
+	void imds(machine_config &config);
+
+protected:
 	DECLARE_READ8_MEMBER(term_r);
 	DECLARE_READ8_MEMBER(term_status_r);
 	void kbd_put(u8 data);
 	uint8_t m_term_data;
 	virtual void machine_reset() override;
-	void imds(machine_config &config);
 	void imds_io(address_map &map);
 	void imds_mem(address_map &map);
+
+private:
+	required_device<cpu_device> m_maincpu;
+	required_device<generic_terminal_device> m_terminal;
 };
 
 READ8_MEMBER( imds_state::term_status_r )
@@ -93,7 +97,7 @@ void imds_state::machine_reset()
 
 MACHINE_CONFIG_START(imds_state::imds)
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", I8080, XTAL(4'000'000)) // no idea of clock.
+	MCFG_CPU_ADD("maincpu", I8080, 4_MHz_XTAL) // no idea of clock.
 	MCFG_CPU_PROGRAM_MAP(imds_mem)
 	MCFG_CPU_IO_MAP(imds_io)
 

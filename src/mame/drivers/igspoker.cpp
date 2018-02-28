@@ -1936,19 +1936,23 @@ MACHINE_CONFIG_START(igspoker_state::igspoker)
 
 MACHINE_CONFIG_END
 
-MACHINE_CONFIG_DERIVED(igspoker_state::csk227it, igspoker)
+MACHINE_CONFIG_START(igspoker_state::csk227it)
+	igspoker(config);
 
 MACHINE_CONFIG_END
 
-MACHINE_CONFIG_DERIVED(igspoker_state::csk234it, igspoker)
+MACHINE_CONFIG_START(igspoker_state::csk234it)
+	igspoker(config);
 
 MACHINE_CONFIG_END
 
-MACHINE_CONFIG_DERIVED(igspoker_state::igs_ncs, igspoker)
+MACHINE_CONFIG_START(igspoker_state::igs_ncs)
+	igspoker(config);
 
 MACHINE_CONFIG_END
 
-MACHINE_CONFIG_DERIVED(igspoker_state::number10, igspoker)
+MACHINE_CONFIG_START(igspoker_state::number10)
+	igspoker(config);
 	MCFG_CPU_MODIFY("maincpu")
 	MCFG_CPU_IO_MAP(number10_io_map)
 
@@ -1962,14 +1966,16 @@ MACHINE_CONFIG_DERIVED(igspoker_state::number10, igspoker)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 MACHINE_CONFIG_END
 
-MACHINE_CONFIG_DERIVED(igspoker_state::cpokerpk, number10)
+MACHINE_CONFIG_START(igspoker_state::cpokerpk)
+	number10(config);
 	MCFG_CPU_MODIFY("maincpu")
 	MCFG_CPU_IO_MAP(cpokerpk_io_map)
 	MCFG_GFXDECODE_MODIFY("gfxdecode", cpokerpk)
 MACHINE_CONFIG_END
 
 
-MACHINE_CONFIG_DERIVED(igspoker_state::pktetris, igspoker)
+MACHINE_CONFIG_START(igspoker_state::pktetris)
+	igspoker(config);
 
 MACHINE_CONFIG_END
 

@@ -45,21 +45,24 @@ class kingpin_state : public driver_device
 {
 public:
 	kingpin_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag),
-		m_maincpu(*this, "maincpu"),
-		m_audiocpu(*this, "audiocpu"),
-		m_soundlatch(*this, "soundlatch")
+		: driver_device(mconfig, type, tag)
+		, m_maincpu(*this, "maincpu")
+		, m_audiocpu(*this, "audiocpu")
+		, m_soundlatch(*this, "soundlatch")
 	{ }
-
-	required_device<cpu_device> m_maincpu;
-	required_device<cpu_device> m_audiocpu;
-	required_device<generic_latch_8_device> m_soundlatch;
 
 	DECLARE_WRITE8_MEMBER(sound_nmi_w);
 	void kingpin(machine_config &config);
 	void kingpin_io_map(address_map &map);
 	void kingpin_program_map(address_map &map);
 	void kingpin_sound_map(address_map &map);
+	void dealracl(machine_config &config);
+	void dealracl_program_map(address_map &map);
+
+private:
+	required_device<cpu_device> m_maincpu;
+	required_device<cpu_device> m_audiocpu;
+	required_device<generic_latch_8_device> m_soundlatch;
 };
 
 
@@ -71,7 +74,13 @@ WRITE8_MEMBER(kingpin_state::sound_nmi_w)
 
 ADDRESS_MAP_START(kingpin_state::kingpin_program_map)
 	AM_RANGE(0x0000, 0xdfff) AM_ROM
+	AM_RANGE(0xc000, 0xcfff) AM_RAM
 	AM_RANGE(0xf000, 0xf7ff) AM_RAM AM_SHARE("nvram")
+ADDRESS_MAP_END
+
+ADDRESS_MAP_START(kingpin_state::dealracl_program_map)
+	AM_RANGE(0x0000, 0x4fff) AM_ROM
+	AM_RANGE(0xc000, 0xc7ff) AM_RAM AM_SHARE("nvram")
 ADDRESS_MAP_END
 
 ADDRESS_MAP_START(kingpin_state::kingpin_io_map)
@@ -171,6 +180,12 @@ MACHINE_CONFIG_START(kingpin_state::kingpin)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
 MACHINE_CONFIG_END
 
+MACHINE_CONFIG_START(kingpin_state::dealracl)
+	kingpin(config);
+	MCFG_CPU_MODIFY("maincpu")
+	MCFG_CPU_PROGRAM_MAP(dealracl_program_map)
+MACHINE_CONFIG_END
+
 
 
 ROM_START( kingpin )
@@ -213,6 +228,80 @@ ROM_START( maxideal )
 	ROM_LOAD( "n82s123n.u43", 0x20, 0x20, CRC(55569a2a) SHA1(5b0482546161c9d14a7d2c719d40774539cb41ca) )
 ROM_END
 
+/* Guru Readme for "The Dealer, ACL, 1981"
 
-GAME( 1983, kingpin,  0, kingpin, kingpin, kingpin_state, 0, 0, "ACL Manufacturing", "Kingpin",     0 )
-GAME( 1983, maxideal, 0, kingpin, kingpin, kingpin_state, 0, 0, "ACL Manufacturing", "Maxi-Dealer", 0 )
+ACL10001B
+|-----------------------------------------------|
+|                2114        DSW1   8255    DSW2|
+|                      LM556                    |
+| AY3-8912                               HMI6514|
+|                2114   ROM    ROM    ROM       |
+|                       ROM    ROM    ROM       |
+| LM555                 ROM    ROM    ROM       |
+|               Z80A    ROM           ROM       |
+|                                     ROM       |
+|                                     ROM       |
+|                                               |
+|                                               |
+|                                        HMI6514|
+|           TMS9918                             |
+| 4116            10.738635MHz                  |
+| 4116      8255                                |
+| 4116                                          |
+| 4116                                          |
+| 4116                                          |
+| 4116                                          |
+| 4116                                          |
+| 4116                              Z80A        |
+|                                               |
+|                                  LM339        |
+|-----|             |------------|        |-----|
+      |-------------|            |--------|
+
+Note! This board was trashed and had many empty sockets so there's no
+guarantee that the above layout is accurate to the PCB when it was working.
+All ROMs have unknown locations. There were no identifying ROM stickers on them
+and their locations were not recorded before removal from the PCB.
+There are no bi-polar PROMs on the PCB so they are probably missing. */
+
+// Does continual writes to i/o 70 and 80.
+
+/* Bad dumps: 11a is a redump of 11, but they both have strange bytes. Both included if anyone wants to investigate.
+   It's possible other roms could be bad too.
+   At 12CB is a jump to E612, which has nothing there. Changed to 1612 which at least *seems* more sensible. */
+
+
+ROM_START( dealracl ) // ROMs were unlabeled, so they might be ordered wrong.
+	ROM_REGION( 0xe000, "maincpu", 0 )
+	ROM_LOAD( "1",   0x0000, 0x0800, CRC(6191abc7) SHA1(2decc88be89f081043c7a2604d7b17dc6b72f49a) )
+	ROM_LOAD( "10",  0x0800, 0x0800, CRC(10b9bafd) SHA1(efda9245d9bba7cc7c97d411757b7a0a87e65e12) )
+	ROM_LOAD( "11a", 0x1000, 0x0800, BAD_DUMP CRC(3f5d55b5) SHA1(5c2e7d11fb26aaf4759751e9c00003f070df648b) )
+	ROM_FILL(0x12CD, 1 , 0x16)
+	ROM_LOAD( "8",   0x1800, 0x0800, CRC(9f1621f8) SHA1(164e117479edfe478942054378e78125f40fe4f7) )
+	ROM_LOAD( "7",   0x2000, 0x0800, CRC(8c491dd0) SHA1(9e77d50198e93d243d5a06893d3a29fc43f21b7d) )
+	ROM_LOAD( "13",  0x2800, 0x0800, CRC(626fea42) SHA1(ed7727231b4bcb63928efb105ede9f42aee4c2df) )
+	ROM_LOAD( "6",   0x3000, 0x0800, CRC(72dedb38) SHA1(d1e12b3d8b1c2170100802e6071df59fc72a211f) )
+	ROM_LOAD( "2",   0x3800, 0x0800, CRC(f21652fb) SHA1(2f5d6bccc570425440d6ca4712ce0d8814bdada5) )
+	ROM_LOAD( "12",  0x4000, 0x0800, CRC(4534cb68) SHA1(235aa0864762da86c30d6f6d64acb593873a8a12) )
+
+	ROM_REGION( 0x2000, "audiocpu", 0 )
+	ROM_LOAD( "5",   0x0000, 0x0800, CRC(0d77ffb4) SHA1(519a1c9efdbafa545640c9a124d81bbfa6fc0791) )
+	ROM_LOAD( "9",   0x0800, 0x0800, CRC(3771b8ae) SHA1(3cc0c16219260c47390df43049665a9159c5c872) )
+	ROM_LOAD( "4",   0x1000, 0x0800, CRC(cea5c377) SHA1(55cb9d45ae315a50dbab2b7082c942b6fb65017a) )
+	ROM_LOAD( "3",   0x1800, 0x0800, CRC(bc1722d6) SHA1(1c00bc789b71669f591bec0fcaebe099a0ae00f1) )
+
+	ROM_REGION( 0x0800, "nvram", ROMREGION_ERASE00 ) // default nvram
+
+	ROM_REGION( 0x40, "user1", 0 ) // not dumped for this PCB
+	ROM_LOAD( "n82s123n.u29", 0x00, 0x20, NO_DUMP ) //CRC(ce8b1a6f) SHA1(9b8f564efa4efea867884970f4a5850d598bc7a7) )
+	ROM_LOAD( "n82s123n.u43", 0x20, 0x20, NO_DUMP ) //CRC(55569a2a) SHA1(5b0482546161c9d14a7d2c719d40774539cb41ca) )
+
+	ROM_REGION( 0x800, "user2", 0 )
+	ROM_LOAD( "11",  0x0000, 0x0800, BAD_DUMP CRC(91a12c65) SHA1(d6c24888937c01ebbc96e28cdd9bee83ad01a1cd) )
+ROM_END
+
+
+
+GAME( 1983, kingpin,  0, kingpin,  kingpin, kingpin_state, 0, 0, "ACL Manufacturing", "Kingpin",     0 )
+GAME( 1983, maxideal, 0, kingpin,  kingpin, kingpin_state, 0, 0, "ACL Manufacturing", "Maxi-Dealer", 0 )
+GAME( 1981, dealracl, 0, dealracl, kingpin, kingpin_state, 0, 0, "ACL Manufacturing", "The Dealer (ACL)",  MACHINE_NOT_WORKING )

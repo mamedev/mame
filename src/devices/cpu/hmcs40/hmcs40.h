@@ -127,10 +127,6 @@ public:
 	template <class Object> static devcb_base &set_read_d_callback(device_t &device, Object &&cb) { return downcast<hmcs40_cpu_device &>(device).m_read_d.set_callback(std::forward<Object>(cb)); }
 	template <class Object> static devcb_base &set_write_d_callback(device_t &device, Object &&cb) { return downcast<hmcs40_cpu_device &>(device).m_write_d.set_callback(std::forward<Object>(cb)); }
 
-	void data_160x4(address_map &map);
-	void data_80x4(address_map &map);
-	void program_1k(address_map &map);
-	void program_2k(address_map &map);
 protected:
 	enum
 	{
@@ -164,6 +160,12 @@ protected:
 	// device_disasm_interface overrides
 	virtual util::disasm_interface *create_disassembler() override;
 	virtual void state_string_export(const device_state_entry &entry, std::string &str) const override;
+
+	// memorymaps
+	void program_1k(address_map &map);
+	void program_2k(address_map &map);
+	void data_160x4(address_map &map);
+	void data_80x4(address_map &map);
 
 	address_space_config m_program_config;
 	address_space_config m_data_config;

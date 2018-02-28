@@ -465,13 +465,15 @@ MACHINE_CONFIG_START(retofinv_state::retofinv)
 MACHINE_CONFIG_END
 
 /* bootleg which has different palette clut */
-MACHINE_CONFIG_DERIVED(retofinv_state::retofinvb1, retofinv)
+MACHINE_CONFIG_START(retofinv_state::retofinvb1)
+	retofinv(config);
 	MCFG_PALETTE_MODIFY("palette")
 	MCFG_PALETTE_INIT_OWNER(retofinv_state, retofinv_bl)
 MACHINE_CONFIG_END
 
 /* bootleg which has no mcu */
-MACHINE_CONFIG_DERIVED(retofinv_state::retofinvb_nomcu, retofinv)
+MACHINE_CONFIG_START(retofinv_state::retofinvb_nomcu)
+	retofinv(config);
 	MCFG_CPU_MODIFY("maincpu")
 	MCFG_CPU_PROGRAM_MAP(bootleg_map)
 
@@ -482,7 +484,8 @@ MACHINE_CONFIG_DERIVED(retofinv_state::retofinvb_nomcu, retofinv)
 MACHINE_CONFIG_END
 
 /* bootleg which has different pallete clut and also has no mcu */
-MACHINE_CONFIG_DERIVED(retofinv_state::retofinvb1_nomcu, retofinvb1)
+MACHINE_CONFIG_START(retofinv_state::retofinvb1_nomcu)
+	retofinvb1(config);
 	MCFG_CPU_MODIFY("maincpu")
 	MCFG_CPU_PROGRAM_MAP(bootleg_map)
 

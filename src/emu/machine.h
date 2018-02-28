@@ -145,7 +145,7 @@ class running_machine
 {
 	DISABLE_COPYING(running_machine);
 
-	class side_effect_disabler;
+	class side_effects_disabler;
 
 	friend class sound_manager;
 	friend class memory_manager;
@@ -201,8 +201,8 @@ public:
 
 	// RAII-based side effect disable
 	// NOP-ed when passed false, to make it more easily conditional
-	side_effect_disabler disable_side_effect(bool disable_se = true) { return side_effect_disabler(this, disable_se); }
-	bool side_effect_disabled() const { return m_side_effect_disabled != 0; }
+	side_effects_disabler disable_side_effects(bool disable_se = true) { return side_effects_disabler(this, disable_se); }
+	bool side_effects_disabled() const { return m_side_effects_disabled != 0; }
 
 	// additional helpers
 	emu_options &options() const { return m_config.options(); }
@@ -263,34 +263,34 @@ private:
 	screen_device *         primary_screen;     // the primary screen device, or nullptr if screenless
 
 	// side effect disable counter
-	u32                     m_side_effect_disabled;
+	u32                     m_side_effects_disabled;
 
 public:
 	// debugger-related information
 	u32                     debug_flags;        // the current debug flags
 
 private:
-	class side_effect_disabler {
+	class side_effects_disabler {
 		running_machine *m_machine;
 		bool m_disable_se;
 
 	public:
-		side_effect_disabler(running_machine *m, bool disable_se) : m_machine(m), m_disable_se(disable_se) {
+		side_effects_disabler(running_machine *m, bool disable_se) : m_machine(m), m_disable_se(disable_se) {
 			if(m_disable_se)
-				m_machine->disable_side_effect_count();
+				m_machine->disable_side_effects_count();
 		}
 
-		~side_effect_disabler() {
+		~side_effects_disabler() {
 			if(m_disable_se)
-				m_machine->enable_side_effect_count();
+				m_machine->enable_side_effects_count();
 		}
 
-		side_effect_disabler(const side_effect_disabler &) = delete;
-		side_effect_disabler(side_effect_disabler &&) = default;
+		side_effects_disabler(const side_effects_disabler &) = delete;
+		side_effects_disabler(side_effects_disabler &&) = default;
 	};
 
-	void disable_side_effect_count() { m_side_effect_disabled++; }
-	void enable_side_effect_count()  { m_side_effect_disabled--; }
+	void disable_side_effects_count() { m_side_effects_disabled++; }
+	void enable_side_effects_count()  { m_side_effects_disabled--; }
 
 	// internal helpers
 	template <typename T> struct is_null { template <typename U> static bool value(U &&x) { return false; } };

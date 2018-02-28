@@ -1822,7 +1822,8 @@ MACHINE_CONFIG_START(aristmk4_state::aristmk4)
 
 MACHINE_CONFIG_END
 
-MACHINE_CONFIG_DERIVED(aristmk4_state::aristmk4_poker, aristmk4)
+MACHINE_CONFIG_START(aristmk4_state::aristmk4_poker)
+	aristmk4(config);
 	/* basic machine hardware */
 	MCFG_CPU_MODIFY("maincpu")
 	MCFG_CPU_PROGRAM_MAP(aristmk4_poker_map)
@@ -1852,7 +1853,8 @@ PALETTE_INIT_MEMBER(aristmk4_state,lions)
 	}
 }
 
-MACHINE_CONFIG_DERIVED(aristmk4_state::_86lions, aristmk4)
+MACHINE_CONFIG_START(aristmk4_state::_86lions)
+	aristmk4(config);
 	MCFG_PALETTE_MODIFY("palette")
 	MCFG_PALETTE_INIT_OWNER(aristmk4_state,lions)
 MACHINE_CONFIG_END

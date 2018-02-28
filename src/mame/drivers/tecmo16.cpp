@@ -410,7 +410,8 @@ MACHINE_CONFIG_START(tecmo16_state::fstarfrc)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", 0.40)
 MACHINE_CONFIG_END
 
-MACHINE_CONFIG_DERIVED(tecmo16_state::ginkun, fstarfrc)
+MACHINE_CONFIG_START(tecmo16_state::ginkun)
+	fstarfrc(config);
 
 	MCFG_CPU_MODIFY("maincpu")
 	MCFG_CPU_PROGRAM_MAP(ginkun_map)
@@ -418,7 +419,8 @@ MACHINE_CONFIG_DERIVED(tecmo16_state::ginkun, fstarfrc)
 	MCFG_VIDEO_START_OVERRIDE(tecmo16_state,ginkun)
 MACHINE_CONFIG_END
 
-MACHINE_CONFIG_DERIVED(tecmo16_state::riot, ginkun)
+MACHINE_CONFIG_START(tecmo16_state::riot)
+	ginkun(config);
 
 	/* basic machine hardware */
 	MCFG_VIDEO_START_OVERRIDE(tecmo16_state,riot)

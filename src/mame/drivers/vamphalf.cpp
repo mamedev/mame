@@ -100,7 +100,7 @@ public:
 	optional_shared_ptr<uint16_t> m_wram;
 	optional_shared_ptr<uint32_t> m_tiles32;
 	optional_shared_ptr<uint32_t> m_wram32;
-	
+
 	optional_memory_region_array<2> m_okiregion;
 	optional_memory_bank m_okibank;
 
@@ -1073,7 +1073,7 @@ MACHINE_CONFIG_START(vamphalf_state::sound_ym_oki)
 MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(vamphalf_state::sound_ym_banked_oki)
-	MCFG_FRAGMENT_ADD(sound_ym_oki)
+	sound_ym_oki(config);
 
 	MCFG_DEVICE_MODIFY("oki1")
 	MCFG_DEVICE_ADDRESS_MAP(0, banked_oki_map)
@@ -1103,70 +1103,79 @@ MACHINE_CONFIG_START(vamphalf_state::sound_qs1000)
 	MCFG_SOUND_ROUTE(1, "rspeaker", 1.0)
 MACHINE_CONFIG_END
 
-MACHINE_CONFIG_DERIVED(vamphalf_state::vamphalf, common)
+MACHINE_CONFIG_START(vamphalf_state::vamphalf)
+	common(config);
 	MCFG_CPU_MODIFY("maincpu")
 	MCFG_CPU_IO_MAP(vamphalf_io)
 
-	MCFG_FRAGMENT_ADD(sound_ym_oki)
+	sound_ym_oki(config);
 MACHINE_CONFIG_END
 
-MACHINE_CONFIG_DERIVED(vamphalf_state::misncrft, common)
+MACHINE_CONFIG_START(vamphalf_state::misncrft)
+	common(config);
 	MCFG_CPU_REPLACE("maincpu", GMS30C2116, XTAL(50'000'000))   /* 50 MHz */
 	MCFG_CPU_PROGRAM_MAP(common_map)
 	MCFG_CPU_IO_MAP(misncrft_io)
 	MCFG_CPU_VBLANK_INT_DRIVER("screen", vamphalf_state,  irq1_line_hold)
 
-	MCFG_FRAGMENT_ADD(sound_qs1000)
+	sound_qs1000(config);
 MACHINE_CONFIG_END
 
-MACHINE_CONFIG_DERIVED(vamphalf_state::coolmini, common)
+MACHINE_CONFIG_START(vamphalf_state::coolmini)
+	common(config);
 	MCFG_CPU_MODIFY("maincpu")
 	MCFG_CPU_IO_MAP(coolmini_io)
 
-	MCFG_FRAGMENT_ADD(sound_ym_oki)
+	sound_ym_oki(config);
 MACHINE_CONFIG_END
 
-MACHINE_CONFIG_DERIVED(vamphalf_state::mrkicker, common)
+MACHINE_CONFIG_START(vamphalf_state::mrkicker)
+	common(config);
 	MCFG_CPU_MODIFY("maincpu")
 	MCFG_CPU_IO_MAP(mrkicker_io)
 
-	MCFG_FRAGMENT_ADD(sound_ym_banked_oki)
+	sound_ym_banked_oki(config);
 MACHINE_CONFIG_END
 
-MACHINE_CONFIG_DERIVED(vamphalf_state::suplup, common)
+MACHINE_CONFIG_START(vamphalf_state::suplup)
+	common(config);
 	MCFG_CPU_MODIFY("maincpu")
 	MCFG_CPU_IO_MAP(suplup_io)
 
-	MCFG_FRAGMENT_ADD(sound_suplup)
+	sound_suplup(config);
 MACHINE_CONFIG_END
 
-MACHINE_CONFIG_DERIVED(vamphalf_state::jmpbreak, common)
+MACHINE_CONFIG_START(vamphalf_state::jmpbreak)
+	common(config);
 	MCFG_CPU_MODIFY("maincpu")
 	MCFG_CPU_IO_MAP(jmpbreak_io)
 
-	MCFG_FRAGMENT_ADD(sound_ym_oki)
+	sound_ym_oki(config);
 MACHINE_CONFIG_END
 
-MACHINE_CONFIG_DERIVED(vamphalf_state::mrdig, common)
+MACHINE_CONFIG_START(vamphalf_state::mrdig)
+	common(config);
 	MCFG_CPU_REPLACE("maincpu", GMS30C2116, XTAL(50'000'000))   /* 50 MHz */
 	MCFG_CPU_PROGRAM_MAP(common_map)
 	MCFG_CPU_MODIFY("maincpu")
 	MCFG_CPU_IO_MAP(mrdig_io)
 	MCFG_CPU_VBLANK_INT_DRIVER("screen", vamphalf_state,  irq1_line_hold)
 
-	MCFG_FRAGMENT_ADD(sound_ym_oki)
+	sound_ym_oki(config);
 MACHINE_CONFIG_END
 
-MACHINE_CONFIG_DERIVED(vamphalf_state::wyvernwg, common)
+MACHINE_CONFIG_START(vamphalf_state::wyvernwg)
+	common(config);
 	MCFG_CPU_REPLACE("maincpu", E132T, XTAL(50'000'000))    /* 50 MHz */
 	MCFG_CPU_PROGRAM_MAP(common_32bit_map)
 	MCFG_CPU_IO_MAP(wyvernwg_io)
 	MCFG_CPU_VBLANK_INT_DRIVER("screen", vamphalf_state,  irq1_line_hold)
 
-	MCFG_FRAGMENT_ADD(sound_qs1000)
+	sound_qs1000(config);
 MACHINE_CONFIG_END
 
-MACHINE_CONFIG_DERIVED(vamphalf_state::finalgdr, common)
+MACHINE_CONFIG_START(vamphalf_state::finalgdr)
+	common(config);
 	MCFG_CPU_REPLACE("maincpu", E132T, XTAL(50'000'000))    /* 50 MHz */
 	MCFG_CPU_PROGRAM_MAP(common_32bit_map)
 	MCFG_CPU_IO_MAP(finalgdr_io)
@@ -1174,10 +1183,11 @@ MACHINE_CONFIG_DERIVED(vamphalf_state::finalgdr, common)
 
 	MCFG_NVRAM_ADD_0FILL("nvram")
 
-	MCFG_FRAGMENT_ADD(sound_ym_banked_oki)
+	sound_ym_banked_oki(config);
 MACHINE_CONFIG_END
 
-MACHINE_CONFIG_DERIVED(vamphalf_state::mrkickera, common)
+MACHINE_CONFIG_START(vamphalf_state::mrkickera)
+	common(config);
 	MCFG_CPU_REPLACE("maincpu", E132T, XTAL(50'000'000))    /* 50 MHz */
 	MCFG_CPU_PROGRAM_MAP(common_32bit_map)
 	MCFG_CPU_IO_MAP(mrkickera_io)
@@ -1185,7 +1195,7 @@ MACHINE_CONFIG_DERIVED(vamphalf_state::mrkickera, common)
 
 	MCFG_NVRAM_ADD_0FILL("nvram")
 
-	MCFG_FRAGMENT_ADD(sound_ym_banked_oki)
+	sound_ym_banked_oki(config);
 MACHINE_CONFIG_END
 
 
@@ -1228,20 +1238,22 @@ MACHINE_CONFIG_START(vamphalf_state::aoh)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", 1.0)
 MACHINE_CONFIG_END
 
-MACHINE_CONFIG_DERIVED(vamphalf_state::boonggab, common)
+MACHINE_CONFIG_START(vamphalf_state::boonggab)
+	common(config);
 	MCFG_CPU_MODIFY("maincpu")
 	MCFG_CPU_IO_MAP(boonggab_io)
 
-	MCFG_FRAGMENT_ADD(sound_ym_banked_oki)
+	sound_ym_banked_oki(config);
 MACHINE_CONFIG_END
 
-MACHINE_CONFIG_DERIVED(vamphalf_state::yorijori, common)
+MACHINE_CONFIG_START(vamphalf_state::yorijori)
+	common(config);
 	MCFG_CPU_REPLACE("maincpu", E132T, XTAL(50'000'000))    /* 50 MHz */
 	MCFG_CPU_PROGRAM_MAP(yorijori_32bit_map)
 	MCFG_CPU_IO_MAP(yorijori_io)
 	MCFG_CPU_VBLANK_INT_DRIVER("screen", vamphalf_state,  irq1_line_hold)
 
-	MCFG_FRAGMENT_ADD(sound_qs1000)
+	sound_qs1000(config);
 MACHINE_CONFIG_END
 
 /*
@@ -1854,7 +1866,7 @@ ROM_START( dtfamily )
 	ROM_LOAD32_WORD( "romu02", 0x800002, 0x200000, CRC(80830961) SHA1(b318e9e3a4d1d7dca61d7d4c9ee01f605e2b2f4a) )
 	/* roml03 empty */
 	/* romu03 empty */
-	
+
 	/* $00000-$20000 stays the same in all sound banks, */
 	/* the second half of the bank is what gets switched */
 	ROM_REGION( 0x80000, "oki1", 0 ) /* Oki Samples */
@@ -2320,7 +2332,7 @@ ROM_START( finalgdr ) /* version 2.20.5915, Korea only */
 	ROM_LOAD32_WORD( "romh00", 0x000002, 0x200000, CRC(f28578a5) SHA1(a5c7b17aff101f1f4f52657d0567a6c9d12a178d) )
 	/* roml01 empty */
 	/* romh01 empty */
-	
+
 	/* $00000-$20000 stays the same in all sound banks, */
 	/* the second half of the bank is what gets switched */
 	ROM_REGION( 0x80000, "oki1", 0 ) /* Oki Samples */
@@ -2428,7 +2440,7 @@ ROM_START( mrkickera )
 	ROM_LOAD32_WORD( "romh00", 0x000002, 0x200000, CRC(b6337d4a) SHA1(2f46e2933af7fd0f71083900d5e6e4f602ab4c66) )
 	/* roml01 empty */
 	/* romh01 empty */
-	
+
 	/* $00000-$20000 stays the same in all sound banks, */
 	/* the second half of the bank is what gets switched */
 	ROM_REGION( 0x80000, "oki1", 0 ) /* Oki Samples */
@@ -2452,7 +2464,7 @@ ROM_START( mrkicker )
 	/* romh02 empty */
 	/* roml03 empty */
 	/* romh03 empty */
-	
+
 	/* $00000-$20000 stays the same in all sound banks, */
 	/* the second half of the bank is what gets switched */
 	ROM_REGION( 0x80000, "oki1", 0 ) /* Oki Samples */
@@ -2520,7 +2532,7 @@ ROM_START( aoh )
 
 	ROM_REGION( 0x40000, "oki_1", 0 ) /* Oki Samples */
 	ROM_LOAD( "rom3", 0x00000, 0x40000, CRC(db8cb455) SHA1(6723b4018208d554bd1bf1e0640b72d2f4f47302) )
-	
+
 	/* $00000-$20000 stays the same in all sound banks, */
 	/* the second half of the bank is what gets switched */
 	ROM_REGION( 0x80000, "oki2", 0 ) /* Oki Samples */
@@ -2562,7 +2574,7 @@ ROM_START( boonggab )
 	/* romu04 empty */
 	/* roml09 empty */
 	/* romu09 empty */
-	
+
 	/* $00000-$20000 stays the same in all sound banks, */
 	/* the second half of the bank is what gets switched */
 	ROM_REGION( 0x100000, "oki1", 0 ) /* Oki Samples */

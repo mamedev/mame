@@ -22,6 +22,9 @@ public:
 	// constructor
 	using driver_device::driver_device;
 
+	void ___empty(machine_config &config);
+
+protected:
 	virtual void machine_start() override
 	{
 		emulator_info::display_ui_chooser(machine());
@@ -32,8 +35,6 @@ public:
 		bitmap.fill(rgb_t::black(), cliprect);
 		return 0;
 	}
-
-	void ___empty(machine_config &config);
 };
 
 
@@ -68,4 +69,4 @@ ROM_END
 //  GAME DRIVERS
 //**************************************************************************
 
-GAME( 2007, ___empty, 0, ___empty, 0, empty_state, 0, ROT0, "MAME", "No Driver Loaded", MACHINE_NO_SOUND )
+GAME( 2007, ___empty, 0, ___empty, 0, empty_state, 0, ROT0, "MAME", "No Driver Loaded", MACHINE_NO_SOUND_HW )

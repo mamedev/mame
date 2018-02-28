@@ -544,7 +544,8 @@ MACHINE_CONFIG_START(okean240_state::okean240t)
 	MCFG_PALETTE_ADD_MONOCHROME("palette")
 MACHINE_CONFIG_END
 
-MACHINE_CONFIG_DERIVED(okean240_state::okean240a, okean240t)
+MACHINE_CONFIG_START(okean240_state::okean240a)
+	okean240t(config);
 	MCFG_CPU_MODIFY("maincpu")
 	MCFG_CPU_IO_MAP(okean240a_io)
 	MCFG_GFXDECODE_ADD("gfxdecode", "palette", okean240a)
@@ -563,7 +564,8 @@ MACHINE_CONFIG_DERIVED(okean240_state::okean240a, okean240t)
 	MCFG_PIT8253_CLK1(1536000) // artificial rate
 MACHINE_CONFIG_END
 
-MACHINE_CONFIG_DERIVED(okean240_state::okean240, okean240t)
+MACHINE_CONFIG_START(okean240_state::okean240)
+	okean240t(config);
 	MCFG_CPU_MODIFY("maincpu")
 	MCFG_CPU_IO_MAP(okean240_io)
 	MCFG_GFXDECODE_ADD("gfxdecode", "palette", okean240)

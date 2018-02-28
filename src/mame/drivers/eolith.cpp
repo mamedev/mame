@@ -266,7 +266,6 @@ ADDRESS_MAP_END
 ADDRESS_MAP_START(eolith_state::sound_io_map)
 	AM_RANGE(0x0000, 0x7fff) AM_ROMBANK("sound_bank")
 	AM_RANGE(0x8000, 0x8000) AM_READ(sound_cmd_r)
-	AM_RANGE(MCS51_PORT_P1, MCS51_PORT_P1) AM_WRITE(sound_p1_w)
 ADDRESS_MAP_END
 
 
@@ -553,6 +552,7 @@ MACHINE_CONFIG_START(eolith_state::eolith45)
 	MCFG_CPU_ADD("soundcpu", I8032, XTAL(12'000'000))
 	MCFG_CPU_PROGRAM_MAP(sound_prg_map)
 	MCFG_CPU_IO_MAP(sound_io_map)
+	MCFG_MCS51_PORT_P1_OUT_CB(WRITE8(eolith_state, sound_p1_w))
 	MCFG_MCS51_SERIAL_TX_CB(WRITE8(eolith_state, soundcpu_to_qs1000)) // Sound CPU -> QS1000 CPU serial link
 
 	MCFG_MACHINE_RESET_OVERRIDE(eolith_state,eolith)
@@ -589,12 +589,14 @@ MACHINE_CONFIG_START(eolith_state::eolith45)
 	MCFG_SOUND_ROUTE(1, "rspeaker", 1.0)
 MACHINE_CONFIG_END
 
-MACHINE_CONFIG_DERIVED(eolith_state::eolith50, eolith45)
+MACHINE_CONFIG_START(eolith_state::eolith50)
+	eolith45(config);
 	MCFG_CPU_MODIFY("maincpu")
 	MCFG_CPU_CLOCK(50000000)         /* 50 MHz */
 MACHINE_CONFIG_END
 
-MACHINE_CONFIG_DERIVED(eolith_state::ironfort, eolith45)
+MACHINE_CONFIG_START(eolith_state::ironfort)
+	eolith45(config);
 	MCFG_CPU_MODIFY("maincpu")
 	MCFG_CPU_CLOCK(44900000) /* Normally 45MHz??? but PCB actually had a 44.9MHz OSC, so it's value is used */
 MACHINE_CONFIG_END

@@ -953,7 +953,8 @@ MACHINE_CONFIG_START(trackfld_state::trackfld)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 1.0)
 MACHINE_CONFIG_END
 
-MACHINE_CONFIG_DERIVED(trackfld_state::trackfldu, trackfld)
+MACHINE_CONFIG_START(trackfld_state::trackfldu)
+	trackfld(config);
 	MCFG_CPU_REPLACE("maincpu", MC6809E, MASTER_CLOCK/6/2)    /* exact M6809 model unknown */
 	MCFG_CPU_PROGRAM_MAP(main_map)
 	MCFG_CPU_VBLANK_INT_DRIVER("screen", trackfld_state, vblank_irq)
@@ -1053,7 +1054,8 @@ ADDRESS_MAP_END
 
 /* same as the original, but uses ADPCM instead of VLM5030 */
 /* also different memory handlers do handle that */
-MACHINE_CONFIG_DERIVED(trackfld_state::hyprolyb, trackfld)
+MACHINE_CONFIG_START(trackfld_state::hyprolyb)
+	trackfld(config);
 
 	MCFG_CPU_MODIFY("audiocpu")
 	MCFG_CPU_PROGRAM_MAP(hyprolyb_sound_map)
@@ -1076,13 +1078,15 @@ MACHINE_CONFIG_DERIVED(trackfld_state::hyprolyb, trackfld)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 0.5)
 MACHINE_CONFIG_END
 
-MACHINE_CONFIG_DERIVED(trackfld_state::atlantol, hyprolyb)
+MACHINE_CONFIG_START(trackfld_state::atlantol)
+	hyprolyb(config);
 
 	MCFG_VIDEO_START_OVERRIDE(trackfld_state,atlantol)
 MACHINE_CONFIG_END
 
 
-MACHINE_CONFIG_DERIVED(trackfld_state::mastkin, trackfld)
+MACHINE_CONFIG_START(trackfld_state::mastkin)
+	trackfld(config);
 
 	/* basic machine hardware */
 	MCFG_CPU_REPLACE("maincpu", MC6809E, MASTER_CLOCK/6/2)    /* a guess for now */
@@ -1094,7 +1098,8 @@ MACHINE_CONFIG_DERIVED(trackfld_state::mastkin, trackfld)
 	MCFG_ADDRESSABLE_LATCH_Q4_OUT_CB(NOOP) // actually not used
 MACHINE_CONFIG_END
 
-MACHINE_CONFIG_DERIVED(trackfld_state::wizzquiz, trackfld)
+MACHINE_CONFIG_START(trackfld_state::wizzquiz)
+	trackfld(config);
 
 	/* basic machine hardware */
 	// right cpu?
@@ -1106,7 +1111,8 @@ MACHINE_CONFIG_DERIVED(trackfld_state::wizzquiz, trackfld)
 	MCFG_ADDRESSABLE_LATCH_Q7_OUT_CB(WRITELINE(trackfld_state, nmi_mask_w))
 MACHINE_CONFIG_END
 
-MACHINE_CONFIG_DERIVED(trackfld_state::reaktor, trackfld)
+MACHINE_CONFIG_START(trackfld_state::reaktor)
+	trackfld(config);
 
 	/* basic machine hardware */
 	MCFG_CPU_REPLACE("maincpu",Z80,MASTER_CLOCK/6)

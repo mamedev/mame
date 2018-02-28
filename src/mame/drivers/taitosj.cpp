@@ -341,7 +341,7 @@ TIMER_CALLBACK_MEMBER(taitosj_state::sound_semaphore2_clear_w_cb)
 // RD5000
 READ8_MEMBER(taitosj_state::soundlatch_r)
 {
-	if (!machine().side_effect_disabled())
+	if (!machine().side_effects_disabled())
 	{
 		m_soundlatch_flag = false;
 		m_soundnmi->in_w<1>(0);
@@ -1827,7 +1827,8 @@ MACHINE_CONFIG_END
 
 
 /* same as above, but with additional 68705 MCU */
-MACHINE_CONFIG_DERIVED(taitosj_state::mcu, nomcu)
+MACHINE_CONFIG_START(taitosj_state::mcu)
+	nomcu(config);
 
 	/* basic machine hardware */
 	MCFG_CPU_MODIFY("maincpu")
@@ -1844,7 +1845,8 @@ MACHINE_CONFIG_DERIVED(taitosj_state::mcu, nomcu)
 MACHINE_CONFIG_END
 
 
-MACHINE_CONFIG_DERIVED(taitosj_state::kikstart, mcu)
+MACHINE_CONFIG_START(taitosj_state::kikstart)
+	mcu(config);
 
 	/* basic machine hardware */
 	MCFG_CPU_MODIFY("maincpu")

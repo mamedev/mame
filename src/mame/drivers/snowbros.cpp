@@ -221,57 +221,29 @@ ADDRESS_MAP_START(snowbros_state::sound_io_map)
 ADDRESS_MAP_END
 
 
-
-READ8_MEMBER(snowbros_state::prot_io_r)
-{
-	// never read?
-	return 0x00;
-}
-
+/* Semicom AT89C52 MCU */
 
 // probably not endian safe
-WRITE8_MEMBER(snowbros_state::prot_io_w)
+WRITE8_MEMBER(snowbros_state::prot_p0_w)
 {
-	switch (offset)
-	{
-		case 0x00:
-		{
-			uint16_t word = m_hyperpac_ram[(0xe000/2)+m_semicom_prot_offset];
-			word = (word & 0xff00) | (data << 0);
-			m_hyperpac_ram[(0xe000/2)+m_semicom_prot_offset] = word;
-			break;
-		}
-
-		case 0x01:
-		{
-			uint16_t word = m_hyperpac_ram[(0xe000/2)+m_semicom_prot_offset];
-			word = (word & 0x00ff) | (data << 8);
-			m_hyperpac_ram[(0xe000/2)+m_semicom_prot_offset] = word;
-			break;
-		}
-
-		case 0x02: // offset
-		{
-			m_semicom_prot_offset = data;
-			break;
-		}
-
-		case 0x03: // ??
-		{
-			//logerror("offset %02x data %02x\n",offset,data);
-			break;
-		}
-	}
+	uint16_t word = m_hyperpac_ram[(0xe000/2)+m_semicom_prot_offset];
+	word = (word & 0xff00) | (data << 0);
+	m_hyperpac_ram[(0xe000/2)+m_semicom_prot_offset] = word;
 }
 
-/* Semicom AT89C52 MCU */
-ADDRESS_MAP_START(snowbros_state::protection_map)
-	AM_RANGE(0x0000, 0x1fff) AM_ROM
-ADDRESS_MAP_END
+// probably not endian safe
+WRITE8_MEMBER(snowbros_state::prot_p1_w)
+{
+	uint16_t word = m_hyperpac_ram[(0xe000/2)+m_semicom_prot_offset];
+	word = (word & 0x00ff) | (data << 8);
+	m_hyperpac_ram[(0xe000/2)+m_semicom_prot_offset] = word;
+}
 
-ADDRESS_MAP_START(snowbros_state::protection_iomap)
-	AM_RANGE(MCS51_PORT_P0, MCS51_PORT_P3) AM_READWRITE(prot_io_r,prot_io_w)
-ADDRESS_MAP_END
+WRITE8_MEMBER(snowbros_state::prot_p2_w)
+{
+	// offset
+	m_semicom_prot_offset = data;
+}
 
 /* Winter Bobble - bootleg GFX chip */
 
@@ -1781,7 +1753,8 @@ MACHINE_CONFIG_START(snowbros_state::snowbros)
 MACHINE_CONFIG_END
 
 
-MACHINE_CONFIG_DERIVED(snowbros_state::wintbob, snowbros)
+MACHINE_CONFIG_START(snowbros_state::wintbob)
+	snowbros(config);
 
 	/* basic machine hardware */
 	MCFG_CPU_MODIFY("maincpu")
@@ -1798,7 +1771,8 @@ MACHINE_CONFIG_DERIVED(snowbros_state::wintbob, snowbros)
 MACHINE_CONFIG_END
 
 
-MACHINE_CONFIG_DERIVED(snowbros_state::semicom, snowbros)
+MACHINE_CONFIG_START(snowbros_state::semicom)
+	snowbros(config);
 
 	/* basic machine hardware */
 	MCFG_CPU_MODIFY("maincpu")
@@ -1828,17 +1802,20 @@ MACHINE_CONFIG_DERIVED(snowbros_state::semicom, snowbros)
 MACHINE_CONFIG_END
 
 
-MACHINE_CONFIG_DERIVED(snowbros_state::semicom_mcu, semicom)
+MACHINE_CONFIG_START(snowbros_state::semicom_mcu)
+	semicom(config);
 
 	/* basic machine hardware */
 
-	MCFG_CPU_ADD("protection", I8052, XTAL(16'000'000))  // AT89C52
-	MCFG_CPU_PROGRAM_MAP(protection_map)
-	MCFG_CPU_IO_MAP(protection_iomap)
+	MCFG_CPU_ADD("protection", I80C52, XTAL(16'000'000))  // AT89C52
+	MCFG_MCS51_PORT_P0_OUT_CB(WRITE8(snowbros_state, prot_p0_w))
+	MCFG_MCS51_PORT_P1_OUT_CB(WRITE8(snowbros_state, prot_p1_w))
+	MCFG_MCS51_PORT_P2_OUT_CB(WRITE8(snowbros_state, prot_p2_w))
 MACHINE_CONFIG_END
 
 
-MACHINE_CONFIG_DERIVED(snowbros_state::semiprot, semicom)
+MACHINE_CONFIG_START(snowbros_state::semiprot)
+	semicom(config);
 	MCFG_MACHINE_RESET_OVERRIDE (snowbros_state, semiprot )
 MACHINE_CONFIG_END
 
@@ -1940,7 +1917,8 @@ Intel P8752 (mcu)
 
 */
 
-MACHINE_CONFIG_DERIVED(snowbros_state::finalttr, semicom)
+MACHINE_CONFIG_START(snowbros_state::finalttr)
+	semicom(config);
 
 	MCFG_CPU_MODIFY("maincpu")
 	MCFG_CPU_CLOCK(XTAL(12'000'000))
@@ -1961,7 +1939,8 @@ MACHINE_CONFIG_DERIVED(snowbros_state::finalttr, semicom)
 MACHINE_CONFIG_END
 
 
-MACHINE_CONFIG_DERIVED(snowbros_state::_4in1, semicom)
+MACHINE_CONFIG_START(snowbros_state::_4in1)
+	semicom(config);
 
 	/* basic machine hardware */
 	MCFG_GFXDECODE_MODIFY("gfxdecode", snowbros)

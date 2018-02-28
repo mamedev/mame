@@ -229,13 +229,15 @@ MACHINE_CONFIG_START(isbc8010_state::isbc8010)
 
 MACHINE_CONFIG_END
 
-MACHINE_CONFIG_DERIVED(isbc8010_state::isbc8010a, isbc8010)
+MACHINE_CONFIG_START(isbc8010_state::isbc8010a)
+	isbc8010(config);
 	/* basic machine hardware */
 	MCFG_CPU_MODIFY( "maincpu" )
 	MCFG_CPU_PROGRAM_MAP(isbc8010a_mem)
 MACHINE_CONFIG_END
 
-MACHINE_CONFIG_DERIVED(isbc8010_state::isbc8010b, isbc8010)
+MACHINE_CONFIG_START(isbc8010_state::isbc8010b)
+	isbc8010(config);
 	/* basic machine hardware */
 	MCFG_CPU_MODIFY("maincpu")
 	MCFG_CPU_PROGRAM_MAP(isbc8010b_mem)

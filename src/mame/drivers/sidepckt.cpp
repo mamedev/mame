@@ -369,7 +369,7 @@ void sidepckt_state::machine_reset()
 MACHINE_CONFIG_START(sidepckt_state::sidepckt)
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", M6809, 2000000) /* 2 MHz */
+	MCFG_CPU_ADD("maincpu", MC6809E, 2000000) /* MC68B09EP, 2 MHz */
 	MCFG_CPU_PROGRAM_MAP(sidepckt_map)
 	MCFG_CPU_VBLANK_INT_DRIVER("screen", sidepckt_state, nmi_line_pulse)
 
@@ -403,7 +403,8 @@ MACHINE_CONFIG_START(sidepckt_state::sidepckt)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 MACHINE_CONFIG_END
 
-MACHINE_CONFIG_DERIVED(sidepckt_state::sidepcktb, sidepckt)
+MACHINE_CONFIG_START(sidepckt_state::sidepcktb)
+	sidepckt(config);
 
 	/* basic machine hardware */
 	MCFG_CPU_MODIFY("maincpu")

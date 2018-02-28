@@ -757,14 +757,16 @@ MACHINE_CONFIG_START(paradise_state::paradise)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
 MACHINE_CONFIG_END
 
-MACHINE_CONFIG_DERIVED(paradise_state::tgtball, paradise)
+MACHINE_CONFIG_START(paradise_state::tgtball)
+	paradise(config);
 
 	/* basic machine hardware */
 	MCFG_CPU_MODIFY("maincpu")
 	MCFG_CPU_PROGRAM_MAP(tgtball_map)
 MACHINE_CONFIG_END
 
-MACHINE_CONFIG_DERIVED(paradise_state::torus, paradise)
+MACHINE_CONFIG_START(paradise_state::torus)
+	paradise(config);
 
 	/* basic machine hardware */
 	MCFG_CPU_MODIFY("maincpu")
@@ -778,7 +780,8 @@ MACHINE_CONFIG_DERIVED(paradise_state::torus, paradise)
 	MCFG_DEVICE_REMOVE("oki2")
 MACHINE_CONFIG_END
 
-MACHINE_CONFIG_DERIVED(paradise_state::madball, torus)
+MACHINE_CONFIG_START(paradise_state::madball)
+	torus(config);
 
 	MCFG_GFXDECODE_MODIFY("gfxdecode", madball)
 
@@ -786,7 +789,8 @@ MACHINE_CONFIG_DERIVED(paradise_state::madball, torus)
 	MCFG_SCREEN_UPDATE_DRIVER(paradise_state, screen_update_madball)
 MACHINE_CONFIG_END
 
-MACHINE_CONFIG_DERIVED(paradise_state::penky, paradise)
+MACHINE_CONFIG_START(paradise_state::penky)
+	paradise(config);
 
 	/* basic machine hardware */
 	MCFG_CPU_MODIFY("maincpu")
@@ -795,7 +799,8 @@ MACHINE_CONFIG_DERIVED(paradise_state::penky, paradise)
 MACHINE_CONFIG_END
 
 
-MACHINE_CONFIG_DERIVED(paradise_state::penkyi, penky)
+MACHINE_CONFIG_START(paradise_state::penkyi)
+	penky(config);
 
 	// TODO add ticket dispenser
 

@@ -773,7 +773,8 @@ MACHINE_CONFIG_START(tutor_state::tutor)
 	MCFG_SOFTWARE_LIST_ADD("cart_list","tutor")
 MACHINE_CONFIG_END
 
-MACHINE_CONFIG_DERIVED(tutor_state::pyuutajr, tutor)
+MACHINE_CONFIG_START(tutor_state::pyuutajr)
+	tutor(config);
 	MCFG_CPU_MODIFY("maincpu")
 	MCFG_CPU_PROGRAM_MAP(pyuutajr_mem)
 	//MCFG_DEVICE_REMOVE("centronics")

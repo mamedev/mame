@@ -113,7 +113,8 @@ MACHINE_CONFIG_START(lynx_state::lynx)
 MACHINE_CONFIG_END
 
 #if 0
-static MACHINE_CONFIG_DERIVED( lynx2, lynx )
+static MACHINE_CONFIG_START( lynx2 )
+	lynx(config);
 
 	/* sound hardware */
 	MCFG_DEVICE_REMOVE("mono")

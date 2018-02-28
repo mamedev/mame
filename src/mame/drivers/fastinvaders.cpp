@@ -678,7 +678,8 @@ MCFG_TIMER_DRIVER_ADD_SCANLINE("scantimer", fastinvaders_state, scanline_timer, 
 	// TODO
 MACHINE_CONFIG_END
 
-MACHINE_CONFIG_DERIVED(fastinvaders_state::fastinvaders_8275, fastinvaders)
+MACHINE_CONFIG_START(fastinvaders_state::fastinvaders_8275)
+	fastinvaders(config);
 	MCFG_CPU_MODIFY("maincpu" ) // guess
 	MCFG_CPU_IO_MAP(fastinvaders_8275_io)
 
@@ -688,7 +689,8 @@ MACHINE_CONFIG_DERIVED(fastinvaders_state::fastinvaders_8275, fastinvaders)
 //  MCFG_I8275_DRQ_CALLBACK(DEVWRITELINE("dma8257",i8257_device, dreq2_w))
 MACHINE_CONFIG_END
 
-MACHINE_CONFIG_DERIVED(fastinvaders_state::fastinvaders_6845, fastinvaders)
+MACHINE_CONFIG_START(fastinvaders_state::fastinvaders_6845)
+	fastinvaders(config);
 	MCFG_CPU_MODIFY("maincpu" ) // guess
 	MCFG_CPU_IO_MAP(fastinvaders_6845_io)
 

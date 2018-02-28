@@ -1288,13 +1288,15 @@ MACHINE_CONFIG_START(midzeus_state::midzeus)
 	MCFG_MIDWAY_SERIAL_PIC2_YEAR_OFFS(94)
 MACHINE_CONFIG_END
 
-MACHINE_CONFIG_DERIVED(midzeus_state::mk4, midzeus)
+MACHINE_CONFIG_START(midzeus_state::mk4)
+	midzeus(config);
 	MCFG_DEVICE_MODIFY("ioasic")
 	MCFG_MIDWAY_IOASIC_UPPER(461/* or 474 */)
 	MCFG_MIDWAY_IOASIC_SHUFFLE_DEFAULT(1)
 MACHINE_CONFIG_END
 
-MACHINE_CONFIG_DERIVED(midzeus_state::invasn, midzeus)
+MACHINE_CONFIG_START(midzeus_state::invasn)
+	midzeus(config);
 	MCFG_CPU_ADD("pic", PIC16C57, 8000000)  /* ? */
 
 	MCFG_DEVICE_MODIFY("ioasic")
@@ -1331,12 +1333,14 @@ MACHINE_CONFIG_START(midzeus2_state::midzeus2)
 	MCFG_MIDWAY_IOASIC_UPPER(474)
 MACHINE_CONFIG_END
 
-MACHINE_CONFIG_DERIVED(midzeus2_state::crusnexo, midzeus2)
+MACHINE_CONFIG_START(midzeus2_state::crusnexo)
+	midzeus2(config);
 	MCFG_DEVICE_MODIFY("ioasic")
 	MCFG_MIDWAY_IOASIC_UPPER(472/* or 476,477,478,110 */)
 MACHINE_CONFIG_END
 
-MACHINE_CONFIG_DERIVED(midzeus2_state::thegrid, midzeus2)
+MACHINE_CONFIG_START(midzeus2_state::thegrid)
+	midzeus2(config);
 	MCFG_DEVICE_MODIFY("ioasic")
 	MCFG_MIDWAY_IOASIC_UPPER(474/* or 491 */)
 MACHINE_CONFIG_END

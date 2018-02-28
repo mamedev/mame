@@ -417,17 +417,6 @@ gottlieb_sound_r2_device::gottlieb_sound_r2_device(const machine_config &mconfig
 
 
 //-------------------------------------------------
-//  static_enable_cobram3_mods - enable changes
-//  for cobram3
-//-------------------------------------------------
-
-void gottlieb_sound_r2_device::static_enable_cobram3_mods(device_t &device)
-{
-	downcast<gottlieb_sound_r2_device &>(device).m_cobram3_mod = true;
-}
-
-
-//-------------------------------------------------
 //  write - handle an external command write
 //-------------------------------------------------
 

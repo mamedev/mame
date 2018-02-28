@@ -543,7 +543,8 @@ MACHINE_CONFIG_START(pegasus_state::pegasus)
 	MCFG_SOFTWARE_LIST_ADD("cart_list", "pegasus_cart")
 MACHINE_CONFIG_END
 
-MACHINE_CONFIG_DERIVED(pegasus_state::pegasusm, pegasus)
+MACHINE_CONFIG_START(pegasus_state::pegasusm)
+	pegasus(config);
 	MCFG_CPU_MODIFY( "maincpu" )
 	MCFG_CPU_PROGRAM_MAP(pegasusm_mem)
 MACHINE_CONFIG_END

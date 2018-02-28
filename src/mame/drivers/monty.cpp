@@ -281,7 +281,8 @@ MACHINE_CONFIG_START(monty_state::monty)
 	MCFG_SED1520_ADD("sed1520_0", monty_screen_update)
 MACHINE_CONFIG_END
 
-MACHINE_CONFIG_DERIVED(monty_state::mmonty, monty)
+MACHINE_CONFIG_START(monty_state::mmonty)
+	monty(config);
 	MCFG_CPU_MODIFY( "maincpu" )
 	MCFG_CPU_PROGRAM_MAP(mmonty_mem)
 MACHINE_CONFIG_END

@@ -582,19 +582,22 @@ MACHINE_CONFIG_START(adp_state::quickjac)
 
 MACHINE_CONFIG_END
 
-MACHINE_CONFIG_DERIVED(adp_state::skattv, quickjac)
+MACHINE_CONFIG_START(adp_state::skattv)
+	quickjac(config);
 	MCFG_CPU_MODIFY("maincpu")
 	MCFG_CPU_PROGRAM_MAP(skattv_mem)
 MACHINE_CONFIG_END
 
-MACHINE_CONFIG_DERIVED(adp_state::skattva, quickjac)
+MACHINE_CONFIG_START(adp_state::skattva)
+	quickjac(config);
 	MCFG_CPU_MODIFY("maincpu")
 	MCFG_CPU_PROGRAM_MAP(skattva_mem)
 
 	MCFG_NVRAM_REPLACE_CUSTOM_DRIVER("nvram", adp_state, skattva_nvram_init)
 MACHINE_CONFIG_END
 
-MACHINE_CONFIG_DERIVED(adp_state::fashiong, skattv)
+MACHINE_CONFIG_START(adp_state::fashiong)
+	skattv(config);
 	MCFG_DEVICE_MODIFY("acrtc")
 	MCFG_HD63484_ADDRESS_MAP(fashiong_hd63484_map)
 MACHINE_CONFIG_END
@@ -603,7 +606,8 @@ ADDRESS_MAP_START(adp_state::ramdac_map)
 	AM_RANGE(0x000, 0x3ff) AM_DEVREADWRITE("ramdac",ramdac_device,ramdac_pal_r,ramdac_rgb666_w)
 ADDRESS_MAP_END
 
-MACHINE_CONFIG_DERIVED(adp_state::funland, quickjac)
+MACHINE_CONFIG_START(adp_state::funland)
+	quickjac(config);
 	MCFG_CPU_MODIFY("maincpu")
 	MCFG_CPU_PROGRAM_MAP(funland_mem)
 
@@ -615,7 +619,8 @@ MACHINE_CONFIG_DERIVED(adp_state::funland, quickjac)
 	MCFG_HD63484_ADDRESS_MAP(fstation_hd63484_map)
 MACHINE_CONFIG_END
 
-MACHINE_CONFIG_DERIVED(adp_state::fstation, funland)
+MACHINE_CONFIG_START(adp_state::fstation)
+	funland(config);
 	MCFG_CPU_MODIFY("maincpu")
 	MCFG_CPU_PROGRAM_MAP(fstation_mem)
 

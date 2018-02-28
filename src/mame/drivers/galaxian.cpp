@@ -5708,7 +5708,8 @@ MACHINE_CONFIG_END
 
 
 
-MACHINE_CONFIG_DERIVED(galaxian_state::konami_base, galaxian_base)
+MACHINE_CONFIG_START(galaxian_state::konami_base)
+	galaxian_base(config);
 
 	MCFG_DEVICE_ADD("ppi8255_0", I8255A, 0)
 	MCFG_I8255_IN_PORTA_CB(IOPORT("IN0"))
@@ -5781,8 +5782,9 @@ MACHINE_CONFIG_START(galaxian_state::konami_sound_2x_ay8910)
 MACHINE_CONFIG_END
 
 
-MACHINE_CONFIG_DERIVED(galaxian_state::scramble_base, konami_base)
-	MCFG_FRAGMENT_ADD(konami_sound_2x_ay8910)
+MACHINE_CONFIG_START(galaxian_state::scramble_base)
+	konami_base(config);
+	konami_sound_2x_ay8910(config);
 
 	/* blinking frequency is determined by 555 counter with Ra=100k, Rb=10k, C=10uF */
 	MCFG_TIMER_DRIVER_ADD_PERIODIC("stars", galaxian_state, scramble_stars_blink_timer, PERIOD_OF_555_ASTABLE(100000, 10000, 0.00001))
@@ -5796,24 +5798,28 @@ MACHINE_CONFIG_END
  *
  *************************************/
 
-MACHINE_CONFIG_DERIVED(galaxian_state::galaxian, galaxian_base)
-	MCFG_FRAGMENT_ADD(galaxian_audio)
+MACHINE_CONFIG_START(galaxian_state::galaxian)
+	galaxian_base(config);
+	galaxian_audio(config);
 MACHINE_CONFIG_END
 
-MACHINE_CONFIG_DERIVED(galaxian_state::spactrai, galaxian)
+MACHINE_CONFIG_START(galaxian_state::spactrai)
+	galaxian(config);
 	/* strange memory map with RAM in the middle of ROM, there's a large block on the ROM board */
 	MCFG_CPU_MODIFY("maincpu")
 	MCFG_CPU_PROGRAM_MAP(spactrai_map)
 MACHINE_CONFIG_END
 
 
-MACHINE_CONFIG_DERIVED(galaxian_state::pacmanbl, galaxian)
+MACHINE_CONFIG_START(galaxian_state::pacmanbl)
+	galaxian(config);
 
 	/* separate tile/sprite ROMs */
 	MCFG_GFXDECODE_MODIFY("gfxdecode", pacmanbl)
 MACHINE_CONFIG_END
 
-MACHINE_CONFIG_DERIVED(galaxian_state::tenspot, galaxian)
+MACHINE_CONFIG_START(galaxian_state::tenspot)
+	galaxian(config);
 
 	MCFG_CPU_MODIFY("maincpu")
 	MCFG_CPU_VBLANK_INT_DRIVER("screen", galaxian_state,  fakechange_interrupt_gen)
@@ -5827,7 +5833,8 @@ MACHINE_CONFIG_DERIVED(galaxian_state::tenspot, galaxian)
 	MCFG_GFXDECODE_MODIFY("gfxdecode", tenspot)
 MACHINE_CONFIG_END
 
-MACHINE_CONFIG_DERIVED(galaxian_state::zigzag, galaxian_base)
+MACHINE_CONFIG_START(galaxian_state::zigzag)
+	galaxian_base(config);
 
 	/* separate tile/sprite ROMs */
 	MCFG_GFXDECODE_MODIFY("gfxdecode", pacmanbl)
@@ -5842,7 +5849,8 @@ MACHINE_CONFIG_DERIVED(galaxian_state::zigzag, galaxian_base)
 MACHINE_CONFIG_END
 
 
-MACHINE_CONFIG_DERIVED(galaxian_state::gmgalax, galaxian)
+MACHINE_CONFIG_START(galaxian_state::gmgalax)
+	galaxian(config);
 
 	/* banked video hardware */
 	MCFG_GFXDECODE_MODIFY("gfxdecode", gmgalax)
@@ -5852,22 +5860,25 @@ MACHINE_CONFIG_DERIVED(galaxian_state::gmgalax, galaxian)
 MACHINE_CONFIG_END
 
 
-MACHINE_CONFIG_DERIVED(galaxian_state::mooncrst, galaxian_base)
+MACHINE_CONFIG_START(galaxian_state::mooncrst)
+	galaxian_base(config);
 
 	/* alternate memory map */
 	MCFG_CPU_MODIFY("maincpu")
 	MCFG_CPU_PROGRAM_MAP(mooncrst_map)
 
-	MCFG_FRAGMENT_ADD(mooncrst_audio)
+	mooncrst_audio(config);
 MACHINE_CONFIG_END
 
-MACHINE_CONFIG_DERIVED(galaxian_state::moonqsr, mooncrst)
+MACHINE_CONFIG_START(galaxian_state::moonqsr)
+	mooncrst(config);
 	MCFG_CPU_MODIFY("maincpu")
 	MCFG_CPU_OPCODES_MAP(moonqsr_decrypted_opcodes_map)
 MACHINE_CONFIG_END
 
 
-MACHINE_CONFIG_DERIVED(galaxian_state::fantastc, galaxian_base)
+MACHINE_CONFIG_START(galaxian_state::fantastc)
+	galaxian_base(config);
 
 	/* alternate memory map */
 	MCFG_CPU_MODIFY("maincpu")
@@ -5895,7 +5906,8 @@ TIMER_DEVICE_CALLBACK_MEMBER(galaxian_state::timefgtr_scanline)
 	}
 }
 
-MACHINE_CONFIG_DERIVED(galaxian_state::timefgtr, galaxian_base)
+MACHINE_CONFIG_START(galaxian_state::timefgtr)
+	galaxian_base(config);
 
 	MCFG_TIMER_DRIVER_ADD_SCANLINE("scantimer", galaxian_state, timefgtr_scanline, "screen", 0, 1)
 
@@ -5912,7 +5924,8 @@ MACHINE_CONFIG_DERIVED(galaxian_state::timefgtr, galaxian_base)
 MACHINE_CONFIG_END
 
 
-MACHINE_CONFIG_DERIVED(galaxian_state::jumpbug, galaxian_base)
+MACHINE_CONFIG_START(galaxian_state::jumpbug)
+	galaxian_base(config);
 
 	MCFG_DEVICE_REMOVE("watchdog")
 
@@ -5926,7 +5939,8 @@ MACHINE_CONFIG_DERIVED(galaxian_state::jumpbug, galaxian_base)
 MACHINE_CONFIG_END
 
 
-MACHINE_CONFIG_DERIVED(galaxian_state::checkman, mooncrst)
+MACHINE_CONFIG_START(galaxian_state::checkman)
+	mooncrst(config);
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("audiocpu", Z80, 1620000)  /* 1.62 MHz */
@@ -5942,7 +5956,8 @@ MACHINE_CONFIG_DERIVED(galaxian_state::checkman, mooncrst)
 MACHINE_CONFIG_END
 
 
-MACHINE_CONFIG_DERIVED(galaxian_state::checkmaj, galaxian_base)
+MACHINE_CONFIG_START(galaxian_state::checkmaj)
+	galaxian_base(config);
 
 	/* basic machine hardware */
 	MCFG_CPU_MODIFY("maincpu")
@@ -5963,7 +5978,8 @@ MACHINE_CONFIG_DERIVED(galaxian_state::checkmaj, galaxian_base)
 MACHINE_CONFIG_END
 
 
-MACHINE_CONFIG_DERIVED(galaxian_state::mshuttle, galaxian_base)
+MACHINE_CONFIG_START(galaxian_state::mshuttle)
+	galaxian_base(config);
 
 	/* basic machine hardware */
 	MCFG_CPU_MODIFY("maincpu")
@@ -5976,7 +5992,8 @@ MACHINE_CONFIG_DERIVED(galaxian_state::mshuttle, galaxian_base)
 MACHINE_CONFIG_END
 
 
-MACHINE_CONFIG_DERIVED(galaxian_state::kingball, mooncrst)
+MACHINE_CONFIG_START(galaxian_state::kingball)
+	mooncrst(config);
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("audiocpu", Z80,5000000/2)
@@ -5992,8 +6009,9 @@ MACHINE_CONFIG_DERIVED(galaxian_state::kingball, mooncrst)
 MACHINE_CONFIG_END
 
 
-MACHINE_CONFIG_DERIVED(galaxian_state::frogger, konami_base)
-	MCFG_FRAGMENT_ADD(konami_sound_1x_ay8910)
+MACHINE_CONFIG_START(galaxian_state::frogger)
+	konami_base(config);
+	konami_sound_1x_ay8910(config);
 
 	/* alternate memory map */
 	MCFG_CPU_MODIFY("maincpu")
@@ -6001,8 +6019,9 @@ MACHINE_CONFIG_DERIVED(galaxian_state::frogger, konami_base)
 MACHINE_CONFIG_END
 
 
-MACHINE_CONFIG_DERIVED(galaxian_state::froggermc, galaxian_base)
-	MCFG_FRAGMENT_ADD(konami_sound_1x_ay8910)
+MACHINE_CONFIG_START(galaxian_state::froggermc)
+	galaxian_base(config);
+	konami_sound_1x_ay8910(config);
 
 	/* alternate memory map */
 	MCFG_CPU_MODIFY("maincpu")
@@ -6013,8 +6032,9 @@ MACHINE_CONFIG_DERIVED(galaxian_state::froggermc, galaxian_base)
 MACHINE_CONFIG_END
 
 
-MACHINE_CONFIG_DERIVED(galaxian_state::froggers, konami_base)
-	MCFG_FRAGMENT_ADD(konami_sound_1x_ay8910)
+MACHINE_CONFIG_START(galaxian_state::froggers)
+	konami_base(config);
+	konami_sound_1x_ay8910(config);
 
 	/* alternate memory map */
 	MCFG_CPU_MODIFY("maincpu")
@@ -6022,8 +6042,9 @@ MACHINE_CONFIG_DERIVED(galaxian_state::froggers, konami_base)
 MACHINE_CONFIG_END
 
 
-MACHINE_CONFIG_DERIVED(galaxian_state::frogf, konami_base)
-	MCFG_FRAGMENT_ADD(konami_sound_1x_ay8910)
+MACHINE_CONFIG_START(galaxian_state::frogf)
+	konami_base(config);
+	konami_sound_1x_ay8910(config);
 
 	/* alternate memory map */
 	MCFG_CPU_MODIFY("maincpu")
@@ -6031,24 +6052,27 @@ MACHINE_CONFIG_DERIVED(galaxian_state::frogf, konami_base)
 MACHINE_CONFIG_END
 
 
-MACHINE_CONFIG_DERIVED(galaxian_state::turtles, konami_base)
-	MCFG_FRAGMENT_ADD(konami_sound_2x_ay8910)
+MACHINE_CONFIG_START(galaxian_state::turtles)
+	konami_base(config);
+	konami_sound_2x_ay8910(config);
 
 	/* alternate memory map */
 	MCFG_CPU_MODIFY("maincpu")
 	MCFG_CPU_PROGRAM_MAP(turtles_map)
 MACHINE_CONFIG_END
 
-MACHINE_CONFIG_DERIVED(galaxian_state::amigo2, galaxian_base) // bootleg has no i8255s
+MACHINE_CONFIG_START(galaxian_state::amigo2) // bootleg has no i8255s
+	galaxian_base(config);
 
 	/* alternate memory map */
 	MCFG_CPU_MODIFY("maincpu")
 	MCFG_CPU_PROGRAM_MAP(amigo2_map)
 
-	MCFG_FRAGMENT_ADD(konami_sound_2x_ay8910)
+	konami_sound_2x_ay8910(config);
 MACHINE_CONFIG_END
 
-MACHINE_CONFIG_DERIVED(galaxian_state::turpins, turtles)
+MACHINE_CONFIG_START(galaxian_state::turpins)
+	turtles(config);
 
 	// the ROMs came from a blister, so there aren't PCB infos available. Chip types and clocks are guessed.
 
@@ -6061,8 +6085,9 @@ MACHINE_CONFIG_DERIVED(galaxian_state::turpins, turtles)
 MACHINE_CONFIG_END
 
 
-MACHINE_CONFIG_DERIVED(galaxian_state::theend, konami_base)
-	MCFG_FRAGMENT_ADD(konami_sound_2x_ay8910)
+MACHINE_CONFIG_START(galaxian_state::theend)
+	konami_base(config);
+	konami_sound_2x_ay8910(config);
 
 	/* alternate memory map */
 	MCFG_CPU_MODIFY("maincpu")
@@ -6073,7 +6098,8 @@ MACHINE_CONFIG_DERIVED(galaxian_state::theend, konami_base)
 MACHINE_CONFIG_END
 
 
-MACHINE_CONFIG_DERIVED(galaxian_state::scramble, scramble_base)
+MACHINE_CONFIG_START(galaxian_state::scramble)
+	scramble_base(config);
 	/* alternate memory map */
 	MCFG_CPU_MODIFY("maincpu")
 	MCFG_CPU_PROGRAM_MAP(theend_map)
@@ -6084,7 +6110,8 @@ MACHINE_CONFIG_DERIVED(galaxian_state::scramble, scramble_base)
 MACHINE_CONFIG_END
 
 
-MACHINE_CONFIG_DERIVED(galaxian_state::explorer, galaxian_base)
+MACHINE_CONFIG_START(galaxian_state::explorer)
+	galaxian_base(config);
 
 	/* alternate memory map */
 	MCFG_CPU_MODIFY("maincpu")
@@ -6107,7 +6134,8 @@ MACHINE_CONFIG_DERIVED(galaxian_state::explorer, galaxian_base)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 0.25)
 MACHINE_CONFIG_END
 
-MACHINE_CONFIG_DERIVED(galaxian_state::takeoff, explorer) // takeoff shares the same main map as explorer, but uses only one AY8912 for sound.
+MACHINE_CONFIG_START(galaxian_state::takeoff) // takeoff shares the same main map as explorer, but uses only one AY8912 for sound.
+	explorer(config);
 
 	MCFG_SOUND_MODIFY("maincpu")
 	MCFG_DEVICE_CLOCK(XTAL(12'000'000) / 8) // XTAL verified, divider not verified
@@ -6127,7 +6155,8 @@ MACHINE_CONFIG_DERIVED(galaxian_state::takeoff, explorer) // takeoff shares the 
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 0.25)
 MACHINE_CONFIG_END
 
-MACHINE_CONFIG_DERIVED(galaxian_state::scorpion, scramble_base)
+MACHINE_CONFIG_START(galaxian_state::scorpion)
+	scramble_base(config);
 	/* alternate memory map */
 	MCFG_CPU_MODIFY("maincpu")
 	MCFG_CPU_PROGRAM_MAP(theend_map)
@@ -6147,7 +6176,8 @@ MACHINE_CONFIG_DERIVED(galaxian_state::scorpion, scramble_base)
 MACHINE_CONFIG_END
 
 
-MACHINE_CONFIG_DERIVED(galaxian_state::sfx, scramble_base)
+MACHINE_CONFIG_START(galaxian_state::sfx)
+	scramble_base(config);
 	MCFG_DEVICE_REMOVE("watchdog")
 
 	/* alternate memory map */
@@ -6176,7 +6206,8 @@ MACHINE_CONFIG_DERIVED(galaxian_state::sfx, scramble_base)
 MACHINE_CONFIG_END
 
 
-MACHINE_CONFIG_DERIVED(galaxian_state::monsterz, sfx)
+MACHINE_CONFIG_START(galaxian_state::monsterz)
+	sfx(config);
 
 	/* alternate memory map */
 	MCFG_CPU_MODIFY("maincpu")
@@ -6192,13 +6223,15 @@ MACHINE_CONFIG_DERIVED(galaxian_state::monsterz, sfx)
 MACHINE_CONFIG_END
 
 
-MACHINE_CONFIG_DERIVED(galaxian_state::scobra, scramble_base)
+MACHINE_CONFIG_START(galaxian_state::scobra)
+	scramble_base(config);
 	/* alternate memory map */
 	MCFG_CPU_MODIFY("maincpu")
 	MCFG_CPU_PROGRAM_MAP(scobra_map)
 MACHINE_CONFIG_END
 
-MACHINE_CONFIG_DERIVED(galaxian_state::anteatergg, galaxian)
+MACHINE_CONFIG_START(galaxian_state::anteatergg)
+	galaxian(config);
 
 	/* alternate memory map */
 	MCFG_CPU_MODIFY("maincpu")
@@ -6253,8 +6286,9 @@ Silkscreened label: "10041"
 */
 
 
-MACHINE_CONFIG_DERIVED(galaxian_state::quaak, konami_base)
-	MCFG_FRAGMENT_ADD(konami_sound_2x_ay8910)
+MACHINE_CONFIG_START(galaxian_state::quaak)
+	konami_base(config);
+	konami_sound_2x_ay8910(config);
 
 	MCFG_DEVICE_MODIFY("8910.0")
 	MCFG_AY8910_PORT_B_READ_CB(READ8(galaxian_state, frogger_sound_timer_r))
@@ -6264,8 +6298,9 @@ MACHINE_CONFIG_DERIVED(galaxian_state::quaak, konami_base)
 	MCFG_CPU_PROGRAM_MAP(scobra_map)
 MACHINE_CONFIG_END
 
-MACHINE_CONFIG_DERIVED(galaxian_state::froggeram, konami_base)
-	MCFG_FRAGMENT_ADD(konami_sound_2x_ay8910)
+MACHINE_CONFIG_START(galaxian_state::froggeram)
+	konami_base(config);
+	konami_sound_2x_ay8910(config);
 
 	MCFG_DEVICE_MODIFY("8910.0")
 	MCFG_AY8910_PORT_B_READ_CB(READ8(galaxian_state, frogger_sound_timer_r))
@@ -6276,7 +6311,8 @@ MACHINE_CONFIG_DERIVED(galaxian_state::froggeram, konami_base)
 MACHINE_CONFIG_END
 
 
-MACHINE_CONFIG_DERIVED(galaxian_state::anteater, scobra)
+MACHINE_CONFIG_START(galaxian_state::anteater)
+	scobra(config);
 
 	/* quiet down the sounds */
 	MCFG_SOUND_MODIFY("konami")
@@ -6285,7 +6321,8 @@ MACHINE_CONFIG_DERIVED(galaxian_state::anteater, scobra)
 MACHINE_CONFIG_END
 
 
-MACHINE_CONFIG_DERIVED(galaxian_state::anteateruk, anteater)
+MACHINE_CONFIG_START(galaxian_state::anteateruk)
+	anteater(config);
 
 	/* strange memory map, maybe a kind of protection */
 	MCFG_CPU_MODIFY("maincpu")
@@ -6293,7 +6330,8 @@ MACHINE_CONFIG_DERIVED(galaxian_state::anteateruk, anteater)
 MACHINE_CONFIG_END
 
 
-MACHINE_CONFIG_DERIVED(galaxian_state::anteaterg, anteater)
+MACHINE_CONFIG_START(galaxian_state::anteaterg)
+	anteater(config);
 
 	/* strange memory map, maybe a kind of protection */
 	MCFG_CPU_MODIFY("maincpu")
@@ -6301,7 +6339,8 @@ MACHINE_CONFIG_DERIVED(galaxian_state::anteaterg, anteater)
 MACHINE_CONFIG_END
 
 
-MACHINE_CONFIG_DERIVED(galaxian_state::moonwar, scobra)
+MACHINE_CONFIG_START(galaxian_state::moonwar)
+	scobra(config);
 
 	MCFG_DEVICE_MODIFY("ppi8255_0")
 	MCFG_I8255_OUT_PORTC_CB(WRITE8(galaxian_state, moonwar_port_select_w))
@@ -10109,7 +10148,27 @@ ROM_START( mshuttle2 )
 	ROM_LOAD( "my06",         0x1000, 0x1000, CRC(6d2dd711) SHA1(82e7c7b10258f651943173c968c7fa2bdf937ca9) )
 ROM_END
 
+ROM_START( mshuttlea ) // PCB MY-01 + MY-02
+	ROM_REGION( 0x8000, "maincpu", 0 )
+	ROM_LOAD( "MY-5A.4L",     0x0000, 0x1000, CRC(14fa3e75) SHA1(50ddb3cf7a4ae1f547bbd53f125e7addeb1f4c10) ) // 2732
+	ROM_LOAD( "MY04.4J",      0x1000, 0x1000, CRC(1cfae2c8) SHA1(6c7eeee70e91b8498c41525dcc60f8086cff8da7) )
+	ROM_LOAD( "MY03.4F",      0x2000, 0x1000, CRC(c8b8a368) SHA1(140ba60f55285d1e9f7a262634f5ce5c3470ab71) )
+	ROM_LOAD( "MY-2A.4E",     0x3000, 0x1000, CRC(51d348b0) SHA1(beb5f7849e032acd7d6cf5845ff2b316b3ff2303) ) // 2732
+	ROM_LOAD( "MY-1A.4C",     0x4000, 0x1000, CRC(c4ad042d) SHA1(93618b72c18d66298ec6bab0d4ac2784bc9c2934) ) // 2732
 
+	ROM_REGION( 0x4000, "gfx1", 0 )
+	ROM_LOAD( "MY09",         0x0000, 0x1000, CRC(3601b380) SHA1(c0b9d1801f58a16449708d514d2fd88e34af340b) )
+	ROM_LOAD( "MY11",         0x1000, 0x0800, CRC(b659e932) SHA1(3f63c99e81cb93c9553a5e274546525f598d50c4) )
+	ROM_LOAD( "MY08",         0x2000, 0x1000, CRC(992b06cd) SHA1(8645ccad8169601bbe25b9f2b17b99004c0a584f) )
+	ROM_LOAD( "MY10",         0x3000, 0x0800, CRC(d860e6ce) SHA1(2912d13bf69496f8f18358a36366a1f60afd0070) )
+
+	ROM_REGION( 0x0020, "proms", 0 )
+	ROM_LOAD( "mscprom1.bin", 0x0000, 0x0020, CRC(ea0d1af0) SHA1(cb59e04c02307dfe847e3170cf0a7f62829b6094) )
+
+	ROM_REGION( 0x2000, "samples", 0 )  /* samples */
+	ROM_LOAD( "MY07.4P",       0x0000, 0x1000, CRC(522a2920) SHA1(a64d821a8ff6bd6e2b0bdb1e632181e65a97363b) )
+	ROM_LOAD( "MY06.4S",       0x1000, 0x1000, CRC(466415f2) SHA1(a05f8238cdcebe926a564ef6268b3cd677987fa2) ) // sldh
+ROM_END
 
 ROM_START( mshuttlej )
 	ROM_REGION( 0x8000, "maincpu", 0 )
@@ -12105,6 +12164,7 @@ GAME( 1983, dingoe,      dingo,    checkman,   dingo,      galaxian_state, dingo
 /* Crazy Climber sound plus AY8910 instead of galaxian sound, plus INT instead of NMI */
 GAME( 1981, mshuttle,    0,        mshuttle,   mshuttle,   galaxian_state, mshuttle,   ROT0,   "Nichibutsu", "Moon Shuttle (US? set 1)", MACHINE_SUPPORTS_SAVE )
 GAME( 1981, mshuttle2,   mshuttle, mshuttle,   mshuttle,   galaxian_state, mshuttle,   ROT0,   "Nichibutsu", "Moon Shuttle (US? set 2)", MACHINE_SUPPORTS_SAVE )
+GAME( 1981, mshuttlea,   mshuttle, mshuttle,   mshuttle,   galaxian_state, mshuttle,   ROT0,   "Nichibutsu", "Moon Shuttle (US, version A)", MACHINE_SUPPORTS_SAVE )
 GAME( 1981, mshuttlej,   mshuttle, mshuttle,   mshuttle,   galaxian_state, mshuttlj,   ROT0,   "Nichibutsu", "Moon Shuttle (Japan set 1)", MACHINE_SUPPORTS_SAVE )
 GAME( 1981, mshuttlej2,  mshuttle, mshuttle,   mshuttle,   galaxian_state, mshuttlj,   ROT0,   "Nichibutsu", "Moon Shuttle (Japan set 2)", MACHINE_SUPPORTS_SAVE )
 

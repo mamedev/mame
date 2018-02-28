@@ -1462,7 +1462,8 @@ MACHINE_CONFIG_START(legionna_state::cupsoc)
 	MCFG_SEIBU_SOUND_YM_WRITE_CB(DEVWRITE8("ymsnd", ym3812_device, write))
 MACHINE_CONFIG_END
 
-MACHINE_CONFIG_DERIVED(legionna_state::cupsocs, cupsoc)
+MACHINE_CONFIG_START(legionna_state::cupsocs)
+	cupsoc(config);
 	MCFG_CPU_MODIFY("maincpu")
 	MCFG_CPU_PROGRAM_MAP(cupsocs_mem)
 MACHINE_CONFIG_END

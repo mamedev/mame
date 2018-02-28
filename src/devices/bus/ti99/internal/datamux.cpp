@@ -335,7 +335,7 @@ READ16_MEMBER( datamux_device::read )
 	uint16_t value = 0;
 
 	// Care for debugger
-	if (machine().side_effect_disabled())
+	if (machine().side_effects_disabled())
 	{
 		return debugger_read(space, offset);
 	}
@@ -384,7 +384,7 @@ READ16_MEMBER( datamux_device::read )
 */
 WRITE16_MEMBER( datamux_device::write )
 {
-	if (machine().side_effect_disabled())
+	if (machine().side_effects_disabled())
 	{
 		debugger_write(space, offset, data);
 		return;

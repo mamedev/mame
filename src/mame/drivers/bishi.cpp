@@ -484,7 +484,8 @@ MACHINE_CONFIG_START(bishi_state::bishi)
 	MCFG_SOUND_ROUTE(1, "rspeaker", 1.0)
 MACHINE_CONFIG_END
 
-MACHINE_CONFIG_DERIVED(bishi_state::dobouchn, bishi)
+MACHINE_CONFIG_START(bishi_state::dobouchn)
+	bishi(config);
 //  TODO: change accordingly (ASCII charset definitely not 8bpp, 5bpp perhaps?)
 	MCFG_DEVICE_MODIFY("k056832")
 //  MCFG_K056832_CB(bishi_state, dobouchn_tile_callback)

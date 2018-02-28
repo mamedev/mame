@@ -71,20 +71,23 @@ class acvirus_state : public driver_device
 {
 public:
 	acvirus_state(const machine_config &mconfig, device_type type, const char *tag)
-	: driver_device(mconfig, type, tag),
+		: driver_device(mconfig, type, tag),
 		m_maincpu(*this, "maincpu"),
 		m_rombank(*this, "rombank")
 	{ }
 
-	required_device<cpu_device> m_maincpu;
-	required_memory_bank m_rombank;
+	DECLARE_DRIVER_INIT(virus);
+	void virus(machine_config &config);
 
+protected:
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
 
-	DECLARE_DRIVER_INIT(virus);
-	void virus(machine_config &config);
 	void virus_map(address_map &map);
+
+private:
+	required_device<cpu_device> m_maincpu;
+	required_memory_bank m_rombank;
 };
 
 void acvirus_state::machine_start()

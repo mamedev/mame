@@ -133,13 +133,13 @@ MACHINE_CONFIG_START(fruitpc_state::fruitpc)
 	MCFG_CPU_IO_MAP(fruitpc_io)
 	MCFG_CPU_IRQ_ACKNOWLEDGE_DEVICE("pic8259_1", pic8259_device, inta_cb)
 
-	MCFG_FRAGMENT_ADD( pcat_common )
+	pcat_common(config);
 
 	MCFG_IDE_CONTROLLER_ADD("ide", ata_devices, "hdd", nullptr, true)
 	MCFG_ATA_INTERFACE_IRQ_HANDLER(DEVWRITELINE("pic8259_2", pic8259_device, ir6_w))
 
 	/* video hardware */
-	MCFG_FRAGMENT_ADD( pcvideo_vga )
+	pcvideo_vga(config);
 
 	MCFG_DEVICE_MODIFY("dma8237_1")
 	MCFG_I8237_OUT_IOW_1_CB(WRITE8(fruitpc_state, dma8237_1_dack_w))

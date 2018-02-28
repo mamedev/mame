@@ -532,6 +532,7 @@ MACHINES["ROC10937"] = true
 MACHINES["RP5C01"] = true
 MACHINES["RP5C15"] = true
 MACHINES["RP5H01"] = true
+--MACHINES["RSTBUF"] = true
 MACHINES["RTC4543"] = true
 MACHINES["RTC65271"] = true
 MACHINES["RTC9701"] = true
@@ -2351,6 +2352,7 @@ files {
 	MAME_DIR .. "src/mame/drivers/jr100.cpp",
 	MAME_DIR .. "src/mame/drivers/jr200.cpp",
 	MAME_DIR .. "src/mame/drivers/myb3k.cpp",
+	MAME_DIR .. "src/mame/drivers/duet16.cpp",
 }
 
 createMESSProjects(_target, _subtarget, "mb")

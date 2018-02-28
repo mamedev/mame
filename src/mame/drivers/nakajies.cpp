@@ -771,15 +771,18 @@ MACHINE_CONFIG_START(nakajies_state::nakajies210)
 	MCFG_TIMER_DRIVER_ADD_PERIODIC("kb_timer", nakajies_state, kb_timer, attotime::from_hz(250))
 MACHINE_CONFIG_END
 
-MACHINE_CONFIG_DERIVED(nakajies_state::dator3k, nakajies210)
+MACHINE_CONFIG_START(nakajies_state::dator3k)
+	nakajies210(config);
 	MCFG_GFXDECODE_MODIFY("gfxdecode", dator3k)
 MACHINE_CONFIG_END
 
-MACHINE_CONFIG_DERIVED(nakajies_state::nakajies220, nakajies210)
+MACHINE_CONFIG_START(nakajies_state::nakajies220)
+	nakajies210(config);
 	MCFG_GFXDECODE_MODIFY("gfxdecode", drwrt400)
 MACHINE_CONFIG_END
 
-MACHINE_CONFIG_DERIVED(nakajies_state::nakajies250, nakajies210)
+MACHINE_CONFIG_START(nakajies_state::nakajies250)
+	nakajies210(config);
 	MCFG_SCREEN_MODIFY( "screen" )
 	MCFG_SCREEN_SIZE( 80 * 6, 16 * 8 )
 	MCFG_SCREEN_VISIBLE_AREA( 0, 6 * 80 - 1, 0, 16 * 8 - 1 )

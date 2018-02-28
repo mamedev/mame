@@ -6,18 +6,18 @@
 #pragma once
 
 #define MCFG_NEXTMO_IRQ_CALLBACK(_write) \
-	devcb = &nextmo_device::set_irq_wr_callback(*device, DEVCB_##_write);
+	devcb = &downcast<nextmo_device &>(*device).set_irq_wr_callback(DEVCB_##_write);
 
 #define MCFG_NEXTMO_DRQ_CALLBACK(_write) \
-	devcb = &nextmo_device::set_drq_wr_callback(*device, DEVCB_##_write);
+	devcb = &downcast<nextmo_device &>(*device).set_drq_wr_callback(DEVCB_##_write);
 
 class nextmo_device : public device_t
 {
 public:
 	nextmo_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
-	template <class Object> static devcb_base &set_irq_wr_callback(device_t &device, Object &&cb) { return downcast<nextmo_device &>(device).irq_cb.set_callback(std::forward<Object>(cb)); }
-	template <class Object> static devcb_base &set_drq_wr_callback(device_t &device, Object &&cb) { return downcast<nextmo_device &>(device).drq_cb.set_callback(std::forward<Object>(cb)); }
+	template <class Object> devcb_base &set_irq_wr_callback(Object &&cb) { return irq_cb.set_callback(std::forward<Object>(cb)); }
+	template <class Object> devcb_base &set_drq_wr_callback(Object &&cb) { return drq_cb.set_callback(std::forward<Object>(cb)); }
 
 	void map(address_map &map);
 

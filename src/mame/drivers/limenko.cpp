@@ -120,7 +120,6 @@ public:
 	void limenko_map(address_map &map);
 	void spotty_io_map(address_map &map);
 	void spotty_map(address_map &map);
-	void spotty_sound_io_map(address_map &map);
 };
 
 /*****************************************************************************************************
@@ -299,11 +298,6 @@ READ8_MEMBER(limenko_state::spotty_sound_r)
 	else
 		return m_oki->read(space,0);
 }
-
-ADDRESS_MAP_START(limenko_state::spotty_sound_io_map)
-	AM_RANGE(MCS51_PORT_P1, MCS51_PORT_P1) AM_READ(spotty_sound_r) AM_DEVWRITE("oki", okim6295_device, write) //? sound latch and ?
-	AM_RANGE(MCS51_PORT_P3, MCS51_PORT_P3) AM_READWRITE(spotty_sound_cmd_r, spotty_sound_cmd_w) //not sure about anything...
-ADDRESS_MAP_END
 
 /*****************************************************************************************************
   VIDEO HARDWARE EMULATION
@@ -780,7 +774,10 @@ MACHINE_CONFIG_START(limenko_state::spotty)
 	MCFG_CPU_VBLANK_INT_DRIVER("screen", limenko_state,  irq0_line_hold)
 
 	MCFG_CPU_ADD("audiocpu", AT89C4051, 4000000)    /* 4 MHz */
-	MCFG_CPU_IO_MAP(spotty_sound_io_map)
+	MCFG_MCS51_PORT_P1_IN_CB(READ8(limenko_state, spotty_sound_r))
+	MCFG_MCS51_PORT_P1_OUT_CB(DEVWRITE8("oki", okim6295_device, write)) //? sound latch and ?
+	MCFG_MCS51_PORT_P3_IN_CB(READ8(limenko_state, spotty_sound_cmd_r))
+	MCFG_MCS51_PORT_P3_OUT_CB(WRITE8(limenko_state, spotty_sound_cmd_w)) //not sure about anything...
 
 	MCFG_EEPROM_SERIAL_93C46_ADD("eeprom")
 

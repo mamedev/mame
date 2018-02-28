@@ -152,7 +152,6 @@ public:
 	void hvyunit(machine_config &config);
 	void master_io(address_map &map);
 	void master_memory(address_map &map);
-	void mcu_io(address_map &map);
 	void slave_io(address_map &map);
 	void slave_memory(address_map &map);
 	void sound_io(address_map &map);
@@ -445,14 +444,6 @@ ADDRESS_MAP_START(hvyunit_state::sound_io)
 ADDRESS_MAP_END
 
 
-ADDRESS_MAP_START(hvyunit_state::mcu_io)
-	AM_RANGE(MCS51_PORT_P0, MCS51_PORT_P0) AM_READWRITE(mermaid_p0_r, mermaid_p0_w)
-	AM_RANGE(MCS51_PORT_P1, MCS51_PORT_P1) AM_READWRITE(mermaid_p1_r, mermaid_p1_w)
-	AM_RANGE(MCS51_PORT_P2, MCS51_PORT_P2) AM_READWRITE(mermaid_p2_r, mermaid_p2_w)
-	AM_RANGE(MCS51_PORT_P3, MCS51_PORT_P3) AM_READWRITE(mermaid_p3_r, mermaid_p3_w)
-ADDRESS_MAP_END
-
-
 /*************************************
  *
  *  Port definitions
@@ -635,7 +626,14 @@ MACHINE_CONFIG_START(hvyunit_state::hvyunit)
 	MCFG_CPU_VBLANK_INT_DRIVER("screen", hvyunit_state,  irq0_line_hold)
 
 	MCFG_CPU_ADD("mermaid", I80C51, 6000000)
-	MCFG_CPU_IO_MAP(mcu_io)
+	MCFG_MCS51_PORT_P0_IN_CB(READ8(hvyunit_state, mermaid_p0_r))
+	MCFG_MCS51_PORT_P0_OUT_CB(WRITE8(hvyunit_state, mermaid_p0_w))
+	MCFG_MCS51_PORT_P1_IN_CB(READ8(hvyunit_state, mermaid_p1_r))
+	MCFG_MCS51_PORT_P1_OUT_CB(WRITE8(hvyunit_state, mermaid_p1_w))
+	MCFG_MCS51_PORT_P2_IN_CB(READ8(hvyunit_state, mermaid_p2_r))
+	MCFG_MCS51_PORT_P2_OUT_CB(WRITE8(hvyunit_state, mermaid_p2_w))
+	MCFG_MCS51_PORT_P3_IN_CB(READ8(hvyunit_state, mermaid_p3_r))
+	MCFG_MCS51_PORT_P3_OUT_CB(WRITE8(hvyunit_state, mermaid_p3_w))
 
 	MCFG_GENERIC_LATCH_8_ADD("mermaidlatch")
 	MCFG_GENERIC_LATCH_DATA_PENDING_CB(INPUTLINE("mermaid", INPUT_LINE_IRQ0))

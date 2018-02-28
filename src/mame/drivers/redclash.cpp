@@ -31,107 +31,14 @@ TODO:
 #include "speaker.h"
 
 
-/* Sound comm between CPU's */
-READ8_MEMBER(redclash_state::sraider_sound_low_r)
-{
-	return m_sound_low;
-}
-
-READ8_MEMBER(redclash_state::sraider_sound_high_r)
-{
-	return m_sound_high;
-}
-
-WRITE8_MEMBER(redclash_state::sraider_sound_low_w)
-{
-	m_sound_low = data;
-}
-
-WRITE8_MEMBER(redclash_state::sraider_sound_high_w)
-{
-	m_sound_high = data;
-}
-
-/* Protection? */
-READ8_MEMBER(redclash_state::sraider_8005_r)
-{
-	/* This must return X011111X or cpu #1 will hang */
-	/* see code at rst $10 */
-	return 0x3e;
-}
-
-/* Unknown IO */
-WRITE8_MEMBER(redclash_state::sraider_misc_w)
-{
-	switch(offset)
-	{
-		/* These 8 bits are stored in the latch at A7 */
-		case 0x00:
-		case 0x01:
-		case 0x02:
-		case 0x03:
-		case 0x04:
-		case 0x05:
-		case 0x06:
-		case 0x07:
-			m_weird_value[offset & 7] = data & 1;
-			break;
-		/* These 6 bits are stored in the latch at N7 */
-		case 0x08:
-			m_sraider_0x30 = data&0x3f;
-			break;
-		/* These 6 bits are stored in the latch at N8 */
-		case 0x10:
-			m_sraider_0x38 = data&0x3f;
-			break;
-		default:
-			osd_printf_debug("(%04X) write to %02X\n", m_sub->pc(), offset);
-			break;
-	}
-}
-
-ADDRESS_MAP_START(redclash_state::sraider_cpu1_map)
-	AM_RANGE(0x0000, 0x5fff) AM_ROM
-	AM_RANGE(0x6000, 0x6fff) AM_RAM
-	AM_RANGE(0x7000, 0x73ff) AM_WRITEONLY AM_SHARE("spriteram")
-	AM_RANGE(0x8005, 0x8005) AM_READ(sraider_8005_r)  // protection check?
-	AM_RANGE(0x8006, 0x8006) AM_WRITE(sraider_sound_low_w)
-	AM_RANGE(0x8007, 0x8007) AM_WRITE(sraider_sound_high_w)
-	AM_RANGE(0x9000, 0x9000) AM_READ_PORT("IN0")
-	AM_RANGE(0x9001, 0x9001) AM_READ_PORT("IN1")
-	AM_RANGE(0x9002, 0x9002) AM_READ_PORT("DSW0")
-	AM_RANGE(0x9003, 0x9003) AM_READ_PORT("DSW1")
-	AM_RANGE(0xd000, 0xd3ff) AM_WRITE(ladybug_videoram_w) AM_SHARE("videoram")
-	AM_RANGE(0xd400, 0xd7ff) AM_WRITE(ladybug_colorram_w) AM_SHARE("colorram")
-	AM_RANGE(0xe000, 0xe000) AM_WRITENOP  //unknown 0x10 when in attract, 0x20 when coined/playing
-ADDRESS_MAP_END
-
-
-ADDRESS_MAP_START(redclash_state::sraider_cpu2_map)
-	AM_RANGE(0x0000, 0x5fff) AM_ROM
-	AM_RANGE(0x6000, 0x63ff) AM_RAM
-	AM_RANGE(0x8000, 0x8000) AM_READ(sraider_sound_low_r)
-	AM_RANGE(0xa000, 0xa000) AM_READ(sraider_sound_high_r)
-	AM_RANGE(0xc000, 0xc000) AM_READNOP //some kind of sync
-	AM_RANGE(0xe000, 0xe0ff) AM_WRITEONLY AM_SHARE("grid_data")
-	AM_RANGE(0xe800, 0xe800) AM_WRITE(sraider_io_w)
-ADDRESS_MAP_END
-
-
-ADDRESS_MAP_START(redclash_state::sraider_cpu2_io_map)
-	ADDRESS_MAP_GLOBAL_MASK(0xff)
-	AM_RANGE(0x00, 0x00) AM_DEVWRITE("sn1", sn76489_device, write)
-	AM_RANGE(0x08, 0x08) AM_DEVWRITE("sn2", sn76489_device, write)
-	AM_RANGE(0x10, 0x10) AM_DEVWRITE("sn3", sn76489_device, write)
-	AM_RANGE(0x18, 0x18) AM_DEVWRITE("sn4", sn76489_device, write)
-	AM_RANGE(0x20, 0x20) AM_DEVWRITE("sn5", sn76489_device, write)
-	AM_RANGE(0x28, 0x3f) AM_WRITE(sraider_misc_w)  // lots unknown
-ADDRESS_MAP_END
-
-
 WRITE8_MEMBER( redclash_state::irqack_w )
 {
 	m_maincpu->set_input_line(0, CLEAR_LINE);
+}
+
+template <unsigned B> WRITE8_MEMBER(redclash_state::redclash_star_w)
+{
+	m_stars->set_speed(BIT(data, 0) << B, 1U << B);
 }
 
 ADDRESS_MAP_START(redclash_state::zerohour_map)
@@ -144,10 +51,10 @@ ADDRESS_MAP_START(redclash_state::zerohour_map)
 	AM_RANGE(0x4802, 0x4802) AM_READ_PORT("DSW1")   /* DSW0 */
 	AM_RANGE(0x4803, 0x4803) AM_READ_PORT("DSW2")   /* DSW1 */
 	AM_RANGE(0x5000, 0x5007) AM_WRITENOP    /* to sound board */
-	AM_RANGE(0x5800, 0x5800) AM_WRITE(redclash_star0_w)
+	AM_RANGE(0x5800, 0x5800) AM_WRITE(redclash_star_w<0>)
 	AM_RANGE(0x5801, 0x5804) AM_WRITENOP    /* to sound board */
-	AM_RANGE(0x5805, 0x5805) AM_WRITE(redclash_star1_w)
-	AM_RANGE(0x5806, 0x5806) AM_WRITE(redclash_star2_w)
+	AM_RANGE(0x5805, 0x5805) AM_WRITE(redclash_star_w<1>)
+	AM_RANGE(0x5806, 0x5806) AM_WRITE(redclash_star_w<2>)
 	AM_RANGE(0x5807, 0x5807) AM_WRITE(redclash_flipscreen_w)
 	AM_RANGE(0x7000, 0x7000) AM_WRITE(redclash_star_reset_w)
 	AM_RANGE(0x7800, 0x7800) AM_WRITE(irqack_w)
@@ -163,10 +70,10 @@ ADDRESS_MAP_START(redclash_state::redclash_map)
 	AM_RANGE(0x4802, 0x4802) AM_READ_PORT("DSW1")   /* DSW0 */
 	AM_RANGE(0x4803, 0x4803) AM_READ_PORT("DSW2")   /* DSW1 */
 	AM_RANGE(0x5000, 0x5007) AM_WRITENOP    /* to sound board */
-	AM_RANGE(0x5800, 0x5800) AM_WRITE(redclash_star0_w)
+	AM_RANGE(0x5800, 0x5800) AM_WRITE(redclash_star_w<0>)
 	AM_RANGE(0x5801, 0x5801) AM_WRITE(redclash_gfxbank_w)
-	AM_RANGE(0x5805, 0x5805) AM_WRITE(redclash_star1_w)
-	AM_RANGE(0x5806, 0x5806) AM_WRITE(redclash_star2_w)
+	AM_RANGE(0x5805, 0x5805) AM_WRITE(redclash_star_w<1>)
+	AM_RANGE(0x5806, 0x5806) AM_WRITE(redclash_star_w<2>)
 	AM_RANGE(0x5807, 0x5807) AM_WRITE(redclash_flipscreen_w)
 	AM_RANGE(0x6000, 0x67ff) AM_RAM
 	AM_RANGE(0x6800, 0x6bff) AM_RAM AM_SHARE("spriteram")
@@ -361,81 +268,6 @@ static INPUT_PORTS_START( zerohour )
 	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_COIN2 ) PORT_IMPULSE(1) PORT_CHANGED_MEMBER(DEVICE_SELF, redclash_state, right_coin_inserted, 0)
 INPUT_PORTS_END
 
-static INPUT_PORTS_START( sraider )
-	PORT_START("IN0")   /* IN0 */
-	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_JOYSTICK_LEFT ) PORT_4WAY
-	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_JOYSTICK_DOWN ) PORT_4WAY
-	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_JOYSTICK_RIGHT ) PORT_4WAY
-	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_JOYSTICK_UP ) PORT_4WAY
-	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_BUTTON1 )
-	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_START1 )
-	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_START2 )
-	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_UNKNOWN )
-
-	PORT_START("IN1")   /* IN1 */
-	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_JOYSTICK_LEFT ) PORT_4WAY PORT_COCKTAIL
-	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_JOYSTICK_DOWN ) PORT_4WAY PORT_COCKTAIL
-	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_JOYSTICK_RIGHT ) PORT_4WAY PORT_COCKTAIL
-	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_JOYSTICK_UP ) PORT_4WAY PORT_COCKTAIL
-	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_COCKTAIL
-	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_UNKNOWN )
-	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_COIN1 )
-	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_COIN2 )
-
-	PORT_START("DSW0")  /* DSW0 */
-	PORT_DIPNAME( 0x03, 0x03, DEF_STR( Difficulty ) )
-	PORT_DIPSETTING(    0x03, DEF_STR( Easy ) )
-	PORT_DIPSETTING(    0x02, DEF_STR( Medium ) )
-	PORT_DIPSETTING(    0x01, DEF_STR( Hard ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( Hardest ) )
-	PORT_DIPNAME( 0x04, 0x04, "High Score Names" )
-	PORT_DIPSETTING(    0x00, "3 Letters" )
-	PORT_DIPSETTING(    0x04, "10 Letters" )
-	PORT_DIPNAME( 0x08, 0x08, DEF_STR( Allow_Continue ) )
-	PORT_DIPSETTING(    0x08, DEF_STR( No ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( Yes ) )
-	PORT_DIPNAME( 0x10, 0x10, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(    0x10, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x20, 0x00, DEF_STR( Cabinet ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( Upright ) )
-	PORT_DIPSETTING(    0x20, DEF_STR( Cocktail ) )
-	PORT_DIPNAME( 0xc0, 0xc0, DEF_STR( Lives ) )
-	PORT_DIPSETTING(    0x00, "2" )
-	PORT_DIPSETTING(    0xc0, "3" )
-	PORT_DIPSETTING(    0x80, "4" )
-	PORT_DIPSETTING(    0x40, "5" )
-
-	/* Free Play setting works when it's set for both */
-	PORT_START("DSW1")  /* DSW1 */
-	PORT_DIPNAME( 0x0f, 0x0f, DEF_STR( Coin_A ) )
-	/* settings 0x00 through 0x05 all give 1 Coin/1 Credit */
-	PORT_DIPSETTING(    0x06, DEF_STR( 4C_1C ) )
-	PORT_DIPSETTING(    0x08, DEF_STR( 3C_1C ) )
-	PORT_DIPSETTING(    0x0a, DEF_STR( 2C_1C ) )
-	PORT_DIPSETTING(    0x07, DEF_STR( 3C_2C ) )
-	PORT_DIPSETTING(    0x09, DEF_STR( 2C_2C ) )
-	PORT_DIPSETTING(    0x0f, DEF_STR( 1C_1C ) )
-	PORT_DIPSETTING(    0x0e, DEF_STR( 1C_2C ) )
-	PORT_DIPSETTING(    0x0d, DEF_STR( 1C_3C ) )
-	PORT_DIPSETTING(    0x0c, DEF_STR( 1C_4C ) )
-	PORT_DIPSETTING(    0x0b, DEF_STR( 1C_5C ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( Free_Play ) )
-	PORT_DIPNAME( 0xf0, 0xf0, DEF_STR( Coin_B ) )
-	/* settings 0x00 through 0x50 all give 1 Coin/1 Credit */
-	PORT_DIPSETTING(    0x60, DEF_STR( 4C_1C ) )
-	PORT_DIPSETTING(    0x80, DEF_STR( 3C_1C ) )
-	PORT_DIPSETTING(    0xa0, DEF_STR( 2C_1C ) )
-	PORT_DIPSETTING(    0x70, DEF_STR( 3C_2C ) )
-	PORT_DIPSETTING(    0x90, DEF_STR( 2C_2C ) )
-	PORT_DIPSETTING(    0xf0, DEF_STR( 1C_1C ) )
-	PORT_DIPSETTING(    0xe0, DEF_STR( 1C_2C ) )
-	PORT_DIPSETTING(    0xd0, DEF_STR( 1C_3C ) )
-	PORT_DIPSETTING(    0xc0, DEF_STR( 1C_4C ) )
-	PORT_DIPSETTING(    0xb0, DEF_STR( 1C_5C ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( Free_Play ) )
-INPUT_PORTS_END
-
 static const gfx_layout charlayout =
 {
 	8,8,
@@ -500,130 +332,15 @@ static GFXDECODE_START( redclash )
 	GFXDECODE_ENTRY( "gfx2", 0x0004, spritelayout16x16bis, 4*8, 16 )
 GFXDECODE_END
 
-static const gfx_layout charlayout2 =
+
+void redclash_state::machine_start()
 {
-	8,8,    /* 8*8 characters */
-	512,    /* 512 characters */
-	2,  /* 2 bits per pixel */
-	{ 0, 512*8*8 }, /* the two bitplanes are separated */
-	{ 7, 6, 5, 4, 3, 2, 1, 0 },
-	{ 0*8, 1*8, 2*8, 3*8, 4*8, 5*8, 6*8, 7*8 },
-	8*8 /* every char takes 8 consecutive bytes */
-};
-static const gfx_layout spritelayout =
-{
-	16,16,  /* 16*16 sprites */
-	128,    /* 128 sprites */
-	2,  /* 2 bits per pixel */
-	{ 1, 0 },   /* the two bitplanes are packed in two consecutive bits */
-	{ 0, 2, 4, 6, 8, 10, 12, 14,
-			8*16+0, 8*16+2, 8*16+4, 8*16+6, 8*16+8, 8*16+10, 8*16+12, 8*16+14 },
-	{ 23*16, 22*16, 21*16, 20*16, 19*16, 18*16, 17*16, 16*16,
-			7*16, 6*16, 5*16, 4*16, 3*16, 2*16, 1*16, 0*16 },
-	64*8    /* every sprite takes 64 consecutive bytes */
-};
-static const gfx_layout spritelayout2 =
-{
-	8,8,    /* 8*8 sprites */
-	512,    /* 512 sprites */
-	2,  /* 2 bits per pixel */
-	{ 1, 0 },   /* the two bitplanes are packed in two consecutive bits */
-	{ 0, 2, 4, 6, 8, 10, 12, 14 },
-	{ 7*16, 6*16, 5*16, 4*16, 3*16, 2*16, 1*16, 0*16 },
-	16*8    /* every sprite takes 16 consecutive bytes */
-};
-
-static const gfx_layout gridlayout =
-{
-	8,8,    /* 8*8 characters */
-	512,    /* 512 characters */
-	1,  /* 1 bit per pixel */
-	{ 0 },
-	{ 7, 6, 5, 4, 3, 2, 1, 0 },
-	{ 0*8, 1*8, 2*8, 3*8, 4*8, 5*8, 6*8, 7*8},
-	8*8 /* every char takes 8 consecutive bytes */
-};
-
-static const gfx_layout gridlayout2 =
-{
-	8,8,    /* 8*8 characters */
-	512,    /* 512 characters */
-	1,  /* 1 bit per pixel */
-	{ 0 },
-	{ 7, 6, 5, 4, 3, 2, 1, 0 },
-	{ 7*8, 6*8, 5*8, 4*8, 3*8, 2*8, 1*8, 0*8 },
-	8*8 /* every char takes 8 consecutive bytes */
-};
-
-static GFXDECODE_START( sraider )
-	GFXDECODE_ENTRY( "gfx1", 0, charlayout2,             0,  8 )
-	GFXDECODE_ENTRY( "gfx2", 0, spritelayout,          4*8, 16 )
-	GFXDECODE_ENTRY( "gfx2", 0, spritelayout2,         4*8, 16 )
-	GFXDECODE_ENTRY( "gfx3", 0, gridlayout,    4*8+4*16+32,  1 )
-	GFXDECODE_ENTRY( "gfx3", 0, gridlayout2,   4*8+4*16+32,  1 )
-GFXDECODE_END
-
-MACHINE_START_MEMBER(redclash_state,sraider)
-{
-	save_item(NAME(m_grid_color));
-	save_item(NAME(m_sound_low));
-	save_item(NAME(m_sound_high));
-	save_item(NAME(m_sraider_0x30));
-	save_item(NAME(m_sraider_0x38));
-	save_item(NAME(m_weird_value));
-
-	/* for stars */
-	save_item(NAME(m_star_speed));
-	save_item(NAME(m_stars_enable));
-	save_item(NAME(m_stars_speed));
-	save_item(NAME(m_stars_state));
-	save_item(NAME(m_stars_offset));
-	save_item(NAME(m_stars_count));
-}
-
-MACHINE_RESET_MEMBER(redclash_state,sraider)
-{
-	int i;
-
-	m_grid_color = 0;
-	m_sound_low = 0;
-	m_sound_high = 0;
-	m_sraider_0x30 = 0;
-	m_sraider_0x38 = 0;
-
-	/* for stars */
-	m_star_speed = 0;
-	m_stars_enable = 0;
-	m_stars_speed = 0;
-	m_stars_state = 0;
-	m_stars_offset = 0;
-	m_stars_count = 0;
-
-	for (i = 0; i < 8; i++)
-		m_weird_value[i] = 0;
-}
-
-
-MACHINE_START_MEMBER(redclash_state,redclash)
-{
-	save_item(NAME(m_star_speed));
 	save_item(NAME(m_gfxbank));
-	save_item(NAME(m_stars_enable));
-	save_item(NAME(m_stars_speed));
-	save_item(NAME(m_stars_state));
-	save_item(NAME(m_stars_offset));
-	save_item(NAME(m_stars_count));
 }
 
-MACHINE_RESET_MEMBER(redclash_state,redclash)
+void redclash_state::machine_reset()
 {
-	m_star_speed = 0;
 	m_gfxbank = 0;
-	m_stars_enable = 0;
-	m_stars_speed = 0;
-	m_stars_state = 0;
-	m_stars_offset = 0;
-	m_stars_count = 0;
 }
 
 MACHINE_CONFIG_START(redclash_state::zerohour)
@@ -631,9 +348,6 @@ MACHINE_CONFIG_START(redclash_state::zerohour)
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", Z80, 4000000)  /* 4 MHz */
 	MCFG_CPU_PROGRAM_MAP(zerohour_map)
-
-	MCFG_MACHINE_START_OVERRIDE(redclash_state,redclash)
-	MCFG_MACHINE_RESET_OVERRIDE(redclash_state,redclash)
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
@@ -649,7 +363,8 @@ MACHINE_CONFIG_START(redclash_state::zerohour)
 	MCFG_PALETTE_ADD("palette", 4*8+4*16+32)
 	MCFG_PALETTE_INDIRECT_ENTRIES(32+32)
 	MCFG_PALETTE_INIT_OWNER(redclash_state,redclash)
-	MCFG_VIDEO_START_OVERRIDE(redclash_state,redclash)
+
+	MCFG_DEVICE_ADD("stars", ZEROHOUR_STARS, 0)
 
 	/* sound hardware */
 MACHINE_CONFIG_END
@@ -661,9 +376,6 @@ MACHINE_CONFIG_START(redclash_state::redclash)
 	MCFG_CPU_ADD("maincpu", Z80, 4000000)  /* 4 MHz */
 	MCFG_CPU_PROGRAM_MAP(redclash_map)
 
-	MCFG_MACHINE_START_OVERRIDE(redclash_state,redclash)
-	MCFG_MACHINE_RESET_OVERRIDE(redclash_state,redclash)
-
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
 	MCFG_SCREEN_REFRESH_RATE(60)
@@ -678,60 +390,10 @@ MACHINE_CONFIG_START(redclash_state::redclash)
 	MCFG_PALETTE_ADD("palette", 4*8+4*16+32)
 	MCFG_PALETTE_INDIRECT_ENTRIES(32+32)
 	MCFG_PALETTE_INIT_OWNER(redclash_state,redclash)
-	MCFG_VIDEO_START_OVERRIDE(redclash_state,redclash)
+
+	MCFG_DEVICE_ADD("stars", ZEROHOUR_STARS, 0)
 
 	/* sound hardware */
-MACHINE_CONFIG_END
-
-MACHINE_CONFIG_START(redclash_state::sraider)
-
-	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", Z80, 4000000)   /* 4 MHz */
-	MCFG_CPU_PROGRAM_MAP(sraider_cpu1_map)
-	MCFG_CPU_VBLANK_INT_DRIVER("screen", redclash_state,  irq0_line_hold)
-
-	MCFG_CPU_ADD("sub", Z80, 4000000)   /* 4 MHz */
-	MCFG_CPU_PROGRAM_MAP(sraider_cpu2_map)
-	MCFG_CPU_IO_MAP(sraider_cpu2_io_map)
-	MCFG_CPU_VBLANK_INT_DRIVER("screen", redclash_state,  irq0_line_hold)
-
-	MCFG_MACHINE_START_OVERRIDE(redclash_state,sraider)
-	MCFG_MACHINE_RESET_OVERRIDE(redclash_state,sraider)
-
-	/* video hardware */
-	MCFG_SCREEN_ADD("screen", RASTER)
-	MCFG_SCREEN_REFRESH_RATE(60)
-	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500) /* not accurate */)
-	MCFG_SCREEN_SIZE(32*8, 32*8)
-	MCFG_SCREEN_VISIBLE_AREA(1*8, 31*8-1, 4*8, 28*8-1)
-	MCFG_SCREEN_UPDATE_DRIVER(redclash_state, screen_update_sraider)
-	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE(redclash_state, screen_vblank_sraider))
-	MCFG_SCREEN_PALETTE("palette")
-
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", sraider)
-	MCFG_PALETTE_ADD("palette", 4*8+4*16+32+2)
-	MCFG_PALETTE_INDIRECT_ENTRIES(32+32+1)
-	MCFG_PALETTE_INIT_OWNER(redclash_state,sraider)
-
-	MCFG_VIDEO_START_OVERRIDE(redclash_state,sraider)
-
-	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_MONO("mono")
-
-	MCFG_SOUND_ADD("sn1", SN76489, 4000000)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
-
-	MCFG_SOUND_ADD("sn2", SN76489, 4000000)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
-
-	MCFG_SOUND_ADD("sn3", SN76489, 4000000)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
-
-	MCFG_SOUND_ADD("sn4", SN76489, 4000000)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
-
-	MCFG_SOUND_ADD("sn5", SN76489, 4000000)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 MACHINE_CONFIG_END
 
 
@@ -900,46 +562,17 @@ ROM_START( redclashk )
 	ROM_LOAD( "3.11e",        0x0040, 0x0020, CRC(27fa3a50) SHA1(7cf59b7a37c156640d6ea91554d1c4276c1780e0) ) /* 6331.6w */
 ROM_END
 
-ROM_START( sraider )
-	ROM_REGION( 0x10000, "maincpu", 0 )
-	ROM_LOAD( "sraid3.r4",    0x0000, 0x2000, CRC(0f389774) SHA1(c67596e6bf00175ff0a241506cd2f88114d05933) )
-	ROM_LOAD( "sraid2.n4",    0x2000, 0x2000, CRC(38a48db0) SHA1(6f4f384d702fb8ee4bb2ef579638239d57e32ddd) )
-	ROM_LOAD( "sraid1.m4",    0x4000, 0x2000, CRC(2f302a4e) SHA1(3a902ce6858f38df88b60830bef4b1d45b09b2df) )
 
-	ROM_REGION( 0x10000, "sub", 0 )
-	ROM_LOAD( "sraid-s4.h6",  0x0000, 0x2000, CRC(57173a12) SHA1(6cb8fd4826e499f9a4e63621d58bc4b596cc261e) )
-	ROM_LOAD( "sraid-s5.j6",  0x2000, 0x2000, CRC(5a459179) SHA1(a261c8f3c7c4cd4587c003bbbe815d2c4e01ffbc) )
-	ROM_LOAD( "sraid-s6.l6",  0x4000, 0x2000, CRC(ea3aa25d) SHA1(353c0d075d5e0a3bc25a65e2748f5eb5212a844d) )
-
-	ROM_REGION( 0x2000, "gfx1", 0 )
-	ROM_LOAD( "sraid-s0.k6",  0x0000, 0x1000, CRC(a0373909) SHA1(00e3bd5dd90769d670fc3c51edd1cd4b69e6132d) )
-	ROM_LOAD( "sraids11.l6",  0x1000, 0x1000, CRC(ba22d949) SHA1(83762ced1df92ff594887e44d5b783826bbfb0c9) )
-
-	ROM_REGION( 0x2000, "gfx2", 0 )
-	ROM_LOAD( "sraid-s7.m2",  0x0000, 0x1000, CRC(299f8e07) SHA1(1de71f251286088487da7285d6f8070147002af5) )
-	ROM_LOAD( "sraid-s8.n2",  0x1000, 0x1000, CRC(57ba8888) SHA1(2aa1a5f682d146a55a96e471bb78e5c60da02bf9) )
-
-	ROM_REGION( 0x1000, "gfx3", 0 ) /* fixed portion of the grid */
-	ROM_LOAD( "sraid-s9.f6",  0x0000, 0x1000, CRC(2380b90f) SHA1(0310554e3f2ec973c2bb6e816d04e5c0c1e0a0b9) )
-
-	ROM_REGION( 0x0060, "proms", 0 )
-	ROM_LOAD( "srpr10-1.a2",  0x0000, 0x0020, CRC(121fdb99) SHA1(3bc092da40beb129a4df3db2f55d22bbbcf7bad8) )
-	ROM_LOAD( "srpr10-2.l3",  0x0020, 0x0020, CRC(88b67e70) SHA1(e21ee2939e96dffee101bd92c62ed975b6b64001) )
-	ROM_LOAD( "srpr10-3.c1",  0x0040, 0x0020, CRC(27fa3a50) SHA1(7cf59b7a37c156640d6ea91554d1c4276c1780e0) ) /* ?? */
-ROM_END
-
-
-DRIVER_INIT_MEMBER(redclash_state,redclash)
+DRIVER_INIT_MEMBER(redclash_state, redclash)
 {
-	int i,j;
-	const uint8_t *src = memregion("gfx2")->base();
-	uint8_t *dst = memregion("gfx3")->base();
-	int len = memregion("gfx3")->bytes();
+	uint8_t const *const src = memregion("gfx2")->base();
+	uint8_t *const dst = memregion("gfx3")->base();
+	int const len = memregion("gfx3")->bytes();
 
 	/* rearrange the sprite graphics */
-	for (i = 0;i < len;i++)
+	for (int i = 0; i < len; i++)
 	{
-		j = (i & ~0x003e) | ((i & 0x0e) << 2) | ((i & 0x30) >> 3);
+		int const j = (i & ~0x003e) | ((i & 0x0e) << 2) | ((i & 0x30) >> 3);
 		dst[i] = src[j];
 	}
 }
@@ -951,4 +584,3 @@ GAME( 1980, zerohouri, zerohour, zerohour, zerohour, redclash_state, redclash, R
 GAME( 1981, redclash,  0,        redclash, redclash, redclash_state, redclash, ROT270, "Tehkan",                  "Red Clash (set 1)",  MACHINE_NO_SOUND | MACHINE_WRONG_COLORS | MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE )
 GAME( 1981, redclasha, redclash, redclash, redclash, redclash_state, redclash, ROT270, "Tehkan",                  "Red Clash (set 2)",  MACHINE_NO_SOUND | MACHINE_WRONG_COLORS | MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE )
 GAME( 1981, redclashk, redclash, redclash, redclash, redclash_state, redclash, ROT270, "Tehkan (Kaneko license)", "Red Clash (Kaneko)", MACHINE_NO_SOUND | MACHINE_WRONG_COLORS | MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE )
-GAME( 1982, sraider,  0,         sraider,  sraider,  redclash_state, 0,        ROT270, "Universal",               "Space Raider",       MACHINE_SUPPORTS_SAVE )

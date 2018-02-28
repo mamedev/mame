@@ -983,7 +983,8 @@ MACHINE_CONFIG_START(gaelco3d_state::gaelco3d)
 MACHINE_CONFIG_END
 
 
-MACHINE_CONFIG_DERIVED(gaelco3d_state::gaelco3d2, gaelco3d)
+MACHINE_CONFIG_START(gaelco3d_state::gaelco3d2)
+	gaelco3d(config);
 
 	/* basic machine hardware */
 	MCFG_CPU_REPLACE("maincpu", M68EC020, 25000000)
@@ -996,7 +997,8 @@ MACHINE_CONFIG_DERIVED(gaelco3d_state::gaelco3d2, gaelco3d)
 	MCFG_MACHINE_RESET_OVERRIDE(gaelco3d_state,gaelco3d2)
 MACHINE_CONFIG_END
 
-MACHINE_CONFIG_DERIVED(gaelco3d_state::footbpow, gaelco3d2)
+MACHINE_CONFIG_START(gaelco3d_state::footbpow)
+	gaelco3d2(config);
 	MCFG_DEVICE_MODIFY("outlatch")
 	MCFG_ADDRESSABLE_LATCH_Q5_OUT_CB(WRITELINE(gaelco3d_state, fp_analog_clock_w))
 MACHINE_CONFIG_END

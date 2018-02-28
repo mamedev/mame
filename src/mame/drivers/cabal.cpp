@@ -535,7 +535,8 @@ MACHINE_CONFIG_START(cabal_state::cabal)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.40)
 MACHINE_CONFIG_END
 
-MACHINE_CONFIG_DERIVED(cabal_state::cabalt, cabal)
+MACHINE_CONFIG_START(cabal_state::cabalt)
+	cabal(config);
 	MCFG_CPU_MODIFY("maincpu")
 	MCFG_CPU_PROGRAM_MAP(trackball_main_map)
 
@@ -548,7 +549,8 @@ MACHINE_CONFIG_DERIVED(cabal_state::cabalt, cabal)
 	MCFG_UPD4701_PORTY("IN3")
 MACHINE_CONFIG_END
 
-MACHINE_CONFIG_DERIVED(cabal_state::cabalbl2, cabal)
+MACHINE_CONFIG_START(cabal_state::cabalbl2)
+	cabal(config);
 	MCFG_DEVICE_REMOVE("sei80bu")
 
 	MCFG_DEVICE_MODIFY("audiocpu")

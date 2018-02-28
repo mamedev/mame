@@ -331,7 +331,7 @@ address_space *cammu_device::translate_address(const offs_t virtual_address, con
 	// check for page faults
 	if (pte & PTE_F)
 	{
-		if (!machine().side_effect_disabled())
+		if (!machine().side_effects_disabled())
 		{
 			LOG("%s page fault address 0x%08x ssw 0x%08x pte 0x%08x (%s)\n",
 				mode == ACCESS_X ? "instruction" : "data",
@@ -345,7 +345,7 @@ address_space *cammu_device::translate_address(const offs_t virtual_address, con
 	}
 
 	// check for protection level faults
-	if (!machine().side_effect_disabled() && !get_access(mode, pte, ssw))
+	if (!machine().side_effects_disabled() && !get_access(mode, pte, ssw))
 	{
 		LOG("%s protection fault address 0x%08x ssw 0x%08x pte 0x%08x (%s)\n",
 			mode == ACCESS_X ? "execute" : mode == ACCESS_R ? "read" : "write",
@@ -386,7 +386,7 @@ address_space *cammu_device::translate_address(const offs_t virtual_address, con
 		// cache purge
 	case ST_7:
 		// main memory, slave mode
-		if (!machine().side_effect_disabled())
+		if (!machine().side_effects_disabled())
 			fatalerror("%s page table entry system tag %d not supported\n",
 				mode == ACCESS_X ? "instruction" : "data", (pte & PTE_ST) >> 9);
 		break;

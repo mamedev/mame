@@ -52,12 +52,10 @@ DEFINE_DEVICE_TYPE(IREM_M72_AUDIO, m72_audio_device, "m72_audio", "Irem M72 Audi
 m72_audio_device::m72_audio_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
 	: device_t(mconfig, IREM_M72_AUDIO, tag, owner, clock)
 	, device_sound_interface(mconfig, *this)
-	, m_irqvector(0)
 	, m_sample_addr(0)
 	, m_samples(*this, "^samples")
 	, m_samples_size(0)
 	, m_dac(*this, "^dac")
-	, m_soundlatch(*this, "^soundlatch")
 {
 }
 
@@ -68,72 +66,8 @@ m72_audio_device::m72_audio_device(const machine_config &mconfig, const char *ta
 void m72_audio_device::device_start()
 {
 	m_samples_size = m_samples.bytes();
-	m_space = &machine().device("soundcpu")->memory().space(AS_IO);
 
-	save_item(NAME(m_irqvector));
 	save_item(NAME(m_sample_addr));
-}
-
-//-------------------------------------------------
-//  device_reset - device-specific reset
-//-------------------------------------------------
-
-void m72_audio_device::device_reset()
-{
-	m_irqvector = 0xff;
-}
-
-
-/*
-
-  The sound CPU runs in interrup mode 0. IRQ is shared by two sources: the
-  YM2151 (bit 4 of the vector), and the main CPU (bit 5).
-  Since the vector can be changed from different contexts (the YM2151 timer
-  callback, the main CPU context, and the sound CPU context), it's important
-  to accurately arbitrate the changes to avoid out-of-order execution. We do
-  that by handling all vector changes in a single timer callback.
-
-*/
-
-TIMER_CALLBACK_MEMBER( m72_audio_device::setvector_callback )
-{
-	switch(param)
-	{
-		case YM2151_ASSERT:
-			m_irqvector &= 0xef;
-			break;
-
-		case YM2151_CLEAR:
-			m_irqvector |= 0x10;
-			break;
-
-		case Z80_ASSERT:
-			m_irqvector &= 0xdf;
-			break;
-
-		case Z80_CLEAR:
-			m_irqvector |= 0x20;
-			break;
-	}
-
-	machine().device("soundcpu")->execute().set_input_line_and_vector(0, (m_irqvector == 0xff) ? CLEAR_LINE : ASSERT_LINE, m_irqvector);
-}
-
-
-WRITE_LINE_MEMBER(m72_audio_device::ym2151_irq_handler)
-{
-	machine().scheduler().synchronize(timer_expired_delegate(FUNC(m72_audio_device::setvector_callback), this), state ? YM2151_ASSERT : YM2151_CLEAR);
-}
-
-WRITE8_MEMBER( m72_audio_device::sound_command_w )
-{
-	m_soundlatch->write(*m_space, offset, data);
-	machine().scheduler().synchronize(timer_expired_delegate(FUNC(m72_audio_device::setvector_callback), this), Z80_ASSERT);
-}
-
-WRITE8_MEMBER( m72_audio_device::sound_irq_ack_w )
-{
-	machine().scheduler().synchronize(timer_expired_delegate(FUNC(m72_audio_device::setvector_callback), this), Z80_CLEAR);
 }
 
 

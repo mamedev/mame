@@ -286,7 +286,7 @@ TODO:
 
 READ8_MEMBER(snk_state::snk_cpuA_nmi_trigger_r)
 {
-	if(!machine().side_effect_disabled())
+	if(!machine().side_effects_disabled())
 	{
 		m_maincpu->set_input_line(INPUT_LINE_NMI, ASSERT_LINE);
 	}
@@ -300,7 +300,7 @@ WRITE8_MEMBER(snk_state::snk_cpuA_nmi_ack_w)
 
 READ8_MEMBER(snk_state::snk_cpuB_nmi_trigger_r)
 {
-	if(!machine().side_effect_disabled())
+	if(!machine().side_effects_disabled())
 	{
 		m_subcpu->set_input_line(INPUT_LINE_NMI, ASSERT_LINE);
 	}
@@ -3658,7 +3658,8 @@ MACHINE_CONFIG_START(snk_state::marvins)
 MACHINE_CONFIG_END
 
 
-MACHINE_CONFIG_DERIVED(snk_state::vangrd2, marvins)
+MACHINE_CONFIG_START(snk_state::vangrd2)
+	marvins(config);
 
 	/* basic machine hardware */
 	MCFG_CPU_MODIFY("maincpu")
@@ -3669,7 +3670,8 @@ MACHINE_CONFIG_DERIVED(snk_state::vangrd2, marvins)
 MACHINE_CONFIG_END
 
 
-MACHINE_CONFIG_DERIVED(snk_state::madcrush, marvins)
+MACHINE_CONFIG_START(snk_state::madcrush)
+	marvins(config);
 
 	/* basic machine hardware */
 	MCFG_CPU_MODIFY("maincpu")
@@ -3727,7 +3729,8 @@ MACHINE_CONFIG_START(snk_state::jcross)
 MACHINE_CONFIG_END
 
 
-MACHINE_CONFIG_DERIVED(snk_state::sgladiat, jcross)
+MACHINE_CONFIG_START(snk_state::sgladiat)
+	jcross(config);
 
 	/* basic machine hardware */
 	MCFG_CPU_MODIFY("maincpu")
@@ -3744,7 +3747,8 @@ MACHINE_CONFIG_DERIVED(snk_state::sgladiat, jcross)
 MACHINE_CONFIG_END
 
 
-MACHINE_CONFIG_DERIVED(snk_state::hal21, jcross)
+MACHINE_CONFIG_START(snk_state::hal21)
+	jcross(config);
 
 	/* basic machine hardware */
 	MCFG_CPU_MODIFY("maincpu")
@@ -3806,7 +3810,8 @@ MACHINE_CONFIG_START(snk_state::tnk3)
 MACHINE_CONFIG_END
 
 
-MACHINE_CONFIG_DERIVED(snk_state::aso, tnk3)
+MACHINE_CONFIG_START(snk_state::aso)
+	tnk3(config);
 
 	/* basic machine hardware */
 	MCFG_CPU_MODIFY("maincpu")
@@ -3823,7 +3828,8 @@ MACHINE_CONFIG_DERIVED(snk_state::aso, tnk3)
 MACHINE_CONFIG_END
 
 
-MACHINE_CONFIG_DERIVED(snk_state::athena, tnk3)
+MACHINE_CONFIG_START(snk_state::athena)
+	tnk3(config);
 
 	/* basic machine hardware */
 	MCFG_CPU_MODIFY("audiocpu")
@@ -3836,7 +3842,8 @@ MACHINE_CONFIG_DERIVED(snk_state::athena, tnk3)
 MACHINE_CONFIG_END
 
 
-MACHINE_CONFIG_DERIVED(snk_state::fitegolf, tnk3)
+MACHINE_CONFIG_START(snk_state::fitegolf)
+	tnk3(config);
 
 	/* basic machine hardware */
 	MCFG_CPU_MODIFY("audiocpu")
@@ -3849,7 +3856,8 @@ MACHINE_CONFIG_DERIVED(snk_state::fitegolf, tnk3)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 2.0)
 MACHINE_CONFIG_END
 
-MACHINE_CONFIG_DERIVED(snk_state::fitegolf2, fitegolf)
+MACHINE_CONFIG_START(snk_state::fitegolf2)
+	fitegolf(config);
 	MCFG_SCREEN_MODIFY("screen")
 	MCFG_SCREEN_UPDATE_DRIVER(snk_state, screen_update_fitegolf2)
 MACHINE_CONFIG_END
@@ -3901,7 +3909,8 @@ MACHINE_CONFIG_START(snk_state::ikari)
 MACHINE_CONFIG_END
 
 
-MACHINE_CONFIG_DERIVED(snk_state::victroad, ikari)
+MACHINE_CONFIG_START(snk_state::victroad)
+	ikari(config);
 
 	/* basic machine hardware */
 	MCFG_CPU_MODIFY("audiocpu")
@@ -3958,14 +3967,16 @@ MACHINE_CONFIG_START(snk_state::bermudat)
 MACHINE_CONFIG_END
 
 
-MACHINE_CONFIG_DERIVED(snk_state::psychos, bermudat)
+MACHINE_CONFIG_START(snk_state::psychos)
+	bermudat(config);
 
 	/* video hardware */
 	MCFG_VIDEO_START_OVERRIDE(snk_state,psychos)
 MACHINE_CONFIG_END
 
 
-MACHINE_CONFIG_DERIVED(snk_state::gwar, bermudat)
+MACHINE_CONFIG_START(snk_state::gwar)
+	bermudat(config);
 
 	/* basic machine hardware */
 	MCFG_CPU_MODIFY("maincpu")
@@ -3977,7 +3988,8 @@ MACHINE_CONFIG_DERIVED(snk_state::gwar, bermudat)
 MACHINE_CONFIG_END
 
 
-MACHINE_CONFIG_DERIVED(snk_state::gwara, bermudat)
+MACHINE_CONFIG_START(snk_state::gwara)
+	bermudat(config);
 
 	/* basic machine hardware */
 	MCFG_CPU_MODIFY("maincpu")
@@ -3988,7 +4000,8 @@ MACHINE_CONFIG_DERIVED(snk_state::gwara, bermudat)
 MACHINE_CONFIG_END
 
 
-MACHINE_CONFIG_DERIVED(snk_state::chopper1, bermudat)
+MACHINE_CONFIG_START(snk_state::chopper1)
+	bermudat(config);
 
 	/* basic machine hardware */
 	MCFG_CPU_MODIFY("sub")
@@ -4004,7 +4017,8 @@ MACHINE_CONFIG_DERIVED(snk_state::chopper1, bermudat)
 MACHINE_CONFIG_END
 
 
-MACHINE_CONFIG_DERIVED(snk_state::choppera, chopper1)
+MACHINE_CONFIG_START(snk_state::choppera)
+	chopper1(config);
 
 	/* basic machine hardware */
 	MCFG_CPU_MODIFY("maincpu")
@@ -4058,7 +4072,8 @@ MACHINE_CONFIG_START(snk_state::tdfever)
 MACHINE_CONFIG_END
 
 
-MACHINE_CONFIG_DERIVED(snk_state::tdfever2, tdfever)
+MACHINE_CONFIG_START(snk_state::tdfever2)
+	tdfever(config);
 
 	/* basic machine hardware */
 	MCFG_CPU_MODIFY("audiocpu")

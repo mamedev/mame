@@ -5,6 +5,10 @@
     Atari Skydiver hardware
 
 *************************************************************************/
+#ifndef MAME_INCLUDES_SKYDIVER_H
+#define MAME_INCLUDES_SKYDIVER_H
+
+#pragma once
 
 #include "machine/74259.h"
 #include "machine/watchdog.h"
@@ -26,29 +30,20 @@
 class skydiver_state : public driver_device
 {
 public:
-	skydiver_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag),
+	skydiver_state(const machine_config &mconfig, device_type type, const char *tag) :
+		driver_device(mconfig, type, tag),
 		m_maincpu(*this, "maincpu"),
 		m_watchdog(*this, "watchdog"),
 		m_latch3(*this, "latch3"),
 		m_discrete(*this, "discrete"),
 		m_gfxdecode(*this, "gfxdecode"),
 		m_palette(*this, "palette"),
-		m_videoram(*this, "videoram") { }
+		m_videoram(*this, "videoram")
+	{ }
 
-	required_device<cpu_device> m_maincpu;
-	required_device<watchdog_timer_device> m_watchdog;
-	required_device<f9334_device> m_latch3;
-	required_device<discrete_device> m_discrete;
-	required_device<gfxdecode_device> m_gfxdecode;
-	required_device<palette_device> m_palette;
+	void skydiver(machine_config &config);
 
-	required_shared_ptr<uint8_t> m_videoram;
-
-	int m_nmion;
-	tilemap_t *m_bg_tilemap;
-	int m_width;
-
+protected:
 	DECLARE_WRITE_LINE_MEMBER(nmion_w);
 	DECLARE_WRITE8_MEMBER(videoram_w);
 	DECLARE_READ8_MEMBER(wram_r);
@@ -77,9 +72,24 @@ public:
 	void draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprect);
 
 	INTERRUPT_GEN_MEMBER(interrupt);
-	void skydiver(machine_config &config);
 	void skydiver_map(address_map &map);
+
+private:
+	required_device<cpu_device> m_maincpu;
+	required_device<watchdog_timer_device> m_watchdog;
+	required_device<f9334_device> m_latch3;
+	required_device<discrete_device> m_discrete;
+	required_device<gfxdecode_device> m_gfxdecode;
+	required_device<palette_device> m_palette;
+
+	required_shared_ptr<uint8_t> m_videoram;
+
+	int m_nmion;
+	tilemap_t *m_bg_tilemap;
+	int m_width;
 };
 
 /*----------- defined in audio/skydiver.c -----------*/
 DISCRETE_SOUND_EXTERN( skydiver );
+
+#endif // MAME_INCLUDES_SKYDIVER_H

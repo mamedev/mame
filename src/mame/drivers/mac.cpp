@@ -964,7 +964,8 @@ MACHINE_CONFIG_START(mac_state::mac512ke)
 	MCFG_RAM_DEFAULT_SIZE("512K")
 MACHINE_CONFIG_END
 
-MACHINE_CONFIG_DERIVED(mac_state::macplus, mac512ke)
+MACHINE_CONFIG_START(mac_state::macplus)
+	mac512ke(config);
 	MCFG_CPU_MODIFY( "maincpu" )
 	MCFG_CPU_PROGRAM_MAP(macplus_map)
 
@@ -988,7 +989,8 @@ MACHINE_CONFIG_DERIVED(mac_state::macplus, mac512ke)
 	MCFG_SOFTWARE_LIST_ADD("hdd_list", "mac_hdd")
 MACHINE_CONFIG_END
 
-MACHINE_CONFIG_DERIVED(mac_state::macse, macplus)
+MACHINE_CONFIG_START(mac_state::macse)
+	macplus(config);
 	MCFG_CPU_MODIFY("maincpu")
 	MCFG_CPU_PROGRAM_MAP(macse_map)
 
@@ -1012,7 +1014,8 @@ MACHINE_CONFIG_DERIVED(mac_state::macse, macplus)
 	MCFG_MACPDS_SLOT_ADD("sepds", "pds", mac_sepds_cards, nullptr)
 MACHINE_CONFIG_END
 
-MACHINE_CONFIG_DERIVED(mac_state::macclasc, macplus)
+MACHINE_CONFIG_START(mac_state::macclasc)
+	macplus(config);
 	MCFG_CPU_MODIFY("maincpu")
 	MCFG_CPU_PROGRAM_MAP(macse_map)
 
@@ -1166,7 +1169,8 @@ MACHINE_CONFIG_START(mac_state::macii)
 	MCFG_SOFTWARE_LIST_ADD("hdd_list", "mac_hdd")
 MACHINE_CONFIG_END
 
-MACHINE_CONFIG_DERIVED(mac_state::maciihmu, macii)
+MACHINE_CONFIG_START(mac_state::maciihmu)
+	macii(config);
 	MCFG_CPU_REPLACE("maincpu", M68020HMMU, C15M)
 	MCFG_CPU_PROGRAM_MAP(macii_map)
 	MCFG_CPU_DISASSEMBLE_OVERRIDE(mac_state, mac_dasm_override)
@@ -1234,7 +1238,8 @@ MACHINE_CONFIG_START(mac_state::maciifx)
 	MCFG_SOFTWARE_LIST_ADD("hdd_list", "mac_hdd")
 MACHINE_CONFIG_END
 
-MACHINE_CONFIG_DERIVED(mac_state::maclc, macii)
+MACHINE_CONFIG_START(mac_state::maclc)
+	macii(config);
 
 	MCFG_CPU_REPLACE("maincpu", M68020HMMU, C15M)
 	MCFG_CPU_PROGRAM_MAP(maclc_map)
@@ -1291,7 +1296,8 @@ MACHINE_CONFIG_DERIVED(mac_state::maclc, macii)
 	MCFG_QUANTUM_PERFECT_CPU("maincpu")
 MACHINE_CONFIG_END
 
-MACHINE_CONFIG_DERIVED(mac_state::maclc2, maclc)
+MACHINE_CONFIG_START(mac_state::maclc2)
+	maclc(config);
 
 	MCFG_CPU_REPLACE("maincpu", M68030, C15M)
 	MCFG_CPU_PROGRAM_MAP(maclc_map)
@@ -1303,7 +1309,8 @@ MACHINE_CONFIG_DERIVED(mac_state::maclc2, maclc)
 	MCFG_RAM_EXTRA_OPTIONS("6M,8M,10M")
 MACHINE_CONFIG_END
 
-MACHINE_CONFIG_DERIVED(mac_state::maccclas, maclc2)
+MACHINE_CONFIG_START(mac_state::maccclas)
+	maclc2(config);
 
 	MCFG_EGRET_REMOVE()
 	MCFG_CUDA_ADD(CUDA_341S0788)    // should be 0417, but that version won't sync up properly with the '030 right now
@@ -1316,7 +1323,8 @@ MACHINE_CONFIG_DERIVED(mac_state::maccclas, maclc2)
 	MCFG_VIA6522_WRITEPB_HANDLER(WRITE8(mac_state,mac_via_out_b_cdadb))
 MACHINE_CONFIG_END
 
-MACHINE_CONFIG_DERIVED(mac_state::maclc3, maclc)
+MACHINE_CONFIG_START(mac_state::maclc3)
+	maclc(config);
 
 	MCFG_CPU_REPLACE("maincpu", M68030, 25000000)
 	MCFG_CPU_PROGRAM_MAP(maclc3_map)
@@ -1344,7 +1352,8 @@ MACHINE_CONFIG_DERIVED(mac_state::maclc3, maclc)
 	MCFG_EGRET_VIA_DATA_CALLBACK(DEVWRITELINE("via6522_0", via6522_device, write_cb2))
 MACHINE_CONFIG_END
 
-MACHINE_CONFIG_DERIVED(mac_state::maclc520, maclc3)
+MACHINE_CONFIG_START(mac_state::maclc520)
+	maclc3(config);
 
 	MCFG_EGRET_REMOVE()
 	MCFG_CUDA_ADD(CUDA_341S0060)
@@ -1357,7 +1366,8 @@ MACHINE_CONFIG_DERIVED(mac_state::maclc520, maclc3)
 	MCFG_VIA6522_WRITEPB_HANDLER(WRITE8(mac_state,mac_via_out_b_cdadb))
 MACHINE_CONFIG_END
 
-MACHINE_CONFIG_DERIVED(mac_state::maciivx, maclc)
+MACHINE_CONFIG_START(mac_state::maciivx)
+	maclc(config);
 
 	MCFG_CPU_REPLACE("maincpu", M68030, C32M)
 	MCFG_CPU_PROGRAM_MAP(maclc3_map)
@@ -1393,7 +1403,8 @@ MACHINE_CONFIG_DERIVED(mac_state::maciivx, maclc)
 	MCFG_EGRET_VIA_DATA_CALLBACK(DEVWRITELINE("via6522_0", via6522_device, write_cb2))
 MACHINE_CONFIG_END
 
-MACHINE_CONFIG_DERIVED(mac_state::maciivi, maclc)
+MACHINE_CONFIG_START(mac_state::maciivi)
+	maclc(config);
 
 	MCFG_CPU_REPLACE("maincpu", M68030, C15M)
 	MCFG_CPU_PROGRAM_MAP(maclc3_map)
@@ -1429,7 +1440,8 @@ MACHINE_CONFIG_DERIVED(mac_state::maciivi, maclc)
 	MCFG_EGRET_VIA_DATA_CALLBACK(DEVWRITELINE("via6522_0", via6522_device, write_cb2))
 MACHINE_CONFIG_END
 
-MACHINE_CONFIG_DERIVED(mac_state::maciix, macii)
+MACHINE_CONFIG_START(mac_state::maciix)
+	macii(config);
 
 	MCFG_CPU_REPLACE("maincpu", M68030, C15M)
 	MCFG_CPU_PROGRAM_MAP(macii_map)
@@ -1440,7 +1452,8 @@ MACHINE_CONFIG_DERIVED(mac_state::maciix, macii)
 	MCFG_RAM_EXTRA_OPTIONS("8M,32M,64M,96M,128M")
 MACHINE_CONFIG_END
 
-MACHINE_CONFIG_DERIVED(mac_state::maciicx, maciix)    // IIcx is a IIx with only slots 9/a/b
+MACHINE_CONFIG_START(mac_state::maciicx)    // IIcx is a IIx with only slots 9/a/b
+	maciix(config);
 	MCFG_NUBUS_SLOT_REMOVE("nbc")
 	MCFG_NUBUS_SLOT_REMOVE("nbd")
 	MCFG_NUBUS_SLOT_REMOVE("nbe")
@@ -1591,7 +1604,8 @@ MACHINE_CONFIG_START(mac_state::macpb140)
 MACHINE_CONFIG_END
 
 // PowerBook 145 = 140 @ 25 MHz (still 2MB RAM - the 145B upped that to 4MB)
-MACHINE_CONFIG_DERIVED(mac_state::macpb145, macpb140)
+MACHINE_CONFIG_START(mac_state::macpb145)
+	macpb140(config);
 	MCFG_CPU_REPLACE("maincpu", M68030, 25000000)
 	MCFG_CPU_PROGRAM_MAP(macpb140_map)
 	MCFG_CPU_DISASSEMBLE_OVERRIDE(mac_state, mac_dasm_override)
@@ -1602,7 +1616,8 @@ MACHINE_CONFIG_DERIVED(mac_state::macpb145, macpb140)
 MACHINE_CONFIG_END
 
 // PowerBook 170 = 140 @ 25 MHz with an active-matrix LCD (140/145/145B were passive)
-MACHINE_CONFIG_DERIVED(mac_state::macpb170, macpb140)
+MACHINE_CONFIG_START(mac_state::macpb170)
+	macpb140(config);
 	MCFG_CPU_REPLACE("maincpu", M68030, 25000000)
 	MCFG_CPU_PROGRAM_MAP(macpb140_map)
 	MCFG_CPU_DISASSEMBLE_OVERRIDE(mac_state, mac_dasm_override)
@@ -1678,7 +1693,8 @@ MACHINE_CONFIG_START(mac_state::macpb160)
 	MCFG_SOFTWARE_LIST_ADD("hdd_list", "mac_hdd")
 MACHINE_CONFIG_END
 
-MACHINE_CONFIG_DERIVED(mac_state::macpb180, macpb160)
+MACHINE_CONFIG_START(mac_state::macpb180)
+	macpb160(config);
 	MCFG_CPU_REPLACE("maincpu", M68030, 33000000)
 	MCFG_CPU_PROGRAM_MAP(macpb160_map)
 	MCFG_CPU_DISASSEMBLE_OVERRIDE(mac_state, mac_dasm_override)
@@ -1688,7 +1704,8 @@ MACHINE_CONFIG_DERIVED(mac_state::macpb180, macpb160)
 	MCFG_RAM_EXTRA_OPTIONS("8M,12M,16M")
 MACHINE_CONFIG_END
 
-MACHINE_CONFIG_DERIVED(mac_state::macpb180c, macpb160)
+MACHINE_CONFIG_START(mac_state::macpb180c)
+	macpb160(config);
 	MCFG_CPU_REPLACE("maincpu", M68030, 33000000)
 	MCFG_CPU_PROGRAM_MAP(macpb165c_map)
 	MCFG_CPU_DISASSEMBLE_OVERRIDE(mac_state, mac_dasm_override)
@@ -1704,7 +1721,8 @@ MACHINE_CONFIG_DERIVED(mac_state::macpb180c, macpb160)
 	MCFG_RAM_EXTRA_OPTIONS("8M,12M,16M")
 MACHINE_CONFIG_END
 
-MACHINE_CONFIG_DERIVED(mac_state::macpd210, macpb160)
+MACHINE_CONFIG_START(mac_state::macpd210)
+	macpb160(config);
 	MCFG_CPU_REPLACE("maincpu", M68030, 25000000)
 	MCFG_CPU_PROGRAM_MAP(macpd210_map)
 	MCFG_CPU_DISASSEMBLE_OVERRIDE(mac_state, mac_dasm_override)
@@ -1714,7 +1732,8 @@ MACHINE_CONFIG_DERIVED(mac_state::macpd210, macpb160)
 	MCFG_RAM_EXTRA_OPTIONS("8M,12M,16M,20M,24M")
 MACHINE_CONFIG_END
 
-MACHINE_CONFIG_DERIVED(mac_state::macclas2, maclc)
+MACHINE_CONFIG_START(mac_state::macclas2)
+	maclc(config);
 	MCFG_CPU_REPLACE("maincpu", M68030, C15M)
 	MCFG_CPU_PROGRAM_MAP(maclc_map)
 	MCFG_CPU_VBLANK_INT_DRIVER(MAC_SCREEN_NAME, mac_state,  mac_rbv_vbl)
@@ -1743,7 +1762,8 @@ MACHINE_CONFIG_DERIVED(mac_state::macclas2, maclc)
 	MCFG_EGRET_VIA_DATA_CALLBACK(DEVWRITELINE("via6522_0", via6522_device, write_cb2))
 MACHINE_CONFIG_END
 
-MACHINE_CONFIG_DERIVED(mac_state::maciici, macii)
+MACHINE_CONFIG_START(mac_state::maciici)
+	macii(config);
 
 	MCFG_CPU_REPLACE("maincpu", M68030, 25000000)
 	MCFG_CPU_PROGRAM_MAP(maciici_map)
@@ -1774,7 +1794,8 @@ MACHINE_CONFIG_DERIVED(mac_state::maciici, macii)
 	MCFG_RAM_EXTRA_OPTIONS("4M,8M,16M,32M,48M,64M,128M")
 MACHINE_CONFIG_END
 
-MACHINE_CONFIG_DERIVED(mac_state::maciisi, macii)
+MACHINE_CONFIG_START(mac_state::maciisi)
+	macii(config);
 
 	MCFG_CPU_REPLACE("maincpu", M68030, 20000000)
 	MCFG_CPU_PROGRAM_MAP(maciici_map)
@@ -2346,4 +2367,4 @@ COMP( 1993, maclc3,   0,        0,      maclc3,   maciici, mac_state,  maclc3,  
 COMP( 1993, maciivx,  0,        0,      maciivx,  maciici, mac_state,  maciivx,      "Apple Computer", "Macintosh IIvx", MACHINE_IMPERFECT_SOUND )
 COMP( 1993, maciivi,  maciivx,  0,      maciivi,  maciici, mac_state,  maciivx,      "Apple Computer", "Macintosh IIvi", MACHINE_IMPERFECT_SOUND )
 COMP( 1993, maclc520, 0,        0,      maclc520, maciici, mac_state,  maclc520,     "Apple Computer", "Macintosh LC 520",  MACHINE_NOT_WORKING )
-COMP( 1994, pmac6100, 0,        0,      pwrmac,   macadb,  mac_state,  macpm6100,    "Apple Computer", "Power Macintosh 6100/60",  MACHINE_NOT_WORKING | MACHINE_NO_SOUND )
+COMP( 1994, pmac6100, 0,        0,      pwrmac,   macadb,  mac_state,  macpm6100,    "Apple Computer", "Power Macintosh 6100/60",  MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND )

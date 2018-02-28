@@ -920,17 +920,17 @@ MACHINE_CONFIG_START(expro02_state::expro02)
 	MCFG_PALETTE_INIT_OWNER(expro02_state, expro02)
 
 	MCFG_DEVICE_ADD("view2_0", KANEKO_TMAP, 0)
-	kaneko_view2_tilemap_device::set_gfx_region(*device, 1);
-	kaneko_view2_tilemap_device::set_offset(*device, 0x5b, 0x8, 256, 224);
+	MCFG_KANEKO_TMAP_GFX_REGION(1)
+	MCFG_KANEKO_TMAP_OFFSET(0x5b, 0x8, 256, 224)
 	MCFG_KANEKO_TMAP_GFXDECODE("gfxdecode")
 
 	MCFG_DEVICE_ADD_VU002_SPRITES
-	kaneko16_sprite_device::set_priorities(*device, 8,8,8,8); // above all (not verified)
-	kaneko16_sprite_device::set_offsets(*device, 0, -0x40);
+	MCFG_KANEKO16_SPRITE_PRIORITIES(8,8,8,8) // above all (not verified)
+	MCFG_KANEKO16_SPRITE_OFFSETS(0, -0x40)
 	MCFG_KANEKO16_SPRITE_GFXDECODE("gfxdecode")
 
 	MCFG_DEVICE_ADD("calc1_mcu", KANEKO_HIT, 0)
-	kaneko_hit_device::set_type(*device, 0);
+	MCFG_KANEKO_HIT_TYPE(0)
 
 
 
@@ -948,7 +948,8 @@ MACHINE_CONFIG_START(expro02_state::expro02)
 MACHINE_CONFIG_END
 
 
-MACHINE_CONFIG_DERIVED(expro02_state::comad, expro02)
+MACHINE_CONFIG_START(expro02_state::comad)
+	expro02(config);
 	/* basic machine hardware */
 	MCFG_CPU_MODIFY("maincpu")
 	MCFG_CPU_PROGRAM_MAP(fantasia_map)
@@ -957,27 +958,30 @@ MACHINE_CONFIG_DERIVED(expro02_state::comad, expro02)
 
 	MCFG_DEVICE_MODIFY("view2_0")
 	// these values might not be correct, behavior differs from original boards
-	kaneko_view2_tilemap_device::set_invert_flip(*device, 1);
-	kaneko_view2_tilemap_device::set_offset(*device, -256, -216, 256, 224);
+	MCFG_KANEKO_TMAP_INVERT_FLIP(1)
+	MCFG_KANEKO_TMAP_OFFSET(-256, -216, 256, 224)
 
 	MCFG_WATCHDOG_MODIFY("watchdog")
 	MCFG_WATCHDOG_TIME_INIT(attotime::from_seconds(0))  /* a guess, and certainly wrong */
 MACHINE_CONFIG_END
 
-MACHINE_CONFIG_DERIVED(expro02_state::comad_noview2, comad)
+MACHINE_CONFIG_START(expro02_state::comad_noview2)
+	comad(config);
 	MCFG_DEVICE_REMOVE("view2_0")
 
 	MCFG_GFXDECODE_MODIFY("gfxdecode", expro02_noview2)
 MACHINE_CONFIG_END
 
 
-MACHINE_CONFIG_DERIVED(expro02_state::fantasia, comad_noview2)
+MACHINE_CONFIG_START(expro02_state::fantasia)
+	comad_noview2(config);
 	MCFG_CPU_MODIFY("maincpu")
 	MCFG_CPU_CLOCK(10000000)
 	MCFG_CPU_PROGRAM_MAP(comad_map)
 MACHINE_CONFIG_END
 
-MACHINE_CONFIG_DERIVED(expro02_state::supmodel, comad_noview2)
+MACHINE_CONFIG_START(expro02_state::supmodel)
+	comad_noview2(config);
 	MCFG_CPU_MODIFY("maincpu")
 	MCFG_CPU_PROGRAM_MAP(supmodel_map)
 	MCFG_OKIM6295_REPLACE("oki", 1584000, PIN7_HIGH) // clock frequency & pin 7 not verified
@@ -985,17 +989,20 @@ MACHINE_CONFIG_DERIVED(expro02_state::supmodel, comad_noview2)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 MACHINE_CONFIG_END
 
-MACHINE_CONFIG_DERIVED(expro02_state::smissw, comad_noview2) // 951127 PCB, 12 & 16 clocks
+MACHINE_CONFIG_START(expro02_state::smissw) // 951127 PCB, 12 & 16 clocks
+	comad_noview2(config);
 	MCFG_CPU_MODIFY("maincpu")
 	MCFG_CPU_PROGRAM_MAP(smissw_map)
 MACHINE_CONFIG_END
 
-MACHINE_CONFIG_DERIVED(expro02_state::fantsia2, comad_noview2)
+MACHINE_CONFIG_START(expro02_state::fantsia2)
+	comad_noview2(config);
 	MCFG_CPU_MODIFY("maincpu")
 	MCFG_CPU_PROGRAM_MAP(fantsia2_map)
 MACHINE_CONFIG_END
 
-MACHINE_CONFIG_DERIVED(expro02_state::galhustl, comad_noview2)
+MACHINE_CONFIG_START(expro02_state::galhustl)
+	comad_noview2(config);
 	MCFG_CPU_MODIFY("maincpu")
 	MCFG_CPU_PROGRAM_MAP(galhustl_map)
 	MCFG_OKIM6295_REPLACE("oki", 1056000, PIN7_HIGH) // clock frequency & pin 7 not verified
@@ -1006,7 +1013,8 @@ MACHINE_CONFIG_DERIVED(expro02_state::galhustl, comad_noview2)
 	MCFG_SCREEN_UPDATE_DRIVER(expro02_state, screen_update_zipzap)
 MACHINE_CONFIG_END
 
-MACHINE_CONFIG_DERIVED(expro02_state::zipzap, comad_noview2)
+MACHINE_CONFIG_START(expro02_state::zipzap)
+	comad_noview2(config);
 	/* basic machine hardware */
 	MCFG_CPU_MODIFY("maincpu")
 	MCFG_CPU_PROGRAM_MAP(zipzap_map)

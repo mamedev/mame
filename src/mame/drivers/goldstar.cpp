@@ -8134,11 +8134,13 @@ MACHINE_CONFIG_START(goldstar_state::goldstbl)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 MACHINE_CONFIG_END
 
-MACHINE_CONFIG_DERIVED(goldstar_state::moonlght, goldstbl)
+MACHINE_CONFIG_START(goldstar_state::moonlght)
+	goldstbl(config);
 	MCFG_GFXDECODE_MODIFY("gfxdecode", ml)
 MACHINE_CONFIG_END
 
-MACHINE_CONFIG_DERIVED(goldstar_state::goldfrui, goldstbl)
+MACHINE_CONFIG_START(goldstar_state::goldfrui)
+	goldstbl(config);
 	MCFG_GFXDECODE_MODIFY("gfxdecode", goldfrui)
 MACHINE_CONFIG_END
 
@@ -8329,23 +8331,28 @@ MACHINE_CONFIG_START(cb3_state::ncb3)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
 MACHINE_CONFIG_END
 
-MACHINE_CONFIG_DERIVED(cb3_state::cb3c, ncb3)
+MACHINE_CONFIG_START(cb3_state::cb3c)
+	ncb3(config);
 	MCFG_GFXDECODE_MODIFY("gfxdecode", cb3c)
 MACHINE_CONFIG_END
 
-MACHINE_CONFIG_DERIVED(cb3_state::cb3e, ncb3)
+MACHINE_CONFIG_START(cb3_state::cb3e)
+	ncb3(config);
 	MCFG_GFXDECODE_MODIFY("gfxdecode", cb3e)
 MACHINE_CONFIG_END
 
-MACHINE_CONFIG_DERIVED(cb3_state::chrygld, ncb3)
+MACHINE_CONFIG_START(cb3_state::chrygld)
+	ncb3(config);
 	MCFG_GFXDECODE_MODIFY("gfxdecode", chry10)
 MACHINE_CONFIG_END
 
-MACHINE_CONFIG_DERIVED(cb3_state::cherrys, ncb3)
+MACHINE_CONFIG_START(cb3_state::cherrys)
+	ncb3(config);
 	MCFG_GFXDECODE_MODIFY("gfxdecode", cherrys)
 MACHINE_CONFIG_END
 
-MACHINE_CONFIG_DERIVED(cb3_state::cm97, ncb3)
+MACHINE_CONFIG_START(cb3_state::cm97)
+	ncb3(config);
 	MCFG_GFXDECODE_MODIFY("gfxdecode", cm97)
 MACHINE_CONFIG_END
 
@@ -8441,7 +8448,8 @@ MACHINE_CONFIG_START(cmaster_state::cm)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
 MACHINE_CONFIG_END
 
-MACHINE_CONFIG_DERIVED(cmaster_state::cmasterc, cm)
+MACHINE_CONFIG_START(cmaster_state::cmasterc)
+	cm(config);
 	MCFG_GFXDECODE_MODIFY("gfxdecode", cmasterc)
 MACHINE_CONFIG_END
 
@@ -8605,12 +8613,14 @@ MACHINE_CONFIG_START(wingco_state::bingowng)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
 MACHINE_CONFIG_END
 
-MACHINE_CONFIG_DERIVED(wingco_state::bingownga, bingowng)
+MACHINE_CONFIG_START(wingco_state::bingownga)
+	bingowng(config);
 	MCFG_GFXDECODE_MODIFY("gfxdecode", bingownga)
 MACHINE_CONFIG_END
 
 
-MACHINE_CONFIG_DERIVED(wingco_state::flam7_w4, lucky8)
+MACHINE_CONFIG_START(wingco_state::flam7_w4)
+	lucky8(config);
 	/* basic machine hardware */
 	MCFG_CPU_MODIFY("maincpu")
 	MCFG_CPU_PROGRAM_MAP(flaming7_map)
@@ -8621,7 +8631,8 @@ MACHINE_CONFIG_DERIVED(wingco_state::flam7_w4, lucky8)
 	MCFG_DS2401_ADD("fl7w4_id")
 MACHINE_CONFIG_END
 
-MACHINE_CONFIG_DERIVED(wingco_state::flaming7, lucky8)
+MACHINE_CONFIG_START(wingco_state::flaming7)
+	lucky8(config);
 	/* basic machine hardware */
 	MCFG_CPU_MODIFY("maincpu")
 	MCFG_CPU_PROGRAM_MAP(flaming7_map)
@@ -8635,7 +8646,8 @@ MACHINE_CONFIG_DERIVED(wingco_state::flaming7, lucky8)
 	MCFG_DS2401_ADD("fl7w4_id")
 MACHINE_CONFIG_END
 
-MACHINE_CONFIG_DERIVED(wingco_state::flam7_tw, lucky8)
+MACHINE_CONFIG_START(wingco_state::flam7_tw)
+	lucky8(config);
 	/* basic machine hardware */
 	MCFG_CPU_MODIFY("maincpu")
 	MCFG_CPU_PROGRAM_MAP(flaming7_map)
@@ -8649,7 +8661,8 @@ MACHINE_CONFIG_DERIVED(wingco_state::flam7_tw, lucky8)
 	MCFG_DS2401_ADD("fl7w4_id")
 MACHINE_CONFIG_END
 
-MACHINE_CONFIG_DERIVED(wingco_state::mbstar, lucky8)
+MACHINE_CONFIG_START(wingco_state::mbstar)
+	lucky8(config);
 	/* basic machine hardware */
 	MCFG_CPU_MODIFY("maincpu")
 	MCFG_CPU_PROGRAM_MAP(mbstar_map)
@@ -8919,7 +8932,8 @@ MACHINE_CONFIG_END
 
 
 /* diff with cm machine driver: gfxdecode, OKI, portmap & tilemaps rect size/position */
-MACHINE_CONFIG_DERIVED(cmaster_state::amcoe1a, amcoe1)
+MACHINE_CONFIG_START(cmaster_state::amcoe1a)
+	amcoe1(config);
 
 	/* video hardware */
 	MCFG_SCREEN_MODIFY("screen")
@@ -8970,7 +8984,8 @@ MACHINE_CONFIG_START(cmaster_state::amcoe2)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 2.00) /* analyzed for clips */
 MACHINE_CONFIG_END
 
-MACHINE_CONFIG_DERIVED(cmaster_state::nfm, amcoe2)
+MACHINE_CONFIG_START(cmaster_state::nfm)
+	amcoe2(config);
 
 	/* basic machine hardware */
 	MCFG_CPU_MODIFY("maincpu")

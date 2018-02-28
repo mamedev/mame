@@ -370,7 +370,7 @@ MACHINE_RESET_MEMBER( cdi_state, quizard4 )
 
 READ8_MEMBER( cdi_state::servo_io_r )
 {
-	if (machine().side_effect_disabled())
+	if (machine().side_effects_disabled())
 	{
 		return 0;
 	}
@@ -570,7 +570,7 @@ WRITE8_MEMBER( cdi_state::servo_io_w )
 
 READ8_MEMBER( cdi_state::slave_io_r )
 {
-	if (machine().side_effect_disabled())
+	if (machine().side_effects_disabled())
 	{
 		return 0;
 	}
@@ -925,7 +925,8 @@ MACHINE_CONFIG_START(cdi_state::cdi910)
 MACHINE_CONFIG_END
 
 // CD-i Mono-I, with CD-ROM image device (MESS) and Software List (MESS)
-MACHINE_CONFIG_DERIVED(cdi_state::cdimono1, cdimono1_base)
+MACHINE_CONFIG_START(cdi_state::cdimono1)
+	cdimono1_base(config);
 	MCFG_MACHINE_RESET_OVERRIDE(cdi_state, cdimono1)
 
 	MCFG_CDROM_ADD( "cdrom" )
@@ -934,7 +935,8 @@ MACHINE_CONFIG_DERIVED(cdi_state::cdimono1, cdimono1_base)
 	MCFG_SOFTWARE_LIST_FILTER("cd_list","!DVC")
 MACHINE_CONFIG_END
 
-MACHINE_CONFIG_DERIVED(cdi_state::quizard, cdimono1_base)
+MACHINE_CONFIG_START(cdi_state::quizard)
+	cdimono1_base(config);
 	MCFG_CPU_MODIFY("maincpu")
 	MCFG_CPU_PROGRAM_MAP(cdimono1_mem)
 	MCFG_CPU_VBLANK_INT_DRIVER("screen", cdi_state, mcu_frame)
@@ -946,33 +948,32 @@ READ8_MEMBER( cdi_state::quizard_mcu_p1_r )
 	return machine().rand();
 }
 
-ADDRESS_MAP_START(cdi_state::mcu_io_map)
-	ADDRESS_MAP_UNMAP_HIGH
-	AM_RANGE(MCS51_PORT_P1, MCS51_PORT_P1) AM_READ(quizard_mcu_p1_r)
-ADDRESS_MAP_END
-
-MACHINE_CONFIG_DERIVED(cdi_state::quizard1, quizard)
+MACHINE_CONFIG_START(cdi_state::quizard1)
+	quizard(config);
 	MCFG_MACHINE_RESET_OVERRIDE(cdi_state, quizard1 )
 
 	MCFG_CPU_ADD("mcu", I8751, 8000000)
-	MCFG_CPU_IO_MAP(mcu_io_map)
+	MCFG_MCS51_PORT_P1_IN_CB(READ8(cdi_state, quizard_mcu_p1_r))
 //  MCFG_DEVICE_VBLANK_INT_DRIVER("screen", cdi_state, irq0_line_pulse)
 
 MACHINE_CONFIG_END
 
-MACHINE_CONFIG_DERIVED(cdi_state::quizard2, quizard)
+MACHINE_CONFIG_START(cdi_state::quizard2)
+	quizard(config);
 	MCFG_MACHINE_RESET_OVERRIDE(cdi_state, quizard2 )
 MACHINE_CONFIG_END
 
-MACHINE_CONFIG_DERIVED(cdi_state::quizard3, quizard)
+MACHINE_CONFIG_START(cdi_state::quizard3)
+	quizard(config);
 	MCFG_MACHINE_RESET_OVERRIDE(cdi_state, quizard3 )
 MACHINE_CONFIG_END
 
-MACHINE_CONFIG_DERIVED(cdi_state::quizard4, quizard)
+MACHINE_CONFIG_START(cdi_state::quizard4)
+	quizard(config);
 	MCFG_MACHINE_RESET_OVERRIDE(cdi_state, quizard4 )
 
 	MCFG_CPU_ADD("mcu", I8751, 8000000)
-	MCFG_CPU_IO_MAP(mcu_io_map)
+	MCFG_MCS51_PORT_P1_IN_CB(READ8(cdi_state, quizard_mcu_p1_r))
 //  MCFG_DEVICE_VBLANK_INT_DRIVER("screen", cdi_state, irq0_line_pulse)
 
 MACHINE_CONFIG_END

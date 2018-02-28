@@ -3834,7 +3834,7 @@ MACHINE_CONFIG_START(hp9845_base_state::hp9845_base)
 MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(hp9845b_state::hp9845b)
-	MCFG_FRAGMENT_ADD(hp9845_base)
+	hp9845_base(config);
 	// video hardware
 	MCFG_SCREEN_MODIFY("screen")
 	MCFG_SCREEN_UPDATE_DRIVER(hp9845b_state, screen_update)
@@ -3852,7 +3852,7 @@ MACHINE_CONFIG_START(hp9845b_state::hp9845b)
 MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(hp9845c_state::hp9845c)
-	MCFG_FRAGMENT_ADD(hp9845_base)
+	hp9845_base(config);
 	// video hardware
 	MCFG_SCREEN_MODIFY("screen")
 	MCFG_SCREEN_UPDATE_DRIVER(hp9845c_state, screen_update)
@@ -3866,7 +3866,7 @@ MACHINE_CONFIG_START(hp9845c_state::hp9845c)
 MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(hp9845t_state::hp9845t)
-	MCFG_FRAGMENT_ADD(hp9845_base)
+	hp9845_base(config);
 	// video hardware
 	MCFG_SCREEN_MODIFY("screen")
 	MCFG_SCREEN_UPDATE_DRIVER(hp9845t_state, screen_update)

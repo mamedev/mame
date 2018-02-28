@@ -1014,10 +1014,7 @@ ADDRESS_MAP_END
 //**************************************************************************
 
 ADDRESS_MAP_START(segas16a_state::mcu_io_map)
-	ADDRESS_MAP_UNMAP_HIGH
 	AM_RANGE(0x0000, 0xffff) AM_READWRITE(mcu_io_r, mcu_io_w)
-	AM_RANGE(MCS51_PORT_P1, MCS51_PORT_P1) AM_READNOP AM_WRITE(mcu_control_w)
-	AM_RANGE(MCS51_PORT_P3, MCS51_PORT_P3) AM_READNOP   // read during jb int0
 ADDRESS_MAP_END
 
 
@@ -2025,41 +2022,48 @@ MACHINE_CONFIG_START(segas16a_state::system16a)
 MACHINE_CONFIG_END
 
 
-MACHINE_CONFIG_DERIVED(segas16a_state::system16a_fd1089a, system16a)
+MACHINE_CONFIG_START(segas16a_state::system16a_fd1089a)
+	system16a(config);
 	MCFG_CPU_REPLACE("maincpu", FD1089A, 10000000)
 	MCFG_CPU_PROGRAM_MAP(system16a_map)
 	MCFG_CPU_VBLANK_INT_DRIVER("screen", segas16a_state, irq4_line_hold)
 MACHINE_CONFIG_END
 
-MACHINE_CONFIG_DERIVED(segas16a_state::system16a_fd1089b, system16a)
+MACHINE_CONFIG_START(segas16a_state::system16a_fd1089b)
+	system16a(config);
 	MCFG_CPU_REPLACE("maincpu", FD1089B, 10000000)
 	MCFG_CPU_PROGRAM_MAP(system16a_map)
 	MCFG_CPU_VBLANK_INT_DRIVER("screen", segas16a_state, irq4_line_hold)
 MACHINE_CONFIG_END
 
-MACHINE_CONFIG_DERIVED(segas16a_state::system16a_fd1094, system16a)
+MACHINE_CONFIG_START(segas16a_state::system16a_fd1094)
+	system16a(config);
 	MCFG_CPU_REPLACE("maincpu", FD1094, 10000000)
 	MCFG_CPU_PROGRAM_MAP(system16a_map)
 	MCFG_CPU_OPCODES_MAP(decrypted_opcodes_map)
 	MCFG_CPU_VBLANK_INT_DRIVER("screen", segas16a_state, irq4_line_hold)
 MACHINE_CONFIG_END
 
-MACHINE_CONFIG_DERIVED(segas16a_state::aceattaca_fd1094, system16a_fd1094)
+MACHINE_CONFIG_START(segas16a_state::aceattaca_fd1094)
+	system16a_fd1094(config);
 	MCFG_DEVICE_ADD("cxdio", CXD1095, 0)
 MACHINE_CONFIG_END
 
 
-MACHINE_CONFIG_DERIVED(segas16a_state::system16a_i8751, system16a)
+MACHINE_CONFIG_START(segas16a_state::system16a_i8751)
+	system16a(config);
 	MCFG_CPU_MODIFY("maincpu")
 	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", segas16a_state, i8751_main_cpu_vblank)
 
 	MCFG_CPU_ADD("mcu", I8751, 8000000)
 	MCFG_CPU_IO_MAP(mcu_io_map)
+	MCFG_MCS51_PORT_P1_OUT_CB(WRITE8(segas16a_state, mcu_control_w))
 	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", segas16a_state, mcu_irq_assert)
 MACHINE_CONFIG_END
 
 
-MACHINE_CONFIG_DERIVED(segas16a_state::system16a_no7751, system16a)
+MACHINE_CONFIG_START(segas16a_state::system16a_no7751)
+	system16a(config);
 	MCFG_CPU_MODIFY("soundcpu")
 	MCFG_CPU_IO_MAP(sound_no7751_portmap)
 
@@ -2071,7 +2075,8 @@ MACHINE_CONFIG_DERIVED(segas16a_state::system16a_no7751, system16a)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 1.0)
 MACHINE_CONFIG_END
 
-MACHINE_CONFIG_DERIVED(segas16a_state::system16a_no7751p, system16a_no7751)
+MACHINE_CONFIG_START(segas16a_state::system16a_no7751p)
+	system16a_no7751(config);
 	MCFG_CPU_REPLACE("soundcpu", SEGA_315_5177, 4000000)
 	MCFG_CPU_PROGRAM_MAP(sound_map)
 	MCFG_CPU_IO_MAP(sound_no7751_portmap)
@@ -2080,7 +2085,8 @@ MACHINE_CONFIG_DERIVED(segas16a_state::system16a_no7751p, system16a_no7751)
 MACHINE_CONFIG_END
 
 /*
-static MACHINE_CONFIG_DERIVED( system16a_i8751_no7751, system16a_i8751 )
+static MACHINE_CONFIG_START( system16a_i8751_no7751 )
+    system16a_i8751(config);
     MCFG_DEVICE_REMOVE("n7751")
     MCFG_DEVICE_REMOVE("dac")
     MCFG_DEVICE_REMOVE("vref")
@@ -2090,7 +2096,8 @@ static MACHINE_CONFIG_DERIVED( system16a_i8751_no7751, system16a_i8751 )
 MACHINE_CONFIG_END
 */
 
-MACHINE_CONFIG_DERIVED(segas16a_state::system16a_fd1089a_no7751, system16a_fd1089a)
+MACHINE_CONFIG_START(segas16a_state::system16a_fd1089a_no7751)
+	system16a_fd1089a(config);
 	MCFG_CPU_MODIFY("soundcpu")
 	MCFG_CPU_IO_MAP(sound_no7751_portmap)
 
@@ -2102,7 +2109,8 @@ MACHINE_CONFIG_DERIVED(segas16a_state::system16a_fd1089a_no7751, system16a_fd108
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 1.0)
 MACHINE_CONFIG_END
 
-MACHINE_CONFIG_DERIVED(segas16a_state::system16a_fd1089b_no7751, system16a_fd1089b)
+MACHINE_CONFIG_START(segas16a_state::system16a_fd1089b_no7751)
+	system16a_fd1089b(config);
 	MCFG_CPU_MODIFY("soundcpu")
 	MCFG_CPU_IO_MAP(sound_no7751_portmap)
 
@@ -2114,7 +2122,8 @@ MACHINE_CONFIG_DERIVED(segas16a_state::system16a_fd1089b_no7751, system16a_fd108
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 1.0)
 MACHINE_CONFIG_END
 
-MACHINE_CONFIG_DERIVED(segas16a_state::system16a_fd1094_no7751, system16a_fd1094)
+MACHINE_CONFIG_START(segas16a_state::system16a_fd1094_no7751)
+	system16a_fd1094(config);
 	MCFG_CPU_MODIFY("soundcpu")
 	MCFG_CPU_IO_MAP(sound_no7751_portmap)
 

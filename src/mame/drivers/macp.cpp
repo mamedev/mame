@@ -63,15 +63,17 @@ MACHINE_CONFIG_START(macp_state::macp)
 
 	/* sound hardware */
 	//2x AY8910
-	MCFG_FRAGMENT_ADD( genpin_audio )
+	genpin_audio(config);
 MACHINE_CONFIG_END
 
-MACHINE_CONFIG_DERIVED(macp_state::macp0, macp)
+MACHINE_CONFIG_START(macp_state::macp0)
+	macp(config);
 	MCFG_CPU_MODIFY("maincpu")
 	MCFG_CPU_PROGRAM_MAP(macp0_map)
 MACHINE_CONFIG_END
 
-MACHINE_CONFIG_DERIVED(macp_state::macpmsm, macp)
+MACHINE_CONFIG_START(macp_state::macpmsm)
+	macp(config);
 	// MSM5205
 MACHINE_CONFIG_END
 

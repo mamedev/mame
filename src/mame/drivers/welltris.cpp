@@ -712,7 +712,8 @@ MACHINE_CONFIG_START(welltris_state::welltris)
 	MCFG_SOUND_ROUTE(2, "mono", 0.75)
 MACHINE_CONFIG_END
 
-MACHINE_CONFIG_DERIVED(welltris_state::quiz18k, welltris)
+MACHINE_CONFIG_START(welltris_state::quiz18k)
+	welltris(config);
 
 	/* basic machine hardware */
 

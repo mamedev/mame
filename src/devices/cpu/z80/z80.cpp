@@ -481,7 +481,7 @@ inline uint8_t z80_device::rop()
 	PC++;
 	uint8_t res = m_decrypted_opcodes_direct->read_byte(pc);
 	m_icount -= 2;
-	m_refresh_cb((m_i << 8) | (m_r2 & 0x80) | ((m_r-1) & 0x7f));
+	m_refresh_cb((m_i << 8) | (m_r2 & 0x80) | ((m_r-1) & 0x7f), 0x00, 0xff);
 	m_icount += 2;
 	return res;
 }

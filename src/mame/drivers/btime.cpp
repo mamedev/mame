@@ -1322,7 +1322,8 @@ MACHINE_CONFIG_START(btime_state::btime)
 MACHINE_CONFIG_END
 
 
-MACHINE_CONFIG_DERIVED(btime_state::cookrace, btime)
+MACHINE_CONFIG_START(btime_state::cookrace)
+	btime(config);
 
 	/* basic machine hardware */
 	MCFG_CPU_REPLACE("maincpu", DECO_C10707, HCLK2)
@@ -1339,7 +1340,8 @@ MACHINE_CONFIG_DERIVED(btime_state::cookrace, btime)
 MACHINE_CONFIG_END
 
 
-MACHINE_CONFIG_DERIVED(btime_state::lnc, btime)
+MACHINE_CONFIG_START(btime_state::lnc)
+	btime(config);
 
 	/* basic machine hardware */
 	MCFG_CPU_REPLACE("maincpu", DECO_C10707, HCLK2)
@@ -1359,7 +1361,8 @@ MACHINE_CONFIG_DERIVED(btime_state::lnc, btime)
 MACHINE_CONFIG_END
 
 
-MACHINE_CONFIG_DERIVED(btime_state::wtennis, lnc)
+MACHINE_CONFIG_START(btime_state::wtennis)
+	lnc(config);
 
 	/* basic machine hardware */
 
@@ -1369,7 +1372,8 @@ MACHINE_CONFIG_DERIVED(btime_state::wtennis, lnc)
 MACHINE_CONFIG_END
 
 
-MACHINE_CONFIG_DERIVED(btime_state::mmonkey, wtennis)
+MACHINE_CONFIG_START(btime_state::mmonkey)
+	wtennis(config);
 
 	/* basic machine hardware */
 	MCFG_CPU_MODIFY("maincpu")
@@ -1379,7 +1383,8 @@ MACHINE_CONFIG_DERIVED(btime_state::mmonkey, wtennis)
 	MCFG_MACHINE_RESET_OVERRIDE(btime_state,mmonkey)
 MACHINE_CONFIG_END
 
-MACHINE_CONFIG_DERIVED(btime_state::bnj, btime)
+MACHINE_CONFIG_START(btime_state::bnj)
+	btime(config);
 
 	/* basic machine hardware */
 	MCFG_CPU_REPLACE("maincpu", DECO_C10707, HCLK4)
@@ -1397,7 +1402,8 @@ MACHINE_CONFIG_DERIVED(btime_state::bnj, btime)
 MACHINE_CONFIG_END
 
 
-MACHINE_CONFIG_DERIVED(btime_state::sdtennis, bnj)
+MACHINE_CONFIG_START(btime_state::sdtennis)
+	bnj(config);
 
 	/* basic machine hardware */
 	MCFG_CPU_REPLACE("audiocpu", DECO_C10707, HCLK1/3/2)
@@ -1405,7 +1411,8 @@ MACHINE_CONFIG_DERIVED(btime_state::sdtennis, bnj)
 MACHINE_CONFIG_END
 
 
-MACHINE_CONFIG_DERIVED(btime_state::zoar, btime)
+MACHINE_CONFIG_START(btime_state::zoar)
+	btime(config);
 
 	/* basic machine hardware */
 	MCFG_CPU_MODIFY("maincpu")
@@ -1433,7 +1440,8 @@ MACHINE_CONFIG_DERIVED(btime_state::zoar, btime)
 MACHINE_CONFIG_END
 
 
-MACHINE_CONFIG_DERIVED(btime_state::disco, btime)
+MACHINE_CONFIG_START(btime_state::disco)
+	btime(config);
 
 	/* basic machine hardware */
 	MCFG_CPU_MODIFY("maincpu")
@@ -1459,7 +1467,8 @@ MACHINE_CONFIG_DERIVED(btime_state::disco, btime)
 MACHINE_CONFIG_END
 
 
-MACHINE_CONFIG_DERIVED(btime_state::tisland, btime)
+MACHINE_CONFIG_START(btime_state::tisland)
+	btime(config);
 
 	/* basic machine hardware */
 	MCFG_CPU_MODIFY("maincpu")

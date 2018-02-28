@@ -402,7 +402,8 @@ MACHINE_CONFIG_START(special_state::special)
 	MCFG_SOFTWARE_LIST_ADD("cass_list","special_cass")
 MACHINE_CONFIG_END
 
-MACHINE_CONFIG_DERIVED(special_state::specialp, special)
+MACHINE_CONFIG_START(special_state::specialp)
+	special(config);
 	/* basic machine hardware */
 	MCFG_CPU_MODIFY("maincpu")
 	MCFG_CPU_PROGRAM_MAP(specialp_mem)
@@ -414,7 +415,8 @@ MACHINE_CONFIG_DERIVED(special_state::specialp, special)
 	MCFG_VIDEO_START_OVERRIDE(special_state,specialp)
 MACHINE_CONFIG_END
 
-MACHINE_CONFIG_DERIVED(special_state::specialm, special)
+MACHINE_CONFIG_START(special_state::specialm)
+	special(config);
 	MCFG_DEVICE_REMOVE("ppi8255")
 	MCFG_DEVICE_ADD("ppi8255", I8255, 0)
 	MCFG_I8255_IN_PORTA_CB(READ8(special_state, specialist_8255_porta_r))
@@ -425,7 +427,8 @@ MACHINE_CONFIG_DERIVED(special_state::specialm, special)
 	MCFG_I8255_OUT_PORTC_CB(WRITE8(special_state, specialist_8255_portc_w))
 MACHINE_CONFIG_END
 
-MACHINE_CONFIG_DERIVED(special_state::specimx, special)
+MACHINE_CONFIG_START(special_state::specimx)
+	special(config);
 	MCFG_CPU_MODIFY("maincpu")
 	MCFG_CPU_PROGRAM_MAP(specimx_mem)
 

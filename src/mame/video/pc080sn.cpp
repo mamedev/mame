@@ -74,16 +74,6 @@ pc080sn_device::pc080sn_device(const machine_config &mconfig, const char *tag, d
 }
 
 //-------------------------------------------------
-//  static_set_gfxdecode_tag: Set the tag of the
-//  gfx decoder
-//-------------------------------------------------
-
-void pc080sn_device::static_set_gfxdecode_tag(device_t &device, const char *tag)
-{
-	downcast<pc080sn_device &>(device).m_gfxdecode.set_tag(tag);
-}
-
-//-------------------------------------------------
 //  device_start - device-specific startup
 //-------------------------------------------------
 

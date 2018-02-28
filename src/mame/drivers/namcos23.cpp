@@ -3683,14 +3683,16 @@ MACHINE_CONFIG_START(namcos23_state::s23)
 	MCFG_SOUND_ROUTE(3, "lspeaker", 1.00)
 MACHINE_CONFIG_END
 
-MACHINE_CONFIG_DERIVED(namcos23_state::timecrs2, s23)
+MACHINE_CONFIG_START(namcos23_state::timecrs2)
+	s23(config);
 
 	/* basic machine hardware */
 	MCFG_CPU_MODIFY("iocpu")
 	MCFG_CPU_PROGRAM_MAP( timecrs2iobrdmap )
 MACHINE_CONFIG_END
 
-MACHINE_CONFIG_DERIVED(namcos23_state::gmen, s23)
+MACHINE_CONFIG_START(namcos23_state::gmen)
+	s23(config);
 
 	/* basic machine hardware */
 	MCFG_CPU_MODIFY("maincpu")
@@ -3760,7 +3762,8 @@ MACHINE_CONFIG_START(namcos23_state::ss23)
 	MCFG_SOUND_ROUTE(3, "lspeaker", 1.00)
 MACHINE_CONFIG_END
 
-MACHINE_CONFIG_DERIVED(namcos23_state::timecrs2v4a, ss23)
+MACHINE_CONFIG_START(namcos23_state::timecrs2v4a)
+	ss23(config);
 	/* basic machine hardware */
 	MCFG_CPU_ADD("iocpu", H83334, JVSCLOCK )
 	MCFG_CPU_PROGRAM_MAP( timecrs2iobrdmap )
@@ -3772,7 +3775,8 @@ MACHINE_CONFIG_DERIVED(namcos23_state::timecrs2v4a, ss23)
 	MCFG_H8_SCI_TX_CALLBACK(DEVWRITELINE(":iocpu:sci0", h8_sci_device, rx_w))
 MACHINE_CONFIG_END
 
-MACHINE_CONFIG_DERIVED(namcos23_state::ss23e2, ss23)
+MACHINE_CONFIG_START(namcos23_state::ss23e2)
+	ss23(config);
 
 	/* basic machine hardware */
 	MCFG_CPU_MODIFY("maincpu")
@@ -4311,8 +4315,8 @@ ROM_END
 
 ROM_START( timecrs2v2b )
 	ROM_REGION32_BE( 0x400000, "user1", 0 ) /* 4 megs for main R4650 code */
-	ROM_LOAD16_BYTE( "tss2verb.2", 0x000000, 0x200000, BAD_DUMP CRC(9f56a4df) SHA1(5ecb3cd93726ab6be02762853fd6a45266d6c0bc) )
-	ROM_LOAD16_BYTE( "tss2verb.1", 0x000001, 0x200000, BAD_DUMP CRC(aa147f71) SHA1(e00267d1a8286942c83dc35289ad65bd3cb6d8db) )
+	ROM_LOAD16_BYTE( "tss2verb.2", 0x000000, 0x200000, CRC(fb129049) SHA1(c975ea022b3a2a249a6ab60e2e0358f9dc507775) )
+	ROM_LOAD16_BYTE( "tss2verb.1", 0x000001, 0x200000, CRC(2d6a1d3e) SHA1(2b6bc54427c1ae2fcdb57a33b2b2b00bd2065109) )
 
 	ROM_REGION( 0x80000, "subcpu", 0 )  /* Hitachi H8/3002 MCU code */
 	ROM_LOAD16_WORD_SWAP( "tss1vera.3",   0x000000, 0x080000, CRC(41e41994) SHA1(eabc1a307c329070bfc6486cb68169c94ff8a162) ) /* Flash ROM type 29F400TC - Common code throughout all versions */

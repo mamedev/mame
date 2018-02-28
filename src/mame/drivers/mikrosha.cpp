@@ -30,7 +30,6 @@ class mikrosha_state : public radio86_state
 public:
 	mikrosha_state(const machine_config &mconfig, device_type type, const char *tag)
 		: radio86_state(mconfig, type, tag)
-		, m_cart(*this, "cartslot")
 	{ }
 
 	DECLARE_WRITE_LINE_MEMBER(mikrosha_pit_out2);
@@ -40,8 +39,6 @@ public:
 	void mikrosha(machine_config &config);
 	void mikrosha_io(address_map &map);
 	void mikrosha_mem(address_map &map);
-protected:
-	required_device<generic_slot_device> m_cart;
 };
 
 MACHINE_RESET_MEMBER(mikrosha_state,mikrosha)

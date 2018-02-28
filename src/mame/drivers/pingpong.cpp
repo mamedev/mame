@@ -476,7 +476,8 @@ MACHINE_CONFIG_START(pingpong_state::pingpong)
 MACHINE_CONFIG_END
 
 /* too fast! */
-MACHINE_CONFIG_DERIVED(pingpong_state::merlinmm, pingpong)
+MACHINE_CONFIG_START(pingpong_state::merlinmm)
+	pingpong(config);
 	MCFG_CPU_MODIFY("maincpu")
 	MCFG_CPU_PROGRAM_MAP(merlinmm_map)
 	MCFG_TIMER_MODIFY("scantimer")
