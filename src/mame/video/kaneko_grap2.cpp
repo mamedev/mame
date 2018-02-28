@@ -62,10 +62,10 @@ void kaneko_grap2_device::device_start()
 	save_item(NAME(m_framebuffer_scrollx));
 	save_item(NAME(m_framebuffer_enable));
 	save_item(NAME(m_regs1_i));
+	save_item(NAME(m_brightreg));
 	save_item(NAME(m_framebuffer_bright1));
 	save_item(NAME(m_framebuffer_bright2));
-	save_item(NAME(m_regs1_address_regs[0x0]));
-	save_item(NAME(m_regs1_address_regs[0x1]));
+	save_item(NAME(m_regs1_address_regs));
 }
 
 void kaneko_grap2_device::device_reset()
