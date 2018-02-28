@@ -187,7 +187,7 @@ WRITE16_MEMBER(kaneko_grap2_device::framebuffer1_bgcol_w)
 	set_color_555(0x100, 5, 10, 0, m_framebuffer_bgcol);
 }
 
-uint16_t kaneko_grap2_device::pen_r(int pen)
+uint32_t kaneko_grap2_device::pen_r(int pen)
 {
 	if ((m_brightreg & 0x1000) && (m_framebuffer_bright1 != 0xff))
 	{
