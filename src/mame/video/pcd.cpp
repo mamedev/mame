@@ -133,7 +133,6 @@ ADDRESS_MAP_START(pcx_video_device::pcx_vid_io)
 	AM_RANGE(0xa000, 0xa001) AM_READWRITE(vram_latch_r, vram_latch_w)
 	AM_RANGE(0xa002, 0xa003) AM_READWRITE(term_mcu_r, term_mcu_w)
 	AM_RANGE(0xc000, 0xc7ff) AM_RAM
-	AM_RANGE(MCS51_PORT_P1, MCS51_PORT_P1) AM_WRITE(p1_w)
 ADDRESS_MAP_END
 
 ADDRESS_MAP_START(pcx_video_device::pcx_vram)
@@ -144,7 +143,7 @@ MACHINE_CONFIG_START(pcx_video_device::device_add_mconfig)
 	MCFG_CPU_ADD("graphics", I8031, XTAL(24'000'000)/2)
 	MCFG_CPU_PROGRAM_MAP(pcx_vid_map)
 	MCFG_CPU_IO_MAP(pcx_vid_io)
-
+	MCFG_MCS51_PORT_P1_OUT_CB(WRITE8(pcx_video_device, p1_w))
 	MCFG_MCS51_SERIAL_TX_CB(WRITE8(pcx_video_device, tx_callback))
 	MCFG_MCS51_SERIAL_RX_CB(READ8(pcx_video_device, rx_callback))
 

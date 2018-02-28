@@ -72,8 +72,8 @@ public:
 		, m_lcdc(*this, "hd44780")
 	{ }
 
-	//DECLARE_WRITE8_MEMBER(henry_io_w);
-	DECLARE_READ8_MEMBER(henry_io_r);
+	DECLARE_WRITE8_MEMBER(henry_p1_w);
+	DECLARE_WRITE8_MEMBER(henry_p3_w);
 	DECLARE_DRIVER_INIT(hprot1);
 	DECLARE_PALETTE_INIT(hprot1);
 	HD44780_PIXEL_UPDATE(hprot1_pixel_update);
@@ -135,9 +135,6 @@ ADDRESS_MAP_START(hprot1_state::i80c31_io)
 	AM_RANGE(0xc030,0xc030) AM_MIRROR(0x13cf) AM_DEVREAD("hd44780", hd44780_device, data_read)
 /*TODO: attach the watchdog/brownout reset device:
     AM_RANGE(0xe000,0xe0??) AM_MIRROR(?) AM_DEVREAD("adm965an", adm965an_device, data_read) */
-
-	//AM_RANGE(MCS51_PORT_P0, MCS51_PORT_P3) AM_READWRITE(henry_io_r, henry_io_w)
-	AM_RANGE(MCS51_PORT_P0, MCS51_PORT_P3) AM_READ(henry_io_r)
 ADDRESS_MAP_END
 
 static INPUT_PORTS_START( hprot1 )
@@ -196,80 +193,17 @@ void hprot1_state::machine_reset()
 {
 }
 
-READ8_MEMBER(hprot1_state::henry_io_r)
+WRITE8_MEMBER(hprot1_state::henry_p1_w)
 {
-	switch (offset)
-	{
-		case 0x01:
-		{
-			uint8_t value = ioport("inputs")->read();
-#if LOG_IO_PORTS
-			printf("value:%02X\n", value);
-#endif
-			return value;
-		}
-		default:
-#if LOG_IO_PORTS
-			printf("Unhandled I/O Read at offset 0x%02X (return 0)\n", offset);
-#endif
-			return 0;
-	}
+	if (LOG_IO_PORTS && data != 0xFF && data != 0xEF)
+		logerror("Write to P1: %02X\n", data);
 }
 
-/*
-WRITE8_MEMBER(hprot1_state::henry_io_w)
+WRITE8_MEMBER(hprot1_state::henry_p3_w)
 {
-    static uint8_t p0=0, p1=0, p2=0, p3=0;
-    switch (offset)
-    {
-        case 0x00:
-        {
-            if (data != p0)
-            {
-                p0=data;
-#if LOG_IO_PORTS
-                printf("Write to P0: %02X\n", data);
-#endif
-            }
-            break;
-        }
-        case 0x01:
-        {
-            if (data != p1)
-            {
-                p1=data;
-                if (data != 0xFF && data != 0xEF)
-#if LOG_IO_PORTS
-                printf("Write to P1: %02X\n", data);
-#endif
-            }
-            break;
-        }
-        case 0x02:
-        {
-            if (data != p2)
-            {
-                p2=data;
-#if LOG_IO_PORTS
-                printf("Write to P2: %02X\n", data);
-#endif
-            }
-            break;
-        }
-        case 0x03:
-        {
-            if (data != p3)
-            {
-                p3=data;
-#if LOG_IO_PORTS
-                printf("Write to P3: %02X\n", data);
-#endif
-            }
-            break;
-        }
-    }
+	if (LOG_IO_PORTS)
+		logerror("Write to P3: %02X\n", data);
 }
-*/
 
 PALETTE_INIT_MEMBER(hprot1_state, hprot1)
 {
@@ -310,6 +244,9 @@ MACHINE_CONFIG_START(hprot1_state::hprot1)
 	MCFG_CPU_ADD("maincpu", I80C31, XTAL(10'000'000))
 	MCFG_CPU_PROGRAM_MAP(i80c31_prg)
 	MCFG_CPU_IO_MAP(i80c31_io)
+	MCFG_MCS51_PORT_P1_IN_CB(IOPORT("inputs"))
+	MCFG_MCS51_PORT_P1_OUT_CB(WRITE8(hprot1_state, henry_p1_w))
+	MCFG_MCS51_PORT_P3_OUT_CB(WRITE8(hprot1_state, henry_p3_w))
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", LCD)

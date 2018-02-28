@@ -492,9 +492,6 @@ ADDRESS_MAP_END
 
 ADDRESS_MAP_START(applix_state::keytronic_pc3270_io)
 	AM_RANGE(0x0000, 0xffff) AM_READWRITE(internal_data_read, internal_data_write)
-	AM_RANGE(MCS51_PORT_P1, MCS51_PORT_P1) AM_READWRITE(p1_read, p1_write)
-	AM_RANGE(MCS51_PORT_P2, MCS51_PORT_P2) AM_READWRITE(p2_read, p2_write)
-	AM_RANGE(MCS51_PORT_P3, MCS51_PORT_P3) AM_READWRITE(p3_read, p3_write)
 ADDRESS_MAP_END
 
 // io priorities:
@@ -849,6 +846,12 @@ MACHINE_CONFIG_START(applix_state::applix)
 	MCFG_CPU_ADD("kbdcpu", I8051, 11060250)
 	MCFG_CPU_PROGRAM_MAP(keytronic_pc3270_program)
 	MCFG_CPU_IO_MAP(keytronic_pc3270_io)
+	MCFG_MCS51_PORT_P1_IN_CB(READ8(applix_state, p1_read))
+	MCFG_MCS51_PORT_P1_OUT_CB(WRITE8(applix_state, p1_write))
+	MCFG_MCS51_PORT_P2_IN_CB(READ8(applix_state, p2_read))
+	MCFG_MCS51_PORT_P2_OUT_CB(WRITE8(applix_state, p2_write))
+	MCFG_MCS51_PORT_P3_IN_CB(READ8(applix_state, p3_read))
+	MCFG_MCS51_PORT_P3_OUT_CB(WRITE8(applix_state, p3_write))
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)

@@ -114,9 +114,11 @@ public:
 	DECLARE_WRITE8_MEMBER(oscar_int_w);
 	DECLARE_WRITE8_MEMBER(shackled_int_w);
 	DECLARE_WRITE8_MEMBER(flip_screen_w);
-	DECLARE_READ8_MEMBER(dec8_mcu_from_main_r);
-	DECLARE_WRITE8_MEMBER(dec8_mcu_to_main_w);
-	DECLARE_READ8_MEMBER(srdarwin_mcu_from_main_r);
+	DECLARE_READ8_MEMBER(i8751_port0_r);
+	DECLARE_WRITE8_MEMBER(i8751_port0_w);
+	DECLARE_READ8_MEMBER(i8751_port1_r);
+	DECLARE_WRITE8_MEMBER(i8751_port1_w);
+	DECLARE_WRITE8_MEMBER(gondo_mcu_to_main_w);
 	DECLARE_WRITE8_MEMBER(srdarwin_mcu_to_main_w);
 	DECLARE_WRITE8_MEMBER(dec8_bg_data_w);
 	DECLARE_READ8_MEMBER(dec8_bg_data_r);
@@ -181,7 +183,6 @@ public:
 	void csilver_map(address_map &map);
 	void csilver_s_map(address_map &map);
 	void csilver_sub_map(address_map &map);
-	void dec8_mcu_io_map(address_map &map);
 	void dec8_s_map(address_map &map);
 	void garyoret_map(address_map &map);
 	void gondo_map(address_map &map);
@@ -194,7 +195,6 @@ public:
 	void shackled_map(address_map &map);
 	void shackled_sub_map(address_map &map);
 	void srdarwin_map(address_map &map);
-	void srdarwin_mcu_io_map(address_map &map);
 	void ym3526_s_map(address_map &map);
 protected:
 	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr) override;

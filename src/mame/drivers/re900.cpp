@@ -258,9 +258,6 @@ ADDRESS_MAP_START(re900_state::mem_io)
 	AM_RANGE(0xe001, 0xe001) AM_DEVWRITE("tms9128", tms9928a_device, register_write)
 	AM_RANGE(0xe800, 0xe801) AM_DEVWRITE("ay_re900", ay8910_device, address_data_w)
 	AM_RANGE(0xe802, 0xe802) AM_DEVREAD("ay_re900", ay8910_device, data_r)
-	AM_RANGE(MCS51_PORT_P0, MCS51_PORT_P0) AM_WRITE(cpu_port_0_w)
-	AM_RANGE(MCS51_PORT_P2, MCS51_PORT_P2) AM_NOP
-	AM_RANGE(MCS51_PORT_P3, MCS51_PORT_P3) AM_NOP
 ADDRESS_MAP_END
 
 
@@ -387,6 +384,7 @@ MACHINE_CONFIG_START(re900_state::re900)
 	MCFG_CPU_ADD("maincpu", I8051, MAIN_CLOCK)
 	MCFG_CPU_PROGRAM_MAP(mem_prg)
 	MCFG_CPU_IO_MAP(mem_io)
+	MCFG_MCS51_PORT_P0_OUT_CB(WRITE8(re900_state, cpu_port_0_w))
 
 	/* video hardware */
 	MCFG_DEVICE_ADD( "tms9128", TMS9128, XTAL(10'738'635) / 2 )   /* TMS9128NL on the board */

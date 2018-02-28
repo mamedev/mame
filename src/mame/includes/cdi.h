@@ -135,7 +135,6 @@ public:
 	void cdimono2_mem(address_map &map);
 	void cdimono2_servo_mem(address_map &map);
 	void cdimono2_slave_mem(address_map &map);
-	void mcu_io_map(address_map &map);
 };
 
 /*----------- debug defines -----------*/

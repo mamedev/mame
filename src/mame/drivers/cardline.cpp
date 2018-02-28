@@ -233,8 +233,6 @@ ADDRESS_MAP_START(cardline_state::mem_io)
 	AM_RANGE(0x3003, 0x3003) AM_WRITE(a3003_w)
 	AM_RANGE(0xc000, 0xdfff) AM_WRITE(vram_w) AM_SHARE("videoram")
 	AM_RANGE(0xe000, 0xffff) AM_WRITE(attr_w) AM_SHARE("colorram")
-	/* Ports */
-	AM_RANGE(MCS51_PORT_P1, MCS51_PORT_P1) AM_READWRITE(hsync_r, video_w)
 ADDRESS_MAP_END
 
 
@@ -323,6 +321,8 @@ MACHINE_CONFIG_START(cardline_state::cardline)
 	MCFG_MCS51_PORT1_CONFIG(0x10)
 	MCFG_CPU_PROGRAM_MAP(mem_prg)
 	MCFG_CPU_IO_MAP(mem_io)
+	MCFG_MCS51_PORT_P1_IN_CB(READ8(cardline_state, hsync_r))
+	MCFG_MCS51_PORT_P1_OUT_CB(WRITE8(cardline_state, video_w))
 	//MCFG_CPU_VBLANK_INT_DRIVER("screen", cardline_state,  irq1_line_hold)
 
 	/* video hardware */

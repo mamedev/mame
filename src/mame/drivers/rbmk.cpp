@@ -240,8 +240,6 @@ WRITE8_MEMBER(rbmk_state::mcu_io_mux_w)
 
 ADDRESS_MAP_START(rbmk_state::mcu_io)
 	AM_RANGE(0x0ff00, 0x0ffff) AM_READWRITE(mcu_io_r, mcu_io_w )
-
-	AM_RANGE(MCS51_PORT_P3, MCS51_PORT_P3) AM_WRITE(mcu_io_mux_w )
 ADDRESS_MAP_END
 
 static INPUT_PORTS_START( rbmk )
@@ -572,6 +570,7 @@ MACHINE_CONFIG_START(rbmk_state::rbmk)
 	MCFG_CPU_ADD("mcu", AT89C4051, 22000000 / 4) // frequency isn't right
 	MCFG_CPU_PROGRAM_MAP(mcu_mem)
 	MCFG_CPU_IO_MAP(mcu_io)
+	MCFG_MCS51_PORT_P3_OUT_CB(WRITE8(rbmk_state, mcu_io_mux_w))
 	MCFG_CPU_VBLANK_INT_DRIVER("screen", rbmk_state,  mcu_irq)
 
 	MCFG_GFXDECODE_ADD("gfxdecode", "palette", rbmk)

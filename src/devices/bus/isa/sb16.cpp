@@ -401,8 +401,6 @@ ADDRESS_MAP_START(sb16_lle_device::sb16_io)
 //  AM_RANGE(0x0080, 0x0080) // ASP comms
 //  AM_RANGE(0x0081, 0x0081)
 //  AM_RANGE(0x0082, 0x0082)
-	AM_RANGE(MCS51_PORT_P1, MCS51_PORT_P1) AM_READWRITE(p1_r, p1_w)
-	AM_RANGE(MCS51_PORT_P2, MCS51_PORT_P2) AM_READWRITE(p2_r, p2_w)
 ADDRESS_MAP_END
 
 const tiny_rom_entry *sb16_lle_device::device_rom_region() const
@@ -413,6 +411,10 @@ const tiny_rom_entry *sb16_lle_device::device_rom_region() const
 MACHINE_CONFIG_START(sb16_lle_device::device_add_mconfig)
 	MCFG_CPU_ADD("sb16_cpu", I80C52, XTAL(24'000'000))
 	MCFG_CPU_IO_MAP(sb16_io)
+	MCFG_MCS51_PORT_P1_IN_CB(READ8(sb16_lle_device, p1_r))
+	MCFG_MCS51_PORT_P1_OUT_CB(WRITE8(sb16_lle_device, p1_w))
+	MCFG_MCS51_PORT_P2_IN_CB(READ8(sb16_lle_device, p2_r))
+	MCFG_MCS51_PORT_P2_OUT_CB(WRITE8(sb16_lle_device, p2_w))
 
 	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
 	MCFG_SOUND_ADD("ymf262", YMF262, XTAL(14'318'181))

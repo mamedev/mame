@@ -1018,19 +1018,8 @@ ADDRESS_MAP_START(superqix_state::sqix_port_map)
 	//AM_RANGE(0xf970, 0xfa6f) AM_RAM // this is probably a portion of the remainder of the chips at 9L and 9M which isn't used or tested for graphics ram
 ADDRESS_MAP_END
 
-
-/* I8751 memory handlers */
-
-ADDRESS_MAP_START(superqix_state::sqix_8031_mcu_io_map)
-	AM_RANGE(MCS51_PORT_P1, MCS51_PORT_P1) AM_WRITE(bootleg_mcu_port1_w)
-	AM_RANGE(MCS51_PORT_P3, MCS51_PORT_P3) AM_READWRITE(bootleg_mcu_port3_r, bootleg_mcu_port3_w)
-ADDRESS_MAP_END
-
-ADDRESS_MAP_START(superqix_state::sqix_mcu_io_map)
-	AM_RANGE(MCS51_PORT_P0, MCS51_PORT_P0) AM_READ_PORT("SYSTEM")
-	AM_RANGE(MCS51_PORT_P1, MCS51_PORT_P1) AM_READ_PORT("DSW1")
-	AM_RANGE(MCS51_PORT_P2, MCS51_PORT_P2) AM_WRITE(mcu_port2_w)
-	AM_RANGE(MCS51_PORT_P3, MCS51_PORT_P3) AM_READWRITE(mcu_port3_r, mcu_port3_w)
+ADDRESS_MAP_START(superqix_state::sqix_8031_map)
+	AM_RANGE(0x0000, 0x0fff) AM_ROM AM_REGION("mcu", 0) // external program ROM
 ADDRESS_MAP_END
 
 
@@ -1409,7 +1398,11 @@ MACHINE_CONFIG_START(superqix_state::sqix)
 	MCFG_CPU_PERIODIC_INT_DRIVER(superqix_state, sqix_timer_irq,  4*60) /* ??? */
 
 	MCFG_CPU_ADD("mcu", I8751, XTAL(12'000'000)/2) /* i8751-88, 12 MHz / 2 (6 MHz), verified from pcb tracing */
-	MCFG_CPU_IO_MAP(sqix_mcu_io_map)
+	MCFG_MCS51_PORT_P0_IN_CB(IOPORT("SYSTEM"))
+	MCFG_MCS51_PORT_P1_IN_CB(IOPORT("DSW1"))
+	MCFG_MCS51_PORT_P2_OUT_CB(WRITE8(superqix_state, mcu_port2_w))
+	MCFG_MCS51_PORT_P3_IN_CB(READ8(superqix_state, mcu_port3_r))
+	MCFG_MCS51_PORT_P3_OUT_CB(WRITE8(superqix_state, mcu_port3_w))
 
 	MCFG_MACHINE_START_OVERRIDE(superqix_state,superqix)
 
@@ -1448,8 +1441,11 @@ MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(superqix_state::sqix_8031)
 	sqix(config);
-	MCFG_CPU_MODIFY("mcu") /* p8031ah, clock not verified */
-	MCFG_CPU_IO_MAP(sqix_8031_mcu_io_map)
+	MCFG_CPU_REPLACE("mcu", I8031, XTAL(12'000'000)/2) /* p8031ah, clock not verified */
+	MCFG_CPU_PROGRAM_MAP(sqix_8031_map)
+	MCFG_MCS51_PORT_P1_OUT_CB(WRITE8(superqix_state, bootleg_mcu_port1_w))
+	MCFG_MCS51_PORT_P3_IN_CB(READ8(superqix_state, bootleg_mcu_port3_r))
+	MCFG_MCS51_PORT_P3_OUT_CB(WRITE8(superqix_state, bootleg_mcu_port3_w))
 MACHINE_CONFIG_END
 
 
@@ -1623,7 +1619,7 @@ ROM_START( sqixb1 ) // formerly 'sqixa'
 	ROM_LOAD( "sq01.97",       0x00000, 0x08000, CRC(0888b7de) SHA1(de3e4637436de185f43d2ad4186d4cfdcd4d33d9) ) // == b03__01.ef3
 	ROM_LOAD( "b03__02.h3",     0x10000, 0x10000, CRC(9c23cb64) SHA1(7e04cb18cabdc0031621162cbc228cd95875a022) ) // actual label is something different on the bootleg
 
-	ROM_REGION( 0x10000, "mcu", 0 ) /* I8031 code */
+	ROM_REGION( 0x01000, "mcu", 0 ) /* I8031 code */
 	ROM_LOAD( "sq07.ic108",     0x00000, 0x1000, CRC(d11411fb) SHA1(31183f433596c4d2503c01f6dc8d91024f2cf5de) ) // actual label is something different on the bootleg
 
 	ROM_REGION( 0x08000, "gfx1", 0 )
