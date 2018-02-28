@@ -1586,7 +1586,7 @@ MACHINE_CONFIG_START(bigfghtr_state::bigfghtr)
 	MCFG_CPU_ADD("mcu", I8751, XTAL(16'000'000)/2)   // verified
 	MCFG_CPU_PROGRAM_MAP(bigfghtr_mcu_map)
 	MCFG_CPU_IO_MAP(bigfghtr_mcu_io_map)
-	MCFG_MCS51_PORT_P1_IN_CB(NOOP) // bit 5: bus contention related?
+	MCFG_MCS51_PORT_P1_IN_CB(CONSTANT(0xdf)) // bit 5: bus contention related?
 
 	MCFG_MACHINE_START_OVERRIDE(armedf_state,armedf)
 	MCFG_MACHINE_RESET_OVERRIDE(armedf_state,armedf)
