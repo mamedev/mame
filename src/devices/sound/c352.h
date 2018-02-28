@@ -105,6 +105,8 @@ private:
 	int m_divider;
 
 	c352_voice_t m_c352_v[32];
+	
+	int16_t m_mulawtab[256];
 
 	uint16_t m_random;
 	uint16_t m_control; // control flags, purpose unknown.
