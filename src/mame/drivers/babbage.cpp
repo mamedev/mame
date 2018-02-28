@@ -4,7 +4,7 @@
 
     Babbage-2nd skeleton driver (19/OCT/2011)
 
-    http://homepage3.nifty.com/takeda-toshiya/babbage/index.html
+    http://takeda-toshiya.my.coocan.jp/babbage/index.html
 
     Pasting:
         0-F : as is
@@ -42,8 +42,11 @@ public:
 		, m_pio_2(*this, "z80pio_2")
 		, m_ctc(*this, "z80ctc")
 		, m_keyboard(*this, "X%u", 0)
-		{ }
+	{ }
 
+	void babbage(machine_config &config);
+
+protected:
 	DECLARE_READ8_MEMBER(pio2_a_r);
 	DECLARE_WRITE8_MEMBER(pio1_b_w);
 	DECLARE_WRITE8_MEMBER(pio2_b_w);
@@ -52,9 +55,9 @@ public:
 	DECLARE_WRITE_LINE_MEMBER(ctc_z2_w);
 	TIMER_DEVICE_CALLBACK_MEMBER(keyboard_callback);
 
-	void babbage(machine_config &config);
 	void babbage_io(address_map &map);
 	void babbage_map(address_map &map);
+
 private:
 	uint8_t m_segment;
 	uint8_t m_key;
@@ -164,15 +167,18 @@ READ8_MEMBER( babbage_state::pio2_a_r )
 WRITE8_MEMBER( babbage_state::pio2_b_w )
 {
 	if (BIT(data, 7))
+	{
 		m_step = false;
-	else
-	if (!m_step)
+	}
+	else if (!m_step)
 	{
 		m_segment = data;
 		m_step = true;
 	}
 	else
+	{
 		output().set_digit_value(data, m_segment);
+	}
 }
 
 static const z80_daisy_config babbage_daisy_chain[] =
