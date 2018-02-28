@@ -149,7 +149,7 @@ WRITE8_MEMBER(minicom_state::i87c52_p1_w)
 			printf(") (        ) (        )\n");
 		}
 #endif
-		if (FALLING_EDGE(m_p[offset], data, 2))
+		if (FALLING_EDGE(m_p[1], data, 2))
 		{
 			m_digit_index--;
 			if (m_digit_index<0) m_digit_index = 19;

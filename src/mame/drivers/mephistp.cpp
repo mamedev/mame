@@ -174,6 +174,7 @@ MACHINE_CONFIG_START(mephisto_pinball_state::mephisto)
 
 	MCFG_CPU_ADD("soundcpu", I8051, XTAL(12'000'000))
 	MCFG_CPU_PROGRAM_MAP(mephisto_8051_map) // EA tied high for external program ROM
+	MCFG_CPU_IO_MAP(mephisto_8051_io)
 	MCFG_MCS51_PORT_P1_IN_CB(READ8(mephisto_pinball_state, ay8910_read))
 	MCFG_MCS51_PORT_P1_OUT_CB(WRITE8(mephisto_pinball_state, ay8910_write))
 	MCFG_MCS51_PORT_P3_OUT_CB(WRITE8(mephisto_pinball_state, t0_t1_w))
