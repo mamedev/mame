@@ -58,7 +58,7 @@ public:
 	DECLARE_READ16_MEMBER(  unk2_r ) { return m_framebuffer_unk2[offset]; }
 	DECLARE_WRITE16_MEMBER( unk2_w ) { COMBINE_DATA(&m_framebuffer_unk2[offset]); }
 
-	uint32_t pen_r(int pen);
+	uint32_t pen_r(uint32_t dst, int pen);
 
 	std::unique_ptr<uint16_t[]> m_framebuffer;
 	std::unique_ptr<uint16_t[]> m_framebuffer_palette;

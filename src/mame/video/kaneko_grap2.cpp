@@ -187,28 +187,24 @@ WRITE16_MEMBER(kaneko_grap2_device::framebuffer1_bgcol_w)
 	set_color_555(0x100, 5, 10, 0, m_framebuffer_bgcol);
 }
 
-uint32_t kaneko_grap2_device::pen_r(int pen)
+uint32_t kaneko_grap2_device::pen_r(uint32_t dst, int pen)
 {
-	if ((m_brightreg & 0x1000) && (m_framebuffer_bright1 != 0xff))
+	int alpha = 0xff;
+	uint32_t pal = m_palette->pens()[pen];
+	if (pen & 0x100)
 	{
-		uint32_t pal = m_palette->pens()[pen];
-		int r,g,b;
-		r = (pal & 0x00ff0000)>>16;
-		g = (pal & 0x0000ff00)>>8;
-		b = (pal & 0x000000ff)>>0;
-
-		r = (r * m_framebuffer_bright1) / 0xff;
-		g = (g * m_framebuffer_bright1) / 0xff;
-		b = (b * m_framebuffer_bright1) / 0xff;
-
-		pal = (r & 0x000000ff)<<16;
-		pal |=(g & 0x000000ff)<<8;
-		pal |=(b & 0x000000ff)<<0;
-
-		return pal;
+		alpha = (m_framebuffer_bgcol & 0x8000) ? m_framebuffer_bright2 : m_framebuffer_bright1;
 	}
 	else
 	{
-		return m_palette->pens()[pen];
+		alpha = (m_framebuffer_palette[pen] & 0x8000) ? m_framebuffer_bright2 : m_framebuffer_bright1;
 	}
+	if (alpha)
+	{
+		if (alpha == 0xff)
+			return pal;
+		else
+			return alpha_blend_r32(dst, pal, alpha);
+	}
+	return dst;
 }

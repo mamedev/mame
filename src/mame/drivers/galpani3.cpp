@@ -118,7 +118,6 @@ public:
 
 	uint32_t screen_update_galpani3(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 	TIMER_DEVICE_CALLBACK_MEMBER(galpani3_vblank);
-	int gp3_is_alpha_pen(int pen);
 	void galpani3(machine_config &config);
 	void galpani3_map(address_map &map);
 };
@@ -159,63 +158,6 @@ void galpani3_state::video_start()
 	save_item(NAME(m_priority_buffer_scrolly));
 	save_pointer(NAME(m_spriteram32.get()), 0x4000/4);
 	save_pointer(NAME(m_spc_regs.get()), 0x40/4);
-}
-
-
-
-int galpani3_state::gp3_is_alpha_pen(int pen)
-{
-	uint16_t dat = 0;
-
-	if (pen<0x4000)
-	{
-		dat = m_paletteram[pen];
-	}
-	else if (pen<0x4100)
-	{
-		if ((m_grap2[0]->m_brightreg & 0x2000) == 0)
-			return 0;
-
-		dat = m_grap2[0]->m_framebuffer_palette[pen&0xff];
-	}
-	else if (pen<0x4200)
-	{
-		if ((m_grap2[1]->m_brightreg & 0x2000) == 0)
-			return 0;
-
-		dat = m_grap2[1]->m_framebuffer_palette[pen&0xff];
-	}
-	else if (pen<0x4300)
-	{
-		if ((m_grap2[2]->m_brightreg & 0x2000) == 0)
-			return 0;
-
-		dat = m_grap2[2]->m_framebuffer_palette[pen&0xff];
-	}
-	else if (pen<0x4301)
-	{
-		if ((m_grap2[0]->m_brightreg & 0x2000) == 0)
-			return 0;
-
-		dat = m_grap2[0]->m_framebuffer_bgcol;
-	}
-	else if (pen<0x4302)
-	{
-		if ((m_grap2[1]->m_brightreg & 0x2000) == 0)
-			return 0;
-
-		dat = m_grap2[1]->m_framebuffer_bgcol;
-	}
-	else if (pen<0x4303)
-	{
-		if ((m_grap2[2]->m_brightreg & 0x2000) == 0)
-			return 0;
-
-		dat = m_grap2[2]->m_framebuffer_bgcol;
-	}
-
-	if (dat&0x8000) return 1;
-	else return 0;
 }
 
 
@@ -262,97 +204,26 @@ uint32_t galpani3_state::screen_update_galpani3(screen_device &screen, bitmap_rg
 				{
 					if (m_grap2[2]->m_framebuffer_enable)
 					{
-						uint16_t pen = dat3+0x4200;
-						uint32_t pal = m_grap2[2]->pen_r(pen & 0xff);
-
-						if (gp3_is_alpha_pen(pen))
-						{
-							int r,g,b;
-							r = (pal & 0x00ff0000)>>16;
-							g = (pal & 0x0000ff00)>>8;
-							b = (pal & 0x000000ff)>>0;
-
-							r = (r * m_grap2[2]->m_framebuffer_bright2) / 0xff;
-							g = (g * m_grap2[2]->m_framebuffer_bright2) / 0xff;
-							b = (b * m_grap2[2]->m_framebuffer_bright2) / 0xff;
-
-							pal = (r & 0x000000ff)<<16;
-							pal |=(g & 0x000000ff)<<8;
-							pal |=(b & 0x000000ff)<<0;
-
-							dst[0] |= pal;
-						}
-						else
-						{
-							dst[0] = pal;
-						}
+						dst[0] = m_grap2[2]->pen_r(dst[0], dat3);
 					}
 
 					if (dat1 && m_grap2[0]->m_framebuffer_enable)
 					{
-						uint16_t pen = dat1+0x4000;
-						uint32_t pal = m_grap2[0]->pen_r(pen & 0xff);
-
-						if (gp3_is_alpha_pen(pen))
-						{
-							int r,g,b;
-							r = (pal & 0x00ff0000)>>16;
-							g = (pal & 0x0000ff00)>>8;
-							b = (pal & 0x000000ff)>>0;
-
-							r = (r * m_grap2[0]->m_framebuffer_bright2) / 0xff;
-							g = (g * m_grap2[0]->m_framebuffer_bright2) / 0xff;
-							b = (b * m_grap2[0]->m_framebuffer_bright2) / 0xff;
-
-							pal = (r & 0x000000ff)<<16;
-							pal |=(g & 0x000000ff)<<8;
-							pal |=(b & 0x000000ff)<<0;
-
-							dst[0] = pal;
-						}
-						else
-						{
-							dst[0] = pal;
-						}
+						dst[0] = m_grap2[0]->pen_r(dst[0], dat1);
 					}
 
 					if (dat2 && m_grap2[1]->m_framebuffer_enable)
 					{
-						uint16_t pen = dat2+0x4100;
-						uint32_t pal = m_grap2[1]->pen_r(pen & 0xff);
-
-						if (gp3_is_alpha_pen(pen))
-						{
-							int r,g,b;
-							r = (pal & 0x00ff0000)>>16;
-							g = (pal & 0x0000ff00)>>8;
-							b = (pal & 0x000000ff)>>0;
-
-							r = (r * m_grap2[1]->m_framebuffer_bright2) / 0xff;
-							g = (g * m_grap2[1]->m_framebuffer_bright2) / 0xff;
-							b = (b * m_grap2[1]->m_framebuffer_bright2) / 0xff;
-
-							pal = (r & 0x000000ff)<<16;
-							pal |=(g & 0x000000ff)<<8;
-							pal |=(b & 0x000000ff)<<0;
-
-							dst[0] |= pal;
-						}
-						else
-						{
-							dst[0] = pal;
-						}
+						dst[0] = m_grap2[1]->pen_r(dst[0], dat2);
 					}
 				}
 				else if (pridat==0xcf) // the girl
 				{
+					dst[0] = m_grap2[0]->pen_r(dst[0], 0x100);
+
 					if (dat3 && m_grap2[2]->m_framebuffer_enable)
 					{
-						dst[0] = m_grap2[2]->pen_r(dat2);
-					}
-					else
-					{
-						dst[0] = m_grap2[0]->pen_r(0x100);
+						dst[0] = m_grap2[2]->pen_r(dst[0], dat3);
 					}
 				}
 				else
@@ -362,86 +233,17 @@ uint32_t galpani3_state::screen_update_galpani3(screen_device &screen, bitmap_rg
 					   enable -- see fading in intro */
 					if (m_grap2[0]->m_framebuffer_enable)
 					{
-						uint16_t pen = dat1+0x4000;
-						uint32_t pal = m_grap2[0]->pen_r(pen & 0xff);
-
-						if (gp3_is_alpha_pen(pen))
-						{
-							int r,g,b;
-							r = (pal & 0x00ff0000)>>16;
-							g = (pal & 0x0000ff00)>>8;
-							b = (pal & 0x000000ff)>>0;
-
-							r = (r * m_grap2[0]->m_framebuffer_bright2) / 0xff;
-							g = (g * m_grap2[0]->m_framebuffer_bright2) / 0xff;
-							b = (b * m_grap2[0]->m_framebuffer_bright2) / 0xff;
-
-							pal = (r & 0x000000ff)<<16;
-							pal |=(g & 0x000000ff)<<8;
-							pal |=(b & 0x000000ff)<<0;
-
-							dst[0] = pal;
-						}
-						else
-						{
-							dst[0] = pal;
-						}
+						dst[0] = m_grap2[0]->pen_r(dst[0], dat1);
 					}
 
 					if (dat2 && m_grap2[1]->m_framebuffer_enable)
 					{
-						uint16_t pen = dat2+0x4100;
-						uint32_t pal = m_grap2[1]->pen_r(pen & 0xff);
-
-						if (gp3_is_alpha_pen(pen))
-						{
-							int r,g,b;
-							r = (pal & 0x00ff0000)>>16;
-							g = (pal & 0x0000ff00)>>8;
-							b = (pal & 0x000000ff)>>0;
-
-							r = (r * m_grap2[1]->m_framebuffer_bright2) / 0xff;
-							g = (g * m_grap2[1]->m_framebuffer_bright2) / 0xff;
-							b = (b * m_grap2[1]->m_framebuffer_bright2) / 0xff;
-
-							pal = (r & 0x000000ff)<<16;
-							pal |=(g & 0x000000ff)<<8;
-							pal |=(b & 0x000000ff)<<0;
-
-							dst[0] |= pal;
-						}
-						else
-						{
-							dst[0] = pal;
-						}
+						dst[0] = m_grap2[0]->pen_r(dst[0], dat2);
 					}
 
 					if (dat3 && m_grap2[2]->m_framebuffer_enable)
 					{
-						uint16_t pen = dat3+0x4200;
-						uint32_t pal = m_grap2[2]->pen_r(pen & 0xff);
-
-						if (gp3_is_alpha_pen(pen))
-						{
-							int r,g,b;
-							r = (pal & 0x00ff0000)>>16;
-							g = (pal & 0x0000ff00)>>8;
-							b = (pal & 0x000000ff)>>0;
-
-							r = (r * m_grap2[2]->m_framebuffer_bright2) / 0xff;
-							g = (g * m_grap2[2]->m_framebuffer_bright2) / 0xff;
-							b = (b * m_grap2[2]->m_framebuffer_bright2) / 0xff;
-
-							pal = (r & 0x000000ff)<<16;
-							pal |=(g & 0x000000ff)<<8;
-							pal |=(b & 0x000000ff)<<0;
-
-							dst[0] |= pal;
-						}
-						else
-						{
-							dst[0] = pal;
-						}
+						dst[0] = m_grap2[0]->pen_r(dst[0], dat3);
 					}
 				}
 
