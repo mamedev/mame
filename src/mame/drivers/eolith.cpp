@@ -266,7 +266,6 @@ ADDRESS_MAP_END
 ADDRESS_MAP_START(eolith_state::sound_io_map)
 	AM_RANGE(0x0000, 0x7fff) AM_ROMBANK("sound_bank")
 	AM_RANGE(0x8000, 0x8000) AM_READ(sound_cmd_r)
-	AM_RANGE(MCS51_PORT_P1, MCS51_PORT_P1) AM_WRITE(sound_p1_w)
 ADDRESS_MAP_END
 
 
@@ -553,6 +552,7 @@ MACHINE_CONFIG_START(eolith_state::eolith45)
 	MCFG_CPU_ADD("soundcpu", I8032, XTAL(12'000'000))
 	MCFG_CPU_PROGRAM_MAP(sound_prg_map)
 	MCFG_CPU_IO_MAP(sound_io_map)
+	MCFG_MCS51_PORT_P1_OUT_CB(WRITE8(eolith_state, sound_p1_w))
 	MCFG_MCS51_SERIAL_TX_CB(WRITE8(eolith_state, soundcpu_to_qs1000)) // Sound CPU -> QS1000 CPU serial link
 
 	MCFG_MACHINE_RESET_OVERRIDE(eolith_state,eolith)

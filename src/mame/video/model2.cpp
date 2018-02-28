@@ -91,8 +91,6 @@
 #include "video/segaic24.h"
 #include "includes/model2.h"
 
-#define MODEL2_VIDEO_DEBUG 0
-
 
 #define pz      p[0]
 #define pu      p[1]
@@ -917,44 +915,6 @@ void model2_state::model2_3d_frame_end( bitmap_rgb32 &bitmap, const rectangle &c
 	/* if we have nothing to render, bail */
 	if ( raster->tri_list_index == 0 )
 		return;
-
-#if MODEL2_VIDEO_DEBUG
-	if (machine().input().code_pressed(KEYCODE_Q))
-	{
-		uint32_t  i;
-
-		FILE *f = fopen( "triangles.txt", "w" );
-
-		if ( f )
-		{
-			for( i = 0; i < raster->tri_list_index; i++ )
-			{
-				fprintf( f, "index: %d\n", i );
-				fprintf( f, "v0.x = %f, v0.y = %f, v0.z = %f\n", raster->tri_list[i].v[0].x, raster->tri_list[i].v[0].y, raster->tri_list[i].v[0].pz );
-				fprintf( f, "v1.x = %f, v1.y = %f, v1.z = %f\n", raster->tri_list[i].v[1].x, raster->tri_list[i].v[1].y, raster->tri_list[i].v[1].pz );
-				fprintf( f, "v2.x = %f, v2.y = %f, v2.z = %f\n", raster->tri_list[i].v[2].x, raster->tri_list[i].v[2].y, raster->tri_list[i].v[2].pz );
-
-				fprintf( f, "tri z: %04x\n", raster->tri_list[i].z );
-				fprintf( f, "texheader - 0: %04x\n", raster->tri_list[i].texheader[0] );
-				fprintf( f, "texheader - 1: %04x\n", raster->tri_list[i].texheader[1] );
-				fprintf( f, "texheader - 2: %04x\n", raster->tri_list[i].texheader[2] );
-				fprintf( f, "texheader - 3: %04x\n", raster->tri_list[i].texheader[3] );
-				fprintf( f, "luma: %02x\n", raster->tri_list[i].luma );
-				fprintf( f, "vp.sx: %04x\n", raster->tri_list[i].viewport[0] );
-				fprintf( f, "vp.sy: %04x\n", raster->tri_list[i].viewport[1] );
-				fprintf( f, "vp.ex: %04x\n", raster->tri_list[i].viewport[2] );
-				fprintf( f, "vp.ey: %04x\n", raster->tri_list[i].viewport[3] );
-				fprintf( f, "vp.swx: %04x\n", raster->tri_list[i].center[0] );
-				fprintf( f, "vp.swy: %04x\n", raster->tri_list[i].center[1] );
-				fprintf( f, "\n---\n\n" );
-			}
-
-			fprintf( f, "min_z = %04x, max_z = %04x\n", raster->min_z, raster->max_z );
-
-			fclose( f );
-		}
-	}
-#endif
 
 	m_poly->destmap().fill(0x00000000, cliprect);
 
@@ -2659,4 +2619,38 @@ uint32_t model2_state::screen_update_model2(screen_device &screen, bitmap_rgb32 
 	copybitmap_trans(bitmap, m_sys24_bitmap, 0, 0, 0, 0, cliprect, 0);
 
 	return 0;
+}
+
+// called from machine/model2.cpp trilist command
+// TODO: fix forward declaration mess and move this function there instead
+void model2_state::tri_list_dump(FILE *dst)
+{
+	uint32_t  i;
+
+	for( i = 0; i < m_raster->tri_list_index; i++ )
+	{
+		fprintf( dst, "index: %d\n", i );
+		fprintf( dst, "v0.x = %f, v0.y = %f, v0.z = %f\n", m_raster->tri_list[i].v[0].x, m_raster->tri_list[i].v[0].y, m_raster->tri_list[i].v[0].pz );
+		fprintf( dst, "v1.x = %f, v1.y = %f, v1.z = %f\n", m_raster->tri_list[i].v[1].x, m_raster->tri_list[i].v[1].y, m_raster->tri_list[i].v[1].pz );
+		fprintf( dst, "v2.x = %f, v2.y = %f, v2.z = %f\n", m_raster->tri_list[i].v[2].x, m_raster->tri_list[i].v[2].y, m_raster->tri_list[i].v[2].pz );
+
+		fprintf( dst, "tri z: %04x\n", m_raster->tri_list[i].z );
+		fprintf( dst, "texheader - 0: %04x\n", m_raster->tri_list[i].texheader[0] );
+		fprintf( dst, "texheader - 1: %04x\n", m_raster->tri_list[i].texheader[1] );
+		fprintf( dst, "texheader - 2: %04x\n", m_raster->tri_list[i].texheader[2] );
+		fprintf( dst, "texheader - 3: %04x\n", m_raster->tri_list[i].texheader[3] );
+		fprintf( dst, "luma: %02x\n", m_raster->tri_list[i].luma );
+		fprintf( dst, "vp.sx: %04x\n", m_raster->tri_list[i].viewport[0] );
+		fprintf( dst, "vp.sy: %04x\n", m_raster->tri_list[i].viewport[1] );
+		fprintf( dst, "vp.ex: %04x\n", m_raster->tri_list[i].viewport[2] );
+		fprintf( dst, "vp.ey: %04x\n", m_raster->tri_list[i].viewport[3] );
+		fprintf( dst, "vp.swx: %04x\n", m_raster->tri_list[i].center[0] );
+		fprintf( dst, "vp.swy: %04x\n", m_raster->tri_list[i].center[1] );
+		fprintf( dst, "\n---\n\n" );
+	}
+
+	fprintf( dst, "min_z = %04x, max_z = %04x\n", m_raster->min_z, m_raster->max_z );
+
+	fclose( dst );
+
 }

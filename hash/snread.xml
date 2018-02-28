@@ -16,6 +16,18 @@
 		</part>
 	</software>
 
+	<software name="ghouse">
+		<description>A Ghost in the House</description>
+		<year>1981</year>
+		<publisher>Texas Instruments</publisher>
+		<info name="serial" value="CD3536"/>
+		<part name="cart" interface="snread">
+			<dataarea name="rom" size="0x4000">
+				<rom name="cd3536.vsm" size="0x4000" crc="9a26e0c8" sha1="a7c5bba2174ad3f53ee4f492d47205fe3d8f267d" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="ontrack">
 		<description>On the Track</description>
 		<year>1981</year>
@@ -60,6 +72,18 @@
 		<part name="cart" interface="snread">
 			<dataarea name="rom" size="0x4000">
 				<rom name="cd3535.vsm" size="0x4000" crc="0694525d" sha1="d7ce974ad70e05be50f8cba5aab0a0adbfb54f8b" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="3circle">
+		<description>The Third Circle</description>
+		<year>1981</year>
+		<publisher>Texas Instruments</publisher>
+		<info name="serial" value="CD3539"/>
+		<part name="cart" interface="snread">
+			<dataarea name="rom" size="0x4000">
+				<rom name="cd3539.vsm" size="0x4000" crc="496ce890" sha1="d005447a74afc612809cc5de72d7cb6f711693ce" offset="0" />
 			</dataarea>
 		</part>
 	</software>

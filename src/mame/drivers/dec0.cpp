@@ -857,11 +857,6 @@ ADDRESS_MAP_START(dec0_automat_state::secretab_s_map)
 	AM_RANGE(0xf000, 0xf000) AM_DEVWRITE("adpcm_select1", ls157_device, ba_w)
 ADDRESS_MAP_END
 
-ADDRESS_MAP_START(dec0_state::mcu_io_map)
-	ADDRESS_MAP_UNMAP_HIGH
-	AM_RANGE(MCS51_PORT_P0, MCS51_PORT_P3) AM_READWRITE(dec0_mcu_port_r, dec0_mcu_port_w)
-ADDRESS_MAP_END
-
 /******************************************************************************/
 
 static INPUT_PORTS_START( dec0 )
@@ -1873,7 +1868,11 @@ MACHINE_CONFIG_START(dec0_state::hbarrel)
 	dec0(config);
 
 	MCFG_CPU_ADD("mcu", I8751, XTAL(8'000'000))
-	MCFG_CPU_IO_MAP(mcu_io_map)
+	MCFG_MCS51_PORT_P0_IN_CB(READ8(dec0_state, dec0_mcu_port0_r))
+	MCFG_MCS51_PORT_P0_OUT_CB(WRITE8(dec0_state, dec0_mcu_port0_w))
+	MCFG_MCS51_PORT_P1_OUT_CB(WRITE8(dec0_state, dec0_mcu_port1_w))
+	MCFG_MCS51_PORT_P2_OUT_CB(WRITE8(dec0_state, dec0_mcu_port2_w))
+	MCFG_MCS51_PORT_P3_OUT_CB(WRITE8(dec0_state, dec0_mcu_port3_w))
 
 	/* video hardware */
 	MCFG_SCREEN_MODIFY("screen")
@@ -1884,7 +1883,11 @@ MACHINE_CONFIG_START(dec0_state::baddudes)
 	dec0(config);
 
 	MCFG_CPU_ADD("mcu", I8751, XTAL(8'000'000))
-	MCFG_CPU_IO_MAP(mcu_io_map)
+	MCFG_MCS51_PORT_P0_IN_CB(READ8(dec0_state, dec0_mcu_port0_r))
+	MCFG_MCS51_PORT_P0_OUT_CB(WRITE8(dec0_state, dec0_mcu_port0_w))
+	MCFG_MCS51_PORT_P1_OUT_CB(WRITE8(dec0_state, dec0_mcu_port1_w))
+	MCFG_MCS51_PORT_P2_OUT_CB(WRITE8(dec0_state, dec0_mcu_port2_w))
+	MCFG_MCS51_PORT_P3_OUT_CB(WRITE8(dec0_state, dec0_mcu_port3_w))
 
 	/* video hardware */
 	MCFG_SCREEN_MODIFY("screen")

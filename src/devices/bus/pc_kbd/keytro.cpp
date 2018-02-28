@@ -350,9 +350,6 @@ ADDRESS_MAP_END
 
 ADDRESS_MAP_START(pc_kbd_keytronic_pc3270_device::keytronic_pc3270_io)
 	AM_RANGE(0x0000, 0xffff) AM_READWRITE(internal_data_read, internal_data_write)
-	AM_RANGE(MCS51_PORT_P1, MCS51_PORT_P1) AM_READWRITE(p1_read, p1_write)
-	AM_RANGE(MCS51_PORT_P2, MCS51_PORT_P2) AM_READWRITE(p2_read, p2_write)
-	AM_RANGE(MCS51_PORT_P3, MCS51_PORT_P3) AM_READWRITE(p3_read, p3_write)
 ADDRESS_MAP_END
 
 
@@ -426,6 +423,12 @@ MACHINE_CONFIG_START(pc_kbd_keytronic_pc3270_device::device_add_mconfig)
 	MCFG_CPU_ADD("kb_keytr", I8051, 11060250)
 	MCFG_CPU_PROGRAM_MAP(keytronic_pc3270_program)
 	MCFG_CPU_IO_MAP(keytronic_pc3270_io)
+	MCFG_MCS51_PORT_P1_IN_CB(READ8(pc_kbd_keytronic_pc3270_device, p1_read))
+	MCFG_MCS51_PORT_P1_OUT_CB(WRITE8(pc_kbd_keytronic_pc3270_device, p1_write))
+	MCFG_MCS51_PORT_P2_IN_CB(READ8(pc_kbd_keytronic_pc3270_device, p2_read))
+	MCFG_MCS51_PORT_P2_OUT_CB(WRITE8(pc_kbd_keytronic_pc3270_device, p2_write))
+	MCFG_MCS51_PORT_P3_IN_CB(READ8(pc_kbd_keytronic_pc3270_device, p3_read))
+	MCFG_MCS51_PORT_P3_OUT_CB(WRITE8(pc_kbd_keytronic_pc3270_device, p3_write))
 MACHINE_CONFIG_END
 
 

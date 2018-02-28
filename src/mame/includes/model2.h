@@ -242,6 +242,7 @@ public:
 
 	void model2_3d_frame_start( void );
 	void geo_parse( void );
+	
 	void model2_3d_frame_end( bitmap_rgb32 &bitmap, const rectangle &cliprect );
 
 	void model2_timers(machine_config &config);
@@ -260,10 +261,18 @@ public:
 
 	uint8_t m_gamma_table[256];
 
+	void debug_init();
+	void debug_commands( int ref, const std::vector<std::string> &params );
+	void debug_geo_dasm_command(int ref, const std::vector<std::string> &params);
+	void debug_tri_dump_command(int ref, const std::vector<std::string> &params);
+	void debug_help_command(int ref, const std::vector<std::string> &params);
+	
 protected:
 	virtual void video_start() override;
 
 private:
+	void tri_list_dump(FILE *dst);
+
 	bool m_render_unk;
 	bool m_render_mode;
 };

@@ -379,13 +379,6 @@ WRITE8_MEMBER(djboy_state::beast_p3_w)
 }
 /* Program/data maps are defined in the 8051 core */
 
-ADDRESS_MAP_START(djboy_state::djboy_mcu_io_map)
-	AM_RANGE(MCS51_PORT_P0, MCS51_PORT_P0) AM_READWRITE(beast_p0_r, beast_p0_w)
-	AM_RANGE(MCS51_PORT_P1, MCS51_PORT_P1) AM_READWRITE(beast_p1_r, beast_p1_w)
-	AM_RANGE(MCS51_PORT_P2, MCS51_PORT_P2) AM_READWRITE(beast_p2_r, beast_p2_w)
-	AM_RANGE(MCS51_PORT_P3, MCS51_PORT_P3) AM_READWRITE(beast_p3_r, beast_p3_w)
-ADDRESS_MAP_END
-
 /******************************************************************************/
 
 static INPUT_PORTS_START( djboy )
@@ -565,7 +558,14 @@ MACHINE_CONFIG_START(djboy_state::djboy)
 	MCFG_CPU_VBLANK_INT_DRIVER("screen", djboy_state,  irq0_line_hold)
 
 	MCFG_CPU_ADD("beast", I80C51, 6000000)
-	MCFG_CPU_IO_MAP(djboy_mcu_io_map)
+	MCFG_MCS51_PORT_P0_IN_CB(READ8(djboy_state, beast_p0_r))
+	MCFG_MCS51_PORT_P0_OUT_CB(WRITE8(djboy_state, beast_p0_w))
+	MCFG_MCS51_PORT_P1_IN_CB(READ8(djboy_state, beast_p1_r))
+	MCFG_MCS51_PORT_P0_OUT_CB(WRITE8(djboy_state, beast_p1_w))
+	MCFG_MCS51_PORT_P2_IN_CB(READ8(djboy_state, beast_p2_r))
+	MCFG_MCS51_PORT_P2_OUT_CB(WRITE8(djboy_state, beast_p2_w))
+	MCFG_MCS51_PORT_P3_IN_CB(READ8(djboy_state, beast_p3_r))
+	MCFG_MCS51_PORT_P3_OUT_CB(WRITE8(djboy_state, beast_p3_w))
 
 	MCFG_QUANTUM_TIME(attotime::from_hz(6000))
 

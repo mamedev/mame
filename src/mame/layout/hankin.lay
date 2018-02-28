@@ -38,22 +38,22 @@
 
 		<!-- Player 1 Score -->
 
-		<bezel name="digit5" element="digit">
+		<bezel name="digit05" element="digit">
 			<bounds left="10" top="45" right="44" bottom="84" />
 		</bezel>
-		<bezel name="digit4" element="digit">
+		<bezel name="digit04" element="digit">
 			<bounds left="54" top="45" right="88" bottom="84" />
 		</bezel>
-		<bezel name="digit3" element="digit">
+		<bezel name="digit03" element="digit">
 			<bounds left="98" top="45" right="132" bottom="84" />
 		</bezel>
-		<bezel name="digit2" element="digit">
+		<bezel name="digit02" element="digit">
 			<bounds left="142" top="45" right="176" bottom="84" />
 		</bezel>
-		<bezel name="digit1" element="digit">
+		<bezel name="digit01" element="digit">
 			<bounds left="186" top="45" right="220" bottom="84" />
 		</bezel>
-		<bezel name="digit0" element="digit">
+		<bezel name="digit00" element="digit">
 			<bounds left="230" top="45" right="264" bottom="84" />
 		</bezel>
 

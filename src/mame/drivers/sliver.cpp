@@ -395,8 +395,6 @@ ADDRESS_MAP_END
 ADDRESS_MAP_START(sliver_state::soundmem_io)
 	AM_RANGE(0x0100, 0x0100) AM_DEVREADWRITE("oki", okim6295_device, read, write)
 	AM_RANGE(0x0101, 0x0101) AM_DEVREAD("soundlatch", generic_latch_8_device, read)
-	/* ports */
-	AM_RANGE(MCS51_PORT_P1, MCS51_PORT_P1) AM_WRITE(oki_setbank )
 ADDRESS_MAP_END
 
 ADDRESS_MAP_START(sliver_state::oki_map)
@@ -520,6 +518,7 @@ MACHINE_CONFIG_START(sliver_state::sliver)
 	MCFG_CPU_ADD("audiocpu", I8051, 8000000)
 	MCFG_CPU_PROGRAM_MAP(soundmem_prg)
 	MCFG_CPU_IO_MAP(soundmem_io)
+	MCFG_MCS51_PORT_P1_OUT_CB(WRITE8(sliver_state, oki_setbank))
 
 	MCFG_SCREEN_ADD("screen", RASTER)
 	MCFG_SCREEN_REFRESH_RATE(60)

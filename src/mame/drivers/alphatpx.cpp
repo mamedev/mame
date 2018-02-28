@@ -101,6 +101,14 @@ public:
 		m_gfx(*this, "gfx"),
 		m_ram(*this, "ram")
 	{ }
+	void alphatp1(machine_config &config);
+	void alphatp2(machine_config &config);
+	void alphatp2u(machine_config &config);
+protected:
+	virtual void machine_start() override;
+	virtual void machine_reset() override;
+
+private:
 
 	uint32_t screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 
@@ -120,16 +128,9 @@ public:
 	DECLARE_WRITE8_MEMBER(beep_w);
 	DECLARE_WRITE8_MEMBER(bank_w);
 
-	void alphatp1(machine_config &config);
-	void alphatp2(machine_config &config);
-	void alphatp2u(machine_config &config);
-
 	void alphatp2_io(address_map &map);
 	void alphatp2_map(address_map &map);
 	void alphatp2_mem(address_map &map);
-protected:
-	virtual void machine_start() override;
-	virtual void machine_reset() override;
 
 	required_device<address_map_bank_device> m_bankdev;
 	required_device<i8041_device> m_kbdmcu;
@@ -139,7 +140,6 @@ protected:
 	required_device<beep_device> m_beep;
 	required_ioport_array<16> m_keycols;
 
-private:
 	uint8_t m_kbdclk, m_kbdread, m_kbdport2;
 	required_device<palette_device> m_palette;
 	required_shared_ptr<u8> m_vram;
@@ -165,12 +165,22 @@ public:
 		m_floppy(*this, "fdc:%u", 0),
 		m_i8088(*this, "i8088"),
 		m_beep(*this, "beeper"),
+		m_pic(*this, "pic8259"),
 		m_keycols(*this, "COL.%u", 0),
+		m_scncfg(*this, "SCREEN"),
 		m_palette(*this, "palette"),
+		m_gfxdecode(*this, "gfxdecode"),
 		m_vram(*this, "vram"),
 		m_gfx(*this, "gfx"),
 		m_ram(*this, "ram")
 	{ }
+
+	void alphatp3(machine_config &config);
+	void alphatp30(machine_config &config);
+protected:
+	virtual void machine_start() override;
+	virtual void machine_reset() override;
+private:
 
 	uint32_t screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 
@@ -194,18 +204,19 @@ public:
 	DECLARE_WRITE8_MEMBER(comm85_w);
 	DECLARE_READ8_MEMBER(comm88_r);
 	DECLARE_WRITE8_MEMBER(comm88_w);
+	DECLARE_READ8_MEMBER(gfxext_r);
+	DECLARE_WRITE8_MEMBER(gfxext_w);
+	DECLARE_WRITE8_MEMBER(gfxext1_w);
+	DECLARE_WRITE8_MEMBER(gfxext2_w);
+	DECLARE_WRITE8_MEMBER(gfxext3_w);
 
-	void alphatp3(machine_config &config);
-	void alphatp30(machine_config &config);
+	u8* vramext_addr_xlate(offs_t offset);
 
 	void alphatp30_8088_io(address_map &map);
 	void alphatp30_8088_map(address_map &map);
 	void alphatp3_io(address_map &map);
 	void alphatp3_map(address_map &map);
 	void alphatp3_mem(address_map &map);
-protected:
-	virtual void machine_start() override;
-	virtual void machine_reset() override;
 
 	required_device<address_map_bank_device> m_bankdev;
 	required_device<i8041_device> m_kbdmcu;
@@ -214,11 +225,13 @@ protected:
 	required_device_array<floppy_connector, 2> m_floppy;
 	optional_device<cpu_device> m_i8088;
 	required_device<beep_device> m_beep;
+	optional_device<pic8259_device> m_pic;
 	required_ioport_array<16> m_keycols;
+	required_ioport m_scncfg;
 
-private:
 	uint8_t m_kbdclk, m_kbdread, m_kbdport2;
 	required_device<palette_device> m_palette;
+	required_device<gfxdecode_device> m_gfxdecode;
 	required_shared_ptr<u8> m_vram;
 	required_region_ptr<u8> m_gfx;
 	required_shared_ptr<u8> m_ram;
@@ -226,6 +239,10 @@ private:
 	bool m_fdc_irq, m_fdc_drq, m_fdc_hld;
 	u8 m_85_data, m_88_data;
 	bool m_88_da, m_85_da, m_88_started;
+	u8 m_gfxext1, m_gfxext2, m_vramlatch;
+	u16 m_gfxext3;
+	u8 m_vramext[371*80];
+	u8 m_vramchr[256*12];  // these are one 32K ram region but with complex mapping
 };
 
 //**************************************************************************
@@ -299,15 +316,15 @@ ADDRESS_MAP_END
 
 ADDRESS_MAP_START(alphatp_34_state::alphatp30_8088_map)
 	AM_RANGE(0x00000, 0x1ffff) AM_RAM
-	//AM_RANGE(0xe0000, 0xeffff) AM_READWRITE // unknown possibly gfx ext
+	AM_RANGE(0xe0000, 0xeffff) AM_READWRITE(gfxext_r, gfxext_w)
 	AM_RANGE(0xfe000, 0xfffff) AM_ROM AM_REGION("16bit", 0)
 ADDRESS_MAP_END
 
 ADDRESS_MAP_START(alphatp_34_state::alphatp30_8088_io)
 	//AM_RANGE(0x008a, 0x008a) AM_READ // unknown
-	//AM_RANGE(0xf800, 0xf800) AM_WRITE // unknown possibly gfx ext
-	//AM_RANGE(0xf900, 0xf900) AM_WRITE // unknown possibly gfx ext
-	//AM_RANGE(0xfa00, 0xfa01) AM_WRITE // unknown possibly gfx ext
+	AM_RANGE(0xf800, 0xf800) AM_WRITE(gfxext1_w)
+	AM_RANGE(0xf900, 0xf900) AM_WRITE(gfxext2_w)
+	AM_RANGE(0xfa00, 0xfa01) AM_WRITE(gfxext3_w)
 	//AM_RANGE(0xfb00, 0xfb0f) AM_WRITE // unknown possibly gfx ext
 	AM_RANGE(0xffe0, 0xffe1) AM_DEVREADWRITE("pic8259", pic8259_device, read, write)
 	AM_RANGE(0xffe4, 0xffe7) AM_DEVREADWRITE("pit", pit8253_device, read, write)
@@ -339,7 +356,8 @@ READ8_MEMBER(alphatp_34_state::comm88_r)
 {
 	if(!offset)
 		return (m_85_da ? 0 : 1) | (m_88_da ? 0 : 0x80);
-	m_i8088->set_input_line(INPUT_LINE_TEST, ASSERT_LINE);
+	if(m_i8088)
+		m_i8088->set_input_line(INPUT_LINE_TEST, ASSERT_LINE);
 	m_85_da = false;
 	return m_85_data;
 }
@@ -347,6 +365,8 @@ READ8_MEMBER(alphatp_34_state::comm88_r)
 WRITE8_MEMBER(alphatp_34_state::comm88_w)
 {
 	m_88_data = data;
+	if(m_pic)
+		m_pic->ir2_w(ASSERT_LINE);
 	m_88_da = true;
 }
 
@@ -354,6 +374,7 @@ READ8_MEMBER(alphatp_34_state::comm85_r)
 {
 	if(!offset)
 		return m_88_da ? 0 : 1;
+	m_pic->ir2_w(CLEAR_LINE);
 	m_88_da = false;
 	return m_88_data;
 }
@@ -363,6 +384,72 @@ WRITE8_MEMBER(alphatp_34_state::comm85_w)
 	m_85_data = data;
 	m_85_da = true;
 	m_i8088->set_input_line(INPUT_LINE_TEST, CLEAR_LINE);
+}
+
+WRITE8_MEMBER(alphatp_34_state::gfxext1_w)
+{
+	m_gfxext1 = data;
+}
+
+WRITE8_MEMBER(alphatp_34_state::gfxext2_w)
+{
+	m_gfxext2 = data;
+}
+
+WRITE8_MEMBER(alphatp_34_state::gfxext3_w)
+{
+	u16 mask = 0xff << (offset ? 0 : 8);
+	m_gfxext3 = (m_gfxext3 & mask) | (data << (offset * 8));
+}
+
+u8* alphatp_34_state::vramext_addr_xlate(offs_t offset)
+{
+	offset = offset >> 3;
+	int bank = offset >> 7;
+	int offs = offset & 0x7f;
+	if(offs < 80)
+		return &m_vramext[(((((m_gfxext2 & 0xf8) << 2) + bank) * 80) + offs) % (371*80)];
+	else
+		return &m_vramchr[(((((m_gfxext2 & 0x8) << 2) ^ bank) * 48) + (offs - 80)) % (256*12)];
+}
+
+READ8_MEMBER(alphatp_34_state::gfxext_r)
+{
+	switch(m_gfxext1)
+	{
+		case 0x33:
+			m_vramlatch = *vramext_addr_xlate(offset);
+			return 0;
+	}
+	logerror("gfxext read offset %x %x\n", offset, m_gfxext1);
+	return 0;
+}
+
+WRITE8_MEMBER(alphatp_34_state::gfxext_w)
+{
+	switch(m_gfxext1)
+	{
+		case 5:
+		{
+			if(m_gfxext3 == 0xe0f)
+				data = ~data;
+			u8 mask = 1 << (offset & 7);
+			u8 *addr = vramext_addr_xlate(offset);
+			*addr &= ~mask;
+			*addr |= data & mask;
+			break;
+		}
+		case 6:
+			*vramext_addr_xlate(offset) ^= 1 << (offset & 7);
+			break;
+		case 0x33:
+			*vramext_addr_xlate(offset) = m_vramlatch;
+			break;
+		default:
+			logerror("gfxext write offset %x %x %x\n", offset, data, m_gfxext1);
+	}
+	if((offset & 0x3ff) > 0x280)
+		m_gfxdecode->gfx(1)->mark_dirty(((uintptr_t)vramext_addr_xlate(offset) - (uintptr_t)m_vramchr) / 12);
 }
 
 //**************************************************************************
@@ -409,8 +496,9 @@ READ_LINE_MEMBER(alphatp_34_state::kbd_matrix_r)
 
 WRITE8_MEMBER(alphatp_34_state::kbd_matrix_w)
 {
-	if ((data & 0x80) && (!m_kbdclk))
+	if (data & 0x80)
 	{
+		data--; // FIXME: the p30 kbc program doesn't clock the keyboard but gets the wrong value from t0
 		const ioport_value tmp_read = m_keycols[(data >> 3) & 0xf]->read() & (1 << (data & 0x7));
 		m_kbdread = (tmp_read != 0) ? 1 : 0;
 	}
@@ -767,6 +855,12 @@ PORT_START("COL.15")
 	PORT_BIT(0x0008, IP_ACTIVE_HIGH, IPT_UNKNOWN)
 	PORT_BIT(0x0010, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("F1")          PORT_CODE(KEYCODE_F1)       PORT_CHAR(UCHAR_MAMEKEY(F1))    // 7Dh -> 85H func. F1 ok
 	PORT_BIT(0x0080, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("SM")          PORT_CODE(KEYCODE_NUMLOCK)  PORT_CHAR(UCHAR_MAMEKEY(NUMLOCK))// SM (typewriter) mode key */
+
+PORT_START("SCREEN")
+	PORT_CONFNAME(0x01, 0x00, "Screen")
+	PORT_CONFSETTING(0x00, "Main")
+	PORT_CONFSETTING(0x01, "Extension")
+
 INPUT_PORTS_END
 
 //**************************************************************************
@@ -782,6 +876,17 @@ static const gfx_layout charlayout =
 	{ 7, 6, 5, 4, 3, 2, 1, 0 },
 	{ 0*8, 1*8, 2*8, 3*8, 4*8, 5*8, 6*8, 7*8, 8*8, 9*8, 10*8, 11*8 },
 	8*16
+};
+
+static const gfx_layout extcharlayout =
+{
+	8, 12,
+	256,
+	1,
+	{ 0 },
+	{ 7, 6, 5, 4, 3, 2, 1, 0 },
+	{ 0*8, 1*8, 2*8, 3*8, 4*8, 5*8, 6*8, 7*8, 8*8, 9*8, 10*8, 11*8 },
+	8*12
 };
 
 //**************************************************************************
@@ -801,7 +906,7 @@ uint32_t alphatp_12_state::screen_update(screen_device &screen, bitmap_rgb32 &bi
 		{
 			uint8_t code = m_vram[(vramy * 128) + x];   // helwie44 must be 128d is 080h physical display-ram step line
 			// draw 12 lines of the character
-			bool cursoren = cursor.contains(x * 8, vramy * 12);
+			bool cursoren = cursor.contains(x * 8, y * 12);
 			for (int line = 0; line < 12; line++)
 			{
 				uint8_t data = m_gfx[((code & 0x7f) * 16) + line];
@@ -836,6 +941,7 @@ uint32_t alphatp_34_state::screen_update(screen_device &screen, bitmap_rgb32 &bi
 	int start = m_crtc->upscroll_offset();
 	rectangle cursor;
 	m_crtc->cursor_bounds(cursor);
+	bool scrext = m_scncfg->read() ? true : false;
 	for (int y = 0; y < 24; y++)
 	{
 		int vramy = (start + y) % 24;
@@ -846,9 +952,20 @@ uint32_t alphatp_34_state::screen_update(screen_device &screen, bitmap_rgb32 &bi
 			bool cursoren = cursor.contains(x * 8, y * 12);
 			for (int line = 0; line < 12; line++)
 			{
-				uint8_t data = m_gfx[((code & 0x7f) * 16) + line];
-				if (cursoren)
-					data ^= 0xff;
+				u8 data = 0;
+				if(scrext)
+				{
+					offs_t offset = (((vramy * 12) + line) * 80) + x;
+					if(offset < (371 * 80))
+						data = m_vramext[offset];
+					code = 0;
+				}
+				else
+				{
+					data = m_gfx[((code & 0x7f) * 16) + line];
+					if (cursoren)
+						data ^= 0xff;
+				}
 				bitmap.pix32(y * 12 + line, x * 8 + 0) = pen[BIT(data, 0) ^ BIT(code, 7)];
 				bitmap.pix32(y * 12 + line, x * 8 + 1) = pen[BIT(data, 1) ^ BIT(code, 7)];
 				bitmap.pix32(y * 12 + line, x * 8 + 2) = pen[BIT(data, 2) ^ BIT(code, 7)];
@@ -936,7 +1053,7 @@ WRITE8_MEMBER(alphatp_12_state::fdc_cmd_w)
 {
 	floppy_image_device *floppy = nullptr;
 
-	logerror("%02x to fdc_cmd_w: motor %d side %d\n", data, (data & 0x10)>>4, (data & 4)>>2);
+	//logerror("%02x to fdc_cmd_w: motor %d side %d\n", data, (data & 0x10)>>4, (data & 4)>>2);
 
 	// select drive
 	if (!(data & 0x80))
@@ -1015,7 +1132,7 @@ WRITE8_MEMBER(alphatp_34_state::fdc_cmd_w)
 {
 	floppy_image_device *floppy = nullptr;
 
-	logerror("%02x to fdc_cmd_w: motor %d side %d\n", data, (data & 0x10)>>4, (data & 4)>>2);
+	//logerror("%02x to fdc_cmd_w: motor %d side %d\n", data, (data & 0x10)>>4, (data & 4)>>2);
 
 	// select drive
 	if (!(data & 0x80))
@@ -1144,9 +1261,11 @@ void alphatp_34_state::machine_start()
 {
 	// setup banking
 	membank("ram_0000")->set_base(m_ram.target());
-
+	save_item(NAME(m_vramext));
 
 	m_kbdclk = 0;   // must be initialized here b/c mcs48_reset() causes write of 0xff to all ports
+	if(m_i8088)
+		m_gfxdecode->set_gfx(1, std::make_unique<gfx_element>(m_palette, extcharlayout, &m_vramchr[0], 0, 1, 0));
 }
 
 void alphatp_34_state::machine_reset()

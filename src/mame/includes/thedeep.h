@@ -77,5 +77,4 @@ public:
 	void thedeep(machine_config &config);
 	void audio_map(address_map &map);
 	void main_map(address_map &map);
-	void mcu_io_map(address_map &map);
 };

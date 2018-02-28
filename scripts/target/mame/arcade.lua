@@ -3204,6 +3204,7 @@ files {
 	MAME_DIR .. "src/mame/audio/dsbz80.cpp",
 	MAME_DIR .. "src/mame/audio/dsbz80.h",
 	MAME_DIR .. "src/mame/drivers/model2.cpp",
+	MAME_DIR .. "src/mame/machine/model2.cpp",
 	MAME_DIR .. "src/mame/includes/model2.h",
 	MAME_DIR .. "src/mame/video/model2rd.hxx",
 	MAME_DIR .. "src/mame/video/model2.cpp",

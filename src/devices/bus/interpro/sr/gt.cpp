@@ -191,7 +191,7 @@ ROM_END
 
 ROM_START(mpcb081)
 	ROM_REGION(0x80, "idprom", 0)
-	ROM_LOAD32_BYTE("mpcb081b.bin", 0x0, 0x20, CRC(90291129) SHA1(cc6debd0307280ed73dbf5b555aa7448c2bcb7ad))
+	ROM_LOAD32_BYTE("mpcb081b.bin", 0x0, 0x20, CRC(79cec897) SHA1(ccda82a61c435800b7894a256deea22ea5dc4c87))
 ROM_END
 
 // FIXME: can't account for this delta yet
