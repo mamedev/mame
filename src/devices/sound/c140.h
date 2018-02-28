@@ -17,8 +17,11 @@
 #define MCFG_C140_REPLACE(tag, clock) \
 		MCFG_DEVICE_REPLACE((tag), C140, (clock))
 
-#define MCFG_C140_BANK_TYPE(type) \
-		c140_device::set_bank_type(*device, (c140_device::C140_TYPE::type));
+#define MCFG_C219_ADD(tag, clock) \
+		MCFG_DEVICE_ADD((tag), C219, (clock))
+
+#define MCFG_C219_REPLACE(tag, clock) \
+		MCFG_DEVICE_REPLACE((tag), C219, (clock))
 
 
 //**************************************************************************
@@ -29,40 +32,38 @@
 // ======================> c140_device
 
 class c140_device : public device_t,
-					public device_sound_interface
+					public device_sound_interface,
+					public device_rom_interface
 {
 public:
-	enum class C140_TYPE
-	{
-		SYSTEM2,
-		SYSTEM21,
-		ASIC219
-	};
-
 	c140_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
-
-	// static configuration
-	static void set_bank_type(device_t &device, C140_TYPE bank) { downcast<c140_device &>(device).m_banking_type = bank; }
 
 	DECLARE_READ8_MEMBER( c140_r );
 	DECLARE_WRITE8_MEMBER( c140_w );
 
-	void set_base(void *base);
-
 protected:
+	c140_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock, int addrbit, int databit);
+
 	// device-level overrides
 	virtual void device_start() override;
+	virtual void device_reset() override;
+	virtual void device_post_load() override;
+	virtual void device_clock_changed() override;
 
 	// sound stream update overrides
 	virtual void sound_stream_update(sound_stream &stream, stream_sample_t **inputs, stream_sample_t **outputs, int samples) override;
+	
+	// device_rom_interface overrides
+	virtual void rom_bank_updated() override;
+	
+	void voice_update(int samples);
 
-private:
 	static constexpr unsigned MAX_VOICE = 24;
 
 	struct C140_VOICE
 	{
 		C140_VOICE() { }
-
+		
 		int32_t    ptoffset     = 0;
 		int32_t    pos          = 0;
 		int32_t    key          = 0;
@@ -83,18 +84,14 @@ private:
 	};
 
 	void init_voice( C140_VOICE *v );
-	long find_sample(long adrs, long bank, int voice);
 
 	int m_sample_rate;
 	sound_stream *m_stream;
-	C140_TYPE m_banking_type;
 	/* internal buffers */
-	std::unique_ptr<int16_t[]> m_mixer_buffer_left;
-	std::unique_ptr<int16_t[]> m_mixer_buffer_right;
+	std::vector<int16_t> m_mixer_buffer_left;
+	std::vector<int16_t> m_mixer_buffer_right;
 
 	int m_baserate;
-	optional_region_ptr<int8_t> m_rom_ptr;
-	int8_t *m_pRom;
 	uint8_t m_REG[0x200];
 
 	int16_t m_pcmtbl[8];        //2000.06.26 CAB
@@ -103,5 +100,28 @@ private:
 };
 
 DECLARE_DEVICE_TYPE(C140, c140_device)
+
+// ======================> c219_device
+
+class c219_device : public c140_device
+{
+public:
+	c219_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+
+	DECLARE_READ8_MEMBER( c219_r );
+	DECLARE_WRITE8_MEMBER( c219_w );
+
+protected:
+	// device-level overrides
+	virtual void device_start() override;
+	virtual void device_reset() override;
+
+	void voice_update(int samples);
+
+private:
+	uint8_t m_c219bank[0x4];
+};
+
+DECLARE_DEVICE_TYPE(C219, c219_device)
 
 #endif // MAME_SOUND_C140_H

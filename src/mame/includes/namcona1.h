@@ -23,7 +23,7 @@ public:
 		m_gfxdecode(*this, "gfxdecode"),
 		m_screen(*this, "screen"),
 		m_palette(*this, "palette"),
-		m_c140(*this, "c140"),
+		m_c219(*this, "c219"),
 		m_muxed_inputs(*this, { { "P4", "DSW", "P1", "P2" } }),
 		m_io_p3(*this, "P3"),
 		m_workram(*this, "workram"),
@@ -81,6 +81,7 @@ public:
 	void namcona1_main_map(address_map &map);
 	void namcona1_mcu_io_map(address_map &map);
 	void namcona1_mcu_map(address_map &map);
+	void namcona1_c219_map(address_map &map);
 protected:
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
@@ -111,7 +112,7 @@ private:
 	required_device<gfxdecode_device> m_gfxdecode;
 	required_device<screen_device> m_screen;
 	required_device<palette_device> m_palette;
-	required_device<c140_device> m_c140;
+	required_device<c219_device> m_c219;
 
 	required_ioport_array<4> m_muxed_inputs;
 	required_ioport          m_io_p3;

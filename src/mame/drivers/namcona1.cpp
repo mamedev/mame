@@ -618,7 +618,7 @@ WRITE16_MEMBER(namcona1_state::na1mcu_shared_w)
 READ16_MEMBER(namcona1_state::snd_r)
 {
 	/* can't use DEVREADWRITE8 for this because it is opposite endianness to the CPU for some reason */
-	return m_c140->c140_r(space,offset*2+1) | m_c140->c140_r(space,offset*2)<<8;
+	return m_c219->c219_r(space,offset*2+1) | m_c219->c219_r(space,offset*2)<<8;
 }
 
 WRITE16_MEMBER(namcona1_state::snd_w)
@@ -626,21 +626,25 @@ WRITE16_MEMBER(namcona1_state::snd_w)
 	/* can't use DEVREADWRITE8 for this because it is opposite endianness to the CPU for some reason */
 	if (ACCESSING_BITS_0_7)
 	{
-		m_c140->c140_w(space,(offset*2)+1, data);
+		m_c219->c219_w(space,(offset*2)+1, data);
 	}
 
 	if (ACCESSING_BITS_8_15)
 	{
-		m_c140->c140_w(space,(offset*2), data>>8);
+		m_c219->c219_w(space,(offset*2), data>>8);
 	}
 }
 
 ADDRESS_MAP_START(namcona1_state::namcona1_mcu_map)
 	AM_RANGE(0x000800, 0x000fff) AM_READWRITE(mcu_mailbox_r, mcu_mailbox_w_mcu) // "Mailslot" communications ports
-	AM_RANGE(0x001000, 0x001fff) AM_READWRITE(snd_r, snd_w) // C140-alike sound chip
+	AM_RANGE(0x001000, 0x001fff) AM_READWRITE(snd_r, snd_w) // C219 sound chip
 	AM_RANGE(0x002000, 0x002fff) AM_READWRITE(na1mcu_shared_r, na1mcu_shared_w) // mirror of first page of shared work RAM
 	AM_RANGE(0x003000, 0x00afff) AM_RAM                     // there is a 32k RAM chip according to CGFM
 	AM_RANGE(0x200000, 0x27ffff) AM_READWRITE(na1mcu_shared_r, na1mcu_shared_w) // shared work RAM
+ADDRESS_MAP_END
+
+ADDRESS_MAP_START(namcona1_state::namcona1_c219_map)
+	AM_RANGE(0x00000, 0x7ffff) AM_RAM AM_SHARE("workram")
 ADDRESS_MAP_END
 
 
@@ -715,7 +719,6 @@ WRITE8_MEMBER(namcona1_state::port8_w)
 void namcona1_state::machine_start()
 {
 	m_mEnableInterrupts = 0;
-	m_c140->set_base(m_workram);
 
 	save_item(NAME(m_mEnableInterrupts));
 	save_item(NAME(m_count));
@@ -986,8 +989,8 @@ MACHINE_CONFIG_START(namcona1_state::namcona1)
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
 
-	MCFG_C140_ADD("c140", 44100)
-	MCFG_C140_BANK_TYPE(ASIC219)
+	MCFG_C219_ADD("c219", 44100)
+	MCFG_DEVICE_ADDRESS_MAP(0, namcona1_c219_map)
 	MCFG_SOUND_ROUTE(0, "rspeaker", 1.00)
 	MCFG_SOUND_ROUTE(1, "lspeaker", 1.00)
 MACHINE_CONFIG_END
