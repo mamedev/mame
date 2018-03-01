@@ -29,7 +29,8 @@ public:
 		: driver_device(mconfig, type, tag),
 		m_maincpu(*this, "maincpu"),
 		m_hd44780(*this, "hd44780"),
-		m_ticket(*this, "ticket")
+		m_ticket(*this, "ticket"),
+		m_digits(*this, "digit%u", 0U)
 	{ }
 
 	void piggypas(machine_config &config);
@@ -37,6 +38,7 @@ public:
 	DECLARE_INPUT_CHANGED_MEMBER(ball_sensor);
 	DECLARE_CUSTOM_INPUT_MEMBER(ticket_r);
 private:
+	virtual void machine_start() override;
 	virtual void machine_reset() override;
 	DECLARE_WRITE8_MEMBER(ctrl_w);
 	DECLARE_WRITE8_MEMBER(mcs51_tx_callback);
@@ -48,9 +50,11 @@ private:
 	required_device<mcs51_cpu_device> m_maincpu;
 	required_device<hd44780_device> m_hd44780;
 	required_device<ticket_dispenser_device> m_ticket;
+	output_finder<4> m_digits;
 	uint8_t   m_ctrl;
 	uint8_t   m_digit_idx;
 	uint8_t   m_lcd_latch;
+	uint32_t  m_digit_latch;
 	void piggypas_io(address_map &map);
 	void piggypas_map(address_map &map);
 	void fidlstix_io(address_map &map);
@@ -71,7 +75,8 @@ WRITE8_MEMBER(piggypas_state::ctrl_w)
 WRITE8_MEMBER(piggypas_state::mcs51_tx_callback)
 {
 	// Serial output driver is UCN5833A
-	output().set_digit_value(m_digit_idx++, bitswap<8>(data,7,6,4,3,2,1,0,5) & 0x7f);
+	if (m_digit_idx < 4)
+		m_digits[m_digit_idx++] = bitswap<8>(data,7,6,4,3,2,1,0,5) & 0x7f;
 }
 
 READ8_MEMBER(piggypas_state::lcd_latch_r)
@@ -96,6 +101,18 @@ WRITE8_MEMBER(piggypas_state::lcd_control_w)
 			m_lcd_latch = m_hd44780->read(space, BIT(data, 1));
 		else
 			m_hd44780->write(space, BIT(data, 1), m_lcd_latch);
+	}
+
+	// T0 (P3.4) = output shift clock (serial data present at P1.0)
+	// T1 (P3.5) = output latch enable
+	if (BIT(data, 4))
+		m_digit_latch = (m_digit_latch << 1) | BIT(m_lcd_latch, 0);
+	if (BIT(data, 5) && !BIT(data, 4))
+	{
+		m_digits[0] = bitswap<8>(m_digit_latch & 0xff, 0,1,3,4,5,6,7,2) & 0x7f;
+		m_digits[1] = bitswap<8>((m_digit_latch >> 8) & 0xff, 0,1,3,4,5,6,7,2) & 0x7f;
+		m_digits[2] = bitswap<8>((m_digit_latch >> 16) & 0xff, 0,1,3,4,5,6,7,2) & 0x7f;
+		m_digits[3] = bitswap<8>((m_digit_latch >> 24) & 0xff, 0,1,3,4,5,6,7,2) & 0x7f;
 	}
 }
 
@@ -154,6 +171,13 @@ static INPUT_PORTS_START( piggypas )
 	PORT_BIT(0x08, IP_ACTIVE_LOW, IPT_BUTTON1) PORT_CHANGED_MEMBER(DEVICE_SELF, piggypas_state, ball_sensor, 0) // ball sensor
 INPUT_PORTS_END
 
+
+void piggypas_state::machine_start()
+{
+	m_digits.resolve();
+
+	m_digit_latch = 0;
+}
 
 void piggypas_state::machine_reset()
 {
