@@ -687,6 +687,9 @@ ROM_START( ironfort )
 	ROM_LOAD( "qs1001a.u96", 0x80000, 0x80000, CRC(d13c6407) SHA1(57b14f97c7d4f9b5d9745d3571a0b7115fbe3176) )
 ROM_END
 
+// 鋼鐵要塞 Iron Fortress (Gong3tit3 Jiu3coi3)
+// Eolith
+// 卓任有限公司 Excellent Competence Ltd.
 ROM_START( ironfortc )
 	ROM_REGION( 0x80000, "maincpu", 0 ) /* Hyperstone CPU Code */
 	ROM_LOAD( "u43.bin", 0x00000, 0x80000, CRC(f1f19c9a) SHA1(98531ecedd1277e6d10395794a66d615df7ddbd6) ) /* 27C040 eprom with no label */
@@ -1737,7 +1740,7 @@ CUSTOM_INPUT_MEMBER(eolith_state::stealsee_speedup_getvblank)
 
 GAME( 1998, linkypip,  0,        eolith45, linkypip,  eolith_state, eolith,   ROT0, "Eolith", "Linky Pipe", MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
 GAME( 1998, ironfort,  0,        ironfort, ironfort,  eolith_state, eolith,   ROT0, "Eolith", "Iron Fortress", MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
-GAME( 1998, ironfortc, ironfort, ironfort, ironfortc, eolith_state, eolith,   ROT0, "Eolith (Excellent Competence Ltd. license)", "Iron Fortress (China?)", MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE ) // Licensed/Distributed to Chinese(or Taiwanese?) company Excellent Competence Ltd.(卓任有限公司)
+GAME( 1998, ironfortc, ironfort, ironfort, ironfortc, eolith_state, eolith,   ROT0, "Eolith (Excellent Competence Ltd. license)", "Gongtit Jiucoi Iron Fortress (Hong Kong)", MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE ) // Licensed/Distributed to Hong Kong company Excellent Competence Ltd.
 GAME( 1998, hidnctch,  0,        eolith45, hidnctch,  eolith_state, eolith,   ROT0, "Eolith", "Hidden Catch (World) / Tul Lin Gu Lim Chat Ki '98 (Korea) (pcb ver 3.03)",  MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE ) // or Teurrin Geurim Chajgi '98
 GAME( 1998, raccoon,   0,        eolith45, raccoon,   eolith_state, eolith,   ROT0, "Eolith", "Raccoon World", MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
 GAME( 1998, puzzlekg,  0,        eolith45, puzzlekg,  eolith_state, eolith,   ROT0, "Eolith", "Puzzle King (Dance & Puzzle)",  MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
