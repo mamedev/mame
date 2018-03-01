@@ -311,7 +311,7 @@ READ32_MEMBER(model2_state::polygon_count_r)
  *
  *******************************************/
 
-static void model2_3d_process_quad( raster_state *raster, uint32_t attr )
+void model2_state::model2_3d_process_quad( raster_state *raster, uint32_t attr )
 {
 	quad_m2     object;
 	uint16_t      *th, *tp;
@@ -551,7 +551,7 @@ static void model2_3d_process_quad( raster_state *raster, uint32_t attr )
 	}
 }
 
-static void model2_3d_process_triangle( raster_state *raster, uint32_t attr )
+void model2_state::model2_3d_process_triangle( raster_state *raster, uint32_t attr )
 {
 	triangle    object;
 	uint16_t      *th, *tp;
@@ -883,7 +883,7 @@ void model2_renderer::model2_3d_render(triangle *tri, const rectangle &cliprect)
 */
 
 /* 3D Rasterizer projection: projects a triangle into screen coordinates */
-static void model2_3d_project( triangle *tri )
+inline void model2_state::model2_3d_project( triangle *tri )
 {
 	uint16_t  i;
 
@@ -948,7 +948,7 @@ void model2_state::model2_3d_frame_end( bitmap_rgb32 &bitmap, const rectangle &c
 }
 
 /* 3D Rasterizer main data input port */
-static void model2_3d_push( raster_state *raster, uint32_t input )
+void model2_state::model2_3d_push( raster_state *raster, uint32_t input )
 {
 	/* see if we have a command in progress */
 	if ( raster->cur_command != 0 )
@@ -1185,7 +1185,7 @@ void model2_state::geo_init(memory_region *polygon_rom)
  *******************************************/
 
 /* Parse Polygons: Normals Present, No Specular case */
-static void geo_parse_np_ns( geo_state *geo, uint32_t *input, uint32_t count )
+void model2_state::geo_parse_np_ns( geo_state *geo, uint32_t *input, uint32_t count )
 {
 	raster_state *raster = geo->raster;
 	poly_vertex point, normal;
@@ -1337,7 +1337,7 @@ static void geo_parse_np_ns( geo_state *geo, uint32_t *input, uint32_t count )
 }
 
 /* Parse Polygons: Normals Present, Specular case */
-static void geo_parse_np_s( geo_state *geo, uint32_t *input, uint32_t count )
+void model2_state::geo_parse_np_s( geo_state *geo, uint32_t *input, uint32_t count )
 {
 	raster_state *raster = geo->raster;
 	poly_vertex point, normal;
@@ -1498,7 +1498,7 @@ static void geo_parse_np_s( geo_state *geo, uint32_t *input, uint32_t count )
 }
 
 /* Parse Polygons: No Normals, No Specular case */
-static void geo_parse_nn_ns( geo_state *geo, uint32_t *input, uint32_t count )
+void model2_state::geo_parse_nn_ns( geo_state *geo, uint32_t *input, uint32_t count )
 {
 	raster_state *raster = geo->raster;
 	poly_vertex point, normal, p0, p1, p2, p3;
@@ -1693,7 +1693,7 @@ static void geo_parse_nn_ns( geo_state *geo, uint32_t *input, uint32_t count )
 }
 
 /* Parse Polygons: No Normals, Specular case */
-static void geo_parse_nn_s( geo_state *geo, uint32_t *input, uint32_t count )
+void model2_state::geo_parse_nn_s( geo_state *geo, uint32_t *input, uint32_t count )
 {
 	raster_state *raster = geo->raster;
 	poly_vertex point, normal, p0, p1, p2, p3;
@@ -1903,7 +1903,7 @@ static void geo_parse_nn_s( geo_state *geo, uint32_t *input, uint32_t count )
  *******************************************/
 
 /* Command 00: NOP */
-static uint32_t * geo_nop( geo_state *geo, uint32_t opcode, uint32_t *input )
+uint32_t *model2_state::geo_nop( geo_state *geo, uint32_t opcode, uint32_t *input )
 {
 	raster_state *raster = geo->raster;
 
@@ -1914,7 +1914,7 @@ static uint32_t * geo_nop( geo_state *geo, uint32_t opcode, uint32_t *input )
 }
 
 /* Command 01: Object Data */
-static uint32_t * geo_object_data( geo_state *geo, uint32_t opcode, uint32_t *input )
+uint32_t *model2_state::geo_object_data( geo_state *geo, uint32_t opcode, uint32_t *input )
 {
 	raster_state *raster = geo->raster;
 	uint32_t  tpa = *input++;     /* Texture Point Address */
@@ -1971,7 +1971,7 @@ static uint32_t * geo_object_data( geo_state *geo, uint32_t opcode, uint32_t *in
 }
 
 /* Command 02: Direct Data */
-static uint32_t * geo_direct_data( geo_state *geo, uint32_t opcode, uint32_t *input )
+uint32_t *model2_state::geo_direct_data( geo_state *geo, uint32_t opcode, uint32_t *input )
 {
 	raster_state *raster = geo->raster;
 	uint32_t  tpa = *input++;     /* Texture Point Address */
@@ -2030,7 +2030,7 @@ static uint32_t * geo_direct_data( geo_state *geo, uint32_t opcode, uint32_t *in
 }
 
 /* Command 03: Window Data */
-static uint32_t * geo_window_data( geo_state *geo, uint32_t opcode, uint32_t *input )
+uint32_t *model2_state::geo_window_data( geo_state *geo, uint32_t opcode, uint32_t *input )
 {
 	raster_state *raster = geo->raster;
 	uint32_t  x, y, i;
@@ -2065,7 +2065,7 @@ static uint32_t * geo_window_data( geo_state *geo, uint32_t opcode, uint32_t *in
 }
 
 /* Command 04: Texture Data Write */
-static uint32_t * geo_texture_data( geo_state *geo, uint32_t opcode, uint32_t *input )
+uint32_t *model2_state::geo_texture_data( geo_state *geo, uint32_t opcode, uint32_t *input )
 {
 	raster_state *raster = geo->raster;
 	uint32_t  i, count;
@@ -2090,7 +2090,7 @@ static uint32_t * geo_texture_data( geo_state *geo, uint32_t opcode, uint32_t *i
 }
 
 /* Command 05: Polygon Data */
-static uint32_t * geo_polygon_data( geo_state *geo, uint32_t opcode, uint32_t *input )
+uint32_t *model2_state::geo_polygon_data( geo_state *geo, uint32_t opcode, uint32_t *input )
 {
 	uint32_t  address, count, i;
 	uint32_t *p;
@@ -2123,7 +2123,7 @@ static uint32_t * geo_polygon_data( geo_state *geo, uint32_t opcode, uint32_t *i
 }
 
 /* Command 06: Texture Parameters */
-static uint32_t * geo_texture_parameters( geo_state *geo, uint32_t opcode, uint32_t *input )
+uint32_t *model2_state::geo_texture_parameters( geo_state *geo, uint32_t opcode, uint32_t *input )
 {
 	uint32_t  index, count, i, param;
 
@@ -2155,7 +2155,7 @@ static uint32_t * geo_texture_parameters( geo_state *geo, uint32_t opcode, uint3
 }
 
 /* Command 07: Geo Mode */
-static uint32_t * geo_mode( geo_state *geo, uint32_t opcode, uint32_t *input )
+uint32_t *model2_state::geo_mode( geo_state *geo, uint32_t opcode, uint32_t *input )
 {
 	(void)opcode;
 
@@ -2166,7 +2166,7 @@ static uint32_t * geo_mode( geo_state *geo, uint32_t opcode, uint32_t *input )
 }
 
 /* Command 08: ZSort Mode */
-static uint32_t * geo_zsort_mode( geo_state *geo, uint32_t opcode, uint32_t *input )
+uint32_t *model2_state::geo_zsort_mode( geo_state *geo, uint32_t opcode, uint32_t *input )
 {
 	raster_state *raster = geo->raster;
 
@@ -2180,7 +2180,7 @@ static uint32_t * geo_zsort_mode( geo_state *geo, uint32_t opcode, uint32_t *inp
 }
 
 /* Command 09: Focal Distance */
-static uint32_t * geo_focal_distance( geo_state *geo, uint32_t opcode, uint32_t *input )
+uint32_t *model2_state::geo_focal_distance( geo_state *geo, uint32_t opcode, uint32_t *input )
 {
 	(void)opcode;
 
@@ -2194,7 +2194,7 @@ static uint32_t * geo_focal_distance( geo_state *geo, uint32_t opcode, uint32_t 
 }
 
 /* Command 0A: Light Source Vector Write */
-static uint32_t * geo_light_source( geo_state *geo, uint32_t opcode, uint32_t *input )
+uint32_t *model2_state::geo_light_source( geo_state *geo, uint32_t opcode, uint32_t *input )
 {
 	(void)opcode;
 
@@ -2211,7 +2211,7 @@ static uint32_t * geo_light_source( geo_state *geo, uint32_t opcode, uint32_t *i
 }
 
 /* Command 0B: Transformation Matrix Write */
-static uint32_t * geo_matrix_write( geo_state *geo, uint32_t opcode, uint32_t *input )
+uint32_t *model2_state::geo_matrix_write( geo_state *geo, uint32_t opcode, uint32_t *input )
 {
 	uint32_t  i;
 
@@ -2225,7 +2225,7 @@ static uint32_t * geo_matrix_write( geo_state *geo, uint32_t opcode, uint32_t *i
 }
 
 /* Command 0C: Parallel Transfer Vector Write */
-static uint32_t * geo_translate_write( geo_state *geo, uint32_t opcode, uint32_t *input )
+uint32_t *model2_state::geo_translate_write( geo_state *geo, uint32_t opcode, uint32_t *input )
 {
 	uint32_t  i;
 
@@ -2239,7 +2239,7 @@ static uint32_t * geo_translate_write( geo_state *geo, uint32_t opcode, uint32_t
 }
 
 /* Command 0D: Geo Data Memory Push (undocumented, unsupported) */
-static uint32_t * geo_data_mem_push( geo_state *geo, uint32_t opcode, uint32_t *input )
+uint32_t *model2_state::geo_data_mem_push( geo_state *geo, uint32_t opcode, uint32_t *input )
 {
 	uint32_t  address, count, i;
 
@@ -2264,7 +2264,7 @@ static uint32_t * geo_data_mem_push( geo_state *geo, uint32_t opcode, uint32_t *
 	/* read in the count */
 	count = *input++;
 
-	geo->state->logerror( "SEGA GEO: Executing unsupported geo_data_mem_push (address = %08x, count = %08x)\n", address, count );
+	logerror( "SEGA GEO: Executing unsupported geo_data_mem_push (address = %08x, count = %08x)\n", address, count );
 
 	(void)i;
 /*
@@ -2276,7 +2276,7 @@ static uint32_t * geo_data_mem_push( geo_state *geo, uint32_t opcode, uint32_t *
 }
 
 /* Command 0E: Geo Test */
-static uint32_t * geo_test( geo_state *geo, uint32_t opcode, uint32_t *input )
+uint32_t *model2_state::geo_test( geo_state *geo, uint32_t opcode, uint32_t *input )
 {
 	uint32_t      data, blocks, address, count, checksum, i;
 
@@ -2290,7 +2290,7 @@ static uint32_t * geo_test( geo_state *geo, uint32_t opcode, uint32_t *input )
 		if ( *input++ != data )
 		{
 			/* TODO: Set Red LED on */
-			geo->state->logerror( "SEGA GEO: FIFO Test failed\n" );
+			logerror( "SEGA GEO: FIFO Test failed\n" );
 		}
 
 		data <<= 1;
@@ -2338,7 +2338,7 @@ static uint32_t * geo_test( geo_state *geo, uint32_t opcode, uint32_t *input )
 		if ( sum_even != 0 || sum_odd != 0 )
 		{
 			/* TODO: Set Green LED on */
-			geo->state->logerror( "SEGA GEO: Polygon ROM Test failed\n" );
+			logerror( "SEGA GEO: Polygon ROM Test failed\n" );
 		}
 	}
 
@@ -2346,7 +2346,7 @@ static uint32_t * geo_test( geo_state *geo, uint32_t opcode, uint32_t *input )
 }
 
 /* Command 0F: End */
-static uint32_t * geo_end( geo_state *geo, uint32_t opcode, uint32_t *input )
+uint32_t *model2_state::geo_end( geo_state *geo, uint32_t opcode, uint32_t *input )
 {
 	raster_state *raster = geo->raster;
 
@@ -2360,7 +2360,7 @@ static uint32_t * geo_end( geo_state *geo, uint32_t opcode, uint32_t *input )
 }
 
 /* Command 10: Dummy */
-static uint32_t * geo_dummy( geo_state *geo, uint32_t opcode, uint32_t *input )
+uint32_t *model2_state::geo_dummy( geo_state *geo, uint32_t opcode, uint32_t *input )
 {
 //  uint32_t  data;
 	(void)opcode;
@@ -2373,7 +2373,7 @@ static uint32_t * geo_dummy( geo_state *geo, uint32_t opcode, uint32_t *input )
 }
 
 /* Command 14: Log Data Write */
-static uint32_t * geo_log_data( geo_state *geo, uint32_t opcode, uint32_t *input )
+uint32_t *model2_state::geo_log_data( geo_state *geo, uint32_t opcode, uint32_t *input )
 {
 	raster_state *raster = geo->raster;
 	uint32_t  i, count;
@@ -2405,7 +2405,7 @@ static uint32_t * geo_log_data( geo_state *geo, uint32_t opcode, uint32_t *input
 }
 
 /* Command 16: LOD */
-static uint32_t * geo_lod( geo_state *geo, uint32_t opcode, uint32_t *input )
+uint32_t *model2_state::geo_lod( geo_state *geo, uint32_t opcode, uint32_t *input )
 {
 	(void)opcode;
 
@@ -2416,7 +2416,7 @@ static uint32_t * geo_lod( geo_state *geo, uint32_t opcode, uint32_t *input )
 }
 
 /* Command 1D: Code Upload  (undocumented, unsupported) */
-static uint32_t * geo_code_upload( geo_state *geo, uint32_t opcode, uint32_t *input )
+uint32_t *model2_state::geo_code_upload( geo_state *geo, uint32_t opcode, uint32_t *input )
 {
 	uint32_t  count, i;
 
@@ -2427,7 +2427,7 @@ static uint32_t * geo_code_upload( geo_state *geo, uint32_t opcode, uint32_t *in
 	    No games are known to use this command yet.
 	*/
 
-	geo->state->logerror( "SEGA GEO: Uploading debug code (unimplemented)\n" );
+	logerror( "SEGA GEO: Uploading debug code (unimplemented)\n" );
 
 	(void)opcode;
 
@@ -2465,7 +2465,7 @@ static uint32_t * geo_code_upload( geo_state *geo, uint32_t opcode, uint32_t *in
 }
 
 /* Command 1E: Code Jump (undocumented, unsupported) */
-static uint32_t * geo_code_jump( geo_state *geo, uint32_t opcode, uint32_t *input )
+uint32_t *model2_state::geo_code_jump( geo_state *geo, uint32_t opcode, uint32_t *input )
 {
 //  uint32_t  address;
 
@@ -2477,7 +2477,7 @@ static uint32_t * geo_code_jump( geo_state *geo, uint32_t opcode, uint32_t *inpu
 	    No games are known to use this command yet.
 	*/
 
-	geo->state->logerror( "SEGA GEO: Jumping to debug code (unimplemented)\n" );
+	logerror( "SEGA GEO: Jumping to debug code (unimplemented)\n" );
 
 	(void)opcode;
 
@@ -2490,7 +2490,7 @@ static uint32_t * geo_code_jump( geo_state *geo, uint32_t opcode, uint32_t *inpu
 	return input;
 }
 
-static uint32_t * geo_process_command( geo_state *geo, uint32_t opcode, uint32_t *input, bool *end_code )
+uint32_t *model2_state::geo_process_command( geo_state *geo, uint32_t opcode, uint32_t *input, bool *end_code )
 {
 	switch( (opcode >> 23) & 0x1f )
 	{
