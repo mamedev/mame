@@ -469,14 +469,15 @@ static inline uint16_t get_texel( uint32_t base_x, uint32_t base_y, int x, int y
 	return (texel & 0x0f);
 }
 
-class model2_renderer : public poly_manager<float, m2_poly_extra_data, 4, 32768>
+// 0x10000 = size of the tri_sorted_list array
+class model2_renderer : public poly_manager<float, m2_poly_extra_data, 4, 0x10000>
 {
 public:
 	typedef void (model2_renderer::*scanline_render_func)(int32_t scanline, const extent_t& extent, const m2_poly_extra_data& object, int threadid);
 
 public:
 	model2_renderer(model2_state& state)
-		: poly_manager<float, m2_poly_extra_data, 4, 32768>(state.machine())
+		: poly_manager<float, m2_poly_extra_data, 4, 0x10000>(state.machine())
 		, m_state(state)
 		, m_destmap(512, 512)
 	{
