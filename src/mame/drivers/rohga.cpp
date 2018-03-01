@@ -776,7 +776,7 @@ static const gfx_layout spritelayout =
 	RGN_FRAC(1,1),
 	4,
 	{ 16, 0, 24, 8 },
-	{ STEP16(16*8*4,1), STEP8(0,1) },
+	{ STEP8(16*8*4,1), STEP8(0,1) },
 	{ STEP16(0,8*4) },
 	16*16*4
 };
@@ -787,7 +787,7 @@ static const gfx_layout spritelayout_6bpp =
 	4096*8,
 	6,
 	{ 0x400000*8+8, 0x400000*8, 0x200000*8+8, 0x200000*8, 8, 0 },
-	{ STEP16(16*8*2,1), STEP8(0,1) },
+	{ STEP8(16*8*2,1), STEP8(0,1) },
 	{ STEP16(0,8*2) },
 	16*16*2
 };
@@ -798,7 +798,7 @@ static const gfx_layout tilelayout =
 	RGN_FRAC(1,2),
 	4,
 	{ RGN_FRAC(1,2)+8, RGN_FRAC(1,2), 8, 0 },
-	{ STEP16(16*8*2,1), STEP8(0,1) },
+	{ STEP8(16*8*2,1), STEP8(0,1) },
 	{ STEP16(0,8*2) },
 	16*16*2
 };

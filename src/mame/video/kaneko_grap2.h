@@ -28,7 +28,7 @@ public:
 	uint16_t m_framebuffer_bright2;
 
 	uint16_t m_regs1_address_regs[0x2];
-	uint16_t m_brightreg;
+	uint16_t m_regs2;
 
 	DECLARE_WRITE16_MEMBER(framebuffer1_enable_w) { m_framebuffer_enable = data; }
 
@@ -46,7 +46,7 @@ public:
 	DECLARE_WRITE16_MEMBER(framebuffer1_bgcol_w);
 
 	DECLARE_WRITE16_MEMBER(regs1_address_w) { COMBINE_DATA(&m_regs1_address_regs[offset]); }
-	DECLARE_WRITE16_MEMBER(brightreg_w) { COMBINE_DATA(&m_brightreg); }
+	DECLARE_WRITE16_MEMBER(regs2_w) { COMBINE_DATA(&m_regs2); }
 
 	DECLARE_READ16_MEMBER(  framebuffer_r ) { return m_framebuffer[offset]; }
 	DECLARE_WRITE16_MEMBER( framebuffer_w ) { COMBINE_DATA(&m_framebuffer[offset]); }

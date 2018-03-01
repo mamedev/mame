@@ -41,8 +41,13 @@ public:
 		, m_msm(*this, "msm")
 		, m_adpcm_select(*this, "adpcm_select")
 		, m_adpcm_bank(*this, "adpcm_bank")
+		, m_main_displays(*this, "digit%u", 0U)
 	{ }
 
+	void jp(machine_config &config);
+	void jps(machine_config &config);
+
+protected:
 	DECLARE_READ8_MEMBER(porta_r);
 	DECLARE_READ8_MEMBER(portb_r);
 	DECLARE_WRITE8_MEMBER(out1_w);
@@ -55,16 +60,15 @@ public:
 	DECLARE_WRITE8_MEMBER(adpcm_reset_w);
 	DECLARE_WRITE_LINE_MEMBER(vck_w);
 	IRQ_CALLBACK_MEMBER(sound_int_cb);
-	DECLARE_DRIVER_INIT(jp);
 
-	void jp(machine_config &config);
-	void jps(machine_config &config);
-	void jp_map(address_map &map);
-	void jp_sound_map(address_map &map);
-private:
-	void update_display();
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
+
+	void jp_map(address_map &map);
+	void jp_sound_map(address_map &map);
+
+private:
+	void update_display();
 
 	uint32_t m_disp_data;
 	bool m_adpcm_ff;
@@ -76,6 +80,7 @@ private:
 	optional_device<msm5205_device> m_msm;
 	optional_device<ls157_device> m_adpcm_select;
 	optional_memory_bank m_adpcm_bank;
+	output_finder<32> m_main_displays;
 };
 
 
@@ -271,9 +276,9 @@ void jp_state::update_display()
 
 		for (int i = 0; i < 32; i++)
 			if (BIT(m_disp_data, i))
-				output().set_digit_value(i, (output().get_digit_value(i) & ~segment));
+				m_main_displays[i] = m_main_displays[i] & ~segment;
 			else
-				output().set_digit_value(i, (output().get_digit_value(i) | segment));
+				m_main_displays[i] = m_main_displays[i] | segment;
 	}
 }
 
@@ -307,12 +312,18 @@ READ8_MEMBER(jp_state::portb_r)
 
 void jp_state::machine_start()
 {
+	genpin_class::machine_start();
+
+	m_main_displays.resolve();
+
 	if (m_adpcm_bank.found())
 		m_adpcm_bank->configure_entries(0, 16, memregion("sound1")->base(), 0x8000);
 }
 
 void jp_state::machine_reset()
 {
+	genpin_class::machine_reset();
+
 	//m_maincpu->set_input_line(INPUT_LINE_NMI, PULSE_LINE);
 	output().set_digit_value(96, 0x3f);
 	output().set_digit_value(97, 0x3f);
@@ -320,15 +331,11 @@ void jp_state::machine_reset()
 	output().set_digit_value(99, 0x3f);
 }
 
-DRIVER_INIT_MEMBER( jp_state, jp )
-{
-}
-
 MACHINE_CONFIG_START(jp_state::jp)
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", Z80, XTAL(8'000'000) / 2)
+	MCFG_CPU_ADD("maincpu", Z80, 8_MHz_XTAL / 2)
 	MCFG_CPU_PROGRAM_MAP(jp_map)
-	MCFG_CPU_PERIODIC_INT_DRIVER(jp_state, irq0_line_hold, XTAL(8'000'000) / 8192) // 4020 divider
+	MCFG_CPU_PERIODIC_INT_DRIVER(jp_state, irq0_line_hold, 8_MHz_XTAL / 8192) // 4020 divider
 
 	MCFG_NVRAM_ADD_0FILL("nvram")
 
@@ -366,7 +373,7 @@ MACHINE_CONFIG_START(jp_state::jp)
 	/* Sound */
 	genpin_audio(config);
 	MCFG_SPEAKER_STANDARD_MONO("ayvol")
-	MCFG_SOUND_ADD("ay", AY8910, XTAL(8'000'000) / 4)
+	MCFG_SOUND_ADD("ay", AY8910, 8_MHz_XTAL / 4)
 	MCFG_AY8910_PORT_A_READ_CB(READ8(jp_state, porta_r))
 	MCFG_AY8910_PORT_B_READ_CB(READ8(jp_state, portb_r))
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "ayvol", 0.9)
@@ -401,7 +408,7 @@ IRQ_CALLBACK_MEMBER(jp_state::sound_int_cb)
 
 MACHINE_CONFIG_START(jp_state::jps)
 	jp(config);
-	MCFG_CPU_ADD("soundcpu", Z80, XTAL(8'000'000) / 2)
+	MCFG_CPU_ADD("soundcpu", Z80, 8_MHz_XTAL / 2)
 	MCFG_CPU_PROGRAM_MAP(jp_sound_map)
 	MCFG_CPU_IRQ_ACKNOWLEDGE_DRIVER(jp_state, sound_int_cb)
 
@@ -409,7 +416,7 @@ MACHINE_CONFIG_START(jp_state::jps)
 	MCFG_74157_OUT_CB(DEVWRITE8("msm", msm5205_device, data_w))
 
 	MCFG_SPEAKER_STANDARD_MONO("msmvol")
-	MCFG_SOUND_ADD("msm", MSM5205, XTAL(384'000)) // not labeled in manual; clock unknown
+	MCFG_SOUND_ADD("msm", MSM5205, 384'000) // not labeled in manual; clock unknown
 	MCFG_MSM5205_VCK_CALLBACK(WRITELINE(jp_state, vck_w))
 	MCFG_MSM5205_PRESCALER_SELECTOR(S48_4B) // unknown
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "msmvol", 1.0)
@@ -609,17 +616,17 @@ ROM_START(petaco2)
 ROM_END
 
 // different hardware
-GAME(1984,  petaco,     0,      jp, jp, jp_state,   jp, ROT0, "Juegos Populares", "Petaco",                               MACHINE_IS_SKELETON_MECHANICAL)
+GAME(1984,  petaco,     0,      jp,  jp, jp_state,  0, ROT0, "Juegos Populares", "Petaco",                               MACHINE_IS_SKELETON_MECHANICAL)
 
 // mostly ok
-GAME(1985,  petacon,    0,      jp, jp, jp_state,   jp, ROT0, "Juegos Populares", "Petaco (new hardware)",                MACHINE_MECHANICAL | MACHINE_NOT_WORKING )
-GAME(1985,  petacona,   0,      jp, jp, jp_state,   jp, ROT0, "Juegos Populares", "Petaco (new hardware, alternate set)", MACHINE_MECHANICAL | MACHINE_NOT_WORKING)
-GAME(1985,  petaco2,    0,      jps, jp, jp_state,  jp, ROT0, "Juegos Populares", "Petaco 2",                             MACHINE_MECHANICAL | MACHINE_NOT_WORKING )
-GAME(1985,  faeton,     0,      jp, jp, jp_state,   jp, ROT0, "Juegos Populares", "Faeton",                               MACHINE_MECHANICAL | MACHINE_NOT_WORKING )
-GAME(1986,  halley,     0,      jps, jp, jp_state,  jp, ROT0, "Juegos Populares", "Halley Comet",                         MACHINE_MECHANICAL | MACHINE_NOT_WORKING )
-GAME(1986,  halleya,    halley, jps, jp, jp_state,  jp, ROT0, "Juegos Populares", "Halley Comet (alternate version)",     MACHINE_MECHANICAL | MACHINE_NOT_WORKING )
-GAME(1986,  aqualand,   0,      jps, jp, jp_state,  jp, ROT0, "Juegos Populares", "Aqualand",                             MACHINE_MECHANICAL | MACHINE_NOT_WORKING )
-GAME(1986,  america,    0,      jps, jp, jp_state,  jp, ROT0, "Juegos Populares", "America 1492",                         MACHINE_MECHANICAL | MACHINE_NOT_WORKING )
-GAME(1986,  olympus,    0,      jps, jp, jp_state,  jp, ROT0, "Juegos Populares", "Olympus",                              MACHINE_MECHANICAL | MACHINE_NOT_WORKING )
-GAME(1987,  lortium,    0,      jp, jp, jp_state,   jp, ROT0, "Juegos Populares", "Lortium",                              MACHINE_IS_SKELETON_MECHANICAL)
-GAME(19??,  pimbal,     0,      jp, jp, jp_state,   jp, ROT0, "Juegos Populares", "Pimbal (Pinball 3000)",                MACHINE_IS_SKELETON_MECHANICAL)
+GAME(1985,  petacon,    0,      jp,  jp, jp_state,  0, ROT0, "Juegos Populares", "Petaco (new hardware)",                MACHINE_MECHANICAL | MACHINE_NOT_WORKING )
+GAME(1985,  petacona,   0,      jp,  jp, jp_state,  0, ROT0, "Juegos Populares", "Petaco (new hardware, alternate set)", MACHINE_MECHANICAL | MACHINE_NOT_WORKING)
+GAME(1985,  petaco2,    0,      jps, jp, jp_state,  0, ROT0, "Juegos Populares", "Petaco 2",                             MACHINE_MECHANICAL | MACHINE_NOT_WORKING )
+GAME(1985,  faeton,     0,      jp,  jp, jp_state,  0, ROT0, "Juegos Populares", "Faeton",                               MACHINE_MECHANICAL | MACHINE_NOT_WORKING )
+GAME(1986,  halley,     0,      jps, jp, jp_state,  0, ROT0, "Juegos Populares", "Halley Comet",                         MACHINE_MECHANICAL | MACHINE_NOT_WORKING )
+GAME(1986,  halleya,    halley, jps, jp, jp_state,  0, ROT0, "Juegos Populares", "Halley Comet (alternate version)",     MACHINE_MECHANICAL | MACHINE_NOT_WORKING )
+GAME(1986,  aqualand,   0,      jps, jp, jp_state,  0, ROT0, "Juegos Populares", "Aqualand",                             MACHINE_MECHANICAL | MACHINE_NOT_WORKING )
+GAME(1986,  america,    0,      jps, jp, jp_state,  0, ROT0, "Juegos Populares", "America 1492",                         MACHINE_MECHANICAL | MACHINE_NOT_WORKING )
+GAME(1986,  olympus,    0,      jps, jp, jp_state,  0, ROT0, "Juegos Populares", "Olympus",                              MACHINE_MECHANICAL | MACHINE_NOT_WORKING )
+GAME(1987,  lortium,    0,      jp,  jp, jp_state,  0, ROT0, "Juegos Populares", "Lortium",                              MACHINE_IS_SKELETON_MECHANICAL)
+GAME(19??,  pimbal,     0,      jp,  jp, jp_state,  0, ROT0, "Juegos Populares", "Pimbal (Pinball 3000)",                MACHINE_IS_SKELETON_MECHANICAL)

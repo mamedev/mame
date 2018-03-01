@@ -77,6 +77,7 @@ public:
 		, m_scsibus(*this, INTERPRO_SCSI_TAG)
 		, m_eth(*this, INTERPRO_ETH_TAG)
 		, m_ioga(*this, INTERPRO_IOGA_TAG)
+		, m_led(*this, "digit0")
 	{
 	}
 
@@ -167,6 +168,8 @@ public:
 protected:
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
+
+	output_finder<> m_led;
 
 	u16 m_sreg_error;
 	u16 m_sreg_status;

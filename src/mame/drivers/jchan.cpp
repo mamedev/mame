@@ -180,7 +180,6 @@ public:
 		, m_sprregs(*this, "sprregs_%u", 1)
 		, m_mainsub_shared_ram(*this, "mainsub_shared")
 		, m_ctrl(*this, "ctrl")
-		, m_spriterom(*this, "gfx%u", 1)
 	{ }
 
 	required_device<cpu_device> m_maincpu;
@@ -193,8 +192,6 @@ public:
 	required_shared_ptr_array<uint16_t, 2> m_sprregs;
 	required_shared_ptr<uint16_t> m_mainsub_shared_ram;
 	required_shared_ptr<uint16_t> m_ctrl;
-
-	required_memory_region_array<2> m_spriterom;
 
 	std::unique_ptr<bitmap_ind16> m_sprite_bitmap[2];
 	std::unique_ptr<uint32_t[]> m_sprite_ram32[2];
@@ -308,7 +305,7 @@ uint32_t jchan_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap,
 	for (int chip = 0; chip < 2; chip++)
 	{
 		m_sprite_bitmap[chip]->fill(0, cliprect);
-		m_spritegen[chip]->skns_draw_sprites(*m_sprite_bitmap[chip], cliprect, m_sprite_ram32[chip].get(), 0x4000, m_spriterom[chip]->base(), m_spriterom[chip]->bytes(), m_sprite_regs32[chip].get() );
+		m_spritegen[chip]->skns_draw_sprites(*m_sprite_bitmap[chip], cliprect, m_sprite_ram32[chip].get(), 0x4000, m_sprite_regs32[chip].get() );
 	}
 
 	bitmap_ind8 *tile_primap = &screen.priority();
@@ -339,10 +336,12 @@ uint32_t jchan_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap,
 						if (pixdata2 & 0xff)
 						{
 							dst[x] = (pixdata2 & 0x3fff)|0x4000;
+							tilepri[x] = (pridata2 << 1);
 						}
 						else if (pixdata1 & 0xff)
 						{
 							dst[x] = (pixdata1 & 0x3fff)|0x4000;
+							tilepri[x] = (pridata1 << 1);
 						}
 					}
 					else
@@ -350,10 +349,12 @@ uint32_t jchan_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap,
 						if (pixdata1 & 0xff)
 						{
 							dst[x] = (pixdata1 & 0x3fff)|0x4000;
+							tilepri[x] = (pridata1 << 1);
 						}
 						else if (pixdata2 & 0xff)
 						{
 							dst[x] = (pixdata2 & 0x3fff)|0x4000;
+							tilepri[x] = (pridata2 << 1);
 						}
 					}
 				}
@@ -362,6 +363,7 @@ uint32_t jchan_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap,
 					if (pixdata1 & 0xff)
 					{
 						dst[x] = (pixdata1 & 0x3fff)|0x4000;
+						tilepri[x] = (pridata1 << 1);
 					}
 				}
 			}
@@ -370,6 +372,7 @@ uint32_t jchan_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap,
 				if (pixdata2 & 0xff)
 				{
 					dst[x] = (pixdata2 & 0x3fff)|0x4000;
+					tilepri[x] = (pridata2 << 1);
 				}
 			}
 		}
@@ -652,7 +655,7 @@ ROM_START( jchan )
 	ROM_LOAD16_BYTE( "jsp1x3.u86", 0x000001, 0x080000, CRC(d15d2b8e) SHA1(e253f2d64fee6627f68833b441f41ea6bbb3ab07) ) // 1xxxxxxxxxxxxxxxxxx = 0xFF
 	ROM_LOAD16_BYTE( "jsp0x3.u87", 0x000000, 0x080000, CRC(ebec50b1) SHA1(57d7bd728349c2b9d662bcf20a3be92902cb3ffb) ) // 1xxxxxxxxxxxxxxxxxx = 0xFF
 
-	ROM_REGION( 0x2000000, "gfx1", 0 ) /* SPA GFX */
+	ROM_REGION( 0x2000000, "spritegen1", 0 ) /* SPA GFX */
 	ROM_LOAD( "jc-100-00.179", 0x0000000, 0x0400000, CRC(578d928c) SHA1(1cfe04f9b02c04f95a85d6fe7c4306a535ff969f) ) // SPA0 kaneko logo
 	ROM_LOAD( "jc-101-00.180", 0x0400000, 0x0400000, CRC(7f5e1aca) SHA1(66ed3deedfd55d88e7dcd017b9c2ce523ccb421a) ) // SPA1
 	ROM_LOAD( "jc-102-00.181", 0x0800000, 0x0400000, CRC(72caaa68) SHA1(f6b98aa949768a306ac9bc5f9c05a1c1a3fb6c3f) ) // SPA2
@@ -663,7 +666,7 @@ ROM_START( jchan )
 	ROM_LOAD16_BYTE( "jcs0x3.164", 0x1600000, 0x040000, CRC(9a012cbc) SHA1(b3e7390220c90d55dccfb96397f0af73925e36f9) ) // SPA-7A female portraits
 	ROM_LOAD16_BYTE( "jcs1x3.165", 0x1600001, 0x040000, CRC(57ae7c8d) SHA1(4086f638c2aabcee84e838243f0fd15cec5c040d) ) // SPA-7B female portraits
 
-	ROM_REGION( 0x1000000, "gfx2", 0 ) /* SPB GFX (background sprites) */
+	ROM_REGION( 0x1000000, "spritegen2", 0 ) /* SPB GFX (background sprites) */
 	ROM_LOAD( "jc-106-00.171", 0x000000, 0x200000, CRC(bc65661b) SHA1(da28b8fcd7c7a0de427a54be2cf41a1d6a295164) ) // SPB0
 	ROM_LOAD( "jc-107-00.172", 0x200000, 0x200000, CRC(92a86e8b) SHA1(c37eddbc9d84239deb543504e27b5bdaf2528f79) ) // SPB1
 
@@ -692,7 +695,7 @@ ROM_START( jchan2 ) /* Some kind of semi-sequel? MASK ROMs dumped and confirmed 
 	ROM_LOAD16_BYTE( "j2p1x5.u86", 0x000001, 0x080000, CRC(dc897725) SHA1(d3e94bac96497deb2f79996c2d4a349f6da5b1d6) ) // 1xxxxxxxxxxxxxxxxxx = 0xFF
 	ROM_LOAD16_BYTE( "j2p1x6.u87", 0x000000, 0x080000, CRC(594224f9) SHA1(bc546a98c5f3c5b08f521c54a4b0e9e2cdf83ced) ) // 1xxxxxxxxxxxxxxxxxx = 0xFF
 
-	ROM_REGION( 0x2000000, "gfx1", 0 ) /* SPA GFX */
+	ROM_REGION( 0x2000000, "spritegen1", 0 ) /* SPA GFX */
 	ROM_LOAD( "jc-100-00.179", 0x0000000, 0x0400000, CRC(578d928c) SHA1(1cfe04f9b02c04f95a85d6fe7c4306a535ff969f) ) // SPA0 kaneko logo
 	ROM_LOAD( "jc-101-00.180", 0x0400000, 0x0400000, CRC(7f5e1aca) SHA1(66ed3deedfd55d88e7dcd017b9c2ce523ccb421a) ) // SPA1
 	ROM_LOAD( "jc-102-00.181", 0x0800000, 0x0400000, CRC(72caaa68) SHA1(f6b98aa949768a306ac9bc5f9c05a1c1a3fb6c3f) ) // SPA2
@@ -703,7 +706,7 @@ ROM_START( jchan2 ) /* Some kind of semi-sequel? MASK ROMs dumped and confirmed 
 	ROM_LOAD16_BYTE( "j2g1x1.164", 0x1600000, 0x080000, CRC(66a7ea6a) SHA1(605cbc1eb50fb0decbea790f2a11e999d5fde762) ) // SPA-7A female portraits
 	ROM_LOAD16_BYTE( "j2g1x2.165", 0x1600001, 0x080000, CRC(660e770c) SHA1(1e385a6ee83559b269d2179e6c247238c0f3c850) ) // SPA-7B female portraits
 
-	ROM_REGION( 0x1000000, "gfx2", 0 ) /* SPB GFX (background sprites) */
+	ROM_REGION( 0x1000000, "spritegen2", 0 ) /* SPB GFX (background sprites) */
 	ROM_LOAD( "jc-106-00.171", 0x000000, 0x200000, CRC(bc65661b) SHA1(da28b8fcd7c7a0de427a54be2cf41a1d6a295164) ) // SPB0
 	ROM_LOAD( "jc-107-00.172", 0x200000, 0x200000, CRC(92a86e8b) SHA1(c37eddbc9d84239deb543504e27b5bdaf2528f79) ) // SPB1
 

@@ -24,7 +24,7 @@ ADDRESS_MAP_START(kaneko_grap2_device::grap2_map)
 	AM_RANGE(0x000c10, 0x000c11) AM_READWRITE(framebuffer1_fbbright1_r, framebuffer1_fbbright1_w )
 	AM_RANGE(0x000c12, 0x000c13) AM_READWRITE(framebuffer1_fbbright2_r, framebuffer1_fbbright2_w )
 	AM_RANGE(0x000c18, 0x000c1b) AM_WRITE(regs1_address_w)
-	AM_RANGE(0x000c1c, 0x000c1d) AM_WRITE(brightreg_w)
+	AM_RANGE(0x000c1c, 0x000c1d) AM_WRITE(regs2_w)
 	AM_RANGE(0x000c1e, 0x000c1f) AM_WRITE(regs1_go_w)
 	AM_RANGE(0x000c00, 0x000c1f) AM_READ(regs1_r)
 	AM_RANGE(0x080000, 0x0801ff) AM_READWRITE( pal_r, framebuffer1_palette_w )
@@ -61,7 +61,7 @@ void kaneko_grap2_device::device_start()
 	save_item(NAME(m_framebuffer_scrollx));
 	save_item(NAME(m_framebuffer_enable));
 	save_item(NAME(m_regs1_i));
-	save_item(NAME(m_brightreg));
+	save_item(NAME(m_regs2));
 	save_item(NAME(m_framebuffer_bright1));
 	save_item(NAME(m_framebuffer_bright2));
 	save_item(NAME(m_regs1_address_regs));

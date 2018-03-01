@@ -2281,7 +2281,7 @@ msgstr "Catégorie"
 
 #: src/frontend/mame/ui/utils.cpp:65
 msgid "Favorites"
-msgstr "Favories"
+msgstr "Favoris"
 
 #: src/frontend/mame/ui/utils.cpp:67
 msgid "Not BIOS"

@@ -187,7 +187,7 @@ uint32_t galpani3_state::screen_update_galpani3(screen_device &screen, bitmap_rg
 	
 	m_sprite_bitmap.fill(0x0000, cliprect);
 
-	m_spritegen->skns_draw_sprites(m_sprite_bitmap, cliprect, m_spriteram32.get(), 0x4000, memregion("gfx1")->base(), memregion ("gfx1")->bytes(), m_spc_regs.get() );
+	m_spritegen->skns_draw_sprites(m_sprite_bitmap, cliprect, m_spriteram32.get(), 0x4000, m_spc_regs.get() );
 
 //  popmessage("%02x %02x", m_grap2[0]->m_framebuffer_bright2, m_grap2[1]->m_framebuffer_bright2);
 
@@ -506,7 +506,7 @@ ROM_START( galpani3 ) /* All game text in English */
 	ROM_LOAD16_BYTE( "g3p0e0.u71",  0x000000, 0x080000, CRC(fa681118) SHA1(982b568a77ed620ba5708fec4c186d329d48cb48) )
 	ROM_LOAD16_BYTE( "g3p1e0.u102", 0x000001, 0x080000, CRC(f1150f1b) SHA1(a6fb719937927a9a39c7a4888017c63c47c2dd6c) )
 
-	ROM_REGION( 0x200000, "gfx1", 0 ) /* Sprites - RLE encoded */
+	ROM_REGION( 0x200000, "spritegen", 0 ) /* Sprites - RLE encoded */
 	ROM_LOAD( "gp320000.1", 0x000000, 0x200000, CRC(a0112827) SHA1(0a6c78d71b75a1d78215aab3104176aa1769b14f) )
 
 	ROM_REGION( 0x1000000, "rlebg", 0 ) /* Backgrounds - RLE encoded */
@@ -530,7 +530,7 @@ ROM_START( galpani3hk )
 	ROM_LOAD16_BYTE( "gp3_hk.u71",  0x000000, 0x080000, CRC(b8fc7826) SHA1(9ce97f2bb6af6a3aa19d2a7d4c159e3c33f43f63) )
 	ROM_LOAD16_BYTE( "gp3_hk.u102", 0x000001, 0x080000, CRC(658f5fe8) SHA1(09c52d7676ccf31a7696596279cb07564ae018b3) )
 
-	ROM_REGION( 0x200000, "gfx1", 0 ) /* Sprites - RLE encoded */
+	ROM_REGION( 0x200000, "spritegen", 0 ) /* Sprites - RLE encoded */
 	ROM_LOAD( "gp320000.1", 0x000000, 0x200000, CRC(a0112827) SHA1(0a6c78d71b75a1d78215aab3104176aa1769b14f) )
 
 	ROM_REGION( 0x1000000, "rlebg", 0 ) /* Backgrounds - RLE encoded */
@@ -554,7 +554,7 @@ ROM_START( galpani3j ) /* Some game text in Japanese, but no "For use in Japan" 
 	ROM_LOAD16_BYTE( "g3p0j1.71",  0x000000, 0x080000, CRC(52893326) SHA1(78fdbf3436a4ba754d7608fedbbede5c719a4505) )
 	ROM_LOAD16_BYTE( "g3p1j1.102", 0x000001, 0x080000, CRC(05f935b4) SHA1(81e78875585bcdadad1c302614b2708e60563662) )
 
-	ROM_REGION( 0x200000, "gfx1", 0 ) /* Sprites - RLE encoded */
+	ROM_REGION( 0x200000, "spritegen", 0 ) /* Sprites - RLE encoded */
 	ROM_LOAD( "gp320000.1", 0x000000, 0x200000, CRC(a0112827) SHA1(0a6c78d71b75a1d78215aab3104176aa1769b14f) )
 
 	ROM_REGION( 0x1000000, "rlebg", 0 ) /* Backgrounds - RLE encoded */
@@ -578,7 +578,7 @@ ROM_START( galpani3k ) /* Some game text in Korean, but no "For use in Korea" ty
 	ROM_LOAD16_BYTE( "g3p0k0.71",  0x000000, 0x080000, CRC(98147760) SHA1(6db614e1af4e163488ab9675d96db829f45cec22) )
 	ROM_LOAD16_BYTE( "g3p1k0.102", 0x000001, 0x080000, CRC(27416b22) SHA1(dbb3ec78cf70fd9a56e4f51c1c2b65feabc14190) )
 
-	ROM_REGION( 0x200000, "gfx1", 0 ) /* Sprites - RLE encoded */
+	ROM_REGION( 0x200000, "spritegen", 0 ) /* Sprites - RLE encoded */
 	ROM_LOAD( "gp320000.1", 0x000000, 0x200000, CRC(a0112827) SHA1(0a6c78d71b75a1d78215aab3104176aa1769b14f) )
 
 	ROM_REGION( 0x1000000, "rlebg", 0 ) /* Backgrounds - RLE encoded */

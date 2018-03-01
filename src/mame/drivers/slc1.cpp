@@ -63,20 +63,28 @@ public:
 		: driver_device(mconfig, type, tag)
 		, m_maincpu(*this, "maincpu")
 		, m_speaker(*this, "speaker")
+		, m_display(*this, "digit%u", 0U)
 	{ }
 
+	void slc1(machine_config &config);
+
+protected:
 	DECLARE_READ8_MEMBER( io_r );
 	DECLARE_WRITE8_MEMBER( io_w );
-	void slc1(machine_config &config);
-	void io_map(address_map &map);
-	void mem_map(address_map &map);
-private:
-	uint8_t m_digit;
-	bool m_kbd_type;
-	virtual void machine_reset() override;
+
 	virtual void machine_start() override;
+	virtual void machine_reset() override;
+
+	void mem_map(address_map &map);
+	void io_map(address_map &map);
+
+private:
+	uint8_t m_digit = 0;
+	bool m_kbd_type = false;
+
 	required_device<cpu_device> m_maincpu;
 	required_device<speaker_sound_device> m_speaker;
+	output_finder<8> m_display;
 };
 
 
@@ -90,37 +98,35 @@ private:
 
 WRITE8_MEMBER( slc1_state::io_w )
 {
-	bool segonoff = BIT(data, 7);
-	bool busyled = BIT(data, 4);
+	bool const segonoff = BIT(data, 7);
+	bool const busyled = BIT(data, 4);
 	data &= 15;
 
 	if (data < 8)
 		m_digit = data;
-	else
-	if (data < 12)
+	else if (data < 12)
 	{
 		m_speaker->level_w(BIT(data, 1));
 		return;
 	}
-	else
-	if (offset == 0x2f07)
+	else if (offset == 0x2f07)
 		return;
 
-	uint8_t segdata = output().get_digit_value(m_digit);
-	uint8_t segnum  = offset & 7;
-	uint8_t segmask = 1 << segnum;
+	uint8_t segdata = m_display[m_digit];
+	uint8_t const segnum  = offset & 7;
+	uint8_t const segmask = 1 << segnum;
 
 	if (segonoff)
 		segdata |= segmask;
 	else
 		segdata &= ~segmask;
 
-	output().set_digit_value(m_digit, segdata);
+	m_display[m_digit] = segdata;
 
 	output().set_value("busyled", busyled);
 
 	if (m_digit == 3)
-		m_kbd_type = (segdata);
+		m_kbd_type = segdata;
 }
 
 
@@ -170,6 +176,10 @@ READ8_MEMBER( slc1_state::io_r )
 
 void slc1_state::machine_start()
 {
+	m_display.resolve();
+
+	save_item(NAME(m_digit));
+	save_item(NAME(m_kbd_type));
 }
 
 void slc1_state::machine_reset()
