@@ -12,9 +12,14 @@
 
 #pragma once
 
+// TODO : Not verified
+#define DRAM_SIZE (1<<20)
+#define DRAM_MASK (DRAM_SIZE-1)
 
 class es5510_device : public cpu_device {
 public:
+	static constexpr feature_type imperfect_features() { return feature::SOUND; }
+
 	es5510_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
 	DECLARE_READ8_MEMBER(host_r);
@@ -114,7 +119,7 @@ public:
 
 	// for testing purposes
 	uint64_t &_instr(int pc) { return instr[pc % 160]; }
-	int16_t &_dram(int addr) { return dram[addr & 0xfffff]; }
+	int16_t &_dram(int addr) { return dram[addr & DRAM_MASK]; }
 
 	// publicly visible for testing purposes
 	int32_t read_reg(uint8_t reg);
@@ -142,7 +147,7 @@ private:
 	bool halt_asserted;
 	uint8_t pc;
 	state_t state;
-	int32_t gpr[0xc0];     // 24 bits, right justified
+	std::unique_ptr<int32_t[]> gpr;
 	int16_t ser0r;
 	int16_t ser0l;
 	int16_t ser1r;
@@ -169,8 +174,11 @@ private:
 	int32_t dol[2];
 	int dol_count;
 
-	uint64_t instr[160];    // 48 bits, right justified
-	int16_t dram[1<<20];   // there are up to 20 address bits (at least 16 expected), left justified within the 24 bits of a gpr or dadr; we preallocate all of it.
+	std::unique_ptr<uint64_t[]> instr;
+	std::unique_ptr<int16_t[]> dram;
+
+	int16_t dram_r(int addr) { return dram[addr & DRAM_MASK]; }
+	void dram_w(int addr, int16_t data) { dram[addr & DRAM_MASK] = data; }
 
 	// latch registers for host interaction
 	int32_t  dol_latch;     // 24 bits

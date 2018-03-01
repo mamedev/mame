@@ -22,8 +22,6 @@ class taito_en_device : public device_t
 
 {
 public:
-	static constexpr feature_type imperfect_features() { return feature::SOUND; }
-
 	taito_en_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
 	DECLARE_WRITE16_MEMBER( en_es5505_bank_w );
@@ -51,6 +49,8 @@ private:
 
 	required_memory_region m_osrom;
 	required_memory_bank_array<3> m_cpubank;
+
+	uint32_t m_bankmask;
 
 	DECLARE_WRITE_LINE_MEMBER(duart_irq_handler);
 	DECLARE_WRITE8_MEMBER(duart_output);
