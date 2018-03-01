@@ -17,6 +17,7 @@
 class model2_renderer;
 struct raster_state;
 struct geo_state;
+struct triangle;
 
 class model2_state : public driver_device
 {
@@ -275,6 +276,31 @@ private:
 
 	bool m_render_unk;
 	bool m_render_mode;
+	
+	inline void model2_3d_project( triangle *tri );
+	uint32_t *geo_process_command( geo_state *geo, uint32_t opcode, uint32_t *input, bool *end_code );
+	// geo commands
+	uint32_t *geo_nop( geo_state *geo, uint32_t opcode, uint32_t *input );
+	uint32_t *geo_object_data( geo_state *geo, uint32_t opcode, uint32_t *input );
+	uint32_t *geo_direct_data( geo_state *geo, uint32_t opcode, uint32_t *input );           
+	uint32_t *geo_window_data( geo_state *geo, uint32_t opcode, uint32_t *input );           
+	uint32_t *geo_texture_data( geo_state *geo, uint32_t opcode, uint32_t *input );          
+	uint32_t *geo_polygon_data( geo_state *geo, uint32_t opcode, uint32_t *input );          
+	uint32_t *geo_texture_parameters( geo_state *geo, uint32_t opcode, uint32_t *input );    
+	uint32_t *geo_mode( geo_state *geo, uint32_t opcode, uint32_t *input );                  
+	uint32_t *geo_zsort_mode( geo_state *geo, uint32_t opcode, uint32_t *input );            
+	uint32_t *geo_focal_distance( geo_state *geo, uint32_t opcode, uint32_t *input );        
+	uint32_t *geo_light_source( geo_state *geo, uint32_t opcode, uint32_t *input );          
+	uint32_t *geo_matrix_write( geo_state *geo, uint32_t opcode, uint32_t *input );          
+	uint32_t *geo_translate_write( geo_state *geo, uint32_t opcode, uint32_t *input );       
+	uint32_t *geo_data_mem_push( geo_state *geo, uint32_t opcode, uint32_t *input );         
+	uint32_t *geo_test( geo_state *geo, uint32_t opcode, uint32_t *input );                  
+	uint32_t *geo_end( geo_state *geo, uint32_t opcode, uint32_t *input );
+	uint32_t *geo_dummy( geo_state *geo, uint32_t opcode, uint32_t *input );
+	uint32_t *geo_log_data( geo_state *geo, uint32_t opcode, uint32_t *input );
+	uint32_t *geo_lod( geo_state *geo, uint32_t opcode, uint32_t *input );
+	uint32_t *geo_code_upload( geo_state *geo, uint32_t opcode, uint32_t *input );
+	uint32_t *geo_code_jump( geo_state *geo, uint32_t opcode, uint32_t *input );
 };
 
 /*****************************
@@ -427,8 +453,6 @@ static inline uint16_t get_texel( uint32_t base_x, uint32_t base_y, int x, int y
 
 	return (texel & 0x0f);
 }
-
-struct triangle;
 
 class model2_renderer : public poly_manager<float, m2_poly_extra_data, 4, 32768>
 {
