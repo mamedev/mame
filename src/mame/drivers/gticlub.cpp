@@ -333,6 +333,12 @@ public:
 	void hangplt(machine_config &config);
 	void slrasslt(machine_config &config);
 	void gticlub(machine_config &config);
+	void gticlub_map(address_map &map);
+	void hangplt_map(address_map &map);
+	void hangplt_sharc0_map(address_map &map);
+	void hangplt_sharc1_map(address_map &map);
+	void sharc_map(address_map &map);
+	void sound_memmap(address_map &map);
 private:
 	void gticlub_led_setreg(int offset, uint8_t data);
 
@@ -505,7 +511,7 @@ MACHINE_START_MEMBER(gticlub_state,gticlub)
 	m_sound_irq_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(gticlub_state::sound_irq), this));
 }
 
-static ADDRESS_MAP_START( gticlub_map, AS_PROGRAM, 32, gticlub_state )
+ADDRESS_MAP_START(gticlub_state::gticlub_map)
 	AM_RANGE(0x00000000, 0x000fffff) AM_RAM AM_SHARE("work_ram")        /* Work RAM */
 	AM_RANGE(0x74000000, 0x740000ff) AM_READWRITE(gticlub_k001604_reg_r, gticlub_k001604_reg_w)
 	AM_RANGE(0x74010000, 0x7401ffff) AM_RAM_WRITE(paletteram32_w) AM_SHARE("paletteram")
@@ -524,7 +530,7 @@ static ADDRESS_MAP_START( gticlub_map, AS_PROGRAM, 32, gticlub_state )
 	AM_RANGE(0x7fe00000, 0x7fffffff) AM_ROM AM_REGION("user1", 0) AM_SHARE("share2")    /* Program ROM */
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( hangplt_map, AS_PROGRAM, 32, gticlub_state )
+ADDRESS_MAP_START(gticlub_state::hangplt_map)
 	AM_RANGE(0x00000000, 0x000fffff) AM_RAM AM_SHARE("work_ram")        /* Work RAM */
 	AM_RANGE(0x74000000, 0x740000ff) AM_READWRITE(gticlub_k001604_reg_r, gticlub_k001604_reg_w)
 	AM_RANGE(0x74010000, 0x7401ffff) AM_RAM_WRITE(paletteram32_w) AM_SHARE("paletteram")
@@ -543,7 +549,7 @@ ADDRESS_MAP_END
 
 /**********************************************************************/
 
-static ADDRESS_MAP_START( sound_memmap, AS_PROGRAM, 16, gticlub_state )
+ADDRESS_MAP_START(gticlub_state::sound_memmap)
 	AM_RANGE(0x000000, 0x07ffff) AM_ROM
 	AM_RANGE(0x200000, 0x20ffff) AM_RAM
 	AM_RANGE(0x300000, 0x30001f) AM_DEVREADWRITE8("k056800", k056800_device, sound_r, sound_w, 0x00ff)
@@ -574,14 +580,14 @@ WRITE32_MEMBER(gticlub_state::dsp_dataram1_w)
 	m_sharc_dataram_1[offset] = data;
 }
 
-static ADDRESS_MAP_START( sharc_map, AS_DATA, 32, gticlub_state )
+ADDRESS_MAP_START(gticlub_state::sharc_map)
 	AM_RANGE(0x400000, 0x41ffff) AM_DEVREADWRITE("konppc", konppc_device, cgboard_0_shared_sharc_r, cgboard_0_shared_sharc_w)
 	AM_RANGE(0x500000, 0x5fffff) AM_READWRITE(dsp_dataram0_r, dsp_dataram0_w)
 	AM_RANGE(0x600000, 0x6fffff) AM_DEVREADWRITE("k001005", k001005_device, read, write)
 	AM_RANGE(0x700000, 0x7000ff) AM_DEVREADWRITE("konppc", konppc_device, cgboard_0_comm_sharc_r, cgboard_0_comm_sharc_w)
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( hangplt_sharc0_map, AS_DATA, 32, gticlub_state )
+ADDRESS_MAP_START(gticlub_state::hangplt_sharc0_map)
 	AM_RANGE(0x0400000, 0x041ffff) AM_DEVREADWRITE("konppc", konppc_device, cgboard_0_shared_sharc_r, cgboard_0_shared_sharc_w)
 	AM_RANGE(0x0500000, 0x05fffff) AM_READWRITE(dsp_dataram0_r, dsp_dataram0_w)
 	AM_RANGE(0x1400000, 0x14fffff) AM_RAM
@@ -592,7 +598,7 @@ static ADDRESS_MAP_START( hangplt_sharc0_map, AS_DATA, 32, gticlub_state )
 	AM_RANGE(0x3600000, 0x37fffff) AM_ROMBANK("bank5")
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( hangplt_sharc1_map, AS_DATA, 32, gticlub_state )
+ADDRESS_MAP_START(gticlub_state::hangplt_sharc1_map)
 	AM_RANGE(0x0400000, 0x041ffff) AM_DEVREADWRITE("konppc", konppc_device, cgboard_1_shared_sharc_r, cgboard_1_shared_sharc_w)
 	AM_RANGE(0x0500000, 0x05fffff) AM_READWRITE(dsp_dataram1_r, dsp_dataram1_w)
 	AM_RANGE(0x1400000, 0x14fffff) AM_RAM
@@ -1011,7 +1017,8 @@ MACHINE_CONFIG_START(gticlub_state::gticlub)
 	MCFG_KONPPC_CGBOARD_TYPE(GTICLUB)
 MACHINE_CONFIG_END
 
-MACHINE_CONFIG_DERIVED(gticlub_state::thunderh, gticlub)
+MACHINE_CONFIG_START(gticlub_state::thunderh)
+	gticlub(config);
 
 	MCFG_DEVICE_REMOVE("adc1038")
 	MCFG_DEVICE_ADD("adc1038", ADC1038, 0)
@@ -1023,7 +1030,8 @@ MACHINE_CONFIG_DERIVED(gticlub_state::thunderh, gticlub)
 	MCFG_K056230_HACK(1)
 MACHINE_CONFIG_END
 
-MACHINE_CONFIG_DERIVED(gticlub_state::slrasslt, gticlub)
+MACHINE_CONFIG_START(gticlub_state::slrasslt)
+	gticlub(config);
 
 	MCFG_DEVICE_REMOVE("adc1038")
 	MCFG_DEVICE_ADD("adc1038", ADC1038, 0)

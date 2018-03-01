@@ -123,7 +123,7 @@ WRITE8_MEMBER(senjyo_state::sound_cmd_w)
 	m_pio->strobe_a(1);
 }
 
-static ADDRESS_MAP_START( senjyo_map, AS_PROGRAM, 8, senjyo_state )
+ADDRESS_MAP_START(senjyo_state::senjyo_map)
 	AM_RANGE(0x0000, 0x7fff) AM_ROM
 	AM_RANGE(0x8000, 0x8fff) AM_RAM
 	AM_RANGE(0x9000, 0x93ff) AM_RAM_WRITE(fgvideoram_w) AM_SHARE("fgvideoram")
@@ -156,11 +156,11 @@ static ADDRESS_MAP_START( senjyo_map, AS_PROGRAM, 8, senjyo_state )
 	AM_RANGE(0xd005, 0xd005) AM_READ_PORT("DSW2")
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( decrypted_opcodes_map, AS_OPCODES, 8, senjyo_state )
+ADDRESS_MAP_START(senjyo_state::decrypted_opcodes_map)
 	AM_RANGE(0x0000, 0x7fff) AM_ROM AM_SHARE("decrypted_opcodes")
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( senjyo_sound_map, AS_PROGRAM, 8, senjyo_state )
+ADDRESS_MAP_START(senjyo_state::senjyo_sound_map)
 	AM_RANGE(0x0000, 0x1fff) AM_ROM
 	AM_RANGE(0x4000, 0x43ff) AM_RAM
 	AM_RANGE(0x8000, 0x8000) AM_DEVWRITE("sn1", sn76496_device, write)
@@ -169,7 +169,7 @@ static ADDRESS_MAP_START( senjyo_sound_map, AS_PROGRAM, 8, senjyo_state )
 	AM_RANGE(0xd000, 0xd000) AM_WRITE(volume_w)
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( senjyo_sound_io_map, AS_IO, 8, senjyo_state )
+ADDRESS_MAP_START(senjyo_state::senjyo_sound_io_map)
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	AM_RANGE(0x00, 0x03) AM_DEVREADWRITE("z80pio", z80pio_device, read_alt, write_alt)
 	AM_RANGE(0x08, 0x0b) AM_DEVREADWRITE("z80ctc", z80ctc_device, read, write)
@@ -190,7 +190,7 @@ WRITE8_MEMBER(senjyo_state::starforb_scrollx2)
 	m_scrollx1[offset] = data;
 }
 
-static ADDRESS_MAP_START( starforb_map, AS_PROGRAM, 8, senjyo_state )
+ADDRESS_MAP_START(senjyo_state::starforb_map)
 	AM_RANGE(0x0000, 0x7fff) AM_ROM
 	AM_RANGE(0x8000, 0x8fff) AM_RAM
 	AM_RANGE(0x9000, 0x93ff) AM_RAM_WRITE(fgvideoram_w) AM_SHARE("fgvideoram")
@@ -222,7 +222,7 @@ static ADDRESS_MAP_START( starforb_map, AS_PROGRAM, 8, senjyo_state )
 ADDRESS_MAP_END
 
 
-static ADDRESS_MAP_START( starforb_sound_map, AS_PROGRAM, 8, senjyo_state )
+ADDRESS_MAP_START(senjyo_state::starforb_sound_map)
 	AM_RANGE(0x0000, 0x1fff) AM_ROM
 	AM_RANGE(0x4000, 0x43ff) AM_RAM
 	AM_RANGE(0x8000, 0x8000) AM_DEVWRITE("sn1", sn76496_device, write)
@@ -598,24 +598,27 @@ MACHINE_CONFIG_END
 
 
 
-MACHINE_CONFIG_DERIVED(senjyo_state::senjyox_e, senjyo)
+MACHINE_CONFIG_START(senjyo_state::senjyox_e)
+	senjyo(config);
 	MCFG_CPU_REPLACE("maincpu", SEGA_315_5015, 4000000)   /* 4 MHz? */
 	MCFG_CPU_PROGRAM_MAP(senjyo_map)
-	MCFG_CPU_DECRYPTED_OPCODES_MAP(decrypted_opcodes_map)
+	MCFG_CPU_OPCODES_MAP(decrypted_opcodes_map)
 	MCFG_CPU_VBLANK_INT_DRIVER("screen", senjyo_state, irq0_line_assert)
 	MCFG_SEGACRPT_SET_DECRYPTED_TAG(":decrypted_opcodes")
 MACHINE_CONFIG_END
 
-MACHINE_CONFIG_DERIVED(senjyo_state::senjyox_a, senjyo)
+MACHINE_CONFIG_START(senjyo_state::senjyox_a)
+	senjyo(config);
 	MCFG_CPU_REPLACE("maincpu", SEGA_315_5018, 4000000)   /* 4 MHz? */
 	MCFG_CPU_PROGRAM_MAP(senjyo_map)
-	MCFG_CPU_DECRYPTED_OPCODES_MAP(decrypted_opcodes_map)
+	MCFG_CPU_OPCODES_MAP(decrypted_opcodes_map)
 	MCFG_CPU_VBLANK_INT_DRIVER("screen", senjyo_state, irq0_line_assert)
 	MCFG_SEGACRPT_SET_DECRYPTED_TAG(":decrypted_opcodes")
 MACHINE_CONFIG_END
 
 
-MACHINE_CONFIG_DERIVED(senjyo_state::starforb, senjyox_e)
+MACHINE_CONFIG_START(senjyo_state::starforb)
+	senjyox_e(config);
 
 	/* basic machine hardware */
 	MCFG_CPU_MODIFY("maincpu")

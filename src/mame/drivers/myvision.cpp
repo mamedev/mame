@@ -56,6 +56,8 @@ public:
 	DECLARE_WRITE8_MEMBER( ay_port_b_w );
 
 	void myvision(machine_config &config);
+	void myvision_io(address_map &map);
+	void myvision_mem(address_map &map);
 private:
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
@@ -69,7 +71,7 @@ private:
 };
 
 
-static ADDRESS_MAP_START(myvision_mem, AS_PROGRAM, 8, myvision_state)
+ADDRESS_MAP_START(myvision_state::myvision_mem)
 	ADDRESS_MAP_UNMAP_HIGH
 	//AM_RANGE(0x0000, 0x5fff)      // mapped by the cartslot
 	AM_RANGE(0xa000, 0xa7ff) AM_RAM
@@ -78,7 +80,7 @@ static ADDRESS_MAP_START(myvision_mem, AS_PROGRAM, 8, myvision_state)
 ADDRESS_MAP_END
 
 
-static ADDRESS_MAP_START(myvision_io, AS_IO, 8, myvision_state)
+ADDRESS_MAP_START(myvision_state::myvision_io)
 	ADDRESS_MAP_UNMAP_HIGH
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	AM_RANGE(0x00, 0x00) AM_DEVWRITE("ay8910", ay8910_device, address_w)

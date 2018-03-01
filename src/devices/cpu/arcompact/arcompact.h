@@ -82,6 +82,7 @@ public:
 	DECLARE_WRITE32_MEMBER( arcompact_auxreg025_INTVECTORBASE_w);
 
 
+	void arcompact_auxreg_map(address_map &map);
 protected:
 	// device-level overrides
 	virtual void device_start() override;

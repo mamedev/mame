@@ -34,7 +34,6 @@
 
 
 #define RS232_TAG       "rs232"
-#define COM5016T_TAG    "com5016t"
 
 class vt100_state : public driver_device
 {
@@ -44,8 +43,7 @@ public:
 		m_maincpu(*this, "maincpu"),
 		m_crtc(*this, "vt100_video"),
 		m_keyboard(*this, "keyboard"),
-		m_uart(*this, "i8251"),
-		m_dbrg(*this, COM5016T_TAG),
+		m_dbrg(*this, "dbrg"),
 		m_nvr(*this, "nvr"),
 		m_p_ram(*this, "p_ram")
 	{
@@ -54,7 +52,6 @@ public:
 	required_device<cpu_device> m_maincpu;
 	required_device<vt100_video_device> m_crtc;
 	required_device<vt100_keyboard_device> m_keyboard;
-	required_device<i8251_device> m_uart;
 	required_device<com8116_device> m_dbrg;
 	required_device<er1400_device> m_nvr;
 	DECLARE_READ8_MEMBER(vt100_flags_r);
@@ -64,7 +61,7 @@ public:
 	DECLARE_WRITE8_MEMBER(vt100_baud_rate_w);
 	DECLARE_WRITE8_MEMBER(vt100_nvr_latch_w);
 	DECLARE_READ8_MEMBER(vt100_read_video_ram_r);
-	DECLARE_WRITE_LINE_MEMBER(vt100_clear_video_interrupt);
+	DECLARE_WRITE_LINE_MEMBER(vert_freq_intr_w);
 	required_shared_ptr<uint8_t> m_p_ram;
 	bool m_keyboard_int;
 	bool m_receiver_int;
@@ -72,17 +69,20 @@ public:
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
 	uint32_t screen_update_vt100(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
-	INTERRUPT_GEN_MEMBER(vt100_vertical_interrupt);
 	IRQ_CALLBACK_MEMBER(vt100_irq_callback);
 	void vt102(machine_config &config);
 	void vt100(machine_config &config);
 	void vt180(machine_config &config);
+	void vt100_io(address_map &map);
+	void vt100_mem(address_map &map);
+	void vt180_io(address_map &map);
+	void vt180_mem(address_map &map);
 };
 
 
 
 
-static ADDRESS_MAP_START(vt100_mem, AS_PROGRAM, 8, vt100_state)
+ADDRESS_MAP_START(vt100_state::vt100_mem)
 	ADDRESS_MAP_UNMAP_HIGH
 	AM_RANGE( 0x0000, 0x1fff ) AM_ROM  // ROM ( 4 * 2K)
 	AM_RANGE( 0x2000, 0x2bff ) AM_RAM AM_SHARE("p_ram") // Screen and scratch RAM
@@ -94,13 +94,13 @@ static ADDRESS_MAP_START(vt100_mem, AS_PROGRAM, 8, vt100_state)
 	// 0xc000, 0xffff is unassigned
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START(vt180_mem, AS_PROGRAM, 8, vt100_state)
+ADDRESS_MAP_START(vt100_state::vt180_mem)
 	ADDRESS_MAP_UNMAP_HIGH
 	AM_RANGE( 0x0000, 0x1fff ) AM_ROM
 	AM_RANGE( 0x2000, 0xffff ) AM_RAM
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START(vt180_io, AS_IO, 8, vt100_state)
+ADDRESS_MAP_START(vt100_state::vt180_io)
 	ADDRESS_MAP_UNMAP_HIGH
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
 ADDRESS_MAP_END
@@ -157,12 +157,12 @@ WRITE8_MEMBER( vt100_state::vt100_nvr_latch_w )
 	m_nvr->data_w(BIT(data, 2) ? 0 : !BIT(data, 0));
 }
 
-static ADDRESS_MAP_START(vt100_io, AS_IO, 8, vt100_state)
+ADDRESS_MAP_START(vt100_state::vt100_io)
 	ADDRESS_MAP_UNMAP_HIGH
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	// 0x00, 0x01 PUSART  (Intel 8251)
-	AM_RANGE (0x00, 0x00) AM_DEVREADWRITE("i8251", i8251_device, data_r, data_w)
-	AM_RANGE (0x01, 0x01) AM_DEVREADWRITE("i8251", i8251_device, status_r, control_w)
+	AM_RANGE (0x00, 0x00) AM_DEVREADWRITE("pusart", i8251_device, data_r, data_w)
+	AM_RANGE (0x01, 0x01) AM_DEVREADWRITE("pusart", i8251_device, status_r, control_w)
 	// 0x02 Baud rate generator
 	AM_RANGE (0x02, 0x02) AM_WRITE(vt100_baud_rate_w)
 	// 0x22 Modem buffer
@@ -233,15 +233,11 @@ READ8_MEMBER( vt100_state::vt100_read_video_ram_r )
 	return m_p_ram[offset];
 }
 
-WRITE_LINE_MEMBER( vt100_state::vt100_clear_video_interrupt )
+WRITE_LINE_MEMBER( vt100_state::vert_freq_intr_w )
 {
-	m_vertical_int = 0;
-}
-
-INTERRUPT_GEN_MEMBER(vt100_state::vt100_vertical_interrupt)
-{
-	m_vertical_int = 1;
-	device.execute().set_input_line(0, HOLD_LINE);
+	m_vertical_int = (state == ASSERT_LINE) ? 1 : 0;
+	if (state)
+		m_maincpu->set_input_line(0, HOLD_LINE);
 }
 
 /* F4 Character Displayer */
@@ -264,10 +260,9 @@ GFXDECODE_END
 
 MACHINE_CONFIG_START(vt100_state::vt100)
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu",I8080, XTAL(24'883'200) / 9)
+	MCFG_CPU_ADD("maincpu", I8080, XTAL(24'883'200) / 9)
 	MCFG_CPU_PROGRAM_MAP(vt100_mem)
 	MCFG_CPU_IO_MAP(vt100_io)
-	MCFG_CPU_VBLANK_INT_DRIVER("screen", vt100_state,  vt100_vertical_interrupt)
 	MCFG_CPU_IRQ_ACKNOWLEDGE_DRIVER(vt100_state,vt100_irq_callback)
 
 	/* video hardware */
@@ -286,21 +281,21 @@ MACHINE_CONFIG_START(vt100_state::vt100)
 	MCFG_VT_SET_SCREEN("screen")
 	MCFG_VT_CHARGEN("chargen")
 	MCFG_VT_VIDEO_RAM_CALLBACK(READ8(vt100_state, vt100_read_video_ram_r))
-	MCFG_VT_VIDEO_CLEAR_VIDEO_INTERRUPT_CALLBACK(WRITELINE(vt100_state, vt100_clear_video_interrupt))
+	MCFG_VT_VIDEO_VERT_FREQ_INTR_CALLBACK(WRITELINE(vt100_state, vert_freq_intr_w))
 	MCFG_VT_VIDEO_LBA7_CALLBACK(DEVWRITELINE("nvr", er1400_device, clock_w))
 
-	MCFG_DEVICE_ADD("i8251", I8251, 0) // 2.7648Mhz phi-clock (not used for tx clock or rx clock?)
+	MCFG_DEVICE_ADD("pusart", I8251, XTAL(24'883'200) / 9)
 	MCFG_I8251_TXD_HANDLER(DEVWRITELINE(RS232_TAG, rs232_port_device, write_txd))
 	MCFG_I8251_DTR_HANDLER(DEVWRITELINE(RS232_TAG, rs232_port_device, write_dtr))
 	MCFG_I8251_RTS_HANDLER(DEVWRITELINE(RS232_TAG, rs232_port_device, write_rts))
 
 	MCFG_RS232_PORT_ADD(RS232_TAG, default_rs232_devices, nullptr)
-	MCFG_RS232_RXD_HANDLER(DEVWRITELINE("i8251", i8251_device, write_rxd))
-	MCFG_RS232_DSR_HANDLER(DEVWRITELINE("i8251", i8251_device, write_dsr))
+	MCFG_RS232_RXD_HANDLER(DEVWRITELINE("pusart", i8251_device, write_rxd))
+	MCFG_RS232_DSR_HANDLER(DEVWRITELINE("pusart", i8251_device, write_dsr))
 
-	MCFG_DEVICE_ADD(COM5016T_TAG, COM8116, 5068800/*XTAL(24'883'200) / 9*/) // COM5016T-013, 2.7648Mhz Clock, currently hacked wrongly
-	MCFG_COM8116_FR_HANDLER(DEVWRITELINE("i8251", i8251_device, write_rxc))
-	MCFG_COM8116_FT_HANDLER(DEVWRITELINE("i8251", i8251_device, write_txc))
+	MCFG_DEVICE_ADD("dbrg", COM5016_013, XTAL(24'883'200) / 9) // COM5016T-013 (or WD1943CD-02), 2.7648Mhz Clock
+	MCFG_COM8116_FR_HANDLER(DEVWRITELINE("pusart", i8251_device, write_rxc))
+	MCFG_COM8116_FT_HANDLER(DEVWRITELINE("pusart", i8251_device, write_txc))
 
 	MCFG_DEVICE_ADD("nvr", ER1400, 0)
 
@@ -308,18 +303,26 @@ MACHINE_CONFIG_START(vt100_state::vt100)
 	MCFG_VT100_KEYBOARD_INT_CALLBACK(WRITELINE(vt100_state, keyboard_int_w))
 MACHINE_CONFIG_END
 
-MACHINE_CONFIG_DERIVED(vt100_state::vt180, vt100)
+MACHINE_CONFIG_START(vt100_state::vt180)
+	vt100(config);
 	MCFG_CPU_ADD("z80cpu", Z80, XTAL(24'883'200) / 9)
 	MCFG_CPU_PROGRAM_MAP(vt180_mem)
 	MCFG_CPU_IO_MAP(vt180_io)
 MACHINE_CONFIG_END
 
-MACHINE_CONFIG_DERIVED(vt100_state::vt102, vt100)
-	MCFG_CPU_REPLACE("maincpu",I8085A, XTAL(24'883'200) / 9)
+MACHINE_CONFIG_START(vt100_state::vt102)
+	vt100(config);
+	MCFG_CPU_REPLACE("maincpu", I8085A, XTAL(24'073'400) / 4)
 	MCFG_CPU_PROGRAM_MAP(vt100_mem)
 	MCFG_CPU_IO_MAP(vt100_io)
-	MCFG_CPU_VBLANK_INT_DRIVER("screen", vt100_state,  vt100_vertical_interrupt)
 	MCFG_CPU_IRQ_ACKNOWLEDGE_DRIVER(vt100_state,vt100_irq_callback)
+
+	MCFG_DEVICE_MODIFY("pusart")
+	MCFG_DEVICE_CLOCK(XTAL(24'073'400) / 8)
+
+	MCFG_DEVICE_REPLACE("dbrg", COM8116_003, XTAL(24'073'400) / 4)
+	MCFG_COM8116_FR_HANDLER(DEVWRITELINE("pusart", i8251_device, write_rxc))
+	MCFG_COM8116_FT_HANDLER(DEVWRITELINE("pusart", i8251_device, write_txc))
 MACHINE_CONFIG_END
 
 /* VT1xx models:
@@ -530,20 +533,15 @@ ROM_START( vt100ac ) // This is from the VT180 technical manual at http://www.bi
 	ROM_REGION( 0x10000, "maincpu", ROMREGION_ERASEFF )
 	ROM_LOAD( "23-095e2.e40", 0x0000, 0x0800, CRC(6c8acf44) SHA1(b3ef5af920995a40a316c6dc008960c461853bfc)) // Label: "23095E2 // (C)DEC // (M)QQ8227" @E40
 	ROM_LOAD( "23-096e2.e45", 0x0800, 0x0800, CRC(77f21473) SHA1(6f10b250777c12cca63ee611735f9f36cc05a7ef)) // Label: "23096E2 // (C)DEC // (M)QQ8227" @E45
-	ROM_LOAD( "23-139e2.bad3.e52", 0x1000, 0x0800, BAD_DUMP CRC(eaede07a) SHA1(410cef41c4f3a6a37570a82f359dd2b2d536d3dd)) // Label: "AMD // 37108 8232DKP // 23-139E2 // AM9218CPC // (C)DEC_1979" @E52;  // revision 2?; revision 1 is 23-097e2 MAYBE // bytes with A1 and A2 both high and a3 high? are mostly correct, rest are likely all wrong.
+	ROM_LOAD( "23-139e2.e52", 0x1000, 0x0800, CRC(c3302ce5) SHA1(a2ab3b9b48b5e850b2d7b22e6f8ef6099599e4b6)) // Label: "AMD // 37108 8232DKP // 23-139E2 // AM9218CPC // (C)DEC_1979" @E52;  // revision 2?; revision 1 is 23-097e2 MAYBE
 	ROM_LOAD( "23-140e2.e56", 0x1800, 0x0800, CRC(4bf1ce4e) SHA1(279f47ec9a68c801c3c05005dd782202ac9e51a4)) // Label: "AMD // 37109 8230DHP // 23-140E2 // AM9218CPC // (C)DEC 1979" @E56  // revision 2?; revision 1 is 23-098e2 MAYBE
 
-	/* bad rom tracing
-	bpset 1be then set pc=1d5 to bypass rom test
-	obvious entry points are 1000, 1016 (which is the first one hit, from f95), 1025, 112e, 1167, 11db, 136e, 1470, 1480, 16a9, 1719, 17e5
-	corresponding functions in vt100 roms are: WRITE ME
-	*/
-
-	ROM_REGION(0x1000, "avo", 0) // all switches on avo are open EXCEPT S2-3; does this map at 0xa000-0xcfff (mirrored) in maincpu space?
-	// are 184 and 185 an older version of the stp avo firmware?
+	ROM_REGION(0x1000, "avo", 0) // all switches on "54-13097-00 // PN2280402L" AVO are open EXCEPT S2-3; does this map at 0xa000-0xcfff (mirrored) in maincpu space?
+	// This same set of roms also appears on the "PN1030385J-F" AVO, which has no dipswitches; instead a single jumper? resistor installed in the NDIP20 footprint between E16 and E22, between pins 6 and 15 of the footprint
 	//NOTE: for both of these two avo roms, Pin 18 is positive enable CE, Pin 20 is negative enable /CE1, Pin 21 is negative enable /CE2,
 	ROM_LOAD( "23-186e2.avo.e21", 0x0000, 0x0800, CRC(1592dec1) SHA1(c4b8fc9fc0514e0cd46ad2de03abe72271ce460b)) // Label: "S 8218 // C69063 // 23186E2" @E21
 	ROM_LOAD( "23-187e2.avo.e17", 0x0800, 0x0800, CRC(c6d72a41) SHA1(956f9eb945a250fd05c76100b38c0ba381ab8fde)) // Label: "S 8228 // C69062 // 23187E2" @E17
+	// are 184 and 185 an older version of the VT100-AC AVO firmware?
 
 	ROM_REGION(0x2000, "stp", 0) // stp switches 1 and 5 are closed, 2,3,4 open
 	ROM_LOAD( "23-029e4.stp.e14", 0x0000, 0x2000, CRC(da55c62b) SHA1(261b02b774d57253d1dedecab8ca0e368c2a96cd)) // Label: "S 8218 // C43020 // 23029E4 (C) DEC // TP02" @E14

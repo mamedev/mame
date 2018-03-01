@@ -36,14 +36,18 @@ public:
 		, m_p_videoram(*this, "videoram")
 	{ }
 
+	void altos2(machine_config &config);
+
+protected:
 	DECLARE_WRITE8_MEMBER(video_mode_w);
 
 	u32 screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 
-	void altos2(machine_config &config);
-private:
 	virtual void machine_reset() override;
+	void io_map(address_map &map);
+	void mem_map(address_map &map);
 
+private:
 	required_device<cpu_device> m_maincpu;
 	required_device<x2210_device> m_novram;
 	required_region_ptr<u8> m_p_chargen;
@@ -68,12 +72,12 @@ u32 altos2_state::screen_update(screen_device &screen, bitmap_rgb32 &bitmap, con
 	return 0;
 }
 
-static ADDRESS_MAP_START( mem_map, AS_PROGRAM, 8, altos2_state )
+ADDRESS_MAP_START(altos2_state::mem_map)
 	AM_RANGE(0x0000, 0x3fff) AM_ROM AM_REGION("roms", 0)
 	AM_RANGE(0xc000, 0xffff) AM_RAM AM_SHARE("videoram")
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( io_map, AS_IO, 8, altos2_state)
+ADDRESS_MAP_START(altos2_state::io_map)
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	ADDRESS_MAP_UNMAP_HIGH
 	AM_RANGE(0x00, 0x03) AM_DEVREADWRITE("dart1", z80dart_device, ba_cd_r, ba_cd_w)

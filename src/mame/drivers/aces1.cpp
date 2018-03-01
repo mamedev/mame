@@ -230,6 +230,8 @@ public:
 	TIMER_CALLBACK_MEMBER(m_aces1_irq_timer_callback);
 	TIMER_CALLBACK_MEMBER(m_aces1_nmi_timer_callback);
 	void aces1(machine_config &config);
+	void aces1_map(address_map &map);
+	void aces1_portmap(address_map &map);
 };
 
 
@@ -267,7 +269,7 @@ void aces1_state::machine_reset()
 	aces1_reset_irq_timer();
 }
 
-static ADDRESS_MAP_START( aces1_map, AS_PROGRAM, 8, aces1_state )
+ADDRESS_MAP_START(aces1_state::aces1_map)
 	AM_RANGE(0x0000, 0x7fff) AM_ROM
 	AM_RANGE(0x8000, 0x8fff) AM_RAM
 	AM_RANGE(0xadf0, 0xadf3) AM_DEVREADWRITE("aysnd", ay8910_device, data_r, address_data_w) //  Dips, Sound
@@ -279,7 +281,7 @@ static ADDRESS_MAP_START( aces1_map, AS_PROGRAM, 8, aces1_state )
 ADDRESS_MAP_END
 
 
-static ADDRESS_MAP_START( aces1_portmap, AS_IO, 8, aces1_state )
+ADDRESS_MAP_START(aces1_state::aces1_portmap)
 	AM_RANGE(0x00, 0x00) AM_READ(aces1_unk_port00_r) // read before enabling interrupts?
 ADDRESS_MAP_END
 

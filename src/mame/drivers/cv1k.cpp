@@ -239,6 +239,9 @@ public:
 	void install_speedups(uint32_t idleramoff, uint32_t idlepc, bool is_typed);
 	void cv1k_d(machine_config &config);
 	void cv1k(machine_config &config);
+	void cv1k_d_map(address_map &map);
+	void cv1k_map(address_map &map);
+	void cv1k_port(address_map &map);
 };
 
 
@@ -339,7 +342,7 @@ WRITE8_MEMBER( cv1k_state::serial_rtc_eeprom_w )
 }
 
 
-static ADDRESS_MAP_START( cv1k_map, AS_PROGRAM, 64, cv1k_state )
+ADDRESS_MAP_START(cv1k_state::cv1k_map)
 	AM_RANGE(0x00000000, 0x003fffff) AM_ROM AM_REGION("maincpu", 0) AM_WRITENOP AM_SHARE("rombase") // mmmbanc writes here on startup for some reason..
 	AM_RANGE(0x0c000000, 0x0c7fffff) AM_RAM AM_SHARE("mainram")// work RAM
 	AM_RANGE(0x10000000, 0x10000007) AM_READWRITE8(flash_io_r, flash_io_w, 0xffffffffffffffffU)
@@ -349,7 +352,7 @@ static ADDRESS_MAP_START( cv1k_map, AS_PROGRAM, 64, cv1k_state )
 	AM_RANGE(0xf0000000, 0xf0ffffff) AM_RAM // mem mapped cache (sh3 internal?)
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( cv1k_d_map, AS_PROGRAM, 64, cv1k_state )
+ADDRESS_MAP_START(cv1k_state::cv1k_d_map)
 	AM_RANGE(0x00000000, 0x003fffff) AM_ROM AM_REGION("maincpu", 0) AM_WRITENOP AM_SHARE("rombase") // mmmbanc writes here on startup for some reason..
 	AM_RANGE(0x0c000000, 0x0cffffff) AM_RAM AM_SHARE("mainram") // work RAM
 	AM_RANGE(0x10000000, 0x10000007) AM_READWRITE8(flash_io_r, flash_io_w, 0xffffffffffffffffU)
@@ -359,7 +362,7 @@ static ADDRESS_MAP_START( cv1k_d_map, AS_PROGRAM, 64, cv1k_state )
 	AM_RANGE(0xf0000000, 0xf0ffffff) AM_RAM // mem mapped cache (sh3 internal?)
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( cv1k_port, AS_IO, 64, cv1k_state )
+ADDRESS_MAP_START(cv1k_state::cv1k_port)
 	AM_RANGE(SH3_PORT_C, SH3_PORT_C+7) AM_READ_PORT("PORT_C")
 	AM_RANGE(SH3_PORT_D, SH3_PORT_D+7) AM_READ_PORT("PORT_D")
 	AM_RANGE(SH3_PORT_E, SH3_PORT_E+7) AM_READ( flash_port_e_r )
@@ -490,7 +493,8 @@ MACHINE_CONFIG_START(cv1k_state::cv1k)
 	MCFG_EPIC12_SET_MAINRAMSIZE(0x800000)
 MACHINE_CONFIG_END
 
-MACHINE_CONFIG_DERIVED(cv1k_state::cv1k_d, cv1k)
+MACHINE_CONFIG_START(cv1k_state::cv1k_d)
+	cv1k(config);
 
 	/* basic machine hardware */
 	MCFG_DEVICE_REMOVE("maincpu")

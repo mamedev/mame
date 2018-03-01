@@ -325,27 +325,31 @@ public:
 	required_device<i80286_cpu_device> m_convcpu;
 
 	void fanucs15(machine_config &config);
+	void convcpu_mem(address_map &map);
+	void gfxcpu_mem(address_map &map);
+	void maincpu_mem(address_map &map);
+	void pmccpu_mem(address_map &map);
 private:
 	virtual void machine_reset() override;
 };
 
-static ADDRESS_MAP_START(maincpu_mem, AS_PROGRAM, 32, fanucs15_state)
+ADDRESS_MAP_START(fanucs15_state::maincpu_mem)
 	AM_RANGE(0x00000000, 0x0017ffff) AM_ROM AM_REGION("base1b", 0)
 	AM_RANGE(0x000f8000, 0x000fffff) AM_RAM // filled with 0x96 on boot
 	AM_RANGE(0xffff0000, 0xffffffff) AM_RAM // initial stack
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START(pmccpu_mem, AS_PROGRAM, 16, fanucs15_state)
+ADDRESS_MAP_START(fanucs15_state::pmccpu_mem)
 	AM_RANGE(0x000000, 0x03ffff) AM_ROM AM_REGION("base1a", 0)
 	AM_RANGE(0xfde000, 0xffffff) AM_RAM
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START(gfxcpu_mem, AS_PROGRAM, 16, fanucs15_state)
+ADDRESS_MAP_START(fanucs15_state::gfxcpu_mem)
 	AM_RANGE(0x000000, 0x01ffff) AM_ROM AM_REGION("gfxboard", 0)
 	AM_RANGE(0xfe0000, 0xfeffff) AM_RAM
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START(convcpu_mem, AS_PROGRAM, 16, fanucs15_state)
+ADDRESS_MAP_START(fanucs15_state::convcpu_mem)
 	AM_RANGE(0x000000, 0x03ffff) AM_ROM AM_REGION("conversational", 0x40000)
 	AM_RANGE(0x040000, 0x07ffff) AM_ROM AM_REGION("conversational", 0)
 	AM_RANGE(0x800000, 0x87ffff) AM_RAM

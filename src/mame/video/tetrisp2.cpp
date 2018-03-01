@@ -713,7 +713,7 @@ TILE_GET_INFO_MEMBER(tetrisp2_state::stepstag_get_tile_info_fg)
 {
 	uint16_t const code_hi = m_vram_fg[ 2 * tile_index ] >> 8;
 	uint16_t const code_lo = m_vram_fg[ 2 * tile_index ] & 0xf;
-   	//logerror("tile_idx[$%2x]=$%3x, palette=$%2x\n", tile_index, code_hi, code_lo);////
+	//logerror("tile_idx[$%2x]=$%3x, palette=$%2x\n", tile_index, code_hi, code_lo);////
 	if (m_vram_fg[2 * tile_index + 1] != 0)
 		logerror("VRAM ASCII Haut-Mot Non-Zero!!!\n");/////////
 	SET_TILE_INFO_MEMBER(3,

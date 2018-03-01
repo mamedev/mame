@@ -159,7 +159,7 @@ WRITE8_MEMBER(bottom9_state::sound_bank_w)
 }
 
 
-static ADDRESS_MAP_START( main_map, AS_PROGRAM, 8, bottom9_state )
+ADDRESS_MAP_START(bottom9_state::main_map)
 	AM_RANGE(0x0000, 0x3fff) AM_READWRITE(k052109_051960_r, k052109_051960_w)
 	AM_RANGE(0x0000, 0x07ff) AM_READWRITE(bottom9_bankedram1_r, bottom9_bankedram1_w)
 	AM_RANGE(0x1f80, 0x1f80) AM_WRITE(bankswitch_w)
@@ -179,7 +179,7 @@ static ADDRESS_MAP_START( main_map, AS_PROGRAM, 8, bottom9_state )
 	AM_RANGE(0x8000, 0xffff) AM_ROM
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( audio_map, AS_PROGRAM, 8, bottom9_state )
+ADDRESS_MAP_START(bottom9_state::audio_map)
 	AM_RANGE(0x0000, 0x7fff) AM_ROM
 	AM_RANGE(0x8000, 0x87ff) AM_RAM
 	AM_RANGE(0x9000, 0x9000) AM_WRITE(sound_bank_w)

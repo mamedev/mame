@@ -116,27 +116,25 @@ k051316_device::k051316_device(const machine_config &mconfig, const char *tag, d
 {
 }
 
-void k051316_device::set_bpp(device_t &device, int bpp)
+void k051316_device::set_bpp(int bpp)
 {
-	k051316_device &dev = downcast<k051316_device &>(device);
-
 	switch(bpp)
 	{
 		case 4:
-			device_gfx_interface::static_set_info(dev, gfxinfo);
-			dev.m_pixels_per_byte = 2;
+			device_gfx_interface::static_set_info(*this, gfxinfo);
+			m_pixels_per_byte = 2;
 			break;
 		case 7:
-			device_gfx_interface::static_set_info(dev, gfxinfo7);
-			dev.m_pixels_per_byte = 1;
+			device_gfx_interface::static_set_info(*this, gfxinfo7);
+			m_pixels_per_byte = 1;
 			break;
 		case 8:
-			device_gfx_interface::static_set_info(dev, gfxinfo8);
-			dev.m_pixels_per_byte = 1;
+			device_gfx_interface::static_set_info(*this, gfxinfo8);
+			m_pixels_per_byte = 1;
 			break;
 		case -4:
-			device_gfx_interface::static_set_info(dev, gfxinfo4_ram);
-			dev.m_pixels_per_byte = 2;
+			device_gfx_interface::static_set_info(*this, gfxinfo4_ram);
+			m_pixels_per_byte = 2;
 			break;
 		default:
 			fatalerror("Unsupported bpp\n");

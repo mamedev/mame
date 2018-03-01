@@ -691,7 +691,7 @@ WRITE8_MEMBER(mcr_state::demoderb_op4_w)
  *************************************/
 
 /* address map verified from schematics */
-static ADDRESS_MAP_START( cpu_90009_map, AS_PROGRAM, 8, mcr_state )
+ADDRESS_MAP_START(mcr_state::cpu_90009_map)
 	ADDRESS_MAP_UNMAP_HIGH
 	AM_RANGE(0x0000, 0x6fff) AM_ROM
 	AM_RANGE(0x7000, 0x77ff) AM_MIRROR(0x0800) AM_RAM AM_SHARE("nvram")
@@ -702,7 +702,7 @@ static ADDRESS_MAP_START( cpu_90009_map, AS_PROGRAM, 8, mcr_state )
 ADDRESS_MAP_END
 
 /* upper I/O map determined by PAL; only SSIO ports are verified from schematics */
-static ADDRESS_MAP_START( cpu_90009_portmap, AS_IO, 8, mcr_state )
+ADDRESS_MAP_START(mcr_state::cpu_90009_portmap)
 	ADDRESS_MAP_UNMAP_HIGH
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	SSIO_INPUT_PORTS("ssio")
@@ -720,7 +720,7 @@ ADDRESS_MAP_END
  *************************************/
 
 /* address map verified from schematics */
-static ADDRESS_MAP_START( cpu_90010_map, AS_PROGRAM, 8, mcr_state )
+ADDRESS_MAP_START(mcr_state::cpu_90010_map)
 	ADDRESS_MAP_UNMAP_HIGH
 	AM_RANGE(0x0000, 0xbfff) AM_ROM
 	AM_RANGE(0xc000, 0xc7ff) AM_MIRROR(0x1800) AM_RAM AM_SHARE("nvram")
@@ -729,7 +729,7 @@ static ADDRESS_MAP_START( cpu_90010_map, AS_PROGRAM, 8, mcr_state )
 ADDRESS_MAP_END
 
 /* upper I/O map determined by PAL; only SSIO ports are verified from schematics */
-static ADDRESS_MAP_START( cpu_90010_portmap, AS_IO, 8, mcr_state )
+ADDRESS_MAP_START(mcr_state::cpu_90010_portmap)
 	ADDRESS_MAP_UNMAP_HIGH
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	SSIO_INPUT_PORTS("ssio")
@@ -747,7 +747,7 @@ ADDRESS_MAP_END
  *************************************/
 
 /* address map verified from schematics */
-static ADDRESS_MAP_START( cpu_91490_map, AS_PROGRAM, 8, mcr_state )
+ADDRESS_MAP_START(mcr_state::cpu_91490_map)
 	ADDRESS_MAP_UNMAP_HIGH
 	AM_RANGE(0x0000, 0xdfff) AM_ROM
 	AM_RANGE(0xe000, 0xe7ff) AM_RAM AM_SHARE("nvram")
@@ -757,7 +757,7 @@ static ADDRESS_MAP_START( cpu_91490_map, AS_PROGRAM, 8, mcr_state )
 ADDRESS_MAP_END
 
 /* upper I/O map determined by PAL; only SSIO ports are verified from schematics */
-static ADDRESS_MAP_START( cpu_91490_portmap, AS_IO, 8, mcr_state )
+ADDRESS_MAP_START(mcr_state::cpu_91490_portmap)
 	ADDRESS_MAP_UNMAP_HIGH
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	SSIO_INPUT_PORTS("ssio")
@@ -775,14 +775,14 @@ ADDRESS_MAP_END
  *************************************/
 
 /* address map verified from schematics */
-static ADDRESS_MAP_START( ipu_91695_map, AS_PROGRAM, 8, mcr_nflfoot_state )
+ADDRESS_MAP_START(mcr_nflfoot_state::ipu_91695_map)
 	ADDRESS_MAP_UNMAP_HIGH
 	AM_RANGE(0x0000, 0x3fff) AM_ROM
 	AM_RANGE(0xe000, 0xffff) AM_RAM
 ADDRESS_MAP_END
 
 /* I/O verified from schematics */
-static ADDRESS_MAP_START( ipu_91695_portmap, AS_IO, 8, mcr_nflfoot_state )
+ADDRESS_MAP_START(mcr_nflfoot_state::ipu_91695_portmap)
 	ADDRESS_MAP_UNMAP_HIGH
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	AM_RANGE(0x00, 0x03) AM_MIRROR(0xe0) AM_DEVREADWRITE("ipu_pio0", z80pio_device, read, write)
@@ -1782,7 +1782,8 @@ MACHINE_CONFIG_END
 
 
 /* as above, but in a casino cabinet */
-MACHINE_CONFIG_DERIVED(mcr_dpoker_state::mcr_90009_dp, mcr_90009)
+MACHINE_CONFIG_START(mcr_dpoker_state::mcr_90009_dp)
+	mcr_90009(config);
 
 	/* basic machine hardware */
 	MCFG_TIMER_DRIVER_ADD("coinin", mcr_dpoker_state, coin_in_callback)
@@ -1791,7 +1792,8 @@ MACHINE_CONFIG_END
 
 
 /* 90010 CPU board plus 90908/90913/91483 sound board */
-MACHINE_CONFIG_DERIVED(mcr_state::mcr_90010, mcr_90009)
+MACHINE_CONFIG_START(mcr_state::mcr_90010)
+	mcr_90009(config);
 
 	/* basic machine hardware */
 	MCFG_CPU_MODIFY("maincpu")
@@ -1806,7 +1808,8 @@ MACHINE_CONFIG_END
 
 
 /* as above, plus 8-track tape */
-MACHINE_CONFIG_DERIVED(mcr_state::mcr_90010_tt, mcr_90010)
+MACHINE_CONFIG_START(mcr_state::mcr_90010_tt)
+	mcr_90010(config);
 
 	/* sound hardware */
 	MCFG_SOUND_ADD("samples", SAMPLES, 0)
@@ -1818,7 +1821,8 @@ MACHINE_CONFIG_END
 
 
 /* 91475 CPU board plus 90908/90913/91483 sound board plus cassette interface */
-MACHINE_CONFIG_DERIVED(mcr_state::mcr_91475, mcr_90010)
+MACHINE_CONFIG_START(mcr_state::mcr_91475)
+	mcr_90010(config);
 
 	/* video hardware */
 	MCFG_PALETTE_MODIFY("palette")
@@ -1835,7 +1839,8 @@ MACHINE_CONFIG_END
 
 
 /* 91490 CPU board plus 90908/90913/91483 sound board */
-MACHINE_CONFIG_DERIVED(mcr_state::mcr_91490, mcr_90010)
+MACHINE_CONFIG_START(mcr_state::mcr_91490)
+	mcr_90010(config);
 
 	/* basic machine hardware */
 	MCFG_CPU_MODIFY("maincpu")
@@ -1849,7 +1854,8 @@ MACHINE_CONFIG_END
 
 
 /* 91490 CPU board plus 90908/90913/91483 sound board plus Squawk n' Talk sound board */
-MACHINE_CONFIG_DERIVED(mcr_state::mcr_91490_snt, mcr_91490)
+MACHINE_CONFIG_START(mcr_state::mcr_91490_snt)
+	mcr_91490(config);
 
 	/* basic machine hardware */
 	MCFG_SOUND_ADD("snt", MIDWAY_SQUAWK_N_TALK, 0)
@@ -1859,7 +1865,8 @@ MACHINE_CONFIG_END
 
 
 /* 91490 CPU board plus 90908/90913/91483 sound board plus Squawk n' Talk sound board plus IPU */
-MACHINE_CONFIG_DERIVED(mcr_nflfoot_state::mcr_91490_ipu, mcr_91490_snt)
+MACHINE_CONFIG_START(mcr_nflfoot_state::mcr_91490_ipu)
+	mcr_91490_snt(config);
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("ipu", Z80, 7372800/2)
@@ -1886,7 +1893,8 @@ MACHINE_CONFIG_END
 
 
 /* 91490 CPU board plus 90908/90913/91483 sound board plus Turbo Cheap Squeak sound board */
-MACHINE_CONFIG_DERIVED(mcr_state::mcr_91490_tcs, mcr_91490)
+MACHINE_CONFIG_START(mcr_state::mcr_91490_tcs)
+	mcr_91490(config);
 
 	/* basic machine hardware */
 	MCFG_SOUND_ADD("tcs", MIDWAY_TURBO_CHEAP_SQUEAK, 0)
@@ -2413,86 +2421,114 @@ ROM_END
 
 ROM_START( tapper )
 	ROM_REGION( 0x10000, "maincpu", 0 )
-	ROM_LOAD( "tappg0.bin",   0x00000, 0x4000, CRC(127171d1) SHA1(373e9a9d73b71e100c02862662d025f5ead2f94d) )
-	ROM_LOAD( "tappg1.bin",   0x04000, 0x4000, CRC(9d6a47f7) SHA1(e493e46fc70a765e54bfdd7ba7ca570e6a5c79d6) )
-	ROM_LOAD( "tappg2.bin",   0x08000, 0x4000, CRC(3a1f8778) SHA1(cb46a2248289ced7282b1463f433dcb970c42c1a) )
-	ROM_LOAD( "tappg3.bin",   0x0c000, 0x2000, CRC(e8dcdaa4) SHA1(45bf1571a2418c7dc00ccc7061a3e04e65cb6bff) )
+	ROM_LOAD( "tapper_c.p.u._pg_0_1c_1-27-84.1c",   0x00000, 0x4000, CRC(bb060bb0) SHA1(ff5a729e36faea3758c8c7b345a42dd8bb465f44) ) /* labeled TAPPER C.P.U. PG 0 1C 1/27/84 */
+	ROM_LOAD( "tapper_c.p.u._pg_1_2c_1-27-84.2c",   0x04000, 0x4000, CRC(fd9acc22) SHA1(b9f0396e2eba5772deec4725c41fa9de49658e72) ) /* labeled TAPPER C.P.U. PG 1 2C 1/27/84 */
+	ROM_LOAD( "tapper_c.p.u._pg_2_3c_1-27-84.3c",   0x08000, 0x4000, CRC(b3755d41) SHA1(434d3c27b9f1e43def081d79b9f56dbce93a9207) ) /* labeled TAPPER C.P.U. PG 2 3C 1/27/84 */
+	ROM_LOAD( "tapper_c.p.u._pg_3_4c_1-27-84.4c",   0x0c000, 0x2000, CRC(77273096) SHA1(5e4e2dc1703b39f588ba374f6a610f273d710532) ) /* labeled TAPPER C.P.U. PG 3 4C 1/27/84 */
 
 	ROM_REGION( 0x10000, "ssio:cpu", 0 )
-	ROM_LOAD( "tapsnda7.bin", 0x0000, 0x1000, CRC(0e8bb9d5) SHA1(9e281c340b7702523c86d56317efad9e3688e585) )
-	ROM_LOAD( "tapsnda8.bin", 0x1000, 0x1000, CRC(0cf0e29b) SHA1(14334b9d2bfece3fe5bda0cbd53158ead8d27e53) )
-	ROM_LOAD( "tapsnda9.bin", 0x2000, 0x1000, CRC(31eb6dc6) SHA1(b38bba5f12516d899e023f99147868e3402fbd7b) )
-	ROM_LOAD( "tapsda10.bin", 0x3000, 0x1000, CRC(01a9be6a) SHA1(0011407c1e886071282808c0a561789b1245a789) )
+	ROM_LOAD( "tapper_sound_snd_0_a7_12-7-83.a7",   0x0000, 0x1000, CRC(0e8bb9d5) SHA1(9e281c340b7702523c86d56317efad9e3688e585) ) /* labeled TAPPER SOUND SND 0 A7 12/7/83 */
+	ROM_LOAD( "tapper_sound_snd_1_a8_12-7-83.a8",   0x1000, 0x1000, CRC(0cf0e29b) SHA1(14334b9d2bfece3fe5bda0cbd53158ead8d27e53) ) /* labeled TAPPER SOUND SND 1 A8 12/7/83 */
+	ROM_LOAD( "tapper_sound_snd_2_a9_12-7-83.a9",   0x2000, 0x1000, CRC(31eb6dc6) SHA1(b38bba5f12516d899e023f99147868e3402fbd7b) ) /* labeled TAPPER SOUND SND 2 A9 12/7/83 */
+	ROM_LOAD( "tapper_sound_snd_3_a10_12-7-83.a10", 0x3000, 0x1000, CRC(01a9be6a) SHA1(0011407c1e886071282808c0a561789b1245a789) ) /* labeled TAPPER SOUND SND 3 A10 12/7/83 */
 
 	ROM_REGION( 0x08000, "gfx1", 0 )
-	ROM_LOAD( "tapbg1.bin",   0x00000, 0x4000, CRC(2a30238c) SHA1(eb30b9bb654324340f0fc5b44776ac2440c1e869) )
-	ROM_LOAD( "tapbg0.bin",   0x04000, 0x4000, CRC(394ab576) SHA1(23e29ec942e1e7516ae8068837af2d1c79592378) )
+	ROM_LOAD( "tapper_c.p.u._bg_1_6f_12-7-83.6f",   0x00000, 0x4000, CRC(2a30238c) SHA1(eb30b9bb654324340f0fc5b44776ac2440c1e869) ) /* labeled TAPPER C.P.U. BG 1 6F 12/7/83 */
+	ROM_LOAD( "tapper_c.p.u._bg_0_5f_12-7-83.5f",   0x04000, 0x4000, CRC(394ab576) SHA1(23e29ec942e1e7516ae8068837af2d1c79592378) ) /* labeled TAPPER C.P.U. BG 0 5F 12/7/83 */
 
 	ROM_REGION( 0x20000, "gfx2", 0 )
-	ROM_LOAD( "tapfg1.bin",   0x00000, 0x4000, CRC(32509011) SHA1(a38667573d235efe2dc515e52af05825fe4e0f30) )
-	ROM_LOAD( "tapfg0.bin",   0x04000, 0x4000, CRC(8412c808) SHA1(2077f79177fda26f9c674b2ab525ec3833802059) )
-	ROM_LOAD( "tapfg3.bin",   0x08000, 0x4000, CRC(818fffd4) SHA1(930142dd73fb30c4d3ec09a1e37517c6c6774024) )
-	ROM_LOAD( "tapfg2.bin",   0x0c000, 0x4000, CRC(67e37690) SHA1(d553b8517c1d03a2be0b065f4da2fa99d9e6fb30) )
-	ROM_LOAD( "tapfg5.bin",   0x10000, 0x4000, CRC(800f7c8a) SHA1(8aead89e1adaee5f0b679661c4bfba36e0d639e8) )
-	ROM_LOAD( "tapfg4.bin",   0x14000, 0x4000, CRC(32674ee6) SHA1(402c166d50b4a693959b3f0706a7931a5daef6ce) )
-	ROM_LOAD( "tapfg7.bin",   0x18000, 0x4000, CRC(070b4c81) SHA1(95879a455ecfe2e3de7fe2a75078f9e6934960f5) )
-	ROM_LOAD( "tapfg6.bin",   0x1c000, 0x4000, CRC(a37aef36) SHA1(a24696f16d467d9eea4f25aef5f4c5ff55bf51ff) )
+	ROM_LOAD( "fg1_a7.128",   0x00000, 0x4000, CRC(bac70b69) SHA1(7fd26cc8ff2faab86d04fcee2b5ec49ecf6b8143) ) /* Are these correct or hacked? Customers from ALL other sets match the 12/7/83 */
+	ROM_LOAD( "fg0_a8.128",   0x04000, 0x4000, CRC(c300925d) SHA1(45df1ac033512be942460d678a7c1ba9dcef1937) ) /* graphics set including the Root Beer and Suntory sets. */
+	ROM_LOAD( "fg3_a5.128",   0x08000, 0x4000, CRC(ecff6c23) SHA1(0b28e7e59eba983bc1929758f8dcaf315b7134a1) ) /* The 1/27/84 program set has been verified to come with 12/7/83 graphics in at least one machine */
+	ROM_LOAD( "fg2_a6.128",   0x0c000, 0x4000, CRC(a4f2d1be) SHA1(faf631d4ee96edf6b2c4349780e2d89eaedf70ab) )
+	ROM_LOAD( "fg5_a3.128",   0x10000, 0x4000, CRC(16ce38cb) SHA1(9829c9574fff0803973246f9d22311ca76be4e58) ) /* Noticed differences in customers: */
+	ROM_LOAD( "fg4_a4.128",   0x14000, 0x4000, CRC(082a4059) SHA1(52672b853d67432fd80e4612fa54208c225d2444) ) /* Black cowboy: has yellow hat & green hair/mustache vs green hat and black hair/mustache   */
+	ROM_LOAD( "fg7_a1.128",   0x18000, 0x4000, CRC(3b476abe) SHA1(6fe170695386fc77310384a5590a7cc3671ae853) ) /* Cowgirl: Has blue shirt, added color dither spots in hair & blue stripe on her hat vs red */
+	ROM_LOAD( "fg6_a2.128",   0x1c000, 0x4000, CRC(6717264c) SHA1(5a6d30974e73f952694b8c09fb3a5393a76db4f2) ) /* shirt and blonde hair. On the points screen she has dithered purple hair vs brown hair    */
 ROM_END
 
 ROM_START( tappera )
 	ROM_REGION( 0x10000, "maincpu", 0 )
-	ROM_LOAD( "pr00_1c.128",   0x00000, 0x4000, CRC(bb060bb0) SHA1(ff5a729e36faea3758c8c7b345a42dd8bb465f44) )
-	ROM_LOAD( "pr01_2c.128",   0x04000, 0x4000, CRC(fd9acc22) SHA1(b9f0396e2eba5772deec4725c41fa9de49658e72) )
-	ROM_LOAD( "pr02_3c.128",   0x08000, 0x4000, CRC(b3755d41) SHA1(434d3c27b9f1e43def081d79b9f56dbce93a9207) )
-	ROM_LOAD( "pr03_4c.64",    0x0c000, 0x2000, CRC(77273096) SHA1(5e4e2dc1703b39f588ba374f6a610f273d710532) )
+	ROM_LOAD( "tapper_c.p.u._pg_0_1c_12-9-83.1c",   0x00000, 0x4000, CRC(496a8e04) SHA1(a1e85d20aafb362d73fdfb7761d14c83e4abed19) ) /* labeled TAPPER C.P.U. PG 0 1C 12/9/83 */
+	ROM_LOAD( "tapper_c.p.u._pg_1_2c_12-9-83.2c",   0x04000, 0x4000, CRC(e79c4b0c) SHA1(6d2e7fad732efbe5063e311e92337d9d24375f7f) ) /* labeled TAPPER C.P.U. PG 1 2C 12/9/83 */
+	ROM_LOAD( "tapper_c.p.u._pg_2_3c_12-9-83.3c",   0x08000, 0x4000, CRC(3034ccf0) SHA1(523cfc8f5a52f41ef8de34ed602a5c684d0ff0a4) ) /* labeled TAPPER C.P.U. PG 2 3C 12/9/83 */
+	ROM_LOAD( "tapper_c.p.u._pg_3_4c_12-9-83.4c",   0x0c000, 0x2000, CRC(2dc99e05) SHA1(e9bc159b55939b923e92976ad90058fe3ed712d4) ) /* labeled TAPPER C.P.U. PG 3 4C 12/9/83 */
 
 	ROM_REGION( 0x10000, "ssio:cpu", 0 )
-	ROM_LOAD( "tapsnda7.bin", 0x0000, 0x1000, CRC(0e8bb9d5) SHA1(9e281c340b7702523c86d56317efad9e3688e585) )
-	ROM_LOAD( "tapsnda8.bin", 0x1000, 0x1000, CRC(0cf0e29b) SHA1(14334b9d2bfece3fe5bda0cbd53158ead8d27e53) )
-	ROM_LOAD( "tapsnda9.bin", 0x2000, 0x1000, CRC(31eb6dc6) SHA1(b38bba5f12516d899e023f99147868e3402fbd7b) )
-	ROM_LOAD( "tapsda10.bin", 0x3000, 0x1000, CRC(01a9be6a) SHA1(0011407c1e886071282808c0a561789b1245a789) )
+	ROM_LOAD( "tapper_sound_snd_0_a7_12-7-83.a7",   0x0000, 0x1000, CRC(0e8bb9d5) SHA1(9e281c340b7702523c86d56317efad9e3688e585) ) /* labeled TAPPER SOUND SND 0 A7 12/7/83 */
+	ROM_LOAD( "tapper_sound_snd_1_a8_12-7-83.a8",   0x1000, 0x1000, CRC(0cf0e29b) SHA1(14334b9d2bfece3fe5bda0cbd53158ead8d27e53) ) /* labeled TAPPER SOUND SND 1 A8 12/7/83 */
+	ROM_LOAD( "tapper_sound_snd_2_a9_12-7-83.a9",   0x2000, 0x1000, CRC(31eb6dc6) SHA1(b38bba5f12516d899e023f99147868e3402fbd7b) ) /* labeled TAPPER SOUND SND 2 A9 12/7/83 */
+	ROM_LOAD( "tapper_sound_snd_3_a10_12-7-83.a10", 0x3000, 0x1000, CRC(01a9be6a) SHA1(0011407c1e886071282808c0a561789b1245a789) ) /* labeled TAPPER SOUND SND 3 A10 12/7/83 */
 
 	ROM_REGION( 0x08000, "gfx1", 0 )
-	ROM_LOAD( "tapbg1.bin",   0x00000, 0x4000, CRC(2a30238c) SHA1(eb30b9bb654324340f0fc5b44776ac2440c1e869) )
-	ROM_LOAD( "tapbg0.bin",   0x04000, 0x4000, CRC(394ab576) SHA1(23e29ec942e1e7516ae8068837af2d1c79592378) )
+	ROM_LOAD( "tapper_c.p.u._bg_1_6f_12-7-83.6f",   0x00000, 0x4000, CRC(2a30238c) SHA1(eb30b9bb654324340f0fc5b44776ac2440c1e869) ) /* labeled TAPPER C.P.U. BG 1 6F 12/7/83 */
+	ROM_LOAD( "tapper_c.p.u._bg_0_5f_12-7-83.5f",   0x04000, 0x4000, CRC(394ab576) SHA1(23e29ec942e1e7516ae8068837af2d1c79592378) ) /* labeled TAPPER C.P.U. BG 0 5F 12/7/83 */
 
 	ROM_REGION( 0x20000, "gfx2", 0 )
-	ROM_LOAD( "fg1_a7.128",   0x00000, 0x4000, CRC(bac70b69) SHA1(7fd26cc8ff2faab86d04fcee2b5ec49ecf6b8143) )
-	ROM_LOAD( "fg0_a8.128",   0x04000, 0x4000, CRC(c300925d) SHA1(45df1ac033512be942460d678a7c1ba9dcef1937) )
-	ROM_LOAD( "fg3_a5.128",   0x08000, 0x4000, CRC(ecff6c23) SHA1(0b28e7e59eba983bc1929758f8dcaf315b7134a1) )
-	ROM_LOAD( "fg2_a6.128",   0x0c000, 0x4000, CRC(a4f2d1be) SHA1(faf631d4ee96edf6b2c4349780e2d89eaedf70ab) )
-	ROM_LOAD( "fg5_a3.128",   0x10000, 0x4000, CRC(16ce38cb) SHA1(9829c9574fff0803973246f9d22311ca76be4e58) )
-	ROM_LOAD( "fg4_a4.128",   0x14000, 0x4000, CRC(082a4059) SHA1(52672b853d67432fd80e4612fa54208c225d2444) )
-	ROM_LOAD( "fg7_a1.128",   0x18000, 0x4000, CRC(3b476abe) SHA1(6fe170695386fc77310384a5590a7cc3671ae853) )
-	ROM_LOAD( "fg6_a2.128",   0x1c000, 0x4000, CRC(6717264c) SHA1(5a6d30974e73f952694b8c09fb3a5393a76db4f2) )
+	ROM_LOAD( "tapper_video_fg_1_a7_12-7-83.a7",   0x00000, 0x4000, CRC(32509011) SHA1(a38667573d235efe2dc515e52af05825fe4e0f30) ) /* labeled TAPPER VIDEO FG1 A7 12/7/83 */
+	ROM_LOAD( "tapper_video_fg_0_a8_12-7-83.a8",   0x04000, 0x4000, CRC(8412c808) SHA1(2077f79177fda26f9c674b2ab525ec3833802059) ) /* labeled TAPPER VIDEO FG0 A8 12/7/83 */
+	ROM_LOAD( "tapper_video_fg_3_a5_12-7-83.a5",   0x08000, 0x4000, CRC(818fffd4) SHA1(930142dd73fb30c4d3ec09a1e37517c6c6774024) ) /* labeled TAPPER VIDEO FG3 A5 12/7/83 */
+	ROM_LOAD( "tapper_video_fg_2_a6_12-7-83.a6",   0x0c000, 0x4000, CRC(67e37690) SHA1(d553b8517c1d03a2be0b065f4da2fa99d9e6fb30) ) /* labeled TAPPER VIDEO FG2 A6 12/7/83 */
+	ROM_LOAD( "tapper_video_fg_5_a3_12-7-83.a3",   0x10000, 0x4000, CRC(800f7c8a) SHA1(8aead89e1adaee5f0b679661c4bfba36e0d639e8) ) /* labeled TAPPER VIDEO FG5 A3 12/7/83 */
+	ROM_LOAD( "tapper_video_fg_4_a4_12-7-83.a4",   0x14000, 0x4000, CRC(32674ee6) SHA1(402c166d50b4a693959b3f0706a7931a5daef6ce) ) /* labeled TAPPER VIDEO FG4 A4 12/7/83 */
+	ROM_LOAD( "tapper_video_fg_7_a1_12-7-83.a1",   0x18000, 0x4000, CRC(070b4c81) SHA1(95879a455ecfe2e3de7fe2a75078f9e6934960f5) ) /* labeled TAPPER VIDEO FG7 A1 12/7/83 */
+	ROM_LOAD( "tapper_video_fg_6_a2_12-7-83.a2",   0x1c000, 0x4000, CRC(a37aef36) SHA1(a24696f16d467d9eea4f25aef5f4c5ff55bf51ff) ) /* labeled TAPPER VIDEO FG6 A2 12/7/83 */
 ROM_END
 
-ROM_START( sutapper )
+ROM_START( tapperb )
 	ROM_REGION( 0x10000, "maincpu", 0 )
-	ROM_LOAD( "5791",         0x0000, 0x4000, CRC(87119cc4) SHA1(155dc1df977a474f3f1bd238d851c2ff8fe1faba) )
-	ROM_LOAD( "5792",         0x4000, 0x4000, CRC(4c23ad89) SHA1(0eebe98be6c21d701c7b7fc6547b5c94f934f5ab) )
-	ROM_LOAD( "5793",         0x8000, 0x4000, CRC(fecbf683) SHA1(de365f4e567d93a9ed9672fabbc739a3a0d47d59) )
-	ROM_LOAD( "5794",         0xc000, 0x2000, CRC(5bdc1916) SHA1(ee038443ae55598568bd1a53c0a671a2828d3949) )
+	ROM_LOAD( "tapper_c.p.u._pg_0_1c.1c",   0x00000, 0x4000, CRC(127171d1) SHA1(373e9a9d73b71e100c02862662d025f5ead2f94d) ) /* Date for these program ROMs are unknown */
+	ROM_LOAD( "tapper_c.p.u._pg_1_2c.1c",   0x04000, 0x4000, CRC(9d6a47f7) SHA1(e493e46fc70a765e54bfdd7ba7ca570e6a5c79d6) ) /* Either this set is the first release at 12/7/83 */
+	ROM_LOAD( "tapper_c.p.u._pg_2_3c.3c",   0x08000, 0x4000, CRC(3a1f8778) SHA1(cb46a2248289ced7282b1463f433dcb970c42c1a) ) /* Or it sits in between the other 2 sets */
+	ROM_LOAD( "tapper_c.p.u._pg_3_4c.4c",   0x0c000, 0x2000, CRC(e8dcdaa4) SHA1(45bf1571a2418c7dc00ccc7061a3e04e65cb6bff) )
 
 	ROM_REGION( 0x10000, "ssio:cpu", 0 )
-	ROM_LOAD( "5788",         0x00000, 0x1000, CRC(5c1d0982) SHA1(c2c94ab26ebce30ce4efc239e555c6368794d265) )
-	ROM_LOAD( "5787",         0x01000, 0x1000, CRC(09e74ed8) SHA1(f5c8585d443bca67d4065314a06431d1f104c553) )
-	ROM_LOAD( "5786",         0x02000, 0x1000, CRC(c3e98284) SHA1(2a4dc0deca48f4d2ac9fe673ecb9548415c996a9) )
-	ROM_LOAD( "5785",         0x03000, 0x1000, CRC(ced2fd47) SHA1(a41323149c50adcae7675efcef69fd7d8365e527) )
+	ROM_LOAD( "tapper_sound_snd_0_a7_12-7-83.a7",   0x0000, 0x1000, CRC(0e8bb9d5) SHA1(9e281c340b7702523c86d56317efad9e3688e585) ) /* labeled TAPPER SOUND SND 0 A7 12/7/83 */
+	ROM_LOAD( "tapper_sound_snd_1_a8_12-7-83.a8",   0x1000, 0x1000, CRC(0cf0e29b) SHA1(14334b9d2bfece3fe5bda0cbd53158ead8d27e53) ) /* labeled TAPPER SOUND SND 1 A8 12/7/83 */
+	ROM_LOAD( "tapper_sound_snd_2_a9_12-7-83.a9",   0x2000, 0x1000, CRC(31eb6dc6) SHA1(b38bba5f12516d899e023f99147868e3402fbd7b) ) /* labeled TAPPER SOUND SND 2 A9 12/7/83 */
+	ROM_LOAD( "tapper_sound_snd_3_a10_12-7-83.a10", 0x3000, 0x1000, CRC(01a9be6a) SHA1(0011407c1e886071282808c0a561789b1245a789) ) /* labeled TAPPER SOUND SND 3 A10 12/7/83 */
 
 	ROM_REGION( 0x08000, "gfx1", 0 )
-	ROM_LOAD( "5790",         0x00000, 0x4000, CRC(ac1558c1) SHA1(f976889b529937948043460679f84b962b4c12bc) )
-	ROM_LOAD( "5789",         0x04000, 0x4000, CRC(fa66cab5) SHA1(96b89dc08f2feeb9950fbbba43d0ee57a9e31804) )
+	ROM_LOAD( "tapper_c.p.u._bg_1_6f_12-7-83.6f",   0x00000, 0x4000, CRC(2a30238c) SHA1(eb30b9bb654324340f0fc5b44776ac2440c1e869) ) /* labeled TAPPER C.P.U. BG 1 6F 12/7/83 */
+	ROM_LOAD( "tapper_c.p.u._bg_0_5f_12-7-83.5f",   0x04000, 0x4000, CRC(394ab576) SHA1(23e29ec942e1e7516ae8068837af2d1c79592378) ) /* labeled TAPPER C.P.U. BG 0 5F 12/7/83 */
 
 	ROM_REGION( 0x20000, "gfx2", 0 )
-	ROM_LOAD( "5795",         0x00000, 0x4000, CRC(5d987c92) SHA1(3c26b0b0d903fb6782c6a1d72e32cd8c57ecad1f) )
-	ROM_LOAD( "5796",         0x04000, 0x4000, CRC(de5700b4) SHA1(c613c2225eeff5cc65dc6ec301e616e54755b1c2) )
-	ROM_LOAD( "5797",         0x08000, 0x4000, CRC(f10a1d05) SHA1(ca54d1fa6704d38e65a4d2a94449ed8dd56cc94b) )
-	ROM_LOAD( "5798",         0x0c000, 0x4000, CRC(614990cd) SHA1(1a6eac2a8fa99d86889d5042c6b64f828b3c5d65) )
-	ROM_LOAD( "5799",         0x10000, 0x4000, CRC(02c69432) SHA1(7f4260f4a4e8b33842355e9d8e859ffb9278c3c2) )
-	ROM_LOAD( "5800",         0x14000, 0x4000, CRC(ebf1f948) SHA1(251cf018da8db11c3844123255082146b22507e5) )
-	ROM_LOAD( "5801",         0x18000, 0x4000, CRC(d70defa7) SHA1(e8ceabe94080eb28aa393b97ec54729cf8aba001) )
-	ROM_LOAD( "5802",         0x1c000, 0x4000, CRC(d4f114b9) SHA1(58ae647b4fd0f48af4158b85e29c813605d930d3) )
+	ROM_LOAD( "tapper_video_fg_1_a7_12-7-83.a7",   0x00000, 0x4000, CRC(32509011) SHA1(a38667573d235efe2dc515e52af05825fe4e0f30) ) /* labeled TAPPER VIDEO FG1 A7 12/7/83 */
+	ROM_LOAD( "tapper_video_fg_0_a8_12-7-83.a8",   0x04000, 0x4000, CRC(8412c808) SHA1(2077f79177fda26f9c674b2ab525ec3833802059) ) /* labeled TAPPER VIDEO FG0 A8 12/7/83 */
+	ROM_LOAD( "tapper_video_fg_3_a5_12-7-83.a5",   0x08000, 0x4000, CRC(818fffd4) SHA1(930142dd73fb30c4d3ec09a1e37517c6c6774024) ) /* labeled TAPPER VIDEO FG3 A5 12/7/83 */
+	ROM_LOAD( "tapper_video_fg_2_a6_12-7-83.a6",   0x0c000, 0x4000, CRC(67e37690) SHA1(d553b8517c1d03a2be0b065f4da2fa99d9e6fb30) ) /* labeled TAPPER VIDEO FG2 A6 12/7/83 */
+	ROM_LOAD( "tapper_video_fg_5_a3_12-7-83.a3",   0x10000, 0x4000, CRC(800f7c8a) SHA1(8aead89e1adaee5f0b679661c4bfba36e0d639e8) ) /* labeled TAPPER VIDEO FG5 A3 12/7/83 */
+	ROM_LOAD( "tapper_video_fg_4_a4_12-7-83.a4",   0x14000, 0x4000, CRC(32674ee6) SHA1(402c166d50b4a693959b3f0706a7931a5daef6ce) ) /* labeled TAPPER VIDEO FG4 A4 12/7/83 */
+	ROM_LOAD( "tapper_video_fg_7_a1_12-7-83.a1",   0x18000, 0x4000, CRC(070b4c81) SHA1(95879a455ecfe2e3de7fe2a75078f9e6934960f5) ) /* labeled TAPPER VIDEO FG7 A1 12/7/83 */
+	ROM_LOAD( "tapper_video_fg_6_a2_12-7-83.a2",   0x1c000, 0x4000, CRC(a37aef36) SHA1(a24696f16d467d9eea4f25aef5f4c5ff55bf51ff) ) /* labeled TAPPER VIDEO FG6 A2 12/7/83 */
+ROM_END
+
+ROM_START( sutapper ) /* Distributed by Sega, Sega game ID# 834-5384 TAPPER */
+	ROM_REGION( 0x10000, "maincpu", 0 )
+	ROM_LOAD( "epr-5791", 0x0000, 0x4000, CRC(87119cc4) SHA1(155dc1df977a474f3f1bd238d851c2ff8fe1faba) )
+	ROM_LOAD( "epr-5792", 0x4000, 0x4000, CRC(4c23ad89) SHA1(0eebe98be6c21d701c7b7fc6547b5c94f934f5ab) )
+	ROM_LOAD( "epr-5793", 0x8000, 0x4000, CRC(fecbf683) SHA1(de365f4e567d93a9ed9672fabbc739a3a0d47d59) )
+	ROM_LOAD( "epr-5794", 0xc000, 0x2000, CRC(5bdc1916) SHA1(ee038443ae55598568bd1a53c0a671a2828d3949) )
+
+	ROM_REGION( 0x10000, "ssio:cpu", 0 )
+	ROM_LOAD( "epr-5788.h11.ic8", 0x00000, 0x1000, CRC(5c1d0982) SHA1(c2c94ab26ebce30ce4efc239e555c6368794d265) )
+	ROM_LOAD( "epr-5787.h10.ic6", 0x01000, 0x1000, CRC(09e74ed8) SHA1(f5c8585d443bca67d4065314a06431d1f104c553) )
+	ROM_LOAD( "epr-5786.h9.ic5",  0x02000, 0x1000, CRC(c3e98284) SHA1(2a4dc0deca48f4d2ac9fe673ecb9548415c996a9) )
+	ROM_LOAD( "epr-5785.h7.ic4",  0x03000, 0x1000, CRC(ced2fd47) SHA1(a41323149c50adcae7675efcef69fd7d8365e527) )
+
+	ROM_REGION( 0x08000, "gfx1", 0 )
+	ROM_LOAD( "epr-5790", 0x00000, 0x4000, CRC(ac1558c1) SHA1(f976889b529937948043460679f84b962b4c12bc) )
+	ROM_LOAD( "epr-5789", 0x04000, 0x4000, CRC(fa66cab5) SHA1(96b89dc08f2feeb9950fbbba43d0ee57a9e31804) )
+
+	ROM_REGION( 0x20000, "gfx2", 0 )
+	ROM_LOAD( "epr-5795", 0x00000, 0x4000, CRC(5d987c92) SHA1(3c26b0b0d903fb6782c6a1d72e32cd8c57ecad1f) )
+	ROM_LOAD( "epr-5796", 0x04000, 0x4000, CRC(de5700b4) SHA1(c613c2225eeff5cc65dc6ec301e616e54755b1c2) )
+	ROM_LOAD( "epr-5797", 0x08000, 0x4000, CRC(f10a1d05) SHA1(ca54d1fa6704d38e65a4d2a94449ed8dd56cc94b) )
+	ROM_LOAD( "epr-5798", 0x0c000, 0x4000, CRC(614990cd) SHA1(1a6eac2a8fa99d86889d5042c6b64f828b3c5d65) )
+	ROM_LOAD( "epr-5799", 0x10000, 0x4000, CRC(02c69432) SHA1(7f4260f4a4e8b33842355e9d8e859ffb9278c3c2) )
+	ROM_LOAD( "epr-5800", 0x14000, 0x4000, CRC(ebf1f948) SHA1(251cf018da8db11c3844123255082146b22507e5) )
+	ROM_LOAD( "epr-5801", 0x18000, 0x4000, CRC(d70defa7) SHA1(e8ceabe94080eb28aa393b97ec54729cf8aba001) )
+	ROM_LOAD( "epr-5802", 0x1c000, 0x4000, CRC(d4f114b9) SHA1(58ae647b4fd0f48af4158b85e29c813605d930d3) )
 ROM_END
 
 ROM_START( rbtapper )
@@ -2931,8 +2967,9 @@ GAME( 1982, kroozr,   0,        mcr_90010,     kroozr, mcr_state,   kroozr,    R
 GAME( 1983, journey,  0,        mcr_91475,     journey, mcr_state,  journey,   ROT90, "Bally Midway", "Journey", MACHINE_SUPPORTS_SAVE )
 
 /* 91490 CPU board + 91464 video gen + 90913 sound I/O */
-GAME( 1983, tapper,   0,        mcr_91490,     tapper, mcr_state,   mcr_91490, ROT0,  "Bally Midway", "Tapper (Budweiser, set 1)", MACHINE_SUPPORTS_SAVE )
-GAME( 1983, tappera,  tapper,   mcr_91490,     tapper, mcr_state,   mcr_91490, ROT0,  "Bally Midway", "Tapper (Budweiser, set 2)", MACHINE_SUPPORTS_SAVE )
+GAME( 1983, tapper,   0,        mcr_91490,     tapper, mcr_state,   mcr_91490, ROT0,  "Bally Midway", "Tapper (Budweiser, 1/27/84)", MACHINE_SUPPORTS_SAVE ) /* Date from program ROM labels - Newest version */
+GAME( 1983, tappera,  tapper,   mcr_91490,     tapper, mcr_state,   mcr_91490, ROT0,  "Bally Midway", "Tapper (Budweiser, 12/9/83)", MACHINE_SUPPORTS_SAVE ) /* Date from program ROM labels - The oldest set? */
+GAME( 1983, tapperb,  tapper,   mcr_91490,     tapper, mcr_state,   mcr_91490, ROT0,  "Bally Midway", "Tapper (Budweiser, Date Unknown)", MACHINE_SUPPORTS_SAVE ) /* First release at 12/7/83? or in between the other two? */
 GAME( 1983, sutapper, tapper,   mcr_91490,     tapper, mcr_state,   mcr_91490, ROT0,  "Bally Midway", "Tapper (Suntory)", MACHINE_SUPPORTS_SAVE )
 GAME( 1984, rbtapper, tapper,   mcr_91490,     tapper, mcr_state,   mcr_91490, ROT0,  "Bally Midway", "Tapper (Root Beer)", MACHINE_SUPPORTS_SAVE )
 GAME( 1984, timber,   0,        mcr_91490,     timber, mcr_state,   mcr_91490, ROT0,  "Bally Midway", "Timber", MACHINE_SUPPORTS_SAVE )

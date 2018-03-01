@@ -210,6 +210,10 @@ public:
 	required_device<palette_device> m_palette;
 	void x2222(machine_config &config);
 	void gstream(machine_config &config);
+	void gstream_32bit_map(address_map &map);
+	void gstream_io(address_map &map);
+	void x2222_32bit_map(address_map &map);
+	void x2222_io(address_map &map);
 };
 
 CUSTOM_INPUT_MEMBER(gstream_state::x2222_toggle_r) // or the game hangs when starting, might be a status flag for the sound?
@@ -284,7 +288,7 @@ WRITE32_MEMBER(gstream_state::gstream_tilemap3_scrolly_w)
 	m_tmap3_scrolly = data;
 }
 
-static ADDRESS_MAP_START( gstream_32bit_map, AS_PROGRAM, 32, gstream_state )
+ADDRESS_MAP_START(gstream_state::gstream_32bit_map)
 	AM_RANGE(0x00000000, 0x003FFFFF) AM_RAM AM_SHARE("workram") // work ram
 //  AM_RANGE(0x40000000, 0x40FFFFFF) AM_RAM // ?? lots of data gets copied here if present, but game runs without it??
 	AM_RANGE(0x80000000, 0x80003FFF) AM_RAM_WRITE(gstream_vram_w) AM_SHARE("vram") // video ram
@@ -365,7 +369,7 @@ WRITE32_MEMBER(gstream_state::gstream_oki_4040_w)
 	// data == 0 or data == 0x81
 }
 
-static ADDRESS_MAP_START( gstream_io, AS_IO, 32, gstream_state )
+ADDRESS_MAP_START(gstream_state::gstream_io)
 	AM_RANGE(0x4000, 0x4003) AM_READ_PORT("IN0")
 	AM_RANGE(0x4010, 0x4013) AM_READ_PORT("IN1")
 	AM_RANGE(0x4020, 0x4023) AM_READ_PORT("IN2")    // extra coin switches etc
@@ -376,7 +380,7 @@ static ADDRESS_MAP_START( gstream_io, AS_IO, 32, gstream_state )
 ADDRESS_MAP_END
 
 
-static ADDRESS_MAP_START( x2222_32bit_map, AS_PROGRAM, 32, gstream_state )
+ADDRESS_MAP_START(gstream_state::x2222_32bit_map)
 	AM_RANGE(0x00000000, 0x003FFFFF) AM_RAM AM_SHARE("workram") // work ram
 	AM_RANGE(0x40000000, 0x403fffff) AM_RAM // ?? data gets copied here if present, but game runs without it??
 	AM_RANGE(0x80000000, 0x80003FFF) AM_RAM_WRITE(gstream_vram_w) AM_SHARE("vram") // video ram
@@ -401,7 +405,7 @@ WRITE32_MEMBER(gstream_state::x2222_sound_w)
 		printf("x2222_sound_w unk %08x\n", data);
 }
 
-static ADDRESS_MAP_START( x2222_io, AS_IO, 32, gstream_state )
+ADDRESS_MAP_START(gstream_state::x2222_io)
 	AM_RANGE(0x4000, 0x4003) AM_READ_PORT("P1")
 	AM_RANGE(0x4004, 0x4007) AM_READ_PORT("P2")
 	AM_RANGE(0x4008, 0x400b) AM_READ_PORT("SYS")

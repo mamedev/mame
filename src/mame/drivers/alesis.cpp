@@ -96,7 +96,7 @@ READ8_MEMBER( alesis_state::mmt8_led_r )
 WRITE8_MEMBER( alesis_state::track_led_w )
 {
 	for (int i=0; i<8; i++)
-		output().set_indexed_value("track_led", i + 1, BIT(data, i));
+		m_track_led[i] = BIT(data, i);
 }
 
 READ8_MEMBER( alesis_state::mmt8_p3_r )
@@ -118,42 +118,36 @@ WRITE8_MEMBER( alesis_state::mmt8_p3_w )
 	m_cassette->output(data & 0x10 ? -1.0 : +1.0);
 }
 
-static ADDRESS_MAP_START(hr16_mem, AS_PROGRAM, 8, alesis_state)
+ADDRESS_MAP_START(alesis_state::hr16_mem)
 	ADDRESS_MAP_UNMAP_HIGH
 	AM_RANGE(0x0000, 0x7fff) AM_MIRROR(0x8000) AM_ROM
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START(hr16_io, AS_IO, 8, alesis_state)
+ADDRESS_MAP_START(alesis_state::hr16_io)
 	ADDRESS_MAP_UNMAP_HIGH
 	AM_RANGE(0x0000, 0x0000) AM_READ(kb_r)
 	AM_RANGE(0x0002, 0x0002) AM_DEVWRITE("dm3ag", alesis_dm3ag_device, write)
 	AM_RANGE(0x0004, 0x0004) AM_WRITE(led_w)
 	AM_RANGE(0x0006, 0x0007) AM_DEVREADWRITE("hd44780", hd44780_device, read, write)
 	AM_RANGE(0x0008, 0x0008) AM_WRITE(kb_matrix_w)
-	AM_RANGE(MCS51_PORT_P1, MCS51_PORT_P1) AM_READ_PORT("SELECT")   AM_WRITENOP
-	AM_RANGE(MCS51_PORT_P2, MCS51_PORT_P2) AM_WRITENOP
-	AM_RANGE(MCS51_PORT_P3, MCS51_PORT_P3) AM_READWRITE(p3_r, p3_w)
 	AM_RANGE(0x8000, 0xffff) AM_RAM     AM_SHARE("nvram")   // 32Kx8 SRAM, (battery-backed)
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START(sr16_mem, AS_PROGRAM, 8, alesis_state)
+ADDRESS_MAP_START(alesis_state::sr16_mem)
 	ADDRESS_MAP_UNMAP_HIGH
 	AM_RANGE(0x0000, 0xffff) AM_ROM
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START(sr16_io, AS_IO, 8, alesis_state)
+ADDRESS_MAP_START(alesis_state::sr16_io)
 	//ADDRESS_MAP_UNMAP_HIGH
 	AM_RANGE(0x0000, 0x0000) AM_MIRROR(0xff) AM_DEVWRITE("dm3ag", alesis_dm3ag_device, write)
 	AM_RANGE(0x0200, 0x0200) AM_MIRROR(0xff) AM_WRITE(sr16_lcd_w)
 	AM_RANGE(0x0300, 0x0300) AM_MIRROR(0xff) AM_WRITE(kb_matrix_w)
 	AM_RANGE(0x0400, 0x0400) AM_MIRROR(0xff) AM_READ(kb_r)
-	AM_RANGE(MCS51_PORT_P1, MCS51_PORT_P1) AM_READNOP
-	AM_RANGE(MCS51_PORT_P2, MCS51_PORT_P2) AM_WRITENOP
-	AM_RANGE(MCS51_PORT_P3, MCS51_PORT_P3) AM_READWRITE(p3_r, p3_w)
 	AM_RANGE(0x8000, 0xffff) AM_RAM     AM_SHARE("nvram")   // 32Kx8 SRAM, (battery-backed)
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START(mmt8_io, AS_IO, 8, alesis_state)
+ADDRESS_MAP_START(alesis_state::mmt8_io)
 	ADDRESS_MAP_UNMAP_HIGH
 	AM_RANGE(0x0000, 0xffff) AM_RAM     AM_SHARE("nvram")   // 2x32Kx8 SRAM, (battery-backed)
 	AM_RANGE(0xff02, 0xff02) AM_WRITE(track_led_w)
@@ -161,9 +155,6 @@ static ADDRESS_MAP_START(mmt8_io, AS_IO, 8, alesis_state)
 	AM_RANGE(0xff06, 0xff06) AM_WRITE(kb_matrix_w)
 	AM_RANGE(0xff08, 0xff09) AM_DEVREADWRITE("hd44780", hd44780_device, read, write)
 	AM_RANGE(0xff0e, 0xff0e) AM_READNOP
-	AM_RANGE(MCS51_PORT_P1, MCS51_PORT_P1) AM_READ(kb_r)
-	AM_RANGE(MCS51_PORT_P2, MCS51_PORT_P2) AM_WRITENOP
-	AM_RANGE(MCS51_PORT_P3, MCS51_PORT_P3) AM_READWRITE(mmt8_p3_r, mmt8_p3_w)
 ADDRESS_MAP_END
 
 /* Input ports */
@@ -339,6 +330,11 @@ PALETTE_INIT_MEMBER(alesis_state, alesis)
 	palette.set_pen_color(1, rgb_t(92, 83, 88));
 }
 
+void alesis_state::machine_start()
+{
+	m_track_led.resolve();
+}
+
 void alesis_state::machine_reset()
 {
 	m_kb_matrix = 0xff;
@@ -357,9 +353,12 @@ HD44780_PIXEL_UPDATE(alesis_state::sr16_pixel_update)
 
 MACHINE_CONFIG_START(alesis_state::hr16)
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu",I8031, XTAL(12'000'000))
+	MCFG_CPU_ADD("maincpu",I8031, 12_MHz_XTAL)
 	MCFG_CPU_PROGRAM_MAP(hr16_mem)
 	MCFG_CPU_IO_MAP(hr16_io)
+	MCFG_MCS51_PORT_P1_IN_CB(IOPORT("SELECT"))
+	MCFG_MCS51_PORT_P3_IN_CB(READ8(alesis_state, p3_r))
+	MCFG_MCS51_PORT_P3_OUT_CB(WRITE8(alesis_state, p3_w))
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", LCD)
@@ -382,16 +381,18 @@ MACHINE_CONFIG_START(alesis_state::hr16)
 	MCFG_HD44780_LCD_SIZE(2, 16)
 
 	/* sound hardware */
-	MCFG_ALESIS_DM3AG_ADD("dm3ag", XTAL(12'000'000)/2)
+	MCFG_ALESIS_DM3AG_ADD("dm3ag", 12_MHz_XTAL/2)
 
 	MCFG_NVRAM_ADD_0FILL("nvram")
 MACHINE_CONFIG_END
 
-MACHINE_CONFIG_DERIVED(alesis_state::sr16, hr16)
+MACHINE_CONFIG_START(alesis_state::sr16)
+	hr16(config);
 	/* basic machine hardware */
 	MCFG_CPU_MODIFY("maincpu")
 	MCFG_CPU_PROGRAM_MAP(sr16_mem)
 	MCFG_CPU_IO_MAP(sr16_io)
+	MCFG_MCS51_PORT_P1_IN_CB(NOOP)
 
 	/* video hardware */
 	MCFG_SCREEN_MODIFY("screen")
@@ -404,10 +405,14 @@ MACHINE_CONFIG_DERIVED(alesis_state::sr16, hr16)
 	MCFG_HD44780_PIXEL_UPDATE_CB(alesis_state, sr16_pixel_update)
 MACHINE_CONFIG_END
 
-MACHINE_CONFIG_DERIVED(alesis_state::mmt8, hr16)
+MACHINE_CONFIG_START(alesis_state::mmt8)
+	hr16(config);
 	/* basic machine hardware */
 	MCFG_CPU_MODIFY("maincpu")
 	MCFG_CPU_IO_MAP(mmt8_io)
+	MCFG_MCS51_PORT_P1_IN_CB(READ8(alesis_state, kb_r))
+	MCFG_MCS51_PORT_P3_IN_CB(READ8(alesis_state, mmt8_p3_r))
+	MCFG_MCS51_PORT_P3_OUT_CB(WRITE8(alesis_state, mmt8_p3_w))
 
 	MCFG_DEVICE_REMOVE("dm3ag")
 MACHINE_CONFIG_END

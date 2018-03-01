@@ -93,6 +93,8 @@ public:
 	int m_trap_aux;
 	DECLARE_DRIVER_INIT(mpz80);
 	void mpz80(machine_config &config);
+	void mpz80_io(address_map &map);
+	void mpz80_mem(address_map &map);
 };
 
 #endif // MAME_INCLUDES_MPZ80_H

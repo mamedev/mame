@@ -204,6 +204,7 @@ public:
 
 	void fccpu1_eprom_sockets(machine_config &config);
 	void fccpu1(machine_config &config);
+	void force68k_mem(address_map &map);
 private:
 	required_device<cpu_device> m_maincpu;
 	required_device<mm58167_device> m_rtc;
@@ -232,7 +233,7 @@ private:
 	required_device<generic_slot_device> m_cart;
 };
 
-static ADDRESS_MAP_START (force68k_mem, AS_PROGRAM, 16, force68k_state)
+ADDRESS_MAP_START(force68k_state::force68k_mem)
 	ADDRESS_MAP_UNMAP_HIGH
 	AM_RANGE (0x000000, 0x000007) AM_ROM AM_READ (bootvect_r)       /* Vectors mapped from System EPROM */
 	AM_RANGE (0x000008, 0x01ffff) AM_RAM /* DRAM CPU-1B */
@@ -596,7 +597,7 @@ MACHINE_CONFIG_START(force68k_state::fccpu1)
 	MCFG_CENTRONICS_OUTPUT_LATCH_ADD ("cent_data_out", "centronics")
 
 	// EPROM sockets
-	MCFG_FRAGMENT_ADD(fccpu1_eprom_sockets)
+	fccpu1_eprom_sockets(config);
 
 	// VME interface
 	MCFG_VME_DEVICE_ADD("vme")

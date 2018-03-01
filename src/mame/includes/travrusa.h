@@ -41,4 +41,5 @@ public:
 	void shtrider(machine_config &config);
 	void travrusa(machine_config &config);
 	void shtriderb(machine_config &config);
+	void main_map(address_map &map);
 };

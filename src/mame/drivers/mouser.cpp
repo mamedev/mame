@@ -64,7 +64,7 @@ INTERRUPT_GEN_MEMBER(mouser_state::mouser_sound_nmi_assert)
 		device.execute().set_input_line(INPUT_LINE_NMI, ASSERT_LINE);
 }
 
-static ADDRESS_MAP_START( mouser_map, AS_PROGRAM, 8, mouser_state )
+ADDRESS_MAP_START(mouser_state::mouser_map)
 	AM_RANGE(0x0000, 0x5fff) AM_ROM
 	AM_RANGE(0x6000, 0x6bff) AM_RAM
 	AM_RANGE(0x8800, 0x88ff) AM_WRITENOP /* unknown */
@@ -78,18 +78,18 @@ static ADDRESS_MAP_START( mouser_map, AS_PROGRAM, 8, mouser_state )
 	AM_RANGE(0xb800, 0xb800) AM_READ_PORT("P2") AM_WRITE(mouser_sound_interrupt_w) /* byte to sound cpu */
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( decrypted_opcodes_map, AS_OPCODES, 8, mouser_state )
+ADDRESS_MAP_START(mouser_state::decrypted_opcodes_map)
 	AM_RANGE(0x0000, 0x5fff) AM_ROM AM_SHARE("decrypted_opcodes")
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( mouser_sound_map, AS_PROGRAM, 8, mouser_state )
+ADDRESS_MAP_START(mouser_state::mouser_sound_map)
 	AM_RANGE(0x0000, 0x0fff) AM_ROM
 	AM_RANGE(0x2000, 0x23ff) AM_RAM
 	AM_RANGE(0x3000, 0x3000) AM_READ(mouser_sound_byte_r)
 	AM_RANGE(0x4000, 0x4000) AM_WRITE(mouser_sound_nmi_clear_w)
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( mouser_sound_io_map, AS_IO, 8, mouser_state )
+ADDRESS_MAP_START(mouser_state::mouser_sound_io_map)
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	AM_RANGE(0x00, 0x01) AM_DEVWRITE("ay1", ay8910_device, data_address_w)
 	AM_RANGE(0x80, 0x81) AM_DEVWRITE("ay2", ay8910_device, data_address_w)
@@ -204,7 +204,7 @@ MACHINE_CONFIG_START(mouser_state::mouser)
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", Z80, 4000000)   /* 4 MHz ? */
 	MCFG_CPU_PROGRAM_MAP(mouser_map)
-	MCFG_CPU_DECRYPTED_OPCODES_MAP(decrypted_opcodes_map)
+	MCFG_CPU_OPCODES_MAP(decrypted_opcodes_map)
 	MCFG_CPU_VBLANK_INT_DRIVER("screen", mouser_state,  mouser_nmi_interrupt) /* NMI is masked externally */
 
 	MCFG_CPU_ADD("audiocpu", Z80, 4000000)  /* ??? */

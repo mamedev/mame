@@ -10,8 +10,10 @@
 
 #pragma once
 
+#include "cpu/es5510/es5510.h"
 #include "cpu/m68000/m68000.h"
 #include "sound/es5506.h"
+#include "sound/esqpump.h"
 #include "machine/mc68681.h"
 #include "machine/mb87078.h"
 #include "machine/mb8421.h"
@@ -20,15 +22,16 @@ class taito_en_device : public device_t
 
 {
 public:
+	static constexpr feature_type imperfect_features() { return feature::SOUND; }
+
 	taito_en_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
 	DECLARE_WRITE16_MEMBER( en_es5505_bank_w );
 	DECLARE_WRITE8_MEMBER( en_volume_w );
 
-	//todo: hook up cpu/es5510
-	DECLARE_READ16_MEMBER( es5510_dsp_r );
-	DECLARE_WRITE16_MEMBER( es5510_dsp_w );
+	void set_bank(int bank, int entry) { m_cpubank[bank]->set_entry(entry); }
 
+	void en_sound_map(address_map &map);
 protected:
 	// device-level overrides
 	virtual void device_start() override;
@@ -39,20 +42,18 @@ private:
 	// inherited devices/pointers
 	required_device<cpu_device> m_audiocpu;
 	required_device<es5505_device> m_ensoniq;
+	required_device<es5510_device> m_esp;
+	required_device<esq_5505_5510_pump_device> m_pump;
 	required_device<mc68681_device> m_duart68681;
 	required_device<mb87078_device> m_mb87078;
 
-	//todo: hook up cpu/es5510
-	std::unique_ptr<uint32_t[]> m_es5510_dram;
-	uint16_t   m_es5510_dsp_ram[0x200];
-	uint32_t   m_es5510_gpr[0xc0];
-	uint32_t   m_es5510_dol_latch;
-	uint32_t   m_es5510_dil_latch;
-	uint32_t   m_es5510_dadr_latch;
-	uint32_t   m_es5510_gpr_latch;
-	uint8_t    m_es5510_ram_sel;
+	required_shared_ptr<uint16_t> m_osram;
+
+	required_memory_region m_osrom;
+	required_memory_bank_array<3> m_cpubank;
 
 	DECLARE_WRITE_LINE_MEMBER(duart_irq_handler);
+	DECLARE_WRITE8_MEMBER(duart_output);
 
 	DECLARE_WRITE8_MEMBER(mb87078_gain_changed);
 };

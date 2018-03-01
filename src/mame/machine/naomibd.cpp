@@ -60,7 +60,7 @@
     Normal address starts with 0xa0000000 to enable auto-advance and 8MB ROM addressing mode.
 */
 
-DEVICE_ADDRESS_MAP_START(submap, 16, naomi_board)
+ADDRESS_MAP_START(naomi_board::submap)
 	AM_RANGE(0x00, 0xff) AM_READ(default_r)
 
 	AM_RANGE(0x00, 0x01) AM_WRITE(rom_offseth_w)
@@ -78,13 +78,6 @@ naomi_board::naomi_board(const machine_config &mconfig, device_type type, const 
 {
 	eeprom_tag = nullptr;
 }
-
-void naomi_board::static_set_eeprom_tag(device_t &device, const char *_eeprom_tag)
-{
-	naomi_board &dev = downcast<naomi_board &>(device);
-	dev.eeprom_tag = _eeprom_tag;
-}
-
 
 void naomi_board::device_start()
 {

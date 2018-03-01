@@ -552,6 +552,8 @@ public:
 	void nvram_init(nvram_device &nvram, void *data, size_t size);
 
 	void clcd(machine_config &config);
+	void clcd_banked_mem(address_map &map);
+	void clcd_mem(address_map &map);
 private:
 	required_device<m65c02_device> m_maincpu;
 	required_device<mos6551_device> m_acia;
@@ -602,7 +604,7 @@ void clcd_state::nvram_init(nvram_device &nvram, void *data, size_t size)
 }
 
 
-static ADDRESS_MAP_START( clcd_banked_mem, AS_PROGRAM, 8, clcd_state )
+ADDRESS_MAP_START(clcd_state::clcd_banked_mem)
 	/* KERN/APPL/RAM */
 	AM_RANGE(0x00000, 0x1ffff) AM_MIRROR(0x40000) AM_READWRITE(ram_r, ram_w)
 	AM_RANGE(0x20000, 0x3ffff) AM_MIRROR(0x40000) AM_ROM AM_REGION("maincpu",0)
@@ -615,7 +617,7 @@ static ADDRESS_MAP_START( clcd_banked_mem, AS_PROGRAM, 8, clcd_state )
 	AM_RANGE(0x8e000, 0x8f7ff) AM_READ(mmu_offset5_r)
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( clcd_mem, AS_PROGRAM, 8, clcd_state )
+ADDRESS_MAP_START(clcd_state::clcd_mem)
 	AM_RANGE(0x0000, 0x0fff) AM_READWRITE(ram_r, ram_w)
 	AM_RANGE(0x1000, 0x3fff) AM_DEVREADWRITE("bank1", address_map_bank_device, read8, write8)
 	AM_RANGE(0x4000, 0x7fff) AM_DEVREADWRITE("bank2", address_map_bank_device, read8, write8)

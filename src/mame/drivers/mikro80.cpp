@@ -20,7 +20,7 @@
 #include "speaker.h"
 
 /* Address maps */
-static ADDRESS_MAP_START(mikro80_mem, AS_PROGRAM, 8, mikro80_state )
+ADDRESS_MAP_START(mikro80_state::mikro80_mem)
 	AM_RANGE( 0x0000, 0x07ff ) AM_RAMBANK("bank1") // First bank
 	AM_RANGE( 0x0800, 0xdfff ) AM_RAM  // RAM
 	AM_RANGE( 0xe000, 0xe7ff ) AM_RAM  AM_SHARE("cursor_ram")// Video RAM
@@ -29,18 +29,18 @@ static ADDRESS_MAP_START(mikro80_mem, AS_PROGRAM, 8, mikro80_state )
 	AM_RANGE( 0xf800, 0xffff ) AM_ROM  // System ROM
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( mikro80_io , AS_IO, 8, mikro80_state )
+ADDRESS_MAP_START(mikro80_state::mikro80_io)
 	ADDRESS_MAP_UNMAP_HIGH
 	AM_RANGE( 0x01, 0x01) AM_READWRITE(mikro80_tape_r, mikro80_tape_w )
 	AM_RANGE( 0x04, 0x07) AM_READWRITE(mikro80_keyboard_r, mikro80_keyboard_w )
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( kristall_io , AS_IO, 8, mikro80_state )
+ADDRESS_MAP_START(mikro80_state::kristall_io)
 	ADDRESS_MAP_UNMAP_HIGH
 	AM_RANGE( 0x00, 0x03) AM_DEVREADWRITE("ppi8255", i8255_device, read, write)
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( radio99_io , AS_IO, 8, mikro80_state )
+ADDRESS_MAP_START(mikro80_state::radio99_io)
 	ADDRESS_MAP_UNMAP_HIGH
 	AM_RANGE( 0x01, 0x01) AM_READWRITE(mikro80_tape_r, mikro80_tape_w )
 	AM_RANGE( 0x04, 0x04) AM_WRITE(radio99_sound_w)
@@ -195,7 +195,8 @@ MACHINE_CONFIG_START(mikro80_state::mikro80)
 	MCFG_SOFTWARE_LIST_ADD("cass_list", "mikro80")
 MACHINE_CONFIG_END
 
-MACHINE_CONFIG_DERIVED(mikro80_state::radio99, mikro80)
+MACHINE_CONFIG_START(mikro80_state::radio99)
+	mikro80(config);
 
 	/* basic machine hardware */
 	MCFG_CPU_MODIFY("maincpu")
@@ -206,7 +207,8 @@ MACHINE_CONFIG_DERIVED(mikro80_state::radio99, mikro80)
 	MCFG_SOUND_ROUTE_EX(0, "dac", 1.0, DAC_VREF_POS_INPUT)
 MACHINE_CONFIG_END
 
-MACHINE_CONFIG_DERIVED(mikro80_state::kristall, mikro80)
+MACHINE_CONFIG_START(mikro80_state::kristall)
+	mikro80(config);
 	MCFG_CPU_MODIFY("maincpu")
 	MCFG_CPU_IO_MAP(kristall_io)
 MACHINE_CONFIG_END

@@ -282,7 +282,7 @@ READ8_MEMBER(xain_state::mcu_comm_reset_r)
 }
 
 
-static ADDRESS_MAP_START( bootleg_map, AS_PROGRAM, 8, xain_state )
+ADDRESS_MAP_START(xain_state::bootleg_map)
 	AM_RANGE(0x0000, 0x1fff) AM_RAM AM_SHARE("share1")
 	AM_RANGE(0x2000, 0x27ff) AM_RAM_WRITE(charram_w) AM_SHARE("charram")
 	AM_RANGE(0x2800, 0x2fff) AM_RAM_WRITE(bgram1_w) AM_SHARE("bgram1")
@@ -307,14 +307,14 @@ static ADDRESS_MAP_START( bootleg_map, AS_PROGRAM, 8, xain_state )
 	AM_RANGE(0x8000, 0xffff) AM_ROM
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( main_map, AS_PROGRAM, 8, xain_state )
+ADDRESS_MAP_START(xain_state::main_map)
 	AM_IMPORT_FROM(bootleg_map)
 	AM_RANGE(0x3a04, 0x3a04) AM_DEVREAD("mcu", taito68705_mcu_device, data_r)
 	AM_RANGE(0x3a06, 0x3a06) AM_READ(mcu_comm_reset_r)
 	AM_RANGE(0x3a0e, 0x3a0e) AM_DEVWRITE("mcu", taito68705_mcu_device, data_w)
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( cpu_map_B, AS_PROGRAM, 8, xain_state )
+ADDRESS_MAP_START(xain_state::cpu_map_B)
 	AM_RANGE(0x0000, 0x1fff) AM_RAM AM_SHARE("share1")
 	AM_RANGE(0x2000, 0x2000) AM_WRITE(irqA_assert_w)
 	AM_RANGE(0x2800, 0x2800) AM_WRITE(irqB_clear_w)
@@ -323,7 +323,7 @@ static ADDRESS_MAP_START( cpu_map_B, AS_PROGRAM, 8, xain_state )
 	AM_RANGE(0x8000, 0xffff) AM_ROM
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( sound_map, AS_PROGRAM, 8, xain_state )
+ADDRESS_MAP_START(xain_state::sound_map)
 	AM_RANGE(0x0000, 0x07ff) AM_RAM
 	AM_RANGE(0x1000, 0x1000) AM_DEVREAD("soundlatch", generic_latch_8_device, read)
 	AM_RANGE(0x2800, 0x2801) AM_DEVWRITE("ym1", ym2203_device, write)
@@ -496,7 +496,8 @@ MACHINE_CONFIG_START(xain_state::xsleena)
 MACHINE_CONFIG_END
 
 
-MACHINE_CONFIG_DERIVED(xain_state::xsleenab, xsleena)
+MACHINE_CONFIG_START(xain_state::xsleenab)
+	xsleena(config);
 	MCFG_CPU_MODIFY("maincpu")
 	MCFG_CPU_PROGRAM_MAP(bootleg_map)
 

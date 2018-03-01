@@ -61,6 +61,7 @@ public:
 	uint32_t screen_update_superqix(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	void superqix_draw_sprites(bitmap_ind16 &bitmap,const rectangle &cliprect);
 
+	void main_map(address_map &map);
 protected:
 	virtual void machine_init_common();
 };
@@ -104,6 +105,8 @@ public:
 	void sqix(machine_config &config);
 	void sqix_8031(machine_config &config);
 	void sqix_nomcu(machine_config &config);
+	void sqix_port_map(address_map &map);
+	void sqix_8031_map(address_map &map);
 protected:
 	virtual void machine_init_common() override;
 
@@ -157,6 +160,7 @@ public:
 	u32 screen_update_pbillian(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 
 	void pbillian(machine_config &config);
+	void pbillian_port_map(address_map &map);
 protected:
 	virtual void machine_init_common() override;
 

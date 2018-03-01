@@ -89,7 +89,7 @@ TIMER_DEVICE_CALLBACK_MEMBER(pingpong_state::merlinmm_interrupt)
 	}
 }
 
-static ADDRESS_MAP_START( pingpong_map, AS_PROGRAM, 8, pingpong_state )
+ADDRESS_MAP_START(pingpong_state::pingpong_map)
 	AM_RANGE(0x0000, 0x7fff) AM_ROM
 	AM_RANGE(0x8000, 0x83ff) AM_RAM_WRITE(pingpong_colorram_w) AM_SHARE("colorram")
 	AM_RANGE(0x8400, 0x87ff) AM_RAM_WRITE(pingpong_videoram_w) AM_SHARE("videoram")
@@ -106,7 +106,7 @@ static ADDRESS_MAP_START( pingpong_map, AS_PROGRAM, 8, pingpong_state )
 	AM_RANGE(0xa600, 0xa600) AM_DEVWRITE("watchdog", watchdog_timer_device, reset_w)
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( merlinmm_map, AS_PROGRAM, 8, pingpong_state )
+ADDRESS_MAP_START(pingpong_state::merlinmm_map)
 	AM_RANGE(0x0000, 0x3fff) AM_ROM
 	AM_RANGE(0x5000, 0x53ff) AM_RAM AM_SHARE("nvram")
 	AM_RANGE(0x5400, 0x57ff) AM_RAM
@@ -476,7 +476,8 @@ MACHINE_CONFIG_START(pingpong_state::pingpong)
 MACHINE_CONFIG_END
 
 /* too fast! */
-MACHINE_CONFIG_DERIVED(pingpong_state::merlinmm, pingpong)
+MACHINE_CONFIG_START(pingpong_state::merlinmm)
+	pingpong(config);
 	MCFG_CPU_MODIFY("maincpu")
 	MCFG_CPU_PROGRAM_MAP(merlinmm_map)
 	MCFG_TIMER_MODIFY("scantimer")

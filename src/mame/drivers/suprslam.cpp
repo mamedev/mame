@@ -102,7 +102,7 @@ WRITE8_MEMBER(suprslam_state::suprslam_sh_bankswitch_w)
 
 /*** MEMORY MAPS *************************************************************/
 
-static ADDRESS_MAP_START( suprslam_map, AS_PROGRAM, 16, suprslam_state )
+ADDRESS_MAP_START(suprslam_state::suprslam_map)
 	AM_RANGE(0x000000, 0x0fffff) AM_ROM
 	AM_RANGE(0xfb0000, 0xfb1fff) AM_RAM AM_SHARE("spriteram")
 	AM_RANGE(0xfc0000, 0xfcffff) AM_RAM AM_SHARE("sp_videoram")
@@ -119,13 +119,13 @@ static ADDRESS_MAP_START( suprslam_map, AS_PROGRAM, 16, suprslam_state )
 	AM_RANGE(0xfff000, 0xfff01f) AM_DEVREADWRITE8("io", vs9209_device, read, write, 0x00ff)
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( sound_map, AS_PROGRAM, 8, suprslam_state )
+ADDRESS_MAP_START(suprslam_state::sound_map)
 	AM_RANGE(0x0000, 0x77ff) AM_ROM
 	AM_RANGE(0x7800, 0x7fff) AM_RAM
 	AM_RANGE(0x8000, 0xffff) AM_ROMBANK("bank1")
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( sound_io_map, AS_IO, 8, suprslam_state )
+ADDRESS_MAP_START(suprslam_state::sound_io_map)
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	AM_RANGE(0x00, 0x00) AM_WRITE(suprslam_sh_bankswitch_w)
 	AM_RANGE(0x04, 0x04) AM_DEVREADWRITE("soundlatch", generic_latch_8_device, read, acknowledge_w)

@@ -1,8 +1,9 @@
 // license:BSD-3-Clause
 // copyright-holders:Ryan Holtz, R. Belmont
 #pragma once
-#ifndef INCLUDES_NDS_H
-#define INCLUDES_NDS_H
+
+#ifndef MAME_INCLUDES_NDS_H
+#define MAME_INCLUDES_NDS_H
 
 #include "cpu/arm7/arm7.h"
 #include "cpu/arm7/arm7core.h"
@@ -41,6 +42,10 @@ public:
 	DECLARE_WRITE32_MEMBER(wram_arm7mirror_w);
 
 	void nds(machine_config &config);
+	void nds7_wram_map(address_map &map);
+	void nds9_wram_map(address_map &map);
+	void nds_arm7_map(address_map &map);
+	void nds_arm9_map(address_map &map);
 protected:
 	required_device<arm7_cpu_device> m_arm7;
 	required_device<arm946es_cpu_device> m_arm9;

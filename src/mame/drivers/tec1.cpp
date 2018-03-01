@@ -125,6 +125,10 @@ public:
 	TIMER_CALLBACK_MEMBER(tec1_kbd_callback);
 	void tec1(machine_config &config);
 	void tecjmon(machine_config &config);
+	void tec1_io(address_map &map);
+	void tec1_map(address_map &map);
+	void tecjmon_io(address_map &map);
+	void tecjmon_map(address_map &map);
 };
 
 
@@ -323,14 +327,14 @@ void tec1_state::machine_reset()
 
 ***************************************************************************/
 
-static ADDRESS_MAP_START( tec1_map, AS_PROGRAM, 8, tec1_state )
+ADDRESS_MAP_START(tec1_state::tec1_map)
 	ADDRESS_MAP_GLOBAL_MASK(0x3fff)
 	AM_RANGE(0x0000, 0x07ff) AM_ROM
 	AM_RANGE(0x0800, 0x0fff) AM_RAM // on main board
 	AM_RANGE(0x1000, 0x3fff) AM_RAM // expansion
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( tec1_io, AS_IO, 8, tec1_state )
+ADDRESS_MAP_START(tec1_state::tec1_io)
 	ADDRESS_MAP_GLOBAL_MASK(0x07)
 	AM_RANGE(0x00, 0x00) AM_READ(tec1_kbd_r)
 	AM_RANGE(0x01, 0x01) AM_WRITE(tec1_digit_w)
@@ -338,14 +342,14 @@ static ADDRESS_MAP_START( tec1_io, AS_IO, 8, tec1_state )
 ADDRESS_MAP_END
 
 
-static ADDRESS_MAP_START( tecjmon_map, AS_PROGRAM, 8, tec1_state )
+ADDRESS_MAP_START(tec1_state::tecjmon_map)
 	ADDRESS_MAP_GLOBAL_MASK(0x3fff)
 	AM_RANGE(0x0000, 0x07ff) AM_ROM
 	AM_RANGE(0x0800, 0x37ff) AM_RAM
 	AM_RANGE(0x3800, 0x3fff) AM_ROM
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( tecjmon_io, AS_IO, 8, tec1_state )
+ADDRESS_MAP_START(tec1_state::tecjmon_io)
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	AM_RANGE(0x00, 0x00) AM_READ(tec1_kbd_r)
 	AM_RANGE(0x01, 0x01) AM_WRITE(tecjmon_digit_w)

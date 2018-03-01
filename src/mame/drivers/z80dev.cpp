@@ -36,6 +36,8 @@ public:
 	DECLARE_WRITE8_MEMBER( display_w );
 	DECLARE_READ8_MEMBER( test_r );
 	void z80dev(machine_config &config);
+	void io_map(address_map &map);
+	void mem_map(address_map &map);
 private:
 	required_device<cpu_device> m_maincpu;
 };
@@ -54,13 +56,13 @@ READ8_MEMBER( z80dev_state::test_r )
 	return machine().rand();
 }
 
-static ADDRESS_MAP_START( mem_map, AS_PROGRAM, 8, z80dev_state )
+ADDRESS_MAP_START(z80dev_state::mem_map)
 	ADDRESS_MAP_UNMAP_HIGH
 	AM_RANGE(0x0000, 0x07ff) AM_ROM
 	AM_RANGE(0x1000, 0x10ff) AM_RAM
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( io_map , AS_IO, 8, z80dev_state )
+ADDRESS_MAP_START(z80dev_state::io_map)
 	ADDRESS_MAP_UNMAP_HIGH
 	ADDRESS_MAP_GLOBAL_MASK (0xff)
 	AM_RANGE(0x20, 0x20) AM_READ_PORT("LINE0")

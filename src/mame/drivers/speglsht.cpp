@@ -108,26 +108,35 @@ Notes:
 #include "emu.h"
 #include "machine/st0016.h"
 #include "cpu/mips/r3000.h"
-
+#include <algorithm>
 
 class speglsht_state : public driver_device
 {
 public:
 	speglsht_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag),
+			m_palette(*this, "palette"),
+			m_maincpu(*this,"maincpu"),
+			m_subcpu(*this, "sub"),
 			m_shared(*this, "shared"),
 			m_framebuffer(*this, "framebuffer"),
 			m_cop_ram(*this, "cop_ram"),
-			m_palette(*this, "palette"),
-			m_maincpu(*this,"maincpu"),
-			m_subcpu(*this, "sub")
+			m_st0016_bank(*this, "st0016_bank")
 			{ }
+
+	required_device<palette_device> m_palette;
+	required_device<st0016_cpu_device> m_maincpu;
+	required_device<cpu_device> m_subcpu;
 
 	required_shared_ptr<uint8_t> m_shared;
 	required_shared_ptr<uint32_t> m_framebuffer;
-	uint32_t m_videoreg;
-	std::unique_ptr<bitmap_ind16> m_bitmap;
 	required_shared_ptr<uint32_t> m_cop_ram;
+
+	required_memory_bank m_st0016_bank;
+
+	std::unique_ptr<bitmap_ind16> m_bitmap;
+	uint32_t m_videoreg;
+
 	DECLARE_READ32_MEMBER(shared_r);
 	DECLARE_WRITE32_MEMBER(shared_w);
 	DECLARE_WRITE32_MEMBER(videoreg_w);
@@ -139,18 +148,18 @@ public:
 	virtual void machine_start() override;
 	DECLARE_VIDEO_START(speglsht);
 	uint32_t screen_update_speglsht(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
-	required_device<palette_device> m_palette;
-	required_device<st0016_cpu_device> m_maincpu;
-	required_device<cpu_device> m_subcpu;
 
 	DECLARE_WRITE8_MEMBER(st0016_rom_bank_w);
 	void speglsht(machine_config &config);
+	void speglsht_mem(address_map &map);
+	void st0016_io(address_map &map);
+	void st0016_mem(address_map &map);
 };
 
 
-static ADDRESS_MAP_START( st0016_mem, AS_PROGRAM, 8, speglsht_state )
+ADDRESS_MAP_START(speglsht_state::st0016_mem)
 	AM_RANGE(0x0000, 0x7fff) AM_ROM
-	AM_RANGE(0x8000, 0xbfff) AM_ROMBANK("bank1")
+	AM_RANGE(0x8000, 0xbfff) AM_ROMBANK("st0016_bank")
 	//AM_RANGE(0xc000, 0xcfff) AM_READ(st0016_sprite_ram_r) AM_WRITE(st0016_sprite_ram_w)
 	//AM_RANGE(0xd000, 0xdfff) AM_READ(st0016_sprite2_ram_r) AM_WRITE(st0016_sprite2_ram_w)
 	AM_RANGE(0xe000, 0xe7ff) AM_RAM
@@ -163,17 +172,17 @@ ADDRESS_MAP_END
 
 void speglsht_state::machine_start()
 {
-	membank("bank1")->configure_entries(0, 256, memregion("maincpu")->base(), 0x4000);
+	m_st0016_bank->configure_entries(0, 256, memregion("maincpu")->base(), 0x4000);
 }
 
 // common rombank? should go in machine/st0016 with larger address space exposed?
 WRITE8_MEMBER(speglsht_state::st0016_rom_bank_w)
 {
-	membank("bank1")->set_entry(data);
+	m_st0016_bank->set_entry(data);
 }
 
 
-static ADDRESS_MAP_START( st0016_io, AS_IO, 8, speglsht_state )
+ADDRESS_MAP_START(speglsht_state::st0016_io)
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	//AM_RANGE(0x00, 0xbf) AM_READ(st0016_vregs_r) AM_WRITE(st0016_vregs_w)
 	AM_RANGE(0xe1, 0xe1) AM_WRITE(st0016_rom_bank_w)
@@ -252,7 +261,7 @@ READ32_MEMBER(speglsht_state::irq_ack_clear)
 	return 0;
 }
 
-static ADDRESS_MAP_START( speglsht_mem, AS_PROGRAM, 32, speglsht_state )
+ADDRESS_MAP_START(speglsht_state::speglsht_mem)
 	AM_RANGE(0x00000000, 0x000fffff) AM_RAM
 	AM_RANGE(0x01000000, 0x01007fff) AM_RAM //tested - STATIC RAM
 	AM_RANGE(0x01600000, 0x0160004f) AM_READWRITE(cop_r, cop_w) AM_SHARE("cop_ram")
@@ -346,7 +355,7 @@ GFXDECODE_END
 
 MACHINE_RESET_MEMBER(speglsht_state,speglsht)
 {
-	memset(m_shared,0,0x1000);
+	std::fill(&m_shared[0],&m_shared[m_shared.bytes()],0);
 }
 
 VIDEO_START_MEMBER(speglsht_state,speglsht)

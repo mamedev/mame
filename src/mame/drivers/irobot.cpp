@@ -149,7 +149,7 @@ WRITE8_MEMBER(irobot_state::quad_pokeyn_w)
  *
  *************************************/
 
-static ADDRESS_MAP_START( irobot_map, AS_PROGRAM, 8, irobot_state )
+ADDRESS_MAP_START(irobot_state::irobot_map)
 	AM_RANGE(0x0000, 0x07ff) AM_RAM
 	AM_RANGE(0x0800, 0x0fff) AM_RAMBANK("bank2")
 	AM_RANGE(0x1000, 0x103f) AM_READ_PORT("IN0")

@@ -23,7 +23,7 @@ DEFINE_DEVICE_TYPE(BBC_TUBE_ARM, bbc_tube_arm_device, "bbc_tube_arm", "ARM Evalu
 //  ADDRESS_MAP( tube_arm_mem )
 //-------------------------------------------------
 
-static ADDRESS_MAP_START(tube_arm_mem, AS_PROGRAM, 32, bbc_tube_arm_device)
+ADDRESS_MAP_START(bbc_tube_arm_device::tube_arm_mem)
 	ADDRESS_MAP_UNMAP_HIGH
 	AM_RANGE(0x0000000, 0x03fffff) AM_READWRITE8(ram_r, ram_w, 0xffffffff)
 	AM_RANGE(0x1000000, 0x100001f) AM_DEVREADWRITE8("ula", tube_device, parasite_r, parasite_w, 0x000000ff)
@@ -145,7 +145,7 @@ READ8_MEMBER(bbc_tube_arm_device::ram_r)
 WRITE8_MEMBER(bbc_tube_arm_device::ram_w)
 {
 	/* clear ROM select on first write */
-	if (!machine().side_effect_disabled()) m_rom_select = false;
+	if (!machine().side_effects_disabled()) m_rom_select = false;
 
 	m_ram->pointer()[offset] = data;
 }

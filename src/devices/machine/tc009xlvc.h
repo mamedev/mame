@@ -23,6 +23,16 @@ public:
 	DECLARE_READ8_MEMBER( vregs_r );
 	DECLARE_WRITE8_MEMBER( vregs_w );
 
+	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	void screen_eof();
+
+protected:
+	virtual void device_start() override;
+	virtual space_config_vector memory_space_config() const override;
+
+private:
+	void draw_sprites(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect, uint8_t global_flip);
+
 	DECLARE_READ8_MEMBER( tc0091lvc_paletteram_r );
 	DECLARE_WRITE8_MEMBER( tc0091lvc_paletteram_w );
 	DECLARE_READ8_MEMBER( tc0091lvc_bitmap_r );
@@ -44,14 +54,7 @@ public:
 	TILE_GET_INFO_MEMBER(get_bg1_tile_info);
 	TILE_GET_INFO_MEMBER(get_tx_tile_info);
 
-	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
-	void screen_eof();
-
-protected:
-	virtual void device_start() override;
-	virtual space_config_vector memory_space_config() const override;
-
-	void draw_sprites(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect, uint8_t global_flip);
+	void tc0091lvc_map8(address_map &map);
 
 	uint8_t *m_pcg1_ram;
 	uint8_t *m_pcg2_ram;

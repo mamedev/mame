@@ -85,6 +85,8 @@ public:
 	DECLARE_MACHINE_RESET(s4a);
 	void s4(machine_config &config);
 	void s4a(machine_config &config);
+	void s4_audio_map(address_map &map);
+	void s4_main_map(address_map &map);
 private:
 	uint8_t m_t_c;
 	uint8_t m_sound_data;
@@ -101,7 +103,7 @@ private:
 	optional_device<pia6821_device> m_pias;
 };
 
-static ADDRESS_MAP_START( s4_main_map, AS_PROGRAM, 8, s4_state )
+ADDRESS_MAP_START(s4_state::s4_main_map)
 	ADDRESS_MAP_GLOBAL_MASK(0x7fff)
 	AM_RANGE(0x0000, 0x00ff) AM_RAM
 	AM_RANGE(0x0100, 0x01ff) AM_RAM AM_SHARE("nvram")
@@ -112,7 +114,7 @@ static ADDRESS_MAP_START( s4_main_map, AS_PROGRAM, 8, s4_state )
 	AM_RANGE(0x6000, 0x7fff) AM_ROM AM_REGION("roms", 0)
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( s4_audio_map, AS_PROGRAM, 8, s4_state )
+ADDRESS_MAP_START(s4_state::s4_audio_map)
 	ADDRESS_MAP_GLOBAL_MASK(0x0fff)
 	AM_RANGE(0x0000, 0x00ff) AM_RAM
 	AM_RANGE(0x0400, 0x0403) AM_DEVREADWRITE("pias", pia6821_device, read, write) // sounds
@@ -431,7 +433,7 @@ MACHINE_CONFIG_START(s4_state::s4)
 	MCFG_DEFAULT_LAYOUT(layout_s4)
 
 	/* Sound */
-	MCFG_FRAGMENT_ADD( genpin_audio )
+	genpin_audio(config);
 
 	/* Devices */
 	MCFG_DEVICE_ADD("pia22", PIA6821, 0)
@@ -472,7 +474,8 @@ MACHINE_CONFIG_START(s4_state::s4)
 	MCFG_NVRAM_ADD_0FILL("nvram")
 MACHINE_CONFIG_END
 
-MACHINE_CONFIG_DERIVED(s4_state::s4a, s4)
+MACHINE_CONFIG_START(s4_state::s4a)
+	s4(config);
 	/* Add the soundcard */
 	MCFG_CPU_ADD("audiocpu", M6808, 3580000)
 	MCFG_CPU_PROGRAM_MAP(s4_audio_map)

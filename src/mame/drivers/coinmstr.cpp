@@ -181,6 +181,13 @@ public:
 	void jpcoin(machine_config &config);
 	void quizmstr(machine_config &config);
 	void trailblz(machine_config &config);
+	void coinmstr_map(address_map &map);
+	void jpcoin_io_map(address_map &map);
+	void jpcoin_map(address_map &map);
+	void pokeroul_io_map(address_map &map);
+	void quizmstr_io_map(address_map &map);
+	void supnudg2_io_map(address_map &map);
+	void trailblz_io_map(address_map &map);
 };
 
 
@@ -332,7 +339,7 @@ READ8_MEMBER(coinmstr_state::ff_r)
 
 // Common memory map
 
-static ADDRESS_MAP_START( coinmstr_map, AS_PROGRAM, 8, coinmstr_state )
+ADDRESS_MAP_START(coinmstr_state::coinmstr_map)
 	AM_RANGE(0x0000, 0xbfff) AM_ROM
 	AM_RANGE(0xc000, 0xdfff) AM_RAM
 	AM_RANGE(0xe000, 0xe7ff) AM_RAM_WRITE(quizmstr_bg_w) AM_SHARE("videoram")
@@ -342,7 +349,7 @@ static ADDRESS_MAP_START( coinmstr_map, AS_PROGRAM, 8, coinmstr_state )
 ADDRESS_MAP_END
 
 /* 2x 6462 hardware C000-DFFF & E000-FFFF */
-static ADDRESS_MAP_START( jpcoin_map, AS_PROGRAM, 8, coinmstr_state )
+ADDRESS_MAP_START(coinmstr_state::jpcoin_map)
 	AM_RANGE(0x0000, 0xbfff) AM_ROM
 	AM_RANGE(0xc000, 0xdfff) AM_RAM     /* 2x 6462 hardware */
 	AM_RANGE(0xe000, 0xe7ff) AM_RAM_WRITE(quizmstr_bg_w) AM_SHARE("videoram")
@@ -353,7 +360,7 @@ ADDRESS_MAP_END
 
 // Different I/O mappping for every game
 
-static ADDRESS_MAP_START( quizmstr_io_map, AS_IO, 8, coinmstr_state )
+ADDRESS_MAP_START(coinmstr_state::quizmstr_io_map)
 	ADDRESS_MAP_UNMAP_HIGH
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	AM_RANGE(0x00, 0x00) AM_READ(question_r)
@@ -370,7 +377,7 @@ static ADDRESS_MAP_START( quizmstr_io_map, AS_IO, 8, coinmstr_state )
 	AM_RANGE(0xc0, 0xc3) AM_WRITENOP
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( trailblz_io_map, AS_IO, 8, coinmstr_state )
+ADDRESS_MAP_START(coinmstr_state::trailblz_io_map)
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	AM_RANGE(0x00, 0x00) AM_READ(question_r)
 	AM_RANGE(0x00, 0x03) AM_WRITE(question_w)
@@ -384,7 +391,7 @@ static ADDRESS_MAP_START( trailblz_io_map, AS_IO, 8, coinmstr_state )
 	AM_RANGE(0xc1, 0xc3) AM_WRITENOP
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( supnudg2_io_map, AS_IO, 8, coinmstr_state )
+ADDRESS_MAP_START(coinmstr_state::supnudg2_io_map)
 /*
 out 40
 in  40
@@ -428,7 +435,7 @@ E0-E1 CRTC
 	AM_RANGE(0xc0, 0xc3) AM_WRITENOP
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( pokeroul_io_map, AS_IO, 8, coinmstr_state )
+ADDRESS_MAP_START(coinmstr_state::pokeroul_io_map)
 /*
 out 68
 in  69
@@ -460,7 +467,7 @@ E0-E1 CRTC
 	AM_RANGE(0xc0, 0xc1) AM_READ(ff_r)  /* needed to boot */
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( jpcoin_io_map, AS_IO, 8, coinmstr_state )
+ADDRESS_MAP_START(coinmstr_state::jpcoin_io_map)
 /*
 out C0
 in  C1
@@ -1281,27 +1288,32 @@ MACHINE_CONFIG_START(coinmstr_state::coinmstr)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
 MACHINE_CONFIG_END
 
-MACHINE_CONFIG_DERIVED(coinmstr_state::quizmstr, coinmstr)
+MACHINE_CONFIG_START(coinmstr_state::quizmstr)
+	coinmstr(config);
 	MCFG_CPU_MODIFY("maincpu")
 	MCFG_CPU_IO_MAP(quizmstr_io_map)
 MACHINE_CONFIG_END
 
-MACHINE_CONFIG_DERIVED(coinmstr_state::trailblz, coinmstr)
+MACHINE_CONFIG_START(coinmstr_state::trailblz)
+	coinmstr(config);
 	MCFG_CPU_MODIFY("maincpu")
 	MCFG_CPU_IO_MAP(trailblz_io_map)
 MACHINE_CONFIG_END
 
-MACHINE_CONFIG_DERIVED(coinmstr_state::supnudg2, coinmstr)
+MACHINE_CONFIG_START(coinmstr_state::supnudg2)
+	coinmstr(config);
 	MCFG_CPU_MODIFY("maincpu")
 	MCFG_CPU_IO_MAP(supnudg2_io_map)
 MACHINE_CONFIG_END
 
-MACHINE_CONFIG_DERIVED(coinmstr_state::pokeroul, coinmstr)
+MACHINE_CONFIG_START(coinmstr_state::pokeroul)
+	coinmstr(config);
 	MCFG_CPU_MODIFY("maincpu")
 	MCFG_CPU_IO_MAP(pokeroul_io_map)
 MACHINE_CONFIG_END
 
-MACHINE_CONFIG_DERIVED(coinmstr_state::jpcoin, coinmstr)
+MACHINE_CONFIG_START(coinmstr_state::jpcoin)
+	coinmstr(config);
 	MCFG_CPU_MODIFY("maincpu")
 	MCFG_CPU_PROGRAM_MAP(jpcoin_map)
 	MCFG_CPU_IO_MAP(jpcoin_io_map)

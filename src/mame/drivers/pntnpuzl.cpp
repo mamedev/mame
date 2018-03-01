@@ -173,6 +173,8 @@ public:
 	DECLARE_DRIVER_INIT(pip);
 	required_device<via6522_device> m_via;
 	void pntnpuzl(machine_config &config);
+	void mcu_map(address_map &map);
+	void pntnpuzl_map(address_map &map);
 };
 
 
@@ -279,7 +281,7 @@ READ16_MEMBER(pntnpuzl_state::irq4_ack_r)
 }
 
 
-static ADDRESS_MAP_START( pntnpuzl_map, AS_PROGRAM, 16, pntnpuzl_state )
+ADDRESS_MAP_START(pntnpuzl_state::pntnpuzl_map)
 	AM_RANGE(0x000000, 0x07ffff) AM_ROM
 	AM_RANGE(0x080000, 0x080001) AM_READ(irq1_ack_r)
 	AM_RANGE(0x100000, 0x100001) AM_READ(irq2_ack_r)
@@ -299,7 +301,7 @@ static ADDRESS_MAP_START( pntnpuzl_map, AS_PROGRAM, 16, pntnpuzl_state )
 	AM_RANGE(0x400000, 0x407fff) AM_RAM
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( mcu_map, AS_PROGRAM, 8, pntnpuzl_state )
+ADDRESS_MAP_START(pntnpuzl_state::mcu_map)
 	AM_RANGE(0x2000, 0x3fff) AM_ROM AM_REGION("mcu", 0)
 ADDRESS_MAP_END
 

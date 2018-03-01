@@ -54,25 +54,28 @@ public:
 
 	void mcb216(machine_config &config);
 	void cb308(machine_config &config);
+	void cb308_mem(address_map &map);
+	void mcb216_io(address_map &map);
+	void mcb216_mem(address_map &map);
 private:
 	required_device<cpu_device> m_maincpu;
 	required_device<ay31015_device> m_uart;
 };
 
-static ADDRESS_MAP_START(mcb216_mem, AS_PROGRAM, 8, mcb216_state)
+ADDRESS_MAP_START(mcb216_state::mcb216_mem)
 	ADDRESS_MAP_UNMAP_HIGH
 	AM_RANGE(0x0000, 0x0fff) AM_ROM AM_REGION("roms", 0)
 	AM_RANGE(0x2000, 0x23ff) AM_RAM
 	AM_RANGE(0x2400, 0xffff) AM_RAM
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START(mcb216_io, AS_IO, 8, mcb216_state)
+ADDRESS_MAP_START(mcb216_state::mcb216_io)
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	AM_RANGE(0x00, 0x00) AM_READ(port00_r)
 	AM_RANGE(0x01, 0x01) AM_READWRITE(port01_r,port01_w)
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START(cb308_mem, AS_PROGRAM, 8, mcb216_state)
+ADDRESS_MAP_START(mcb216_state::cb308_mem)
 	ADDRESS_MAP_UNMAP_HIGH
 	AM_RANGE(0x0000, 0x1fff) AM_RAM
 	AM_RANGE(0xe000, 0xefff) AM_ROM AM_REGION("roms", 0)
@@ -86,9 +89,9 @@ INPUT_PORTS_END
 
 READ8_MEMBER( mcb216_state::port01_r )
 {
-	m_uart->set_input_pin(AY31015_RDAV, 0);
+	m_uart->write_rdav(0);
 	u8 result = m_uart->get_received_data();
-	m_uart->set_input_pin(AY31015_RDAV, 1);
+	m_uart->write_rdav(1);
 	return result;
 }
 
@@ -96,7 +99,7 @@ READ8_MEMBER( mcb216_state::port01_r )
 // 0x80 - ok to send to terminal
 READ8_MEMBER( mcb216_state::port00_r )
 {
-	return (m_uart->get_output_pin(AY31015_DAV) << 6) | (m_uart->get_output_pin(AY31015_TBMT) << 7);
+	return (m_uart->dav_r() << 6) | (m_uart->tbmt_r() << 7);
 }
 
 WRITE8_MEMBER( mcb216_state::port01_w )
@@ -106,30 +109,30 @@ WRITE8_MEMBER( mcb216_state::port01_w )
 
 MACHINE_RESET_MEMBER( mcb216_state, mcb216 )
 {
-	m_uart->set_input_pin(AY31015_XR, 0);
-	m_uart->set_input_pin(AY31015_XR, 1);
-	m_uart->set_input_pin(AY31015_SWE, 0);
-	m_uart->set_input_pin(AY31015_NP, 1);
-	m_uart->set_input_pin(AY31015_TSB, 0);
-	m_uart->set_input_pin(AY31015_NB1, 1);
-	m_uart->set_input_pin(AY31015_NB2, 1);
-	m_uart->set_input_pin(AY31015_EPS, 1);
-	m_uart->set_input_pin(AY31015_CS, 1);
-	m_uart->set_input_pin(AY31015_CS, 0);
+	m_uart->write_xr(0);
+	m_uart->write_xr(1);
+	m_uart->write_swe(0);
+	m_uart->write_np(1);
+	m_uart->write_tsb(0);
+	m_uart->write_nb1(1);
+	m_uart->write_nb2(1);
+	m_uart->write_eps(1);
+	m_uart->write_cs(1);
+	m_uart->write_cs(0);
 }
 
 MACHINE_RESET_MEMBER( mcb216_state, cb308 )
 {
-	m_uart->set_input_pin(AY31015_XR, 0);
-	m_uart->set_input_pin(AY31015_XR, 1);
-	m_uart->set_input_pin(AY31015_SWE, 0);
-	m_uart->set_input_pin(AY31015_NP, 1);
-	m_uart->set_input_pin(AY31015_TSB, 0);
-	m_uart->set_input_pin(AY31015_NB1, 1);
-	m_uart->set_input_pin(AY31015_NB2, 1);
-	m_uart->set_input_pin(AY31015_EPS, 1);
-	m_uart->set_input_pin(AY31015_CS, 1);
-	m_uart->set_input_pin(AY31015_CS, 0);
+	m_uart->write_xr(0);
+	m_uart->write_xr(1);
+	m_uart->write_swe(0);
+	m_uart->write_np(1);
+	m_uart->write_tsb(0);
+	m_uart->write_nb1(1);
+	m_uart->write_nb2(1);
+	m_uart->write_eps(1);
+	m_uart->write_cs(1);
+	m_uart->write_cs(0);
 	m_maincpu->set_state_int(Z80_PC, 0xe000);
 }
 

@@ -58,6 +58,7 @@ public:
 	DECLARE_READ8_MEMBER(input_1_r);
 	DECLARE_WRITE8_MEMBER(output_1_w);
 	void cchance(machine_config &config);
+	void main_map(address_map &map);
 };
 
 
@@ -81,7 +82,7 @@ WRITE8_MEMBER(cchance_state::output_1_w)
 	m_bell_io = (data & 0x80)>>4;
 }
 
-static ADDRESS_MAP_START( main_map, AS_PROGRAM, 8, cchance_state )
+ADDRESS_MAP_START(cchance_state::main_map)
 	AM_RANGE(0x0000, 0x7fff) AM_ROM
 
 	AM_RANGE(0xa000, 0xafff) AM_RAM AM_DEVREADWRITE("spritegen", seta001_device, spritecodelow_r8, spritecodelow_w8)

@@ -62,6 +62,8 @@ public:
 	DECLARE_WRITE_LINE_MEMBER(io_enable_w);
 
 	void jpms80(machine_config &config);
+	void jpms80_io_map(address_map &map);
+	void jpms80_map(address_map &map);
 protected:
 
 	// devices
@@ -86,12 +88,12 @@ WRITE_LINE_MEMBER(jpms80_state::io_enable_w)
 {
 }
 
-static ADDRESS_MAP_START( jpms80_map, AS_PROGRAM, 8, jpms80_state )
+ADDRESS_MAP_START(jpms80_state::jpms80_map)
 	AM_RANGE(0x0000, 0x2fff) AM_ROM
 	AM_RANGE(0x3000, 0x3fff) AM_RAM
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( jpms80_io_map, AS_IO, 8, jpms80_state )
+ADDRESS_MAP_START(jpms80_state::jpms80_io_map)
 	ADDRESS_MAP_GLOBAL_MASK(0x1ff)
 //  AM_RANGE(0x0000, 0x001f) // I/O & Optic (in)
 	AM_RANGE(0x0000, 0x0007) AM_DEVWRITE("outlatch0", ls259_device, write_d0)

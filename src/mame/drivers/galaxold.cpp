@@ -145,7 +145,7 @@ READ8_MEMBER(galaxold_state::drivfrcg_port0_r)
 	return 0;
 }
 
-static ADDRESS_MAP_START( galaxold_map, AS_PROGRAM, 8, galaxold_state )
+ADDRESS_MAP_START(galaxold_state::galaxold_map)
 	AM_RANGE(0x0000, 0x3fff) AM_ROM
 	AM_RANGE(0x4000, 0x47ff) AM_RAM
 	AM_RANGE(0x5000, 0x53ff) AM_RAM_WRITE(galaxold_videoram_w) AM_SHARE("videoram")
@@ -175,7 +175,7 @@ static ADDRESS_MAP_START( galaxold_map, AS_PROGRAM, 8, galaxold_state )
 ADDRESS_MAP_END
 
 
-static ADDRESS_MAP_START( mooncrst_map, AS_PROGRAM, 8, galaxold_state )
+ADDRESS_MAP_START(galaxold_state::mooncrst_map)
 	AM_RANGE(0x0000, 0x5fff) AM_ROM
 	AM_RANGE(0x8000, 0x87ff) AM_RAM
 	AM_RANGE(0x9000, 0x93ff) AM_RAM_WRITE(galaxold_videoram_w) AM_SHARE("videoram")
@@ -202,7 +202,7 @@ static ADDRESS_MAP_START( mooncrst_map, AS_PROGRAM, 8, galaxold_state )
 ADDRESS_MAP_END
 
 
-static ADDRESS_MAP_START( hustlerb3_map, AS_PROGRAM, 8, galaxold_state )
+ADDRESS_MAP_START(galaxold_state::hustlerb3_map)
 	ADDRESS_MAP_UNMAP_HIGH
 	AM_RANGE(0x0000, 0x7fff) AM_ROM
 	AM_RANGE(0x8000, 0x87ff) AM_RAM
@@ -228,7 +228,7 @@ static ADDRESS_MAP_START( hustlerb3_map, AS_PROGRAM, 8, galaxold_state )
 
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( rockclim_map, AS_PROGRAM, 8, galaxold_state )
+ADDRESS_MAP_START(galaxold_state::rockclim_map)
 	AM_RANGE(0x0000, 0x3fff) AM_ROM
 	AM_RANGE(0x4000, 0x47ff) AM_READWRITE(rockclim_videoram_r, rockclim_videoram_w) AM_SHARE("rockclim_vram")//4800 - 4803 = bg scroll ?
 	AM_RANGE(0x4800, 0x4803) AM_WRITE(rockclim_scroll_w)
@@ -260,7 +260,7 @@ static ADDRESS_MAP_START( rockclim_map, AS_PROGRAM, 8, galaxold_state )
 ADDRESS_MAP_END
 
 
-static ADDRESS_MAP_START( ckongg_map, AS_PROGRAM, 8, galaxold_state )
+ADDRESS_MAP_START(galaxold_state::ckongg_map)
 	AM_RANGE(0x0000, 0x5fff) AM_ROM
 	AM_RANGE(0x6000, 0x6fff) AM_RAM
 	AM_RANGE(0x9000, 0x93ff) AM_READWRITE(galaxold_videoram_r, galaxold_videoram_w) AM_SHARE("videoram")
@@ -287,7 +287,7 @@ static ADDRESS_MAP_START( ckongg_map, AS_PROGRAM, 8, galaxold_state )
 ADDRESS_MAP_END
 
 /* Memory map based on mooncrst_map according to Z80 code - seems to be good but needs further checking */
-static ADDRESS_MAP_START( ckongmc_map, AS_PROGRAM, 8, galaxold_state )
+ADDRESS_MAP_START(galaxold_state::ckongmc_map)
 	AM_RANGE(0x0000, 0x5fff) AM_ROM
 	AM_RANGE(0x6000, 0x6fff) AM_RAM
 	AM_RANGE(0x9000, 0x93ff) AM_READWRITE(galaxold_videoram_r, galaxold_videoram_w) AM_SHARE("videoram")
@@ -314,7 +314,7 @@ static ADDRESS_MAP_START( ckongmc_map, AS_PROGRAM, 8, galaxold_state )
 ADDRESS_MAP_END
 
 
-static ADDRESS_MAP_START( scramblb_map, AS_PROGRAM, 8, galaxold_state )
+ADDRESS_MAP_START(galaxold_state::scramblb_map)
 	AM_RANGE(0x0000, 0x3fff) AM_ROM
 	AM_RANGE(0x4000, 0x47ff) AM_RAM
 	AM_RANGE(0x4800, 0x4bff) AM_RAM_WRITE(galaxold_videoram_w) AM_SHARE("videoram")
@@ -349,7 +349,7 @@ READ8_MEMBER(galaxold_state::scramb2_port0_r){ return (ioport("IN0")->read() >> 
 READ8_MEMBER(galaxold_state::scramb2_port1_r){ return (ioport("IN1")->read() >> offset) & 0x1; }
 READ8_MEMBER(galaxold_state::scramb2_port2_r){ return (ioport("IN2")->read() >> offset) & 0x1; }
 
-static ADDRESS_MAP_START( scramb2_map, AS_PROGRAM, 8, galaxold_state )
+ADDRESS_MAP_START(galaxold_state::scramb2_map)
 	AM_RANGE(0x0000, 0x3fff) AM_ROM
 	AM_RANGE(0x4000, 0x47ff) AM_RAM
 	AM_RANGE(0x4800, 0x4bff) AM_RAM_WRITE(galaxold_videoram_w) AM_SHARE("videoram")
@@ -380,7 +380,7 @@ READ8_MEMBER( galaxold_state::scrambler_protection_2_r )
 }
 
 // there are still unmapped reads / writes, it's not really clear what gets hooked up to where on these bootlegs, if they go anywhere at all
-static ADDRESS_MAP_START( scrambler_map, AS_PROGRAM, 8, galaxold_state )
+ADDRESS_MAP_START(galaxold_state::scrambler_map)
 	AM_RANGE(0x0000, 0x3fff) AM_ROM
 	AM_RANGE(0x4000, 0x47ff) AM_RAM
 
@@ -430,7 +430,7 @@ WRITE8_MEMBER( galaxold_state::guttang_rombank_w )
 }
 
 
-static ADDRESS_MAP_START( guttang_map, AS_PROGRAM, 8, galaxold_state )
+ADDRESS_MAP_START(galaxold_state::guttang_map)
 	AM_RANGE(0x0000, 0x3fff) AM_ROM AM_WRITENOP // 0x2000-0x27ff is banked (so they have room for the new music player), see init
 	AM_RANGE(0x4000, 0x47ff) AM_RAM
 
@@ -458,7 +458,7 @@ static ADDRESS_MAP_START( guttang_map, AS_PROGRAM, 8, galaxold_state )
 ADDRESS_MAP_END
 
 
-static ADDRESS_MAP_START( _4in1_map, AS_PROGRAM, 8, galaxold_state )
+ADDRESS_MAP_START(galaxold_state::_4in1_map)
 	AM_RANGE(0x0000, 0x3fff) AM_ROMBANK("bank1")    /* banked game code */
 	AM_RANGE(0x4000, 0x47ff) AM_RAM
 	AM_RANGE(0x5000, 0x53ff) AM_RAM_WRITE(galaxold_videoram_w) AM_SHARE("videoram")
@@ -489,7 +489,7 @@ static ADDRESS_MAP_START( _4in1_map, AS_PROGRAM, 8, galaxold_state )
 ADDRESS_MAP_END
 
 
-static ADDRESS_MAP_START( bagmanmc_map, AS_PROGRAM, 8, galaxold_state )
+ADDRESS_MAP_START(galaxold_state::bagmanmc_map)
 	AM_RANGE(0x0000, 0x5fff) AM_ROM
 	AM_RANGE(0x6000, 0x67ff) AM_RAM
 	AM_RANGE(0x9000, 0x93ff) AM_RAM_WRITE(galaxold_videoram_w) AM_SHARE("videoram")
@@ -511,7 +511,7 @@ static ADDRESS_MAP_START( bagmanmc_map, AS_PROGRAM, 8, galaxold_state )
 ADDRESS_MAP_END
 
 
-static ADDRESS_MAP_START( dkongjrm_map, AS_PROGRAM, 8, galaxold_state )
+ADDRESS_MAP_START(galaxold_state::dkongjrm_map)
 	AM_RANGE(0x0000, 0x5fff) AM_ROM
 	AM_RANGE(0x6000, 0x6fff) AM_RAM
 	AM_RANGE(0x7000, 0x7fff) AM_ROM
@@ -537,7 +537,7 @@ static ADDRESS_MAP_START( dkongjrm_map, AS_PROGRAM, 8, galaxold_state )
 ADDRESS_MAP_END
 
 
-static ADDRESS_MAP_START( dkongjrmc_map, AS_PROGRAM, 8, galaxold_state )
+ADDRESS_MAP_START(galaxold_state::dkongjrmc_map)
 	AM_RANGE(0x0000, 0x5fff) AM_ROM
 	AM_RANGE(0x6000, 0x6fff) AM_RAM
 	AM_RANGE(0x7000, 0x73ff) AM_RAM_WRITE(galaxold_videoram_w)
@@ -563,7 +563,7 @@ static ADDRESS_MAP_START( dkongjrmc_map, AS_PROGRAM, 8, galaxold_state )
 ADDRESS_MAP_END
 
 
-static ADDRESS_MAP_START( tazzmang, AS_PROGRAM, 8, galaxold_state )
+ADDRESS_MAP_START(galaxold_state::tazzmang)
 	AM_RANGE(0x0000, 0x5fff) AM_ROM
 	AM_RANGE(0x7000, 0x7000) AM_READ_PORT("DSW0") /* mirror */
 	AM_RANGE(0x8000, 0x87ff) AM_RAM
@@ -588,7 +588,7 @@ static ADDRESS_MAP_START( tazzmang, AS_PROGRAM, 8, galaxold_state )
 ADDRESS_MAP_END
 
 
-static ADDRESS_MAP_START( bongo, AS_PROGRAM, 8, galaxold_state )
+ADDRESS_MAP_START(galaxold_state::bongo)
 	AM_RANGE(0x0000, 0x5fff) AM_ROM
 	AM_RANGE(0x8000, 0x83ff) AM_RAM
 	AM_RANGE(0x8400, 0x87ff) AM_WRITENOP // not used
@@ -607,14 +607,14 @@ static ADDRESS_MAP_START( bongo, AS_PROGRAM, 8, galaxold_state )
 	AM_RANGE(0xb800, 0xb800) AM_DEVREAD("watchdog", watchdog_timer_device, reset_r) AM_WRITENOP
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( bongo_io, AS_IO, 8, galaxold_state )
+ADDRESS_MAP_START(galaxold_state::bongo_io)
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	AM_RANGE(0x00, 0x01) AM_DEVWRITE("aysnd", ay8910_device, address_data_w)
 	AM_RANGE(0x02, 0x02) AM_DEVREAD("aysnd", ay8910_device, data_r)
 ADDRESS_MAP_END
 
 
-static ADDRESS_MAP_START( ozon1_map, AS_PROGRAM, 8, galaxold_state )
+ADDRESS_MAP_START(galaxold_state::ozon1_map)
 	AM_RANGE(0x0000, 0x2fff) AM_ROM
 	AM_RANGE(0x4000, 0x4200) AM_RAM
 	AM_RANGE(0x4300, 0x43ff) AM_RAM
@@ -632,13 +632,13 @@ static ADDRESS_MAP_START( ozon1_map, AS_PROGRAM, 8, galaxold_state )
 	AM_RANGE(0x8103, 0x8103) AM_WRITENOP //only one 9b at reset
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( ozon1_io_map, AS_IO, 8, galaxold_state )
+ADDRESS_MAP_START(galaxold_state::ozon1_io_map)
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	AM_RANGE(0x00, 0x01) AM_DEVWRITE("aysnd", ay8910_device, data_address_w)
 ADDRESS_MAP_END
 
 
-static ADDRESS_MAP_START( hunchbkg, AS_PROGRAM, 8, galaxold_state )
+ADDRESS_MAP_START(galaxold_state::hunchbkg)
 	AM_RANGE(0x0000, 0x0fff) AM_ROM
 	AM_RANGE(0x1480, 0x14bf) AM_MIRROR(0x6000) AM_RAM_WRITE(galaxold_attributesram_w) AM_SHARE("attributesram")
 	AM_RANGE(0x14c0, 0x14ff) AM_MIRROR(0x6000) AM_WRITEONLY AM_SHARE("spriteram")
@@ -663,7 +663,7 @@ static ADDRESS_MAP_START( hunchbkg, AS_PROGRAM, 8, galaxold_state )
 ADDRESS_MAP_END
 
 /* hunchbkg style */
-static ADDRESS_MAP_START( spcwarp, AS_PROGRAM, 8, galaxold_state )
+ADDRESS_MAP_START(galaxold_state::spcwarp)
 	AM_RANGE(0x0000, 0x0fff) AM_ROM
 	AM_RANGE(0x1480, 0x14bf) AM_MIRROR(0x6000) AM_RAM_WRITE(galaxold_attributesram_w) AM_SHARE("attributesram")
 	AM_RANGE(0x14c0, 0x14ff) AM_MIRROR(0x6000) AM_WRITEONLY AM_SHARE("spriteram")
@@ -689,12 +689,12 @@ static ADDRESS_MAP_START( spcwarp, AS_PROGRAM, 8, galaxold_state )
 	AM_RANGE(0x6000, 0x6fff) AM_ROM
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( hunchbkg_data, AS_DATA, 8, galaxold_state )
+ADDRESS_MAP_START(galaxold_state::hunchbkg_data)
 	AM_RANGE(S2650_DATA_PORT,  S2650_DATA_PORT) AM_READNOP // not used
 ADDRESS_MAP_END
 
 
-static ADDRESS_MAP_START( drivfrcg, AS_PROGRAM, 8, galaxold_state )
+ADDRESS_MAP_START(galaxold_state::drivfrcg)
 	AM_RANGE(0x0000, 0x0fff) AM_ROM
 	AM_RANGE(0x1480, 0x14bf) AM_MIRROR(0x6000) AM_WRITE(galaxold_attributesram_w) AM_SHARE("attributesram")
 	AM_RANGE(0x14c0, 0x14ff) AM_MIRROR(0x6000) AM_WRITEONLY AM_SHARE("spriteram")
@@ -716,12 +716,12 @@ static ADDRESS_MAP_START( drivfrcg, AS_PROGRAM, 8, galaxold_state )
 	AM_RANGE(0x6000, 0x6fff) AM_ROM
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( drivfrcg_io, AS_IO, 8, galaxold_state )
+ADDRESS_MAP_START(galaxold_state::drivfrcg_io)
 	AM_RANGE(0x00, 0x00) AM_READ(drivfrcg_port0_r)
 ADDRESS_MAP_END
 
 
-static ADDRESS_MAP_START( racknrol, AS_PROGRAM, 8, galaxold_state )
+ADDRESS_MAP_START(galaxold_state::racknrol)
 	AM_RANGE(0x0000, 0x0fff) AM_ROM
 	AM_RANGE(0x1400, 0x143f) AM_MIRROR(0x6000) AM_RAM_WRITE(galaxold_attributesram_w) AM_SHARE("attributesram")
 	AM_RANGE(0x1440, 0x14bf) AM_MIRROR(0x6000) AM_RAM AM_SHARE("spriteram")
@@ -742,7 +742,7 @@ static ADDRESS_MAP_START( racknrol, AS_PROGRAM, 8, galaxold_state )
 	AM_RANGE(0x6000, 0x6fff) AM_ROM
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( racknrol_io, AS_IO, 8, galaxold_state )
+ADDRESS_MAP_START(galaxold_state::racknrol_io)
 	AM_RANGE(0x1d, 0x1d) AM_DEVWRITE("snsnd", sn76489a_device, write)
 //  AM_RANGE(0x1e, 0x1e) AM_WRITENOP
 //  AM_RANGE(0x1f, 0x1f) AM_WRITENOP
@@ -763,12 +763,12 @@ READ8_MEMBER(galaxold_state::hexpoola_data_port_r)
 	return 0;
 }
 
-static ADDRESS_MAP_START( hexpoola_io, AS_IO, 8, galaxold_state )
+ADDRESS_MAP_START(galaxold_state::hexpoola_io)
 	AM_RANGE(0x00, 0x00) AM_READNOP
 	AM_RANGE(0x20, 0x3f) AM_WRITE(racknrol_tiles_bank_w) AM_SHARE("racknrol_tbank")
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( hexpoola_data, AS_DATA, 8, galaxold_state )
+ADDRESS_MAP_START(galaxold_state::hexpoola_data)
 	AM_RANGE(S2650_DATA_PORT, S2650_DATA_PORT) AM_READ(hexpoola_data_port_r) AM_DEVWRITE("snsnd", sn76496_device, write)
 ADDRESS_MAP_END
 
@@ -793,7 +793,7 @@ READ8_MEMBER(galaxold_state::bullsdrtg_data_port_r)
 	return 0;
 }
 
-static ADDRESS_MAP_START( bullsdrtg_data_map, AS_IO, 8, galaxold_state )
+ADDRESS_MAP_START(galaxold_state::bullsdrtg_data_map)
 	AM_RANGE(S2650_DATA_PORT, S2650_DATA_PORT) AM_READ(bullsdrtg_data_port_r) AM_DEVWRITE("snsnd", sn76496_device, write)
 ADDRESS_MAP_END
 
@@ -2248,16 +2248,18 @@ MACHINE_CONFIG_START(galaxold_state::galaxold_base)
 MACHINE_CONFIG_END
 
 
-MACHINE_CONFIG_DERIVED(galaxold_state::galaxian, galaxold_base)
+MACHINE_CONFIG_START(galaxold_state::galaxian)
+	galaxold_base(config);
 
 	/* basic machine hardware */
 
 	/* sound hardware */
-	MCFG_FRAGMENT_ADD(galaxian_audio)
+	galaxian_audio(config);
 MACHINE_CONFIG_END
 
 
-MACHINE_CONFIG_DERIVED(galaxold_state::mooncrst, galaxold_base)
+MACHINE_CONFIG_START(galaxold_state::mooncrst)
+	galaxold_base(config);
 
 	/* basic machine hardware */
 	MCFG_CPU_MODIFY("maincpu")
@@ -2267,7 +2269,7 @@ MACHINE_CONFIG_DERIVED(galaxold_state::mooncrst, galaxold_base)
 	MCFG_VIDEO_START_OVERRIDE(galaxold_state,mooncrst)
 
 	/* sound hardware */
-	MCFG_FRAGMENT_ADD(mooncrst_audio)
+	mooncrst_audio(config);
 MACHINE_CONFIG_END
 
 // 'Videotron'
@@ -2276,7 +2278,8 @@ MACHINE_CONFIG_END
 // but neither of the games we have (froggerv and hustlerb3) make use of either. There are a number
 // of unpopulated positions on the game board which presumably can be populated with code for the
 // 2nd Z80.
-MACHINE_CONFIG_DERIVED(galaxold_state::videotron, galaxian)
+MACHINE_CONFIG_START(galaxold_state::videotron)
+	galaxian(config);
 
 	/* basic machine hardware */
 	MCFG_CPU_MODIFY("maincpu")
@@ -2287,14 +2290,16 @@ MACHINE_CONFIG_DERIVED(galaxold_state::videotron, galaxian)
 MACHINE_CONFIG_END
 
 
-MACHINE_CONFIG_DERIVED(galaxold_state::porter, mooncrst)
+MACHINE_CONFIG_START(galaxold_state::porter)
+	mooncrst(config);
 
 	/* video hardware */
 	MCFG_VIDEO_START_OVERRIDE(galaxold_state, pisces)
 MACHINE_CONFIG_END
 
 
-MACHINE_CONFIG_DERIVED(galaxold_state::scramblb, galaxian)
+MACHINE_CONFIG_START(galaxold_state::scramblb)
+	galaxian(config);
 
 	/* basic machine hardware */
 	MCFG_CPU_MODIFY("maincpu")
@@ -2309,7 +2314,8 @@ MACHINE_CONFIG_DERIVED(galaxold_state::scramblb, galaxian)
 MACHINE_CONFIG_END
 
 
-MACHINE_CONFIG_DERIVED(galaxold_state::scramb2, galaxian)
+MACHINE_CONFIG_START(galaxold_state::scramb2)
+	galaxian(config);
 
 	/* basic machine hardware */
 	MCFG_CPU_MODIFY("maincpu")
@@ -2324,7 +2330,8 @@ MACHINE_CONFIG_DERIVED(galaxold_state::scramb2, galaxian)
 MACHINE_CONFIG_END
 
 
-MACHINE_CONFIG_DERIVED(galaxold_state::scrambler, galaxian)
+MACHINE_CONFIG_START(galaxold_state::scrambler)
+	galaxian(config);
 
 	/* basic machine hardware */
 	MCFG_CPU_MODIFY("maincpu")
@@ -2339,7 +2346,8 @@ MACHINE_CONFIG_DERIVED(galaxold_state::scrambler, galaxian)
 MACHINE_CONFIG_END
 
 
-MACHINE_CONFIG_DERIVED(galaxold_state::guttang, galaxian)
+MACHINE_CONFIG_START(galaxold_state::guttang)
+	galaxian(config);
 
 	/* basic machine hardware */
 	MCFG_CPU_MODIFY("maincpu")
@@ -2355,7 +2363,8 @@ MACHINE_CONFIG_DERIVED(galaxold_state::guttang, galaxian)
 MACHINE_CONFIG_END
 
 
-MACHINE_CONFIG_DERIVED(galaxold_state::_4in1, galaxian)
+MACHINE_CONFIG_START(galaxold_state::_4in1)
+	galaxian(config);
 
 	/* basic machine hardware */
 	MCFG_CPU_MODIFY("maincpu")
@@ -2368,7 +2377,8 @@ MACHINE_CONFIG_DERIVED(galaxold_state::_4in1, galaxian)
 MACHINE_CONFIG_END
 
 
-MACHINE_CONFIG_DERIVED(galaxold_state::bagmanmc, mooncrst)
+MACHINE_CONFIG_START(galaxold_state::bagmanmc)
+	mooncrst(config);
 
 	/* basic machine hardware */
 	MCFG_CPU_MODIFY("maincpu")
@@ -2381,7 +2391,8 @@ MACHINE_CONFIG_DERIVED(galaxold_state::bagmanmc, mooncrst)
 MACHINE_CONFIG_END
 
 
-MACHINE_CONFIG_DERIVED(galaxold_state::dkongjrm, mooncrst)
+MACHINE_CONFIG_START(galaxold_state::dkongjrm)
+	mooncrst(config);
 
 	/* basic machine hardware */
 	MCFG_CPU_MODIFY("maincpu")
@@ -2392,7 +2403,8 @@ MACHINE_CONFIG_DERIVED(galaxold_state::dkongjrm, mooncrst)
 MACHINE_CONFIG_END
 
 
-MACHINE_CONFIG_DERIVED(galaxold_state::dkongjrmc, mooncrst)
+MACHINE_CONFIG_START(galaxold_state::dkongjrmc)
+	mooncrst(config);
 	MCFG_CPU_MODIFY("maincpu")
 	MCFG_CPU_PROGRAM_MAP(dkongjrmc_map)
 
@@ -2400,7 +2412,8 @@ MACHINE_CONFIG_DERIVED(galaxold_state::dkongjrmc, mooncrst)
 MACHINE_CONFIG_END
 
 
-MACHINE_CONFIG_DERIVED(galaxold_state::rockclim, mooncrst)
+MACHINE_CONFIG_START(galaxold_state::rockclim)
+	mooncrst(config);
 
 	/* basic machine hardware */
 	MCFG_CPU_MODIFY("maincpu")
@@ -2418,7 +2431,8 @@ MACHINE_CONFIG_DERIVED(galaxold_state::rockclim, mooncrst)
 MACHINE_CONFIG_END
 
 
-MACHINE_CONFIG_DERIVED(galaxold_state::ozon1, galaxold_base)
+MACHINE_CONFIG_START(galaxold_state::ozon1)
+	galaxold_base(config);
 
 	/* basic machine hardware */
 	MCFG_CPU_MODIFY("maincpu")
@@ -2467,11 +2481,12 @@ MACHINE_CONFIG_START(galaxold_state::drivfrcg)
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("speaker")
 
-	MCFG_FRAGMENT_ADD(galaxian_audio)
+	galaxian_audio(config);
 MACHINE_CONFIG_END
 
 
-MACHINE_CONFIG_DERIVED(galaxold_state::bongo, galaxold_base)
+MACHINE_CONFIG_START(galaxold_state::bongo)
+	galaxold_base(config);
 
 	/* basic machine hardware */
 	MCFG_CPU_MODIFY("maincpu")
@@ -2490,7 +2505,8 @@ MACHINE_CONFIG_DERIVED(galaxold_state::bongo, galaxold_base)
 MACHINE_CONFIG_END
 
 
-MACHINE_CONFIG_DERIVED(galaxold_state::hunchbkg, galaxold_base)
+MACHINE_CONFIG_START(galaxold_state::hunchbkg)
+	galaxold_base(config);
 
 	/* basic machine hardware */
 	MCFG_CPU_REPLACE("maincpu", S2650, PIXEL_CLOCK / 4)
@@ -2505,11 +2521,12 @@ MACHINE_CONFIG_DERIVED(galaxold_state::hunchbkg, galaxold_base)
 
 	MCFG_MACHINE_RESET_OVERRIDE(galaxold_state,hunchbkg)
 
-	MCFG_FRAGMENT_ADD(galaxian_audio)
+	galaxian_audio(config);
 MACHINE_CONFIG_END
 
 
-MACHINE_CONFIG_DERIVED(galaxold_state::spcwarp, hunchbkg)
+MACHINE_CONFIG_START(galaxold_state::spcwarp)
+	hunchbkg(config);
 	/* hunchbkg, but with a different memory map */
 	/* basic machine hardware */
 	MCFG_CPU_MODIFY("maincpu")
@@ -2517,7 +2534,8 @@ MACHINE_CONFIG_DERIVED(galaxold_state::spcwarp, hunchbkg)
 MACHINE_CONFIG_END
 
 
-MACHINE_CONFIG_DERIVED(galaxold_state::tazzmang, galaxian)
+MACHINE_CONFIG_START(galaxold_state::tazzmang)
+	galaxian(config);
 
 	/* basic machine hardware */
 	MCFG_CPU_MODIFY("maincpu")
@@ -2581,7 +2599,8 @@ MACHINE_CONFIG_START(galaxold_state::hexpoola)
 MACHINE_CONFIG_END
 
 
-MACHINE_CONFIG_DERIVED(galaxold_state::ckongg, galaxian)
+MACHINE_CONFIG_START(galaxold_state::ckongg)
+	galaxian(config);
 
 	/* basic machine hardware */
 	MCFG_CPU_MODIFY("maincpu")
@@ -2593,7 +2612,8 @@ MACHINE_CONFIG_DERIVED(galaxold_state::ckongg, galaxian)
 MACHINE_CONFIG_END
 
 
-MACHINE_CONFIG_DERIVED(galaxold_state::ckongmc, mooncrst)
+MACHINE_CONFIG_START(galaxold_state::ckongmc)
+	mooncrst(config);
 
 	/* basic machine hardware */
 	MCFG_CPU_MODIFY("maincpu")
@@ -2605,7 +2625,8 @@ MACHINE_CONFIG_DERIVED(galaxold_state::ckongmc, mooncrst)
 MACHINE_CONFIG_END
 
 
-MACHINE_CONFIG_DERIVED(galaxold_state::bullsdrtg, hexpoola)
+MACHINE_CONFIG_START(galaxold_state::bullsdrtg)
+	hexpoola(config);
 
 	MCFG_CPU_MODIFY("maincpu")
 	MCFG_CPU_DATA_MAP(bullsdrtg_data_map)

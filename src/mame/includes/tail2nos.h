@@ -62,4 +62,7 @@ public:
 	void draw_sprites( bitmap_ind16 &bitmap, const rectangle &cliprect );
 	K051316_CB_MEMBER(zoom_callback);
 	void tail2nos(machine_config &config);
+	void main_map(address_map &map);
+	void sound_map(address_map &map);
+	void sound_port_map(address_map &map);
 };

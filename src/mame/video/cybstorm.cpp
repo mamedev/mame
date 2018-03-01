@@ -96,7 +96,7 @@ const atari_motion_objects_config cybstorm_state::s_mob_config =
 	0,                  /* resulting value to indicate "special" */
 };
 
-VIDEO_START_MEMBER(cybstorm_state,cybstorm)
+void cybstorm_state::video_start()
 {
 	/* motion objects have 256 color granularity */
 	m_gfxdecode->gfx(1)->set_granularity(256);

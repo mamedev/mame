@@ -71,30 +71,7 @@ public:
 
 	uint16_t get_cs(offs_t address);
 
-	// TODO: Support Limp mode and external clock with no PLL
-	static void set_crystal(device_t &device, int crystal)
-	{
-		m68340_cpu_device &dev = downcast<m68340_cpu_device &>(device);
-		dev.m_crystal = crystal;
-		dev.m_clock_mode |= (m68340_sim::CLOCK_MODCK | m68340_sim::CLOCK_PLL);
-	}
-
 	static void set_crystal(device_t &device, const XTAL &crystal) { set_crystal(device, crystal.value()); }
-
-	READ32_MEMBER( m68340_internal_base_r );
-	WRITE32_MEMBER( m68340_internal_base_w );
-	READ32_MEMBER( m68340_internal_dma_r );
-	WRITE32_MEMBER( m68340_internal_dma_w );
-	READ16_MEMBER( m68340_internal_sim_r );
-	READ8_MEMBER( m68340_internal_sim_ports_r );
-	READ32_MEMBER( m68340_internal_sim_cs_r );
-	WRITE16_MEMBER( m68340_internal_sim_w );
-	WRITE8_MEMBER( m68340_internal_sim_ports_w );
-	WRITE32_MEMBER( m68340_internal_sim_cs_w );
-
-	// Clock/VCO setting TODO: support external clock with PLL and Limp mode
-	DECLARE_WRITE_LINE_MEMBER( set_modck );
-	DECLARE_WRITE_LINE_MEMBER( extal_w );
 
 	// Timer input methods, can be used instead of the corresponding polling MCFG callbacks
 	DECLARE_WRITE_LINE_MEMBER( tin1_w )  { m_timer1->tin_w(state);  }
@@ -107,6 +84,7 @@ protected:
 	virtual void device_reset() override;
 	virtual void device_add_mconfig(machine_config &config) override;
 
+private:
 	required_device<mc68340_serial_module_device> m_serial;
 	required_device<mc68340_timer_module_device> m_timer1;
 	required_device<mc68340_timer_module_device> m_timer2;
@@ -125,6 +103,31 @@ protected:
 	uint32_t m_modck;
 	uint32_t m_crystal;
 	uint32_t m_extal;
+
+	// TODO: Support Limp mode and external clock with no PLL
+	static void set_crystal(device_t &device, int crystal)
+	{
+		m68340_cpu_device &dev = downcast<m68340_cpu_device &>(device);
+		dev.m_crystal = crystal;
+		dev.m_clock_mode |= (m68340_sim::CLOCK_MODCK | m68340_sim::CLOCK_PLL);
+	}
+
+	READ32_MEMBER( m68340_internal_base_r );
+	WRITE32_MEMBER( m68340_internal_base_w );
+	READ32_MEMBER( m68340_internal_dma_r );
+	WRITE32_MEMBER( m68340_internal_dma_w );
+	READ16_MEMBER( m68340_internal_sim_r );
+	READ8_MEMBER( m68340_internal_sim_ports_r );
+	READ32_MEMBER( m68340_internal_sim_cs_r );
+	WRITE16_MEMBER( m68340_internal_sim_w );
+	WRITE8_MEMBER( m68340_internal_sim_ports_w );
+	WRITE32_MEMBER( m68340_internal_sim_cs_w );
+
+	// Clock/VCO setting TODO: support external clock with PLL and Limp mode
+	DECLARE_WRITE_LINE_MEMBER( set_modck );
+	DECLARE_WRITE_LINE_MEMBER( extal_w );
+
+	void m68340_internal_map(address_map &map);
 
 	/* 68340 peripheral modules */
 	m68340_sim*    m_m68340SIM;

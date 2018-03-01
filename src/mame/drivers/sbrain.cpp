@@ -91,6 +91,10 @@ public:
 	TIMER_DEVICE_CALLBACK_MEMBER(kbd_scan);
 
 	void sbrain(machine_config &config);
+	void sbrain_io(address_map &map);
+	void sbrain_mem(address_map &map);
+	void sbrain_subio(address_map &map);
+	void sbrain_submem(address_map &map);
 private:
 	bool m_busak;
 	u8 m_keydown;
@@ -119,7 +123,7 @@ private:
 	required_ioport_array<10> m_keyboard;
 };
 
-static ADDRESS_MAP_START( sbrain_mem, AS_PROGRAM, 8, sbrain_state )
+ADDRESS_MAP_START(sbrain_state::sbrain_mem)
 	AM_RANGE( 0x0000, 0x3fff ) AM_READ_BANK("bankr0") AM_WRITE_BANK("bankw0")
 	AM_RANGE( 0x4000, 0x7fff ) AM_RAM
 	AM_RANGE( 0x8000, 0xbfff ) AM_RAMBANK("bank2")
@@ -127,7 +131,7 @@ static ADDRESS_MAP_START( sbrain_mem, AS_PROGRAM, 8, sbrain_state )
 	AM_RANGE( 0xf800, 0xffff ) AM_RAM AM_SHARE("videoram")
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( sbrain_io, AS_IO, 8, sbrain_state )
+ADDRESS_MAP_START(sbrain_state::sbrain_io)
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	AM_RANGE(0x40, 0x40) AM_MIRROR(6) AM_DEVREADWRITE("uart0", i8251_device, data_r, data_w)
 	AM_RANGE(0x41, 0x41) AM_MIRROR(6) AM_DEVREADWRITE("uart0", i8251_device, status_r, control_w)
@@ -139,12 +143,12 @@ static ADDRESS_MAP_START( sbrain_io, AS_IO, 8, sbrain_state )
 	AM_RANGE(0x68, 0x6b) AM_MIRROR(4) AM_DEVREADWRITE("ppi", i8255_device, read, write)
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( sbrain_submem, AS_PROGRAM, 8, sbrain_state )
+ADDRESS_MAP_START(sbrain_state::sbrain_submem)
 	AM_RANGE( 0x0000, 0x07ff ) AM_ROM
 	AM_RANGE( 0x8800, 0x8bff ) AM_RAM AM_REGION("subcpu", 0x8800)
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( sbrain_subio, AS_IO, 8, sbrain_state )
+ADDRESS_MAP_START(sbrain_state::sbrain_subio)
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	AM_RANGE(0x08, 0x0b) AM_DEVREADWRITE("fdc", fd1791_device, read, write)
 	AM_RANGE(0x10, 0x10) AM_READWRITE(port10_r,port10_w)

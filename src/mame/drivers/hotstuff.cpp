@@ -15,13 +15,16 @@ public:
 	hotstuff_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag),
 		m_bitmapram(*this, "bitmapram"),
-		m_maincpu(*this, "maincpu") { }
+		m_maincpu(*this, "maincpu"),
+		m_rtc(*this, "rtc") { }
 
 	required_shared_ptr<uint16_t> m_bitmapram;
 	virtual void video_start() override;
 	uint32_t screen_update_hotstuff(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 	required_device<cpu_device> m_maincpu;
+	required_device<mc146818_device> m_rtc;
 	void hotstuff(machine_config &config);
+	void hotstuff_map(address_map &map);
 };
 
 
@@ -72,7 +75,7 @@ uint32_t hotstuff_state::screen_update_hotstuff(screen_device &screen, bitmap_rg
 	return 0;
 }
 
-static ADDRESS_MAP_START( hotstuff_map, AS_PROGRAM, 16, hotstuff_state )
+ADDRESS_MAP_START(hotstuff_state::hotstuff_map)
 	AM_RANGE(0x000000, 0x07ffff) AM_ROM
 	AM_RANGE(0x080000, 0x0fffff) AM_NOP //ROM AM_REGION("data", 0)
 
@@ -80,7 +83,7 @@ static ADDRESS_MAP_START( hotstuff_map, AS_PROGRAM, 16, hotstuff_state )
 
 	AM_RANGE(0x600000, 0x600003) AM_DEVREADWRITE8("scc1", z80scc_device, ba_cd_inv_r, ba_cd_inv_w, 0xffff)
 	AM_RANGE(0x620000, 0x620003) AM_DEVREADWRITE8("scc2", z80scc_device, ba_cd_inv_r, ba_cd_inv_w, 0xffff)
-	AM_RANGE(0x680000, 0x680001) AM_DEVREADWRITE8_MOD("rtc", mc146818_device, read, write, xor<1>, 0xffff)
+	;map(0x680000, 0x680001).lrw8("rtc_rw", [this](address_space &space, offs_t offset, u8 mem_mask){ return m_rtc->read(space, offset^1, mem_mask); }, [this](address_space &space, offs_t offset, u8 data, u8 mem_mask){ m_rtc->write(space, offset^1, data, mem_mask); });
 
 	AM_RANGE(0x980000, 0x9bffff) AM_RAM AM_SHARE("bitmapram")
 ADDRESS_MAP_END

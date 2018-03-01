@@ -41,25 +41,30 @@ public:
 		, m_ram(*this, "ram")
 	{ }
 
+	void altair(machine_config &config);
+
+protected:
 	DECLARE_QUICKLOAD_LOAD_MEMBER(altair);
 
-	void altair(machine_config &config);
-private:
 	virtual void machine_reset() override;
+	void io_map(address_map &map);
+	void mem_map(address_map &map);
+
+private:
 	required_device<cpu_device> m_maincpu;
 	required_shared_ptr<uint8_t> m_ram;
 };
 
 
 
-static ADDRESS_MAP_START(mem_map, AS_PROGRAM, 8, altair_state)
+ADDRESS_MAP_START(altair_state::mem_map)
 	ADDRESS_MAP_UNMAP_HIGH
 	AM_RANGE( 0x0000, 0xfcff ) AM_RAM AM_SHARE("ram")
 	AM_RANGE( 0xfd00, 0xfdff ) AM_ROM
 	AM_RANGE( 0xff00, 0xffff ) AM_ROM
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START(io_map, AS_IO, 8, altair_state)
+ADDRESS_MAP_START(altair_state::io_map)
 	ADDRESS_MAP_UNMAP_HIGH
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	// TODO: Remove AM_MIRROR() and use SIO address S0-S7
@@ -93,7 +98,7 @@ void altair_state::machine_reset()
 
 MACHINE_CONFIG_START(altair_state::altair)
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", I8080, XTAL(2'000'000))
+	MCFG_CPU_ADD("maincpu", I8080, 2_MHz_XTAL)
 	MCFG_CPU_PROGRAM_MAP(mem_map)
 	MCFG_CPU_IO_MAP(io_map)
 

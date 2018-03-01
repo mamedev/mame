@@ -1037,7 +1037,7 @@ READ8_MEMBER(decocass_widel_state::decocass_widel_r)
 	{
 		if (0 == (offset & E5XX_MASK))
 		{
-			if (m_widel_latch && !machine().side_effect_disabled())
+			if (m_widel_latch && !machine().side_effects_disabled())
 				m_widel_ctrs = (m_widel_ctrs + 0x100) & 0xfffff;
 			data = m_mcu->upi41_master_r(space,1);
 			LOG(4,("%10s 6502-PC: %04x decocass_widel_r(%02x): $%02x <- 8041 STATUS\n", machine().time().as_string(6), m_maincpu->pcbase(), offset, data));
@@ -1057,7 +1057,7 @@ READ8_MEMBER(decocass_widel_state::decocass_widel_r)
 			data = prom[m_widel_ctrs];
 			LOG(3,("%10s 6502-PC: %04x decocass_widel_r(%02x): $%02x '%c' <- PROM[%04x]\n", machine().time().as_string(6), m_maincpu->pcbase(), offset, data, (data >= 32) ? data : '.', m_widel_ctrs));
 
-			if (!machine().side_effect_disabled())
+			if (!machine().side_effects_disabled())
 				m_widel_ctrs = (m_widel_ctrs + 1) & 0xfffff;
 		}
 		else

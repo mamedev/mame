@@ -25,7 +25,7 @@
 /* Address maps */
 
 /* Orion 128 */
-static ADDRESS_MAP_START(orion128_mem, AS_PROGRAM, 8, orion_state )
+ADDRESS_MAP_START(orion_state::orion128_mem)
 	AM_RANGE( 0x0000, 0xefff ) AM_RAMBANK("bank1")
 	AM_RANGE( 0xf000, 0xf3ff ) AM_RAMBANK("bank2")
 	AM_RANGE( 0xf400, 0xf4ff ) AM_READWRITE(orion128_system_r,orion128_system_w)  // Keyboard and cassette
@@ -38,7 +38,7 @@ static ADDRESS_MAP_START(orion128_mem, AS_PROGRAM, 8, orion_state )
 ADDRESS_MAP_END
 
 /* Orion Z80 Card II */
-static ADDRESS_MAP_START( orion128_io , AS_IO, 8, orion_state )
+ADDRESS_MAP_START(orion_state::orion128_io)
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	ADDRESS_MAP_UNMAP_HIGH
 	AM_RANGE( 0xf8, 0xf8) AM_WRITE(orion128_video_mode_w )
@@ -46,7 +46,7 @@ static ADDRESS_MAP_START( orion128_io , AS_IO, 8, orion_state )
 	AM_RANGE( 0xfa, 0xfa) AM_WRITE(orion128_video_page_w )
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START(orionz80_mem, AS_PROGRAM, 8, orion_state )
+ADDRESS_MAP_START(orion_state::orionz80_mem)
 	ADDRESS_MAP_UNMAP_HIGH
 	AM_RANGE( 0x0000, 0x3fff ) AM_RAMBANK("bank1")
 	AM_RANGE( 0x4000, 0xefff ) AM_RAMBANK("bank2")
@@ -56,11 +56,11 @@ static ADDRESS_MAP_START(orionz80_mem, AS_PROGRAM, 8, orion_state )
 ADDRESS_MAP_END
 
 /* Orion Pro */
-static ADDRESS_MAP_START( orionz80_io , AS_IO, 8, orion_state )
+ADDRESS_MAP_START(orion_state::orionz80_io)
 	AM_RANGE( 0x0000, 0xffff) AM_READWRITE(orionz80_io_r, orionz80_io_w )
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START(orionpro_mem, AS_PROGRAM, 8, orion_state )
+ADDRESS_MAP_START(orion_state::orionpro_mem)
 	ADDRESS_MAP_UNMAP_HIGH
 	AM_RANGE( 0x0000, 0x1fff ) AM_RAMBANK("bank1")
 	AM_RANGE( 0x2000, 0x3fff ) AM_RAMBANK("bank2")
@@ -72,7 +72,7 @@ static ADDRESS_MAP_START(orionpro_mem, AS_PROGRAM, 8, orion_state )
 	AM_RANGE( 0xf800, 0xffff ) AM_RAMBANK("bank8")
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( orionpro_io , AS_IO, 8, orion_state )
+ADDRESS_MAP_START(orion_state::orionpro_io)
 	AM_RANGE( 0x0000, 0xffff) AM_READWRITE(orionpro_io_r, orionpro_io_w )
 ADDRESS_MAP_END
 
@@ -147,7 +147,8 @@ MACHINE_CONFIG_START(orion_state::orion128)
 	MCFG_RAM_DEFAULT_VALUE(0x00)
 MACHINE_CONFIG_END
 
-MACHINE_CONFIG_DERIVED(orion_state::orion128ms, orion128)
+MACHINE_CONFIG_START(orion_state::orion128ms)
+	orion128(config);
 	MCFG_DEVICE_REMOVE("ppi8255_2")
 	MCFG_DEVICE_ADD("ppi8255_2", I8255A, 0)
 	MCFG_I8255_OUT_PORTA_CB(WRITE8(radio86_state, radio86_8255_porta_w2))
@@ -226,7 +227,8 @@ MACHINE_CONFIG_START(orion_state::orionz80)
 	MCFG_RAM_DEFAULT_VALUE(0x00)
 MACHINE_CONFIG_END
 
-MACHINE_CONFIG_DERIVED(orion_state::orionz80ms, orionz80)
+MACHINE_CONFIG_START(orion_state::orionz80ms)
+	orionz80(config);
 
 	MCFG_DEVICE_REMOVE("ppi8255_2")
 	MCFG_DEVICE_ADD("ppi8255_2", I8255A, 0)

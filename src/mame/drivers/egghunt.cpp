@@ -98,6 +98,9 @@ public:
 	required_device<palette_device> m_palette;
 	required_device<generic_latch_8_device> m_soundlatch;
 	void egghunt(machine_config &config);
+	void egghunt_map(address_map &map);
+	void io_map(address_map &map);
+	void sound_map(address_map &map);
 };
 
 
@@ -235,7 +238,7 @@ WRITE8_MEMBER(egghunt_state::egghunt_okibanking_w)
 	m_oki->set_rom_bank((data >> 4) & 1);
 }
 
-static ADDRESS_MAP_START( egghunt_map, AS_PROGRAM, 8, egghunt_state )
+ADDRESS_MAP_START(egghunt_state::egghunt_map)
 	AM_RANGE(0x0000, 0x7fff) AM_ROM
 	AM_RANGE(0xc000, 0xc7ff) AM_RAM_DEVWRITE("palette", palette_device, write8) AM_SHARE("palette")
 	AM_RANGE(0xc800, 0xcfff) AM_RAM_WRITE(egghunt_atram_w) AM_SHARE("atram")
@@ -244,7 +247,7 @@ static ADDRESS_MAP_START( egghunt_map, AS_PROGRAM, 8, egghunt_state )
 ADDRESS_MAP_END
 
 
-static ADDRESS_MAP_START( io_map, AS_IO, 8, egghunt_state )
+ADDRESS_MAP_START(egghunt_state::io_map)
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	AM_RANGE(0x00, 0x00) AM_READ_PORT("DSW1") AM_WRITE(egghunt_vidram_bank_w)
 	AM_RANGE(0x01, 0x01) AM_READ_PORT("SYSTEM") AM_WRITE(egghunt_gfx_banking_w)
@@ -255,7 +258,7 @@ static ADDRESS_MAP_START( io_map, AS_IO, 8, egghunt_state )
 	AM_RANGE(0x07, 0x07) AM_WRITENOP
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( sound_map, AS_PROGRAM, 8, egghunt_state )
+ADDRESS_MAP_START(egghunt_state::sound_map)
 	AM_RANGE(0x0000, 0x7fff) AM_ROM
 	AM_RANGE(0xe000, 0xe000) AM_DEVREAD("soundlatch", generic_latch_8_device, read)
 	AM_RANGE(0xe001, 0xe001) AM_READWRITE(egghunt_okibanking_r, egghunt_okibanking_w)

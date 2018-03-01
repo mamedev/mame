@@ -190,6 +190,7 @@ public:
 	DECLARE_PALETTE_INIT(miniboy7);
 
 	void miniboy7(machine_config &config);
+	void miniboy7_map(address_map &map);
 private:
 	uint8_t m_ay_pb;
 	int m_gpri;
@@ -344,7 +345,7 @@ WRITE_LINE_MEMBER(miniboy7_state::pia_ca2_w)
 *      Memory Map Information      *
 ***********************************/
 
-static ADDRESS_MAP_START( miniboy7_map, AS_PROGRAM, 8, miniboy7_state )
+ADDRESS_MAP_START(miniboy7_state::miniboy7_map)
 	AM_RANGE(0x0000, 0x07ff) AM_RAM AM_SHARE("nvram") /* battery backed RAM? */
 	AM_RANGE(0x0800, 0x0fff) AM_RAM AM_SHARE("videoram_a")
 	AM_RANGE(0x1000, 0x17ff) AM_RAM AM_SHARE("colorram_a")

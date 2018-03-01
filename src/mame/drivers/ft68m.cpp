@@ -32,6 +32,7 @@ public:
 	DECLARE_READ16_MEMBER(switches_r);
 
 	void ft68m(machine_config &config);
+	void mem_map(address_map &map);
 private:
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
@@ -47,7 +48,7 @@ READ16_MEMBER( ft68m_state::switches_r )
 }
 
 
-static ADDRESS_MAP_START(mem_map, AS_PROGRAM, 16, ft68m_state)
+ADDRESS_MAP_START(ft68m_state::mem_map)
 	ADDRESS_MAP_UNMAP_HIGH
 	ADDRESS_MAP_GLOBAL_MASK(0xffffff)
 	AM_RANGE(0x000000, 0x1fffff) AM_RAM AM_SHARE("rambase")

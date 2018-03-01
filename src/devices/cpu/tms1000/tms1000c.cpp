@@ -23,19 +23,9 @@
 DEFINE_DEVICE_TYPE(TMS1000C, tms1000c_cpu_device, "tms1000c", "TMS1000C") // 28-pin SDIP, 10 R pins
 
 
-// internal memory maps
-static ADDRESS_MAP_START(program_10bit_8, AS_PROGRAM, 8, tms1k_base_device)
-	AM_RANGE(0x000, 0x3ff) AM_ROM
-ADDRESS_MAP_END
-
-static ADDRESS_MAP_START(data_64x4, AS_DATA, 8, tms1k_base_device)
-	AM_RANGE(0x00, 0x3f) AM_RAM
-ADDRESS_MAP_END
-
-
 // device definitions
 tms1000c_cpu_device::tms1000c_cpu_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock)
-	: tms1000_cpu_device(mconfig, TMS1000C, tag, owner, clock, 8 /* o pins */, 10 /* r pins */, 6 /* pc bits */, 8 /* byte width */, 2 /* x width */, 10 /* prg width */, ADDRESS_MAP_NAME(program_10bit_8), 6 /* data width */, ADDRESS_MAP_NAME(data_64x4))
+	: tms1000_cpu_device(mconfig, TMS1000C, tag, owner, clock, 8 /* o pins */, 10 /* r pins */, 6 /* pc bits */, 8 /* byte width */, 2 /* x width */, 10 /* prg width */, address_map_constructor(FUNC(tms1000c_cpu_device::program_10bit_8), this), 6 /* data width */, address_map_constructor(FUNC(tms1000c_cpu_device::data_64x4), this))
 {
 }
 

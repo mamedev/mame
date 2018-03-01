@@ -127,6 +127,7 @@ public:
 	TIMER_CALLBACK_MEMBER(keyboard_strobe_cb);
 
 	void apple1(machine_config &config);
+	void apple1_map(address_map &map);
 private:
 	uint8_t *m_ram_ptr, *m_char_ptr;
 	int m_ram_size, m_char_size;
@@ -426,7 +427,7 @@ WRITE8_MEMBER(apple1_state::ram_w)
 	}
 }
 
-static ADDRESS_MAP_START( apple1_map, AS_PROGRAM, 8, apple1_state )
+ADDRESS_MAP_START(apple1_state::apple1_map)
 	AM_RANGE(0x0000, 0xbfff) AM_READWRITE(ram_r, ram_w)
 	AM_RANGE(0xd010, 0xd013) AM_MIRROR(0x0fec) AM_DEVREADWRITE(A1_PIA_TAG, pia6821_device, read, write)
 	AM_RANGE(0xe000, 0xefff) AM_RAM AM_SHARE(A1_BASICRAM_TAG)

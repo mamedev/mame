@@ -644,7 +644,7 @@ READ16_MEMBER(alpha68k_state::alpha_V_trigger_r)
 
 /******************************************************************************/
 
-static ADDRESS_MAP_START( kyros_map, AS_PROGRAM, 16, alpha68k_state )
+ADDRESS_MAP_START(alpha68k_state::kyros_map)
 	AM_RANGE(0x000000, 0x01ffff) AM_ROM                       // main program
 	AM_RANGE(0x020000, 0x020fff) AM_RAM AM_SHARE("shared_ram")  // work RAM
 	AM_RANGE(0x040000, 0x041fff) AM_RAM AM_SHARE("spriteram") // sprite RAM
@@ -654,7 +654,7 @@ static ADDRESS_MAP_START( kyros_map, AS_PROGRAM, 16, alpha68k_state )
 	AM_RANGE(0x0e0000, 0x0e0001) AM_READWRITE(kyros_dip_r, kyros_sound_w)
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( alpha68k_I_map, AS_PROGRAM, 16, alpha68k_state )
+ADDRESS_MAP_START(alpha68k_state::alpha68k_I_map)
 	AM_RANGE(0x000000, 0x03ffff) AM_ROM                         // main program
 	AM_RANGE(0x080000, 0x083fff) AM_RAM                         // work RAM
 	AM_RANGE(0x100000, 0x103fff) AM_RAM AM_SHARE("spriteram")   // video RAM
@@ -665,7 +665,7 @@ static ADDRESS_MAP_START( alpha68k_I_map, AS_PROGRAM, 16, alpha68k_state )
 	AM_RANGE(0x380000, 0x380001) AM_READ_PORT("IN2") AM_WRITE(paddlema_soundlatch_w) // LSB: sound latch write and RST38 trigger, joy3, joy4
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( alpha68k_II_map, AS_PROGRAM, 16, alpha68k_state )
+ADDRESS_MAP_START(alpha68k_state::alpha68k_II_map)
 	AM_RANGE(0x000000, 0x03ffff) AM_ROM
 	AM_RANGE(0x040000, 0x040fff) AM_RAM AM_SHARE("shared_ram")
 	AM_RANGE(0x080000, 0x080001) AM_READ(control_1_r) /* Joysticks */
@@ -684,7 +684,7 @@ static ADDRESS_MAP_START( alpha68k_II_map, AS_PROGRAM, 16, alpha68k_state )
 	AM_RANGE(0x800000, 0x83ffff) AM_ROMBANK("bank8")
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( alpha68k_V_map, AS_PROGRAM, 16, alpha68k_state )
+ADDRESS_MAP_START(alpha68k_state::alpha68k_V_map)
 	AM_RANGE(0x000000, 0x03ffff) AM_ROM
 	AM_RANGE(0x040000, 0x043fff) AM_RAM AM_SHARE("shared_ram")
 	AM_RANGE(0x080000, 0x080001) AM_READWRITE(control_1_r, alpha68k_V_sound_w) /* Joysticks */
@@ -704,7 +704,7 @@ ADDRESS_MAP_END
 
 READ16_MEMBER(alpha68k_state::sound_cpu_r){ return 1; }
 
-static ADDRESS_MAP_START( tnextspc_map, AS_PROGRAM, 16, alpha68k_state )
+ADDRESS_MAP_START(alpha68k_state::tnextspc_map)
 	AM_RANGE(0x000000, 0x03ffff) AM_ROM
 	AM_RANGE(0x070000, 0x073fff) AM_RAM
 	AM_RANGE(0x0a0000, 0x0a3fff) AM_RAM AM_SHARE("spriteram")
@@ -729,13 +729,13 @@ WRITE8_MEMBER(alpha68k_state::sound_bank_w)
 	membank("bank7")->set_entry(data);
 }
 
-static ADDRESS_MAP_START( sound_map, AS_PROGRAM, 8, alpha68k_state )
+ADDRESS_MAP_START(alpha68k_state::sound_map)
 	AM_RANGE(0x0000, 0x7fff) AM_ROM
 	AM_RANGE(0x8000, 0x87ff) AM_RAM
 	AM_RANGE(0xc000, 0xffff) AM_ROMBANK("bank7")
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( kyros_sound_map, AS_PROGRAM, 8, alpha68k_state )
+ADDRESS_MAP_START(alpha68k_state::kyros_sound_map)
 	AM_RANGE(0x0000, 0xbfff) AM_ROM
 	AM_RANGE(0xc000, 0xc7ff) AM_RAM
 	AM_RANGE(0xe000, 0xe000) AM_DEVREAD("soundlatch", generic_latch_8_device, read)
@@ -751,7 +751,7 @@ static ADDRESS_MAP_START( kyros_sound_map, AS_PROGRAM, 8, alpha68k_state )
 */
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( sstingry_sound_map, AS_PROGRAM, 8, alpha68k_state )
+ADDRESS_MAP_START(alpha68k_state::sstingry_sound_map)
 	AM_RANGE(0x0000, 0x7fff) AM_ROM
 	AM_RANGE(0x8000, 0x87ff) AM_RAM
 	AM_RANGE(0xc100, 0xc100) AM_DEVREAD("soundlatch", generic_latch_8_device, read)
@@ -760,12 +760,12 @@ static ADDRESS_MAP_START( sstingry_sound_map, AS_PROGRAM, 8, alpha68k_state )
 	AM_RANGE(0xc106, 0xc10e) AM_WRITENOP // soundboard I/O's, ignored
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( jongbou_sound_map, AS_PROGRAM, 8, alpha68k_state )
+ADDRESS_MAP_START(alpha68k_state::jongbou_sound_map)
 	AM_RANGE(0x0000, 0x7fff) AM_ROM
 	AM_RANGE(0x8000, 0x83ff) AM_RAM
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( alpha68k_I_s_map, AS_PROGRAM, 8, alpha68k_state )
+ADDRESS_MAP_START(alpha68k_state::alpha68k_I_s_map)
 	AM_RANGE(0x0000, 0x9fff) AM_ROM
 	AM_RANGE(0xe000, 0xe000) AM_DEVREADWRITE("soundlatch", generic_latch_8_device, read, clear_w)
 	AM_RANGE(0xe800, 0xe800) AM_DEVREADWRITE("ymsnd", ym3812_device, status_port_r, control_port_w)
@@ -775,13 +775,13 @@ static ADDRESS_MAP_START( alpha68k_I_s_map, AS_PROGRAM, 8, alpha68k_state )
 ADDRESS_MAP_END
 
 
-static ADDRESS_MAP_START( tnextspc_sound_map, AS_PROGRAM, 8, alpha68k_state )
+ADDRESS_MAP_START(alpha68k_state::tnextspc_sound_map)
 	AM_RANGE(0x0000, 0xefff) AM_ROM
 	AM_RANGE(0xf000, 0xf7ff) AM_RAM
 	AM_RANGE(0xf800, 0xf800) AM_DEVREADWRITE("soundlatch", generic_latch_8_device, read, clear_w)
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( sound_portmap, AS_IO, 8, alpha68k_state )
+ADDRESS_MAP_START(alpha68k_state::sound_portmap)
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	AM_RANGE(0x00, 0x00) AM_DEVREADWRITE("soundlatch", generic_latch_8_device, read, clear_w)
 	AM_RANGE(0x08, 0x08) AM_DEVWRITE("dac", dac_byte_interface, write)
@@ -790,7 +790,7 @@ static ADDRESS_MAP_START( sound_portmap, AS_IO, 8, alpha68k_state )
 	AM_RANGE(0x0e, 0x0e) AM_WRITE(sound_bank_w)
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( kyros_sound_portmap, AS_IO, 8, alpha68k_state )
+ADDRESS_MAP_START(alpha68k_state::kyros_sound_portmap)
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	AM_RANGE(0x10, 0x11) AM_DEVWRITE("ym1", ym2203_device, write)
 	AM_RANGE(0x80, 0x80) AM_DEVWRITE("ym2", ym2203_device, write_port_w)
@@ -799,7 +799,7 @@ static ADDRESS_MAP_START( kyros_sound_portmap, AS_IO, 8, alpha68k_state )
 	AM_RANGE(0x91, 0x91) AM_DEVWRITE("ym3", ym2203_device, control_port_w)
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( jongbou_sound_portmap, AS_IO, 8, alpha68k_state )
+ADDRESS_MAP_START(alpha68k_state::jongbou_sound_portmap)
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	AM_RANGE(0x00, 0x00) AM_DEVWRITE("aysnd", ay8910_device, address_w)
 	AM_RANGE(0x01, 0x01) AM_DEVREADWRITE("aysnd", ay8910_device, data_r, data_w)
@@ -807,7 +807,7 @@ static ADDRESS_MAP_START( jongbou_sound_portmap, AS_IO, 8, alpha68k_state )
 	AM_RANGE(0x06, 0x06) AM_WRITENOP
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( tnextspc_sound_portmap, AS_IO, 8, alpha68k_state )
+ADDRESS_MAP_START(alpha68k_state::tnextspc_sound_portmap)
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	AM_RANGE(0x00, 0x00) AM_DEVREADWRITE("ymsnd", ym3812_device, status_port_r, control_port_w)
 	AM_RANGE(0x20, 0x20) AM_DEVWRITE("ymsnd", ym3812_device, write_port_w)
@@ -2160,7 +2160,8 @@ MACHINE_CONFIG_START(alpha68k_state::alpha68k_II)
 	MCFG_SOUND_ROUTE_EX(0, "dac", 1.0, DAC_VREF_POS_INPUT) MCFG_SOUND_ROUTE_EX(0, "dac", -1.0, DAC_VREF_NEG_INPUT)
 MACHINE_CONFIG_END
 
-MACHINE_CONFIG_DERIVED(alpha68k_state::btlfieldb, alpha68k_II)
+MACHINE_CONFIG_START(alpha68k_state::btlfieldb)
+	alpha68k_II(config);
 	MCFG_CPU_MODIFY("maincpu")
 	MCFG_CPU_VBLANK_INT_DRIVER("screen", alpha68k_state, irq1_line_hold)
 	MCFG_CPU_PERIODIC_INT_DRIVER(alpha68k_state, irq2_line_hold, 60*4) // MCU irq

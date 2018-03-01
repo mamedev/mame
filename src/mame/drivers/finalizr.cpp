@@ -104,7 +104,7 @@ WRITE8_MEMBER(finalizr_state::i8039_T0_w)
 	*/
 }
 
-static ADDRESS_MAP_START( main_map, AS_PROGRAM, 8, finalizr_state )
+ADDRESS_MAP_START(finalizr_state::main_map)
 	AM_RANGE(0x0001, 0x0001) AM_WRITEONLY AM_SHARE("scroll")
 	AM_RANGE(0x0003, 0x0003) AM_WRITE(finalizr_videoctrl_w)
 	AM_RANGE(0x0004, 0x0004) AM_WRITE(finalizr_flipscreen_w)
@@ -132,11 +132,11 @@ static ADDRESS_MAP_START( main_map, AS_PROGRAM, 8, finalizr_state )
 	AM_RANGE(0x4000, 0xffff) AM_ROM
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( sound_map, AS_PROGRAM, 8, finalizr_state )
+ADDRESS_MAP_START(finalizr_state::sound_map)
 	AM_RANGE(0x0000, 0x0fff) AM_ROM
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( sound_io_map, AS_IO, 8, finalizr_state )
+ADDRESS_MAP_START(finalizr_state::sound_io_map)
 	AM_RANGE(0x00, 0xff)                   AM_DEVREAD("soundlatch", generic_latch_8_device, read)
 ADDRESS_MAP_END
 

@@ -32,23 +32,20 @@
 class unixpc_state : public driver_device
 {
 public:
-	unixpc_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag),
-			m_maincpu(*this, "maincpu"),
-			m_ram(*this, RAM_TAG),
-			m_wd2797(*this, "wd2797"),
-			m_floppy(*this, "wd2797:0:525dd"),
-			m_ramrombank(*this, "ramrombank"),
-			m_mapram(*this, "mapram"),
-			m_videoram(*this, "videoram")
+	unixpc_state(const machine_config &mconfig, device_type type, const char *tag) :
+		driver_device(mconfig, type, tag),
+		m_maincpu(*this, "maincpu"),
+		m_ram(*this, RAM_TAG),
+		m_wd2797(*this, "wd2797"),
+		m_floppy(*this, "wd2797:0:525dd"),
+		m_ramrombank(*this, "ramrombank"),
+		m_mapram(*this, "mapram"),
+		m_videoram(*this, "videoram")
 	{ }
 
-	required_device<cpu_device> m_maincpu;
-	required_device<ram_device> m_ram;
-	required_device<wd2797_device> m_wd2797;
-	required_device<floppy_image_device> m_floppy;
-	required_device<address_map_bank_device> m_ramrombank;
+	void unixpc(machine_config &config);
 
+protected:
 	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 
 	virtual void machine_start() override;
@@ -72,11 +69,19 @@ public:
 	DECLARE_WRITE_LINE_MEMBER( wd2797_intrq_w );
 	DECLARE_WRITE_LINE_MEMBER( wd2797_drq_w );
 
+	void ramrombank_map(address_map &map);
+	void unixpc_mem(address_map &map);
+
+private:
+	required_device<cpu_device> m_maincpu;
+	required_device<ram_device> m_ram;
+	required_device<wd2797_device> m_wd2797;
+	required_device<floppy_image_device> m_floppy;
+	required_device<address_map_bank_device> m_ramrombank;
+
 	required_shared_ptr<uint16_t> m_mapram;
 	required_shared_ptr<uint16_t> m_videoram;
 
-	void unixpc(machine_config &config);
-private:
 	uint16_t *m_ramptr;
 	uint32_t m_ramsize;
 	uint16_t m_diskdmasize;
@@ -273,7 +278,7 @@ uint32_t unixpc_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap
     ADDRESS MAPS
 ***************************************************************************/
 
-static ADDRESS_MAP_START( unixpc_mem, AS_PROGRAM, 16, unixpc_state )
+ADDRESS_MAP_START(unixpc_state::unixpc_mem)
 	AM_RANGE(0x000000, 0x3fffff) AM_DEVICE("ramrombank", address_map_bank_device, amap16)
 	AM_RANGE(0x400000, 0x4007ff) AM_RAM AM_SHARE("mapram")
 	AM_RANGE(0x420000, 0x427fff) AM_RAM AM_SHARE("videoram")
@@ -283,17 +288,17 @@ static ADDRESS_MAP_START( unixpc_mem, AS_PROGRAM, 16, unixpc_state )
 	AM_RANGE(0x4a0000, 0x4a0001) AM_WRITE(misc_control_w)
 	AM_RANGE(0x4d0000, 0x4d7fff) AM_WRITE(diskdma_ptr_w)
 	AM_RANGE(0x4e0000, 0x4e0001) AM_WRITE(disk_control_w)
-	AM_RANGE(0x800000, 0x803fff) AM_MIRROR(0x7fc000) AM_ROM AM_REGION("bootrom", 0)
 	AM_RANGE(0xe10000, 0xe10007) AM_DEVREADWRITE8("wd2797", wd_fdc_device_base, read, write, 0x00ff)
 	AM_RANGE(0xe30000, 0xe30001) AM_READ(rtc_r)
 	AM_RANGE(0xe40000, 0xe40001) AM_WRITE(error_enable_w)
 	AM_RANGE(0xe41000, 0xe41001) AM_WRITE(parity_enable_w)
 	AM_RANGE(0xe42000, 0xe42001) AM_WRITE(bpplus_w)
 	AM_RANGE(0xe43000, 0xe43001) AM_WRITE(romlmap_w)
+	AM_RANGE(0x800000, 0x803fff) AM_MIRROR(0x7fc000) AM_ROM AM_REGION("bootrom", 0)
 	// e70000 / e70002 = keyboard 6850 status/control and Rx data / Tx data
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( ramrombank_map, AS_PROGRAM, 16, unixpc_state )
+ADDRESS_MAP_START(unixpc_state::ramrombank_map)
 	AM_RANGE(0x000000, 0x3fffff) AM_ROM AM_REGION("bootrom", 0)
 	AM_RANGE(0x400000, 0x7fffff) AM_READWRITE(ram_mmu_r, ram_mmu_w)
 ADDRESS_MAP_END

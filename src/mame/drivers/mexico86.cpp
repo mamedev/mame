@@ -80,7 +80,7 @@ READ8_MEMBER(mexico86_state::kiki_ym2203_r)
  *
  *************************************/
 
-static ADDRESS_MAP_START( mexico86_map, AS_PROGRAM, 8, mexico86_state )
+ADDRESS_MAP_START(mexico86_state::mexico86_map)
 	AM_RANGE(0x0000, 0x7fff) AM_ROM
 	AM_RANGE(0x8000, 0xbfff) AM_ROMBANK("bank1")                /* banked roms */
 	AM_RANGE(0xc000, 0xe7ff) AM_RAM AM_SHARE("mainram")         /* shared with sound cpu */
@@ -93,7 +93,7 @@ static ADDRESS_MAP_START( mexico86_map, AS_PROGRAM, 8, mexico86_state )
 	AM_RANGE(0xf800, 0xffff) AM_RAM AM_SHARE("subram")          /* communication ram - to connect 4 players's subboard */
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( mexico86_sound_map, AS_PROGRAM, 8, mexico86_state )
+ADDRESS_MAP_START(mexico86_state::mexico86_sound_map)
 	AM_RANGE(0x0000, 0x7fff) AM_ROM
 	AM_RANGE(0x8000, 0xa7ff) AM_RAM AM_SHARE("mainram")  /* shared with main */
 	AM_RANGE(0xa800, 0xbfff) AM_RAM
@@ -108,7 +108,7 @@ WRITE8_MEMBER(mexico86_state::mexico86_sub_output_w)
 	/*---- --x- <unknown, always high, irq ack?>*/
 }
 
-static ADDRESS_MAP_START( mexico86_sub_cpu_map, AS_PROGRAM, 8, mexico86_state )
+ADDRESS_MAP_START(mexico86_state::mexico86_sub_cpu_map)
 	AM_RANGE(0x0000, 0x3fff) AM_ROM
 	AM_RANGE(0x4000, 0x47ff) AM_RAM /* sub cpu ram */
 	AM_RANGE(0x8000, 0x87ff) AM_RAM AM_SHARE("subram")  /* shared with main */
@@ -469,7 +469,8 @@ MACHINE_CONFIG_START(mexico86_state::mexico86)
 MACHINE_CONFIG_END
 
 
-MACHINE_CONFIG_DERIVED(mexico86_state::knightb, mexico86)
+MACHINE_CONFIG_START(mexico86_state::knightb)
+	mexico86(config);
 
 	/* basic machine hardware */
 
@@ -481,7 +482,8 @@ MACHINE_CONFIG_DERIVED(mexico86_state::knightb, mexico86)
 MACHINE_CONFIG_END
 
 
-MACHINE_CONFIG_DERIVED(mexico86_state::kikikai, knightb)
+MACHINE_CONFIG_START(mexico86_state::kikikai)
+	knightb(config);
 
 	/* basic machine hardware */
 

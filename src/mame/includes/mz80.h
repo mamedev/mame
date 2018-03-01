@@ -49,6 +49,8 @@ public:
 	void mz80kj(machine_config &config);
 	void mz80k(machine_config &config);
 	void mz80a(machine_config &config);
+	void mz80k_io(address_map &map);
+	void mz80k_mem(address_map &map);
 private:
 	bool m_mz80k_vertical;
 	bool m_mz80k_tempo_strobe;

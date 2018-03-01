@@ -196,6 +196,7 @@ public:
 	DECLARE_WRITE32_MEMBER(pluto5_mem_w);
 
 	void pluto5(machine_config &config);
+	void pluto5_map(address_map &map);
 protected:
 
 	// devices
@@ -238,7 +239,7 @@ WRITE32_MEMBER(pluto5_state::pluto5_mem_w)
 }
 
 
-static ADDRESS_MAP_START( pluto5_map, AS_PROGRAM, 32, pluto5_state )
+ADDRESS_MAP_START(pluto5_state::pluto5_map)
 	AM_RANGE(0x00000000, 0xffffffff) AM_READWRITE(pluto5_mem_r, pluto5_mem_w)
 ADDRESS_MAP_END
 

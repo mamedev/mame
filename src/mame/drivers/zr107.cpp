@@ -263,6 +263,11 @@ public:
 
 	void zr107(machine_config &config);
 	void jetwave(machine_config &config);
+	void jetwave_map(address_map &map);
+	void k054539_map(address_map &map);
+	void sharc_map(address_map &map);
+	void sound_memmap(address_map &map);
+	void zr107_map(address_map &map);
 protected:
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
@@ -471,7 +476,7 @@ void zr107_state::machine_start()
 	m_maincpu->ppcdrc_add_fastram(0x00000000, 0x000fffff, false, m_workram);
 }
 
-static ADDRESS_MAP_START( zr107_map, AS_PROGRAM, 32, zr107_state )
+ADDRESS_MAP_START(zr107_state::zr107_map)
 	AM_RANGE(0x00000000, 0x000fffff) AM_RAM AM_SHARE("workram") /* Work RAM */
 	AM_RANGE(0x74000000, 0x74003fff) AM_DEVREADWRITE("k056832", k056832_device, ram_long_r, ram_long_w)
 	AM_RANGE(0x74020000, 0x7402003f) AM_DEVREADWRITE("k056832", k056832_device, long_r, long_w)
@@ -498,7 +503,7 @@ WRITE32_MEMBER(zr107_state::jetwave_palette_w)
 	m_palette->set_pen_color(offset, pal5bit(data >> 10), pal5bit(data >> 5), pal5bit(data >> 0));
 }
 
-static ADDRESS_MAP_START( jetwave_map, AS_PROGRAM, 32, zr107_state )
+ADDRESS_MAP_START(zr107_state::jetwave_map)
 	AM_RANGE(0x00000000, 0x000fffff) AM_RAM       /* Work RAM */
 	AM_RANGE(0x74000000, 0x740000ff) AM_DEVREADWRITE("k001604", k001604_device, reg_r, reg_w)
 	AM_RANGE(0x74010000, 0x7401ffff) AM_RAM_WRITE(jetwave_palette_w) AM_SHARE("paletteram")
@@ -533,7 +538,7 @@ WRITE16_MEMBER(zr107_state::sound_ctrl_w)
 	}
 }
 
-static ADDRESS_MAP_START( sound_memmap, AS_PROGRAM, 16, zr107_state )
+ADDRESS_MAP_START(zr107_state::sound_memmap)
 	AM_RANGE(0x000000, 0x01ffff) AM_ROM
 	AM_RANGE(0x100000, 0x103fff) AM_RAM     /* Work RAM */
 	AM_RANGE(0x200000, 0x2004ff) AM_DEVREADWRITE8("k054539_1", k054539_device, read, write, 0xff00)
@@ -543,7 +548,7 @@ static ADDRESS_MAP_START( sound_memmap, AS_PROGRAM, 16, zr107_state )
 	AM_RANGE(0x580000, 0x580001) AM_WRITENOP // 'NRES' - D2: K056602 /RESET
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( k054539_map, 0, 8, zr107_state )
+ADDRESS_MAP_START(zr107_state::k054539_map)
 	AM_RANGE(0x000000, 0x5fffff) AM_ROM AM_REGION("k054539", 0)
 ADDRESS_MAP_END
 
@@ -560,7 +565,7 @@ WRITE32_MEMBER(zr107_state::dsp_dataram_w)
 	m_sharc_dataram[offset] = data;
 }
 
-static ADDRESS_MAP_START( sharc_map, AS_DATA, 32, zr107_state )
+ADDRESS_MAP_START(zr107_state::sharc_map)
 	AM_RANGE(0x400000, 0x41ffff) AM_DEVREADWRITE("konppc", konppc_device, cgboard_0_shared_sharc_r, cgboard_0_shared_sharc_w)
 	AM_RANGE(0x500000, 0x5fffff) AM_READWRITE(dsp_dataram_r, dsp_dataram_w)
 	AM_RANGE(0x600000, 0x6fffff) AM_DEVREADWRITE("k001005", k001005_device, read, write)

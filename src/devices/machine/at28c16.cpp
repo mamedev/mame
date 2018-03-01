@@ -22,7 +22,7 @@
 //  GLOBAL VARIABLES
 //**************************************************************************
 
-static ADDRESS_MAP_START( at28c16_map8, AS_PROGRAM, 8, at28c16_device )
+ADDRESS_MAP_START(at28c16_device::at28c16_map8)
 	AM_RANGE(0x0000, 0x081f) AM_RAM
 ADDRESS_MAP_END
 
@@ -43,7 +43,7 @@ at28c16_device::at28c16_device(const machine_config &mconfig, const char *tag, d
 	: device_t(mconfig, AT28C16, tag, owner, clock),
 		device_memory_interface(mconfig, *this),
 		device_nvram_interface(mconfig, *this),
-		m_space_config("at28c16", ENDIANNESS_BIG, 8,  12, 0, *ADDRESS_MAP_NAME(at28c16_map8)),
+		m_space_config("at28c16", ENDIANNESS_BIG, 8,  12, 0, address_map_constructor(FUNC(at28c16_device::at28c16_map8), this)),
 		m_a9_12v(0),
 		m_oe_12v(0),
 		m_last_write(-1),

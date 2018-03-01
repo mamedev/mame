@@ -78,4 +78,6 @@ public:
 	void draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprect, uint32_t scr);
 	void ps4big(machine_config &config);
 	void ps4small(machine_config &config);
+	void ps4_map(address_map &map);
+	void ps4_ymf_map(address_map &map);
 };

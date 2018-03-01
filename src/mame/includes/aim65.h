@@ -8,8 +8,8 @@
  *
  ****************************************************************************/
 
-#ifndef AIM65_H_
-#define AIM65_H_
+#ifndef MAME_INCLUDES_AIM65_H
+#define MAME_INCLUDES_AIM65_H
 
 #include "cpu/m6502/m6502.h"
 #include "video/dl1416.h"
@@ -70,6 +70,7 @@ public:
 	DECLARE_DEVICE_IMAGE_LOAD_MEMBER(z15_load) { return load_cart(image, m_z15, "z15"); }
 
 	void aim65(machine_config &config);
+	void aim65_mem(address_map &map);
 protected:
 	virtual void machine_start() override;
 
@@ -93,4 +94,4 @@ protected:
 };
 
 
-#endif /* AIM65_H_ */
+#endif // MAME_INCLUDES_AIM65_H

@@ -123,6 +123,7 @@ public:
 	DECLARE_WRITE8_MEMBER( tmpz84c011_dir_pd_w ) { m_pio_dir[3] = data; }
 	DECLARE_WRITE8_MEMBER( tmpz84c011_dir_pe_w ) { m_pio_dir[4] = data; }
 
+	void tmpz84c011_internal_io_map(address_map &map);
 protected:
 	// device-level overrides
 	virtual void device_add_mconfig(machine_config &config) override;

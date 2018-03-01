@@ -12,13 +12,13 @@
 //**************************************************************************
 
 #define MCFG_C140_ADD(tag, clock) \
-		MCFG_DEVICE_ADD((tag), C140, (clock))
+	MCFG_DEVICE_ADD((tag), C140, (clock))
 
 #define MCFG_C140_REPLACE(tag, clock) \
-		MCFG_DEVICE_REPLACE((tag), C140, (clock))
+	MCFG_DEVICE_REPLACE((tag), C140, (clock))
 
 #define MCFG_C140_BANK_TYPE(type) \
-		c140_device::set_bank_type(*device, (c140_device::C140_TYPE::type));
+	downcast<c140_device &>(*device).set_bank_type((c140_device::C140_TYPE::type));
 
 
 //**************************************************************************
@@ -41,8 +41,8 @@ public:
 
 	c140_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
-	// static configuration
-	static void set_bank_type(device_t &device, C140_TYPE bank) { downcast<c140_device &>(device).m_banking_type = bank; }
+	// configuration
+	void set_bank_type(C140_TYPE bank) { m_banking_type = bank; }
 
 	DECLARE_READ8_MEMBER( c140_r );
 	DECLARE_WRITE8_MEMBER( c140_w );

@@ -53,4 +53,5 @@ public:
 	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	void draw_bullets(bitmap_ind16 &bitmap, const rectangle &cliprect);
 	void tankbatt(machine_config &config);
+	void main_map(address_map &map);
 };

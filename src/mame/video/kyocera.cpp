@@ -42,7 +42,7 @@ uint32_t tandy200_state::screen_update(screen_device &screen, bitmap_ind16 &bitm
 	return 0;
 }
 
-static ADDRESS_MAP_START( tandy200_lcdc, 0, 8, tandy200_state )
+ADDRESS_MAP_START(tandy200_state::tandy200_lcdc)
 	ADDRESS_MAP_GLOBAL_MASK(0x1fff)
 	AM_RANGE(0x0000, 0x1fff) AM_RAM
 ADDRESS_MAP_END

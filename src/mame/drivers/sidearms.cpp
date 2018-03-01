@@ -77,7 +77,7 @@ READ8_MEMBER(sidearms_state::turtship_ports_r)
 }
 
 
-static ADDRESS_MAP_START( sidearms_map, AS_PROGRAM, 8, sidearms_state )
+ADDRESS_MAP_START(sidearms_state::sidearms_map)
 	AM_RANGE(0x0000, 0x7fff) AM_ROM
 	AM_RANGE(0x8000, 0xbfff) AM_ROMBANK("bank1")
 	AM_RANGE(0xc000, 0xc3ff) AM_RAM_DEVWRITE("palette", palette_device, write8) AM_SHARE("palette")
@@ -98,7 +98,7 @@ static ADDRESS_MAP_START( sidearms_map, AS_PROGRAM, 8, sidearms_state )
 	AM_RANGE(0xf000, 0xffff) AM_RAM AM_SHARE("spriteram")
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( turtship_map, AS_PROGRAM, 8, sidearms_state )
+ADDRESS_MAP_START(sidearms_state::turtship_map)
 	AM_RANGE(0x0000, 0x7fff) AM_ROM
 	AM_RANGE(0x8000, 0xbfff) AM_ROMBANK("bank1")
 	AM_RANGE(0xc000, 0xcfff) AM_RAM
@@ -119,7 +119,7 @@ static ADDRESS_MAP_START( turtship_map, AS_PROGRAM, 8, sidearms_state )
 	AM_RANGE(0xf800, 0xffff) AM_RAM_WRITE(colorram_w) AM_SHARE("colorram")
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( sidearms_sound_map, AS_PROGRAM, 8, sidearms_state )
+ADDRESS_MAP_START(sidearms_state::sidearms_sound_map)
 	AM_RANGE(0x0000, 0x7fff) AM_ROM
 	AM_RANGE(0xc000, 0xc7ff) AM_RAM
 	AM_RANGE(0xd000, 0xd000) AM_DEVREAD("soundlatch", generic_latch_8_device, read)
@@ -142,7 +142,7 @@ WRITE8_MEMBER(sidearms_state::whizz_bankswitch_w)
 	membank("bank1")->set_entry(bank);
 }
 
-static ADDRESS_MAP_START( whizz_map, AS_PROGRAM, 8, sidearms_state )
+ADDRESS_MAP_START(sidearms_state::whizz_map)
 	AM_RANGE(0x0000, 0x7fff) AM_ROM
 	AM_RANGE(0x8000, 0xbfff) AM_ROMBANK("bank1")
 	AM_RANGE(0xc000, 0xc3ff) AM_RAM_DEVWRITE("palette", palette_device, write8) AM_SHARE("palette")
@@ -166,12 +166,12 @@ static ADDRESS_MAP_START( whizz_map, AS_PROGRAM, 8, sidearms_state )
 	AM_RANGE(0xf000, 0xffff) AM_RAM AM_SHARE("spriteram")
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( whizz_sound_map, AS_PROGRAM, 8, sidearms_state )
+ADDRESS_MAP_START(sidearms_state::whizz_sound_map)
 	AM_RANGE(0x0000, 0x7fff) AM_ROM
 	AM_RANGE(0xf800, 0xffff) AM_RAM
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( whizz_io_map, AS_IO, 8, sidearms_state )
+ADDRESS_MAP_START(sidearms_state::whizz_io_map)
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	AM_RANGE(0x00, 0x01) AM_DEVREADWRITE("ymsnd", ym2151_device, read, write)
 	AM_RANGE(0x40, 0x40) AM_WRITENOP

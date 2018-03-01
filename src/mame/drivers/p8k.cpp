@@ -107,6 +107,11 @@ public:
 
 	void p8k(machine_config &config);
 	void p8k_16(machine_config &config);
+	void p8k_16_datamap(address_map &map);
+	void p8k_16_iomap(address_map &map);
+	void p8k_16_memmap(address_map &map);
+	void p8k_iomap(address_map &map);
+	void p8k_memmap(address_map &map);
 private:
 	required_device<cpu_device> m_maincpu;
 	optional_device<p8k_16_daisy_device> m_daisy;
@@ -120,7 +125,7 @@ private:
 
 ****************************************************************************/
 
-static ADDRESS_MAP_START(p8k_memmap, AS_PROGRAM, 8, p8k_state)
+ADDRESS_MAP_START(p8k_state::p8k_memmap)
 	AM_RANGE(0x0000, 0x0FFF) AM_RAMBANK("bank0")
 	AM_RANGE(0x1000, 0x1FFF) AM_RAMBANK("bank1")
 	AM_RANGE(0x2000, 0x2FFF) AM_RAMBANK("bank2")
@@ -139,7 +144,7 @@ static ADDRESS_MAP_START(p8k_memmap, AS_PROGRAM, 8, p8k_state)
 	AM_RANGE(0xF000, 0xFFFF) AM_RAMBANK("bank15")
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START(p8k_iomap, AS_IO, 8, p8k_state)
+ADDRESS_MAP_START(p8k_state::p8k_iomap)
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	AM_RANGE(0x00, 0x07) AM_READWRITE(p8k_port0_r,p8k_port0_w) // MH7489
 	AM_RANGE(0x08, 0x0b) AM_DEVREADWRITE("ctc0", z80ctc_device, read, write)
@@ -314,20 +319,20 @@ DRIVER_INIT_MEMBER(p8k_state,p8k)
 
 ****************************************************************************/
 
-static ADDRESS_MAP_START(p8k_16_memmap, AS_PROGRAM, 16, p8k_state)
+ADDRESS_MAP_START(p8k_state::p8k_16_memmap)
 	AM_RANGE(0x00000, 0x03fff) AM_ROM AM_SHARE("share0")
 	AM_RANGE(0x04000, 0x07fff) AM_RAM AM_SHARE("share1")
 	AM_RANGE(0x08000, 0xfffff) AM_RAM AM_SHARE("share2")
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START(p8k_16_datamap, AS_DATA, 16, p8k_state)
+ADDRESS_MAP_START(p8k_state::p8k_16_datamap)
 	AM_RANGE(0x00000, 0x03fff) AM_ROM AM_SHARE("share0")
 	AM_RANGE(0x04000, 0x07fff) AM_RAM AM_SHARE("share1")
 	AM_RANGE(0x08000, 0xfffff) AM_RAM AM_SHARE("share2")
 ADDRESS_MAP_END
 
 
-static ADDRESS_MAP_START(p8k_16_iomap, AS_IO, 16, p8k_state)
+ADDRESS_MAP_START(p8k_state::p8k_16_iomap)
 //  AM_RANGE(0x0fef0, 0x0feff) // clock
 	AM_RANGE(0x0ff80, 0x0ff87) AM_DEVREADWRITE8("sio", z80sio_device, cd_ba_r, cd_ba_w, 0xff)
 	AM_RANGE(0x0ff88, 0x0ff8f) AM_DEVREADWRITE8("sio1", z80sio_device, cd_ba_r, cd_ba_w, 0xff)

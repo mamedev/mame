@@ -20,12 +20,15 @@ Possibly related to ADP hardware? The HD63484 video board is definitely absent h
 class stellafr_state : public driver_device
 {
 public:
-	stellafr_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag),
-			m_maincpu(*this, "maincpu"),
-			m_duart(*this, "duart")
+	stellafr_state(const machine_config &mconfig, device_type type, const char *tag) :
+		driver_device(mconfig, type, tag),
+		m_maincpu(*this, "maincpu"),
+		m_duart(*this, "duart")
 	{ }
 
+	void stellafr(machine_config &config);
+
+protected:
 	IRQ_CALLBACK_MEMBER(irq_ack);
 	DECLARE_WRITE8_MEMBER(write_8000c1);
 	DECLARE_READ8_MEMBER(read_800101);
@@ -33,9 +36,9 @@ public:
 	DECLARE_WRITE8_MEMBER(duart_output_w);
 	DECLARE_WRITE8_MEMBER(ay8910_portb_w);
 
-	void stellafr(machine_config &config);
-protected:
+	void stellafr_map(address_map &map);
 
+private:
 	// devices
 	required_device<cpu_device> m_maincpu;
 	required_device<mc68681_device> m_duart;
@@ -70,7 +73,7 @@ WRITE8_MEMBER(stellafr_state::ay8910_portb_w)
 
 
 
-static ADDRESS_MAP_START( stellafr_map, AS_PROGRAM, 16, stellafr_state )
+ADDRESS_MAP_START(stellafr_state::stellafr_map)
 	AM_RANGE(0x000000, 0x01ffff) AM_ROM
 	AM_RANGE(0x8000c0, 0x8000c1) AM_WRITE8(write_8000c1, 0x00ff)
 	AM_RANGE(0x800100, 0x800101) AM_READWRITE8(read_800101, write_800101, 0x00ff)

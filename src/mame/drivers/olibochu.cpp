@@ -105,6 +105,8 @@ public:
 	TIMER_DEVICE_CALLBACK_MEMBER(olibochu_scanline);
 	void draw_sprites( bitmap_ind16 &bitmap, const rectangle &cliprect );
 	void olibochu(machine_config &config);
+	void olibochu_map(address_map &map);
+	void olibochu_sound_map(address_map &map);
 };
 
 
@@ -268,7 +270,7 @@ WRITE8_MEMBER(olibochu_state::sound_command_w)
 }
 
 
-static ADDRESS_MAP_START( olibochu_map, AS_PROGRAM, 8, olibochu_state )
+ADDRESS_MAP_START(olibochu_state::olibochu_map)
 	AM_RANGE(0x0000, 0x7fff) AM_ROM
 	AM_RANGE(0x8000, 0x83ff) AM_RAM_WRITE(olibochu_videoram_w) AM_SHARE("videoram")
 	AM_RANGE(0x8400, 0x87ff) AM_RAM_WRITE(olibochu_colorram_w) AM_SHARE("colorram")
@@ -287,7 +289,7 @@ static ADDRESS_MAP_START( olibochu_map, AS_PROGRAM, 8, olibochu_state )
 	AM_RANGE(0xf440, 0xf47f) AM_RAM AM_SHARE("spriteram2")
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( olibochu_sound_map, AS_PROGRAM, 8, olibochu_state )
+ADDRESS_MAP_START(olibochu_state::olibochu_sound_map)
 	AM_RANGE(0x0000, 0x1fff) AM_ROM
 	AM_RANGE(0x6000, 0x63ff) AM_RAM
 	AM_RANGE(0x7000, 0x7000) AM_DEVREAD("soundlatch", generic_latch_8_device, read) /* likely ay8910 input port, not direct */

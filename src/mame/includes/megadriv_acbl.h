@@ -37,6 +37,10 @@ public:
 	void jzth(machine_config &config);
 	void puckpkmna(machine_config &config);
 
+	void jzth_map(address_map &map);
+	void md_bootleg_map(address_map &map);
+	void puckpkmn_map(address_map &map);
+	void puckpkmna_map(address_map &map);
 private:
 	// bootleg specific
 	int m_aladmdb_mcu_port;

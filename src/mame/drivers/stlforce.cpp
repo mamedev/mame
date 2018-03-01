@@ -92,7 +92,7 @@ WRITE8_MEMBER(stlforce_state::oki_bank_w)
 	}
 }
 
-static ADDRESS_MAP_START( stlforce_map, AS_PROGRAM, 16, stlforce_state )
+ADDRESS_MAP_START(stlforce_state::stlforce_map)
 	AM_RANGE(0x000000, 0x03ffff) AM_ROM
 	AM_RANGE(0x100000, 0x1007ff) AM_RAM_WRITE(bg_videoram_w) AM_SHARE("bg_videoram")
 	AM_RANGE(0x100800, 0x100fff) AM_RAM_WRITE(mlow_videoram_w) AM_SHARE("mlow_videoram")
@@ -115,7 +115,7 @@ static ADDRESS_MAP_START( stlforce_map, AS_PROGRAM, 16, stlforce_state )
 	AM_RANGE(0x410000, 0x410001) AM_DEVREADWRITE8("oki", okim6295_device, read, write, 0x00ff)
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( twinbrat_oki_map, 0, 8, stlforce_state )
+ADDRESS_MAP_START(stlforce_state::twinbrat_oki_map)
 	AM_RANGE(0x00000, 0x1ffff) AM_ROM
 	AM_RANGE(0x20000, 0x3ffff) AM_ROMBANK("okibank")
 ADDRESS_MAP_END
@@ -220,7 +220,8 @@ MACHINE_CONFIG_START(stlforce_state::stlforce)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 MACHINE_CONFIG_END
 
-MACHINE_CONFIG_DERIVED(stlforce_state::twinbrat, stlforce)
+MACHINE_CONFIG_START(stlforce_state::twinbrat)
+	stlforce(config);
 
 	/* basic machine hardware */
 	MCFG_CPU_MODIFY("maincpu")

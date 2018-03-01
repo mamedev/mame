@@ -95,6 +95,8 @@ public:
 	required_device<ticket_dispenser_device> m_hopper;
 	required_device<gfxdecode_device> m_gfxdecode;
 	void funtech(machine_config &config);
+	void funtech_io_map(address_map &map);
+	void funtech_map(address_map &map);
 };
 
 
@@ -240,7 +242,7 @@ INTERRUPT_GEN_MEMBER(fun_tech_corp_state::funtech_vblank_interrupt)
 
 
 
-static ADDRESS_MAP_START( funtech_map, AS_PROGRAM, 8, fun_tech_corp_state )
+ADDRESS_MAP_START(fun_tech_corp_state::funtech_map)
 	AM_RANGE(0x0000, 0xbfff) AM_ROM
 
 	AM_RANGE(0xc000, 0xc1ff) AM_RAM_DEVWRITE("palette", palette_device, write8) AM_SHARE("palette")
@@ -316,7 +318,7 @@ WRITE8_MEMBER(fun_tech_corp_state::funtech_vreg_w)
 
 
 
-static ADDRESS_MAP_START( funtech_io_map, AS_IO, 8, fun_tech_corp_state )
+ADDRESS_MAP_START(fun_tech_corp_state::funtech_io_map)
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	// lamps?
 	AM_RANGE(0x00, 0x00) AM_WRITE(funtech_lamps_w)

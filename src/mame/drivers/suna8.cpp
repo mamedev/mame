@@ -558,7 +558,7 @@ WRITE8_MEMBER(suna8_state::hardhead_flipscreen_w)
 	machine().bookkeeping().coin_lockout_w(1, data & 0x10);
 }
 
-static ADDRESS_MAP_START( hardhead_map, AS_PROGRAM, 8, suna8_state )
+ADDRESS_MAP_START(suna8_state::hardhead_map)
 	AM_RANGE(0x0000, 0x7fff) AM_ROM                             // ROM
 	AM_RANGE(0x8000, 0xbfff) AM_ROMBANK("bank1")                        // Banked ROM
 	AM_RANGE(0xc000, 0xd7ff) AM_RAM                             // RAM
@@ -574,7 +574,7 @@ static ADDRESS_MAP_START( hardhead_map, AS_PROGRAM, 8, suna8_state )
 	AM_RANGE(0xe000, 0xffff) AM_RAM_WRITE(suna8_spriteram_w) AM_SHARE("spriteram")  // Sprites
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( hardhead_io_map, AS_IO, 8, suna8_state )
+ADDRESS_MAP_START(suna8_state::hardhead_io_map)
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	AM_RANGE(0x00, 0x00) AM_READNOP // ? IRQ Ack
 ADDRESS_MAP_END
@@ -625,7 +625,7 @@ WRITE8_MEMBER(suna8_state::sranger_prot_w)
 	m_maincpu->space(AS_PROGRAM).write_byte(0xcd99,0xff);
 }
 
-static ADDRESS_MAP_START( rranger_map, AS_PROGRAM, 8, suna8_state )
+ADDRESS_MAP_START(suna8_state::rranger_map)
 	AM_RANGE(0x0000, 0x7fff) AM_ROM                             // ROM
 	AM_RANGE(0x8000, 0xbfff) AM_ROMBANK("bank1")                        // Banked ROM
 	AM_RANGE(0xc000, 0xc000) AM_DEVREAD("watchdog", watchdog_timer_device, reset_r) AM_DEVWRITE("soundlatch", generic_latch_8_device, write)  // To Sound CPU
@@ -643,7 +643,7 @@ static ADDRESS_MAP_START( rranger_map, AS_PROGRAM, 8, suna8_state )
 ADDRESS_MAP_END
 
 
-static ADDRESS_MAP_START( rranger_io_map, AS_IO, 8, suna8_state )
+ADDRESS_MAP_START(suna8_state::rranger_io_map)
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	AM_RANGE(0x00, 0x00) AM_READNOP // ? IRQ Ack
 ADDRESS_MAP_END
@@ -732,7 +732,7 @@ WRITE8_MEMBER(suna8_state::brickzn_palbank_w)
 	if (data & ~0x01)   logerror("CPU #0 - PC %04X: unknown palettebank bits: %02X\n",m_maincpu->pc(),data);
 }
 
-static ADDRESS_MAP_START( brickzn11_map, AS_PROGRAM, 8, suna8_state )
+ADDRESS_MAP_START(suna8_state::brickzn11_map)
 	AM_RANGE(0x0000, 0x7fff) AM_ROM                             // ROM
 	AM_RANGE(0x8000, 0xbfff) AM_ROMBANK("bank1")                // Banked ROM
 
@@ -860,7 +860,7 @@ WRITE8_MEMBER(suna8_state::brickzn_disab_palram_w)
 	m_paletteram_enab = 0;
 }
 
-static ADDRESS_MAP_START( brickzn_map, AS_PROGRAM, 8, suna8_state )
+ADDRESS_MAP_START(suna8_state::brickzn_map)
 	AM_RANGE(0x0000, 0x7fff) AM_ROM                             // ROM
 	AM_RANGE(0x8000, 0xbfff) AM_ROMBANK("bank1")                // Banked ROM
 
@@ -889,12 +889,12 @@ static ADDRESS_MAP_START( brickzn_map, AS_PROGRAM, 8, suna8_state )
 	AM_RANGE(0xe000, 0xffff) AM_READWRITE(suna8_banked_spriteram_r, suna8_banked_spriteram_w)   // Sprites (Banked)
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( decrypted_opcodes_map, AS_OPCODES, 8, suna8_state )
+ADDRESS_MAP_START(suna8_state::decrypted_opcodes_map)
 	AM_RANGE(0x0000, 0x7fff) AM_ROMBANK("bank0d")
 	AM_RANGE(0x8000, 0xbfff) AM_ROMBANK("bank1d")
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( brickzn_io_map, AS_IO, 8, suna8_state )
+ADDRESS_MAP_START(suna8_state::brickzn_io_map)
 	AM_RANGE(0x0000, 0x0000) AM_WRITE(brickzn_disab_palram_w    )   // Disable Palette RAM
 	AM_RANGE(0x00a1, 0x00a1) AM_WRITE(brickzn_enab_palram_w     )   // Enable Palette RAM
 ADDRESS_MAP_END
@@ -974,7 +974,7 @@ WRITE8_MEMBER(suna8_state::hardhea2_rambank_1_w)
 }
 
 
-static ADDRESS_MAP_START( hardhea2_map, AS_PROGRAM, 8, suna8_state )
+ADDRESS_MAP_START(suna8_state::hardhea2_map)
 	AM_RANGE(0x0000, 0x7fff) AM_ROM                                 // ROM
 	AM_RANGE(0x8000, 0xbfff) AM_ROMBANK("bank1")                            // Banked ROM
 	AM_RANGE(0xc000, 0xc000) AM_READ_PORT("P1")                     // P1 (Inputs)
@@ -1094,7 +1094,7 @@ WRITE8_MEMBER(suna8_state::starfigh_leds_w)
 	logerror("CPU #0 - PC %04X: rom bank = %02X\n",m_maincpu->pc(), m_rombank);
 }
 
-static ADDRESS_MAP_START( starfigh_map, AS_PROGRAM, 8, suna8_state )
+ADDRESS_MAP_START(suna8_state::starfigh_map)
 	AM_RANGE(0x0000, 0x7fff) AM_ROM                                     // ROM
 	AM_RANGE(0x8000, 0xbfff) AM_ROMBANK("bank1")                        // Banked ROM
 
@@ -1222,7 +1222,7 @@ READ8_MEMBER(suna8_state::sparkman_c0a3_r)
 	return (m_screen->frame_number() & 1) ? 0x80 : 0;
 }
 
-static ADDRESS_MAP_START( sparkman_map, AS_PROGRAM, 8, suna8_state )
+ADDRESS_MAP_START(suna8_state::sparkman_map)
 	AM_RANGE(0x0000, 0x7fff) AM_ROM                                     // ROM
 	AM_RANGE(0x8000, 0xbfff) AM_ROMBANK("bank1")                        // Banked ROM
 
@@ -1259,7 +1259,7 @@ ADDRESS_MAP_END
                                 Hard Head
 ***************************************************************************/
 
-static ADDRESS_MAP_START( hardhead_sound_map, AS_PROGRAM, 8, suna8_state )
+ADDRESS_MAP_START(suna8_state::hardhead_sound_map)
 	AM_RANGE(0x0000, 0x7fff) AM_ROM // ROM
 	AM_RANGE(0xa000, 0xa001) AM_DEVREADWRITE("ymsnd", ym3812_device, read, write)
 	AM_RANGE(0xa002, 0xa003) AM_DEVWRITE("aysnd", ay8910_device, address_data_w)
@@ -1270,7 +1270,7 @@ static ADDRESS_MAP_START( hardhead_sound_map, AS_PROGRAM, 8, suna8_state )
 ADDRESS_MAP_END
 
 
-static ADDRESS_MAP_START( hardhead_sound_io_map, AS_IO, 8, suna8_state )
+ADDRESS_MAP_START(suna8_state::hardhead_sound_io_map)
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	AM_RANGE(0x01, 0x01) AM_READNOP // ? IRQ Ack
 ADDRESS_MAP_END
@@ -1280,7 +1280,7 @@ ADDRESS_MAP_END
                                 Rough Ranger
 ***************************************************************************/
 
-static ADDRESS_MAP_START( rranger_sound_map, AS_PROGRAM, 8, suna8_state )
+ADDRESS_MAP_START(suna8_state::rranger_sound_map)
 	AM_RANGE(0x0000, 0x7fff) AM_ROM // ROM
 	AM_RANGE(0xa000, 0xa001) AM_DEVWRITE("ym1", ym2203_device, write)   // Samples + Music
 	AM_RANGE(0xa002, 0xa003) AM_DEVWRITE("ym2", ym2203_device, write)   // Music + FX
@@ -1294,7 +1294,7 @@ ADDRESS_MAP_END
                                 Brick Zone
 ***************************************************************************/
 
-static ADDRESS_MAP_START( brickzn_sound_map, AS_PROGRAM, 8, suna8_state )
+ADDRESS_MAP_START(suna8_state::brickzn_sound_map)
 	AM_RANGE(0x0000, 0xbfff) AM_ROM // ROM
 	AM_RANGE(0xc000, 0xc001) AM_DEVWRITE("ymsnd", ym3812_device, write)
 	AM_RANGE(0xc002, 0xc003) AM_DEVWRITE("aysnd", ay8910_device, address_data_w)
@@ -1306,12 +1306,12 @@ ADDRESS_MAP_END
 
 /* PCM Z80, 4 DACs (4 bits per sample), NO RAM !! */
 
-static ADDRESS_MAP_START( brickzn_pcm_map, AS_PROGRAM, 8, suna8_state )
+ADDRESS_MAP_START(suna8_state::brickzn_pcm_map)
 	AM_RANGE(0x0000, 0xffff) AM_ROM // ROM
 ADDRESS_MAP_END
 
 
-static ADDRESS_MAP_START( brickzn_pcm_io_map, AS_IO, 8, suna8_state )
+ADDRESS_MAP_START(suna8_state::brickzn_pcm_io_map)
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	AM_RANGE(0x00, 0x00) AM_DEVREAD("soundlatch2", generic_latch_8_device, read)   // From Sound CPU
 	AM_RANGE(0x00, 0x00) AM_DEVWRITE("ldac", dac_byte_interface, write)
@@ -1873,7 +1873,7 @@ MACHINE_CONFIG_START(suna8_state::hardhead)
 	MCFG_CPU_ADD("maincpu", Z80, SUNA8_MASTER_CLOCK / 4)    /* verified on pcb */
 	MCFG_CPU_PROGRAM_MAP(hardhead_map)
 	MCFG_CPU_IO_MAP(hardhead_io_map)
-	MCFG_CPU_DECRYPTED_OPCODES_MAP(decrypted_opcodes_map)
+	MCFG_CPU_OPCODES_MAP(decrypted_opcodes_map)
 	MCFG_CPU_VBLANK_INT_DRIVER("screen", suna8_state,  irq0_line_hold)      /* No NMI */
 
 	MCFG_CPU_ADD("audiocpu", Z80, SUNA8_MASTER_CLOCK / 8)   /* verified on pcb */
@@ -1931,7 +1931,7 @@ MACHINE_CONFIG_START(suna8_state::rranger)
 	MCFG_CPU_ADD("maincpu", Z80, SUNA8_MASTER_CLOCK / 4)                    /* ? */
 	MCFG_CPU_PROGRAM_MAP(rranger_map)
 	MCFG_CPU_IO_MAP(rranger_io_map)
-//  MCFG_CPU_DECRYPTED_OPCODES_MAP(decrypted_opcodes_map)
+//  MCFG_CPU_OPCODES_MAP(decrypted_opcodes_map)
 	MCFG_CPU_VBLANK_INT_DRIVER("screen", suna8_state,  irq0_line_hold)  /* IRQ & NMI ! */
 
 	MCFG_CPU_ADD("audiocpu", Z80, SUNA8_MASTER_CLOCK / 8)   /* verified on pcb */
@@ -2049,11 +2049,12 @@ MACHINE_CONFIG_START(suna8_state::brickzn11)
 	MCFG_SOUND_ROUTE_EX(0, "rdac2", 1.0, DAC_VREF_POS_INPUT) MCFG_SOUND_ROUTE_EX(0, "rdac2", -1.0, DAC_VREF_NEG_INPUT)
 MACHINE_CONFIG_END
 
-MACHINE_CONFIG_DERIVED(suna8_state::brickzn, brickzn11)
+MACHINE_CONFIG_START(suna8_state::brickzn)
+	brickzn11(config);
 	MCFG_CPU_MODIFY("maincpu")
 	MCFG_CPU_PROGRAM_MAP(brickzn_map)
 	MCFG_CPU_IO_MAP(brickzn_io_map)
-	MCFG_CPU_DECRYPTED_OPCODES_MAP(decrypted_opcodes_map)
+	MCFG_CPU_OPCODES_MAP(decrypted_opcodes_map)
 MACHINE_CONFIG_END
 
 
@@ -2079,12 +2080,13 @@ MACHINE_RESET_MEMBER(suna8_state,hardhea2)
 	hardhea2_rambank_0_w(space,0,0);
 }
 
-MACHINE_CONFIG_DERIVED(suna8_state::hardhea2, brickzn)
+MACHINE_CONFIG_START(suna8_state::hardhea2)
+	brickzn(config);
 	MCFG_DEVICE_REMOVE("maincpu")
 
 	MCFG_CPU_ADD("maincpu", Z80, SUNA8_MASTER_CLOCK / 4)        /* SUNA T568009 */
 	MCFG_CPU_PROGRAM_MAP(hardhea2_map)
-	MCFG_CPU_DECRYPTED_OPCODES_MAP(decrypted_opcodes_map)
+	MCFG_CPU_OPCODES_MAP(decrypted_opcodes_map)
 	MCFG_TIMER_DRIVER_ADD_SCANLINE("scantimer", suna8_state, hardhea2_interrupt, "screen", 0, 1)
 
 	MCFG_MACHINE_RESET_OVERRIDE(suna8_state,hardhea2)
@@ -2094,7 +2096,8 @@ MACHINE_CONFIG_DERIVED(suna8_state::hardhea2, brickzn)
 	MCFG_PALETTE_ENDIANNESS(ENDIANNESS_BIG)
 MACHINE_CONFIG_END
 
-MACHINE_CONFIG_DERIVED(suna8_state::hardhea2b, hardhea2)
+MACHINE_CONFIG_START(suna8_state::hardhea2b)
+	hardhea2(config);
 	MCFG_DEVICE_REMOVE("maincpu")
 
 	MCFG_CPU_ADD("maincpu", Z80, SUNA8_MASTER_CLOCK / 4)        //bootleg clock not verified (?)
@@ -2111,7 +2114,7 @@ MACHINE_CONFIG_START(suna8_state::starfigh)
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", Z80, SUNA8_MASTER_CLOCK / 4)                    /* ? */
 	MCFG_CPU_PROGRAM_MAP(starfigh_map)
-	MCFG_CPU_DECRYPTED_OPCODES_MAP(decrypted_opcodes_map)
+	MCFG_CPU_OPCODES_MAP(decrypted_opcodes_map)
 	MCFG_TIMER_DRIVER_ADD_SCANLINE("scantimer", suna8_state, hardhea2_interrupt, "screen", 0, 1)
 
 	/* The sound section is identical to that of hardhead */
@@ -2166,7 +2169,7 @@ MACHINE_CONFIG_START(suna8_state::sparkman)
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", Z80, SUNA8_MASTER_CLOCK / 4)                    /* ? */
 	MCFG_CPU_PROGRAM_MAP(sparkman_map)
-	MCFG_CPU_DECRYPTED_OPCODES_MAP(decrypted_opcodes_map)
+	MCFG_CPU_OPCODES_MAP(decrypted_opcodes_map)
 	MCFG_TIMER_DRIVER_ADD_SCANLINE("scantimer", suna8_state, hardhea2_interrupt, "screen", 0, 1)
 
 	MCFG_CPU_ADD("audiocpu", Z80, SUNA8_MASTER_CLOCK / 4)               /* ? */

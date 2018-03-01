@@ -215,7 +215,7 @@ List of default vregs (title screen):
 // device type definition
 DEFINE_DEVICE_TYPE(SEIBU_CRTC, seibu_crtc_device, "seibu_crtc", "Seibu CRT Controller")
 
-static ADDRESS_MAP_START( seibu_crtc_vregs, 0, 16, seibu_crtc_device )
+ADDRESS_MAP_START(seibu_crtc_device::seibu_crtc_vregs)
 	AM_RANGE(0x0000, 0x004f) AM_RAM // debug
 	AM_RANGE(0x0014, 0x0015) AM_WRITE(decrypt_key_w)
 	AM_RANGE(0x001a, 0x001b) AM_READWRITE(reg_1a_r, reg_1a_w)
@@ -278,7 +278,7 @@ seibu_crtc_device::seibu_crtc_device(const machine_config &mconfig, const char *
 		m_layer_scroll_cb(*this),
 		m_reg_1a_cb(*this),
 		m_layer_scroll_base_cb(*this),
-		m_space_config("vregs", ENDIANNESS_LITTLE, 16, 7, 0, nullptr, *ADDRESS_MAP_NAME(seibu_crtc_vregs))
+		m_space_config("vregs", ENDIANNESS_LITTLE, 16, 7, 0, address_map_constructor(), address_map_constructor(FUNC(seibu_crtc_device::seibu_crtc_vregs), this))
 {
 }
 

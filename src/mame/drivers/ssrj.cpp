@@ -62,7 +62,7 @@ READ8_MEMBER(ssrj_state::wheel_r)
 	return retval;
 }
 
-static ADDRESS_MAP_START( ssrj_map, AS_PROGRAM, 8, ssrj_state )
+ADDRESS_MAP_START(ssrj_state::ssrj_map)
 	AM_RANGE(0x0000, 0x7fff) AM_ROM
 	AM_RANGE(0xc000, 0xc7ff) AM_RAM_WRITE(vram1_w) AM_SHARE("vram1")
 	AM_RANGE(0xc800, 0xcfff) AM_RAM_WRITE(vram2_w) AM_SHARE("vram2")

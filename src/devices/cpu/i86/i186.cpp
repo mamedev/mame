@@ -164,13 +164,6 @@ device_memory_interface::space_config_vector i80186_cpu_device::memory_space_con
 		};
 }
 
-uint8_t i80186_cpu_device::fetch_op()
-{
-	uint8_t data = m_direct_opcodes->read_byte(update_pc(), m_fetch_xor);
-	m_ip++;
-	return data;
-}
-
 uint8_t i80186_cpu_device::fetch()
 {
 	uint8_t data = m_direct_opcodes->read_byte(update_pc(), m_fetch_xor);
@@ -570,6 +563,33 @@ void i80186_cpu_device::device_start()
 	state_add( STATE_GENPCBASE, "CURPC", m_pc ).callimport().formatstr("%05X").noshow();
 	state_add( I8086_HALT, "HALT", m_halt ).mask(1);
 
+	// Most of these mnemonics are not official and only chosen as convenient shorthand.
+	state_add( I80186_RELOC, "RELOC", m_reloc ).formatstr("%04X");
+	state_add( I80186_UMCS, "UMCS", m_mem.upper ).formatstr("%04X");
+	state_add( I80186_LMCS, "LMCS", m_mem.lower ).formatstr("%04X");
+	state_add( I80186_PACS, "PACS", m_mem.peripheral ).formatstr("%04X");
+	state_add( I80186_MMCS, "MMCS", m_mem.middle ).formatstr("%04X");
+	state_add( I80186_MPCS, "MPCS", m_mem.middle_size ).formatstr("%04X");
+	state_add( I80186_DMA_SP + 0, "DMA0_SP", m_dma[0].source ).formatstr("%05X").mask(0xfffff);
+	state_add( I80186_DMA_DP + 0, "DMA0_DP", m_dma[0].dest ).formatstr("%05X").mask(0xfffff);
+	state_add( I80186_DMA_TC + 0, "DMA0_TC", m_dma[0].count ).formatstr("%04X");
+	state_add( I80186_DMA_CR + 0, "DMA0_CR", m_dma[0].control ).formatstr("%04X");
+	state_add( I80186_DMA_SP + 1, "DMA1_SP", m_dma[1].source ).formatstr("%05X").mask(0xfffff);
+	state_add( I80186_DMA_DP + 1, "DMA1_DP", m_dma[1].dest ).formatstr("%05X").mask(0xfffff);
+	state_add( I80186_DMA_TC + 1, "DMA1_TC", m_dma[1].count ).formatstr("%04X");
+	state_add( I80186_DMA_CR + 1, "DMA1_CR", m_dma[1].control ).formatstr("%04X");
+	state_add( I80186_T_COUNT + 0, "T0_COUNT", m_timer[0].count ).formatstr("%04X");
+	state_add( I80186_T_MAX_A + 0, "T0_MAX_A", m_timer[0].maxA ).formatstr("%04X");
+	state_add( I80186_T_MAX_B + 0, "T0_MAX_B", m_timer[0].maxB ).formatstr("%04X");
+	state_add( I80186_T_CONTROL + 0, "T0_CONTROL", m_timer[0].control ).formatstr("%04X");
+	state_add( I80186_T_COUNT + 1, "T1_COUNT", m_timer[1].count ).formatstr("%04X");
+	state_add( I80186_T_MAX_A + 1, "T1_MAX_A", m_timer[1].maxA ).formatstr("%04X");
+	state_add( I80186_T_MAX_B + 1, "T1_MAX_B", m_timer[1].maxB ).formatstr("%04X");
+	state_add( I80186_T_CONTROL + 1, "T1_CONTROL", m_timer[1].control ).formatstr("%04X");
+	state_add( I80186_T_COUNT + 2, "T2_COUNT", m_timer[2].count ).formatstr("%04X");
+	state_add( I80186_T_MAX_A + 2, "T2_MAX", m_timer[2].maxA ).formatstr("%04X");
+	state_add( I80186_T_CONTROL + 2, "T2_CONTROL", m_timer[2].control ).formatstr("%04X");
+
 	// register for savestates
 	save_item(NAME(m_timer[0].control));
 	save_item(NAME(m_timer[0].maxA));
@@ -647,7 +667,9 @@ void i80186_cpu_device::device_reset()
 	m_intr.status           = 0x0000;
 	m_intr.poll_status      = 0x0000;
 	m_intr.ext_state        = 0x00;
+
 	m_reloc = 0x20ff;
+	m_mem.upper = 0xfffb;
 
 	for (auto & elem : m_dma)
 	{

@@ -7,8 +7,11 @@
 ***************************************************************************/
 
 #include "machine/bankdev.h"
+#include "machine/gen_latch.h"
+#include "machine/rstbuf.h"
 #include "sound/msm5205.h"
 #include "sound/okim6295.h"
+#include "machine/74259.h"
 #include "screen.h"
 
 class dynax_state : public driver_device
@@ -23,6 +26,10 @@ public:
 		, m_screen(*this, "screen")
 		, m_palette(*this, "palette")
 		, m_bankdev(*this, "bankdev")
+		, m_mainlatch(*this, "mainlatch")
+		, m_mainirq(*this, "mainirq")
+		, m_soundirq(*this, "soundirq")
+		, m_soundlatch(*this, "soundlatch")
 		, m_gfx_region1(*this, "gfx1")
 		, m_gfx_region2(*this, "gfx2")
 		, m_gfx_region3(*this, "gfx3")
@@ -31,7 +38,6 @@ public:
 		, m_gfx_region6(*this, "gfx6")
 		, m_gfx_region7(*this, "gfx7")
 		, m_gfx_region8(*this, "gfx8")
-
 	{
 	}
 
@@ -43,6 +49,10 @@ public:
 	optional_device<screen_device> m_screen;
 	required_device<palette_device> m_palette;
 	optional_device<address_map_bank_device> m_bankdev;
+	optional_device<ls259_device> m_mainlatch;
+	optional_device<rst_pos_buffer_device> m_mainirq;
+	optional_device<rst_pos_buffer_device> m_soundirq;
+	optional_device<generic_latch_8_device> m_soundlatch;
 	optional_region_ptr<uint8_t> m_gfx_region1;
 	optional_region_ptr<uint8_t> m_gfx_region2;
 	optional_region_ptr<uint8_t> m_gfx_region3;
@@ -60,14 +70,10 @@ public:
 	/* irq */
 	typedef void (dynax_state::*irq_func)();    // some games trigger IRQ at blitter end, some don't
 	irq_func m_update_irq_func;
-	bool m_sound_irq;
-	bool m_vblank_irq;
 	bool m_blitter_irq;
 	bool m_blitter_irq_mask;
 	bool m_blitter2_irq;
 	bool m_blitter2_irq_mask;
-	bool m_soundlatch_irq;
-	bool m_sound_vblank_irq;
 
 	/* blitters */
 	int m_blit_scroll_x;
@@ -121,10 +127,6 @@ public:
 	int m_resetkludge;
 	int m_toggle;
 	int m_toggle_cpu1;
-	int m_yarunara_clk_toggle;
-	uint8_t m_soundlatch_ack;
-	uint8_t m_soundlatch_full;
-	uint8_t m_latch;
 	int m_rombank;
 	uint8_t m_tenkai_p5_val;
 	int m_tenkai_6c;
@@ -254,12 +256,9 @@ public:
 	INTERRUPT_GEN_MEMBER(sprtmtch_vblank_interrupt);
 	INTERRUPT_GEN_MEMBER(jantouki_vblank_interrupt);
 	INTERRUPT_GEN_MEMBER(jantouki_sound_vblank_interrupt);
-	INTERRUPT_GEN_MEMBER(yarunara_clock_interrupt);
 
 	void tenkai_update_rombank();
 
-	DECLARE_WRITE_LINE_MEMBER(sprtmtch_sound_callback);
-	DECLARE_WRITE_LINE_MEMBER(jantouki_sound_callback);
 	DECLARE_WRITE_LINE_MEMBER(adpcm_int);
 	DECLARE_WRITE_LINE_MEMBER(adpcm_int_cpu1);
 
@@ -302,7 +301,6 @@ public:
 	void jantouki_update_irq();
 	void mjelctrn_update_irq();
 	void tenkai_update_irq();
-	void jantouki_sound_update_irq();
 	void tenkai_show_6c();
 	void mjfriday(machine_config &config);
 	void yarunara(machine_config &config);
@@ -325,4 +323,39 @@ public:
 	void mjangels(machine_config &config);
 	void hanamai(machine_config &config);
 	void sprtmtch(machine_config &config);
+	void cdracula_io_map(address_map &map);
+	void cdracula_mem_map(address_map &map);
+	void gekisha_banked_map(address_map &map);
+	void gekisha_map(address_map &map);
+	void hanamai_io_map(address_map &map);
+	void hjingi_banked_map(address_map &map);
+	void hjingi_io_map(address_map &map);
+	void hjingi_mem_map(address_map &map);
+	void hnoridur_banked_map(address_map &map);
+	void hnoridur_io_map(address_map &map);
+	void hnoridur_mem_map(address_map &map);
+	void htengoku_banked_map(address_map &map);
+	void jantouki_io_map(address_map &map);
+	void jantouki_mem_map(address_map &map);
+	void jantouki_sound_io_map(address_map &map);
+	void jantouki_sound_mem_map(address_map &map);
+	void mcnpshnt_io_map(address_map &map);
+	void mcnpshnt_mem_map(address_map &map);
+	void mjangels_banked_map(address_map &map);
+	void mjdialq2_mem_map(address_map &map);
+	void mjelctrn_banked_map(address_map &map);
+	void mjelctrn_io_map(address_map &map);
+	void mjembase_io_map(address_map &map);
+	void mjfriday_io_map(address_map &map);
+	void nanajign_banked_map(address_map &map);
+	void nanajign_io_map(address_map &map);
+	void nanajign_mem_map(address_map &map);
+	void quiztvqq_mem_map(address_map &map);
+	void sprtmtch_io_map(address_map &map);
+	void sprtmtch_mem_map(address_map &map);
+	void tenkai_banked_map(address_map &map);
+	void tenkai_map(address_map &map);
+	void yarunara_banked_map(address_map &map);
+	void yarunara_io_map(address_map &map);
+	void yarunara_mem_map(address_map &map);
 };

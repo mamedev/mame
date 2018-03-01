@@ -105,13 +105,13 @@ Example:
 
 **-listfull** / **-ll** [*<pattern>*]
 
-	Displays a list of system driver names and descriptions. By default all systems are listed; however, you can limit this list by specifying a *pattern* after the **-listfull** command.
+	Displays a list of system driver names and descriptions. By default all systems and devices are listed; however, you can limit this list by specifying a *pattern* after the **-listfull** command.
 
 .. _mame-commandline-listsource:
 
 **-listsource** / **-ls** [<*pattern>*]
 
-	Displays a list of drivers and the names of the source files their system drivers live in. Useful for finding which driver a system runs on in order to fix bugs. By default all systems are listed; however, you can limit this list by specifying a *pattern* after the **-listsource** command.
+	Displays a list of drivers and the names of the source files their system drivers are defined in. Useful for finding which driver a system runs on in order to fix bugs. By default all systems are listed; however, you can limit this list by specifying a *pattern* after the **-listsource** command.
 
 .. _mame-commandline-listclones:
 

@@ -248,6 +248,8 @@ public:
 	uint8_t m_keylatch;
 	void studio2_cartslot(machine_config &config);
 	void studio2(machine_config &config);
+	void studio2_io_map(address_map &map);
+	void studio2_map(address_map &map);
 };
 
 class visicom_state : public studio2_state
@@ -266,6 +268,8 @@ public:
 
 	DECLARE_WRITE8_MEMBER( dma_w );
 	void visicom(machine_config &config);
+	void visicom_io_map(address_map &map);
+	void visicom_map(address_map &map);
 };
 
 class mpt02_state : public studio2_state
@@ -292,6 +296,8 @@ public:
 	required_shared_ptr<uint8_t> m_color_ram;
 	uint8_t m_color;
 	void mpt02(machine_config &config);
+	void mpt02_io_map(address_map &map);
+	void mpt02_map(address_map &map);
 };
 
 
@@ -328,19 +334,19 @@ WRITE8_MEMBER( studio2_state::dispon_w )
 
 /* Memory Maps */
 
-static ADDRESS_MAP_START( studio2_map, AS_PROGRAM, 8, studio2_state )
+ADDRESS_MAP_START(studio2_state::studio2_map)
 	ADDRESS_MAP_UNMAP_HIGH
 	AM_RANGE(0x0000, 0x07ff) AM_ROM
 	AM_RANGE(0x0800, 0x09ff) AM_MIRROR(0xf400) AM_RAM
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( studio2_io_map, AS_IO, 8, studio2_state )
+ADDRESS_MAP_START(studio2_state::studio2_io_map)
 	ADDRESS_MAP_UNMAP_HIGH
 	AM_RANGE(0x01, 0x01) AM_READ(dispon_r)
 	AM_RANGE(0x02, 0x02) AM_WRITE(keylatch_w)
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( visicom_map, AS_PROGRAM, 8, visicom_state )
+ADDRESS_MAP_START(visicom_state::visicom_map)
 	AM_RANGE(0x0000, 0x07ff) AM_ROM
 	AM_RANGE(0x0800, 0x0fff) AM_DEVREAD("cartslot", generic_slot_device, read_rom)
 	AM_RANGE(0x1000, 0x10ff) AM_RAM
@@ -348,19 +354,19 @@ static ADDRESS_MAP_START( visicom_map, AS_PROGRAM, 8, visicom_state )
 	AM_RANGE(0x1300, 0x13ff) AM_RAM AM_SHARE("color1_ram")
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( visicom_io_map, AS_IO, 8, visicom_state )
+ADDRESS_MAP_START(visicom_state::visicom_io_map)
 	AM_RANGE(0x01, 0x01) AM_WRITE(dispon_w)
 	AM_RANGE(0x02, 0x02) AM_WRITE(keylatch_w)
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( mpt02_map, AS_PROGRAM, 8, mpt02_state )
+ADDRESS_MAP_START(mpt02_state::mpt02_map)
 	AM_RANGE(0x0000, 0x07ff) AM_ROM
 	AM_RANGE(0x0800, 0x09ff) AM_RAM
 	AM_RANGE(0x0b00, 0x0b3f) AM_RAM AM_SHARE("color_ram")
 	AM_RANGE(0x0c00, 0x0fff) AM_ROM
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( mpt02_io_map, AS_IO, 8, mpt02_state )
+ADDRESS_MAP_START(mpt02_state::mpt02_io_map)
 	AM_RANGE(0x01, 0x01) AM_DEVREADWRITE(CDP1864_TAG, cdp1864_device, dispon_r, step_bgcolor_w)
 	AM_RANGE(0x02, 0x02) AM_WRITE(keylatch_w)
 	AM_RANGE(0x04, 0x04) AM_DEVREADWRITE(CDP1864_TAG, cdp1864_device, dispoff_r, tone_latch_w)
@@ -650,7 +656,7 @@ MACHINE_CONFIG_START(studio2_state::studio2)
 	MCFG_SOUND_ADD("beeper", BEEP, 300)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.00)
 
-	MCFG_FRAGMENT_ADD( studio2_cartslot )
+	studio2_cartslot(config);
 MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(visicom_state::visicom)
@@ -711,7 +717,7 @@ MACHINE_CONFIG_START(mpt02_state::mpt02)
 
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
 
-	MCFG_FRAGMENT_ADD( studio2_cartslot )
+	studio2_cartslot(config);
 MACHINE_CONFIG_END
 
 /* ROMs */

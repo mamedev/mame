@@ -157,7 +157,7 @@ WRITE16_MEMBER(esd16_state::esd_eeprom_w)
 	AM_RANGE(_BASE + 0x20000, _BASE + 0x23fff) AM_WRITE(esd16_vram_1_w) AM_SHARE("vram_1") AM_MIRROR(0x4000)
 /*** Memory Maps ***/
 
-static ADDRESS_MAP_START( multchmp_map, AS_PROGRAM, 16, esd16_state )
+ADDRESS_MAP_START(esd16_state::multchmp_map)
 	AM_RANGE(0x000000, 0x07ffff) AM_ROM
 	AM_RANGE(0x100000, 0x10ffff) AM_RAM
 
@@ -170,7 +170,7 @@ static ADDRESS_MAP_START( multchmp_map, AS_PROGRAM, 16, esd16_state )
 	AM_RANGE(0x700008, 0x70000b) AM_READNOP // unused protection?
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( jumppop_map, AS_PROGRAM, 16, esd16_state )
+ADDRESS_MAP_START(esd16_state::jumppop_map)
 	AM_RANGE(0x000000, 0x07ffff) AM_ROM
 	AM_RANGE(0x120000, 0x123fff) AM_RAM
 	AM_RANGE(0x1a0000, 0x1a7fff) AM_RAM
@@ -184,7 +184,7 @@ static ADDRESS_MAP_START( jumppop_map, AS_PROGRAM, 16, esd16_state )
 	ESD16_VID_ATTR_AREA( 0x380000 )
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( hedpanic_map, AS_PROGRAM, 16, esd16_state )
+ADDRESS_MAP_START(esd16_state::hedpanic_map)
 	AM_RANGE(0x000000, 0x07ffff) AM_ROM
 	AM_RANGE(0x100000, 0x10ffff) AM_RAM
 
@@ -199,7 +199,7 @@ ADDRESS_MAP_END
 
 /* Multi Champ Deluxe, like Head Panic but different addresses */
 
-static ADDRESS_MAP_START( mchampdx_map, AS_PROGRAM, 16, esd16_state )
+ADDRESS_MAP_START(esd16_state::mchampdx_map)
 	AM_RANGE(0x000000, 0x07ffff) AM_ROM
 	AM_RANGE(0x200000, 0x20ffff) AM_RAM
 
@@ -214,7 +214,7 @@ ADDRESS_MAP_END
 
 /* Tang Tang & Deluxe 5 - like the others but again with different addresses */
 
-static ADDRESS_MAP_START( tangtang_map, AS_PROGRAM, 16, esd16_state )
+ADDRESS_MAP_START(esd16_state::tangtang_map)
 	AM_RANGE(0x000000, 0x07ffff) AM_ROM
 	AM_RANGE(0x700000, 0x70ffff) AM_RAM
 
@@ -241,7 +241,7 @@ WRITE8_MEMBER(esd16_state::esd16_sound_rombank_w)
 	membank("bank1")->set_entry(bank);
 }
 
-static ADDRESS_MAP_START( multchmp_sound_map, AS_PROGRAM, 8, esd16_state )
+ADDRESS_MAP_START(esd16_state::multchmp_sound_map)
 	AM_RANGE(0x0000, 0x7fff) AM_ROM                         // ROM
 	AM_RANGE(0x8000, 0xbfff) AM_ROMBANK("bank1")                    // Banked ROM
 	AM_RANGE(0xf800, 0xffff) AM_RAM                         // RAM
@@ -254,7 +254,7 @@ READ8_MEMBER(esd16_state::esd16_sound_command_r)
 	return m_soundlatch->read(space, 0);
 }
 
-static ADDRESS_MAP_START( multchmp_sound_io_map, AS_IO, 8, esd16_state )
+ADDRESS_MAP_START(esd16_state::multchmp_sound_io_map)
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	AM_RANGE(0x00, 0x01) AM_DEVWRITE("ymsnd", ym3812_device, write)          // YM3812
 	AM_RANGE(0x02, 0x02) AM_DEVREADWRITE("oki", okim6295_device, read, write)   // M6295
@@ -652,7 +652,8 @@ MACHINE_CONFIG_START(esd16_state::esd16)
 MACHINE_CONFIG_END
 
 
-MACHINE_CONFIG_DERIVED(esd16_state::jumppop, esd16)
+MACHINE_CONFIG_START(esd16_state::jumppop)
+	esd16(config);
 
 	/* basic machine hardware */
 
@@ -673,7 +674,8 @@ MACHINE_CONFIG_END
 
 /* The ESD 05-28-99 PCB adds an EEPROM */
 
-MACHINE_CONFIG_DERIVED(esd16_state::hedpanio, esd16)
+MACHINE_CONFIG_START(esd16_state::hedpanio)
+	esd16(config);
 	/* basic machine hardware */
 	MCFG_CPU_MODIFY("maincpu")
 	MCFG_CPU_PROGRAM_MAP(hedpanic_map)
@@ -683,19 +685,22 @@ MACHINE_CONFIG_END
 
 /* The ESD 08-26-1999 PCBs take that further and modify the sprite offsets */
 
-MACHINE_CONFIG_DERIVED(esd16_state::hedpanic, hedpanio)
+MACHINE_CONFIG_START(esd16_state::hedpanic)
+	hedpanio(config);
 	MCFG_DEVICE_MODIFY("spritegen")
 	MCFG_DECO_SPRITE_OFFSETS(-0x18, -0x100)
 MACHINE_CONFIG_END
 
 /* ESD 08-26-1999 PCBs with different memory maps */
 
-MACHINE_CONFIG_DERIVED(esd16_state::mchampdx, hedpanic)
+MACHINE_CONFIG_START(esd16_state::mchampdx)
+	hedpanic(config);
 	MCFG_CPU_MODIFY("maincpu")
 	MCFG_CPU_PROGRAM_MAP(mchampdx_map)
 MACHINE_CONFIG_END
 
-MACHINE_CONFIG_DERIVED(esd16_state::tangtang, hedpanic)
+MACHINE_CONFIG_START(esd16_state::tangtang)
+	hedpanic(config);
 	MCFG_CPU_MODIFY("maincpu")
 	MCFG_CPU_PROGRAM_MAP(tangtang_map)
 MACHINE_CONFIG_END

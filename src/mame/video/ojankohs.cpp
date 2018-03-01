@@ -70,8 +70,7 @@ WRITE8_MEMBER(ojankohs_state::ccasino_palette_w)
 {
 	int r, g, b;
 
-	/* get top 8 bits of the I/O port address */
-	offset = (offset << 8) | (m_maincpu->state_int(Z80_BC) >> 8);
+	offset = bitswap<11>(offset, 2, 1, 0, 15, 14, 13, 12, 11, 10, 9, 8);
 
 	m_paletteram[offset] = data;
 
@@ -268,6 +267,12 @@ VIDEO_START_MEMBER(ojankohs_state,ojankoy)
 	m_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(ojankohs_state::ojankoy_get_tile_info),this), TILEMAP_SCAN_ROWS,  8, 4, 64, 64);
 //  m_videoram = std::make_unique<uint8_t[]>(0x2000);
 //  m_colorram = std::make_unique<uint8_t[]>(0x1000);
+}
+
+VIDEO_START_MEMBER(ojankohs_state,ccasino)
+{
+	VIDEO_START_CALL_MEMBER(ojankoy);
+	m_paletteram.allocate(0x800);
 }
 
 VIDEO_START_MEMBER(ojankohs_state,ojankoc)

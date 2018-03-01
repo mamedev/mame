@@ -116,6 +116,10 @@ public:
 	void fastinvaders(machine_config &config);
 	void fastinvaders_8275(machine_config &config);
 	void fastinvaders_6845(machine_config &config);
+	void fastinvaders_6845_io(address_map &map);
+	void fastinvaders_8275_io(address_map &map);
+	void fastinvaders_io_base(address_map &map);
+	void fastinvaders_map(address_map &map);
 };
 
 
@@ -504,17 +508,17 @@ logerror("dma write\n");
 
 ***************************************************************************/
 
-static ADDRESS_MAP_START( fastinvaders_map, AS_PROGRAM, 8, fastinvaders_state )
+ADDRESS_MAP_START(fastinvaders_state::fastinvaders_map)
 	//AM_RANGE(0x0000, 0x1fff) AM_ROM   AM_MIRROR(0x8000)
 	AM_RANGE(0x0000, 0x27ff) AM_ROM AM_MIRROR(0x8000)
 	AM_RANGE(0x2800, 0x2fff) AM_RAM AM_MIRROR(0x8000) AM_SHARE("videoram")
 	AM_RANGE(0x3000, 0x33ff) AM_RAM AM_MIRROR(0x8000)
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( fastinvaders_io_base, AS_IO, 8, fastinvaders_state )
+ADDRESS_MAP_START(fastinvaders_state::fastinvaders_io_base)
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( fastinvaders_6845_io, AS_IO, 8, fastinvaders_state )
+ADDRESS_MAP_START(fastinvaders_state::fastinvaders_6845_io)
 	AM_IMPORT_FROM(fastinvaders_io_base)
 
 	AM_RANGE(0x10, 0x1f) AM_DEVREADWRITE("dma8257", i8257_device, read, write)
@@ -536,7 +540,7 @@ static ADDRESS_MAP_START( fastinvaders_6845_io, AS_IO, 8, fastinvaders_state )
 ADDRESS_MAP_END
 
 
-static ADDRESS_MAP_START( fastinvaders_8275_io, AS_IO, 8, fastinvaders_state )
+ADDRESS_MAP_START(fastinvaders_state::fastinvaders_8275_io)
 	AM_IMPORT_FROM(fastinvaders_io_base)
 
 	AM_RANGE( 0x20, 0x21 ) AM_DEVREADWRITE("8275", i8275_device, read, write)
@@ -674,7 +678,8 @@ MCFG_TIMER_DRIVER_ADD_SCANLINE("scantimer", fastinvaders_state, scanline_timer, 
 	// TODO
 MACHINE_CONFIG_END
 
-MACHINE_CONFIG_DERIVED(fastinvaders_state::fastinvaders_8275, fastinvaders)
+MACHINE_CONFIG_START(fastinvaders_state::fastinvaders_8275)
+	fastinvaders(config);
 	MCFG_CPU_MODIFY("maincpu" ) // guess
 	MCFG_CPU_IO_MAP(fastinvaders_8275_io)
 
@@ -684,7 +689,8 @@ MACHINE_CONFIG_DERIVED(fastinvaders_state::fastinvaders_8275, fastinvaders)
 //  MCFG_I8275_DRQ_CALLBACK(DEVWRITELINE("dma8257",i8257_device, dreq2_w))
 MACHINE_CONFIG_END
 
-MACHINE_CONFIG_DERIVED(fastinvaders_state::fastinvaders_6845, fastinvaders)
+MACHINE_CONFIG_START(fastinvaders_state::fastinvaders_6845)
+	fastinvaders(config);
 	MCFG_CPU_MODIFY("maincpu" ) // guess
 	MCFG_CPU_IO_MAP(fastinvaders_6845_io)
 

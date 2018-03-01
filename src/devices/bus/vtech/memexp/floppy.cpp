@@ -19,7 +19,7 @@
 
 DEFINE_DEVICE_TYPE(VTECH_FLOPPY_CONTROLLER, vtech_floppy_controller_device, "vtech_fdc", "Laser/VZ Floppy Disk Controller")
 
-DEVICE_ADDRESS_MAP_START(map, 8, vtech_floppy_controller_device)
+ADDRESS_MAP_START(vtech_floppy_controller_device::map)
 	AM_RANGE(0, 0) AM_WRITE(latch_w)
 	AM_RANGE(1, 1) AM_READ(shifter_r)
 	AM_RANGE(2, 2) AM_READ(rd_r)

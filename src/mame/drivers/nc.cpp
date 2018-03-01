@@ -469,7 +469,7 @@ void nc_state::nc_common_init_machine()
 	m_uart_control = 0x0ff;
 }
 
-static ADDRESS_MAP_START(nc_map, AS_PROGRAM, 8, nc_state )
+ADDRESS_MAP_START(nc_state::nc_map)
 	AM_RANGE(0x0000, 0x3fff) AM_READ_BANK("bank1") AM_WRITE_BANK("bank5")
 	AM_RANGE(0x4000, 0x7fff) AM_READ_BANK("bank2") AM_WRITE_BANK("bank6")
 	AM_RANGE(0x8000, 0xbfff) AM_READ_BANK("bank3") AM_WRITE_BANK("bank7")
@@ -857,7 +857,7 @@ WRITE8_MEMBER(nc_state::nc100_memory_card_wait_state_w)
 
 
 
-static ADDRESS_MAP_START(nc100_io, AS_IO, 8, nc_state )
+ADDRESS_MAP_START(nc_state::nc100_io)
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	ADDRESS_MAP_UNMAP_HIGH
 	AM_RANGE(0x00, 0x0f) AM_WRITE(nc100_display_memory_start_w)
@@ -1264,7 +1264,7 @@ WRITE8_MEMBER(nc_state::nc200_poweroff_control_w)
 	nc200_video_set_backlight(((data ^ (1 << 2)) >> 2) & 0x01);
 }
 
-static ADDRESS_MAP_START(nc200_io, AS_IO, 8, nc_state )
+ADDRESS_MAP_START(nc_state::nc200_io)
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	AM_RANGE(0x00, 0x0f) AM_WRITE(nc100_display_memory_start_w)
 	AM_RANGE(0x10, 0x13) AM_READWRITE(nc_memory_management_r, nc_memory_management_w)
@@ -1467,7 +1467,8 @@ static SLOT_INTERFACE_START( ibmpc_floppies )
 		SLOT_INTERFACE( "525dd", FLOPPY_525_DD )
 SLOT_INTERFACE_END
 
-MACHINE_CONFIG_DERIVED(nc_state::nc200, nc100)
+MACHINE_CONFIG_START(nc_state::nc200)
+	nc100(config);
 
 	MCFG_CPU_MODIFY( "maincpu" )
 	MCFG_CPU_IO_MAP(nc200_io)

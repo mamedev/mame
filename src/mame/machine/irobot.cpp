@@ -278,7 +278,7 @@ READ8_MEMBER(irobot_state::irobot_status_r)
 
 
 #if DISASSEMBLE_MB_ROM
-static void disassemble_instruction(irmb_ops *op);
+static void disassemble_instruction(irobot_state::irmb_ops const *op);
 #endif
 
 
@@ -820,7 +820,7 @@ default:    case 0x3f:  IXOR(irmb_din(curop), 0);                            bre
 
 
 #if DISASSEMBLE_MB_ROM
-static void disassemble_instruction(irmb_ops *op)
+static void disassemble_instruction(irobot_state::irmb_ops const *op)
 {
 	int lp;
 
@@ -969,4 +969,4 @@ static void disassemble_instruction(irmb_ops *op)
 		if (op->jtype == 5) logerror("\n");
 	}
 }
-#endif
+#endif // DISASSEMBLE_MB_ROM

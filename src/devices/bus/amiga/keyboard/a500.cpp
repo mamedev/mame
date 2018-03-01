@@ -34,9 +34,7 @@ DEFINE_DEVICE_TYPE_NS(A500_KBD_GB, bus::amiga::keyboard, a500_kbd_gb_device, "a5
 
 namespace bus { namespace amiga { namespace keyboard {
 
-namespace {
-
-ADDRESS_MAP_START( mpu6500_map, AS_PROGRAM, 8, a500_kbd_device )
+ADDRESS_MAP_START(a500_kbd_device::mpu6500_map)
 	ADDRESS_MAP_GLOBAL_MASK(0xfff)
 	AM_RANGE(0x000, 0x03f) AM_RAM
 	AM_RANGE(0x080, 0x080) AM_READWRITE(port_a_r, port_a_w)
@@ -52,6 +50,8 @@ ADDRESS_MAP_START( mpu6500_map, AS_PROGRAM, 8, a500_kbd_device )
 	AM_RANGE(0x090, 0x0ff) AM_NOP
 	AM_RANGE(0x800, 0xfff) AM_ROM AM_REGION("ic1", 0)
 ADDRESS_MAP_END
+
+namespace {
 
 //-------------------------------------------------
 //  rom_region - device-specific ROM region
@@ -442,7 +442,7 @@ WRITE8_MEMBER( a500_kbd_device::latch_w )
 
 READ8_MEMBER( a500_kbd_device::counter_r )
 {
-	if (!machine().side_effect_disabled())
+	if (!machine().side_effects_disabled())
 	{
 		m_control &= ~COUNTER_OVERFLOW;
 		update_irqs();

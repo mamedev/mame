@@ -108,7 +108,7 @@ void cs8221_device::device_reset()
 //**************************************************************************
 //  READ/WRITE HANDLERS
 //**************************************************************************
-DEVICE_ADDRESS_MAP_START( map, 16, cs8221_device )
+ADDRESS_MAP_START(cs8221_device::map)
 	AM_RANGE(0x0022, 0x0023) AM_DEVWRITE8("cs8221", cs8221_device, address_w, 0x00ff)
 	AM_RANGE(0x0022, 0x0023) AM_DEVREADWRITE8("cs8221", cs8221_device, data_r, data_w, 0xff00)
 ADDRESS_MAP_END

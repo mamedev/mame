@@ -120,6 +120,11 @@ public:
 	void spider(machine_config &config);
 	void twins(machine_config &config);
 	void twinsa(machine_config &config);
+	void ramdac_map(address_map &map);
+	void spider_io(address_map &map);
+	void twins_io(address_map &map);
+	void twins_map(address_map &map);
+	void twinsa_io(address_map &map);
 };
 
 
@@ -277,11 +282,11 @@ WRITE16_MEMBER(twins_state::spider_blitter_w)
 }
 
 
-static ADDRESS_MAP_START( twins_map, AS_PROGRAM, 16, twins_state )
+ADDRESS_MAP_START(twins_state::twins_map)
 	AM_RANGE(0x00000, 0xfffff) AM_READWRITE(spider_blitter_r, spider_blitter_w)
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( twins_io, AS_IO, 16, twins_state )
+ADDRESS_MAP_START(twins_state::twins_io)
 	AM_RANGE(0x0000, 0x0003) AM_DEVWRITE8("aysnd", ay8910_device, address_data_w, 0x00ff)
 	AM_RANGE(0x0002, 0x0003) AM_DEVREAD8("aysnd", ay8910_device, data_r, 0x00ff)
 	AM_RANGE(0x0004, 0x0005) AM_READWRITE(twins_port4_r, twins_port4_w)
@@ -415,7 +420,7 @@ MACHINE_CONFIG_END
 
 
 
-static ADDRESS_MAP_START( twinsa_io, AS_IO, 16, twins_state )
+ADDRESS_MAP_START(twins_state::twinsa_io)
 	AM_RANGE(0x0000, 0x0001) AM_DEVWRITE8("ramdac",ramdac_device,index_w,0x00ff)
 	AM_RANGE(0x0002, 0x0003) AM_DEVWRITE8("ramdac",ramdac_device,mask_w,0x00ff)
 	AM_RANGE(0x0004, 0x0005) AM_DEVREADWRITE8("ramdac",ramdac_device,pal_r,pal_w,0x00ff)
@@ -425,7 +430,7 @@ static ADDRESS_MAP_START( twinsa_io, AS_IO, 16, twins_state )
 ADDRESS_MAP_END
 
 
-static ADDRESS_MAP_START( ramdac_map, 0, 8, twins_state )
+ADDRESS_MAP_START(twins_state::ramdac_map)
 	AM_RANGE(0x000, 0x3ff) AM_DEVREADWRITE("ramdac",ramdac_device,ramdac_pal_r,ramdac_rgb666_w)
 ADDRESS_MAP_END
 
@@ -540,7 +545,7 @@ READ16_MEMBER(twins_state::spider_port_1e_r)
 }
 
 
-static ADDRESS_MAP_START( spider_io, AS_IO, 16, twins_state )
+ADDRESS_MAP_START(twins_state::spider_io)
 	AM_RANGE(0x0000, 0x0003) AM_DEVWRITE8("aysnd", ay8910_device, address_data_w, 0x00ff)
 	AM_RANGE(0x0002, 0x0003) AM_DEVREAD8("aysnd", ay8910_device, data_r, 0x00ff)
 	AM_RANGE(0x0004, 0x0005) AM_READWRITE(twins_port4_r, twins_port4_w)

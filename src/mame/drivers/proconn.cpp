@@ -180,6 +180,8 @@ public:
 	DECLARE_WRITE_LINE_MEMBER(pio_5_m_out_brdy_w)   { logerror("pio_5_m_out_brdy_w %02x\n", state); }
 
 	void proconn(machine_config &config);
+	void proconn_map(address_map &map);
+	void proconn_portmap(address_map &map);
 protected:
 
 	// devices
@@ -204,7 +206,7 @@ public:
 	DECLARE_READ16_MEMBER(serial_receive);
 };
 
-static ADDRESS_MAP_START( proconn_map, AS_PROGRAM, 8, proconn_state )
+ADDRESS_MAP_START(proconn_state::proconn_map)
 	AM_RANGE(0x0000, 0xefff) AM_ROM
 	AM_RANGE(0xf000, 0xffff) AM_RAM
 ADDRESS_MAP_END
@@ -214,7 +216,7 @@ ADDRESS_MAP_END
 
 // the mapping of the devices is rather ugly with address bits 8-9 providing the usual address bits 0-1 or 'offset'
 // r0/r1/r2/r3 and w0/w1/w2/w3 might still be in the wrong order at the moment.
-static ADDRESS_MAP_START( proconn_portmap, AS_IO, 8, proconn_state )
+ADDRESS_MAP_START(proconn_state::proconn_portmap)
 //  ADDRESS_MAP_GLOBAL_MASK(0x3ff)
 
 	// sio (vfd should be connected to it?)

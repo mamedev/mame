@@ -67,6 +67,7 @@ public:
 	DECLARE_WRITE_LINE_MEMBER(via_irq_func);
 	void concept_set_interrupt(int level, int state);
 	void concept(machine_config &config);
+	void concept_memmap(address_map &map);
 };
 
 #endif // MAME_INCLUDES_CONCEPT_H

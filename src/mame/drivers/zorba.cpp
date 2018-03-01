@@ -71,15 +71,13 @@ ToDo:
 #include "speaker.h"
 
 
-namespace {
-
-ADDRESS_MAP_START( zorba_mem, AS_PROGRAM, 8, zorba_state )
+ADDRESS_MAP_START(zorba_state::zorba_mem)
 	AM_RANGE( 0x0000, 0x3fff ) AM_READ_BANK("bankr0") AM_WRITE_BANK("bankw0")
 	AM_RANGE( 0x4000, 0xffff ) AM_RAM
 ADDRESS_MAP_END
 
 
-ADDRESS_MAP_START( zorba_io, AS_IO, 8, zorba_state )
+ADDRESS_MAP_START(zorba_state::zorba_io)
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	AM_RANGE(0x00, 0x03) AM_DEVREADWRITE("pit", pit8254_device, read, write)
 	AM_RANGE(0x04, 0x04) AM_READWRITE(rom_r, rom_w)
@@ -98,6 +96,7 @@ ADDRESS_MAP_START( zorba_io, AS_IO, 8, zorba_state )
 	AM_RANGE(0x60, 0x63) AM_DEVREADWRITE("pia1", pia6821_device, read, write)
 ADDRESS_MAP_END
 
+namespace {
 
 INPUT_PORTS_START( zorba )
 	PORT_START("CNF")
@@ -138,7 +137,6 @@ MACHINE_CONFIG_START(zorba_state::zorba)
 	MCFG_CPU_ADD("maincpu", Z80, 24_MHz_XTAL / 6)
 	MCFG_CPU_PROGRAM_MAP(zorba_mem)
 	MCFG_CPU_IO_MAP(zorba_io)
-	MCFG_MACHINE_RESET_OVERRIDE(zorba_state, zorba)
 
 	/* video hardware */
 	MCFG_SCREEN_ADD_MONOCHROME("screen", RASTER, rgb_t::green())
@@ -269,7 +267,7 @@ MACHINE_CONFIG_END
 //  Initialise/reset
 //-------------------------------------------------
 
-DRIVER_INIT_MEMBER( zorba_state, zorba )
+void zorba_state::machine_start()
 {
 	uint8_t *main = memregion("maincpu")->base();
 
@@ -292,7 +290,7 @@ DRIVER_INIT_MEMBER( zorba_state, zorba )
 	m_printer_select = 0;
 }
 
-MACHINE_RESET_MEMBER( zorba_state, zorba )
+void zorba_state::machine_reset()
 {
 	m_uart2->write_cts(0); // always asserted
 
@@ -316,7 +314,7 @@ MACHINE_RESET_MEMBER( zorba_state, zorba )
 
 READ8_MEMBER( zorba_state::ram_r )
 {
-	if (!machine().side_effect_disabled())
+	if (!machine().side_effects_disabled())
 		m_read_bank->set_entry(0);
 	return 0;
 }
@@ -328,7 +326,7 @@ WRITE8_MEMBER( zorba_state::ram_w )
 
 READ8_MEMBER( zorba_state::rom_r )
 {
-	if (!machine().side_effect_disabled())
+	if (!machine().side_effects_disabled())
 		m_read_bank->set_entry(1);
 	return 0;
 }
@@ -562,8 +560,8 @@ ROM_START( zorba )
 	ROM_LOAD( "74ls288.u77", 0x0040, 0x0020, CRC(946e03b0) SHA1(24240bdd7bdf507a5b51628fb36ad1266fc53a28) BAD_DUMP ) // looks like bad dump of address decode PROM
 ROM_END
 
-COMP( 1984?, zorba, 0, 0, zorba, zorba, zorba_state, zorba, "Modular Micros", "Zorba (Modular Micros)", MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE )
+COMP( 1984?, zorba, 0, 0, zorba, zorba, zorba_state, 0, "Modular Micros", "Zorba (Modular Micros)", MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE )
 
 // Undumped versions (see startup screen notes at top of file)
-// COMP( 1983, zorbat, zorba, 0, zorba, zorba, zorba_state, zorba, "Telcon Industries",  "Zorba (Telcon Industries)",  MACHINE_NOT_WORKING )
-// COMP( 1984, zorbag, zorba, 0, zorba, zorba, zorba_state, zorba, "Gemini Electronics", "Zorba (Gemini Electronics)", MACHINE_NOT_WORKING )
+// COMP( 1983, zorbat, zorba, 0, zorba, zorba, zorba_state, 0, "Telcon Industries",  "Zorba (Telcon Industries)",  MACHINE_NOT_WORKING )
+// COMP( 1984, zorbag, zorba, 0, zorba, zorba, zorba_state, 0, "Gemini Electronics", "Zorba (Gemini Electronics)", MACHINE_NOT_WORKING )

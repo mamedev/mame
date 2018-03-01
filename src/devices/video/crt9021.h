@@ -39,7 +39,7 @@
 
 
 #define MCFG_CRT9021_DRAW_CHARACTER_CALLBACK_OWNER(_class, _method) \
-	crt9021_device::static_set_display_callback(*device, crt9021_device::draw_character_delegate(&_class::_method, #_class "::" #_method, this));
+	downcast<crt9021_device &>(*device).set_display_callback(crt9021_device::draw_character_delegate(&_class::_method, #_class "::" #_method, this));
 
 
 //**************************************************************************
@@ -57,7 +57,7 @@ public:
 	// construction/destruction
 	crt9021_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
-	static void static_set_display_callback(device_t &device, draw_character_delegate &&cb) { downcast<crt9021_device &>(device).m_display_cb = std::move(cb); }
+	template <typename Object> void set_display_callback(Object &&cb) { m_display_cb = std::forward<Object>(cb); }
 
 	void write(uint8_t data) { m_data = data; }
 	DECLARE_WRITE8_MEMBER( write ) { write(data); }

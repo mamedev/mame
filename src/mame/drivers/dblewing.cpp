@@ -124,6 +124,10 @@ public:
 	WRITE16_MEMBER( wf_protection_region_0_104_w );
 
 	void dblewing(machine_config &config);
+	void dblewing_map(address_map &map);
+	void decrypted_opcodes_map(address_map &map);
+	void sound_io(address_map &map);
+	void sound_map(address_map &map);
 private:
 	bool m_soundlatch_pending;
 };
@@ -135,6 +139,7 @@ uint32_t dblewing_state::screen_update_dblewing(screen_device &screen, bitmap_in
 	uint16_t flip = m_deco_tilegen1->pf_control_r(space, 0, 0xffff);
 
 	flip_screen_set(BIT(flip, 7));
+	m_sprgen->set_flip_screen(BIT(flip, 7));
 	m_deco_tilegen1->pf_update(m_pf1_rowscroll, m_pf2_rowscroll);
 
 	bitmap.fill(0, cliprect); /* not Confirmed */
@@ -168,7 +173,7 @@ WRITE_LINE_MEMBER( dblewing_state::soundlatch_irq_w )
 	m_soundlatch_pending = bool(state);
 }
 
-static ADDRESS_MAP_START( dblewing_map, AS_PROGRAM, 16, dblewing_state )
+ADDRESS_MAP_START(dblewing_state::dblewing_map)
 	AM_RANGE(0x000000, 0x07ffff) AM_ROM
 
 	AM_RANGE(0x100000, 0x100fff) AM_DEVREADWRITE("tilegen1", deco16ic_device, pf1_data_r, pf1_data_w)
@@ -188,7 +193,7 @@ static ADDRESS_MAP_START( dblewing_map, AS_PROGRAM, 16, dblewing_state )
 	AM_RANGE(0xff0000, 0xff3fff) AM_MIRROR(0xc000) AM_RAM
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( decrypted_opcodes_map, AS_OPCODES, 16, dblewing_state )
+ADDRESS_MAP_START(dblewing_state::decrypted_opcodes_map)
 	AM_RANGE(0x000000, 0x07ffff) AM_ROM AM_SHARE("decrypted_opcodes")
 ADDRESS_MAP_END
 
@@ -198,7 +203,7 @@ READ8_MEMBER(dblewing_state::irq_latch_r)
 	return m_soundlatch_pending ? 0 : 1;
 }
 
-static ADDRESS_MAP_START( sound_map, AS_PROGRAM, 8, dblewing_state )
+ADDRESS_MAP_START(dblewing_state::sound_map)
 	AM_RANGE(0x0000, 0x7fff) AM_ROM
 	AM_RANGE(0x8000, 0x87ff) AM_RAM
 	AM_RANGE(0xa000, 0xa001) AM_DEVREADWRITE("ymsnd", ym2151_device, status_r, write)
@@ -208,7 +213,7 @@ static ADDRESS_MAP_START( sound_map, AS_PROGRAM, 8, dblewing_state )
 	AM_RANGE(0xf000, 0xf000) AM_DEVREADWRITE("oki", okim6295_device, read, write)
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( sound_io, AS_IO, 8, dblewing_state )
+ADDRESS_MAP_START(dblewing_state::sound_io)
 	AM_RANGE(0x0000, 0xffff)  AM_ROM AM_REGION("audiocpu", 0)
 ADDRESS_MAP_END
 
@@ -345,7 +350,7 @@ MACHINE_CONFIG_START(dblewing_state::dblewing)
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", M68000, XTAL(28'000'000)/2)   /* DE102 */
 	MCFG_CPU_PROGRAM_MAP(dblewing_map)
-	MCFG_CPU_DECRYPTED_OPCODES_MAP(decrypted_opcodes_map)
+	MCFG_CPU_OPCODES_MAP(decrypted_opcodes_map)
 	MCFG_CPU_VBLANK_INT_DRIVER("screen", dblewing_state,  irq6_line_hold)
 
 	MCFG_CPU_ADD("audiocpu", Z80, XTAL(32'220'000)/9)

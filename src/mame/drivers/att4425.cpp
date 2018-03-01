@@ -48,8 +48,11 @@ public:
 		, m_p_videoram(*this, "videoram")
 		, m_p_chargen(*this, "chargen")
 		, m_screen(*this, SCREEN_TAG)
-		{ }
+	{ }
 
+	void att4425(machine_config &config);
+
+protected:
 	DECLARE_WRITE8_MEMBER(port10_w);
 	DECLARE_WRITE8_MEMBER(port14_w);
 	DECLARE_READ8_MEMBER(port14_r);
@@ -60,11 +63,12 @@ public:
 
 	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 
-	void att4425(machine_config &config);
-private:
 	virtual void machine_start() override;
 	virtual void video_start() override;
+	void att4425_io(address_map &map);
+	void att4425_mem(address_map &map);
 
+private:
 	required_device<z80_device> m_maincpu;
 	required_device<i8251_device> m_i8251;
 	required_device<z80sio_device> m_sio;
@@ -97,12 +101,12 @@ READ8_MEMBER(att4425_state::port15_r)
 	return 0;
 }
 
-static ADDRESS_MAP_START( att4425_mem, AS_PROGRAM, 8, att4425_state )
+ADDRESS_MAP_START(att4425_state::att4425_mem)
 	AM_RANGE(0x0000, 0x7fff) AM_ROM AM_REGION(Z80_TAG, 0)
 	AM_RANGE(0x8000, 0xffff) AM_RAM AM_SHARE("videoram") // c000..f7af?
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( att4425_io, AS_IO, 8, att4425_state )
+ADDRESS_MAP_START(att4425_state::att4425_io)
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	AM_RANGE(0x00, 0x00) AM_DEVREADWRITE(I8251_TAG, i8251_device, data_r, data_w)
 	AM_RANGE(0x01, 0x01) AM_DEVREADWRITE(I8251_TAG, i8251_device, status_r, control_w)

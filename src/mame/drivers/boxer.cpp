@@ -32,8 +32,8 @@ public:
 		TIMER_PERIODIC
 	};
 
-	boxer_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag),
+	boxer_state(const machine_config &mconfig, device_type type, const char *tag) :
+		driver_device(mconfig, type, tag),
 		m_tile_ram(*this, "tile_ram"),
 		m_sprite_ram(*this, "sprite_ram"),
 		m_maincpu(*this, "maincpu"),
@@ -41,6 +41,30 @@ public:
 		m_screen(*this, "screen"),
 		m_palette(*this, "palette"){ }
 
+	void boxer(machine_config &config);
+
+protected:
+	DECLARE_READ8_MEMBER(input_r);
+	DECLARE_READ8_MEMBER(misc_r);
+	DECLARE_WRITE8_MEMBER(bell_w);
+	DECLARE_WRITE8_MEMBER(sound_w);
+	DECLARE_WRITE8_MEMBER(pot_w);
+	DECLARE_WRITE8_MEMBER(irq_reset_w);
+	DECLARE_WRITE8_MEMBER(crowd_w);
+	DECLARE_WRITE8_MEMBER(led_w);
+	DECLARE_PALETTE_INIT(boxer);
+	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	TIMER_CALLBACK_MEMBER(pot_interrupt);
+	TIMER_CALLBACK_MEMBER(periodic_callback);
+	void draw(bitmap_ind16 &bitmap, const rectangle &cliprect);
+
+	virtual void machine_start() override;
+	virtual void machine_reset() override;
+	void boxer_map(address_map &map);
+
+	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr) override;
+
+private:
 	/* memory pointers */
 	required_shared_ptr<uint8_t> m_tile_ram;
 	required_shared_ptr<uint8_t> m_sprite_ram;
@@ -56,26 +80,6 @@ public:
 	required_device<gfxdecode_device> m_gfxdecode;
 	required_device<screen_device> m_screen;
 	required_device<palette_device> m_palette;
-
-	DECLARE_READ8_MEMBER(input_r);
-	DECLARE_READ8_MEMBER(misc_r);
-	DECLARE_WRITE8_MEMBER(bell_w);
-	DECLARE_WRITE8_MEMBER(sound_w);
-	DECLARE_WRITE8_MEMBER(pot_w);
-	DECLARE_WRITE8_MEMBER(irq_reset_w);
-	DECLARE_WRITE8_MEMBER(crowd_w);
-	DECLARE_WRITE8_MEMBER(led_w);
-	virtual void machine_start() override;
-	virtual void machine_reset() override;
-	DECLARE_PALETTE_INIT(boxer);
-	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
-	TIMER_CALLBACK_MEMBER(pot_interrupt);
-	TIMER_CALLBACK_MEMBER(periodic_callback);
-	void draw(bitmap_ind16 &bitmap, const rectangle &cliprect);
-
-	void boxer(machine_config &config);
-protected:
-	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr) override;
 };
 
 /*************************************
@@ -337,7 +341,7 @@ WRITE8_MEMBER(boxer_state::led_w)
  *
  *************************************/
 
-static ADDRESS_MAP_START( boxer_map, AS_PROGRAM, 8, boxer_state )
+ADDRESS_MAP_START(boxer_state::boxer_map)
 	ADDRESS_MAP_GLOBAL_MASK(0x3fff)
 	AM_RANGE(0x0000, 0x01ff) AM_RAM
 	AM_RANGE(0x0200, 0x03ff) AM_RAM AM_SHARE("tile_ram")

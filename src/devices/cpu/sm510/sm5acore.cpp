@@ -22,12 +22,12 @@ DEFINE_DEVICE_TYPE(KB1013VK12, kb1013vk12_device, "kb1013vk1_2", "KB1013VK1-2") 
 
 
 // internal memory maps
-static ADDRESS_MAP_START(program_1_8k, AS_PROGRAM, 8, sm510_base_device)
+ADDRESS_MAP_START(sm5a_device::program_1_8k)
 	AM_RANGE(0x000, 0x6ff) AM_ROM
 	AM_RANGE(0x700, 0x73f) AM_ROM AM_MIRROR(0x0c0)
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START(data_5x13x4, AS_DATA, 8, sm510_base_device)
+ADDRESS_MAP_START(sm5a_device::data_5x13x4)
 	AM_RANGE(0x00, 0x0b) AM_RAM
 	AM_RANGE(0x0c, 0x0c) AM_RAM AM_MIRROR(0x03)
 	AM_RANGE(0x10, 0x1b) AM_RAM
@@ -43,7 +43,7 @@ ADDRESS_MAP_END
 
 // device definitions
 sm5a_device::sm5a_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock)
-	: sm5a_device(mconfig, SM5A, tag, owner, clock, 1 /* stack levels */, 9 /* o group pins */, 11 /* prg width */, ADDRESS_MAP_NAME(program_1_8k), 7 /* data width */, ADDRESS_MAP_NAME(data_5x13x4))
+	: sm5a_device(mconfig, SM5A, tag, owner, clock, 1 /* stack levels */, 9 /* o group pins */, 11 /* prg width */, address_map_constructor(FUNC(sm5a_device::program_1_8k), this), 7 /* data width */, address_map_constructor(FUNC(sm5a_device::data_5x13x4), this))
 {
 }
 
@@ -53,12 +53,12 @@ sm5a_device::sm5a_device(const machine_config &mconfig, device_type type, const 
 }
 
 sm5l_device::sm5l_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock)
-	: sm5a_device(mconfig, SM5L, tag, owner, clock, 1, 9, 11, ADDRESS_MAP_NAME(program_1_8k), 7, ADDRESS_MAP_NAME(data_5x13x4))
+	: sm5a_device(mconfig, SM5L, tag, owner, clock, 1, 9, 11, address_map_constructor(FUNC(sm5l_device::program_1_8k), this), 7, address_map_constructor(FUNC(sm5l_device::data_5x13x4), this))
 {
 }
 
 kb1013vk12_device::kb1013vk12_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock)
-	: sm5a_device(mconfig, KB1013VK12, tag, owner, clock, 1, 9, 11, ADDRESS_MAP_NAME(program_1_8k), 7, ADDRESS_MAP_NAME(data_5x13x4))
+	: sm5a_device(mconfig, KB1013VK12, tag, owner, clock, 1, 9, 11, address_map_constructor(FUNC(kb1013vk12_device::program_1_8k), this), 7, address_map_constructor(FUNC(kb1013vk12_device::data_5x13x4), this))
 {
 }
 

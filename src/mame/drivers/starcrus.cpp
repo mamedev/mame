@@ -20,12 +20,12 @@ palazzol@home.com
 #include "speaker.h"
 
 
-static ADDRESS_MAP_START( starcrus_map, AS_PROGRAM, 8, starcrus_state )
+ADDRESS_MAP_START(starcrus_state::starcrus_map)
 	AM_RANGE(0x0000, 0x0fff) AM_ROM
 	AM_RANGE(0x1000, 0x10ff) AM_RAM
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( starcrus_io_map, AS_IO, 8, starcrus_state )
+ADDRESS_MAP_START(starcrus_state::starcrus_io_map)
 	AM_RANGE(0x00, 0x00) AM_READ_PORT("P1") AM_WRITE(s1_x_w)
 	AM_RANGE(0x01, 0x01) AM_READ_PORT("P2") AM_WRITE(s1_y_w)
 	AM_RANGE(0x02, 0x02) AM_READWRITE(coll_det_r, s2_x_w)

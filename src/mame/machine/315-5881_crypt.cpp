@@ -1,6 +1,9 @@
 // license:BSD-3-Clause
 // copyright-holders:Andreas Naive, Olivier Galibert, David Haywood
 /*
+  TODO:
+  - merge interface for ST-V and NAOMI too.
+
   re: Tecmo World Cup '98 (ST-V) (from ANY)
 
   I got one of the card in subject open it up to check the rom version
@@ -19,6 +22,24 @@
 
 DEFINE_DEVICE_TYPE(SEGA315_5881_CRYPT, sega_315_5881_crypt_device, "sega315_5881", "Sega 315-5881 Encryption")
 
+// TODO: standard hookup doesn't work properly (causes a crash in LA Machine Gun)
+//       might be due of high address variables not properly set (@see sega_315_5881_crypt_device::set_addr_high)
+ADDRESS_MAP_START(sega_315_5881_crypt_device::iomap_64be)
+	AM_RANGE(0x0000, 0x0001) AM_READ(ready_r)
+//	TODO: it is unknown if the 
+	AM_RANGE(0x0010, 0x0011) AM_WRITE(addrlo_w)
+	AM_RANGE(0x0012, 0x0013) AM_WRITE(addrhi_w)
+	AM_RANGE(0x0018, 0x0019) AM_WRITE(subkey_be_w)
+	AM_RANGE(0x001c, 0x001d) AM_READ(decrypt_be_r)
+ADDRESS_MAP_END
+
+ADDRESS_MAP_START(sega_315_5881_crypt_device::iomap_le)
+	AM_RANGE(0x0000, 0x0001) AM_READ(ready_r)
+	AM_RANGE(0x0008, 0x0009) AM_WRITE(addrlo_w)
+	AM_RANGE(0x000a, 0x000b) AM_WRITE(addrhi_w)
+	AM_RANGE(0x000c, 0x000d) AM_WRITE(subkey_le_w)
+	AM_RANGE(0x000e, 0x000f) AM_READ(decrypt_le_r)
+ADDRESS_MAP_END
 
 sega_315_5881_crypt_device::sega_315_5881_crypt_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
 	: device_t(mconfig, SEGA315_5881_CRYPT, tag, owner, clock)
@@ -68,11 +89,82 @@ void sega_315_5881_crypt_device::device_reset()
 	dec_hist = 0;
 	dec_header = 0;
 	enc_ready = false;
-
+	first_read = false;
+	
 	buffer_pos = 0;
 	line_buffer_pos = 0;
 	line_buffer_size = 0;
 	buffer_bit = 0;
+}
+
+/*************************************************
+ *
+ * Chip I/O interface (Model 2/3)
+ *
+ ************************************************/
+
+READ16_MEMBER(sega_315_5881_crypt_device::ready_r)
+{
+	// bit 0: busy flag
+	return 0;
+}
+
+WRITE16_MEMBER(sega_315_5881_crypt_device::addrlo_w)
+{
+	set_addr_low(data&0xffff);
+	first_read = true;
+}
+
+WRITE16_MEMBER(sega_315_5881_crypt_device::addrhi_w)
+{
+	set_addr_high(0);
+	if (data != 0)
+		printf("sega_315_5881_crypt_device not zero high address %08x (%08x)\n", data, mem_mask);
+	first_read = true;
+}
+
+WRITE16_MEMBER(sega_315_5881_crypt_device::subkey_le_w)
+{
+	printf("subkey %08x (%08x)\n", data, mem_mask);
+	set_subkey(data & 0xffff);
+}
+
+WRITE16_MEMBER(sega_315_5881_crypt_device::subkey_be_w)
+{
+	uint16_t subkey;
+	printf("subkey %08x (%08x)\n", data, mem_mask);
+	// endian swap the sub-key for big endian CPUs
+	subkey = ((data & 0xff00) >> 8) | ((data & 0x00ff) << 8);
+	set_subkey(subkey);
+}
+
+READ16_MEMBER(sega_315_5881_crypt_device::decrypt_le_r)
+{
+	uint16_t retval = decrypt_be_r(space,offset,mem_mask);
+	// endian swap the sub-key for little endian CPUs	
+	retval = ((retval & 0xff00) >> 8) | ((retval & 0x00ff) << 8);
+	
+	return retval;
+}
+
+READ16_MEMBER(sega_315_5881_crypt_device::decrypt_be_r)
+{
+	if (first_read == true)
+	{
+		// the RAM based schemes expect a dummy value before the start of the stream
+		// to match the previous simulation (dynamite cop) I use 0x0000 here
+
+		// this is actually header data?
+		first_read = false;
+		return 0;
+	}
+
+	uint8_t* base;
+	uint16_t retval;
+	retval = do_decrypt(base);
+	// retval = ((retval & 0xff00) >> 8) | ((retval & 0x00ff) << 8);
+		
+	return retval;
 }
 
 uint16_t sega_315_5881_crypt_device::do_decrypt(uint8_t *&base)

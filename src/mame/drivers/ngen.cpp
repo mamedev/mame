@@ -146,6 +146,11 @@ public:
 	DECLARE_READ16_MEMBER(b38_crtc_r);
 	DECLARE_WRITE16_MEMBER(b38_crtc_w);
 	void ngen(machine_config &config);
+	void ngen386_io(address_map &map);
+	void ngen386_mem(address_map &map);
+	void ngen386i_mem(address_map &map);
+	void ngen_io(address_map &map);
+	void ngen_mem(address_map &map);
 protected:
 	virtual void machine_reset() override;
 	virtual void machine_start() override;
@@ -855,7 +860,7 @@ void ngen_state::machine_reset()
 }
 
 // boot ROMs from modules are not mapped anywhere, instead, they have to send the code from the boot ROM via DMA
-static ADDRESS_MAP_START( ngen_mem, AS_PROGRAM, 16, ngen_state )
+ADDRESS_MAP_START(ngen_state::ngen_mem)
 	AM_RANGE(0x00000, 0xf7fff) AM_RAM
 	AM_RANGE(0xf8000, 0xf9fff) AM_RAM AM_SHARE("vram")
 	AM_RANGE(0xfa000, 0xfbfff) AM_RAM AM_SHARE("fontram")
@@ -863,7 +868,7 @@ static ADDRESS_MAP_START( ngen_mem, AS_PROGRAM, 16, ngen_state )
 	AM_RANGE(0xfe000, 0xfffff) AM_ROM AM_REGION("bios",0)
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( ngen_io, AS_IO, 16, ngen_state )
+ADDRESS_MAP_START(ngen_state::ngen_io)
 	AM_RANGE(0x0000, 0x0001) AM_READWRITE(xbus_r,xbus_w)
 
 	// Floppy/Hard disk module
@@ -877,7 +882,7 @@ static ADDRESS_MAP_START( ngen_io, AS_IO, 16, ngen_state )
 
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( ngen386_mem, AS_PROGRAM, 32, ngen_state )
+ADDRESS_MAP_START(ngen_state::ngen386_mem)
 	AM_RANGE(0x00000000, 0x000f7fff) AM_RAM
 	AM_RANGE(0x000f8000, 0x000f9fff) AM_RAM AM_SHARE("vram")
 	AM_RANGE(0x000fa000, 0x000fbfff) AM_RAM AM_SHARE("fontram")
@@ -887,7 +892,7 @@ static ADDRESS_MAP_START( ngen386_mem, AS_PROGRAM, 32, ngen_state )
 	AM_RANGE(0xffffe000, 0xffffffff) AM_ROM AM_REGION("bios",0)
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( ngen386i_mem, AS_PROGRAM, 32, ngen_state )
+ADDRESS_MAP_START(ngen_state::ngen386i_mem)
 	AM_RANGE(0x00000000, 0x000f7fff) AM_RAM
 	AM_RANGE(0x000f8000, 0x000f9fff) AM_RAM AM_SHARE("vram")
 	AM_RANGE(0x000fa000, 0x000fbfff) AM_RAM AM_SHARE("fontram")
@@ -896,7 +901,7 @@ static ADDRESS_MAP_START( ngen386i_mem, AS_PROGRAM, 32, ngen_state )
 	AM_RANGE(0xffffc000, 0xffffffff) AM_ROM AM_REGION("bios",0)
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( ngen386_io, AS_IO, 32, ngen_state )
+ADDRESS_MAP_START(ngen_state::ngen386_io)
 	AM_RANGE(0x0000, 0x0003) AM_READWRITE16(xbus_r, xbus_w, 0x0000ffff)
 //  AM_RANGE(0xf800, 0xfeff) AM_READWRITE16(peripheral_r, peripheral_w,0xffffffff)
 	AM_RANGE(0xfd08, 0xfd0b) AM_READWRITE16(b38_crtc_r, b38_crtc_w,0xffffffff)
@@ -1138,7 +1143,8 @@ MACHINE_CONFIG_START(ngen386_state::ngen386)
 	MCFG_HARDDISK_ADD("hard0")
 MACHINE_CONFIG_END
 
-MACHINE_CONFIG_DERIVED(ngen386_state::_386i, ngen386)
+MACHINE_CONFIG_START(ngen386_state::_386i)
+	ngen386(config);
 	MCFG_CPU_MODIFY("i386cpu")
 	MCFG_CPU_PROGRAM_MAP(ngen386i_mem)
 MACHINE_CONFIG_END

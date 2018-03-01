@@ -1,8 +1,8 @@
 // license:BSD-3-Clause
 // copyright-holders:Farfetch'd, David Haywood
 
-#ifndef __GSTRIKER_H
-#define __GSTRIKER_H
+#ifndef MAME_INCLUDES_GSTRIKER_H
+#define MAME_INCLUDES_GSTRIKER_H
 
 #include "machine/6850acia.h"
 #include "machine/gen_latch.h"
@@ -86,6 +86,10 @@ public:
 	void twc94(machine_config &config);
 	void gstriker(machine_config &config);
 	void vgoal(machine_config &config);
+	void gstriker_map(address_map &map);
+	void sound_io_map(address_map &map);
+	void sound_map(address_map &map);
+	void twcup94_map(address_map &map);
 };
 
 #endif

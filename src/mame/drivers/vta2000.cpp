@@ -37,6 +37,8 @@ public:
 	DECLARE_PALETTE_INIT(vta2000);
 
 	void vta2000(machine_config &config);
+	void io_map(address_map &map);
+	void mem_map(address_map &map);
 private:
 	virtual void machine_reset() override;
 	required_device<cpu_device> m_maincpu;
@@ -44,14 +46,14 @@ private:
 	required_region_ptr<u8> m_p_chargen;
 };
 
-static ADDRESS_MAP_START(mem_map, AS_PROGRAM, 8, vta2000_state)
+ADDRESS_MAP_START(vta2000_state::mem_map)
 	ADDRESS_MAP_UNMAP_HIGH
 	AM_RANGE( 0x0000, 0x5fff ) AM_ROM AM_REGION("roms", 0)
 	AM_RANGE( 0x8000, 0xc7ff ) AM_RAM AM_SHARE("videoram")
 	AM_RANGE( 0xc800, 0xc8ff ) AM_ROM AM_REGION("roms", 0x5000)
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START(io_map, AS_IO, 8, vta2000_state)
+ADDRESS_MAP_START(vta2000_state::io_map)
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	ADDRESS_MAP_UNMAP_HIGH
 ADDRESS_MAP_END

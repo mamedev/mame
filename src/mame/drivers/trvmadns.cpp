@@ -125,6 +125,8 @@ public:
 	required_device<palette_device> m_palette;
 	required_shared_ptr<uint8_t> m_generic_paletteram_8;
 	void trvmadns(machine_config &config);
+	void cpu_map(address_map &map);
+	void io_map(address_map &map);
 };
 
 
@@ -254,7 +256,7 @@ WRITE8_MEMBER(trvmadns_state::trvmadns_tileram_w)
 }
 
 
-static ADDRESS_MAP_START( cpu_map, AS_PROGRAM, 8, trvmadns_state )
+ADDRESS_MAP_START(trvmadns_state::cpu_map)
 	AM_RANGE(0x0000, 0x5fff) AM_ROM
 	AM_RANGE(0x6000, 0x6fff) AM_ROMBANK("bank1")
 	AM_RANGE(0x7000, 0x7fff) AM_ROMBANK("bank2")
@@ -266,7 +268,7 @@ static ADDRESS_MAP_START( cpu_map, AS_PROGRAM, 8, trvmadns_state )
 	AM_RANGE(0xe004, 0xe004) AM_WRITE(w3)//NOP
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( io_map, AS_IO, 8, trvmadns_state )
+ADDRESS_MAP_START(trvmadns_state::io_map)
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	AM_RANGE(0x00, 0x01) AM_DEVWRITE("aysnd", ay8910_device, address_data_w)
 	AM_RANGE(0x02, 0x02) AM_READ_PORT("IN0")

@@ -107,7 +107,7 @@ It's possible to get MAME working from 10.6, but a bit more complicated:
 Emscripten Javascript and HTML
 ------------------------------
 
-First, download and install Emscripten by following the instructions at the `official site <https://kripken.github.io/emscripten-site/docs/getting_started/downloads.html>`_
+First, download and install Emscripten 1.37.29 or later by following the instructions at the `official site <https://kripken.github.io/emscripten-site/docs/getting_started/downloads.html>`_
 
 Once Emscripten has been installed, it should be possible to compile MAME out-of-the-box using Emscripten's '**emmake**' tool. Because a full MAME compile is too large to load into a web browser at once, you will want to use the SOURCES parameter to compile only a subset of the project, e.g. (in the mame directory):
 

@@ -6,7 +6,7 @@
   mostly LED electronic games/toys.
 
   TODO:
-  - why does h2hbaskb(and clones) need a workaround on writing L pins?
+  - why does h2hbaskbc(and clones) need a workaround on writing L pins?
   - plus1: which sensor position is which colour?
   - vidchal: Add screen and gun cursor with brightness detection callback,
     and softwarelist for the video tapes. We'd also need a VHS player device.
@@ -32,9 +32,9 @@
 #include "einvaderc.lh"
 #include "funjacks.lh" // clickable
 #include "funrlgl.lh"
-#include "h2hbaskb.lh"
-#include "h2hhockey.lh"
-#include "h2hsoccer.lh"
+#include "h2hbaskbc.lh"
+#include "h2hhockeyc.lh"
+#include "h2hsoccerc.lh"
 #include "lchicken.lh" // clickable
 #include "lightfgt.lh" // clickable
 #include "mdallas.lh"
@@ -346,16 +346,16 @@ MACHINE_CONFIG_END
   the same, only differing on game time. The PCB is pre-configured on G1+IN2
   and IN3 to select the game.
 
-  An earlier revision of this runs on TMS1000. Model numbers are the same.
-  From the outside, an easy way to spot the difference is the Start/Display
-  button: TMS1000 version button label is D, COP420 label is a *.
+  An earlier revision of this runs on TMS1000, see hh_tms1k.cpp driver. Model
+  numbers are the same. From the outside, an easy way to spot the difference is
+  the Start/Display button: TMS1000 version button label is D, COP420 one is a *.
 
 ***************************************************************************/
 
-class h2hbaskb_state : public hh_cop400_state
+class h2hbaskbc_state : public hh_cop400_state
 {
 public:
-	h2hbaskb_state(const machine_config &mconfig, device_type type, const char *tag)
+	h2hbaskbc_state(const machine_config &mconfig, device_type type, const char *tag)
 		: hh_cop400_state(mconfig, type, tag)
 	{ }
 
@@ -363,27 +363,27 @@ public:
 	DECLARE_WRITE8_MEMBER(write_g);
 	DECLARE_WRITE8_MEMBER(write_l);
 	DECLARE_READ8_MEMBER(read_in);
-	void h2hsoccer(machine_config &config);
-	void h2hbaskb(machine_config &config);
-	void h2hhockey(machine_config &config);
+	void h2hsoccerc(machine_config &config);
+	void h2hbaskbc(machine_config &config);
+	void h2hhockeyc(machine_config &config);
 };
 
 // handlers
 
-WRITE8_MEMBER(h2hbaskb_state::write_d)
+WRITE8_MEMBER(h2hbaskbc_state::write_d)
 {
 	// D: led select
 	m_d = data & 0xf;
 }
 
-WRITE8_MEMBER(h2hbaskb_state::write_g)
+WRITE8_MEMBER(h2hbaskbc_state::write_g)
 {
 	// G: led select, input mux
 	m_inp_mux = data;
 	m_g = data & 0xf;
 }
 
-WRITE8_MEMBER(h2hbaskb_state::write_l)
+WRITE8_MEMBER(h2hbaskbc_state::write_l)
 {
 	// D2,D3 double as multiplexer
 	u16 mask = ((m_d >> 2 & 1) * 0x00ff) | ((m_d >> 3 & 1) * 0xff00);
@@ -398,7 +398,7 @@ WRITE8_MEMBER(h2hbaskb_state::write_l)
 	display_matrix(7, 16, 0, 0);
 }
 
-READ8_MEMBER(h2hbaskb_state::read_in)
+READ8_MEMBER(h2hbaskbc_state::read_in)
 {
 	// IN: multiplexed inputs
 	return read_inputs(4, 7) | (m_inp_matrix[4]->read() & 8);
@@ -406,7 +406,7 @@ READ8_MEMBER(h2hbaskb_state::read_in)
 
 // config
 
-static INPUT_PORTS_START( h2hbaskb )
+static INPUT_PORTS_START( h2hbaskbc )
 	PORT_START("IN.0") // G0 port IN
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_JOYSTICK_RIGHT ) PORT_16WAY PORT_NAME("P1 Pass CW") // clockwise
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_JOYSTICK_LEFT ) PORT_16WAY PORT_NAME("P1 Pass CCW") // counter-clockwise
@@ -437,8 +437,8 @@ static INPUT_PORTS_START( h2hbaskb )
 	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_SPECIAL )
 INPUT_PORTS_END
 
-static INPUT_PORTS_START( h2hhockey )
-	PORT_INCLUDE( h2hbaskb )
+static INPUT_PORTS_START( h2hhockeyc )
+	PORT_INCLUDE( h2hbaskbc )
 
 	PORT_MODIFY("IN.3")
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_BUTTON2 ) PORT_COCKTAIL PORT_NAME("P2 Goalie Right")
@@ -448,26 +448,26 @@ static INPUT_PORTS_START( h2hhockey )
 	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_SPECIAL )
 INPUT_PORTS_END
 
-static INPUT_PORTS_START( h2hsoccer )
-	PORT_INCLUDE( h2hhockey )
+static INPUT_PORTS_START( h2hsoccerc )
+	PORT_INCLUDE( h2hhockeyc )
 
 	PORT_MODIFY("IN.1")
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_SPECIAL )
 INPUT_PORTS_END
 
-MACHINE_CONFIG_START(h2hbaskb_state::h2hbaskb)
+MACHINE_CONFIG_START(h2hbaskbc_state::h2hbaskbc)
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", COP420, 850000) // approximation - RC osc. R=43K, C=101pF
 	MCFG_COP400_CONFIG(COP400_CKI_DIVISOR_8, COP400_CKO_OSCILLATOR_OUTPUT, false) // guessed
-	MCFG_COP400_WRITE_D_CB(WRITE8(h2hbaskb_state, write_d))
-	MCFG_COP400_WRITE_G_CB(WRITE8(h2hbaskb_state, write_g))
-	MCFG_COP400_WRITE_L_CB(WRITE8(h2hbaskb_state, write_l))
-	MCFG_COP400_READ_IN_CB(READ8(h2hbaskb_state, read_in))
+	MCFG_COP400_WRITE_D_CB(WRITE8(h2hbaskbc_state, write_d))
+	MCFG_COP400_WRITE_G_CB(WRITE8(h2hbaskbc_state, write_g))
+	MCFG_COP400_WRITE_L_CB(WRITE8(h2hbaskbc_state, write_l))
+	MCFG_COP400_READ_IN_CB(READ8(h2hbaskbc_state, read_in))
 	MCFG_COP400_WRITE_SO_CB(DEVWRITELINE("speaker", speaker_sound_device, level_w))
 
 	MCFG_TIMER_DRIVER_ADD_PERIODIC("display_decay", hh_cop400_state, display_decay_tick, attotime::from_msec(1))
-	MCFG_DEFAULT_LAYOUT(layout_h2hbaskb)
+	MCFG_DEFAULT_LAYOUT(layout_h2hbaskbc)
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
@@ -475,16 +475,18 @@ MACHINE_CONFIG_START(h2hbaskb_state::h2hbaskb)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
 MACHINE_CONFIG_END
 
-MACHINE_CONFIG_DERIVED(h2hbaskb_state::h2hhockey, h2hbaskb)
+MACHINE_CONFIG_START(h2hbaskbc_state::h2hhockeyc)
+	h2hbaskbc(config);
 
 	/* basic machine hardware */
-	MCFG_DEFAULT_LAYOUT(layout_h2hhockey)
+	MCFG_DEFAULT_LAYOUT(layout_h2hhockeyc)
 MACHINE_CONFIG_END
 
-MACHINE_CONFIG_DERIVED(h2hbaskb_state::h2hsoccer, h2hbaskb)
+MACHINE_CONFIG_START(h2hbaskbc_state::h2hsoccerc)
+	h2hbaskbc(config);
 
 	/* basic machine hardware */
-	MCFG_DEFAULT_LAYOUT(layout_h2hsoccer)
+	MCFG_DEFAULT_LAYOUT(layout_h2hsoccerc)
 MACHINE_CONFIG_END
 
 
@@ -1831,17 +1833,17 @@ ROM_START( ctstein )
 ROM_END
 
 
-ROM_START( h2hbaskb )
+ROM_START( h2hbaskbc )
 	ROM_REGION( 0x0400, "maincpu", 0 )
 	ROM_LOAD( "cop420l-nmy", 0x0000, 0x0400, CRC(87152509) SHA1(acdb869b65d49b3b9855a557ed671cbbb0f61e2c) )
 ROM_END
 
-ROM_START( h2hhockey ) // dumped from Basketball
+ROM_START( h2hhockeyc ) // dumped from Basketball
 	ROM_REGION( 0x0400, "maincpu", 0 )
 	ROM_LOAD( "cop420l-nmy", 0x0000, 0x0400, CRC(87152509) SHA1(acdb869b65d49b3b9855a557ed671cbbb0f61e2c) )
 ROM_END
 
-ROM_START( h2hsoccer ) // dumped from Basketball
+ROM_START( h2hsoccerc ) // dumped from Basketball
 	ROM_REGION( 0x0400, "maincpu", 0 )
 	ROM_LOAD( "cop420l-nmy", 0x0000, 0x0400, CRC(87152509) SHA1(acdb869b65d49b3b9855a557ed671cbbb0f61e2c) )
 ROM_END
@@ -1917,30 +1919,30 @@ ROM_END
 
 
 
-//    YEAR  NAME       PARENT   CMP MACHINE    INPUT      STATE          INIT COMPANY, FULLNAME, FLAGS
-CONS( 1979, ctstein,   0,        0, ctstein,   ctstein,   ctstein_state,   0, "Castle Toy", "Einstein (Castle Toy)", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK )
+//    YEAR  NAME        PARENT   COMP MACHINE     INPUT       STATE          INIT COMPANY, FULLNAME, FLAGS
+CONS( 1979, ctstein,    0,         0, ctstein,    ctstein,    ctstein_state,   0, "Castle Toy", "Einstein (Castle Toy)", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK )
 
-CONS( 1980, h2hbaskb,  0,        0, h2hbaskb,  h2hbaskb,  h2hbaskb_state,  0, "Coleco", "Head to Head: Electronic Basketball (COP420L version)", MACHINE_SUPPORTS_SAVE )
-CONS( 1980, h2hhockey, h2hbaskb, 0, h2hhockey, h2hhockey, h2hbaskb_state,  0, "Coleco", "Head to Head: Electronic Hockey (COP420L version)", MACHINE_SUPPORTS_SAVE )
-CONS( 1980, h2hsoccer, h2hbaskb, 0, h2hsoccer, h2hsoccer, h2hbaskb_state,  0, "Coleco", "Head to Head: Electronic Soccer (COP420L version)", MACHINE_SUPPORTS_SAVE )
+CONS( 1980, h2hbaskbc,  0,         0, h2hbaskbc,  h2hbaskbc,  h2hbaskbc_state, 0, "Coleco", "Head to Head: Electronic Basketball (COP420L version)", MACHINE_SUPPORTS_SAVE )
+CONS( 1980, h2hhockeyc, h2hhockey, 0, h2hhockeyc, h2hhockeyc, h2hbaskbc_state, 0, "Coleco", "Head to Head: Electronic Hockey (COP420L version)", MACHINE_SUPPORTS_SAVE )
+CONS( 1980, h2hsoccerc, 0,         0, h2hsoccerc, h2hsoccerc, h2hbaskbc_state, 0, "Coleco", "Head to Head: Electronic Soccer (COP420L version)", MACHINE_SUPPORTS_SAVE )
 
-CONS( 1981, einvaderc, einvader, 0, einvaderc, einvaderc, einvaderc_state, 0, "Entex", "Space Invader (Entex, COP444L version)", MACHINE_SUPPORTS_SAVE )
+CONS( 1981, einvaderc,  einvader,  0, einvaderc,  einvaderc,  einvaderc_state, 0, "Entex", "Space Invader (Entex, COP444L version)", MACHINE_SUPPORTS_SAVE )
 
-CONS( 1980, unkeinv,   0,        0, unkeinv,   unkeinv,   unkeinv_state,   0, "Gordon Barlow Design", "unknown electronic Space Invaders game (patent)", MACHINE_SUPPORTS_SAVE )
+CONS( 1980, unkeinv,    0,         0, unkeinv,    unkeinv,    unkeinv_state,   0, "Gordon Barlow Design", "unknown electronic Space Invaders game (patent)", MACHINE_SUPPORTS_SAVE )
 
-CONS( 1980, lchicken,  0,        0, lchicken,  lchicken,  lchicken_state,  0, "LJN", "I Took a Lickin' From a Chicken", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK | MACHINE_MECHANICAL )
+CONS( 1980, lchicken,   0,         0, lchicken,   lchicken,   lchicken_state,  0, "LJN", "I Took a Lickin' From a Chicken", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK | MACHINE_MECHANICAL )
 
-CONS( 1979, funjacks,  0,        0, funjacks,  funjacks,  funjacks_state,  0, "Mattel", "Funtronics: Jacks", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK )
-CONS( 1979, funrlgl,   0,        0, funrlgl,   funrlgl,   funrlgl_state,   0, "Mattel", "Funtronics: Red Light Green Light", MACHINE_SUPPORTS_SAVE )
-CONS( 1981, mdallas,   0,        0, mdallas,   mdallas,   mdallas_state,   0, "Mattel", "Dalla$ (J.R. handheld)", MACHINE_SUPPORTS_SAVE ) // ***
+CONS( 1979, funjacks,   0,         0, funjacks,   funjacks,   funjacks_state,  0, "Mattel", "Funtronics: Jacks", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK )
+CONS( 1979, funrlgl,    0,         0, funrlgl,    funrlgl,    funrlgl_state,   0, "Mattel", "Funtronics: Red Light Green Light", MACHINE_SUPPORTS_SAVE )
+CONS( 1981, mdallas,    0,         0, mdallas,    mdallas,    mdallas_state,   0, "Mattel", "Dalla$ (J.R. handheld)", MACHINE_SUPPORTS_SAVE ) // ***
 
-CONS( 1980, plus1,     0,        0, plus1,     plus1,     plus1_state,     0, "Milton Bradley", "Plus One", MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_CONTROLS ) // ***
-CONS( 1981, lightfgt,  0,        0, lightfgt,  lightfgt,  lightfgt_state,  0, "Milton Bradley", "Electronic Lightfight - The Games of Dueling Lights", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK )
-CONS( 1982, bship82,   bship,    0, bship82,   bship82,   bship82_state,   0, "Milton Bradley", "Electronic Battleship (1982 version)", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK ) // ***
+CONS( 1980, plus1,      0,         0, plus1,      plus1,      plus1_state,     0, "Milton Bradley", "Plus One", MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_CONTROLS ) // ***
+CONS( 1981, lightfgt,   0,         0, lightfgt,   lightfgt,   lightfgt_state,  0, "Milton Bradley", "Electronic Lightfight - The Games of Dueling Lights", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK )
+CONS( 1982, bship82,    bship,     0, bship82,    bship82,    bship82_state,   0, "Milton Bradley", "Electronic Battleship (1982 version)", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK ) // ***
 
-CONS( 1978, qkracer,   0,        0, qkracer,   qkracer,   qkracer_state,   0, "National Semiconductor", "QuizKid Racer (COP420 version)", MACHINE_SUPPORTS_SAVE | MACHINE_NO_SOUND_HW )
+CONS( 1978, qkracer,    0,         0, qkracer,    qkracer,    qkracer_state,   0, "National Semiconductor", "QuizKid Racer (COP420 version)", MACHINE_SUPPORTS_SAVE | MACHINE_NO_SOUND_HW )
 
-CONS( 1987, vidchal,   0,        0, vidchal,   vidchal,   vidchal_state,   0, "Select Merchandise", "Video Challenger", MACHINE_SUPPORTS_SAVE | MACHINE_NOT_WORKING )
+CONS( 1987, vidchal,    0,         0, vidchal,    vidchal,    vidchal_state,   0, "Select Merchandise", "Video Challenger", MACHINE_SUPPORTS_SAVE | MACHINE_NOT_WORKING )
 
 // ***: As far as MAME is concerned, the game is emulated fine. But for it to be playable, it requires interaction
 // with other, unemulatable, things eg. game board/pieces, playing cards, pen & paper, etc.

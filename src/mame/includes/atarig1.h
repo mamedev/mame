@@ -16,14 +16,12 @@ class atarig1_state : public atarigen_state
 public:
 	atarig1_state(const machine_config &mconfig, device_type type, const char *tag)
 		: atarigen_state(mconfig, type, tag),
-			m_maincpu(*this, "maincpu"),
 			m_jsa(*this, "jsa"),
 			m_playfield_tilemap(*this, "playfield"),
 			m_alpha_tilemap(*this, "alpha"),
 			m_rle(*this, "rle"),
 			m_mo_command(*this, "mo_command") { }
 
-	required_device<cpu_device> m_maincpu;
 	required_device<atari_jsa_ii_device> m_jsa;
 	required_device<tilemap_device> m_playfield_tilemap;
 	required_device<tilemap_device> m_alpha_tilemap;
@@ -72,6 +70,7 @@ public:
 	void pitfight(machine_config &config);
 	void hydrap(machine_config &config);
 	void hydra(machine_config &config);
+	void main_map(address_map &map);
 private:
 	void pitfightb_cheap_slapstic_init();
 };

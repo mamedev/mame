@@ -6,8 +6,8 @@
  *
  ****************************************************************************/
 
-#ifndef GALAXY_H_
-#define GALAXY_H_
+#ifndef MAME_INCLUDES_GALAXY_H
+#define MAME_INCLUDES_GALAXY_H
 
 #include "imagedev/snapquik.h"
 #include "imagedev/cassette.h"
@@ -49,6 +49,9 @@ public:
 	DECLARE_SNAPSHOT_LOAD_MEMBER( galaxy );
 	void galaxy(machine_config &config);
 	void galaxyp(machine_config &config);
+	void galaxy_mem(address_map &map);
+	void galaxyp_io(address_map &map);
+	void galaxyp_mem(address_map &map);
 protected:
 	required_device<cassette_image_device> m_cassette;
 	required_device<ram_device> m_ram;
@@ -57,4 +60,4 @@ protected:
 };
 
 
-#endif /* GALAXY_H_ */
+#endif // MAME_INCLUDES_GALAXY_H

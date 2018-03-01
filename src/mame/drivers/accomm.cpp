@@ -42,24 +42,24 @@
 class accomm_state : public driver_device
 {
 public:
-	accomm_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag),
-			m_maincpu(*this, "maincpu"),
-			m_beeper(*this, "beeper"),
-			m_ram(*this, RAM_TAG),
-			m_via(*this, "via6522"),
-			m_acia(*this, "acia"),
-			m_acia_clock(*this, "acia_clock"),
-			m_adlc(*this, "mc6854"),
-			m_vram(*this, "vram"),
-			m_keybd1(*this, "LINE1.%u", 0),
-			m_keybd2(*this, "LINE2.%u", 0),
-			m_ch00rom_enabled(true)
+	accomm_state(const machine_config &mconfig, device_type type, const char *tag) :
+		driver_device(mconfig, type, tag),
+		m_maincpu(*this, "maincpu"),
+		m_beeper(*this, "beeper"),
+		m_ram(*this, RAM_TAG),
+		m_via(*this, "via6522"),
+		m_acia(*this, "acia"),
+		m_acia_clock(*this, "acia_clock"),
+		m_adlc(*this, "mc6854"),
+		m_vram(*this, "vram"),
+		m_keybd1(*this, "LINE1.%u", 0),
+		m_keybd2(*this, "LINE2.%u", 0),
+		m_ch00rom_enabled(true)
 	{ }
 
-	virtual void machine_reset() override;
-	virtual void machine_start() override;
+	void accomm(machine_config &config);
 
+protected:
 	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 
 	DECLARE_WRITE8_MEMBER(ch00switch_w);
@@ -75,8 +75,10 @@ public:
 	DECLARE_PALETTE_INIT(accomm);
 	INTERRUPT_GEN_MEMBER(vbl_int);
 
-	void accomm(machine_config &config);
-protected:
+	virtual void machine_reset() override;
+	virtual void machine_start() override;
+	void main_map(address_map &map);
+
 	// devices
 	required_device<g65816_device> m_maincpu;
 	required_device<beep_device> m_beeper;
@@ -218,7 +220,7 @@ void accomm_state::video_start()
 
 WRITE8_MEMBER(accomm_state::ch00switch_w)
 {
-	if (!machine().side_effect_disabled())
+	if (!machine().side_effects_disabled())
 		m_ch00rom_enabled = false;
 }
 
@@ -633,7 +635,7 @@ WRITE_LINE_MEMBER(accomm_state::econet_clk_w)
 	m_adlc->txc_w(state);
 }
 
-static ADDRESS_MAP_START( main_map, AS_PROGRAM, 8, accomm_state )
+ADDRESS_MAP_START(accomm_state::main_map)
 	AM_RANGE(0x000000, 0x1fffff) AM_READWRITE(ram_r, ram_w)                                       /* System RAM */
 	AM_RANGE(0x200000, 0x3fffff) AM_NOP                                                           /* External expansion RAM */
 	AM_RANGE(0x400000, 0x400000) AM_NOP                                                           /* MODEM */
@@ -829,7 +831,7 @@ static INPUT_PORTS_START( accomm )
 INPUT_PORTS_END
 
 MACHINE_CONFIG_START(accomm_state::accomm)
-	MCFG_CPU_ADD("maincpu", G65816, XTAL(16'000'000) / 8)
+	MCFG_CPU_ADD("maincpu", G65816, 16_MHz_XTAL / 8)
 	MCFG_CPU_PROGRAM_MAP(main_map)
 	MCFG_CPU_VBLANK_INT_DRIVER("screen", accomm_state, vbl_int)
 

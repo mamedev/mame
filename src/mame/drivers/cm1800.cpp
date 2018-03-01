@@ -53,6 +53,8 @@ public:
 	DECLARE_WRITE8_MEMBER(port00_w);
 
 	void cm1800(machine_config &config);
+	void io_map(address_map &map);
+	void mem_map(address_map &map);
 private:
 	virtual void machine_reset() override;
 	required_device<cpu_device> m_maincpu;
@@ -66,24 +68,24 @@ WRITE8_MEMBER( cm1800_state::port00_w )
 
 READ8_MEMBER( cm1800_state::port01_r )
 {
-	return (m_uart->get_output_pin(AY31015_DAV)) | (m_uart->get_output_pin(AY31015_TBMT) << 2);
+	return (m_uart->dav_r()) | (m_uart->tbmt_r() << 2);
 }
 
 READ8_MEMBER( cm1800_state::port00_r )
 {
-	m_uart->set_input_pin(AY31015_RDAV, 0);
+	m_uart->write_rdav(0);
 	u8 result = m_uart->get_received_data();
-	m_uart->set_input_pin(AY31015_RDAV, 1);
+	m_uart->write_rdav(1);
 	return result;
 }
 
-static ADDRESS_MAP_START( mem_map, AS_PROGRAM, 8, cm1800_state )
+ADDRESS_MAP_START(cm1800_state::mem_map)
 	ADDRESS_MAP_UNMAP_HIGH
 	AM_RANGE( 0x0000, 0x07ff ) AM_ROM AM_REGION("roms", 0)
 	AM_RANGE( 0x0800, 0xffff ) AM_RAM
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( io_map, AS_IO, 8, cm1800_state )
+ADDRESS_MAP_START(cm1800_state::io_map)
 	ADDRESS_MAP_UNMAP_HIGH
 	AM_RANGE(0x00, 0x00) AM_READWRITE(port00_r,port00_w)
 	AM_RANGE(0x01, 0x01) AM_READ(port01_r)
@@ -96,16 +98,16 @@ INPUT_PORTS_END
 
 void cm1800_state::machine_reset()
 {
-	m_uart->set_input_pin(AY31015_XR, 0);
-	m_uart->set_input_pin(AY31015_XR, 1);
-	m_uart->set_input_pin(AY31015_SWE, 0);
-	m_uart->set_input_pin(AY31015_NP, 1);
-	m_uart->set_input_pin(AY31015_TSB, 0);
-	m_uart->set_input_pin(AY31015_NB1, 1);
-	m_uart->set_input_pin(AY31015_NB2, 1);
-	m_uart->set_input_pin(AY31015_EPS, 1);
-	m_uart->set_input_pin(AY31015_CS, 1);
-	m_uart->set_input_pin(AY31015_CS, 0);
+	m_uart->write_xr(0);
+	m_uart->write_xr(1);
+	m_uart->write_swe(0);
+	m_uart->write_np(1);
+	m_uart->write_tsb(0);
+	m_uart->write_nb1(1);
+	m_uart->write_nb2(1);
+	m_uart->write_eps(1);
+	m_uart->write_cs(1);
+	m_uart->write_cs(0);
 }
 
 MACHINE_CONFIG_START(cm1800_state::cm1800)

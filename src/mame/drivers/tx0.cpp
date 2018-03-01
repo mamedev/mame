@@ -80,12 +80,12 @@ DRIVER_INIT_MEMBER(tx0_state,tx0)
 }
 
 
-static ADDRESS_MAP_START(tx0_64kw_map, AS_PROGRAM, 32, tx0_state )
+ADDRESS_MAP_START(tx0_state::tx0_64kw_map)
 	AM_RANGE(0x0000, 0xffff) AM_RAM
 ADDRESS_MAP_END
 
 
-static ADDRESS_MAP_START(tx0_8kw_map, AS_PROGRAM, 32, tx0_state )
+ADDRESS_MAP_START(tx0_state::tx0_8kw_map)
 	AM_RANGE(0x0000, 0x1fff) AM_RAM
 ADDRESS_MAP_END
 
@@ -1583,7 +1583,8 @@ MACHINE_CONFIG_START(tx0_state::tx0_64kw)
 	MCFG_PALETTE_INIT_OWNER(tx0_state, tx0)
 MACHINE_CONFIG_END
 
-MACHINE_CONFIG_DERIVED(tx0_state::tx0_8kw, tx0_64kw)
+MACHINE_CONFIG_START(tx0_state::tx0_8kw)
+	tx0_64kw(config);
 
 	/* basic machine hardware */
 	/* TX0 CPU @ approx. 167 kHz (no master clock, but the memory cycle time is

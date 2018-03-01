@@ -91,6 +91,7 @@ public:
 	void tmek(machine_config &config);
 	void primrage20(machine_config &config);
 	void primrage(machine_config &config);
+	void main_map(address_map &map);
 private:
 	void tmek_update_mode(offs_t offset);
 	void tmek_protection_w(address_space &space, offs_t offset, uint16_t data);

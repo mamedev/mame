@@ -24,6 +24,7 @@ public:
 	u32 screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 
 	void d461(machine_config &config);
+	void mem_map(address_map &map);
 private:
 	required_device<cpu_device> m_maincpu;
 };
@@ -33,7 +34,7 @@ u32 d400_state::screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const
 	return 0;
 }
 
-static ADDRESS_MAP_START( mem_map, AS_PROGRAM, 8, d400_state )
+ADDRESS_MAP_START(d400_state::mem_map)
 	AM_RANGE(0x0000, 0x3fff) AM_RAM
 	//AM_RANGE(0x4000, 0x403f) AM_DEVREADWRITE("vpac", crt9007_device, read, write)
 	AM_RANGE(0x4800, 0x48ff) AM_RAM

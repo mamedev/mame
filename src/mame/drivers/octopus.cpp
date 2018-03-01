@@ -225,6 +225,11 @@ public:
 	};
 
 	void octopus(machine_config &config);
+	void octopus_io(address_map &map);
+	void octopus_mem(address_map &map);
+	void octopus_sub_io(address_map &map);
+	void octopus_sub_mem(address_map &map);
+	void octopus_vram(address_map &map);
 protected:
 	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr) override;
 
@@ -280,7 +285,7 @@ private:
 };
 
 
-static ADDRESS_MAP_START( octopus_mem, AS_PROGRAM, 8, octopus_state )
+ADDRESS_MAP_START(octopus_state::octopus_mem)
 	AM_RANGE(0x00000, 0xcffff) AM_RAMBANK("main_ram_bank")
 	AM_RANGE(0xd0000, 0xdffff) AM_RAM AM_SHARE("vram")
 	AM_RANGE(0xe0000, 0xe3fff) AM_NOP
@@ -290,7 +295,7 @@ static ADDRESS_MAP_START( octopus_mem, AS_PROGRAM, 8, octopus_state )
 	AM_RANGE(0xfc000, 0xfffff) AM_ROM AM_REGION("user1",0)
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( octopus_io, AS_IO, 8, octopus_state )
+ADDRESS_MAP_START(octopus_state::octopus_io)
 	ADDRESS_MAP_UNMAP_HIGH
 	AM_RANGE(0x00, 0x0f) AM_DEVREADWRITE("dma1", am9517a_device, read, write)
 	AM_RANGE(0x10, 0x1f) AM_DEVREADWRITE("dma2", am9517a_device, read, write)
@@ -318,16 +323,16 @@ static ADDRESS_MAP_START( octopus_io, AS_IO, 8, octopus_state )
 ADDRESS_MAP_END
 
 
-static ADDRESS_MAP_START( octopus_sub_mem, AS_PROGRAM, 8, octopus_state )
+ADDRESS_MAP_START(octopus_state::octopus_sub_mem)
 	AM_RANGE(0x0000, 0xffff) AM_DEVREADWRITE("z80_bank", address_map_bank_device, read8, write8)
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( octopus_sub_io, AS_IO, 8, octopus_state )
+ADDRESS_MAP_START(octopus_state::octopus_sub_io)
 	ADDRESS_MAP_UNMAP_HIGH
 	AM_RANGE(0x0000, 0xffff) AM_READWRITE(z80_io_r, z80_io_w)
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( octopus_vram, 0, 8, octopus_state )
+ADDRESS_MAP_START(octopus_state::octopus_vram)
 	AM_RANGE(0x0000,0xffff) AM_READWRITE(vram_r, vram_w)
 ADDRESS_MAP_END
 

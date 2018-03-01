@@ -186,11 +186,15 @@ uint32_t boogwing_state::screen_update_boogwing(screen_device &screen, bitmap_rg
 	uint16_t flip = m_deco_tilegen1->pf_control_r(space, 0, 0xffff);
 	uint16_t priority = m_priority;
 
-	/* Draw sprite planes to bitmaps for later mixing */
-	m_sprgen2->draw_sprites(bitmap, cliprect, m_spriteram2->buffer(), 0x400, true);
-	m_sprgen1->draw_sprites(bitmap, cliprect, m_spriteram->buffer(), 0x400, true);
-
+	// sprites are flipped relative to tilemaps
 	flip_screen_set(BIT(flip, 7));
+	m_sprgen1->set_flip_screen(!BIT(flip, 7));
+	m_sprgen2->set_flip_screen(!BIT(flip, 7));
+
+	/* Draw sprite planes to bitmaps for later mixing */
+	m_sprgen2->draw_sprites(bitmap, cliprect, m_spriteram2->buffer(), 0x400);
+	m_sprgen1->draw_sprites(bitmap, cliprect, m_spriteram->buffer(), 0x400);
+
 	m_deco_tilegen1->pf_update(m_pf1_rowscroll, m_pf2_rowscroll);
 	m_deco_tilegen2->pf_update(m_pf3_rowscroll, m_pf4_rowscroll);
 

@@ -83,6 +83,10 @@ public:
 	required_device<palette_device> m_palette;
 
 	void mbc200(machine_config &config);
+	void mbc200_io(address_map &map);
+	void mbc200_mem(address_map &map);
+	void mbc200_sub_io(address_map &map);
+	void mbc200_sub_mem(address_map &map);
 private:
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
@@ -100,7 +104,7 @@ private:
 };
 
 
-static ADDRESS_MAP_START(mbc200_mem, AS_PROGRAM, 8, mbc200_state)
+ADDRESS_MAP_START(mbc200_state::mbc200_mem)
 	ADDRESS_MAP_UNMAP_HIGH
 	AM_RANGE( 0x0000, 0x0fff ) AM_RAM AM_REGION("maincpu", 0)
 	AM_RANGE( 0x1000, 0xffff ) AM_RAM
@@ -139,7 +143,7 @@ WRITE8_MEMBER( mbc200_state::pm_portb_w )
 	m_beep->set_state(BIT(data, 1)); // key-click
 }
 
-static ADDRESS_MAP_START( mbc200_io , AS_IO, 8, mbc200_state)
+ADDRESS_MAP_START(mbc200_state::mbc200_io)
 	ADDRESS_MAP_UNMAP_HIGH
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	//AM_RANGE(0xe0, 0xe0) AM_DEVREADWRITE("uart1", i8251_device, data_r, data_w)
@@ -153,7 +157,7 @@ ADDRESS_MAP_END
 
 
 
-static ADDRESS_MAP_START(mbc200_sub_mem, AS_PROGRAM, 8, mbc200_state)
+ADDRESS_MAP_START(mbc200_state::mbc200_sub_mem)
 	ADDRESS_MAP_UNMAP_HIGH
 	AM_RANGE( 0x0000, 0x2fff ) AM_ROM
 	AM_RANGE( 0x3000, 0x7fff ) AM_RAM
@@ -169,7 +173,7 @@ READ8_MEMBER(mbc200_state::p2_porta_r)
 	return tmp;
 }
 
-static ADDRESS_MAP_START( mbc200_sub_io , AS_IO, 8, mbc200_state)
+ADDRESS_MAP_START(mbc200_state::mbc200_sub_io)
 	ADDRESS_MAP_UNMAP_HIGH
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	AM_RANGE(0x70, 0x73) AM_DEVREADWRITE("ppi_1", i8255_device, read, write)

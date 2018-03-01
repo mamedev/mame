@@ -116,6 +116,8 @@ public:
 	DECLARE_CUSTOM_INPUT_MEMBER(printer_ready_r);
 	DECLARE_CUSTOM_INPUT_MEMBER(printer_ack_r);
 	void pencil2(machine_config &config);
+	void io_map(address_map &map);
+	void mem_map(address_map &map);
 private:
 	virtual void machine_start() override;
 	int m_centronics_busy;
@@ -127,7 +129,7 @@ private:
 	required_device<generic_slot_device> m_cart;
 };
 
-static ADDRESS_MAP_START(mem_map, AS_PROGRAM, 8, pencil2_state)
+ADDRESS_MAP_START(pencil2_state::mem_map)
 	ADDRESS_MAP_UNMAP_HIGH
 	AM_RANGE(0x0000, 0x1fff) AM_ROM
 	AM_RANGE(0x2000, 0x5fff) AM_WRITENOP  // stop error log filling up
@@ -135,7 +137,7 @@ static ADDRESS_MAP_START(mem_map, AS_PROGRAM, 8, pencil2_state)
 	//AM_RANGE(0x8000, 0xffff)      // mapped by the cartslot
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START(io_map, AS_IO, 8, pencil2_state)
+ADDRESS_MAP_START(pencil2_state::io_map)
 	ADDRESS_MAP_UNMAP_HIGH
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	AM_RANGE(0x00, 0x0f) AM_DEVWRITE("cent_data_out", output_latch_device, write)

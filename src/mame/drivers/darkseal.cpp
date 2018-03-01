@@ -31,47 +31,25 @@
 
 /******************************************************************************/
 
-WRITE16_MEMBER(darkseal_state::control_w)
+WRITE16_MEMBER(darkseal_state::irq_ack_w)
 {
-	switch (offset<<1) {
-	case 6: /* DMA flag */
-		m_spriteram->copy();
-		return;
-	case 8: /* Sound CPU write */
-		m_soundlatch->write(space, 0, data & 0xff);
-		m_audiocpu->set_input_line(0, HOLD_LINE);
-		return;
-	case 0xa: /* IRQ Ack (VBL) */
-		return;
-	}
-}
-
-READ16_MEMBER(darkseal_state::control_r)
-{
-	switch (offset<<1)
-	{
-		case 0:
-			return ioport("DSW")->read();
-
-		case 2:
-			return ioport("P1_P2")->read();
-
-		case 4:
-			return ioport("SYSTEM")->read();
-	}
-
-	return ~0;
+	m_maincpu->set_input_line(M68K_IRQ_6, CLEAR_LINE);
 }
 
 /******************************************************************************/
 
-static ADDRESS_MAP_START( darkseal_map, AS_PROGRAM, 16, darkseal_state )
+ADDRESS_MAP_START(darkseal_state::darkseal_map)
 	AM_RANGE(0x000000, 0x07ffff) AM_ROM
 	AM_RANGE(0x100000, 0x103fff) AM_RAM AM_SHARE("ram")
 	AM_RANGE(0x120000, 0x1207ff) AM_RAM AM_SHARE("spriteram")
 	AM_RANGE(0x140000, 0x140fff) AM_RAM_WRITE(palette_24bit_rg_w) AM_SHARE("paletteram")
 	AM_RANGE(0x141000, 0x141fff) AM_RAM_WRITE(palette_24bit_b_w) AM_SHARE("paletteram2")
-	AM_RANGE(0x180000, 0x18000f) AM_READWRITE(control_r, control_w)
+	AM_RANGE(0x180000, 0x180001) AM_READ_PORT("DSW")
+	AM_RANGE(0x180002, 0x180003) AM_READ_PORT("P1_P2")
+	AM_RANGE(0x180004, 0x180005) AM_READ_PORT("SYSTEM")
+	AM_RANGE(0x180006, 0x180007) AM_READNOP AM_DEVWRITE("spriteram", buffered_spriteram16_device, write)
+	AM_RANGE(0x180008, 0x180009) AM_DEVWRITE8("soundlatch", generic_latch_8_device, write, 0x00ff).cswidth(16)
+	AM_RANGE(0x18000a, 0x18000b) AM_READNOP AM_WRITE(irq_ack_w)
 
 	AM_RANGE(0x200000, 0x201fff) AM_DEVREADWRITE("tilegen2", deco16ic_device, pf1_data_r, pf1_data_w)
 	AM_RANGE(0x202000, 0x203fff) AM_DEVREADWRITE("tilegen2", deco16ic_device, pf2_data_r, pf2_data_w)
@@ -88,7 +66,7 @@ ADDRESS_MAP_END
 
 /******************************************************************************/
 
-static ADDRESS_MAP_START( sound_map, AS_PROGRAM, 8, darkseal_state )
+ADDRESS_MAP_START(darkseal_state::sound_map)
 	AM_RANGE(0x000000, 0x00ffff) AM_ROM
 	AM_RANGE(0x100000, 0x100001) AM_DEVREADWRITE("ym1", ym2203_device, read, write)
 	AM_RANGE(0x110000, 0x110001) AM_DEVREADWRITE("ym2", ym2151_device, read, write)
@@ -221,7 +199,6 @@ static const gfx_layout seallayout2 =
 static GFXDECODE_START( darkseal )
 	GFXDECODE_ENTRY( "gfx1", 0, charlayout,    0, 16 )  /* Characters 8x8 */
 	GFXDECODE_ENTRY( "gfx2", 0, seallayout,  768, 16 )  /* Tiles 16x16 */
-	GFXDECODE_ENTRY( "gfx1", 0, charlayout,    0, 16 )  /* Characters 8x8 */
 	GFXDECODE_ENTRY( "gfx3", 0, seallayout, 1024, 16 )  /* Tiles 16x16 */
 	GFXDECODE_ENTRY( "gfx4", 0, seallayout2, 256, 32 )  /* Sprites 16x16 */
 GFXDECODE_END
@@ -233,7 +210,7 @@ MACHINE_CONFIG_START(darkseal_state::darkseal)
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", M68000, XTAL(24'000'000)/2) /* Custom chip 59 */
 	MCFG_CPU_PROGRAM_MAP(darkseal_map)
-	MCFG_CPU_VBLANK_INT_DRIVER("screen", darkseal_state,  irq6_line_hold)/* VBL */
+	MCFG_CPU_VBLANK_INT_DRIVER("screen", darkseal_state,  irq6_line_assert)/* VBL */
 
 	MCFG_CPU_ADD("audiocpu", H6280, XTAL(32'220'000)/4) /* Custom chip 45, Audio section crystal is 32.220 MHz */
 	MCFG_CPU_PROGRAM_MAP(sound_map)
@@ -254,7 +231,7 @@ MACHINE_CONFIG_START(darkseal_state::darkseal)
 
 	MCFG_DEVICE_ADD("tilegen1", DECO16IC, 0)
 	MCFG_DECO16IC_SPLIT(0)
-	MCFG_DECO16IC_PF1_SIZE(DECO_64x32)
+	MCFG_DECO16IC_PF1_SIZE(DECO_64x64)
 	MCFG_DECO16IC_PF2_SIZE(DECO_64x64)     // both these tilemaps need to be twice the y size of usual!
 	MCFG_DECO16IC_PF1_TRANS_MASK(0x0f)
 	MCFG_DECO16IC_PF2_TRANS_MASK(0x0f)
@@ -276,12 +253,12 @@ MACHINE_CONFIG_START(darkseal_state::darkseal)
 	MCFG_DECO16IC_PF2_COL_BANK(0x00)
 	MCFG_DECO16IC_PF1_COL_MASK(0x0f)
 	MCFG_DECO16IC_PF2_COL_MASK(0x0f)
-	MCFG_DECO16IC_PF12_8X8_BANK(2)
-	MCFG_DECO16IC_PF12_16X16_BANK(3)
+	MCFG_DECO16IC_PF12_8X8_BANK(0)
+	MCFG_DECO16IC_PF12_16X16_BANK(2)
 	MCFG_DECO16IC_GFXDECODE("gfxdecode")
 
 	MCFG_DEVICE_ADD("spritegen", DECO_SPRITE, 0)
-	MCFG_DECO_SPRITE_GFX_REGION(4)
+	MCFG_DECO_SPRITE_GFX_REGION(3)
 	MCFG_DECO_SPRITE_GFXDECODE("gfxdecode")
 
 
@@ -289,6 +266,7 @@ MACHINE_CONFIG_START(darkseal_state::darkseal)
 	MCFG_SPEAKER_STANDARD_MONO("mono")
 
 	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
+	MCFG_GENERIC_LATCH_DATA_PENDING_CB(INPUTLINE("audiocpu", 0))
 
 	MCFG_SOUND_ADD("ym1", YM2203, XTAL(32'220'000)/8)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.45)

@@ -81,10 +81,12 @@ WRITE8_MEMBER(thedeep_state::protection_w)
 	{
 		case 0x11:
 			flip_screen_set(1);
+			m_spritegen->set_flip_screen(true);
 		break;
 
 		case 0x20:
 			flip_screen_set(0);
+			m_spritegen->set_flip_screen(false);
 		break;
 
 		case 0x30:
@@ -146,7 +148,7 @@ WRITE8_MEMBER(thedeep_state::e100_w)
 		logerror("pc %04x: e100 = %02x\n", m_maincpu->pc(),data);
 }
 
-static ADDRESS_MAP_START( main_map, AS_PROGRAM, 8, thedeep_state )
+ADDRESS_MAP_START(thedeep_state::main_map)
 	AM_RANGE(0x0000, 0x7fff) AM_ROM
 	AM_RANGE(0x8000, 0xbfff) AM_ROMBANK("bank1")    // ROM (banked)
 	AM_RANGE(0xc000, 0xcfff) AM_RAM
@@ -174,7 +176,7 @@ ADDRESS_MAP_END
 
 ***************************************************************************/
 
-static ADDRESS_MAP_START( audio_map, AS_PROGRAM, 8, thedeep_state )
+ADDRESS_MAP_START(thedeep_state::audio_map)
 	AM_RANGE(0x0000, 0x07ff) AM_RAM
 	AM_RANGE(0x0800, 0x0801) AM_DEVWRITE("ymsnd", ym2203_device, write)  //
 	AM_RANGE(0x3000, 0x3000) AM_DEVREAD("soundlatch", generic_latch_8_device, read) // From Main CPU
@@ -190,7 +192,8 @@ ADDRESS_MAP_END
 
 WRITE8_MEMBER(thedeep_state::p1_w)
 {
-	flip_screen_set((data & 1) ^ 1);
+	flip_screen_set(!BIT(data, 0));
+	m_spritegen->set_flip_screen(!BIT(data, 0));
 	membank("bank1")->set_entry((data & 6) >> 1);
 	logerror("P1 %02x\n",data);
 }
@@ -236,14 +239,6 @@ READ8_MEMBER(thedeep_state::p0_r)
 
 	return (ioport("COINS")->read() & 0xfe) | (coin_mux & 1);
 }
-
-static ADDRESS_MAP_START( mcu_io_map, AS_IO, 8, thedeep_state )
-	ADDRESS_MAP_UNMAP_HIGH
-	AM_RANGE(MCS51_PORT_P0,MCS51_PORT_P0) AM_READ(p0_r)
-	AM_RANGE(MCS51_PORT_P1,MCS51_PORT_P1) AM_WRITE(p1_w)
-	AM_RANGE(MCS51_PORT_P2,MCS51_PORT_P2) AM_READWRITE(from_main_r,to_main_w)
-	AM_RANGE(MCS51_PORT_P3,MCS51_PORT_P3) AM_WRITE(p3_w)
-ADDRESS_MAP_END
 
 
 /***************************************************************************
@@ -417,7 +412,11 @@ MACHINE_CONFIG_START(thedeep_state::thedeep)
 
 	/* MCU is a i8751 running at 8Mhz (8mhz xtal)*/
 	MCFG_CPU_ADD("mcu", I8751, XTAL(8'000'000))
-	MCFG_CPU_IO_MAP(mcu_io_map)
+	MCFG_MCS51_PORT_P0_IN_CB(READ8(thedeep_state, p0_r))
+	MCFG_MCS51_PORT_P1_OUT_CB(WRITE8(thedeep_state, p1_w))
+	MCFG_MCS51_PORT_P2_IN_CB(READ8(thedeep_state, from_main_r))
+	MCFG_MCS51_PORT_P2_OUT_CB(WRITE8(thedeep_state, to_main_w))
+	MCFG_MCS51_PORT_P3_OUT_CB(WRITE8(thedeep_state, p3_w))
 	MCFG_CPU_VBLANK_INT_DRIVER("screen", thedeep_state, mcu_irq) // unknown source, but presumably vblank
 	MCFG_DEVICE_DISABLE()
 

@@ -92,6 +92,8 @@ public:
 	uint32_t screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 
 	void mmagic(machine_config &config);
+	void mmagic_io(address_map &map);
+	void mmagic_mem(address_map &map);
 protected:
 	virtual void machine_start() override;
 
@@ -115,7 +117,7 @@ private:
 //  ADDRESS MAPS
 //**************************************************************************
 
-static ADDRESS_MAP_START( mmagic_mem, AS_PROGRAM, 8, mmagic_state )
+ADDRESS_MAP_START(mmagic_state::mmagic_mem)
 	ADDRESS_MAP_UNMAP_HIGH
 	AM_RANGE(0x0000, 0x17ff) AM_ROM
 	AM_RANGE(0x2000, 0x21ff) AM_RAM
@@ -125,7 +127,7 @@ static ADDRESS_MAP_START( mmagic_mem, AS_PROGRAM, 8, mmagic_state )
 	AM_RANGE(0x8004, 0x8004) AM_READ(vblank_r)
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( mmagic_io, AS_IO, 8, mmagic_state )
+ADDRESS_MAP_START(mmagic_state::mmagic_io)
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	AM_RANGE(0x80, 0x80) AM_WRITE(color_w)
 	AM_RANGE(0x81, 0x81) AM_WRITE(audio_w)

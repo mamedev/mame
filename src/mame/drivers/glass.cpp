@@ -104,12 +104,12 @@ WRITE_LINE_MEMBER(glass_state::coin2_counter_w)
 }
 
 
-static ADDRESS_MAP_START( mcu_hostmem_map, 0, 8, glass_state )
+ADDRESS_MAP_START(glass_state::mcu_hostmem_map)
 	AM_RANGE(0x0000, 0xffff) AM_MASK(0x3fff) AM_READWRITE(shareram_r, shareram_w) // shared RAM with the main CPU
 ADDRESS_MAP_END
 
 
-static ADDRESS_MAP_START( glass_map, AS_PROGRAM, 16, glass_state )
+ADDRESS_MAP_START(glass_state::glass_map)
 	AM_RANGE(0x000000, 0x0fffff) AM_ROM                                                                   // ROM
 	AM_RANGE(0x100000, 0x101fff) AM_RAM_WRITE(vram_w) AM_SHARE("videoram")                                // Video RAM
 	AM_RANGE(0x102000, 0x102fff) AM_RAM                                                                   // Extra Video RAM
@@ -129,7 +129,7 @@ static ADDRESS_MAP_START( glass_map, AS_PROGRAM, 16, glass_state )
 ADDRESS_MAP_END
 
 
-static ADDRESS_MAP_START( oki_map, 0, 8, glass_state )
+ADDRESS_MAP_START(glass_state::oki_map)
 	AM_RANGE(0x00000, 0x2ffff) AM_ROM
 	AM_RANGE(0x30000, 0x3ffff) AM_ROMBANK("okibank")
 ADDRESS_MAP_END
@@ -263,7 +263,8 @@ MACHINE_CONFIG_START(glass_state::glass)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 MACHINE_CONFIG_END
 
-MACHINE_CONFIG_DERIVED(glass_state::glass_ds5002fp, glass)
+MACHINE_CONFIG_START(glass_state::glass_ds5002fp)
+	glass(config);
 	MCFG_DEVICE_ADD("gaelco_ds5002fp", GAELCO_DS5002FP, XTAL(24'000'000) / 2) /* verified on pcb */
 	MCFG_DEVICE_ADDRESS_MAP(0, mcu_hostmem_map)
 MACHINE_CONFIG_END

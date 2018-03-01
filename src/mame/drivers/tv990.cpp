@@ -92,6 +92,7 @@ public:
 	INTERRUPT_GEN_MEMBER(vblank);
 	DECLARE_INPUT_CHANGED_MEMBER(color);
 	void tv990(machine_config &config);
+	void tv990_mem(address_map &map);
 private:
 	uint16_t tvi1111_regs[(0x100/2)+2];
 	emu_timer *m_rowtimer;
@@ -309,7 +310,7 @@ WRITE8_MEMBER(tv990_state::kbdc_w)
 		m_kbdc->data_w(space, 0, data);
 }
 
-static ADDRESS_MAP_START(tv990_mem, AS_PROGRAM, 16, tv990_state)
+ADDRESS_MAP_START(tv990_state::tv990_mem)
 	AM_RANGE(0x000000, 0x03ffff) AM_ROM AM_REGION("maincpu", 0)
 	AM_RANGE(0x060000, 0x06ffff) AM_RAM AM_SHARE("vram") // character/attribute RAM
 	AM_RANGE(0x080000, 0x087fff) AM_RAM AM_SHARE("fontram") // font RAM

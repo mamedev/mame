@@ -829,13 +829,13 @@ READ8_MEMBER(norautp_state::test2_r)
   +----------+---------+--------------+--------+--------------+--------+--------------+------------------------+
 
 */
-static ADDRESS_MAP_START( norautp_map, AS_PROGRAM, 8, norautp_state )
+ADDRESS_MAP_START(norautp_state::norautp_map)
 	ADDRESS_MAP_GLOBAL_MASK(0x3fff)
 	AM_RANGE(0x0000, 0x1fff) AM_ROM
 	AM_RANGE(0x2000, 0x27ff) AM_RAM AM_SHARE("nvram")   /* 6116 */
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( norautp_portmap, AS_IO, 8, norautp_state )
+ADDRESS_MAP_START(norautp_state::norautp_portmap)
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	AM_RANGE(0x60, 0x63) AM_MIRROR(0x1c) AM_DEVREADWRITE("ppi8255_0", i8255_device, read, write)
 	AM_RANGE(0xa0, 0xa3) AM_MIRROR(0x1c) AM_DEVREADWRITE("ppi8255_1", i8255_device, read, write)
@@ -860,69 +860,69 @@ ADDRESS_MAP_END
 
 */
 
-static ADDRESS_MAP_START( nortest1_map, AS_PROGRAM, 8, norautp_state )
+ADDRESS_MAP_START(norautp_state::nortest1_map)
 	ADDRESS_MAP_GLOBAL_MASK(0x7fff)
 	AM_RANGE(0x0000, 0x2fff) AM_ROM
 	AM_RANGE(0x5000, 0x57ff) AM_RAM AM_SHARE("nvram")
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( norautxp_map, AS_PROGRAM, 8, norautp_state )
+ADDRESS_MAP_START(norautp_state::norautxp_map)
 //  ADDRESS_MAP_GLOBAL_MASK(~0x4000)
 	ADDRESS_MAP_GLOBAL_MASK(0x7fff)
 	AM_RANGE(0x0000, 0x3fff) AM_ROM /* need to be checked */
 	AM_RANGE(0x6000, 0x67ff) AM_RAM AM_SHARE("nvram") /* HM6116 */
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( norautx4_map, AS_PROGRAM, 8, norautp_state )
+ADDRESS_MAP_START(norautp_state::norautx4_map)
 	AM_RANGE(0x0000, 0x3fff) AM_ROM
 	AM_RANGE(0x6000, 0x67ff) AM_RAM AM_SHARE("nvram") /* 6116 */
 ADDRESS_MAP_END
 
 #ifdef UNUSED_CODE
-static ADDRESS_MAP_START( norautx8_map, AS_PROGRAM, 8, norautp_state )
+ADDRESS_MAP_START(norautp_state::norautx8_map)
 	AM_RANGE(0x0000, 0x7fff) AM_ROM /* need to be checked */
 	AM_RANGE(0xc000, 0xc7ff) AM_RAM AM_SHARE("nvram") /* 6116 */
 ADDRESS_MAP_END
 #endif
 
-static ADDRESS_MAP_START( kimble_map, AS_PROGRAM, 8, norautp_state )
+ADDRESS_MAP_START(norautp_state::kimble_map)
 	AM_RANGE(0x0000, 0xbfff) AM_ROM
 	AM_RANGE(0xc000, 0xc7ff) AM_RAM AM_SHARE("nvram")
 	AM_RANGE(0xc800, 0xc9ff) AM_RAM /* working RAM? */
 ADDRESS_MAP_END
 
 #ifdef UNUSED_CODE
-static ADDRESS_MAP_START( norautxp_portmap, AS_IO, 8, norautp_state )
+ADDRESS_MAP_START(norautp_state::norautxp_portmap)
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
 ADDRESS_MAP_END
 #endif
 
-static ADDRESS_MAP_START( newhilop_map, AS_PROGRAM, 8, norautp_state )
+ADDRESS_MAP_START(norautp_state::newhilop_map)
 	AM_RANGE(0x0000, 0x1fff) AM_ROM
 	AM_RANGE(0xd000, 0xd7ff) AM_RAM AM_SHARE("nvram")   /* 6116 */
 ADDRESS_MAP_END
 
 /*********** 8080 based **********/
 
-static ADDRESS_MAP_START( dphl_map, AS_PROGRAM, 8, norautp_state )
+ADDRESS_MAP_START(norautp_state::dphl_map)
 	ADDRESS_MAP_GLOBAL_MASK(0x7fff) /* A15 not connected */
 	AM_RANGE(0x0000, 0x3fff) AM_ROM
 	AM_RANGE(0x5000, 0x53ff) AM_RAM AM_SHARE("nvram")   /* should be 2x 0x100 segments (4x 2111) */
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( dphla_map, AS_PROGRAM, 8, norautp_state )
+ADDRESS_MAP_START(norautp_state::dphla_map)
 	ADDRESS_MAP_GLOBAL_MASK(0x3fff)
 	AM_RANGE(0x0000, 0x1fff) AM_ROM
 	AM_RANGE(0x2000, 0x23ff) AM_RAM AM_SHARE("nvram")
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( ssjkrpkr_map, AS_PROGRAM, 8, norautp_state )
+ADDRESS_MAP_START(norautp_state::ssjkrpkr_map)
 	ADDRESS_MAP_GLOBAL_MASK(0x7fff)
 	AM_RANGE(0x0000, 0x1fff) AM_ROM
 	AM_RANGE(0x4000, 0x43ff) AM_RAM AM_SHARE("nvram")
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( dphltest_map, AS_PROGRAM, 8, norautp_state )
+ADDRESS_MAP_START(norautp_state::dphltest_map)
 //  ADDRESS_MAP_GLOBAL_MASK(0x7fff) /* A15 not connected */
 	AM_RANGE(0x0000, 0x6fff) AM_ROM
 	AM_RANGE(0x7000, 0x7fff) AM_RAM
@@ -942,12 +942,12 @@ ADDRESS_MAP_END
   The code read on port $62, when is suppossed to be set as output.
 
 */
-static ADDRESS_MAP_START( kimbldhl_map, AS_PROGRAM, 8, norautp_state )
+ADDRESS_MAP_START(norautp_state::kimbldhl_map)
 	AM_RANGE(0x0000, 0x7fff) AM_ROM
 	AM_RANGE(0xc000, 0xc7ff) AM_RAM AM_SHARE("nvram")
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( drhl_map, AS_PROGRAM, 8, norautp_state )
+ADDRESS_MAP_START(norautp_state::drhl_map)
 	ADDRESS_MAP_GLOBAL_MASK(0x7fff) /* A15 not connected */
 	AM_RANGE(0x0000, 0x3fff) AM_ROM
 	AM_RANGE(0x5000, 0x53ff) AM_RAM AM_SHARE("nvram")
@@ -1277,7 +1277,8 @@ MACHINE_CONFIG_START(norautp_state::noraut_base)
 MACHINE_CONFIG_END
 
 
-MACHINE_CONFIG_DERIVED(norautp_state::norautp, noraut_base)
+MACHINE_CONFIG_START(norautp_state::norautp)
+	noraut_base(config);
 
 	/* basic machine hardware */
 	MCFG_CPU_MODIFY("maincpu")
@@ -1285,7 +1286,8 @@ MACHINE_CONFIG_DERIVED(norautp_state::norautp, noraut_base)
 MACHINE_CONFIG_END
 
 
-MACHINE_CONFIG_DERIVED(norautp_state::norautpl, noraut_base)
+MACHINE_CONFIG_START(norautp_state::norautpl)
+	noraut_base(config);
 
 	/* basic machine hardware */
 	MCFG_CPU_MODIFY("maincpu")
@@ -1297,7 +1299,8 @@ MACHINE_CONFIG_DERIVED(norautp_state::norautpl, noraut_base)
 MACHINE_CONFIG_END
 
 
-MACHINE_CONFIG_DERIVED(norautp_state::norautxp, noraut_base)
+MACHINE_CONFIG_START(norautp_state::norautxp)
+	noraut_base(config);
 
 	/* basic machine hardware */
 	MCFG_CPU_MODIFY("maincpu")
@@ -1306,7 +1309,8 @@ MACHINE_CONFIG_DERIVED(norautp_state::norautxp, noraut_base)
 MACHINE_CONFIG_END
 
 
-MACHINE_CONFIG_DERIVED(norautp_state::nortest1, noraut_base)
+MACHINE_CONFIG_START(norautp_state::nortest1)
+	noraut_base(config);
 
 	/* basic machine hardware */
 	MCFG_CPU_MODIFY("maincpu")
@@ -1315,7 +1319,8 @@ MACHINE_CONFIG_DERIVED(norautp_state::nortest1, noraut_base)
 MACHINE_CONFIG_END
 
 
-MACHINE_CONFIG_DERIVED(norautp_state::norautx4, noraut_base)
+MACHINE_CONFIG_START(norautp_state::norautx4)
+	noraut_base(config);
 
 	/* basic machine hardware */
 	MCFG_CPU_MODIFY("maincpu")
@@ -1325,7 +1330,8 @@ MACHINE_CONFIG_END
 
 
 #ifdef UNUSED_CODE
-static MACHINE_CONFIG_DERIVED( norautx8, noraut_base )
+static MACHINE_CONFIG_START( norautx8 )
+	noraut_base(config);
 
 	/* basic machine hardware */
 	MCFG_CPU_MODIFY("maincpu")
@@ -1335,7 +1341,8 @@ MACHINE_CONFIG_END
 #endif
 
 
-MACHINE_CONFIG_DERIVED(norautp_state::kimble, noraut_base)
+MACHINE_CONFIG_START(norautp_state::kimble)
+	noraut_base(config);
 
 	/* basic machine hardware */
 	MCFG_CPU_MODIFY("maincpu")
@@ -1347,7 +1354,8 @@ MACHINE_CONFIG_DERIVED(norautp_state::kimble, noraut_base)
 	MCFG_DISCRETE_INTF(kimble)
 MACHINE_CONFIG_END
 
-MACHINE_CONFIG_DERIVED(norautp_state::newhilop, noraut_base)
+MACHINE_CONFIG_START(norautp_state::newhilop)
+	noraut_base(config);
 
 	/* basic machine hardware */
 	MCFG_CPU_MODIFY("maincpu")
@@ -1359,7 +1367,8 @@ MACHINE_CONFIG_END
 /********** 8080 based **********/
 
 
-MACHINE_CONFIG_DERIVED(norautp_state::dphl, noraut_base)
+MACHINE_CONFIG_START(norautp_state::dphl)
+	noraut_base(config);
 
 	/* basic machine hardware */
 	MCFG_CPU_REPLACE("maincpu", I8080, DPHL_CPU_CLOCK)
@@ -1372,7 +1381,8 @@ MACHINE_CONFIG_DERIVED(norautp_state::dphl, noraut_base)
 MACHINE_CONFIG_END
 
 
-MACHINE_CONFIG_DERIVED(norautp_state::dphla, noraut_base)
+MACHINE_CONFIG_START(norautp_state::dphla)
+	noraut_base(config);
 
 	/* basic machine hardware */
 	MCFG_CPU_REPLACE("maincpu", I8080, DPHL_CPU_CLOCK)
@@ -1385,7 +1395,8 @@ MACHINE_CONFIG_DERIVED(norautp_state::dphla, noraut_base)
 MACHINE_CONFIG_END
 
 
-MACHINE_CONFIG_DERIVED(norautp_state::kimbldhl, noraut_base)
+MACHINE_CONFIG_START(norautp_state::kimbldhl)
+	noraut_base(config);
 
 	/* basic machine hardware */
 	MCFG_CPU_REPLACE("maincpu", I8080, DPHL_CPU_CLOCK)
@@ -1398,7 +1409,8 @@ MACHINE_CONFIG_DERIVED(norautp_state::kimbldhl, noraut_base)
 MACHINE_CONFIG_END
 
 
-MACHINE_CONFIG_DERIVED(norautp_state::dphltest, noraut_base)
+MACHINE_CONFIG_START(norautp_state::dphltest)
+	noraut_base(config);
 
 	/* basic machine hardware */
 	MCFG_CPU_REPLACE("maincpu", I8080, DPHL_CPU_CLOCK)
@@ -1411,7 +1423,8 @@ MACHINE_CONFIG_DERIVED(norautp_state::dphltest, noraut_base)
 MACHINE_CONFIG_END
 
 
-MACHINE_CONFIG_DERIVED(norautp_state::drhl, noraut_base)
+MACHINE_CONFIG_START(norautp_state::drhl)
+	noraut_base(config);
 
 	/* basic machine hardware */
 	MCFG_CPU_REPLACE("maincpu", I8080, DPHL_CPU_CLOCK)
@@ -1424,7 +1437,8 @@ MACHINE_CONFIG_DERIVED(norautp_state::drhl, noraut_base)
 MACHINE_CONFIG_END
 
 
-MACHINE_CONFIG_DERIVED(norautp_state::ssjkrpkr, noraut_base)
+MACHINE_CONFIG_START(norautp_state::ssjkrpkr)
+	noraut_base(config);
 
 	/* basic machine hardware */
 	MCFG_CPU_REPLACE("maincpu", I8080, DPHL_CPU_CLOCK)

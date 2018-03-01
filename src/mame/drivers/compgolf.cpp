@@ -60,7 +60,7 @@ WRITE8_MEMBER(compgolf_state::compgolf_ctrl_w)
  *
  *************************************/
 
-static ADDRESS_MAP_START( compgolf_map, AS_PROGRAM, 8, compgolf_state )
+ADDRESS_MAP_START(compgolf_state::compgolf_map)
 	AM_RANGE(0x0000, 0x07ff) AM_RAM
 	AM_RANGE(0x1000, 0x17ff) AM_RAM_WRITE(compgolf_video_w) AM_SHARE("videoram")
 	AM_RANGE(0x1800, 0x1fff) AM_RAM_WRITE(compgolf_back_w) AM_SHARE("bg_ram")
@@ -224,7 +224,7 @@ void compgolf_state::machine_reset()
 MACHINE_CONFIG_START(compgolf_state::compgolf)
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", M6809, 2000000)
+	MCFG_CPU_ADD("maincpu", MC6809E, 2000000) // HD68B09EP
 	MCFG_CPU_PROGRAM_MAP(compgolf_map)
 	MCFG_CPU_VBLANK_INT_DRIVER("screen", compgolf_state,  nmi_line_pulse)
 

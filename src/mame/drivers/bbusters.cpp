@@ -324,7 +324,7 @@ READ16_MEMBER(bbusters_state::mechatt_gun_r)
 
 /*******************************************************************************/
 
-static ADDRESS_MAP_START( bbusters_map, AS_PROGRAM, 16, bbusters_state )
+ADDRESS_MAP_START(bbusters_state::bbusters_map)
 	AM_RANGE(0x000000, 0x07ffff) AM_ROM
 	AM_RANGE(0x080000, 0x08ffff) AM_RAM AM_SHARE("ram")
 	AM_RANGE(0x090000, 0x090fff) AM_RAM_WRITE(video_w) AM_SHARE("videoram")
@@ -354,7 +354,7 @@ ADDRESS_MAP_END
 
 /*******************************************************************************/
 
-static ADDRESS_MAP_START( mechatt_map, AS_PROGRAM, 16, bbusters_state )
+ADDRESS_MAP_START(bbusters_state::mechatt_map)
 	AM_RANGE(0x000000, 0x06ffff) AM_ROM
 	AM_RANGE(0x070000, 0x07ffff) AM_RAM AM_SHARE("ram")
 	AM_RANGE(0x090000, 0x090fff) AM_RAM_WRITE(video_w) AM_SHARE("videoram")
@@ -375,19 +375,19 @@ ADDRESS_MAP_END
 
 /******************************************************************************/
 
-static ADDRESS_MAP_START( sound_map, AS_PROGRAM, 8, bbusters_state )
+ADDRESS_MAP_START(bbusters_state::sound_map)
 	AM_RANGE(0x0000, 0xefff) AM_ROM
 	AM_RANGE(0xf000, 0xf7ff) AM_RAM
 	AM_RANGE(0xf800, 0xf800) AM_DEVREAD("soundlatch", generic_latch_8_device, read) AM_WRITE(sound_status_w)
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( sound_portmap, AS_IO, 8, bbusters_state )
+ADDRESS_MAP_START(bbusters_state::sound_portmap)
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	AM_RANGE(0x00, 0x03) AM_DEVREADWRITE("ymsnd", ym2610_device, read, write)
 	AM_RANGE(0xc0, 0xc1) AM_WRITENOP /* -> Main CPU */
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( sounda_portmap, AS_IO, 8, bbusters_state )
+ADDRESS_MAP_START(bbusters_state::sounda_portmap)
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	AM_RANGE(0x00, 0x03) AM_DEVREADWRITE("ymsnd", ym2608_device, read, write)
 	AM_RANGE(0xc0, 0xc1) AM_WRITENOP /* -> Main CPU */

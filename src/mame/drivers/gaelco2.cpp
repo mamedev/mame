@@ -72,7 +72,7 @@ GFXDECODEINFO(0x0400000, 128)
                             COMMON
   ============================================================================*/
 
-static ADDRESS_MAP_START( mcu_hostmem_map, 0, 8, gaelco2_state )
+ADDRESS_MAP_START(gaelco2_state::mcu_hostmem_map)
 	AM_RANGE(0x8000, 0xffff) AM_READWRITE(shareram_r, shareram_w) // confirmed that 0x8000 - 0xffff is a window into 68k shared RAM
 ADDRESS_MAP_END
 
@@ -81,7 +81,7 @@ ADDRESS_MAP_END
                             MANIAC SQUARE (FINAL)
   ============================================================================*/
 
-static ADDRESS_MAP_START( maniacsq_map, AS_PROGRAM, 16, gaelco2_state )
+ADDRESS_MAP_START(gaelco2_state::maniacsq_map)
 	AM_RANGE(0x000000, 0x03ffff) AM_ROM                                                                     /* ROM */
 	AM_RANGE(0x200000, 0x20ffff) AM_RAM_WRITE(gaelco2_vram_w) AM_SHARE("spriteram")                         /* Video RAM */
 	AM_RANGE(0x202890, 0x2028ff) AM_DEVREADWRITE("gaelco", gaelco_gae1_device, gaelcosnd_r, gaelcosnd_w)    /* Sound Registers */
@@ -208,7 +208,8 @@ MACHINE_CONFIG_START(gaelco2_state::maniacsq)
 	MCFG_SOUND_ROUTE(1, "rspeaker", 1.0)
 MACHINE_CONFIG_END
 
-MACHINE_CONFIG_DERIVED(gaelco2_state::maniacsq_d5002fp, maniacsq)
+MACHINE_CONFIG_START(gaelco2_state::maniacsq_d5002fp)
+	maniacsq(config);
 	MCFG_DEVICE_ADD("gaelco_ds5002fp", GAELCO_DS5002FP, XTAL(24'000'000) / 2) /* ? */
 	MCFG_DEVICE_ADDRESS_MAP(0, mcu_hostmem_map)
 MACHINE_CONFIG_END
@@ -478,7 +479,7 @@ WRITE16_MEMBER(gaelco2_state::play2000_shareram_68k_w)
 }
 
 
-static ADDRESS_MAP_START( play2000_map, AS_PROGRAM, 16, gaelco2_state )
+ADDRESS_MAP_START(gaelco2_state::play2000_map)
 	AM_RANGE(0x000000, 0x03ffff) AM_ROM                                                                     /* ROM */
 	AM_RANGE(0x100000, 0x100001) AM_READ_PORT("IN0")                                                        /* Coins + other buttons? */
 	// AM_RANGE(0x110000, 0x110001) ?
@@ -637,7 +638,7 @@ READ16_MEMBER(bang_state::p1_gun_y){return (m_light0_y->read() * 240 / 0x100) - 
 READ16_MEMBER(bang_state::p2_gun_x){return (m_light1_x->read() * 320 / 0x100) + 1;}
 READ16_MEMBER(bang_state::p2_gun_y){return (m_light1_y->read() * 240 / 0x100) - 4;}
 
-static ADDRESS_MAP_START( bang_map, AS_PROGRAM, 16, bang_state )
+ADDRESS_MAP_START(bang_state::bang_map)
 	AM_RANGE(0x000000, 0x0fffff) AM_ROM                                                                     /* ROM */
 	AM_RANGE(0x200000, 0x20ffff) AM_RAM_WRITE(gaelco2_vram_w) AM_SHARE("spriteram")                         /* Video RAM */
 	AM_RANGE(0x202890, 0x2028ff) AM_DEVREADWRITE("gaelco", gaelco_cg1v_device, gaelcosnd_r, gaelcosnd_w)    /* Sound Registers */
@@ -840,7 +841,7 @@ ROM_END
   ============================================================================*/
 
 
-static ADDRESS_MAP_START( alighunt_map, AS_PROGRAM, 16, gaelco2_state )
+ADDRESS_MAP_START(gaelco2_state::alighunt_map)
 	AM_RANGE(0x000000, 0x0fffff) AM_ROM                                                                         /* ROM */
 	AM_RANGE(0x200000, 0x20ffff) AM_RAM_WRITE(gaelco2_vram_w) AM_SHARE("spriteram")                             /* Video RAM */
 	AM_RANGE(0x202890, 0x2028ff) AM_DEVREADWRITE("gaelco", gaelco_gae1_device, gaelcosnd_r, gaelcosnd_w)        /* Sound Registers */
@@ -966,7 +967,8 @@ MACHINE_CONFIG_START(gaelco2_state::alighunt)
 	MCFG_SOUND_ROUTE(1, "rspeaker", 1.0)
 MACHINE_CONFIG_END
 
-MACHINE_CONFIG_DERIVED(gaelco2_state::alighunt_d5002fp, alighunt)
+MACHINE_CONFIG_START(gaelco2_state::alighunt_d5002fp)
+	alighunt(config);
 	MCFG_DEVICE_ADD("gaelco_ds5002fp", GAELCO_DS5002FP, XTAL(24'000'000) / 2) /* 12 MHz */
 	MCFG_DEVICE_ADDRESS_MAP(0, mcu_hostmem_map)
 MACHINE_CONFIG_END
@@ -1106,7 +1108,7 @@ ROM_END
   ============================================================================*/
 
 
-static ADDRESS_MAP_START( touchgo_map, AS_PROGRAM, 16, gaelco2_state )
+ADDRESS_MAP_START(gaelco2_state::touchgo_map)
 	AM_RANGE(0x000000, 0x0fffff) AM_ROM                                                                         /* ROM */
 	AM_RANGE(0x200000, 0x20ffff) AM_RAM_WRITE(gaelco2_vram_w) AM_SHARE("spriteram")                             /* Video RAM */
 	AM_RANGE(0x202890, 0x2028ff) AM_DEVREADWRITE("gaelco", gaelco_gae1_device, gaelcosnd_r, gaelcosnd_w)        /* Sound Registers */
@@ -1278,7 +1280,8 @@ MACHINE_CONFIG_START(gaelco2_state::touchgo)
 	MCFG_SOUND_ROUTE(1, "lspeaker", 1.0)
 MACHINE_CONFIG_END
 
-MACHINE_CONFIG_DERIVED(gaelco2_state::touchgo_d5002fp, touchgo)
+MACHINE_CONFIG_START(gaelco2_state::touchgo_d5002fp)
+	touchgo(config);
 	MCFG_DEVICE_ADD("gaelco_ds5002fp", GAELCO_DS5002FP, XTAL(40'000'000) / 4) /* 10MHz? - Not verified */
 	MCFG_DEVICE_ADDRESS_MAP(0, mcu_hostmem_map)
 MACHINE_CONFIG_END
@@ -1427,7 +1430,7 @@ ROM_END
                             SNOW BOARD
   ============================================================================*/
 
-static ADDRESS_MAP_START( snowboar_map, AS_PROGRAM, 16, gaelco2_state )
+ADDRESS_MAP_START(gaelco2_state::snowboar_map)
 	AM_RANGE(0x000000, 0x0fffff) AM_ROM                                                                         /* ROM */
 	AM_RANGE(0x200000, 0x20ffff) AM_RAM_WRITE(gaelco2_vram_w) AM_SHARE("spriteram")                             /* Video RAM */
 	AM_RANGE(0x202890, 0x2028ff) AM_DEVREADWRITE("gaelco", gaelco_cg1v_device, gaelcosnd_r, gaelcosnd_w)        /* Sound Registers */
@@ -1655,7 +1658,7 @@ ROM_END
                             WORLD RALLY 2
   ============================================================================*/
 
-static ADDRESS_MAP_START( wrally2_map, AS_PROGRAM, 16, wrally2_state )
+ADDRESS_MAP_START(wrally2_state::wrally2_map)
 	AM_RANGE(0x000000, 0x0fffff) AM_ROM                                                                     /* ROM */
 	AM_RANGE(0x200000, 0x20ffff) AM_RAM_WRITE(gaelco2_vram_w) AM_SHARE("spriteram")                         /* Video RAM */
 	AM_RANGE(0x202890, 0x2028ff) AM_DEVREADWRITE("gaelco", gaelco_gae1_device, gaelcosnd_r, gaelcosnd_w)    /* Sound Registers */

@@ -173,10 +173,11 @@ public:
 	DECLARE_PALETTE_INIT(pitagjr);
 	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	void pitajr(machine_config &config);
+	void pitajr_mem(address_map &map);
 };
 
 
-static ADDRESS_MAP_START(pitajr_mem, AS_PROGRAM, 8, pitagjr_state)
+ADDRESS_MAP_START(pitagjr_state::pitajr_mem)
 	AM_RANGE(0x0000, 0x00ff) AM_RAM
 	AM_RANGE(0x1000, 0x1fff) AM_ROM // boot ROM ???
 	AM_RANGE(0x2000, 0x3fff) AM_ROMBANK("rombank")

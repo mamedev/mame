@@ -11,19 +11,19 @@ typedef device_delegate<void (int *code, int *color, int *flags)> k051316_cb_del
 
 
 #define MCFG_K051316_CB(_class, _method) \
-	k051316_device::set_k051316_callback(*device, k051316_cb_delegate(&_class::_method, #_class "::" #_method, this));
+	downcast<k051316_device &>(*device).set_k051316_callback(k051316_cb_delegate(&_class::_method, #_class "::" #_method, this));
 
 #define MCFG_K051316_OFFSETS(_xoffs, _yoffs) \
-	k051316_device::set_offsets(*device, _xoffs, _yoffs);
+	downcast<k051316_device &>(*device).set_offsets(_xoffs, _yoffs);
 
 #define MCFG_K051316_BPP(_bpp) \
-	k051316_device::set_bpp(*device, _bpp);
+	downcast<k051316_device &>(*device).set_bpp(_bpp);
 
 #define MCFG_K051316_LAYER_MASK(_mask) \
-	k051316_device::set_layermask(*device, _mask);
+	downcast<k051316_device &>(*device).set_layermask(_mask);
 
 #define MCFG_K051316_WRAP(_wrap) \
-	k051316_device::set_wrap(*device, _wrap);
+	downcast<k051316_device &>(*device).set_wrap(_wrap);
 
 
 class k051316_device : public device_t, public device_gfx_interface
@@ -39,16 +39,15 @@ public:
 	DECLARE_GFXDECODE_MEMBER(gfxinfo8);
 	DECLARE_GFXDECODE_MEMBER(gfxinfo4_ram);
 
-	// static configuration
-	static void set_k051316_callback(device_t &device, k051316_cb_delegate callback) { downcast<k051316_device &>(device).m_k051316_cb = callback; }
-	static void set_wrap(device_t &device, int wrap) { downcast<k051316_device &>(device).m_wrap = wrap; }
-	static void set_bpp(device_t &device, int bpp);
-	static void set_layermask(device_t &device, int mask) { downcast<k051316_device &>(device).m_layermask = mask; }
-	static void set_offsets(device_t &device, int x_offset, int y_offset)
+	// configuration
+	void set_k051316_callback(k051316_cb_delegate callback) { m_k051316_cb = callback; }
+	void set_wrap(int wrap) { m_wrap = wrap; }
+	void set_bpp(int bpp);
+	void set_layermask(int mask) { m_layermask = mask; }
+	void set_offsets(int x_offset, int y_offset)
 	{
-		k051316_device &dev = downcast<k051316_device &>(device);
-		dev.m_dx = x_offset;
-		dev.m_dy = y_offset;
+		m_dx = x_offset;
+		m_dy = y_offset;
 	}
 
 	/*

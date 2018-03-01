@@ -168,7 +168,7 @@ WRITE16_MEMBER( sshangha_state::sshangha_protection_region_8_146_w )
 }
 
 
-static ADDRESS_MAP_START( sshangha_map, AS_PROGRAM, 16, sshangha_state )
+ADDRESS_MAP_START(sshangha_state::sshangha_map)
 	ADDRESS_MAP_GLOBAL_MASK(0x3fffff)
 	AM_RANGE(0x000000, 0x03ffff) AM_ROM
 	AM_RANGE(0x100000, 0x10000f) AM_RAM AM_SHARE("sound_shared")
@@ -200,7 +200,7 @@ static ADDRESS_MAP_START( sshangha_map, AS_PROGRAM, 16, sshangha_state )
 	AM_RANGE(0x3f4000, 0x3f7fff) AM_READWRITE(sshangha_protection_region_d_146_r,sshangha_protection_region_d_146_w) AM_SHARE("prot_data")
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( sshanghb_map, AS_PROGRAM, 16, sshangha_state )
+ADDRESS_MAP_START(sshangha_state::sshanghb_map)
 	AM_RANGE(0x000000, 0x03ffff) AM_ROM
 	AM_RANGE(0x084000, 0x0847ff) AM_READ(sshanghb_protection16_r)
 	AM_RANGE(0x101000, 0x10100f) AM_RAM AM_SHARE("sound_shared") /* the bootleg writes here */
@@ -243,7 +243,7 @@ WRITE8_MEMBER(sshangha_state::sshangha_sound_shared_w)
 }
 
 /* Note: there's rom data after 0x8000 but the game never seem to call a rom bank, left-over? */
-static ADDRESS_MAP_START( sshangha_sound_map, AS_PROGRAM, 8, sshangha_state )
+ADDRESS_MAP_START(sshangha_state::sshangha_sound_map)
 	AM_RANGE(0x0000, 0x7fff) AM_ROM
 	AM_RANGE(0xc000, 0xc001) AM_DEVREADWRITE("ymsnd", ym2203_device, read, write)
 	AM_RANGE(0xc200, 0xc201) AM_DEVREADWRITE("oki", okim6295_device, read, write)
@@ -443,7 +443,8 @@ MACHINE_CONFIG_START(sshangha_state::sshangha)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", 0.27)
 MACHINE_CONFIG_END
 
-MACHINE_CONFIG_DERIVED(sshangha_state::sshanghb, sshangha)
+MACHINE_CONFIG_START(sshangha_state::sshanghb)
+	sshangha(config);
 
 	MCFG_CPU_MODIFY("maincpu")
 	MCFG_CPU_PROGRAM_MAP(sshanghb_map)

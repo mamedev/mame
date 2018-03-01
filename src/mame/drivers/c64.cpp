@@ -176,6 +176,9 @@ public:
 	void pal(machine_config &config);
 	void ntsc(machine_config &config);
 	void pet64(machine_config &config);
+	void c64_mem(address_map &map);
+	void vic_colorram_map(address_map &map);
+	void vic_videoram_map(address_map &map);
 };
 
 
@@ -533,7 +536,7 @@ READ8_MEMBER( c64_state::vic_colorram_r )
 //  ADDRESS_MAP( c64_mem )
 //-------------------------------------------------
 
-static ADDRESS_MAP_START( c64_mem, AS_PROGRAM, 8, c64_state )
+ADDRESS_MAP_START(c64_state::c64_mem)
 	AM_RANGE(0x0000, 0xffff) AM_READWRITE(read, write)
 ADDRESS_MAP_END
 
@@ -542,7 +545,7 @@ ADDRESS_MAP_END
 //  ADDRESS_MAP( vic_videoram_map )
 //-------------------------------------------------
 
-static ADDRESS_MAP_START( vic_videoram_map, 0, 8, c64_state )
+ADDRESS_MAP_START(c64_state::vic_videoram_map)
 	AM_RANGE(0x0000, 0x3fff) AM_READ(vic_videoram_r)
 ADDRESS_MAP_END
 
@@ -551,7 +554,7 @@ ADDRESS_MAP_END
 //  ADDRESS_MAP( vic_colorram_map )
 //-------------------------------------------------
 
-static ADDRESS_MAP_START( vic_colorram_map, 1, 8, c64_state )
+ADDRESS_MAP_START(c64_state::vic_colorram_map)
 	AM_RANGE(0x000, 0x3ff) AM_READ(vic_colorram_r)
 ADDRESS_MAP_END
 
@@ -1424,7 +1427,8 @@ MACHINE_CONFIG_END
 //  MACHINE_CONFIG( pet64 )
 //-------------------------------------------------
 
-MACHINE_CONFIG_DERIVED(c64_state::pet64, ntsc)
+MACHINE_CONFIG_START(c64_state::pet64)
+	ntsc(config);
 	// TODO monochrome green palette
 MACHINE_CONFIG_END
 
@@ -1434,7 +1438,7 @@ MACHINE_CONFIG_END
 //-------------------------------------------------
 
 MACHINE_CONFIG_START(sx64_state::ntsc_sx)
-	MCFG_FRAGMENT_ADD(ntsc)
+	ntsc(config);
 
 	// basic hardware
 	MCFG_CPU_MODIFY(M6510_TAG)
@@ -1452,7 +1456,7 @@ MACHINE_CONFIG_END
 //-------------------------------------------------
 
 MACHINE_CONFIG_START(sx64_state::ntsc_dx)
-	MCFG_FRAGMENT_ADD(ntsc_sx)
+	ntsc_sx(config);
 
 	// devices
 	MCFG_DEVICE_MODIFY("iec9")
@@ -1464,7 +1468,8 @@ MACHINE_CONFIG_END
 //  MACHINE_CONFIG( ntsc_c )
 //-------------------------------------------------
 
-MACHINE_CONFIG_DERIVED(c64c_state::ntsc_c, ntsc)
+MACHINE_CONFIG_START(c64c_state::ntsc_c)
+	ntsc(config);
 	MCFG_SOUND_REPLACE(MOS6581_TAG, MOS8580, XTAL(14'318'181)/14)
 	MCFG_MOS6581_POTX_CALLBACK(READ8(c64_state, sid_potx_r))
 	MCFG_MOS6581_POTY_CALLBACK(READ8(c64_state, sid_poty_r))
@@ -1582,7 +1587,7 @@ MACHINE_CONFIG_END
 //-------------------------------------------------
 
 MACHINE_CONFIG_START(sx64_state::pal_sx)
-	MCFG_FRAGMENT_ADD(pal)
+	pal(config);
 
 	// basic hardware
 	MCFG_CPU_MODIFY(M6510_TAG)
@@ -1599,7 +1604,8 @@ MACHINE_CONFIG_END
 //  MACHINE_CONFIG( pal_c )
 //-------------------------------------------------
 
-MACHINE_CONFIG_DERIVED(c64c_state::pal_c, pal)
+MACHINE_CONFIG_START(c64c_state::pal_c)
+	pal(config);
 	MCFG_SOUND_REPLACE(MOS6581_TAG, MOS8580, XTAL(17'734'472)/18)
 	MCFG_MOS6581_POTX_CALLBACK(READ8(c64_state, sid_potx_r))
 	MCFG_MOS6581_POTY_CALLBACK(READ8(c64_state, sid_poty_r))

@@ -144,17 +144,17 @@ MACHINE_CONFIG_START(at_mb_device::device_add_mconfig)
 MACHINE_CONFIG_END
 
 
-DEVICE_ADDRESS_MAP_START( map, 16, at_mb_device )
-	AM_RANGE(0x0000, 0x001f) AM_DEVREADWRITE8("dma8237_1", am9517a_device, read, write, 0xffff)
-	AM_RANGE(0x0020, 0x003f) AM_DEVREADWRITE8("pic8259_master", pic8259_device, read, write, 0xffff)
-	AM_RANGE(0x0040, 0x005f) AM_DEVREADWRITE8("pit8254", pit8254_device, read, write, 0xffff)
+ADDRESS_MAP_START(at_mb_device::map)
+	AM_RANGE(0x0000, 0x001f) AM_DEVREADWRITE8("dma8237_1", am9517a_device, read, write, 0xffffffff)
+	AM_RANGE(0x0020, 0x003f) AM_DEVREADWRITE8("pic8259_master", pic8259_device, read, write, 0xffffffff)
+	AM_RANGE(0x0040, 0x005f) AM_DEVREADWRITE8("pit8254", pit8254_device, read, write, 0xffffffff)
 	AM_RANGE(0x0060, 0x0061) AM_READWRITE8(portb_r, portb_w, 0xff00)
 	AM_RANGE(0x0060, 0x0061) AM_DEVREADWRITE8("keybc", at_keyboard_controller_device, data_r, data_w, 0x00ff)
 	AM_RANGE(0x0064, 0x0065) AM_DEVREADWRITE8("keybc", at_keyboard_controller_device, status_r, command_w, 0x00ff)
-	AM_RANGE(0x0070, 0x007f) AM_DEVREAD8("rtc", mc146818_device, read, 0xffff) AM_WRITE8(write_rtc , 0xffff)
-	AM_RANGE(0x0080, 0x009f) AM_READWRITE8(page8_r, page8_w, 0xffff)
-	AM_RANGE(0x00a0, 0x00bf) AM_DEVREADWRITE8("pic8259_slave", pic8259_device, read, write, 0xffff)
-	AM_RANGE(0x00c0, 0x00df) AM_DEVREADWRITE8("dma8237_2", am9517a_device, read, write, 0x00ff)
+	AM_RANGE(0x0070, 0x007f) AM_DEVREAD8("rtc", mc146818_device, read, 0xffffffff) AM_WRITE8(write_rtc, 0xffffffff)
+	AM_RANGE(0x0080, 0x009f) AM_READWRITE8(page8_r, page8_w, 0xffffffff)
+	AM_RANGE(0x00a0, 0x00bf) AM_DEVREADWRITE8("pic8259_slave", pic8259_device, read, write, 0xffffffff)
+	AM_RANGE(0x00c0, 0x00df) AM_DEVREADWRITE8("dma8237_2", am9517a_device, read, write, 0x00ff00ff)
 ADDRESS_MAP_END
 
 /*************************************************************

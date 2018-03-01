@@ -665,6 +665,7 @@ public:
 	void ip225015(machine_config &config);
 	void ip224613(machine_config &config);
 	void ip244415(machine_config &config);
+	void ip225015_map(address_map &map);
 protected:
 	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr) override;
 
@@ -1165,7 +1166,7 @@ WRITE32_MEMBER(ip22_state::hpc3_unkpbus0_w)
 	//COMBINE_DATA(&m_unkpbus0[offset]);
 }
 
-static ADDRESS_MAP_START( ip225015_map, AS_PROGRAM, 32, ip22_state )
+ADDRESS_MAP_START(ip22_state::ip225015_map)
 	AM_RANGE( 0x00000000, 0x0007ffff ) AM_RAMBANK( "bank1" )    /* mirror of first 512k of main RAM */
 	AM_RANGE( 0x08000000, 0x0fffffff ) AM_SHARE("mainram") AM_RAM_WRITE(ip22_write_ram)     /* 128 MB of main RAM */
 	AM_RANGE( 0x1f0f0000, 0x1f0f1fff ) AM_DEVREADWRITE("newport", newport_video_device, rex3_r, rex3_w )
@@ -1522,14 +1523,16 @@ MACHINE_CONFIG_START(ip22_state::ip225015)
 	MCFG_DS1386_8K_ADD(RTC_TAG, 32768)
 MACHINE_CONFIG_END
 
-MACHINE_CONFIG_DERIVED(ip22_state::ip224613, ip225015)
+MACHINE_CONFIG_START(ip22_state::ip224613)
+	ip225015(config);
 	MCFG_CPU_REPLACE( "maincpu", R4600BE, 133333333 )
 	//MCFG_MIPS3_ICACHE_SIZE(32768)
 	//MCFG_MIPS3_DCACHE_SIZE(32768)
 	MCFG_CPU_PROGRAM_MAP( ip225015_map)
 MACHINE_CONFIG_END
 
-MACHINE_CONFIG_DERIVED(ip22_state::ip244415, ip225015)
+MACHINE_CONFIG_START(ip22_state::ip244415)
+	ip225015(config);
 	MCFG_CPU_REPLACE( "maincpu", R4600BE, 150000000 )
 	//MCFG_MIPS3_ICACHE_SIZE(32768)
 	//MCFG_MIPS3_DCACHE_SIZE(32768)

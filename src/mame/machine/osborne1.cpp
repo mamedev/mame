@@ -103,7 +103,7 @@ WRITE8_MEMBER( osborne1_state::videoram_w )
 
 READ8_MEMBER( osborne1_state::opcode_r )
 {
-	if (!machine().side_effect_disabled())
+	if (!machine().side_effects_disabled())
 	{
 		// Update the flipflops that control bank selection and NMI
 		uint8_t const new_ub6a_q = (m_btn_reset->read() & 0x80) ? 1 : 0;

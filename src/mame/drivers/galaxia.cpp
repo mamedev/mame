@@ -131,7 +131,7 @@ READ8_MEMBER(galaxia_state::galaxia_collision_clear)
 	return 0xff;
 }
 
-static ADDRESS_MAP_START( galaxia_mem_map, AS_PROGRAM, 8, galaxia_state )
+ADDRESS_MAP_START(galaxia_state::galaxia_mem_map)
 	AM_RANGE(0x0000, 0x13ff) AM_ROM
 	AM_RANGE(0x1400, 0x14ff) AM_MIRROR(0x6000) AM_RAM AM_SHARE("bullet_ram")
 	AM_RANGE(0x1500, 0x15ff) AM_MIRROR(0x6000) AM_DEVREADWRITE("s2636_0", s2636_device, read_data, write_data)
@@ -143,7 +143,7 @@ static ADDRESS_MAP_START( galaxia_mem_map, AS_PROGRAM, 8, galaxia_state )
 	AM_RANGE(0x7214, 0x7214) AM_READ_PORT("IN0")
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( astrowar_mem_map, AS_PROGRAM, 8, galaxia_state )
+ADDRESS_MAP_START(galaxia_state::astrowar_mem_map)
 	AM_RANGE(0x0000, 0x13ff) AM_ROM
 	AM_RANGE(0x1400, 0x14ff) AM_MIRROR(0x6000) AM_RAM
 	AM_RANGE(0x1500, 0x15ff) AM_MIRROR(0x6000) AM_DEVREADWRITE("s2636_0", s2636_device, read_data, write_data)
@@ -152,7 +152,7 @@ static ADDRESS_MAP_START( astrowar_mem_map, AS_PROGRAM, 8, galaxia_state )
 	AM_RANGE(0x2000, 0x33ff) AM_ROM
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( galaxia_io_map, AS_IO, 8, galaxia_state )
+ADDRESS_MAP_START(galaxia_state::galaxia_io_map)
 	ADDRESS_MAP_UNMAP_HIGH
 	AM_RANGE(0x00, 0x00) AM_WRITE(galaxia_scroll_w) AM_READ_PORT("IN0")
 	AM_RANGE(0x02, 0x02) AM_READ_PORT("IN1")
@@ -162,7 +162,7 @@ static ADDRESS_MAP_START( galaxia_io_map, AS_IO, 8, galaxia_state )
 	AM_RANGE(0xac, 0xac) AM_READNOP
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( galaxia_data_map, AS_DATA, 8, galaxia_state )
+ADDRESS_MAP_START(galaxia_state::galaxia_data_map)
 	AM_RANGE(S2650_CTRL_PORT, S2650_CTRL_PORT) AM_READWRITE(galaxia_collision_r, galaxia_ctrlport_w)
 	AM_RANGE(S2650_DATA_PORT, S2650_DATA_PORT) AM_READWRITE(galaxia_collision_clear, galaxia_dataport_w)
 ADDRESS_MAP_END

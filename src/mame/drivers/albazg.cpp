@@ -49,14 +49,37 @@ PCB:
 class albazg_state : public driver_device
 {
 public:
-	albazg_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag),
+	albazg_state(const machine_config &mconfig, device_type type, const char *tag) :
+		driver_device(mconfig, type, tag),
 		m_cus_ram(*this, "cus_ram"),
 		m_videoram(*this, "videoram"),
 		m_colorram(*this, "colorram"),
 		m_maincpu(*this, "maincpu"),
-		m_gfxdecode(*this, "gfxdecode") { }
+		m_gfxdecode(*this, "gfxdecode")
+	{ }
 
+	virtual void yumefuda(machine_config &config);
+
+protected:
+	virtual void machine_start() override;
+	virtual void machine_reset() override;
+	virtual void video_start() override;
+
+	DECLARE_WRITE8_MEMBER(yumefuda_vram_w);
+	DECLARE_WRITE8_MEMBER(yumefuda_cram_w);
+	DECLARE_READ8_MEMBER(custom_ram_r);
+	DECLARE_WRITE8_MEMBER(custom_ram_w);
+	DECLARE_WRITE8_MEMBER(prot_lock_w);
+	DECLARE_READ8_MEMBER(mux_r);
+	DECLARE_WRITE8_MEMBER(mux_w);
+	DECLARE_WRITE8_MEMBER(yumefuda_output_w);
+	TILE_GET_INFO_MEMBER(y_get_bg_tile_info);
+	uint32_t screen_update_yumefuda(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+
+	void main_map(address_map &map);
+	void port_map(address_map &map);
+
+private:
 	/* memory pointers */
 	required_shared_ptr<uint8_t> m_cus_ram;
 	required_shared_ptr<uint8_t> m_videoram;
@@ -69,22 +92,9 @@ public:
 	uint8_t m_mux_data;
 	int m_bank;
 	uint8_t m_prot_lock;
-	DECLARE_WRITE8_MEMBER(yumefuda_vram_w);
-	DECLARE_WRITE8_MEMBER(yumefuda_cram_w);
-	DECLARE_READ8_MEMBER(custom_ram_r);
-	DECLARE_WRITE8_MEMBER(custom_ram_w);
-	DECLARE_WRITE8_MEMBER(prot_lock_w);
-	DECLARE_READ8_MEMBER(mux_r);
-	DECLARE_WRITE8_MEMBER(mux_w);
-	DECLARE_WRITE8_MEMBER(yumefuda_output_w);
-	TILE_GET_INFO_MEMBER(y_get_bg_tile_info);
-	virtual void machine_start() override;
-	virtual void machine_reset() override;
-	virtual void video_start() override;
-	uint32_t screen_update_yumefuda(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+
 	required_device<cpu_device> m_maincpu;
 	required_device<gfxdecode_device> m_gfxdecode;
-	void yumefuda(machine_config &config);
 };
 
 TILE_GET_INFO_MEMBER(albazg_state::y_get_bg_tile_info)
@@ -206,7 +216,7 @@ WRITE8_MEMBER(albazg_state::yumefuda_output_w)
 
 /***************************************************************************************/
 
-static ADDRESS_MAP_START( main_map, AS_PROGRAM, 8, albazg_state )
+ADDRESS_MAP_START(albazg_state::main_map)
 	AM_RANGE(0x0000, 0x7fff) AM_ROM
 	AM_RANGE(0x8000, 0x9fff) AM_ROMBANK("bank1")
 	AM_RANGE(0xa7fc, 0xa7fc) AM_WRITE(prot_lock_w)
@@ -219,7 +229,7 @@ static ADDRESS_MAP_START( main_map, AS_PROGRAM, 8, albazg_state )
 	AM_RANGE(0xe000, 0xffff) AM_RAM
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( port_map, AS_IO, 8, albazg_state )
+ADDRESS_MAP_START(albazg_state::port_map)
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	AM_RANGE(0x00, 0x00) AM_DEVWRITE("crtc", mc6845_device, address_w)
 	AM_RANGE(0x01, 0x01) AM_DEVWRITE("crtc", mc6845_device, register_w)

@@ -63,6 +63,8 @@ public:
 
 	uint8_t m_dma0pg;
 	void olypeopl(machine_config &config);
+	void peoplepc_io(address_map &map);
+	void peoplepc_map(address_map &map);
 protected:
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
@@ -188,7 +190,7 @@ void peoplepc_state::machine_start()
 	m_flop1->get_device()->setup_unload_cb(floppy_image_device::unload_cb(&peoplepc_state::floppy_unload, this));
 }
 
-static ADDRESS_MAP_START( peoplepc_map, AS_PROGRAM, 16, peoplepc_state )
+ADDRESS_MAP_START(peoplepc_state::peoplepc_map)
 	ADDRESS_MAP_UNMAP_HIGH
 	AM_RANGE(0x00000, 0x7ffff) AM_RAM
 	AM_RANGE(0xc0000, 0xdffff) AM_RAM AM_SHARE("gvram")
@@ -197,7 +199,7 @@ static ADDRESS_MAP_START( peoplepc_map, AS_PROGRAM, 16, peoplepc_state )
 	AM_RANGE(0xfe000, 0xfffff) AM_ROM AM_REGION("maincpu", 0)
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START(peoplepc_io, AS_IO, 16, peoplepc_state )
+ADDRESS_MAP_START(peoplepc_state::peoplepc_io)
 	ADDRESS_MAP_UNMAP_HIGH
 	AM_RANGE(0x0014, 0x0017) AM_DEVREADWRITE8("pic8259_1", pic8259_device, read, write, 0x00ff)
 	AM_RANGE(0x0018, 0x001b) AM_DEVREADWRITE8("pic8259_0", pic8259_device, read, write, 0x00ff)

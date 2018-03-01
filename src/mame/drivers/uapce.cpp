@@ -121,6 +121,9 @@ public:
 	virtual void machine_reset() override;
 	required_device<discrete_device> m_discrete;
 	void uapce(machine_config &config);
+	void pce_io(address_map &map);
+	void pce_mem(address_map &map);
+	void z80_map(address_map &map);
 };
 
 #define UAPCE_SOUND_EN  NODE_10
@@ -240,7 +243,7 @@ void uapce_state::machine_reset()
 	m_jamma_if_control_latch = 0;
 }
 
-static ADDRESS_MAP_START( z80_map, AS_PROGRAM, 8, uapce_state )
+ADDRESS_MAP_START(uapce_state::z80_map)
 	AM_RANGE( 0x0000, 0x07FF) AM_ROM
 	AM_RANGE( 0x0800, 0x0FFF) AM_RAM
 	AM_RANGE( 0x1000, 0x17FF) AM_WRITE(jamma_if_control_latch_w )
@@ -283,7 +286,7 @@ static INPUT_PORTS_START( uapce )
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_COIN1 ) PORT_IMPULSE(1)
 INPUT_PORTS_END
 
-static ADDRESS_MAP_START( pce_mem , AS_PROGRAM, 8, uapce_state )
+ADDRESS_MAP_START(uapce_state::pce_mem)
 	AM_RANGE( 0x000000, 0x09FFFF) AM_ROM
 	AM_RANGE( 0x1F0000, 0x1F1FFF) AM_RAM AM_MIRROR(0x6000)
 	AM_RANGE( 0x1FE000, 0x1FE3FF) AM_DEVREADWRITE( "huc6270", huc6270_device, read, write )
@@ -294,7 +297,7 @@ static ADDRESS_MAP_START( pce_mem , AS_PROGRAM, 8, uapce_state )
 	AM_RANGE( 0x1FF400, 0x1FF7FF) AM_DEVREADWRITE("maincpu", h6280_device, irq_status_r, irq_status_w )
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( pce_io , AS_IO, 8, uapce_state )
+ADDRESS_MAP_START(uapce_state::pce_io)
 	AM_RANGE( 0x00, 0x03) AM_DEVREADWRITE( "huc6270", huc6270_device, read, write )
 ADDRESS_MAP_END
 

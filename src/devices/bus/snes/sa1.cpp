@@ -1135,7 +1135,7 @@ WRITE8_MEMBER( sns_sa1_device::sa1_lo_w )
 		sa1_hi_w(space, offset, data);
 }
 
-static ADDRESS_MAP_START( sa1_map, AS_PROGRAM, 8, sns_sa1_device )
+ADDRESS_MAP_START(sns_sa1_device::sa1_map)
 	AM_RANGE(0x000000, 0x7dffff) AM_READWRITE(sa1_lo_r, sa1_lo_w)
 	AM_RANGE(0x7e0000, 0x7fffff) AM_NOP
 	AM_RANGE(0x800000, 0xffffff) AM_READWRITE(sa1_hi_r, sa1_hi_w)

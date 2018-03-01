@@ -99,9 +99,10 @@ public:
 	TIMER_DEVICE_CALLBACK_MEMBER(acommand_scanline);
 
 
-	void acommand(machine_config &config);	
+	void acommand(machine_config &config);
+	void acommand_map(address_map &map);
 protected:
-//	virtual void video_start() override;
+//  virtual void video_start() override;
 
 private:
 	required_shared_ptr<uint16_t> m_spriteram;
@@ -319,7 +320,7 @@ WRITE16_MEMBER(acommand_state::output_lamps_w)
 	// --xx --xx lamps
 }
 
-static ADDRESS_MAP_START( acommand_map, AS_PROGRAM, 16, acommand_state )
+ADDRESS_MAP_START(acommand_state::acommand_map)
 	AM_RANGE(0x000000, 0x03ffff) AM_ROM
 	AM_RANGE(0x082000, 0x082005) AM_DEVWRITE("bgtmap", megasys1_tilemap_device, scroll_w)
 	AM_RANGE(0x082100, 0x082105) AM_DEVWRITE("txtmap", megasys1_tilemap_device, scroll_w)

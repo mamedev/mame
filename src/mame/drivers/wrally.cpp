@@ -138,12 +138,12 @@ The PCB has a layout that can either use the 4 rom set of I7, I9, I11 & I13 or l
 #include "speaker.h"
 
 
-static ADDRESS_MAP_START( mcu_hostmem_map, 0, 8, wrally_state )
+ADDRESS_MAP_START(wrally_state::mcu_hostmem_map)
 	AM_RANGE(0x0000, 0xffff) AM_MASK(0x3fff) AM_READWRITE(shareram_r, shareram_w) // shared RAM with the main CPU
 ADDRESS_MAP_END
 
 
-static ADDRESS_MAP_START( wrally_map, AS_PROGRAM, 16, wrally_state )
+ADDRESS_MAP_START(wrally_state::wrally_map)
 	AM_RANGE(0x000000, 0x0fffff) AM_ROM                                                         /* ROM */
 	AM_RANGE(0x100000, 0x103fff) AM_RAM_WRITE(vram_w) AM_SHARE("videoram")   /* encrypted Video RAM */
 	AM_RANGE(0x108000, 0x108007) AM_RAM AM_SHARE("vregs")                                   /* Video Registers */
@@ -154,7 +154,7 @@ static ADDRESS_MAP_START( wrally_map, AS_PROGRAM, 16, wrally_state )
 	AM_RANGE(0x700002, 0x700003) AM_READ_PORT("P1_P2")
 	AM_RANGE(0x700004, 0x700005) AM_READ_PORT("WHEEL")
 	AM_RANGE(0x700008, 0x700009) AM_READ_PORT("SYSTEM")
-	AM_RANGE(0x70000a, 0x70000b) AM_SELECT(0x000070) AM_DEVWRITE8_MOD("outlatch", ls259_device, write_d0, rshift<3>, 0x00ff)
+	;map(0x70000a, 0x70000b).select(0x000070).lw8("outlatch_w", [this](address_space &space, offs_t offset, u8 data, u8 mem_mask){ m_outlatch->write_d0(space, offset >> 3, data, mem_mask); }).umask16(0x00ff);
 	AM_RANGE(0x70000c, 0x70000d) AM_WRITE(okim6295_bankswitch_w)                                /* OKI6295 bankswitch */
 	AM_RANGE(0x70000e, 0x70000f) AM_DEVREADWRITE8("oki", okim6295_device, read, write, 0x00ff)  /* OKI6295 status/data register */
 	AM_RANGE(0xfec000, 0xfeffff) AM_RAM AM_SHARE("shareram")                                        /* Work RAM (shared with DS5002FP) */
@@ -162,7 +162,7 @@ ADDRESS_MAP_END
 
 
 
-static ADDRESS_MAP_START( oki_map, 0, 8, wrally_state )
+ADDRESS_MAP_START(wrally_state::oki_map)
 	AM_RANGE(0x00000, 0x2ffff) AM_ROM
 	AM_RANGE(0x30000, 0x3ffff) AM_ROMBANK("okibank")
 ADDRESS_MAP_END

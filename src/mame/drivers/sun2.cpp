@@ -122,6 +122,7 @@ How the architecture works:
 #include "cpu/m68000/m68000.h"
 #include "machine/ram.h"
 #include "machine/am9513.h"
+#include "machine/mm58167.h"
 #include "machine/z80scc.h"
 #include "machine/bankdev.h"
 #include "machine/input_merger.h"
@@ -176,6 +177,15 @@ public:
 
 	void sun2mbus(machine_config &config);
 	void sun2vme(machine_config &config);
+	void mbustype0space_map(address_map &map);
+	void mbustype1space_map(address_map &map);
+	void mbustype2space_map(address_map &map);
+	void mbustype3space_map(address_map &map);
+	void sun2_mem(address_map &map);
+	void vmetype0space_map(address_map &map);
+	void vmetype1space_map(address_map &map);
+	void vmetype2space_map(address_map &map);
+	void vmetype3space_map(address_map &map);
 private:
 	uint16_t *m_rom_ptr, *m_ram_ptr;
 	uint8_t *m_idprom_ptr;
@@ -202,7 +212,7 @@ READ16_MEMBER( sun2_state::tl_mmu_r )
 {
 	uint8_t fc = m_maincpu->get_fc();
 
-	if ((fc == 3) && !machine().side_effect_disabled())
+	if ((fc == 3) && !machine().side_effects_disabled())
 	{
 		if (offset & 0x4)   // set for CPU space
 		{
@@ -261,7 +271,7 @@ READ16_MEMBER( sun2_state::tl_mmu_r )
 	}
 
 	// debugger hack
-	if (machine().side_effect_disabled() && (offset >= (0xef0000>>1)) && (offset <= (0xef8000>>1)))
+	if (machine().side_effects_disabled() && (offset >= (0xef0000>>1)) && (offset <= (0xef8000>>1)))
 	{
 		return m_rom_ptr[offset & 0x3fff];
 	}
@@ -281,7 +291,7 @@ READ16_MEMBER( sun2_state::tl_mmu_r )
 		uint32_t tmp = (m_pagemap[entry] & 0xfff) << 10;
 		tmp |= (offset & 0x3ff);
 
-	//  if (!machine().side_effect_disabled())
+	//  if (!machine().side_effects_disabled())
 	//      printf("sun2: Translated addr: %08x, type %d (page %d page entry %08x, orig virt %08x, FC %d)\n", tmp << 1, (m_pagemap[entry] >> 22) & 7, entry, m_pagemap[entry], offset<<1, fc);
 
 		switch ((m_pagemap[entry] >> 22) & 7)
@@ -324,10 +334,10 @@ READ16_MEMBER( sun2_state::tl_mmu_r )
 	}
 	else
 	{
-		if (!machine().side_effect_disabled()) printf("sun2: pagemap entry not valid!\n");
+		if (!machine().side_effects_disabled()) printf("sun2: pagemap entry not valid!\n");
 	}
 
-	if (!machine().side_effect_disabled()) printf("sun2: Unmapped read @ %08x (FC %d, mask %04x, PC=%x, seg %x)\n", offset<<1, fc, mem_mask, m_maincpu->pc(), offset>>15);
+	if (!machine().side_effects_disabled()) printf("sun2: Unmapped read @ %08x (FC %d, mask %04x, PC=%x, seg %x)\n", offset<<1, fc, mem_mask, m_maincpu->pc(), offset>>15);
 
 	return 0xffff;
 }
@@ -427,7 +437,7 @@ WRITE16_MEMBER( sun2_state::tl_mmu_w )
 		uint32_t tmp = (m_pagemap[entry] & 0xfff) << 10;
 		tmp |= (offset & 0x3ff);
 
-		//if (!machine().side_effect_disabled()) printf("sun2: Translated addr: %08x, type %d (page entry %08x, orig virt %08x)\n", tmp << 1, (m_pagemap[entry] >> 22) & 7, m_pagemap[entry], offset<<1);
+		//if (!machine().side_effects_disabled()) printf("sun2: Translated addr: %08x, type %d (page entry %08x, orig virt %08x)\n", tmp << 1, (m_pagemap[entry] >> 22) & 7, m_pagemap[entry], offset<<1);
 
 		switch ((m_pagemap[entry] >> 22) & 7)
 		{
@@ -451,7 +461,7 @@ WRITE16_MEMBER( sun2_state::tl_mmu_w )
 	}
 	else
 	{
-		if (!machine().side_effect_disabled()) printf("sun2: pagemap entry not valid!\n");
+		if (!machine().side_effects_disabled()) printf("sun2: pagemap entry not valid!\n");
 	}
 
 	printf("sun2: Unmapped write %04x (FC %d, mask %04x, PC=%x) to %08x\n", data, fc, mem_mask, m_maincpu->pc(), offset<<1);
@@ -469,18 +479,18 @@ WRITE16_MEMBER( sun2_state::video_ctrl_w )
 	COMBINE_DATA(&m_bw2_ctrl);
 }
 
-static ADDRESS_MAP_START(sun2_mem, AS_PROGRAM, 16, sun2_state)
+ADDRESS_MAP_START(sun2_state::sun2_mem)
 	AM_RANGE(0x000000, 0xffffff) AM_READWRITE( tl_mmu_r, tl_mmu_w )
 ADDRESS_MAP_END
 
 // VME memory spaces
 // type 0 device space
-static ADDRESS_MAP_START(vmetype0space_map, AS_PROGRAM, 16, sun2_state)
+ADDRESS_MAP_START(sun2_state::vmetype0space_map)
 	AM_RANGE(0x000000, 0x7fffff) AM_READWRITE(ram_r, ram_w)
 ADDRESS_MAP_END
 
 // type 1 device space
-static ADDRESS_MAP_START(vmetype1space_map, AS_PROGRAM, 16, sun2_state)
+ADDRESS_MAP_START(sun2_state::vmetype1space_map)
 	AM_RANGE(0x000000, 0x01ffff) AM_RAM AM_SHARE("bw2_vram")
 	AM_RANGE(0x020000, 0x020001) AM_READWRITE( video_ctrl_r, video_ctrl_w )
 	AM_RANGE(0x7f0000, 0x7f07ff) AM_ROM AM_REGION("bootprom", 0)    // uses MMU loophole to read 32k from a 2k window
@@ -498,16 +508,16 @@ static ADDRESS_MAP_START(vmetype1space_map, AS_PROGRAM, 16, sun2_state)
 ADDRESS_MAP_END
 
 // type 2 device space
-static ADDRESS_MAP_START(vmetype2space_map, AS_PROGRAM, 16, sun2_state)
+ADDRESS_MAP_START(sun2_state::vmetype2space_map)
 ADDRESS_MAP_END
 
 // type 3 device space
-static ADDRESS_MAP_START(vmetype3space_map, AS_PROGRAM, 16, sun2_state)
+ADDRESS_MAP_START(sun2_state::vmetype3space_map)
 ADDRESS_MAP_END
 
 // Multibus memory spaces
 // type 0 device space
-static ADDRESS_MAP_START(mbustype0space_map, AS_PROGRAM, 16, sun2_state)
+ADDRESS_MAP_START(sun2_state::mbustype0space_map)
 	AM_RANGE(0x000000, 0x3fffff) AM_READWRITE(ram_r, ram_w)
 	// 7f80000-7f807ff: Keyboard/mouse SCC8530
 	//AM_RANGE(0x7f8000, 0x7f8007) AM_DEVREADWRITE8(SCC1_TAG, z80scc_device, ba_cd_inv_r, ba_cd_inv_w, 0xff00)
@@ -516,21 +526,21 @@ static ADDRESS_MAP_START(mbustype0space_map, AS_PROGRAM, 16, sun2_state)
 ADDRESS_MAP_END
 
 // type 1 device space
-static ADDRESS_MAP_START(mbustype1space_map, AS_PROGRAM, 16, sun2_state)
+ADDRESS_MAP_START(sun2_state::mbustype1space_map)
 	AM_RANGE(0x000000, 0x0007ff) AM_ROM AM_REGION("bootprom", 0)    // uses MMU loophole to read 32k from a 2k window
 	// 001000-0017ff: AM9518 encryption processor
 	// 001800-001fff: Parallel port
 	AM_RANGE(0x002000, 0x0027ff) AM_DEVREADWRITE8(SCC2_TAG, z80scc_device, ba_cd_inv_r, ba_cd_inv_w, 0xff00)
 	AM_RANGE(0x002800, 0x002803) AM_MIRROR(0x7fc) AM_DEVREADWRITE("timer", am9513_device, read16, write16)
-	// 003800-003fff: MM58167 RTC
+	AM_RANGE(0x003800, 0x00383f) AM_MIRROR(0x7c0) AM_DEVREADWRITE8("rtc", mm58167_device, read, write, 0xff00) // 12 wait states generated by PAL16R6 (U415)
 ADDRESS_MAP_END
 
 // type 2 device space (Multibus memory space)
-static ADDRESS_MAP_START(mbustype2space_map, AS_PROGRAM, 16, sun2_state)
+ADDRESS_MAP_START(sun2_state::mbustype2space_map)
 ADDRESS_MAP_END
 
 // type 3 device space (Multibus I/O space)
-static ADDRESS_MAP_START(mbustype3space_map, AS_PROGRAM, 16, sun2_state)
+ADDRESS_MAP_START(sun2_state::mbustype3space_map)
 ADDRESS_MAP_END
 
 uint32_t sun2_state::bw2_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
@@ -731,6 +741,8 @@ MACHINE_CONFIG_START(sun2_state::sun2mbus)
 	MCFG_RS232_RXD_HANDLER(DEVWRITELINE(SCC2_TAG, z80scc_device, rxb_w))
 	MCFG_RS232_DCD_HANDLER(DEVWRITELINE(SCC2_TAG, z80scc_device, dcdb_w))
 	MCFG_RS232_CTS_HANDLER(DEVWRITELINE(SCC2_TAG, z80scc_device, ctsb_w))
+
+	MCFG_DEVICE_ADD("rtc", MM58167, XTAL(32'768))
 MACHINE_CONFIG_END
 
 /* ROM definition */

@@ -71,6 +71,8 @@ public:
 	virtual void video_start() override;
 	uint32_t screen_update_cavepc(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	void cavepc(machine_config &config);
+	void cavepc_io(address_map &map);
+	void cavepc_map(address_map &map);
 };
 
 void cavepc_state::video_start()
@@ -84,12 +86,12 @@ uint32_t cavepc_state::screen_update_cavepc(screen_device &screen, bitmap_ind16 
 
 /*****************************************************************************/
 
-static ADDRESS_MAP_START( cavepc_map, AS_PROGRAM, 32, cavepc_state )
+ADDRESS_MAP_START(cavepc_state::cavepc_map)
 	AM_RANGE(0x000f0000, 0x000fffff) AM_ROMBANK("bank1")
 	AM_RANGE(0xfffc0000, 0xffffffff) AM_ROM AM_REGION("bios", 0)    /* System BIOS */
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START(cavepc_io, AS_IO, 32, cavepc_state )
+ADDRESS_MAP_START(cavepc_state::cavepc_io)
 ADDRESS_MAP_END
 
 /*****************************************************************************/

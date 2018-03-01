@@ -116,6 +116,10 @@ public:
 	void copy_sprites(bitmap_ind16 &bitmap, bitmap_ind16 &sprites_bitmap, bitmap_ind8 &priority_bitmap, const rectangle &cliprect);
 	void limenko(machine_config &config);
 	void spotty(machine_config &config);
+	void limenko_io_map(address_map &map);
+	void limenko_map(address_map &map);
+	void spotty_io_map(address_map &map);
+	void spotty_map(address_map &map);
 };
 
 /*****************************************************************************************************
@@ -224,7 +228,7 @@ WRITE8_MEMBER(limenko_state::qs1000_p3_w)
   MEMORY MAPS
 *****************************************************************************************************/
 
-static ADDRESS_MAP_START( limenko_map, AS_PROGRAM, 32, limenko_state )
+ADDRESS_MAP_START(limenko_state::limenko_map)
 	AM_RANGE(0x00000000, 0x001fffff) AM_RAM AM_SHARE("mainram")
 	AM_RANGE(0x40000000, 0x403fffff) AM_ROM AM_REGION("user2",0)
 	AM_RANGE(0x80000000, 0x80007fff) AM_RAM_WRITE(fg_videoram_w) AM_SHARE("fg_videoram")
@@ -239,7 +243,7 @@ static ADDRESS_MAP_START( limenko_map, AS_PROGRAM, 32, limenko_state )
 	AM_RANGE(0xffe00000, 0xffffffff) AM_ROM AM_REGION("user1",0)
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( limenko_io_map, AS_IO, 32, limenko_state )
+ADDRESS_MAP_START(limenko_state::limenko_io_map)
 	AM_RANGE(0x0000, 0x0003) AM_READ_PORT("IN0")
 	AM_RANGE(0x0800, 0x0803) AM_READ_PORT("IN1")
 	AM_RANGE(0x1000, 0x1003) AM_READ_PORT("IN2")
@@ -251,7 +255,7 @@ ADDRESS_MAP_END
 
 /* Spotty memory map */
 
-static ADDRESS_MAP_START( spotty_map, AS_PROGRAM, 32, limenko_state )
+ADDRESS_MAP_START(limenko_state::spotty_map)
 	AM_RANGE(0x00000000, 0x001fffff) AM_RAM AM_SHARE("mainram")
 	AM_RANGE(0x40002000, 0x400024d3) AM_RAM //?
 	AM_RANGE(0x80000000, 0x80007fff) AM_RAM_WRITE(fg_videoram_w) AM_SHARE("fg_videoram")
@@ -266,7 +270,7 @@ static ADDRESS_MAP_START( spotty_map, AS_PROGRAM, 32, limenko_state )
 	AM_RANGE(0xfff00000, 0xffffffff) AM_ROM AM_REGION("user1",0)
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( spotty_io_map, AS_IO, 32, limenko_state )
+ADDRESS_MAP_START(limenko_state::spotty_io_map)
 	AM_RANGE(0x0000, 0x0003) AM_READ_PORT("IN0")
 	AM_RANGE(0x0800, 0x0803) AM_READ_PORT("IN1")
 	AM_RANGE(0x0800, 0x0803) AM_WRITENOP // hopper related
@@ -294,11 +298,6 @@ READ8_MEMBER(limenko_state::spotty_sound_r)
 	else
 		return m_oki->read(space,0);
 }
-
-static ADDRESS_MAP_START( spotty_sound_io_map, AS_IO, 8, limenko_state )
-	AM_RANGE(MCS51_PORT_P1, MCS51_PORT_P1) AM_READ(spotty_sound_r) AM_DEVWRITE("oki", okim6295_device, write) //? sound latch and ?
-	AM_RANGE(MCS51_PORT_P3, MCS51_PORT_P3) AM_READWRITE(spotty_sound_cmd_r, spotty_sound_cmd_w) //not sure about anything...
-ADDRESS_MAP_END
 
 /*****************************************************************************************************
   VIDEO HARDWARE EMULATION
@@ -775,7 +774,10 @@ MACHINE_CONFIG_START(limenko_state::spotty)
 	MCFG_CPU_VBLANK_INT_DRIVER("screen", limenko_state,  irq0_line_hold)
 
 	MCFG_CPU_ADD("audiocpu", AT89C4051, 4000000)    /* 4 MHz */
-	MCFG_CPU_IO_MAP(spotty_sound_io_map)
+	MCFG_MCS51_PORT_P1_IN_CB(READ8(limenko_state, spotty_sound_r))
+	MCFG_MCS51_PORT_P1_OUT_CB(DEVWRITE8("oki", okim6295_device, write)) //? sound latch and ?
+	MCFG_MCS51_PORT_P3_IN_CB(READ8(limenko_state, spotty_sound_cmd_r))
+	MCFG_MCS51_PORT_P3_OUT_CB(WRITE8(limenko_state, spotty_sound_cmd_w)) //not sure about anything...
 
 	MCFG_EEPROM_SERIAL_93C46_ADD("eeprom")
 

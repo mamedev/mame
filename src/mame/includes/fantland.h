@@ -83,4 +83,13 @@ public:
 	void wheelrun(machine_config &config);
 	void borntofi(machine_config &config);
 	void galaxygn(machine_config &config);
+	void borntofi_map(address_map &map);
+	void borntofi_sound_map(address_map &map);
+	void fantland_map(address_map &map);
+	void fantland_sound_iomap(address_map &map);
+	void fantland_sound_map(address_map &map);
+	void galaxygn_map(address_map &map);
+	void galaxygn_sound_iomap(address_map &map);
+	void wheelrun_map(address_map &map);
+	void wheelrun_sound_map(address_map &map);
 };

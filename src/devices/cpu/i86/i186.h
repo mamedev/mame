@@ -35,6 +35,20 @@ public:
 	virtual space_config_vector memory_space_config() const override;
 
 protected:
+	enum
+	{
+		I80186_RELOC = I8086_HALT + 1,
+		I80186_UMCS, I80186_LMCS, I80186_PACS, I80186_MMCS, I80186_MPCS,
+		I80186_DMA_SP,
+		I80186_DMA_DP = I80186_DMA_SP + 2,
+		I80186_DMA_TC = I80186_DMA_DP + 2,
+		I80186_DMA_CR = I80186_DMA_TC + 2,
+		I80186_T_COUNT = I80186_DMA_CR + 2,
+		I80186_T_MAX_A = I80186_T_COUNT + 3,
+		I80186_T_MAX_B = I80186_T_MAX_A + 3,
+		I80186_T_CONTROL = I80186_T_MAX_B + 2
+	};
+
 	i80186_cpu_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock, int data_bus_size);
 
 	// device_execute_interface overrides
@@ -45,7 +59,6 @@ protected:
 	virtual void device_reset() override;
 	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr) override;
 	virtual uint32_t execute_input_lines() const override { return 1; }
-	virtual uint8_t fetch_op() override;
 	virtual uint8_t fetch() override;
 	uint32_t update_pc() { return m_pc = (m_sregs[CS] << 4) + m_ip; }
 

@@ -57,6 +57,9 @@ public:
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
 	void rambo(machine_config &config);
+	void rambo_data_map(address_map &map);
+	void rambo_io_map(address_map &map);
+	void rambo_prg_map(address_map &map);
 };
 
 void rambo_state::machine_start()
@@ -104,15 +107,15 @@ WRITE8_MEMBER(rambo_state::port_w)
 * Address maps                                       *
 \****************************************************/
 
-static ADDRESS_MAP_START( rambo_prg_map, AS_PROGRAM, 8, rambo_state )
+ADDRESS_MAP_START(rambo_state::rambo_prg_map)
 	AM_RANGE(0x0000, 0x1FFFF) AM_ROM
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( rambo_data_map, AS_DATA, 8, rambo_state )
+ADDRESS_MAP_START(rambo_state::rambo_data_map)
 	AM_RANGE(0x0200, 0x21FF) AM_RAM  /* ATMEGA2560 Internal SRAM */
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( rambo_io_map, AS_IO, 8, rambo_state )
+ADDRESS_MAP_START(rambo_state::rambo_io_map)
 	AM_RANGE(AVR8_IO_PORTA, AVR8_IO_PORTL) AM_READWRITE( port_r, port_w )
 ADDRESS_MAP_END
 

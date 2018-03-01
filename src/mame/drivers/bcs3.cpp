@@ -85,6 +85,9 @@ public:
 	void bcs3a(machine_config &config);
 	void bcs3(machine_config &config);
 	void bcs3b(machine_config &config);
+	void bcs3_io(address_map &map);
+	void bcs3_mem(address_map &map);
+	void bcs3a_mem(address_map &map);
 private:
 	bool m_cass_bit;
 	u8 s_curs;
@@ -130,7 +133,7 @@ READ8_MEMBER( bcs3_state::zx_r )
 	return 0xf7;
 }
 
-static ADDRESS_MAP_START(bcs3_mem, AS_PROGRAM, 8, bcs3_state)
+ADDRESS_MAP_START(bcs3_state::bcs3_mem)
 	ADDRESS_MAP_UNMAP_HIGH
 	AM_RANGE( 0x0000, 0x0fff ) AM_MIRROR(0x2000) AM_ROM AM_REGION("roms", 0)
 	AM_RANGE( 0x1000, 0x13ff ) AM_MIRROR(0x2000) AM_READ(keyboard_r)
@@ -139,7 +142,7 @@ static ADDRESS_MAP_START(bcs3_mem, AS_PROGRAM, 8, bcs3_state)
 	AM_RANGE( 0x1c00, 0x1fff ) AM_MIRROR(0x2000) AM_RAM AM_SHARE("videoram")
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START(bcs3a_mem, AS_PROGRAM, 8, bcs3_state)
+ADDRESS_MAP_START(bcs3_state::bcs3a_mem)
 	ADDRESS_MAP_UNMAP_HIGH
 	AM_RANGE( 0x0000, 0x0fff ) AM_MIRROR(0x2000) AM_ROM AM_REGION("roms", 0)
 	AM_RANGE( 0x1000, 0x13ff ) AM_MIRROR(0x2000) AM_READ(keyboard_r)
@@ -149,7 +152,7 @@ static ADDRESS_MAP_START(bcs3a_mem, AS_PROGRAM, 8, bcs3_state)
 	AM_RANGE( 0xf000, 0xf3ff ) AM_ROM AM_REGION("roms", 0x1000)
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( bcs3_io, AS_IO, 8, bcs3_state)
+ADDRESS_MAP_START(bcs3_state::bcs3_io)
 	ADDRESS_MAP_UNMAP_HIGH
 	ADDRESS_MAP_GLOBAL_MASK(3)
 	// coded in the rom as F8 to FB
@@ -431,7 +434,8 @@ MACHINE_CONFIG_START(bcs3_state::bcs3a)
 	MCFG_CASSETTE_ADD( "cassette" )
 MACHINE_CONFIG_END
 
-MACHINE_CONFIG_DERIVED(bcs3_state::bcs3b, bcs3a)
+MACHINE_CONFIG_START(bcs3_state::bcs3b)
+	bcs3a(config);
 	MCFG_SCREEN_MODIFY("screen")
 	MCFG_SCREEN_SIZE(40*8, 24*10)
 	MCFG_SCREEN_VISIBLE_AREA(0,40*8-1,0,24*10-1)

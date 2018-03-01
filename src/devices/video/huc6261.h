@@ -16,13 +16,13 @@
 
 
 #define MCFG_HUC6261_VDC1(_tag) \
-	huc6261_device::set_vdc1_tag(*device, _tag);
+	downcast<huc6261_device &>(*device).set_vdc1_tag(_tag);
 
 #define MCFG_HUC6261_VDC2(_tag) \
-	huc6261_device::set_vdc2_tag(*device, _tag);
+	downcast<huc6261_device &>(*device).set_vdc2_tag(_tag);
 
 #define MCFG_HUC6261_KING(_tag) \
-	huc6261_device::set_king_tag(*device, _tag);
+	downcast<huc6261_device &>(*device).set_king_tag(_tag);
 
 
 class huc6261_device :  public device_t,
@@ -36,9 +36,9 @@ public:
 	// construction/destruction
 	huc6261_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
-	static void set_vdc1_tag(device_t &device, const char *tag) { downcast<huc6261_device &>(device).m_huc6270_a_tag = tag; }
-	static void set_vdc2_tag(device_t &device, const char *tag) { downcast<huc6261_device &>(device).m_huc6270_b_tag = tag; }
-	static void set_king_tag(device_t &device, const char *tag) { downcast<huc6261_device &>(device).m_huc6272_tag = tag; }
+	void set_vdc1_tag(const char *tag) { m_huc6270_a_tag = tag; }
+	void set_vdc2_tag(const char *tag) { m_huc6270_b_tag = tag; }
+	void set_king_tag(const char *tag) { m_huc6272_tag = tag; }
 
 	void video_update(bitmap_rgb32 &bitmap, const rectangle &cliprect);
 	DECLARE_READ16_MEMBER( read );

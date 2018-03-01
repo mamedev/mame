@@ -61,7 +61,7 @@ const tiny_rom_entry *cmd_hd_device::device_rom_region() const
 //  ADDRESS_MAP( cmd_hd_mem )
 //-------------------------------------------------
 
-static ADDRESS_MAP_START( cmd_hd_mem, AS_PROGRAM, 8, cmd_hd_device )
+ADDRESS_MAP_START(cmd_hd_device::cmd_hd_mem)
 	AM_RANGE(0x0000, 0x7fff) AM_RAM
 	AM_RANGE(0x8000, 0xffff) AM_ROM AM_REGION(M6502_TAG, 0)
 	AM_RANGE(0x8000, 0x800f) AM_MIRROR(0x1f0) AM_DEVWRITE(M6522_1_TAG, via6522_device, write)

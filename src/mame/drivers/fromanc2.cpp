@@ -35,13 +35,7 @@
  *
  *************************************/
 
-INTERRUPT_GEN_MEMBER(fromanc2_state::fromanc2_interrupt)
-{
-	device.execute().set_input_line(1, HOLD_LINE);
-}
-
-
-WRITE16_MEMBER(fromanc2_state::fromanc2_sndcmd_w)
+WRITE16_MEMBER(fromanc2_state::sndcmd_w)
 {
 	m_soundlatch->write(space, offset, (data >> 8) & 0xff);   // 1P (LEFT)
 	m_soundlatch2->write(space, offset, data & 0xff);         // 2P (RIGHT)
@@ -50,12 +44,12 @@ WRITE16_MEMBER(fromanc2_state::fromanc2_sndcmd_w)
 	m_sndcpu_nmi_flag = 0;
 }
 
-WRITE16_MEMBER(fromanc2_state::fromanc2_portselect_w)
+WRITE16_MEMBER(fromanc2_state::portselect_w)
 {
 	m_portselect = data;
 }
 
-READ16_MEMBER(fromanc2_state::fromanc2_keymatrix_r)
+READ16_MEMBER(fromanc2_state::keymatrix_r)
 {
 	uint16_t ret;
 
@@ -99,7 +93,7 @@ WRITE16_MEMBER(fromanc2_state::fromancr_gfxbank_eeprom_w)
 	}
 }
 
-WRITE16_MEMBER(fromanc2_state::fromanc2_subcpu_w)
+WRITE16_MEMBER(fromanc2_state::subcpu_w)
 {
 	m_datalatch1 = data;
 
@@ -107,7 +101,7 @@ WRITE16_MEMBER(fromanc2_state::fromanc2_subcpu_w)
 	m_subcpu_int_flag = 0;
 }
 
-READ16_MEMBER(fromanc2_state::fromanc2_subcpu_r)
+READ16_MEMBER(fromanc2_state::subcpu_r)
 {
 	m_subcpu->set_input_line(INPUT_LINE_NMI, PULSE_LINE);
 	m_subcpu_nmi_flag = 0;
@@ -115,53 +109,47 @@ READ16_MEMBER(fromanc2_state::fromanc2_subcpu_r)
 	return (m_datalatch_2h << 8) | m_datalatch_2l;
 }
 
-READ8_MEMBER(fromanc2_state::fromanc2_maincpu_r_l)
+READ8_MEMBER(fromanc2_state::maincpu_r_l)
 {
 	return m_datalatch1 & 0x00ff;
 }
 
-READ8_MEMBER(fromanc2_state::fromanc2_maincpu_r_h)
+READ8_MEMBER(fromanc2_state::maincpu_r_h)
 {
 	m_subcpu_int_flag = 1;
 
 	return (m_datalatch1 & 0xff00) >> 8;
 }
 
-WRITE8_MEMBER(fromanc2_state::fromanc2_maincpu_w_l)
+WRITE8_MEMBER(fromanc2_state::maincpu_w_l)
 {
 	m_datalatch_2l = data;
 }
 
-WRITE8_MEMBER(fromanc2_state::fromanc2_maincpu_w_h)
+WRITE8_MEMBER(fromanc2_state::maincpu_w_h)
 {
 	m_datalatch_2h = data;
 }
 
-WRITE8_MEMBER(fromanc2_state::fromanc2_subcpu_nmi_clr)
+WRITE8_MEMBER(fromanc2_state::subcpu_nmi_clr)
 {
 	m_subcpu_nmi_flag = 1;
 }
 
-READ8_MEMBER(fromanc2_state::fromanc2_sndcpu_nmi_clr)
+READ8_MEMBER(fromanc2_state::sndcpu_nmi_clr)
 {
 	m_sndcpu_nmi_flag = 1;
 
 	return 0xff;
 }
 
-WRITE8_MEMBER(fromanc2_state::fromanc2_subcpu_rombank_w)
+WRITE8_MEMBER(fromanc2_state::subcpu_rombank_w)
 {
 	// Change ROM BANK
 	membank("bank1")->set_entry(data & 0x03);
 
 	// Change RAM BANK
 	membank("bank2")->set_entry((data & 0x0c) >> 2);
-}
-
-// custom handler allowing byte-smeared writes
-WRITE16_MEMBER(fromanc2_state::uart_w)
-{
-	m_uart->ins8250_w(space, offset, data & 0xff);
 }
 
 
@@ -171,7 +159,7 @@ WRITE16_MEMBER(fromanc2_state::uart_w)
  *
  *************************************/
 
-static ADDRESS_MAP_START( fromanc2_main_map, AS_PROGRAM, 16, fromanc2_state )
+ADDRESS_MAP_START(fromanc2_state::fromanc2_main_map)
 	AM_RANGE(0x000000, 0x07ffff) AM_ROM                                 // MAIN ROM
 
 	AM_RANGE(0x802000, 0x802fff) AM_READNOP                             // ???
@@ -191,20 +179,20 @@ static ADDRESS_MAP_START( fromanc2_main_map, AS_PROGRAM, 16, fromanc2_state )
 	AM_RANGE(0xd00400, 0xd00413) AM_WRITENOP                            // ???
 	AM_RANGE(0xd00500, 0xd00513) AM_WRITENOP                            // ???
 
-	AM_RANGE(0xd01000, 0xd01001) AM_WRITE(fromanc2_sndcmd_w)            // SOUND REQ (1P/2P)
+	AM_RANGE(0xd01000, 0xd01001) AM_WRITE(sndcmd_w)                     // SOUND REQ (1P/2P)
 	AM_RANGE(0xd01100, 0xd01101) AM_READ_PORT("SYSTEM")
-	AM_RANGE(0xd01200, 0xd01201) AM_WRITE(fromanc2_subcpu_w)            // SUB CPU WRITE
-	AM_RANGE(0xd01300, 0xd01301) AM_READ(fromanc2_subcpu_r  )           // SUB CPU READ
+	AM_RANGE(0xd01200, 0xd01201) AM_WRITE(subcpu_w)                     // SUB CPU WRITE
+	AM_RANGE(0xd01300, 0xd01301) AM_READ(subcpu_r)                      // SUB CPU READ
 	AM_RANGE(0xd01400, 0xd01401) AM_WRITE(fromanc2_gfxbank_0_w)         // GFXBANK (1P)
 	AM_RANGE(0xd01500, 0xd01501) AM_WRITE(fromanc2_gfxbank_1_w)         // GFXBANK (2P)
 	AM_RANGE(0xd01600, 0xd01601) AM_WRITE_PORT("EEPROMOUT")             // EEPROM DATA
-	AM_RANGE(0xd01800, 0xd01801) AM_READ(fromanc2_keymatrix_r)          // INPUT KEY MATRIX
-	AM_RANGE(0xd01a00, 0xd01a01) AM_WRITE(fromanc2_portselect_w)        // PORT SELECT (1P/2P)
+	AM_RANGE(0xd01800, 0xd01801) AM_READ(keymatrix_r)                   // INPUT KEY MATRIX
+	AM_RANGE(0xd01a00, 0xd01a01) AM_WRITE(portselect_w)                 // PORT SELECT (1P/2P)
 
 	AM_RANGE(0xd80000, 0xd8ffff) AM_RAM                                 // WORK RAM
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( fromancr_main_map, AS_PROGRAM, 16, fromanc2_state )
+ADDRESS_MAP_START(fromanc2_state::fromancr_main_map)
 	AM_RANGE(0x000000, 0x07ffff) AM_ROM                                 // MAIN ROM
 
 	AM_RANGE(0x800000, 0x803fff) AM_WRITE(fromancr_videoram_0_w)        // VRAM BG (1P/2P)
@@ -219,32 +207,32 @@ static ADDRESS_MAP_START( fromancr_main_map, AS_PROGRAM, 16, fromanc2_state )
 	AM_RANGE(0xd00200, 0xd002ff) AM_WRITENOP                            // ?
 	AM_RANGE(0xd00400, 0xd00413) AM_WRITENOP                            // ???
 	AM_RANGE(0xd00500, 0xd00513) AM_WRITENOP                            // ???
-	AM_RANGE(0xd01000, 0xd01001) AM_WRITE(fromanc2_sndcmd_w)            // SOUND REQ (1P/2P)
+	AM_RANGE(0xd01000, 0xd01001) AM_WRITE(sndcmd_w)                     // SOUND REQ (1P/2P)
 	AM_RANGE(0xd00100, 0xd00123) AM_WRITE(fromancr_gfxreg_0_w)          // SCROLL REG (1P/2P)
 	AM_RANGE(0xd01100, 0xd01101) AM_READ_PORT("SYSTEM")
-	AM_RANGE(0xd01200, 0xd01201) AM_WRITE(fromanc2_subcpu_w)            // SUB CPU WRITE
-	AM_RANGE(0xd01300, 0xd01301) AM_READ(fromanc2_subcpu_r)             // SUB CPU READ
+	AM_RANGE(0xd01200, 0xd01201) AM_WRITE(subcpu_w)                     // SUB CPU WRITE
+	AM_RANGE(0xd01300, 0xd01301) AM_READ(subcpu_r)                      // SUB CPU READ
 	AM_RANGE(0xd01400, 0xd01401) AM_WRITENOP                            // COIN COUNTER ?
 	AM_RANGE(0xd01600, 0xd01601) AM_WRITE(fromancr_gfxbank_eeprom_w)    // EEPROM DATA, GFXBANK (1P/2P)
-	AM_RANGE(0xd01800, 0xd01801) AM_READ(fromanc2_keymatrix_r)          // INPUT KEY MATRIX
-	AM_RANGE(0xd01a00, 0xd01a01) AM_WRITE(fromanc2_portselect_w)        // PORT SELECT (1P/2P)
+	AM_RANGE(0xd01800, 0xd01801) AM_READ(keymatrix_r)                   // INPUT KEY MATRIX
+	AM_RANGE(0xd01a00, 0xd01a01) AM_WRITE(portselect_w)                 // PORT SELECT (1P/2P)
 
 	AM_RANGE(0xd80000, 0xd8ffff) AM_RAM                                 // WORK RAM
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( fromanc4_main_map, AS_PROGRAM, 16, fromanc2_state )
+ADDRESS_MAP_START(fromanc2_state::fromanc4_main_map)
 	AM_RANGE(0x000000, 0x07ffff) AM_ROM                             // MAIN ROM
 	AM_RANGE(0x400000, 0x7fffff) AM_ROM                             // DATA ROM
 
 	AM_RANGE(0x800000, 0x81ffff) AM_RAM                             // WORK RAM
 
-	AM_RANGE(0xd00000, 0xd00001) AM_WRITE(fromanc2_portselect_w)    // PORT SELECT (1P/2P)
+	AM_RANGE(0xd00000, 0xd00001) AM_WRITE(portselect_w)             // PORT SELECT (1P/2P)
 
 	AM_RANGE(0xd10000, 0xd10001) AM_WRITENOP                        // ?
 	AM_RANGE(0xd30000, 0xd30001) AM_WRITENOP                        // ?
 	AM_RANGE(0xd50000, 0xd50001) AM_WRITE_PORT("EEPROMOUT")         // EEPROM DATA
 
-	AM_RANGE(0xd70000, 0xd70001) AM_WRITE(fromanc2_sndcmd_w)        // SOUND REQ (1P/2P)
+	AM_RANGE(0xd70000, 0xd70001) AM_WRITE(sndcmd_w)                 // SOUND REQ (1P/2P)
 
 	AM_RANGE(0xd80000, 0xd8ffff) AM_WRITE(fromanc4_videoram_0_w)    // VRAM FG (1P/2P)
 	AM_RANGE(0xd90000, 0xd9ffff) AM_WRITE(fromanc4_videoram_1_w)    // VRAM BG (1P/2P)
@@ -253,7 +241,7 @@ static ADDRESS_MAP_START( fromanc4_main_map, AS_PROGRAM, 16, fromanc2_state )
 	AM_RANGE(0xdb0000, 0xdb0fff) AM_RAM_DEVWRITE("lpalette", palette_device, write16) AM_SHARE("lpalette") // PALETTE (1P)
 	AM_RANGE(0xdc0000, 0xdc0fff) AM_RAM_DEVWRITE("rpalette", palette_device, write16) AM_SHARE("rpalette") // PALETTE (2P)
 
-	AM_RANGE(0xd10000, 0xd10001) AM_READ(fromanc2_keymatrix_r)      // INPUT KEY MATRIX
+	AM_RANGE(0xd10000, 0xd10001) AM_READ(keymatrix_r)               // INPUT KEY MATRIX
 	AM_RANGE(0xd20000, 0xd20001) AM_READ_PORT("SYSTEM")
 
 	AM_RANGE(0xe00000, 0xe0001d) AM_WRITE(fromanc4_gfxreg_0_w)      // SCROLL, GFXBANK (1P/2P)
@@ -263,37 +251,37 @@ static ADDRESS_MAP_START( fromanc4_main_map, AS_PROGRAM, 16, fromanc2_state )
 	AM_RANGE(0xe30000, 0xe30013) AM_WRITENOP                        // ???
 	AM_RANGE(0xe40000, 0xe40013) AM_WRITENOP                        // ???
 
-	AM_RANGE(0xe50000, 0xe5000f) AM_DEVREAD8("uart", ns16550_device, ins8250_r, 0x00ff) AM_WRITE(uart_w) // EXT-COMM PORT ?
+	AM_RANGE(0xe50000, 0xe5000f) AM_DEVREADWRITE8("uart", ns16550_device, ins8250_r, ins8250_w, 0x00ff).cswidth(16) // EXT-COMM PORT ?
 ADDRESS_MAP_END
 
 
-static ADDRESS_MAP_START( fromanc2_sub_map, AS_PROGRAM, 8, fromanc2_state )
+ADDRESS_MAP_START(fromanc2_state::fromanc2_sub_map)
 	AM_RANGE(0x0000, 0x3fff) AM_ROM                                 // ROM
 	AM_RANGE(0x4000, 0x7fff) AM_ROMBANK("bank1")                    // ROM(BANK)
 	AM_RANGE(0x8000, 0xbfff) AM_RAM                                 // RAM(WORK)
 	AM_RANGE(0xc000, 0xffff) AM_RAMBANK("bank2")                    // RAM(BANK)
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( fromanc2_sub_io_map, AS_IO, 8, fromanc2_state )
+ADDRESS_MAP_START(fromanc2_state::fromanc2_sub_io_map)
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
-	AM_RANGE(0x00, 0x00) AM_WRITE(fromanc2_subcpu_rombank_w)
-	AM_RANGE(0x02, 0x02) AM_READWRITE(fromanc2_maincpu_r_l, fromanc2_maincpu_w_l) // to/from MAIN CPU
-	AM_RANGE(0x04, 0x04) AM_READWRITE(fromanc2_maincpu_r_h, fromanc2_maincpu_w_h) // to/from MAIN CPU
-	AM_RANGE(0x06, 0x06) AM_WRITE(fromanc2_subcpu_nmi_clr)
+	AM_RANGE(0x00, 0x00) AM_WRITE(subcpu_rombank_w)
+	AM_RANGE(0x02, 0x02) AM_READWRITE(maincpu_r_l, maincpu_w_l) // to/from MAIN CPU
+	AM_RANGE(0x04, 0x04) AM_READWRITE(maincpu_r_h, maincpu_w_h) // to/from MAIN CPU
+	AM_RANGE(0x06, 0x06) AM_WRITE(subcpu_nmi_clr)
 ADDRESS_MAP_END
 
 
-static ADDRESS_MAP_START( fromanc2_sound_map, AS_PROGRAM, 8, fromanc2_state )
+ADDRESS_MAP_START(fromanc2_state::fromanc2_sound_map)
 	AM_RANGE(0x0000, 0xdfff) AM_ROM
 	AM_RANGE(0xe000, 0xffff) AM_RAM
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( fromanc2_sound_io_map, AS_IO, 8, fromanc2_state )
+ADDRESS_MAP_START(fromanc2_state::fromanc2_sound_io_map)
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	AM_RANGE(0x00, 0x00) AM_DEVREAD("soundlatch", generic_latch_8_device, read) AM_WRITENOP     // snd cmd (1P) / ?
 	AM_RANGE(0x04, 0x04) AM_DEVREAD("soundlatch2", generic_latch_8_device, read)                // snd cmd (2P)
 	AM_RANGE(0x08, 0x0b) AM_DEVREADWRITE("ymsnd", ym2610_device, read, write)
-	AM_RANGE(0x0c, 0x0c) AM_READ(fromanc2_sndcpu_nmi_clr)
+	AM_RANGE(0x0c, 0x0c) AM_READ(sndcpu_nmi_clr)
 ADDRESS_MAP_END
 
 
@@ -511,7 +499,7 @@ MACHINE_CONFIG_START(fromanc2_state::fromanc2)
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", M68000,32000000/2)      /* 16.00 MHz */
 	MCFG_CPU_PROGRAM_MAP(fromanc2_main_map)
-	MCFG_CPU_VBLANK_INT_DRIVER("lscreen", fromanc2_state,  fromanc2_interrupt)
+	MCFG_CPU_VBLANK_INT_DRIVER("lscreen", fromanc2_state, irq1_line_hold)
 
 	MCFG_CPU_ADD("audiocpu", Z80,32000000/4)        /* 8.00 MHz */
 	MCFG_CPU_PROGRAM_MAP(fromanc2_sound_map)
@@ -540,7 +528,7 @@ MACHINE_CONFIG_START(fromanc2_state::fromanc2)
 	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
 	MCFG_SCREEN_SIZE(512, 512)
 	MCFG_SCREEN_VISIBLE_AREA(0, 352-1, 0, 240-1)
-	MCFG_SCREEN_UPDATE_DRIVER(fromanc2_state, screen_update_fromanc2_left)
+	MCFG_SCREEN_UPDATE_DRIVER(fromanc2_state, screen_update_left)
 	MCFG_SCREEN_PALETTE("lpalette")
 
 	MCFG_SCREEN_ADD("rscreen", RASTER)
@@ -548,7 +536,7 @@ MACHINE_CONFIG_START(fromanc2_state::fromanc2)
 	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
 	MCFG_SCREEN_SIZE(512, 512)
 	MCFG_SCREEN_VISIBLE_AREA(0, 352-1, 0, 240-1)
-	MCFG_SCREEN_UPDATE_DRIVER(fromanc2_state, screen_update_fromanc2_right)
+	MCFG_SCREEN_UPDATE_DRIVER(fromanc2_state, screen_update_right)
 	MCFG_SCREEN_PALETTE("rpalette")
 
 	MCFG_VIDEO_START_OVERRIDE(fromanc2_state,fromanc2)
@@ -571,7 +559,7 @@ MACHINE_CONFIG_START(fromanc2_state::fromancr)
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", M68000,32000000/2)      /* 16.00 MHz */
 	MCFG_CPU_PROGRAM_MAP(fromancr_main_map)
-	MCFG_CPU_VBLANK_INT_DRIVER("lscreen", fromanc2_state,  fromanc2_interrupt)
+	MCFG_CPU_VBLANK_INT_DRIVER("lscreen", fromanc2_state, irq1_line_hold)
 
 	MCFG_CPU_ADD("audiocpu", Z80,32000000/4)        /* 8.00 MHz */
 	MCFG_CPU_PROGRAM_MAP(fromanc2_sound_map)
@@ -600,7 +588,7 @@ MACHINE_CONFIG_START(fromanc2_state::fromancr)
 	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
 	MCFG_SCREEN_SIZE(512, 512)
 	MCFG_SCREEN_VISIBLE_AREA(0, 352-1, 0, 240-1)
-	MCFG_SCREEN_UPDATE_DRIVER(fromanc2_state, screen_update_fromanc2_left)
+	MCFG_SCREEN_UPDATE_DRIVER(fromanc2_state, screen_update_left)
 	MCFG_SCREEN_PALETTE("lpalette")
 
 	MCFG_SCREEN_ADD("rscreen", RASTER)
@@ -608,7 +596,7 @@ MACHINE_CONFIG_START(fromanc2_state::fromancr)
 	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
 	MCFG_SCREEN_SIZE(512, 512)
 	MCFG_SCREEN_VISIBLE_AREA(0, 352-1, 0, 240-1)
-	MCFG_SCREEN_UPDATE_DRIVER(fromanc2_state, screen_update_fromanc2_right)
+	MCFG_SCREEN_UPDATE_DRIVER(fromanc2_state, screen_update_right)
 	MCFG_SCREEN_PALETTE("rpalette")
 
 	MCFG_VIDEO_START_OVERRIDE(fromanc2_state,fromancr)
@@ -631,7 +619,7 @@ MACHINE_CONFIG_START(fromanc2_state::fromanc4)
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", M68000, XTAL(32'000'000)/2)      /* 16.00 MHz */
 	MCFG_CPU_PROGRAM_MAP(fromanc4_main_map)
-	MCFG_CPU_VBLANK_INT_DRIVER("lscreen", fromanc2_state,  fromanc2_interrupt)
+	MCFG_CPU_VBLANK_INT_DRIVER("lscreen", fromanc2_state, irq1_line_hold)
 
 	MCFG_CPU_ADD("audiocpu", Z80, XTAL(32'000'000)/4)        /* 8.00 MHz */
 	MCFG_CPU_PROGRAM_MAP(fromanc2_sound_map)
@@ -661,7 +649,7 @@ MACHINE_CONFIG_START(fromanc2_state::fromanc4)
 	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
 	MCFG_SCREEN_SIZE(512, 512)
 	MCFG_SCREEN_VISIBLE_AREA(0, 352-1, 0, 240-1)
-	MCFG_SCREEN_UPDATE_DRIVER(fromanc2_state, screen_update_fromanc2_left)
+	MCFG_SCREEN_UPDATE_DRIVER(fromanc2_state, screen_update_left)
 	MCFG_SCREEN_PALETTE("lpalette")
 
 	MCFG_SCREEN_ADD("rscreen", RASTER)
@@ -669,7 +657,7 @@ MACHINE_CONFIG_START(fromanc2_state::fromanc4)
 	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
 	MCFG_SCREEN_SIZE(512, 512)
 	MCFG_SCREEN_VISIBLE_AREA(0, 352-1, 0, 240-1)
-	MCFG_SCREEN_UPDATE_DRIVER(fromanc2_state, screen_update_fromanc2_right)
+	MCFG_SCREEN_UPDATE_DRIVER(fromanc2_state, screen_update_right)
 	MCFG_SCREEN_PALETTE("rpalette")
 
 	MCFG_VIDEO_START_OVERRIDE(fromanc2_state,fromanc4)

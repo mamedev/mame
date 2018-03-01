@@ -8,7 +8,7 @@ DEFINE_DEVICE_TYPE(H83007, h83007_device, "h83007", "H8/3007")
 
 
 h83006_device::h83006_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock, uint32_t start) :
-	h8h_device(mconfig, type, tag, owner, clock, address_map_delegate(FUNC(h83006_device::map), this)),
+	h8h_device(mconfig, type, tag, owner, clock, address_map_constructor(FUNC(h83006_device::map), this)),
 	intc(*this, "intc"),
 	adc(*this, "adc"),
 	port4(*this, "port4"),
@@ -46,7 +46,7 @@ h83007_device::h83007_device(const machine_config &mconfig, const char *tag, dev
 {
 }
 
-DEVICE_ADDRESS_MAP_START(map, 16, h83006_device)
+ADDRESS_MAP_START(h83006_device::map)
 	AM_RANGE(0xfee002, 0xfee003) AM_DEVWRITE8(    "port4",     h8_port_device,                     ddr_w,   0x00ff)
 	AM_RANGE(0xfee004, 0xfee005) AM_DEVWRITE8(    "port6",     h8_port_device,                     ddr_w,   0x00ff)
 	AM_RANGE(0xfee006, 0xfee007) AM_DEVWRITE8(    "port8",     h8_port_device,                     ddr_w,   0x00ff)

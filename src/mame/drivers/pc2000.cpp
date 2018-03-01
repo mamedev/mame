@@ -71,6 +71,8 @@ public:
 	DECLARE_DEVICE_IMAGE_LOAD_MEMBER(pc2000_cart);
 	void pc2000(machine_config &config);
 	void gl2000(machine_config &config);
+	void pc2000_io(address_map &map);
+	void pc2000_mem(address_map &map);
 };
 
 class gl3000s_state : public pc2000_state
@@ -87,6 +89,7 @@ public:
 
 	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	void gl3000s(machine_config &config);
+	void gl3000s_io(address_map &map);
 };
 
 class gl4004_state : public pc2000_state
@@ -120,6 +123,8 @@ public:
 	HD44780_PIXEL_UPDATE(pc1000_pixel_update);
 	void misterx(machine_config &config);
 	void pc1000(machine_config &config);
+	void pc1000_io(address_map &map);
+	void pc1000_mem(address_map &map);
 };
 
 
@@ -175,7 +180,7 @@ WRITE8_MEMBER( pc2000_state::beep_w )
 	m_beep_state = data;
 }
 
-static ADDRESS_MAP_START(pc2000_mem, AS_PROGRAM, 8, pc2000_state)
+ADDRESS_MAP_START(pc2000_state::pc2000_mem)
 	ADDRESS_MAP_UNMAP_HIGH
 	AM_RANGE(0x0000, 0x3fff) AM_ROMBANK("bank0")
 	AM_RANGE(0x4000, 0x7fff) AM_ROMBANK("bank1")
@@ -183,7 +188,7 @@ static ADDRESS_MAP_START(pc2000_mem, AS_PROGRAM, 8, pc2000_state)
 	AM_RANGE(0xc000, 0xdfff) AM_RAM
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( pc2000_io , AS_IO, 8, pc2000_state)
+ADDRESS_MAP_START(pc2000_state::pc2000_io)
 	ADDRESS_MAP_UNMAP_HIGH
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	AM_RANGE(0x00, 0x00) AM_WRITE(rombank0_w)
@@ -292,7 +297,7 @@ SED1520_UPDATE_CB(gl3000s_screen_update_left)
 }
 
 
-static ADDRESS_MAP_START( gl3000s_io , AS_IO, 8, gl3000s_state)
+ADDRESS_MAP_START(gl3000s_state::gl3000s_io)
 	ADDRESS_MAP_UNMAP_HIGH
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	AM_RANGE(0x01, 0x01) AM_WRITE(rombank1_w)
@@ -357,7 +362,7 @@ HD44780_PIXEL_UPDATE(pc1000_state::pc1000_pixel_update)
 		}
 }
 
-static ADDRESS_MAP_START(pc1000_mem, AS_PROGRAM, 8, pc1000_state)
+ADDRESS_MAP_START(pc1000_state::pc1000_mem)
 	ADDRESS_MAP_UNMAP_HIGH
 	AM_RANGE(0x0000, 0x3fff) AM_ROM AM_REGION("bios", 0x00000)
 	AM_RANGE(0x4000, 0x47ff) AM_RAM
@@ -365,7 +370,7 @@ static ADDRESS_MAP_START(pc1000_mem, AS_PROGRAM, 8, pc1000_state)
 	AM_RANGE(0xc000, 0xffff) AM_ROMBANK("bank1")
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( pc1000_io , AS_IO, 8, pc1000_state)
+ADDRESS_MAP_START(pc1000_state::pc1000_io)
 	AM_RANGE(0x0000, 0x01ff) AM_READ(kb_r)
 	AM_RANGE(0x4000, 0x4000) AM_MIRROR(0xfe) AM_READWRITE(lcdc_control_r, lcdc_control_w)
 	AM_RANGE(0x4100, 0x4100) AM_MIRROR(0xfe) AM_READWRITE(lcdc_data_r, lcdc_data_w)
@@ -870,7 +875,8 @@ MACHINE_CONFIG_START(pc2000_state::pc2000)
 	MCFG_SOFTWARE_LIST_COMPATIBLE_ADD("pc1000_cart", "pc1000")
 MACHINE_CONFIG_END
 
-MACHINE_CONFIG_DERIVED(pc2000_state::gl2000, pc2000)
+MACHINE_CONFIG_START(pc2000_state::gl2000)
+	pc2000(config);
 	MCFG_SOFTWARE_LIST_ADD("cart_list", "gl2000")
 	MCFG_SOFTWARE_LIST_COMPATIBLE_ADD("misterx_cart", "misterx")
 MACHINE_CONFIG_END
@@ -892,7 +898,8 @@ HD44780_PIXEL_UPDATE(gl4004_state::gl4000_pixel_update)
 	}
 }
 
-MACHINE_CONFIG_DERIVED(gl3000s_state::gl3000s, pc2000)
+MACHINE_CONFIG_START(gl3000s_state::gl3000s)
+	pc2000(config);
 	MCFG_CPU_MODIFY("maincpu")
 	MCFG_CPU_IO_MAP(gl3000s_io)
 
@@ -913,7 +920,8 @@ MACHINE_CONFIG_DERIVED(gl3000s_state::gl3000s, pc2000)
 	MCFG_SOFTWARE_LIST_COMPATIBLE_ADD("misterx_cart", "misterx")
 MACHINE_CONFIG_END
 
-MACHINE_CONFIG_DERIVED(gl4004_state::gl4000, pc2000)
+MACHINE_CONFIG_START(gl4004_state::gl4000)
+	pc2000(config);
 	MCFG_SCREEN_MODIFY("screen")
 	MCFG_SCREEN_SIZE(120, 36) // 4x20 chars
 	MCFG_SCREEN_VISIBLE_AREA(0, 120-1, 0, 36-1)
@@ -926,7 +934,8 @@ MACHINE_CONFIG_DERIVED(gl4004_state::gl4000, pc2000)
 	MCFG_SOFTWARE_LIST_COMPATIBLE_ADD("misterx_cart", "misterx")
 MACHINE_CONFIG_END
 
-MACHINE_CONFIG_DERIVED(pc1000_state::misterx, pc2000)
+MACHINE_CONFIG_START(pc1000_state::misterx)
+	pc2000(config);
 	/* basic machine hardware */
 	MCFG_CPU_MODIFY("maincpu")
 	MCFG_CPU_PROGRAM_MAP(pc1000_mem)
@@ -946,7 +955,8 @@ MACHINE_CONFIG_DERIVED(pc1000_state::misterx, pc2000)
 	MCFG_SOFTWARE_LIST_ADD("cart_list", "misterx")
 MACHINE_CONFIG_END
 
-MACHINE_CONFIG_DERIVED(pc1000_state::pc1000, misterx)
+MACHINE_CONFIG_START(pc1000_state::pc1000)
+	misterx(config);
 	MCFG_SOFTWARE_LIST_REMOVE("cart_list")
 	MCFG_SOFTWARE_LIST_REMOVE("pc1000_cart")
 	MCFG_SOFTWARE_LIST_ADD("cart_list", "pc1000")

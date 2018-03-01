@@ -80,7 +80,7 @@ WRITE8_MEMBER( bfm_sc5_state::sc5_mux2_w )
 }
 
 
-static ADDRESS_MAP_START( sc5_map, AS_PROGRAM, 32, bfm_sc5_state )
+ADDRESS_MAP_START(bfm_sc5_state::sc5_map)
 	// ROM (max size?)
 	AM_RANGE(0x00000000, 0x002fffff) AM_ROM
 	// ?

@@ -161,7 +161,7 @@ ROM_START( aha1542 )
 	ROM_LOAD( "553801-00.u15", 0x0000, 0x8000, CRC(7824397e) SHA1(35bc2c8fab31aad3190a478f2dc8f3a72958cf04) ) /* ADAPTEC, INC MCODE */
 ROM_END
 
-static ADDRESS_MAP_START( z84c0010_mem, AS_PROGRAM, 8, aha1542_device )
+ADDRESS_MAP_START(aha1542_device::z84c0010_mem)
 	AM_RANGE(0x0000, 0x7fff) AM_ROM AM_REGION(Z84C0010_TAG, 0)
 	AM_RANGE(0x8000, 0x800f) AM_NOP        // something is mapped there
 	AM_RANGE(0x9000, 0xafff) AM_RAM        // 2kb RAM chip

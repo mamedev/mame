@@ -1,16 +1,16 @@
-# Portuguese translations for PACKAGE package
-# Traduções em português brasileiro para o pacote PACKAGE.
-# Copyright (C) 2016 THE PACKAGE'S COPYRIGHT HOLDER
-# This file is distributed under the same license as the PACKAGE package.
-# Automatically generated, 2016.
+# Brazilian Portuguese translations for MAME Project.
+# Traduções para o Português do Brasil para o Projeto MAME.
+# Copyright (C) 1997-2018  MAMEDev and contributors
+# This file is distributed under the same license as the MAME Project.
+# Automatically generated, 2018.
 #
 msgid ""
 msgstr ""
 "Project-Id-Version: MAME\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2018-01-28 14:02+1100\n"
+"POT-Creation-Date: 2018-02-23 05:25-0300\n"
 "PO-Revision-Date: 2017-11-30 08:07-0300\n"
-"Last-Translator: Katananja\n"
+"Last-Translator: Katananja, Ashura-X\n"
 "Language-Team: MAME Language Team\n"
 "Language: pt_BR\n"
 "MIME-Version: 1.0\n"
@@ -432,7 +432,7 @@ msgstr ""
 
 #: src/frontend/mame/ui/info.cpp:200
 msgid "Completely unemulated features: "
-msgstr "Características completamente não emuladas: "
+msgstr "Recursos não emulados por completo: "
 
 #: src/frontend/mame/ui/info.cpp:206 src/frontend/mame/ui/info.cpp:222
 #, c-format
@@ -480,6 +480,7 @@ msgid ""
 "complete. There is nothing you can do to fix this problem except wait for "
 "the developers to improve the emulation.\n"
 msgstr ""
+"\n"
 "ESTA MÁQUINA NÃO FUNCIONA. A emulação para esta máquina ainda não está "
 "completa. Não há nada que você possa fazer para resolver este problema "
 "exceto aguardar os desenvolvedores melhorarem a emulação.\n"
@@ -491,6 +492,7 @@ msgid ""
 "interaction or consist of mechanical devices. It is not possible to fully "
 "experience this machine.\n"
 msgstr ""
+"\n"
 "Não foi possível emular elementos desta máquina pois necessitam de interação "
 "física ou são dispositivos mecânicos. Não é possível ter uma experiência "
 "completa com esta máquina.\n"
@@ -721,7 +723,7 @@ msgstr "Gravar"
 
 #: src/frontend/mame/ui/tapectrl.cpp:104 src/frontend/mame/ui/submenu.cpp:66
 msgid "Rewind"
-msgstr "Rebobinar"
+msgstr "Retroceder"
 
 #: src/frontend/mame/ui/tapectrl.cpp:107
 msgid "Fast Forward"
@@ -1407,7 +1409,7 @@ msgstr "Mostrar painéis laterais"
 
 #: src/frontend/mame/ui/custui.cpp:173
 msgid "Custom UI Settings"
-msgstr "Personalizaçoes da Interface"
+msgstr "Personalizações da Interface"
 
 #: src/frontend/mame/ui/custui.cpp:223
 msgid "default"
@@ -1459,7 +1461,7 @@ msgstr "Cor de fundo selecionada"
 
 #: src/frontend/mame/ui/custui.cpp:455
 msgid "Subitem color"
-msgstr "Cor do Sub-item"
+msgstr "Cor do Subitem"
 
 #: src/frontend/mame/ui/custui.cpp:456 src/frontend/mame/ui/custui.cpp:511
 msgid "Clone"
@@ -1528,7 +1530,7 @@ msgstr "Normal"
 
 #: src/frontend/mame/ui/custui.cpp:508
 msgid "Subitem"
-msgstr "Sub-item"
+msgstr "Subitem"
 
 #: src/frontend/mame/ui/custui.cpp:509
 msgid "Selected"
@@ -1639,7 +1641,7 @@ msgstr "Pular menu de seleção para o programa em partes"
 
 #: src/frontend/mame/ui/submenu.cpp:33
 msgid "Info auto audit"
-msgstr "Informação da auditoria automática"
+msgstr "Informação automática de aferição"
 
 #: src/frontend/mame/ui/submenu.cpp:34
 msgid "Hide romless machine from available list"
@@ -1743,7 +1745,7 @@ msgstr "Salvar/Restaurar Automático"
 
 #: src/frontend/mame/ui/submenu.cpp:67
 msgid "Rewind capacity"
-msgstr ""
+msgstr "Função de rebobinamento"
 
 #: src/frontend/mame/ui/submenu.cpp:68
 msgid "Bilinear snapshot"
@@ -2175,7 +2177,7 @@ msgstr "Condição da ROM\tRUIM\n"
 
 #: src/frontend/mame/ui/selgame.cpp:975
 msgid "Samples Audit Result\tNone Needed\n"
-msgstr "Condição da ROM\tNenhuma Necessária\n"
+msgstr "Condição das Amostras\tNenhuma Necessária\n"
 
 #: src/frontend/mame/ui/selgame.cpp:977
 msgid "Samples Audit Result\tOK\n"
@@ -2190,6 +2192,8 @@ msgid ""
 "ROM Audit \tDisabled\n"
 "Samples Audit \tDisabled\n"
 msgstr ""
+"Aferição de ROM \tDesativado\n"
+"Aferição de Amostras \tDesativado\n"
 
 #: src/frontend/mame/ui/selgame.cpp:1167
 #, c-format
@@ -2800,21 +2804,21 @@ msgstr "Localizador de Trapaças"
 
 #: plugins/portname/init.lua:89
 msgid "Save input names to file"
-msgstr ""
+msgstr "Salvar os nomes de entrada para o arquivo"
 
 #: plugins/portname/init.lua:115 plugins/portname/init.lua:120
 #: plugins/portname/init.lua:136
 msgid "Failed to save input name file"
-msgstr ""
+msgstr "Erro ao salvar os nomes de entrada ao arquivo"
 
 #: plugins/portname/init.lua:153
 #, lua-format
 msgid "Input port name file saved to %s"
-msgstr ""
+msgstr "O Arquivo com o nome das portas de entrada foi salvo em %s"
 
 #: plugins/portname/init.lua:158
 msgid "Input ports"
-msgstr ""
+msgstr "Portas de entrada"
 
 #~ msgid ""
 #~ "ROM Audit Disabled\t\n"
@@ -2875,8 +2879,8 @@ msgstr ""
 #~ "Roms Audit Pass\tDisabled\n"
 #~ "Samples Audit Pass\tDisabled\n"
 #~ msgstr ""
-#~ "Auditoria de Roms\tDesligada\n"
-#~ "Auditoria de Amostras\tDesligada\n"
+#~ "Aferição de Roms\tDesativado\n"
+#~ "Aferição das Amostras\tDesativado\n"
 
 #~ msgid "Unimplemented"
 #~ msgstr "Não-implementado"
@@ -2891,7 +2895,7 @@ msgstr ""
 #~ msgstr "Gfx: %s, Som: %s"
 
 #~ msgid "Audit in progress..."
-#~ msgstr "Auditoria em progresso..."
+#~ msgstr "Aferição em andamento..."
 
 #~ msgid "Extra INIs"
 #~ msgstr "Extra INIs"

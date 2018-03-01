@@ -59,7 +59,7 @@ READ8_MEMBER(powerins_state::powerinsb_fake_ym2203_r)
 }
 
 
-static ADDRESS_MAP_START( powerins_map, AS_PROGRAM, 16, powerins_state )
+ADDRESS_MAP_START(powerins_state::powerins_map)
 	AM_RANGE(0x000000, 0x0fffff) AM_ROM
 	AM_RANGE(0x100000, 0x100001) AM_READ_PORT("SYSTEM")
 	AM_RANGE(0x100002, 0x100003) AM_READ_PORT("P1_P2")
@@ -78,13 +78,13 @@ static ADDRESS_MAP_START( powerins_map, AS_PROGRAM, 16, powerins_state )
 ADDRESS_MAP_END
 
 /* powerinsa: same as the original one but without the sound cpu (and inferior sound HW) */
-static ADDRESS_MAP_START( powerinsa_map, AS_PROGRAM, 16, powerins_state )
+ADDRESS_MAP_START(powerins_state::powerinsa_map)
 	AM_IMPORT_FROM(powerins_map)
 	AM_RANGE(0x100030, 0x100031) AM_WRITE8(powerinsa_okibank_w, 0x00ff)
 	AM_RANGE(0x10003e, 0x10003f) AM_DEVREADWRITE8("oki1", okim6295_device, read, write, 0x00ff)
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( powerins_sound_map, AS_PROGRAM, 8, powerins_state )
+ADDRESS_MAP_START(powerins_state::powerins_sound_map)
 	AM_RANGE(0x0000, 0xbfff) AM_ROM
 	AM_RANGE(0xc000, 0xdfff) AM_RAM
 	AM_RANGE(0xe000, 0xe000) AM_DEVREAD("soundlatch", generic_latch_8_device, read)
@@ -92,7 +92,7 @@ static ADDRESS_MAP_START( powerins_sound_map, AS_PROGRAM, 8, powerins_state )
 //  AM_RANGE(0xe001, 0xe001) AM_WRITENOP // ?
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( powerins_sound_io_map, AS_IO, 8, powerins_state )
+ADDRESS_MAP_START(powerins_state::powerins_sound_io_map)
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	AM_RANGE(0x00, 0x01) AM_DEVREADWRITE("ym2203", ym2203_device, read, write)
 	AM_RANGE(0x80, 0x80) AM_DEVREADWRITE("oki1", okim6295_device, read, write)
@@ -100,7 +100,7 @@ static ADDRESS_MAP_START( powerins_sound_io_map, AS_IO, 8, powerins_state )
 	AM_RANGE(0x90, 0x97) AM_DEVWRITE("nmk112", nmk112_device, okibank_w)
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( powerinsb_sound_io_map, AS_IO, 8, powerins_state )
+ADDRESS_MAP_START(powerins_state::powerinsb_sound_io_map)
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	AM_RANGE(0x00, 0x00) AM_READ(powerinsb_fake_ym2203_r) AM_WRITENOP
 	AM_RANGE(0x01, 0x01) AM_NOP
@@ -109,7 +109,7 @@ static ADDRESS_MAP_START( powerinsb_sound_io_map, AS_IO, 8, powerins_state )
 	AM_RANGE(0x90, 0x97) AM_DEVWRITE("nmk112", nmk112_device, okibank_w)
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( powerinsa_oki_map, 0, 8, powerins_state )
+ADDRESS_MAP_START(powerins_state::powerinsa_oki_map)
 	AM_RANGE(0x00000, 0x2ffff) AM_ROM
 	AM_RANGE(0x30000, 0x3ffff) AM_ROMBANK("okibank")
 ADDRESS_MAP_END
@@ -341,7 +341,8 @@ MACHINE_CONFIG_START(powerins_state::powerins)
 	MCFG_NMK112_ROM1("oki2")
 MACHINE_CONFIG_END
 
-MACHINE_CONFIG_DERIVED(powerins_state::powerinsa, powerins)
+MACHINE_CONFIG_START(powerins_state::powerinsa)
+	powerins(config);
 
 	/* basic machine hardware */
 
@@ -364,7 +365,8 @@ MACHINE_CONFIG_DERIVED(powerins_state::powerinsa, powerins)
 	MCFG_DEVICE_REMOVE("nmk112")
 MACHINE_CONFIG_END
 
-MACHINE_CONFIG_DERIVED(powerins_state::powerinsb, powerins)
+MACHINE_CONFIG_START(powerins_state::powerinsb)
+	powerins(config);
 
 	/* basic machine hardware */
 

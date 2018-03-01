@@ -51,6 +51,9 @@ public:
 		, m_io_joy(*this, "JOY")
 	{ }
 
+	void sv8000(machine_config &config);
+
+protected:
 	DECLARE_DEVICE_IMAGE_LOAD_MEMBER( cart );
 
 	DECLARE_READ8_MEMBER( ay_port_a_r );
@@ -67,11 +70,12 @@ public:
 
 	DECLARE_READ8_MEMBER( mc6847_videoram_r );
 
-	void sv8000(machine_config &config);
-private:
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
+	void sv8000_io(address_map &map);
+	void sv8000_mem(address_map &map);
 
+private:
 	required_device<cpu_device> m_maincpu;
 	required_device<s68047_device> m_s68047p;
 	required_device<generic_slot_device> m_cart;
@@ -95,7 +99,7 @@ private:
 };
 
 
-static ADDRESS_MAP_START(sv8000_mem, AS_PROGRAM, 8, sv8000_state)
+ADDRESS_MAP_START(sv8000_state::sv8000_mem)
 	ADDRESS_MAP_UNMAP_HIGH
 	//AM_RANGE(0x0000, 0x0fff)      // mapped by the cartslot
 	AM_RANGE( 0x8000, 0x83ff ) AM_RAM // Work RAM??
@@ -103,7 +107,7 @@ static ADDRESS_MAP_START(sv8000_mem, AS_PROGRAM, 8, sv8000_state)
 ADDRESS_MAP_END
 
 
-static ADDRESS_MAP_START(sv8000_io, AS_IO, 8, sv8000_state)
+ADDRESS_MAP_START(sv8000_state::sv8000_io)
 	ADDRESS_MAP_UNMAP_HIGH
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	AM_RANGE(0x80, 0x83) AM_DEVREADWRITE("i8255", i8255_device, read, write)

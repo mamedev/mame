@@ -143,4 +143,11 @@ public:
 	void valtric(machine_config &config);
 	void argus(machine_config &config);
 	void butasan(machine_config &config);
+	void argus_map(address_map &map);
+	void butasan_map(address_map &map);
+	void sound_map_a(address_map &map);
+	void sound_map_b(address_map &map);
+	void sound_portmap_1(address_map &map);
+	void sound_portmap_2(address_map &map);
+	void valtric_map(address_map &map);
 };

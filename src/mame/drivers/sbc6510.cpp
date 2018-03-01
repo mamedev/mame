@@ -78,6 +78,10 @@ public:
 	DECLARE_READ8_MEMBER(key_r);
 
 	void sbc6510(machine_config &config);
+	void sbc6510_mem(address_map &map);
+	void sbc6510_video_data(address_map &map);
+	void sbc6510_video_io(address_map &map);
+	void sbc6510_video_mem(address_map &map);
 private:
 	uint8_t m_key_row;
 	uint8_t m_2;
@@ -90,7 +94,7 @@ private:
 };
 
 
-static ADDRESS_MAP_START( sbc6510_mem, AS_PROGRAM, 8, sbc6510_state )
+ADDRESS_MAP_START(sbc6510_state::sbc6510_mem)
 	ADDRESS_MAP_UNMAP_HIGH
 	AM_RANGE(0x0000, 0x0001) AM_RAM
 	AM_RANGE(0x0002, 0x0002) AM_READWRITE(a2_r,a2_w)
@@ -101,15 +105,15 @@ static ADDRESS_MAP_START( sbc6510_mem, AS_PROGRAM, 8, sbc6510_state )
 	AM_RANGE(0xf000, 0xffff) AM_ROM
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( sbc6510_video_mem, AS_PROGRAM, 8, sbc6510_state )
+ADDRESS_MAP_START(sbc6510_state::sbc6510_video_mem)
 	AM_RANGE(0x0000, 0x1fff) AM_ROM
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( sbc6510_video_data, AS_DATA, 8, sbc6510_state )
+ADDRESS_MAP_START(sbc6510_state::sbc6510_video_data)
 	AM_RANGE(0x0100, 0x04ff) AM_RAM
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( sbc6510_video_io, AS_IO, 8, sbc6510_state )
+ADDRESS_MAP_START(sbc6510_state::sbc6510_video_io)
 ADDRESS_MAP_END
 
 /* Input ports */

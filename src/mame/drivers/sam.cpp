@@ -11,9 +11,10 @@ public:
 		: driver_device(mconfig, type, tag) { }
 
 		void sam(machine_config &config);
+		void sam_map(address_map &map);
 };
 
-static ADDRESS_MAP_START( sam_map, AS_PROGRAM, 32, sam_state)
+ADDRESS_MAP_START(sam_state::sam_map)
 	AM_RANGE(0x00000000, 0x000fffff) AM_ROM AM_REGION("boot",0)
 	AM_RANGE(0x00300000, 0x003fffff) AM_RAM
 ADDRESS_MAP_END

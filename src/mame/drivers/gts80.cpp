@@ -52,6 +52,7 @@ public:
 	void gts80_ss(machine_config &config);
 	void gts80_s(machine_config &config);
 	void gts80_hh(machine_config &config);
+	void gts80_map(address_map &map);
 private:
 	uint8_t m_port2;
 	uint8_t m_segment;
@@ -63,7 +64,7 @@ private:
 	optional_device<gottlieb_sound_r1_device> m_r1_sound;
 };
 
-static ADDRESS_MAP_START( gts80_map, AS_PROGRAM, 8, gts80_state )
+ADDRESS_MAP_START(gts80_state::gts80_map)
 	ADDRESS_MAP_GLOBAL_MASK(0x3fff)
 	AM_RANGE(0x0000, 0x017f) AM_RAM
 	AM_RANGE(0x0200, 0x027f) AM_DEVREADWRITE("riot1", riot6532_device, read, write)
@@ -379,21 +380,24 @@ MACHINE_CONFIG_START(gts80_state::gts80)
 	MCFG_RIOT6532_IRQ_CB(INPUTLINE("maincpu", M6502_IRQ_LINE))
 
 	/* Sound */
-	MCFG_FRAGMENT_ADD( genpin_audio )
+	genpin_audio(config);
 	MCFG_SPEAKER_STANDARD_MONO("speaker")
 MACHINE_CONFIG_END
 
-MACHINE_CONFIG_DERIVED(gts80_state::gts80_s, gts80)
+MACHINE_CONFIG_START(gts80_state::gts80_s)
+	gts80(config);
 	MCFG_SOUND_ADD("r0sound", GOTTLIEB_SOUND_REV0, 0)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 1.0)
 MACHINE_CONFIG_END
 
-MACHINE_CONFIG_DERIVED(gts80_state::gts80_hh, gts80)
+MACHINE_CONFIG_START(gts80_state::gts80_hh)
+	gts80(config);
 	MCFG_SOUND_ADD("r1sound", GOTTLIEB_SOUND_REV1, 0)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 1.0)
 MACHINE_CONFIG_END
 
-MACHINE_CONFIG_DERIVED(gts80_state::gts80_ss, gts80)
+MACHINE_CONFIG_START(gts80_state::gts80_ss)
+	gts80(config);
 	MCFG_SOUND_ADD("r1sound", GOTTLIEB_SOUND_REV1, 0)
 	//MCFG_SOUND_ADD("r1sound", GOTTLIEB_SOUND_REV1_WITH_VOTRAX, 0) // votrax crashes
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 1.0)

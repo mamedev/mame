@@ -375,7 +375,7 @@ WRITE8_MEMBER(bwidow_state::irq_ack_w)
  *
  *************************************/
 
-static ADDRESS_MAP_START( bwidow_map, AS_PROGRAM, 8, bwidow_state )
+ADDRESS_MAP_START(bwidow_state::bwidow_map)
 	AM_RANGE(0x0000, 0x07ff) AM_RAM
 	AM_RANGE(0x2000, 0x27ff) AM_RAM AM_SHARE("vectorram") AM_REGION("maincpu", 0x2000)
 	AM_RANGE(0x2800, 0x5fff) AM_ROM
@@ -395,7 +395,7 @@ static ADDRESS_MAP_START( bwidow_map, AS_PROGRAM, 8, bwidow_state )
 	AM_RANGE(0x9000, 0xffff) AM_ROM
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( bwidowp_map, AS_PROGRAM, 8, bwidow_state )
+ADDRESS_MAP_START(bwidow_state::bwidowp_map)
 	AM_RANGE(0x0000, 0x07ff) AM_RAM
 	AM_RANGE(0x0800, 0x080f) AM_DEVREADWRITE("pokey1", pokey_device, read, write)
 	AM_RANGE(0x0810, 0x081f) AM_DEVREADWRITE("pokey2", pokey_device, read, write)
@@ -415,7 +415,7 @@ static ADDRESS_MAP_START( bwidowp_map, AS_PROGRAM, 8, bwidow_state )
 	AM_RANGE(0xa000, 0xffff) AM_ROM
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( spacduel_map, AS_PROGRAM, 8, bwidow_state )
+ADDRESS_MAP_START(bwidow_state::spacduel_map)
 	AM_RANGE(0x0000, 0x03ff) AM_RAM
 	AM_RANGE(0x0800, 0x0800) AM_READ_PORT("IN0")
 	AM_RANGE(0x0900, 0x0907) AM_READ(spacduel_IN3_r)    /* IN1 */
@@ -752,18 +752,20 @@ MACHINE_CONFIG_START(bwidow_state::bwidow)
 	MCFG_AVGDVG_VECTOR("vector")
 
 	/* sound hardware */
-	MCFG_FRAGMENT_ADD(bwidow_audio)
+	bwidow_audio(config);
 
 MACHINE_CONFIG_END
 
-MACHINE_CONFIG_DERIVED(bwidow_state::bwidowp, bwidow)
+MACHINE_CONFIG_START(bwidow_state::bwidowp)
+	bwidow(config);
 	MCFG_CPU_MODIFY("maincpu")
 	MCFG_CPU_PROGRAM_MAP(bwidowp_map)
 
 	MCFG_WATCHDOG_ADD("watchdog")
 MACHINE_CONFIG_END
 
-MACHINE_CONFIG_DERIVED(bwidow_state::gravitar, bwidow)
+MACHINE_CONFIG_START(bwidow_state::gravitar)
+	bwidow(config);
 
 	/* basic machine hardware */
 
@@ -772,11 +774,12 @@ MACHINE_CONFIG_DERIVED(bwidow_state::gravitar, bwidow)
 	MCFG_SCREEN_VISIBLE_AREA(0, 420, 0, 400)
 
 	/* sound hardware */
-	MCFG_FRAGMENT_ADD(gravitar_audio)
+	gravitar_audio(config);
 MACHINE_CONFIG_END
 
 
-MACHINE_CONFIG_DERIVED(bwidow_state::lunarbat, gravitar)
+MACHINE_CONFIG_START(bwidow_state::lunarbat)
+	gravitar(config);
 
 	/* basic machine hardware */
 	MCFG_CPU_MODIFY("maincpu")
@@ -788,7 +791,8 @@ MACHINE_CONFIG_DERIVED(bwidow_state::lunarbat, gravitar)
 MACHINE_CONFIG_END
 
 
-MACHINE_CONFIG_DERIVED(bwidow_state::spacduel, gravitar)
+MACHINE_CONFIG_START(bwidow_state::spacduel)
+	gravitar(config);
 
 	/* basic machine hardware */
 	MCFG_CPU_MODIFY("maincpu")

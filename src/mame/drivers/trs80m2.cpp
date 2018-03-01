@@ -282,9 +282,9 @@ WRITE8_MEMBER( trs80m16_state::tcl_w )
 	m_subcpu->set_input_line(INPUT_LINE_HALT, BIT(data, 2) ? ASSERT_LINE : CLEAR_LINE);
 	m_subcpu->set_input_line(INPUT_LINE_RESET, BIT(data, 3) ? ASSERT_LINE : CLEAR_LINE);
 
-	m_pic->ir0_w(BIT(data, 4));
-	m_pic->ir1_w(BIT(data, 5));
-	m_pic->ir2_w(BIT(data, 6));
+	m_uic->ireq0_w(BIT(data, 4));
+	m_uic->ireq1_w(BIT(data, 5));
+	m_uic->ireq2_w(BIT(data, 6));
 
 	m_ual = (m_ual & 0x1fe) | BIT(data, 7);
 }
@@ -319,7 +319,7 @@ WRITE8_MEMBER( trs80m16_state::ual_w )
 //  ADDRESS_MAP( z80_mem )
 //-------------------------------------------------
 
-static ADDRESS_MAP_START( z80_mem, AS_PROGRAM, 8, trs80m2_state )
+ADDRESS_MAP_START(trs80m2_state::z80_mem)
 	AM_RANGE(0x0000, 0xffff) AM_READWRITE(read, write)
 ADDRESS_MAP_END
 
@@ -328,7 +328,7 @@ ADDRESS_MAP_END
 //  ADDRESS_MAP( z80_io )
 //-------------------------------------------------
 
-static ADDRESS_MAP_START( z80_io, AS_IO, 8, trs80m2_state )
+ADDRESS_MAP_START(trs80m2_state::z80_io)
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	AM_RANGE(0xe0, 0xe3) AM_DEVREADWRITE(Z80PIO_TAG, z80pio_device, read, write)
 	AM_RANGE(0xe4, 0xe7) AM_READWRITE(fdc_r, fdc_w)
@@ -348,7 +348,7 @@ ADDRESS_MAP_END
 //  ADDRESS_MAP( m16_z80_io )
 //-------------------------------------------------
 
-static ADDRESS_MAP_START( m16_z80_io, AS_IO, 8, trs80m16_state )
+ADDRESS_MAP_START(trs80m16_state::m16_z80_io)
 	AM_IMPORT_FROM(z80_io)
 	AM_RANGE(0xde, 0xde) AM_WRITE(tcl_w)
 	AM_RANGE(0xdf, 0xdf) AM_WRITE(ual_w)
@@ -359,8 +359,8 @@ ADDRESS_MAP_END
 //  ADDRESS_MAP( m68000_mem )
 //-------------------------------------------------
 
-static ADDRESS_MAP_START( m68000_mem, AS_PROGRAM, 16, trs80m2_state )
-//  AM_RANGE(0x7800d0, 0x7800d1) PIC
+ADDRESS_MAP_START(trs80m2_state::m68000_mem)
+//  AM_RANGE(0x7800d0, 0x7800d1) 9519A (C/D = UDS)
 //  AM_RANGE(0x7800d2, 0x7800d3) limit/offset 2
 //  AM_RANGE(0x7800d4, 0x7800d5) limit/offset 1
 //  AM_RANGE(0x7800d6, 0x7800d7) Z80 IRQ
@@ -793,7 +793,7 @@ MACHINE_CONFIG_START(trs80m16_state::trs80m16)
 	MCFG_Z80_DAISY_CHAIN(trs80m2_daisy_chain)
 	MCFG_CPU_PROGRAM_MAP(z80_mem)
 	MCFG_CPU_IO_MAP(m16_z80_io)
-	MCFG_CPU_IRQ_ACKNOWLEDGE_DEVICE(AM9519A_TAG, pic8259_device, inta_cb)
+	MCFG_CPU_IRQ_ACKNOWLEDGE_DEVICE(AM9519A_TAG, am9519_device, iack_cb)
 
 	MCFG_CPU_ADD(M68000_TAG, M68000, XTAL(24'000'000)/4)
 	MCFG_CPU_PROGRAM_MAP(m68000_mem)
@@ -851,8 +851,8 @@ MACHINE_CONFIG_START(trs80m16_state::trs80m16)
 	MCFG_DEVICE_ADD(Z80SIO_TAG, Z80SIO0, XTAL(8'000'000)/2)
 	MCFG_Z80DART_OUT_INT_CB(INPUTLINE(Z80_TAG, INPUT_LINE_IRQ0))
 
-	MCFG_DEVICE_ADD(AM9519A_TAG, PIC8259, 0)
-	MCFG_PIC8259_OUT_INT_CB(INPUTLINE(M68000_TAG, M68K_IRQ_5))
+	MCFG_DEVICE_ADD(AM9519A_TAG, AM9519, 0)
+	MCFG_AM9519_OUT_INT_CB(INPUTLINE(M68000_TAG, M68K_IRQ_5))
 
 	MCFG_CENTRONICS_ADD(CENTRONICS_TAG, centronics_devices, "printer")
 	MCFG_CENTRONICS_ACK_HANDLER(DEVWRITELINE(Z80PIO_TAG, z80pio_device, strobe_b))

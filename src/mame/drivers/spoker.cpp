@@ -99,6 +99,9 @@ public:
 	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	void spoker(machine_config &config);
 	void _3super8(machine_config &config);
+	void _3super8_portmap(address_map &map);
+	void spoker_map(address_map &map);
+	void spoker_portmap(address_map &map);
 };
 
 
@@ -260,12 +263,12 @@ READ8_MEMBER(spoker_state::magic_r)
                                 Memory Maps
 ***************************************************************************/
 
-static ADDRESS_MAP_START( spoker_map, AS_PROGRAM, 8, spoker_state )
+ADDRESS_MAP_START(spoker_state::spoker_map)
 	AM_RANGE(0x00000, 0x0f3ff) AM_ROM
 	AM_RANGE(0x0f400, 0x0ffff) AM_RAM AM_SHARE("nvram")
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( spoker_portmap, AS_IO, 8, spoker_state )
+ADDRESS_MAP_START(spoker_state::spoker_portmap)
 	AM_RANGE(0x0000, 0x003f) AM_RAM // Z180 internal regs
 	AM_RANGE(0x2000, 0x23ff) AM_RAM_DEVWRITE("palette", palette_device, write8) AM_SHARE("palette")
 	AM_RANGE(0x2400, 0x27ff) AM_RAM_DEVWRITE("palette", palette_device, write8_ext) AM_SHARE("palette_ext")
@@ -280,7 +283,7 @@ static ADDRESS_MAP_START( spoker_portmap, AS_IO, 8, spoker_state )
 	AM_RANGE(0x7000, 0x7fff) AM_RAM_WRITE(fg_color_w ) AM_SHARE("fg_color_ram")
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( 3super8_portmap, AS_IO, 8, spoker_state )
+ADDRESS_MAP_START(spoker_state::_3super8_portmap)
 //  AM_RANGE(0x1000, 0x1fff) AM_WRITENOP
 	AM_RANGE(0x2000, 0x27ff) AM_RAM_DEVWRITE("palette", palette_device, write8) AM_SHARE("palette")
 	AM_RANGE(0x2800, 0x2fff) AM_RAM_DEVWRITE("palette", palette_device, write8_ext) AM_SHARE("palette_ext")
@@ -634,12 +637,13 @@ MACHINE_CONFIG_START(spoker_state::spoker)
 MACHINE_CONFIG_END
 
 
-MACHINE_CONFIG_DERIVED(spoker_state::_3super8, spoker)
+MACHINE_CONFIG_START(spoker_state::_3super8)
+	spoker(config);
 
 	MCFG_CPU_REPLACE("maincpu", Z80, XTAL(24'000'000) / 4)    /* z840006, 24/4 MHz? */
 	MCFG_CPU_MODIFY("maincpu")
 	MCFG_CPU_PROGRAM_MAP(spoker_map)
-	MCFG_CPU_IO_MAP(3super8_portmap)
+	MCFG_CPU_IO_MAP(_3super8_portmap)
 	MCFG_CPU_VBLANK_INT_DRIVER("screen", spoker_state, nmi_line_assert)
 	MCFG_CPU_PERIODIC_INT_DRIVER(spoker_state, irq0_line_hold, 120) // this signal comes from the PIC
 

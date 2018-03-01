@@ -104,4 +104,11 @@ public:
 	void onna34ro(machine_config &config);
 	void victnine(machine_config &config);
 	void onna34ro_mcu(machine_config &config);
+	void base_map(address_map &map);
+	void flstory_map(address_map &map);
+	void onna34ro_map(address_map &map);
+	void onna34ro_mcu_map(address_map &map);
+	void rumba_map(address_map &map);
+	void sound_map(address_map &map);
+	void victnine_map(address_map &map);
 };

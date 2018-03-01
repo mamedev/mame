@@ -41,17 +41,19 @@ public:
 	DECLARE_WRITE8_MEMBER(port40_w);
 
 	void ccs300(machine_config &config);
+	void ccs300_io(address_map &map);
+	void ccs300_mem(address_map &map);
 private:
 	required_device<cpu_device> m_maincpu;
 };
 
-static ADDRESS_MAP_START(ccs300_mem, AS_PROGRAM, 8, ccs300_state)
+ADDRESS_MAP_START(ccs300_state::ccs300_mem)
 	ADDRESS_MAP_UNMAP_HIGH
 	AM_RANGE(0x0000, 0x07ff) AM_READ_BANK("bankr0") AM_WRITE_BANK("bankw0")
 	AM_RANGE(0x0800, 0xffff) AM_RAM
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( ccs300_io, AS_IO, 8, ccs300_state)
+ADDRESS_MAP_START(ccs300_state::ccs300_io)
 	ADDRESS_MAP_UNMAP_HIGH
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	AM_RANGE(0x10, 0x13) AM_DEVREADWRITE("sio", z80sio_device, ba_cd_r, ba_cd_w)

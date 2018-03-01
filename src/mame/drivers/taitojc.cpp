@@ -618,7 +618,7 @@ WRITE8_MEMBER(taitojc_state::jc_lan_w)
 }
 
 
-static ADDRESS_MAP_START( taitojc_map, AS_PROGRAM, 32, taitojc_state )
+ADDRESS_MAP_START(taitojc_state::taitojc_map)
 	AM_RANGE(0x00000000, 0x001fffff) AM_ROM AM_MIRROR(0x200000)
 	AM_RANGE(0x00400000, 0x01bfffff) AM_ROM AM_REGION("gfx1", 0)
 	AM_RANGE(0x04000000, 0x040f7fff) AM_RAM AM_SHARE("vram")
@@ -668,7 +668,7 @@ WRITE8_MEMBER(taitojc_state::dendego_brakemeter_w)
 	}
 }
 
-static ADDRESS_MAP_START( dendego_map, AS_PROGRAM, 32, taitojc_state )
+ADDRESS_MAP_START(taitojc_state::dendego_map)
 	AM_IMPORT_FROM( taitojc_map )
 	AM_RANGE(0x06e00000, 0x06e00003) AM_WRITE8(dendego_speedmeter_w, 0x00ff0000)
 	AM_RANGE(0x06e00004, 0x06e00007) AM_WRITE8(dendego_brakemeter_w, 0x00ff0000)
@@ -743,12 +743,12 @@ READ8_MEMBER(taitojc_state::hc11_analog_r)
 }
 
 
-static ADDRESS_MAP_START( hc11_pgm_map, AS_PROGRAM, 8, taitojc_state )
+ADDRESS_MAP_START(taitojc_state::hc11_pgm_map)
 	AM_RANGE(0x4000, 0x5fff) AM_RAM
 	AM_RANGE(0x8000, 0xffff) AM_ROM
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( hc11_io_map, AS_IO, 8, taitojc_state )
+ADDRESS_MAP_START(taitojc_state::hc11_io_map)
 	AM_RANGE(MC68HC11_IO_PORTA,     MC68HC11_IO_PORTA    ) AM_READNOP // ?
 	AM_RANGE(MC68HC11_IO_PORTG,     MC68HC11_IO_PORTG    ) AM_READWRITE(hc11_comm_r, hc11_comm_w)
 	AM_RANGE(MC68HC11_IO_PORTH,     MC68HC11_IO_PORTH    ) AM_READWRITE(hc11_output_r, hc11_output_w)
@@ -845,12 +845,12 @@ WRITE16_MEMBER(taitojc_state::dsp_rom_w)
 	}
 }
 
-static ADDRESS_MAP_START( tms_program_map, AS_PROGRAM, 16, taitojc_state )
+ADDRESS_MAP_START(taitojc_state::tms_program_map)
 	AM_RANGE(0x0000, 0x1fff) AM_RAM AM_MIRROR(0x4000)
 	AM_RANGE(0x6000, 0x7fff) AM_RAM
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( tms_data_map, AS_DATA, 16, taitojc_state )
+ADDRESS_MAP_START(taitojc_state::tms_data_map)
 	AM_RANGE(0x6a01, 0x6a02) AM_DEVWRITE("tc0780fpa", tc0780fpa_device, render_w)
 	AM_RANGE(0x6a11, 0x6a12) AM_NOP     // same as 0x6a01..02 for the second renderer chip?
 	AM_RANGE(0x6b20, 0x6b20) AM_DEVWRITE("tc0780fpa", tc0780fpa_device, poly_fifo_w)
@@ -1112,7 +1112,8 @@ MACHINE_CONFIG_START(taitojc_state::taitojc)
 	MCFG_DEVICE_ADD("taito_en", TAITO_EN, 0)
 MACHINE_CONFIG_END
 
-MACHINE_CONFIG_DERIVED(taitojc_state::dendego, taitojc)
+MACHINE_CONFIG_START(taitojc_state::dendego)
+	taitojc(config);
 
 	/* basic machine hardware */
 	MCFG_CPU_MODIFY("maincpu")

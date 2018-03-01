@@ -66,6 +66,7 @@ public:
 	DECLARE_WRITE8_MEMBER(baud_rate_w);
 
 	void poly(machine_config &config);
+	void poly_mem(address_map &map);
 protected:
 	virtual void machine_reset() override;
 
@@ -81,7 +82,7 @@ private:
 };
 
 
-static ADDRESS_MAP_START(poly_mem, AS_PROGRAM, 8, poly_state)
+ADDRESS_MAP_START(poly_state::poly_mem)
 	ADDRESS_MAP_UNMAP_HIGH
 	AM_RANGE(0x0000,0x9fff) AM_RAM
 	AM_RANGE(0xa000,0xcfff) AM_ROM
@@ -186,8 +187,8 @@ MACHINE_CONFIG_START(poly_state::poly)
 
 	MCFG_DEVICE_ADD("ptm", PTM6840, XTAL(12'057'600) / 3)
 	MCFG_PTM6840_EXTERNAL_CLOCKS(0, 0, 0)
-	MCFG_PTM6840_OUT1_CB(WRITELINE(poly_state, ptm_o2_callback))
-	MCFG_PTM6840_OUT2_CB(WRITELINE(poly_state, ptm_o3_callback))
+	MCFG_PTM6840_O2_CB(WRITELINE(poly_state, ptm_o2_callback))
+	MCFG_PTM6840_O3_CB(WRITELINE(poly_state, ptm_o3_callback))
 	MCFG_PTM6840_IRQ_CB(INPUTLINE("maincpu", M6809_IRQ_LINE))
 
 	MCFG_DEVICE_ADD("acia", ACIA6850, 0)

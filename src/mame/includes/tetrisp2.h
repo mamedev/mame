@@ -143,6 +143,12 @@ public:
 	void nndmseal(machine_config &config);
 	void rocknms(machine_config &config);
 	void rockn(machine_config &config);
+	void nndmseal_map(address_map &map);
+	void rockn1_map(address_map &map);
+	void rockn2_map(address_map &map);
+	void rocknms_main_map(address_map &map);
+	void rocknms_sub_map(address_map &map);
+	void tetrisp2_map(address_map &map);
 };
 
 class stepstag_state : public tetrisp2_state
@@ -189,6 +195,9 @@ public:
 	void stepstag(machine_config &config);
 	void vjdash(machine_config &config);
 
+	void stepstag_map(address_map &map);
+	void stepstag_sub_map(address_map &map);
+	void vjdash_map(address_map &map);
 private:
 	required_shared_ptr<uint16_t> m_spriteram1;
 	required_shared_ptr<uint16_t> m_spriteram3;

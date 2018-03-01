@@ -106,6 +106,8 @@ public:
 	required_device<screen_device> m_screen;
 	required_device<palette_device> m_palette;
 	void seabattl(machine_config &config);
+	void seabattl_data_map(address_map &map);
+	void seabattl_map(address_map &map);
 };
 
 
@@ -250,7 +252,7 @@ void seabattl_state::video_start()
 
 ***************************************************************************/
 
-static ADDRESS_MAP_START( seabattl_map, AS_PROGRAM, 8, seabattl_state )
+ADDRESS_MAP_START(seabattl_state::seabattl_map)
 	ADDRESS_MAP_GLOBAL_MASK(0x7fff)
 	AM_RANGE(0x0000, 0x13ff) AM_ROM
 	AM_RANGE(0x2000, 0x33ff) AM_ROM
@@ -264,11 +266,11 @@ static ADDRESS_MAP_START( seabattl_map, AS_PROGRAM, 8, seabattl_state )
 	AM_RANGE(0x1e05, 0x1e05) AM_MIRROR(0x20f0) AM_READ_PORT("DIPS2")
 	AM_RANGE(0x1e06, 0x1e06) AM_MIRROR(0x20f0) AM_READ_PORT("DIPS1") AM_WRITE(sound_w)
 	AM_RANGE(0x1e07, 0x1e07) AM_MIRROR(0x20f0) AM_READ_PORT("DIPS0") AM_WRITE(sound2_w)
-	AM_RANGE(0x1fcc, 0x1fcc) AM_MIRROR(0x2000) AM_READ_PORT("IN1")
 	AM_RANGE(0x1f00, 0x1fff) AM_MIRROR(0x2000) AM_DEVREADWRITE("s2636", s2636_device, read_data, write_data)
+	AM_RANGE(0x1fcc, 0x1fcc) AM_MIRROR(0x2000) AM_READ_PORT("IN1")
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( seabattl_data_map, AS_DATA, 8, seabattl_state )
+ADDRESS_MAP_START(seabattl_state::seabattl_data_map)
 	AM_RANGE(S2650_CTRL_PORT, S2650_CTRL_PORT) AM_READWRITE( seabattl_collision_r, seabattl_control_w )
 	AM_RANGE(S2650_DATA_PORT, S2650_DATA_PORT) AM_READWRITE( seabattl_collision_clear_r, seabattl_collision_clear_w )
 ADDRESS_MAP_END

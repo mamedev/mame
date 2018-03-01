@@ -50,6 +50,8 @@ public:
 	uint32_t screen_update_paso1600(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 
 	void paso1600(machine_config &config);
+	void paso1600_io(address_map &map);
+	void paso1600_map(address_map &map);
 private:
 	uint8_t m_crtc_vreg[0x100],m_crtc_index;
 	struct{
@@ -227,7 +229,7 @@ READ16_MEMBER( paso1600_state::test_hi_r )
 	return 0xffff;
 }
 
-static ADDRESS_MAP_START(paso1600_map, AS_PROGRAM, 16, paso1600_state)
+ADDRESS_MAP_START(paso1600_state::paso1600_map)
 	ADDRESS_MAP_UNMAP_HIGH
 	AM_RANGE(0x00000,0x7ffff) AM_RAM
 	AM_RANGE(0xb0000,0xb0fff) AM_RAM AM_SHARE("vram") // tvram
@@ -237,7 +239,7 @@ static ADDRESS_MAP_START(paso1600_map, AS_PROGRAM, 16, paso1600_state)
 	AM_RANGE(0xfe000,0xfffff) AM_ROM AM_REGION("ipl", 0)
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START(paso1600_io, AS_IO, 16, paso1600_state)
+ADDRESS_MAP_START(paso1600_state::paso1600_io)
 	ADDRESS_MAP_UNMAP_LOW
 	AM_RANGE(0x0000,0x000f) AM_DEVREADWRITE8("8237dma", am9517a_device, read, write, 0xffff)
 	AM_RANGE(0x0010,0x0011) AM_DEVREADWRITE8("pic8259", pic8259_device, read, write, 0xffff) // i8259

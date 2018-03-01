@@ -41,7 +41,7 @@ jangou_blitter_device::jangou_blitter_device(const machine_config &mconfig, cons
 }
 
 
-DEVICE_ADDRESS_MAP_START( blit_v1_regs, 8, jangou_blitter_device )
+ADDRESS_MAP_START(jangou_blitter_device::blit_v1_regs)
 	AM_RANGE(0x00, 0x00) AM_WRITE(src_lo_address_w)
 	AM_RANGE(0x01, 0x01) AM_WRITE(src_md_address_w)
 	AM_RANGE(0x02, 0x02) AM_WRITE(x_w)
@@ -52,7 +52,7 @@ DEVICE_ADDRESS_MAP_START( blit_v1_regs, 8, jangou_blitter_device )
 ADDRESS_MAP_END
 
 // Sexy Gal and variants (v2) swaps around upper src address
-DEVICE_ADDRESS_MAP_START( blit_v2_regs, 8, jangou_blitter_device )
+ADDRESS_MAP_START(jangou_blitter_device::blit_v2_regs)
 	AM_RANGE(0x00, 0x00) AM_WRITE(src_lo_address_w)
 	AM_RANGE(0x01, 0x01) AM_WRITE(src_md_address_w)
 	AM_RANGE(0x02, 0x02) AM_WRITE(src_hi_address_w)

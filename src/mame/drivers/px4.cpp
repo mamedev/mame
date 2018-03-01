@@ -134,6 +134,8 @@ public:
 	DECLARE_WRITE_LINE_MEMBER( centronics_perror_w ) { m_centronics_perror = state; }
 
 	void px4(machine_config &config);
+	void px4_io(address_map &map);
+	void px4_mem(address_map &map);
 protected:
 	// driver_device overrides
 	virtual void machine_start() override;
@@ -268,6 +270,7 @@ public:
 	DECLARE_READ8_MEMBER( ramdisk_control_r );
 
 	void px4p(machine_config &config);
+	void px4p_io(address_map &map);
 protected:
 	// driver_device overrides
 	virtual void machine_start() override;
@@ -1256,12 +1259,12 @@ void px4p_state::machine_start()
 //  ADDRESS MAPS
 //**************************************************************************
 
-static ADDRESS_MAP_START( px4_mem, AS_PROGRAM, 8, px4_state )
+ADDRESS_MAP_START(px4_state::px4_mem)
 	AM_RANGE(0x0000, 0x7fff) AM_ROMBANK("bank1")
 	AM_RANGE(0x8000, 0xffff) AM_RAMBANK("bank2")
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( px4_io, AS_IO, 8, px4_state )
+ADDRESS_MAP_START(px4_state::px4_io)
 	ADDRESS_MAP_UNMAP_HIGH
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	// gapnit, 0x00-0x07
@@ -1290,7 +1293,7 @@ static ADDRESS_MAP_START( px4_io, AS_IO, 8, px4_state )
 	AM_RANGE(0x1a, 0x1f) AM_NOP
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( px4p_io, AS_IO, 8, px4p_state )
+ADDRESS_MAP_START(px4p_state::px4p_io)
 	AM_IMPORT_FROM(px4_io)
 	AM_RANGE(0x90, 0x92) AM_WRITE(ramdisk_address_w )
 	AM_RANGE(0x93, 0x93) AM_READWRITE(ramdisk_data_r, ramdisk_data_w )
@@ -1540,7 +1543,8 @@ MACHINE_CONFIG_START(px4_state::px4)
 	MCFG_SOFTWARE_LIST_ADD("epson_cpm_list", "epson_cpm")
 MACHINE_CONFIG_END
 
-MACHINE_CONFIG_DERIVED(px4p_state::px4p, px4)
+MACHINE_CONFIG_START(px4p_state::px4p)
+	px4(config);
 	MCFG_CPU_MODIFY("maincpu")
 	MCFG_CPU_IO_MAP(px4p_io)
 

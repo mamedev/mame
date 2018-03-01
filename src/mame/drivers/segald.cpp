@@ -70,6 +70,8 @@ public:
 	required_device<gfxdecode_device> m_gfxdecode;
 	required_device<palette_device> m_palette;
 	void astron(machine_config &config);
+	void mainmem(address_map &map);
+	void mainport(address_map &map);
 };
 
 /* VIDEO GOODS */
@@ -251,7 +253,7 @@ WRITE8_MEMBER(segald_state::astron_io_bankswitch_w)
 
 
 /* PROGRAM MAP */
-static ADDRESS_MAP_START( mainmem, AS_PROGRAM, 8, segald_state )
+ADDRESS_MAP_START(segald_state::mainmem)
 	AM_RANGE(0x0000, 0x7fff) AM_ROM
 	AM_RANGE(0x8000, 0xbfff) AM_ROMBANK("bank1")
 
@@ -269,7 +271,7 @@ ADDRESS_MAP_END
 
 
 /* I/O MAP */
-static ADDRESS_MAP_START( mainport, AS_IO, 8, segald_state )
+ADDRESS_MAP_START(segald_state::mainport)
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	AM_RANGE(0x00, 0x01) AM_WRITE(astron_io_bankswitch_w)
 ADDRESS_MAP_END

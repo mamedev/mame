@@ -23,17 +23,22 @@ public:
 	{
 	}
 
-	required_device<i80186_cpu_device> m_maincpu;
-	required_device<wd1772_device> m_fdc;
-	required_device<ncr5380n_device> m_scsi;
+	void lb186(machine_config &config);
 
+protected:
 	DECLARE_WRITE8_MEMBER(sio_out_w);
 	DECLARE_WRITE8_MEMBER(drive_sel_w);
 	DECLARE_READ8_MEMBER(scsi_dack_r);
 	DECLARE_WRITE8_MEMBER(scsi_dack_w);
 	DECLARE_FLOPPY_FORMATS( floppy_formats );
-	void lb186(machine_config &config);
 	static void ncr5380(device_t *device);
+	void lb186_io(address_map &map);
+	void lb186_map(address_map &map);
+
+private:
+	required_device<i80186_cpu_device> m_maincpu;
+	required_device<wd1772_device> m_fdc;
+	required_device<ncr5380n_device> m_scsi;
 };
 
 WRITE8_MEMBER(lb186_state::scsi_dack_w)
@@ -87,12 +92,12 @@ WRITE8_MEMBER(lb186_state::drive_sel_w)
 	floppy->ss_w(BIT(data, 4));
 }
 
-static ADDRESS_MAP_START( lb186_map, AS_PROGRAM, 16, lb186_state )
+ADDRESS_MAP_START(lb186_state::lb186_map)
 	AM_RANGE(0x00000, 0x3ffff) AM_RAM // fixed 256k for now
 	AM_RANGE(0xfc000, 0xfffff) AM_ROM AM_REGION("bios", 0)
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( lb186_io, AS_IO, 16, lb186_state )
+ADDRESS_MAP_START(lb186_state::lb186_io)
 	ADDRESS_MAP_UNMAP_HIGH
 	AM_RANGE(0x1000, 0x101f) AM_DEVREADWRITE8("duart", scn2681_device, read, write, 0x00ff)
 	AM_RANGE(0x1080, 0x108f) AM_DEVREADWRITE8("scsibus:7:ncr5380", ncr5380n_device, read, write, 0x00ff)
@@ -125,7 +130,7 @@ FLOPPY_FORMATS_MEMBER( lb186_state::floppy_formats )
 FLOPPY_FORMATS_END
 
 MACHINE_CONFIG_START(lb186_state::lb186)
-	MCFG_CPU_ADD("maincpu", I80186, XTAL(16'000'000) / 2)
+	MCFG_CPU_ADD("maincpu", I80186, 16_MHz_XTAL / 2)
 	MCFG_CPU_PROGRAM_MAP(lb186_map)
 	MCFG_CPU_IO_MAP(lb186_io)
 
@@ -140,7 +145,7 @@ MACHINE_CONFIG_START(lb186_state::lb186)
 	MCFG_RS232_PORT_ADD("rs232_2", default_rs232_devices, nullptr)
 	MCFG_RS232_RXD_HANDLER(DEVWRITELINE("duart", scn2681_device, rx_b_w))
 
-	MCFG_WD1772_ADD("fdc", XTAL(16'000'000)/2)
+	MCFG_WD1772_ADD("fdc", 16_MHz_XTAL / 2)
 	MCFG_WD_FDC_INTRQ_CALLBACK(DEVWRITELINE("maincpu", i80186_cpu_device, int2_w))
 	MCFG_WD_FDC_DRQ_CALLBACK(DEVWRITELINE("maincpu", i80186_cpu_device, drq0_w))
 	MCFG_FLOPPY_DRIVE_ADD("fdc:0", lb186_floppies, "525dd", lb186_state::floppy_formats)

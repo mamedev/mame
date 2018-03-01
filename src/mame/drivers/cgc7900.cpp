@@ -334,7 +334,7 @@ WRITE_LINE_MEMBER(cgc7900_state::write_rs449_clock)
     ADDRESS_MAP( cgc7900_mem )
 -------------------------------------------------*/
 
-static ADDRESS_MAP_START( cgc7900_mem, AS_PROGRAM, 16, cgc7900_state )
+ADDRESS_MAP_START(cgc7900_state::cgc7900_mem)
 	ADDRESS_MAP_UNMAP_HIGH
 	AM_RANGE(0x000000, 0x1fffff) AM_RAM AM_SHARE("chrom_ram")
 	AM_RANGE(0x800000, 0x80ffff) AM_ROM AM_REGION(M68000_TAG, 0)
@@ -397,7 +397,7 @@ ADDRESS_MAP_END
     ADDRESS_MAP( keyboard_mem )
 -------------------------------------------------*/
 
-static ADDRESS_MAP_START( keyboard_mem, AS_PROGRAM, 8, cgc7900_state )
+ADDRESS_MAP_START(cgc7900_state::keyboard_mem)
 	AM_RANGE(0x000, 0x7ff) AM_ROM
 ADDRESS_MAP_END
 
@@ -496,7 +496,7 @@ MACHINE_CONFIG_START(cgc7900_state::cgc7900)
     MCFG_CPU_PROGRAM_MAP(omti10_mem)*/
 
 	/* video hardware */
-	MCFG_FRAGMENT_ADD(cgc7900_video)
+	cgc7900_video(config);
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")

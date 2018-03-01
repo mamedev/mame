@@ -20,10 +20,10 @@ class nmk112_device : public device_t
 public:
 	nmk112_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
-	// static configuration
-	static void set_rom0_tag(device_t &device, const char *tag) { downcast<nmk112_device &>(device).m_tag0 = tag; }
-	static void set_rom1_tag(device_t &device, const char *tag) { downcast<nmk112_device &>(device).m_tag1 = tag; }
-	static void set_page_mask(device_t &device, uint8_t mask) { downcast<nmk112_device &>(device).m_page_mask = ~mask; }
+	// configuration
+	void set_rom0_tag(const char *tag) { m_tag0 = tag; }
+	void set_rom1_tag(const char *tag) { m_tag1 = tag; }
+	void set_page_mask(uint8_t mask) { m_page_mask = ~mask; }
 
 	DECLARE_WRITE8_MEMBER( okibank_w );
 
@@ -56,13 +56,13 @@ DECLARE_DEVICE_TYPE(NMK112, nmk112_device)
 ***************************************************************************/
 
 #define MCFG_NMK112_ROM0(_tag) \
-	nmk112_device::set_rom0_tag(*device, _tag);
+	downcast<nmk112_device &>(*device).set_rom0_tag(_tag);
 
 #define MCFG_NMK112_ROM1(_tag) \
-	nmk112_device::set_rom1_tag(*device, _tag);
+	downcast<nmk112_device &>(*device).set_rom1_tag(_tag);
 
 #define MCFG_NMK112_DISABLE_PAGEMASK(_mask) \
-	nmk112_device::set_page_mask(*device, _mask);
+	downcast<nmk112_device &>(*device).set_page_mask(_mask);
 
 
 #endif // MAME_MACHINE_NMK112_H

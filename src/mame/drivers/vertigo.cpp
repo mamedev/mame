@@ -35,7 +35,7 @@
  *
  *************************************/
 
-static ADDRESS_MAP_START( vertigo_map, AS_PROGRAM, 16, vertigo_state )
+ADDRESS_MAP_START(vertigo_state::vertigo_map)
 	AM_RANGE(0x000000, 0x000007) AM_ROM
 	AM_RANGE(0x000008, 0x001fff) AM_RAM AM_MIRROR(0x010000)
 	AM_RANGE(0x002000, 0x003fff) AM_RAM AM_SHARE("vectorram")
@@ -52,7 +52,7 @@ static ADDRESS_MAP_START( vertigo_map, AS_PROGRAM, 16, vertigo_state )
 	AM_RANGE(0x800000, 0x81ffff) AM_ROM
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( exidy440_audio_map, AS_PROGRAM, 8, exidy440_sound_device )
+ADDRESS_MAP_START(vertigo_state::exidy440_audio_map)
 	AM_RANGE(0x0000, 0x7fff) AM_NOP
 	AM_RANGE(0x8000, 0x801f) AM_MIRROR(0x03e0) AM_DEVREADWRITE("custom", exidy440_sound_device, m6844_r, m6844_w)
 	AM_RANGE(0x8400, 0x840f) AM_MIRROR(0x03f0) AM_DEVREADWRITE("custom", exidy440_sound_device, sound_volume_r, sound_volume_w)
@@ -74,7 +74,7 @@ ADDRESS_MAP_END
  *************************************/
 
 #if 0
-static ADDRESS_MAP_START( vertigo_motor, AS_PROGRAM, 8, vertigo_state )
+ADDRESS_MAP_START(vertigo_state::vertigo_motor)
 	AM_RANGE(0x010, 0x07f) AM_RAM
 	AM_RANGE(0x080, 0x7ff) AM_ROM
 ADDRESS_MAP_END
@@ -125,24 +125,24 @@ INPUT_PORTS_END
 MACHINE_CONFIG_START(vertigo_state::vertigo)
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", M68000, XTAL(24'000'000) / 3)
+	MCFG_CPU_ADD("maincpu", M68000, 24_MHz_XTAL / 3)
 	MCFG_CPU_PROGRAM_MAP(vertigo_map)
 	MCFG_CPU_PERIODIC_INT_DRIVER(vertigo_state, vertigo_interrupt, 60)
 
-	MCFG_FRAGMENT_ADD(exidy440_audio)
+	exidy440_audio(config);
 
 	MCFG_DEVICE_ADD("pit", PIT8254, 0)
-	MCFG_PIT8253_CLK0(XTAL(24'000'000) / 100)
+	MCFG_PIT8253_CLK0(24_MHz_XTAL / 100)
 	MCFG_PIT8253_OUT0_HANDLER(WRITELINE(vertigo_state, v_irq4_w))
-	MCFG_PIT8253_CLK1(XTAL(24'000'000) / 100)
+	MCFG_PIT8253_CLK1(24_MHz_XTAL / 100)
 	MCFG_PIT8253_OUT1_HANDLER(WRITELINE(vertigo_state, v_irq3_w))
-	MCFG_PIT8253_CLK2(XTAL(24'000'000) / 100)
+	MCFG_PIT8253_CLK2(24_MHz_XTAL / 100)
 
 	MCFG_DEVICE_ADD("74148", TTL74148, 0)
 	MCFG_74148_OUTPUT_CB(vertigo_state, update_irq)
 
 	/* motor controller */
-	MCFG_CPU_ADD("motorcpu", M68705P3, XTAL(24'000'000) / 6)
+	MCFG_CPU_ADD("motorcpu", M68705P3, 24_MHz_XTAL / 6)
 
 	MCFG_NVRAM_ADD_0FILL("nvram")
 

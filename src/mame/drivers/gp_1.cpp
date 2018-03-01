@@ -59,6 +59,8 @@ public:
 	TIMER_DEVICE_CALLBACK_MEMBER(zero_timer);
 	void gp_1(machine_config &config);
 	void gp_1s(machine_config &config);
+	void gp_1_io(address_map &map);
+	void gp_1_map(address_map &map);
 private:
 	uint8_t m_u14;
 	uint8_t m_digit;
@@ -79,12 +81,12 @@ private:
 };
 
 
-static ADDRESS_MAP_START( gp_1_map, AS_PROGRAM, 8, gp_1_state )
+ADDRESS_MAP_START(gp_1_state::gp_1_map)
 	AM_RANGE(0x0000, 0x0fff) AM_ROM AM_REGION("roms", 0)
 	AM_RANGE(0x8c00, 0x8cff) AM_RAM AM_SHARE("nvram")
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( gp_1_io, AS_IO, 8, gp_1_state )
+ADDRESS_MAP_START(gp_1_state::gp_1_io)
 	ADDRESS_MAP_GLOBAL_MASK(0x0f)
 	AM_RANGE(0x04, 0x07) AM_DEVREADWRITE("ppi", i8255_device, read, write)
 	AM_RANGE(0x08, 0x0b) AM_DEVREADWRITE("ctc", z80ctc_device, read, write)
@@ -436,7 +438,7 @@ MACHINE_CONFIG_START(gp_1_state::gp_1)
 	MCFG_DEFAULT_LAYOUT(layout_gp_1)
 
 	/* Sound */
-	MCFG_FRAGMENT_ADD( genpin_audio )
+	genpin_audio(config);
 
 	/* Devices */
 	MCFG_DEVICE_ADD("ppi", I8255A, 0 )
@@ -449,7 +451,8 @@ MACHINE_CONFIG_START(gp_1_state::gp_1)
 	MCFG_TIMER_DRIVER_ADD_PERIODIC("gp1", gp_1_state, zero_timer, attotime::from_hz(120)) // mains freq*2
 MACHINE_CONFIG_END
 
-MACHINE_CONFIG_DERIVED(gp_1_state::gp_1s, gp_1)
+MACHINE_CONFIG_START(gp_1_state::gp_1s)
+	gp_1(config);
 	MCFG_SPEAKER_STANDARD_MONO("mono")
 	MCFG_SOUND_ADD("snsnd", SN76477, 0)
 	MCFG_SN76477_NOISE_PARAMS(0, 0, 0)                // noise + filter: N/C

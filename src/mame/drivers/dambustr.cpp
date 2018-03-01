@@ -72,6 +72,7 @@ public:
 	DECLARE_WRITE8_MEMBER(dambustr_noise_enable_w);
 	DECLARE_DRIVER_INIT(dambustr);
 	void dambustr(machine_config &config);
+	void dambustr_map(address_map &map);
 };
 
 
@@ -86,7 +87,7 @@ WRITE8_MEMBER(dambustr_state::dambustr_noise_enable_w)
 }
 
 
-static ADDRESS_MAP_START( dambustr_map, AS_PROGRAM, 8, dambustr_state )
+ADDRESS_MAP_START(dambustr_state::dambustr_map)
 	AM_RANGE(0x0000, 0x7fff) AM_ROM
 
 	AM_RANGE(0x8000, 0x8000) AM_WRITE(dambustr_bg_color_w)
@@ -286,7 +287,7 @@ MACHINE_CONFIG_START(dambustr_state::dambustr)
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("speaker")
 
-	MCFG_FRAGMENT_ADD(galaxian_audio)
+	galaxian_audio(config);
 MACHINE_CONFIG_END
 
 

@@ -29,15 +29,6 @@ public:
 		return write_irq.set_callback(std::forward<Write>(wr));
 	}
 
-	DECLARE_READ8_MEMBER(regs_mode2_r);
-	DECLARE_WRITE8_MEMBER(regs_mode2_w);
-	DECLARE_READ8_MEMBER(asic_r);
-	DECLARE_WRITE8_MEMBER(asic_w);
-	DECLARE_READ8_MEMBER(port1_r);
-	DECLARE_WRITE8_MEMBER(port1_w);
-	DECLARE_READ8_MEMBER(port2_r);
-	DECLARE_WRITE8_MEMBER(port2_w);
-
 	// public API - call for reads/writes at I/O 330/331 on PC, C0n0/C0n1 on Apple II, etc.
 	DECLARE_READ8_MEMBER(mpu_r);
 	DECLARE_WRITE8_MEMBER(mpu_w);
@@ -52,6 +43,18 @@ protected:
 
 private:
 	DECLARE_WRITE_LINE_MEMBER(midi_rx_w);
+
+	DECLARE_READ8_MEMBER(regs_mode2_r);
+	DECLARE_WRITE8_MEMBER(regs_mode2_w);
+	DECLARE_READ8_MEMBER(asic_r);
+	DECLARE_WRITE8_MEMBER(asic_w);
+	DECLARE_READ8_MEMBER(port1_r);
+	DECLARE_WRITE8_MEMBER(port1_w);
+	DECLARE_READ8_MEMBER(port2_r);
+	DECLARE_WRITE8_MEMBER(port2_w);
+
+	void mpu401_io_map(address_map &map);
+	void mpu401_map(address_map &map);
 
 	required_device<m6801_cpu_device> m_ourcpu;
 

@@ -124,7 +124,7 @@ WRITE_LINE_MEMBER(spcforce_state::unknown_w)
 	// written very frequently
 }
 
-static ADDRESS_MAP_START( spcforce_map, AS_PROGRAM, 8, spcforce_state )
+ADDRESS_MAP_START(spcforce_state::spcforce_map)
 	AM_RANGE(0x0000, 0x3fff) AM_ROM
 	AM_RANGE(0x4000, 0x43ff) AM_RAM
 	AM_RANGE(0x7000, 0x7000) AM_READ_PORT("DSW") AM_DEVWRITE("soundlatch", generic_latch_8_device, write)
@@ -136,7 +136,7 @@ static ADDRESS_MAP_START( spcforce_map, AS_PROGRAM, 8, spcforce_state )
 	AM_RANGE(0xa000, 0xa3ff) AM_RAM AM_SHARE("scrollram")
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( spcforce_sound_map, AS_PROGRAM, 8, spcforce_state )
+ADDRESS_MAP_START(spcforce_state::spcforce_sound_map)
 	AM_RANGE(0x0000, 0x07ff) AM_ROM
 ADDRESS_MAP_END
 
@@ -331,7 +331,8 @@ MACHINE_CONFIG_START(spcforce_state::spcforce)
 	MCFG_SN76496_READY_HANDLER(WRITELINE(spcforce_state, write_sn3_ready))
 MACHINE_CONFIG_END
 
-MACHINE_CONFIG_DERIVED(spcforce_state::meteors, spcforce)
+MACHINE_CONFIG_START(spcforce_state::meteors)
+	spcforce(config);
 	MCFG_DEVICE_MODIFY("mainlatch")
 	MCFG_ADDRESSABLE_LATCH_Q3_OUT_CB(NOOP)
 	MCFG_ADDRESSABLE_LATCH_Q5_OUT_CB(WRITELINE(spcforce_state, irq_mask_w)) // ??

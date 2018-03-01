@@ -36,8 +36,8 @@
 class sms_state : public driver_device
 {
 public:
-	sms_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag),
+	sms_state(const machine_config &mconfig, device_type type, const char *tag) :
+		driver_device(mconfig, type, tag),
 		m_maincpu(*this, "maincpu"),
 		m_vdp(*this, "sms_vdp"),
 		m_main_scr(*this, "screen"),
@@ -55,6 +55,7 @@ public:
 		m_port_scope(*this, "SEGASCOPE"),
 		m_port_scope_binocular(*this, "SSCOPE_BINOCULAR"),
 		m_port_persist(*this, "PERSISTENCE"),
+		m_led_pwr(*this, "led_pwr"),
 		m_region_maincpu(*this, "maincpu"),
 		m_mainram(nullptr),
 		m_is_gamegear(0),
@@ -66,7 +67,8 @@ public:
 		m_has_bios_2000(0),
 		m_has_bios_full(0),
 		m_has_jpn_sms_cart_slot(0),
-		m_store_cart_selection_data(0) { }
+		m_store_cart_selection_data(0)
+	{ }
 
 	// devices
 	required_device<cpu_device> m_maincpu;
@@ -87,6 +89,8 @@ public:
 	optional_ioport m_port_scope;
 	optional_ioport m_port_scope_binocular;
 	optional_ioport m_port_persist;
+
+	output_finder<> m_led_pwr;
 
 	required_memory_region m_region_maincpu;
 	address_space *m_space;
@@ -243,6 +247,13 @@ public:
 	void sms1_br(machine_config &config);
 	void sms2_ntsc(machine_config &config);
 	void sms1_kr(machine_config &config);
+	void gg_io(address_map &map);
+	void sg1000m3_io(address_map &map);
+	void sms1_mem(address_map &map);
+	void sms_io(address_map &map);
+	void sms_mem(address_map &map);
+	void smsj_io(address_map &map);
+	void smskr_io(address_map &map);
 protected:
 	uint8_t read_bus(address_space &space, unsigned int bank, uint16_t base_addr, uint16_t offset);
 	void setup_bios();
@@ -256,9 +267,9 @@ protected:
 class smssdisp_state : public sms_state
 {
 public:
-	smssdisp_state(const machine_config &mconfig, device_type type, const char *tag)
-	: sms_state(mconfig, type, tag),
-	m_control_cpu(*this, "control")
+	smssdisp_state(const machine_config &mconfig, device_type type, const char *tag) :
+		sms_state(mconfig, type, tag),
+		m_control_cpu(*this, "control")
 	{ }
 
 	required_device<cpu_device> m_control_cpu;
@@ -272,6 +283,7 @@ public:
 
 	DECLARE_WRITE_LINE_MEMBER(sms_store_int_callback);
 	void sms_sdisp(machine_config &config);
+	void sms_store_mem(address_map &map);
 };
 
 

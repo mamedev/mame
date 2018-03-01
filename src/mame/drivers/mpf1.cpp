@@ -58,17 +58,17 @@
 
 /* Address Maps */
 
-static ADDRESS_MAP_START( mpf1_map, AS_PROGRAM, 8, mpf1_state )
+ADDRESS_MAP_START(mpf1_state::mpf1_map)
 	ADDRESS_MAP_UNMAP_HIGH
 	AM_RANGE(0x0000, 0x0fff) AM_ROM
 	AM_RANGE(0x1800, 0x1fff) AM_RAM
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( mpf1_step, AS_OPCODES, 8, mpf1_state )
+ADDRESS_MAP_START(mpf1_state::mpf1_step)
 	AM_RANGE(0x0000, 0xffff) AM_READ(step_r)
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( mpf1b_map, AS_PROGRAM, 8, mpf1_state )
+ADDRESS_MAP_START(mpf1_state::mpf1b_map)
 	ADDRESS_MAP_UNMAP_HIGH
 	AM_RANGE(0x0000, 0x0fff) AM_ROM
 	AM_RANGE(0x1800, 0x1fff) AM_RAM
@@ -76,13 +76,13 @@ static ADDRESS_MAP_START( mpf1b_map, AS_PROGRAM, 8, mpf1_state )
 	AM_RANGE(0x5000, 0x6fff) AM_ROM
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( mpf1p_map, AS_PROGRAM, 8, mpf1_state )
+ADDRESS_MAP_START(mpf1_state::mpf1p_map)
 	AM_RANGE(0x0000, 0x1fff) AM_ROM
 	AM_RANGE(0x6000, 0x6fff) AM_ROM
 	AM_RANGE(0xf000, 0xffff) AM_RAM
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( mpf1_io_map, AS_IO, 8, mpf1_state )
+ADDRESS_MAP_START(mpf1_state::mpf1_io_map)
 	ADDRESS_MAP_UNMAP_HIGH
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	AM_RANGE(0x00, 0x03) AM_MIRROR(0x3c) AM_DEVREADWRITE(I8255A_TAG, i8255_device, read, write)
@@ -90,7 +90,7 @@ static ADDRESS_MAP_START( mpf1_io_map, AS_IO, 8, mpf1_state )
 	AM_RANGE(0x80, 0x83) AM_MIRROR(0x3c) AM_DEVREADWRITE(Z80PIO_TAG, z80pio_device, read, write)
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( mpf1b_io_map, AS_IO, 8, mpf1_state )
+ADDRESS_MAP_START(mpf1_state::mpf1b_io_map)
 	ADDRESS_MAP_UNMAP_HIGH
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	AM_RANGE(0x00, 0x03) AM_MIRROR(0x3c) AM_DEVREADWRITE(I8255A_TAG, i8255_device, read, write)
@@ -99,7 +99,7 @@ static ADDRESS_MAP_START( mpf1b_io_map, AS_IO, 8, mpf1_state )
 	AM_RANGE(0xfe, 0xfe) AM_MIRROR(0x01) AM_DEVREADWRITE(TMS5220_TAG, tms5220_device, status_r, data_w)
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( mpf1p_io_map, AS_IO, 8, mpf1_state )
+ADDRESS_MAP_START(mpf1_state::mpf1p_io_map)
 	ADDRESS_MAP_UNMAP_HIGH
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	AM_RANGE(0x00, 0x03) AM_MIRROR(0x3c) AM_DEVREADWRITE(I8255A_TAG, i8255_device, read, write)
@@ -357,7 +357,7 @@ MACHINE_CONFIG_START(mpf1_state::mpf1)
 	/* basic machine hardware */
 	MCFG_CPU_ADD(Z80_TAG, Z80, XTAL(3'579'545)/2)
 	MCFG_CPU_PROGRAM_MAP(mpf1_map)
-	MCFG_CPU_DECRYPTED_OPCODES_MAP(mpf1_step)
+	MCFG_CPU_OPCODES_MAP(mpf1_step)
 	MCFG_CPU_IO_MAP(mpf1_io_map)
 	MCFG_Z80_DAISY_CHAIN(mpf1_daisy_chain)
 
@@ -391,7 +391,7 @@ MACHINE_CONFIG_START(mpf1_state::mpf1b)
 	/* basic machine hardware */
 	MCFG_CPU_ADD(Z80_TAG, Z80, XTAL(3'579'545)/2)
 	MCFG_CPU_PROGRAM_MAP(mpf1b_map)
-	MCFG_CPU_DECRYPTED_OPCODES_MAP(mpf1_step)
+	MCFG_CPU_OPCODES_MAP(mpf1_step)
 	MCFG_CPU_IO_MAP(mpf1b_io_map)
 	MCFG_Z80_DAISY_CHAIN(mpf1_daisy_chain)
 
@@ -428,7 +428,7 @@ MACHINE_CONFIG_START(mpf1_state::mpf1p)
 	/* basic machine hardware */
 	MCFG_CPU_ADD(Z80_TAG, Z80, 2500000)
 	MCFG_CPU_PROGRAM_MAP(mpf1p_map)
-	MCFG_CPU_DECRYPTED_OPCODES_MAP(mpf1_step)
+	MCFG_CPU_OPCODES_MAP(mpf1_step)
 	MCFG_CPU_IO_MAP(mpf1p_io_map)
 	MCFG_Z80_DAISY_CHAIN(mpf1_daisy_chain)
 

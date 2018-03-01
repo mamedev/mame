@@ -13,7 +13,7 @@
 #include "screen.h"
 
 #define MCFG_BFM_DM01_BUSY_CB(_devcb) \
-	devcb = &bfm_dm01_device::set_busy_callback(*device, DEVCB_##_devcb);
+	devcb = &downcast<bfm_dm01_device &>(*device).set_busy_callback(DEVCB_##_devcb);
 
 class bfm_dm01_device : public device_t
 {
@@ -21,7 +21,7 @@ public:
 	bfm_dm01_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 	~bfm_dm01_device() {}
 
-	template <class Object> static devcb_base &set_busy_callback(device_t &device, Object &&cb) { return downcast<bfm_dm01_device &>(device).m_busy_cb.set_callback(std::forward<Object>(cb)); }
+	template <class Object> devcb_base &set_busy_callback(Object &&cb) { return m_busy_cb.set_callback(std::forward<Object>(cb)); }
 
 	DECLARE_READ8_MEMBER( control_r );
 	DECLARE_WRITE8_MEMBER( control_w );
@@ -35,6 +35,7 @@ public:
 	void writedata(uint8_t data);
 	int busy(void);
 
+	void bfm_dm01_memmap(address_map &map);
 protected:
 	// device-level overrides
 	virtual void device_add_mconfig(machine_config &config) override;

@@ -54,16 +54,18 @@ public:
 	virtual void video_start() override;
 	uint32_t screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 	void tekxp330(machine_config &config);
+	void cpu_map(address_map &map);
+	void tms_map(address_map &map);
 };
 
 /* Memory Maps */
 
-static ADDRESS_MAP_START( cpu_map, AS_PROGRAM, 32, tekxp330_state )
+ADDRESS_MAP_START(tekxp330_state::cpu_map)
 	AM_RANGE(0x00000000, 0x003fffff) AM_RAM
 	AM_RANGE(0x1fc00000, 0x1fdfffff) AM_ROM AM_REGION("maincpu", 0)
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( tms_map, AS_PROGRAM, 16, tekxp330_state )
+ADDRESS_MAP_START(tekxp330_state::tms_map)
 ADDRESS_MAP_END
 
 /* Input Ports */

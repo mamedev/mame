@@ -92,6 +92,8 @@ public:
 	required_device<gfxdecode_device> m_gfxdecode;
 	required_device<palette_device> m_palette;
 	void hitpoker(machine_config &config);
+	void hitpoker_io(address_map &map);
+	void hitpoker_map(address_map &map);
 };
 
 
@@ -255,7 +257,7 @@ READ8_MEMBER(hitpoker_state::test_r)
 #endif
 
 /* overlap empty rom addresses */
-static ADDRESS_MAP_START( hitpoker_map, AS_PROGRAM, 8, hitpoker_state )
+ADDRESS_MAP_START(hitpoker_state::hitpoker_map)
 	AM_RANGE(0x0000, 0xbdff) AM_ROM
 	AM_RANGE(0xbf00, 0xffff) AM_ROM
 
@@ -278,7 +280,7 @@ static ADDRESS_MAP_START( hitpoker_map, AS_PROGRAM, 8, hitpoker_state )
 	AM_RANGE(0xe000, 0xefff) AM_READWRITE(hitpoker_paletteram_r,hitpoker_paletteram_w)
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( hitpoker_io, AS_IO, 8, hitpoker_state )
+ADDRESS_MAP_START(hitpoker_state::hitpoker_io)
 	AM_RANGE(MC68HC11_IO_PORTA, MC68HC11_IO_PORTA) AM_READWRITE(hitpoker_pic_r,hitpoker_pic_w) AM_SHARE("sys_regs")
 ADDRESS_MAP_END
 

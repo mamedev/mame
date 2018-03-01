@@ -223,13 +223,13 @@ void pes_state::machine_reset()
  Address Maps
 ******************************************************************************/
 
-static ADDRESS_MAP_START(i80c31_mem, AS_PROGRAM, 8, pes_state)
+ADDRESS_MAP_START(pes_state::i80c31_mem)
 	ADDRESS_MAP_UNMAP_HIGH
 	AM_RANGE(0x0000, 0x1fff) AM_ROM /* 27C64 ROM */
 	// AM_RANGE(0x2000, 0x3fff) AM_RAM /* 6164 8k SRAM, not populated */
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START(i80c31_io, AS_IO, 8, pes_state)
+ADDRESS_MAP_START(pes_state::i80c31_io)
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	AM_RANGE(0x0, 0x0) AM_WRITE(rsq_wsq_w) /* /WS(0) and /RS(1) */
 	AM_RANGE(0x1, 0x1) AM_READWRITE(port1_r, port1_w) /* tms5220 reads and writes */

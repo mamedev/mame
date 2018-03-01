@@ -68,6 +68,7 @@ public:
 
 	void wpt_callback(floppy_image_device *floppy, int state);
 
+	void c1571_mem(address_map &map);
 protected:
 	c1571_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock);
 
@@ -174,6 +175,8 @@ private:
 	DECLARE_READ8_MEMBER( cia_pa_r );
 	DECLARE_WRITE8_MEMBER( cia_pa_w );
 	DECLARE_WRITE8_MEMBER( cia_pb_w );
+
+	void mini_chief_mem(address_map &map);
 };
 
 

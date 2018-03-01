@@ -109,6 +109,10 @@ public:
 	virtual void machine_start() override;
 	void bonanza(machine_config &config);
 	void pcat_nit(machine_config &config);
+	void bonanza_io_map(address_map &map);
+	void bonanza_map(address_map &map);
+	void pcat_map(address_map &map);
+	void pcat_nit_io(address_map &map);
 };
 
 /*************************************
@@ -148,7 +152,7 @@ WRITE8_MEMBER(pcat_nit_state::pcat_nit_rombank_w)
 	}
 }
 
-static ADDRESS_MAP_START( pcat_map, AS_PROGRAM, 32, pcat_nit_state )
+ADDRESS_MAP_START(pcat_nit_state::pcat_map)
 	AM_RANGE(0x00000000, 0x0009ffff) AM_RAM
 	AM_RANGE(0x000a0000, 0x000bffff) AM_DEVREADWRITE8("vga", vga_device, mem_r, mem_w, 0xffffffff)
 	AM_RANGE(0x000c0000, 0x000c7fff) AM_ROM AM_REGION("video_bios", 0) AM_WRITENOP
@@ -159,7 +163,7 @@ static ADDRESS_MAP_START( pcat_map, AS_PROGRAM, 32, pcat_nit_state )
 	AM_RANGE(0xffff0000, 0xffffffff) AM_ROM AM_REGION("bios", 0 )
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( bonanza_map, AS_PROGRAM, 32, pcat_nit_state )
+ADDRESS_MAP_START(pcat_nit_state::bonanza_map)
 	AM_RANGE(0x00000000, 0x0009ffff) AM_RAM
 	AM_RANGE(0x000a0000, 0x000bffff) AM_DEVREADWRITE8("vga", cirrus_gd5428_device, mem_r, mem_w, 0xffffffff)
 	AM_RANGE(0x000c0000, 0x000c7fff) AM_ROM AM_REGION("video_bios", 0) AM_WRITENOP
@@ -185,7 +189,7 @@ READ8_MEMBER(pcat_nit_state::pcat_nit_io_r)
 	}
 }
 
-static ADDRESS_MAP_START( pcat_nit_io, AS_IO, 32, pcat_nit_state )
+ADDRESS_MAP_START(pcat_nit_state::pcat_nit_io)
 	AM_IMPORT_FROM(pcat32_io_common)
 	AM_RANGE(0x0278, 0x027f) AM_READ8(pcat_nit_io_r, 0xffffffff) AM_WRITENOP
 	AM_RANGE(0x0280, 0x0283) AM_READNOP
@@ -195,7 +199,7 @@ static ADDRESS_MAP_START( pcat_nit_io, AS_IO, 32, pcat_nit_state )
 	AM_RANGE(0x03f8, 0x03ff) AM_DEVREADWRITE8("ns16450_0", ns16450_device, ins8250_r, ins8250_w, 0xffffffff)
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( bonanza_io_map, AS_IO, 32, pcat_nit_state )
+ADDRESS_MAP_START(pcat_nit_state::bonanza_io_map)
 	AM_IMPORT_FROM(pcat32_io_common)
 	AM_RANGE(0x0278, 0x027f) AM_READ8(pcat_nit_io_r, 0xffffffff) AM_WRITENOP
 	AM_RANGE(0x0280, 0x0283) AM_READNOP
@@ -228,9 +232,9 @@ MACHINE_CONFIG_START(pcat_nit_state::pcat_nit)
 	MCFG_CPU_IRQ_ACKNOWLEDGE_DEVICE("pic8259_1", pic8259_device, inta_cb)
 
 	/* video hardware */
-	MCFG_FRAGMENT_ADD( pcvideo_vga )
+	pcvideo_vga(config);
 
-	MCFG_FRAGMENT_ADD( pcat_common )
+	pcat_common(config);
 	MCFG_DEVICE_ADD( "ns16450_0", NS16450, XTAL(1'843'200) )
 	MCFG_INS8250_OUT_TX_CB(DEVWRITELINE("microtouch", microtouch_device, rx))
 	MCFG_INS8250_OUT_INT_CB(DEVWRITELINE("pic8259_1", pic8259_device, ir4_w))
@@ -247,9 +251,9 @@ MACHINE_CONFIG_START(pcat_nit_state::bonanza)
 	MCFG_CPU_IRQ_ACKNOWLEDGE_DEVICE("pic8259_1", pic8259_device, inta_cb)
 
 	/* video hardware */
-	MCFG_FRAGMENT_ADD( pcvideo_cirrus_gd5428 )
+	pcvideo_cirrus_gd5428(config);
 
-	MCFG_FRAGMENT_ADD( pcat_common )
+	pcat_common(config);
 	MCFG_DEVICE_ADD( "ns16450_0", NS16450, XTAL(1'843'200) )
 	MCFG_INS8250_OUT_TX_CB(DEVWRITELINE("microtouch", microtouch_device, rx))
 	MCFG_INS8250_OUT_INT_CB(DEVWRITELINE("pic8259_1", pic8259_device, ir4_w))

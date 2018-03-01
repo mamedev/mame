@@ -187,6 +187,9 @@ public:
 	virtual void machine_reset() override;
 	DECLARE_PALETTE_INIT(replicator);
 	void replicator(machine_config &config);
+	void replicator_data_map(address_map &map);
+	void replicator_io_map(address_map &map);
+	void replicator_prg_map(address_map &map);
 };
 
 void replicator_state::machine_start()
@@ -529,15 +532,15 @@ WRITE8_MEMBER(replicator_state::port_w)
 * Address maps                                       *
 \****************************************************/
 
-static ADDRESS_MAP_START( replicator_prg_map, AS_PROGRAM, 8, replicator_state )
+ADDRESS_MAP_START(replicator_state::replicator_prg_map)
 	AM_RANGE(0x0000, 0x1FFFF) AM_ROM
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( replicator_data_map, AS_DATA, 8, replicator_state )
+ADDRESS_MAP_START(replicator_state::replicator_data_map)
 	AM_RANGE(0x0200, 0x21FF) AM_RAM  /* ATMEGA1280 Internal SRAM */
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( replicator_io_map, AS_IO, 8, replicator_state )
+ADDRESS_MAP_START(replicator_state::replicator_io_map)
 	AM_RANGE(AVR8_IO_PORTA, AVR8_IO_PORTL) AM_READWRITE( port_r, port_w )
 ADDRESS_MAP_END
 

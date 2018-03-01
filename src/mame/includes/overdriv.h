@@ -71,4 +71,8 @@ public:
 	K051316_CB_MEMBER(zoom_callback_2);
 	K053246_CB_MEMBER(sprite_callback);
 	void overdriv(machine_config &config);
+	void overdriv_k053260_map(address_map &map);
+	void overdriv_master_map(address_map &map);
+	void overdriv_slave_map(address_map &map);
+	void overdriv_sound_map(address_map &map);
 };

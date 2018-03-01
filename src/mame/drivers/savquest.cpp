@@ -114,6 +114,8 @@ public:
 	DECLARE_WRITE8_MEMBER(smram_w);
 
 	void savquest(machine_config &config);
+	void savquest_io(address_map &map);
+	void savquest_map(address_map &map);
 protected:
 
 
@@ -730,7 +732,7 @@ WRITE8_MEMBER(savquest_state::smram_w)
 
 }
 
-static ADDRESS_MAP_START(savquest_map, AS_PROGRAM, 32, savquest_state)
+ADDRESS_MAP_START(savquest_state::savquest_map)
 	ADDRESS_MAP_UNMAP_HIGH
 	AM_RANGE(0x00000000, 0x0009ffff) AM_RAM
 	AM_RANGE(0x000a0000, 0x000bffff) AM_READWRITE8(smram_r,smram_w,0xffffffff) //AM_DEVREADWRITE8("vga", vga_device, mem_r, mem_w, 0xffffffff)
@@ -745,7 +747,7 @@ static ADDRESS_MAP_START(savquest_map, AS_PROGRAM, 32, savquest_state)
 	AM_RANGE(0xfffc0000, 0xffffffff) AM_ROM AM_REGION("bios", 0)    /* System BIOS */
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START(savquest_io, AS_IO, 32, savquest_state)
+ADDRESS_MAP_START(savquest_state::savquest_io)
 	AM_IMPORT_FROM(pcat32_io_common)
 	AM_RANGE(0x0070, 0x007f) AM_DEVREADWRITE8("rtc", ds12885_device, read, write, 0xffffffff)
 
@@ -809,7 +811,7 @@ MACHINE_CONFIG_START(savquest_state::savquest)
 	MCFG_CPU_IO_MAP(savquest_io)
 	MCFG_CPU_IRQ_ACKNOWLEDGE_DEVICE("pic8259_1", pic8259_device, inta_cb)
 
-	MCFG_FRAGMENT_ADD( pcat_common )
+	pcat_common(config);
 	MCFG_DEVICE_REMOVE("rtc")
 	MCFG_DS12885_ADD("rtc")
 
@@ -831,7 +833,7 @@ MACHINE_CONFIG_START(savquest_state::savquest)
 	MCFG_ISA16_SLOT_ADD("isa", "isa1", savquest_isa16_cards, "sb16", false)
 
 	/* video hardware */
-	MCFG_FRAGMENT_ADD( pcvideo_s3_vga )
+	pcvideo_s3_vga(config);
 
 	MCFG_DEVICE_ADD("voodoo", VOODOO_2, STD_VOODOO_2_CLOCK)
 	MCFG_VOODOO_FBMEM(4)

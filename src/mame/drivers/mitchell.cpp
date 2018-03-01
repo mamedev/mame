@@ -315,7 +315,7 @@ WRITE8_MEMBER(mitchell_state::input_w)
  *
  *************************************/
 
-static ADDRESS_MAP_START( mgakuen_map, AS_PROGRAM, 8, mitchell_state )
+ADDRESS_MAP_START(mitchell_state::mgakuen_map)
 	AM_RANGE(0x0000, 0x7fff) AM_ROM
 	AM_RANGE(0x8000, 0xbfff) AM_ROMBANK("bank1")
 	AM_RANGE(0xc000, 0xc7ff) AM_RAM_DEVWRITE("palette", palette_device, write8)   /* palette RAM */
@@ -325,7 +325,7 @@ static ADDRESS_MAP_START( mgakuen_map, AS_PROGRAM, 8, mitchell_state )
 	AM_RANGE(0xf000, 0xffff) AM_READWRITE(mgakuen_objram_r, mgakuen_objram_w)   /* OBJ RAM */
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( mitchell_map, AS_PROGRAM, 8, mitchell_state )
+ADDRESS_MAP_START(mitchell_state::mitchell_map)
 	AM_RANGE(0x0000, 0x7fff) AM_ROM
 	AM_RANGE(0x8000, 0xbfff) AM_ROMBANK("bank1")
 	AM_RANGE(0xc000, 0xc7ff) AM_READWRITE(pang_paletteram_r,pang_paletteram_w) /* Banked palette RAM */
@@ -334,13 +334,13 @@ static ADDRESS_MAP_START( mitchell_map, AS_PROGRAM, 8, mitchell_state )
 	AM_RANGE(0xe000, 0xffff) AM_RAM AM_SHARE("nvram") /* Work RAM */
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( decrypted_opcodes_map, AS_OPCODES, 8, mitchell_state )
+ADDRESS_MAP_START(mitchell_state::decrypted_opcodes_map)
 	AM_RANGE(0x0000, 0x7fff) AM_ROMBANK("bank0d")
 	AM_RANGE(0x8000, 0xbfff) AM_ROMBANK("bank1d")
 	AM_RANGE(0xe000, 0xffff) AM_RAM AM_SHARE("nvram") /* Work RAM */
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( mitchell_io_map, AS_IO, 8, mitchell_state )
+ADDRESS_MAP_START(mitchell_state::mitchell_io_map)
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	AM_RANGE(0x00, 0x00) AM_WRITE(pang_gfxctrl_w)   /* Palette bank, layer enable, coin counters, more */
 	AM_RANGE(0x00, 0x02) AM_READ(input_r)           /* The Mahjong games and Block Block need special input treatment */
@@ -357,7 +357,7 @@ static ADDRESS_MAP_START( mitchell_io_map, AS_IO, 8, mitchell_state )
 ADDRESS_MAP_END
 
 /* spangbl */
-static ADDRESS_MAP_START( spangbl_map, AS_PROGRAM, 8, mitchell_state )
+ADDRESS_MAP_START(mitchell_state::spangbl_map)
 	AM_RANGE(0x0000, 0x7fff) AM_ROM
 	AM_RANGE(0x8000, 0xbfff) AM_ROMBANK("bank1") AM_WRITENOP
 	AM_RANGE(0xc000, 0xc7ff) AM_READWRITE(pang_paletteram_r, pang_paletteram_w) /* Banked palette RAM */
@@ -366,7 +366,7 @@ static ADDRESS_MAP_START( spangbl_map, AS_PROGRAM, 8, mitchell_state )
 	AM_RANGE(0xe000, 0xffff) AM_RAM AM_SHARE("nvram")     /* Work RAM */
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( spangbl_io_map, AS_IO, 8, mitchell_state )
+ADDRESS_MAP_START(mitchell_state::spangbl_io_map)
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	AM_RANGE(0x00, 0x02) AM_READ(input_r)
 	AM_RANGE(0x00, 0x00) AM_WRITE(pangbl_gfxctrl_w)    /* Palette bank, layer enable, coin counters, more */
@@ -387,7 +387,7 @@ WRITE8_MEMBER(mitchell_state::sound_bankswitch_w)
 	m_soundbank->set_entry(data & 7);
 }
 
-static ADDRESS_MAP_START( spangbl_sound_map, AS_PROGRAM, 8, mitchell_state )
+ADDRESS_MAP_START(mitchell_state::spangbl_sound_map)
 	AM_RANGE(0x0000, 0x7fff) AM_ROM
 	AM_RANGE(0x8000, 0xbfff) AM_ROMBANK("soundbank")
 	AM_RANGE(0xe000, 0xe000) AM_WRITE(sound_bankswitch_w)
@@ -397,7 +397,7 @@ static ADDRESS_MAP_START( spangbl_sound_map, AS_PROGRAM, 8, mitchell_state )
 	AM_RANGE(0xf800, 0xf800) AM_DEVREAD("soundlatch", generic_latch_8_device, read)
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( pangba_sound_map, AS_PROGRAM, 8, mitchell_state )
+ADDRESS_MAP_START(mitchell_state::pangba_sound_map)
 	AM_RANGE(0x0000, 0x7fff) AM_ROM
 	AM_RANGE(0x8000, 0xbfff) AM_ROMBANK("soundbank")
 	AM_RANGE(0xe000, 0xe000) AM_WRITE(sound_bankswitch_w)
@@ -414,7 +414,7 @@ WRITE8_MEMBER(mitchell_state::oki_banking_w)
 	m_oki->set_rom_bank(data & 3);
 }
 
-static ADDRESS_MAP_START( mstworld_sound_map, AS_PROGRAM, 8, mitchell_state )
+ADDRESS_MAP_START(mitchell_state::mstworld_sound_map)
 	AM_RANGE(0x0000, 0x7fff) AM_ROM
 	AM_RANGE(0x8000, 0x87ff) AM_RAM
 	AM_RANGE(0x9000, 0x9000) AM_WRITE(oki_banking_w)
@@ -428,7 +428,7 @@ WRITE8_MEMBER(mitchell_state::mstworld_sound_w)
 	m_audiocpu->set_input_line(0, HOLD_LINE);
 }
 
-static ADDRESS_MAP_START( mstworld_io_map, AS_IO, 8, mitchell_state )
+ADDRESS_MAP_START(mitchell_state::mstworld_io_map)
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	AM_RANGE(0x00, 0x00) AM_READ_PORT("IN0") AM_WRITE(mstworld_gfxctrl_w)   /* Palette bank, layer enable, coin counters, more */
 	AM_RANGE(0x01, 0x01) AM_READ_PORT("IN1")
@@ -1197,7 +1197,7 @@ MACHINE_CONFIG_START(mitchell_state::pang)
 	MCFG_CPU_ADD("maincpu",Z80, XTAL(16'000'000)/2) /* verified on pcb */
 	MCFG_CPU_PROGRAM_MAP(mitchell_map)
 	MCFG_CPU_IO_MAP(mitchell_io_map)
-	MCFG_CPU_DECRYPTED_OPCODES_MAP(decrypted_opcodes_map)
+	MCFG_CPU_OPCODES_MAP(decrypted_opcodes_map)
 	MCFG_TIMER_DRIVER_ADD_SCANLINE("scantimer", mitchell_state, mitchell_irq, "screen", 0, 1)
 
 	MCFG_MACHINE_START_OVERRIDE(mitchell_state,mitchell)
@@ -1231,7 +1231,8 @@ MACHINE_CONFIG_START(mitchell_state::pang)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 MACHINE_CONFIG_END
 
-MACHINE_CONFIG_DERIVED(mitchell_state::pangnv, pang)
+MACHINE_CONFIG_START(mitchell_state::pangnv)
+	pang(config);
 	MCFG_NVRAM_ADD_0FILL("nvram")
 MACHINE_CONFIG_END
 
@@ -1266,12 +1267,13 @@ WRITE_LINE_MEMBER(mitchell_state::spangbl_adpcm_int)
 }
 
 
-MACHINE_CONFIG_DERIVED(mitchell_state::spangbl, pangnv)
+MACHINE_CONFIG_START(mitchell_state::spangbl)
+	pangnv(config);
 
 	MCFG_CPU_MODIFY("maincpu")
 	MCFG_CPU_PROGRAM_MAP(spangbl_map)
 	MCFG_CPU_IO_MAP(spangbl_io_map)
-	MCFG_CPU_DECRYPTED_OPCODES_MAP(decrypted_opcodes_map)
+	MCFG_CPU_OPCODES_MAP(decrypted_opcodes_map)
 	MCFG_CPU_VBLANK_INT_DRIVER("screen", mitchell_state,  irq0_line_hold)
 
 	MCFG_DEVICE_REMOVE("scantimer")
@@ -1294,7 +1296,8 @@ MACHINE_CONFIG_DERIVED(mitchell_state::spangbl, pangnv)
 	MCFG_74157_OUT_CB(DEVWRITE8("msm", msm5205_device, data_w))
 MACHINE_CONFIG_END
 
-MACHINE_CONFIG_DERIVED(mitchell_state::pangba, spangbl)
+MACHINE_CONFIG_START(mitchell_state::pangba)
+	spangbl(config);
 	MCFG_CPU_MODIFY("audiocpu")
 	MCFG_CPU_PROGRAM_MAP(pangba_sound_map)
 
@@ -1311,7 +1314,7 @@ MACHINE_CONFIG_START(mitchell_state::mstworld)
 	MCFG_CPU_ADD("maincpu", Z80, 6000000*4)
 	MCFG_CPU_PROGRAM_MAP(mitchell_map)
 	MCFG_CPU_IO_MAP(mstworld_io_map)
-	MCFG_CPU_DECRYPTED_OPCODES_MAP(decrypted_opcodes_map)
+	MCFG_CPU_OPCODES_MAP(decrypted_opcodes_map)
 	MCFG_CPU_VBLANK_INT_DRIVER("screen", mitchell_state,  irq0_line_hold)
 
 	MCFG_CPU_ADD("audiocpu", Z80,6000000)        /* 6 MHz? */
@@ -1352,7 +1355,7 @@ MACHINE_CONFIG_START(mitchell_state::marukin)
 	MCFG_CPU_ADD("maincpu", Z80, XTAL(16'000'000)/2) /* verified on pcb */
 	MCFG_CPU_PROGRAM_MAP(mitchell_map)
 	MCFG_CPU_IO_MAP(mitchell_io_map)
-	MCFG_CPU_DECRYPTED_OPCODES_MAP(decrypted_opcodes_map)
+	MCFG_CPU_OPCODES_MAP(decrypted_opcodes_map)
 	MCFG_TIMER_DRIVER_ADD_SCANLINE("scantimer", mitchell_state, mitchell_irq, "screen", 0, 1)
 
 	MCFG_EEPROM_SERIAL_93C46_ADD("eeprom")
@@ -1407,7 +1410,7 @@ MACHINE_CONFIG_START(mitchell_state::pkladiesbl)
 	MCFG_CPU_ADD("maincpu", Z80, XTAL(12'000'000)/2) /* verified on pcb */
 	MCFG_CPU_PROGRAM_MAP(mitchell_map)
 	MCFG_CPU_IO_MAP(mitchell_io_map)
-	MCFG_CPU_DECRYPTED_OPCODES_MAP(decrypted_opcodes_map)
+	MCFG_CPU_OPCODES_MAP(decrypted_opcodes_map)
 	MCFG_TIMER_DRIVER_ADD_SCANLINE("scantimer", mitchell_state, mitchell_irq, "screen", 0, 1)
 
 	MCFG_EEPROM_SERIAL_93C46_ADD("eeprom")
