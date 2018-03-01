@@ -15,16 +15,16 @@
 
 
 #define MCFG_AICA_MASTER \
-		aica_device::set_master(*device);
+	downcast<aica_device &>(*device).set_master(true);
 
 #define MCFG_AICA_ROFFSET(offs) \
-		aica_device::set_roffset(*device, (offs));
+	downcast<aica_device &>(*device).set_roffset((offs));
 
 #define MCFG_AICA_IRQ_CB(cb) \
-		devcb = &aica_device::set_irq_callback(*device, (DEVCB_##cb));
+	devcb = &downcast<aica_device &>(*device).set_irq_callback((DEVCB_##cb));
 
 #define MCFG_AICA_MAIN_IRQ_CB(cb) \
-		devcb = &aica_device::set_main_irq_callback(*device, (DEVCB_##cb));
+	devcb = &downcast<aica_device &>(*device).set_main_irq_callback((DEVCB_##cb));
 
 class aica_device : public device_t,
 									public device_sound_interface
@@ -32,10 +32,10 @@ class aica_device : public device_t,
 public:
 	aica_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
-	static void set_master(device_t &device) { downcast<aica_device &>(device).m_master = true; }
-	static void set_roffset(device_t &device, int roffset) { downcast<aica_device &>(device).m_roffset = roffset; }
-	template <class Object> static devcb_base &set_irq_callback(device_t &device, Object &&cb) { return downcast<aica_device &>(device).m_irq_cb.set_callback(std::forward<Object>(cb)); }
-	template <class Object> static devcb_base &set_main_irq_callback(device_t &device, Object &&cb) { return downcast<aica_device &>(device).m_main_irq_cb.set_callback(std::forward<Object>(cb)); }
+	void set_master(bool master) { m_master = master; }
+	void set_roffset(int roffset) { m_roffset = roffset; }
+	template <class Object> devcb_base &set_irq_callback(Object &&cb) { return m_irq_cb.set_callback(std::forward<Object>(cb)); }
+	template <class Object> devcb_base &set_main_irq_callback(Object &&cb) { return m_main_irq_cb.set_callback(std::forward<Object>(cb)); }
 
 	// AICA register access
 	DECLARE_READ16_MEMBER( read );

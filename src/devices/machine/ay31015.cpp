@@ -198,10 +198,13 @@ void ay31015_device::device_start()
 
 void ay31015_device::device_reset()
 {
-	m_control_reg = 0;
 	m_rx_data = 0;
 
-	internal_reset();
+	if (!m_pins[CS])
+	{
+		m_control_reg = 0;
+		internal_reset();
+	}
 }
 
 

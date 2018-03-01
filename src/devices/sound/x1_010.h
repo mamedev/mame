@@ -10,8 +10,8 @@ class x1_010_device : public device_t, public device_sound_interface
 public:
 	x1_010_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
-	// static configuration
-	static void set_address_xor(device_t &device, int addr) { downcast<x1_010_device &>(device).m_xor = addr; }
+	// configuration
+	void set_address_xor(int addr) { m_xor = addr; }
 
 	DECLARE_READ8_MEMBER ( read );
 	DECLARE_WRITE8_MEMBER( write );
@@ -50,6 +50,6 @@ private:
 DECLARE_DEVICE_TYPE(X1_010, x1_010_device)
 
 #define MCFG_X1_010_ADDRESS_XOR(_addr) \
-	x1_010_device::set_address_xor(*device, _addr);
+	downcast<x1_010_device &>(*device).set_address_xor(_addr);
 
 #endif // MAME_SOUND_X1_010_H

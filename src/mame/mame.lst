@@ -11338,6 +11338,9 @@ kdynastg                        // (c) 1999 EZ Graphics
 xfiles                          // (c) 1999 dgPIX Entertainment Inc
 xfilesk                         // (c) 1999 dgPIX Entertainment Inc (censored for the Korean market)
 
+@source:diablo1300.cpp
+diablo				//
+
 @source:didact.cpp
 md6802                          //
 mp68a                           //
@@ -11570,6 +11573,8 @@ dragon200e                      // Dragon 200E
 dragon32                        // Dragon 32
 dragon64                        // Dragon 64
 tanodr64                        // Tano Dragon 64 (NTSC)
+dragon64h                       // Dragon 64 with HD6309
+tanodr64h                       // Tano Dragon 64 (NTSC) with HD6309
 
 @source:dragrace.cpp
 dragrace                        // 008505-008521    1977/06 [6800]
@@ -36741,15 +36746,22 @@ ti74                            // 1985 TI-74
 ti95                            // 1986 TI-95
 
 @source:ti85.cpp
-ti73                            // 1990 TI-73
+ti73                            // 1998 TI-73 Explorer
+ti73b                           // 20?? TI-73 Explorer (Bootleg)
 ti81                            // 1990 TI-81 (Z80 2 MHz)
-ti81v2                          // 1990 TI-81 (Z80 2 MHz)
+ti81v2                          // 1994 TI-81 v2.0 (Z80 2 MHz)
 ti82                            // 1993 TI-82 (Z80 6 MHz)
 ti83                            // 1996 TI-83 (Z80 6 MHz)
 ti83p                           // 1999 TI-83 Plus (Boot Code 1.00) (Z80 6 MHz)
+ti83pb                          // 20?? TI-83 Plus (Bootleg) (Z80 6 MHz)
 ti83pse                         // 2001 TI-83 Plus Silver Edition (Boot Code 1.00)
 ti84p                           // 2004 TI-84 Plus (Boot Code 1.00)
+ti84pv2                         // 200? TI-84 Plus (Boot Code 1.02)
+ti84pv3                         // 2011 TI-84 Plus (Boot Code 1.03)
+ti84pb                          // 20?? TI-84 Plus (Bootleg)
 ti84pse                         // 2004 TI-84 Plus Silver Edition (Boot Code 1.00)
+ti84psev3                       // 2011 TI-84 Plus Silver Edition (Boot Code 1.03)
+ti84pseb                        // 20?? TI-84 Plus Silver Edition (Bootleg)
 ti85                            // 1992 TI-85 (Z80 6 MHz)
 ti86                            // 1997 TI-86 (Z80 6 MHz)
 

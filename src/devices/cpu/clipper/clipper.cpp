@@ -8,7 +8,7 @@
  *
  * TODO:
  *   - save/restore state
- *   - unimplemented C400 instructions
+ *   - unimplemented C400 instructions (cdb, cnvx[ds]w, loadts, waitd)
  *   - correct boot logic
  *   - condition codes for multiply instructions
  *   - instruction timing
@@ -57,25 +57,29 @@ DEFINE_DEVICE_TYPE(CLIPPER_C400, clipper_c400_device, "clipper_c400", "C400 CLIP
 
 clipper_c100_device::clipper_c100_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock)
 	: clipper_device(mconfig, CLIPPER_C100, tag, owner, clock, ENDIANNESS_LITTLE, 0)
+	, m_icammu(*this, "^cammu_i")
+	, m_dcammu(*this, "^cammu_d")
 {
 }
 
 clipper_c300_device::clipper_c300_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock)
 	: clipper_device(mconfig, CLIPPER_C300, tag, owner, clock, ENDIANNESS_LITTLE, 0)
+	, m_icammu(*this, "^cammu_i")
+	, m_dcammu(*this, "^cammu_d")
 {
 }
 
 clipper_c400_device::clipper_c400_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock)
 	: clipper_device(mconfig, CLIPPER_C400, tag, owner, clock, ENDIANNESS_LITTLE, SSW_ID_C400R4)
+	, m_cammu(*this, "^cammu")
 {
 }
 
 clipper_device::clipper_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, u32 clock, const endianness_t endianness, const u32 cpuid)
 	: cpu_device(mconfig, type, tag, owner, clock)
-	, m_insn_config("insn", endianness, 32, 32, 0)
-	, m_data_config("data", endianness, 32, 32, 0)
-	, m_insn(nullptr)
-	, m_data(nullptr)
+	, m_main_config("main", endianness, 32, 32, 0)
+	, m_io_config("io", endianness, 32, 32, 0)
+	, m_boot_config("boot", endianness, 32, 32, 0)
 	, m_icount(0)
 	, m_psw(endianness == ENDIANNESS_BIG ? PSW_BIG : 0)
 	, m_ssw(cpuid)
@@ -110,9 +114,12 @@ inline u64 rotr64(u64 x, u8 shift)
 
 void clipper_device::device_start()
 {
-	// get our address spaces
-	m_insn = &space(AS_PROGRAM);
-	m_data = &space(AS_DATA);
+	// map spaces to system tags
+	std::vector<address_space *> spaces = { &space(0), &space(0), &space(0), &space(0), &space(1), &space(2), nullptr, nullptr };
+
+	// configure the cammu address spaces
+	get_icammu().set_spaces(spaces);
+	get_dcammu().set_spaces(spaces);
 
 	// set our instruction counter
 	m_icountptr = &m_icount;
@@ -155,6 +162,8 @@ void clipper_device::device_reset()
 	 *   psw: T cleared, BIG set from hardware, others undefined
 	 *   ssw: EI, TP, M, U, K, KU, UU, P cleared, ID set from hardware, others undefined
 	 */
+
+	m_wait = false;
 
 	// clear the psw and ssw
 	set_psw(0);
@@ -205,10 +214,14 @@ void clipper_device::execute_run()
 			// acknowledge interrupt
 			standard_irq_callback(INPUT_LINE_IRQ0);
 
-			LOGMASKED(LOG_EXCEPTION, "transferring control to ivec 0x%02x\n", m_ivec);
 			m_ip = intrap(EXCEPTION_INTERRUPT_BASE + m_ivec * 8, m_ip);
+
+			LOGMASKED(LOG_EXCEPTION, "transferring control to ivec 0x%02x address 0x%08x\n", m_ivec, m_ip);
 		}
 	}
+
+	if (m_wait)
+		m_icount = 0;
 
 	while (m_icount > 0)
 	{
@@ -282,6 +295,9 @@ void clipper_device::execute_run()
 
 void clipper_device::execute_set_input(int inputnum, int state)
 {
+	if (state)
+		m_wait = false;
+
 	switch (inputnum)
 	{
 	case INPUT_LINE_IRQ0:
@@ -294,15 +310,12 @@ void clipper_device::execute_set_input(int inputnum, int state)
 	}
 }
 
-/*
- * The CLIPPER has a true Harvard architecture. In the InterPro, these are tied back together
- * again by the MMU, which then directs the access to one of 3 address spaces: main, i/o or boot.
- */
 device_memory_interface::space_config_vector clipper_device::memory_space_config() const
 {
 	return space_config_vector {
-		std::make_pair(AS_PROGRAM, &m_insn_config),
-		std::make_pair(AS_DATA,    &m_data_config)
+		std::make_pair(0, &m_main_config),
+		std::make_pair(1, &m_io_config),
+		std::make_pair(2, &m_boot_config)
 	};
 }
 
@@ -324,16 +337,14 @@ WRITE16_MEMBER(clipper_device::set_exception)
  */
 bool clipper_device::decode_instruction()
 {
-	// fetch instruction word
-	u16 insn = m_insn->read_word(m_ip + 0);
-	if (m_exception)
+	// fetch and decode the primary parcel
+	if (!get_icammu().fetch<u16>(m_ssw, m_ip + 0, [this](u16 insn) {
+		m_info.opcode = insn >> 8;
+		m_info.subopcode = insn & 0xff;
+		m_info.r1 = (insn & 0x00f0) >> 4;
+		m_info.r2 = insn & 0x000f;
+	}))
 		return false;
-
-	// decode the primary parcel
-	m_info.opcode = insn >> 8;
-	m_info.subopcode = insn & 0xff;
-	m_info.r1 = (insn & 0x00f0) >> 4;
-	m_info.r2 = insn & 0x000f;
 
 	// initialise the other fields
 	m_info.imm = 0;
@@ -343,112 +354,93 @@ bool clipper_device::decode_instruction()
 	// default instruction size is 2 bytes
 	int size = 2;
 
-	if ((insn & 0xf800) == 0x3800)
+	if ((m_info.opcode & 0xf8) == 0x38)
 	{
-		// instruction has a 16 bit immediate operand
-
 		// fetch 16 bit immediate and sign extend
-		m_info.imm = (s16)m_insn->read_word(m_ip + 2);
-		if (m_exception)
+		if (!get_icammu().fetch<s16>(m_ssw, m_ip + 2, [this](s32 v) { m_info.imm = v; }))
 			return false;
 		size = 4;
 	}
-	else if ((insn & 0xd300) == 0x8300)
+	else if ((m_info.opcode & 0xd3) == 0x83)
 	{
 		// instruction has an immediate operand, either 16 or 32 bit
-		if (insn & 0x0080)
+		if (m_info.subopcode & 0x80)
 		{
 			// fetch 16 bit immediate and sign extend
-			m_info.imm = (s16)m_insn->read_word(m_ip + 2);
-			if (m_exception)
+			if (!get_icammu().fetch<s16>(m_ssw, m_ip + 2, [this](s32 v) { m_info.imm = v; }))
 				return false;
 			size = 4;
 		}
 		else
 		{
 			// fetch 32 bit immediate
-			m_info.imm = m_insn->read_dword_unaligned(m_ip + 2);
-			if (m_exception)
+			if (!get_icammu().fetch<u32>(m_ssw, m_ip + 2, [this](u32 v) { m_info.imm = v; }))
 				return false;
 			size = 6;
 		}
 	}
-	else if ((insn & 0xc000) == 0x4000)
+	else if ((m_info.opcode & 0xc0) == 0x40)
 	{
 		// instructions with addresses
-		if (insn & 0x0100)
+		if (m_info.opcode & 0x01)
 		{
 			// instructions with complex modes
-			u16 temp;
-
-			switch (insn & 0x00f0)
+			switch (m_info.subopcode & 0xf0)
 			{
 			case ADDR_MODE_PC32:
-				m_info.address = m_ip + m_insn->read_dword_unaligned(m_ip + 2);
-				if (m_exception)
+				if (!get_icammu().fetch<u32>(m_ssw, m_ip + 2, [this](u32 v) { m_info.address = m_ip + v; }))
 					return false;
 				size = 6;
 				break;
 
 			case ADDR_MODE_ABS32:
-				m_info.address = m_insn->read_dword_unaligned(m_ip + 2);
-				if (m_exception)
+				if (!get_icammu().fetch<u32>(m_ssw, m_ip + 2, [this](u32 v) { m_info.address = v; }))
 					return false;
 				size = 6;
 				break;
 
 			case ADDR_MODE_REL32:
-				m_info.r2 = m_insn->read_word(m_ip + 2) & 0xf;
-				if (m_exception)
+				if (!get_icammu().fetch<u16>(m_ssw, m_ip + 2, [this](u16 v) { m_info.r2 = v & 0xf; }))
 					return false;
 
-				m_info.address = m_r[insn & 0xf] + m_insn->read_dword_unaligned(m_ip + 4);
-				if (m_exception)
+				if (!get_icammu().fetch<u32>(m_ssw, m_ip + 4, [this](u32 v) { m_info.address = m_r[m_info.subopcode & 0xf] + v; }))
 					return false;
 				size = 8;
 				break;
 
 			case ADDR_MODE_PC16:
-				m_info.address = m_ip + (s16)m_insn->read_word(m_ip + 2);
-				if (m_exception)
+				if (!get_icammu().fetch<s16>(m_ssw, m_ip + 2, [this](s16 v) { m_info.address = m_ip + v; }))
 					return false;
 				size = 4;
 				break;
 
 			case ADDR_MODE_REL12:
-				temp = m_insn->read_word(m_ip + 2);
-				if (m_exception)
+				if (!get_icammu().fetch<s16>(m_ssw, m_ip + 2, [this](s16 v) {
+					m_info.r2 = v & 0xf;
+					m_info.address = m_r[m_info.subopcode & 0xf] + (v >> 4); }))
 					return false;
-
-				m_info.r2 = temp & 0xf;
-				m_info.address = m_r[insn & 0xf] + ((s16)temp >> 4);
 				size = 4;
 				break;
 
 			case ADDR_MODE_ABS16:
-				m_info.address = (s16)m_insn->read_word(m_ip + 2);
-				if (m_exception)
+				if (!get_icammu().fetch<s16>(m_ssw, m_ip + 2, [this](s32 v) { m_info.address = v; }))
 					return false;
 				size = 4;
 				break;
 
 			case ADDR_MODE_PCX:
-				temp = m_insn->read_word(m_ip + 2);
-				if (m_exception)
+				if (!get_icammu().fetch<u16>(m_ssw, m_ip + 2, [this](u16 v) {
+					m_info.r2 = v & 0xf;
+					m_info.address = m_ip + m_r[(v >> 4) & 0xf]; }))
 					return false;
-
-				m_info.r2 = temp & 0xf;
-				m_info.address = m_ip + m_r[(temp >> 4) & 0xf];
 				size = 4;
 				break;
 
 			case ADDR_MODE_RELX:
-				temp = m_insn->read_word(m_ip + 2);
-				if (m_exception)
+				if (!get_icammu().fetch<u16>(m_ssw, m_ip + 2, [this](u16 v) {
+					m_info.r2 = v & 0xf;
+					m_info.address = m_r[m_info.subopcode & 0xf] + m_r[(v >> 4) & 0xf]; }))
 					return false;
-
-				m_info.r2 = temp & 0xf;
-				m_info.address = m_r[insn & 0xf] + m_r[(temp >> 4) & 0xf];
 				size = 4;
 				break;
 
@@ -461,11 +453,10 @@ bool clipper_device::decode_instruction()
 			// relative addressing mode
 			m_info.address = m_r[m_info.r1];
 	}
-	else if ((insn & 0xfd00) == 0xb400)
+	else if ((m_info.opcode & 0xfd) == 0xb4)
 	{
 		// macro instructions
-		m_info.macro = m_insn->read_word(m_ip + 2);
-		if (m_exception)
+		if (!get_icammu().fetch<u16>(m_ssw, m_ip + 2, [this](u16 v) { m_info.macro = v; }))
 			return false;
 		size = 4;
 	}
@@ -479,9 +470,6 @@ bool clipper_device::decode_instruction()
 
 void clipper_device::execute_instruction()
 {
-	// memory fetch temporary
-	u64 temp;
-
 	switch (m_info.opcode)
 	{
 	case 0x00: // noop
@@ -511,27 +499,25 @@ void clipper_device::execute_instruction()
 		break;
 	case 0x13:
 		// ret: return from subroutine
-		temp = m_data->read_dword(m_r[R2]);
-		if (!m_exception)
-		{
-			m_ip = temp;
+		get_dcammu().load<u32>(m_ssw, m_r[R2], [this](u32 v) {
+			m_ip = v;
 			m_r[R2] += 4;
-		}
+		});
 		// TRAPS: C,U,A,P,R
 		break;
 	case 0x14:
 		// pushw: push word
-		m_data->write_dword(m_r[R1] - 4, m_r[R2]);
-		m_r[R1] -= 4;
+		if (get_dcammu().store<u32>(m_ssw, m_r[R1] - 4, m_r[R2]))
+			m_r[R1] -= 4;
 		// TRAPS: A,P,W
 		break;
 
 	case 0x16:
 		// popw: pop word
-		m_r[R1] += 4;
-		temp = m_data->read_dword(m_r[R1] - 4);
-		if (!m_exception)
-			m_r[R2] = temp;
+		get_dcammu().load<u32>(m_ssw, m_r[R1], [this](u32 v) {
+			m_r[R1] += 4;
+			m_r[R2] = v;
+		});
 		// TRAPS: C,U,A,P,R
 		break;
 
@@ -774,8 +760,7 @@ void clipper_device::execute_instruction()
 	case 0x44:
 	case 0x45:
 		// call: call subroutine
-		m_data->write_dword(m_r[R2] - 4, m_ip);
-		if (!m_exception)
+		if (get_dcammu().store<u32>(m_ssw, m_r[R2] - 4, m_ip))
 		{
 			m_ip = m_info.address;
 			m_r[R2] -= 4;
@@ -818,9 +803,7 @@ void clipper_device::execute_instruction()
 	case 0x60:
 	case 0x61:
 		// loadw: load word
-		temp = m_data->read_dword(m_info.address);
-		if (!m_exception)
-			m_r[R2] = temp;
+		get_dcammu().load<u32>(m_ssw, m_info.address, [this](u32 v) { m_r[R2] = v; });
 		// TRAPS: C,U,A,P,R,I
 		break;
 	case 0x62:
@@ -832,92 +815,77 @@ void clipper_device::execute_instruction()
 	case 0x64:
 	case 0x65:
 		// loads: load single floating
-		temp = m_data->read_dword(m_info.address);
-		if (!m_exception)
-			set_fp(R2, (float32)temp, F_NONE);
+		get_dcammu().load<float32>(m_ssw, m_info.address, [this](float32 v) { set_fp(R2, v, F_NONE); });
 		// TRAPS: C,U,A,P,R,I
 		break;
 	case 0x66:
 	case 0x67:
 		// loadd: load double floating
-		temp = m_data->read_qword(m_info.address);
-		if (!m_exception)
-			set_fp(R2, (float64)temp, F_NONE);
+		get_dcammu().load<float64>(m_ssw, m_info.address, [this](float64 v) { set_fp(R2, float64(v), F_NONE); });
 		// TRAPS: C,U,A,P,R,I
 		break;
 	case 0x68:
 	case 0x69:
 		// loadb: load byte
-		temp = s64(s8(m_data->read_byte(m_info.address)));
-		if (!m_exception)
-			m_r[R2] = temp;
+		get_dcammu().load<s8>(m_ssw, m_info.address, [this](s32 v) { m_r[R2] = v; });
 		// TRAPS: C,U,A,P,R,I
 		break;
 	case 0x6a:
 	case 0x6b:
 		// loadbu: load byte unsigned
-		temp = m_data->read_byte(m_info.address);
-		if (!m_exception)
-			m_r[R2] = temp;
+		get_dcammu().load<u8>(m_ssw, m_info.address, [this](u32 v) { m_r[R2] = v; });
 		// TRAPS: C,U,A,P,R,I
 		break;
 	case 0x6c:
 	case 0x6d:
 		// loadh: load halfword
-		temp = s64(s16(m_data->read_word(m_info.address)));
-		if (!m_exception)
-			m_r[R2] = temp;
+		get_dcammu().load<s16>(m_ssw, m_info.address, [this](s32 v) { m_r[R2] = v; });
 		// TRAPS: C,U,A,P,R,I
 		break;
 	case 0x6e:
 	case 0x6f:
 		// loadhu: load halfword unsigned
-		temp = m_data->read_word(m_info.address);
-		if (!m_exception)
-			m_r[R2] = temp;
+		get_dcammu().load<u16>(m_ssw, m_info.address, [this](u32 v) { m_r[R2] = v; });
 		// TRAPS: C,U,A,P,R,I
 		break;
 	case 0x70:
 	case 0x71:
 		// storw: store word
-		m_data->write_dword(m_info.address, m_r[R2]);
+		get_dcammu().store<u32>(m_ssw, m_info.address, m_r[R2]);
 		// TRAPS: A,P,W,I
 		break;
 	case 0x72:
 	case 0x73:
 		// tsts: test and set
-		temp = m_data->read_dword(m_info.address);
-		if (!m_exception)
-		{
-			m_data->write_dword(m_info.address, temp | 0x80000000U);
-			if (!m_exception)
-				m_r[R2] = temp;
-		}
+		get_dcammu().modify<u32>(m_ssw, m_info.address, [this](u32 v) {
+			m_r[R2] = v;
+			return v | 0x80000000U;
+		});
 		// TRAPS: C,U,A,P,R,W,I
 		break;
 	case 0x74:
 	case 0x75:
 		// stors: store single floating
-		m_data->write_dword(m_info.address, get_fp32(R2));
+		get_dcammu().store<float32>(m_ssw, m_info.address, get_fp32(R2));
 		// TRAPS: A,P,W,I
 		break;
 	case 0x76:
 	case 0x77:
 		// stord: store double floating
-		m_data->write_qword(m_info.address, get_fp64(R2));
+		get_dcammu().store<float64>(m_ssw, m_info.address, get_fp64(R2));
 		// TRAPS: A,P,W,I
 		break;
 	case 0x78:
 	case 0x79:
 		// storb: store byte
-		m_data->write_byte(m_info.address, m_r[R2]);
+		get_dcammu().store<u8>(m_ssw, m_info.address, m_r[R2]);
 		// TRAPS: A,P,W,I
 		break;
 
 	case 0x7c:
 	case 0x7d:
 		// storh: store halfword
-		m_data->write_word(m_info.address, m_r[R2]);
+		get_dcammu().store<u16>(m_ssw, m_info.address, m_r[R2]);
 		// TRAPS: A,P,W,I
 		break;
 
@@ -1163,7 +1131,7 @@ void clipper_device::execute_instruction()
 
 			// store ri at sp - 4 * (15 - i)
 			for (int i = R2; i < 15 && !m_exception; i++)
-				m_data->write_dword(m_r[15] - 4 * (15 - i), m_r[i]);
+				get_dcammu().store<u32>(m_ssw, m_r[15] - 4 * (15 - i), m_r[i]);
 
 			// decrement sp after push to allow restart on exceptions
 			if (!m_exception)
@@ -1179,11 +1147,8 @@ void clipper_device::execute_instruction()
 
 			while (m_r[0])
 			{
-				const u8 byte = m_data->read_byte(m_r[1]);
-				if (m_exception)
-					break;
+				get_dcammu().load<u8>(m_ssw, m_r[1], [this](u8 byte) { get_dcammu().store<u8>(m_ssw, m_r[2], byte); });
 
-				m_data->write_byte(m_r[2], byte);
 				if (m_exception)
 					break;
 
@@ -1197,8 +1162,7 @@ void clipper_device::execute_instruction()
 			// initc: initialise r0 bytes at r1 with value in r2
 			while (m_r[0])
 			{
-				m_data->write_byte(m_r[1], m_r[2]);
-				if (m_exception)
+				if (!get_dcammu().store<u8>(m_ssw, m_r[1], m_r[2]))
 					break;
 
 				m_r[0]--;
@@ -1215,18 +1179,15 @@ void clipper_device::execute_instruction()
 
 			while (m_r[0])
 			{
-				// set condition codes and abort the loop if the current byte does not match
-				s32 byte1 = s8(m_data->read_byte(m_r[1]));
-				if (m_exception)
+				// read and compare bytes (as signed 32 bit integers)
+				get_dcammu().load<s8>(m_ssw, m_r[1], [this](s32 byte1) {
+					get_dcammu().load<s8>(m_ssw, m_r[2], [this, byte1](s32 byte2) {
+						if (byte1 != byte2)
+							FLAGS(C_SUB(byte2, byte1), V_SUB(byte2, byte1), byte2 == byte1, byte2 < byte1); }); });
+
+				// abort on exception or mismatch
+				if (m_exception || !PSW(Z))
 					break;
-				s32 byte2 = s8(m_data->read_byte(m_r[2]));
-				if (m_exception)
-					break;
-				if (byte1 != byte2)
-				{
-					FLAGS(C_SUB(byte2, byte1), V_SUB(byte2, byte1), byte2 == byte1, byte2 < byte1)
-					break;
-				}
 
 				m_r[0]--;
 				m_r[1]++;
@@ -1241,13 +1202,8 @@ void clipper_device::execute_instruction()
 			// restwN..restw12: pop registers rN:r14
 
 			// load ri from sp + 4 * (i - N)
-			for (int i = R2; i < 15; i++)
-			{
-				temp = m_data->read_dword(m_r[15] + 4 * (i - R2));
-				if (m_exception)
-					break;
-				m_r[i] = temp;
-			}
+			for (int i = R2; i < 15 && !m_exception; i++)
+				get_dcammu().load<u32>(m_ssw, m_r[15] + 4 * (i - R2), [this, i](u32 v) { m_r[i] = v; });
 
 			// increment sp after pop to allow restart on exceptions
 			if (!m_exception)
@@ -1261,7 +1217,7 @@ void clipper_device::execute_instruction()
 
 			// store fi at sp - 8 * (8 - i)
 			for (int i = R2; i < 8 && !m_exception; i++)
-				m_data->write_qword(m_r[15] - 8 * (8 - i), get_fp64(i));
+				get_dcammu().store<float64>(m_ssw, m_r[15] - 8 * (8 - i), get_fp64(i));
 
 			// decrement sp after push to allow restart on exceptions
 			if (!m_exception)
@@ -1273,13 +1229,8 @@ void clipper_device::execute_instruction()
 			// restd0..restd7: pop registers fN:f7
 
 			// load fi from sp + 8 * (i - N)
-			for (int i = R2; i < 8; i++)
-			{
-				temp = m_data->read_qword(m_r[15] + 8 * (i - R2));
-				if (m_exception)
-					break;
-				set_fp(i, (float64)temp, F_NONE);
-			}
+			for (int i = R2; i < 8 && !m_exception; i++)
+				get_dcammu().load<float64>(m_ssw, m_r[15] + 8 * (i - R2), [this, i](float64 v) { set_fp(i, v, F_NONE); });
 
 			// increment sp after pop to allow restart on exceptions
 			if (!m_exception)
@@ -1438,7 +1389,7 @@ void clipper_device::execute_instruction()
 			case 0x02:
 				// saveur: save user registers
 				for (int i = 0; i < 16 && !m_exception; i++)
-					m_data->write_dword(m_rs[(m_info.macro >> 4) & 0xf] - 4 * (i + 1), m_ru[15 - i]);
+					get_dcammu().store<u32>(m_ssw, m_rs[(m_info.macro >> 4) & 0xf] - 4 * (i + 1), m_ru[15 - i]);
 
 				if (!m_exception)
 					m_rs[(m_info.macro >> 4) & 0xf] -= 64;
@@ -1446,13 +1397,8 @@ void clipper_device::execute_instruction()
 				break;
 			case 0x03:
 				// restur: restore user registers
-				for (int i = 0; i < 16; i++)
-				{
-					temp = m_data->read_dword(m_rs[(m_info.macro >> 4) & 0xf] + 4 * i);
-					if (m_exception)
-						break;
-					m_ru[i] = temp;
-				}
+				for (int i = 0; i < 16 && !m_exception; i++)
+					get_dcammu().load<u32>(m_ssw, m_rs[(m_info.macro >> 4) & 0xf] + 4 * i, [this, i](u32 v) { m_ru[i] = v; });
 
 				if (!m_exception)
 					m_rs[(m_info.macro >> 4) & 0xf] += 64;
@@ -1465,7 +1411,7 @@ void clipper_device::execute_instruction()
 				break;
 			case 0x05:
 				// wait: wait for interrupt
-				m_ip = m_pc;
+				m_wait = true;
 				// TRAPS: S
 				break;
 
@@ -1486,17 +1432,16 @@ void clipper_device::execute_instruction()
 
 u32 clipper_device::reti()
 {
+	u32 new_psw = 0, new_ssw = 0, new_pc = 0;
+
 	// fetch the psw, ssw and pc from the supervisor stack
-	const u32 new_psw = m_data->read_dword(m_rs[(m_info.macro >> 4) & 0xf] + 0);
-	if (m_exception)
+	if (!get_dcammu().load<u32>(m_ssw, m_rs[(m_info.macro >> 4) & 0xf] + 0, [&new_psw](u32 v) { new_psw = v; }))
 		fatalerror("reti unrecoverable fault 0x%04x read psw address 0x%08x pc 0x%08x\n", m_exception, m_rs[(m_info.macro >> 4) & 0xf] + 0, m_pc);
 
-	const u32 new_ssw = m_data->read_dword(m_rs[(m_info.macro >> 4) & 0xf] + 4);
-	if (m_exception)
+	if (!get_dcammu().load<u32>(m_ssw, m_rs[(m_info.macro >> 4) & 0xf] + 4, [&new_ssw](u32 v) { new_ssw = v; }))
 		fatalerror("reti unrecoverable fault 0x%04x read ssw address 0x%08x pc 0x%08x\n", m_exception, m_rs[(m_info.macro >> 4) & 0xf] + 4, m_pc);
 
-	const u32 new_pc = m_data->read_dword(m_rs[(m_info.macro >> 4) & 0xf] + 8);
-	if (m_exception)
+	if (!get_dcammu().load<u32>(m_ssw, m_rs[(m_info.macro >> 4) & 0xf] + 8, [&new_pc](u32 v) { new_pc = v; }))
 		fatalerror("reti unrecoverable fault 0x%04x read pc address 0x%08x pc 0x%08x\n", m_exception, m_rs[(m_info.macro >> 4) & 0xf] + 8, m_pc);
 
 	LOGMASKED(LOG_EXCEPTION, "reti r%d ssp 0x%08x pc 0x%08x ssw 0x%08x psw 0x%08x new_pc 0x%08x new_ssw 0x%08x new_psw 0x%08x\n",
@@ -1522,6 +1467,7 @@ u32 clipper_device::intrap(const u16 vector, const u32 old_pc)
 {
 	const u32 old_ssw = m_ssw;
 	const u32 old_psw = m_psw;
+	u32 new_pc = 0, new_ssw = 0;
 
 	// clear ssw bits to enable supervisor memory access
 	m_ssw &= ~(SSW_U | SSW_K | SSW_UU | SSW_KU);
@@ -1530,13 +1476,10 @@ u32 clipper_device::intrap(const u16 vector, const u32 old_pc)
 	m_exception = 0;
 
 	// fetch next pc and ssw from interrupt vector
-	const u32 new_pc = m_data->read_dword(vector + get_evpc_offset());
-	if (m_exception)
-		fatalerror("intrap unrecoverable fault 0x%04x read pc address 0x%08x pc 0x%08x\n", m_exception, vector + get_evpc_offset(), old_pc);
-
-	const u32 new_ssw = m_data->read_dword(vector + get_evssw_offset());
-	if (m_exception)
-		fatalerror("intrap unrecoverable fault 0x%04x read ssw address 0x%08x pc 0x%08x\n", m_exception, vector + get_evssw_offset(), old_pc);
+	if (!get_dcammu().load<u32>(m_ssw, vector + 0, [&new_pc](u32 v) { new_pc = v; }))
+		fatalerror("intrap unrecoverable fault 0x%04x load pc address 0x%08x pc 0x%08x\n", m_exception, vector + 0, old_pc);
+	if (!get_dcammu().load<u32>(m_ssw, vector + 4, [&new_ssw](u32 v) { new_ssw = v; }))
+		fatalerror("intrap unrecoverable fault 0x%04x load ssw address 0x%08x pc 0x%08x\n", m_exception, vector + 4, old_pc);
 
 	LOGMASKED(LOG_EXCEPTION, "intrap vector 0x%04x pc 0x%08x ssp 0x%08x new_pc 0x%08x new_ssw 0x%08x\n", vector, old_pc, m_rs[15], new_pc, new_ssw);
 
@@ -1581,18 +1524,107 @@ u32 clipper_device::intrap(const u16 vector, const u32 old_pc)
 	}
 
 	// push pc, ssw and psw onto supervisor stack
-	m_data->write_dword(m_rs[15] - 0x4, old_pc);
-	if (m_exception)
-		fatalerror("intrap unrecoverable fault 0x%04x write pc address 0x%08x pc 0x%08x\n", m_exception, m_rs[15] - 0x4, old_pc);
-	m_data->write_dword(m_rs[15] - 0x8, old_ssw);
-	if (m_exception)
-		fatalerror("intrap unrecoverable fault 0x%04x write ssw address 0x%08x pc 0x%08x\n", m_exception, m_rs[15] - 0x8, old_pc);
-	m_data->write_dword(m_rs[15] - 0xc, (old_psw & ~(PSW_CTS | PSW_MTS)) | source);
-	if (m_exception)
-		fatalerror("intrap unrecoverable fault 0x%04x write psw address 0x%08x pc 0x%08x\n", m_exception, m_rs[15] - 0xc, old_pc);
+	if (!get_dcammu().store<u32>(m_ssw, m_rs[15] - 0x4, old_pc))
+		fatalerror("intrap unrecoverable fault 0x%04x push pc ssp 0x%08x pc 0x%08x\n", m_exception, m_rs[15] - 0x4, old_pc);
+
+	if (!get_dcammu().store<u32>(m_ssw, m_rs[15] - 0x8, old_ssw))
+		fatalerror("intrap unrecoverable fault 0x%04x push ssw ssp 0x%08x pc 0x%08x\n", m_exception, m_rs[15] - 0x8, old_pc);
+
+	if (!get_dcammu().store<u32>(m_ssw, m_rs[15] - 0xc, (old_psw & ~(PSW_CTS | PSW_MTS)) | source))
+		fatalerror("intrap unrecoverable fault 0x%04x push psw ssp 0x%08x pc 0x%08x\n", m_exception, m_rs[15] - 0xc, old_pc);
 
 	// decrement supervisor stack pointer
-	m_rs[15] -= get_eframe_size();
+	m_rs[15] -= 12;
+
+	// set ssw from vector and previous mode
+	set_ssw((new_ssw & ~SSW_P) | (old_ssw & SSW_U) << 1);
+
+	// clear psw
+	set_psw(0);
+
+	// return new pc from trap vector
+	return new_pc;
+}
+
+u32 clipper_c400_device::intrap(const u16 vector, const u32 old_pc)
+{
+	const u32 old_ssw = m_ssw;
+	const u32 old_psw = m_psw;
+	u32 new_pc = 0, new_ssw = 0;
+
+	// clear ssw bits to enable supervisor memory access
+	m_ssw &= ~(SSW_U | SSW_K | SSW_UU | SSW_KU);
+
+	// clear exception state
+	m_exception = 0;
+
+	// fetch ssw and pc from interrupt vector (C400 reversed wrt C100/C300)
+	if (!get_dcammu().load<u32>(m_ssw, vector + 0, [&new_ssw](u32 v) { new_ssw = v; }))
+		fatalerror("intrap unrecoverable fault 0x%04x load ssw address 0x%08x pc 0x%08x\n", m_exception, vector + 0, old_pc);
+	if (!get_dcammu().load<u32>(m_ssw, vector + 4, [&new_pc](u32 v) { new_pc = v; }))
+		fatalerror("intrap unrecoverable fault 0x%04x load pc address 0x%08x pc 0x%08x\n", m_exception, vector + 4, old_pc);
+
+	LOGMASKED(LOG_EXCEPTION, "intrap vector 0x%04x pc 0x%08x ssp 0x%08x new_pc 0x%08x new_ssw 0x%08x\n", vector, old_pc, m_rs[15], new_pc, new_ssw);
+
+	// derive cts and mts from vector
+	u32 source = 0;
+	switch (vector)
+	{
+		// data memory trap group
+	case EXCEPTION_D_CORRECTED_MEMORY_ERROR:
+	case EXCEPTION_D_UNCORRECTABLE_MEMORY_ERROR:
+	case EXCEPTION_D_ALIGNMENT_FAULT:
+	case EXCEPTION_D_PAGE_FAULT:
+	case EXCEPTION_D_READ_PROTECT_FAULT:
+	case EXCEPTION_D_WRITE_PROTECT_FAULT:
+
+		// instruction memory trap group
+	case EXCEPTION_I_CORRECTED_MEMORY_ERROR:
+	case EXCEPTION_I_UNCORRECTABLE_MEMORY_ERROR:
+	case EXCEPTION_I_ALIGNMENT_FAULT:
+	case EXCEPTION_I_PAGE_FAULT:
+	case EXCEPTION_I_EXECUTE_PROTECT_FAULT:
+		source = (vector & MTS_VMASK) << (MTS_SHIFT - MTS_VSHIFT);
+		break;
+
+		// integer arithmetic trap group
+	case EXCEPTION_INTEGER_DIVIDE_BY_ZERO:
+		source = CTS_DIVIDE_BY_ZERO;
+		break;
+
+		// illegal operation trap group
+	case EXCEPTION_ILLEGAL_OPERATION:
+		source = CTS_ILLEGAL_OPERATION;
+		break;
+	case EXCEPTION_PRIVILEGED_INSTRUCTION:
+		source = CTS_PRIVILEGED_INSTRUCTION;
+		break;
+
+		// diagnostic trap group
+	case EXCEPTION_TRACE:
+		source = CTS_TRACE_TRAP;
+		break;
+	}
+
+	// push pc, ssw and psw onto supervisor stack
+	if (!get_dcammu().store<u32>(m_ssw, m_rs[15] - 0x4, old_pc))
+		fatalerror("intrap unrecoverable fault 0x%04x push pc ssp 0x%08x pc 0x%08x\n", m_exception, m_rs[15] - 0x4, old_pc);
+
+	if (!get_dcammu().store<u32>(m_ssw, m_rs[15] - 0x8, old_ssw))
+		fatalerror("intrap unrecoverable fault 0x%04x push ssw ssp 0x%08x pc 0x%08x\n", m_exception, m_rs[15] - 0x8, old_pc);
+
+	if (!get_dcammu().store<u32>(m_ssw, m_rs[15] - 0xc, (old_psw & ~(PSW_CTS | PSW_MTS)) | source))
+		fatalerror("intrap unrecoverable fault 0x%04x push psw ssp 0x%08x pc 0x%08x\n", m_exception, m_rs[15] - 0xc, old_pc);
+
+	// TODO: push pc1
+	// TODO: push pc2
+
+	// push delayed branch pc onto supervisor stack
+	if (!get_dcammu().store<u32>(m_ssw, m_rs[15] - 0x18, m_db_pc))
+		fatalerror("intrap unrecoverable fault 0x%04x push db_pc address 0x%08x pc 0x%08x\n", m_exception, m_rs[15] - 0x18, old_pc);
+
+	// decrement supervisor stack pointer
+	m_rs[15] -= 24;
 
 	// set ssw from vector and previous mode
 	set_ssw((new_ssw & ~SSW_P) | (old_ssw & SSW_U) << 1);
@@ -1736,37 +1768,119 @@ void clipper_device::fp_exception()
 
 void clipper_c400_device::execute_instruction()
 {
+	// update delay slot pointer
+	switch (PSW(DSP))
+	{
+	case DSP_S1:
+		// take delayed branch
+		m_psw &= ~PSW_DSP;
+		m_ip = m_db_pc;
+		return;
+
+	case DSP_SALL:
+		// one delay slot still active
+		m_psw &= ~PSW_DSP;
+		m_psw |= DSP_S1;
+		break;
+
+	case DSP_SETUP:
+		// two delay slots active
+		m_psw &= ~PSW_DSP;
+		m_psw |= DSP_SALL;
+		break;
+	}
+
+	// if executing a delay slot instruction, test for valid type
+	if (PSW(DSP))
+	{
+		switch (m_info.opcode)
+		{
+		case 0x13: // ret
+		case 0x44: // call
+		case 0x45:
+		case 0x48: // b*
+		case 0x49:
+		case 0x4a: // cdb
+		case 0x4b:
+		case 0x4c: // cdbeq
+		case 0x4d:
+		case 0x4e: // cdbne
+		case 0x4f:
+		case 0x50: // db*
+		case 0x51:
+			// TODO: this should throw some kind of illegal instruction trap, not abort
+			fatalerror("instruction type 0x%02x invalid in branch delay slot pc 0x%08x\n", m_info.opcode, m_pc);
+
+		default:
+			break;
+		}
+	}
+
 	switch (m_info.opcode)
 	{
-#ifdef UNIMPLEMENTED_C400
 	case 0x46:
 	case 0x47:
-		// loadd2:
+		// loadd2: load double floating double
+		// TODO: 128-bit load
+		get_dcammu().load<float64>(m_ssw, m_info.address + 0, [this](float64 v) { set_fp(R2 + 0, v, F_NONE); });
+		get_dcammu().load<float64>(m_ssw, m_info.address + 8, [this](float64 v) { set_fp(R2 + 1, v, F_NONE); });
+		// TRAPS: C,U,A,P,R,I
 		break;
 
 	case 0x4a:
 	case 0x4b:
-		// cdb:
-		break;
+		// cdb: call with delayed branch?
+		// emulate.h: "cdb is special because it does not support all addressing modes", 2-3 parcels
+		fatalerror("cdb pc 0x%08x\n", m_pc);
 	case 0x4c:
 	case 0x4d:
-		// cdbeq:
-		break;
+		// cdbeq: call with delayed branch if equal?
+		fatalerror("cdbeq pc 0x%08x\n", m_pc);
 	case 0x4e:
 	case 0x4f:
-		// cdbne:
-		break;
+		// cdbne: call with delayed branch if not equal?
+		fatalerror("cdbne pc 0x%08x\n", m_pc);
 	case 0x50:
 	case 0x51:
-		// db*:
+		// db*: delayed branch on condition
+		if (evaluate_branch())
+		{
+			m_psw |= DSP_SETUP;
+			m_db_pc = m_info.address;
+		}
 		break;
 
 	case 0xb0:
 		// abss: absolute value single floating?
+		if (float32_lt(get_fp32(R1), 0))
+			set_fp(R2, float32_mul(get_fp32(R1), int32_to_float32(-1)), F_IVUX);
+		else
+			set_fp(R2, get_fp32(R1), F_IVUX);
 		break;
 
 	case 0xb2:
 		// absd: absolute value double floating?
+		if (float64_lt(get_fp64(R1), 0))
+			set_fp(R2, float64_mul(get_fp64(R1), int32_to_float64(-1)), F_IVUX);
+		else
+			set_fp(R2, get_fp64(R1), F_IVUX);
+		break;
+
+	case 0xb4:
+		// unprivileged macro instructions
+		switch (m_info.subopcode)
+		{
+		case 0x44:
+			// cnvxsw: ??
+			fatalerror("cnvxsw pc 0x%08x\n", m_pc);
+		case 0x46:
+			// cnvxdw: ??
+			fatalerror("cnvxdw pc 0x%08x\n", m_pc);
+
+		default:
+			clipper_device::execute_instruction();
+			break;
+		}
 		break;
 
 	case 0xb6:
@@ -1777,19 +1891,29 @@ void clipper_c400_device::execute_instruction()
 			{
 			case 0x07:
 				// loadts: unknown?
+				fatalerror("loadts pc 0x%08x\n", m_pc);
+
+			default:
+				clipper_device::execute_instruction();
 				break;
 			}
 		}
+		else
+			m_exception = EXCEPTION_PRIVILEGED_INSTRUCTION;
 		break;
 
 	case 0xbc:
 		// waitd:
+		if (!SSW(U))
+			; // TODO: don't know what this instruction does
+		else
+			m_exception = EXCEPTION_PRIVILEGED_INSTRUCTION;
 		break;
 
 	case 0xc0:
-		// s*:
+		// s*: set register on condition
+		m_r[R1] = evaluate_branch() ? 1 : 0;
 		break;
-#endif
 
 	default:
 		clipper_device::execute_instruction();

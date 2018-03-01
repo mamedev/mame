@@ -15,16 +15,16 @@
 //**************************************************************************
 
 #define MCFG_SEGAPCM_ADD(tag, clock) \
-		MCFG_DEVICE_ADD((tag), SEGAPCM, (clock))
+	MCFG_DEVICE_ADD((tag), SEGAPCM, (clock))
 
 #define MCFG_SEGAPCM_REPLACE(tag, clock) \
-		MCFG_DEVICE_REPLACE((tag), SEGAPCM, (clock))
+	MCFG_DEVICE_REPLACE((tag), SEGAPCM, (clock))
 
 #define MCFG_SEGAPCM_BANK(bank) \
-		segapcm_device::set_bank(*device, (segapcm_device::bank));
+	downcast<segapcm_device &>(*device).set_bank((segapcm_device::bank));
 
 #define MCFG_SEGAPCM_BANK_MASK(bank, mask) \
-		segapcm_device::set_bank(*device, (segapcm_device::bank) | (segapcm_device::mask));
+	downcast<segapcm_device &>(*device).set_bank((segapcm_device::bank) | (segapcm_device::mask));
 
 
 //**************************************************************************
@@ -45,8 +45,8 @@ public:
 
 	segapcm_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
-	// static configuration
-	static void set_bank(device_t &device, int bank) { downcast<segapcm_device &>(device).m_bank = bank; }
+	// configuration
+	void set_bank(int bank) { m_bank = bank; }
 
 	DECLARE_WRITE8_MEMBER( sega_pcm_w );
 	DECLARE_READ8_MEMBER( sega_pcm_r );

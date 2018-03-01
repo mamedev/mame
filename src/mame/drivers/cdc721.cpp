@@ -161,7 +161,7 @@ MACHINE_CONFIG_START(cdc721_state::cdc721)
 	MCFG_PALETTE_INIT_OWNER(cdc721_state, cdc721)
 	MCFG_GFXDECODE_ADD("gfxdecode", "palette", cdc721)
 
-	MCFG_DEVICE_ADD("crtc", TMS9927, 2000000) // clock guess
+	MCFG_DEVICE_ADD("crtc", TMS9927, 2000000 / 8) // clock guess
 	MCFG_TMS9927_CHAR_WIDTH(8)
 MACHINE_CONFIG_END
 
