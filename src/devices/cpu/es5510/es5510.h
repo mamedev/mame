@@ -15,8 +15,8 @@
 class es5510_device : public cpu_device {
 public:
 	// TODO : Not verified
-	static constexpr DRAM_SIZE (1<<20);
-	static constexpr DRAM_MASK (DRAM_SIZE-1);
+	static constexpr uint32_t DRAM_SIZE = (1<<20);
+	static constexpr uint32_t DRAM_MASK = (DRAM_SIZE-1);
 	static constexpr feature_type imperfect_features() { return feature::SOUND; }
 
 	es5510_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
