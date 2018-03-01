@@ -60,10 +60,16 @@ public:
 		, m_buttons(*this, "BUTTONS")
 		, m_maincpu(*this, "maincpu")
 		, m_bank(*this, "bank")
+		, m_leds(*this, "p%c%u", unsigned('a'), 0U)
 		, m_rxd(true)
 	{
 	}
 
+	DECLARE_INPUT_CHANGED_MEMBER(update_buttons);
+
+	void sitcom(machine_config &config);
+
+protected:
 	template <unsigned D> DECLARE_WRITE16_MEMBER(update_ds) { output().set_digit_value((D << 2) | offset, data); }
 	DECLARE_WRITE_LINE_MEMBER(update_rxd)                   { m_rxd = bool(state); }
 	DECLARE_WRITE_LINE_MEMBER(sod_led)                      { output().set_value("sod_led", state); }
@@ -72,19 +78,17 @@ public:
 	virtual DECLARE_WRITE8_MEMBER(update_pia_pa);
 	virtual DECLARE_WRITE8_MEMBER(update_pia_pb);
 
-	DECLARE_INPUT_CHANGED_MEMBER(update_buttons);
-
-	void sitcom(machine_config &config);
 	void sitcom_bank(address_map &map);
 	void sitcom_io(address_map &map);
 	void sitcom_mem(address_map &map);
-protected:
+
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
 
 	required_ioport                          m_buttons;
 	required_device<cpu_device>              m_maincpu;
 	required_device<address_map_bank_device> m_bank;
+	output_finder<2, 8>                      m_leds;
 
 	bool m_rxd;
 };
@@ -110,15 +114,16 @@ public:
 	{
 	}
 
-	virtual DECLARE_WRITE8_MEMBER(update_pia_pa) override;
-	virtual DECLARE_WRITE8_MEMBER(update_pia_pb) override;
 	DECLARE_READ_LINE_MEMBER(shutter_r);
-
 	DECLARE_INPUT_CHANGED_MEMBER(update_shutter);
 	DECLARE_INPUT_CHANGED_MEMBER(update_speed);
 
 	void sitcomtmr(machine_config &config);
+
 protected:
+	virtual DECLARE_WRITE8_MEMBER(update_pia_pa) override;
+	virtual DECLARE_WRITE8_MEMBER(update_pia_pb) override;
+
 	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr) override;
 
 	virtual void machine_start() override;
@@ -201,6 +206,8 @@ INPUT_PORTS_END
 
 void sitcom_state::machine_start()
 {
+	m_leds.resolve();
+
 	save_item(NAME(m_rxd));
 
 	m_rxd = true;
@@ -214,13 +221,13 @@ void sitcom_state::machine_reset()
 WRITE8_MEMBER( sitcom_state::update_pia_pa )
 {
 	for (int i = 0; 8 > i; ++i)
-		output().set_indexed_value("pa", i, BIT(data, i));
+		m_leds[0][i] = BIT(data, i);
 }
 
 WRITE8_MEMBER( sitcom_state::update_pia_pb )
 {
 	for (int i = 0; 8 > i; ++i)
-		output().set_indexed_value("pb", i, BIT(data, i));
+		m_leds[1][i] = BIT(data, i);
 }
 
 INPUT_CHANGED_MEMBER( sitcom_state::update_buttons )
@@ -374,8 +381,9 @@ MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(sitcom_timer_state::sitcomtmr)
 	sitcom(config);
+
 	MCFG_DEVICE_ADD("ds2", DL1414T, 0) // remote display
-	MCFG_DL1414_UPDATE_HANDLER(WRITE16(sitcom_state, update_ds<2>))
+	MCFG_DL1414_UPDATE_HANDLER(WRITE16(sitcom_timer_state, update_ds<2>))
 
 	MCFG_DEFAULT_LAYOUT(layout_sitcomtmr)
 MACHINE_CONFIG_END

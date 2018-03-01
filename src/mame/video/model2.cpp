@@ -91,6 +91,7 @@
 #include "video/segaic24.h"
 #include "includes/model2.h"
 
+#include <cmath>
 
 #define pz      p[0]
 #define pu      p[1]
@@ -213,7 +214,10 @@ static int32_t clip_polygon(poly_vertex *v, int32_t num_vertices, plane *cp, pol
 		nextin = (nextdot >= cp->distance) ? 1 : 0;
 
 		/* Add a clipped vertex if one end of the current edge is inside the plane and the other is outside */
-		if ( curin != nextin )
+		// TODO: displaying Honey in Fighting Vipers and Bean in Sonic the Fighters somehow causes a NaN dot product here, 
+		//       causing MAME to hardlock in the renderer routine. They are also causing lots of invalid polygon renders
+		//       which might be related.
+		if ( curin != nextin && std::isnan(curdot) == false && std::isnan(nextdot) == false )
 		{
 			scale = (cp->distance - curdot) / (nextdot - curdot);
 
@@ -1941,6 +1945,11 @@ static uint32_t * geo_object_data( geo_state *geo, uint32_t opcode, uint32_t *in
 		/* Slow Polygon RAM */
 		obp = &geo->polygon_ram0[oba & 0x7FFF];
 	}
+
+	// if count == 0 then rolls over to max size
+	// Virtual On & Gunblade NY
+	if(obc == 0)
+		obc = 0xfffff;
 
 	switch( geo->mode & 3 )
 	{

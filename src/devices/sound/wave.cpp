@@ -25,12 +25,6 @@
 
 
 
-void wave_device::static_set_cassette_tag(device_t &device, const char *cassette_tag)
-{
-	wave_device &wave = downcast<wave_device &>(device);
-	wave.m_cassette_tag = cassette_tag;
-}
-
 DEFINE_DEVICE_TYPE(WAVE, wave_device, "wave", "Wave")
 
 wave_device::wave_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)

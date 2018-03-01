@@ -53,6 +53,7 @@ public:
 	DECLARE_WRITE8_MEMBER(page_w);
 
 	DECLARE_WRITE_LINE_MEMBER(vsyn_w);
+	DECLARE_WRITE_LINE_MEMBER(so_w);
 	DECLARE_WRITE_LINE_MEMBER(dav_w);
 
 	void ampex(machine_config &config);
@@ -63,6 +64,7 @@ private:
 	u8 m_page;
 	u8 m_attr;
 	bool m_attr_readback;
+	bool m_uart_loopback;
 	std::unique_ptr<u16[]> m_paged_ram;
 
 	required_device<cpu_device> m_maincpu;
@@ -100,8 +102,7 @@ READ8_MEMBER(ampex_state::read_5841)
 
 WRITE8_MEMBER(ampex_state::write_5841)
 {
-	// bit 7 set for UART loopback test
-
+	m_uart_loopback = BIT(data, 7);
 	m_attr_readback = BIT(data, 5);
 }
 
@@ -160,6 +161,12 @@ WRITE_LINE_MEMBER(ampex_state::vsyn_w)
 	// should generate RST 6 interrupt
 }
 
+WRITE_LINE_MEMBER(ampex_state::so_w)
+{
+	if (m_uart_loopback)
+		m_uart->write_si(state);
+}
+
 WRITE_LINE_MEMBER(ampex_state::dav_w)
 {
 	// DAV should generate RST 7
@@ -188,13 +195,27 @@ void ampex_state::machine_start()
 	m_page = 0;
 	m_attr = 0;
 	m_attr_readback = false;
+	m_uart_loopback = false;
 	m_paged_ram = std::make_unique<u16[]>(0x1800 * 4);
 
 	m_uart->write_swe(0);
 
+	// Are rates hardwired to DIP switches? They don't seem to be software-controlled...
+	m_dbrg->str_w(0xe);
+	m_dbrg->stt_w(0xe);
+
+	// Make up some settings for the UART (probably also actually controlled by DIP switches)
+	m_uart->write_nb1(1);
+	m_uart->write_nb2(1);
+	m_uart->write_np(1);
+	m_uart->write_eps(1);
+	m_uart->write_tsb(0);
+	m_uart->write_cs(1);
+
 	save_item(NAME(m_page));
 	save_item(NAME(m_attr));
 	save_item(NAME(m_attr_readback));
+	save_item(NAME(m_uart_loopback));
 	save_pointer(NAME(m_paged_ram.get()), 0x1800 * 4);
 }
 
@@ -206,16 +227,18 @@ MACHINE_CONFIG_START(ampex_state::ampex)
 	MCFG_SCREEN_RAW_PARAMS(XTAL(23'814'000) / 2, 105 * CHAR_WIDTH, 0, 80 * CHAR_WIDTH, 270, 0, 250)
 	MCFG_SCREEN_UPDATE_DRIVER(ampex_state, screen_update)
 
-	// FIXME: dot clock should be divided by char width
-	MCFG_DEVICE_ADD("vtac", CRT5037, XTAL(23'814'000) / 2)
+	MCFG_DEVICE_ADD("vtac", CRT5037, XTAL(23'814'000) / 2 / CHAR_WIDTH)
 	MCFG_TMS9927_CHAR_WIDTH(CHAR_WIDTH)
 	MCFG_TMS9927_VSYN_CALLBACK(WRITELINE(ampex_state, vsyn_w))
 	MCFG_VIDEO_SET_SCREEN("screen")
 
 	MCFG_DEVICE_ADD("uart", AY31015, 0) // COM8017, actually
+	MCFG_AY31015_WRITE_SO_CB(WRITELINE(ampex_state, so_w))
 	MCFG_AY31015_WRITE_DAV_CB(WRITELINE(ampex_state, dav_w))
 
 	MCFG_DEVICE_ADD("dbrg", COM5016_5, XTAL(4'915'200))
+	MCFG_COM8116_FR_HANDLER(DEVWRITELINE("uart", ay31015_device, write_rcp))
+	MCFG_COM8116_FT_HANDLER(DEVWRITELINE("uart", ay31015_device, write_tcp))
 MACHINE_CONFIG_END
 
 ROM_START( dialog80 )

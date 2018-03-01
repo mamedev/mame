@@ -8,19 +8,19 @@
 /* an interface for the MSM5205 and similar chips */
 
 #define MCFG_MSM5205_PRESCALER_SELECTOR(select) \
-	msm5205_device::set_prescaler_selector(*device, (msm5205_device::select));
+	downcast<msm5205_device &>(*device).set_prescaler_selector((msm5205_device::select));
 
 #define MCFG_MSM5205_VCK_CALLBACK(cb) \
-	devcb = &msm5205_device::set_vck_callback(*device, (DEVCB_##cb));
+	devcb = &downcast<msm5205_device &>(*device).set_vck_callback((DEVCB_##cb));
 
 #define MCFG_MSM5205_VCLK_CB(cb) \
-	devcb = &msm5205_device::set_vck_legacy_callback(*device, (DEVCB_##cb));
+	devcb = &downcast<msm5205_device &>(*device).set_vck_legacy_callback((DEVCB_##cb));
 
 #define MCFG_MSM6585_PRESCALER_SELECTOR(select) \
-	msm6585_device::set_prescaler_selector(*device, (msm6585_device::select));
+	downcast<msm5205_device &>(*device).set_prescaler_selector((msm6585_device::select));
 
 #define MCFG_MSM6585_VCK_CALLBACK(cb) \
-	devcb = &msm6585_device::set_vck_callback(*device, (DEVCB_##cb));
+	devcb = &downcast<msm5205_device &>(*device).set_vck_callback((DEVCB_##cb));
 
 
 class msm5205_device : public device_t, public device_sound_interface
@@ -38,9 +38,14 @@ public:
 
 	msm5205_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock);
 
-	static void set_prescaler_selector(device_t &device, int select);
-	template <class Object> static devcb_base &set_vck_callback(device_t &device, Object &&cb) { return downcast<msm5205_device &>(device).m_vck_cb.set_callback(std::forward<Object>(cb)); }
-	template <class Object> static devcb_base &set_vck_legacy_callback(device_t &device, Object &&cb) { return downcast<msm5205_device &>(device).m_vck_legacy_cb.set_callback(std::forward<Object>(cb)); }
+	void set_prescaler_selector(int select)
+	{
+		m_s1 = BIT(select, 1);
+		m_s2 = BIT(select, 0);
+		m_bitwidth = (select & 4) ? 4 : 3;
+	}
+	template <class Object> devcb_base &set_vck_callback(Object &&cb) { return m_vck_cb.set_callback(std::forward<Object>(cb)); }
+	template <class Object> devcb_base &set_vck_legacy_callback(Object &&cb) { return m_vck_legacy_cb.set_callback(std::forward<Object>(cb)); }
 
 	// reset signal should keep for 2cycle of VCLK
 	DECLARE_WRITE_LINE_MEMBER(reset_w);

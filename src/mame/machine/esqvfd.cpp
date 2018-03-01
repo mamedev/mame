@@ -116,8 +116,10 @@ static const uint16_t font[]=
 	0x0000, // 0000 0000 0000 0000 (DEL)
 };
 
-esqvfd_device::esqvfd_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock) :
-	device_t(mconfig, type, tag, owner, clock)
+esqvfd_device::esqvfd_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock, int rows, int cols) :
+	device_t(mconfig, type, tag, owner, clock),
+	m_rows(rows),
+	m_cols(cols)
 {
 }
 
@@ -177,9 +179,7 @@ void esqvfd_device::update_display()
 
 				// force bottom bar on all underlined chars
 				if (m_attrs[row][col] & AT_UNDERLINE)
-				{
 					segdata |= 0x0008;
-				}
 
 				machine().output().set_indexed_value("vfd", (row*m_cols) + col, segdata);
 
@@ -317,10 +317,8 @@ bool esq2x40_device::write_contents(std::ostream &o)
 }
 
 
-esq2x40_device::esq2x40_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) : esqvfd_device(mconfig, ESQ2X40, tag, owner, clock)
+esq2x40_device::esq2x40_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) : esqvfd_device(mconfig, ESQ2X40, tag, owner, clock, 2, 40)
 {
-	m_rows = 2;
-	m_cols = 40;
 }
 
 /* 1x22 display from the VFX (not right, but it'll do for now) */
@@ -366,10 +364,8 @@ void esq1x22_device::write_char(int data)
 	update_display();
 }
 
-esq1x22_device::esq1x22_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) : esqvfd_device(mconfig, ESQ1X22, tag, owner, clock)
+esq1x22_device::esq1x22_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) : esqvfd_device(mconfig, ESQ1X22, tag, owner, clock, 1, 22)
 {
-	m_rows = 1;
-	m_cols = 22;
 }
 
 /* SQ-1 display, I think it's really an LCD but we'll deal with it for now */
@@ -429,10 +425,8 @@ void esq2x40_sq1_device::write_char(int data)
 	}
 }
 
-esq2x40_sq1_device::esq2x40_sq1_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) : esqvfd_device(mconfig, ESQ2X40_SQ1, tag, owner, clock)
+esq2x40_sq1_device::esq2x40_sq1_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) : esqvfd_device(mconfig, ESQ2X40_SQ1, tag, owner, clock, 2, 40)
 {
-	m_rows = 2;
-	m_cols = 40;
 	m_wait87shift = false;
 	m_wait88shift = false;
 }

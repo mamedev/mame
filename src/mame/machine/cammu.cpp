@@ -23,7 +23,6 @@
  *
  * TODO
  *   - fault register values
- *   - alignment faults
  *   - c3 protection faults
  *   - hard-wired and dynamic tlb
  *   - cache
@@ -112,18 +111,17 @@ DEFINE_DEVICE_TYPE(CAMMU_C4I, cammu_c4i_device, "c4i", "C4I CAMMU")
 DEFINE_DEVICE_TYPE(CAMMU_C3,  cammu_c3_device,  "c3",  "C1/C3 CAMMU")
 
 cammu_c4t_device::cammu_c4t_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-	: cammu_c4_device(mconfig, CAMMU_C4T, tag, owner, clock, CID_C4T)
+	: cammu_c4_device(mconfig, CAMMU_C4T, tag, owner, clock)
 {
 }
 
 cammu_c4i_device::cammu_c4i_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-	: cammu_c4_device(mconfig, CAMMU_C4I, tag, owner, clock, CID_C4I)
+	: cammu_c4_device(mconfig, CAMMU_C4I, tag, owner, clock)
 {
 }
 
-cammu_c4_device::cammu_c4_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock, u32 cammu_id)
+cammu_c4_device::cammu_c4_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock)
 	: cammu_device(mconfig, type, tag, owner, clock)
-	, m_control(cammu_id)
 {
 }
 
@@ -136,42 +134,13 @@ cammu_c3_device::cammu_c3_device(const machine_config &mconfig, const char *tag,
 
 cammu_device::cammu_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock)
 	: device_t(mconfig, type, tag, owner, clock)
-	, device_memory_interface(mconfig, *this)
-	, m_main_space_config("main", ENDIANNESS_LITTLE, 32, 32, 0)
-	, m_io_space_config("io", ENDIANNESS_LITTLE, 32, 32, 0)
-	, m_boot_space_config("boot", ENDIANNESS_LITTLE, 32, 32, 0)
-	, m_main_space(nullptr)
-	, m_io_space(nullptr)
-	, m_boot_space(nullptr)
-	, m_ssw_func(*this)
 	, m_exception_func(*this)
 {
 }
 
-device_memory_interface::space_config_vector cammu_device::memory_space_config() const
-{
-	return space_config_vector {
-		std::make_pair(0, &m_main_space_config),
-		std::make_pair(1, &m_io_space_config),
-		std::make_pair(2, &m_boot_space_config)
-	};
-}
-
-void cammu_c3_device::static_add_linked(device_t &device, const char *const tag)
-{
-	cammu_c3_device &parent = downcast<cammu_c3_device &>(device);
-
-	parent.m_linked.push_back(downcast<cammu_c3_device *>(parent.siblingdevice(tag)));
-}
-
 void cammu_device::device_start()
 {
-	m_ssw_func.resolve();
 	m_exception_func.resolve();
-
-	m_main_space = &space(0);
-	m_io_space = &space(1);
-	m_boot_space = &space(2);
 }
 
 void cammu_device::device_reset()
@@ -246,238 +215,168 @@ void cammu_c3_device::device_reset()
 	m_reset = 0;
 }
 
-READ32_MEMBER(cammu_device::read)
+void cammu_device::set_spaces(std::vector<address_space *> spaces)
 {
-	const u32 virtual_address = (offset << 2) | (
-		(mem_mask & 0x00ffffff) == 0 ? 0x3 :
-		(mem_mask & 0x0000ffff) == 0 ? 0x2 :
-		(mem_mask & 0x000000ff) == 0 ? 0x1 : 0x0);
-	offs_t physical_address;
+	assert_always(spaces.size() == 8, "exactly 8 address space pointers are required");
 
-	LOGMASKED(LOG_ACCESS, "%s read address 0x%08x mem_mask 0x%08x (%s)\n",
-		space.name(), virtual_address, mem_mask, machine().describe_context());
-
-	address_space *physical_space = translate_address(virtual_address, space.spacenum() == AS_PROGRAM ? ACCESS_X : ACCESS_R, &physical_address);
-
-	if (physical_space != nullptr)
-		return physical_space->read_dword(physical_address, mem_mask);
-	else
-		return space.unmap();
+	for (int i = 0; i < spaces.size(); i++)
+		m_space[i] = spaces[i];
 }
 
-WRITE32_MEMBER(cammu_device::write)
+cammu_device::translated_t cammu_device::translate_address(const u32 ssw, const u32 virtual_address, const access_size size, const access_type mode)
 {
-	const u32 virtual_address = (offset << 2) | (
-		(mem_mask & 0x00ffffff) == 0 ? 0x3 :
-		(mem_mask & 0x0000ffff) == 0 ? 0x2 :
-		(mem_mask & 0x000000ff) == 0 ? 0x1 : 0x0);
-	offs_t physical_address;
+	// get effective user/supervisor mode
+	const bool user = mode == EXECUTE ? ssw & SSW_U : ssw & (SSW_U | SSW_UU);
 
-	LOGMASKED(LOG_ACCESS, "%s write address 0x%08x data 0x%08x mem_mask 0x%08x (%s)\n",
-		space.name(), virtual_address, data, mem_mask, machine().describe_context());
+	// check for alignment faults
+	if (get_alignment() && !machine().side_effects_disabled())
+	{
+		if ((mode == EXECUTE && (virtual_address & 0x1)) || (mode != EXECUTE && virtual_address & (size - 1)))
+		{
+			set_fault_address(virtual_address);
+			m_exception_func(mode == EXECUTE ? EXCEPTION_I_ALIGNMENT_FAULT : EXCEPTION_D_ALIGNMENT_FAULT);
 
-	address_space *physical_space = translate_address(virtual_address, ACCESS_W, &physical_address);
-
-	if (physical_space != nullptr)
-		physical_space->write_dword(physical_address, data, mem_mask);
-}
-
-address_space *cammu_device::translate_address(const offs_t virtual_address, const access_t mode, offs_t *physical_address)
-{
-	// get ssw and user/supervisor mode
-	const u32 ssw = m_ssw_func();
-	const bool user = mode == ACCESS_X ? ssw & SSW_U : ssw & (SSW_U | SSW_UU);
-
-	// TODO: check for alignment faults
+			return { nullptr, 0 };
+		}
+	}
 
 	// in supervisor mode, the first 8 pages are always mapped via the hard-wired tlb
 	if (!user && (virtual_address & ~0x7fff) == 0)
 	{
 		switch (virtual_address & 0x7000)
 		{
-		case 0x0000:
-		case 0x1000:
-		case 0x2000:
-		case 0x3000:
 			// pages 0-3: main space pages 0-3
-			*physical_address = virtual_address & 0x3fff;
-			return m_main_space;
+		case 0x0000: return { m_space[ST1], virtual_address & 0x3fff };
+		case 0x1000: return { m_space[ST2], virtual_address & 0x3fff };
+		case 0x2000: return { m_space[ST3], virtual_address & 0x3fff };
+		case 0x3000: return { m_space[ST3], virtual_address & 0x3fff };
 
-		case 0x4000:
-		case 0x5000:
 			// pages 4-5: i/o space pages 0-1
-			*physical_address = virtual_address & 0x1fff;
-			return m_io_space;
+		case 0x4000: return { m_space[ST4], virtual_address & 0x1fff };
+		case 0x5000: return { m_space[ST4], virtual_address & 0x1fff };
 
-		case 0x6000:
-		case 0x7000:
 			// pages 6-7: boot space pages 0-1
-			*physical_address = virtual_address & 0x1fff;
-			return m_boot_space;
+		case 0x6000: return { m_space[ST5], virtual_address & 0x1fff };
+		case 0x7000: return { m_space[ST5], virtual_address & 0x1fff };
 		}
 	}
 
 	// if not in mapped mode, use unmapped system tag
 	if ((ssw & SSW_M) == 0)
-	{
-		*physical_address = virtual_address;
-
-		return get_ust_space();
-	}
+		return { m_space[get_ust_space()], virtual_address };
 
 	// get the page table entry
-	const u32 pte = get_pte(virtual_address, user);
+	pte_t pte = get_pte(virtual_address, user);
 
 	// check for page faults
-	if (pte & PTE_F)
+	if (pte.entry & PTE_F)
 	{
 		if (!machine().side_effects_disabled())
 		{
 			LOG("%s page fault address 0x%08x ssw 0x%08x pte 0x%08x (%s)\n",
-				mode == ACCESS_X ? "instruction" : "data",
-				virtual_address, ssw, pte, machine().describe_context());
+				mode == EXECUTE ? "instruction" : "data",
+				virtual_address, ssw, pte.entry, machine().describe_context());
 
 			set_fault_address(virtual_address);
-			m_exception_func(mode == ACCESS_X ? EXCEPTION_I_PAGE_FAULT : EXCEPTION_D_PAGE_FAULT);
+			m_exception_func(mode == EXECUTE ? EXCEPTION_I_PAGE_FAULT : EXCEPTION_D_PAGE_FAULT);
 		}
 
-		return nullptr;
+		return { nullptr, 0 };
 	}
 
 	// check for protection level faults
-	if (!machine().side_effects_disabled() && !get_access(mode, pte, ssw))
+	if (!machine().side_effects_disabled() && !get_access(mode, pte.entry, ssw))
 	{
 		LOG("%s protection fault address 0x%08x ssw 0x%08x pte 0x%08x (%s)\n",
-			mode == ACCESS_X ? "execute" : mode == ACCESS_R ? "read" : "write",
-			virtual_address, ssw, pte, machine().describe_context());
+			mode == EXECUTE ? "execute" : mode == READ ? "read" : "write",
+			virtual_address, ssw, pte.entry, machine().describe_context());
 
 		set_fault_address(virtual_address);
 		m_exception_func(
-			mode == ACCESS_X ? EXCEPTION_I_EXECUTE_PROTECT_FAULT :
-			mode == ACCESS_R ? EXCEPTION_D_READ_PROTECT_FAULT :
+			mode == EXECUTE ? EXCEPTION_I_EXECUTE_PROTECT_FAULT :
+			mode == READ ? EXCEPTION_D_READ_PROTECT_FAULT :
 			EXCEPTION_D_WRITE_PROTECT_FAULT);
 
-		return nullptr;
+		return { nullptr, 0 };
 	}
+
+	// set pte referenced and dirty flags
+	if (mode & WRITE && !(pte.entry & PTE_D))
+		m_space[ST0]->write_dword(pte.address, pte.entry | PTE_D | PTE_R);
+	else if (!(pte.entry & PTE_R))
+		m_space[ST0]->write_dword(pte.address, pte.entry | PTE_R);
 
 	// translate the address
-	*physical_address = (pte & ~CAMMU_PAGE_MASK) | (virtual_address & CAMMU_PAGE_MASK);
-	LOGMASKED(LOG_DTU, "%s address translated 0x%08x\n", mode == ACCESS_X ? "instruction" : "data", *physical_address);
+	LOGMASKED(LOG_DTU, "%s address translated 0x%08x\n", mode == EXECUTE ? "instruction" : "data",
+		(pte.entry & ~CAMMU_PAGE_MASK) | (virtual_address & CAMMU_PAGE_MASK));
 
-	// return the physical space based on the system tag
-	switch (pte & PTE_ST)
-	{
-	case ST_0:
-	case ST_1:
-	case ST_2:
-	case ST_3:
-		// main memory space
-		return m_main_space;
-
-	case ST_4:
-		// i/o space
-		return m_io_space;
-
-	case ST_5:
-		// boot space
-		return m_boot_space;
-
-	case ST_6:
-		// cache purge
-	case ST_7:
-		// main memory, slave mode
-		if (!machine().side_effects_disabled())
-			fatalerror("%s page table entry system tag %d not supported\n",
-				mode == ACCESS_X ? "instruction" : "data", (pte & PTE_ST) >> 9);
-		break;
-	}
-
-	return nullptr;
+	// return the system tag and translated address
+	return { m_space[system_tag_t((pte.entry & PTE_ST) >> PTE_ST_SHIFT)], (pte.entry & ~CAMMU_PAGE_MASK) | (virtual_address & CAMMU_PAGE_MASK) };
 }
 
 // return the page table entry for a given virtual address
-u32 cammu_device::get_pte(const u32 va, const bool user)
+cammu_device::pte_t cammu_device::get_pte(const u32 va, const bool user)
 {
-	const u32 tlb_index = user ? 1 : 0;
-	if ((va & ~CAMMU_PAGE_MASK) != m_tlb[tlb_index].va)
-	{
-		// get page table directory origin from user or supervisor pdo register
-		const u32 pdo = get_pdo(user);
+	// get page table directory origin from user or supervisor pdo register
+	const u32 pdo = get_pdo(user);
 
-		// get page table directory index from top 12 bits of virtual address
-		const u32 ptdi = (va & VA_PTDI) >> 20;
+	// get page table directory index from top 12 bits of virtual address
+	const u32 ptdi = (va & VA_PTDI) >> 20;
 
-		// fetch page table directory entry
-		const u32 ptde = m_main_space->read_dword(pdo | ptdi);
+	// fetch page table directory entry
+	const u32 ptde = m_space[ST0]->read_dword(pdo | ptdi);
 
-		LOGMASKED(LOG_DTU, "get_pte pdo 0x%08x ptdi 0x%08x ptde 0x%08x\n", pdo, ptdi, ptde);
+	LOGMASKED(LOG_DTU, "get_pte pdo 0x%08x ptdi 0x%08x ptde 0x%08x\n", pdo, ptdi, ptde);
 
-		// check for page table directory entry fault
-		if (ptde & PTDE_F)
-			return PTE_F;
+	// check for page table directory entry fault
+	if (ptde & PTDE_F)
+		return { PTE_F, pdo | ptdi };
 
-		// get the page table origin from the page table directory entry
-		const u32 pto = ptde & PTDE_PTO;
+	// get the page table origin from the page table directory entry
+	const u32 pto = ptde & PTDE_PTO;
 
-		// get the page table index from the middle 12 bits of the virtual address
-		const u32 pti = (va & VA_PTI) >> 10;
+	// get the page table index from the middle 12 bits of the virtual address
+	const u32 pti = (va & VA_PTI) >> 10;
 
-		// fetch page table entry
-		const u32 pte = m_main_space->read_dword(pto | pti);
+	// fetch page table entry
+	pte_t pte = { m_space[ST0]->read_dword(pto | pti), pto | pti };
 
-		LOGMASKED(LOG_DTU, "get_pte pto 0x%08x pti 0x%08x pte 0x%08x\n", pto, pti, pte);
+	LOGMASKED(LOG_DTU, "get_pte pto 0x%08x pti 0x%08x pte 0x%08x\n", pto, pti, pte.entry);
 
-		// check for page table entry fault
-		if (pte & PTE_F)
-			return PTE_F;
+	// check for page table entry fault
+	if (!(pte.entry & PTE_F))
+		LOGMASKED(LOG_DTU, "get_pte address 0x%08x pte 0x%08x (%s)\n", va, pte.entry, machine().describe_context());
 
-		// add the pte to the tlb
-		m_tlb[tlb_index].va = va & ~CAMMU_PAGE_MASK;
-		m_tlb[tlb_index].pte = pte;
-
-		LOGMASKED(LOG_DTU, "get_pte address 0x%08x pte 0x%08x (%s)\n", va, pte, machine().describe_context());
-	}
-
-	return m_tlb[tlb_index].pte;
+	return pte;
 }
 
-address_space *cammu_c4i_device::get_ust_space() const
-{
-	switch (m_control & CNTL_UMM)
-	{
-	case UMM_MM: return m_main_space;
-	case UMM_MMRIO: return m_main_space; // FIXME: what determines main or i/o?
-	case UMM_IO: return m_io_space;
-	}
-
-	return m_main_space;
-}
-
-bool cammu_c4_device::get_access(const access_t mode, const u32 pte, const u32 ssw) const
+bool cammu_c4_device::get_access(const access_type mode, const u32 pte, const u32 ssw) const
 {
 	switch (mode)
 	{
-	case ACCESS_R: return pte & 0x20;
-	case ACCESS_W: return pte & 0x10;
-	case ACCESS_X: return pte & 0x08;
+	case READ: return pte & 0x20;
+	case WRITE: return pte & 0x10;
+	case RMW: return (pte & 0x30) == 0x30;
+	case EXECUTE: return pte & 0x08;
 	}
 
 	return false;
 }
 
-bool cammu_c3_device::get_access(const access_t mode, const u32 pte, const u32 ssw) const
+bool cammu_c3_device::get_access(const access_type mode, const u32 pte, const u32 ssw) const
 {
 	// FIXME: logic is not correct yet
 	return true;
 
-	const u8 column = (mode == ACCESS_X ? i_cammu_column : d_cammu_column)[(ssw & SSW_PL) >> 9];
+	const u8 column = (mode == EXECUTE ? i_cammu_column : d_cammu_column)[(ssw & SSW_PL) >> 9];
 	const u8 access = cammu_matrix[column][(pte & PTE_PL) >> 3];
 
 	switch (mode)
 	{
-	case ACCESS_R: return access & R;
-	case ACCESS_W: return access & W;
-	case ACCESS_X: return access & E;
+	case READ: return access & R;
+	case WRITE: return access & W;
+	case RMW: return (access & (R | W)) == (R | W);
+	case EXECUTE: return access & E;
 	}
 
 	return false;
@@ -494,5 +393,3 @@ const cammu_c3_device::c3_access_t cammu_c3_device::cammu_matrix[][16] =
 	{ N,   N,   RW,  RW,  RW,  R,   R,   RWE, N,   N,   RE,  RE,  N,   RE,  N,   N },
 	{ N,   N,   N,   RW,  R,   R,   R,   RWE, N,   N,   N,   RE,  RE,  N,   RE,  N }
 };
-
-

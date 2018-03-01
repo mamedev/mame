@@ -83,7 +83,7 @@
 # OVERRIDE_CXX = c++
 # OVERRIDE_LD = ld
 
-# DEPRECATED = 1
+# DEPRECATED = 0
 # LTO = 1
 # SSE2 = 1
 # OPENMP = 1

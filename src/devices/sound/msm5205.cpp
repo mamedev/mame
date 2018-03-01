@@ -84,18 +84,6 @@ msm6585_device::msm6585_device(const machine_config &mconfig, const char *tag, d
 }
 
 //-------------------------------------------------
-//  set_prescaler_selector - configuration helper
-//-------------------------------------------------
-
-void msm5205_device::set_prescaler_selector(device_t &device, int select)
-{
-	msm5205_device &msm = downcast<msm5205_device &>(device);
-	msm.m_s1 = BIT(select, 1);
-	msm.m_s2 = BIT(select, 0);
-	msm.m_bitwidth = (select & 4) ? 4 : 3;
-}
-
-//-------------------------------------------------
 //  device_start - device-specific startup
 //-------------------------------------------------
 

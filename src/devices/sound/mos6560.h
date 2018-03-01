@@ -79,10 +79,10 @@
 
 
 #define MCFG_MOS6560_POTX_CALLBACK(_read) \
-	devcb = &mos6560_device::set_potx_rd_callback(*device, DEVCB_##_read);
+	devcb = &downcast<mos6560_device &>(*device).set_potx_rd_callback(DEVCB_##_read);
 
 #define MCFG_MOS6560_POTY_CALLBACK(_read) \
-	devcb = &mos6560_device::set_poty_rd_callback(*device, DEVCB_##_read);
+	devcb = &downcast<mos6560_device &>(*device).set_poty_rd_callback(DEVCB_##_read);
 
 
 
@@ -136,8 +136,8 @@ class mos6560_device : public device_t,
 public:
 	mos6560_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
-	template <class Object> static devcb_base &set_potx_rd_callback(device_t &device, Object &&cb) { return downcast<mos6560_device &>(device).m_read_potx.set_callback(std::forward<Object>(cb)); }
-	template <class Object> static devcb_base &set_poty_rd_callback(device_t &device, Object &&cb) { return downcast<mos6560_device &>(device).m_read_poty.set_callback(std::forward<Object>(cb)); }
+	template <class Object> devcb_base &set_potx_rd_callback(Object &&cb) { return m_read_potx.set_callback(std::forward<Object>(cb)); }
+	template <class Object> devcb_base &set_poty_rd_callback(Object &&cb) { return m_read_poty.set_callback(std::forward<Object>(cb)); }
 
 	virtual space_config_vector memory_space_config() const override;
 

@@ -15,16 +15,16 @@
 //**************************************************************************
 
 #define MCFG_SEGAPCM_ADD(tag, clock) \
-		MCFG_DEVICE_ADD((tag), SEGAPCM, (clock))
+	MCFG_DEVICE_ADD((tag), SEGAPCM, (clock))
 
 #define MCFG_SEGAPCM_REPLACE(tag, clock) \
-		MCFG_DEVICE_REPLACE((tag), SEGAPCM, (clock))
+	MCFG_DEVICE_REPLACE((tag), SEGAPCM, (clock))
 
 #define MCFG_SEGAPCM_BANK(bank) \
-		downcast<segapcm_device &>(*device).set_bank((segapcm_device::bank));
+	downcast<segapcm_device &>(*device).set_bank((segapcm_device::bank));
 
 #define MCFG_SEGAPCM_BANK_MASK(bank, mask) \
-		downcast<segapcm_device &>(*device).set_bank((segapcm_device::bank) | (segapcm_device::mask));
+	downcast<segapcm_device &>(*device).set_bank((segapcm_device::bank) | (segapcm_device::mask));
 
 
 //**************************************************************************

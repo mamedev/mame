@@ -39,24 +39,34 @@ public:
 		: driver_device(mconfig, type, tag)
 		, m_riot(*this, "riot")
 		, m_maincpu(*this, "maincpu")
+		, m_line(*this, "LINE%u", 0U)
+		, m_digit(*this, "digit%u", 0U)
 	{
 	}
 
-	required_device<mos6532_new_device> m_riot;
+	DECLARE_INPUT_CHANGED_MEMBER(junior_reset);
+	void junior(machine_config &config);
+
+protected:
 	DECLARE_READ8_MEMBER(junior_riot_a_r);
 	DECLARE_READ8_MEMBER(junior_riot_b_r);
 	DECLARE_WRITE8_MEMBER(junior_riot_a_w);
 	DECLARE_WRITE8_MEMBER(junior_riot_b_w);
+
+	virtual void machine_start() override;
+	virtual void machine_reset() override;
+	TIMER_DEVICE_CALLBACK_MEMBER(junior_update_leds);
+
+	void junior_mem(address_map &map);
+
+private:
+	required_device<mos6532_new_device> m_riot;
 	uint8_t m_port_a;
 	uint8_t m_port_b;
 	uint8_t m_led_time[6];
-	virtual void machine_start() override;
-	virtual void machine_reset() override;
-	DECLARE_INPUT_CHANGED_MEMBER(junior_reset);
-	TIMER_DEVICE_CALLBACK_MEMBER(junior_update_leds);
 	required_device<cpu_device> m_maincpu;
-	void junior(machine_config &config);
-	void junior_mem(address_map &map);
+	required_ioport_array<4> m_line;
+	output_finder<6> m_digit;
 };
 
 
@@ -130,16 +140,13 @@ READ8_MEMBER( junior_state::junior_riot_a_r )
 {
 	uint8_t data = 0xff;
 
-	switch( ( m_port_b >> 1 ) & 0x0f )
+	uint8_t const sel = ( m_port_b >> 1) & 0x0f;
+	switch ( sel )
 	{
 	case 0:
-		data = ioport("LINE0")->read();
-		break;
 	case 1:
-		data = ioport("LINE1")->read();
-		break;
 	case 2:
-		data = ioport("LINE2")->read();
+		data = m_line[sel]->read();
 		break;
 	}
 	return data;
@@ -165,7 +172,7 @@ WRITE8_MEMBER( junior_state::junior_riot_a_w )
 
 	if ((idx >= 4 && idx < 10) & ( m_port_a != 0xff ))
 	{
-		output().set_digit_value( idx-4, m_port_a ^ 0x7f );
+		m_digit[idx - 4] = m_port_a ^ 0x7f;
 		m_led_time[idx - 4] = 10;
 	}
 }
@@ -179,7 +186,7 @@ WRITE8_MEMBER( junior_state::junior_riot_b_w )
 
 	if ((idx >= 4 && idx < 10) & ( m_port_a != 0xff ))
 	{
-		output().set_digit_value( idx-4, m_port_a ^ 0x7f );
+		m_digit[idx - 4] = m_port_a ^ 0x7f;
 		m_led_time[idx - 4] = 10;
 	}
 }
@@ -194,15 +201,18 @@ TIMER_DEVICE_CALLBACK_MEMBER(junior_state::junior_update_leds)
 		if ( m_led_time[i] )
 			m_led_time[i]--;
 		else
-			output().set_digit_value( i, 0 );
+			m_digit[i] = 0;
 	}
 }
 
 
 void junior_state::machine_start()
 {
+	m_digit.resolve();
+
 	save_item(NAME(m_port_a));
 	save_item(NAME(m_port_b));
+	save_item(NAME(m_led_time));
 }
 
 
@@ -217,7 +227,7 @@ void junior_state::machine_reset()
 
 MACHINE_CONFIG_START(junior_state::junior)
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu",M6502, XTAL(1'000'000))
+	MCFG_CPU_ADD("maincpu",M6502, 1_MHz_XTAL)
 	MCFG_CPU_PROGRAM_MAP(junior_mem)
 	MCFG_QUANTUM_TIME(attotime::from_hz(50))
 
@@ -225,7 +235,7 @@ MACHINE_CONFIG_START(junior_state::junior)
 	MCFG_DEFAULT_LAYOUT( layout_junior )
 
 	/* Devices */
-	MCFG_DEVICE_ADD("riot", MOS6532_NEW, XTAL(1'000'000))
+	MCFG_DEVICE_ADD("riot", MOS6532_NEW, 1_MHz_XTAL)
 	MCFG_MOS6530n_IN_PA_CB(READ8(junior_state, junior_riot_a_r))
 	MCFG_MOS6530n_OUT_PA_CB(WRITE8(junior_state, junior_riot_a_w))
 	MCFG_MOS6530n_IN_PB_CB(READ8(junior_state, junior_riot_b_r))

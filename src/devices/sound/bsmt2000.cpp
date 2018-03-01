@@ -78,18 +78,6 @@ bsmt2000_device::bsmt2000_device(const machine_config &mconfig, const char *tag,
 
 
 //-------------------------------------------------
-//  static_set_ready_callback - configuration
-//  helper to set the ready callback
-//-------------------------------------------------
-
-void bsmt2000_device::static_set_ready_callback(device_t &device, ready_callback &&callback)
-{
-	bsmt2000_device &bsmt = downcast<bsmt2000_device &>(device);
-	bsmt.m_ready_callback = std::move(callback);
-}
-
-
-//-------------------------------------------------
 //  rom_region - return a pointer to the device's
 //  internal ROM region
 //-------------------------------------------------

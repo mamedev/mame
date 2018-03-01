@@ -96,7 +96,7 @@ READ8_MEMBER( alesis_state::mmt8_led_r )
 WRITE8_MEMBER( alesis_state::track_led_w )
 {
 	for (int i=0; i<8; i++)
-		output().set_indexed_value("track_led", i + 1, BIT(data, i));
+		m_track_led[i] = BIT(data, i);
 }
 
 READ8_MEMBER( alesis_state::mmt8_p3_r )
@@ -330,6 +330,11 @@ PALETTE_INIT_MEMBER(alesis_state, alesis)
 	palette.set_pen_color(1, rgb_t(92, 83, 88));
 }
 
+void alesis_state::machine_start()
+{
+	m_track_led.resolve();
+}
+
 void alesis_state::machine_reset()
 {
 	m_kb_matrix = 0xff;
@@ -348,7 +353,7 @@ HD44780_PIXEL_UPDATE(alesis_state::sr16_pixel_update)
 
 MACHINE_CONFIG_START(alesis_state::hr16)
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu",I8031, XTAL(12'000'000))
+	MCFG_CPU_ADD("maincpu",I8031, 12_MHz_XTAL)
 	MCFG_CPU_PROGRAM_MAP(hr16_mem)
 	MCFG_CPU_IO_MAP(hr16_io)
 	MCFG_MCS51_PORT_P1_IN_CB(IOPORT("SELECT"))
@@ -376,7 +381,7 @@ MACHINE_CONFIG_START(alesis_state::hr16)
 	MCFG_HD44780_LCD_SIZE(2, 16)
 
 	/* sound hardware */
-	MCFG_ALESIS_DM3AG_ADD("dm3ag", XTAL(12'000'000)/2)
+	MCFG_ALESIS_DM3AG_ADD("dm3ag", 12_MHz_XTAL/2)
 
 	MCFG_NVRAM_ADD_0FILL("nvram")
 MACHINE_CONFIG_END

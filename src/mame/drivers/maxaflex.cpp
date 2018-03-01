@@ -45,29 +45,36 @@ public:
 		, m_console(*this, "console")
 		, m_joy01(*this, "djoy_0_1")
 		, m_joy23(*this, "djoy_2_3")
+		, m_lamp(*this, "lamp%u", 0U)
+		, m_digit(*this, "digit%u", 0U)
 	{
 	}
 
-	uint8_t m_portB_out;
-	uint8_t m_portC_out;
+	DECLARE_INPUT_CHANGED_MEMBER(coin_inserted);
+	void maxaflex(machine_config &config);
+
+protected:
 	DECLARE_READ8_MEMBER(mcu_portA_r);
 	DECLARE_WRITE8_MEMBER(mcu_portA_w);
 	DECLARE_WRITE8_MEMBER(mcu_portB_w);
 	DECLARE_WRITE8_MEMBER(mcu_portC_w);
-	DECLARE_INPUT_CHANGED_MEMBER(coin_inserted);
 	DECLARE_READ8_MEMBER(pia_pa_r);
 	DECLARE_READ8_MEMBER(pia_pb_r);
 	WRITE8_MEMBER(pia_pb_w) { mmu(data); }
 	WRITE_LINE_MEMBER(pia_cb2_w) { }  // This is used by Floppy drive on Atari 8bits Home Computers
 	TIMER_DEVICE_CALLBACK_MEMBER(mf_interrupt);
 
-	void maxaflex(machine_config &config);
-	void a600xl_mem(address_map &map);
-protected:
+	virtual void machine_start() override;
 	virtual void machine_reset() override;
 
 	bool atari_input_disabled() const { return !BIT(m_portB_out, 7); }
 	void mmu(uint8_t new_mmu);
+
+private:
+	void a600xl_mem(address_map &map);
+
+	uint8_t m_portB_out;
+	uint8_t m_portC_out;
 
 	required_device<cpu_device> m_mcu;
 	required_device<speaker_sound_device> m_speaker;
@@ -77,6 +84,8 @@ protected:
 	required_ioport m_console;
 	required_ioport m_joy01;
 	required_ioport m_joy23;
+	output_finder<4> m_lamp;
+	output_finder<3> m_digit;
 };
 
 
@@ -155,10 +164,10 @@ WRITE8_MEMBER(maxaflex_state::mcu_portB_w)
 	/* latch for lamps */
 	if (BIT(diff, 6) && !BIT(data, 6))
 	{
-		output().set_lamp_value(0, BIT(m_portC_out, 0));
-		output().set_lamp_value(1, BIT(m_portC_out, 1));
-		output().set_lamp_value(2, BIT(m_portC_out, 2));
-		output().set_lamp_value(3, BIT(m_portC_out, 3));
+		m_lamp[0] = BIT(m_portC_out, 0);
+		m_lamp[1] = BIT(m_portC_out, 1);
+		m_lamp[2] = BIT(m_portC_out, 2);
+		m_lamp[3] = BIT(m_portC_out, 3);
 	}
 }
 
@@ -177,13 +186,9 @@ WRITE8_MEMBER(maxaflex_state::mcu_portC_w)
 	m_portC_out = data & 0x0f;
 
 	/* displays */
-	switch (m_portB_out & 0x03)
-	{
-	case 0x0: output().set_digit_value(0, ls48_map[m_portC_out]); break;
-	case 0x1: output().set_digit_value(1, ls48_map[m_portC_out]); break;
-	case 0x2: output().set_digit_value(2, ls48_map[m_portC_out]); break;
-	case 0x3: break;
-	}
+	uint8_t const sel = m_portB_out & 0x03;
+	if (3U > sel)
+		m_digit[sel] = ls48_map[m_portC_out];
 }
 
 INPUT_CHANGED_MEMBER(maxaflex_state::coin_inserted)
@@ -285,8 +290,21 @@ READ8_MEMBER(maxaflex_state::pia_pb_r)
 }
 
 
+void maxaflex_state::machine_start()
+{
+	atari_common_state::machine_start();
+
+	m_lamp.resolve();
+	m_digit.resolve();
+
+	save_item(NAME(m_portB_out));
+	save_item(NAME(m_portC_out));
+}
+
 void maxaflex_state::machine_reset()
 {
+	atari_common_state::machine_reset();
+
 	pokey_device *pokey = machine().device<pokey_device>("pokey");
 	pokey->write(15,0);
 
@@ -294,13 +312,8 @@ void maxaflex_state::machine_reset()
 	m_portB_out = 0xff;
 	m_portC_out = 0xff;
 
-	output().set_lamp_value(0, 0);
-	output().set_lamp_value(1, 0);
-	output().set_lamp_value(2, 0);
-	output().set_lamp_value(3, 0);
-	output().set_digit_value(0, 0x00);
-	output().set_digit_value(1, 0x00);
-	output().set_digit_value(2, 0x00);
+	std::fill(std::begin(m_lamp), std::end(m_lamp), 0);
+	std::fill(std::begin(m_digit), std::end(m_digit), 0x00);
 }
 
 TIMER_DEVICE_CALLBACK_MEMBER( maxaflex_state::mf_interrupt )
@@ -342,14 +355,14 @@ MACHINE_CONFIG_START(maxaflex_state::maxaflex)
 	MCFG_SCREEN_PALETTE("palette")
 
 	MCFG_PALETTE_ADD("palette", 256)
-	MCFG_PALETTE_INIT_OWNER(atari_common_state, atari)
+	MCFG_PALETTE_INIT_OWNER(maxaflex_state, atari)
 	MCFG_DEFAULT_LAYOUT(layout_maxaflex)
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
 
 	MCFG_SOUND_ADD("pokey", POKEY, pokey_device::FREQ_17_EXACT)
-	MCFG_POKEY_INTERRUPT_CB(atari_common_state, interrupt_cb)
+	MCFG_POKEY_INTERRUPT_CB(maxaflex_state, interrupt_cb)
 	MCFG_POKEY_OUTPUT_RC(RES_K(1), CAP_U(0.0), 5.0)
 
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)

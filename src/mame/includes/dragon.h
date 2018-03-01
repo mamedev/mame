@@ -65,6 +65,8 @@ public:
 
 	void tanodr64(machine_config &config);
 	void dragon64(machine_config &config);
+	void tanodr64h(machine_config &config);
+	void dragon64h(machine_config &config);
 protected:
 	virtual DECLARE_READ8_MEMBER( ff00_read ) override;
 	virtual DECLARE_WRITE8_MEMBER( ff00_write ) override;

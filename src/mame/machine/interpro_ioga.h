@@ -196,10 +196,9 @@ public:
 		DMA_CTRL_ERR     = 0x00800000, // checked for in scsi isr
 
 		DMA_CTRL_BGR     = 0x01000000, // cleared when command complete (maybe bus grant required?)
-		DMA_CTRL_WAIT    = 0x02000000, // waiting for bus grant
+		DMA_CTRL_VIRTUAL = 0x02000000, // virtual address translation required
 		DMA_CTRL_DOUBLE  = 0x04000000, // double transfer size (double or quad quad)
 
-		DMA_CTRL_VIRTUAL = 0x20000000, // use virtual addressing
 		DMA_CTRL_WRITE   = 0x40000000, // memory to device transfer
 		DMA_CTRL_QUAD    = 0x80000000, // select quad transfer size (quad quad when combined with double)
 
@@ -513,8 +512,8 @@ public:
 
 	virtual void map(address_map &map) override;
 
-	DECLARE_WRITE32_MEMBER(eth_w);
-	DECLARE_READ32_MEMBER(eth_r);
+	DECLARE_WRITE16_MEMBER(eth_w);
+	DECLARE_READ16_MEMBER(eth_r);
 
 protected:
 	virtual TIMER_CALLBACK_MEMBER(eth_reset) override;

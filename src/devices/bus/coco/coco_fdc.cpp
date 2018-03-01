@@ -494,6 +494,40 @@ namespace
 DEFINE_DEVICE_TYPE(COCO3_HDB1, coco3_hdb1_device, "coco3_hdb1", "CoCo3 HDB-DOS")
 
 //**************************************************************************
+//              COCO-2 HDB-DOS
+//**************************************************************************
+
+ROM_START(coco2_hdb1)
+	ROM_REGION(0x8000, "eprom", ROMREGION_ERASE00)
+	ROM_LOAD("hdbdw3bck.rom", 0x0000, 0x2000, CRC(867a3f42) SHA1(8fd64f1c246489e0bf2b3743ae76332ff324716a))
+	ROM_RELOAD(0x2000, 0x2000)
+	ROM_RELOAD(0x4000, 0x2000)
+	ROM_RELOAD(0x6000, 0x2000)
+ROM_END
+
+namespace
+{
+	class coco2_hdb1_device : public coco_fdc_device_base
+	{
+	public:
+		// construction/destruction
+		coco2_hdb1_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+			: coco_fdc_device_base(mconfig, COCO2_HDB1, tag, owner, clock)
+		{
+		}
+
+	protected:
+		// optional information overrides
+		virtual const tiny_rom_entry *device_rom_region() const override
+		{
+			return ROM_NAME(coco2_hdb1);
+		}
+	};
+}
+
+DEFINE_DEVICE_TYPE(COCO2_HDB1, coco2_hdb1_device, "coco2_hdb1", "CoCo2 HDB-DOS")
+
+//**************************************************************************
 //              Prológica CP-450 BASIC Disco V. 1.0 (1984)
 //
 //  There is a photo of the CP-450 disk controller unit at:

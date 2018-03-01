@@ -1388,15 +1388,15 @@ ROM_END
 // Ericsson WS286
 ROM_START(ews286 ) // Computer is brown/yellow-ish with Ericsson logo
 	ROM_REGION(0x20000,"bios", 0)
-	ROM_LOAD16_BYTE( "RYS_103_1002_R8A_3C00_IC-POS_71.BIN", 0x18000, 0x4000, CRC(af179e56) SHA1(58b1df46d6e68eef472a0529cb9317abaf17880f)) // Last ROM set and has Nokia
-	ROM_LOAD16_BYTE( "RYS_103_1003_R8A_8600_IC-POS_69.BIN", 0x18001, 0x4000, CRC(555502cb) SHA1(1977fe54b69c5e52731bf3eb8bdabe777aac014b)) // copyright patched in both roms
+	ROM_LOAD16_BYTE( "rys_103_1002_r8a_3c00_ic-pos_71.bin", 0x18000, 0x4000, CRC(af179e56) SHA1(58b1df46d6e68eef472a0529cb9317abaf17880f)) // Last ROM set and has Nokia
+	ROM_LOAD16_BYTE( "rys_103_1003_r8a_8600_ic-pos_69.bin", 0x18001, 0x4000, CRC(555502cb) SHA1(1977fe54b69c5e52731bf3eb8bdabe777aac014b)) // copyright patched in both roms
 ROM_END
 
 // Nokia Data WS286
 //ROM_START(nws286 ) // Computer is grey with Nokia logo.
-//  ROM_REGION(0x20000,"bios", 0)
-//  ROM_LOAD16_BYTE( "RYS_103_1002_R8A_3C00_IC-POS_71.BIN", 0x18000, 0x4000, NO_DUMP)
-//  ROM_LOAD16_BYTE( "RYS_103_1003_R8A_8600_IC-POS_69.BIN", 0x18001, 0x4000, NO_DUMP)
+//	ROM_REGION(0x20000,"bios", 0)
+//	ROM_LOAD16_BYTE( "rys_103_1002_r8a_3c00_ic-pos_71.bin", 0x18000, 0x4000, NO_DUMP)
+//	ROM_LOAD16_BYTE( "rys_103_1003_r8a_8600_ic-pos_69.bin", 0x18001, 0x4000, NO_DUMP)
 //ROM_END
 
 /***************************************************************************
