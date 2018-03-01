@@ -311,7 +311,7 @@ READ32_MEMBER(model2_state::polygon_count_r)
  *
  *******************************************/
 
-static void model2_3d_process_quad( raster_state *raster, uint32_t attr )
+void model2_state::model2_3d_process_quad( raster_state *raster, uint32_t attr )
 {
 	quad_m2     object;
 	uint16_t      *th, *tp;
@@ -551,7 +551,7 @@ static void model2_3d_process_quad( raster_state *raster, uint32_t attr )
 	}
 }
 
-static void model2_3d_process_triangle( raster_state *raster, uint32_t attr )
+void model2_state::model2_3d_process_triangle( raster_state *raster, uint32_t attr )
 {
 	triangle    object;
 	uint16_t      *th, *tp;
@@ -948,7 +948,7 @@ void model2_state::model2_3d_frame_end( bitmap_rgb32 &bitmap, const rectangle &c
 }
 
 /* 3D Rasterizer main data input port */
-static void model2_3d_push( raster_state *raster, uint32_t input )
+void model2_state::model2_3d_push( raster_state *raster, uint32_t input )
 {
 	/* see if we have a command in progress */
 	if ( raster->cur_command != 0 )
@@ -1185,7 +1185,7 @@ void model2_state::geo_init(memory_region *polygon_rom)
  *******************************************/
 
 /* Parse Polygons: Normals Present, No Specular case */
-static void geo_parse_np_ns( geo_state *geo, uint32_t *input, uint32_t count )
+void model2_state::geo_parse_np_ns( geo_state *geo, uint32_t *input, uint32_t count )
 {
 	raster_state *raster = geo->raster;
 	poly_vertex point, normal;
@@ -1337,7 +1337,7 @@ static void geo_parse_np_ns( geo_state *geo, uint32_t *input, uint32_t count )
 }
 
 /* Parse Polygons: Normals Present, Specular case */
-static void geo_parse_np_s( geo_state *geo, uint32_t *input, uint32_t count )
+void model2_state::geo_parse_np_s( geo_state *geo, uint32_t *input, uint32_t count )
 {
 	raster_state *raster = geo->raster;
 	poly_vertex point, normal;
@@ -1498,7 +1498,7 @@ static void geo_parse_np_s( geo_state *geo, uint32_t *input, uint32_t count )
 }
 
 /* Parse Polygons: No Normals, No Specular case */
-static void geo_parse_nn_ns( geo_state *geo, uint32_t *input, uint32_t count )
+void model2_state::geo_parse_nn_ns( geo_state *geo, uint32_t *input, uint32_t count )
 {
 	raster_state *raster = geo->raster;
 	poly_vertex point, normal, p0, p1, p2, p3;
@@ -1693,7 +1693,7 @@ static void geo_parse_nn_ns( geo_state *geo, uint32_t *input, uint32_t count )
 }
 
 /* Parse Polygons: No Normals, Specular case */
-static void geo_parse_nn_s( geo_state *geo, uint32_t *input, uint32_t count )
+void model2_state::geo_parse_nn_s( geo_state *geo, uint32_t *input, uint32_t count )
 {
 	raster_state *raster = geo->raster;
 	poly_vertex point, normal, p0, p1, p2, p3;

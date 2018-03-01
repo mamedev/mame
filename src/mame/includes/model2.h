@@ -277,7 +277,6 @@ private:
 	bool m_render_unk;
 	bool m_render_mode;
 	
-	inline void model2_3d_project( triangle *tri );
 	uint32_t *geo_process_command( geo_state *geo, uint32_t opcode, uint32_t *input, bool *end_code );
 	// geo commands
 	uint32_t *geo_nop( geo_state *geo, uint32_t opcode, uint32_t *input );
@@ -301,6 +300,22 @@ private:
 	uint32_t *geo_lod( geo_state *geo, uint32_t opcode, uint32_t *input );
 	uint32_t *geo_code_upload( geo_state *geo, uint32_t opcode, uint32_t *input );
 	uint32_t *geo_code_jump( geo_state *geo, uint32_t opcode, uint32_t *input );
+	// geo code drawing paths
+	void geo_parse_np_ns( geo_state *geo, uint32_t *input, uint32_t count );
+	void geo_parse_np_s( geo_state *geo, uint32_t *input, uint32_t count );
+	void geo_parse_nn_ns( geo_state *geo, uint32_t *input, uint32_t count );
+	void geo_parse_nn_s( geo_state *geo, uint32_t *input, uint32_t count );
+	
+	// raster functions
+	// main data input port
+	void model2_3d_push( raster_state *raster, uint32_t input );
+	// quad & triangle push paths
+	void model2_3d_process_quad( raster_state *raster, uint32_t attr );
+	void model2_3d_process_triangle( raster_state *raster, uint32_t attr );
+
+	// inliners
+	inline void model2_3d_project( triangle *tri );
+
 };
 
 /*****************************
