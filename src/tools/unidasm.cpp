@@ -776,7 +776,7 @@ unidasm_data_buffer::unidasm_data_buffer(util::disasm_interface *_disasm, const 
 		case -2:
 			lr8 = [](offs_t pc) -> u8 { abort(); };
 			lr16 = [](offs_t pc) -> u16 { abort(); };
-			lr32 = [this](offs_t pc) -> u16 {
+			lr32 = [this](offs_t pc) -> u32 {
 				const u32 *p = get_ptr<u32>(pc);
 				return p ?
 				p[0]
