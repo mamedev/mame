@@ -1967,7 +1967,7 @@ void lua_engine::initialize()
 			"set_value", &output_manager::set_value,
 			"set_indexed_value", &output_manager::set_indexed_value,
 			"get_value", &output_manager::get_value,
-			"get_indexed_value", &output_manager::get_indexed_value,
+			"get_indexed_value", [](output_manager &o, char const *basename, int index) { return o.get_value(util::string_format("%s%d", basename, index).c_str()); },
 			"name_to_id", &output_manager::name_to_id,
 			"id_to_name", &output_manager::id_to_name);
 

@@ -76,6 +76,9 @@ ToDo:
 #include "render.h"
 #include "speaker.h"
 
+//#define VERBOSE 1
+#include "logmacro.h"
+
 #include "by35.lh"
 #include "by35_playboy.lh"
 
@@ -83,8 +86,28 @@ ToDo:
 class by35_state : public genpin_class
 {
 public:
-	by35_state(const machine_config &mconfig, device_type type, const char *tag)
+	by35_state(machine_config const &mconfig, device_type type, char const *tag)
+		: by35_state(mconfig, type, tag, s_solenoid_features_default)
+	{ }
+
+	DECLARE_DRIVER_INIT(by35_6) { m_7d = 0; }
+	DECLARE_DRIVER_INIT(by35_7) { m_7d = 1; }
+
+	DECLARE_INPUT_CHANGED_MEMBER(activity_button);
+	DECLARE_INPUT_CHANGED_MEMBER(self_test);
+	DECLARE_CUSTOM_INPUT_MEMBER(outhole_x0);
+	DECLARE_CUSTOM_INPUT_MEMBER(drop_target_x0);
+	DECLARE_CUSTOM_INPUT_MEMBER(kickback_x3);
+
+	void by35(machine_config &config);
+	void nuovo(machine_config &config);
+
+protected:
+	typedef uint8_t solenoid_feature_data[20][4];
+
+	by35_state(machine_config const &mconfig, device_type type, char const *tag, solenoid_feature_data const &solenoid_features)
 		: genpin_class(mconfig, type, tag)
+		, m_solenoid_features(solenoid_features)
 		, m_maincpu(*this, "maincpu")
 		, m_nvram(*this, "nvram")
 		, m_pia_u10(*this, "pia_u10")
@@ -99,13 +122,10 @@ public:
 		, m_io_x2(*this, "X2")
 		, m_io_x3(*this, "X3")
 		, m_io_x4(*this, "X4")
-		, m_discrete(*this, "discrete")
-		, m_timer_s_freq(*this, "timer_s_freq")
+		, m_lamps(*this, "lamp%u", 0U)
+		, m_solenoids(*this, "solenoid%u", 0U)
 	{ }
 
-	DECLARE_DRIVER_INIT(by35_6);
-	DECLARE_DRIVER_INIT(by35_7);
-	DECLARE_DRIVER_INIT(playboy);
 	DECLARE_READ8_MEMBER(u10_a_r);
 	DECLARE_WRITE8_MEMBER(u10_a_w);
 	DECLARE_READ8_MEMBER(u10_b_r);
@@ -113,7 +133,6 @@ public:
 	DECLARE_READ8_MEMBER(u11_a_r);
 	DECLARE_WRITE8_MEMBER(u11_a_w);
 	DECLARE_WRITE8_MEMBER(u11_b_w);
-	DECLARE_WRITE8_MEMBER(u11_b_as2888_w);
 	DECLARE_READ8_MEMBER(nibble_nvram_r);
 	DECLARE_WRITE8_MEMBER(nibble_nvram_w);
 	DECLARE_READ_LINE_MEMBER(u10_ca1_r);
@@ -124,47 +143,34 @@ public:
 	DECLARE_READ_LINE_MEMBER(u11_cb1_r);
 	DECLARE_WRITE_LINE_MEMBER(u11_ca2_w);
 	DECLARE_WRITE_LINE_MEMBER(u11_cb2_w);
-	DECLARE_WRITE_LINE_MEMBER(u11_cb2_as2888_w);
-	DECLARE_INPUT_CHANGED_MEMBER(activity_button);
-	DECLARE_INPUT_CHANGED_MEMBER(self_test);
-	DECLARE_CUSTOM_INPUT_MEMBER(outhole_x0);
-	DECLARE_CUSTOM_INPUT_MEMBER(drop_target_x0);
-	DECLARE_CUSTOM_INPUT_MEMBER(kickback_x3);
-	DECLARE_MACHINE_START(as2888);
-	DECLARE_MACHINE_RESET(by35);
+	virtual void machine_reset() override;
 	TIMER_DEVICE_CALLBACK_MEMBER(timer_z_freq);
 	TIMER_DEVICE_CALLBACK_MEMBER(timer_z_pulse);
 	TIMER_DEVICE_CALLBACK_MEMBER(u11_timer);
 	TIMER_DEVICE_CALLBACK_MEMBER(timer_d_pulse);
-	TIMER_DEVICE_CALLBACK_MEMBER(timer_s);
-	TIMER_DEVICE_CALLBACK_MEMBER(timer_as2888);
-	void by35(machine_config &config);
-	void nuovo(machine_config &config);
-	void as2888(machine_config &config);
-	void as2888_audio(machine_config &config);
+
 	void by35_map(address_map &map);
 	void nuovo_map(address_map &map);
-private:
+
 	uint8_t m_u10a;
 	uint8_t m_u10b;
 	uint8_t m_u11a;
 	uint8_t m_u11b;
+
+	static solenoid_feature_data const s_solenoid_features_default;
+
+private:
 	bool m_u10_ca2;
 	bool m_u10_cb1;
 	bool m_u10_cb2;
 	bool m_u11_ca1;
 	bool m_u11_cb2;
-	bool m_timer_as2888;
 	bool m_7d;
 	uint8_t m_digit;
 	uint8_t m_segment[6];
 	uint8_t m_lamp_decode;
-	uint8_t m_solenoid_features[20][4];
+	solenoid_feature_data const &m_solenoid_features;
 	uint8_t m_io_hold_x[6];
-	uint8_t m_snd_sel;
-	uint8_t m_snd_tone_gen;
-	uint8_t m_snd_div;
-	uint8_t *m_snd_prom;
 	required_device<m6800_cpu_device> m_maincpu;
 	required_shared_ptr<uint8_t> m_nvram;
 	required_device<pia6821_device> m_pia_u10;
@@ -179,8 +185,57 @@ private:
 	required_ioport m_io_x2;
 	required_ioport m_io_x3;
 	required_ioport m_io_x4;
-	optional_device<discrete_device> m_discrete;
-	optional_device<timer_device> m_timer_s_freq;
+	output_finder<15 * 4> m_lamps;
+	output_finder<20> m_solenoids;
+};
+
+
+class as2888_state : public by35_state
+{
+public:
+	as2888_state(machine_config const &mconfig, device_type type, char const *tag)
+		: as2888_state(mconfig, type, tag, s_solenoid_features_default)
+	{ }
+
+	DECLARE_DRIVER_INIT(playboy);
+
+	void as2888(machine_config &config);
+
+protected:
+	as2888_state(machine_config const &mconfig, device_type type, char const *tag, solenoid_feature_data const &solenoid_features)
+		: by35_state(mconfig, type, tag, solenoid_features)
+		, m_snd_prom(*this, "sound1")
+		, m_discrete(*this, "discrete")
+		, m_timer_s_freq(*this, "timer_s_freq")
+	{ }
+
+	DECLARE_WRITE8_MEMBER(u11_b_as2888_w);
+	DECLARE_WRITE_LINE_MEMBER(u11_cb2_as2888_w);
+	TIMER_DEVICE_CALLBACK_MEMBER(timer_s);
+	TIMER_DEVICE_CALLBACK_MEMBER(timer_as2888);
+
+	void as2888_audio(machine_config &config);
+
+private:
+	bool m_timer_as2888;
+	uint8_t m_snd_sel;
+	uint8_t m_snd_tone_gen;
+	uint8_t m_snd_div;
+	required_region_ptr<uint8_t> m_snd_prom;
+	required_device<discrete_device> m_discrete;
+	required_device<timer_device> m_timer_s_freq;
+};
+
+
+class playboy_state : public as2888_state
+{
+public:
+	playboy_state(machine_config const &mconfig, device_type type, char const *tag)
+		: as2888_state(mconfig, type, tag, s_solenoid_features_playboy)
+	{ }
+
+protected:
+	static solenoid_feature_data const s_solenoid_features_playboy;
 };
 
 
@@ -547,7 +602,7 @@ WRITE_LINE_MEMBER( by35_state::u10_ca2_w )
 
 WRITE_LINE_MEMBER( by35_state::u10_cb2_w )
 {
-//  logerror("New U10 CB2 state %01x, was %01x.   PIA=%02x\n", state, m_u10_cb2, m_u10a);
+	LOG("New U10 CB2 state %01x, was %01x.   PIA=%02x\n", state, m_u10_cb2, m_u10a);
 
 	if (state == true)
 		m_lamp_decode = m_u10a & 0x0f;
@@ -576,20 +631,18 @@ WRITE_LINE_MEMBER( by35_state::u11_cb2_w )
 	m_u11_cb2 = state;
 }
 
-WRITE_LINE_MEMBER( by35_state::u11_cb2_as2888_w )
+WRITE_LINE_MEMBER( as2888_state::u11_cb2_as2888_w )
 {
 	if (state)
 	{
-		address_space &space = m_maincpu->space(AS_PROGRAM);
-
 		timer_device *snd_sustain_timer = machine().device<timer_device>("timer_as2888");
 		snd_sustain_timer->adjust(attotime::from_msec(5));
 		m_timer_as2888 = true;
 
-		m_discrete->write(space, NODE_08, 11);  // 11 volt pulse
+		m_discrete->write(machine().dummy_space(), NODE_08, 11);  // 11 volt pulse
 	}
 
-	m_u11_cb2 = state;
+	u11_cb2_w(state);
 }
 
 READ8_MEMBER( by35_state::u10_a_r )
@@ -599,7 +652,7 @@ READ8_MEMBER( by35_state::u10_a_r )
 
 WRITE8_MEMBER( by35_state::u10_a_w )
 {
-//  logerror("Writing %02x to U10 PIA, CB2 state is %01x,  CA2 state is %01x, Lamp_Dec is %02x\n",data, m_u10_cb2, m_u10_ca2, (m_lamp_decode & 0x0f));
+	LOG("Writing %02x to U10 PIA, CB2 state is %01x,  CA2 state is %01x, Lamp_Dec is %02x\n",data, m_u10_cb2, m_u10_ca2, (m_lamp_decode & 0x0f));
 
 	if (!m_u10_ca2)
 	{
@@ -621,10 +674,10 @@ WRITE8_MEMBER( by35_state::u10_a_w )
 	{
 		if ((m_lamp_decode & 0x0f) < 0x0f)
 		{
-			if (output().get_indexed_value("lamp", ((m_lamp_decode & 0x0f)+00) ) ==0 ) output().set_indexed_value("lamp", ((m_lamp_decode & 0x0f)+00), ((data & 0x10) ? false : true));
-			if (output().get_indexed_value("lamp", ((m_lamp_decode & 0x0f)+15) ) ==0 ) output().set_indexed_value("lamp", ((m_lamp_decode & 0x0f)+15), ((data & 0x20) ? false : true));
-			if (output().get_indexed_value("lamp", ((m_lamp_decode & 0x0f)+30) ) ==0 ) output().set_indexed_value("lamp", ((m_lamp_decode & 0x0f)+30), ((data & 0x40) ? false : true));
-			if (output().get_indexed_value("lamp", ((m_lamp_decode & 0x0f)+45) ) ==0 ) output().set_indexed_value("lamp", ((m_lamp_decode & 0x0f)+45), ((data & 0x80) ? false : true));
+			if (!m_lamps[(m_lamp_decode & 0x0f)+00]) m_lamps[(m_lamp_decode & 0x0f)+00] = !BIT(data, 4);
+			if (!m_lamps[(m_lamp_decode & 0x0f)+15]) m_lamps[(m_lamp_decode & 0x0f)+15] = !BIT(data, 5);
+			if (!m_lamps[(m_lamp_decode & 0x0f)+30]) m_lamps[(m_lamp_decode & 0x0f)+30] = !BIT(data, 6);
+			if (!m_lamps[(m_lamp_decode & 0x0f)+45]) m_lamps[(m_lamp_decode & 0x0f)+45] = !BIT(data, 7);
 		}
 		else
 		{
@@ -728,7 +781,7 @@ WRITE8_MEMBER( by35_state::u11_b_w )
 		if ((data & 0x0f) < 0x0f)   // Momentary Solenoids
 		{
 			if (m_solenoid_features[(data & 0x0f)][0] != 0xff) {    // Play solenoid audio sample
-				if (output().get_indexed_value("solenoid", (data & 0x0f)) == false)
+				if (!m_solenoids[data & 0x0f])
 					m_samples->start(m_solenoid_features[(data & 0x0f)][0], m_solenoid_features[(data & 0x0f)][1]);
 			}
 
@@ -739,59 +792,56 @@ WRITE8_MEMBER( by35_state::u11_b_w )
 		}
 		else                        // Rest output - all momentary solenoids are off
 		{
-			for (int i=0; i<15; i++)
-			{
-				output().set_indexed_value( "solenoid", i, false);
-			}
+			std::fill_n(std::begin(m_solenoids), 15, false);
 		}
 	}
 
 
 	if ((m_u11b & 0x10) && ((data & 0x10)==0))
 	{
-		output().set_value("solenoid16", true);
+		m_solenoids[16] = true;
 		if (m_solenoid_features[16][0] != 0xff)
 			m_samples->start(m_solenoid_features[16][0], m_solenoid_features[16][1]);
 	}
 	else if ((data & 0x10) && ((m_u11b & 0x10)==0))
 	{
-		output().set_value("solenoid16", false);
+		m_solenoids[16] = false;
 		if (m_solenoid_features[16][0] != 0xff)
 			m_samples->start(m_solenoid_features[16][0], m_solenoid_features[16][2]);
 	}
 	if ((m_u11b & 0x20) && ((data & 0x20)==0))
 	{
-		output().set_value("solenoid17", true);                   // Coin Lockout Coil engage
+		m_solenoids[17] = true;                   // Coin Lockout Coil engage
 		if (m_solenoid_features[17][0] != 0xff)
 			m_samples->start(m_solenoid_features[17][0], m_solenoid_features[17][1]);
 	}
 	else if ((data & 0x20) && ((m_u11b & 0x20)==0))
 	{
-		output().set_value("solenoid17", false);                  // Coin Lockout Coil release
+		m_solenoids[17] = false;                  // Coin Lockout Coil release
 		if (m_solenoid_features[17][0] != 0xff)
 			m_samples->start(m_solenoid_features[17][0], m_solenoid_features[17][2]);
 	}
 	if ((m_u11b & 0x40) && ((data & 0x40)==0))
 	{
-		output().set_value("solenoid18", true);                   // Flipper Enable Relay engage
+		m_solenoids[18] = true;                   // Flipper Enable Relay engage
 		if (m_solenoid_features[18][0] != 0xff)
 			m_samples->start(m_solenoid_features[18][0], m_solenoid_features[18][1]);
 	}
 	else if ((data & 0x40) && ((m_u11b & 0x40)==0))
 	{
-		output().set_value("solenoid18", false);                  // Flipper Enable Relay release
+		m_solenoids[18] = false;                  // Flipper Enable Relay release
 		if (m_solenoid_features[18][0] != 0xff)
 			m_samples->start(m_solenoid_features[18][0], m_solenoid_features[18][2]);
 	}
 	if ((m_u11b & 0x80) && ((data & 0x80)==0))
 	{
-		output().set_value("solenoid19", true);
+		m_solenoids[19] = true;
 		if (m_solenoid_features[19][0] != 0xff)
 			m_samples->start(m_solenoid_features[19][0], m_solenoid_features[19][1]);
 	}
 	else if ((data & 0x80) && ((m_u11b & 0x80)==0))
 	{
-		output().set_value("solenoid19", false);
+		m_solenoids[19] = false;
 		if (m_solenoid_features[19][0] != 0xff)
 			m_samples->start(m_solenoid_features[19][0], m_solenoid_features[19][2]);
 	}
@@ -799,7 +849,7 @@ WRITE8_MEMBER( by35_state::u11_b_w )
 	m_u11b = data;
 }
 
-WRITE8_MEMBER( by35_state::u11_b_as2888_w )
+WRITE8_MEMBER( as2888_state::u11_b_as2888_w )
 {
 	u11_b_w( space, offset, data );
 }
@@ -864,143 +914,106 @@ TIMER_DEVICE_CALLBACK_MEMBER( by35_state::timer_d_pulse )
 	m_pia_u11->ca1_w(m_u11_ca1);
 }
 
-TIMER_DEVICE_CALLBACK_MEMBER( by35_state::timer_s )
+TIMER_DEVICE_CALLBACK_MEMBER( as2888_state::timer_s )
 {
 	m_snd_tone_gen--;
 
 	if ((m_snd_tone_gen == 0) && (m_snd_sel != 0x01))
 	{
-		address_space &space = m_maincpu->space(AS_PROGRAM);
-
 		m_snd_tone_gen = m_snd_sel;
 		m_snd_div++;
 
-		m_discrete->write(space, NODE_04, ((m_snd_div & 0x04)>>2) * 1);
-		m_discrete->write(space, NODE_01, ((m_snd_div & 0x01)>>0) * 1);
+		m_discrete->write(machine().dummy_space(), NODE_04, BIT(m_snd_div, 2) * 1);
+		m_discrete->write(machine().dummy_space(), NODE_01, BIT(m_snd_div, 0) * 1);
 
-//      if (m_snd_sel == 0x01) logerror("SndSel=%02x, Tone=%02x, Div=%02x\n",m_snd_sel, m_snd_tone_gen, m_snd_div);
+		if (m_snd_sel == 0x01) LOG("SndSel=%02x, Tone=%02x, Div=%02x\n",m_snd_sel, m_snd_tone_gen, m_snd_div);
 	}
 }
 
-TIMER_DEVICE_CALLBACK_MEMBER( by35_state::timer_as2888 )
+TIMER_DEVICE_CALLBACK_MEMBER( as2888_state::timer_as2888 )
 {
-	address_space &space = m_maincpu->space(AS_PROGRAM);
-
 	offs_t offs = (m_u11b & 0x0f);
 	if ((m_u11a & 0x02) == 0) offs |= 0x10;
 	{
 		m_snd_sel = m_snd_prom[offs];
-//      logerror("SndSel read %02x from PROM addr %02x\n",m_snd_sel, offs );
+		LOG("SndSel read %02x from PROM addr %02x\n",m_snd_sel, offs );
 		m_snd_sel = bitswap<8>(m_snd_sel,0,1,2,3,4,5,6,7);
 
 		m_snd_tone_gen = m_snd_sel;
-//      logerror("SndSel=%02x, Tone=%02x, Div=%02x\n",m_snd_sel, m_snd_tone_gen, m_snd_div);
+		LOG("SndSel=%02x, Tone=%02x, Div=%02x\n",m_snd_sel, m_snd_tone_gen, m_snd_div);
 	}
 
-	m_discrete->write(space, NODE_08, 0);
+	m_discrete->write(machine().dummy_space(), NODE_08, 0);
 	timer.adjust(attotime::never);
 	m_timer_as2888 = false;
 
-// logerror("Sustain off\n");
+	LOG("Sustain off\n");
 }
 
 
 
-DRIVER_INIT_MEMBER( by35_state, by35_6 )
+by35_state::solenoid_feature_data const by35_state::s_solenoid_features_default =
 {
-	static const uint8_t solenoid_features_default[20][4] =
-	{
-	// This table serves two functions and is configured on a per game basis:
-	// Assign a particular sound sample corresponding to a solenoid function, and
-	// release any switches being held closed eg. drop targets, ball in saucer/outhole, etc
+// This table serves two functions and is configured on a per game basis:
+// Assign a particular sound sample corresponding to a solenoid function, and
+// release any switches being held closed eg. drop targets, ball in saucer/outhole, etc
 
-	//  { Sound Channel, Sound Sample, Switch Strobe, Switch Return Mask }
-	/*00*/  { 0x00, 0x00,  0x00, 0x00 },
-	/*01*/  { 0x00, 0x00,  0x00, 0x00 },
-	/*02*/  { 0x00, 0x00,  0x00, 0x00 },
-	/*03*/  { 0x00, 0x00,  0x00, 0x00 },
-	/*04*/  { 0x00, 0x00,  0x00, 0x00 },
-	/*05*/  { 0x04, 0x06,  0x00, 0x00 },        // Knocker
-	/*06*/  { 0x01, 0x09,  0x00, 0x7f },        // Outhole
-	/*07*/  { 0x00, 0x0a,  0x00, 0x00 },
-	/*08*/  { 0x02, 0x00,  0x00, 0x00 },
-	/*09*/  { 0x02, 0x00,  0x00, 0x00 },
-	/*10*/  { 0x02, 0x00,  0x00, 0x00 },
-	/*11*/  { 0x02, 0x07,  0x00, 0x00 },
-	/*12*/  { 0x00, 0x0b,  0x00, 0x00 },
-	/*13*/  { 0x02, 0x07,  0x00, 0x00 },
-	/*14*/  { 0x00, 0x00,  0x00, 0x00 },
-	/*15*/  { 0xff, 0xff,  0x00, 0x00 },        // None - all momentary solenoids off
-	//  { Sound Channel, Sound engage, Sound release, Not Used }
-	/*16*/  { 0xff, 0xff, 0xff,  0x00 },
-	/*17*/  { 0x00, 0x0c, 0x0d,  0x00 },        // Coin Lockout coil
-	/*18*/  { 0x00, 0x0e, 0x0f,  0x00 },        // Flipper enable relay
-	/*19*/  { 0xff, 0xff, 0xff,  0x00 }
-	};
+//  { Sound Channel, Sound Sample, Switch Strobe, Switch Return Mask }
+/*00*/  { 0x00, 0x00,  0x00, 0x00 },
+/*01*/  { 0x00, 0x00,  0x00, 0x00 },
+/*02*/  { 0x00, 0x00,  0x00, 0x00 },
+/*03*/  { 0x00, 0x00,  0x00, 0x00 },
+/*04*/  { 0x00, 0x00,  0x00, 0x00 },
+/*05*/  { 0x04, 0x06,  0x00, 0x00 },        // Knocker
+/*06*/  { 0x01, 0x09,  0x00, 0x7f },        // Outhole
+/*07*/  { 0x00, 0x0a,  0x00, 0x00 },
+/*08*/  { 0x02, 0x00,  0x00, 0x00 },
+/*09*/  { 0x02, 0x00,  0x00, 0x00 },
+/*10*/  { 0x02, 0x00,  0x00, 0x00 },
+/*11*/  { 0x02, 0x07,  0x00, 0x00 },
+/*12*/  { 0x00, 0x0b,  0x00, 0x00 },
+/*13*/  { 0x02, 0x07,  0x00, 0x00 },
+/*14*/  { 0x00, 0x00,  0x00, 0x00 },
+/*15*/  { 0xff, 0xff,  0x00, 0x00 },        // None - all momentary solenoids off
+//  { Sound Channel, Sound engage, Sound release, Not Used }
+/*16*/  { 0xff, 0xff, 0xff,  0x00 },
+/*17*/  { 0x00, 0x0c, 0x0d,  0x00 },        // Coin Lockout coil
+/*18*/  { 0x00, 0x0e, 0x0f,  0x00 },        // Flipper enable relay
+/*19*/  { 0xff, 0xff, 0xff,  0x00 }
+};
 
 
-	for (int i=0; i<20; i++)
-	{
-		for (int j=0; j<4; j++)
-			m_solenoid_features[i][j] = solenoid_features_default[i][j];
-	}
-
-
-	m_7d = 0;
-}
-
-DRIVER_INIT_MEMBER( by35_state, playboy )
+by35_state::solenoid_feature_data const playboy_state::s_solenoid_features_playboy =
 {
-	static const uint8_t solenoid_features_playboy[20][4] =
-	{
-	//  { Sound Channel, Sound Sample, Switch Strobe, Switch Return Mask }
-	/*00*/  { 0xff, 0xff,  0x00, 0x00 },
-	/*01*/  { 0xff, 0xff,  0x00, 0x00 },
-	/*02*/  { 0xff, 0xff,  0x00, 0x00 },
-	/*03*/  { 0xff, 0xff,  0x00, 0x00 },
-	/*04*/  { 0xff, 0xff,  0x00, 0x00 },
-	/*05*/  { 0x04, 0x06,  0x00, 0x00 },        // Knocker
-	/*06*/  { 0x01, 0x09,  0x00, 0x7f },        // Outhole
-	/*07*/  { 0x02, 0x0a,  0x03, 0x7f },        // Kickback Grotto
-	/*08*/  { 0x02, 0x00,  0x00, 0x00 },        // Pop Bumper Left
-	/*09*/  { 0x02, 0x00,  0x00, 0x00 },        // Pop Bumper Right
-	/*10*/  { 0x02, 0x00,  0x00, 0x00 },        // Pop Bumper Bottom
-	/*11*/  { 0x02, 0x07,  0x00, 0x00 },        // Slingshot Left
-	/*12*/  { 0x03, 0x0b,  0x00, 0xe0 },        // Drop Target Reset
-	/*13*/  { 0x02, 0x07,  0x00, 0x00 },        // Slingshot Right
-	/*14*/  { 0xff, 0xff,  0x00, 0x00 },
-	/*15*/  { 0xff, 0xff,  0x00, 0x00 },        // None - all momentary solenoids off
-	//  { Sound Channel, Sound engage, Sound release, Not Used }
-	/*16*/  { 0xff, 0xff, 0xff,  0x00 },
-	/*17*/  { 0x00, 0x0c, 0x0d,  0x00 },        // Coin Lockout coil
-	/*18*/  { 0x00, 0x0e, 0x0f,  0x00 },        // Flipper enable relay
-	/*19*/  { 0xff, 0xff, 0xff,  0x00 }
-	};
+//  { Sound Channel, Sound Sample, Switch Strobe, Switch Return Mask }
+/*00*/  { 0xff, 0xff,  0x00, 0x00 },
+/*01*/  { 0xff, 0xff,  0x00, 0x00 },
+/*02*/  { 0xff, 0xff,  0x00, 0x00 },
+/*03*/  { 0xff, 0xff,  0x00, 0x00 },
+/*04*/  { 0xff, 0xff,  0x00, 0x00 },
+/*05*/  { 0x04, 0x06,  0x00, 0x00 },        // Knocker
+/*06*/  { 0x01, 0x09,  0x00, 0x7f },        // Outhole
+/*07*/  { 0x02, 0x0a,  0x03, 0x7f },        // Kickback Grotto
+/*08*/  { 0x02, 0x00,  0x00, 0x00 },        // Pop Bumper Left
+/*09*/  { 0x02, 0x00,  0x00, 0x00 },        // Pop Bumper Right
+/*10*/  { 0x02, 0x00,  0x00, 0x00 },        // Pop Bumper Bottom
+/*11*/  { 0x02, 0x07,  0x00, 0x00 },        // Slingshot Left
+/*12*/  { 0x03, 0x0b,  0x00, 0xe0 },        // Drop Target Reset
+/*13*/  { 0x02, 0x07,  0x00, 0x00 },        // Slingshot Right
+/*14*/  { 0xff, 0xff,  0x00, 0x00 },
+/*15*/  { 0xff, 0xff,  0x00, 0x00 },        // None - all momentary solenoids off
+//  { Sound Channel, Sound engage, Sound release, Not Used }
+/*16*/  { 0xff, 0xff, 0xff,  0x00 },
+/*17*/  { 0x00, 0x0c, 0x0d,  0x00 },        // Coin Lockout coil
+/*18*/  { 0x00, 0x0e, 0x0f,  0x00 },        // Flipper enable relay
+/*19*/  { 0xff, 0xff, 0xff,  0x00 }
+};
 
 
-	DRIVER_INIT_CALL( by35_6 );
-
-	for (int i=0; i<20; i++)
-	{
-		for (int j=0; j<4; j++)
-			m_solenoid_features[i][j] = solenoid_features_playboy[i][j];
-	}
-
-
-	m_7d = 0;
-}
-
-
-DRIVER_INIT_MEMBER( by35_state, by35_7 )
+void by35_state::machine_reset()
 {
-	DRIVER_INIT_CALL(by35_6);
+	genpin_class::machine_reset();
 
-	m_7d = 1;
-}
-
-
-MACHINE_RESET_MEMBER( by35_state, by35 )
-{
 	render_target *target = machine().render().first_target();
 
 	target->set_view(0);
@@ -1012,12 +1025,6 @@ MACHINE_RESET_MEMBER( by35_state, by35 )
 	m_lamp_decode = 0x0f;
 	m_io_hold_x[0] = 0x80;  // Put ball in Outhole on startup
 	m_io_hold_x[1] = m_io_hold_x[2] = m_io_hold_x[3] = m_io_hold_x[4] = m_io_hold_x[5] = 0;
-}
-
-MACHINE_START_MEMBER( by35_state, as2888 )
-{
-	MACHINE_RESET_CALL_MEMBER( by35 );
-	m_snd_prom = memregion("sound1")->base();
 }
 
 static const discrete_mixer_desc as2888_digital_mixer_info =
@@ -1086,8 +1093,6 @@ MACHINE_CONFIG_START(by35_state::by35)
 	MCFG_CPU_ADD("maincpu", M6800, 530000) // No xtal, just 2 chips forming a multivibrator oscillator around 530KHz
 	MCFG_CPU_PROGRAM_MAP(by35_map)
 
-	MCFG_MACHINE_RESET_OVERRIDE( by35_state, by35 )
-
 	MCFG_NVRAM_ADD_0FILL("nvram")   // 'F' filled causes Credit Display to be blank on first startup
 
 	/* Video */
@@ -1125,27 +1130,23 @@ MACHINE_CONFIG_START(by35_state::by35)
 	MCFG_TIMER_DRIVER_ADD("timer_d_pulse", by35_state, timer_d_pulse)                             // 555 Active pulse length
 MACHINE_CONFIG_END
 
-MACHINE_CONFIG_START(by35_state::as2888_audio)
-
-	MCFG_MACHINE_START_OVERRIDE( by35_state, as2888 )
-
+MACHINE_CONFIG_START(as2888_state::as2888_audio)
 	MCFG_SPEAKER_STANDARD_MONO("mono")
 	MCFG_SOUND_ADD("discrete", DISCRETE, 0)
 	MCFG_DISCRETE_INTF(as2888)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.00)
 
 	MCFG_DEVICE_MODIFY("pia_u11")
-	MCFG_PIA_WRITEPB_HANDLER(WRITE8(by35_state, u11_b_as2888_w))
-	MCFG_PIA_CB2_HANDLER(WRITELINE(by35_state, u11_cb2_as2888_w))
+	MCFG_PIA_WRITEPB_HANDLER(WRITE8(as2888_state, u11_b_as2888_w))
+	MCFG_PIA_CB2_HANDLER(WRITELINE(as2888_state, u11_cb2_as2888_w))
 
-	MCFG_TIMER_DRIVER_ADD_PERIODIC("timer_s_freq", by35_state, timer_s, attotime::from_hz(353000))     // Inverter clock on AS-2888 sound board
-	MCFG_TIMER_DRIVER_ADD("timer_as2888", by35_state, timer_as2888)
+	MCFG_TIMER_DRIVER_ADD_PERIODIC("timer_s_freq", as2888_state, timer_s, attotime::from_hz(353000))     // Inverter clock on AS-2888 sound board
+	MCFG_TIMER_DRIVER_ADD("timer_as2888", as2888_state, timer_as2888)
 MACHINE_CONFIG_END
 
 
-MACHINE_CONFIG_START(by35_state::as2888)
+MACHINE_CONFIG_START(as2888_state::as2888)
 	by35(config);
-
 	as2888_audio(config);
 MACHINE_CONFIG_END
 
@@ -2414,16 +2415,16 @@ ROM_START(suprbowl)
 ROM_END
 
 // AS-2888 sound
-GAME( 1979, sst,        0,        as2888, by35,    by35_state, by35_6,  ROT0, "Bally", "Supersonic",                   MACHINE_IS_SKELETON_MECHANICAL)
-GAMEL(1978, playboy,    0,        as2888, playboy, by35_state, playboy, ROT0, "Bally", "Playboy",                      MACHINE_MECHANICAL | MACHINE_NOT_WORKING, layout_by35_playboy)
-GAME( 1978, lostwrlp,   0,        as2888, by35,    by35_state, by35_6,  ROT0, "Bally", "Lost World",                   MACHINE_IS_SKELETON_MECHANICAL)
-GAME( 1978, smman,      0,        as2888, by35,    by35_state, by35_6,  ROT0, "Bally", "Six Million Dollar Man",       MACHINE_IS_SKELETON_MECHANICAL)
-GAME( 1978, voltan,     0,        as2888, by35,    by35_state, by35_6,  ROT0, "Bally", "Voltan Escapes Cosmic Doom",   MACHINE_IS_SKELETON_MECHANICAL)
-GAME( 1979, startrep,   0,        as2888, by35,    by35_state, by35_6,  ROT0, "Bally", "Star Trek (Pinball)",          MACHINE_IS_SKELETON_MECHANICAL)
-GAME( 1979, kiss,       0,        as2888, by35,    by35_state, by35_6,  ROT0, "Bally", "Kiss",                         MACHINE_IS_SKELETON_MECHANICAL)
-GAME( 1979, hglbtrtr,   0,        as2888, by35,    by35_state, by35_6,  ROT0, "Bally", "Harlem Globetrotters On Tour", MACHINE_IS_SKELETON_MECHANICAL)
-GAME( 1979, dollyptn,   0,        as2888, by35,    by35_state, by35_6,  ROT0, "Bally", "Dolly Parton",                 MACHINE_IS_SKELETON_MECHANICAL)
-GAME( 1979, paragon,    0,        as2888, by35,    by35_state, by35_6,  ROT0, "Bally", "Paragon",                      MACHINE_IS_SKELETON_MECHANICAL)
+GAME( 1979, sst,        0,        as2888, by35,    as2888_state,  by35_6, ROT0, "Bally", "Supersonic",                   MACHINE_IS_SKELETON_MECHANICAL)
+GAMEL(1978, playboy,    0,        as2888, playboy, playboy_state, by35_6, ROT0, "Bally", "Playboy",                      MACHINE_MECHANICAL | MACHINE_NOT_WORKING, layout_by35_playboy)
+GAME( 1978, lostwrlp,   0,        as2888, by35,    as2888_state,  by35_6, ROT0, "Bally", "Lost World",                   MACHINE_IS_SKELETON_MECHANICAL)
+GAME( 1978, smman,      0,        as2888, by35,    as2888_state,  by35_6, ROT0, "Bally", "Six Million Dollar Man",       MACHINE_IS_SKELETON_MECHANICAL)
+GAME( 1978, voltan,     0,        as2888, by35,    as2888_state,  by35_6, ROT0, "Bally", "Voltan Escapes Cosmic Doom",   MACHINE_IS_SKELETON_MECHANICAL)
+GAME( 1979, startrep,   0,        as2888, by35,    as2888_state,  by35_6, ROT0, "Bally", "Star Trek (Pinball)",          MACHINE_IS_SKELETON_MECHANICAL)
+GAME( 1979, kiss,       0,        as2888, by35,    as2888_state,  by35_6, ROT0, "Bally", "Kiss",                         MACHINE_IS_SKELETON_MECHANICAL)
+GAME( 1979, hglbtrtr,   0,        as2888, by35,    as2888_state,  by35_6, ROT0, "Bally", "Harlem Globetrotters On Tour", MACHINE_IS_SKELETON_MECHANICAL)
+GAME( 1979, dollyptn,   0,        as2888, by35,    as2888_state,  by35_6, ROT0, "Bally", "Dolly Parton",                 MACHINE_IS_SKELETON_MECHANICAL)
+GAME( 1979, paragon,    0,        as2888, by35,    as2888_state,  by35_6, ROT0, "Bally", "Paragon",                      MACHINE_IS_SKELETON_MECHANICAL)
 
 // AS-3022 sound
 GAME( 1980, ngndshkr,   0,        by35, by35, by35_state, by35_6, ROT0, "Bally", "Nitro Ground Shaker",               MACHINE_IS_SKELETON_MECHANICAL)

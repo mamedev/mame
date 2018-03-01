@@ -297,12 +297,12 @@ void mpu4_state::lamp_extend_small(int data)
 	lamp_ext_data = 0x1f - ((data & 0xf8) >> 3);//remove the mux lines from the data
 
 	if (m_lamp_strobe_ext_persistence == 0)
-	//One write to reset the drive lines, one with the data, one to clear the lines, so only the 2nd write does anything
-	//Once again, lamp persistences would take care of this, but we can't do that
 	{
+		//One write to reset the drive lines, one with the data, one to clear the lines, so only the 2nd write does anything
+		//Once again, lamp persistences would take care of this, but we can't do that
 		for (i = 0; i < 5; i++)
 		{
-			output().set_lamp_value((8*column)+i+128,((lamp_ext_data  & (1 << i)) != 0));
+			m_lamps[(8*column)+i+128] = BIT(lamp_ext_data, i);
 		}
 	}
 	m_lamp_strobe_ext_persistence ++;
@@ -334,7 +334,7 @@ void mpu4_state::lamp_extend_large(int data,int column,int active)
 			{
 				for (i = 0; i < 8; i++)
 				{//CHECK, this includes bit 7
-					output().set_lamp_value((8*column)+i+128+lampbase ,(data  & (1 << i)) != 0);
+					m_lamps[(8*column)+i+128+lampbase] = BIT(data, i);
 				}
 				m_lamp_strobe_ext = column;
 			}
@@ -576,7 +576,7 @@ WRITE8_MEMBER(mpu4_state::pia_ic3_porta_w)
 
 			for (i = 0; i < 8; i++)
 			{
-				output().set_lamp_value((8*m_input_strobe)+i, ((data  & (1 << i)) !=0));
+				m_lamps[(8*m_input_strobe)+i] = BIT(data, i);
 			}
 			m_lamp_strobe = m_input_strobe;
 		}
@@ -594,7 +594,7 @@ WRITE8_MEMBER(mpu4_state::pia_ic3_portb_w)
 		{
 			for (i = 0; i < 8; i++)
 			{
-				output().set_lamp_value((8*m_input_strobe)+i+64, ((data  & (1 << i)) !=0));
+				m_lamps[(8*m_input_strobe)+i+64] = BIT(data, i);
 			}
 			m_lamp_strobe2 = m_input_strobe;
 		}
@@ -606,13 +606,13 @@ WRITE8_MEMBER(mpu4_state::pia_ic3_portb_w)
 			/* TODO: replace this with 'segment' lamp masks, to make it more generic */
 			uint8_t pled_segs[2] = {0,0};
 
-			static const int lamps1[8] = { 106, 107, 108, 109, 104, 105, 110, 133 };
+			static const int lamps1[8] = { 106, 107, 108, 109, 104, 105, 110, 111 };
 			static const int lamps2[8] = { 114, 115, 116, 117, 112, 113, 118, 119 };
 
 			for (i = 0; i < 8; i++)
 			{
-				if (output().get_lamp_value(lamps1[i])) pled_segs[0] |= (1 << i);
-				if (output().get_lamp_value(lamps2[i])) pled_segs[1] |= (1 << i);
+				if (m_lamps[lamps1[i]]) pled_segs[0] |= (1 << i);
+				if (m_lamps[lamps2[i]]) pled_segs[1] |= (1 << i);
 			}
 
 			output().set_digit_value(8,pled_segs[0]);
@@ -2155,6 +2155,8 @@ void mpu4_state::mpu4_install_mod4bwb_space(address_space &space)
 
 void mpu4_state::mpu4_config_common()
 {
+	m_lamps.resolve();
+
 	m_ic24_timer = timer_alloc(TIMER_IC24);
 	m_lamp_strobe_ext_persistence = 0;
 }

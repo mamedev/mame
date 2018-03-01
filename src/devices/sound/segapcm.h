@@ -46,7 +46,7 @@ public:
 	segapcm_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
 	// configuration
-	void set_bank(int bank) { m_bank = bank; }
+	void set_bank(int bank) { m_bankshift = (bank & 0xf); m_bankmask = (0x70|((bank >> 16) & 0xfc)); }
 
 	DECLARE_WRITE8_MEMBER( sega_pcm_w );
 	DECLARE_READ8_MEMBER( sega_pcm_r );
@@ -54,6 +54,7 @@ public:
 protected:
 	// device-level overrides
 	virtual void device_start() override;
+	virtual void device_clock_changed() override;
 
 	// sound stream update overrides
 	virtual void sound_stream_update(sound_stream &stream, stream_sample_t **inputs, stream_sample_t **outputs, int samples) override;
@@ -64,7 +65,6 @@ protected:
 private:
 	std::unique_ptr<uint8_t[]> m_ram;
 	uint8_t m_low[16];
-	int m_bank;
 	int m_bankshift;
 	int m_bankmask;
 	sound_stream* m_stream;
