@@ -177,6 +177,7 @@ private:
 	std::unique_ptr<uint64_t[]> instr;
 	std::unique_ptr<int16_t[]> dram;
 
+	// TODO : Masked address?
 	int16_t dram_r(int addr) { return dram[addr & DRAM_MASK]; }
 	void dram_w(int addr, int16_t data) { dram[addr & DRAM_MASK] = data; }
 
