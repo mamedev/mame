@@ -189,6 +189,8 @@
 
 void interpro_state::machine_start()
 {
+	m_led.resolve();
+
 	// FIXME: disabled for now to avoid cold start diagnostic errors
 	//m_sreg_ctrl2 = CTRL2_COLDSTART | CTRL2_PWRUP;
 	m_sreg_ctrl2 = 0;
@@ -230,7 +232,7 @@ WRITE16_MEMBER(interpro_state::sreg_led_w)
 	// 7-segment decode patterns (hex digits) borrowed from wico.cpp (mc14495)
 	static const u8 patterns[16] = { 0x3f, 0x06, 0x5b, 0x4f, 0x66, 0x6d, 0x7d, 0x07, 0x7f, 0x6f, 0x77, 0x7c, 0x39, 0x5e, 0x79, 0x71 };
 
-	output().set_digit_value(0, patterns[data & 0xf]);
+	m_led = patterns[data & 0xf];
 
 	COMBINE_DATA(&m_sreg_led);
 }
@@ -241,7 +243,7 @@ WRITE16_MEMBER(interpro_state::sreg_ctrl1_w)
 
 	// check if led decimal point changes state
 	if ((data ^ m_sreg_ctrl1) & CTRL1_LEDDP)
-		output().set_digit_value(0, (output().get_digit_value(0) + 0x80) & 0xff);
+		m_led = (m_led + 0x80) & 0xff;
 
 	COMBINE_DATA(&m_sreg_ctrl1);
 }
