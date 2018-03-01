@@ -606,7 +606,7 @@ WRITE8_MEMBER(mpu4_state::pia_ic3_portb_w)
 			/* TODO: replace this with 'segment' lamp masks, to make it more generic */
 			uint8_t pled_segs[2] = {0,0};
 
-			static const int lamps1[8] = { 106, 107, 108, 109, 104, 105, 110, 133 }; // FIXME: the above code can only light lamps up to 127 - what should 133 really be?
+			static const int lamps1[8] = { 106, 107, 108, 109, 104, 105, 110, 111 };
 			static const int lamps2[8] = { 114, 115, 116, 117, 112, 113, 118, 119 };
 
 			for (i = 0; i < 8; i++)
