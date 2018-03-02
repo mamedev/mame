@@ -1603,25 +1603,9 @@ static const gfx_layout spritelayout =
 	16*8                                    /* every sprite takes 16 consecutive bytes */
 };
 
-static const gfx_layout pestplce_spritelayout =
-{
-	16,16,                                  /* 16*16 sprites */
-	RGN_FRAC(1,4),                          /* 256 sprites */
-	2,                                      /* 2 bits per pixel */
-	{ RGN_FRAC(1,2), RGN_FRAC(0,2) },       /* the two bitplanes are separated */
-	{ STEP8(0,1), STEP8(RGN_FRAC(1,4),1) }, /* the two halves of the sprite are separated */
-	{ STEP16(0,8) },
-	16*8                                    /* every sprite takes 16 consecutive bytes */
-};
-
 static GFXDECODE_START( dkong )
 	GFXDECODE_ENTRY( "gfx1", 0x0000, gfx_8x8x2_planar,   0, 64 )
 	GFXDECODE_ENTRY( "gfx2", 0x0000, spritelayout,       0, 64 )
-GFXDECODE_END
-
-static GFXDECODE_START( pestplce )
-	GFXDECODE_ENTRY( "gfx1", 0x0000, gfx_8x8x2_planar,         0, 64 )
-	GFXDECODE_ENTRY( "gfx2", 0x0000, pestplce_spritelayout,   0, 64 )
 GFXDECODE_END
 
 
@@ -1840,9 +1824,7 @@ MACHINE_CONFIG_START(dkong_state::pestplce)
 	dkongjr(config);
 
 	/* video hardware */
-	MCFG_GFXDECODE_MODIFY("gfxdecode", pestplce)
 	MCFG_PALETTE_MODIFY("palette")
-	MCFG_PALETTE_ENTRIES(DK2B_PALETTE_LENGTH)
 	MCFG_PALETTE_INIT_OWNER(dkong_state,dkong2b)  /* wrong! */
 	MCFG_SCREEN_MODIFY("screen")
 	MCFG_SCREEN_UPDATE_DRIVER(dkong_state, screen_update_pestplce)

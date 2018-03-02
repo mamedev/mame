@@ -100,32 +100,33 @@ class mpu4_state : public driver_device
 {
 public:
 	mpu4_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag),
-			m_maincpu(*this, "maincpu"),
-			m_vfd(*this, "vfd"),
-			m_6840ptm(*this, "ptm_ic2"),
-			m_pia3(*this, "pia_ic3"),
-			m_pia4(*this, "pia_ic4"),
-			m_pia5(*this, "pia_ic5"),
-			m_pia6(*this, "pia_ic6"),
-			m_pia7(*this, "pia_ic7"),
-			m_pia8(*this, "pia_ic8"),
-			m_port_mux(*this, {"ORANGE1", "ORANGE2", "BLACK1", "BLACK2", "ORANGE1", "ORANGE2", "DIL1", "DIL2"}),
-			m_aux1_port(*this, "AUX1"),
-			m_aux2_port(*this, "AUX2"),
-			m_bank1(*this, "bank1"),
-			m_msm6376(*this, "msm6376"),
-			m_reel0(*this, "reel0"),
-			m_reel1(*this, "reel1"),
-			m_reel2(*this, "reel2"),
-			m_reel3(*this, "reel3"),
-			m_reel4(*this, "reel4"),
-			m_reel5(*this, "reel5"),
-			m_reel6(*this, "reel6"),
-			m_reel7(*this, "reel7"),
-			m_palette(*this, "palette"),
-			m_meters(*this, "meters")
-	{}
+		: driver_device(mconfig, type, tag)
+		, m_maincpu(*this, "maincpu")
+		, m_vfd(*this, "vfd")
+		, m_6840ptm(*this, "ptm_ic2")
+		, m_pia3(*this, "pia_ic3")
+		, m_pia4(*this, "pia_ic4")
+		, m_pia5(*this, "pia_ic5")
+		, m_pia6(*this, "pia_ic6")
+		, m_pia7(*this, "pia_ic7")
+		, m_pia8(*this, "pia_ic8")
+		, m_port_mux(*this, {"ORANGE1", "ORANGE2", "BLACK1", "BLACK2", "ORANGE1", "ORANGE2", "DIL1", "DIL2"})
+		, m_aux1_port(*this, "AUX1")
+		, m_aux2_port(*this, "AUX2")
+		, m_bank1(*this, "bank1")
+		, m_msm6376(*this, "msm6376")
+		, m_reel0(*this, "reel0")
+		, m_reel1(*this, "reel1")
+		, m_reel2(*this, "reel2")
+		, m_reel3(*this, "reel3")
+		, m_reel4(*this, "reel4")
+		, m_reel5(*this, "reel5")
+		, m_reel6(*this, "reel6")
+		, m_reel7(*this, "reel7")
+		, m_palette(*this, "palette")
+		, m_meters(*this, "meters")
+		, m_lamps(*this, "lamp%u", 0U)
+	 { }
 
 	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 	{
@@ -338,6 +339,13 @@ protected:
 	optional_device<stepper_device> m_reel7;
 	optional_device<palette_device> m_palette;
 	required_device<meters_device> m_meters;
+
+	// not all systems have this many lamps but the driver is too much of a mess to split up now
+	// 0-63 are on PIA IC3 port A (always present)
+	// 64-127 are on PIA IC3 port B (always present)
+	// 128-132 136-140 144-148 152-156 160-164 168-172 176-180 184-188 are on small lamp extender
+	// 128-255 are on large lamp externders
+	output_finder<256> m_lamps;
 
 	enum
 	{

@@ -76,11 +76,12 @@ MACHINE_CONFIG_START(vp122_state::vp122)
 
 	MCFG_SCREEN_ADD("screen", RASTER)
 	MCFG_SCREEN_RAW_PARAMS(XTAL(14'916'000), 960, 0, 800, 259, 0, 240)
+	//MCFG_SCREEN_RAW_PARAMS(XTAL(22'096'000), 1422, 0, 1188, 259, 0, 240)
 	MCFG_SCREEN_UPDATE_DEVICE("avdc", scn2674_device, screen_update)
 
 	MCFG_DEVICE_ADD("avdc", SCN2674, XTAL(14'916'000) / 10)
 	MCFG_SCN2674_INTR_CALLBACK(INPUTLINE("maincpu", I8085_RST65_LINE))
-	MCFG_SCN2674_TEXT_CHARACTER_WIDTH(10)
+	MCFG_SCN2674_TEXT_CHARACTER_WIDTH(10) // 9 in 132-column modes
 	MCFG_SCN2674_GFX_CHARACTER_WIDTH(10)
 	MCFG_SCN2674_DRAW_CHARACTER_CALLBACK_OWNER(vp122_state, draw_character)
 	MCFG_DEVICE_ADDRESS_MAP(0, vram_map)
@@ -88,10 +89,13 @@ MACHINE_CONFIG_START(vp122_state::vp122)
 
 	MCFG_DEVICE_ADD("duart", SCN2681, XTAL(3'686'400))
 	MCFG_MC68681_IRQ_CALLBACK(INPUTLINE("maincpu", I8085_RST55_LINE))
+	// OP3 timer output likely provides 8251 serial clocks
+	// OP7 = 0 for 80-column modes, 1 for 132-column modes
 
 	MCFG_DEVICE_ADD("usart", I8251, XTAL(8'000'000) / 4)
 
 	MCFG_DEVICE_ADD("pit", PIT8253, 0)
+	// Input clocks are video-related and should differ for 80-column and 132-column modes
 MACHINE_CONFIG_END
 
 /**************************************************************************************************************

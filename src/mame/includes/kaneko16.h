@@ -28,21 +28,23 @@ public:
 		: driver_device(mconfig, type, tag),
 		m_maincpu(*this, "maincpu"),
 		m_audiocpu(*this, "audiocpu"),
-		m_oki(*this, "oki"),
 		m_ym2149(*this, "ym2149_%u", 1),
+		m_oki(*this, "oki%u", 1),
 		m_view2(*this, "view2_%u", 0),
 		m_kaneko_spr(*this, "kan_spr"),
 		m_palette(*this, "palette"),
 		m_eeprom(*this, "eeprom"),
 		m_soundlatch(*this, "soundlatch"),
 		m_spriteram(*this, "spriteram"),
-		m_mainram(*this, "mainram")
+		m_mainram(*this, "mainram"),
+		m_okiregion(*this, "oki%u", 1),
+		m_okibank(*this, "okibank%u", 1)
 		{ }
 
 	required_device<cpu_device> m_maincpu;
 	optional_device<cpu_device> m_audiocpu;
-	optional_device<okim6295_device> m_oki;
 	optional_device_array<ym2149_device, 2> m_ym2149;
+	optional_device_array<okim6295_device, 2> m_oki;
 	optional_device_array<kaneko_view2_tilemap_device, 2> m_view2;
 	required_device<kaneko16_sprite_device> m_kaneko_spr;
 	required_device<palette_device> m_palette;
@@ -51,29 +53,30 @@ public:
 
 	optional_shared_ptr<uint16_t> m_spriteram;
 	optional_shared_ptr<uint16_t> m_mainram;
+	
+	optional_memory_region_array<2> m_okiregion;
+	optional_memory_bank_array<2> m_okibank;
 
 	uint16_t m_disp_enable;
 
 	int m_VIEW2_2_pri;
-
-
+	
+	void kaneko16_common_oki_bank_install(int bankno, size_t fixedsize, size_t bankedsize);
 	DECLARE_WRITE16_MEMBER(kaneko16_coin_lockout_w);
-	DECLARE_WRITE16_MEMBER(kaneko16_soundlatch_w);
 	DECLARE_WRITE16_MEMBER(kaneko16_eeprom_w);
 
 	DECLARE_WRITE16_MEMBER(kaneko16_display_enable);
 
-	DECLARE_READ16_MEMBER(kaneko16_ay1_YM2149_r);
-	DECLARE_WRITE16_MEMBER(kaneko16_ay1_YM2149_w);
-	DECLARE_READ16_MEMBER(kaneko16_ay2_YM2149_r);
-	DECLARE_WRITE16_MEMBER(kaneko16_ay2_YM2149_w);
-	DECLARE_WRITE16_MEMBER(bakubrkr_oki_bank_w);
-	DECLARE_WRITE8_MEMBER(wingforc_oki_bank_w);
+	template<int Chip> DECLARE_READ16_MEMBER(kaneko16_ay_YM2149_r);
+	template<int Chip> DECLARE_WRITE16_MEMBER(kaneko16_ay_YM2149_w);
+	template<int Mask> DECLARE_WRITE8_MEMBER(oki_bank0_w);
+	template<int Mask> DECLARE_WRITE8_MEMBER(oki_bank1_w);
 
 	DECLARE_READ8_MEMBER(eeprom_r);
 	DECLARE_WRITE8_MEMBER(eeprom_w);
-
+	
 	DECLARE_DRIVER_INIT(kaneko16);
+	DECLARE_DRIVER_INIT(bakubrkr);
 
 
 	DECLARE_MACHINE_RESET(gtmr);
@@ -95,33 +98,30 @@ public:
 	void blazeon(machine_config &config);
 	void mgcrystl(machine_config &config);
 	void bakubrkr(address_map &map);
+	void bakubrkr_oki1_map(address_map &map);
 	void blazeon(address_map &map);
 	void blazeon_soundmem(address_map &map);
 	void blazeon_soundport(address_map &map);
 	void mgcrystl(address_map &map);
 	void wingforc_soundport(address_map &map);
+	void gtmr_oki1_map(address_map &map);
+	void gtmr_oki2_map(address_map &map);
 };
 
 class kaneko16_gtmr_state : public kaneko16_state
 {
 public:
 	kaneko16_gtmr_state(const machine_config &mconfig, device_type type, const char *tag)
-		: kaneko16_state(mconfig, type, tag),
-		m_oki(*this, "oki%u", 1)
+		: kaneko16_state(mconfig, type, tag)
 	{
 	}
 
-	DECLARE_WRITE16_MEMBER(bloodwar_oki_0_bank_w);
-	DECLARE_WRITE16_MEMBER(bloodwar_oki_1_bank_w);
-	DECLARE_WRITE16_MEMBER(bonkadv_oki_0_bank_w);
-	DECLARE_WRITE16_MEMBER(bonkadv_oki_1_bank_w);
-	DECLARE_WRITE16_MEMBER(gtmr_oki_0_bank_w);
-	DECLARE_WRITE16_MEMBER(gtmr_oki_1_bank_w);
 	DECLARE_WRITE16_MEMBER(bloodwar_coin_lockout_w);
 	DECLARE_READ16_MEMBER(gtmr_wheel_r);
 	DECLARE_READ16_MEMBER(gtmr2_wheel_r);
 	DECLARE_READ16_MEMBER(gtmr2_IN1_r);
 	DECLARE_DRIVER_INIT(gtmr);
+	void kaneko16_common_oki_bank_install(int bankno, size_t fixedsize, size_t bankedsize);
 
 	void bonkadv(machine_config &config);
 	void gtmr(machine_config &config);
@@ -132,10 +132,6 @@ public:
 	void bonkadv(address_map &map);
 	void gtmr2_map(address_map &map);
 	void gtmr_map(address_map &map);
-private:
-	void kaneko16_expand_sample_banks(const char *region);
-
-	required_device_array<okim6295_device, 2> m_oki;
 };
 
 
@@ -197,7 +193,6 @@ public:
 	}
 
 	DECLARE_WRITE16_MEMBER(shogwarr_oki_bank_w);
-	DECLARE_WRITE16_MEMBER(brapboys_oki_bank_w);
 
 	DECLARE_DRIVER_INIT(shogwarr);
 	DECLARE_DRIVER_INIT(brapboys);
@@ -208,10 +203,7 @@ public:
 	void brapboys(machine_config &config);
 	void brapboys_oki2_map(address_map &map);
 	void shogwarr(address_map &map);
-	void shogwarr_oki1_map(address_map &map);
-	void shogwarr_oki2_map(address_map &map);
 private:
-	void kaneko16_common_oki_bank_w(const char *bankname, const char *tag, int bank, size_t fixedsize, size_t bankedsize);
 
 	optional_device<kaneko_calc3_device> m_calc3_prot;
 };

@@ -121,7 +121,7 @@ public:
 	void daitorid_upd7810_sound(machine_config &config);
 	void poitto(machine_config &config);
 	void blzntrnd(machine_config &config);
-	void _3kokushi(machine_config &config);
+	void sankokushi(machine_config &config);
 	void mouja(machine_config &config);
 	void toride2g(machine_config &config);
 	void karatour(machine_config &config);
@@ -131,6 +131,7 @@ public:
 	void pururun(machine_config &config);
 	void vmetal(machine_config &config);
 	void daitorid(machine_config &config);
+	void puzzli(machine_config &config);
 	void pangpoms(machine_config &config);
 	void dokyusp(machine_config &config);
 	void dokyusei(machine_config &config);

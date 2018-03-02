@@ -1,8 +1,7 @@
 // license:LGPL-2.1+
 // copyright-holders:Angelo Salese, R. Belmont
 /*
-
-    dc.c - Sega Dreamcast driver
+    dccons.cpp - Sega Dreamcast driver
     by R. Belmont & Angelo Salese
 
     SH-4 @ 200 MHz
@@ -273,7 +272,7 @@
 
 #include "screen.h"
 #include "speaker.h"
-
+#include "softlist.h"
 
 #define CPU_CLOCK (200000000)
 
@@ -631,6 +630,8 @@ MACHINE_CONFIG_START(dc_cons_state::dc)
 	MCFG_SLOT_OPTION_ADD("gdrom", GDROM)
 	MCFG_SLOT_OPTION_MACHINE_CONFIG("gdrom", gdrom_config)
 	MCFG_SLOT_DEFAULT_OPTION("gdrom")
+
+	MCFG_SOFTWARE_LIST_ADD("cd_list","dc")
 MACHINE_CONFIG_END
 
 
