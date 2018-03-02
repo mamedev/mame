@@ -75,12 +75,8 @@ ToDo:
 #include "gts1.lh"
 
 #define VERBOSE    1
+#include "logmacro.h"
 
-#if VERBOSE
-#define LOG(x) logerror x
-#else
-#define LOG(x)
-#endif
 
 class gts1_state : public genpin_class
 {
@@ -88,11 +84,15 @@ public:
 	gts1_state(const machine_config &mconfig, device_type type, const char *tag)
 		: genpin_class(mconfig, type, tag)
 		, m_maincpu(*this, "maincpu")
+		, m_dips(*this, "DSW%u", 0)
 		, m_switches(*this, "X.%u", 0)
 	{ }
 
 	DECLARE_DRIVER_INIT(gts1);
 
+	void gts1(machine_config &config);
+
+protected:
 	DECLARE_READ8_MEMBER (gts1_solenoid_r);
 	DECLARE_WRITE8_MEMBER(gts1_solenoid_w);
 	DECLARE_READ8_MEMBER (gts1_switches_r);
@@ -106,13 +106,16 @@ public:
 	DECLARE_WRITE8_MEMBER(gts1_io_w);
 	DECLARE_READ8_MEMBER (gts1_pa_r);
 	DECLARE_WRITE8_MEMBER(gts1_do_w);
-	void gts1(machine_config &config);
+
+	virtual void machine_reset() override;
+
+	void gts1_map(address_map &map);
 	void gts1_data(address_map &map);
 	void gts1_io(address_map &map);
-	void gts1_map(address_map &map);
+
 private:
-	virtual void machine_reset() override;
 	required_device<cpu_device> m_maincpu;
+	required_ioport_array<3> m_dips;
 	required_ioport_array<5> m_switches;
 	uint8_t m_strobe;             //!< switches strobe lines (5 lower bits used)
 	uint8_t m_nvram_addr;         //!< NVRAM address
@@ -346,7 +349,7 @@ DRIVER_INIT_MEMBER(gts1_state,gts1)
 READ8_MEMBER (gts1_state::gts1_solenoid_r)
 {
 	uint8_t data = 0;
-	LOG(("%s: solenoid[%02x] -> %x\n", __FUNCTION__, offset, data));
+	LOG("%s: solenoid[%02x] -> %x\n", __FUNCTION__, offset, data);
 	return data;
 }
 
@@ -355,45 +358,45 @@ WRITE8_MEMBER(gts1_state::gts1_solenoid_w)
 	switch (offset)
 	{
 	case  0:
-		LOG(("%s: outhole <- %x\n", __FUNCTION__, data));
+		LOG("%s: outhole <- %x\n", __FUNCTION__, data);
 		break;
 	case  1:
-		LOG(("%s: knocker <- %x\n", __FUNCTION__, data));
+		LOG("%s: knocker <- %x\n", __FUNCTION__, data);
 		break;
 	case  2:
-		LOG(("%s: tens chime <- %x\n", __FUNCTION__, data));
+		LOG("%s: tens chime <- %x\n", __FUNCTION__, data);
 		break;
 	case  3:
-		LOG(("%s: hundreds chime <- %x\n", __FUNCTION__, data));
+		LOG("%s: hundreds chime <- %x\n", __FUNCTION__, data);
 		break;
 	case  4:
-		LOG(("%s: thousands chime <- %x\n", __FUNCTION__, data));
+		LOG("%s: thousands chime <- %x\n", __FUNCTION__, data);
 		break;
 	case  5:
-		LOG(("%s: no. 6 <- %x\n", __FUNCTION__, data));
+		LOG("%s: no. 6 <- %x\n", __FUNCTION__, data);
 		break;
 	case  6:
-		LOG(("%s: no. 7 <- %x\n", __FUNCTION__, data));
+		LOG("%s: no. 7 <- %x\n", __FUNCTION__, data);
 		break;
 	case  7:
-		LOG(("%s: no. 8 <- %x\n", __FUNCTION__, data));
+		LOG("%s: no. 8 <- %x\n", __FUNCTION__, data);
 		break;
 	case  8: case  9: case 10: case 11:
-		LOG(("%s: not used [%x] <- %x\n", __FUNCTION__, offset, data));
+		LOG("%s: not used [%x] <- %x\n", __FUNCTION__, offset, data);
 		break;
 	case 12:    // spare
-		LOG(("%s: spare [%x] <- %x\n", __FUNCTION__, offset, data));
+		LOG("%s: spare [%x] <- %x\n", __FUNCTION__, offset, data);
 		break;
 	case 13:    // RAM control E2
-		LOG(("%s: RAM control E2 <- %x\n", __FUNCTION__, data));
+		LOG("%s: RAM control E2 <- %x\n", __FUNCTION__, data);
 		m_nvram_e2 = (data & 1) ? true : false;
 		break;
 	case 14:    // RAM control W/R
-		LOG(("%s: RAM control W/R <- %x\n", __FUNCTION__, data));
+		LOG("%s: RAM control W/R <- %x\n", __FUNCTION__, data);
 		m_nvram_wr = (data & 1) ? true : false;
 		break;
 	case 15:    // spare
-		LOG(("%s: spare [%x] <- %x\n", __FUNCTION__, offset, data));
+		LOG("%s: spare [%x] <- %x\n", __FUNCTION__, offset, data);
 		break;
 	}
 }
@@ -409,13 +412,13 @@ READ8_MEMBER (gts1_state::gts1_switches_r)
 			}
 		}
 	}
-	LOG(("%s: switches[%x,%x] -> %x\n", __FUNCTION__, m_strobe, offset, data));
+	LOG("%s: switches[%x,%x] -> %x\n", __FUNCTION__, m_strobe, offset, data);
 	return data;
 }
 
 WRITE8_MEMBER(gts1_state::gts1_switches_w)
 {
-	LOG(("%s: switches[%x] <- %x\n", __FUNCTION__, offset, data));
+	LOG("%s: switches[%x] <- %x\n", __FUNCTION__, offset, data);
 	if (offset < 5) {
 		// outputs O-0 to O-4 are the 5 strobe lines
 		m_strobe = (m_strobe & ~(1 << offset)) | ((data & 1) << offset);
@@ -462,7 +465,7 @@ WRITE8_MEMBER(gts1_state::gts1_display_w)
 	};
 	uint8_t a = ttl7448_mod[(data >> 0) & 15];
 	uint8_t b = ttl7448_mod[(data >> 4) & 15];
-	// LOG(("%s: offset:%d data:%02x a:%02x b:%02x\n", __FUNCTION__, offset, data, a, b));
+	// LOG("%s: offset:%d data:%02x a:%02x b:%02x\n", __FUNCTION__, offset, data, a, b);
 	if ((offset % 8) < 7) {
 		output().set_indexed_value("digit8_", offset, a);
 		output().set_indexed_value("digit8_", offset + 16, b);
@@ -505,7 +508,7 @@ READ8_MEMBER (gts1_state::gts1_nvram_r)
 				uint8_t* nvram = memregion("nvram")->base();
 				assert(nvram != nullptr);
 				data = nvram[m_nvram_addr];
-				LOG(("%s: nvram[%02x] -> %x\n", __FUNCTION__, m_nvram_addr, data));
+				LOG("%s: nvram[%02x] -> %x\n", __FUNCTION__, m_nvram_addr, data);
 			}
 			break;
 		case 1: // group B
@@ -533,7 +536,7 @@ WRITE8_MEMBER(gts1_state::gts1_nvram_w)
 			break;
 		case 2: // group C - data bits 3:0 of NVRAM
 			if (m_nvram_wr && m_nvram_e2) {
-				LOG(("%s: nvram[%02x] <- %x\n", __FUNCTION__, m_nvram_addr, data & 15));
+				LOG("%s: nvram[%02x] <- %x\n", __FUNCTION__, m_nvram_addr, data & 15);
 				uint8_t* nvram = memregion("nvram")->base();
 				assert(nvram != nullptr);
 				nvram[m_nvram_addr] = data & 15;
@@ -553,7 +556,7 @@ READ8_MEMBER (gts1_state::gts1_lamp_apm_r)
 	switch (offset) {
 		case 0: // group A switches S01-S04, S09-S12, S17-S20
 			if (m_z30_out & 1) {
-				uint8_t dsw0 = ioport("DSW0")->read();
+				uint8_t dsw0 = m_dips[0]->read();
 				if (0 == BIT(dsw0,0)) // S01
 					data &= ~(1 << 3);
 				if (0 == BIT(dsw0,1)) // S02
@@ -564,7 +567,7 @@ READ8_MEMBER (gts1_state::gts1_lamp_apm_r)
 					data &= ~(1 << 0);
 			}
 			if (m_z30_out & 2) {
-				uint8_t dsw1 = ioport("DSW1")->read();
+				uint8_t dsw1 = m_dips[1]->read();
 				if (0 == BIT(dsw1,0)) // S09
 					data &= ~(1 << 0);
 				if (0 == BIT(dsw1,1)) // S10
@@ -575,7 +578,7 @@ READ8_MEMBER (gts1_state::gts1_lamp_apm_r)
 					data &= ~(1 << 3);
 			}
 			if (m_z30_out & 4) {
-				uint8_t dsw2 = ioport("DSW2")->read();
+				uint8_t dsw2 = m_dips[2]->read();
 				if (0 == BIT(dsw2,0)) // S17
 					data &= ~(1 << 0);
 				if (0 == BIT(dsw2,1)) // S18
@@ -588,7 +591,7 @@ READ8_MEMBER (gts1_state::gts1_lamp_apm_r)
 			break;
 		case 1: // group B switches S05-S08, S09-S12, S17-S20
 			if (m_z30_out & 1) {
-				uint8_t dsw0 = ioport("DSW0")->read();
+				uint8_t dsw0 = m_dips[0]->read();
 				if (0 == BIT(dsw0,4)) // S05
 					data &= ~(1 << 3);
 				if (0 == BIT(dsw0,5)) // S06
@@ -599,7 +602,7 @@ READ8_MEMBER (gts1_state::gts1_lamp_apm_r)
 					data &= ~(1 << 0);
 			}
 			if (m_z30_out & 2) {
-				uint8_t dsw1 = ioport("DSW1")->read();
+				uint8_t dsw1 = m_dips[1]->read();
 				if (0 == BIT(dsw1,4)) // S13
 					data &= ~(1 << 0);
 				if (0 == BIT(dsw1,5)) // S14
@@ -610,7 +613,7 @@ READ8_MEMBER (gts1_state::gts1_lamp_apm_r)
 					data &= ~(1 << 3);
 			}
 			if (m_z30_out & 4) {
-				uint8_t dsw2 = ioport("DSW2")->read();
+				uint8_t dsw2 = m_dips[2]->read();
 				if (0 == BIT(dsw2,4)) // S21
 					data &= ~(1 << 0);
 				if (0 == BIT(dsw2,5)) // S22
@@ -654,13 +657,13 @@ WRITE8_MEMBER(gts1_state::gts1_lamp_apm_w)
 READ8_MEMBER (gts1_state::gts1_io_r)
 {
 	const uint8_t data = 0x0f;
-	LOG(("%s: unmapped io[%02x] -> %x\n", __FUNCTION__, offset, data));
+	LOG("%s: unmapped io[%02x] -> %x\n", __FUNCTION__, offset, data);
 	return data;
 }
 
 WRITE8_MEMBER(gts1_state::gts1_io_w)
 {
-	LOG(("%s: unmapped io[%02x] <- %x\n", __FUNCTION__, offset, data));
+	LOG("%s: unmapped io[%02x] <- %x\n", __FUNCTION__, offset, data);
 }
 
 READ8_MEMBER (gts1_state::gts1_pa_r)
@@ -668,7 +671,7 @@ READ8_MEMBER (gts1_state::gts1_pa_r)
 	// return ROM nibble
 	uint8_t *ROM = memregion("maincpu")->base();
 	uint8_t data = ROM[0x2000 + m_6351_addr] & 0x0f;
-	LOG(("%s: ROM[%03x]:%02x\n", __FUNCTION__, m_6351_addr, data));
+	LOG("%s: ROM[%03x]:%02x\n", __FUNCTION__, m_6351_addr, data);
 	return data;
 }
 
@@ -676,7 +679,7 @@ WRITE8_MEMBER(gts1_state::gts1_do_w)
 {
 	// write address lines (DO1-4 to A0-3, DIO1-4 to A4-7)
 	m_6351_addr = (m_6351_addr & 0x300) | data;
-	LOG(("%s: ROM addr:%02x\n", __FUNCTION__, m_6351_addr));
+	LOG("%s: ROM addr:%02x\n", __FUNCTION__, m_6351_addr);
 }
 
 
