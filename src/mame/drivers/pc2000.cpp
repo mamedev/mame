@@ -44,19 +44,13 @@ public:
 		, m_bank0(*this, "bank0")
 		, m_bank1(*this, "bank1")
 		, m_bank2(*this, "bank2")
+		, m_rows{ { *this, "IN%X", 0 }, { *this, "IN%X", 8 } }
 	{ }
 
-	required_device<cpu_device> m_maincpu;
-	optional_device<hd44780_device> m_lcdc;
-	required_device<beep_device> m_beep;
-	required_device<generic_slot_device> m_cart;
-	optional_memory_bank m_bank0;
-	required_memory_bank m_bank1;
-	optional_memory_bank m_bank2;
+	void pc2000(machine_config &config);
+	void gl2000(machine_config &config);
 
-	uint8_t m_mux_data;
-	uint8_t m_beep_state;
-
+protected:
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
 
@@ -69,27 +63,58 @@ public:
 	DECLARE_WRITE8_MEMBER( beep_w );
 	DECLARE_PALETTE_INIT(pc2000);
 	DECLARE_DEVICE_IMAGE_LOAD_MEMBER(pc2000_cart);
-	void pc2000(machine_config &config);
-	void gl2000(machine_config &config);
+
 	void pc2000_io(address_map &map);
 	void pc2000_mem(address_map &map);
+
+	required_device<cpu_device> m_maincpu;
+	optional_device<hd44780_device> m_lcdc;
+	required_device<beep_device> m_beep;
+	required_device<generic_slot_device> m_cart;
+	optional_memory_bank m_bank0;
+	required_memory_bank m_bank1;
+	optional_memory_bank m_bank2;
+
+private:
+	required_ioport_array<8> m_rows[2];
+
+	uint8_t m_mux_data;
+	uint8_t m_beep_state;
 };
 
 class gl3000s_state : public pc2000_state
 {
 public:
 	gl3000s_state(const machine_config &mconfig, device_type type, const char *tag)
-		: pc2000_state(mconfig, type, tag),
-			m_lcdc_r(*this, "sed1520_r"),
-			m_lcdc_l(*this, "sed1520_l")
-		{ }
+		: pc2000_state(mconfig, type, tag)
+		, m_lcdc_r(*this, "sed1520_r")
+		, m_lcdc_l(*this, "sed1520_l")
+		, m_lev_out(*this, "LEV%u", 1U)
+		, m_try_out(*this, "TRY%u", 1U)
+		, m_tick_out(*this, "TICK%u", 0U)
+		, m_time_out(*this, "TIME%u", 0U)
+		, m_points_out(*this, "P%u%u", 1U, 0U)
+	{ }
+
+	void gl3000s(machine_config &config);
+
+protected:
+	void machine_start() override;
+	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	void gl3000s_io(address_map &map);
+
+private:
+	int sed1520_screen_update(bitmap_ind16 &bitmap, const rectangle &cliprect, uint8_t *vram, int start_line, int adc, int start_x);
+	SED1520_UPDATE_CB(screen_update_right);
+	SED1520_UPDATE_CB(screen_update_left);
 
 	required_device<sed1520_device> m_lcdc_r;
 	required_device<sed1520_device> m_lcdc_l;
-
-	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
-	void gl3000s(machine_config &config);
-	void gl3000s_io(address_map &map);
+	output_finder<4> m_lev_out;
+	output_finder<3> m_try_out;
+	output_finder<8> m_tick_out;
+	output_finder<3> m_time_out;
+	output_finder<2, 3> m_points_out;
 };
 
 class gl4004_state : public pc2000_state
@@ -97,11 +122,13 @@ class gl4004_state : public pc2000_state
 public:
 	gl4004_state(const machine_config &mconfig, device_type type, const char *tag)
 		: pc2000_state(mconfig, type, tag)
-		{ }
+	{ }
 
+	void gl4000(machine_config &config);
+
+protected:
 	virtual void machine_start() override;
 	HD44780_PIXEL_UPDATE(gl4000_pixel_update);
-	void gl4000(machine_config &config);
 };
 
 class pc1000_state : public pc2000_state
@@ -109,9 +136,12 @@ class pc1000_state : public pc2000_state
 public:
 	pc1000_state(const machine_config &mconfig, device_type type, const char *tag)
 		: pc2000_state(mconfig, type, tag)
-		{ }
+	{ }
 
+	void misterx(machine_config &config);
+	void pc1000(machine_config &config);
 
+protected:
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
 
@@ -121,27 +151,19 @@ public:
 	DECLARE_READ8_MEMBER( lcdc_control_r );
 	DECLARE_WRITE8_MEMBER( lcdc_control_w );
 	HD44780_PIXEL_UPDATE(pc1000_pixel_update);
-	void misterx(machine_config &config);
-	void pc1000(machine_config &config);
+
 	void pc1000_io(address_map &map);
 	void pc1000_mem(address_map &map);
 };
 
 
-/* TODO: put a breakpoint at 1625 and test the inputs, writes at dce4 are the scancode values */
+// TODO: put a breakpoint at 1625 and test the inputs, writes at dce4 are the scancode values
 READ8_MEMBER( pc2000_state::key_matrix_r )
 {
-	static const char *const bitnames[2][8] =
-	{
-		{"IN0", "IN1", "IN2", "IN3", "IN4", "IN5", "IN6", "IN7"},
-		{"IN8", "IN9", "INA", "INB", "INC", "IND", "INE", "INF"}
-	};
-
 	uint8_t data = 0xff;
-
-	for (int line=0; line<8; line++)
-		if (m_mux_data & (1<<line))
-			data &= ioport(bitnames[offset][line])->read();
+	for (int line = 0; line < 8; line++)
+		if (BIT(m_mux_data, line))
+			data &= m_rows[offset & 1][line]->read();
 
 	return data;
 }
@@ -200,6 +222,17 @@ ADDRESS_MAP_START(pc2000_state::pc2000_io)
 ADDRESS_MAP_END
 
 
+void gl3000s_state::machine_start()
+{
+	pc2000_state::machine_start();
+
+	m_lev_out.resolve();
+	m_try_out.resolve();
+	m_tick_out.resolve();
+	m_time_out.resolve();
+	m_points_out.resolve();
+}
+
 uint32_t gl3000s_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
 	bitmap.fill(0);
@@ -208,7 +241,7 @@ uint32_t gl3000s_state::screen_update(screen_device &screen, bitmap_ind16 &bitma
 	return 0;
 }
 
-int gl3000s_sed1520_screen_update(device_t &device, bitmap_ind16 &bitmap, const rectangle &cliprect, uint8_t *vram, int start_line, int adc, int start_x)
+int gl3000s_state::sed1520_screen_update(bitmap_ind16 &bitmap, const rectangle &cliprect, uint8_t *vram, int start_line, int adc, int start_x)
 {
 	for (int y=0; y<2; y++)
 	{
@@ -231,12 +264,12 @@ int gl3000s_sed1520_screen_update(device_t &device, bitmap_ind16 &bitmap, const 
 	return 0;
 }
 
-SED1520_UPDATE_CB(gl3000s_screen_update_right)
+SED1520_UPDATE_CB(gl3000s_state::screen_update_right)
 {
-	return gl3000s_sed1520_screen_update(device, bitmap, cliprect, vram, start_line, adc, 119);
+	return sed1520_screen_update(bitmap, cliprect, vram, start_line, adc, 119);
 }
 
-SED1520_UPDATE_CB(gl3000s_screen_update_left)
+SED1520_UPDATE_CB(gl3000s_state::screen_update_left)
 {
 	uint8_t sec[5];
 	uint8_t points[2][5];
@@ -273,10 +306,10 @@ SED1520_UPDATE_CB(gl3000s_screen_update_left)
 				else if ((x == 75 || x == 77 || x == 79) && yi == 5)    points[y][dpos] |= (state << 4);
 				else if ((x == 75 || x == 77 || x == 79) && yi == 6)    points[y][dpos] |= (state << 3);
 
-				else if (y == 1 && x >= 65 && x <= 68 && yi == 7)       device.machine().output().set_indexed_value("LEV", x - 64, state);
-				else if (x >= 59  && x <= 60 && yi == 7)                device.machine().output().set_indexed_value("TRY", x - 58 + (y ? 0 : 1), state);
-				else if (y == 1 && x >= 61 && x <= 64 && yi == 7)       device.machine().output().set_indexed_value("TICK", x - 59, state);
-				else if (y == 0 && x >= 61 && x <= 64 && yi == 7)       device.machine().output().set_indexed_value("TICK", 62 - x + (x >= 63 ? 8 : 0), state);
+				else if (y == 1 && x >= 65 && x <= 68 && yi == 7)       m_lev_out[x - 65] = state;
+				else if (x >= 59  && x <= 60 && yi == 7)                m_try_out[x - 59 + (y ? 0 : 1)] = state;
+				else if (y == 1 && x >= 61 && x <= 64 && yi == 7)       m_tick_out[x - 59] = state;
+				else if (y == 0 && x >= 61 && x <= 64 && yi == 7)       m_tick_out[62 - x + (x >= 63 ? 8 : 0)] = state;
 
 				else if (x < 74 && yi < 7)
 				{
@@ -286,14 +319,14 @@ SED1520_UPDATE_CB(gl3000s_screen_update_left)
 			}
 		}
 
-	for(int i=0; i < 3; i++)
+	for (int i = 0; i < 3; i++)
 	{
-		device.machine().output().set_indexed_value("TIME", i, sec[i]);
-		device.machine().output().set_indexed_value("P1", i, points[1][i]);
-		device.machine().output().set_indexed_value("P2", i, points[0][i]);
+		m_time_out[i] = sec[i];
+		m_points_out[0][i] = points[1][i];
+		m_points_out[1][i] = points[0][i];
 	}
 
-	return gl3000s_sed1520_screen_update(device, bitmap, cliprect, vram, start_line, adc, 58);
+	return sed1520_screen_update(bitmap, cliprect, vram, start_line, adc, 58);
 }
 
 
@@ -766,7 +799,7 @@ void pc2000_state::machine_start()
 	std::string region_tag;
 	uint8_t *bios = memregion("bios")->base();
 	memory_region *cart_region = memregion(region_tag.assign(m_cart->tag()).append(GENERIC_ROM_REGION_TAG).c_str());
-	uint8_t *cart = (cart_region != nullptr) ? cart_region->base() : memregion("bios")->base();
+	uint8_t *cart = cart_region ? cart_region->base() : bios;
 
 	m_bank0->configure_entries(0, 0x10, bios, 0x4000);
 	m_bank1->configure_entries(0, 0x10, bios, 0x4000);
@@ -904,8 +937,8 @@ MACHINE_CONFIG_START(gl3000s_state::gl3000s)
 	MCFG_CPU_IO_MAP(gl3000s_io)
 
 	MCFG_DEVICE_REMOVE("hd44780")
-	MCFG_SED1520_ADD("sed1520_l", gl3000s_screen_update_left)   // left panel is 59 pixels (0-58)
-	MCFG_SED1520_ADD("sed1520_r", gl3000s_screen_update_right)  // right panel is 61 pixels (59-119)
+	MCFG_SED1520_ADD("sed1520_l", UPDATE(gl3000s_state, screen_update_left))    // left panel is 59 pixels (0-58)
+	MCFG_SED1520_ADD("sed1520_r", UPDATE(gl3000s_state, screen_update_right))   // right panel is 61 pixels (59-119)
 
 	MCFG_SCREEN_MODIFY("screen")
 	MCFG_SCREEN_SIZE(120, 24)

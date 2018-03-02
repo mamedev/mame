@@ -21,69 +21,41 @@
 class ecoinf2_state : public driver_device
 {
 public:
-	ecoinf2_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag),
+	ecoinf2_state(const machine_config &mconfig, device_type type, const char *tag) :
+		driver_device(mconfig, type, tag),
 		m_maincpu(*this, "maincpu"),
-		m_reel0(*this, "reel0"),
-		m_reel1(*this, "reel1"),
-		m_reel2(*this, "reel2"),
-		m_reel3(*this, "reel3"),
+		m_reels(*this, "reel%s", 0U),
 		m_meters(*this, "meters"),
 		m_coins(*this, "COINS"),
 		m_key(*this, "PERKEY"),
-		m_panel(*this, "PANEL")
+		m_panel(*this, "PANEL"),
+		m_lamp_outputs(*this, "lamp%u", 0U),
+		m_led_outputs(*this, "digit%u", 0U),
+		m_coinlamp_outputs(*this, "coinlamp%u", 0U)
 	{
-		strobe_amount = 0;
-		strobe_addr = 0;
 	}
 
-	required_device<cpu_device> m_maincpu;
-	required_device<stepper_device> m_reel0;
-	required_device<stepper_device> m_reel1;
-	required_device<stepper_device> m_reel2;
-	required_device<stepper_device> m_reel3;
-	required_device<meters_device> m_meters;
-	required_ioport m_coins;
-	required_ioport m_key;
-	required_ioport m_panel;
+	void ecoinf2_oxo(machine_config &config);
 
-	uint16_t m_lamps[16];
-	uint16_t m_leds[16];
-	//uint16_t m_chars[14];
-//  void update_display();
-	int m_optic_pattern;
-	DECLARE_WRITE_LINE_MEMBER(reel0_optic_cb) { if (state) m_optic_pattern |= 0x01; else m_optic_pattern &= ~0x01; }
-	DECLARE_WRITE_LINE_MEMBER(reel1_optic_cb) { if (state) m_optic_pattern |= 0x02; else m_optic_pattern &= ~0x02; }
-	DECLARE_WRITE_LINE_MEMBER(reel2_optic_cb) { if (state) m_optic_pattern |= 0x04; else m_optic_pattern &= ~0x04; }
-	DECLARE_WRITE_LINE_MEMBER(reel3_optic_cb) { if (state) m_optic_pattern |= 0x08; else m_optic_pattern &= ~0x08; }
-	int strobe_addr;
-	int strobe_amount;
+protected:
+	template <unsigned N> DECLARE_WRITE_LINE_MEMBER(reel_optic_cb) { if (state) m_optic_pattern |= (1 << N); else m_optic_pattern &= ~(1 << N); }
 
 	DECLARE_WRITE8_MEMBER(ox_port5c_out_w);
-	DECLARE_DRIVER_INIT(ecoinf2);
 
 	void update_lamps()
 	{
-		for (int i=0; i<16; i++)
+		for (int i = 0; i < 16; i++)
 		{
-			for (int bit=0;bit<16;bit++)
-			{
-				int data = ((m_lamps[i] << bit)&0x8000)>>15;
-
-				output().set_indexed_value("lamp", (i*16)+bit, data );
-			}
+			for (int bit = 0; bit < 16; bit++)
+				m_lamp_outputs[(i << 4) | bit] = BIT(m_lamps[i], 15 - i);
 		}
 	}
-	void update_leds(void)
+	void update_leds()
 	{
-		for (int i=0; i<16; i++)
+		for (int i = 0; i < 16; i++)
 		{
-			for (int bit=0;bit<16;bit++)
-			{
-				int data = ((m_leds[i] << bit)&0x8000)>>15;
-
-				output().set_digit_value((i*16)+bit, data );
-			}
+			for (int bit = 0; bit < 16; bit++)
+				m_led_outputs[(i << 4) | bit] = BIT(m_leds[i], 15 - i);
 		}
 	}
 
@@ -181,8 +153,8 @@ public:
 	DECLARE_WRITE8_MEMBER(ppi8255_ic24_write_b_payouts)
 	{
 		//TODO: Fix up payout enables - all available bits enable one slide each
-		output().set_value("coinlamp0", data&0x40 );
-		output().set_value("coinlamp1", data&0x80 );
+		m_coinlamp_outputs[0] = BIT(data, 6);
+		m_coinlamp_outputs[1] = BIT(data, 7);
 	}
 
 	DECLARE_WRITE8_MEMBER(ppi8255_ic24_write_c_inhibits)
@@ -197,24 +169,22 @@ public:
 	}
 
 
-
-
 	DECLARE_WRITE8_MEMBER(ppi8255_ic23_write_a_reel01)
 	{
-		m_reel0->update( data    &0x0f);
-		m_reel1->update((data>>4)&0x0f);
+		m_reels[0]->update( data    &0x0f);
+		m_reels[1]->update((data>>4)&0x0f);
 
-		awp_draw_reel(machine(),"reel1", *m_reel0);
-		awp_draw_reel(machine(),"reel2", *m_reel1);
+		awp_draw_reel(machine(),"reel1", *m_reels[0]);
+		awp_draw_reel(machine(),"reel2", *m_reels[1]);
 	}
 
 	DECLARE_WRITE8_MEMBER(ppi8255_ic23_write_b_reel23)
 	{
-		m_reel2->update( data    &0x0f);
-		m_reel3->update((data>>4)&0x0f);
+		m_reels[2]->update( data    &0x0f);
+		m_reels[3]->update((data>>4)&0x0f);
 
-		awp_draw_reel(machine(),"reel3", *m_reel2);
-		awp_draw_reel(machine(),"reel4", *m_reel3);
+		awp_draw_reel(machine(),"reel3", *m_reels[2]);
+		awp_draw_reel(machine(),"reel4", *m_reels[3]);
 	}
 
 	DECLARE_READ8_MEMBER(ppi8255_ic23_read_c_key)
@@ -224,11 +194,34 @@ public:
 		return data;
 	}
 
-	DECLARE_MACHINE_START(ecoinf2);
+	virtual void machine_start() override
+	{
+		m_lamp_outputs.resolve();
+		m_led_outputs.resolve();
+		m_coinlamp_outputs.resolve();
+	}
 
-	void ecoinf2_oxo(machine_config &config);
 	void oxo_memmap(address_map &map);
 	void oxo_portmap(address_map &map);
+
+private:
+	required_device<cpu_device> m_maincpu;
+	required_device_array<stepper_device, 4> m_reels;
+	required_device<meters_device> m_meters;
+	required_ioport m_coins;
+	required_ioport m_key;
+	required_ioport m_panel;
+	output_finder<16 * 16> m_lamp_outputs;
+	output_finder<16 * 16> m_led_outputs;
+	output_finder<2> m_coinlamp_outputs;
+
+	uint16_t m_lamps[16];
+	uint16_t m_leds[16];
+	//uint16_t m_chars[14];
+	int m_optic_pattern;
+
+	int strobe_addr = 0;
+	int strobe_amount = 0;
 };
 
 
@@ -538,13 +531,13 @@ MACHINE_CONFIG_START(ecoinf2_state::ecoinf2_oxo)
 	MCFG_I8255_IN_PORTC_CB(READ8(ecoinf2_state, ppi8255_ic13_read_c_panel))
 
 	MCFG_ECOIN_200STEP_ADD("reel0")
-	MCFG_STEPPER_OPTIC_CALLBACK(WRITELINE(ecoinf2_state, reel0_optic_cb))
+	MCFG_STEPPER_OPTIC_CALLBACK(WRITELINE(ecoinf2_state, reel_optic_cb<0>))
 	MCFG_ECOIN_200STEP_ADD("reel1")
-	MCFG_STEPPER_OPTIC_CALLBACK(WRITELINE(ecoinf2_state, reel1_optic_cb))
+	MCFG_STEPPER_OPTIC_CALLBACK(WRITELINE(ecoinf2_state, reel_optic_cb<1>))
 	MCFG_ECOIN_200STEP_ADD("reel2")
-	MCFG_STEPPER_OPTIC_CALLBACK(WRITELINE(ecoinf2_state, reel2_optic_cb))
+	MCFG_STEPPER_OPTIC_CALLBACK(WRITELINE(ecoinf2_state, reel_optic_cb<2>))
 	MCFG_ECOIN_200STEP_ADD("reel3")
-	MCFG_STEPPER_OPTIC_CALLBACK(WRITELINE(ecoinf2_state, reel3_optic_cb))
+	MCFG_STEPPER_OPTIC_CALLBACK(WRITELINE(ecoinf2_state, reel_optic_cb<3>))
 
 	MCFG_DEVICE_ADD("meters", METERS, 0)
 	MCFG_METERS_NUMBER(8)
@@ -788,18 +781,15 @@ ROM_START( ec_sumnc )
 	ROM_LOAD( "smn94.bin", 0x0000, 0x010000, CRC(9ade016a) SHA1(1c75dc46436253c4e6730f40523d016098c20683) )
 	ROM_LOAD( "smncscst", 0x0000, 0x010000, CRC(1147531a) SHA1(c303187452afdcb79e0f182d26d2c27693f69d76) )
 ROM_END
-DRIVER_INIT_MEMBER(ecoinf2_state,ecoinf2)
-{
-}
 
 // OXO wh type (Phoenix?) (watchdog on port 5c?)
-GAME( 19??, ec_oxocg,   0        , ecoinf2_oxo,   ecoinf2, ecoinf2_state,   ecoinf2,    ROT0,  "Electrocoin", "Oxo Classic Gold (Electrocoin) (?)",                              MACHINE_NO_SOUND|MACHINE_REQUIRES_ARTWORK|MACHINE_NOT_WORKING|MACHINE_MECHANICAL)
-GAME( 19??, ec_oxocl,   0        , ecoinf2_oxo,   ecoinf2, ecoinf2_state,   ecoinf2,    ROT0,  "Electrocoin", "Oxo Club (Electrocoin) (?)",                                      MACHINE_NO_SOUND|MACHINE_REQUIRES_ARTWORK|MACHINE_NOT_WORKING|MACHINE_MECHANICAL)
-GAME( 19??, ec_oxogb,   0        , ecoinf2_oxo,   ecoinf2, ecoinf2_state,   ecoinf2,    ROT0,  "Electrocoin", "Oxo Golden Bars (Electrocoin) (?)",                               MACHINE_NO_SOUND|MACHINE_REQUIRES_ARTWORK|MACHINE_NOT_WORKING|MACHINE_MECHANICAL)
-GAME( 19??, ec_oxorl,   0        , ecoinf2_oxo,   ecoinf2, ecoinf2_state,   ecoinf2,    ROT0,  "Electrocoin", "Oxo Reels (Electrocoin) (?)",                                     MACHINE_NO_SOUND|MACHINE_REQUIRES_ARTWORK|MACHINE_NOT_WORKING|MACHINE_MECHANICAL)
-GAME( 19??, ec_oxorv,   0        , ecoinf2_oxo,   ecoinf2, ecoinf2_state,   ecoinf2,    ROT0,  "Electrocoin", "Oxo Revolution (Electrocoin) (?)",                                MACHINE_NO_SOUND|MACHINE_REQUIRES_ARTWORK|MACHINE_NOT_WORKING|MACHINE_MECHANICAL)
-GAME( 19??, ec_suprl,   0        , ecoinf2_oxo,   ecoinf2, ecoinf2_state,   ecoinf2,    ROT0,  "Electrocoin", "Super Reels (Electrocoin) (?)",                                   MACHINE_NO_SOUND|MACHINE_REQUIRES_ARTWORK|MACHINE_NOT_WORKING|MACHINE_MECHANICAL)
-GAME( 19??, ec_rcc,     0        , ecoinf2_oxo,   ecoinf2, ecoinf2_state,   ecoinf2,    ROT0,  "Electrocoin", "Royal Casino Club (Electrocoin) (?)",                             MACHINE_NO_SOUND|MACHINE_REQUIRES_ARTWORK|MACHINE_NOT_WORKING|MACHINE_MECHANICAL)
+GAME( 19??, ec_oxocg,   0        , ecoinf2_oxo,   ecoinf2, ecoinf2_state,   0,    ROT0,  "Electrocoin",       "Oxo Classic Gold (Electrocoin) (?)",                        MACHINE_NO_SOUND|MACHINE_REQUIRES_ARTWORK|MACHINE_NOT_WORKING|MACHINE_MECHANICAL)
+GAME( 19??, ec_oxocl,   0        , ecoinf2_oxo,   ecoinf2, ecoinf2_state,   0,    ROT0,  "Electrocoin",       "Oxo Club (Electrocoin) (?)",                                MACHINE_NO_SOUND|MACHINE_REQUIRES_ARTWORK|MACHINE_NOT_WORKING|MACHINE_MECHANICAL)
+GAME( 19??, ec_oxogb,   0        , ecoinf2_oxo,   ecoinf2, ecoinf2_state,   0,    ROT0,  "Electrocoin",       "Oxo Golden Bars (Electrocoin) (?)",                         MACHINE_NO_SOUND|MACHINE_REQUIRES_ARTWORK|MACHINE_NOT_WORKING|MACHINE_MECHANICAL)
+GAME( 19??, ec_oxorl,   0        , ecoinf2_oxo,   ecoinf2, ecoinf2_state,   0,    ROT0,  "Electrocoin",       "Oxo Reels (Electrocoin) (?)",                               MACHINE_NO_SOUND|MACHINE_REQUIRES_ARTWORK|MACHINE_NOT_WORKING|MACHINE_MECHANICAL)
+GAME( 19??, ec_oxorv,   0        , ecoinf2_oxo,   ecoinf2, ecoinf2_state,   0,    ROT0,  "Electrocoin",       "Oxo Revolution (Electrocoin) (?)",                          MACHINE_NO_SOUND|MACHINE_REQUIRES_ARTWORK|MACHINE_NOT_WORKING|MACHINE_MECHANICAL)
+GAME( 19??, ec_suprl,   0        , ecoinf2_oxo,   ecoinf2, ecoinf2_state,   0,    ROT0,  "Electrocoin",       "Super Reels (Electrocoin) (?)",                             MACHINE_NO_SOUND|MACHINE_REQUIRES_ARTWORK|MACHINE_NOT_WORKING|MACHINE_MECHANICAL)
+GAME( 19??, ec_rcc,     0        , ecoinf2_oxo,   ecoinf2, ecoinf2_state,   0,    ROT0,  "Electrocoin",       "Royal Casino Club (Electrocoin) (?)",                       MACHINE_NO_SOUND|MACHINE_REQUIRES_ARTWORK|MACHINE_NOT_WORKING|MACHINE_MECHANICAL)
 
-GAME( 19??, ec_sumnd,   0        , ecoinf2_oxo,   ecoinf2, ecoinf2_state,   ecoinf2,    ROT0,  "Concept Games Ltd", "Super Multi Nudger (Concept / Electrocoin Oxo) (?)",        MACHINE_NO_SOUND|MACHINE_REQUIRES_ARTWORK|MACHINE_NOT_WORKING|MACHINE_MECHANICAL)
-GAME( 19??, ec_sumnc,   0        , ecoinf2_oxo,   ecoinf2, ecoinf2_state,   ecoinf2,    ROT0,  "Concept Games Ltd", "Casino Super Multi Nudger (Concept / Electrocoin Oxo) (?)", MACHINE_NO_SOUND|MACHINE_REQUIRES_ARTWORK|MACHINE_NOT_WORKING|MACHINE_MECHANICAL)
+GAME( 19??, ec_sumnd,   0        , ecoinf2_oxo,   ecoinf2, ecoinf2_state,   0,    ROT0,  "Concept Games Ltd", "Super Multi Nudger (Concept / Electrocoin Oxo) (?)",        MACHINE_NO_SOUND|MACHINE_REQUIRES_ARTWORK|MACHINE_NOT_WORKING|MACHINE_MECHANICAL)
+GAME( 19??, ec_sumnc,   0        , ecoinf2_oxo,   ecoinf2, ecoinf2_state,   0,    ROT0,  "Concept Games Ltd", "Casino Super Multi Nudger (Concept / Electrocoin Oxo) (?)", MACHINE_NO_SOUND|MACHINE_REQUIRES_ARTWORK|MACHINE_NOT_WORKING|MACHINE_MECHANICAL)
