@@ -166,6 +166,8 @@ void galpani3_state::video_start()
 		dst[drawx] = paldata[sprdat & 0x3fff];                     \
 	}
 
+// Switchable brightness value in highest bit of palette
+// TODO : m_framebuffer_bright1 is alpha-blended?
 #define FB_DRAW_PIXEL(_chip, _pixel)                                                              \
 	int alpha = 0xff;                                                                             \
 	uint32_t pal = m_grap2[_chip]->pen_r(_pixel);                                                 \
