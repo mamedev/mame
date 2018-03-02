@@ -249,7 +249,7 @@ static int32_t clip_polygon(poly_vertex *v, int32_t num_vertices, plane *cp, pol
 
 struct raster_state
 {
-	uint32_t              mode;               /* bit 0 = Test Mode, bit 2 = Switch 60Hz(1)/30Hz(0) operation */
+//	uint32_t              mode;               /* bit 0 = Test Mode, bit 2 = Switch 60Hz(1)/30Hz(0) operation */
 	uint16_t *            texture_rom;        /* Texture ROM pointer */
 	uint32_t              texture_rom_mask;   /* Texture ROM mask */
 	int16_t               viewport[4];        /* View port (startx,starty,endx,endy) */
@@ -284,6 +284,23 @@ void model2_state::raster_init( memory_region *texture_rom )
 
 	m_raster->texture_rom = (uint16_t *)texture_rom->base();
 	m_raster->texture_rom_mask = (texture_rom->bytes() / 2) - 1;
+
+	save_item(NAME(m_raster->min_z));
+	save_item(NAME(m_raster->max_z));
+//	save_item(NAME(m_raster->tri_list));
+	save_item(NAME(m_raster->tri_list_index));
+	save_item(NAME(m_raster->command_buffer));
+	save_item(NAME(m_raster->command_index));
+	save_item(NAME(m_raster->cur_command));
+	save_item(NAME(m_raster->master_z_clip));
+	save_item(NAME(m_raster->triangle_z));
+	save_item(NAME(m_raster->z_adjust));
+	save_item(NAME(m_raster->reverse));
+	save_item(NAME(m_raster->viewport));
+	save_item(NAME(m_raster->center));
+	save_item(NAME(m_raster->center_sel));
+	save_item(NAME(m_raster->texture_ram));	
+	save_item(NAME(m_raster->log_ram));
 }
 
 /*******************************************
@@ -1176,6 +1193,13 @@ void model2_state::geo_init(memory_region *polygon_rom)
 	m_geo->raster = m_raster;
 	m_geo->polygon_rom = (uint32_t *)polygon_rom->base();
 	m_geo->polygon_rom_mask = (polygon_rom->bytes() / 4) - 1;
+	
+	save_item(NAME(m_geo->mode));
+	save_item(NAME(m_geo->matrix));
+	save_item(NAME(m_geo->lod));
+	save_item(NAME(m_geo->coef_table));
+	save_item(NAME(m_geo->polygon_ram0));
+	save_item(NAME(m_geo->polygon_ram1));
 }
 
 /*******************************************
