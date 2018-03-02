@@ -246,7 +246,7 @@ GFXDECODE_END
 
 
 
-static ADDRESS_MAP_START( twcup94_map, AS_PROGRAM, 16, gstriker_state )
+ADDRESS_MAP_START(gstriker_state::twcup94_map)
 	AM_RANGE(0x000000, 0x0fffff) AM_ROM
 	AM_RANGE(0x100000, 0x103fff) AM_DEVREADWRITE("zoomtilemap", mb60553_zooming_tilemap_device,  vram_r, vram_w )
 	AM_RANGE(0x140000, 0x141fff) AM_RAM AM_SHARE("cg10103_m_vram")
@@ -264,18 +264,18 @@ static ADDRESS_MAP_START( twcup94_map, AS_PROGRAM, 16, gstriker_state )
 	AM_RANGE(0xffc000, 0xffffff) AM_RAM AM_SHARE("work_ram")
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( gstriker_map, AS_PROGRAM, 16, gstriker_state )
-	AM_RANGE(0x200060, 0x200063) AM_DEVREADWRITE8("acia", acia6850_device, read, write, 0x00ff)
+ADDRESS_MAP_START(gstriker_state::gstriker_map)
 	AM_IMPORT_FROM(twcup94_map)
+	AM_RANGE(0x200060, 0x200063) AM_DEVREADWRITE8("acia", acia6850_device, read, write, 0x00ff)
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( sound_map, AS_PROGRAM, 8, gstriker_state )
+ADDRESS_MAP_START(gstriker_state::sound_map)
 	AM_RANGE(0x0000, 0x77ff) AM_ROM
 	AM_RANGE(0x7800, 0x7fff) AM_RAM
 	AM_RANGE(0x8000, 0xffff) AM_ROMBANK("soundbank")
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( sound_io_map, AS_IO, 8, gstriker_state )
+ADDRESS_MAP_START(gstriker_state::sound_io_map)
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	AM_RANGE(0x00, 0x03) AM_DEVREADWRITE("ymsnd", ym2610_device, read, write)
 	AM_RANGE(0x04, 0x04) AM_WRITE(sh_bankswitch_w)
@@ -558,7 +558,8 @@ MACHINE_CONFIG_START(gstriker_state::gstriker)
 	MCFG_SOUND_ROUTE(2, "rspeaker", 1.0)
 MACHINE_CONFIG_END
 
-MACHINE_CONFIG_DERIVED(gstriker_state::twc94, gstriker)
+MACHINE_CONFIG_START(gstriker_state::twc94)
+	gstriker(config);
 	MCFG_CPU_REPLACE("maincpu", M68000, 16000000)
 	MCFG_CPU_PROGRAM_MAP(twcup94_map)
 	MCFG_CPU_VBLANK_INT_DRIVER("screen", gstriker_state,  irq1_line_hold)
@@ -571,7 +572,8 @@ MACHINE_CONFIG_DERIVED(gstriker_state::twc94, gstriker)
 MACHINE_CONFIG_END
 
 
-MACHINE_CONFIG_DERIVED(gstriker_state::vgoal, twc94)
+MACHINE_CONFIG_START(gstriker_state::vgoal)
+	twc94(config);
 	MCFG_DEVICE_MODIFY("vsystem_spr")
 	MCFG_VSYSTEM_SPR_SET_TRANSPEN(0xf) // different vs. the other games, find register
 MACHINE_CONFIG_END

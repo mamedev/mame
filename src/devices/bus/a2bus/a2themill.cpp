@@ -40,7 +40,7 @@ DEFINE_DEVICE_TYPE(A2BUS_THEMILL, a2bus_themill_device, "a2themill", "Stellation
 
 #define M6809_TAG         "m6809"
 
-static ADDRESS_MAP_START( m6809_mem, AS_PROGRAM, 8, a2bus_themill_device )
+ADDRESS_MAP_START(a2bus_themill_device::m6809_mem)
 	AM_RANGE(0x0000, 0xffff) AM_READWRITE(dma_r, dma_w)
 ADDRESS_MAP_END
 

@@ -1545,6 +1545,7 @@ public:
 
 	void set_5a22_map();
 
+	void _5a22_map(address_map &map);
 protected:
 	// device-level overrides
 	virtual void device_start() override;

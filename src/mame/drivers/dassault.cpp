@@ -275,7 +275,7 @@ READ16_MEMBER(dassault_state::dassault_sub_control_r)
 
 /**********************************************************************************/
 
-static ADDRESS_MAP_START( dassault_map, AS_PROGRAM, 16, dassault_state )
+ADDRESS_MAP_START(dassault_state::dassault_map)
 	AM_RANGE(0x000000, 0x07ffff) AM_ROM
 
 	AM_RANGE(0x100000, 0x103fff) AM_RAM_DEVWRITE("palette", palette_device, write16) AM_SHARE("palette")
@@ -305,7 +305,7 @@ static ADDRESS_MAP_START( dassault_map, AS_PROGRAM, 16, dassault_state )
 	AM_RANGE(0x3fe000, 0x3fefff) AM_DEVREADWRITE("sharedram", mb8421_mb8431_16_device, left_r, left_w)
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( dassault_sub_map, AS_PROGRAM, 16, dassault_state )
+ADDRESS_MAP_START(dassault_state::dassault_sub_map)
 	AM_RANGE(0x000000, 0x07ffff) AM_ROM
 
 	AM_RANGE(0x100000, 0x100001) AM_DEVWRITE("spriteram", buffered_spriteram16_device, write)
@@ -320,7 +320,7 @@ ADDRESS_MAP_END
 
 /******************************************************************************/
 
-static ADDRESS_MAP_START( sound_map, AS_PROGRAM, 8, dassault_state )
+ADDRESS_MAP_START(dassault_state::sound_map)
 	AM_RANGE(0x000000, 0x00ffff) AM_ROM
 	AM_RANGE(0x100000, 0x100001) AM_DEVREADWRITE("ym1", ym2203_device, read, write)
 	AM_RANGE(0x110000, 0x110001) AM_DEVREADWRITE("ym2", ym2151_device, read, write)

@@ -748,7 +748,7 @@ uint8_t i8274_new_device::read_vector()
 			constexpr uint8_t RR1_SPECIAL(RR1_RX_OVERRUN_ERROR | RR1_CRC_FRAMING_ERROR | RR1_END_OF_FRAME);
 
 			// in non-vectored mode this serves the same function as the end of the second acknowldege cycle
-			if (!(m_chanB->m_wr2 & WR2_VECTORED_INT) && !machine().side_effect_disabled())
+			if (!(m_chanB->m_wr2 & WR2_VECTORED_INT) && !machine().side_effects_disabled())
 			{
 				m_int_state[prio[i]] |= Z80_DAISY_IEO;
 				check_interrupts();
@@ -1359,7 +1359,7 @@ uint8_t z80sio_channel::do_sioreg_rr1()
    NEC upd7201 MPSC2 Technical Manual: "When the MPSC2 is used in vectored mode, the
    contents of this register are placed on the bus during the appropriate portion of
    interrupt acknowledge sequence. You can read the value of CR2B at any time.
-   This is particularly useful in determining the cause of an interrup when using the
+   This is particularly useful in determining the cause of an interrupt when using the
    MPSC2 in Non-vectored mode."
 */
 uint8_t z80sio_channel::do_sioreg_rr2()
@@ -1384,7 +1384,7 @@ uint8_t z80sio_channel::control_read()
 
 	//LOG("%s %s\n",FUNCNAME, tag());
 	// mask out register index
-	if (!machine().side_effect_disabled())
+	if (!machine().side_effects_disabled())
 		m_wr0 &= ~WR0_REGISTER_MASK;
 
 	switch (reg)
@@ -1652,7 +1652,7 @@ uint8_t z80sio_channel::data_read()
 {
 	uint8_t const data = uint8_t(m_rx_data_fifo & 0x000000ffU);
 
-	if (!machine().side_effect_disabled())
+	if (!machine().side_effects_disabled())
 	{
 		// framing and overrun errors need to be cleared to advance the FIFO in interrupt-on-first mode
 		// TODO: Intel 8274 manual doesn't mention this behaviour - is it specific to Z80 SIO?

@@ -6,8 +6,8 @@
  *
  ****************************************************************************/
 
-#ifndef POCKETC_H_
-#define POCKETC_H_
+#ifndef MAME_INCLUDES_POCKETC_H
+#define MAME_INCLUDES_POCKETC_H
 
 typedef const char *POCKETC_FIGURE[];
 
@@ -24,4 +24,4 @@ public:
 	void pocketc(machine_config &config);
 };
 
-#endif /* POCKETC_H_ */
+#endif // MAME_INCLUDES_POCKETC_H

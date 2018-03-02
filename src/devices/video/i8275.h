@@ -197,6 +197,7 @@ protected:
 	uint8_t m_fifo[2][16];
 	int m_buffer_idx;
 	int m_fifo_idx;
+	int m_dma_idx;
 	bool m_fifo_next;
 	int m_buffer_dma;
 
@@ -215,6 +216,7 @@ protected:
 	bool m_du;
 	bool m_dma_stop;
 	bool m_end_of_screen;
+	bool m_preset;
 
 	int m_cursor_blink;
 	int m_char_blink;

@@ -23,7 +23,10 @@ Notes:
   there isn't a sound CPU and that program isn't executed. Instead, the main
   CPU reads the sound program through an 8255 PPI and plays sounds directly.
 - Gigas: according to a photo of a genuine board:
-    Sega Game ID#: 834-6167
+    Sega Game ID#: "834-6167 // GIGAS"
+    NEC MC-8123 with Sega security number 317-5002
+- Gigas MarkII: according to a photo of a genuine board:
+    Sega Game ID#: "834-6167-01 // GIGAS 2"
     NEC MC-8123 with Sega security number 317-5002
 
 TODO:
@@ -190,7 +193,7 @@ WRITE8_MEMBER(freekick_state::freekick_ff_w)
  *
  *************************************/
 
-static ADDRESS_MAP_START( omega_map, AS_PROGRAM, 8, freekick_state )
+ADDRESS_MAP_START(freekick_state::omega_map)
 	AM_RANGE(0x0000, 0xbfff) AM_ROM
 	AM_RANGE(0xc000, 0xcfff) AM_RAM // ram is 2x sony cxk5813d-55
 	AM_RANGE(0xd000, 0xd7ff) AM_RAM_WRITE(freek_videoram_w) AM_SHARE("videoram")
@@ -207,7 +210,7 @@ static ADDRESS_MAP_START( omega_map, AS_PROGRAM, 8, freekick_state )
 	AM_RANGE(0xfc03, 0xfc03) AM_DEVWRITE("sn4", sn76489a_device, write)
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( pbillrd_map, AS_PROGRAM, 8, freekick_state )
+ADDRESS_MAP_START(freekick_state::pbillrd_map)
 	AM_RANGE(0x0000, 0x7fff) AM_ROM
 	AM_RANGE(0x8000, 0xbfff) AM_ROMBANK("bank1")
 	AM_RANGE(0xc000, 0xcfff) AM_RAM
@@ -225,12 +228,12 @@ static ADDRESS_MAP_START( pbillrd_map, AS_PROGRAM, 8, freekick_state )
 	AM_RANGE(0xfc03, 0xfc03) AM_DEVWRITE("sn4", sn76489a_device, write)
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( decrypted_opcodes_map, AS_OPCODES, 8, freekick_state )
+ADDRESS_MAP_START(freekick_state::decrypted_opcodes_map)
 	AM_RANGE(0x0000, 0x7fff) AM_ROMBANK("bank0d")
 	AM_RANGE(0x8000, 0xbfff) AM_ROMBANK("bank1d")
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( freekick_map, AS_PROGRAM, 8, freekick_state )
+ADDRESS_MAP_START(freekick_state::freekick_map)
 	AM_RANGE(0x0000, 0xcfff) AM_ROM
 	AM_RANGE(0xd000, 0xdfff) AM_RAM
 	AM_RANGE(0xe000, 0xe7ff) AM_RAM_WRITE(freek_videoram_w) AM_SHARE("videoram")    // tilemap
@@ -248,7 +251,7 @@ static ADDRESS_MAP_START( freekick_map, AS_PROGRAM, 8, freekick_state )
 	AM_RANGE(0xfc03, 0xfc03) AM_DEVWRITE("sn4", sn76489a_device, write)
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( gigas_map, AS_PROGRAM, 8, freekick_state )
+ADDRESS_MAP_START(freekick_state::gigas_map)
 	AM_RANGE(0x0000, 0xbfff) AM_ROM
 	AM_RANGE(0xc000, 0xcfff) AM_RAM
 	AM_RANGE(0xd000, 0xd7ff) AM_RAM_WRITE(freek_videoram_w) AM_SHARE("videoram")
@@ -265,19 +268,19 @@ static ADDRESS_MAP_START( gigas_map, AS_PROGRAM, 8, freekick_state )
 	AM_RANGE(0xfc03, 0xfc03) AM_DEVWRITE("sn4", sn76489a_device, write)
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( omega_io_map, AS_IO, 8, freekick_state )
+ADDRESS_MAP_START(freekick_state::omega_io_map)
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	AM_RANGE(0x00, 0x00) AM_READWRITE(spinner_r, gigas_spinner_select_w)
 	AM_RANGE(0x01, 0x01) AM_READ_PORT("DSW3")
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( gigas_io_map, AS_IO, 8, freekick_state )
+ADDRESS_MAP_START(freekick_state::gigas_io_map)
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	AM_RANGE(0x00, 0x00) AM_READWRITE(spinner_r, gigas_spinner_select_w)
 	AM_RANGE(0x01, 0x01) AM_READNOP //unused dip 3
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( oigas_io_map, AS_IO, 8, freekick_state )
+ADDRESS_MAP_START(freekick_state::oigas_io_map)
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	AM_RANGE(0x00, 0x00) AM_READWRITE(spinner_r, gigas_spinner_select_w)
 	AM_RANGE(0x01, 0x01) AM_READNOP //unused dip 3
@@ -286,7 +289,7 @@ static ADDRESS_MAP_START( oigas_io_map, AS_IO, 8, freekick_state )
 	AM_RANGE(0x05, 0x05) AM_WRITE(oigas_5_w)
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( freekick_io_map, AS_IO, 8, freekick_state )
+ADDRESS_MAP_START(freekick_state::freekick_io_map)
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	AM_RANGE(0xff, 0xff) AM_READWRITE(freekick_ff_r, freekick_ff_w)
 ADDRESS_MAP_END
@@ -721,7 +724,7 @@ MACHINE_CONFIG_START(freekick_state::omega)
 	MCFG_CPU_ADD("maincpu", MC8123, XTAL(18'432'000)/6) // unknown divisor
 	MCFG_CPU_PROGRAM_MAP(omega_map)
 	MCFG_CPU_IO_MAP(omega_io_map)
-	MCFG_CPU_DECRYPTED_OPCODES_MAP(decrypted_opcodes_map)
+	MCFG_CPU_OPCODES_MAP(decrypted_opcodes_map)
 	MCFG_CPU_PERIODIC_INT_DRIVER(freekick_state, irq0_line_hold, 120) // measured on PCB
 	MCFG_CPU_VBLANK_INT_DRIVER("screen", freekick_state,  freekick_irqgen)
 
@@ -795,7 +798,8 @@ MACHINE_CONFIG_START(freekick_state::base)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
 MACHINE_CONFIG_END
 
-MACHINE_CONFIG_DERIVED(freekick_state::pbillrd, base)
+MACHINE_CONFIG_START(freekick_state::pbillrd)
+	base(config);
 	MCFG_DEVICE_MODIFY("outlatch") // 10K
 	MCFG_ADDRESSABLE_LATCH_Q0_OUT_CB(WRITELINE(freekick_state, flipscreen_x_w))
 	MCFG_ADDRESSABLE_LATCH_Q1_OUT_CB(WRITELINE(freekick_state, flipscreen_y_w))
@@ -805,15 +809,17 @@ MACHINE_CONFIG_DERIVED(freekick_state::pbillrd, base)
 	MCFG_MACHINE_RESET_OVERRIDE(freekick_state,freekick)
 MACHINE_CONFIG_END
 
-MACHINE_CONFIG_DERIVED(freekick_state::pbillrdm, pbillrd)
+MACHINE_CONFIG_START(freekick_state::pbillrdm)
+	pbillrd(config);
 	MCFG_CPU_REPLACE("maincpu", MC8123, XTAL(12'000'000)/4)
 	MCFG_CPU_PROGRAM_MAP(pbillrd_map)
-	MCFG_CPU_DECRYPTED_OPCODES_MAP(decrypted_opcodes_map)
+	MCFG_CPU_OPCODES_MAP(decrypted_opcodes_map)
 	MCFG_CPU_PERIODIC_INT_DRIVER(freekick_state, irq0_line_hold, 120) // measured on PCB
 	MCFG_CPU_VBLANK_INT_DRIVER("screen", freekick_state,  freekick_irqgen)
 MACHINE_CONFIG_END
 
-MACHINE_CONFIG_DERIVED(freekick_state::freekick, base)
+MACHINE_CONFIG_START(freekick_state::freekick)
+	base(config);
 
 	/* basic machine hardware */
 	MCFG_CPU_MODIFY("maincpu")
@@ -842,13 +848,14 @@ MACHINE_CONFIG_DERIVED(freekick_state::freekick, base)
 	MCFG_SCREEN_UPDATE_DRIVER(freekick_state, screen_update_freekick)
 MACHINE_CONFIG_END
 
-MACHINE_CONFIG_DERIVED(freekick_state::gigas, base)
+MACHINE_CONFIG_START(freekick_state::gigas)
+	base(config);
 
 	/* basic machine hardware */
 	MCFG_CPU_MODIFY("maincpu")
 	MCFG_CPU_PROGRAM_MAP(gigas_map)
 	MCFG_CPU_IO_MAP(gigas_io_map)
-	MCFG_CPU_DECRYPTED_OPCODES_MAP(decrypted_opcodes_map)
+	MCFG_CPU_OPCODES_MAP(decrypted_opcodes_map)
 
 	MCFG_DEVICE_MODIFY("outlatch")
 	MCFG_ADDRESSABLE_LATCH_Q0_OUT_CB(WRITELINE(freekick_state, flipscreen_w))
@@ -862,13 +869,14 @@ MACHINE_CONFIG_DERIVED(freekick_state::gigas, base)
 	MCFG_SCREEN_UPDATE_DRIVER(freekick_state, screen_update_gigas)
 MACHINE_CONFIG_END
 
-MACHINE_CONFIG_DERIVED(freekick_state::gigasm, base)
+MACHINE_CONFIG_START(freekick_state::gigasm)
+	base(config);
 
 	/* basic machine hardware */
 	MCFG_CPU_REPLACE("maincpu", MC8123, XTAL(12'000'000)/4)
 	MCFG_CPU_PROGRAM_MAP(gigas_map)
 	MCFG_CPU_IO_MAP(gigas_io_map)
-	MCFG_CPU_DECRYPTED_OPCODES_MAP(decrypted_opcodes_map)
+	MCFG_CPU_OPCODES_MAP(decrypted_opcodes_map)
 	MCFG_CPU_PERIODIC_INT_DRIVER(freekick_state, irq0_line_hold, 120) // measured on PCB
 	MCFG_CPU_VBLANK_INT_DRIVER("screen", freekick_state,  freekick_irqgen)
 
@@ -884,7 +892,8 @@ MACHINE_CONFIG_DERIVED(freekick_state::gigasm, base)
 	MCFG_SCREEN_UPDATE_DRIVER(freekick_state, screen_update_gigas)
 MACHINE_CONFIG_END
 
-MACHINE_CONFIG_DERIVED(freekick_state::oigas, gigas)
+MACHINE_CONFIG_START(freekick_state::oigas)
+	gigas(config);
 
 	/* basic machine hardware */
 	MCFG_CPU_MODIFY("maincpu")
@@ -962,7 +971,7 @@ ROM_START( pbillrdsa ) /* all ROMs were HN4827128G-25, except 17, HN27256G-25, C
 	ROM_LOAD( "19", 0xc000, 0x4000, CRC(2335e6dd) SHA1(82352b6f4abea88aad3a96ca63cccccb6e278f48) ) /* encrypted */
 
 	ROM_REGION( 0x2000, "maincpu:key", 0 ) /* MC8123 key */
-	ROM_LOAD( "317-0030.key", 0x0000, 0x2000, CRC(9223f06d) SHA1(51a22a4c80fe273526bde68918c13c6476cec383) )
+	ROM_LOAD( "317-5008.key", 0x0000, 0x2000, CRC(9223f06d) SHA1(51a22a4c80fe273526bde68918c13c6476cec383) ) /* same key as 317-0030 */
 
 	ROM_REGION( 0xc000, "gfx1", 0 ) /* GFX */
 	ROM_LOAD( "pb.4", 0x000000, 0x04000, CRC(2f4d4dd3) SHA1(ee4facabf591c235c270db4f4d3f612b8c474e57) )
@@ -1227,7 +1236,7 @@ ROM_START( countrunb2 )
 	ROM_LOAD( "24s10n.7h", 0x0500, 0x0100, CRC(c77d0077) SHA1(4cbbf625ad5e45d00ca6aebe9566538ff0a3348d) )
 ROM_END
 
-ROM_START( gigas ) /* From an actual Sega board 834-6167 with mc-8123: 317-5002 */
+ROM_START( gigas ) /* From an actual Sega board "834-6167 // GIGAS" with MC-8123: 317-5002 */
 /* The MC-8123 is located on a small daughterboard which plugs into the z80 socket;
  * the daughterboard also has an input for the spinner control the game uses
  * An empty socket marked 27256 is at location 10n */
@@ -1248,13 +1257,13 @@ ROM_START( gigas ) /* From an actual Sega board 834-6167 with mc-8123: 317-5002 
 	ROM_LOAD( "3.3l", 0x04000, 0x04000, CRC(37df4a4c) SHA1(ab996db636d89845474529ba2573307046fb96ee) )
 	ROM_LOAD( "2.3n", 0x08000, 0x04000, CRC(3a46e354) SHA1(ebd6a5db4c9cdfc6fabe6b412a704aaf03c32d7c) )
 
-	ROM_REGION( 0x0600, "proms", 0 ) /* not dumped yet; assumed to be the same */
-	ROM_LOAD( "3a.bin", 0x0000, 0x0100, CRC(a784e71f) SHA1(1741ce98d719bad6cc5ea42337ef897f2435bbab) )
-	ROM_LOAD( "4d.bin", 0x0100, 0x0100, CRC(376df30c) SHA1(cc95920cd1c133da1becc7d92f4b187b56a90ec7) )
-	ROM_LOAD( "4a.bin", 0x0200, 0x0100, CRC(4edff5bd) SHA1(305efc7ad7f86635489a655e214e216ac02b904d) )
-	ROM_LOAD( "3d.bin", 0x0300, 0x0100, CRC(fe201a4e) SHA1(15f8ecfcf6c63ffbf9777bec9b203c319ba1b96c) )
-	ROM_LOAD( "3b.bin", 0x0400, 0x0100, CRC(5796cc4a) SHA1(39576c4e48fd7ac52fc652a1ae0573db3d878878) )
-	ROM_LOAD( "3c.bin", 0x0500, 0x0100, CRC(28b5ee4c) SHA1(e21b9c38f433dca1e8894619b1d9f0389a81b48a) )
+	ROM_REGION( 0x0600, "proms", 0 )
+	ROM_LOAD( "tbp24s10n.3a", 0x0000, 0x0100, CRC(a784e71f) SHA1(1741ce98d719bad6cc5ea42337ef897f2435bbab) ) /* Or compatible type prom like the 82S129 */
+	ROM_LOAD( "tbp24s10n.4d", 0x0100, 0x0100, CRC(376df30c) SHA1(cc95920cd1c133da1becc7d92f4b187b56a90ec7) )
+	ROM_LOAD( "tbp24s10n.4a", 0x0200, 0x0100, CRC(4edff5bd) SHA1(305efc7ad7f86635489a655e214e216ac02b904d) )
+	ROM_LOAD( "tbp24s10n.3d", 0x0300, 0x0100, CRC(fe201a4e) SHA1(15f8ecfcf6c63ffbf9777bec9b203c319ba1b96c) )
+	ROM_LOAD( "tbp24s10n.3b", 0x0400, 0x0100, CRC(5796cc4a) SHA1(39576c4e48fd7ac52fc652a1ae0573db3d878878) )
+	ROM_LOAD( "tbp24s10n.3c", 0x0500, 0x0100, CRC(28b5ee4c) SHA1(e21b9c38f433dca1e8894619b1d9f0389a81b48a) )
 ROM_END
 
 /*
@@ -1287,7 +1296,7 @@ ROM_START( gigasb )
 	ROM_LOAD( "g-2", 0x08000, 0x04000, CRC(3a46e354) SHA1(ebd6a5db4c9cdfc6fabe6b412a704aaf03c32d7c) )
 
 	ROM_REGION( 0x0600, "proms", 0 )
-	ROM_LOAD( "1.pr", 0x0000, 0x0100, CRC(a784e71f) SHA1(1741ce98d719bad6cc5ea42337ef897f2435bbab) )
+	ROM_LOAD( "1.pr", 0x0000, 0x0100, CRC(a784e71f) SHA1(1741ce98d719bad6cc5ea42337ef897f2435bbab) ) /* 24S10N, 82S129 or compatible? */
 	ROM_LOAD( "6.pr", 0x0100, 0x0100, CRC(376df30c) SHA1(cc95920cd1c133da1becc7d92f4b187b56a90ec7) )
 	ROM_LOAD( "5.pr", 0x0200, 0x0100, CRC(4edff5bd) SHA1(305efc7ad7f86635489a655e214e216ac02b904d) )
 	ROM_LOAD( "4.pr", 0x0300, 0x0100, CRC(fe201a4e) SHA1(15f8ecfcf6c63ffbf9777bec9b203c319ba1b96c) )
@@ -1315,7 +1324,7 @@ ROM_START( oigas )
 	ROM_LOAD( "g-2", 0x08000, 0x04000, CRC(3a46e354) SHA1(ebd6a5db4c9cdfc6fabe6b412a704aaf03c32d7c) )
 
 	ROM_REGION( 0x0600, "proms", 0 )
-	ROM_LOAD( "1.pr", 0x0000, 0x0100, CRC(a784e71f) SHA1(1741ce98d719bad6cc5ea42337ef897f2435bbab) )
+	ROM_LOAD( "1.pr", 0x0000, 0x0100, CRC(a784e71f) SHA1(1741ce98d719bad6cc5ea42337ef897f2435bbab) ) /* 24S10N, 82S129 or compatible? */
 	ROM_LOAD( "6.pr", 0x0100, 0x0100, CRC(376df30c) SHA1(cc95920cd1c133da1becc7d92f4b187b56a90ec7) )
 	ROM_LOAD( "5.pr", 0x0200, 0x0100, CRC(4edff5bd) SHA1(305efc7ad7f86635489a655e214e216ac02b904d) )
 	ROM_LOAD( "4.pr", 0x0300, 0x0100, CRC(fe201a4e) SHA1(15f8ecfcf6c63ffbf9777bec9b203c319ba1b96c) )
@@ -1323,8 +1332,38 @@ ROM_START( oigas )
 	ROM_LOAD( "3.pr", 0x0500, 0x0100, CRC(28b5ee4c) SHA1(e21b9c38f433dca1e8894619b1d9f0389a81b48a) )
 ROM_END
 
-//gigas MarkII is a romswap/upgrade to gigas, and uses the same mc8123 (317-5002).
-//the original, mc8123-protected version of gigas MarkII is undumped, we only have the bootleg below.
+//Gigas Mark II is a romswap/upgrade to gigas, and uses the same MC-8123 (317-5002).
+ROM_START( gigasm2 ) /* From an actual Sega board "834-6167-01 // GIGAS 2" with MC-8123: 317-5002 */
+/* The MC-8123 is located on a small daughterboard which plugs into the z80 socket;
+ * the daughterboard also has an input for the spinner control the game uses
+ * An empty socket marked 27256 is at location 10n */
+	ROM_REGION( 0x10000, "maincpu", 0 )
+	ROM_LOAD( "18.8n",   0x00000, 0x4000, CRC(32e83d80) SHA1(c1b5e995f32e775e9b73c56395a27f6a9f40d156) )
+	ROM_LOAD( "17.8r",   0x04000, 0x8000, CRC(460dadd2) SHA1(9f0ee949f391bcc7c1b9911a5385eb1cbf9d0e4d) ) /* 27256 */
+
+	ROM_REGION( 0x2000, "maincpu:key", 0 ) /* MC8123 key */
+	ROM_LOAD( "317-5002.key", 0x0000, 0x2000, CRC(86a7e5f6) SHA1(3ff3a17c02eb5610182b6febfada4e8eca0c5eea) )
+
+	ROM_REGION( 0xc000, "gfx1", 0 ) /* GFX */
+	ROM_LOAD( "14.3k", 0x00000, 0x04000, CRC(20b3405f) SHA1(32120d7b40e74648eb4ac4ab3ad3d2125033f6b1) )
+	ROM_LOAD( "15.3h", 0x04000, 0x04000, CRC(d04ecfa8) SHA1(10bfb1d075da768f31a8c34cdfe1a1bf01e89f94) )
+	ROM_LOAD( "16.3g", 0x08000, 0x04000, CRC(33776801) SHA1(29952818038a08c98b95ac801b8929cf1647049c) )
+
+	ROM_REGION( 0xc000, "gfx2", 0 ) /* GFX */
+	ROM_LOAD( "11.3p", 0x00000, 0x04000, CRC(f64cbd1e) SHA1(f8d9b110cdac6ef524e35bec9a5d406651cd7bab) )
+	ROM_LOAD( "13.3l", 0x04000, 0x04000, CRC(c228df19) SHA1(584f269f7de2d531f2b038b4b7318f813c329f7f) )
+	ROM_LOAD( "12.3n", 0x08000, 0x04000, CRC(a6ad9ce2) SHA1(db0338385208df9e9cf43efc11383412dec493e6) )
+
+	ROM_REGION( 0x0600, "proms", 0 )
+	ROM_LOAD( "tbp24s10n.3a", 0x0000, 0x0100, CRC(a784e71f) SHA1(1741ce98d719bad6cc5ea42337ef897f2435bbab) ) /* Or compatible type prom like the 82S129 */
+	ROM_LOAD( "tbp24s10n.4d", 0x0100, 0x0100, CRC(376df30c) SHA1(cc95920cd1c133da1becc7d92f4b187b56a90ec7) )
+	ROM_LOAD( "tbp24s10n.4a", 0x0200, 0x0100, CRC(4edff5bd) SHA1(305efc7ad7f86635489a655e214e216ac02b904d) )
+	ROM_LOAD( "tbp24s10n.3d", 0x0300, 0x0100, CRC(fe201a4e) SHA1(15f8ecfcf6c63ffbf9777bec9b203c319ba1b96c) )
+	ROM_LOAD( "tbp24s10n.3b", 0x0400, 0x0100, CRC(5796cc4a) SHA1(39576c4e48fd7ac52fc652a1ae0573db3d878878) )
+	ROM_LOAD( "tbp24s10n.3c", 0x0500, 0x0100, CRC(28b5ee4c) SHA1(e21b9c38f433dca1e8894619b1d9f0389a81b48a) )
+ROM_END
+
+//bootleg of Gigas MarkII without the MC-8123
 ROM_START( gigasm2b )
 	ROM_REGION( 2*0xc000, "maincpu", 0 )
 	ROM_LOAD( "8.rom", 0x0c000, 0x4000, CRC(c00a4a6c) SHA1(0d1bb849c9bfe4e92ad70e4ef19da494c0bd7ba8) )
@@ -1335,17 +1374,17 @@ ROM_START( gigasm2b )
 	ROM_CONTINUE(      0x08000, 0x4000 )
 
 	ROM_REGION( 0xc000, "gfx1", 0 ) /* GFX */
-	ROM_LOAD( "4.rom", 0x00000, 0x04000, CRC(20b3405f) SHA1(32120d7b40e74648eb4ac4ab3ad3d2125033f6b1) )
-	ROM_LOAD( "5.rom", 0x04000, 0x04000, CRC(d04ecfa8) SHA1(10bfb1d075da768f31a8c34cdfe1a1bf01e89f94) )
-	ROM_LOAD( "6.rom", 0x08000, 0x04000, CRC(33776801) SHA1(29952818038a08c98b95ac801b8929cf1647049c) )
+	ROM_LOAD( "4.rom", 0x00000, 0x04000, CRC(20b3405f) SHA1(32120d7b40e74648eb4ac4ab3ad3d2125033f6b1) ) // == 14.3k
+	ROM_LOAD( "5.rom", 0x04000, 0x04000, CRC(d04ecfa8) SHA1(10bfb1d075da768f31a8c34cdfe1a1bf01e89f94) ) // == 15.3h
+	ROM_LOAD( "6.rom", 0x08000, 0x04000, CRC(33776801) SHA1(29952818038a08c98b95ac801b8929cf1647049c) ) // == 16.3g
 
 	ROM_REGION( 0xc000, "gfx2", 0 ) /* GFX */
-	ROM_LOAD( "1.rom", 0x00000, 0x04000, CRC(f64cbd1e) SHA1(f8d9b110cdac6ef524e35bec9a5d406651cd7bab) )
-	ROM_LOAD( "3.rom", 0x04000, 0x04000, CRC(c228df19) SHA1(584f269f7de2d531f2b038b4b7318f813c329f7f) )
-	ROM_LOAD( "2.rom", 0x08000, 0x04000, CRC(a6ad9ce2) SHA1(db0338385208df9e9cf43efc11383412dec493e6) )
+	ROM_LOAD( "1.rom", 0x00000, 0x04000, CRC(f64cbd1e) SHA1(f8d9b110cdac6ef524e35bec9a5d406651cd7bab) ) // == 11.3p
+	ROM_LOAD( "3.rom", 0x04000, 0x04000, CRC(c228df19) SHA1(584f269f7de2d531f2b038b4b7318f813c329f7f) ) // == 13.3l
+	ROM_LOAD( "2.rom", 0x08000, 0x04000, CRC(a6ad9ce2) SHA1(db0338385208df9e9cf43efc11383412dec493e6) ) // == 12.3n
 
 	ROM_REGION( 0x0600, "proms", 0 )
-	ROM_LOAD( "1.pr", 0x0000, 0x0100, CRC(a784e71f) SHA1(1741ce98d719bad6cc5ea42337ef897f2435bbab) )
+	ROM_LOAD( "1.pr", 0x0000, 0x0100, CRC(a784e71f) SHA1(1741ce98d719bad6cc5ea42337ef897f2435bbab) ) /* 24S10N, 82S129 or compatible? */
 	ROM_LOAD( "6.pr", 0x0100, 0x0100, CRC(376df30c) SHA1(cc95920cd1c133da1becc7d92f4b187b56a90ec7) )
 	ROM_LOAD( "5.pr", 0x0200, 0x0100, CRC(4edff5bd) SHA1(305efc7ad7f86635489a655e214e216ac02b904d) )
 	ROM_LOAD( "4.pr", 0x0300, 0x0100, CRC(fe201a4e) SHA1(15f8ecfcf6c63ffbf9777bec9b203c319ba1b96c) )
@@ -1375,7 +1414,7 @@ ROM_START( omega )
 	ROM_LOAD("2.c10",  0x08000, 0x04000, CRC(dbc0a47f) SHA1(b617c5a10c655e7befaeaecd9ce736e972285e6b)) // 27128
 
 	ROM_REGION(0x600, "proms", 0)
-	ROM_LOAD("tbp24s10n.3f", 0x0000, 0x100, CRC(75ec7472) SHA1(868811e838c570a0f576a0ece249cab2d4274d65) )
+	ROM_LOAD("tbp24s10n.3f", 0x0000, 0x100, CRC(75ec7472) SHA1(868811e838c570a0f576a0ece249cab2d4274d65) ) /* Or compatible type prom like the 82S129 */
 	ROM_LOAD("tbp24s10n.4f", 0x0100, 0x100, CRC(5113a114) SHA1(3a5ab68c93d1f2c05ceb0311e12a54fd124d8435) )
 	ROM_LOAD("tbp24s10n.3g", 0x0200, 0x100, CRC(b6b5d4a0) SHA1(2b7ba59a6c185326e11ce8ccd96b3c8cfd652fdf) )
 	ROM_LOAD("tbp24s10n.4g", 0x0300, 0x100, CRC(931bc299) SHA1(f116f1d6a4324b86b0aae0a5a040236b3a4fd12d) )
@@ -1424,7 +1463,8 @@ DRIVER_INIT_MEMBER(freekick_state,gigas)
 GAME( 1986, gigas,      0,        gigasm,    gigas,    freekick_state, gigas,    ROT270, "Sega",                         "Gigas (MC-8123, 317-5002)",            MACHINE_SUPPORTS_SAVE )
 GAME( 1986, gigasb,     gigas,    gigas,     gigas,    freekick_state, gigasb,   ROT270, "bootleg",                      "Gigas (bootleg)",                      MACHINE_SUPPORTS_SAVE )
 GAME( 1986, oigas,      gigas ,   oigas,     gigas,    freekick_state, gigasb,   ROT270, "bootleg",                      "Oigas (bootleg)",                      MACHINE_SUPPORTS_SAVE )
-GAME( 1986, gigasm2b,   0,        gigas,     gigasm2,  freekick_state, gigasb,   ROT270, "bootleg",                      "Gigas Mark II (bootleg)",              MACHINE_SUPPORTS_SAVE )
+GAME( 1986, gigasm2,    0,        gigasm,    gigasm2,  freekick_state, gigas,    ROT270, "Sega",                         "Gigas Mark II (MC-8123, 317-5002)",    MACHINE_SUPPORTS_SAVE )
+GAME( 1986, gigasm2b,   gigasm2,  gigas,     gigasm2,  freekick_state, gigasb,   ROT270, "bootleg",                      "Gigas Mark II (bootleg)",              MACHINE_SUPPORTS_SAVE )
 GAME( 1986, omega,      0,        omega,     omega,    freekick_state, gigas,    ROT270, "Nihon System",                 "Omega",                                MACHINE_SUPPORTS_SAVE )
 GAME( 1987, pbillrd,    0,        pbillrd,   pbillrd,  freekick_state, 0,        ROT0,   "Nihon System",                 "Perfect Billiard",                     MACHINE_SUPPORTS_SAVE )
 GAME( 1987, pbillrds,   pbillrd,  pbillrdm,  pbillrd,  freekick_state, pbillrds, ROT0,   "Nihon System",                 "Perfect Billiard (MC-8123, 317-0030)", MACHINE_SUPPORTS_SAVE )

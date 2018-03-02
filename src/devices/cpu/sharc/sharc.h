@@ -204,6 +204,8 @@ public:
 		EXCEPTION_COUNT
 	};
 
+	void internal_data(address_map &map);
+	void internal_pgm(address_map &map);
 protected:
 	// device-level overrides
 	virtual void device_start() override;

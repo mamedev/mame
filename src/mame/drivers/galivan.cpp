@@ -62,7 +62,7 @@ READ8_MEMBER(galivan_state::IO_port_c0_r)
 
 
 
-static ADDRESS_MAP_START( galivan_map, AS_PROGRAM, 8, galivan_state )
+ADDRESS_MAP_START(galivan_state::galivan_map)
 	AM_RANGE(0x0000, 0xbfff) AM_ROM
 
 	AM_RANGE(0xc000, 0xdfff) AM_ROMBANK("bank1")
@@ -72,7 +72,7 @@ static ADDRESS_MAP_START( galivan_map, AS_PROGRAM, 8, galivan_state )
 	AM_RANGE(0xe100, 0xffff) AM_RAM
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( ninjemak_map, AS_PROGRAM, 8, galivan_state )
+ADDRESS_MAP_START(galivan_state::ninjemak_map)
 	AM_RANGE(0x0000, 0xbfff) AM_ROM
 
 	AM_RANGE(0xc000, 0xdfff) AM_ROMBANK("bank1")
@@ -82,7 +82,7 @@ static ADDRESS_MAP_START( ninjemak_map, AS_PROGRAM, 8, galivan_state )
 	AM_RANGE(0xe200, 0xffff) AM_RAM
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( io_map, AS_IO, 8, galivan_state )
+ADDRESS_MAP_START(galivan_state::io_map)
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	AM_RANGE(0x00, 0x00) AM_READ_PORT("P1")
 	AM_RANGE(0x01, 0x01) AM_READ_PORT("P2")
@@ -103,7 +103,7 @@ WRITE8_MEMBER(galivan_state::blit_trigger_w)
 	m_nb1414m4->exec((m_videoram[0] << 8) | (m_videoram[1] & 0xff),m_videoram,m_scrollx,m_scrolly,m_tx_tilemap);
 }
 
-static ADDRESS_MAP_START( ninjemak_io_map, AS_IO, 8, galivan_state )
+ADDRESS_MAP_START(galivan_state::ninjemak_io_map)
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	AM_RANGE(0x80, 0x80) AM_READ_PORT("P1") AM_WRITE(ninjemak_gfxbank_w)
 	AM_RANGE(0x81, 0x81) AM_READ_PORT("P2")
@@ -115,12 +115,12 @@ static ADDRESS_MAP_START( ninjemak_io_map, AS_IO, 8, galivan_state )
 //  AM_RANGE(0x87, 0x87) AM_WRITENOP         // ??
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( sound_map, AS_PROGRAM, 8, galivan_state )
+ADDRESS_MAP_START(galivan_state::sound_map)
 	AM_RANGE(0x0000, 0xbfff) AM_ROM
 	AM_RANGE(0xc000, 0xc7ff) AM_RAM
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( sound_io_map, AS_IO, 8, galivan_state )
+ADDRESS_MAP_START(galivan_state::sound_io_map)
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	AM_RANGE(0x00, 0x01) AM_DEVWRITE("ymsnd", ym3526_device, write)
 	AM_RANGE(0x02, 0x02) AM_DEVWRITE("dac1", dac_byte_interface, write)
@@ -521,7 +521,8 @@ MACHINE_CONFIG_START(galivan_state::ninjemak)
 MACHINE_CONFIG_END
 
 
-MACHINE_CONFIG_DERIVED(galivan_state::youmab, ninjemak)
+MACHINE_CONFIG_START(galivan_state::youmab)
+	ninjemak(config);
 
 	MCFG_DEVICE_REMOVE("nb1414m4")
 MACHINE_CONFIG_END

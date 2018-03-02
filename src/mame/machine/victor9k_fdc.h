@@ -24,13 +24,13 @@
 //**************************************************************************
 
 #define MCFG_VICTOR_9000_FDC_IRQ_CB(_write) \
-	devcb = &victor_9000_fdc_device::set_irq_wr_callback(*device, DEVCB_##_write);
+	devcb = &downcast<victor_9000_fdc_device &>(*device).set_irq_wr_callback(DEVCB_##_write);
 
 #define MCFG_VICTOR_9000_FDC_SYN_CB(_write) \
-	devcb = &victor_9000_fdc_device::set_syn_wr_callback(*device, DEVCB_##_write);
+	devcb = &downcast<victor_9000_fdc_device &>(*device).set_syn_wr_callback(DEVCB_##_write);
 
 #define MCFG_VICTOR_9000_FDC_LBRDY_CB(_write) \
-	devcb = &victor_9000_fdc_device::set_lbrdy_wr_callback(*device, DEVCB_##_write);
+	devcb = &downcast<victor_9000_fdc_device &>(*device).set_lbrdy_wr_callback(DEVCB_##_write);
 
 
 
@@ -46,9 +46,9 @@ public:
 	// construction/destruction
 	victor_9000_fdc_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
-	template <class Object> static devcb_base &set_irq_wr_callback(device_t &device, Object &&cb) { return downcast<victor_9000_fdc_device &>(device).m_irq_cb.set_callback(std::forward<Object>(cb)); }
-	template <class Object> static devcb_base &set_syn_wr_callback(device_t &device, Object &&cb) { return downcast<victor_9000_fdc_device &>(device).m_syn_cb.set_callback(std::forward<Object>(cb)); }
-	template <class Object> static devcb_base &set_lbrdy_wr_callback(device_t &device, Object &&cb) { return downcast<victor_9000_fdc_device &>(device).m_lbrdy_cb.set_callback(std::forward<Object>(cb)); }
+	template <class Object> devcb_base &set_irq_wr_callback(Object &&cb) { return m_irq_cb.set_callback(std::forward<Object>(cb)); }
+	template <class Object> devcb_base &set_syn_wr_callback(Object &&cb) { return m_syn_cb.set_callback(std::forward<Object>(cb)); }
+	template <class Object> devcb_base &set_lbrdy_wr_callback(Object &&cb) { return m_lbrdy_cb.set_callback(std::forward<Object>(cb)); }
 
 	DECLARE_READ8_MEMBER( cs5_r ) { return m_via4->read(space, offset); }
 	DECLARE_WRITE8_MEMBER( cs5_w ) { m_via4->write(space, offset, data); }

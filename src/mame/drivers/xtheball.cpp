@@ -59,6 +59,7 @@ public:
 	TMS340X0_FROM_SHIFTREG_CB_MEMBER(from_shiftreg);
 	TMS340X0_SCANLINE_RGB32_CB_MEMBER(scanline_update);
 	void xtheball(machine_config &config);
+	void main_map(address_map &map);
 };
 
 
@@ -190,7 +191,7 @@ READ16_MEMBER(xtheball_state::analogy_watchdog_r)
  *
  *************************************/
 
-static ADDRESS_MAP_START( main_map, AS_PROGRAM, 16, xtheball_state )
+ADDRESS_MAP_START(xtheball_state::main_map)
 	AM_RANGE(0x00000000, 0x0001ffff) AM_RAM AM_SHARE("nvram")
 	AM_RANGE(0x01000000, 0x010fffff) AM_RAM AM_SHARE("vrabg")
 	AM_RANGE(0x02000000, 0x020fffff) AM_RAM AM_SHARE("vrafg")

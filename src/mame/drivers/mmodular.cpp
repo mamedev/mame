@@ -57,6 +57,11 @@ public:
 	void van16(machine_config &config);
 	void alm16(machine_config &config);
 	void gen32(machine_config &config);
+	void alm16_mem(address_map &map);
+	void alm32_mem(address_map &map);
+	void gen32_mem(address_map &map);
+	void van16_mem(address_map &map);
+	void van32_mem(address_map &map);
 };
 
 
@@ -72,13 +77,14 @@ public:
 	DECLARE_READ8_MEMBER(berlinp_input_r);
 
 	void berlinp(machine_config &config);
+	void berlinp_mem(address_map &map);
 private:
 	required_device<mephisto_board_device> m_board;
 	required_ioport m_keys;
 };
 
 
-static ADDRESS_MAP_START(alm16_mem, AS_PROGRAM, 16, mmodular_state)
+ADDRESS_MAP_START(mmodular_state::alm16_mem)
 	AM_RANGE( 0x000000, 0x01ffff )  AM_ROM
 
 	AM_RANGE( 0xc00000, 0xc00001 ) AM_DEVREAD8("board", mephisto_board_device, input_r, 0xff00)
@@ -94,17 +100,17 @@ static ADDRESS_MAP_START(alm16_mem, AS_PROGRAM, 16, mmodular_state)
 	AM_RANGE( 0x800000, 0x803fff ) AM_RAM AM_SHARE("nvram")
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START(van16_mem, AS_PROGRAM, 16, mmodular_state)
+ADDRESS_MAP_START(mmodular_state::van16_mem)
+	AM_IMPORT_FROM(alm16_mem)
+
 	AM_RANGE( 0x000000, 0x03ffff ) AM_ROM
 
 //  AM_RANGE( 0xe80004, 0xe80005 )  AM_WRITE(write_unknown2 )   // Bavaria sensors
 //  AM_RANGE( 0xe80002, 0xe80003 )  AM_READ(read_unknown1 )     // Bavaria sensors
 //  AM_RANGE( 0xe80006, 0xe80007 )  AM_READ(read_unknown3 )     // Bavaria sensors
-
-	AM_IMPORT_FROM(alm16_mem)
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START(alm32_mem, AS_PROGRAM, 32, mmodular_state)
+ADDRESS_MAP_START(mmodular_state::alm32_mem)
 	AM_RANGE( 0x00000000, 0x0001ffff )  AM_ROM
 
 	AM_RANGE( 0x800000fc, 0x800000ff ) AM_DEVREAD8("board", mephisto_board_device, input_r, 0xff000000)
@@ -121,17 +127,17 @@ static ADDRESS_MAP_START(alm32_mem, AS_PROGRAM, 32, mmodular_state)
 ADDRESS_MAP_END
 
 
-static ADDRESS_MAP_START(van32_mem, AS_PROGRAM, 32, mmodular_state)
+ADDRESS_MAP_START(mmodular_state::van32_mem)
+	AM_IMPORT_FROM(alm32_mem)
+
 	AM_RANGE( 0x00000000, 0x0003ffff ) AM_ROM
 
 //  AM_RANGE( 0x98000008, 0x9800000b )  AM_WRITE(write_unknown2 )   // Bavaria sensors
 //  AM_RANGE( 0x98000004, 0x98000007 )  AM_READ(read_unknown1 ) // Bavaria sensors
 //  AM_RANGE( 0x9800000c, 0x9800000f )  AM_READ(read_unknown3 ) // Bavaria sensors
-
-	AM_IMPORT_FROM(alm32_mem)
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START(gen32_mem, AS_PROGRAM, 32, mmodular_state)
+ADDRESS_MAP_START(mmodular_state::gen32_mem)
 	AM_RANGE( 0x00000000, 0x0003ffff ) AM_ROM
 
 	AM_RANGE( 0xc8000004, 0xc8000007 ) AM_DEVWRITE8("board", mephisto_board_device, mux_w, 0xff000000)
@@ -161,7 +167,7 @@ READ8_MEMBER(berlinp_state::berlinp_input_r)
 		return m_board->input_r(space, offset) ^ 0xff;
 }
 
-static ADDRESS_MAP_START(berlinp_mem, AS_PROGRAM, 32, berlinp_state)
+ADDRESS_MAP_START(berlinp_state::berlinp_mem)
 	AM_RANGE( 0x000000, 0x03ffff ) AM_ROM
 
 	AM_RANGE( 0x800000, 0x800003 ) AM_READ8(berlinp_input_r, 0xff000000)
@@ -249,7 +255,8 @@ MACHINE_CONFIG_START(mmodular_state::alm16)
 MACHINE_CONFIG_END
 
 
-MACHINE_CONFIG_DERIVED(mmodular_state::van16, alm16)
+MACHINE_CONFIG_START(mmodular_state::van16)
+	alm16(config);
 	MCFG_CPU_MODIFY("maincpu")
 	MCFG_CPU_PROGRAM_MAP(van16_mem)
 MACHINE_CONFIG_END
@@ -268,7 +275,8 @@ MACHINE_CONFIG_START(mmodular_state::alm32)
 MACHINE_CONFIG_END
 
 
-MACHINE_CONFIG_DERIVED(mmodular_state::van32, alm32)
+MACHINE_CONFIG_START(mmodular_state::van32)
+	alm32(config);
 	MCFG_CPU_MODIFY("maincpu")
 	MCFG_CPU_PROGRAM_MAP(van32_mem)
 MACHINE_CONFIG_END

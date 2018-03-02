@@ -102,6 +102,7 @@ public:
 	void kbd_put(u8 data);
 
 	void d6809(machine_config &config);
+	void mem_map(address_map &map);
 private:
 	uint8_t m_term_data;
 	virtual void machine_reset() override;
@@ -122,7 +123,7 @@ WRITE8_MEMBER( d6809_state::term_w )
 		m_terminal->write(space, 0, data);
 }
 
-static ADDRESS_MAP_START( mem_map, AS_PROGRAM, 8, d6809_state )
+ADDRESS_MAP_START(d6809_state::mem_map)
 	ADDRESS_MAP_UNMAP_HIGH
 	// 00-FF is for various devices.
 	AM_RANGE(0x0000, 0x0003) AM_DEVREADWRITE("acia1", mos6551_device, read, write)

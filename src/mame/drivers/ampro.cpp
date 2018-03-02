@@ -52,6 +52,8 @@ public:
 	DECLARE_WRITE8_MEMBER(io_w);
 
 	void ampro(machine_config &config);
+	void ampro_io(address_map &map);
+	void ampro_mem(address_map &map);
 private:
 	required_device<cpu_device> m_maincpu;
 	required_device<z80dart_device> m_dart;
@@ -94,13 +96,13 @@ WRITE8_MEMBER( ampro_state::io_w )
 		m_dart->ba_cd_w(space, offset>>2, data);
 }
 
-static ADDRESS_MAP_START(ampro_mem, AS_PROGRAM, 8, ampro_state)
+ADDRESS_MAP_START(ampro_state::ampro_mem)
 	ADDRESS_MAP_UNMAP_HIGH
 	AM_RANGE(0x0000, 0x0fff) AM_READ_BANK("bankr0") AM_WRITE_BANK("bankw0")
 	AM_RANGE(0x1000, 0xffff) AM_RAM
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START(ampro_io, AS_IO, 8, ampro_state)
+ADDRESS_MAP_START(ampro_state::ampro_io)
 	ADDRESS_MAP_UNMAP_HIGH
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	AM_RANGE(0x00, 0x00) AM_WRITE(port00_w) // system

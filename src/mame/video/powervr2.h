@@ -32,8 +32,8 @@ public:
 		ERR_PVRIF_ILL_ADDR_IRQ
 	};
 
-	DECLARE_ADDRESS_MAP(ta_map, 32);
-	DECLARE_ADDRESS_MAP(pd_dma_map, 32);
+	void ta_map(address_map &map);
+	void pd_dma_map(address_map &map);
 
 	struct {
 		uint32_t pvr_addr;

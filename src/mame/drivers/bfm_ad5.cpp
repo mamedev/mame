@@ -13,6 +13,7 @@
 
 #include "emu.h"
 #include "includes/bfm_ad5.h"
+#include "includes/bfm_sc4.h"
 #include "machine/mcf5206e.h"
 #include "machine/bfm_sc45_helper.h"
 #include "speaker.h"
@@ -58,7 +59,7 @@ DRIVER_INIT_MEMBER(adder5_state,ad5)
 
 }
 
-static ADDRESS_MAP_START( ad5_map, AS_PROGRAM, 32, adder5_state )
+ADDRESS_MAP_START(adder5_state::ad5_map)
 	AM_RANGE(0x00000000, 0x00ffffff) AM_ROM
 	AM_RANGE(0x01000000, 0x0100ffff) AM_RAM
 	AM_RANGE(0x40000000, 0x40000fff) AM_RAM

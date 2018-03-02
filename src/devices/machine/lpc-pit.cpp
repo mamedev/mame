@@ -5,7 +5,7 @@
 
 DEFINE_DEVICE_TYPE(LPC_PIT, lpc_pit_device, "lpc_pit", "LPC PIT")
 
-DEVICE_ADDRESS_MAP_START(map, 32, lpc_pit_device)
+ADDRESS_MAP_START(lpc_pit_device::map)
 	AM_RANGE(0x40, 0x43) AM_READWRITE8(status_r, access_w,  0x00ffffff)
 	AM_RANGE(0x40, 0x43) AM_WRITE8    (          control_w, 0xff000000)
 	AM_RANGE(0x50, 0x53) AM_READWRITE8(status_r, access_w,  0x00ffffff)

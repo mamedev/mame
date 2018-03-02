@@ -96,16 +96,15 @@ k05324x_device::k05324x_device(const machine_config &mconfig, const char *tag, d
 {
 }
 
-void k05324x_device::set_bpp(device_t &device, int bpp)
+void k05324x_device::set_bpp(int bpp)
 {
-	k05324x_device &dev = downcast<k05324x_device &>(device);
 	switch(bpp)
 	{
 		case 4:
-			device_gfx_interface::static_set_info(dev, gfxinfo);
+			device_gfx_interface::static_set_info(*this, gfxinfo);
 			break;
 		case 6:
-			device_gfx_interface::static_set_info(dev, gfxinfo_6bpp);
+			device_gfx_interface::static_set_info(*this, gfxinfo_6bpp);
 			break;
 		default:
 			fatalerror("Unsupported bpp\n");

@@ -281,6 +281,9 @@ protected:
 	void draw_graphics();
 	void draw_sprites();
 
+	void mos6566_colorram_map(address_map &map);
+	void mos6566_videoram_map(address_map &map);
+
 	int m_icount;
 	const int m_variant;
 

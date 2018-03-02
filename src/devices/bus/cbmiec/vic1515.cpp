@@ -42,7 +42,7 @@ const tiny_rom_entry *vic1515_device::device_rom_region() const
 //  ADDRESS_MAP( vic1515_mem )
 //-------------------------------------------------
 
-static ADDRESS_MAP_START( vic1515_mem, AS_PROGRAM, 8, vic1515_device )
+ADDRESS_MAP_START(vic1515_device::vic1515_mem)
 	AM_RANGE(0x0000, 0x0fff) AM_ROM AM_REGION("rom", 0)
 ADDRESS_MAP_END
 
@@ -51,7 +51,7 @@ ADDRESS_MAP_END
 //  ADDRESS_MAP( vic1515_io )
 //-------------------------------------------------
 
-static ADDRESS_MAP_START( vic1515_io, AS_IO, 8, vic1515_device )
+ADDRESS_MAP_START(vic1515_device::vic1515_io)
 ADDRESS_MAP_END
 
 

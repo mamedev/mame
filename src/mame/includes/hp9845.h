@@ -3,8 +3,9 @@
 // *******************************
 // Driver for HP 9845B/C/T systems
 // *******************************
-#ifndef _HP9845_H_
-#define _HP9845_H_
+
+#ifndef MAME_INCLUDES_HP9845_H
+#define MAME_INCLUDES_HP9845_H
 
 #include "cpu/hphybrid/hphybrid.h"
 #include "machine/hp_taco.h"
@@ -60,6 +61,8 @@ public:
 	DECLARE_INPUT_CHANGED_MEMBER(togglekey_changed);
 
 	void hp9845_base(machine_config &config);
+	void global_mem_map(address_map &map);
+	void ppu_io_map(address_map &map);
 protected:
 	required_device<hp_5061_3001_cpu_device> m_lpu;
 	required_device<hp_5061_3001_cpu_device> m_ppu;
@@ -151,4 +154,4 @@ protected:
 	bool m_prt_irl;
 };
 
-#endif /* _HP9845_H_ */
+#endif // MAME_INCLUDES_HP9845_H

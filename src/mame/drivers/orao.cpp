@@ -26,7 +26,7 @@
 
 
 /* Address maps */
-static ADDRESS_MAP_START(orao_mem, AS_PROGRAM, 8, orao_state )
+ADDRESS_MAP_START(orao_state::orao_mem)
 	AM_RANGE( 0x0000, 0x5fff ) AM_RAM AM_SHARE("memory")
 	AM_RANGE( 0x6000, 0x7fff ) AM_RAM AM_SHARE("video_ram") // video ram
 	AM_RANGE( 0x8000, 0x9fff ) AM_READWRITE(orao_io_r, orao_io_w )

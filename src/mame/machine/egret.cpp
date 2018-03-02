@@ -66,7 +66,7 @@ ROM_END
 //  ADDRESS_MAP
 //-------------------------------------------------
 
-static ADDRESS_MAP_START( egret_map, AS_PROGRAM, 8, egret_device )
+ADDRESS_MAP_START(egret_device::egret_map)
 	AM_RANGE(0x0000, 0x0002) AM_READWRITE(ports_r, ports_w)
 	AM_RANGE(0x0004, 0x0006) AM_READWRITE(ddr_r, ddr_w)
 	AM_RANGE(0x0007, 0x0007) AM_READWRITE(pll_r, pll_w)
@@ -332,17 +332,6 @@ egret_device::egret_device(const machine_config &mconfig, const char *tag, devic
 	write_via_data(*this),
 	m_maincpu(*this, EGRET_CPU_TAG)
 {
-}
-
-//-------------------------------------------------
-//  static_set_type - configuration helper to set
-//  the chip type
-//-------------------------------------------------
-
-void egret_device::static_set_type(device_t &device, int type)
-{
-	egret_device &egret = downcast<egret_device &>(device);
-	egret.rom_offset = type;
 }
 
 //-------------------------------------------------

@@ -79,7 +79,7 @@ const atari_motion_objects_config relief_state::s_mob_config =
 	0                   /* resulting value to indicate "special" */
 };
 
-VIDEO_START_MEMBER(relief_state,relief)
+void relief_state::video_start()
 {
 	/* MOs are 5bpp but with a 4-bit color granularity */
 	m_gfxdecode->gfx(1)->set_granularity(16);

@@ -99,6 +99,7 @@ public:
 
 	INTERRUPT_GEN_MEMBER(vic3_vblank_irq);
 	void c65(machine_config &config);
+	void c65_map(address_map &map);
 protected:
 	// driver_device overrides
 	virtual void machine_start() override;
@@ -223,7 +224,7 @@ READ8_MEMBER(c65_state::vic4567_dummy_r)
 			return m_VIC3_ControlB;
 	}
 
-	if(!machine().side_effect_disabled())
+	if(!machine().side_effects_disabled())
 		printf("%02x\n",offset); // TODO: PC
 	return res;
 }
@@ -483,7 +484,7 @@ READ8_MEMBER(c65_state::dummy_r)
 	return 0;
 }
 
-static ADDRESS_MAP_START( c65_map, AS_PROGRAM, 8, c65_state )
+ADDRESS_MAP_START(c65_state::c65_map)
 	AM_RANGE(0x00000, 0x07fff) AM_RAM AM_SHARE("wram") // TODO: bank
 	AM_RANGE(0x0c800, 0x0cfff) AM_ROM AM_REGION("maincpu", 0xc800)
 	AM_RANGE(0x0d000, 0x0d07f) AM_READWRITE(vic4567_dummy_r,vic4567_dummy_w) // 0x0d000, 0x0d07f VIC-4567

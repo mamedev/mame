@@ -202,6 +202,9 @@ public:
 
 	void aleck64(machine_config &config);
 	void a64_e90(machine_config &config);
+	void e90_map(address_map &map);
+	void n64_map(address_map &map);
+	void rsp_map(address_map &map);
 protected:
 	optional_shared_ptr<uint32_t> m_e90_vram;
 	optional_shared_ptr<uint32_t> m_e90_pal;
@@ -312,7 +315,7 @@ READ32_MEMBER(aleck64_state::aleck_dips_r)
     4MB @ 0xd0800000 - 0xd0bfffff doncdoon, hipai, kurufev, twrshaft, srmvs : unused
  */
 
-static ADDRESS_MAP_START( n64_map, AS_PROGRAM, 32, aleck64_state )
+ADDRESS_MAP_START(aleck64_state::n64_map)
 	AM_RANGE(0x00000000, 0x007fffff) AM_RAM /*AM_MIRROR(0xc0000000)*/ AM_SHARE("rdram")             // RDRAM
 
 	AM_RANGE(0x03f00000, 0x03f00027) AM_DEVREADWRITE("rcp", n64_periphs, rdram_reg_r, rdram_reg_w)
@@ -366,14 +369,14 @@ WRITE16_MEMBER(aleck64_state::e90_prot_w)
 	}
 }
 
-static ADDRESS_MAP_START( e90_map, AS_PROGRAM, 32, aleck64_state )
+ADDRESS_MAP_START(aleck64_state::e90_map)
 	AM_IMPORT_FROM( n64_map )
 	AM_RANGE(0xd0000000, 0xd0000fff) AM_RAM AM_SHARE("e90vram")// x/y offsets
 	AM_RANGE(0xd0010000, 0xd0010fff) AM_RAM AM_SHARE("e90pal")// RGB555 palette
 	AM_RANGE(0xd0030000, 0xd003001f) AM_READWRITE16(e90_prot_r, e90_prot_w,0xffffffff)
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( rsp_map, AS_PROGRAM, 32, aleck64_state )
+ADDRESS_MAP_START(aleck64_state::rsp_map)
 	AM_RANGE(0x00000000, 0x00000fff) AM_RAM AM_SHARE("rsp_dmem")
 	AM_RANGE(0x00001000, 0x00001fff) AM_RAM AM_SHARE("rsp_imem")
 	AM_RANGE(0x04000000, 0x04000fff) AM_RAM AM_SHARE("rsp_dmem")
@@ -982,7 +985,8 @@ uint32_t aleck64_state::screen_update_e90(screen_device &screen, bitmap_rgb32 &b
 	return 0;
 }
 
-MACHINE_CONFIG_DERIVED(aleck64_state::a64_e90, aleck64)
+MACHINE_CONFIG_START(aleck64_state::a64_e90)
+	aleck64(config);
 	MCFG_CPU_MODIFY("maincpu")
 	MCFG_CPU_PROGRAM_MAP(e90_map)
 

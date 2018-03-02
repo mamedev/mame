@@ -108,6 +108,9 @@ public:
 	MC6845_UPDATE_ROW(crtc_update_row);
 	void tapatune(machine_config &config);
 	void tapatune_base(machine_config &config);
+	void maincpu_io_map(address_map &map);
+	void maincpu_map(address_map &map);
+	void video_map(address_map &map);
 };
 
 
@@ -277,7 +280,7 @@ READ8_MEMBER(tapatune_state::read_data_from_68k)
  *
  *************************************/
 
-static ADDRESS_MAP_START( video_map, AS_PROGRAM, 16, tapatune_state )
+ADDRESS_MAP_START(tapatune_state::video_map)
 	AM_RANGE(0x000000, 0x2fffff) AM_ROM
 	AM_RANGE(0x300000, 0x31ffff) AM_RAM AM_SHARE("videoram")
 	AM_RANGE(0x320000, 0x33ffff) AM_RAM
@@ -289,13 +292,13 @@ static ADDRESS_MAP_START( video_map, AS_PROGRAM, 16, tapatune_state )
 ADDRESS_MAP_END
 
 
-static ADDRESS_MAP_START( maincpu_map, AS_PROGRAM, 8, tapatune_state )
+ADDRESS_MAP_START(tapatune_state::maincpu_map)
 	AM_RANGE(0x0000, 0x7fff) AM_ROM AM_WRITENOP
 	AM_RANGE(0xe000, 0xffff) AM_RAM AM_SHARE("nvram")
 ADDRESS_MAP_END
 
 
-static ADDRESS_MAP_START ( maincpu_io_map, AS_IO, 8, tapatune_state )
+ADDRESS_MAP_START(tapatune_state::maincpu_io_map)
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	AM_RANGE(0x00, 0x00) AM_WRITE(bsmt_data_lo_w)
 	AM_RANGE(0x08, 0x08) AM_WRITE(bsmt_data_hi_w)
@@ -530,7 +533,8 @@ MACHINE_CONFIG_START(tapatune_state::tapatune_base)
 	MCFG_SOUND_ROUTE(1, "rspeaker", 1.0)
 MACHINE_CONFIG_END
 
-MACHINE_CONFIG_DERIVED(tapatune_state::tapatune, tapatune_base)
+MACHINE_CONFIG_START(tapatune_state::tapatune)
+	tapatune_base(config);
 	MCFG_CPU_ADD("videocpu", M68000, XTAL(24'000'000) / 2)
 	MCFG_CPU_PROGRAM_MAP(video_map)
 

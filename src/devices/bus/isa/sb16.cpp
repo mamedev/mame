@@ -16,7 +16,7 @@ DEFINE_DEVICE_TYPE(ISA16_SB16, sb16_lle_device, "sb16", "SoundBlaster 16 Audio A
 
 READ8_MEMBER( sb16_lle_device::dsp_data_r )
 {
-	if(!machine().side_effect_disabled())
+	if(!machine().side_effects_disabled())
 		m_data_in = false;
 
 	return m_in_byte;
@@ -373,7 +373,7 @@ ROM_START( sb16 )
 	ROM_LOAD("ct1741_v413_xor.bin", 0x00, 0x40, CRC(5243d15a) SHA1(c7637c92828843f47e6e2f956af639b07aee4571))
 ROM_END
 
-static ADDRESS_MAP_START(sb16_io, AS_IO, 8, sb16_lle_device)
+ADDRESS_MAP_START(sb16_lle_device::sb16_io)
 	AM_RANGE(0x0000, 0x0000) AM_MIRROR(0xff00) AM_READWRITE(dsp_data_r, dsp_data_w)
 //  AM_RANGE(0x0001, 0x0001) // MIDI related?
 //  AM_RANGE(0x0002, 0x0002)

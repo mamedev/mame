@@ -158,14 +158,14 @@ void gauntlet_state::scanline_update(screen_device &screen, int scanline)
 }
 
 
-MACHINE_START_MEMBER(gauntlet_state,gauntlet)
+void gauntlet_state::machine_start()
 {
 	atarigen_state::machine_start();
 	save_item(NAME(m_sound_reset_val));
 }
 
 
-MACHINE_RESET_MEMBER(gauntlet_state,gauntlet)
+void gauntlet_state::machine_reset()
 {
 	m_sound_reset_val = 1;
 
@@ -272,7 +272,7 @@ WRITE8_MEMBER(gauntlet_state::mixer_w)
  *************************************/
 
 /* full map verified from schematics */
-static ADDRESS_MAP_START( main_map, AS_PROGRAM, 16, gauntlet_state )
+ADDRESS_MAP_START(gauntlet_state::main_map)
 	ADDRESS_MAP_UNMAP_HIGH
 	AM_RANGE(0x000000, 0x037fff) AM_MIRROR(0x280000) AM_ROM
 	AM_RANGE(0x038000, 0x03ffff) AM_MIRROR(0x280000) AM_ROM /* slapstic maps here */
@@ -297,8 +297,8 @@ static ADDRESS_MAP_START( main_map, AS_PROGRAM, 16, gauntlet_state )
 	AM_RANGE(0x900000, 0x901fff) AM_MIRROR(0x2c8000) AM_RAM_DEVWRITE("playfield", tilemap_device, write16) AM_SHARE("playfield")
 	AM_RANGE(0x902000, 0x903fff) AM_MIRROR(0x2c8000) AM_RAM AM_SHARE("mob")
 	AM_RANGE(0x904000, 0x904fff) AM_MIRROR(0x2c8000) AM_RAM
-	AM_RANGE(0x905f6e, 0x905f6f) AM_MIRROR(0x2c8000) AM_RAM_WRITE(gauntlet_yscroll_w) AM_SHARE("yscroll")
 	AM_RANGE(0x905000, 0x905f7f) AM_MIRROR(0x2c8000) AM_RAM_DEVWRITE("alpha", tilemap_device, write16) AM_SHARE("alpha")
+	AM_RANGE(0x905f6e, 0x905f6f) AM_MIRROR(0x2c8000) AM_RAM_WRITE(gauntlet_yscroll_w) AM_SHARE("yscroll")
 	AM_RANGE(0x905f80, 0x905fff) AM_MIRROR(0x2c8000) AM_RAM AM_SHARE("mob:slip")
 	AM_RANGE(0x910000, 0x9107ff) AM_MIRROR(0x2cf800) AM_RAM_DEVWRITE("palette", palette_device, write16) AM_SHARE("palette")
 	AM_RANGE(0x930000, 0x930001) AM_MIRROR(0x2cfffe) AM_WRITE(gauntlet_xscroll_w) AM_SHARE("xscroll")
@@ -313,7 +313,7 @@ ADDRESS_MAP_END
  *************************************/
 
 /* full map verified from schematics */
-static ADDRESS_MAP_START( sound_map, AS_PROGRAM, 8, gauntlet_state )
+ADDRESS_MAP_START(gauntlet_state::sound_map)
 	ADDRESS_MAP_UNMAP_HIGH
 	AM_RANGE(0x0000, 0x0fff) AM_MIRROR(0x2000) AM_RAM
 	AM_RANGE(0x1000, 0x100f) AM_MIRROR(0x27c0) AM_DEVWRITE("soundcomm", atari_sound_comm_device, sound_response_w)
@@ -491,13 +491,10 @@ MACHINE_CONFIG_START(gauntlet_state::gauntlet_base)
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", M68010, ATARI_CLOCK_14MHz/2)
 	MCFG_CPU_PROGRAM_MAP(main_map)
-	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", atarigen_state, video_int_gen)
+	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", gauntlet_state, video_int_gen)
 
 	MCFG_CPU_ADD("audiocpu", M6502, ATARI_CLOCK_14MHz/8)
 	MCFG_CPU_PROGRAM_MAP(sound_map)
-
-	MCFG_MACHINE_START_OVERRIDE(gauntlet_state,gauntlet)
-	MCFG_MACHINE_RESET_OVERRIDE(gauntlet_state,gauntlet)
 
 	MCFG_EEPROM_2804_ADD("eeprom")
 	MCFG_EEPROM_28XX_LOCK_AFTER_WRITE(true)
@@ -523,10 +520,8 @@ MACHINE_CONFIG_START(gauntlet_state::gauntlet_base)
 	MCFG_SCREEN_UPDATE_DRIVER(gauntlet_state, screen_update_gauntlet)
 	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_VIDEO_START_OVERRIDE(gauntlet_state,gauntlet)
-
 	/* sound hardware */
-	MCFG_ATARI_SOUND_COMM_ADD("soundcomm", "audiocpu", WRITELINE(atarigen_state, sound_int_write_line))
+	MCFG_ATARI_SOUND_COMM_ADD("soundcomm", "audiocpu", WRITELINE(gauntlet_state, sound_int_write_line))
 	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
 
 	MCFG_YM2151_ADD("ymsnd", ATARI_CLOCK_14MHz/4)
@@ -551,22 +546,26 @@ MACHINE_CONFIG_START(gauntlet_state::gauntlet_base)
 MACHINE_CONFIG_END
 
 
-MACHINE_CONFIG_DERIVED(gauntlet_state::gauntlet, gauntlet_base)
+MACHINE_CONFIG_START(gauntlet_state::gauntlet)
+	gauntlet_base(config);
 	MCFG_SLAPSTIC_ADD("slapstic", 104)
 MACHINE_CONFIG_END
 
 
-MACHINE_CONFIG_DERIVED(gauntlet_state::gaunt2p, gauntlet_base)
+MACHINE_CONFIG_START(gauntlet_state::gaunt2p)
+	gauntlet_base(config);
 	MCFG_SLAPSTIC_ADD("slapstic", 107)
 MACHINE_CONFIG_END
 
 
-MACHINE_CONFIG_DERIVED(gauntlet_state::gauntlet2, gauntlet_base)
+MACHINE_CONFIG_START(gauntlet_state::gauntlet2)
+	gauntlet_base(config);
 	MCFG_SLAPSTIC_ADD("slapstic", 106)
 MACHINE_CONFIG_END
 
 
-MACHINE_CONFIG_DERIVED(gauntlet_state::vindctr2, gauntlet_base)
+MACHINE_CONFIG_START(gauntlet_state::vindctr2)
+	gauntlet_base(config);
 	MCFG_SLAPSTIC_ADD("slapstic", 118)
 MACHINE_CONFIG_END
 

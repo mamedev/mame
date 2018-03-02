@@ -503,7 +503,7 @@ READ8_MEMBER(hp9895_device::phi_reg_r)
 	return (uint8_t)reg;
 }
 
-WRITE16_MEMBER(hp9895_device::z80_m1_w)
+WRITE8_MEMBER(hp9895_device::z80_m1_w)
 {
 	// Every M1 cycle of Z80 clears the IRQ line
 	if (m_cpu_irq) {
@@ -847,13 +847,13 @@ ROM_START(hp9895)
 	ROM_LOAD("1818-1391a.bin" , 0 , 0x2000 , CRC(b50dbfb5) SHA1(96edf9af78be75fbad2a0245b8af43958ba32752))
 ROM_END
 
-static ADDRESS_MAP_START(z80_program_map , AS_PROGRAM , 8 , hp9895_device)
+ADDRESS_MAP_START(hp9895_device::z80_program_map)
 	ADDRESS_MAP_UNMAP_HIGH
 	AM_RANGE(0x0000 , 0x1fff) AM_ROM AM_REGION("cpu" , 0)
 	AM_RANGE(0x6000 , 0x63ff) AM_RAM
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START(z80_io_map , AS_IO , 8 , hp9895_device)
+ADDRESS_MAP_START(hp9895_device::z80_io_map)
 	ADDRESS_MAP_UNMAP_HIGH
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	AM_RANGE(0x10 , 0x17) AM_DEVWRITE("phi" , phi_device , reg8_w) AM_READ(phi_reg_r)
@@ -886,7 +886,7 @@ MACHINE_CONFIG_START(hp9895_device::device_add_mconfig)
 	MCFG_CPU_ADD("cpu" , Z80 , 4000000)
 	MCFG_CPU_PROGRAM_MAP(z80_program_map)
 	MCFG_CPU_IO_MAP(z80_io_map)
-	MCFG_Z80_SET_REFRESH_CALLBACK(WRITE16(hp9895_device , z80_m1_w))
+	MCFG_Z80_SET_REFRESH_CALLBACK(WRITE8(hp9895_device , z80_m1_w))
 
 	MCFG_DEVICE_ADD("phi" , PHI , 0)
 	MCFG_PHI_EOI_WRITE_CB(WRITELINE(hp9895_device , phi_eoi_w))

@@ -197,7 +197,7 @@ WRITE8_MEMBER(vball_state::scrollx_lo_w)
 
 
 //Cheaters note: Scores are stored in ram @ 0x57-0x58 (though the space is used for other things between matches)
-static ADDRESS_MAP_START( main_map, AS_PROGRAM, 8, vball_state )
+ADDRESS_MAP_START(vball_state::main_map)
 	AM_RANGE(0x0000, 0x07ff) AM_RAM
 	AM_RANGE(0x0800, 0x08ff) AM_RAM AM_SHARE("spriteram")
 	AM_RANGE(0x1000, 0x1000) AM_READ_PORT("P1")
@@ -219,7 +219,7 @@ static ADDRESS_MAP_START( main_map, AS_PROGRAM, 8, vball_state )
 	AM_RANGE(0x8000, 0xffff) AM_ROM
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( sound_map, AS_PROGRAM, 8, vball_state )
+ADDRESS_MAP_START(vball_state::sound_map)
 	AM_RANGE(0x0000, 0x7fff) AM_ROM
 	AM_RANGE(0x8000, 0x87ff) AM_RAM
 	AM_RANGE(0x8800, 0x8801) AM_DEVREADWRITE("ymsnd", ym2151_device, read, write)

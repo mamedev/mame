@@ -97,6 +97,8 @@ private:
 	void dump_bitplanes_word();
 	void update_interrupts();
 
+	void ef9365(address_map &map);
+
 	// internal state
 	static constexpr device_timer_id BUSY_TIMER = 0;
 

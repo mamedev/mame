@@ -10,7 +10,7 @@ DEFINE_DEVICE_TYPE(NCR5390, ncr5390_device, "ncr5390", "NCR 5390 SCSI")
 DEFINE_DEVICE_TYPE(NCR53C90A, ncr53c90a_device, "ncr53c90a", "NCR 53C90A SCSI")
 DEFINE_DEVICE_TYPE(NCR53C94, ncr53c94_device, "ncr53c94", "NCR 53C94 SCSI")
 
-DEVICE_ADDRESS_MAP_START(map, 8, ncr5390_device)
+ADDRESS_MAP_START(ncr5390_device::map)
 	AM_RANGE(0x0, 0x0) AM_READWRITE(tcounter_lo_r, tcount_lo_w)
 	AM_RANGE(0x1, 0x1) AM_READWRITE(tcounter_hi_r, tcount_hi_w)
 	AM_RANGE(0x2, 0x2) AM_READWRITE(fifo_r, fifo_w)
@@ -24,14 +24,14 @@ DEVICE_ADDRESS_MAP_START(map, 8, ncr5390_device)
 	AM_RANGE(0x9, 0x9) AM_WRITE(clock_w)
 ADDRESS_MAP_END
 
-DEVICE_ADDRESS_MAP_START(map, 8, ncr53c90a_device)
-	AM_INHERIT_FROM(ncr5390_device::map)
+ADDRESS_MAP_START(ncr53c90a_device::map)
+	AM_IMPORT_FROM(ncr5390_device::map)
 
 	AM_RANGE(0xb, 0xb) AM_READWRITE(conf2_r, conf2_w)
 ADDRESS_MAP_END
 
-DEVICE_ADDRESS_MAP_START(map, 8, ncr53c94_device)
-	AM_INHERIT_FROM(ncr53c90a_device::map)
+ADDRESS_MAP_START(ncr53c94_device::map)
+	AM_IMPORT_FROM(ncr53c90a_device::map)
 
 	AM_RANGE(0xc, 0xc) AM_READWRITE(conf3_r, conf3_w)
 	AM_RANGE(0xf, 0xf) AM_WRITE(fifo_align_w)

@@ -194,6 +194,10 @@ public:
 
 	void socrates_pal(machine_config &config);
 	void socrates(machine_config &config);
+	void socrates_rambank_map(address_map &map);
+	void socrates_rombank_map(address_map &map);
+	void z80_io(address_map &map);
+	void z80_mem(address_map &map);
 protected:
 	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr) override;
 };
@@ -214,6 +218,10 @@ public:
 	DECLARE_INPUT_CHANGED_MEMBER( send_input );
 
 	void iqunlimz(machine_config &config);
+	void iqunlimz_io(address_map &map);
+	void iqunlimz_mem(address_map &map);
+	void iqunlimz_rambank_map(address_map &map);
+	void iqunlimz_rombank_map(address_map &map);
 protected:
 	virtual void machine_reset() override;
 	int get_color(int index, int y);
@@ -969,7 +977,7 @@ INPUT_CHANGED_MEMBER( iqunlimz_state::send_input )
  Address Maps
 ******************************************************************************/
 
-static ADDRESS_MAP_START(z80_mem, AS_PROGRAM, 8, socrates_state )
+ADDRESS_MAP_START(socrates_state::z80_mem)
 	ADDRESS_MAP_UNMAP_HIGH
 	AM_RANGE(0x0000, 0x3fff) AM_ROM /* system rom, bank 0 (fixed) */
 	AM_RANGE(0x4000, 0x7fff) AM_DEVICE("rombank1", address_map_bank_device, amap8) /* banked rom space; system rom is banks 0 through F, cartridge rom is banks 10 onward, usually banks 10 through 17. area past the end of the cartridge, and the whole 10-ff area when no cartridge is inserted, reads as 0xF3 */
@@ -977,19 +985,19 @@ static ADDRESS_MAP_START(z80_mem, AS_PROGRAM, 8, socrates_state )
 	AM_RANGE(0xc000, 0xffff) AM_DEVICE("rambank2", address_map_bank_device, amap8) /* banked ram 'window' 1 */
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( socrates_rombank_map, AS_PROGRAM, 8, socrates_state )
+ADDRESS_MAP_START(socrates_state::socrates_rombank_map)
 	ADDRESS_MAP_UNMAP_HIGH
 	AM_RANGE(0x000000, 0x03ffff) AM_ROM AM_REGION("maincpu", 0) AM_MIRROR(0xF00000)      // xxxx 00** **** **** **** ****
 	AM_RANGE(0x040000, 0x07ffff) AM_READ(socrates_cart_r) AM_SELECT(0xF80000)            // **** *1** **** **** **** ****
 	AM_RANGE(0x080000, 0x0bffff) AM_READ(read_f3)                                        // xxxx 10** **** **** **** ****
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( socrates_rambank_map, AS_PROGRAM, 8, socrates_state )
+ADDRESS_MAP_START(socrates_state::socrates_rambank_map)
 	ADDRESS_MAP_UNMAP_HIGH
 	AM_RANGE(0x0000, 0xffff) AM_RAM AM_REGION("vram", 0) AM_MIRROR(0x30000)
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START(z80_io, AS_IO, 8, socrates_state )
+ADDRESS_MAP_START(socrates_state::z80_io)
 	ADDRESS_MAP_UNMAP_HIGH
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	AM_RANGE(0x00, 0x00) AM_READWRITE(common_rom_bank_r, common_rom_bank_w) AM_MIRROR(0x7) /* rom bank select - RW - 8 bits */
@@ -1014,7 +1022,7 @@ static ADDRESS_MAP_START(z80_io, AS_IO, 8, socrates_state )
 	AM_RANGE(0x70, 0xFF) AM_READ(read_f3) // nothing mapped here afaik
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START(iqunlimz_mem, AS_PROGRAM, 8, iqunlimz_state)
+ADDRESS_MAP_START(iqunlimz_state::iqunlimz_mem)
 	ADDRESS_MAP_UNMAP_HIGH
 	AM_RANGE(0x0000, 0x3fff) AM_DEVICE("rombank2", address_map_bank_device, amap8)
 	AM_RANGE(0x4000, 0x7fff) AM_DEVICE("rombank1", address_map_bank_device, amap8)
@@ -1022,19 +1030,19 @@ static ADDRESS_MAP_START(iqunlimz_mem, AS_PROGRAM, 8, iqunlimz_state)
 	AM_RANGE(0xc000, 0xffff) AM_DEVICE("rambank2", address_map_bank_device, amap8)
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( iqunlimz_rombank_map, AS_PROGRAM, 8, iqunlimz_state )
+ADDRESS_MAP_START(iqunlimz_state::iqunlimz_rombank_map)
 	ADDRESS_MAP_UNMAP_HIGH
 	AM_RANGE(0x000000, 0x03ffff) AM_ROM AM_REGION("maincpu", 0) AM_MIRROR(0xF00000)      // xxxx 00** **** **** **** ****
 	AM_RANGE(0x040000, 0x07ffff) AM_READ(socrates_cart_r) AM_SELECT(0xF80000)            // **** *1** **** **** **** ****
 	AM_RANGE(0x080000, 0x0bffff) AM_ROM AM_REGION("maincpu", 0x40000) AM_MIRROR(0xF00000)// xxxx 10** **** **** **** ****
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( iqunlimz_rambank_map, AS_PROGRAM, 8, iqunlimz_state )
+ADDRESS_MAP_START(iqunlimz_state::iqunlimz_rambank_map)
 	ADDRESS_MAP_UNMAP_HIGH
 	AM_RANGE(0x0000, 0x3ffff) AM_RAM AM_REGION("vram", 0)
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( iqunlimz_io , AS_IO, 8, iqunlimz_state)
+ADDRESS_MAP_START(iqunlimz_state::iqunlimz_io)
 	ADDRESS_MAP_UNMAP_HIGH
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	AM_RANGE(0x00, 0x01) AM_READWRITE(common_rom_bank_r, common_rom_bank_w) AM_MIRROR(0x06)
@@ -1495,7 +1503,8 @@ MACHINE_CONFIG_START(socrates_state::socrates)
 	MCFG_SOFTWARE_LIST_ADD("cart_list", "socrates")
 MACHINE_CONFIG_END
 
-MACHINE_CONFIG_DERIVED(socrates_state::socrates_pal, socrates)
+MACHINE_CONFIG_START(socrates_state::socrates_pal)
+	socrates(config);
 	MCFG_CPU_REPLACE("maincpu", Z80, XTAL(26'601'712)/8)
 	MCFG_CPU_PROGRAM_MAP(z80_mem)
 	MCFG_CPU_IO_MAP(z80_io)

@@ -182,7 +182,7 @@ static const floppy_interface apple2gs_floppy525_floppy_interface =
 };
 
 
-static ADDRESS_MAP_START( apple2gs_map, AS_PROGRAM, 8, apple2gs_state )
+ADDRESS_MAP_START(apple2gs_state::apple2gs_map)
 	/* nothing in the address map - everything is added dynamically */
 ADDRESS_MAP_END
 
@@ -415,7 +415,8 @@ MACHINE_CONFIG_START(apple2gs_state::apple2gs)
 	MCFG_SOFTWARE_LIST_COMPATIBLE_ADD("flop525_list", "apple2")
 MACHINE_CONFIG_END
 
-MACHINE_CONFIG_DERIVED(apple2gs_state::apple2gsr1, apple2gs)
+MACHINE_CONFIG_START(apple2gs_state::apple2gsr1)
+	apple2gs(config);
 	MCFG_MACHINE_START_OVERRIDE(apple2gs_state, apple2gsr1 )
 
 	#if RUN_ADB_MICRO

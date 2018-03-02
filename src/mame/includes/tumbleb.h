@@ -147,4 +147,15 @@ public:
 	void chokchok(machine_config &config);
 	void cookbib_mcu(machine_config &config);
 	void jumpkids(machine_config &config);
+	void fncywld_main_map(address_map &map);
+	void htchctch_main_map(address_map &map);
+	void jumpkids_main_map(address_map &map);
+	void jumpkids_sound_map(address_map &map);
+	void pangpang_main_map(address_map &map);
+	void protection_iomap(address_map &map);
+	void protection_map(address_map &map);
+	void semicom_sound_map(address_map &map);
+	void suprtrio_main_map(address_map &map);
+	void suprtrio_sound_map(address_map &map);
+	void tumblepopb_main_map(address_map &map);
 };

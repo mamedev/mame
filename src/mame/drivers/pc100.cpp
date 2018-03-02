@@ -146,6 +146,8 @@ public:
 	WRITE_LINE_MEMBER(rtc_portc_3_w) { m_rtc_portc = (m_rtc_portc & ~(1 << 3)) | ((state & 1) << 3); }
 	uint8_t m_rtc_portc;
 	void pc100(machine_config &config);
+	void pc100_io(address_map &map);
+	void pc100_map(address_map &map);
 };
 
 void pc100_state::video_start()
@@ -230,7 +232,7 @@ WRITE16_MEMBER( pc100_state::pc100_vram_w )
 	}
 }
 
-static ADDRESS_MAP_START(pc100_map, AS_PROGRAM, 16, pc100_state)
+ADDRESS_MAP_START(pc100_state::pc100_map)
 	ADDRESS_MAP_UNMAP_HIGH
 	AM_RANGE(0x00000,0xbffff) AM_RAM // work ram
 	AM_RANGE(0xc0000,0xdffff) AM_READWRITE(pc100_vram_r,pc100_vram_w) // vram, blitter based!
@@ -310,7 +312,7 @@ WRITE8_MEMBER( pc100_state::pc100_crtc_data_w )
 
 
 /* everything is 8-bit bus wide */
-static ADDRESS_MAP_START(pc100_io, AS_IO, 16, pc100_state)
+ADDRESS_MAP_START(pc100_state::pc100_io)
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	AM_RANGE(0x00, 0x03) AM_DEVREADWRITE8("pic8259", pic8259_device, read, write, 0x00ff) // i8259
 //  AM_RANGE(0x04, 0x07) i8237?

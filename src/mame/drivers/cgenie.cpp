@@ -73,6 +73,8 @@ public:
 	DECLARE_WRITE_LINE_MEMBER(rs232_dcd_w);
 
 	void cgenie(machine_config &config);
+	void cgenie_io(address_map &map);
+	void cgenie_mem(address_map &map);
 protected:
 	virtual void machine_start() override;
 
@@ -106,7 +108,7 @@ private:
 //  ADDRESS MAPS
 //**************************************************************************
 
-static ADDRESS_MAP_START( cgenie_mem, AS_PROGRAM, 8, cgenie_state )
+ADDRESS_MAP_START(cgenie_state::cgenie_mem)
 	ADDRESS_MAP_UNMAP_HIGH
 	AM_RANGE(0x0000, 0x3fff) AM_ROM
 //  AM_RANGE(0x4000, 0xbfff) AM_RAM // set up in machine_start
@@ -117,7 +119,7 @@ static ADDRESS_MAP_START( cgenie_mem, AS_PROGRAM, 8, cgenie_state )
 	AM_RANGE(0xfc00, 0xffff) AM_NOP // cartridge space
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( cgenie_io, AS_IO, 8, cgenie_state )
+ADDRESS_MAP_START(cgenie_state::cgenie_io)
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	AM_RANGE(0xf8, 0xf8) AM_DEVWRITE("ay8910", ay8910_device, address_w)
 	AM_RANGE(0xf9, 0xf9) AM_DEVREADWRITE("ay8910", ay8910_device, data_r, data_w)

@@ -30,8 +30,8 @@ public:
 		TIMER_DESTROYR_FRAME
 	};
 
-	destroyr_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag),
+	destroyr_state(const machine_config &mconfig, device_type type, const char *tag) :
+		driver_device(mconfig, type, tag),
 		m_maincpu(*this, "maincpu"),
 		m_watchdog(*this, "watchdog"),
 		m_gfxdecode(*this, "gfxdecode"),
@@ -39,8 +39,33 @@ public:
 		m_palette(*this, "palette"),
 		m_alpha_num_ram(*this, "alpha_nuram"),
 		m_major_obj_ram(*this, "major_obj_ram"),
-		m_minor_obj_ram(*this, "minor_obj_ram") { }
+		m_minor_obj_ram(*this, "minor_obj_ram")
+	{ }
 
+	void destroyr(machine_config &config);
+
+protected:
+	DECLARE_WRITE8_MEMBER(misc_w);
+	DECLARE_WRITE8_MEMBER(cursor_load_w);
+	DECLARE_WRITE8_MEMBER(interrupt_ack_w);
+	DECLARE_WRITE_LINE_MEMBER(led0_w);
+	DECLARE_WRITE_LINE_MEMBER(led1_w);
+	DECLARE_READ8_MEMBER(input_r);
+	DECLARE_READ8_MEMBER(scanline_r);
+
+	DECLARE_PALETTE_INIT(destroyr);
+
+	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+
+	TIMER_CALLBACK_MEMBER(dial_callback);
+	TIMER_CALLBACK_MEMBER(frame_callback);
+
+	virtual void machine_start() override;
+	virtual void machine_reset() override;
+	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr) override;
+	void destroyr_map(address_map &map);
+
+private:
 	/* devices */
 	required_device<cpu_device> m_maincpu;
 	required_device<watchdog_timer_device> m_watchdog;
@@ -65,27 +90,6 @@ public:
 	int            m_noise;
 	emu_timer      *m_dial_timer;
 	emu_timer      *m_frame_timer;
-
-	DECLARE_WRITE8_MEMBER(misc_w);
-	DECLARE_WRITE8_MEMBER(cursor_load_w);
-	DECLARE_WRITE8_MEMBER(interrupt_ack_w);
-	DECLARE_WRITE_LINE_MEMBER(led0_w);
-	DECLARE_WRITE_LINE_MEMBER(led1_w);
-	DECLARE_READ8_MEMBER(input_r);
-	DECLARE_READ8_MEMBER(scanline_r);
-
-	virtual void machine_start() override;
-	virtual void machine_reset() override;
-	DECLARE_PALETTE_INIT(destroyr);
-
-	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
-
-	TIMER_CALLBACK_MEMBER(dial_callback);
-	TIMER_CALLBACK_MEMBER(frame_callback);
-
-	void destroyr(machine_config &config);
-protected:
-	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr) override;
 };
 
 
@@ -286,7 +290,7 @@ READ8_MEMBER(destroyr_state::scanline_r)
 }
 
 
-static ADDRESS_MAP_START( destroyr_map, AS_PROGRAM, 8, destroyr_state )
+ADDRESS_MAP_START(destroyr_state::destroyr_map)
 	ADDRESS_MAP_GLOBAL_MASK(0x7fff)
 	AM_RANGE(0x0000, 0x00ff) AM_MIRROR(0xf00) AM_RAM
 	AM_RANGE(0x1000, 0x1001) AM_MIRROR(0xffe) AM_READ(input_r)

@@ -73,6 +73,8 @@ public:
 	const debugger_constants *debugc_bios;
 
 	void xbox_base(machine_config &config);
+	void xbox_base_map(address_map &map);
+	void xbox_base_map_io(address_map &map);
 private:
 	void dump_string_command(int ref, const std::vector<std::string> &params);
 	void dump_process_command(int ref, const std::vector<std::string> &params);
@@ -90,12 +92,9 @@ private:
 	void vprogdis_command(int ref, const std::vector<std::string> &params);
 	void help_command(int ref, const std::vector<std::string> &params);
 	void xbox_debug_commands(int ref, const std::vector<std::string> &params);
-	int find_bios_index(running_machine &mach);
-	bool find_bios_hash(running_machine &mach, int bios, uint32_t &crc32);
-	void find_debug_params(running_machine &mach);
+	int find_bios_index();
+	bool find_bios_hash(int bios, uint32_t &crc32);
+	void find_debug_params();
 };
-
-ADDRESS_MAP_EXTERN(xbox_base_map, 32);
-ADDRESS_MAP_EXTERN(xbox_base_map_io, 32);
 
 #endif // MAME_INCLUDES_XBOX_H

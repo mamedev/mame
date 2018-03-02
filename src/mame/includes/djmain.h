@@ -81,4 +81,9 @@ public:
 	void djmainj(machine_config &config);
 	void djmainu(machine_config &config);
 	void djmaina(machine_config &config);
+	void k054539_map(address_map &map);
+	void maincpu_djmain(address_map &map);
+	void maincpu_djmaina(address_map &map);
+	void maincpu_djmainj(address_map &map);
+	void maincpu_djmainu(address_map &map);
 };

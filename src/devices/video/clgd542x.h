@@ -117,8 +117,19 @@ protected:
 	virtual void device_start() override;
 };
 
+class cirrus_gd5446_device :  public cirrus_gd5428_device
+{
+public:
+	cirrus_gd5446_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+
+protected:
+	virtual void device_start() override;
+};
+
+
 // device type definition
 DECLARE_DEVICE_TYPE(CIRRUS_GD5428, cirrus_gd5428_device)
 DECLARE_DEVICE_TYPE(CIRRUS_GD5430, cirrus_gd5430_device)
+DECLARE_DEVICE_TYPE(CIRRUS_GD5446, cirrus_gd5446_device)
 
 #endif // MAME_VIDEO_CLGD542X_H

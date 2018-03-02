@@ -97,6 +97,21 @@ public:
 	void hyouban(machine_config &config);
 	void qmhayaku(machine_config &config);
 	void mjgottub(machine_config &config);
+	void av2mj1bb_io_map(address_map &map);
+	void av2mj1bb_map(address_map &map);
+	void av2mj2rg_map(address_map &map);
+	void galkaika_map(address_map &map);
+	void galkoku_io_map(address_map &map);
+	void galkoku_map(address_map &map);
+	void hyouban_io_map(address_map &map);
+	void mjlstory_map(address_map &map);
+	void nbmj8991_sound_io_map(address_map &map);
+	void nbmj8991_sound_map(address_map &map);
+	void pstadium_io_map(address_map &map);
+	void pstadium_map(address_map &map);
+	void tokyogal_map(address_map &map);
+	void triplew1_map(address_map &map);
+	void triplew2_map(address_map &map);
 protected:
 	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr) override;
 };

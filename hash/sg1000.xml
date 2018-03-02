@@ -1922,6 +1922,21 @@ A135 : 森林歷險記 / Sēnlín lìxiǎn jì -> Pitfall II (same as R-049 by A
 		</part>
 	</software>
 
+	<software name="pippols">
+		<description>Shénqí huāyuán (Tw)</description>
+		<year>1986?</year>
+		<publisher>Jumbo</publisher>
+		<info name="alt_title" value="Pippols / Shénqí huāyuán (神奇花園)"/>
+		<part name="cart" interface="sg1000_cart">
+			<feature name="slot" value="dahjee_typea"/>
+			<dataarea name="rom" size="32768">
+				<rom name="pippols [jumbo] (tw).sg" size="32768" crc="df7cbfa5" sha1="4a95b98e127fb0c6428d6debcfc92152069ac531" offset="000000" />
+			</dataarea>
+			<dataarea name="ram" size="9216">
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="pitfall2a" cloneof="pitfall2">
 		<description>Pitfall II - The Lost Caverns (Jpn, v0)</description>
 		<year>1985</year>
@@ -2735,6 +2750,21 @@ A135 : 森林歷險記 / Sēnlín lìxiǎn jì -> Pitfall II (same as R-049 by A
 			<feature name="slot" value="dahjee_typea"/>
 			<dataarea name="rom" size="49152">
 				<rom name="legend of kage, the [dahjee] (tw).bin" size="49152" crc="2e7166d5" sha1="902dbb122bf0efc76604a876c3fae51c074bdc6a" offset="000000" />
+			</dataarea>
+			<dataarea name="ram" size="9216">
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="starsold">
+		<description>Yǔzhòu zhànshì (Tw)</description>
+		<year>1986?</year>
+		<publisher>DahJee</publisher>
+		<info name="alt_title" value="Star Soldier / Yǔzhòu zhànshì (宇宙戰士)"/>
+		<part name="cart" interface="sg1000_cart">
+			<feature name="slot" value="dahjee_typea"/>
+			<dataarea name="rom" size="49152">
+				<rom name="star soldier [dahjee] (tw).sg" size="49152" crc="e0816bb7" sha1="c1984257809ec5bce80a65d22b9b32561e04922c" offset="000000" />
 			</dataarea>
 			<dataarea name="ram" size="9216">
 			</dataarea>

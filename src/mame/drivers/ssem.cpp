@@ -32,6 +32,7 @@ public:
 	void strlower(char *buf);
 
 	void ssem(machine_config &config);
+	void ssem_map(address_map &map);
 private:
 	template <typename Format, typename... Params>
 	void glyph_print(bitmap_rgb32 &bitmap, int32_t x, int32_t y, Format &&fmt, Params &&...args);
@@ -76,7 +77,7 @@ inline uint32_t ssem_state::reverse(uint32_t v)
 * Address map                                        *
 \****************************************************/
 
-static ADDRESS_MAP_START( ssem_map, AS_PROGRAM, 8, ssem_state )
+ADDRESS_MAP_START(ssem_state::ssem_map)
 	AM_RANGE(0x00, 0x7f) AM_RAM AM_SHARE("store")// Primary store
 ADDRESS_MAP_END
 

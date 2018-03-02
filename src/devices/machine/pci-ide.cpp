@@ -16,33 +16,33 @@ ide_pci_device::ide_pci_device(const machine_config &mconfig, const char *tag, d
 {
 }
 
-DEVICE_ADDRESS_MAP_START(config_map, 32, ide_pci_device)
+ADDRESS_MAP_START(ide_pci_device::config_map)
+	AM_IMPORT_FROM(pci_device::config_map)
 	AM_RANGE(0x08, 0x0b) AM_WRITE8(prog_if_w, 0x0000ff00)
 	AM_RANGE(0x10, 0x1f) AM_READWRITE(address_base_r, address_base_w)
 	AM_RANGE(0x2c, 0x2f) AM_WRITE(subsystem_id_w);
 	AM_RANGE(0x40, 0x5f) AM_READWRITE(pcictrl_r, pcictrl_w)
 	AM_RANGE(0x70, 0x77) AM_DEVREADWRITE("ide", bus_master_ide_controller_device, bmdma_r, bmdma_w) // PCI646
 	AM_RANGE(0x78, 0x7f) AM_DEVREADWRITE("ide2", bus_master_ide_controller_device, bmdma_r, bmdma_w) // PCI646
-	AM_INHERIT_FROM(pci_device::config_map)
 ADDRESS_MAP_END
 
-DEVICE_ADDRESS_MAP_START(chan1_data_command_map, 32, ide_pci_device)
+ADDRESS_MAP_START(ide_pci_device::chan1_data_command_map)
 	AM_RANGE(0x0, 0x7) AM_DEVREADWRITE("ide", bus_master_ide_controller_device, read_cs0, write_cs0)
 ADDRESS_MAP_END
 
-DEVICE_ADDRESS_MAP_START(chan1_control_map, 32, ide_pci_device)
+ADDRESS_MAP_START(ide_pci_device::chan1_control_map)
 	AM_RANGE(0x0, 0x3) AM_READWRITE(ide_read_cs1, ide_write_cs1)
 ADDRESS_MAP_END
 
-DEVICE_ADDRESS_MAP_START(chan2_data_command_map, 32, ide_pci_device)
+ADDRESS_MAP_START(ide_pci_device::chan2_data_command_map)
 	AM_RANGE(0x0, 0x7) AM_DEVREADWRITE("ide2", bus_master_ide_controller_device, read_cs0, write_cs0)
 ADDRESS_MAP_END
 
-DEVICE_ADDRESS_MAP_START(chan2_control_map, 32, ide_pci_device)
+ADDRESS_MAP_START(ide_pci_device::chan2_control_map)
 	AM_RANGE(0x0, 0x3) AM_READWRITE(ide2_read_cs1, ide2_write_cs1)
 ADDRESS_MAP_END
 
-DEVICE_ADDRESS_MAP_START(bus_master_map, 32, ide_pci_device)
+ADDRESS_MAP_START(ide_pci_device::bus_master_map)
 	AM_RANGE(0x0, 0x7) AM_DEVREADWRITE("ide", bus_master_ide_controller_device, bmdma_r, bmdma_w)
 	AM_RANGE(0x8, 0xf) AM_DEVREADWRITE("ide2", bus_master_ide_controller_device, bmdma_r, bmdma_w)
 ADDRESS_MAP_END

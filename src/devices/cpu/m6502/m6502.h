@@ -140,6 +140,8 @@ protected:
 	void prefetch_noirq();
 	void set_nz(uint8_t v);
 
+	u32 XPC;
+	virtual offs_t pc_to_external(u16 pc); // For paged PCs
 	virtual void do_exec_full();
 	virtual void do_exec_partial();
 

@@ -215,6 +215,7 @@ public:
 	uint8_t m_sound3;
 
 	void spaceg(machine_config &config);
+	void spaceg_map(address_map &map);
 protected:
 	virtual void driver_start() override;
 };
@@ -417,7 +418,7 @@ WRITE8_MEMBER(spaceg_state::sound3_w)
  *
  *************************************/
 
-static ADDRESS_MAP_START( spaceg_map, AS_PROGRAM, 8, spaceg_state )
+ADDRESS_MAP_START(spaceg_state::spaceg_map)
 	AM_RANGE(0x0000, 0x1fff) AM_ROM
 	AM_RANGE(0x3000, 0x3fff) AM_ROM
 	AM_RANGE(0x7000, 0x77ff) AM_RAM

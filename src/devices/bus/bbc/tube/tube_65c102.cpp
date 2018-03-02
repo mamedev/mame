@@ -25,7 +25,7 @@ DEFINE_DEVICE_TYPE(BBC_TUBE_65C102, bbc_tube_65c102_device, "bbc_tube_65c102", "
 //  ADDRESS_MAP( tube_6502_mem )
 //-------------------------------------------------
 
-static ADDRESS_MAP_START(tube_6502_mem, AS_PROGRAM, 8, bbc_tube_65c102_device)
+ADDRESS_MAP_START(bbc_tube_65c102_device::tube_6502_mem)
 	AM_RANGE(0x0000, 0xffff) AM_READWRITE(read, write)
 ADDRESS_MAP_END
 
@@ -130,7 +130,7 @@ READ8_MEMBER(bbc_tube_65c102_device::read)
 
 	if ((offset >= 0xfef0) && (offset <= 0xfeff))
 	{
-		if (!machine().side_effect_disabled()) m_rom_enabled = false;
+		if (!machine().side_effects_disabled()) m_rom_enabled = false;
 		data = m_ula->parasite_r(space, offset);
 	}
 	else if (m_rom_enabled && (offset >= 0xf000))

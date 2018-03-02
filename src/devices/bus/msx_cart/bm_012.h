@@ -28,6 +28,8 @@ protected:
 private:
 	DECLARE_WRITE_LINE_MEMBER(midi_in);
 
+	void bm_012_memory_map(address_map &map);
+
 	required_device<tmpz84c015_device> m_tmpz84c015af;
 	required_device<z80pio_device> m_bm012_pio;
 	required_device<midi_port_device> m_mdthru;

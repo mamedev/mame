@@ -141,6 +141,14 @@ public:
 	void polepos2bi(machine_config &config);
 	void topracern(machine_config &config);
 	void polepos(machine_config &config);
+	void sound_z80_bootleg_iomap(address_map &map);
+	void sound_z80_bootleg_map(address_map &map);
+	void topracern_io(address_map &map);
+	void z8002_map(address_map &map);
+	void z8002_map_1(address_map &map);
+	void z8002_map_2(address_map &map);
+	void z80_io(address_map &map);
+	void z80_map(address_map &map);
 };
 
 

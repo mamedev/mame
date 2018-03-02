@@ -6,8 +6,8 @@
  *
  ****************************************************************************/
 
-#ifndef PDP1_H_
-#define PDP1_H_
+#ifndef MAME_INCLUDES_PDP1_H
+#define MAME_INCLUDES_PDP1_H
 
 #include "cpu/pdp1/pdp1.h"
 #include "video/crt.h"
@@ -303,6 +303,7 @@ public:
 	int read_spacewar() { return m_spacewar->read(); }
 
 	void pdp1(machine_config &config);
+	void pdp1_map(address_map &map);
 private:
 	pdp1_reset_param_t m_reset_param;
 	int m_old_typewriter_keys[4];
@@ -332,4 +333,5 @@ private:
 	required_ioport m_lightx;
 	required_ioport m_lighty;
 };
-#endif /* PDP1_H_ */
+
+#endif // MAME_INCLUDES_PDP1_H

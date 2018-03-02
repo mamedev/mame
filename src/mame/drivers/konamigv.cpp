@@ -165,6 +165,11 @@ public:
 	void kdeadeye(machine_config &config);
 	void btchamp(machine_config &config);
 	void konamigv(machine_config &config);
+	void btchamp_map(address_map &map);
+	void kdeadeye_map(address_map &map);
+	void konamigv_map(address_map &map);
+	void simpbowl_map(address_map &map);
+	void tmosh_map(address_map &map);
 protected:
 	virtual void driver_start() override;
 
@@ -180,7 +185,7 @@ private:
 	required_device<cpu_device> m_maincpu;
 };
 
-static ADDRESS_MAP_START( konamigv_map, AS_PROGRAM, 32, konamigv_state )
+ADDRESS_MAP_START(konamigv_state::konamigv_map)
 	AM_RANGE(0x1f000000, 0x1f00001f) AM_DEVREADWRITE8("am53cf96", am53cf96_device, read, write, 0x00ff00ff)
 	AM_RANGE(0x1f100000, 0x1f100003) AM_READ_PORT("P1")
 	AM_RANGE(0x1f100004, 0x1f100007) AM_READ_PORT("P2")
@@ -190,7 +195,7 @@ static ADDRESS_MAP_START( konamigv_map, AS_PROGRAM, 32, konamigv_state )
 	AM_RANGE(0x1f780000, 0x1f780003) AM_WRITENOP /* watchdog? */
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( simpbowl_map, AS_PROGRAM, 32, konamigv_state )
+ADDRESS_MAP_START(konamigv_state::simpbowl_map)
 	AM_IMPORT_FROM( konamigv_map )
 
 	AM_RANGE(0x1f680080, 0x1f68008f) AM_READWRITE16(flash_r, flash_w, 0xffffffff)
@@ -198,7 +203,7 @@ static ADDRESS_MAP_START( simpbowl_map, AS_PROGRAM, 32, konamigv_state )
 	AM_RANGE(0x1f6800c8, 0x1f6800cb) AM_DEVREAD8("upd", upd4701_device, reset_xy, 0x0000ff00)
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( btchamp_map, AS_PROGRAM, 32, konamigv_state )
+ADDRESS_MAP_START(konamigv_state::btchamp_map)
 	AM_IMPORT_FROM( konamigv_map )
 
 	AM_RANGE(0x1f380000, 0x1f3fffff) AM_DEVREADWRITE16("flash", intelfsh16_device, read, write, 0xffffffff)
@@ -208,7 +213,7 @@ static ADDRESS_MAP_START( btchamp_map, AS_PROGRAM, 32, konamigv_state )
 	AM_RANGE(0x1f6800e0, 0x1f6800e3) AM_WRITENOP
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( kdeadeye_map, AS_PROGRAM, 32, konamigv_state )
+ADDRESS_MAP_START(konamigv_state::kdeadeye_map)
 	AM_IMPORT_FROM( konamigv_map )
 
 	AM_RANGE(0x1f380000, 0x1f3fffff) AM_DEVREADWRITE16("flash", intelfsh16_device, read, write, 0xffffffff)
@@ -220,7 +225,7 @@ static ADDRESS_MAP_START( kdeadeye_map, AS_PROGRAM, 32, konamigv_state )
 	AM_RANGE(0x1f6800e0, 0x1f6800e3) AM_WRITENOP
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( tmosh_map, AS_PROGRAM, 32, konamigv_state )
+ADDRESS_MAP_START(konamigv_state::tmosh_map)
 	AM_IMPORT_FROM( konamigv_map )
 
 	AM_RANGE(0x1f680080, 0x1f680083) AM_READ16(tokimeki_serial_r, 0x0000ffff)
@@ -479,7 +484,8 @@ DRIVER_INIT_MEMBER(konamigv_state,simpbowl)
 	m_flash8[3] = machine().device<fujitsu_29f016a_device>("flash3");
 }
 
-MACHINE_CONFIG_DERIVED(konamigv_state::simpbowl, konamigv)
+MACHINE_CONFIG_START(konamigv_state::simpbowl)
+	konamigv(config);
 	MCFG_CPU_MODIFY( "maincpu" )
 	MCFG_CPU_PROGRAM_MAP( simpbowl_map )
 
@@ -518,7 +524,8 @@ WRITE16_MEMBER(konamigv_state::btc_trackball_w)
 	}
 }
 
-MACHINE_CONFIG_DERIVED(konamigv_state::btchamp, konamigv)
+MACHINE_CONFIG_START(konamigv_state::btchamp)
+	konamigv(config);
 	MCFG_CPU_MODIFY( "maincpu" )
 	MCFG_CPU_PROGRAM_MAP( btchamp_map )
 
@@ -575,7 +582,8 @@ WRITE16_MEMBER(konamigv_state::tokimeki_serial_w)
 
 }
 
-MACHINE_CONFIG_DERIVED(konamigv_state::tmosh, konamigv)
+MACHINE_CONFIG_START(konamigv_state::tmosh)
+	konamigv(config);
 	MCFG_CPU_MODIFY( "maincpu" )
 	MCFG_CPU_PROGRAM_MAP( tmosh_map )
 MACHINE_CONFIG_END
@@ -590,7 +598,8 @@ CD:
     A01
 */
 
-MACHINE_CONFIG_DERIVED(konamigv_state::kdeadeye, konamigv)
+MACHINE_CONFIG_START(konamigv_state::kdeadeye)
+	konamigv(config);
 	MCFG_CPU_MODIFY( "maincpu" )
 	MCFG_CPU_PROGRAM_MAP( kdeadeye_map )
 

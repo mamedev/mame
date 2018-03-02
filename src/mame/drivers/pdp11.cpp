@@ -119,6 +119,8 @@ public:
 	void pdp11ub2(machine_config &config);
 	void pdp11(machine_config &config);
 	void pdp11qb(machine_config &config);
+	void pdp11_mem(address_map &map);
+	void pdp11qb_mem(address_map &map);
 };
 
 READ16_MEMBER(pdp11_state::teletype_ctrl_r)
@@ -159,16 +161,16 @@ WRITE16_MEMBER(pdp11_state::teletype_ctrl_w)
 	}
 }
 
-static ADDRESS_MAP_START(pdp11_mem, AS_PROGRAM, 16, pdp11_state)
+ADDRESS_MAP_START(pdp11_state::pdp11_mem)
 	ADDRESS_MAP_UNMAP_HIGH
 	AM_RANGE( 0x0000, 0xdfff ) AM_RAM  // RAM
 	AM_RANGE( 0xea00, 0xfeff ) AM_ROM
 	AM_RANGE( 0xff70, 0xff77 ) AM_READWRITE(teletype_ctrl_r,teletype_ctrl_w)
 
-	AM_RANGE( 0xfe78, 0xfe7b ) AM_DEVREADWRITE("rx01", rx01_device, read, write)
+	AM_RANGE( 0xfe78, 0xfe7b ) AM_DEVWRITE("rx01", rx01_device, write)
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START(pdp11qb_mem, AS_PROGRAM, 16, pdp11_state)
+ADDRESS_MAP_START(pdp11_state::pdp11qb_mem)
 	ADDRESS_MAP_UNMAP_HIGH
 	AM_RANGE( 0x0000, 0xe9ff ) AM_RAM  // RAM
 	AM_RANGE( 0xea00, 0xefff ) AM_ROM
@@ -363,11 +365,13 @@ MACHINE_CONFIG_START(pdp11_state::pdp11)
 	MCFG_RX01_ADD("rx01")
 MACHINE_CONFIG_END
 
-MACHINE_CONFIG_DERIVED(pdp11_state::pdp11ub2, pdp11)
+MACHINE_CONFIG_START(pdp11_state::pdp11ub2)
+	pdp11(config);
 	MCFG_MACHINE_RESET_OVERRIDE(pdp11_state,pdp11ub2)
 MACHINE_CONFIG_END
 
-MACHINE_CONFIG_DERIVED(pdp11_state::pdp11qb, pdp11)
+MACHINE_CONFIG_START(pdp11_state::pdp11qb)
+	pdp11(config);
 	MCFG_MACHINE_RESET_OVERRIDE(pdp11_state,pdp11qb)
 
 	MCFG_CPU_MODIFY("maincpu")

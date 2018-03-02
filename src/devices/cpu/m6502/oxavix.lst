@@ -1,0 +1,105 @@
+# license:BSD-3-Clause
+# copyright-holders:David Haywood
+# xavix opcodes
+
+callf_xa3
+	read(SP);
+	if (PC & 0x8000) // if top bit of PC isn't set we're in the non-banked RAM area, don't store farbank?
+	{
+		write(SP, m_farbank);
+		dec_SP();
+	}
+	TMP2 = read_pc();
+	TMP = read_pc();
+	//read(SP);
+	write(SP, PC>>8);
+	dec_SP();
+	write(SP, PC);
+	dec_SP();
+	TMP = set_h(TMP, read_pc());
+	PC = TMP;
+	m_farbank=TMP2;
+	prefetch();
+
+retf_imp
+	read_pc_noinc();
+	read(SP);
+	inc_SP();
+	PC = read(SP);
+	inc_SP();
+	PC = set_h(PC, read(SP));
+	if (PC & 0x8000) // if top bit of PC is set then we're jumping back to a banked ROM area, so get farbank? (see 0fdae in rad_ping)
+	{
+		inc_SP();
+		TMP2 = read(SP);
+		m_farbank = TMP2;
+	}
+	read_pc();
+	prefetch();
+
+brk_xav_imp
+	// The 6502 bug when a nmi occurs in a brk is reproduced (case !irq_taken && nmi_state)
+	if(irq_taken) {
+		read_pc_noinc();
+	} else {
+		read_pc();
+	}
+	write(SP, m_farbank); // maybe
+	dec_SP();
+	write(SP, PC >> 8);
+	dec_SP();
+	write(SP, PC);
+	dec_SP();
+	write(SP, irq_taken ? P & ~F_B : P);
+	dec_SP();
+	if(nmi_state) {
+		if (m_vector_callback.isnull())
+		{
+			PC = read_arg(0xfffa);
+			PC = set_h(PC, read_arg(0xfffb));
+			m_farbank = 0;
+		}
+		else
+		{
+			PC = m_vector_callback(0,1);
+			PC = set_h(PC, m_vector_callback(0,0));
+			m_farbank = 0;
+		}
+
+		nmi_state = false;
+		standard_irq_callback(NMI_LINE);
+	} else {
+		if (m_vector_callback.isnull())
+		{
+			PC = read_arg(0xfffe);
+			PC = set_h(PC, read_arg(0xffff));
+			m_farbank = 0;
+		}
+		else
+		{
+			PC = m_vector_callback(1,1);
+			PC = set_h(PC, m_vector_callback(1,0));
+			m_farbank = 0;
+		}
+
+		if(irq_taken)
+			standard_irq_callback(IRQ_LINE);
+	}
+	irq_taken = false;
+	P |= F_I; // Do *not* move after the prefetch
+	prefetch();
+	inst_state = -1;
+
+rti_xav_imp
+	read_pc_noinc();
+	read(SP);
+	inc_SP();
+	P = read(SP) | (F_B|F_E);
+	inc_SP();
+	PC = read(SP);
+	inc_SP();
+	PC = set_h(PC, read(SP));
+	inc_SP();
+	TMP2 = read(SP);
+	m_farbank = TMP2;
+	prefetch();

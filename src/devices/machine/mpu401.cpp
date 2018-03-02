@@ -57,7 +57,7 @@
 #define STAT_TX_FULL  (0x40)    // indicates the PC has written a new byte we haven't read yet
 #define STAT_RX_EMPTY (0x80)    // indicates we've written a new byte the PC hasn't read yet
 
-static ADDRESS_MAP_START( mpu401_map, AS_PROGRAM, 8, mpu401_device )
+ADDRESS_MAP_START(mpu401_device::mpu401_map)
 	AM_RANGE(0x0000, 0x001f) AM_READWRITE(regs_mode2_r, regs_mode2_w)
 	AM_RANGE(0x0020, 0x0021) AM_READWRITE(asic_r, asic_w)
 	AM_RANGE(0x0080, 0x00ff) AM_RAM // on-chip RAM
@@ -65,7 +65,7 @@ static ADDRESS_MAP_START( mpu401_map, AS_PROGRAM, 8, mpu401_device )
 	AM_RANGE(0xf000, 0xffff) AM_ROM AM_REGION(ROM_TAG, 0)
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( mpu401_io_map, AS_IO, 8, mpu401_device )
+ADDRESS_MAP_START(mpu401_device::mpu401_io_map)
 	AM_RANGE(M6801_PORT1, M6801_PORT1) AM_READWRITE(port1_r, port1_w)
 	AM_RANGE(M6801_PORT2, M6801_PORT2) AM_READWRITE(port2_r, port2_w)
 ADDRESS_MAP_END

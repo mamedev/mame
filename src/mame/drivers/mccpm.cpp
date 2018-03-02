@@ -44,6 +44,8 @@ public:
 	{ }
 
 	void mccpm(machine_config &config);
+	void mccpm_io(address_map &map);
+	void mccpm_mem(address_map &map);
 private:
 	virtual void machine_reset() override;
 	required_device<cpu_device> m_maincpu;
@@ -51,12 +53,12 @@ private:
 };
 
 
-static ADDRESS_MAP_START(mccpm_mem, AS_PROGRAM, 8, mccpm_state)
+ADDRESS_MAP_START(mccpm_state::mccpm_mem)
 	ADDRESS_MAP_UNMAP_HIGH
 	AM_RANGE(0x0000, 0xffff) AM_RAM AM_SHARE("ram")
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( mccpm_io, AS_IO, 8, mccpm_state)
+ADDRESS_MAP_START(mccpm_state::mccpm_io)
 	ADDRESS_MAP_UNMAP_HIGH
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	AM_RANGE(0xf0, 0xf3) AM_DEVREADWRITE("sio", z80sio_device, ba_cd_r, ba_cd_w)

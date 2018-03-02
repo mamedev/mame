@@ -38,7 +38,7 @@ Known games on this hardware include....
 Game                      (C)      Year
 ---------------------------------------
 Racing Jam                Konami   1998
-Racing Jam : Chapter 2    Konami   1999
+Racing Jam : Chapter 2    Konami   1998
 Thrill Drive              Konami   1998
 
 PCB Layouts
@@ -340,6 +340,10 @@ public:
 	void lanc2_init();
 	void thrilld(machine_config &config);
 	void nwktr(machine_config &config);
+	void nwktr_map(address_map &map);
+	void sharc0_map(address_map &map);
+	void sharc1_map(address_map &map);
+	void sound_memmap(address_map &map);
 };
 
 
@@ -653,7 +657,7 @@ void nwktr_state::machine_start()
 	m_sound_irq_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(nwktr_state::sound_irq), this));
 }
 
-static ADDRESS_MAP_START( nwktr_map, AS_PROGRAM, 32, nwktr_state )
+ADDRESS_MAP_START(nwktr_state::nwktr_map)
 	AM_RANGE(0x00000000, 0x003fffff) AM_RAM AM_SHARE("work_ram")        /* Work RAM */
 	AM_RANGE(0x74000000, 0x740000ff) AM_DEVREADWRITE("k001604", k001604_device, reg_r, reg_w)
 	AM_RANGE(0x74010000, 0x74017fff) AM_RAM_WRITE(paletteram32_w) AM_SHARE("paletteram")
@@ -674,7 +678,7 @@ ADDRESS_MAP_END
 
 /*****************************************************************************/
 
-static ADDRESS_MAP_START( sound_memmap, AS_PROGRAM, 16, nwktr_state )
+ADDRESS_MAP_START(nwktr_state::sound_memmap)
 	AM_RANGE(0x000000, 0x07ffff) AM_ROM
 	AM_RANGE(0x100000, 0x10ffff) AM_RAM
 	AM_RANGE(0x200000, 0x200fff) AM_DEVREADWRITE("rfsnd", rf5c400_device, rf5c400_r, rf5c400_w)      /* Ricoh RF5C400 */
@@ -706,7 +710,7 @@ WRITE32_MEMBER(nwktr_state::dsp_dataram1_w)
 	m_sharc1_dataram[offset] = data;
 }
 
-static ADDRESS_MAP_START( sharc0_map, AS_DATA, 32, nwktr_state )
+ADDRESS_MAP_START(nwktr_state::sharc0_map)
 	AM_RANGE(0x0400000, 0x041ffff) AM_DEVREADWRITE("konppc", konppc_device, cgboard_0_shared_sharc_r, cgboard_0_shared_sharc_w)
 	AM_RANGE(0x0500000, 0x05fffff) AM_READWRITE(dsp_dataram0_r, dsp_dataram0_w)
 	AM_RANGE(0x1400000, 0x14fffff) AM_RAM
@@ -716,7 +720,7 @@ static ADDRESS_MAP_START( sharc0_map, AS_DATA, 32, nwktr_state )
 	AM_RANGE(0x3600000, 0x37fffff) AM_ROMBANK("bank5")
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START(sharc1_map, AS_DATA, 32, nwktr_state)
+ADDRESS_MAP_START(nwktr_state::sharc1_map)
 	AM_RANGE(0x0400000, 0x041ffff) AM_DEVREADWRITE("konppc", konppc_device, cgboard_1_shared_sharc_r, cgboard_1_shared_sharc_w)
 	AM_RANGE(0x0500000, 0x05fffff) AM_READWRITE(dsp_dataram1_r, dsp_dataram1_w)
 	AM_RANGE(0x1400000, 0x14fffff) AM_RAM
@@ -894,7 +898,8 @@ MACHINE_CONFIG_START(nwktr_state::nwktr)
 	MCFG_KONPPC_CGBOARD_TYPE(NWKTR)
 MACHINE_CONFIG_END
 
-MACHINE_CONFIG_DERIVED(nwktr_state::thrilld, nwktr)
+MACHINE_CONFIG_START(nwktr_state::thrilld)
+	nwktr(config);
 
 	MCFG_DEVICE_REMOVE("k001604")
 	MCFG_DEVICE_ADD("k001604", K001604, 0)
@@ -1064,8 +1069,8 @@ ROM_END
 /*****************************************************************************/
 
 GAME( 1998, racingj,    0,       nwktr,   nwktr, nwktr_state, nwktr, ROT0, "Konami", "Racing Jam (JAC)",            MACHINE_NOT_WORKING | MACHINE_IMPERFECT_GRAPHICS | MACHINE_NO_SOUND )
-GAME( 1999, racingj2,   racingj, nwktr,   nwktr, nwktr_state, nwktr, ROT0, "Konami", "Racing Jam: Chapter 2 (EAE)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_GRAPHICS | MACHINE_NO_SOUND )
-GAME( 1999, racingj2j,  racingj, nwktr,   nwktr, nwktr_state, nwktr, ROT0, "Konami", "Racing Jam: Chapter 2 (JAE)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_GRAPHICS | MACHINE_NO_SOUND )
+GAME( 1998, racingj2,   racingj, nwktr,   nwktr, nwktr_state, nwktr, ROT0, "Konami", "Racing Jam: Chapter 2 (EAE)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_GRAPHICS | MACHINE_NO_SOUND )
+GAME( 1998, racingj2j,  racingj, nwktr,   nwktr, nwktr_state, nwktr, ROT0, "Konami", "Racing Jam: Chapter 2 (JAE)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_GRAPHICS | MACHINE_NO_SOUND )
 GAME( 1998, thrilld,    0,       thrilld, nwktr, nwktr_state, nwktr, ROT0, "Konami", "Thrill Drive (JAE)",          MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND )
 GAME( 1998, thrilldb,   thrilld, thrilld, nwktr, nwktr_state, nwktr, ROT0, "Konami", "Thrill Drive (JAB)",          MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND )
 GAME( 1998, thrilldae,  thrilld, thrilld, nwktr, nwktr_state, nwktr, ROT0, "Konami", "Thrill Drive (EAA)",          MACHINE_NOT_WORKING | MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND )

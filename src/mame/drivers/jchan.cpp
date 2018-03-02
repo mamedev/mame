@@ -170,51 +170,43 @@ class jchan_state : public driver_device
 {
 public:
 	jchan_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag),
-		m_maincpu(*this,"maincpu"),
-		m_subcpu(*this,"sub"),
-		m_palette(*this, "palette"),
-		m_spritegen1(*this, "spritegen1"),
-		m_spritegen2(*this, "spritegen2"),
-		m_view2_0(*this, "view2_0"),
-		m_spriteram_1(*this, "spriteram_1"),
-		m_sprregs_1(*this, "sprregs_1"),
-		m_spriteram_2(*this, "spriteram_2"),
-		m_sprregs_2(*this, "sprregs_2"),
-		m_mainsub_shared_ram(*this, "mainsub_shared"),
-		m_ctrl(*this, "ctrl")
+		: driver_device(mconfig, type, tag)
+		, m_maincpu(*this,"maincpu")
+		, m_subcpu(*this,"sub")
+		, m_palette(*this, "palette")
+		, m_spritegen(*this, "spritegen%u", 1)
+		, m_view2(*this, "view2")
+		, m_spriteram(*this, "spriteram_%u", 1)
+		, m_sprregs(*this, "sprregs_%u", 1)
+		, m_mainsub_shared_ram(*this, "mainsub_shared")
+		, m_ctrl(*this, "ctrl")
+		, m_spriterom(*this, "gfx%u", 1)
 	{ }
 
 	required_device<cpu_device> m_maincpu;
 	required_device<cpu_device> m_subcpu;
 	required_device<palette_device> m_palette;
-	required_device<sknsspr_device> m_spritegen1;
-	required_device<sknsspr_device> m_spritegen2;
-	required_device<kaneko_view2_tilemap_device> m_view2_0;
+	required_device_array<sknsspr_device, 2> m_spritegen;
+	required_device<kaneko_view2_tilemap_device> m_view2;
 
-	required_shared_ptr<uint16_t> m_spriteram_1;
-	required_shared_ptr<uint16_t> m_sprregs_1;
-	required_shared_ptr<uint16_t> m_spriteram_2;
-	required_shared_ptr<uint16_t> m_sprregs_2;
+	required_shared_ptr_array<uint16_t, 2> m_spriteram;
+	required_shared_ptr_array<uint16_t, 2> m_sprregs;
 	required_shared_ptr<uint16_t> m_mainsub_shared_ram;
 	required_shared_ptr<uint16_t> m_ctrl;
 
-	std::unique_ptr<bitmap_ind16> m_sprite_bitmap_1;
-	std::unique_ptr<bitmap_ind16> m_sprite_bitmap_2;
-	std::unique_ptr<uint32_t[]> m_sprite_ram32_1;
-	std::unique_ptr<uint32_t[]> m_sprite_ram32_2;
-	std::unique_ptr<uint32_t[]> m_sprite_regs32_1;
-	std::unique_ptr<uint32_t[]> m_sprite_regs32_2;
+	required_memory_region_array<2> m_spriterom;
+
+	std::unique_ptr<bitmap_ind16> m_sprite_bitmap[2];
+	std::unique_ptr<uint32_t[]> m_sprite_ram32[2];
+	std::unique_ptr<uint32_t[]> m_sprite_regs32[2];
 	int m_irq_sub_enable;
 
 	DECLARE_WRITE16_MEMBER(ctrl_w);
 	DECLARE_READ16_MEMBER(ctrl_r);
 	DECLARE_WRITE16_MEMBER(main2sub_cmd_w);
 	DECLARE_WRITE16_MEMBER(sub2main_cmd_w);
-	DECLARE_WRITE16_MEMBER(sknsspr_sprite32_1_w);
-	DECLARE_WRITE16_MEMBER(sknsspr_sprite32regs_1_w);
-	DECLARE_WRITE16_MEMBER(sknsspr_sprite32_2_w);
-	DECLARE_WRITE16_MEMBER(sknsspr_sprite32regs_2_w);
+	template<int Chip> DECLARE_WRITE16_MEMBER(sknsspr_sprite32_w);
+	template<int Chip> DECLARE_WRITE16_MEMBER(sknsspr_sprite32regs_w);
 
 	DECLARE_DRIVER_INIT(jchan);
 	virtual void video_start() override;
@@ -223,6 +215,8 @@ public:
 
 	TIMER_DEVICE_CALLBACK_MEMBER(vblank);
 	void jchan(machine_config &config);
+	void jchan_main(address_map &map);
+	void jchan_sub(address_map &map);
 };
 
 
@@ -265,34 +259,27 @@ TIMER_DEVICE_CALLBACK_MEMBER(jchan_state::vblank)
 }
 
 
-
-
 void jchan_state::video_start()
 {
-	/* so we can use sknsspr.c */
-	m_sprite_ram32_1 = std::make_unique<uint32_t[]>(0x4000/4);
-	m_sprite_ram32_2 = std::make_unique<uint32_t[]>(0x4000/4);
+	/* so we can use sknsspr.cpp */
+	m_sprite_ram32[0] = std::make_unique<uint32_t[]>(0x4000/4);
+	m_sprite_ram32[1] = std::make_unique<uint32_t[]>(0x4000/4);
 
-	m_sprite_regs32_1 = std::make_unique<uint32_t[]>(0x40/4);
-	m_sprite_regs32_2 = std::make_unique<uint32_t[]>(0x40/4);
+	m_sprite_regs32[0] = std::make_unique<uint32_t[]>(0x40/4);
+	m_sprite_regs32[1] = std::make_unique<uint32_t[]>(0x40/4);
 
-	m_sprite_bitmap_1 = std::make_unique<bitmap_ind16>(1024,1024);
-	m_sprite_bitmap_2 = std::make_unique<bitmap_ind16>(1024,1024);
+	m_sprite_bitmap[0] = std::make_unique<bitmap_ind16>(1024,1024);
+	m_sprite_bitmap[1] = std::make_unique<bitmap_ind16>(1024,1024);
 
-	m_spritegen1->skns_sprite_kludge(0,0);
-	m_spritegen2->skns_sprite_kludge(0,0);
+	m_spritegen[0]->skns_sprite_kludge(0,0);
+	m_spritegen[1]->skns_sprite_kludge(0,0);
 
 	save_item(NAME(m_irq_sub_enable));
-	save_pointer(NAME(m_sprite_ram32_1.get()), 0x4000/4);
-	save_pointer(NAME(m_sprite_ram32_2.get()), 0x4000/4);
-	save_pointer(NAME(m_sprite_regs32_1.get()), 0x40/4);
-	save_pointer(NAME(m_sprite_regs32_2.get()), 0x40/4);
+	save_pointer(NAME(m_sprite_ram32[0].get()), 0x4000/4);
+	save_pointer(NAME(m_sprite_ram32[1].get()), 0x4000/4);
+	save_pointer(NAME(m_sprite_regs32[0].get()), 0x40/4);
+	save_pointer(NAME(m_sprite_regs32[1].get()), 0x40/4);
 }
-
-
-
-
-
 
 
 uint32_t jchan_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
@@ -301,46 +288,89 @@ uint32_t jchan_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap,
 	uint16_t* src1;
 	uint16_t* src2;
 	uint16_t* dst;
-	uint16_t pixdata1;
-	uint16_t pixdata2;
+	uint16_t pixdata1, pixdata2;
+	uint16_t pridata1, pridata2;
 
-	bitmap.fill(m_palette->black_pen(), cliprect);
+	uint8_t *tilepri;
+	uint8_t bgpridata;
+
+	bitmap.fill(0x7f00, cliprect); // verified
 
 	screen.priority().fill(0, cliprect);
 
-	m_view2_0->kaneko16_prepare(bitmap, cliprect);
+	m_view2->kaneko16_prepare(bitmap, cliprect);
 
-	for ( int i = 0; i < 8; i++ )
+	for (int i = 0; i < 8; i++)
 	{
-		m_view2_0->render_tilemap_chip(screen,bitmap,cliprect,i);
+		m_view2->render_tilemap_chip(screen,bitmap,cliprect,i);
 	}
 
-	m_sprite_bitmap_1->fill(0x0000, cliprect);
-	m_sprite_bitmap_2->fill(0x0000, cliprect);
-
-	m_spritegen1->skns_draw_sprites(*m_sprite_bitmap_1, cliprect, m_sprite_ram32_1.get(), 0x4000, memregion("gfx1")->base(), memregion ("gfx1")->bytes(), m_sprite_regs32_1.get() );
-	m_spritegen2->skns_draw_sprites(*m_sprite_bitmap_2, cliprect, m_sprite_ram32_2.get(), 0x4000, memregion("gfx2")->base(), memregion ("gfx2")->bytes(), m_sprite_regs32_2.get() );
-
-	// ignoring priority bits for now - might use alpha too, check 0x8000 of palette writes
-	for (y=0;y<240;y++)
+	for (int chip = 0; chip < 2; chip++)
 	{
-		src1 = &m_sprite_bitmap_1->pix16(y);
-		src2 = &m_sprite_bitmap_2->pix16(y);
+		m_sprite_bitmap[chip]->fill(0, cliprect);
+		m_spritegen[chip]->skns_draw_sprites(*m_sprite_bitmap[chip], cliprect, m_sprite_ram32[chip].get(), 0x4000, m_spriterom[chip]->base(), m_spriterom[chip]->bytes(), m_sprite_regs32[chip].get() );
+	}
+
+	bitmap_ind8 *tile_primap = &screen.priority();
+
+	// TODO : verify sprite-tile priorities from real hardware, Check what 15 bit of palette actually working
+	for (y=cliprect.min_y;y<=cliprect.max_y;y++)
+	{
+		src1 = &m_sprite_bitmap[0]->pix16(y);
+		src2 = &m_sprite_bitmap[1]->pix16(y);
+		tilepri = &tile_primap->pix8(y);
 		dst =  &bitmap.pix16(y);
 
-		for (x=0;x<320;x++)
+		for (x=cliprect.min_x;x<=cliprect.max_x;x++)
 		{
 			pixdata1 = src1[x];
 			pixdata2 = src2[x];
+			pridata1 = (pixdata1 >> 14) & 3;
+			pridata2 = (pixdata2 >> 14) & 3;
 
-			if (pixdata2 & 0x3fff)
+			bgpridata = tilepri[x] >> 1;
+
+			if (pridata1 >= bgpridata)
 			{
-				dst[x] = (pixdata2 & 0x3fff)|0x4000;
+				if (pridata2 >= bgpridata)
+				{
+					if (pridata2 >= pridata1)
+					{
+						if (pixdata2 & 0xff)
+						{
+							dst[x] = (pixdata2 & 0x3fff)|0x4000;
+						}
+						else if (pixdata1 & 0xff)
+						{
+							dst[x] = (pixdata1 & 0x3fff)|0x4000;
+						}
+					}
+					else
+					{
+						if (pixdata1 & 0xff)
+						{
+							dst[x] = (pixdata1 & 0x3fff)|0x4000;
+						}
+						else if (pixdata2 & 0xff)
+						{
+							dst[x] = (pixdata2 & 0x3fff)|0x4000;
+						}
+					}
+				}
+				else
+				{
+					if (pixdata1 & 0xff)
+					{
+						dst[x] = (pixdata1 & 0x3fff)|0x4000;
+					}
+				}
 			}
-
-			if (pixdata1 & 0x3fff)
+			else if (pridata2 >= bgpridata)
 			{
-				dst[x] = (pixdata1 & 0x3fff)|0x4000;
+				if (pixdata2 & 0xff)
+				{
+					dst[x] = (pixdata2 & 0x3fff)|0x4000;
+				}
 			}
 		}
 	}
@@ -399,36 +429,24 @@ WRITE16_MEMBER(jchan_state::sub2main_cmd_w)
 }
 
 /* ram convert for suprnova (requires 32-bit stuff) */
-WRITE16_MEMBER(jchan_state::sknsspr_sprite32_1_w)
+template<int Chip>
+WRITE16_MEMBER(jchan_state::sknsspr_sprite32_w)
 {
-	COMBINE_DATA(&m_spriteram_1[offset]);
+	COMBINE_DATA(&m_spriteram[Chip][offset]);
 	offset>>=1;
-	m_sprite_ram32_1[offset]=(m_spriteram_1[offset*2+1]<<16) | (m_spriteram_1[offset*2]);
+	m_sprite_ram32[Chip][offset]=(m_spriteram[Chip][offset*2+1]<<16) | (m_spriteram[Chip][offset*2]);
 }
 
-WRITE16_MEMBER(jchan_state::sknsspr_sprite32regs_1_w)
+template<int Chip>
+WRITE16_MEMBER(jchan_state::sknsspr_sprite32regs_w)
 {
-	COMBINE_DATA(&m_sprregs_1[offset]);
+	COMBINE_DATA(&m_sprregs[Chip][offset]);
 	offset>>=1;
-	m_sprite_regs32_1[offset]=(m_sprregs_1[offset*2+1]<<16) | (m_sprregs_1[offset*2]);
-}
-
-WRITE16_MEMBER(jchan_state::sknsspr_sprite32_2_w)
-{
-	COMBINE_DATA(&m_spriteram_2[offset]);
-	offset>>=1;
-	m_sprite_ram32_2[offset]=(m_spriteram_2[offset*2+1]<<16) | (m_spriteram_2[offset*2]);
-}
-
-WRITE16_MEMBER(jchan_state::sknsspr_sprite32regs_2_w)
-{
-	COMBINE_DATA(&m_sprregs_2[offset]);
-	offset>>=1;
-	m_sprite_regs32_2[offset]=(m_sprregs_2[offset*2+1]<<16) | (m_sprregs_2[offset*2]);
+	m_sprite_regs32[Chip][offset]=(m_sprregs[Chip][offset*2+1]<<16) | (m_sprregs[Chip][offset*2]);
 }
 
 
-static ADDRESS_MAP_START( jchan_main, AS_PROGRAM, 16, jchan_state )
+ADDRESS_MAP_START(jchan_state::jchan_main)
 	AM_RANGE(0x000000, 0x1fffff) AM_ROM
 	AM_RANGE(0x200000, 0x20ffff) AM_RAM // Work RAM - [A] grid tested, cleared ($9d6-$a54)
 
@@ -442,10 +460,10 @@ static ADDRESS_MAP_START( jchan_main, AS_PROGRAM, 16, jchan_state )
 	AM_RANGE(0x400000, 0x403fff) AM_RAM AM_SHARE("mainsub_shared")
 
 	/* 1st sprite layer */
-	AM_RANGE(0x500000, 0x503fff) AM_RAM_WRITE(sknsspr_sprite32_1_w) AM_SHARE("spriteram_1")
-	AM_RANGE(0x600000, 0x60003f) AM_RAM_WRITE(sknsspr_sprite32regs_1_w) AM_SHARE("sprregs_1")
+	AM_RANGE(0x500000, 0x503fff) AM_RAM_WRITE(sknsspr_sprite32_w<0>) AM_SHARE("spriteram_1")
+	AM_RANGE(0x600000, 0x60003f) AM_RAM_WRITE(sknsspr_sprite32regs_w<0>) AM_SHARE("sprregs_1")
 
-	AM_RANGE(0x700000, 0x70ffff) AM_RAM_DEVWRITE("palette", palette_device, write16) AM_SHARE("palette") // palette for sprites?
+	AM_RANGE(0x700000, 0x70ffff) AM_RAM_DEVWRITE("palette", palette_device, write16) AM_SHARE("palette") // palette
 
 	AM_RANGE(0xf00000, 0xf00007) AM_READWRITE(ctrl_r, ctrl_w) AM_SHARE("ctrl")
 
@@ -453,19 +471,19 @@ static ADDRESS_MAP_START( jchan_main, AS_PROGRAM, 16, jchan_state )
 ADDRESS_MAP_END
 
 
-static ADDRESS_MAP_START( jchan_sub, AS_PROGRAM, 16, jchan_state )
+ADDRESS_MAP_START(jchan_state::jchan_sub)
 	AM_RANGE(0x000000, 0x0fffff) AM_ROM
 	AM_RANGE(0x100000, 0x10ffff) AM_RAM // Work RAM - grid tested, cleared ($612-$6dc)
 
 	AM_RANGE(0x400000, 0x403fff) AM_RAM AM_SHARE("mainsub_shared")
 
 	/* VIEW2 Tilemap - [D] grid tested, cleared ($1d84), also cleared at startup ($810-$826) */
-	AM_RANGE(0x500000, 0x503fff) AM_DEVREADWRITE("view2_0", kaneko_view2_tilemap_device,  kaneko_tmap_vram_r, kaneko_tmap_vram_w )
-	AM_RANGE(0x600000, 0x60001f) AM_DEVREADWRITE("view2_0", kaneko_view2_tilemap_device,  kaneko_tmap_regs_r, kaneko_tmap_regs_w)
+	AM_RANGE(0x500000, 0x503fff) AM_DEVREADWRITE("view2", kaneko_view2_tilemap_device,  kaneko_tmap_vram_r, kaneko_tmap_vram_w )
+	AM_RANGE(0x600000, 0x60001f) AM_DEVREADWRITE("view2", kaneko_view2_tilemap_device,  kaneko_tmap_regs_r, kaneko_tmap_regs_w)
 
 	/* background sprites */
-	AM_RANGE(0x700000, 0x703fff) AM_RAM_WRITE(sknsspr_sprite32_2_w) AM_SHARE("spriteram_2")
-	AM_RANGE(0x780000, 0x78003f) AM_RAM_WRITE(sknsspr_sprite32regs_2_w) AM_SHARE("sprregs_2")
+	AM_RANGE(0x700000, 0x703fff) AM_RAM_WRITE(sknsspr_sprite32_w<1>) AM_SHARE("spriteram_2")
+	AM_RANGE(0x780000, 0x78003f) AM_RAM_WRITE(sknsspr_sprite32regs_w<1>) AM_SHARE("sprregs_2")
 
 	AM_RANGE(0x800000, 0x800003) AM_DEVWRITE8("ymz", ymz280b_device, write, 0x00ff) // sound
 
@@ -484,11 +502,10 @@ static const gfx_layout tilelayout =
 	32*32
 };
 
-// we don't decode the sprites, they are non-tile based and RLE encoded!, see suprnova.c */
+// we don't decode the sprites, they are non-tile based and RLE encoded!, see suprnova.cpp */
 
 static GFXDECODE_START( jchan )
 	GFXDECODE_ENTRY( "gfx3", 0, tilelayout,   0, 0x4000/16  )
-	GFXDECODE_ENTRY( "gfx3", 0, tilelayout,   0, 0x4000/16  ) // video/kaneko16.c is hardcoded to here for now
 GFXDECODE_END
 
 
@@ -591,7 +608,6 @@ MACHINE_CONFIG_START(jchan_state::jchan)
 
 	MCFG_GFXDECODE_ADD("gfxdecode", "palette", jchan)
 
-
 	MCFG_SCREEN_ADD("screen", RASTER)
 	MCFG_SCREEN_REFRESH_RATE(60)
 	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
@@ -603,18 +619,15 @@ MACHINE_CONFIG_START(jchan_state::jchan)
 	MCFG_PALETTE_ADD("palette", 0x10000)
 	MCFG_PALETTE_FORMAT(xGGGGGRRRRRBBBBB)
 
-	MCFG_DEVICE_ADD("view2_0", KANEKO_TMAP, 0)
-	kaneko_view2_tilemap_device::set_gfx_region(*device, 1);
-	kaneko_view2_tilemap_device::set_offset(*device, 25, 11, 320, 240);
+	MCFG_DEVICE_ADD("view2", KANEKO_TMAP, 0)
+	MCFG_KANEKO_TMAP_GFX_REGION(0)
+	MCFG_KANEKO_TMAP_OFFSET(33, 11, 320, 240)
 	MCFG_KANEKO_TMAP_GFXDECODE("gfxdecode")
-
-
 
 	MCFG_DEVICE_ADD("spritegen1", SKNS_SPRITE, 0)
 	MCFG_DEVICE_ADD("spritegen2", SKNS_SPRITE, 0)
 
 	MCFG_DEVICE_ADD("toybox", KANEKO_TOYBOX, 0)
-
 
 	MCFG_EEPROM_SERIAL_93C46_ADD("eeprom")
 

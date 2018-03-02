@@ -116,7 +116,7 @@ WRITE_LINE_MEMBER(dectalk_isa_device::clock_w)
 	m_dsp->set_input_line(INPUT_LINE_IRQ0, (!(m_ctl & 0x20) || state) ? CLEAR_LINE : ASSERT_LINE);
 }
 
-static ADDRESS_MAP_START(dectalk_cpu_io, AS_IO, 16, dectalk_isa_device)
+ADDRESS_MAP_START(dectalk_isa_device::dectalk_cpu_io)
 	AM_RANGE(0x0400, 0x0401) AM_READWRITE(cmd_r, status_w) //PCS0
 	AM_RANGE(0x0480, 0x0481) AM_READWRITE(data_r, data_w) //PCS1
 	AM_RANGE(0x0500, 0x0501) AM_WRITE(dsp_dma_w) //PCS2
@@ -126,17 +126,17 @@ static ADDRESS_MAP_START(dectalk_cpu_io, AS_IO, 16, dectalk_isa_device)
 	AM_RANGE(0x0700, 0x0701) AM_WRITE(irq_line_w) //PCS6
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START(dectalk_cpu_map, AS_PROGRAM, 16, dectalk_isa_device)
+ADDRESS_MAP_START(dectalk_isa_device::dectalk_cpu_map)
 	AM_RANGE(0x00000, 0xFBFFF) AM_RAM
 	AM_RANGE(0xFC000, 0xFFFFF) AM_ROM AM_REGION("dectalk_cpu", 0)
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START(dectalk_dsp_io, AS_IO, 16, dectalk_isa_device)
+ADDRESS_MAP_START(dectalk_isa_device::dectalk_dsp_io)
 	AM_RANGE(0x0, 0x0) AM_READ(dsp_dma_r)
 	AM_RANGE(0x1, 0x1) AM_READWRITE(dsp_dma_r, dac_w)
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START(dectalk_dsp_map, AS_PROGRAM, 16, dectalk_isa_device)
+ADDRESS_MAP_START(dectalk_isa_device::dectalk_dsp_map)
 	AM_RANGE(0x0000, 0x0FFF) AM_ROM AM_REGION("dectalk_dsp", 0)
 ADDRESS_MAP_END
 

@@ -187,7 +187,7 @@ Table 3-2.  TMS32025/26 Memory Blocks
 DEFINE_DEVICE_TYPE(TMS32025, tms32025_device, "tms32025", "TMS32025")
 DEFINE_DEVICE_TYPE(TMS32026, tms32026_device, "tms32026", "TMS32026")
 
-static ADDRESS_MAP_START( tms32025_data, AS_DATA, 16, tms32025_device )
+ADDRESS_MAP_START(tms32025_device::tms32025_data)
 	AM_RANGE(0x0000, 0x0000) AM_READWRITE(drr_r, drr_w)
 	AM_RANGE(0x0001, 0x0001) AM_READWRITE(dxr_r, dxr_w)
 	AM_RANGE(0x0002, 0x0002) AM_READWRITE(tim_r, tim_w)
@@ -199,7 +199,7 @@ static ADDRESS_MAP_START( tms32025_data, AS_DATA, 16, tms32025_device )
 	AM_RANGE(0x0300, 0x03ff) AM_RAM AM_SHARE("b1")
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( tms32026_data, AS_DATA, 16, tms32025_device )
+ADDRESS_MAP_START(tms32025_device::tms32026_data)
 	AM_RANGE(0x0000, 0x0000) AM_READWRITE(drr_r, drr_w)
 	AM_RANGE(0x0001, 0x0001) AM_READWRITE(dxr_r, dxr_w)
 	AM_RANGE(0x0002, 0x0002) AM_READWRITE(tim_r, tim_w)
@@ -214,7 +214,7 @@ ADDRESS_MAP_END
 
 
 tms32025_device::tms32025_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-	: tms32025_device(mconfig, TMS32025, tag, owner, clock, ADDRESS_MAP_NAME(tms32025_data))
+	: tms32025_device(mconfig, TMS32025, tag, owner, clock, address_map_constructor(FUNC(tms32025_device::tms32025_data), this))
 {
 	m_fixed_STR1 = 0x0180;
 }
@@ -240,7 +240,7 @@ tms32025_device::tms32025_device(const machine_config &mconfig, device_type type
 
 
 tms32026_device::tms32026_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-	: tms32025_device(mconfig, TMS32026, tag, owner, clock, ADDRESS_MAP_NAME(tms32026_data))
+	: tms32025_device(mconfig, TMS32026, tag, owner, clock, address_map_constructor(FUNC(tms32026_device::tms32026_data), this))
 {
 	m_fixed_STR1 = 0x0100;
 }

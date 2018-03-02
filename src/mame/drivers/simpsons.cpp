@@ -115,8 +115,10 @@ Notes:
 
 ***************************************************************************/
 
-static ADDRESS_MAP_START( main_map, AS_PROGRAM, 8, simpsons_state )
+ADDRESS_MAP_START(simpsons_state::main_map)
+	AM_RANGE(0x0000, 0x1fff) AM_DEVREADWRITE("k052109", k052109_device, read, write)
 	AM_RANGE(0x0000, 0x0fff) AM_DEVICE("bank0000", address_map_bank_device, amap8)
+	AM_RANGE(0x2000, 0x3fff) AM_DEVICE("bank2000", address_map_bank_device, amap8)
 	AM_RANGE(0x1f80, 0x1f80) AM_READ_PORT("COIN")
 	AM_RANGE(0x1f81, 0x1f81) AM_READ_PORT("TEST")
 	AM_RANGE(0x1f90, 0x1f90) AM_READ_PORT("P1")
@@ -131,19 +133,17 @@ static ADDRESS_MAP_START( main_map, AS_PROGRAM, 8, simpsons_state )
 	AM_RANGE(0x1fc6, 0x1fc7) AM_DEVREADWRITE("k053260", k053260_device, main_read, main_write)
 	AM_RANGE(0x1fc8, 0x1fc9) AM_DEVREAD("k053246", k053247_device, k053246_r)
 	AM_RANGE(0x1fca, 0x1fca) AM_DEVREAD("watchdog", watchdog_timer_device, reset_r)
-	AM_RANGE(0x0000, 0x1fff) AM_DEVREADWRITE("k052109", k052109_device, read, write)
-	AM_RANGE(0x2000, 0x3fff) AM_DEVICE("bank2000", address_map_bank_device, amap8)
 	AM_RANGE(0x4000, 0x5fff) AM_RAM
 	AM_RANGE(0x6000, 0x7fff) AM_ROMBANK("bank1")
 	AM_RANGE(0x8000, 0xffff) AM_ROM AM_REGION("maincpu", 0x78000)
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( bank0000_map, AS_PROGRAM, 8, simpsons_state )
+ADDRESS_MAP_START(simpsons_state::bank0000_map)
 	AM_RANGE(0x0000, 0x0fff) AM_DEVREADWRITE("k052109", k052109_device, read, write)
 	AM_RANGE(0x1000, 0x1fff) AM_RAM_DEVWRITE("palette", palette_device, write8) AM_SHARE("palette")
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( bank2000_map, AS_PROGRAM, 8, simpsons_state )
+ADDRESS_MAP_START(simpsons_state::bank2000_map)
 	AM_RANGE(0x0000, 0x1fff) AM_READWRITE(simpsons_k052109_r, simpsons_k052109_w)
 	AM_RANGE(0x2000, 0x2fff) AM_READWRITE(simpsons_k053247_r, simpsons_k053247_w)
 	AM_RANGE(0x3000, 0x3fff) AM_RAM
@@ -186,7 +186,7 @@ WRITE8_MEMBER(simpsons_state::z80_arm_nmi_w)
 	timer_set(attotime::from_usec(25), TIMER_NMI);  /* kludge until the K053260 is emulated correctly */
 }
 
-static ADDRESS_MAP_START( z80_map, AS_PROGRAM, 8, simpsons_state )
+ADDRESS_MAP_START(simpsons_state::z80_map)
 	AM_RANGE(0x0000, 0x7fff) AM_ROM
 	AM_RANGE(0x8000, 0xbfff) AM_ROMBANK("bank2")
 	AM_RANGE(0xf000, 0xf7ff) AM_RAM

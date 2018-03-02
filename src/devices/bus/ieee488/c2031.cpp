@@ -61,7 +61,7 @@ const tiny_rom_entry *c2031_device::device_rom_region() const
 //  ADDRESS_MAP( c2031_mem )
 //-------------------------------------------------
 
-static ADDRESS_MAP_START( c2031_mem, AS_PROGRAM, 8, c2031_device )
+ADDRESS_MAP_START(c2031_device::c2031_mem)
 	AM_RANGE(0x0000, 0x07ff) AM_MIRROR(0x6000) AM_RAM
 	AM_RANGE(0x1800, 0x180f) AM_MIRROR(0x63f0) AM_DEVREADWRITE(M6522_0_TAG, via6522_device, read, write)
 	AM_RANGE(0x1c00, 0x1c0f) AM_MIRROR(0x63f0) AM_DEVREADWRITE(M6522_1_TAG, via6522_device, read, write)

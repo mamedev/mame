@@ -44,6 +44,7 @@ public:
 
 	void dragon_base(machine_config &config);
 	void dragon32(machine_config &config);
+	void dragon_mem(address_map &map);
 protected:
 	virtual void pia1_pa_changed(uint8_t data) override;
 

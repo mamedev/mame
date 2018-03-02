@@ -126,6 +126,10 @@ public:
 	void scsi_dma_read( uint32_t *p_n_psxram, uint32_t n_address, int32_t n_size );
 	void scsi_dma_write( uint32_t *p_n_psxram, uint32_t n_address, int32_t n_size );
 	void konamigq(machine_config &config);
+	void konamigq_dasp_map(address_map &map);
+	void konamigq_k054539_map(address_map &map);
+	void konamigq_map(address_map &map);
+	void konamigq_sound_map(address_map &map);
 };
 
 /* EEPROM */
@@ -163,7 +167,7 @@ READ8_MEMBER(konamigq_state::pcmram_r)
 
 /* Video */
 
-static ADDRESS_MAP_START( konamigq_map, AS_PROGRAM, 32, konamigq_state )
+ADDRESS_MAP_START(konamigq_state::konamigq_map)
 	AM_RANGE(0x1f000000, 0x1f00001f) AM_DEVREADWRITE8("am53cf96", am53cf96_device, read, write, 0x00ff00ff)
 	AM_RANGE(0x1f100000, 0x1f10001f) AM_DEVREADWRITE8("k056800", k056800_device, host_r, host_w, 0x00ff00ff)
 	AM_RANGE(0x1f180000, 0x1f180003) AM_WRITE16(eeprom_w, 0x0000ffff)
@@ -226,7 +230,7 @@ WRITE16_MEMBER(konamigq_state::tms57002_control_word_w)
 }
 
 /* 68000 memory handling - near identical to Konami GX */
-static ADDRESS_MAP_START( konamigq_sound_map, AS_PROGRAM, 16, konamigq_state )
+ADDRESS_MAP_START(konamigq_state::konamigq_sound_map)
 	AM_RANGE(0x000000, 0x07ffff) AM_ROM
 	AM_RANGE(0x100000, 0x10ffff) AM_RAM
 	AM_RANGE(0x200000, 0x2004ff) AM_DEVREADWRITE8("k054539_1", k054539_device, read, write, 0xff00)
@@ -239,13 +243,13 @@ ADDRESS_MAP_END
 
 
 /* TMS57002 memory handling */
-static ADDRESS_MAP_START( konamigq_dasp_map, AS_DATA, 8, konamigq_state )
+ADDRESS_MAP_START(konamigq_state::konamigq_dasp_map)
 	AM_RANGE(0x00000, 0x3ffff) AM_RAM
 ADDRESS_MAP_END
 
 
 /* K058141 memory handling */
-static ADDRESS_MAP_START( konamigq_k054539_map, 0, 8, konamigq_state )
+ADDRESS_MAP_START(konamigq_state::konamigq_k054539_map)
 	AM_RANGE(0x000000, 0x07ffff) AM_ROM AM_REGION("k054539", 0)
 	AM_RANGE(0x080000, 0x3fffff) AM_RAM AM_SHARE("pcmram")
 ADDRESS_MAP_END

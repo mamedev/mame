@@ -76,9 +76,14 @@ keycus_c409_device::keycus_c409_device(const machine_config &mconfig, const char
 
 READ16_MEMBER(keycus_c409_device::read)
 {
-	if( offset == 7 && m_p1 == 0x0006 && m_p2 == 0x0000 && m_p3 == 0x0013 )
+	if( offset == 7 )
 	{
-		return 0x000f;
+		int a2 = (m_p1 - 0x01) & 0x1f;
+		int a3 = (0x20 - m_p1) & 0x1f;
+		int r = (((m_p2 & 0x1f) * a2) + ((m_p3 & 0x1f) * a3)) / 0x1f;
+		int g = ((((m_p2 >> 5) & 0x1f) * a2) + (((m_p3 >> 5) & 0x1f) * a3)) / 0x1f;
+		int b = ((((m_p2 >> 10) & 0x1f) * a2) + (((m_p3 >> 10) & 0x1f) * a3)) / 0x1f;
+		return r | (g << 5) | (b << 10);
 	}
 
 	logerror( "keycus_c409_device::read unexpected offset=%d m_p1=%04x m_p2=%04x m_p3=%04x\n", offset, m_p1, m_p2, m_p3 );

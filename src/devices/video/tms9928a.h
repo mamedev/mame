@@ -130,6 +130,8 @@ private:
 	void update_table_masks();
 	void set_palette();
 
+	void memmap(address_map &map);
+
 	static const device_timer_id TIMER_LINE = 0;
 	static const device_timer_id GROMCLK = 1;
 

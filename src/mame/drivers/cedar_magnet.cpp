@@ -228,6 +228,11 @@ public:
 	DECLARE_DRIVER_INIT(mag_xain);
 	DECLARE_DRIVER_INIT(mag_exzi);
 	void cedar_magnet(machine_config &config);
+	void cedar_bank0(address_map &map);
+	void cedar_magnet_io(address_map &map);
+	void cedar_magnet_mainboard_sub_pal_map(address_map &map);
+	void cedar_magnet_mainboard_sub_ram_map(address_map &map);
+	void cedar_magnet_map(address_map &map);
 };
 
 /***********************
@@ -236,7 +241,7 @@ public:
 
 ***********************/
 
-static ADDRESS_MAP_START( cedar_magnet_mainboard_sub_pal_map, AS_PROGRAM, 8, cedar_magnet_state )
+ADDRESS_MAP_START(cedar_magnet_state::cedar_magnet_mainboard_sub_pal_map)
 // these are 3x MOTOROLA MM2114N SRAM 4096 bit RAM (twice the size because we map bytes, but only 4 bits are used)
 // these are on the master board memory sub-board
 	AM_RANGE(0x2400, 0x27ff) AM_RAM_WRITE(palette_r_w) AM_SHARE("pal_r")
@@ -244,17 +249,17 @@ static ADDRESS_MAP_START( cedar_magnet_mainboard_sub_pal_map, AS_PROGRAM, 8, ced
 	AM_RANGE(0x3000, 0x33ff) AM_RAM_WRITE(palette_b_w) AM_SHARE("pal_b")
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( cedar_magnet_mainboard_sub_ram_map, AS_PROGRAM, 8, cedar_magnet_state )
+ADDRESS_MAP_START(cedar_magnet_state::cedar_magnet_mainboard_sub_ram_map)
 // these are 8x SIEMENS HYB 41256-15 AA - 262,144 bit DRAM (32kbytes)
 // these are on the master board memory sub-board
 	AM_RANGE(0x00000, 0x3ffff) AM_RAM AM_SHARE("ram0")
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( cedar_magnet_map, AS_PROGRAM, 8, cedar_magnet_state )
+ADDRESS_MAP_START(cedar_magnet_state::cedar_magnet_map)
 	AM_RANGE(0x0000, 0xffff) AM_DEVICE("bank0", address_map_bank_device, amap8)
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( cedar_magnet_io, AS_IO, 8, cedar_magnet_state )
+ADDRESS_MAP_START(cedar_magnet_state::cedar_magnet_io)
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
 
 	AM_RANGE(0x18, 0x18) AM_READWRITE(port18_r, port18_w)
@@ -280,7 +285,7 @@ static ADDRESS_MAP_START( cedar_magnet_io, AS_IO, 8, cedar_magnet_state )
 	AM_RANGE(0xff, 0xff) AM_DEVWRITE("cedtop", cedar_magnet_sound_device, sound_command_w)
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( cedar_bank0, AS_PROGRAM, 8, cedar_magnet_state )
+ADDRESS_MAP_START(cedar_magnet_state::cedar_bank0)
 	/* memory configuration 0 */
 	AM_RANGE(0x00000, 0x0ffff) AM_DEVICE("mb_sub_ram", address_map_bank_device, amap8)
 

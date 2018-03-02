@@ -100,6 +100,7 @@ public:
 	required_device<palette_device> m_palette;
 	void _60in1(machine_config &config);
 	void _39in1(machine_config &config);
+	void _39in1_map(address_map &map);
 };
 
 
@@ -1453,7 +1454,7 @@ DRIVER_INIT_MEMBER(_39in1_state,39in1)
 
 
 
-static ADDRESS_MAP_START( 39in1_map, AS_PROGRAM, 32, _39in1_state )
+ADDRESS_MAP_START(_39in1_state::_39in1_map)
 	AM_RANGE(0x00000000, 0x0007ffff) AM_ROM
 	AM_RANGE(0x00400000, 0x005fffff) AM_ROM AM_REGION("data", 0)
 	AM_RANGE(0x04000000, 0x047fffff) AM_READWRITE(cpld_r, cpld_w )
@@ -1577,7 +1578,7 @@ MACHINE_START_MEMBER(_39in1_state,60in1)
 MACHINE_CONFIG_START(_39in1_state::_39in1)
 
 	MCFG_CPU_ADD("maincpu", PXA255, 200000000)
-	MCFG_CPU_PROGRAM_MAP(39in1_map)
+	MCFG_CPU_PROGRAM_MAP(_39in1_map)
 	MCFG_CPU_VBLANK_INT_DRIVER("screen", _39in1_state,  pxa255_vblank_start)
 
 	MCFG_SCREEN_ADD("screen", RASTER)
@@ -1599,7 +1600,8 @@ MACHINE_CONFIG_START(_39in1_state::_39in1)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", 1.0)
 MACHINE_CONFIG_END
 
-MACHINE_CONFIG_DERIVED(_39in1_state::_60in1, _39in1)
+MACHINE_CONFIG_START(_39in1_state::_60in1)
+	_39in1(config);
 	MCFG_MACHINE_START_OVERRIDE(_39in1_state,60in1)
 MACHINE_CONFIG_END
 

@@ -104,6 +104,12 @@ public:
 	UPD7220_DRAW_TEXT_LINE_MEMBER( hgdc_draw_text );
 
 	void mz3500(machine_config &config);
+	void mz3500_master_io(address_map &map);
+	void mz3500_master_map(address_map &map);
+	void mz3500_slave_io(address_map &map);
+	void mz3500_slave_map(address_map &map);
+	void upd7220_1_map(address_map &map);
+	void upd7220_2_map(address_map &map);
 protected:
 	// driver_device overrides
 	virtual void machine_start() override;
@@ -585,11 +591,11 @@ READ8_MEMBER(mz3500_state::mz3500_fdc_dma_r)
 	return m_fdc->dma_r();
 }
 
-static ADDRESS_MAP_START( mz3500_master_map, AS_PROGRAM, 8, mz3500_state )
+ADDRESS_MAP_START(mz3500_state::mz3500_master_map)
 	AM_RANGE(0x0000, 0xffff) AM_READWRITE(mz3500_master_mem_r,mz3500_master_mem_w)
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( mz3500_master_io, AS_IO, 8, mz3500_state )
+ADDRESS_MAP_START(mz3500_state::mz3500_master_io)
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
 //  ADDRESS_MAP_UNMAP_HIGH
 //  AM_RANGE(0xe4, 0xe7) SFD upd765
@@ -602,13 +608,13 @@ static ADDRESS_MAP_START( mz3500_master_io, AS_IO, 8, mz3500_state )
 	AM_RANGE(0xfc, 0xff) AM_READWRITE(mz3500_io_r,mz3500_io_w) // memory mapper
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( mz3500_slave_map, AS_PROGRAM, 8, mz3500_state )
+ADDRESS_MAP_START(mz3500_state::mz3500_slave_map)
 	AM_RANGE(0x0000, 0x1fff) AM_ROM AM_REGION("ipl", 0)
 	AM_RANGE(0x2000, 0x27ff) AM_READWRITE(mz3500_shared_ram_r, mz3500_shared_ram_w)
 	AM_RANGE(0x4000, 0x5fff) AM_RAM
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( mz3500_slave_io, AS_IO, 8, mz3500_state )
+ADDRESS_MAP_START(mz3500_state::mz3500_slave_io)
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	ADDRESS_MAP_UNMAP_HIGH
 //  AM_RANGE(0x00, 0x0f) f/f and irq to master CPU
@@ -787,12 +793,12 @@ void mz3500_state::machine_reset()
 }
 
 
-static ADDRESS_MAP_START( upd7220_1_map, 0, 16, mz3500_state )
+ADDRESS_MAP_START(mz3500_state::upd7220_1_map)
 	ADDRESS_MAP_GLOBAL_MASK(0x1fff)
 	AM_RANGE(0x00000, 0x00fff) AM_RAM AM_SHARE("video_ram")
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( upd7220_2_map, 0, 16, mz3500_state )
+ADDRESS_MAP_START(mz3500_state::upd7220_2_map)
 	AM_RANGE(0x00000, 0x3ffff) AM_RAM // AM_SHARE("video_ram_2")
 ADDRESS_MAP_END
 

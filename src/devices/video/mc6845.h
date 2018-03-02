@@ -492,6 +492,8 @@ protected:
 	emu_timer *m_block_copy_timer;
 
 	DECLARE_PALETTE_INIT(mos8563);
+
+	void mos8563_videoram_map(address_map &map);
 };
 
 class mos8568_device : public mos8563_device

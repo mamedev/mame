@@ -30,14 +30,11 @@ class powerbal_state : public playmark_state
 public:
 	powerbal_state(const machine_config &mconfig, device_type type, const char *tag)
 		: playmark_state(mconfig, type, tag)
-		, m_eeprom(*this, "eeprom")
 	{ }
 
 	/* powerbal-specific */
 	int         m_tilebank;
 	int         m_bg_yoffset;
-
-	optional_device<eeprom_serial_93cxx_device> m_eeprom;
 
 	DECLARE_DRIVER_INIT(powerbal);
 	DECLARE_DRIVER_INIT(magicstk);
@@ -53,6 +50,9 @@ public:
 	DECLARE_WRITE16_MEMBER(oki_banking);
 	void magicstk(machine_config &config);
 	void powerbal(machine_config &config);
+	void magicstk_main_map(address_map &map);
+	void oki_map(address_map &map);
+	void powerbal_main_map(address_map &map);
 };
 
 
@@ -89,7 +89,7 @@ WRITE16_MEMBER(powerbal_state::oki_banking)
 	m_okibank->set_entry(bank & (m_oki_numbanks - 1));
 }
 
-static ADDRESS_MAP_START( magicstk_main_map, AS_PROGRAM, 16, powerbal_state )
+ADDRESS_MAP_START(powerbal_state::magicstk_main_map)
 	AM_RANGE(0x000000, 0x03ffff) AM_ROM
 	AM_RANGE(0x088000, 0x0883ff) AM_RAM_DEVWRITE("palette", palette_device, write16) AM_SHARE("palette")
 	AM_RANGE(0x094000, 0x094001) AM_WRITENOP
@@ -108,7 +108,7 @@ static ADDRESS_MAP_START( magicstk_main_map, AS_PROGRAM, 16, powerbal_state )
 	AM_RANGE(0x100000, 0x100fff) AM_RAM AM_SHARE("spriteram")
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( powerbal_main_map, AS_PROGRAM, 16, powerbal_state )
+ADDRESS_MAP_START(powerbal_state::powerbal_main_map)
 	AM_RANGE(0x000000, 0x07ffff) AM_ROM
 	AM_RANGE(0x088000, 0x0883ff) AM_RAM_DEVWRITE("palette", palette_device, write16) AM_SHARE("palette")
 	AM_RANGE(0x094000, 0x094001) AM_WRITENOP
@@ -130,7 +130,7 @@ static ADDRESS_MAP_START( powerbal_main_map, AS_PROGRAM, 16, powerbal_state )
 	AM_RANGE(0x103000, 0x103fff) AM_RAM
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( oki_map, 0, 8, powerbal_state )
+ADDRESS_MAP_START(powerbal_state::oki_map)
 	AM_RANGE(0x00000, 0x1ffff) AM_ROM
 	AM_RANGE(0x20000, 0x3ffff) AM_ROMBANK("okibank")
 ADDRESS_MAP_END

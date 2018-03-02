@@ -616,7 +616,7 @@ void segaybd_state::update_irqs()
 //  MAIN CPU ADDRESS MAPS
 //**************************************************************************
 
-static ADDRESS_MAP_START( main_map, AS_PROGRAM, 16, segaybd_state )
+ADDRESS_MAP_START(segaybd_state::main_map)
 	ADDRESS_MAP_UNMAP_HIGH
 	ADDRESS_MAP_GLOBAL_MASK(0x1fffff)
 	AM_RANGE(0x000000, 0x07ffff) AM_ROM
@@ -635,7 +635,7 @@ ADDRESS_MAP_END
 //  SUB CPU ADDRESS MAPS
 //**************************************************************************
 
-static ADDRESS_MAP_START( subx_map, AS_PROGRAM, 16, segaybd_state )
+ADDRESS_MAP_START(segaybd_state::subx_map)
 	ADDRESS_MAP_UNMAP_HIGH
 	ADDRESS_MAP_GLOBAL_MASK(0x1fffff)
 	AM_RANGE(0x000000, 0x03ffff) AM_ROM
@@ -647,7 +647,7 @@ static ADDRESS_MAP_START( subx_map, AS_PROGRAM, 16, segaybd_state )
 	AM_RANGE(0x1fc000, 0x1fffff) AM_RAM AM_SHARE("backupram")
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( suby_map, AS_PROGRAM, 16, segaybd_state )
+ADDRESS_MAP_START(segaybd_state::suby_map)
 	ADDRESS_MAP_UNMAP_HIGH
 	ADDRESS_MAP_GLOBAL_MASK(0x1fffff)
 	AM_RANGE(0x000000, 0x03ffff) AM_ROM
@@ -666,14 +666,14 @@ ADDRESS_MAP_END
 //  Z80 SOUND CPU ADDRESS MAPS
 //**************************************************************************
 
-static ADDRESS_MAP_START( sound_map, AS_PROGRAM, 8, segaybd_state )
+ADDRESS_MAP_START(segaybd_state::sound_map)
 	ADDRESS_MAP_UNMAP_HIGH
 	AM_RANGE(0x0000, 0xefff) AM_ROM
 	AM_RANGE(0xf000, 0xf0ff) AM_MIRROR(0x0700) AM_DEVREADWRITE("pcm", segapcm_device, sega_pcm_r, sega_pcm_w)
 	AM_RANGE(0xf800, 0xffff) AM_RAM
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( sound_portmap, AS_IO, 8, segaybd_state )
+ADDRESS_MAP_START(segaybd_state::sound_portmap)
 	ADDRESS_MAP_UNMAP_HIGH
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	AM_RANGE(0x00, 0x01) AM_MIRROR(0x3e) AM_DEVREADWRITE("ymsnd", ym2151_device, read, write)
@@ -714,16 +714,15 @@ WRITE16_MEMBER(segaybd_state::link2_w)
 	logerror("link2_w %04x\n", data);
 }
 
-static ADDRESS_MAP_START( main_map_link, AS_PROGRAM, 16, segaybd_state )
+ADDRESS_MAP_START(segaybd_state::main_map_link)
+	AM_IMPORT_FROM(main_map)
 	AM_RANGE(0x190000, 0x190fff) AM_DEVREADWRITE8("mb8421", mb8421_device, left_r, left_w, 0x00ff)
 	AM_RANGE(0x191000, 0x191001) AM_READ(link_r)
 	AM_RANGE(0x192000, 0x192001) AM_READWRITE(link2_r, link2_w)
-
-	AM_IMPORT_FROM(main_map)
 ADDRESS_MAP_END
 
 
-static ADDRESS_MAP_START( link_map, AS_PROGRAM, 8, segaybd_state )
+ADDRESS_MAP_START(segaybd_state::link_map)
 	ADDRESS_MAP_UNMAP_HIGH
 	AM_RANGE(0x0000, 0x0fff) AM_ROM
 	AM_RANGE(0x2000, 0x3fff) AM_RAM // 0x2000-0x2*** maybe shared with other boards?
@@ -737,7 +736,7 @@ READ8_MEMBER(segaybd_state::link_portc0_r)
 }
 #endif
 
-static ADDRESS_MAP_START( link_portmap, AS_IO, 8, segaybd_state )
+ADDRESS_MAP_START(segaybd_state::link_portmap)
 	ADDRESS_MAP_UNMAP_HIGH
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
 
@@ -746,7 +745,7 @@ static ADDRESS_MAP_START( link_portmap, AS_IO, 8, segaybd_state )
 ADDRESS_MAP_END
 
 
-static ADDRESS_MAP_START( motor_map, AS_PROGRAM, 8, segaybd_state )
+ADDRESS_MAP_START(segaybd_state::motor_map)
 	ADDRESS_MAP_UNMAP_HIGH
 	AM_RANGE(0x0000, 0x7fff) AM_ROM
 	AM_RANGE(0x8000, 0xffff) AM_RAM
@@ -1383,7 +1382,8 @@ MACHINE_CONFIG_END
 
 
 // irq at 0x28 is from MB8421, and irq at 0x38 probably from MB89372?
-MACHINE_CONFIG_DERIVED(segaybd_state::yboard_link, yboard)
+MACHINE_CONFIG_START(segaybd_state::yboard_link)
+	yboard(config);
 
 	// basic machine hardware
 	MCFG_CPU_MODIFY("maincpu")
@@ -1398,7 +1398,8 @@ MACHINE_CONFIG_DERIVED(segaybd_state::yboard_link, yboard)
 	MCFG_MB8421_INTR_HANDLER(WRITELINE(segaybd_state, mb8421_intr))
 MACHINE_CONFIG_END
 
-MACHINE_CONFIG_DERIVED(segaybd_state::yboard_deluxe, yboard)
+MACHINE_CONFIG_START(segaybd_state::yboard_deluxe)
+	yboard(config);
 
 	// basic machine hardware
 	MCFG_CPU_ADD("motorcpu", Z80, XTAL(16'000'000)/2 ) // 8 Mhz(guessed)

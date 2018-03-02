@@ -35,8 +35,6 @@ public:
 	// construction/destruction
 	softbox_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
-	DECLARE_WRITE8_MEMBER( dbrg_w );
-
 protected:
 	// device-level overrides
 	virtual void device_start() override;
@@ -58,6 +56,11 @@ private:
 	DECLARE_WRITE8_MEMBER( ppi1_pb_w );
 	DECLARE_READ8_MEMBER( ppi1_pc_r );
 	DECLARE_WRITE8_MEMBER( ppi1_pc_w );
+
+	DECLARE_WRITE8_MEMBER( dbrg_w );
+
+	void softbox_io(address_map &map);
+	void softbox_mem(address_map &map);
 
 	enum
 	{

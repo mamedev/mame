@@ -44,68 +44,13 @@ public:
 	// construction/destruction
 	imagetek_i4100_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
-	DECLARE_ADDRESS_MAP(map, 16);
+	void map(address_map &map);
 
 	static void static_set_gfxdecode_tag(device_t &device, const char *tag);
 	static void static_set_tmap_xoffsets(device_t &device, int x1, int x2, int x3);
 	static void static_set_tmap_yoffsets(device_t &device, int y1, int y2, int y3);
 
 	template <class Object> static devcb_base &static_set_blitter_irq_callback(device_t &device, Object &&cb) { return downcast<imagetek_i4100_device &>(device).m_blit_irq_cb.set_callback(std::forward<Object>(cb)); }
-
-
-	// I/O operations
-	DECLARE_READ16_MEMBER( vram_0_r );
-	DECLARE_READ16_MEMBER( vram_1_r );
-	DECLARE_READ16_MEMBER( vram_2_r );
-	DECLARE_WRITE16_MEMBER( vram_0_w );
-	DECLARE_WRITE16_MEMBER( vram_1_w );
-	DECLARE_WRITE16_MEMBER( vram_2_w );
-	DECLARE_READ16_MEMBER( rmw_vram_0_r );
-	DECLARE_READ16_MEMBER( rmw_vram_1_r );
-	DECLARE_READ16_MEMBER( rmw_vram_2_r );
-	DECLARE_WRITE16_MEMBER( rmw_vram_0_w );
-	DECLARE_WRITE16_MEMBER( rmw_vram_1_w );
-	DECLARE_WRITE16_MEMBER( rmw_vram_2_w );
-	DECLARE_READ16_MEMBER( scratchram_r );
-	DECLARE_WRITE16_MEMBER( scratchram_w );
-	DECLARE_READ16_MEMBER( spriteram_r );
-	DECLARE_WRITE16_MEMBER( spriteram_w );
-	DECLARE_READ16_MEMBER( tiletable_r );
-	DECLARE_WRITE16_MEMBER( tiletable_w );
-	DECLARE_READ16_MEMBER( sprite_count_r );
-	DECLARE_WRITE16_MEMBER( sprite_count_w );
-	DECLARE_READ16_MEMBER( sprite_priority_r );
-	DECLARE_WRITE16_MEMBER( sprite_priority_w );
-	DECLARE_READ16_MEMBER( sprite_xoffset_r );
-	DECLARE_WRITE16_MEMBER( sprite_xoffset_w );
-	DECLARE_READ16_MEMBER( sprite_yoffset_r );
-	DECLARE_WRITE16_MEMBER( sprite_yoffset_w );
-	DECLARE_READ16_MEMBER( sprite_color_code_r );
-	DECLARE_WRITE16_MEMBER( sprite_color_code_w );
-	DECLARE_READ16_MEMBER( layer_priority_r );
-	DECLARE_WRITE16_MEMBER( layer_priority_w );
-	DECLARE_READ16_MEMBER( background_color_r );
-	DECLARE_WRITE16_MEMBER( background_color_w );
-
-	DECLARE_READ16_MEMBER( screen_xoffset_r );
-	DECLARE_WRITE16_MEMBER( screen_xoffset_w );
-	DECLARE_READ16_MEMBER( screen_yoffset_r );
-	DECLARE_WRITE16_MEMBER( screen_yoffset_w );
-
-	DECLARE_READ16_MEMBER( window_r );
-	DECLARE_WRITE16_MEMBER( window_w );
-	DECLARE_READ16_MEMBER( scroll_r );
-	DECLARE_WRITE16_MEMBER( scroll_w );
-
-
-	DECLARE_READ16_MEMBER( gfxrom_r );
-	DECLARE_WRITE16_MEMBER( crtc_vert_w );
-	DECLARE_WRITE16_MEMBER( crtc_horz_w );
-	DECLARE_WRITE16_MEMBER( crtc_unlock_w );
-	DECLARE_WRITE16_MEMBER( blitter_w );
-	DECLARE_WRITE16_MEMBER( screen_ctrl_w );
-	DECLARE_WRITE16_MEMBER( rombank_w );
-
 
 	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 
@@ -163,6 +108,59 @@ protected:
 
 	emu_timer *m_blit_done_timer;
 
+		// I/O operations
+	DECLARE_READ16_MEMBER( vram_0_r );
+	DECLARE_READ16_MEMBER( vram_1_r );
+	DECLARE_READ16_MEMBER( vram_2_r );
+	DECLARE_WRITE16_MEMBER( vram_0_w );
+	DECLARE_WRITE16_MEMBER( vram_1_w );
+	DECLARE_WRITE16_MEMBER( vram_2_w );
+	DECLARE_READ16_MEMBER( rmw_vram_0_r );
+	DECLARE_READ16_MEMBER( rmw_vram_1_r );
+	DECLARE_READ16_MEMBER( rmw_vram_2_r );
+	DECLARE_WRITE16_MEMBER( rmw_vram_0_w );
+	DECLARE_WRITE16_MEMBER( rmw_vram_1_w );
+	DECLARE_WRITE16_MEMBER( rmw_vram_2_w );
+	DECLARE_READ16_MEMBER( scratchram_r );
+	DECLARE_WRITE16_MEMBER( scratchram_w );
+	DECLARE_READ16_MEMBER( spriteram_r );
+	DECLARE_WRITE16_MEMBER( spriteram_w );
+	DECLARE_READ16_MEMBER( tiletable_r );
+	DECLARE_WRITE16_MEMBER( tiletable_w );
+	DECLARE_READ16_MEMBER( sprite_count_r );
+	DECLARE_WRITE16_MEMBER( sprite_count_w );
+	DECLARE_READ16_MEMBER( sprite_priority_r );
+	DECLARE_WRITE16_MEMBER( sprite_priority_w );
+	DECLARE_READ16_MEMBER( sprite_xoffset_r );
+	DECLARE_WRITE16_MEMBER( sprite_xoffset_w );
+	DECLARE_READ16_MEMBER( sprite_yoffset_r );
+	DECLARE_WRITE16_MEMBER( sprite_yoffset_w );
+	DECLARE_READ16_MEMBER( sprite_color_code_r );
+	DECLARE_WRITE16_MEMBER( sprite_color_code_w );
+	DECLARE_READ16_MEMBER( layer_priority_r );
+	DECLARE_WRITE16_MEMBER( layer_priority_w );
+	DECLARE_READ16_MEMBER( background_color_r );
+	DECLARE_WRITE16_MEMBER( background_color_w );
+
+	DECLARE_READ16_MEMBER( screen_xoffset_r );
+	DECLARE_WRITE16_MEMBER( screen_xoffset_w );
+	DECLARE_READ16_MEMBER( screen_yoffset_r );
+	DECLARE_WRITE16_MEMBER( screen_yoffset_w );
+
+	DECLARE_READ16_MEMBER( window_r );
+	DECLARE_WRITE16_MEMBER( window_w );
+	DECLARE_READ16_MEMBER( scroll_r );
+	DECLARE_WRITE16_MEMBER( scroll_w );
+
+
+	DECLARE_READ16_MEMBER( gfxrom_r );
+	DECLARE_WRITE16_MEMBER( crtc_vert_w );
+	DECLARE_WRITE16_MEMBER( crtc_horz_w );
+	DECLARE_WRITE16_MEMBER( crtc_unlock_w );
+	DECLARE_WRITE16_MEMBER( blitter_w );
+	DECLARE_WRITE16_MEMBER( screen_ctrl_w );
+	DECLARE_WRITE16_MEMBER( rombank_w );
+
 	void draw_layers( screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect, int pri );
 	inline uint8_t get_tile_pix( uint16_t code, uint8_t x, uint8_t y, bool big, uint16_t *pix );
 	void draw_tilemap( screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect, uint32_t flags, uint32_t pcode,
@@ -187,14 +185,11 @@ public:
 	// construction/destruction
 	imagetek_i4220_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
-	DECLARE_ADDRESS_MAP(v2_map, 16);
-
 	// needed by Blazing Tornado / Grand Striker 2 for mixing with PSAC
 	// (it's unknown how the chip enables external sync)
 	uint16_t get_background_pen() { return m_background_color; };
 
-protected:
-
+	void v2_map(address_map &map);
 };
 
 class imagetek_i4300_device : public imagetek_i4100_device
@@ -203,11 +198,7 @@ public:
 	// construction/destruction
 	imagetek_i4300_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
-	DECLARE_ADDRESS_MAP(v3_map, 16);
-
-
-protected:
-
+	void v3_map(address_map &map);
 };
 
 // device type definition

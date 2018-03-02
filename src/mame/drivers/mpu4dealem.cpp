@@ -39,6 +39,7 @@ public:
 	DECLARE_WRITE_LINE_MEMBER(dealem_vsync_changed);
 	required_device<gfxdecode_device> m_gfxdecode;
 	void dealem(machine_config &config);
+	void dealem_memmap(address_map &map);
 };
 
 
@@ -152,7 +153,7 @@ WRITE_LINE_MEMBER(mpu4dealem_state::dealem_vsync_changed)
  *
  *************************************/
 
-static ADDRESS_MAP_START( dealem_memmap, AS_PROGRAM, 8, mpu4dealem_state )
+ADDRESS_MAP_START(mpu4dealem_state::dealem_memmap)
 	AM_RANGE(0x0000, 0x07ff) AM_RAM AM_SHARE("nvram")
 
 	AM_RANGE(0x0800, 0x0800) AM_DEVWRITE("crtc", mc6845_device, address_w)
@@ -202,7 +203,7 @@ MACHINE_CONFIG_START(mpu4dealem_state::dealem)
 	MCFG_CPU_ADD("maincpu", M6809, MPU4_MASTER_CLOCK/4)
 	MCFG_CPU_PROGRAM_MAP(dealem_memmap)
 
-	MCFG_FRAGMENT_ADD(mpu4_common)
+	mpu4_common(config);
 
 	MCFG_SPEAKER_STANDARD_MONO("mono")
 	MCFG_SOUND_ADD("ay8913",AY8913, MPU4_MASTER_CLOCK/4)

@@ -108,6 +108,11 @@ public:
 	uint32_t screen_update_granny(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 	void babypac(machine_config &config);
 	void granny(machine_config &config);
+	void granny_map(address_map &map);
+	void main_map(address_map &map);
+	void sound_map(address_map &map);
+	void sound_portmap(address_map &map);
+	void video_map(address_map &map);
 private:
 	uint8_t m_mpu_to_vid;
 	uint8_t m_vid_to_mpu;
@@ -144,7 +149,7 @@ private:
 };
 
 
-static ADDRESS_MAP_START( main_map, AS_PROGRAM, 8, by133_state ) // U9 MPU
+ADDRESS_MAP_START(by133_state::main_map) // U9 MPU
 	ADDRESS_MAP_GLOBAL_MASK(0x7fff)
 	AM_RANGE(0x0000, 0x007f) AM_RAM // 128x8 in MC6810 U7 MPU
 	AM_RANGE(0x0088, 0x008b) AM_DEVREADWRITE("pia_u10", pia6821_device, read, write) // PIA U10 MPU
@@ -157,7 +162,7 @@ static ADDRESS_MAP_START( main_map, AS_PROGRAM, 8, by133_state ) // U9 MPU
 	AM_RANGE(0x7000, 0x7fff) AM_ROM AM_REGION("roms", 0x1000)
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( video_map, AS_PROGRAM, 8, by133_state ) // U8 Vidiot
+ADDRESS_MAP_START(by133_state::video_map) // U8 Vidiot
 	AM_RANGE(0x0000, 0x1fff) AM_READWRITE(sound_data_r,sound_data_w)
 	AM_RANGE(0x2000, 0x2003) AM_MIRROR(0x0ffc) AM_DEVREADWRITE("pia_u7", pia6821_device, read, write) // PIA U7 Vidiot
 	AM_RANGE(0x4000, 0x4000) AM_MIRROR(0x0ffe) AM_DEVREADWRITE("crtc", tms9928a_device, vram_read, vram_write)
@@ -166,7 +171,7 @@ static ADDRESS_MAP_START( video_map, AS_PROGRAM, 8, by133_state ) // U8 Vidiot
 	AM_RANGE(0x8000, 0xffff) AM_ROM
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( granny_map, AS_PROGRAM, 8, by133_state )
+ADDRESS_MAP_START(by133_state::granny_map)
 	AM_RANGE(0x0000, 0x0001) AM_READWRITE(sound_data_r,sound_data_w)
 	AM_RANGE(0x0002, 0x0002) AM_DEVREADWRITE("crtc", tms9928a_device, vram_read, vram_write)
 	AM_RANGE(0x0003, 0x0003) AM_DEVREADWRITE("crtc", tms9928a_device, register_read, register_write)
@@ -179,11 +184,11 @@ static ADDRESS_MAP_START( granny_map, AS_PROGRAM, 8, by133_state )
 	AM_RANGE(0x4000, 0xffff) AM_ROM
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( sound_map, AS_PROGRAM, 8, by133_state ) // U27 Vidiot
+ADDRESS_MAP_START(by133_state::sound_map) // U27 Vidiot
 	AM_RANGE(0xc000, 0xffff) AM_ROM
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( sound_portmap, AS_IO, 8, by133_state )
+ADDRESS_MAP_START(by133_state::sound_portmap)
 	AM_RANGE(M6801_PORT1, M6801_PORT1) AM_DEVWRITE("dac", dac_byte_interface, write) // P10-P17
 	AM_RANGE(M6801_PORT2, M6801_PORT2) AM_READWRITE(m6803_port2_r, m6803_port2_w) // P20-P24 sound command in
 ADDRESS_MAP_END
@@ -807,7 +812,8 @@ MACHINE_CONFIG_START(by133_state::babypac)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "beee", 0.10)
 MACHINE_CONFIG_END
 
-MACHINE_CONFIG_DERIVED(by133_state::granny, babypac)
+MACHINE_CONFIG_START(by133_state::granny)
+	babypac(config);
 	MCFG_DEVICE_REMOVE("videocpu")
 	MCFG_CPU_ADD("videocpu", MC6809, XTAL(8'000'000)) // MC68B09P (XTAL value hard to read)
 	MCFG_CPU_PROGRAM_MAP(granny_map)

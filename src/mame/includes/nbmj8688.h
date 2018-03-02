@@ -136,6 +136,20 @@ public:
 	void vipclub(machine_config &config);
 	void ojousan(machine_config &config);
 	void seiha(machine_config &config);
+	void barline_io_map(address_map &map);
+	void crystalg_io_map(address_map &map);
+	void iemoto_io_map(address_map &map);
+	void kaguya_io_map(address_map &map);
+	void mjgaiden_io_map(address_map &map);
+	void mjsikaku_io_map(address_map &map);
+	void mjsikaku_map(address_map &map);
+	void mmsikaku_io_map(address_map &map);
+	void ojousan_map(address_map &map);
+	void otonano_io_map(address_map &map);
+	void p16bit_LCD_io_map(address_map &map);
+	void secolove_io_map(address_map &map);
+	void secolove_map(address_map &map);
+	void seiha_io_map(address_map &map);
 protected:
 	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr) override;
 };

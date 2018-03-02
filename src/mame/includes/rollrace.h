@@ -62,4 +62,6 @@ public:
 	INTERRUPT_GEN_MEMBER(sound_timer_irq);
 	void rollace2(machine_config &config);
 	void rollrace(machine_config &config);
+	void rollrace_map(address_map &map);
+	void rollrace_sound_map(address_map &map);
 };

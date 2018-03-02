@@ -72,7 +72,9 @@ public:
 			m_ram2(*this, "ram2"),
 			m_maincpu(*this,"maincpu"),
 			m_cart1(*this, "slot_a"),
-			m_cart2(*this, "slot_b")
+			m_cart2(*this, "slot_b"),
+			m_rombank(*this, "rombank%u", 1),
+			m_rambank(*this, "rambank%u", 1)
 			{ }
 
 	uint8_t m_mux_data;
@@ -98,14 +100,19 @@ public:
 	optional_device<generic_slot_device> m_cart1;
 	optional_device<generic_slot_device> m_cart2;
 
+	required_memory_bank_array<2> m_rombank;
+	required_memory_bank_array<2> m_rambank;
+
 	void macs(machine_config &config);
+	void macs_io(address_map &map);
+	void macs_mem(address_map &map);
 };
 
 
 
-static ADDRESS_MAP_START( macs_mem, AS_PROGRAM, 8, macs_state )
-	AM_RANGE(0x0000, 0x7fff) AM_ROMBANK("bank4")
-	AM_RANGE(0x8000, 0xbfff) AM_ROMBANK("bank1")
+ADDRESS_MAP_START(macs_state::macs_mem)
+	AM_RANGE(0x0000, 0x7fff) AM_ROMBANK("rombank1")
+	AM_RANGE(0x8000, 0xbfff) AM_ROMBANK("rombank2")
 	//AM_RANGE(0xc000, 0xcfff) AM_READ(st0016_sprite_ram_r) AM_WRITE(st0016_sprite_ram_w)
 	//AM_RANGE(0xd000, 0xdfff) AM_READ(st0016_sprite2_ram_r) AM_WRITE(st0016_sprite2_ram_w)
 	AM_RANGE(0xe000, 0xe7ff) AM_RAM /* work ram ? */
@@ -113,13 +120,13 @@ static ADDRESS_MAP_START( macs_mem, AS_PROGRAM, 8, macs_state )
 	//AM_RANGE(0xe900, 0xe9ff) // sound - internal
 	//AM_RANGE(0xea00, 0xebff) AM_READ(st0016_palette_ram_r) AM_WRITE(st0016_palette_ram_w)
 	//AM_RANGE(0xec00, 0xec1f) AM_READ(st0016_character_ram_r) AM_WRITE(st0016_character_ram_w)
-	AM_RANGE(0xf000, 0xf7ff) AM_RAMBANK("bank3") /* common /backup ram ?*/
-	AM_RANGE(0xf800, 0xffff) AM_RAMBANK("bank2") /* common /backup ram ?*/
+	AM_RANGE(0xf000, 0xf7ff) AM_RAMBANK("rambank1") /* common /backup ram ?*/
+	AM_RANGE(0xf800, 0xffff) AM_RAMBANK("rambank2") /* common /backup ram ?*/
 ADDRESS_MAP_END
 
 WRITE8_MEMBER(macs_state::rambank_w)
 {
-	membank("bank3")->set_entry(2 + (data & 1));
+	m_rambank[0]->set_entry(2 + (data & 1));
 }
 
 READ8_MEMBER(macs_state::macs_input_r)
@@ -157,7 +164,7 @@ READ8_MEMBER(macs_state::macs_input_r)
 
 WRITE8_MEMBER(macs_state::macs_rom_bank_w)
 {
-	membank("bank1")->set_entry(m_cart_bank * 0x100 + data);
+	m_rombank[1]->set_entry(m_cart_bank * 0x100 + data);
 }
 
 WRITE8_MEMBER(macs_state::macs_output_w)
@@ -176,20 +183,20 @@ WRITE8_MEMBER(macs_state::macs_output_w)
 			/* FIXME: dunno if this RAM bank is right, DASM tracking made on the POST
 			    screens indicates that there's just one RAM bank, but then MACS2 games
 			    locks up. */
-			membank("bank3")->set_entry(BIT(data, 5));
+			m_rambank[0]->set_entry(BIT(data, 5));
 
 			m_cart_bank = (data & 0xc) >> 2;
-			membank("bank4")->set_entry(m_cart_bank * 0x100);
+			m_rombank[0]->set_entry(m_cart_bank * 0x100);
 		}
 
-		membank("bank2")->set_entry(BIT(data, 5));
+		m_rambank[1]->set_entry(BIT(data, 5));
 		break;
 		case 2: m_mux_data = data; break;
 
 	}
 }
 
-static ADDRESS_MAP_START( macs_io, AS_IO, 8, macs_state )
+ADDRESS_MAP_START(macs_state::macs_io)
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	//AM_RANGE(0x00, 0xbf) AM_READ(st0016_vregs_r) AM_WRITE(st0016_vregs_w) /* video/crt regs ? */
 	AM_RANGE(0xc0, 0xc7) AM_READWRITE(macs_input_r,macs_output_w)
@@ -647,21 +654,21 @@ static const uint8_t ramdata[160]=
 
 MACHINE_START_MEMBER(macs_state,macs)
 {
-	membank("bank1")->configure_entries(0  , 256, memregion("maincpu")->base(), 0x4000);
-	membank("bank1")->configure_entries(256, 256, m_cart1->get_rom_base(), 0x4000);
-	membank("bank1")->configure_entries(512, 256, m_cart2->get_rom_base(), 0x4000);
-	membank("bank1")->set_entry(0);
+	m_rombank[0]->configure_entries(0  , 256, memregion("maincpu")->base(), 0x4000);
+	m_rombank[0]->configure_entries(256, 256, m_cart1->get_rom_base(), 0x4000);
+	m_rombank[0]->configure_entries(512, 256, m_cart2->get_rom_base(), 0x4000);
+	m_rombank[0]->set_entry(0);
 
-	membank("bank2")->configure_entries(0, 2, m_ram1.get() + 0x2000, 0x800);
-	membank("bank2")->set_entry(0);
+	m_rombank[1]->configure_entries(0  , 256, memregion("maincpu")->base(), 0x4000);
+	m_rombank[1]->configure_entries(256, 256, m_cart1->get_rom_base(), 0x4000);
+	m_rombank[1]->configure_entries(512, 256, m_cart2->get_rom_base(), 0x4000);
+	m_rombank[1]->set_entry(0);
 
-	membank("bank3")->configure_entries(0, 4, m_ram1.get(), 0x800);
-	membank("bank3")->set_entry(2);
+	m_rambank[0]->configure_entries(0, 4, m_ram1.get(), 0x800);
+	m_rambank[0]->set_entry(2);
 
-	membank("bank4")->configure_entries(0  , 256, memregion("maincpu")->base(), 0x4000);
-	membank("bank4")->configure_entries(256, 256, m_cart1->get_rom_base(), 0x4000);
-	membank("bank4")->configure_entries(512, 256, m_cart2->get_rom_base(), 0x4000);
-	membank("bank4")->set_entry(0);
+	m_rambank[1]->configure_entries(0, 2, m_ram1.get() + 0x2000, 0x800);
+	m_rambank[1]->set_entry(0);
 }
 
 MACHINE_RESET_MEMBER(macs_state,macs)

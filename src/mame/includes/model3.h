@@ -347,4 +347,7 @@ public:
 	void model3_20(machine_config &config);
 	void model3_21(machine_config &config);
 	void scud(machine_config &config);
+	void model3_10_mem(address_map &map);
+	void model3_mem(address_map &map);
+	void model3_snd(address_map &map);
 };

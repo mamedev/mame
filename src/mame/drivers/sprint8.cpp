@@ -109,7 +109,7 @@ WRITE_LINE_MEMBER(sprint8_state::team_w)
 }
 
 
-static ADDRESS_MAP_START( sprint8_map, AS_PROGRAM, 8, sprint8_state )
+ADDRESS_MAP_START(sprint8_state::sprint8_map)
 	AM_RANGE(0x0000, 0x00ff) AM_RAM
 	AM_RANGE(0x1800, 0x1bff) AM_RAM_WRITE(video_ram_w) AM_SHARE("video_ram")
 	AM_RANGE(0x1c00, 0x1c00) AM_READ(collision_r)
@@ -477,7 +477,7 @@ MACHINE_CONFIG_START(sprint8_state::sprint8)
 	MCFG_PALETTE_INDIRECT_ENTRIES(18)
 	MCFG_PALETTE_INIT_OWNER(sprint8_state, sprint8)
 
-	MCFG_FRAGMENT_ADD(sprint8_audio)
+	sprint8_audio(config);
 MACHINE_CONFIG_END
 
 

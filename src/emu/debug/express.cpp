@@ -1159,7 +1159,7 @@ void parsed_expression::parse_memory_operator(parse_token &token, const char *st
 	}
 
 	// configure the token
-	token.configure_operator(TVL_MEMORYAT, 2).set_memory_size(memsize).set_memory_space(memspace).set_memory_source(namestring).set_memory_side_effect(disable_se);
+	token.configure_operator(TVL_MEMORYAT, 2).set_memory_size(memsize).set_memory_space(memspace).set_memory_source(namestring).set_memory_side_effects(disable_se);
 }
 
 
@@ -1703,7 +1703,7 @@ u64 parsed_expression::parse_token::get_lval_value(symbol_table *table)
 
 	// or get the value from the memory callbacks
 	else if (is_memory() && table != nullptr) {
-		return table->memory_value(m_string, memory_space(), address(), 1 << memory_size(), memory_side_effect());
+		return table->memory_value(m_string, memory_space(), address(), 1 << memory_size(), memory_side_effects());
 	}
 
 	return 0;
@@ -1723,7 +1723,7 @@ inline void parsed_expression::parse_token::set_lval_value(symbol_table *table, 
 
 	// or set the value via the memory callbacks
 	else if (is_memory() && table != nullptr)
-		table->set_memory_value(m_string, memory_space(), address(), 1 << memory_size(), value, memory_side_effect());
+		table->set_memory_value(m_string, memory_space(), address(), 1 << memory_size(), value, memory_side_effects());
 }
 
 

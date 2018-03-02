@@ -129,6 +129,9 @@ public:
 
 	void mz2000(machine_config &config);
 	void mz80b(machine_config &config);
+	void mz2000_io(address_map &map);
+	void mz2000_map(address_map &map);
+	void mz80b_io(address_map &map);
 protected:
 	required_device<cpu_device> m_maincpu;
 	required_device<mb8877_device> m_mb8877a;
@@ -399,12 +402,12 @@ WRITE8_MEMBER(mz2000_state::mz2000_gvram_mask_w)
 	m_gvram_mask = data;
 }
 
-static ADDRESS_MAP_START(mz2000_map, AS_PROGRAM, 8, mz2000_state )
+ADDRESS_MAP_START(mz2000_state::mz2000_map)
 	ADDRESS_MAP_UNMAP_HIGH
 	AM_RANGE( 0x0000, 0xffff ) AM_READWRITE(mz2000_mem_r,mz2000_mem_w)
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START(mz80b_io, AS_IO, 8, mz2000_state )
+ADDRESS_MAP_START(mz2000_state::mz80b_io)
 	ADDRESS_MAP_UNMAP_HIGH
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	AM_RANGE(0xd8, 0xdb) AM_READWRITE(fdc_r, fdc_w)
@@ -417,13 +420,13 @@ static ADDRESS_MAP_START(mz80b_io, AS_IO, 8, mz2000_state )
 //  AM_RANGE(0xf4, 0xf4) AM_WRITE(vram_bank_w)
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START(mz2000_io, AS_IO, 8, mz2000_state )
+ADDRESS_MAP_START(mz2000_state::mz2000_io)
 	ADDRESS_MAP_UNMAP_HIGH
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
+	AM_IMPORT_FROM(mz80b_io)
 	AM_RANGE(0xf5, 0xf5) AM_WRITE(mz2000_tvram_attr_w)
 	AM_RANGE(0xf6, 0xf6) AM_WRITE(mz2000_gvram_mask_w)
 	AM_RANGE(0xf7, 0xf7) AM_WRITE(mz2000_gvram_bank_w)
-	AM_IMPORT_FROM(mz80b_io)
 ADDRESS_MAP_END
 
 
@@ -925,7 +928,8 @@ MACHINE_CONFIG_START(mz2000_state::mz2000)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS,"mono",0.15)
 MACHINE_CONFIG_END
 
-MACHINE_CONFIG_DERIVED(mz2000_state::mz80b, mz2000)
+MACHINE_CONFIG_START(mz2000_state::mz80b)
+	mz2000(config);
 	MCFG_CPU_MODIFY("maincpu")
 	MCFG_CPU_IO_MAP(mz80b_io)
 MACHINE_CONFIG_END

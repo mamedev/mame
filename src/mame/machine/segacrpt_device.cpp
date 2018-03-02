@@ -324,18 +324,6 @@ void segacrpt_z80_device::device_reset()
 	z80_device::device_reset();
 }
 
-void segacrpt_z80_device::set_decrypted_tag(device_t &device, const char* decrypted_tag)
-{
-	segacrpt_z80_device &dev = downcast<segacrpt_z80_device &>(device);
-	dev.m_decrypted_tag = decrypted_tag;
-}
-
-void segacrpt_z80_device::set_decrypted_ptr(device_t &device, uint8_t* ptr)
-{
-	segacrpt_z80_device &dev = downcast<segacrpt_z80_device &>(device);
-	dev.m_decrypted_ptr = ptr;
-}
-
 void segacrpt_z80_device::set_region_p(uint8_t* ptr)
 {
 	m_region_ptr = ptr;
@@ -344,24 +332,6 @@ void segacrpt_z80_device::set_region_p(uint8_t* ptr)
 void segacrpt_z80_device::set_decrypted_p(uint8_t* ptr)
 {
 	m_decrypted_ptr = ptr;
-}
-
-void segacrpt_z80_device::set_size(device_t &device, int size)
-{
-	segacrpt_z80_device &dev = downcast<segacrpt_z80_device &>(device);
-	dev.m_decode_size = size;
-}
-
-void segacrpt_z80_device::set_numbanks(device_t &device, int numbanks)
-{
-	segacrpt_z80_device &dev = downcast<segacrpt_z80_device &>(device);
-	dev.m_numbanks = numbanks;
-}
-
-void segacrpt_z80_device::set_banksize(device_t &device, int banksize)
-{
-	segacrpt_z80_device &dev = downcast<segacrpt_z80_device &>(device);
-	dev.m_banksize = banksize;
 }
 
 

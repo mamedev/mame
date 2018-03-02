@@ -38,6 +38,9 @@ public:
 	required_device<palette_device> m_palette;
 	UPD7220_DISPLAY_PIXELS_MEMBER( hgdc_display_pixels );
 	void mz6500(machine_config &config);
+	void mz6500_io(address_map &map);
+	void mz6500_map(address_map &map);
+	void upd7220_map(address_map &map);
 };
 
 UPD7220_DISPLAY_PIXELS_MEMBER( mz6500_state::hgdc_display_pixels )
@@ -77,7 +80,7 @@ WRITE8_MEMBER( mz6500_state::mz6500_vram_w )
 	m_video_ram[offset] |= data << mask;
 }
 
-static ADDRESS_MAP_START(mz6500_map, AS_PROGRAM, 16, mz6500_state)
+ADDRESS_MAP_START(mz6500_state::mz6500_map)
 	ADDRESS_MAP_UNMAP_HIGH
 	AM_RANGE(0x00000,0x9ffff) AM_RAM
 //  AM_RANGE(0xa0000,0xbffff) kanji/dictionary ROM
@@ -85,7 +88,7 @@ static ADDRESS_MAP_START(mz6500_map, AS_PROGRAM, 16, mz6500_state)
 	AM_RANGE(0xfc000,0xfffff) AM_ROM AM_REGION("ipl", 0)
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START(mz6500_io, AS_IO, 16, mz6500_state)
+ADDRESS_MAP_START(mz6500_state::mz6500_io)
 	ADDRESS_MAP_UNMAP_HIGH
 //  AM_RANGE(0x0000, 0x000f) i8237 dma
 //  AM_RANGE(0x0010, 0x001f) i8255
@@ -133,7 +136,7 @@ static SLOT_INTERFACE_START( mz6500_floppies )
 	SLOT_INTERFACE( "525hd", FLOPPY_525_HD )
 SLOT_INTERFACE_END
 
-static ADDRESS_MAP_START( upd7220_map, 0, 16, mz6500_state )
+ADDRESS_MAP_START(mz6500_state::upd7220_map)
 	AM_RANGE(0x00000, 0x3ffff) AM_RAM AM_SHARE("video_ram")
 ADDRESS_MAP_END
 

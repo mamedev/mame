@@ -500,7 +500,7 @@ WRITE8_MEMBER( c1541_prologic_dos_classic_device::write )
 //  ADDRESS_MAP( c1541_mem )
 //-------------------------------------------------
 
-static ADDRESS_MAP_START( c1541_mem, AS_PROGRAM, 8, c1541_device_base )
+ADDRESS_MAP_START(c1541_device_base::c1541_mem)
 	AM_RANGE(0x0000, 0x07ff) AM_MIRROR(0x6000) AM_RAM
 	AM_RANGE(0x1800, 0x180f) AM_MIRROR(0x63f0) AM_DEVREADWRITE(M6522_0_TAG, via6522_device, read, write)
 	AM_RANGE(0x1c00, 0x1c0f) AM_MIRROR(0x63f0) AM_DEVREADWRITE(M6522_1_TAG, via6522_device, read, write)
@@ -512,7 +512,7 @@ ADDRESS_MAP_END
 //  ADDRESS_MAP( c1541dd_mem )
 //-------------------------------------------------
 
-static ADDRESS_MAP_START( c1541dd_mem, AS_PROGRAM, 8, c1541_device_base )
+ADDRESS_MAP_START(c1541_device_base::c1541dd_mem)
 	AM_RANGE(0x0000, 0x07ff) AM_MIRROR(0x6000) AM_RAM
 	AM_RANGE(0x1800, 0x180f) AM_MIRROR(0x63f0) AM_DEVREADWRITE(M6522_0_TAG, via6522_device, read, write)
 	AM_RANGE(0x1c00, 0x1c0f) AM_MIRROR(0x63f0) AM_DEVREADWRITE(M6522_1_TAG, via6522_device, read, write)
@@ -525,14 +525,13 @@ ADDRESS_MAP_END
 //  ADDRESS_MAP( c1541pd_mem )
 //-------------------------------------------------
 
-static ADDRESS_MAP_START( c1541pd_mem, AS_PROGRAM, 8, c1541_device_base )
+ADDRESS_MAP_START(c1541_device_base::c1541pd_mem)
 	AM_RANGE(0x0000, 0x07ff) AM_MIRROR(0x6000) AM_RAM
 	AM_RANGE(0x1800, 0x180f) AM_MIRROR(0x63f0) AM_DEVREADWRITE(M6522_0_TAG, via6522_device, read, write)
 	AM_RANGE(0x1c00, 0x1c0f) AM_MIRROR(0x63f0) AM_DEVREADWRITE(M6522_1_TAG, via6522_device, read, write)
 	AM_RANGE(0x8000, 0x9fff) AM_ROM AM_REGION(M6502_TAG, 0x4000)
 	AM_RANGE(0xa000, 0xbfff) AM_RAM
 	AM_RANGE(0xc000, 0xffff) AM_ROM AM_REGION(M6502_TAG, 0x0000)
-	AM_RANGE(0xe000, 0xffff) AM_ROM AM_REGION(M6502_TAG, 0x2000)
 ADDRESS_MAP_END
 
 
@@ -540,7 +539,7 @@ ADDRESS_MAP_END
 //  ADDRESS_MAP( c1541pdc_mem )
 //-------------------------------------------------
 
-static ADDRESS_MAP_START( c1541pdc_mem, AS_PROGRAM, 8, c1541_prologic_dos_classic_device )
+ADDRESS_MAP_START(c1541_prologic_dos_classic_device::c1541pdc_mem)
 	AM_RANGE(0x0000, 0xffff) AM_READWRITE(read, write)
 /*  AM_RANGE(0x0000, 0x07ff) AM_MIRROR(0x6000) AM_RAM AM_SHARE("share1")
     AM_RANGE(0x1800, 0x180f) AM_MIRROR(0x63f0) AM_DEVREADWRITE(M6522_0_TAG, via6522_device, read, write)

@@ -25,7 +25,7 @@
 
 
 /* Address maps */
-static ADDRESS_MAP_START(partner_mem, AS_PROGRAM, 8, partner_state )
+ADDRESS_MAP_START(partner_state::partner_mem)
 	AM_RANGE( 0x0000, 0x07ff ) AM_RAMBANK("bank1")
 	AM_RANGE( 0x0800, 0x3fff ) AM_RAMBANK("bank2")
 	AM_RANGE( 0x4000, 0x5fff ) AM_RAMBANK("bank3")

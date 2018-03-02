@@ -42,8 +42,7 @@ public:
 	required_shared_ptr<uint16_t> m_generic_paletteram_16;
 	required_shared_ptr<uint16_t> m_generic_paletteram2_16;
 
-	DECLARE_WRITE16_MEMBER(control_w);
-	DECLARE_READ16_MEMBER(control_r);
+	DECLARE_WRITE16_MEMBER(irq_ack_w);
 	DECLARE_WRITE16_MEMBER(palette_24bit_rg_w);
 	DECLARE_WRITE16_MEMBER(palette_24bit_b_w);
 
@@ -53,4 +52,6 @@ public:
 	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	void update_24bitcol(int offset);
 	void darkseal(machine_config &config);
+	void darkseal_map(address_map &map);
+	void sound_map(address_map &map);
 };

@@ -15,10 +15,6 @@ public:
 	microdisc_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 	virtual ~microdisc_device();
 
-	DECLARE_ADDRESS_MAP(map, 8);
-	DECLARE_WRITE8_MEMBER(port_314_w);
-	DECLARE_READ8_MEMBER(port_314_r);
-	DECLARE_READ8_MEMBER(port_318_r);
 
 protected:
 	enum {
@@ -49,6 +45,12 @@ private:
 	DECLARE_WRITE_LINE_MEMBER(fdc_irq_w);
 	DECLARE_WRITE_LINE_MEMBER(fdc_drq_w);
 	DECLARE_WRITE_LINE_MEMBER(fdc_hld_w);
+
+	DECLARE_WRITE8_MEMBER(port_314_w);
+	DECLARE_READ8_MEMBER(port_314_r);
+	DECLARE_READ8_MEMBER(port_318_r);
+
+	void map(address_map &map);
 
 	DECLARE_FLOPPY_FORMATS(floppy_formats);
 };

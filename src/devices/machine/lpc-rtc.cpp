@@ -5,12 +5,12 @@
 
 DEFINE_DEVICE_TYPE(LPC_RTC, lpc_rtc_device, "lpc_rpc", "LPC RTC")
 
-DEVICE_ADDRESS_MAP_START(map, 32, lpc_rtc_device)
+ADDRESS_MAP_START(lpc_rtc_device::map)
 	AM_RANGE(0x70, 0x77) AM_READWRITE8(index_r,     index_w,     0x00ff00ff)
 	AM_RANGE(0x70, 0x77) AM_READWRITE8(target_r,    target_w,    0xff00ff00)
 ADDRESS_MAP_END
 
-DEVICE_ADDRESS_MAP_START(extmap, 32, lpc_rtc_device)
+ADDRESS_MAP_START(lpc_rtc_device::extmap)
 	AM_RANGE(0x70, 0x77) AM_READWRITE8(extindex_r,  extindex_w,  0x00ff0000)
 	AM_RANGE(0x70, 0x77) AM_READWRITE8(exttarget_r, exttarget_w, 0xff000000)
 ADDRESS_MAP_END

@@ -117,7 +117,7 @@ WRITE_LINE_MEMBER(pandoras_state::coin_counter_2_w)
 }
 
 
-static ADDRESS_MAP_START( pandoras_master_map, AS_PROGRAM, 8, pandoras_state )
+ADDRESS_MAP_START(pandoras_state::pandoras_master_map)
 	AM_RANGE(0x0000, 0x0fff) AM_RAM AM_SHARE("spriteram")               /* Work RAM (Shared with CPU B) */
 	AM_RANGE(0x1000, 0x13ff) AM_RAM_WRITE(pandoras_cram_w) AM_SHARE("colorram") /* Color RAM (shared with CPU B) */
 	AM_RANGE(0x1400, 0x17ff) AM_RAM_WRITE(pandoras_vram_w) AM_SHARE("videoram") /* Video RAM (shared with CPU B) */
@@ -132,7 +132,7 @@ static ADDRESS_MAP_START( pandoras_master_map, AS_PROGRAM, 8, pandoras_state )
 	AM_RANGE(0x8000, 0xffff) AM_ROM                                                         /* ROM */
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( pandoras_slave_map, AS_PROGRAM, 8, pandoras_state )
+ADDRESS_MAP_START(pandoras_state::pandoras_slave_map)
 	AM_RANGE(0x0000, 0x0fff) AM_RAM AM_SHARE("spriteram")                                       /* Work RAM (Shared with CPU A) */
 	AM_RANGE(0x1000, 0x13ff) AM_RAM_WRITE(pandoras_cram_w) AM_SHARE("colorram")             /* Color RAM (shared with CPU A) */
 	AM_RANGE(0x1400, 0x17ff) AM_RAM_WRITE(pandoras_vram_w) AM_SHARE("videoram")             /* Video RAM (shared with CPU A) */
@@ -150,7 +150,7 @@ static ADDRESS_MAP_START( pandoras_slave_map, AS_PROGRAM, 8, pandoras_state )
 	AM_RANGE(0xe000, 0xffff) AM_ROM                                                         /* ROM */
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( pandoras_sound_map, AS_PROGRAM, 8, pandoras_state )
+ADDRESS_MAP_START(pandoras_state::pandoras_sound_map)
 	AM_RANGE(0x0000, 0x1fff) AM_ROM                                                         /* ROM */
 	AM_RANGE(0x2000, 0x23ff) AM_RAM                                                         /* RAM */
 	AM_RANGE(0x4000, 0x4000) AM_DEVREAD("soundlatch", generic_latch_8_device, read)
@@ -161,11 +161,11 @@ static ADDRESS_MAP_START( pandoras_sound_map, AS_PROGRAM, 8, pandoras_state )
 	AM_RANGE(0xa000, 0xa000) AM_DEVWRITE("soundlatch2", generic_latch_8_device, write)      /* sound command to the 8039 */
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( pandoras_i8039_map, AS_PROGRAM, 8, pandoras_state )
+ADDRESS_MAP_START(pandoras_state::pandoras_i8039_map)
 	AM_RANGE(0x0000, 0x0fff) AM_ROM
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( pandoras_i8039_io_map, AS_IO, 8, pandoras_state )
+ADDRESS_MAP_START(pandoras_state::pandoras_i8039_io_map)
 	AM_RANGE(0x00, 0xff) AM_DEVREAD("soundlatch2", generic_latch_8_device, read)
 ADDRESS_MAP_END
 

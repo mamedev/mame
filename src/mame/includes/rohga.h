@@ -21,45 +21,29 @@ public:
 		: driver_device(mconfig, type, tag),
 		m_maincpu(*this, "maincpu"),
 		m_audiocpu(*this, "audiocpu"),
-		m_deco146(*this, "ioprot"),
-		m_deco104(*this, "ioprot104"),
+		m_ioprot(*this, "ioprot"),
 		m_decocomn(*this, "deco_common"),
-		m_deco_tilegen1(*this, "tilegen1"),
-		m_deco_tilegen2(*this, "tilegen2"),
-		m_oki1(*this, "oki1"),
-		m_oki2(*this, "oki2"),
-		m_spriteram(*this, "spriteram"),
-		m_spriteram2(*this, "spriteram2") ,
-		m_pf1_rowscroll(*this, "pf1_rowscroll"),
-		m_pf2_rowscroll(*this, "pf2_rowscroll"),
-		m_pf3_rowscroll(*this, "pf3_rowscroll"),
-		m_pf4_rowscroll(*this, "pf4_rowscroll"),
-		m_sprgen1(*this, "spritegen1"),
-		m_sprgen2(*this, "spritegen2"),
+		m_deco_tilegen(*this, "tilegen%u", 1),
+		m_oki(*this, "oki%u", 1),
+		m_spriteram(*this, "spriteram%u", 1),
+		m_pf_rowscroll(*this, "pf%u_rowscroll", 1),
+		m_sprgen(*this, "spritegen%u", 1),
 		m_palette(*this, "palette")
 	{ }
 
 	/* devices */
 	required_device<cpu_device> m_maincpu;
 	required_device<cpu_device> m_audiocpu;
-	optional_device<deco146_device> m_deco146;
-	optional_device<deco104_device> m_deco104;
+	required_device<deco_146_base_device> m_ioprot;
 	required_device<decocomn_device> m_decocomn;
-	required_device<deco16ic_device> m_deco_tilegen1;
-	required_device<deco16ic_device> m_deco_tilegen2;
-	required_device<okim6295_device> m_oki1;
-	required_device<okim6295_device> m_oki2;
-	required_device<buffered_spriteram16_device> m_spriteram;
-	optional_device<buffered_spriteram16_device> m_spriteram2;
+	required_device_array<deco16ic_device, 2> m_deco_tilegen;
+	required_device_array<okim6295_device, 2> m_oki;
+	optional_device_array<buffered_spriteram16_device, 2> m_spriteram;
 
 	/* memory pointers */
-	optional_shared_ptr<uint16_t> m_pf1_rowscroll;
-	optional_shared_ptr<uint16_t> m_pf2_rowscroll;
-	required_shared_ptr<uint16_t> m_pf3_rowscroll;
-	required_shared_ptr<uint16_t> m_pf4_rowscroll;
+	optional_shared_ptr_array<uint16_t, 4> m_pf_rowscroll;
 
-	optional_device<decospr_device> m_sprgen1;
-	optional_device<decospr_device> m_sprgen2;
+	optional_device_array<decospr_device, 2> m_sprgen;
 
 	required_device<palette_device> m_palette;
 
@@ -83,13 +67,18 @@ public:
 	DECOSPR_COLOUR_CB_MEMBER(rohga_col_callback);
 	DECOSPR_COLOUR_CB_MEMBER(schmeisr_col_callback);
 
-	READ16_MEMBER( nb_protection_region_0_146_r );
-	WRITE16_MEMBER( nb_protection_region_0_146_w );
-	READ16_MEMBER( wf_protection_region_0_104_r );
-	WRITE16_MEMBER( wf_protection_region_0_104_w );
+	READ16_MEMBER( ioprot_r );
+	WRITE16_MEMBER( ioprot_w );
 	void wizdfire(machine_config &config);
 	void nitrobal(machine_config &config);
 	void hangzo(machine_config &config);
 	void schmeisr(machine_config &config);
 	void rohga(machine_config &config);
+	void hangzo_map(address_map &map);
+	void hotb_base_map(address_map &map);
+	void nitrobal_map(address_map &map);
+	void rohga_map(address_map &map);
+	void sound_map(address_map &map);
+	void schmeisr_map(address_map &map);
+	void wizdfire_map(address_map &map);
 };

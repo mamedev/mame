@@ -86,6 +86,8 @@ public:
 	DECLARE_READ8_MEMBER(inputs_r);
 
 	void popper(machine_config &config);
+	void main_map(address_map &map);
+	void sub_map(address_map &map);
 protected:
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
@@ -116,7 +118,7 @@ private:
 //  ADDRESS MAPS
 //**************************************************************************
 
-static ADDRESS_MAP_START( main_map, AS_PROGRAM, 8, popper_state )
+ADDRESS_MAP_START(popper_state::main_map)
 	AM_RANGE(0x0000, 0x7fff) AM_ROM
 	AM_RANGE(0x8000, 0xbfff) AM_NOP
 	AM_RANGE(0xc000, 0xc0ff) AM_RAM
@@ -138,7 +140,7 @@ static ADDRESS_MAP_START( main_map, AS_PROGRAM, 8, popper_state )
 	AM_RANGE(0xfc00, 0xfc00) AM_MIRROR(0x03ff) AM_READ(watchdog_clear_r)
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( sub_map, AS_PROGRAM, 8, popper_state )
+ADDRESS_MAP_START(popper_state::sub_map)
 	AM_RANGE(0x0000, 0x1fff) AM_ROM
 	AM_RANGE(0x2000, 0x7fff) AM_NOP
 	AM_RANGE(0x8000, 0x8003) AM_MIRROR(0x1ffc) AM_WRITE(ay1_w)

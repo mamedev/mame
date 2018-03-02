@@ -57,6 +57,7 @@ public:
 	virtual void video_start() override;
 	uint32_t screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 	void ez2d(machine_config &config);
+	void ez2d_map(address_map &map);
 };
 
 void ez2d_state::video_start()
@@ -68,7 +69,7 @@ uint32_t ez2d_state::screen_update(screen_device &screen, bitmap_rgb32 &bitmap, 
 	return 0;
 }
 
-static ADDRESS_MAP_START( ez2d_map, AS_PROGRAM, 32, ez2d_state )
+ADDRESS_MAP_START(ez2d_state::ez2d_map)
 ADDRESS_MAP_END
 
 static INPUT_PORTS_START( ez2d )

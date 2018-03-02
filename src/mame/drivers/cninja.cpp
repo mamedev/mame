@@ -106,7 +106,7 @@ READ16_MEMBER(cninja_state::cninjabl2_sprite_dma_r)
 }
 
 
-static ADDRESS_MAP_START( cninja_map, AS_PROGRAM, 16, cninja_state )
+ADDRESS_MAP_START(cninja_state::cninja_map)
 	AM_RANGE(0x000000, 0x0bffff) AM_ROM
 
 	AM_RANGE(0x140000, 0x14000f) AM_WRITE(cninja_pf12_control_w)
@@ -134,7 +134,7 @@ static ADDRESS_MAP_START( cninja_map, AS_PROGRAM, 16, cninja_state )
 	AM_RANGE(0x308000, 0x308fff) AM_WRITENOP /* Bootleg only */
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( cninjabl_map, AS_PROGRAM, 16, cninja_state )
+ADDRESS_MAP_START(cninja_state::cninjabl_map)
 	AM_RANGE(0x000000, 0x0bffff) AM_ROM
 
 	AM_RANGE(0x138000, 0x1387ff) AM_RAM AM_SHARE("spriteram") /* bootleg sprite-ram (sprites rewritten here in new format) */
@@ -208,7 +208,7 @@ WRITE16_MEMBER( cninja_state::sshangha_protection_region_6_146_w )
 	m_ioprot->write_data( space, deco146_addr, data, mem_mask, cs );
 }
 
-static ADDRESS_MAP_START( edrandy_map, AS_PROGRAM, 16, cninja_state )
+ADDRESS_MAP_START(cninja_state::edrandy_map)
 	AM_RANGE(0x000000, 0x0fffff) AM_ROM
 
 	AM_RANGE(0x140000, 0x14000f) AM_WRITE(cninja_pf12_control_w)
@@ -241,7 +241,7 @@ WRITE16_MEMBER(cninja_state::robocop2_priority_w)
 	COMBINE_DATA(&m_priority);
 }
 
-static ADDRESS_MAP_START( robocop2_map, AS_PROGRAM, 16, cninja_state )
+ADDRESS_MAP_START(cninja_state::robocop2_map)
 	AM_RANGE(0x000000, 0x0fffff) AM_ROM
 
 	AM_RANGE(0x140000, 0x14000f) AM_WRITE(cninja_pf12_control_w)
@@ -296,7 +296,7 @@ READ16_MEMBER( cninja_state::mutantf_71_r )
 	return 0xffff; // todo
 }
 
-static ADDRESS_MAP_START( mutantf_map, AS_PROGRAM, 16, cninja_state )
+ADDRESS_MAP_START(cninja_state::mutantf_map)
 	AM_RANGE(0x000000, 0x07ffff) AM_ROM
 	AM_RANGE(0x100000, 0x103fff) AM_RAM
 	AM_RANGE(0x120000, 0x1207ff) AM_RAM AM_SHARE("spriteram")
@@ -325,7 +325,7 @@ ADDRESS_MAP_END
 
 /******************************************************************************/
 
-static ADDRESS_MAP_START( sound_map, AS_PROGRAM, 8, cninja_state )
+ADDRESS_MAP_START(cninja_state::sound_map)
 	AM_RANGE(0x000000, 0x00ffff) AM_ROM
 	AM_RANGE(0x100000, 0x100001) AM_DEVREADWRITE("ym1", ym2203_device, read, write)
 	AM_RANGE(0x110000, 0x110001) AM_DEVREADWRITE("ym2", ym2151_device, read, write)
@@ -337,7 +337,7 @@ static ADDRESS_MAP_START( sound_map, AS_PROGRAM, 8, cninja_state )
 	AM_RANGE(0x1ff400, 0x1ff403) AM_DEVWRITE("audiocpu", h6280_device, irq_status_w)
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( sound_map_mutantf, AS_PROGRAM, 8, cninja_state )
+ADDRESS_MAP_START(cninja_state::sound_map_mutantf)
 	AM_RANGE(0x000000, 0x00ffff) AM_ROM
 	AM_RANGE(0x100000, 0x100001) AM_NOP
 	AM_RANGE(0x110000, 0x110001) AM_DEVREADWRITE("ymsnd", ym2151_device, read, write)
@@ -349,7 +349,7 @@ static ADDRESS_MAP_START( sound_map_mutantf, AS_PROGRAM, 8, cninja_state )
 	AM_RANGE(0x1ff400, 0x1ff403) AM_DEVWRITE("audiocpu", h6280_device, irq_status_w)
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( stoneage_s_map, AS_PROGRAM, 8, cninja_state )
+ADDRESS_MAP_START(cninja_state::stoneage_s_map)
 	AM_RANGE(0x0000, 0x7fff) AM_ROM
 	AM_RANGE(0x8000, 0x87ff) AM_RAM
 	AM_RANGE(0x8800, 0x8801) AM_DEVREADWRITE("ymsnd", ym2151_device, read, write)
@@ -357,7 +357,7 @@ static ADDRESS_MAP_START( stoneage_s_map, AS_PROGRAM, 8, cninja_state )
 	AM_RANGE(0xa000, 0xa000) AM_DEVREAD("ioprot", deco_146_base_device, soundlatch_r)
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( cninjabl_sound_map, AS_PROGRAM, 8, cninja_state )
+ADDRESS_MAP_START(cninja_state::cninjabl_sound_map)
 	AM_RANGE(0x0000, 0x7fff) AM_ROM
 	AM_RANGE(0x8000, 0x87ff) AM_RAM
 	AM_RANGE(0x8800, 0x8801) AM_DEVREADWRITE("ymsnd", ym2151_device, read, write)
@@ -365,7 +365,7 @@ static ADDRESS_MAP_START( cninjabl_sound_map, AS_PROGRAM, 8, cninja_state )
 	AM_RANGE(0xa000, 0xa000) AM_DEVREAD("soundlatch", generic_latch_8_device, read)
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( cninjabl2_s_map, AS_PROGRAM, 8, cninja_state )
+ADDRESS_MAP_START(cninja_state::cninjabl2_s_map)
 	AM_RANGE(0x0000, 0x7fff) AM_ROM
 	AM_RANGE(0x8000, 0x87ff) AM_RAM
 	AM_RANGE(0x9000, 0x9000) AM_WRITE(cninjabl2_oki_bank_w)
@@ -373,7 +373,7 @@ static ADDRESS_MAP_START( cninjabl2_s_map, AS_PROGRAM, 8, cninja_state )
 	AM_RANGE(0xa000, 0xa000) AM_DEVREAD("ioprot", deco_146_base_device, soundlatch_r)
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( cninjabl2_oki_map, 0, 8, cninja_state )
+ADDRESS_MAP_START(cninja_state::cninjabl2_oki_map)
 	AM_RANGE(0x00000, 0x2ffff) AM_ROM AM_REGION("oki1", 0)
 	AM_RANGE(0x30000, 0x3ffff) AM_ROMBANK("okibank")
 ADDRESS_MAP_END
@@ -984,7 +984,8 @@ MACHINE_CONFIG_START(cninja_state::stoneage)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.75)
 MACHINE_CONFIG_END
 
-MACHINE_CONFIG_DERIVED(cninja_state::cninjabl2, stoneage)
+MACHINE_CONFIG_START(cninja_state::cninjabl2)
+	stoneage(config);
 	MCFG_CPU_MODIFY("audiocpu")
 	MCFG_CPU_PROGRAM_MAP(cninjabl2_s_map)
 

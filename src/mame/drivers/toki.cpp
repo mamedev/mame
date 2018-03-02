@@ -142,7 +142,7 @@ WRITE8_MEMBER(toki_state::tokib_adpcm_data_w)
 
 /*****************************************************************************/
 
-static ADDRESS_MAP_START( toki_map, AS_PROGRAM, 16, toki_state )
+ADDRESS_MAP_START(toki_state::toki_map)
 	AM_RANGE(0x000000, 0x05ffff) AM_ROM
 	AM_RANGE(0x060000, 0x06d7ff) AM_RAM
 	AM_RANGE(0x06d800, 0x06dfff) AM_RAM AM_SHARE("spriteram")
@@ -158,7 +158,7 @@ static ADDRESS_MAP_START( toki_map, AS_PROGRAM, 16, toki_state )
 ADDRESS_MAP_END
 
 /* In the bootleg, sound and sprites are remapped to 0x70000 */
-static ADDRESS_MAP_START( tokib_map, AS_PROGRAM, 16, toki_state )
+ADDRESS_MAP_START(toki_state::tokib_map)
 	AM_RANGE(0x000000, 0x05ffff) AM_ROM
 	AM_RANGE(0x060000, 0x06dfff) AM_RAM
 	AM_RANGE(0x06e000, 0x06e7ff) AM_RAM_DEVWRITE("palette", palette_device, write16) AM_SHARE("palette")
@@ -182,7 +182,7 @@ ADDRESS_MAP_END
 
 /*****************************************************************************/
 
-static ADDRESS_MAP_START( toki_audio_map, AS_PROGRAM, 8, toki_state )
+ADDRESS_MAP_START(toki_state::toki_audio_map)
 	AM_RANGE(0x0000, 0x1fff) AM_DEVREAD("sei80bu", sei80bu_device, data_r)
 	AM_RANGE(0x2000, 0x27ff) AM_RAM
 	AM_RANGE(0x4000, 0x4000) AM_DEVWRITE("seibu_sound", seibu_sound_device, pending_w)
@@ -200,12 +200,12 @@ static ADDRESS_MAP_START( toki_audio_map, AS_PROGRAM, 8, toki_state )
 	AM_RANGE(0x8000, 0xffff) AM_ROMBANK("seibu_bank1")
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( toki_audio_opcodes_map, AS_OPCODES, 8, toki_state )
+ADDRESS_MAP_START(toki_state::toki_audio_opcodes_map)
 	AM_RANGE(0x0000, 0x1fff) AM_DEVREAD("sei80bu", sei80bu_device, opcode_r)
 	AM_RANGE(0x8000, 0xffff) AM_ROMBANK("seibu_bank1")
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( jujuba_audio_map, AS_PROGRAM, 8, toki_state )
+ADDRESS_MAP_START(toki_state::jujuba_audio_map)
 	AM_RANGE(0x0000, 0x1fff) AM_READ(jujuba_z80_data_decrypt)
 	AM_RANGE(0x2000, 0x27ff) AM_RAM
 	AM_RANGE(0x4000, 0x4000) AM_DEVWRITE("seibu_sound", seibu_sound_device, pending_w)
@@ -223,7 +223,7 @@ static ADDRESS_MAP_START( jujuba_audio_map, AS_PROGRAM, 8, toki_state )
 	AM_RANGE(0x8000, 0xffff) AM_ROMBANK("seibu_bank1")
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( jujuba_audio_opcodes_map, AS_OPCODES, 8, toki_state )
+ADDRESS_MAP_START(toki_state::jujuba_audio_opcodes_map)
 	AM_RANGE(0x0000, 0x1fff) AM_ROM AM_REGION("audiocpu", 0)
 	AM_RANGE(0x8000, 0xffff) AM_ROMBANK("seibu_bank1")
 ADDRESS_MAP_END
@@ -233,7 +233,7 @@ READ8_MEMBER(toki_state::jujuba_z80_data_decrypt)
 	return m_audiocpu_rom[offset] ^ 0x55;
 }
 
-static ADDRESS_MAP_START( tokib_audio_map, AS_PROGRAM, 8, toki_state )
+ADDRESS_MAP_START(toki_state::tokib_audio_map)
 	AM_RANGE(0x0000, 0x7fff) AM_ROM
 	AM_RANGE(0x8000, 0xbfff) AM_ROMBANK("bank1")
 	AM_RANGE(0xe000, 0xe000) AM_WRITE(tokib_adpcm_control_w) /* MSM5205 + ROM bank */
@@ -494,7 +494,7 @@ MACHINE_CONFIG_START(toki_state::toki) /* KOYO 20.000MHz near the cpu */
 
 	MCFG_CPU_ADD("audiocpu", Z80, XTAL(14'318'181)/4) // verified on pcb
 	MCFG_CPU_PROGRAM_MAP(toki_audio_map)
-	MCFG_CPU_DECRYPTED_OPCODES_MAP(toki_audio_opcodes_map)
+	MCFG_CPU_OPCODES_MAP(toki_audio_opcodes_map)
 
 	MCFG_DEVICE_ADD("sei80bu", SEI80BU, 0)
 	MCFG_DEVICE_ROM("audiocpu")
@@ -531,12 +531,13 @@ MACHINE_CONFIG_START(toki_state::toki) /* KOYO 20.000MHz near the cpu */
 	MCFG_SEIBU_SOUND_YM_WRITE_CB(DEVWRITE8("ymsnd", ym3812_device, write))
 MACHINE_CONFIG_END
 
-MACHINE_CONFIG_DERIVED(toki_state::jujuba, toki)
+MACHINE_CONFIG_START(toki_state::jujuba)
+	toki(config);
 	MCFG_DEVICE_REMOVE("sei80bu")
 
 	MCFG_DEVICE_MODIFY("audiocpu")
 	MCFG_CPU_PROGRAM_MAP(jujuba_audio_map)
-	MCFG_CPU_DECRYPTED_OPCODES_MAP(jujuba_audio_opcodes_map)
+	MCFG_CPU_OPCODES_MAP(jujuba_audio_opcodes_map)
 MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(toki_state::tokib)

@@ -58,7 +58,7 @@ write:
 #include "speaker.h"
 
 
-static ADDRESS_MAP_START( dday_map, AS_PROGRAM, 8, dday_state )
+ADDRESS_MAP_START(dday_state::dday_map)
 	AM_RANGE(0x0000, 0x3fff) AM_ROM
 	AM_RANGE(0x4000, 0x4000) AM_WRITE(dday_sl_control_w)
 	AM_RANGE(0x5000, 0x53ff) AM_RAM_WRITE(dday_textvideoram_w) AM_SHARE("textvideoram")

@@ -112,6 +112,10 @@ public:
 	uint8_t m_analog_select;
 	uint8_t m_analog_count;
 	void spyhuntertec(machine_config &config);
+	void spyhuntertec_map(address_map &map);
+	void spyhuntertec_portmap(address_map &map);
+	void spyhuntertec_sound_map(address_map &map);
+	void spyhuntertec_sound_portmap(address_map &map);
 };
 
 WRITE8_MEMBER(spyhuntertec_state::ay1_porta_w)
@@ -420,12 +424,12 @@ READ8_MEMBER(spyhuntertec_state::spyhuntertec_in3_r)
 	return ret;
 }
 
-static ADDRESS_MAP_START( spyhuntertec_map, AS_PROGRAM, 8, spyhuntertec_state )
+ADDRESS_MAP_START(spyhuntertec_state::spyhuntertec_map)
 	ADDRESS_MAP_UNMAP_HIGH
+	AM_RANGE(0x0000, 0xdfff) AM_ROM
+
 	AM_RANGE(0xa800, 0xa8ff) AM_RAM // the ROM is a solid fill in these areas, and they get tested as RAM, I think they moved the 'real' scroll regs here
 	AM_RANGE(0xa900, 0xa9ff) AM_RAM
-
-	AM_RANGE(0x0000, 0xdfff) AM_ROM
 
 	AM_RANGE(0xe000, 0xe7ff) AM_RAM_WRITE(spyhunt_videoram_w) AM_SHARE("videoram")
 	AM_RANGE(0xe800, 0xebff) AM_MIRROR(0x0400) AM_RAM_WRITE(spyhunt_alpharam_w) AM_SHARE("spyhunt_alpha")
@@ -453,7 +457,7 @@ WRITE8_MEMBER(spyhuntertec_state::spyhuntertec_portf0_w)
 	if ((data != 0x03) && (data != 0x08)) printf("spyhuntertec_portf0_w %02x\n", data);
 }
 
-static ADDRESS_MAP_START( spyhuntertec_portmap, AS_IO, 8, spyhuntertec_state )
+ADDRESS_MAP_START(spyhuntertec_state::spyhuntertec_portmap)
 	ADDRESS_MAP_UNMAP_HIGH
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	AM_RANGE(0x04, 0x04) AM_WRITE(spyhuntertec_port04_w)
@@ -464,7 +468,7 @@ static ADDRESS_MAP_START( spyhuntertec_portmap, AS_IO, 8, spyhuntertec_state )
 ADDRESS_MAP_END
 
 
-static ADDRESS_MAP_START( spyhuntertec_sound_map, AS_PROGRAM, 8, spyhuntertec_state )
+ADDRESS_MAP_START(spyhuntertec_state::spyhuntertec_sound_map)
 	AM_RANGE(0x0000, 0x1fff) AM_ROM
 	AM_RANGE(0x8000, 0x83ff) AM_RAM
 
@@ -477,7 +481,7 @@ WRITE8_MEMBER(spyhuntertec_state::sound_irq_ack)
 	m_audiocpu->set_input_line(INPUT_LINE_IRQ0, CLEAR_LINE);
 }
 
-static ADDRESS_MAP_START( spyhuntertec_sound_portmap, AS_IO, 8, spyhuntertec_state )
+ADDRESS_MAP_START(spyhuntertec_state::spyhuntertec_sound_portmap)
 	ADDRESS_MAP_UNMAP_HIGH
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
 

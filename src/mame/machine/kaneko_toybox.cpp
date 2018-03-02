@@ -383,18 +383,6 @@ kaneko_toybox_device::kaneko_toybox_device(const machine_config &mconfig, const 
 	m_mcu_com[0] = m_mcu_com[1] = m_mcu_com[2] = m_mcu_com[3] = 0;
 }
 
-void kaneko_toybox_device::set_table(device_t &device, int tabletype)
-{
-	kaneko_toybox_device &dev = downcast<kaneko_toybox_device &>(device);
-	dev.m_tabletype = tabletype;
-}
-
-void kaneko_toybox_device::set_game_type(device_t &device, int gametype)
-{
-	kaneko_toybox_device &dev = downcast<kaneko_toybox_device &>(device);
-	dev.m_gametype = gametype;
-}
-
 void kaneko_toybox_device::device_start()
 {
 	memset(m_mcu_com, 0, 4 * sizeof( uint16_t) );

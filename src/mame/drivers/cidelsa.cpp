@@ -141,21 +141,21 @@ WRITE8_MEMBER( draco_state::out1_w )
 
 // Destroyer
 
-static ADDRESS_MAP_START( destryer_map, AS_PROGRAM, 8, cidelsa_state )
+ADDRESS_MAP_START(cidelsa_state::destryer_map)
 	AM_RANGE(0x0000, 0x1fff) AM_ROM
 	AM_RANGE(0x2000, 0x20ff) AM_RAM AM_SHARE("nvram")
 	AM_RANGE(0xf400, 0xf7ff) AM_DEVICE(CDP1869_TAG, cdp1869_device, char_map)
 	AM_RANGE(0xf800, 0xffff) AM_DEVICE(CDP1869_TAG, cdp1869_device, page_map)
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( destryera_map, AS_PROGRAM, 8, cidelsa_state )
+ADDRESS_MAP_START(cidelsa_state::destryera_map)
 	AM_RANGE(0x0000, 0x1fff) AM_ROM
 	AM_RANGE(0x3000, 0x30ff) AM_RAM AM_SHARE("nvram")
 	AM_RANGE(0xf400, 0xf7ff) AM_DEVICE(CDP1869_TAG, cdp1869_device, char_map)
 	AM_RANGE(0xf800, 0xffff) AM_DEVICE(CDP1869_TAG, cdp1869_device, page_map)
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( destryer_io_map, AS_IO, 8, cidelsa_state )
+ADDRESS_MAP_START(cidelsa_state::destryer_io_map)
 	AM_RANGE(0x01, 0x01) AM_READ_PORT("IN0") AM_WRITE(destryer_out1_w)
 	AM_RANGE(0x02, 0x02) AM_READ_PORT("IN1")
 	AM_RANGE(0x03, 0x07) AM_WRITE(cdp1869_w)
@@ -163,14 +163,14 @@ ADDRESS_MAP_END
 
 // Altair
 
-static ADDRESS_MAP_START( altair_map, AS_PROGRAM, 8, cidelsa_state )
+ADDRESS_MAP_START(cidelsa_state::altair_map)
 	AM_RANGE(0x0000, 0x2fff) AM_ROM
 	AM_RANGE(0x3000, 0x30ff) AM_RAM AM_SHARE("nvram")
 	AM_RANGE(0xf400, 0xf7ff) AM_DEVICE(CDP1869_TAG, cdp1869_device, char_map)
 	AM_RANGE(0xf800, 0xffff) AM_DEVICE(CDP1869_TAG, cdp1869_device, page_map)
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( altair_io_map, AS_IO, 8, cidelsa_state )
+ADDRESS_MAP_START(cidelsa_state::altair_io_map)
 	AM_RANGE(0x01, 0x01) AM_DEVREAD("ic23", cdp1852_device, read) AM_DEVWRITE("ic26", cdp1852_device, write)
 	AM_RANGE(0x02, 0x02) AM_DEVREAD("ic24", cdp1852_device, read)
 	AM_RANGE(0x04, 0x04) AM_DEVREAD("ic25", cdp1852_device, read)
@@ -179,21 +179,21 @@ ADDRESS_MAP_END
 
 // Draco
 
-static ADDRESS_MAP_START( draco_map, AS_PROGRAM, 8, draco_state )
+ADDRESS_MAP_START(draco_state::draco_map)
 	AM_RANGE(0x0000, 0x3fff) AM_ROM
 	AM_RANGE(0x8000, 0x83ff) AM_RAM AM_SHARE("nvram")
 	AM_RANGE(0xf400, 0xf7ff) AM_DEVICE(CDP1869_TAG, cdp1869_device, char_map)
 	AM_RANGE(0xf800, 0xffff) AM_DEVICE(CDP1869_TAG, cdp1869_device, page_map)
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( draco_io_map, AS_IO, 8, draco_state )
+ADDRESS_MAP_START(draco_state::draco_io_map)
 	AM_RANGE(0x01, 0x01) AM_DEVREAD("ic29", cdp1852_device, read) AM_DEVWRITE("ic32", cdp1852_device, write)
 	AM_RANGE(0x02, 0x02) AM_DEVREAD("ic30", cdp1852_device, read)
 	AM_RANGE(0x04, 0x04) AM_DEVREAD("ic31", cdp1852_device, read)
 	AM_RANGE(0x03, 0x07) AM_WRITE(cdp1869_w)
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( draco_sound_map, AS_PROGRAM, 8, draco_state )
+ADDRESS_MAP_START(draco_state::draco_sound_map)
 	AM_RANGE(0x000, 0x3ff) AM_ROMBANK("bank1")
 ADDRESS_MAP_END
 
@@ -401,7 +401,7 @@ MACHINE_CONFIG_START(cidelsa_state::destryer)
 	MCFG_NVRAM_ADD_0FILL("nvram")
 
 	/* sound and video hardware */
-	MCFG_FRAGMENT_ADD(destryer_video)
+	destryer_video(config);
 MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(cidelsa_state::destryera)
@@ -416,7 +416,7 @@ MACHINE_CONFIG_START(cidelsa_state::destryera)
 	MCFG_NVRAM_ADD_0FILL("nvram")
 
 	/* sound and video hardware */
-	MCFG_FRAGMENT_ADD(destryer_video)
+	destryer_video(config);
 MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(cidelsa_state::altair)
@@ -445,7 +445,7 @@ MACHINE_CONFIG_START(cidelsa_state::altair)
 	MCFG_CDP1852_DO_CALLBACK(WRITE8(cidelsa_state, altair_out1_w))
 
 	/* sound and video hardware */
-	MCFG_FRAGMENT_ADD(altair_video)
+	altair_video(config);
 MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(draco_state::draco)
@@ -483,7 +483,7 @@ MACHINE_CONFIG_START(draco_state::draco)
 	MCFG_CDP1852_DO_CALLBACK(WRITE8(draco_state, out1_w))
 
 	/* sound and video hardware */
-	MCFG_FRAGMENT_ADD(draco_video)
+	draco_video(config);
 MACHINE_CONFIG_END
 
 /* ROMs */

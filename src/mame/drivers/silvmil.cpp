@@ -135,6 +135,8 @@ public:
 	void puzzlovek(machine_config &config);
 	void puzzlove(machine_config &config);
 	void silvmil(machine_config &config);
+	void silvmil_map(address_map &map);
+	void silvmil_sound_map(address_map &map);
 };
 
 
@@ -181,7 +183,7 @@ uint32_t silvmil_state::screen_update_silvmil(screen_device &screen, bitmap_ind1
 }
 
 
-static ADDRESS_MAP_START( silvmil_map, AS_PROGRAM, 16, silvmil_state )
+ADDRESS_MAP_START(silvmil_state::silvmil_map)
 	AM_RANGE(0x000000, 0x0fffff) AM_ROM
 
 	AM_RANGE(0x100000, 0x100001) AM_WRITE(silvmil_tilebank1_w)
@@ -388,7 +390,7 @@ void silvmil_state::machine_reset()
 }
 
 
-static ADDRESS_MAP_START( silvmil_sound_map, AS_PROGRAM, 8, silvmil_state )
+ADDRESS_MAP_START(silvmil_state::silvmil_sound_map)
 	AM_RANGE(0x0000, 0xbfff) AM_ROM
 	AM_RANGE(0xd000, 0xd7ff) AM_RAM
 	AM_RANGE(0xc000, 0xc001) AM_DEVREADWRITE("ymsnd", ym2151_device, read, write)
@@ -441,7 +443,8 @@ MACHINE_CONFIG_START(silvmil_state::silvmil)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
 MACHINE_CONFIG_END
 
-MACHINE_CONFIG_DERIVED(silvmil_state::puzzlove, silvmil)
+MACHINE_CONFIG_START(silvmil_state::puzzlove)
+	silvmil(config);
 	MCFG_DEVICE_REMOVE("audiocpu")
 	MCFG_CPU_ADD("audiocpu", Z80, XTAL(4'000'000)) /* Verified */
 	MCFG_CPU_PROGRAM_MAP(silvmil_sound_map)
@@ -454,11 +457,12 @@ MACHINE_CONFIG_DERIVED(silvmil_state::puzzlove, silvmil)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
 MACHINE_CONFIG_END
 
-MACHINE_CONFIG_DERIVED(silvmil_state::puzzlovek, puzzlove)
-		MCFG_DEVICE_REMOVE("ymsnd")
-		MCFG_YM2151_ADD("ymsnd", XTAL(15'000'000)/4) /* Verified */
-		MCFG_YM2151_IRQ_HANDLER(INPUTLINE("audiocpu", 0))
-		MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
+MACHINE_CONFIG_START(silvmil_state::puzzlovek)
+	puzzlove(config);
+	MCFG_DEVICE_REMOVE("ymsnd")
+	MCFG_YM2151_ADD("ymsnd", XTAL(15'000'000)/4) /* Verified */
+	MCFG_YM2151_IRQ_HANDLER(INPUTLINE("audiocpu", 0))
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
 MACHINE_CONFIG_END
 
 

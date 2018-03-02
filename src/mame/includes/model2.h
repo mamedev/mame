@@ -25,10 +25,8 @@ public:
 		: driver_device(mconfig, type, tag),
 		m_workram(*this, "workram"),
 		m_bufferram(*this, "bufferram"),
-		m_colorxlat(*this, "colorxlat"),
 		m_textureram0(*this, "textureram0"),
 		m_textureram1(*this, "textureram1"),
-		m_lumaram(*this, "lumaram"),
 		m_fbvram1(*this, "fbvram1"),
 		m_fbvram2(*this, "fbvram2"),
 		m_soundram(*this, "soundram"),
@@ -62,10 +60,10 @@ public:
 	required_shared_ptr<uint32_t> m_workram;
 	required_shared_ptr<uint32_t> m_bufferram;
 	std::unique_ptr<uint16_t[]> m_palram;
-	required_shared_ptr<uint32_t> m_colorxlat;
+	std::unique_ptr<uint16_t[]> m_colorxlat;
 	required_shared_ptr<uint32_t> m_textureram0;
 	required_shared_ptr<uint32_t> m_textureram1;
-	required_shared_ptr<uint32_t> m_lumaram;
+	std::unique_ptr<uint16_t[]> m_lumaram;
 	required_shared_ptr<uint32_t> m_fbvram1;
 	required_shared_ptr<uint32_t> m_fbvram2;
 	optional_shared_ptr<uint16_t> m_soundram;
@@ -132,7 +130,6 @@ public:
 	uint32_t m_geo_iop_data;
 	int m_to_68k;
 
-	int m_maxxstate;
 	uint32_t m_geo_read_start_address;
 	uint32_t m_geo_write_start_address;
 	model2_renderer *m_poly;
@@ -147,17 +144,17 @@ public:
 	uint8_t m_lightgun_mux;
 
 	DECLARE_READ8_MEMBER(model2_crx_in_r);
-	DECLARE_CUSTOM_INPUT_MEMBER(srallyc_gearbox_r);
+	DECLARE_CUSTOM_INPUT_MEMBER(daytona_gearbox_r);
 	DECLARE_CUSTOM_INPUT_MEMBER(rchase2_devices_r);
 	DECLARE_READ32_MEMBER(timers_r);
 	DECLARE_WRITE32_MEMBER(timers_w);
-	DECLARE_READ16_MEMBER(model2_palette_r);
-	DECLARE_WRITE16_MEMBER(model2_palette_w);
+	DECLARE_READ16_MEMBER(palette_r);
+	DECLARE_WRITE16_MEMBER(palette_w);
+	DECLARE_READ16_MEMBER(colorxlat_r);
+	DECLARE_WRITE16_MEMBER(colorxlat_w);
 	DECLARE_WRITE32_MEMBER(ctrl0_w);
 	DECLARE_WRITE32_MEMBER(analog_2b_w);
 	DECLARE_READ32_MEMBER(fifoctl_r);
-	DECLARE_READ32_MEMBER(model2o_fifoctrl_r);
-	DECLARE_READ8_MEMBER(model2o_in_r);
 	DECLARE_READ32_MEMBER(videoctl_r);
 	DECLARE_WRITE32_MEMBER(videoctl_w);
 	DECLARE_WRITE32_MEMBER(rchase2_devices_w);
@@ -177,7 +174,6 @@ public:
 	DECLARE_WRITE32_MEMBER(geo_w);
 	DECLARE_READ8_MEMBER(hotd_lightgun_r);
 	DECLARE_WRITE32_MEMBER(hotd_lightgun_w);
-	DECLARE_READ32_MEMBER(daytona_unk_r);
 	DECLARE_READ32_MEMBER(model2_irq_r);
 	DECLARE_WRITE32_MEMBER(model2_irq_w);
 	DECLARE_READ32_MEMBER(model2_serial_r);
@@ -187,13 +183,14 @@ public:
 	DECLARE_WRITE32_MEMBER(model2_5881prot_w);
 	int first_read;
 
-	void model2_3d_init(uint16_t *texture_rom);
-	void geo_init(uint32_t *polygon_rom);
-	DECLARE_READ32_MEMBER(maxx_r);
-	DECLARE_WRITE32_MEMBER(mode_w);
+	void raster_init(memory_region *texture_rom);
+	void geo_init(memory_region *polygon_rom);
+	DECLARE_READ32_MEMBER(render_mode_r);
+	DECLARE_WRITE32_MEMBER(render_mode_w);
 	DECLARE_WRITE32_MEMBER(model2o_tex_w0);
 	DECLARE_WRITE32_MEMBER(model2o_tex_w1);
-	DECLARE_WRITE32_MEMBER(model2o_luma_w);
+	DECLARE_READ16_MEMBER(lumaram_r);
+	DECLARE_WRITE16_MEMBER(lumaram_w);
 	DECLARE_WRITE32_MEMBER(model2_3d_zclip_w);
 	DECLARE_WRITE16_MEMBER(model2snd_ctrl);
 	DECLARE_READ32_MEMBER(copro_sharc_input_fifo_r);
@@ -214,7 +211,6 @@ public:
 	DECLARE_DRIVER_INIT(pltkids);
 	DECLARE_DRIVER_INIT(rchase2);
 	DECLARE_DRIVER_INIT(genprot);
-	DECLARE_DRIVER_INIT(daytonam);
 	DECLARE_DRIVER_INIT(manxttdx);
 	DECLARE_DRIVER_INIT(srallyc);
 	DECLARE_DRIVER_INIT(doa);
@@ -230,6 +226,7 @@ public:
 	DECLARE_MACHINE_RESET(model2_common);
 	DECLARE_MACHINE_RESET(model2_scsp);
 	uint32_t screen_update_model2(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
+	DECLARE_WRITE_LINE_MEMBER(screen_vblank_model2);
 	TIMER_DEVICE_CALLBACK_MEMBER(model2_timer_cb);
 	TIMER_DEVICE_CALLBACK_MEMBER(model2_interrupt);
 	TIMER_DEVICE_CALLBACK_MEMBER(model2c_interrupt);
@@ -247,28 +244,140 @@ public:
 	uint32_t copro_fifoout_pop(address_space &space, uint32_t offset, uint32_t mem_mask);
 	void copro_fifoout_push(device_t *device, uint32_t data,uint32_t offset,uint32_t mem_mask);
 
+	void model2_3d_frame_start( void );
+	void geo_parse( void );
 	void model2_3d_frame_end( bitmap_rgb32 &bitmap, const rectangle &cliprect );
 
+	void model2_timers(machine_config &config);
+	void model2_screen(machine_config &config);
+
+	void sj25_0207_01(machine_config &config);
+	void copro_sharc_map(address_map &map);
+	void copro_tgp_map(address_map &map);
+	void copro_tgpx4_map(address_map &map);
+	void drive_io_map(address_map &map);
+	void drive_map(address_map &map);
+	void geo_sharc_map(address_map &map);
+	void model2_base_mem(address_map &map);
+	void model2_snd(address_map &map);
+
+	uint8_t m_gamma_table[256];
+
+protected:
+	virtual void video_start() override;
+
+private:
+	bool m_render_unk;
+	bool m_render_mode;
+};
+
+/*****************************
+ *
+ * Model 2
+ *
+ *****************************/
+
+class model2o_state : public model2_state
+{
+public:
+	model2o_state(const machine_config &mconfig, device_type type, const char *tag)
+		: model2_state(mconfig, type, tag)
+	{}
+
+	DECLARE_READ32_MEMBER(daytona_unk_r);
+	DECLARE_READ8_MEMBER(model2o_in_r);
+	DECLARE_READ32_MEMBER(fifoctrl_r);
+
 	void daytona(machine_config &config);
-	void indy500(machine_config &config);
+	void model2o(machine_config &config);
+	void model2o_mem(address_map &map);
+};
+
+/*****************************
+ *
+ * Daytona To The Maxx
+ *
+ *****************************/
+
+class model2o_maxx_state : public model2o_state
+{
+public:
+	model2o_maxx_state(const machine_config &mconfig, device_type type, const char *tag)
+		: model2o_state(mconfig, type, tag)
+	{}
+
+	DECLARE_READ32_MEMBER(maxx_r);
+	void daytona_maxx(machine_config &config);
+	void model2o_maxx_mem(address_map &map);
+
+private:
+	int m_maxxstate;
+};
+
+/*****************************
+ *
+ * Model 2A
+ *
+ *****************************/
+
+class model2a_state : public model2_state
+{
+public:
+	model2a_state(const machine_config &mconfig, device_type type, const char *tag)
+		: model2_state(mconfig, type, tag)
+	{}
+
 	void manxtt(machine_config &config);
 	void manxttdx(machine_config &config);
 	void model2a(machine_config &config);
 	void model2a_0229(machine_config &config);
 	void model2a_5881(machine_config &config);
+	void srallyc(machine_config &config);
+	void model2a_crx_mem(address_map &map);
+};
+
+/*****************************
+ *
+ * Model 2B
+ *
+ *****************************/
+
+class model2b_state : public model2_state
+{
+public:
+	model2b_state(const machine_config &mconfig, device_type type, const char *tag)
+		: model2_state(mconfig, type, tag)
+	{}
+
 	void model2b(machine_config &config);
 	void model2b_0229(machine_config &config);
 	void model2b_5881(machine_config &config);
-	void model2c(machine_config &config);
-	void model2c_5881(machine_config &config);
-	void model2o(machine_config &config);
-	void overrev2c(machine_config &config);
+	void indy500(machine_config &config);
 	void rchase2(machine_config &config);
-	void sj25_0207_01(machine_config &config);
-	void srallyc(machine_config &config);
-	void stcc(machine_config &config);
+	void model2b_crx_mem(address_map &map);
+	void rchase2_iocpu_map(address_map &map);
+	void rchase2_ioport_map(address_map &map);
 };
 
+/*****************************
+ *
+ * Model 2C
+ *
+ *****************************/
+
+class model2c_state : public model2_state
+{
+public:
+	model2c_state(const machine_config &mconfig, device_type type, const char *tag)
+		: model2_state(mconfig, type, tag)
+	{}
+
+	void model2c(machine_config &config);
+	void model2c_5881(machine_config &config);
+	void overrev2c(machine_config &config);
+	void stcc(machine_config &config);
+	void model2c_crx_mem(address_map &map);
+};
 
 /*****************************
  *
@@ -311,16 +420,16 @@ static inline uint16_t get_texel( uint32_t base_x, uint32_t base_y, int x, int y
 
 struct triangle;
 
-class model2_renderer : public poly_manager<float, m2_poly_extra_data, 4, 4000>
+class model2_renderer : public poly_manager<float, m2_poly_extra_data, 4, 32768>
 {
 public:
 	typedef void (model2_renderer::*scanline_render_func)(int32_t scanline, const extent_t& extent, const m2_poly_extra_data& object, int threadid);
 
 public:
 	model2_renderer(model2_state& state)
-		: poly_manager<float, m2_poly_extra_data, 4, 4000>(state.machine())
+		: poly_manager<float, m2_poly_extra_data, 4, 32768>(state.machine())
 		, m_state(state)
-		, m_destmap(state.m_screen->width(), state.m_screen->height())
+		, m_destmap(512, 512)
 	{
 		m_renderfuncs[0] = &model2_renderer::model2_3d_render_0;
 		m_renderfuncs[1] = &model2_renderer::model2_3d_render_1;

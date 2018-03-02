@@ -276,10 +276,10 @@ WRITE8_MEMBER(cloud9_state::nvram_store_w)
  *
  *************************************/
 
-static ADDRESS_MAP_START( cloud9_map, AS_PROGRAM, 8, cloud9_state )
+ADDRESS_MAP_START(cloud9_state::cloud9_map)
+	AM_RANGE(0x0000, 0x4fff) AM_ROMBANK("bank1") AM_WRITE(cloud9_videoram_w)
 	AM_RANGE(0x0000, 0x0001) AM_WRITE(cloud9_bitmode_addr_w)
 	AM_RANGE(0x0002, 0x0002) AM_READWRITE(cloud9_bitmode_r, cloud9_bitmode_w)
-	AM_RANGE(0x0000, 0x4fff) AM_ROMBANK("bank1") AM_WRITE(cloud9_videoram_w)
 	AM_RANGE(0x5000, 0x53ff) AM_RAM AM_SHARE("spriteram")
 	AM_RANGE(0x5400, 0x547f) AM_DEVWRITE("watchdog", watchdog_timer_device, reset_w)
 	AM_RANGE(0x5480, 0x54ff) AM_WRITE(irq_ack_w)

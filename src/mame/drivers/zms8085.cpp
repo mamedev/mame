@@ -33,6 +33,8 @@ public:
 	DECLARE_READ8_MEMBER(special_r);
 
 	void zephyr(machine_config &config);
+	void io_map(address_map &map);
+	void mem_map(address_map &map);
 private:
 	required_device<cpu_device> m_maincpu;
 	required_device<screen_device> m_screen;
@@ -71,12 +73,12 @@ READ8_MEMBER(zms8085_state::special_r)
 }
 
 
-static ADDRESS_MAP_START( mem_map, AS_PROGRAM, 8, zms8085_state )
+ADDRESS_MAP_START(zms8085_state::mem_map)
 	AM_RANGE(0x0000, 0x0fff) AM_ROM AM_REGION("maincpu", 0) AM_WRITENOP
 	AM_RANGE(0x1000, 0x1fff) AM_RAM AM_SHARE("mainram")
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( io_map, AS_PROGRAM, 8, zms8085_state )
+ADDRESS_MAP_START(zms8085_state::io_map)
 	AM_RANGE(0x61, 0x61) AM_READ(special_r)
 	AM_RANGE(0x68, 0x68) AM_WRITENOP
 ADDRESS_MAP_END

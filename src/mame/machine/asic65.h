@@ -24,8 +24,8 @@ class asic65_device : public device_t
 public:
 	asic65_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
-	// (static) configuration helpers
-	static void set_type(device_t &device, int type) { downcast<asic65_device &>(device).m_asic65_type = type; }
+	// configuration helpers
+	void set_type(int type) { m_asic65_type = type; }
 
 	void reset_line(int state);
 	DECLARE_WRITE16_MEMBER( data_w );
@@ -42,6 +42,8 @@ public:
 		TIMER_M68K_ASIC65_DEFERRED_W
 	};
 
+	void asic65_io_map(address_map &map);
+	void asic65_program_map(address_map &map);
 protected:
 	// device-level overrides
 	virtual void device_start() override;
@@ -77,6 +79,6 @@ DECLARE_DEVICE_TYPE(ASIC65, asic65_device)
 
 #define MCFG_ASIC65_ADD(_tag, _type) \
 	MCFG_DEVICE_ADD(_tag, ASIC65, 0) \
-	asic65_device::set_type(*device, _type);
+	downcast<asic65_device &>(*device).set_type(_type);
 
 #endif // MAME_MACHINE_ASIC65_H

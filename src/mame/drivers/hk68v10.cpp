@@ -210,6 +210,7 @@ virtual void machine_start () override;
 virtual void machine_reset () override;
 
 void hk68v10(machine_config &config);
+void hk68v10_mem(address_map &map);
 protected:
 
 private:
@@ -221,10 +222,10 @@ required_device<scc8530_device> m_sccterm;
 	uint16_t  m_sysram[4];
 };
 
-static ADDRESS_MAP_START (hk68v10_mem, AS_PROGRAM, 16, hk68v10_state)
+ADDRESS_MAP_START(hk68v10_state::hk68v10_mem)
 ADDRESS_MAP_UNMAP_HIGH
-AM_RANGE (0x000000, 0x000007) AM_ROM AM_READ  (bootvect_r)       /* ROM mirror just durin reset */
 AM_RANGE (0x000000, 0x000007) AM_RAM AM_WRITE (bootvect_w)       /* After first write we act as RAM */
+AM_RANGE (0x000000, 0x000007) AM_ROM AM_READ  (bootvect_r)       /* ROM mirror just durin reset */
 AM_RANGE (0x000008, 0x1fffff) AM_RAM /* 2 Mb RAM */
 AM_RANGE (0xFC0000, 0xFC3fff) AM_ROM /* System EPROM Area 16Kb HBUG */
 AM_RANGE (0xFC4000, 0xFDffff) AM_ROM /* System EPROM Area an additional 112Kb for System ROM */

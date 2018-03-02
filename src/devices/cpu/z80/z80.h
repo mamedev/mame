@@ -247,7 +247,7 @@ protected:
 	direct_read_data<0> *m_direct;
 	direct_read_data<0> *m_decrypted_opcodes_direct;
 	devcb_write_line m_irqack_cb;
-	devcb_write16 m_refresh_cb;
+	devcb_write8 m_refresh_cb;
 	devcb_write_line m_halt_cb;
 
 	PAIR            m_prvpc;

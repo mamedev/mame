@@ -109,7 +109,7 @@ WRITE16_MEMBER(oneshot_state::soundbank_w)
 
 
 
-static ADDRESS_MAP_START( oneshot_map, AS_PROGRAM, 16, oneshot_state )
+ADDRESS_MAP_START(oneshot_state::oneshot_map)
 	AM_RANGE(0x000000, 0x03ffff) AM_ROM
 	AM_RANGE(0x080000, 0x087fff) AM_RAM
 	AM_RANGE(0x0c0000, 0x0c07ff) AM_RAM_DEVWRITE("palette", palette_device, write16) AM_SHARE("palette")
@@ -132,7 +132,7 @@ static ADDRESS_MAP_START( oneshot_map, AS_PROGRAM, 16, oneshot_state )
 	AM_RANGE(0x19c034, 0x19c035) AM_READ_PORT("P2")
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( oneshot_sound_map, AS_PROGRAM, 8, oneshot_state )
+ADDRESS_MAP_START(oneshot_state::oneshot_sound_map)
 	AM_RANGE(0x0000, 0x7fff) AM_ROM
 	AM_RANGE(0x8000, 0x8000) AM_DEVREADWRITE("soundlatch", generic_latch_8_device, read, write)
 	AM_RANGE(0x8001, 0x87ff) AM_RAM
@@ -396,7 +396,8 @@ MACHINE_CONFIG_START(oneshot_state::oneshot)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 MACHINE_CONFIG_END
 
-MACHINE_CONFIG_DERIVED(oneshot_state::maddonna, oneshot)
+MACHINE_CONFIG_START(oneshot_state::maddonna)
+	oneshot(config);
 
 	/* basic machine hardware */
 

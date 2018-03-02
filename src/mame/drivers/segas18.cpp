@@ -125,12 +125,12 @@ void segas18_state::memory_mapper(sega_315_5195_mapper_device &mapper, uint8_t i
  *
  *************************************/
 
-uint8_t segas18_state::mapper_sound_r()
+READ8_MEMBER(segas18_state::mapper_sound_r)
 {
 	return m_mcu_data;
 }
 
-void segas18_state::mapper_sound_w(uint8_t data)
+WRITE8_MEMBER(segas18_state::mapper_sound_w)
 {
 	m_soundlatch->write(m_soundcpu->space(AS_PROGRAM), 0, data & 0xff);
 	m_soundcpu->set_input_line(INPUT_LINE_NMI, PULSE_LINE);
@@ -632,7 +632,7 @@ WRITE8_MEMBER( segas18_state::mcu_data_w )
  *
  *************************************/
 
-static ADDRESS_MAP_START( system18_map, AS_PROGRAM, 16, segas18_state )
+ADDRESS_MAP_START(segas18_state::system18_map)
 	ADDRESS_MAP_UNMAP_HIGH
 	AM_RANGE(0x000000, 0xffffff) AM_DEVREADWRITE8("mapper", sega_315_5195_mapper_device, read, write, 0x00ff)
 
@@ -645,7 +645,7 @@ static ADDRESS_MAP_START( system18_map, AS_PROGRAM, 16, segas18_state )
 	AM_RANGE(0x500000, 0x503fff) AM_RAM AM_SHARE("workram")
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( decrypted_opcodes_map, AS_OPCODES, 16, segas18_state )
+ADDRESS_MAP_START(segas18_state::decrypted_opcodes_map)
 	AM_RANGE(0x00000, 0xfffff) AM_ROMBANK("fd1094_decrypted_opcodes")
 ADDRESS_MAP_END
 
@@ -655,7 +655,7 @@ ADDRESS_MAP_END
  *
  *************************************/
 
-static ADDRESS_MAP_START( sound_map, AS_PROGRAM, 8, segas18_state )
+ADDRESS_MAP_START(segas18_state::sound_map)
 	ADDRESS_MAP_UNMAP_HIGH
 	AM_RANGE(0x0000, 0x9fff) AM_ROM AM_REGION("soundcpu", 0x10000)
 	AM_RANGE(0xa000, 0xbfff) AM_ROMBANK("soundbank")
@@ -664,7 +664,7 @@ static ADDRESS_MAP_START( sound_map, AS_PROGRAM, 8, segas18_state )
 	AM_RANGE(0xe000, 0xffff) AM_RAM
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( sound_portmap, AS_IO, 8, segas18_state )
+ADDRESS_MAP_START(segas18_state::sound_portmap)
 	ADDRESS_MAP_UNMAP_HIGH
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	AM_RANGE(0x80, 0x83) AM_MIRROR(0x0c) AM_DEVREADWRITE("ym1", ym3438_device, read, write)
@@ -681,7 +681,7 @@ ADDRESS_MAP_END
  *
  *************************************/
 
-static ADDRESS_MAP_START( mcu_io_map, AS_IO, 8, segas18_state )
+ADDRESS_MAP_START(segas18_state::mcu_io_map)
 	ADDRESS_MAP_UNMAP_HIGH
 	// port 2 not used for high order address byte
 	AM_RANGE(0x0000, 0x001f) AM_MIRROR(0xff00) AM_DEVREADWRITE("mapper", sega_315_5195_mapper_device, read, write)
@@ -1332,7 +1332,9 @@ MACHINE_CONFIG_START(segas18_state::system18)
 
 	MCFG_NVRAM_ADD_0FILL("nvram")
 
-	MCFG_SEGA_315_5195_MAPPER_ADD("mapper", "maincpu", segas18_state, memory_mapper, mapper_sound_r, mapper_sound_w)
+	MCFG_SEGA_315_5195_MAPPER_ADD("mapper", "maincpu", segas18_state, memory_mapper)
+	MCFG_SEGA_315_5195_SOUND_READ_CALLBACK(READ8(segas18_state, mapper_sound_r))
+	MCFG_SEGA_315_5195_SOUND_WRITE_CALLBACK(WRITE8(segas18_state, mapper_sound_w))
 
 	MCFG_DEVICE_ADD("io", SEGA_315_5296, 16000000)
 	MCFG_315_5296_IN_PORTA_CB(IOPORT("P1"))
@@ -1389,30 +1391,34 @@ MACHINE_CONFIG_START(segas18_state::system18)
 MACHINE_CONFIG_END
 
 
-MACHINE_CONFIG_DERIVED(segas18_state::system18_fd1094, system18)
+MACHINE_CONFIG_START(segas18_state::system18_fd1094)
+	system18(config);
 
 	// basic machine hardware
 	MCFG_CPU_REPLACE("maincpu", FD1094, 10000000)
 	MCFG_CPU_PROGRAM_MAP(system18_map)
-	MCFG_CPU_DECRYPTED_OPCODES_MAP(decrypted_opcodes_map)
+	MCFG_CPU_OPCODES_MAP(decrypted_opcodes_map)
 	MCFG_CPU_VBLANK_INT_DRIVER("screen", segas18_state, irq4_line_hold)
 MACHINE_CONFIG_END
 
-MACHINE_CONFIG_DERIVED(segas18_state::lghost_fd1094, system18_fd1094)
+MACHINE_CONFIG_START(segas18_state::lghost_fd1094)
+	system18_fd1094(config);
 
 	// basic machine hardware
 	MCFG_DEVICE_MODIFY("io")
 	MCFG_315_5296_OUT_PORTC_CB(WRITE8(segas18_state, lghost_gun_recoil_w))
 MACHINE_CONFIG_END
 
-MACHINE_CONFIG_DERIVED(segas18_state::lghost, system18)
+MACHINE_CONFIG_START(segas18_state::lghost)
+	system18(config);
 
 	// basic machine hardware
 	MCFG_DEVICE_MODIFY("io")
 	MCFG_315_5296_OUT_PORTC_CB(WRITE8(segas18_state, lghost_gun_recoil_w))
 MACHINE_CONFIG_END
 
-MACHINE_CONFIG_DERIVED(segas18_state::wwally_fd1094, system18_fd1094)
+MACHINE_CONFIG_START(segas18_state::wwally_fd1094)
+	system18_fd1094(config);
 	MCFG_DEVICE_ADD("upd1", UPD4701A, 0)
 	MCFG_UPD4701_PORTX("TRACKX1")
 	MCFG_UPD4701_PORTY("TRACKY1")
@@ -1426,7 +1432,8 @@ MACHINE_CONFIG_DERIVED(segas18_state::wwally_fd1094, system18_fd1094)
 	MCFG_UPD4701_PORTY("TRACKY3")
 MACHINE_CONFIG_END
 
-MACHINE_CONFIG_DERIVED(segas18_state::wwally, system18)
+MACHINE_CONFIG_START(segas18_state::wwally)
+	system18(config);
 	MCFG_DEVICE_ADD("upd1", UPD4701A, 0)
 	MCFG_UPD4701_PORTX("TRACKX1")
 	MCFG_UPD4701_PORTY("TRACKY1")
@@ -1440,7 +1447,8 @@ MACHINE_CONFIG_DERIVED(segas18_state::wwally, system18)
 	MCFG_UPD4701_PORTY("TRACKY3")
 MACHINE_CONFIG_END
 
-MACHINE_CONFIG_DERIVED(segas18_state::system18_i8751, system18)
+MACHINE_CONFIG_START(segas18_state::system18_i8751)
+	system18(config);
 
 	// basic machine hardware
 	MCFG_CPU_MODIFY("maincpu")
@@ -1451,7 +1459,8 @@ MACHINE_CONFIG_DERIVED(segas18_state::system18_i8751, system18)
 	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", segas18_state, irq0_line_hold)
 MACHINE_CONFIG_END
 
-MACHINE_CONFIG_DERIVED(segas18_state::system18_fd1094_i8751, system18_fd1094)
+MACHINE_CONFIG_START(segas18_state::system18_fd1094_i8751)
+	system18_fd1094(config);
 
 	// basic machine hardware
 	MCFG_CPU_MODIFY("maincpu")

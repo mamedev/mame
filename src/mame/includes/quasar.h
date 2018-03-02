@@ -33,4 +33,9 @@ public:
 	uint32_t screen_update_quasar(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	INTERRUPT_GEN_MEMBER(quasar_interrupt);
 	void quasar(machine_config &config);
+	void quasar(address_map &map);
+	void quasar_data(address_map &map);
+	void quasar_io(address_map &map);
+	void sound_map(address_map &map);
+	void sound_portmap(address_map &map);
 };

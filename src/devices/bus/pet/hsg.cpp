@@ -69,7 +69,7 @@ const tiny_rom_entry *cbm8000_hsg_device::device_rom_region() const
 //  ADDRESS_MAP( hsg_a_map )
 //-------------------------------------------------
 
-static ADDRESS_MAP_START( hsg_a_map, 0, 8, cbm8000_hsg_a_device )
+ADDRESS_MAP_START(cbm8000_hsg_a_device::hsg_a_map)
 	ADDRESS_MAP_GLOBAL_MASK(0x7fff)
 	AM_RANGE(0x0000, 0x7fff) AM_RAM
 ADDRESS_MAP_END
@@ -79,7 +79,7 @@ ADDRESS_MAP_END
 //  ADDRESS_MAP( hsg_b_map )
 //-------------------------------------------------
 
-static ADDRESS_MAP_START( hsg_b_map, 0, 8, cbm8000_hsg_b_device )
+ADDRESS_MAP_START(cbm8000_hsg_b_device::hsg_b_map)
 	ADDRESS_MAP_GLOBAL_MASK(0x3fff)
 	AM_RANGE(0x0000, 0x3fff) AM_RAM
 ADDRESS_MAP_END

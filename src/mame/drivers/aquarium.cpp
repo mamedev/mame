@@ -99,7 +99,7 @@ WRITE8_MEMBER(aquarium_state::aquarium_oki_w)
 
 
 
-static ADDRESS_MAP_START( main_map, AS_PROGRAM, 16, aquarium_state )
+ADDRESS_MAP_START(aquarium_state::main_map)
 	AM_RANGE(0x000000, 0x07ffff) AM_ROM
 	AM_RANGE(0xc00000, 0xc00fff) AM_RAM_WRITE(aquarium_mid_videoram_w) AM_SHARE("mid_videoram")
 	AM_RANGE(0xc01000, 0xc01fff) AM_RAM_WRITE(aquarium_bak_videoram_w) AM_SHARE("bak_videoram")
@@ -117,13 +117,13 @@ static ADDRESS_MAP_START( main_map, AS_PROGRAM, 16, aquarium_state )
 	AM_RANGE(0xff0000, 0xffffff) AM_RAM
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( snd_map, AS_PROGRAM, 8, aquarium_state )
+ADDRESS_MAP_START(aquarium_state::snd_map)
 	AM_RANGE(0x0000, 0x3fff) AM_ROM
 	AM_RANGE(0x7800, 0x7fff) AM_RAM
 	AM_RANGE(0x8000, 0xffff) AM_ROMBANK("bank1")
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( snd_portmap, AS_IO, 8, aquarium_state )
+ADDRESS_MAP_START(aquarium_state::snd_portmap)
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	AM_RANGE(0x00, 0x01) AM_DEVREADWRITE("ymsnd", ym2151_device, read, write)
 	AM_RANGE(0x02, 0x02) AM_READWRITE(aquarium_oki_r, aquarium_oki_w)

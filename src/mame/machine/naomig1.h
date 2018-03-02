@@ -23,7 +23,7 @@ public:
 	template <class Object> void set_irq_cb(Object &&cb) { irq_cb.set_callback(std::forward<Object>(cb)); }
 	void set_dma_cb(dma_cb cb) { _dma_cb = cb; }
 
-	DECLARE_ADDRESS_MAP(amap, 32);
+	void amap(address_map &map);
 
 	DECLARE_READ32_MEMBER(sb_gdstar_r);   // 5f7404
 	DECLARE_WRITE32_MEMBER(sb_gdstar_w);  // 5f7404

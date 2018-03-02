@@ -283,11 +283,11 @@ WRITE8_MEMBER( liberatr_state::earom_control_w )
  *
  *************************************/
 
-static ADDRESS_MAP_START( liberatr_map, AS_PROGRAM, 8, liberatr_state )
+ADDRESS_MAP_START(liberatr_state::liberatr_map)
+	AM_RANGE(0x0000, 0x3fff) AM_RAM_WRITE(bitmap_w) AM_SHARE("bitmapram")   /* overlapping for my convenience */
 	AM_RANGE(0x0000, 0x0000) AM_RAM AM_SHARE("xcoord")
 	AM_RANGE(0x0001, 0x0001) AM_RAM AM_SHARE("ycoord")
 	AM_RANGE(0x0002, 0x0002) AM_READWRITE(bitmap_xy_r, bitmap_xy_w)
-	AM_RANGE(0x0000, 0x3fff) AM_RAM_WRITE(bitmap_w) AM_SHARE("bitmapram")   /* overlapping for my convenience */
 	AM_RANGE(0x4000, 0x403f) AM_READ(earom_r)
 	AM_RANGE(0x5000, 0x5000) AM_READ(port0_r)
 	AM_RANGE(0x5001, 0x5001) AM_READ_PORT("IN1")
@@ -313,11 +313,11 @@ ADDRESS_MAP_END
  *
  *************************************/
 
-static ADDRESS_MAP_START( liberat2_map, AS_PROGRAM, 8, liberatr_state )
+ADDRESS_MAP_START(liberatr_state::liberat2_map)
+	AM_RANGE(0x0000, 0x3fff) AM_RAM_WRITE(bitmap_w) AM_SHARE("bitmapram")   /* overlapping for my convenience */
 	AM_RANGE(0x0000, 0x0000) AM_RAM AM_SHARE("xcoord")
 	AM_RANGE(0x0001, 0x0001) AM_RAM AM_SHARE("ycoord")
 	AM_RANGE(0x0002, 0x0002) AM_READWRITE(bitmap_xy_r, bitmap_xy_w)
-	AM_RANGE(0x0000, 0x3fff) AM_RAM_WRITE(bitmap_w) AM_SHARE("bitmapram")   /* overlapping for my convenience */
 	AM_RANGE(0x4000, 0x4000) AM_READ(port0_r)
 	AM_RANGE(0x4001, 0x4001) AM_READ_PORT("IN1")
 	AM_RANGE(0x4000, 0x400f) AM_WRITEONLY AM_SHARE("base_ram")
@@ -471,7 +471,8 @@ MACHINE_CONFIG_START(liberatr_state::liberatr)
 MACHINE_CONFIG_END
 
 
-MACHINE_CONFIG_DERIVED(liberatr_state::liberat2, liberatr)
+MACHINE_CONFIG_START(liberatr_state::liberat2)
+	liberatr(config);
 
 	/* basic machine hardware */
 	MCFG_CPU_MODIFY("maincpu")

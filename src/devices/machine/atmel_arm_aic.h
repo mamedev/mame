@@ -27,31 +27,7 @@ public:
 	// configuration
 	template <class Object> static devcb_base &set_line_callback(device_t &device, Object &&cb) { return downcast<arm_aic_device &>(device).m_irq_out.set_callback(std::forward<Object>(cb)); }
 
-	DECLARE_ADDRESS_MAP(regs_map, 32);
-
-	DECLARE_READ32_MEMBER(irq_vector_r);
-	DECLARE_READ32_MEMBER(firq_vector_r);
-	DECLARE_READ32_MEMBER(aic_isr_r) { return m_status; };
-	DECLARE_READ32_MEMBER(aic_cisr_r) { return m_core_status; };
-	DECLARE_READ32_MEMBER(aic_ipr_r) { return m_irqs_pending; };
-	DECLARE_READ32_MEMBER(aic_imr_r) { return m_irqs_enabled; };
-	DECLARE_READ32_MEMBER(aic_ffsr_r) { return m_fast_irqs; };
-
-	// can't use AM_RAM and AM_SHARE in device submaps
-	DECLARE_READ32_MEMBER(aic_smr_r) { return m_aic_smr[offset]; };
-	DECLARE_READ32_MEMBER(aic_svr_r) { return m_aic_svr[offset]; };
-	DECLARE_WRITE32_MEMBER(aic_smr_w) { COMBINE_DATA(&m_aic_smr[offset]); };
-	DECLARE_WRITE32_MEMBER(aic_svr_w) { COMBINE_DATA(&m_aic_svr[offset]); };
-	DECLARE_WRITE32_MEMBER(aic_spu_w) { COMBINE_DATA(&m_spurious_vector); };
-	DECLARE_WRITE32_MEMBER(aic_dcr_w) { COMBINE_DATA(&m_debug); check_irqs(); };
-	DECLARE_WRITE32_MEMBER(aic_ffer_w) { m_fast_irqs |= data & mem_mask; check_irqs(); };
-	DECLARE_WRITE32_MEMBER(aic_ffdr_w) { m_fast_irqs &= ~(data & mem_mask) | 1; check_irqs(); };
-
-	DECLARE_WRITE32_MEMBER(aic_iecr_w) { m_irqs_enabled |= data & mem_mask; check_irqs(); };
-	DECLARE_WRITE32_MEMBER(aic_idcr_w) { m_irqs_enabled &= ~(data & mem_mask); check_irqs(); };
-	DECLARE_WRITE32_MEMBER(aic_iccr_w) { m_irqs_pending &= ~(data & mem_mask); check_irqs(); };
-	DECLARE_WRITE32_MEMBER(aic_iscr_w) { m_irqs_pending |= data & mem_mask; check_irqs(); };
-	DECLARE_WRITE32_MEMBER(aic_eoicr_w) { m_status = 0; pop_level(); check_irqs(); };
+	void regs_map(address_map &map);
 
 	void set_irq(int line, int state);
 
@@ -82,6 +58,30 @@ private:
 	void push_level(int lvl) { m_level_stack[++m_lvlidx] = lvl; };
 	void pop_level() { if (m_lvlidx) --m_lvlidx; };
 	int get_level() { return m_level_stack[m_lvlidx]; };
+
+	DECLARE_READ32_MEMBER(irq_vector_r);
+	DECLARE_READ32_MEMBER(firq_vector_r);
+	DECLARE_READ32_MEMBER(aic_isr_r) { return m_status; };
+	DECLARE_READ32_MEMBER(aic_cisr_r) { return m_core_status; };
+	DECLARE_READ32_MEMBER(aic_ipr_r) { return m_irqs_pending; };
+	DECLARE_READ32_MEMBER(aic_imr_r) { return m_irqs_enabled; };
+	DECLARE_READ32_MEMBER(aic_ffsr_r) { return m_fast_irqs; };
+
+	// can't use AM_RAM and AM_SHARE in device submaps
+	DECLARE_READ32_MEMBER(aic_smr_r) { return m_aic_smr[offset]; };
+	DECLARE_READ32_MEMBER(aic_svr_r) { return m_aic_svr[offset]; };
+	DECLARE_WRITE32_MEMBER(aic_smr_w) { COMBINE_DATA(&m_aic_smr[offset]); };
+	DECLARE_WRITE32_MEMBER(aic_svr_w) { COMBINE_DATA(&m_aic_svr[offset]); };
+	DECLARE_WRITE32_MEMBER(aic_spu_w) { COMBINE_DATA(&m_spurious_vector); };
+	DECLARE_WRITE32_MEMBER(aic_dcr_w) { COMBINE_DATA(&m_debug); check_irqs(); };
+	DECLARE_WRITE32_MEMBER(aic_ffer_w) { m_fast_irqs |= data & mem_mask; check_irqs(); };
+	DECLARE_WRITE32_MEMBER(aic_ffdr_w) { m_fast_irqs &= ~(data & mem_mask) | 1; check_irqs(); };
+
+	DECLARE_WRITE32_MEMBER(aic_iecr_w) { m_irqs_enabled |= data & mem_mask; check_irqs(); };
+	DECLARE_WRITE32_MEMBER(aic_idcr_w) { m_irqs_enabled &= ~(data & mem_mask); check_irqs(); };
+	DECLARE_WRITE32_MEMBER(aic_iccr_w) { m_irqs_pending &= ~(data & mem_mask); check_irqs(); };
+	DECLARE_WRITE32_MEMBER(aic_iscr_w) { m_irqs_pending |= data & mem_mask; check_irqs(); };
+	DECLARE_WRITE32_MEMBER(aic_eoicr_w) { m_status = 0; pop_level(); check_irqs(); };
 };
 
 #endif

@@ -76,7 +76,7 @@ f5d6    print 7 digit BCD number: d0.l to (a1)+ color $3000
 */
 
 
-static ADDRESS_MAP_START( ginganin_map, AS_PROGRAM, 16, ginganin_state )
+ADDRESS_MAP_START(ginganin_state::ginganin_map)
 /* The ROM area: 10000-13fff is written with: 0000 0000 0000 0001, at startup only. Why? */
 	AM_RANGE(0x000000, 0x01ffff) AM_ROM
 	AM_RANGE(0x020000, 0x023fff) AM_RAM
@@ -96,7 +96,7 @@ ADDRESS_MAP_END
 **
 */
 
-static ADDRESS_MAP_START( sound_map, AS_PROGRAM, 8, ginganin_state )
+ADDRESS_MAP_START(ginganin_state::sound_map)
 	AM_RANGE(0x0000, 0x07ff) AM_RAM
 	AM_RANGE(0x0800, 0x0807) AM_DEVREADWRITE("6840ptm", ptm6840_device, read, write)
 	AM_RANGE(0x1800, 0x1800) AM_DEVREAD("soundlatch", generic_latch_8_device, read)
@@ -256,7 +256,7 @@ MACHINE_CONFIG_START(ginganin_state::ginganin)
 
 	MCFG_DEVICE_ADD("6840ptm", PTM6840, SOUND_CLOCK/2)
 	MCFG_PTM6840_EXTERNAL_CLOCKS(0, 0, 0)
-	MCFG_PTM6840_OUT0_CB(WRITELINE(ginganin_state, ptm_irq))
+	MCFG_PTM6840_O1_CB(WRITELINE(ginganin_state, ptm_irq))
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)

@@ -70,4 +70,7 @@ public:
 	void draw_sprites(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect, int flip, int whichmask);
 	void draw_fg(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect, int priority );
 	void pacland(machine_config &config);
+	void main_map(address_map &map);
+	void mcu_map(address_map &map);
+	void mcu_port_map(address_map &map);
 };

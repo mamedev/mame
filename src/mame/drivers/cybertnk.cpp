@@ -239,6 +239,9 @@ public:
 	uint32_t screen_update_cybertnk_left(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	uint32_t screen_update_cybertnk_right(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	void cybertnk(machine_config &config);
+	void master_mem(address_map &map);
+	void slave_mem(address_map &map);
+	void sound_mem(address_map &map);
 };
 
 /* tile format
@@ -604,7 +607,7 @@ WRITE8_MEMBER( cybertnk_state::cybertnk_cnt_w )
 }
 
 
-static ADDRESS_MAP_START( master_mem, AS_PROGRAM, 16, cybertnk_state )
+ADDRESS_MAP_START(cybertnk_state::master_mem)
 	AM_RANGE(0x000000, 0x03ffff) AM_ROM
 	AM_RANGE(0x080000, 0x087fff) AM_RAM /*Work RAM*/
 	AM_RANGE(0x0a0000, 0x0a0fff) AM_RAM AM_SHARE("spr_ram") // non-tile based sprite ram
@@ -630,7 +633,7 @@ static ADDRESS_MAP_START( master_mem, AS_PROGRAM, 16, cybertnk_state )
 	AM_RANGE(0x1100d4, 0x1100d5) AM_READ8(cybertnk_mux_r, 0x00ff)
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( slave_mem, AS_PROGRAM, 16, cybertnk_state )
+ADDRESS_MAP_START(cybertnk_state::slave_mem)
 	AM_RANGE(0x000000, 0x01ffff) AM_ROM
 	AM_RANGE(0x020000, 0x020001) AM_READNOP // POST debug?
 	AM_RANGE(0x07fff8, 0x07fffd) AM_READNOP // POST debug?
@@ -640,12 +643,12 @@ static ADDRESS_MAP_START( slave_mem, AS_PROGRAM, 16, cybertnk_state )
 	AM_RANGE(0x140000, 0x140003) AM_NOP /*Watchdog? Written during loops and interrupts*/
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( sound_mem, AS_PROGRAM, 8, cybertnk_state )
+ADDRESS_MAP_START(cybertnk_state::sound_mem)
 	AM_RANGE(0x0000, 0x7fff) AM_ROM
 	AM_RANGE(0x8000, 0x9fff) AM_RAM
+	AM_RANGE(0xa000, 0xa001) AM_DEVREADWRITE("ym1", y8950_device, read, write)
 	AM_RANGE(0xa001, 0xa001) AM_DEVREAD("soundlatch", generic_latch_8_device, read)
 	AM_RANGE(0xa005, 0xa006) AM_NOP
-	AM_RANGE(0xa000, 0xa001) AM_DEVREADWRITE("ym1", y8950_device, read, write)
 	AM_RANGE(0xc000, 0xc001) AM_DEVREADWRITE("ym2", y8950_device, read, write)
 ADDRESS_MAP_END
 

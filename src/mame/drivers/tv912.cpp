@@ -99,7 +99,6 @@ public:
 	DECLARE_READ8_MEMBER(uart_status_r);
 	DECLARE_READ8_MEMBER(uart_data_r);
 	DECLARE_WRITE8_MEMBER(uart_data_w);
-	DECLARE_WRITE_LINE_MEMBER(uart_reset_w);
 	DECLARE_READ8_MEMBER(keyboard_r);
 	DECLARE_WRITE8_MEMBER(output_40c);
 
@@ -108,6 +107,9 @@ public:
 	DECLARE_INPUT_CHANGED_MEMBER(uart_settings_changed);
 
 	void tv912(machine_config &config);
+	void bank_map(address_map &map);
+	void io_map(address_map &map);
+	void prog_map(address_map &map);
 private:
 	enum
 	{
@@ -201,33 +203,28 @@ READ8_MEMBER(tv912_state::keyboard_r)
 
 READ8_MEMBER(tv912_state::uart_status_r)
 {
-	m_uart->set_input_pin(AY31015_SWE, 0);
-	u8 status = m_uart->get_output_pin(AY31015_DAV) << 0;
-	status |= m_uart->get_output_pin(AY31015_TBMT) << 1;
-	status |= m_uart->get_output_pin(AY31015_PE) << 2;
-	status |= m_uart->get_output_pin(AY31015_FE) << 3;
+	m_uart->write_swe(0);
+	u8 status = m_uart->dav_r() << 0;
+	status |= m_uart->tbmt_r() << 1;
+	status |= m_uart->pe_r() << 2;
+	status |= m_uart->fe_r() << 3;
 	status |= BIT(m_jumpers->read(), offset) << 4;
 	status |= m_option->read();
-	m_uart->set_input_pin(AY31015_SWE, 1);
+	m_uart->write_swe(1);
 	return status;
 }
 
 READ8_MEMBER(tv912_state::uart_data_r)
 {
-	m_uart->set_input_pin(AY31015_RDAV, 0);
+	m_uart->write_rdav(0);
 	u8 data = m_uart->get_received_data();
-	m_uart->set_input_pin(AY31015_RDAV, 1);
+	m_uart->write_rdav(1);
 	return data;
 }
 
 WRITE8_MEMBER(tv912_state::uart_data_w)
 {
 	m_uart->set_transmit_data(data);
-}
-
-WRITE_LINE_MEMBER(tv912_state::uart_reset_w)
-{
-	m_uart->set_input_pin(AY31015_XR, state);
 }
 
 WRITE8_MEMBER(tv912_state::output_40c)
@@ -262,8 +259,8 @@ void tv912_state::device_timer(emu_timer &timer, device_timer_id id, int param, 
 	switch (id)
 	{
 	case TIMER_BAUDGEN:
-		m_uart->set_input_pin(AY31015_RCP, param);
-		m_uart->set_input_pin(AY31015_TCP, param);
+		m_uart->write_rcp(param);
+		m_uart->write_tcp(param);
 
 		ioport_value sel = (m_lpt_select ? m_printer_baud : m_modem_baud)->read();
 		for (int b = 0; b < 10; b++)
@@ -294,9 +291,11 @@ u32 tv912_state::screen_update(screen_device &screen, bitmap_rgb32 &bitmap, cons
 	rectangle curs;
 	m_crtc->cursor_bounds(curs);
 
+	int scroll = m_crtc->upscroll_offset();
+
 	for (int y = cliprect.top(); y <= cliprect.bottom(); y++)
 	{
-		int row = y / 10;
+		int row = ((y / 10) + scroll) % 24;
 		int ra = y % 10;
 		int x = 0;
 		u8 *charbase = &m_p_chargen[(ra & 7) | BIT(videoctrl, 1) << 10];
@@ -360,23 +359,23 @@ void tv912_state::machine_start()
 void tv912_state::machine_reset()
 {
 	ioport_value uart_ctrl = m_uart_control->read();
-	m_uart->set_input_pin(AY31015_NP, BIT(uart_ctrl, 4));
-	m_uart->set_input_pin(AY31015_TSB, BIT(uart_ctrl, 3));
-	m_uart->set_input_pin(AY31015_NB1, BIT(uart_ctrl, 2));
-	m_uart->set_input_pin(AY31015_NB2, BIT(uart_ctrl, 1));
-	m_uart->set_input_pin(AY31015_EPS, BIT(uart_ctrl, 0));
-	m_uart->set_input_pin(AY31015_CS, 1);
+	m_uart->write_np(BIT(uart_ctrl, 4));
+	m_uart->write_tsb(BIT(uart_ctrl, 3));
+	m_uart->write_nb1(BIT(uart_ctrl, 2));
+	m_uart->write_nb2(BIT(uart_ctrl, 1));
+	m_uart->write_eps(BIT(uart_ctrl, 0));
+	m_uart->write_cs(1);
 }
 
-static ADDRESS_MAP_START( prog_map, AS_PROGRAM, 8, tv912_state )
+ADDRESS_MAP_START(tv912_state::prog_map)
 	AM_RANGE(0x000, 0xfff) AM_ROM AM_REGION("maincpu", 0)
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( io_map, AS_IO, 8, tv912_state )
+ADDRESS_MAP_START(tv912_state::io_map)
 	AM_RANGE(0x00, 0xff) AM_DEVICE("bankdev", address_map_bank_device, amap8)
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( bank_map, 0, 8, tv912_state )
+ADDRESS_MAP_START(tv912_state::bank_map)
 	AM_RANGE(0x000, 0x0ff) AM_MIRROR(0x300) AM_RAM
 	AM_RANGE(0x400, 0x403) AM_MIRROR(0x3c0) AM_SELECT(0x030) AM_READWRITE(crtc_r, crtc_w)
 	AM_RANGE(0x404, 0x404) AM_MIRROR(0x3f3) AM_READ(uart_data_r)
@@ -390,11 +389,11 @@ ADDRESS_MAP_END
 INPUT_CHANGED_MEMBER(tv912_state::uart_settings_changed)
 {
 	ioport_value uart_ctrl = m_uart_control->read();
-	m_uart->set_input_pin(AY31015_NP, BIT(uart_ctrl, 4));
-	m_uart->set_input_pin(AY31015_TSB, BIT(uart_ctrl, 3));
-	m_uart->set_input_pin(AY31015_NB1, BIT(uart_ctrl, 2));
-	m_uart->set_input_pin(AY31015_NB2, BIT(uart_ctrl, 1));
-	m_uart->set_input_pin(AY31015_EPS, BIT(uart_ctrl, 0));
+	m_uart->write_np(BIT(uart_ctrl, 4));
+	m_uart->write_tsb(BIT(uart_ctrl, 3));
+	m_uart->write_nb1(BIT(uart_ctrl, 2));
+	m_uart->write_nb2(BIT(uart_ctrl, 1));
+	m_uart->write_eps(BIT(uart_ctrl, 0));
 }
 
 static INPUT_PORTS_START( switches )
@@ -892,7 +891,7 @@ MACHINE_CONFIG_START(tv912_state::tv912)
 	MCFG_MCS48_PORT_P2_OUT_CB(WRITE8(tv912_state, p2_w))
 	MCFG_MCS48_PORT_T0_IN_CB(DEVREADLINE("rs232", rs232_port_device, cts_r))
 	MCFG_MCS48_PORT_T1_IN_CB(DEVREADLINE("crtc", tms9927_device, bl_r)) MCFG_DEVCB_INVERT
-	MCFG_MCS48_PORT_PROG_OUT_CB(WRITELINE(tv912_state, uart_reset_w)) MCFG_DEVCB_INVERT
+	MCFG_MCS48_PORT_PROG_OUT_CB(DEVWRITELINE("uart", ay51013_device, write_xr)) MCFG_DEVCB_INVERT
 
 	MCFG_DEVICE_ADD("bankdev", ADDRESS_MAP_BANK, 0)
 	MCFG_DEVICE_PROGRAM_MAP(bank_map)

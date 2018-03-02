@@ -59,4 +59,6 @@ public:
 	uint32_t screen_update_metlclsh(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	void draw_sprites( bitmap_ind16 &bitmap, const rectangle &cliprect );
 	void metlclsh(machine_config &config);
+	void metlclsh_master_map(address_map &map);
+	void metlclsh_slave_map(address_map &map);
 };

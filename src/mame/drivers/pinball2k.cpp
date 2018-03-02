@@ -98,6 +98,9 @@ public:
 	void draw_cga(bitmap_rgb32 &bitmap, const rectangle &cliprect);
 	void init_mediagx();
 	void mediagx(machine_config &config);
+	void mediagx_io(address_map &map);
+	void mediagx_map(address_map &map);
+	void ramdac_map(address_map &map);
 };
 
 // Display controller registers
@@ -473,7 +476,7 @@ static void cx5510_pci_w(device_t *busdevice, device_t *device, int function, in
 
 /*****************************************************************************/
 
-static ADDRESS_MAP_START( mediagx_map, AS_PROGRAM, 32, pinball2k_state )
+ADDRESS_MAP_START(pinball2k_state::mediagx_map)
 	AM_RANGE(0x00000000, 0x0009ffff) AM_RAM AM_SHARE("main_ram")
 	AM_RANGE(0x000a0000, 0x000affff) AM_RAM
 	AM_RANGE(0x000b0000, 0x000b7fff) AM_RAM AM_SHARE("cga_ram")
@@ -486,9 +489,9 @@ static ADDRESS_MAP_START( mediagx_map, AS_PROGRAM, 32, pinball2k_state )
 	AM_RANGE(0xfffc0000, 0xffffffff) AM_ROM AM_REGION("bios", 0)    /* System BIOS */
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START(mediagx_io, AS_IO, 32, pinball2k_state )
-	AM_RANGE(0x0020, 0x0023) AM_READWRITE8(io20_r, io20_w, 0xffff0000)
+ADDRESS_MAP_START(pinball2k_state::mediagx_io)
 	AM_IMPORT_FROM(pcat32_io_common)
+	AM_RANGE(0x0020, 0x0023) AM_READWRITE8(io20_r, io20_w, 0xffff0000)
 	AM_RANGE(0x00e8, 0x00eb) AM_NOP     // I/O delay port
 	AM_RANGE(0x0378, 0x037b) AM_READWRITE(parallel_port_r, parallel_port_w)
 	AM_RANGE(0x0400, 0x0403) AM_READWRITE(port400_r, port400_w)
@@ -588,7 +591,7 @@ void pinball2k_state::machine_reset()
 	m_maincpu->reset();
 }
 
-static ADDRESS_MAP_START( ramdac_map, 0, 8, pinball2k_state )
+ADDRESS_MAP_START(pinball2k_state::ramdac_map)
 	AM_RANGE(0x000, 0x3ff) AM_DEVREADWRITE("ramdac",ramdac_device,ramdac_pal_r,ramdac_rgb666_w)
 ADDRESS_MAP_END
 
@@ -600,7 +603,7 @@ MACHINE_CONFIG_START(pinball2k_state::mediagx)
 	MCFG_CPU_IO_MAP(mediagx_io)
 	MCFG_CPU_IRQ_ACKNOWLEDGE_DEVICE("pic8259_1", pic8259_device, inta_cb)
 
-	MCFG_FRAGMENT_ADD( pcat_common )
+	pcat_common(config);
 
 	MCFG_PCI_BUS_LEGACY_ADD("pcibus", 0)
 	MCFG_PCI_BUS_LEGACY_DEVICE(18, nullptr, cx5510_pci_r, cx5510_pci_w)

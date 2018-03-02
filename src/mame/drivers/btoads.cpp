@@ -166,7 +166,7 @@ WRITE8_MEMBER( btoads_state::bsmt2000_port_w )
  *
  *************************************/
 
-static ADDRESS_MAP_START( main_map, AS_PROGRAM, 16, btoads_state )
+ADDRESS_MAP_START(btoads_state::main_map)
 	AM_RANGE(0x00000000, 0x003fffff) AM_RAM
 	AM_RANGE(0x20000000, 0x2000007f) AM_READ_PORT("P1")
 	AM_RANGE(0x20000080, 0x200000ff) AM_READ_PORT("P2")
@@ -202,12 +202,12 @@ ADDRESS_MAP_END
  *
  *************************************/
 
-static ADDRESS_MAP_START( sound_map, AS_PROGRAM, 8, btoads_state )
+ADDRESS_MAP_START(btoads_state::sound_map)
 	AM_RANGE(0x0000, 0x7fff) AM_ROM
 	AM_RANGE(0x8000, 0xffff) AM_RAM
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( sound_io_map, AS_IO, 8, btoads_state )
+ADDRESS_MAP_START(btoads_state::sound_io_map)
 	AM_RANGE(0x0000, 0x7fff) AM_WRITE(bsmt2000_port_w)
 	AM_RANGE(0x8000, 0x8000) AM_READWRITE(sound_data_r, sound_data_w)
 	AM_RANGE(0x8002, 0x8002) AM_WRITE(sound_int_state_w)

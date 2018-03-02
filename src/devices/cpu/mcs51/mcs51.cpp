@@ -242,20 +242,20 @@ DEFINE_DEVICE_TYPE(DS5002FP, ds5002fp_device, "ds5002fp", "DS5002FP")
     ADDRESS MAPS
 ***************************************************************************/
 
-static ADDRESS_MAP_START(program_12bit, AS_PROGRAM, 8, mcs51_cpu_device)
+ADDRESS_MAP_START(mcs51_cpu_device::program_12bit)
 	AM_RANGE(0x00, 0x0fff) AM_ROM
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START(program_13bit, AS_PROGRAM, 8, mcs51_cpu_device)
+ADDRESS_MAP_START(mcs51_cpu_device::program_13bit)
 	AM_RANGE(0x00, 0x1fff) AM_ROM
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START(data_7bit, AS_DATA, 8, mcs51_cpu_device)
+ADDRESS_MAP_START(mcs51_cpu_device::data_7bit)
 	AM_RANGE(0x0000, 0x007f) AM_RAM AM_SHARE("scratchpad")
 	AM_RANGE(0x0100, 0x01ff) AM_RAM AM_SHARE("sfr_ram") /* SFR */
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START(data_8bit, AS_DATA, 8, mcs51_cpu_device)
+ADDRESS_MAP_START(mcs51_cpu_device::data_8bit)
 	AM_RANGE(0x0000, 0x00ff) AM_RAM AM_SHARE("scratchpad")
 	AM_RANGE(0x0100, 0x01ff) AM_RAM AM_SHARE("sfr_ram") /* SFR */
 ADDRESS_MAP_END
@@ -265,9 +265,9 @@ ADDRESS_MAP_END
 mcs51_cpu_device::mcs51_cpu_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock, int program_width, int data_width, uint8_t features)
 	: cpu_device(mconfig, type, tag, owner, clock)
 	, m_program_config("program", ENDIANNESS_LITTLE, 8, 16, 0,
-			(program_width == 12) ? ADDRESS_MAP_NAME(program_12bit) : (program_width == 13) ? ADDRESS_MAP_NAME(program_13bit) : nullptr)
+					   (program_width == 12) ? address_map_constructor(FUNC(mcs51_cpu_device::program_12bit), this) : (program_width == 13) ? address_map_constructor(FUNC(mcs51_cpu_device::program_13bit), this) : address_map_constructor())
 	, m_data_config("data", ENDIANNESS_LITTLE, 8, 9, 0,
-			 (data_width == 7) ? ADDRESS_MAP_NAME(data_7bit) : (data_width == 8) ? ADDRESS_MAP_NAME(data_8bit) : nullptr )
+					(data_width == 7) ? address_map_constructor(FUNC(mcs51_cpu_device::data_7bit), this) : (data_width == 8) ? address_map_constructor(FUNC(mcs51_cpu_device::data_8bit), this) : address_map_constructor())
 	, m_io_config("io", ENDIANNESS_LITTLE, 8, 18, 0)
 	, m_pc(0)
 	, m_features(features)

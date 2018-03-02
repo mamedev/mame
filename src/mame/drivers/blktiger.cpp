@@ -74,7 +74,7 @@ WRITE8_MEMBER(blktiger_state::blktiger_coinlockout_w)
 }
 
 
-static ADDRESS_MAP_START( blktiger_map, AS_PROGRAM, 8, blktiger_state )
+ADDRESS_MAP_START(blktiger_state::blktiger_map)
 	AM_RANGE(0x0000, 0x7fff) AM_ROM
 	AM_RANGE(0x8000, 0xbfff) AM_ROMBANK("bank1")
 	AM_RANGE(0xc000, 0xcfff) AM_READWRITE(blktiger_bgvideoram_r, blktiger_bgvideoram_w)
@@ -85,7 +85,7 @@ static ADDRESS_MAP_START( blktiger_map, AS_PROGRAM, 8, blktiger_state )
 	AM_RANGE(0xfe00, 0xffff) AM_RAM AM_SHARE("spriteram")
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( blktiger_io_map, AS_IO, 8, blktiger_state )
+ADDRESS_MAP_START(blktiger_state::blktiger_io_map)
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	AM_RANGE(0x00, 0x00) AM_READ_PORT("IN0") AM_DEVWRITE("soundlatch", generic_latch_8_device, write)
 	AM_RANGE(0x01, 0x01) AM_READ_PORT("IN1") AM_WRITE(blktiger_bankswitch_w)
@@ -102,7 +102,7 @@ static ADDRESS_MAP_START( blktiger_io_map, AS_IO, 8, blktiger_state )
 	AM_RANGE(0x0e, 0x0e) AM_WRITE(blktiger_screen_layout_w)
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( blktigerbl_io_map, AS_IO, 8, blktiger_state )
+ADDRESS_MAP_START(blktiger_state::blktigerbl_io_map)
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	AM_RANGE(0x00, 0x00) AM_READ_PORT("IN0") AM_DEVWRITE("soundlatch", generic_latch_8_device, write)
 	AM_RANGE(0x01, 0x01) AM_READ_PORT("IN1") AM_WRITE(blktiger_bankswitch_w)
@@ -119,7 +119,7 @@ static ADDRESS_MAP_START( blktigerbl_io_map, AS_IO, 8, blktiger_state )
 	AM_RANGE(0x0e, 0x0e) AM_WRITE(blktiger_screen_layout_w)
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( blktiger_sound_map, AS_PROGRAM, 8, blktiger_state )
+ADDRESS_MAP_START(blktiger_state::blktiger_sound_map)
 	AM_RANGE(0x0000, 0x7fff) AM_ROM
 	AM_RANGE(0xc000, 0xc7ff) AM_RAM
 	AM_RANGE(0xc800, 0xc800) AM_DEVREAD("soundlatch", generic_latch_8_device, read)
@@ -127,11 +127,11 @@ static ADDRESS_MAP_START( blktiger_sound_map, AS_PROGRAM, 8, blktiger_state )
 	AM_RANGE(0xe002, 0xe003) AM_DEVREADWRITE("ym2", ym2203_device, read, write)
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( blktiger_mcu_map, AS_PROGRAM, 8, blktiger_state )
+ADDRESS_MAP_START(blktiger_state::blktiger_mcu_map)
 	AM_RANGE(0x0000, 0x0fff) AM_ROM
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( blktiger_mcu_io_map, AS_IO, 8, blktiger_state )
+ADDRESS_MAP_START(blktiger_state::blktiger_mcu_io_map)
 	AM_RANGE(MCS51_PORT_P0,MCS51_PORT_P0) AM_READWRITE(blktiger_from_main_r,blktiger_to_main_w)
 	AM_RANGE(MCS51_PORT_P1,MCS51_PORT_P3) AM_WRITENOP   /* other ports unknown */
 ADDRESS_MAP_END
@@ -343,7 +343,8 @@ MACHINE_CONFIG_START(blktiger_state::blktiger)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.15)
 MACHINE_CONFIG_END
 
-MACHINE_CONFIG_DERIVED(blktiger_state::blktigerbl, blktiger)
+MACHINE_CONFIG_START(blktiger_state::blktigerbl)
+	blktiger(config);
 	MCFG_CPU_MODIFY("maincpu")
 	MCFG_CPU_IO_MAP(blktigerbl_io_map)
 

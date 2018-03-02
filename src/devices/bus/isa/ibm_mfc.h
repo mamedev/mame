@@ -31,9 +31,6 @@ public:
 	// Construction/destruction
 	isa8_ibm_mfc_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
-	DECLARE_READ8_MEMBER( ibm_mfc_r );
-	DECLARE_WRITE8_MEMBER( ibm_mfc_w );
-
 protected:
 	// Device-level overrides
 	virtual void                    device_start() override;
@@ -61,6 +58,12 @@ private:
 	DECLARE_WRITE_LINE_MEMBER( write_usart_clock );
 
 	DECLARE_WRITE_LINE_MEMBER( ibm_mfc_ym_irq );
+
+	DECLARE_READ8_MEMBER( ibm_mfc_r );
+	DECLARE_WRITE8_MEMBER( ibm_mfc_w );
+
+	void io_map(address_map &map);
+	void prg_map(address_map &map);
 
 	void                            set_z80_interrupt(int src, int state);
 	void                            set_pc_interrupt(int src, int state);

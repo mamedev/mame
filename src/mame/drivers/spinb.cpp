@@ -97,6 +97,12 @@ public:
 	void jolypark(machine_config &config);
 	void vrnwrld(machine_config &config);
 	void spinb(machine_config &config);
+	void dmd_io(address_map &map);
+	void dmd_mem(address_map &map);
+	void spinb_audio_map(address_map &map);
+	void spinb_map(address_map &map);
+	void spinb_music_map(address_map &map);
+	void vrnwrld_map(address_map &map);
 private:
 	bool m_pc0a;
 	bool m_pc0m;
@@ -135,7 +141,7 @@ private:
 	required_ioport_array<11> m_switches;
 };
 
-static ADDRESS_MAP_START( spinb_map, AS_PROGRAM, 8, spinb_state )
+ADDRESS_MAP_START(spinb_state::spinb_map)
 	AM_RANGE(0x0000, 0x3fff) AM_ROM
 	AM_RANGE(0x4000, 0x5fff) AM_RAM AM_SHARE("nvram") // 6164, battery-backed
 	AM_RANGE(0x6000, 0x6003) AM_MIRROR(0x13fc) AM_DEVREADWRITE("ppi60", i8255_device, read, write)
@@ -148,7 +154,7 @@ static ADDRESS_MAP_START( spinb_map, AS_PROGRAM, 8, spinb_state )
 	AM_RANGE(0x6ce0, 0x6ce0) AM_WRITENOP
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( vrnwrld_map, AS_PROGRAM, 8, spinb_state )
+ADDRESS_MAP_START(spinb_state::vrnwrld_map)
 	AM_RANGE(0x0000, 0x7fff) AM_ROM
 	AM_RANGE(0x8000, 0x9fff) AM_RAM AM_SHARE("nvram") // 6164, battery-backed
 	AM_RANGE(0xc000, 0xc003) AM_MIRROR(0x13fc) AM_DEVREADWRITE("ppi60", i8255_device, read, write)
@@ -161,7 +167,7 @@ static ADDRESS_MAP_START( vrnwrld_map, AS_PROGRAM, 8, spinb_state )
 	AM_RANGE(0xcce0, 0xcce0) AM_WRITENOP
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( spinb_audio_map, AS_PROGRAM, 8, spinb_state )
+ADDRESS_MAP_START(spinb_state::spinb_audio_map)
 	AM_RANGE(0x0000, 0x1fff) AM_ROM
 	AM_RANGE(0x2000, 0x3fff) AM_RAM // 6164
 	AM_RANGE(0x4000, 0x4003) AM_MIRROR(0x1ffc) AM_DEVREADWRITE("ppia", i8255_device, read, write)
@@ -169,7 +175,7 @@ static ADDRESS_MAP_START( spinb_audio_map, AS_PROGRAM, 8, spinb_state )
 	AM_RANGE(0x8000, 0x8000) AM_READ(sndcmd_r)
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( spinb_music_map, AS_PROGRAM, 8, spinb_state )
+ADDRESS_MAP_START(spinb_state::spinb_music_map)
 	AM_RANGE(0x0000, 0x1fff) AM_ROM
 	AM_RANGE(0x2000, 0x3fff) AM_RAM // 6164
 	AM_RANGE(0x4000, 0x4003) AM_MIRROR(0x1ffc) AM_DEVREADWRITE("ppim", i8255_device, read, write)
@@ -178,11 +184,11 @@ static ADDRESS_MAP_START( spinb_music_map, AS_PROGRAM, 8, spinb_state )
 	AM_RANGE(0xA000, 0xA000) AM_WRITE(volume_w)
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START(dmd_mem, AS_PROGRAM, 8, spinb_state)
+ADDRESS_MAP_START(spinb_state::dmd_mem)
 	AM_RANGE(0x0000, 0xffff) AM_ROM
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START(dmd_io, AS_IO, 8, spinb_state)
+ADDRESS_MAP_START(spinb_state::dmd_io)
 	AM_RANGE(0x0000, 0x1fff) AM_WRITE(dmdram_w)
 	AM_RANGE(0x0000, 0xffff) AM_READ(dmdram_r)
 	AM_RANGE(MCS51_PORT_P1, MCS51_PORT_P1) AM_WRITE(p1_w)
@@ -651,7 +657,7 @@ MACHINE_CONFIG_START(spinb_state::spinb)
 	MCFG_PALETTE_INIT_OWNER(spinb_state, spinb)
 
 	/* Sound */
-	MCFG_FRAGMENT_ADD( genpin_audio )
+	genpin_audio(config);
 	MCFG_SPEAKER_STANDARD_MONO("msmavol")
 	MCFG_SOUND_ADD("msm_a", MSM5205, XTAL(384'000))
 	MCFG_MSM5205_VCK_CALLBACK(DEVWRITELINE("ic5a", ttl7474_device, clock_w))
@@ -721,7 +727,8 @@ MACHINE_CONFIG_START(spinb_state::spinb)
 	MCFG_74157_OUT_CB(DEVWRITE8("msm_m", msm5205_device, data_w))
 MACHINE_CONFIG_END
 
-MACHINE_CONFIG_DERIVED(spinb_state::jolypark, spinb)
+MACHINE_CONFIG_START(spinb_state::jolypark)
+	spinb(config);
 	MCFG_SOUND_REPLACE("msm_a", MSM6585, XTAL(640'000))
 	MCFG_MSM6585_VCK_CALLBACK(DEVWRITELINE("ic5a", ttl7474_device, clock_w))
 	MCFG_MSM6585_PRESCALER_SELECTOR(S40)
@@ -732,7 +739,8 @@ MACHINE_CONFIG_DERIVED(spinb_state::jolypark, spinb)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "msmmvol", 1.0)
 MACHINE_CONFIG_END
 
-MACHINE_CONFIG_DERIVED(spinb_state::vrnwrld, jolypark)
+MACHINE_CONFIG_START(spinb_state::vrnwrld)
+	jolypark(config);
 	/* basic machine hardware */
 	MCFG_CPU_MODIFY("maincpu")
 	MCFG_CPU_PROGRAM_MAP(vrnwrld_map)

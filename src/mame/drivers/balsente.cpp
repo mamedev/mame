@@ -231,7 +231,6 @@ DIP locations verified for:
 #include "cpu/z80/z80.h"
 #include "cpu/m6809/m6809.h"
 #include "cpu/m68000/m68000.h"
-#include "machine/74259.h"
 #include "machine/nvram.h"
 #include "machine/watchdog.h"
 #include "sound/cem3394.h"
@@ -247,13 +246,13 @@ DIP locations verified for:
  *
  *************************************/
 
-static ADDRESS_MAP_START( cpu1_map, AS_PROGRAM, 8, balsente_state )
+ADDRESS_MAP_START(balsente_state::cpu1_map)
 	AM_RANGE(0x0000, 0x07ff) AM_RAM AM_SHARE("spriteram")
 	AM_RANGE(0x0800, 0x7fff) AM_RAM_WRITE(balsente_videoram_w) AM_SHARE("videoram")
 	AM_RANGE(0x8000, 0x8fff) AM_RAM_WRITE(balsente_paletteram_w) AM_SHARE("paletteram")
 	AM_RANGE(0x9000, 0x9007) AM_WRITE(balsente_adc_select_w)
 	AM_RANGE(0x9400, 0x9401) AM_READ(balsente_adc_data_r)
-	AM_RANGE(0x9800, 0x981f) AM_MIRROR(0x0060) AM_DEVWRITE_MOD("outlatch", ls259_device, write_d7, rshift<2>)
+	;map(0x9800, 0x981f).mirror(0x0060).lw8("outlatch_w", [this](address_space &space, offs_t offset, u8 data, u8 mem_mask){ m_outlatch->write_d7(space, offset >> 2, data, mem_mask); });
 	AM_RANGE(0x9880, 0x989f) AM_WRITE(balsente_random_reset_w)
 	AM_RANGE(0x98a0, 0x98bf) AM_WRITE(balsente_rombank_select_w)
 	AM_RANGE(0x98c0, 0x98df) AM_WRITE(balsente_palette_select_w)
@@ -277,7 +276,7 @@ ADDRESS_MAP_END
  *
  *************************************/
 
-static ADDRESS_MAP_START( cpu2_map, AS_PROGRAM, 8, balsente_state )
+ADDRESS_MAP_START(balsente_state::cpu2_map)
 	AM_RANGE(0x0000, 0x1fff) AM_ROM
 	AM_RANGE(0x2000, 0x5fff) AM_RAM
 	AM_RANGE(0x6000, 0x7fff) AM_WRITE(balsente_m6850_sound_w)
@@ -285,7 +284,7 @@ static ADDRESS_MAP_START( cpu2_map, AS_PROGRAM, 8, balsente_state )
 ADDRESS_MAP_END
 
 
-static ADDRESS_MAP_START( cpu2_io_map, AS_IO, 8, balsente_state )
+ADDRESS_MAP_START(balsente_state::cpu2_io_map)
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	AM_RANGE(0x00, 0x03) AM_READWRITE(balsente_counter_8253_r, balsente_counter_8253_w)
 	AM_RANGE(0x08, 0x0f) AM_READ(balsente_counter_state_r)
@@ -304,7 +303,7 @@ ADDRESS_MAP_END
  *************************************/
 
 /* CPU 1 read addresses */
-static ADDRESS_MAP_START( shrike68k_map, AS_PROGRAM, 16, balsente_state )
+ADDRESS_MAP_START(balsente_state::shrike68k_map)
 	AM_RANGE(0x000000, 0x003fff) AM_ROM
 	AM_RANGE(0x010000, 0x01001f) AM_RAM AM_SHARE("shrike_io")
 	AM_RANGE(0x018000, 0x018fff) AM_RAM AM_SHARE("shrike_shared")
@@ -1371,7 +1370,8 @@ MACHINE_CONFIG_START(balsente_state::balsente)
 MACHINE_CONFIG_END
 
 
-MACHINE_CONFIG_DERIVED(balsente_state::shrike, balsente)
+MACHINE_CONFIG_START(balsente_state::shrike)
+	balsente(config);
 
 	/* basic machine hardware */
 

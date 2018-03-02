@@ -58,7 +58,7 @@ and 2764 eprom (swapped D3/D4 and D5/D6 data lines)
 #include "screen.h"
 
 
-static ADDRESS_MAP_START( main_map, AS_PROGRAM, 8, travrusa_state )
+ADDRESS_MAP_START(travrusa_state::main_map)
 	AM_RANGE(0x0000, 0x7fff) AM_ROM
 	AM_RANGE(0x8000, 0x8fff) AM_RAM_WRITE(travrusa_videoram_w) AM_SHARE("videoram")
 	AM_RANGE(0x9000, 0x9000) AM_WRITE(travrusa_scroll_x_low_w)
@@ -329,12 +329,13 @@ MACHINE_CONFIG_START(travrusa_state::travrusa)
 	MCFG_PALETTE_INIT_OWNER(travrusa_state, travrusa)
 
 	/* sound hardware */
-	//MCFG_FRAGMENT_ADD(m52_sound_c_audio)
+	//m52_sound_c_audio(config);
 	MCFG_DEVICE_ADD("irem_audio", IREM_M52_SOUNDC_AUDIO, 0)
 
 MACHINE_CONFIG_END
 
-MACHINE_CONFIG_DERIVED(travrusa_state::shtrider, travrusa)
+MACHINE_CONFIG_START(travrusa_state::shtrider)
+	travrusa(config);
 
 	/* video hardware */
 	MCFG_GFXDECODE_MODIFY("gfxdecode", shtrider)
@@ -342,7 +343,8 @@ MACHINE_CONFIG_DERIVED(travrusa_state::shtrider, travrusa)
 	MCFG_PALETTE_INIT_OWNER(travrusa_state,shtrider)
 MACHINE_CONFIG_END
 
-MACHINE_CONFIG_DERIVED(travrusa_state::shtriderb, travrusa)
+MACHINE_CONFIG_START(travrusa_state::shtriderb)
+	travrusa(config);
 
 	/* video hardware */
 	MCFG_GFXDECODE_MODIFY("gfxdecode", shtrider)

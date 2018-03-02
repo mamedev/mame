@@ -429,7 +429,7 @@ WRITE8_MEMBER( abc806_state::mao_w )
 //  ADDRESS_MAP( abc800c_mem )
 //-------------------------------------------------
 
-static ADDRESS_MAP_START( abc800c_mem, AS_PROGRAM, 8, abc800c_state )
+ADDRESS_MAP_START(abc800c_state::abc800c_mem)
 	ADDRESS_MAP_UNMAP_HIGH
 	AM_RANGE(0x0000, 0x3fff) AM_RAM AM_SHARE("video_ram")
 	AM_RANGE(0x4000, 0x7bff) AM_ROM
@@ -442,7 +442,7 @@ ADDRESS_MAP_END
 //  ADDRESS_MAP( abc800c_io )
 //-------------------------------------------------
 
-static ADDRESS_MAP_START( abc800c_io, AS_IO, 8, abc800_state )
+ADDRESS_MAP_START(abc800_state::abc800c_io)
 	ADDRESS_MAP_UNMAP_HIGH
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	AM_RANGE(0x00, 0x00) AM_MIRROR(0x18) AM_DEVREADWRITE(ABCBUS_TAG, abcbus_slot_device, inp_r, out_w)
@@ -464,7 +464,7 @@ ADDRESS_MAP_END
 //  ADDRESS_MAP( abc800m_mem )
 //-------------------------------------------------
 
-static ADDRESS_MAP_START( abc800m_mem, AS_PROGRAM, 8, abc800_state )
+ADDRESS_MAP_START(abc800_state::abc800m_mem)
 	ADDRESS_MAP_UNMAP_HIGH
 	AM_RANGE(0x0000, 0x3fff) AM_RAM AM_SHARE("video_ram")
 	AM_RANGE(0x4000, 0x77ff) AM_ROM
@@ -477,7 +477,7 @@ ADDRESS_MAP_END
 //  ADDRESS_MAP( abc800m_io )
 //-------------------------------------------------
 
-static ADDRESS_MAP_START( abc800m_io, AS_IO, 8, abc800_state )
+ADDRESS_MAP_START(abc800_state::abc800m_io)
 	AM_IMPORT_FROM( abc800c_io )
 	AM_RANGE(0x31, 0x31) AM_MIRROR(0x06) AM_DEVREAD(MC6845_TAG, mc6845_device, register_r)
 	AM_RANGE(0x38, 0x38) AM_MIRROR(0x06) AM_DEVWRITE(MC6845_TAG, mc6845_device, address_w)
@@ -489,7 +489,7 @@ ADDRESS_MAP_END
 //  ADDRESS_MAP( abc802_mem )
 //-------------------------------------------------
 
-static ADDRESS_MAP_START( abc802_mem, AS_PROGRAM, 8, abc802_state )
+ADDRESS_MAP_START(abc802_state::abc802_mem)
 	ADDRESS_MAP_UNMAP_HIGH
 	AM_RANGE(0x0000, 0x77ff) AM_ROM
 	AM_RANGE(0x7800, 0x7fff) AM_RAM AM_SHARE("char_ram")
@@ -501,7 +501,7 @@ ADDRESS_MAP_END
 //  ADDRESS_MAP( abc802_io )
 //-------------------------------------------------
 
-static ADDRESS_MAP_START( abc802_io, AS_IO, 8, abc802_state )
+ADDRESS_MAP_START(abc802_state::abc802_io)
 	ADDRESS_MAP_UNMAP_HIGH
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	AM_RANGE(0x00, 0x00) AM_MIRROR(0x18) AM_DEVREADWRITE(ABCBUS_TAG, abcbus_slot_device, inp_r, out_w)
@@ -525,7 +525,7 @@ ADDRESS_MAP_END
 //  ADDRESS_MAP( abc806_mem )
 //-------------------------------------------------
 
-static ADDRESS_MAP_START( abc806_mem, AS_PROGRAM, 8, abc806_state )
+ADDRESS_MAP_START(abc806_state::abc806_mem)
 	ADDRESS_MAP_UNMAP_HIGH
 	AM_RANGE(0x0000, 0x0fff) AM_RAMBANK("bank1")
 	AM_RANGE(0x1000, 0x1fff) AM_RAMBANK("bank2")
@@ -550,7 +550,7 @@ ADDRESS_MAP_END
 //  ADDRESS_MAP( abc806_io )
 //-------------------------------------------------
 
-static ADDRESS_MAP_START( abc806_io, AS_IO, 8, abc806_state )
+ADDRESS_MAP_START(abc806_state::abc806_io)
 	ADDRESS_MAP_UNMAP_HIGH
 	AM_RANGE(0x00, 0x00) AM_MIRROR(0xff18) AM_DEVREADWRITE(ABCBUS_TAG, abcbus_slot_device, inp_r, out_w)
 	AM_RANGE(0x01, 0x01) AM_MIRROR(0xff18) AM_DEVREADWRITE(ABCBUS_TAG, abcbus_slot_device, stat_r, cs_w)
@@ -1023,7 +1023,7 @@ MACHINE_CONFIG_START(abc800c_state::abc800c)
 	MCFG_CPU_IO_MAP(abc800c_io)
 
 	// video hardware
-	MCFG_FRAGMENT_ADD(abc800c_video)
+	abc800c_video(config);
 
 	// sound hardware
 	MCFG_SPEAKER_STANDARD_MONO("mono")
@@ -1098,7 +1098,7 @@ MACHINE_CONFIG_START(abc800m_state::abc800m)
 	MCFG_CPU_IO_MAP(abc800m_io)
 
 	// video hardware
-	MCFG_FRAGMENT_ADD(abc800m_video)
+	abc800m_video(config);
 
 	// sound hardware
 	MCFG_SPEAKER_STANDARD_MONO("mono")
@@ -1173,7 +1173,7 @@ MACHINE_CONFIG_START(abc802_state::abc802)
 	MCFG_CPU_IO_MAP(abc802_io)
 
 	// video hardware
-	MCFG_FRAGMENT_ADD(abc802_video)
+	abc802_video(config);
 
 	// sound hardware
 	MCFG_SPEAKER_STANDARD_MONO("mono")
@@ -1249,7 +1249,7 @@ MACHINE_CONFIG_START(abc806_state::abc806)
 	MCFG_CPU_IO_MAP(abc806_io)
 
 	// video hardware
-	MCFG_FRAGMENT_ADD(abc806_video)
+	abc806_video(config);
 
 	// peripheral hardware
 	MCFG_E0516_ADD(E0516_TAG, ABC806_X02)

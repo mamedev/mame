@@ -94,6 +94,12 @@ public:
 	void sklflite(machine_config &config);
 	void play_3(machine_config &config);
 	void megaaton(machine_config &config);
+	void megaaton_io(address_map &map);
+	void play_3_audio_io(address_map &map);
+	void play_3_audio_map(address_map &map);
+	void play_3_io(address_map &map);
+	void play_3_map(address_map &map);
+	void sklflite_io(address_map &map);
 private:
 	u16 m_clockcnt;
 	u16 m_resetcnt;
@@ -117,12 +123,12 @@ private:
 };
 
 
-static ADDRESS_MAP_START( play_3_map, AS_PROGRAM, 8, play_3_state )
+ADDRESS_MAP_START(play_3_state::play_3_map)
 	AM_RANGE(0x0000, 0x3fff) AM_ROM
 	AM_RANGE(0x8000, 0x80ff) AM_RAM AM_SHARE("nvram") // pair of 5101, battery-backed
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( play_3_io, AS_IO, 8, play_3_state )
+ADDRESS_MAP_START(play_3_state::play_3_io)
 	AM_RANGE(0x01, 0x01) AM_WRITE(port01_w) // digits, scan-lines
 	AM_RANGE(0x02, 0x02) AM_WRITE(port02_w) // sound code
 	AM_RANGE(0x03, 0x03) AM_WRITE(port03_w) //
@@ -132,24 +138,24 @@ static ADDRESS_MAP_START( play_3_io, AS_IO, 8, play_3_state )
 	AM_RANGE(0x07, 0x07) AM_WRITE(port07_w) // flipflop clear
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( megaaton_io, AS_IO, 8, play_3_state )
+ADDRESS_MAP_START(play_3_state::megaaton_io)
+	AM_IMPORT_FROM(play_3_io)
 	AM_RANGE(0x01, 0x01) AM_WRITE(megaaton_port01_w) // digits, scan-lines
-	AM_IMPORT_FROM(play_3_io)
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( sklflite_io, AS_IO, 8, play_3_state )
+ADDRESS_MAP_START(play_3_state::sklflite_io)
+	AM_IMPORT_FROM(play_3_io)
 	AM_RANGE(0x03, 0x03) AM_WRITE(sklflite_port03_w) //
-	AM_IMPORT_FROM(play_3_io)
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( play_3_audio_map, AS_PROGRAM, 8, play_3_state )
+ADDRESS_MAP_START(play_3_state::play_3_audio_map)
 	AM_RANGE(0x0000, 0x3fff) AM_ROM
 	AM_RANGE(0x4000, 0x4001) AM_MIRROR(0x1ffe) AM_DEVREADWRITE("aysnd1", ay8910_device, data_r, address_data_w)
 	AM_RANGE(0x6000, 0x6001) AM_MIRROR(0x1ffe) AM_DEVREADWRITE("aysnd2", ay8910_device, data_r, address_data_w)
 	AM_RANGE(0x8000, 0x80ff) AM_RAM
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( play_3_audio_io, AS_IO, 8, play_3_state )
+ADDRESS_MAP_START(play_3_state::play_3_audio_io)
 	AM_RANGE(0x01, 0x01) AM_WRITE(port01_a_w) // irq counter
 	AM_RANGE(0x02, 0x02) AM_READ(port02_a_r) // sound code
 ADDRESS_MAP_END
@@ -491,7 +497,7 @@ MACHINE_CONFIG_START(play_3_state::play_3)
 	MCFG_7474_COMP_OUTPUT_CB(DEVWRITELINE("maincpu", cosmac_device, int_w)) MCFG_DEVCB_INVERT // inverted
 
 	/* Sound */
-	MCFG_FRAGMENT_ADD( genpin_audio )
+	genpin_audio(config);
 
 	MCFG_CPU_ADD("audiocpu", CDP1802, XTAL(3'579'545))
 	MCFG_CPU_PROGRAM_MAP(play_3_audio_map)
@@ -506,7 +512,8 @@ MACHINE_CONFIG_START(play_3_state::play_3)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", 0.75)
 MACHINE_CONFIG_END
 
-MACHINE_CONFIG_DERIVED(play_3_state::megaaton, play_3)
+MACHINE_CONFIG_START(play_3_state::megaaton)
+	play_3(config);
 	MCFG_CPU_MODIFY("maincpu")
 	MCFG_CPU_CLOCK(XTAL(2'950'000))
 	MCFG_CPU_IO_MAP(megaaton_io)
@@ -515,7 +522,8 @@ MACHINE_CONFIG_DERIVED(play_3_state::megaaton, play_3)
 	MCFG_DEVICE_CLOCK(XTAL(2'950'000) / 8) // TPB line from CPU
 MACHINE_CONFIG_END
 
-MACHINE_CONFIG_DERIVED(play_3_state::sklflite, play_3)
+MACHINE_CONFIG_START(play_3_state::sklflite)
+	play_3(config);
 	MCFG_CPU_MODIFY("maincpu")
 	MCFG_CPU_IO_MAP(sklflite_io)
 

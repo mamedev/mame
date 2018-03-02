@@ -985,7 +985,7 @@ WRITE32_MEMBER(konamigx_state::type1_cablamps_w)
 /* 68EC020 memory handlers */
 /**********************************************************************************/
 
-static ADDRESS_MAP_START( gx_base_memmap, AS_PROGRAM, 32, konamigx_state )
+ADDRESS_MAP_START(konamigx_state::gx_base_memmap)
 	AM_RANGE(0x000000, 0x01ffff) AM_ROM // BIOS ROM
 	AM_RANGE(0x200000, 0x3fffff) AM_ROM // main program ROM
 	AM_RANGE(0x400000, 0x7fffff) AM_ROM // data ROM
@@ -1013,7 +1013,8 @@ static ADDRESS_MAP_START( gx_base_memmap, AS_PROGRAM, 32, konamigx_state )
 	AM_RANGE(0xda2000, 0xda3fff) AM_DEVREADWRITE("k056832", k056832_device, ram_long_r, ram_long_w)
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( gx_type1_map, AS_PROGRAM, 32, konamigx_state )
+ADDRESS_MAP_START(konamigx_state::gx_type1_map)
+	AM_IMPORT_FROM(gx_base_memmap)
 	AM_RANGE(0xd90000, 0xd97fff) AM_RAM_DEVWRITE("palette", palette_device, write32) AM_SHARE("palette")
 	AM_RANGE(0xdc0000, 0xdc1fff) AM_RAM         // LAN RAM? (Racin' Force has, Open Golf doesn't)
 	AM_RANGE(0xdd0000, 0xdd00ff) AM_READNOP AM_WRITENOP // LAN board
@@ -1029,16 +1030,16 @@ static ADDRESS_MAP_START( gx_type1_map, AS_PROGRAM, 32, konamigx_state )
 	AM_RANGE(0xf40000, 0xf7ffff) AM_READ(type1_roz_r2)  // ROM readback
 	AM_RANGE(0xf80000, 0xf80fff) AM_RAM // chip 21Q / S
 	AM_RANGE(0xfc0000, 0xfc00ff) AM_RAM // chip 22N / S
-	AM_IMPORT_FROM(gx_base_memmap)
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( gx_type2_map, AS_PROGRAM, 32, konamigx_state )
+ADDRESS_MAP_START(konamigx_state::gx_type2_map)
+	AM_IMPORT_FROM(gx_base_memmap)
 	AM_RANGE(0xcc0000, 0xcc0003) AM_WRITE(esc_w)
 	AM_RANGE(0xd90000, 0xd97fff) AM_RAM_DEVWRITE("palette", palette_device, write32) AM_SHARE("palette")
-	AM_IMPORT_FROM(gx_base_memmap)
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( gx_type3_map, AS_PROGRAM, 32, konamigx_state )
+ADDRESS_MAP_START(konamigx_state::gx_type3_map)
+	AM_IMPORT_FROM(gx_base_memmap)
 	AM_RANGE(0xd90000, 0xd97fff) AM_RAM
 	//AM_RANGE(0xcc0000, 0xcc0007) AM_WRITE(type4_prot_w)
 	AM_RANGE(0xe00000, 0xe0001f) AM_RAM AM_SHARE("k053936_0_ctrl")
@@ -1049,10 +1050,10 @@ static ADDRESS_MAP_START( gx_type3_map, AS_PROGRAM, 32, konamigx_state )
 	AM_RANGE(0xea0000, 0xea3fff) AM_RAM AM_SHARE("subpaletteram")
 	AM_RANGE(0xec0000, 0xec0003) AM_READ(type3_sync_r)
 	//AM_RANGE(0xf00000, 0xf07fff) AM_RAM
-	AM_IMPORT_FROM(gx_base_memmap)
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( gx_type4_map, AS_PROGRAM, 32, konamigx_state )
+ADDRESS_MAP_START(konamigx_state::gx_type4_map)
+	AM_IMPORT_FROM(gx_base_memmap)
 	AM_RANGE(0xcc0000, 0xcc0007) AM_WRITE(type4_prot_w)
 	AM_RANGE(0xd90000, 0xd97fff) AM_RAM
 	AM_RANGE(0xe00000, 0xe0001f) AM_RAM AM_SHARE("k053936_0_ctrl")
@@ -1064,7 +1065,6 @@ static ADDRESS_MAP_START( gx_type4_map, AS_PROGRAM, 32, konamigx_state )
 	AM_RANGE(0xec0000, 0xec0003) AM_READ(type3_sync_r)      // type 4 polls this too
 	AM_RANGE(0xf00000, 0xf07fff) AM_RAM_WRITE(konamigx_t4_psacmap_w) AM_SHARE("psacram")    // PSAC2 tilemap
 //  AM_RANGE(0xf00000, 0xf07fff) AM_RAM
-	AM_IMPORT_FROM(gx_base_memmap)
 ADDRESS_MAP_END
 
 /**********************************************************************************/
@@ -1104,7 +1104,7 @@ WRITE16_MEMBER(konamigx_state::tms57002_control_word_w)
 }
 
 /* 68000 memory handling */
-static ADDRESS_MAP_START( gxsndmap, AS_PROGRAM, 16, konamigx_state )
+ADDRESS_MAP_START(konamigx_state::gxsndmap)
 	AM_RANGE(0x000000, 0x03ffff) AM_ROM
 	AM_RANGE(0x100000, 0x10ffff) AM_RAM
 	AM_RANGE(0x200000, 0x2004ff) AM_DEVREADWRITE8("k054539_1", k054539_device, read, write, 0xff00)
@@ -1115,7 +1115,7 @@ static ADDRESS_MAP_START( gxsndmap, AS_PROGRAM, 16, konamigx_state )
 	AM_RANGE(0x580000, 0x580001) AM_WRITENOP // 'NRES' - D2: K056602 /RESET
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( gxtmsmap, AS_DATA, 8, konamigx_state )
+ADDRESS_MAP_START(konamigx_state::gxtmsmap)
 	AM_RANGE(0x00000, 0x3ffff) AM_RAM
 ADDRESS_MAP_END
 
@@ -1692,17 +1692,20 @@ MACHINE_CONFIG_START(konamigx_state::konamigx)
 	MCFG_SOUND_ROUTE(1, "rspeaker", 1.0)
 MACHINE_CONFIG_END
 
-MACHINE_CONFIG_DERIVED(konamigx_state::konamigx_bios, konamigx)
+MACHINE_CONFIG_START(konamigx_state::konamigx_bios)
+	konamigx(config);
 	MCFG_DEVICE_MODIFY("k056832")
 	MCFG_K056832_CONFIG("gfx1", K056832_BPP_4, 0, 0, "k055555")
 MACHINE_CONFIG_END
 
-MACHINE_CONFIG_DERIVED(konamigx_state::gokuparo, konamigx)
+MACHINE_CONFIG_START(konamigx_state::gokuparo)
+	konamigx(config);
 	MCFG_DEVICE_MODIFY("k055673")
 	MCFG_K055673_CONFIG("gfx2", K055673_LAYOUT_GX, -46, -23)
 MACHINE_CONFIG_END
 
-MACHINE_CONFIG_DERIVED(konamigx_state::sexyparo, konamigx)
+MACHINE_CONFIG_START(konamigx_state::sexyparo)
+	konamigx(config);
 	MCFG_DEVICE_MODIFY("k056832")
 	MCFG_K056832_CB(konamigx_state, alpha_tile_callback)
 
@@ -1710,12 +1713,14 @@ MACHINE_CONFIG_DERIVED(konamigx_state::sexyparo, konamigx)
 	MCFG_K055673_CONFIG("gfx2", K055673_LAYOUT_GX, -42, -23)
 MACHINE_CONFIG_END
 
-MACHINE_CONFIG_DERIVED(konamigx_state::tbyahhoo, konamigx)
+MACHINE_CONFIG_START(konamigx_state::tbyahhoo)
+	konamigx(config);
 	MCFG_DEVICE_MODIFY("k056832")
 	MCFG_K056832_CONFIG("gfx1", K056832_BPP_5, 0, 0, "k055555")
 MACHINE_CONFIG_END
 
-MACHINE_CONFIG_DERIVED(konamigx_state::dragoonj, konamigx)
+MACHINE_CONFIG_START(konamigx_state::dragoonj)
+	konamigx(config);
 	MCFG_SCREEN_MODIFY("screen")
 	MCFG_VIDEO_START_OVERRIDE(konamigx_state, dragoonj)
 
@@ -1730,7 +1735,8 @@ MACHINE_CONFIG_DERIVED(konamigx_state::dragoonj, konamigx)
 	MCFG_K055673_CONFIG("gfx2", K055673_LAYOUT_RNG, -53, -23)
 MACHINE_CONFIG_END
 
-MACHINE_CONFIG_DERIVED(konamigx_state::le2, konamigx)
+MACHINE_CONFIG_START(konamigx_state::le2)
+	konamigx(config);
 	MCFG_VIDEO_START_OVERRIDE(konamigx_state, le2)
 	MCFG_TIMER_DRIVER_ADD_SCANLINE("scantimer", konamigx_state, konamigx_type2_scanline, "screen", 0, 1)
 
@@ -1742,7 +1748,8 @@ MACHINE_CONFIG_DERIVED(konamigx_state::le2, konamigx)
 	MCFG_K055673_CONFIG("gfx2", K055673_LAYOUT_LE2, -46, -23)
 MACHINE_CONFIG_END
 
-MACHINE_CONFIG_DERIVED(konamigx_state::konamigx_6bpp, konamigx)
+MACHINE_CONFIG_START(konamigx_state::konamigx_6bpp)
+	konamigx(config);
 	MCFG_VIDEO_START_OVERRIDE(konamigx_state, konamigx_6bpp)
 
 	MCFG_DEVICE_MODIFY("k056832")
@@ -1752,7 +1759,8 @@ MACHINE_CONFIG_DERIVED(konamigx_state::konamigx_6bpp, konamigx)
 	MCFG_K055673_CONFIG("gfx2", K055673_LAYOUT_GX, -46, -23)
 MACHINE_CONFIG_END
 
-MACHINE_CONFIG_DERIVED(konamigx_state::salmndr2, konamigx)
+MACHINE_CONFIG_START(konamigx_state::salmndr2)
+	konamigx(config);
 	MCFG_DEVICE_MODIFY("k056832")
 	MCFG_K056832_CONFIG("gfx1", K056832_BPP_6, 1, 0, "none")
 
@@ -1761,7 +1769,8 @@ MACHINE_CONFIG_DERIVED(konamigx_state::salmndr2, konamigx)
 	MCFG_K055673_CONFIG("gfx2", K055673_LAYOUT_GX6, -48, -23)
 MACHINE_CONFIG_END
 
-MACHINE_CONFIG_DERIVED(konamigx_state::opengolf, konamigx)
+MACHINE_CONFIG_START(konamigx_state::opengolf)
+	konamigx(config);
 	MCFG_SCREEN_MODIFY("screen")
 	MCFG_SCREEN_RAW_PARAMS(8000000, 384+24+64+40, 0, 383, 224+16+8+16, 0, 223)
 	MCFG_SCREEN_VISIBLE_AREA(40, 40+384-1, 16, 16+224-1)
@@ -1779,7 +1788,8 @@ MACHINE_CONFIG_DERIVED(konamigx_state::opengolf, konamigx)
 	MCFG_ADC083X_INPUT_CB(konamigx_state, adc0834_callback)
 MACHINE_CONFIG_END
 
-MACHINE_CONFIG_DERIVED(konamigx_state::racinfrc, konamigx)
+MACHINE_CONFIG_START(konamigx_state::racinfrc)
+	konamigx(config);
 	MCFG_SCREEN_MODIFY("screen")
 	//MCFG_SCREEN_RAW_PARAMS(6000000, 384+24+64+40, 0, 383, 224+16+8+16, 0, 223)
 	//MCFG_SCREEN_VISIBLE_AREA(32, 32+384-1, 16, 16+224-1)
@@ -1803,7 +1813,8 @@ MACHINE_CONFIG_DERIVED(konamigx_state::racinfrc, konamigx)
 	MCFG_ADC083X_INPUT_CB(konamigx_state, adc0834_callback)
 MACHINE_CONFIG_END
 
-MACHINE_CONFIG_DERIVED(konamigx_state::gxtype3, konamigx)
+MACHINE_CONFIG_START(konamigx_state::gxtype3)
+	konamigx(config);
 
 	MCFG_DEVICE_MODIFY("maincpu")
 	MCFG_CPU_PROGRAM_MAP(gx_type3_map)
@@ -1843,7 +1854,8 @@ MACHINE_CONFIG_DERIVED(konamigx_state::gxtype3, konamigx)
 	MCFG_SCREEN_UPDATE_DRIVER(konamigx_state, screen_update_konamigx_right)
 MACHINE_CONFIG_END
 
-MACHINE_CONFIG_DERIVED(konamigx_state::gxtype4, konamigx)
+MACHINE_CONFIG_START(konamigx_state::gxtype4)
+	konamigx(config);
 
 	MCFG_DEVICE_MODIFY("maincpu")
 	MCFG_CPU_PROGRAM_MAP(gx_type4_map)
@@ -1884,7 +1896,8 @@ MACHINE_CONFIG_DERIVED(konamigx_state::gxtype4, konamigx)
 	MCFG_K055673_CONFIG("gfx2", K055673_LAYOUT_GX6, -79, -24) // -23 looks better in intro
 MACHINE_CONFIG_END
 
-MACHINE_CONFIG_DERIVED(konamigx_state::gxtype4_vsn, gxtype4)
+MACHINE_CONFIG_START(konamigx_state::gxtype4_vsn)
+	gxtype4(config);
 	MCFG_DEFAULT_LAYOUT(layout_dualhsxs)
 
 	//MCFG_SCREEN_MODIFY("screen")
@@ -1908,14 +1921,16 @@ MACHINE_CONFIG_DERIVED(konamigx_state::gxtype4_vsn, gxtype4)
 	MCFG_K055673_CONFIG("gfx2", K055673_LAYOUT_GX6, -132, -23)
 MACHINE_CONFIG_END
 
-MACHINE_CONFIG_DERIVED(konamigx_state::gxtype4sd2, gxtype4)
+MACHINE_CONFIG_START(konamigx_state::gxtype4sd2)
+	gxtype4(config);
 	MCFG_VIDEO_START_OVERRIDE(konamigx_state, konamigx_type4_sd2)
 
 	MCFG_DEVICE_MODIFY("k055673")
 	MCFG_K055673_CONFIG("gfx2", K055673_LAYOUT_GX6, -81, -23)
 MACHINE_CONFIG_END
 
-MACHINE_CONFIG_DERIVED(konamigx_state::winspike, konamigx)
+MACHINE_CONFIG_START(konamigx_state::winspike)
+	konamigx(config);
 	//MCFG_SCREEN_MODIFY("screen")
 	//MCFG_SCREEN_VISIBLE_AREA(38, 38+384-1, 16, 16+224-1)
 

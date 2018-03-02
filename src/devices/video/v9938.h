@@ -214,6 +214,8 @@ private:
 	uint8_t command_unit_w(uint8_t Op);
 	void update_command();
 
+	void memmap(address_map &map);
+
 	// general
 	int m_offset_x, m_offset_y, m_visible_y, m_mode;
 	// palette

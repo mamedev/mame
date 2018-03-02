@@ -35,8 +35,6 @@ public:
 	DECLARE_READ8_MEMBER( status_r );
 	DECLARE_WRITE8_MEMBER( vbank_w );
 	DECLARE_WRITE8_MEMBER( vbank_clear_w );
-	DECLARE_READ8_MEMBER( mb_vcu_paletteram_r );
-	DECLARE_WRITE8_MEMBER( mb_vcu_paletteram_w );
 
 	uint32_t screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 	void screen_eof(void);
@@ -53,6 +51,12 @@ private:
 	inline void write_byte(offs_t address, uint8_t data);
 	inline uint8_t read_io(offs_t address);
 	inline void write_io(offs_t address, uint8_t data);
+
+	DECLARE_READ8_MEMBER( mb_vcu_paletteram_r );
+	DECLARE_WRITE8_MEMBER( mb_vcu_paletteram_w );
+
+	void mb_vcu_pal_ram(address_map &map);
+	void mb_vcu_vram(address_map &map);
 
 	const address_space_config      m_videoram_space_config;
 	const address_space_config      m_paletteram_space_config;

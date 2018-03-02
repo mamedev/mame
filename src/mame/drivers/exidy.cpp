@@ -200,7 +200,7 @@ WRITE8_MEMBER(exidy_state::fax_bank_select_w)
  *
  *************************************/
 
-static ADDRESS_MAP_START( exidy_map, AS_PROGRAM, 8, exidy_state )
+ADDRESS_MAP_START(exidy_state::exidy_map)
 	AM_RANGE(0x0000, 0x03ff) AM_RAM
 	AM_RANGE(0x4000, 0x43ff) AM_MIRROR(0x0400) AM_RAM AM_SHARE("videoram")
 	AM_RANGE(0x5000, 0x5000) AM_MIRROR(0x003f) AM_WRITEONLY AM_SHARE("sprite1_xpos")
@@ -217,37 +217,37 @@ static ADDRESS_MAP_START( exidy_map, AS_PROGRAM, 8, exidy_state )
 ADDRESS_MAP_END
 
 
-static ADDRESS_MAP_START( sidetrac_map, AS_PROGRAM, 8, exidy_state )
+ADDRESS_MAP_START(exidy_state::sidetrac_map)
+	AM_IMPORT_FROM(exidy_map)
 	AM_RANGE(0x0800, 0x3fff) AM_ROM
 	AM_RANGE(0x4800, 0x4fff) AM_ROM AM_SHARE("characterram")
 	AM_RANGE(0x5200, 0x5200) AM_WRITE(targ_audio_1_w)
 	AM_RANGE(0x5201, 0x5201) AM_WRITE(spectar_audio_2_w)
 	AM_RANGE(0xff00, 0xffff) AM_ROM AM_REGION("maincpu", 0x3f00)
-	AM_IMPORT_FROM(exidy_map)
 ADDRESS_MAP_END
 
 
-static ADDRESS_MAP_START( targ_map, AS_PROGRAM, 8, exidy_state )
+ADDRESS_MAP_START(exidy_state::targ_map)
+	AM_IMPORT_FROM(exidy_map)
 	AM_RANGE(0x0800, 0x3fff) AM_ROM
 	AM_RANGE(0x4800, 0x4fff) AM_RAM AM_SHARE("characterram")
 	AM_RANGE(0x5200, 0x5200) AM_WRITE(targ_audio_1_w)
 	AM_RANGE(0x5201, 0x5201) AM_WRITE(targ_audio_2_w)
 	AM_RANGE(0xff00, 0xffff) AM_ROM AM_REGION("maincpu", 0x3f00)
-	AM_IMPORT_FROM(exidy_map)
 ADDRESS_MAP_END
 
 
-static ADDRESS_MAP_START( spectar_map, AS_PROGRAM, 8, exidy_state )
+ADDRESS_MAP_START(exidy_state::spectar_map)
+	AM_IMPORT_FROM(exidy_map)
 	AM_RANGE(0x0800, 0x3fff) AM_ROM
 	AM_RANGE(0x4800, 0x4fff) AM_RAM AM_SHARE("characterram")
 	AM_RANGE(0x5200, 0x5200) AM_WRITE(targ_audio_1_w)
 	AM_RANGE(0x5201, 0x5201) AM_WRITE(spectar_audio_2_w)
 	AM_RANGE(0xff00, 0xffff) AM_ROM AM_REGION("maincpu", 0x3f00)
-	AM_IMPORT_FROM(exidy_map)
 ADDRESS_MAP_END
 
 
-static ADDRESS_MAP_START( rallys_map, AS_PROGRAM, 8, exidy_state )
+ADDRESS_MAP_START(exidy_state::rallys_map)
 	AM_RANGE(0x0000, 0x03ff) AM_RAM
 	AM_RANGE(0x0800, 0x3fff) AM_ROM
 	AM_RANGE(0x4000, 0x43ff) AM_MIRROR(0x0400) AM_RAM AM_SHARE("videoram")
@@ -269,24 +269,25 @@ static ADDRESS_MAP_START( rallys_map, AS_PROGRAM, 8, exidy_state )
 ADDRESS_MAP_END
 
 
-static ADDRESS_MAP_START( venture_map, AS_PROGRAM, 8, exidy_state )
+ADDRESS_MAP_START(exidy_state::venture_map)
+	AM_IMPORT_FROM(exidy_map)
 	AM_RANGE(0x4800, 0x4fff) AM_RAM AM_SHARE("characterram")
 	AM_RANGE(0x5200, 0x520f) AM_DEVREADWRITE("pia0", pia6821_device, read, write)
 	AM_RANGE(0x8000, 0xffff) AM_ROM
-	AM_IMPORT_FROM(exidy_map)
 ADDRESS_MAP_END
 
 
-static ADDRESS_MAP_START( pepper2_map, AS_PROGRAM, 8, exidy_state )
+ADDRESS_MAP_START(exidy_state::pepper2_map)
+	AM_IMPORT_FROM(exidy_map)
 	AM_RANGE(0x4800, 0x4fff) AM_NOP
 	AM_RANGE(0x5200, 0x520f) AM_DEVREADWRITE("pia0", pia6821_device, read, write)
 	AM_RANGE(0x6000, 0x6fff) AM_RAM AM_SHARE("characterram")
 	AM_RANGE(0x8000, 0xffff) AM_ROM
-	AM_IMPORT_FROM(exidy_map)
 ADDRESS_MAP_END
 
 
-static ADDRESS_MAP_START( fax_map, AS_PROGRAM, 8, exidy_state )
+ADDRESS_MAP_START(exidy_state::fax_map)
+	AM_IMPORT_FROM(exidy_map)
 	AM_RANGE(0x0400, 0x07ff) AM_RAM
 	AM_RANGE(0x1a00, 0x1a00) AM_READ_PORT("IN4")
 	AM_RANGE(0x1c00, 0x1c00) AM_READ_PORT("IN3")
@@ -296,7 +297,6 @@ static ADDRESS_MAP_START( fax_map, AS_PROGRAM, 8, exidy_state )
 	AM_RANGE(0x5213, 0x5217) AM_WRITENOP        /* empty control lines on color/sound board */
 	AM_RANGE(0x6000, 0x6fff) AM_RAM AM_SHARE("characterram")
 	AM_RANGE(0x8000, 0xffff) AM_ROM
-	AM_IMPORT_FROM(exidy_map)
 ADDRESS_MAP_END
 
 
@@ -832,40 +832,44 @@ MACHINE_CONFIG_START(exidy_state::base)
 MACHINE_CONFIG_END
 
 
-MACHINE_CONFIG_DERIVED(exidy_state::sidetrac, base)
+MACHINE_CONFIG_START(exidy_state::sidetrac)
+	base(config);
 
 	/* basic machine hardware */
 	MCFG_CPU_MODIFY("maincpu")
 	MCFG_CPU_PROGRAM_MAP(sidetrac_map)
 
 	/* audio hardware */
-	MCFG_FRAGMENT_ADD(spectar_audio)
+	spectar_audio(config);
 MACHINE_CONFIG_END
 
 
-MACHINE_CONFIG_DERIVED(exidy_state::targ, base)
+MACHINE_CONFIG_START(exidy_state::targ)
+	base(config);
 
 	/* basic machine hardware */
 	MCFG_CPU_MODIFY("maincpu")
 	MCFG_CPU_PROGRAM_MAP(targ_map)
 
 	/* audio hardware */
-	MCFG_FRAGMENT_ADD(targ_audio)
+	targ_audio(config);
 MACHINE_CONFIG_END
 
 
-MACHINE_CONFIG_DERIVED(exidy_state::spectar, base)
+MACHINE_CONFIG_START(exidy_state::spectar)
+	base(config);
 
 	/* basic machine hardware */
 	MCFG_CPU_MODIFY("maincpu")
 	MCFG_CPU_PROGRAM_MAP(spectar_map)
 
 	/* audio hardware */
-	MCFG_FRAGMENT_ADD(spectar_audio)
+	spectar_audio(config);
 MACHINE_CONFIG_END
 
 
-MACHINE_CONFIG_DERIVED(exidy_state::rallys, spectar)
+MACHINE_CONFIG_START(exidy_state::rallys)
+	spectar(config);
 
 	/* basic machine hardware */
 	MCFG_CPU_MODIFY("maincpu")
@@ -873,7 +877,8 @@ MACHINE_CONFIG_DERIVED(exidy_state::rallys, spectar)
 MACHINE_CONFIG_END
 
 
-MACHINE_CONFIG_DERIVED(exidy_state::venture, base)
+MACHINE_CONFIG_START(exidy_state::venture)
+	base(config);
 
 	/* basic machine hardware */
 	MCFG_CPU_MODIFY("maincpu")
@@ -882,11 +887,12 @@ MACHINE_CONFIG_DERIVED(exidy_state::venture, base)
 	MCFG_QUANTUM_TIME(attotime::from_hz(600))
 
 	/* audio hardware */
-	MCFG_FRAGMENT_ADD(venture_audio)
+	venture_audio(config);
 MACHINE_CONFIG_END
 
 
-MACHINE_CONFIG_DERIVED(exidy_state::teetert, venture)
+MACHINE_CONFIG_START(exidy_state::teetert)
+	venture(config);
 
 	/* basic machine hardware */
 	MCFG_CPU_MODIFY("maincpu")
@@ -897,18 +903,20 @@ MACHINE_CONFIG_DERIVED(exidy_state::teetert, venture)
 MACHINE_CONFIG_END
 
 
-MACHINE_CONFIG_DERIVED(exidy_state::mtrap, venture)
+MACHINE_CONFIG_START(exidy_state::mtrap)
+	venture(config);
 
 	/* basic machine hardware */
 
 	MCFG_QUANTUM_TIME(attotime::from_hz(1920))
 
 	/* audio hardware */
-	MCFG_FRAGMENT_ADD(mtrap_cvsd_audio)
+	mtrap_cvsd_audio(config);
 MACHINE_CONFIG_END
 
 
-MACHINE_CONFIG_DERIVED(exidy_state::pepper2, venture)
+MACHINE_CONFIG_START(exidy_state::pepper2)
+	venture(config);
 
 	/* basic machine hardware */
 	MCFG_CPU_MODIFY("maincpu")
@@ -916,7 +924,8 @@ MACHINE_CONFIG_DERIVED(exidy_state::pepper2, venture)
 MACHINE_CONFIG_END
 
 
-MACHINE_CONFIG_DERIVED(exidy_state::fax, pepper2)
+MACHINE_CONFIG_START(exidy_state::fax)
+	pepper2(config);
 
 	/* basic machine hardware */
 	MCFG_CPU_MODIFY("maincpu")

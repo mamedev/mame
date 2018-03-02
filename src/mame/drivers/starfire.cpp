@@ -190,7 +190,7 @@ READ8_MEMBER(starfire_state::fireone_input_r)
  *
  *************************************/
 
-static ADDRESS_MAP_START( main_map, AS_PROGRAM, 8, starfire_state )
+ADDRESS_MAP_START(starfire_state::main_map)
 	AM_RANGE(0x0000, 0x7fff) AM_ROM
 	AM_RANGE(0x8000, 0x9fff) AM_READWRITE(starfire_scratch_r, starfire_scratch_w)
 	AM_RANGE(0xa000, 0xbfff) AM_READWRITE(starfire_colorram_r, starfire_colorram_w) AM_SHARE("colorram")
@@ -343,7 +343,8 @@ MACHINE_CONFIG_START(starfire_state::fireone)
 MACHINE_CONFIG_END
 
 
-MACHINE_CONFIG_DERIVED(starfire_state::starfire, fireone)
+MACHINE_CONFIG_START(starfire_state::starfire)
+	fireone(config);
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")

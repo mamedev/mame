@@ -189,11 +189,10 @@ public:
 		m_dsw2(*this, "DSW2")
 	{ }
 
-	std::unique_ptr<uint8_t[]> m_main_mem;
-	int m_bank_cfg;
-	int m_bank[8];
-	int m_input_mux;
-	required_device<v9938_device> m_v9938;
+	DECLARE_DRIVER_INIT(sfkick);
+	void sfkick(machine_config &config);
+
+protected:
 	DECLARE_WRITE8_MEMBER(page0_w);
 	DECLARE_WRITE8_MEMBER(page1_w);
 	DECLARE_WRITE8_MEMBER(page2_w);
@@ -201,11 +200,22 @@ public:
 	DECLARE_READ8_MEMBER(ppi_port_b_r);
 	DECLARE_WRITE8_MEMBER(ppi_port_a_w);
 	DECLARE_WRITE8_MEMBER(ppi_port_c_w);
-	DECLARE_DRIVER_INIT(sfkick);
 	virtual void machine_reset() override;
 	void sfkick_remap_banks();
 	void sfkick_bank_set(int num, int data);
 	DECLARE_WRITE_LINE_MEMBER(irqhandler);
+	void sfkick_io_map(address_map &map);
+	void sfkick_map(address_map &map);
+	void sfkick_sound_io_map(address_map &map);
+	void sfkick_sound_map(address_map &map);
+
+private:
+	std::unique_ptr<uint8_t[]> m_main_mem;
+	int m_bank_cfg;
+	int m_bank[8];
+	int m_input_mux;
+
+	required_device<v9938_device> m_v9938;
 	required_device<cpu_device> m_maincpu;
 	required_device<cpu_device> m_soundcpu;
 	required_memory_region m_region_bios;
@@ -225,7 +235,6 @@ public:
 	required_ioport m_dial;
 	required_ioport m_dsw1;
 	required_ioport m_dsw2;
-	void sfkick(machine_config &config);
 };
 
 
@@ -456,7 +465,7 @@ WRITE8_MEMBER(sfkick_state::page3_w)
 
 
 
-static ADDRESS_MAP_START( sfkick_map, AS_PROGRAM, 8, sfkick_state )
+ADDRESS_MAP_START(sfkick_state::sfkick_map)
 	AM_RANGE( 0x0000, 0x1fff) AM_ROMBANK("bank1")
 	AM_RANGE( 0x2000, 0x3fff) AM_ROMBANK("bank2")
 	AM_RANGE( 0x4000, 0x5fff) AM_ROMBANK("bank3")
@@ -471,7 +480,7 @@ static ADDRESS_MAP_START( sfkick_map, AS_PROGRAM, 8, sfkick_state )
 	AM_RANGE( 0xc000, 0xffff) AM_WRITE(page3_w )
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( sfkick_io_map, AS_IO, 8, sfkick_state )
+ADDRESS_MAP_START(sfkick_state::sfkick_io_map)
 	ADDRESS_MAP_UNMAP_HIGH
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	AM_RANGE( 0xa0, 0xa7) AM_DEVWRITE("soundlatch", generic_latch_8_device, write)
@@ -480,12 +489,12 @@ static ADDRESS_MAP_START( sfkick_io_map, AS_IO, 8, sfkick_state )
 	AM_RANGE( 0xb4, 0xb5) AM_RAM /* loopback ? req by sfkicka (MSX Bios leftover)*/
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( sfkick_sound_map, AS_PROGRAM, 8, sfkick_state )
+ADDRESS_MAP_START(sfkick_state::sfkick_sound_map)
 	AM_RANGE(0x0000, 0x7fff) AM_ROM
 	AM_RANGE(0xc000, 0xc7ff) AM_RAM
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( sfkick_sound_io_map, AS_IO, 8, sfkick_state )
+ADDRESS_MAP_START(sfkick_state::sfkick_sound_io_map)
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	AM_RANGE(0x00, 0x00) AM_DEVREAD("soundlatch", generic_latch_8_device, read)
 	AM_RANGE(0x04, 0x05) AM_DEVREADWRITE("ym1", ym2203_device, read, write)

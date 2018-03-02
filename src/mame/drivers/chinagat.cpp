@@ -114,6 +114,12 @@ public:
 	void saiyugoub2(machine_config &config);
 	void saiyugoub1(machine_config &config);
 	void chinagat(machine_config &config);
+	void i8748_map(address_map &map);
+	void main_map(address_map &map);
+	void saiyugoub1_sound_map(address_map &map);
+	void sound_map(address_map &map);
+	void sub_map(address_map &map);
+	void ym2203c_sound_map(address_map &map);
 };
 
 
@@ -328,7 +334,7 @@ WRITE_LINE_MEMBER(chinagat_state::saiyugoub1_m5205_irq_w)
 	m_adpcm_sound_irq = 1;
 }
 
-static ADDRESS_MAP_START( main_map, AS_PROGRAM, 8, chinagat_state )
+ADDRESS_MAP_START(chinagat_state::main_map)
 	AM_RANGE(0x0000, 0x1fff) AM_RAM AM_SHARE("share1")
 	AM_RANGE(0x2000, 0x27ff) AM_RAM_WRITE(ddragon_fgvideoram_w) AM_SHARE("fgvideoram")
 	AM_RANGE(0x2800, 0x2fff) AM_RAM_WRITE(ddragon_bgvideoram_w) AM_SHARE("bgvideoram")
@@ -349,7 +355,7 @@ static ADDRESS_MAP_START( main_map, AS_PROGRAM, 8, chinagat_state )
 	AM_RANGE(0x8000, 0xffff) AM_ROM
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( sub_map, AS_PROGRAM, 8, chinagat_state )
+ADDRESS_MAP_START(chinagat_state::sub_map)
 	AM_RANGE(0x0000, 0x1fff) AM_RAM AM_SHARE("share1")
 	AM_RANGE(0x2000, 0x2000) AM_WRITE(sub_bankswitch_w)
 	AM_RANGE(0x2800, 0x2800) AM_WRITE(sub_irq_ack_w) /* Called on CPU start and after return from jump table */
@@ -359,7 +365,7 @@ static ADDRESS_MAP_START( sub_map, AS_PROGRAM, 8, chinagat_state )
 	AM_RANGE(0x8000, 0xffff) AM_ROM
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( sound_map, AS_PROGRAM, 8, chinagat_state )
+ADDRESS_MAP_START(chinagat_state::sound_map)
 	AM_RANGE(0x0000, 0x7fff) AM_ROM
 	AM_RANGE(0x8000, 0x87ff) AM_RAM
 	AM_RANGE(0x8800, 0x8801) AM_DEVREADWRITE("ymsnd", ym2151_device, read, write)
@@ -367,7 +373,7 @@ static ADDRESS_MAP_START( sound_map, AS_PROGRAM, 8, chinagat_state )
 	AM_RANGE(0xA000, 0xA000) AM_DEVREAD("soundlatch", generic_latch_8_device, read)
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( ym2203c_sound_map, AS_PROGRAM, 8, chinagat_state )
+ADDRESS_MAP_START(chinagat_state::ym2203c_sound_map)
 	AM_RANGE(0x0000, 0x7fff) AM_ROM
 	AM_RANGE(0x8000, 0x87ff) AM_RAM
 // 8804 and/or 8805 make a gong sound when the coin goes in
@@ -385,7 +391,7 @@ static ADDRESS_MAP_START( ym2203c_sound_map, AS_PROGRAM, 8, chinagat_state )
 	AM_RANGE(0xA000, 0xA000) AM_DEVREAD("soundlatch", generic_latch_8_device, read)
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( saiyugoub1_sound_map, AS_PROGRAM, 8, chinagat_state )
+ADDRESS_MAP_START(chinagat_state::saiyugoub1_sound_map)
 	AM_RANGE(0x0000, 0x7fff) AM_ROM
 	AM_RANGE(0x8000, 0x87ff) AM_RAM
 	AM_RANGE(0x8800, 0x8801) AM_DEVREADWRITE("ymsnd", ym2151_device, read, write)
@@ -393,7 +399,7 @@ static ADDRESS_MAP_START( saiyugoub1_sound_map, AS_PROGRAM, 8, chinagat_state )
 	AM_RANGE(0xA000, 0xA000) AM_DEVREAD("soundlatch", generic_latch_8_device, read)
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( i8748_map, AS_PROGRAM, 8, chinagat_state )
+ADDRESS_MAP_START(chinagat_state::i8748_map)
 	AM_RANGE(0x0000, 0x03ff) AM_ROM
 	AM_RANGE(0x0400, 0x07ff) AM_ROM     /* i8749 version */
 ADDRESS_MAP_END

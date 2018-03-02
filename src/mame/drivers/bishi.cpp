@@ -144,7 +144,7 @@ READ16_MEMBER(bishi_state::bishi_K056832_rom_r)
 	return m_k056832->bishi_rom_word_r(space, ouroffs, mem_mask);
 }
 
-static ADDRESS_MAP_START( main_map, AS_PROGRAM, 16, bishi_state )
+ADDRESS_MAP_START(bishi_state::main_map)
 	AM_RANGE(0x000000, 0x0fffff) AM_ROM
 	AM_RANGE(0x400000, 0x407fff) AM_RAM                     // Work RAM
 	AM_RANGE(0x800000, 0x800001) AM_READWRITE(control_r, control_w)
@@ -484,7 +484,8 @@ MACHINE_CONFIG_START(bishi_state::bishi)
 	MCFG_SOUND_ROUTE(1, "rspeaker", 1.0)
 MACHINE_CONFIG_END
 
-MACHINE_CONFIG_DERIVED(bishi_state::dobouchn, bishi)
+MACHINE_CONFIG_START(bishi_state::dobouchn)
+	bishi(config);
 //  TODO: change accordingly (ASCII charset definitely not 8bpp, 5bpp perhaps?)
 	MCFG_DEVICE_MODIFY("k056832")
 //  MCFG_K056832_CB(bishi_state, dobouchn_tile_callback)

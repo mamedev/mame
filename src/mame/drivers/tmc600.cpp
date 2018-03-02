@@ -121,14 +121,14 @@ WRITE8_MEMBER( tmc600_state::printer_w )
 
 /* Memory Maps */
 
-static ADDRESS_MAP_START( tmc600_map, AS_PROGRAM, 8, tmc600_state )
+ADDRESS_MAP_START(tmc600_state::tmc600_map)
 	AM_RANGE(0x0000, 0x5fff) AM_ROM
 	AM_RANGE(0x6000, 0x7fff) AM_RAM
 	AM_RANGE(0xf400, 0xf7ff) AM_DEVICE(CDP1869_TAG, cdp1869_device, char_map)
 	AM_RANGE(0xf800, 0xffff) AM_DEVICE(CDP1869_TAG, cdp1869_device, page_map)
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( tmc600_io_map, AS_IO, 8, tmc600_state )
+ADDRESS_MAP_START(tmc600_state::tmc600_io_map)
 	AM_RANGE(0x03, 0x03) AM_DEVWRITE(CDP1852_KB_TAG, cdp1852_device, write)
 	AM_RANGE(0x04, 0x04) AM_DEVWRITE(CDP1852_TMC700_TAG, cdp1852_device, write)
 	AM_RANGE(0x05, 0x05) AM_READWRITE(rtc_r, vismac_data_w)
@@ -263,7 +263,7 @@ MACHINE_CONFIG_START(tmc600_state::tmc600)
 	MCFG_COSMAC_SC_CALLBACK(WRITE8(tmc600_state, sc_w))
 
 	// sound and video hardware
-	MCFG_FRAGMENT_ADD(tmc600_video)
+	tmc600_video(config);
 
 	// keyboard output latch
 	MCFG_DEVICE_ADD(CDP1852_KB_TAG, CDP1852, XTAL(3'570'000)/8) // clock is CDP1802 TPB

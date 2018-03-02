@@ -93,7 +93,7 @@ ROM_START( stereo_fx )
 	ROM_LOAD("ati_stereo_fx.bin", 0x0000, 0x8000, CRC(1bebffa6) SHA1(e66c2619a6c05199554b5702d67877ae3799d415))
 ROM_END
 
-static ADDRESS_MAP_START(stereo_fx_io, AS_IO, 8, stereo_fx_device)
+ADDRESS_MAP_START(stereo_fx_device::stereo_fx_io)
 	AM_RANGE(0xFF00, 0xFF00) AM_WRITE(port00_w)
 	AM_RANGE(0xFF10, 0xFF10) AM_DEVWRITE("rdac", dac_byte_interface, write)
 	AM_RANGE(0xFF20, 0xFF20) AM_WRITE(port20_w)
@@ -105,7 +105,7 @@ static ADDRESS_MAP_START(stereo_fx_io, AS_IO, 8, stereo_fx_device)
 	AM_RANGE(MCS51_PORT_P3, MCS51_PORT_P3) AM_READWRITE(p3_r, p3_w)
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START(stereo_fx_rom, AS_PROGRAM, 8, stereo_fx_device)
+ADDRESS_MAP_START(stereo_fx_device::stereo_fx_rom)
 	AM_RANGE(0x0000, 0x7fff) AM_ROM
 ADDRESS_MAP_END
 

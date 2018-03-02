@@ -82,6 +82,8 @@ private:
 	int m_sck;
 	int m_si;
 	int m_so;
+
+	void upd7227_map(address_map &map);
 };
 
 

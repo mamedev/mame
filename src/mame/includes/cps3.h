@@ -164,4 +164,6 @@ public:
 	void simm5_128mbit(machine_config &config);
 	void simm5_32mbit(machine_config &config);
 	void simm6_128mbit(machine_config &config);
+	void cps3_map(address_map &map);
+	void decrypted_opcodes_map(address_map &map);
 };

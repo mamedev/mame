@@ -22,7 +22,7 @@ DEFINE_DEVICE_TYPE(TMS32082_PP, tms32082_pp_device, "tms32082_pp", "TMS32082 PP"
 // Master Processor
 
 // internal memory map
-static ADDRESS_MAP_START(mp_internal_map, AS_PROGRAM, 32, tms32082_mp_device)
+ADDRESS_MAP_START(tms32082_mp_device::mp_internal_map)
 	AM_RANGE(0x00000000, 0x00000fff) AM_RAM AM_SHARE("pp0_data0")
 	AM_RANGE(0x00001000, 0x00001fff) AM_RAM AM_SHARE("pp1_data0")
 	AM_RANGE(0x00008000, 0x00008fff) AM_RAM AM_SHARE("pp0_data1")
@@ -45,7 +45,7 @@ const uint32_t tms32082_mp_device::SHIFT_MASK[] =
 
 tms32082_mp_device::tms32082_mp_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
 	: cpu_device(mconfig, TMS32082_MP, tag, owner, clock)
-	, m_program_config("program", ENDIANNESS_BIG, 32, 32, 0, ADDRESS_MAP_NAME(mp_internal_map))
+	, m_program_config("program", ENDIANNESS_BIG, 32, 32, 0, address_map_constructor(FUNC(tms32082_mp_device::mp_internal_map), this))
 {
 }
 
@@ -484,7 +484,7 @@ void tms32082_mp_device::execute_run()
 // Parallel Processor
 
 // internal memory map
-static ADDRESS_MAP_START(pp_internal_map, AS_PROGRAM, 32, tms32082_pp_device)
+ADDRESS_MAP_START(tms32082_pp_device::pp_internal_map)
 	AM_RANGE(0x00000000, 0x00000fff) AM_RAM AM_SHARE("pp0_data0")
 	AM_RANGE(0x00001000, 0x00001fff) AM_RAM AM_SHARE("pp1_data0")
 	AM_RANGE(0x00008000, 0x00008fff) AM_RAM AM_SHARE("pp0_data1")
@@ -495,7 +495,7 @@ ADDRESS_MAP_END
 
 tms32082_pp_device::tms32082_pp_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
 	: cpu_device(mconfig, TMS32082_PP, tag, owner, clock)
-	, m_program_config("program", ENDIANNESS_BIG, 32, 32, 0, ADDRESS_MAP_NAME(pp_internal_map))
+	, m_program_config("program", ENDIANNESS_BIG, 32, 32, 0, address_map_constructor(FUNC(tms32082_pp_device::pp_internal_map), this))
 {
 }
 

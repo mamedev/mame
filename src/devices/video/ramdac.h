@@ -60,16 +60,14 @@ public:
 	DECLARE_WRITE8_MEMBER( ramdac_rgb666_w );
 	DECLARE_WRITE8_MEMBER( ramdac_rgb888_w );
 
-	virtual space_config_vector memory_space_config() const override;
+	void ramdac_palram(address_map &map);
 
 protected:
 	// device-level overrides
 	virtual void device_validity_check(validity_checker &valid) const override;
 	virtual void device_start() override;
 	virtual void device_reset() override;
-	inline uint8_t readbyte(offs_t address);
-	inline void writebyte(offs_t address, uint8_t data);
-	inline void reg_increment(uint8_t inc_type);
+	virtual space_config_vector memory_space_config() const override;
 
 private:
 	uint8_t m_pal_index[2];
@@ -82,6 +80,10 @@ private:
 
 	uint32_t m_color_base;
 	uint8_t m_split_read_reg; // read register index is separated, seen in rltennis
+
+	inline uint8_t readbyte(offs_t address);
+	inline void writebyte(offs_t address, uint8_t data);
+	inline void reg_increment(uint8_t inc_type);
 };
 
 

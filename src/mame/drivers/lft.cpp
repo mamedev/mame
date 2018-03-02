@@ -28,6 +28,8 @@ public:
 	DECLARE_READ16_MEMBER(status_r);
 
 	void lft(machine_config &config);
+	void lft_io(address_map &map);
+	void lft_mem(address_map &map);
 private:
 	uint8_t m_term_data;
 	virtual void machine_reset() override;
@@ -35,13 +37,13 @@ private:
 	required_device<generic_terminal_device> m_terminal;
 };
 
-static ADDRESS_MAP_START(lft_mem, AS_PROGRAM, 16, lft_state)
+ADDRESS_MAP_START(lft_state::lft_mem)
 	ADDRESS_MAP_UNMAP_HIGH
 	AM_RANGE(0x00000, 0x5ffff) AM_RAM
 	AM_RANGE(0xfc000, 0xfffff) AM_ROM AM_REGION("roms", 0)
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START(lft_io, AS_IO, 16, lft_state)
+ADDRESS_MAP_START(lft_state::lft_io)
 	ADDRESS_MAP_UNMAP_HIGH
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	// screen 1

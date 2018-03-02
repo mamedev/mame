@@ -76,6 +76,11 @@ public:
 	required_device<ym3438_device> m_ymsnd;
 	void unkm1(machine_config &config);
 	void segam1(machine_config &config);
+	void segam1_comms_map(address_map &map);
+	void segam1_map(address_map &map);
+	void segam1_sound_io_map(address_map &map);
+	void segam1_sound_map(address_map &map);
+	void unkm1_sound_map(address_map &map);
 };
 
 void segam1_state::machine_start()
@@ -179,7 +184,7 @@ uint32_t segam1_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap
 
 
 
-static ADDRESS_MAP_START( segam1_map, AS_PROGRAM, 16, segam1_state )
+ADDRESS_MAP_START(segam1_state::segam1_map)
 	AM_RANGE(0x000000, 0x07ffff) AM_ROM
 	AM_RANGE(0x340000, 0x340fff) AM_DEVREADWRITE8("dpram", mb8421_device, right_r, right_w, 0x00ff)
 	AM_RANGE(0xb00000, 0xb0ffff) AM_DEVREADWRITE("tile", segas24_tile_device, tile_r, tile_w)
@@ -200,25 +205,25 @@ static ADDRESS_MAP_START( segam1_map, AS_PROGRAM, 16, segam1_state )
 	AM_RANGE(0xf00000, 0xf03fff) AM_MIRROR(0x0fc000) AM_RAM // NVRAM?
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( segam1_sound_map, AS_PROGRAM, 8, segam1_state )
+ADDRESS_MAP_START(segam1_state::segam1_sound_map)
 	AM_RANGE(0x0000, 0x7fff) AM_ROM
 	AM_RANGE(0xa000, 0xbfff) AM_ROMBANK("soundbank")
 	AM_RANGE(0xf000, 0xffff) AM_RAM
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( unkm1_sound_map, AS_PROGRAM, 8, segam1_state )
-	AM_RANGE(0xe000, 0xefff) AM_RAM
+ADDRESS_MAP_START(segam1_state::unkm1_sound_map)
 	AM_IMPORT_FROM(segam1_sound_map)
+	AM_RANGE(0xe000, 0xefff) AM_RAM
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( segam1_sound_io_map, AS_IO, 8, segam1_state )
+ADDRESS_MAP_START(segam1_state::segam1_sound_io_map)
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	AM_RANGE(0x80, 0x83) AM_DEVREADWRITE("ymsnd", ym3438_device, read, write)
 	AM_RANGE(0xa0, 0xa0) AM_WRITE(sound_a0_bank_w)
 	AM_RANGE(0xc0, 0xc0) AM_DEVREAD("soundlatch", generic_latch_8_device, read) AM_WRITENOP
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( segam1_comms_map, AS_PROGRAM, 8, segam1_state )
+ADDRESS_MAP_START(segam1_state::segam1_comms_map)
 	AM_RANGE(0x0000, 0x7fff) AM_ROM
 	AM_RANGE(0x8000, 0x9fff) AM_RAM
 	AM_RANGE(0xa000, 0xa7ff) AM_DEVREADWRITE("dpram", mb8421_device, left_r, left_w)
@@ -388,7 +393,8 @@ MACHINE_CONFIG_START(segam1_state::segam1)
 	//MCFG_YM2612_IRQ_HANDLER(WRITELINE(segam1_state, ym3438_irq_handler))
 MACHINE_CONFIG_END
 
-MACHINE_CONFIG_DERIVED(segam1_state::unkm1, segam1)
+MACHINE_CONFIG_START(segam1_state::unkm1)
+	segam1(config);
 	MCFG_CPU_MODIFY("audiocpu")
 	MCFG_CPU_PROGRAM_MAP(unkm1_sound_map)
 

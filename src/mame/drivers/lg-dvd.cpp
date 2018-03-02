@@ -18,6 +18,7 @@ public:
 	{ }
 
 	void lg(machine_config &config);
+	void lg_dvd_map(address_map &map);
 protected:
 	required_device<i80c52_device> m_maincpu;
 };
@@ -25,7 +26,7 @@ protected:
 static INPUT_PORTS_START( lg )
 INPUT_PORTS_END
 
-static ADDRESS_MAP_START( lg_dvd_map, AS_PROGRAM, 8, lg_dvd_state )
+ADDRESS_MAP_START(lg_dvd_state::lg_dvd_map)
 	AM_RANGE(0x0000, 0x7fff) AM_ROM AM_REGION("maincpu", 0)
 ADDRESS_MAP_END
 

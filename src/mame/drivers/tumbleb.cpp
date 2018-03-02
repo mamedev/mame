@@ -628,7 +628,7 @@ WRITE16_MEMBER(tumbleb_state::tumbleb2_soundmcu_w)
 
 /******************************************************************************/
 
-static ADDRESS_MAP_START( tumblepopb_main_map, AS_PROGRAM, 16, tumbleb_state )
+ADDRESS_MAP_START(tumbleb_state::tumblepopb_main_map)
 	AM_RANGE(0x000000, 0x07ffff) AM_ROM
 #if TUMBLEP_HACK
 	AM_RANGE(0x000000, 0x07ffff) AM_WRITEONLY   /* To write levels modifications */
@@ -650,7 +650,7 @@ static ADDRESS_MAP_START( tumblepopb_main_map, AS_PROGRAM, 16, tumbleb_state )
 	AM_RANGE(0x342400, 0x34247f) AM_WRITENOP
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( fncywld_main_map, AS_PROGRAM, 16, tumbleb_state )
+ADDRESS_MAP_START(tumbleb_state::fncywld_main_map)
 	AM_RANGE(0x000000, 0x0fffff) AM_ROM
 #if FNCYWLD_HACK
 	AM_RANGE(0x000000, 0x0fffff) AM_WRITEONLY   /* To write levels modifications */
@@ -679,7 +679,7 @@ READ16_MEMBER(tumbleb_state::semibase_unknown_r)
 	return machine().rand();
 }
 
-static ADDRESS_MAP_START( htchctch_main_map, AS_PROGRAM, 16, tumbleb_state )
+ADDRESS_MAP_START(tumbleb_state::htchctch_main_map)
 	AM_RANGE(0x000000, 0x0fffff) AM_ROM
 	AM_RANGE(0x100000, 0x10000f) AM_READ(semibase_unknown_r)
 	AM_RANGE(0x100000, 0x100001) AM_WRITE(semicom_soundcmd_w)
@@ -705,7 +705,7 @@ WRITE16_MEMBER(tumbleb_state::jumpkids_sound_w)
 	m_audiocpu->set_input_line(0, HOLD_LINE);
 }
 
-static ADDRESS_MAP_START( suprtrio_main_map, AS_PROGRAM, 16, tumbleb_state )
+ADDRESS_MAP_START(tumbleb_state::suprtrio_main_map)
 	AM_RANGE(0x000000, 0x07ffff) AM_ROM
 	AM_RANGE(0x700000, 0x700fff) AM_RAM AM_SHARE("spriteram")
 	AM_RANGE(0xa00000, 0xa0000f) AM_RAM AM_SHARE("control")
@@ -719,7 +719,7 @@ static ADDRESS_MAP_START( suprtrio_main_map, AS_PROGRAM, 16, tumbleb_state )
 	AM_RANGE(0xf00000, 0xf07fff) AM_RAM
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( pangpang_main_map, AS_PROGRAM, 16, tumbleb_state )
+ADDRESS_MAP_START(tumbleb_state::pangpang_main_map)
 	AM_RANGE(0x000000, 0x07ffff) AM_ROM
 	AM_RANGE(0x120000, 0x123fff) AM_RAM AM_SHARE("mainram")
 	AM_RANGE(0x140000, 0x1407ff) AM_RAM_DEVWRITE("palette", palette_device, write16) AM_SHARE("palette")
@@ -753,7 +753,7 @@ WRITE8_MEMBER(tumbleb_state::oki_sound_bank_w)
 	memcpy(&oki[0x30000], &oki[(data * 0x10000) + 0x40000], 0x10000);
 }
 
-static ADDRESS_MAP_START( semicom_sound_map, AS_PROGRAM, 8, tumbleb_state )
+ADDRESS_MAP_START(tumbleb_state::semicom_sound_map)
 	AM_RANGE(0x0000, 0xcfff) AM_ROM
 	AM_RANGE(0xd000, 0xd7ff) AM_RAM
 	AM_RANGE(0xf000, 0xf001) AM_DEVREADWRITE("ymsnd", ym2151_device, read, write)
@@ -763,7 +763,7 @@ static ADDRESS_MAP_START( semicom_sound_map, AS_PROGRAM, 8, tumbleb_state )
 	AM_RANGE(0xf00e, 0xf00e) AM_WRITE(oki_sound_bank_w)
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( suprtrio_sound_map, AS_PROGRAM, 8, tumbleb_state )
+ADDRESS_MAP_START(tumbleb_state::suprtrio_sound_map)
 	AM_RANGE(0x0000, 0xcfff) AM_ROM
 	AM_RANGE(0xd000, 0xd7ff) AM_RAM
 	AM_RANGE(0xf002, 0xf002) AM_DEVREADWRITE("oki", okim6295_device, read, write)
@@ -774,7 +774,7 @@ ADDRESS_MAP_END
 
 /* Jump Kids */
 
-static ADDRESS_MAP_START( jumpkids_main_map, AS_PROGRAM, 16, tumbleb_state )
+ADDRESS_MAP_START(tumbleb_state::jumpkids_main_map)
 	AM_RANGE(0x000000, 0x07ffff) AM_ROM
 	AM_RANGE(0x100000, 0x100001) AM_WRITE(jumpkids_sound_w)
 	AM_RANGE(0x120000, 0x123fff) AM_RAM AM_SHARE("mainram")
@@ -802,7 +802,7 @@ WRITE8_MEMBER(tumbleb_state::jumpkids_oki_bank_w)
 	memcpy(sound1 + 0x20000, sound2 + bank * 0x20000, 0x20000);
 }
 
-static ADDRESS_MAP_START( jumpkids_sound_map, AS_PROGRAM, 8, tumbleb_state )
+ADDRESS_MAP_START(tumbleb_state::jumpkids_sound_map)
 	AM_RANGE(0x0000, 0x0fff) AM_ROM
 	AM_RANGE(0x8000, 0x87ff) AM_RAM
 	AM_RANGE(0x9000, 0x9000) AM_WRITE(jumpkids_oki_bank_w)
@@ -857,11 +857,11 @@ WRITE8_MEMBER(tumbleb_state::prot_io_w)
 
 
 /* Semicom AT89C52 MCU */
-static ADDRESS_MAP_START( protection_map, AS_PROGRAM, 8, tumbleb_state )
+ADDRESS_MAP_START(tumbleb_state::protection_map)
 	AM_RANGE(0x0000, 0x1fff) AM_ROM
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( protection_iomap, AS_IO, 8, tumbleb_state )
+ADDRESS_MAP_START(tumbleb_state::protection_iomap)
 	AM_RANGE(MCS51_PORT_P0, MCS51_PORT_P3) AM_READWRITE(prot_io_r,prot_io_w)
 ADDRESS_MAP_END
 
@@ -2265,12 +2265,14 @@ MACHINE_CONFIG_START(tumbleb_state::htchctch)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 MACHINE_CONFIG_END
 
-MACHINE_CONFIG_DERIVED(tumbleb_state::cookbib, htchctch)
+MACHINE_CONFIG_START(tumbleb_state::cookbib)
+	htchctch(config);
 	MCFG_SCREEN_MODIFY("screen")
 	MCFG_SCREEN_UPDATE_DRIVER(tumbleb_state, screen_update_semicom_altoffsets)
 MACHINE_CONFIG_END
 
-MACHINE_CONFIG_DERIVED(tumbleb_state::chokchok, htchctch)
+MACHINE_CONFIG_START(tumbleb_state::chokchok)
+	htchctch(config);
 	MCFG_PALETTE_MODIFY("palette")
 	MCFG_PALETTE_FORMAT(xxxxBBBBGGGGRRRR)
 	// some PCBs have left factory with a 3.57mhz while some have a 4.096 which matches other games, assuming the former are factory errors
@@ -2280,7 +2282,8 @@ MACHINE_CONFIG_DERIVED(tumbleb_state::chokchok, htchctch)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 MACHINE_CONFIG_END
 
-MACHINE_CONFIG_DERIVED(tumbleb_state::cookbib_mcu, htchctch)
+MACHINE_CONFIG_START(tumbleb_state::cookbib_mcu)
+	htchctch(config);
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("protection", I8052, 16000000)  // AT89C52
@@ -2292,7 +2295,8 @@ MACHINE_CONFIG_DERIVED(tumbleb_state::cookbib_mcu, htchctch)
 	MCFG_SCREEN_UPDATE_DRIVER(tumbleb_state, screen_update_semicom_altoffsets)
 MACHINE_CONFIG_END
 
-MACHINE_CONFIG_DERIVED(tumbleb_state::bcstory, htchctch)
+MACHINE_CONFIG_START(tumbleb_state::bcstory)
+	htchctch(config);
 	MCFG_SCREEN_MODIFY("screen")
 	MCFG_SCREEN_UPDATE_DRIVER(tumbleb_state, screen_update_bcstory)
 
@@ -2301,19 +2305,22 @@ MACHINE_CONFIG_DERIVED(tumbleb_state::bcstory, htchctch)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.10)
 MACHINE_CONFIG_END
 
-MACHINE_CONFIG_DERIVED(tumbleb_state::semibase, bcstory)
+MACHINE_CONFIG_START(tumbleb_state::semibase)
+	bcstory(config);
 	MCFG_SCREEN_MODIFY("screen")
 	MCFG_SCREEN_UPDATE_DRIVER(tumbleb_state, screen_update_semibase)
 MACHINE_CONFIG_END
 
-MACHINE_CONFIG_DERIVED(tumbleb_state::sdfight, bcstory)
+MACHINE_CONFIG_START(tumbleb_state::sdfight)
+	bcstory(config);
 	MCFG_VIDEO_START_OVERRIDE(tumbleb_state,sdfight)
 	MCFG_SCREEN_MODIFY("screen")
 	MCFG_SCREEN_UPDATE_DRIVER(tumbleb_state, screen_update_sdfight)
 MACHINE_CONFIG_END
 
 
-MACHINE_CONFIG_DERIVED(tumbleb_state::metlsavr, cookbib)
+MACHINE_CONFIG_START(tumbleb_state::metlsavr)
+	cookbib(config);
 	MCFG_PALETTE_MODIFY("palette")
 	MCFG_PALETTE_FORMAT(xxxxBBBBGGGGRRRR)
 

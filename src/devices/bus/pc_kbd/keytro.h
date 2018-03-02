@@ -26,20 +26,6 @@ public:
 	// construction/destruction
 	pc_kbd_keytronic_pc3270_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
-	required_device<cpu_device> m_cpu;
-
-	virtual DECLARE_WRITE_LINE_MEMBER(clock_write) override;
-	virtual DECLARE_WRITE_LINE_MEMBER(data_write) override;
-
-	DECLARE_READ8_MEMBER( internal_data_read );
-	DECLARE_WRITE8_MEMBER( internal_data_write );
-	DECLARE_READ8_MEMBER( p1_read );
-	DECLARE_WRITE8_MEMBER( p1_write );
-	DECLARE_READ8_MEMBER( p2_read );
-	DECLARE_WRITE8_MEMBER( p2_write );
-	DECLARE_READ8_MEMBER( p3_read );
-	DECLARE_WRITE8_MEMBER( p3_write );
-
 protected:
 	pc_kbd_keytronic_pc3270_device(
 			machine_config const &mconfig,
@@ -56,6 +42,23 @@ protected:
 	virtual void device_add_mconfig(machine_config &config) override;
 	virtual ioport_constructor device_input_ports() const override;
 	virtual const tiny_rom_entry *device_rom_region() const override;
+
+	virtual DECLARE_WRITE_LINE_MEMBER(clock_write) override;
+	virtual DECLARE_WRITE_LINE_MEMBER(data_write) override;
+
+	DECLARE_READ8_MEMBER( internal_data_read );
+	DECLARE_WRITE8_MEMBER( internal_data_write );
+	DECLARE_READ8_MEMBER( p1_read );
+	DECLARE_WRITE8_MEMBER( p1_write );
+	DECLARE_READ8_MEMBER( p2_read );
+	DECLARE_WRITE8_MEMBER( p2_write );
+	DECLARE_READ8_MEMBER( p3_read );
+	DECLARE_WRITE8_MEMBER( p3_write );
+
+	void keytronic_pc3270_io(address_map &map);
+	void keytronic_pc3270_program(address_map &map);
+
+	required_device<cpu_device> m_cpu;
 
 	uint8_t   m_p1;
 	uint8_t   m_p1_data;

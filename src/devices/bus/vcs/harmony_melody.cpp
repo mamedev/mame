@@ -78,7 +78,7 @@ void a26_rom_harmony_device::device_start()
 	save_item(NAME(m_base_bank));
 }
 
-static ADDRESS_MAP_START( harmony_arm7_map, AS_PROGRAM, 32, a26_rom_harmony_device )
+ADDRESS_MAP_START(a26_rom_harmony_device::harmony_arm7_map)
 ADDRESS_MAP_END
 
 MACHINE_CONFIG_START(a26_rom_harmony_device::device_add_mconfig)

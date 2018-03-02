@@ -32,29 +32,29 @@ ROM_START( dmv_k235 )
 	ROM_LOAD( "dmv_int_8088_pic_33473.bin", 0x0000, 0x1000, CRC(104195dc) SHA1(08d48ca3b84ab26c1a764792e04ec4def7dad2ad))
 ROM_END
 
-static ADDRESS_MAP_START(k230_mem, AS_PROGRAM, 8, dmv_k230_device)
+ADDRESS_MAP_START(dmv_k230_device::k230_mem)
 	ADDRESS_MAP_UNMAP_HIGH
 	AM_RANGE( 0x00000, 0x7ffff ) AM_READWRITE(program_r, program_w)
 	AM_RANGE( 0x80000, 0xfffff ) AM_READ(rom_r)
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START(k230_io, AS_IO, 8, dmv_k230_device)
+ADDRESS_MAP_START(dmv_k230_device::k230_io)
 	ADDRESS_MAP_UNMAP_HIGH
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	AM_RANGE( 0x00, 0xff ) AM_READWRITE(io_r, io_w)
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START(k234_mem, AS_PROGRAM, 8, dmv_k230_device)
+ADDRESS_MAP_START(dmv_k230_device::k234_mem)
 	ADDRESS_MAP_UNMAP_HIGH
 	AM_RANGE( 0x00000, 0x7ffff ) AM_READWRITE(program_r, program_w)
 	AM_RANGE( 0xfff00, 0xfffff ) AM_READWRITE(io_r, io_w)
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START(k235_io, AS_IO, 8, dmv_k230_device)
+ADDRESS_MAP_START(dmv_k230_device::k235_io)
 	ADDRESS_MAP_UNMAP_HIGH
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
-	AM_RANGE( 0x90, 0x91 ) AM_DEVREADWRITE("pic8259", pic8259_device, read, write)
 	AM_RANGE( 0x00, 0xff ) AM_READWRITE(io_r, io_w)
+	AM_RANGE( 0x90, 0x91 ) AM_DEVREADWRITE("pic8259", pic8259_device, read, write)
 ADDRESS_MAP_END
 
 static INPUT_PORTS_START( dmv_k235 )

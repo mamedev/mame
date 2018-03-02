@@ -33,26 +33,31 @@ public:
 		, m_p_chargen(*this, "chargen")
 	{ }
 
+	void banctec(machine_config &config);
+
+protected:
 	MC6845_UPDATE_ROW(crtc_update_row);
 	MC6845_ON_UPDATE_ADDR_CHANGED(crtc_addr);
 	DECLARE_WRITE8_MEMBER(videoram_w);
-	required_device<palette_device> m_palette;
 
-	void banctec(machine_config &config);
-private:
-	u8 m_video_address;
 	virtual void machine_reset() override;
+	void banctec_mcu_mem(address_map &map);
+	void banctec_mem(address_map &map);
+
+private:
+	required_device<palette_device> m_palette;
+	u8 m_video_address;
 	required_device<cpu_device> m_maincpu;
 	required_shared_ptr<u8> m_videoram;
 	required_region_ptr<u8> m_p_chargen;
 };
 
-static ADDRESS_MAP_START( banctec_mem , AS_PROGRAM, 8, banctec_state )
+ADDRESS_MAP_START(banctec_state::banctec_mem)
 	AM_RANGE(0x0000, 0x07ff) AM_ROM
 	AM_RANGE(0x0800, 0xffff) AM_RAM /* Probably wrong. Must be verified on pcb! */
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( banctec_mcu_mem , AS_PROGRAM, 8, banctec_state )
+ADDRESS_MAP_START(banctec_state::banctec_mcu_mem)
 	AM_RANGE(0x0000, 0x00ff) AM_RAM /* Probably wrong. Must be verified on pcb! */
 	AM_RANGE(0x2000, 0x2000) AM_DEVREADWRITE("crtc", mc6845_device, status_r, address_w)
 	AM_RANGE(0x2001, 0x2001) AM_DEVREADWRITE("crtc", mc6845_device, register_r, register_w)

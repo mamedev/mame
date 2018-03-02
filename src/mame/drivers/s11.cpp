@@ -28,7 +28,7 @@ ToDo:
 #include "s11.lh"
 
 
-static ADDRESS_MAP_START( s11_main_map, AS_PROGRAM, 8, s11_state )
+ADDRESS_MAP_START(s11_state::s11_main_map)
 	AM_RANGE(0x0000, 0x07ff) AM_RAM AM_SHARE("nvram")
 	AM_RANGE(0x2100, 0x2103) AM_DEVREADWRITE("pia21", pia6821_device, read, write) // sound+solenoids
 	AM_RANGE(0x2200, 0x2200) AM_WRITE(sol3_w) // solenoids
@@ -40,7 +40,7 @@ static ADDRESS_MAP_START( s11_main_map, AS_PROGRAM, 8, s11_state )
 	AM_RANGE(0x4000, 0xffff) AM_ROM
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( s11_audio_map, AS_PROGRAM, 8, s11_state )
+ADDRESS_MAP_START(s11_state::s11_audio_map)
 	AM_RANGE(0x0000, 0x07ff) AM_MIRROR(0x0800) AM_RAM
 	AM_RANGE(0x1000, 0x1fff) AM_WRITE(bank_w)
 	AM_RANGE(0x2000, 0x2003) AM_MIRROR(0x0ffc) AM_DEVREADWRITE("pias", pia6821_device, read, write)
@@ -48,7 +48,7 @@ static ADDRESS_MAP_START( s11_audio_map, AS_PROGRAM, 8, s11_state )
 	AM_RANGE(0xc000, 0xffff) AM_ROMBANK("bank1")
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( s11_bg_map, AS_PROGRAM, 8, s11_state )
+ADDRESS_MAP_START(s11_state::s11_bg_map)
 	AM_RANGE(0x0000, 0x07ff) AM_MIRROR(0x1800) AM_RAM
 	AM_RANGE(0x2000, 0x2001) AM_MIRROR(0x1ffe) AM_DEVREADWRITE("ym2151", ym2151_device, read, write)
 	AM_RANGE(0x4000, 0x4003) AM_MIRROR(0x1ffc) AM_DEVREADWRITE("pia40", pia6821_device, read, write)
@@ -389,7 +389,7 @@ MACHINE_CONFIG_START(s11_state::s11)
 	MCFG_DEFAULT_LAYOUT(layout_s11)
 
 	/* Sound */
-	MCFG_FRAGMENT_ADD( genpin_audio )
+	genpin_audio(config);
 
 	/* Devices */
 	MCFG_DEVICE_ADD("pia21", PIA6821, 0)

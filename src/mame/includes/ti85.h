@@ -211,7 +211,8 @@ public:
 	DECLARE_WRITE8_MEMBER(ti83pse_ctimer3_loop_w);
 	DECLARE_READ8_MEMBER(ti83pse_ctimer3_count_r);
 	DECLARE_WRITE8_MEMBER(ti83pse_ctimer3_count_w);
-
+	DECLARE_READ8_MEMBER(ti83p_membank2_r);
+	DECLARE_READ8_MEMBER(ti83p_membank3_r);
 
 	void ti8x_update_bank(address_space &space, uint8_t bank, uint8_t *base, uint8_t page, bool is_ram);
 	void update_ti85_memory();
@@ -237,6 +238,20 @@ public:
 	void ti81(machine_config &config);
 	void ti85(machine_config &config);
 	void ti84p(machine_config &config);
+	void ti81_io(address_map &map);
+	void ti81_mem(address_map &map);
+	void ti81v2_io(address_map &map);
+	void ti82_io(address_map &map);
+	void ti83_io(address_map &map);
+	void ti83p_asic_mem(address_map &map);
+	void ti83p_banked_mem(address_map &map);
+	void ti83p_io(address_map &map);
+	void ti83pse_banked_mem(address_map &map);
+	void ti83pse_io(address_map &map);
+	void ti84p_banked_mem(address_map &map);
+	void ti85_io(address_map &map);
+	void ti86_io(address_map &map);
+	void ti86_mem(address_map &map);
 	//address_space &asic;
 };
 

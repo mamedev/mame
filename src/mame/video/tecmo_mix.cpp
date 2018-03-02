@@ -42,53 +42,6 @@ void tecmo_mix_device::device_reset()
 {
 }
 
-
-
-void tecmo_mix_device::set_mixer_shifts(device_t &device, int sprpri_shift, int sprbln_shift, int sprcol_shift)
-{
-	tecmo_mix_device &dev = downcast<tecmo_mix_device &>(device);
-	dev.m_sprpri_shift = sprpri_shift;
-	dev.m_sprbln_shift = sprbln_shift;
-	dev.m_sprcol_shift = sprcol_shift;
-}
-
-void tecmo_mix_device::set_blendcols(device_t &device, int bgblend_comp, int fgblend_comp, int txblend_comp, int spblend_comp)
-{
-	tecmo_mix_device &dev = downcast<tecmo_mix_device &>(device);
-	dev.m_bgblend_comp = bgblend_comp;
-	dev.m_fgblend_comp = fgblend_comp;
-	dev.m_txblend_comp = txblend_comp;
-	dev.m_spblend_comp = spblend_comp;
-}
-
-void tecmo_mix_device::set_regularcols(device_t &device, int bgregular_comp, int fgregular_comp, int txregular_comp, int spregular_comp)
-{
-	tecmo_mix_device &dev = downcast<tecmo_mix_device &>(device);
-	dev.m_bgregular_comp = bgregular_comp;
-	dev.m_fgregular_comp = fgregular_comp;
-	dev.m_txregular_comp = txregular_comp;
-	dev.m_spregular_comp = spregular_comp;
-}
-
-void tecmo_mix_device::set_blendsource(device_t &device, int spblend_source, int fgblend_source)
-{
-	tecmo_mix_device &dev = downcast<tecmo_mix_device &>(device);
-	dev.m_spblend_source = spblend_source;
-	dev.m_fgblend_source = fgblend_source;
-}
-
-void tecmo_mix_device::set_revspritetile(device_t &device)
-{
-	tecmo_mix_device &dev = downcast<tecmo_mix_device &>(device);
-	dev.m_revspritetile = 3;
-}
-
-void tecmo_mix_device::set_bgpen(device_t &device, int bgpen)
-{
-	tecmo_mix_device &dev = downcast<tecmo_mix_device &>(device);
-	dev.m_bgpen = bgpen;
-}
-
 uint32_t tecmo_mix_device::sum_colors(const pen_t *pal, int c1_idx, int c2_idx)
 {
 	const pen_t c1 = pal[c1_idx];

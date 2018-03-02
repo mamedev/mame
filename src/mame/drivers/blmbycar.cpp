@@ -100,7 +100,7 @@ READ16_MEMBER(blmbycar_state::blmbycar_opt_wheel_r)
 
 ***************************************************************************/
 
-static ADDRESS_MAP_START( common_map, AS_PROGRAM, 16, blmbycar_state )
+ADDRESS_MAP_START(blmbycar_state::common_map)
 	AM_RANGE(0x000000, 0x0fffff) AM_ROM
 	AM_RANGE(0xfec000, 0xfeffff) AM_RAM
 	AM_RANGE(0x100000, 0x103fff) AM_WRITEONLY                                               // ???
@@ -119,7 +119,7 @@ static ADDRESS_MAP_START( common_map, AS_PROGRAM, 16, blmbycar_state )
 	AM_RANGE(0x70000e, 0x70000f) AM_DEVREADWRITE8("oki", okim6295_device, read, write, 0x00ff)  // Sound
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( blmbycar_map, AS_PROGRAM, 16, blmbycar_state )
+ADDRESS_MAP_START(blmbycar_state::blmbycar_map)
 	AM_IMPORT_FROM(common_map)
 
 	AM_RANGE(0x700004, 0x700005) AM_READ(blmbycar_opt_wheel_r)                              // Wheel (optical)
@@ -136,7 +136,7 @@ READ16_MEMBER(blmbycar_state::waterball_unk_r)
 	return m_retvalue;
 }
 
-static ADDRESS_MAP_START( watrball_map, AS_PROGRAM, 16, blmbycar_state )
+ADDRESS_MAP_START(blmbycar_state::watrball_map)
 	AM_IMPORT_FROM(common_map)
 
 	AM_RANGE(0x700006, 0x700007) AM_READNOP                                                 // read
@@ -144,7 +144,7 @@ static ADDRESS_MAP_START( watrball_map, AS_PROGRAM, 16, blmbycar_state )
 	AM_RANGE(0x70000a, 0x70000b) AM_WRITEONLY                                               // ?? busy
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( blmbycar_oki_map, 0, 8, blmbycar_state )
+ADDRESS_MAP_START(blmbycar_state::blmbycar_oki_map)
 	AM_RANGE(0x00000, 0x2ffff) AM_ROM
 	AM_RANGE(0x30000, 0x3ffff) AM_ROMBANK("okibank")
 ADDRESS_MAP_END
@@ -389,7 +389,8 @@ MACHINE_RESET_MEMBER(blmbycar_state,watrball)
 	m_retvalue = 0;
 }
 
-MACHINE_CONFIG_DERIVED(blmbycar_state::watrball, blmbycar)
+MACHINE_CONFIG_START(blmbycar_state::watrball)
+	blmbycar(config);
 
 	/* basic machine hardware */
 	MCFG_CPU_MODIFY("maincpu")

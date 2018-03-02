@@ -17,6 +17,7 @@
 #include "machine/upd71071.h"
 #include "machine/wd_fdc.h"
 #include "machine/i8251.h"
+#include "machine/msm58321.h"
 #include "sound/2612intf.h"
 #include "sound/cdda.h"
 #include "sound/rf5c68.h"
@@ -106,6 +107,7 @@ class towns_state : public driver_device
 			m_i8251(*this, "i8251"),
 			m_rs232(*this, "rs232c"),
 			m_screen(*this, "screen"),
+			m_rtc(*this, "rtc58321"),
 			m_nvram(*this, "nvram"),
 			m_nvram16(*this, "nvram16"),
 			m_ctrltype(*this, "ctrltype"),
@@ -144,6 +146,7 @@ class towns_state : public driver_device
 	required_device<i8251_device> m_i8251;
 	required_device<rs232_port_device> m_rs232;
 	required_device<screen_device> m_screen;
+	required_device<msm58321_device> m_rtc;
 	ram_device* m_messram;
 	cdrom_image_device* m_cdrom;
 	cdda_device* m_cdda;
@@ -174,8 +177,6 @@ class towns_state : public driver_device
 	uint8_t m_towns_srom_reset;
 	uint8_t m_towns_rtc_select;
 	uint8_t m_towns_rtc_data;
-	uint8_t m_towns_rtc_reg[16];
-	emu_timer* m_towns_rtc_timer;
 	uint8_t m_towns_timer_mask;
 	uint16_t m_towns_machine_id;  // default is 0x0101
 	uint8_t m_towns_kb_status;
@@ -281,6 +282,8 @@ class towns_state : public driver_device
 
 	DECLARE_READ8_MEMBER(towns_gfx_high_r);
 	DECLARE_WRITE8_MEMBER(towns_gfx_high_w);
+	DECLARE_READ8_MEMBER(towns_gfx_packed_r);
+	DECLARE_WRITE8_MEMBER(towns_gfx_packed_w);
 	DECLARE_READ8_MEMBER(towns_gfx_r);
 	DECLARE_WRITE8_MEMBER(towns_gfx_w);
 	DECLARE_READ8_MEMBER(towns_video_cff80_r);
@@ -312,11 +315,16 @@ class towns_state : public driver_device
 	DECLARE_READ8_MEMBER(towns_serial_r);
 	DECLARE_WRITE8_MEMBER(towns_serial_w);
 
+	DECLARE_WRITE_LINE_MEMBER(rtc_d0_w);
+	DECLARE_WRITE_LINE_MEMBER(rtc_d1_w);
+	DECLARE_WRITE_LINE_MEMBER(rtc_d2_w);
+	DECLARE_WRITE_LINE_MEMBER(rtc_d3_w);
+	DECLARE_WRITE_LINE_MEMBER(rtc_busy_w);
+
 	RF5C68_SAMPLE_END_CB_MEMBER(towns_pcm_irq);
 
 	void towns_update_video_banks(address_space&);
 	void init_serial_rom();
-	void init_rtc();
 	void kb_sendcode(uint8_t scancode, int release);
 	uint8_t speaker_get_spk();
 	void speaker_set_spkrdata(uint8_t data);
@@ -343,8 +351,12 @@ class towns_state : public driver_device
 	void townsftv(machine_config &config);
 	void townshr(machine_config &config);
 	void townssj(machine_config &config);
+	void marty_mem(address_map &map);
+	void towns16_io(address_map &map);
+	void towns_io(address_map &map);
+	void towns_mem(address_map &map);
+	void ux_mem(address_map &map);
 private:
-	static const device_timer_id TIMER_RTC = 0;
 	static const device_timer_id TIMER_FREERUN = 1;
 	static const device_timer_id TIMER_INTERVAL2 = 2;
 	static const device_timer_id TIMER_KEYBOARD = 3;
@@ -352,7 +364,6 @@ private:
 	static const device_timer_id TIMER_WAIT = 5;
 	static const device_timer_id TIMER_CDSTATUS = 6;
 	static const device_timer_id TIMER_CDDA = 7;
-	void rtc_second();
 	void freerun_inc();
 	void intervaltimer2_timeout();
 	void poll_keyboard();
@@ -364,6 +375,11 @@ private:
 	void towns_cdrom_read(cdrom_image_device* device);
 	void towns_cd_status_ready();
 	void towns_delay_cdda(cdrom_image_device* dev);
+
+	u8 m_rtc_d;
+	bool m_rtc_busy;
+	u8 m_vram_mask[4];
+	u8 m_vram_mask_addr;
 public:
 	INTERRUPT_GEN_MEMBER(towns_vsync_irq);
 	TIMER_CALLBACK_MEMBER(towns_cdrom_read_byte);
@@ -397,8 +413,6 @@ public:
 	void towns_cdrom_set_irq(int line,int state);
 	uint8_t towns_cd_get_track();
 	DECLARE_READ16_MEMBER(towns_cdrom_dma_r);
-	void rtc_hour();
-	void rtc_minute();
 	DECLARE_READ16_MEMBER(towns_scsi_dma_r);
 	DECLARE_WRITE16_MEMBER(towns_scsi_dma_w);
 };

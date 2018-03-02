@@ -499,7 +499,7 @@ WRITE8_MEMBER(turbo_state::spriteram_w)
  *
  *************************************/
 
-static ADDRESS_MAP_START( turbo_map, AS_PROGRAM, 8, turbo_state )
+ADDRESS_MAP_START(turbo_state::turbo_map)
 	AM_RANGE(0x0000, 0x5fff) AM_ROM
 	AM_RANGE(0xa000, 0xa0ff) AM_MIRROR(0x0700) AM_READWRITE(spriteram_r, spriteram_w)
 	AM_RANGE(0xa800, 0xa807) AM_MIRROR(0x07f8) AM_DEVWRITE("outlatch", ls259_device, write_d0)
@@ -525,7 +525,7 @@ ADDRESS_MAP_END
  *
  *************************************/
 
-static ADDRESS_MAP_START( subroc3d_map, AS_PROGRAM, 8, turbo_state )
+ADDRESS_MAP_START(turbo_state::subroc3d_map)
 	AM_RANGE(0x0000, 0x9fff) AM_ROM
 	AM_RANGE(0xa000, 0xa3ff) AM_RAM AM_SHARE("spritepos")                           // CONT RAM
 	AM_RANGE(0xa400, 0xa7ff) AM_RAM AM_SHARE("spriteram")                           // CONT RAM
@@ -549,7 +549,7 @@ ADDRESS_MAP_END
  *
  *************************************/
 
-static ADDRESS_MAP_START( buckrog_map, AS_PROGRAM, 8, turbo_state )
+ADDRESS_MAP_START(turbo_state::buckrog_map)
 	AM_RANGE(0x0000, 0x7fff) AM_ROM
 	AM_RANGE(0xc000, 0xc7ff) AM_RAM_WRITE(turbo_videoram_w) AM_SHARE("videoram")    // FIX PAGE
 	AM_RANGE(0xc800, 0xc803) AM_MIRROR(0x07fc) AM_DEVREAD("i8255_0", i8255_device, read) AM_WRITE(buckrog_i8255_0_w)    // 8255
@@ -565,18 +565,18 @@ static ADDRESS_MAP_START( buckrog_map, AS_PROGRAM, 8, turbo_state )
 	AM_RANGE(0xf800, 0xffff) AM_RAM                                                 // SCRATCH
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( decrypted_opcodes_map, AS_OPCODES, 8, turbo_state )
+ADDRESS_MAP_START(turbo_state::decrypted_opcodes_map)
 	AM_RANGE(0x0000, 0x7fff) AM_ROM AM_SHARE("decrypted_opcodes")
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( buckrog_cpu2_map, AS_PROGRAM, 8, turbo_state )
+ADDRESS_MAP_START(turbo_state::buckrog_cpu2_map)
 	AM_RANGE(0x0000, 0x1fff) AM_ROM
 	AM_RANGE(0x0000, 0xdfff) AM_WRITE(buckrog_bitmap_w)
 	AM_RANGE(0xe000, 0xe7ff) AM_MIRROR(0x1800) AM_RAM
 ADDRESS_MAP_END
 
 
-static ADDRESS_MAP_START( buckrog_cpu2_portmap, AS_IO, 8, turbo_state )
+ADDRESS_MAP_START(turbo_state::buckrog_cpu2_portmap)
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	AM_RANGE(0x00, 0xff) AM_READ(buckrog_cpu2_command_r)
 ADDRESS_MAP_END
@@ -888,7 +888,7 @@ MACHINE_CONFIG_START(turbo_state::turbo)
 	MCFG_VIDEO_START_OVERRIDE(turbo_state,turbo)
 
 	/* sound hardware */
-	MCFG_FRAGMENT_ADD(turbo_samples)
+	turbo_samples(config);
 MACHINE_CONFIG_END
 
 
@@ -928,7 +928,7 @@ MACHINE_CONFIG_START(turbo_state::subroc3d)
 	MCFG_VIDEO_START_OVERRIDE(turbo_state,turbo)
 
 	/* sound hardware */
-	MCFG_FRAGMENT_ADD(subroc3d_samples)
+	subroc3d_samples(config);
 MACHINE_CONFIG_END
 
 
@@ -937,7 +937,7 @@ MACHINE_CONFIG_START(turbo_state::buckrog)
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", Z80, MASTER_CLOCK/4)
 	MCFG_CPU_PROGRAM_MAP(buckrog_map)
-	MCFG_CPU_DECRYPTED_OPCODES_MAP(decrypted_opcodes_map)
+	MCFG_CPU_OPCODES_MAP(decrypted_opcodes_map)
 	MCFG_CPU_VBLANK_INT_DRIVER("screen", turbo_state,  irq0_line_hold)
 
 	MCFG_CPU_ADD("subcpu", Z80, MASTER_CLOCK/4)
@@ -976,21 +976,23 @@ MACHINE_CONFIG_START(turbo_state::buckrog)
 	MCFG_VIDEO_START_OVERRIDE(turbo_state,buckrog)
 
 	/* sound hardware */
-	MCFG_FRAGMENT_ADD(buckrog_samples)
+	buckrog_samples(config);
 MACHINE_CONFIG_END
 
-MACHINE_CONFIG_DERIVED(turbo_state::buckrogu, buckrog)
+MACHINE_CONFIG_START(turbo_state::buckrogu)
+	buckrog(config);
 	MCFG_CPU_MODIFY("maincpu")
 	MCFG_DEVICE_REMOVE_ADDRESS_MAP(AS_OPCODES)
 MACHINE_CONFIG_END
 
 
-MACHINE_CONFIG_DERIVED(turbo_state::buckroge, buckrog)
+MACHINE_CONFIG_START(turbo_state::buckroge)
+	buckrog(config);
 
 	/* basic machine hardware */
 	MCFG_CPU_REPLACE("maincpu", SEGA_315_5014, MASTER_CLOCK/4)
 	MCFG_CPU_PROGRAM_MAP(buckrog_map)
-	MCFG_CPU_DECRYPTED_OPCODES_MAP(decrypted_opcodes_map)
+	MCFG_CPU_OPCODES_MAP(decrypted_opcodes_map)
 	MCFG_CPU_VBLANK_INT_DRIVER("screen", turbo_state,  irq0_line_hold)
 	MCFG_SEGACRPT_SET_DECRYPTED_TAG(":decrypted_opcodes")
 MACHINE_CONFIG_END

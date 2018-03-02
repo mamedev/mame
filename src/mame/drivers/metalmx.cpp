@@ -505,14 +505,14 @@ WRITE32_MEMBER(metalmx_state::timer_w)
  *
  *************************************/
 
-static ADDRESS_MAP_START( main_map, AS_PROGRAM, 32, metalmx_state )
+ADDRESS_MAP_START(metalmx_state::main_map)
 	AM_RANGE(0x000000, 0x1fffff) AM_ROM
 	AM_RANGE(0x200000, 0x3fffff) AM_ROM
 	AM_RANGE(0x400000, 0x4000ff) AM_READWRITE(host_gsp_r, host_gsp_w)
 	AM_RANGE(0x600000, 0x6fffff) AM_READWRITE(host_dram_r, host_dram_w)
 	AM_RANGE(0x700000, 0x7fffff) AM_READWRITE(host_vram_r, host_vram_w)
 	AM_RANGE(0x800000, 0x80001f) AM_READWRITE(dsp32c_2_r, dsp32c_2_w)
-	AM_RANGE(0x800000, 0x85ffff) AM_NOP         /* Unknown */
+	AM_RANGE(0x800020, 0x85ffff) AM_NOP         /* Unknown */
 	AM_RANGE(0x880000, 0x88001f) AM_READWRITE(dsp32c_1_r, dsp32c_1_w)
 	AM_RANGE(0x980000, 0x9800ff) AM_WRITE(reset_w)
 	AM_RANGE(0xb40000, 0xb40003) AM_READWRITE(sound_data_r, sound_data_w)
@@ -537,11 +537,11 @@ ADDRESS_MAP_END
  *
  *************************************/
 
-static ADDRESS_MAP_START( adsp_program_map, AS_PROGRAM, 32, metalmx_state )
+ADDRESS_MAP_START(metalmx_state::adsp_program_map)
 	AM_RANGE(0x0000, 0x03ff) AM_RAM AM_SHARE("adsp_intprog")
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( adsp_data_map, AS_DATA, 16, metalmx_state )
+ADDRESS_MAP_START(metalmx_state::adsp_data_map)
 	AM_RANGE(0x3800, 0x39ff) AM_RAM
 	AM_RANGE(0x2000, 0x2007) AM_RAM
 	AM_RANGE(0x3fe0, 0x3fff) AM_RAM // TODO: CPU control registers
@@ -554,7 +554,7 @@ ADDRESS_MAP_END
  *
  *************************************/
 
-static ADDRESS_MAP_START( gsp_map, AS_PROGRAM, 16, metalmx_state )
+ADDRESS_MAP_START(metalmx_state::gsp_map)
 	AM_RANGE(0x88800000, 0x8880000f) AM_RAM /* ? */
 	AM_RANGE(0x88c00000, 0x88c0000f) AM_RAM /* ? */
 	AM_RANGE(0xc0000000, 0xc00003ff) AM_DEVREADWRITE("gsp", tms34020_device, io_register_r, io_register_w)
@@ -569,7 +569,7 @@ ADDRESS_MAP_END
  *
  *************************************/
 
-static ADDRESS_MAP_START( dsp32c_1_map, AS_PROGRAM, 32, metalmx_state )
+ADDRESS_MAP_START(metalmx_state::dsp32c_1_map)
 	ADDRESS_MAP_UNMAP_HIGH
 	AM_RANGE(0x000000, 0x03ffff) AM_RAM
 	AM_RANGE(0x600000, 0x67ffff) AM_RAM
@@ -586,7 +586,7 @@ ADDRESS_MAP_END
  *
  *************************************/
 
-static ADDRESS_MAP_START( dsp32c_2_map, AS_PROGRAM, 32, metalmx_state )
+ADDRESS_MAP_START(metalmx_state::dsp32c_2_map)
 	ADDRESS_MAP_UNMAP_HIGH
 	AM_RANGE(0x000000, 0x03ffff) AM_RAM
 	AM_RANGE(0x600000, 0x67ffff) AM_RAM

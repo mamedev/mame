@@ -156,7 +156,7 @@ WRITE32_MEMBER(groundfx_state::motor_control_w)
              MEMORY STRUCTURES
 ***********************************************************/
 
-static ADDRESS_MAP_START( groundfx_map, AS_PROGRAM, 32, groundfx_state )
+ADDRESS_MAP_START(groundfx_state::groundfx_map)
 	AM_RANGE(0x000000, 0x1fffff) AM_ROM
 	AM_RANGE(0x200000, 0x21ffff) AM_RAM AM_SHARE("ram") /* main CPUA ram */
 	AM_RANGE(0x300000, 0x303fff) AM_RAM AM_SHARE("spriteram") /* sprite ram */

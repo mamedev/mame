@@ -25,8 +25,7 @@ public:
 		m_mcu(*this, "mcu"),
 		m_spriteram(*this, "spriteram") ,
 		m_msm(*this, "msm"),
-		m_tilegen1(*this, "tilegen1"),
-		m_tilegen2(*this, "tilegen2"),
+		m_tilegen(*this, "tilegen%u", 1),
 		m_spritegen_krn(*this, "spritegen_krn"),
 		m_spritegen_mxc(*this, "spritegen_mxc"),
 		m_gfxdecode(*this, "gfxdecode"),
@@ -34,6 +33,8 @@ public:
 		m_soundlatch(*this, "soundlatch"),
 		m_videoram(*this, "videoram"),
 		m_bg_data(*this, "bg_data"),
+		m_mainbank(*this, "mainbank"),
+		m_soundbank(*this, "soundbank"),
 		m_coin_port(*this, "I8751") { }
 
 	/* devices */
@@ -43,8 +44,7 @@ public:
 	optional_device<cpu_device> m_mcu;
 	required_device<buffered_spriteram8_device> m_spriteram;
 	optional_device<msm5205_device> m_msm;
-	optional_device<deco_bac06_device> m_tilegen1;
-	optional_device<deco_bac06_device> m_tilegen2;
+	optional_device_array<deco_bac06_device, 2> m_tilegen;
 	optional_device<deco_karnovsprites_device> m_spritegen_krn;
 	optional_device<deco_mxc06_device> m_spritegen_mxc;
 	required_device<gfxdecode_device> m_gfxdecode;
@@ -55,9 +55,13 @@ public:
 	required_shared_ptr<uint8_t> m_videoram;
 	optional_shared_ptr<uint8_t> m_bg_data;
 
+	/* memory regions */
+	required_memory_bank m_mainbank;
+	optional_memory_bank m_soundbank;
+
 	uint8_t *  m_pf1_data;
 	uint8_t *  m_row;
-	uint16_t   m_buffered_spriteram16[0x800/2]; // for the mxc06 sprite chip emulation (oscar, cobra)
+	std::unique_ptr<uint16_t[]>   m_buffered_spriteram16; // for the mxc06 sprite chip emulation (oscar, cobra)
 
 	/* video-related */
 	tilemap_t  *m_bg_tilemap;
@@ -127,17 +131,7 @@ public:
 	DECLARE_WRITE8_MEMBER(gondo_scroll_w);
 	DECLARE_READ8_MEMBER(csilver_adpcm_reset_r);
 	DECLARE_DRIVER_INIT(dec8);
-	DECLARE_DRIVER_INIT(deco222);
-	DECLARE_DRIVER_INIT(meikyuh);
-	DECLARE_DRIVER_INIT(garyoret);
-	DECLARE_DRIVER_INIT(shackled);
-	DECLARE_DRIVER_INIT(cobracom);
 	DECLARE_DRIVER_INIT(csilver);
-	DECLARE_DRIVER_INIT(ghostb);
-	DECLARE_DRIVER_INIT(srdarwin);
-	DECLARE_DRIVER_INIT(lastmisn);
-	DECLARE_DRIVER_INIT(gondo);
-	DECLARE_DRIVER_INIT(oscar);
 	TILE_GET_INFO_MEMBER(get_cobracom_fix_tile_info);
 	TILE_GET_INFO_MEMBER(get_ghostb_fix_tile_info);
 	TILE_GET_INFO_MEMBER(get_oscar_fix_tile_info);
@@ -158,6 +152,7 @@ public:
 	DECLARE_VIDEO_START(oscar);
 	DECLARE_VIDEO_START(srdarwin);
 	DECLARE_VIDEO_START(cobracom);
+	void allocate_buffered_spriteram16();
 	uint32_t screen_update_lastmisn(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	uint32_t screen_update_shackled(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	uint32_t screen_update_gondo(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
@@ -182,6 +177,25 @@ public:
 	void ghostb(machine_config &config);
 	void oscar(machine_config &config);
 	void gondo(machine_config &config);
+	void cobra_map(address_map &map);
+	void csilver_map(address_map &map);
+	void csilver_s_map(address_map &map);
+	void csilver_sub_map(address_map &map);
+	void dec8_mcu_io_map(address_map &map);
+	void dec8_s_map(address_map &map);
+	void garyoret_map(address_map &map);
+	void gondo_map(address_map &map);
+	void lastmisn_map(address_map &map);
+	void lastmisn_sub_map(address_map &map);
+	void meikyuh_map(address_map &map);
+	void oscar_map(address_map &map);
+	void oscar_s_map(address_map &map);
+	void oscar_sub_map(address_map &map);
+	void shackled_map(address_map &map);
+	void shackled_sub_map(address_map &map);
+	void srdarwin_map(address_map &map);
+	void srdarwin_mcu_io_map(address_map &map);
+	void ym3526_s_map(address_map &map);
 protected:
 	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr) override;
 

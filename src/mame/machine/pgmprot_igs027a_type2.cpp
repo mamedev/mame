@@ -104,7 +104,7 @@ WRITE16_MEMBER(pgm_arm_type2_state::arm7_ram_w )
 /* 55857F? */
 /* Knights of Valor 2, Martial Masters, DoDonpachi 2 */
 /*  no execute only space? */
-static ADDRESS_MAP_START( kov2_mem, AS_PROGRAM, 16, pgm_arm_type2_state )
+ADDRESS_MAP_START(pgm_arm_type2_state::kov2_mem)
 	AM_IMPORT_FROM(pgm_mem)
 	AM_RANGE(0x100000, 0x5fffff) AM_ROMBANK("bank1") /* Game ROM */
 	AM_RANGE(0xd00000, 0xd0ffff) AM_READWRITE(arm7_ram_r, arm7_ram_w) /* ARM7 Shared RAM */
@@ -112,7 +112,7 @@ static ADDRESS_MAP_START( kov2_mem, AS_PROGRAM, 16, pgm_arm_type2_state )
 ADDRESS_MAP_END
 
 
-static ADDRESS_MAP_START( 55857F_arm7_map, AS_PROGRAM, 32, pgm_arm_type2_state )
+ADDRESS_MAP_START(pgm_arm_type2_state::_55857F_arm7_map)
 	AM_RANGE(0x00000000, 0x00003fff) AM_ROM
 	AM_RANGE(0x08000000, 0x083fffff) AM_ROM AM_REGION("user1", 0)
 	AM_RANGE(0x10000000, 0x100003ff) AM_RAM
@@ -131,7 +131,7 @@ MACHINE_START_MEMBER(pgm_arm_type2_state,pgm_arm_type2)
 /******* ARM 55857F *******/
 
 MACHINE_CONFIG_START(pgm_arm_type2_state::pgm_arm_type2)
-	MCFG_FRAGMENT_ADD(pgmbase)
+	pgmbase(config);
 
 	MCFG_MACHINE_START_OVERRIDE(pgm_arm_type2_state, pgm_arm_type2 )
 
@@ -140,7 +140,7 @@ MACHINE_CONFIG_START(pgm_arm_type2_state::pgm_arm_type2)
 
 	/* protection CPU */
 	MCFG_CPU_ADD("prot", ARM7, 20000000)    // 55857F
-	MCFG_CPU_PROGRAM_MAP(55857F_arm7_map)
+	MCFG_CPU_PROGRAM_MAP(_55857F_arm7_map)
 MACHINE_CONFIG_END
 
 

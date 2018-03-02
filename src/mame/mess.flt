@@ -180,6 +180,7 @@ dps1.cpp
 dragon.cpp
 dsb46.cpp
 dual68.cpp
+duet16.cpp
 dvk_kcgd.cpp
 dvk_ksm.cpp
 e100.cpp
@@ -302,6 +303,7 @@ indiana.cpp
 indigo.cpp
 indy_indigo2.cpp
 instruct.cpp
+inteladv.cpp
 intellec4.cpp
 interact.cpp
 interpro.cpp
@@ -461,6 +463,7 @@ ob68k1a.cpp
 octopus.cpp
 odyssey2.cpp
 okean240.cpp
+olyboss.cpp
 ondra.cpp
 onyx.cpp
 orao.cpp
@@ -616,6 +619,7 @@ selz80.cpp
 sg1000.cpp
 sh4robot.cpp
 sitcom.cpp
+sk1.cpp
 slc1.cpp
 slicer.cpp
 sm1800.cpp

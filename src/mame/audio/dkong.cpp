@@ -1273,31 +1273,31 @@ WRITE8_MEMBER(dkong_state::dkong_audio_irq_w)
  *
  *************************************/
 
-static ADDRESS_MAP_START( dkong_sound_map, AS_PROGRAM, 8, dkong_state )
+ADDRESS_MAP_START(dkong_state::dkong_sound_map)
 	AM_RANGE(0x0000, 0x0fff) AM_ROM
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( dkong_sound_io_map, AS_IO, 8, dkong_state )
+ADDRESS_MAP_START(dkong_state::dkong_sound_io_map)
 	AM_RANGE(0x00, 0xff) AM_READWRITE(dkong_tune_r, dkong_voice_w)
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( dkongjr_sound_io_map, AS_IO, 8, dkong_state )
+ADDRESS_MAP_START(dkong_state::dkongjr_sound_io_map)
 	AM_RANGE(0x00, 0x00) AM_MIRROR(0xff) AM_DEVREAD("ls174.3d", latch8_device, read)
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( radarscp1_sound_io_map, AS_IO, 8, dkong_state )
+ADDRESS_MAP_START(dkong_state::radarscp1_sound_io_map)
 	AM_RANGE(0x00, 0x00) AM_MIRROR(0xff) AM_DEVREAD("ls175.3d", latch8_device, read)
 	AM_RANGE(0x00, 0xff) AM_WRITE(dkong_p1_w) /* DAC here */
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( dkong3_sound1_map, AS_PROGRAM, 8, dkong_state )
+ADDRESS_MAP_START(dkong_state::dkong3_sound1_map)
 	AM_RANGE(0x0000, 0x01ff) AM_RAM
 	AM_RANGE(0x4016, 0x4016) AM_DEVREAD("latch1", latch8_device, read)       /* overwrite default */
 	AM_RANGE(0x4017, 0x4017) AM_DEVREAD("latch2", latch8_device, read)
 	AM_RANGE(0xe000, 0xffff) AM_ROM
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( dkong3_sound2_map, AS_PROGRAM, 8, dkong_state )
+ADDRESS_MAP_START(dkong_state::dkong3_sound2_map)
 	AM_RANGE(0x0000, 0x01ff) AM_RAM
 	AM_RANGE(0x4016, 0x4016) AM_DEVREAD("latch3", latch8_device, read)       /* overwrite default */
 	AM_RANGE(0xe000, 0xffff) AM_ROM
@@ -1351,14 +1351,16 @@ MACHINE_CONFIG_START(dkong_state::dkong2b_audio)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 MACHINE_CONFIG_END
 
-MACHINE_CONFIG_DERIVED(dkong_state::radarscp_audio, dkong2b_audio)
+MACHINE_CONFIG_START(dkong_state::radarscp_audio)
+	dkong2b_audio(config);
 
 	MCFG_DISCRETE_REPLACE("discrete", 0, radarscp)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.7)
 MACHINE_CONFIG_END
 
 
-MACHINE_CONFIG_DERIVED(dkong_state::radarscp1_audio, radarscp_audio)
+MACHINE_CONFIG_START(dkong_state::radarscp1_audio)
+	radarscp_audio(config);
 
 	MCFG_CPU_MODIFY("soundcpu")
 	MCFG_CPU_IO_MAP(radarscp1_sound_io_map)

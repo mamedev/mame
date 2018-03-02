@@ -61,7 +61,7 @@ WRITE_LINE_MEMBER(gameplan_state::trvquest_misc_w)
 	// data & 1 -> led on/off ?
 }
 
-static ADDRESS_MAP_START( cpu_map, AS_PROGRAM, 8, gameplan_state )
+ADDRESS_MAP_START(gameplan_state::cpu_map)
 	AM_RANGE(0x0000, 0x1fff) AM_RAM AM_SHARE("nvram") // cmos ram
 	AM_RANGE(0x2000, 0x27ff) AM_RAM // main ram
 	AM_RANGE(0x3800, 0x380f) AM_DEVREADWRITE("via6522_1", via6522_device, read, write)
@@ -188,7 +188,7 @@ MACHINE_CONFIG_START(gameplan_state::trvquest)
 	MCFG_MACHINE_RESET_OVERRIDE(gameplan_state,trvquest)
 
 	/* video hardware */
-	MCFG_FRAGMENT_ADD(trvquest_video)
+	trvquest_video(config);
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")

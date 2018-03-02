@@ -108,6 +108,8 @@ protected:
 	// device_disasm_interface overrides
 	virtual util::disasm_interface *create_disassembler() override;
 
+	void tmp87ph40an_mem(address_map &map);
+
 	uint32_t m_debugger_temp;
 
 private:

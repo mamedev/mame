@@ -47,4 +47,7 @@ public:
 	uint32_t screen_update_actfancr(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	void triothep(machine_config &config);
 	void actfancr(machine_config &config);
+	void actfan_map(address_map &map);
+	void dec0_s_map(address_map &map);
+	void triothep_map(address_map &map);
 };

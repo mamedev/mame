@@ -214,13 +214,9 @@ public:
 	virtual space_config_vector memory_space_config() const override;
 
 	void install_device(offs_t start, offs_t end, read8_delegate rhandler, write8_delegate whandler);
-	template<typename T> void install_device(offs_t addrstart, offs_t addrend, T &device, void (T::*map)(class address_map &map), int bits = 8)
+	template<typename T> void install_device(offs_t addrstart, offs_t addrend, T &device, void (T::*map)(class address_map &map), uint64_t unitmask = ~u64(0))
 	{
-		m_iospace->install_device(addrstart, addrend, device, map, bits, 0xffffffffffffffffU >> (64 - m_iospace->data_width()));
-	}
-	template<typename T> void install_device(offs_t addrstart, offs_t addrend, T &device, void (T::*map)(class address_map &map), int bits, uint64_t unitmask)
-	{
-		m_iospace->install_device(addrstart, addrend, device, map, bits, unitmask);
+		m_iospace->install_device(addrstart, addrend, device, map, unitmask);
 	}
 	void install_bank(offs_t start, offs_t end, const char *tag, uint8_t *data);
 	void install_rom(device_t *dev, offs_t start, offs_t end, const char *tag, const char *region);

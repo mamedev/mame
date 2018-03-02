@@ -154,6 +154,13 @@ public:
 	void z80netf(machine_config &config);
 	void z80ne(machine_config &config);
 	void z80netb(machine_config &config);
+	void z80ne_io(address_map &map);
+	void z80ne_mem(address_map &map);
+	void z80net_io(address_map &map);
+	void z80net_mem(address_map &map);
+	void z80netb_mem(address_map &map);
+	void z80netf_io(address_map &map);
+	void z80netf_mem(address_map &map);
 protected:
 	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr) override;
 

@@ -34,6 +34,9 @@ public:
 
 	void compc(machine_config &config);
 	void pc10iii(machine_config &config);
+	void compc_io(address_map &map);
+	void compc_map(address_map &map);
+	void compciii_io(address_map &map);
 private:
 	u8 m_portb, m_dips;
 };
@@ -169,21 +172,21 @@ static INPUT_PORTS_START(compc)
 	PORT_INCLUDE(pc_keyboard)
 INPUT_PORTS_END
 
-static ADDRESS_MAP_START(compc_map, AS_PROGRAM, 8, compc_state)
+ADDRESS_MAP_START(compc_state::compc_map)
 	ADDRESS_MAP_UNMAP_HIGH
 	AM_RANGE(0xf0000, 0xfffff) AM_ROM AM_REGION("bios", 0)
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START(compc_io, AS_IO, 8, compc_state)
+ADDRESS_MAP_START(compc_state::compc_io)
 	ADDRESS_MAP_UNMAP_HIGH
-	AM_RANGE(0x0060, 0x0063) AM_READWRITE(pio_r, pio_w)
 	AM_RANGE(0x0000, 0x00ff) AM_DEVICE("mb", pc_noppi_mb_device, map)
+	AM_RANGE(0x0060, 0x0063) AM_READWRITE(pio_r, pio_w)
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START(compciii_io, AS_IO, 8, compc_state)
+ADDRESS_MAP_START(compc_state::compciii_io)
 	ADDRESS_MAP_UNMAP_HIGH
-	AM_RANGE(0x0060, 0x0063) AM_READWRITE(pioiii_r, pioiii_w)
 	AM_RANGE(0x0000, 0x00ff) AM_DEVICE("mb", pc_noppi_mb_device, map)
+	AM_RANGE(0x0060, 0x0063) AM_READWRITE(pioiii_r, pioiii_w)
 ADDRESS_MAP_END
 
 MACHINE_CONFIG_START(compc_state::compc)
@@ -218,7 +221,8 @@ MACHINE_CONFIG_START(compc_state::compc)
 	MCFG_SOFTWARE_LIST_ADD("disk_list", "ibm5150")
 MACHINE_CONFIG_END
 
-MACHINE_CONFIG_DERIVED(compc_state::pc10iii, compc)
+MACHINE_CONFIG_START(compc_state::pc10iii)
+	compc(config);
 	MCFG_DEVICE_MODIFY("maincpu")
 	MCFG_CPU_IO_MAP(compciii_io)
 MACHINE_CONFIG_END

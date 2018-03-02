@@ -4,9 +4,9 @@
    Dinamic / Inder arcade hardware
 
    Mega Phoenix
+   Hammer Boy
 
  also known to exist on this hardware:
-   Hammer Boy
    Nonamed 2 (ever finished? only code seen has 1991 date and is vastly incomplete) (versions exist for Amstrad CPC, MSX and Spectrum)
    After The War
 
@@ -88,10 +88,10 @@ class megaphx_state : public driver_device
 public:
 	megaphx_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag),
+		m_indervid(*this, "inder_vid"),
 		m_maincpu(*this, "maincpu"),
 		m_mainram(*this, "mainram"),
 		m_indersb(*this, "inder_sb"),
-		m_indervid(*this, "inder_vid"),
 		m_ppi(*this, "ppi8255_0"),
 		m_dsw_shifter{ {*this, "ttl166_1"}, {*this, "ttl166_2"} },
 		m_dsw_data(0),
@@ -110,11 +110,15 @@ public:
 	DECLARE_DRIVER_INIT(megaphx);
 
 	void megaphx(machine_config &config);
+	void megaphx_68k_map(address_map &map);
+
+protected:
+	virtual void machine_reset() override;
+	required_device<inder_vid_device> m_indervid;
 private:
 	required_device<cpu_device> m_maincpu;
 	required_shared_ptr<uint16_t> m_mainram;
 	required_device<inder_sb_device> m_indersb;
-	required_device<inder_vid_device> m_indervid;
 	required_device<i8255_device> m_ppi;
 	required_device<ttl166_device> m_dsw_shifter[2];
 
@@ -126,17 +130,35 @@ private:
 	int m_pic_to_ppi_data;
 };
 
+class hamboy_state : public megaphx_state
+{
+public:
+	hamboy_state(const machine_config &mconfig, device_type type, const char *tag)
+		: megaphx_state(mconfig, type, tag)
+	{ }
 
-static ADDRESS_MAP_START( megaphx_68k_map, AS_PROGRAM, 16, megaphx_state )
-	AM_RANGE(0x000000, 0x0013ff) AM_RAM AM_SHARE("mainram") // maps over part of the rom??
-	AM_RANGE(0x000000, 0x03ffff) AM_ROM AM_REGION("roms67", 0x00000) // or the rom doesn't map here? it contains the service mode grid amongst other things..
+protected:
+	virtual void machine_reset() override;
+};
+
+void megaphx_state::machine_reset()
+{
+	m_indervid->set_bpp(8);
+}
+
+void hamboy_state::machine_reset()
+{
+	m_indervid->set_bpp(4);
+}
+
+ADDRESS_MAP_START(megaphx_state::megaphx_68k_map)
+	AM_RANGE(0x000000, 0x03ffff) AM_ROM AM_REGION("boot", 0x00000) // or the rom doesn't map here? it contains the service mode grid amongst other things..
+	AM_RANGE(0x000000, 0x00ffff) AM_RAM AM_SHARE("mainram") // maps over part of the rom??
 	AM_RANGE(0x040000, 0x040007) AM_DEVREADWRITE("inder_vid:tms", tms34010_device, host_r, host_w)
 	AM_RANGE(0x050000, 0x050001) AM_DEVWRITE("inder_sb", inder_sb_device, megaphx_0x050000_w)
 	AM_RANGE(0x050002, 0x050003) AM_DEVREAD("inder_sb", inder_sb_device, megaphx_0x050002_r)
 	AM_RANGE(0x060000, 0x060007) AM_DEVREADWRITE8("ppi8255_0", i8255_device, read, write, 0x00ff)
-	AM_RANGE(0x800000, 0x83ffff) AM_ROM  AM_REGION("roms01", 0x00000) // code + bg gfx are in here
-	AM_RANGE(0x840000, 0x87ffff) AM_ROM  AM_REGION("roms23", 0x00000) // bg gfx are in here
-	AM_RANGE(0x880000, 0x8bffff) AM_ROM  AM_REGION("roms45", 0x00000) // bg gfx + title screen in here
+	AM_RANGE(0x800000, 0x8fffff) AM_ROM AM_REGION("data", 0x00000)
 ADDRESS_MAP_END
 
 
@@ -206,18 +228,63 @@ static INPUT_PORTS_START( megaphx )
 	PORT_DIPSETTING(   0x14, "5")
 	PORT_DIPSETTING(   0x18, "6")
 	PORT_DIPSETTING(   0x1c, "7")
-	PORT_DIPUNKNOWN_DIPLOC(0x20, 0x20, "SW2:!6") // something to do with time in hammer boy??
+	PORT_DIPUNKNOWN_DIPLOC(0x20, 0x20, "SW2:!6")
 	PORT_DIPUNKNOWN_DIPLOC(0x40, 0x40, "SW2:!7")
 	PORT_DIPUNKNOWN_DIPLOC(0x80, 0x80, "SW2:!8")
 INPUT_PORTS_END
 
+static INPUT_PORTS_START( hamboy )
+	PORT_INCLUDE(megaphx)
+
+	PORT_MODIFY("DSW1")
+	PORT_DIPNAME(0x07, 0x06, DEF_STR( Coin_A )) PORT_DIPLOCATION("SW1:!1,!2,!3")
+	PORT_DIPSETTING(   0x00, DEF_STR( 5C_1C ))
+	PORT_DIPSETTING(   0x03, DEF_STR( 4C_1C ))
+	PORT_DIPSETTING(   0x05, DEF_STR( 3C_1C ))
+	PORT_DIPSETTING(   0x01, DEF_STR( 2C_1C ))
+	PORT_DIPSETTING(   0x06, DEF_STR( 1C_1C ))
+	PORT_DIPSETTING(   0x02, DEF_STR( 1C_2C ))
+	PORT_DIPSETTING(   0x04, DEF_STR( 1C_3C ))
+	PORT_DIPSETTING(   0x07, DEF_STR( 1C_4C ))
+	PORT_DIPNAME(0x38, 0x30, DEF_STR( Coin_B )) PORT_DIPLOCATION("SW1:!4,!5,!6")
+	PORT_DIPSETTING(   0x00, DEF_STR( 5C_1C ))
+	PORT_DIPSETTING(   0x18, DEF_STR( 4C_1C ))
+	PORT_DIPSETTING(   0x28, DEF_STR( 3C_1C ))
+	PORT_DIPSETTING(   0x08, DEF_STR( 2C_1C ))
+	PORT_DIPSETTING(   0x30, DEF_STR( 1C_1C ))
+	PORT_DIPSETTING(   0x10, DEF_STR( 1C_2C ))
+	PORT_DIPSETTING(   0x20, DEF_STR( 1C_3C ))
+	PORT_DIPSETTING(   0x38, DEF_STR( 1C_4C ))
+	PORT_DIPNAME(0xc0, 0x80, DEF_STR( Lives ))  PORT_DIPLOCATION("SW1:!7,!8")
+	PORT_DIPSETTING(   0x00, "1")
+	PORT_DIPSETTING(   0x40, "2")
+	PORT_DIPSETTING(   0x80, "3")
+	PORT_DIPSETTING(   0xc0, "4")
+
+	PORT_MODIFY("DSW2")
+	PORT_DIPNAME(0x01, 0x00, DEF_STR( Demo_Sounds )) PORT_DIPLOCATION("SW2:!1")
+	PORT_DIPSETTING(   0x01, DEF_STR( Off ))
+	PORT_DIPSETTING(   0x00, DEF_STR( On ))
+	PORT_SERVICE_DIPLOC(0x02, IP_ACTIVE_HIGH, "SW2:!2")
+	PORT_DIPUNKNOWN_DIPLOC(0x04, 0x00, "SW2:!3")
+	PORT_DIPUNKNOWN_DIPLOC(0x08, 0x00, "SW2:!4")
+	PORT_DIPUNKNOWN_DIPLOC(0x10, 0x00, "SW2:!5")
+	PORT_DIPUNKNOWN_DIPLOC(0x20, 0x00, "SW2:!6") // 6 or 7 needs to be off or the timer runs at ridiculous speed
+	PORT_DIPUNKNOWN_DIPLOC(0x40, 0x00, "SW2:!7")
+	PORT_DIPUNKNOWN_DIPLOC(0x80, 0x80, "SW2:!8")
+INPUT_PORTS_END
+
+
+// pic port a
+//
+// 3---  r   serial clock
+// -2--   w  serial clock
+// --1-   w  not used
+// ---0  rw  serial data
 
 READ8_MEMBER( megaphx_state::pic_porta_r )
 {
 	uint8_t data = 0;
-
-	// 3-  serial clock
-	// -0  serial data
 
 	// clear when the pic starts reading the command
 	m_ppi_to_pic_command = 0;
@@ -230,22 +297,24 @@ READ8_MEMBER( megaphx_state::pic_porta_r )
 
 WRITE8_MEMBER( megaphx_state::pic_porta_w )
 {
-	// 2--  serial clock
-	// -1-  not used
-	// --0  serial data
-
 	m_pic_to_ppi_data = BIT(data, 0);
 	m_pic_to_ppi_clock = BIT(data, 2);
 }
 
+// pic port b
+//
+// 7-------   w  not used
+// -6------   w  watchdog (not enabled by megaphx)
+// --5-----  r   start2
+// ---4----  r   start1
+// ----3---   w  dsw clock
+// -----2--   w  dsw shift/load
+// ------1-  r   dip switch data
+// -------0  r   ppi to pic command incoming
+
 READ8_MEMBER( megaphx_state::pic_portb_r )
 {
 	uint8_t data = 0;
-
-	// 5---  start2
-	// -4--  start1
-	// --1-  dip switch data
-	// ---0  ppi to pic command incoming
 
 	data |= m_ppi_to_pic_command << 0;
 	data |= m_dsw_data << 1;
@@ -256,10 +325,6 @@ READ8_MEMBER( megaphx_state::pic_portb_r )
 
 WRITE8_MEMBER( megaphx_state::pic_portb_w )
 {
-	// 7---  not used
-	// -6--  watchdog (not enabled by megaphx)
-	// --3-  dsw clock
-	// ---2  dsw shift/load
 
 	m_dsw_shifter[0]->shift_load_w(BIT(data, 2));
 	m_dsw_shifter[1]->shift_load_w(BIT(data, 2));
@@ -267,14 +332,20 @@ WRITE8_MEMBER( megaphx_state::pic_portb_w )
 	m_dsw_shifter[1]->clock_w(BIT(data, 3));
 }
 
+// ppi port c
+//
+// 7-------   w  ppi to pic clock
+// -6------   w  ppi to pic data
+// --5-----   w  unknown
+// ---4----   w  ppi to pic command
+// ----3---  r   pic to ppi clock
+// -----2--  r   unknown
+// ------1-  r   pic to ppi data
+// -------0  r   unknown
+
 READ8_MEMBER( megaphx_state::ppi_portc_r )
 {
 	uint8_t data = 0;
-
-	// 3---  pic to ppi clock
-	// -2--  unknown
-	// --1-  pic to ppi data
-	// ---0  unknown
 
 	data |= m_pic_to_ppi_data << 1;
 	data |= m_pic_to_ppi_clock << 3;
@@ -284,10 +355,9 @@ READ8_MEMBER( megaphx_state::ppi_portc_r )
 
 WRITE8_MEMBER( megaphx_state::ppi_portc_w )
 {
-	// 7---  ppi to pic clock
-	// -6--  ppi to pic data
-	// --5-  unknown
-	// ---4  ppi to pic command
+	// avoid bogus write on reset
+	if (data == 0xff)
+		return;
 
 	// only set, don't clear here. otherwise the pic has no chance to pick it up
 	if (BIT(data, 4))
@@ -303,10 +373,10 @@ WRITE_LINE_MEMBER( megaphx_state::dsw_w )
 }
 
 MACHINE_CONFIG_START(megaphx_state::megaphx)
-	MCFG_CPU_ADD("maincpu", M68000, 8000000) // ??  can't read xtal due to reflections, CPU is an 8Mhz part
+	MCFG_CPU_ADD("maincpu", M68000, 16_MHz_XTAL / 2)
 	MCFG_CPU_PROGRAM_MAP(megaphx_68k_map)
 
-	MCFG_CPU_ADD("pic", PIC16C54, 12000000)    /* 3MHz */
+	MCFG_CPU_ADD("pic", PIC16C54, 6_MHz_XTAL) // correct?
 	MCFG_PIC16C5x_READ_A_CB(READ8(megaphx_state, pic_porta_r))
 	MCFG_PIC16C5x_WRITE_A_CB(WRITE8(megaphx_state, pic_porta_w))
 	MCFG_PIC16C5x_READ_B_CB(READ8(megaphx_state, pic_portb_r))
@@ -335,28 +405,24 @@ MACHINE_CONFIG_END
 
 DRIVER_INIT_MEMBER(megaphx_state, megaphx)
 {
-	uint16_t *src = (uint16_t*)memregion( "roms67" )->base();
+	uint16_t *src = (uint16_t*)memregion( "boot" )->base();
 	// copy vector table? - it must be writable because the game write the irq vector..
 	memcpy(m_mainram, src, 0x80);
 }
 
 
 ROM_START( megaphx )
-	ROM_REGION16_BE( 0x40000, "roms67", 0 )  // the majority of the data in these does not get used?! (only the vector table) is it just garbage??
+	ROM_REGION16_BE( 0x40000, "boot", 0 )  // the majority of the data in these does not get used?! (only the vector table) is it just garbage??
 	ROM_LOAD16_BYTE( "mph6.u32", 0x000001, 0x20000, CRC(b99703d4) SHA1(393b6869e71d4c61060e66e0e9e36a1e6ca345d1) )
 	ROM_LOAD16_BYTE( "mph7.u21", 0x000000, 0x20000, CRC(f11e7449) SHA1(1017142d10011d68e49d3ccdb1ac4e815c03b17a) )
 
-	ROM_REGION16_BE( 0x40000, "roms01", 0 )
+	ROM_REGION16_BE( 0x100000, "data", 0 )
 	ROM_LOAD16_BYTE( "mph0.u38", 0x000001, 0x20000, CRC(b63dd20f) SHA1(c8ce5985a6ba49428d66a49d9d623ccdfce422c2) )
 	ROM_LOAD16_BYTE( "mph1.u27", 0x000000, 0x20000, CRC(4dcbf44b) SHA1(a8fa49ecd033f1aeb323e0032ddcf5f8f9463ac0) )
-
-	ROM_REGION16_BE( 0x40000, "roms23", 0 )
-	ROM_LOAD16_BYTE( "mph2.u37", 0x000001, 0x20000, CRC(a0f69c27) SHA1(d0c5c241d94a1f03f51e7e517e2f9dec6abcf75a) )
-	ROM_LOAD16_BYTE( "mph3.u26", 0x000000, 0x20000, CRC(4db84cc5) SHA1(dd74acd4b32c7e7553554ac0f9ba13503358e869) )
-
-	ROM_REGION16_BE( 0x40000, "roms45", 0 )
-	ROM_LOAD16_BYTE( "mph4.u36", 0x000001, 0x20000, CRC(c8e0725e) SHA1(b3af315b9a94a692e81e0dbfd4035036c2af4f50) )
-	ROM_LOAD16_BYTE( "mph5.u25", 0x000000, 0x20000, CRC(c95ccb69) SHA1(9d14cbfafd943f6ff461a7f373170a35e36eb695) )
+	ROM_LOAD16_BYTE( "mph2.u37", 0x040001, 0x20000, CRC(a0f69c27) SHA1(d0c5c241d94a1f03f51e7e517e2f9dec6abcf75a) )
+	ROM_LOAD16_BYTE( "mph3.u26", 0x040000, 0x20000, CRC(4db84cc5) SHA1(dd74acd4b32c7e7553554ac0f9ba13503358e869) )
+	ROM_LOAD16_BYTE( "mph4.u36", 0x080001, 0x20000, CRC(c8e0725e) SHA1(b3af315b9a94a692e81e0dbfd4035036c2af4f50) )
+	ROM_LOAD16_BYTE( "mph5.u25", 0x080000, 0x20000, CRC(c95ccb69) SHA1(9d14cbfafd943f6ff461a7f373170a35e36eb695) )
 
 	ROM_REGION( 0x200000, "inder_sb:user2", 0 )
 	ROM_LOAD( "sonido_mph1.u39", 0x00000, 0x20000, CRC(f5e65557) SHA1(5ae759c2bcef96fbda42f088c02b6dec208030f3) )
@@ -367,10 +433,39 @@ ROM_START( megaphx )
 
 	ROM_REGION( 0x100000, "pic", 0 )
 	ROM_LOAD( "pic16c54-xt.bin", 0x000000, 0x430,  CRC(21f396fb) SHA1(c8badb9b3681e684bced0ced1de4c3a15641de8b) )
+	ROM_FILL(0x2c, 1, 0x01) // patch timer length or its too slow (pic issue?)
 
 	ROM_REGION( 0x100000, "pals", 0 ) // jedutil won't convert these? are they bad?
 	ROM_LOAD( "p31_u31_palce16v8h-25.jed", 0x000, 0xbd4, CRC(05ef04b7) SHA1(330dd81a832b6675fb0473868c26fe9bec2da854) )
 	ROM_LOAD( "p40_u29_palce16v8h-25.jed", 0x000, 0xbd4, CRC(44b7e51c) SHA1(b8b34f3b319d664ec3ad72ed87d9f65701f183a5) )
 ROM_END
 
+ROM_START( hamboy )
+	ROM_REGION16_BE( 0x40000, "boot", 0 )  // these only contain the boot vectors(!)
+	ROM_LOAD16_BYTE( "HB8 - U32.bin", 0x000001, 0x20000, CRC(4f7b142a) SHA1(e6e6cb05672e4f99def69be2f4cbc56f5d37f226) )
+	ROM_LOAD16_BYTE( "HB9 - U21.bin", 0x000000, 0x20000, CRC(138e294f) SHA1(671b34395f0773889ddf6aa1f4291df981d1b059) )
+
+	ROM_REGION16_BE( 0x100000, "data", 0 )
+	ROM_LOAD16_BYTE( "HB0 - U38.bin", 0x000001, 0x20000, CRC(b946a47f) SHA1(7f78a198fa3c5a00c124ab62473da4cddc0ac31f) )
+	ROM_LOAD16_BYTE( "HB1 - U27.bin", 0x000000, 0x20000, CRC(890e1571) SHA1(e4a50a1849e9bc9853070da160e042f13737d8d2) )
+	ROM_LOAD16_BYTE( "HB2 - U37.bin", 0x040001, 0x20000, CRC(b71b0aad) SHA1(fb2525a1581e6aa9a60ce76a09947b8d1941951c) )
+	ROM_LOAD16_BYTE( "HB3 - U26.bin", 0x040000, 0x20000, CRC(1d0d61b9) SHA1(d747c8c31a81364d85ac00c50cefd695868d916d) )
+	ROM_LOAD16_BYTE( "HB4 - U36.bin", 0x080001, 0x20000, CRC(9b81948e) SHA1(9e8bbee7f19e97d81205add7dbe89b353c6ab25a) )
+	ROM_LOAD16_BYTE( "HB5 - U25.bin", 0x080000, 0x20000, CRC(23885e08) SHA1(f0233e3e007715d1b0b94fd52ffb597d667dc818) )
+	ROM_LOAD16_BYTE( "HB6 - U35.bin", 0x0c0001, 0x20000, CRC(0c479648) SHA1(a07947b0b4e526b853782545bfdf73effa6c6579) )
+	ROM_LOAD16_BYTE( "HB7 - U24.bin", 0x0c0000, 0x20000, CRC(297a6944) SHA1(7c5c66412db7905b0302a4e451fc20c20233990e) )
+
+	ROM_REGION( 0x200000, "inder_sb:user2", 0 )
+	ROM_LOAD( "Sonido HammerBoy 0 - U39.bin", 0x00000, 0x20000, CRC(8d94ac97) SHA1(3447e4b5670880a9b222cba84f5630e8ed42c2d3) )
+	ROM_LOAD( "Sonido HammerBoy 1 - U38.bin", 0x20000, 0x20000, CRC(f92e5098) SHA1(10c869c7b1250a119bf201bfc8c586e9340c2a66) )
+
+	ROM_REGION( 0x100000, "inder_sb:audiocpu", 0 )
+	ROM_LOAD( "HammerBoy - U35.bin", 0x000000, 0x2000,  CRC(cd22f2a4) SHA1(c5cf5b1ce528412493e2b5f565ed38e3e9123d37) )
+
+	ROM_REGION( 0x100000, "pic", 0 )
+	ROM_LOAD( "pic16c54-xt.bin", 0x000000, 0x430, CRC(21f396fb) SHA1(c8badb9b3681e684bced0ced1de4c3a15641de8b) )
+	ROM_FILL(0x2c, 1, 0x01) // patch timer length or its too slow (pic issue?)
+ROM_END
+
 GAME( 1991, megaphx,  0,        megaphx, megaphx, megaphx_state, megaphx, ROT0, "Dinamic / Inder", "Mega Phoenix", MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND )
+GAME( 1990, hamboy,   0,        megaphx, hamboy,  hamboy_state,  megaphx, ROT0, "Dinamic / Inder", "Hammer Boy",   MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND )

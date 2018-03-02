@@ -126,7 +126,7 @@ WRITE8_MEMBER(victory_state::lamp_control_w)
  *
  *************************************/
 
-static ADDRESS_MAP_START( main_map, AS_PROGRAM, 8, victory_state )
+ADDRESS_MAP_START(victory_state::main_map)
 	AM_RANGE(0x0000, 0xbfff) AM_ROM
 	AM_RANGE(0xc000, 0xc0ff) AM_READ(video_control_r)
 	AM_RANGE(0xc100, 0xc1ff) AM_WRITE(video_control_w)
@@ -140,7 +140,7 @@ static ADDRESS_MAP_START( main_map, AS_PROGRAM, 8, victory_state )
 ADDRESS_MAP_END
 
 
-static ADDRESS_MAP_START( main_io_map, AS_IO, 8, victory_state )
+ADDRESS_MAP_START(victory_state::main_io_map)
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	AM_RANGE(0x00, 0x00) AM_MIRROR(0x03) AM_READ_PORT("SW2")
 	AM_RANGE(0x04, 0x04) AM_MIRROR(0x03) AM_READ_PORT("SW1")
@@ -239,7 +239,7 @@ MACHINE_CONFIG_START(victory_state::victory)
 
 
 	/* audio hardware */
-	MCFG_FRAGMENT_ADD(victory_audio)
+	victory_audio(config);
 
 MACHINE_CONFIG_END
 

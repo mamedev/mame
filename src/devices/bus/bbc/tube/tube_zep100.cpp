@@ -25,7 +25,7 @@ DEFINE_DEVICE_TYPE(BBC_TUBE_ZEP100, bbc_tube_zep100_device, "bbc_tube_zep100", "
 //  ADDRESS_MAP( tube_zep100_mem )
 //-------------------------------------------------
 
-static ADDRESS_MAP_START(tube_zep100_mem, AS_PROGRAM, 8, bbc_tube_zep100_device)
+ADDRESS_MAP_START(bbc_tube_zep100_device::tube_zep100_mem)
 	AM_RANGE(0x0000, 0xffff) AM_READWRITE(mem_r, mem_w)
 ADDRESS_MAP_END
 
@@ -33,7 +33,7 @@ ADDRESS_MAP_END
 //  ADDRESS_MAP( tube_zep100_io )
 //-------------------------------------------------
 
-static ADDRESS_MAP_START(tube_zep100_io, AS_IO, 8, bbc_tube_zep100_device)
+ADDRESS_MAP_START(bbc_tube_zep100_device::tube_zep100_io)
 	ADDRESS_MAP_UNMAP_HIGH
 	AM_RANGE(0x00, 0x07) AM_MIRROR(0xff00) AM_READWRITE(io_r, io_w)
 ADDRESS_MAP_END
@@ -171,7 +171,7 @@ READ8_MEMBER(bbc_tube_zep100_device::io_r)
 {
 	uint8_t data = 0xff;
 
-	if (!machine().side_effect_disabled())
+	if (!machine().side_effects_disabled())
 		m_rom_enabled = !BIT(offset, 2);
 
 	data = m_ppi->read(space, offset & 0x03);

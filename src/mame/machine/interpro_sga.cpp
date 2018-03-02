@@ -20,7 +20,7 @@
 #define VERBOSE 0
 #include "logmacro.h"
 
-DEVICE_ADDRESS_MAP_START(map, 32, interpro_sga_device)
+ADDRESS_MAP_START(interpro_sga_device::map)
 	AM_RANGE(0x00, 0x03) AM_READWRITE(gcsr_r, gcsr_w)
 	AM_RANGE(0x04, 0x07) AM_READWRITE(ipoll_r, ipoll_w)
 	AM_RANGE(0x08, 0x0b) AM_READWRITE(imask_r, imask_w)

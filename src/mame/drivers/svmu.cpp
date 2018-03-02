@@ -55,6 +55,8 @@ public:
 	DECLARE_QUICKLOAD_LOAD_MEMBER( svmu );
 
 	void svmu(machine_config &config);
+	void svmu_io_mem(address_map &map);
+	void svmu_mem(address_map &map);
 private:
 	uint8_t       m_page;
 };
@@ -123,11 +125,11 @@ READ8_MEMBER(svmu_state::p7_r)
 }
 
 
-static ADDRESS_MAP_START(svmu_mem, AS_PROGRAM, 8, svmu_state)
+ADDRESS_MAP_START(svmu_state::svmu_mem)
 	AM_RANGE( 0x0000, 0xffff ) AM_READWRITE(prog_r, prog_w)
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START(svmu_io_mem, AS_IO, 8, svmu_state)
+ADDRESS_MAP_START(svmu_state::svmu_io_mem)
 	AM_RANGE( LC8670_PORT1, LC8670_PORT1 ) AM_READWRITE(p1_r, p1_w)
 	AM_RANGE( LC8670_PORT3, LC8670_PORT3 ) AM_READ_PORT("P3")
 	AM_RANGE( LC8670_PORT7, LC8670_PORT7 ) AM_READ(p7_r)

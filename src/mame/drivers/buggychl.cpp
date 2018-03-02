@@ -194,7 +194,7 @@ READ8_MEMBER(buggychl_state::sound_status_sound_r)
  1  1  1  0  ?  ?  ?  ?  ?  ?  ?  ?  ?  ?  ?  ?   ?  (unknown, cut off on schematic)
  1  1  1  1  ?  ?  ?  ?  ?  ?  ?  ?  ?  ?  ?  ?   ?  (unknown, cut off on schematic)
 */
-static ADDRESS_MAP_START( buggychl_map, AS_PROGRAM, 8, buggychl_state )
+ADDRESS_MAP_START(buggychl_state::buggychl_map)
 	AM_RANGE(0x0000, 0x3fff) AM_ROM /* A22-04 (23) */
 	AM_RANGE(0x4000, 0x7fff) AM_ROM /* A22-05 (22) */
 	AM_RANGE(0x8000, 0x87ff) AM_RAM /* 6116 SRAM (36) */
@@ -237,7 +237,7 @@ ADDRESS_MAP_END
   (The schematic is for an unknown taito game, possibly never released.)
    The final buggy challenge sound board is more similar to Fairyland Story sound
    hardware, except it has two YM2149 chips instead of one, and much less ROM space. */
-static ADDRESS_MAP_START( sound_map, AS_PROGRAM, 8, buggychl_state )
+ADDRESS_MAP_START(buggychl_state::sound_map)
 	AM_RANGE(0x0000, 0x3fff) AM_ROM
 	AM_RANGE(0x4000, 0x47ff) AM_RAM
 	AM_RANGE(0x4800, 0x4801) AM_DEVWRITE("ay1", ay8910_device, address_data_w)

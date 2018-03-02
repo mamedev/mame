@@ -115,7 +115,7 @@ WRITE16_MEMBER(shangha3_state::irq_ack_w)
 	m_maincpu->set_input_line(4, CLEAR_LINE);
 }
 
-static ADDRESS_MAP_START( shangha3_map, AS_PROGRAM, 16, shangha3_state )
+ADDRESS_MAP_START(shangha3_state::shangha3_map)
 	AM_RANGE(0x000000, 0x07ffff) AM_ROM
 	AM_RANGE(0x100000, 0x100fff) AM_RAM_DEVWRITE("palette", palette_device, write16) AM_SHARE("palette")
 	AM_RANGE(0x200000, 0x200001) AM_READ_PORT("INPUTS")
@@ -133,7 +133,7 @@ static ADDRESS_MAP_START( shangha3_map, AS_PROGRAM, 16, shangha3_state )
 	AM_RANGE(0x360000, 0x360001) AM_WRITE(gfxlist_addr_w)
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( heberpop_map, AS_PROGRAM, 16, shangha3_state )
+ADDRESS_MAP_START(shangha3_state::heberpop_map)
 	AM_RANGE(0x000000, 0x0fffff) AM_ROM
 	AM_RANGE(0x100000, 0x100fff) AM_RAM_DEVWRITE("palette", palette_device, write16) AM_SHARE("palette")
 	AM_RANGE(0x200000, 0x200001) AM_READ_PORT("INPUTS")
@@ -149,7 +149,7 @@ static ADDRESS_MAP_START( heberpop_map, AS_PROGRAM, 16, shangha3_state )
 	AM_RANGE(0x800000, 0xb7ffff) AM_ROM AM_REGION("gfx1", 0)
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( blocken_map, AS_PROGRAM, 16, shangha3_state )
+ADDRESS_MAP_START(shangha3_state::blocken_map)
 	AM_RANGE(0x000000, 0x0fffff) AM_ROM
 	AM_RANGE(0x100000, 0x100001) AM_READ_PORT("INPUTS")
 	AM_RANGE(0x100002, 0x100003) AM_READ_PORT("SYSTEM") AM_WRITENOP // w -> unknown purpose
@@ -166,12 +166,12 @@ static ADDRESS_MAP_START( blocken_map, AS_PROGRAM, 16, shangha3_state )
 ADDRESS_MAP_END
 
 
-static ADDRESS_MAP_START( heberpop_sound_map, AS_PROGRAM, 8, shangha3_state )
+ADDRESS_MAP_START(shangha3_state::heberpop_sound_map)
 	AM_RANGE(0x0000, 0xf7ff) AM_ROM
 	AM_RANGE(0xf800, 0xffff) AM_RAM
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( heberpop_sound_io_map, AS_IO, 8, shangha3_state )
+ADDRESS_MAP_START(shangha3_state::heberpop_sound_io_map)
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	AM_RANGE(0x00, 0x03) AM_DEVREADWRITE("ymsnd", ym3438_device, read, write)
 	AM_RANGE(0x80, 0x80) AM_DEVREADWRITE("oki", okim6295_device, read, write)

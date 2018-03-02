@@ -56,4 +56,6 @@ public:
 	required_device<okim6295_device> m_oki;
 	required_device<gfxdecode_device> m_gfxdecode;
 	void gotcha(machine_config &config);
+	void gotcha_map(address_map &map);
+	void sound_map(address_map &map);
 };

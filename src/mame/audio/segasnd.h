@@ -13,6 +13,19 @@
 #include "cpu/mcs48/mcs48.h"
 #include "machine/timer.h"
 
+class segag80snd_common : public driver_device {
+public:
+	segag80snd_common(const machine_config &mconfig, device_type type, const char *tag)
+		: driver_device(mconfig, type, tag)
+	{}
+
+	virtual ~segag80snd_common() = default;
+
+	void sega_speech_board(machine_config &config);
+
+	void speech_map(address_map &map);
+	void speech_portmap(address_map &map);
+};
 
 class speech_sound_device : public device_t, public device_sound_interface
 {
@@ -30,8 +43,6 @@ public:
 	DECLARE_WRITE8_MEMBER( p2_w );
 
 	DECLARE_WRITE_LINE_MEMBER(drq_w);
-
-	void sega_speech_board(machine_config &config);
 
 protected:
 	// device-level overrides
@@ -70,6 +81,9 @@ public:
 
 	TIMER_DEVICE_CALLBACK_MEMBER( increment_t1_clock_timer_cb );
 
+	void usb_map(address_map &map);
+	void usb_map_rom(address_map &map);
+	void usb_portmap(address_map &map);
 protected:
 	usb_sound_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, u32 clock);
 

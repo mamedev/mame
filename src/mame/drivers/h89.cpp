@@ -44,10 +44,12 @@ public:
 	virtual void machine_reset() override;
 	TIMER_DEVICE_CALLBACK_MEMBER(h89_irq_timer);
 	void h89(machine_config &config);
+	void h89_io(address_map &map);
+	void h89_mem(address_map &map);
 };
 
 
-static ADDRESS_MAP_START(h89_mem, AS_PROGRAM, 8, h89_state)
+ADDRESS_MAP_START(h89_state::h89_mem)
 	ADDRESS_MAP_UNMAP_HIGH
 	// Bank 0 - At startup has the format defined below, but software could swap it for RAM (Later H-89s and
 	//          Early ones with the Org-0 modification),
@@ -60,7 +62,7 @@ static ADDRESS_MAP_START(h89_mem, AS_PROGRAM, 8, h89_state)
 	AM_RANGE(0x2000, 0xffff) AM_RAM
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( h89_io, AS_IO, 8, h89_state)
+ADDRESS_MAP_START(h89_state::h89_io)
 	ADDRESS_MAP_UNMAP_HIGH
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
 //  AM_RANGE(0x78, 0x7b)    expansion 1    // Options - Cassette I/O (only uses 0x78 - 0x79) Requires MTR-88 ROM

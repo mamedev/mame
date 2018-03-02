@@ -103,6 +103,9 @@ protected:
 	virtual void execute_one() override;
 	virtual bool check_interrupt() override;
 
+	void e0c6s46_data(address_map &map);
+	void e0c6s46_program(address_map &map);
+
 private:
 	required_shared_ptr<u8> m_vram1;
 	required_shared_ptr<u8> m_vram2;

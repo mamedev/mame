@@ -56,7 +56,7 @@ Pleiads:
 #include "speaker.h"
 
 
-static ADDRESS_MAP_START( phoenix_memory_map, AS_PROGRAM, 8, phoenix_state )
+ADDRESS_MAP_START(phoenix_state::phoenix_memory_map)
 	AM_RANGE(0x0000, 0x3fff) AM_ROM
 	AM_RANGE(0x4000, 0x4fff) AM_READ_BANK("bank1") AM_WRITE(phoenix_videoram_w) /* 2 pages selected by bit 0 of the video register */
 	AM_RANGE(0x5000, 0x53ff) AM_WRITE(phoenix_videoreg_w)
@@ -67,7 +67,7 @@ static ADDRESS_MAP_START( phoenix_memory_map, AS_PROGRAM, 8, phoenix_state )
 	AM_RANGE(0x7800, 0x7bff) AM_READ_PORT("DSW0")                           /* DSW */
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( pleiads_memory_map, AS_PROGRAM, 8, phoenix_state )
+ADDRESS_MAP_START(phoenix_state::pleiads_memory_map)
 	AM_RANGE(0x0000, 0x3fff) AM_ROM
 	AM_RANGE(0x4000, 0x4fff) AM_READ_BANK("bank1") AM_WRITE(phoenix_videoram_w) /* 2 pages selected by bit 0 of the video register */
 	AM_RANGE(0x5000, 0x53ff) AM_WRITE(pleiads_videoreg_w)
@@ -78,7 +78,7 @@ static ADDRESS_MAP_START( pleiads_memory_map, AS_PROGRAM, 8, phoenix_state )
 	AM_RANGE(0x7800, 0x7bff) AM_READ_PORT("DSW0")                           /* DSW */
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( survival_memory_map, AS_PROGRAM, 8, phoenix_state )
+ADDRESS_MAP_START(phoenix_state::survival_memory_map)
 	AM_RANGE(0x0000, 0x3fff) AM_ROM
 	AM_RANGE(0x4000, 0x4fff) AM_READ_BANK("bank1") AM_WRITE(phoenix_videoram_w) /* 2 pages selected by bit 0 of the video register */
 	AM_RANGE(0x5000, 0x53ff) AM_WRITE(phoenix_videoreg_w)
@@ -475,7 +475,8 @@ MACHINE_CONFIG_START(phoenix_state::phoenix)
 MACHINE_CONFIG_END
 
 
-MACHINE_CONFIG_DERIVED(phoenix_state::pleiads, phoenix)
+MACHINE_CONFIG_START(phoenix_state::pleiads)
+	phoenix(config);
 
 	/* basic machine hardware */
 	MCFG_CPU_MODIFY("maincpu")
@@ -542,7 +543,8 @@ MACHINE_CONFIG_END
 
 
 /* Uses a Z80 */
-MACHINE_CONFIG_DERIVED(phoenix_state::condor, phoenix)
+MACHINE_CONFIG_START(phoenix_state::condor)
+	phoenix(config);
 
 	/* basic machine hardware */
 	/* FIXME: Verify clock. This is most likely 11MHz/2 */

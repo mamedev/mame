@@ -111,7 +111,7 @@ READ8_MEMBER(spectrum_uspeech_device::mreq_r)
 {
 	uint8_t data;
 
-	if (!machine().side_effect_disabled() && (offset == 0x38))
+	if (!machine().side_effects_disabled() && (offset == 0x38))
 	{
 		m_romcs = !m_romcs;
 	}

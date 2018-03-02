@@ -17,19 +17,19 @@
 
 #define MCFG_DECOCPU_TYPE1_ADD(_tag, _clock, _region) \
 	MCFG_DEVICE_ADD(_tag, DECOCPU1, _clock) \
-	decocpu_type1_device::static_set_cpuregion(*device, _region);
+	downcast<decocpu_type1_device &>(*device).set_cpuregion(_region);
 
 #define MCFG_DECOCPU_TYPE2_ADD(_tag, _clock, _region) \
 	MCFG_DEVICE_ADD(_tag, DECOCPU2, _clock) \
-	decocpu_type1_device::static_set_cpuregion(*device, _region);
+	downcast<decocpu_type1_device &>(*device).set_cpuregion(_region);
 
 #define MCFG_DECOCPU_TYPE3_ADD(_tag, _clock, _region) \
 	MCFG_DEVICE_ADD(_tag, DECOCPU3, _clock) \
-	decocpu_type1_device::static_set_cpuregion(*device, _region);
+	downcast<decocpu_type1_device &>(*device).set_cpuregion(_region);
 
 #define MCFG_DECOCPU_TYPE3B_ADD(_tag, _clock, _region) \
 	MCFG_DEVICE_ADD(_tag, DECOCPU3B, _clock) \
-	decocpu_type1_device::static_set_cpuregion(*device, _region);
+	downcast<decocpu_type1_device &>(*device).set_cpuregion(_region);
 
 #define MCFG_DECOCPU_DISPLAY(_disp_r, _disp_w) \
 	downcast<decocpu_type1_device *>(device)->set_display_read_callback(DEVCB_##_disp_r); \
@@ -81,8 +81,9 @@ public:
 	INPUT_CHANGED_MEMBER(main_nmi);
 	INPUT_CHANGED_MEMBER(audio_nmi);
 
-	static void static_set_cpuregion(device_t &device, const char *tag);
+	void set_cpuregion(const char *tag) { m_cputag = tag; }
 
+	void decocpu1_map(address_map &map);
 protected:
 	static constexpr device_timer_id TIMER_IRQ = 0;
 
@@ -141,6 +142,7 @@ class decocpu_type2_device : public decocpu_type1_device
 public:
 	decocpu_type2_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
+	void decocpu2_map(address_map &map);
 protected:
 	decocpu_type2_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock);
 

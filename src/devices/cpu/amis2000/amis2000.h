@@ -52,6 +52,10 @@ public:
 	template <class Object> static devcb_base &set_write_f_callback(device_t &device, Object &&cb) { return downcast<amis2000_base_device &>(device).m_write_f.set_callback(std::forward<Object>(cb)); }
 	static void set_7seg_table(device_t &device, const u8 *ptr) { downcast<amis2000_base_device &>(device).m_7seg_table = ptr; }
 
+	void data_64x4(address_map &map);
+	void data_80x4(address_map &map);
+	void program_1_5k(address_map &map);
+	void program_1k(address_map &map);
 protected:
 	// construction/destruction
 	amis2000_base_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, u32 clock, u8 bu_bits, u8 callstack_bits, u8 callstack_depth, int prgwidth, address_map_constructor program, int datawidth, address_map_constructor data)

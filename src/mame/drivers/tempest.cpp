@@ -287,8 +287,8 @@ Note: Roms for Tempest Analog Vector-Generator PCB Assembly A037383-03 or A03738
 #include "speaker.h"
 
 
-#define MASTER_CLOCK (XTAL(12'096'000))
-#define CLOCK_3KHZ   (MASTER_CLOCK / 4096)
+static constexpr XTAL MASTER_CLOCK = 12.096_MHz_XTAL;
+static constexpr XTAL CLOCK_3KHZ   = MASTER_CLOCK / 4096;
 
 #define TEMPEST_KNOB_P1_TAG "KNOBP1"
 #define TEMPEST_KNOB_P2_TAG "KNOBP2"
@@ -313,6 +313,24 @@ public:
 		m_in2(*this, "IN2")
 	{ }
 
+	DECLARE_CUSTOM_INPUT_MEMBER(tempest_knob_r);
+	DECLARE_CUSTOM_INPUT_MEMBER(tempest_buttons_r);
+	DECLARE_CUSTOM_INPUT_MEMBER(clock_r);
+	void tempest(machine_config &config);
+
+protected:
+	DECLARE_WRITE8_MEMBER(wdclr_w);
+	DECLARE_WRITE8_MEMBER(tempest_led_w);
+	DECLARE_WRITE8_MEMBER(tempest_coin_w);
+	DECLARE_READ8_MEMBER(input_port_1_bit_r);
+	DECLARE_READ8_MEMBER(input_port_2_bit_r);
+
+	DECLARE_READ8_MEMBER(rom_ae1f_r);
+
+	virtual void machine_start() override;
+	void main_map(address_map &map);
+
+private:
 	required_device<cpu_device> m_maincpu;
 	required_device<mathbox_device> m_mathbox;
 	required_device<watchdog_timer_device> m_watchdog;
@@ -327,19 +345,6 @@ public:
 	required_ioport m_in2;
 
 	uint8_t m_player_select;
-	DECLARE_WRITE8_MEMBER(wdclr_w);
-	DECLARE_WRITE8_MEMBER(tempest_led_w);
-	DECLARE_WRITE8_MEMBER(tempest_coin_w);
-	DECLARE_CUSTOM_INPUT_MEMBER(tempest_knob_r);
-	DECLARE_CUSTOM_INPUT_MEMBER(tempest_buttons_r);
-	DECLARE_CUSTOM_INPUT_MEMBER(clock_r);
-	DECLARE_READ8_MEMBER(input_port_1_bit_r);
-	DECLARE_READ8_MEMBER(input_port_2_bit_r);
-
-	DECLARE_READ8_MEMBER(rom_ae1f_r);
-
-	virtual void machine_start() override;
-	void tempest(machine_config &config);
 };
 
 
@@ -440,7 +445,7 @@ READ8_MEMBER(tempest_state::rom_ae1f_r)
 }
 
 
-static ADDRESS_MAP_START( main_map, AS_PROGRAM, 8, tempest_state )
+ADDRESS_MAP_START(tempest_state::main_map)
 	AM_RANGE(0x0000, 0x07ff) AM_RAM
 	AM_RANGE(0x0800, 0x080f) AM_WRITEONLY AM_SHARE("colorram")
 	AM_RANGE(0x0c00, 0x0c00) AM_READ_PORT("IN0")
@@ -461,8 +466,8 @@ static ADDRESS_MAP_START( main_map, AS_PROGRAM, 8, tempest_state )
 	AM_RANGE(0x60c0, 0x60cf) AM_DEVREADWRITE("pokey1", pokey_device, read, write)
 	AM_RANGE(0x60d0, 0x60df) AM_DEVREADWRITE("pokey2", pokey_device, read, write)
 	AM_RANGE(0x60e0, 0x60e0) AM_WRITE(tempest_led_w)
-	AM_RANGE(0xae1f, 0xae1f) AM_READ(rom_ae1f_r)
 	AM_RANGE(0x9000, 0xdfff) AM_ROM
+	AM_RANGE(0xae1f, 0xae1f) AM_READ(rom_ae1f_r)
 	AM_RANGE(0xf000, 0xffff) AM_ROM /* for the reset / interrupt vectors */
 ADDRESS_MAP_END
 

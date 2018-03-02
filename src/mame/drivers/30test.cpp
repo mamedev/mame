@@ -75,6 +75,8 @@ public:
 	required_device<cpu_device> m_maincpu;
 	required_device<okim6295_device> m_oki;
 	void _30test(machine_config &config);
+	void namco_30test_io(address_map &map);
+	void namco_30test_map(address_map &map);
 };
 
 
@@ -137,11 +139,11 @@ WRITE8_MEMBER(namco_30test_state::hc11_okibank_w)
 }
 
 
-static ADDRESS_MAP_START( namco_30test_map, AS_PROGRAM, 8, namco_30test_state )
+ADDRESS_MAP_START(namco_30test_state::namco_30test_map)
 	AM_RANGE(0x0000, 0x003f) AM_RAM // internal I/O
+	AM_RANGE(0x0040, 0x007f) AM_RAM // more internal I/O, HC11 change pending
 	AM_RANGE(0x007c, 0x007c) AM_READWRITE(hc11_mux_r,hc11_mux_w)
 	AM_RANGE(0x007e, 0x007e) AM_READWRITE(hc11_okibank_r,hc11_okibank_w)
-	AM_RANGE(0x0040, 0x007f) AM_RAM // more internal I/O, HC11 change pending
 	AM_RANGE(0x0080, 0x037f) AM_RAM // internal RAM
 	AM_RANGE(0x0d80, 0x0dbf) AM_RAM // EEPROM read-back data goes there
 	AM_RANGE(0x2000, 0x2000) AM_DEVREADWRITE("oki", okim6295_device, read, write)
@@ -157,7 +159,7 @@ static ADDRESS_MAP_START( namco_30test_map, AS_PROGRAM, 8, namco_30test_state )
 	AM_RANGE(0x8000, 0xffff) AM_ROM
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( namco_30test_io, AS_IO, 8, namco_30test_state )
+ADDRESS_MAP_START(namco_30test_state::namco_30test_io)
 	AM_RANGE(MC68HC11_IO_PORTA,MC68HC11_IO_PORTA) AM_READ(namco_30test_mux_r)
 //  AM_RANGE(MC68HC11_IO_PORTD,MC68HC11_IO_PORTD) AM_RAM
 	AM_RANGE(MC68HC11_IO_PORTE,MC68HC11_IO_PORTE) AM_READ_PORT("SYSTEM")

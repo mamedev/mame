@@ -69,6 +69,10 @@ public:
 
 	void magerror(machine_config &config);
 	void hyprduel(machine_config &config);
+	void hyprduel_map(address_map &map);
+	void hyprduel_map2(address_map &map);
+	void magerror_map(address_map &map);
+	void magerror_map2(address_map &map);
 protected:
 	virtual void machine_reset() override;
 

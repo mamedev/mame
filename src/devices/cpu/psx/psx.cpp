@@ -203,14 +203,14 @@ static const uint32_t mtc0_writemask[]=
 
 READ32_MEMBER( psxcpu_device::berr_r )
 {
-	if( !machine().side_effect_disabled() )
+	if( !machine().side_effects_disabled() )
 		m_berr = 1;
 	return 0;
 }
 
 WRITE32_MEMBER( psxcpu_device::berr_w )
 {
-	if( !machine().side_effect_disabled() )
+	if( !machine().side_effects_disabled() )
 		m_berr = 1;
 }
 
@@ -1724,7 +1724,7 @@ int psxcpu_device::store_data_address_breakpoint( uint32_t address )
 }
 
 // On-board RAM and peripherals
-static ADDRESS_MAP_START( psxcpu_internal_map, AS_PROGRAM, 32, psxcpu_device )
+ADDRESS_MAP_START(psxcpu_device::psxcpu_internal_map)
 	AM_RANGE( 0x1f800000, 0x1f8003ff ) AM_NOP /* scratchpad */
 	AM_RANGE( 0x1f800400, 0x1f800fff ) AM_READWRITE( berr_r, berr_w )
 	AM_RANGE( 0x1f801000, 0x1f801003 ) AM_READWRITE( exp_base_r, exp_base_w )
@@ -1768,7 +1768,7 @@ ADDRESS_MAP_END
 
 psxcpu_device::psxcpu_device( const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock ) :
 	cpu_device( mconfig, type, tag, owner, clock ),
-	m_program_config( "program", ENDIANNESS_LITTLE, 32, 32, 0, ADDRESS_MAP_NAME( psxcpu_internal_map ) ),
+	m_program_config( "program", ENDIANNESS_LITTLE, 32, 32, 0, address_map_constructor(FUNC(psxcpu_device::psxcpu_internal_map), this)),
 	m_gpu_read_handler( *this ),
 	m_gpu_write_handler( *this ),
 	m_spu_read_handler( *this ),

@@ -65,4 +65,8 @@ public:
 	K051960_CB_MEMBER(dv_sprite_callback);
 	void devstors(machine_config &config);
 	void mainevt(machine_config &config);
+	void devstors_map(address_map &map);
+	void devstors_sound_map(address_map &map);
+	void mainevt_map(address_map &map);
+	void mainevt_sound_map(address_map &map);
 };

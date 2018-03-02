@@ -288,7 +288,7 @@ WRITE8_MEMBER(vicdual_state::depthch_io_w)
 }
 
 
-static ADDRESS_MAP_START( depthch_map, AS_PROGRAM, 8, vicdual_state )
+ADDRESS_MAP_START(vicdual_state::depthch_map)
 	AM_RANGE(0x0000, 0x3fff) AM_MIRROR(0x4000) AM_ROM
 	AM_RANGE(0x8000, 0x83ff) AM_MIRROR(0x7000) AM_RAM_WRITE(videoram_w) AM_SHARE("videoram")
 	AM_RANGE(0x8400, 0x87ff) AM_MIRROR(0x7000) AM_RAM
@@ -296,7 +296,7 @@ static ADDRESS_MAP_START( depthch_map, AS_PROGRAM, 8, vicdual_state )
 ADDRESS_MAP_END
 
 
-static ADDRESS_MAP_START( depthch_io_map, AS_IO, 8, vicdual_state )
+ADDRESS_MAP_START(vicdual_state::depthch_io_map)
 	ADDRESS_MAP_GLOBAL_MASK(0x0f)
 
 	/* no decoder, just logic gates, so in theory the
@@ -327,7 +327,8 @@ static INPUT_PORTS_START( depthch )
 INPUT_PORTS_END
 
 
-MACHINE_CONFIG_DERIVED(vicdual_state::depthch, vicdual_root)
+MACHINE_CONFIG_START(vicdual_state::depthch)
+	vicdual_root(config);
 
 	/* basic machine hardware */
 	MCFG_CPU_REPLACE("maincpu", I8080, VICDUAL_MAIN_CPU_CLOCK)
@@ -340,7 +341,7 @@ MACHINE_CONFIG_DERIVED(vicdual_state::depthch, vicdual_root)
 
 	/* audio hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
-	MCFG_FRAGMENT_ADD(depthch_audio)
+	depthch_audio(config);
 MACHINE_CONFIG_END
 
 
@@ -369,7 +370,7 @@ WRITE8_MEMBER(vicdual_state::safari_io_w)
 }
 
 
-static ADDRESS_MAP_START( safari_map, AS_PROGRAM, 8, vicdual_state )
+ADDRESS_MAP_START(vicdual_state::safari_map)
 	AM_RANGE(0x0000, 0x3fff) AM_ROM
 	AM_RANGE(0x4000, 0x7fff) AM_NOP /* unused */
 	AM_RANGE(0x8000, 0x8fff) AM_MIRROR(0x3000) AM_RAM
@@ -379,7 +380,7 @@ static ADDRESS_MAP_START( safari_map, AS_PROGRAM, 8, vicdual_state )
 ADDRESS_MAP_END
 
 
-static ADDRESS_MAP_START( safari_io_map, AS_IO, 8, vicdual_state )
+ADDRESS_MAP_START(vicdual_state::safari_io_map)
 	ADDRESS_MAP_GLOBAL_MASK(0x0f)
 
 	/* no decoder, just logic gates, so in theory the
@@ -414,7 +415,8 @@ static INPUT_PORTS_START( safari )
 INPUT_PORTS_END
 
 
-MACHINE_CONFIG_DERIVED(vicdual_state::safari, vicdual_root)
+MACHINE_CONFIG_START(vicdual_state::safari)
+	vicdual_root(config);
 
 	/* basic machine hardware */
 	MCFG_CPU_MODIFY("maincpu")
@@ -452,7 +454,7 @@ WRITE8_MEMBER(vicdual_state::frogs_io_w)
 }
 
 
-static ADDRESS_MAP_START( frogs_map, AS_PROGRAM, 8, vicdual_state )
+ADDRESS_MAP_START(vicdual_state::frogs_map)
 	AM_RANGE(0x0000, 0x3fff) AM_MIRROR(0x4000) AM_ROM
 	AM_RANGE(0x8000, 0x83ff) AM_MIRROR(0x7000) AM_RAM_WRITE(videoram_w) AM_SHARE("videoram")
 	AM_RANGE(0x8400, 0x87ff) AM_MIRROR(0x7000) AM_RAM
@@ -460,7 +462,7 @@ static ADDRESS_MAP_START( frogs_map, AS_PROGRAM, 8, vicdual_state )
 ADDRESS_MAP_END
 
 
-static ADDRESS_MAP_START( frogs_io_map, AS_IO, 8, vicdual_state )
+ADDRESS_MAP_START(vicdual_state::frogs_io_map)
 	ADDRESS_MAP_GLOBAL_MASK(0x0f)
 
 	/* no decoder, just logic gates, so in theory the
@@ -518,7 +520,8 @@ static INPUT_PORTS_START( frogs )
 INPUT_PORTS_END
 
 
-MACHINE_CONFIG_DERIVED(vicdual_state::frogs, vicdual_root)
+MACHINE_CONFIG_START(vicdual_state::frogs)
+	vicdual_root(config);
 
 	/* basic machine hardware */
 	MCFG_CPU_MODIFY("maincpu")
@@ -533,7 +536,7 @@ MACHINE_CONFIG_DERIVED(vicdual_state::frogs, vicdual_root)
 
 	/* audio hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
-	MCFG_FRAGMENT_ADD(frogs_audio)
+	frogs_audio(config);
 MACHINE_CONFIG_END
 
 
@@ -576,7 +579,7 @@ WRITE8_MEMBER(vicdual_state::headon_io_w)
 }
 
 
-static ADDRESS_MAP_START( headon_map, AS_PROGRAM, 8, vicdual_state )
+ADDRESS_MAP_START(vicdual_state::headon_map)
 	AM_RANGE(0x0000, 0x1fff) AM_MIRROR(0x6000) AM_ROM
 	AM_RANGE(0x8000, 0xbfff) AM_NOP /* unused */
 	AM_RANGE(0xc000, 0xc3ff) AM_MIRROR(0x3000) AM_RAM_WRITE(videoram_w) AM_SHARE("videoram")
@@ -585,7 +588,7 @@ static ADDRESS_MAP_START( headon_map, AS_PROGRAM, 8, vicdual_state )
 ADDRESS_MAP_END
 
 
-static ADDRESS_MAP_START( headon_io_map, AS_IO, 8, vicdual_state )
+ADDRESS_MAP_START(vicdual_state::headon_io_map)
 	ADDRESS_MAP_GLOBAL_MASK(0x0f)
 
 	/* no decoder, just logic gates, so in theory the
@@ -594,7 +597,7 @@ static ADDRESS_MAP_START( headon_io_map, AS_IO, 8, vicdual_state )
 ADDRESS_MAP_END
 
 
-static ADDRESS_MAP_START( sspaceat_io_map, AS_IO, 8, vicdual_state )
+ADDRESS_MAP_START(vicdual_state::sspaceat_io_map)
 	ADDRESS_MAP_GLOBAL_MASK(0x0f)
 
 	/* no decoder, just logic gates, so in theory the
@@ -762,7 +765,8 @@ static INPUT_PORTS_START( sspaceat )
 INPUT_PORTS_END
 
 
-MACHINE_CONFIG_DERIVED(vicdual_state::headon, vicdual_root)
+MACHINE_CONFIG_START(vicdual_state::headon)
+	vicdual_root(config);
 
 	/* basic machine hardware */
 	MCFG_CPU_MODIFY("maincpu")
@@ -775,10 +779,11 @@ MACHINE_CONFIG_DERIVED(vicdual_state::headon, vicdual_root)
 
 	/* audio hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
-	MCFG_FRAGMENT_ADD(headon_audio)
+	headon_audio(config);
 MACHINE_CONFIG_END
 
-MACHINE_CONFIG_DERIVED(vicdual_state::headons, headon)
+MACHINE_CONFIG_START(vicdual_state::headons)
+	headon(config);
 
 	/* video hardware */
 	MCFG_SCREEN_MODIFY("screen")
@@ -786,7 +791,8 @@ MACHINE_CONFIG_DERIVED(vicdual_state::headons, headon)
 MACHINE_CONFIG_END
 
 
-MACHINE_CONFIG_DERIVED(vicdual_state::sspaceat, vicdual_root)
+MACHINE_CONFIG_START(vicdual_state::sspaceat)
+	vicdual_root(config);
 
 	/* basic machine hardware */
 	MCFG_CPU_MODIFY("maincpu")
@@ -842,7 +848,7 @@ WRITE8_MEMBER(vicdual_state::digger_io_w)
 }
 
 
-static ADDRESS_MAP_START( headon2_map, AS_PROGRAM, 8, vicdual_state )
+ADDRESS_MAP_START(vicdual_state::headon2_map)
 	AM_RANGE(0x0000, 0x1fff) AM_MIRROR(0x6000) AM_ROM
 	/* AM_RANGE(0x8000, 0x80ff) AM_MIRROR(0x3f00) */  /* schematics show this as battery backed RAM, but doesn't appear to be used */
 	AM_RANGE(0xc000, 0xc3ff) AM_MIRROR(0x3000) AM_RAM_WRITE(videoram_w) AM_SHARE("videoram")
@@ -851,13 +857,13 @@ static ADDRESS_MAP_START( headon2_map, AS_PROGRAM, 8, vicdual_state )
 ADDRESS_MAP_END
 
 
-static ADDRESS_MAP_START( headon2_io_map, AS_IO, 8, vicdual_state )
+ADDRESS_MAP_START(vicdual_state::headon2_io_map)
 	ADDRESS_MAP_GLOBAL_MASK(0x1f)
 	AM_RANGE(0x00, 0x1f) AM_READWRITE(headon2_io_r, headon2_io_w)
 ADDRESS_MAP_END
 
 
-static ADDRESS_MAP_START( digger_io_map, AS_IO, 8, vicdual_state )
+ADDRESS_MAP_START(vicdual_state::digger_io_map)
 	ADDRESS_MAP_GLOBAL_MASK(0x1f)
 
 	/* no decoder, just logic gates, so in theory the
@@ -979,7 +985,8 @@ MACHINE_RESET_MEMBER( vicdual_state, headon2 )
 }
 
 
-MACHINE_CONFIG_DERIVED(vicdual_state::headon2, vicdual_root)
+MACHINE_CONFIG_START(vicdual_state::headon2)
+	vicdual_root(config);
 
 	/* basic machine hardware */
 	MCFG_CPU_MODIFY("maincpu")
@@ -994,10 +1001,11 @@ MACHINE_CONFIG_DERIVED(vicdual_state::headon2, vicdual_root)
 
 	/* audio hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
-	MCFG_FRAGMENT_ADD(headon_audio)
+	headon_audio(config);
 MACHINE_CONFIG_END
 
-MACHINE_CONFIG_DERIVED(vicdual_state::headon2bw, headon2)
+MACHINE_CONFIG_START(vicdual_state::headon2bw)
+	headon2(config);
 
 	/* basic machine hardware */
 	/* video hardware */
@@ -1006,7 +1014,8 @@ MACHINE_CONFIG_DERIVED(vicdual_state::headon2bw, headon2)
 MACHINE_CONFIG_END
 
 
-MACHINE_CONFIG_DERIVED(vicdual_state::digger, vicdual_root)
+MACHINE_CONFIG_START(vicdual_state::digger)
+	vicdual_root(config);
 
 	/* basic machine hardware */
 	MCFG_CPU_MODIFY("maincpu")
@@ -1149,21 +1158,21 @@ WRITE8_MEMBER(vicdual_state::headonn_io_w)
 }
 
 
-static ADDRESS_MAP_START( vicdual_dualgame_map, AS_PROGRAM, 8, vicdual_state )
+ADDRESS_MAP_START(vicdual_state::vicdual_dualgame_map)
 	AM_RANGE(0x0000, 0x3fff) AM_MIRROR(0x4000) AM_ROM
 	AM_RANGE(0x8000, 0x83ff) AM_MIRROR(0x7000) AM_RAM_WRITE(videoram_w) AM_SHARE("videoram")
 	AM_RANGE(0x8400, 0x87ff) AM_MIRROR(0x7000) AM_RAM
 	AM_RANGE(0x8800, 0x8fff) AM_MIRROR(0x7000) AM_RAM_WRITE(characterram_w) AM_SHARE("characterram")
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( carhntds_dualgame_map, AS_PROGRAM, 8, vicdual_state )
+ADDRESS_MAP_START(vicdual_state::carhntds_dualgame_map)
 	AM_RANGE(0x0000, 0x7fff) AM_ROM // also has part of a rom mapped at 0x4000
 	AM_RANGE(0x8000, 0x83ff) AM_MIRROR(0x7000) AM_RAM_WRITE(videoram_w) AM_SHARE("videoram")
 	AM_RANGE(0x8400, 0x87ff) AM_MIRROR(0x7000) AM_RAM
 	AM_RANGE(0x8800, 0x8fff) AM_MIRROR(0x7000) AM_RAM_WRITE(characterram_w) AM_SHARE("characterram")
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( invho2_io_map, AS_IO, 8, vicdual_state )
+ADDRESS_MAP_START(vicdual_state::invho2_io_map)
 	ADDRESS_MAP_GLOBAL_MASK(0x7f)
 
 	AM_RANGE(0x00, 0x00) AM_MIRROR(0x7c) AM_READ_PORT("IN0")
@@ -1177,7 +1186,7 @@ static ADDRESS_MAP_START( invho2_io_map, AS_IO, 8, vicdual_state )
 ADDRESS_MAP_END
 
 
-static ADDRESS_MAP_START( invds_io_map, AS_IO, 8, vicdual_state )
+ADDRESS_MAP_START(vicdual_state::invds_io_map)
 	ADDRESS_MAP_GLOBAL_MASK(0x7f)
 
 	AM_RANGE(0x00, 0x00) AM_MIRROR(0x7c) AM_READ_PORT("IN0")
@@ -1190,7 +1199,7 @@ static ADDRESS_MAP_START( invds_io_map, AS_IO, 8, vicdual_state )
 	AM_RANGE(0x00, 0x7f) AM_WRITE(invds_io_w)
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( carhntds_io_map, AS_IO, 8, vicdual_state )
+ADDRESS_MAP_START(vicdual_state::carhntds_io_map)
 	ADDRESS_MAP_GLOBAL_MASK(0x7f)
 
 	AM_RANGE(0x00, 0x00) AM_MIRROR(0x7c) AM_READ_PORT("IN0")
@@ -1203,7 +1212,7 @@ static ADDRESS_MAP_START( carhntds_io_map, AS_IO, 8, vicdual_state )
 	AM_RANGE(0x00, 0x7f) AM_WRITE(carhntds_io_w)
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( sspacaho_io_map, AS_IO, 8, vicdual_state )
+ADDRESS_MAP_START(vicdual_state::sspacaho_io_map)
 	ADDRESS_MAP_GLOBAL_MASK(0x7f)
 
 	AM_RANGE(0x00, 0x00) AM_MIRROR(0x7c) AM_READ_PORT("IN0")
@@ -1217,7 +1226,7 @@ static ADDRESS_MAP_START( sspacaho_io_map, AS_IO, 8, vicdual_state )
 ADDRESS_MAP_END
 
 
-static ADDRESS_MAP_START( tranqgun_io_map, AS_IO, 8, vicdual_state )
+ADDRESS_MAP_START(vicdual_state::tranqgun_io_map)
 	ADDRESS_MAP_GLOBAL_MASK(0x0f)
 
 	AM_RANGE(0x00, 0x00) AM_MIRROR(0x0c) AM_READ_PORT("IN0")
@@ -1231,7 +1240,7 @@ static ADDRESS_MAP_START( tranqgun_io_map, AS_IO, 8, vicdual_state )
 ADDRESS_MAP_END
 
 
-static ADDRESS_MAP_START( spacetrk_io_map, AS_IO, 8, vicdual_state )
+ADDRESS_MAP_START(vicdual_state::spacetrk_io_map)
 	ADDRESS_MAP_GLOBAL_MASK(0x7f)
 
 	AM_RANGE(0x00, 0x00) AM_MIRROR(0x7c) AM_READ_PORT("IN0")
@@ -1245,7 +1254,7 @@ static ADDRESS_MAP_START( spacetrk_io_map, AS_IO, 8, vicdual_state )
 ADDRESS_MAP_END
 
 
-static ADDRESS_MAP_START( carnival_io_map, AS_IO, 8, vicdual_state )
+ADDRESS_MAP_START(vicdual_state::carnival_io_map)
 	ADDRESS_MAP_GLOBAL_MASK(0x7f)
 
 	AM_RANGE(0x00, 0x00) AM_MIRROR(0x7c) AM_READ_PORT("IN0")
@@ -1259,7 +1268,7 @@ static ADDRESS_MAP_START( carnival_io_map, AS_IO, 8, vicdual_state )
 ADDRESS_MAP_END
 
 
-static ADDRESS_MAP_START( brdrline_io_map, AS_IO, 8, vicdual_state )
+ADDRESS_MAP_START(vicdual_state::brdrline_io_map)
 	ADDRESS_MAP_GLOBAL_MASK(0x0f)
 
 	AM_RANGE(0x00, 0x00) AM_MIRROR(0x0c) AM_READ_PORT("IN0")
@@ -1273,7 +1282,7 @@ static ADDRESS_MAP_START( brdrline_io_map, AS_IO, 8, vicdual_state )
 ADDRESS_MAP_END
 
 
-static ADDRESS_MAP_START( pulsar_io_map, AS_IO, 8, vicdual_state )
+ADDRESS_MAP_START(vicdual_state::pulsar_io_map)
 	ADDRESS_MAP_GLOBAL_MASK(0x7f)
 
 	AM_RANGE(0x00, 0x00) AM_MIRROR(0x7c) AM_READ_PORT("IN0")
@@ -1287,7 +1296,7 @@ static ADDRESS_MAP_START( pulsar_io_map, AS_IO, 8, vicdual_state )
 ADDRESS_MAP_END
 
 
-static ADDRESS_MAP_START( heiankyo_io_map, AS_IO, 8, vicdual_state )
+ADDRESS_MAP_START(vicdual_state::heiankyo_io_map)
 	ADDRESS_MAP_GLOBAL_MASK(0x0f)
 
 	AM_RANGE(0x00, 0x00) AM_MIRROR(0x0c) AM_READ_PORT("IN0")
@@ -1301,7 +1310,7 @@ static ADDRESS_MAP_START( heiankyo_io_map, AS_IO, 8, vicdual_state )
 ADDRESS_MAP_END
 
 
-static ADDRESS_MAP_START( alphaho_io_map, AS_IO, 8, vicdual_state )
+ADDRESS_MAP_START(vicdual_state::alphaho_io_map)
 	ADDRESS_MAP_GLOBAL_MASK(0x7f)
 
 	AM_RANGE(0x00, 0x00) AM_MIRROR(0x7c) AM_READ_PORT("IN0")
@@ -1315,7 +1324,7 @@ static ADDRESS_MAP_START( alphaho_io_map, AS_IO, 8, vicdual_state )
 ADDRESS_MAP_END
 
 
-static ADDRESS_MAP_START( headonn_io_map, AS_IO, 8, vicdual_state )
+ADDRESS_MAP_START(vicdual_state::headonn_io_map)
 	ADDRESS_MAP_GLOBAL_MASK(0x7f)
 
 	AM_RANGE(0x00, 0x00) AM_MIRROR(0x7c) AM_READ_PORT("IN0")
@@ -2037,7 +2046,8 @@ static INPUT_PORTS_START( headonn )
 INPUT_PORTS_END
 
 
-MACHINE_CONFIG_DERIVED(vicdual_state::vicdual_dualgame_root, vicdual_root)
+MACHINE_CONFIG_START(vicdual_state::vicdual_dualgame_root)
+	vicdual_root(config);
 
 	/* basic machine hardware */
 	MCFG_CPU_MODIFY("maincpu")
@@ -2050,7 +2060,8 @@ MACHINE_CONFIG_END
 
 
 
-MACHINE_CONFIG_DERIVED(vicdual_state::invho2, vicdual_dualgame_root)
+MACHINE_CONFIG_START(vicdual_state::invho2)
+	vicdual_dualgame_root(config);
 
 	/* basic machine hardware */
 	MCFG_CPU_MODIFY("maincpu")
@@ -2058,13 +2069,14 @@ MACHINE_CONFIG_DERIVED(vicdual_state::invho2, vicdual_dualgame_root)
 
 	/* audio hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
-	MCFG_FRAGMENT_ADD(invinco_audio)
-	MCFG_FRAGMENT_ADD(headon_audio)
+	invinco_audio(config);
+	headon_audio(config);
 MACHINE_CONFIG_END
 
 
 
-MACHINE_CONFIG_DERIVED(vicdual_state::invds, vicdual_dualgame_root)
+MACHINE_CONFIG_START(vicdual_state::invds)
+	vicdual_dualgame_root(config);
 
 	/* basic machine hardware */
 	MCFG_CPU_MODIFY("maincpu")
@@ -2072,10 +2084,11 @@ MACHINE_CONFIG_DERIVED(vicdual_state::invds, vicdual_dualgame_root)
 
 	/* audio hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
-	MCFG_FRAGMENT_ADD(invinco_audio)
+	invinco_audio(config);
 MACHINE_CONFIG_END
 
-MACHINE_CONFIG_DERIVED(vicdual_state::carhntds, vicdual_dualgame_root)
+MACHINE_CONFIG_START(vicdual_state::carhntds)
+	vicdual_dualgame_root(config);
 
 	/* basic machine hardware */
 	MCFG_CPU_MODIFY("maincpu")
@@ -2084,7 +2097,8 @@ MACHINE_CONFIG_DERIVED(vicdual_state::carhntds, vicdual_dualgame_root)
 MACHINE_CONFIG_END
 
 
-MACHINE_CONFIG_DERIVED(vicdual_state::sspacaho, vicdual_dualgame_root)
+MACHINE_CONFIG_START(vicdual_state::sspacaho)
+	vicdual_dualgame_root(config);
 
 	/* basic machine hardware */
 	MCFG_CPU_MODIFY("maincpu")
@@ -2092,11 +2106,12 @@ MACHINE_CONFIG_DERIVED(vicdual_state::sspacaho, vicdual_dualgame_root)
 
 	/* audio hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
-	MCFG_FRAGMENT_ADD(headon_audio)
+	headon_audio(config);
 MACHINE_CONFIG_END
 
 
-MACHINE_CONFIG_DERIVED(vicdual_state::spacetrk, vicdual_dualgame_root)
+MACHINE_CONFIG_START(vicdual_state::spacetrk)
+	vicdual_dualgame_root(config);
 
 	/* basic machine hardware */
 	MCFG_CPU_MODIFY("maincpu")
@@ -2104,7 +2119,8 @@ MACHINE_CONFIG_DERIVED(vicdual_state::spacetrk, vicdual_dualgame_root)
 MACHINE_CONFIG_END
 
 
-MACHINE_CONFIG_DERIVED(vicdual_state::carnival, vicdual_dualgame_root)
+MACHINE_CONFIG_START(vicdual_state::carnival)
+	vicdual_dualgame_root(config);
 
 	/* basic machine hardware */
 	MCFG_CPU_MODIFY("maincpu")
@@ -2114,10 +2130,11 @@ MACHINE_CONFIG_DERIVED(vicdual_state::carnival, vicdual_dualgame_root)
 
 	/* audio hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
-	MCFG_FRAGMENT_ADD(carnival_audio)
+	carnival_audio(config);
 MACHINE_CONFIG_END
 
-MACHINE_CONFIG_DERIVED(vicdual_state::carnivalh, carnival)
+MACHINE_CONFIG_START(vicdual_state::carnivalh)
+	carnival(config);
 
 	/* basic machine hardware */
 	MCFG_CPU_MODIFY("maincpu")
@@ -2125,7 +2142,8 @@ MACHINE_CONFIG_DERIVED(vicdual_state::carnivalh, carnival)
 MACHINE_CONFIG_END
 
 
-MACHINE_CONFIG_DERIVED(vicdual_state::tranqgun, vicdual_dualgame_root)
+MACHINE_CONFIG_START(vicdual_state::tranqgun)
+	vicdual_dualgame_root(config);
 
 	/* basic machine hardware */
 	MCFG_CPU_MODIFY("maincpu")
@@ -2133,11 +2151,12 @@ MACHINE_CONFIG_DERIVED(vicdual_state::tranqgun, vicdual_dualgame_root)
 
 	/* audio hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
-	MCFG_FRAGMENT_ADD(tranqgun_audio)
+	tranqgun_audio(config);
 MACHINE_CONFIG_END
 
 
-MACHINE_CONFIG_DERIVED(vicdual_state::brdrline, vicdual_dualgame_root)
+MACHINE_CONFIG_START(vicdual_state::brdrline)
+	vicdual_dualgame_root(config);
 
 	/* basic machine hardware */
 	MCFG_CPU_MODIFY("maincpu")
@@ -2145,11 +2164,12 @@ MACHINE_CONFIG_DERIVED(vicdual_state::brdrline, vicdual_dualgame_root)
 
 	/* audio hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
-	MCFG_FRAGMENT_ADD(brdrline_audio)
+	brdrline_audio(config);
 MACHINE_CONFIG_END
 
 
-MACHINE_CONFIG_DERIVED(vicdual_state::pulsar, vicdual_dualgame_root)
+MACHINE_CONFIG_START(vicdual_state::pulsar)
+	vicdual_dualgame_root(config);
 
 	/* basic machine hardware */
 	MCFG_CPU_MODIFY("maincpu")
@@ -2157,11 +2177,12 @@ MACHINE_CONFIG_DERIVED(vicdual_state::pulsar, vicdual_dualgame_root)
 
 	/* audio hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
-	MCFG_FRAGMENT_ADD(pulsar_audio)
+	pulsar_audio(config);
 MACHINE_CONFIG_END
 
 
-MACHINE_CONFIG_DERIVED(vicdual_state::heiankyo, vicdual_dualgame_root)
+MACHINE_CONFIG_START(vicdual_state::heiankyo)
+	vicdual_dualgame_root(config);
 
 	/* basic machine hardware */
 	MCFG_CPU_MODIFY("maincpu")
@@ -2169,7 +2190,8 @@ MACHINE_CONFIG_DERIVED(vicdual_state::heiankyo, vicdual_dualgame_root)
 MACHINE_CONFIG_END
 
 
-MACHINE_CONFIG_DERIVED(vicdual_state::alphaho, vicdual_dualgame_root)
+MACHINE_CONFIG_START(vicdual_state::alphaho)
+	vicdual_dualgame_root(config);
 
 	/* basic machine hardware */
 	MCFG_CPU_MODIFY("maincpu")
@@ -2177,7 +2199,8 @@ MACHINE_CONFIG_DERIVED(vicdual_state::alphaho, vicdual_dualgame_root)
 MACHINE_CONFIG_END
 
 
-MACHINE_CONFIG_DERIVED(vicdual_state::headonn, vicdual_dualgame_root)
+MACHINE_CONFIG_START(vicdual_state::headonn)
+	vicdual_dualgame_root(config);
 
 	/* basic machine hardware */
 	MCFG_CPU_MODIFY("maincpu")
@@ -2185,7 +2208,7 @@ MACHINE_CONFIG_DERIVED(vicdual_state::headonn, vicdual_dualgame_root)
 
 	/* audio hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
-	MCFG_FRAGMENT_ADD(headon_audio)
+	headon_audio(config);
 MACHINE_CONFIG_END
 
 
@@ -2224,7 +2247,7 @@ WRITE8_MEMBER(vicdual_state::samurai_io_w)
 
 
 /* dual game hardware */
-static ADDRESS_MAP_START( samurai_map, AS_PROGRAM, 8, vicdual_state )
+ADDRESS_MAP_START(vicdual_state::samurai_map)
 	AM_RANGE(0x0000, 0x3fff) AM_MIRROR(0x4000) AM_ROM AM_WRITE(samurai_protection_w)
 	AM_RANGE(0x8000, 0x83ff) AM_MIRROR(0x7000) AM_RAM_WRITE(videoram_w) AM_SHARE("videoram")
 	AM_RANGE(0x8400, 0x87ff) AM_MIRROR(0x7000) AM_RAM
@@ -2232,7 +2255,7 @@ static ADDRESS_MAP_START( samurai_map, AS_PROGRAM, 8, vicdual_state )
 ADDRESS_MAP_END
 
 
-static ADDRESS_MAP_START( samurai_io_map, AS_IO, 8, vicdual_state )
+ADDRESS_MAP_START(vicdual_state::samurai_io_map)
 	ADDRESS_MAP_GLOBAL_MASK(0x7f)
 
 	AM_RANGE(0x00, 0x00) AM_MIRROR(0x7c) AM_READ_PORT("IN0")
@@ -2305,7 +2328,8 @@ MACHINE_START_MEMBER(vicdual_state,samurai)
 	machine_start();
 }
 
-MACHINE_CONFIG_DERIVED(vicdual_state::samurai, vicdual_root)
+MACHINE_CONFIG_START(vicdual_state::samurai)
+	vicdual_root(config);
 
 	/* basic machine hardware */
 	MCFG_CPU_MODIFY("maincpu")
@@ -2353,7 +2377,7 @@ WRITE8_MEMBER(nsub_state::nsub_io_w)
 }
 
 
-static ADDRESS_MAP_START( nsub_map, AS_PROGRAM, 8, nsub_state )
+ADDRESS_MAP_START(nsub_state::nsub_map)
 	AM_RANGE(0x0000, 0x3fff) AM_MIRROR(0x4000) AM_ROM
 	AM_RANGE(0x8000, 0xbfff) AM_NOP /* unused */
 	AM_RANGE(0xc000, 0xc3ff) AM_MIRROR(0x3000) AM_RAM_WRITE(videoram_w) AM_SHARE("videoram")
@@ -2362,7 +2386,7 @@ static ADDRESS_MAP_START( nsub_map, AS_PROGRAM, 8, nsub_state )
 ADDRESS_MAP_END
 
 
-static ADDRESS_MAP_START( nsub_io_map, AS_IO, 8, nsub_state )
+ADDRESS_MAP_START(nsub_state::nsub_io_map)
 	ADDRESS_MAP_GLOBAL_MASK(0x0f)
 
 	/* no decoder, just logic gates, so in theory the
@@ -2540,7 +2564,7 @@ WRITE8_MEMBER(vicdual_state::invinco_io_w)
 }
 
 
-static ADDRESS_MAP_START( invinco_map, AS_PROGRAM, 8, vicdual_state )
+ADDRESS_MAP_START(vicdual_state::invinco_map)
 	AM_RANGE(0x0000, 0x3fff) AM_MIRROR(0x4000) AM_ROM
 	AM_RANGE(0x8000, 0xbfff) AM_NOP /* unused */
 	AM_RANGE(0xc000, 0xc3ff) AM_MIRROR(0x3000) AM_RAM_WRITE(videoram_w) AM_SHARE("videoram")
@@ -2549,7 +2573,7 @@ static ADDRESS_MAP_START( invinco_map, AS_PROGRAM, 8, vicdual_state )
 ADDRESS_MAP_END
 
 
-static ADDRESS_MAP_START( invinco_io_map, AS_IO, 8, vicdual_state )
+ADDRESS_MAP_START(vicdual_state::invinco_io_map)
 	ADDRESS_MAP_GLOBAL_MASK(0x0f)
 
 	/* no decoder, just logic gates, so in theory the
@@ -2598,7 +2622,8 @@ static INPUT_PORTS_START( invinco )
 INPUT_PORTS_END
 
 
-MACHINE_CONFIG_DERIVED(vicdual_state::invinco, vicdual_root)
+MACHINE_CONFIG_START(vicdual_state::invinco)
+	vicdual_root(config);
 
 	/* basic machine hardware */
 	MCFG_CPU_MODIFY("maincpu")
@@ -2611,7 +2636,7 @@ MACHINE_CONFIG_DERIVED(vicdual_state::invinco, vicdual_root)
 
 	/* audio hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
-	MCFG_FRAGMENT_ADD(invinco_audio)
+	invinco_audio(config);
 MACHINE_CONFIG_END
 
 

@@ -19,6 +19,7 @@ public:
 	DECLARE_WRITE_LINE_MEMBER(flipscreen_w);
 	DECLARE_WRITE_LINE_MEMBER(ym_irq);
 
+	void cpu2_map(address_map &map);
 protected:
 	gladiatr_state_base(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag)
@@ -140,6 +141,10 @@ public:
 	void swap_block(uint8_t *src1,uint8_t *src2,int len);
 
 	void gladiatr(machine_config &config);
+	void gladiatr_cpu1_io(address_map &map);
+	void gladiatr_cpu1_map(address_map &map);
+	void gladiatr_cpu2_io(address_map &map);
+	void gladiatr_cpu3_map(address_map &map);
 private:
 	required_ioport m_dsw1, m_dsw2;
 	required_ioport m_in0, m_in1, m_in2;
@@ -185,6 +190,10 @@ public:
 	uint32_t screen_update_ppking(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 
 	void ppking(machine_config &config);
+	void ppking_cpu1_io(address_map &map);
+	void ppking_cpu1_map(address_map &map);
+	void ppking_cpu2_io(address_map &map);
+	void ppking_cpu3_map(address_map &map);
 private:
 	required_shared_ptr<uint8_t>    m_nvram;
 	required_device<generic_latch_8_device> m_soundlatch2;

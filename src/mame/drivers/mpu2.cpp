@@ -44,19 +44,22 @@
 class mpu2_state : public driver_device
 {
 public:
-	mpu2_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag),
-			m_maincpu(*this, "maincpu")
+	mpu2_state(const machine_config &mconfig, device_type type, const char *tag) :
+		driver_device(mconfig, type, tag),
+		m_maincpu(*this, "maincpu")
 	{ }
 
 	void mpu2(machine_config &config);
-protected:
 
+protected:
+	void mpu2_basemap(address_map &map);
+
+private:
 	// devices
 	required_device<cpu_device> m_maincpu;
 };
 
-static ADDRESS_MAP_START( mpu2_basemap, AS_PROGRAM, 8, mpu2_state )
+ADDRESS_MAP_START(mpu2_state::mpu2_basemap)
 	ADDRESS_MAP_GLOBAL_MASK(0x3fff) // A14/A15 Not Connected
 	AM_RANGE(0x0000, 0x007f) AM_RAM
 	AM_RANGE(0x0800, 0x0fff) AM_ROM AM_REGION("romp1", 0)

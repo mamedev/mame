@@ -40,7 +40,7 @@ Notes:
 #include "speaker.h"
 
 
-static ADDRESS_MAP_START( scramble_map, AS_PROGRAM, 8, scramble_state )
+ADDRESS_MAP_START(scramble_state::scramble_map)
 	AM_RANGE(0x0000, 0x3fff) AM_ROM
 	AM_RANGE(0x4000, 0x47ff) AM_RAM
 	AM_RANGE(0x4800, 0x4bff) AM_RAM_WRITE(galaxold_videoram_w) AM_SHARE("videoram")
@@ -71,14 +71,13 @@ WRITE8_MEMBER(scramble_state::scramble_soundram_w)
 	m_soundram[offset & 0x03ff] = data;
 }
 
-static ADDRESS_MAP_START( scramble_sound_map, AS_PROGRAM, 8, scramble_state )
+ADDRESS_MAP_START(scramble_state::scramble_sound_map)
 	AM_RANGE(0x0000, 0x2fff) AM_ROM
-	AM_RANGE(0x8000, 0x8fff) AM_READWRITE(scramble_soundram_r, scramble_soundram_w)
-	AM_RANGE(0x8000, 0x83ff) AM_WRITENOP AM_SHARE("soundram")  /* only here to initialize pointer */
+	AM_RANGE(0x8000, 0x8fff) AM_READWRITE(scramble_soundram_r, scramble_soundram_w) AM_SHARE("soundram")
 	AM_RANGE(0x9000, 0x9fff) AM_WRITE(scramble_filter_w)
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( scramble_sound_io_map, AS_IO, 8, scramble_state )
+ADDRESS_MAP_START(scramble_state::scramble_sound_io_map)
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	AM_RANGE(0x10, 0x10) AM_DEVWRITE("8910.1", ay8910_device, address_w)
 	AM_RANGE(0x20, 0x20) AM_DEVREADWRITE("8910.1", ay8910_device, data_r, data_w)
@@ -87,7 +86,7 @@ static ADDRESS_MAP_START( scramble_sound_io_map, AS_IO, 8, scramble_state )
 ADDRESS_MAP_END
 
 
-static ADDRESS_MAP_START( ckongs_map, AS_PROGRAM, 8, scramble_state )
+ADDRESS_MAP_START(scramble_state::ckongs_map)
 	AM_RANGE(0x0000, 0x5fff) AM_ROM
 	AM_RANGE(0x6000, 0x6bff) AM_RAM
 	AM_RANGE(0x7000, 0x7003) AM_DEVREADWRITE("ppi8255_0", i8255_device, read, write)
@@ -126,7 +125,7 @@ WRITE8_MEMBER(scramble_state::mars_ppi8255_1_w)
 	m_ppi8255_1->write(space, ((offset >> 2) & 0x02) | ((offset >> 1) & 0x01), data);
 }
 
-static ADDRESS_MAP_START( mars_map, AS_PROGRAM, 8, scramble_state )
+ADDRESS_MAP_START(scramble_state::mars_map)
 	AM_RANGE(0x0000, 0x3fff) AM_ROM
 	AM_RANGE(0x4000, 0x47ff) AM_RAM
 	AM_RANGE(0x4800, 0x4bff) AM_RAM_WRITE(galaxold_videoram_w) AM_SHARE("videoram")
@@ -149,7 +148,7 @@ ADDRESS_MAP_END
 
 
 
-static ADDRESS_MAP_START( newsin7_map, AS_PROGRAM, 8, scramble_state )
+ADDRESS_MAP_START(scramble_state::newsin7_map)
 	AM_RANGE(0x0000, 0x3fff) AM_ROM
 	AM_RANGE(0x4000, 0x47ff) AM_RAM
 	AM_RANGE(0x4800, 0x4bff) AM_RAM_WRITE(galaxold_videoram_w) AM_SHARE("videoram")
@@ -172,7 +171,7 @@ ADDRESS_MAP_END
 
 
 
-static ADDRESS_MAP_START( mrkougar_map, AS_PROGRAM, 8, scramble_state )
+ADDRESS_MAP_START(scramble_state::mrkougar_map)
 	AM_RANGE(0x0000, 0x3fff) AM_ROM
 	AM_RANGE(0x4000, 0x47ff) AM_RAM
 	AM_RANGE(0x4800, 0x4bff) AM_RAM_WRITE(galaxold_videoram_w) AM_SHARE("videoram")
@@ -193,7 +192,7 @@ ADDRESS_MAP_END
 
 
 
-static ADDRESS_MAP_START( hotshock_map, AS_PROGRAM, 8, scramble_state )
+ADDRESS_MAP_START(scramble_state::hotshock_map)
 	AM_RANGE(0x0000, 0x3fff) AM_ROM
 	AM_RANGE(0x4000, 0x47ff) AM_RAM
 	AM_RANGE(0x4800, 0x4bff) AM_RAM_WRITE(galaxold_videoram_w) AM_SHARE("videoram")
@@ -218,7 +217,7 @@ ADDRESS_MAP_END
 
 
 
-static ADDRESS_MAP_START( hunchbks_map, AS_PROGRAM, 8, scramble_state )
+ADDRESS_MAP_START(scramble_state::hunchbks_map)
 	AM_RANGE(0x0000, 0x0fff) AM_ROM
 	AM_RANGE(0x1210, 0x1213) AM_DEVREADWRITE("ppi8255_1", i8255_device, read, write)
 	AM_RANGE(0x1400, 0x143f) AM_RAM_WRITE(galaxold_attributesram_w) AM_SHARE("attributesram")
@@ -242,7 +241,7 @@ ADDRESS_MAP_END
 
 
 
-static ADDRESS_MAP_START( mimonscr_map, AS_PROGRAM, 8, scramble_state )
+ADDRESS_MAP_START(scramble_state::mimonscr_map)
 	AM_RANGE(0x0000, 0x3fff) AM_ROM
 	AM_RANGE(0x4000, 0x43ff) AM_READWRITE(galaxold_videoram_r, galaxold_videoram_w) /* mirror address?, probably not */
 	AM_RANGE(0x4400, 0x47ff) AM_RAM
@@ -251,8 +250,8 @@ static ADDRESS_MAP_START( mimonscr_map, AS_PROGRAM, 8, scramble_state )
 	AM_RANGE(0x5040, 0x505f) AM_RAM AM_SHARE("spriteram")
 	AM_RANGE(0x5060, 0x507f) AM_RAM AM_SHARE("bulletsram")
 	AM_RANGE(0x5080, 0x50ff) AM_RAM
-	AM_RANGE(0x6801, 0x6801) AM_WRITE(galaxold_nmi_enable_w)
 	AM_RANGE(0x6800, 0x6802) AM_WRITE(galaxold_gfxbank_w)
+	AM_RANGE(0x6801, 0x6801) AM_WRITE(galaxold_nmi_enable_w)
 	AM_RANGE(0x6806, 0x6806) AM_WRITE(galaxold_flip_screen_x_w)
 	AM_RANGE(0x6807, 0x6807) AM_WRITE(galaxold_flip_screen_y_w)
 	AM_RANGE(0x7000, 0x7000) AM_DEVREAD("watchdog", watchdog_timer_device, reset_r)
@@ -263,7 +262,7 @@ ADDRESS_MAP_END
 
 
 
-static ADDRESS_MAP_START( ad2083_map, AS_PROGRAM, 8, scramble_state )
+ADDRESS_MAP_START(scramble_state::ad2083_map)
 	AM_RANGE(0x0000, 0x3fff) AM_ROM
 	AM_RANGE(0x4000, 0x47ff) AM_RAM
 	AM_RANGE(0x4800, 0x4bff) AM_READWRITE(galaxold_videoram_r, galaxold_videoram_w) AM_SHARE("videoram")
@@ -291,7 +290,7 @@ ADDRESS_MAP_END
 
 
 
-static ADDRESS_MAP_START( triplep_map, AS_PROGRAM, 8, scramble_state )
+ADDRESS_MAP_START(scramble_state::triplep_map)
 	AM_RANGE(0x0000, 0x3fff) AM_ROM
 	AM_RANGE(0x4000, 0x47ff) AM_RAM
 	AM_RANGE(0x4800, 0x4bff) AM_RAM_WRITE(galaxold_videoram_w) AM_SHARE("videoram")
@@ -310,7 +309,7 @@ static ADDRESS_MAP_START( triplep_map, AS_PROGRAM, 8, scramble_state )
 	AM_RANGE(0x8100, 0x8103) AM_DEVREADWRITE("ppi8255_0", i8255_device, read, write)
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( triplep_io_map, AS_IO, 8, scramble_state )
+ADDRESS_MAP_START(scramble_state::triplep_io_map)
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	AM_RANGE(0x00, 0x01) AM_DEVWRITE("8910.1", ay8910_device, data_address_w)
 	AM_RANGE(0x01, 0x01) AM_DEVREAD("8910.1", ay8910_device, data_r)
@@ -318,7 +317,7 @@ static ADDRESS_MAP_START( triplep_io_map, AS_IO, 8, scramble_state )
 	AM_RANGE(0x03, 0x03) AM_READ(triplep_pap_r)
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( hotshock_sound_io_map, AS_IO, 8, scramble_state )
+ADDRESS_MAP_START(scramble_state::hotshock_sound_io_map)
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	AM_RANGE(0x10, 0x10) AM_DEVWRITE("8910.1", ay8910_device, address_w)
 	AM_RANGE(0x20, 0x20) AM_DEVREADWRITE("8910.1", ay8910_device, data_r, data_w)
@@ -336,14 +335,14 @@ READ8_MEMBER(scramble_state::hncholms_prot_r)
 		return 0;
 }
 
-static ADDRESS_MAP_START( hunchbks_readport, AS_IO, 8, scramble_state )
+ADDRESS_MAP_START(scramble_state::hunchbks_readport)
 	AM_RANGE(0x00, 0x00) AM_READ(hncholms_prot_r)
 ADDRESS_MAP_END
 
 
 // Harem
 
-static ADDRESS_MAP_START( harem_map, AS_PROGRAM, 8, scramble_state )
+ADDRESS_MAP_START(scramble_state::harem_map)
 	AM_RANGE(0x0000, 0x1fff) AM_ROM
 
 	AM_RANGE(0x2000, 0x27ff) AM_RAM
@@ -374,19 +373,19 @@ static ADDRESS_MAP_START( harem_map, AS_PROGRAM, 8, scramble_state )
 	AM_RANGE(0x8000, 0x9fff) AM_ROMBANK("rombank")                  // bitswapped rom
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( decrypted_opcodes_map, AS_OPCODES, 8, scramble_state )
+ADDRESS_MAP_START(scramble_state::decrypted_opcodes_map)
 	AM_RANGE(0x0000, 0x1fff) AM_ROM AM_REGION("maincpu", 0)
 	AM_RANGE(0x8000, 0x9fff) AM_ROMBANK("rombank_decrypted")
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( harem_sound_map, AS_PROGRAM, 8, scramble_state )
+ADDRESS_MAP_START(scramble_state::harem_sound_map)
 	AM_RANGE(0x0000, 0x2fff) AM_ROM
 	AM_RANGE(0x6000, 0x6000) AM_READ(harem_digitalker_intr_r)
 	AM_RANGE(0x8000, 0x83ff) AM_RAM
 	AM_RANGE(0xa000, 0xafff) AM_WRITE(scramble_filter_w)
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( harem_sound_io_map, AS_IO, 8, scramble_state )
+ADDRESS_MAP_START(scramble_state::harem_sound_io_map)
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
 
 	// ports->speech:
@@ -1348,7 +1347,8 @@ MACHINE_CONFIG_START(scramble_state::scramble)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.16)
 MACHINE_CONFIG_END
 
-MACHINE_CONFIG_DERIVED(scramble_state::mars, scramble)
+MACHINE_CONFIG_START(scramble_state::mars)
+	scramble(config);
 
 	/* basic machine hardware */
 	MCFG_CPU_MODIFY("maincpu")
@@ -1366,7 +1366,8 @@ MACHINE_CONFIG_DERIVED(scramble_state::mars, scramble)
 	MCFG_PALETTE_INIT_OWNER(scramble_state,galaxold)
 MACHINE_CONFIG_END
 
-MACHINE_CONFIG_DERIVED(scramble_state::devilfsh, scramble)
+MACHINE_CONFIG_START(scramble_state::devilfsh)
+	scramble(config);
 
 	/* basic machine hardware */
 	MCFG_CPU_MODIFY("maincpu")
@@ -1379,7 +1380,8 @@ MACHINE_CONFIG_DERIVED(scramble_state::devilfsh, scramble)
 	MCFG_PALETTE_INIT_OWNER(scramble_state,galaxold)
 MACHINE_CONFIG_END
 
-MACHINE_CONFIG_DERIVED(scramble_state::newsin7, scramble)
+MACHINE_CONFIG_START(scramble_state::newsin7)
+	scramble(config);
 
 	/* basic machine hardware */
 	MCFG_CPU_MODIFY("maincpu")
@@ -1394,7 +1396,8 @@ MACHINE_CONFIG_DERIVED(scramble_state::newsin7, scramble)
 	MCFG_VIDEO_START_OVERRIDE(scramble_state,newsin7)
 MACHINE_CONFIG_END
 
-MACHINE_CONFIG_DERIVED(scramble_state::mrkougb, scramble)
+MACHINE_CONFIG_START(scramble_state::mrkougb)
+	scramble(config);
 
 	/* basic machine hardware */
 	MCFG_CPU_MODIFY("maincpu")
@@ -1411,13 +1414,15 @@ MACHINE_CONFIG_DERIVED(scramble_state::mrkougb, scramble)
 	MCFG_PALETTE_INIT_OWNER(scramble_state,galaxold)
 MACHINE_CONFIG_END
 
-MACHINE_CONFIG_DERIVED(scramble_state::mrkougar, mrkougb)
+MACHINE_CONFIG_START(scramble_state::mrkougar)
+	mrkougb(config);
 
 	/* video hardware */
 	MCFG_GFXDECODE_MODIFY("gfxdecode", mrkougar)
 MACHINE_CONFIG_END
 
-MACHINE_CONFIG_DERIVED(scramble_state::ckongs, scramble)
+MACHINE_CONFIG_START(scramble_state::ckongs)
+	scramble(config);
 
 	/* basic machine hardware */
 	MCFG_CPU_MODIFY("maincpu")
@@ -1430,7 +1435,8 @@ MACHINE_CONFIG_DERIVED(scramble_state::ckongs, scramble)
 	MCFG_VIDEO_START_OVERRIDE(scramble_state,ckongs)
 MACHINE_CONFIG_END
 
-MACHINE_CONFIG_DERIVED(scramble_state::hotshock, scramble)
+MACHINE_CONFIG_START(scramble_state::hotshock)
+	scramble(config);
 
 	/* basic machine hardware */
 	MCFG_CPU_MODIFY("maincpu")
@@ -1461,7 +1467,8 @@ MACHINE_CONFIG_DERIVED(scramble_state::hotshock, scramble)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.33)
 MACHINE_CONFIG_END
 
-MACHINE_CONFIG_DERIVED(scramble_state::cavelon, scramble)
+MACHINE_CONFIG_START(scramble_state::cavelon)
+	scramble(config);
 
 	/* basic machine hardware */
 
@@ -1472,7 +1479,8 @@ MACHINE_CONFIG_DERIVED(scramble_state::cavelon, scramble)
 	MCFG_VIDEO_START_OVERRIDE(scramble_state,ckongs)
 MACHINE_CONFIG_END
 
-MACHINE_CONFIG_DERIVED(scramble_state::mimonscr, scramble)
+MACHINE_CONFIG_START(scramble_state::mimonscr)
+	scramble(config);
 
 	/* basic machine hardware */
 	MCFG_CPU_MODIFY("maincpu")
@@ -1483,7 +1491,8 @@ MACHINE_CONFIG_DERIVED(scramble_state::mimonscr, scramble)
 MACHINE_CONFIG_END
 
 /* Triple Punch and Mariner are different - only one CPU, one 8910 */
-MACHINE_CONFIG_DERIVED(scramble_state::triplep, scramble)
+MACHINE_CONFIG_START(scramble_state::triplep)
+	scramble(config);
 
 	/* basic machine hardware */
 	MCFG_CPU_MODIFY("maincpu")
@@ -1510,7 +1519,8 @@ MACHINE_CONFIG_DERIVED(scramble_state::triplep, scramble)
 	MCFG_DEVICE_REMOVE("8910.2")
 MACHINE_CONFIG_END
 
-MACHINE_CONFIG_DERIVED(scramble_state::mariner, triplep)
+MACHINE_CONFIG_START(scramble_state::mariner)
+	triplep(config);
 
 	/* basic machine hardware */
 
@@ -1523,7 +1533,8 @@ MACHINE_CONFIG_DERIVED(scramble_state::mariner, triplep)
 MACHINE_CONFIG_END
 
 /* Hunchback replaces the Z80 with a S2650 CPU */
-MACHINE_CONFIG_DERIVED(scramble_state::hunchbks, scramble)
+MACHINE_CONFIG_START(scramble_state::hunchbks)
+	scramble(config);
 
 	/* basic machine hardware */
 	MCFG_CPU_REPLACE("maincpu", S2650, 18432000/6)
@@ -1542,7 +1553,8 @@ MACHINE_CONFIG_DERIVED(scramble_state::hunchbks, scramble)
 	MCFG_PALETTE_INIT_OWNER(scramble_state,galaxold)
 MACHINE_CONFIG_END
 
-MACHINE_CONFIG_DERIVED(scramble_state::hncholms, hunchbks)
+MACHINE_CONFIG_START(scramble_state::hncholms)
+	hunchbks(config);
 
 	/* basic machine hardware */
 	MCFG_CPU_MODIFY("maincpu")
@@ -1588,17 +1600,18 @@ MACHINE_CONFIG_START(scramble_state::ad2083)
 
 	/* sound hardware */
 
-	MCFG_FRAGMENT_ADD(ad2083_audio)
+	ad2083_audio(config);
 
 MACHINE_CONFIG_END
 
 
-MACHINE_CONFIG_DERIVED(scramble_state::harem, scramble)
+MACHINE_CONFIG_START(scramble_state::harem)
+	scramble(config);
 
 	/* basic machine hardware */
 	MCFG_CPU_MODIFY("maincpu")
 	MCFG_CPU_PROGRAM_MAP(harem_map)
-	MCFG_CPU_DECRYPTED_OPCODES_MAP(decrypted_opcodes_map)
+	MCFG_CPU_OPCODES_MAP(decrypted_opcodes_map)
 
 	MCFG_CPU_MODIFY("audiocpu")
 	MCFG_CPU_PROGRAM_MAP(harem_sound_map)

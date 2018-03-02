@@ -55,4 +55,7 @@ public:
 	void natodef(machine_config &config);
 	void sharkatt(machine_config &config);
 	void thief(machine_config &config);
+	void io_map(address_map &map);
+	void sharkatt_main_map(address_map &map);
+	void thief_main_map(address_map &map);
 };

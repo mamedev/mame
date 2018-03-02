@@ -18,6 +18,13 @@ public:
 	// construction/destruction
 	sns_sa1_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
+protected:
+	// device-level overrides
+	virtual void device_start() override;
+	virtual void device_reset() override;
+
+	virtual void device_add_mconfig(machine_config &config) override;
+
 	// reading and writing
 	virtual DECLARE_READ8_MEMBER(read_l) override;
 	virtual DECLARE_READ8_MEMBER(read_h) override;
@@ -27,18 +34,6 @@ public:
 	// additional reading and writing
 	virtual DECLARE_READ8_MEMBER(chip_read) override;
 	virtual DECLARE_WRITE8_MEMBER(chip_write) override;
-
-	DECLARE_READ8_MEMBER(sa1_lo_r);
-	DECLARE_READ8_MEMBER(sa1_hi_r);
-	DECLARE_WRITE8_MEMBER(sa1_lo_w);
-	DECLARE_WRITE8_MEMBER(sa1_hi_w);
-
-protected:
-	// device-level overrides
-	virtual void device_start() override;
-	virtual void device_reset() override;
-
-	virtual void device_add_mconfig(machine_config &config) override;
 
 private:
 	uint8_t var_length_read(address_space &space, uint32_t offset);
@@ -107,6 +102,13 @@ private:
 	uint8_t m_scpu_flags, m_sa1_flags;
 	// $2302-$2305
 	uint16_t m_hcr, m_vcr;
+
+	DECLARE_READ8_MEMBER(sa1_lo_r);
+	DECLARE_READ8_MEMBER(sa1_hi_r);
+	DECLARE_WRITE8_MEMBER(sa1_lo_w);
+	DECLARE_WRITE8_MEMBER(sa1_hi_w);
+
+	void sa1_map(address_map &map);
 };
 
 

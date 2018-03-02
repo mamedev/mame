@@ -87,6 +87,8 @@ private:
 	void makechar_12x80(uint16_t x, uint16_t y);
 	void ef9345_exec(uint8_t cmd);
 
+	void ef9345(address_map &map);
+
 	// internal state
 	static const device_timer_id BUSY_TIMER = 0;
 	static const device_timer_id BLINKING_TIMER = 1;

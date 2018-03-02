@@ -47,6 +47,7 @@ public:
 	uint32_t screen_update_hideseek(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 
 	void hideseek(machine_config &config);
+	void mem_map(address_map &map);
 protected:
 	required_device<cpu_device> m_maincpu;
 };
@@ -62,7 +63,7 @@ uint32_t hideseek_state::screen_update_hideseek(screen_device &screen, bitmap_in
 	return 0;
 }
 
-static ADDRESS_MAP_START( mem_map, AS_PROGRAM, 32, hideseek_state )
+ADDRESS_MAP_START(hideseek_state::mem_map)
 	AM_RANGE(0x00000000, 0x0003ffff) AM_ROM // On-chip ROM
 	AM_RANGE(0x00200000, 0x0023ffff) AM_RAM // CS0
 	AM_RANGE(0x00400000, 0x005fffff) AM_ROM AM_REGION("prg", 0) // CS1

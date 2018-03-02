@@ -145,6 +145,10 @@ public:
 	void pktetris(machine_config &config);
 	void cpokerpk(machine_config &config);
 	void number10(machine_config &config);
+	void cpokerpk_io_map(address_map &map);
+	void igspoker_io_map(address_map &map);
+	void igspoker_prg_map(address_map &map);
+	void number10_io_map(address_map &map);
 };
 
 
@@ -379,12 +383,13 @@ READ8_MEMBER(igspoker_state::exp_rom_r)
 	return rom[offset+0x10000];
 }
 
-static ADDRESS_MAP_START( igspoker_prg_map, AS_PROGRAM, 8, igspoker_state )
+ADDRESS_MAP_START(igspoker_state::igspoker_prg_map)
 	AM_RANGE(0x0000, 0xefff) AM_ROM
 	AM_RANGE(0xf000, 0xffff) AM_RAM AM_REGION("maincpu", 0xf000)
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( igspoker_io_map, AS_IO, 8, igspoker_state )
+ADDRESS_MAP_START(igspoker_state::igspoker_io_map)
+	AM_RANGE(0x0000, 0xffff) AM_READ(exp_rom_r )
 	AM_RANGE(0x2000, 0x27ff) AM_RAM_DEVWRITE("palette", palette_device, write8) AM_SHARE("palette")
 	AM_RANGE(0x2800, 0x2fff) AM_RAM_DEVWRITE("palette", palette_device, write8_ext) AM_SHARE("palette_ext")
 	AM_RANGE(0x4000, 0x4000) AM_READ_PORT("DSW1")           /* DSW1 */
@@ -401,7 +406,6 @@ static ADDRESS_MAP_START( igspoker_io_map, AS_IO, 8, igspoker_state )
 	AM_RANGE(0x6800, 0x6fff) AM_RAM_WRITE(bg_tile_w )  AM_SHARE("bg_tile_ram")
 	AM_RANGE(0x7000, 0x77ff) AM_RAM_WRITE(fg_tile_w )  AM_SHARE("fg_tile_ram")
 	AM_RANGE(0x7800, 0x7fff) AM_RAM_WRITE(fg_color_w ) AM_SHARE("fg_color_ram")
-	AM_RANGE(0x0000, 0xffff) AM_READ(exp_rom_r )
 ADDRESS_MAP_END
 
 
@@ -1136,7 +1140,8 @@ static INPUT_PORTS_START( igs_ncs )
 INPUT_PORTS_END
 
 
-static ADDRESS_MAP_START( number10_io_map, AS_IO, 8, igspoker_state )
+ADDRESS_MAP_START(igspoker_state::number10_io_map)
+	AM_RANGE(0x0000, 0xffff) AM_READ(exp_rom_r )
 	AM_RANGE(0x2000, 0x27ff) AM_RAM_DEVWRITE("palette", palette_device, write8) AM_SHARE("palette")
 	AM_RANGE(0x2800, 0x2fff) AM_RAM_DEVWRITE("palette", palette_device, write8_ext) AM_SHARE("palette_ext")
 	AM_RANGE(0x4000, 0x4000) AM_READ_PORT("DSW1")           /* DSW1 */
@@ -1156,10 +1161,10 @@ static ADDRESS_MAP_START( number10_io_map, AS_IO, 8, igspoker_state )
 	AM_RANGE(0x50c0, 0x50c0) AM_READ(igs_irqack_r) AM_WRITE(igs_irqack_w)
 	AM_RANGE(0x7000, 0x77ff) AM_RAM_WRITE(fg_tile_w )  AM_SHARE("fg_tile_ram")
 	AM_RANGE(0x7800, 0x7fff) AM_RAM_WRITE(fg_color_w ) AM_SHARE("fg_color_ram")
-	AM_RANGE(0x0000, 0xffff) AM_READ(exp_rom_r )
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( cpokerpk_io_map, AS_IO, 8, igspoker_state )
+ADDRESS_MAP_START(igspoker_state::cpokerpk_io_map)
+	AM_RANGE(0x0000, 0xffff) AM_READ(exp_rom_r )
 	AM_RANGE(0x2000, 0x27ff) AM_RAM_DEVWRITE("palette", palette_device, write8) AM_SHARE("palette")
 	AM_RANGE(0x2800, 0x2fff) AM_RAM_DEVWRITE("palette", palette_device, write8_ext) AM_SHARE("palette_ext")
 	AM_RANGE(0x4000, 0x4000) AM_READ_PORT("DSW1")           /* DSW1 */
@@ -1178,7 +1183,6 @@ static ADDRESS_MAP_START( cpokerpk_io_map, AS_IO, 8, igspoker_state )
 	AM_RANGE(0x50c0, 0x50c0) AM_READ(igs_irqack_r) AM_WRITE(igs_irqack_w)
 	AM_RANGE(0x7000, 0x77ff) AM_RAM_WRITE(fg_tile_w )  AM_SHARE("fg_tile_ram")
 	AM_RANGE(0x7800, 0x7fff) AM_RAM_WRITE(fg_color_w ) AM_SHARE("fg_color_ram")
-	AM_RANGE(0x0000, 0xffff) AM_READ(exp_rom_r )
 ADDRESS_MAP_END
 
 static INPUT_PORTS_START( number10 )
@@ -1932,19 +1936,23 @@ MACHINE_CONFIG_START(igspoker_state::igspoker)
 
 MACHINE_CONFIG_END
 
-MACHINE_CONFIG_DERIVED(igspoker_state::csk227it, igspoker)
+MACHINE_CONFIG_START(igspoker_state::csk227it)
+	igspoker(config);
 
 MACHINE_CONFIG_END
 
-MACHINE_CONFIG_DERIVED(igspoker_state::csk234it, igspoker)
+MACHINE_CONFIG_START(igspoker_state::csk234it)
+	igspoker(config);
 
 MACHINE_CONFIG_END
 
-MACHINE_CONFIG_DERIVED(igspoker_state::igs_ncs, igspoker)
+MACHINE_CONFIG_START(igspoker_state::igs_ncs)
+	igspoker(config);
 
 MACHINE_CONFIG_END
 
-MACHINE_CONFIG_DERIVED(igspoker_state::number10, igspoker)
+MACHINE_CONFIG_START(igspoker_state::number10)
+	igspoker(config);
 	MCFG_CPU_MODIFY("maincpu")
 	MCFG_CPU_IO_MAP(number10_io_map)
 
@@ -1958,14 +1966,16 @@ MACHINE_CONFIG_DERIVED(igspoker_state::number10, igspoker)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 MACHINE_CONFIG_END
 
-MACHINE_CONFIG_DERIVED(igspoker_state::cpokerpk, number10)
+MACHINE_CONFIG_START(igspoker_state::cpokerpk)
+	number10(config);
 	MCFG_CPU_MODIFY("maincpu")
 	MCFG_CPU_IO_MAP(cpokerpk_io_map)
 	MCFG_GFXDECODE_MODIFY("gfxdecode", cpokerpk)
 MACHINE_CONFIG_END
 
 
-MACHINE_CONFIG_DERIVED(igspoker_state::pktetris, igspoker)
+MACHINE_CONFIG_START(igspoker_state::pktetris)
+	igspoker(config);
 
 MACHINE_CONFIG_END
 

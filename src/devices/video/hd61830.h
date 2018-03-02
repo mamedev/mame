@@ -85,6 +85,8 @@ private:
 	void draw_char(bitmap_ind16 &bitmap, const rectangle &cliprect, uint16_t ma, int x, int y, uint8_t md);
 	void update_text(bitmap_ind16 &bitmap, const rectangle &cliprect);
 
+	void hd61830(address_map &map);
+
 	devcb_read8 m_read_rd;
 
 	emu_timer *m_busy_timer;

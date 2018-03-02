@@ -274,7 +274,7 @@ WRITE16_MEMBER(tecmosys_state::eeprom_w)
 	}
 }
 
-static ADDRESS_MAP_START( main_map, AS_PROGRAM, 16, tecmosys_state )
+ADDRESS_MAP_START(tecmosys_state::main_map)
 	AM_RANGE(0x000000, 0x0fffff) AM_ROM
 	AM_RANGE(0x200000, 0x20ffff) AM_RAM // work ram
 	AM_RANGE(0x210000, 0x210001) AM_READNOP // single byte overflow on stack defined as 0x210000
@@ -329,13 +329,13 @@ WRITE8_MEMBER(tecmosys_state::oki_bank_w)
 	memcpy( region+0x20000, region+0x80000 + upperbank * 0x20000, 0x20000  );
 }
 
-static ADDRESS_MAP_START( sound_map, AS_PROGRAM, 8, tecmosys_state )
+ADDRESS_MAP_START(tecmosys_state::sound_map)
 	AM_RANGE(0x0000, 0x7fff) AM_ROM
 	AM_RANGE(0x8000, 0xbfff) AM_ROMBANK("bank1")
 	AM_RANGE(0xe000, 0xf7ff) AM_RAM
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( io_map, AS_IO, 8, tecmosys_state )
+ADDRESS_MAP_START(tecmosys_state::io_map)
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	AM_RANGE(0x00, 0x03) AM_DEVREADWRITE("ymf", ymf262_device, read, write)
 	AM_RANGE(0x10, 0x10) AM_DEVREADWRITE("oki", okim6295_device, read, write)

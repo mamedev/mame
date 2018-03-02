@@ -52,27 +52,7 @@ public:
 	sega_scu_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
 	// I/O operations
-	DECLARE_ADDRESS_MAP(regs_map, 32);
-
-	// DMA
-	DECLARE_READ32_MEMBER(dma_lv0_r);
-	DECLARE_WRITE32_MEMBER(dma_lv0_w);
-	DECLARE_READ32_MEMBER(dma_lv1_r);
-	DECLARE_WRITE32_MEMBER(dma_lv1_w);
-	DECLARE_READ32_MEMBER(dma_lv2_r);
-	DECLARE_WRITE32_MEMBER(dma_lv2_w);
-	DECLARE_READ32_MEMBER(dma_status_r);
-
-	// Timers
-	DECLARE_WRITE32_MEMBER(t0_compare_w);
-	DECLARE_WRITE32_MEMBER(t1_setdata_w);
-	DECLARE_WRITE16_MEMBER(t1_mode_w);
-	// Interrupt
-	DECLARE_READ32_MEMBER(irq_mask_r);
-	DECLARE_READ32_MEMBER(irq_status_r);
-	DECLARE_WRITE32_MEMBER(irq_mask_w);
-	DECLARE_WRITE32_MEMBER(irq_status_w);
-	DECLARE_READ32_MEMBER(version_r);
+	void regs_map(address_map &map);
 
 	DECLARE_WRITE_LINE_MEMBER(vblank_out_w);
 	DECLARE_WRITE_LINE_MEMBER(vblank_in_w);
@@ -81,9 +61,6 @@ public:
 	void check_scanline_timers(int scanline,int y_step);
 	DECLARE_WRITE_LINE_MEMBER(sound_req_w);
 	DECLARE_WRITE_LINE_MEMBER(smpc_irq_w);
-	DECLARE_WRITE_LINE_MEMBER(scudsp_end_w);
-	DECLARE_READ16_MEMBER(scudsp_dma_r);
-	DECLARE_WRITE16_MEMBER(scudsp_dma_w);
 
 	static void static_set_hostcpu(device_t &device, const char *cputag);
 
@@ -140,6 +117,30 @@ private:
 	void update_dma_status(uint8_t level,bool state);
 	void dma_single_transfer(uint32_t src, uint32_t dst,uint8_t *src_shift);
 	void dma_start_factor_ack(uint8_t event);
+
+	DECLARE_WRITE_LINE_MEMBER(scudsp_end_w);
+	DECLARE_READ16_MEMBER(scudsp_dma_r);
+	DECLARE_WRITE16_MEMBER(scudsp_dma_w);
+
+	// DMA
+	DECLARE_READ32_MEMBER(dma_lv0_r);
+	DECLARE_WRITE32_MEMBER(dma_lv0_w);
+	DECLARE_READ32_MEMBER(dma_lv1_r);
+	DECLARE_WRITE32_MEMBER(dma_lv1_w);
+	DECLARE_READ32_MEMBER(dma_lv2_r);
+	DECLARE_WRITE32_MEMBER(dma_lv2_w);
+	DECLARE_READ32_MEMBER(dma_status_r);
+
+	// Timers
+	DECLARE_WRITE32_MEMBER(t0_compare_w);
+	DECLARE_WRITE32_MEMBER(t1_setdata_w);
+	DECLARE_WRITE16_MEMBER(t1_mode_w);
+	// Interrupt
+	DECLARE_READ32_MEMBER(irq_mask_r);
+	DECLARE_READ32_MEMBER(irq_status_r);
+	DECLARE_WRITE32_MEMBER(irq_mask_w);
+	DECLARE_WRITE32_MEMBER(irq_status_w);
+	DECLARE_READ32_MEMBER(version_r);
 };
 
 

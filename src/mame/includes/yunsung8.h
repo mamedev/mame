@@ -6,7 +6,6 @@
 
 *************************************************************************/
 
-#include "machine/gen_latch.h"
 #include "machine/74157.h"
 #include "sound/msm5205.h"
 
@@ -20,8 +19,7 @@ public:
 		m_msm(*this, "msm"),
 		m_adpcm_select(*this, "adpcm_select"),
 		m_gfxdecode(*this, "gfxdecode"),
-		m_palette(*this, "palette"),
-		m_soundlatch(*this, "soundlatch")
+		m_palette(*this, "palette")
 	{
 	}
 
@@ -43,14 +41,11 @@ public:
 	required_device<ls157_device> m_adpcm_select;
 	required_device<gfxdecode_device> m_gfxdecode;
 	required_device<palette_device> m_palette;
-	required_device<generic_latch_8_device> m_soundlatch;
 
 	/* memory */
 	uint8_t      m_videoram[0x4000];
 
 	DECLARE_WRITE8_MEMBER(bankswitch_w);
-	DECLARE_READ8_MEMBER(sound_command_r);
-	DECLARE_WRITE8_MEMBER(sound_command_w);
 	DECLARE_WRITE8_MEMBER(main_irq_ack_w);
 	DECLARE_WRITE8_MEMBER(videobank_w);
 	DECLARE_READ8_MEMBER(videoram_r);
@@ -68,4 +63,7 @@ public:
 
 	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	void yunsung8(machine_config &config);
+	void main_map(address_map &map);
+	void port_map(address_map &map);
+	void sound_map(address_map &map);
 };

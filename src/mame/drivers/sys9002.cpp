@@ -39,6 +39,8 @@ public:
 	MC6845_UPDATE_ROW(crtc_update_row);
 
 	void sys9002(machine_config &config);
+	void sys9002_io(address_map &map);
+	void sys9002_mem(address_map &map);
 private:
 	required_device<cpu_device> m_maincpu;
 	required_shared_ptr<uint8_t> m_p_videoram;
@@ -46,7 +48,7 @@ private:
 };
 
 
-static ADDRESS_MAP_START(sys9002_mem, AS_PROGRAM, 8, sys9002_state)
+ADDRESS_MAP_START(sys9002_state::sys9002_mem)
 	ADDRESS_MAP_UNMAP_HIGH
 	AM_RANGE(0x0000, 0x7fff) AM_ROM // 4 * 4K ROM
 	AM_RANGE(0x8000, 0x9fff) AM_RAM // 4 * 2k RAM
@@ -54,7 +56,7 @@ static ADDRESS_MAP_START(sys9002_mem, AS_PROGRAM, 8, sys9002_state)
 	AM_RANGE(0xc000, 0xc07f) AM_RAM // ??
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START(sys9002_io, AS_IO, 8, sys9002_state)
+ADDRESS_MAP_START(sys9002_state::sys9002_io)
 	ADDRESS_MAP_UNMAP_HIGH
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	//AM_RANGE(0x04, 0x04) AM_DEVREADWRITE("crtc", mc6845_device, status_r, address_w)  // left commented out as mame freezes after about 2 seconds

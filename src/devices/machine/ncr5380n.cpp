@@ -19,7 +19,7 @@
 
 DEFINE_DEVICE_TYPE(NCR5380N, ncr5380n_device, "ncr5380_new", "NCR 5380 SCSI (new)")
 
-DEVICE_ADDRESS_MAP_START(map, 8, ncr5380n_device)
+ADDRESS_MAP_START(ncr5380n_device::map)
 	AM_RANGE(0x0, 0x0) AM_READWRITE(scsidata_r, outdata_w)
 	AM_RANGE(0x1, 0x1) AM_READWRITE(icmd_r, icmd_w)
 	AM_RANGE(0x2, 0x2) AM_READWRITE(mode_r, mode_w)

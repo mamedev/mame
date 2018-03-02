@@ -71,6 +71,8 @@ private:
 	void set_video_mode(void);
 	void draw_border(uint16_t line);
 
+	void ef9364(address_map &map);
+
 	// internal state
 
 	required_region_ptr<uint8_t> m_charset;

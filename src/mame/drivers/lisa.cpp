@@ -23,11 +23,11 @@
     ADDRESS MAP
 ***************************************************************************/
 
-static ADDRESS_MAP_START(lisa_map, AS_PROGRAM, 16, lisa_state )
+ADDRESS_MAP_START(lisa_state::lisa_map)
 	AM_RANGE(0x000000, 0xffffff) AM_READWRITE(lisa_r, lisa_w)           /* no fixed map, we use an MMU */
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START(lisa_fdc_map, AS_PROGRAM, 8, lisa_state )
+ADDRESS_MAP_START(lisa_state::lisa_fdc_map)
 	ADDRESS_MAP_GLOBAL_MASK(0x1fff) // only 8k of address space
 	AM_RANGE(0x0000, 0x03ff) AM_RAM AM_SHARE("fdc_ram")             /* RAM (shared with 68000) */
 	AM_RANGE(0x0400, 0x07ff) AM_READWRITE(lisa_fdc_io_r, lisa_fdc_io_w) /* disk controller (IWM and TTL logic) */
@@ -35,7 +35,7 @@ static ADDRESS_MAP_START(lisa_fdc_map, AS_PROGRAM, 8, lisa_state )
 	AM_RANGE(0x1000, 0x1fff) AM_ROM AM_REGION("fdccpu", 0x1000) AM_SHARE("fdc_rom")     /* ROM */
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START(lisa210_fdc_map, AS_PROGRAM, 8, lisa_state )
+ADDRESS_MAP_START(lisa_state::lisa210_fdc_map)
 	ADDRESS_MAP_GLOBAL_MASK(0x1fff) // only 8k of address space
 	AM_RANGE(0x0000, 0x03ff) AM_RAM AM_SHARE("fdc_ram")             /* RAM (shared with 68000) */
 	AM_RANGE(0x0400, 0x07ff) AM_NOP                                     /* nothing, or RAM wrap-around ??? */
@@ -163,7 +163,8 @@ MACHINE_CONFIG_START(lisa_state::lisa)
 MACHINE_CONFIG_END
 
 
-MACHINE_CONFIG_DERIVED(lisa_state::lisa210, lisa)
+MACHINE_CONFIG_START(lisa_state::lisa210)
+	lisa(config);
 	MCFG_CPU_MODIFY( "fdccpu" )
 	MCFG_CPU_PROGRAM_MAP(lisa210_fdc_map)
 
@@ -178,7 +179,8 @@ MACHINE_CONFIG_DERIVED(lisa_state::lisa210, lisa)
 MACHINE_CONFIG_END
 
 
-MACHINE_CONFIG_DERIVED(lisa_state::macxl, lisa210)
+MACHINE_CONFIG_START(lisa_state::macxl)
+	lisa210(config);
 	MCFG_SCREEN_MODIFY("screen")
 	MCFG_SCREEN_SIZE(   768/* ???? */, 447/* ???? */)
 	MCFG_SCREEN_VISIBLE_AREA(0, 608-1, 0, 431-1)

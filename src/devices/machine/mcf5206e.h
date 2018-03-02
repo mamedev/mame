@@ -31,33 +31,35 @@ class mcf5206e_peripheral_device :  public device_t,
 									public device_memory_interface
 {
 public:
-	enum
-	{
-		ICR1 = 0,
-		ICR2,
-		ICR3,
-		ICR4,
-		ICR5,
-		ICR6,
-		ICR7,
-		ICR8,
-		ICR9,
-		ICR10,
-		ICR11,
-		ICR12,
-		ICR13,
-		MAX_ICR
-	};
-
 	// construction/destruction
 	mcf5206e_peripheral_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
-
-	void ICR_info(uint8_t ICR);
 
 	DECLARE_READ32_MEMBER( dev_r );
 	DECLARE_WRITE32_MEMBER( dev_w );
 	DECLARE_READ32_MEMBER( seta2_coldfire_regs_r );
 	DECLARE_WRITE32_MEMBER( seta2_coldfire_regs_w );
+
+protected:
+	// device-level overrides
+	virtual void device_start() override;
+	virtual void device_reset() override;
+	virtual void device_post_load() override { }
+	virtual void device_clock_changed() override { }
+	virtual space_config_vector memory_space_config() const override;
+
+private:
+	TIMER_CALLBACK_MEMBER(timer1_callback);
+
+	void init_regs(bool first_init);
+
+	void ICR_info(uint8_t ICR);
+
+	uint16_t CSAR_r(int which, int offset, uint16_t mem_mask);
+	void CSAR_w(int which, int offset, uint16_t data, uint16_t mem_mask);
+	uint32_t CSMR_r(int which, uint32_t mem_mask);
+	void CSMR_w(int which, uint32_t data, uint32_t mem_mask);
+	uint16_t CSCR_r(int which, int offset, uint16_t mem_mask);
+	void CSCR_w(int which, int offset, uint16_t data, uint16_t mem_mask);
 
 	DECLARE_READ8_MEMBER( ICR1_ICR2_ICR3_ICR4_r );
 	DECLARE_WRITE8_MEMBER( ICR1_ICR2_ICR3_ICR4_w );
@@ -66,13 +68,6 @@ public:
 	DECLARE_WRITE8_MEMBER( ICR9_ICR10_ICR11_ICR12_w );
 	DECLARE_READ8_MEMBER( ICR13_r );
 	DECLARE_WRITE8_MEMBER( ICR13_w );
-
-	uint16_t CSAR_r(int which, int offset, uint16_t mem_mask);
-	void CSAR_w(int which, int offset, uint16_t data, uint16_t mem_mask);
-	uint32_t CSMR_r(int which, uint32_t mem_mask);
-	void CSMR_w(int which, uint32_t data, uint32_t mem_mask);
-	uint16_t CSCR_r(int which, int offset, uint16_t mem_mask);
-	void CSCR_w(int which, int offset, uint16_t data, uint16_t mem_mask);
 
 	DECLARE_READ16_MEMBER(  CSAR0_r );
 	DECLARE_WRITE16_MEMBER( CSAR0_w );
@@ -155,18 +150,25 @@ public:
 	DECLARE_READ8_MEMBER( MBDR_r );
 	DECLARE_WRITE8_MEMBER( MBDR_w );
 
-protected:
-	// device-level overrides
-	virtual void device_start() override;
-	virtual void device_reset() override;
-	virtual void device_post_load() override { }
-	virtual void device_clock_changed() override { }
-	virtual space_config_vector memory_space_config() const override;
+	void coldfire_regs_map(address_map &map);
 
-private:
-	TIMER_CALLBACK_MEMBER(timer1_callback);
-
-	void init_regs(bool first_init);
+	enum
+	{
+		ICR1 = 0,
+		ICR2,
+		ICR3,
+		ICR4,
+		ICR5,
+		ICR6,
+		ICR7,
+		ICR8,
+		ICR9,
+		ICR10,
+		ICR11,
+		ICR12,
+		ICR13,
+		MAX_ICR
+	};
 
 	cpu_device* m_cpu;
 

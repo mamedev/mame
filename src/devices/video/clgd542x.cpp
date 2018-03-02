@@ -43,6 +43,7 @@
 
 DEFINE_DEVICE_TYPE(CIRRUS_GD5428, cirrus_gd5428_device, "clgd5428", "Cirrus Logic GD5428")
 DEFINE_DEVICE_TYPE(CIRRUS_GD5430, cirrus_gd5430_device, "clgd5430", "Cirrus Logic GD5430")
+DEFINE_DEVICE_TYPE(CIRRUS_GD5446, cirrus_gd5446_device, "clgd5446", "Cirrus Logic GD5446")
 
 
 cirrus_gd5428_device::cirrus_gd5428_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
@@ -57,6 +58,11 @@ cirrus_gd5428_device::cirrus_gd5428_device(const machine_config &mconfig, device
 
 cirrus_gd5430_device::cirrus_gd5430_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
 	: cirrus_gd5428_device(mconfig, CIRRUS_GD5430, tag, owner, clock)
+{
+}
+
+cirrus_gd5446_device::cirrus_gd5446_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+	: cirrus_gd5428_device(mconfig, CIRRUS_GD5446, tag, owner, clock)
 {
 }
 
@@ -95,6 +101,13 @@ void cirrus_gd5430_device::device_start()
 	cirrus_gd5428_device::device_start();
 	m_chip_id = 0xa0;  // GD5430 - Rev 0
 }
+
+void cirrus_gd5446_device::device_start()
+{
+	cirrus_gd5428_device::device_start();
+	m_chip_id = 0x80 | 0x39;  // GD5446
+}
+
 
 void cirrus_gd5428_device::device_reset()
 {
@@ -1250,7 +1263,7 @@ READ8_MEMBER(cirrus_gd5428_device::mem_r)
 	if(vga.sequencer.data[4] & 4)
 	{
 		int data;
-		if (!machine().side_effect_disabled())
+		if (!machine().side_effects_disabled())
 		{
 			vga.gc.latch[0]=vga.memory[(offset+addr) % vga.svga_intf.vram_size];
 			vga.gc.latch[1]=vga.memory[((offset+addr)+0x10000) % vga.svga_intf.vram_size];
