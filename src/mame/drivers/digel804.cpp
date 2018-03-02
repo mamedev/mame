@@ -70,28 +70,27 @@
 class digel804_state : public driver_device
 {
 public:
-	digel804_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag),
+	digel804_state(const machine_config &mconfig, device_type type, const char *tag) :
+		driver_device(mconfig, type, tag),
 		m_maincpu(*this, "maincpu"),
 		m_speaker(*this, "speaker"),
 		m_acia(*this, "acia"),
 		m_vfd(*this, "vfd"),
 		m_kb(*this, "74c923"),
 		m_ram(*this, RAM_TAG),
-		m_rambank(*this, "bankedram")
+		m_rambank(*this, "bankedram"),
+		m_func_leds(*this, "func_led%u", 0U)
 	{
 	}
 
-	required_device<cpu_device> m_maincpu;
-	required_device<speaker_sound_device> m_speaker;
-	required_device<mos6551_device> m_acia;
-	required_device<roc10937_device> m_vfd;
-	required_device<mm74c922_device> m_kb;
-	required_device<ram_device> m_ram;
-	required_memory_bank m_rambank;
+	DECLARE_INPUT_CHANGED_MEMBER(mode_change);
 
+	void digel804(machine_config &config);
+
+protected:
+	virtual void machine_start() override;
 	virtual void machine_reset() override;
-	DECLARE_DRIVER_INIT(digel804);
+
 	DECLARE_WRITE8_MEMBER( op00 );
 	DECLARE_READ8_MEMBER( ip40 );
 	DECLARE_WRITE8_MEMBER( op40 );
@@ -114,9 +113,22 @@ public:
 	DECLARE_READ8_MEMBER( acia_control_r );
 	DECLARE_WRITE8_MEMBER( acia_control_w );
 	DECLARE_WRITE_LINE_MEMBER( acia_irq_w );
-	DECLARE_WRITE_LINE_MEMBER( ep804_acia_irq_w );
 	DECLARE_WRITE_LINE_MEMBER( da_w );
-	DECLARE_INPUT_CHANGED_MEMBER(mode_change);
+
+	void z80_mem_804_1_4(address_map &map);
+	void z80_io_1_4(address_map &map);
+
+private:
+	required_device<cpu_device> m_maincpu;
+	required_device<speaker_sound_device> m_speaker;
+	required_device<mos6551_device> m_acia;
+	required_device<roc10937_device> m_vfd;
+	required_device<mm74c922_device> m_kb;
+	required_device<ram_device> m_ram;
+	required_memory_bank m_rambank;
+
+	output_finder<16> m_func_leds;
+
 	// current speaker state for port 45
 	uint8_t m_speaker_state;
 	// ram stuff for banking
@@ -132,20 +144,44 @@ public:
 	uint8_t m_chipinsert_state;
 	uint8_t m_keyen_state;
 	uint8_t m_op41;
+};
+
+
+class ep804_state : public digel804_state
+{
+public:
+	using digel804_state::digel804_state;
+
 	void ep804(machine_config &config);
-	void digel804(machine_config &config);
-	void z80_io_1_2(address_map &map);
-	void z80_io_1_4(address_map &map);
+
+protected:
+	DECLARE_WRITE_LINE_MEMBER( ep804_acia_irq_w );
+
 	void z80_mem_804_1_2(address_map &map);
-	void z80_mem_804_1_4(address_map &map);
+	void z80_io_1_2(address_map &map);
 };
 
 
 enum { MODE_OFF, MODE_KEY, MODE_REM, MODE_SIM };
 
 
-DRIVER_INIT_MEMBER(digel804_state,digel804)
+void digel804_state::machine_start()
 {
+	m_func_leds.resolve();
+
+	save_item(NAME(m_speaker_state));
+	save_item(NAME(m_ram_bank));
+	save_item(NAME(m_acia_intq));
+	save_item(NAME(m_overload_state));
+	save_item(NAME(m_key_intq));
+	save_item(NAME(m_remote_mode));
+	save_item(NAME(m_key_mode));
+	save_item(NAME(m_sim_mode));
+	save_item(NAME(m_powerfail_state));
+	save_item(NAME(m_chipinsert_state));
+	save_item(NAME(m_keyen_state));
+	save_item(NAME(m_op41));
+
 	m_speaker_state = 0;
 	//port43_rtn = 0xEE;//0xB6;
 	m_acia_intq = 1; // /INT source 1
@@ -344,8 +380,8 @@ WRITE8_MEMBER( digel804_state::op46 )
 	output().set_value("busy_led",  BIT(data,6));
 	output().set_value("error_led", BIT(data,5));
 
-	for(int i=0; i<16; i++)
-		output().set_indexed_value("func_led", i, (!(data & 0x10) && ((~data & 0x0f) == i)) ? 1 : 0);
+	for (int i = 0; i < 16; i++)
+		m_func_leds[i] = (!(data & 0x10) && ((~data & 0x0f) == i)) ? 1 : 0;
 }
 
 WRITE8_MEMBER( digel804_state::op47 ) // eprom timing/power and control write
@@ -446,7 +482,7 @@ ADDRESS_MAP_START(digel804_state::z80_mem_804_1_4)
 	// f800-ffff is open bus in mapper, 7f
 ADDRESS_MAP_END
 
-ADDRESS_MAP_START(digel804_state::z80_mem_804_1_2)
+ADDRESS_MAP_START(ep804_state::z80_mem_804_1_2)
 	ADDRESS_MAP_UNMAP_HIGH
 	AM_RANGE(0x0000, 0x1fff) AM_ROM // 3f in mapper = rom D41
 	AM_RANGE(0x2000, 0x3fff) AM_ROM // 5f in mapper = rom D42
@@ -489,7 +525,7 @@ ADDRESS_MAP_START(digel804_state::z80_io_1_4)
 
 ADDRESS_MAP_END
 
-ADDRESS_MAP_START(digel804_state::z80_io_1_2)
+ADDRESS_MAP_START(ep804_state::z80_io_1_2)
 	ADDRESS_MAP_UNMAP_HIGH
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	// io bits: x 1 x x x * * *
@@ -586,13 +622,13 @@ WRITE_LINE_MEMBER( digel804_state::acia_irq_w )
 	m_maincpu->set_input_line(0, (m_key_intq & m_acia_intq) ? CLEAR_LINE : ASSERT_LINE);
 }
 
-WRITE_LINE_MEMBER( digel804_state::ep804_acia_irq_w )
+WRITE_LINE_MEMBER( ep804_state::ep804_acia_irq_w )
 {
 }
 
 MACHINE_CONFIG_START(digel804_state::digel804)
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", Z80, XTAL(3'686'400)/2) /* Z80A, X1(aka E0 on schematics): 3.6864Mhz */
+	MCFG_CPU_ADD("maincpu", Z80, 3.6864_MHz_XTAL/2) /* Z80A, X1(aka E0 on schematics): 3.6864Mhz */
 	MCFG_CPU_PROGRAM_MAP(z80_mem_804_1_4)
 	MCFG_CPU_IO_MAP(z80_io_1_4)
 	MCFG_QUANTUM_TIME(attotime::from_hz(60))
@@ -611,7 +647,7 @@ MACHINE_CONFIG_START(digel804_state::digel804)
 
 	/* acia */
 	MCFG_DEVICE_ADD("acia", MOS6551, 0)
-	MCFG_MOS6551_XTAL(XTAL(3'686'400)/2)
+	MCFG_MOS6551_XTAL(3.6864_MHz_XTAL/2)
 	MCFG_MOS6551_IRQ_HANDLER(WRITELINE(digel804_state, acia_irq_w))
 	MCFG_MOS6551_TXD_HANDLER(DEVWRITELINE("rs232", rs232_port_device, write_txd))
 	MCFG_MOS6551_RTS_HANDLER(DEVWRITELINE("rs232", rs232_port_device, write_rts))
@@ -634,15 +670,16 @@ MACHINE_CONFIG_START(digel804_state::digel804)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
 MACHINE_CONFIG_END
 
-MACHINE_CONFIG_START(digel804_state::ep804)
+MACHINE_CONFIG_START(ep804_state::ep804)
 	digel804(config);
+
 	/* basic machine hardware */
 	MCFG_CPU_MODIFY("maincpu")  /* Z80, X1(aka E0 on schematics): 3.6864Mhz */
 	MCFG_CPU_PROGRAM_MAP(z80_mem_804_1_2)
 	MCFG_CPU_IO_MAP(z80_io_1_2)
 
 	MCFG_DEVICE_MODIFY("acia")
-	MCFG_MOS6551_IRQ_HANDLER(WRITELINE(digel804_state, ep804_acia_irq_w))
+	MCFG_MOS6551_IRQ_HANDLER(WRITELINE(ep804_state, ep804_acia_irq_w))
 
 	MCFG_RAM_MODIFY(RAM_TAG)
 	MCFG_RAM_DEFAULT_SIZE("32K")
@@ -730,6 +767,6 @@ ROM_END
  Drivers
 ******************************************************************************/
 
-//    YEAR  NAME      PARENT    COMPAT  MACHINE   INPUT     STATE           INIT      COMPANY                 FULLNAME                        FLAGS
-COMP( 1985, digel804, 0,        0,      digel804, digel804, digel804_state, digel804, "Digelec, Inc",         "Digelec 804 EPROM Programmer", MACHINE_NOT_WORKING )
-COMP( 1982, ep804,    digel804, 0,      ep804,    digel804, digel804_state, digel804, "Wavetek/Digelec, Inc", "EP804 EPROM Programmer",       MACHINE_NOT_WORKING )
+//    YEAR  NAME      PARENT    COMPAT  MACHINE   INPUT     STATE           INIT  COMPANY                 FULLNAME                        FLAGS
+COMP( 1985, digel804, 0,        0,      digel804, digel804, digel804_state, 0,    "Digelec, Inc",         "Digelec 804 EPROM Programmer", MACHINE_NOT_WORKING )
+COMP( 1982, ep804,    digel804, 0,      ep804,    digel804, ep804_state,    0,    "Wavetek/Digelec, Inc", "EP804 EPROM Programmer",       MACHINE_NOT_WORKING )

@@ -121,7 +121,7 @@ void model2_state::debug_geo_dasm_command(int ref, const std::vector<std::string
 					util::stream_format(f, "nop");
 					break;
 				// object data display
-				case 0x01: 
+				case 0x01:
 					util::stream_format(f, "object data  (point:%08x header:%08x start:%08x count:%08x)",m_bufferram[ptr],m_bufferram[ptr+1],m_bufferram[ptr+2],m_bufferram[ptr+3]);
 					ptr+=4;
 					break;

@@ -7,6 +7,7 @@ Photo Play (c) 199? Funworld
 Preliminary driver by Angelo Salese
 
 TODO:
+- BIOS CMOS doesn't save at all (needed for setting up the Hard Disk);
 - DISK BOOT FAILURE after eeprom checking (many unknown IDE cs1 reads/writes);
 - partition boot sector is missing from the CHD dump, protection?
 - Detects CPU type as "-S 16 MHz"? Sometimes it detects it as 486SX, unknown repro (after fiddling with CMOS settings anyway)
@@ -53,7 +54,6 @@ public:
 	DECLARE_WRITE8_MEMBER(eeprom_w);
 
 	uint16_t m_pci_shadow_reg;
-	DECLARE_DRIVER_INIT(photoply);
 	void photoply(machine_config &config);
 
 	void photoply_io(address_map &map);
@@ -231,6 +231,14 @@ static INPUT_PORTS_START( photoply )
 	AT_KEYB_HELPER( 0x0002, "Esc",          KEYCODE_Q           ) /* Esc                         01  81 */
 	AT_KEYB_HELPER( 0x0004, "1",            KEYCODE_1           )
 	AT_KEYB_HELPER( 0x0008, "2",            KEYCODE_2           )
+	AT_KEYB_HELPER( 0x0010, "3",            KEYCODE_3           )
+	AT_KEYB_HELPER( 0x0020, "4",            KEYCODE_4           )
+	AT_KEYB_HELPER( 0x0040, "5",            KEYCODE_5           )
+	AT_KEYB_HELPER( 0x0080, "6",            KEYCODE_6           )
+	AT_KEYB_HELPER( 0x0100, "7",            KEYCODE_7           )
+	AT_KEYB_HELPER( 0x0200, "8",            KEYCODE_8           )
+	AT_KEYB_HELPER( 0x0400, "9",            KEYCODE_9           )
+	AT_KEYB_HELPER( 0x0800, "0",            KEYCODE_0           )
 
 	PORT_START("pc_keyboard_1")
 	AT_KEYB_HELPER( 0x0020, "Y",            KEYCODE_Y           ) /* Y                           15  95 */
@@ -338,8 +346,25 @@ ROM_START(photoply)
 	DISK_IMAGE( "pp201", 0, SHA1(23e1940d485d19401e7d0ad912ddad2cf2ea10b4) )
 ROM_END
 
-DRIVER_INIT_MEMBER(photoply_state,photoply)
-{
-}
+// bios not provided, might be different
+ROM_START(photoply2k4)
+	ROM_REGION(0x20000, "bios", 0)  /* motherboard bios */
+	ROM_LOAD("award bootblock bios v1.0.bin", 0x000000, 0x20000, BAD_DUMP CRC(e96d1bbc) SHA1(64d0726c4e9ecee8fddf4cc39d92aecaa8184d5c) )
 
-GAME( 199?, photoply,  0,   photoply, photoply, photoply_state, photoply, ROT0, "Funworld", "Photo Play 2000 (v2.01)", MACHINE_NOT_WORKING|MACHINE_NO_SOUND|MACHINE_UNEMULATED_PROTECTION )
+	ROM_REGION(0x8000, "ex_bios", ROMREGION_ERASE00 ) /* multifunction board with a ESS AudioDrive chip,  M27128A */
+	ROM_LOAD("enhanced bios.bin", 0x000000, 0x4000, BAD_DUMP CRC(a216404e) SHA1(c9067cf87d5c8106de00866bb211eae3a6c02c65) )
+//  ROM_RELOAD(                   0x004000, 0x4000 )
+//  ROM_RELOAD(                   0x008000, 0x4000 )
+//  ROM_RELOAD(                   0x00c000, 0x4000 )
+
+	ROM_REGION(0x8000, "video_bios", 0 )
+	ROM_LOAD("vga.bin", 0x000000, 0x8000, CRC(7a859659) BAD_DUMP SHA1(ff667218261969c48082ec12aa91088a01b0cb2a) )
+
+	DISK_REGION( "ide:0:hdd:image" )
+//  CYLS:1023,HEADS:64,SECS:63,BPS:512.
+	DISK_IMAGE( "pp2004", 0, SHA1(2376a4eb6efc2c9f40edae8d45ade7d3d7f6bf53) )
+ROM_END
+
+
+GAME( 199?, photoply,     0,  photoply, photoply, photoply_state, 0, ROT0, "Funworld", "Photo Play 2000 (v2.01)", MACHINE_NOT_WORKING|MACHINE_NO_SOUND|MACHINE_UNEMULATED_PROTECTION )
+GAME( 2004, photoply2k4,  0,  photoply, photoply, photoply_state, 0, ROT0, "Funworld", "Photo Play 2004", MACHINE_NOT_WORKING|MACHINE_NO_SOUND|MACHINE_UNEMULATED_PROTECTION )

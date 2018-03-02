@@ -49,21 +49,26 @@ public:
 			elem = 0xff000000;
 	}
 
+	DECLARE_WRITE_LINE_MEMBER(key_pressed);
+
+	void monty(machine_config &config);
+	void mmonty(machine_config &config);
+
+protected:
 	DECLARE_WRITE8_MEMBER(sound_w);
 	DECLARE_WRITE8_MEMBER(ioDisplayWrite_w);
 	DECLARE_WRITE8_MEMBER(ioCommandWrite0_w);
 	DECLARE_WRITE8_MEMBER(ioCommandWrite1_w);
 	DECLARE_WRITE_LINE_MEMBER(halt_changed);
-	DECLARE_WRITE_LINE_MEMBER(key_pressed);
 
 	// screen updates
 	uint32_t lcd_update(screen_device& screen, bitmap_rgb32& bitmap, const rectangle& cliprect);
+	SED1520_UPDATE_CB(screen_update);
 
-	void monty(machine_config &config);
-	void mmonty(machine_config &config);
 	void mmonty_mem(address_map &map);
 	void monty_io(address_map &map);
 	void monty_mem(address_map &map);
+
 private:
 	required_device<cpu_device> m_maincpu;
 	required_device<speaker_sound_device> m_speaker;
@@ -249,7 +254,7 @@ uint32_t monty_state::lcd_update(screen_device& screen, bitmap_rgb32& bitmap, co
 }
 
 
-SED1520_UPDATE_CB(monty_screen_update)
+SED1520_UPDATE_CB(monty_state::screen_update)
 {
 	// TODO: Not really a SED1520 - there are two SED1503s
 	return 0x00;
@@ -278,7 +283,7 @@ MACHINE_CONFIG_START(monty_state::monty)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
 
 	// LCD controller interfaces
-	MCFG_SED1520_ADD("sed1520_0", monty_screen_update)
+	MCFG_SED1520_ADD("sed1520_0", UPDATE(monty_state, screen_update))
 MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(monty_state::mmonty)

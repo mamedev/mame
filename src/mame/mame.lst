@@ -21134,6 +21134,9 @@ mil4000b                        // (c) 2000 Sure Milano
 mil4000c                        // (c) 2000 Sure Milano
 top21                           // (c) 200? Assogiochi Assago (Mi)
 
+@source:milton6805.cpp
+milton                          // 1980 Milton Bradley
+
 @source:milwaukee.cpp
 mc1200                          //
 
@@ -31581,6 +31584,7 @@ kok                             //
 
 @source:photoply.cpp
 photoply                        //
+photoply2k4						//
 
 @source:phunsy.cpp
 phunsy                          //

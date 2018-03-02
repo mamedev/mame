@@ -550,9 +550,20 @@ void adsp21062_device::SHIFT_OPERATION_IMM(int shiftop, int data, int rn, int rx
 			break;
 		}
 
-		case 0x11: /* TODO */
-			break;
+		case 0x11:      /* Rn = Rn FDEP Rx BY <bit6>:<len6> */
+		{
+			uint32_t ext = REG(rx) & MAKE_EXTRACT_MASK(0, len);
 
+			REG(rn) = ext << bit;
+
+			SET_FLAG_SZ(REG(rn));
+			if (bit+len > 32)
+			{
+				m_core->astat |= SV;
+			}
+			break;
+		}
+			
 		case 0x12:      /* FEXT Rx BY <bit6>:<len6> (Sign Extended) */
 		{
 			uint32_t ext = (REG(rx) & MAKE_EXTRACT_MASK(bit, len)) >> bit;

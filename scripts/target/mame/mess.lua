@@ -220,7 +220,7 @@ SOUNDS["ES5506"] = true
 --SOUNDS["GAELCO_CG1V"] = true
 --SOUNDS["GAELCO_GAE1"] = true
 SOUNDS["C6280"] = true
---SOUNDS["SP0250"] = true
+SOUNDS["SP0250"] = true
 SOUNDS["SPU"] = true
 SOUNDS["CDDA"] = true
 --SOUNDS["ICS2115"] = true
@@ -3588,6 +3588,7 @@ files {
 	MAME_DIR .. "src/mame/includes/micronic.h",
 	MAME_DIR .. "src/mame/drivers/microterm.cpp",
 	MAME_DIR .. "src/mame/drivers/mightyframe.cpp",
+	MAME_DIR .. "src/mame/drivers/milton6805.cpp",
 	MAME_DIR .. "src/mame/drivers/milwaukee.cpp",
 	MAME_DIR .. "src/mame/drivers/mini2440.cpp",
 	MAME_DIR .. "src/mame/drivers/miniframe.cpp",
