@@ -124,7 +124,7 @@ struct BOARD_FIELD // FIXME: global structure
 {
 	uint8_t field;
 	uint8_t piece;
-} BOARD_FIELD;
+};
 
 BOARD_FIELD l_board[8][8]; // FIXME: mutable global state
 
