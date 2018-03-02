@@ -57,15 +57,19 @@
        of all subsequent Seibu arcade games.
 
     3. Korean bootleg hardware, with no custom ICs and an enormous subboard
-       with four ROMs amidst over 100 TTL chips. (This is almost certainly
-       different from the dumped raidenk set, despite displaying the IBL
-       license on the title screen.)
+       with four ROMs amidst over 100 TTL chips. This hardware also uses
+       different XTAL frequencies (32.000MHz, 14.000MHz, 12.000MHz).
 
     On some boards (both the common dedicated hardware and the older
     SEI8904), the SEI0050BU has been replaced with a small daughterboard
     with six TTL chips and two PLDs labeled S50P01 and S50P02. A bootleg
     set has been observed with a (larger) daughterboard likewise standing
     in for a Xilinx PLD.
+
+    To be verified on the bootleg:
+    - Screen timings, Z80 and YM3812 clocks
+    - Are the V30 main and sub programs really encrypted here?
+    - Correct numbers and locations for all ROMs
 
 ***************************************************************************/
 
