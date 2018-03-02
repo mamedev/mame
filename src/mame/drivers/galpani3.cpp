@@ -160,6 +160,12 @@ void galpani3_state::video_start()
 	save_pointer(NAME(m_spc_regs.get()), 0x40/4);
 }
 
+#define SPRITE_DRAW_PIXEL(_pri)                                    \
+	if (((sprdat & 0xc000) == _pri) && ((sprdat & 0xff) != 0))     \
+	{                                                              \
+		dst[drawx] = paldata[sprdat & 0x3fff];                     \
+	}
+
 #define FB_DRAW_PIXEL(_chip, _pixel)                                                              \
 	int alpha = 0xff;                                                                             \
 	uint32_t pal = m_grap2[_chip]->pen_r(_pixel);                                                 \
@@ -220,99 +226,60 @@ uint32_t galpani3_state::screen_update_galpani3(screen_device &screen, bitmap_rg
 
 				uint8_t  pridat = priline[prioffs];
 
-				// this is all wrong
+				// TODO : Verify priorities, blendings from real PCB.
 				if (pridat==0x0f) // relates to the area you've drawn over
 				{
-					if ((sprdat & 0xc000) == 0x0000)
-					{
-						dst[drawx] = paldata[sprdat & 0x3fff];
-					}
+					SPRITE_DRAW_PIXEL(0x0000);
 					if (m_grap2[2]->m_framebuffer_enable)
 					{
 						FB_DRAW_PIXEL(2, dat3);
 					}
-					if ((sprdat & 0xc000) == 0x4000)
-					{
-						dst[drawx] = paldata[sprdat & 0x3fff];
-					}
+					SPRITE_DRAW_PIXEL(0x4000);
 					if (dat1 && m_grap2[0]->m_framebuffer_enable)
 					{
 						FB_DRAW_PIXEL(0, dat1);
 					}
-					if ((sprdat & 0xc000) == 0x8000)
-					{
-						dst[drawx] = paldata[sprdat & 0x3fff];
-					}
+					SPRITE_DRAW_PIXEL(0x8000);
 					if (dat2 && m_grap2[1]->m_framebuffer_enable)
 					{
 						FB_DRAW_PIXEL(1, dat2);
 					}
-					if ((sprdat & 0xc000) == 0xc000)
-					{
-						dst[drawx] = paldata[sprdat & 0x3fff];
-					}
+					SPRITE_DRAW_PIXEL(0xc000);
 				}
 				else if (pridat==0xcf) // the girl
 				{
-					if ((sprdat & 0xc000) == 0x0000)
-					{
-						dst[drawx] = paldata[sprdat & 0x3fff];
-					}
+					SPRITE_DRAW_PIXEL(0x0000);
 					FB_DRAW_PIXEL(0, 0x100);
-					if ((sprdat & 0xc000) == 0x4000)
-					{
-						dst[drawx] = paldata[sprdat & 0x3fff];
-					}
+					SPRITE_DRAW_PIXEL(0x4000);
 					if (m_grap2[1]->m_framebuffer_enable)
 					{
 						FB_DRAW_PIXEL(1, 0x100);
 					}
-					if ((sprdat & 0xc000) == 0x8000)
-					{
-						dst[drawx] = paldata[sprdat & 0x3fff];
-					}
+					SPRITE_DRAW_PIXEL(0x8000);
 					if (dat3 && m_grap2[2]->m_framebuffer_enable)
 					{
 						FB_DRAW_PIXEL(2, dat3);
 					}
-					if ((sprdat & 0xc000) == 0xc000)
-					{
-						dst[drawx] = paldata[sprdat & 0x3fff];
-					}
+					SPRITE_DRAW_PIXEL(0xc000);
 				}
 				else
 				{
-					/* this isn't right, but the registers have something to do with
-					   alpha / mixing, and bit 0x8000 of the palette is DEFINITELY alpha
-					   enable -- see fading in intro */
-					if ((sprdat & 0xc000) == 0x0000)
-					{
-						dst[drawx] = paldata[sprdat & 0x3fff];
-					}
+					SPRITE_DRAW_PIXEL(0x0000);
 					if (m_grap2[0]->m_framebuffer_enable)
 					{
 						FB_DRAW_PIXEL(0, dat1);
 					}
-					if ((sprdat & 0xc000) == 0x4000)
-					{
-						dst[drawx] = paldata[sprdat & 0x3fff];
-					}
+					SPRITE_DRAW_PIXEL(0x4000);
 					if (dat2 && m_grap2[1]->m_framebuffer_enable)
 					{
 						FB_DRAW_PIXEL(1, dat2);
 					}
-					if ((sprdat & 0xc000) == 0x8000)
-					{
-						dst[drawx] = paldata[sprdat & 0x3fff];
-					}
+					SPRITE_DRAW_PIXEL(0x8000);
 					if (dat3 && m_grap2[2]->m_framebuffer_enable)
 					{
 						FB_DRAW_PIXEL(2, dat3);
 					}
-					if ((sprdat & 0xc000) == 0xc000)
-					{
-						dst[drawx] = paldata[sprdat & 0x3fff];
-					}
+					SPRITE_DRAW_PIXEL(0xc000);
 				}
 
 				/*
