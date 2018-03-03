@@ -47,8 +47,8 @@ rs232_port_device::rs232_port_device(const machine_config &mconfig, const char *
 {
 }
 
-rs232_port_device::rs232_port_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock)
-	: device_t(mconfig, type, tag, owner, clock),
+rs232_port_device::rs232_port_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock) :
+	device_t(mconfig, type, tag, owner, clock),
 	device_slot_interface(mconfig, *this),
 	m_rxd(0),
 	m_dcd(0),
@@ -77,7 +77,7 @@ void rs232_port_device::device_config_complete()
 	m_dev = dynamic_cast<device_rs232_port_interface *>(get_card_device());
 }
 
-void rs232_port_device::device_start()
+void rs232_port_device::device_resolve_objects()
 {
 	m_rxd_handler.resolve_safe();
 	m_dcd_handler.resolve_safe();
@@ -86,7 +86,10 @@ void rs232_port_device::device_start()
 	m_cts_handler.resolve_safe();
 	m_rxc_handler.resolve_safe();
 	m_txc_handler.resolve_safe();
+}
 
+void rs232_port_device::device_start()
+{
 	save_item(NAME(m_rxd));
 	save_item(NAME(m_dcd));
 	save_item(NAME(m_dsr));
@@ -110,30 +113,30 @@ void rs232_port_device::device_start()
 
 WRITE_LINE_MEMBER( rs232_port_device::write_txd )
 {
-	if(m_dev)
+	if (m_dev)
 		m_dev->input_txd(state);
 }
 
 WRITE_LINE_MEMBER( rs232_port_device::write_dtr )
 {
-	if(m_dev)
+	if (m_dev)
 		m_dev->input_dtr(state);
 }
 
 WRITE_LINE_MEMBER( rs232_port_device::write_rts )
 {
-	if(m_dev)
+	if (m_dev)
 		m_dev->input_rts(state);
 }
 
 WRITE_LINE_MEMBER( rs232_port_device::write_etc )
 {
-	if(m_dev)
+	if (m_dev)
 		m_dev->input_etc(state);
 }
 
-device_rs232_port_interface::device_rs232_port_interface(const machine_config &mconfig, device_t &device)
-	: device_slot_card_interface(mconfig, device)
+device_rs232_port_interface::device_rs232_port_interface(const machine_config &mconfig, device_t &device) :
+	device_slot_card_interface(mconfig, device)
 {
 	m_port = dynamic_cast<rs232_port_device *>(device.owner());
 }
