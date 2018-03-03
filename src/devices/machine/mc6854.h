@@ -18,19 +18,19 @@
 
 
 #define MCFG_MC6854_OUT_IRQ_CB(_devcb) \
-	devcb = &mc6854_device::set_out_irq_callback(*device, DEVCB_##_devcb);
+	devcb = &downcast<mc6854_device &>(*device).set_out_irq_callback(DEVCB_##_devcb);
 
 #define MCFG_MC6854_OUT_TXD_CB(_devcb) \
-	devcb = &mc6854_device::set_out_txd_callback(*device, DEVCB_##_devcb);
+	devcb = &downcast<mc6854_device &>(*device).set_out_txd_callback(DEVCB_##_devcb);
 
 #define MCFG_MC6854_OUT_FRAME_CB(_class, _method) \
-	mc6854_device::set_out_frame_callback(*device, mc6854_device::out_frame_delegate(&_class::_method, #_class "::" #_method, this));
+	downcast<mc6854_device &>(*device).set_out_frame_callback(mc6854_device::out_frame_delegate(&_class::_method, #_class "::" #_method, this));
 
 #define MCFG_MC6854_OUT_RTS_CB(_devcb) \
-	devcb = &mc6854_device::set_out_rts_callback(*device, DEVCB_##_devcb);
+	devcb = &downcast<mc6854_device &>(*device).set_out_rts_callback(DEVCB_##_devcb);
 
 #define MCFG_MC6854_OUT_DTR_CB(_devcb) \
-	devcb = &mc6854_device::set_out_dtr_callback(*device, DEVCB_##_devcb);
+	devcb = &downcast<mc6854_device &>(*device).set_out_dtr_callback(DEVCB_##_devcb);
 
 
 class mc6854_device : public device_t
@@ -42,11 +42,11 @@ public:
 
 	mc6854_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
-	template <class Object> static devcb_base &set_out_irq_callback(device_t &device, Object &&cb) { return downcast<mc6854_device &>(device).m_out_irq_cb.set_callback(std::forward<Object>(cb)); }
-	template <class Object> static devcb_base &set_out_txd_callback(device_t &device, Object &&cb) { return downcast<mc6854_device &>(device).m_out_txd_cb.set_callback(std::forward<Object>(cb)); }
-	static void set_out_frame_callback(device_t &device, out_frame_delegate &&callback) { downcast<mc6854_device &>(device).m_out_frame_cb = std::move(callback); }
-	template <class Object> static devcb_base &set_out_rts_callback(device_t &device, Object &&cb) { return downcast<mc6854_device &>(device).m_out_rts_cb.set_callback(std::forward<Object>(cb)); }
-	template <class Object> static devcb_base &set_out_dtr_callback(device_t &device, Object &&cb) { return downcast<mc6854_device &>(device).m_out_dtr_cb.set_callback(std::forward<Object>(cb)); }
+	template <class Object> devcb_base &set_out_irq_callback(Object &&cb) { return m_out_irq_cb.set_callback(std::forward<Object>(cb)); }
+	template <class Object> devcb_base &set_out_txd_callback(Object &&cb) { return m_out_txd_cb.set_callback(std::forward<Object>(cb)); }
+	template <typename Object> void set_out_frame_callback(Object &&cb) { m_out_frame_cb = std::forward<Object>(cb); }
+	template <class Object> devcb_base &set_out_rts_callback(Object &&cb) { return m_out_rts_cb.set_callback(std::forward<Object>(cb)); }
+	template <class Object> devcb_base &set_out_dtr_callback(Object &&cb) { return m_out_dtr_cb.set_callback(std::forward<Object>(cb)); }
 
 	/* interface to CPU via address/data bus*/
 	DECLARE_READ8_MEMBER( read );

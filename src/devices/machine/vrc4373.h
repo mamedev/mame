@@ -33,8 +33,8 @@ public:
 							uint64_t io_window_start, uint64_t io_window_end, uint64_t io_offset, address_space *io_space) override;
 	void postload(void);
 
-	template <class Object> static devcb_base &set_irq_cb(device_t &device, Object &&cb) { return downcast<vrc4373_device &>(device).m_irq_cb.set_callback(std::forward<Object>(cb)); }
-	void set_cpu_tag(const char *tag);
+	template <class Object> devcb_base &set_irq_cb(Object &&cb) { return m_irq_cb.set_callback(std::forward<Object>(cb)); }
+	void set_cpu_tag(const char *tag) { cpu_tag = tag; }
 	void set_ram_size(const int size) { m_ram_size = size; };
 	void set_simm0_size(const int size) { m_simm0_size = size; };
 

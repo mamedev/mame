@@ -126,10 +126,10 @@ MACHINE_CONFIG_START(milton_state::milton)
 	MCFG_CPU_IO_MAP(io_map)
 
 	MCFG_DEVICE_ADD("grom3", TMC0430, 3120000 / 8)
-	tmc0430_device::set_region_and_ident(*device, "groms", 0x0000, 0);
+	downcast<tmc0430_device &>(*device).set_region_and_ident("groms", 0x0000, 0);
 
 	MCFG_DEVICE_ADD("grom4", TMC0430, 3120000 / 8)
-	tmc0430_device::set_region_and_ident(*device, "groms", 0x2000, 1);
+	downcast<tmc0430_device &>(*device).set_region_and_ident("groms", 0x2000, 1);
 
 	MCFG_SPEAKER_STANDARD_MONO("speaker")
 	MCFG_SOUND_ADD("sp0250", SP0250, 3120000)

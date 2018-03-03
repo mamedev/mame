@@ -512,9 +512,9 @@ ADDRESS_MAP_END
 /* single built-in 3.5" 720K drive, connector for optional external 3.5" or 5.25" drive */
 void europc_pc_state::cfg_builtin_720K(device_t *device)
 {
-	device_slot_interface::static_set_default_option(*device->subdevice("fdc:0"), "35dd");
-	device_slot_interface::static_set_fixed(*device->subdevice("fdc:0"), true);
-	device_slot_interface::static_set_default_option(*device->subdevice("fdc:1"), "");
+	dynamic_cast<device_slot_interface &>(*device->subdevice("fdc:0")).set_default_option("35dd");
+	dynamic_cast<device_slot_interface &>(*device->subdevice("fdc:0")).set_fixed(true);
+	dynamic_cast<device_slot_interface &>(*device->subdevice("fdc:1")).set_default_option("");
 }
 
 //Euro PC

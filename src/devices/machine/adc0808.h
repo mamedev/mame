@@ -40,37 +40,37 @@
 
 
 #define MCFG_ADC0808_OUT_EOC_CB(_devcb) \
-	devcb = &adc0808_device::set_out_eoc_callback(*device, DEVCB_##_devcb);
+	devcb = &downcast<adc0808_device &>(*device).set_out_eoc_callback(DEVCB_##_devcb);
 
 #define MCFG_ADC0808_IN_VREF_POS_CB(_class, _method) \
-	adc0808_device::set_in_vref_pos_callback(*device, adc0808_device::analog_read_delegate(&_class::_method, #_class "::" #_method, this));
+	downcast<adc0808_device &>(*device).set_in_vref_pos_callback(adc0808_device::analog_read_delegate(&_class::_method, #_class "::" #_method, this));
 
 #define MCFG_ADC0808_IN_VREF_NEG_CB(_class, _method) \
-	adc0808_device::set_in_vref_neg_callback(*device, adc0808_device::analog_read_delegate(&_class::_method, #_class "::" #_method, this));
+	downcast<adc0808_device &>(*device).set_in_vref_neg_callback(adc0808_device::analog_read_delegate(&_class::_method, #_class "::" #_method, this));
 
 #define MCFG_ADC0808_IN_IN_0_CB(_class, _method) \
-	adc0808_device::set_in_in_0_callback(*device, adc0808_device::analog_read_delegate(&_class::_method, #_class "::" #_method, this));
+	downcast<adc0808_device &>(*device).set_in_in_0_callback(adc0808_device::analog_read_delegate(&_class::_method, #_class "::" #_method, this));
 
 #define MCFG_ADC0808_IN_IN_1_CB(_class, _method) \
-	adc0808_device::set_in_in_1_callback(*device, adc0808_device::analog_read_delegate(&_class::_method, #_class "::" #_method, this));
+	downcast<adc0808_device &>(*device).set_in_in_1_callback(adc0808_device::analog_read_delegate(&_class::_method, #_class "::" #_method, this));
 
 #define MCFG_ADC0808_IN_IN_2_CB(_class, _method) \
-	adc0808_device::set_in_in_2_callback(*device, adc0808_device::analog_read_delegate(&_class::_method, #_class "::" #_method, this));
+	downcast<adc0808_device &>(*device).set_in_in_2_callback(adc0808_device::analog_read_delegate(&_class::_method, #_class "::" #_method, this));
 
 #define MCFG_ADC0808_IN_IN_3_CB(_class, _method) \
-	adc0808_device::set_in_in_3_callback(*device, adc0808_device::analog_read_delegate(&_class::_method, #_class "::" #_method, this));
+	downcast<adc0808_device &>(*device).set_in_in_3_callback(adc0808_device::analog_read_delegate(&_class::_method, #_class "::" #_method, this));
 
 #define MCFG_ADC0808_IN_IN_4_CB(_class, _method) \
-	adc0808_device::set_in_in_4_callback(*device, adc0808_device::analog_read_delegate(&_class::_method, #_class "::" #_method, this));
+	downcast<adc0808_device &>(*device).set_in_in_4_callback(adc0808_device::analog_read_delegate(&_class::_method, #_class "::" #_method, this));
 
 #define MCFG_ADC0808_IN_IN_5_CB(_class, _method) \
-	adc0808_device::set_in_in_5_callback(*device, adc0808_device::analog_read_delegate(&_class::_method, #_class "::" #_method, this));
+	downcast<adc0808_device &>(*device).set_in_in_5_callback(adc0808_device::analog_read_delegate(&_class::_method, #_class "::" #_method, this));
 
 #define MCFG_ADC0808_IN_IN_6_CB(_class, _method) \
-	adc0808_device::set_in_in_6_callback(*device, adc0808_device::analog_read_delegate(&_class::_method, #_class "::" #_method, this));
+	downcast<adc0808_device &>(*device).set_in_in_6_callback(adc0808_device::analog_read_delegate(&_class::_method, #_class "::" #_method, this));
 
 #define MCFG_ADC0808_IN_IN_7_CB(_class, _method) \
-	adc0808_device::set_in_in_7_callback(*device, adc0808_device::analog_read_delegate(&_class::_method, #_class "::" #_method, this));
+	downcast<adc0808_device &>(*device).set_in_in_7_callback(adc0808_device::analog_read_delegate(&_class::_method, #_class "::" #_method, this));
 
 // ======================> adc0808_device
 
@@ -82,17 +82,17 @@ public:
 	// construction/destruction
 	adc0808_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
-	template <class Object> static devcb_base &set_out_eoc_callback(device_t &device, Object &&cb) { return downcast<adc0808_device &>(device).m_out_eoc_cb.set_callback(std::forward<Object>(cb)); }
-	static void set_in_vref_pos_callback(device_t &device, analog_read_delegate &&cb) { downcast<adc0808_device &>(device).m_in_vref_pos_cb = std::move(cb); }
-	static void set_in_vref_neg_callback(device_t &device, analog_read_delegate &&cb) { downcast<adc0808_device &>(device).m_in_vref_neg_cb = std::move(cb); }
-	static void set_in_in_0_callback(device_t &device, analog_read_delegate &&cb) { downcast<adc0808_device &>(device).m_in_in_0_cb = std::move(cb); }
-	static void set_in_in_1_callback(device_t &device, analog_read_delegate &&cb) { downcast<adc0808_device &>(device).m_in_in_1_cb = std::move(cb); }
-	static void set_in_in_2_callback(device_t &device, analog_read_delegate &&cb) { downcast<adc0808_device &>(device).m_in_in_2_cb = std::move(cb); }
-	static void set_in_in_3_callback(device_t &device, analog_read_delegate &&cb) { downcast<adc0808_device &>(device).m_in_in_3_cb = std::move(cb); }
-	static void set_in_in_4_callback(device_t &device, analog_read_delegate &&cb) { downcast<adc0808_device &>(device).m_in_in_4_cb = std::move(cb); }
-	static void set_in_in_5_callback(device_t &device, analog_read_delegate &&cb) { downcast<adc0808_device &>(device).m_in_in_5_cb = std::move(cb); }
-	static void set_in_in_6_callback(device_t &device, analog_read_delegate &&cb) { downcast<adc0808_device &>(device).m_in_in_6_cb = std::move(cb); }
-	static void set_in_in_7_callback(device_t &device, analog_read_delegate &&cb) { downcast<adc0808_device &>(device).m_in_in_7_cb = std::move(cb); }
+	template <class Object> devcb_base &set_out_eoc_callback(Object &&cb) { return m_out_eoc_cb.set_callback(std::forward<Object>(cb)); }
+	template <typename Object> void set_in_vref_pos_callback(Object &&cb) { m_in_vref_pos_cb = std::forward<Object>(cb); }
+	template <typename Object> void set_in_vref_neg_callback(Object &&cb) { m_in_vref_neg_cb = std::forward<Object>(cb); }
+	template <typename Object> void set_in_in_0_callback(Object &&cb) { m_in_in_0_cb = std::forward<Object>(cb); }
+	template <typename Object> void set_in_in_1_callback(Object &&cb) { m_in_in_1_cb = std::forward<Object>(cb); }
+	template <typename Object> void set_in_in_2_callback(Object &&cb) { m_in_in_2_cb = std::forward<Object>(cb); }
+	template <typename Object> void set_in_in_3_callback(Object &&cb) { m_in_in_3_cb = std::forward<Object>(cb); }
+	template <typename Object> void set_in_in_4_callback(Object &&cb) { m_in_in_4_cb = std::forward<Object>(cb); }
+	template <typename Object> void set_in_in_5_callback(Object &&cb) { m_in_in_5_cb = std::forward<Object>(cb); }
+	template <typename Object> void set_in_in_6_callback(Object &&cb) { m_in_in_6_cb = std::forward<Object>(cb); }
+	template <typename Object> void set_in_in_7_callback(Object &&cb) { m_in_in_7_cb = std::forward<Object>(cb); }
 
 	DECLARE_READ8_MEMBER( data_r );
 	DECLARE_WRITE8_MEMBER( ale_w );

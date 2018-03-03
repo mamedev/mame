@@ -28,31 +28,31 @@
 //**************************************************************************
 
 #define MCFG_MSM6253_IN0_ANALOG_PORT(_input) \
-	msm6253_device::static_set_input_tag(*device, 0, "^" _input);
+	downcast<msm6253_device &>(*device).set_input_tag(0, "^" _input);
 #define MCFG_MSM6253_IN1_ANALOG_PORT(_input) \
-	msm6253_device::static_set_input_tag(*device, 1, "^" _input);
+	downcast<msm6253_device &>(*device).set_input_tag(1, "^" _input);
 #define MCFG_MSM6253_IN2_ANALOG_PORT(_input) \
-	msm6253_device::static_set_input_tag(*device, 2, "^" _input);
+	downcast<msm6253_device &>(*device).set_input_tag(2, "^" _input);
 #define MCFG_MSM6253_IN3_ANALOG_PORT(_input) \
-	msm6253_device::static_set_input_tag(*device, 3, "^" _input);
+	downcast<msm6253_device &>(*device).set_input_tag(3, "^" _input);
 
 #define MCFG_MSM6253_IN0_ANALOG_READ(_class, _method) \
-	msm6253_device::static_set_input_cb(*device, 0, msm6253_device::port_read_delegate(&_class::_method, #_class "::" #_method, this));
+	downcast<msm6253_device &>(*device).set_input_cb(0, msm6253_device::port_read_delegate(&_class::_method, #_class "::" #_method, this));
 #define MCFG_MSM6253_IN1_ANALOG_READ(_class, _method) \
-	msm6253_device::static_set_input_cb(*device, 1, msm6253_device::port_read_delegate(&_class::_method, #_class "::" #_method, this));
+	downcast<msm6253_device &>(*device).set_input_cb(1, msm6253_device::port_read_delegate(&_class::_method, #_class "::" #_method, this));
 #define MCFG_MSM6253_IN2_ANALOG_READ(_class, _method) \
-	msm6253_device::static_set_input_cb(*device, 2, msm6253_device::port_read_delegate(&_class::_method, #_class "::" #_method, this));
+	downcast<msm6253_device &>(*device).set_input_cb(2, msm6253_device::port_read_delegate(&_class::_method, #_class "::" #_method, this));
 #define MCFG_MSM6253_IN3_ANALOG_READ(_class, _method) \
-	msm6253_device::static_set_input_cb(*device, 3, msm6253_device::port_read_delegate(&_class::_method, #_class "::" #_method, this));
+	downcast<msm6253_device &>(*device).set_input_cb(3, msm6253_device::port_read_delegate(&_class::_method, #_class "::" #_method, this));
 
 #define MCFG_MSM6253_IN0_ANALOG_DEVREAD(_tag, _class, _method) \
-	msm6253_device::static_set_input_cb(*device, 0, msm6253_device::port_read_delegate(&_class::_method, #_class "::" #_method, _tag));
+	downcast<msm6253_device &>(*device).set_input_cb(0, msm6253_device::port_read_delegate(&_class::_method, #_class "::" #_method, _tag));
 #define MCFG_MSM6253_IN1_ANALOG_DEVREAD(_tag, _class, _method) \
-	msm6253_device::static_set_input_cb(*device, 1, msm6253_device::port_read_delegate(&_class::_method, #_class "::" #_method, _tag));
+	downcast<msm6253_device &>(*device).set_input_cb(1, msm6253_device::port_read_delegate(&_class::_method, #_class "::" #_method, _tag));
 #define MCFG_MSM6253_IN2_ANALOG_DEVREAD(_tag, _class, _method) \
-	msm6253_device::static_set_input_cb(*device, 2, msm6253_device::port_read_delegate(&_class::_method, #_class "::" #_method, _tag));
+	downcast<msm6253_device &>(*device).set_input_cb(2, msm6253_device::port_read_delegate(&_class::_method, #_class "::" #_method, _tag));
 #define MCFG_MSM6253_IN3_ANALOG_DEVREAD(_tag, _class, _method) \
-	msm6253_device::static_set_input_cb(*device, 3, msm6253_device::port_read_delegate(&_class::_method, #_class "::" #_method, _tag));
+	downcast<msm6253_device &>(*device).set_input_cb(3, msm6253_device::port_read_delegate(&_class::_method, #_class "::" #_method, _tag));
 
 
 //**************************************************************************
@@ -69,9 +69,9 @@ public:
 	// construction/destruction
 	msm6253_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock);
 
-	// static configuration
-	static void static_set_input_tag(device_t &device, int port, const char *tag) { downcast<msm6253_device &>(device).m_analog_ports[port].set_tag(tag); }
-	static void static_set_input_cb(device_t &device, int port, port_read_delegate &&cb) { downcast<msm6253_device &>(device).m_analog_input_cb[port] = std::move(cb); }
+	// configuration
+	void set_input_tag(int port, const char *tag) { m_analog_ports[port].set_tag(tag); }
+	template <typename Object> void set_input_cb(int port, Object &&cb) { m_analog_input_cb[port] = std::forward<Object>(cb); }
 
 	// write handlers
 	WRITE8_MEMBER(address_w);

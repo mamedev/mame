@@ -1077,10 +1077,10 @@ MACHINE_CONFIG_START(stv_state::stv)
 	MCFG_CPU_PROGRAM_MAP(sound_mem)
 
 	MCFG_SEGA_SCU_ADD("scu")
-	sega_scu_device::static_set_hostcpu(*device, "maincpu");
+	downcast<sega_scu_device &>(*device).set_hostcpu("maincpu");
 
 	MCFG_SMPC_HLE_ADD("smpc", XTAL(4'000'000))
-	smpc_hle_device::static_set_region_code(*device, 0);
+	downcast<smpc_hle_device &>(*device).set_region_code(0);
 	MCFG_SMPC_HLE_PDR1_IN_CB(READ8(stv_state, pdr1_input_r))
 	MCFG_SMPC_HLE_PDR2_IN_CB(READ8(stv_state, pdr2_input_r))
 	MCFG_SMPC_HLE_PDR1_OUT_CB(WRITE8(stv_state, pdr1_output_w))

@@ -536,22 +536,22 @@ MACHINE_CONFIG_END
 
 void pc_state::cfg_dual_720K(device_t *device)
 {
-	device_slot_interface::static_set_default_option(*device->subdevice("fdc:0"), "35dd");
-	device_slot_interface::static_set_default_option(*device->subdevice("fdc:1"), "35dd");
+	dynamic_cast<device_slot_interface &>(*device->subdevice("fdc:0")).set_default_option("35dd");
+	dynamic_cast<device_slot_interface &>(*device->subdevice("fdc:1")).set_default_option("35dd");
 }
 
 void pc_state::cfg_single_360K(device_t *device)
 {
-	device_slot_interface::static_set_default_option(*device->subdevice("fdc:0"), "525dd");
-	device_slot_interface::static_set_fixed(*device->subdevice("fdc:0"), true);
-	device_slot_interface::static_set_default_option(*device->subdevice("fdc:1"), "");
+	dynamic_cast<device_slot_interface &>(*device->subdevice("fdc:0")).set_default_option("525dd");
+	dynamic_cast<device_slot_interface &>(*device->subdevice("fdc:0")).set_fixed(true);
+	dynamic_cast<device_slot_interface &>(*device->subdevice("fdc:1")).set_default_option("");
 }
 
 void pc_state::cfg_single_720K(device_t *device)
 {
-	device_slot_interface::static_set_default_option(*device->subdevice("fdc:0"), "35dd");
-	device_slot_interface::static_set_fixed(*device->subdevice("fdc:0"), true);
-	device_slot_interface::static_set_default_option(*device->subdevice("fdc:1"), "");
+	dynamic_cast<device_slot_interface &>(*device->subdevice("fdc:0")).set_default_option("35dd");
+	dynamic_cast<device_slot_interface &>(*device->subdevice("fdc:0")).set_fixed(true);
+	dynamic_cast<device_slot_interface &>(*device->subdevice("fdc:1")).set_default_option("");
 }
 
 //Data General One

@@ -45,40 +45,40 @@
 //**************************************************************************
 
 #define MCFG_MC68901_TIMER_CLOCK(_clk) \
-	mc68901_device::set_timer_clock(*device, _clk);
+	downcast<mc68901_device &>(*device).set_timer_clock(_clk);
 
 #define MCFG_MC68901_RX_CLOCK(_clk) \
-	mc68901_device::set_rx_clock(*device, _clk);
+	downcast<mc68901_device &>(*device).set_rx_clock(_clk);
 
 #define MCFG_MC68901_TX_CLOCK(_clk) \
-	mc68901_device::set_tx_clock(*device, _clk);
+	downcast<mc68901_device &>(*device).set_tx_clock(_clk);
 
 #define MCFG_MC68901_OUT_IRQ_CB(_devcb) \
-	devcb = &mc68901_device::set_out_irq_callback(*device, DEVCB_##_devcb);
+	devcb = &downcast<mc68901_device &>(*device).set_out_irq_callback(DEVCB_##_devcb);
 
 #define MCFG_MC68901_OUT_GPIO_CB(_devcb) \
-	devcb = &mc68901_device::set_out_gpio_callback(*device, DEVCB_##_devcb);
+	devcb = &downcast<mc68901_device &>(*device).set_out_gpio_callback(DEVCB_##_devcb);
 
 #define MCFG_MC68901_OUT_TAO_CB(_devcb) \
-	devcb = &mc68901_device::set_out_tao_callback(*device, DEVCB_##_devcb);
+	devcb = &downcast<mc68901_device &>(*device).set_out_tao_callback(DEVCB_##_devcb);
 
 #define MCFG_MC68901_OUT_TBO_CB(_devcb) \
-	devcb = &mc68901_device::set_out_tbo_callback(*device, DEVCB_##_devcb);
+	devcb = &downcast<mc68901_device &>(*device).set_out_tbo_callback(DEVCB_##_devcb);
 
 #define MCFG_MC68901_OUT_TCO_CB(_devcb) \
-	devcb = &mc68901_device::set_out_tco_callback(*device, DEVCB_##_devcb);
+	devcb = &downcast<mc68901_device &>(*device).set_out_tco_callback(DEVCB_##_devcb);
 
 #define MCFG_MC68901_OUT_TDO_CB(_devcb) \
-	devcb = &mc68901_device::set_out_tdo_callback(*device, DEVCB_##_devcb);
+	devcb = &downcast<mc68901_device &>(*device).set_out_tdo_callback(DEVCB_##_devcb);
 
 #define MCFG_MC68901_OUT_SO_CB(_devcb) \
-	devcb = &mc68901_device::set_out_so_callback(*device, DEVCB_##_devcb);
+	devcb = &downcast<mc68901_device &>(*device).set_out_so_callback(DEVCB_##_devcb);
 
 /*#define MCFG_MC68901_OUT_RR_CB(_devcb) \
-    devcb = &mc68901_device::set_out_rr_callback(*device, DEVCB_##_devcb);
+    devcb = &downcast<mc68901_device &>(*device).set_out_rr_callback(DEVCB_##_devcb);
 
 #define MCFG_MC68901_OUT_TR_CB(_devcb) \
-    devcb = &mc68901_device::set_out_tr_callback(*device, DEVCB_##_devcb);*/
+    devcb = &downcast<mc68901_device &>(*device).set_out_tr_callback(DEVCB_##_devcb);*/
 
 
 //**************************************************************************
@@ -95,21 +95,21 @@ public:
 	// construction/destruction
 	mc68901_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
-	static void set_timer_clock(device_t &device, int timer_clock) { downcast<mc68901_device &>(device).m_timer_clock = timer_clock; }
-	static void set_rx_clock(device_t &device, int rx_clock) { downcast<mc68901_device &>(device).m_rx_clock = rx_clock; }
-	static void set_tx_clock(device_t &device, int tx_clock) { downcast<mc68901_device &>(device).m_tx_clock = tx_clock; }
-	static void set_timer_clock(device_t &device, const XTAL &xtal) { set_timer_clock(device, xtal.value()); }
-	static void set_rx_clock(device_t &device, const XTAL &xtal) { set_rx_clock(device, xtal.value()); }
-	static void set_tx_clock(device_t &device, const XTAL &xtal) { set_tx_clock(device, xtal.value()); }
-	template <class Object> static devcb_base &set_out_irq_callback(device_t &device, Object &&cb) { return downcast<mc68901_device &>(device).m_out_irq_cb.set_callback(std::forward<Object>(cb)); }
-	template <class Object> static devcb_base &set_out_gpio_callback(device_t &device, Object &&cb) { return downcast<mc68901_device &>(device).m_out_gpio_cb.set_callback(std::forward<Object>(cb)); }
-	template <class Object> static devcb_base &set_out_tao_callback(device_t &device, Object &&cb) { return downcast<mc68901_device &>(device).m_out_tao_cb.set_callback(std::forward<Object>(cb)); }
-	template <class Object> static devcb_base &set_out_tbo_callback(device_t &device, Object &&cb) { return downcast<mc68901_device &>(device).m_out_tbo_cb.set_callback(std::forward<Object>(cb)); }
-	template <class Object> static devcb_base &set_out_tco_callback(device_t &device, Object &&cb) { return downcast<mc68901_device &>(device).m_out_tco_cb.set_callback(std::forward<Object>(cb)); }
-	template <class Object> static devcb_base &set_out_tdo_callback(device_t &device, Object &&cb) { return downcast<mc68901_device &>(device).m_out_tdo_cb.set_callback(std::forward<Object>(cb)); }
-	template <class Object> static devcb_base &set_out_so_callback(device_t &device, Object &&cb) { return downcast<mc68901_device &>(device).m_out_so_cb.set_callback(std::forward<Object>(cb)); }
-	//template <class Object> static devcb_base &set_rr_callback(device_t &device, Object &&cb) { return downcast<mc68901_device &>(device).m_out_rr_cb.set_callback(std::forward<Object>(cb)); }
-	//template <class Object> static devcb_base &set_tr_callback(device_t &device, Object &&cb) { return downcast<mc68901_device &>(device).m_out_tr_cb.set_callback(std::forward<Object>(cb)); }
+	void set_timer_clock(int timer_clock) { m_timer_clock = timer_clock; }
+	void set_rx_clock(int rx_clock) { m_rx_clock = rx_clock; }
+	void set_tx_clock(int tx_clock) { m_tx_clock = tx_clock; }
+	void set_timer_clock(const XTAL &xtal) { set_timer_clock(xtal.value()); }
+	void set_rx_clock(const XTAL &xtal) { set_rx_clock(xtal.value()); }
+	void set_tx_clock(const XTAL &xtal) { set_tx_clock(xtal.value()); }
+	template <class Object> devcb_base &set_out_irq_callback(Object &&cb) { return m_out_irq_cb.set_callback(std::forward<Object>(cb)); }
+	template <class Object> devcb_base &set_out_gpio_callback(Object &&cb) { return m_out_gpio_cb.set_callback(std::forward<Object>(cb)); }
+	template <class Object> devcb_base &set_out_tao_callback(Object &&cb) { return m_out_tao_cb.set_callback(std::forward<Object>(cb)); }
+	template <class Object> devcb_base &set_out_tbo_callback(Object &&cb) { return m_out_tbo_cb.set_callback(std::forward<Object>(cb)); }
+	template <class Object> devcb_base &set_out_tco_callback(Object &&cb) { return m_out_tco_cb.set_callback(std::forward<Object>(cb)); }
+	template <class Object> devcb_base &set_out_tdo_callback(Object &&cb) { return m_out_tdo_cb.set_callback(std::forward<Object>(cb)); }
+	template <class Object> devcb_base &set_out_so_callback(Object &&cb) { return m_out_so_cb.set_callback(std::forward<Object>(cb)); }
+	//template <class Object> devcb_base &set_rr_callback(Object &&cb) { return m_out_rr_cb.set_callback(std::forward<Object>(cb)); }
+	//template <class Object> devcb_base &set_tr_callback(Object &&cb) { return m_out_tr_cb.set_callback(std::forward<Object>(cb)); }
 
 	DECLARE_READ8_MEMBER( read );
 	DECLARE_WRITE8_MEMBER( write );

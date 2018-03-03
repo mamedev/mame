@@ -37,27 +37,27 @@
 	MCFG_DEVICE_ADD(_tag, STEPPER, 0)
 
 #define MCFG_STEPPER_REEL_TYPE(_data) \
-	stepper_device::set_reel_type(*device, _data);
+	downcast<stepper_device &>(*device).set_reel_type(_data);
 
 /* total size of reel (in half steps) */
 #define MCFG_STEPPER_MAX_STEPS(_write) \
-	stepper_device::set_max_steps(*device, _write);
+	downcast<stepper_device &>(*device).set_max_steps(_write);
 
 /* start position of index (in half steps) */
 #define MCFG_STEPPER_START_INDEX(_write) \
-	stepper_device::set_start_index(*device, _write);
+	downcast<stepper_device &>(*device).set_start_index(_write);
 
 /* end position of index (in half steps) */
 #define MCFG_STEPPER_END_INDEX(_write) \
-	stepper_device::set_end_index(*device, _write);
+	downcast<stepper_device &>(*device).set_end_index(_write);
 
 /* end position of index (in half steps) */
 #define MCFG_STEPPER_INDEX_PATTERN(_write) \
-	stepper_device::set_index_pattern(*device, _write);
+	downcast<stepper_device &>(*device).set_index_pattern(_write);
 
 /* Phase at 0, for opto linkage */
 #define MCFG_STEPPER_INIT_PHASE(_write) \
-	stepper_device::set_init_phase(*device, _write);
+	downcast<stepper_device &>(*device).set_init_phase(_write);
 
 #define MCFG_STARPOINT_48STEP_ADD(_tag)\
 	MCFG_STEPPER_ADD(_tag)\
@@ -95,7 +95,7 @@
 	MCFG_STEPPER_INIT_PHASE(7)
 
 #define MCFG_STEPPER_OPTIC_CALLBACK(_write) \
-	devcb = &stepper_device::set_optic_handler(*device, DEVCB_##_write);
+	devcb = &downcast<stepper_device &>(*device).set_optic_handler(DEVCB_##_write);
 
 DECLARE_DEVICE_TYPE(STEPPER, stepper_device)
 
@@ -104,11 +104,11 @@ class stepper_device : public device_t
 public:
 	stepper_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
-	template <class Object> static devcb_base &set_optic_handler(device_t &device, Object &&cb) { return downcast<stepper_device &>(device).m_optic_cb.set_callback(std::forward<Object>(cb)); }
+	template <class Object> devcb_base &set_optic_handler(Object &&cb) { return m_optic_cb.set_callback(std::forward<Object>(cb)); }
 
-	static void set_reel_type(device_t &device, uint8_t type)
+	void set_reel_type(uint8_t type)
 	{
-		downcast<stepper_device &>(device).m_type = type;
+		m_type = type;
 		switch ( type )
 		{
 		default:
@@ -117,33 +117,28 @@ public:
 		case MPU3_48STEP_REEL :
 		case GAMESMAN_48STEP_REEL :  /* Gamesman GMxxxx */
 		case PROJECT_48STEP_REEL :
-			downcast<stepper_device &>(device).m_max_steps = (48*2);
+			m_max_steps = (48*2);
 			break;
 		case GAMESMAN_100STEP_REEL :
-			downcast<stepper_device &>(device).m_max_steps = (100*2);
+			m_max_steps = (100*2);
 			break;
 		case STARPOINT_144STEP_DICE :/* STARPOINT 1DCU DICE mechanism */
 			//Dice reels are 48 step motors, but complete three full cycles between opto updates
-			downcast<stepper_device &>(device).m_max_steps = ((48*3)*2);
+			m_max_steps = ((48*3)*2);
 			break;
 		case STARPOINT_200STEP_REEL :
 		case GAMESMAN_200STEP_REEL :
 		case ECOIN_200STEP_REEL :
-			downcast<stepper_device &>(device).m_max_steps = (200*2);
+			m_max_steps = (200*2);
 			break;
 		}
 	}
 
-	static void set_max_steps(device_t &device, int16_t steps) { downcast<stepper_device &>(device).m_max_steps = steps; }
-	static void set_start_index(device_t &device, int16_t index) { downcast<stepper_device &>(device).m_index_start = index; }
-	static void set_end_index(device_t &device, int16_t index) { downcast<stepper_device &>(device).m_index_end = index; }
-	static void set_index_pattern(device_t &device, int16_t index) { downcast<stepper_device &>(device).m_index_patt = index; }
-	static void set_init_phase(device_t &device, uint8_t phase)
-	{
-		downcast<stepper_device &>(device).m_initphase = phase;
-		downcast<stepper_device &>(device).m_phase = phase;
-		downcast<stepper_device &>(device).m_old_phase = phase;
-	}
+	void set_max_steps(int16_t steps) { m_max_steps = steps; }
+	void set_start_index(int16_t index) { m_index_start = index; }
+	void set_end_index(int16_t index) { m_index_end = index; }
+	void set_index_pattern(int16_t index) { m_index_patt = index; }
+	void set_init_phase(uint8_t phase) { m_initphase = phase; m_phase = phase; m_old_phase = phase; }
 
 	/* update a motor */
 	int update(uint8_t pattern);

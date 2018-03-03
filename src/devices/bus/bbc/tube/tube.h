@@ -54,7 +54,7 @@
 	MCFG_DEVICE_SLOT_INTERFACE(_slot_intf, _def_slot, false)
 
 #define MCFG_BBC_TUBE_SLOT_IRQ_HANDLER(_devcb) \
-	devcb = &bbc_tube_slot_device::set_irq_handler(*device, DEVCB_##_devcb);
+	devcb = &downcast<bbc_tube_slot_device &>(*device).set_irq_handler(DEVCB_##_devcb);
 
 
 //**************************************************************************
@@ -74,8 +74,7 @@ public:
 	virtual ~bbc_tube_slot_device();
 
 	// callbacks
-	template <class Object> static devcb_base &set_irq_handler(device_t &device, Object &&cb)
-	{ return downcast<bbc_tube_slot_device &>(device).m_irq_handler.set_callback(std::forward<Object>(cb)); }
+	template <class Object> devcb_base &set_irq_handler(Object &&cb) { return m_irq_handler.set_callback(std::forward<Object>(cb)); }
 
 	DECLARE_READ8_MEMBER( host_r );
 	DECLARE_WRITE8_MEMBER( host_w );

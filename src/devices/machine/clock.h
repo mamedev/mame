@@ -10,14 +10,14 @@
 	MCFG_DEVICE_ADD(_tag, CLOCK, _clock)
 
 #define MCFG_CLOCK_SIGNAL_HANDLER(_devcb) \
-	devcb = &clock_device::set_signal_handler(*device, DEVCB_##_devcb);
+	devcb = &downcast<clock_device &>(*device).set_signal_handler(DEVCB_##_devcb);
 
 class clock_device : public device_t
 {
 public:
 	clock_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
-	template <class Object> static devcb_base &set_signal_handler(device_t &device, Object &&cb) { return downcast<clock_device &>(device).m_signal_handler.set_callback(std::forward<Object>(cb)); }
+	template <class Object> devcb_base &set_signal_handler(Object &&cb) { return m_signal_handler.set_callback(std::forward<Object>(cb)); }
 
 protected:
 	virtual void device_start() override;

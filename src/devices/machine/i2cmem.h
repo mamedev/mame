@@ -30,19 +30,19 @@
 	MCFG_DEVICE_ADD( _tag, I2CMEM, 0 )
 
 #define MCFG_I2CMEM_ADDRESS( address ) \
-	i2cmem_device::set_address(*device, address);
+	downcast<i2cmem_device &>(*device).set_address(address);
 #define MCFG_I2CMEM_PAGE_SIZE( page_size ) \
-	i2cmem_device::set_page_size(*device, page_size);
+	downcast<i2cmem_device &>(*device).set_page_size(page_size);
 #define MCFG_I2CMEM_DATA_SIZE(data_size) \
-	i2cmem_device::set_data_size(*device, data_size);
+	downcast<i2cmem_device &>(*device).set_data_size(data_size);
 #define MCFG_I2CMEM_E0(e0) \
-	i2cmem_device::set_e0(*device, e0);
+	downcast<i2cmem_device &>(*device).set_e0(e0);
 #define MCFG_I2CMEM_E1(e1) \
-	i2cmem_device::set_e1(*device, e1);
+	downcast<i2cmem_device &>(*device).set_e1(e1);
 #define MCFG_I2CMEM_E2(e2) \
-	i2cmem_device::set_e2(*device, e2);
+	downcast<i2cmem_device &>(*device).set_e2(e2);
 #define MCFG_I2CMEM_WC(wc) \
-	i2cmem_device::set_wc(*device, wc);
+	downcast<i2cmem_device &>(*device).set_wc(wc);
 
 #define MCFG_X2404P_ADD( _tag ) \
 	MCFG_I2CMEM_ADD( _tag ) \
@@ -91,13 +91,13 @@ public:
 	// construction/destruction
 	i2cmem_device( const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock );
 
-	static void set_address(device_t &device, int address) { downcast<i2cmem_device &>(device).m_slave_address = address; }
-	static void set_page_size(device_t &device, int page_size) { downcast<i2cmem_device &>(device).m_page_size = page_size; }
-	static void set_data_size(device_t &device, int data_size) { downcast<i2cmem_device &>(device).m_data_size = data_size; }
-	static void set_e0(device_t &device, int e0) { downcast<i2cmem_device &>(device).m_e0 = e0; }
-	static void set_e1(device_t &device, int e1) { downcast<i2cmem_device &>(device).m_e1 = e1; }
-	static void set_e2(device_t &device, int e2) { downcast<i2cmem_device &>(device).m_e2 = e2; }
-	static void set_wc(device_t &device, int wc) { downcast<i2cmem_device &>(device).m_wc = wc; }
+	void set_address(int address) { m_slave_address = address; }
+	void set_page_size(int page_size) { m_page_size = page_size; }
+	void set_data_size(int data_size) { m_data_size = data_size; }
+	void set_e0(int e0) { m_e0 = e0; }
+	void set_e1(int e1) { m_e1 = e1; }
+	void set_e2(int e2) { m_e2 = e2; }
+	void set_wc(int wc) { m_wc = wc; }
 
 	// I/O operations
 	DECLARE_WRITE_LINE_MEMBER( write_e0 );

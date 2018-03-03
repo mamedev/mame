@@ -877,7 +877,7 @@ void rainbow_state::machine_start()
 	m_SCREEN_BLANK = false;
 
 	cpu_device *maincpu = machine().device<cpu_device>("maincpu");
-	device_execute_interface::static_set_irq_acknowledge_callback(*maincpu, device_irq_acknowledge_delegate(FUNC(rainbow_state::irq_callback), this));
+	maincpu->set_irq_acknowledge_callback(device_irq_acknowledge_delegate(FUNC(rainbow_state::irq_callback), this));
 
 	save_item(NAME(m_z80_private));
 	save_item(NAME(m_z80_mailbox));

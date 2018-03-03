@@ -61,7 +61,7 @@ enum
 
 
 #define MCFG_LH5801_IN(_devcb) \
-	devcb = &lh5801_cpu_device::set_in_func(*device, DEVCB_##_devcb);
+	devcb = &downcast<lh5801_cpu_device &>(*device).set_in_func(DEVCB_##_devcb);
 
 
 class lh5801_cpu_device :  public cpu_device
@@ -70,8 +70,8 @@ public:
 	// construction/destruction
 	lh5801_cpu_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
-	// static configuration helpers
-	template <class Object> static devcb_base &set_in_func(device_t &device, Object &&cb) { return downcast<lh5801_cpu_device &>(device).m_in_func.set_callback(std::forward<Object>(cb)); }
+	// configuration helpers
+	template <class Object> devcb_base &set_in_func(Object &&cb) { return m_in_func.set_callback(std::forward<Object>(cb)); }
 
 protected:
 	// device-level overrides

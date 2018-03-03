@@ -52,9 +52,9 @@ enum
 
 
 #define MCFG_M6801_SC2(_devcb) \
-	devcb = &m6801_cpu_device::set_out_sc2_func(*device, DEVCB_##_devcb);
+	devcb = &downcast<m6801_cpu_device &>(*device).set_out_sc2_func(DEVCB_##_devcb);
 #define MCFG_M6801_SER_TX(_devcb) \
-	devcb = &m6801_cpu_device::set_out_sertx_func(*device, DEVCB_##_devcb);
+	devcb = &downcast<m6801_cpu_device &>(*device).set_out_sertx_func(DEVCB_##_devcb);
 
 
 class m6801_cpu_device : public m6800_cpu_device
@@ -62,9 +62,9 @@ class m6801_cpu_device : public m6800_cpu_device
 public:
 	m6801_cpu_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
-	// static configuration helpers
-	template<class _Object> static devcb_base &set_out_sc2_func(device_t &device, _Object object) { return downcast<m6801_cpu_device &>(device).m_out_sc2_func.set_callback(object); }
-	template<class _Object> static devcb_base &set_out_sertx_func(device_t &device, _Object object) { return downcast<m6801_cpu_device &>(device).m_out_sertx_func.set_callback(object); }
+	// configuration helpers
+	template<class Object> devcb_base &set_out_sc2_func(Object &&cb) { return m_out_sc2_func.set_callback(std::forward<Object>(cb)); }
+	template<class Object> devcb_base &set_out_sertx_func(Object &&cb) { return m_out_sertx_func.set_callback(std::forward<Object>(cb)); }
 
 	DECLARE_READ8_MEMBER( m6801_io_r );
 	DECLARE_WRITE8_MEMBER( m6801_io_w );

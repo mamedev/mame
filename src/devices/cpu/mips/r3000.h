@@ -19,19 +19,19 @@
 ***************************************************************************/
 
 #define MCFG_R3000_ENDIANNESS(_endianness) \
-	r3000_device::static_set_endianness(*device, _endianness);
+	downcast<r3000_device &>(*device).set_endianness(_endianness);
 
 #define MCFG_R3000_BRCOND0_INPUT(_devcb) \
-	devcb = &r3000_device::static_set_brcond0_input(*device, DEVCB_##_devcb);
+	devcb = &downcast<r3000_device &>(*device).set_brcond0_input(DEVCB_##_devcb);
 
 #define MCFG_R3000_BRCOND1_INPUT(_devcb) \
-	devcb = &r3000_device::static_set_brcond1_input(*device, DEVCB_##_devcb);
+	devcb = &downcast<r3000_device &>(*device).set_brcond1_input(DEVCB_##_devcb);
 
 #define MCFG_R3000_BRCOND2_INPUT(_devcb) \
-	devcb = &r3000_device::static_set_brcond2_input(*device, DEVCB_##_devcb);
+	devcb = &downcast<r3000_device &>(*device).set_brcond2_input(DEVCB_##_devcb);
 
 #define MCFG_R3000_BRCOND3_INPUT(_devcb) \
-	devcb = &r3000_device::static_set_brcond3_input(*device, DEVCB_##_devcb);
+	devcb = &downcast<r3000_device &>(*device).set_brcond3_input(DEVCB_##_devcb);
 
 
 /***************************************************************************
@@ -73,30 +73,12 @@ public:
 	virtual ~r3000_device();
 
 	// inline configuration helpers
-	static void static_set_endianness(device_t &device, endianness_t endianness)
-	{
-		downcast<r3000_device &>(device).m_endianness = endianness;
-	}
+	void set_endianness(endianness_t endianness) { m_endianness = endianness; }
 
-	template <class Object> static devcb_base &static_set_brcond0_input(device_t &device, Object &&cb)
-	{
-		return downcast<r3000_device &>(device).m_in_brcond0.set_callback(std::forward<Object>(cb));
-	}
-
-	template <class Object> static devcb_base &static_set_brcond1_input(device_t &device, Object &&cb)
-	{
-		return downcast<r3000_device &>(device).m_in_brcond1.set_callback(std::forward<Object>(cb));
-	}
-
-	template <class Object> static devcb_base &static_set_brcond2_input(device_t &device, Object &&cb)
-	{
-		return downcast<r3000_device &>(device).m_in_brcond2.set_callback(std::forward<Object>(cb));
-	}
-
-	template <class Object> static devcb_base &static_set_brcond3_input(device_t &device, Object &&cb)
-	{
-		return downcast<r3000_device &>(device).m_in_brcond3.set_callback(std::forward<Object>(cb));
-	}
+	template <class Object> devcb_base &set_brcond0_input(Object &&cb) { return m_in_brcond0.set_callback(std::forward<Object>(cb)); }
+	template <class Object> devcb_base &set_brcond1_input(Object &&cb) { return m_in_brcond1.set_callback(std::forward<Object>(cb)); }
+	template <class Object> devcb_base &set_brcond2_input(Object &&cb) { return m_in_brcond2.set_callback(std::forward<Object>(cb)); }
+	template <class Object> devcb_base &set_brcond3_input(Object &&cb) { return m_in_brcond3.set_callback(std::forward<Object>(cb)); }
 
 protected:
 	enum chip_type

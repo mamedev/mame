@@ -217,16 +217,6 @@ s3c2400_device::~s3c2400_device()
 }
 
 //-------------------------------------------------
-//  static_set_palette_tag: Set the tag of the
-//  palette device
-//-------------------------------------------------
-
-void s3c2400_device::static_set_palette_tag(device_t &device, const char *tag)
-{
-	downcast<s3c2400_device &>(device).m_palette.set_tag(tag);
-}
-
-//-------------------------------------------------
 //  device_start - device-specific startup
 //-------------------------------------------------
 

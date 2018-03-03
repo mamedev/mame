@@ -82,15 +82,15 @@
 //**************************************************************************
 
 #define MCFG_HP_HIL_INT_CALLBACK(_devcb) \
-	devcb = &hp_hil_mlc_device::set_int_callback(*device, DEVCB_##_devcb);
+	devcb = &downcast<hp_hil_mlc_device &>(*device).set_int_callback(DEVCB_##_devcb);
 
 #define MCFG_HP_HIL_NMI_CALLBACK(_devcb) \
-	devcb = &hp_hil_mlc_device::set_nmi_callback(*device, DEVCB_##_devcb);
+	devcb = &downcast<hp_hil_mlc_device &>(*device).set_nmi_callback(DEVCB_##_devcb);
 
 #define MCFG_HP_HIL_SLOT_ADD(_mlc_tag, _tag, _slot_intf, _def_slot) \
 	MCFG_DEVICE_ADD(_tag, HP_HIL_SLOT, 0) \
 	MCFG_DEVICE_SLOT_INTERFACE(_slot_intf, _def_slot, false) \
-	hp_hil_slot_device::static_set_hp_hil_slot(*device, this, _mlc_tag);
+	downcast<hp_hil_slot_device &>(*device).set_hp_hil_slot(this, _mlc_tag);
 
 //**************************************************************************
 //  TYPE DEFINITIONS
@@ -107,7 +107,7 @@ public:
 	virtual void device_start() override;
 
 	// inline configuration
-	static void static_set_hp_hil_slot(device_t &device, device_t *owner, const char *mlc_tag);
+	void set_hp_hil_slot(device_t *owner, const char *mlc_tag) { m_owner = owner; m_mlc_tag = mlc_tag; }
 
 protected:
 	// configuration
@@ -129,8 +129,8 @@ public:
 	hp_hil_mlc_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 	~hp_hil_mlc_device() { m_device_list.detach_all(); }
 
-	template <class Object> static devcb_base &set_int_callback(device_t &device, Object &&cb) { return downcast<hp_hil_mlc_device &>(device).int_cb.set_callback(std::forward<Object>(cb)); }
-	template <class Object> static devcb_base &set_nmi_callback(device_t &device, Object &&cb) { return downcast<hp_hil_mlc_device &>(device).nmi_cb.set_callback(std::forward<Object>(cb)); }
+	template <class Object> devcb_base &set_int_callback(Object &&cb) { return int_cb.set_callback(std::forward<Object>(cb)); }
+	template <class Object> devcb_base &set_nmi_callback(Object &&cb) { return nmi_cb.set_callback(std::forward<Object>(cb)); }
 
 	void add_hp_hil_device(device_hp_hil_interface *device);
 	bool get_int(void) { return m_r3 & 1; }
@@ -176,7 +176,7 @@ public:
 	void set_hp_hil_mlc_device();
 
 	// inline configuration
-	static void static_set_hp_hil_mlc(device_t &device, device_t *mlc_device);
+	void set_hp_hil_mlc(device_t *mlc_device) { m_hp_hil_mlc_dev = mlc_device; }
 
 	virtual bool hil_write(uint16_t *data) { return true; };
 	int device_id() { return m_device_id; };

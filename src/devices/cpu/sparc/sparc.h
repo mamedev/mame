@@ -20,7 +20,7 @@
 
 // TODO: when there are more SPARC CPUs, move setter to a base class
 #define MCFG_SPARC_ADD_ASI_DESC(desc) \
-	mb86901_device::add_asi_desc(*device, [](sparc_disassembler *dasm) { dasm->add_asi_desc(desc); });
+	downcast<mb86901_device &>(*device).add_asi_desc([](sparc_disassembler *dasm) { dasm->add_asi_desc(desc); });
 
 class mb86901_device : public cpu_device, protected sparc_disassembler::config
 {
@@ -51,7 +51,7 @@ public:
 	uint8_t get_asi() { return m_asi; }
 	uint32_t pc() { return m_pc; }
 
-	static void add_asi_desc(device_t &device, std::function<void (sparc_disassembler *)> f) { downcast<mb86901_device &>(device).m_asi_desc_adder = f; }
+	void add_asi_desc(std::function<void (sparc_disassembler *)> f) { m_asi_desc_adder = f; }
 
 #if LOG_FCODES
 	void enable_log_fcodes(bool enable) { m_log_fcodes = enable; }

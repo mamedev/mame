@@ -8,13 +8,13 @@
 #include "z80daisy.h"
 
 #define MCFG_Z80_SET_IRQACK_CALLBACK(_devcb) \
-	devcb = &z80_device::set_irqack_cb(*device, DEVCB_##_devcb);
+	devcb = &downcast<z80_device &>(*device).set_irqack_cb(DEVCB_##_devcb);
 
 #define MCFG_Z80_SET_REFRESH_CALLBACK(_devcb) \
-	devcb = &z80_device::set_refresh_cb(*device, DEVCB_##_devcb);
+	devcb = &downcast<z80_device &>(*device).set_refresh_cb(DEVCB_##_devcb);
 
 #define MCFG_Z80_SET_HALT_CALLBACK(_devcb) \
-	devcb = &z80_device::set_halt_cb(*device, DEVCB_##_devcb);
+	devcb = &downcast<z80_device &>(*device).set_halt_cb(DEVCB_##_devcb);
 
 enum
 {
@@ -42,9 +42,9 @@ public:
 	z80_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
 	void z80_set_cycle_tables(const uint8_t *op, const uint8_t *cb, const uint8_t *ed, const uint8_t *xy, const uint8_t *xycb, const uint8_t *ex);
-	template<class _Object> static devcb_base &set_irqack_cb(device_t &device, _Object object) { return downcast<z80_device &>(device).m_irqack_cb.set_callback(object); }
-	template<class _Object> static devcb_base &set_refresh_cb(device_t &device, _Object object) { return downcast<z80_device &>(device).m_refresh_cb.set_callback(object); }
-	template<class _Object> static devcb_base &set_halt_cb(device_t &device, _Object object) { return downcast<z80_device &>(device).m_halt_cb.set_callback(object); }
+	template<class Object> devcb_base &set_irqack_cb(Object &&cb) { return m_irqack_cb.set_callback(std::forward<Object>(cb)); }
+	template<class Object> devcb_base &set_refresh_cb(Object &&cb) { return m_refresh_cb.set_callback(std::forward<Object>(cb)); }
+	template<class Object> devcb_base &set_halt_cb(Object &&cb) { return m_halt_cb.set_callback(std::forward<Object>(cb)); }
 
 protected:
 	z80_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock);

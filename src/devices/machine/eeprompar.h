@@ -40,7 +40,7 @@
 
 // true when external circuit is used to lock EEPROM after every write
 #define MCFG_EEPROM_28XX_LOCK_AFTER_WRITE(_lock) \
-	eeprom_parallel_28xx_device::static_set_lock_after_write(*device, _lock);
+	downcast<eeprom_parallel_28xx_device &>(*device).set_lock_after_write(_lock);
 
 
 //**************************************************************************
@@ -68,8 +68,8 @@ protected:
 class eeprom_parallel_28xx_device : public eeprom_parallel_base_device
 {
 public:
-	// static configuration helpers
-	static void static_set_lock_after_write(device_t &device, bool lock);
+	// configuration helpers
+	void set_lock_after_write(bool lock) { m_lock_after_write = lock; }
 
 	// read/write data lines
 	DECLARE_WRITE8_MEMBER(write);

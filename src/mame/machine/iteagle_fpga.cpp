@@ -689,7 +689,7 @@ void iteagle_eeprom_device::device_start()
 	}
 	m_iteagle_default_eeprom[0x3f] = checkSum;
 
-	eeprom_base_device::static_set_default_data(*m_eeprom, m_iteagle_default_eeprom.data(), 0x80);
+	m_eeprom->set_default_data(m_iteagle_default_eeprom.data(), 0x80);
 
 	pci_device::device_start();
 	skip_map_regs(1);

@@ -20,20 +20,20 @@
 //**************************************************************************
 
 #define MCFG_EEPROM_SIZE(_cells, _cellbits) \
-	eeprom_base_device::static_set_size(*device, _cells, _cellbits);
+	downcast<eeprom_base_device &>(*device).set_size(_cells, _cellbits);
 #define MCFG_EEPROM_DATA(_data, _size) \
-	eeprom_base_device::static_set_default_data(*device, _data, _size);
+	downcast<eeprom_base_device &>(*device).set_default_data(_data, _size);
 #define MCFG_EEPROM_DEFAULT_VALUE(_value) \
-	eeprom_base_device::static_set_default_value(*device, _value);
+	downcast<eeprom_base_device &>(*device).set_default_value(_value);
 
 #define MCFG_EEPROM_WRITE_TIME(_value) \
-	eeprom_base_device::static_set_timing(*device, eeprom_base_device::WRITE_TIME, _value);
+	downcast<eeprom_base_device &>(*device).set_timing(eeprom_base_device::WRITE_TIME, _value);
 #define MCFG_EEPROM_WRITE_ALL_TIME(_value) \
-	eeprom_base_device::static_set_timing(*device, eeprom_base_device::WRITE_ALL_TIME, _value);
+	downcast<eeprom_base_device &>(*device).set_timing(eeprom_base_device::WRITE_ALL_TIME, _value);
 #define MCFG_EEPROM_ERASE_TIME(_value) \
-	eeprom_base_device::static_set_timing(*device, eeprom_base_device::ERASE_TIME, _value);
+	downcast<eeprom_base_device &>(*device).set_timing(eeprom_base_device::ERASE_TIME, _value);
 #define MCFG_EEPROM_ERASE_ALL_TIME(_value) \
-	eeprom_base_device::static_set_timing(*device, eeprom_base_device::ERASE_ALL_TIME, _value);
+	downcast<eeprom_base_device &>(*device).set_timing(eeprom_base_device::ERASE_ALL_TIME, _value);
 
 
 
@@ -58,11 +58,11 @@ public:
 	};
 
 	// inline configuration helpers
-	static void static_set_size(device_t &device, int cells, int cellbits);
-	static void static_set_default_data(device_t &device, const uint8_t *data, uint32_t size);
-	static void static_set_default_data(device_t &device, const uint16_t *data, uint32_t size);
-	static void static_set_default_value(device_t &device, uint32_t value);
-	static void static_set_timing(device_t &device, timing_type type, const attotime &duration);
+	void set_size(int cells, int cellbits);
+	void set_default_data(const uint8_t *data, uint32_t size);
+	void set_default_data(const uint16_t *data, uint32_t size);
+	void set_default_value(uint32_t value) { m_default_value = value; m_default_value_set = true; }
+	void set_timing(timing_type type, const attotime &duration) { m_operation_time[type] = duration; }
 
 	// read/write/erase data
 	uint32_t read(offs_t address);

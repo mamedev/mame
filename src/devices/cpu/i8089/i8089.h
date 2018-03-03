@@ -23,7 +23,7 @@
 //**************************************************************************
 
 #define MCFG_I8089_DATA_WIDTH(_data_width) \
-	i8089_device::set_data_width(*device, _data_width);
+	downcast<i8089_device &>(*device).set_data_width(_data_width);
 
 #define MCFG_I8089_SINTR1(_sintr1) \
 	devcb = &downcast<i8089_device *>(device)->set_sintr1_callback(DEVCB_##_sintr1);
@@ -53,8 +53,8 @@ public:
 	template <class Object> devcb_base &set_sintr1_callback(Object &&sintr1) { return m_write_sintr1.set_callback(std::forward<Object>(sintr1)); }
 	template <class Object> devcb_base &set_sintr2_callback(Object &&sintr2) { return m_write_sintr2.set_callback(std::forward<Object>(sintr2)); }
 
-	// static configuration helpers
-	static void set_data_width(device_t &device, uint8_t data_width) { downcast<i8089_device &>(device).m_data_width = data_width; }
+	// configuration helpers
+	void set_data_width(uint8_t data_width) { m_data_width = data_width; }
 
 	// input lines
 	DECLARE_WRITE_LINE_MEMBER( ca_w );
