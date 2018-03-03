@@ -38,6 +38,7 @@ MACHINE_CONFIG_START(isa16_svga_cirrus_device::device_add_mconfig)
 	MCFG_PALETTE_ADD("palette", 0x100)
 
 	MCFG_DEVICE_ADD("vga", CIRRUS_GD5430, 0)
+	MCFG_VIDEO_SET_SCREEN("screen")
 MACHINE_CONFIG_END
 
 //-------------------------------------------------
@@ -119,6 +120,7 @@ MACHINE_CONFIG_START(isa16_svga_cirrus_gd542x_device::device_add_mconfig)
 	MCFG_PALETTE_ADD("palette", 0x100)
 
 	MCFG_DEVICE_ADD("vga", CIRRUS_GD5428, 0)
+	MCFG_VIDEO_SET_SCREEN("screen")
 MACHINE_CONFIG_END
 
 //-------------------------------------------------

@@ -84,6 +84,7 @@ MACHINE_CONFIG_START(isa16_vga_gfxultra_device::device_add_mconfig)
 	MCFG_PALETTE_ADD("palette", 0x100)
 
 	MCFG_DEVICE_ADD("vga", ATI_VGA, 0)
+	MCFG_VIDEO_SET_SCREEN("screen")
 MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(isa16_vga_gfxultrapro_device::device_add_mconfig)
@@ -94,6 +95,7 @@ MACHINE_CONFIG_START(isa16_vga_gfxultrapro_device::device_add_mconfig)
 	MCFG_PALETTE_ADD("palette", 0x100)
 
 	MCFG_DEVICE_ADD("vga", ATIMACH32, 0)
+	MCFG_VIDEO_SET_SCREEN("screen")
 MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(isa16_vga_mach64_device::device_add_mconfig)
@@ -104,6 +106,7 @@ MACHINE_CONFIG_START(isa16_vga_mach64_device::device_add_mconfig)
 	MCFG_PALETTE_ADD("palette", 0x100)
 
 	MCFG_DEVICE_ADD("vga", ATIMACH64, 0)
+	MCFG_VIDEO_SET_SCREEN("screen")
 MACHINE_CONFIG_END
 
 //-------------------------------------------------

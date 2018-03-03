@@ -48,6 +48,7 @@ MACHINE_CONFIG_START(isa16_svga_s3_device::device_add_mconfig)
 	MCFG_PALETTE_ADD("palette", 0x100)
 
 	MCFG_DEVICE_ADD("vga", S3_VGA, 0)
+	MCFG_VIDEO_SET_SCREEN("screen")
 MACHINE_CONFIG_END
 
 //-------------------------------------------------
@@ -155,6 +156,7 @@ MACHINE_CONFIG_START(isa16_s3virge_device::device_add_mconfig)
 	MCFG_PALETTE_ADD("palette", 0x100)
 
 	MCFG_DEVICE_ADD("vga", S3VIRGE, 0)
+	MCFG_VIDEO_SET_SCREEN("screen")
 MACHINE_CONFIG_END
 
 //-------------------------------------------------
@@ -237,6 +239,7 @@ MACHINE_CONFIG_START(isa16_s3virgedx_device::device_add_mconfig)
 	MCFG_PALETTE_ADD("palette", 0x100)
 
 	MCFG_DEVICE_ADD("vga", S3VIRGEDX, 0)
+	MCFG_VIDEO_SET_SCREEN("screen")
 MACHINE_CONFIG_END
 
 //-------------------------------------------------
@@ -320,6 +323,7 @@ MACHINE_CONFIG_START(isa16_stealth3d2kpro_device::device_add_mconfig)
 	MCFG_PALETTE_ADD("palette", 0x100)
 
 	MCFG_DEVICE_ADD("vga", S3VIRGEDX1, 0)
+	MCFG_VIDEO_SET_SCREEN("screen")
 MACHINE_CONFIG_END
 
 //-------------------------------------------------

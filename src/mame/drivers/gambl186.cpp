@@ -481,6 +481,7 @@ MACHINE_CONFIG_START(gambl186_state::gambl186)
 
 	MCFG_PALETTE_ADD("palette", 0x100)
 	MCFG_DEVICE_ADD("vga", CIRRUS_GD5428, 0)
+	MCFG_VIDEO_SET_SCREEN("screen")
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")

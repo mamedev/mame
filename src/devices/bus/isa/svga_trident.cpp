@@ -38,6 +38,7 @@ MACHINE_CONFIG_START(isa16_svga_tgui9680_device::device_add_mconfig)
 	MCFG_PALETTE_ADD("palette", 0x100)
 
 	MCFG_DEVICE_ADD("vga", TRIDENT_VGA, 0)
+	MCFG_VIDEO_SET_SCREEN("screen")
 MACHINE_CONFIG_END
 
 //-------------------------------------------------

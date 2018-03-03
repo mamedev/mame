@@ -15,7 +15,7 @@
 
 // ======================> vga_device
 
-class vga_device : public device_t
+class vga_device : public device_t, public device_video_interface
 {
 	friend class ibm8514a_device;
 
@@ -231,7 +231,6 @@ protected:
 
 	emu_timer *m_vblank_timer;
 	required_device<palette_device> m_palette;
-	required_device<screen_device> m_screen;
 };
 
 

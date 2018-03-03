@@ -166,6 +166,7 @@ MACHINE_CONFIG_START(i82371sb_isa_device::device_add_mconfig)
 
 	MCFG_PALETTE_ADD("palette", 0x100)
 	MCFG_DEVICE_ADD("vga", VGA, 0)
+	MCFG_VIDEO_SET_SCREEN("screen")
 	// end-VGA-HACK
 MACHINE_CONFIG_END
 

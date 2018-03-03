@@ -322,6 +322,7 @@ MACHINE_CONFIG_START(photoply_state::photoply)
 
 	MCFG_PALETTE_ADD("palette", 0x100)
 	MCFG_DEVICE_ADD("vga", CIRRUS_GD5446, 0)
+	MCFG_VIDEO_SET_SCREEN("screen")
 
 	MCFG_EEPROM_SERIAL_93C46_ADD("eeprom")
 	MCFG_EEPROM_WRITE_TIME(attotime::from_usec(1))

@@ -91,6 +91,7 @@ MACHINE_CONFIG_START(gaminator_state::gaminator)
 
 	MCFG_PALETTE_ADD("palette", 0x100)
 	MCFG_DEVICE_ADD("vga", GAMTOR_VGA, 0)
+	MCFG_VIDEO_SET_SCREEN("screen")
 
 	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
 	/* unknown sound */

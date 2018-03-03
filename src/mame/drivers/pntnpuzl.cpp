@@ -371,6 +371,7 @@ MACHINE_CONFIG_START(pntnpuzl_state::pntnpuzl)
 
 	MCFG_PALETTE_ADD("palette", 0x100)
 	MCFG_DEVICE_ADD("vga", VGA, 0)
+	MCFG_VIDEO_SET_SCREEN("screen")
 MACHINE_CONFIG_END
 
 ROM_START( pntnpuzl )
