@@ -104,11 +104,11 @@ public:
 		auto &operator[](unsigned n) const { return m_proxies[n]; }
 
 		auto begin() { return std::begin(m_proxies); }
-		auto end() { return std::begin(m_proxies); }
+		auto end() { return std::end(m_proxies); }
 		auto begin() const { return std::begin(m_proxies); }
-		auto end() const { return std::begin(m_proxies); }
+		auto end() const { return std::end(m_proxies); }
 		auto cbegin() const { return std::begin(m_proxies); }
-		auto cend() const { return std::begin(m_proxies); }
+		auto cend() const { return std::end(m_proxies); }
 
 		void resolve() { resolve<0U>(m_proxies); }
 
