@@ -170,7 +170,7 @@ READ16_MEMBER(mcatadv_state::mcat_wd_r)
 }
 
 template<int Chip>
-WRITE16_MEMBER(mcatadv_state::vram_w<0>)
+WRITE16_MEMBER(mcatadv_state::vram_w)
 {
 	COMBINE_DATA(&m_vram[Chip][offset]);
 	m_tilemap[Chip]->mark_tile_dirty(offset / 2);
