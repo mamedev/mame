@@ -267,7 +267,7 @@ uint32_t galpani3_state::screen_update_galpani3(screen_device &screen, bitmap_rg
 				else
 				{
 					SPRITE_DRAW_PIXEL(0x0000);
-					if (m_grap2[0]->m_framebuffer_enable)
+					if (m_grap2[0]->m_framebuffer_enable) // TODO : Opaque drawing 1st framebuffer in real PCB?
 					{
 						FB_DRAW_PIXEL(0, dat1);
 					}
