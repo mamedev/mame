@@ -15,6 +15,14 @@
   ports, descriptions and a lot of things... :)
 
 
+  Pyon Pyon series:
+
+  ぴょんぴょん (Pyon Pyon),                1988 Success / Taiyo Jidoki.
+  くるくるぴょんぴょん (Kuru Kuru Pyon Pyon), 1990 Success / Taiyo Jidoki.
+  ぴょんぴょんジャンプ (Pyon Pyon Jump),     1991 Success / Taiyo Jidoki.
+  スイスイぴょんぴょん (Sui Sui Pyon Pyon),  1992 Success / Taiyo Jidoki.
+
+
 ************************************************************************************
 
   Technical Notes....
@@ -378,6 +386,7 @@
 #include "cpu/z80/z80.h"
 #include "machine/gen_latch.h"
 #include "machine/nvram.h"
+#include "machine/rstbuf.h"
 #include "machine/ticket.h"
 #include "sound/ay8910.h"
 #include "sound/msm5205.h"
@@ -396,8 +405,8 @@ public:
 		m_audiocpu(*this, "audiocpu"),
 		m_v9938(*this, "v9938"),
 		m_adpcm(*this, "adpcm"),
+		m_soundirq(*this, "soundirq"),
 		m_hopper(*this, "hopper"),
-		m_soundlatch(*this, "soundlatch"),
 		m_bank1(*this, "bank1")
 	{ }
 
@@ -405,33 +414,39 @@ public:
 	required_device<cpu_device> m_audiocpu;
 	required_device<v9938_device> m_v9938;
 	required_device<msm5205_device> m_adpcm;
+	required_device<rst_neg_buffer_device> m_soundirq;
 	required_device<ticket_dispenser_device> m_hopper;
-	required_device<generic_latch_8_device> m_soundlatch;
 	required_memory_bank m_bank1;
 
-	uint8_t m_sound_irq_cause;
 	uint8_t m_adpcm_data;
 
 	DECLARE_WRITE8_MEMBER(kurukuru_out_latch_w);
 	DECLARE_WRITE8_MEMBER(kurukuru_bankswitch_w);
-	DECLARE_WRITE8_MEMBER(kurukuru_soundlatch_w);
-	DECLARE_READ8_MEMBER(kurukuru_soundlatch_r);
 	DECLARE_WRITE8_MEMBER(kurukuru_adpcm_reset_w);
 	DECLARE_READ8_MEMBER(kurukuru_adpcm_timer_irqack_r);
 	DECLARE_WRITE8_MEMBER(kurukuru_adpcm_data_w);
 	DECLARE_WRITE8_MEMBER(ym2149_aout_w);
 	DECLARE_WRITE8_MEMBER(ym2149_bout_w);
 
-	void update_sound_irq(uint8_t cause);
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
 	DECLARE_WRITE_LINE_MEMBER(kurukuru_msm5205_vck);
+	void ppj(machine_config &config);
+	void kurukuru(machine_config &config);
+	void kurukuru_audio_io(address_map &map);
+	void kurukuru_audio_map(address_map &map);
+	void kurukuru_io(address_map &map);
+	void kurukuru_map(address_map &map);
+	void ppj_audio_io(address_map &map);
+	void ppj_audio_map(address_map &map);
+	void ppj_io(address_map &map);
+	void ppj_map(address_map &map);
 };
 
-#define MAIN_CLOCK      XTAL_21_4772MHz
+#define MAIN_CLOCK      XTAL(21'477'272)
 #define CPU_CLOCK       MAIN_CLOCK/6
 #define YM2149_CLOCK    MAIN_CLOCK/6/2  // '/SEL' pin tied to GND, so internal divisor x2 is active
-#define M5205_CLOCK     XTAL_384kHz
+#define M5205_CLOCK     XTAL(384'000)
 
 #define HOPPER_PULSE    50          // time between hopper pulses in milliseconds
 #define VDP_MEM         0x30000
@@ -442,28 +457,9 @@ public:
 *************************************************/
 
 
-void kurukuru_state::update_sound_irq(uint8_t cause)
-{
-	m_sound_irq_cause = cause & 3;
-	if (m_sound_irq_cause)
-	{
-		// use bit 0 for latch irq, and bit 1 for timer irq
-		// latch irq vector is $ef (rst $28)
-		// timer irq vector is $f7 (rst $30)
-		// if both are asserted, the vector becomes $f7 AND $ef = $e7 (rst $20)
-		const uint8_t irq_vector[4] = { 0x00, 0xef, 0xf7, 0xe7 };
-		m_audiocpu->set_input_line_and_vector(0, ASSERT_LINE, irq_vector[m_sound_irq_cause]);
-	}
-	else
-	{
-		m_audiocpu->set_input_line(0, CLEAR_LINE);
-	}
-}
-
-
 WRITE_LINE_MEMBER(kurukuru_state::kurukuru_msm5205_vck)
 {
-	update_sound_irq(m_sound_irq_cause | 2);
+	m_soundirq->rst30_w(1);
 	m_adpcm->data_w(m_adpcm_data);
 }
 
@@ -491,13 +487,13 @@ WRITE8_MEMBER(kurukuru_state::kurukuru_out_latch_w)
     07 | Not connected      | unused
 
 */
-	machine().bookkeeping().coin_counter_w(0, data & 0x01);      /* Coin Counter 1 */
-	machine().bookkeeping().coin_counter_w(1, data & 0x20);      /* Coin Counter 2 */
-	machine().bookkeeping().coin_lockout_global_w(data & 0x40);  /* Coin Lock */
-	m_hopper->write(space, 0, (data & 0x40) ? 0x80 : 0);         /* Hopper Motor */
+	machine().bookkeeping().coin_counter_w(0, BIT(data, 0));
+	machine().bookkeeping().coin_counter_w(1, BIT(data, 5));
+	//machine().bookkeeping().coin_lockout_global_w(BIT(data, 6));
+	m_hopper->motor_w(BIT(data, 6));
 
 	if (data & 0x9e)
-		logerror("kurukuru_out_latch_w %02X @ %04X\n", data, space.device().safe_pc());
+		logerror("kurukuru_out_latch_w %02X @ %04X\n", data, m_maincpu->pc());
 }
 
 WRITE8_MEMBER(kurukuru_state::kurukuru_bankswitch_w)
@@ -519,25 +515,19 @@ WRITE8_MEMBER(kurukuru_state::kurukuru_bankswitch_w)
 	}
 }
 
-WRITE8_MEMBER(kurukuru_state::kurukuru_soundlatch_w)
-{
-	m_soundlatch->write(space, 0, data);
-	update_sound_irq(m_sound_irq_cause | 1);
-}
 
-
-static ADDRESS_MAP_START( kurukuru_map, AS_PROGRAM, 8, kurukuru_state )
+ADDRESS_MAP_START(kurukuru_state::kurukuru_map)
 	AM_RANGE(0x0000, 0x5fff) AM_ROM
 	AM_RANGE(0x6000, 0xdfff) AM_ROMBANK("bank1")
 	AM_RANGE(0xe000, 0xffff) AM_RAM AM_SHARE("nvram")
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( kurukuru_io, AS_IO, 8, kurukuru_state )
+ADDRESS_MAP_START(kurukuru_state::kurukuru_io)
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	AM_RANGE(0x00, 0x00) AM_MIRROR(0x0f) AM_WRITE(kurukuru_out_latch_w)
 	AM_RANGE(0x10, 0x10) AM_MIRROR(0x0f) AM_READ_PORT("DSW1")
-	AM_RANGE(0x20, 0x20) AM_MIRROR(0x0f) AM_WRITE(kurukuru_soundlatch_w)
-	AM_RANGE(0x80, 0x83) AM_MIRROR(0x0c) AM_DEVREADWRITE( "v9938", v9938_device, read, write )
+	AM_RANGE(0x20, 0x20) AM_MIRROR(0x0f) AM_DEVWRITE("soundlatch", generic_latch_8_device, write)
+	AM_RANGE(0x80, 0x83) AM_MIRROR(0x0c) AM_DEVREADWRITE("v9938", v9938_device, read, write)
 	AM_RANGE(0x90, 0x90) AM_MIRROR(0x0f) AM_WRITE(kurukuru_bankswitch_w)
 	AM_RANGE(0xa0, 0xa0) AM_MIRROR(0x0f) AM_READ_PORT("IN0")
 	AM_RANGE(0xb0, 0xb0) AM_MIRROR(0x0f) AM_READ_PORT("IN1")
@@ -545,17 +535,17 @@ static ADDRESS_MAP_START( kurukuru_io, AS_IO, 8, kurukuru_state )
 	AM_RANGE(0xd0, 0xd0) AM_MIRROR(0x0f) AM_DEVWRITE("ym2149", ay8910_device, data_w)
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( ppj_map, AS_PROGRAM, 8, kurukuru_state )
+ADDRESS_MAP_START(kurukuru_state::ppj_map)
 	AM_RANGE(0x0000, 0x5fff) AM_ROM
 	AM_RANGE(0x6000, 0xdfff) AM_ROMBANK("bank1")
 	AM_RANGE(0xe000, 0xffff) AM_RAM AM_SHARE("nvram")
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( ppj_io, AS_IO, 8, kurukuru_state )
+ADDRESS_MAP_START(kurukuru_state::ppj_io)
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	AM_RANGE(0x00, 0x00) AM_MIRROR(0x0f) AM_WRITE(kurukuru_bankswitch_w)
-	AM_RANGE(0x10, 0x13) AM_MIRROR(0x0c) AM_DEVREADWRITE( "v9938", v9938_device, read, write )
-	AM_RANGE(0x30, 0x30) AM_MIRROR(0x0f) AM_WRITE(kurukuru_soundlatch_w)
+	AM_RANGE(0x10, 0x13) AM_MIRROR(0x0c) AM_DEVREADWRITE("v9938", v9938_device, read, write)
+	AM_RANGE(0x30, 0x30) AM_MIRROR(0x0f) AM_DEVWRITE("soundlatch", generic_latch_8_device, write)
 	AM_RANGE(0x40, 0x40) AM_MIRROR(0x0f) AM_READ_PORT("DSW1")
 	AM_RANGE(0x50, 0x50) AM_MIRROR(0x0f) AM_WRITE(kurukuru_out_latch_w)
 	AM_RANGE(0x60, 0x60) AM_MIRROR(0x0f) AM_READ_PORT("IN1")
@@ -604,46 +594,41 @@ WRITE8_MEMBER(kurukuru_state::kurukuru_adpcm_reset_w)
        bit 2 = S2
        bit 3 = S1
 */
-	m_adpcm->playmode_w(BITSWAP8((data>>1), 7,6,5,4,3,0,1,2));
+	m_adpcm->playmode_w(bitswap<8>((data>>1), 7,6,5,4,3,0,1,2));
 	m_adpcm->reset_w(data & 1);
-}
-
-READ8_MEMBER(kurukuru_state::kurukuru_soundlatch_r)
-{
-	update_sound_irq(m_sound_irq_cause & ~1);
-	return m_soundlatch->read(space, 0);
 }
 
 READ8_MEMBER(kurukuru_state::kurukuru_adpcm_timer_irqack_r)
 {
-	update_sound_irq(m_sound_irq_cause & ~2);
+	if (!machine().side_effects_disabled())
+		m_soundirq->rst30_w(0);
 	return 0;
 }
 
 
-static ADDRESS_MAP_START( kurukuru_audio_map, AS_PROGRAM, 8, kurukuru_state )
+ADDRESS_MAP_START(kurukuru_state::kurukuru_audio_map)
 	AM_RANGE(0x0000, 0xf7ff) AM_ROM
 	AM_RANGE(0xf800, 0xffff) AM_RAM
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( kurukuru_audio_io, AS_IO, 8, kurukuru_state )
+ADDRESS_MAP_START(kurukuru_state::kurukuru_audio_io)
 	ADDRESS_MAP_GLOBAL_MASK(0x7f)
 	AM_RANGE(0x40, 0x40) AM_MIRROR(0x0f) AM_WRITE(kurukuru_adpcm_data_w)
 	AM_RANGE(0x50, 0x50) AM_MIRROR(0x0f) AM_WRITE(kurukuru_adpcm_reset_w)
-	AM_RANGE(0x60, 0x60) AM_MIRROR(0x0f) AM_READ(kurukuru_soundlatch_r)
+	AM_RANGE(0x60, 0x60) AM_MIRROR(0x0f) AM_DEVREAD("soundlatch", generic_latch_8_device, read)
 	AM_RANGE(0x70, 0x70) AM_MIRROR(0x0f) AM_READ(kurukuru_adpcm_timer_irqack_r)
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( ppj_audio_map, AS_PROGRAM, 8, kurukuru_state )
+ADDRESS_MAP_START(kurukuru_state::ppj_audio_map)
 	AM_RANGE(0x0000, 0xf7ff) AM_ROM
 	AM_RANGE(0xf800, 0xffff) AM_RAM
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( ppj_audio_io, AS_IO, 8, kurukuru_state )
+ADDRESS_MAP_START(kurukuru_state::ppj_audio_io)
 	ADDRESS_MAP_GLOBAL_MASK(0x7f)
 	AM_RANGE(0x20, 0x20) AM_MIRROR(0x0f) AM_WRITE(kurukuru_adpcm_data_w)
 	AM_RANGE(0x30, 0x30) AM_MIRROR(0x0f) AM_WRITE(kurukuru_adpcm_reset_w)
-	AM_RANGE(0x40, 0x40) AM_MIRROR(0x0f) AM_READ(kurukuru_soundlatch_r)
+	AM_RANGE(0x40, 0x40) AM_MIRROR(0x0f) AM_DEVREAD("soundlatch", generic_latch_8_device, read)
 	AM_RANGE(0x50, 0x50) AM_MIRROR(0x0f) AM_READ(kurukuru_adpcm_timer_irqack_r)
 ADDRESS_MAP_END
 /*
@@ -841,14 +826,13 @@ void kurukuru_state::machine_start()
 
 void kurukuru_state::machine_reset()
 {
-	update_sound_irq(0);
 }
 
 /*************************************************
 *                 Machine Driver                 *
 *************************************************/
 
-static MACHINE_CONFIG_START( kurukuru )
+MACHINE_CONFIG_START(kurukuru_state::kurukuru)
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu",Z80, CPU_CLOCK)
@@ -858,6 +842,7 @@ static MACHINE_CONFIG_START( kurukuru )
 	MCFG_CPU_ADD("audiocpu", Z80, CPU_CLOCK)
 	MCFG_CPU_PROGRAM_MAP(kurukuru_audio_map)
 	MCFG_CPU_IO_MAP(kurukuru_audio_io)
+	MCFG_CPU_IRQ_ACKNOWLEDGE_DEVICE("soundirq", rst_neg_buffer_device, inta_cb)
 
 	MCFG_NVRAM_ADD_0FILL("nvram")
 
@@ -872,6 +857,13 @@ static MACHINE_CONFIG_START( kurukuru )
 	MCFG_SPEAKER_STANDARD_MONO("mono")
 
 	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
+	MCFG_GENERIC_LATCH_DATA_PENDING_CB(DEVWRITELINE("soundirq", rst_neg_buffer_device, rst28_w))
+
+	// latch irq vector is $ef (rst $28)
+	// timer irq vector is $f7 (rst $30)
+	// if both are asserted, the vector becomes $f7 AND $ef = $e7 (rst $20)
+	MCFG_DEVICE_ADD("soundirq", RST_NEG_BUFFER, 0)
+	MCFG_RST_BUFFER_INT_CALLBACK(INPUTLINE("audiocpu", 0))
 
 	MCFG_SOUND_ADD("ym2149", YM2149, YM2149_CLOCK)
 	MCFG_AY8910_PORT_B_READ_CB(IOPORT("DSW2"))
@@ -886,41 +878,17 @@ static MACHINE_CONFIG_START( kurukuru )
 MACHINE_CONFIG_END
 
 
-static MACHINE_CONFIG_START( ppj )
+MACHINE_CONFIG_START(kurukuru_state::ppj)
+	kurukuru(config);
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu",Z80, CPU_CLOCK)
+	MCFG_CPU_MODIFY("maincpu")
 	MCFG_CPU_PROGRAM_MAP(ppj_map)
 	MCFG_CPU_IO_MAP(ppj_io)
 
-	MCFG_CPU_ADD("audiocpu", Z80, CPU_CLOCK)
+	MCFG_CPU_MODIFY("audiocpu")
 	MCFG_CPU_PROGRAM_MAP(ppj_audio_map)
 	MCFG_CPU_IO_MAP(ppj_audio_io)
-
-	MCFG_NVRAM_ADD_0FILL("nvram")
-
-	/* video hardware */
-	MCFG_V9938_ADD("v9938", "screen", VDP_MEM, MAIN_CLOCK)
-	MCFG_V99X8_INTERRUPT_CALLBACK(INPUTLINE("maincpu", 0))
-	MCFG_V99X8_SCREEN_ADD_NTSC("screen", "v9938", MAIN_CLOCK)
-
-	MCFG_TICKET_DISPENSER_ADD("hopper", attotime::from_msec(HOPPER_PULSE), TICKET_MOTOR_ACTIVE_HIGH, TICKET_STATUS_ACTIVE_HIGH )
-
-	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_MONO("mono")
-
-	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
-
-	MCFG_SOUND_ADD("ym2149", YM2149, YM2149_CLOCK)  // pin 26 (/SEL) is low so final clock is clk/2, handled inside the ym2149 core
-	MCFG_AY8910_PORT_B_READ_CB(IOPORT("DSW2"))
-	MCFG_AY8910_PORT_A_WRITE_CB(WRITE8(kurukuru_state, ym2149_aout_w))
-	MCFG_AY8910_PORT_B_WRITE_CB(WRITE8(kurukuru_state, ym2149_bout_w))
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.80)
-
-	MCFG_SOUND_ADD("adpcm", MSM5205, M5205_CLOCK)
-	MCFG_MSM5205_VCLK_CB(WRITELINE(kurukuru_state, kurukuru_msm5205_vck))
-	MCFG_MSM5205_PRESCALER_SELECTOR(S48_4B)  // changed on the fly
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.80)
 MACHINE_CONFIG_END
 
 
@@ -929,6 +897,7 @@ MACHINE_CONFIG_END
 *************************************************/
 
 /*  Kuru Kuru Pyon Pyon.
+    くるくるぴょんぴょん
     1990, Success / Taiyo Jidoki.
 */
 ROM_START( kurukuru )
@@ -953,6 +922,7 @@ ROM_START( kurukuru )
 ROM_END
 
 /*  Pyon Pyon Jump.
+    ぴょんぴょんジャンプ
     Ver 1.40.
     1991, Success / Taiyo Jidoki.
 */
@@ -988,5 +958,5 @@ GAME( 1991, ppj,      0,      ppj,      ppj,      kurukuru_state, 0,    ROT0, "S
 
 // unemulated....
 
-//    1988, Success / Taiyo Jidoki, Pyon Pyon
-//    1992, Success / Taiyo Jidoki, Sui Sui Pyon Pyon
+//  ぴょんぴょん (Pyon Pyon),                1988 Success / Taiyo Jidoki.
+//  スイスイぴょんぴょん (Sui Sui Pyon Pyon),  1992 Success / Taiyo Jidoki.

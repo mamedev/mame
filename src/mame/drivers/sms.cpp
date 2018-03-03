@@ -253,18 +253,18 @@ DC00      - Selection buttons #2, 9-16 (R)
 #include "sms1.lh"
 
 
-#define MASTER_CLOCK_GG     32215905
-#define MASTER_CLOCK_PALN   10746168
+#define MASTER_CLOCK_GG     32215905.0
+#define MASTER_CLOCK_PALN   10746168.0
 // The clocks for PAL and PAL-M used here differ from their nominal values,
 // because with the latter errors will occur on Flubba's VDPTest, probably
 // due to rounding issues in the core.
 // Nominal XTAL value for SMS PAL-M (Brazil) is 10726834.
-#define MASTER_CLOCK_PALM   10726833
+#define MASTER_CLOCK_PALM   10726833.0
 // Nominal XTAL value for SMS PAL is 53203424.
-#define MASTER_CLOCK_PAL    53203425    /* 12 * subcarrier freq. (4.43361875MHz) */
+#define MASTER_CLOCK_PAL    53203425.0  /* 12 * subcarrier freq. (4.43361875MHz) */
 
 
-static ADDRESS_MAP_START( sms1_mem, AS_PROGRAM, 8, sms_state )
+ADDRESS_MAP_START(sms_state::sms1_mem)
 	AM_RANGE(0x0000, 0xbfff) AM_WRITE(write_cart)
 	AM_RANGE(0x0000, 0x3fff) AM_READ(read_0000)
 	AM_RANGE(0x4000, 0x7fff) AM_READ(read_4000)
@@ -274,7 +274,7 @@ static ADDRESS_MAP_START( sms1_mem, AS_PROGRAM, 8, sms_state )
 	AM_RANGE(0xfffc, 0xffff) AM_READWRITE(sms_mapper_r, sms_mapper_w)       /* Bankswitch control */
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( sms_mem, AS_PROGRAM, 8, sms_state )
+ADDRESS_MAP_START(sms_state::sms_mem)
 	AM_RANGE(0x0000, 0xbfff) AM_WRITE(write_cart)
 	AM_RANGE(0x0000, 0x3fff) AM_READ(read_0000)
 	AM_RANGE(0x4000, 0x7fff) AM_READ(read_4000)
@@ -283,7 +283,7 @@ static ADDRESS_MAP_START( sms_mem, AS_PROGRAM, 8, sms_state )
 	AM_RANGE(0xfffc, 0xffff) AM_READWRITE(sms_mapper_r, sms_mapper_w)       /* Bankswitch control */
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( sms_store_mem, AS_PROGRAM, 8, smssdisp_state )
+ADDRESS_MAP_START(smssdisp_state::sms_store_mem)
 	AM_RANGE(0x0000, 0x3fff) AM_ROM                     /* BIOS */
 	AM_RANGE(0x4000, 0x47ff) AM_RAM                     /* RAM */
 	AM_RANGE(0x6000, 0x7fff) AM_READ(store_cart_peek)
@@ -294,7 +294,7 @@ static ADDRESS_MAP_START( sms_store_mem, AS_PROGRAM, 8, smssdisp_state )
 ADDRESS_MAP_END
 
 // I/O ports $3E and $3F do not exist on Mark III
-static ADDRESS_MAP_START( sg1000m3_io, AS_IO, 8, sms_state )
+ADDRESS_MAP_START(sms_state::sg1000m3_io)
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	ADDRESS_MAP_UNMAP_HIGH
 	AM_RANGE(0x40, 0x7f)                 AM_READWRITE(sms_count_r, sms_psg_w)
@@ -304,7 +304,7 @@ static ADDRESS_MAP_START( sg1000m3_io, AS_IO, 8, sms_state )
 ADDRESS_MAP_END
 
 
-static ADDRESS_MAP_START( sms_io, AS_IO, 8, sms_state )
+ADDRESS_MAP_START(sms_state::sms_io)
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	ADDRESS_MAP_UNMAP_HIGH
 	AM_RANGE(0x00, 0x00) AM_MIRROR(0x3e) AM_WRITE(sms_mem_control_w)
@@ -321,7 +321,7 @@ ADDRESS_MAP_END
 // addresses.
 // At least the mirrors for I/O ports $3E/$3F don't seem to exist there.
 // Leaving the mirrors breaks the Korean cartridge bublboky.
-static ADDRESS_MAP_START( smskr_io, AS_IO, 8, sms_state )
+ADDRESS_MAP_START(sms_state::smskr_io)
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	ADDRESS_MAP_UNMAP_HIGH
 	AM_RANGE(0x3e, 0x3e)                 AM_WRITE(sms_mem_control_w)
@@ -336,7 +336,7 @@ ADDRESS_MAP_END
 
 // Mirrors for I/O ports $3E/$3F don't exist on the Japanese SMS.
 // Also, $C0/$C1 are the only mirrors for I/O ports $DC/$DD.
-static ADDRESS_MAP_START( smsj_io, AS_IO, 8, sms_state )
+ADDRESS_MAP_START(sms_state::smsj_io)
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	ADDRESS_MAP_UNMAP_HIGH
 	AM_RANGE(0x3e, 0x3e)                 AM_WRITE(sms_mem_control_w)
@@ -356,7 +356,7 @@ ADDRESS_MAP_END
 
 // It seems the mirrors for I/O ports $3E/$3F also don't seem to exist on the
 // Game Gear. Leaving the mirrors breaks 'gloc' (it freezes after 1st stage).
-static ADDRESS_MAP_START( gg_io, AS_IO, 8, sms_state )
+ADDRESS_MAP_START(sms_state::gg_io)
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	ADDRESS_MAP_UNMAP_HIGH
 	AM_RANGE(0x00, 0x00)                 AM_READ(gg_input_port_00_r)
@@ -486,7 +486,7 @@ static INPUT_PORTS_START( gg )
 INPUT_PORTS_END
 
 
-static MACHINE_CONFIG_START( sms_base )
+MACHINE_CONFIG_START(sms_state::sms_base)
 	MCFG_MACHINE_START_OVERRIDE(sms_state,sms)
 	MCFG_MACHINE_RESET_OVERRIDE(sms_state,sms)
 
@@ -506,15 +506,16 @@ static MACHINE_CONFIG_START( sms_base )
 	MCFG_SMS_CONTROL_PORT_PIXEL_HANDLER(READ32(sms_state, sms_pixel_color))
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_DERIVED( sms_ntsc_base, sms_base )
-	MCFG_CPU_ADD("maincpu", Z80, XTAL_10_738635MHz/3)
+MACHINE_CONFIG_START(sms_state::sms_ntsc_base)
+	sms_base(config);
+	MCFG_CPU_ADD("maincpu", Z80, XTAL(10'738'635)/3)
 	MCFG_CPU_PROGRAM_MAP(sms_mem)
 	MCFG_CPU_IO_MAP(sms_io)
 
 	MCFG_QUANTUM_TIME(attotime::from_hz(60))
 
 	/* actually, PSG is embedded in the VDP chip */
-	MCFG_SOUND_ADD("segapsg", SEGAPSG, XTAL_10_738635MHz/3)
+	MCFG_SOUND_ADD("segapsg", SEGAPSG, XTAL(10'738'635)/3)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.00)
 MACHINE_CONFIG_END
 
@@ -543,7 +544,7 @@ MACHINE_CONFIG_END
 		sega315_5124_device::HEIGHT_PAL, \
 		sega315_5124_device::TBORDER_START + sega315_5124_device::PAL_240_TBORDER_HEIGHT, \
 		sega315_5124_device::TBORDER_START + sega315_5124_device::PAL_240_TBORDER_HEIGHT + 240) \
-	MCFG_SCREEN_REFRESH_RATE((double) _pixelclock / (sega315_5124_device::WIDTH * sega315_5124_device::HEIGHT_PAL))
+	MCFG_SCREEN_REFRESH_RATE(_pixelclock / (sega315_5124_device::WIDTH * sega315_5124_device::HEIGHT_PAL))
 
 #define MCFG_SCREEN_SMS_NTSC_RAW_PARAMS(_pixelclock) \
 	MCFG_SCREEN_RAW_PARAMS(_pixelclock, \
@@ -553,7 +554,7 @@ MACHINE_CONFIG_END
 		sega315_5124_device::HEIGHT_NTSC, \
 		sega315_5124_device::TBORDER_START + sega315_5124_device::NTSC_224_TBORDER_HEIGHT, \
 		sega315_5124_device::TBORDER_START + sega315_5124_device::NTSC_224_TBORDER_HEIGHT + 224) \
-	MCFG_SCREEN_REFRESH_RATE((double) _pixelclock / (sega315_5124_device::WIDTH * sega315_5124_device::HEIGHT_NTSC))
+	MCFG_SCREEN_REFRESH_RATE(_pixelclock / (sega315_5124_device::WIDTH * sega315_5124_device::HEIGHT_NTSC))
 
 #define MCFG_SCREEN_GG_RAW_PARAMS(_pixelclock) \
 	MCFG_SCREEN_RAW_PARAMS(_pixelclock, \
@@ -563,13 +564,14 @@ MACHINE_CONFIG_END
 		sega315_5124_device::HEIGHT_NTSC, \
 		sega315_5124_device::TBORDER_START + sega315_5124_device::NTSC_192_TBORDER_HEIGHT + 3*8, \
 		sega315_5124_device::TBORDER_START + sega315_5124_device::NTSC_192_TBORDER_HEIGHT + 21*8 ) \
-	MCFG_SCREEN_REFRESH_RATE((double) _pixelclock / (sega315_5124_device::WIDTH * sega315_5124_device::HEIGHT_NTSC))
+	MCFG_SCREEN_REFRESH_RATE(_pixelclock / (sega315_5124_device::WIDTH * sega315_5124_device::HEIGHT_NTSC))
 
 
-static MACHINE_CONFIG_DERIVED( sms2_ntsc, sms_ntsc_base )
+MACHINE_CONFIG_START(sms_state::sms2_ntsc)
+	sms_ntsc_base(config);
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
-	MCFG_SCREEN_SMS_NTSC_RAW_PARAMS(XTAL_10_738635MHz/2)
+	MCFG_SCREEN_SMS_NTSC_RAW_PARAMS(XTAL(10'738'635)/2)
 	MCFG_SCREEN_UPDATE_DRIVER(sms_state, screen_update_sms)
 
 	MCFG_DEVICE_ADD("sms_vdp", SEGA315_5246, 0)
@@ -580,22 +582,23 @@ static MACHINE_CONFIG_DERIVED( sms2_ntsc, sms_ntsc_base )
 MACHINE_CONFIG_END
 
 
-static MACHINE_CONFIG_DERIVED( sms1_ntsc, sms_ntsc_base )
+MACHINE_CONFIG_START(sms_state::sms1_ntsc)
+	sms_ntsc_base(config);
 
 	MCFG_CPU_MODIFY("maincpu")
 	MCFG_CPU_PROGRAM_MAP(sms1_mem)  // This adds the SegaScope handlers for 3-D glasses
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
-	MCFG_SCREEN_SMS_NTSC_RAW_PARAMS(XTAL_10_738635MHz/2)
+	MCFG_SCREEN_SMS_NTSC_RAW_PARAMS(XTAL(10'738'635)/2)
 	MCFG_SCREEN_UPDATE_DRIVER(sms_state, screen_update_sms1)
 
 	MCFG_SCREEN_ADD("left_lcd", LCD)    // This is needed for SegaScope Left LCD
-	MCFG_SCREEN_SMS_NTSC_RAW_PARAMS(XTAL_10_738635MHz/2)
+	MCFG_SCREEN_SMS_NTSC_RAW_PARAMS(XTAL(10'738'635)/2)
 	MCFG_SCREEN_UPDATE_DRIVER(sms_state, screen_update_sms1)
 
 	MCFG_SCREEN_ADD("right_lcd", LCD)   // This is needed for SegaScope Right LCD
-	MCFG_SCREEN_SMS_NTSC_RAW_PARAMS(XTAL_10_738635MHz/2)
+	MCFG_SCREEN_SMS_NTSC_RAW_PARAMS(XTAL(10'738'635)/2)
 	MCFG_SCREEN_UPDATE_DRIVER(sms_state, screen_update_sms1)
 
 	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE(sms_state, screen_vblank_sms1))
@@ -616,12 +619,13 @@ static MACHINE_CONFIG_DERIVED( sms1_ntsc, sms_ntsc_base )
 	MCFG_SMS_EXPANSION_ADD("smsexp", sms_expansion_devices, nullptr)
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_DERIVED( sms_sdisp, sms1_ntsc )
+MACHINE_CONFIG_START(smssdisp_state::sms_sdisp)
+	sms1_ntsc(config);
 
 	MCFG_DEVICE_MODIFY("sms_vdp")
 	MCFG_SEGA315_5124_INT_CB(WRITELINE(smssdisp_state, sms_store_int_callback))
 
-	MCFG_CPU_ADD("control", Z80, XTAL_10_738635MHz/3)
+	MCFG_CPU_ADD("control", Z80, XTAL(10'738'635)/3)
 	MCFG_CPU_PROGRAM_MAP(sms_store_mem)
 	/* Both CPUs seem to communicate with the VDP etc? */
 	MCFG_CPU_IO_MAP(sms_io)
@@ -663,7 +667,8 @@ static MACHINE_CONFIG_DERIVED( sms_sdisp, sms1_ntsc )
 	MCFG_SMS_CARD_ADD("slot32", sms_cart, nullptr)
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_DERIVED( sms_pal_base, sms_base )
+MACHINE_CONFIG_START(sms_state::sms_pal_base)
+	sms_base(config);
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", Z80, MASTER_CLOCK_PAL/15)
 	MCFG_CPU_PROGRAM_MAP(sms_mem)
@@ -676,7 +681,8 @@ static MACHINE_CONFIG_DERIVED( sms_pal_base, sms_base )
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.00)
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_DERIVED( sms2_pal, sms_pal_base )
+MACHINE_CONFIG_START(sms_state::sms2_pal)
+	sms_pal_base(config);
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
@@ -690,7 +696,8 @@ static MACHINE_CONFIG_DERIVED( sms2_pal, sms_pal_base )
 	MCFG_SEGA315_5246_PAUSE_CB(WRITELINE(sms_state, sms_pause_callback))
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_DERIVED( sms1_pal, sms_pal_base )
+MACHINE_CONFIG_START(sms_state::sms1_pal)
+	sms_pal_base(config);
 
 	MCFG_CPU_MODIFY("maincpu")
 	MCFG_CPU_PROGRAM_MAP(sms1_mem)  // This adds the SegaScope handlers for 3-D glasses
@@ -727,7 +734,8 @@ static MACHINE_CONFIG_DERIVED( sms1_pal, sms_pal_base )
 MACHINE_CONFIG_END
 
 
-static MACHINE_CONFIG_DERIVED( sms_paln_base, sms_base )
+MACHINE_CONFIG_START(sms_state::sms_paln_base)
+	sms_base(config);
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", Z80, MASTER_CLOCK_PALN/3)
 	MCFG_CPU_PROGRAM_MAP(sms_mem)
@@ -740,7 +748,8 @@ static MACHINE_CONFIG_DERIVED( sms_paln_base, sms_base )
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.00)
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_DERIVED( sms3_paln, sms_paln_base )
+MACHINE_CONFIG_START(sms_state::sms3_paln)
+	sms_paln_base(config);
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
@@ -754,7 +763,8 @@ static MACHINE_CONFIG_DERIVED( sms3_paln, sms_paln_base )
 	MCFG_SEGA315_5246_PAUSE_CB(WRITELINE(sms_state, sms_pause_callback))
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_DERIVED( sms1_paln, sms_paln_base )
+MACHINE_CONFIG_START(sms_state::sms1_paln)
+	sms_paln_base(config);
 
 	MCFG_CPU_MODIFY("maincpu")
 	MCFG_CPU_PROGRAM_MAP(sms1_mem)  // This adds the SegaScope handlers for 3-D glasses
@@ -791,7 +801,8 @@ static MACHINE_CONFIG_DERIVED( sms1_paln, sms_paln_base )
 MACHINE_CONFIG_END
 
 
-static MACHINE_CONFIG_DERIVED( sms_br_base, sms_base )
+MACHINE_CONFIG_START(sms_state::sms_br_base)
+	sms_base(config);
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", Z80, MASTER_CLOCK_PALM/3)
 	MCFG_CPU_PROGRAM_MAP(sms_mem)
@@ -805,7 +816,8 @@ static MACHINE_CONFIG_DERIVED( sms_br_base, sms_base )
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.00)
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_DERIVED( sms3_br, sms_br_base )
+MACHINE_CONFIG_START(sms_state::sms3_br)
+	sms_br_base(config);
 	/* video hardware */
 	// PAL-M height/width parameters are the same of NTSC screens.
 	MCFG_SCREEN_ADD("screen", RASTER)
@@ -819,7 +831,8 @@ static MACHINE_CONFIG_DERIVED( sms3_br, sms_br_base )
 	MCFG_SEGA315_5246_PAUSE_CB(WRITELINE(sms_state, sms_pause_callback))
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_DERIVED( sms1_br, sms_br_base )
+MACHINE_CONFIG_START(sms_state::sms1_br)
+	sms_br_base(config);
 
 	MCFG_CPU_MODIFY("maincpu")
 	MCFG_CPU_PROGRAM_MAP(sms1_mem)  // This adds the SegaScope handlers for 3-D glasses
@@ -857,7 +870,8 @@ static MACHINE_CONFIG_DERIVED( sms1_br, sms_br_base )
 MACHINE_CONFIG_END
 
 
-static MACHINE_CONFIG_DERIVED( sms2_kr, sms2_ntsc )
+MACHINE_CONFIG_START(sms_state::sms2_kr)
+	sms2_ntsc(config);
 	MCFG_CPU_MODIFY("maincpu")
 	MCFG_CPU_IO_MAP(smskr_io)
 
@@ -866,7 +880,8 @@ static MACHINE_CONFIG_DERIVED( sms2_kr, sms2_ntsc )
 	MCFG_SOFTWARE_LIST_ADD("cart_list2","sg1000")
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_DERIVED( sms1_kr, sms1_ntsc )
+MACHINE_CONFIG_START(sms_state::sms1_kr)
+	sms1_ntsc(config);
 	MCFG_CPU_MODIFY("maincpu")
 	MCFG_CPU_IO_MAP(smskr_io)
 
@@ -885,17 +900,19 @@ static MACHINE_CONFIG_DERIVED( sms1_kr, sms1_ntsc )
 	MCFG_SEGA315_5124_CSYNC_CB(WRITELINE(sms_state, sms_csync_callback))
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_DERIVED( smsj, sms1_kr )
+MACHINE_CONFIG_START(sms_state::smsj)
+	sms1_kr(config);
 	MCFG_CPU_MODIFY("maincpu")
 	MCFG_CPU_IO_MAP(smsj_io)
 
-	MCFG_SOUND_ADD("ym2413", YM2413, XTAL_10_738635MHz/3)
+	MCFG_SOUND_ADD("ym2413", YM2413, XTAL(10'738'635)/3)
 	// if this output gain is changed, the gain set when unmute the output need
 	// to be changed too, probably along the gain set for the Mark III FM Unit.
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.00)
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_DERIVED( sg1000m3, sms1_ntsc )
+MACHINE_CONFIG_START(sms_state::sg1000m3)
+	sms1_ntsc(config);
 	MCFG_CPU_MODIFY("maincpu")
 	MCFG_CPU_IO_MAP(sg1000m3_io)
 
@@ -917,7 +934,7 @@ static MACHINE_CONFIG_DERIVED( sg1000m3, sms1_ntsc )
 	MCFG_SMS_CONTROL_PORT_TH_INPUT_HANDLER(NOOP)
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_START( gamegear )
+MACHINE_CONFIG_START(sms_state::gamegear)
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", Z80, MASTER_CLOCK_GG/9)
 	MCFG_CPU_PROGRAM_MAP(sms_mem)

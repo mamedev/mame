@@ -40,10 +40,9 @@ static uint8_t cfidata[] = {
 0x01,0x00
 };
 
-DEVICE_ADDRESS_MAP_START(submap, 16, naomi_m4_board)
+ADDRESS_MAP_START(naomi_m4_board::submap)
+	AM_IMPORT_FROM(naomi_board::submap)
 	AM_RANGE(0x1a, 0x1b) AM_READ(m4_id_r)
-
-	AM_INHERIT_FROM(naomi_board::submap)
 ADDRESS_MAP_END
 
 naomi_m4_board::naomi_m4_board(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
@@ -51,12 +50,6 @@ naomi_m4_board::naomi_m4_board(const machine_config &mconfig, const char *tag, d
 	, m_region(*this, DEVICE_SELF)
 	, m_key_data(*this, finder_base::DUMMY_TAG)
 {
-}
-
-void naomi_m4_board::static_set_tags(device_t &device, const char *key_tag)
-{
-	naomi_m4_board &dev = downcast<naomi_m4_board &>(device);
-	dev.m_key_data.set_tag(key_tag);
 }
 
 void naomi_m4_board::device_start()

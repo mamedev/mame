@@ -92,6 +92,8 @@ public:
 	DECLARE_READ_LINE_MEMBER(pia1_cb1_r);
 	DECLARE_WRITE_LINE_MEMBER(pia1_cb2_w);
 
+	void eurocom2(machine_config &config);
+	void eurocom2_map(address_map &map);
 protected:
 	// driver_device overrides
 	virtual void machine_reset() override;
@@ -139,6 +141,8 @@ public:
 	DECLARE_READ8_MEMBER(waveterm_adc);
 	DECLARE_WRITE8_MEMBER(waveterm_dac);
 
+	void waveterm(machine_config &config);
+	void waveterm_map(address_map &map);
 protected:
 	bool m_driveh;
 	uint8_t m_drive;
@@ -326,7 +330,7 @@ uint32_t eurocom2_state::screen_update(screen_device &screen, bitmap_ind16 &bitm
 	return 0;
 }
 
-static ADDRESS_MAP_START(eurocom2_map, AS_PROGRAM, 8, eurocom2_state)
+ADDRESS_MAP_START(eurocom2_state::eurocom2_map)
 	AM_RANGE(0x0000, 0xefff) AM_RAM AM_SHARE("videoram")
 	AM_RANGE(0xf000, 0xfcef) AM_ROM AM_REGION("maincpu", 0)
 	AM_RANGE(0xfcf0, 0xfcf3) AM_DEVREADWRITE("pia1", pia6821_device, read, write)
@@ -338,7 +342,7 @@ static ADDRESS_MAP_START(eurocom2_map, AS_PROGRAM, 8, eurocom2_state)
 	AM_RANGE(0xfd40, 0xffff) AM_ROM AM_REGION("maincpu", 0xd40) AM_WRITENOP
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START(waveterm_map, AS_PROGRAM, 8, waveterm_state)
+ADDRESS_MAP_START(waveterm_state::waveterm_map)
 	AM_IMPORT_FROM(eurocom2_map)
 	AM_RANGE(0xfd00, 0xfd03) AM_DEVREADWRITE("pia3", pia6821_device, read, write)
 	AM_RANGE(0xfd08, 0xfd0f) AM_DEVREADWRITE("ptm", ptm6840_device, read, write)
@@ -426,12 +430,12 @@ static SLOT_INTERFACE_START( eurocom_floppies )
 	SLOT_INTERFACE( "8dsdd", FLOPPY_8_DSDD )
 SLOT_INTERFACE_END
 
-static MACHINE_CONFIG_START( eurocom2 )
-	MCFG_CPU_ADD("maincpu", M6809, XTAL_5_3586MHz/4)
+MACHINE_CONFIG_START(eurocom2_state::eurocom2)
+	MCFG_CPU_ADD("maincpu", MC6809, XTAL(10'717'200)/2) // EXTAL = CLK/2 = 5.3586 MHz; Q = E = 1.33965 MHz
 	MCFG_CPU_PROGRAM_MAP(eurocom2_map)
 
 	MCFG_SCREEN_ADD_MONOCHROME("screen", RASTER, rgb_t::green())
-	MCFG_SCREEN_RAW_PARAMS(XTAL_5_3586MHz*2, VC_TOTAL_HORZ, 0, VC_DISP_HORZ, VC_TOTAL_VERT, 0, VC_DISP_VERT)
+	MCFG_SCREEN_RAW_PARAMS(XTAL(10'717'200), VC_TOTAL_HORZ, 0, VC_DISP_HORZ, VC_TOTAL_VERT, 0, VC_DISP_VERT)
 	MCFG_SCREEN_UPDATE_DRIVER(eurocom2_state, screen_update)
 
 	MCFG_SCREEN_PALETTE("palette")
@@ -461,7 +465,7 @@ static MACHINE_CONFIG_START( eurocom2 )
 	MCFG_RS232_RXD_HANDLER(DEVWRITELINE ("acia", acia6850_device, write_rxd))
 	MCFG_RS232_CTS_HANDLER(DEVWRITELINE ("acia", acia6850_device, write_cts))
 
-	MCFG_FD1793_ADD("fdc", XTAL_2MHz/2)
+	MCFG_FD1793_ADD("fdc", XTAL(2'000'000)/2)
 //  MCFG_WD_FDC_INTRQ_CALLBACK(INPUTLINE("maincpu", M6809_IRQ_LINE))
 	MCFG_FLOPPY_DRIVE_ADD("fdc:0", eurocom_floppies, "525qd", eurocom2_state::floppy_formats)
 //  MCFG_FLOPPY_DRIVE_SOUND(true)
@@ -469,7 +473,8 @@ static MACHINE_CONFIG_START( eurocom2 )
 //  MCFG_FLOPPY_DRIVE_SOUND(true)
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_DERIVED(waveterm, eurocom2)
+MACHINE_CONFIG_START(waveterm_state::waveterm)
+	eurocom2(config);
 	MCFG_CPU_MODIFY("maincpu")
 	MCFG_CPU_PROGRAM_MAP(waveterm_map)
 

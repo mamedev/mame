@@ -12,8 +12,10 @@ ToDo:
 - Need artwork of the front panel switches and LEDs, and port FF.
 
 ***************************************************************************************************************/
+
 #include "emu.h"
 #include "cpu/z80/z80.h"
+#include "machine/am9519.h"
 #include "machine/upd765.h"
 #include "machine/mc2661.h"
 #include "bus/rs232/rs232.h"
@@ -44,6 +46,9 @@ public:
 	DECLARE_DRIVER_INIT(dps1);
 	DECLARE_MACHINE_RESET(dps1);
 
+	void dps1(machine_config &config);
+	void io_map(address_map &map);
+	void mem_map(address_map &map);
 private:
 	bool m_dma_dir;
 	uint16_t m_dma_adr;
@@ -53,12 +58,12 @@ private:
 	//required_device<floppy_connector> m_floppy1;
 };
 
-static ADDRESS_MAP_START( mem_map, AS_PROGRAM, 8, dps1_state )
+ADDRESS_MAP_START(dps1_state::mem_map)
 	AM_RANGE(0x0000, 0x03ff) AM_READ_BANK("bankr0") AM_WRITE_BANK("bankw0")
 	AM_RANGE(0x0400, 0xffff) AM_RAM
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( io_map, AS_IO, 8, dps1_state )
+ADDRESS_MAP_START(dps1_state::io_map)
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	ADDRESS_MAP_UNMAP_HIGH
 	AM_RANGE(0x00, 0x03) AM_DEVREADWRITE("uart", mc2661_device, read, write) // S2651
@@ -74,7 +79,11 @@ static ADDRESS_MAP_START( io_map, AS_IO, 8, dps1_state )
 	// other allocated ports, optional
 	// AM_RANGE(0x04, 0x07) AM_DEVREADWRITE("uart2", mc2661_device, read, write) // S2651
 	// AM_RANGE(0x08, 0x0b) parallel ports
-	AM_RANGE(0x10, 0x17) AM_NOP // pair of AM9519 interrupt controllers
+	// AM_RANGE(0x10, 0x11) // interrupt response
+	AM_RANGE(0x14, 0x14) AM_DEVREADWRITE("am9519a", am9519_device, data_r, data_w)
+	AM_RANGE(0x15, 0x15) AM_DEVREADWRITE("am9519a", am9519_device, stat_r, cmd_w)
+	AM_RANGE(0x16, 0x16) AM_DEVREADWRITE("am9519b", am9519_device, data_r, data_w)
+	AM_RANGE(0x17, 0x17) AM_DEVREADWRITE("am9519b", am9519_device, stat_r, cmd_w)
 	// AM_RANGE(0x18, 0x1f) control lines 0 to 7
 	AM_RANGE(0xe0, 0xe3) AM_NOP //unknown device
 ADDRESS_MAP_END
@@ -181,7 +190,7 @@ static SLOT_INTERFACE_START( floppies )
 	SLOT_INTERFACE( "floppy0", FLOPPY_8_DSDD )
 SLOT_INTERFACE_END
 
-static MACHINE_CONFIG_START( dps1 )
+MACHINE_CONFIG_START(dps1_state::dps1)
 	// basic machine hardware
 	MCFG_CPU_ADD("maincpu", Z80, 4000000)
 	MCFG_CPU_PROGRAM_MAP(mem_map)
@@ -189,7 +198,7 @@ static MACHINE_CONFIG_START( dps1 )
 	MCFG_MACHINE_RESET_OVERRIDE(dps1_state, dps1)
 
 	/* video hardware */
-	MCFG_DEVICE_ADD("uart", MC2661, XTAL_5_0688MHz)
+	MCFG_DEVICE_ADD("uart", MC2661, XTAL(5'068'800))
 	MCFG_MC2661_TXD_HANDLER(DEVWRITELINE("rs232", rs232_port_device, write_txd))
 	MCFG_MC2661_RTS_HANDLER(DEVWRITELINE("rs232", rs232_port_device, write_rts))
 	MCFG_MC2661_DTR_HANDLER(DEVWRITELINE("rs232", rs232_port_device, write_dtr))
@@ -198,6 +207,10 @@ static MACHINE_CONFIG_START( dps1 )
 	MCFG_RS232_RXD_HANDLER(DEVWRITELINE("uart",mc2661_device,rx_w))
 	MCFG_RS232_DSR_HANDLER(DEVWRITELINE("uart",mc2661_device,dsr_w))
 	MCFG_RS232_CTS_HANDLER(DEVWRITELINE("uart",mc2661_device,cts_w))
+
+	MCFG_DEVICE_ADD("am9519a", AM9519, 0)
+
+	MCFG_DEVICE_ADD("am9519b", AM9519, 0)
 
 	// floppy
 	MCFG_UPD765A_ADD("fdc", false, true)

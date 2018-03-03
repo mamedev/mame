@@ -51,6 +51,8 @@ public:
 	DECLARE_WRITE8_MEMBER(segment_w );
 	uint8_t m_digit;
 	uint8_t m_digit_last;
+	void cvicny(machine_config &config);
+	void cvicny_mem(address_map &map);
 };
 
 WRITE8_MEMBER( cvicny_state::segment_w ) // output segments on the selected digit
@@ -75,7 +77,7 @@ READ8_MEMBER( cvicny_state::key_r )
 	return ((data << 4) ^ 0xf0) | data;
 }
 
-static ADDRESS_MAP_START( cvicny_mem, AS_PROGRAM, 8, cvicny_state )
+ADDRESS_MAP_START(cvicny_state::cvicny_mem)
 	ADDRESS_MAP_UNMAP_HIGH
 	AM_RANGE(0x0000, 0x07ff) AM_ROM // 1 x 2716
 	AM_RANGE(0x0800, 0x0bff) AM_RAM AM_MIRROR(0x400) // 2x 2114 static ram
@@ -128,9 +130,9 @@ static INPUT_PORTS_START( cvicny )
 INPUT_PORTS_END
 
 
-static MACHINE_CONFIG_START( cvicny )
+MACHINE_CONFIG_START(cvicny_state::cvicny)
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu",Z80, XTAL_2MHz)
+	MCFG_CPU_ADD("maincpu",Z80, XTAL(2'000'000))
 	MCFG_CPU_PROGRAM_MAP(cvicny_mem)
 
 	/* video hardware */

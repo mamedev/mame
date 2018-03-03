@@ -97,6 +97,9 @@ public:
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
 
+	void mps1000(machine_config &config);
+	void mps1230(machine_config &config);
+	void mps1230_map(address_map &map);
 private:
 };
 
@@ -120,7 +123,7 @@ void mps1230_state::machine_reset()
     ADDRESS MAP
 ***************************************************************************/
 
-static ADDRESS_MAP_START( mps1230_map, AS_PROGRAM, 8, mps1230_state )
+ADDRESS_MAP_START(mps1230_state::mps1230_map)
 	AM_RANGE(0x0000, 0x7fff) AM_ROM AM_REGION("maincpu", 0)
 	AM_RANGE(0xc000, 0xdfff) AM_RAM // as per the service manual
 	AM_RANGE(0xff80, 0xffff) AM_RAM // internal in cpu
@@ -133,12 +136,12 @@ ADDRESS_MAP_END
 static INPUT_PORTS_START( mps1230 )
 INPUT_PORTS_END
 
-static MACHINE_CONFIG_START( mps1230 )
+MACHINE_CONFIG_START(mps1230_state::mps1230)
 	MCFG_CPU_ADD(CPU_TAG, UPD7810, 11060000)
 	MCFG_CPU_PROGRAM_MAP(mps1230_map)
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_START( mps1000 )
+MACHINE_CONFIG_START(mps1230_state::mps1000)
 	MCFG_CPU_ADD(CPU_TAG, Z80, 4000000)
 	MCFG_CPU_PROGRAM_MAP(mps1230_map)
 MACHINE_CONFIG_END

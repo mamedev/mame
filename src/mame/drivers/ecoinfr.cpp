@@ -123,6 +123,9 @@ public:
 	required_device<stepper_device> m_reel1;
 	required_device<stepper_device> m_reel2;
 	required_device<stepper_device> m_reel3;
+	void ecoinfr(machine_config &config);
+	void memmap(address_map &map);
+	void portmap(address_map &map);
 };
 
 
@@ -323,7 +326,7 @@ WRITE8_MEMBER(ecoinfr_state::ec_port0d_out_cred_data_w)
 {
 	if (m_credsel!=0xff)
 	{
-		uint8_t bf7segdata = BITSWAP8(data,7,0,1,2,3,4,5,6);
+		uint8_t bf7segdata = bitswap<8>(data,7,0,1,2,3,4,5,6);
 		output().set_digit_value(m_credsel+8, bf7segdata);
 	}
 }
@@ -336,7 +339,7 @@ WRITE8_MEMBER(ecoinfr_state::ec_port0f_out_bank_segdata_w)
 {
 	if (m_banksel!=0xff)
 	{
-		uint8_t bf7segdata = BITSWAP8(data,7,0,1,2,3,4,5,6);
+		uint8_t bf7segdata = bitswap<8>(data,7,0,1,2,3,4,5,6);
 		output().set_digit_value(m_banksel, bf7segdata);
 	}
 }
@@ -473,7 +476,7 @@ WRITE8_MEMBER(ecoinfr_state::ec_port18_out_w)
 }
 
 
-static ADDRESS_MAP_START( memmap, AS_PROGRAM, 8, ecoinfr_state )
+ADDRESS_MAP_START(ecoinfr_state::memmap)
 	AM_RANGE(0x0000, 0x7fff) AM_ROM
 	AM_RANGE(0x8000, 0x9fff) AM_RAM
 
@@ -484,7 +487,7 @@ ADDRESS_MAP_END
 
 
 
-static ADDRESS_MAP_START( portmap, AS_IO, 8, ecoinfr_state )
+ADDRESS_MAP_START(ecoinfr_state::portmap)
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	AM_RANGE(0x00, 0x00) AM_WRITE(ec_port00_out_w) AM_READ_PORT("IN0") // Reel 1 Write
 	AM_RANGE(0x01, 0x01) AM_WRITE(ec_port01_out_w) AM_READ_PORT("IN1") // Reel 2 Write + Reels Opto Read
@@ -770,7 +773,7 @@ void ecoinfr_state::machine_reset()
 }
 
 
-static MACHINE_CONFIG_START( ecoinfr )
+MACHINE_CONFIG_START(ecoinfr_state::ecoinfr)
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", Z80,4000000)
 	MCFG_CPU_PROGRAM_MAP(memmap)

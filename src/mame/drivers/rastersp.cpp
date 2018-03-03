@@ -34,8 +34,8 @@
  *
  *************************************/
 
-#define SOUND_CLOCK             XTAL_12_288MHz
-#define PLL_CLOCK               XTAL_14_31818MHz
+#define SOUND_CLOCK             XTAL(12'288'000)
+#define PLL_CLOCK               XTAL(14'318'181)
 #define NVRAM_SIZE              0x8000
 
 #define USE_SPEEDUP_HACK        1
@@ -144,6 +144,11 @@ public:
 	void    update_irq(uint32_t which, uint32_t state);
 	void    upload_palette(uint32_t word1, uint32_t word2);
 	IRQ_CALLBACK_MEMBER(irq_callback);
+	static void ncr53c700(device_t *device);
+	void rastersp(machine_config &config);
+	void cpu_map(address_map &map);
+	void dsp_map(address_map &map);
+	void io_map(address_map &map);
 protected:
 	// driver_device overrides
 	virtual void machine_reset() override;
@@ -645,11 +650,11 @@ WRITE32_MEMBER( rastersp_state::dsp_ctrl_w )
 WRITE32_MEMBER( rastersp_state::dsp_speedup_w )
 {
 	// 809e90  48fd, 48d5
-	if (space.device().safe_pc() == 0x809c23)
+	if (m_dsp->pc() == 0x809c23)
 	{
-		int32_t cycles_left = space.device().execute().cycles_remaining();
+		int32_t cycles_left = m_dsp->cycles_remaining();
 		data += cycles_left / 6;
-		space.device().execute().spin();
+		m_dsp->spin();
 	}
 
 	m_speedup_count = data;
@@ -668,18 +673,18 @@ READ32_MEMBER( rastersp_state::dsp_speedup_r )
  *
  *************************************/
 
-static ADDRESS_MAP_START( cpu_map, AS_PROGRAM, 32, rastersp_state )
+ADDRESS_MAP_START(rastersp_state::cpu_map)
 	AM_RANGE(0x00000000, 0x003fffff) AM_RAM AM_SHARE("dram")
 	AM_RANGE(0x01000000, 0x010bffff) AM_NOP // External ROM
 	AM_RANGE(0x010c0000, 0x010cffff) AM_ROM AM_REGION("bios", 0)
+	AM_RANGE(0x02200000, 0x022fffff) AM_READWRITE8(nvram_r, nvram_w, 0x000000ff)
 	AM_RANGE(0x02200800, 0x02200803) AM_WRITENOP // ?
 	AM_RANGE(0x02208000, 0x02208fff) AM_DEVREADWRITE("scsibus:7:ncr53c700", ncr53c7xx_device, read, write)
 	AM_RANGE(0x0220e000, 0x0220e003) AM_WRITE(dpylist_w)
-	AM_RANGE(0x02200000, 0x022fffff) AM_READWRITE8(nvram_r, nvram_w, 0x000000ff)
 	AM_RANGE(0xfff00000, 0xffffffff) AM_RAMBANK("bank3")
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( io_map, AS_IO, 32, rastersp_state )
+ADDRESS_MAP_START(rastersp_state::io_map)
 	AM_RANGE(0x0020, 0x0023) AM_WRITE(cyrix_cache_w)
 	AM_RANGE(0x1000, 0x1003) AM_READ_PORT("P1") AM_WRITE(port1_w)
 	AM_RANGE(0x1004, 0x1007) AM_READ_PORT("P2") AM_WRITE(port2_w)
@@ -692,7 +697,7 @@ static ADDRESS_MAP_START( io_map, AS_IO, 32, rastersp_state )
 ADDRESS_MAP_END
 
 
-static ADDRESS_MAP_START( dsp_map, AS_PROGRAM, 32, rastersp_state )
+ADDRESS_MAP_START(rastersp_state::dsp_map)
 	AM_RANGE(0x000000, 0x0fffff) AM_RAMBANK("bank1")
 	AM_RANGE(0x400000, 0x40ffff) AM_ROM AM_REGION("dspboot", 0)
 	AM_RANGE(0x808000, 0x80807f) AM_READWRITE(tms32031_control_r, tms32031_control_w)
@@ -829,12 +834,15 @@ WRITE32_MEMBER(rastersp_state::ncr53c700_write)
 	m_maincpu->space(AS_PROGRAM).write_dword(offset, data, mem_mask);
 }
 
-static MACHINE_CONFIG_START( ncr53c700 )
+void rastersp_state::ncr53c700(device_t *device)
+{
+	devcb_base *devcb;
+	(void)devcb;
 	MCFG_DEVICE_CLOCK(66000000)
 	MCFG_NCR53C7XX_IRQ_HANDLER(DEVWRITELINE(":", rastersp_state, scsi_irq))
 	MCFG_NCR53C7XX_HOST_READ(DEVREAD32(":", rastersp_state, ncr53c700_read))
 	MCFG_NCR53C7XX_HOST_WRITE(DEVWRITE32(":", rastersp_state, ncr53c700_write))
-MACHINE_CONFIG_END
+}
 
 static SLOT_INTERFACE_START( rastersp_scsi_devices )
 	SLOT_INTERFACE("harddisk", NSCSI_HARDDISK)
@@ -848,7 +856,7 @@ SLOT_INTERFACE_END
  *
  *************************************/
 
-static MACHINE_CONFIG_START( rastersp )
+MACHINE_CONFIG_START(rastersp_state::rastersp)
 	MCFG_CPU_ADD("maincpu", I486, 33330000)
 	MCFG_CPU_PROGRAM_MAP(cpu_map)
 	MCFG_CPU_IO_MAP(io_map)
@@ -862,7 +870,7 @@ static MACHINE_CONFIG_START( rastersp )
 	/* Devices */
 	MCFG_TIMER_DRIVER_ADD("tms_timer1", rastersp_state, tms_timer1)
 	MCFG_TIMER_DRIVER_ADD("tms_tx_timer", rastersp_state, tms_tx_timer)
-	MCFG_MC146818_ADD( "rtc", XTAL_32_768kHz )
+	MCFG_MC146818_ADD( "rtc", XTAL(32'768) )
 	MCFG_NVRAM_ADD_0FILL("nvram")
 
 	MCFG_NSCSI_BUS_ADD("scsibus")

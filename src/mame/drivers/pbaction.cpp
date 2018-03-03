@@ -86,7 +86,7 @@ WRITE8_MEMBER(pbaction_state::nmi_mask_w)
 	m_nmi_mask = data & 1;
 }
 
-static ADDRESS_MAP_START( pbaction_map, AS_PROGRAM, 8, pbaction_state )
+ADDRESS_MAP_START(pbaction_state::pbaction_map)
 	AM_RANGE(0x0000, 0xbfff) AM_ROM
 	AM_RANGE(0xc000, 0xcfff) AM_RAM AM_SHARE("work_ram")
 	AM_RANGE(0xd000, 0xd3ff) AM_RAM_WRITE(pbaction_videoram2_w) AM_SHARE("videoram2")
@@ -94,7 +94,7 @@ static ADDRESS_MAP_START( pbaction_map, AS_PROGRAM, 8, pbaction_state )
 	AM_RANGE(0xd800, 0xdbff) AM_RAM_WRITE(pbaction_videoram_w) AM_SHARE("videoram")
 	AM_RANGE(0xdc00, 0xdfff) AM_RAM_WRITE(pbaction_colorram_w) AM_SHARE("colorram")
 	AM_RANGE(0xe000, 0xe07f) AM_RAM AM_SHARE("spriteram")
-	AM_RANGE(0xe400, 0xe5ff) AM_RAM_DEVWRITE("palette", palette_device, write) AM_SHARE("palette")
+	AM_RANGE(0xe400, 0xe5ff) AM_RAM_DEVWRITE("palette", palette_device, write8) AM_SHARE("palette")
 	AM_RANGE(0xe600, 0xe600) AM_READ_PORT("P1") AM_WRITE(nmi_mask_w)
 	AM_RANGE(0xe601, 0xe601) AM_READ_PORT("P2")
 	AM_RANGE(0xe602, 0xe602) AM_READ_PORT("SYSTEM")
@@ -104,12 +104,12 @@ static ADDRESS_MAP_START( pbaction_map, AS_PROGRAM, 8, pbaction_state )
 	AM_RANGE(0xe800, 0xe800) AM_WRITE(pbaction_sh_command_w)
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( decrypted_opcodes_map, AS_OPCODES, 8, pbaction_state )
+ADDRESS_MAP_START(pbaction_state::decrypted_opcodes_map)
 	AM_RANGE(0x0000, 0x7fff) AM_ROM AM_SHARE("decrypted_opcodes")
 	AM_RANGE(0x8000, 0xbfff) AM_ROM AM_REGION("maincpu", 0x8000)
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( pbaction_sound_map, AS_PROGRAM, 8, pbaction_state )
+ADDRESS_MAP_START(pbaction_state::pbaction_sound_map)
 	AM_RANGE(0x0000, 0x1fff) AM_ROM
 	AM_RANGE(0x4000, 0x47ff) AM_RAM
 	AM_RANGE(0x8000, 0x8000) AM_DEVREAD("soundlatch", generic_latch_8_device, read)
@@ -117,7 +117,7 @@ static ADDRESS_MAP_START( pbaction_sound_map, AS_PROGRAM, 8, pbaction_state )
 ADDRESS_MAP_END
 
 
-static ADDRESS_MAP_START( pbaction_sound_io_map, AS_IO, 8, pbaction_state )
+ADDRESS_MAP_START(pbaction_state::pbaction_sound_io_map)
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	AM_RANGE(0x10, 0x11) AM_DEVWRITE("ay1", ay8910_device, address_data_w)
 	AM_RANGE(0x20, 0x21) AM_DEVWRITE("ay2", ay8910_device, address_data_w)
@@ -281,7 +281,7 @@ INTERRUPT_GEN_MEMBER(pbaction_state::vblank_irq)
 		device.execute().set_input_line(INPUT_LINE_NMI, PULSE_LINE);
 }
 
-static MACHINE_CONFIG_START( pbaction )
+MACHINE_CONFIG_START(pbaction_state::pbaction)
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", Z80, 4000000)   /* 4 MHz? */
@@ -323,11 +323,12 @@ static MACHINE_CONFIG_START( pbaction )
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_DERIVED( pbactionx, pbaction )
+MACHINE_CONFIG_START(pbaction_state::pbactionx)
+	pbaction(config);
 	MCFG_CPU_REPLACE("maincpu", SEGA_CPU_PBACTIO4, 4000000)   /* 4 MHz? */
 	MCFG_CPU_PROGRAM_MAP(pbaction_map)
 	MCFG_CPU_VBLANK_INT_DRIVER("screen", pbaction_state,  vblank_irq)
-	MCFG_CPU_DECRYPTED_OPCODES_MAP(decrypted_opcodes_map)
+	MCFG_CPU_OPCODES_MAP(decrypted_opcodes_map)
 	MCFG_SEGACRPT_SET_DECRYPTED_TAG(":decrypted_opcodes")
 MACHINE_CONFIG_END
 
@@ -480,7 +481,7 @@ ROM_END
 READ8_MEMBER(pbaction_state::pbactio3_prot_kludge_r)
 {
 	/* on startup, the game expect this location to NOT act as RAM */
-	if (space.device().safe_pc() == 0xab80)
+	if (m_maincpu->pc() == 0xab80)
 		return 0;
 
 	return m_work_ram[0];
@@ -494,7 +495,7 @@ DRIVER_INIT_MEMBER(pbaction_state,pbactio3)
 	/* first of all, do a simple bitswap */
 	for (i = 0; i < 0xc000; i++)
 	{
-		rom[i] = BITSWAP8(rom[i], 7,6,5,4,1,2,3,0);
+		rom[i] = bitswap<8>(rom[i], 7,6,5,4,1,2,3,0);
 	}
 
 	/* install a protection (?) workaround */

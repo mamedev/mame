@@ -290,6 +290,13 @@ public:
 	DECLARE_DRIVER_INIT(sg1000a);
 	required_device<cpu_device> m_maincpu;
 	optional_shared_ptr<uint8_t> m_decrypted_opcodes;
+	void sderby2s(machine_config &config);
+	void sg1000ax(machine_config &config);
+	void sg1000a(machine_config &config);
+	void decrypted_opcodes_map(address_map &map);
+	void io_map(address_map &map);
+	void program_map(address_map &map);
+	void sderby2_io_map(address_map &map);
 };
 
 
@@ -299,17 +306,17 @@ public:
  *
  *************************************/
 
-static ADDRESS_MAP_START( program_map, AS_PROGRAM, 8, sg1000a_state )
+ADDRESS_MAP_START(sg1000a_state::program_map)
 	AM_RANGE(0x0000, 0xbfff) AM_ROM
 	AM_RANGE(0xc000, 0xc3ff) AM_RAM AM_MIRROR(0x400)
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( decrypted_opcodes_map, AS_OPCODES, 8, sg1000a_state )
+ADDRESS_MAP_START(sg1000a_state::decrypted_opcodes_map)
 	AM_RANGE(0x0000, 0x7fff) AM_ROM AM_SHARE("decrypted_opcodes")
 	AM_RANGE(0x8000, 0xbfff) AM_ROM AM_REGION("maincpu", 0x8000)
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( io_map, AS_IO, 8, sg1000a_state )
+ADDRESS_MAP_START(sg1000a_state::io_map)
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	AM_RANGE(0x7f, 0x7f) AM_DEVWRITE("snsnd", sn76489a_device, write)
 	AM_RANGE(0xbe, 0xbe) AM_DEVREADWRITE("tms9928a", tms9928a_device, vram_read, vram_write)
@@ -317,7 +324,7 @@ static ADDRESS_MAP_START( io_map, AS_IO, 8, sg1000a_state )
 	AM_RANGE(0xdc, 0xdf) AM_DEVREADWRITE("ppi8255", i8255_device, read, write)
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( sderby2_io_map, AS_IO, 8, sg1000a_state )
+ADDRESS_MAP_START(sg1000a_state::sderby2_io_map)
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	AM_RANGE(0x7f, 0x7f) AM_DEVWRITE("snsnd", sn76489a_device, write)
 	AM_RANGE(0xbe, 0xbe) AM_DEVREADWRITE("tms9928a", tms9928a_device, vram_read, vram_write)
@@ -454,9 +461,9 @@ WRITE8_MEMBER(sg1000a_state::sg1000a_coin_counter_w)
  *
  *************************************/
 
-static MACHINE_CONFIG_START( sg1000a )
+MACHINE_CONFIG_START(sg1000a_state::sg1000a)
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", Z80, XTAL_3_579545MHz)
+	MCFG_CPU_ADD("maincpu", Z80, XTAL(3'579'545))
 	MCFG_CPU_PROGRAM_MAP(program_map)
 	MCFG_CPU_IO_MAP(io_map)
 
@@ -467,7 +474,7 @@ static MACHINE_CONFIG_START( sg1000a )
 	MCFG_I8255_OUT_PORTC_CB(WRITE8(sg1000a_state, sg1000a_coin_counter_w))
 
 	/* video hardware */
-	MCFG_DEVICE_ADD( "tms9928a", TMS9928A, XTAL_10_738635MHz / 2 )
+	MCFG_DEVICE_ADD( "tms9928a", TMS9928A, XTAL(10'738'635) / 2 )
 	MCFG_TMS9928A_VRAM_SIZE(0x4000)
 	MCFG_TMS9928A_OUT_INT_LINE_CB(INPUTLINE("maincpu", INPUT_LINE_IRQ0))
 
@@ -477,21 +484,23 @@ static MACHINE_CONFIG_START( sg1000a )
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
 
-	MCFG_SOUND_ADD("snsnd", SN76489A, XTAL_3_579545MHz)
+	MCFG_SOUND_ADD("snsnd", SN76489A, XTAL(3'579'545))
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_DERIVED( sg1000ax, sg1000a )
-	MCFG_CPU_REPLACE("maincpu", SEGA_315_5033, XTAL_3_579545MHz)
+MACHINE_CONFIG_START(sg1000a_state::sg1000ax)
+	sg1000a(config);
+	MCFG_CPU_REPLACE("maincpu", SEGA_315_5033, XTAL(3'579'545))
 	MCFG_CPU_PROGRAM_MAP(program_map)
 	MCFG_CPU_IO_MAP(io_map)
-	MCFG_CPU_DECRYPTED_OPCODES_MAP(decrypted_opcodes_map)
+	MCFG_CPU_OPCODES_MAP(decrypted_opcodes_map)
 	MCFG_SEGACRPT_SET_DECRYPTED_TAG(":decrypted_opcodes")
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_DERIVED( sderby2s, sg1000a )
+MACHINE_CONFIG_START(sg1000a_state::sderby2s)
+	sg1000a(config);
 	MCFG_CPU_MODIFY("maincpu")
-	MCFG_CPU_CLOCK(XTAL_10_738635MHz / 3)
+	MCFG_CPU_CLOCK(XTAL(10'738'635) / 3)
 	MCFG_CPU_IO_MAP(sderby2_io_map)
 
 	// Actually uses a Sega 315-5066 chip, which is a TMS9918 and SN76489 in the same package but with RGB output

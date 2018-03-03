@@ -73,6 +73,7 @@
 ******************************************************************************************/
 #include "emu.h"
 #include "includes/maygay1b.h"
+#include "machine/74259.h"
 #include "speaker.h"
 
 #include "maygay1b.lh"
@@ -220,13 +221,10 @@ WRITE8_MEMBER(maygay1b_state::m1_pia_porta_w)
 
 WRITE8_MEMBER(maygay1b_state::m1_pia_portb_w)
 {
-	int i;
-	for (i=0; i<8; i++)
+	for (int i = 0; i < 8; i++)
 	{
-		if ( data & (1 << i) )
-		{
-			output().set_indexed_value("triac", i, data & (1 << i));
-		}
+		if (BIT(data, i))
+			m_triacs[i] = 1;
 	}
 }
 
@@ -349,32 +347,35 @@ INPUT_PORTS_END
 
 void maygay1b_state::machine_start()
 {
+	m_lamps.resolve();
+	m_triacs.resolve();
 }
+
 WRITE8_MEMBER(maygay1b_state::reel12_w)
 {
-	m_reel0->update( data     & 0x0F);
-	m_reel1->update((data>>4) & 0x0F);
+	m_reels[0]->update( data     & 0x0F);
+	m_reels[1]->update((data>>4) & 0x0F);
 
-	awp_draw_reel(machine(),"reel1", *m_reel0);
-	awp_draw_reel(machine(),"reel2", *m_reel1);
+	awp_draw_reel(machine(),"reel1", *m_reels[0]);
+	awp_draw_reel(machine(),"reel2", *m_reels[1]);
 }
 
 WRITE8_MEMBER(maygay1b_state::reel34_w)
 {
-	m_reel2->update( data     & 0x0F);
-	m_reel3->update((data>>4) & 0x0F);
+	m_reels[2]->update( data     & 0x0F);
+	m_reels[3]->update((data>>4) & 0x0F);
 
-	awp_draw_reel(machine(),"reel3", *m_reel2);
-	awp_draw_reel(machine(),"reel4", *m_reel3);
+	awp_draw_reel(machine(),"reel3", *m_reels[2]);
+	awp_draw_reel(machine(),"reel4", *m_reels[3]);
 }
 
 WRITE8_MEMBER(maygay1b_state::reel56_w)
 {
-	m_reel4->update( data     & 0x0F);
-	m_reel5->update((data>>4) & 0x0F);
+	m_reels[4]->update( data     & 0x0F);
+	m_reels[5]->update((data>>4) & 0x0F);
 
-	awp_draw_reel(machine(),"reel5", *m_reel4);
-	awp_draw_reel(machine(),"reel6", *m_reel5);
+	awp_draw_reel(machine(),"reel5", *m_reels[4]);
+	awp_draw_reel(machine(),"reel6", *m_reels[5]);
 }
 
 READ8_MEMBER(maygay1b_state::m1_duart_r)
@@ -395,42 +396,45 @@ WRITE8_MEMBER(maygay1b_state::m1_meter_w)
 	}
 }
 
-WRITE8_MEMBER(maygay1b_state::m1_latch_w)
+WRITE_LINE_MEMBER(maygay1b_state::ramen_w)
 {
-	switch ( offset )
+	m_RAMEN = state;
+}
+
+WRITE_LINE_MEMBER(maygay1b_state::alarmen_w)
+{
+	m_ALARMEN = state;
+}
+
+WRITE_LINE_MEMBER(maygay1b_state::nmien_w)
+{
+	if (m_NMIENABLE == 0 && state)
 	{
-		case 0: // m_RAMEN
-		m_RAMEN = (data & 1);
-		break;
-		case 1: // AlarmEn
-		m_ALARMEN = (data & 1);
-		break;
-		case 2: // Enable
-		{
-			if ( m_NMIENABLE == 0 && ( data & 1 ))
-			{
-				m_NMIENABLE = (data & 1);
-				cpu0_nmi();
-			}
-			m_NMIENABLE = (data & 1);
-		}
-		break;
-		case 3: // RTS
-		{
-		}
-		break;
-		case 4: // PSURelay
-		m_PSUrelay = (data & 1);
-		break;
-		case 5: // WDog
-		m_WDOG = (data & 1);
-		break;
-		case 6: // Srsel
-		// this is the ROM banking?
-		printf("rom bank %02x\n",data);
-		m_bank1->set_entry(data & 1);
-		break;
+		m_NMIENABLE = state;
+		cpu0_nmi();
 	}
+	m_NMIENABLE = state;
+}
+
+WRITE_LINE_MEMBER(maygay1b_state::rts_w)
+{
+}
+
+WRITE_LINE_MEMBER(maygay1b_state::psurelay_w)
+{
+	m_PSUrelay = state;
+}
+
+WRITE_LINE_MEMBER(maygay1b_state::wdog_w)
+{
+	m_WDOG = state;
+}
+
+WRITE_LINE_MEMBER(maygay1b_state::srsel_w)
+{
+	// this is the ROM banking?
+	logerror("rom bank %02x\n", state);
+	m_bank1->set_entry(state);
 }
 
 WRITE8_MEMBER(maygay1b_state::latch_ch2_w)
@@ -472,7 +476,7 @@ WRITE8_MEMBER(maygay1b_state::m1_lockout_w)
 	}
 }
 
-static ADDRESS_MAP_START( m1_memmap, AS_PROGRAM, 8, maygay1b_state )
+ADDRESS_MAP_START(maygay1b_state::m1_memmap)
 	AM_RANGE(0x0000, 0x1fff) AM_RAM AM_SHARE("nvram")
 
 	AM_RANGE(0x2000, 0x2000) AM_WRITE(reel12_w)
@@ -500,7 +504,7 @@ static ADDRESS_MAP_START( m1_memmap, AS_PROGRAM, 8, maygay1b_state )
 	AM_RANGE(0x20A0, 0x20A3) AM_DEVWRITE("pia", pia6821_device, write)
 	AM_RANGE(0x20A0, 0x20A3) AM_DEVREAD("pia", pia6821_device, read)
 
-	AM_RANGE(0x20C0, 0x20C7) AM_WRITE(m1_latch_w)
+	AM_RANGE(0x20C0, 0x20C7) AM_DEVWRITE("mainlatch", hc259_device, write_d0)
 
 	AM_RANGE(0x2400, 0x2401) AM_DEVWRITE("ymsnd", ym2413_device, write)
 	AM_RANGE(0x2404, 0x2405) AM_READ(latch_st_lo)
@@ -557,7 +561,7 @@ WRITE8_MEMBER(maygay1b_state::nec_bank1_w)
 	m_upd7759->start_w(1);
 }
 
-static ADDRESS_MAP_START( m1_nec_memmap, AS_PROGRAM, 8, maygay1b_state )
+ADDRESS_MAP_START(maygay1b_state::m1_nec_memmap)
 	AM_RANGE(0x0000, 0x1fff) AM_RAM AM_SHARE("nvram")
 
 	AM_RANGE(0x2000, 0x2000) AM_WRITE(reel12_w)
@@ -585,7 +589,7 @@ static ADDRESS_MAP_START( m1_nec_memmap, AS_PROGRAM, 8, maygay1b_state )
 	AM_RANGE(0x20A0, 0x20A3) AM_DEVWRITE("pia", pia6821_device, write)
 	AM_RANGE(0x20A0, 0x20A3) AM_DEVREAD("pia", pia6821_device, read)
 
-	AM_RANGE(0x20C0, 0x20C7) AM_WRITE(m1_latch_w)
+	AM_RANGE(0x20C0, 0x20C7) AM_DEVWRITE("mainlatch", hc259_device, write_d0)
 
 	AM_RANGE(0x2400, 0x2401) AM_DEVWRITE("ymsnd", ym2413_device, write)
 	AM_RANGE(0x2404, 0x2405) AM_WRITE(nec_bank0_w)
@@ -624,9 +628,7 @@ WRITE8_MEMBER( maygay1b_state::lamp_data_w )
 		// As a consequence, the lamp column data can change before the input strobe without
 		// causing the relevant lamps to black out.
 		for (int i = 0; i < 8; i++)
-		{
-			output().set_lamp_value((8*m_lamp_strobe)+i, ((data  & (1 << (i^4))) !=0));
-		}
+			m_lamps[((m_lamp_strobe << 3) & 0x78) | i] = BIT(data, i ^ 4);
 
 		m_old_lamp_strobe = m_lamp_strobe;
 	}
@@ -653,9 +655,7 @@ WRITE8_MEMBER( maygay1b_state::lamp_data_2_w )
 		// As a consequence, the lamp column data can change before the input strobe without
 		// causing the relevant lamps to black out.
 		for (int i = 0; i < 8; i++)
-		{
-			output().set_lamp_value((8*m_lamp_strobe2)+i+128, ((data  & (1 << (i^4))) !=0));
-		}
+			m_lamps[((m_lamp_strobe2 << 3) & 0x78) | i | 0x80] = BIT(data, i ^ 4);
 
 		m_old_lamp_strobe2 = m_lamp_strobe2;
 	}
@@ -757,24 +757,21 @@ READ8_MEMBER(maygay1b_state::mcu_port2_r)
 	return ret;
 }
 
-static ADDRESS_MAP_START( maygay_mcu_io, AS_IO, 8, maygay1b_state )
-	AM_RANGE(MCS51_PORT_P0, MCS51_PORT_P0) AM_READWRITE( mcu_port0_r, mcu_port0_w )
-	AM_RANGE(MCS51_PORT_P1, MCS51_PORT_P1) AM_WRITE( mcu_port1_w )
-	AM_RANGE(MCS51_PORT_P2, MCS51_PORT_P2) AM_READWRITE( mcu_port2_r, mcu_port2_w )
-	AM_RANGE(MCS51_PORT_P3, MCS51_PORT_P3) AM_WRITE( mcu_port3_w )
-ADDRESS_MAP_END
-
 
 // machine driver for maygay m1 board /////////////////////////////////
 
-MACHINE_CONFIG_START( maygay_m1 )
+MACHINE_CONFIG_START(maygay1b_state::maygay_m1)
 
-	MCFG_CPU_ADD("maincpu", M6809, M1_MASTER_CLOCK/2)
+	MCFG_CPU_ADD("maincpu", MC6809, M1_MASTER_CLOCK/2) // claimed to be 4 MHz
 	MCFG_CPU_PROGRAM_MAP(m1_memmap)
 
 	MCFG_CPU_ADD("mcu", I80C51, 2000000) //  EP840034.A-P-80C51AVW
-	MCFG_CPU_IO_MAP(maygay_mcu_io)
-
+	MCFG_MCS51_PORT_P0_IN_CB(READ8(maygay1b_state, mcu_port0_r))
+	MCFG_MCS51_PORT_P0_OUT_CB(WRITE8(maygay1b_state, mcu_port0_w))
+	MCFG_MCS51_PORT_P1_OUT_CB(WRITE8(maygay1b_state, mcu_port1_w))
+	MCFG_MCS51_PORT_P2_IN_CB(READ8(maygay1b_state, mcu_port2_r))
+	MCFG_MCS51_PORT_P2_OUT_CB(WRITE8(maygay1b_state, mcu_port2_w))
+	MCFG_MCS51_PORT_P3_OUT_CB(WRITE8(maygay1b_state, mcu_port3_w))
 
 	MCFG_DEVICE_ADD("duart68681", MC68681, M1_DUART_CLOCK)
 	MCFG_MC68681_IRQ_CALLBACK(WRITELINE(maygay1b_state, duart_irq_handler))
@@ -783,6 +780,15 @@ MACHINE_CONFIG_START( maygay_m1 )
 	MCFG_DEVICE_ADD("pia", PIA6821, 0)
 	MCFG_PIA_WRITEPA_HANDLER(WRITE8(maygay1b_state, m1_pia_porta_w))
 	MCFG_PIA_WRITEPB_HANDLER(WRITE8(maygay1b_state, m1_pia_portb_w))
+
+	MCFG_DEVICE_ADD("mainlatch", HC259, 0) // U29
+	MCFG_ADDRESSABLE_LATCH_Q0_OUT_CB(WRITELINE(maygay1b_state, ramen_w))  // m_RAMEN
+	MCFG_ADDRESSABLE_LATCH_Q1_OUT_CB(WRITELINE(maygay1b_state, alarmen_w)) // AlarmEn
+	MCFG_ADDRESSABLE_LATCH_Q2_OUT_CB(WRITELINE(maygay1b_state, nmien_w)) // Enable
+	MCFG_ADDRESSABLE_LATCH_Q3_OUT_CB(WRITELINE(maygay1b_state, rts_w)) // RTS
+	MCFG_ADDRESSABLE_LATCH_Q4_OUT_CB(WRITELINE(maygay1b_state, psurelay_w)) // PSURelay
+	MCFG_ADDRESSABLE_LATCH_Q5_OUT_CB(WRITELINE(maygay1b_state, wdog_w)) // WDog
+	MCFG_ADDRESSABLE_LATCH_Q6_OUT_CB(WRITELINE(maygay1b_state, srsel_w)) // Srsel
 
 	MCFG_S16LF01_ADD("vfd",0)
 	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
@@ -815,17 +821,17 @@ MACHINE_CONFIG_START( maygay_m1 )
 #endif
 
 	MCFG_STARPOINT_48STEP_ADD("reel0")
-	MCFG_STEPPER_OPTIC_CALLBACK(WRITELINE(maygay1b_state, reel0_optic_cb))
+	MCFG_STEPPER_OPTIC_CALLBACK(WRITELINE(maygay1b_state, reel_optic_cb<0>))
 	MCFG_STARPOINT_48STEP_ADD("reel1")
-	MCFG_STEPPER_OPTIC_CALLBACK(WRITELINE(maygay1b_state, reel1_optic_cb))
+	MCFG_STEPPER_OPTIC_CALLBACK(WRITELINE(maygay1b_state, reel_optic_cb<1>))
 	MCFG_STARPOINT_48STEP_ADD("reel2")
-	MCFG_STEPPER_OPTIC_CALLBACK(WRITELINE(maygay1b_state, reel2_optic_cb))
+	MCFG_STEPPER_OPTIC_CALLBACK(WRITELINE(maygay1b_state, reel_optic_cb<2>))
 	MCFG_STARPOINT_48STEP_ADD("reel3")
-	MCFG_STEPPER_OPTIC_CALLBACK(WRITELINE(maygay1b_state, reel3_optic_cb))
+	MCFG_STEPPER_OPTIC_CALLBACK(WRITELINE(maygay1b_state, reel_optic_cb<3>))
 	MCFG_STARPOINT_48STEP_ADD("reel4")
-	MCFG_STEPPER_OPTIC_CALLBACK(WRITELINE(maygay1b_state, reel4_optic_cb))
+	MCFG_STEPPER_OPTIC_CALLBACK(WRITELINE(maygay1b_state, reel_optic_cb<4>))
 	MCFG_STARPOINT_48STEP_ADD("reel5")
-	MCFG_STEPPER_OPTIC_CALLBACK(WRITELINE(maygay1b_state, reel5_optic_cb))
+	MCFG_STEPPER_OPTIC_CALLBACK(WRITELINE(maygay1b_state, reel_optic_cb<5>))
 
 	MCFG_DEVICE_ADD("meters", METERS, 0)
 	MCFG_METERS_NUMBER(8)
@@ -835,11 +841,13 @@ MACHINE_CONFIG_START( maygay_m1 )
 	MCFG_DEFAULT_LAYOUT(layout_maygay1b)
 MACHINE_CONFIG_END
 
-MACHINE_CONFIG_DERIVED( maygay_m1_no_oki, maygay_m1 )
+MACHINE_CONFIG_START(maygay1b_state::maygay_m1_no_oki)
+	maygay_m1(config);
 	MCFG_DEVICE_REMOVE("msm6376")
 MACHINE_CONFIG_END
 
-MACHINE_CONFIG_DERIVED( maygay_m1_nec, maygay_m1 )
+MACHINE_CONFIG_START(maygay1b_state::maygay_m1_nec)
+	maygay_m1(config);
 	MCFG_CPU_MODIFY("maincpu")
 	MCFG_CPU_PROGRAM_MAP(m1_nec_memmap)
 

@@ -7,7 +7,6 @@
         29/04/2009 Preliminary driver.
 
         TODO: keyboard doesn't work properly, kb uart comms issue?
-        TODO: split keyboard off as a synchronous serial device?
         TODO: vt100 gives a '2' error on startup indicating bad nvram checksum
               adding the serial nvram support should fix this
         TODO: support for the on-AVO character set roms
@@ -25,18 +24,16 @@
 #include "cpu/i8085/i8085.h"
 #include "cpu/z80/z80.h"
 #include "machine/com8116.h"
+#include "machine/er1400.h"
 #include "machine/i8251.h"
-#include "machine/timer.h"
-#include "sound/beep.h"
+#include "machine/vt100_kbd.h"
 #include "video/vtvideo.h"
 #include "screen.h"
-#include "speaker.h"
 
 #include "vt100.lh"
 
 
 #define RS232_TAG       "rs232"
-#define COM5016T_TAG    "com5016t"
 
 class vt100_state : public driver_device
 {
@@ -45,44 +42,47 @@ public:
 		driver_device(mconfig, type, tag),
 		m_maincpu(*this, "maincpu"),
 		m_crtc(*this, "vt100_video"),
-		m_speaker(*this, "beeper"),
-		m_uart(*this, "i8251"),
-		m_dbrg(*this, COM5016T_TAG),
+		m_keyboard(*this, "keyboard"),
+		m_dbrg(*this, "dbrg"),
+		m_nvr(*this, "nvr"),
 		m_p_ram(*this, "p_ram")
 	{
 	}
 
 	required_device<cpu_device> m_maincpu;
 	required_device<vt100_video_device> m_crtc;
-	required_device<beep_device> m_speaker;
-	required_device<i8251_device> m_uart;
+	required_device<vt100_keyboard_device> m_keyboard;
 	required_device<com8116_device> m_dbrg;
+	required_device<er1400_device> m_nvr;
 	DECLARE_READ8_MEMBER(vt100_flags_r);
+	DECLARE_WRITE_LINE_MEMBER(keyboard_int_w);
 	DECLARE_WRITE8_MEMBER(vt100_keyboard_w);
 	DECLARE_READ8_MEMBER(vt100_keyboard_r);
 	DECLARE_WRITE8_MEMBER(vt100_baud_rate_w);
 	DECLARE_WRITE8_MEMBER(vt100_nvr_latch_w);
 	DECLARE_READ8_MEMBER(vt100_read_video_ram_r);
-	DECLARE_WRITE_LINE_MEMBER(vt100_clear_video_interrupt);
+	DECLARE_WRITE_LINE_MEMBER(vert_freq_intr_w);
 	required_shared_ptr<uint8_t> m_p_ram;
 	bool m_keyboard_int;
 	bool m_receiver_int;
 	bool m_vertical_int;
-	bool m_key_scan;
-	uint8_t m_key_code;
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
 	uint32_t screen_update_vt100(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
-	INTERRUPT_GEN_MEMBER(vt100_vertical_interrupt);
-	TIMER_DEVICE_CALLBACK_MEMBER(keyboard_callback);
 	IRQ_CALLBACK_MEMBER(vt100_irq_callback);
-	uint8_t bit_sel(uint8_t data);
+	void vt102(machine_config &config);
+	void vt100(machine_config &config);
+	void vt180(machine_config &config);
+	void vt100_io(address_map &map);
+	void vt100_mem(address_map &map);
+	void vt180_io(address_map &map);
+	void vt180_mem(address_map &map);
 };
 
 
 
 
-static ADDRESS_MAP_START(vt100_mem, AS_PROGRAM, 8, vt100_state)
+ADDRESS_MAP_START(vt100_state::vt100_mem)
 	ADDRESS_MAP_UNMAP_HIGH
 	AM_RANGE( 0x0000, 0x1fff ) AM_ROM  // ROM ( 4 * 2K)
 	AM_RANGE( 0x2000, 0x2bff ) AM_RAM AM_SHARE("p_ram") // Screen and scratch RAM
@@ -94,13 +94,13 @@ static ADDRESS_MAP_START(vt100_mem, AS_PROGRAM, 8, vt100_state)
 	// 0xc000, 0xffff is unassigned
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START(vt180_mem, AS_PROGRAM, 8, vt100_state)
+ADDRESS_MAP_START(vt100_state::vt180_mem)
 	ADDRESS_MAP_UNMAP_HIGH
 	AM_RANGE( 0x0000, 0x1fff ) AM_ROM
 	AM_RANGE( 0x2000, 0xffff ) AM_RAM
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START(vt180_io, AS_IO, 8, vt100_state)
+ADDRESS_MAP_START(vt100_state::vt180_io)
 	ADDRESS_MAP_UNMAP_HIGH
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
 ADDRESS_MAP_END
@@ -116,62 +116,28 @@ ADDRESS_MAP_END
 READ8_MEMBER( vt100_state::vt100_flags_r )
 {
 	uint8_t ret = 0;
-	ret |= m_crtc->lba7_r(space, 0) << 6;
+
+	ret |= !m_nvr->data_r() << 5;
+	ret |= m_crtc->lba7_r() << 6;
 	ret |= m_keyboard_int << 7;
 	return ret;
 }
 
-uint8_t vt100_state::bit_sel(uint8_t data)
+WRITE_LINE_MEMBER(vt100_state::keyboard_int_w)
 {
-	if (!BIT(data,7)) return 0x70;
-	if (!BIT(data,6)) return 0x60;
-	if (!BIT(data,5)) return 0x50;
-	if (!BIT(data,4)) return 0x40;
-	if (!BIT(data,3)) return 0x30;
-	if (!BIT(data,2)) return 0x20;
-	if (!BIT(data,1)) return 0x10;
-	if (!BIT(data,0)) return 0x00;
-	return 0;
+	m_keyboard_int = state;
+	if (state)
+		m_maincpu->set_input_line(0, HOLD_LINE);
 }
-
-TIMER_DEVICE_CALLBACK_MEMBER(vt100_state::keyboard_callback)
-{
-	uint8_t i, code;
-	char kbdrow[8];
-	if (m_key_scan)
-	{
-		for(i = 0; i < 16; i++)
-		{
-			sprintf(kbdrow,"LINE%X", i);
-			code =  ioport(kbdrow)->read();
-			if (code < 0xff)
-			{
-				m_keyboard_int = 1;
-				m_key_code = i | bit_sel(code);
-				m_maincpu->set_input_line(0, HOLD_LINE);
-				break;
-			}
-		}
-	}
-}
-
 
 WRITE8_MEMBER( vt100_state::vt100_keyboard_w )
 {
-	output().set_value("online_led",BIT(data, 5) ? 0 : 1);
-	output().set_value("local_led", BIT(data, 5));
-	output().set_value("locked_led",BIT(data, 4) ? 0 : 1);
-	output().set_value("l1_led", BIT(data, 3) ? 0 : 1);
-	output().set_value("l2_led", BIT(data, 2) ? 0 : 1);
-	output().set_value("l3_led", BIT(data, 1) ? 0 : 1);
-	output().set_value("l4_led", BIT(data, 0) ? 0 : 1);
-	m_key_scan = BIT(data, 6);
-	m_speaker->set_state(BIT(data, 7));
+	m_keyboard->control_w(data);
 }
 
 READ8_MEMBER( vt100_state::vt100_keyboard_r )
 {
-	return m_key_code;
+	return m_keyboard->key_code_r();
 }
 
 WRITE8_MEMBER( vt100_state::vt100_baud_rate_w )
@@ -182,14 +148,21 @@ WRITE8_MEMBER( vt100_state::vt100_baud_rate_w )
 
 WRITE8_MEMBER( vt100_state::vt100_nvr_latch_w )
 {
+	// data inverted due to negative logic
+	m_nvr->c3_w(!BIT(data, 3));
+	m_nvr->c2_w(!BIT(data, 2));
+	m_nvr->c1_w(!BIT(data, 1));
+
+	// C2 is used to disable pullup on data line
+	m_nvr->data_w(BIT(data, 2) ? 0 : !BIT(data, 0));
 }
 
-static ADDRESS_MAP_START(vt100_io, AS_IO, 8, vt100_state)
+ADDRESS_MAP_START(vt100_state::vt100_io)
 	ADDRESS_MAP_UNMAP_HIGH
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	// 0x00, 0x01 PUSART  (Intel 8251)
-	AM_RANGE (0x00, 0x00) AM_DEVREADWRITE("i8251", i8251_device, data_r, data_w)
-	AM_RANGE (0x01, 0x01) AM_DEVREADWRITE("i8251", i8251_device, status_r, control_w)
+	AM_RANGE (0x00, 0x00) AM_DEVREADWRITE("pusart", i8251_device, data_r, data_w)
+	AM_RANGE (0x01, 0x01) AM_DEVREADWRITE("pusart", i8251_device, status_r, control_w)
 	// 0x02 Baud rate generator
 	AM_RANGE (0x02, 0x02) AM_WRITE(vt100_baud_rate_w)
 	// 0x22 Modem buffer
@@ -214,120 +187,6 @@ ADDRESS_MAP_END
 
 /* Input ports */
 static INPUT_PORTS_START( vt100 )
-	PORT_START("LINE0")
-		PORT_BIT(0x01, IP_ACTIVE_LOW, IPT_UNUSED)
-		PORT_BIT(0x02, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("Right") PORT_CODE(KEYCODE_RIGHT)
-		PORT_BIT(0x04, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("Left") PORT_CODE(KEYCODE_LEFT)
-		PORT_BIT(0x08, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("Up") PORT_CODE(KEYCODE_UP)
-		PORT_BIT(0x10, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("Num 7") PORT_CODE(KEYCODE_7_PAD)
-		PORT_BIT(0x20, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("Num 8") PORT_CODE(KEYCODE_8_PAD)
-		PORT_BIT(0x40, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("Num .") PORT_CODE(KEYCODE_DEL_PAD)
-		PORT_BIT(0x80, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("Num 9") PORT_CODE(KEYCODE_9_PAD)
-	PORT_START("LINE1")
-		PORT_BIT(0x01, IP_ACTIVE_LOW, IPT_UNUSED)
-		PORT_BIT(0x02, IP_ACTIVE_LOW, IPT_UNUSED)
-		PORT_BIT(0x04, IP_ACTIVE_LOW, IPT_UNUSED)
-		PORT_BIT(0x08, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("PF3") PORT_CODE(KEYCODE_F3)
-		PORT_BIT(0x10, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("PF4") PORT_CODE(KEYCODE_F4)
-		PORT_BIT(0x20, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("Num Enter") PORT_CODE(KEYCODE_ENTER_PAD)
-		PORT_BIT(0x40, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("Num ,") PORT_CODE(KEYCODE_PLUS_PAD)
-		PORT_BIT(0x80, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("Num 3") PORT_CODE(KEYCODE_3_PAD)
-	PORT_START("LINE2")
-		PORT_BIT(0x01, IP_ACTIVE_LOW, IPT_UNUSED)
-		PORT_BIT(0x02, IP_ACTIVE_LOW, IPT_UNUSED)
-		PORT_BIT(0x04, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("Down") PORT_CODE(KEYCODE_DOWN)
-		PORT_BIT(0x08, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("PF1") PORT_CODE(KEYCODE_F1)
-		PORT_BIT(0x10, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("PF2") PORT_CODE(KEYCODE_F2)
-		PORT_BIT(0x20, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("Num 2") PORT_CODE(KEYCODE_2_PAD)
-		PORT_BIT(0x40, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("Num 5") PORT_CODE(KEYCODE_5_PAD)
-		PORT_BIT(0x80, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("Num 6") PORT_CODE(KEYCODE_6_PAD)
-	PORT_START("LINE3")
-		PORT_BIT(0x01, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("Delete") PORT_CODE(KEYCODE_DEL)
-		PORT_BIT(0x02, IP_ACTIVE_LOW, IPT_UNUSED)
-		PORT_BIT(0x04, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("Break") PORT_CODE(KEYCODE_F6)
-		PORT_BIT(0x08, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("Backspace") PORT_CODE(KEYCODE_BACKSPACE)
-		PORT_BIT(0x10, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("Num 0") PORT_CODE(KEYCODE_0_PAD)
-		PORT_BIT(0x20, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("Num 1") PORT_CODE(KEYCODE_1_PAD)
-		PORT_BIT(0x40, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("Num 4") PORT_CODE(KEYCODE_4_PAD)
-		PORT_BIT(0x80, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("Num -") PORT_CODE(KEYCODE_MINUS_PAD)
-	PORT_START("LINE4")
-		PORT_BIT(0x01, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("Num Return") PORT_CODE(KEYCODE_ENTER_PAD)
-		PORT_BIT(0x02, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("]") PORT_CODE(KEYCODE_CLOSEBRACE)
-		PORT_BIT(0x04, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("~") PORT_CODE(KEYCODE_TILDE)
-		PORT_BIT(0x08, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("=") PORT_CODE(KEYCODE_EQUALS)
-		PORT_BIT(0x10, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("Line feed") PORT_CODE(KEYCODE_RALT)
-		PORT_BIT(0x20, IP_ACTIVE_LOW, IPT_UNUSED)
-		PORT_BIT(0x40, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("Return") PORT_CODE(KEYCODE_ENTER)
-		PORT_BIT(0x80, IP_ACTIVE_LOW, IPT_UNUSED)
-	PORT_START("LINE5")
-		PORT_BIT(0x01, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("P") PORT_CODE(KEYCODE_P)
-		PORT_BIT(0x02, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("[") PORT_CODE(KEYCODE_OPENBRACE)
-		PORT_BIT(0x04, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("-") PORT_CODE(KEYCODE_MINUS)
-		PORT_BIT(0x08, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("0") PORT_CODE(KEYCODE_0)
-		PORT_BIT(0x10, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("\\") PORT_CODE(KEYCODE_BACKSLASH)
-		PORT_BIT(0x20, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME(",") PORT_CODE(KEYCODE_COMMA)
-		PORT_BIT(0x40, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME(".") PORT_CODE(KEYCODE_STOP)
-		PORT_BIT(0x80, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("/") PORT_CODE(KEYCODE_SLASH)
-	PORT_START("LINE6")
-		PORT_BIT(0x01, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("O") PORT_CODE(KEYCODE_O)
-		PORT_BIT(0x02, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("I") PORT_CODE(KEYCODE_I)
-		PORT_BIT(0x04, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("9") PORT_CODE(KEYCODE_9)
-		PORT_BIT(0x08, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("8") PORT_CODE(KEYCODE_8)
-		PORT_BIT(0x10, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("L") PORT_CODE(KEYCODE_L)
-		PORT_BIT(0x20, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME(";") PORT_CODE(KEYCODE_COLON)
-		PORT_BIT(0x40, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("'") PORT_CODE(KEYCODE_QUOTE)
-		PORT_BIT(0x80, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("M") PORT_CODE(KEYCODE_M)
-	PORT_START("LINE7")
-		PORT_BIT(0x01, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("V") PORT_CODE(KEYCODE_Y)
-		PORT_BIT(0x02, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("U") PORT_CODE(KEYCODE_U)
-		PORT_BIT(0x04, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("7") PORT_CODE(KEYCODE_7)
-		PORT_BIT(0x08, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("6") PORT_CODE(KEYCODE_6)
-		PORT_BIT(0x10, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("K") PORT_CODE(KEYCODE_K)
-		PORT_BIT(0x20, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("J") PORT_CODE(KEYCODE_J)
-		PORT_BIT(0x40, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("N") PORT_CODE(KEYCODE_N)
-		PORT_BIT(0x80, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("Space") PORT_CODE(KEYCODE_SPACE)
-	PORT_START("LINE8")
-		PORT_BIT(0x01, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("T") PORT_CODE(KEYCODE_T)
-		PORT_BIT(0x02, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("R") PORT_CODE(KEYCODE_R)
-		PORT_BIT(0x04, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("4") PORT_CODE(KEYCODE_4)
-		PORT_BIT(0x08, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("5") PORT_CODE(KEYCODE_5)
-		PORT_BIT(0x10, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("G") PORT_CODE(KEYCODE_G)
-		PORT_BIT(0x20, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("H") PORT_CODE(KEYCODE_H)
-		PORT_BIT(0x40, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("B") PORT_CODE(KEYCODE_B)
-		PORT_BIT(0x80, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("V") PORT_CODE(KEYCODE_V)
-	PORT_START("LINE9")
-		PORT_BIT(0x01, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("W") PORT_CODE(KEYCODE_W)
-		PORT_BIT(0x02, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("E") PORT_CODE(KEYCODE_E)
-		PORT_BIT(0x04, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("3") PORT_CODE(KEYCODE_3)
-		PORT_BIT(0x08, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("2") PORT_CODE(KEYCODE_2)
-		PORT_BIT(0x10, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("F") PORT_CODE(KEYCODE_F)
-		PORT_BIT(0x20, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("D") PORT_CODE(KEYCODE_D)
-		PORT_BIT(0x40, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("X") PORT_CODE(KEYCODE_X)
-		PORT_BIT(0x80, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("C") PORT_CODE(KEYCODE_C)
-	PORT_START("LINEA")
-		PORT_BIT(0x01, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("Q") PORT_CODE(KEYCODE_Q)
-		PORT_BIT(0x02, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("1") PORT_CODE(KEYCODE_1)
-		PORT_BIT(0x04, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("Esc") PORT_CODE(KEYCODE_ESC)
-		PORT_BIT(0x08, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("Tab") PORT_CODE(KEYCODE_TAB)
-		PORT_BIT(0x10, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("A") PORT_CODE(KEYCODE_A)
-		PORT_BIT(0x20, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("S") PORT_CODE(KEYCODE_S)
-		PORT_BIT(0x40, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("No scroll") PORT_CODE(KEYCODE_LALT)
-		PORT_BIT(0x80, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("Z") PORT_CODE(KEYCODE_Z)
-	PORT_START("LINEB")
-		PORT_BIT(0x7F, IP_ACTIVE_LOW, IPT_UNUSED)
-		PORT_BIT(0x80, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("Setup") PORT_CODE(KEYCODE_F5)
-	PORT_START("LINEC")
-		PORT_BIT(0x7F, IP_ACTIVE_LOW, IPT_UNUSED)
-		PORT_BIT(0x80, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("Ctrl") PORT_CODE(KEYCODE_LCONTROL) PORT_CODE(KEYCODE_RCONTROL)
-	PORT_START("LINED")
-		PORT_BIT(0x7F, IP_ACTIVE_LOW, IPT_UNUSED)
-		PORT_BIT(0x80, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("Shift") PORT_CODE(KEYCODE_LSHIFT) PORT_CODE(KEYCODE_RSHIFT)
-	PORT_START("LINEE")
-		PORT_BIT(0x7F, IP_ACTIVE_LOW, IPT_UNUSED)
-		PORT_BIT(0x80, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("Caps lock") PORT_CODE(KEYCODE_CAPSLOCK)
-	PORT_START("LINEF")
-		PORT_BIT(0x7F, IP_ACTIVE_LOW,  IPT_UNUSED)
-		PORT_BIT(0x80, IP_ACTIVE_HIGH, IPT_UNUSED) // Always return 0x7f on last scan line
 INPUT_PORTS_END
 
 uint32_t vt100_state::screen_update_vt100(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
@@ -366,7 +225,7 @@ void vt100_state::machine_reset()
 	output().set_value("l3_led", 1);
 	output().set_value("l4_led", 1);
 
-	m_key_scan = 0;
+	vt100_nvr_latch_w(machine().dummy_space(), 0, 0);
 }
 
 READ8_MEMBER( vt100_state::vt100_read_video_ram_r )
@@ -374,15 +233,11 @@ READ8_MEMBER( vt100_state::vt100_read_video_ram_r )
 	return m_p_ram[offset];
 }
 
-WRITE_LINE_MEMBER( vt100_state::vt100_clear_video_interrupt )
+WRITE_LINE_MEMBER( vt100_state::vert_freq_intr_w )
 {
-	m_vertical_int = 0;
-}
-
-INTERRUPT_GEN_MEMBER(vt100_state::vt100_vertical_interrupt)
-{
-	m_vertical_int = 1;
-	device.execute().set_input_line(0, HOLD_LINE);
+	m_vertical_int = (state == ASSERT_LINE) ? 1 : 0;
+	if (state)
+		m_maincpu->set_input_line(0, HOLD_LINE);
 }
 
 /* F4 Character Displayer */
@@ -403,20 +258,17 @@ static GFXDECODE_START( vt100 )
 	GFXDECODE_ENTRY( "chargen", 0x0000, vt100_charlayout, 0, 1 )
 GFXDECODE_END
 
-static MACHINE_CONFIG_START( vt100 )
+MACHINE_CONFIG_START(vt100_state::vt100)
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu",I8080, XTAL_24_8832MHz / 9)
+	MCFG_CPU_ADD("maincpu", I8080, XTAL(24'883'200) / 9)
 	MCFG_CPU_PROGRAM_MAP(vt100_mem)
 	MCFG_CPU_IO_MAP(vt100_io)
-	MCFG_CPU_VBLANK_INT_DRIVER("screen", vt100_state,  vt100_vertical_interrupt)
 	MCFG_CPU_IRQ_ACKNOWLEDGE_DRIVER(vt100_state,vt100_irq_callback)
 
 	/* video hardware */
 	MCFG_SCREEN_ADD_MONOCHROME("screen", RASTER, rgb_t::green())
-	MCFG_SCREEN_REFRESH_RATE(60)
-	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500)) /* not accurate */
-	MCFG_SCREEN_SIZE(80*10, 25*10)
-	MCFG_SCREEN_VISIBLE_AREA(0, 80*10-1, 0, 25*10-1)
+	MCFG_SCREEN_RAW_PARAMS(XTAL(24'073'400)*2/3, 102*10, 0, 80*10, 262, 0, 25*10)
+	//MCFG_SCREEN_RAW_PARAMS(XTAL(24'073'400), 170*9, 0, 132*9, 262, 0, 25*10)
 	MCFG_SCREEN_UPDATE_DRIVER(vt100_state, screen_update_vt100)
 	MCFG_SCREEN_PALETTE("vt100_video:palette")
 
@@ -425,45 +277,52 @@ static MACHINE_CONFIG_START( vt100 )
 
 	MCFG_DEFAULT_LAYOUT( layout_vt100 )
 
-	MCFG_DEVICE_ADD("vt100_video", VT100_VIDEO, 0)
+	MCFG_DEVICE_ADD("vt100_video", VT100_VIDEO, XTAL(24'073'400))
 	MCFG_VT_SET_SCREEN("screen")
 	MCFG_VT_CHARGEN("chargen")
 	MCFG_VT_VIDEO_RAM_CALLBACK(READ8(vt100_state, vt100_read_video_ram_r))
-	MCFG_VT_VIDEO_CLEAR_VIDEO_INTERRUPT_CALLBACK(WRITELINE(vt100_state, vt100_clear_video_interrupt))
+	MCFG_VT_VIDEO_VERT_FREQ_INTR_CALLBACK(WRITELINE(vt100_state, vert_freq_intr_w))
+	MCFG_VT_VIDEO_LBA7_CALLBACK(DEVWRITELINE("nvr", er1400_device, clock_w))
 
-	MCFG_DEVICE_ADD("i8251", I8251, 0) // 2.7648Mhz phi-clock (not used for tx clock or rx clock?)
+	MCFG_DEVICE_ADD("pusart", I8251, XTAL(24'883'200) / 9)
 	MCFG_I8251_TXD_HANDLER(DEVWRITELINE(RS232_TAG, rs232_port_device, write_txd))
 	MCFG_I8251_DTR_HANDLER(DEVWRITELINE(RS232_TAG, rs232_port_device, write_dtr))
 	MCFG_I8251_RTS_HANDLER(DEVWRITELINE(RS232_TAG, rs232_port_device, write_rts))
 
 	MCFG_RS232_PORT_ADD(RS232_TAG, default_rs232_devices, nullptr)
-	MCFG_RS232_RXD_HANDLER(DEVWRITELINE("i8251", i8251_device, write_rxd))
-	MCFG_RS232_DSR_HANDLER(DEVWRITELINE("i8251", i8251_device, write_dsr))
+	MCFG_RS232_RXD_HANDLER(DEVWRITELINE("pusart", i8251_device, write_rxd))
+	MCFG_RS232_DSR_HANDLER(DEVWRITELINE("pusart", i8251_device, write_dsr))
 
-	MCFG_DEVICE_ADD(COM5016T_TAG, COM8116, XTAL_5_0688MHz/*XTAL_24_8832MHz / 9*/) // COM5016T-013, 2.7648Mhz Clock, currently hacked wrongly
-	MCFG_COM8116_FR_HANDLER(DEVWRITELINE("i8251", i8251_device, write_rxc))
-	MCFG_COM8116_FT_HANDLER(DEVWRITELINE("i8251", i8251_device, write_txc))
+	MCFG_DEVICE_ADD("dbrg", COM5016_013, XTAL(24'883'200) / 9) // COM5016T-013 (or WD1943CD-02), 2.7648Mhz Clock
+	MCFG_COM8116_FR_HANDLER(DEVWRITELINE("pusart", i8251_device, write_rxc))
+	MCFG_COM8116_FT_HANDLER(DEVWRITELINE("pusart", i8251_device, write_txc))
 
-	/* audio hardware */
-	MCFG_SPEAKER_STANDARD_MONO("mono")
-	MCFG_SOUND_ADD("beeper", BEEP, 786) // 7.945us per serial clock = ~125865.324hz, / 160 clocks per char = ~ 786 hz
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
+	MCFG_DEVICE_ADD("nvr", ER1400, 0)
 
-	MCFG_TIMER_DRIVER_ADD_PERIODIC("keyboard_timer", vt100_state, keyboard_callback, attotime::from_hz(800))
+	MCFG_DEVICE_ADD("keyboard", VT100_KEYBOARD, 0)
+	MCFG_VT100_KEYBOARD_INT_CALLBACK(WRITELINE(vt100_state, keyboard_int_w))
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_DERIVED( vt180, vt100 )
-	MCFG_CPU_ADD("z80cpu", Z80, XTAL_24_8832MHz / 9)
+MACHINE_CONFIG_START(vt100_state::vt180)
+	vt100(config);
+	MCFG_CPU_ADD("z80cpu", Z80, XTAL(24'883'200) / 9)
 	MCFG_CPU_PROGRAM_MAP(vt180_mem)
 	MCFG_CPU_IO_MAP(vt180_io)
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_DERIVED( vt102, vt100 )
-	MCFG_CPU_REPLACE("maincpu",I8085A, XTAL_24_8832MHz / 9)
+MACHINE_CONFIG_START(vt100_state::vt102)
+	vt100(config);
+	MCFG_CPU_REPLACE("maincpu", I8085A, XTAL(24'073'400) / 4)
 	MCFG_CPU_PROGRAM_MAP(vt100_mem)
 	MCFG_CPU_IO_MAP(vt100_io)
-	MCFG_CPU_VBLANK_INT_DRIVER("screen", vt100_state,  vt100_vertical_interrupt)
 	MCFG_CPU_IRQ_ACKNOWLEDGE_DRIVER(vt100_state,vt100_irq_callback)
+
+	MCFG_DEVICE_MODIFY("pusart")
+	MCFG_DEVICE_CLOCK(XTAL(24'073'400) / 8)
+
+	MCFG_DEVICE_REPLACE("dbrg", COM8116_003, XTAL(24'073'400) / 4)
+	MCFG_COM8116_FR_HANDLER(DEVWRITELINE("pusart", i8251_device, write_rxc))
+	MCFG_COM8116_FT_HANDLER(DEVWRITELINE("pusart", i8251_device, write_txc))
 MACHINE_CONFIG_END
 
 /* VT1xx models:
@@ -674,20 +533,15 @@ ROM_START( vt100ac ) // This is from the VT180 technical manual at http://www.bi
 	ROM_REGION( 0x10000, "maincpu", ROMREGION_ERASEFF )
 	ROM_LOAD( "23-095e2.e40", 0x0000, 0x0800, CRC(6c8acf44) SHA1(b3ef5af920995a40a316c6dc008960c461853bfc)) // Label: "23095E2 // (C)DEC // (M)QQ8227" @E40
 	ROM_LOAD( "23-096e2.e45", 0x0800, 0x0800, CRC(77f21473) SHA1(6f10b250777c12cca63ee611735f9f36cc05a7ef)) // Label: "23096E2 // (C)DEC // (M)QQ8227" @E45
-	ROM_LOAD( "23-139e2.bad3.e52", 0x1000, 0x0800, BAD_DUMP CRC(eaede07a) SHA1(410cef41c4f3a6a37570a82f359dd2b2d536d3dd)) // Label: "AMD // 37108 8232DKP // 23-139E2 // AM9218CPC // (C)DEC_1979" @E52;  // revision 2?; revision 1 is 23-097e2 MAYBE // bytes with A1 and A2 both high and a3 high? are mostly correct, rest are likely all wrong.
+	ROM_LOAD( "23-139e2.e52", 0x1000, 0x0800, CRC(c3302ce5) SHA1(a2ab3b9b48b5e850b2d7b22e6f8ef6099599e4b6)) // Label: "AMD // 37108 8232DKP // 23-139E2 // AM9218CPC // (C)DEC_1979" @E52;  // revision 2?; revision 1 is 23-097e2 MAYBE
 	ROM_LOAD( "23-140e2.e56", 0x1800, 0x0800, CRC(4bf1ce4e) SHA1(279f47ec9a68c801c3c05005dd782202ac9e51a4)) // Label: "AMD // 37109 8230DHP // 23-140E2 // AM9218CPC // (C)DEC 1979" @E56  // revision 2?; revision 1 is 23-098e2 MAYBE
 
-	/* bad rom tracing
-	bpset 1be then set pc=1d5 to bypass rom test
-	obvious entry points are 1000, 1016 (which is the first one hit, from f95), 1025, 112e, 1167, 11db, 136e, 1470, 1480, 16a9, 1719, 17e5
-	corresponding functions in vt100 roms are: WRITE ME
-	*/
-
-	ROM_REGION(0x1000, "avo", 0) // all switches on avo are open EXCEPT S2-3; does this map at 0xa000-0xcfff (mirrored) in maincpu space?
-	// are 184 and 185 an older version of the stp avo firmware?
+	ROM_REGION(0x1000, "avo", 0) // all switches on "54-13097-00 // PN2280402L" AVO are open EXCEPT S2-3; does this map at 0xa000-0xcfff (mirrored) in maincpu space?
+	// This same set of roms also appears on the "PN1030385J-F" AVO, which has no dipswitches; instead a single jumper? resistor installed in the NDIP20 footprint between E16 and E22, between pins 6 and 15 of the footprint
 	//NOTE: for both of these two avo roms, Pin 18 is positive enable CE, Pin 20 is negative enable /CE1, Pin 21 is negative enable /CE2,
 	ROM_LOAD( "23-186e2.avo.e21", 0x0000, 0x0800, CRC(1592dec1) SHA1(c4b8fc9fc0514e0cd46ad2de03abe72271ce460b)) // Label: "S 8218 // C69063 // 23186E2" @E21
 	ROM_LOAD( "23-187e2.avo.e17", 0x0800, 0x0800, CRC(c6d72a41) SHA1(956f9eb945a250fd05c76100b38c0ba381ab8fde)) // Label: "S 8228 // C69062 // 23187E2" @E17
+	// are 184 and 185 an older version of the VT100-AC AVO firmware?
 
 	ROM_REGION(0x2000, "stp", 0) // stp switches 1 and 5 are closed, 2,3,4 open
 	ROM_LOAD( "23-029e4.stp.e14", 0x0000, 0x2000, CRC(da55c62b) SHA1(261b02b774d57253d1dedecab8ca0e368c2a96cd)) // Label: "S 8218 // C43020 // 23029E4 (C) DEC // TP02" @E14

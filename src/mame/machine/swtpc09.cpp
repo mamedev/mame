@@ -420,13 +420,13 @@ WRITE8_MEMBER( swtpc09_state::piaide_b_w )
 	{
 		if (!(data & 0x02))  //rd line bit 1
 		{
-			tempidedata = m_ide->read_cs0(space, (data&0x1c)>>2, 0xffff);
+			tempidedata = m_ide->read_cs0((data&0x1c)>>2);
 			LOG(("swtpc09_ide_bus_r: offset $%02X data %04X\n", (data&0x1c)>>2, tempidedata));
 			m_piaide_porta = tempidedata & 0x00ff;
 		}
 		else if (!(data & 0x01))  //wr line bit 0
 		{
-			m_ide->write_cs0(space, (data&0x1c)>>2, m_piaide_porta, 0xffff);
+			m_ide->write_cs0((data&0x1c)>>2, m_piaide_porta);
 			LOG(("swtpc09_ide_bus_w: offset $%02X data %04X\n", (data&0x1c)>>2, m_piaide_porta));
 		}
 	}
@@ -434,13 +434,13 @@ WRITE8_MEMBER( swtpc09_state::piaide_b_w )
 	{
 		if (!(data & 0x02))  //rd line bit 1
 		{
-			tempidedata = m_ide->read_cs1(space, (data&0x1c)>>2, 0xffff);
+			tempidedata = m_ide->read_cs1((data&0x1c)>>2);
 			LOG(("swtpc09_ide_bus_r: offset $%02X data %04X\n", (data&0x1c)>>2, tempidedata));
 			m_piaide_porta = tempidedata & 0x00ff;
 		}
 		else if (!(data & 0x01))  //wr line bit 0
 		{
-			m_ide->write_cs1(space, (data&0x1c)>>2, m_piaide_porta, 0xffff);
+			m_ide->write_cs1((data&0x1c)>>2, m_piaide_porta);
 			LOG(("swtpc09_ide_bus_w: offset $%02X data %04X\n", (data&0x1c)>>2, m_piaide_porta));
 		}
 	}

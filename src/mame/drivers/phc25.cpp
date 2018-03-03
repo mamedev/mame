@@ -119,14 +119,14 @@ WRITE_LINE_MEMBER( phc25_state::write_centronics_busy )
 
 /* Memory Maps */
 
-static ADDRESS_MAP_START( phc25_mem, AS_PROGRAM, 8, phc25_state )
+ADDRESS_MAP_START(phc25_state::phc25_mem)
 	ADDRESS_MAP_UNMAP_HIGH
 	AM_RANGE(0x0000, 0x5fff) AM_ROM AM_REGION(Z80_TAG, 0)
 	AM_RANGE(0x6000, 0x77ff) AM_RAM AM_SHARE("video_ram")
 	AM_RANGE(0xc000, 0xffff) AM_RAM
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( phc25_io, AS_IO, 8, phc25_state )
+ADDRESS_MAP_START(phc25_state::phc25_io)
 	ADDRESS_MAP_UNMAP_HIGH
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	AM_RANGE(0x00, 0x00) AM_DEVWRITE("cent_data_out", output_latch_device, write)
@@ -306,9 +306,9 @@ void phc25_state::video_start()
 
 /* Machine Driver */
 
-static MACHINE_CONFIG_START( phc25 )
+MACHINE_CONFIG_START(phc25_state::phc25)
 	/* basic machine hardware */
-	MCFG_CPU_ADD(Z80_TAG, Z80, XTAL_4MHz)
+	MCFG_CPU_ADD(Z80_TAG, Z80, XTAL(4'000'000))
 	MCFG_CPU_PROGRAM_MAP(phc25_mem)
 	MCFG_CPU_IO_MAP(phc25_io)
 
@@ -340,11 +340,12 @@ static MACHINE_CONFIG_START( phc25 )
 	MCFG_SOFTWARE_LIST_ADD("cass_list", "phc25_cass")
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_DERIVED( pal, phc25 )
+MACHINE_CONFIG_START(phc25_state::pal)
+	phc25(config);
 	/* video hardware */
 	MCFG_SCREEN_MC6847_PAL_ADD(SCREEN_TAG, MC6847_TAG)
 
-	MCFG_DEVICE_ADD(MC6847_TAG, MC6847_PAL, XTAL_4_433619MHz)
+	MCFG_DEVICE_ADD(MC6847_TAG, MC6847_PAL, XTAL(4'433'619))
 	MCFG_MC6847_FSYNC_CALLBACK(WRITELINE(phc25_state, irq_w))
 	MCFG_MC6847_INPUT_CALLBACK(READ8(phc25_state, video_ram_r))
 	MCFG_MC6847_CHARROM_CALLBACK(phc25_state, pal_char_rom_r)
@@ -352,11 +353,12 @@ static MACHINE_CONFIG_DERIVED( pal, phc25 )
 	// other lines not connected
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_DERIVED( ntsc, phc25 )
+MACHINE_CONFIG_START(phc25_state::ntsc)
+	phc25(config);
 	/* video hardware */
 	MCFG_SCREEN_MC6847_NTSC_ADD(SCREEN_TAG, MC6847_TAG)
 
-	MCFG_DEVICE_ADD(MC6847_TAG, MC6847_NTSC, XTAL_3_579545MHz)
+	MCFG_DEVICE_ADD(MC6847_TAG, MC6847_NTSC, XTAL(3'579'545))
 	MCFG_MC6847_FSYNC_CALLBACK(WRITELINE(phc25_state, irq_w))
 	MCFG_MC6847_INPUT_CALLBACK(READ8(phc25_state, video_ram_r))
 	MCFG_MC6847_CHARROM_CALLBACK(phc25_state, ntsc_char_rom_r)

@@ -23,14 +23,21 @@ public:
 		m_maincpu(*this, "maincpu") { }
 
 	required_device<cpu_device> m_maincpu;
+	void pcega(machine_config &config);
+	void pcvga(machine_config &config);
+	void pccga(machine_config &config);
+	void pcherc(machine_config &config);
+	void pcmda(machine_config &config);
+	void pc8_io(address_map &map);
+	void pc8_map(address_map &map);
 };
 
-static ADDRESS_MAP_START( pc8_map, AS_PROGRAM, 8, genpc_state )
+ADDRESS_MAP_START(genpc_state::pc8_map)
 	ADDRESS_MAP_UNMAP_HIGH
 	AM_RANGE(0xfe000, 0xfffff) AM_ROM AM_REGION("bios", 0)
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START(pc8_io, AS_IO, 8, genpc_state )
+ADDRESS_MAP_START(genpc_state::pc8_io)
 	ADDRESS_MAP_UNMAP_HIGH
 	AM_RANGE(0x0000, 0x00ff) AM_DEVICE("mb", ibm5160_mb_device, map)
 ADDRESS_MAP_END
@@ -43,7 +50,7 @@ static DEVICE_INPUT_DEFAULTS_START(vga)
 	DEVICE_INPUT_DEFAULTS("DSW0",0x30, 0x00)
 DEVICE_INPUT_DEFAULTS_END
 
-static MACHINE_CONFIG_START( pcmda )
+MACHINE_CONFIG_START(genpc_state::pcmda)
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", I8088, 4772720)
 	MCFG_CPU_PROGRAM_MAP(pc8_map)
@@ -72,13 +79,15 @@ static MACHINE_CONFIG_START( pcmda )
 MACHINE_CONFIG_END
 
 
-static MACHINE_CONFIG_DERIVED( pcherc, pcmda )
+MACHINE_CONFIG_START(genpc_state::pcherc)
+	pcmda(config);
 	MCFG_DEVICE_MODIFY("isa1")
 	MCFG_DEVICE_SLOT_INTERFACE(pc_isa8_cards, "hercules", false)
 MACHINE_CONFIG_END
 
 
-static MACHINE_CONFIG_DERIVED( pccga, pcmda )
+MACHINE_CONFIG_START(genpc_state::pccga)
+	pcmda(config);
 	MCFG_DEVICE_MODIFY("mb")
 	MCFG_DEVICE_INPUT_DEFAULTS(cga)
 	MCFG_DEVICE_MODIFY("isa1")
@@ -86,7 +95,8 @@ static MACHINE_CONFIG_DERIVED( pccga, pcmda )
 MACHINE_CONFIG_END
 
 
-static MACHINE_CONFIG_DERIVED( pcega, pccga )
+MACHINE_CONFIG_START(genpc_state::pcega)
+	pccga(config);
 	MCFG_DEVICE_MODIFY("isa1")
 	MCFG_DEVICE_SLOT_INTERFACE(pc_isa8_cards, "ega", false)
 	MCFG_DEVICE_MODIFY("mb")
@@ -94,7 +104,8 @@ static MACHINE_CONFIG_DERIVED( pcega, pccga )
 MACHINE_CONFIG_END
 
 
-static MACHINE_CONFIG_DERIVED( pcvga, pcega )
+MACHINE_CONFIG_START(genpc_state::pcvga)
+	pcega(config);
 	MCFG_DEVICE_MODIFY("isa1")
 	MCFG_DEVICE_SLOT_INTERFACE(pc_isa8_cards, "vga", false)
 MACHINE_CONFIG_END

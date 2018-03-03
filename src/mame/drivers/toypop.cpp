@@ -37,7 +37,7 @@
 #include "speaker.h"
 
 
-#define MASTER_CLOCK XTAL_6_144MHz
+#define MASTER_CLOCK XTAL(6'144'000)
 
 class namcos16_state : public driver_device
 {
@@ -101,6 +101,13 @@ public:
 	DECLARE_WRITE8_MEMBER(sound_halt_ctrl_w);
 	DECLARE_READ8_MEMBER(bg_rmw_r);
 	DECLARE_WRITE8_MEMBER(bg_rmw_w);
+	void toypop(machine_config &config);
+	void liblrabl(machine_config &config);
+	void master_liblrabl_map(address_map &map);
+	void master_toypop_map(address_map &map);
+	void namcos16_master_base_map(address_map &map);
+	void slave_map(address_map &map);
+	void sound_map(address_map &map);
 protected:
 	// driver_device overrides
 //  virtual void machine_start() override;
@@ -348,7 +355,7 @@ WRITE8_MEMBER(namcos16_state::pal_bank_w)
 	m_pal_bank = offset & 1;
 }
 
-static ADDRESS_MAP_START( namcos16_master_base_map, AS_PROGRAM, 8, namcos16_state )
+ADDRESS_MAP_START(namcos16_state::namcos16_master_base_map)
 	AM_RANGE(0x0000, 0x03ff) AM_RAM AM_SHARE("fgvram")
 	AM_RANGE(0x0400, 0x07ff) AM_RAM AM_SHARE("fgattr")
 	AM_RANGE(0x0800, 0x1fff) AM_RAM AM_SHARE("master_workram")
@@ -362,7 +369,7 @@ static ADDRESS_MAP_START( namcos16_master_base_map, AS_PROGRAM, 8, namcos16_stat
 	AM_RANGE(0x8000, 0xffff) AM_ROM AM_REGION("master_rom",0)
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( master_liblrabl_map, AS_PROGRAM, 8, namcos16_state )
+ADDRESS_MAP_START(namcos16_state::master_liblrabl_map)
 	AM_IMPORT_FROM( namcos16_master_base_map )
 	AM_RANGE(0x6000, 0x63ff) AM_DEVREADWRITE("namco", namco_15xx_device, sharedram_r, sharedram_w)
 	AM_RANGE(0x6800, 0x680f) AM_DEVREADWRITE("58xx", namco58xx_device, read, write)
@@ -371,7 +378,7 @@ static ADDRESS_MAP_START( master_liblrabl_map, AS_PROGRAM, 8, namcos16_state )
 	AM_RANGE(0x7000, 0x7fff) AM_READNOP AM_WRITE(irq_ctrl_w)
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( master_toypop_map, AS_PROGRAM, 8, namcos16_state )
+ADDRESS_MAP_START(namcos16_state::master_toypop_map)
 	AM_IMPORT_FROM( namcos16_master_base_map )
 	AM_RANGE(0x6000, 0x600f) AM_DEVREADWRITE("58xx", namco58xx_device, read, write)
 	AM_RANGE(0x6010, 0x601f) AM_DEVREADWRITE("56xx_1", namco56xx_device, read, write)
@@ -380,7 +387,7 @@ static ADDRESS_MAP_START( master_toypop_map, AS_PROGRAM, 8, namcos16_state )
 	AM_RANGE(0x7000, 0x7000) AM_READWRITE(irq_enable_r,irq_disable_w)
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( slave_map, AS_PROGRAM, 16, namcos16_state )
+ADDRESS_MAP_START(namcos16_state::slave_map)
 	AM_RANGE(0x000000, 0x007fff) AM_ROM AM_REGION("slave_rom", 0)
 	AM_RANGE(0x080000, 0x0bffff) AM_RAM
 	AM_RANGE(0x100000, 0x100fff) AM_READWRITE8(slave_shared_r,slave_shared_w,0x00ff)
@@ -389,7 +396,7 @@ static ADDRESS_MAP_START( slave_map, AS_PROGRAM, 16, namcos16_state )
 	AM_RANGE(0x300000, 0x3fffff) AM_WRITE(slave_irq_enable_w)
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( sound_map, AS_PROGRAM, 8, namcos16_state )
+ADDRESS_MAP_START(namcos16_state::sound_map)
 	AM_RANGE(0x0000, 0x03ff) AM_DEVREADWRITE("namco", namco_15xx_device, sharedram_r, sharedram_w)
 	AM_RANGE(0xe000, 0xffff) AM_ROM AM_REGION("sound_rom", 0)
 ADDRESS_MAP_END
@@ -652,8 +659,8 @@ INTERRUPT_GEN_MEMBER(namcos16_state::slave_vblank_irq)
 		device.execute().set_input_line(6,HOLD_LINE);
 }
 
-static MACHINE_CONFIG_START( liblrabl )
-	MCFG_CPU_ADD("maincpu", M6809, MASTER_CLOCK/4)
+MACHINE_CONFIG_START(namcos16_state::liblrabl)
+	MCFG_CPU_ADD("maincpu", MC6809E, MASTER_CLOCK/4)
 	MCFG_CPU_PROGRAM_MAP(master_liblrabl_map)
 	MCFG_TIMER_DRIVER_ADD_SCANLINE("scantimer", namcos16_state, master_scanline, "screen", 0, 1)
 
@@ -661,7 +668,7 @@ static MACHINE_CONFIG_START( liblrabl )
 	MCFG_CPU_PROGRAM_MAP(slave_map)
 	MCFG_CPU_VBLANK_INT_DRIVER("screen", namcos16_state,  slave_vblank_irq)
 
-	MCFG_CPU_ADD("audiocpu", M6809, MASTER_CLOCK/4)
+	MCFG_CPU_ADD("audiocpu", MC6809E, MASTER_CLOCK/4)
 	MCFG_CPU_PROGRAM_MAP(sound_map)
 	MCFG_CPU_PERIODIC_INT_DRIVER(namcos16_state,  irq0_line_hold, 60)
 
@@ -701,7 +708,8 @@ static MACHINE_CONFIG_START( liblrabl )
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_DERIVED( toypop, liblrabl )
+MACHINE_CONFIG_START(namcos16_state::toypop)
+	liblrabl(config);
 	MCFG_CPU_MODIFY("maincpu")
 	MCFG_CPU_PROGRAM_MAP(master_toypop_map)
 MACHINE_CONFIG_END

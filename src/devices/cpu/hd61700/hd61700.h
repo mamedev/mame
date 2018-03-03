@@ -16,25 +16,25 @@
 //**************************************************************************
 
 #define MCFG_HD61700_LCD_CTRL_CB(_devcb) \
-	devcb = &hd61700_cpu_device::set_lcd_ctrl_callback(*device, DEVCB_##_devcb);
+	devcb = &downcast<hd61700_cpu_device &>(*device).set_lcd_ctrl_callback(DEVCB_##_devcb);
 
 #define MCFG_HD61700_LCD_WRITE_CB(_devcb) \
-	devcb = &hd61700_cpu_device::set_lcd_write_callback(*device, DEVCB_##_devcb);
+	devcb = &downcast<hd61700_cpu_device &>(*device).set_lcd_write_callback(DEVCB_##_devcb);
 
 #define MCFG_HD61700_LCD_READ_CB(_devcb) \
-	devcb = &hd61700_cpu_device::set_lcd_read_callback(*device, DEVCB_##_devcb);
+	devcb = &downcast<hd61700_cpu_device &>(*device).set_lcd_read_callback(DEVCB_##_devcb);
 
 #define MCFG_HD61700_KB_WRITE_CB(_devcb) \
-	devcb = &hd61700_cpu_device::set_kb_write_callback(*device, DEVCB_##_devcb);
+	devcb = &downcast<hd61700_cpu_device &>(*device).set_kb_write_callback(DEVCB_##_devcb);
 
 #define MCFG_HD61700_KB_READ_CB(_devcb) \
-	devcb = &hd61700_cpu_device::set_kb_read_callback(*device, DEVCB_##_devcb);
+	devcb = &downcast<hd61700_cpu_device &>(*device).set_kb_read_callback(DEVCB_##_devcb);
 
 #define MCFG_HD61700_PORT_WRITE_CB(_devcb) \
-	devcb = &hd61700_cpu_device::set_port_write_callback(*device, DEVCB_##_devcb);
+	devcb = &downcast<hd61700_cpu_device &>(*device).set_port_write_callback(DEVCB_##_devcb);
 
 #define MCFG_HD61700_PORT_READ_CB(_devcb) \
-	devcb = &hd61700_cpu_device::set_port_read_callback(*device, DEVCB_##_devcb);
+	devcb = &downcast<hd61700_cpu_device &>(*device).set_port_read_callback(DEVCB_##_devcb);
 
 
 //**************************************************************************
@@ -61,13 +61,13 @@ public:
 	// construction/destruction
 	hd61700_cpu_device(const machine_config &mconfig, const char *_tag, device_t *_owner, uint32_t _clock);
 
-	template<class _Object> static devcb_base &set_lcd_ctrl_callback(device_t &device, _Object object) { return downcast<hd61700_cpu_device &>(device).m_lcd_ctrl_cb.set_callback(object); }
-	template<class _Object> static devcb_base &set_lcd_write_callback(device_t &device, _Object object) { return downcast<hd61700_cpu_device &>(device).m_lcd_write_cb.set_callback(object); }
-	template<class _Object> static devcb_base &set_lcd_read_callback(device_t &device, _Object object) { return downcast<hd61700_cpu_device &>(device).m_lcd_read_cb.set_callback(object); }
-	template<class _Object> static devcb_base &set_kb_write_callback(device_t &device, _Object object) { return downcast<hd61700_cpu_device &>(device).m_kb_write_cb.set_callback(object); }
-	template<class _Object> static devcb_base &set_kb_read_callback(device_t &device, _Object object) { return downcast<hd61700_cpu_device &>(device).m_kb_read_cb.set_callback(object); }
-	template<class _Object> static devcb_base &set_port_write_callback(device_t &device, _Object object) { return downcast<hd61700_cpu_device &>(device).m_port_write_cb.set_callback(object); }
-	template<class _Object> static devcb_base &set_port_read_callback(device_t &device, _Object object) { return downcast<hd61700_cpu_device &>(device).m_port_read_cb.set_callback(object); }
+	template<class Object> devcb_base &set_lcd_ctrl_callback(Object &&cb) { return m_lcd_ctrl_cb.set_callback(std::forward<Object>(cb)); }
+	template<class Object> devcb_base &set_lcd_write_callback(Object &&cb) { return m_lcd_write_cb.set_callback(std::forward<Object>(cb)); }
+	template<class Object> devcb_base &set_lcd_read_callback(Object &&cb) { return m_lcd_read_cb.set_callback(std::forward<Object>(cb)); }
+	template<class Object> devcb_base &set_kb_write_callback(Object &&cb) { return m_kb_write_cb.set_callback(std::forward<Object>(cb)); }
+	template<class Object> devcb_base &set_kb_read_callback(Object &&cb) { return m_kb_read_cb.set_callback(std::forward<Object>(cb)); }
+	template<class Object> devcb_base &set_port_write_callback(Object &&cb) { return m_port_write_cb.set_callback(std::forward<Object>(cb)); }
+	template<class Object> devcb_base &set_port_read_callback(Object &&cb) { return m_port_read_cb.set_callback(std::forward<Object>(cb)); }
 
 protected:
 	// device-level overrides

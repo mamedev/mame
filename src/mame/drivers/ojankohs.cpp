@@ -96,7 +96,7 @@ WRITE8_MEMBER(ojankohs_state::ojankoc_ctrl_w)
 }
 
 
-static ADDRESS_MAP_START( ojankohs_map, AS_PROGRAM, 8, ojankohs_state )
+ADDRESS_MAP_START(ojankohs_state::ojankohs_map)
 	AM_RANGE(0x0000, 0x7fff) AM_ROM
 	AM_RANGE(0x8000, 0x8fff) AM_RAM_WRITE(ojankohs_videoram_w) AM_SHARE("videoram")
 	AM_RANGE(0x9000, 0x9fff) AM_RAM_WRITE(ojankohs_colorram_w) AM_SHARE("colorram")
@@ -106,7 +106,7 @@ static ADDRESS_MAP_START( ojankohs_map, AS_PROGRAM, 8, ojankohs_state )
 ADDRESS_MAP_END
 
 
-static ADDRESS_MAP_START( ojankoy_map, AS_PROGRAM, 8, ojankohs_state )
+ADDRESS_MAP_START(ojankohs_state::ojankoy_map)
 	AM_RANGE(0x0000, 0x7fff) AM_ROM
 	AM_RANGE(0x8000, 0x9fff) AM_RAM_WRITE(ojankohs_videoram_w) AM_SHARE("videoram")
 	AM_RANGE(0xa000, 0xafff) AM_RAM_WRITE(ojankohs_colorram_w) AM_SHARE("colorram")
@@ -115,14 +115,14 @@ static ADDRESS_MAP_START( ojankoy_map, AS_PROGRAM, 8, ojankohs_state )
 ADDRESS_MAP_END
 
 
-static ADDRESS_MAP_START( ojankoc_map, AS_PROGRAM, 8, ojankohs_state )
+ADDRESS_MAP_START(ojankohs_state::ojankoc_map)
 	AM_RANGE(0x0000, 0x77ff) AM_ROM
 	AM_RANGE(0x7800, 0x7fff) AM_RAM AM_SHARE("nvram")
 	AM_RANGE(0x8000, 0xffff) AM_ROMBANK("bank1") AM_WRITE(ojankoc_videoram_w)
 ADDRESS_MAP_END
 
 
-static ADDRESS_MAP_START( ojankohs_io_map, AS_IO, 8, ojankohs_state )
+ADDRESS_MAP_START(ojankohs_state::ojankohs_io_map)
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	AM_RANGE(0x00, 0x00) AM_READ_PORT("system") AM_WRITE(port_select_w)
 	AM_RANGE(0x01, 0x01) AM_READWRITE(keymatrix_p1_r, ojankohs_rombank_w)
@@ -135,7 +135,7 @@ static ADDRESS_MAP_START( ojankohs_io_map, AS_IO, 8, ojankohs_state )
 	AM_RANGE(0x10, 0x11) AM_DEVWRITE("gga", vsystem_gga_device, write)
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( ojankoy_io_map, AS_IO, 8, ojankohs_state )
+ADDRESS_MAP_START(ojankohs_state::ojankoy_io_map)
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	AM_RANGE(0x00, 0x00) AM_READ_PORT("system") AM_WRITE(port_select_w)
 	AM_RANGE(0x01, 0x01) AM_READWRITE(keymatrix_p1_r, ojankoy_rombank_w)
@@ -146,21 +146,20 @@ static ADDRESS_MAP_START( ojankoy_io_map, AS_IO, 8, ojankohs_state )
 	AM_RANGE(0x06, 0x07) AM_DEVWRITE("aysnd", ay8910_device, data_address_w)
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( ccasino_io_map, AS_IO, 8, ojankohs_state )
-	ADDRESS_MAP_GLOBAL_MASK(0xff)
-	AM_RANGE(0x00, 0x00) AM_READ_PORT("system") AM_WRITE(port_select_w)
-	AM_RANGE(0x01, 0x01) AM_READWRITE(keymatrix_p1_r, ojankohs_rombank_w)
-	AM_RANGE(0x02, 0x02) AM_READWRITE(keymatrix_p2_r, ccasino_coinctr_w)
-	AM_RANGE(0x03, 0x03) AM_READ(ccasino_dipsw3_r) AM_WRITE(ojankohs_adpcm_reset_w)
-	AM_RANGE(0x04, 0x04) AM_READ(ccasino_dipsw4_r) AM_WRITE(ojankohs_flipscreen_w)
-	AM_RANGE(0x05, 0x05) AM_WRITE(ojankohs_msm5205_w)
-	AM_RANGE(0x06, 0x06) AM_DEVREAD("aysnd", ay8910_device, data_r)
-	AM_RANGE(0x06, 0x07) AM_DEVWRITE("aysnd", ay8910_device, data_address_w)
-	AM_RANGE(0x08, 0x0f) AM_WRITE(ccasino_palette_w) AM_SHARE("paletteram")     // 16bit address access
-	AM_RANGE(0x10, 0x11) AM_DEVWRITE("gga", vsystem_gga_device, write)
+ADDRESS_MAP_START(ojankohs_state::ccasino_io_map)
+	AM_RANGE(0x00, 0x00) AM_MIRROR(0xff00) AM_READ_PORT("system") AM_WRITE(port_select_w)
+	AM_RANGE(0x01, 0x01) AM_MIRROR(0xff00) AM_READWRITE(keymatrix_p1_r, ojankohs_rombank_w)
+	AM_RANGE(0x02, 0x02) AM_MIRROR(0xff00) AM_READWRITE(keymatrix_p2_r, ccasino_coinctr_w)
+	AM_RANGE(0x03, 0x03) AM_MIRROR(0xff00) AM_READ(ccasino_dipsw3_r) AM_WRITE(ojankohs_adpcm_reset_w)
+	AM_RANGE(0x04, 0x04) AM_MIRROR(0xff00) AM_READ(ccasino_dipsw4_r) AM_WRITE(ojankohs_flipscreen_w)
+	AM_RANGE(0x05, 0x05) AM_MIRROR(0xff00) AM_WRITE(ojankohs_msm5205_w)
+	AM_RANGE(0x06, 0x06) AM_MIRROR(0xff00) AM_DEVREAD("aysnd", ay8910_device, data_r)
+	AM_RANGE(0x06, 0x07) AM_MIRROR(0xff00) AM_DEVWRITE("aysnd", ay8910_device, data_address_w)
+	AM_RANGE(0x08, 0x0f) AM_SELECT(0xff00) AM_WRITE(ccasino_palette_w)     // 16bit address access
+	AM_RANGE(0x10, 0x11) AM_MIRROR(0xff00) AM_DEVWRITE("gga", vsystem_gga_device, write)
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( ojankoc_io_map, AS_IO, 8, ojankohs_state )
+ADDRESS_MAP_START(ojankohs_state::ojankoc_io_map)
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	AM_RANGE(0x00, 0x1f) AM_WRITE(ojankoc_palette_w)
 	AM_RANGE(0xf9, 0xf9) AM_WRITE(ojankohs_msm5205_w)
@@ -604,13 +603,13 @@ READ8_MEMBER( ojankohs_state::ojankoc_keymatrix_p2_r )
 READ8_MEMBER( ojankohs_state::ojankohs_dipsw1_r )
 {
 	uint8_t data = m_dsw1->read();
-	return BITSWAP8(data, 0, 1, 2, 3, 4, 5, 6, 7);
+	return bitswap<8>(data, 0, 1, 2, 3, 4, 5, 6, 7);
 }
 
 READ8_MEMBER( ojankohs_state::ojankohs_dipsw2_r )
 {
 	uint8_t data = m_dsw2->read();
-	return BITSWAP8(data, 0, 1, 2, 3, 4, 5, 6, 7);
+	return bitswap<8>(data, 0, 1, 2, 3, 4, 5, 6, 7);
 }
 
 READ8_MEMBER( ojankohs_state::ccasino_dipsw3_r )
@@ -706,7 +705,7 @@ void ojankohs_state::machine_reset()
 	m_screen_refresh = 0;
 }
 
-static MACHINE_CONFIG_START( ojankohs )
+MACHINE_CONFIG_START(ojankohs_state::ojankohs)
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", Z80,12000000/2)     /* 6.00 MHz ? */
@@ -729,7 +728,7 @@ static MACHINE_CONFIG_START( ojankohs )
 	MCFG_GFXDECODE_ADD("gfxdecode", "palette", ojankohs)
 	MCFG_PALETTE_ADD("palette", 1024)
 
-	MCFG_DEVICE_ADD("gga", VSYSTEM_GGA, XTAL_13_333MHz/2) // divider not verified
+	MCFG_DEVICE_ADD("gga", VSYSTEM_GGA, XTAL(13'333'000)/2) // divider not verified
 
 	MCFG_VIDEO_START_OVERRIDE(ojankohs_state,ojankohs)
 
@@ -747,7 +746,7 @@ static MACHINE_CONFIG_START( ojankohs )
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_START( ojankoy )
+MACHINE_CONFIG_START(ojankohs_state::ojankoy)
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", Z80,12000000/2)     /* 6.00 MHz ? */
@@ -787,7 +786,7 @@ static MACHINE_CONFIG_START( ojankoy )
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_START( ccasino )
+MACHINE_CONFIG_START(ojankohs_state::ccasino)
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", Z80,12000000/2)     /* 6.00 MHz ? */
@@ -810,9 +809,9 @@ static MACHINE_CONFIG_START( ccasino )
 	MCFG_GFXDECODE_ADD("gfxdecode", "palette", ojankohs)
 	MCFG_PALETTE_ADD("palette", 1024)
 
-	MCFG_DEVICE_ADD("gga", VSYSTEM_GGA, XTAL_13_333MHz/2) // divider not verified
+	MCFG_DEVICE_ADD("gga", VSYSTEM_GGA, XTAL(13'333'000)/2) // divider not verified
 
-	MCFG_VIDEO_START_OVERRIDE(ojankohs_state,ojankoy)
+	MCFG_VIDEO_START_OVERRIDE(ojankohs_state,ccasino)
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
@@ -828,7 +827,7 @@ static MACHINE_CONFIG_START( ccasino )
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_START( ojankoc )
+MACHINE_CONFIG_START(ojankohs_state::ojankoc)
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", Z80,8000000/2)          /* 4.00 MHz */

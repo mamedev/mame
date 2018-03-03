@@ -346,7 +346,7 @@ READ8_MEMBER(combatsc_state::unk_r)
  *
  *************************************/
 
-static ADDRESS_MAP_START( combatsc_map, AS_PROGRAM, 8, combatsc_state )
+ADDRESS_MAP_START(combatsc_state::combatsc_map)
 	AM_RANGE(0x0000, 0x0007) AM_WRITE(combatsc_pf_control_w)
 	AM_RANGE(0x001f, 0x001f) AM_READ(unk_r)
 	AM_RANGE(0x0020, 0x005f) AM_READWRITE(combatsc_scrollram_r, combatsc_scrollram_w)
@@ -374,7 +374,7 @@ static ADDRESS_MAP_START( combatsc_map, AS_PROGRAM, 8, combatsc_state )
 	AM_RANGE(0x8000, 0xffff) AM_ROM                             /* ROM */
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( combatscb_map, AS_PROGRAM, 8, combatsc_state )
+ADDRESS_MAP_START(combatsc_state::combatscb_map)
 	AM_RANGE(0x0000, 0x04ff) AM_RAM
 	AM_RANGE(0x0500, 0x0500) AM_WRITE(combatscb_bankselect_w)
 	AM_RANGE(0x0600, 0x06ff) AM_RAM_DEVWRITE("palette", palette_device, write_indirect) AM_SHARE("palette")
@@ -384,7 +384,7 @@ static ADDRESS_MAP_START( combatscb_map, AS_PROGRAM, 8, combatsc_state )
 	AM_RANGE(0x8000, 0xffff) AM_ROM                             /* ROM */
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( combatsc_sound_map, AS_PROGRAM, 8, combatsc_state )
+ADDRESS_MAP_START(combatsc_state::combatsc_sound_map)
 	AM_RANGE(0x0000, 0x7fff) AM_ROM                                             /* ROM */
 	AM_RANGE(0x8000, 0x87ff) AM_RAM                                             /* RAM */
 
@@ -410,7 +410,7 @@ WRITE8_MEMBER(combatsc_state::combatscb_sound_irq_ack)
 	m_audiocpu->set_input_line(0, CLEAR_LINE);
 }
 
-static ADDRESS_MAP_START( combatscb_sound_map, AS_PROGRAM, 8, combatsc_state )
+ADDRESS_MAP_START(combatsc_state::combatscb_sound_map)
 	AM_RANGE(0x0000, 0x7fff) AM_ROM                                     /* ROM */
 	AM_RANGE(0x8000, 0x87ff) AM_RAM                                     /* RAM */
 	AM_RANGE(0x9000, 0x9001) AM_DEVREADWRITE("ymsnd", ym2203_device, read, write)   /* YM 2203 */
@@ -692,7 +692,7 @@ void combatsc_state::machine_reset()
 }
 
 /* combat school (original) */
-static MACHINE_CONFIG_START( combatsc )
+MACHINE_CONFIG_START(combatsc_state::combatsc)
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", HD6309, 3000000*4)  /* 3 MHz? */
@@ -714,7 +714,7 @@ static MACHINE_CONFIG_START( combatsc )
 //  MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500) /* not accurate */)
 //  MCFG_SCREEN_SIZE(32*8, 32*8)
 //  MCFG_SCREEN_VISIBLE_AREA(0*8, 32*8-1, 2*8, 30*8-1)
-	MCFG_SCREEN_RAW_PARAMS(XTAL_24MHz/3, 528, 0, 256, 256, 16, 240) // not accurate, assuming same to other Konami games (59.17)
+	MCFG_SCREEN_RAW_PARAMS(XTAL(24'000'000)/3, 528, 0, 256, 256, 16, 240) // not accurate, assuming same to other Konami games (59.17)
 	MCFG_SCREEN_UPDATE_DRIVER(combatsc_state, screen_update_combatsc)
 	MCFG_SCREEN_PALETTE("palette")
 
@@ -746,7 +746,7 @@ MACHINE_CONFIG_END
 
 
 /* combat school (bootleg on different hardware) */
-static MACHINE_CONFIG_START( combatscb )
+MACHINE_CONFIG_START(combatsc_state::combatscb)
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", HD6309, 3000000*4)  /* 3 MHz? */

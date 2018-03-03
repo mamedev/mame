@@ -332,12 +332,12 @@ WRITE8_MEMBER(ie15_device::flag_w)
 	}
 }
 
-static ADDRESS_MAP_START( ie15_mem, AS_PROGRAM, 8, ie15_device )
+ADDRESS_MAP_START(ie15_device::ie15_mem)
 	ADDRESS_MAP_UNMAP_HIGH
 	AM_RANGE(0x0000, 0x0fff) AM_ROM
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( ie15_io, AS_IO, 8, ie15_device )
+ADDRESS_MAP_START(ie15_device::ie15_io)
 	ADDRESS_MAP_UNMAP_HIGH
 	AM_RANGE(000, 000) AM_READWRITE(mem_r, mem_w)   // 00h W: memory request, R: memory data [6.1.2.2]
 	AM_RANGE(001, 001) AM_READ(serial_rx_ready_r) AM_WRITENOP   // 01h W: memory latch [6.1.2.2]
@@ -564,9 +564,9 @@ static GFXDECODE_START( ie15 )
 	GFXDECODE_ENTRY("chargen", 0x0000, ie15_charlayout, 0, 1)
 GFXDECODE_END
 
-static MACHINE_CONFIG_START( ie15core )
+MACHINE_CONFIG_START(ie15_device::ie15core)
 	/* Basic machine hardware */
-	MCFG_CPU_ADD("maincpu", IE15_CPU, XTAL_30_8MHz/10)
+	MCFG_CPU_ADD("maincpu", IE15_CPU, XTAL(30'800'000)/10)
 	MCFG_CPU_PROGRAM_MAP(ie15_mem)
 	MCFG_CPU_IO_MAP(ie15_io)
 
@@ -599,12 +599,12 @@ ROM_START( ie15 )
 	ROM_LOAD("chargen-15ie.bin", 0x0000, 0x0800, CRC(ed16bf6b) SHA1(6af9fb75f5375943d5c0ce9ed408e0fb4621b17e))
 ROM_END
 
-MACHINE_CONFIG_MEMBER( ie15_device::device_add_mconfig )
-	MCFG_FRAGMENT_ADD(ie15core)
+MACHINE_CONFIG_START(ie15_device::device_add_mconfig)
+	ie15core(config);
 
 	MCFG_SCREEN_ADD_MONOCHROME("screen", RASTER, rgb_t::green())
 	MCFG_SCREEN_UPDATE_DRIVER(ie15_device, screen_update)
-	MCFG_SCREEN_RAW_PARAMS(XTAL_30_8MHz/2, IE15_TOTAL_HORZ, IE15_HORZ_START,
+	MCFG_SCREEN_RAW_PARAMS(XTAL(30'800'000)/2, IE15_TOTAL_HORZ, IE15_HORZ_START,
 		IE15_HORZ_START+IE15_DISP_HORZ, IE15_TOTAL_VERT, IE15_VERT_START,
 		IE15_VERT_START+IE15_DISP_VERT);
 

@@ -26,8 +26,8 @@ DIP locations verified for:
 #include "speaker.h"
 
 
-#define MASTER_CLOCK         XTAL_2MHz
-#define VIDEO_CLOCK          XTAL_4_9152MHz
+#define MASTER_CLOCK         XTAL(2'000'000)
+#define VIDEO_CLOCK          XTAL(4'915'200)
 
 
 /* sample sound IDs - must match sample file name table below */
@@ -92,6 +92,13 @@ public:
 	TIMER_CALLBACK_MEMBER(kamikaze_int_off);
 	TIMER_CALLBACK_MEMBER(kamizake_int_gen);
 
+	void spcking2(machine_config &config);
+	void spaceint(machine_config &config);
+	void kamikaze(machine_config &config);
+	void kamikaze_map(address_map &map);
+	void kamikaze_portmap(address_map &map);
+	void spaceint_map(address_map &map);
+	void spaceint_portmap(address_map &map);
 private:
 	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr) override;
 	void plot_byte( bitmap_rgb32 &bitmap, uint8_t y, uint8_t x, uint8_t data, uint8_t color );
@@ -468,7 +475,7 @@ WRITE8_MEMBER(astinvad_state::spaceint_sound2_w)
  *
  *************************************/
 
-static ADDRESS_MAP_START( kamikaze_map, AS_PROGRAM, 8, astinvad_state )
+ADDRESS_MAP_START(astinvad_state::kamikaze_map)
 	ADDRESS_MAP_GLOBAL_MASK(0x3fff)
 	AM_RANGE(0x0000, 0x1bff) AM_ROM
 	AM_RANGE(0x1c00, 0x1fff) AM_RAM
@@ -476,20 +483,20 @@ static ADDRESS_MAP_START( kamikaze_map, AS_PROGRAM, 8, astinvad_state )
 ADDRESS_MAP_END
 
 
-static ADDRESS_MAP_START( spaceint_map, AS_PROGRAM, 8, astinvad_state )
+ADDRESS_MAP_START(astinvad_state::spaceint_map)
 	AM_RANGE(0x0000, 0x1fff) AM_ROM
 	AM_RANGE(0x2000, 0x23ff) AM_RAM
 	AM_RANGE(0x4000, 0x5fff) AM_RAM_WRITE(spaceint_videoram_w) AM_SHARE("videoram")
 ADDRESS_MAP_END
 
 
-static ADDRESS_MAP_START( kamikaze_portmap, AS_IO, 8, astinvad_state )
+ADDRESS_MAP_START(astinvad_state::kamikaze_portmap)
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	AM_RANGE(0x00, 0xff) AM_READWRITE(kamikaze_ppi_r, kamikaze_ppi_w)
 ADDRESS_MAP_END
 
 
-static ADDRESS_MAP_START( spaceint_portmap, AS_IO, 8, astinvad_state )
+ADDRESS_MAP_START(astinvad_state::spaceint_portmap)
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	AM_RANGE(0x00, 0x00) AM_READ_PORT("IN0")
 	AM_RANGE(0x01, 0x01) AM_READ_PORT("IN1")
@@ -652,7 +659,7 @@ static const char *const astinvad_sample_names[] =
  *
  *************************************/
 
-static MACHINE_CONFIG_START( kamikaze )
+MACHINE_CONFIG_START(astinvad_state::kamikaze)
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", Z80, MASTER_CLOCK)
@@ -688,7 +695,8 @@ static MACHINE_CONFIG_START( kamikaze )
 MACHINE_CONFIG_END
 
 
-static MACHINE_CONFIG_DERIVED( spcking2, kamikaze )
+MACHINE_CONFIG_START(astinvad_state::spcking2)
+	kamikaze(config);
 
 	/* basic machine hardware */
 	MCFG_DEVICE_MODIFY("ppi8255_1")
@@ -703,7 +711,7 @@ static MACHINE_CONFIG_DERIVED( spcking2, kamikaze )
 MACHINE_CONFIG_END
 
 
-static MACHINE_CONFIG_START( spaceint )
+MACHINE_CONFIG_START(astinvad_state::spaceint)
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", Z80, MASTER_CLOCK)        /* a guess */

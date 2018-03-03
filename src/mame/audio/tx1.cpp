@@ -253,9 +253,9 @@ void tx1_sound_device::sound_stream_update(sound_stream &stream, stream_sample_t
 	memset(outputs[1], 0, samples * sizeof(*outputs[1]));
 
 	/* 8253 outputs for the player/opponent engine sounds. */
-	step_0 = m_pit8253.counts[0].val ? (TX1_PIT_CLOCK / m_pit8253.counts[0].val) * m_freq_to_step : 0;
-	step_1 = m_pit8253.counts[1].val ? (TX1_PIT_CLOCK / m_pit8253.counts[1].val) * m_freq_to_step : 0;
-	step_2 = m_pit8253.counts[2].val ? (TX1_PIT_CLOCK / m_pit8253.counts[2].val) * m_freq_to_step : 0;
+	step_0 = m_pit8253.counts[0].val ? (TX1_PIT_CLOCK / m_pit8253.counts[0].val * m_freq_to_step).value() : 0;
+	step_1 = m_pit8253.counts[1].val ? (TX1_PIT_CLOCK / m_pit8253.counts[1].val * m_freq_to_step).value() : 0;
+	step_2 = m_pit8253.counts[2].val ? (TX1_PIT_CLOCK / m_pit8253.counts[2].val * m_freq_to_step).value() : 0;
 
 	//gain_0 = tx1_engine_gains[m_ay_outputa & 0xf];
 	//gain_1 = tx1_engine_gains[m_ay_outputa >> 4];
@@ -435,18 +435,18 @@ WRITE8_MEMBER( buggyboy_sound_device::ym2_a_w )
 
 WRITE8_MEMBER( buggyboy_sound_device::ym2_b_w )
 {
-	device_t *ym1 = space.machine().device("ym1");
-	device_t *ym2 = space.machine().device("ym2");
+	device_t *ym1 = machine().device("ym1");
+	device_t *ym2 = machine().device("ym2");
 	double gain;
 
 	m_stream->update();
 
 	m_ym2_outputb = data ^ 0xff;
 
-	if (!strcmp(space.machine().system().name, "buggyboyjr"))
+	if (!strcmp(machine().system().name, "buggyboyjr"))
 	{
-		space.machine().bookkeeping().coin_counter_w(0, data & 0x01);
-		space.machine().bookkeeping().coin_counter_w(1, data & 0x02);
+		machine().bookkeeping().coin_counter_w(0, data & 0x01);
+		machine().bookkeeping().coin_counter_w(1, data & 0x02);
 	}
 
 	/*
@@ -492,8 +492,8 @@ void buggyboy_sound_device::sound_stream_update(sound_stream &stream, stream_sam
 	memset(outputs[1], 0, samples * sizeof(*outputs[1]));
 
 	/* 8253 outputs for the player/opponent buggy engine sounds. */
-	step_0 = m_pit8253.counts[0].val ? (BUGGYBOY_PIT_CLOCK / m_pit8253.counts[0].val) * m_freq_to_step : 0;
-	step_1 = m_pit8253.counts[1].val ? (BUGGYBOY_PIT_CLOCK / m_pit8253.counts[1].val) * m_freq_to_step : 0;
+	step_0 = m_pit8253.counts[0].val ? (BUGGYBOY_PIT_CLOCK / m_pit8253.counts[0].val * m_freq_to_step).value() : 0;
+	step_1 = m_pit8253.counts[1].val ? (BUGGYBOY_PIT_CLOCK / m_pit8253.counts[1].val * m_freq_to_step).value() : 0;
 
 	if (!strcmp(machine().system().name, "buggyboyjr"))
 		gain0 = BIT(m_ym2_outputb, 3) ? 1.0 : 2.0;
@@ -514,7 +514,7 @@ void buggyboy_sound_device::sound_stream_update(sound_stream &stream, stream_sam
 		pit1 = m_eng_voltages[(m_step1 >> 24) & 0xf];
 
 		/* Calculate the tyre screech noise source */
-		for (i = 0; i < BUGGYBOY_NOISE_CLOCK / machine().sample_rate(); ++i)
+		for (i = 0; i < BUGGYBOY_NOISE_CLOCK.value() / machine().sample_rate(); ++i)
 		{
 			/* CD4006 is a 4-4-1-4-4-1 shift register */
 			int p13 = BIT(m_noise_lfsra, 3);

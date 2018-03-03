@@ -619,7 +619,7 @@ Stephh's and AWJ's notes (based on the games M68000 and Z80 code and some tests)
 
 /***************************** 68000 Memory Map *****************************/
 
-static ADDRESS_MAP_START( rallybik_main_map, AS_PROGRAM, 16, toaplan1_rallybik_state )
+ADDRESS_MAP_START(toaplan1_rallybik_state::rallybik_main_map)
 	AM_RANGE(0x000000, 0x00ffff) AM_ROM
 	AM_RANGE(0x040000, 0x07ffff) AM_ROM
 	AM_RANGE(0x080000, 0x083fff) AM_RAM
@@ -639,7 +639,7 @@ static ADDRESS_MAP_START( rallybik_main_map, AS_PROGRAM, 16, toaplan1_rallybik_s
 	AM_RANGE(0x1c8000, 0x1c8001) AM_WRITE(toaplan1_reset_sound_w)
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( truxton_main_map, AS_PROGRAM, 16, toaplan1_state )
+ADDRESS_MAP_START(toaplan1_state::truxton_main_map)
 	AM_RANGE(0x000000, 0x03ffff) AM_ROM
 	AM_RANGE(0x080000, 0x083fff) AM_RAM
 	AM_RANGE(0x0c0000, 0x0c0001) AM_READ(toaplan1_frame_done_r)
@@ -662,7 +662,7 @@ static ADDRESS_MAP_START( truxton_main_map, AS_PROGRAM, 16, toaplan1_state )
 	AM_RANGE(0x1d0000, 0x1d0001) AM_WRITE(toaplan1_reset_sound_w)
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( hellfire_main_map, AS_PROGRAM, 16, toaplan1_state )
+ADDRESS_MAP_START(toaplan1_state::hellfire_main_map)
 	AM_RANGE(0x000000, 0x03ffff) AM_ROM
 	AM_RANGE(0x040000, 0x047fff) AM_RAM
 	AM_RANGE(0x080000, 0x080001) AM_READ_PORT("VBLANK")
@@ -685,7 +685,7 @@ static ADDRESS_MAP_START( hellfire_main_map, AS_PROGRAM, 16, toaplan1_state )
 	AM_RANGE(0x180008, 0x180009) AM_WRITE(toaplan1_reset_sound_w)
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( zerowing_main_map, AS_PROGRAM, 16, toaplan1_state )
+ADDRESS_MAP_START(toaplan1_state::zerowing_main_map)
 	AM_RANGE(0x000000, 0x00ffff) AM_ROM
 	AM_RANGE(0x040000, 0x07ffff) AM_ROM
 	AM_RANGE(0x080000, 0x087fff) AM_RAM
@@ -708,7 +708,7 @@ static ADDRESS_MAP_START( zerowing_main_map, AS_PROGRAM, 16, toaplan1_state )
 	AM_RANGE(0x4c0006, 0x4c0007) AM_READWRITE(toaplan1_spritesizeram16_r, toaplan1_spritesizeram16_w)
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( demonwld_main_map, AS_PROGRAM, 16, toaplan1_state )
+ADDRESS_MAP_START(toaplan1_state::demonwld_main_map)
 	AM_RANGE(0x000000, 0x03ffff) AM_ROM
 	AM_RANGE(0x400000, 0x400001) AM_READ_PORT("VBLANK")
 //  AM_RANGE(0x400000, 0x400001) AM_WRITE(?? video frame related ??)
@@ -732,7 +732,7 @@ static ADDRESS_MAP_START( demonwld_main_map, AS_PROGRAM, 16, toaplan1_state )
 	AM_RANGE(0xe0000a, 0xe0000b) AM_WRITE(demonwld_dsp_ctrl_w)  /* DSP Comms control */
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( samesame_main_map, AS_PROGRAM, 16, toaplan1_state )
+ADDRESS_MAP_START(toaplan1_state::samesame_main_map)
 	AM_RANGE(0x000000, 0x00ffff) AM_ROM
 	AM_RANGE(0x040000, 0x07ffff) AM_ROM
 	AM_RANGE(0x080000, 0x080003) AM_WRITE(toaplan1_tile_offsets_w)
@@ -763,7 +763,7 @@ static ADDRESS_MAP_START( samesame_main_map, AS_PROGRAM, 16, toaplan1_state )
 	AM_RANGE(0x1c0006, 0x1c0007) AM_READWRITE(toaplan1_spritesizeram16_r, toaplan1_spritesizeram16_w)
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( outzone_main_map, AS_PROGRAM, 16, toaplan1_state )
+ADDRESS_MAP_START(toaplan1_state::outzone_main_map)
 	AM_RANGE(0x000000, 0x03ffff) AM_ROM
 	AM_RANGE(0x100000, 0x100001) AM_READ(toaplan1_frame_done_r)
 	AM_RANGE(0x100002, 0x100003) AM_READWRITE(toaplan1_spriteram_offs_r, toaplan1_spriteram_offs_w)
@@ -785,7 +785,7 @@ static ADDRESS_MAP_START( outzone_main_map, AS_PROGRAM, 16, toaplan1_state )
 	AM_RANGE(0x340006, 0x340007) AM_WRITE(toaplan1_fcu_flipscreen_w)
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( outzonecv_main_map, AS_PROGRAM, 16, toaplan1_state )
+ADDRESS_MAP_START(toaplan1_state::outzonecv_main_map)
 	AM_RANGE(0x000000, 0x03ffff) AM_ROM
 //  AM_RANGE(0x040000, 0x07ffff) AM_ROM
 	AM_RANGE(0x080000, 0x087fff) AM_RAM
@@ -808,7 +808,7 @@ static ADDRESS_MAP_START( outzonecv_main_map, AS_PROGRAM, 16, toaplan1_state )
 	AM_RANGE(0x4c0006, 0x4c0007) AM_READWRITE(toaplan1_spritesizeram16_r, toaplan1_spritesizeram16_w)
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( vimana_main_map, AS_PROGRAM, 16, toaplan1_state )
+ADDRESS_MAP_START(toaplan1_state::vimana_main_map)
 	AM_RANGE(0x000000, 0x03ffff) AM_ROM
 	AM_RANGE(0x080000, 0x080003) AM_WRITE(toaplan1_tile_offsets_w)
 	AM_RANGE(0x080006, 0x080007) AM_WRITE(toaplan1_fcu_flipscreen_w)
@@ -833,12 +833,12 @@ ADDRESS_MAP_END
 
 /***************************** Z80 Memory Map *******************************/
 
-static ADDRESS_MAP_START( toaplan1_sound_map, AS_PROGRAM, 8, toaplan1_state )
+ADDRESS_MAP_START(toaplan1_state::toaplan1_sound_map)
 	AM_RANGE(0x0000, 0x7fff) AM_ROM
 	AM_RANGE(0x8000, 0x87ff) AM_RAM AM_SHARE("sharedram")
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( rallybik_sound_io_map, AS_IO, 8, toaplan1_rallybik_state )
+ADDRESS_MAP_START(toaplan1_rallybik_state::rallybik_sound_io_map)
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	AM_RANGE(0x00, 0x00) AM_READ_PORT("P1")
 	AM_RANGE(0x10, 0x10) AM_READ_PORT("P2")
@@ -849,7 +849,7 @@ static ADDRESS_MAP_START( rallybik_sound_io_map, AS_IO, 8, toaplan1_rallybik_sta
 	AM_RANGE(0x60, 0x61) AM_DEVREADWRITE("ymsnd", ym3812_device, read, write)
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( truxton_sound_io_map, AS_IO, 8, toaplan1_state )
+ADDRESS_MAP_START(toaplan1_state::truxton_sound_io_map)
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	AM_RANGE(0x00, 0x00) AM_READ_PORT("P1")
 	AM_RANGE(0x10, 0x10) AM_READ_PORT("P2")
@@ -861,7 +861,7 @@ static ADDRESS_MAP_START( truxton_sound_io_map, AS_IO, 8, toaplan1_state )
 	AM_RANGE(0x70, 0x70) AM_READ_PORT("TJUMP")
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( hellfire_sound_io_map, AS_IO, 8, toaplan1_state )
+ADDRESS_MAP_START(toaplan1_state::hellfire_sound_io_map)
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	AM_RANGE(0x00, 0x00) AM_READ_PORT("DSWA")
 	AM_RANGE(0x10, 0x10) AM_READ_PORT("DSWB")
@@ -873,7 +873,7 @@ static ADDRESS_MAP_START( hellfire_sound_io_map, AS_IO, 8, toaplan1_state )
 	AM_RANGE(0x70, 0x71) AM_DEVREADWRITE("ymsnd", ym3812_device, read, write)
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( zerowing_sound_io_map, AS_IO, 8, toaplan1_state )
+ADDRESS_MAP_START(toaplan1_state::zerowing_sound_io_map)
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	AM_RANGE(0x00, 0x00) AM_READ_PORT("P1")
 	AM_RANGE(0x08, 0x08) AM_READ_PORT("P2")
@@ -885,7 +885,7 @@ static ADDRESS_MAP_START( zerowing_sound_io_map, AS_IO, 8, toaplan1_state )
 	AM_RANGE(0xa8, 0xa9) AM_DEVREADWRITE("ymsnd", ym3812_device, read, write)
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( demonwld_sound_io_map, AS_IO, 8, toaplan1_state )
+ADDRESS_MAP_START(toaplan1_state::demonwld_sound_io_map)
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	AM_RANGE(0x00, 0x01) AM_DEVREADWRITE("ymsnd", ym3812_device, read, write)
 	AM_RANGE(0x20, 0x20) AM_READ_PORT("TJUMP")
@@ -897,7 +897,7 @@ static ADDRESS_MAP_START( demonwld_sound_io_map, AS_IO, 8, toaplan1_state )
 	AM_RANGE(0xe0, 0xe0) AM_READ_PORT("DSWA")
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( outzone_sound_io_map, AS_IO, 8, toaplan1_state )
+ADDRESS_MAP_START(toaplan1_state::outzone_sound_io_map)
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	AM_RANGE(0x00, 0x01) AM_DEVREADWRITE("ymsnd", ym3812_device, read, write)
 	AM_RANGE(0x04, 0x04) AM_WRITE(toaplan1_coin_w)  /* Coin counter/lockout */
@@ -912,13 +912,13 @@ ADDRESS_MAP_END
 
 /***************************** TMS32010 Memory Map **************************/
 
-static ADDRESS_MAP_START( DSP_program_map, AS_PROGRAM, 16, toaplan1_state )
+ADDRESS_MAP_START(toaplan1_state::DSP_program_map)
 	AM_RANGE(0x000, 0x7ff) AM_ROM
 ADDRESS_MAP_END
 
 	/* $000 - 08F  TMS32010 Internal Data RAM in Data Address Space */
 
-static ADDRESS_MAP_START( DSP_io_map, AS_IO, 16, toaplan1_state )
+ADDRESS_MAP_START(toaplan1_state::DSP_io_map)
 	AM_RANGE(0, 0) AM_WRITE(demonwld_dsp_addrsel_w)
 	AM_RANGE(1, 1) AM_READWRITE(demonwld_dsp_r, demonwld_dsp_w)
 	AM_RANGE(3, 3) AM_WRITE(demonwld_dsp_bio_w)
@@ -927,13 +927,13 @@ ADDRESS_MAP_END
 
 /***************************** HD647180 Memory Map **************************/
 
-static ADDRESS_MAP_START( vimana_hd647180_mem_map, AS_PROGRAM, 8, toaplan1_state )
+ADDRESS_MAP_START(toaplan1_state::vimana_hd647180_mem_map)
 	AM_RANGE(0x00000, 0x03fff) AM_ROM   /* Internal 16k byte ROM */
 	AM_RANGE(0x08000, 0x087ff) AM_RAM AM_SHARE("sharedram") /* 2048 bytes of shared ram w/maincpu */
 	AM_RANGE(0x0fe00, 0x0ffff) AM_RAM   /* Internal 512 byte RAM */
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( vimana_hd647180_io_map, AS_IO, 8, toaplan1_state )
+ADDRESS_MAP_START(toaplan1_state::vimana_hd647180_io_map)
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	// lots of low level 647180 peripherals are not emulated yet, ddr regs, timer regs etc, see comments below
 	// also see http://bitsavers.trailing-edge.com/pdf/hitachi/_dataBooks/U94_HD647180X_8-Bit_Microcontroller_Hardware_Manual_Jan88.pdf particularly page 38 (pdf page 56)
@@ -996,12 +996,12 @@ READ8_MEMBER(toaplan1_state::samesame_cmdavailable_r)
 	else return 0x00;
 };
 
-static ADDRESS_MAP_START( samesame_hd647180_mem_map, AS_PROGRAM, 8, toaplan1_state )
+ADDRESS_MAP_START(toaplan1_state::samesame_hd647180_mem_map)
 	AM_RANGE(0x00000, 0x03fff) AM_ROM   /* Internal 16k byte ROM */
 	AM_RANGE(0x0fe00, 0x0ffff) AM_RAM   /* Internal 512 byte RAM */
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( samesame_hd647180_io_map, AS_IO, 8, toaplan1_state )
+ADDRESS_MAP_START(toaplan1_state::samesame_hd647180_io_map)
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
 
 	AM_RANGE(0x63, 0x63) AM_READ( samesame_cmdavailable_r )
@@ -1871,7 +1871,7 @@ static GFXDECODE_START( rallybik )
 GFXDECODE_END
 
 
-#define PIXEL_CLOCK         (XTAL_28MHz/4)
+#define PIXEL_CLOCK         (XTAL(28'000'000)/4)
 
 // HTOTAL and VTOTAL taken from CRTC registers (toaplan1_bcu_control_w)
 // rallybik, demonwld and outzone program a larger VTOTAL than the other
@@ -1887,14 +1887,14 @@ GFXDECODE_END
 #define VBSTART             (240)
 
 
-static MACHINE_CONFIG_START( rallybik )
+MACHINE_CONFIG_START(toaplan1_rallybik_state::rallybik)
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", M68000, XTAL_10MHz)
+	MCFG_CPU_ADD("maincpu", M68000, XTAL(10'000'000))
 	MCFG_CPU_PROGRAM_MAP(rallybik_main_map)
 	MCFG_CPU_VBLANK_INT_DRIVER("screen", toaplan1_state,  toaplan1_interrupt)
 
-	MCFG_CPU_ADD("audiocpu", Z80, XTAL_28MHz/8)
+	MCFG_CPU_ADD("audiocpu", Z80, XTAL(28'000'000)/8)
 	MCFG_CPU_PROGRAM_MAP(toaplan1_sound_map)
 	MCFG_CPU_IO_MAP(rallybik_sound_io_map)
 
@@ -1927,20 +1927,20 @@ static MACHINE_CONFIG_START( rallybik )
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
 
-	MCFG_SOUND_ADD("ymsnd", YM3812, XTAL_28MHz/8)
+	MCFG_SOUND_ADD("ymsnd", YM3812, XTAL(28'000'000)/8)
 	MCFG_YM3812_IRQ_HANDLER(INPUTLINE("audiocpu", 0))
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 MACHINE_CONFIG_END
 
 
-static MACHINE_CONFIG_START( truxton )
+MACHINE_CONFIG_START(toaplan1_state::truxton)
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", M68000, XTAL_10MHz)
+	MCFG_CPU_ADD("maincpu", M68000, XTAL(10'000'000))
 	MCFG_CPU_PROGRAM_MAP(truxton_main_map)
 	MCFG_CPU_VBLANK_INT_DRIVER("screen", toaplan1_state,  toaplan1_interrupt)
 
-	MCFG_CPU_ADD("audiocpu", Z80, XTAL_28MHz/8)
+	MCFG_CPU_ADD("audiocpu", Z80, XTAL(28'000'000)/8)
 	MCFG_CPU_PROGRAM_MAP(toaplan1_sound_map)
 	MCFG_CPU_IO_MAP(truxton_sound_io_map)
 
@@ -1965,20 +1965,20 @@ static MACHINE_CONFIG_START( truxton )
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
 
-	MCFG_SOUND_ADD("ymsnd", YM3812, XTAL_28MHz/8)
+	MCFG_SOUND_ADD("ymsnd", YM3812, XTAL(28'000'000)/8)
 	MCFG_YM3812_IRQ_HANDLER(INPUTLINE("audiocpu", 0))
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 MACHINE_CONFIG_END
 
 
-static MACHINE_CONFIG_START( hellfire )
+MACHINE_CONFIG_START(toaplan1_state::hellfire)
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", M68000, XTAL_10MHz)
+	MCFG_CPU_ADD("maincpu", M68000, XTAL(10'000'000))
 	MCFG_CPU_PROGRAM_MAP(hellfire_main_map)
 	MCFG_CPU_VBLANK_INT_DRIVER("screen", toaplan1_state,  toaplan1_interrupt)
 
-	MCFG_CPU_ADD("audiocpu", Z80, XTAL_28MHz/8)
+	MCFG_CPU_ADD("audiocpu", Z80, XTAL(28'000'000)/8)
 	MCFG_CPU_PROGRAM_MAP(toaplan1_sound_map)
 	MCFG_CPU_IO_MAP(hellfire_sound_io_map)
 
@@ -2003,20 +2003,20 @@ static MACHINE_CONFIG_START( hellfire )
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
 
-	MCFG_SOUND_ADD("ymsnd", YM3812, XTAL_28MHz/8)
+	MCFG_SOUND_ADD("ymsnd", YM3812, XTAL(28'000'000)/8)
 	MCFG_YM3812_IRQ_HANDLER(INPUTLINE("audiocpu", 0))
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 MACHINE_CONFIG_END
 
 
-static MACHINE_CONFIG_START( zerowing )
+MACHINE_CONFIG_START(toaplan1_state::zerowing)
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", M68000, XTAL_10MHz)
+	MCFG_CPU_ADD("maincpu", M68000, XTAL(10'000'000))
 	MCFG_CPU_PROGRAM_MAP(zerowing_main_map)
 	MCFG_CPU_VBLANK_INT_DRIVER("screen", toaplan1_state,  toaplan1_interrupt)
 
-	MCFG_CPU_ADD("audiocpu", Z80, XTAL_28MHz/8)
+	MCFG_CPU_ADD("audiocpu", Z80, XTAL(28'000'000)/8)
 	MCFG_CPU_PROGRAM_MAP(toaplan1_sound_map)
 	MCFG_CPU_IO_MAP(zerowing_sound_io_map)
 
@@ -2041,24 +2041,24 @@ static MACHINE_CONFIG_START( zerowing )
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
 
-	MCFG_SOUND_ADD("ymsnd", YM3812, XTAL_28MHz/8)
+	MCFG_SOUND_ADD("ymsnd", YM3812, XTAL(28'000'000)/8)
 	MCFG_YM3812_IRQ_HANDLER(INPUTLINE("audiocpu", 0))
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 MACHINE_CONFIG_END
 
 
-static MACHINE_CONFIG_START( demonwld )
+MACHINE_CONFIG_START(toaplan1_state::demonwld)
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", M68000, XTAL_10MHz)
+	MCFG_CPU_ADD("maincpu", M68000, XTAL(10'000'000))
 	MCFG_CPU_PROGRAM_MAP(demonwld_main_map)
 	MCFG_CPU_VBLANK_INT_DRIVER("screen", toaplan1_state,  toaplan1_interrupt)
 
-	MCFG_CPU_ADD("audiocpu", Z80, XTAL_28MHz/8)
+	MCFG_CPU_ADD("audiocpu", Z80, XTAL(28'000'000)/8)
 	MCFG_CPU_PROGRAM_MAP(toaplan1_sound_map)
 	MCFG_CPU_IO_MAP(demonwld_sound_io_map)
 
-	MCFG_CPU_ADD("dsp", TMS32010, XTAL_28MHz/2)
+	MCFG_CPU_ADD("dsp", TMS32010, XTAL(28'000'000)/2)
 	MCFG_CPU_PROGRAM_MAP(DSP_program_map)
 	MCFG_CPU_IO_MAP(DSP_io_map)
 	MCFG_TMS32010_BIO_IN_CB(READLINE(toaplan1_state, demonwld_BIO_r))
@@ -2084,20 +2084,20 @@ static MACHINE_CONFIG_START( demonwld )
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
 
-	MCFG_SOUND_ADD("ymsnd", YM3812, XTAL_28MHz/8)
+	MCFG_SOUND_ADD("ymsnd", YM3812, XTAL(28'000'000)/8)
 	MCFG_YM3812_IRQ_HANDLER(INPUTLINE("audiocpu", 0))
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 MACHINE_CONFIG_END
 
 
-static MACHINE_CONFIG_START( samesame )
+MACHINE_CONFIG_START(toaplan1_state::samesame)
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", M68000, XTAL_10MHz)
+	MCFG_CPU_ADD("maincpu", M68000, XTAL(10'000'000))
 	MCFG_CPU_PROGRAM_MAP(samesame_main_map)
 	MCFG_CPU_VBLANK_INT_DRIVER("screen", toaplan1_state,  toaplan1_interrupt)
 
-	MCFG_CPU_ADD("audiocpu", Z180, XTAL_28MHz/8)    /* HD647180XOFS6 CPU */
+	MCFG_CPU_ADD("audiocpu", Z180, XTAL(28'000'000)/8)    /* HD647180XOFS6 CPU */
 	MCFG_CPU_PROGRAM_MAP(samesame_hd647180_mem_map)
 	MCFG_CPU_IO_MAP(samesame_hd647180_io_map)
 
@@ -2122,20 +2122,20 @@ static MACHINE_CONFIG_START( samesame )
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
 
-	MCFG_SOUND_ADD("ymsnd", YM3812, XTAL_28MHz/8)
+	MCFG_SOUND_ADD("ymsnd", YM3812, XTAL(28'000'000)/8)
 	MCFG_YM3812_IRQ_HANDLER(INPUTLINE("audiocpu", 0))
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 MACHINE_CONFIG_END
 
 
-static MACHINE_CONFIG_START( outzone )
+MACHINE_CONFIG_START(toaplan1_state::outzone)
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", M68000, XTAL_10MHz)
+	MCFG_CPU_ADD("maincpu", M68000, XTAL(10'000'000))
 	MCFG_CPU_PROGRAM_MAP(outzone_main_map)
 	MCFG_CPU_VBLANK_INT_DRIVER("screen", toaplan1_state,  toaplan1_interrupt)
 
-	MCFG_CPU_ADD("audiocpu", Z80, XTAL_28MHz/8)
+	MCFG_CPU_ADD("audiocpu", Z80, XTAL(28'000'000)/8)
 	MCFG_CPU_PROGRAM_MAP(toaplan1_sound_map)
 	MCFG_CPU_IO_MAP(outzone_sound_io_map)
 
@@ -2160,20 +2160,20 @@ static MACHINE_CONFIG_START( outzone )
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
 
-	MCFG_SOUND_ADD("ymsnd", YM3812, XTAL_28MHz/8)
+	MCFG_SOUND_ADD("ymsnd", YM3812, XTAL(28'000'000)/8)
 	MCFG_YM3812_IRQ_HANDLER(INPUTLINE("audiocpu", 0))
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 MACHINE_CONFIG_END
 
 
-static MACHINE_CONFIG_START( outzonecv )
+MACHINE_CONFIG_START(toaplan1_state::outzonecv)
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", M68000, XTAL_10MHz)
+	MCFG_CPU_ADD("maincpu", M68000, XTAL(10'000'000))
 	MCFG_CPU_PROGRAM_MAP(outzonecv_main_map)
 	MCFG_CPU_VBLANK_INT_DRIVER("screen", toaplan1_state,  toaplan1_interrupt)
 
-	MCFG_CPU_ADD("audiocpu", Z80, XTAL_28MHz/8)
+	MCFG_CPU_ADD("audiocpu", Z80, XTAL(28'000'000)/8)
 	MCFG_CPU_PROGRAM_MAP(toaplan1_sound_map)
 	MCFG_CPU_IO_MAP(zerowing_sound_io_map)
 
@@ -2198,20 +2198,20 @@ static MACHINE_CONFIG_START( outzonecv )
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
 
-	MCFG_SOUND_ADD("ymsnd", YM3812, XTAL_28MHz/8)
+	MCFG_SOUND_ADD("ymsnd", YM3812, XTAL(28'000'000)/8)
 	MCFG_YM3812_IRQ_HANDLER(INPUTLINE("audiocpu", 0))
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 MACHINE_CONFIG_END
 
 
-static MACHINE_CONFIG_START( vimana )
+MACHINE_CONFIG_START(toaplan1_state::vimana)
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", M68000, XTAL_10MHz) /* verified on pcb */
+	MCFG_CPU_ADD("maincpu", M68000, XTAL(10'000'000)) /* verified on pcb */
 	MCFG_CPU_PROGRAM_MAP(vimana_main_map)
 	MCFG_CPU_VBLANK_INT_DRIVER("screen", toaplan1_state,  toaplan1_interrupt)
 
-	MCFG_CPU_ADD("audiocpu", Z180, XTAL_28MHz/8)    /* HD647180XOFS6 CPU */
+	MCFG_CPU_ADD("audiocpu", Z180, XTAL(28'000'000)/8)    /* HD647180XOFS6 CPU */
 	MCFG_CPU_PROGRAM_MAP(vimana_hd647180_mem_map)
 	MCFG_CPU_IO_MAP(vimana_hd647180_io_map)
 
@@ -2236,7 +2236,7 @@ static MACHINE_CONFIG_START( vimana )
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
 
-	MCFG_SOUND_ADD("ymsnd", YM3812, XTAL_28MHz/8)   /* verified on pcb */
+	MCFG_SOUND_ADD("ymsnd", YM3812, XTAL(28'000'000)/8)   /* verified on pcb */
 	MCFG_YM3812_IRQ_HANDLER(INPUTLINE("audiocpu", 0))
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 MACHINE_CONFIG_END

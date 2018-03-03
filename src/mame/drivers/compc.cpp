@@ -32,6 +32,11 @@ public:
 	DECLARE_WRITE8_MEMBER(pio_w);
 	DECLARE_READ8_MEMBER(pio_r);
 
+	void compc(machine_config &config);
+	void pc10iii(machine_config &config);
+	void compc_io(address_map &map);
+	void compc_map(address_map &map);
+	void compciii_io(address_map &map);
 private:
 	u8 m_portb, m_dips;
 };
@@ -167,24 +172,24 @@ static INPUT_PORTS_START(compc)
 	PORT_INCLUDE(pc_keyboard)
 INPUT_PORTS_END
 
-static ADDRESS_MAP_START(compc_map, AS_PROGRAM, 8, compc_state)
+ADDRESS_MAP_START(compc_state::compc_map)
 	ADDRESS_MAP_UNMAP_HIGH
 	AM_RANGE(0xf0000, 0xfffff) AM_ROM AM_REGION("bios", 0)
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START(compc_io, AS_IO, 8, compc_state)
+ADDRESS_MAP_START(compc_state::compc_io)
 	ADDRESS_MAP_UNMAP_HIGH
+	AM_RANGE(0x0000, 0x00ff) AM_DEVICE("mb", pc_noppi_mb_device, map)
 	AM_RANGE(0x0060, 0x0063) AM_READWRITE(pio_r, pio_w)
-	AM_RANGE(0x0000, 0x00ff) AM_DEVICE("mb", pc_noppi_mb_device, map)
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START(compciii_io, AS_IO, 8, compc_state)
+ADDRESS_MAP_START(compc_state::compciii_io)
 	ADDRESS_MAP_UNMAP_HIGH
-	AM_RANGE(0x0060, 0x0063) AM_READWRITE(pioiii_r, pioiii_w)
 	AM_RANGE(0x0000, 0x00ff) AM_DEVICE("mb", pc_noppi_mb_device, map)
+	AM_RANGE(0x0060, 0x0063) AM_READWRITE(pioiii_r, pioiii_w)
 ADDRESS_MAP_END
 
-static MACHINE_CONFIG_START(compc)
+MACHINE_CONFIG_START(compc_state::compc)
 	MCFG_CPU_ADD("maincpu", I8088, 4772720*2)
 	MCFG_CPU_PROGRAM_MAP(compc_map)
 	MCFG_CPU_IO_MAP(compc_io)
@@ -193,11 +198,11 @@ static MACHINE_CONFIG_START(compc)
 	MCFG_PCNOPPI_MOTHERBOARD_ADD("mb", "maincpu")
 	MCFG_DEVICE_REMOVE("mb:pit8253")
 	MCFG_DEVICE_ADD("mb:pit8253", FE2010_PIT, 0)
-	MCFG_PIT8253_CLK0(XTAL_14_31818MHz/12.0) /* heartbeat IRQ */
+	MCFG_PIT8253_CLK0(XTAL(14'318'181)/12.0) /* heartbeat IRQ */
 	MCFG_PIT8253_OUT0_HANDLER(DEVWRITELINE("pic8259", pic8259_device, ir0_w))
-	MCFG_PIT8253_CLK1(XTAL_14_31818MHz/12.0) /* dram refresh */
+	MCFG_PIT8253_CLK1(XTAL(14'318'181)/12.0) /* dram refresh */
 	MCFG_PIT8253_OUT1_HANDLER(WRITELINE(ibm5160_mb_device, pc_pit8253_out1_changed))
-	MCFG_PIT8253_CLK2(XTAL_14_31818MHz/12.0) /* pio port c pin 4, and speaker polling enough */
+	MCFG_PIT8253_CLK2(XTAL(14'318'181)/12.0) /* pio port c pin 4, and speaker polling enough */
 	MCFG_PIT8253_OUT2_HANDLER(WRITELINE(ibm5160_mb_device, pc_pit8253_out2_changed))
 
 	MCFG_ISA8_SLOT_ADD("mb:isa", "isa1", pc_isa8_cards, "mda", false)
@@ -216,7 +221,8 @@ static MACHINE_CONFIG_START(compc)
 	MCFG_SOFTWARE_LIST_ADD("disk_list", "ibm5150")
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_DERIVED(pc10iii, compc)
+MACHINE_CONFIG_START(compc_state::pc10iii)
+	compc(config);
 	MCFG_DEVICE_MODIFY("maincpu")
 	MCFG_CPU_IO_MAP(compciii_io)
 MACHINE_CONFIG_END
@@ -252,7 +258,7 @@ ROM_START(pc10iii)
 	ROMX_LOAD("318085-06.u201", 0x8000, 0x8000, CRC(1901993c) SHA1(f75060c1c442376bd42c61e74fa9eee053351791), ROM_BIOS(7))
 	ROMX_LOAD("318085-07.u201", 0x8000, 0x8000, CRC(505d52b0) SHA1(f717c6ab791d51f35e1c38ffbc81a44075b5f2f8), ROM_BIOS(8))
 	ROMX_LOAD("318085-08.u201", 0x8000, 0x8000, CRC(7e228dc8) SHA1(958dfdd637bd31c01b949fac729d6973a7e630bc), ROM_BIOS(9))
-	
+
 	ROM_REGION(0x8000, "gfx1", 0)
 	ROMX_LOAD("318086-01_p10c_164a.bin", 0x0000, 0x4000, CRC(ee6c27f0) SHA1(e769cc3a49a1d708bd74eb4ac85bb6ea67220d38), ROM_BIOS(1)) // came with ROM 4.35c
 	ROMX_LOAD("318086-01_p10c_164a.bin", 0x0000, 0x4000, CRC(ee6c27f0) SHA1(e769cc3a49a1d708bd74eb4ac85bb6ea67220d38), ROM_BIOS(2))

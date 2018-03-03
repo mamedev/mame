@@ -165,19 +165,19 @@ DEFINE_DEVICE_TYPE(Z8681,   z8681_device,   "z8681",   "Z8681")
     ADDRESS MAPS
 ***************************************************************************/
 
-DEVICE_ADDRESS_MAP_START( program_2kb, 8, z8_device )
+ADDRESS_MAP_START(z8_device::program_2kb)
 	AM_RANGE(0x0000, 0x07ff) AM_ROM
 ADDRESS_MAP_END
 
-DEVICE_ADDRESS_MAP_START( program_4kb, 8, z8_device )
+ADDRESS_MAP_START(z8_device::program_4kb)
 	AM_RANGE(0x0000, 0x0fff) AM_ROM
 ADDRESS_MAP_END
 
 
-z8_device::z8_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock, uint32_t rom_size, address_map_delegate map)
+z8_device::z8_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock, uint32_t rom_size, address_map_constructor map)
 	: cpu_device(mconfig, type, tag, owner, clock)
-	, m_program_config("program", ENDIANNESS_LITTLE, 8, 16, 0, map)
-	, m_data_config("data", ENDIANNESS_LITTLE, 8, 16, 0)
+	, m_program_config("program", ENDIANNESS_BIG, 8, 16, 0, map)
+	, m_data_config("data", ENDIANNESS_BIG, 8, 16, 0)
 	, m_input_cb{{*this}, {*this}, {*this}, {*this}}
 	, m_output_cb{{*this}, {*this}, {*this}, {*this}}
 	, m_rom_size(rom_size)
@@ -186,25 +186,25 @@ z8_device::z8_device(const machine_config &mconfig, device_type type, const char
 
 
 z8601_device::z8601_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-	: z8_device(mconfig, Z8601, tag, owner, clock, 0x800, address_map_delegate(FUNC(z8601_device::program_2kb), this))
+	: z8_device(mconfig, Z8601, tag, owner, clock, 0x800, address_map_constructor(FUNC(z8601_device::program_2kb), this))
 {
 }
 
 
 ub8830d_device::ub8830d_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-	: z8_device(mconfig, UB8830D, tag, owner, clock, 0x800, address_map_delegate(FUNC(ub8830d_device::program_2kb), this))
+	: z8_device(mconfig, UB8830D, tag, owner, clock, 0x800, address_map_constructor(FUNC(ub8830d_device::program_2kb), this))
 {
 }
 
 
 z8611_device::z8611_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-	: z8_device(mconfig, Z8611, tag, owner, clock, 0x1000, address_map_delegate(FUNC(z8611_device::program_4kb), this))
+	: z8_device(mconfig, Z8611, tag, owner, clock, 0x1000, address_map_constructor(FUNC(z8611_device::program_4kb), this))
 {
 }
 
 
 z8681_device::z8681_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-	: z8_device(mconfig, Z8681, tag, owner, clock, 0, address_map_delegate())
+	: z8_device(mconfig, Z8681, tag, owner, clock, 0, address_map_constructor())
 {
 }
 
@@ -539,7 +539,7 @@ void z8_device::stack_push_word(uint16_t src)
 		register_pair_write(Z8_REGISTER_SPH, sp);
 
 		// @SP <- src
-		m_data->write_word(mask_external_address(sp), src);
+		m_data->write_word_unaligned(mask_external_address(sp), src);
 	}
 }
 
@@ -586,7 +586,7 @@ uint16_t z8_device::stack_pop_word()
 	{
 		// @SP <- src
 		uint16_t sp = register_pair_read(Z8_REGISTER_SPH);
-		uint16_t word = m_data->read_word(mask_external_address(sp));
+		uint16_t word = m_data->read_word_unaligned(mask_external_address(sp));
 
 		// SP <- SP + 2 (postincrement)
 		register_pair_write(Z8_REGISTER_SPH, sp + 2);

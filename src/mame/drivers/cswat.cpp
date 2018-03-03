@@ -62,6 +62,8 @@ public:
 	virtual void video_start() override;
 	virtual void machine_reset() override;
 	virtual void machine_start() override;
+	void cswat(machine_config &config);
+	void cswat_map(address_map &map);
 };
 
 
@@ -135,7 +137,7 @@ READ8_MEMBER(cswat_state::sensors_r)
 	return machine().rand();
 }
 
-static ADDRESS_MAP_START( cswat_map, AS_PROGRAM, 8, cswat_state )
+ADDRESS_MAP_START(cswat_state::cswat_map)
 	AM_RANGE(0x0000, 0x0bff) AM_RAM_WRITE(videoram_w) AM_SHARE("videoram")
 	AM_RANGE(0x0c00, 0x0fff) AM_RAM
 //  AM_RANGE(0x1800, 0x1800) AM_READNOP // ? reads here after writing to $4000
@@ -253,10 +255,10 @@ void cswat_state::machine_start()
 	save_item(NAME(m_nmi_enabled));
 }
 
-static MACHINE_CONFIG_START( cswat )
+MACHINE_CONFIG_START(cswat_state::cswat)
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", M6809E, XTAL_18_432MHz/3/4) // HD68A09EP, 1.5MHz?
+	MCFG_CPU_ADD("maincpu", MC6809E, XTAL(18'432'000)/3/4) // HD68A09EP, 1.5MHz?
 	MCFG_CPU_PROGRAM_MAP(cswat_map)
 	MCFG_CPU_VBLANK_INT_DRIVER("screen", cswat_state, irq0_line_assert)
 	MCFG_CPU_PERIODIC_INT_DRIVER(cswat_state, nmi_handler, 300) // ?

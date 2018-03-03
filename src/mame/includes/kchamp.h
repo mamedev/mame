@@ -81,4 +81,15 @@ public:
 	void kchampvs_draw_sprites( bitmap_ind16 &bitmap, const rectangle &cliprect );
 	void decrypt_code();
 	DECLARE_WRITE_LINE_MEMBER(msmint);
+	void kchamp(machine_config &config);
+	void kchampvs(machine_config &config);
+	void decrypted_opcodes_map(address_map &map);
+	void kchamp_io_map(address_map &map);
+	void kchamp_map(address_map &map);
+	void kchamp_sound_io_map(address_map &map);
+	void kchamp_sound_map(address_map &map);
+	void kchampvs_io_map(address_map &map);
+	void kchampvs_map(address_map &map);
+	void kchampvs_sound_io_map(address_map &map);
+	void kchampvs_sound_map(address_map &map);
 };

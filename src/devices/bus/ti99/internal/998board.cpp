@@ -634,7 +634,7 @@ READ8_MEMBER( mainboard8_device::read )
 	uint8_t value = 0;
 	const char* what;
 
-	if (machine().side_effect_disabled())
+	if (machine().side_effects_disabled())
 	{
 		return debugger_read(space, offset);
 	}
@@ -832,7 +832,7 @@ WRITE8_MEMBER( mainboard8_device::write )
 	m_latched_data = data;
 	m_pending_write = true;
 
-	if (machine().side_effect_disabled())
+	if (machine().side_effects_disabled())
 	{
 		return debugger_write(space, offset, data);
 	}
@@ -1012,7 +1012,7 @@ void mainboard8_device::device_reset()
 	m_space = &cpu->space(AS_PROGRAM);
 }
 
-MACHINE_CONFIG_MEMBER( mainboard8_device::device_add_mconfig )
+MACHINE_CONFIG_START(mainboard8_device::device_add_mconfig)
 	MCFG_DEVICE_ADD(TI998_VAQUERRO_TAG, TI99_VAQUERRO, 0)
 	MCFG_DEVICE_ADD(TI998_MOFETTA_TAG, TI99_MOFETTA, 0)
 	MCFG_DEVICE_ADD(TI998_AMIGO_TAG, TI99_AMIGO, 0)

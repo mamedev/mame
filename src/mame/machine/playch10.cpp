@@ -1,9 +1,11 @@
 // license:BSD-3-Clause
 // copyright-holders:Ernesto Corvi,Brad Oliver
 #include "emu.h"
-#include "video/ppu2c0x.h"
-#include "machine/nvram.h"
 #include "includes/playch10.h"
+
+#include "machine/nvram.h"
+#include "video/ppu2c0x.h"
+
 
 /*************************************
  *
@@ -35,6 +37,8 @@ void playch10_state::machine_reset()
 
 void playch10_state::machine_start()
 {
+	m_timedigits.resolve();
+
 	m_vrom = (m_vrom_region != nullptr) ? m_vrom_region->base() : nullptr;
 
 	/* allocate 4K of nametable ram here */
@@ -50,7 +54,7 @@ void playch10_state::machine_start()
 
 	nvram_device *nvram = machine().device<nvram_device>("nvram");
 	if (nvram != nullptr)
-		nvram->set_base(memregion("cart" )->base() + 0x6000, 0x1000);
+		nvram->set_base(memregion("cart")->base() + 0x6000, 0x1000);
 }
 
 MACHINE_START_MEMBER(playch10_state,playch10_hboard)

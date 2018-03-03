@@ -3,7 +3,7 @@
 #include "audio/seibu.h"
 #include "sound/3812intf.h"
 
-class bloodbro_state : public driver_device
+class bloodbro_state : public driver_device, protected seibu_sound_common
 {
 public:
 	bloodbro_state(const machine_config &mconfig, device_type type, const char *tag)
@@ -66,4 +66,12 @@ public:
 	void weststry_draw_sprites(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 
 	DECLARE_DRIVER_INIT(weststry);
+	void bloodbro(machine_config &config);
+	void skysmash(machine_config &config);
+	void weststry(machine_config &config);
+	void bloodbro_map(address_map &map);
+	void common_map(address_map &map);
+	void skysmash_map(address_map &map);
+	void weststry_map(address_map &map);
+	void weststry_sound_map(address_map &map);
 };

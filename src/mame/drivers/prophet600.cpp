@@ -105,6 +105,9 @@ public:
 	DECLARE_WRITE8_MEMBER(cv_w);
 	DECLARE_WRITE8_MEMBER(gate_w);
 
+	void prophet600(machine_config &config);
+	void cpu_map(address_map &map);
+	void io_map(address_map &map);
 private:
 	uint16_t m_dac;
 	uint8_t m_scanrow;
@@ -236,7 +239,7 @@ READ8_MEMBER(prophet600_state::comparitor_r)
 	return m_comparitor;
 }
 
-static ADDRESS_MAP_START( cpu_map, AS_PROGRAM, 8, prophet600_state )
+ADDRESS_MAP_START(prophet600_state::cpu_map)
 	AM_RANGE(0x0000, 0x1fff) AM_ROM AM_REGION(MAINCPU_TAG, 0)
 	AM_RANGE(0x2000, 0x27ff) AM_RAM
 	AM_RANGE(0x3000, 0x37ff) AM_RAM
@@ -245,7 +248,7 @@ static ADDRESS_MAP_START( cpu_map, AS_PROGRAM, 8, prophet600_state )
 	AM_RANGE(0xe000, 0xe001) AM_DEVREAD(UART_TAG, acia6850_device, read)
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( io_map, AS_IO, 8, prophet600_state )
+ADDRESS_MAP_START(prophet600_state::io_map)
 	AM_RANGE(0x00, 0x07) AM_MIRROR(0xff00) AM_DEVREADWRITE(PIT_TAG, pit8253_device, read, write)
 	AM_RANGE(0x08, 0x08) AM_MIRROR(0xff00) AM_WRITE(scanrow_w)
 	AM_RANGE(0x09, 0x09) AM_MIRROR(0xff00) AM_READWRITE(comparitor_r, led_w)
@@ -260,17 +263,17 @@ DRIVER_INIT_MEMBER(prophet600_state, prophet600)
 }
 
 // master crystal is 8 MHz, all clocks derived from there
-static MACHINE_CONFIG_START( prophet600 )
-	MCFG_CPU_ADD(MAINCPU_TAG, Z80, XTAL_8MHz/2)
+MACHINE_CONFIG_START(prophet600_state::prophet600)
+	MCFG_CPU_ADD(MAINCPU_TAG, Z80, XTAL(8'000'000)/2)
 	MCFG_CPU_PROGRAM_MAP(cpu_map)
 	MCFG_CPU_IO_MAP(io_map)
 
 	MCFG_DEFAULT_LAYOUT( layout_prophet600 )
 
-	MCFG_DEVICE_ADD(PIT_TAG, PIT8253, XTAL_8MHz/4)
-	MCFG_PIT8253_CLK0(XTAL_8MHz/4)
-	MCFG_PIT8253_CLK1(XTAL_8MHz/4)
-	MCFG_PIT8253_CLK2(XTAL_8MHz/4)
+	MCFG_DEVICE_ADD(PIT_TAG, PIT8253, XTAL(8'000'000)/4)
+	MCFG_PIT8253_CLK0(XTAL(8'000'000)/4)
+	MCFG_PIT8253_CLK1(XTAL(8'000'000)/4)
+	MCFG_PIT8253_CLK2(XTAL(8'000'000)/4)
 	MCFG_PIT8253_OUT0_HANDLER(WRITELINE(prophet600_state, pit_ch0_tick_w))
 	MCFG_PIT8253_OUT2_HANDLER(WRITELINE(prophet600_state, pit_ch2_tick_w))
 
@@ -283,7 +286,7 @@ static MACHINE_CONFIG_START( prophet600 )
 
 	MCFG_MIDI_PORT_ADD("mdout", midiout_slot, "midiout")
 
-	MCFG_DEVICE_ADD("acia_clock", CLOCK, XTAL_8MHz/16)  // 500kHz = 16 times the MIDI rate
+	MCFG_DEVICE_ADD("acia_clock", CLOCK, XTAL(8'000'000)/16)  // 500kHz = 16 times the MIDI rate
 	MCFG_CLOCK_SIGNAL_HANDLER(WRITELINE(prophet600_state, acia_clock_w))
 
 MACHINE_CONFIG_END

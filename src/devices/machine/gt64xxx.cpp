@@ -149,16 +149,13 @@
 
 DEFINE_DEVICE_TYPE(GT64XXX, gt64xxx_device, "gt64xxx", "Galileo GT-64XXX System Controller")
 
-DEVICE_ADDRESS_MAP_START(config_map, 32, gt64xxx_device)
-	AM_INHERIT_FROM(pci_device::config_map)
+ADDRESS_MAP_START(gt64xxx_device::config_map)
+	AM_IMPORT_FROM(pci_device::config_map)
 ADDRESS_MAP_END
 
 // cpu i/f map
-DEVICE_ADDRESS_MAP_START(cpu_map, 32, gt64xxx_device)
+ADDRESS_MAP_START(gt64xxx_device::cpu_map)
 	AM_RANGE(0x00000000, 0x00000cff) AM_READWRITE(    cpu_if_r,          cpu_if_w)
-ADDRESS_MAP_END
-
-DEVICE_ADDRESS_MAP_START(empty, 32, gt64xxx_device)
 ADDRESS_MAP_END
 
 gt64xxx_device::gt64xxx_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
@@ -175,10 +172,10 @@ gt64xxx_device::gt64xxx_device(const machine_config &mconfig, const char *tag, d
 	}
 }
 
-void gt64xxx_device::set_map(int id, const address_map_delegate &map, device_t *device)
+void gt64xxx_device::set_map(int id, const address_map_constructor &map, device_t *device)
 {
-	m_cs_maps[id] = map;
 	m_cs_devices[id] = device;
+	m_cs_maps[id] = map;
 }
 
 device_memory_interface::space_config_vector gt64xxx_device::memory_space_config() const
@@ -497,18 +494,18 @@ WRITE_LINE_MEMBER(gt64xxx_device::pci_stall)
 READ32_MEMBER (gt64xxx_device::pci_config_r)
 {
 	uint32_t result = 0;
-	LOGGALILEO("%06X:galileo pci_config_r from offset %02X = %08X & %08X\n", space.device().safe_pc(), offset*4, result, mem_mask);
+	LOGGALILEO("%s galileo pci_config_r from offset %02X = %08X & %08X\n", machine().describe_context(), offset*4, result, mem_mask);
 	return result;
 }
 WRITE32_MEMBER (gt64xxx_device::pci_config_w)
 {
-	LOGGALILEO("%06X:galileo pci_config_w to offset %02X = %08X & %08X\n", space.device().safe_pc(), offset*4, data, mem_mask);
+	LOGGALILEO("%s galileo pci_config_w to offset %02X = %08X & %08X\n", machine().describe_context(), offset*4, data, mem_mask);
 }
 // PCI Master Window 0
 READ32_MEMBER (gt64xxx_device::master_mem0_r)
 {
 	uint32_t result = this->space(AS_PCI_MEM).read_dword((m_reg[GREG_PCI_MEM0_LO]<<21) | (offset*4), mem_mask);
-	LOGPCI("%06X:galileo pci mem0 read from offset %08X = %08X & %08X\n", space.device().safe_pc(), (m_reg[GREG_PCI_MEM0_LO]<<21) | (offset*4), result, mem_mask);
+	LOGPCI("%s galileo pci mem0 read from offset %08X = %08X & %08X\n", machine().describe_context(), (m_reg[GREG_PCI_MEM0_LO]<<21) | (offset*4), result, mem_mask);
 	return result;
 }
 WRITE32_MEMBER (gt64xxx_device::master_mem0_w)
@@ -524,7 +521,7 @@ WRITE32_MEMBER (gt64xxx_device::master_mem0_w)
 			m_stall_windex++;
 			// Stall cpu until trigger
 			m_cpu_space->device().execute().spin_until_trigger(45678);
-			LOGMASKED(LOG_GALILEO | LOG_PCI, "%08X:Stalling CPU on PCI Stall\n", m_cpu_space->device().safe_pc());
+			LOGMASKED(LOG_GALILEO | LOG_PCI, "%s Stalling CPU on PCI Stall\n", machine().describe_context());
 		}
 		else {
 			fatalerror("master_mem0_w: m_stall_windex full\n");
@@ -532,20 +529,20 @@ WRITE32_MEMBER (gt64xxx_device::master_mem0_w)
 		return;
 	}
 	this->space(AS_PCI_MEM).write_dword((m_reg[GREG_PCI_MEM0_LO]<<21) | (offset*4), data, mem_mask);
-	LOGPCI("%06X:galileo pci mem0 write to offset %08X = %08X & %08X\n", space.device().safe_pc(), (m_reg[GREG_PCI_MEM0_LO]<<21) | (offset*4), data, mem_mask);
+	LOGPCI("%s galileo pci mem0 write to offset %08X = %08X & %08X\n", machine().describe_context(), (m_reg[GREG_PCI_MEM0_LO]<<21) | (offset*4), data, mem_mask);
 }
 
 // PCI Master Window 1
 READ32_MEMBER (gt64xxx_device::master_mem1_r)
 {
 	uint32_t result = this->space(AS_PCI_MEM).read_dword((m_reg[GREG_PCI_MEM1_LO]<<21) | (offset*4), mem_mask);
-	LOGPCI("%06X:galileo pci mem1 read from offset %08X = %08X & %08X\n", space.device().safe_pc(), (m_reg[GREG_PCI_MEM1_LO]<<21) | (offset*4), result, mem_mask);
+	LOGPCI("%s galileo pci mem1 read from offset %08X = %08X & %08X\n", machine().describe_context(), (m_reg[GREG_PCI_MEM1_LO]<<21) | (offset*4), result, mem_mask);
 	return result;
 }
 WRITE32_MEMBER (gt64xxx_device::master_mem1_w)
 {
 	this->space(AS_PCI_MEM).write_dword((m_reg[GREG_PCI_MEM1_LO]<<21) | (offset*4), data, mem_mask);
-	LOGPCI("%06X:galileo pci mem1 write to offset %08X = %08X & %08X\n", space.device().safe_pc(), (m_reg[GREG_PCI_MEM1_LO]<<21) | (offset*4), data, mem_mask);
+	LOGPCI("%s galileo pci mem1 write to offset %08X = %08X & %08X\n", machine().describe_context(), (m_reg[GREG_PCI_MEM1_LO]<<21) | (offset*4), data, mem_mask);
 }
 
 // PCI Master IO
@@ -554,7 +551,7 @@ READ32_MEMBER (gt64xxx_device::master_io_r)
 	uint32_t result = this->space(AS_PCI_IO).read_dword((m_reg[GREG_PCI_IO_LO] << 21) | (offset * 4), mem_mask);
 	if (m_prev_addr != offset) {
 		m_prev_addr = offset;
-		LOGPCI("%06X:galileo pci io read from offset %08X = %08X & %08X\n", space.device().safe_pc(), (m_reg[GREG_PCI_IO_LO] << 21) | (offset * 4), result, mem_mask);
+		LOGPCI("%s galileo pci io read from offset %08X = %08X & %08X\n", machine().describe_context(), (m_reg[GREG_PCI_IO_LO] << 21) | (offset * 4), result, mem_mask);
 	}
 	return result;
 }
@@ -563,60 +560,60 @@ WRITE32_MEMBER (gt64xxx_device::master_io_w)
 	this->space(AS_PCI_IO).write_dword((m_reg[GREG_PCI_IO_LO] << 21) | (offset * 4), data, mem_mask);
 	if (m_prev_addr != offset) {
 		m_prev_addr = offset;
-		LOGPCI("%06X:galileo pci io write to offset %08X = %08X & %08X\n", space.device().safe_pc(), (m_reg[GREG_PCI_IO_LO] << 21) | (offset * 4), data, mem_mask);
+		LOGPCI("%s galileo pci io write to offset %08X = %08X & %08X\n", machine().describe_context(), (m_reg[GREG_PCI_IO_LO] << 21) | (offset * 4), data, mem_mask);
 	}
 }
 
 READ32_MEMBER(gt64xxx_device::ras_0_r)
 {
 	uint32_t result = m_ram[0][offset];
-	LOGPCI("%06X:galileo ras_0 read from offset %08X = %08X & %08X\n", space.device().safe_pc(), offset * 4, result, mem_mask);
+	LOGPCI("%s galileo ras_0 read from offset %08X = %08X & %08X\n", machine().describe_context(), offset * 4, result, mem_mask);
 	return result;
 }
 
 WRITE32_MEMBER(gt64xxx_device::ras_0_w)
 {
 	COMBINE_DATA(&m_ram[0][offset]);
-	LOGPCI("%06X:galileo ras_0 write to offset %08X = %08X & %08X\n", space.device().safe_pc(), offset * 4, data, mem_mask);
+	LOGPCI("%s galileo ras_0 write to offset %08X = %08X & %08X\n", machine().describe_context(), offset * 4, data, mem_mask);
 }
 
 READ32_MEMBER(gt64xxx_device::ras_1_r)
 {
 	uint32_t result = m_ram[1][offset];
-	LOGPCI("%06X:galileo ras_0 read from offset %08X = %08X & %08X\n", space.device().safe_pc(), offset * 4, result, mem_mask);
+	LOGPCI("%s galileo ras_0 read from offset %08X = %08X & %08X\n", machine().describe_context(), offset * 4, result, mem_mask);
 	return result;
 }
 
 WRITE32_MEMBER(gt64xxx_device::ras_1_w)
 {
 	COMBINE_DATA(&m_ram[1][offset]);
-	LOGPCI("%06X:galileo ras_0 write to offset %08X = %08X & %08X\n", space.device().safe_pc(), offset * 4, data, mem_mask);
+	LOGPCI("%s galileo ras_0 write to offset %08X = %08X & %08X\n", machine().describe_context(), offset * 4, data, mem_mask);
 }
 
 READ32_MEMBER(gt64xxx_device::ras_2_r)
 {
 	uint32_t result = m_ram[2][offset];
-	LOGPCI("%06X:galileo ras_0 read from offset %08X = %08X & %08X\n", space.device().safe_pc(), offset * 4, result, mem_mask);
+	LOGPCI("%s galileo ras_0 read from offset %08X = %08X & %08X\n", machine().describe_context(), offset * 4, result, mem_mask);
 	return result;
 }
 
 WRITE32_MEMBER(gt64xxx_device::ras_2_w)
 {
 	COMBINE_DATA(&m_ram[2][offset]);
-	LOGPCI("%06X:galileo ras_0 write to offset %08X = %08X & %08X\n", space.device().safe_pc(), offset * 4, data, mem_mask);
+	LOGPCI("%s galileo ras_0 write to offset %08X = %08X & %08X\n", machine().describe_context(), offset * 4, data, mem_mask);
 }
 
 READ32_MEMBER(gt64xxx_device::ras_3_r)
 {
 	uint32_t result = m_ram[3][offset];
-	LOGPCI("%06X:galileo ras_0 read from offset %08X = %08X & %08X\n", space.device().safe_pc(), offset * 4, result, mem_mask);
+	LOGPCI("%s galileo ras_0 read from offset %08X = %08X & %08X\n", machine().describe_context(), offset * 4, result, mem_mask);
 	return result;
 }
 
 WRITE32_MEMBER(gt64xxx_device::ras_3_w)
 {
 	COMBINE_DATA(&m_ram[3][offset]);
-	LOGPCI("%06X:galileo ras_0 write to offset %08X = %08X & %08X\n", space.device().safe_pc(), offset * 4, data, mem_mask);
+	LOGPCI("%s galileo ras_0 write to offset %08X = %08X & %08X\n", machine().describe_context(), offset * 4, data, mem_mask);
 }
 
 
@@ -643,10 +640,7 @@ READ32_MEMBER (gt64xxx_device::cpu_if_r)
 				result = (result > elapsed) ? (result - elapsed) : 0;
 			}
 
-			/* eat some time for those which poll this register */
-			//space.device().execute().eat_cycles(100);
-
-			LOGTIMERS("%08X:hires_timer_r = %08X\n", space.device().safe_pc(), result);
+			LOGTIMERS("%s hires_timer_r = %08X\n", machine().describe_context(), result);
 			break;
 		}
 
@@ -660,7 +654,7 @@ READ32_MEMBER (gt64xxx_device::cpu_if_r)
 
 		case GREG_CONFIG_DATA:
 			result = config_data_r(space, offset);
-			LOGGALILEO("%08X:Galileo GREG_CONFIG_DATA read from offset %03X = %08X\n", space.device().safe_pc(), offset*4, result);
+			LOGGALILEO("%s Galileo GREG_CONFIG_DATA read from offset %03X = %08X\n", machine().describe_context(), offset*4, result);
 			break;
 
 		case GREG_CONFIG_ADDRESS:
@@ -670,11 +664,11 @@ READ32_MEMBER (gt64xxx_device::cpu_if_r)
 		case GREG_INT_STATE:
 		case GREG_INT_MASK:
 		case GREG_TIMER_CONTROL:
-//          LOGGALILEO("%08X:Galileo read from offset %03X = %08X\n", space.device().safe_pc(), offset*4, result);
+//          LOGGALILEO("%s Galileo read from offset %03X = %08X\n", machine().describe_context(), offset*4, result);
 			break;
 
 		default:
-			LOGGALILEO("%08X:Galileo read from offset %03X = %08X\n", space.device().safe_pc(), offset*4, result);
+			LOGGALILEO("%s Galileo read from offset %03X = %08X\n", machine().describe_context(), offset*4, result);
 			break;
 	}
 
@@ -714,7 +708,7 @@ WRITE32_MEMBER(gt64xxx_device::cpu_if_w)
 		case GREG_CS3_HI:
 			map_cpu_space();
 			remap_cb();
-			LOGGALILEO("%08X:Galileo Memory Map data write to offset %03X = %08X & %08X\n", space.device().safe_pc(), offset*4, data, mem_mask);
+			LOGGALILEO("%s Galileo Memory Map data write to offset %03X = %08X & %08X\n", machine().describe_context(), offset*4, data, mem_mask);
 			break;
 
 		case GREG_DMA0_CONTROL:
@@ -741,9 +735,9 @@ WRITE32_MEMBER(gt64xxx_device::cpu_if_w)
 					m_dma_timer->adjust(attotime::zero, 0, DMA_TIMER_PERIOD);
 				m_dma_active |= (1<< which);
 				//perform_dma(space, which);
-				LOGDMA("%08X:Galileo starting DMA Chan %i\n", space.device().safe_pc(), which);
+				LOGDMA("%s Galileo starting DMA Chan %i\n", machine().describe_context(), which);
 			}
-			LOGGALILEO("%08X:Galileo write to offset %03X = %08X & %08X\n", space.device().safe_pc(), offset * 4, data, mem_mask);
+			LOGGALILEO("%s Galileo write to offset %03X = %08X & %08X\n", machine().describe_context(), offset * 4, data, mem_mask);
 			break;
 		}
 
@@ -759,7 +753,7 @@ WRITE32_MEMBER(gt64xxx_device::cpu_if_w)
 				data &= 0xffffff;
 			if (!timer->active)
 				timer->count = data;
-			LOGTIMERS("%08X:timer/counter %d count = %08X [start=%08X]\n", space.device().safe_pc(), offset % 4, data, timer->count);
+			LOGTIMERS("%s timer/counter %d count = %08X [start=%08X]\n", machine().describe_context(), offset % 4, data, timer->count);
 			break;
 		}
 
@@ -767,7 +761,7 @@ WRITE32_MEMBER(gt64xxx_device::cpu_if_w)
 		{
 			int which, mask;
 
-			LOGTIMERS("%08X:timer/counter control = %08X\n", space.device().safe_pc(), data);
+			LOGTIMERS("%s timer/counter control = %08X\n", machine().describe_context(), data);
 			for (which = 0, mask = 0x01; which < 4; which++, mask <<= 2)
 			{
 				galileo_timer *timer = &m_timer[which];
@@ -796,14 +790,14 @@ WRITE32_MEMBER(gt64xxx_device::cpu_if_w)
 		}
 
 		case GREG_INT_STATE:
-			LOGGALILEO("%08X:Galileo write to IRQ clear = %08X & %08X\n", offset*4, data, mem_mask);
+			LOGGALILEO("%s Galileo write to IRQ clear = %08X & %08X\n", offset*4, data, mem_mask);
 			m_reg[offset] = oldata & data;
 			update_irqs();
 			break;
 
 		case GREG_CONFIG_DATA:
 			pci_host_device::config_data_w(space, offset, data);
-			LOGGALILEO("%08X:Galileo PCI config data write to offset %03X = %08X & %08X\n", space.device().safe_pc(), offset*4, data, mem_mask);
+			LOGGALILEO("%s Galileo PCI config data write to offset %03X = %08X & %08X\n", machine().describe_context(), offset*4, data, mem_mask);
 			break;
 
 		case GREG_CONFIG_ADDRESS:
@@ -829,7 +823,7 @@ WRITE32_MEMBER(gt64xxx_device::cpu_if_w)
 				modData = data;
 			}
 			pci_host_device::config_address_w(space, offset, modData);
-			LOGGALILEO("%08X:Galileo PCI config address write to offset %03X = %08X & %08X origData = %08X\n", space.device().safe_pc(), offset*4, modData, mem_mask, data);
+			LOGGALILEO("%s Galileo PCI config address write to offset %03X = %08X & %08X origData = %08X\n", machine().describe_context(), offset*4, modData, mem_mask, data);
 			break;
 
 		case GREG_DMA0_COUNT:   case GREG_DMA1_COUNT:   case GREG_DMA2_COUNT:   case GREG_DMA3_COUNT:
@@ -837,11 +831,11 @@ WRITE32_MEMBER(gt64xxx_device::cpu_if_w)
 		case GREG_DMA0_DEST:    case GREG_DMA1_DEST:    case GREG_DMA2_DEST:    case GREG_DMA3_DEST:
 		case GREG_DMA0_NEXT:    case GREG_DMA1_NEXT:    case GREG_DMA2_NEXT:    case GREG_DMA3_NEXT:
 		case GREG_INT_MASK:
-			LOGGALILEO("%08X:Galileo write to offset %03X = %08X & %08X\n", space.device().safe_pc(), offset*4, data, mem_mask);
+			LOGGALILEO("%s Galileo write to offset %03X = %08X & %08X\n", machine().describe_context(), offset*4, data, mem_mask);
 			break;
 
 		default:
-			LOGGALILEO("%08X:Galileo write to offset %03X = %08X & %08X\n", space.device().safe_pc(), offset*4, data, mem_mask);
+			LOGGALILEO("%s Galileo write to offset %03X = %08X & %08X\n", machine().describe_context(), offset*4, data, mem_mask);
 			break;
 	}
 }
@@ -997,7 +991,7 @@ TIMER_CALLBACK_MEMBER (gt64xxx_device::perform_dma)
 		{
 			if (m_pci_stall_state)
 			{
-				if (m_retry_count<4) LOGDMA("%08X:Stalling DMA on voodoo retry_count: %i\n", m_cpu_space->device().safe_pc(), m_retry_count);
+				if (m_retry_count<4) LOGDMA("%s Stalling DMA on voodoo retry_count: %i\n", machine().describe_context(), m_retry_count);
 				// Save info
 				m_reg[GREG_DMA0_SOURCE + which] = srcaddr;
 				m_reg[GREG_DMA0_DEST + which] = dstaddr;
@@ -1027,7 +1021,6 @@ TIMER_CALLBACK_MEMBER (gt64xxx_device::perform_dma)
 				bytesleft--;
 			}
 			else {
-				//space.write_byte(dstaddr, space.read_byte(srcaddr));
 				dstSpace->write_dword(dstaddr, srcSpace->read_dword(srcaddr));
 				srcaddr += srcinc * 4;
 				dstaddr += dstinc * 4;

@@ -1107,7 +1107,7 @@ void floppy_sound_device::device_start()
 {
 	// What kind of drive do we have?
 	bool is525 = strstr(tag(), "525") != nullptr;
-	static_set_samples_names(*this, is525? floppy525_sample_names : floppy35_sample_names);
+	set_samples_names(is525? floppy525_sample_names : floppy35_sample_names);
 
 	m_motor_on = false;
 
@@ -1361,7 +1361,7 @@ void floppy_sound_device::sound_stream_update(sound_stream &stream, stream_sampl
 
 #define FLOPSPK "flopsndout"
 
-MACHINE_CONFIG_MEMBER( floppy_image_device::device_add_mconfig )
+MACHINE_CONFIG_START(floppy_image_device::device_add_mconfig)
 	MCFG_SPEAKER_STANDARD_MONO(FLOPSPK)
 	MCFG_SOUND_ADD(FLOPSND_TAG, FLOPPYSOUND, 44100)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, FLOPSPK, 0.5)

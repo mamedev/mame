@@ -220,7 +220,7 @@ WRITE8_MEMBER(docastle_state::idsoccer_adpcm_w)
 }
 
 /* Memory Maps */
-static ADDRESS_MAP_START( docastle_map, AS_PROGRAM, 8, docastle_state )
+ADDRESS_MAP_START(docastle_state::docastle_map)
 	AM_RANGE(0x0000, 0x7fff) AM_ROM
 	AM_RANGE(0x8000, 0x97ff) AM_RAM
 	AM_RANGE(0x9800, 0x99ff) AM_RAM AM_SHARE("spriteram")
@@ -231,7 +231,7 @@ static ADDRESS_MAP_START( docastle_map, AS_PROGRAM, 8, docastle_state )
 	AM_RANGE(0xe000, 0xe000) AM_WRITE(docastle_nmitrigger_w)
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( docastle_map2, AS_PROGRAM, 8, docastle_state )
+ADDRESS_MAP_START(docastle_state::docastle_map2)
 	AM_RANGE(0x0000, 0x3fff) AM_ROM
 	AM_RANGE(0x8000, 0x87ff) AM_RAM
 	AM_RANGE(0xa000, 0xa008) AM_READWRITE(docastle_shared1_r, docastle_shared0_w)
@@ -242,7 +242,7 @@ static ADDRESS_MAP_START( docastle_map2, AS_PROGRAM, 8, docastle_state )
 	AM_RANGE(0xec00, 0xec00) AM_DEVWRITE("sn4", sn76489a_device, write)
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( docastle_map3, AS_PROGRAM, 8, docastle_state )
+ADDRESS_MAP_START(docastle_state::docastle_map3)
 	AM_RANGE(0x0000, 0x00ff) AM_ROM
 	AM_RANGE(0x4000, 0x47ff) AM_RAM
 	AM_RANGE(0x8000, 0x8008) AM_READ(docastle_shared1_r)    // ???
@@ -250,14 +250,14 @@ static ADDRESS_MAP_START( docastle_map3, AS_PROGRAM, 8, docastle_state )
 	AM_RANGE(0xc432, 0xc435) AM_NOP // ???
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( docastle_io_map, AS_IO, 8, docastle_state )
+ADDRESS_MAP_START(docastle_state::docastle_io_map)
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	AM_RANGE(0x00, 0x00) AM_DEVWRITE("crtc", mc6845_device, address_w)
 	AM_RANGE(0x02, 0x02) AM_DEVWRITE("crtc", mc6845_device, register_w)
 ADDRESS_MAP_END
 
 
-static ADDRESS_MAP_START( dorunrun_map, AS_PROGRAM, 8, docastle_state )
+ADDRESS_MAP_START(docastle_state::dorunrun_map)
 	AM_RANGE(0x0000, 0x1fff) AM_ROM
 	AM_RANGE(0x2000, 0x37ff) AM_RAM
 	AM_RANGE(0x3800, 0x39ff) AM_RAM AM_SHARE("spriteram")
@@ -269,7 +269,7 @@ static ADDRESS_MAP_START( dorunrun_map, AS_PROGRAM, 8, docastle_state )
 	AM_RANGE(0xb800, 0xb800) AM_WRITE(docastle_nmitrigger_w)
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( dorunrun_map2, AS_PROGRAM, 8, docastle_state )
+ADDRESS_MAP_START(docastle_state::dorunrun_map2)
 	AM_RANGE(0x0000, 0x3fff) AM_ROM
 	AM_RANGE(0x8000, 0x87ff) AM_RAM
 	AM_RANGE(0xa000, 0xa000) AM_DEVWRITE("sn1", sn76489a_device, write)
@@ -281,7 +281,7 @@ static ADDRESS_MAP_START( dorunrun_map2, AS_PROGRAM, 8, docastle_state )
 ADDRESS_MAP_END
 
 
-static ADDRESS_MAP_START( idsoccer_map, AS_PROGRAM, 8, docastle_state )
+ADDRESS_MAP_START(docastle_state::idsoccer_map)
 	AM_RANGE(0x0000, 0x3fff) AM_ROM
 	AM_RANGE(0x4000, 0x57ff) AM_RAM
 	AM_RANGE(0x5800, 0x59ff) AM_RAM AM_SHARE("spriteram")
@@ -571,18 +571,18 @@ void docastle_state::machine_start()
 	save_item(NAME(m_buffer1));
 }
 
-static MACHINE_CONFIG_START( docastle )
+MACHINE_CONFIG_START(docastle_state::docastle)
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", Z80, XTAL_4MHz)
+	MCFG_CPU_ADD("maincpu", Z80, XTAL(4'000'000))
 	MCFG_CPU_PROGRAM_MAP(docastle_map)
 	MCFG_CPU_IO_MAP(docastle_io_map)
 	MCFG_CPU_VBLANK_INT_DRIVER("screen", docastle_state, irq0_line_hold)
 
-	MCFG_CPU_ADD("slave", Z80, XTAL_4MHz)
+	MCFG_CPU_ADD("slave", Z80, XTAL(4'000'000))
 	MCFG_CPU_PROGRAM_MAP(docastle_map2)
 
-	MCFG_CPU_ADD("cpu3", Z80, XTAL_4MHz)
+	MCFG_CPU_ADD("cpu3", Z80, XTAL(4'000'000))
 	MCFG_CPU_PROGRAM_MAP(docastle_map3)
 	MCFG_CPU_VBLANK_INT_DRIVER("screen", docastle_state, nmi_line_pulse)
 
@@ -603,7 +603,7 @@ static MACHINE_CONFIG_START( docastle )
 	MCFG_WATCHDOG_ADD("watchdog")
 
 	/* video hardware */
-	MCFG_MC6845_ADD("crtc", H46505, "screen", XTAL_9_828MHz / 16)
+	MCFG_MC6845_ADD("crtc", H46505, "screen", XTAL(9'828'000) / 16)
 	/*
 	The games program the CRTC for a width of 32 characters (256 pixels).
 	However, the DE output from the CRTC is first ANDed with the NAND of
@@ -616,7 +616,7 @@ static MACHINE_CONFIG_START( docastle )
 	MCFG_MC6845_OUT_HSYNC_CB(WRITELINE(docastle_state, docastle_tint))
 
 	MCFG_SCREEN_ADD("screen", RASTER)
-	MCFG_SCREEN_RAW_PARAMS(XTAL_9_828MHz/2, 0x138, 8, 0x100-8, 0x108, 0, 0xc0) // from crtc
+	MCFG_SCREEN_RAW_PARAMS(XTAL(9'828'000)/2, 0x138, 8, 0x100-8, 0x108, 0, 0xc0) // from crtc
 	MCFG_SCREEN_UPDATE_DRIVER(docastle_state, screen_update_docastle)
 	MCFG_SCREEN_PALETTE("palette")
 
@@ -627,20 +627,21 @@ static MACHINE_CONFIG_START( docastle )
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
 
-	MCFG_SOUND_ADD("sn1", SN76489A, XTAL_4MHz)
+	MCFG_SOUND_ADD("sn1", SN76489A, XTAL(4'000'000))
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
 
-	MCFG_SOUND_ADD("sn2", SN76489A, XTAL_4MHz)
+	MCFG_SOUND_ADD("sn2", SN76489A, XTAL(4'000'000))
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
 
-	MCFG_SOUND_ADD("sn3", SN76489A, XTAL_4MHz)
+	MCFG_SOUND_ADD("sn3", SN76489A, XTAL(4'000'000))
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
 
-	MCFG_SOUND_ADD("sn4", SN76489A, XTAL_4MHz)
+	MCFG_SOUND_ADD("sn4", SN76489A, XTAL(4'000'000))
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_DERIVED( dorunrun, docastle )
+MACHINE_CONFIG_START(docastle_state::dorunrun)
+	docastle(config);
 
 	/* basic machine hardware */
 	MCFG_CPU_MODIFY("maincpu")
@@ -653,7 +654,8 @@ static MACHINE_CONFIG_DERIVED( dorunrun, docastle )
 	MCFG_VIDEO_START_OVERRIDE(docastle_state,dorunrun)
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_DERIVED( idsoccer, docastle )
+MACHINE_CONFIG_START(docastle_state::idsoccer)
+	docastle(config);
 
 	/* basic machine hardware */
 	MCFG_CPU_MODIFY("maincpu")
@@ -669,7 +671,7 @@ static MACHINE_CONFIG_DERIVED( idsoccer, docastle )
 	MCFG_VIDEO_START_OVERRIDE(docastle_state,dorunrun)
 
 	/* sound hardware */
-	MCFG_SOUND_ADD("msm", MSM5205, XTAL_384kHz) /* Crystal verified on American Soccer board. */
+	MCFG_SOUND_ADD("msm", MSM5205, XTAL(384'000)) /* Crystal verified on American Soccer board. */
 	MCFG_MSM5205_VCLK_CB(WRITELINE(docastle_state, idsoccer_adpcm_int)) // interrupt function
 	MCFG_MSM5205_PRESCALER_SELECTOR(S64_4B)      // 6 kHz    ???
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.40)

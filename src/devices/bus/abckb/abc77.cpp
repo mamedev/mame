@@ -89,7 +89,7 @@ const tiny_rom_entry *abc77_device::device_rom_region() const
 //  ADDRESS_MAP( abc77_mem )
 //-------------------------------------------------
 
-static ADDRESS_MAP_START( abc77_map, AS_PROGRAM, 8, abc77_device )
+ADDRESS_MAP_START(abc77_device::abc77_map)
 	AM_RANGE(0x000, 0xfff) AM_ROM AM_REGION("z16", 0)
 ADDRESS_MAP_END
 
@@ -98,7 +98,7 @@ ADDRESS_MAP_END
 //  ADDRESS_MAP( abc77_io )
 //-------------------------------------------------
 
-static ADDRESS_MAP_START( abc77_io, AS_IO, 8, abc77_device )
+ADDRESS_MAP_START(abc77_device::abc77_io)
 	AM_RANGE(0x00, 0x00) AM_MIRROR(0xff) AM_WRITE(j3_w)
 	AM_RANGE(0x00, 0x00) AM_MIRROR(0xff) AM_READ_PORT("DSW")
 ADDRESS_MAP_END
@@ -127,9 +127,9 @@ DISCRETE_SOUND_END
 //  device_add_mconfig - add device configuration
 //-------------------------------------------------
 
-MACHINE_CONFIG_MEMBER( abc77_device::device_add_mconfig )
+MACHINE_CONFIG_START(abc77_device::device_add_mconfig)
 	// keyboard cpu
-	MCFG_CPU_ADD(I8035_TAG, I8035, XTAL_4_608MHz)
+	MCFG_CPU_ADD(I8035_TAG, I8035, XTAL(4'608'000))
 	MCFG_CPU_PROGRAM_MAP(abc77_map)
 	MCFG_CPU_IO_MAP(abc77_io)
 	MCFG_MCS48_PORT_P1_IN_CB(READ8(abc77_device, p1_r))
@@ -139,7 +139,7 @@ MACHINE_CONFIG_MEMBER( abc77_device::device_add_mconfig )
 
 	// watchdog
 	MCFG_WATCHDOG_ADD("watchdog")
-	MCFG_WATCHDOG_TIME_INIT(attotime::from_hz(XTAL_4_608MHz/3/5/4096))
+	MCFG_WATCHDOG_TIME_INIT(attotime::from_hz(XTAL(4'608'000)/3/5/4096))
 
 	// discrete sound
 	MCFG_SPEAKER_STANDARD_MONO("mono")
@@ -423,7 +423,7 @@ abc77_device::abc77_device(const machine_config &mconfig, device_type type, cons
 	m_dsw(*this, "DSW"),
 	m_txd(1), m_keylatch(0),
 	m_keydown(1),
-	m_clock(0), m_hys(0), m_reset(0),
+	m_clock(0), m_hys(0),
 	m_stb(1), m_j3(0), m_serial_timer(nullptr), m_reset_timer(nullptr)
 {
 }

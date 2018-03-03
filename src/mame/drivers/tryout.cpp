@@ -56,7 +56,7 @@ WRITE8_MEMBER(tryout_state::bankswitch_w)
 	membank("bank1")->set_entry(data & 0x01);
 }
 
-static ADDRESS_MAP_START( main_cpu, AS_PROGRAM, 8, tryout_state )
+ADDRESS_MAP_START(tryout_state::main_cpu)
 	AM_RANGE(0x0000, 0x07ff) AM_RAM
 	AM_RANGE(0x1000, 0x17ff) AM_RAM_WRITE(videoram_w) AM_SHARE("videoram")
 	AM_RANGE(0x2000, 0x3fff) AM_ROMBANK("bank1")
@@ -77,7 +77,7 @@ static ADDRESS_MAP_START( main_cpu, AS_PROGRAM, 8, tryout_state )
 	AM_RANGE(0xfff0, 0xffff) AM_ROM AM_REGION("maincpu", 0xbff0) /* reset vectors */
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( sound_cpu, AS_PROGRAM, 8, tryout_state )
+ADDRESS_MAP_START(tryout_state::sound_cpu)
 	AM_RANGE(0x0000, 0x07ff) AM_RAM
 	AM_RANGE(0x4000, 0x4001) AM_DEVREADWRITE("ymsnd", ym2203_device, read, write)
 	AM_RANGE(0xa000, 0xa000) AM_DEVREAD("soundlatch", generic_latch_8_device, read)
@@ -189,7 +189,7 @@ static GFXDECODE_START( tryout )
 	GFXDECODE_ENTRY( nullptr,   0, vramlayout,   0, 4 )
 GFXDECODE_END
 
-static MACHINE_CONFIG_START( tryout )
+MACHINE_CONFIG_START(tryout_state::tryout)
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", M6502, 2000000)     /* ? */
 	MCFG_CPU_PROGRAM_MAP(main_cpu)

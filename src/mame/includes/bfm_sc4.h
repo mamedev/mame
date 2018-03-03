@@ -86,22 +86,26 @@ static const uint8_t SEGMENT_34_ENCODING_LOOKUP[16] =
 // common base class for things shared between sc4 and sc5
 class bfm_sc45_state : public driver_device
 {
-public:
+protected:
 	bfm_sc45_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag),
-			m_duart(*this, "duart68681"),
-			m_vfd0(*this, "vfd0"),
-			m_dm01(*this, "dm01"),
-			m_ymz(*this, "ymz")
+		: driver_device(mconfig, type, tag)
+		, m_duart(*this, "duart68681")
+		, m_vfd0(*this, "vfd0")
+		, m_dm01(*this, "dm01")
+		, m_ymz(*this, "ymz")
+		, m_lamps(*this, "lamp%u", 0U)
+		, m_matrix(*this, "matrix%u", 0U)
+		, m_digits(*this, "digit%u", 0U)
 	{
 	}
-
-public:
 
 	required_device<mc68681_device> m_duart;
 	optional_device<bfm_bda_device> m_vfd0;
 	optional_device<bfm_dm01_device> m_dm01;
 	required_device<ymz280b_device> m_ymz;
+	output_finder<0x20 * 8> m_lamps;
+	output_finder<0x20 * 8> m_matrix;
+	output_finder<32 + 2> m_digits;
 
 	// serial vfd
 	int vfd_enabled;
@@ -113,6 +117,8 @@ public:
 	// 34 segment custom encoding used by some sc4/5 machines such as Box Clever, Break The Bank, The Big Deal, The Crazy Chair, The Perfect Game
 	bool m_segment_34_encoding;
 	uint8_t m_segment_34_cache[32];
+
+	virtual void machine_start() override;
 
 	DECLARE_WRITE8_MEMBER(mux_output_w);
 	DECLARE_WRITE8_MEMBER(mux_output2_w);
@@ -606,11 +612,8 @@ public:
 	DECLARE_DRIVER_INIT(sc4corotb);
 	DECLARE_DRIVER_INIT(sc4hyper);
 
-
-
-	DECLARE_MACHINE_START(sc4);
-	DECLARE_MACHINE_RESET(sc4);
-
+	virtual void machine_start() override;
+	virtual void machine_reset() override;
 
 	void bfm_sc4_68307_porta_w(address_space &space, bool dedicated, uint8_t data, uint8_t line_mask);
 	DECLARE_WRITE8_MEMBER( bfm_sc4_reel3_w );
@@ -622,6 +625,32 @@ public:
 	void find_mbus(uint16_t* rom);
 
 
+	void sc4_common(machine_config &config);
+	void sc4(machine_config &config);
+	void sc4_200_4r(machine_config &config);
+	void sc4_200_4ra(machine_config &config);
+	void sc4_200_4rb(machine_config &config);
+	void sc4_200_5r(machine_config &config);
+	void sc4_200_5ra(machine_config &config);
+	void sc4_200_5rb(machine_config &config);
+	void sc4_200_5rc(machine_config &config);
+	void sc4_200_alt(machine_config &config);
+	void sc4_200_alta(machine_config &config);
+	void sc4_200_altb(machine_config &config);
+	void sc4_200_std(machine_config &config);
+	void sc4_3reel(machine_config &config);
+	void sc4_3reel_200(machine_config &config);
+	void sc4_3reel_200_48(machine_config &config);
+	void sc4_4reel(machine_config &config);
+	void sc4_4reel_200(machine_config &config);
+	void sc4_4reel_alt(machine_config &config);
+	void sc4_5reel(machine_config &config);
+	void sc4_5reel_alt(machine_config &config);
+	void sc4_adder4(machine_config &config);
+	void sc4_no_reels(machine_config &config);
+	void sc4dmd(machine_config &config);
+	void sc4_map(address_map &map);
+
 protected:
 	optional_ioport_array<16> m_io_ports;
 };
@@ -630,46 +659,25 @@ class sc4_adder4_state : public sc4_state
 {
 public:
 	sc4_adder4_state(const machine_config &mconfig, device_type type, const char *tag)
-		: sc4_state(mconfig, type, tag),
-			m_adder4cpu(*this, "adder4")
+		: sc4_state(mconfig, type, tag)
+		, m_adder4cpuregion(*this, "adder4")
+		, m_adder4cpu(*this, "adder4")
 	{ }
 
-	uint32_t* m_adder4cpuregion;
+	required_region_ptr<uint32_t> m_adder4cpuregion;
 	std::unique_ptr<uint32_t[]> m_adder4ram;
 
 	DECLARE_READ32_MEMBER(adder4_mem_r);
 	DECLARE_WRITE32_MEMBER(adder4_mem_w);
-	DECLARE_MACHINE_START(adder4);
+	virtual void machine_start() override;
 
 	// devices
 	required_device<m68340_cpu_device> m_adder4cpu;
+	void sc4_adder4(machine_config &config);
+	void sc4_adder4_map(address_map &map);
 };
 
 
-MACHINE_CONFIG_EXTERN( sc4 );
-MACHINE_CONFIG_EXTERN( sc4_adder4 );
-MACHINE_CONFIG_EXTERN( sc4dmd );
-MACHINE_CONFIG_EXTERN(sc4_3reel);
-MACHINE_CONFIG_EXTERN(sc4_4reel);
-MACHINE_CONFIG_EXTERN(sc4_4reel_alt);
-MACHINE_CONFIG_EXTERN(sc4_5reel);
-MACHINE_CONFIG_EXTERN(sc4_5reel_alt);
-MACHINE_CONFIG_EXTERN(sc4_200_std);
-MACHINE_CONFIG_EXTERN(sc4_200_alt);
-MACHINE_CONFIG_EXTERN(sc4_200_alta);
-MACHINE_CONFIG_EXTERN(sc4_200_altb);
-MACHINE_CONFIG_EXTERN(sc4_200_5r);
-MACHINE_CONFIG_EXTERN(sc4_200_5ra);
-MACHINE_CONFIG_EXTERN(sc4_200_5rb);
-MACHINE_CONFIG_EXTERN(sc4_200_5rc);
-MACHINE_CONFIG_EXTERN(sc4_200_5rc);
-MACHINE_CONFIG_EXTERN(sc4_200_4r);
-MACHINE_CONFIG_EXTERN(sc4_200_4ra);
-MACHINE_CONFIG_EXTERN(sc4_200_4rb);
-MACHINE_CONFIG_EXTERN(sc4_4reel_200);
-MACHINE_CONFIG_EXTERN(sc4_3reel_200);
-MACHINE_CONFIG_EXTERN(sc4_3reel_200_48);
-MACHINE_CONFIG_EXTERN(sc4_no_reels);
 
 
 INPUT_PORTS_EXTERN( sc4_base );

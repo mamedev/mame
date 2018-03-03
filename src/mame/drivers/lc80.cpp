@@ -48,7 +48,7 @@
 
 /* Memory Maps */
 
-static ADDRESS_MAP_START( lc80_mem, AS_PROGRAM, 8, lc80_state )
+ADDRESS_MAP_START(lc80_state::lc80_mem)
 	ADDRESS_MAP_GLOBAL_MASK(0x3fff)
 	AM_RANGE(0x0000, 0x07ff) AM_ROMBANK("bank1")
 	AM_RANGE(0x0800, 0x0fff) AM_ROMBANK("bank2")
@@ -58,13 +58,13 @@ static ADDRESS_MAP_START( lc80_mem, AS_PROGRAM, 8, lc80_state )
 ADDRESS_MAP_END
 
 #if 0
-static ADDRESS_MAP_START( sc80_mem, AS_PROGRAM, 8, lc80_state )
+ADDRESS_MAP_START(lc80_state::sc80_mem)
 	AM_IMPORT_FROM(lc80_mem)
 	AM_RANGE(0xc000, 0xcfff) AM_ROM
 ADDRESS_MAP_END
 #endif
 
-static ADDRESS_MAP_START( lc80_io, AS_IO, 8, lc80_state )
+ADDRESS_MAP_START(lc80_state::lc80_io)
 	ADDRESS_MAP_GLOBAL_MASK(0x1f)
 	AM_RANGE(0x14, 0x17) AM_DEVREADWRITE(Z80PIO1_TAG, z80pio_device, read, write)
 	AM_RANGE(0x18, 0x1b) AM_DEVREADWRITE(Z80PIO2_TAG, z80pio_device, read, write)
@@ -164,7 +164,7 @@ WRITE8_MEMBER( lc80_state::pio1_pa_w )
 
 	*/
 
-	m_segment = BITSWAP8(~data, 4, 3, 1, 6, 7, 5, 0, 2);
+	m_segment = bitswap<8>(~data, 4, 3, 1, 6, 7, 5, 0, 2);
 
 	update_display();
 }
@@ -325,7 +325,7 @@ void lc80_state::machine_start()
 
 /* Machine Driver */
 
-static MACHINE_CONFIG_START( lc80 )
+MACHINE_CONFIG_START(lc80_state::lc80)
 	/* basic machine hardware */
 	MCFG_CPU_ADD(Z80_TAG, Z80, 900000) /* UD880D */
 	MCFG_CPU_PROGRAM_MAP(lc80_mem)
@@ -364,7 +364,7 @@ static MACHINE_CONFIG_START( lc80 )
 	MCFG_RAM_EXTRA_OPTIONS("2K,3K,4K")
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_START( lc80_2 )
+MACHINE_CONFIG_START(lc80_state::lc80_2)
 	/* basic machine hardware */
 	MCFG_CPU_ADD(Z80_TAG, Z80, 1800000) /* UD880D */
 	MCFG_CPU_PROGRAM_MAP(lc80_mem)
@@ -404,7 +404,8 @@ static MACHINE_CONFIG_START( lc80_2 )
 MACHINE_CONFIG_END
 
 #if 0
-static MACHINE_CONFIG_DERIVED( sc80, lc80_2 )
+static MACHINE_CONFIG_START( sc80 )
+	lc80_2(config);
 
 	/* basic machine hardware */
 	MCFG_CPU_MODIFY(Z80_TAG)

@@ -379,6 +379,8 @@ public:
 	uint8_t m_keyboard_line;
 	uint8_t m_floppy_control;
 
+	void swyft(machine_config &config);
+	void swyft_mem(address_map &map);
 //protected:
 	//virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr);
 };
@@ -568,7 +570,7 @@ x   x   x   x   1   1  ?1? ?0?  ?   1   0   0   x   x   *   *   *   *   x   x   
 
 */
 
-static ADDRESS_MAP_START(swyft_mem, AS_PROGRAM, 8, swyft_state)
+ADDRESS_MAP_START(swyft_state::swyft_mem)
 	ADDRESS_MAP_UNMAP_HIGH
 	ADDRESS_MAP_GLOBAL_MASK(0xfffff)
 	AM_RANGE(0x000000, 0x00ffff) AM_ROM // 64 KB ROM
@@ -768,10 +770,10 @@ WRITE_LINE_MEMBER( swyft_state::write_acia_clock )
 	m_acia6850->write_rxc(state);
 }
 
-static MACHINE_CONFIG_START( swyft )
+MACHINE_CONFIG_START(swyft_state::swyft)
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu",M68008, XTAL_15_8976MHz/2) //MC68008P8, Y1=15.8976Mhz, clock GUESSED at Y1 / 2
+	MCFG_CPU_ADD("maincpu",M68008, XTAL(15'897'600)/2) //MC68008P8, Y1=15.8976Mhz, clock GUESSED at Y1 / 2
 	MCFG_CPU_PROGRAM_MAP(swyft_mem)
 
 	MCFG_MACHINE_START_OVERRIDE(swyft_state,swyft)
@@ -792,10 +794,10 @@ static MACHINE_CONFIG_START( swyft )
 
 	MCFG_DEVICE_ADD("acia6850", ACIA6850, 0)
 	// acia rx and tx clocks come from one of the VIA pins and are tied together, fix this below? acia e clock comes from 68008
-	MCFG_DEVICE_ADD("acia_clock", CLOCK, (XTAL_15_8976MHz/2)/5) // out e clock from 68008, ~ 10in clocks per out clock
+	MCFG_DEVICE_ADD("acia_clock", CLOCK, (XTAL(15'897'600)/2)/5) // out e clock from 68008, ~ 10in clocks per out clock
 	MCFG_CLOCK_SIGNAL_HANDLER(WRITELINE(swyft_state, write_acia_clock))
 
-	MCFG_DEVICE_ADD("via6522_0", VIA6522, (XTAL_15_8976MHz/2)/5) // out e clock from 68008
+	MCFG_DEVICE_ADD("via6522_0", VIA6522, (XTAL(15'897'600)/2)/5) // out e clock from 68008
 	MCFG_VIA6522_READPA_HANDLER(READ8(swyft_state, via0_pa_r))
 	MCFG_VIA6522_READPB_HANDLER(READ8(swyft_state, via0_pb_r))
 	MCFG_VIA6522_WRITEPA_HANDLER(WRITE8(swyft_state, via0_pa_w))
@@ -805,7 +807,7 @@ static MACHINE_CONFIG_START( swyft )
 	MCFG_VIA6522_CB2_HANDLER(WRITELINE(swyft_state, via0_cb2_w))
 	MCFG_VIA6522_IRQ_HANDLER(WRITELINE(swyft_state, via0_int_w))
 
-	MCFG_DEVICE_ADD("via6522_1", VIA6522, (XTAL_15_8976MHz/2)/5) // out e clock from 68008
+	MCFG_DEVICE_ADD("via6522_1", VIA6522, (XTAL(15'897'600)/2)/5) // out e clock from 68008
 	MCFG_VIA6522_READPA_HANDLER(READ8(swyft_state, via1_pa_r))
 	MCFG_VIA6522_READPB_HANDLER(READ8(swyft_state, via1_pb_r))
 	MCFG_VIA6522_WRITEPA_HANDLER(WRITE8(swyft_state, via1_pa_w))

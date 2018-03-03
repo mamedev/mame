@@ -44,6 +44,11 @@ public:
 	DECLARE_MACHINE_RESET(missb2);
 	uint32_t screen_update_missb2(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 
+	void missb2(machine_config &config);
+	void bublpong(machine_config &config);
+	void maincpu_map(address_map &map);
+	void sound_map(address_map &map);
+	void subcpu_map(address_map &map);
 protected:
 	void configure_banks();
 
@@ -164,23 +169,23 @@ WRITE8_MEMBER(missb2_state::missb2_bg_bank_w)
 
 WRITE8_MEMBER(missb2_state::missb2_oki_w)
 {
-	m_oki->write_command(BITSWAP8(data, 7,5,6,4,3,1,2,0));
+	m_oki->write_command(bitswap<8>(data, 7,5,6,4,3,1,2,0));
 }
 
 READ8_MEMBER(missb2_state::missb2_oki_r)
 {
-	return BITSWAP8(m_oki->read_status(), 7,5,6,4,3,1,2,0);
+	return bitswap<8>(m_oki->read_status(), 7,5,6,4,3,1,2,0);
 }
 
 /* Memory Maps */
 
-static ADDRESS_MAP_START( maincpu_map, AS_PROGRAM, 8, missb2_state )
+ADDRESS_MAP_START(missb2_state::maincpu_map)
 	AM_RANGE(0x0000, 0x7fff) AM_ROM
 	AM_RANGE(0x8000, 0xbfff) AM_ROMBANK("bank1")
 	AM_RANGE(0xc000, 0xdcff) AM_RAM AM_SHARE("videoram")
 	AM_RANGE(0xdd00, 0xdfff) AM_RAM AM_SHARE("objectram")
 	AM_RANGE(0xe000, 0xf7ff) AM_RAM AM_SHARE("share1")
-	AM_RANGE(0xf800, 0xf9ff) AM_RAM_DEVWRITE("palette", palette_device, write) AM_SHARE("palette")
+	AM_RANGE(0xf800, 0xf9ff) AM_RAM_DEVWRITE("palette", palette_device, write8) AM_SHARE("palette")
 	AM_RANGE(0xfa00, 0xfa00) AM_MIRROR(0x007c) AM_DEVREAD("sound_to_main", generic_latch_8_device, read) AM_DEVWRITE("main_to_sound", generic_latch_8_device, write)
 	AM_RANGE(0xfa01, 0xfa01) AM_MIRROR(0x007c) AM_READ(common_sound_semaphores_r)
 	AM_RANGE(0xfa03, 0xfa03) AM_MIRROR(0x007c) AM_WRITE(bublbobl_soundcpu_reset_w)
@@ -198,12 +203,12 @@ static ADDRESS_MAP_START( maincpu_map, AS_PROGRAM, 8, missb2_state )
 	AM_RANGE(0xff98, 0xff98) AM_WRITENOP    // ???
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( subcpu_map, AS_PROGRAM, 8, missb2_state )
+ADDRESS_MAP_START(missb2_state::subcpu_map)
 	AM_RANGE(0x0000, 0x7fff) AM_ROM
 	AM_RANGE(0x9000, 0x9fff) AM_ROMBANK("bank2")    // ROM data for the background palette ram
 	AM_RANGE(0xa000, 0xafff) AM_ROMBANK("bank3")    // ROM data for the background palette ram
 	AM_RANGE(0xb000, 0xb1ff) AM_ROM         // banked ???
-	AM_RANGE(0xc000, 0xc1ff) AM_RAM_DEVWRITE("bgpalette", palette_device, write) AM_SHARE("bgpalette")
+	AM_RANGE(0xc000, 0xc1ff) AM_RAM_DEVWRITE("bgpalette", palette_device, write8) AM_SHARE("bgpalette")
 	AM_RANGE(0xc800, 0xcfff) AM_RAM         // main ???
 	AM_RANGE(0xd000, 0xd000) AM_WRITE(missb2_bg_bank_w)
 	AM_RANGE(0xd002, 0xd002) AM_WRITENOP
@@ -214,7 +219,7 @@ ADDRESS_MAP_END
 // Looks like the original bublbobl code modified to support the OKI M6295.
 // due to some really wacky bugs in the way the oki6295 was hacked in place, writes will happen to
 // many addresses other than 9000: 9000-9001, 0000-0001, 3827-3828, 44a8-44a9
-static ADDRESS_MAP_START( sound_map, AS_PROGRAM, 8, missb2_state )
+ADDRESS_MAP_START(missb2_state::sound_map)
 	AM_RANGE(0x0000, 0x7fff) AM_ROM
 	AM_RANGE(0x8000, 0x8fff) AM_RAM
 	AM_RANGE(0x9000, 0x9000) AM_READWRITE(missb2_oki_r, missb2_oki_w) //AM_MIRROR(0x0fff) ???
@@ -453,7 +458,7 @@ MACHINE_RESET_MEMBER(missb2_state,missb2)
 	bublbobl_bankswitch_w(m_maincpu->device_t::memory().space(AS_PROGRAM), 0, 0x00, 0xFF); // force a bankswitch write of all zeroes, as /RESET clears the latch
 }
 
-static MACHINE_CONFIG_START( missb2 )
+MACHINE_CONFIG_START(missb2_state::missb2)
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", Z80, MAIN_XTAL/4)   // 6 MHz
@@ -512,7 +517,8 @@ static MACHINE_CONFIG_START( missb2 )
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.4)
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_DERIVED( bublpong, missb2 )
+MACHINE_CONFIG_START(missb2_state::bublpong)
+	missb2(config);
 	MCFG_GFXDECODE_MODIFY("gfxdecode", bublpong)
 MACHINE_CONFIG_END
 

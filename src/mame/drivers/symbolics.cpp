@@ -105,13 +105,16 @@ public:
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
 
+	void symbolics(machine_config &config);
+	void m68k_io(address_map &map);
+	void m68k_mem(address_map &map);
 //protected:
 //  virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr) override;
 };
 
 READ16_MEMBER(symbolics_state::buserror_r)
 {
-	if(!machine().side_effect_disabled())
+	if(!machine().side_effects_disabled())
 	{
 		m_maincpu->set_input_line(M68K_LINE_BUSERROR, ASSERT_LINE);
 		m_maincpu->set_input_line(M68K_LINE_BUSERROR, CLEAR_LINE);
@@ -243,7 +246,7 @@ currently dies at context switch code loaded to ram around 38EE0, see patent 488
 
 */
 
-static ADDRESS_MAP_START(m68k_mem, AS_PROGRAM, 16, symbolics_state )
+ADDRESS_MAP_START(symbolics_state::m68k_mem)
 	ADDRESS_MAP_UNMAP_HIGH
 	//AM_RANGE(0x000000, 0x01ffff) AM_ROM /* ROM lives here */
 	AM_RANGE(0x000000, 0x00bfff) AM_ROM
@@ -265,7 +268,7 @@ static ADDRESS_MAP_START(m68k_mem, AS_PROGRAM, 16, symbolics_state )
 	//FF018A is writable, gets 0x5555 written to it
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START(m68k_io, AS_IO, 16, symbolics_state )
+ADDRESS_MAP_START(symbolics_state::m68k_io)
 ADDRESS_MAP_END
 
 /******************************************************************************
@@ -314,13 +317,13 @@ void symbolics_state::machine_reset()
 	*/
 }
 
-static MACHINE_CONFIG_START( symbolics )
+MACHINE_CONFIG_START(symbolics_state::symbolics)
 	/* basic machine hardware */
 	// per page 159 of http://bitsavers.trailing-edge.com/pdf/symbolics/3600_series/Lisp_Machine_Hardware_Memos.pdf:
 	//XTALS: 16MHz @H11 (68k CPU clock)
 	//       4.9152MHz @J5 (driving the two MPSCs serial clocks)
 	//       66.67MHz @J10 (main lispcpu/system clock)
-	MCFG_CPU_ADD("maincpu", M68000, XTAL_16MHz/2) /* MC68000L8 @A27; clock is derived from the 16Mhz xtal @ H11, verified from patent */
+	MCFG_CPU_ADD("maincpu", M68000, XTAL(16'000'000)/2) /* MC68000L8 @A27; clock is derived from the 16Mhz xtal @ H11, verified from patent */
 	MCFG_CPU_PROGRAM_MAP(m68k_mem)
 	MCFG_CPU_IO_MAP(m68k_io)
 

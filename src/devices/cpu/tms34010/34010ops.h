@@ -126,7 +126,7 @@ inline void tms340x0_device::TMS34010_WRMEM_DWORD(offs_t A, uint32_t V)
 	offset = offset & 0xfffffff0;                                                   \
 																					\
 	if (shift >= MAX)                                                               \
-		ret = (TMS34010_RDMEM_DWORD(offset) >> shift) & (MASK);	                    \
+		ret = (TMS34010_RDMEM_DWORD(offset) >> shift) & (MASK);                     \
 	else                                                                            \
 		ret = (TMS34010_RDMEM_WORD(offset) >> shift) & (MASK);
 

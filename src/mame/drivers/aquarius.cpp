@@ -33,7 +33,7 @@
 ***************************************************************************/
 
 #define XTAL1   8866000
-#define XTAL2   XTAL_7_15909MHz
+#define XTAL2   XTAL(7'159'090)
 
 
 /***************************************************************************
@@ -207,7 +207,7 @@ DRIVER_INIT_MEMBER(aquarius_state,aquarius)
     ADDRESS MAPS
 ***************************************************************************/
 
-static ADDRESS_MAP_START( aquarius_mem, AS_PROGRAM, 8, aquarius_state )
+ADDRESS_MAP_START(aquarius_state::aquarius_mem)
 	AM_RANGE(0x0000, 0x1fff) AM_ROM
 	AM_RANGE(0x3000, 0x33ff) AM_RAM_WRITE(aquarius_videoram_w) AM_SHARE("videoram")
 	AM_RANGE(0x3400, 0x37ff) AM_RAM_WRITE(aquarius_colorram_w) AM_SHARE("colorram")
@@ -216,7 +216,7 @@ static ADDRESS_MAP_START( aquarius_mem, AS_PROGRAM, 8, aquarius_state )
 	AM_RANGE(0xc000, 0xffff) AM_READ(cartridge_r)
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( aquarius_io, AS_IO, 8, aquarius_state )
+ADDRESS_MAP_START(aquarius_state::aquarius_io)
 //  AM_RANGE(0x7e, 0x7f) AM_MIRROR(0xff00) AM_READWRITE(modem_r, modem_w)
 	AM_RANGE(0xf6, 0xf6) AM_MIRROR(0xff00) AM_DEVREADWRITE("ay8910", ay8910_device, data_r, data_w)
 	AM_RANGE(0xf7, 0xf7) AM_MIRROR(0xff00) AM_DEVWRITE("ay8910", ay8910_device, address_w)
@@ -347,9 +347,9 @@ GFXDECODE_END
     MACHINE DRIVERS
 ***************************************************************************/
 
-static MACHINE_CONFIG_START( aquarius )
+MACHINE_CONFIG_START(aquarius_state::aquarius)
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", Z80, XTAL_3_579545MHz) // ???
+	MCFG_CPU_ADD("maincpu", Z80, XTAL(3'579'545)) // ???
 	MCFG_CPU_PROGRAM_MAP(aquarius_mem)
 	MCFG_CPU_IO_MAP(aquarius_io)
 	MCFG_CPU_VBLANK_INT_DRIVER("screen", aquarius_state,  irq0_line_hold)
@@ -364,7 +364,7 @@ static MACHINE_CONFIG_START( aquarius )
 	MCFG_SCREEN_PALETTE("palette")
 
 	MCFG_GFXDECODE_ADD("gfxdecode", "palette", aquarius )
-	MCFG_TEA1002_ADD("encoder", XTAL_8_867238MHz)
+	MCFG_TEA1002_ADD("encoder", XTAL(8'867'238))
 	MCFG_PALETTE_ADD("palette", 512)
 	MCFG_PALETTE_INDIRECT_ENTRIES(16)
 	MCFG_PALETTE_INIT_OWNER(aquarius_state, aquarius)
@@ -374,7 +374,7 @@ static MACHINE_CONFIG_START( aquarius )
 	MCFG_SOUND_ADD("speaker", SPEAKER_SOUND, 0)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
 
-	MCFG_SOUND_ADD("ay8910", AY8910, XTAL_3_579545MHz/2) // ??? AY-3-8914
+	MCFG_SOUND_ADD("ay8910", AY8910, XTAL(3'579'545)/2) // ??? AY-3-8914
 	MCFG_AY8910_PORT_A_READ_CB(IOPORT("RIGHT"))
 	MCFG_AY8910_PORT_B_READ_CB(IOPORT("LEFT"))
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)

@@ -181,16 +181,16 @@ enum
 //**************************************************************************
 
 #define MCFG_ADSP21XX_SPORT_RX_CB(_devcb) \
-	devcb = &adsp21xx_device::set_sport_rx_callback(*device, DEVCB_##_devcb);
+	devcb = &downcast<adsp21xx_device &>(*device).set_sport_rx_callback(DEVCB_##_devcb);
 
 #define MCFG_ADSP21XX_SPORT_TX_CB(_devcb) \
-	devcb = &adsp21xx_device::set_sport_tx_callback(*device, DEVCB_##_devcb);
+	devcb = &downcast<adsp21xx_device &>(*device).set_sport_tx_callback(DEVCB_##_devcb);
 
 #define MCFG_ADSP21XX_TIMER_FIRED_CB(_devcb) \
-	devcb = &adsp21xx_device::set_timer_fired_callback(*device, DEVCB_##_devcb);
+	devcb = &downcast<adsp21xx_device &>(*device).set_timer_fired_callback(DEVCB_##_devcb);
 
 #define MCFG_ADSP21XX_DMOVLAY_CB(_devcb) \
-	devcb = &adsp21xx_device::set_dmovlay_callback(*device, DEVCB_##_devcb);
+	devcb = &downcast<adsp21xx_device &>(*device).set_dmovlay_callback(DEVCB_##_devcb);
 
 //**************************************************************************
 //  TYPE DEFINITIONS
@@ -204,10 +204,10 @@ public:
 	virtual ~adsp21xx_device();
 
 	// inline configuration helpers
-	template <class Object> static devcb_base &set_sport_rx_callback(device_t &device, Object &&cb) { return downcast<adsp21xx_device &>(device).m_sport_rx_cb.set_callback(std::forward<Object>(cb)); }
-	template <class Object> static devcb_base &set_sport_tx_callback(device_t &device, Object &&cb) { return downcast<adsp21xx_device &>(device).m_sport_tx_cb.set_callback(std::forward<Object>(cb)); }
-	template <class Object> static devcb_base &set_timer_fired_callback(device_t &device, Object &&cb) { return downcast<adsp21xx_device &>(device).m_timer_fired_cb.set_callback(std::forward<Object>(cb)); }
-	template <class Object> static devcb_base &set_dmovlay_callback(device_t &device, Object &&cb) { return downcast<adsp21xx_device &>(device).m_dmovlay_cb.set_callback(std::forward<Object>(cb)); }
+	template <class Object> devcb_base &set_sport_rx_callback(Object &&cb) { return m_sport_rx_cb.set_callback(std::forward<Object>(cb)); }
+	template <class Object> devcb_base &set_sport_tx_callback(Object &&cb) { return m_sport_tx_cb.set_callback(std::forward<Object>(cb)); }
+	template <class Object> devcb_base &set_timer_fired_callback(Object &&cb) { return m_timer_fired_cb.set_callback(std::forward<Object>(cb)); }
+	template <class Object> devcb_base &set_dmovlay_callback(Object &&cb) { return m_dmovlay_cb.set_callback(std::forward<Object>(cb)); }
 
 	// public interfaces
 	void load_boot_data(uint8_t *srcdata, uint32_t *dstdata);

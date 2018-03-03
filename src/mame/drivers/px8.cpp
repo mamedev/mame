@@ -43,8 +43,8 @@
     CONSTANTS
 ***************************************************************************/
 
-#define XTAL_CR1        XTAL_9_8304MHz
-#define XTAL_CR2        XTAL_32_768kHz
+#define XTAL_CR1        XTAL(9'830'400)
+#define XTAL_CR2        XTAL(32'768)
 
 /* interrupt sources */
 #define INT0_7508       0x01
@@ -511,7 +511,7 @@ WRITE8_MEMBER( px8_state::ksc_w )
     ADDRESS_MAP( px8_mem )
 -------------------------------------------------*/
 
-static ADDRESS_MAP_START( px8_mem, AS_PROGRAM, 8, px8_state )
+ADDRESS_MAP_START(px8_state::px8_mem)
 	ADDRESS_MAP_UNMAP_HIGH
 	AM_RANGE(0x0000, 0x7fff) AM_RAMBANK("bank0")
 	AM_RANGE(0x8000, 0xffff) AM_RAMBANK("bank1")
@@ -521,7 +521,7 @@ ADDRESS_MAP_END
     ADDRESS_MAP( px8_io )
 -------------------------------------------------*/
 
-static ADDRESS_MAP_START( px8_io, AS_IO, 8, px8_state )
+ADDRESS_MAP_START(px8_state::px8_io)
 	ADDRESS_MAP_UNMAP_HIGH
 	ADDRESS_MAP_GLOBAL_MASK(0x0f)
 	AM_RANGE(0x00, 0x07) AM_READWRITE(gah40m_r, gah40m_w)
@@ -535,7 +535,7 @@ ADDRESS_MAP_END
     ADDRESS_MAP( px8_slave_mem )
 -------------------------------------------------*/
 
-static ADDRESS_MAP_START( px8_slave_mem, AS_PROGRAM, 8, px8_state )
+ADDRESS_MAP_START(px8_state::px8_slave_mem)
 	ADDRESS_MAP_UNMAP_HIGH
 	AM_RANGE(0x0020, 0x0023) AM_READWRITE(gah40s_r, gah40s_w)
 //  AM_RANGE(0x0024, 0x0027) AM_DEVREADWRITE_LEGACY(SED1320_TAG, )
@@ -549,7 +549,7 @@ ADDRESS_MAP_END
     ADDRESS_MAP( px8_slave_io )
 -------------------------------------------------*/
 
-static ADDRESS_MAP_START( px8_slave_io, AS_IO, 8, px8_state )
+ADDRESS_MAP_START(px8_state::px8_slave_io)
 	ADDRESS_MAP_UNMAP_HIGH
 	AM_RANGE(M6801_PORT1, M6801_PORT1)
 	AM_RANGE(M6801_PORT2, M6801_PORT2)
@@ -557,21 +557,6 @@ static ADDRESS_MAP_START( px8_slave_io, AS_IO, 8, px8_state )
 	AM_RANGE(M6801_PORT4, M6801_PORT4)
 ADDRESS_MAP_END
 
-/*-------------------------------------------------
-    ADDRESS_MAP( px8_sub_io )
--------------------------------------------------*/
-#ifdef UNUSED_CODE
-static ADDRESS_MAP_START( px8_sub_io, AS_IO, 8, px8_state )
-//  AM_RANGE(0x00, 0x00) AM_READWRITE()
-	AM_RANGE(0x01, 0x01) AM_READ(krtn_0_3_r)
-//  AM_RANGE(0x02, 0x02) AM_WRITE()
-	AM_RANGE(0x03, 0x03) AM_WRITE(ksc_w)
-//  AM_RANGE(0x04, 0x04) AM_WRITE()
-	AM_RANGE(0x05, 0x05) AM_READ(krtn_4_7_r)
-//  AM_RANGE(0x06, 0x06) AM_READ()
-//  AM_RANGE(0x07, 0x07) AM_WRITE()
-ADDRESS_MAP_END
-#endif
 /***************************************************************************
     INPUT PORTS
 ***************************************************************************/
@@ -758,7 +743,7 @@ void px8_state::machine_reset()
     MACHINE DRIVERS
 ***************************************************************************/
 
-static MACHINE_CONFIG_START( px8 )
+MACHINE_CONFIG_START(px8_state::px8)
 	/* main cpu (uPD70008) */
 	MCFG_CPU_ADD(UPD70008_TAG, Z80, XTAL_CR1 / 4) /* 2.45 MHz */
 	MCFG_CPU_PROGRAM_MAP(px8_mem)

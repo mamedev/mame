@@ -76,6 +76,42 @@ public:
 
 	void postload();
 
+	void nbmjdrv1(machine_config &config);
+	void nbmjdrv2(machine_config &config);
+	void nbmjdrv3(machine_config &config);
+	void tokyogal(machine_config &config);
+	void finalbny(machine_config &config);
+	void mjlstory(machine_config &config);
+	void galkaika(machine_config &config);
+	void pstadium(machine_config &config);
+	void galkoku(machine_config &config);
+	void av2mj2rg(machine_config &config);
+	void av2mj1bb(machine_config &config);
+	void vanilla(machine_config &config);
+	void mcontest(machine_config &config);
+	void triplew1(machine_config &config);
+	void ntopstar(machine_config &config);
+	void tokimbsj(machine_config &config);
+	void triplew2(machine_config &config);
+	void uchuuai(machine_config &config);
+	void hyouban(machine_config &config);
+	void qmhayaku(machine_config &config);
+	void mjgottub(machine_config &config);
+	void av2mj1bb_io_map(address_map &map);
+	void av2mj1bb_map(address_map &map);
+	void av2mj2rg_map(address_map &map);
+	void galkaika_map(address_map &map);
+	void galkoku_io_map(address_map &map);
+	void galkoku_map(address_map &map);
+	void hyouban_io_map(address_map &map);
+	void mjlstory_map(address_map &map);
+	void nbmj8991_sound_io_map(address_map &map);
+	void nbmj8991_sound_map(address_map &map);
+	void pstadium_io_map(address_map &map);
+	void pstadium_map(address_map &map);
+	void tokyogal_map(address_map &map);
+	void triplew1_map(address_map &map);
+	void triplew2_map(address_map &map);
 protected:
 	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr) override;
 };

@@ -133,6 +133,9 @@ public:
 	DECLARE_WRITE_LINE_MEMBER( centronics_busy_w ) { m_centronics_busy = state; }
 	DECLARE_WRITE_LINE_MEMBER( centronics_perror_w ) { m_centronics_perror = state; }
 
+	void px4(machine_config &config);
+	void px4_io(address_map &map);
+	void px4_mem(address_map &map);
 protected:
 	// driver_device overrides
 	virtual void machine_start() override;
@@ -266,6 +269,8 @@ public:
 	DECLARE_WRITE8_MEMBER( ramdisk_data_w );
 	DECLARE_READ8_MEMBER( ramdisk_control_r );
 
+	void px4p(machine_config &config);
+	void px4p_io(address_map &map);
 protected:
 	// driver_device overrides
 	virtual void machine_start() override;
@@ -1254,12 +1259,12 @@ void px4p_state::machine_start()
 //  ADDRESS MAPS
 //**************************************************************************
 
-static ADDRESS_MAP_START( px4_mem, AS_PROGRAM, 8, px4_state )
+ADDRESS_MAP_START(px4_state::px4_mem)
 	AM_RANGE(0x0000, 0x7fff) AM_ROMBANK("bank1")
 	AM_RANGE(0x8000, 0xffff) AM_RAMBANK("bank2")
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( px4_io, AS_IO, 8, px4_state )
+ADDRESS_MAP_START(px4_state::px4_io)
 	ADDRESS_MAP_UNMAP_HIGH
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	// gapnit, 0x00-0x07
@@ -1288,7 +1293,7 @@ static ADDRESS_MAP_START( px4_io, AS_IO, 8, px4_state )
 	AM_RANGE(0x1a, 0x1f) AM_NOP
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( px4p_io, AS_IO, 8, px4p_state )
+ADDRESS_MAP_START(px4p_state::px4p_io)
 	AM_IMPORT_FROM(px4_io)
 	AM_RANGE(0x90, 0x92) AM_WRITE(ramdisk_address_w )
 	AM_RANGE(0x93, 0x93) AM_READWRITE(ramdisk_data_r, ramdisk_data_w )
@@ -1472,9 +1477,9 @@ PALETTE_INIT_MEMBER( px4p_state, px4p )
 //  MACHINE DRIVERS
 //**************************************************************************
 
-static MACHINE_CONFIG_START( px4 )
+MACHINE_CONFIG_START(px4_state::px4)
 	// basic machine hardware
-	MCFG_CPU_ADD("maincpu", Z80, XTAL_7_3728MHz / 2)    // uPD70008
+	MCFG_CPU_ADD("maincpu", Z80, XTAL(7'372'800) / 2)    // uPD70008
 	MCFG_CPU_PROGRAM_MAP(px4_mem)
 	MCFG_CPU_IO_MAP(px4_io)
 
@@ -1497,7 +1502,7 @@ static MACHINE_CONFIG_START( px4 )
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 
 	MCFG_TIMER_DRIVER_ADD_PERIODIC("one_sec", px4_state, upd7508_1sec_callback, attotime::from_seconds(1))
-	MCFG_TIMER_DRIVER_ADD_PERIODIC("frc", px4_state, frc_tick, attotime::from_hz(XTAL_7_3728MHz / 2 / 6))
+	MCFG_TIMER_DRIVER_ADD_PERIODIC("frc", px4_state, frc_tick, attotime::from_hz(XTAL(7'372'800) / 2 / 6))
 
 	// internal ram
 	MCFG_RAM_ADD(RAM_TAG)
@@ -1538,7 +1543,8 @@ static MACHINE_CONFIG_START( px4 )
 	MCFG_SOFTWARE_LIST_ADD("epson_cpm_list", "epson_cpm")
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_DERIVED( px4p, px4 )
+MACHINE_CONFIG_START(px4p_state::px4p)
+	px4(config);
 	MCFG_CPU_MODIFY("maincpu")
 	MCFG_CPU_IO_MAP(px4p_io)
 

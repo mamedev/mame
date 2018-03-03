@@ -30,6 +30,10 @@ public:
 	DECLARE_WRITE_LINE_MEMBER(sod_w);
 	SCN2674_DRAW_CHARACTER_MEMBER(draw_character);
 
+	void cit220p(machine_config &config);
+	void io_map(address_map &map);
+	void mem_map(address_map &map);
+	void vram_map(address_map &map);
 private:
 	required_device<cpu_device> m_maincpu;
 	required_device<screen_device> m_screen;
@@ -42,14 +46,14 @@ WRITE_LINE_MEMBER(cit220_state::sod_w)
 	// probably asserts PBREQ on SCN2674 to access memory at Exxx
 }
 
-static ADDRESS_MAP_START( mem_map, AS_PROGRAM, 8, cit220_state )
+ADDRESS_MAP_START(cit220_state::mem_map)
 	AM_RANGE(0x0000, 0x7fff) AM_ROM AM_REGION("maincpu", 0)
 	AM_RANGE(0x8000, 0x87ff) AM_RAM
 	AM_RANGE(0xa000, 0xa1ff) AM_ROM AM_REGION("eeprom", 0x800)
 	AM_RANGE(0xe000, 0xe7ff) AM_RAM // ???
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( io_map, AS_IO, 8, cit220_state )
+ADDRESS_MAP_START(cit220_state::io_map)
 	AM_RANGE(0x00, 0x0f) AM_DEVREADWRITE("duart", scn2681_device, read, write)
 	AM_RANGE(0x10, 0x10) AM_DEVREADWRITE("usart", i8251_device, data_r, data_w)
 	AM_RANGE(0x11, 0x11) AM_DEVREADWRITE("usart", i8251_device, status_r, control_w)
@@ -63,7 +67,7 @@ SCN2674_DRAW_CHARACTER_MEMBER(cit220_state::draw_character)
 {
 }
 
-static ADDRESS_MAP_START( vram_map, 0, 8, cit220_state )
+ADDRESS_MAP_START(cit220_state::vram_map)
 	AM_RANGE(0x0000, 0x27ff) AM_NOP
 ADDRESS_MAP_END
 
@@ -72,23 +76,20 @@ static INPUT_PORTS_START( cit220p )
 INPUT_PORTS_END
 
 
-static MACHINE_CONFIG_START( cit220p )
+MACHINE_CONFIG_START(cit220_state::cit220p)
 	MCFG_CPU_ADD("maincpu", I8085A, 6000000)
 	MCFG_CPU_PROGRAM_MAP(mem_map)
 	MCFG_CPU_IO_MAP(io_map)
 	MCFG_I8085A_SOD(WRITELINE(cit220_state, sod_w))
 
 	MCFG_SCREEN_ADD("screen", RASTER)
-	MCFG_SCREEN_REFRESH_RATE(50)
-	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500)) /* not accurate */
-	MCFG_SCREEN_SIZE(720, 360)
-	MCFG_SCREEN_VISIBLE_AREA(0, 720-1, 0, 360-1)
+	MCFG_SCREEN_RAW_PARAMS(24553200, 1580, 0, 1320, 259, 0, 240) // dot clock guessed
 	MCFG_SCREEN_UPDATE_DEVICE("avdc", scn2674_device, screen_update)
 
-	MCFG_DEVICE_ADD("avdc", SCN2674, 4000000)
+	MCFG_DEVICE_ADD("avdc", SCN2674, 24553200 / 10)
 	MCFG_SCN2674_INTR_CALLBACK(INPUTLINE("maincpu", I8085_RST65_LINE))
-	MCFG_SCN2674_TEXT_CHARACTER_WIDTH(8)
-	MCFG_SCN2674_GFX_CHARACTER_WIDTH(8)
+	MCFG_SCN2674_TEXT_CHARACTER_WIDTH(10)
+	MCFG_SCN2674_GFX_CHARACTER_WIDTH(10)
 	MCFG_SCN2674_DRAW_CHARACTER_CALLBACK_OWNER(cit220_state, draw_character)
 	MCFG_DEVICE_ADDRESS_MAP(0, vram_map)
 	MCFG_VIDEO_SET_SCREEN("screen")

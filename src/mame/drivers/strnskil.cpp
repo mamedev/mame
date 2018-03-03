@@ -16,7 +16,14 @@ Notes:
  Its internal ROM has been imaged, manually typed, and decoded as sun-8212.ic3.
  Pettan Pyuu is a clone of Banbam although with different levels / play fields.
 
-*****************************************************************************/
+ Protection currently fails on both Pettan Pyuu and Banbam if you play either
+ game to Round 11. When you get there, the music still plays but all you see is
+ "ERR-43" in red text at the bottom left of the screen and the game is no longer
+ playable.  Also, in some earlier rounds you notice the background graphics are
+ also not producing logical playfields as bits of graphics are in different
+ locations.
+
+******************************************************************************/
 
 #include "emu.h"
 #include "includes/strnskil.h"
@@ -50,7 +57,7 @@ READ8_MEMBER(strnskil_state::pettanp_protection_r)
 {
 	int res;
 
-	switch (space.device().safe_pc())
+	switch (m_maincpu->pc())
 	{
 		case 0x6066:    res = 0xa5; break;
 		case 0x60dc:    res = 0x20; break;  /* bits 0-3 unknown */
@@ -61,7 +68,7 @@ READ8_MEMBER(strnskil_state::pettanp_protection_r)
 		default:        res = 0xff; break;
 	}
 
-	logerror("%04x: protection_r -> %02x\n",space.device().safe_pc(),res);
+	logerror("%04x: protection_r -> %02x\n",m_maincpu->pc(),res);
 	return res;
 }
 
@@ -69,7 +76,7 @@ READ8_MEMBER(strnskil_state::banbam_protection_r)
 {
 	int res;
 
-	switch (space.device().safe_pc())
+	switch (m_maincpu->pc())
 	{
 		case 0x6094:    res = 0xa5; break;
 		case 0x6118:    res = 0x20; break;  /* bits 0-3 unknown */
@@ -80,18 +87,18 @@ READ8_MEMBER(strnskil_state::banbam_protection_r)
 		default:        res = 0xff; break;
 	}
 
-	logerror("%04x: protection_r -> %02x\n",space.device().safe_pc(),res);
+	logerror("%04x: protection_r -> %02x\n",m_maincpu->pc(),res);
 	return res;
 }
 
 WRITE8_MEMBER(strnskil_state::protection_w)
 {
-	logerror("%04x: protection_w %02x\n",space.device().safe_pc(),data);
+	logerror("%04x: protection_w %02x\n",m_maincpu->pc(),data);
 }
 
 /****************************************************************************/
 
-static ADDRESS_MAP_START( strnskil_map1, AS_PROGRAM, 8, strnskil_state )
+ADDRESS_MAP_START(strnskil_state::strnskil_map1)
 	AM_RANGE(0x0000, 0x9fff) AM_ROM
 
 	AM_RANGE(0xc000, 0xc7ff) AM_RAM
@@ -110,7 +117,7 @@ static ADDRESS_MAP_START( strnskil_map1, AS_PROGRAM, 8, strnskil_state )
 	AM_RANGE(0xd80a, 0xd80b) AM_WRITEONLY AM_SHARE("xscroll")
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( strnskil_map2, AS_PROGRAM, 8, strnskil_state )
+ADDRESS_MAP_START(strnskil_state::strnskil_map2)
 	AM_RANGE(0x0000, 0x5fff) AM_ROM
 	AM_RANGE(0xc000, 0xc7ff) AM_RAM AM_SHARE("spriteram")
 	AM_RANGE(0xc800, 0xcfff) AM_RAM AM_SHARE("share1")
@@ -336,7 +343,7 @@ TIMER_DEVICE_CALLBACK_MEMBER(strnskil_state::strnskil_irq)
 }
 
 
-static MACHINE_CONFIG_START( strnskil )
+MACHINE_CONFIG_START(strnskil_state::strnskil)
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", Z80,8000000/2) /* 4.000MHz */
@@ -375,7 +382,8 @@ static MACHINE_CONFIG_START( strnskil )
 MACHINE_CONFIG_END
 
 
-static MACHINE_CONFIG_DERIVED( banbam, strnskil )
+MACHINE_CONFIG_START(strnskil_state::banbam)
+	strnskil(config);
 	MCFG_CPU_ADD("mcu", MB8841, 8000000/2)
 //  MCFG_MB88XX_READ_K_CB(READ8(strnskil_state, mcu_portk_r))
 //  MCFG_MB88XX_READ_R0_CB(READ8(strnskil_state, mcu_portr0_r))

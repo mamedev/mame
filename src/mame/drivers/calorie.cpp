@@ -126,6 +126,12 @@ public:
 	required_device<palette_device> m_palette;
 	required_device<generic_latch_8_device> m_soundlatch;
 	optional_shared_ptr<uint8_t> m_decrypted_opcodes;
+	void caloriee(machine_config &config);
+	void calorie(machine_config &config);
+	void calorie_map(address_map &map);
+	void calorie_sound_io_map(address_map &map);
+	void calorie_sound_map(address_map &map);
+	void decrypted_opcodes_map(address_map &map);
 };
 
 
@@ -258,13 +264,13 @@ WRITE8_MEMBER(calorie_state::bogus_w)
  *
  *************************************/
 
-static ADDRESS_MAP_START( calorie_map, AS_PROGRAM, 8, calorie_state )
+ADDRESS_MAP_START(calorie_state::calorie_map)
 	AM_RANGE(0x0000, 0x7fff) AM_ROM
 	AM_RANGE(0x8000, 0xbfff) AM_ROM
 	AM_RANGE(0xc000, 0xcfff) AM_RAM AM_SHARE("ram")
 	AM_RANGE(0xd000, 0xd7ff) AM_RAM_WRITE(fg_ram_w) AM_SHARE("fg_ram")
 	AM_RANGE(0xd800, 0xdbff) AM_RAM AM_SHARE("sprites")
-	AM_RANGE(0xdc00, 0xdcff) AM_RAM_DEVWRITE("palette", palette_device, write) AM_SHARE("palette")
+	AM_RANGE(0xdc00, 0xdcff) AM_RAM_DEVWRITE("palette", palette_device, write8) AM_SHARE("palette")
 	AM_RANGE(0xde00, 0xde00) AM_WRITE(bg_bank_w)
 	AM_RANGE(0xf000, 0xf000) AM_READ_PORT("P1")
 	AM_RANGE(0xf001, 0xf001) AM_READ_PORT("P2")
@@ -274,26 +280,27 @@ static ADDRESS_MAP_START( calorie_map, AS_PROGRAM, 8, calorie_state )
 	AM_RANGE(0xf800, 0xf800) AM_DEVWRITE("soundlatch", generic_latch_8_device, write)
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( decrypted_opcodes_map, AS_OPCODES, 8, calorie_state )
+ADDRESS_MAP_START(calorie_state::decrypted_opcodes_map)
 	AM_RANGE(0x0000, 0x7fff) AM_ROM AM_SHARE("decrypted_opcodes")
 	AM_RANGE(0x8000, 0xbfff) AM_ROM
 	AM_RANGE(0xc000, 0xcfff) AM_RAM AM_SHARE("ram")
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( calorie_sound_map, AS_PROGRAM, 8, calorie_state )
+ADDRESS_MAP_START(calorie_state::calorie_sound_map)
 	AM_RANGE(0x0000, 0x3fff) AM_ROM
 	AM_RANGE(0x8000, 0x87ff) AM_RAM
 	AM_RANGE(0xc000, 0xc000) AM_READ(calorie_soundlatch_r)
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( calorie_sound_io_map, AS_IO, 8, calorie_state )
+ADDRESS_MAP_START(calorie_state::calorie_sound_io_map)
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
+	// 3rd ?
+	AM_RANGE(0x00, 0xff) AM_WRITE(bogus_w)
+
 	AM_RANGE(0x00, 0x01) AM_DEVWRITE("ay1", ym2149_device, address_data_w)
 	AM_RANGE(0x01, 0x01) AM_DEVREAD("ay1", ym2149_device, data_r)
 	AM_RANGE(0x10, 0x11) AM_DEVWRITE("ay2", ym2149_device, address_data_w)
 	AM_RANGE(0x11, 0x11) AM_DEVREAD("ay2", ym2149_device, data_r)
-	// 3rd ?
-	AM_RANGE(0x00, 0xff) AM_WRITE(bogus_w)
 ADDRESS_MAP_END
 
 
@@ -452,12 +459,12 @@ void calorie_state::machine_reset()
 }
 
 
-static MACHINE_CONFIG_START( calorie )
+MACHINE_CONFIG_START(calorie_state::calorie)
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", Z80,4000000)         /* 4 MHz */
 	MCFG_CPU_PROGRAM_MAP(calorie_map)
-	MCFG_CPU_DECRYPTED_OPCODES_MAP(decrypted_opcodes_map)
+	MCFG_CPU_OPCODES_MAP(decrypted_opcodes_map)
 	MCFG_CPU_VBLANK_INT_DRIVER("screen", calorie_state,  irq0_line_hold)
 
 	MCFG_CPU_ADD("audiocpu", Z80,3000000)        /* 3 MHz */
@@ -494,10 +501,11 @@ static MACHINE_CONFIG_START( calorie )
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.8)
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_DERIVED( caloriee, calorie )
+MACHINE_CONFIG_START(calorie_state::caloriee)
+	calorie(config);
 	MCFG_CPU_REPLACE("maincpu", SEGA_317_0004,4000000)         /* 4 MHz */
 	MCFG_CPU_PROGRAM_MAP(calorie_map)
-	MCFG_CPU_DECRYPTED_OPCODES_MAP(decrypted_opcodes_map)
+	MCFG_CPU_OPCODES_MAP(decrypted_opcodes_map)
 	MCFG_CPU_VBLANK_INT_DRIVER("screen", calorie_state,  irq0_line_hold)
 	MCFG_SEGAZ80_SET_DECRYPTED_TAG(":decrypted_opcodes")
 MACHINE_CONFIG_END

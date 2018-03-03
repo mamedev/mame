@@ -66,6 +66,8 @@ public:
 
 	int steering_1();
 	int steering_2();
+	void subs(machine_config &config);
+	void main_map(address_map &map);
 };
 
 /*----------- defined in audio/subs.c -----------*/

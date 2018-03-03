@@ -59,4 +59,6 @@ public:
 	void draw_bitmap(bitmap_ind16 &bitmap, const rectangle &cliprect);
 
 	void mcu_update_seed(uint8_t data);
+	void chaknpop(machine_config &config);
+	void chaknpop_map(address_map &map);
 };

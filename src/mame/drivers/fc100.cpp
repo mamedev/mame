@@ -84,6 +84,9 @@ public:
 	{
 		return m_p_chargen[(ch * 16 + line) & 0xfff];
 	}
+	void fc100(machine_config &config);
+	void fc100_io(address_map &map);
+	void fc100_mem(address_map &map);
 private:
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
@@ -115,7 +118,7 @@ private:
 };
 
 
-static ADDRESS_MAP_START( fc100_mem, AS_PROGRAM, 8, fc100_state )
+ADDRESS_MAP_START(fc100_state::fc100_mem)
 	ADDRESS_MAP_UNMAP_HIGH
 	AM_RANGE( 0x0000, 0x5fff ) AM_ROM AM_REGION("roms", 0)
 	//AM_RANGE(0x6000, 0x6fff)      // mapped by the cartslot
@@ -124,7 +127,7 @@ static ADDRESS_MAP_START( fc100_mem, AS_PROGRAM, 8, fc100_state )
 	AM_RANGE( 0xc000, 0xffff ) AM_RAM AM_SHARE("videoram")
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( fc100_io, AS_IO, 8, fc100_state )
+ADDRESS_MAP_START(fc100_state::fc100_io)
 	ADDRESS_MAP_UNMAP_HIGH
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	AM_RANGE(0x00, 0x0F) AM_READ(port00_r)
@@ -506,14 +509,14 @@ DRIVER_INIT_MEMBER( fc100_state, fc100 )
 	membank("bankr")->configure_entry(1, &ram[0]);
 }
 
-static MACHINE_CONFIG_START( fc100 )
+MACHINE_CONFIG_START(fc100_state::fc100)
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu",Z80, XTAL_7_15909MHz/2)
+	MCFG_CPU_ADD("maincpu",Z80, XTAL(7'159'090)/2)
 	MCFG_CPU_PROGRAM_MAP(fc100_mem)
 	MCFG_CPU_IO_MAP(fc100_io)
 
 	/* video hardware */
-	MCFG_DEVICE_ADD("vdg", M5C6847P1, XTAL_7_15909MHz/3)  // Clock not verified
+	MCFG_DEVICE_ADD("vdg", M5C6847P1, XTAL(7'159'090)/3)  // Clock not verified
 	MCFG_MC6847_INPUT_CALLBACK(READ8(fc100_state, mc6847_videoram_r))
 	MCFG_MC6847_CHARROM_CALLBACK(fc100_state, get_char_rom)
 	MCFG_MC6847_FIXED_MODE(m5c6847p1_device::MODE_INTEXT)
@@ -527,7 +530,7 @@ static MACHINE_CONFIG_START( fc100 )
 	MCFG_SPEAKER_STANDARD_MONO("mono")
 	MCFG_SOUND_WAVE_ADD(WAVE_TAG, "cassette")
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.05)
-	MCFG_SOUND_ADD("psg", AY8910, XTAL_7_15909MHz/3/2)  /* AY-3-8910 - clock not verified */
+	MCFG_SOUND_ADD("psg", AY8910, XTAL(7'159'090)/3/2)  /* AY-3-8910 - clock not verified */
 	MCFG_AY8910_PORT_A_READ_CB(IOPORT("JOY0"))
 	MCFG_AY8910_PORT_B_READ_CB(IOPORT("JOY1"))
 	//MCFG_AY8910_PORT_A_WRITE_CB(WRITE8(fc100_state, ay_port_a_w))
@@ -541,7 +544,7 @@ static MACHINE_CONFIG_START( fc100 )
 
 	MCFG_DEVICE_ADD("uart", I8251, 0)
 	MCFG_I8251_TXD_HANDLER(WRITELINE(fc100_state, txdata_callback))
-	MCFG_DEVICE_ADD("uart_clock", CLOCK, XTAL_4_9152MHz/16/16) // gives 19200
+	MCFG_DEVICE_ADD("uart_clock", CLOCK, XTAL(4'915'200)/16/16) // gives 19200
 	MCFG_CLOCK_SIGNAL_HANDLER(DEVWRITELINE("uart", i8251_device, write_txc))
 	MCFG_DEVCB_CHAIN_OUTPUT(DEVWRITELINE("uart", i8251_device, write_rxc))
 

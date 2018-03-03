@@ -69,7 +69,7 @@ public:
 
 private:
 	// largest block of code that can be generated at once
-	static const size_t CODEGEN_MAX_BYTES = 65536;
+	static const size_t CODEGEN_MAX_BYTES = 131072;
 
 	// minimum alignment, in bytes (must be power of 2)
 	static const size_t CACHE_ALIGNMENT = alignof(std::max_align_t);
@@ -78,7 +78,7 @@ private:
 	static const size_t MAX_PERMANENT_ALLOC = 1024;
 
 	// size of "near" area at the base of the cache
-	static const size_t NEAR_CACHE_SIZE = 65536;
+	static const size_t NEAR_CACHE_SIZE = 131072;
 
 	// core parameters
 	drccodeptr          m_near;             // pointer to the near part of the cache

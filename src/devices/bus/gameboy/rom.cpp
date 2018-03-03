@@ -222,7 +222,7 @@ WRITE8_MEMBER(gb_rom_tama5_device::write_ram)
 						m_tama5_data = 0xff;
 				case 0x80:      /* Unknown, some kind of read (when 07=01)/write (when 07=00/02) */
 				default:
-					logerror( "0x%04X: Unknown addressing mode\n", space.device() .safe_pc( ) );
+					logerror( "%s Unknown addressing mode\n", machine().describe_context() );
 					break;
 				}
 				break;
@@ -248,7 +248,7 @@ WRITE8_MEMBER(gb_rom_tama5_device::write_ram)
 				m_rtc_reg = (m_tama5_data & 0xf0) >> 4;
 				break;
 			default:
-				logerror( "0x%04X: Unknown tama5 command 0x%02X\n", space.device() .safe_pc( ), data );
+				logerror( "%s Unknown tama5 command 0x%02X\n", machine().describe_context(), data );
 				break;
 			}
 			m_tama5_cmd = data;

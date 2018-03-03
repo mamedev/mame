@@ -33,25 +33,31 @@ public:
 		, m_p_chargen(*this, "chargen")
 	{ }
 
+	void banctec(machine_config &config);
+
+protected:
 	MC6845_UPDATE_ROW(crtc_update_row);
 	MC6845_ON_UPDATE_ADDR_CHANGED(crtc_addr);
 	DECLARE_WRITE8_MEMBER(videoram_w);
-	required_device<palette_device> m_palette;
+
+	virtual void machine_reset() override;
+	void banctec_mcu_mem(address_map &map);
+	void banctec_mem(address_map &map);
 
 private:
+	required_device<palette_device> m_palette;
 	u8 m_video_address;
-	virtual void machine_reset() override;
 	required_device<cpu_device> m_maincpu;
 	required_shared_ptr<u8> m_videoram;
 	required_region_ptr<u8> m_p_chargen;
 };
 
-static ADDRESS_MAP_START( banctec_mem , AS_PROGRAM, 8, banctec_state )
+ADDRESS_MAP_START(banctec_state::banctec_mem)
 	AM_RANGE(0x0000, 0x07ff) AM_ROM
 	AM_RANGE(0x0800, 0xffff) AM_RAM /* Probably wrong. Must be verified on pcb! */
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( banctec_mcu_mem , AS_PROGRAM, 8, banctec_state )
+ADDRESS_MAP_START(banctec_state::banctec_mcu_mem)
 	AM_RANGE(0x0000, 0x00ff) AM_RAM /* Probably wrong. Must be verified on pcb! */
 	AM_RANGE(0x2000, 0x2000) AM_DEVREADWRITE("crtc", mc6845_device, status_r, address_w)
 	AM_RANGE(0x2001, 0x2001) AM_DEVREADWRITE("crtc", mc6845_device, register_r, register_w)
@@ -127,10 +133,10 @@ static GFXDECODE_START( banctec )
 	GFXDECODE_ENTRY( "chargen", 0x00000, banctec_gfx_layout, 0, 1 )
 GFXDECODE_END
 
-static MACHINE_CONFIG_START( banctec )
+MACHINE_CONFIG_START(banctec_state::banctec)
 	/* basic machine hardware */
 
-	MCFG_CPU_ADD("maincpu", I80C31, XTAL_11_0592MHz)
+	MCFG_CPU_ADD("maincpu", I80C31, XTAL(11'059'200))
 	MCFG_CPU_PROGRAM_MAP(banctec_mem)
 
 	MCFG_CPU_ADD("mcu", M6803, 4000000)     /* Actual MCU is a Motorola 6803 and the clock frequency is still unknown */
@@ -148,7 +154,7 @@ static MACHINE_CONFIG_START( banctec )
 	MCFG_PALETTE_ADD_MONOCHROME("palette")
 	MCFG_GFXDECODE_ADD("gfxdecode", "palette", banctec)
 
-	MCFG_MC6845_ADD("crtc", R6545_1, "screen", XTAL_2MHz) /* (?) */
+	MCFG_MC6845_ADD("crtc", R6545_1, "screen", XTAL(2'000'000)) /* (?) */
 	MCFG_MC6845_SHOW_BORDER_AREA(false)
 	MCFG_MC6845_CHAR_WIDTH(8)
 	MCFG_MC6845_UPDATE_ROW_CB(banctec_state, crtc_update_row)

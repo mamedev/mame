@@ -74,4 +74,8 @@ public:
 	TIMER_CALLBACK_MEMBER(music_playback);
 	void draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprect);
 	void sslam_play(int track, int data);
+	void sslam(machine_config &config);
+	void powerbls(machine_config &config);
+	void powerbls_map(address_map &map);
+	void sslam_program_map(address_map &map);
 };

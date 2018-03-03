@@ -87,7 +87,7 @@ DEFINE_DEVICE_TYPE(PPU_2C05_04, ppu2c05_04_device, "ppu2c05_04", "2C05_04 PPU")
 
 
 // default address map
-static ADDRESS_MAP_START( ppu2c0x, 0, 8, ppu2c0x_device )
+ADDRESS_MAP_START(ppu2c0x_device::ppu2c0x)
 	AM_RANGE(0x0000, 0x3eff) AM_RAM
 	AM_RANGE(0x3f00, 0x3fff) AM_READWRITE(palette_read, palette_write)
 //  AM_RANGE(0x0000, 0x3fff) AM_RAM
@@ -106,12 +106,6 @@ device_memory_interface::space_config_vector ppu2c0x_device::memory_space_config
 }
 
 
-// static
-void ppu2c0x_device::set_nmi_delegate(device_t &device, nmi_delegate &&cb)
-{
-	ppu2c0x_device &dev = downcast<ppu2c0x_device &>(device);
-	dev.m_nmi_callback_proc = std::move(cb);
-}
 //-------------------------------------------------
 //  ppu2c0x_device - constructor
 //-------------------------------------------------
@@ -129,7 +123,7 @@ ppu2c0x_device::ppu2c0x_device(const machine_config &mconfig, device_type type, 
 	: device_t(mconfig, type, tag, owner, clock)
 	, device_memory_interface(mconfig, *this)
 	, device_video_interface(mconfig, *this)
-	, m_space_config("videoram", ENDIANNESS_LITTLE, 8, 17, 0, nullptr, *ADDRESS_MAP_NAME(ppu2c0x))
+	, m_space_config("videoram", ENDIANNESS_LITTLE, 8, 17, 0, address_map_constructor(), address_map_constructor(FUNC(ppu2c0x_device::ppu2c0x), this))
 	, m_cpu(*this, finder_base::DUMMY_TAG)
 	, m_scanline(0)  // reset the scanline count
 	, m_refresh_data(0)
@@ -230,7 +224,7 @@ void ppu2c0x_device::device_start()
 	m_scanline_timer = timer_alloc(TIMER_SCANLINE);
 
 	/* initialize the scanline handling portion */
-	m_scanline_timer->adjust(m_screen->time_until_pos(1));
+	m_scanline_timer->adjust(screen().time_until_pos(1));
 	m_hblank_timer->adjust(m_cpu->cycles_to_attotime(86.67)); // ??? FIXME - hardcoding NTSC, need better calculation
 	m_nmi_timer->adjust(attotime::never);
 
@@ -522,7 +516,7 @@ void ppu2c0x_device::device_timer(emu_timer &timer, device_timer_id id, int para
 			/* increment our scanline count */
 			m_scanline++;
 
-			//  logerror("starting scanline %d (MAME %d, beam %d)\n", m_scanline, device->m_screen->vpos(), device->m_screen->hpos());
+			//  logerror("starting scanline %d (MAME %d, beam %d)\n", m_scanline, device->screen().vpos(), device->screen().hpos());
 
 			/* Note: this is called at the _end_ of each scanline */
 			if (m_scanline == m_vblank_first_scanline)
@@ -569,7 +563,7 @@ void ppu2c0x_device::device_timer(emu_timer &timer, device_timer_id id, int para
 			m_hblank_timer->adjust(m_cpu->cycles_to_attotime(86.67)); // ??? FIXME - hardcoding NTSC, need better calculation
 
 			// trigger again at the start of the next scanline
-			m_scanline_timer->adjust(m_screen->time_until_pos(next_scanline * m_scan_scale));
+			m_scanline_timer->adjust(screen().time_until_pos(next_scanline * m_scan_scale));
 			break;
 	}
 }
@@ -1191,7 +1185,7 @@ WRITE8_MEMBER( ppu2c0x_device::write )
 #ifdef MAME_DEBUG
 	if (m_scanline <= BOTTOM_VISIBLE_SCANLINE)
 	{
-		logerror("PPU register %d write %02x during non-vblank scanline %d (MAME %d, beam pos: %d)\n", offset, data, m_scanline, m_screen->vpos(), m_screen->hpos());
+		logerror("PPU register %d write %02x during non-vblank scanline %d (MAME %d, beam pos: %d)\n", offset, data, m_scanline, screen().vpos(), screen().hpos());
 	}
 #endif
 
@@ -1323,6 +1317,14 @@ WRITE8_MEMBER( ppu2c0x_device::write )
 	}
 
 	m_data_latch = data;
+}
+
+uint16_t ppu2c0x_device::get_vram_dest() {
+	return m_videomem_addr;
+}
+
+void ppu2c0x_device::set_vram_dest(uint16_t dest) {
+	m_videomem_addr = dest;
 }
 
 /*************************************

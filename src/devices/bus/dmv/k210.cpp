@@ -73,7 +73,7 @@ void dmv_k210_device::device_timer(emu_timer &timer, device_timer_id tid, int pa
 //  device_add_mconfig - add device configuration
 //-------------------------------------------------
 
-MACHINE_CONFIG_MEMBER( dmv_k210_device::device_add_mconfig )
+MACHINE_CONFIG_START(dmv_k210_device::device_add_mconfig)
 	MCFG_DEVICE_ADD("ppi8255", I8255, 0)
 	MCFG_I8255_IN_PORTA_CB(READ8(dmv_k210_device, porta_r))
 	MCFG_I8255_IN_PORTB_CB(READ8(dmv_k210_device, portb_r))
@@ -142,7 +142,7 @@ WRITE8_MEMBER( dmv_k210_device::portc_w )
 	if (!(data & 0x80))
 	{
 		m_centronics->write_strobe(ASSERT_LINE);
-		m_clk1_timer->adjust(attotime::from_hz(XTAL_1MHz));
+		m_clk1_timer->adjust(attotime::from_hz(XTAL(1'000'000)));
 	}
 
 	m_centronics->write_init(!BIT(data, 1));

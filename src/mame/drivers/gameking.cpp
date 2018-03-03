@@ -69,6 +69,10 @@ public:
 		uint8_t bank8000_cart; //34 bit 7; bits 0,1,.. a15,a16,..
 		uint8_t res2[0x4c];
 	};
+	void gameking(machine_config &config);
+	void gameking3(machine_config &config);
+	void gameking1(machine_config &config);
+	void gameking_mem(address_map &map);
 protected:
 	required_device<cpu_device> m_maincpu;
 	required_device<generic_slot_device> m_cart;
@@ -144,7 +148,7 @@ READ8_MEMBER(gameking_state::lcd_r)
 	return data;
 }
 
-static ADDRESS_MAP_START( gameking_mem , AS_PROGRAM, 8, gameking_state )
+ADDRESS_MAP_START(gameking_state::gameking_mem)
 	AM_RANGE(0x0000, 0x007f) AM_READWRITE(io_r, io_w)
 	AM_RANGE(0x0080, 0x01ff) AM_RAM
 	AM_RANGE(0x0200, 0x03ff) AM_RAM // lcd 2nd copy
@@ -276,7 +280,7 @@ INTERRUPT_GEN_MEMBER(gameking_state::gameking_frame_int) // guess to get over bi
 }
 
 
-static MACHINE_CONFIG_START( gameking )
+MACHINE_CONFIG_START(gameking_state::gameking)
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", R65C02, 6000000)
 	MCFG_CPU_PROGRAM_MAP(gameking_mem)
@@ -299,11 +303,13 @@ static MACHINE_CONFIG_START( gameking )
 	MCFG_GENERIC_LOAD(gameking_state, gameking_cart)
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_DERIVED( gameking1, gameking )
+MACHINE_CONFIG_START(gameking_state::gameking1)
+	gameking(config);
 	MCFG_SOFTWARE_LIST_ADD("cart_list", "gameking")
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_DERIVED( gameking3, gameking )
+MACHINE_CONFIG_START(gameking_state::gameking3)
+	gameking(config);
 	MCFG_SOFTWARE_LIST_ADD("cart_list", "gameking")
 	MCFG_SOFTWARE_LIST_ADD("cart_list_3", "gameking3")
 MACHINE_CONFIG_END

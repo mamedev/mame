@@ -231,11 +231,11 @@ WRITE16_MEMBER(tecmosys_state::unk880000_w)
 
 		case 0x22/2:
 			m_watchdog->watchdog_reset();
-			//logerror( "watchdog_w( %06x, %04x ) @ %06x\n", (offset * 2)+0x880000, data, space.device().safe_pc() );
+			//logerror( "watchdog_w( %06x, %04x ) @ %06x\n", (offset * 2)+0x880000, data, m_maincpu->_pc() );
 			break;
 
 		default:
-			logerror( "unk880000_w( %06x, %04x ) @ %06x\n", (offset * 2)+0x880000, data, space.device().safe_pc() );
+			logerror( "unk880000_w( %06x, %04x ) @ %06x\n", (offset * 2)+0x880000, data, m_maincpu->pc() );
 			break;
 	}
 }
@@ -244,7 +244,7 @@ READ16_MEMBER(tecmosys_state::unk880000_r)
 {
 	//uint16_t ret = m_880000regs[offset];
 
-	logerror( "unk880000_r( %06x ) @ %06x = %04x\n", (offset * 2 ) +0x880000, space.device().safe_pc(), m_880000regs[offset] );
+	logerror( "unk880000_r( %06x ) @ %06x = %04x\n", (offset * 2 ) +0x880000, m_maincpu->pc(), m_880000regs[offset] );
 
 	/* this code allows scroll regs to be updated, but tkdensho at least resets perodically */
 
@@ -274,7 +274,7 @@ WRITE16_MEMBER(tecmosys_state::eeprom_w)
 	}
 }
 
-static ADDRESS_MAP_START( main_map, AS_PROGRAM, 16, tecmosys_state )
+ADDRESS_MAP_START(tecmosys_state::main_map)
 	AM_RANGE(0x000000, 0x0fffff) AM_ROM
 	AM_RANGE(0x200000, 0x20ffff) AM_RAM // work ram
 	AM_RANGE(0x210000, 0x210001) AM_READNOP // single byte overflow on stack defined as 0x210000
@@ -290,7 +290,7 @@ static ADDRESS_MAP_START( main_map, AS_PROGRAM, 16, tecmosys_state )
 	AM_RANGE(0x700000, 0x703fff) AM_RAM_WRITE(fg_tilemap_w) AM_SHARE("fgtilemap_ram") // fix ram
 	AM_RANGE(0x800000, 0x80ffff) AM_RAM AM_SHARE("spriteram") // obj ram
 	AM_RANGE(0x880000, 0x88000b) AM_READ(unk880000_r)
-	AM_RANGE(0x900000, 0x907fff) AM_RAM_DEVWRITE("palette", palette_device, write) AM_SHARE("palette") // AM_WRITEONLY // obj pal
+	AM_RANGE(0x900000, 0x907fff) AM_RAM_DEVWRITE("palette", palette_device, write16) AM_SHARE("palette") // AM_WRITEONLY // obj pal
 
 	//AM_RANGE(0x980000, 0x9807ff) AM_WRITEONLY // bg pal
 	//AM_RANGE(0x980800, 0x980fff) AM_WRITE(paletteram_xGGGGGRRRRRBBBBB_word_w) AM_SHARE("paletteram") // fix pal
@@ -329,13 +329,13 @@ WRITE8_MEMBER(tecmosys_state::oki_bank_w)
 	memcpy( region+0x20000, region+0x80000 + upperbank * 0x20000, 0x20000  );
 }
 
-static ADDRESS_MAP_START( sound_map, AS_PROGRAM, 8, tecmosys_state )
+ADDRESS_MAP_START(tecmosys_state::sound_map)
 	AM_RANGE(0x0000, 0x7fff) AM_ROM
 	AM_RANGE(0x8000, 0xbfff) AM_ROMBANK("bank1")
 	AM_RANGE(0xe000, 0xf7ff) AM_RAM
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( io_map, AS_IO, 8, tecmosys_state )
+ADDRESS_MAP_START(tecmosys_state::io_map)
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	AM_RANGE(0x00, 0x03) AM_DEVREADWRITE("ymf", ymf262_device, read, write)
 	AM_RANGE(0x10, 0x10) AM_DEVREADWRITE("oki", okim6295_device, read, write)
@@ -432,15 +432,15 @@ void tecmosys_state::machine_start()
 	save_item(NAME(m_device_value));
 }
 
-static MACHINE_CONFIG_START( deroon )
-	MCFG_CPU_ADD("maincpu", M68000, XTAL_16MHz)
+MACHINE_CONFIG_START(tecmosys_state::deroon)
+	MCFG_CPU_ADD("maincpu", M68000, XTAL(16'000'000))
 	MCFG_CPU_PROGRAM_MAP(main_map)
 	MCFG_CPU_VBLANK_INT_DRIVER("screen", tecmosys_state,  irq1_line_hold)
 
 	MCFG_WATCHDOG_ADD("watchdog")
 	MCFG_WATCHDOG_VBLANK_INIT("screen", 400) // guess
 
-	MCFG_CPU_ADD("audiocpu", Z80, XTAL_16MHz/2 )
+	MCFG_CPU_ADD("audiocpu", Z80, XTAL(16'000'000)/2 )
 	MCFG_CPU_PROGRAM_MAP(sound_map)
 	MCFG_CPU_IO_MAP(io_map)
 
@@ -471,18 +471,18 @@ static MACHINE_CONFIG_START( deroon )
 	MCFG_INPUT_MERGER_ALL_HIGH("soundnmi")
 	MCFG_INPUT_MERGER_OUTPUT_HANDLER(INPUTLINE("audiocpu", INPUT_LINE_NMI))
 
-	MCFG_SOUND_ADD("ymf", YMF262, XTAL_14_31818MHz)
+	MCFG_SOUND_ADD("ymf", YMF262, XTAL(14'318'181))
 	MCFG_YMF262_IRQ_HANDLER(INPUTLINE("audiocpu", 0))
 	MCFG_SOUND_ROUTE(0, "lspeaker", 1.00)
 	MCFG_SOUND_ROUTE(1, "rspeaker", 1.00)
 	MCFG_SOUND_ROUTE(2, "lspeaker", 1.00)
 	MCFG_SOUND_ROUTE(3, "rspeaker", 1.00)
 
-	MCFG_OKIM6295_ADD("oki", XTAL_16MHz/8, PIN7_HIGH)
+	MCFG_OKIM6295_ADD("oki", XTAL(16'000'000)/8, PIN7_HIGH)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "lspeaker", 0.50)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", 0.50)
 
-	MCFG_SOUND_ADD("ymz", YMZ280B, XTAL_16_9344MHz)
+	MCFG_SOUND_ADD("ymz", YMZ280B, XTAL(16'934'400))
 	MCFG_SOUND_ROUTE(0, "lspeaker", 0.30)
 	MCFG_SOUND_ROUTE(1, "rspeaker", 0.30)
 MACHINE_CONFIG_END

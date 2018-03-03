@@ -1,7 +1,8 @@
 // license:BSD-3-Clause
 // copyright-holders:Angelo Salese, R. Belmont, Anthony Kruize, Fabio Priuli, Ryan Holtz
-#ifndef _SNES_H_
-#define _SNES_H_
+
+#ifndef MAME_INCLUDES_SNES_H
+#define MAME_INCLUDES_SNES_H
 
 #include "cpu/spc700/spc700.h"
 #include "cpu/g65816/g65816.h"
@@ -418,6 +419,7 @@ public:
 	DECLARE_READ8_MEMBER(snes_r_bank2);
 	DECLARE_WRITE8_MEMBER(snes_w_bank1);
 	DECLARE_WRITE8_MEMBER(snes_w_bank2);
+	uint8_t snes_open_bus_r();
 	DECLARE_READ8_MEMBER(snes_open_bus_r);
 	TIMER_CALLBACK_MEMBER(snes_nmi_tick);
 	TIMER_CALLBACK_MEMBER(snes_hirq_tick_callback);
@@ -460,4 +462,4 @@ enum
 	HAS_UNK
 };
 
-#endif /* _SNES_H_ */
+#endif // MAME_INCLUDES_SNES_H

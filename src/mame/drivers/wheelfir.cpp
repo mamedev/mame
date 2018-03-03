@@ -288,6 +288,10 @@ public:
 	uint32_t screen_update_wheelfir(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	DECLARE_WRITE_LINE_MEMBER(screen_vblank_wheelfir);
 	TIMER_DEVICE_CALLBACK_MEMBER(scanline_timer_callback);
+	void wheelfir(machine_config &config);
+	void ramdac_map(address_map &map);
+	void wheelfir_main(address_map &map);
+	void wheelfir_sub(address_map &map);
 };
 
 
@@ -605,7 +609,7 @@ WRITE16_MEMBER(wheelfir_state::coin_cnt_w)
 	machine().bookkeeping().coin_counter_w(1, data & 0x02);
 }
 
-static ADDRESS_MAP_START( wheelfir_main, AS_PROGRAM, 16, wheelfir_state )
+ADDRESS_MAP_START(wheelfir_state::wheelfir_main)
 	AM_RANGE(0x000000, 0x0fffff) AM_ROM
 	AM_RANGE(0x200000, 0x20ffff) AM_RAM
 
@@ -626,7 +630,7 @@ static ADDRESS_MAP_START( wheelfir_main, AS_PROGRAM, 16, wheelfir_state )
 ADDRESS_MAP_END
 
 
-static ADDRESS_MAP_START( wheelfir_sub, AS_PROGRAM, 16, wheelfir_state )
+ADDRESS_MAP_START(wheelfir_state::wheelfir_sub)
 	AM_RANGE(0x000000, 0x0fffff) AM_ROM
 	AM_RANGE(0x200000, 0x20ffff) AM_RAM
 
@@ -743,11 +747,11 @@ void wheelfir_state::machine_start()
 	}
 }
 
-static ADDRESS_MAP_START( ramdac_map, 0, 8, wheelfir_state )
+ADDRESS_MAP_START(wheelfir_state::ramdac_map)
 	AM_RANGE(0x000, 0x3ff) AM_DEVREADWRITE("ramdac",ramdac_device,ramdac_pal_r,ramdac_rgb888_w)
 ADDRESS_MAP_END
 
-static MACHINE_CONFIG_START( wheelfir )
+MACHINE_CONFIG_START(wheelfir_state::wheelfir)
 
 	MCFG_CPU_ADD("maincpu", M68000, 32000000/2)
 	MCFG_CPU_PROGRAM_MAP(wheelfir_main)

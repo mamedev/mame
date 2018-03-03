@@ -9,5 +9,6 @@
 // device type definitions - Dragon FDC
 extern const device_type DRAGON_FDC;
 extern const device_type SDTANDY_FDC;
+extern const device_type PREMIER_FDC;
 
 #endif // MAME_BUS_COCO_DRAGON_FDC_H

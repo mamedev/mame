@@ -40,6 +40,8 @@ public:
 	DECLARE_READ8_MEMBER(keyboard_status_r);
 	void kbd_put(u8 data);
 
+	void harriet(machine_config &config);
+	void harriet_map(address_map &map);
 protected:
 	// driver_device overrides
 	virtual void machine_start() override;
@@ -107,7 +109,7 @@ READ8_MEMBER(harriet_state::keyboard_status_r)
 	return res;
 }
 
-static ADDRESS_MAP_START( harriet_map, AS_PROGRAM, 16, harriet_state )
+ADDRESS_MAP_START(harriet_state::harriet_map)
 	AM_RANGE(0x000000, 0x007fff) AM_ROM
 	AM_RANGE(0x040000, 0x040fff) AM_RAM // NVRAM
 	AM_RANGE(0x7f0000, 0x7fffff) AM_RAM // todo: boundaries, 0x7fe000 - 0x7fffff tested on boot
@@ -193,10 +195,10 @@ void harriet_state::machine_reset()
 }
 
 
-static MACHINE_CONFIG_START( harriet )
+MACHINE_CONFIG_START(harriet_state::harriet)
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu",M68010,XTAL_8MHz) // TODO: clock
+	MCFG_CPU_ADD("maincpu",M68010,XTAL(8'000'000)) // TODO: clock
 	MCFG_CPU_PROGRAM_MAP(harriet_map)
 
 	/* video hardware */

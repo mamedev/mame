@@ -55,6 +55,11 @@ public:
 	DECLARE_WRITE_LINE_MEMBER(b2m_fdc_drq);
 	DECLARE_FLOPPY_FORMATS( b2m_floppy_formats );
 
+	void b2mrom(machine_config &config);
+	void b2m(machine_config &config);
+	void b2m_io(address_map &map);
+	void b2m_mem(address_map &map);
+	void b2m_rom_io(address_map &map);
 protected:
 	virtual void machine_start() override;
 	virtual void machine_reset() override;

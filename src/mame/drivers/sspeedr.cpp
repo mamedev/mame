@@ -81,14 +81,14 @@ WRITE8_MEMBER(sspeedr_state::sspeedr_sound_w)
 }
 
 
-static ADDRESS_MAP_START( sspeedr_map, AS_PROGRAM, 8, sspeedr_state )
+ADDRESS_MAP_START(sspeedr_state::sspeedr_map)
 	AM_RANGE(0x0000, 0x0fff) AM_ROM
 	AM_RANGE(0x2000, 0x21ff) AM_RAM
 	AM_RANGE(0x7f00, 0x7f17) AM_WRITE(sspeedr_score_w)
 ADDRESS_MAP_END
 
 
-static ADDRESS_MAP_START( sspeedr_io_map, AS_IO, 8, sspeedr_state )
+ADDRESS_MAP_START(sspeedr_state::sspeedr_io_map)
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	AM_RANGE(0x00, 0x00) AM_READ_PORT("IN0")
 	AM_RANGE(0x01, 0x01) AM_READ_PORT("IN1")
@@ -190,10 +190,10 @@ static GFXDECODE_START( sspeedr )
 GFXDECODE_END
 
 
-static MACHINE_CONFIG_START( sspeedr )
+MACHINE_CONFIG_START(sspeedr_state::sspeedr)
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", Z80, XTAL_19_968MHz/8)
+	MCFG_CPU_ADD("maincpu", Z80, XTAL(19'968'000)/8)
 	MCFG_CPU_PROGRAM_MAP(sspeedr_map)
 	MCFG_CPU_IO_MAP(sspeedr_io_map)
 	MCFG_CPU_VBLANK_INT_DRIVER("screen", sspeedr_state,  irq0_line_assert)

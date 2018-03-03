@@ -5,9 +5,14 @@
     Chequered Flag / Checkered Flag (GX717) (c) Konami 1988
 
     Notes:
-    - 007232 volume & panning control is almost certainly wrong.
-    - Needs HW tests or side-by-side tests to determine if the protection
-      is 100% ok now;
+    - 007232 volume & panning control is almost certainly wrong;
+    - 051733 opponent cars have wrong RNG colors compared to references;
+    - 051733 opponent car-to-car collisions direction are wrong, according
+      to reference orange car should shift to the left instead (current emulation
+      makes them to wall crash most of the time instead);
+    - needs proper shadow/highlight factor values for sprites and tilemap;
+    - compared to references, emulation is a bit slower (around 2/3 seconds
+      behind on a full lap of stage 2);
 
     2008-07
     Dip locations and recommended settings verified with manual
@@ -133,7 +138,7 @@ WRITE8_MEMBER(chqflag_state::chqflag_sh_irqtrigger_w)
 
 /****************************************************************************/
 
-static ADDRESS_MAP_START( chqflag_map, AS_PROGRAM, 8, chqflag_state )
+ADDRESS_MAP_START(chqflag_state::chqflag_map)
 	AM_RANGE(0x0000, 0x0fff) AM_RAM
 	AM_RANGE(0x1000, 0x1fff) AM_DEVICE("bank1000", address_map_bank_device, amap8)
 	AM_RANGE(0x2000, 0x2007) AM_DEVREADWRITE("k051960", k051960_device, k051937_r, k051937_w)            /* Sprite control registers */
@@ -158,10 +163,10 @@ static ADDRESS_MAP_START( chqflag_map, AS_PROGRAM, 8, chqflag_state )
 	AM_RANGE(0x8000, 0xffff) AM_ROM AM_REGION("maincpu", 0x48000)               /* ROM */
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( bank1000_map, AS_PROGRAM, 8, chqflag_state )
+ADDRESS_MAP_START(chqflag_state::bank1000_map)
 	AM_RANGE(0x0000, 0x0fff) AM_RAM
 	AM_RANGE(0x1000, 0x17ff) AM_READ(k051316_1_ramrom_r) AM_DEVWRITE("k051316_1", k051316_device, write)
-	AM_RANGE(0x1800, 0x1fff) AM_RAM_DEVWRITE("palette", palette_device, write) AM_SHARE("palette")
+	AM_RANGE(0x1800, 0x1fff) AM_RAM_DEVWRITE("palette", palette_device, write8) AM_SHARE("palette")
 ADDRESS_MAP_END
 
 
@@ -180,7 +185,7 @@ WRITE8_MEMBER(chqflag_state::k007232_bankswitch_w)
 	m_k007232_2->set_bank(bank_A, bank_B);
 }
 
-static ADDRESS_MAP_START( chqflag_sound_map, AS_PROGRAM, 8, chqflag_state )
+ADDRESS_MAP_START(chqflag_state::chqflag_sound_map)
 	AM_RANGE(0x0000, 0x7fff) AM_ROM /* ROM */
 	AM_RANGE(0x8000, 0x87ff) AM_RAM /* RAM */
 	AM_RANGE(0x9000, 0x9000) AM_WRITE(k007232_bankswitch_w) /* 007232 bankswitch */
@@ -320,13 +325,13 @@ WRITE_LINE_MEMBER(chqflag_state::background_brt_w)
 	}
 }
 
-static MACHINE_CONFIG_START( chqflag )
+MACHINE_CONFIG_START(chqflag_state::chqflag)
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", KONAMI, XTAL_24MHz/2/4)    /* 052001 (verified on pcb) */
+	MCFG_CPU_ADD("maincpu", KONAMI, XTAL(24'000'000)/2/4)    /* 052001 (verified on pcb) */
 	MCFG_CPU_PROGRAM_MAP(chqflag_map)
 
-	MCFG_CPU_ADD("audiocpu", Z80, XTAL_3_579545MHz) /* verified on pcb */
+	MCFG_CPU_ADD("audiocpu", Z80, XTAL(3'579'545)) /* verified on pcb */
 	MCFG_CPU_PROGRAM_MAP(chqflag_sound_map)
 
 	MCFG_DEVICE_ADD("bank1000", ADDRESS_MAP_BANK, 0)
@@ -342,9 +347,9 @@ static MACHINE_CONFIG_START( chqflag )
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
-	MCFG_SCREEN_RAW_PARAMS(XTAL_24MHz/3, 528, 96, 400, 256, 16, 240) // measured Vsync 59.17hz Hsync 15.13 / 15.19khz
+	MCFG_SCREEN_RAW_PARAMS(XTAL(24'000'000)/3, 528, 96, 400, 256, 16, 240) // measured Vsync 59.17hz Hsync 15.13 / 15.19khz
 //  6MHz dotclock is more realistic, however needs drawing updates. replace when ready
-//  MCFG_SCREEN_RAW_PARAMS(XTAL_24MHz/4, 396, hbend, hbstart, 256, 16, 240)
+//  MCFG_SCREEN_RAW_PARAMS(XTAL(24'000'000)/4, 396, hbend, hbstart, 256, 16, 240)
 	MCFG_SCREEN_UPDATE_DRIVER(chqflag_state, screen_update_chqflag)
 	MCFG_SCREEN_PALETTE("palette")
 
@@ -380,17 +385,17 @@ static MACHINE_CONFIG_START( chqflag )
 	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
 	MCFG_GENERIC_LATCH_8_ADD("soundlatch2")
 
-	MCFG_YM2151_ADD("ymsnd", XTAL_3_579545MHz) /* verified on pcb */
+	MCFG_YM2151_ADD("ymsnd", XTAL(3'579'545)) /* verified on pcb */
 	MCFG_YM2151_IRQ_HANDLER(INPUTLINE("audiocpu", INPUT_LINE_NMI))
 	MCFG_SOUND_ROUTE(0, "lspeaker", 1.00)
 	MCFG_SOUND_ROUTE(1, "rspeaker", 1.00)
 
-	MCFG_SOUND_ADD("k007232_1", K007232, XTAL_3_579545MHz) /* verified on pcb */
+	MCFG_SOUND_ADD("k007232_1", K007232, XTAL(3'579'545)) /* verified on pcb */
 	MCFG_K007232_PORT_WRITE_HANDLER(WRITE8(chqflag_state, volume_callback0))
 	MCFG_SOUND_ROUTE(0, "lspeaker", 0.20)
 	MCFG_SOUND_ROUTE(1, "rspeaker", 0.20)
 
-	MCFG_SOUND_ADD("k007232_2", K007232, XTAL_3_579545MHz) /* verified on pcb */
+	MCFG_SOUND_ADD("k007232_2", K007232, XTAL(3'579'545)) /* verified on pcb */
 	MCFG_K007232_PORT_WRITE_HANDLER(WRITE8(chqflag_state, volume_callback1))
 	MCFG_SOUND_ROUTE(0, "lspeaker", 0.20)
 	MCFG_SOUND_ROUTE(0, "rspeaker", 0.20)
@@ -456,5 +461,5 @@ ROM_END
 
 
 //     YEAR, NAME,     PARENT,  MACHINE, INPUT,    STATE,         INIT, MONITOR, COMPANY,  FULLNAME,                 FLAGS,                                           LAYOUT
-GAMEL( 1988, chqflag,  0,       chqflag, chqflag,  chqflag_state, 0,    ROT90,   "Konami", "Chequered Flag",         MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE, layout_chqflag )
-GAMEL( 1988, chqflagj, chqflag, chqflag, chqflagj, chqflag_state, 0,    ROT90,   "Konami", "Chequered Flag (Japan)", MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE, layout_chqflag )
+GAMEL( 1988, chqflag,  0,       chqflag, chqflag,  chqflag_state, 0,    ROT90,   "Konami", "Chequered Flag",         MACHINE_UNEMULATED_PROTECTION | MACHINE_IMPERFECT_COLORS | MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE, layout_chqflag )
+GAMEL( 1988, chqflagj, chqflag, chqflag, chqflagj, chqflag_state, 0,    ROT90,   "Konami", "Chequered Flag (Japan)", MACHINE_UNEMULATED_PROTECTION | MACHINE_IMPERFECT_COLORS | MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE, layout_chqflag )

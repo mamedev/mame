@@ -8,59 +8,59 @@
 
 // I/O callbacks
 #define MCFG_TLCS90_PORT_P0_READ_CB(_devcb) \
-	devcb = &tlcs90_device::set_port_read_cb(*device, 0, DEVCB_##_devcb);
+	devcb = &downcast<tlcs90_device &>(*device).set_port_read_cb(0, DEVCB_##_devcb);
 
 #define MCFG_TLCS90_PORT_P1_READ_CB(_devcb) \
-	devcb = &tlcs90_device::set_port_read_cb(*device, 1, DEVCB_##_devcb);
+	devcb = &downcast<tlcs90_device &>(*device).set_port_read_cb(1, DEVCB_##_devcb);
 
 #define MCFG_TLCS90_PORT_P2_READ_CB(_devcb) \
-	devcb = &tlcs90_device::set_port_read_cb(*device, 2, DEVCB_##_devcb);
+	devcb = &downcast<tlcs90_device &>(*device).set_port_read_cb(2, DEVCB_##_devcb);
 
 #define MCFG_TLCS90_PORT_P3_READ_CB(_devcb) \
-	devcb = &tlcs90_device::set_port_read_cb(*device, 3, DEVCB_##_devcb);
+	devcb = &downcast<tlcs90_device &>(*device).set_port_read_cb(3, DEVCB_##_devcb);
 
 #define MCFG_TLCS90_PORT_P4_READ_CB(_devcb) \
-	devcb = &tlcs90_device::set_port_read_cb(*device, 4, DEVCB_##_devcb);
+	devcb = &downcast<tlcs90_device &>(*device).set_port_read_cb(4, DEVCB_##_devcb);
 
 #define MCFG_TLCS90_PORT_P5_READ_CB(_devcb) \
-	devcb = &tlcs90_device::set_port_read_cb(*device, 5, DEVCB_##_devcb);
+	devcb = &downcast<tlcs90_device &>(*device).set_port_read_cb(5, DEVCB_##_devcb);
 
 #define MCFG_TLCS90_PORT_P6_READ_CB(_devcb) \
-	devcb = &tlcs90_device::set_port_read_cb(*device, 6, DEVCB_##_devcb);
+	devcb = &downcast<tlcs90_device &>(*device).set_port_read_cb(6, DEVCB_##_devcb);
 
 #define MCFG_TLCS90_PORT_P7_READ_CB(_devcb) \
-	devcb = &tlcs90_device::set_port_read_cb(*device, 7, DEVCB_##_devcb);
+	devcb = &downcast<tlcs90_device &>(*device).set_port_read_cb(7, DEVCB_##_devcb);
 
 #define MCFG_TLCS90_PORT_P8_READ_CB(_devcb) \
-	devcb = &tlcs90_device::set_port_read_cb(*device, 8, DEVCB_##_devcb);
+	devcb = &downcast<tlcs90_device &>(*device).set_port_read_cb(8, DEVCB_##_devcb);
 
 
 #define MCFG_TLCS90_PORT_P0_WRITE_CB(_devcb) \
-	devcb = &tlcs90_device::set_port_write_cb(*device, 0, DEVCB_##_devcb);
+	devcb = &downcast<tlcs90_device &>(*device).set_port_write_cb(0, DEVCB_##_devcb);
 
 #define MCFG_TLCS90_PORT_P1_WRITE_CB(_devcb) \
-	devcb = &tlcs90_device::set_port_write_cb(*device, 1, DEVCB_##_devcb);
+	devcb = &downcast<tlcs90_device &>(*device).set_port_write_cb(1, DEVCB_##_devcb);
 
 #define MCFG_TLCS90_PORT_P2_WRITE_CB(_devcb) \
-	devcb = &tlcs90_device::set_port_write_cb(*device, 2, DEVCB_##_devcb);
+	devcb = &downcast<tlcs90_device &>(*device).set_port_write_cb(2, DEVCB_##_devcb);
 
 #define MCFG_TLCS90_PORT_P3_WRITE_CB(_devcb) \
-	devcb = &tlcs90_device::set_port_write_cb(*device, 3, DEVCB_##_devcb);
+	devcb = &downcast<tlcs90_device &>(*device).set_port_write_cb(3, DEVCB_##_devcb);
 
 #define MCFG_TLCS90_PORT_P4_WRITE_CB(_devcb) \
-	devcb = &tlcs90_device::set_port_write_cb(*device, 4, DEVCB_##_devcb);
+	devcb = &downcast<tlcs90_device &>(*device).set_port_write_cb(4, DEVCB_##_devcb);
 
 #define MCFG_TLCS90_PORT_P5_WRITE_CB(_devcb) \
-	devcb = &tlcs90_device::set_port_write_cb(*device, 5, DEVCB_##_devcb);
+	devcb = &downcast<tlcs90_device &>(*device).set_port_write_cb(5, DEVCB_##_devcb);
 
 #define MCFG_TLCS90_PORT_P6_WRITE_CB(_devcb) \
-	devcb = &tlcs90_device::set_port_write_cb(*device, 6, DEVCB_##_devcb);
+	devcb = &downcast<tlcs90_device &>(*device).set_port_write_cb(6, DEVCB_##_devcb);
 
 #define MCFG_TLCS90_PORT_P7_WRITE_CB(_devcb) \
-	devcb = &tlcs90_device::set_port_write_cb(*device, 7, DEVCB_##_devcb);
+	devcb = &downcast<tlcs90_device &>(*device).set_port_write_cb(7, DEVCB_##_devcb);
 
 #define MCFG_TLCS90_PORT_P8_WRITE_CB(_devcb) \
-	devcb = &tlcs90_device::set_port_write_cb(*device, 8, DEVCB_##_devcb);
+	devcb = &downcast<tlcs90_device &>(*device).set_port_write_cb(8, DEVCB_##_devcb);
 
 
 enum tlcs90_e_irq {    INTSWI = 0, INTNMI, INTWD,  INT0,   INTT0,  INTT1,  INTT2,  INTT3,  INTT4,  INT1,   INTT5,  INT2,   INTRX,  INTTX,  INTMAX  };
@@ -78,21 +78,26 @@ public:
 	TIMER_CALLBACK_MEMBER( t90_timer_callback );
 	TIMER_CALLBACK_MEMBER( t90_timer4_callback );
 
+	void tmp90840_mem(address_map &map);
+	void tmp90841_mem(address_map &map);
+	void tmp90ph44_mem(address_map &map);
+	void tmp91640_mem(address_map &map);
+	void tmp91641_mem(address_map &map);
 protected:
 	enum _e_op {    UNKNOWN,    NOP,    EX,     EXX,    LD,     LDW,    LDA,    LDI,    LDIR,   LDD,    LDDR,   CPI,    CPIR,   CPD,    CPDR,   PUSH,   POP,    JP,     JR,     CALL,   CALLR,      RET,    RETI,   HALT,   DI,     EI,     SWI,    DAA,    CPL,    NEG,    LDAR,   RCF,    SCF,    CCF,    TSET,   BIT,    SET,    RES,    INC,    DEC,    INCX,   DECX,   INCW,   DECW,   ADD,    ADC,    SUB,    SBC,    AND,    XOR,    OR,     CP,     RLC,    RRC,    RL,     RR,     SLA,    SRA,    SLL,    SRL,    RLD,    RRD,    DJNZ,   MUL,    DIV     };
 
 
 public:
-	// static configuration
-	template<class Object> static devcb_base &set_port_read_cb(device_t &device, int port, Object &&object)
+	// configuration
+	template<class Object> devcb_base &set_port_read_cb(int port, Object &&object)
 	{
 		assert(port >= 0 && port < MAX_PORTS);
-		return downcast<tlcs90_device &>(device).m_port_read_cb[port].set_callback(std::forward<Object>(object));
+		return m_port_read_cb[port].set_callback(std::forward<Object>(object));
 	}
-	template<class Object> static devcb_base &set_port_write_cb(device_t &device, int port, Object &&object)
+	template<class Object> devcb_base &set_port_write_cb(int port, Object &&object)
 	{
 		assert(port >= 0 && port < MAX_PORTS);
-		return downcast<tlcs90_device &>(device).m_port_write_cb[port].set_callback(std::forward<Object>(object));
+		return m_port_write_cb[port].set_callback(std::forward<Object>(object));
 	}
 
 protected:

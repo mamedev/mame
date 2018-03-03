@@ -253,36 +253,36 @@ WRITE8_MEMBER( tmc1800_state::dispoff_w )
 
 // Telmac 1800
 
-static ADDRESS_MAP_START( tmc1800_map, AS_PROGRAM, 8, tmc1800_state )
+ADDRESS_MAP_START(tmc1800_state::tmc1800_map)
 	AM_RANGE(0x0000, 0x07ff) AM_MIRROR(0x7800) AM_RAM
 	AM_RANGE(0x8000, 0x81ff) AM_MIRROR(0x7e00) AM_ROM AM_REGION(CDP1802_TAG, 0)
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( tmc1800_io_map, AS_IO, 8, tmc1800_state )
+ADDRESS_MAP_START(tmc1800_state::tmc1800_io_map)
 	AM_RANGE(0x01, 0x01) AM_READWRITE(dispon_r, dispoff_w)
 	AM_RANGE(0x02, 0x02) AM_WRITE(keylatch_w)
 ADDRESS_MAP_END
 
 // OSCOM 1000B
 
-static ADDRESS_MAP_START( osc1000b_map, AS_PROGRAM, 8, osc1000b_state )
+ADDRESS_MAP_START(osc1000b_state::osc1000b_map)
 	AM_RANGE(0x0000, 0x07ff) AM_MIRROR(0x7800) AM_RAM
 	AM_RANGE(0x8000, 0x81ff) AM_MIRROR(0x7e00) AM_ROM AM_REGION(CDP1802_TAG, 0)
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( osc1000b_io_map, AS_IO, 8, osc1000b_state )
+ADDRESS_MAP_START(osc1000b_state::osc1000b_io_map)
 	AM_RANGE(0x02, 0x02) AM_WRITE(keylatch_w)
 ADDRESS_MAP_END
 
 // Telmac 2000
 
-static ADDRESS_MAP_START( tmc2000_map, AS_PROGRAM, 8, tmc2000_state )
+ADDRESS_MAP_START(tmc2000_state::tmc2000_map)
 	ADDRESS_MAP_UNMAP_HIGH
 	AM_RANGE(0x0000, 0x7fff) // RAM / monitor ROM
 	AM_RANGE(0x8000, 0xffff) // color RAM / monitor ROM
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( tmc2000_io_map, AS_IO, 8, tmc2000_state )
+ADDRESS_MAP_START(tmc2000_state::tmc2000_io_map)
 	ADDRESS_MAP_UNMAP_HIGH
 	AM_RANGE(0x01, 0x01) AM_DEVREADWRITE(CDP1864_TAG, cdp1864_device, dispon_r, step_bgcolor_w)
 	AM_RANGE(0x02, 0x02) AM_WRITE(keylatch_w)
@@ -291,12 +291,12 @@ ADDRESS_MAP_END
 
 // OSCOM Nano
 
-static ADDRESS_MAP_START( nano_map, AS_PROGRAM, 8, nano_state )
+ADDRESS_MAP_START(nano_state::nano_map)
 	AM_RANGE(0x0000, 0x7fff) // RAM / monitor ROM
 	AM_RANGE(0x8000, 0x81ff) AM_MIRROR(0x7e00) AM_ROM AM_REGION(CDP1802_TAG, 0)
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( nano_io_map, AS_IO, 8, nano_state )
+ADDRESS_MAP_START(nano_state::nano_io_map)
 	AM_RANGE(0x01, 0x01) AM_DEVREADWRITE(CDP1864_TAG, cdp1864_device, dispon_r, step_bgcolor_w)
 	AM_RANGE(0x02, 0x02) AM_WRITE(keylatch_w)
 	AM_RANGE(0x04, 0x04) AM_DEVREAD(CDP1864_TAG, cdp1864_device, dispoff_r) AM_WRITE(bankswitch_w)
@@ -704,9 +704,9 @@ QUICKLOAD_LOAD_MEMBER( tmc1800_base_state, tmc1800 )
 	return image_init_result::PASS;
 }
 
-static MACHINE_CONFIG_START( tmc1800 )
+MACHINE_CONFIG_START(tmc1800_state::tmc1800)
 	// basic system hardware
-	MCFG_CPU_ADD(CDP1802_TAG, CDP1802, XTAL_1_75MHz)
+	MCFG_CPU_ADD(CDP1802_TAG, CDP1802, XTAL(1'750'000))
 	MCFG_CPU_PROGRAM_MAP(tmc1800_map)
 	MCFG_CPU_IO_MAP(tmc1800_io_map)
 	MCFG_COSMAC_WAIT_CALLBACK(VCC)
@@ -717,7 +717,7 @@ static MACHINE_CONFIG_START( tmc1800 )
 	MCFG_COSMAC_DMAW_CALLBACK(DEVWRITE8(CDP1861_TAG, cdp1861_device, dma_w))
 
 	// video hardware
-	MCFG_FRAGMENT_ADD(tmc1800_video)
+	tmc1800_video(config);
 
 	// sound hardware
 	MCFG_SPEAKER_STANDARD_MONO("mono")
@@ -736,9 +736,9 @@ static MACHINE_CONFIG_START( tmc1800 )
 	MCFG_RAM_EXTRA_OPTIONS("4K")
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_START( osc1000b )
+MACHINE_CONFIG_START(osc1000b_state::osc1000b)
 	// basic system hardware
-	MCFG_CPU_ADD(CDP1802_TAG, CDP1802, XTAL_1_75MHz)
+	MCFG_CPU_ADD(CDP1802_TAG, CDP1802, XTAL(1'750'000))
 	MCFG_CPU_PROGRAM_MAP(osc1000b_map)
 	MCFG_CPU_IO_MAP(osc1000b_io_map)
 	MCFG_COSMAC_WAIT_CALLBACK(VCC)
@@ -748,7 +748,7 @@ static MACHINE_CONFIG_START( osc1000b )
 	MCFG_COSMAC_Q_CALLBACK(WRITELINE(osc1000b_state, q_w))
 
 	// video hardware
-	MCFG_FRAGMENT_ADD(osc1000b_video)
+	osc1000b_video(config);
 
 	// sound hardware
 	MCFG_SPEAKER_STANDARD_MONO("mono")
@@ -767,9 +767,9 @@ static MACHINE_CONFIG_START( osc1000b )
 	MCFG_RAM_EXTRA_OPTIONS("4K")
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_START( tmc2000 )
+MACHINE_CONFIG_START(tmc2000_state::tmc2000)
 	// basic system hardware
-	MCFG_CPU_ADD(CDP1802_TAG, CDP1802, XTAL_1_75MHz)
+	MCFG_CPU_ADD(CDP1802_TAG, CDP1802, XTAL(1'750'000))
 	MCFG_CPU_PROGRAM_MAP(tmc2000_map)
 	MCFG_CPU_IO_MAP(tmc2000_io_map)
 	MCFG_COSMAC_WAIT_CALLBACK(VCC)
@@ -780,7 +780,7 @@ static MACHINE_CONFIG_START( tmc2000 )
 	MCFG_COSMAC_DMAW_CALLBACK(WRITE8(tmc2000_state, dma_w))
 
 	// video hardware
-	MCFG_FRAGMENT_ADD(tmc2000_video)
+	tmc2000_video(config);
 
 	// devices
 	MCFG_QUICKLOAD_ADD("quickload", tmc1800_base_state, tmc1800, "bin", 0)
@@ -793,9 +793,9 @@ static MACHINE_CONFIG_START( tmc2000 )
 	MCFG_RAM_EXTRA_OPTIONS("16K,32K")
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_START( nano )
+MACHINE_CONFIG_START(nano_state::nano)
 	// basic system hardware
-	MCFG_CPU_ADD(CDP1802_TAG, CDP1802, XTAL_1_75MHz)
+	MCFG_CPU_ADD(CDP1802_TAG, CDP1802, XTAL(1'750'000))
 	MCFG_CPU_PROGRAM_MAP(nano_map)
 	MCFG_CPU_IO_MAP(nano_io_map)
 	MCFG_COSMAC_WAIT_CALLBACK(VCC)
@@ -806,7 +806,7 @@ static MACHINE_CONFIG_START( nano )
 	MCFG_COSMAC_DMAW_CALLBACK(DEVWRITE8(CDP1864_TAG, cdp1864_device, dma_w))
 
 	// video hardware
-	MCFG_FRAGMENT_ADD(nano_video)
+	nano_video(config);
 
 	// devices
 	MCFG_QUICKLOAD_ADD("quickload", tmc1800_base_state, tmc1800, "bin", 0)

@@ -16,9 +16,9 @@
 #include "sound/volt_reg.h"
 
 
-#define SOUND1_CLOCK        XTAL_3_579545MHz
-#define SOUND2_CLOCK        XTAL_4MHz
-#define SOUND2_SPEECH_CLOCK XTAL_3_12MHz
+#define SOUND1_CLOCK        XTAL(3'579'545)
+#define SOUND2_CLOCK        XTAL(4'000'000)
+#define SOUND2_SPEECH_CLOCK XTAL(3'120'000)
 
 
 //**************************************************************************
@@ -77,7 +77,7 @@ WRITE8_MEMBER( gottlieb_sound_r0_device::write )
 //  audio CPU map
 //-------------------------------------------------
 
-static ADDRESS_MAP_START( gottlieb_sound_r0_map, AS_PROGRAM, 8, gottlieb_sound_r0_device )
+ADDRESS_MAP_START(gottlieb_sound_r0_device::gottlieb_sound_r0_map)
 	ADDRESS_MAP_GLOBAL_MASK(0x0fff)
 	AM_RANGE(0x0000, 0x003f) AM_RAM AM_MIRROR(0x1c0)
 	AM_RANGE(0x0200, 0x020f) AM_DEVREADWRITE("r6530", mos6530_device, read, write)
@@ -108,7 +108,7 @@ INPUT_CHANGED_MEMBER( gottlieb_sound_r0_device::audio_nmi )
 // device_add_mconfig - add device configuration
 //-------------------------------------------------
 
-MACHINE_CONFIG_MEMBER( gottlieb_sound_r0_device::device_add_mconfig )
+MACHINE_CONFIG_START(gottlieb_sound_r0_device::device_add_mconfig)
 	// audio CPU
 	MCFG_CPU_ADD("audiocpu", M6502, SOUND1_CLOCK/4) // M6503 - clock is a gate, a resistor and a capacitor. Freq unknown.
 	MCFG_CPU_PROGRAM_MAP(gottlieb_sound_r0_map)
@@ -265,7 +265,7 @@ WRITE_LINE_MEMBER( gottlieb_sound_r1_device::votrax_request )
 //  audio CPU map
 //-------------------------------------------------
 
-static ADDRESS_MAP_START( gottlieb_sound_r1_map, AS_PROGRAM, 8, gottlieb_sound_r1_device )
+ADDRESS_MAP_START(gottlieb_sound_r1_device::gottlieb_sound_r1_map)
 	// A15 not decoded except in expansion socket
 	ADDRESS_MAP_GLOBAL_MASK(0x7fff)
 	AM_RANGE(0x0000, 0x007f) AM_MIRROR(0x0d80) AM_RAM
@@ -306,7 +306,7 @@ INPUT_PORTS_END
 // device_add_mconfig - add device configuration
 //-------------------------------------------------
 
-MACHINE_CONFIG_MEMBER( gottlieb_sound_r1_device::device_add_mconfig )
+MACHINE_CONFIG_START(gottlieb_sound_r1_device::device_add_mconfig)
 	// audio CPU
 	MCFG_CPU_ADD("audiocpu", M6502, SOUND1_CLOCK/4) // the board can be set to /2 as well
 	MCFG_CPU_PROGRAM_MAP(gottlieb_sound_r1_map)
@@ -364,7 +364,7 @@ gottlieb_sound_r1_with_votrax_device::gottlieb_sound_r1_with_votrax_device(const
 // device_add_mconfig - add device configuration
 //-------------------------------------------------
 
-MACHINE_CONFIG_MEMBER( gottlieb_sound_r1_with_votrax_device::device_add_mconfig )
+MACHINE_CONFIG_START(gottlieb_sound_r1_with_votrax_device::device_add_mconfig)
 	gottlieb_sound_r1_device::device_add_mconfig(config);
 
 	// add the VOTRAX
@@ -413,17 +413,6 @@ gottlieb_sound_r2_device::gottlieb_sound_r2_device(const machine_config &mconfig
 		m_psg_data_latch(0),
 		m_sp0250_latch(0)
 {
-}
-
-
-//-------------------------------------------------
-//  static_enable_cobram3_mods - enable changes
-//  for cobram3
-//-------------------------------------------------
-
-void gottlieb_sound_r2_device::static_enable_cobram3_mods(device_t &device)
-{
-	downcast<gottlieb_sound_r2_device &>(device).m_cobram3_mod = true;
 }
 
 
@@ -615,7 +604,7 @@ WRITE8_MEMBER( gottlieb_sound_r2_device::sp0250_latch_w )
 //  sound CPU address map
 //-------------------------------------------------
 
-static ADDRESS_MAP_START( gottlieb_sound_r2_map, AS_PROGRAM, 8, gottlieb_sound_r2_device )
+ADDRESS_MAP_START(gottlieb_sound_r2_device::gottlieb_sound_r2_map)
 	AM_RANGE(0x0000, 0x03ff) AM_MIRROR(0x3c00) AM_RAM
 	AM_RANGE(0x4000, 0x4000) AM_MIRROR(0x3ffe) AM_DEVWRITE("dacvol", dac_byte_interface, write)
 	AM_RANGE(0x4001, 0x4001) AM_MIRROR(0x3ffe) AM_DEVWRITE("dac", dac_byte_interface, write)
@@ -628,7 +617,7 @@ ADDRESS_MAP_END
 //  sppech CPU address map
 //-------------------------------------------------
 
-static ADDRESS_MAP_START( gottlieb_speech_r2_map, AS_PROGRAM, 8, gottlieb_sound_r2_device )
+ADDRESS_MAP_START(gottlieb_sound_r2_device::gottlieb_speech_r2_map)
 	AM_RANGE(0x0000, 0x03ff) AM_MIRROR(0x1c00) AM_RAM
 	AM_RANGE(0x2000, 0x2000) AM_MIRROR(0x1fff) AM_WRITE(sp0250_latch_w)
 	AM_RANGE(0x4000, 0x4000) AM_MIRROR(0x1fff) AM_WRITE(speech_control_w)
@@ -664,7 +653,7 @@ INPUT_PORTS_END
 // device_add_mconfig - add device configuration
 //-------------------------------------------------
 
-MACHINE_CONFIG_MEMBER( gottlieb_sound_r2_device::device_add_mconfig )
+MACHINE_CONFIG_START(gottlieb_sound_r2_device::device_add_mconfig)
 	// audio CPUs
 	MCFG_CPU_ADD("audiocpu", M6502, SOUND2_CLOCK/4)
 	MCFG_CPU_PROGRAM_MAP(gottlieb_sound_r2_map)

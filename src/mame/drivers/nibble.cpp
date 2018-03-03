@@ -54,7 +54,7 @@
 #include "screen.h"
 
 
-#define MASTER_CLOCK    XTAL_12MHz
+#define MASTER_CLOCK    XTAL(12'000'000)
 
 
 class nibble_state : public driver_device
@@ -79,6 +79,9 @@ public:
 	INTERRUPT_GEN_MEMBER(nibble_interrupt);
 	required_device<cpu_device> m_maincpu;
 	required_device<gfxdecode_device> m_gfxdecode;
+	void nibble(machine_config &config);
+	void nibble_cru_map(address_map &map);
+	void nibble_map(address_map &map);
 };
 
 
@@ -149,7 +152,7 @@ void nibble_state::machine_reset()
 * Memory Map Information *
 *************************/
 
-static ADDRESS_MAP_START( nibble_map, AS_PROGRAM, 16, nibble_state )
+ADDRESS_MAP_START(nibble_state::nibble_map)
 //  ADDRESS_MAP_GLOBAL_MASK(0x3fff)
 	AM_RANGE(0x0000, 0xbfff) AM_ROM
 	AM_RANGE(0xc000, 0xc3ff) AM_WRITE(nibble_videoram_w) AM_SHARE("videoram")   // placeholder
@@ -158,7 +161,7 @@ static ADDRESS_MAP_START( nibble_map, AS_PROGRAM, 16, nibble_state )
 ADDRESS_MAP_END
 
 
-static ADDRESS_MAP_START( nibble_cru_map, AS_IO, 8, nibble_state )
+ADDRESS_MAP_START(nibble_state::nibble_cru_map)
 ADDRESS_MAP_END
 
 
@@ -301,7 +304,7 @@ GFXDECODE_END
 *    Machine Drivers     *
 *************************/
 
-static MACHINE_CONFIG_START( nibble )
+MACHINE_CONFIG_START(nibble_state::nibble)
 
 	MCFG_TMS99xx_ADD("maincpu", TMS9900, MASTER_CLOCK/4, nibble_map, nibble_cru_map)
 	MCFG_CPU_VBLANK_INT_DRIVER("screen", nibble_state,  nibble_interrupt)

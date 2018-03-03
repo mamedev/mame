@@ -45,6 +45,9 @@ public:
 
 	MC6845_UPDATE_ROW(crtc_update_row);
 
+	void mx2178(machine_config &config);
+	void mx2178_io(address_map &map);
+	void mx2178_mem(address_map &map);
 private:
 	virtual void machine_reset() override;
 	required_device<palette_device> m_palette;
@@ -53,7 +56,7 @@ private:
 	required_region_ptr<u8> m_p_chargen;
 };
 
-static ADDRESS_MAP_START(mx2178_mem, AS_PROGRAM, 8, mx2178_state)
+ADDRESS_MAP_START(mx2178_state::mx2178_mem)
 	ADDRESS_MAP_UNMAP_HIGH
 	AM_RANGE(0x0000, 0x1fff) AM_ROM AM_REGION("roms", 0)
 	AM_RANGE(0x2000, 0x27ff) AM_RAM AM_SHARE("videoram")
@@ -61,7 +64,7 @@ static ADDRESS_MAP_START(mx2178_mem, AS_PROGRAM, 8, mx2178_state)
 	AM_RANGE(0xe000, 0xe7ff) AM_RAM
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START(mx2178_io, AS_IO, 8, mx2178_state)
+ADDRESS_MAP_START(mx2178_state::mx2178_io)
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	AM_RANGE(0x00, 0x00) AM_DEVREADWRITE("crtc", mc6845_device, status_r, address_w)
 	AM_RANGE(0x01, 0x01) AM_DEVREADWRITE("crtc", mc6845_device, register_r, register_w)
@@ -123,9 +126,9 @@ void mx2178_state::machine_reset()
 {
 }
 
-static MACHINE_CONFIG_START( mx2178 )
+MACHINE_CONFIG_START(mx2178_state::mx2178)
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", Z80, XTAL_18_8696MHz / 5) // guess
+	MCFG_CPU_ADD("maincpu", Z80, XTAL(18'869'600) / 5) // guess
 	MCFG_CPU_PROGRAM_MAP(mx2178_mem)
 	MCFG_CPU_IO_MAP(mx2178_io)
 
@@ -140,13 +143,13 @@ static MACHINE_CONFIG_START( mx2178 )
 	MCFG_PALETTE_ADD_MONOCHROME("palette")
 
 	/* Devices */
-	MCFG_MC6845_ADD("crtc", MC6845, "screen", XTAL_18_8696MHz / 8) // clk unknown
+	MCFG_MC6845_ADD("crtc", MC6845, "screen", XTAL(18'869'600) / 8) // clk unknown
 	MCFG_MC6845_SHOW_BORDER_AREA(false)
 	MCFG_MC6845_CHAR_WIDTH(8)
 	MCFG_MC6845_UPDATE_ROW_CB(mx2178_state, crtc_update_row)
 	MCFG_MC6845_OUT_VSYNC_CB(INPUTLINE("maincpu", INPUT_LINE_NMI))
 
-	MCFG_DEVICE_ADD("acia_clock", CLOCK, XTAL_18_8696MHz / 30)
+	MCFG_DEVICE_ADD("acia_clock", CLOCK, XTAL(18'869'600) / 30)
 	MCFG_CLOCK_SIGNAL_HANDLER(DEVWRITELINE("acia1", acia6850_device, write_txc))
 	MCFG_DEVCB_CHAIN_OUTPUT(DEVWRITELINE("acia1", acia6850_device, write_rxc))
 	MCFG_DEVCB_CHAIN_OUTPUT(DEVWRITELINE("acia2", acia6850_device, write_rxc))

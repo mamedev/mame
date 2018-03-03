@@ -66,6 +66,8 @@ public:
 	DECLARE_WRITE32_MEMBER(s3c2440_gpio_port_w);
 
 	bitmap_rgb32 m_bitmap;
+	void gizmondo(machine_config &config);
+	void gizmondo_map(address_map &map);
 };
 
 
@@ -165,7 +167,7 @@ void gizmondo_state::machine_reset()
     ADDRESS MAPS
 *******************************************************************************/
 
-static ADDRESS_MAP_START( gizmondo_map, AS_PROGRAM, 32, gizmondo_state )
+ADDRESS_MAP_START(gizmondo_state::gizmondo_map)
 	AM_RANGE(0x00000000, 0x000007ff) AM_ROM
 	AM_RANGE(0x00000800, 0x00000fff) AM_DEVREADWRITE16("diskonchip", diskonchip_g3_device, sec_1_r, sec_1_w, 0xffffffff)
 	AM_RANGE(0x00001000, 0x000017ff) AM_DEVREADWRITE16("diskonchip", diskonchip_g3_device, sec_2_r, sec_2_w, 0xffffffff)
@@ -183,7 +185,7 @@ DRIVER_INIT_MEMBER(gizmondo_state,gizmondo)
 	// do nothing
 }
 
-static MACHINE_CONFIG_START( gizmondo )
+MACHINE_CONFIG_START(gizmondo_state::gizmondo)
 	MCFG_CPU_ADD("maincpu", ARM9, 40000000)
 	MCFG_CPU_PROGRAM_MAP(gizmondo_map)
 

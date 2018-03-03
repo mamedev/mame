@@ -110,7 +110,7 @@ DEFINE_DEVICE_TYPE(ISA8_MDA, isa8_mda_device, "isa_ibm_mda", "IBM Monochrome Dis
 //  device_add_mconfig - add device configuration
 //-------------------------------------------------
 
-MACHINE_CONFIG_MEMBER( isa8_mda_device::device_add_mconfig )
+MACHINE_CONFIG_START(isa8_mda_device::device_add_mconfig)
 	MCFG_SCREEN_ADD( MDA_SCREEN_NAME, RASTER)
 	MCFG_SCREEN_RAW_PARAMS(MDA_CLOCK, 882, 0, 720, 370, 0, 350 )
 	MCFG_SCREEN_UPDATE_DEVICE( MDA_MC6845_NAME, mc6845_device, screen_update )
@@ -538,7 +538,7 @@ DEFINE_DEVICE_TYPE(ISA8_HERCULES, isa8_hercules_device, "isa_hercules", "Hercule
 //  device_add_mconfig - add device configuration
 //-------------------------------------------------
 
-MACHINE_CONFIG_MEMBER( isa8_hercules_device::device_add_mconfig )
+MACHINE_CONFIG_START(isa8_hercules_device::device_add_mconfig)
 	MCFG_SCREEN_ADD( HERCULES_SCREEN_NAME, RASTER)
 	MCFG_SCREEN_RAW_PARAMS(MDA_CLOCK, 882, 0, 720, 370, 0, 350 )
 	MCFG_SCREEN_UPDATE_DEVICE( HERCULES_MC6845_NAME, mc6845_device, screen_update )
@@ -756,7 +756,7 @@ DEFINE_DEVICE_TYPE(ISA8_EC1840_0002, isa8_ec1840_0002_device, "ec1840_0002", "EC
 //-------------------------------------------------
 
 // XXX
-MACHINE_CONFIG_MEMBER( isa8_ec1840_0002_device::device_add_mconfig )
+MACHINE_CONFIG_START(isa8_ec1840_0002_device::device_add_mconfig)
 	MCFG_SCREEN_ADD( MDA_SCREEN_NAME, RASTER)
 	MCFG_SCREEN_RAW_PARAMS(MDA_CLOCK, 792, 0, 640, 370, 0, 350 )
 	MCFG_SCREEN_UPDATE_DEVICE( MDA_MC6845_NAME, mc6845_device, screen_update )

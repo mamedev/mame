@@ -88,4 +88,6 @@ public:
 	DECLARE_WRITE_LINE_MEMBER(write_centronics_perror);
 	DECLARE_WRITE_LINE_MEMBER(write_centronics_select);
 	DECLARE_WRITE_LINE_MEMBER(write_centronics_fault);
+	void sage2(machine_config &config);
+	void sage2_mem(address_map &map);
 };

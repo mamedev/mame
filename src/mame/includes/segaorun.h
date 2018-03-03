@@ -64,8 +64,8 @@ public:
 
 	// memory mapping
 	void memory_mapper(sega_315_5195_mapper_device &mapper, uint8_t index);
-	uint8_t mapper_sound_r();
-	void mapper_sound_w(uint8_t data);
+	DECLARE_READ8_MEMBER(mapper_sound_r);
+	DECLARE_WRITE8_MEMBER(mapper_sound_w);
 
 	// main CPU read/write handlers
 	DECLARE_READ16_MEMBER( misc_io_r );
@@ -93,6 +93,18 @@ public:
 	CUSTOM_INPUT_MEMBER( bankmotor_pos_r );
 	TIMER_DEVICE_CALLBACK_MEMBER(bankmotor_update);
 
+	void shangon_fd1089b(machine_config &config);
+	void outrun_fd1094(machine_config &config);
+	void outrundx(machine_config &config);
+	void shangon(machine_config &config);
+	void outrun_fd1089a(machine_config &config);
+	void outrun(machine_config &config);
+	void outrun_base(machine_config &config);
+	void decrypted_opcodes_map(address_map &map);
+	void outrun_map(address_map &map);
+	void sound_map(address_map &map);
+	void sound_portmap(address_map &map);
+	void sub_map(address_map &map);
 protected:
 	// timer IDs
 	enum

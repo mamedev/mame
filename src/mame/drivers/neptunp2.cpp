@@ -27,6 +27,9 @@ public:
 
 	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 
+	void neptunp2(machine_config &config);
+	void neptunp2_io(address_map &map);
+	void neptunp2_map(address_map &map);
 protected:
 
 	// devices
@@ -51,7 +54,7 @@ READ8_MEMBER( neptunp2_state::test_r )
 	return machine().rand();
 }
 
-static ADDRESS_MAP_START( neptunp2_map, AS_PROGRAM, 8, neptunp2_state )
+ADDRESS_MAP_START(neptunp2_state::neptunp2_map)
 	AM_RANGE(0x00000, 0xbffff) AM_ROM
 	AM_RANGE(0xe0000, 0xeffff) AM_RAM
 
@@ -68,7 +71,7 @@ static ADDRESS_MAP_START( neptunp2_map, AS_PROGRAM, 8, neptunp2_state )
 	AM_RANGE(0xffff0, 0xfffff) AM_ROM
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( neptunp2_io, AS_IO, 8, neptunp2_state )
+ADDRESS_MAP_START(neptunp2_state::neptunp2_io)
 ADDRESS_MAP_END
 
 
@@ -92,7 +95,7 @@ static GFXDECODE_START( neptunp2 )
 //  GFXDECODE_ENTRY( "gfx1", 0, charlayout,     0, 8 )
 GFXDECODE_END
 
-static MACHINE_CONFIG_START( neptunp2 )
+MACHINE_CONFIG_START(neptunp2_state::neptunp2)
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu",I80188,20000000) // N80C188-20 AMD

@@ -250,6 +250,9 @@ public:
 	int mole_state_a[6];
 	int mole_state_b[6];
 
+	void kenseim(machine_config &config);
+	void kenseim_io_map(address_map &map);
+	void kenseim_map(address_map &map);
 };
 
 
@@ -453,12 +456,12 @@ WRITE8_MEMBER(kenseim_state::cpu_porte_w)
 
 
 
-static ADDRESS_MAP_START( kenseim_map, AS_PROGRAM, 8, kenseim_state )
+ADDRESS_MAP_START(kenseim_state::kenseim_map)
 	AM_RANGE(0x0000, 0x7fff) AM_ROM
 	AM_RANGE(0x8000, 0xffff) AM_RAM
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( kenseim_io_map, AS_IO, 8, kenseim_state )
+ADDRESS_MAP_START(kenseim_state::kenseim_io_map)
 	AM_RANGE(0x20, 0x27) AM_MIRROR(0xff00) AM_DEVREADWRITE("mb89363b", mb89363b_device, read, write)
 ADDRESS_MAP_END
 
@@ -470,10 +473,11 @@ static const z80_daisy_config daisy_chain_gamecpu[] =
 	{ nullptr }
 };
 
-static MACHINE_CONFIG_DERIVED( kenseim, cps1_12MHz )
+MACHINE_CONFIG_START(kenseim_state::kenseim)
+	cps1_12MHz(config);
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("gamecpu", TMPZ84C011, XTAL_16MHz/2) // tmpz84c011-8
+	MCFG_CPU_ADD("gamecpu", TMPZ84C011, XTAL(16'000'000)/2) // tmpz84c011-8
 	MCFG_Z80_DAISY_CHAIN(daisy_chain_gamecpu)
 	MCFG_CPU_PROGRAM_MAP(kenseim_map)
 	MCFG_CPU_IO_MAP(kenseim_io_map)
@@ -677,7 +681,7 @@ ROM_START( kenseim )
 	ROM_LOAD( "bprg1.11d",    0x0000, 0x0117, CRC(31793da7) SHA1(400fa7ac517421c978c1ee7773c30b9ed0c5d3f3) )
 
 	ROM_REGION( 0x0200, "cboardplds", ROMREGION_ERASE00 )
-	ROM_LOAD( "ioc1.ic7",     0x0000, 0x0117, CRC(0d182081) SHA1(475b3d417785da4bc512cce2b274bb00d4cc6792) )
+	ROM_LOAD( "ioc1.ic7",     0x0000, 0x0104, CRC(a399772d) SHA1(55471189db573dd61e3087d12c55564291672c77) )
 	ROM_LOAD( "c632.ic1",     0x0000, 0x0117, CRC(0fbd9270) SHA1(d7e737b20c44d41e29ca94be56114b31934dde81) )
 
 	ROM_REGION( 0x08000, "gamecpu", 0 )

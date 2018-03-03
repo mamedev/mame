@@ -69,4 +69,7 @@ public:
 	void decrypt_snd();
 
 	TIMER_DEVICE_CALLBACK_MEMBER(scanline);
+	void darkmist(machine_config &config);
+	void decrypted_opcodes_map(address_map &map);
+	void memmap(address_map &map);
 };

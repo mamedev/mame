@@ -75,7 +75,7 @@ SRAM:
 #include "speaker.h"
 
 
-#define MAIN_CLOCK XTAL_18_432MHz
+#define MAIN_CLOCK XTAL(18'432'000)
 
 
 WRITE8_MEMBER(ksayakyu_state::bank_select_w)
@@ -113,7 +113,7 @@ READ8_MEMBER(ksayakyu_state::int_ack_r)
 	return 0xff; // value not used
 }
 
-static ADDRESS_MAP_START( maincpu_map, AS_PROGRAM, 8, ksayakyu_state )
+ADDRESS_MAP_START(ksayakyu_state::maincpu_map)
 	AM_RANGE(0x0000, 0x3fff) AM_ROM
 	AM_RANGE(0x4000, 0x7fff) AM_ROMBANK("bank1")
 	AM_RANGE(0x8000, 0x9fff) AM_ROM
@@ -131,7 +131,7 @@ static ADDRESS_MAP_START( maincpu_map, AS_PROGRAM, 8, ksayakyu_state )
 	AM_RANGE(0xb800, 0xbfff) AM_RAM AM_SHARE("spriteram")
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( soundcpu_map, AS_PROGRAM, 8, ksayakyu_state )
+ADDRESS_MAP_START(ksayakyu_state::soundcpu_map)
 	AM_RANGE(0x0000, 0x7fff) AM_ROM
 	AM_RANGE(0x8000, 0x83ff) AM_RAM
 	AM_RANGE(0xa001, 0xa001) AM_DEVREAD("ay1", ay8910_device, data_r)
@@ -256,7 +256,7 @@ void ksayakyu_state::machine_reset()
 	m_flipscreen = 0;
 }
 
-static MACHINE_CONFIG_START( ksayakyu )
+MACHINE_CONFIG_START(ksayakyu_state::ksayakyu)
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", Z80,MAIN_CLOCK/8) //divider is guessed

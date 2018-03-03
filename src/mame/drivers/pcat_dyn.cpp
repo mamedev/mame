@@ -59,6 +59,10 @@ public:
 	DECLARE_WRITE8_MEMBER(dma8237_1_dack_w);
 	virtual void machine_start() override;
 	void nvram_init(nvram_device &nvram, void *base, size_t size);
+	static void pcat_dyn_sb_conf(device_t *device);
+	void pcat_dyn(machine_config &config);
+	void pcat_io(address_map &map);
+	void pcat_map(address_map &map);
 };
 
 void pcat_dyn_state::machine_start()
@@ -93,7 +97,7 @@ WRITE8_MEMBER(pcat_dyn_state::bank2_w)
 	m_nvram_bank->set_entry(data & 1);
 }
 
-static ADDRESS_MAP_START( pcat_map, AS_PROGRAM, 32, pcat_dyn_state )
+ADDRESS_MAP_START(pcat_dyn_state::pcat_map)
 	AM_RANGE(0x00000000, 0x0009ffff) AM_RAM
 	AM_RANGE(0x000a0000, 0x000bffff) AM_DEVREADWRITE8("vga", trident_vga_device, mem_r, mem_w, 0xffffffff)
 	AM_RANGE(0x000c0000, 0x000c7fff) AM_ROM AM_REGION("video_bios", 0)
@@ -107,7 +111,7 @@ static ADDRESS_MAP_START( pcat_map, AS_PROGRAM, 32, pcat_dyn_state )
 	AM_RANGE(0xffff0000, 0xffffffff) AM_ROM AM_REGION("bios", 0 )
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( pcat_io, AS_IO, 32, pcat_dyn_state )
+ADDRESS_MAP_START(pcat_dyn_state::pcat_io)
 	AM_IMPORT_FROM(pcat32_io_common)
 	AM_RANGE(0x03b0, 0x03bf) AM_DEVREADWRITE8("vga", trident_vga_device, port_03b0_r, port_03b0_w, 0xffffffff)
 	AM_RANGE(0x03c0, 0x03cf) AM_DEVREADWRITE8("vga", trident_vga_device, port_03c0_r, port_03c0_w, 0xffffffff)
@@ -147,12 +151,13 @@ static DEVICE_INPUT_DEFAULTS_START( pcat_dyn_sb_def )
 	DEVICE_INPUT_DEFAULTS("CONFIG", 0x03, 0x01)
 DEVICE_INPUT_DEFAULTS_END
 
-static MACHINE_CONFIG_START( pcat_dyn_sb_conf )
-	MCFG_DEVICE_MODIFY("pc_joy")
+void pcat_dyn_state::pcat_dyn_sb_conf(device_t *device)
+{
+	device = device->subdevice("pc_joy");
 	MCFG_DEVICE_SLOT_INTERFACE(pc_joysticks, nullptr, true) // remove joystick
-MACHINE_CONFIG_END
+}
 
-static MACHINE_CONFIG_START( pcat_dyn )
+MACHINE_CONFIG_START(pcat_dyn_state::pcat_dyn)
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", I486, 40000000) /* Am486 DX-40 */
 	MCFG_CPU_PROGRAM_MAP(pcat_map)
@@ -160,12 +165,12 @@ static MACHINE_CONFIG_START( pcat_dyn )
 	MCFG_CPU_IRQ_ACKNOWLEDGE_DEVICE("pic8259_1", pic8259_device, inta_cb)
 
 	/* video hardware */
-	MCFG_FRAGMENT_ADD( pcvideo_trident_vga )
+	pcvideo_trident_vga(config);
 	MCFG_SCREEN_MODIFY("screen")
 	MCFG_SCREEN_REFRESH_RATE(60)
 	MCFG_DEVICE_REPLACE("vga", TVGA9000_VGA, 0)
 
-	MCFG_FRAGMENT_ADD( pcat_common )
+	pcat_common(config);
 
 	MCFG_DEVICE_REMOVE("rtc")
 	MCFG_DS12885_ADD("rtc")
@@ -182,7 +187,7 @@ static MACHINE_CONFIG_START( pcat_dyn )
 
 	MCFG_NVRAM_ADD_CUSTOM_DRIVER("nvram", pcat_dyn_state, nvram_init)
 
-	MCFG_DEVICE_ADD( "ns16550", NS16550, XTAL_1_8432MHz )
+	MCFG_DEVICE_ADD( "ns16550", NS16550, XTAL(1'843'200) )
 	MCFG_INS8250_OUT_TX_CB(DEVWRITELINE("serport", rs232_port_device, write_txd))
 	MCFG_INS8250_OUT_DTR_CB(DEVWRITELINE("serport", rs232_port_device, write_dtr))
 	MCFG_INS8250_OUT_RTS_CB(DEVWRITELINE("serport", rs232_port_device, write_rts))

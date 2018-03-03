@@ -147,7 +147,7 @@ WRITE16_MEMBER(lockon_state::emres_w)
  *
  *************************************/
 
-static ADDRESS_MAP_START( main_v30, AS_PROGRAM, 16, lockon_state )
+ADDRESS_MAP_START(lockon_state::main_v30)
 	ADDRESS_MAP_UNMAP_HIGH
 	AM_RANGE(0x00000, 0x03fff) AM_RAM
 	AM_RANGE(0x04000, 0x04003) AM_READWRITE(lockon_crtc_r, lockon_crtc_w)
@@ -169,7 +169,7 @@ static ADDRESS_MAP_START( main_v30, AS_PROGRAM, 16, lockon_state )
 ADDRESS_MAP_END
 
 
-static ADDRESS_MAP_START( ground_v30, AS_PROGRAM, 16, lockon_state )
+ADDRESS_MAP_START(lockon_state::ground_v30)
 	ADDRESS_MAP_UNMAP_HIGH
 	AM_RANGE(0x00000, 0x03fff) AM_RAM
 	AM_RANGE(0x04000, 0x04fff) AM_RAM AM_SHARE("scene_ram")
@@ -182,7 +182,7 @@ static ADDRESS_MAP_START( ground_v30, AS_PROGRAM, 16, lockon_state )
 ADDRESS_MAP_END
 
 
-static ADDRESS_MAP_START( object_v30, AS_PROGRAM, 16, lockon_state )
+ADDRESS_MAP_START(lockon_state::object_v30)
 	ADDRESS_MAP_UNMAP_HIGH
 	AM_RANGE(0x00000, 0x03fff) AM_RAM
 	AM_RANGE(0x04000, 0x04001) AM_READWRITE(lockon_obj_4000_r, lockon_obj_4000_w)
@@ -192,7 +192,7 @@ static ADDRESS_MAP_START( object_v30, AS_PROGRAM, 16, lockon_state )
 ADDRESS_MAP_END
 
 
-static ADDRESS_MAP_START( sound_prg, AS_PROGRAM, 8, lockon_state )
+ADDRESS_MAP_START(lockon_state::sound_prg)
 	ADDRESS_MAP_UNMAP_HIGH
 	AM_RANGE(0x0000, 0x6fff) AM_ROM
 	AM_RANGE(0x7000, 0x7000) AM_WRITE(sound_vol)
@@ -200,7 +200,7 @@ static ADDRESS_MAP_START( sound_prg, AS_PROGRAM, 8, lockon_state )
 	AM_RANGE(0x7800, 0x7fff) AM_MIRROR(0x8000) AM_RAM
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( sound_io, AS_IO, 8, lockon_state )
+ADDRESS_MAP_START(lockon_state::sound_io)
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	AM_RANGE(0x00, 0x01) AM_DEVREADWRITE("ymsnd", ym2203_device, read, write)
 	AM_RANGE(0x02, 0x02) AM_NOP
@@ -480,18 +480,18 @@ void lockon_state::machine_reset()
 	m_main_inten = 0;
 }
 
-static MACHINE_CONFIG_START( lockon )
+MACHINE_CONFIG_START(lockon_state::lockon)
 
-	MCFG_CPU_ADD("maincpu", V30, XTAL_16MHz / 2)
+	MCFG_CPU_ADD("maincpu", V30, XTAL(16'000'000) / 2)
 	MCFG_CPU_PROGRAM_MAP(main_v30)
 
-	MCFG_CPU_ADD("ground", V30, XTAL_16MHz / 2)
+	MCFG_CPU_ADD("ground", V30, XTAL(16'000'000) / 2)
 	MCFG_CPU_PROGRAM_MAP(ground_v30)
 
-	MCFG_CPU_ADD("object", V30, XTAL_16MHz / 2)
+	MCFG_CPU_ADD("object", V30, XTAL(16'000'000) / 2)
 	MCFG_CPU_PROGRAM_MAP(object_v30)
 
-	MCFG_CPU_ADD("audiocpu", Z80, XTAL_16MHz / 4)
+	MCFG_CPU_ADD("audiocpu", Z80, XTAL(16'000'000) / 4)
 	MCFG_CPU_PROGRAM_MAP(sound_prg)
 	MCFG_CPU_IO_MAP(sound_io)
 
@@ -513,7 +513,7 @@ static MACHINE_CONFIG_START( lockon )
 
 	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
 
-	MCFG_SOUND_ADD("ymsnd", YM2203, XTAL_16MHz / 4)
+	MCFG_SOUND_ADD("ymsnd", YM2203, XTAL(16'000'000) / 4)
 	MCFG_YM2203_IRQ_HANDLER(WRITELINE(lockon_state, ym2203_irq))
 	MCFG_AY8910_PORT_A_READ_CB(IOPORT("YM2203"))
 	MCFG_AY8910_PORT_B_WRITE_CB(WRITE8(lockon_state, ym2203_out_b))

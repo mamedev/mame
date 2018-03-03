@@ -20,10 +20,10 @@
 // note: INT pins are only available on MB84x1
 // INTL is for the CPU on the left side, INTR for the one on the right
 #define MCFG_MB8421_INTL_HANDLER(_devcb) \
-	devcb = &mb8421_master_device::set_intl_handler(*device, DEVCB_##_devcb);
+	devcb = &downcast<mb8421_master_device &>(*device).set_intl_handler(DEVCB_##_devcb);
 
 #define MCFG_MB8421_INTR_HANDLER(_devcb) \
-	devcb = &mb8421_master_device::set_intr_handler(*device, DEVCB_##_devcb);
+	devcb = &downcast<mb8421_master_device &>(*device).set_intr_handler(DEVCB_##_devcb);
 
 
 //**************************************************************************
@@ -35,9 +35,9 @@
 class mb8421_master_device : public device_t
 {
 public:
-	// static configuration helpers
-	template <class Object> static devcb_base &set_intl_handler(device_t &device, Object &&cb) { return downcast<mb8421_master_device &>(device).m_intl_handler.set_callback(std::forward<Object>(cb)); }
-	template <class Object> static devcb_base &set_intr_handler(device_t &device, Object &&cb) { return downcast<mb8421_master_device &>(device).m_intr_handler.set_callback(std::forward<Object>(cb)); }
+	// configuration helpers
+	template <class Object> devcb_base &set_intl_handler(Object &&cb) { return m_intl_handler.set_callback(std::forward<Object>(cb)); }
+	template <class Object> devcb_base &set_intr_handler(Object &&cb) { return m_intr_handler.set_callback(std::forward<Object>(cb)); }
 
 	DECLARE_READ_LINE_MEMBER(busy_r) { return 0; } // _BUSY pin - not emulated
 

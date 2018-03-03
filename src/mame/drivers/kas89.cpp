@@ -201,7 +201,7 @@
 #include "kas89.lh"
 
 
-#define MASTER_CLOCK        XTAL_21_4772MHz
+#define MASTER_CLOCK        XTAL(21'477'272)
 #define VDP_MEM             0x40000
 
 
@@ -258,6 +258,11 @@ public:
 	virtual void machine_reset() override;
 	TIMER_DEVICE_CALLBACK_MEMBER(kas89_nmi_cb);
 	TIMER_DEVICE_CALLBACK_MEMBER(kas89_sound_nmi_cb);
+	void kas89(machine_config &config);
+	void audio_io(address_map &map);
+	void audio_map(address_map &map);
+	void kas89_io(address_map &map);
+	void kas89_map(address_map &map);
 };
 
 
@@ -506,7 +511,7 @@ WRITE8_MEMBER(kas89_state::led_mux_select_w)
 *             Memory Map              *
 **************************************/
 
-static ADDRESS_MAP_START( kas89_map, AS_PROGRAM, 8, kas89_state )
+ADDRESS_MAP_START(kas89_state::kas89_map)
 	AM_RANGE(0x0000, 0x7fff) AM_ROM
 	AM_RANGE(0x0037, 0x0037) AM_WRITENOP    /* WTF? */
 	AM_RANGE(0x8000, 0x81ff) AM_RAM     /* empty */
@@ -521,7 +526,7 @@ static ADDRESS_MAP_START( kas89_map, AS_PROGRAM, 8, kas89_state )
 	AM_RANGE(0x9800, 0x9fff) AM_RAM AM_SHARE("nvram")
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( kas89_io, AS_IO, 8, kas89_state )
+ADDRESS_MAP_START(kas89_state::kas89_io)
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	AM_RANGE(0x40, 0x43) AM_DEVREADWRITE("v9938", v9938_device, read, write)
 	AM_RANGE(0x80, 0x80) AM_WRITE(mux_w)
@@ -570,12 +575,12 @@ ADDRESS_MAP_END
   4aa1 : ret
 */
 
-static ADDRESS_MAP_START( audio_map, AS_PROGRAM, 8, kas89_state )
+ADDRESS_MAP_START(kas89_state::audio_map)
 	AM_RANGE(0x0000, 0x0fff) AM_ROM
 	AM_RANGE(0xc000, 0xc7ff) AM_RAM
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( audio_io, AS_IO, 8, kas89_state )
+ADDRESS_MAP_START(kas89_state::audio_io)
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	AM_RANGE(0x00, 0x00) AM_WRITE(int_ack_w)    // comm out (1st Z80). seems to write here the value previously read through soundlatch (port 0x02).
 	AM_RANGE(0x02, 0x02) AM_DEVREAD("soundlatch", generic_latch_8_device, read)
@@ -753,7 +758,7 @@ INPUT_PORTS_END
 *           Machine Driver            *
 **************************************/
 
-static MACHINE_CONFIG_START( kas89 )
+MACHINE_CONFIG_START(kas89_state::kas89)
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", Z80, MASTER_CLOCK/6)    /* Confirmed */
@@ -841,7 +846,7 @@ DRIVER_INIT_MEMBER(kas89_state,kas89)
 	/* Unscrambling data lines */
 	for ( i = 0; i < memsize; i++ )
 	{
-		mem[i] = BITSWAP8(mem[i], 3, 1, 0, 5, 6, 4, 7, 2);
+		mem[i] = bitswap<8>(mem[i], 3, 1, 0, 5, 6, 4, 7, 2);
 	}
 
 	/* Unscrambling address lines */
@@ -849,7 +854,7 @@ DRIVER_INIT_MEMBER(kas89_state,kas89)
 	memcpy(&buf[0], mem, memsize);
 	for ( i = 0; i < memsize; i++ )
 	{
-		mem[BITSWAP16(i, 15, 14, 5, 6, 3, 0, 12, 1, 9, 13, 4, 7, 10, 8, 2, 11)] = buf[i];
+		mem[bitswap<16>(i, 15, 14, 5, 6, 3, 0, 12, 1, 9, 13, 4, 7, 10, 8, 2, 11)] = buf[i];
 	}
 }
 

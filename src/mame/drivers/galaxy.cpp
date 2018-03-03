@@ -38,7 +38,7 @@ Galaksija driver by Krzysztof Strzecha and Miodrag Milanovic
 #include "speaker.h"
 
 
-static ADDRESS_MAP_START (galaxyp_io, AS_IO, 8, galaxy_state )
+ADDRESS_MAP_START(galaxy_state::galaxyp_io)
 	ADDRESS_MAP_GLOBAL_MASK(0x01)
 	ADDRESS_MAP_UNMAP_HIGH
 	AM_RANGE(0x00, 0x00) AM_DEVWRITE("ay8910", ay8910_device, address_w)
@@ -46,13 +46,13 @@ static ADDRESS_MAP_START (galaxyp_io, AS_IO, 8, galaxy_state )
 ADDRESS_MAP_END
 
 
-static ADDRESS_MAP_START (galaxy_mem, AS_PROGRAM, 8, galaxy_state )
+ADDRESS_MAP_START(galaxy_state::galaxy_mem)
 	AM_RANGE(0x0000, 0x0fff) AM_ROM
 	AM_RANGE(0x2000, 0x2037) AM_MIRROR(0x07c0) AM_READ(galaxy_keyboard_r )
 	AM_RANGE(0x2038, 0x203f) AM_MIRROR(0x07c0) AM_WRITE(galaxy_latch_w )
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START (galaxyp_mem, AS_PROGRAM, 8, galaxy_state )
+ADDRESS_MAP_START(galaxy_state::galaxyp_mem)
 	AM_RANGE(0x0000, 0x0fff) AM_ROM // ROM A
 	AM_RANGE(0x1000, 0x1fff) AM_ROM // ROM B
 	AM_RANGE(0x2000, 0x2037) AM_MIRROR(0x07c0) AM_READ(galaxy_keyboard_r )
@@ -172,7 +172,7 @@ static GFXDECODE_START( galaxy )
 GFXDECODE_END
 
 
-static MACHINE_CONFIG_START( galaxy )
+MACHINE_CONFIG_START(galaxy_state::galaxy)
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", Z80, XTAL / 2)
 	MCFG_CPU_PROGRAM_MAP(galaxy_mem)
@@ -214,7 +214,7 @@ static MACHINE_CONFIG_START( galaxy )
 	MCFG_RAM_EXTRA_OPTIONS("2K,22K,38K,54K")
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_START( galaxyp )
+MACHINE_CONFIG_START(galaxy_state::galaxyp)
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", Z80, XTAL / 2)
 	MCFG_CPU_PROGRAM_MAP(galaxyp_mem)

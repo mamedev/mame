@@ -139,6 +139,12 @@ public:
 	void render_jpeg();
 
 	void postload();
+	void sliver(machine_config &config);
+	void oki_map(address_map &map);
+	void ramdac_map(address_map &map);
+	void sliver_map(address_map &map);
+	void soundmem_io(address_map &map);
+	void soundmem_prg(address_map &map);
 };
 
 void sliver_state::machine_start()
@@ -346,7 +352,7 @@ WRITE16_MEMBER(sliver_state::sound_w)
 	m_audiocpu->set_input_line(MCS51_INT0_LINE, HOLD_LINE);
 }
 
-static ADDRESS_MAP_START( sliver_map, AS_PROGRAM, 16, sliver_state )
+ADDRESS_MAP_START(sliver_state::sliver_map)
 	AM_RANGE(0x000000, 0x0fffff) AM_ROM
 
 	AM_RANGE(0x100000, 0x100001) AM_DEVWRITE8("ramdac", ramdac_device, index_w, 0x00ff)
@@ -382,18 +388,16 @@ WRITE8_MEMBER(sliver_state::oki_setbank)
 	membank("okibank")->set_entry(bank);
 }
 
-static ADDRESS_MAP_START( soundmem_prg, AS_PROGRAM, 8, sliver_state )
+ADDRESS_MAP_START(sliver_state::soundmem_prg)
 	AM_RANGE(0x0000, 0xffff) AM_ROM
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( soundmem_io, AS_IO, 8, sliver_state )
+ADDRESS_MAP_START(sliver_state::soundmem_io)
 	AM_RANGE(0x0100, 0x0100) AM_DEVREADWRITE("oki", okim6295_device, read, write)
 	AM_RANGE(0x0101, 0x0101) AM_DEVREAD("soundlatch", generic_latch_8_device, read)
-	/* ports */
-	AM_RANGE(MCS51_PORT_P1, MCS51_PORT_P1) AM_WRITE(oki_setbank )
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( oki_map, 0, 8, sliver_state )
+ADDRESS_MAP_START(sliver_state::oki_map)
 	AM_RANGE(0x00000, 0x1ffff) AM_ROM
 	AM_RANGE(0x20000, 0x3ffff) AM_ROMBANK("okibank")
 ADDRESS_MAP_END
@@ -495,7 +499,7 @@ static INPUT_PORTS_START( sliver )
 	PORT_DIPUNUSED_DIPLOC( 0x8000, 0x0000, "SW2:8" )    /* Listed as "UNUSED (MUST ON)" */
 INPUT_PORTS_END
 
-static ADDRESS_MAP_START( ramdac_map, 0, 8, sliver_state )
+ADDRESS_MAP_START(sliver_state::ramdac_map)
 	AM_RANGE(0x000, 0x3ff) AM_RAM AM_SHARE("colorram")
 ADDRESS_MAP_END
 
@@ -504,7 +508,7 @@ TIMER_DEVICE_CALLBACK_MEMBER ( sliver_state::obj_irq_cb )
 	m_maincpu->set_input_line(3, HOLD_LINE);
 }
 
-static MACHINE_CONFIG_START( sliver )
+MACHINE_CONFIG_START(sliver_state::sliver)
 	MCFG_CPU_ADD("maincpu", M68000, 12000000)
 	MCFG_CPU_PROGRAM_MAP(sliver_map)
 	MCFG_CPU_VBLANK_INT_DRIVER("screen", sliver_state, irq4_line_hold)
@@ -514,6 +518,7 @@ static MACHINE_CONFIG_START( sliver )
 	MCFG_CPU_ADD("audiocpu", I8051, 8000000)
 	MCFG_CPU_PROGRAM_MAP(soundmem_prg)
 	MCFG_CPU_IO_MAP(soundmem_io)
+	MCFG_MCS51_PORT_P1_OUT_CB(WRITE8(sliver_state, oki_setbank))
 
 	MCFG_SCREEN_ADD("screen", RASTER)
 	MCFG_SCREEN_REFRESH_RATE(60)

@@ -63,4 +63,10 @@ public:
 	DECLARE_PALETTE_INIT(matmania);
 	uint32_t screen_update_matmania(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	uint32_t screen_update_maniach(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	void matmania(machine_config &config);
+	void maniach(machine_config &config);
+	void maniach_map(address_map &map);
+	void maniach_sound_map(address_map &map);
+	void matmania_map(address_map &map);
+	void matmania_sound_map(address_map &map);
 };

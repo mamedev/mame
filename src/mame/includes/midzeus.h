@@ -6,7 +6,7 @@
 
 **************************************************************************/
 
-#define MIDZEUS_VIDEO_CLOCK     XTAL_66_6667MHz
+#define MIDZEUS_VIDEO_CLOCK     XTAL(66'666'700)
 
 #include "machine/timekpr.h"
 #include "screen.h"
@@ -75,6 +75,10 @@ public:
 	INTERRUPT_GEN_MEMBER(display_irq);
 	TIMER_CALLBACK_MEMBER(display_irq_off);
 	TIMER_CALLBACK_MEMBER(invasn_gun_callback);
+	void midzeus(machine_config &config);
+	void invasn(machine_config &config);
+	void mk4(machine_config &config);
+	void zeus_map(address_map &map);
 private:
 	void exit_handler();
 	void zeus_pointer_w(uint32_t which, uint32_t data, bool logit);

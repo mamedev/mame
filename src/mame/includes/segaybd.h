@@ -85,6 +85,18 @@ public:
 	// video updates
 	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 
+	void yboard_deluxe(machine_config &config);
+	void yboard_link(machine_config &config);
+	void yboard(machine_config &config);
+	void link_map(address_map &map);
+	void link_portmap(address_map &map);
+	void main_map(address_map &map);
+	void main_map_link(address_map &map);
+	void motor_map(address_map &map);
+	void sound_map(address_map &map);
+	void sound_portmap(address_map &map);
+	void subx_map(address_map &map);
+	void suby_map(address_map &map);
 protected:
 	// internal types
 	typedef delegate<void (uint16_t)> output_delegate;

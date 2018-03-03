@@ -25,7 +25,7 @@
 #include "screen.h"
 #include "speaker.h"
 
-#define MAIN_CLOCK XTAL_6_144MHz
+static constexpr XTAL MAIN_CLOCK = 6.144_MHz_XTAL;
 
 class fp200_state : public driver_device
 {
@@ -68,6 +68,9 @@ public:
 	DECLARE_READ_LINE_MEMBER(sid_r);
 
 	DECLARE_PALETTE_INIT(fp200);
+	void fp200(machine_config &config);
+	void fp200_io(address_map &map);
+	void fp200_map(address_map &map);
 protected:
 	// driver_device overrides
 	virtual void machine_start() override;
@@ -409,7 +412,7 @@ WRITE8_MEMBER(fp200_state::fp200_io_w)
 	}
 }
 
-static ADDRESS_MAP_START( fp200_map, AS_PROGRAM, 8, fp200_state )
+ADDRESS_MAP_START(fp200_state::fp200_map)
 	AM_RANGE(0x0000, 0x7fff) AM_ROM
 	AM_RANGE(0x8000, 0x9fff) AM_RAM
 //  0xa000, 0xffff exp RAM
@@ -418,7 +421,7 @@ static ADDRESS_MAP_START( fp200_map, AS_PROGRAM, 8, fp200_state )
 	AM_RANGE(0xe000, 0xffff) AM_RAM
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( fp200_io, AS_IO, 8, fp200_state )
+ADDRESS_MAP_START(fp200_state::fp200_io)
 	AM_RANGE(0x00, 0xff) AM_READWRITE(fp200_io_r,fp200_io_w)
 ADDRESS_MAP_END
 
@@ -554,7 +557,7 @@ void fp200_state::machine_start()
 
 	for(int i=0;i<0x800;i++)
 	{
-		m_chargen[i] = raw_gfx[BITSWAP16(i,15,14,13,12,11,6,5,4,3,10,9,8,7,2,1,0)];
+		m_chargen[i] = raw_gfx[bitswap<16>(i,15,14,13,12,11,6,5,4,3,10,9,8,7,2,1,0)];
 	}
 }
 
@@ -579,7 +582,7 @@ READ_LINE_MEMBER( fp200_state::sid_r )
 	return (ioport("KEYMOD")->read() >> m_keyb_mux) & 1;
 }
 
-static MACHINE_CONFIG_START( fp200 )
+MACHINE_CONFIG_START(fp200_state::fp200)
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu",I8085A,MAIN_CLOCK)

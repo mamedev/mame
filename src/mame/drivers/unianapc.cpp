@@ -41,6 +41,8 @@ public:
 	virtual void machine_reset() override;
 	virtual void video_start() override;
 	uint32_t screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
+	void unianapc(machine_config &config);
+	void unianapc_map(address_map &map);
 };
 
 void unianapc_state::video_start()
@@ -52,7 +54,7 @@ uint32_t unianapc_state::screen_update(screen_device &screen, bitmap_rgb32 &bitm
 	return 0;
 }
 
-static ADDRESS_MAP_START( unianapc_map, AS_PROGRAM, 32, unianapc_state )
+ADDRESS_MAP_START(unianapc_state::unianapc_map)
 ADDRESS_MAP_END
 
 static INPUT_PORTS_START( unianapc )
@@ -67,7 +69,7 @@ void unianapc_state::machine_reset()
 {
 }
 
-static MACHINE_CONFIG_START( unianapc )
+MACHINE_CONFIG_START(unianapc_state::unianapc)
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", PENTIUM3, 100000000) // actually a Celeron at 1.70 GHz

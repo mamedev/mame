@@ -152,13 +152,7 @@ public:
 		m_mouse0(*this, "MOUSE0"),
 		m_mouse1(*this, "MOUSE1"),
 		m_mouse2(*this, "MOUSE2"),
-		m_key0(*this, "KEY0"),
-		m_key1(*this, "KEY1"),
-		m_key2(*this, "KEY2"),
-		m_key3(*this, "KEY3"),
-		m_key4(*this, "KEY4"),
-		m_key5(*this, "KEY5"),
-		m_key6(*this, "KEY6"),
+		m_key_port(*this, "KEY%u", 0),
 		m_screen(*this, "screen"),
 		m_dac(*this, DAC_TAG),
 		m_scc(*this, SCC_TAG)
@@ -173,8 +167,7 @@ public:
 	optional_device<rtc3430042_device> m_rtc;
 
 	required_ioport m_mouse0, m_mouse1, m_mouse2;
-	required_ioport m_key0, m_key1, m_key2, m_key3, m_key4, m_key5;
-	optional_ioport m_key6;
+	optional_ioport_array<7> m_key_port;
 
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
@@ -266,6 +259,11 @@ public:
 	void mac_driver_init(mac128model_t model);
 	void update_volume();
 
+	void mac512ke(machine_config &config);
+	void mac128k(machine_config &config);
+	void macplus(machine_config &config);
+	void mac512ke_map(address_map &map);
+	void macplus_map(address_map &map);
 private:
 	// wait states for accessing the VIA
 	int m_via_cycles;
@@ -636,22 +634,22 @@ READ16_MEMBER ( mac128_state::mac_iwm_r )
 	 */
 
 	uint16_t result = 0;
-	applefdc_base_device *fdc = space.machine().device<applefdc_base_device>("fdc");
+	applefdc_base_device *fdc = machine().device<applefdc_base_device>("fdc");
 
 	result = fdc->read(offset >> 8);
 
 	if (LOG_MAC_IWM)
-		printf("mac_iwm_r: offset=0x%08x mem_mask %04x = %02x (PC %x)\n", offset, mem_mask, result, space.device().safe_pc());
+		printf("mac_iwm_r: offset=0x%08x mem_mask %04x = %02x (PC %x)\n", offset, mem_mask, result, m_maincpu->pc());
 
 	return (result << 8) | result;
 }
 
 WRITE16_MEMBER ( mac128_state::mac_iwm_w )
 {
-	applefdc_base_device *fdc = space.machine().device<applefdc_base_device>("fdc");
+	applefdc_base_device *fdc = machine().device<applefdc_base_device>("fdc");
 
 	if (LOG_MAC_IWM)
-		printf("mac_iwm_w: offset=0x%08x data=0x%04x mask %04x (PC=%x)\n", offset, data, mem_mask, space.device().safe_pc());
+		printf("mac_iwm_w: offset=0x%08x data=0x%04x mask %04x (PC=%x)\n", offset, data, mem_mask, m_maincpu->pc());
 
 	if (ACCESSING_BITS_0_7)
 		fdc->write((offset >> 8), data & 0xff);
@@ -815,7 +813,6 @@ int mac128_state::scan_keyboard()
 	int i, j;
 	int keybuf = 0;
 	int keycode;
-	ioport_port *ports[7] = { m_key0, m_key1, m_key2, m_key3, m_key4, m_key5, m_key6 };
 
 	if (m_keycode_buf_index)
 	{
@@ -824,7 +821,7 @@ int mac128_state::scan_keyboard()
 
 	for (i=0; i<7; i++)
 	{
-		keybuf = ports[i]->read();
+		keybuf = m_key_port[i]->read();
 
 		if (keybuf != m_key_matrix[i])
 		{
@@ -1281,7 +1278,7 @@ MAC_DRIVER_INIT(macplus, MODEL_MAC_PLUS)
     ADDRESS MAPS
 ***************************************************************************/
 
-static ADDRESS_MAP_START(mac512ke_map, AS_PROGRAM, 16, mac128_state )
+ADDRESS_MAP_START(mac128_state::mac512ke_map)
 	AM_RANGE(0x000000, 0x3fffff) AM_READWRITE(ram_r, ram_w)
 	AM_RANGE(0x400000, 0x4fffff) AM_ROM AM_REGION("bootrom", 0) AM_MIRROR(0x100000)
 	AM_RANGE(0x600000, 0x6fffff) AM_READWRITE(ram_600000_r, ram_600000_w)
@@ -1292,7 +1289,7 @@ static ADDRESS_MAP_START(mac512ke_map, AS_PROGRAM, 16, mac128_state )
 	AM_RANGE(0xfffff0, 0xffffff) AM_READWRITE(mac_autovector_r, mac_autovector_w)
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START(macplus_map, AS_PROGRAM, 16, mac128_state )
+ADDRESS_MAP_START(mac128_state::macplus_map)
 	AM_RANGE(0x000000, 0x3fffff) AM_READWRITE(ram_r, ram_w)
 	AM_RANGE(0x400000, 0x4fffff) AM_ROM AM_REGION("bootrom", 0)
 	AM_RANGE(0x580000, 0x5fffff) AM_READWRITE(macplus_scsi_r, macplus_scsi_w)
@@ -1328,7 +1325,7 @@ static const floppy_interface mac_floppy_interface =
 	"floppy_3_5"
 };
 
-static MACHINE_CONFIG_START( mac512ke )
+MACHINE_CONFIG_START(mac128_state::mac512ke)
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", M68000, C7M)        /* 7.8336 MHz */
 	MCFG_CPU_PROGRAM_MAP(mac512ke_map)
@@ -1354,7 +1351,7 @@ static MACHINE_CONFIG_START( mac512ke )
 	MCFG_SOUND_ROUTE_EX(0, DAC_TAG, 1.0, DAC_VREF_POS_INPUT) MCFG_SOUND_ROUTE_EX(0, DAC_TAG, -1.0, DAC_VREF_NEG_INPUT)
 
 	/* devices */
-	MCFG_RTC3430042_ADD("rtc", XTAL_32_768kHz)
+	MCFG_RTC3430042_ADD("rtc", XTAL(32'768))
 	MCFG_IWM_ADD("fdc", mac_iwm_interface)
 	MCFG_LEGACY_FLOPPY_SONY_2_DRIVES_ADD(mac_floppy_interface)
 
@@ -1384,7 +1381,8 @@ static MACHINE_CONFIG_START( mac512ke )
 	MCFG_SOFTWARE_LIST_ADD("hdd_list", "mac_hdd")
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_DERIVED( mac128k, mac512ke )
+MACHINE_CONFIG_START(mac128_state::mac128k)
+	mac512ke(config);
 
 	/* internal ram */
 	MCFG_RAM_MODIFY(RAM_TAG)
@@ -1392,7 +1390,8 @@ static MACHINE_CONFIG_DERIVED( mac128k, mac512ke )
 MACHINE_CONFIG_END
 
 
-static MACHINE_CONFIG_DERIVED( macplus, mac512ke )
+MACHINE_CONFIG_START(mac128_state::macplus)
+	mac512ke(config);
 	MCFG_CPU_MODIFY( "maincpu" )
 	MCFG_CPU_PROGRAM_MAP(macplus_map)
 

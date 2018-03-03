@@ -7,13 +7,13 @@
 
 
 #define MCFG_MB86233_FIFO_READ_CB(_devcb) \
-	devcb = &mb86233_cpu_device::set_fifo_read_cb(*device, DEVCB_##_devcb);
+	devcb = &downcast<mb86233_cpu_device &>(*device).set_fifo_read_cb(DEVCB_##_devcb);
 #define MCFG_MB86233_FIFO_READ_OK_CB(_devcb) \
-	devcb = &mb86233_cpu_device::set_fifo_read_ok_cb(*device, DEVCB_##_devcb);
+	devcb = &downcast<mb86233_cpu_device &>(*device).set_fifo_read_ok_cb(DEVCB_##_devcb);
 #define MCFG_MB86233_FIFO_WRITE_CB(_devcb) \
-	devcb = &mb86233_cpu_device::set_fifo_write_cb(*device, DEVCB_##_devcb);
+	devcb = &downcast<mb86233_cpu_device &>(*device).set_fifo_write_cb(DEVCB_##_devcb);
 #define MCFG_MB86233_TABLE_REGION(_region) \
-	mb86233_cpu_device::set_tablergn(*device, _region);
+	downcast<mb86233_cpu_device &>(*device).set_tablergn(_region);
 
 
 class mb86233_cpu_device : public cpu_device
@@ -22,11 +22,11 @@ public:
 	// construction/destruction
 	mb86233_cpu_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
-	// static configuration helpers
-	template <class Object> static devcb_base &set_fifo_read_cb(device_t &device, Object &&cb) { return downcast<mb86233_cpu_device &>(device).m_fifo_read_cb.set_callback(std::forward<Object>(cb)); }
-	template <class Object> static devcb_base &set_fifo_read_ok_cb(device_t &device, Object &&cb) { return downcast<mb86233_cpu_device &>(device).m_fifo_read_ok_cb.set_callback(std::forward<Object>(cb)); }
-	template <class Object> static devcb_base &set_fifo_write_cb(device_t &device, Object &&cb) { return downcast<mb86233_cpu_device &>(device).m_fifo_write_cb.set_callback(std::forward<Object>(cb)); }
-	static void set_tablergn(device_t &device, const char *tablergn) { downcast<mb86233_cpu_device &>(device).m_tablergn = tablergn; }
+	// configuration helpers
+	template <class Object> devcb_base &set_fifo_read_cb(Object &&cb) { return m_fifo_read_cb.set_callback(std::forward<Object>(cb)); }
+	template <class Object> devcb_base &set_fifo_read_ok_cb(Object &&cb) { return m_fifo_read_ok_cb.set_callback(std::forward<Object>(cb)); }
+	template <class Object> devcb_base &set_fifo_write_cb(Object &&cb) { return m_fifo_write_cb.set_callback(std::forward<Object>(cb)); }
+	void set_tablergn(const char *tablergn) { m_tablergn = tablergn; }
 
 protected:
 	// register enumeration

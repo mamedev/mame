@@ -116,6 +116,13 @@ public:
 	TIMER_DEVICE_CALLBACK_MEMBER(update_nmi_r5);
 	TIMER_DEVICE_CALLBACK_MEMBER(update_irq);
 
+	void rebel5(machine_config &config);
+	void mm4tk(machine_config &config);
+	void mm2(machine_config &config);
+	void mephisto(machine_config &config);
+	void mephisto_mem(address_map &map);
+	void mm2_mem(address_map &map);
+	void rebel5_mem(address_map &map);
 protected:
 	required_ioport m_key1_0;
 	required_ioport m_key1_1;
@@ -215,11 +222,11 @@ WRITE8_MEMBER( mephisto_state::write_led_mm2 )
 		m_led7= BIT(data, 7) ? 0xff :0x00;  //MM2
 }
 
-static ADDRESS_MAP_START( rebel5_mem, AS_PROGRAM, 8, mephisto_state )
+ADDRESS_MAP_START(mephisto_state::rebel5_mem)
 	AM_RANGE( 0x0000, 0x1fff) AM_RAM                        // AM_BASE(m_p_ram)
 	AM_RANGE( 0x2000, 0x2007) AM_WRITE(write_led)           // Status LEDs+ buzzer
-	AM_RANGE( 0x3000, 0x3007) AM_READ(read_keys)            // Rebel 5.0
 	AM_RANGE( 0x3000, 0x4000) AM_DEVREAD("board", mephisto_board_device, input_r)
+	AM_RANGE( 0x3000, 0x3007) AM_READ(read_keys)            // Rebel 5.0
 	AM_RANGE( 0x5000, 0x5000) AM_WRITE(write_lcd)
 	AM_RANGE( 0x6000, 0x6000) AM_DEVWRITE("board", mephisto_board_device, led_w)
 	AM_RANGE( 0x7000, 0x7000) AM_DEVWRITE("board", mephisto_board_device, mux_w)
@@ -227,7 +234,7 @@ static ADDRESS_MAP_START( rebel5_mem, AS_PROGRAM, 8, mephisto_state )
 ADDRESS_MAP_END
 
 
-static ADDRESS_MAP_START( mephisto_mem, AS_PROGRAM, 8, mephisto_state )
+ADDRESS_MAP_START(mephisto_state::mephisto_mem)
 	AM_RANGE( 0x0000, 0x1fff) AM_RAM //AM_BASE(m_p_ram)
 	AM_RANGE( 0x2000, 0x2000) AM_WRITE(write_lcd)
 	AM_RANGE( 0x2400, 0x2407) AM_DEVWRITE("board", mephisto_board_device, led_w)
@@ -240,7 +247,7 @@ static ADDRESS_MAP_START( mephisto_mem, AS_PROGRAM, 8, mephisto_state )
 	AM_RANGE( 0x8000, 0xffff) AM_ROM
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( mm2_mem, AS_PROGRAM, 8, mephisto_state )
+ADDRESS_MAP_START(mephisto_state::mm2_mem)
 	AM_RANGE( 0x0000, 0x0fff) AM_RAM //AM_BASE(m_p_ram)
 	AM_RANGE( 0x1000, 0x1007) AM_WRITE(write_led_mm2)       //Status LEDs
 	AM_RANGE( 0x1800, 0x1807) AM_READ(read_keys)
@@ -352,7 +359,7 @@ void mephisto_state::machine_reset()
 }
 
 
-static MACHINE_CONFIG_START( mephisto )
+MACHINE_CONFIG_START(mephisto_state::mephisto)
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu",M65C02,4915200)  /* 65C02 */
 	MCFG_CPU_PROGRAM_MAP(mephisto_mem)
@@ -369,7 +376,8 @@ static MACHINE_CONFIG_START( mephisto )
 	MCFG_DEFAULT_LAYOUT(layout_mephisto)
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_DERIVED( rebel5, mephisto )
+MACHINE_CONFIG_START(mephisto_state::rebel5)
+	mephisto(config);
 	/* basic machine hardware */
 	MCFG_CPU_MODIFY("maincpu")
 	MCFG_CPU_PROGRAM_MAP(rebel5_mem)
@@ -378,7 +386,8 @@ static MACHINE_CONFIG_DERIVED( rebel5, mephisto )
 
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_DERIVED( mm2, mephisto )
+MACHINE_CONFIG_START(mephisto_state::mm2)
+	mephisto(config);
 	MCFG_CPU_REPLACE("maincpu", M65C02, 3700000)
 	MCFG_CPU_PROGRAM_MAP(mm2_mem)
 	MCFG_MACHINE_START_OVERRIDE(mephisto_state, mm2 )
@@ -387,7 +396,8 @@ static MACHINE_CONFIG_DERIVED( mm2, mephisto )
 	MCFG_TIMER_DRIVER_ADD_PERIODIC("irq_timer", mephisto_state, update_irq, attotime::from_hz(450))
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_DERIVED( mm4tk, mephisto )
+MACHINE_CONFIG_START(mephisto_state::mm4tk)
+	mephisto(config);
 	MCFG_CPU_MODIFY("maincpu")
 	MCFG_CPU_REPLACE("maincpu", M65C02, 18000000)
 	MCFG_CPU_PROGRAM_MAP(mephisto_mem)

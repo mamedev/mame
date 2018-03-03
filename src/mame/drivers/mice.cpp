@@ -45,19 +45,25 @@ public:
 		, m_maincpu(*this, "maincpu")
 	{ }
 
+	void mice2(machine_config &config);
+	void mice(machine_config &config);
+	void mice2_io(address_map &map);
+	void mice2_mem(address_map &map);
+	void mice_io(address_map &map);
+	void mice_mem(address_map &map);
 private:
 	required_device<cpu_device> m_maincpu;
 };
 
 
-static ADDRESS_MAP_START(mice_mem, AS_PROGRAM, 8, mice_state)
+ADDRESS_MAP_START(mice_state::mice_mem)
 	ADDRESS_MAP_UNMAP_HIGH
 	AM_RANGE(0x0000, 0x3fff) AM_ROM AM_REGION("mcp", 0)
 	AM_RANGE(0x4400, 0x47ff) AM_RAM //(U13)
 	AM_RANGE(0x6000, 0x60ff) AM_DEVREADWRITE("rpt", i8155_device, memory_r, memory_w)
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START(mice_io, AS_IO, 8, mice_state)
+ADDRESS_MAP_START(mice_state::mice_io)
 	ADDRESS_MAP_UNMAP_HIGH
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	AM_RANGE(0x50, 0x50) AM_DEVREADWRITE("uart", i8251_device, data_r, data_w)
@@ -66,7 +72,7 @@ static ADDRESS_MAP_START(mice_io, AS_IO, 8, mice_state)
 	AM_RANGE(0x70, 0x73) AM_DEVREADWRITE("ppi", i8255_device, read, write)
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START(mice2_mem, AS_PROGRAM, 8, mice_state)
+ADDRESS_MAP_START(mice_state::mice2_mem)
 	ADDRESS_MAP_UNMAP_HIGH
 	AM_RANGE(0x0000, 0x7fff) AM_ROM AM_REGION("cep", 0)
 	AM_RANGE(0x9000, 0x90ff) AM_DEVREADWRITE("rpt", i8155_device, memory_r, memory_w)
@@ -74,7 +80,7 @@ static ADDRESS_MAP_START(mice2_mem, AS_PROGRAM, 8, mice_state)
 	AM_RANGE(0xe800, 0xe8ff) AM_DEVREADWRITE("rtt8155", i8155_device, memory_r, memory_w)
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START(mice2_io, AS_IO, 8, mice_state)
+ADDRESS_MAP_START(mice_state::mice2_io)
 	ADDRESS_MAP_UNMAP_HIGH
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	AM_RANGE(0x80, 0x80) AM_DEVREADWRITE("uart", i8251_device, data_r, data_w)
@@ -151,13 +157,13 @@ static DEVICE_INPUT_DEFAULTS_START( mice2_terminal )
 DEVICE_INPUT_DEFAULTS_END
 
 
-static MACHINE_CONFIG_START( mice )
+MACHINE_CONFIG_START(mice_state::mice)
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", I8085A, XTAL_6_144MHz)
+	MCFG_CPU_ADD("maincpu", I8085A, 6.144_MHz_XTAL)
 	MCFG_CPU_PROGRAM_MAP(mice_mem)
 	MCFG_CPU_IO_MAP(mice_io)
 
-	MCFG_DEVICE_ADD("uart", I8251, XTAL_6_144MHz / 2)
+	MCFG_DEVICE_ADD("uart", I8251, 6.144_MHz_XTAL / 2)
 	MCFG_I8251_TXD_HANDLER(DEVWRITELINE("rs232", rs232_port_device, write_txd))
 	MCFG_I8251_DTR_HANDLER(DEVWRITELINE("rs232", rs232_port_device, write_dtr))
 	MCFG_I8251_RTS_HANDLER(DEVWRITELINE("rs232", rs232_port_device, write_rts))
@@ -170,7 +176,7 @@ static MACHINE_CONFIG_START( mice )
 	MCFG_RS232_CTS_HANDLER(DEVWRITELINE("uart", i8251_device, write_cts))
 	MCFG_DEVICE_CARD_DEVICE_INPUT_DEFAULTS("terminal", mice_terminal)
 
-	MCFG_DEVICE_ADD("rpt", I8155, XTAL_6_144MHz / 2)
+	MCFG_DEVICE_ADD("rpt", I8155, 6.144_MHz_XTAL / 2)
 	MCFG_I8155_IN_PORTC_CB(IOPORT("BAUD"))
 	MCFG_I8155_OUT_TIMEROUT_CB(DEVWRITELINE("uart", i8251_device, write_txc))
 	MCFG_DEVCB_CHAIN_OUTPUT(DEVWRITELINE("uart", i8251_device, write_rxc))
@@ -178,7 +184,8 @@ static MACHINE_CONFIG_START( mice )
 	MCFG_DEVICE_ADD("ppi", I8255, 0)
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_DERIVED( mice2, mice )
+MACHINE_CONFIG_START(mice_state::mice2)
+	mice(config);
 	MCFG_CPU_MODIFY("maincpu")
 	MCFG_CPU_PROGRAM_MAP(mice2_mem)
 	MCFG_CPU_IO_MAP(mice2_io)

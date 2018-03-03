@@ -56,11 +56,15 @@ public:
 		: driver_device(mconfig, type, tag)
 		, m_maincpu(*this, Z80_TAG)
 		, m_usart_l(*this, I8251_L_TAG)
-		, m_usart_r(*this, I8251_L_TAG)
+		, m_usart_r(*this, I8251_R_TAG)
 		{ }
 
 	DECLARE_READ8_MEMBER(ff_r);
 
+	void horizon(machine_config &config);
+	void horizon2mhz(machine_config &config);
+	void horizon_io(address_map &map);
+	void horizon_mem(address_map &map);
 private:
 	virtual void machine_reset() override;
 	required_device<cpu_device> m_maincpu;
@@ -78,7 +82,7 @@ private:
 //  ADDRESS_MAP( horizon_mem )
 //-------------------------------------------------
 
-static ADDRESS_MAP_START( horizon_mem, AS_PROGRAM, 8, horizon_state )
+ADDRESS_MAP_START(horizon_state::horizon_mem)
 	AM_RANGE(0x0000, 0xe7ff) AM_RAM
 	AM_RANGE(0xe800, 0xe9ff) AM_ROM AM_REGION("roms", 0)
 	AM_RANGE(0xea01, 0xea01)
@@ -96,7 +100,7 @@ ADDRESS_MAP_END
 //  ADDRESS_MAP( horizon_io )
 //-------------------------------------------------
 
-static ADDRESS_MAP_START( horizon_io, AS_IO, 8, horizon_state )
+ADDRESS_MAP_START(horizon_state::horizon_io)
 ADDRESS_MAP_END
 
 
@@ -146,6 +150,7 @@ DEVICE_INPUT_DEFAULTS_END
 //#include "bus/s100/mm65k16s.h"
 #include "bus/s100/nsmdsa.h"
 #include "bus/s100/nsmdsad.h"
+#include "bus/s100/seals8k.h"
 //#include "bus/s100/wunderbus.h"
 
 static SLOT_INTERFACE_START( horizon_s100_cards )
@@ -155,6 +160,8 @@ static SLOT_INTERFACE_START( horizon_s100_cards )
 	//SLOT_INTERFACE("ram32a", S100_RAM32A)
 	//SLOT_INTERFACE("ram16a", S100_RAM16A)
 	//SLOT_INTERFACE("fpb", S100_FPB)
+	SLOT_INTERFACE("8ksc", S100_8K_SC)
+	SLOT_INTERFACE("8kscbb", S100_8K_SC_BB)
 SLOT_INTERFACE_END
 
 
@@ -167,9 +174,9 @@ SLOT_INTERFACE_END
 //  MACHINE_CONFIG( horizon )
 //-------------------------------------------------
 
-static MACHINE_CONFIG_START( horizon )
+MACHINE_CONFIG_START(horizon_state::horizon)
 	// basic machine hardware
-	MCFG_CPU_ADD(Z80_TAG, Z80, XTAL_8MHz / 2)
+	MCFG_CPU_ADD(Z80_TAG, Z80, XTAL(8'000'000) / 2)
 	MCFG_CPU_PROGRAM_MAP(horizon_mem)
 	MCFG_CPU_IO_MAP(horizon_io)
 
@@ -194,7 +201,7 @@ static MACHINE_CONFIG_START( horizon )
 	MCFG_RS232_DSR_HANDLER(DEVWRITELINE(I8251_R_TAG, i8251_device, write_dsr))
 
 	// S-100
-	MCFG_DEVICE_ADD("s100", S100_BUS, XTAL_8MHz / 4)
+	MCFG_DEVICE_ADD("s100", S100_BUS, XTAL(8'000'000) / 4)
 	MCFG_S100_RDY_CALLBACK(INPUTLINE(Z80_TAG, Z80_INPUT_LINE_BOGUSWAIT))
 	//MCFG_S100_SLOT_ADD("s100:1", horizon_s100_cards, nullptr, nullptr) // CPU
 	MCFG_S100_SLOT_ADD("s100:2", horizon_s100_cards, nullptr) // RAM
@@ -213,12 +220,13 @@ static MACHINE_CONFIG_START( horizon )
 	MCFG_SOFTWARE_LIST_ADD("flop_list", "horizon")
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_DERIVED( horizon2mhz, horizon )
+MACHINE_CONFIG_START(horizon_state::horizon2mhz)
+	horizon(config);
 	MCFG_CPU_MODIFY("z80")
-	MCFG_CPU_CLOCK(XTAL_4MHz / 2)
+	MCFG_CPU_CLOCK(XTAL(4'000'000) / 2)
 
 	MCFG_DEVICE_MODIFY("s100")
-	MCFG_DEVICE_CLOCK(XTAL_4MHz / 2)
+	MCFG_DEVICE_CLOCK(XTAL(4'000'000) / 2)
 MACHINE_CONFIG_END
 
 

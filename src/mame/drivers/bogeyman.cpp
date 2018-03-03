@@ -48,14 +48,14 @@ WRITE8_MEMBER(bogeyman_state::ay8910_control_w)
 
 /* Memory Map */
 
-static ADDRESS_MAP_START( bogeyman_map, AS_PROGRAM, 8, bogeyman_state )
+ADDRESS_MAP_START(bogeyman_state::bogeyman_map)
 	AM_RANGE(0x0000, 0x17ff) AM_RAM
 	AM_RANGE(0x1800, 0x1bff) AM_RAM_WRITE(videoram2_w) AM_SHARE("videoram2")
 	AM_RANGE(0x1c00, 0x1fff) AM_RAM_WRITE(colorram2_w) AM_SHARE("colorram2")
 	AM_RANGE(0x2000, 0x20ff) AM_RAM_WRITE(videoram_w) AM_SHARE("videoram")
 	AM_RANGE(0x2100, 0x21ff) AM_RAM_WRITE(colorram_w) AM_SHARE("colorram")
 	AM_RANGE(0x2800, 0x2bff) AM_RAM AM_SHARE("spriteram")
-	AM_RANGE(0x3000, 0x300f) AM_RAM_DEVWRITE("palette", palette_device, write) AM_SHARE("palette")
+	AM_RANGE(0x3000, 0x300f) AM_RAM_DEVWRITE("palette", palette_device, write8) AM_SHARE("palette")
 	AM_RANGE(0x3800, 0x3800) AM_READ_PORT("P1") AM_WRITE(ay8910_control_w)
 	AM_RANGE(0x3801, 0x3801) AM_READ_PORT("P2") AM_WRITE(ay8910_latch_w)
 	AM_RANGE(0x3802, 0x3802) AM_READ_PORT("DSW1")
@@ -228,7 +228,7 @@ WRITE8_MEMBER(bogeyman_state::colbank_w)
 	}
 }
 
-static MACHINE_CONFIG_START( bogeyman )
+MACHINE_CONFIG_START(bogeyman_state::bogeyman)
 
 	// basic machine hardware
 	MCFG_CPU_ADD("maincpu", M6502, 1500000) /* Verified */
@@ -243,7 +243,7 @@ static MACHINE_CONFIG_START( bogeyman )
 //  MCFG_SCREEN_SIZE(32*8, 32*8)
 //  MCFG_SCREEN_VISIBLE_AREA(0*8, 32*8-1, 1*8, 31*8-1)
 	// DECO video CRTC, unverified
-	MCFG_SCREEN_RAW_PARAMS(XTAL_12MHz/2,384,0,256,272,8,248)
+	MCFG_SCREEN_RAW_PARAMS(XTAL(12'000'000)/2,384,0,256,272,8,248)
 	MCFG_SCREEN_UPDATE_DRIVER(bogeyman_state, screen_update)
 	MCFG_SCREEN_PALETTE("palette")
 

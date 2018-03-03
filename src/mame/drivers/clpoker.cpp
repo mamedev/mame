@@ -57,6 +57,10 @@ public:
 
 	u32 screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 
+	void clpoker(machine_config &config);
+	void io_map(address_map &map);
+	void prg_map(address_map &map);
+	void ramdac_map(address_map &map);
 protected:
 	virtual void video_start() override;
 
@@ -75,7 +79,7 @@ private:
 	bool m_nmi_enable;
 };
 
-static ADDRESS_MAP_START( prg_map, AS_PROGRAM, 8, clpoker_state )
+ADDRESS_MAP_START(clpoker_state::prg_map)
 	AM_RANGE(0x0000, 0xbfff) AM_ROM
 	AM_RANGE(0xc000, 0xdfff) AM_RAM_WRITE(videoram_w) AM_SHARE("videoram")
 	AM_RANGE(0xe000, 0xe7ff) AM_RAM AM_SHARE("nvram")
@@ -84,7 +88,7 @@ static ADDRESS_MAP_START( prg_map, AS_PROGRAM, 8, clpoker_state )
 	AM_RANGE(0xf002, 0xf002) AM_DEVWRITE("ramdac", ramdac_device, mask_w)
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( io_map, AS_IO, 8, clpoker_state )
+ADDRESS_MAP_START(clpoker_state::io_map)
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	AM_RANGE(0x00, 0x03) AM_DEVREADWRITE("ppi_outputs", i8255_device, read, write)
 	AM_RANGE(0x10, 0x13) AM_DEVREADWRITE("ppi_inputs", i8255_device, read, write)
@@ -94,7 +98,7 @@ static ADDRESS_MAP_START( io_map, AS_IO, 8, clpoker_state )
 	AM_RANGE(0xc0, 0xc0) AM_READNOP // mystery read at startup
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( ramdac_map, 0, 8, clpoker_state )
+ADDRESS_MAP_START(clpoker_state::ramdac_map)
 	AM_RANGE(0x000, 0x3ff) AM_DEVREADWRITE("ramdac", ramdac_device, ramdac_pal_r, ramdac_rgb666_w)
 ADDRESS_MAP_END
 
@@ -246,9 +250,9 @@ static GFXDECODE_START( clpoker )
 GFXDECODE_END
 
 
-static MACHINE_CONFIG_START( clpoker )
+MACHINE_CONFIG_START(clpoker_state::clpoker)
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", Z80, XTAL_12MHz / 3) // Z0840004PSC, divider not verified
+	MCFG_CPU_ADD("maincpu", Z80, XTAL(12'000'000) / 3) // Z0840004PSC, divider not verified
 	MCFG_CPU_PROGRAM_MAP(prg_map)
 	MCFG_CPU_IO_MAP(io_map)
 
@@ -282,7 +286,7 @@ static MACHINE_CONFIG_START( clpoker )
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
-	MCFG_SOUND_ADD("aysnd", AY8910, XTAL_12MHz / 8) // AY38910A/P, divider not verified
+	MCFG_SOUND_ADD("aysnd", AY8910, XTAL(12'000'000) / 8) // AY38910A/P, divider not verified
 	MCFG_AY8910_PORT_A_READ_CB(IOPORT("DSW1"))
 	MCFG_AY8910_PORT_B_READ_CB(IOPORT("DSW2"))
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.30)

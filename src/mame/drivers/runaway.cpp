@@ -82,7 +82,7 @@ WRITE8_MEMBER(runaway_state::runaway_irq_ack_w)
 }
 
 
-static ADDRESS_MAP_START( runaway_map, AS_PROGRAM, 8, runaway_state )
+ADDRESS_MAP_START(runaway_state::runaway_map)
 	AM_RANGE(0x0000, 0x03ff) AM_RAM
 	AM_RANGE(0x0400, 0x07bf) AM_RAM_WRITE(runaway_video_ram_w) AM_SHARE("video_ram")
 	AM_RANGE(0x07c0, 0x07ff) AM_RAM AM_SHARE("sprite_ram")
@@ -327,7 +327,7 @@ static GFXDECODE_START( qwak )
 GFXDECODE_END
 
 
-static MACHINE_CONFIG_START( runaway )
+MACHINE_CONFIG_START(runaway_state::runaway)
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", M6502, 12096000 / 8) /* ? */
@@ -368,7 +368,8 @@ static MACHINE_CONFIG_START( runaway )
 MACHINE_CONFIG_END
 
 
-static MACHINE_CONFIG_DERIVED( qwak, runaway )
+MACHINE_CONFIG_START(runaway_state::qwak)
+	runaway(config);
 
 	/* basic machine hardware */
 

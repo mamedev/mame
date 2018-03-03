@@ -37,6 +37,7 @@
 #include "emu.h"
 #include "bus/rs232/rs232.h"
 #include "cpu/m6502/m6502.h"
+#include "cpu/mcs48/mcs48.h"
 #include "machine/6522via.h"
 #include "machine/mos6551.h"
 #include "video/mc6845.h"
@@ -50,7 +51,7 @@
 #define RS232A_TAG  "rs232a"
 #define RS232B_TAG  "rs232b"
 
-#define MASTER_CLOCK XTAL_23_814MHz
+#define MASTER_CLOCK XTAL(23'814'000)
 
 class tv950_state : public driver_device
 {
@@ -74,6 +75,8 @@ public:
 	DECLARE_WRITE8_MEMBER(row_addr_w);
 	DECLARE_WRITE_LINE_MEMBER(via_crtc_reset_w);
 
+	void tv950(machine_config &config);
+	void tv950_mem(address_map &map);
 private:
 	uint8_t m_via_row;
 	uint8_t m_attr_row;
@@ -89,7 +92,7 @@ private:
 	int m_row;
 };
 
-static ADDRESS_MAP_START(tv950_mem, AS_PROGRAM, 8, tv950_state)
+ADDRESS_MAP_START(tv950_state::tv950_mem)
 	ADDRESS_MAP_UNMAP_HIGH
 	AM_RANGE(0x0000, 0x07ff) AM_RAM
 	AM_RANGE(0x2000, 0x3fff) AM_RAM AM_SHARE("vram") // VRAM
@@ -266,7 +269,7 @@ MC6845_UPDATE_ROW( tv950_state::crtc_update_row )
 	m_row = (m_row + 1) % 250;
 }
 
-static MACHINE_CONFIG_START( tv950 )
+MACHINE_CONFIG_START(tv950_state::tv950)
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", M6502, MASTER_CLOCK/14)
 	MCFG_CPU_PROGRAM_MAP(tv950_mem)
@@ -301,6 +304,8 @@ static MACHINE_CONFIG_START( tv950 )
 
 	MCFG_DEVICE_ADD(ACIA3_TAG, MOS6551, 0)
 	MCFG_MOS6551_XTAL(MASTER_CLOCK/13)
+
+	MCFG_DEVICE_ADD("kbd", I8748, XTAL(5'714'300))
 MACHINE_CONFIG_END
 
 /* ROM definition */
@@ -313,7 +318,7 @@ ROM_START( tv950 )
 	ROM_LOAD16_BYTE( "180000-002a_a33_9294.bin", 0x000001, 0x001000, CRC(eaf4f346) SHA1(b4c531626846f3f055ddc086ac24fdb1b34f3f8e) )
 	ROM_LOAD16_BYTE( "180000-003a_a32_7ebf.bin", 0x000000, 0x001000, CRC(783ca0b6) SHA1(1cec9a9a56ef5795809f7ca7cd2e3f61b27e698d) )
 
-	ROM_REGION(0x1000, "kbd", 0)
+	ROM_REGION(0x400, "kbd", 0)
 	ROM_LOAD( "950kbd_8748_pn52080723-02.bin", 0x000000, 0x000400, CRC(11c8f22c) SHA1(99e73e9c74b10055733e89b92adbc5bf7f4ff338) )
 
 	ROM_REGION(0x10000, "user1", 0)

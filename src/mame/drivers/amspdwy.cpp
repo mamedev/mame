@@ -71,9 +71,9 @@ READ8_MEMBER(amspdwy_state::amspdwy_sound_r)
 	return (m_ym2151->status_r(space, 0) & ~0x30) | ioport("IN0")->read();
 }
 
-static ADDRESS_MAP_START( amspdwy_map, AS_PROGRAM, 8, amspdwy_state )
+ADDRESS_MAP_START(amspdwy_state::amspdwy_map)
 	AM_RANGE(0x0000, 0x7fff) AM_ROM
-	AM_RANGE(0x8000, 0x801f) AM_DEVWRITE("palette", palette_device, write) AM_SHARE("palette")
+	AM_RANGE(0x8000, 0x801f) AM_DEVWRITE("palette", palette_device, write8) AM_SHARE("palette")
 	AM_RANGE(0x9000, 0x93ff) AM_MIRROR(0x0400) AM_RAM_WRITE(amspdwy_videoram_w) AM_SHARE("videoram")
 	AM_RANGE(0x9800, 0x9bff) AM_RAM_WRITE(amspdwy_colorram_w) AM_SHARE("colorram")
 	AM_RANGE(0x9c00, 0x9fff) AM_RAM // unused?
@@ -88,7 +88,7 @@ static ADDRESS_MAP_START( amspdwy_map, AS_PROGRAM, 8, amspdwy_state )
 	AM_RANGE(0xe000, 0xe7ff) AM_RAM
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( amspdwy_portmap, AS_IO, 8, amspdwy_state )
+ADDRESS_MAP_START(amspdwy_state::amspdwy_portmap)
 	AM_RANGE(0x0000, 0x7fff) AM_ROM AM_REGION("tracks", 0)
 ADDRESS_MAP_END
 
@@ -102,7 +102,7 @@ ADDRESS_MAP_END
 
 ***************************************************************************/
 
-static ADDRESS_MAP_START( amspdwy_sound_map, AS_PROGRAM, 8, amspdwy_state )
+ADDRESS_MAP_START(amspdwy_state::amspdwy_sound_map)
 	AM_RANGE(0x0000, 0x7fff) AM_ROM
 //  AM_RANGE(0x8000, 0x8000) AM_WRITENOP // ? writes 0 at start
 	AM_RANGE(0x9000, 0x9000) AM_DEVREAD("soundlatch", generic_latch_8_device, read)
@@ -244,7 +244,7 @@ void amspdwy_state::machine_reset()
 	m_wheel_return[1] = 0;
 }
 
-static MACHINE_CONFIG_START( amspdwy )
+MACHINE_CONFIG_START(amspdwy_state::amspdwy)
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", Z80, 3000000)

@@ -27,7 +27,7 @@
 #include "machine/watchdog.h"
 #include "speaker.h"
 
-#define MASTER_CLOCK        XTAL_32MHz
+static constexpr XTAL MASTER_CLOCK = 32_MHz_XTAL;
 
 
 
@@ -42,12 +42,6 @@ void toobin_state::update_interrupts()
 	m_maincpu->set_input_line(1, m_scanline_int_state ? ASSERT_LINE : CLEAR_LINE);
 	m_maincpu->set_input_line(2, m_sound_int_state ? ASSERT_LINE : CLEAR_LINE);
 	m_maincpu->set_input_line(3, m_scanline_int_state && m_sound_int_state ? ASSERT_LINE : CLEAR_LINE);
-}
-
-
-MACHINE_RESET_MEMBER(toobin_state,toobin)
-{
-	atarigen_state::machine_reset();
 }
 
 
@@ -81,11 +75,11 @@ WRITE16_MEMBER(toobin_state::interrupt_scan_w)
  *************************************/
 
 /* full address map decoded from schematics */
-static ADDRESS_MAP_START( main_map, AS_PROGRAM, 16, toobin_state )
+ADDRESS_MAP_START(toobin_state::main_map)
 	ADDRESS_MAP_GLOBAL_MASK(0xc7ffff)
 	AM_RANGE(0x000000, 0x07ffff) AM_ROM
-	AM_RANGE(0xc00000, 0xc07fff) AM_RAM_DEVWRITE("playfield", tilemap_device, write) AM_SHARE("playfield")
-	AM_RANGE(0xc08000, 0xc097ff) AM_MIRROR(0x046000) AM_RAM_DEVWRITE("alpha", tilemap_device, write) AM_SHARE("alpha")
+	AM_RANGE(0xc00000, 0xc07fff) AM_RAM_DEVWRITE("playfield", tilemap_device, write16) AM_SHARE("playfield")
+	AM_RANGE(0xc08000, 0xc097ff) AM_MIRROR(0x046000) AM_RAM_DEVWRITE("alpha", tilemap_device, write16) AM_SHARE("alpha")
 	AM_RANGE(0xc09800, 0xc09fff) AM_MIRROR(0x046000) AM_RAM AM_SHARE("mob")
 	AM_RANGE(0xc10000, 0xc107ff) AM_MIRROR(0x047800) AM_RAM_WRITE(paletteram_w) AM_SHARE("paletteram")
 	AM_RANGE(0x826000, 0x826001) AM_MIRROR(0x4500fe) AM_READNOP     /* who knows? read at controls time */
@@ -96,7 +90,7 @@ static ADDRESS_MAP_START( main_map, AS_PROGRAM, 16, toobin_state )
 	AM_RANGE(0x828380, 0x828381) AM_MIRROR(0x45003e) AM_RAM_WRITE(slip_w) AM_SHARE("mob:slip")
 	AM_RANGE(0x8283c0, 0x8283c1) AM_MIRROR(0x45003e) AM_WRITE(scanline_int_ack_w)
 	AM_RANGE(0x828400, 0x828401) AM_MIRROR(0x4500fe) AM_DEVWRITE("jsa", atari_jsa_i_device, sound_reset_w)
-	AM_RANGE(0x828500, 0x828501) AM_MIRROR(0x4500fe) AM_DEVWRITE("eeprom", eeprom_parallel_28xx_device, unlock_write)
+	AM_RANGE(0x828500, 0x828501) AM_MIRROR(0x4500fe) AM_DEVWRITE("eeprom", eeprom_parallel_28xx_device, unlock_write16)
 	AM_RANGE(0x828600, 0x828601) AM_MIRROR(0x4500fe) AM_WRITE(xscroll_w) AM_SHARE("xscroll")
 	AM_RANGE(0x828700, 0x828701) AM_MIRROR(0x4500fe) AM_WRITE(yscroll_w) AM_SHARE("yscroll")
 	AM_RANGE(0x828800, 0x828801) AM_MIRROR(0x4507fe) AM_READ_PORT("FF8800")
@@ -196,13 +190,11 @@ GFXDECODE_END
  *
  *************************************/
 
-static MACHINE_CONFIG_START( toobin )
+MACHINE_CONFIG_START(toobin_state::toobin)
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", M68010, MASTER_CLOCK/4)
 	MCFG_CPU_PROGRAM_MAP(main_map)
-
-	MCFG_MACHINE_RESET_OVERRIDE(toobin_state,toobin)
 
 	MCFG_EEPROM_2804_ADD("eeprom")
 	MCFG_EEPROM_28XX_LOCK_AFTER_WRITE(true)
@@ -224,12 +216,10 @@ static MACHINE_CONFIG_START( toobin )
 	MCFG_GFXDECODE_ADD("gfxdecode", "palette", toobin)
 	MCFG_PALETTE_ADD("palette", 1024)
 
-	MCFG_VIDEO_START_OVERRIDE(toobin_state,toobin)
-
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
 
-	MCFG_ATARI_JSA_I_ADD("jsa", WRITELINE(atarigen_state, sound_int_write_line))
+	MCFG_ATARI_JSA_I_ADD("jsa", WRITELINE(toobin_state, sound_int_write_line))
 	MCFG_ATARI_JSA_TEST_PORT("FF9000", 12)
 	MCFG_SOUND_ROUTE(0, "lspeaker", 1.0)
 	MCFG_SOUND_ROUTE(1, "rspeaker", 1.0)

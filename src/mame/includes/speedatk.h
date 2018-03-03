@@ -44,4 +44,7 @@ public:
 	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 
 	uint8_t iox_key_matrix_calc(uint8_t p_side);
+	void speedatk(machine_config &config);
+	void speedatk_io(address_map &map);
+	void speedatk_mem(address_map &map);
 };

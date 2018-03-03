@@ -46,6 +46,8 @@ protected:
 
 private:
 	uint8_t m_bank;
+
+	void multiscreen_mem(address_map &map);
 };
 
 

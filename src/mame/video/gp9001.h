@@ -7,7 +7,7 @@
 #pragma once
 
 #define MCFG_GP9001_VINT_CALLBACK(_devcb) \
-	devcb = &gp9001vdp_device::set_vint_out_cb(*device, DEVCB_##_devcb);
+	devcb = &downcast<gp9001vdp_device &>(*device).set_vint_out_cb(DEVCB_##_devcb);
 
 class gp9001vdp_device : public device_t,
 							public device_gfx_interface,
@@ -22,7 +22,7 @@ class gp9001vdp_device : public device_t,
 public:
 	gp9001vdp_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
-	template<class Object> static devcb_base &set_vint_out_cb(device_t &device, Object &&obj) { return downcast<gp9001vdp_device &>(device).m_vint_out_cb.set_callback(std::forward<Object>(obj)); }
+	template<class Object> devcb_base &set_vint_out_cb(Object &&obj) { return m_vint_out_cb.set_callback(std::forward<Object>(obj)); }
 
 	void draw_sprites( bitmap_ind16 &bitmap, const rectangle &cliprect, const uint8_t* primap );
 	void gp9001_draw_custom_tilemap( bitmap_ind16 &bitmap, tilemap_t* tilemap, const uint8_t* priremap, const uint8_t* pri_enable );
@@ -33,7 +33,7 @@ public:
 
 	bitmap_ind8 *custom_priority_bitmap;
 
-	DECLARE_ADDRESS_MAP(map, 16);
+	void map(address_map &map);
 
 	// game-specific hack stuff
 	void disable_sprite_buffer() { sp.use_sprite_buffer = 0; }
@@ -54,22 +54,21 @@ public:
 	}
 
 	// access to VDP
-	DECLARE_READ16_MEMBER( gp9001_vdp_r );
-	DECLARE_WRITE16_MEMBER( gp9001_vdp_w );
-	DECLARE_READ16_MEMBER( gp9001_vdp_alt_r );
-	DECLARE_WRITE16_MEMBER( gp9001_vdp_alt_w );
+	DECLARE_READ16_MEMBER(gp9001_vdp_r);
+	DECLARE_WRITE16_MEMBER(gp9001_vdp_w);
+	DECLARE_READ16_MEMBER(gp9001_vdp_alt_r);
+	DECLARE_WRITE16_MEMBER(gp9001_vdp_alt_w);
+
+	DECLARE_READ_LINE_MEMBER(hsync_r);
+	DECLARE_READ_LINE_MEMBER(vsync_r);
+	DECLARE_READ_LINE_MEMBER(fblank_r);
 
 	// this bootleg has strange access
-	DECLARE_READ16_MEMBER( pipibibi_bootleg_videoram16_r );
-	DECLARE_WRITE16_MEMBER( pipibibi_bootleg_videoram16_w );
-	DECLARE_READ16_MEMBER( pipibibi_bootleg_spriteram16_r );
-	DECLARE_WRITE16_MEMBER( pipibibi_bootleg_spriteram16_w );
-	DECLARE_WRITE16_MEMBER( pipibibi_bootleg_scroll_w );
-
-	// internal handlers
-	DECLARE_WRITE16_MEMBER( gp9001_bg_tmap_w );
-	DECLARE_WRITE16_MEMBER( gp9001_fg_tmap_w );
-	DECLARE_WRITE16_MEMBER( gp9001_top_tmap_w );
+	DECLARE_READ16_MEMBER(pipibibi_bootleg_videoram16_r);
+	DECLARE_WRITE16_MEMBER(pipibibi_bootleg_videoram16_w);
+	DECLARE_READ16_MEMBER(pipibibi_bootleg_spriteram16_r);
+	DECLARE_WRITE16_MEMBER(pipibibi_bootleg_spriteram16_w);
+	DECLARE_WRITE16_MEMBER(pipibibi_bootleg_scroll_w);
 
 protected:
 	virtual void device_start() override;
@@ -85,6 +84,11 @@ protected:
 	TILE_GET_INFO_MEMBER(get_bg0_tile_info);
 
 private:
+	// internal handlers
+	DECLARE_WRITE16_MEMBER(bg_tmap_w);
+	DECLARE_WRITE16_MEMBER(fg_tmap_w);
+	DECLARE_WRITE16_MEMBER(top_tmap_w);
+
 	static constexpr unsigned BG_VRAM_SIZE   = 0x1000;   /* Background RAM size */
 	static constexpr unsigned FG_VRAM_SIZE   = 0x1000;   /* Foreground RAM size */
 	static constexpr unsigned TOP_VRAM_SIZE  = 0x1000;   /* Top Layer  RAM size */

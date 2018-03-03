@@ -15,7 +15,7 @@
 DEFINE_DEVICE_TYPE(M6509, m6509_device, "m6509", "M6509")
 
 m6509_device::m6509_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
-	m6502_device(mconfig, M6509, tag, owner, clock), XPC(0), bank_i(0), bank_y(0)
+	m6502_device(mconfig, M6509, tag, owner, clock), bank_i(0), bank_y(0)
 {
 	program_config.m_addr_width = 20;
 	program_config.m_logaddr_width = 20;
@@ -26,9 +26,9 @@ m6509_device::m6509_device(const machine_config &mconfig, const char *tag, devic
 void m6509_device::device_start()
 {
 	if(direct_disabled)
-		mintf = new mi_6509_nd(this);
+		mintf = std::make_unique<mi_6509_nd>(this);
 	else
-		mintf = new mi_6509_normal(this);
+		mintf = std::make_unique<mi_6509_normal>(this);
 
 	init();
 
@@ -45,14 +45,9 @@ void m6509_device::device_reset()
 	bank_y = 0x0f;
 }
 
-void m6509_device::state_export(const device_state_entry &entry)
+offs_t m6509_device::pc_to_external(u16 pc)
 {
-	switch(entry.index()) {
-	case STATE_GENPC:
-	case STATE_GENPCBASE:
-		XPC = adr_in_bank_i(NPC);
-		break;
-	}
+	return adr_in_bank_i(pc);
 }
 
 util::disasm_interface *m6509_device::create_disassembler()

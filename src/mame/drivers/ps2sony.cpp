@@ -171,6 +171,8 @@ public:
 
 	uint32_t screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 
+	void ps2sony(machine_config &config);
+	void mem_map(address_map &map);
 private:
 	virtual void video_start() override;
 	required_device<cpu_device> m_maincpu;
@@ -186,7 +188,7 @@ uint32_t ps2sony_state::screen_update(screen_device &screen, bitmap_rgb32 &bitma
 	return 0;
 }
 
-static ADDRESS_MAP_START(mem_map, AS_PROGRAM, 32, ps2sony_state)
+ADDRESS_MAP_START(ps2sony_state::mem_map)
 	AM_RANGE(0x00000000, 0x01ffffff) AM_RAM // 32 MB RAM
 	AM_RANGE(0x1fc00000, 0x1fdfffff) AM_ROM AM_REGION("bios", 0)
 ADDRESS_MAP_END
@@ -194,7 +196,7 @@ ADDRESS_MAP_END
 static INPUT_PORTS_START( ps2sony )
 INPUT_PORTS_END
 
-static MACHINE_CONFIG_START( ps2sony )
+MACHINE_CONFIG_START(ps2sony_state::ps2sony)
 	MCFG_CPU_ADD("maincpu", R5000LE, 294'912'000) // actually R5900
 	MCFG_MIPS3_ICACHE_SIZE(16384)
 	MCFG_MIPS3_DCACHE_SIZE(16384)

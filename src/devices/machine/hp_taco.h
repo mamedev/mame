@@ -16,13 +16,13 @@
 #include "formats/hti_tape.h"
 
 #define MCFG_TACO_IRQ_HANDLER(_devcb) \
-		devcb = &hp_taco_device::set_irq_handler(*device , DEVCB_##_devcb);
+	devcb = &downcast<hp_taco_device &>(*device).set_irq_handler(DEVCB_##_devcb);
 
 #define MCFG_TACO_FLG_HANDLER(_devcb) \
-		devcb = &hp_taco_device::set_flg_handler(*device , DEVCB_##_devcb);
+	devcb = &downcast<hp_taco_device &>(*device).set_flg_handler(DEVCB_##_devcb);
 
 #define MCFG_TACO_STS_HANDLER(_devcb) \
-		devcb = &hp_taco_device::set_sts_handler(*device , DEVCB_##_devcb);
+	devcb = &downcast<hp_taco_device &>(*device).set_sts_handler(DEVCB_##_devcb);
 
 class hp_taco_device : public device_t ,
 						public device_image_interface
@@ -31,10 +31,10 @@ public:
 	// construction/destruction
 	hp_taco_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
-	// static configuration helpers
-	template <class Object> static devcb_base &set_irq_handler(device_t &device, Object &&cb) { return downcast<hp_taco_device &>(device).m_irq_handler.set_callback(std::forward<Object>(cb)); }
-	template <class Object> static devcb_base &set_flg_handler(device_t &device, Object &&cb) { return downcast<hp_taco_device &>(device).m_flg_handler.set_callback(std::forward<Object>(cb)); }
-	template <class Object> static devcb_base &set_sts_handler(device_t &device, Object &&cb) { return downcast<hp_taco_device &>(device).m_sts_handler.set_callback(std::forward<Object>(cb)); }
+	// configuration helpers
+	template <class Object> devcb_base &set_irq_handler(Object &&cb) { return m_irq_handler.set_callback(std::forward<Object>(cb)); }
+	template <class Object> devcb_base &set_flg_handler(Object &&cb) { return m_flg_handler.set_callback(std::forward<Object>(cb)); }
+	template <class Object> devcb_base &set_sts_handler(Object &&cb) { return m_sts_handler.set_callback(std::forward<Object>(cb)); }
 
 	// Register read/write
 	DECLARE_WRITE16_MEMBER(reg_w);

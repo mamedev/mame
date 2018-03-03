@@ -326,7 +326,7 @@ WRITE8_MEMBER( wswan_sound_device::port_w )
 			break;
 
 		case 0x8D:              /* Sweep time */
-			m_sweep_time = space.machine().sample_rate() / ( 3072000 / ( 8192 * (data + 1) ) );
+			m_sweep_time = machine().sample_rate() / ( 3072000 / ( 8192 * (data + 1) ) );
 			break;
 
 		case 0x8E:              /* Noise control */

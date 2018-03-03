@@ -52,10 +52,14 @@ void sun_keyboard_port_device::device_config_complete()
 }
 
 
-void sun_keyboard_port_device::device_start()
+void sun_keyboard_port_device::device_resolve_objects()
 {
 	m_rxd_handler.resolve_safe();
+}
 
+
+void sun_keyboard_port_device::device_start()
+{
 	save_item(NAME(m_rxd));
 
 	m_rxd = 1;

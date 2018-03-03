@@ -21,12 +21,12 @@
 #define AY8910_TAG  "ay8910"
 
 #define DESTRYER_CHR1   3579000.0 // unverified
-#define DESTRYER_CHR2   XTAL_5_7143MHz
+#define DESTRYER_CHR2   XTAL(5'714'300)
 #define ALTAIR_CHR1     3579000.0 // unverified
 #define ALTAIR_CHR2     cdp1869_device::DOT_CLK_PAL // unverified
-#define DRACO_CHR1      XTAL_4_43361MHz
+#define DRACO_CHR1      XTAL(4'433'610)
 #define DRACO_CHR2      cdp1869_device::DOT_CLK_PAL // unverified
-#define DRACO_SND_CHR1  XTAL_2_01216MHz
+#define DRACO_SND_CHR1  XTAL(2'012'160)
 
 #define CIDELSA_PAGERAM_SIZE    0x400
 #define DRACO_PAGERAM_SIZE      0x800
@@ -84,6 +84,17 @@ public:
 	std::unique_ptr<uint8_t[]> m_pcbram;
 	std::unique_ptr<uint8_t[]> m_charram;
 
+	void destryera(machine_config &config);
+	void altair(machine_config &config);
+	void destryer(machine_config &config);
+	void destryer_video(machine_config &config);
+	void altair_video(machine_config &config);
+	void altair_io_map(address_map &map);
+	void altair_map(address_map &map);
+	void cidelsa_page_ram(address_map &map);
+	void destryer_io_map(address_map &map);
+	void destryer_map(address_map &map);
+	void destryera_map(address_map &map);
 protected:
 	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr) override;
 };
@@ -115,12 +126,12 @@ public:
 	// sound state
 	int m_sound;
 	int m_psg_latch;
+	void draco(machine_config &config);
+	void draco_video(machine_config &config);
+	void draco_io_map(address_map &map);
+	void draco_map(address_map &map);
+	void draco_page_ram(address_map &map);
+	void draco_sound_map(address_map &map);
 };
-
-/*----------- defined in video/cidelsa.c -----------*/
-
-MACHINE_CONFIG_EXTERN( destryer_video );
-MACHINE_CONFIG_EXTERN( altair_video );
-MACHINE_CONFIG_EXTERN( draco_video );
 
 #endif // MAME_INCLUDES_CIDELSA_H

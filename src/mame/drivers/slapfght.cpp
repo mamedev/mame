@@ -273,7 +273,7 @@ Stephh's notes (based on the games Z80 code and some tests) :
 
 ***************************************************************************/
 
-static ADDRESS_MAP_START( perfrman_map, AS_PROGRAM, 8, slapfght_state )
+ADDRESS_MAP_START(slapfght_state::perfrman_map)
 	AM_RANGE(0x0000, 0x7fff) AM_ROM
 	AM_RANGE(0x8000, 0x87ff) AM_RAM
 	AM_RANGE(0x8800, 0x8fff) AM_RAM AM_SHARE("share1")
@@ -283,7 +283,7 @@ static ADDRESS_MAP_START( perfrman_map, AS_PROGRAM, 8, slapfght_state )
 ADDRESS_MAP_END
 
 
-static ADDRESS_MAP_START( tigerh_map, AS_PROGRAM, 8, slapfght_state )
+ADDRESS_MAP_START(slapfght_state::tigerh_map)
 	AM_RANGE(0x0000, 0xbfff) AM_ROM
 	AM_RANGE(0xc000, 0xc7ff) AM_RAM
 	AM_RANGE(0xc800, 0xcfff) AM_RAM AM_SHARE("share1")
@@ -297,23 +297,23 @@ static ADDRESS_MAP_START( tigerh_map, AS_PROGRAM, 8, slapfght_state )
 	AM_RANGE(0xf800, 0xffff) AM_RAM_WRITE(fixcol_w) AM_SHARE("fixcolorram")
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( tigerh_map_mcu, AS_PROGRAM, 8, slapfght_state )
+ADDRESS_MAP_START(slapfght_state::tigerh_map_mcu)
+	AM_IMPORT_FROM( tigerh_map )
 	AM_RANGE(0xe803, 0xe803) AM_DEVREADWRITE("bmcu", taito68705_mcu_device, data_r, data_w)
-	AM_IMPORT_FROM( tigerh_map )
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( tigerhb1_map, AS_PROGRAM, 8, slapfght_state )
+ADDRESS_MAP_START(slapfght_state::tigerhb1_map)
+	AM_IMPORT_FROM( tigerh_map )
 	AM_RANGE(0xe803, 0xe803) AM_READWRITE(tigerhb1_prot_r, tigerhb1_prot_w)
-	AM_IMPORT_FROM( tigerh_map )
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( tigerhb2_map, AS_PROGRAM, 8, slapfght_state )
+ADDRESS_MAP_START(slapfght_state::tigerhb2_map)
+	AM_IMPORT_FROM( tigerh_map )
 	AM_RANGE(0xe803, 0xe803) AM_NOP // no MCU
-	AM_IMPORT_FROM( tigerh_map )
 ADDRESS_MAP_END
 
 
-static ADDRESS_MAP_START( slapfigh_map, AS_PROGRAM, 8, slapfght_state )
+ADDRESS_MAP_START(slapfght_state::slapfigh_map)
 	AM_RANGE(0x0000, 0x7fff) AM_ROM
 	AM_RANGE(0x8000, 0xbfff) AM_ROMBANK("bank1")
 	AM_RANGE(0xc000, 0xc7ff) AM_RAM
@@ -328,22 +328,22 @@ static ADDRESS_MAP_START( slapfigh_map, AS_PROGRAM, 8, slapfght_state )
 	AM_RANGE(0xf800, 0xffff) AM_RAM_WRITE(fixcol_w) AM_SHARE("fixcolorram")
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( slapfigh_map_mcu, AS_PROGRAM, 8, slapfght_state )
+ADDRESS_MAP_START(slapfght_state::slapfigh_map_mcu)
+	AM_IMPORT_FROM( slapfigh_map )
 	AM_RANGE(0xe803, 0xe803) AM_DEVREADWRITE("bmcu", taito68705_mcu_device, data_r, data_w)
-	AM_IMPORT_FROM( slapfigh_map )
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( slapfighb1_map, AS_PROGRAM, 8, slapfght_state )
+ADDRESS_MAP_START(slapfght_state::slapfighb1_map)
+	AM_IMPORT_FROM( slapfigh_map )
 	AM_RANGE(0xe803, 0xe803) AM_NOP // no MCU
-	AM_IMPORT_FROM( slapfigh_map )
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( getstar_map, AS_PROGRAM, 8, slapfght_state )
+ADDRESS_MAP_START(slapfght_state::getstar_map)
+	AM_IMPORT_FROM( slapfigh_map )
 	AM_RANGE(0xe803, 0xe803) AM_READWRITE(getstar_mcusim_r, getstar_mcusim_w)
-	AM_IMPORT_FROM( slapfigh_map )
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( slapfighb2_map, AS_PROGRAM, 8, slapfght_state )
+ADDRESS_MAP_START(slapfght_state::slapfighb2_map)
 	AM_RANGE(0x0000, 0x7fff) AM_ROM
 	AM_RANGE(0x8000, 0xbfff) AM_ROMBANK("bank1")
 	AM_RANGE(0xc000, 0xc7ff) AM_RAM
@@ -389,25 +389,25 @@ READ8_MEMBER(slapfght_state::vblank_r)
 	return m_screen->vblank() ? 1 : 0;
 }
 
-static ADDRESS_MAP_START( io_map_nomcu, AS_IO, 8, slapfght_state )
+ADDRESS_MAP_START(slapfght_state::io_map_nomcu)
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	AM_RANGE(0x00, 0x00) AM_READ(vblank_r)
 	AM_RANGE(0x00, 0x0f) AM_DEVWRITE("mainlatch", ls259_device, write_a0)
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( io_map_mcu, AS_IO, 8, slapfght_state )
+ADDRESS_MAP_START(slapfght_state::io_map_mcu)
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	AM_RANGE(0x00, 0x00) AM_READ(tigerh_mcu_status_r)
 	AM_RANGE(0x00, 0x0f) AM_DEVWRITE("mainlatch", ls259_device, write_a0)
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( getstarb1_io_map, AS_IO, 8, slapfght_state )
+ADDRESS_MAP_START(slapfght_state::getstarb1_io_map)
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	AM_RANGE(0x00, 0x00) AM_READ(getstarb1_prot_r)
 	AM_RANGE(0x00, 0x0f) AM_DEVWRITE("mainlatch", ls259_device, write_a0)
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( getstarb2_io_map, AS_IO, 8, slapfght_state )
+ADDRESS_MAP_START(slapfght_state::getstarb2_io_map)
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	AM_RANGE(0x00, 0x00) AM_READ(getstar_mcusim_status_r)
 	AM_RANGE(0x00, 0x0f) AM_DEVWRITE("mainlatch", ls259_device, write_a0)
@@ -432,7 +432,7 @@ WRITE8_MEMBER(slapfght_state::sound_nmi_enable_w)
 	m_sound_nmi_enabled = offset ? false : true;
 }
 
-static ADDRESS_MAP_START( perfrman_sound_map, AS_PROGRAM, 8, slapfght_state )
+ADDRESS_MAP_START(slapfght_state::perfrman_sound_map)
 	AM_RANGE(0x0000, 0x1fff) AM_ROM
 	AM_RANGE(0x8800, 0x8fff) AM_RAM AM_SHARE("share1")
 	AM_RANGE(0xa080, 0xa080) AM_DEVWRITE("ay1", ay8910_device, address_w)
@@ -444,7 +444,7 @@ static ADDRESS_MAP_START( perfrman_sound_map, AS_PROGRAM, 8, slapfght_state )
 	AM_RANGE(0xa0e0, 0xa0e0) AM_SELECT(0x0010) AM_WRITE(sound_nmi_enable_w)
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( tigerh_sound_map, AS_PROGRAM, 8, slapfght_state )
+ADDRESS_MAP_START(slapfght_state::tigerh_sound_map)
 	AM_RANGE(0x0000, 0x1fff) AM_ROM
 	AM_RANGE(0xa080, 0xa080) AM_DEVWRITE("ay1", ay8910_device, address_w)
 	AM_RANGE(0xa081, 0xa081) AM_DEVREAD("ay1", ay8910_device, data_r)
@@ -873,10 +873,10 @@ GFXDECODE_END
 
 ***************************************************************************/
 
-static MACHINE_CONFIG_START( perfrman )
+MACHINE_CONFIG_START(slapfght_state::perfrman)
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", Z80, XTAL_16MHz/4) // 4MHz? XTAL is known, divider is guessed
+	MCFG_CPU_ADD("maincpu", Z80, XTAL(16'000'000)/4) // 4MHz? XTAL is known, divider is guessed
 	MCFG_CPU_PROGRAM_MAP(perfrman_map)
 	MCFG_CPU_IO_MAP(io_map_nomcu)
 	MCFG_CPU_VBLANK_INT_DRIVER("screen", slapfght_state, vblank_irq)
@@ -887,7 +887,7 @@ static MACHINE_CONFIG_START( perfrman )
 	MCFG_ADDRESSABLE_LATCH_Q3_OUT_CB(WRITELINE(slapfght_state, irq_enable_w))
 	MCFG_ADDRESSABLE_LATCH_Q6_OUT_CB(WRITELINE(slapfght_state, palette_bank_w))
 
-	MCFG_CPU_ADD("audiocpu", Z80, XTAL_16MHz/8) // 2MHz? XTAL is known, divider is guessed
+	MCFG_CPU_ADD("audiocpu", Z80, XTAL(16'000'000)/8) // 2MHz? XTAL is known, divider is guessed
 	MCFG_CPU_PROGRAM_MAP(perfrman_sound_map)
 	MCFG_CPU_PERIODIC_INT_DRIVER(slapfght_state, sound_nmi, 240) // music speed, verified
 
@@ -912,22 +912,22 @@ static MACHINE_CONFIG_START( perfrman )
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
 
-	MCFG_SOUND_ADD("ay1", AY8910, XTAL_16MHz/8)
+	MCFG_SOUND_ADD("ay1", AY8910, XTAL(16'000'000)/8)
 	MCFG_AY8910_PORT_A_READ_CB(IOPORT("IN0"))
 	MCFG_AY8910_PORT_B_READ_CB(IOPORT("IN1"))
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
 
-	MCFG_SOUND_ADD("ay2", AY8910, XTAL_16MHz/8)
+	MCFG_SOUND_ADD("ay2", AY8910, XTAL(16'000'000)/8)
 	MCFG_AY8910_PORT_A_READ_CB(IOPORT("DSW1"))
 	MCFG_AY8910_PORT_B_READ_CB(IOPORT("DSW2"))
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
 MACHINE_CONFIG_END
 
 
-static MACHINE_CONFIG_START( tigerh )
+MACHINE_CONFIG_START(slapfght_state::tigerh)
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", Z80, XTAL_36MHz/6) // 6MHz
+	MCFG_CPU_ADD("maincpu", Z80, XTAL(36'000'000)/6) // 6MHz
 	MCFG_CPU_PROGRAM_MAP(tigerh_map_mcu)
 	MCFG_CPU_IO_MAP(io_map_mcu)
 	MCFG_CPU_VBLANK_INT_DRIVER("screen", slapfght_state, vblank_irq)
@@ -937,11 +937,11 @@ static MACHINE_CONFIG_START( tigerh )
 	MCFG_ADDRESSABLE_LATCH_Q1_OUT_CB(WRITELINE(slapfght_state, flipscreen_w))
 	MCFG_ADDRESSABLE_LATCH_Q3_OUT_CB(WRITELINE(slapfght_state, irq_enable_w))
 
-	MCFG_CPU_ADD("audiocpu", Z80, XTAL_36MHz/12) // 3MHz
+	MCFG_CPU_ADD("audiocpu", Z80, XTAL(36'000'000)/12) // 3MHz
 	MCFG_CPU_PROGRAM_MAP(tigerh_sound_map)
 	MCFG_CPU_PERIODIC_INT_DRIVER(slapfght_state, sound_nmi, 360) // music speed, verified with pcb recording
 
-	MCFG_DEVICE_ADD("bmcu", TAITO68705_MCU_TIGER, XTAL_36MHz/12) // 3MHz
+	MCFG_DEVICE_ADD("bmcu", TAITO68705_MCU_TIGER, XTAL(36'000'000)/12) // 3MHz
 
 	MCFG_QUANTUM_PERFECT_CPU("maincpu")
 
@@ -964,18 +964,19 @@ static MACHINE_CONFIG_START( tigerh )
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
 
-	MCFG_SOUND_ADD("ay1", AY8910, XTAL_36MHz/24) // 1.5MHz
+	MCFG_SOUND_ADD("ay1", AY8910, XTAL(36'000'000)/24) // 1.5MHz
 	MCFG_AY8910_PORT_A_READ_CB(IOPORT("IN0"))
 	MCFG_AY8910_PORT_B_READ_CB(IOPORT("IN1"))
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
 
-	MCFG_SOUND_ADD("ay2", AY8910, XTAL_36MHz/24) // 1.5MHz
+	MCFG_SOUND_ADD("ay2", AY8910, XTAL(36'000'000)/24) // 1.5MHz
 	MCFG_AY8910_PORT_A_READ_CB(IOPORT("DSW1"))
 	MCFG_AY8910_PORT_B_READ_CB(IOPORT("DSW2"))
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_DERIVED( tigerhb1, tigerh )
+MACHINE_CONFIG_START(slapfght_state::tigerhb1)
+	tigerh(config);
 
 	/* basic machine hardware */
 	MCFG_CPU_MODIFY("maincpu")
@@ -985,7 +986,8 @@ static MACHINE_CONFIG_DERIVED( tigerhb1, tigerh )
 	MCFG_DEVICE_REMOVE("bmcu")
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_DERIVED( tigerhb2, tigerhb1 )
+MACHINE_CONFIG_START(slapfght_state::tigerhb2)
+	tigerhb1(config);
 
 	/* basic machine hardware */
 	MCFG_CPU_MODIFY("maincpu")
@@ -993,10 +995,10 @@ static MACHINE_CONFIG_DERIVED( tigerhb2, tigerhb1 )
 MACHINE_CONFIG_END
 
 
-static MACHINE_CONFIG_START( slapfigh )
+MACHINE_CONFIG_START(slapfght_state::slapfigh)
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu",Z80, XTAL_36MHz/6) // 6MHz
+	MCFG_CPU_ADD("maincpu",Z80, XTAL(36'000'000)/6) // 6MHz
 	MCFG_CPU_PROGRAM_MAP(slapfigh_map_mcu)
 	MCFG_CPU_IO_MAP(io_map_mcu)
 	MCFG_CPU_VBLANK_INT_DRIVER("screen", slapfght_state, vblank_irq)
@@ -1007,11 +1009,11 @@ static MACHINE_CONFIG_START( slapfigh )
 	MCFG_ADDRESSABLE_LATCH_Q3_OUT_CB(WRITELINE(slapfght_state, irq_enable_w))
 	MCFG_ADDRESSABLE_LATCH_Q4_OUT_CB(MEMBANK("bank1"))
 
-	MCFG_CPU_ADD("audiocpu", Z80, XTAL_36MHz/12) // 3MHz
+	MCFG_CPU_ADD("audiocpu", Z80, XTAL(36'000'000)/12) // 3MHz
 	MCFG_CPU_PROGRAM_MAP(tigerh_sound_map)
 	MCFG_CPU_PERIODIC_INT_DRIVER(slapfght_state, sound_nmi, 180)
 
-	MCFG_DEVICE_ADD("bmcu", TAITO68705_MCU, XTAL_36MHz/12) // 3MHz
+	MCFG_DEVICE_ADD("bmcu", TAITO68705_MCU, XTAL(36'000'000)/12) // 3MHz
 	MCFG_TAITO_M68705_AUX_STROBE_CB(WRITE8(slapfght_state, scroll_from_mcu_w))
 
 	MCFG_QUANTUM_PERFECT_CPU("maincpu")
@@ -1035,18 +1037,19 @@ static MACHINE_CONFIG_START( slapfigh )
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
 
-	MCFG_SOUND_ADD("ay1", AY8910, XTAL_36MHz/24) // 1.5MHz
+	MCFG_SOUND_ADD("ay1", AY8910, XTAL(36'000'000)/24) // 1.5MHz
 	MCFG_AY8910_PORT_A_READ_CB(IOPORT("IN0"))
 	MCFG_AY8910_PORT_B_READ_CB(IOPORT("IN1"))
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
 
-	MCFG_SOUND_ADD("ay2", AY8910, XTAL_36MHz/24) // 1.5MHz
+	MCFG_SOUND_ADD("ay2", AY8910, XTAL(36'000'000)/24) // 1.5MHz
 	MCFG_AY8910_PORT_A_READ_CB(IOPORT("DSW1"))
 	MCFG_AY8910_PORT_B_READ_CB(IOPORT("DSW2"))
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_DERIVED( slapfighb1, slapfigh )
+MACHINE_CONFIG_START(slapfght_state::slapfighb1)
+	slapfigh(config);
 
 	/* basic machine hardware */
 	MCFG_CPU_MODIFY("maincpu")
@@ -1056,21 +1059,24 @@ static MACHINE_CONFIG_DERIVED( slapfighb1, slapfigh )
 	MCFG_DEVICE_REMOVE("bmcu")
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_DERIVED( slapfighb2, slapfighb1 )
+MACHINE_CONFIG_START(slapfght_state::slapfighb2)
+	slapfighb1(config);
 
 	/* basic machine hardware */
 	MCFG_CPU_MODIFY("maincpu")
 	MCFG_CPU_PROGRAM_MAP(slapfighb2_map)
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_DERIVED( getstarb1, slapfighb1 )
+MACHINE_CONFIG_START(slapfght_state::getstarb1)
+	slapfighb1(config);
 
 	/* basic machine hardware */
 	MCFG_CPU_MODIFY("maincpu")
 	MCFG_CPU_IO_MAP(getstarb1_io_map)
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_DERIVED( getstarb2, slapfighb1 )
+MACHINE_CONFIG_START(slapfght_state::getstarb2)
+	slapfighb1(config);
 
 	/* basic machine hardware */
 	MCFG_CPU_MODIFY("maincpu")

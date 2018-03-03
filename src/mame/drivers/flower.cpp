@@ -85,7 +85,7 @@ CHIP #  POSITION   TYPE
 #include "screen.h"
 #include "speaker.h"
 
-#define MASTER_CLOCK XTAL_18_432MHz
+#define MASTER_CLOCK XTAL(18'432'000)
 
 class flower_state : public driver_device
 {
@@ -120,6 +120,9 @@ public:
 	TILE_GET_INFO_MEMBER(get_fg_tile_info);
 	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 
+	void flower(machine_config &config);
+	void audio_map(address_map &map);
+	void shared_map(address_map &map);
 protected:
 	// driver_device overrides
 	virtual void machine_start() override;
@@ -332,7 +335,7 @@ WRITE8_MEMBER(flower_state::fgvram_w)
 	m_fg_tilemap->mark_tile_dirty(offset & 0xff);
 }
 
-static ADDRESS_MAP_START( shared_map, AS_PROGRAM, 8, flower_state )
+ADDRESS_MAP_START(flower_state::shared_map)
 	AM_RANGE(0x0000, 0x7fff) AM_ROM
 	AM_RANGE(0xc000, 0xdfff) AM_RAM AM_SHARE("workram")
 	AM_RANGE(0xa000, 0xa000) AM_WRITENOP
@@ -353,7 +356,7 @@ static ADDRESS_MAP_START( shared_map, AS_PROGRAM, 8, flower_state )
 	AM_RANGE(0xfa00, 0xfa00) AM_RAM AM_SHARE("bgscroll")
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( audio_map, AS_PROGRAM, 8, flower_state )
+ADDRESS_MAP_START(flower_state::audio_map)
 	AM_RANGE(0x0000, 0x3fff) AM_ROM
 	AM_RANGE(0x4000, 0x4000) AM_WRITENOP // audio irq related (0 at start, 1 at end)
 	AM_RANGE(0x4001, 0x4001) AM_WRITE(audio_nmi_mask_w)
@@ -486,7 +489,7 @@ INTERRUPT_GEN_MEMBER(flower_state::slave_vblank_irq)
 }
 
 
-static MACHINE_CONFIG_START( flower )
+MACHINE_CONFIG_START(flower_state::flower)
 	MCFG_CPU_ADD("mastercpu",Z80,MASTER_CLOCK/4)
 	MCFG_CPU_PROGRAM_MAP(shared_map)
 	MCFG_CPU_VBLANK_INT_DRIVER("screen", flower_state, master_vblank_irq)

@@ -45,6 +45,11 @@ public:
 	DECLARE_WRITE8_MEMBER(ppi0b_w);
 	DECLARE_WRITE8_MEMBER(sndcmd_w);
 	TIMER_DEVICE_CALLBACK_MEMBER(timer_a);
+	void jeutel(machine_config &config);
+	void jeutel_cpu2(address_map &map);
+	void jeutel_cpu3(address_map &map);
+	void jeutel_cpu3_io(address_map &map);
+	void jeutel_map(address_map &map);
 private:
 	bool m_timer_a;
 	uint8_t m_sndcmd;
@@ -56,7 +61,7 @@ private:
 };
 
 
-static ADDRESS_MAP_START( jeutel_map, AS_PROGRAM, 8, jeutel_state )
+ADDRESS_MAP_START(jeutel_state::jeutel_map)
 	ADDRESS_MAP_UNMAP_HIGH
 	AM_RANGE(0x0000, 0x1fff) AM_ROM AM_REGION("roms", 0)
 	AM_RANGE(0xc000, 0xc3ff) AM_RAM AM_SHARE("shared")
@@ -64,7 +69,7 @@ static ADDRESS_MAP_START( jeutel_map, AS_PROGRAM, 8, jeutel_state )
 	AM_RANGE(0xe000, 0xe003) AM_DEVREADWRITE("ppi8255_2", i8255_device, read, write)
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( jeutel_cpu2, AS_PROGRAM, 8, jeutel_state )
+ADDRESS_MAP_START(jeutel_state::jeutel_cpu2)
 	ADDRESS_MAP_UNMAP_HIGH
 	AM_RANGE(0x0000, 0x0fff) AM_ROM AM_REGION("roms", 0x2000)
 	AM_RANGE(0x2000, 0x2003) AM_DEVREADWRITE("ppi8255_0", i8255_device, read, write)
@@ -74,14 +79,14 @@ static ADDRESS_MAP_START( jeutel_cpu2, AS_PROGRAM, 8, jeutel_state )
 	AM_RANGE(0xc000, 0xc3ff) AM_RAM AM_SHARE("shared")
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( jeutel_cpu3, AS_PROGRAM, 8, jeutel_state )
+ADDRESS_MAP_START(jeutel_state::jeutel_cpu3)
 	ADDRESS_MAP_UNMAP_HIGH
 	AM_RANGE(0x0000, 0x0fff) AM_ROM AM_REGION("roms", 0x3000)
 	AM_RANGE(0x4000, 0x43ff) AM_RAM
 	AM_RANGE(0x8000, 0x8000) AM_WRITE(sndcmd_w)
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( jeutel_cpu3_io, AS_IO, 8, jeutel_state )
+ADDRESS_MAP_START(jeutel_state::jeutel_cpu3_io)
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	AM_RANGE(0x00, 0x00) AM_DEVWRITE("aysnd", ay8910_device, address_w)
 	AM_RANGE(0x01, 0x01) AM_DEVWRITE("aysnd", ay8910_device, data_w)
@@ -184,7 +189,7 @@ DRIVER_INIT_MEMBER( jeutel_state, jeutel )
 {
 }
 
-static MACHINE_CONFIG_START( jeutel )
+MACHINE_CONFIG_START(jeutel_state::jeutel)
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", Z80, 3300000)
 	MCFG_CPU_PROGRAM_MAP(jeutel_map)
@@ -198,7 +203,7 @@ static MACHINE_CONFIG_START( jeutel )
 	MCFG_DEFAULT_LAYOUT(layout_jeutel)
 
 	/* Sound */
-	MCFG_FRAGMENT_ADD( genpin_audio )
+	genpin_audio(config);
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")

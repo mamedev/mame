@@ -45,4 +45,7 @@ public:
 	INTERRUPT_GEN_MEMBER(skyfox_interrupt);
 	void draw_sprites( bitmap_ind16 &bitmap, const rectangle &cliprect );
 	void draw_background(bitmap_ind16 &bitmap, const rectangle &cliprect);
+	void skyfox(machine_config &config);
+	void skyfox_map(address_map &map);
+	void skyfox_sound_map(address_map &map);
 };

@@ -171,7 +171,7 @@ Module timer tag static_vblank_timer name m_expire.seconds
 #include "screen.h"
 
 
-static ADDRESS_MAP_START(rm380z_mem, AS_PROGRAM, 8, rm380z_state)
+ADDRESS_MAP_START(rm380z_state::rm380z_mem)
 	AM_RANGE( 0xe000, 0xefff ) AM_ROM AM_REGION(RM380Z_MAINCPU_TAG, 0)
 	AM_RANGE( 0xf000, 0xf5ff ) AM_READWRITE(videoram_read,videoram_write)
 	AM_RANGE( 0xf600, 0xf9ff ) AM_ROM AM_REGION(RM380Z_MAINCPU_TAG, 0x1000)     /* Extra ROM space for COS4.0 */
@@ -180,7 +180,7 @@ static ADDRESS_MAP_START(rm380z_mem, AS_PROGRAM, 8, rm380z_state)
 	AM_RANGE( 0xfc00, 0xffff ) AM_READWRITE(hiram_read,hiram_write)
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( rm380z_io , AS_IO, 8, rm380z_state)
+ADDRESS_MAP_START(rm380z_state::rm380z_io)
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	AM_RANGE(0x00, 0xbf) AM_READWRITE(rm380z_portlow_r, rm380z_portlow_w)
 	AM_RANGE(0xc0, 0xc3) AM_DEVREADWRITE("wd1771", fd1771_device, read, write)
@@ -188,13 +188,13 @@ static ADDRESS_MAP_START( rm380z_io , AS_IO, 8, rm380z_state)
 	AM_RANGE(0xc5, 0xff) AM_READWRITE(rm380z_porthi_r, rm380z_porthi_w)
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START(rm480z_mem, AS_PROGRAM, 8, rm380z_state)
+ADDRESS_MAP_START(rm380z_state::rm480z_mem)
 	AM_RANGE( 0x0000, 0xe7ff ) AM_RAM
 	AM_RANGE( 0xe800, 0xf7ff ) AM_ROM AM_REGION(RM380Z_MAINCPU_TAG, 0)
 	AM_RANGE( 0xf800, 0xffff ) AM_RAM
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( rm480z_io , AS_IO, 8, rm380z_state)
+ADDRESS_MAP_START(rm380z_state::rm480z_io)
 	//AM_RANGE(0x00, 0x17) AM_RAM // videoram
 	//AM_RANGE(0x18, 0x18) AM_MIRROR(0xff00) // control port 0
 	//AM_RANGE(0x19, 0x19) AM_MIRROR(0xff00) // control port 1
@@ -228,9 +228,9 @@ uint32_t rm380z_state::screen_update_rm380z(screen_device &screen, bitmap_ind16 
 	return 0;
 }
 
-static MACHINE_CONFIG_START( rm380z )
+MACHINE_CONFIG_START(rm380z_state::rm380z)
 	/* basic machine hardware */
-	MCFG_CPU_ADD(RM380Z_MAINCPU_TAG, Z80, XTAL_16MHz / 4)
+	MCFG_CPU_ADD(RM380Z_MAINCPU_TAG, Z80, XTAL(16'000'000) / 4)
 	MCFG_CPU_PROGRAM_MAP(rm380z_mem)
 	MCFG_CPU_IO_MAP(rm380z_io)
 
@@ -258,7 +258,7 @@ static MACHINE_CONFIG_START( rm380z )
 	MCFG_RAM_DEFAULT_SIZE("56K")
 
 	/* floppy disk */
-	MCFG_FD1771_ADD("wd1771", XTAL_1MHz)
+	MCFG_FD1771_ADD("wd1771", XTAL(1'000'000))
 
 	MCFG_FLOPPY_DRIVE_ADD("wd1771:0", rm380z_floppies, "sssd", floppy_image_device::default_floppy_formats)
 	MCFG_FLOPPY_DRIVE_ADD("wd1771:1", rm380z_floppies, "sssd", floppy_image_device::default_floppy_formats)
@@ -268,9 +268,9 @@ static MACHINE_CONFIG_START( rm380z )
 	MCFG_GENERIC_KEYBOARD_CB(PUT(rm380z_state, keyboard_put))
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_START( rm480z )
+MACHINE_CONFIG_START(rm380z_state::rm480z)
 	/* basic machine hardware */
-	MCFG_CPU_ADD(RM380Z_MAINCPU_TAG, Z80, XTAL_16MHz / 4)
+	MCFG_CPU_ADD(RM380Z_MAINCPU_TAG, Z80, XTAL(16'000'000) / 4)
 	MCFG_CPU_PROGRAM_MAP(rm480z_mem)
 	MCFG_CPU_IO_MAP(rm480z_io)
 

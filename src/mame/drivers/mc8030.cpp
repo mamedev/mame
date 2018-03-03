@@ -50,13 +50,16 @@ public:
 	DECLARE_WRITE8_MEMBER(asp_port_b_w);
 	uint32_t screen_update_mc8030(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 
+	void mc8030(machine_config &config);
+	void io_map(address_map &map);
+	void mem_map(address_map &map);
 private:
 	required_region_ptr<u8> m_p_videoram;
 	required_device<cpu_device> m_maincpu;
 };
 
 
-static ADDRESS_MAP_START( mem_map, AS_PROGRAM, 8, mc8030_state )
+ADDRESS_MAP_START(mc8030_state::mem_map)
 	ADDRESS_MAP_UNMAP_HIGH
 	//  ZRE 4 * 2KB
 	AM_RANGE(0x0000, 0x1fff) AM_ROM // ZRE ROM's 4 * 2716
@@ -66,7 +69,7 @@ static ADDRESS_MAP_START( mem_map, AS_PROGRAM, 8, mc8030_state )
 	AM_RANGE(0xc000, 0xffff) AM_RAM // ZRE RAM
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( io_map, AS_IO, 8, mc8030_state )
+ADDRESS_MAP_START(mc8030_state::io_map)
 	ADDRESS_MAP_UNMAP_HIGH
 	AM_RANGE(0x30, 0x3f) AM_MIRROR(0xff00) AM_NOP //"mass storage"
 	AM_RANGE(0x80, 0x83) AM_MIRROR(0xff00) AM_DEVREADWRITE("zve_ctc", z80ctc_device, read, write) // user CTC
@@ -176,9 +179,9 @@ static const z80_daisy_config daisy_chain[] =
 };
 
 
-static MACHINE_CONFIG_START( mc8030 )
+MACHINE_CONFIG_START(mc8030_state::mc8030)
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu",Z80, XTAL_2_4576MHz)
+	MCFG_CPU_ADD("maincpu",Z80, XTAL(2'457'600))
 	MCFG_CPU_PROGRAM_MAP(mem_map)
 	MCFG_CPU_IO_MAP(io_map)
 	MCFG_Z80_DAISY_CHAIN(daisy_chain)
@@ -195,25 +198,25 @@ static MACHINE_CONFIG_START( mc8030 )
 	MCFG_PALETTE_ADD_MONOCHROME("palette")
 
 	/* Devices */
-	MCFG_DEVICE_ADD("zve_pio", Z80PIO, XTAL_2_4576MHz)
+	MCFG_DEVICE_ADD("zve_pio", Z80PIO, XTAL(2'457'600))
 	MCFG_Z80PIO_OUT_INT_CB(INPUTLINE("maincpu", INPUT_LINE_IRQ0))
 	MCFG_Z80PIO_IN_PA_CB(READ8(mc8030_state, zve_port_a_r))
 	//MCFG_Z80PIO_OUT_PA_CB(WRITE8(mc8030_state, zve_port_a_w))
 	MCFG_Z80PIO_IN_PB_CB(READ8(mc8030_state, zve_port_b_r))
 	//MCFG_Z80PIO_OUT_PB_CB(WRITE8(mc8030_state, zve_port_b_w))
 
-	MCFG_DEVICE_ADD("zve_ctc", Z80CTC, XTAL_2_4576MHz)
+	MCFG_DEVICE_ADD("zve_ctc", Z80CTC, XTAL(2'457'600))
 	MCFG_Z80CTC_INTR_CB(INPUTLINE("maincpu", INPUT_LINE_IRQ0))
 	// ZC0, ZC1, ZC2 for user
 
-	MCFG_DEVICE_ADD("asp_pio", Z80PIO, XTAL_2_4576MHz)
+	MCFG_DEVICE_ADD("asp_pio", Z80PIO, XTAL(2'457'600))
 	MCFG_Z80PIO_OUT_INT_CB(INPUTLINE("maincpu", INPUT_LINE_IRQ0))
 	MCFG_Z80PIO_IN_PA_CB(READ8(mc8030_state, asp_port_a_r))
 	//MCFG_Z80PIO_OUT_PA_CB(WRITE8(mc8030_state, asp_port_a_w))
 	MCFG_Z80PIO_IN_PB_CB(READ8(mc8030_state, asp_port_b_r))
 	//MCFG_Z80PIO_OUT_PB_CB(WRITE8(mc8030_state, asp_port_b_w))
 
-	MCFG_DEVICE_ADD("asp_ctc", Z80CTC, XTAL_2_4576MHz)
+	MCFG_DEVICE_ADD("asp_ctc", Z80CTC, XTAL(2'457'600))
 	MCFG_Z80CTC_INTR_CB(INPUTLINE("maincpu", INPUT_LINE_IRQ0))
 	// ZC0: to SIO CLK CH A
 	// ZC1: to SIO CLK CH B

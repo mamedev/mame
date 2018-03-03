@@ -29,6 +29,9 @@ public:
 	DECLARE_PALETTE_INIT(unistar);
 	uint32_t screen_update_unistar(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 
+	void unistar(machine_config &config);
+	void unistar_io(address_map &map);
+	void unistar_mem(address_map &map);
 private:
 	virtual void machine_reset() override;
 	required_device<cpu_device> m_maincpu;
@@ -36,13 +39,13 @@ private:
 };
 
 
-static ADDRESS_MAP_START(unistar_mem, AS_PROGRAM, 8, unistar_state)
+ADDRESS_MAP_START(unistar_state::unistar_mem)
 	ADDRESS_MAP_UNMAP_HIGH
 	AM_RANGE(0x0000, 0x2fff) AM_ROM
 	AM_RANGE(0x8000, 0x8fff) AM_RAM
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START(unistar_io, AS_IO, 8, unistar_state)
+ADDRESS_MAP_START(unistar_state::unistar_io)
 	//ADDRESS_MAP_UNMAP_HIGH
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	AM_RANGE(0x8c, 0x8d) AM_DEVREADWRITE("stc", am9513_device, read8, write8)
@@ -90,13 +93,13 @@ static GFXDECODE_START( unistar )
 	GFXDECODE_ENTRY( "chargen", 0x0000, unistar_charlayout, 0, 1 )
 GFXDECODE_END
 
-static MACHINE_CONFIG_START( unistar )
+MACHINE_CONFIG_START(unistar_state::unistar)
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu",I8085A, XTAL_2MHz)
+	MCFG_CPU_ADD("maincpu",I8085A, XTAL(2'000'000))
 	MCFG_CPU_PROGRAM_MAP(unistar_mem)
 	MCFG_CPU_IO_MAP(unistar_io)
 
-	MCFG_DEVICE_ADD("stc", AM9513, XTAL_8MHz)
+	MCFG_DEVICE_ADD("stc", AM9513, XTAL(8'000'000))
 	MCFG_AM9513_FOUT_CALLBACK(DEVWRITELINE("stc", am9513_device, source1_w))
 
 	MCFG_DEVICE_ADD("ppi", I8255A, 0)

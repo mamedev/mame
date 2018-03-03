@@ -47,6 +47,8 @@ public:
 	void install_boot_rom();
 	void remove_boot_rom();
 
+	void risc2500(machine_config &config);
+	void risc2500_mem(address_map &map);
 private:
 	required_device<cpu_device> m_maincpu;
 	required_device<ram_device> m_ram;
@@ -77,7 +79,7 @@ uint32_t risc2500_state::screen_update(screen_device &screen, bitmap_ind16 &bitm
 		// 12 characters 5 x 7
 		for(int x=0; x<5; x++)
 		{
-			uint8_t gfx = BITSWAP8(m_vram[c*5 + x], 6,5,0,1,2,3,4,7);
+			uint8_t gfx = bitswap<8>(m_vram[c*5 + x], 6,5,0,1,2,3,4,7);
 
 			for(int y=0; y<7; y++)
 				bitmap.pix16(y, 71 - (c*6 + x)) = (gfx >> (y + 1)) & 1;
@@ -86,7 +88,7 @@ uint32_t risc2500_state::screen_update(screen_device &screen, bitmap_ind16 &bitm
 		// LCD digits and symbols
 		int data_addr = 0x40 + c * 5;
 		uint16_t data = ((m_vram[data_addr + 1] & 0x3) << 5) | ((m_vram[data_addr + 2] & 0x7) << 2) | (m_vram[data_addr + 4] & 0x3);
-		data = BITSWAP8(data, 7,3,0,1,4,6,5,2) | ((m_vram[data_addr - 1] & 0x04) ? 0x80 : 0);
+		data = bitswap<8>(data, 7,3,0,1,4,6,5,2) | ((m_vram[data_addr - 1] & 0x04) ? 0x80 : 0);
 
 		output().set_digit_value(c, data);
 		output().set_indexed_value("sym", c, BIT(m_vram[data_addr + 1], 2));
@@ -286,7 +288,7 @@ void risc2500_state::machine_reset()
 	install_boot_rom();
 }
 
-static ADDRESS_MAP_START(risc2500_mem, AS_PROGRAM, 32, risc2500_state )
+ADDRESS_MAP_START(risc2500_state::risc2500_mem)
 	AM_RANGE( 0x00000000,  0x0001ffff )  AM_RAM
 	AM_RANGE( 0x01800000,  0x01800003 )  AM_READ(disable_boot_rom)
 	AM_RANGE( 0x01000000,  0x01000003 )  AM_READWRITE(p1000_r, p1000_w)
@@ -294,8 +296,8 @@ static ADDRESS_MAP_START(risc2500_mem, AS_PROGRAM, 32, risc2500_state )
 ADDRESS_MAP_END
 
 
-static MACHINE_CONFIG_START( risc2500 )
-	MCFG_CPU_ADD("maincpu", ARM, XTAL_28_322MHz / 2)      // VY86C010
+MACHINE_CONFIG_START(risc2500_state::risc2500)
+	MCFG_CPU_ADD("maincpu", ARM, XTAL(28'322'000) / 2)      // VY86C010
 	MCFG_CPU_PROGRAM_MAP(risc2500_mem)
 	MCFG_ARM_COPRO(VL86C020)
 	MCFG_CPU_PERIODIC_INT_DRIVER(risc2500_state, irq1_line_hold, 250)

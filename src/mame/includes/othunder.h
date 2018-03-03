@@ -53,6 +53,9 @@ public:
 	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	INTERRUPT_GEN_MEMBER(vblank_interrupt);
 
+	void othunder(machine_config &config);
+	void othunder_map(address_map &map);
+	void z80_sound_map(address_map &map);
 protected:
 	virtual void machine_start() override;
 	virtual void machine_reset() override;

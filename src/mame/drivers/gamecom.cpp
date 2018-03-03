@@ -34,7 +34,7 @@ Game Status:
 #include "gamecom.lh"
 
 
-static ADDRESS_MAP_START(gamecom_mem_map, AS_PROGRAM, 8, gamecom_state)
+ADDRESS_MAP_START(gamecom_state::gamecom_mem_map)
 	AM_RANGE( 0x0000, 0x0013 )  AM_RAM AM_REGION("maincpu", 0x00)
 	AM_RANGE( 0x0014, 0x0017 )  AM_READWRITE( gamecom_pio_r, gamecom_pio_w )        // buttons
 	AM_RANGE( 0x0018, 0x001F )  AM_RAM AM_REGION("maincpu", 0x18)
@@ -247,9 +247,9 @@ INTERRUPT_GEN_MEMBER(gamecom_state::gamecom_interrupt)
 	m_maincpu->set_input_line(sm8500_cpu_device::LCDC_INT, ASSERT_LINE );
 }
 
-static MACHINE_CONFIG_START( gamecom )
+MACHINE_CONFIG_START(gamecom_state::gamecom)
 	/* basic machine hardware */
-	MCFG_CPU_ADD( "maincpu", SM8500, XTAL_11_0592MHz/2 )   /* actually it's an sm8521 microcontroller containing an sm8500 cpu */
+	MCFG_CPU_ADD( "maincpu", SM8500, XTAL(11'059'200)/2 )   /* actually it's an sm8521 microcontroller containing an sm8500 cpu */
 	MCFG_CPU_PROGRAM_MAP( gamecom_mem_map)
 	MCFG_SM8500_DMA_CB( WRITE8( gamecom_state, gamecom_handle_dma ) )
 	MCFG_SM8500_TIMER_CB( WRITE8( gamecom_state, gamecom_update_timers ) )

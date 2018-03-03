@@ -119,7 +119,6 @@ WRITE16_MEMBER(dcheese_state::eeprom_control_w)
 	if (ACCESSING_BITS_0_7)
 	{
 		ioport("EEPROMOUT")->write(data, 0xff);
-		machine().device<ticket_dispenser_device>("ticket")->write(space, 0, (data & 1) << 7);
 	}
 }
 
@@ -148,7 +147,7 @@ WRITE8_MEMBER(dcheese_state::sound_control_w)
 	if ((diff & 0x40) && (data & 0x40))
 		m_bsmt->reset();
 	if (data != 0x40 && data != 0x60)
-		logerror("%04X:sound_control_w = %02X\n", space.device().safe_pc(), data);
+		logerror("%04X:sound_control_w = %02X\n", m_audiocpu->pc(), data);
 }
 
 
@@ -172,7 +171,7 @@ WRITE8_MEMBER(dcheese_state::bsmt_data_w)
  *
  *************************************/
 
-static ADDRESS_MAP_START( main_cpu_map, AS_PROGRAM, 16, dcheese_state )
+ADDRESS_MAP_START(dcheese_state::main_cpu_map)
 	ADDRESS_MAP_UNMAP_HIGH
 	AM_RANGE(0x000000, 0x03ffff) AM_ROM
 	AM_RANGE(0x100000, 0x10ffff) AM_RAM
@@ -194,7 +193,7 @@ ADDRESS_MAP_END
  *
  *************************************/
 
-static ADDRESS_MAP_START( sound_cpu_map, AS_PROGRAM, 8, dcheese_state )
+ADDRESS_MAP_START(dcheese_state::sound_cpu_map)
 	ADDRESS_MAP_UNMAP_HIGH
 	AM_RANGE(0x0000, 0x07ff) AM_READWRITE(sound_status_r, sound_control_w)
 	AM_RANGE(0x0800, 0x0fff) AM_DEVREAD("soundlatch", generic_latch_8_device, read)
@@ -257,6 +256,7 @@ static INPUT_PORTS_START( dcheese )
 	PORT_BIT( 0xff00, IP_ACTIVE_LOW, IPT_UNKNOWN )
 
 	PORT_START( "EEPROMOUT" )
+	PORT_BIT( 0x0001, IP_ACTIVE_HIGH, IPT_OUTPUT ) PORT_WRITE_LINE_DEVICE_MEMBER("ticket", ticket_dispenser_device, motor_w)
 	PORT_BIT( 0x0002, IP_ACTIVE_HIGH, IPT_OUTPUT ) PORT_WRITE_LINE_DEVICE_MEMBER("eeprom", eeprom_serial_93cxx_device, di_write)
 	PORT_BIT( 0x0004, IP_ACTIVE_HIGH, IPT_OUTPUT ) PORT_WRITE_LINE_DEVICE_MEMBER("eeprom", eeprom_serial_93cxx_device, clk_write)
 	PORT_BIT( 0x0008, IP_ACTIVE_HIGH, IPT_OUTPUT ) PORT_WRITE_LINE_DEVICE_MEMBER("eeprom", eeprom_serial_93cxx_device, cs_write)
@@ -305,6 +305,7 @@ static INPUT_PORTS_START( lottof2 )
 	PORT_BIT( 0xffff, IP_ACTIVE_LOW, IPT_UNKNOWN )
 
 	PORT_START( "EEPROMOUT" )
+	PORT_BIT( 0x0001, IP_ACTIVE_HIGH, IPT_OUTPUT ) PORT_WRITE_LINE_DEVICE_MEMBER("ticket", ticket_dispenser_device, motor_w)
 	PORT_BIT( 0x0002, IP_ACTIVE_HIGH, IPT_OUTPUT ) PORT_WRITE_LINE_DEVICE_MEMBER("eeprom", eeprom_serial_93cxx_device, di_write)
 	PORT_BIT( 0x0004, IP_ACTIVE_HIGH, IPT_OUTPUT ) PORT_WRITE_LINE_DEVICE_MEMBER("eeprom", eeprom_serial_93cxx_device, clk_write)
 	PORT_BIT( 0x0008, IP_ACTIVE_HIGH, IPT_OUTPUT ) PORT_WRITE_LINE_DEVICE_MEMBER("eeprom", eeprom_serial_93cxx_device, cs_write)
@@ -355,6 +356,7 @@ static INPUT_PORTS_START( fredmem )
 	PORT_BIT( 0xffff, IP_ACTIVE_LOW, IPT_UNKNOWN )
 
 	PORT_START( "EEPROMOUT" )
+	PORT_BIT( 0x0001, IP_ACTIVE_HIGH, IPT_OUTPUT ) PORT_WRITE_LINE_DEVICE_MEMBER("ticket", ticket_dispenser_device, motor_w)
 	PORT_BIT( 0x0002, IP_ACTIVE_HIGH, IPT_OUTPUT ) PORT_WRITE_LINE_DEVICE_MEMBER("eeprom", eeprom_serial_93cxx_device, di_write)
 	PORT_BIT( 0x0004, IP_ACTIVE_HIGH, IPT_OUTPUT ) PORT_WRITE_LINE_DEVICE_MEMBER("eeprom", eeprom_serial_93cxx_device, clk_write)
 	PORT_BIT( 0x0008, IP_ACTIVE_HIGH, IPT_OUTPUT ) PORT_WRITE_LINE_DEVICE_MEMBER("eeprom", eeprom_serial_93cxx_device, cs_write)
@@ -368,7 +370,7 @@ INPUT_PORTS_END
  *
  *************************************/
 
-static MACHINE_CONFIG_START( dcheese )
+MACHINE_CONFIG_START(dcheese_state::dcheese)
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", M68000, MAIN_OSC)
@@ -409,7 +411,8 @@ static MACHINE_CONFIG_START( dcheese )
 MACHINE_CONFIG_END
 
 
-static MACHINE_CONFIG_DERIVED( fredmem, dcheese )
+MACHINE_CONFIG_START(dcheese_state::fredmem)
+	dcheese(config);
 	MCFG_SCREEN_MODIFY("screen")
 	MCFG_SCREEN_VISIBLE_AREA(0, 359, 0, 239)
 MACHINE_CONFIG_END

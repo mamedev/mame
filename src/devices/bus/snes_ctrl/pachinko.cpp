@@ -83,7 +83,7 @@ void snes_pachinko_device::device_reset()
 
 void snes_pachinko_device::port_poll()
 {
-	uint8_t dial = BITSWAP8(m_dial->read() ^ 0xff,7,6,5,4,3,2,1,0);
+	uint8_t dial = bitswap<8>(m_dial->read() ^ 0xff,7,6,5,4,3,2,1,0);
 	m_latch = m_button->read() | (dial << 25) | 0xee7000;   // add ID
 }
 

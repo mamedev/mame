@@ -23,9 +23,6 @@ class lpc210x_device : public arm7_cpu_device
 public:
 	lpc210x_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t);
 
-	// static configuration helpers
-
-
 	DECLARE_READ32_MEMBER(arm_E01FC088_r);
 	DECLARE_READ32_MEMBER(flash_r);
 	DECLARE_WRITE32_MEMBER(flash_w);
@@ -71,6 +68,7 @@ public:
 	// todo, use an appropriate flash type instead
 	uint8_t m_flash[0x8000]; // needs to be public because the harmony/melody device injects contents with memcpy, yuck
 
+	void lpc2103_map(address_map &map);
 protected:
 	// device-level overrides
 	virtual void device_add_mconfig(machine_config &config) override;

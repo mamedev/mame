@@ -91,6 +91,11 @@ public:
 	required_device<gfxdecode_device> m_gfxdecode;
 	required_device<screen_device> m_screen;
 	required_device<palette_device> m_palette;
+	void sprint1(machine_config &config);
+	void sprint2(machine_config &config);
+	void dominos4(machine_config &config);
+	void dominos(machine_config &config);
+	void sprint2_map(address_map &map);
 };
 
 /*----------- defined in audio/sprint2.c -----------*/

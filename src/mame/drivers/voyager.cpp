@@ -56,6 +56,9 @@ public:
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
 	void intel82439tx_init();
+	void voyager(machine_config &config);
+	void voyager_io(address_map &map);
+	void voyager_map(address_map &map);
 };
 
 
@@ -232,7 +235,7 @@ WRITE32_MEMBER(voyager_state::bios_ram_w)
 	}
 }
 
-static ADDRESS_MAP_START( voyager_map, AS_PROGRAM, 32, voyager_state )
+ADDRESS_MAP_START(voyager_state::voyager_map)
 	AM_RANGE(0x00000000, 0x0009ffff) AM_RAM
 	AM_RANGE(0x000a0000, 0x000bffff) AM_DEVREADWRITE8("vga", trident_vga_device, mem_r, mem_w, 0xffffffff) // VGA VRAM
 	AM_RANGE(0x000c0000, 0x000c7fff) AM_RAM AM_REGION("video_bios", 0)
@@ -240,7 +243,7 @@ static ADDRESS_MAP_START( voyager_map, AS_PROGRAM, 32, voyager_state )
 	//AM_RANGE(0x000d0000, 0x000d0003) AM_RAM  // XYLINX - Sincronus serial communication
 	AM_RANGE(0x000d0008, 0x000d000b) AM_WRITENOP // ???
 	AM_RANGE(0x000d0800, 0x000d0fff) AM_ROM AM_REGION("nvram",0) //
-	AM_RANGE(0x000d0800, 0x000d0fff) AM_RAM  // GAME_CMOS
+//  AM_RANGE(0x000d0800, 0x000d0fff) AM_RAM  // GAME_CMOS
 
 	//GRULL AM_RANGE(0x000e0000, 0x000effff) AM_RAM
 	//GRULL-AM_RANGE(0x000f0000, 0x000fffff) AM_ROMBANK("bank1")
@@ -248,7 +251,7 @@ static ADDRESS_MAP_START( voyager_map, AS_PROGRAM, 32, voyager_state )
 	AM_RANGE(0x000e0000, 0x000fffff) AM_ROMBANK("bank1")
 	AM_RANGE(0x000e0000, 0x000fffff) AM_WRITE(bios_ram_w)
 	AM_RANGE(0x00100000, 0x03ffffff) AM_RAM  // 64MB
-	AM_RANGE(0x02000000, 0x28ffffff) AM_NOP
+	AM_RANGE(0x04000000, 0x28ffffff) AM_NOP
 	//AM_RANGE(0x04000000, 0x040001ff) AM_RAM
 	//AM_RANGE(0x08000000, 0x080001ff) AM_RAM
 	//AM_RANGE(0x0c000000, 0x0c0001ff) AM_RAM
@@ -260,7 +263,7 @@ static ADDRESS_MAP_START( voyager_map, AS_PROGRAM, 32, voyager_state )
 	AM_RANGE(0xfffe0000, 0xffffffff) AM_ROM AM_REGION("bios", 0)    /* System BIOS */
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( voyager_io, AS_IO, 32, voyager_state )
+ADDRESS_MAP_START(voyager_state::voyager_io)
 	AM_IMPORT_FROM(pcat32_io_common)
 
 	//AM_RANGE(0x00e8, 0x00eb) AM_NOP
@@ -274,7 +277,6 @@ static ADDRESS_MAP_START( voyager_io, AS_IO, 32, voyager_state )
 	AM_RANGE(0x02a0, 0x02a7) AM_NOP //To debug
 	AM_RANGE(0x02c0, 0x02c7) AM_NOP //To debug
 	AM_RANGE(0x02e0, 0x02ef) AM_NOP //To debug
-	AM_RANGE(0x0278, 0x02ff) AM_NOP //To debug
 	AM_RANGE(0x02f8, 0x02ff) AM_NOP //To debug
 	AM_RANGE(0x0320, 0x038f) AM_NOP //To debug
 	AM_RANGE(0x03a0, 0x03a7) AM_NOP //To debug
@@ -490,13 +492,13 @@ void voyager_state::machine_reset()
 	membank("bank1")->set_base(memregion("bios")->base());
 }
 
-static MACHINE_CONFIG_START( voyager )
+MACHINE_CONFIG_START(voyager_state::voyager)
 	MCFG_CPU_ADD("maincpu", PENTIUM3, 133000000) // actually AMD Duron CPU of unknown clock
 	MCFG_CPU_PROGRAM_MAP(voyager_map)
 	MCFG_CPU_IO_MAP(voyager_io)
 	MCFG_CPU_IRQ_ACKNOWLEDGE_DEVICE("pic8259_1", pic8259_device, inta_cb)
 
-	MCFG_FRAGMENT_ADD( pcat_common )
+	pcat_common(config);
 
 	MCFG_IDE_CONTROLLER_ADD("ide", ata_devices, "hdd", nullptr, true)
 	MCFG_ATA_INTERFACE_IRQ_HANDLER(DEVWRITELINE("pic8259_2", pic8259_device, ir6_w))
@@ -506,7 +508,7 @@ static MACHINE_CONFIG_START( voyager )
 	MCFG_PCI_BUS_LEGACY_DEVICE(7, nullptr, intel82371ab_pci_r, intel82371ab_pci_w)
 
 	/* video hardware */
-	MCFG_FRAGMENT_ADD( pcvideo_trident_vga )
+	pcvideo_trident_vga(config);
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_STEREO("lspeaker","rspeaker")

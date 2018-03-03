@@ -86,6 +86,11 @@ public:
 	DECLARE_WRITE8_MEMBER(eeprom_w);
 	DECLARE_READ8_MEMBER(eeprom_r);
 	DECLARE_DRIVER_INIT(pve500);
+	void pve500(machine_config &config);
+	void maincpu_io(address_map &map);
+	void maincpu_prg(address_map &map);
+	void subcpu_io(address_map &map);
+	void subcpu_prg(address_map &map);
 private:
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
@@ -115,21 +120,21 @@ static const z80_daisy_config maincpu_daisy_chain[] =
 };
 
 
-static ADDRESS_MAP_START(maincpu_io, AS_IO, 8, pve500_state)
+ADDRESS_MAP_START(pve500_state::maincpu_io)
 	AM_RANGE(0x00, 0x03) AM_MIRROR(0xff00) AM_DEVREADWRITE("external_sio", z80sio0_device, cd_ba_r, cd_ba_w)
 	AM_RANGE(0x08, 0x0B) AM_MIRROR(0xff00) AM_DEVREADWRITE("external_ctc", z80ctc_device, read, write)
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START(maincpu_prg, AS_PROGRAM, 8, pve500_state)
+ADDRESS_MAP_START(pve500_state::maincpu_prg)
 	AM_RANGE(0x0000, 0xbfff) AM_ROM // ICB7: 48kbytes EPROM
 	AM_RANGE(0xc000, 0xdfff) AM_RAM // ICD6: 8kbytes of RAM
 	AM_RANGE(0xe000, 0xe7ff) AM_MIRROR(0x1800) AM_DEVREADWRITE("mb8421", mb8421_device, left_r, left_w)
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START(subcpu_io, AS_IO, 8, pve500_state)
+ADDRESS_MAP_START(pve500_state::subcpu_io)
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START(subcpu_prg, AS_PROGRAM, 8, pve500_state)
+ADDRESS_MAP_START(pve500_state::subcpu_prg)
 	AM_RANGE(0x0000, 0x7fff) AM_ROM // ICG5: 32kbytes EPROM
 	AM_RANGE(0x8000, 0x8007) AM_MIRROR(0x3ff8) AM_DEVREADWRITE("cxdio", cxd1095_device, read, write)
 	AM_RANGE(0xc000, 0xc7ff) AM_MIRROR(0x3800) AM_DEVREADWRITE("mb8421", mb8421_device, right_r, right_w)
@@ -325,14 +330,14 @@ WRITE8_MEMBER(pve500_state::io_sel_w)
 	io_SEL = data;
 	for (int i=0; i<4; i++){
 		if (BIT(io_SEL, i)){
-			LD_data[i] = 0x7F & BITSWAP8(io_LD ^ 0xFF, 7, 0, 1, 2, 3, 4, 5, 6);
+			LD_data[i] = 0x7F & bitswap<8>(io_LD ^ 0xFF, 7, 0, 1, 2, 3, 4, 5, 6);
 		}
 	}
 }
 
-static MACHINE_CONFIG_START( pve500 )
+MACHINE_CONFIG_START(pve500_state::pve500)
 	/* Main CPU */
-	MCFG_CPU_ADD("maincpu", TMPZ84C015, XTAL_12MHz / 2) /* TMPZ84C015BF-6 */
+	MCFG_CPU_ADD("maincpu", TMPZ84C015, XTAL(12'000'000) / 2) /* TMPZ84C015BF-6 */
 	MCFG_CPU_PROGRAM_MAP(maincpu_prg)
 	MCFG_CPU_IO_MAP(maincpu_io)
 	MCFG_Z80_DAISY_CHAIN(maincpu_daisy_chain)
@@ -341,16 +346,16 @@ static MACHINE_CONFIG_START( pve500 )
 	MCFG_TMPZ84C015_OUT_TXDA_CB(DEVWRITELINE("recorder", rs232_port_device, write_txd))
 	MCFG_TMPZ84C015_OUT_TXDB_CB(DEVWRITELINE("player1", rs232_port_device, write_txd))
 
-	MCFG_DEVICE_ADD("external_ctc", Z80CTC, XTAL_12MHz / 2)
+	MCFG_DEVICE_ADD("external_ctc", Z80CTC, XTAL(12'000'000) / 2)
 	MCFG_Z80CTC_INTR_CB(INPUTLINE("maincpu", INPUT_LINE_IRQ0))
 
-	MCFG_DEVICE_ADD("external_sio", Z80SIO0, XTAL_12MHz / 2)
+	MCFG_DEVICE_ADD("external_sio", Z80SIO0, XTAL(12'000'000) / 2)
 	MCFG_Z80DART_OUT_INT_CB(INPUTLINE("maincpu", INPUT_LINE_IRQ0))
 	MCFG_Z80DART_OUT_TXDA_CB(DEVWRITELINE("player2", rs232_port_device, write_txd))
 	MCFG_Z80DART_OUT_TXDB_CB(DEVWRITELINE("edl_inout", rs232_port_device, write_txd))
 
 	/* Secondary CPU */
-	MCFG_CPU_ADD("subcpu", TMPZ84C015, XTAL_12MHz / 2) /* TMPZ84C015BF-6 */
+	MCFG_CPU_ADD("subcpu", TMPZ84C015, XTAL(12'000'000) / 2) /* TMPZ84C015BF-6 */
 	MCFG_CPU_PROGRAM_MAP(subcpu_prg)
 	MCFG_CPU_IO_MAP(subcpu_io)
 	MCFG_TMPZ84C015_OUT_DTRB_CB(WRITELINE(pve500_state, external_monitor_w))
@@ -370,8 +375,8 @@ static MACHINE_CONFIG_START( pve500 )
 	MCFG_CXD1095_OUT_PORTE_CB(WRITE8(pve500_state, io_sel_w))
 
 	/* Search Dial MCUs */
-	MCFG_CPU_ADD("dial_mcu_left", MB88201, XTAL_4MHz) /* PLAYER DIAL MCU */
-	MCFG_CPU_ADD("dial_mcu_right", MB88201, XTAL_4MHz) /* RECORDER DIAL MCU */
+	MCFG_CPU_ADD("dial_mcu_left", MB88201, XTAL(4'000'000)) /* PLAYER DIAL MCU */
+	MCFG_CPU_ADD("dial_mcu_right", MB88201, XTAL(4'000'000)) /* RECORDER DIAL MCU */
 
 	/* Serial EEPROM (128 bytes, 8-bit data organization) */
 	/* The EEPROM stores the setup data */

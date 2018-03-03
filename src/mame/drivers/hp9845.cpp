@@ -188,7 +188,7 @@ constexpr unsigned LP_FOV = 9;  // Field of view
 constexpr unsigned LP_XOFFSET = 5;  // x-offset of LP (due to delay in hit recognition)
 
 // Peripheral Addresses (PA)
-#define PRINTER_PA			0
+#define PRINTER_PA          0
 #define IO_SLOT_FIRST_PA    1
 #define IO_SLOT_LAST_PA     12
 #define GVIDEO_PA           13
@@ -205,6 +205,8 @@ public:
 	{ }
 
 	uint32_t screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
+	void hp9845a(machine_config &config);
+	void hp9835a(machine_config &config);
 };
 
 static INPUT_PORTS_START( hp9845 )
@@ -860,6 +862,7 @@ public:
 
 	DECLARE_WRITE_LINE_MEMBER(vblank_w);
 
+	void hp9845b(machine_config &config);
 protected:
 	void set_graphic_mode(bool graphic);
 	void set_video_mar(uint16_t mar);
@@ -2084,6 +2087,7 @@ public:
 
 	TIMER_DEVICE_CALLBACK_MEMBER(scanline_timer);
 
+	void hp9845c(machine_config &config);
 protected:
 	virtual void set_graphic_mode(bool graphic , bool alpha) override;
 	void video_render_buff(unsigned video_scanline , unsigned line_in_row, bool buff_idx);
@@ -2820,6 +2824,7 @@ public:
 
 	TIMER_DEVICE_CALLBACK_MEMBER(scanline_timer);
 
+	void hp9845t(machine_config &config);
 protected:
 	virtual void set_graphic_mode(bool graphic , bool alpha) override;
 	void video_render_buff(unsigned video_scanline , unsigned line_in_row, bool buff_idx);
@@ -3652,9 +3657,9 @@ const uint8_t hp9845t_state::m_back_arrow_shape[] = {
 	0xf8, 0xf0, 0xe0, 0xc0, 0x80, 0x00, 0x00
 };
 
-static MACHINE_CONFIG_START( hp9845a )
-	//MCFG_CPU_ADD("lpu", HP_5061_3010, XTAL_11_4MHz)
-	//MCFG_CPU_ADD("ppu", HP_5061_3011, XTAL_11_4MHz)
+MACHINE_CONFIG_START(hp9845_state::hp9845a)
+	//MCFG_CPU_ADD("lpu", HP_5061_3010, XTAL(11'400'000))
+	//MCFG_CPU_ADD("ppu", HP_5061_3011, XTAL(11'400'000))
 
 	// video hardware
 	MCFG_SCREEN_ADD("screen", RASTER)
@@ -3667,9 +3672,9 @@ static MACHINE_CONFIG_START( hp9845a )
 	MCFG_SOFTWARE_LIST_ADD("optrom_list", "hp9845a_rom")
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_START( hp9835a )
-	//MCFG_CPU_ADD("lpu", HP_5061_3001, XTAL_11_4MHz)
-	//MCFG_CPU_ADD("ppu", HP_5061_3001, XTAL_11_4MHz)
+MACHINE_CONFIG_START(hp9845_state::hp9835a)
+	//MCFG_CPU_ADD("lpu", HP_5061_3001, XTAL(11'400'000))
+	//MCFG_CPU_ADD("ppu", HP_5061_3001, XTAL(11'400'000))
 
 	// video hardware
 	MCFG_SCREEN_ADD("screen", RASTER)
@@ -3711,7 +3716,7 @@ MACHINE_CONFIG_END
     - all LPU RAM is dynamically mapped at machine start according to -ramsize option
 */
 
-static ADDRESS_MAP_START(global_mem_map , AS_PROGRAM , 16 , hp9845_base_state)
+ADDRESS_MAP_START(hp9845_base_state::global_mem_map)
 	ADDRESS_MAP_GLOBAL_MASK(0x3f7fff)
 	ADDRESS_MAP_UNMAP_LOW
 	AM_RANGE(0x014000 , 0x017fff) AM_RAM AM_SHARE("ppu_ram")
@@ -3719,7 +3724,7 @@ static ADDRESS_MAP_START(global_mem_map , AS_PROGRAM , 16 , hp9845_base_state)
 	AM_RANGE(0x050000 , 0x057fff) AM_ROM AM_REGION("ppu" , 0)
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START(ppu_io_map , AS_IO , 16 , hp9845_base_state)
+ADDRESS_MAP_START(hp9845_base_state::ppu_io_map)
 	ADDRESS_MAP_UNMAP_LOW
 	// PA = 0, IC = 0..1
 	// Internal printer
@@ -3741,7 +3746,7 @@ static ADDRESS_MAP_START(ppu_io_map , AS_IO , 16 , hp9845_base_state)
 	AM_RANGE(HP_MAKE_IOADDR(T15_PA , 0) , HP_MAKE_IOADDR(T15_PA , 3))        AM_DEVREADWRITE("t15" , hp_taco_device , reg_r , reg_w)
 ADDRESS_MAP_END
 
-static MACHINE_CONFIG_START(hp9845_base)
+MACHINE_CONFIG_START(hp9845_base_state::hp9845_base)
 	MCFG_CPU_ADD("lpu", HP_5061_3001, 5700000)
 	MCFG_CPU_PROGRAM_MAP(global_mem_map)
 	MCFG_HPHYBRID_SET_9845_BOOT(true)
@@ -3828,8 +3833,8 @@ static MACHINE_CONFIG_START(hp9845_base)
 	MCFG_9845PRT_STS_HANDLER(WRITELINE(hp9845_base_state , prt_sts_w))
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_START(hp9845b)
-	MCFG_FRAGMENT_ADD(hp9845_base)
+MACHINE_CONFIG_START(hp9845b_state::hp9845b)
+	hp9845_base(config);
 	// video hardware
 	MCFG_SCREEN_MODIFY("screen")
 	MCFG_SCREEN_UPDATE_DRIVER(hp9845b_state, screen_update)
@@ -3846,8 +3851,8 @@ static MACHINE_CONFIG_START(hp9845b)
 
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_START(hp9845c)
-	MCFG_FRAGMENT_ADD(hp9845_base)
+MACHINE_CONFIG_START(hp9845c_state::hp9845c)
+	hp9845_base(config);
 	// video hardware
 	MCFG_SCREEN_MODIFY("screen")
 	MCFG_SCREEN_UPDATE_DRIVER(hp9845c_state, screen_update)
@@ -3860,8 +3865,8 @@ static MACHINE_CONFIG_START(hp9845c)
 
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_START(hp9845t)
-	MCFG_FRAGMENT_ADD(hp9845_base)
+MACHINE_CONFIG_START(hp9845t_state::hp9845t)
+	hp9845_base(config);
 	// video hardware
 	MCFG_SCREEN_MODIFY("screen")
 	MCFG_SCREEN_UPDATE_DRIVER(hp9845t_state, screen_update)

@@ -118,17 +118,21 @@
 class elekmono_state : public driver_device
 {
 public:
-	elekmono_state(const machine_config &mconfig, device_type type, const char *tag)
-	: driver_device(mconfig, type, tag),
+	elekmono_state(const machine_config &mconfig, device_type type, const char *tag) :
+		driver_device(mconfig, type, tag),
 		m_maincpu(*this, "maincpu")
 	{ }
 
-	required_device<cpu_device> m_maincpu;
+	void elektron(machine_config &config);
 
+protected:
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
 
-	DECLARE_DRIVER_INIT(elektron);
+	void elektron_map(address_map &map);
+
+private:
+	required_device<cpu_device> m_maincpu;
 };
 
 void elekmono_state::machine_start()
@@ -139,7 +143,7 @@ void elekmono_state::machine_reset()
 {
 }
 
-static ADDRESS_MAP_START( elektron_map, AS_PROGRAM, 32, elekmono_state )
+ADDRESS_MAP_START(elekmono_state::elektron_map)
 	AM_RANGE(0x00000000, 0x000fffff) AM_ROM AM_REGION("maincpu", 0)
 	AM_RANGE(0x00100000, 0x001fffff) AM_RAM // patch memory
 	AM_RANGE(0x00200000, 0x002fffff) AM_RAM // main RAM
@@ -150,8 +154,8 @@ static ADDRESS_MAP_START( elektron_map, AS_PROGRAM, 32, elekmono_state )
 	AM_RANGE(0x10000000, 0x107fffff) AM_ROM AM_REGION("maincpu", 0)
 ADDRESS_MAP_END
 
-static MACHINE_CONFIG_START( elektron )
-	MCFG_CPU_ADD("maincpu", MCF5206E, XTAL_25_447MHz)
+MACHINE_CONFIG_START(elekmono_state::elektron)
+	MCFG_CPU_ADD("maincpu", MCF5206E, XTAL(25'447'000))
 	MCFG_CPU_PROGRAM_MAP(elektron_map)
 
 	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")

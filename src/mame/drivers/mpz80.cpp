@@ -532,7 +532,7 @@ WRITE8_MEMBER( mpz80_state::disp_col_w )
 //  ADDRESS_MAP( mpz80_mem )
 //-------------------------------------------------
 
-static ADDRESS_MAP_START( mpz80_mem, AS_PROGRAM, 8, mpz80_state )
+ADDRESS_MAP_START(mpz80_state::mpz80_mem)
 	AM_RANGE(0x0000, 0xffff) AM_READWRITE(mmu_r, mmu_w)
 /*
     Task 0 Segment 0 map:
@@ -552,7 +552,7 @@ ADDRESS_MAP_END
 //  ADDRESS_MAP( mpz80_io )
 //-------------------------------------------------
 
-static ADDRESS_MAP_START( mpz80_io, AS_IO, 8, mpz80_state )
+ADDRESS_MAP_START(mpz80_state::mpz80_io)
 	AM_RANGE(0x0000, 0xffff) AM_READWRITE(mmu_io_r, mmu_io_w)
 ADDRESS_MAP_END
 
@@ -709,14 +709,14 @@ void mpz80_state::machine_reset()
 //  MACHINE_CONFIG( mpz80 )
 //-------------------------------------------------
 
-static MACHINE_CONFIG_START( mpz80 )
+MACHINE_CONFIG_START(mpz80_state::mpz80)
 	// basic machine hardware
-	MCFG_CPU_ADD(Z80_TAG, Z80, XTAL_4MHz)
+	MCFG_CPU_ADD(Z80_TAG, Z80, XTAL(4'000'000))
 	MCFG_CPU_PROGRAM_MAP(mpz80_mem)
 	MCFG_CPU_IO_MAP(mpz80_io)
 
 	// S-100
-	MCFG_DEVICE_ADD(S100_TAG, S100_BUS, XTAL_4MHz / 2)
+	MCFG_DEVICE_ADD(S100_TAG, S100_BUS, XTAL(4'000'000) / 2)
 	MCFG_S100_IRQ_CALLBACK(WRITELINE(mpz80_state, s100_pint_w))
 	MCFG_S100_NMI_CALLBACK(WRITELINE(mpz80_state, s100_nmi_w))
 	MCFG_S100_RDY_CALLBACK(INPUTLINE(Z80_TAG, Z80_INPUT_LINE_BOGUSWAIT))

@@ -64,7 +64,7 @@ WRITE_LINE_MEMBER(rollrace_state::coin_counter_2_w)
 	machine().bookkeeping().coin_counter_w(1, state);
 }
 
-static ADDRESS_MAP_START( rollrace_map, AS_PROGRAM, 8, rollrace_state )
+ADDRESS_MAP_START(rollrace_state::rollrace_map)
 	AM_RANGE(0x0000, 0x7fff) AM_ROM
 	AM_RANGE(0x8000, 0x9fff) AM_ROM          /* only rollace2 */
 	AM_RANGE(0xc000, 0xcfff) AM_RAM
@@ -86,7 +86,7 @@ static ADDRESS_MAP_START( rollrace_map, AS_PROGRAM, 8, rollrace_state )
 ADDRESS_MAP_END
 
 
-static ADDRESS_MAP_START( rollrace_sound_map, AS_PROGRAM, 8, rollrace_state )
+ADDRESS_MAP_START(rollrace_state::rollrace_sound_map)
 	AM_RANGE(0x0000, 0x0fff) AM_ROM
 	AM_RANGE(0x2000, 0x2fff) AM_RAM
 	AM_RANGE(0x3000, 0x3000) AM_DEVREAD("soundlatch", generic_latch_8_device, read) AM_WRITE(sound_nmi_mask_w)
@@ -245,14 +245,14 @@ INTERRUPT_GEN_MEMBER(rollrace_state::sound_timer_irq)
 		device.execute().set_input_line(INPUT_LINE_NMI, PULSE_LINE);
 }
 
-static MACHINE_CONFIG_START( rollrace )
+MACHINE_CONFIG_START(rollrace_state::rollrace)
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", Z80,XTAL_24MHz/8) /* verified on pcb */
+	MCFG_CPU_ADD("maincpu", Z80,XTAL(24'000'000)/8) /* verified on pcb */
 	MCFG_CPU_PROGRAM_MAP(rollrace_map)
 	MCFG_CPU_VBLANK_INT_DRIVER("screen", rollrace_state,  vblank_irq)
 
-	MCFG_CPU_ADD("audiocpu", Z80,XTAL_24MHz/16) /* verified on pcb */
+	MCFG_CPU_ADD("audiocpu", Z80,XTAL(24'000'000)/16) /* verified on pcb */
 	MCFG_CPU_PROGRAM_MAP(rollrace_sound_map)
 	MCFG_CPU_PERIODIC_INT_DRIVER(rollrace_state, sound_timer_irq, 4*60)
 
@@ -283,17 +283,18 @@ static MACHINE_CONFIG_START( rollrace )
 
 	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
 
-	MCFG_SOUND_ADD("ay1", AY8910,XTAL_24MHz/16) /* verified on pcb */
+	MCFG_SOUND_ADD("ay1", AY8910,XTAL(24'000'000)/16) /* verified on pcb */
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", 0.10)
 
-	MCFG_SOUND_ADD("ay2", AY8910,XTAL_24MHz/16) /* verified on pcb */
+	MCFG_SOUND_ADD("ay2", AY8910,XTAL(24'000'000)/16) /* verified on pcb */
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", 0.10)
 
-	MCFG_SOUND_ADD("ay3", AY8910,XTAL_24MHz/16) /* verified on pcb */
+	MCFG_SOUND_ADD("ay3", AY8910,XTAL(24'000'000)/16) /* verified on pcb */
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "lspeaker", 0.10)
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_DERIVED( rollace2, rollrace )
+MACHINE_CONFIG_START(rollrace_state::rollace2)
+	rollrace(config);
 
 	/* basic machine hardware */
 

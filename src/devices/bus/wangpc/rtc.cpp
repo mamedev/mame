@@ -56,7 +56,7 @@ const tiny_rom_entry *wangpc_rtc_device::device_rom_region() const
 //  ADDRESS_MAP( wangpc_rtc_mem )
 //-------------------------------------------------
 
-static ADDRESS_MAP_START( wangpc_rtc_mem, AS_PROGRAM, 8, wangpc_rtc_device )
+ADDRESS_MAP_START(wangpc_rtc_device::wangpc_rtc_mem)
 	AM_RANGE(0x0000, 0x0fff) AM_ROM AM_REGION(Z80_TAG, 0)
 	AM_RANGE(0x1000, 0xffff) AM_RAM
 ADDRESS_MAP_END
@@ -66,7 +66,7 @@ ADDRESS_MAP_END
 //  ADDRESS_MAP( wangpc_rtc_io )
 //-------------------------------------------------
 
-static ADDRESS_MAP_START( wangpc_rtc_io, AS_IO, 8, wangpc_rtc_device )
+ADDRESS_MAP_START(wangpc_rtc_device::wangpc_rtc_io)
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	AM_RANGE(0x00, 0x03) AM_DEVREADWRITE(Z80SIO_TAG, z80sio0_device, cd_ba_r, cd_ba_w)
 	AM_RANGE(0x10, 0x1f) AM_DEVREADWRITE(AM9517A_TAG, am9517a_device, read, write)
@@ -103,7 +103,7 @@ static const z80_daisy_config wangpc_rtc_daisy_chain[] =
 //  MACHINE_CONFIG_START( wangpc_rtc )
 //-------------------------------------------------
 
-MACHINE_CONFIG_MEMBER( wangpc_rtc_device::device_add_mconfig )
+MACHINE_CONFIG_START(wangpc_rtc_device::device_add_mconfig)
 	MCFG_CPU_ADD(Z80_TAG, Z80, 2000000)
 	MCFG_Z80_DAISY_CHAIN(wangpc_rtc_daisy_chain)
 	MCFG_CPU_PROGRAM_MAP(wangpc_rtc_mem)

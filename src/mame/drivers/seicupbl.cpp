@@ -24,7 +24,7 @@
 #include "speaker.h"
 
 
-#define MAIN_CLOCK XTAL_8MHz
+#define MAIN_CLOCK XTAL(8'000'000)
 
 class seicupbl_state : public driver_device
 {
@@ -73,6 +73,9 @@ public:
 	TILE_GET_INFO_MEMBER(get_sc2_tileinfo);
 	TILE_GET_INFO_MEMBER(get_sc3_tileinfo);
 
+	void cupsocbl(machine_config &config);
+	void cupsocbl_mem(address_map &map);
+	void cupsocbl_sound_mem(address_map &map);
 protected:
 	// driver_device overrides
 	virtual void machine_start() override;
@@ -318,7 +321,7 @@ WRITE16_MEMBER(seicupbl_state::vram_sc3_w)
 	m_sc_layer[3]->mark_tile_dirty(offset);
 }
 
-static ADDRESS_MAP_START( cupsocbl_mem, AS_PROGRAM, 16, seicupbl_state )
+ADDRESS_MAP_START(seicupbl_state::cupsocbl_mem)
 //  AM_IMPORT_FROM( legionna_cop_mem )
 	AM_RANGE(0x000000, 0x0fffff) AM_ROM
 	AM_RANGE(0x100400, 0x1005ff) AM_DEVREADWRITE("seibucop_boot", seibu_cop_bootleg_device, copdxbl_0_r,copdxbl_0_w) AM_SHARE("cop_mcu_ram")
@@ -333,7 +336,7 @@ static ADDRESS_MAP_START( cupsocbl_mem, AS_PROGRAM, 16, seicupbl_state )
 	AM_RANGE(0x101000, 0x1017ff) AM_RAM_WRITE(vram_sc2_w) AM_SHARE("fore_data")
 	AM_RANGE(0x101800, 0x101fff) AM_RAM_WRITE(vram_sc1_w) AM_SHARE("mid_data")
 	AM_RANGE(0x102000, 0x102fff) AM_RAM_WRITE(vram_sc3_w) AM_SHARE("textram")
-	AM_RANGE(0x103000, 0x103fff) AM_RAM_DEVWRITE("palette", palette_device, write) AM_SHARE("palette")
+	AM_RANGE(0x103000, 0x103fff) AM_RAM_DEVWRITE("palette", palette_device, write16) AM_SHARE("palette")
 	AM_RANGE(0x104000, 0x106fff) AM_RAM
 	AM_RANGE(0x107000, 0x1077ff) AM_RAM AM_SHARE("spriteram")
 	AM_RANGE(0x107800, 0x107fff) AM_RAM
@@ -346,7 +349,7 @@ WRITE8_MEMBER(seicupbl_state::okim_rombank_w)
 	m_oki->set_rom_bank(data & 0x7);
 }
 
-static ADDRESS_MAP_START( cupsocbl_sound_mem, AS_PROGRAM, 8, seicupbl_state )
+ADDRESS_MAP_START(seicupbl_state::cupsocbl_sound_mem)
 	AM_RANGE(0x0000, 0x7fff) AM_ROM
 	AM_RANGE(0x8000, 0x87ff) AM_RAM
 	AM_RANGE(0x9000, 0x9000) AM_WRITE(okim_rombank_w)
@@ -532,7 +535,7 @@ static GFXDECODE_START( seicupbl_csb )
 GFXDECODE_END
 
 
-static MACHINE_CONFIG_START( cupsocbl )
+MACHINE_CONFIG_START(seicupbl_state::cupsocbl)
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", M68000,12000000)

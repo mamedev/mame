@@ -17,8 +17,8 @@ pages; and multiple pieces of rom/ram/components can occur in a single slot.
 
 #define MCFG_MSX_INTERNAL_SLOT_ADD(_tag, _type, _startpage, _numpages) \
 	MCFG_DEVICE_ADD(_tag, _type, 0) \
-	msx_internal_slot_interface::set_start_address(*device, _startpage * 0x4000); \
-	msx_internal_slot_interface::set_size(*device, _numpages * 0x4000);
+	dynamic_cast<msx_internal_slot_interface &>(*device).set_start_address(_startpage * 0x4000); \
+	dynamic_cast<msx_internal_slot_interface &>(*device).set_size(_numpages * 0x4000);
 
 class msx_internal_slot_interface
 {
@@ -26,9 +26,9 @@ public:
 	msx_internal_slot_interface();
 	virtual ~msx_internal_slot_interface() { }
 
-	// static configuration helpers
-	static void set_start_address(device_t &device, uint32_t start_address);
-	static void set_size(device_t &device, uint32_t size);
+	// configuration helpers
+	void set_start_address(uint32_t start_address) { m_start_address = start_address; m_end_address = m_start_address + m_size; }
+	void set_size(uint32_t size) { m_size = size; m_end_address = m_start_address + m_size; }
 
 	virtual DECLARE_READ8_MEMBER(read) { return 0xFF; }
 	virtual DECLARE_WRITE8_MEMBER(write) { }

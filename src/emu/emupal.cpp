@@ -36,69 +36,6 @@ palette_device::palette_device(const machine_config &mconfig, const char *tag, d
 
 
 //**************************************************************************
-//  INITIALIZATION AND CONFIGURATION
-//**************************************************************************
-
-void palette_device::static_set_init(device_t &device, palette_init_delegate init)
-{
-	downcast<palette_device &>(device).m_init = init;
-}
-
-
-void palette_device::static_set_format(device_t &device, raw_to_rgb_converter raw_to_rgb)
-{
-	downcast<palette_device &>(device).m_raw_to_rgb = raw_to_rgb;
-}
-
-
-void palette_device::static_set_membits(device_t &device, int membits)
-{
-	palette_device &palette = downcast<palette_device &>(device);
-	palette.m_membits = membits;
-	palette.m_membits_supplied = true;
-}
-
-
-void palette_device::static_set_endianness(device_t &device, endianness_t endianness)
-{
-	palette_device &palette = downcast<palette_device &>(device);
-	palette.m_endianness = endianness;
-	palette.m_endianness_supplied = true;
-}
-
-
-void palette_device::static_set_entries(device_t &device, u32 entries)
-{
-	downcast<palette_device &>(device).m_entries = entries;
-}
-
-
-void palette_device::static_set_indirect_entries(device_t &device, u32 entries)
-{
-	downcast<palette_device &>(device).m_indirect_entries = entries;
-}
-
-
-void palette_device::static_enable_shadows(device_t &device)
-{
-	downcast<palette_device &>(device).m_enable_shadows = true;
-}
-
-
-void palette_device::static_enable_hilights(device_t &device)
-{
-	downcast<palette_device &>(device).m_enable_hilights = true;
-}
-
-
-void palette_device::static_set_prom_region(device_t &device, const char *region)
-{
-	downcast<palette_device &>(device).m_prom_region.set_tag(region);
-}
-
-
-
-//**************************************************************************
 //  GENERIC WRITE HANDLERS
 //**************************************************************************
 
@@ -133,35 +70,35 @@ inline void palette_device::update_for_write(offs_t byte_offset, int bytes_modif
 //  write - write a byte to the base paletteram
 //-------------------------------------------------
 
-WRITE8_MEMBER(palette_device::write)
+WRITE8_MEMBER(palette_device::write8)
 {
 	m_paletteram.write8(offset, data);
 	update_for_write(offset, 1);
 }
 
-WRITE16_MEMBER(palette_device::write)
+WRITE16_MEMBER(palette_device::write16)
 {
 	m_paletteram.write16(offset, data, mem_mask);
 	update_for_write(offset * 2, 2);
 }
 
-WRITE32_MEMBER(palette_device::write)
+WRITE32_MEMBER(palette_device::write32)
 {
 	m_paletteram.write32(offset, data, mem_mask);
 	update_for_write(offset * 4, 4);
 }
 
-READ8_MEMBER(palette_device::read)
+READ8_MEMBER(palette_device::read8)
 {
 	return m_paletteram.read8(offset);
 }
 
-READ16_MEMBER(palette_device::read)
+READ16_MEMBER(palette_device::read16)
 {
 	return m_paletteram.read16(offset);
 }
 
-READ32_MEMBER(palette_device::read)
+READ32_MEMBER(palette_device::read32)
 {
 	return m_paletteram.read32(offset);
 }
@@ -172,14 +109,14 @@ READ32_MEMBER(palette_device::read)
 //  paletteram
 //-------------------------------------------------
 
-WRITE8_MEMBER(palette_device::write_ext)
+WRITE8_MEMBER(palette_device::write8_ext)
 {
 	m_paletteram_ext.write8(offset, data);
 	update_for_write(offset, 1);
 }
 
 
-WRITE16_MEMBER(palette_device::write_ext)
+WRITE16_MEMBER(palette_device::write16_ext)
 {
 	m_paletteram_ext.write16(offset, data, mem_mask);
 	update_for_write(offset * 2, 2);

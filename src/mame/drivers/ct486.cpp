@@ -51,6 +51,9 @@ public:
 	DECLARE_WRITE_LINE_MEMBER( cs4031_hold );
 	DECLARE_WRITE8_MEMBER( cs4031_tc ) { m_isabus->eop_w(offset, data); }
 	DECLARE_WRITE_LINE_MEMBER( cs4031_spkr ) { m_speaker->level_w(state); }
+	void ct486(machine_config &config);
+	void ct486_io(address_map &map);
+	void ct486_map(address_map &map);
 };
 
 
@@ -92,10 +95,10 @@ WRITE_LINE_MEMBER( ct486_state::cs4031_hold )
 //  ADDRESS MAPS
 //**************************************************************************
 
-static ADDRESS_MAP_START( ct486_map, AS_PROGRAM, 32, ct486_state )
+ADDRESS_MAP_START(ct486_state::ct486_map)
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( ct486_io, AS_IO, 32, ct486_state )
+ADDRESS_MAP_START(ct486_state::ct486_io)
 	ADDRESS_MAP_UNMAP_HIGH
 ADDRESS_MAP_END
 
@@ -104,13 +107,13 @@ ADDRESS_MAP_END
 //  MACHINE DRIVERS
 //**************************************************************************
 
-static MACHINE_CONFIG_START( ct486 )
-	MCFG_CPU_ADD("maincpu", I486, XTAL_25MHz)
+MACHINE_CONFIG_START(ct486_state::ct486)
+	MCFG_CPU_ADD("maincpu", I486, XTAL(25'000'000))
 	MCFG_CPU_PROGRAM_MAP(ct486_map)
 	MCFG_CPU_IO_MAP(ct486_io)
 	MCFG_CPU_IRQ_ACKNOWLEDGE_DEVICE("cs4031", cs4031_device, int_ack_r)
 
-	MCFG_CS4031_ADD("cs4031", XTAL_25MHz, "maincpu", "isa", "bios", "keybc")
+	MCFG_CS4031_ADD("cs4031", XTAL(25'000'000), "maincpu", "isa", "bios", "keybc")
 	// cpu connections
 	MCFG_CS4031_HOLD(WRITELINE(ct486_state, cs4031_hold));
 	MCFG_CS4031_NMI(INPUTLINE("maincpu", INPUT_LINE_NMI));
@@ -128,7 +131,7 @@ static MACHINE_CONFIG_START( ct486 )
 	MCFG_RAM_DEFAULT_SIZE("4M")
 	MCFG_RAM_EXTRA_OPTIONS("1M,2M,8M,16M,32M,64M")
 
-	MCFG_DEVICE_ADD("keybc", AT_KEYBOARD_CONTROLLER, XTAL_12MHz)
+	MCFG_DEVICE_ADD("keybc", AT_KEYBOARD_CONTROLLER, XTAL(12'000'000))
 	MCFG_AT_KEYBOARD_CONTROLLER_SYSTEM_RESET_CB(DEVWRITELINE("cs4031", cs4031_device, kbrst_w))
 	MCFG_AT_KEYBOARD_CONTROLLER_GATE_A20_CB(DEVWRITELINE("cs4031", cs4031_device, gatea20_w))
 	MCFG_AT_KEYBOARD_CONTROLLER_INPUT_BUFFER_FULL_CB(DEVWRITELINE("cs4031", cs4031_device, irq01_w))

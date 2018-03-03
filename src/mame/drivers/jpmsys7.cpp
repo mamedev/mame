@@ -33,6 +33,8 @@ public:
 		, m_maincpu(*this, "maincpu")
 	{ }
 
+	void jpmsys7(machine_config &config);
+	void jpmsys7_map(address_map &map);
 protected:
 
 	// devices
@@ -40,7 +42,7 @@ protected:
 };
 
 
-static ADDRESS_MAP_START( jpmsys7_map, AS_PROGRAM, 32, jpmsys7_state )
+ADDRESS_MAP_START(jpmsys7_state::jpmsys7_map)
 	AM_RANGE(0x00000000, 0x002fffff) AM_ROM
 	AM_RANGE(0x10000000, 0x1000ffff) AM_RAM
 	AM_RANGE(0x20000018, 0x2000001b) AM_WRITENOP // large data upload like astra/pluto?
@@ -52,7 +54,7 @@ ADDRESS_MAP_END
 static INPUT_PORTS_START(  jpmsys7 )
 INPUT_PORTS_END
 
-static MACHINE_CONFIG_START( jpmsys7 )
+MACHINE_CONFIG_START(jpmsys7_state::jpmsys7)
 	MCFG_CPU_ADD("maincpu", MCF5206E, 40000000)  // seems to be a Coldfire of some kind
 	MCFG_CPU_PROGRAM_MAP(jpmsys7_map)
 	MCFG_MCF5206E_PERIPHERAL_ADD("maincpu_onboard")

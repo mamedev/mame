@@ -106,12 +106,8 @@
 #include "emu.h"
 #include "includes/mcr.h"
 #include "includes/mcr3.h"
-#include "audio/midway.h"
-#include "audio/csd.h"
 
-#include "cpu/z80/z80.h"
 #include "machine/nvram.h"
-#include "machine/z80ctc.h"
 
 #include "speaker.h"
 
@@ -119,7 +115,7 @@
 #include "turbotag.lh"
 
 
-#define MASTER_CLOCK        XTAL_20MHz
+#define MASTER_CLOCK        XTAL(20'000'000)
 
 
 
@@ -138,7 +134,7 @@ WRITE8_MEMBER(mcr3_state::mcrmono_control_port_w)
 	*/
 
 	machine().bookkeeping().coin_counter_w(0, (data >> 0) & 1);
-	mcr_cocktail_flip = (data >> 6) & 1;
+	m_mcr_cocktail_flip = (data >> 6) & 1;
 }
 
 
@@ -268,7 +264,7 @@ WRITE8_MEMBER(mcr3_state::maxrpm_op6_w)
 
 	/* when both the write and the enable are low, it's a write to the ADC0844 */
 	if (!(data & 0x40) && !(data & 0x20))
-		m_maxrpm_adc->write(space, 0, BITSWAP8(m_maxrpm_adc_control, 7, 6, 5, 4, 2, 3, 1, 0));
+		m_maxrpm_adc->write(space, 0, bitswap<4>(m_maxrpm_adc_control, 2, 3, 1, 0));
 
 	/* low 5 bits control the turbo CS */
 	m_turbo_cheap_squeak->write(space, offset, data);
@@ -470,7 +466,7 @@ READ8_MEMBER(mcr3_state::turbotag_kludge_r)
 	/* Unfortunately, the game refuses to start if any bad ROM is   */
 	/* found; to work around this, we catch the checksum byte read  */
 	/* and modify it to what we know we will be getting.            */
-	if (space.device().safe_pcbase() == 0xb29)
+	if (m_maincpu->pcbase() == 0xb29)
 		return 0x82;
 	else
 		return 0x92;
@@ -485,7 +481,7 @@ READ8_MEMBER(mcr3_state::turbotag_kludge_r)
  *************************************/
 
 /* address map verified from schematics */
-static ADDRESS_MAP_START( mcrmono_map, AS_PROGRAM, 8, mcr3_state )
+ADDRESS_MAP_START(mcr3_state::mcrmono_map)
 	ADDRESS_MAP_UNMAP_HIGH
 	AM_RANGE(0x0000, 0xdfff) AM_ROM
 	AM_RANGE(0xe000, 0xe7ff) AM_RAM AM_SHARE("nvram")
@@ -497,7 +493,7 @@ static ADDRESS_MAP_START( mcrmono_map, AS_PROGRAM, 8, mcr3_state )
 ADDRESS_MAP_END
 
 /* I/O map verified from schematics */
-static ADDRESS_MAP_START( mcrmono_portmap, AS_IO, 8, mcr3_state )
+ADDRESS_MAP_START(mcr3_state::mcrmono_portmap)
 	ADDRESS_MAP_UNMAP_HIGH
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	AM_RANGE(0x00, 0x00) AM_MIRROR(0x78) AM_READ_PORT("MONO.IP0")
@@ -519,7 +515,7 @@ ADDRESS_MAP_END
  *************************************/
 
 /* address map verified from schematics */
-static ADDRESS_MAP_START( spyhunt_map, AS_PROGRAM, 8, mcr3_state )
+ADDRESS_MAP_START(mcr3_state::spyhunt_map)
 	ADDRESS_MAP_UNMAP_HIGH
 	AM_RANGE(0x0000, 0xdfff) AM_ROM
 	AM_RANGE(0xe000, 0xe7ff) AM_RAM_WRITE(spyhunt_videoram_w) AM_SHARE("videoram")
@@ -530,7 +526,7 @@ static ADDRESS_MAP_START( spyhunt_map, AS_PROGRAM, 8, mcr3_state )
 ADDRESS_MAP_END
 
 /* upper I/O map determined by PAL; only SSIO ports and scroll registers are verified from schematics */
-static ADDRESS_MAP_START( spyhunt_portmap, AS_IO, 8, mcr3_state )
+ADDRESS_MAP_START(mcr3_state::spyhunt_portmap)
 	ADDRESS_MAP_UNMAP_HIGH
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	SSIO_INPUT_PORTS("ssio")
@@ -611,7 +607,7 @@ static INPUT_PORTS_START( demoderm )
 INPUT_PORTS_END
 
 
-/* inputs not verfied yet, DIP switches from manual */
+/* inputs not verified yet, DIP switches from manual */
 static INPUT_PORTS_START( sarge )
 	PORT_START("MONO.IP0")  /* J2 1-8 */
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_COIN1 )
@@ -1085,7 +1081,7 @@ GFXDECODE_END
  *************************************/
 
 /* Core MCR monoboard system with no sound */
-static MACHINE_CONFIG_START( mcrmono )
+MACHINE_CONFIG_START(mcr3_state::mcrmono)
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", Z80, MASTER_CLOCK/4)
@@ -1101,8 +1097,6 @@ static MACHINE_CONFIG_START( mcrmono )
 	MCFG_WATCHDOG_ADD("watchdog")
 	MCFG_WATCHDOG_VBLANK_INIT("screen", 16)
 
-	MCFG_MACHINE_START_OVERRIDE(mcr3_state,mcr)
-	MCFG_MACHINE_RESET_OVERRIDE(mcr3_state,mcr)
 	MCFG_NVRAM_ADD_0FILL("nvram")
 
 	// sound hardware
@@ -1120,8 +1114,6 @@ static MACHINE_CONFIG_START( mcrmono )
 
 	MCFG_GFXDECODE_ADD("gfxdecode", "palette", mcr3)
 	MCFG_PALETTE_ADD("palette", 64)
-
-	MCFG_VIDEO_START_OVERRIDE(mcr3_state,mcrmono)
 MACHINE_CONFIG_END
 
 
@@ -1129,7 +1121,8 @@ MACHINE_CONFIG_END
 
 
 /* Sarge/Demolition Derby Mono/Max RPM = MCR monoboard with Turbo Cheap Squeak */
-static MACHINE_CONFIG_DERIVED( mono_tcs, mcrmono )
+MACHINE_CONFIG_START(mcr3_state::mono_tcs)
+	mcrmono(config);
 
 	/* basic machine hardware */
 	MCFG_SOUND_ADD("tcs", MIDWAY_TURBO_CHEAP_SQUEAK, 0)
@@ -1137,7 +1130,8 @@ static MACHINE_CONFIG_DERIVED( mono_tcs, mcrmono )
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", 1.0)
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_DERIVED( maxrpm, mono_tcs )
+MACHINE_CONFIG_START(mcr3_state::maxrpm)
+	mono_tcs(config);
 	MCFG_ADC0844_ADD("adc")
 	MCFG_ADC0844_CH1_CB(IOPORT("MONO.IP1"))
 	MCFG_ADC0844_CH2_CB(IOPORT("MONO.IP1.ALT1"))
@@ -1147,7 +1141,8 @@ MACHINE_CONFIG_END
 
 
 /* Rampage/Power Drive/Star Guards = MCR monoboard with Sounds Good */
-static MACHINE_CONFIG_DERIVED( mono_sg, mcrmono )
+MACHINE_CONFIG_START(mcr3_state::mono_sg)
+	mcrmono(config);
 
 	/* basic machine hardware */
 	MCFG_SOUND_ADD("sg", MIDWAY_SOUNDS_GOOD, 0)
@@ -1160,7 +1155,8 @@ MACHINE_CONFIG_END
 
 
 /* Core scrolling system with SSIO sound */
-static MACHINE_CONFIG_DERIVED( mcrscroll, mcrmono )
+MACHINE_CONFIG_START(mcr3_state::mcrscroll)
+	mcrmono(config);
 
 	/* basic machine hardware */
 	MCFG_SOUND_ADD("ssio", MIDWAY_SSIO, 0)
@@ -1186,7 +1182,8 @@ MACHINE_CONFIG_END
 
 
 /* Spy Hunter = scrolling system with an SSIO and a cheap squeak deluxe */
-static MACHINE_CONFIG_DERIVED( mcrsc_csd, mcrscroll )
+MACHINE_CONFIG_START(mcr3_state::mcrsc_csd)
+	mcrscroll(config);
 
 	/* basic machine hardware */
 	MCFG_SOUND_ADD("csd", MIDWAY_CHEAP_SQUEAK_DELUXE, 0)
@@ -1635,9 +1632,9 @@ DRIVER_INIT_MEMBER(mcr3_state,stargrds)
 DRIVER_INIT_MEMBER(mcr3_state,spyhunt)
 {
 	mcr_common_init();
-	machine().device<midway_ssio_device>("ssio")->set_custom_input(1, 0x60, read8_delegate(FUNC(mcr3_state::spyhunt_ip1_r),this));
-	machine().device<midway_ssio_device>("ssio")->set_custom_input(2, 0xff, read8_delegate(FUNC(mcr3_state::spyhunt_ip2_r),this));
-	machine().device<midway_ssio_device>("ssio")->set_custom_output(4, 0xff, write8_delegate(FUNC(mcr3_state::spyhunt_op4_w),this));
+	m_ssio->set_custom_input(1, 0x60, read8_delegate(FUNC(mcr3_state::spyhunt_ip1_r),this));
+	m_ssio->set_custom_input(2, 0xff, read8_delegate(FUNC(mcr3_state::spyhunt_ip2_r),this));
+	m_ssio->set_custom_output(4, 0xff, write8_delegate(FUNC(mcr3_state::spyhunt_op4_w),this));
 
 	m_spyhunt_lamp.resolve();
 
@@ -1659,9 +1656,9 @@ DRIVER_INIT_MEMBER(mcr3_state,crater)
 DRIVER_INIT_MEMBER(mcr3_state,turbotag)
 {
 	mcr_common_init();
-	machine().device<midway_ssio_device>("ssio")->set_custom_input(1, 0x60, read8_delegate(FUNC(mcr3_state::spyhunt_ip1_r),this));
-	machine().device<midway_ssio_device>("ssio")->set_custom_input(2, 0xff, read8_delegate(FUNC(mcr3_state::turbotag_ip2_r),this));
-	machine().device<midway_ssio_device>("ssio")->set_custom_output(4, 0xff, write8_delegate(FUNC(mcr3_state::spyhunt_op4_w),this));
+	m_ssio->set_custom_input(1, 0x60, read8_delegate(FUNC(mcr3_state::spyhunt_ip1_r),this));
+	m_ssio->set_custom_input(2, 0xff, read8_delegate(FUNC(mcr3_state::turbotag_ip2_r),this));
+	m_ssio->set_custom_output(4, 0xff, write8_delegate(FUNC(mcr3_state::spyhunt_op4_w),this));
 
 	m_spyhunt_lamp.resolve();
 

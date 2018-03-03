@@ -329,7 +329,7 @@ TIMER_CALLBACK_MEMBER(cxhumax_state::timer_tick)
 				m_maincpu->set_input_line(ARM7_IRQ_LINE, ASSERT_LINE);
 		}
 	}
-	attotime period = attotime::from_hz(XTAL_54MHz)*m_timer_regs.timer[param].timebase;
+	attotime period = attotime::from_hz(XTAL(54'000'000))*m_timer_regs.timer[param].timebase;
 	m_timer_regs.timer[param].timer->adjust(period,param);
 }
 
@@ -375,7 +375,7 @@ WRITE32_MEMBER( cxhumax_state::cx_timers_w )
 			case TIMER_MODE:
 				COMBINE_DATA(&m_timer_regs.timer[index].mode);
 				if(data&1) {
-					attotime period = attotime::from_hz(XTAL_54MHz)*m_timer_regs.timer[index].timebase;
+					attotime period = attotime::from_hz(XTAL(54'000'000))*m_timer_regs.timer[index].timebase;
 					m_timer_regs.timer[index].timer->adjust(period,index);
 				} else {
 					m_timer_regs.timer[index].timer->adjust(attotime::never,index);
@@ -943,7 +943,7 @@ uint32_t cxhumax_state::screen_update_cxhumax(screen_device &screen, bitmap_rgb3
 	return 0;
 }
 
-static ADDRESS_MAP_START(cxhumax_map, AS_PROGRAM, 32, cxhumax_state)
+ADDRESS_MAP_START(cxhumax_state::cxhumax_map)
 	AM_RANGE(0x00000000, 0x03ffffff) AM_RAM AM_SHARE("ram") AM_MIRROR(0x40000000)           // 64?MB RAM
 	AM_RANGE(0xe0000000, 0xe000ffff) AM_READWRITE(cx_hsx_r, cx_hsx_w)                       // HSX
 	AM_RANGE(0xe0010000, 0xe0010003) AM_READWRITE(cx_romdescr_r, cx_romdescr_w)             // ROM Descriptor
@@ -1053,7 +1053,7 @@ void cxhumax_state::machine_reset()
 	memset(m_gxa_cmd_regs,0,sizeof(m_gxa_cmd_regs));
 }
 
-static MACHINE_CONFIG_START( cxhumax )
+MACHINE_CONFIG_START(cxhumax_state::cxhumax)
 	MCFG_CPU_ADD("maincpu", ARM920T, 180000000) // CX24175 (RevC up?)
 	MCFG_CPU_PROGRAM_MAP(cxhumax_map)
 

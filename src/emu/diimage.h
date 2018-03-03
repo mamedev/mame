@@ -115,7 +115,7 @@ typedef delegate<void (device_image_interface &)> device_image_func_delegate;
 #define DEVICE_IMAGE_UNLOAD_DELEGATE(_class,_name)      device_image_func_delegate(&DEVICE_IMAGE_UNLOAD_NAME(_class,_name), downcast<_class *>(device->owner()))
 
 #define MCFG_SET_IMAGE_LOADABLE(_usrload) \
-	device_image_interface::static_set_user_loadable(*device, _usrload);
+	dynamic_cast<device_image_interface &>(*device).set_user_loadable(_usrload);
 
 
 // ======================> device_image_interface
@@ -230,13 +230,7 @@ public:
 	bool load_software(software_list_device &swlist, const char *swname, const rom_entry *entry);
 	int reopen_for_write(const std::string &path);
 
-	static void static_set_user_loadable(device_t &device, bool user_loadable) {
-		device_image_interface *img;
-		if (!device.interface(img))
-			throw emu_fatalerror("MCFG_SET_IMAGE_LOADABLE called on device '%s' with no image interface\n", device.tag());
-
-		img->m_user_loadable = user_loadable;
-	}
+	void set_user_loadable(bool user_loadable) { m_user_loadable = user_loadable; }
 
 	bool user_loadable() const { return m_user_loadable; }
 	bool is_reset_and_loading() const { return m_is_reset_and_loading; }

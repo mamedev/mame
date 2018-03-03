@@ -132,6 +132,11 @@ public:
 	virtual void video_start() override;
 	uint32_t screen_update_silvmil(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	void tumblepb_gfx1_rearrange();
+	void puzzlovek(machine_config &config);
+	void puzzlove(machine_config &config);
+	void silvmil(machine_config &config);
+	void silvmil_map(address_map &map);
+	void silvmil_sound_map(address_map &map);
 };
 
 
@@ -178,7 +183,7 @@ uint32_t silvmil_state::screen_update_silvmil(screen_device &screen, bitmap_ind1
 }
 
 
-static ADDRESS_MAP_START( silvmil_map, AS_PROGRAM, 16, silvmil_state )
+ADDRESS_MAP_START(silvmil_state::silvmil_map)
 	AM_RANGE(0x000000, 0x0fffff) AM_ROM
 
 	AM_RANGE(0x100000, 0x100001) AM_WRITE(silvmil_tilebank1_w)
@@ -190,7 +195,7 @@ static ADDRESS_MAP_START( silvmil_map, AS_PROGRAM, 16, silvmil_state )
 
 	AM_RANGE(0x120000, 0x120fff) AM_RAM_WRITE(silvmil_fg_videoram_w) AM_SHARE("fg_videoram")
 	AM_RANGE(0x122000, 0x122fff) AM_RAM_WRITE(silvmil_bg_videoram_w) AM_SHARE("bg_videoram")
-	AM_RANGE(0x200000, 0x2005ff) AM_RAM_DEVWRITE("palette", palette_device, write) AM_SHARE("palette")
+	AM_RANGE(0x200000, 0x2005ff) AM_RAM_DEVWRITE("palette", palette_device, write16) AM_SHARE("palette")
 	AM_RANGE(0x210000, 0x2107ff) AM_RAM AM_SHARE("spriteram")
 	AM_RANGE(0x270000, 0x270001) AM_WRITE(silvmil_soundcmd_w)
 	AM_RANGE(0x280000, 0x280001) AM_READ_PORT("P1_P2")
@@ -385,7 +390,7 @@ void silvmil_state::machine_reset()
 }
 
 
-static ADDRESS_MAP_START( silvmil_sound_map, AS_PROGRAM, 8, silvmil_state )
+ADDRESS_MAP_START(silvmil_state::silvmil_sound_map)
 	AM_RANGE(0x0000, 0xbfff) AM_ROM
 	AM_RANGE(0xd000, 0xd7ff) AM_RAM
 	AM_RANGE(0xc000, 0xc001) AM_DEVREADWRITE("ymsnd", ym2151_device, read, write)
@@ -395,14 +400,14 @@ static ADDRESS_MAP_START( silvmil_sound_map, AS_PROGRAM, 8, silvmil_state )
 ADDRESS_MAP_END
 
 
-static MACHINE_CONFIG_START( silvmil )
+MACHINE_CONFIG_START(silvmil_state::silvmil)
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", M68000, XTAL_12MHz) /* Verified */
+	MCFG_CPU_ADD("maincpu", M68000, XTAL(12'000'000)) /* Verified */
 	MCFG_CPU_PROGRAM_MAP(silvmil_map)
 	MCFG_CPU_VBLANK_INT_DRIVER("screen", silvmil_state,  irq6_line_hold)
 
-	MCFG_CPU_ADD("audiocpu", Z80, XTAL_4_096MHz) /* Verified */
+	MCFG_CPU_ADD("audiocpu", Z80, XTAL(4'096'000)) /* Verified */
 	MCFG_CPU_PROGRAM_MAP(silvmil_sound_map)
 
 
@@ -430,32 +435,34 @@ static MACHINE_CONFIG_START( silvmil )
 
 	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
 
-	MCFG_YM2151_ADD("ymsnd", XTAL_14_31818MHz/4) /* Verified */
+	MCFG_YM2151_ADD("ymsnd", XTAL(14'318'181)/4) /* Verified */
 	MCFG_YM2151_IRQ_HANDLER(INPUTLINE("audiocpu", 0))
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
 
-	MCFG_OKIM6295_ADD("oki", XTAL_4_096MHz/4, PIN7_HIGH) /* Verified */
+	MCFG_OKIM6295_ADD("oki", XTAL(4'096'000)/4, PIN7_HIGH) /* Verified */
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_DERIVED( puzzlove, silvmil )
+MACHINE_CONFIG_START(silvmil_state::puzzlove)
+	silvmil(config);
 	MCFG_DEVICE_REMOVE("audiocpu")
-	MCFG_CPU_ADD("audiocpu", Z80, XTAL_4MHz) /* Verified */
+	MCFG_CPU_ADD("audiocpu", Z80, XTAL(4'000'000)) /* Verified */
 	MCFG_CPU_PROGRAM_MAP(silvmil_sound_map)
 
 	MCFG_DEVICE_MODIFY("spritegen")
 	MCFG_DECO_SPRITE_BOOTLEG_TYPE(1)
 
 	MCFG_DEVICE_REMOVE("oki")
-	MCFG_OKIM6295_ADD("oki", XTAL_4MHz/4, PIN7_HIGH) /* Verified */
+	MCFG_OKIM6295_ADD("oki", XTAL(4'000'000)/4, PIN7_HIGH) /* Verified */
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_DERIVED( puzzlovek, puzzlove )
-		MCFG_DEVICE_REMOVE("ymsnd")
-		MCFG_YM2151_ADD("ymsnd", XTAL_15MHz/4) /* Verified */
-		MCFG_YM2151_IRQ_HANDLER(INPUTLINE("audiocpu", 0))
-		MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
+MACHINE_CONFIG_START(silvmil_state::puzzlovek)
+	puzzlove(config);
+	MCFG_DEVICE_REMOVE("ymsnd")
+	MCFG_YM2151_ADD("ymsnd", XTAL(15'000'000)/4) /* Verified */
+	MCFG_YM2151_IRQ_HANDLER(INPUTLINE("audiocpu", 0))
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
 MACHINE_CONFIG_END
 
 

@@ -37,7 +37,7 @@ WRITE_LINE_MEMBER(cheekyms_audio_device::pest_dies_w)   { m_pest_dies->write_lin
 WRITE_LINE_MEMBER(cheekyms_audio_device::coin_extra_w)  { m_coin_extra->write_line(state); }
 
 
-MACHINE_CONFIG_MEMBER(cheekyms_audio_device::device_add_mconfig)
+MACHINE_CONFIG_START(cheekyms_audio_device::device_add_mconfig)
 	MCFG_SPEAKER_STANDARD_MONO("mono")
 
 	MCFG_SOUND_ADD("sound_nl", NETLIST_SOUND, 48000)

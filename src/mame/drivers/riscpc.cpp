@@ -67,6 +67,13 @@ public:
 	TIMER_CALLBACK_MEMBER(IOMD_timer0_callback);
 	TIMER_CALLBACK_MEMBER(IOMD_timer1_callback);
 	TIMER_CALLBACK_MEMBER(flyback_timer_callback);
+	void rpc700(machine_config &config);
+	void rpc600(machine_config &config);
+	void sarpc(machine_config &config);
+	void sarpc_j233(machine_config &config);
+	void a7000(machine_config &config);
+	void a7000p(machine_config &config);
+	void a7000_mem(address_map &map);
 };
 
 
@@ -751,7 +758,7 @@ WRITE32_MEMBER( riscpc_state::a7000_iomd_w )
 	}
 }
 
-static ADDRESS_MAP_START( a7000_mem, AS_PROGRAM, 32, riscpc_state)
+ADDRESS_MAP_START(riscpc_state::a7000_mem)
 	AM_RANGE(0x00000000, 0x003fffff) AM_MIRROR(0x00800000) AM_ROM AM_REGION("user1", 0)
 //  AM_RANGE(0x01000000, 0x01ffffff) AM_NOP //expansion ROM
 //  AM_RANGE(0x02000000, 0x02ffffff) AM_RAM //VRAM
@@ -799,9 +806,9 @@ void riscpc_state::machine_reset()
 	m_flyback_timer->adjust( attotime::never);
 }
 
-static MACHINE_CONFIG_START( rpc600 )
+MACHINE_CONFIG_START(riscpc_state::rpc600)
 	/* Basic machine hardware */
-	MCFG_CPU_ADD( "maincpu", ARM7, XTAL_30MHz ) // ARM610
+	MCFG_CPU_ADD( "maincpu", ARM7, XTAL(30'000'000) ) // ARM610
 	MCFG_CPU_PROGRAM_MAP(a7000_mem)
 
 	/* video hardware */
@@ -814,9 +821,9 @@ static MACHINE_CONFIG_START( rpc600 )
 	MCFG_PALETTE_ADD("palette", 0x200)
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_START( rpc700 )
+MACHINE_CONFIG_START(riscpc_state::rpc700)
 	/* Basic machine hardware */
-	MCFG_CPU_ADD( "maincpu", ARM7, XTAL_40MHz ) // ARM710
+	MCFG_CPU_ADD( "maincpu", ARM7, XTAL(40'000'000) ) // ARM710
 	MCFG_CPU_PROGRAM_MAP(a7000_mem)
 
 	/* video hardware */
@@ -829,9 +836,9 @@ static MACHINE_CONFIG_START( rpc700 )
 	MCFG_PALETTE_ADD("palette", 0x200)
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_START( a7000 )
+MACHINE_CONFIG_START(riscpc_state::a7000)
 	/* Basic machine hardware */
-	MCFG_CPU_ADD( "maincpu", ARM7, XTAL_32MHz ) // ARM7500
+	MCFG_CPU_ADD( "maincpu", ARM7, XTAL(32'000'000) ) // ARM7500
 	MCFG_CPU_PROGRAM_MAP(a7000_mem)
 
 	/* video hardware */
@@ -844,12 +851,13 @@ static MACHINE_CONFIG_START( a7000 )
 	MCFG_PALETTE_ADD("palette", 0x200)
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_DERIVED( a7000p, a7000 )
+MACHINE_CONFIG_START(riscpc_state::a7000p)
+	a7000(config);
 	MCFG_CPU_MODIFY("maincpu") // ARM7500FE
-	MCFG_CPU_CLOCK(XTAL_48MHz)
+	MCFG_CPU_CLOCK(XTAL(48'000'000))
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_START( sarpc )
+MACHINE_CONFIG_START(riscpc_state::sarpc)
 	/* Basic machine hardware */
 	MCFG_CPU_ADD( "maincpu", ARM7, 202000000 ) // StrongARM
 	MCFG_CPU_PROGRAM_MAP(a7000_mem)
@@ -864,7 +872,7 @@ static MACHINE_CONFIG_START( sarpc )
 	MCFG_PALETTE_ADD("palette", 0x200)
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_START( sarpc_j233 )
+MACHINE_CONFIG_START(riscpc_state::sarpc_j233)
 	/* Basic machine hardware */
 	MCFG_CPU_ADD( "maincpu", ARM7, 233000000 ) // StrongARM
 	MCFG_CPU_PROGRAM_MAP(a7000_mem)

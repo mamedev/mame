@@ -23,15 +23,18 @@ public:
 		m_maincpu(*this, "maincpu") { }
 	DECLARE_DRIVER_INIT(ecoinf1);
 	required_device<cpu_device> m_maincpu;
+	void ecoinf1_older(machine_config &config);
+	void older_memmap(address_map &map);
+	void older_portmap(address_map &map);
 };
 
 
-static ADDRESS_MAP_START( older_memmap, AS_PROGRAM, 8, ecoinf1_state )
+ADDRESS_MAP_START(ecoinf1_state::older_memmap)
 	AM_RANGE(0x0000, 0x2fff) AM_ROM
 	AM_RANGE(0x4000, 0x4fff) AM_RAM
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( older_portmap, AS_IO, 8, ecoinf1_state )
+ADDRESS_MAP_START(ecoinf1_state::older_portmap)
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
 ADDRESS_MAP_END
 
@@ -248,7 +251,7 @@ static INPUT_PORTS_START( ecoinf1 )
 INPUT_PORTS_END
 
 
-static MACHINE_CONFIG_START( ecoinf1_older )
+MACHINE_CONFIG_START(ecoinf1_state::ecoinf1_older)
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", Z80,4000000)
 	MCFG_CPU_PROGRAM_MAP(older_memmap)

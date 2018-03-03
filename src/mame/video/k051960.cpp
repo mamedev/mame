@@ -145,37 +145,25 @@ k051960_device::k051960_device(const machine_config &mconfig, const char *tag, d
 {
 }
 
-void k051960_device::set_plane_order(device_t &device, int order)
+void k051960_device::set_plane_order(int order)
 {
-	k051960_device &dev = downcast<k051960_device &>(device);
-
 	switch (order)
 	{
 		case K051960_PLANEORDER_BASE:
-			device_gfx_interface::static_set_info(dev, gfxinfo);
+			set_info(gfxinfo);
 			break;
 
 		case K051960_PLANEORDER_MIA:
-			device_gfx_interface::static_set_info(dev, gfxinfo_reverse);
+			set_info(gfxinfo_reverse);
 			break;
 
 		case K051960_PLANEORDER_GRADIUS3:
-			device_gfx_interface::static_set_info(dev, gfxinfo_gradius3);
+			set_info(gfxinfo_gradius3);
 			break;
 
 		default:
 			fatalerror("Unknown plane_order\n");
 	}
-}
-
-//-------------------------------------------------
-//  set_screen_tag - set screen we are attached to
-//-------------------------------------------------
-
-void k051960_device::set_screen_tag(device_t &device, const char *tag)
-{
-	k051960_device &dev = dynamic_cast<k051960_device &>(device);
-	dev.m_screen.set_tag(tag);
 }
 
 //-------------------------------------------------
@@ -304,7 +292,7 @@ READ8_MEMBER( k051960_device::k051937_r )
 	else if (offset == 0)
 		return m_screen->vblank() ? 1 : 0; // vblank?
 
-	//logerror("%04x: read unknown 051937 address %x\n", space.device().safe_pc(), offset);
+	//logerror("%s: read unknown 051937 address %x\n", m_maincpu->pc(), offset);
 	return 0;
 }
 
@@ -329,11 +317,11 @@ WRITE8_MEMBER( k051960_device::k051937_w )
 
 		/* bit 5 = enable gfx ROM reading */
 		m_readroms = data & 0x20;
-		//logerror("%04x: write %02x to 051937 address %x\n", space.device().safe_pc(), data, offset);
+		//logerror("%s: write %02x to 051937 address %x\n", m_maincpu->pc(), data, offset);
 	}
 	else if (offset == 1)
 	{
-		//popmessage("%04x: write %02x to 051937 address %x", space.device().safe_pc(), data, offset);
+		//popmessage("%04x: write %02x to 051937 address %x", m_maincpu->pc(), data, offset);
 		// Chequered Flag uses this bit to enable background palette dimming
 		// TODO: use a callback here for now, pending further investigation over this bit
 		m_vreg_contrast_handler(BIT(data,0));
@@ -347,8 +335,7 @@ WRITE8_MEMBER( k051960_device::k051937_w )
 	}
 	else
 	{
-	//  popmessage("%04x: write %02x to 051937 address %x", space.device().safe_pc(), data, offset);
-	//logerror("%04x: write %02x to unknown 051937 address %x\n", space.device().safe_pc(), data, offset);
+	//logerror("%s: write %02x to unknown 051937 address %x\n", m_maincpu->pc(), data, offset);
 	}
 }
 

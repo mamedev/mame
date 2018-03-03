@@ -51,7 +51,7 @@ WRITE16_MEMBER(suna16_state::soundlatch_w)
 	{
 		m_soundlatch->write(space, 0, data & 0xff );
 	}
-	if (data & ~0xff)   logerror("CPU#0 PC %06X - Sound latch unknown bits: %04X\n", space.device().safe_pc(), data);
+	if (data & ~0xff)   logerror("CPU#0 PC %06X - Sound latch unknown bits: %04X\n", m_maincpu->pc(), data);
 }
 
 
@@ -65,7 +65,7 @@ WRITE16_MEMBER(suna16_state::bssoccer_leds_w)
 		output().set_led_value(3, data & 0x08);
 		machine().bookkeeping().coin_counter_w(0, data & 0x10);
 	}
-	if (data & ~0x1f)   logerror("CPU#0 PC %06X - Leds unknown bits: %04X\n", space.device().safe_pc(), data);
+	if (data & ~0x1f)   logerror("CPU#0 PC %06X - Leds unknown bits: %04X\n", m_maincpu->pc(), data);
 }
 
 
@@ -77,7 +77,7 @@ WRITE16_MEMBER(suna16_state::uballoon_leds_w)
 		output().set_led_value(0, data & 0x02);
 		output().set_led_value(1, data & 0x04);
 	}
-	if (data & ~0x07)   logerror("CPU#0 PC %06X - Leds unknown bits: %04X\n", space.device().safe_pc(), data);
+	if (data & ~0x07)   logerror("CPU#0 PC %06X - Leds unknown bits: %04X\n", m_maincpu->pc(), data);
 }
 
 
@@ -87,7 +87,7 @@ WRITE16_MEMBER(suna16_state::bestbest_coin_w)
 	{
 		machine().bookkeeping().coin_counter_w(0, data & 0x04);
 	}
-	if (data & ~0x04)   logerror("CPU#0 PC %06X - Leds unknown bits: %04X\n", space.device().safe_pc(), data);
+	if (data & ~0x04)   logerror("CPU#0 PC %06X - Leds unknown bits: %04X\n", m_maincpu->pc(), data);
 }
 
 
@@ -95,7 +95,7 @@ WRITE16_MEMBER(suna16_state::bestbest_coin_w)
                             Back Street Soccer
 ***************************************************************************/
 
-static ADDRESS_MAP_START( bssoccer_map, AS_PROGRAM, 16, suna16_state )
+ADDRESS_MAP_START(suna16_state::bssoccer_map)
 	AM_RANGE(0x000000, 0x1fffff) AM_ROM // ROM
 	AM_RANGE(0x200000, 0x203fff) AM_RAM // RAM
 	AM_RANGE(0x400000, 0x4001ff) AM_READWRITE(paletteram_r, paletteram_w)  // Banked Palette
@@ -151,7 +151,7 @@ WRITE8_MEMBER(suna16_state::uballoon_prot_w)
 	}
 }
 
-static ADDRESS_MAP_START( uballoon_map, AS_PROGRAM, 16, suna16_state )
+ADDRESS_MAP_START(suna16_state::uballoon_map)
 	AM_RANGE(0x000000, 0x0fffff) AM_ROM // ROM
 	AM_RANGE(0x800000, 0x803fff) AM_RAM // RAM
 	AM_RANGE(0x200000, 0x2001ff) AM_READWRITE(paletteram_r, paletteram_w) // Banked Palette
@@ -172,7 +172,7 @@ ADDRESS_MAP_END
                             Suna Quiz 6000 Academy
 ***************************************************************************/
 
-static ADDRESS_MAP_START( sunaq_map, AS_PROGRAM, 16, suna16_state )
+ADDRESS_MAP_START(suna16_state::sunaq_map)
 	AM_RANGE(0x000000, 0x0fffff) AM_ROM // ROM
 	AM_RANGE(0x500000, 0x500001) AM_READ_PORT("P1") AM_WRITE(soundlatch_w)   // To Sound CPU
 	AM_RANGE(0x500002, 0x500003) AM_READ_PORT("P2") AM_WRITE(flipscreen_w)   // Flip Screen
@@ -201,11 +201,11 @@ WRITE8_MEMBER(suna16_state::bestbest_prot_w)
 		case 0x00:  m_prot = m_prot ^ 0x0009;   break;
 		case 0x08:  m_prot = m_prot ^ 0x0002;   break;
 		case 0x0c:  m_prot = m_prot ^ 0x0003;   break;
-		//default:    logerror("CPU#0 PC %06X - Unknown protection value: %04X\n", space.device().safe_pc(), data);
+		//default:    logerror("CPU#0 PC %06X - Unknown protection value: %04X\n", m_maincpu->pc(), data);
 	}
 }
 
-static ADDRESS_MAP_START( bestbest_map, AS_PROGRAM, 16, suna16_state )
+ADDRESS_MAP_START(suna16_state::bestbest_map)
 	AM_RANGE( 0x000000, 0x03ffff ) AM_ROM AM_MIRROR(0xc0000)        // ROM
 	AM_RANGE( 0x200000, 0x2fffff ) AM_ROM AM_REGION("user1", 0)     // ROM
 	AM_RANGE( 0x500000, 0x500001 ) AM_READ_PORT("P1") AM_WRITE(soundlatch_w)     // To Sound CPU
@@ -241,7 +241,7 @@ MACHINE_START_MEMBER(suna16_state,bestbest)
                             Back Street Soccer
 ***************************************************************************/
 
-static ADDRESS_MAP_START( bssoccer_sound_map, AS_PROGRAM, 8, suna16_state )
+ADDRESS_MAP_START(suna16_state::bssoccer_sound_map)
 	AM_RANGE(0x0000, 0x7fff) AM_ROM // ROM
 	AM_RANGE(0xf000, 0xf7ff) AM_RAM // RAM
 	AM_RANGE(0xf800, 0xf801) AM_DEVREADWRITE("ymsnd", ym2151_device, read, write)   // YM2151
@@ -254,7 +254,7 @@ ADDRESS_MAP_END
                                 Ultra Balloon
 ***************************************************************************/
 
-static ADDRESS_MAP_START( uballoon_sound_map, AS_PROGRAM, 8, suna16_state )
+ADDRESS_MAP_START(suna16_state::uballoon_sound_map)
 	AM_RANGE(0x0000, 0xefff) AM_ROM // ROM
 	AM_RANGE(0xf000, 0xf7ff) AM_RAM // RAM
 	AM_RANGE(0xf800, 0xf801) AM_DEVREADWRITE("ymsnd", ym2151_device, read, write)   // YM2151
@@ -265,7 +265,7 @@ ADDRESS_MAP_END
                             Suna Quiz 6000 Academy
 ***************************************************************************/
 
-static ADDRESS_MAP_START( sunaq_sound_map, AS_PROGRAM, 8, suna16_state )
+ADDRESS_MAP_START(suna16_state::sunaq_sound_map)
 	AM_RANGE(0x0000, 0xe82f) AM_ROM // ROM
 	AM_RANGE(0xe830, 0xf7ff) AM_RAM // RAM (writes to efxx, could be a program bug tho)
 	AM_RANGE(0xf800, 0xf801) AM_DEVREADWRITE("ymsnd", ym2151_device, read, write)   // YM2151
@@ -276,7 +276,7 @@ ADDRESS_MAP_END
                             Best Of Best
 ***************************************************************************/
 
-static ADDRESS_MAP_START( bestbest_sound_map, AS_PROGRAM, 8, suna16_state )
+ADDRESS_MAP_START(suna16_state::bestbest_sound_map)
 	AM_RANGE( 0x0000, 0xbfff ) AM_ROM                                   // ROM
 	AM_RANGE( 0xc000, 0xc001 ) AM_DEVWRITE("ymsnd", ym3526_device, write)
 	AM_RANGE( 0xc002, 0xc003 ) AM_DEVWRITE("aysnd", ay8910_device, address_data_w)   // AY8910
@@ -310,14 +310,14 @@ MACHINE_START_MEMBER(suna16_state, bssoccer)
 WRITE8_MEMBER(suna16_state::bssoccer_pcm_1_bankswitch_w)
 {
 	const int bank = data & 7;
-	if (bank & ~7)  logerror("CPU#2 PC %06X - ROM bank unknown bits: %02X\n", space.device().safe_pc(), data);
+	if (bank & ~7)  logerror("CPU#2 PC %06X - ROM bank unknown bits: %02X\n", m_pcm1->pc(), data);
 	m_bank1->set_entry(bank);
 }
 
 WRITE8_MEMBER(suna16_state::bssoccer_pcm_2_bankswitch_w)
 {
 	const int bank = data & 7;
-	if (bank & ~7)  logerror("CPU#3 PC %06X - ROM bank unknown bits: %02X\n", space.device().safe_pc(), data);
+	if (bank & ~7)  logerror("CPU#3 PC %06X - ROM bank unknown bits: %02X\n", m_pcm2->pc(), data);
 	m_bank2->set_entry(bank);
 }
 
@@ -325,19 +325,19 @@ WRITE8_MEMBER(suna16_state::bssoccer_pcm_2_bankswitch_w)
 
 /* Memory maps: Yes, *no* RAM */
 
-static ADDRESS_MAP_START( bssoccer_pcm_1_map, AS_PROGRAM, 8, suna16_state )
+ADDRESS_MAP_START(suna16_state::bssoccer_pcm_1_map)
 	AM_RANGE(0x0000, 0x0fff) AM_ROM // ROM
 	AM_RANGE(0x1000, 0xffff) AM_ROMBANK("bank1")    // Banked ROM
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( bssoccer_pcm_2_map, AS_PROGRAM, 8, suna16_state )
+ADDRESS_MAP_START(suna16_state::bssoccer_pcm_2_map)
 	AM_RANGE(0x0000, 0x0fff) AM_ROM // ROM
 	AM_RANGE(0x1000, 0xffff) AM_ROMBANK("bank2")    // Banked ROM
 ADDRESS_MAP_END
 
 
 
-static ADDRESS_MAP_START( bssoccer_pcm_1_io_map, AS_IO, 8, suna16_state )
+ADDRESS_MAP_START(suna16_state::bssoccer_pcm_1_io_map)
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	AM_RANGE(0x00, 0x00) AM_DEVREAD("soundlatch2", generic_latch_8_device, read)    // From The Sound Z80
 	AM_RANGE(0x00, 0x00) AM_DEVWRITE("ldac", dac_byte_interface, write)
@@ -345,7 +345,7 @@ static ADDRESS_MAP_START( bssoccer_pcm_1_io_map, AS_IO, 8, suna16_state )
 	AM_RANGE(0x03, 0x03) AM_WRITE(bssoccer_pcm_1_bankswitch_w)  // Rom Bank
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( bssoccer_pcm_2_io_map, AS_IO, 8, suna16_state )
+ADDRESS_MAP_START(suna16_state::bssoccer_pcm_2_io_map)
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	AM_RANGE(0x00, 0x00) AM_DEVREAD("soundlatch3", generic_latch_8_device, read)    // From The Sound Z80
 	AM_RANGE(0x00, 0x00) AM_DEVWRITE("ldac2", dac_byte_interface, write)
@@ -363,18 +363,18 @@ ADDRESS_MAP_END
 WRITE8_MEMBER(suna16_state::uballoon_pcm_1_bankswitch_w)
 {
 	const int bank = data & 1;
-	if (bank & ~1)  logerror("CPU#2 PC %06X - ROM bank unknown bits: %02X\n", space.device().safe_pc(), data);
+	if (bank & ~1)  logerror("CPU#2 PC %06X - ROM bank unknown bits: %02X\n", m_pcm1->pc(), data);
 	m_bank1->set_entry(bank);
 }
 
 /* Memory maps: Yes, *no* RAM */
 
-static ADDRESS_MAP_START( uballoon_pcm_1_map, AS_PROGRAM, 8, suna16_state )
+ADDRESS_MAP_START(suna16_state::uballoon_pcm_1_map)
 	AM_RANGE(0x0000, 0x03ff) AM_ROM // ROM
 	AM_RANGE(0x0400, 0xffff) AM_ROMBANK("bank1")    // Banked ROM
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( uballoon_pcm_1_io_map, AS_IO, 8, suna16_state )
+ADDRESS_MAP_START(suna16_state::uballoon_pcm_1_io_map)
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	AM_RANGE(0x00, 0x00) AM_DEVREAD("soundlatch2", generic_latch_8_device, read)    // From The Sound Z80
 	AM_RANGE(0x00, 0x00) AM_DEVWRITE("ldac", dac_byte_interface, write)
@@ -400,11 +400,11 @@ MACHINE_RESET_MEMBER(suna16_state,uballoon)
                             Best Of Best
 ***************************************************************************/
 
-static ADDRESS_MAP_START( bestbest_pcm_1_map, AS_PROGRAM, 8, suna16_state )
+ADDRESS_MAP_START(suna16_state::bestbest_pcm_1_map)
 	AM_RANGE(0x0000, 0xffff) AM_ROM
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( bestbest_pcm_1_iomap, AS_IO, 8, suna16_state )
+ADDRESS_MAP_START(suna16_state::bestbest_pcm_1_iomap)
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	AM_RANGE(0x00, 0x00) AM_DEVREAD("soundlatch2", generic_latch_8_device, read)   // From The Sound Z80
 	AM_RANGE(0x00, 0x00) AM_DEVWRITE("ldac", dac_byte_interface, write)
@@ -796,21 +796,21 @@ TIMER_DEVICE_CALLBACK_MEMBER(suna16_state::bssoccer_interrupt)
 		m_maincpu->set_input_line(2, HOLD_LINE); // does RAM to sprite buffer copy here
 }
 
-static MACHINE_CONFIG_START( bssoccer )
+MACHINE_CONFIG_START(suna16_state::bssoccer)
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", M68000, XTAL_32MHz/4)    /* 8MHz */
+	MCFG_CPU_ADD("maincpu", M68000, XTAL(32'000'000)/4)    /* 8MHz */
 	MCFG_CPU_PROGRAM_MAP(bssoccer_map)
 	MCFG_TIMER_DRIVER_ADD_SCANLINE("scantimer", suna16_state, bssoccer_interrupt, "screen", 0, 1)
 
-	MCFG_CPU_ADD("audiocpu", Z80, XTAL_14_31818MHz/4)      /* Z80B at 3.579545MHz */
+	MCFG_CPU_ADD("audiocpu", Z80, XTAL(14'318'181)/4)      /* Z80B at 3.579545MHz */
 	MCFG_CPU_PROGRAM_MAP(bssoccer_sound_map)
 
-	MCFG_CPU_ADD("pcm1", Z80, XTAL_32MHz/6)      /* Z80B at 5.333MHz */
+	MCFG_CPU_ADD("pcm1", Z80, XTAL(32'000'000)/6)      /* Z80B at 5.333MHz */
 	MCFG_CPU_PROGRAM_MAP(bssoccer_pcm_1_map)
 	MCFG_CPU_IO_MAP(bssoccer_pcm_1_io_map)
 
-	MCFG_CPU_ADD("pcm2", Z80, XTAL_32MHz/6)      /* Z80B at 5.333MHz */
+	MCFG_CPU_ADD("pcm2", Z80, XTAL(32'000'000)/6)      /* Z80B at 5.333MHz */
 	MCFG_CPU_PROGRAM_MAP(bssoccer_pcm_2_map)
 	MCFG_CPU_IO_MAP(bssoccer_pcm_2_io_map)
 
@@ -838,7 +838,7 @@ static MACHINE_CONFIG_START( bssoccer )
 	MCFG_GENERIC_LATCH_8_ADD("soundlatch2")
 	MCFG_GENERIC_LATCH_8_ADD("soundlatch3")
 
-	MCFG_YM2151_ADD("ymsnd", XTAL_14_31818MHz/4)  /* 3.579545MHz */
+	MCFG_YM2151_ADD("ymsnd", XTAL(14'318'181)/4)  /* 3.579545MHz */
 	MCFG_SOUND_ROUTE(0, "lspeaker", 0.2)
 	MCFG_SOUND_ROUTE(1, "rspeaker", 0.2)
 
@@ -859,17 +859,17 @@ MACHINE_CONFIG_END
                                 Ultra Balloon
 ***************************************************************************/
 
-static MACHINE_CONFIG_START( uballoon )
+MACHINE_CONFIG_START(suna16_state::uballoon)
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", M68000, XTAL_32MHz/4)   /* 8MHz */
+	MCFG_CPU_ADD("maincpu", M68000, XTAL(32'000'000)/4)   /* 8MHz */
 	MCFG_CPU_PROGRAM_MAP(uballoon_map)
 	MCFG_CPU_VBLANK_INT_DRIVER("screen", suna16_state,  irq1_line_hold)
 
-	MCFG_CPU_ADD("audiocpu", Z80, XTAL_14_31818MHz/4)   /* Z80B at 3.579545MHz */
+	MCFG_CPU_ADD("audiocpu", Z80, XTAL(14'318'181)/4)   /* Z80B at 3.579545MHz */
 	MCFG_CPU_PROGRAM_MAP(uballoon_sound_map)
 
-	MCFG_CPU_ADD("pcm1", Z80, XTAL_32MHz/6) /* Z80B at 5.333MHz */
+	MCFG_CPU_ADD("pcm1", Z80, XTAL(32'000'000)/6) /* Z80B at 5.333MHz */
 	MCFG_CPU_PROGRAM_MAP(uballoon_pcm_1_map)
 	MCFG_CPU_IO_MAP(uballoon_pcm_1_io_map)
 
@@ -899,7 +899,7 @@ static MACHINE_CONFIG_START( uballoon )
 	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
 	MCFG_GENERIC_LATCH_8_ADD("soundlatch2")
 
-	MCFG_YM2151_ADD("ymsnd", XTAL_14_31818MHz/4)    /* 3.579545MHz */
+	MCFG_YM2151_ADD("ymsnd", XTAL(14'318'181)/4)    /* 3.579545MHz */
 	MCFG_SOUND_ROUTE(0, "lspeaker", 0.50)
 	MCFG_SOUND_ROUTE(1, "rspeaker", 0.50)
 
@@ -914,17 +914,17 @@ MACHINE_CONFIG_END
                             Suna Quiz 6000 Academy
 ***************************************************************************/
 
-static MACHINE_CONFIG_START( sunaq )
+MACHINE_CONFIG_START(suna16_state::sunaq)
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", M68000, XTAL_24MHz/4)   /* 6MHz */
+	MCFG_CPU_ADD("maincpu", M68000, XTAL(24'000'000)/4)   /* 6MHz */
 	MCFG_CPU_PROGRAM_MAP(sunaq_map)
 	MCFG_CPU_VBLANK_INT_DRIVER("screen", suna16_state,  irq1_line_hold)
 
-	MCFG_CPU_ADD("audiocpu", Z80, XTAL_14_31818MHz/4)   /* Z80B at 3.579545MHz */
+	MCFG_CPU_ADD("audiocpu", Z80, XTAL(14'318'181)/4)   /* Z80B at 3.579545MHz */
 	MCFG_CPU_PROGRAM_MAP(sunaq_sound_map)
 
-	MCFG_CPU_ADD("pcm1", Z80, XTAL_24MHz/4) /* Z80B at 6MHz */
+	MCFG_CPU_ADD("pcm1", Z80, XTAL(24'000'000)/4) /* Z80B at 6MHz */
 	MCFG_CPU_PROGRAM_MAP(bssoccer_pcm_1_map)
 	MCFG_CPU_IO_MAP(bssoccer_pcm_1_io_map)
 
@@ -955,7 +955,7 @@ static MACHINE_CONFIG_START( sunaq )
 	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
 	MCFG_GENERIC_LATCH_8_ADD("soundlatch2")
 
-	MCFG_YM2151_ADD("ymsnd", XTAL_14_31818MHz/4)    /* 3.579545MHz */
+	MCFG_YM2151_ADD("ymsnd", XTAL(14'318'181)/4)    /* 3.579545MHz */
 	MCFG_SOUND_ROUTE(0, "lspeaker", 0.50)
 	MCFG_SOUND_ROUTE(1, "rspeaker", 0.50)
 
@@ -975,17 +975,17 @@ WRITE8_MEMBER(suna16_state::bestbest_ay8910_port_a_w)
 	// ?
 }
 
-static MACHINE_CONFIG_START( bestbest )
+MACHINE_CONFIG_START(suna16_state::bestbest)
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", M68000, XTAL_24MHz/4)   /* 6MHz */
+	MCFG_CPU_ADD("maincpu", M68000, XTAL(24'000'000)/4)   /* 6MHz */
 	MCFG_CPU_PROGRAM_MAP(bestbest_map)
 	MCFG_TIMER_DRIVER_ADD_SCANLINE("scantimer", suna16_state, bssoccer_interrupt, "screen", 0, 1)
 
-	MCFG_CPU_ADD("audiocpu", Z80, XTAL_24MHz/4) /* 6MHz */
+	MCFG_CPU_ADD("audiocpu", Z80, XTAL(24'000'000)/4) /* 6MHz */
 	MCFG_CPU_PROGRAM_MAP(bestbest_sound_map)
 
-	MCFG_CPU_ADD("pcm1", Z80, XTAL_24MHz/4) /* 6MHz */
+	MCFG_CPU_ADD("pcm1", Z80, XTAL(24'000'000)/4) /* 6MHz */
 	MCFG_CPU_PROGRAM_MAP(bestbest_pcm_1_map)
 	MCFG_CPU_IO_MAP(bestbest_pcm_1_iomap)
 
@@ -1014,12 +1014,12 @@ static MACHINE_CONFIG_START( bestbest )
 	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
 	MCFG_GENERIC_LATCH_8_ADD("soundlatch2")
 
-	MCFG_SOUND_ADD("aysnd", AY8910, XTAL_24MHz/16)  /* 1.5MHz */
+	MCFG_SOUND_ADD("aysnd", AY8910, XTAL(24'000'000)/16)  /* 1.5MHz */
 	MCFG_AY8910_PORT_A_WRITE_CB(WRITE8(suna16_state, bestbest_ay8910_port_a_w))
 	MCFG_SOUND_ROUTE(0, "lspeaker", 1.0)
 	MCFG_SOUND_ROUTE(1, "rspeaker", 1.0)
 
-	MCFG_SOUND_ADD("ymsnd", YM3526, XTAL_24MHz/8)   /* 3MHz */
+	MCFG_SOUND_ADD("ymsnd", YM3526, XTAL(24'000'000)/8)   /* 3MHz */
 	MCFG_YM3526_IRQ_HANDLER(INPUTLINE("audiocpu", INPUT_LINE_IRQ0))
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "lspeaker", 1.0)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", 1.0)

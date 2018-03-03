@@ -57,6 +57,11 @@ public:
 	DECLARE_WRITE8_MEMBER(pb_w);
 	DECLARE_INPUT_CHANGED_MEMBER(trigger_reset);
 	DECLARE_INPUT_CHANGED_MEMBER(trigger_nmi);
+	void mkit09a(machine_config &config);
+	void mkit09(machine_config &config);
+	void mkit09_io(address_map &map);
+	void mkit09_mem(address_map &map);
+	void mkit09a_mem(address_map &map);
 private:
 	uint8_t m_keydata;
 	virtual void machine_reset() override;
@@ -66,14 +71,14 @@ private:
 };
 
 
-static ADDRESS_MAP_START(mkit09_mem, AS_PROGRAM, 8, mkit09_state)
+ADDRESS_MAP_START(mkit09_state::mkit09_mem)
 	ADDRESS_MAP_UNMAP_HIGH
 	AM_RANGE(0x0000,0x07ff) AM_MIRROR(0x1800) AM_RAM
 	AM_RANGE(0xa004,0xa007) AM_MIRROR(0x1ff8) AM_DEVREADWRITE("pia", pia6821_device, read_alt, write_alt)
 	AM_RANGE(0xe000,0xe7ff) AM_MIRROR(0x1800) AM_ROM AM_REGION("roms", 0)
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START(mkit09a_mem, AS_PROGRAM, 8, mkit09_state)
+ADDRESS_MAP_START(mkit09_state::mkit09a_mem)
 	ADDRESS_MAP_UNMAP_HIGH
 	AM_RANGE(0x0000,0x07ff) AM_RAM
 	AM_RANGE(0xe600,0xe603) AM_DEVREADWRITE("pia", pia6821_device, read_alt, write_alt)
@@ -81,7 +86,7 @@ static ADDRESS_MAP_START(mkit09a_mem, AS_PROGRAM, 8, mkit09_state)
 	AM_RANGE(0xf000,0xffff) AM_ROM AM_REGION("roms", 0)
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( mkit09_io, AS_IO, 8, mkit09_state)
+ADDRESS_MAP_START(mkit09_state::mkit09_io)
 	ADDRESS_MAP_UNMAP_HIGH
 ADDRESS_MAP_END
 
@@ -173,7 +178,7 @@ WRITE8_MEMBER( mkit09_state::pa_w )
 	data ^= 0xff;
 	if (m_keydata > 3)
 	{
-		output().set_digit_value(m_keydata, BITSWAP8(data, 7, 0, 5, 6, 4, 2, 1, 3));
+		output().set_digit_value(m_keydata, bitswap<8>(data, 7, 0, 5, 6, 4, 2, 1, 3));
 		m_keydata = 0;
 	}
 
@@ -189,9 +194,9 @@ WRITE8_MEMBER( mkit09_state::pb_w )
 }
 
 
-static MACHINE_CONFIG_START( mkit09 )
+MACHINE_CONFIG_START(mkit09_state::mkit09)
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu",M6809E, XTAL_4MHz)
+	MCFG_CPU_ADD("maincpu", MC6809, XTAL(4'000'000))
 	MCFG_CPU_PROGRAM_MAP(mkit09_mem)
 	MCFG_CPU_IO_MAP(mkit09_io)
 
@@ -215,9 +220,9 @@ static MACHINE_CONFIG_START( mkit09 )
 	MCFG_CASSETTE_ADD( "cassette" )
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_START( mkit09a )
+MACHINE_CONFIG_START(mkit09_state::mkit09a)
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu",M6809E, XTAL_4MHz)
+	MCFG_CPU_ADD("maincpu", MC6809, XTAL(4'000'000))
 	MCFG_CPU_PROGRAM_MAP(mkit09a_mem)
 	MCFG_CPU_IO_MAP(mkit09_io)
 

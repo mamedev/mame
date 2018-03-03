@@ -44,6 +44,12 @@ public:
 	DECLARE_PALETTE_INIT(rt1715);
 	I8275_DRAW_CHARACTER_MEMBER( crtc_display_pixels );
 
+	void rt1715(machine_config &config);
+	void rt1715w(machine_config &config);
+	void k7658_io(address_map &map);
+	void k7658_mem(address_map &map);
+	void rt1715_io(address_map &map);
+	void rt1715_mem(address_map &map);
 protected:
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
@@ -183,12 +189,12 @@ PALETTE_INIT_MEMBER(rt1715_state, rt1715)
     ADDRESS MAPS
 ***************************************************************************/
 
-static ADDRESS_MAP_START( rt1715_mem, AS_PROGRAM, 8, rt1715_state )
+ADDRESS_MAP_START(rt1715_state::rt1715_mem)
 	AM_RANGE(0x0000, 0x07ff) AM_READ_BANK("bank1") AM_WRITE_BANK("bank3")
 	AM_RANGE(0x0800, 0xffff) AM_RAMBANK("bank2")
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( rt1715_io, AS_IO, 8, rt1715_state )
+ADDRESS_MAP_START(rt1715_state::rt1715_io)
 	ADDRESS_MAP_UNMAP_HIGH
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	AM_RANGE(0x00, 0x03) AM_DEVREADWRITE("a71", z80pio_device, read_alt, write_alt)
@@ -200,12 +206,12 @@ static ADDRESS_MAP_START( rt1715_io, AS_IO, 8, rt1715_state )
 	AM_RANGE(0x28, 0x28) AM_WRITE(rt1715_rom_disable)
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( k7658_mem, AS_PROGRAM, 8, rt1715_state )
+ADDRESS_MAP_START(rt1715_state::k7658_mem)
 	AM_RANGE(0x0000, 0xffff) AM_WRITE(k7658_data_w)
 	AM_RANGE(0x0000, 0x07ff) AM_MIRROR(0xf800) AM_ROM
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( k7658_io, AS_IO, 8, rt1715_state )
+ADDRESS_MAP_START(rt1715_state::k7658_io)
 	AM_RANGE(0x2000, 0x2000) AM_MIRROR(0x8000) AM_READ(k7658_led1_r)
 	AM_RANGE(0x4000, 0x4000) AM_MIRROR(0x8000) AM_READ(k7658_led2_r)
 	AM_RANGE(0x8000, 0x9fff) AM_READ(k7658_data_r)
@@ -272,9 +278,9 @@ static const z80_daisy_config rt1715_daisy_chain[] =
 	{ nullptr }
 };
 
-static MACHINE_CONFIG_START( rt1715 )
+MACHINE_CONFIG_START(rt1715_state::rt1715)
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", Z80, XTAL_2_4576MHz)
+	MCFG_CPU_ADD("maincpu", Z80, XTAL(2'457'600))
 	MCFG_CPU_PROGRAM_MAP(rt1715_mem)
 	MCFG_CPU_IO_MAP(rt1715_io)
 	MCFG_Z80_DAISY_CHAIN(rt1715_daisy_chain)
@@ -297,17 +303,17 @@ static MACHINE_CONFIG_START( rt1715 )
 	MCFG_PALETTE_ADD("palette", 3)
 	MCFG_PALETTE_INIT_OWNER(rt1715_state, rt1715)
 
-	MCFG_DEVICE_ADD("a26", I8275, XTAL_2_4576MHz)
+	MCFG_DEVICE_ADD("a26", I8275, XTAL(2'457'600))
 	MCFG_I8275_CHARACTER_WIDTH(8)
 	MCFG_I8275_DRAW_CHARACTER_CALLBACK_OWNER(rt1715_state, crtc_display_pixels)
 
-	MCFG_DEVICE_ADD("a30", Z80CTC, XTAL_10MHz/4 /* ? */)
+	MCFG_DEVICE_ADD("a30", Z80CTC, XTAL(10'000'000)/4 /* ? */)
 
-	MCFG_DEVICE_ADD("a29", Z80SIO, XTAL_10MHz/4 /* ? */)
+	MCFG_DEVICE_ADD("a29", Z80SIO, XTAL(10'000'000)/4 /* ? */)
 
 	/* floppy */
-	MCFG_DEVICE_ADD("a71", Z80PIO, XTAL_10MHz/4 /* ? */)
-	MCFG_DEVICE_ADD("a72", Z80PIO, XTAL_10MHz/4 /* ? */)
+	MCFG_DEVICE_ADD("a71", Z80PIO, XTAL(10'000'000)/4 /* ? */)
+	MCFG_DEVICE_ADD("a72", Z80PIO, XTAL(10'000'000)/4 /* ? */)
 
 	/* internal ram */
 	MCFG_RAM_ADD(RAM_TAG)
@@ -315,7 +321,8 @@ static MACHINE_CONFIG_START( rt1715 )
 	MCFG_RAM_DEFAULT_VALUE(0x00)
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_DERIVED( rt1715w, rt1715 )
+MACHINE_CONFIG_START(rt1715_state::rt1715w)
+	rt1715(config);
 MACHINE_CONFIG_END
 
 

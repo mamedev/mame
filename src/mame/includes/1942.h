@@ -65,4 +65,11 @@ public:
 	required_device<gfxdecode_device> m_gfxdecode;
 	required_device<palette_device> m_palette;
 	required_device<generic_latch_8_device> m_soundlatch;
+	void _1942p(machine_config &config);
+	void _1942(machine_config &config);
+	void c1942_map(address_map &map);
+	void c1942p_map(address_map &map);
+	void c1942p_sound_io(address_map &map);
+	void c1942p_sound_map(address_map &map);
+	void sound_map(address_map &map);
 };

@@ -103,7 +103,7 @@ WRITE8_MEMBER(homerun_state::homerun_d7756_sample_w)
 		m_d7756->port_w(space, 0, data);
 }
 
-static ADDRESS_MAP_START( homerun_memmap, AS_PROGRAM, 8, homerun_state )
+ADDRESS_MAP_START(homerun_state::homerun_memmap)
 	AM_RANGE(0x0000, 0x3fff) AM_ROM
 	AM_RANGE(0x4000, 0x7fff) AM_ROMBANK("bank1")
 	AM_RANGE(0x8000, 0x9fff) AM_RAM_WRITE(homerun_videoram_w) AM_SHARE("videoram")
@@ -112,7 +112,7 @@ static ADDRESS_MAP_START( homerun_memmap, AS_PROGRAM, 8, homerun_state )
 	AM_RANGE(0xc000, 0xdfff) AM_RAM
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( homerun_iomap, AS_IO, 8, homerun_state )
+ADDRESS_MAP_START(homerun_state::homerun_iomap)
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	AM_RANGE(0x10, 0x10) AM_WRITE(homerun_d7756_sample_w)
 	AM_RANGE(0x20, 0x20) AM_WRITE(homerun_control_w)
@@ -244,6 +244,7 @@ static INPUT_PORTS_START( ganjaja )
 	PORT_BIT( 0xcf, IP_ACTIVE_HIGH, IPT_UNKNOWN )
 
 	PORT_START("DSW")
+	// starts game with coin in if 1c_1c?
 	PORT_DIPNAME( 0x01, 0x00, DEF_STR( Coin_B ) )       PORT_DIPLOCATION("DIPSW:1")
 	PORT_DIPSETTING(    0x00, DEF_STR( 2C_1C ) )
 	PORT_DIPSETTING(    0x01, DEF_STR( 1C_1C ) )
@@ -347,10 +348,10 @@ void homerun_state::machine_reset()
 
 /**************************************************************************/
 
-static MACHINE_CONFIG_START( dynashot )
+MACHINE_CONFIG_START(homerun_state::dynashot)
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", Z80, XTAL_20MHz/4)
+	MCFG_CPU_ADD("maincpu", Z80, XTAL(20'000'000)/4)
 	MCFG_CPU_PROGRAM_MAP(homerun_memmap)
 	MCFG_CPU_IO_MAP(homerun_iomap)
 	MCFG_CPU_VBLANK_INT_DRIVER("screen", homerun_state,  irq0_line_hold)
@@ -362,9 +363,10 @@ static MACHINE_CONFIG_START( dynashot )
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
-	MCFG_SCREEN_REFRESH_RATE(60)
-	MCFG_SCREEN_SIZE(256, 256)
-	MCFG_SCREEN_VISIBLE_AREA(0*8, 32*8-1, 0*8, 30*8-1)
+//  MCFG_SCREEN_REFRESH_RATE(60)
+//  MCFG_SCREEN_SIZE(256, 256)
+//  MCFG_SCREEN_VISIBLE_AREA(0*8, 32*8-1, 0*8, 30*8-1)
+	MCFG_SCREEN_RAW_PARAMS(XTAL(20'000'000)/4,328,0,256,253,0,240)
 	MCFG_SCREEN_UPDATE_DRIVER(homerun_state, screen_update_homerun)
 	MCFG_SCREEN_PALETTE("palette")
 
@@ -374,13 +376,14 @@ static MACHINE_CONFIG_START( dynashot )
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
 
-	MCFG_SOUND_ADD("ymsnd", YM2203, XTAL_20MHz/8)
+	MCFG_SOUND_ADD("ymsnd", YM2203, XTAL(20'000'000)/8)
 	MCFG_AY8910_PORT_A_READ_CB(IOPORT("DSW"))
 	MCFG_AY8910_PORT_B_WRITE_CB(WRITE8(homerun_state, homerun_banking_w))
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_DERIVED( homerun, dynashot )
+MACHINE_CONFIG_START(homerun_state::homerun)
+	dynashot(config);
 
 	/* sound hardware */
 	MCFG_SOUND_ADD("d7756", UPD7756, UPD7759_STANDARD_CLOCK)
@@ -392,7 +395,8 @@ static MACHINE_CONFIG_DERIVED( homerun, dynashot )
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_DERIVED( ganjaja, dynashot )
+MACHINE_CONFIG_START(homerun_state::ganjaja)
+	dynashot(config);
 
 	/* basic machine hardware */
 	MCFG_CPU_MODIFY("maincpu")
@@ -422,6 +426,20 @@ ROM_START( homerun )
 	ROM_LOAD( "d7756c.ic98",    0x00000, 0x08000, NO_DUMP ) /* D7756C built-in rom - very likely the same rom as [Moero!! Pro Yakyuu (Black/Red)] on Famicom, and [Moero!! Nettou Yakyuu '88] on MSX2 */
 ROM_END
 
+ROM_START( nhomerun )
+	ROM_REGION( 0x30000, "maincpu", 0 )
+	ROM_LOAD( "1.ic43",   0x00000, 0x04000, CRC(aed96d6d) SHA1(5cb3932f4cfa3f6c0134ac20a1747c562db31a65) )
+	ROM_CONTINUE(         0x10000, 0x1c000)
+
+	ROM_REGION( 0x10000, "gfx1", 0 )
+	ROM_LOAD( "3.ic60",   0x00000, 0x10000, CRC(69a720d1) SHA1(0f0a4877578f358e9e829ece8c31e23f01adcf83) )
+
+	ROM_REGION( 0x20000, "gfx2", 0 )
+	ROM_LOAD( "2.ic120",  0x00000, 0x20000, CRC(57e9b757) SHA1(8190d690721005407a5b06d13d64e70301d1e925) )
+
+	ROM_REGION( 0x08000, "d7756", ROMREGION_ERASE00 )
+	ROM_LOAD( "d7756c.ic98",    0x00000, 0x08000, NO_DUMP )
+ROM_END
 
 ROM_START( dynashot )
 	ROM_REGION( 0x30000, "maincpu", 0 )
@@ -452,6 +470,8 @@ ROM_START( ganjaja )
 ROM_END
 
 
-GAME( 1988, homerun,  0, homerun,  homerun,  homerun_state, 0, ROT0, "Jaleco", "Moero!! Pro Yakyuu Homerun Kyousou", MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
-GAME( 1988, dynashot, 0, dynashot, dynashot, homerun_state, 0, ROT0, "Jaleco", "Dynamic Shoot Kyousou", MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE )
-GAME( 1990, ganjaja,  0, ganjaja,  ganjaja,  homerun_state, 0, ROT0, "Jaleco", "Ganbare Jajamaru Saisho wa Goo / Ganbare Jajamaru Hop Step & Jump", MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE )
+//    YEAR  NAME      PARENT    MACHINE   INPUT     STATE          INIT   ROT    COMPANY   FULLNAME                                                            FLAGS
+GAME( 1988, nhomerun, 0,        homerun,  homerun,  homerun_state, 0,     ROT0, "Jaleco", "NEW Moero!! Pro Yakyuu Homerun Kyousou",                            MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE ) // same as below but harder?
+GAME( 1988, homerun,  nhomerun, homerun,  homerun,  homerun_state, 0,     ROT0, "Jaleco", "Moero!! Pro Yakyuu Homerun Kyousou",                                MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
+GAME( 1988, dynashot, 0,        dynashot, dynashot, homerun_state, 0,     ROT0, "Jaleco", "Dynamic Shoot Kyousou",                                             MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE )
+GAME( 1990, ganjaja,  0,        ganjaja,  ganjaja,  homerun_state, 0,     ROT0, "Jaleco", "Ganbare Jajamaru Saisho wa Goo / Ganbare Jajamaru Hop Step & Jump", MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE )

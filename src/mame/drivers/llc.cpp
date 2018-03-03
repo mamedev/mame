@@ -58,14 +58,14 @@
 
 
 /* Address maps */
-static ADDRESS_MAP_START( llc1_mem, AS_PROGRAM, 8, llc_state )
+ADDRESS_MAP_START(llc_state::llc1_mem)
 	AM_RANGE(0x0000, 0x07ff) AM_ROM // Monitor ROM
 	AM_RANGE(0x0800, 0x13ff) AM_ROM // BASIC ROM
 	AM_RANGE(0x1400, 0x1bff) AM_RAM // RAM
 	AM_RANGE(0x1c00, 0x1fff) AM_RAM AM_SHARE("videoram") // Video RAM
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( llc1_io, AS_IO, 8, llc_state )
+ADDRESS_MAP_START(llc_state::llc1_io)
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	ADDRESS_MAP_UNMAP_HIGH
 	AM_RANGE(0xEC, 0xEF) AM_DEVREADWRITE("z80pio2", z80pio_device, read, write)
@@ -73,14 +73,14 @@ static ADDRESS_MAP_START( llc1_io, AS_IO, 8, llc_state )
 	AM_RANGE(0xF8, 0xFB) AM_DEVREADWRITE("z80ctc", z80ctc_device, read, write)
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( llc2_mem, AS_PROGRAM, 8, llc_state )
+ADDRESS_MAP_START(llc_state::llc2_mem)
 	AM_RANGE(0x0000, 0x3fff) AM_RAMBANK("bank1")
 	AM_RANGE(0x4000, 0x5fff) AM_RAMBANK("bank2")
 	AM_RANGE(0x6000, 0xbfff) AM_RAMBANK("bank3")
 	AM_RANGE(0xc000, 0xffff) AM_RAMBANK("bank4")
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( llc2_io, AS_IO, 8, llc_state )
+ADDRESS_MAP_START(llc_state::llc2_io)
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	ADDRESS_MAP_UNMAP_HIGH
 	AM_RANGE(0xE0, 0xE3) AM_WRITE(llc2_rom_disable_w)
@@ -195,9 +195,9 @@ static GFXDECODE_START( llc2 )
 GFXDECODE_END
 
 /* Machine driver */
-static MACHINE_CONFIG_START( llc1 )
+MACHINE_CONFIG_START(llc_state::llc1)
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", Z80, XTAL_3MHz)
+	MCFG_CPU_ADD("maincpu", Z80, XTAL(3'000'000))
 	MCFG_Z80_DAISY_CHAIN(llc1_daisy_chain)
 	MCFG_CPU_PROGRAM_MAP(llc1_mem)
 	MCFG_CPU_IO_MAP(llc1_io)
@@ -218,16 +218,16 @@ static MACHINE_CONFIG_START( llc1 )
 	MCFG_PALETTE_ADD_MONOCHROME("palette")
 	MCFG_DEFAULT_LAYOUT(layout_llc1)
 
-	MCFG_DEVICE_ADD("z80pio1", Z80PIO, XTAL_3MHz)
+	MCFG_DEVICE_ADD("z80pio1", Z80PIO, XTAL(3'000'000))
 	MCFG_Z80PIO_IN_PA_CB(READ8(llc_state, llc1_port1_a_r))
 	MCFG_Z80PIO_OUT_PA_CB(WRITE8(llc_state, llc1_port1_a_w))
 	MCFG_Z80PIO_OUT_PB_CB(WRITE8(llc_state, llc1_port1_b_w))
 
-	MCFG_DEVICE_ADD("z80pio2", Z80PIO, XTAL_3MHz)
+	MCFG_DEVICE_ADD("z80pio2", Z80PIO, XTAL(3'000'000))
 	MCFG_Z80PIO_IN_PA_CB(READ8(llc_state, llc1_port2_a_r))
 	MCFG_Z80PIO_IN_PB_CB(READ8(llc_state, llc1_port2_b_r))
 
-	MCFG_DEVICE_ADD("z80ctc", Z80CTC, XTAL_3MHz)
+	MCFG_DEVICE_ADD("z80ctc", Z80CTC, XTAL(3'000'000))
 	// timer 0 irq does digit display, and timer 3 irq does scan of the
 	// monitor keyboard.
 	// No idea how the CTC is connected, so guessed.
@@ -239,9 +239,9 @@ static MACHINE_CONFIG_START( llc1 )
 	MCFG_GENERIC_KEYBOARD_CB(PUT(llc_state, kbd_put))
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_START( llc2 )
+MACHINE_CONFIG_START(llc_state::llc2)
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", Z80, XTAL_3MHz)
+	MCFG_CPU_ADD("maincpu", Z80, XTAL(3'000'000))
 	MCFG_Z80_DAISY_CHAIN(llc2_daisy_chain)
 	MCFG_CPU_PROGRAM_MAP(llc2_mem)
 	MCFG_CPU_IO_MAP(llc2_io)
@@ -265,15 +265,15 @@ static MACHINE_CONFIG_START( llc2 )
 	MCFG_SOUND_ADD("speaker", SPEAKER_SOUND, 0)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.15)
 
-	MCFG_DEVICE_ADD("z80pio1", Z80PIO, XTAL_3MHz)
+	MCFG_DEVICE_ADD("z80pio1", Z80PIO, XTAL(3'000'000))
 	MCFG_Z80PIO_IN_PA_CB(DEVREAD8(K7659_KEYBOARD_TAG, k7659_keyboard_device, read))
 	MCFG_Z80PIO_IN_PB_CB(READ8(llc_state, llc2_port1_b_r))
 	MCFG_Z80PIO_OUT_PB_CB(WRITE8(llc_state, llc2_port1_b_w))
 
-	MCFG_DEVICE_ADD("z80pio2", Z80PIO, XTAL_3MHz)
+	MCFG_DEVICE_ADD("z80pio2", Z80PIO, XTAL(3'000'000))
 	MCFG_Z80PIO_IN_PA_CB(READ8(llc_state, llc2_port2_a_r))
 
-	MCFG_DEVICE_ADD("z80ctc", Z80CTC, XTAL_3MHz)
+	MCFG_DEVICE_ADD("z80ctc", Z80CTC, XTAL(3'000'000))
 
 	MCFG_K7659_KEYBOARD_ADD()
 

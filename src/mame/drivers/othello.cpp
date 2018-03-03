@@ -112,6 +112,11 @@ public:
 	virtual void machine_reset() override;
 	DECLARE_PALETTE_INIT(othello);
 	MC6845_UPDATE_ROW(crtc_update_row);
+	void othello(machine_config &config);
+	void audio_map(address_map &map);
+	void audio_portmap(address_map &map);
+	void main_map(address_map &map);
+	void main_portmap(address_map &map);
 };
 
 
@@ -155,7 +160,7 @@ PALETTE_INIT_MEMBER(othello_state, othello)
 	palette.set_pen_color(0x0f, rgb_t(0xff, 0xff, 0xff));
 }
 
-static ADDRESS_MAP_START( main_map, AS_PROGRAM, 8, othello_state )
+ADDRESS_MAP_START(othello_state::main_map)
 	AM_RANGE(0x0000, 0x1fff) AM_ROM
 	AM_RANGE(0x8000, 0x97ff) AM_NOP /* not populated */
 	AM_RANGE(0x9800, 0x9fff) AM_RAM AM_SHARE("videoram")
@@ -208,7 +213,7 @@ WRITE8_MEMBER(othello_state::tilebank_w)
 	logerror("tilebank -> %x\n", data);
 }
 
-static ADDRESS_MAP_START( main_portmap, AS_IO, 8, othello_state )
+ADDRESS_MAP_START(othello_state::main_portmap)
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	AM_RANGE(0x08, 0x08) AM_DEVWRITE("crtc", mc6845_device, address_w)
 	AM_RANGE(0x09, 0x09) AM_DEVREADWRITE("crtc", mc6845_device, register_r, register_w)
@@ -252,12 +257,12 @@ WRITE8_MEMBER(othello_state::ay_data_w)
 	if (m_ay_select & 2) m_ay2->data_w(space, 0, data);
 }
 
-static ADDRESS_MAP_START( audio_map, AS_PROGRAM, 8, othello_state )
+ADDRESS_MAP_START(othello_state::audio_map)
 	AM_RANGE(0x0000, 0x1fff) AM_ROM
 	AM_RANGE(0x8000, 0x83ff) AM_RAM
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( audio_portmap, AS_IO, 8, othello_state )
+ADDRESS_MAP_START(othello_state::audio_portmap)
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	AM_RANGE(0x00, 0x00) AM_READ(latch_r)
 	AM_RANGE(0x01, 0x01) AM_WRITE(ay_data_w)
@@ -389,19 +394,19 @@ void othello_state::machine_reset()
 	m_n7751_busy = 0;
 }
 
-static MACHINE_CONFIG_START( othello )
+MACHINE_CONFIG_START(othello_state::othello)
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu",Z80,XTAL_8MHz/2)
+	MCFG_CPU_ADD("maincpu",Z80,XTAL(8'000'000)/2)
 	MCFG_CPU_PROGRAM_MAP(main_map)
 	MCFG_CPU_IO_MAP(main_portmap)
 	MCFG_CPU_VBLANK_INT_DRIVER("screen", othello_state,  irq0_line_hold)
 
-	MCFG_CPU_ADD("audiocpu",Z80,XTAL_3_579545MHz)
+	MCFG_CPU_ADD("audiocpu",Z80,XTAL(3'579'545))
 	MCFG_CPU_PROGRAM_MAP(audio_map)
 	MCFG_CPU_IO_MAP(audio_portmap)
 
-	MCFG_CPU_ADD("n7751", N7751, XTAL_6MHz)
+	MCFG_CPU_ADD("n7751", N7751, XTAL(6'000'000))
 	MCFG_MCS48_PORT_T1_IN_CB(GND) // labelled as "TEST", connected to ground
 	MCFG_MCS48_PORT_P2_IN_CB(READ8(othello_state, n7751_command_r))
 	MCFG_MCS48_PORT_BUS_IN_CB(READ8(othello_state, n7751_rom_r))

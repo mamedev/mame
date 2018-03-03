@@ -16,6 +16,8 @@ public:
 			m_maincpu(*this, "maincpu")
 	{ }
 
+	void capcom(machine_config &config);
+	void capcom_map(address_map &map);
 protected:
 
 	// devices
@@ -28,7 +30,7 @@ public:
 };
 
 
-static ADDRESS_MAP_START( capcom_map, AS_PROGRAM, 16, capcom_state )
+ADDRESS_MAP_START(capcom_state::capcom_map)
 	AM_RANGE(0x0000, 0xffffff) AM_NOP
 ADDRESS_MAP_END
 
@@ -43,7 +45,7 @@ DRIVER_INIT_MEMBER(capcom_state,capcom)
 {
 }
 
-static MACHINE_CONFIG_START( capcom )
+MACHINE_CONFIG_START(capcom_state::capcom)
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", M68000, 16670000) // M68306
 	MCFG_CPU_PROGRAM_MAP(capcom_map)

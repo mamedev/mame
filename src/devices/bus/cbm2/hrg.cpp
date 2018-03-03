@@ -66,7 +66,7 @@ const tiny_rom_entry *cbm2_hrg_device::device_rom_region() const
 //  ADDRESS_MAP( hrg_a_map )
 //-------------------------------------------------
 
-static ADDRESS_MAP_START( hrg_a_map, 0, 8, cbm2_hrg_a_device )
+ADDRESS_MAP_START(cbm2_hrg_a_device::hrg_a_map)
 	ADDRESS_MAP_GLOBAL_MASK(0x7fff)
 	AM_RANGE(0x0000, 0x7fff) AM_RAM
 ADDRESS_MAP_END
@@ -76,7 +76,7 @@ ADDRESS_MAP_END
 //  ADDRESS_MAP( hrg_b_map )
 //-------------------------------------------------
 
-static ADDRESS_MAP_START( hrg_b_map, 0, 8, cbm2_hrg_b_device )
+ADDRESS_MAP_START(cbm2_hrg_b_device::hrg_b_map)
 	ADDRESS_MAP_GLOBAL_MASK(0x3fff)
 	AM_RANGE(0x0000, 0x3fff) AM_RAM
 ADDRESS_MAP_END
@@ -86,7 +86,7 @@ ADDRESS_MAP_END
 //  device_add_mconfig - add device configuration
 //-------------------------------------------------
 
-MACHINE_CONFIG_MEMBER( cbm2_hrg_a_device::device_add_mconfig )
+MACHINE_CONFIG_START(cbm2_hrg_a_device::device_add_mconfig)
 	MCFG_SCREEN_ADD_MONOCHROME(SCREEN_TAG, RASTER, rgb_t::green())
 	MCFG_SCREEN_UPDATE_DEVICE(EF9365_TAG, ef9365_device, screen_update)
 	MCFG_SCREEN_SIZE(512, 512)
@@ -102,7 +102,7 @@ MACHINE_CONFIG_MEMBER( cbm2_hrg_a_device::device_add_mconfig )
 	MCFG_EF936X_DISPLAYMODE(DISPLAY_MODE_512x512);
 MACHINE_CONFIG_END
 
-MACHINE_CONFIG_MEMBER( cbm2_hrg_b_device::device_add_mconfig )
+MACHINE_CONFIG_START(cbm2_hrg_b_device::device_add_mconfig)
 	MCFG_SCREEN_ADD_MONOCHROME(SCREEN_TAG, RASTER, rgb_t::green())
 	MCFG_SCREEN_UPDATE_DEVICE(EF9366_TAG, ef9365_device, screen_update)
 	MCFG_SCREEN_SIZE(512, 256)

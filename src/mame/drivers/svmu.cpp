@@ -54,6 +54,9 @@ public:
 	DECLARE_READ8_MEMBER(p7_r);
 	DECLARE_QUICKLOAD_LOAD_MEMBER( svmu );
 
+	void svmu(machine_config &config);
+	void svmu_io_mem(address_map &map);
+	void svmu_mem(address_map &map);
 private:
 	uint8_t       m_page;
 };
@@ -122,11 +125,11 @@ READ8_MEMBER(svmu_state::p7_r)
 }
 
 
-static ADDRESS_MAP_START(svmu_mem, AS_PROGRAM, 8, svmu_state)
+ADDRESS_MAP_START(svmu_state::svmu_mem)
 	AM_RANGE( 0x0000, 0xffff ) AM_READWRITE(prog_r, prog_w)
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START(svmu_io_mem, AS_IO, 8, svmu_state)
+ADDRESS_MAP_START(svmu_state::svmu_io_mem)
 	AM_RANGE( LC8670_PORT1, LC8670_PORT1 ) AM_READWRITE(p1_r, p1_w)
 	AM_RANGE( LC8670_PORT3, LC8670_PORT3 ) AM_READ_PORT("P3")
 	AM_RANGE( LC8670_PORT7, LC8670_PORT7 ) AM_READ(p7_r)
@@ -300,14 +303,14 @@ QUICKLOAD_LOAD_MEMBER( svmu_state, svmu )
 }
 
 
-static MACHINE_CONFIG_START( svmu )
+MACHINE_CONFIG_START(svmu_state::svmu)
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", LC8670, XTAL_32_768kHz)
+	MCFG_CPU_ADD("maincpu", LC8670, XTAL(32'768))
 	MCFG_CPU_PROGRAM_MAP(svmu_mem)
 	MCFG_CPU_IO_MAP(svmu_io_mem)
 
 	/* specific LC8670 configurations */
-	MCFG_LC8670_SET_CLOCK_SOURCES(XTAL_32_768kHz, 600000, XTAL_6MHz)    // tolerance range of the RC oscillator is 600kHz to 1200kHz
+	MCFG_LC8670_SET_CLOCK_SOURCES(XTAL(32'768), 600000, XTAL(6'000'000))    // tolerance range of the RC oscillator is 600kHz to 1200kHz
 	MCFG_LC8670_BANKSWITCH_CB(WRITE8(svmu_state, page_w))
 	MCFG_LC8670_LCD_UPDATE_CB(svmu_lcd_update)
 

@@ -226,7 +226,7 @@ WRITE8_MEMBER( vidbrain_state::f3853_w )
 //  ADDRESS_MAP( vidbrain_mem )
 //-------------------------------------------------
 
-static ADDRESS_MAP_START( vidbrain_mem, AS_PROGRAM, 8, vidbrain_state )
+ADDRESS_MAP_START(vidbrain_state::vidbrain_mem)
 	ADDRESS_MAP_GLOBAL_MASK(0x3fff)
 	AM_RANGE(0x0000, 0x07ff) AM_ROM AM_REGION("res1", 0)
 	AM_RANGE(0x0800, 0x08ff) AM_MIRROR(0x2300) AM_DEVREADWRITE(UV201_TAG, uv201_device, read, write)
@@ -242,7 +242,7 @@ ADDRESS_MAP_END
 //  ADDRESS_MAP( vidbrain_io )
 //-------------------------------------------------
 
-static ADDRESS_MAP_START( vidbrain_io, AS_IO, 8, vidbrain_state )
+ADDRESS_MAP_START(vidbrain_state::vidbrain_io)
 	AM_RANGE(0x00, 0x00) AM_WRITE(keyboard_w)
 	AM_RANGE(0x01, 0x01) AM_READWRITE(keyboard_r, sound_w)
 	AM_RANGE(0x0c, 0x0f) AM_WRITE(f3853_w)
@@ -500,9 +500,9 @@ void vidbrain_state::machine_reset()
 //  MACHINE_CONFIG( vidbrain )
 //-------------------------------------------------
 
-static MACHINE_CONFIG_START( vidbrain )
+MACHINE_CONFIG_START(vidbrain_state::vidbrain)
 	// basic machine hardware
-	MCFG_CPU_ADD(F3850_TAG, F8, XTAL_4MHz/2)
+	MCFG_CPU_ADD(F3850_TAG, F8, XTAL(4'000'000)/2)
 	MCFG_CPU_PROGRAM_MAP(vidbrain_mem)
 	MCFG_CPU_IO_MAP(vidbrain_io)
 	MCFG_CPU_IRQ_ACKNOWLEDGE_DRIVER(vidbrain_state,vidbrain_int_ack)
@@ -522,7 +522,7 @@ static MACHINE_CONFIG_START( vidbrain )
 	MCFG_SOUND_ROUTE_EX(0, "dac", 1.0, DAC_VREF_POS_INPUT) MCFG_SOUND_ROUTE_EX(0, "dac", -1.0, DAC_VREF_NEG_INPUT)
 
 	// devices
-	MCFG_DEVICE_ADD(F3853_TAG, F3853, XTAL_4MHz/2)
+	MCFG_DEVICE_ADD(F3853_TAG, F3853, XTAL(4'000'000)/2)
 	MCFG_F3853_EXT_INPUT_CB(vidbrain_state, f3853_int_req_w)
 
 	// cartridge

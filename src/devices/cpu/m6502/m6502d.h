@@ -59,7 +59,8 @@ protected:
 		DASM_biz,    /* bit, zero page (M740) */
 		DASM_bzr,    /* bit, zero page, relative offset (M740) */
 		DASM_bar,    /* bit, accumulator, relative offset (M740) */
-		DASM_bac     /* bit, accumulator (M740) */
+		DASM_bac,    /* bit, accumulator (M740) */
+		DASM_xa3     /* unknown XaviX opcode, 24-bit ROM pointer? */
 	};
 
 	virtual u32 get_instruction_bank() const;

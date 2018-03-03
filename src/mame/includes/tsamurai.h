@@ -72,6 +72,22 @@ public:
 	INTERRUPT_GEN_MEMBER(interrupt);
 	INTERRUPT_GEN_MEMBER(vsgongf_sound_interrupt);
 
+	void tsamurai(machine_config &config);
+	void m660(machine_config &config);
+	void vsgongf(machine_config &config);
+	void m660_map(address_map &map);
+	void main_map(address_map &map);
+	void sound1_m660_map(address_map &map);
+	void sound1_map(address_map &map);
+	void sound2_m660_map(address_map &map);
+	void sound2_map(address_map &map);
+	void sound3_m660_io_map(address_map &map);
+	void sound3_m660_map(address_map &map);
+	void sound_vsgongf_map(address_map &map);
+	void vsgongf_audio_io_map(address_map &map);
+	void vsgongf_map(address_map &map);
+	void z80_io_map(address_map &map);
+	void z80_m660_io_map(address_map &map);
 protected:
 	virtual void machine_start() override;
 	virtual void video_start() override;

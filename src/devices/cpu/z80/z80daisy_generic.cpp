@@ -34,16 +34,6 @@ z80daisy_generic_device::z80daisy_generic_device(const machine_config &mconfig, 
 }
 
 //-------------------------------------------------
-//  static_set_vector - static configuration
-//-------------------------------------------------
-
-void z80daisy_generic_device::static_set_vector(device_t &device, uint8_t vector)
-{
-	z80daisy_generic_device &dev = downcast<z80daisy_generic_device &>(device);
-	dev.m_vector = vector;
-}
-
-//-------------------------------------------------
 //  device_start - device-specific startup
 //-------------------------------------------------
 

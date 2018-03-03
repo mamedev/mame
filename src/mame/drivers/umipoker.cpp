@@ -81,6 +81,10 @@ public:
 	required_device<cpu_device> m_maincpu;
 	required_device<gfxdecode_device> m_gfxdecode;
 	required_device<palette_device> m_palette;
+	void umipoker(machine_config &config);
+	void umipoker_audio_io_map(address_map &map);
+	void umipoker_audio_map(address_map &map);
+	void umipoker_map(address_map &map);
 };
 
 TILE_GET_INFO_MEMBER(umipoker_state::get_tile_info_0)
@@ -311,11 +315,11 @@ WRITE16_MEMBER(umipoker_state::saiyu_counters_w)
 }
 
 
-static ADDRESS_MAP_START( umipoker_map, AS_PROGRAM, 16, umipoker_state )
+ADDRESS_MAP_START(umipoker_state::umipoker_map)
 	ADDRESS_MAP_UNMAP_LOW
 	AM_RANGE(0x000000, 0x03ffff) AM_ROM
 	AM_RANGE(0x400000, 0x403fff) AM_RAM AM_SHARE("nvram")
-	AM_RANGE(0x600000, 0x6007ff) AM_RAM_DEVWRITE("palette", palette_device, write) AM_SHARE("palette")    // Palette
+	AM_RANGE(0x600000, 0x6007ff) AM_RAM_DEVWRITE("palette", palette_device, write16) AM_SHARE("palette")    // Palette
 	AM_RANGE(0x800000, 0x801fff) AM_RAM_WRITE(umipoker_vram_0_w) AM_SHARE("vra0")
 	AM_RANGE(0x802000, 0x803fff) AM_RAM_WRITE(umipoker_vram_1_w) AM_SHARE("vra1")
 	AM_RANGE(0x804000, 0x805fff) AM_RAM_WRITE(umipoker_vram_2_w) AM_SHARE("vra2")
@@ -337,12 +341,12 @@ static ADDRESS_MAP_START( umipoker_map, AS_PROGRAM, 16, umipoker_state )
 	AM_RANGE(0xe0002e, 0xe0002f) AM_WRITE(umipoker_scrolly_3_w)
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( umipoker_audio_map, AS_PROGRAM, 8, umipoker_state )
+ADDRESS_MAP_START(umipoker_state::umipoker_audio_map)
 	AM_RANGE(0x0000, 0x7fff) AM_ROM
 	AM_RANGE(0xf800, 0xffff) AM_READWRITE(z80_shared_ram_r,z80_shared_ram_w) AM_SHARE("z80_wram")
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( umipoker_audio_io_map, AS_IO, 8, umipoker_state )
+ADDRESS_MAP_START(umipoker_state::umipoker_audio_io_map)
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	AM_RANGE(0x00, 0x00) AM_DEVREADWRITE("oki", okim6295_device, read, write)
 	AM_RANGE(0x10, 0x11) AM_DEVREADWRITE("ym", ym3812_device, read, write)
@@ -657,7 +661,7 @@ void umipoker_state::machine_reset()
 }
 
 // TODO: clocks
-static MACHINE_CONFIG_START( umipoker )
+MACHINE_CONFIG_START(umipoker_state::umipoker)
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu",M68000,16000000) // TMP68HC000-16

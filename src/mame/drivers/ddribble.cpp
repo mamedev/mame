@@ -108,7 +108,7 @@ WRITE8_MEMBER(ddribble_state::ddribble_vlm5030_ctrl_w)
 }
 
 
-static ADDRESS_MAP_START( cpu0_map, AS_PROGRAM, 8, ddribble_state )
+ADDRESS_MAP_START(ddribble_state::cpu0_map)
 	AM_RANGE(0x0000, 0x0004) AM_WRITE(K005885_0_w)                                              /* video registers (005885 #1) */
 	AM_RANGE(0x0800, 0x0804) AM_WRITE(K005885_1_w)                                              /* video registers (005885 #2) */
 	AM_RANGE(0x1800, 0x187f) AM_RAM_DEVWRITE("palette", palette_device, write_indirect) AM_SHARE("palette")  /* palette */
@@ -122,7 +122,7 @@ static ADDRESS_MAP_START( cpu0_map, AS_PROGRAM, 8, ddribble_state )
 	AM_RANGE(0xa000, 0xffff) AM_ROM                                                             /* ROM */
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( cpu1_map, AS_PROGRAM, 8, ddribble_state )
+ADDRESS_MAP_START(ddribble_state::cpu1_map)
 	AM_RANGE(0x0000, 0x1fff) AM_READWRITE(ddribble_sharedram_r, ddribble_sharedram_w)           /* shared RAM with CPU #0 */
 	AM_RANGE(0x2000, 0x27ff) AM_READWRITE(ddribble_snd_sharedram_r, ddribble_snd_sharedram_w)   /* shared RAM with CPU #2 */
 	AM_RANGE(0x2800, 0x2800) AM_READ_PORT("DSW1")
@@ -136,14 +136,14 @@ static ADDRESS_MAP_START( cpu1_map, AS_PROGRAM, 8, ddribble_state )
 	AM_RANGE(0x8000, 0xffff) AM_ROM                                                         /* ROM */
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( cpu2_map, AS_PROGRAM, 8, ddribble_state )
+ADDRESS_MAP_START(ddribble_state::cpu2_map)
 	AM_RANGE(0x0000, 0x07ff) AM_RAM AM_SHARE("snd_sharedram")       /* shared RAM with CPU #1 */
 	AM_RANGE(0x1000, 0x1001) AM_DEVREADWRITE("ymsnd", ym2203_device, read, write)    /* YM2203 */
 	AM_RANGE(0x3000, 0x3000) AM_DEVWRITE("vlm", vlm5030_device, data_w)          /* Speech data */
 	AM_RANGE(0x8000, 0xffff) AM_ROM                                     /* ROM */
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( vlm_map, 0, 8, ddribble_state )
+ADDRESS_MAP_START(ddribble_state::vlm_map)
 	AM_RANGE(0x0000, 0xffff) AM_ROMBANK("vlmbank")
 ADDRESS_MAP_END
 
@@ -256,18 +256,18 @@ void ddribble_state::machine_reset()
 	m_charbank[1] = 0;
 }
 
-static MACHINE_CONFIG_START( ddribble )
+MACHINE_CONFIG_START(ddribble_state::ddribble)
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", M6809,  XTAL_18_432MHz/12)  /* verified on pcb */
+	MCFG_CPU_ADD("maincpu", MC6809E, XTAL(18'432'000)/12)  /* verified on pcb */
 	MCFG_CPU_PROGRAM_MAP(cpu0_map)
 	MCFG_CPU_VBLANK_INT_DRIVER("screen", ddribble_state,  ddribble_interrupt_0)
 
-	MCFG_CPU_ADD("cpu1", M6809, XTAL_18_432MHz/12)  /* verified on pcb */
+	MCFG_CPU_ADD("cpu1", MC6809E, XTAL(18'432'000)/12)  /* verified on pcb */
 	MCFG_CPU_PROGRAM_MAP(cpu1_map)
 	MCFG_CPU_VBLANK_INT_DRIVER("screen", ddribble_state,  ddribble_interrupt_1)
 
-	MCFG_CPU_ADD("cpu2", M6809, XTAL_18_432MHz/12)  /* verified on pcb */
+	MCFG_CPU_ADD("cpu2", MC6809E, XTAL(18'432'000)/12)  /* verified on pcb */
 	MCFG_CPU_PROGRAM_MAP(cpu2_map)
 
 	MCFG_QUANTUM_TIME(attotime::from_hz(6000))  /* we need heavy synch */
@@ -294,7 +294,7 @@ static MACHINE_CONFIG_START( ddribble )
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
 
-	MCFG_SOUND_ADD("ymsnd", YM2203, XTAL_3_579545MHz) /* verified on pcb */
+	MCFG_SOUND_ADD("ymsnd", YM2203, XTAL(3'579'545)) /* verified on pcb */
 	MCFG_AY8910_PORT_B_READ_CB(READ8(ddribble_state, ddribble_vlm5030_busy_r))
 	MCFG_AY8910_PORT_A_WRITE_CB(WRITE8(ddribble_state, ddribble_vlm5030_ctrl_w))
 	MCFG_SOUND_ROUTE(0, "filter1", 0.25)
@@ -302,7 +302,7 @@ static MACHINE_CONFIG_START( ddribble )
 	MCFG_SOUND_ROUTE(2, "filter3", 0.25)
 	MCFG_SOUND_ROUTE(3, "mono", 0.25)
 
-	MCFG_SOUND_ADD("vlm", VLM5030, XTAL_3_579545MHz) /* verified on pcb */
+	MCFG_SOUND_ADD("vlm", VLM5030, XTAL(3'579'545)) /* verified on pcb */
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 	MCFG_DEVICE_ADDRESS_MAP(0, vlm_map)
 

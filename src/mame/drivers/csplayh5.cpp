@@ -41,7 +41,7 @@
 #include "audio/nichisnd.h"
 
 #define USE_H8 0
-#define DVD_CLOCK XTAL_27MHz
+#define DVD_CLOCK XTAL(27'000'000)
 
 class csplayh5_state : public driver_device
 {
@@ -96,12 +96,16 @@ public:
 	DECLARE_DRIVER_INIT(thenanpa);
 	DECLARE_DRIVER_INIT(torarech);
 	DECLARE_DRIVER_INIT(tsuwaku);
-	
+
 	virtual void machine_reset() override;
 	TIMER_DEVICE_CALLBACK_MEMBER(csplayh5_irq);
 	DECLARE_WRITE_LINE_MEMBER(csplayh5_vdp0_interrupt);
 
 	void general_init(int patchaddress, int patchvalue);
+	void csplayh5(machine_config &config);
+	void csplayh5_map(address_map &map);
+	void csplayh5_sub_io_map(address_map &map);
+	void csplayh5_sub_map(address_map &map);
 };
 
 
@@ -126,7 +130,7 @@ WRITE16_MEMBER(csplayh5_state::csplayh5_mux_w)
 	m_mux_data = (~data & 0x1f);
 }
 
-static ADDRESS_MAP_START( csplayh5_map, AS_PROGRAM, 16, csplayh5_state )
+ADDRESS_MAP_START(csplayh5_state::csplayh5_map)
 	AM_RANGE(0x000000, 0x03ffff) AM_ROM
 
 	AM_RANGE(0x200000, 0x200001) AM_READ_PORT("DSW") AM_DEVWRITE8("nichisnd", nichisnd_device,sound_host_command_w,0xff00)
@@ -137,9 +141,9 @@ static ADDRESS_MAP_START( csplayh5_map, AS_PROGRAM, 16, csplayh5_state )
 
 	AM_RANGE(0x800000, 0xbfffff) AM_ROM AM_REGION("blit_gfx",0) // GFX ROM routes here
 
-	AM_RANGE(0xfffc00, 0xffffff) AM_DEVREADWRITE("tmp68301", tmp68301_device, regs_r, regs_w)  // TMP68301 Registers
-
 	AM_RANGE(0xc00000, 0xc7ffff) AM_RAM AM_SHARE("nvram") AM_MIRROR(0x380000) // work RAM
+
+	AM_RANGE(0xfffc00, 0xffffff) AM_DEVREADWRITE("tmp68301", tmp68301_device, regs_r, regs_w)  // TMP68301 Registers
 ADDRESS_MAP_END
 
 #if USE_H8
@@ -148,7 +152,7 @@ READ16_MEMBER(csplayh5_state::test_r)
 	return machine().rand();
 }
 
-static ADDRESS_MAP_START( csplayh5_sub_map, AS_PROGRAM, 16, csplayh5_state )
+ADDRESS_MAP_START(csplayh5_state::csplayh5_sub_map)
 	AM_RANGE(0x000000, 0x01ffff) AM_ROM
 
 	AM_RANGE(0x02000a, 0x02000b) AM_READ(test_r)
@@ -162,7 +166,7 @@ static ADDRESS_MAP_START( csplayh5_sub_map, AS_PROGRAM, 16, csplayh5_state )
 ADDRESS_MAP_END
 
 
-static ADDRESS_MAP_START( csplayh5_sub_io_map, AS_IO, 16, csplayh5_state )
+ADDRESS_MAP_START(csplayh5_state::csplayh5_sub_io_map)
 	AM_RANGE(0x0a, 0x0b) AM_READ(test_r)
 ADDRESS_MAP_END
 #endif
@@ -352,7 +356,7 @@ WRITE16_MEMBER(csplayh5_state::tmp68301_parallel_port_w)
 }
 
 
-static MACHINE_CONFIG_START( csplayh5 )
+MACHINE_CONFIG_START(csplayh5_state::csplayh5)
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu",M68000,16000000) /* TMP68301-16 */
@@ -362,6 +366,7 @@ static MACHINE_CONFIG_START( csplayh5 )
 	MCFG_TIMER_DRIVER_ADD_SCANLINE("scantimer", csplayh5_state, csplayh5_irq, "screen", 0, 1)
 
 	MCFG_DEVICE_ADD("tmp68301", TMP68301, 0)
+	MCFG_TMP68301_CPU("maincpu")
 	MCFG_TMP68301_OUT_PARALLEL_CB(WRITE16(csplayh5_state, tmp68301_parallel_port_w))
 
 #if USE_H8
@@ -376,9 +381,9 @@ static MACHINE_CONFIG_START( csplayh5 )
 	MCFG_NVRAM_ADD_0FILL("nvram")
 
 	/* video hardware */
-	MCFG_V9958_ADD("v9958", "screen", 0x20000, XTAL_21_4772MHz) // typical 9958 clock, not verified
+	MCFG_V9958_ADD("v9958", "screen", 0x20000, XTAL(21'477'272)) // typical 9958 clock, not verified
 	MCFG_V99X8_INTERRUPT_CALLBACK(WRITELINE(csplayh5_state, csplayh5_vdp0_interrupt))
-	MCFG_V99X8_SCREEN_ADD_NTSC("screen", "v9958", XTAL_21_4772MHz)
+	MCFG_V99X8_SCREEN_ADD_NTSC("screen", "v9958", XTAL(21'477'272))
 
 	/* sound hardware */
 	MCFG_NICHISND_ADD("nichisnd")
@@ -806,12 +811,11 @@ ROM_START( nuretemi )
 	DVD_BIOS
 
 	ROM_REGION( 0x20000, ":nichisnd:audiorom", 0 ) // z80
-	// identical to vol. 19, probably an attempt to fix a dead board.
-	ROM_LOAD( "11.ic51", 0x000000, 0x020000, BAD_DUMP CRC(d1ba05d6) SHA1(8d29cdbf00946e06e92225eb260a694d17d7b8d4) )
+	ROM_LOAD( "11.ic51", 0x000000, 0x020000, CRC(655ec499) SHA1(5cea38e998edc7833b9a644930daecd99933c277) )
 
 	ROM_REGION( 0x400000, "blit_gfx", ROMREGION_ERASEFF ) // blitter based gfxs
 	ROM_LOAD16_BYTE( "3.ic40", 0x000000, 0x080000, CRC(5c7af7f6) SHA1(78e58e3a81a6585c2c61f0026b7dc73a72c0d862) )
-	ROM_LOAD16_BYTE( "4.ic41",            0x000001, 0x080000, CRC(335b6388) SHA1(c5427b42af011b5a5026d905b1740684b9f6f953) )
+	ROM_LOAD16_BYTE( "4.ic41", 0x000001, 0x080000, CRC(335b6388) SHA1(c5427b42af011b5a5026d905b1740684b9f6f953) )
 
 	DISK_REGION( "ide:0:hdd:image" )
 	DISK_IMAGE_READONLY( "nb8016", 0, SHA1(607d9f390265da3f0c50753d0ea32257b12e8c08) )
@@ -939,7 +943,7 @@ GAME( 1998, nichidvd,   0,   csplayh5,  csplayh5, csplayh5_state,  0,           
 /* 15 */ GAME( 2000, fuudol,    nichidvd,   csplayh5,  csplayh5, csplayh5_state,  fuudol,    ROT0, "Nichibutsu/eic", "Fuudol (Japan)", MACHINE_NOT_WORKING )
 /* 16 */ GAME( 2000, nuretemi,  nichidvd,   csplayh5,  csplayh5, csplayh5_state,  nuretemi,  ROT0, "Nichibutsu/Love Factory", "Nurete Mitaino... - Net Idol Hen (Japan)", MACHINE_NOT_WORKING )
 /* 17 */ GAME( 2000, tsuwaku,   nichidvd,   csplayh5,  csplayh5, csplayh5_state,  tsuwaku,   ROT0, "Nichibutsu/Love Factory/Just&Just", "Tsuugakuro no Yuuwaku (Japan)", MACHINE_NOT_WORKING )
-/* 18 */ GAME( 2000, torarech,  nichidvd,   csplayh5,  csplayh5, csplayh5_state,  torarech, ROT0,  "Nichibutsu/Love Factory/M Friend", "Torarechattano - AV Kantoku Hen (Japan)", MACHINE_NOT_WORKING ) 
+/* 18 */ GAME( 2000, torarech,  nichidvd,   csplayh5,  csplayh5, csplayh5_state,  torarech, ROT0,  "Nichibutsu/Love Factory/M Friend", "Torarechattano - AV Kantoku Hen (Japan)", MACHINE_NOT_WORKING )
 /* sp */ GAME( 2000, nichisel,  nichidvd,   csplayh5,  csplayh5, csplayh5_state,  nichisel,  ROT0, "Nichibutsu", "DVD Select (Japan)", MACHINE_NOT_WORKING )
 
 // 2001

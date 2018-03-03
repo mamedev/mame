@@ -6,8 +6,8 @@
  *
  ****************************************************************************/
 
-#ifndef GB_H_
-#define GB_H_
+#ifndef MAME_INCLUDES_GB_H
+#define MAME_INCLUDES_GB_H
 
 #include "sound/gb.h"
 #include "cpu/lr35902/lr35902.h"
@@ -89,6 +89,14 @@ public:
 	DECLARE_WRITE8_MEMBER(gb_echo_w);
 	optional_device<gb_cart_slot_device> m_cartslot;
 
+	void supergb(machine_config &config);
+	void supergb2(machine_config &config);
+	void gbcolor(machine_config &config);
+	void gbpocket(machine_config &config);
+	void gameboy(machine_config &config);
+	void gameboy_map(address_map &map);
+	void gbc_map(address_map &map);
+	void sgb_map(address_map &map);
 protected:
 	enum {
 		SIO_ENABLED = 0x80,
@@ -142,8 +150,10 @@ public:
 	DECLARE_WRITE8_MEMBER(bank1_w);
 	DECLARE_WRITE8_MEMBER(bank2_w);
 	optional_device<megaduck_cart_slot_device> m_cartslot;
+	void megaduck(machine_config &config);
+	void megaduck_map(address_map &map);
 };
 
 
 
-#endif /* GB_H_ */
+#endif // MAME_INCLUDES_GB_H

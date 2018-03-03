@@ -25,9 +25,6 @@ public:
 	// construction/destruction
 	a2bus_softcard_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
-	DECLARE_READ8_MEMBER( dma_r );
-	DECLARE_WRITE8_MEMBER( dma_w );
-
 protected:
 	a2bus_softcard_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock);
 
@@ -36,14 +33,18 @@ protected:
 	virtual void device_add_mconfig(machine_config &config) override;
 
 	// overrides of standard a2bus slot functions
-	virtual void write_cnxx(address_space &space, uint8_t offset, uint8_t data) override;
+	virtual void write_cnxx(uint8_t offset, uint8_t data) override;
 	virtual bool take_c800() override;
 
-	required_device<cpu_device> m_z80;
-
 private:
+	required_device<cpu_device> m_z80;
 	bool m_bEnabled;
 	bool m_FirstZ80Boot;
+
+	DECLARE_READ8_MEMBER( dma_r );
+	DECLARE_WRITE8_MEMBER( dma_w );
+
+	void z80_mem(address_map &map);
 };
 
 // device type definition

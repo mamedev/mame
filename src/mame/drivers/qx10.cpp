@@ -156,6 +156,10 @@ public:
 	required_device<palette_device> m_palette;
 	UPD7220_DISPLAY_PIXELS_MEMBER( hgdc_display_pixels );
 	UPD7220_DRAW_TEXT_LINE_MEMBER( hgdc_draw_text );
+	void qx10(machine_config &config);
+	void qx10_io(address_map &map);
+	void qx10_mem(address_map &map);
+	void upd7220_map(address_map &map);
 };
 
 UPD7220_DISPLAY_PIXELS_MEMBER( qx10_state::hgdc_display_pixels )
@@ -486,14 +490,14 @@ WRITE8_MEMBER( qx10_state::vram_bank_w )
 	}
 }
 
-static ADDRESS_MAP_START(qx10_mem, AS_PROGRAM, 8, qx10_state)
+ADDRESS_MAP_START(qx10_state::qx10_mem)
 	ADDRESS_MAP_UNMAP_HIGH
 	AM_RANGE( 0x0000, 0x7fff ) AM_RAMBANK("bank1")
 	AM_RANGE( 0x8000, 0xdfff ) AM_RAMBANK("bank2")
 	AM_RANGE( 0xe000, 0xffff ) AM_RAM
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( qx10_io , AS_IO, 8, qx10_state)
+ADDRESS_MAP_START(qx10_state::qx10_io)
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	AM_RANGE(0x00, 0x03) AM_DEVREADWRITE("pit8253_1", pit8253_device, read, write)
 	AM_RANGE(0x04, 0x07) AM_DEVREADWRITE("pit8253_2", pit8253_device, read, write)
@@ -657,7 +661,7 @@ WRITE16_MEMBER( qx10_state::vram_w )
 	COMBINE_DATA(&m_video_ram[offset + (0x20000 * bank)]);
 }
 
-static ADDRESS_MAP_START( upd7220_map, 0, 16, qx10_state )
+ADDRESS_MAP_START(qx10_state::upd7220_map)
 	AM_RANGE(0x00000, 0x3ffff) AM_READWRITE(vram_r,vram_w)
 ADDRESS_MAP_END
 
@@ -665,7 +669,7 @@ static SLOT_INTERFACE_START(keyboard)
 	SLOT_INTERFACE("qx10", QX10_KEYBOARD)
 SLOT_INTERFACE_END
 
-static MACHINE_CONFIG_START( qx10 )
+MACHINE_CONFIG_START(qx10_state::qx10)
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu",Z80, MAIN_CLK / 4)
 	MCFG_CPU_PROGRAM_MAP(qx10_mem)
@@ -751,7 +755,7 @@ static MACHINE_CONFIG_START( qx10 )
 	MCFG_UPD7220_DRAW_TEXT_CALLBACK_OWNER(qx10_state, hgdc_draw_text)
 	MCFG_VIDEO_SET_SCREEN("screen")
 
-	MCFG_MC146818_ADD( "rtc", XTAL_32_768kHz )
+	MCFG_MC146818_ADD( "rtc", XTAL(32'768) )
 	MCFG_MC146818_IRQ_HANDLER(DEVWRITELINE("pic8259_slave", pic8259_device, ir2_w))
 	MCFG_UPD765A_ADD("upd765", true, true)
 	MCFG_UPD765_INTRQ_CALLBACK(WRITELINE(qx10_state, qx10_upd765_interrupt))

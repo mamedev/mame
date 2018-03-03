@@ -47,6 +47,8 @@ public:
 	void lcd_spi_line_w( int line, int data);
 	int lcd_spi_line_r( int line);
 	required_device<cpu_device> m_maincpu;
+	void hp49gp(machine_config &config);
+	void hp49gp_map(address_map &map);
 };
 
 /***************************************************************************
@@ -257,7 +259,7 @@ void hp49gp_state::machine_reset()
     ADDRESS MAPS
 ***************************************************************************/
 
-static ADDRESS_MAP_START( hp49gp_map, AS_PROGRAM, 32, hp49gp_state )
+ADDRESS_MAP_START(hp49gp_state::hp49gp_map)
 	AM_RANGE(0x00000000, 0x001fffff) AM_ROM
 	AM_RANGE(0x08000000, 0x0801ffff) AM_RAM
 	AM_RANGE(0x08020000, 0x0803ffff) AM_RAM
@@ -276,7 +278,7 @@ DRIVER_INIT_MEMBER(hp49gp_state,hp49gp)
 	lcd_spi_init();
 }
 
-static MACHINE_CONFIG_START( hp49gp )
+MACHINE_CONFIG_START(hp49gp_state::hp49gp)
 	MCFG_CPU_ADD("maincpu", ARM9, 400000000)
 	MCFG_CPU_PROGRAM_MAP(hp49gp_map)
 

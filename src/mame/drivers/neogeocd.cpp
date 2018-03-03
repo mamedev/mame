@@ -133,6 +133,10 @@ public:
 	IRQ_CALLBACK_MEMBER(neocd_int_callback);
 
 	std::unique_ptr<uint8_t[]> m_meminternal_data;
+	void neocd(machine_config &config);
+	void neocd_audio_io_map(address_map &map);
+	void neocd_audio_map(address_map &map);
+	void neocd_main_map(address_map &map);
 protected:
 
 	int32_t SekIdle(int32_t nCycles);
@@ -282,7 +286,7 @@ WRITE16_MEMBER(ngcd_state::neocd_control_w)
 		case 0x0126:
 //          bprintf(PRINT_NORMAL, _T("  - NGCD Z80 BUSREQ -> 1 (PC: 0x%06X)\n"), SekGetPC(-1));
 			m_has_z80_bus = false;
-			space.machine().scheduler().synchronize();
+			machine().scheduler().synchronize();
 			m_audiocpu->set_input_line(INPUT_LINE_HALT, ASSERT_LINE);
 			break;
 		case 0x0128:
@@ -301,7 +305,7 @@ WRITE16_MEMBER(ngcd_state::neocd_control_w)
 		case 0x0146:
 //          bprintf(PRINT_NORMAL, _T("  - NGCD Z80 BUSREQ -> 0 (PC: 0x%06X)\n"), SekGetPC(-1));
 			m_has_z80_bus = true;
-			space.machine().scheduler().synchronize();
+			machine().scheduler().synchronize();
 			m_audiocpu->set_input_line(INPUT_LINE_HALT, CLEAR_LINE);
 			break;
 		case 0x0148:
@@ -885,10 +889,10 @@ MACHINE_RESET_MEMBER(ngcd_state,neocd)
  *
  *************************************/
 
-static ADDRESS_MAP_START( neocd_main_map, AS_PROGRAM, 16, ngcd_state )
+ADDRESS_MAP_START(ngcd_state::neocd_main_map)
 //  AM_RANGE(0x000000, 0x00007f) AM_READ_BANK("vectors") // writes will fall through to area below
-	AM_RANGE(0x000000, 0x00007f) AM_READ(banked_vectors_r)
 	AM_RANGE(0x000000, 0x1fffff) AM_RAM AM_REGION("maincpu", 0x00000)
+	AM_RANGE(0x000000, 0x00007f) AM_READ(banked_vectors_r)
 
 	AM_RANGE(0x300000, 0x300001) AM_MIRROR(0x01fffe) AM_DEVREAD8("ctrl1", neogeo_control_port_device, ctrl_r, 0xff00)
 	AM_RANGE(0x320000, 0x320001) AM_MIRROR(0x01fffe) AM_READ_PORT("AUDIO") AM_WRITE8(audio_command_w, 0xff00)
@@ -896,7 +900,8 @@ static ADDRESS_MAP_START( neocd_main_map, AS_PROGRAM, 16, ngcd_state )
 	AM_RANGE(0x360000, 0x37ffff) AM_READ(unmapped_r)
 	AM_RANGE(0x380000, 0x380001) AM_MIRROR(0x01fffe) AM_READ(aes_in2_r)
 	AM_RANGE(0x380000, 0x38007f) AM_MIRROR(0x01ff80) AM_WRITE8(io_control_w, 0x00ff)
-	AM_RANGE(0x3a0000, 0x3a001f) AM_MIRROR(0x01ffe0) AM_READ(unmapped_r) AM_DEVWRITE8("systemlatch", hc259_device, write_a3, 0x00ff)
+	AM_RANGE(0x3a0000, 0x3a001f) AM_MIRROR(0x01ffe0) AM_READ(unmapped_r)
+	AM_RANGE(0x3a0000, 0x3a001f) AM_MIRROR(0x01ffe0) AM_DEVWRITE8("systemlatch", hc259_device, write_a3, 0x00ff)
 	AM_RANGE(0x3c0000, 0x3c0007) AM_MIRROR(0x01fff8) AM_READ(video_register_r)
 	AM_RANGE(0x3c0000, 0x3c000f) AM_MIRROR(0x01fff0) AM_WRITE(video_register_w)
 	AM_RANGE(0x3e0000, 0x3fffff) AM_READ(unmapped_r)
@@ -918,12 +923,12 @@ ADDRESS_MAP_END
  *************************************/
 
 
-static ADDRESS_MAP_START( neocd_audio_map, AS_PROGRAM, 8, ngcd_state )
+ADDRESS_MAP_START(ngcd_state::neocd_audio_map)
 	AM_RANGE(0x0000, 0xffff) AM_RAM AM_REGION("audiocpu", 0x00000)
 ADDRESS_MAP_END
 
 
-static ADDRESS_MAP_START( neocd_audio_io_map, AS_IO, 8, ngcd_state )
+ADDRESS_MAP_START(ngcd_state::neocd_audio_io_map)
 	AM_RANGE(0x00, 0x00) AM_MIRROR(0xff00) AM_READ(audio_command_r) AM_DEVWRITE("soundlatch", generic_latch_8_device, clear_w)
 	AM_RANGE(0x04, 0x07) AM_MIRROR(0xff00) AM_DEVREADWRITE("ymsnd", ym2610_device, read, write)
 	AM_RANGE(0x08, 0x08) AM_MIRROR(0xff00) AM_SELECT(0x0010) AM_WRITE(audio_cpu_enable_nmi_w)
@@ -1037,7 +1042,8 @@ uint32_t ngcd_state::screen_update_neocd(screen_device &screen, bitmap_rgb32 &bi
 }
 
 
-static MACHINE_CONFIG_DERIVED( neocd, neogeo_base )
+MACHINE_CONFIG_START(ngcd_state::neocd)
+	neogeo_base(config);
 
 	MCFG_CPU_MODIFY("maincpu")
 	MCFG_CPU_PROGRAM_MAP(neocd_main_map)

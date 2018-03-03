@@ -21,6 +21,7 @@ CPUS["M6502"] = true
 CPUS["MCS48"] = true
 CPUS["MCS51"] = true
 CPUS["M6800"] = true
+CPUS["M6805"] = true
 CPUS["M6809"] = true
 CPUS["M680X0"] = true
 CPUS["TMS9900"] = true
@@ -56,6 +57,7 @@ SOUNDS["VOLT_REG"] = true
 MACHINES["6821PIA"] = true
 MACHINES["TTL74148"] = true
 MACHINES["TTL74153"] = true
+MACHINES["TTL74157"] = true
 MACHINES["TTL7474"] = true
 MACHINES["TTL74259"] = true
 MACHINES["RIOT6532"] = true
@@ -65,6 +67,7 @@ MACHINES["Z80PIO"] = true
 MACHINES["68681"] = true
 MACHINES["BANKDEV"] = true
 MACHINES["GEN_LATCH"] = true
+MACHINES["TICKET"] = true
 MACHINES["WATCHDOG"] = true
 
 
@@ -100,8 +103,6 @@ function createProjects_mame_tiny(_target, _subtarget)
 	}
 
 files{
-	MAME_DIR .. "src/mame/machine/ticket.cpp",
-	MAME_DIR .. "src/mame/machine/ticket.h",
 	MAME_DIR .. "src/mame/drivers/carpolo.cpp",
 	MAME_DIR .. "src/mame/includes/carpolo.h",
 	MAME_DIR .. "src/mame/machine/carpolo.cpp",

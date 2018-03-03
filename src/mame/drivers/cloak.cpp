@@ -180,7 +180,7 @@ WRITE8_MEMBER(cloak_state::cloak_nvram_enable_w)
  *
  *************************************/
 
-static ADDRESS_MAP_START( master_map, AS_PROGRAM, 8, cloak_state )
+ADDRESS_MAP_START(cloak_state::master_map)
 	AM_RANGE(0x0000, 0x03ff) AM_RAM
 	AM_RANGE(0x0400, 0x07ff) AM_RAM_WRITE(cloak_videoram_w) AM_SHARE("videoram")
 	AM_RANGE(0x0800, 0x0fff) AM_RAM AM_SHARE("share1")
@@ -208,7 +208,7 @@ ADDRESS_MAP_END
  *
  *************************************/
 
-static ADDRESS_MAP_START( slave_map, AS_PROGRAM, 8, cloak_state )
+ADDRESS_MAP_START(cloak_state::slave_map)
 	AM_RANGE(0x0000, 0x0007) AM_RAM
 	AM_RANGE(0x0008, 0x000f) AM_READWRITE(graph_processor_r, graph_processor_w)
 	AM_RANGE(0x0010, 0x07ff) AM_RAM
@@ -321,7 +321,7 @@ GFXDECODE_END
  *
  *************************************/
 
-static MACHINE_CONFIG_START( cloak )
+MACHINE_CONFIG_START(cloak_state::cloak)
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", M6502, 1000000)     /* 1 MHz ???? */
@@ -363,12 +363,12 @@ static MACHINE_CONFIG_START( cloak )
 	MCFG_SPEAKER_STANDARD_MONO("mono")
 
 	/* more low pass filters ==> DISCRETE processing */
-	MCFG_SOUND_ADD("pokey1", POKEY, XTAL_10MHz/8)      /* Accurate to recording */
+	MCFG_SOUND_ADD("pokey1", POKEY, XTAL(10'000'000)/8)      /* Accurate to recording */
 	MCFG_POKEY_ALLPOT_R_CB(IOPORT("START"))
 	MCFG_POKEY_OUTPUT_OPAMP_LOW_PASS(RES_K(1), CAP_U(0.047), 5.0)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
 
-	MCFG_SOUND_ADD("pokey2", POKEY, XTAL_10MHz/8)      /* Accurate to recording */
+	MCFG_SOUND_ADD("pokey2", POKEY, XTAL(10'000'000)/8)      /* Accurate to recording */
 	MCFG_POKEY_ALLPOT_R_CB(IOPORT("DSW"))
 	MCFG_POKEY_OUTPUT_OPAMP_LOW_PASS(RES_K(1), CAP_U(0.022), 5.0)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)

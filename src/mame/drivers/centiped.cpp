@@ -594,7 +594,7 @@ WRITE8_MEMBER(centiped_state::mazeinv_input_select_w)
 
 READ8_MEMBER(centiped_state::bullsdrt_data_port_r)
 {
-	switch (space.device().safe_pc())
+	switch (m_maincpu->pc())
 	{
 		case 0x0033:
 		case 0x6b19:
@@ -676,7 +676,7 @@ WRITE_LINE_MEMBER(centiped_state::bullsdrt_coin_count_w)
  *
  *************************************/
 
-static ADDRESS_MAP_START( centiped_base_map, AS_PROGRAM, 8, centiped_state )
+ADDRESS_MAP_START(centiped_state::centiped_base_map)
 	ADDRESS_MAP_GLOBAL_MASK(0x3fff)
 	AM_RANGE(0x0000, 0x03ff) AM_RAM AM_SHARE("rambase")
 	AM_RANGE(0x0400, 0x07bf) AM_RAM_WRITE(centiped_videoram_w) AM_SHARE("videoram")
@@ -698,7 +698,7 @@ static ADDRESS_MAP_START( centiped_base_map, AS_PROGRAM, 8, centiped_state )
 ADDRESS_MAP_END
 
 
-static ADDRESS_MAP_START( centiped_map, AS_PROGRAM, 8, centiped_state )
+ADDRESS_MAP_START(centiped_state::centiped_map)
 	AM_IMPORT_FROM(centiped_base_map)
 	AM_RANGE(0x1000, 0x100f) AM_DEVREADWRITE("pokey", pokey_device, read, write)
 ADDRESS_MAP_END
@@ -706,7 +706,7 @@ ADDRESS_MAP_END
 
 //// Centipede bootlegs ////
 
-static ADDRESS_MAP_START( centipdb_map, AS_PROGRAM, 8, centiped_state )
+ADDRESS_MAP_START(centiped_state::centipdb_map)
 	ADDRESS_MAP_GLOBAL_MASK(0x7fff)
 	AM_RANGE(0x0000, 0x03ff) AM_MIRROR(0x4000) AM_RAM
 	AM_RANGE(0x0400, 0x07bf) AM_MIRROR(0x4000) AM_RAM_WRITE(centiped_videoram_w) AM_SHARE("videoram")
@@ -731,14 +731,14 @@ static ADDRESS_MAP_START( centipdb_map, AS_PROGRAM, 8, centiped_state )
 ADDRESS_MAP_END
 
 
-static ADDRESS_MAP_START( magworm_map, AS_PROGRAM, 8, centiped_state )
+ADDRESS_MAP_START(centiped_state::magworm_map)
 	AM_IMPORT_FROM(centiped_base_map)
 	AM_RANGE(0x1001, 0x1001) AM_DEVWRITE("aysnd", ay8910_device, address_w)
 	AM_RANGE(0x1003, 0x1003) AM_DEVREADWRITE("aysnd", ay8910_device, data_r, data_w)
 ADDRESS_MAP_END
 
 
-static ADDRESS_MAP_START( caterplr_map, AS_PROGRAM, 8, centiped_state )
+ADDRESS_MAP_START(centiped_state::caterplr_map)
 	AM_IMPORT_FROM(centiped_base_map)
 	AM_RANGE(0x1780, 0x1780) AM_READ(caterplr_unknown_r)
 	AM_RANGE(0x1000, 0x100f) AM_READWRITE(caterplr_AY8910_r, caterplr_AY8910_w)
@@ -764,7 +764,7 @@ READ8_MEMBER(centiped_state::caterplr_AY8910_r)
  *
  *************************************/
 
-static ADDRESS_MAP_START( milliped_map, AS_PROGRAM, 8, centiped_state )
+ADDRESS_MAP_START(centiped_state::milliped_map)
 	ADDRESS_MAP_GLOBAL_MASK(0x7fff)
 	AM_RANGE(0x0000, 0x03ff) AM_RAM
 	AM_RANGE(0x0400, 0x040f) AM_DEVREADWRITE("pokey", pokey_device, read, write)
@@ -809,7 +809,7 @@ ADDRESS_MAP_END
  TODO: centiped does not work yet, the game reconfigures the memorymap
 */
 
-static ADDRESS_MAP_START( multiped_map, AS_PROGRAM, 8, centiped_state )
+ADDRESS_MAP_START(centiped_state::multiped_map)
 	AM_RANGE(0x0000, 0x03ff) AM_RAM
 	AM_RANGE(0x0400, 0x040f) AM_DEVREADWRITE("pokey", pokey_device, read, write)
 	AM_RANGE(0x0800, 0x080f) AM_DEVREADWRITE("pokey2", pokey_device, read, write)
@@ -881,7 +881,7 @@ WRITE8_MEMBER(centiped_state::multiped_prgbank_w)
  *
  *************************************/
 
-static ADDRESS_MAP_START( warlords_map, AS_PROGRAM, 8, centiped_state )
+ADDRESS_MAP_START(centiped_state::warlords_map)
 	ADDRESS_MAP_GLOBAL_MASK(0x7fff)
 	AM_RANGE(0x0000, 0x03ff) AM_RAM
 	AM_RANGE(0x0400, 0x07bf) AM_RAM_WRITE(centiped_videoram_w) AM_SHARE("videoram")
@@ -905,7 +905,7 @@ ADDRESS_MAP_END
  *
  *************************************/
 
-static ADDRESS_MAP_START( mazeinv_map, AS_PROGRAM, 8, centiped_state )
+ADDRESS_MAP_START(centiped_state::mazeinv_map)
 	ADDRESS_MAP_GLOBAL_MASK(0x7fff)
 	AM_RANGE(0x0000, 0x03ff) AM_RAM
 	AM_RANGE(0x0400, 0x040f) AM_DEVREADWRITE("pokey", pokey_device, read, write)
@@ -936,7 +936,7 @@ ADDRESS_MAP_END
  *
  ****************************************/
 
-static ADDRESS_MAP_START( bullsdrt_map, AS_PROGRAM, 8, centiped_state )
+ADDRESS_MAP_START(centiped_state::bullsdrt_map)
 	AM_RANGE(0x0000, 0x0fff) AM_ROM
 	AM_RANGE(0x1000, 0x1000) AM_MIRROR(0x6000) AM_READ_PORT("DSW1")
 	AM_RANGE(0x1080, 0x1080) AM_MIRROR(0x6000) AM_READ(centiped_IN0_r)
@@ -957,12 +957,12 @@ static ADDRESS_MAP_START( bullsdrt_map, AS_PROGRAM, 8, centiped_state )
 	AM_RANGE(0x6000, 0x6fff) AM_ROM
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( bullsdrt_port_map, AS_IO, 8, centiped_state )
+ADDRESS_MAP_START(centiped_state::bullsdrt_port_map)
 	AM_RANGE(0x00, 0x00) AM_WRITE(bullsdrt_sprites_bank_w)
 	AM_RANGE(0x20, 0x3f) AM_WRITE(bullsdrt_tilesbank_w) AM_SHARE("bullsdrt_bank")
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( bullsdrt_data_map, AS_DATA, 8, centiped_state )
+ADDRESS_MAP_START(centiped_state::bullsdrt_data_map)
 	AM_RANGE(S2650_DATA_PORT, S2650_DATA_PORT) AM_READ(bullsdrt_data_port_r) AM_DEVWRITE("snsnd", sn76496_device, write)
 ADDRESS_MAP_END
 
@@ -1693,7 +1693,7 @@ GFXDECODE_END
  *
  *************************************/
 
-static MACHINE_CONFIG_START( centiped_base )
+MACHINE_CONFIG_START(centiped_state::centiped_base)
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", M6502, 12096000/8)  /* 1.512 MHz (slows down to 0.75MHz while accessing playfield RAM) */
@@ -1730,7 +1730,8 @@ static MACHINE_CONFIG_START( centiped_base )
 
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_DERIVED( centiped, centiped_base )
+MACHINE_CONFIG_START(centiped_state::centiped)
+	centiped_base(config);
 	MCFG_CPU_MODIFY("maincpu")
 	MCFG_CPU_PROGRAM_MAP(centiped_map)
 
@@ -1747,7 +1748,8 @@ static MACHINE_CONFIG_DERIVED( centiped, centiped_base )
 MACHINE_CONFIG_END
 
 
-static MACHINE_CONFIG_DERIVED( caterplr, centiped_base )
+MACHINE_CONFIG_START(centiped_state::caterplr)
+	centiped_base(config);
 
 	/* basic machine hardware */
 	MCFG_CPU_MODIFY("maincpu")
@@ -1765,7 +1767,8 @@ static MACHINE_CONFIG_DERIVED( caterplr, centiped_base )
 MACHINE_CONFIG_END
 
 
-static MACHINE_CONFIG_DERIVED( centipdb, centiped_base )
+MACHINE_CONFIG_START(centiped_state::centipdb)
+	centiped_base(config);
 
 	/* basic machine hardware */
 	MCFG_CPU_MODIFY("maincpu")
@@ -1783,7 +1786,8 @@ static MACHINE_CONFIG_DERIVED( centipdb, centiped_base )
 MACHINE_CONFIG_END
 
 
-static MACHINE_CONFIG_DERIVED( magworm, centiped_base )
+MACHINE_CONFIG_START(centiped_state::magworm)
+	centiped_base(config);
 
 	/* basic machine hardware */
 	MCFG_CPU_MODIFY("maincpu")
@@ -1802,7 +1806,8 @@ static MACHINE_CONFIG_DERIVED( magworm, centiped_base )
 MACHINE_CONFIG_END
 
 
-static MACHINE_CONFIG_DERIVED( milliped, centiped_base )
+MACHINE_CONFIG_START(centiped_state::milliped)
+	centiped_base(config);
 
 	/* basic machine hardware */
 	MCFG_CPU_MODIFY("maincpu")
@@ -1835,7 +1840,8 @@ static MACHINE_CONFIG_DERIVED( milliped, centiped_base )
 MACHINE_CONFIG_END
 
 
-static MACHINE_CONFIG_DERIVED( multiped, milliped )
+MACHINE_CONFIG_START(centiped_state::multiped)
+	milliped(config);
 
 	/* basic machine hardware */
 	MCFG_CPU_MODIFY("maincpu")
@@ -1846,7 +1852,8 @@ static MACHINE_CONFIG_DERIVED( multiped, milliped )
 MACHINE_CONFIG_END
 
 
-static MACHINE_CONFIG_DERIVED( warlords, centiped_base )
+MACHINE_CONFIG_START(centiped_state::warlords)
+	centiped_base(config);
 
 	/* basic machine hardware */
 	MCFG_CPU_MODIFY("maincpu")
@@ -1879,7 +1886,8 @@ static MACHINE_CONFIG_DERIVED( warlords, centiped_base )
 MACHINE_CONFIG_END
 
 
-static MACHINE_CONFIG_DERIVED( mazeinv, milliped )
+MACHINE_CONFIG_START(centiped_state::mazeinv)
+	milliped(config);
 
 	/* basic machine hardware */
 	MCFG_CPU_MODIFY("maincpu")
@@ -1893,7 +1901,7 @@ static MACHINE_CONFIG_DERIVED( mazeinv, milliped )
 MACHINE_CONFIG_END
 
 
-static MACHINE_CONFIG_START( bullsdrt )
+MACHINE_CONFIG_START(centiped_state::bullsdrt)
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", S2650, 12096000/8)
@@ -2233,7 +2241,7 @@ DRIVER_INIT_MEMBER(centiped_state,multiped)
 
 	// descramble rom and put in maincpu region
 	for (int i = 0; i < 0x10000; i++)
-		dest[0x10000 + (i ^ (~i << 4 & 0x1000) ^ (~i >> 3 & 0x400))] = BITSWAP8(src[BITSWAP16(i,15,14,13,1,8,11,4,7,10,5,6,9,12,0,3,2)],0,2,1,3,4,5,6,7);
+		dest[0x10000 + (i ^ (~i << 4 & 0x1000) ^ (~i >> 3 & 0x400))] = bitswap<8>(src[bitswap<16>(i,15,14,13,1,8,11,4,7,10,5,6,9,12,0,3,2)],0,2,1,3,4,5,6,7);
 
 	// (this can be removed when prg bankswitch is implemented)
 	memmove(dest+0x0000, dest+0x10000, 0x8000);

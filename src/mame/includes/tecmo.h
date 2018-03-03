@@ -77,4 +77,14 @@ public:
 	virtual void video_start() override;
 
 	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	void geminib(machine_config &config);
+	void backfirt(machine_config &config);
+	void silkworm(machine_config &config);
+	void gemini(machine_config &config);
+	void rygar(machine_config &config);
+	void gemini_map(address_map &map);
+	void rygar_map(address_map &map);
+	void rygar_sound_map(address_map &map);
+	void silkworm_map(address_map &map);
+	void tecmo_sound_map(address_map &map);
 };

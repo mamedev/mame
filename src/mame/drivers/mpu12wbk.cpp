@@ -214,7 +214,7 @@
 #include "speaker.h"
 
 
-#define MASTER_CLOCK    XTAL_8MHz
+#define MASTER_CLOCK    XTAL(8'000'000)
 
 
 class mpu12wbk_state : public driver_device
@@ -239,6 +239,8 @@ public:
 	uint32_t screen_update_mpu12wbk(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	required_device<cpu_device> m_maincpu;
 	required_device<gfxdecode_device> m_gfxdecode;
+	void mpu12wbk(machine_config &config);
+	void mpu12wbk_map(address_map &map);
 };
 
 
@@ -309,7 +311,7 @@ PALETTE_INIT_MEMBER(mpu12wbk_state, mpu12wbk)
 * Memory Map Information *
 *************************/
 
-static ADDRESS_MAP_START( mpu12wbk_map, AS_PROGRAM, 8, mpu12wbk_state )
+ADDRESS_MAP_START(mpu12wbk_state::mpu12wbk_map)
 	AM_RANGE(0x1400, 0x1400) AM_DEVWRITE("crtc", mc6845_device, address_w)                      // OK
 	AM_RANGE(0x1401, 0x1401) AM_DEVREADWRITE("crtc", mc6845_device, register_r, register_w)     // OK
 	AM_RANGE(0x1e00, 0x1e01) AM_DEVREADWRITE("ay8910", ay8910_device, data_r, address_data_w)  // hmmmmm....
@@ -483,10 +485,10 @@ GFXDECODE_END
 *    Machine Drivers     *
 *************************/
 
-static MACHINE_CONFIG_START( mpu12wbk )
+MACHINE_CONFIG_START(mpu12wbk_state::mpu12wbk)
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", M6809, MASTER_CLOCK/2)  /* guess */
+	MCFG_CPU_ADD("maincpu", MC6809, MASTER_CLOCK)
 	MCFG_CPU_PROGRAM_MAP(mpu12wbk_map)
 	MCFG_CPU_VBLANK_INT_DRIVER("screen", mpu12wbk_state,  nmi_line_pulse)
 

@@ -51,7 +51,7 @@ WRITE16_MEMBER(midwunit_state::midwunit_cmos_w)
 	}
 	else
 	{
-		logerror("%08X:Unexpected CMOS W @ %05X\n", space.device().safe_pc(), offset);
+		logerror("%08X:Unexpected CMOS W @ %05X\n", m_maincpu->pc(), offset);
 		popmessage("Bad CMOS write");
 	}
 }
@@ -83,7 +83,7 @@ WRITE16_MEMBER(midwunit_state::midwunit_io_w)
 	switch (offset)
 	{
 		case 1:
-			logerror("%08X:Control W @ %05X = %04X\n", space.device().safe_pc(), offset, data);
+			logerror("%08X:Control W @ %05X = %04X\n", m_maincpu->pc(), offset, data);
 
 			/* bit 4 reset sound CPU */
 			m_dcs->reset_w(newword & 0x10);
@@ -99,7 +99,7 @@ WRITE16_MEMBER(midwunit_state::midwunit_io_w)
 			break;
 
 		default:
-			logerror("%08X:Unknown I/O write to %d = %04X\n", space.device().safe_pc(), offset, data);
+			logerror("%08X:Unknown I/O write to %d = %04X\n", m_maincpu->pc(), offset, data);
 			break;
 	}
 	m_iodata[offset] = newword;
@@ -134,7 +134,7 @@ READ16_MEMBER(midwunit_state::midwunit_io_r)
 			return (picret << 12) | midwunit_sound_state_r(space, 0, 0xffff);
 		}
 		default:
-			logerror("%08X:Unknown I/O read from %d\n", space.device().safe_pc(), offset);
+			logerror("%08X:Unknown I/O read from %d\n", m_maincpu->pc(), offset);
 			break;
 	}
 	return ~0;
@@ -385,7 +385,7 @@ WRITE16_MEMBER(midwunit_state::midwunit_security_w)
 
 READ16_MEMBER(midwunit_state::midwunit_sound_r)
 {
-	logerror("%08X:Sound read\n", space.device().safe_pc());
+	logerror("%08X:Sound read\n", m_maincpu->pc());
 
 	return m_dcs->data_r() & 0xff;
 }
@@ -402,14 +402,14 @@ WRITE16_MEMBER(midwunit_state::midwunit_sound_w)
 	/* check for out-of-bounds accesses */
 	if (offset)
 	{
-		logerror("%08X:Unexpected write to sound (hi) = %04X\n", space.device().safe_pc(), data);
+		logerror("%08X:Unexpected write to sound (hi) = %04X\n", m_maincpu->pc(), data);
 		return;
 	}
 
 	/* call through based on the sound type */
 	if (ACCESSING_BITS_0_7)
 	{
-		logerror("%08X:Sound write = %04X\n", space.device().safe_pc(), data);
+		logerror("%08X:Sound write = %04X\n", m_maincpu->pc(), data);
 		m_dcs->data_w(data & 0xff);
 	}
 }

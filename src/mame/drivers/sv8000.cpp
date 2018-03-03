@@ -51,6 +51,9 @@ public:
 		, m_io_joy(*this, "JOY")
 	{ }
 
+	void sv8000(machine_config &config);
+
+protected:
 	DECLARE_DEVICE_IMAGE_LOAD_MEMBER( cart );
 
 	DECLARE_READ8_MEMBER( ay_port_a_r );
@@ -67,10 +70,12 @@ public:
 
 	DECLARE_READ8_MEMBER( mc6847_videoram_r );
 
-private:
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
+	void sv8000_io(address_map &map);
+	void sv8000_mem(address_map &map);
 
+private:
 	required_device<cpu_device> m_maincpu;
 	required_device<s68047_device> m_s68047p;
 	required_device<generic_slot_device> m_cart;
@@ -94,7 +99,7 @@ private:
 };
 
 
-static ADDRESS_MAP_START(sv8000_mem, AS_PROGRAM, 8, sv8000_state)
+ADDRESS_MAP_START(sv8000_state::sv8000_mem)
 	ADDRESS_MAP_UNMAP_HIGH
 	//AM_RANGE(0x0000, 0x0fff)      // mapped by the cartslot
 	AM_RANGE( 0x8000, 0x83ff ) AM_RAM // Work RAM??
@@ -102,7 +107,7 @@ static ADDRESS_MAP_START(sv8000_mem, AS_PROGRAM, 8, sv8000_state)
 ADDRESS_MAP_END
 
 
-static ADDRESS_MAP_START(sv8000_io, AS_IO, 8, sv8000_state)
+ADDRESS_MAP_START(sv8000_state::sv8000_io)
 	ADDRESS_MAP_UNMAP_HIGH
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	AM_RANGE(0x80, 0x83) AM_DEVREADWRITE("i8255", i8255_device, read, write)
@@ -368,9 +373,9 @@ READ8_MEMBER( sv8000_state::mc6847_videoram_r )
 	return data;
 }
 
-static MACHINE_CONFIG_START( sv8000 )
+MACHINE_CONFIG_START(sv8000_state::sv8000)
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu",Z80, XTAL_10_738635MHz/3)  /* Not verified */
+	MCFG_CPU_ADD("maincpu",Z80, XTAL(10'738'635)/3)  /* Not verified */
 	MCFG_CPU_PROGRAM_MAP(sv8000_mem)
 	MCFG_CPU_IO_MAP(sv8000_io)
 	MCFG_CPU_VBLANK_INT_DRIVER("screen", sv8000_state,  irq0_line_hold)
@@ -385,14 +390,14 @@ static MACHINE_CONFIG_START( sv8000 )
 
 	/* video hardware */
 	// S68047P - Unknown whether the internal or an external character rom is used
-	MCFG_DEVICE_ADD("s68047p", S68047, XTAL_10_738635MHz/3 )  // Clock not verified
+	MCFG_DEVICE_ADD("s68047p", S68047, XTAL(10'738'635)/3 )  // Clock not verified
 	MCFG_MC6847_INPUT_CALLBACK(READ8(sv8000_state, mc6847_videoram_r))
 
 	MCFG_SCREEN_MC6847_NTSC_ADD("screen", "s68047p")
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
-	MCFG_SOUND_ADD("ay8910", AY8910, XTAL_10_738635MHz/3/2)  /* Exact model and clock not verified */
+	MCFG_SOUND_ADD("ay8910", AY8910, XTAL(10'738'635)/3/2)  /* Exact model and clock not verified */
 	MCFG_AY8910_PORT_A_READ_CB(READ8(sv8000_state, ay_port_a_r))
 	MCFG_AY8910_PORT_B_READ_CB(READ8(sv8000_state, ay_port_b_r))
 	MCFG_AY8910_PORT_A_WRITE_CB(WRITE8(sv8000_state, ay_port_a_w))

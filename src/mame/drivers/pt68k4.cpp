@@ -124,6 +124,10 @@ public:
 
 	DECLARE_FLOPPY_FORMATS( floppy_formats );
 
+	void pt68k2(machine_config &config);
+	void pt68k4(machine_config &config);
+	void pt68k2_mem(address_map &map);
+	void pt68k4_mem(address_map &map);
 private:
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
@@ -246,7 +250,7 @@ WRITE8_MEMBER(pt68k4_state::fdc_select_w)
 	}
 }
 
-static ADDRESS_MAP_START(pt68k2_mem, AS_PROGRAM, 16, pt68k4_state)
+ADDRESS_MAP_START(pt68k4_state::pt68k2_mem)
 	ADDRESS_MAP_UNMAP_HIGH
 	AM_RANGE(0x000000, 0x0fffff) AM_RAM AM_SHARE("rambase") // 1MB RAM
 	AM_RANGE(0xf80000, 0xf8ffff) AM_ROM AM_REGION("roms", 0)
@@ -262,7 +266,7 @@ static ADDRESS_MAP_START(pt68k2_mem, AS_PROGRAM, 16, pt68k4_state)
 	AM_RANGE(0xff0000, 0xff0fff) AM_DEVREADWRITE8(TIMEKEEPER_TAG, timekeeper_device, read, write, 0x00ff)
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START(pt68k4_mem, AS_PROGRAM, 16, pt68k4_state)
+ADDRESS_MAP_START(pt68k4_state::pt68k4_mem)
 	ADDRESS_MAP_UNMAP_HIGH
 	AM_RANGE(0x000000, 0x0fffff) AM_RAM AM_SHARE("rambase") // 1MB RAM (OS9 needs more)
 	AM_RANGE(0xf80000, 0xf8ffff) AM_ROM AM_REGION("roms", 0)
@@ -394,16 +398,16 @@ SLOT_INTERFACE_START( pt68k4_isa8_cards )
 	SLOT_INTERFACE("xtide", ISA8_XTIDE) // Monk only
 SLOT_INTERFACE_END
 
-static MACHINE_CONFIG_START( pt68k2 )
+MACHINE_CONFIG_START(pt68k4_state::pt68k2)
 	/* basic machine hardware */
-	MCFG_CPU_ADD(M68K_TAG, M68000, XTAL_16MHz/2)    // 68k2 came in 8, 10, and 12 MHz versions
+	MCFG_CPU_ADD(M68K_TAG, M68000, XTAL(16'000'000)/2)    // 68k2 came in 8, 10, and 12 MHz versions
 	MCFG_CPU_PROGRAM_MAP(pt68k2_mem)
 
-	MCFG_DEVICE_ADD("duart1", MC68681, XTAL_3_6864MHz)
+	MCFG_DEVICE_ADD("duart1", MC68681, XTAL(3'686'400))
 	MCFG_MC68681_IRQ_CALLBACK(WRITELINE(pt68k4_state, duart1_irq))
 	MCFG_MC68681_OUTPORT_CALLBACK(WRITE8(pt68k4_state, duart1_out))
 
-	MCFG_DEVICE_ADD("duart2", MC68681, XTAL_3_6864MHz)
+	MCFG_DEVICE_ADD("duart2", MC68681, XTAL(3'686'400))
 
 	MCFG_DEVICE_ADD(KBDC_TAG, PC_KBDC, 0)
 	MCFG_PC_KBDC_OUT_CLOCK_CB(WRITELINE(pt68k4_state, keyboard_clock_w))
@@ -412,7 +416,7 @@ static MACHINE_CONFIG_START( pt68k2 )
 
 	MCFG_M48T02_ADD(TIMEKEEPER_TAG)
 
-	MCFG_WD1772_ADD(WDFDC_TAG, XTAL_16MHz / 2)
+	MCFG_WD1772_ADD(WDFDC_TAG, XTAL(16'000'000) / 2)
 	MCFG_FLOPPY_DRIVE_ADD(WDFDC_TAG":0", pt68k_floppies, "525dd", pt68k4_state::floppy_formats)
 	MCFG_FLOPPY_DRIVE_ADD(WDFDC_TAG":1", pt68k_floppies, "525dd", pt68k4_state::floppy_formats)
 
@@ -434,17 +438,17 @@ static MACHINE_CONFIG_START( pt68k2 )
 	MCFG_SOFTWARE_LIST_ADD("flop525_list", "pt68k2")
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_START( pt68k4 )
+MACHINE_CONFIG_START(pt68k4_state::pt68k4)
 	/* basic machine hardware */
-	MCFG_CPU_ADD(M68K_TAG, M68000, XTAL_16MHz)
+	MCFG_CPU_ADD(M68K_TAG, M68000, XTAL(16'000'000))
 	MCFG_CPU_PROGRAM_MAP(pt68k4_mem)
 
 	// add the DUARTS.  first one has the console on channel A at 19200.
-	MCFG_DEVICE_ADD("duart1", MC68681, XTAL_16MHz / 4)
+	MCFG_DEVICE_ADD("duart1", MC68681, XTAL(16'000'000) / 4)
 	MCFG_MC68681_IRQ_CALLBACK(WRITELINE(pt68k4_state, duart1_irq))
 	MCFG_MC68681_OUTPORT_CALLBACK(WRITE8(pt68k4_state, duart1_out))
 
-	MCFG_DEVICE_ADD("duart2", MC68681, XTAL_16MHz / 4)
+	MCFG_DEVICE_ADD("duart2", MC68681, XTAL(16'000'000) / 4)
 
 	MCFG_DEVICE_ADD(KBDC_TAG, PC_KBDC, 0)
 	MCFG_PC_KBDC_OUT_CLOCK_CB(WRITELINE(pt68k4_state, keyboard_clock_w))

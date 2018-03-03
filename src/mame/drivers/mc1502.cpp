@@ -228,12 +228,12 @@ MACHINE_RESET_MEMBER(mc1502_state, mc1502)
  * macros
  */
 
-static ADDRESS_MAP_START( mc1502_map, AS_PROGRAM, 8, mc1502_state )
+ADDRESS_MAP_START(mc1502_state::mc1502_map)
 	ADDRESS_MAP_UNMAP_HIGH
 	AM_RANGE(0xf0000, 0xfffff) AM_ROM AM_REGION("bios", 0)
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START(mc1502_io, AS_IO, 8, mc1502_state )
+ADDRESS_MAP_START(mc1502_state::mc1502_io)
 	AM_RANGE(0x0020, 0x0021) AM_DEVREADWRITE("pic8259", pic8259_device, read, write)
 	AM_RANGE(0x0028, 0x0028) AM_DEVREADWRITE("upd8251", i8251_device, data_r, data_w)
 	AM_RANGE(0x0029, 0x0029) AM_DEVREADWRITE("upd8251", i8251_device, status_r, control_w)
@@ -246,8 +246,8 @@ static INPUT_PORTS_START( mc1502 )
 	PORT_INCLUDE( mc7007_3_keyboard )
 INPUT_PORTS_END
 
-static MACHINE_CONFIG_START( mc1502 )
-	MCFG_CPU_ADD("maincpu", I8088, XTAL_16MHz/3)
+MACHINE_CONFIG_START(mc1502_state::mc1502)
+	MCFG_CPU_ADD("maincpu", I8088, XTAL(16'000'000)/3)
 	MCFG_CPU_PROGRAM_MAP(mc1502_map)
 	MCFG_CPU_IO_MAP(mc1502_io)
 	MCFG_CPU_IRQ_ACKNOWLEDGE_DEVICE("pic8259", pic8259_device, inta_cb)
@@ -256,11 +256,11 @@ static MACHINE_CONFIG_START( mc1502 )
 	MCFG_MACHINE_RESET_OVERRIDE( mc1502_state, mc1502 )
 
 	MCFG_DEVICE_ADD("pit8253", PIT8253, 0)
-	MCFG_PIT8253_CLK0(XTAL_16MHz/12) /* heartbeat IRQ */
+	MCFG_PIT8253_CLK0(XTAL(16'000'000)/12) /* heartbeat IRQ */
 	MCFG_PIT8253_OUT0_HANDLER(DEVWRITELINE("pic8259", pic8259_device, ir0_w))
-	MCFG_PIT8253_CLK1(XTAL_16MHz/12) /* serial port */
+	MCFG_PIT8253_CLK1(XTAL(16'000'000)/12) /* serial port */
 	MCFG_PIT8253_OUT1_HANDLER(WRITELINE(mc1502_state, mc1502_pit8253_out1_changed))
-	MCFG_PIT8253_CLK2(XTAL_16MHz/12) /* pio port c pin 4, and speaker polling enough */
+	MCFG_PIT8253_CLK2(XTAL(16'000'000)/12) /* pio port c pin 4, and speaker polling enough */
 	MCFG_PIT8253_OUT2_HANDLER(WRITELINE(mc1502_state, mc1502_pit8253_out2_changed))
 
 	MCFG_DEVICE_ADD("pic8259", PIC8259, 0)

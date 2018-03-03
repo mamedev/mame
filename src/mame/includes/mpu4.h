@@ -16,8 +16,8 @@
 #include "machine/meters.h"
 
 
-#define MPU4_MASTER_CLOCK (6880000)
-#define VIDEO_MASTER_CLOCK          XTAL_10MHz
+#define MPU4_MASTER_CLOCK           XTAL(6'880'000)
+#define VIDEO_MASTER_CLOCK          XTAL(10'000'000)
 
 
 #ifdef MAME_DEBUG
@@ -100,32 +100,33 @@ class mpu4_state : public driver_device
 {
 public:
 	mpu4_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag),
-			m_maincpu(*this, "maincpu"),
-			m_vfd(*this, "vfd"),
-			m_6840ptm(*this, "ptm_ic2"),
-			m_pia3(*this, "pia_ic3"),
-			m_pia4(*this, "pia_ic4"),
-			m_pia5(*this, "pia_ic5"),
-			m_pia6(*this, "pia_ic6"),
-			m_pia7(*this, "pia_ic7"),
-			m_pia8(*this, "pia_ic8"),
-			m_port_mux(*this, {"ORANGE1", "ORANGE2", "BLACK1", "BLACK2", "ORANGE1", "ORANGE2", "DIL1", "DIL2"}),
-			m_aux1_port(*this, "AUX1"),
-			m_aux2_port(*this, "AUX2"),
-			m_bank1(*this, "bank1"),
-			m_msm6376(*this, "msm6376"),
-			m_reel0(*this, "reel0"),
-			m_reel1(*this, "reel1"),
-			m_reel2(*this, "reel2"),
-			m_reel3(*this, "reel3"),
-			m_reel4(*this, "reel4"),
-			m_reel5(*this, "reel5"),
-			m_reel6(*this, "reel6"),
-			m_reel7(*this, "reel7"),
-			m_palette(*this, "palette"),
-			m_meters(*this, "meters")
-	{}
+		: driver_device(mconfig, type, tag)
+		, m_maincpu(*this, "maincpu")
+		, m_vfd(*this, "vfd")
+		, m_6840ptm(*this, "ptm_ic2")
+		, m_pia3(*this, "pia_ic3")
+		, m_pia4(*this, "pia_ic4")
+		, m_pia5(*this, "pia_ic5")
+		, m_pia6(*this, "pia_ic6")
+		, m_pia7(*this, "pia_ic7")
+		, m_pia8(*this, "pia_ic8")
+		, m_port_mux(*this, {"ORANGE1", "ORANGE2", "BLACK1", "BLACK2", "ORANGE1", "ORANGE2", "DIL1", "DIL2"})
+		, m_aux1_port(*this, "AUX1")
+		, m_aux2_port(*this, "AUX2")
+		, m_bank1(*this, "bank1")
+		, m_msm6376(*this, "msm6376")
+		, m_reel0(*this, "reel0")
+		, m_reel1(*this, "reel1")
+		, m_reel2(*this, "reel2")
+		, m_reel3(*this, "reel3")
+		, m_reel4(*this, "reel4")
+		, m_reel5(*this, "reel5")
+		, m_reel6(*this, "reel6")
+		, m_reel7(*this, "reel7")
+		, m_palette(*this, "palette")
+		, m_meters(*this, "meters")
+		, m_lamps(*this, "lamp%u", 0U)
+	 { }
 
 	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 	{
@@ -259,6 +260,45 @@ public:
 	DECLARE_WRITE_LINE_MEMBER(reel5_optic_cb) { if (state) m_optic_pattern |= 0x20; else m_optic_pattern &= ~0x20; }
 	DECLARE_WRITE_LINE_MEMBER(reel6_optic_cb) { if (state) m_optic_pattern |= 0x40; else m_optic_pattern &= ~0x40; }
 	DECLARE_WRITE_LINE_MEMBER(reel7_optic_cb) { if (state) m_optic_pattern |= 0x80; else m_optic_pattern &= ~0x80; }
+	void bwboki(machine_config &config);
+	void mod2(machine_config &config);
+	void mod2_alt(machine_config &config);
+	void mod4oki(machine_config &config);
+	void mod4oki_5r(machine_config &config);
+	void mod4oki_alt(machine_config &config);
+	void mod4yam(machine_config &config);
+	void mpu4_common(machine_config &config);
+	void mpu4_common2(machine_config &config);
+	void mpu4crys(machine_config &config);
+	void mpu4_std_3reel(machine_config &config);
+	void mpu4_type2_3reel(machine_config &config);
+	void mpu4_type3_3reel(machine_config &config);
+	void mpu4_type4_3reel(machine_config &config);
+	void mpu4_bwb_3reel(machine_config &config);
+	void mpu4_std_4reel(machine_config &config);
+	void mpu4_type2_4reel(machine_config &config);
+	void mpu4_type3_4reel(machine_config &config);
+	void mpu4_type4_4reel(machine_config &config);
+	void mpu4_bwb_4reel(machine_config &config);
+	void mpu4_std_5reel(machine_config &config);
+	void mpu4_type2_5reel(machine_config &config);
+	void mpu4_type3_5reel(machine_config &config);
+	void mpu4_type4_5reel(machine_config &config);
+	void mpu4_bwb_5reel(machine_config &config);
+	void mpu4_std_6reel(machine_config &config);
+	void mpu4_type2_6reel(machine_config &config);
+	void mpu4_type3_6reel(machine_config &config);
+	void mpu4_type4_6reel(machine_config &config);
+	void mpu4_bwb_6reel(machine_config &config);
+	void mpu4_std_7reel(machine_config &config);
+	void mpu4_type2_7reel(machine_config &config);
+	void mpu4_type3_7reel(machine_config &config);
+	void mpu4_type4_7reel(machine_config &config);
+	void mpu4_bwb_7reel(machine_config &config);
+	void mpu4base(machine_config &config);
+
+	void mpu4_6809_map(address_map &map);
+	void mpu4_memmap(address_map &map);
 protected:
 	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr) override;
 
@@ -299,6 +339,13 @@ protected:
 	optional_device<stepper_device> m_reel7;
 	optional_device<palette_device> m_palette;
 	required_device<meters_device> m_meters;
+
+	// not all systems have this many lamps but the driver is too much of a mess to split up now
+	// 0-63 are on PIA IC3 port A (always present)
+	// 64-127 are on PIA IC3 port B (always present)
+	// 128-132 136-140 144-148 152-156 160-164 168-172 176-180 184-188 are on small lamp extender
+	// 128-255 are on large lamp externders
+	output_finder<256> m_lamps;
 
 	enum
 	{
@@ -368,13 +415,5 @@ protected:
 	mpu4_chr_table* m_current_chr_table;
 	const bwb_chr_table* m_bwb_chr_table1;
 };
-
-MACHINE_CONFIG_EXTERN( mpu4_common );
-MACHINE_CONFIG_EXTERN( mpu4_common2 );
-
-MACHINE_CONFIG_EXTERN( mod2     );
-MACHINE_CONFIG_EXTERN( mod4oki_alt );
-MACHINE_CONFIG_EXTERN( mod4oki_5r );
-MACHINE_CONFIG_EXTERN( mod2_alt );
 
 INPUT_PORTS_EXTERN( mpu4 );

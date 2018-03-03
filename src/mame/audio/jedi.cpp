@@ -163,7 +163,7 @@ WRITE8_MEMBER(jedi_state::speech_reset_w)
  *
  *************************************/
 
-static ADDRESS_MAP_START( audio_map, AS_PROGRAM, 8, jedi_state )
+ADDRESS_MAP_START(jedi_state::audio_map)
 	AM_RANGE(0x0000, 0x07ff) AM_RAM
 	AM_RANGE(0x0800, 0x080f) AM_MIRROR(0x07c0) AM_DEVREADWRITE("pokey1", pokey_device, read, write)
 	AM_RANGE(0x0810, 0x081f) AM_MIRROR(0x07c0) AM_DEVREADWRITE("pokey2", pokey_device, read, write)
@@ -190,7 +190,7 @@ ADDRESS_MAP_END
  *
  *************************************/
 
-MACHINE_CONFIG_START( jedi_audio )
+MACHINE_CONFIG_START(jedi_state::jedi_audio)
 
 	MCFG_CPU_ADD("audiocpu", M6502, JEDI_AUDIO_CPU_CLOCK)
 	MCFG_CPU_PROGRAM_MAP(audio_map)

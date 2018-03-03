@@ -203,7 +203,7 @@ WRITE16_MEMBER(mcr68_state::pigskin_protection_w)
 		m_protection_data[3] = m_protection_data[4];
 		m_protection_data[4] = data & 0xff;
 
-		logerror("%06X:protection_w=%02X\n", space.device().safe_pcbase(), data & 0xff);
+		logerror("%06X:protection_w=%02X\n", m_maincpu->pcbase(), data & 0xff);
 	}
 }
 
@@ -273,7 +273,7 @@ READ16_MEMBER(mcr68_state::trisport_port_1_r)
  *
  *************************************/
 
-static ADDRESS_MAP_START( mcr68_map, AS_PROGRAM, 16, mcr68_state )
+ADDRESS_MAP_START(mcr68_state::mcr68_map)
 	ADDRESS_MAP_UNMAP_HIGH
 	ADDRESS_MAP_GLOBAL_MASK(0x1fffff)
 	AM_RANGE(0x000000, 0x03ffff) AM_ROM
@@ -281,7 +281,7 @@ static ADDRESS_MAP_START( mcr68_map, AS_PROGRAM, 16, mcr68_state )
 	AM_RANGE(0x070000, 0x070fff) AM_RAM_WRITE(mcr68_videoram_w) AM_SHARE("videoram")
 	AM_RANGE(0x071000, 0x071fff) AM_RAM
 	AM_RANGE(0x080000, 0x080fff) AM_RAM AM_SHARE("spriteram")
-	AM_RANGE(0x090000, 0x09007f) AM_DEVWRITE("palette", palette_device, write) AM_SHARE("palette")
+	AM_RANGE(0x090000, 0x09007f) AM_DEVWRITE("palette", palette_device, write16) AM_SHARE("palette")
 	AM_RANGE(0x0a0000, 0x0a000f) AM_DEVREADWRITE8("ptm", ptm6840_device, read, write, 0xff00)
 	AM_RANGE(0x0b0000, 0x0bffff) AM_DEVWRITE("watchdog", watchdog_timer_device, reset16_w)
 	AM_RANGE(0x0d0000, 0x0dffff) AM_READ_PORT("IN0")
@@ -297,13 +297,13 @@ ADDRESS_MAP_END
  *
  *************************************/
 
-static ADDRESS_MAP_START( pigskin_map, AS_PROGRAM, 16, mcr68_state )
+ADDRESS_MAP_START(mcr68_state::pigskin_map)
 	ADDRESS_MAP_UNMAP_HIGH
 	ADDRESS_MAP_GLOBAL_MASK(0x1fffff)
 	AM_RANGE(0x000000, 0x03ffff) AM_ROM
 	AM_RANGE(0x080000, 0x08ffff) AM_READ(pigskin_port_1_r)
 	AM_RANGE(0x0a0000, 0x0affff) AM_READ(pigskin_port_2_r)
-	AM_RANGE(0x0c0000, 0x0c007f) AM_DEVWRITE("palette", palette_device, write) AM_SHARE("palette")
+	AM_RANGE(0x0c0000, 0x0c007f) AM_DEVWRITE("palette", palette_device, write16) AM_SHARE("palette")
 	AM_RANGE(0x0e0000, 0x0effff) AM_DEVWRITE("watchdog", watchdog_timer_device, reset16_w)
 	AM_RANGE(0x100000, 0x100fff) AM_RAM_WRITE(mcr68_videoram_w) AM_SHARE("videoram")
 	AM_RANGE(0x120000, 0x120001) AM_READWRITE(pigskin_protection_r, pigskin_protection_w)
@@ -322,14 +322,14 @@ ADDRESS_MAP_END
  *
  *************************************/
 
-static ADDRESS_MAP_START( trisport_map, AS_PROGRAM, 16, mcr68_state )
+ADDRESS_MAP_START(mcr68_state::trisport_map)
 	ADDRESS_MAP_UNMAP_HIGH
 	ADDRESS_MAP_GLOBAL_MASK(0x1fffff)
 	AM_RANGE(0x000000, 0x03ffff) AM_ROM
 	AM_RANGE(0x080000, 0x08ffff) AM_READ(trisport_port_1_r)
 	AM_RANGE(0x0a0000, 0x0affff) AM_READ_PORT("DSW")
 	AM_RANGE(0x100000, 0x103fff) AM_RAM AM_SHARE("nvram")
-	AM_RANGE(0x120000, 0x12007f) AM_DEVWRITE("palette", palette_device, write) AM_SHARE("palette")
+	AM_RANGE(0x120000, 0x12007f) AM_DEVWRITE("palette", palette_device, write16) AM_SHARE("palette")
 	AM_RANGE(0x140000, 0x1407ff) AM_RAM AM_SHARE("spriteram")
 	AM_RANGE(0x160000, 0x160fff) AM_RAM_WRITE(mcr68_videoram_w) AM_SHARE("videoram")
 	AM_RANGE(0x180000, 0x18000f) AM_DEVREADWRITE8("ptm", ptm6840_device, read, write, 0xff00)
@@ -892,7 +892,7 @@ GFXDECODE_END
 
 =================================================================*/
 
-static MACHINE_CONFIG_START( mcr68 )
+MACHINE_CONFIG_START(mcr68_state::mcr68)
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", M68000, 7723800)
@@ -928,14 +928,16 @@ static MACHINE_CONFIG_START( mcr68 )
 MACHINE_CONFIG_END
 
 
-static MACHINE_CONFIG_DERIVED( xenophob, mcr68 )
+MACHINE_CONFIG_START(mcr68_state::xenophob)
+	mcr68(config);
 
 	/* basic machine hardware */
 	MCFG_SOUND_ADD("sg", MIDWAY_SOUNDS_GOOD, 0)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 1.0)
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_DERIVED( intlaser, mcr68 )
+MACHINE_CONFIG_START(mcr68_state::intlaser)
+	mcr68(config);
 
 	/* basic machine hardware */
 	MCFG_SOUND_ADD("sg", MIDWAY_SOUNDS_GOOD, 0)
@@ -946,7 +948,8 @@ static MACHINE_CONFIG_DERIVED( intlaser, mcr68 )
 MACHINE_CONFIG_END
 
 
-static MACHINE_CONFIG_DERIVED( spyhunt2, mcr68 )
+MACHINE_CONFIG_START(mcr68_state::spyhunt2)
+	mcr68(config);
 
 	/* basic machine hardware */
 	MCFG_SOUND_ADD("sg", MIDWAY_SOUNDS_GOOD, 0)
@@ -962,7 +965,8 @@ static MACHINE_CONFIG_DERIVED( spyhunt2, mcr68 )
 MACHINE_CONFIG_END
 
 
-static MACHINE_CONFIG_DERIVED( archrivl, mcr68 )
+MACHINE_CONFIG_START(mcr68_state::archrivl)
+	mcr68(config);
 
 	/* basic machine hardware */
 	MCFG_SOUND_ADD("cvsd", WILLIAMS_CVSD_SOUND, 0)
@@ -970,7 +974,8 @@ static MACHINE_CONFIG_DERIVED( archrivl, mcr68 )
 MACHINE_CONFIG_END
 
 
-static MACHINE_CONFIG_DERIVED( pigskin, mcr68 )
+MACHINE_CONFIG_START(mcr68_state::pigskin)
+	mcr68(config);
 
 	/* basic machine hardware */
 	MCFG_SOUND_ADD("cvsd", WILLIAMS_CVSD_SOUND, 0)
@@ -981,7 +986,8 @@ static MACHINE_CONFIG_DERIVED( pigskin, mcr68 )
 MACHINE_CONFIG_END
 
 
-static MACHINE_CONFIG_DERIVED( trisport, mcr68 )
+MACHINE_CONFIG_START(mcr68_state::trisport)
+	mcr68(config);
 
 	/* basic machine hardware */
 	MCFG_SOUND_ADD("cvsd", WILLIAMS_CVSD_SOUND, 0)

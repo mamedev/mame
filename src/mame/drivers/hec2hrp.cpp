@@ -90,7 +90,7 @@
 
 
 /*****************************************************************************/
-static ADDRESS_MAP_START(hecdisc2_mem, AS_PROGRAM, 8, hec2hrp_state )
+ADDRESS_MAP_START(hec2hrp_state::hecdisc2_mem)
 /*****************************************************************************/
 	ADDRESS_MAP_UNMAP_HIGH
 
@@ -101,7 +101,7 @@ static ADDRESS_MAP_START(hecdisc2_mem, AS_PROGRAM, 8, hec2hrp_state )
 
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( hecdisc2_io , AS_IO, 8, hec2hrp_state )
+ADDRESS_MAP_START(hec2hrp_state::hecdisc2_io)
 	ADDRESS_MAP_UNMAP_HIGH
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	// ROM Page managing
@@ -118,9 +118,12 @@ static ADDRESS_MAP_START( hecdisc2_io , AS_IO, 8, hec2hrp_state )
 ADDRESS_MAP_END
 
 /*****************************************************************************/
-static ADDRESS_MAP_START(hec2hrp_mem, AS_PROGRAM, 8, hec2hrp_state )
+ADDRESS_MAP_START(hec2hrp_state::hec2hrp_mem)
 /*****************************************************************************/
 	ADDRESS_MAP_UNMAP_HIGH
+	/* Main ROM page*/
+	AM_RANGE(0x0000,0x3fff) AM_ROM
+
 	/* Hardware address mapping*/
 	AM_RANGE(0x0800,0x0808) AM_WRITE(hector_switch_bank_w)/* Bank management*/
 	AM_RANGE(0x1000,0x1000) AM_WRITE(hector_color_a_w)  /* Color c0/c1*/
@@ -129,9 +132,6 @@ static ADDRESS_MAP_START(hec2hrp_mem, AS_PROGRAM, 8, hec2hrp_state )
 	AM_RANGE(0x2800,0x2803) AM_WRITE(hector_sn_2800_w)  /* Sound*/
 	AM_RANGE(0x3000,0x3000) AM_READWRITE(hector_cassette_r, hector_sn_3000_w)/* Write necessary*/
 	AM_RANGE(0x3800,0x3807) AM_READWRITE(hector_keyboard_r, hector_keyboard_w)  /* Keyboard*/
-
-	/* Main ROM page*/
-	AM_RANGE(0x0000,0x3fff) AM_ROM
 
 	/* Video br mapping*/
 	AM_RANGE(0x4000,0x49ff) AM_RAM AM_SHARE("videoram")
@@ -142,9 +142,12 @@ static ADDRESS_MAP_START(hec2hrp_mem, AS_PROGRAM, 8, hec2hrp_state )
 ADDRESS_MAP_END
 
 /*****************************************************************************/
-static ADDRESS_MAP_START(hec2hrx_mem, AS_PROGRAM, 8, hec2hrp_state )
+ADDRESS_MAP_START(hec2hrp_state::hec2hrx_mem)
 /*****************************************************************************/
 	ADDRESS_MAP_UNMAP_HIGH
+	/* Main ROM page*/
+	AM_RANGE(0x0000,0x3fff) AM_ROMBANK("bank2")
+
 	/* Hardware address mapping*/
 	AM_RANGE(0x0800,0x0808) AM_WRITE(hector_switch_bank_w)/* Bank management*/
 	AM_RANGE(0x1000,0x1000) AM_WRITE(hector_color_a_w)  /* Color c0/c1*/
@@ -154,9 +157,6 @@ static ADDRESS_MAP_START(hec2hrx_mem, AS_PROGRAM, 8, hec2hrp_state )
 	AM_RANGE(0x3000,0x3000) AM_READWRITE(hector_cassette_r, hector_sn_3000_w)/* Write necessary*/
 	AM_RANGE(0x3800,0x3807) AM_READWRITE(hector_keyboard_r, hector_keyboard_w)  /* Keyboard*/
 
-	/* Main ROM page*/
-	AM_RANGE(0x0000,0x3fff) AM_ROMBANK("bank2")
-
 	/* Video br mapping*/
 	AM_RANGE(0x4000,0x49ff) AM_RAM AM_SHARE("videoram")
 	/* continous RAM*/
@@ -165,19 +165,19 @@ static ADDRESS_MAP_START(hec2hrx_mem, AS_PROGRAM, 8, hec2hrp_state )
 	AM_RANGE(0xc000,0xffff) AM_RAMBANK("bank1") AM_SHARE("hector_videoram")
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( hec2hrp_io , AS_IO, 8, hec2hrp_state )
+ADDRESS_MAP_START(hec2hrp_state::hec2hrp_io)
 	ADDRESS_MAP_UNMAP_HIGH
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	AM_RANGE(0x000,0x0ff) AM_READWRITE(hector_io_8255_r, hector_io_8255_w )
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( hec2hrx_io , AS_IO, 8, hec2hrp_state )
+ADDRESS_MAP_START(hec2hrp_state::hec2hrx_io)
 	ADDRESS_MAP_UNMAP_HIGH
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	AM_RANGE(0x0f0,0x0ff) AM_READWRITE(hector_io_8255_r, hector_io_8255_w )
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( hec2mdhrx_io , AS_IO, 8, hec2hrp_state )
+ADDRESS_MAP_START(hec2hrp_state::hec2mdhrx_io)
 	ADDRESS_MAP_UNMAP_HIGH
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
 
@@ -187,14 +187,14 @@ static ADDRESS_MAP_START( hec2mdhrx_io , AS_IO, 8, hec2hrp_state )
 	AM_RANGE(0x0f0,0x0ff) AM_READWRITE(hector_io_8255_r, hector_io_8255_w )
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( hec2mx40_io , AS_IO, 8, hec2hrp_state )
+ADDRESS_MAP_START(hec2hrp_state::hec2mx40_io)
 	ADDRESS_MAP_UNMAP_HIGH
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	AM_RANGE(0x000,0x0ef) AM_WRITE(hector_mx40_io_port_w )
 	AM_RANGE(0x0f0,0x0f3) AM_READWRITE(hector_io_8255_r, hector_io_8255_w )
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( hec2mx80_io , AS_IO, 8, hec2hrp_state )
+ADDRESS_MAP_START(hec2hrp_state::hec2mx80_io)
 	ADDRESS_MAP_UNMAP_HIGH
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	AM_RANGE(0x000,0x0ef) AM_WRITE(hector_mx80_io_port_w )
@@ -401,10 +401,10 @@ SLOT_INTERFACE_END
 
 
 /******************************************************************************/
-static MACHINE_CONFIG_START( hec2hr )
+MACHINE_CONFIG_START(hec2hrp_state::hec2hr)
 /******************************************************************************/
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu",Z80, XTAL_5MHz)
+	MCFG_CPU_ADD("maincpu",Z80, XTAL(5'000'000))
 	MCFG_CPU_PROGRAM_MAP(hec2hrp_mem)
 	MCFG_CPU_IO_MAP(hec2hrp_io)
 	MCFG_CPU_PERIODIC_INT_DRIVER(hec2hrp_state, irq0_line_hold, 50) /*  put on the Z80 irq in Hz*/
@@ -423,7 +423,7 @@ static MACHINE_CONFIG_START( hec2hr )
 	MCFG_PALETTE_ADD("palette", 16)
 	MCFG_VIDEO_START_OVERRIDE(hec2hrp_state,hec2hrp)
 
-	MCFG_FRAGMENT_ADD(hector_audio)
+	hector_audio(config);
 
 	/* Gestion cassette*/
 	MCFG_CASSETTE_ADD( "cassette" )
@@ -436,10 +436,10 @@ static MACHINE_CONFIG_START( hec2hr )
 MACHINE_CONFIG_END
 
 /*****************************************************************************/
-static MACHINE_CONFIG_START( hec2hrp )
+MACHINE_CONFIG_START(hec2hrp_state::hec2hrp)
 /*****************************************************************************/
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu",Z80, XTAL_5MHz)
+	MCFG_CPU_ADD("maincpu",Z80, XTAL(5'000'000))
 	MCFG_CPU_PROGRAM_MAP(hec2hrp_mem)
 	MCFG_CPU_IO_MAP(hec2hrp_io)
 	MCFG_CPU_PERIODIC_INT_DRIVER(hec2hrp_state, irq0_line_hold, 50) /*  put on the Z80 irq in Hz*/
@@ -458,7 +458,7 @@ static MACHINE_CONFIG_START( hec2hrp )
 	MCFG_PALETTE_ADD("palette", 16)
 	MCFG_VIDEO_START_OVERRIDE(hec2hrp_state,hec2hrp)
 
-	MCFG_FRAGMENT_ADD(hector_audio)
+	hector_audio(config);
 
 	/* Gestion cassette*/
 	MCFG_CASSETTE_ADD( "cassette" )
@@ -475,16 +475,16 @@ static SLOT_INTERFACE_START( hector_floppies )
 SLOT_INTERFACE_END
 
 /*****************************************************************************/
-static MACHINE_CONFIG_START( hec2mx40 )
+MACHINE_CONFIG_START(hec2hrp_state::hec2mx40)
 /*****************************************************************************/
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu",Z80, XTAL_5MHz)
+	MCFG_CPU_ADD("maincpu",Z80, XTAL(5'000'000))
 	MCFG_CPU_PROGRAM_MAP(hec2hrx_mem)
 	MCFG_CPU_IO_MAP(hec2mx40_io)
 	MCFG_CPU_PERIODIC_INT_DRIVER(hec2hrp_state, irq0_line_hold, 50) //  put on the Z80 irq in Hz
 
 	/* Disc II unit */
-	MCFG_CPU_ADD("disc2cpu",Z80, XTAL_4MHz)
+	MCFG_CPU_ADD("disc2cpu",Z80, XTAL(4'000'000))
 	MCFG_CPU_PROGRAM_MAP(hecdisc2_mem)
 	MCFG_CPU_IO_MAP(hecdisc2_io)
 	MCFG_UPD765A_ADD("upd765", false, true)
@@ -507,7 +507,7 @@ static MACHINE_CONFIG_START( hec2mx40 )
 	MCFG_PALETTE_ADD("palette", 16)
 	MCFG_VIDEO_START_OVERRIDE(hec2hrp_state,hec2hrp)
 
-	MCFG_FRAGMENT_ADD(hector_audio)
+	hector_audio(config);
 
 	/* Gestion cassette*/
 	MCFG_CASSETTE_ADD( "cassette" )
@@ -519,10 +519,10 @@ static MACHINE_CONFIG_START( hec2mx40 )
 
 MACHINE_CONFIG_END
 /*****************************************************************************/
-static MACHINE_CONFIG_START( hec2hrx )
+MACHINE_CONFIG_START(hec2hrp_state::hec2hrx)
 /*****************************************************************************/
 /* basic machine hardware */
-	MCFG_CPU_ADD("maincpu",Z80, XTAL_5MHz)
+	MCFG_CPU_ADD("maincpu",Z80, XTAL(5'000'000))
 	MCFG_CPU_PROGRAM_MAP(hec2hrx_mem)
 	MCFG_CPU_IO_MAP(hec2hrx_io)
 	MCFG_CPU_PERIODIC_INT_DRIVER(hec2hrp_state, irq0_line_hold, 50) //  put on the Z80 irq in Hz
@@ -530,7 +530,7 @@ static MACHINE_CONFIG_START( hec2hrx )
 	MCFG_MACHINE_START_OVERRIDE(hec2hrp_state,hec2hrx)
 
 	/* Disc II unit */
-	MCFG_CPU_ADD("disc2cpu",Z80, XTAL_4MHz)
+	MCFG_CPU_ADD("disc2cpu",Z80, XTAL(4'000'000))
 	MCFG_CPU_PROGRAM_MAP(hecdisc2_mem)
 	MCFG_CPU_IO_MAP(hecdisc2_io)
 	MCFG_UPD765A_ADD("upd765", false, true)
@@ -551,7 +551,7 @@ static MACHINE_CONFIG_START( hec2hrx )
 	MCFG_PALETTE_ADD("palette", 16)
 	MCFG_VIDEO_START_OVERRIDE(hec2hrp_state,hec2hrp)
 
-	MCFG_FRAGMENT_ADD(hector_audio)
+	hector_audio(config);
 
 	// Gestion cassette
 	MCFG_CASSETTE_ADD( "cassette" )
@@ -563,11 +563,11 @@ static MACHINE_CONFIG_START( hec2hrx )
 
 MACHINE_CONFIG_END
 /*****************************************************************************/
-static MACHINE_CONFIG_START( hec2mdhrx )
+MACHINE_CONFIG_START(hec2hrp_state::hec2mdhrx)
 /*****************************************************************************/
 // minidisc
 /* basic machine hardware */
-	MCFG_CPU_ADD("maincpu",Z80, XTAL_5MHz)
+	MCFG_CPU_ADD("maincpu",Z80, XTAL(5'000'000))
 	MCFG_CPU_PROGRAM_MAP(hec2hrx_mem)
 	MCFG_CPU_IO_MAP(hec2mdhrx_io)
 	MCFG_CPU_PERIODIC_INT_DRIVER(hec2hrp_state, irq0_line_hold, 50) //  put on the Z80 irq in Hz
@@ -575,7 +575,7 @@ static MACHINE_CONFIG_START( hec2mdhrx )
 	MCFG_MACHINE_START_OVERRIDE(hec2hrp_state,hec2mdhrx)
 
 	/* Mini Disc */
-	MCFG_FD1793_ADD("wd179x", XTAL_1MHz)
+	MCFG_FD1793_ADD("wd179x", XTAL(1'000'000))
 
 	MCFG_FLOPPY_DRIVE_ADD("wd179x:0", minidisc_floppies, "dd", hec2hrp_state::minidisc_formats)
 
@@ -592,7 +592,7 @@ static MACHINE_CONFIG_START( hec2mdhrx )
 	MCFG_PALETTE_ADD("palette", 16)
 	MCFG_VIDEO_START_OVERRIDE(hec2hrp_state,hec2hrp)
 
-	MCFG_FRAGMENT_ADD(hector_audio)
+	hector_audio(config);
 
 	// Gestion cassette
 	MCFG_CASSETTE_ADD( "cassette" )
@@ -605,10 +605,10 @@ static MACHINE_CONFIG_START( hec2mdhrx )
 MACHINE_CONFIG_END
 
 /*****************************************************************************/
-static MACHINE_CONFIG_START( hec2mx80 )
+MACHINE_CONFIG_START(hec2hrp_state::hec2mx80)
 /*****************************************************************************/
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu",Z80, XTAL_5MHz)
+	MCFG_CPU_ADD("maincpu",Z80, XTAL(5'000'000))
 	MCFG_CPU_PROGRAM_MAP(hec2hrx_mem)
 	MCFG_CPU_IO_MAP(hec2mx80_io)
 	MCFG_CPU_PERIODIC_INT_DRIVER(hec2hrp_state, irq0_line_hold, 50) //  put on the Z80 irq in Hz
@@ -616,7 +616,7 @@ static MACHINE_CONFIG_START( hec2mx80 )
 	MCFG_MACHINE_START_OVERRIDE(hec2hrp_state,hec2hrx)
 
 	/* Disc II unit */
-	MCFG_CPU_ADD("disc2cpu",Z80, XTAL_4MHz)
+	MCFG_CPU_ADD("disc2cpu",Z80, XTAL(4'000'000))
 	MCFG_CPU_PROGRAM_MAP(hecdisc2_mem)
 	MCFG_CPU_IO_MAP(hecdisc2_io)
 	MCFG_UPD765A_ADD("upd765", false, true)
@@ -637,7 +637,7 @@ static MACHINE_CONFIG_START( hec2mx80 )
 	MCFG_PALETTE_ADD("palette", 16)
 	MCFG_VIDEO_START_OVERRIDE(hec2hrp_state,hec2hrp)
 
-	MCFG_FRAGMENT_ADD(hector_audio)
+	hector_audio(config);
 
 	/* Gestion cassette*/
 	MCFG_CASSETTE_ADD( "cassette" )

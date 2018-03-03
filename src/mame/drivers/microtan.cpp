@@ -55,7 +55,7 @@
 #include "speaker.h"
 
 
-static ADDRESS_MAP_START( microtan_map, AS_PROGRAM, 8, microtan_state )
+ADDRESS_MAP_START(microtan_state::microtan_map)
 	AM_RANGE(0x0000, 0x01ff) AM_RAM
 	AM_RANGE(0x0200, 0x03ff) AM_RAM_WRITE(microtan_videoram_w) AM_SHARE("videoram")
 	AM_RANGE(0xbc00, 0xbc00) AM_DEVWRITE("ay8910.1", ay8910_device, address_w)
@@ -209,9 +209,9 @@ static GFXDECODE_START( microtan )
 GFXDECODE_END
 
 
-static MACHINE_CONFIG_START( microtan )
+MACHINE_CONFIG_START(microtan_state::microtan)
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", M6502, 750000)  // 750 kHz
+	MCFG_CPU_ADD("maincpu", M6502, XTAL(6'000'000) / 8)  // 750 kHz
 	MCFG_CPU_PROGRAM_MAP(microtan_map)
 	MCFG_CPU_VBLANK_INT_DRIVER("screen", microtan_state,  microtan_interrupt)
 
@@ -247,10 +247,10 @@ static MACHINE_CONFIG_START( microtan )
 
 	/* acia */
 	MCFG_DEVICE_ADD("acia", MOS6551, 0)
-	MCFG_MOS6551_XTAL(XTAL_1_8432MHz)
+	MCFG_MOS6551_XTAL(XTAL(1'843'200))
 
 	/* via */
-	MCFG_DEVICE_ADD("via6522_0", VIA6522, 0)
+	MCFG_DEVICE_ADD("via6522_0", VIA6522, XTAL(6'000'000) / 8)
 	MCFG_VIA6522_READPA_HANDLER(READ8(microtan_state, via_0_in_a))
 	MCFG_VIA6522_WRITEPA_HANDLER(WRITE8(microtan_state, via_0_out_a))
 	MCFG_VIA6522_WRITEPB_HANDLER(WRITE8(microtan_state, via_0_out_b))
@@ -258,7 +258,7 @@ static MACHINE_CONFIG_START( microtan )
 	MCFG_VIA6522_CB2_HANDLER(WRITELINE(microtan_state, via_0_out_cb2))
 	MCFG_VIA6522_IRQ_HANDLER(WRITELINE(microtan_state, via_0_irq))
 
-	MCFG_DEVICE_ADD("via6522_1", VIA6522, 0)
+	MCFG_DEVICE_ADD("via6522_1", VIA6522, XTAL(6'000'000) / 8)
 	MCFG_VIA6522_WRITEPA_HANDLER(WRITE8(microtan_state, via_1_out_a))
 	MCFG_VIA6522_WRITEPB_HANDLER(WRITE8(microtan_state, via_1_out_b))
 	MCFG_VIA6522_CA2_HANDLER(WRITELINE(microtan_state, via_1_out_ca2))

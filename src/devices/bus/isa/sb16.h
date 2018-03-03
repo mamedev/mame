@@ -22,6 +22,23 @@ public:
 	// construction/destruction
 	sb16_lle_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
+protected:
+	// device-level overrides
+	virtual void device_start() override;
+	virtual void device_reset() override;
+
+	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr) override;
+
+	// optional information overrides
+	virtual const tiny_rom_entry *device_rom_region() const override;
+	virtual void device_add_mconfig(machine_config &config) override;
+
+	uint8_t dack_r(int line) override;
+	void dack_w(int line, uint8_t data) override;
+	uint16_t dack16_r(int line) override;
+	void dack16_w(int line, uint16_t data) override;
+
+private:
 	READ8_MEMBER( mpu401_r );
 	WRITE8_MEMBER( mpu401_w );
 
@@ -68,29 +85,14 @@ public:
 	DECLARE_READ8_MEMBER( invalid_r );
 	DECLARE_WRITE8_MEMBER( invalid_w );
 
-protected:
-	// device-level overrides
-	virtual void device_start() override;
-	virtual void device_reset() override;
+	void sb16_io(address_map &map);
 
-	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr) override;
-
-	// optional information overrides
-	virtual const tiny_rom_entry *device_rom_region() const override;
-	virtual void device_add_mconfig(machine_config &config) override;
-
-	uint8_t dack_r(int line) override;
-	void dack_w(int line, uint8_t data) override;
-	uint16_t dack16_r(int line) override;
-	void dack16_w(int line, uint16_t data) override;
+	void control_timer(bool start);
 
 	required_device<dac_word_interface> m_ldac;
 	required_device<dac_word_interface> m_rdac;
 	required_device<pc_joy_device> m_joy;
 	required_device<cpu_device> m_cpu;
-
-private:
-	void control_timer(bool start);
 
 	// internal state
 	bool m_data_in;

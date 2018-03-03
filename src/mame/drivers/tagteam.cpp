@@ -47,7 +47,7 @@ WRITE8_MEMBER(tagteam_state::irq_clear_w)
 	m_maincpu->set_input_line(M6502_IRQ_LINE, CLEAR_LINE);
 }
 
-static ADDRESS_MAP_START( main_map, AS_PROGRAM, 8, tagteam_state )
+ADDRESS_MAP_START(tagteam_state::main_map)
 	AM_RANGE(0x0000, 0x07ff) AM_RAM
 	AM_RANGE(0x2000, 0x2000) AM_READ_PORT("P2") AM_WRITE(flipscreen_w)
 	AM_RANGE(0x2001, 0x2001) AM_READ_PORT("P1") AM_WRITE(control_w)
@@ -67,7 +67,7 @@ WRITE8_MEMBER(tagteam_state::sound_nmi_mask_w)
 }
 
 /* Same as Syusse Oozumou */
-static ADDRESS_MAP_START( sound_map, AS_PROGRAM, 8, tagteam_state )
+ADDRESS_MAP_START(tagteam_state::sound_map)
 	AM_RANGE(0x0000, 0x03ff) AM_RAM
 	AM_RANGE(0x2000, 0x2001) AM_DEVWRITE("ay1", ay8910_device, data_address_w)
 	AM_RANGE(0x2002, 0x2003) AM_DEVWRITE("ay2", ay8910_device, data_address_w)
@@ -207,14 +207,14 @@ INTERRUPT_GEN_MEMBER(tagteam_state::sound_timer_irq)
 }
 
 
-static MACHINE_CONFIG_START( tagteam )
+MACHINE_CONFIG_START(tagteam_state::tagteam)
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", M6502, XTAL_12MHz/8)
+	MCFG_CPU_ADD("maincpu", M6502, XTAL(12'000'000)/8)
 	MCFG_CPU_PROGRAM_MAP(main_map)
 	MCFG_CPU_PERIODIC_INT_DRIVER(tagteam_state, irq0_line_assert, 272/16*57) // connected to bit 4 of vcount (basically once every 16 scanlines)
 
-	MCFG_CPU_ADD("audiocpu", M6502, XTAL_12MHz/2/6) // daughterboard gets 12mhz/2 from mainboard, but how it's divided further is a guess
+	MCFG_CPU_ADD("audiocpu", M6502, XTAL(12'000'000)/2/6) // daughterboard gets 12mhz/2 from mainboard, but how it's divided further is a guess
 	MCFG_CPU_PROGRAM_MAP(sound_map)
 	MCFG_CPU_PERIODIC_INT_DRIVER(tagteam_state, sound_timer_irq, 272/16*57) // same source as maincpu irq
 
@@ -237,10 +237,10 @@ static MACHINE_CONFIG_START( tagteam )
 	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
 	MCFG_GENERIC_LATCH_DATA_PENDING_CB(INPUTLINE("audiocpu", M6502_IRQ_LINE))
 
-	MCFG_SOUND_ADD("ay1", AY8910, XTAL_12MHz/8)
+	MCFG_SOUND_ADD("ay1", AY8910, XTAL(12'000'000)/8)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 0.25)
 
-	MCFG_SOUND_ADD("ay2", AY8910, XTAL_12MHz/8)
+	MCFG_SOUND_ADD("ay2", AY8910, XTAL(12'000'000)/8)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 0.25)
 
 	MCFG_SOUND_ADD("dac", DAC_8BIT_R2R, 0) MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 0.25) // unknown DAC

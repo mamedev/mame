@@ -720,7 +720,7 @@ WRITE8_MEMBER(kageki_state::csport_w)
 	}
 }
 
-static ADDRESS_MAP_START( main_map, AS_PROGRAM, 8, tnzs_base_state )
+ADDRESS_MAP_START(tnzs_base_state::main_map)
 	AM_RANGE(0x0000, 0x7fff) AM_ROM
 	AM_RANGE(0x8000, 0xbfff) AM_DEVICE("mainbank", address_map_bank_device, amap8)
 	AM_RANGE(0xc000, 0xcfff) AM_RAM AM_DEVREADWRITE("spritegen", seta001_device, spritecodelow_r8, spritecodelow_w8)
@@ -730,17 +730,17 @@ static ADDRESS_MAP_START( main_map, AS_PROGRAM, 8, tnzs_base_state )
 	AM_RANGE(0xf300, 0xf303) AM_MIRROR(0xfc) AM_DEVWRITE("spritegen", seta001_device, spritectrl_w8)  /* control registers (0x80 mirror used by Arkanoid 2) */
 	AM_RANGE(0xf400, 0xf400) AM_DEVWRITE("spritegen", seta001_device, spritebgflag_w8)   /* enable / disable background transparency */
 	AM_RANGE(0xf600, 0xf600) AM_READNOP AM_WRITE(ramrom_bankswitch_w)
-	AM_RANGE(0xf800, 0xfbff) AM_RAM_DEVWRITE("palette", palette_device, write) AM_SHARE("palette")
+	AM_RANGE(0xf800, 0xfbff) AM_RAM_DEVWRITE("palette", palette_device, write8) AM_SHARE("palette")
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( prompal_main_map, AS_PROGRAM, 8, extrmatn_state )
+ADDRESS_MAP_START(extrmatn_state::prompal_main_map)
+	AM_IMPORT_FROM(main_map)
 	/* arknoid2, extrmatn, plumppop and drtoppel have PROMs instead of RAM */
 	/* drtoppel writes here anyway! (maybe leftover from tests during development) */
 	AM_RANGE(0xf800, 0xfbff) AM_WRITENOP
-	AM_IMPORT_FROM(main_map)
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( tnzsb_main_map, AS_PROGRAM, 8, tnzsb_state )
+ADDRESS_MAP_START(tnzsb_state::tnzsb_main_map)
 	AM_RANGE(0x0000, 0x7fff) AM_ROM
 	AM_RANGE(0x8000, 0xbfff) AM_DEVICE("mainbank", address_map_bank_device, amap8)
 	AM_RANGE(0xc000, 0xcfff) AM_RAM AM_DEVREADWRITE("spritegen", seta001_device, spritecodelow_r8, spritecodelow_w8)
@@ -754,7 +754,7 @@ static ADDRESS_MAP_START( tnzsb_main_map, AS_PROGRAM, 8, tnzsb_state )
 	AM_RANGE(0xf800, 0xfbff) AM_WRITENOP
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( base_sub_map, AS_PROGRAM, 8, tnzs_base_state )
+ADDRESS_MAP_START(tnzs_base_state::base_sub_map)
 	AM_RANGE(0x0000, 0x7fff) AM_ROM
 	AM_RANGE(0x8000, 0x9fff) AM_ROMBANK("subbank")
 	AM_RANGE(0xa000, 0xa000) AM_WRITE(bankswitch1_w)
@@ -763,37 +763,37 @@ static ADDRESS_MAP_START( base_sub_map, AS_PROGRAM, 8, tnzs_base_state )
 	AM_RANGE(0xe000, 0xefff) AM_RAM AM_SHARE("share1")
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( tnzs_sub_map, AS_PROGRAM, 8, tnzs_mcu_state )
+ADDRESS_MAP_START(tnzs_mcu_state::tnzs_sub_map)
+	AM_IMPORT_FROM(base_sub_map)
 	AM_RANGE(0xc000, 0xc001) AM_READWRITE(mcu_r, mcu_w)   /* not present in insectx */
 	AM_RANGE(0xa000, 0xa000) AM_WRITE(bankswitch1_w)
 	AM_RANGE(0xf000, 0xf003) AM_READ(analog_r) /* paddles in arkanoid2/plumppop. The ports are */
 											   /* read but not used by the other games, and are not read at */
 											   /* all by insectx. */
-	AM_IMPORT_FROM(base_sub_map)
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( arknoid2_sub_map, AS_PROGRAM, 8, arknoid2_state )
-	AM_RANGE(0xc000, 0xc001) AM_READWRITE(mcu_r, mcu_w)
+ADDRESS_MAP_START(arknoid2_state::arknoid2_sub_map)
 	AM_IMPORT_FROM(tnzs_sub_map)
+	AM_RANGE(0xc000, 0xc001) AM_READWRITE(mcu_r, mcu_w)
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( kageki_sub_map, AS_PROGRAM, 8, kageki_state )
+ADDRESS_MAP_START(kageki_state::kageki_sub_map)
+	AM_IMPORT_FROM(base_sub_map)
 	AM_RANGE(0xc000, 0xc000) AM_READ_PORT("IN0")
 	AM_RANGE(0xc001, 0xc001) AM_READ_PORT("IN1")
 	AM_RANGE(0xc002, 0xc002) AM_READ_PORT("IN2")
-	AM_IMPORT_FROM(base_sub_map)
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( insectx_sub_map, AS_PROGRAM, 8, insectx_state )
+ADDRESS_MAP_START(insectx_state::insectx_sub_map)
+	AM_IMPORT_FROM(base_sub_map)
 	AM_RANGE(0xc000, 0xc000) AM_READ_PORT("IN0")
 	AM_RANGE(0xc001, 0xc001) AM_READ_PORT("IN1")
 	AM_RANGE(0xc002, 0xc002) AM_READ_PORT("IN2")
-	AM_IMPORT_FROM(base_sub_map)
 ADDRESS_MAP_END
 
 /* the later board is different, it has a third CPU (and of course no mcu) */
 
-static ADDRESS_MAP_START( tnzsb_base_sub_map, AS_PROGRAM, 8, tnzsb_state )
+ADDRESS_MAP_START(tnzsb_state::tnzsb_base_sub_map)
 	AM_RANGE(0x0000, 0x7fff) AM_ROM
 	AM_RANGE(0x8000, 0x9fff) AM_ROMBANK("subbank")
 	AM_RANGE(0xa000, 0xa000) AM_WRITE(bankswitch1_w)
@@ -807,35 +807,34 @@ static ADDRESS_MAP_START( tnzsb_base_sub_map, AS_PROGRAM, 8, tnzsb_state )
 	AM_RANGE(0xe000, 0xefff) AM_RAM AM_SHARE("share1")
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( tnzsb_sub_map, AS_PROGRAM, 8, tnzsb_state )
-	AM_RANGE(0xf000, 0xf003) AM_READONLY
-	AM_RANGE(0xf000, 0xf3ff) AM_RAM_DEVWRITE("palette", palette_device, write) AM_SHARE("palette")
+ADDRESS_MAP_START(tnzsb_state::tnzsb_sub_map)
 	AM_IMPORT_FROM(tnzsb_base_sub_map)
+	AM_RANGE(0xf000, 0xf3ff) AM_RAM_DEVWRITE("palette", palette_device, write8) AM_SHARE("palette")
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( kabukiz_sub_map, AS_PROGRAM, 8, kabukiz_state )
-	AM_RANGE(0xf800, 0xfbff) AM_RAM_DEVWRITE("palette", palette_device, write) AM_SHARE("palette")
+ADDRESS_MAP_START(kabukiz_state::kabukiz_sub_map)
 	AM_IMPORT_FROM(tnzsb_base_sub_map)
+	AM_RANGE(0xf800, 0xfbff) AM_RAM_DEVWRITE("palette", palette_device, write8) AM_SHARE("palette")
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( tnzsb_cpu2_map, AS_PROGRAM, 8, tnzsb_state )
+ADDRESS_MAP_START(tnzsb_state::tnzsb_cpu2_map)
 	AM_RANGE(0x0000, 0x7fff) AM_ROM
 	AM_RANGE(0xc000, 0xdfff) AM_RAM
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( kabukiz_cpu2_map, AS_PROGRAM, 8, kabukiz_state )
+ADDRESS_MAP_START(kabukiz_state::kabukiz_cpu2_map)
 	AM_RANGE(0x0000, 0x7fff) AM_ROM
 	AM_RANGE(0x8000, 0xbfff) AM_ROMBANK("audiobank")
 	AM_RANGE(0xe000, 0xffff) AM_RAM
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( tnzsb_io_map, AS_IO, 8, tnzsb_state )
+ADDRESS_MAP_START(tnzsb_state::tnzsb_io_map)
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	AM_RANGE(0x00, 0x01) AM_DEVREADWRITE("ymsnd", ym2203_device, read, write)
 	AM_RANGE(0x02, 0x02) AM_DEVREAD("soundlatch", generic_latch_8_device, read)
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( jpopnics_main_map, AS_PROGRAM, 8, jpopnics_state )
+ADDRESS_MAP_START(jpopnics_state::jpopnics_main_map)
 	AM_RANGE(0x0000, 0x7fff) AM_ROM
 	AM_RANGE(0x8000, 0xbfff) AM_DEVICE("mainbank", address_map_bank_device, amap8)
 	AM_RANGE(0xc000, 0xcfff) AM_RAM AM_DEVREADWRITE("spritegen", seta001_device, spritecodelow_r8, spritecodelow_w8)
@@ -845,10 +844,10 @@ static ADDRESS_MAP_START( jpopnics_main_map, AS_PROGRAM, 8, jpopnics_state )
 	AM_RANGE(0xf300, 0xf303) AM_MIRROR(0xfc) AM_DEVWRITE("spritegen", seta001_device, spritectrl_w8) /* control registers (0x80 mirror used by Arkanoid 2) */
 	AM_RANGE(0xf400, 0xf400) AM_DEVWRITE("spritegen", seta001_device, spritebgflag_w8)   /* enable / disable background transparency */
 	AM_RANGE(0xf600, 0xf600) AM_READNOP AM_WRITE(ramrom_bankswitch_w)
-	AM_RANGE(0xf800, 0xffff) AM_RAM_DEVWRITE("palette", palette_device, write) AM_SHARE("palette")
+	AM_RANGE(0xf800, 0xffff) AM_RAM_DEVWRITE("palette", palette_device, write8) AM_SHARE("palette")
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( jpopnics_sub_map, AS_PROGRAM, 8, jpopnics_state )
+ADDRESS_MAP_START(jpopnics_state::jpopnics_sub_map)
 	AM_RANGE(0x0000, 0x7fff) AM_ROM
 	AM_RANGE(0x8000, 0x9fff) AM_ROMBANK("subbank")
 
@@ -866,12 +865,12 @@ static ADDRESS_MAP_START( jpopnics_sub_map, AS_PROGRAM, 8, jpopnics_state )
 ADDRESS_MAP_END
 
 /* RAM/ROM bank that maps at 0x8000-0xbfff on maincpu */
-static ADDRESS_MAP_START( mainbank_map, AS_PROGRAM, 8, tnzs_base_state )
+ADDRESS_MAP_START(tnzs_base_state::mainbank_map)
 	AM_RANGE(0x00000, 0x07fff) AM_RAM // instead of the first two banks of ROM being repeated redundantly the hardware maps RAM here
 	AM_RANGE(0x08000, 0x1ffff) AM_ROM AM_REGION(":maincpu", 0x8000)
 ADDRESS_MAP_END
 
-MACHINE_CONFIG_START( tnzs_mainbank )
+MACHINE_CONFIG_START(tnzs_base_state::tnzs_mainbank)
 	MCFG_DEVICE_ADD("mainbank", ADDRESS_MAP_BANK, 0)
 	MCFG_DEVICE_PROGRAM_MAP(mainbank_map)
 	MCFG_ADDRESS_MAP_BANK_ENDIANNESS(ENDIANNESS_LITTLE)
@@ -1517,17 +1516,17 @@ static GFXDECODE_START( insectx )
 	GFXDECODE_ENTRY( "gfx1", 0, insectx_charlayout, 0, 32 )
 GFXDECODE_END
 
-static MACHINE_CONFIG_START( tnzs_base )
+MACHINE_CONFIG_START(tnzs_base_state::tnzs_base)
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", Z80,XTAL_12MHz/2)       /* 6.0 MHz ??? - Main board Crystal is 12MHz, verified on insectx, kageki, tnzsb */
+	MCFG_CPU_ADD("maincpu", Z80,XTAL(12'000'000)/2)       /* 6.0 MHz ??? - Main board Crystal is 12MHz, verified on insectx, kageki, tnzsb */
 	MCFG_CPU_PROGRAM_MAP(main_map)
 	MCFG_CPU_VBLANK_INT_DRIVER("screen", tnzs_base_state,  irq0_line_hold)
 
-	MCFG_CPU_ADD("sub", Z80,XTAL_12MHz/2)       /* 6.0 MHz ??? - Main board Crystal is 12MHz, verified on insectx, kageki, tnzsb */
+	MCFG_CPU_ADD("sub", Z80,XTAL(12'000'000)/2)       /* 6.0 MHz ??? - Main board Crystal is 12MHz, verified on insectx, kageki, tnzsb */
 	MCFG_CPU_PROGRAM_MAP(base_sub_map)
 	MCFG_CPU_VBLANK_INT_DRIVER("screen", tnzs_base_state,  irq0_line_hold)
 
-	MCFG_FRAGMENT_ADD(tnzs_mainbank)
+	tnzs_mainbank(config);
 
 	MCFG_QUANTUM_PERFECT_CPU("maincpu")
 
@@ -1552,7 +1551,8 @@ static MACHINE_CONFIG_START( tnzs_base )
 	MCFG_SPEAKER_STANDARD_MONO("speaker")
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_DERIVED( tnzs, tnzs_base )
+MACHINE_CONFIG_START(tnzs_mcu_state::tnzs)
+	tnzs_base(config);
 	MCFG_CPU_ADD("mcu", I8742, 12000000/2)  /* 400KHz ??? - Main board Crystal is 12MHz */
 	MCFG_MCS48_PORT_P1_IN_CB(READ8(tnzs_mcu_state, mcu_port1_r))
 	MCFG_MCS48_PORT_P2_IN_CB(READ8(tnzs_mcu_state, mcu_port2_r))
@@ -1569,13 +1569,14 @@ static MACHINE_CONFIG_DERIVED( tnzs, tnzs_base )
 	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500) /* not accurate */)
 
 	/* sound hardware */
-	MCFG_SOUND_ADD("ymsnd", YM2203, XTAL_12MHz/4)
+	MCFG_SOUND_ADD("ymsnd", YM2203, XTAL(12'000'000)/4)
 	MCFG_AY8910_PORT_A_READ_CB(IOPORT("DSWA"))
 	MCFG_AY8910_PORT_B_READ_CB(IOPORT("DSWB"))
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 0.3)
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_DERIVED( extrmatn, tnzs )
+MACHINE_CONFIG_START(extrmatn_state::extrmatn)
+	tnzs(config);
 	/* basic machine hardware */
 	MCFG_CPU_MODIFY("maincpu")
 	MCFG_CPU_PROGRAM_MAP(prompal_main_map)
@@ -1589,13 +1590,15 @@ static MACHINE_CONFIG_DERIVED( extrmatn, tnzs )
 	MCFG_PALETTE_INIT_OWNER(tnzs_base_state, prompalette)
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_DERIVED( plumppop, extrmatn )
+MACHINE_CONFIG_START(extrmatn_state::plumppop)
+	extrmatn(config);
 	MCFG_DEVICE_ADD("upd4701", UPD4701A, 0)
 	MCFG_UPD4701_PORTX("AN1")
 	MCFG_UPD4701_PORTY("AN2")
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_DERIVED( arknoid2, plumppop )
+MACHINE_CONFIG_START(arknoid2_state::arknoid2)
+	plumppop(config);
 	/* basic machine hardware */
 	MCFG_CPU_MODIFY("maincpu")
 	MCFG_CPU_VBLANK_INT_DRIVER("screen", arknoid2_state, mcu_interrupt)
@@ -1607,7 +1610,8 @@ static MACHINE_CONFIG_DERIVED( arknoid2, plumppop )
 	MCFG_DEVICE_DISABLE()
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_DERIVED( insectx, tnzs_base )
+MACHINE_CONFIG_START(insectx_state::insectx)
+	tnzs_base(config);
 	/* basic machine hardware */
 	MCFG_CPU_MODIFY("sub")
 	MCFG_CPU_PROGRAM_MAP(insectx_sub_map)
@@ -1616,20 +1620,21 @@ static MACHINE_CONFIG_DERIVED( insectx, tnzs_base )
 	MCFG_GFXDECODE_MODIFY("gfxdecode", insectx)
 
 	/* sound hardware */
-	MCFG_SOUND_ADD("ymsnd", YM2203, XTAL_12MHz/4) /* verified on pcb */
+	MCFG_SOUND_ADD("ymsnd", YM2203, XTAL(12'000'000)/4) /* verified on pcb */
 	MCFG_AY8910_PORT_A_READ_CB(IOPORT("DSWA"))
 	MCFG_AY8910_PORT_B_READ_CB(IOPORT("DSWB"))
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 0.3)
 MACHINE_CONFIG_END
 
 
-static MACHINE_CONFIG_DERIVED( kageki, tnzs_base )
+MACHINE_CONFIG_START(kageki_state::kageki)
+	tnzs_base(config);
 	/* basic machine hardware */
 	MCFG_CPU_MODIFY("sub")
 	MCFG_CPU_PROGRAM_MAP(kageki_sub_map)
 
 	/* sound hardware */
-	MCFG_SOUND_ADD("ymsnd", YM2203, XTAL_12MHz/4) /* verified on pcb */
+	MCFG_SOUND_ADD("ymsnd", YM2203, XTAL(12'000'000)/4) /* verified on pcb */
 	MCFG_AY8910_PORT_A_READ_CB(READ8(kageki_state, csport_r))
 	MCFG_AY8910_PORT_B_WRITE_CB(WRITE8(kageki_state, csport_w))
 	MCFG_SOUND_ROUTE(0, "speaker", 0.15)
@@ -1643,7 +1648,8 @@ static MACHINE_CONFIG_DERIVED( kageki, tnzs_base )
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 1.0)
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_DERIVED( tnzsb, tnzs_base )
+MACHINE_CONFIG_START(tnzsb_state::tnzsb)
+	tnzs_base(config);
 	/* basic machine hardware */
 	MCFG_CPU_MODIFY("maincpu")
 	MCFG_CPU_PROGRAM_MAP(tnzsb_main_map)
@@ -1651,7 +1657,7 @@ static MACHINE_CONFIG_DERIVED( tnzsb, tnzs_base )
 	MCFG_CPU_MODIFY("sub") /* verified on pcb */
 	MCFG_CPU_PROGRAM_MAP(tnzsb_sub_map)
 
-	MCFG_CPU_ADD("audiocpu", Z80, XTAL_12MHz/2) /* verified on pcb */
+	MCFG_CPU_ADD("audiocpu", Z80, XTAL(12'000'000)/2) /* verified on pcb */
 	MCFG_CPU_PROGRAM_MAP(tnzsb_cpu2_map)
 	MCFG_CPU_IO_MAP(tnzsb_io_map)
 
@@ -1662,7 +1668,7 @@ static MACHINE_CONFIG_DERIVED( tnzsb, tnzs_base )
 	/* sound hardware */
 	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
 
-	MCFG_SOUND_ADD("ymsnd", YM2203, XTAL_12MHz/4) /* verified on pcb */
+	MCFG_SOUND_ADD("ymsnd", YM2203, XTAL(12'000'000)/4) /* verified on pcb */
 	MCFG_YM2203_IRQ_HANDLER(WRITELINE(tnzsb_state, ym2203_irqhandler))
 	MCFG_SOUND_ROUTE(0, "speaker", 1.0)
 	MCFG_SOUND_ROUTE(1, "speaker", 1.0)
@@ -1671,7 +1677,8 @@ static MACHINE_CONFIG_DERIVED( tnzsb, tnzs_base )
 MACHINE_CONFIG_END
 
 
-static MACHINE_CONFIG_DERIVED( kabukiz, tnzsb )
+MACHINE_CONFIG_START(kabukiz_state::kabukiz)
+	tnzsb(config);
 
 	/* basic machine hardware */
 	MCFG_CPU_MODIFY("sub")
@@ -1691,7 +1698,8 @@ static MACHINE_CONFIG_DERIVED( kabukiz, tnzsb )
 MACHINE_CONFIG_END
 
 
-static MACHINE_CONFIG_DERIVED( jpopnics, tnzs_base )
+MACHINE_CONFIG_START(jpopnics_state::jpopnics)
+	tnzs_base(config);
 	/* basic machine hardware */
 	MCFG_CPU_MODIFY("maincpu")
 	MCFG_CPU_PROGRAM_MAP(jpopnics_main_map)
@@ -1710,7 +1718,7 @@ static MACHINE_CONFIG_DERIVED( jpopnics, tnzs_base )
 	MCFG_PALETTE_ENDIANNESS(ENDIANNESS_BIG)
 
 	/* sound hardware */
-	MCFG_YM2151_ADD("ymsnd", XTAL_12MHz/4) /* Not verified - Main board Crystal is 12MHz */
+	MCFG_YM2151_ADD("ymsnd", XTAL(12'000'000)/4) /* Not verified - Main board Crystal is 12MHz */
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 0.3)
 MACHINE_CONFIG_END
 

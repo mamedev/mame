@@ -103,6 +103,9 @@ public:
 
 	int m_40_80;
 	int m_200_256;
+	void act_f1(machine_config &config);
+	void act_f1_io(address_map &map);
+	void act_f1_mem(address_map &map);
 };
 
 
@@ -248,7 +251,7 @@ void f1_state::machine_start()
 //  ADDRESS_MAP( act_f1_mem )
 //-------------------------------------------------
 
-static ADDRESS_MAP_START( act_f1_mem, AS_PROGRAM, 16, f1_state )
+ADDRESS_MAP_START(f1_state::act_f1_mem)
 	ADDRESS_MAP_UNMAP_HIGH
 	AM_RANGE(0x00000, 0x01dff) AM_RAM
 	AM_RANGE(0x01e00, 0x01fff) AM_RAM AM_SHARE("p_scrollram")
@@ -262,7 +265,7 @@ ADDRESS_MAP_END
 //  ADDRESS_MAP( act_f1_io )
 //-------------------------------------------------
 
-static ADDRESS_MAP_START( act_f1_io, AS_IO, 16, f1_state )
+ADDRESS_MAP_START(f1_state::act_f1_io)
 	ADDRESS_MAP_UNMAP_HIGH
 	AM_RANGE(0x0000, 0x000f) AM_WRITE8(system_w, 0xffff)
 	AM_RANGE(0x0010, 0x0017) AM_DEVREADWRITE8(Z80CTC_TAG, z80ctc_device, read, write, 0x00ff)
@@ -329,9 +332,9 @@ SLOT_INTERFACE_END
 //  MACHINE_CONFIG( act_f1 )
 //-------------------------------------------------
 
-static MACHINE_CONFIG_START( act_f1 )
+MACHINE_CONFIG_START(f1_state::act_f1)
 	/* basic machine hardware */
-	MCFG_CPU_ADD(I8086_TAG, I8086, XTAL_14MHz/4)
+	MCFG_CPU_ADD(I8086_TAG, I8086, XTAL(14'000'000)/4)
 	MCFG_CPU_PROGRAM_MAP(act_f1_mem)
 	MCFG_CPU_IO_MAP(act_f1_io)
 
@@ -367,7 +370,7 @@ static MACHINE_CONFIG_START( act_f1 )
 	MCFG_CENTRONICS_OUTPUT_LATCH_ADD("cent_data_out", CENTRONICS_TAG)
 
 	// floppy
-	MCFG_WD2797_ADD(WD2797_TAG, XTAL_4MHz / 2 /* ? */)
+	MCFG_WD2797_ADD(WD2797_TAG, XTAL(4'000'000) / 2 /* ? */)
 	MCFG_WD_FDC_INTRQ_CALLBACK(INPUTLINE(I8086_TAG, INPUT_LINE_NMI))
 	MCFG_WD_FDC_DRQ_CALLBACK(INPUTLINE(I8086_TAG, INPUT_LINE_TEST))
 

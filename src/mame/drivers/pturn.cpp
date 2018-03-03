@@ -143,6 +143,9 @@ public:
 
 	INTERRUPT_GEN_MEMBER(sub_intgen);
 	INTERRUPT_GEN_MEMBER(main_intgen);
+	void pturn(machine_config &config);
+	void main_map(address_map &map);
+	void sub_map(address_map &map);
 };
 
 
@@ -340,7 +343,7 @@ READ8_MEMBER(pturn_state::custom_r)
 }
 
 
-static ADDRESS_MAP_START( main_map, AS_PROGRAM, 8, pturn_state )
+ADDRESS_MAP_START(pturn_state::main_map)
 	AM_RANGE(0x0000, 0x7fff) AM_ROM
 	AM_RANGE(0xc000, 0xc7ff) AM_RAM
 	AM_RANGE(0xc800, 0xcfff) AM_WRITENOP AM_READ(custom_r)
@@ -367,7 +370,7 @@ static ADDRESS_MAP_START( main_map, AS_PROGRAM, 8, pturn_state )
 
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( sub_map, AS_PROGRAM, 8, pturn_state )
+ADDRESS_MAP_START(pturn_state::sub_map)
 	AM_RANGE(0x0000, 0x0fff) AM_ROM
 	AM_RANGE(0x2000, 0x23ff) AM_RAM
 	AM_RANGE(0x3000, 0x3000) AM_DEVREAD("soundlatch", generic_latch_8_device, read) AM_WRITE(nmi_sub_enable_w)
@@ -507,7 +510,7 @@ void pturn_state::machine_reset()
 	m_nmi_sub = false;
 }
 
-static MACHINE_CONFIG_START( pturn )
+MACHINE_CONFIG_START(pturn_state::pturn)
 	MCFG_CPU_ADD("maincpu", Z80, 12000000/3)
 	MCFG_CPU_PROGRAM_MAP(main_map)
 	MCFG_CPU_VBLANK_INT_DRIVER("screen", pturn_state,  main_intgen)

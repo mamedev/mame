@@ -40,17 +40,20 @@ public:
 	DECLARE_MACHINE_RESET(ccs300);
 	DECLARE_WRITE8_MEMBER(port40_w);
 
+	void ccs300(machine_config &config);
+	void ccs300_io(address_map &map);
+	void ccs300_mem(address_map &map);
 private:
 	required_device<cpu_device> m_maincpu;
 };
 
-static ADDRESS_MAP_START(ccs300_mem, AS_PROGRAM, 8, ccs300_state)
+ADDRESS_MAP_START(ccs300_state::ccs300_mem)
 	ADDRESS_MAP_UNMAP_HIGH
 	AM_RANGE(0x0000, 0x07ff) AM_READ_BANK("bankr0") AM_WRITE_BANK("bankw0")
 	AM_RANGE(0x0800, 0xffff) AM_RAM
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( ccs300_io, AS_IO, 8, ccs300_state)
+ADDRESS_MAP_START(ccs300_state::ccs300_io)
 	ADDRESS_MAP_UNMAP_HIGH
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	AM_RANGE(0x10, 0x13) AM_DEVREADWRITE("sio", z80sio_device, ba_cd_r, ba_cd_w)
@@ -110,9 +113,9 @@ static DEVICE_INPUT_DEFAULTS_START( terminal )
 	DEVICE_INPUT_DEFAULTS( "RS232_STOPBITS", 0xff, RS232_STOPBITS_2 )
 DEVICE_INPUT_DEFAULTS_END
 
-static MACHINE_CONFIG_START( ccs300 )
+MACHINE_CONFIG_START(ccs300_state::ccs300)
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu",Z80, XTAL_4MHz)
+	MCFG_CPU_ADD("maincpu",Z80, XTAL(4'000'000))
 	MCFG_CPU_PROGRAM_MAP(ccs300_mem)
 	MCFG_CPU_IO_MAP(ccs300_io)
 	MCFG_Z80_DAISY_CHAIN(daisy_chain)
@@ -125,7 +128,7 @@ static MACHINE_CONFIG_START( ccs300 )
 	MCFG_DEVCB_CHAIN_OUTPUT(DEVWRITELINE("sio", z80sio_device, rxca_w))
 
 	/* Devices */
-	MCFG_DEVICE_ADD("sio", Z80SIO, XTAL_4MHz)
+	MCFG_DEVICE_ADD("sio", Z80SIO, XTAL(4'000'000))
 	MCFG_Z80SIO_OUT_INT_CB(INPUTLINE("maincpu", INPUT_LINE_IRQ0))
 	MCFG_Z80SIO_OUT_TXDA_CB(DEVWRITELINE("rs232", rs232_port_device, write_txd))
 	MCFG_Z80SIO_OUT_DTRA_CB(DEVWRITELINE("rs232", rs232_port_device, write_dtr))
@@ -136,10 +139,10 @@ static MACHINE_CONFIG_START( ccs300 )
 	MCFG_RS232_CTS_HANDLER(DEVWRITELINE("sio", z80sio_device, ctsa_w))
 	MCFG_DEVICE_CARD_DEVICE_INPUT_DEFAULTS("terminal", terminal) // must be exactly here
 
-	MCFG_DEVICE_ADD("ctc", Z80CTC, XTAL_4MHz)
+	MCFG_DEVICE_ADD("ctc", Z80CTC, XTAL(4'000'000))
 	MCFG_Z80CTC_INTR_CB(INPUTLINE("maincpu", INPUT_LINE_IRQ0))
 
-	MCFG_DEVICE_ADD("pio", Z80PIO, XTAL_4MHz)
+	MCFG_DEVICE_ADD("pio", Z80PIO, XTAL(4'000'000))
 	MCFG_Z80PIO_OUT_INT_CB(INPUTLINE("maincpu", INPUT_LINE_IRQ0))
 MACHINE_CONFIG_END
 

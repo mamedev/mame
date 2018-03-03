@@ -56,6 +56,9 @@ public:
 	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 
 	TILE_GET_INFO_MEMBER(get_tile_info);
+	void headonb(machine_config &config);
+	void headonb_io_map(address_map &map);
+	void headonb_map(address_map &map);
 };
 
 
@@ -95,13 +98,13 @@ WRITE8_MEMBER(headonb_state::video_ram_w)
 	m_tilemap->mark_tile_dirty(offset);
 }
 
-static ADDRESS_MAP_START( headonb_map, AS_PROGRAM, 8, headonb_state )
+ADDRESS_MAP_START(headonb_state::headonb_map)
 	AM_RANGE(0x0000, 0x3fff) AM_ROM AM_MIRROR(0x4000)
 	AM_RANGE(0xe000, 0xe3ff) AM_RAM_WRITE(video_ram_w) AM_SHARE("video_ram")
 	AM_RANGE(0xff00, 0xffff) AM_RAM
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( headonb_io_map, AS_IO, 8, headonb_state )
+ADDRESS_MAP_START(headonb_state::headonb_io_map)
 	AM_RANGE(0x01, 0x01) AM_READ_PORT("IN0")
 	AM_RANGE(0x04, 0x04) AM_READ_PORT("IN1")
 ADDRESS_MAP_END
@@ -157,10 +160,10 @@ static GFXDECODE_START( headonb )
 	GFXDECODE_ENTRY( "gfx1", 0, charlayout, 0, 1 )
 GFXDECODE_END
 
-static MACHINE_CONFIG_START( headonb )
+MACHINE_CONFIG_START(headonb_state::headonb)
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", I8080A, XTAL_20MHz / 10) // divider guessed
+	MCFG_CPU_ADD("maincpu", I8080A, XTAL(20'000'000) / 10) // divider guessed
 	MCFG_CPU_PROGRAM_MAP(headonb_map)
 	MCFG_CPU_IO_MAP(headonb_io_map)
 	MCFG_CPU_VBLANK_INT_DRIVER("screen", headonb_state, irq0_line_hold) // where is irqack?

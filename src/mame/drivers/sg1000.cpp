@@ -123,7 +123,7 @@ WRITE8_MEMBER( sg1000_state::peripheral_w )
     ADDRESS_MAP( sg1000_map )
 -------------------------------------------------*/
 
-static ADDRESS_MAP_START( sg1000_map, AS_PROGRAM, 8, sg1000_state )
+ADDRESS_MAP_START(sg1000_state::sg1000_map)
 	AM_RANGE(0x0000, 0xbfff) AM_DEVREADWRITE(CARTSLOT_TAG, sega8_cart_slot_device, read_cart, write_cart)
 	AM_RANGE(0xc000, 0xc3ff) AM_MIRROR(0x3c00) AM_RAM
 ADDRESS_MAP_END
@@ -132,7 +132,7 @@ ADDRESS_MAP_END
     ADDRESS_MAP( sg1000_io_map )
 -------------------------------------------------*/
 
-static ADDRESS_MAP_START( sg1000_io_map, AS_IO, 8, sg1000_state )
+ADDRESS_MAP_START(sg1000_state::sg1000_io_map)
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	AM_RANGE(0x40, 0x40) AM_MIRROR(0x3f) AM_DEVWRITE(SN76489AN_TAG, sn76489a_device, write)
 	AM_RANGE(0x80, 0x80) AM_MIRROR(0x3e) AM_DEVREADWRITE(TMS9918A_TAG, tms9918a_device, vram_read, vram_write)
@@ -144,7 +144,7 @@ ADDRESS_MAP_END
     ADDRESS_MAP( omv_map )
 -------------------------------------------------*/
 
-static ADDRESS_MAP_START( omv_map, AS_PROGRAM, 8, sg1000_state )
+ADDRESS_MAP_START(sg1000_state::omv_map)
 	AM_RANGE(0x0000, 0xbfff) AM_READWRITE(omv_r, omv_w)
 	AM_RANGE(0xc000, 0xc7ff) AM_MIRROR(0x3800) AM_RAM
 ADDRESS_MAP_END
@@ -153,7 +153,7 @@ ADDRESS_MAP_END
     ADDRESS_MAP( omv_io_map )
 -------------------------------------------------*/
 
-static ADDRESS_MAP_START( omv_io_map, AS_IO, 8, sg1000_state )
+ADDRESS_MAP_START(sg1000_state::omv_io_map)
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	AM_RANGE(0x40, 0x40) AM_MIRROR(0x3f) AM_DEVWRITE(SN76489AN_TAG, sn76489a_device, write)
 	AM_RANGE(0x80, 0x80) AM_MIRROR(0x3e) AM_DEVREADWRITE(TMS9918A_TAG, tms9918a_device, vram_read, vram_write)
@@ -170,7 +170,7 @@ ADDRESS_MAP_END
     ADDRESS_MAP( sc3000_map )
 -------------------------------------------------*/
 
-static ADDRESS_MAP_START( sc3000_map, AS_PROGRAM, 8, sg1000_state )
+ADDRESS_MAP_START(sg1000_state::sc3000_map)
 	AM_RANGE(0x0000, 0xbfff) AM_DEVREADWRITE(CARTSLOT_TAG, sega8_cart_slot_device, read_cart, write_cart)
 	AM_RANGE(0xc000, 0xc7ff) AM_MIRROR(0x3800) AM_RAM
 ADDRESS_MAP_END
@@ -179,7 +179,7 @@ ADDRESS_MAP_END
     ADDRESS_MAP( sc3000_io_map )
 -------------------------------------------------*/
 
-static ADDRESS_MAP_START( sc3000_io_map, AS_IO, 8, sg1000_state )
+ADDRESS_MAP_START(sg1000_state::sc3000_io_map)
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	AM_RANGE(0x7f, 0x7f) AM_DEVWRITE(SN76489AN_TAG, sn76489a_device, write)
 	AM_RANGE(0xbe, 0xbe) AM_DEVREADWRITE(TMS9918A_TAG, tms9918a_device, vram_read, vram_write)
@@ -202,7 +202,7 @@ ADDRESS_MAP_END
     ADDRESS_MAP( sf7000_map )
 -------------------------------------------------*/
 
-static ADDRESS_MAP_START( sf7000_map, AS_PROGRAM, 8, sf7000_state )
+ADDRESS_MAP_START(sf7000_state::sf7000_map)
 	AM_RANGE(0x0000, 0x3fff) AM_READ_BANK("bank1") AM_WRITE_BANK("bank2")
 	AM_RANGE(0x4000, 0xffff) AM_RAM
 ADDRESS_MAP_END
@@ -211,7 +211,7 @@ ADDRESS_MAP_END
     ADDRESS_MAP( sf7000_io_map )
 -------------------------------------------------*/
 
-static ADDRESS_MAP_START( sf7000_io_map, AS_IO, 8, sf7000_state )
+ADDRESS_MAP_START(sf7000_state::sf7000_io_map)
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	AM_RANGE(0x7f, 0x7f) AM_DEVWRITE(SN76489AN_TAG, sn76489a_device, write)
 	AM_RANGE(0xbe, 0xbe) AM_DEVREADWRITE(TMS9918A_TAG, tms9918a_device, vram_read, vram_write)
@@ -517,14 +517,14 @@ void sf7000_state::machine_reset()
     MACHINE_CONFIG_START( sg1000 )
 -------------------------------------------------*/
 
-static MACHINE_CONFIG_START( sg1000 )
+MACHINE_CONFIG_START(sg1000_state::sg1000)
 	/* basic machine hardware */
-	MCFG_CPU_ADD(Z80_TAG, Z80, XTAL_10_738635MHz/3)
+	MCFG_CPU_ADD(Z80_TAG, Z80, XTAL(10'738'635)/3)
 	MCFG_CPU_PROGRAM_MAP(sg1000_map)
 	MCFG_CPU_IO_MAP(sg1000_io_map)
 
 	/* video hardware */
-	MCFG_DEVICE_ADD( TMS9918A_TAG, TMS9918A, XTAL_10_738635MHz / 2 )
+	MCFG_DEVICE_ADD( TMS9918A_TAG, TMS9918A, XTAL(10'738'635) / 2 )
 	MCFG_TMS9928A_VRAM_SIZE(0x4000)
 	MCFG_TMS9928A_OUT_INT_LINE_CB(INPUTLINE(Z80_TAG, INPUT_LINE_IRQ0))
 	MCFG_TMS9928A_SCREEN_ADD_NTSC( SCREEN_TAG )
@@ -533,7 +533,7 @@ static MACHINE_CONFIG_START( sg1000 )
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
 
-	MCFG_SOUND_ADD(SN76489AN_TAG, SN76489A, XTAL_10_738635MHz/3)
+	MCFG_SOUND_ADD(SN76489AN_TAG, SN76489A, XTAL(10'738'635)/3)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.00)
 
 	/* expansion slot */
@@ -551,10 +551,11 @@ static MACHINE_CONFIG_START( sg1000 )
 MACHINE_CONFIG_END
 
 /*-------------------------------------------------
-    MACHINE_CONFIG_DERIVED( omv, sg1000 )
+    MACHINE_CONFIG_START( omv )
 -------------------------------------------------*/
 
-static MACHINE_CONFIG_DERIVED( omv, sg1000 )
+MACHINE_CONFIG_START(sg1000_state::omv)
+	sg1000(config);
 	MCFG_CPU_MODIFY(Z80_TAG)
 	MCFG_CPU_PROGRAM_MAP(omv_map)
 	MCFG_CPU_IO_MAP(omv_io_map)
@@ -570,14 +571,14 @@ MACHINE_CONFIG_END
     MACHINE_CONFIG_START( sc3000 )
 -------------------------------------------------*/
 
-static MACHINE_CONFIG_START( sc3000 )
+MACHINE_CONFIG_START(sc3000_state::sc3000)
 	/* basic machine hardware */
-	MCFG_CPU_ADD(Z80_TAG, Z80, XTAL_10_738635MHz/3) // LH0080A
+	MCFG_CPU_ADD(Z80_TAG, Z80, XTAL(10'738'635)/3) // LH0080A
 	MCFG_CPU_PROGRAM_MAP(sc3000_map)
 	MCFG_CPU_IO_MAP(sc3000_io_map)
 
 	/* video hardware */
-	MCFG_DEVICE_ADD( TMS9918A_TAG, TMS9918A, XTAL_10_738635MHz / 2 )
+	MCFG_DEVICE_ADD( TMS9918A_TAG, TMS9918A, XTAL(10'738'635) / 2 )
 	MCFG_TMS9928A_VRAM_SIZE(0x4000)
 	MCFG_TMS9928A_OUT_INT_LINE_CB(INPUTLINE(Z80_TAG, INPUT_LINE_IRQ0))
 	MCFG_TMS9928A_SCREEN_ADD_NTSC( SCREEN_TAG )
@@ -586,7 +587,7 @@ static MACHINE_CONFIG_START( sc3000 )
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
 
-	MCFG_SOUND_ADD(SN76489AN_TAG, SN76489A, XTAL_10_738635MHz/3)
+	MCFG_SOUND_ADD(SN76489AN_TAG, SN76489A, XTAL(10'738'635)/3)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.00)
 
 	/* sc3000 has all sk1100 features built-in, so add it as a fixed slot */
@@ -608,14 +609,14 @@ MACHINE_CONFIG_END
     MACHINE_CONFIG_START( sf7000 )
 -------------------------------------------------*/
 
-static MACHINE_CONFIG_START( sf7000 )
+MACHINE_CONFIG_START(sf7000_state::sf7000)
 	/* basic machine hardware */
-	MCFG_CPU_ADD(Z80_TAG, Z80, XTAL_10_738635MHz/3)
+	MCFG_CPU_ADD(Z80_TAG, Z80, XTAL(10'738'635)/3)
 	MCFG_CPU_PROGRAM_MAP(sf7000_map)
 	MCFG_CPU_IO_MAP(sf7000_io_map)
 
 	/* video hardware */
-	MCFG_DEVICE_ADD( TMS9918A_TAG, TMS9918A, XTAL_10_738635MHz / 2 )
+	MCFG_DEVICE_ADD( TMS9918A_TAG, TMS9918A, XTAL(10'738'635) / 2 )
 	MCFG_TMS9928A_VRAM_SIZE(0x4000)
 	MCFG_TMS9928A_OUT_INT_LINE_CB(INPUTLINE(Z80_TAG, INPUT_LINE_IRQ0))
 	MCFG_TMS9928A_SCREEN_ADD_NTSC( SCREEN_TAG )
@@ -624,7 +625,7 @@ static MACHINE_CONFIG_START( sf7000 )
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
 
-	MCFG_SOUND_ADD(SN76489AN_TAG, SN76489A, XTAL_10_738635MHz/3)
+	MCFG_SOUND_ADD(SN76489AN_TAG, SN76489A, XTAL(10'738'635)/3)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.00)
 
 	/* devices */

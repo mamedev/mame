@@ -54,6 +54,9 @@ public:
 			m_maincpu(*this, "maincpu")
 	{ }
 
+	void speeddrv(machine_config &config);
+	void speeddrv_io(address_map &map);
+	void speeddrv_map(address_map &map);
 protected:
 
 	// devices
@@ -62,11 +65,11 @@ public:
 	DECLARE_DRIVER_INIT(speeddrv);
 };
 
-static ADDRESS_MAP_START( speeddrv_map, AS_PROGRAM, 32, speeddrv_state )
+ADDRESS_MAP_START(speeddrv_state::speeddrv_map)
 	AM_RANGE(0xfffc0000, 0xffffffff) AM_ROM AM_REGION("bios", 0 )
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( speeddrv_io, AS_IO, 32, speeddrv_state )
+ADDRESS_MAP_START(speeddrv_state::speeddrv_io)
 ADDRESS_MAP_END
 
 
@@ -75,7 +78,7 @@ INPUT_PORTS_END
 
 
 
-static MACHINE_CONFIG_START( speeddrv )
+MACHINE_CONFIG_START(speeddrv_state::speeddrv)
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", I486, 40000000 ) // ?? at least a pentium
 	MCFG_CPU_PROGRAM_MAP(speeddrv_map)

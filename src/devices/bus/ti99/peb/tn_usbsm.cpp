@@ -185,7 +185,7 @@ WRITE8_MEMBER(nouspikel_usb_smartmedia_device::cruwrite)
 */
 READ8Z_MEMBER(nouspikel_usb_smartmedia_device::readz)
 {
-	if (machine().side_effect_disabled()) return;
+	if (machine().side_effects_disabled()) return;
 
 	if (((offset & m_select_mask)==m_select_value) && m_selected)
 	{
@@ -236,7 +236,7 @@ READ8Z_MEMBER(nouspikel_usb_smartmedia_device::readz)
 */
 WRITE8_MEMBER(nouspikel_usb_smartmedia_device::write)
 {
-	if (machine().side_effect_disabled()) return;
+	if (machine().side_effects_disabled()) return;
 
 	if (((offset & m_select_mask)==m_select_value) && m_selected)
 	{
@@ -360,7 +360,7 @@ INPUT_PORTS_START( tn_usbsm )
 		PORT_DIPSETTING( 0x01, "Geneve mode")
 INPUT_PORTS_END
 
-MACHINE_CONFIG_MEMBER( nouspikel_usb_smartmedia_device::device_add_mconfig )
+MACHINE_CONFIG_START(nouspikel_usb_smartmedia_device::device_add_mconfig)
 	MCFG_DEVICE_ADD("smartmedia", SMARTMEDIA, 0)
 	MCFG_STRATAFLASH_ADD(STRATA_TAG)
 	MCFG_RAM_ADD(RAM1_TAG)

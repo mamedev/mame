@@ -533,6 +533,7 @@ the keypad symbols seem to use a different matrix pattern from the rest?
 #include "cpu/i86/i86.h"
 #include "machine/i8251.h"
 #include "machine/i8257.h"
+#include "machine/i8087.h"
 #include "machine/pic8259.h"
 #include "machine/pit8253.h"
 #include "machine/ram.h"
@@ -635,6 +636,11 @@ public:
 	uint8_t m_vram[24576];
 	uint8_t m_video_ctrl;
 
+	void fanucspmgm(machine_config &config);
+	void fanucspmg(machine_config &config);
+	void maincpu_io(address_map &map);
+	void maincpu_mem(address_map &map);
+	void subcpu_mem(address_map &map);
 private:
 	virtual void machine_reset() override;
 	int32_t m_vram_bank;
@@ -710,7 +716,7 @@ READ16_MEMBER(fanucspmg_state::magic_r)
 	return 0x0041;  // 31 = memory error
 }
 
-static ADDRESS_MAP_START(maincpu_mem, AS_PROGRAM, 16, fanucspmg_state)
+ADDRESS_MAP_START(fanucspmg_state::maincpu_mem)
 	AM_RANGE(0x00000, 0x7ffff) AM_RAM   // main RAM
 
 	AM_RANGE(0x80000, 0x81fff) AM_RAM   // believed to be shared RAM with a CPU inside the Program File
@@ -737,7 +743,7 @@ static ADDRESS_MAP_START(maincpu_mem, AS_PROGRAM, 16, fanucspmg_state)
 	AM_RANGE(0xfc000, 0xfffff) AM_ROM AM_REGION(MAINCPU_TAG, 0)
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START(maincpu_io, AS_IO, 16, fanucspmg_state)
+ADDRESS_MAP_START(fanucspmg_state::maincpu_io)
 ADDRESS_MAP_END
 
 WRITE_LINE_MEMBER(fanucspmg_state::vsync_w)
@@ -811,7 +817,7 @@ WRITE8_MEMBER(fanucspmg_state::video_ctrl_w)
 	m_video_ctrl = data;
 }
 
-static ADDRESS_MAP_START(subcpu_mem, AS_PROGRAM, 8, fanucspmg_state)
+ADDRESS_MAP_START(fanucspmg_state::subcpu_mem)
 	AM_RANGE(0x0000, 0x3fff) AM_ROM AM_REGION(SUBCPU_TAG, 0)
 
 	AM_RANGE(0x4000, 0x45ff) AM_READWRITE(vram1_r, vram1_w)
@@ -954,14 +960,22 @@ FLOPPY_FORMATS_MEMBER( fanucspmg_state::floppy_formats )
 	FLOPPY_IMD_FORMAT
 FLOPPY_FORMATS_END
 
-static MACHINE_CONFIG_START( fanucspmg )
+MACHINE_CONFIG_START(fanucspmg_state::fanucspmg)
 	/* basic machine hardware */
-	MCFG_CPU_ADD(MAINCPU_TAG, I8086, XTAL_15MHz/3)
+	MCFG_CPU_ADD(MAINCPU_TAG, I8086, XTAL(15'000'000)/3)
 	MCFG_CPU_PROGRAM_MAP(maincpu_mem)
 	MCFG_CPU_IO_MAP(maincpu_io)
 	MCFG_CPU_IRQ_ACKNOWLEDGE_DEVICE(PIC0_TAG, pic8259_device, inta_cb)
+	MCFG_I8086_ESC_OPCODE_HANDLER(DEVWRITE32("i8087", i8087_device, insn_w))
+	MCFG_I8086_ESC_DATA_HANDLER(DEVWRITE32("i8087", i8087_device, addr_w))
 
-	MCFG_CPU_ADD(SUBCPU_TAG, I8085A, XTAL_16MHz/2/2)
+	MCFG_DEVICE_ADD("i8087", I8087, XTAL(15'000'000)/3)
+	MCFG_DEVICE_PROGRAM_MAP(maincpu_mem)
+	MCFG_I8087_DATA_WIDTH(16)
+	//MCFG_I8087_INT_HANDLER(INPUTLINE("maincpu", INPUT_LINE_NMI))  // TODO: presumably this is connected to the pic
+	MCFG_I8087_BUSY_HANDLER(INPUTLINE("maincpu", INPUT_LINE_TEST))
+
+	MCFG_CPU_ADD(SUBCPU_TAG, I8085A, XTAL(16'000'000)/2/2)
 	MCFG_CPU_PROGRAM_MAP(subcpu_mem)
 
 	MCFG_DEVICE_ADD(USART0_TAG, I8251, 0)
@@ -970,15 +984,15 @@ static MACHINE_CONFIG_START( fanucspmg )
 	MCFG_DEVICE_ADD(USART3_TAG, I8251, 0)
 
 	MCFG_DEVICE_ADD(PIT0_TAG, PIT8253, 0)
-	MCFG_PIT8253_CLK0(XTAL_15MHz/12)
-	MCFG_PIT8253_CLK1(XTAL_15MHz/12)
-	MCFG_PIT8253_CLK2(XTAL_15MHz/12)
+	MCFG_PIT8253_CLK0(XTAL(15'000'000)/12)
+	MCFG_PIT8253_CLK1(XTAL(15'000'000)/12)
+	MCFG_PIT8253_CLK2(XTAL(15'000'000)/12)
 	MCFG_DEVICE_ADD(PIT1_TAG, PIT8253, 0)
-	MCFG_PIT8253_CLK0(XTAL_15MHz/12)
-	MCFG_PIT8253_CLK1(XTAL_15MHz/12)
-	MCFG_PIT8253_CLK2(XTAL_15MHz/12)
+	MCFG_PIT8253_CLK0(XTAL(15'000'000)/12)
+	MCFG_PIT8253_CLK1(XTAL(15'000'000)/12)
+	MCFG_PIT8253_CLK2(XTAL(15'000'000)/12)
 
-	MCFG_DEVICE_ADD(DMAC_TAG, I8257, XTAL_15MHz / 5)
+	MCFG_DEVICE_ADD(DMAC_TAG, I8257, XTAL(15'000'000) / 5)
 	MCFG_I8257_OUT_HRQ_CB(WRITELINE(fanucspmg_state, hrq_w))
 	MCFG_I8257_OUT_TC_CB(WRITELINE(fanucspmg_state, tc_w))
 	MCFG_I8257_IN_MEMR_CB(READ8(fanucspmg_state, memory_read_byte))
@@ -1002,20 +1016,21 @@ static MACHINE_CONFIG_START( fanucspmg )
 	MCFG_FLOPPY_DRIVE_ADD(FDC_TAG":1", fanuc_floppies, "525dd", fanucspmg_state::floppy_formats)
 
 	MCFG_SCREEN_ADD( SCREEN_TAG, RASTER)
-	MCFG_SCREEN_RAW_PARAMS(XTAL_15MHz, 640, 0, 512, 390, 0, 384 )
+	MCFG_SCREEN_RAW_PARAMS(XTAL(15'000'000), 640, 0, 512, 390, 0, 384 )
 	MCFG_SCREEN_UPDATE_DEVICE( CRTC_TAG, mc6845_device, screen_update )
 
-	MCFG_MC6845_ADD( CRTC_TAG, HD6845, SCREEN_TAG, XTAL_8MHz/2)
+	MCFG_MC6845_ADD( CRTC_TAG, HD6845, SCREEN_TAG, XTAL(8'000'000)/2)
 	MCFG_MC6845_SHOW_BORDER_AREA(false)
 	MCFG_MC6845_CHAR_WIDTH(8)
 	MCFG_MC6845_UPDATE_ROW_CB(fanucspmg_state, crtc_update_row)
 	MCFG_MC6845_OUT_VSYNC_CB(WRITELINE(fanucspmg_state, vsync_w))
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_DERIVED( fanucspmgm, fanucspmg )
+MACHINE_CONFIG_START(fanucspmg_state::fanucspmgm)
+	fanucspmg(config);
 	MCFG_DEVICE_REMOVE( CRTC_TAG )
 
-	MCFG_MC6845_ADD( CRTC_TAG, HD6845, SCREEN_TAG, XTAL_8MHz/2)
+	MCFG_MC6845_ADD( CRTC_TAG, HD6845, SCREEN_TAG, XTAL(8'000'000)/2)
 	MCFG_MC6845_SHOW_BORDER_AREA(false)
 	MCFG_MC6845_CHAR_WIDTH(8)
 	MCFG_MC6845_UPDATE_ROW_CB(fanucspmg_state, crtc_update_row_mono)

@@ -11,7 +11,7 @@
 
 #pragma once
 
-
+#include "bus/cbus/pc9801_cbus.h"
 #include "sound/ay8910.h"
 
 
@@ -48,7 +48,7 @@ private:
 
 	uint8_t m_ay3_latch;
 
-//  required_device<cpu_device>  m_maincpu;
+	required_device<pc9801_slot_device> m_bus;
 	required_device<ay8910_device>  m_ay1;
 	required_device<ay8910_device>  m_ay2;
 	required_device<ay8910_device>  m_ay3;

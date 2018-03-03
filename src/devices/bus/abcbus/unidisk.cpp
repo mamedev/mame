@@ -54,7 +54,7 @@ const tiny_rom_entry *unidisk_t::device_rom_region() const
 //  ADDRESS_MAP( unidisk_mem )
 //-------------------------------------------------
 
-static ADDRESS_MAP_START( unidisk_mem, AS_PROGRAM, 8, unidisk_t )
+ADDRESS_MAP_START(unidisk_t::unidisk_mem)
 	AM_RANGE(0x0000, 0x0fff) AM_ROM AM_REGION(TMS9995_TAG, 0)
 ADDRESS_MAP_END
 
@@ -63,7 +63,7 @@ ADDRESS_MAP_END
 //  ADDRESS_MAP( unidisk_io )
 //-------------------------------------------------
 
-static ADDRESS_MAP_START( unidisk_io, AS_IO, 8, unidisk_t )
+ADDRESS_MAP_START(unidisk_t::unidisk_io)
 ADDRESS_MAP_END
 
 
@@ -71,7 +71,7 @@ ADDRESS_MAP_END
 //  device_add_mconfig - add device configuration
 //-------------------------------------------------
 
-MACHINE_CONFIG_MEMBER( unidisk_t::device_add_mconfig )
+MACHINE_CONFIG_START(unidisk_t::device_add_mconfig)
 	MCFG_TMS99xx_ADD(TMS9995_TAG, TMS9995, 12000000, unidisk_mem, unidisk_io)
 MACHINE_CONFIG_END
 

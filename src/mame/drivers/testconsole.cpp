@@ -88,6 +88,9 @@ public:
 		output().set_digit_value((Dsp << 2) | offset, data);
 	}
 
+	void whousetc(machine_config &config);
+	void io_map(address_map &map);
+	void program_map(address_map &map);
 protected:
 	virtual void machine_reset() override
 	{
@@ -99,7 +102,7 @@ protected:
 };
 
 
-ADDRESS_MAP_START(program_map, AS_PROGRAM, 8, whouse_testcons_state)
+ADDRESS_MAP_START(whouse_testcons_state::program_map)
 	ADDRESS_MAP_UNMAP_HIGH
 	AM_RANGE(0x0000, 0x1fff) AM_ROM
 	AM_RANGE(0x2000, 0x2003) AM_DEVWRITE("dsp0", dl1416_device, bus_w)
@@ -114,7 +117,7 @@ ADDRESS_MAP_START(program_map, AS_PROGRAM, 8, whouse_testcons_state)
 	AM_RANGE(0x8803, 0x8803) AM_READ_PORT("row3")
 ADDRESS_MAP_END
 
-ADDRESS_MAP_START(io_map, AS_IO, 8, whouse_testcons_state)
+ADDRESS_MAP_START(whouse_testcons_state::io_map)
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	ADDRESS_MAP_UNMAP_HIGH
 	AM_RANGE(0x80, 0x87) AM_DEVREADWRITE("i8155", i8155_device, io_r, io_w)
@@ -165,12 +168,12 @@ INPUT_PORTS_START(whousetc)
 INPUT_PORTS_END
 
 
-MACHINE_CONFIG_START(whousetc)
-	MCFG_CPU_ADD("maincpu", I8085A, XTAL_6_144MHz)
+MACHINE_CONFIG_START(whouse_testcons_state::whousetc)
+	MCFG_CPU_ADD("maincpu", I8085A, 6.144_MHz_XTAL)
 	MCFG_CPU_PROGRAM_MAP(program_map)
 	MCFG_CPU_IO_MAP(io_map)
 
-	MCFG_DEVICE_ADD("i8155", I8155, XTAL_6_144MHz)
+	MCFG_DEVICE_ADD("i8155", I8155, 6.144_MHz_XTAL)
 
 	MCFG_DEVICE_ADD("i8255", I8255, 0)
 

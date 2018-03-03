@@ -79,4 +79,10 @@ public:
 	uint32_t screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 
 	void save_state();
+	void ginkun(machine_config &config);
+	void fstarfrc(machine_config &config);
+	void riot(machine_config &config);
+	void fstarfrc_map(address_map &map);
+	void ginkun_map(address_map &map);
+	void sound_map(address_map &map);
 };

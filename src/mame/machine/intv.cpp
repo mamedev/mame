@@ -275,7 +275,7 @@ WRITE8_MEMBER( intv_state::intvkbd_io_w )
 			m_sr1_int_pending = 0;
 			break;
 		default:
-			//logerror("%04X: Unknown write %02x to 0x40%02x\n",space.device().safe_pc(),data,offset);
+			//logerror("%04X: Unknown write %02x to 0x40%02x\n",m_keyboard->pc(),data,offset);
 			break;
 	}
 }

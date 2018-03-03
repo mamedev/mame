@@ -21,7 +21,7 @@
 //**************************************************************************
 
 #define MCFG_KONAMICPU_LINE_CB(_devcb) \
-	devcb = &konami_cpu_device::set_line_callback(*device, DEVCB_##_devcb);
+	devcb = &downcast<konami_cpu_device &>(*device).set_line_callback(DEVCB_##_devcb);
 
 
 // device type definition
@@ -36,7 +36,7 @@ public:
 	konami_cpu_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
 	// configuration
-	template<class _Object> static devcb_base &set_line_callback(device_t &device, _Object object) { return downcast<konami_cpu_device &>(device).m_set_lines.set_callback(object); }
+	template<class Object> devcb_base &set_line_callback(Object &&cb) { return m_set_lines.set_callback(std::forward<Object>(cb)); }
 
 protected:
 	// device-level overrides

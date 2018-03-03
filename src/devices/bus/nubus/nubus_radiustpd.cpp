@@ -37,7 +37,7 @@ DEFINE_DEVICE_TYPE(NUBUS_RADIUSTPD, nubus_radiustpd_device, "nb_rtpd", "Radius T
 //  device_add_mconfig - add device configuration
 //-------------------------------------------------
 
-MACHINE_CONFIG_MEMBER( nubus_radiustpd_device::device_add_mconfig )
+MACHINE_CONFIG_START(nubus_radiustpd_device::device_add_mconfig)
 	MCFG_SCREEN_ADD( RADIUSTPD_SCREEN_NAME, RASTER)
 	MCFG_SCREEN_UPDATE_DEVICE(DEVICE_SELF, nubus_radiustpd_device, screen_update)
 	MCFG_SCREEN_SIZE(1280, 960)
@@ -76,7 +76,7 @@ nubus_radiustpd_device::nubus_radiustpd_device(const machine_config &mconfig, de
 	m_vram32(nullptr), m_mode(0), m_vbl_disable(0), m_toggle(0), m_count(0), m_clutoffs(0), m_timer(nullptr),
 	m_assembled_tag(util::string_format("%s:%s", tag, RADIUSTPD_SCREEN_NAME))
 {
-	m_screen_tag = m_assembled_tag.c_str();
+	set_screen(m_assembled_tag.c_str());
 }
 
 //-------------------------------------------------
@@ -87,8 +87,6 @@ void nubus_radiustpd_device::device_start()
 {
 	uint32_t slotspace;
 
-	// set_nubus_device makes m_slot valid
-	set_nubus_device();
 	install_declaration_rom(this, RADIUSTPD_ROM_REGION, true, true);
 
 	slotspace = get_slotspace();
@@ -98,13 +96,13 @@ void nubus_radiustpd_device::device_start()
 	m_vram.resize(VRAM_SIZE);
 	m_vram32 = (uint32_t *)&m_vram[0];
 
-	m_nubus->install_device(slotspace, slotspace+VRAM_SIZE-1, read32_delegate(FUNC(nubus_radiustpd_device::vram_r), this), write32_delegate(FUNC(nubus_radiustpd_device::vram_w), this));
-	m_nubus->install_device(slotspace+0x900000, slotspace+VRAM_SIZE-1+0x900000, read32_delegate(FUNC(nubus_radiustpd_device::vram_r), this), write32_delegate(FUNC(nubus_radiustpd_device::vram_w), this));
-	m_nubus->install_device(slotspace+0x80000, slotspace+0xeffff, read32_delegate(FUNC(nubus_radiustpd_device::radiustpd_r), this), write32_delegate(FUNC(nubus_radiustpd_device::radiustpd_w), this));
-	m_nubus->install_device(slotspace+0x980000, slotspace+0x9effff, read32_delegate(FUNC(nubus_radiustpd_device::radiustpd_r), this), write32_delegate(FUNC(nubus_radiustpd_device::radiustpd_w), this));
+	nubus().install_device(slotspace, slotspace+VRAM_SIZE-1, read32_delegate(FUNC(nubus_radiustpd_device::vram_r), this), write32_delegate(FUNC(nubus_radiustpd_device::vram_w), this));
+	nubus().install_device(slotspace+0x900000, slotspace+VRAM_SIZE-1+0x900000, read32_delegate(FUNC(nubus_radiustpd_device::vram_r), this), write32_delegate(FUNC(nubus_radiustpd_device::vram_w), this));
+	nubus().install_device(slotspace+0x80000, slotspace+0xeffff, read32_delegate(FUNC(nubus_radiustpd_device::radiustpd_r), this), write32_delegate(FUNC(nubus_radiustpd_device::radiustpd_w), this));
+	nubus().install_device(slotspace+0x980000, slotspace+0x9effff, read32_delegate(FUNC(nubus_radiustpd_device::radiustpd_r), this), write32_delegate(FUNC(nubus_radiustpd_device::radiustpd_w), this));
 
 	m_timer = timer_alloc(0, nullptr);
-	m_timer->adjust(m_screen->time_until_pos(479, 0), 0);
+	m_timer->adjust(screen().time_until_pos(479, 0), 0);
 }
 
 //-------------------------------------------------
@@ -132,7 +130,7 @@ void nubus_radiustpd_device::device_timer(emu_timer &timer, device_timer_id tid,
 		raise_slot_irq();
 	}
 
-	m_timer->adjust(m_screen->time_until_pos(479, 0), 0);
+	m_timer->adjust(screen().time_until_pos(479, 0), 0);
 }
 
 /***************************************************************************

@@ -34,12 +34,17 @@ public:
 	uint32_t screen_update_x1pce(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 	DECLARE_INPUT_CHANGED_MEMBER(ipl_reset);
 	DECLARE_INPUT_CHANGED_MEMBER(nmi_reset);
+	void x1twin(machine_config &config);
+	void pce_io(address_map &map);
+	void pce_mem(address_map &map);
+	void x1_io(address_map &map);
+	void x1_mem(address_map &map);
 };
 
 
-#define X1_MAIN_CLOCK XTAL_16MHz
-#define VDP_CLOCK  XTAL_42_9545MHz
-#define MCU_CLOCK  XTAL_6MHz
+#define X1_MAIN_CLOCK XTAL(16'000'000)
+#define VDP_CLOCK  XTAL(42'954'545)
+#define MCU_CLOCK  XTAL(6'000'000)
 #define PCE_MAIN_CLOCK      VDP_CLOCK / 2
 
 uint32_t x1twin_state::screen_update_x1pce(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
@@ -47,18 +52,18 @@ uint32_t x1twin_state::screen_update_x1pce(screen_device &screen, bitmap_rgb32 &
 	return 0;
 }
 
-static ADDRESS_MAP_START( x1_mem, AS_PROGRAM, 8, x1twin_state )
+ADDRESS_MAP_START(x1twin_state::x1_mem)
 	ADDRESS_MAP_UNMAP_HIGH
 	AM_RANGE(0x0000, 0xffff) AM_READWRITE(x1_mem_r,x1_mem_w)
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( x1_io, AS_IO, 8, x1twin_state )
+ADDRESS_MAP_START(x1twin_state::x1_io)
 	ADDRESS_MAP_UNMAP_HIGH
-	AM_RANGE(0x0000, 0xffff) AM_READWRITE(x1_io_r, x1_io_w)
+	AM_RANGE(0x0000, 0xffff) AM_DEVICE("iobank", address_map_bank_device, amap8)
 ADDRESS_MAP_END
 
 #if 0
-static ADDRESS_MAP_START( pce_mem , AS_PROGRAM, 8, x1twin_state )
+ADDRESS_MAP_START(x1twin_state::pce_mem)
 	AM_RANGE( 0x000000, 0x09FFFF) AM_ROM
 	AM_RANGE( 0x1F0000, 0x1F1FFF) AM_RAM AM_MIRROR(0x6000)
 	AM_RANGE( 0x1FE000, 0x1FE3FF) AM_READWRITE( vdc_r, vdc_w )
@@ -69,7 +74,7 @@ static ADDRESS_MAP_START( pce_mem , AS_PROGRAM, 8, x1twin_state )
 	AM_RANGE( 0x1FF400, 0x1FF7FF) AM_DEVREADWRITE( "maincpu", h6280_device, irq_status_r, irq_status_w )
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( pce_io, AS_IO, 8, x1twin_state )
+ADDRESS_MAP_START(x1twin_state::pce_io)
 	AM_RANGE( 0x00, 0x03) AM_READWRITE( vdc_r, vdc_w )
 ADDRESS_MAP_END
 #endif
@@ -401,12 +406,19 @@ static SLOT_INTERFACE_START( x1_floppies )
 	SLOT_INTERFACE("dd", FLOPPY_525_DD)
 SLOT_INTERFACE_END
 
-static MACHINE_CONFIG_START( x1twin )
+MACHINE_CONFIG_START(x1twin_state::x1twin)
 	/* basic machine hardware */
 	MCFG_CPU_ADD("x1_cpu", Z80, X1_MAIN_CLOCK/4)
 	MCFG_CPU_PROGRAM_MAP(x1_mem)
 	MCFG_CPU_IO_MAP(x1_io)
 	MCFG_Z80_DAISY_CHAIN(x1_daisy)
+
+	MCFG_DEVICE_ADD("iobank", ADDRESS_MAP_BANK, 0)
+	MCFG_DEVICE_PROGRAM_MAP(x1_io_banks)
+	MCFG_ADDRESS_MAP_BANK_ENDIANNESS(ENDIANNESS_LITTLE)
+	MCFG_ADDRESS_MAP_BANK_DATA_WIDTH(8)
+	MCFG_ADDRESS_MAP_BANK_ADDR_WIDTH(17)
+	MCFG_ADDRESS_MAP_BANK_STRIDE(0x10000)
 
 	MCFG_DEVICE_ADD("ctc", Z80CTC, MAIN_CLOCK/4)
 	MCFG_Z80CTC_INTR_CB(INPUTLINE("x1_cpu", INPUT_LINE_IRQ0))
@@ -436,7 +448,7 @@ static MACHINE_CONFIG_START( x1twin )
 
 	MCFG_DEFAULT_LAYOUT(layout_dualhsxs)
 	/* video hardware */
-	MCFG_SCREEN_ADD("x1_screen", RASTER)
+	MCFG_SCREEN_ADD("screen", RASTER)
 	MCFG_SCREEN_REFRESH_RATE(60)
 	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500)) /* not accurate */
 	MCFG_SCREEN_SIZE(640, 480)
@@ -449,8 +461,8 @@ static MACHINE_CONFIG_START( x1twin )
 	MCFG_SCREEN_RAW_PARAMS(PCE_MAIN_CLOCK/2, huc6260_device::WPF, 70, 70 + 512 + 32, huc6260_device::LPF, 14, 14+242)
 	MCFG_SCREEN_UPDATE_DRIVER(x1twin_state, screen_update_x1pce)
 
-	MCFG_MC6845_ADD("crtc", H46505, "x1_screen", (VDP_CLOCK/48)) //unknown divider
-	MCFG_MC6845_SHOW_BORDER_AREA(false)
+	MCFG_MC6845_ADD("crtc", H46505, "screen", (VDP_CLOCK/48)) //unknown divider
+	MCFG_MC6845_SHOW_BORDER_AREA(true)
 	MCFG_MC6845_CHAR_WIDTH(8)
 
 	MCFG_PALETTE_ADD("palette", 0x10+0x1000)
@@ -461,6 +473,8 @@ static MACHINE_CONFIG_START( x1twin )
 	MCFG_VIDEO_START_OVERRIDE(x1twin_state,x1)
 
 	MCFG_MB8877_ADD("fdc", MAIN_CLOCK / 16)
+	// TODO: guesswork, try to implicitily start the motor
+	MCFG_WD_FDC_HLD_CALLBACK(WRITELINE(x1_state, hdl_w))
 
 	MCFG_FLOPPY_DRIVE_ADD("fdc:0", x1_floppies, "dd", x1_state::floppy_formats)
 	MCFG_FLOPPY_DRIVE_ADD("fdc:1", x1_floppies, "dd", x1_state::floppy_formats)

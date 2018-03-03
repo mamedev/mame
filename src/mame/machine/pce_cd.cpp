@@ -241,7 +241,7 @@ void pce_cd_device::nvram_init(nvram_device &nvram, void *data, size_t size)
 }
 
 // TODO: left and right speaker tags should be passed from the parent config, instead of using the hard-coded ones below!?!
- MACHINE_CONFIG_MEMBER( pce_cd_device::device_add_mconfig )
+ MACHINE_CONFIG_START(pce_cd_device::device_add_mconfig)
 	MCFG_NVRAM_ADD_CUSTOM_DRIVER("bram", pce_cd_device, nvram_init)
 
 	MCFG_CDROM_ADD("cdrom")
@@ -1072,7 +1072,7 @@ TIMER_CALLBACK_MEMBER(pce_cd_device::adpcm_fadein_callback)
 
 WRITE8_MEMBER(pce_cd_device::intf_w)
 {
-	logerror("%04X: write to CD interface offset %02X, data %02X\n", space.device().safe_pc(), offset, data);
+	logerror("%s write to CD interface offset %02X, data %02X\n", machine().describe_context(), offset, data);
 
 	switch (offset & 0xf)
 	{
@@ -1307,7 +1307,7 @@ READ8_MEMBER(pce_cd_device::intf_r)
 {
 	uint8_t data = m_regs[offset & 0x0F];
 
-	logerror("%04X: read from CD interface offset %02X\n", space.device().safe_pc(), offset );
+	logerror("%s: read from CD interface offset %02X\n", machine().describe_context(), offset );
 
 	switch (offset & 0xf)
 	{

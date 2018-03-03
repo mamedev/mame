@@ -140,7 +140,7 @@ WRITE_LINE_MEMBER( snug_bwg_device::fdc_drq_w )
 SETADDRESS_DBIN_MEMBER( snug_bwg_device::setaddress_dbin )
 {
 	// Do not allow setaddress for debugger
-	if (machine().side_effect_disabled()) return;
+	if (machine().side_effects_disabled()) return;
 
 	// Selection login in the PAL and some circuits on the board
 
@@ -219,7 +219,7 @@ void snug_bwg_device::debug_write(offs_t offset, uint8_t data)
 */
 READ8Z_MEMBER(snug_bwg_device::readz)
 {
-	if (machine().side_effect_disabled())
+	if (machine().side_effects_disabled())
 	{
 		debug_read(offset, value);
 		return;
@@ -289,7 +289,7 @@ READ8Z_MEMBER(snug_bwg_device::readz)
 */
 WRITE8_MEMBER(snug_bwg_device::write)
 {
-	if (machine().side_effect_disabled())
+	if (machine().side_effects_disabled())
 	{
 		debug_write(offset, data);
 		return;
@@ -693,8 +693,8 @@ ROM_START( bwg_fdc )
 	ROM_LOAD("bwg_dsr.u15", 0x0000, 0x8000, CRC(06f1ec89) SHA1(6ad77033ed268f986d9a5439e65f7d391c4b7651)) /* BwG disk DSR ROM */
 ROM_END
 
-MACHINE_CONFIG_MEMBER( snug_bwg_device::device_add_mconfig )
-	MCFG_WD1773_ADD(FDC_TAG, XTAL_8MHz)
+MACHINE_CONFIG_START(snug_bwg_device::device_add_mconfig)
+	MCFG_WD1773_ADD(FDC_TAG, XTAL(8'000'000))
 	MCFG_WD_FDC_INTRQ_CALLBACK(WRITELINE(snug_bwg_device, fdc_irq_w))
 	MCFG_WD_FDC_DRQ_CALLBACK(WRITELINE(snug_bwg_device, fdc_drq_w))
 

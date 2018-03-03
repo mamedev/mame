@@ -1213,7 +1213,7 @@ void k001005_device::device_start()
 
 	m_fifo = std::make_unique<uint32_t[]>(0x800);
 
-	m_renderer = auto_alloc(machine(), k001005_renderer(*this, *m_screen, m_k001006));
+	m_renderer = auto_alloc(machine(), k001005_renderer(*this, screen(), m_k001006));
 
 	save_pointer(NAME(m_ram[0].get()), 0x140000);
 	save_pointer(NAME(m_ram[1].get()), 0x140000);
@@ -1313,7 +1313,7 @@ READ32_MEMBER( k001005_device::read )
 			}
 
 		default:
-			//osd_printf_debug("m_r: %08X, %08X at %08X\n", offset, mem_mask, space.device().safe_pc());
+			//osd_printf_debug("m_r: %08X, %08X at %s\n", offset, mem_mask, machine().describe_context());
 			break;
 	}
 	return 0;
@@ -1327,7 +1327,7 @@ WRITE32_MEMBER( k001005_device::write )
 	{
 		case 0x000:         // FIFO write
 		{
-			//osd_printf_debug("K001005 FIFO write: %08X at %08X\n", data, space.device().safe_pc());
+			//osd_printf_debug("K001005 FIFO write: %08X at %s\n", data, machine().describe_context());
 			if (m_status != 1 && m_status != 2)
 			{
 				if (m_fifo_write_ptr < 0x400)
@@ -1344,7 +1344,7 @@ WRITE32_MEMBER( k001005_device::write )
 				dsp->set_flag_input(1, ASSERT_LINE);
 			}
 
-		//  osd_printf_debug("K001005 FIFO write: %08X at %08X\n", data, space.device().safe_pc());
+		//  osd_printf_debug("K001005 FIFO write: %08X at %s\n", data, machine().describe_context());
 			m_fifo[m_fifo_write_ptr] = data;
 			m_fifo_write_ptr++;
 			m_fifo_write_ptr &= 0x7ff;
@@ -1451,7 +1451,7 @@ WRITE32_MEMBER( k001005_device::write )
 			break;
 
 		default:
-			//osd_printf_debug("m_w: %08X, %08X, %08X at %08X\n", data, offset, mem_mask, space.device().safe_pc());
+			//osd_printf_debug("m_w: %08X, %08X, %08X at %s\n", data, offset, mem_mask, machine().describe_context());
 			break;
 	}
 
@@ -1460,9 +1460,4 @@ WRITE32_MEMBER( k001005_device::write )
 void k001005_device::draw( bitmap_rgb32 &bitmap, const rectangle &cliprect )
 {
 	m_renderer->draw(bitmap, cliprect);
-}
-
-void k001005_device::set_texel_chip(device_t &device, const char *tag)
-{
-	downcast<k001005_device &>(device).m_k001006_tag = tag;
 }

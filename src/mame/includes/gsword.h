@@ -64,6 +64,7 @@ public:
 
 	uint32_t screen_update_gsword(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	void draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprect);
+	void cpu1_map(address_map &map);
 };
 
 
@@ -96,6 +97,11 @@ public:
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
 
+	void gsword(machine_config &config);
+	void cpu1_io_map(address_map &map);
+	void cpu2_io_map(address_map &map);
+	void cpu2_map(address_map &map);
+	void cpu3_map(address_map &map);
 private:
 	required_device<generic_latch_8_device> m_soundlatch;
 	required_device<msm5205_device>         m_msm;
@@ -134,6 +140,10 @@ public:
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
 
+	void josvolly(machine_config &config);
+	void josvolly_cpu1_io_map(address_map &map);
+	void josvolly_cpu2_io_map(address_map &map);
+	void josvolly_cpu2_map(address_map &map);
 private:
 	bool    m_cpu2_nmi_enable;
 	u8      m_mcu1_p1;

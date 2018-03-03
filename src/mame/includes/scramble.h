@@ -93,6 +93,44 @@ public:
 	DECLARE_WRITE8_MEMBER( mrkougar_sh_irqtrigger_w );
 	IRQ_CALLBACK_MEMBER( scramble_sh_irq_callback );
 
+	void scramble(machine_config &config);
+	void hncholms(machine_config &config);
+	void cavelon(machine_config &config);
+	void harem(machine_config &config);
+	void ad2083(machine_config &config);
+	void ad2083_audio(machine_config &config);
+	void mrkougar(machine_config &config);
+	void mars(machine_config &config);
+	void hunchbks(machine_config &config);
+	void hotshock(machine_config &config);
+	void mariner(machine_config &config);
+	void devilfsh(machine_config &config);
+	void triplep(machine_config &config);
+	void newsin7(machine_config &config);
+	void mimonscr(machine_config &config);
+	void ckongs(machine_config &config);
+	void mrkougb(machine_config &config);
+	void ad2083_map(address_map &map);
+	void ad2083_sound_io_map(address_map &map);
+	void ad2083_sound_map(address_map &map);
+	void ckongs_map(address_map &map);
+	void decrypted_opcodes_map(address_map &map);
+	void harem_map(address_map &map);
+	void harem_sound_io_map(address_map &map);
+	void harem_sound_map(address_map &map);
+	void hotshock_map(address_map &map);
+	void hotshock_sound_io_map(address_map &map);
+	void hunchbks_map(address_map &map);
+	void hunchbks_readport(address_map &map);
+	void mars_map(address_map &map);
+	void mimonscr_map(address_map &map);
+	void mrkougar_map(address_map &map);
+	void newsin7_map(address_map &map);
+	void scramble_map(address_map &map);
+	void scramble_sound_io_map(address_map &map);
+	void scramble_sound_map(address_map &map);
+	void triplep_io_map(address_map &map);
+	void triplep_map(address_map &map);
 private:
 	void cavelon_banksw();
 	inline int bit(int i,int n);
@@ -108,7 +146,3 @@ private:
 	std::unique_ptr<uint8_t[]> m_harem_decrypted_data;
 	std::unique_ptr<uint8_t[]> m_harem_decrypted_opcodes;
 };
-
-/*----------- defined in audio/scramble.cpp -----------*/
-
-MACHINE_CONFIG_EXTERN( ad2083_audio );

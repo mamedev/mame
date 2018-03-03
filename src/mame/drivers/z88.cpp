@@ -148,7 +148,7 @@ UPD65031_MEMORY_UPDATE(z88_state::bankswitch_update)
 }
 
 
-static ADDRESS_MAP_START(z88_mem, AS_PROGRAM, 8, z88_state )
+ADDRESS_MAP_START(z88_state::z88_mem)
 	AM_RANGE(0x0000, 0x1fff) AM_READWRITE_BANK("bank1")
 	AM_RANGE(0x2000, 0x3fff) AM_READWRITE_BANK("bank2")
 	AM_RANGE(0x4000, 0x7fff) AM_READWRITE_BANK("bank3")
@@ -156,7 +156,7 @@ static ADDRESS_MAP_START(z88_mem, AS_PROGRAM, 8, z88_state )
 	AM_RANGE(0xc000, 0xffff) AM_READWRITE_BANK("bank5")
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( z88_io, AS_IO, 8, z88_state )
+ADDRESS_MAP_START(z88_state::z88_io)
 	AM_RANGE(0x0000, 0xffff)    AM_DEVREADWRITE("blink", upd65031_device, read, write)
 ADDRESS_MAP_END
 
@@ -621,9 +621,9 @@ static SLOT_INTERFACE_START(z88_cart)
 	SLOT_INTERFACE("1024kflash", Z88_1024K_FLASH)    // 1024KB Flash cart
 SLOT_INTERFACE_END
 
-static MACHINE_CONFIG_START( z88 )
+MACHINE_CONFIG_START(z88_state::z88)
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", Z80, XTAL_9_8304MHz/3)  // divided by 3 through the uPD65031
+	MCFG_CPU_ADD("maincpu", Z80, XTAL(9'830'400)/3)  // divided by 3 through the uPD65031
 	MCFG_CPU_PROGRAM_MAP(z88_mem)
 	MCFG_CPU_IO_MAP(z88_io)
 
@@ -641,7 +641,7 @@ static MACHINE_CONFIG_START( z88 )
 
 	MCFG_DEFAULT_LAYOUT(layout_lcd)
 
-	MCFG_DEVICE_ADD("blink", UPD65031, XTAL_9_8304MHz)
+	MCFG_DEVICE_ADD("blink", UPD65031, XTAL(9'830'400))
 	MCFG_UPD65031_KB_CALLBACK(READ8(z88_state, kb_r))
 	MCFG_UPD65031_INT_CALLBACK(INPUTLINE("maincpu", INPUT_LINE_IRQ0))
 	MCFG_UPD65031_NMI_CALLBACK(INPUTLINE("maincpu", INPUT_LINE_NMI))

@@ -144,7 +144,7 @@ READ16_MEMBER(bishi_state::bishi_K056832_rom_r)
 	return m_k056832->bishi_rom_word_r(space, ouroffs, mem_mask);
 }
 
-static ADDRESS_MAP_START( main_map, AS_PROGRAM, 16, bishi_state )
+ADDRESS_MAP_START(bishi_state::main_map)
 	AM_RANGE(0x000000, 0x0fffff) AM_ROM
 	AM_RANGE(0x400000, 0x407fff) AM_RAM                     // Work RAM
 	AM_RANGE(0x800000, 0x800001) AM_READWRITE(control_r, control_w)
@@ -159,7 +159,7 @@ static ADDRESS_MAP_START( main_map, AS_PROGRAM, 16, bishi_state )
 	AM_RANGE(0x870000, 0x8700ff) AM_DEVWRITE("k055555", k055555_device, K055555_word_w)  // PCU2
 	AM_RANGE(0x880000, 0x880003) AM_DEVREADWRITE8("ymz", ymz280b_device, read, write, 0xff00)
 	AM_RANGE(0xa00000, 0xa01fff) AM_DEVREADWRITE("k056832", k056832_device, ram_word_r, ram_word_w)  // Graphic planes
-	AM_RANGE(0xb00000, 0xb03fff) AM_RAM_DEVWRITE("palette", palette_device, write) AM_SHARE("palette")
+	AM_RANGE(0xb00000, 0xb03fff) AM_RAM_DEVWRITE("palette", palette_device, write16) AM_SHARE("palette")
 	AM_RANGE(0xb04000, 0xb047ff) AM_READ(bishi_mirror_r)    // bug in the ram/rom test?
 	AM_RANGE(0xc00000, 0xc01fff) AM_READ(bishi_K056832_rom_r)
 ADDRESS_MAP_END
@@ -444,7 +444,7 @@ void bishi_state::machine_reset()
 	m_cur_control2 = 0;
 }
 
-static MACHINE_CONFIG_START( bishi )
+MACHINE_CONFIG_START(bishi_state::bishi)
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", M68000, CPU_CLOCK) /* 12MHz (24MHz OSC / 2 ) */
@@ -484,7 +484,8 @@ static MACHINE_CONFIG_START( bishi )
 	MCFG_SOUND_ROUTE(1, "rspeaker", 1.0)
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_DERIVED( dobouchn, bishi )
+MACHINE_CONFIG_START(bishi_state::dobouchn)
+	bishi(config);
 //  TODO: change accordingly (ASCII charset definitely not 8bpp, 5bpp perhaps?)
 	MCFG_DEVICE_MODIFY("k056832")
 //  MCFG_K056832_CB(bishi_state, dobouchn_tile_callback)

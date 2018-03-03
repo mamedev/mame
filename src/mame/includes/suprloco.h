@@ -46,4 +46,8 @@ public:
 	inline void draw_pixel(bitmap_ind16 &bitmap,const rectangle &cliprect,int x,int y,int color,int flip);
 	void draw_sprite(bitmap_ind16 &bitmap,const rectangle &cliprect,int spr_number);
 	void draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprect);
+	void suprloco(machine_config &config);
+	void decrypted_opcodes_map(address_map &map);
+	void main_map(address_map &map);
+	void sound_map(address_map &map);
 };

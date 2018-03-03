@@ -60,7 +60,7 @@ WRITE8_MEMBER(dogfgt_state::dogfgt_soundcontrol_w)
 
 
 
-static ADDRESS_MAP_START( main_map, AS_PROGRAM, 8, dogfgt_state )
+ADDRESS_MAP_START(dogfgt_state::main_map)
 	AM_RANGE(0x0000, 0x07ff) AM_READWRITE(sharedram_r, sharedram_w) AM_SHARE("sharedram")
 	AM_RANGE(0x0f80, 0x0fdf) AM_WRITEONLY AM_SHARE("spriteram")
 	AM_RANGE(0x1000, 0x17ff) AM_WRITE(dogfgt_bgvideoram_w) AM_SHARE("bgvideoram")
@@ -74,12 +74,12 @@ static ADDRESS_MAP_START( main_map, AS_PROGRAM, 8, dogfgt_state )
 	AM_RANGE(0x1830, 0x1830) AM_READ_PORT("DSW2")
 	AM_RANGE(0x1830, 0x1830) AM_WRITE(dogfgt_soundlatch_w)
 	AM_RANGE(0x1840, 0x1840) AM_WRITE(dogfgt_soundcontrol_w)
-	AM_RANGE(0x1870, 0x187f) AM_DEVWRITE("palette", palette_device, write) AM_SHARE("palette")
+	AM_RANGE(0x1870, 0x187f) AM_DEVWRITE("palette", palette_device, write8) AM_SHARE("palette")
 	AM_RANGE(0x2000, 0x3fff) AM_READWRITE(dogfgt_bitmapram_r, dogfgt_bitmapram_w)
 	AM_RANGE(0x8000, 0xffff) AM_ROM
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( sub_map, AS_PROGRAM, 8, dogfgt_state )
+ADDRESS_MAP_START(dogfgt_state::sub_map)
 	AM_RANGE(0x0000, 0x07ff) AM_RAM
 	AM_RANGE(0x2000, 0x27ff) AM_READWRITE(sharedram_r, sharedram_w)
 	AM_RANGE(0x4000, 0x4000) AM_WRITE(sub_irqack_w)
@@ -237,7 +237,7 @@ void dogfgt_state::machine_reset()
 }
 
 
-static MACHINE_CONFIG_START( dogfgt )
+MACHINE_CONFIG_START(dogfgt_state::dogfgt)
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", M6502, 1500000) /* 1.5 MHz ???? */

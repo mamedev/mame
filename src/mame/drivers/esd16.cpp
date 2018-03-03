@@ -90,7 +90,7 @@ WRITE16_MEMBER(esd16_state::esd16_sound_command_w)
 	{
 		m_soundlatch->write(space, 0, data & 0xff);
 		m_audiocpu->set_input_line(0, ASSERT_LINE);      // Generate an IRQ
-		space.device().execute().spin_until_time(attotime::from_usec(50));  // Allow the other CPU to reply
+		m_maincpu->spin_until_time(attotime::from_usec(50));  // Allow the other CPU to reply
 	}
 }
 
@@ -110,7 +110,7 @@ READ16_MEMBER(esd16_state::esd_eeprom_r)
 		return ((m_eeprom->do_read() & 0x01) << 15);
 	}
 
-//  logerror("(0x%06x) unk EEPROM read: %04x\n", space.device().safe_pc(), mem_mask);
+//  logerror("(0x%06x) unk EEPROM read: %04x\n", m_maincpu->pc(), mem_mask);
 	return 0;
 }
 
@@ -119,7 +119,7 @@ WRITE16_MEMBER(esd16_state::esd_eeprom_w)
 	if (ACCESSING_BITS_8_15)
 		ioport("EEPROMOUT")->write(data, 0xffff);
 
-//  logerror("(0x%06x) Unk EEPROM write: %04x %04x\n", space.device().safe_pc(), data, mem_mask);
+//  logerror("(0x%06x) Unk EEPROM write: %04x %04x\n", m_maincpu->pc(), data, mem_mask);
 }
 
 
@@ -149,7 +149,7 @@ WRITE16_MEMBER(esd16_state::esd_eeprom_w)
 	AM_RANGE(_BASE + 0xc, _BASE + 0xd) AM_WRITENOP \
 	AM_RANGE(_BASE + 0xe, _BASE + 0xf) AM_WRITEONLY AM_SHARE("head_layersize")
 #define ESD16_PALETTE_AREA( _BASE ) \
-	AM_RANGE(_BASE + 0x000, _BASE + 0xfff) AM_RAM_DEVWRITE("palette", palette_device, write) AM_SHARE("palette")
+	AM_RANGE(_BASE + 0x000, _BASE + 0xfff) AM_RAM_DEVWRITE("palette", palette_device, write16) AM_SHARE("palette")
 #define ESD16_SPRITE_AREA( _BASE ) \
 	AM_RANGE(_BASE + 0x000, _BASE + 0x7ff) AM_WRITEONLY AM_SHARE("spriteram") AM_MIRROR(0x000800)
 #define ESD16_VRAM_AREA( _BASE ) \
@@ -157,7 +157,7 @@ WRITE16_MEMBER(esd16_state::esd_eeprom_w)
 	AM_RANGE(_BASE + 0x20000, _BASE + 0x23fff) AM_WRITE(esd16_vram_1_w) AM_SHARE("vram_1") AM_MIRROR(0x4000)
 /*** Memory Maps ***/
 
-static ADDRESS_MAP_START( multchmp_map, AS_PROGRAM, 16, esd16_state )
+ADDRESS_MAP_START(esd16_state::multchmp_map)
 	AM_RANGE(0x000000, 0x07ffff) AM_ROM
 	AM_RANGE(0x100000, 0x10ffff) AM_RAM
 
@@ -170,7 +170,7 @@ static ADDRESS_MAP_START( multchmp_map, AS_PROGRAM, 16, esd16_state )
 	AM_RANGE(0x700008, 0x70000b) AM_READNOP // unused protection?
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( jumppop_map, AS_PROGRAM, 16, esd16_state )
+ADDRESS_MAP_START(esd16_state::jumppop_map)
 	AM_RANGE(0x000000, 0x07ffff) AM_ROM
 	AM_RANGE(0x120000, 0x123fff) AM_RAM
 	AM_RANGE(0x1a0000, 0x1a7fff) AM_RAM
@@ -184,7 +184,7 @@ static ADDRESS_MAP_START( jumppop_map, AS_PROGRAM, 16, esd16_state )
 	ESD16_VID_ATTR_AREA( 0x380000 )
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( hedpanic_map, AS_PROGRAM, 16, esd16_state )
+ADDRESS_MAP_START(esd16_state::hedpanic_map)
 	AM_RANGE(0x000000, 0x07ffff) AM_ROM
 	AM_RANGE(0x100000, 0x10ffff) AM_RAM
 
@@ -199,7 +199,7 @@ ADDRESS_MAP_END
 
 /* Multi Champ Deluxe, like Head Panic but different addresses */
 
-static ADDRESS_MAP_START( mchampdx_map, AS_PROGRAM, 16, esd16_state )
+ADDRESS_MAP_START(esd16_state::mchampdx_map)
 	AM_RANGE(0x000000, 0x07ffff) AM_ROM
 	AM_RANGE(0x200000, 0x20ffff) AM_RAM
 
@@ -214,7 +214,7 @@ ADDRESS_MAP_END
 
 /* Tang Tang & Deluxe 5 - like the others but again with different addresses */
 
-static ADDRESS_MAP_START( tangtang_map, AS_PROGRAM, 16, esd16_state )
+ADDRESS_MAP_START(esd16_state::tangtang_map)
 	AM_RANGE(0x000000, 0x07ffff) AM_ROM
 	AM_RANGE(0x700000, 0x70ffff) AM_RAM
 
@@ -241,7 +241,7 @@ WRITE8_MEMBER(esd16_state::esd16_sound_rombank_w)
 	membank("bank1")->set_entry(bank);
 }
 
-static ADDRESS_MAP_START( multchmp_sound_map, AS_PROGRAM, 8, esd16_state )
+ADDRESS_MAP_START(esd16_state::multchmp_sound_map)
 	AM_RANGE(0x0000, 0x7fff) AM_ROM                         // ROM
 	AM_RANGE(0x8000, 0xbfff) AM_ROMBANK("bank1")                    // Banked ROM
 	AM_RANGE(0xf800, 0xffff) AM_RAM                         // RAM
@@ -254,7 +254,7 @@ READ8_MEMBER(esd16_state::esd16_sound_command_r)
 	return m_soundlatch->read(space, 0);
 }
 
-static ADDRESS_MAP_START( multchmp_sound_io_map, AS_IO, 8, esd16_state )
+ADDRESS_MAP_START(esd16_state::multchmp_sound_io_map)
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	AM_RANGE(0x00, 0x01) AM_DEVWRITE("ymsnd", ym3812_device, write)          // YM3812
 	AM_RANGE(0x02, 0x02) AM_DEVREADWRITE("oki", okim6295_device, read, write)   // M6295
@@ -605,14 +605,14 @@ DECOSPR_PRIORITY_CB_MEMBER(esd16_state::hedpanic_pri_callback)
 		return 0; // above everything
 }
 
-static MACHINE_CONFIG_START( esd16 )
+MACHINE_CONFIG_START(esd16_state::esd16)
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu",M68000, XTAL_16MHz)  /* 16MHz */
+	MCFG_CPU_ADD("maincpu",M68000, XTAL(16'000'000))  /* 16MHz */
 	MCFG_CPU_PROGRAM_MAP(multchmp_map)
 	MCFG_CPU_VBLANK_INT_DRIVER("screen", esd16_state,  irq6_line_hold)
 
-	MCFG_CPU_ADD("audiocpu", Z80, XTAL_16MHz/4) /* 4MHz */
+	MCFG_CPU_ADD("audiocpu", Z80, XTAL(16'000'000)/4) /* 4MHz */
 	MCFG_CPU_PROGRAM_MAP(multchmp_sound_map)
 	MCFG_CPU_IO_MAP(multchmp_sound_io_map)
 	MCFG_CPU_PERIODIC_INT_DRIVER(esd16_state, nmi_line_pulse, 32*60)    /* IRQ By Main CPU */
@@ -644,15 +644,16 @@ static MACHINE_CONFIG_START( esd16 )
 
 	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
 
-	MCFG_SOUND_ADD("ymsnd", YM3812, XTAL_16MHz/4)   /* 4MHz */
+	MCFG_SOUND_ADD("ymsnd", YM3812, XTAL(16'000'000)/4)   /* 4MHz */
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.30)
 
-	MCFG_OKIM6295_ADD("oki", XTAL_16MHz/16, PIN7_HIGH) /* 1MHz */
+	MCFG_OKIM6295_ADD("oki", XTAL(16'000'000)/16, PIN7_HIGH) /* 1MHz */
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.60)
 MACHINE_CONFIG_END
 
 
-static MACHINE_CONFIG_DERIVED( jumppop, esd16 )
+MACHINE_CONFIG_START(esd16_state::jumppop)
+	esd16(config);
 
 	/* basic machine hardware */
 
@@ -660,20 +661,21 @@ static MACHINE_CONFIG_DERIVED( jumppop, esd16 )
 	MCFG_CPU_PROGRAM_MAP(jumppop_map)
 
 	MCFG_CPU_MODIFY("audiocpu")
-	MCFG_CPU_CLOCK( XTAL_14MHz/4) /* 3.5MHz - Verified */
+	MCFG_CPU_CLOCK( XTAL(14'000'000)/4) /* 3.5MHz - Verified */
 
 	MCFG_GFXDECODE_MODIFY("gfxdecode", jumppop)
 
-	MCFG_SOUND_REPLACE("ymsnd", YM3812, XTAL_14MHz/4) /* 3.5MHz - Verified */
+	MCFG_SOUND_REPLACE("ymsnd", YM3812, XTAL(14'000'000)/4) /* 3.5MHz - Verified */
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.30)
 
-	MCFG_OKIM6295_REPLACE("oki", XTAL_14MHz/16, PIN7_HIGH) /* 875kHz - Verified */
+	MCFG_OKIM6295_REPLACE("oki", XTAL(14'000'000)/16, PIN7_HIGH) /* 875kHz - Verified */
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.60)
 MACHINE_CONFIG_END
 
 /* The ESD 05-28-99 PCB adds an EEPROM */
 
-static MACHINE_CONFIG_DERIVED( hedpanio, esd16 )
+MACHINE_CONFIG_START(esd16_state::hedpanio)
+	esd16(config);
 	/* basic machine hardware */
 	MCFG_CPU_MODIFY("maincpu")
 	MCFG_CPU_PROGRAM_MAP(hedpanic_map)
@@ -683,19 +685,22 @@ MACHINE_CONFIG_END
 
 /* The ESD 08-26-1999 PCBs take that further and modify the sprite offsets */
 
-static MACHINE_CONFIG_DERIVED( hedpanic, hedpanio )
+MACHINE_CONFIG_START(esd16_state::hedpanic)
+	hedpanio(config);
 	MCFG_DEVICE_MODIFY("spritegen")
 	MCFG_DECO_SPRITE_OFFSETS(-0x18, -0x100)
 MACHINE_CONFIG_END
 
 /* ESD 08-26-1999 PCBs with different memory maps */
 
-static MACHINE_CONFIG_DERIVED( mchampdx, hedpanic )
+MACHINE_CONFIG_START(esd16_state::mchampdx)
+	hedpanic(config);
 	MCFG_CPU_MODIFY("maincpu")
 	MCFG_CPU_PROGRAM_MAP(mchampdx_map)
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_DERIVED( tangtang, hedpanic )
+MACHINE_CONFIG_START(esd16_state::tangtang)
+	hedpanic(config);
 	MCFG_CPU_MODIFY("maincpu")
 	MCFG_CPU_PROGRAM_MAP(tangtang_map)
 MACHINE_CONFIG_END
@@ -933,6 +938,9 @@ ROM_START( mchampdx )
 
 	ROM_REGION( 0x40000, "oki", 0 ) /* Samples */
 	ROM_LOAD( "ver0106_esd4.su10", 0x00000, 0x40000, CRC(ac8ae009) SHA1(2c1c30cc4b3e34a5f14d7dfb6f6e18ff21f526f5) )
+
+	ROM_REGION16_BE( 0x80, "eeprom", ROMREGION_ERASE00 ) // factory default settings because game doesn't init them properly otherwise
+	ROM_LOAD16_WORD_SWAP( "eeprom", 0x0000, 0x0080, CRC(646b2f53) SHA1(f6673f68084b63a69c612a03c58f57435d5a9496) )
 ROM_END
 
 ROM_START( mchampdxa )
@@ -956,6 +964,9 @@ ROM_START( mchampdxa )
 
 	ROM_REGION( 0x40000, "oki", 0 ) /* Samples */
 	ROM_LOAD( "esd4.su10", 0x00000, 0x40000, CRC(2fbe94ab) SHA1(1bc4a33ec93a80fb598722d2b50bdf3ccaaa984a) )
+
+	ROM_REGION16_BE( 0x80, "eeprom", ROMREGION_ERASE00 ) // factory default settings because game doesn't init them properly otherwise
+	ROM_LOAD16_WORD_SWAP( "eeprom", 0x0000, 0x0080, CRC(646b2f53) SHA1(f6673f68084b63a69c612a03c58f57435d5a9496) )
 ROM_END
 
 ROM_START( mchampdxb )
@@ -979,6 +990,9 @@ ROM_START( mchampdxb )
 
 	ROM_REGION( 0x40000, "oki", 0 ) /* Samples */
 	ROM_LOAD( "esd4.su10", 0x00000, 0x40000, CRC(2fbe94ab) SHA1(1bc4a33ec93a80fb598722d2b50bdf3ccaaa984a) )
+
+	ROM_REGION16_BE( 0x80, "eeprom", ROMREGION_ERASE00 ) // factory default settings because game doesn't init them properly otherwise
+	ROM_LOAD16_WORD_SWAP( "eeprom1114", 0x0000, 0x0080, CRC(427d90d2) SHA1(39983f9b22b1e9221f7f745f7e84ddcf44d03a08) )
 ROM_END
 
 /***************************************************************************
@@ -1248,6 +1262,9 @@ ROM_START( deluxe5 ) /* Deluxe 5 */
 
 	ROM_REGION( 0x40000, "oki", 0 ) /* Samples */
 	ROM_LOAD( "esd4.su10", 0x00000, 0x20000, CRC(23f2b7d9) SHA1(328c951d14674760df68486841c933bad0d59fe3) ) /* AT27C010 mask rom */
+
+	ROM_REGION16_BE( 0x80, "eeprom", ROMREGION_ERASE00 ) // factory default settings because game doesn't init them properly otherwise
+	ROM_LOAD16_WORD_SWAP( "eeprom", 0x0000, 0x0080, CRC(4539a8a0) SHA1(b882110b489e61ac5421fbe3551d9ee323b5d86b) )
 ROM_END
 
 ROM_START( deluxe5a ) /* Deluxe 5 */
@@ -1271,6 +1288,9 @@ ROM_START( deluxe5a ) /* Deluxe 5 */
 
 	ROM_REGION( 0x40000, "oki", 0 ) /* Samples */
 	ROM_LOAD( "esd4.su10", 0x00000, 0x20000, CRC(23f2b7d9) SHA1(328c951d14674760df68486841c933bad0d59fe3) ) /* AT27C010 mask rom */
+
+	ROM_REGION16_BE( 0x80, "eeprom", ROMREGION_ERASE00 ) // factory default settings because game doesn't init them properly otherwise
+	ROM_LOAD16_WORD_SWAP( "eeprom", 0x0000, 0x0080, CRC(4539a8a0) SHA1(b882110b489e61ac5421fbe3551d9ee323b5d86b) )
 ROM_END
 
 ROM_START( deluxe5b ) /* Deluxe 5 */
@@ -1294,6 +1314,9 @@ ROM_START( deluxe5b ) /* Deluxe 5 */
 
 	ROM_REGION( 0x40000, "oki", 0 ) /* Samples */
 	ROM_LOAD( "esd4.su10", 0x00000, 0x20000, CRC(23f2b7d9) SHA1(328c951d14674760df68486841c933bad0d59fe3) ) /* AT27C010 mask rom */
+
+	ROM_REGION16_BE( 0x80, "eeprom", ROMREGION_ERASE00 ) // factory default settings because game doesn't init them properly otherwise
+	ROM_LOAD16_WORD_SWAP( "eeprom", 0x0000, 0x0080, CRC(4539a8a0) SHA1(b882110b489e61ac5421fbe3551d9ee323b5d86b) )
 ROM_END
 
 
@@ -1318,6 +1341,9 @@ ROM_START( deluxe4u ) /* Deluxe 4 U - Removes Blackjack game, but otherwise same
 
 	ROM_REGION( 0x40000, "oki", 0 ) /* Samples */
 	ROM_LOAD( "esd4.su10", 0x00000, 0x20000, CRC(23f2b7d9) SHA1(328c951d14674760df68486841c933bad0d59fe3) ) /* AT27C010 mask rom */
+
+	ROM_REGION16_BE( 0x80, "eeprom", ROMREGION_ERASE00 ) // factory default settings because game doesn't init them properly otherwise
+	ROM_LOAD16_WORD_SWAP( "eeprom", 0x0000, 0x0080, CRC(4539a8a0) SHA1(b882110b489e61ac5421fbe3551d9ee323b5d86b) )
 ROM_END
 
 

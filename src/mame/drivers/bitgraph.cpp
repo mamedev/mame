@@ -139,6 +139,12 @@ public:
 	DECLARE_WRITE8_MEMBER(ppu_write);
 	DECLARE_WRITE8_MEMBER(ppu_i8243_w);
 
+	void bg_motherboard(machine_config &config);
+	void bitgrpha(machine_config &config);
+	void bitgrphb(machine_config &config);
+	void bitgrapha_mem(address_map &map);
+	void bitgraphb_mem(address_map &map);
+	void ppu_io(address_map &map);
 private:
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
@@ -164,7 +170,7 @@ private:
 	uint8_t m_ppu[4];
 };
 
-static ADDRESS_MAP_START(bitgrapha_mem, AS_PROGRAM, 16, bitgraph_state)
+ADDRESS_MAP_START(bitgraph_state::bitgrapha_mem)
 	ADDRESS_MAP_UNMAP_HIGH
 	AM_RANGE(0x000000, 0x007fff) AM_ROM
 	AM_RANGE(0x010000, 0x010001) AM_DEVREADWRITE8(ACIA0_TAG, acia6850_device, data_r, data_w, 0xff00)   // HOST
@@ -181,7 +187,7 @@ static ADDRESS_MAP_START(bitgrapha_mem, AS_PROGRAM, 16, bitgraph_state)
 	AM_RANGE(0x3e0000, 0x3fffff) AM_RAM
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START(bitgraphb_mem, AS_PROGRAM, 16, bitgraph_state)
+ADDRESS_MAP_START(bitgraph_state::bitgraphb_mem)
 	ADDRESS_MAP_UNMAP_HIGH
 	AM_RANGE(0x000000, 0x007fff) AM_ROM
 	AM_RANGE(0x010000, 0x010001) AM_DEVREADWRITE8(ACIA0_TAG, acia6850_device, data_r, data_w, 0xff00)   // HOST
@@ -424,7 +430,7 @@ WRITE8_MEMBER(bitgraph_state::ppu_write)
 }
 
 #ifdef UNUSED_FUNCTION
-static ADDRESS_MAP_START(ppu_io, AS_IO, 8, bitgraph_state)
+ADDRESS_MAP_START(bitgraph_state::ppu_io)
 //  AM_RANGE(0x00, 0x00) AM_READ(ppu_irq)
 ADDRESS_MAP_END
 #endif
@@ -482,7 +488,7 @@ void bitgraph_state::machine_reset()
 }
 
 
-static MACHINE_CONFIG_START( bg_motherboard )
+MACHINE_CONFIG_START(bitgraph_state::bg_motherboard)
 	MCFG_SCREEN_ADD("screen", RASTER)
 	MCFG_SCREEN_REFRESH_RATE(40)
 	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500)) /* not accurate */
@@ -525,11 +531,11 @@ static MACHINE_CONFIG_START( bg_motherboard )
 	MCFG_RS232_CTS_HANDLER(DEVWRITELINE(ACIA2_TAG, acia6850_device, write_cts))
 
 	// XXX actual part may be something else
-	MCFG_DEVICE_ADD(COM8116_A_TAG, COM8116, XTAL_5_0688MHz)
+	MCFG_DEVICE_ADD(COM8116_A_TAG, COM8116, XTAL(5'068'800))
 	MCFG_COM8116_FR_HANDLER(WRITELINE(bitgraph_state, com8116_a_fr_w))
 	MCFG_COM8116_FT_HANDLER(WRITELINE(bitgraph_state, com8116_a_ft_w))
 
-	MCFG_DEVICE_ADD(COM8116_B_TAG, COM8116, XTAL_5_0688MHz)
+	MCFG_DEVICE_ADD(COM8116_B_TAG, COM8116, XTAL(5'068'800))
 	MCFG_COM8116_FR_HANDLER(WRITELINE(bitgraph_state, com8116_b_fr_w))
 	MCFG_COM8116_FT_HANDLER(WRITELINE(bitgraph_state, com8116_b_ft_w))
 
@@ -544,14 +550,14 @@ static MACHINE_CONFIG_START( bg_motherboard )
 	MCFG_ER2055_ADD(EAROM_TAG)
 
 	MCFG_SPEAKER_STANDARD_MONO("mono")
-	MCFG_SOUND_ADD(PSG_TAG, AY8912, XTAL_1_2944MHz)
+	MCFG_SOUND_ADD(PSG_TAG, AY8912, XTAL(1'294'400))
 	MCFG_AY8910_PORT_A_WRITE_CB(WRITE8(bitgraph_state, earom_write))
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.00)
 MACHINE_CONFIG_END
 
 #ifdef UNUSED_FUNCTION
-static MACHINE_CONFIG_START( bg_ppu )
-	MCFG_CPU_ADD(PPU_TAG, I8035, XTAL_6_9MHz)
+MACHINE_CONFIG_START(bitgraph_state::bg_ppu)
+	MCFG_CPU_ADD(PPU_TAG, I8035, XTAL(6'900'000))
 	MCFG_CPU_IO_MAP(ppu_io)
 //  MCFG_MCS48_PORT_T0_IN_CB(READLINE(bitgraph_state, ppu_t0_r))
 	MCFG_MCS48_PORT_PROG_OUT_CB(DEVWRITELINE("i8243", i8243_device, prog_w))
@@ -570,11 +576,11 @@ static MACHINE_CONFIG_START( bg_ppu )
 MACHINE_CONFIG_END
 #endif
 
-static MACHINE_CONFIG_START( bitgrpha )
-	MCFG_CPU_ADD(M68K_TAG, M68000, XTAL_6_9MHz)
+MACHINE_CONFIG_START(bitgraph_state::bitgrpha)
+	MCFG_CPU_ADD(M68K_TAG, M68000, XTAL(6'900'000))
 	MCFG_CPU_PROGRAM_MAP(bitgrapha_mem)
 
-	MCFG_FRAGMENT_ADD(bg_motherboard)
+	bg_motherboard(config);
 
 	MCFG_DEVICE_ADD("system_clock", CLOCK, 40)
 	MCFG_CLOCK_SIGNAL_HANDLER(WRITELINE(bitgraph_state, system_clock_write))
@@ -593,12 +599,12 @@ static MACHINE_CONFIG_START( bitgrpha )
 	MCFG_RAM_DEFAULT_SIZE("128K")
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_START( bitgrphb )
-	MCFG_CPU_ADD(M68K_TAG, M68000, XTAL_6_9MHz)
+MACHINE_CONFIG_START(bitgraph_state::bitgrphb)
+	MCFG_CPU_ADD(M68K_TAG, M68000, XTAL(6'900'000))
 	MCFG_CPU_PROGRAM_MAP(bitgraphb_mem)
 
-	MCFG_FRAGMENT_ADD(bg_motherboard)
-//  MCFG_FRAGMENT_ADD(bg_ppu)
+	bg_motherboard(config);
+//  bg_ppu(config);
 
 	MCFG_DEVICE_ADD("system_clock", CLOCK, 1040)
 	MCFG_CLOCK_SIGNAL_HANDLER(WRITELINE(bitgraph_state, system_clock_write))

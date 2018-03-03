@@ -418,11 +418,11 @@ WRITE16_MEMBER(armedf_state::irq_lv2_ack_w)
  *
  *************************************/
 
-static ADDRESS_MAP_START( terraf_map, AS_PROGRAM, 16, armedf_state )
+ADDRESS_MAP_START(armedf_state::terraf_map)
 	AM_RANGE(0x000000, 0x05ffff) AM_ROM
 	AM_RANGE(0x060000, 0x0603ff) AM_RAM AM_SHARE("spriteram")
 	AM_RANGE(0x060400, 0x063fff) AM_RAM
-	AM_RANGE(0x064000, 0x064fff) AM_RAM_DEVWRITE("palette", palette_device, write) AM_SHARE("palette")
+	AM_RANGE(0x064000, 0x064fff) AM_RAM_DEVWRITE("palette", palette_device, write16) AM_SHARE("palette")
 	AM_RANGE(0x068000, 0x069fff) AM_READWRITE8(nb1414m4_text_videoram_r,nb1414m4_text_videoram_w,0x00ff)
 	AM_RANGE(0x06a000, 0x06a9ff) AM_RAM
 	AM_RANGE(0x06c000, 0x06cfff) AM_RAM AM_SHARE("spr_pal_clut")
@@ -440,20 +440,20 @@ static ADDRESS_MAP_START( terraf_map, AS_PROGRAM, 16, armedf_state )
 	AM_RANGE(0x07c00e, 0x07c00f) AM_WRITE(irq_lv1_ack_w)
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( kozure_map, AS_PROGRAM, 16, armedf_state )
+ADDRESS_MAP_START(armedf_state::kozure_map)
+	AM_IMPORT_FROM( terraf_map )
 	AM_RANGE(0x060000, 0x060fff) AM_RAM AM_SHARE("spriteram")
 	AM_RANGE(0x061000, 0x063fff) AM_RAM
 //  AM_RANGE(0x07c000, 0x07c001) AM_WRITE(kozure_io_w)
 //  AM_RANGE(0x0c0000, 0x0c0001) AM_WRITENOP /* watchdog? */
 //  AM_RANGE(0xffd000, 0xffd001) AM_WRITENOP /* passes crc ROM information to MCU, I guess */
-	AM_IMPORT_FROM( terraf_map )
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( cclimbr2_map, AS_PROGRAM, 16, armedf_state )
+ADDRESS_MAP_START(armedf_state::cclimbr2_map)
 	AM_RANGE(0x000000, 0x05ffff) AM_ROM
 	AM_RANGE(0x060000, 0x060fff) AM_RAM AM_SHARE("spriteram")
 	AM_RANGE(0x061000, 0x063fff) AM_RAM
-	AM_RANGE(0x064000, 0x064fff) AM_RAM_DEVWRITE("palette", palette_device, write) AM_SHARE("palette")
+	AM_RANGE(0x064000, 0x064fff) AM_RAM_DEVWRITE("palette", palette_device, write16) AM_SHARE("palette")
 	AM_RANGE(0x068000, 0x069fff) AM_READWRITE8(nb1414m4_text_videoram_r,nb1414m4_text_videoram_w,0x00ff)
 	AM_RANGE(0x06a000, 0x06a9ff) AM_RAM
 	AM_RANGE(0x06c000, 0x06cfff) AM_RAM AM_SHARE("spr_pal_clut")
@@ -471,11 +471,11 @@ static ADDRESS_MAP_START( cclimbr2_map, AS_PROGRAM, 16, armedf_state )
 	AM_RANGE(0x07c00e, 0x07c00f) AM_WRITE(irq_lv2_ack_w)
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( legion_map, AS_PROGRAM, 16, armedf_state )
+ADDRESS_MAP_START(armedf_state::legion_map)
 	AM_RANGE(0x000000, 0x05ffff) AM_ROM
 	AM_RANGE(0x060000, 0x060fff) AM_RAM AM_SHARE("spriteram")
 	AM_RANGE(0x061000, 0x063fff) AM_RAM
-	AM_RANGE(0x064000, 0x064fff) AM_RAM_DEVWRITE("palette", palette_device, write) AM_SHARE("palette")
+	AM_RANGE(0x064000, 0x064fff) AM_RAM_DEVWRITE("palette", palette_device, write16) AM_SHARE("palette")
 	AM_RANGE(0x068000, 0x069fff) AM_READWRITE8(nb1414m4_text_videoram_r,nb1414m4_text_videoram_w,0x00ff)
 	AM_RANGE(0x06a000, 0x06a9ff) AM_RAM
 	AM_RANGE(0x06c000, 0x06cfff) AM_RAM AM_SHARE("spr_pal_clut")
@@ -502,12 +502,12 @@ WRITE8_MEMBER(armedf_state::legionjb_fg_scroll_w)
 	m_fg_scrolly = (m_legion_cmd[0x00] & 0xff) | ((m_legion_cmd[0x01] & 0x3) << 8);
 }
 
-static ADDRESS_MAP_START( legionjb_map, AS_PROGRAM, 16, armedf_state )
+ADDRESS_MAP_START(armedf_state::legionjb_map)
 	AM_RANGE(0x040000, 0x04003f) AM_WRITE8(legionjb_fg_scroll_w,0x00ff)
 	AM_RANGE(0x000000, 0x05ffff) AM_ROM
 	AM_RANGE(0x060000, 0x060fff) AM_RAM AM_SHARE("spriteram")
 	AM_RANGE(0x061000, 0x063fff) AM_RAM
-	AM_RANGE(0x064000, 0x064fff) AM_RAM_DEVWRITE("palette", palette_device, write) AM_SHARE("palette")
+	AM_RANGE(0x064000, 0x064fff) AM_RAM_DEVWRITE("palette", palette_device, write16) AM_SHARE("palette")
 	AM_RANGE(0x068000, 0x069fff) AM_READWRITE8(armedf_text_videoram_r,armedf_text_videoram_w,0x00ff)
 	AM_RANGE(0x06a000, 0x06a9ff) AM_RAM
 	AM_RANGE(0x06c000, 0x06cfff) AM_RAM AM_SHARE("spr_pal_clut")
@@ -525,20 +525,20 @@ static ADDRESS_MAP_START( legionjb_map, AS_PROGRAM, 16, armedf_state )
 	AM_RANGE(0x07c00e, 0x07c00f) AM_WRITE(irq_lv2_ack_w)
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( armedf_map, AS_PROGRAM, 16, armedf_state )
+ADDRESS_MAP_START(armedf_state::armedf_map)
 	AM_RANGE(0x000000, 0x05ffff) AM_ROM
 	AM_RANGE(0x060000, 0x060fff) AM_RAM AM_SHARE("spriteram")
 	AM_RANGE(0x061000, 0x065fff) AM_RAM
 	AM_RANGE(0x066000, 0x066fff) AM_RAM_WRITE(armedf_bg_videoram_w) AM_SHARE("bg_videoram")
 	AM_RANGE(0x067000, 0x067fff) AM_RAM_WRITE(armedf_fg_videoram_w) AM_SHARE("fg_videoram")
 	AM_RANGE(0x068000, 0x069fff) AM_READWRITE8(armedf_text_videoram_r,armedf_text_videoram_w,0x00ff)
-	AM_RANGE(0x06a000, 0x06afff) AM_RAM_DEVWRITE("palette", palette_device, write) AM_SHARE("palette")
+	AM_RANGE(0x06a000, 0x06afff) AM_RAM_DEVWRITE("palette", palette_device, write16) AM_SHARE("palette")
 	AM_RANGE(0x06b000, 0x06bfff) AM_RAM AM_SHARE("spr_pal_clut")
+	AM_RANGE(0x06c000, 0x06c7ff) AM_RAM
 	AM_RANGE(0x06c000, 0x06c001) AM_READ_PORT("P1")
 	AM_RANGE(0x06c002, 0x06c003) AM_READ_PORT("P2")
 	AM_RANGE(0x06c004, 0x06c005) AM_READ_PORT("DSW1")
 	AM_RANGE(0x06c006, 0x06c007) AM_READ_PORT("DSW2")
-	AM_RANGE(0x06c000, 0x06c7ff) AM_RAM
 	AM_RANGE(0x06d000, 0x06d001) AM_WRITE(terraf_io_w)
 	AM_RANGE(0x06d002, 0x06d003) AM_WRITE(armedf_bg_scrollx_w)
 	AM_RANGE(0x06d004, 0x06d005) AM_WRITE(armedf_bg_scrolly_w)
@@ -717,7 +717,7 @@ WRITE8_MEMBER(bigfghtr_state::mcu_spritelist_w)
 	popmessage("MCU access spritelist %04x = %02x, contact MAMEdev",offset,data);
 }
 
-static ADDRESS_MAP_START( bigfghtr_map, AS_PROGRAM, 16, bigfghtr_state )
+ADDRESS_MAP_START(bigfghtr_state::bigfghtr_map)
 	AM_RANGE(0x000000, 0x07ffff) AM_ROM
 	AM_RANGE(0x080000, 0x0805ff) AM_RAM AM_SHARE("spriteram")
 	AM_RANGE(0x080600, 0x083fff) AM_READWRITE8(main_sharedram_r,main_sharedram_w,0xffff)
@@ -725,7 +725,7 @@ static ADDRESS_MAP_START( bigfghtr_map, AS_PROGRAM, 16, bigfghtr_state )
 	AM_RANGE(0x086000, 0x086fff) AM_RAM_WRITE(armedf_bg_videoram_w) AM_SHARE("bg_videoram")
 	AM_RANGE(0x087000, 0x087fff) AM_RAM_WRITE(armedf_fg_videoram_w) AM_SHARE("fg_videoram")
 	AM_RANGE(0x088000, 0x089fff) AM_READWRITE8(armedf_text_videoram_r,armedf_text_videoram_w,0x00ff)
-	AM_RANGE(0x08a000, 0x08afff) AM_RAM_DEVWRITE("palette", palette_device, write) AM_SHARE("palette")
+	AM_RANGE(0x08a000, 0x08afff) AM_RAM_DEVWRITE("palette", palette_device, write16) AM_SHARE("palette")
 	AM_RANGE(0x08b000, 0x08bfff) AM_RAM AM_SHARE("spr_pal_clut")
 	AM_RANGE(0x08c000, 0x08c001) AM_READ_PORT("P1")
 	AM_RANGE(0x08c002, 0x08c003) AM_READ_PORT("P2")
@@ -743,23 +743,21 @@ static ADDRESS_MAP_START( bigfghtr_map, AS_PROGRAM, 16, bigfghtr_state )
 	AM_RANGE(0x400000, 0x400001) AM_READ(latch_r)
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( bigfghtr_mcu_map, AS_PROGRAM, 8, bigfghtr_state )
+ADDRESS_MAP_START(bigfghtr_state::bigfghtr_mcu_map)
 	AM_RANGE(0x0000, 0x0fff) AM_ROM
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( bigfghtr_mcu_io_map, AS_IO, 8, bigfghtr_state )
+ADDRESS_MAP_START(bigfghtr_state::bigfghtr_mcu_io_map)
 	AM_RANGE(0x00000, 0x005ff) AM_WRITE(mcu_spritelist_w) //Sprite RAM, guess shared as well
 	AM_RANGE(0x00600, 0x03fff) AM_RAM AM_SHARE("sharedram")
-	AM_RANGE(MCS51_PORT_P1,MCS51_PORT_P1) AM_READNOP // bit 5: bus contention related?
-	AM_RANGE(MCS51_PORT_P3,MCS51_PORT_P3) AM_WRITENOP
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( sound_map, AS_PROGRAM, 8, armedf_state )
+ADDRESS_MAP_START(armedf_state::sound_map)
 	AM_RANGE(0x0000, 0xf7ff) AM_ROM
 	AM_RANGE(0xf800, 0xffff) AM_RAM
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( cclimbr2_soundmap, AS_PROGRAM, 8, armedf_state )
+ADDRESS_MAP_START(armedf_state::cclimbr2_soundmap)
 	AM_RANGE(0x0000, 0xbfff) AM_ROM
 	AM_RANGE(0xc000, 0xffff) AM_RAM
 ADDRESS_MAP_END
@@ -792,20 +790,20 @@ WRITE8_MEMBER(armedf_state::fg_scroll_msb_w)
 }
 
 
-static ADDRESS_MAP_START( terrafjb_extraz80_map, AS_PROGRAM, 8, armedf_state )
+ADDRESS_MAP_START(armedf_state::terrafjb_extraz80_map)
 	AM_RANGE(0x0000, 0x3fff) AM_ROM
 	AM_RANGE(0x4000, 0x5fff) AM_READWRITE(blitter_txram_r,blitter_txram_w)
 	AM_RANGE(0x8000, 0x87ff) AM_RAM
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( terrafjb_extraz80_portmap, AS_IO, 8, armedf_state )
+ADDRESS_MAP_START(armedf_state::terrafjb_extraz80_portmap)
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	AM_RANGE(0x00,0x00) AM_WRITE(fg_scrollx_w)
 	AM_RANGE(0x01,0x01) AM_WRITE(fg_scrolly_w)
 	AM_RANGE(0x02,0x02) AM_WRITE(fg_scroll_msb_w)
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( sound_portmap, AS_IO, 8, armedf_state )
+ADDRESS_MAP_START(armedf_state::sound_portmap)
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	AM_RANGE(0x0, 0x1) AM_DEVWRITE("ymsnd", ym3812_device, write)
 	AM_RANGE(0x2, 0x2) AM_DEVWRITE("dac1", dac_byte_interface, write)
@@ -814,7 +812,7 @@ static ADDRESS_MAP_START( sound_portmap, AS_IO, 8, armedf_state )
 	AM_RANGE(0x6, 0x6) AM_DEVREAD("soundlatch", generic_latch_8_device, read)
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( sound_3526_portmap, AS_IO, 8, armedf_state )
+ADDRESS_MAP_START(armedf_state::sound_3526_portmap)
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	AM_RANGE(0x0, 0x1) AM_DEVWRITE("ymsnd", ym3526_device, write)
 	AM_RANGE(0x2, 0x2) AM_DEVWRITE("dac1", dac_byte_interface, write)
@@ -1237,17 +1235,17 @@ MACHINE_RESET_MEMBER(armedf_state,armedf)
 }
 
 
-static MACHINE_CONFIG_START( terraf_sound )
-	MCFG_CPU_ADD("audiocpu", Z80, XTAL_24MHz/6)      // 4mhz
+MACHINE_CONFIG_START(armedf_state::terraf_sound)
+	MCFG_CPU_ADD("audiocpu", Z80, XTAL(24'000'000)/6)      // 4mhz
 	MCFG_CPU_PROGRAM_MAP(sound_map)
 	MCFG_CPU_IO_MAP(sound_portmap)
-	MCFG_CPU_PERIODIC_INT_DRIVER(armedf_state, irq0_line_hold,  XTAL_8MHz/2/512)    // ?
+	MCFG_CPU_PERIODIC_INT_DRIVER(armedf_state, irq0_line_hold,  XTAL(8'000'000)/2/512)    // ?
 
 	MCFG_SPEAKER_STANDARD_MONO("speaker")
 
 	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
 
-	MCFG_SOUND_ADD("ymsnd", YM3812, XTAL_24MHz/6)      // 4mhz
+	MCFG_SOUND_ADD("ymsnd", YM3812, XTAL(24'000'000)/6)      // 4mhz
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 0.5)
 
 	MCFG_SOUND_ADD("dac1", DAC_8BIT_R2R, 0) MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 0.8) // 10-pin SIP with 74HC374P latch
@@ -1257,10 +1255,10 @@ static MACHINE_CONFIG_START( terraf_sound )
 	MCFG_SOUND_ROUTE_EX(0, "dac2", 1.0, DAC_VREF_POS_INPUT) MCFG_SOUND_ROUTE_EX(0, "dac2", -1.0, DAC_VREF_NEG_INPUT)
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_START( terraf )
+MACHINE_CONFIG_START(armedf_state::terraf)
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", M68000, XTAL_16MHz/2)   // 8mhz?
+	MCFG_CPU_ADD("maincpu", M68000, XTAL(16'000'000)/2)   // 8mhz?
 	MCFG_CPU_PROGRAM_MAP(terraf_map)
 	MCFG_CPU_VBLANK_INT_DRIVER("screen", armedf_state,  irq1_line_assert)
 
@@ -1289,22 +1287,22 @@ static MACHINE_CONFIG_START( terraf )
 	MCFG_BUFFERED_SPRITERAM16_ADD("spriteram")
 
 	/* sound hardware */
-	MCFG_FRAGMENT_ADD(terraf_sound)
+	terraf_sound(config);
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_START( terrafjb )
+MACHINE_CONFIG_START(armedf_state::terrafjb)
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", M68000, XTAL_16MHz/2)   // 8mhz
+	MCFG_CPU_ADD("maincpu", M68000, XTAL(16'000'000)/2)   // 8mhz
 	MCFG_CPU_PROGRAM_MAP(terraf_map)
 	MCFG_CPU_VBLANK_INT_DRIVER("screen", armedf_state,  irq1_line_assert)
 
-	MCFG_CPU_ADD("audiocpu", Z80, XTAL_24MHz/6)      // 4mhz
+	MCFG_CPU_ADD("audiocpu", Z80, XTAL(24'000'000)/6)      // 4mhz
 	MCFG_CPU_PROGRAM_MAP(sound_map)
 	MCFG_CPU_IO_MAP(sound_portmap)
-	MCFG_CPU_PERIODIC_INT_DRIVER(armedf_state, irq0_line_hold,  XTAL_8MHz/2/512)    // ?
+	MCFG_CPU_PERIODIC_INT_DRIVER(armedf_state, irq0_line_hold,  XTAL(8'000'000)/2/512)    // ?
 
-	MCFG_CPU_ADD("extra", Z80, XTAL_16MHz/4)         // 4mhz?
+	MCFG_CPU_ADD("extra", Z80, XTAL(16'000'000)/4)         // 4mhz?
 	MCFG_CPU_PROGRAM_MAP(terrafjb_extraz80_map)
 	MCFG_CPU_IO_MAP(terrafjb_extraz80_portmap)
 
@@ -1334,7 +1332,7 @@ static MACHINE_CONFIG_START( terrafjb )
 
 	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
 
-	MCFG_SOUND_ADD("ymsnd", YM3812, XTAL_24MHz/6)      // 4mhz
+	MCFG_SOUND_ADD("ymsnd", YM3812, XTAL(24'000'000)/6)      // 4mhz
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 0.5)
 
 	MCFG_SOUND_ADD("dac1", DAC_8BIT_R2R, 0) MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 0.8) // unknown DAC
@@ -1344,14 +1342,15 @@ static MACHINE_CONFIG_START( terrafjb )
 	MCFG_SOUND_ROUTE_EX(0, "dac2", 1.0, DAC_VREF_POS_INPUT) MCFG_SOUND_ROUTE_EX(0, "dac2", -1.0, DAC_VREF_NEG_INPUT)
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_DERIVED( terrafb, terraf )
+MACHINE_CONFIG_START(armedf_state::terrafb)
+	terraf(config);
 	MCFG_DEVICE_REMOVE("nb1414m4")
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_START( kozure )
+MACHINE_CONFIG_START(armedf_state::kozure)
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", M68000, XTAL_16MHz/2)   // 8mhz
+	MCFG_CPU_ADD("maincpu", M68000, XTAL(16'000'000)/2)   // 8mhz
 	MCFG_CPU_PROGRAM_MAP(kozure_map)
 	MCFG_CPU_VBLANK_INT_DRIVER("screen", armedf_state,  irq1_line_assert)
 
@@ -1379,20 +1378,20 @@ static MACHINE_CONFIG_START( kozure )
 	MCFG_BUFFERED_SPRITERAM16_ADD("spriteram")
 
 	/* sound hardware */
-	MCFG_FRAGMENT_ADD(terraf_sound)
+	terraf_sound(config);
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_START( armedf )
+MACHINE_CONFIG_START(armedf_state::armedf)
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", M68000, XTAL_16MHz/2)   // 8mhz
+	MCFG_CPU_ADD("maincpu", M68000, XTAL(16'000'000)/2)   // 8mhz
 	MCFG_CPU_PROGRAM_MAP(armedf_map)
 	MCFG_CPU_VBLANK_INT_DRIVER("screen", armedf_state,  irq1_line_assert)
 
-	MCFG_CPU_ADD("audiocpu", Z80, XTAL_24MHz/6)      // 4mhz
+	MCFG_CPU_ADD("audiocpu", Z80, XTAL(24'000'000)/6)      // 4mhz
 	MCFG_CPU_PROGRAM_MAP(sound_map)
 	MCFG_CPU_IO_MAP(sound_portmap)
-	MCFG_CPU_PERIODIC_INT_DRIVER(armedf_state, irq0_line_hold,  XTAL_8MHz/2/512)    // ?
+	MCFG_CPU_PERIODIC_INT_DRIVER(armedf_state, irq0_line_hold,  XTAL(8'000'000)/2/512)    // ?
 
 	MCFG_MACHINE_START_OVERRIDE(armedf_state,armedf)
 	MCFG_MACHINE_RESET_OVERRIDE(armedf_state,armedf)
@@ -1420,7 +1419,7 @@ static MACHINE_CONFIG_START( armedf )
 
 	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
 
-	MCFG_SOUND_ADD("ymsnd", YM3812, XTAL_24MHz/6)      // 4mhz
+	MCFG_SOUND_ADD("ymsnd", YM3812, XTAL(24'000'000)/6)      // 4mhz
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 0.5)
 
 	MCFG_SOUND_ADD("dac1", DAC_8BIT_R2R, 0) MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 0.5) // unknown DAC
@@ -1430,17 +1429,17 @@ static MACHINE_CONFIG_START( armedf )
 	MCFG_SOUND_ROUTE_EX(0, "dac2", 1.0, DAC_VREF_POS_INPUT) MCFG_SOUND_ROUTE_EX(0, "dac2", -1.0, DAC_VREF_NEG_INPUT)
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_START( cclimbr2 )
+MACHINE_CONFIG_START(armedf_state::cclimbr2)
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", M68000, XTAL_16MHz/2)   // 8mhz
+	MCFG_CPU_ADD("maincpu", M68000, XTAL(16'000'000)/2)   // 8mhz
 	MCFG_CPU_PROGRAM_MAP(cclimbr2_map)
 	MCFG_CPU_VBLANK_INT_DRIVER("screen", armedf_state,  irq2_line_assert)
 
-	MCFG_CPU_ADD("audiocpu", Z80, XTAL_24MHz/6)      // 4mhz
+	MCFG_CPU_ADD("audiocpu", Z80, XTAL(24'000'000)/6)      // 4mhz
 	MCFG_CPU_PROGRAM_MAP(cclimbr2_soundmap)
 	MCFG_CPU_IO_MAP(sound_portmap)
-	MCFG_CPU_PERIODIC_INT_DRIVER(armedf_state, irq0_line_hold,  XTAL_8MHz/2/512)    // ?
+	MCFG_CPU_PERIODIC_INT_DRIVER(armedf_state, irq0_line_hold,  XTAL(8'000'000)/2/512)    // ?
 
 	MCFG_MACHINE_START_OVERRIDE(armedf_state,armedf)
 	MCFG_MACHINE_RESET_OVERRIDE(armedf_state,armedf)
@@ -1470,7 +1469,7 @@ static MACHINE_CONFIG_START( cclimbr2 )
 
 	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
 
-	MCFG_SOUND_ADD("ymsnd", YM3812, XTAL_24MHz/6) // or YM3526?
+	MCFG_SOUND_ADD("ymsnd", YM3812, XTAL(24'000'000)/6) // or YM3526?
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 0.5)
 
 	MCFG_SOUND_ADD("dac1", DAC_8BIT_R2R, 0) MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 0.4) // unknown DAC
@@ -1480,17 +1479,17 @@ static MACHINE_CONFIG_START( cclimbr2 )
 	MCFG_SOUND_ROUTE_EX(0, "dac2", 1.0, DAC_VREF_POS_INPUT) MCFG_SOUND_ROUTE_EX(0, "dac2", -1.0, DAC_VREF_NEG_INPUT)
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_START( legion )
+MACHINE_CONFIG_START(armedf_state::legion)
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", M68000, XTAL_16MHz/2)   // 8mhz
+	MCFG_CPU_ADD("maincpu", M68000, XTAL(16'000'000)/2)   // 8mhz
 	MCFG_CPU_PROGRAM_MAP(legion_map)
 	MCFG_CPU_VBLANK_INT_DRIVER("screen", armedf_state,  irq2_line_assert)
 
-	MCFG_CPU_ADD("audiocpu", Z80, XTAL_24MHz/6)      // 4mhz
+	MCFG_CPU_ADD("audiocpu", Z80, XTAL(24'000'000)/6)      // 4mhz
 	MCFG_CPU_PROGRAM_MAP(cclimbr2_soundmap)
 	MCFG_CPU_IO_MAP(sound_3526_portmap)
-	MCFG_CPU_PERIODIC_INT_DRIVER(armedf_state, irq0_line_hold,  XTAL_8MHz/2/512)    // ?
+	MCFG_CPU_PERIODIC_INT_DRIVER(armedf_state, irq0_line_hold,  XTAL(8'000'000)/2/512)    // ?
 
 	MCFG_MACHINE_START_OVERRIDE(armedf_state,armedf)
 	MCFG_MACHINE_RESET_OVERRIDE(armedf_state,armedf)
@@ -1520,7 +1519,7 @@ static MACHINE_CONFIG_START( legion )
 
 	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
 
-	MCFG_SOUND_ADD("ymsnd", YM3526, XTAL_24MHz/6)      // 4mhz
+	MCFG_SOUND_ADD("ymsnd", YM3526, XTAL(24'000'000)/6)      // 4mhz
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 0.5)
 
 	MCFG_SOUND_ADD("dac1", DAC_8BIT_R2R, 0) MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 0.4) // 10-pin SIP with 74HC374P latch
@@ -1530,17 +1529,17 @@ static MACHINE_CONFIG_START( legion )
 	MCFG_SOUND_ROUTE_EX(0, "dac2", 1.0, DAC_VREF_POS_INPUT) MCFG_SOUND_ROUTE_EX(0, "dac2", -1.0, DAC_VREF_NEG_INPUT)
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_START( legionjb )
+MACHINE_CONFIG_START(armedf_state::legionjb)
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", M68000, XTAL_16MHz/2)   // 8mhz
+	MCFG_CPU_ADD("maincpu", M68000, XTAL(16'000'000)/2)   // 8mhz
 	MCFG_CPU_PROGRAM_MAP(legionjb_map)
 	MCFG_CPU_VBLANK_INT_DRIVER("screen", armedf_state,  irq2_line_assert)
 
-	MCFG_CPU_ADD("audiocpu", Z80, XTAL_24MHz/6)      // 4mhz
+	MCFG_CPU_ADD("audiocpu", Z80, XTAL(24'000'000)/6)      // 4mhz
 	MCFG_CPU_PROGRAM_MAP(cclimbr2_soundmap)
 	MCFG_CPU_IO_MAP(sound_portmap)
-	MCFG_CPU_PERIODIC_INT_DRIVER(armedf_state, irq0_line_hold,  XTAL_8MHz/2/512)    // ?
+	MCFG_CPU_PERIODIC_INT_DRIVER(armedf_state, irq0_line_hold,  XTAL(8'000'000)/2/512)    // ?
 
 	MCFG_MACHINE_START_OVERRIDE(armedf_state,armedf)
 	MCFG_MACHINE_RESET_OVERRIDE(armedf_state,armedf)
@@ -1568,7 +1567,7 @@ static MACHINE_CONFIG_START( legionjb )
 
 	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
 
-	MCFG_SOUND_ADD("ymsnd", YM3812, XTAL_24MHz/6) // or YM3526?
+	MCFG_SOUND_ADD("ymsnd", YM3812, XTAL(24'000'000)/6) // or YM3526?
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 0.5)
 
 	MCFG_SOUND_ADD("dac1", DAC_8BIT_R2R, 0) MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 0.4) // unknown DAC
@@ -1578,22 +1577,23 @@ static MACHINE_CONFIG_START( legionjb )
 	MCFG_SOUND_ROUTE_EX(0, "dac2", 1.0, DAC_VREF_POS_INPUT) MCFG_SOUND_ROUTE_EX(0, "dac2", -1.0, DAC_VREF_NEG_INPUT)
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_START( bigfghtr )
+MACHINE_CONFIG_START(bigfghtr_state::bigfghtr)
 
-	MCFG_CPU_ADD("maincpu", M68000, XTAL_16MHz/2)   // verified
+	MCFG_CPU_ADD("maincpu", M68000, XTAL(16'000'000)/2)   // verified
 	MCFG_CPU_PROGRAM_MAP(bigfghtr_map)
 	MCFG_CPU_VBLANK_INT_DRIVER("screen", armedf_state,  irq1_line_assert)
 
-	MCFG_CPU_ADD("mcu", I8751, XTAL_16MHz/2)   // verified
+	MCFG_CPU_ADD("mcu", I8751, XTAL(16'000'000)/2)   // verified
 	MCFG_CPU_PROGRAM_MAP(bigfghtr_mcu_map)
 	MCFG_CPU_IO_MAP(bigfghtr_mcu_io_map)
+	MCFG_MCS51_PORT_P1_IN_CB(CONSTANT(0xdf)) // bit 5: bus contention related?
 
 	MCFG_MACHINE_START_OVERRIDE(armedf_state,armedf)
 	MCFG_MACHINE_RESET_OVERRIDE(armedf_state,armedf)
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
-	MCFG_SCREEN_RAW_PARAMS(XTAL_16MHz/2,531,12*8,(64-12)*8, 254, 1*8, 31*8) // guess, matches 59.3 Hz from reference - measured at 59.1358Hz
+	MCFG_SCREEN_RAW_PARAMS(XTAL(16'000'000)/2,531,12*8,(64-12)*8, 254, 1*8, 31*8) // guess, matches 59.3 Hz from reference - measured at 59.1358Hz
 	MCFG_SCREEN_PALETTE("palette")
 
 	MCFG_VIDEO_START_OVERRIDE(armedf_state,armedf)
@@ -1607,7 +1607,7 @@ static MACHINE_CONFIG_START( bigfghtr )
 	MCFG_BUFFERED_SPRITERAM16_ADD("spriteram")
 
 	/* sound hardware */
-	MCFG_FRAGMENT_ADD(terraf_sound)
+	terraf_sound(config);
 MACHINE_CONFIG_END
 
 /*************************************

@@ -94,8 +94,8 @@ public:
 	tvcexp_slot_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 	virtual ~tvcexp_slot_device();
 
-	template <class Object> static devcb_base &set_out_irq_callback(device_t &device, Object &&cb) { return downcast<tvcexp_slot_device &>(device).m_out_irq_cb.set_callback(std::forward<Object>(cb)); }
-	template <class Object> static devcb_base &set_out_nmi_callback(device_t &device, Object &&cb) { return downcast<tvcexp_slot_device &>(device).m_out_nmi_cb.set_callback(std::forward<Object>(cb)); }
+	template <class Object> devcb_base &set_out_irq_callback(Object &&cb) { return m_out_irq_cb.set_callback(std::forward<Object>(cb)); }
+	template <class Object> devcb_base &set_out_nmi_callback(Object &&cb) { return m_out_nmi_cb.set_callback(std::forward<Object>(cb)); }
 
 	// reading and writing
 	virtual uint8_t id_r();
@@ -125,9 +125,9 @@ DECLARE_DEVICE_TYPE(TVCEXP_SLOT, tvcexp_slot_device)
 ***************************************************************************/
 
 #define MCFG_TVCEXP_SLOT_OUT_IRQ_CB(_devcb) \
-	devcb = &tvcexp_slot_device::set_out_irq_callback(*device, DEVCB_##_devcb);
+	devcb = &downcast<tvcexp_slot_device &>(*device).set_out_irq_callback(DEVCB_##_devcb);
 
 #define MCFG_TVCEXP_SLOT_OUT_NMI_CB(_devcb) \
-	devcb = &tvcexp_slot_device::set_out_nmi_callback(*device, DEVCB_##_devcb);
+	devcb = &downcast<tvcexp_slot_device &>(*device).set_out_nmi_callback(DEVCB_##_devcb);
 
 #endif // MAME_BUS_TVC_TVC_H

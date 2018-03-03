@@ -65,4 +65,8 @@ public:
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
 	virtual void video_start() override;
+	void amspdwy(machine_config &config);
+	void amspdwy_map(address_map &map);
+	void amspdwy_portmap(address_map &map);
+	void amspdwy_sound_map(address_map &map);
 };

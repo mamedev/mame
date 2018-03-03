@@ -21,7 +21,7 @@ DEFINE_DEVICE_TYPE(TK02_80COL, tk02_device, "tk02", "TK02 80 Column Monochrome U
 //  device_address_map
 //-------------------------------------------------
 
-DEVICE_ADDRESS_MAP_START(map, 8, tk02_device)
+ADDRESS_MAP_START(tk02_device::map)
 //  AM_RANGE(0x00, 0x07) AM_SELECT(0xff00) AM_READWRITE(ram_r, ram_w) // no AM_SELECT (or AM_MASK) support here
 	AM_RANGE(0x08, 0x08) AM_MIRROR(0xff00) AM_DEVWRITE("crtc", mc6845_device, address_w)
 	AM_RANGE(0x09, 0x09) AM_MIRROR(0xff00) AM_DEVWRITE("crtc", mc6845_device, register_w)
@@ -95,16 +95,16 @@ GFXDECODE_END
 //  device_add_mconfig - add device configuration
 //-------------------------------------------------
 
-MACHINE_CONFIG_MEMBER( tk02_device::device_add_mconfig )
+MACHINE_CONFIG_START(tk02_device::device_add_mconfig)
 	MCFG_SCREEN_ADD_MONOCHROME("mono", RASTER, rgb_t::green())
-	MCFG_SCREEN_RAW_PARAMS(XTAL_8MHz * 2, 1024, 0, 640, 312, 0, 250)
+	MCFG_SCREEN_RAW_PARAMS(XTAL(8'000'000) * 2, 1024, 0, 640, 312, 0, 250)
 	MCFG_SCREEN_UPDATE_DEVICE("crtc", mc6845_device, screen_update)
 
 	MCFG_PALETTE_ADD_MONOCHROME("palette")
 
 	MCFG_GFXDECODE_ADD("gfxdecode", "palette", tk02)
 
-	MCFG_MC6845_ADD("crtc", MC6845, "mono", XTAL_8MHz / 4)
+	MCFG_MC6845_ADD("crtc", MC6845, "mono", XTAL(8'000'000) / 4)
 	MCFG_MC6845_SHOW_BORDER_AREA(false)
 	MCFG_MC6845_CHAR_WIDTH(8)
 	MCFG_MC6845_UPDATE_ROW_CB(tk02_device, crtc_update_row)

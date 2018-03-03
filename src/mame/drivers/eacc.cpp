@@ -81,6 +81,8 @@ public:
 	virtual void machine_reset() override;
 	TIMER_DEVICE_CALLBACK_MEMBER(eacc_cb1);
 	TIMER_DEVICE_CALLBACK_MEMBER(eacc_nmi);
+	void eacc(machine_config &config);
+	void eacc_mem(address_map &map);
 private:
 	uint8_t m_digit;
 };
@@ -92,7 +94,7 @@ private:
  Address Maps
 ******************************************************************************/
 
-static ADDRESS_MAP_START(eacc_mem, AS_PROGRAM, 8, eacc_state)
+ADDRESS_MAP_START(eacc_state::eacc_mem)
 	ADDRESS_MAP_UNMAP_HIGH
 	ADDRESS_MAP_GLOBAL_MASK(0xc7ff) // A11,A12,A13 not connected
 	AM_RANGE(0x0000, 0x001f) AM_RAM AM_SHARE("nvram") // inside cpu, battery-backed
@@ -218,7 +220,7 @@ WRITE8_MEMBER( eacc_state::eacc_segment_w )
 		{
 			for (i = 3; i < 7; i++)
 				if (BIT(m_digit, i))
-					output().set_digit_value(i, BITSWAP8(data, 7, 0, 1, 4, 5, 6, 2, 3));
+					output().set_digit_value(i, bitswap<8>(data, 7, 0, 1, 4, 5, 6, 2, 3));
 		}
 	}
 }
@@ -238,9 +240,9 @@ WRITE8_MEMBER( eacc_state::eacc_digit_w )
  Machine Drivers
 ******************************************************************************/
 
-static MACHINE_CONFIG_START( eacc )
+MACHINE_CONFIG_START(eacc_state::eacc)
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", M6802, XTAL_3_579545MHz)  /* Divided by 4 inside the m6802*/
+	MCFG_CPU_ADD("maincpu", M6802, XTAL(3'579'545))  /* Divided by 4 inside the m6802*/
 	MCFG_CPU_PROGRAM_MAP(eacc_mem)
 
 	MCFG_DEFAULT_LAYOUT(layout_eacc)

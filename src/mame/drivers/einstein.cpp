@@ -41,8 +41,8 @@
 #define VERBOSE_KEYBOARD    0
 #define VERBOSE_DISK        0
 
-#define XTAL_X001  XTAL_10_738635MHz
-#define XTAL_X002  XTAL_8MHz
+#define XTAL_X001  XTAL(10'738'635)
+#define XTAL_X002  XTAL(8'000'000)
 
 #define IC_I001  "i001"  /* Z8400A */
 #define IC_I030  "i030"  /* AY-3-8910 */
@@ -107,6 +107,9 @@ public:
 	DECLARE_WRITE_LINE_MEMBER(ardy_w);
 	TIMER_DEVICE_CALLBACK_MEMBER(strobe_callback);
 
+	void einstein(machine_config &config);
+	void einstein_io(address_map &map);
+	void einstein_mem(address_map &map);
 protected:
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
@@ -410,13 +413,13 @@ void einstein_state::machine_reset()
     ADDRESS MAPS
 ***************************************************************************/
 
-static ADDRESS_MAP_START( einstein_mem, AS_PROGRAM, 8, einstein_state )
+ADDRESS_MAP_START(einstein_state::einstein_mem)
 	AM_RANGE(0x0000, 0x07fff) AM_READ_BANK("bank1") AM_WRITE_BANK("bank2")
 	AM_RANGE(0x8000, 0x0ffff) AM_RAMBANK("bank3")
 ADDRESS_MAP_END
 
 // I/O ports are decoded into 8 blocks using address lines A3 to A7
-static ADDRESS_MAP_START( einstein_io, AS_IO, 8, einstein_state )
+ADDRESS_MAP_START(einstein_state::einstein_io)
 	ADDRESS_MAP_UNMAP_HIGH
 	AM_RANGE(0x00, 0x00) AM_MIRROR(0xff04) AM_READWRITE(reset_r, reset_w)
 	AM_RANGE(0x02, 0x02) AM_MIRROR(0xff04) AM_DEVREADWRITE(IC_I030, ay8910_device, data_r, address_w)
@@ -569,7 +572,7 @@ static SLOT_INTERFACE_START( einstein_floppies )
 	SLOT_INTERFACE("35dd", FLOPPY_35_DD)
 SLOT_INTERFACE_END
 
-static MACHINE_CONFIG_START( einstein )
+MACHINE_CONFIG_START(einstein_state::einstein)
 	/* basic machine hardware */
 	MCFG_CPU_ADD(IC_I001, Z80, XTAL_X002 / 2)
 	MCFG_CPU_PROGRAM_MAP(einstein_mem)
@@ -608,7 +611,7 @@ static MACHINE_CONFIG_START( einstein )
 	MCFG_Z80DAISY_GENERIC_INT_CB(WRITELINE(einstein_state, int_w<4>))
 
 	/* video hardware */
-	MCFG_DEVICE_ADD("vdp", TMS9129, XTAL_10_738635MHz / 2)
+	MCFG_DEVICE_ADD("vdp", TMS9129, XTAL(10'738'635) / 2)
 	MCFG_TMS9928A_VRAM_SIZE(0x4000) // 16k RAM, provided by IC i040 and i041
 	MCFG_TMS9928A_SET_SCREEN("screen")
 	MCFG_TMS9928A_SCREEN_ADD_PAL("screen")

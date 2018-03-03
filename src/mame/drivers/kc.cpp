@@ -22,17 +22,17 @@
 #include "speaker.h"
 
 
-static ADDRESS_MAP_START(kc85_4_io, AS_IO, 8, kc85_4_state)
+ADDRESS_MAP_START(kc85_4_state::kc85_4_io)
 	ADDRESS_MAP_UNMAP_HIGH
+	AM_RANGE(0x0000, 0xffff) AM_READWRITE(expansion_io_read, expansion_io_write)
+
 	AM_RANGE(0x0084, 0x0085) AM_MIRROR(0xff00) AM_READWRITE(kc85_4_84_r, kc85_4_84_w)
 	AM_RANGE(0x0086, 0x0087) AM_MIRROR(0xff00) AM_READWRITE(kc85_4_86_r, kc85_4_86_w)
 	AM_RANGE(0x0088, 0x008b) AM_MIRROR(0xff00) AM_DEVREADWRITE("z80pio", z80pio_device, read, write)
 	AM_RANGE(0x008c, 0x008f) AM_MIRROR(0xff00) AM_DEVREADWRITE("z80ctc", z80ctc_device, read, write)
-
-	AM_RANGE(0x0000, 0xffff) AM_READWRITE(expansion_io_read, expansion_io_write)
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START(kc85_4_mem, AS_PROGRAM, 8, kc85_4_state)
+ADDRESS_MAP_START(kc85_4_state::kc85_4_mem)
 	ADDRESS_MAP_UNMAP_HIGH
 	AM_RANGE(0x0000, 0x3fff) AM_READWRITE_BANK("bank1")
 	AM_RANGE(0x4000, 0x7fff) AM_READWRITE_BANK("bank2")
@@ -42,7 +42,7 @@ static ADDRESS_MAP_START(kc85_4_mem, AS_PROGRAM, 8, kc85_4_state)
 	AM_RANGE(0xe000, 0xffff) AM_READ_BANK("bank5")
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START(kc85_3_mem, AS_PROGRAM, 8, kc_state)
+ADDRESS_MAP_START(kc_state::kc85_3_mem)
 	ADDRESS_MAP_UNMAP_HIGH
 	AM_RANGE(0x0000, 0x3fff) AM_READWRITE_BANK("bank1")
 	AM_RANGE(0x4000, 0x7fff) AM_READWRITE_BANK("bank2")
@@ -51,12 +51,12 @@ static ADDRESS_MAP_START(kc85_3_mem, AS_PROGRAM, 8, kc_state)
 	AM_RANGE(0xe000, 0xffff) AM_READ_BANK("bank5")
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START(kc85_3_io, AS_IO, 8, kc_state)
+ADDRESS_MAP_START(kc_state::kc85_3_io)
 	ADDRESS_MAP_UNMAP_HIGH
+	AM_RANGE(0x0000, 0xffff) AM_READWRITE(expansion_io_read, expansion_io_write)
+
 	AM_RANGE(0x0088, 0x008b) AM_MIRROR(0xff00) AM_DEVREADWRITE("z80pio", z80pio_device, read, write)
 	AM_RANGE(0x008c, 0x008f) AM_MIRROR(0xff00) AM_DEVREADWRITE("z80ctc", z80ctc_device, read, write)
-
-	AM_RANGE(0x0000, 0xffff) AM_READWRITE(expansion_io_read, expansion_io_write)
 ADDRESS_MAP_END
 
 static INPUT_PORTS_START( kc85 )
@@ -90,7 +90,7 @@ extern SLOT_INTERFACE_START(kc85_exp)
 SLOT_INTERFACE_END
 
 
-static MACHINE_CONFIG_START( kc85_3 )
+MACHINE_CONFIG_START(kc_state::kc85_3)
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", Z80, KC85_3_CLOCK)
 	MCFG_CPU_PROGRAM_MAP(kc85_3_mem)
@@ -115,7 +115,7 @@ static MACHINE_CONFIG_START( kc85_3 )
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
-	MCFG_SCREEN_RAW_PARAMS(XTAL_28_37516MHz/2, 908, 0, 320, 312, 0, 256)
+	MCFG_SCREEN_RAW_PARAMS(XTAL(28'375'160)/2, 908, 0, 320, 312, 0, 256)
 	MCFG_SCREEN_UPDATE_DRIVER(kc_state, screen_update)
 	MCFG_SCREEN_PALETTE("palette")
 	MCFG_TIMER_DRIVER_ADD_SCANLINE("scantimer", kc_state, kc_scanline, "screen", 0, 1)
@@ -123,7 +123,7 @@ static MACHINE_CONFIG_START( kc85_3 )
 	MCFG_PALETTE_ADD("palette", KC85_PALETTE_SIZE)
 	MCFG_PALETTE_INIT_OWNER(kc_state, kc85 )
 
-	MCFG_DEVICE_ADD("keyboard", KC_KEYBOARD, XTAL_4MHz)
+	MCFG_DEVICE_ADD("keyboard", KC_KEYBOARD, XTAL(4'000'000))
 	MCFG_KC_KEYBOARD_OUT_CALLBACK(WRITELINE(kc_state, keyboard_cb))
 
 	/* sound hardware */
@@ -174,7 +174,7 @@ static MACHINE_CONFIG_START( kc85_3 )
 MACHINE_CONFIG_END
 
 
-static MACHINE_CONFIG_START( kc85_4 )
+MACHINE_CONFIG_START(kc85_4_state::kc85_4)
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", Z80, KC85_4_CLOCK)
 	MCFG_CPU_PROGRAM_MAP(kc85_4_mem)
@@ -199,7 +199,7 @@ static MACHINE_CONFIG_START( kc85_4 )
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
-	MCFG_SCREEN_RAW_PARAMS(XTAL_28_37516MHz/2, 908, 0, 320, 312, 0, 256)
+	MCFG_SCREEN_RAW_PARAMS(XTAL(28'375'160)/2, 908, 0, 320, 312, 0, 256)
 	MCFG_SCREEN_UPDATE_DRIVER(kc85_4_state, screen_update)
 	MCFG_SCREEN_PALETTE("palette")
 	MCFG_TIMER_DRIVER_ADD_SCANLINE("scantimer", kc85_4_state, kc_scanline, "screen", 0, 1)
@@ -207,7 +207,7 @@ static MACHINE_CONFIG_START( kc85_4 )
 	MCFG_PALETTE_ADD("palette", KC85_PALETTE_SIZE)
 	MCFG_PALETTE_INIT_OWNER(kc85_4_state, kc85 )
 
-	MCFG_DEVICE_ADD("keyboard", KC_KEYBOARD, XTAL_4MHz)
+	MCFG_DEVICE_ADD("keyboard", KC_KEYBOARD, XTAL(4'000'000))
 	MCFG_KC_KEYBOARD_OUT_CALLBACK(WRITELINE(kc_state, keyboard_cb))
 
 	/* sound hardware */
@@ -257,7 +257,8 @@ static MACHINE_CONFIG_START( kc85_4 )
 	MCFG_RAM_DEFAULT_SIZE("64K")
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_DERIVED( kc85_5, kc85_4 )
+MACHINE_CONFIG_START(kc85_4_state::kc85_5)
+	kc85_4(config);
 	/* internal ram */
 	MCFG_RAM_MODIFY(RAM_TAG)
 	MCFG_RAM_DEFAULT_SIZE("256K")

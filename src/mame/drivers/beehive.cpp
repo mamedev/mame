@@ -39,6 +39,9 @@ public:
 	DECLARE_WRITE8_MEMBER(beehive_62_w);
 	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 
+	void beehive(machine_config &config);
+	void beehive_io(address_map &map);
+	void beehive_mem(address_map &map);
 private:
 	required_device<cpu_device> m_maincpu;
 	required_shared_ptr<uint8_t> m_p_videoram;
@@ -64,13 +67,13 @@ WRITE8_MEMBER(beehive_state::beehive_62_w)
 	m_keyline = data;
 }
 
-static ADDRESS_MAP_START(beehive_mem, AS_PROGRAM, 8, beehive_state)
+ADDRESS_MAP_START(beehive_state::beehive_mem)
 	ADDRESS_MAP_UNMAP_HIGH
 	AM_RANGE( 0x0000, 0x17ff ) AM_ROM
 	AM_RANGE( 0x8000, 0x8fff ) AM_RAM AM_SHARE("videoram")
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( beehive_io, AS_IO, 8, beehive_state)
+ADDRESS_MAP_START(beehive_state::beehive_io)
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	ADDRESS_MAP_UNMAP_HIGH
 	AM_RANGE(0x11, 0x11) AM_READ_PORT("DIPS")
@@ -285,9 +288,9 @@ uint32_t beehive_state::screen_update(screen_device &screen, bitmap_ind16 &bitma
 	return 0;
 }
 
-static MACHINE_CONFIG_START( beehive )
+MACHINE_CONFIG_START(beehive_state::beehive)
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu",I8085A, XTAL_4MHz)
+	MCFG_CPU_ADD("maincpu",I8085A, XTAL(4'000'000))
 	MCFG_CPU_PROGRAM_MAP(beehive_mem)
 	MCFG_CPU_IO_MAP(beehive_io)
 

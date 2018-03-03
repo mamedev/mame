@@ -44,6 +44,9 @@ public:
 	DECLARE_READ8_MEMBER(unk_r);
 	DECLARE_WRITE8_MEMBER(tc_w);
 	DECLARE_WRITE8_MEMBER(ctl_w);
+	void ax20(machine_config &config);
+	void ax20_io(address_map &map);
+	void ax20_map(address_map &map);
 };
 
 READ8_MEMBER(ax20_state::unk_r)
@@ -77,7 +80,7 @@ uint32_t ax20_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap, 
 }
 
 
-static ADDRESS_MAP_START(ax20_map, AS_PROGRAM, 8, ax20_state)
+ADDRESS_MAP_START(ax20_state::ax20_map)
 	ADDRESS_MAP_UNMAP_HIGH
 	AM_RANGE(0x00000,0x1ffff) AM_RAM
 	AM_RANGE(0x20000,0x3ffff) AM_RAM //optional RAM
@@ -85,7 +88,7 @@ static ADDRESS_MAP_START(ax20_map, AS_PROGRAM, 8, ax20_state)
 	AM_RANGE(0xff800,0xfffff) AM_ROM AM_REGION("ipl", 0)
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START(ax20_io, AS_IO, 8, ax20_state)
+ADDRESS_MAP_START(ax20_state::ax20_io)
 	ADDRESS_MAP_UNMAP_HIGH
 	AM_RANGE(0xffc0, 0xffc0) AM_WRITE(tc_w)
 	AM_RANGE(0xffd0, 0xffd0) AM_WRITE(ctl_w)
@@ -121,9 +124,9 @@ static SLOT_INTERFACE_START( ax20_floppies )
 	SLOT_INTERFACE( "525dd", FLOPPY_525_DD )
 SLOT_INTERFACE_END
 
-static MACHINE_CONFIG_START( ax20 )
+MACHINE_CONFIG_START(ax20_state::ax20)
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", I8088, XTAL_14_31818MHz/3)
+	MCFG_CPU_ADD("maincpu", I8088, XTAL(14'318'181)/3)
 	MCFG_CPU_PROGRAM_MAP(ax20_map)
 	MCFG_CPU_IO_MAP(ax20_io)
 

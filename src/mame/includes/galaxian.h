@@ -18,7 +18,7 @@
 #define GALAXIAN_XSCALE         3
 
 /* master clocks */
-#define GALAXIAN_MASTER_CLOCK   (XTAL_18_432MHz)
+#define GALAXIAN_MASTER_CLOCK   (XTAL(18'432'000))
 #define GALAXIAN_PIXEL_CLOCK    (GALAXIAN_XSCALE*GALAXIAN_MASTER_CLOCK/3)
 
 /* H counts from 128->511, HBLANK starts at 130 and ends at 250 */
@@ -330,5 +330,93 @@ public:
 	void decode_victoryc();
 	void mshuttle_decode(const uint8_t convtable[8][16]);
 	void common_init(galaxian_draw_bullet_func draw_bullet,galaxian_draw_background_func draw_background,
-		galaxian_extend_tile_info_func extend_tile_info,galaxian_extend_sprite_info_func extend_sprite_info);
+					 galaxian_extend_tile_info_func extend_tile_info,galaxian_extend_sprite_info_func extend_sprite_info);
+	void galaxian_base(machine_config &config);
+	void konami_base(machine_config &config);
+	void konami_sound_1x_ay8910(machine_config &config);
+	void konami_sound_2x_ay8910(machine_config &config);
+	void scramble_base(machine_config &config);
+	void timefgtr(machine_config &config);
+	void moonqsr(machine_config &config);
+	void frogger(machine_config &config);
+	void anteatergg(machine_config &config);
+	void theend(machine_config &config);
+	void turtles(machine_config &config);
+	void fantastc(machine_config &config);
+	void jumpbug(machine_config &config);
+	void checkmaj(machine_config &config);
+	void pacmanbl(machine_config &config);
+	void quaak(machine_config &config);
+	void galaxian(machine_config &config);
+	void gmgalax(machine_config &config);
+	void tenspot(machine_config &config);
+	void froggers(machine_config &config);
+	void mshuttle(machine_config &config);
+	void anteateruk(machine_config &config);
+	void monsterz(machine_config &config);
+	void kingball(machine_config &config);
+	void anteaterg(machine_config &config);
+	void anteater(machine_config &config);
+	void moonwar(machine_config &config);
+	void turpins(machine_config &config);
+	void explorer(machine_config &config);
+	void scramble(machine_config &config);
+	void scobra(machine_config &config);
+	void froggermc(machine_config &config);
+	void froggeram(machine_config &config);
+	void spactrai(machine_config &config);
+	void takeoff(machine_config &config);
+	void sfx(machine_config &config);
+	void mooncrst(machine_config &config);
+	void scorpion(machine_config &config);
+	void frogf(machine_config &config);
+	void amigo2(machine_config &config);
+	void zigzag(machine_config &config);
+	void checkman(machine_config &config);
+	void galaxian_audio(machine_config &config);
+	void mooncrst_audio(machine_config &config);
+	void amigo2_map(address_map &map);
+	void anteaterg_map(address_map &map);
+	void anteatergg_map(address_map &map);
+	void anteateruk_map(address_map &map);
+	void checkmaj_sound_map(address_map &map);
+	void checkman_sound_map(address_map &map);
+	void checkman_sound_portmap(address_map &map);
+	void explorer_map(address_map &map);
+	void fantastc_map(address_map &map);
+	void frogf_map(address_map &map);
+	void frogger_map(address_map &map);
+	void frogger_sound_map(address_map &map);
+	void frogger_sound_portmap(address_map &map);
+	void froggeram_map(address_map &map);
+	void galaxian_map(address_map &map);
+	void galaxian_map_base(address_map &map);
+	void galaxian_map_discrete(address_map &map);
+	void jumpbug_map(address_map &map);
+	void kingball_sound_map(address_map &map);
+	void kingball_sound_portmap(address_map &map);
+	void konami_sound_map(address_map &map);
+	void konami_sound_portmap(address_map &map);
+	void monsterz_map(address_map &map);
+	void mooncrst_map(address_map &map);
+	void mooncrst_map_base(address_map &map);
+	void mooncrst_map_discrete(address_map &map);
+	void moonqsr_decrypted_opcodes_map(address_map &map);
+	void mshuttle_decrypted_opcodes_map(address_map &map);
+	void mshuttle_map(address_map &map);
+	void mshuttle_portmap(address_map &map);
+	void scobra_map(address_map &map);
+	void sfx_map(address_map &map);
+	void sfx_sample_map(address_map &map);
+	void sfx_sample_portmap(address_map &map);
+	void spactrai_map(address_map &map);
+	void takeoff_sound_map(address_map &map);
+	void takeoff_sound_portmap(address_map &map);
+	void tenspot_select_map(address_map &map);
+	void theend_map(address_map &map);
+	void timefgtr_map(address_map &map);
+	void turpins_map(address_map &map);
+	void turpins_sound_map(address_map &map);
+	void turtles_map(address_map &map);
+	void zigzag_map(address_map &map);
 };

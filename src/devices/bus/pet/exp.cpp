@@ -74,12 +74,27 @@ device_pet_expansion_card_interface::~device_pet_expansion_card_interface()
 
 
 //-------------------------------------------------
+//  device_validity_check -
+//-------------------------------------------------
+
+void pet_expansion_slot_device::device_validity_check(validity_checker &valid) const
+{
+	device_t *const carddev = get_card_device();
+	if (carddev && !dynamic_cast<device_pet_expansion_card_interface *>(carddev))
+		osd_printf_error("Card device %s (%s) does not implement device_pet_expansion_card_interface\n", carddev->tag(), carddev->name());
+}
+
+
+//-------------------------------------------------
 //  device_start - device-specific startup
 //-------------------------------------------------
 
 void pet_expansion_slot_device::device_start()
 {
-	m_card = dynamic_cast<device_pet_expansion_card_interface *>(get_card_device());
+	device_t *const carddev = get_card_device();
+	m_card = dynamic_cast<device_pet_expansion_card_interface *>(carddev);
+	if (carddev && !m_card)
+		fatalerror("Card device %s (%s) does not implement device_pet_expansion_card_interface\n", carddev->tag(), carddev->name());
 
 	// resolve callbacks
 	m_read_dma.resolve_safe(0);
@@ -93,10 +108,6 @@ void pet_expansion_slot_device::device_start()
 
 void pet_expansion_slot_device::device_reset()
 {
-	if (m_card != nullptr)
-	{
-		get_card_device()->reset();
-	}
 }
 
 

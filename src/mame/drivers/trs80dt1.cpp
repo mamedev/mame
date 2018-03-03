@@ -61,6 +61,9 @@ public:
 	DECLARE_WRITE8_MEMBER(port3_w);
 	I8275_DRAW_CHARACTER_MEMBER(crtc_update_row);
 
+	void trs80dt1(machine_config &config);
+	void io_map(address_map &map);
+	void prg_map(address_map &map);
 private:
 	bool m_bow;
 	virtual void machine_reset() override;
@@ -140,18 +143,13 @@ WRITE8_MEMBER( trs80dt1_state::port3_w )
 	m_beep->set_state(BIT(data, 4));
 }
 
-static ADDRESS_MAP_START( prg_map, AS_PROGRAM, 8, trs80dt1_state )
+ADDRESS_MAP_START(trs80dt1_state::prg_map)
 	AM_RANGE(0x0000, 0x0fff) AM_ROM
 	AM_RANGE(0x2000, 0x27ff) AM_READ(dma_r)
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( data_map, AS_DATA, 8, trs80dt1_state )
-ADDRESS_MAP_END
-
-static ADDRESS_MAP_START( io_map, AS_IO, 8, trs80dt1_state )
+ADDRESS_MAP_START(trs80dt1_state::io_map)
 	ADDRESS_MAP_GLOBAL_MASK(0xbfff) // A14 not used
-	AM_RANGE(0x0001, 0x0001) AM_WRITE(port1_w)
-	AM_RANGE(0x0003, 0x0003) AM_WRITE(port3_w)
 	AM_RANGE(0xa000, 0xa7ff) AM_RAM AM_SHARE("videoram")
 	AM_RANGE(0xa800, 0xa83f) AM_MIRROR(0x3c0) AM_DEVREADWRITE("nvram", x2210_device, read, write) // X2210
 	AM_RANGE(0xac00, 0xafff) AM_READ(key_r)
@@ -307,12 +305,13 @@ I8275_DRAW_CHARACTER_MEMBER( trs80dt1_state::crtc_update_row )
 }
 
 
-static MACHINE_CONFIG_START( trs80dt1 )
+MACHINE_CONFIG_START(trs80dt1_state::trs80dt1)
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", I8051, 7372800)
 	MCFG_CPU_PROGRAM_MAP(prg_map)
-	MCFG_CPU_DATA_MAP(data_map)
 	MCFG_CPU_IO_MAP(io_map)
+	MCFG_MCS51_PORT_P1_OUT_CB(WRITE8(trs80dt1_state, port1_w))
+	MCFG_MCS51_PORT_P3_OUT_CB(WRITE8(trs80dt1_state, port3_w))
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)

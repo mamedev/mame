@@ -14,6 +14,8 @@ public:
 			m_maincpu(*this, "maincpu")
 	{ }
 
+	void bingo(machine_config &config);
+	void bingo_map(address_map &map);
 protected:
 
 	// devices
@@ -26,7 +28,7 @@ public:
 };
 
 
-static ADDRESS_MAP_START( bingo_map, AS_PROGRAM, 8, bingo_state )
+ADDRESS_MAP_START(bingo_state::bingo_map)
 	AM_RANGE(0x0000, 0x7fff) AM_NOP
 	AM_RANGE(0x0000, 0x1eff) AM_ROM
 	AM_RANGE(0x1f00, 0x1fff) AM_RAM
@@ -43,7 +45,7 @@ DRIVER_INIT_MEMBER(bingo_state,bingo)
 {
 }
 
-static MACHINE_CONFIG_START( bingo )
+MACHINE_CONFIG_START(bingo_state::bingo)
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", S2650, 1000000)
 	MCFG_CPU_PROGRAM_MAP(bingo_map)
@@ -57,6 +59,8 @@ public:
 			m_maincpu(*this, "maincpu")
 	{ }
 
+	void seeben(machine_config &config);
+	void seeben_map(address_map &map);
 protected:
 
 	// devices
@@ -69,7 +73,7 @@ public:
 };
 
 
-static ADDRESS_MAP_START( seeben_map, AS_PROGRAM, 8, seeben_state )
+ADDRESS_MAP_START(seeben_state::seeben_map)
 ADDRESS_MAP_END
 
 static INPUT_PORTS_START( seeben )
@@ -83,7 +87,7 @@ DRIVER_INIT_MEMBER(seeben_state,seeben)
 {
 }
 
-static MACHINE_CONFIG_START( seeben )
+MACHINE_CONFIG_START(seeben_state::seeben)
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", I8085A, 1000000)
 	MCFG_CPU_PROGRAM_MAP(seeben_map)
@@ -97,6 +101,8 @@ public:
 			m_maincpu(*this, "maincpu")
 	{ }
 
+	void splin(machine_config &config);
+	void splin_map(address_map &map);
 protected:
 
 	// devices
@@ -108,7 +114,7 @@ public:
 	DECLARE_DRIVER_INIT(splin);
 };
 
-static ADDRESS_MAP_START( splin_map, AS_PROGRAM, 16, splin_state )
+ADDRESS_MAP_START(splin_state::splin_map)
 	AM_RANGE(0x00000, 0x0bfff) AM_RAM
 	AM_RANGE(0x0d900, 0x0d9ff) AM_RAM
 	AM_RANGE(0xe0000, 0xfffff) AM_ROM
@@ -125,7 +131,7 @@ DRIVER_INIT_MEMBER(splin_state,splin)
 {
 }
 
-static MACHINE_CONFIG_START( splin )
+MACHINE_CONFIG_START(splin_state::splin)
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", I80186, 16000000)
 	MCFG_CPU_PROGRAM_MAP(splin_map)

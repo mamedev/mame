@@ -82,7 +82,7 @@ const tiny_rom_entry *vic1520_device::device_rom_region() const
 //  ADDRESS_MAP( vic1520_mem )
 //-------------------------------------------------
 
-static ADDRESS_MAP_START( vic1520_mem, AS_PROGRAM, 8, vic1520_device )
+ADDRESS_MAP_START(vic1520_device::vic1520_mem)
 	ADDRESS_MAP_GLOBAL_MASK(0xfff)
 	AM_RANGE(0x000, 0x03f) AM_RAM
 	AM_RANGE(0x800, 0xfff) AM_ROM AM_REGION(M6500_1_TAG, 0)
@@ -93,8 +93,8 @@ ADDRESS_MAP_END
 //  device_add_mconfig - add device configuration
 //-------------------------------------------------
 
-MACHINE_CONFIG_MEMBER( vic1520_device::device_add_mconfig )
-	MCFG_CPU_ADD(M6500_1_TAG, M6502, XTAL_2MHz) // M6500/1
+MACHINE_CONFIG_START(vic1520_device::device_add_mconfig)
+	MCFG_CPU_ADD(M6500_1_TAG, M6502, XTAL(2'000'000)) // M6500/1
 	MCFG_CPU_PROGRAM_MAP(vic1520_mem)
 MACHINE_CONFIG_END
 

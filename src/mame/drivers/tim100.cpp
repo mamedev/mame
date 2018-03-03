@@ -38,6 +38,9 @@ public:
 	DECLARE_WRITE_LINE_MEMBER(irq_w);
 	I8275_DRAW_CHARACTER_MEMBER( crtc_display_pixels );
 
+	void tim100(machine_config &config);
+	void tim100_io(address_map &map);
+	void tim100_mem(address_map &map);
 private:
 	virtual void machine_start() override;
 	uint8_t *m_charmap;
@@ -48,7 +51,7 @@ private:
 	required_device<i8275_device> m_crtc;
 };
 
-static ADDRESS_MAP_START(tim100_mem, AS_PROGRAM, 8, tim100_state)
+ADDRESS_MAP_START(tim100_state::tim100_mem)
 	ADDRESS_MAP_UNMAP_HIGH
 	AM_RANGE(0x0000, 0x1fff) AM_ROM // 2764 at U16
 	AM_RANGE(0x2000, 0x27ff) AM_RAM AM_SHARE("videoram") // 2KB static ram CDM6116A at U15
@@ -60,7 +63,7 @@ static ADDRESS_MAP_START(tim100_mem, AS_PROGRAM, 8, tim100_state)
 	AM_RANGE(0xc000, 0xc001) AM_DEVREADWRITE("crtc", i8275_device, read, write) // i8276
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START(tim100_io, AS_IO, 8, tim100_state)
+ADDRESS_MAP_START(tim100_state::tim100_io)
 	ADDRESS_MAP_UNMAP_HIGH
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
 ADDRESS_MAP_END
@@ -154,9 +157,9 @@ WRITE_LINE_MEMBER( tim100_state::irq_w )
 }
 
 
-static MACHINE_CONFIG_START( tim100 )
+MACHINE_CONFIG_START(tim100_state::tim100)
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu",I8085A, XTAL_4_9152MHz) // divider unknown
+	MCFG_CPU_ADD("maincpu",I8085A, XTAL(4'915'200)) // divider unknown
 	MCFG_CPU_PROGRAM_MAP(tim100_mem)
 	MCFG_CPU_IO_MAP(tim100_io)
 
@@ -170,7 +173,7 @@ static MACHINE_CONFIG_START( tim100 )
 
 	MCFG_GFXDECODE_ADD("gfxdecode", "palette", tim100 )
 
-	MCFG_DEVICE_ADD("crtc", I8275, XTAL_4_9152MHz)
+	MCFG_DEVICE_ADD("crtc", I8275, XTAL(4'915'200))
 	MCFG_I8275_CHARACTER_WIDTH(12)
 	MCFG_I8275_DRAW_CHARACTER_CALLBACK_OWNER(tim100_state, crtc_display_pixels)
 	MCFG_I8275_DRQ_CALLBACK(WRITELINE(tim100_state, drq_w))

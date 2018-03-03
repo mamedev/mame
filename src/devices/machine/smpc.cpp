@@ -178,7 +178,7 @@ DEFINE_DEVICE_TYPE(SMPC_HLE, smpc_hle_device, "smpc_hle", "Sega Saturn SMPC HLE 
 
 // TODO: use DEVICE_ADDRESS_MAP once this fatalerror is fixed:
 // "uplift_submaps unhandled case: range straddling slots."
-static ADDRESS_MAP_START( smpc_regs, 0, 8, smpc_hle_device )
+ADDRESS_MAP_START(smpc_hle_device::smpc_regs)
 //  ADDRESS_MAP_UNMAP_HIGH
 	AM_RANGE(0x00, 0x0d) AM_WRITE(ireg_w)
 	AM_RANGE(0x1f, 0x1f) AM_WRITE(command_register_w)
@@ -204,7 +204,7 @@ ADDRESS_MAP_END
 smpc_hle_device::smpc_hle_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
 	: device_t(mconfig, SMPC_HLE, tag, owner, clock),
 	device_memory_interface(mconfig, *this),
-	m_space_config("regs", ENDIANNESS_LITTLE, 8, 7, 0, nullptr, *ADDRESS_MAP_NAME(smpc_regs)),
+	  m_space_config("regs", ENDIANNESS_LITTLE, 8, 7, 0, address_map_constructor(), address_map_constructor(FUNC(smpc_hle_device::smpc_regs), this)),
 	m_mini_nvram(*this, "smem"),
 	m_mshres(*this),
 	m_mshnmi(*this),
@@ -226,28 +226,12 @@ smpc_hle_device::smpc_hle_device(const machine_config &mconfig, const char *tag,
 	m_has_ctrl_ports = false;
 }
 
-// method setters
-void smpc_hle_device::static_set_region_code(device_t &device, uint8_t rgn)
-{
-	smpc_hle_device &dev = downcast<smpc_hle_device &>(device);
-	dev.m_region_code = rgn;
-}
-
-void smpc_hle_device::static_set_control_port_tags(device_t &device, const char *tag1, const char *tag2)
-{
-	smpc_hle_device &dev = downcast<smpc_hle_device &>(device);
-	dev.m_ctrl1_tag = tag1;
-	dev.m_ctrl2_tag = tag2;
-	// TODO: checking against nullptr still returns a device!?
-	dev.m_has_ctrl_ports = true;
-}
-
 //-------------------------------------------------
 //  device_add_mconfig - device-specific machine
 //  configuration addiitons
 //-------------------------------------------------
 
-MACHINE_CONFIG_MEMBER(smpc_hle_device::device_add_mconfig)
+MACHINE_CONFIG_START(smpc_hle_device::device_add_mconfig)
 	MCFG_NVRAM_ADD_0FILL("smem")
 
 	// TODO: custom RTC subdevice

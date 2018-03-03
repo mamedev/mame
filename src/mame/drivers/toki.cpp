@@ -142,11 +142,11 @@ WRITE8_MEMBER(toki_state::tokib_adpcm_data_w)
 
 /*****************************************************************************/
 
-static ADDRESS_MAP_START( toki_map, AS_PROGRAM, 16, toki_state )
+ADDRESS_MAP_START(toki_state::toki_map)
 	AM_RANGE(0x000000, 0x05ffff) AM_ROM
 	AM_RANGE(0x060000, 0x06d7ff) AM_RAM
 	AM_RANGE(0x06d800, 0x06dfff) AM_RAM AM_SHARE("spriteram")
-	AM_RANGE(0x06e000, 0x06e7ff) AM_RAM_DEVWRITE("palette", palette_device, write) AM_SHARE("palette")
+	AM_RANGE(0x06e000, 0x06e7ff) AM_RAM_DEVWRITE("palette", palette_device, write16) AM_SHARE("palette")
 	AM_RANGE(0x06e800, 0x06efff) AM_RAM_WRITE(background1_videoram_w) AM_SHARE("bg1_vram")
 	AM_RANGE(0x06f000, 0x06f7ff) AM_RAM_WRITE(background2_videoram_w) AM_SHARE("bg2_vram")
 	AM_RANGE(0x06f800, 0x06ffff) AM_RAM_WRITE(foreground_videoram_w) AM_SHARE("videoram")
@@ -158,10 +158,10 @@ static ADDRESS_MAP_START( toki_map, AS_PROGRAM, 16, toki_state )
 ADDRESS_MAP_END
 
 /* In the bootleg, sound and sprites are remapped to 0x70000 */
-static ADDRESS_MAP_START( tokib_map, AS_PROGRAM, 16, toki_state )
+ADDRESS_MAP_START(toki_state::tokib_map)
 	AM_RANGE(0x000000, 0x05ffff) AM_ROM
 	AM_RANGE(0x060000, 0x06dfff) AM_RAM
-	AM_RANGE(0x06e000, 0x06e7ff) AM_RAM_DEVWRITE("palette", palette_device, write) AM_SHARE("palette")
+	AM_RANGE(0x06e000, 0x06e7ff) AM_RAM_DEVWRITE("palette", palette_device, write16) AM_SHARE("palette")
 	AM_RANGE(0x06e800, 0x06efff) AM_RAM_WRITE(background1_videoram_w) AM_SHARE("bg1_vram")
 	AM_RANGE(0x06f000, 0x06f7ff) AM_RAM_WRITE(background2_videoram_w) AM_SHARE("bg2_vram")
 	AM_RANGE(0x06f800, 0x06ffff) AM_RAM_WRITE(foreground_videoram_w) AM_SHARE("videoram")
@@ -182,7 +182,7 @@ ADDRESS_MAP_END
 
 /*****************************************************************************/
 
-static ADDRESS_MAP_START( toki_audio_map, AS_PROGRAM, 8, toki_state )
+ADDRESS_MAP_START(toki_state::toki_audio_map)
 	AM_RANGE(0x0000, 0x1fff) AM_DEVREAD("sei80bu", sei80bu_device, data_r)
 	AM_RANGE(0x2000, 0x27ff) AM_RAM
 	AM_RANGE(0x4000, 0x4000) AM_DEVWRITE("seibu_sound", seibu_sound_device, pending_w)
@@ -200,12 +200,12 @@ static ADDRESS_MAP_START( toki_audio_map, AS_PROGRAM, 8, toki_state )
 	AM_RANGE(0x8000, 0xffff) AM_ROMBANK("seibu_bank1")
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( toki_audio_opcodes_map, AS_OPCODES, 8, toki_state )
+ADDRESS_MAP_START(toki_state::toki_audio_opcodes_map)
 	AM_RANGE(0x0000, 0x1fff) AM_DEVREAD("sei80bu", sei80bu_device, opcode_r)
 	AM_RANGE(0x8000, 0xffff) AM_ROMBANK("seibu_bank1")
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( jujuba_audio_map, AS_PROGRAM, 8, toki_state )
+ADDRESS_MAP_START(toki_state::jujuba_audio_map)
 	AM_RANGE(0x0000, 0x1fff) AM_READ(jujuba_z80_data_decrypt)
 	AM_RANGE(0x2000, 0x27ff) AM_RAM
 	AM_RANGE(0x4000, 0x4000) AM_DEVWRITE("seibu_sound", seibu_sound_device, pending_w)
@@ -223,7 +223,7 @@ static ADDRESS_MAP_START( jujuba_audio_map, AS_PROGRAM, 8, toki_state )
 	AM_RANGE(0x8000, 0xffff) AM_ROMBANK("seibu_bank1")
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( jujuba_audio_opcodes_map, AS_OPCODES, 8, toki_state )
+ADDRESS_MAP_START(toki_state::jujuba_audio_opcodes_map)
 	AM_RANGE(0x0000, 0x1fff) AM_ROM AM_REGION("audiocpu", 0)
 	AM_RANGE(0x8000, 0xffff) AM_ROMBANK("seibu_bank1")
 ADDRESS_MAP_END
@@ -233,7 +233,7 @@ READ8_MEMBER(toki_state::jujuba_z80_data_decrypt)
 	return m_audiocpu_rom[offset] ^ 0x55;
 }
 
-static ADDRESS_MAP_START( tokib_audio_map, AS_PROGRAM, 8, toki_state )
+ADDRESS_MAP_START(toki_state::tokib_audio_map)
 	AM_RANGE(0x0000, 0x7fff) AM_ROM
 	AM_RANGE(0x8000, 0xbfff) AM_ROMBANK("bank1")
 	AM_RANGE(0xe000, 0xe000) AM_WRITE(tokib_adpcm_control_w) /* MSM5205 + ROM bank */
@@ -485,16 +485,16 @@ GFXDECODE_END
 
 /*****************************************************************************/
 
-static MACHINE_CONFIG_START( toki ) /* KOYO 20.000MHz near the cpu */
+MACHINE_CONFIG_START(toki_state::toki) /* KOYO 20.000MHz near the cpu */
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", M68000,XTAL_20MHz /2)   /* verified on pcb */
+	MCFG_CPU_ADD("maincpu", M68000,XTAL(20'000'000) /2)   /* verified on pcb */
 	MCFG_CPU_PROGRAM_MAP(toki_map)
 	MCFG_CPU_VBLANK_INT_DRIVER("screen", toki_state,  irq1_line_hold)/* VBL */
 
-	MCFG_CPU_ADD("audiocpu", Z80, XTAL_14_31818MHz/4) // verified on pcb
+	MCFG_CPU_ADD("audiocpu", Z80, XTAL(14'318'181)/4) // verified on pcb
 	MCFG_CPU_PROGRAM_MAP(toki_audio_map)
-	MCFG_CPU_DECRYPTED_OPCODES_MAP(toki_audio_opcodes_map)
+	MCFG_CPU_OPCODES_MAP(toki_audio_opcodes_map)
 
 	MCFG_DEVICE_ADD("sei80bu", SEI80BU, 0)
 	MCFG_DEVICE_ROM("audiocpu")
@@ -517,11 +517,11 @@ static MACHINE_CONFIG_START( toki ) /* KOYO 20.000MHz near the cpu */
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
 
-	MCFG_SOUND_ADD("ymsnd", YM3812, XTAL_14_31818MHz/4)
+	MCFG_SOUND_ADD("ymsnd", YM3812, XTAL(14'318'181)/4)
 	MCFG_YM3812_IRQ_HANDLER(DEVWRITELINE("seibu_sound", seibu_sound_device, fm_irqhandler))
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 
-	MCFG_OKIM6295_ADD("oki", XTAL_12MHz/12, PIN7_HIGH) // verified on pcb
+	MCFG_OKIM6295_ADD("oki", XTAL(12'000'000)/12, PIN7_HIGH) // verified on pcb
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 
 	MCFG_DEVICE_ADD("seibu_sound", SEIBU_SOUND, 0)
@@ -531,15 +531,16 @@ static MACHINE_CONFIG_START( toki ) /* KOYO 20.000MHz near the cpu */
 	MCFG_SEIBU_SOUND_YM_WRITE_CB(DEVWRITE8("ymsnd", ym3812_device, write))
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_DERIVED( jujuba, toki )
+MACHINE_CONFIG_START(toki_state::jujuba)
+	toki(config);
 	MCFG_DEVICE_REMOVE("sei80bu")
 
 	MCFG_DEVICE_MODIFY("audiocpu")
 	MCFG_CPU_PROGRAM_MAP(jujuba_audio_map)
-	MCFG_CPU_DECRYPTED_OPCODES_MAP(jujuba_audio_opcodes_map)
+	MCFG_CPU_OPCODES_MAP(jujuba_audio_opcodes_map)
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_START( tokib )
+MACHINE_CONFIG_START(toki_state::tokib)
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", M68000, 10000000)   /* 10MHz causes bad slowdowns with monkey machine rd1, but is correct, 20Mhz XTAL */
@@ -959,7 +960,7 @@ DRIVER_INIT_MEMBER(toki_state,toki)
 	memcpy(&buffer[0],ROM,0x20000);
 	for( i = 0; i < 0x20000; i++ )
 	{
-		ROM[i] = buffer[BITSWAP24(i,23,22,21,20,19,18,17,16,13,14,15,12,11,10,9,8,7,6,5,4,3,2,1,0)];
+		ROM[i] = buffer[bitswap<24>(i,23,22,21,20,19,18,17,16,13,14,15,12,11,10,9,8,7,6,5,4,3,2,1,0)];
 	}
 }
 
@@ -1014,7 +1015,7 @@ DRIVER_INIT_MEMBER(toki_state,jujuba)
 
 		for (i = 0; i < 0x60000/2; i++)
 		{
-			prgrom[i] = BITSWAP16(prgrom[i],15,12,13,14,
+			prgrom[i] = bitswap<16>(prgrom[i],15,12,13,14,
 											11,10, 9, 8,
 											7, 6,  5, 3,
 											4, 2,  1, 0);
@@ -1029,7 +1030,7 @@ DRIVER_INIT_MEMBER(toki_state,jujuba)
 		memcpy(&buffer[0],ROM,0x20000);
 		for( i = 0; i < 0x20000; i++ )
 		{
-			ROM[i] = buffer[BITSWAP24(i,23,22,21,20,19,18,17,16,13,14,15,12,11,10,9,8,7,6,5,4,3,2,1,0)];
+			ROM[i] = buffer[bitswap<24>(i,23,22,21,20,19,18,17,16,13,14,15,12,11,10,9,8,7,6,5,4,3,2,1,0)];
 		}
 	}
 }

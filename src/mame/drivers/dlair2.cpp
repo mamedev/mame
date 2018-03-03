@@ -35,7 +35,7 @@ http://www.dragons-lair-project.com/tech/pages/dl2.asp
 #include "screen.h"
 #include "speaker.h"
 
-#define MAIN_CLOCK XTAL_30MHz
+#define MAIN_CLOCK XTAL(30'000'000)
 
 class dlair2_state : public driver_device
 {
@@ -53,6 +53,9 @@ public:
 	INTERRUPT_GEN_MEMBER(dlair2_timer_irq);
 	DECLARE_PALETTE_INIT(dlair2);
 
+	void dlair2(machine_config &config);
+	void dlair2_io(address_map &map);
+	void dlair2_map(address_map &map);
 protected:
 	// driver_device overrides
 	virtual void machine_start() override;
@@ -70,12 +73,12 @@ uint32_t dlair2_state::screen_update( screen_device &screen, bitmap_ind16 &bitma
 	return 0;
 }
 
-static ADDRESS_MAP_START( dlair2_map, AS_PROGRAM, 8, dlair2_state )
+ADDRESS_MAP_START(dlair2_state::dlair2_map)
 	AM_RANGE(0x00000, 0xeffff) AM_RAM
 	AM_RANGE(0xf0000, 0xfffff) AM_ROM AM_REGION("ipl", 0)
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( dlair2_io, AS_IO, 8, dlair2_state )
+ADDRESS_MAP_START(dlair2_state::dlair2_io)
 //  AM_RANGE(0x020, 0x020) ICR
 //  AM_RANGE(0x042, 0x043) sound related
 //  AM_RANGE(0x061, 0x061) sound related
@@ -173,7 +176,7 @@ INTERRUPT_GEN_MEMBER(dlair2_state::dlair2_timer_irq)
 	device.execute().set_input_line_and_vector(0,HOLD_LINE,0x20/4);
 }
 
-static MACHINE_CONFIG_START( dlair2 )
+MACHINE_CONFIG_START(dlair2_state::dlair2)
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", I8088 , MAIN_CLOCK/3)   /* Schematics show I8088 "max" CPU */

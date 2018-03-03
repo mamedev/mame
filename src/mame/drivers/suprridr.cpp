@@ -143,7 +143,7 @@ WRITE8_MEMBER(suprridr_state::coin_lock_w)
  *
  *************************************/
 
-static ADDRESS_MAP_START( main_map, AS_PROGRAM, 8, suprridr_state )
+ADDRESS_MAP_START(suprridr_state::main_map)
 	AM_RANGE(0x0000, 0x7fff) AM_ROM
 	AM_RANGE(0x8000, 0x87ff) AM_RAM
 	AM_RANGE(0x8800, 0x8bff) AM_RAM_WRITE(bgram_w) AM_SHARE("bgram")
@@ -165,7 +165,7 @@ static ADDRESS_MAP_START( main_map, AS_PROGRAM, 8, suprridr_state )
 ADDRESS_MAP_END
 
 
-static ADDRESS_MAP_START( main_portmap, AS_IO, 8, suprridr_state )
+ADDRESS_MAP_START(suprridr_state::main_portmap)
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	AM_RANGE(0x00, 0x00) AM_DEVREAD("watchdog", watchdog_timer_device, reset_r)
 ADDRESS_MAP_END
@@ -178,13 +178,13 @@ ADDRESS_MAP_END
  *
  *************************************/
 
-static ADDRESS_MAP_START( sound_map, AS_PROGRAM, 8, suprridr_state )
+ADDRESS_MAP_START(suprridr_state::sound_map)
 	AM_RANGE(0x0000, 0x0fff) AM_ROM
 	AM_RANGE(0x3800, 0x3bff) AM_RAM
 ADDRESS_MAP_END
 
 
-static ADDRESS_MAP_START( sound_portmap, AS_IO, 8, suprridr_state )
+ADDRESS_MAP_START(suprridr_state::sound_portmap)
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	AM_RANGE(0x00, 0x00) AM_DEVWRITE("soundlatch", generic_latch_8_device, acknowledge_w)
 	AM_RANGE(0x8c, 0x8d) AM_DEVWRITE("ay1", ay8910_device, address_data_w)
@@ -317,10 +317,10 @@ GFXDECODE_END
  *
  *************************************/
 
-static MACHINE_CONFIG_START( suprridr )
+MACHINE_CONFIG_START(suprridr_state::suprridr)
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", Z80, XTAL_49_152MHz/16)     /* 3 MHz */
+	MCFG_CPU_ADD("maincpu", Z80, XTAL(49'152'000)/16)     /* 3 MHz */
 	MCFG_CPU_PROGRAM_MAP(main_map)
 	MCFG_CPU_IO_MAP(main_portmap)
 	MCFG_CPU_VBLANK_INT_DRIVER("screen", suprridr_state,  main_nmi_gen)
@@ -347,10 +347,10 @@ static MACHINE_CONFIG_START( suprridr )
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
 
-	MCFG_SOUND_ADD("ay1", AY8910, XTAL_49_152MHz/32)
+	MCFG_SOUND_ADD("ay1", AY8910, XTAL(49'152'000)/32)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
 
-	MCFG_SOUND_ADD("ay2", AY8910, XTAL_49_152MHz/32)
+	MCFG_SOUND_ADD("ay2", AY8910, XTAL(49'152'000)/32)
 	MCFG_AY8910_PORT_A_READ_CB(DEVREAD8("soundlatch", generic_latch_8_device, read))
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
 

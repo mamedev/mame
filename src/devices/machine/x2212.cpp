@@ -16,11 +16,11 @@
 //  GLOBAL VARIABLES
 //**************************************************************************
 
-static ADDRESS_MAP_START( x2212_sram_map, 0, 8, x2212_device )
+ADDRESS_MAP_START(x2212_device::x2212_sram_map)
 	AM_RANGE(0x0000, 0x00ff) AM_RAM
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( x2212_e2prom_map, 1, 8, x2212_device )
+ADDRESS_MAP_START(x2212_device::x2212_e2prom_map)
 	AM_RANGE(0x0000, 0x00ff) AM_RAM
 ADDRESS_MAP_END
 
@@ -48,25 +48,14 @@ x2212_device::x2212_device(const machine_config &mconfig, device_type type, cons
 	, device_memory_interface(mconfig, *this)
 	, device_nvram_interface(mconfig, *this)
 	, m_auto_save(false)
-	, m_sram_space_config("SRAM", ENDIANNESS_BIG, 8, 8, 0, *ADDRESS_MAP_NAME(x2212_sram_map))
-	, m_e2prom_space_config("E2PROM", ENDIANNESS_BIG, 8, 8, 0, *ADDRESS_MAP_NAME(x2212_e2prom_map))
+	, m_sram_space_config("SRAM", ENDIANNESS_BIG, 8, 8, 0, address_map_constructor(FUNC(x2212_device::x2212_sram_map), this))
+	, m_e2prom_space_config("E2PROM", ENDIANNESS_BIG, 8, 8, 0, address_map_constructor(FUNC(x2212_device::x2212_e2prom_map), this))
 	, m_store(false)
 	, m_array_recall(false)
 	, m_size_data(size_data)
 	, m_default_data(*this, DEVICE_SELF, size_data)
 {
 }
-
-//-------------------------------------------------
-//  static_set_auto_save - configuration helper
-//  to set the auto-save flag
-//-------------------------------------------------
-
-void x2212_device::static_set_auto_save(device_t &device)
-{
-	downcast<x2212_device &>(device).m_auto_save = true;
-}
-
 
 //-------------------------------------------------
 //  device_start - device-specific startup
@@ -125,8 +114,8 @@ void x2212_device::nvram_default()
 
 void x2212_device::nvram_read(emu_file &file)
 {
-	uint8_t *buffer = (uint8_t *) alloca(m_size_data);
-	file.read(buffer, m_size_data);
+	auto buffer = std::make_unique<uint8_t[]>(m_size_data);
+	file.read(buffer.get(), m_size_data);
 	for (int byte = 0; byte < m_size_data; byte++)
 	{
 		m_sram->write_byte(byte, 0xff);

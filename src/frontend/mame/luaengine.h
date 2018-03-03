@@ -132,8 +132,8 @@ private:
 	struct addr_space {
 		addr_space(address_space &space, device_memory_interface &dev) :
 			space(space), dev(dev) {}
-		template<typename T> T mem_read(offs_t address, sol::object shift);
-		template<typename T> void mem_write(offs_t address, T val, sol::object shift);
+		template<typename T> T mem_read(offs_t address);
+		template<typename T> void mem_write(offs_t address, T val);
 		template<typename T> T log_mem_read(offs_t address);
 		template<typename T> void log_mem_write(offs_t address, T val);
 		template<typename T> T direct_mem_read(offs_t address);

@@ -27,9 +27,11 @@ public:
 	virtual void machine_reset() override;
 
 	required_device<cpu_device> m_maincpu;
+	void clowndwn(machine_config &config);
+	void clowndwn_map(address_map &map);
 };
 
-static ADDRESS_MAP_START(clowndwn_map, AS_PROGRAM, 8, clowndwn_state)
+ADDRESS_MAP_START(clowndwn_state::clowndwn_map)
 	AM_RANGE(0x0000, 0x07ff) AM_RAM
 	AM_RANGE(0x4100, 0x4103) AM_DEVREADWRITE("pia0", pia6821_device, read, write)
 	AM_RANGE(0x4200, 0x4203) AM_DEVREADWRITE("pia1", pia6821_device, read, write)
@@ -53,7 +55,7 @@ void clowndwn_state::machine_reset()
 }
 
 
-static MACHINE_CONFIG_START( clowndwn )
+MACHINE_CONFIG_START(clowndwn_state::clowndwn)
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", M6802, 8000000) // unknown type and clock

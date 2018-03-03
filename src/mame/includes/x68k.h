@@ -341,6 +341,13 @@ public:
 	DECLARE_READ16_MEMBER(x68k_tvram_r);
 	IRQ_CALLBACK_MEMBER(x68k_int_ack);
 
+	void x68kxvi(machine_config &config);
+	void x68ksupr(machine_config &config);
+	void x68030(machine_config &config);
+	void x68000(machine_config &config);
+	void x68030_map(address_map &map);
+	void x68k_map(address_map &map);
+	void x68kxvi_map(address_map &map);
 private:
 	inline void x68k_plot_pixel(bitmap_rgb32 &bitmap, int x, int y, uint32_t color);
 	void x68k_crtc_text_copy(int src, int dest, uint8_t planes);

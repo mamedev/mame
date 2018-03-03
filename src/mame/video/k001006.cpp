@@ -70,7 +70,7 @@ READ32_MEMBER( k001006_device::read )
 		{
 			case 0x0b:      // CG Board ROM read
 			{
-				uint16_t *rom = (uint16_t*)space.machine().root_device().memregion(m_gfx_region)->base();
+				uint16_t *rom = (uint16_t*)machine().root_device().memregion(m_gfx_region)->base();
 				return rom[m_addr / 2] << 16;
 			}
 			case 0x0d:      // Palette RAM read

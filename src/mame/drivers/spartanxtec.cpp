@@ -68,6 +68,10 @@ public:
 	DECLARE_WRITE8_MEMBER(a801_w);
 	DECLARE_WRITE8_MEMBER(sound_irq_ack);
 	DECLARE_WRITE8_MEMBER(irq_ack);
+	void spartanxtec(machine_config &config);
+	void spartanxtec_map(address_map &map);
+	void spartanxtec_sound_io(address_map &map);
+	void spartanxtec_sound_map(address_map &map);
 };
 
 
@@ -173,7 +177,7 @@ WRITE8_MEMBER(spartanxtec_state::irq_ack)
 }
 
 
-static ADDRESS_MAP_START( spartanxtec_map, AS_PROGRAM, 8, spartanxtec_state )
+ADDRESS_MAP_START(spartanxtec_state::spartanxtec_map)
 	AM_RANGE(0x0000, 0x7fff) AM_ROM
 	AM_RANGE(0xc400, 0xc7ff) AM_RAM AM_SHARE("spriteram")
 
@@ -205,7 +209,7 @@ WRITE8_MEMBER(spartanxtec_state::sound_irq_ack)
 }
 
 
-static ADDRESS_MAP_START( spartanxtec_sound_map, AS_PROGRAM, 8, spartanxtec_state )
+ADDRESS_MAP_START(spartanxtec_state::spartanxtec_sound_map)
 
 	AM_RANGE(0x0000, 0x0fff) AM_ROM
 	AM_RANGE(0x8000, 0x83ff) AM_RAM
@@ -213,7 +217,7 @@ static ADDRESS_MAP_START( spartanxtec_sound_map, AS_PROGRAM, 8, spartanxtec_stat
 	AM_RANGE(0xc000, 0xc000) AM_DEVREAD("soundlatch", generic_latch_8_device, read)
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( spartanxtec_sound_io, AS_IO, 8, spartanxtec_state )
+ADDRESS_MAP_START(spartanxtec_state::spartanxtec_sound_io)
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	AM_RANGE(0x0000, 0x0000) AM_WRITE( sound_irq_ack )
 
@@ -349,7 +353,7 @@ PALETTE_INIT_MEMBER(spartanxtec_state, spartanxtec)
 
 
 
-static MACHINE_CONFIG_START( spartanxtec )
+MACHINE_CONFIG_START(spartanxtec_state::spartanxtec)
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", Z80,4000000)         /* ? MHz */

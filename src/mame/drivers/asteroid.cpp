@@ -187,7 +187,6 @@ There is not a rev 03 known or dumped. An Asteroids rev 03 is not mentioned in a
 
 #include "emu.h"
 #include "includes/asteroid.h"
-#include "audio/llander.h"
 #include "cpu/m6502/m6502.h"
 #include "machine/74259.h"
 #include "machine/atari_vg.h"
@@ -199,8 +198,8 @@ There is not a rev 03 known or dumped. An Asteroids rev 03 is not mentioned in a
 
 #include "astdelux.lh"
 
-#define MASTER_CLOCK (XTAL_12_096MHz)
-#define CLOCK_3KHZ   (double(MASTER_CLOCK) / 4096)
+#define MASTER_CLOCK (XTAL(12'096'000))
+#define CLOCK_3KHZ   (MASTER_CLOCK / 4096)
 
 /*************************************
  *
@@ -249,7 +248,7 @@ WRITE8_MEMBER(asteroid_state::llander_led_w)
  *
  *************************************/
 
-static ADDRESS_MAP_START( asteroid_map, AS_PROGRAM, 8, asteroid_state )
+ADDRESS_MAP_START(asteroid_state::asteroid_map)
 	ADDRESS_MAP_GLOBAL_MASK(0x7fff)
 	AM_RANGE(0x0000, 0x01ff) AM_RAM
 	AM_RANGE(0x0200, 0x02ff) AM_RAMBANK("ram1") AM_SHARE("ram1")
@@ -270,7 +269,7 @@ static ADDRESS_MAP_START( asteroid_map, AS_PROGRAM, 8, asteroid_state )
 ADDRESS_MAP_END
 
 
-static ADDRESS_MAP_START( astdelux_map, AS_PROGRAM, 8, asteroid_state )
+ADDRESS_MAP_START(asteroid_state::astdelux_map)
 	ADDRESS_MAP_GLOBAL_MASK(0x7fff)
 	AM_RANGE(0x0000, 0x01ff) AM_RAM
 	AM_RANGE(0x0200, 0x02ff) AM_RAMBANK("ram1") AM_SHARE("ram1")
@@ -293,7 +292,7 @@ static ADDRESS_MAP_START( astdelux_map, AS_PROGRAM, 8, asteroid_state )
 ADDRESS_MAP_END
 
 
-static ADDRESS_MAP_START( llander_map, AS_PROGRAM, 8, asteroid_state )
+ADDRESS_MAP_START(asteroid_state::llander_map)
 	ADDRESS_MAP_GLOBAL_MASK(0x7fff)
 	AM_RANGE(0x0000, 0x00ff) AM_RAM AM_MIRROR(0x1f00)
 	AM_RANGE(0x2000, 0x2000) AM_READ_PORT("IN0")
@@ -650,7 +649,7 @@ INPUT_PORTS_END
  *
  *************************************/
 
-static MACHINE_CONFIG_START( asteroid_base )
+MACHINE_CONFIG_START(asteroid_state::asteroid_base)
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", M6502, MASTER_CLOCK/8)
@@ -658,6 +657,8 @@ static MACHINE_CONFIG_START( asteroid_base )
 	MCFG_CPU_PERIODIC_INT_DRIVER(asteroid_state, asteroid_interrupt, CLOCK_3KHZ/12)
 
 	MCFG_WATCHDOG_ADD("watchdog")
+
+	MCFG_TTL153_ADD("dsw_sel")
 
 	/* video hardware */
 	MCFG_VECTOR_ADD("vector")
@@ -671,13 +672,15 @@ static MACHINE_CONFIG_START( asteroid_base )
 	MCFG_AVGDVG_VECTOR("vector")
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_DERIVED( asteroid, asteroid_base )
+MACHINE_CONFIG_START(asteroid_state::asteroid)
+	asteroid_base(config);
 
 	/* sound hardware */
-	MCFG_FRAGMENT_ADD(asteroid_sound)
+	asteroid_sound(config);
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_DERIVED( asterock, asteroid )
+MACHINE_CONFIG_START(asteroid_state::asterock)
+	asteroid(config);
 
 	/* basic machine hardware */
 	MCFG_CPU_MODIFY("maincpu")
@@ -685,7 +688,8 @@ static MACHINE_CONFIG_DERIVED( asterock, asteroid )
 MACHINE_CONFIG_END
 
 
-static MACHINE_CONFIG_DERIVED( astdelux, asteroid_base )
+MACHINE_CONFIG_START(asteroid_state::astdelux)
+	asteroid_base(config);
 
 	/* basic machine hardware */
 	MCFG_CPU_MODIFY("maincpu")
@@ -694,7 +698,7 @@ static MACHINE_CONFIG_DERIVED( astdelux, asteroid_base )
 	MCFG_ATARIVGEAROM_ADD("earom")
 
 	/* sound hardware */
-	MCFG_FRAGMENT_ADD(astdelux_sound)
+	astdelux_sound(config);
 
 	MCFG_SOUND_ADD("pokey", POKEY, MASTER_CLOCK/8)
 	MCFG_POKEY_ALLPOT_R_CB(IOPORT("DSW2"))
@@ -712,12 +716,13 @@ static MACHINE_CONFIG_DERIVED( astdelux, asteroid_base )
 MACHINE_CONFIG_END
 
 
-static MACHINE_CONFIG_DERIVED( llander, asteroid_base )
+MACHINE_CONFIG_START(asteroid_state::llander)
+	asteroid_base(config);
 
 	/* basic machine hardware */
 	MCFG_CPU_MODIFY("maincpu")
 	MCFG_CPU_PROGRAM_MAP(llander_map)
-	MCFG_CPU_PERIODIC_INT_DRIVER(asteroid_state, llander_interrupt,  (double)MASTER_CLOCK/4096/12)
+	MCFG_CPU_PERIODIC_INT_DRIVER(asteroid_state, llander_interrupt,  MASTER_CLOCK/4096/12)
 
 	MCFG_SCREEN_MODIFY("screen")
 	MCFG_SCREEN_REFRESH_RATE(CLOCK_3KHZ/12/6)
@@ -725,7 +730,7 @@ static MACHINE_CONFIG_DERIVED( llander, asteroid_base )
 	MCFG_SCREEN_UPDATE_DEVICE("vector", vector_device, screen_update)
 
 	/* sound hardware */
-	MCFG_FRAGMENT_ADD(llander_sound)
+	llander_sound(config);
 MACHINE_CONFIG_END
 
 

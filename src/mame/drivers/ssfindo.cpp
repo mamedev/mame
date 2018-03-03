@@ -288,14 +288,20 @@ public:
 	TIMER_CALLBACK_MEMBER(PS7500_Timer0_callback);
 	TIMER_CALLBACK_MEMBER(PS7500_Timer1_callback);
 
-	typedef void (ssfindo_state::*speedup_func)(address_space &space);
+	typedef void (ssfindo_state::*speedup_func)();
 	speedup_func m_speedup;
 
 	void PS7500_startTimer0();
 	void PS7500_startTimer1();
 	void PS7500_reset();
-	void ssfindo_speedups(address_space& space);
-	void ppcar_speedups(address_space& space);
+	void ssfindo_speedups();
+	void ppcar_speedups();
+	void ssfindo(machine_config &config);
+	void ppcar(machine_config &config);
+	void tetfight(machine_config &config);
+	void ppcar_map(address_map &map);
+	void ssfindo_map(address_map &map);
+	void tetfight_map(address_map &map);
 };
 
 
@@ -390,20 +396,20 @@ void ssfindo_state::PS7500_reset()
 }
 
 
-void ssfindo_state::ssfindo_speedups(address_space& space)
+void ssfindo_state::ssfindo_speedups()
 {
-	if (space.device().safe_pc()==0x2d6c8) // ssfindo
-		space.device().execute().spin_until_time(attotime::from_usec(20));
-	else if (space.device().safe_pc()==0x2d6bc) // ssfindo
-		space.device().execute().spin_until_time(attotime::from_usec(20));
+	if (m_maincpu->pc()==0x2d6c8) // ssfindo
+		m_maincpu->spin_until_time(attotime::from_usec(20));
+	else if (m_maincpu->pc()==0x2d6bc) // ssfindo
+		m_maincpu->spin_until_time(attotime::from_usec(20));
 }
 
-void ssfindo_state::ppcar_speedups(address_space& space)
+void ssfindo_state::ppcar_speedups()
 {
-	if (space.device().safe_pc()==0x000bc8) // ppcar
-		space.device().execute().spin_until_time(attotime::from_usec(20));
-	else if (space.device().safe_pc()==0x000bbc) // ppcar
-		space.device().execute().spin_until_time(attotime::from_usec(20));
+	if (m_maincpu->pc()==0x000bc8) // ppcar
+		m_maincpu->spin_until_time(attotime::from_usec(20));
+	else if (m_maincpu->pc()==0x000bbc) // ppcar
+		m_maincpu->spin_until_time(attotime::from_usec(20));
 }
 
 
@@ -416,7 +422,7 @@ READ32_MEMBER(ssfindo_state::PS7500_IO_r)
 
 		case IOLINES: //TODO: eeprom  24c01
 #if 0
-		osd_printf_debug("IOLINESR %i @%x\n", offset, space.device().safe_pc());
+		osd_printf_debug("IOLINESR %i @%x\n", offset, m_maincpu->pc());
 #endif
 
 		if(m_flashType == 1)
@@ -431,7 +437,7 @@ READ32_MEMBER(ssfindo_state::PS7500_IO_r)
 			return (m_PS7500_IO[IRQSTA] & m_PS7500_IO[IRQMSKA]) | 0x80;
 
 		case IOCR: //TODO: nINT1, OD[n] p.81
-			if (m_speedup) (this->*m_speedup)(space);
+			if (m_speedup) (this->*m_speedup)();
 
 			if( m_iocr_hack)
 			{
@@ -472,13 +478,13 @@ WRITE32_MEMBER(ssfindo_state::PS7500_IO_w)
 				if(data&0xc0)
 					m_adrLatch=0;
 
-			if(space.device().safe_pc() == 0xbac0 && m_flashType == 1)
+			if(m_maincpu->pc() == 0xbac0 && m_flashType == 1)
 			{
 				m_flashN=data&1;
 			}
 
 #if 0
-				logerror("IOLINESW %i = %x  @%x\n",offset,data,space.device().safe_pc());
+				logerror("IOLINESW %i = %x  @%x\n",offset,data,m_maincpu->pc());
 #endif
 			break;
 
@@ -505,7 +511,7 @@ WRITE32_MEMBER(ssfindo_state::PS7500_IO_w)
 			break;
 
 		case IOCR:
-			//popmessage("IOLINESW %i = %x  @%x\n",offset,data,space.device().safe_pc());
+			//popmessage("IOLINESW %i = %x  @%x\n",offset,data,m_maincpu->pc());
 			COMBINE_DATA(&m_PS7500_IO[offset]);
 			// TODO: correct hook-up
 			m_i2cmem->write_scl((data & 0x01) ? 1 : 0);
@@ -560,7 +566,7 @@ WRITE32_MEMBER(ssfindo_state::io_w)
 	COMBINE_DATA(&temp);
 
 #if 0
-	logerror("[io_w] = %x @%x [latch=%x]\n",data,space.device().safe_pc(),m_adrLatch);
+	logerror("[io_w] = %x @%x [latch=%x]\n",data,m_maincpu->pc(),m_adrLatch);
 #endif
 
 	if(m_adrLatch==1)
@@ -595,7 +601,7 @@ READ32_MEMBER(ssfindo_state::randomized_r)
 	return machine().rand();
 }
 
-static ADDRESS_MAP_START( ssfindo_map, AS_PROGRAM, 32, ssfindo_state )
+ADDRESS_MAP_START(ssfindo_state::ssfindo_map)
 	AM_RANGE(0x00000000, 0x000fffff) AM_ROM
 	AM_RANGE(0x03200000, 0x032001ff) AM_READWRITE(PS7500_IO_r,PS7500_IO_w)
 	AM_RANGE(0x03012e60, 0x03012e67) AM_NOP
@@ -613,7 +619,7 @@ static ADDRESS_MAP_START( ssfindo_map, AS_PROGRAM, 32, ssfindo_state )
 	AM_RANGE(0x10000000, 0x11ffffff) AM_RAM AM_SHARE("vram")
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( ppcar_map, AS_PROGRAM, 32, ssfindo_state )
+ADDRESS_MAP_START(ssfindo_state::ppcar_map)
 	AM_RANGE(0x00000000, 0x000fffff) AM_ROM
 	AM_RANGE(0x03200000, 0x032001ff) AM_READWRITE(PS7500_IO_r,PS7500_IO_w)
 	AM_RANGE(0x03012b00, 0x03012bff) AM_READ(randomized_r) AM_WRITENOP
@@ -639,7 +645,7 @@ WRITE32_MEMBER(ssfindo_state::tetfight_unk_w)
 	//sound latch ?
 }
 
-static ADDRESS_MAP_START( tetfight_map, AS_PROGRAM, 32, ssfindo_state )
+ADDRESS_MAP_START(ssfindo_state::tetfight_map)
 	AM_RANGE(0x00000000, 0x001fffff) AM_ROM
 	AM_RANGE(0x03200000, 0x032001ff) AM_READWRITE(PS7500_IO_r,PS7500_IO_w)
 	AM_RANGE(0x03400000, 0x03400003) AM_WRITE(FIFO_w)
@@ -782,7 +788,7 @@ static INPUT_PORTS_START( tetfight )
 INPUT_PORTS_END
 
 
-static MACHINE_CONFIG_START( ssfindo )
+MACHINE_CONFIG_START(ssfindo_state::ssfindo)
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", ARM7, 54000000) // guess...
@@ -803,7 +809,8 @@ static MACHINE_CONFIG_START( ssfindo )
 	MCFG_PALETTE_ADD("palette", 256)
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_DERIVED( ppcar, ssfindo )
+MACHINE_CONFIG_START(ssfindo_state::ppcar)
+	ssfindo(config);
 
 	/* basic machine hardware */
 	MCFG_CPU_MODIFY("maincpu")
@@ -812,7 +819,8 @@ static MACHINE_CONFIG_DERIVED( ppcar, ssfindo )
 	MCFG_DEVICE_REMOVE("i2cmem")
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_DERIVED( tetfight, ppcar )
+MACHINE_CONFIG_START(ssfindo_state::tetfight)
+	ppcar(config);
 
 	/* basic machine hardware */
 	MCFG_CPU_MODIFY("maincpu")

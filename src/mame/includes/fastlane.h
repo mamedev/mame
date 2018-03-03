@@ -68,4 +68,6 @@ public:
 	TIMER_DEVICE_CALLBACK_MEMBER(fastlane_scanline);
 	DECLARE_WRITE8_MEMBER(volume_callback0);
 	DECLARE_WRITE8_MEMBER(volume_callback1);
+	void fastlane(machine_config &config);
+	void fastlane_map(address_map &map);
 };

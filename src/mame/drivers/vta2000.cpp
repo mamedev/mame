@@ -36,6 +36,9 @@ public:
 	uint32_t screen_update_vta2000(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	DECLARE_PALETTE_INIT(vta2000);
 
+	void vta2000(machine_config &config);
+	void io_map(address_map &map);
+	void mem_map(address_map &map);
 private:
 	virtual void machine_reset() override;
 	required_device<cpu_device> m_maincpu;
@@ -43,14 +46,14 @@ private:
 	required_region_ptr<u8> m_p_chargen;
 };
 
-static ADDRESS_MAP_START(mem_map, AS_PROGRAM, 8, vta2000_state)
+ADDRESS_MAP_START(vta2000_state::mem_map)
 	ADDRESS_MAP_UNMAP_HIGH
 	AM_RANGE( 0x0000, 0x5fff ) AM_ROM AM_REGION("roms", 0)
 	AM_RANGE( 0x8000, 0xc7ff ) AM_RAM AM_SHARE("videoram")
 	AM_RANGE( 0xc800, 0xc8ff ) AM_ROM AM_REGION("roms", 0x5000)
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START(io_map, AS_IO, 8, vta2000_state)
+ADDRESS_MAP_START(vta2000_state::io_map)
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	ADDRESS_MAP_UNMAP_HIGH
 ADDRESS_MAP_END
@@ -154,9 +157,9 @@ PALETTE_INIT_MEMBER(vta2000_state, vta2000)
 	palette.set_pen_color(2, 0x00, 0xff, 0x00); // highlight
 }
 
-static MACHINE_CONFIG_START( vta2000 )
+MACHINE_CONFIG_START(vta2000_state::vta2000)
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu",I8080, XTAL_4MHz / 4)
+	MCFG_CPU_ADD("maincpu",I8080, XTAL(4'000'000) / 4)
 	MCFG_CPU_PROGRAM_MAP(mem_map)
 	MCFG_CPU_IO_MAP(io_map)
 

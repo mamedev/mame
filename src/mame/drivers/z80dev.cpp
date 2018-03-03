@@ -35,6 +35,9 @@ public:
 
 	DECLARE_WRITE8_MEMBER( display_w );
 	DECLARE_READ8_MEMBER( test_r );
+	void z80dev(machine_config &config);
+	void io_map(address_map &map);
+	void mem_map(address_map &map);
 private:
 	required_device<cpu_device> m_maincpu;
 };
@@ -50,16 +53,16 @@ WRITE8_MEMBER( z80dev_state::display_w )
 
 READ8_MEMBER( z80dev_state::test_r )
 {
-	return space.machine().rand();
+	return machine().rand();
 }
 
-static ADDRESS_MAP_START( mem_map, AS_PROGRAM, 8, z80dev_state )
+ADDRESS_MAP_START(z80dev_state::mem_map)
 	ADDRESS_MAP_UNMAP_HIGH
 	AM_RANGE(0x0000, 0x07ff) AM_ROM
 	AM_RANGE(0x1000, 0x10ff) AM_RAM
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( io_map , AS_IO, 8, z80dev_state )
+ADDRESS_MAP_START(z80dev_state::io_map)
 	ADDRESS_MAP_UNMAP_HIGH
 	ADDRESS_MAP_GLOBAL_MASK (0xff)
 	AM_RANGE(0x20, 0x20) AM_READ_PORT("LINE0")
@@ -106,9 +109,9 @@ INPUT_PORTS_START( z80dev )
 		PORT_BIT(0x20, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("LD") PORT_CODE(KEYCODE_L)
 INPUT_PORTS_END
 
-static MACHINE_CONFIG_START( z80dev )
+MACHINE_CONFIG_START(z80dev_state::z80dev)
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu",Z80, XTAL_4MHz)
+	MCFG_CPU_ADD("maincpu",Z80, XTAL(4'000'000))
 	MCFG_CPU_PROGRAM_MAP(mem_map)
 	MCFG_CPU_IO_MAP(io_map)
 

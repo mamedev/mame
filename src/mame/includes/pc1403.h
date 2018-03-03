@@ -8,8 +8,8 @@
  *
  ****************************************************************************/
 
-#ifndef PC1403_H_
-#define PC1403_H_
+#ifndef MAME_INCLUDES_PC1403_H
+#define MAME_INCLUDES_PC1403_H
 
 #include "pocketc.h"
 #include "cpu/sc61860/sc61860.h"
@@ -58,8 +58,14 @@ public:
 	required_device<gfxdecode_device> m_gfxdecode;
 	required_device<palette_device> m_palette;
 
+	void pc1403h(machine_config &config);
+	void pc1403(machine_config &config);
+	void pc1403_mem(address_map &map);
+	void pc1403h_mem(address_map &map);
+	void pc1421_readmem(address_map &map);
+	void pc1421_writemem(address_map &map);
 protected:
 	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr) override;
 };
 
-#endif /* PC1403_H_ */
+#endif // MAME_INCLUDES_PC1403_H

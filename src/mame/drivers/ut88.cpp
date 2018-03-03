@@ -38,14 +38,14 @@ static GFXDECODE_START( ut88 )
 GFXDECODE_END
 
 /* Address maps */
-static ADDRESS_MAP_START( ut88mini_mem, AS_PROGRAM, 8, ut88_state )
+ADDRESS_MAP_START(ut88_state::ut88mini_mem)
 	ADDRESS_MAP_UNMAP_HIGH
 	AM_RANGE( 0x0000, 0x03ff ) AM_ROM  // System ROM
 	AM_RANGE( 0xc000, 0xc3ff ) AM_RAM  // RAM
 	AM_RANGE( 0x9000, 0x9fff ) AM_WRITE(ut88mini_write_led) // 7seg LED
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( ut88_mem, AS_PROGRAM, 8, ut88_state )
+ADDRESS_MAP_START(ut88_state::ut88_mem)
 	AM_RANGE( 0x0000, 0x07ff ) AM_RAMBANK("bank1") // First bank
 	AM_RANGE( 0x0800, 0xdfff ) AM_RAM  // RAM
 	AM_RANGE( 0xe000, 0xe7ff ) AM_RAM  // Video RAM (not used)
@@ -54,12 +54,12 @@ static ADDRESS_MAP_START( ut88_mem, AS_PROGRAM, 8, ut88_state )
 	AM_RANGE( 0xf800, 0xffff ) AM_ROM  // System ROM
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( ut88mini_io, AS_IO, 8, ut88_state )
+ADDRESS_MAP_START(ut88_state::ut88mini_io)
 	AM_RANGE( 0xA0, 0xA0) AM_READ(ut88mini_keyboard_r)
 	AM_RANGE( 0xA1, 0xA1) AM_READ(ut88_tape_r)
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( ut88_io, AS_IO, 8, ut88_state )
+ADDRESS_MAP_START(ut88_state::ut88_io)
 	AM_RANGE( 0x04, 0x07) AM_READWRITE(ut88_keyboard_r, ut88_keyboard_w)
 	AM_RANGE( 0xA1, 0xA1) AM_READWRITE(ut88_tape_r, ut88_sound_w)
 ADDRESS_MAP_END
@@ -183,7 +183,7 @@ static INPUT_PORTS_START( ut88mini )
 INPUT_PORTS_END
 
 /* Machine driver */
-static MACHINE_CONFIG_START( ut88 )
+MACHINE_CONFIG_START(ut88_state::ut88)
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", I8080, 2000000)
 	MCFG_CPU_PROGRAM_MAP(ut88_mem)
@@ -226,7 +226,7 @@ static MACHINE_CONFIG_START( ut88 )
 	MCFG_SOFTWARE_LIST_ADD("cass_list","ut88")
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_START( ut88mini )
+MACHINE_CONFIG_START(ut88_state::ut88mini)
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", I8080, 2000000)
 	MCFG_CPU_PROGRAM_MAP(ut88mini_mem)

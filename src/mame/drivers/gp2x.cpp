@@ -55,6 +55,8 @@ public:
 	uint32_t m_nand_ptr_temp;
 	uint32_t m_timer;
 	uint32_t screen_update_gp2x(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
+	void gp2x(machine_config &config);
+	void gp2x_map(address_map &map);
 };
 
 
@@ -341,7 +343,7 @@ READ32_MEMBER( gp2x_state::sdcard_r )
 	return 0xffff<<16;  // at 3e146b0 - indicate timeout & CRC error
 }
 
-static ADDRESS_MAP_START( gp2x_map, AS_PROGRAM, 32, gp2x_state )
+ADDRESS_MAP_START(gp2x_state::gp2x_map)
 	AM_RANGE(0x00000000, 0x00007fff) AM_ROM
 	AM_RANGE(0x01000000, 0x04ffffff) AM_RAM AM_SHARE("ram") // 64 MB of RAM
 	AM_RANGE(0x9c000000, 0x9c00001f) AM_READWRITE(nand_r, nand_w)
@@ -356,7 +358,7 @@ ADDRESS_MAP_END
 static INPUT_PORTS_START( gp2x )
 INPUT_PORTS_END
 
-static MACHINE_CONFIG_START( gp2x )
+MACHINE_CONFIG_START(gp2x_state::gp2x)
 	MCFG_CPU_ADD("maincpu", ARM9, 80000000)
 	MCFG_CPU_PROGRAM_MAP(gp2x_map)
 

@@ -91,7 +91,7 @@ READ16_MEMBER(ashnojoe_state::fake_4a00a_r)
 	return 0;
 }
 
-static ADDRESS_MAP_START( ashnojoe_map, AS_PROGRAM, 16, ashnojoe_state )
+ADDRESS_MAP_START(ashnojoe_state::ashnojoe_map)
 	AM_RANGE(0x000000, 0x01ffff) AM_ROM
 	AM_RANGE(0x040000, 0x041fff) AM_RAM_WRITE(ashnojoe_tileram3_w) AM_SHARE("tileram_3")
 	AM_RANGE(0x042000, 0x043fff) AM_RAM_WRITE(ashnojoe_tileram4_w) AM_SHARE("tileram_4")
@@ -100,7 +100,7 @@ static ADDRESS_MAP_START( ashnojoe_map, AS_PROGRAM, 16, ashnojoe_state )
 	AM_RANGE(0x046000, 0x046fff) AM_RAM_WRITE(ashnojoe_tileram6_w) AM_SHARE("tileram_6")
 	AM_RANGE(0x047000, 0x047fff) AM_RAM_WRITE(ashnojoe_tileram7_w) AM_SHARE("tileram_7")
 	AM_RANGE(0x048000, 0x048fff) AM_RAM_WRITE(ashnojoe_tileram_w) AM_SHARE("tileram")
-	AM_RANGE(0x049000, 0x049fff) AM_RAM_DEVWRITE("palette", palette_device, write) AM_SHARE("palette")
+	AM_RANGE(0x049000, 0x049fff) AM_RAM_DEVWRITE("palette", palette_device, write16) AM_SHARE("palette")
 	AM_RANGE(0x04a000, 0x04a001) AM_READ_PORT("P1")
 	AM_RANGE(0x04a002, 0x04a003) AM_READ_PORT("P2")
 	AM_RANGE(0x04a004, 0x04a005) AM_READ_PORT("DSW")
@@ -124,13 +124,13 @@ READ8_MEMBER(ashnojoe_state::sound_latch_status_r)
 	return m_soundlatch->pending_r();
 }
 
-static ADDRESS_MAP_START( sound_map, AS_PROGRAM, 8, ashnojoe_state )
+ADDRESS_MAP_START(ashnojoe_state::sound_map)
 	AM_RANGE(0x0000, 0x5fff) AM_ROM
 	AM_RANGE(0x6000, 0x7fff) AM_RAM
 	AM_RANGE(0x8000, 0xffff) AM_ROMBANK("bank4")
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( sound_portmap, AS_IO, 8, ashnojoe_state )
+ADDRESS_MAP_START(ashnojoe_state::sound_portmap)
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	AM_RANGE(0x00, 0x01) AM_DEVREADWRITE("ymsnd", ym2203_device, read, write)
 	AM_RANGE(0x02, 0x02) AM_WRITE(adpcm_w)
@@ -301,7 +301,7 @@ void ashnojoe_state::machine_reset()
 }
 
 
-static MACHINE_CONFIG_START( ashnojoe )
+MACHINE_CONFIG_START(ashnojoe_state::ashnojoe)
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", M68000, 8000000)

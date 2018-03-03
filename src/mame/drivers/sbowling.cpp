@@ -87,6 +87,9 @@ public:
 
 	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	void postload();
+	void sbowling(machine_config &config);
+	void main_map(address_map &map);
+	void port_map(address_map &map);
 };
 
 TILE_GET_INFO_MEMBER(sbowling_state::get_tile_info)
@@ -244,7 +247,7 @@ READ8_MEMBER(sbowling_state::controls_r)
 		return ioport("TRACKX")->read();
 }
 
-static ADDRESS_MAP_START( main_map, AS_PROGRAM, 8, sbowling_state )
+ADDRESS_MAP_START(sbowling_state::main_map)
 	AM_RANGE(0x0000, 0x2fff) AM_ROM
 	AM_RANGE(0x8000, 0xbfff) AM_RAM_WRITE(videoram_w) AM_SHARE("videoram")
 	AM_RANGE(0xf800, 0xf801) AM_DEVWRITE("aysnd", ay8910_device, address_data_w)
@@ -253,7 +256,7 @@ static ADDRESS_MAP_START( main_map, AS_PROGRAM, 8, sbowling_state )
 ADDRESS_MAP_END
 
 
-static ADDRESS_MAP_START( port_map, AS_IO, 8, sbowling_state )
+ADDRESS_MAP_START(sbowling_state::port_map)
 	AM_RANGE(0x00, 0x00) AM_READ_PORT("IN0") AM_DEVWRITE("watchdog", watchdog_timer_device, reset_w)
 	AM_RANGE(0x01, 0x01) AM_READWRITE(controls_r, pix_data_w)
 	AM_RANGE(0x02, 0x02) AM_READWRITE(pix_data_r, pix_shift_w)
@@ -402,8 +405,8 @@ PALETTE_INIT_MEMBER(sbowling_state, sbowling)
 	}
 }
 
-static MACHINE_CONFIG_START( sbowling )
-	MCFG_CPU_ADD("maincpu", I8080, XTAL_19_968MHz/10)   /* ? */
+MACHINE_CONFIG_START(sbowling_state::sbowling)
+	MCFG_CPU_ADD("maincpu", I8080, XTAL(19'968'000)/10)   /* ? */
 	MCFG_CPU_PROGRAM_MAP(main_map)
 	MCFG_CPU_IO_MAP(port_map)
 	MCFG_TIMER_DRIVER_ADD_SCANLINE("scantimer", sbowling_state, interrupt, "screen", 0, 1)
@@ -426,7 +429,7 @@ static MACHINE_CONFIG_START( sbowling )
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
 
-	MCFG_SOUND_ADD("aysnd", AY8910, XTAL_19_968MHz/16)  /* ? */
+	MCFG_SOUND_ADD("aysnd", AY8910, XTAL(19'968'000)/16)  /* ? */
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.33)
 MACHINE_CONFIG_END
 

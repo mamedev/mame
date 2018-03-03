@@ -5,10 +5,18 @@
 
     74LS157/74HCT157 Quad 2 to 1-Line Data Selectors/Multiplexers (TTL)
 
-    Often used to help feed 8-bit ROM data into a MSM5205, and for many
-    other purposes.
+    Often used to help feed 8-bit ROM data into a MSM5205 (which may
+    require additional pullups for CMOS compatibility), and for many other
+    purposes.
 
     74LS158 has inverted outputs; 74LS157 is non-inverting.
+
+    74LS257 and 74LS258 have three-state outputs with an active-low enable,
+    making these devices popular for bus-compatible applications which the
+    emulation here is not particularly suitable for. When pin 15 is tied to
+    GND, however, these devices become pin-compatible replacements for
+    74LS157 and 74LS158; this substitution is somewhat common on arcade
+    bootlegs.
 
 ***************************************************************************/
 
@@ -20,27 +28,39 @@
 //  74LS157 DEVICE
 //**************************************************************************
 
-DEFINE_DEVICE_TYPE(LS157, ls157_device, "74ls157", "74LS157 Quad 2-to-1 Multiplexer")
+DEFINE_DEVICE_TYPE(LS157, ls157_device, "ls157", "74LS157 Quad 2-to-1 Multiplexer")
+DEFINE_DEVICE_TYPE(LS157_X2, ls157_x2_device, "ls157_x2", "74LS157 Quad 2-to-1 Multiplexer (x2)")
 
 //-------------------------------------------------
 //  ls157_device - constructor
 //-------------------------------------------------
 
 ls157_device::ls157_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-	: ls157_device(mconfig, LS157, tag, owner, clock)
+	: ls157_device(mconfig, LS157, tag, owner, clock, 0x0f)
 {
 }
 
-ls157_device::ls157_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, u32 clock)
+ls157_device::ls157_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, u32 clock, u8 mask)
 	: device_t(mconfig, type, tag, owner, clock)
 	, m_a_in_cb(*this)
 	, m_b_in_cb(*this)
 	, m_out_cb(*this)
+	, m_data_mask(mask)
 {
 	m_a = 0;
 	m_b = 0;
 	m_select = false;
 	m_strobe = false;
+}
+
+
+//-------------------------------------------------
+//  ls157_x2_device - constructor
+//-------------------------------------------------
+
+ls157_x2_device::ls157_x2_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+	: ls157_device(mconfig, LS157_X2, tag, owner, clock, 0xff)
+{
 }
 
 
@@ -79,7 +99,7 @@ WRITE8_MEMBER(ls157_device::a_w)
 
 void ls157_device::a_w(u8 data)
 {
-	m_a = data & 0xf;
+	m_a = data & m_data_mask;
 	update_output();
 }
 
@@ -95,7 +115,7 @@ WRITE8_MEMBER(ls157_device::b_w)
 
 void ls157_device::b_w(u8 data)
 {
-	m_b = data & 0xf;
+	m_b = data & m_data_mask;
 	update_output();
 }
 
@@ -112,6 +132,7 @@ WRITE8_MEMBER(ls157_device::ab_w)
 
 void ls157_device::ab_w(u8 data)
 {
+	assert(m_data_mask == 0x0f);
 	m_a = data >> 4;
 	m_b = data & 0xf;
 	update_output();
@@ -130,6 +151,7 @@ WRITE8_MEMBER(ls157_device::ba_w)
 
 void ls157_device::ba_w(u8 data)
 {
+	assert(m_data_mask == 0x0f);
 	m_b = data >> 4;
 	m_a = data & 0xf;
 	update_output();
@@ -148,14 +170,9 @@ WRITE8_MEMBER(ls157_device::interleave_w)
 
 void ls157_device::interleave_w(u8 data)
 {
-	m_b = ((data >> 4) & 8)
-		| ((data >> 3) & 4)
-		| ((data >> 2) & 2)
-		| ((data >> 1) & 1);
-	m_a = ((data >> 3) & 8)
-		| ((data >> 2) & 4)
-		| ((data >> 1) & 2)
-		| ((data >> 0) & 1);
+	assert(m_data_mask == 0x0f);
+	m_b = bitswap<4>(data, 7, 5, 3, 1);
+	m_a = bitswap<4>(data, 6, 4, 2, 0);
 	update_output();
 }
 
@@ -257,9 +274,9 @@ void ls157_device::update_output()
 	if (!m_strobe && !m_out_cb.isnull())
 	{
 		if (m_select)
-			m_out_cb(m_b_in_cb.isnull() ? m_b : (m_b_in_cb() & 0xf));
+			m_out_cb(m_b_in_cb.isnull() ? m_b : (m_b_in_cb() & m_data_mask));
 		else
-			m_out_cb(m_a_in_cb.isnull() ? m_a : (m_a_in_cb() & 0xf));
+			m_out_cb(m_a_in_cb.isnull() ? m_a : (m_a_in_cb() & m_data_mask));
 	}
 }
 
@@ -273,9 +290,9 @@ READ8_MEMBER(ls157_device::output_r)
 	if (m_strobe)
 		return 0;
 	else if (m_select)
-		return m_b_in_cb.isnull() ? m_b : (m_b_in_cb() & 0xf);
+		return m_b_in_cb.isnull() ? m_b : (m_b_in_cb() & m_data_mask);
 	else
-		return m_a_in_cb.isnull() ? m_a : (m_a_in_cb() & 0xf);
+		return m_a_in_cb.isnull() ? m_a : (m_a_in_cb() & m_data_mask);
 }
 
 
@@ -283,10 +300,10 @@ READ8_MEMBER(ls157_device::output_r)
 //  74HC157 DEVICE
 //**************************************************************************
 
-DEFINE_DEVICE_TYPE(HC157, hc157_device, "74hc157", "74HC157 Quad 2-to-1 Multiplexer")
+DEFINE_DEVICE_TYPE(HC157, hc157_device, "hc157", "74HC157 Quad 2-to-1 Multiplexer")
 
 hc157_device::hc157_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-	: ls157_device(mconfig, HC157, tag, owner, clock)
+	: ls157_device(mconfig, HC157, tag, owner, clock, 0x0f)
 {
 }
 
@@ -295,9 +312,9 @@ hc157_device::hc157_device(const machine_config &mconfig, const char *tag, devic
 //  74HCT157 DEVICE
 //**************************************************************************
 
-DEFINE_DEVICE_TYPE(HCT157, hct157_device, "74hct157", "74HCT157 Quad 2-to-1 Multiplexer")
+DEFINE_DEVICE_TYPE(HCT157, hct157_device, "hct157", "74HCT157 Quad 2-to-1 Multiplexer")
 
 hct157_device::hct157_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-	: ls157_device(mconfig, HCT157, tag, owner, clock)
+	: ls157_device(mconfig, HCT157, tag, owner, clock, 0x0f)
 {
 }

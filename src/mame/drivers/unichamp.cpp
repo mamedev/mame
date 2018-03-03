@@ -81,6 +81,8 @@ public:
 
 	uint32_t screen_update_unichamp(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 
+	void unichamp(machine_config &config);
+	void unichamp_mem(address_map &map);
 protected:
 	required_ioport m_ctrls;
 	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr) override;
@@ -104,7 +106,7 @@ PALETTE_INIT_MEMBER(unichamp_state, unichamp)
 }
 
 
-static ADDRESS_MAP_START( unichamp_mem, AS_PROGRAM, 16, unichamp_state )
+ADDRESS_MAP_START(unichamp_state::unichamp_mem)
 	ADDRESS_MAP_GLOBAL_MASK(0x1FFF) //B13/B14/B15 are grounded!
 	AM_RANGE(0x0000, 0x00FF) AM_READWRITE8(unichamp_gicram_r, unichamp_gicram_w, 0x00ff)
 	AM_RANGE(0x0100, 0x07FF) AM_READWRITE(unichamp_trapl_r, unichamp_trapl_w)
@@ -231,14 +233,14 @@ WRITE16_MEMBER( unichamp_state::unichamp_trapl_w )
 	logerror("trapl_w(%x) = %x\n",offset,data);
 }
 
-static MACHINE_CONFIG_START( unichamp )
+MACHINE_CONFIG_START(unichamp_state::unichamp)
 	/* basic machine hardware */
 
 	//The CPU is really clocked this way:
-	//MCFG_CPU_ADD("maincpu", CP1610, XTAL_3_579545MHz/4)
+	//MCFG_CPU_ADD("maincpu", CP1610, XTAL(3'579'545)/4)
 	//But since it is only running 7752/29868 th's of the time...
 	//TODO find a more accurate method? (the emulation will me the same though)
-	MCFG_CPU_ADD("maincpu", CP1610, (int)((7752.0/29868.0)*XTAL_3_579545MHz/4))
+	MCFG_CPU_ADD("maincpu", CP1610, (7752.0/29868.0)*XTAL(3'579'545)/4)
 
 	MCFG_CPU_PROGRAM_MAP(unichamp_mem)
 	MCFG_QUANTUM_TIME(attotime::from_hz(60))
@@ -246,7 +248,7 @@ static MACHINE_CONFIG_START( unichamp )
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
-	MCFG_SCREEN_RAW_PARAMS( XTAL_3_579545MHz,
+	MCFG_SCREEN_RAW_PARAMS( XTAL(3'579'545),
 							gic_device::LINE_CLOCKS,
 							gic_device::START_ACTIVE_SCAN,
 							gic_device::END_ACTIVE_SCAN,
@@ -262,7 +264,7 @@ static MACHINE_CONFIG_START( unichamp )
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
-	MCFG_GIC_ADD( "gic", XTAL_3_579545MHz, "screen", READ8(unichamp_state, unichamp_gicram_r) )
+	MCFG_GIC_ADD( "gic", XTAL(3'579'545), "screen", READ8(unichamp_state, unichamp_gicram_r) )
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.40)
 
 	/* cartridge */

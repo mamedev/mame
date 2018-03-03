@@ -64,7 +64,7 @@
 #include "screen.h"
 
 
-#define MASTER_CLOCK    XTAL_22_1184MHz
+#define MASTER_CLOCK    XTAL(22'118'400)
 
 
 class nsmpoker_state : public driver_device
@@ -91,6 +91,9 @@ public:
 	INTERRUPT_GEN_MEMBER(nsmpoker_interrupt);
 	required_device<cpu_device> m_maincpu;
 	required_device<gfxdecode_device> m_gfxdecode;
+	void nsmpoker(machine_config &config);
+	void nsmpoker_map(address_map &map);
+	void nsmpoker_portmap(address_map &map);
 };
 
 
@@ -174,7 +177,7 @@ READ8_MEMBER(nsmpoker_state::debug_r)
 * Memory Map Information *
 *************************/
 
-static ADDRESS_MAP_START( nsmpoker_map, AS_PROGRAM, 8, nsmpoker_state )
+ADDRESS_MAP_START(nsmpoker_state::nsmpoker_map)
 	AM_RANGE(0x0000, 0x7fff) AM_ROM
 	AM_RANGE(0x9000, 0xafff) AM_RAM // OK... cleared at beginning.
 	AM_RANGE(0xb000, 0xcfff) AM_ROM // WRONG... just to map the last rom somewhere.
@@ -182,7 +185,7 @@ static ADDRESS_MAP_START( nsmpoker_map, AS_PROGRAM, 8, nsmpoker_state )
 	AM_RANGE(0xf000, 0xffff) AM_RAM_WRITE(nsmpoker_colorram_w) AM_SHARE("colorram") // WRONG... just a placeholder.
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( nsmpoker_portmap, AS_IO, 8, nsmpoker_state )
+ADDRESS_MAP_START(nsmpoker_state::nsmpoker_portmap)
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	AM_RANGE(0xf0, 0xf0) AM_READ(debug_r)   // kind of trap at beginning
 ADDRESS_MAP_END
@@ -400,14 +403,16 @@ GFXDECODE_END
 void nsmpoker_state::machine_reset()
 {
 	// Disable auto wait state generation by raising the READY line on reset
-	static_cast<tms9995_device*>(machine().device("maincpu"))->ready_line(ASSERT_LINE);
+	tms9995_device* cpu = static_cast<tms9995_device*>(machine().device("maincpu"));
+	cpu->ready_line(ASSERT_LINE);
+	cpu->reset_line(ASSERT_LINE);
 }
 
 /*************************
 *    Machine Drivers     *
 *************************/
 
-static MACHINE_CONFIG_START( nsmpoker )
+MACHINE_CONFIG_START(nsmpoker_state::nsmpoker)
 
 	// CPU TMS9995, standard variant; no line connections
 	MCFG_TMS99xx_ADD("maincpu", TMS9995, MASTER_CLOCK/2, nsmpoker_map, nsmpoker_portmap)

@@ -3,7 +3,7 @@
 /*
  * PlayStation CPU emulator
  *
- * Copyright 2003-2013 smf
+ * Copyright 2003-2017 smf
  *
  * Known chip id's
  *   CXD8530AQ
@@ -203,14 +203,14 @@ static const uint32_t mtc0_writemask[]=
 
 READ32_MEMBER( psxcpu_device::berr_r )
 {
-	if( !machine().side_effect_disabled() )
+	if( !machine().side_effects_disabled() )
 		m_berr = 1;
 	return 0;
 }
 
 WRITE32_MEMBER( psxcpu_device::berr_w )
 {
-	if( !machine().side_effect_disabled() )
+	if( !machine().side_effects_disabled() )
 		m_berr = 1;
 }
 
@@ -1724,7 +1724,7 @@ int psxcpu_device::store_data_address_breakpoint( uint32_t address )
 }
 
 // On-board RAM and peripherals
-static ADDRESS_MAP_START( psxcpu_internal_map, AS_PROGRAM, 32, psxcpu_device )
+ADDRESS_MAP_START(psxcpu_device::psxcpu_internal_map)
 	AM_RANGE( 0x1f800000, 0x1f8003ff ) AM_NOP /* scratchpad */
 	AM_RANGE( 0x1f800400, 0x1f800fff ) AM_READWRITE( berr_r, berr_w )
 	AM_RANGE( 0x1f801000, 0x1f801003 ) AM_READWRITE( exp_base_r, exp_base_w )
@@ -1768,7 +1768,7 @@ ADDRESS_MAP_END
 
 psxcpu_device::psxcpu_device( const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock ) :
 	cpu_device( mconfig, type, tag, owner, clock ),
-	m_program_config( "program", ENDIANNESS_LITTLE, 32, 32, 0, ADDRESS_MAP_NAME( psxcpu_internal_map ) ),
+	m_program_config( "program", ENDIANNESS_LITTLE, 32, 32, 0, address_map_constructor(FUNC(psxcpu_device::psxcpu_internal_map), this)),
 	m_gpu_read_handler( *this ),
 	m_gpu_write_handler( *this ),
 	m_spu_read_handler( *this ),
@@ -1837,6 +1837,10 @@ void psxcpu_device::device_start()
 	save_item( NAME( m_multiplier_operation ) );
 	save_item( NAME( m_multiplier_operand1 ) );
 	save_item( NAME( m_multiplier_operand2 ) );
+	save_item( NAME( m_exp_base ) );
+	save_item( NAME( m_exp_config ) );
+	save_item( NAME( m_ram_config ) );
+	save_item( NAME( m_rom_config ) );
 
 	state_add( STATE_GENPC, "GENPC", m_pc ).noshow();
 	state_add( STATE_GENPCBASE, "CURPC", m_pc ).noshow();
@@ -2023,6 +2027,8 @@ void psxcpu_device::device_post_load()
 	update_memory_handlers();
 	update_address_masks();
 	update_scratchpad();
+	update_ram_config();
+	update_rom_config();
 }
 
 
@@ -3375,11 +3381,6 @@ void psxcpu_device::setcp3cr( int reg, uint32_t value )
 {
 }
 
-psxcpu_device *psxcpu_device::getcpu( device_t &device, const char *cputag )
-{
-	return downcast<psxcpu_device *>( device.subdevice( cputag ) );
-}
-
 READ32_MEMBER( psxcpu_device::gpu_r )
 {
 	return m_gpu_read_handler( space, offset, mem_mask );
@@ -3426,7 +3427,7 @@ device_memory_interface::space_config_vector psxcpu_device::memory_space_config(
 //  device_add_mconfig - add device configuration
 //-------------------------------------------------
 
-MACHINE_CONFIG_MEMBER( psxcpu_device::device_add_mconfig )
+MACHINE_CONFIG_START(psxcpu_device::device_add_mconfig)
 	MCFG_DEVICE_ADD( "irq", PSX_IRQ, 0 )
 	MCFG_PSX_IRQ_HANDLER( INPUTLINE( DEVICE_SELF, PSXCPU_IRQ0 ) )
 

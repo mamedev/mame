@@ -99,6 +99,7 @@ public:
 	DECLARE_MACHINE_START(ojankoy);
 	DECLARE_VIDEO_START(ojankoy);
 	DECLARE_PALETTE_INIT(ojankoy);
+	DECLARE_VIDEO_START(ccasino);
 	DECLARE_MACHINE_START(ojankoc);
 	DECLARE_VIDEO_START(ojankoc);
 	DECLARE_MACHINE_START(common);
@@ -106,4 +107,15 @@ public:
 	uint32_t screen_update_ojankoc(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	void ojankoc_flipscreen( address_space &space, int data );
 	DECLARE_WRITE_LINE_MEMBER(ojankohs_adpcm_int);
+	void ojankohs(machine_config &config);
+	void ccasino(machine_config &config);
+	void ojankoc(machine_config &config);
+	void ojankoy(machine_config &config);
+	void ccasino_io_map(address_map &map);
+	void ojankoc_io_map(address_map &map);
+	void ojankoc_map(address_map &map);
+	void ojankohs_io_map(address_map &map);
+	void ojankohs_map(address_map &map);
+	void ojankoy_io_map(address_map &map);
+	void ojankoy_map(address_map &map);
 };

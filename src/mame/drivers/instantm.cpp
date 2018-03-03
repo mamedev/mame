@@ -43,6 +43,10 @@ public:
 	DECLARE_WRITE8_MEMBER(port01_w);
 	DECLARE_WRITE_LINE_MEMBER(clock_w);
 
+	void instantm(machine_config &config);
+	void main_map(address_map &map);
+	void sub_io(address_map &map);
+	void sub_map(address_map &map);
 private:
 	u8 m_port01;
 	bool m_clock_en;
@@ -76,7 +80,7 @@ WRITE_LINE_MEMBER( instantm_state::clock_w )
 
 
 
-static ADDRESS_MAP_START( main_map, AS_PROGRAM, 8, instantm_state )
+ADDRESS_MAP_START(instantm_state::main_map)
 	AM_RANGE(0x0000, 0x1fff) AM_ROM
 	AM_RANGE(0x4000, 0x47ff) AM_RAM
 	AM_RANGE(0x8000, 0x8000) //AM_WRITE
@@ -91,12 +95,12 @@ static ADDRESS_MAP_START( main_map, AS_PROGRAM, 8, instantm_state )
 ADDRESS_MAP_END
 
 // doesn't use ram
-static ADDRESS_MAP_START( sub_map, AS_PROGRAM, 8, instantm_state )
+ADDRESS_MAP_START(instantm_state::sub_map)
 	AM_RANGE(0x0000, 0xffff) AM_ROM
 	AM_RANGE(0x0000, 0x0000) AM_DEVWRITE("dac", dac_byte_interface, write)
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( sub_io, AS_PROGRAM, 8, instantm_state )
+ADDRESS_MAP_START(instantm_state::sub_io)
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	AM_RANGE(0x01, 0x01) AM_READWRITE(port01_r,port01_w)
 ADDRESS_MAP_END
@@ -115,14 +119,14 @@ void instantm_state::machine_reset()
 	m_clock_en = true;
 }
 
-// OSC1 = XTAL_3_579545MHz
+// OSC1 = XTAL(3'579'545)
 
-static MACHINE_CONFIG_START( instantm )
+MACHINE_CONFIG_START(instantm_state::instantm)
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", Z80, XTAL_3_579545MHz)
+	MCFG_CPU_ADD("maincpu", Z80, XTAL(3'579'545))
 	MCFG_CPU_PROGRAM_MAP(main_map)
 
-	MCFG_CPU_ADD("subcpu", Z80, XTAL_3_579545MHz)
+	MCFG_CPU_ADD("subcpu", Z80, XTAL(3'579'545))
 	MCFG_CPU_PROGRAM_MAP(sub_map)
 	MCFG_CPU_IO_MAP(sub_io)
 

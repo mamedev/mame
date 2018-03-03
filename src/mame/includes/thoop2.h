@@ -5,6 +5,8 @@
 
 #pragma once
 
+#include "machine/74259.h"
+
 class thoop2_state : public driver_device
 {
 public:
@@ -12,6 +14,7 @@ public:
 		driver_device(mconfig, type, tag),
 		m_pant{ nullptr, nullptr },
 		m_maincpu(*this, "maincpu"),
+		m_outlatch(*this, "outlatch"),
 		m_gfxdecode(*this, "gfxdecode"),
 		m_palette(*this, "palette"),
 		m_videoram(*this, "videoram"),
@@ -34,6 +37,10 @@ public:
 	TILE_GET_INFO_MEMBER(get_tile_info_screen1);
 	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 
+	void thoop2(machine_config &config);
+	void mcu_hostmem_map(address_map &map);
+	void oki_map(address_map &map);
+	void thoop2_map(address_map &map);
 protected:
 	virtual void machine_start() override;
 	virtual void video_start() override;
@@ -47,6 +54,7 @@ private:
 	tilemap_t *m_pant[2];
 
 	required_device<cpu_device> m_maincpu;
+	required_device<ls259_device> m_outlatch;
 	required_device<gfxdecode_device> m_gfxdecode;
 	required_device<palette_device> m_palette;
 

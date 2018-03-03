@@ -95,6 +95,13 @@ public:
 	uint32_t screen_update_supbtime(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	uint32_t screen_update_tumblep(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 
+	void chinatwn(machine_config &config);
+	void supbtime(machine_config &config);
+	void tumblep(machine_config &config);
+	void chinatwn_map(address_map &map);
+	void sound_map(address_map &map);
+	void supbtime_map(address_map &map);
+	void tumblep_map(address_map &map);
 private:
 	required_shared_ptr<uint16_t> m_spriteram;
 	required_shared_ptr<uint16_t> m_pf1_rowscroll;
@@ -109,13 +116,13 @@ private:
 //  ADDRESS MAPS
 //**************************************************************************
 
-static ADDRESS_MAP_START( supbtime_map, AS_PROGRAM, 16, supbtime_state )
+ADDRESS_MAP_START(supbtime_state::supbtime_map)
 	AM_RANGE(0x000000, 0x03ffff) AM_ROM
 	AM_RANGE(0x100000, 0x103fff) AM_RAM
 	AM_RANGE(0x104000, 0x11ffff) AM_WRITENOP // Nothing there
 	AM_RANGE(0x120000, 0x1207ff) AM_RAM AM_SHARE("spriteram")
 	AM_RANGE(0x120800, 0x13ffff) AM_WRITENOP // Nothing there
-	AM_RANGE(0x140000, 0x1407ff) AM_RAM_DEVWRITE("palette", palette_device, write) AM_SHARE("palette")
+	AM_RANGE(0x140000, 0x1407ff) AM_RAM_DEVWRITE("palette", palette_device, write16) AM_SHARE("palette")
 	AM_RANGE(0x180000, 0x180001) AM_READ_PORT("INPUTS")
 	AM_RANGE(0x180002, 0x180003) AM_READ_PORT("DSW")
 	AM_RANGE(0x180008, 0x180009) AM_READ_PORT("SYSTEM")
@@ -129,11 +136,11 @@ static ADDRESS_MAP_START( supbtime_map, AS_PROGRAM, 16, supbtime_state )
 	AM_RANGE(0x342000, 0x3427ff) AM_RAM AM_SHARE("pf2_rowscroll")
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( chinatwn_map, AS_PROGRAM, 16, supbtime_state )
+ADDRESS_MAP_START(supbtime_state::chinatwn_map)
 	AM_RANGE(0x000000, 0x03ffff) AM_ROM
 	AM_RANGE(0x100000, 0x100001) AM_DEVWRITE8("soundlatch", generic_latch_8_device, write, 0x00ff)
 	AM_RANGE(0x120000, 0x1207ff) AM_RAM AM_SHARE("spriteram")
-	AM_RANGE(0x140000, 0x1407ff) AM_RAM_DEVWRITE("palette", palette_device, write) AM_SHARE("palette")
+	AM_RANGE(0x140000, 0x1407ff) AM_RAM_DEVWRITE("palette", palette_device, write16) AM_SHARE("palette")
 	AM_RANGE(0x180000, 0x180001) AM_READ_PORT("INPUTS")
 	AM_RANGE(0x180002, 0x180003) AM_READ_PORT("DSW")
 	AM_RANGE(0x180008, 0x180009) AM_READ_PORT("SYSTEM")
@@ -147,14 +154,14 @@ static ADDRESS_MAP_START( chinatwn_map, AS_PROGRAM, 16, supbtime_state )
 	AM_RANGE(0x342000, 0x3427ff) AM_RAM AM_SHARE("pf2_rowscroll") // unused
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( tumblep_map, AS_PROGRAM, 16, supbtime_state )
+ADDRESS_MAP_START(supbtime_state::tumblep_map)
 #if TUMBLEP_HACK
 	AM_RANGE(0x000000, 0x07ffff) AM_WRITEONLY   // To write levels modifications
 #endif
 	AM_RANGE(0x000000, 0x07ffff) AM_ROM
 	AM_RANGE(0x100000, 0x100001) AM_DEVWRITE8("soundlatch", generic_latch_8_device, write, 0x00ff)
 	AM_RANGE(0x120000, 0x123fff) AM_RAM
-	AM_RANGE(0x140000, 0x1407ff) AM_RAM_DEVWRITE("palette", palette_device, write) AM_SHARE("palette")
+	AM_RANGE(0x140000, 0x1407ff) AM_RAM_DEVWRITE("palette", palette_device, write16) AM_SHARE("palette")
 	AM_RANGE(0x180000, 0x180001) AM_READ_PORT("INPUTS")
 	AM_RANGE(0x180002, 0x180003) AM_READ_PORT("DSW")
 	AM_RANGE(0x180008, 0x180009) AM_READ_PORT("SYSTEM")
@@ -169,7 +176,7 @@ static ADDRESS_MAP_START( tumblep_map, AS_PROGRAM, 16, supbtime_state )
 ADDRESS_MAP_END
 
 // Physical memory map (21 bits)
-static ADDRESS_MAP_START( sound_map, AS_PROGRAM, 8, supbtime_state )
+ADDRESS_MAP_START(supbtime_state::sound_map)
 	ADDRESS_MAP_GLOBAL_MASK(0x1fffff)
 	AM_RANGE(0x000000, 0x00ffff) AM_ROM
 	AM_RANGE(0x100000, 0x100001) AM_NOP // YM2203 - this board doesn't have one
@@ -206,6 +213,7 @@ uint32_t supbtime_state::screen_update_supbtime(screen_device &screen, bitmap_in
 	uint16_t flip = m_deco_tilegen1->pf_control_r(space, 0, 0xffff);
 
 	flip_screen_set(BIT(flip, 7));
+	m_sprgen->set_flip_screen(BIT(flip, 7));
 	m_deco_tilegen1->pf_update(m_pf1_rowscroll, m_pf2_rowscroll);
 
 	bitmap.fill(768, cliprect);
@@ -225,6 +233,7 @@ uint32_t supbtime_state::screen_update_tumblep(screen_device &screen, bitmap_ind
 	uint16_t flip = m_deco_tilegen1->pf_control_r(space, 0, 0xffff);
 
 	flip_screen_set(BIT(flip, 7));
+	m_sprgen->set_flip_screen(BIT(flip, 7));
 	m_deco_tilegen1->pf_update(m_pf1_rowscroll, m_pf2_rowscroll);
 
 	bitmap.fill(256+512, cliprect); // not verified
@@ -427,16 +436,16 @@ GFXDECODE_END
 //  MACHINE DEFINITIONS
 //**************************************************************************
 
-static MACHINE_CONFIG_START( supbtime )
-	MCFG_CPU_ADD("maincpu", M68000, XTAL_28MHz / 2)
+MACHINE_CONFIG_START(supbtime_state::supbtime)
+	MCFG_CPU_ADD("maincpu", M68000, XTAL(28'000'000) / 2)
 	MCFG_CPU_PROGRAM_MAP(supbtime_map)
 
-	MCFG_CPU_ADD("audiocpu", H6280, XTAL_32_22MHz / 8)
+	MCFG_CPU_ADD("audiocpu", H6280, XTAL(32'220'000) / 8)
 	MCFG_CPU_PROGRAM_MAP(sound_map)
 
 	// video hardware
 	MCFG_SCREEN_ADD("screen", RASTER)
-	MCFG_SCREEN_RAW_PARAMS(XTAL_28MHz / 4, 442, 0, 320, 274, 8, 248)
+	MCFG_SCREEN_RAW_PARAMS(XTAL(28'000'000) / 4, 442, 0, 320, 274, 8, 248)
 	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE(supbtime_state, vblank_w))
 	MCFG_SCREEN_UPDATE_DRIVER(supbtime_state, screen_update_supbtime)
 	MCFG_SCREEN_PALETTE("palette")
@@ -447,7 +456,8 @@ static MACHINE_CONFIG_START( supbtime )
 
 	MCFG_DEVICE_ADD("tilegen1", DECO16IC, 0)
 	MCFG_DECO16IC_SPLIT(0)
-	MCFG_DECO16IC_WIDTH12(1)
+	MCFG_DECO16IC_PF1_SIZE(DECO_64x32)
+	MCFG_DECO16IC_PF2_SIZE(DECO_64x32)
 	MCFG_DECO16IC_PF1_TRANS_MASK(0x0f)
 	MCFG_DECO16IC_PF2_TRANS_MASK(0x0f)
 	MCFG_DECO16IC_PF1_COL_BANK(0x00)
@@ -468,21 +478,23 @@ static MACHINE_CONFIG_START( supbtime )
 	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
 	MCFG_GENERIC_LATCH_DATA_PENDING_CB(INPUTLINE("audiocpu", 0))
 
-	MCFG_YM2151_ADD("ymsnd", XTAL_32_22MHz / 9)
+	MCFG_YM2151_ADD("ymsnd", XTAL(32'220'000) / 9)
 	MCFG_YM2151_IRQ_HANDLER(INPUTLINE("audiocpu", 1)) // IRQ 2
 	MCFG_SOUND_ROUTE(0, "mono", 0.45)
 	MCFG_SOUND_ROUTE(1, "mono", 0.45)
 
-	MCFG_OKIM6295_ADD("oki", XTAL_21_4772MHz / 20, PIN7_HIGH) // clock frequency & pin 7 not verified
+	MCFG_OKIM6295_ADD("oki", XTAL(21'477'272) / 20, PIN7_HIGH) // clock frequency & pin 7 not verified
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_DERIVED( chinatwn, supbtime )
+MACHINE_CONFIG_START(supbtime_state::chinatwn)
+	supbtime(config);
 	MCFG_CPU_MODIFY("maincpu")
 	MCFG_CPU_PROGRAM_MAP(chinatwn_map)
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_DERIVED( tumblep, supbtime )
+MACHINE_CONFIG_START(supbtime_state::tumblep)
+	supbtime(config);
 	MCFG_CPU_MODIFY("maincpu")
 	MCFG_CPU_PROGRAM_MAP(tumblep_map)
 

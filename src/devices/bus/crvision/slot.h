@@ -97,7 +97,6 @@ protected:
 
 
 // device type definition
-extern const device_type CRVISION_CART_SLOT;
 DECLARE_DEVICE_TYPE(CRVISION_CART_SLOT, crvision_cart_slot_device)
 
 

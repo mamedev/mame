@@ -14,13 +14,13 @@
 
 
 
-VIDEO_START_MEMBER(p2000t_state,p2000m)
+void p2000m_state::video_start()
 {
 	m_frame_count = 0;
 }
 
 
-uint32_t p2000t_state::screen_update_p2000m(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
+uint32_t p2000m_state::screen_update_p2000m(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
 	uint8_t *videoram = m_videoram;
 	int offs, sx, sy, code, loop;

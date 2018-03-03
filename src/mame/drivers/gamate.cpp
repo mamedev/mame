@@ -51,6 +51,8 @@ public:
 	TIMER_CALLBACK_MEMBER(gamate_timer);
 	TIMER_CALLBACK_MEMBER(gamate_timer2);
 
+	void gamate(machine_config &config);
+	void gamate_mem(address_map &map);
 private:
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
@@ -114,7 +116,7 @@ READ8_MEMBER(gamate_state::read_cart)
 	return m_cartslot->read_cart(space, offset);
 }
 
-static ADDRESS_MAP_START( gamate_mem, AS_PROGRAM, 8, gamate_state )
+ADDRESS_MAP_START(gamate_state::gamate_mem)
 	AM_RANGE(0x0000, 0x03ff) AM_MIRROR(0x1c00) AM_RAM
 	AM_RANGE(0x4000, 0x400f) AM_MIRROR(0x03f0) AM_READWRITE(sound_r,sound_w)
 	AM_RANGE(0x4400, 0x4400) AM_MIRROR(0x03ff) AM_READ_PORT("JOY")
@@ -175,7 +177,7 @@ TIMER_CALLBACK_MEMBER(gamate_state::gamate_timer2)
 	timer2->reset(m_maincpu->cycles_to_attotime(32768/2));
 }
 
-static MACHINE_CONFIG_START( gamate )
+MACHINE_CONFIG_START(gamate_state::gamate)
 	MCFG_CPU_ADD("maincpu", M6502, 4433000/2) // NCR 65CX02
 	MCFG_CPU_PROGRAM_MAP(gamate_mem)
 

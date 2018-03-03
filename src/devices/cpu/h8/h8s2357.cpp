@@ -11,7 +11,7 @@ DEFINE_DEVICE_TYPE(H8S2392, h8s2392_device, "h8s2392", "H8S/2392")
 DEFINE_DEVICE_TYPE(H8S2390, h8s2390_device, "h8s2390", "H8S/2390")
 
 h8s2357_device::h8s2357_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock, uint32_t start) :
-	h8s2000_device(mconfig, type, tag, owner, clock, address_map_delegate(FUNC(h8s2357_device::map), this)),
+	h8s2000_device(mconfig, type, tag, owner, clock, address_map_constructor(FUNC(h8s2357_device::map), this)),
 	intc(*this, "intc"),
 	adc(*this, "adc"),
 	port1(*this, "port1"),
@@ -75,7 +75,7 @@ h8s2390_device::h8s2390_device(const machine_config &mconfig, const char *tag, d
 {
 }
 
-DEVICE_ADDRESS_MAP_START(map, 16, h8s2357_device)
+ADDRESS_MAP_START(h8s2357_device::map)
 	AM_RANGE(ram_start, 0xfffbff) AM_RAM
 	AM_RANGE(0xfffe80, 0xfffe81) AM_DEVREADWRITE8("timer16:3", h8_timer16_channel_device, tcr_r,   tcr_w,   0xff00)
 	AM_RANGE(0xfffe80, 0xfffe81) AM_DEVREADWRITE8("timer16:3", h8_timer16_channel_device, tmdr_r,  tmdr_w,  0x00ff)
@@ -98,7 +98,6 @@ DEVICE_ADDRESS_MAP_START(map, 16, h8s2357_device)
 	AM_RANGE(0xfffea4, 0xfffea5) AM_DEVREADWRITE8("timer16:5", h8_timer16_channel_device, tsr_r,   tsr_w,   0x00ff)
 	AM_RANGE(0xfffea6, 0xfffea7) AM_DEVREADWRITE( "timer16:5", h8_timer16_channel_device, tcnt_r,  tcnt_w         )
 	AM_RANGE(0xfffea8, 0xfffeab) AM_DEVREADWRITE( "timer16:5", h8_timer16_channel_device, tgr_r,   tgr_w          )
-	AM_RANGE(0xfffeb0, 0xfffeb1) AM_DEVWRITE8(    "port1",     h8_port_device,                     ddr_w,   0xff00)
 	AM_RANGE(0xfffeb0, 0xfffeb1) AM_DEVWRITE8(    "port1",     h8_port_device,                     ddr_w,   0xff00)
 	AM_RANGE(0xfffeb0, 0xfffeb1) AM_DEVWRITE8(    "port2",     h8_port_device,                     ddr_w,   0x00ff)
 	AM_RANGE(0xfffeb2, 0xfffeb3) AM_DEVWRITE8(    "port3",     h8_port_device,                     ddr_w,   0xff00)
@@ -209,7 +208,7 @@ DEVICE_ADDRESS_MAP_START(map, 16, h8s2357_device)
 	AM_RANGE(0xfffff8, 0xfffffb) AM_DEVREADWRITE( "timer16:2", h8_timer16_channel_device, tgr_r,   tgr_w          )
 ADDRESS_MAP_END
 
-MACHINE_CONFIG_MEMBER(h8s2357_device::device_add_mconfig)
+MACHINE_CONFIG_START(h8s2357_device::device_add_mconfig)
 	MCFG_H8S_INTC_ADD("intc")
 	MCFG_H8_ADC_2357_ADD("adc", "intc", 28)
 	MCFG_H8_PORT_ADD("port1", h8_device::PORT_1, 0x00, 0x00)

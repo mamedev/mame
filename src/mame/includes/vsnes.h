@@ -101,6 +101,18 @@ public:
 	DECLARE_READ8_MEMBER(vsnes_bootleg_z80_data_r);
 	DECLARE_READ8_MEMBER(vsnes_bootleg_z80_address_r);
 
+	void vsdual(machine_config &config);
+	void vsgshoe(machine_config &config);
+	void vsnes(machine_config &config);
+	void vsdual_pi(machine_config &config);
+	void topgun(machine_config &config);
+	void mightybj(machine_config &config);
+	void vsnes_bootleg(machine_config &config);
+	void jajamaru(machine_config &config);
+	void vsnes_bootleg_z80_map(address_map &map);
+	void vsnes_cpu1_bootleg_map(address_map &map);
+	void vsnes_cpu1_map(address_map &map);
+	void vsnes_cpu2_map(address_map &map);
 private:
 	int m_coin;
 	int m_do_vrom_bank;

@@ -46,20 +46,18 @@
 class tomcat_state : public driver_device
 {
 public:
-	tomcat_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag),
+	tomcat_state(const machine_config &mconfig, device_type type, const char *tag) :
+		driver_device(mconfig, type, tag),
 		m_tms(*this, "tms"),
 		m_shared_ram(*this, "shared_ram"),
 		m_maincpu(*this, "maincpu"),
 		m_dsp(*this, "dsp"),
-		m_mainlatch(*this, "mainlatch") { }
+		m_mainlatch(*this, "mainlatch")
+	{ }
 
-	required_device<tms5220_device> m_tms;
-	int m_control_num;
-	required_shared_ptr<uint16_t> m_shared_ram;
-	uint8_t m_nvram[0x800];
-	int m_dsp_BIO;
-	int m_dsp_idle;
+	void tomcat(machine_config &config);
+
+protected:
 	DECLARE_WRITE16_MEMBER(tomcat_adcon_w);
 	DECLARE_READ16_MEMBER(tomcat_adcread_r);
 	DECLARE_READ16_MEMBER(tomcat_inputs_r);
@@ -80,6 +78,18 @@ public:
 	DECLARE_READ_LINE_MEMBER(dsp_BIO_r);
 	DECLARE_WRITE8_MEMBER(soundlatches_w);
 	virtual void machine_start() override;
+	void dsp_map(address_map &map);
+	void sound_map(address_map &map);
+	void tomcat_map(address_map &map);
+
+private:
+	required_device<tms5220_device> m_tms;
+	int m_control_num;
+	required_shared_ptr<uint16_t> m_shared_ram;
+	uint8_t m_nvram[0x800];
+	int m_dsp_BIO;
+	int m_dsp_idle;
+
 	required_device<cpu_device> m_maincpu;
 	required_device<cpu_device> m_dsp;
 	required_device<ls259_device> m_mainlatch;
@@ -238,7 +248,7 @@ WRITE8_MEMBER(tomcat_state::tomcat_nvram_w)
 	m_nvram[offset] = data;
 }
 
-static ADDRESS_MAP_START( tomcat_map, AS_PROGRAM, 16, tomcat_state )
+ADDRESS_MAP_START(tomcat_state::tomcat_map)
 	AM_RANGE(0x000000, 0x00ffff) AM_ROM
 	AM_RANGE(0x402000, 0x402001) AM_READ(tomcat_adcread_r) AM_WRITE(tomcat_adcon_w)
 	AM_RANGE(0x404000, 0x404001) AM_READ(tomcat_inputs_r) AM_DEVWRITE("avg", avg_tomcat_device, go_word_w)
@@ -253,7 +263,7 @@ static ADDRESS_MAP_START( tomcat_map, AS_PROGRAM, 16, tomcat_state )
 	AM_RANGE(0xffd000, 0xffdfff) AM_READWRITE8(tomcat_nvram_r, tomcat_nvram_w, 0x00ff)
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( dsp_map, AS_PROGRAM, 16, tomcat_state )
+ADDRESS_MAP_START(tomcat_state::dsp_map)
 	AM_RANGE(0x0000, 0x0fff) AM_RAM AM_SHARE("shared_ram")
 ADDRESS_MAP_END
 
@@ -272,7 +282,7 @@ WRITE8_MEMBER(tomcat_state::soundlatches_w)
 	}
 }
 
-static ADDRESS_MAP_START( sound_map, AS_PROGRAM, 8, tomcat_state )
+ADDRESS_MAP_START(tomcat_state::sound_map)
 	AM_RANGE(0x0000, 0x1fff) AM_RAM
 	AM_RANGE(0x2000, 0x2001) AM_DEVREADWRITE("ymsnd", ym2151_device, read, write)
 	AM_RANGE(0x3000, 0x30df) AM_WRITE(soundlatches_w)
@@ -319,21 +329,21 @@ void tomcat_state::machine_start()
 	m_dsp_BIO = 0;
 }
 
-static MACHINE_CONFIG_START( tomcat )
-	MCFG_CPU_ADD("maincpu", M68010, XTAL_12MHz / 2)
+MACHINE_CONFIG_START(tomcat_state::tomcat)
+	MCFG_CPU_ADD("maincpu", M68010, 12_MHz_XTAL / 2)
 	MCFG_CPU_PROGRAM_MAP(tomcat_map)
 	MCFG_CPU_PERIODIC_INT_DRIVER(tomcat_state, irq1_line_assert,  5*60)
-	//MCFG_CPU_PERIODIC_INT_DRIVER(tomcat_state, irq1_line_assert,  (double)XTAL_12MHz / 16 / 16 / 16 / 12)
+	//MCFG_CPU_PERIODIC_INT_DRIVER(tomcat_state, irq1_line_assert,  (double)XTAL(12'000'000) / 16 / 16 / 16 / 12)
 
-	MCFG_CPU_ADD("dsp", TMS32010, XTAL_16MHz)
+	MCFG_CPU_ADD("dsp", TMS32010, 16_MHz_XTAL)
 	MCFG_CPU_PROGRAM_MAP( dsp_map)
 	MCFG_TMS32010_BIO_IN_CB(READLINE(tomcat_state, dsp_BIO_r))
 
-	MCFG_CPU_ADD("soundcpu", M6502, XTAL_14_31818MHz / 8 )
+	MCFG_CPU_ADD("soundcpu", M6502, XTAL(14'318'181) / 8 )
 	MCFG_DEVICE_DISABLE()
 	MCFG_CPU_PROGRAM_MAP( sound_map)
 
-	MCFG_DEVICE_ADD("riot", RIOT6532, XTAL_14_31818MHz / 8)
+	MCFG_DEVICE_ADD("riot", RIOT6532, XTAL(14'318'181) / 8)
 	/*
 	 PA0 = /WS   OUTPUT  (TMS-5220 WRITE STROBE)
 	 PA1 = /RS   OUTPUT  (TMS-5220 READ STROBE)
@@ -370,7 +380,7 @@ static MACHINE_CONFIG_START( tomcat )
 	MCFG_VECTOR_ADD("vector")
 	MCFG_SCREEN_ADD("screen", VECTOR)
 	MCFG_SCREEN_REFRESH_RATE(40)
-	//MCFG_SCREEN_REFRESH_RATE((double)XTAL_12MHz / 16 / 16 / 16 / 12  / 5 )
+	//MCFG_SCREEN_REFRESH_RATE((double)XTAL(12'000'000) / 16 / 16 / 16 / 12  / 5 )
 	MCFG_SCREEN_SIZE(400, 300)
 	MCFG_SCREEN_VISIBLE_AREA(0, 280, 0, 250)
 	MCFG_SCREEN_UPDATE_DEVICE("vector", vector_device, screen_update)
@@ -379,17 +389,17 @@ static MACHINE_CONFIG_START( tomcat )
 	MCFG_AVGDVG_VECTOR("vector")
 
 	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
-	MCFG_SOUND_ADD("pokey1", POKEY, XTAL_14_31818MHz / 8)
+	MCFG_SOUND_ADD("pokey1", POKEY, XTAL(14'318'181) / 8)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "lspeaker", 0.20)
 
-	MCFG_SOUND_ADD("pokey2", POKEY, XTAL_14_31818MHz / 8)
+	MCFG_SOUND_ADD("pokey2", POKEY, XTAL(14'318'181) / 8)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", 0.20)
 
 	MCFG_SOUND_ADD("tms", TMS5220, 325000)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "lspeaker", 0.50)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", 0.50)
 
-	MCFG_YM2151_ADD("ymsnd", XTAL_14_31818MHz / 4)
+	MCFG_YM2151_ADD("ymsnd", XTAL(14'318'181) / 4)
 	MCFG_SOUND_ROUTE(0, "lspeaker", 0.60)
 	MCFG_SOUND_ROUTE(1, "rspeaker", 0.60)
 MACHINE_CONFIG_END

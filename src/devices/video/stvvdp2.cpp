@@ -34,7 +34,7 @@ Video emulation TODO:
  \-complete windows effects
  \-mosaic effect
  \-ODD bit/H/V Counter not yet emulated properly
- \-Reduction enable bits
+ \-Reduction enable bits (zooming limiters)
  \-Check if there are any remaining video registers that are yet to be macroized & added to the rumble.
 -batmanfr:
  \-If you reset the game after the character selection screen,when you get again to it there's garbage
@@ -44,10 +44,10 @@ Video emulation TODO:
 -hanagumi:
  \-ending screens have corrupt graphics. (*untested*)
 -kiwames:
- \-incorrect color emulation for the alpha blended flames on the title screen,it's caused by a schizoid
+ \-(fixed) incorrect color emulation for the alpha blended flames on the title screen,it's caused by a schizoid
    linescroll emulation quirk.
  \-the VDP1 sprites refresh is too slow,causing the "Draw by request" mode to
-   flicker.Moved back to default ATM.
+   flicker. Moved back to default ATM.
 -pblbeach:
  \-Sprites are offset, because it doesn't clear vdp1 local coordinates set by bios,
    I guess that they are cleared when some vdp1 register is written (kludged for now)
@@ -55,7 +55,15 @@ Video emulation TODO:
  \-Attract mode presentation has corrupted graphics in various places,probably caused by incomplete
    framebuffer data delete.
 -seabass:
- \-Player sprite is corrupt/missing during movements,caused by incomplete framebuffer switching.
+ \-(fixed) Player sprite is corrupt/missing during movements,caused by incomplete framebuffer switching.
+-shienryu:
+ \-level 2 background colors on statues, caused by special color calculation usage (per dot);
+(Saturn games)
+- scud the disposable assassin:
+ \- when zooming on melee attack background gets pink, color calculation issue?
+- virtual hydlide:
+ \- transparent pens usage on most vdp1 items should be black instead.
+ \- likewise "press start button" is the other way around, i.e. black pen where it should be transparent instead.
 
 Notes of Interest & Unclear features:
 
@@ -5772,7 +5780,7 @@ READ16_MEMBER ( saturn_state::saturn_vdp2_regs_r )
 			/* latch h/v signals through HV latch*/
 			if(!STV_VDP2_EXLTEN)
 			{
-				if(!machine().side_effect_disabled())
+				if(!machine().side_effects_disabled())
 				{
 					m_vdp2.h_count = get_hcounter();
 					m_vdp2.v_count = get_vcounter();
@@ -5799,7 +5807,7 @@ READ16_MEMBER ( saturn_state::saturn_vdp2_regs_r )
 				m_vdp2_regs[offset] |= 1 << 3;
 
 			/* HV latches clears if this register is read */
-			if(!machine().side_effect_disabled())
+			if(!machine().side_effects_disabled())
 			{
 				m_vdp2.exltfg &= ~1;
 				m_vdp2.exsyfg &= ~1;
@@ -5813,7 +5821,7 @@ READ16_MEMBER ( saturn_state::saturn_vdp2_regs_r )
 
 			/* Games basically r/w the entire VDP2 register area when this is tripped. (example: Silhouette Mirage)
 			   Disable log for the time being. */
-			//if(!machine().side_effect_disabled())
+			//if(!machine().side_effects_disabled())
 			//  printf("Warning: VDP2 version read\n");
 			break;
 		}
@@ -5833,7 +5841,7 @@ READ16_MEMBER ( saturn_state::saturn_vdp2_regs_r )
 		}
 
 		default:
-			//if(!machine().side_effect_disabled())
+			//if(!machine().side_effects_disabled())
 			//  printf("VDP2: read from register %08x %08x\n",offset*4,mem_mask);
 			break;
 	}
@@ -6010,7 +6018,7 @@ int saturn_state::get_pixel_clock( void )
 {
 	int res,divider;
 
-	res = m_vdp2.dotsel ? MASTER_CLOCK_352 : MASTER_CLOCK_320;
+	res = (m_vdp2.dotsel ? MASTER_CLOCK_352 : MASTER_CLOCK_320).value();
 	/* TODO: divider is ALWAYS 8, this thing is just to over-compensate for MAME framework faults ... */
 	divider = 8;
 

@@ -65,16 +65,16 @@ WRITE8_MEMBER( vcs80_state::pio_w )
 
 /* Memory Maps */
 
-static ADDRESS_MAP_START( vcs80_bd_mem, AS_PROGRAM, 8, vcs80_state )
+ADDRESS_MAP_START(vcs80_state::vcs80_bd_mem)
 	AM_RANGE(0x0000, 0x01ff) AM_ROM AM_REGION(Z80_TAG, 0)
 	AM_RANGE(0x0400, 0x07ff) AM_RAM
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( vcs80_mem, AS_PROGRAM, 8, vcs80_state )
+ADDRESS_MAP_START(vcs80_state::vcs80_mem)
 	AM_RANGE(0x0000, 0xffff) AM_READWRITE(mem_r, mem_w)
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( vcs80_io, AS_IO, 8, vcs80_state )
+ADDRESS_MAP_START(vcs80_state::vcs80_io)
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	AM_RANGE(0x00, 0xff) AM_READWRITE(io_r, io_w)
 ADDRESS_MAP_END
@@ -178,7 +178,7 @@ WRITE8_MEMBER( vcs80_state::pio_pb_w )
 
 	*/
 
-	uint8_t led_data = BITSWAP8(data & 0x7f, 7, 5, 6, 4, 3, 2, 1, 0);
+	uint8_t led_data = bitswap<8>(data & 0x7f, 7, 5, 6, 4, 3, 2, 1, 0);
 	int digit = m_keylatch;
 
 	/* skip middle digit */
@@ -209,9 +209,9 @@ void vcs80_state::machine_start()
 
 /* Machine Driver */
 
-static MACHINE_CONFIG_START( vcs80 )
+MACHINE_CONFIG_START(vcs80_state::vcs80)
 	/* basic machine hardware */
-	MCFG_CPU_ADD(Z80_TAG, Z80, XTAL_5MHz/2) /* U880D */
+	MCFG_CPU_ADD(Z80_TAG, Z80, XTAL(5'000'000)/2) /* U880D */
 	MCFG_CPU_PROGRAM_MAP(vcs80_mem)
 	MCFG_CPU_IO_MAP(vcs80_io)
 	MCFG_Z80_DAISY_CHAIN(vcs80_daisy_chain)
@@ -223,7 +223,7 @@ static MACHINE_CONFIG_START( vcs80 )
 	MCFG_DEFAULT_LAYOUT( layout_vcs80 )
 
 	/* devices */
-	MCFG_DEVICE_ADD(Z80PIO_TAG, Z80PIO, XTAL_5MHz/2)
+	MCFG_DEVICE_ADD(Z80PIO_TAG, Z80PIO, XTAL(5'000'000)/2)
 	MCFG_Z80PIO_OUT_INT_CB(INPUTLINE(Z80_TAG, INPUT_LINE_IRQ0))
 	MCFG_Z80PIO_IN_PA_CB(READ8(vcs80_state, pio_pa_r))
 	MCFG_Z80PIO_OUT_PB_CB(WRITE8(vcs80_state, pio_pb_w))

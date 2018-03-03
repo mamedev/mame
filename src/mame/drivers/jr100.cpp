@@ -72,6 +72,8 @@ public:
 	DECLARE_QUICKLOAD_LOAD_MEMBER(jr100);
 
 
+	void jr100(machine_config &config);
+	void jr100_mem(address_map &map);
 protected:
 	required_device<via6522_device> m_via;
 	required_device<cassette_image_device> m_cassette;
@@ -128,7 +130,7 @@ WRITE8_MEMBER(jr100_state::jr100_via_w)
 	m_via->write(space,offset,data);
 }
 
-static ADDRESS_MAP_START(jr100_mem, AS_PROGRAM, 8, jr100_state )
+ADDRESS_MAP_START(jr100_state::jr100_mem)
 	ADDRESS_MAP_UNMAP_HIGH
 	AM_RANGE(0x0000, 0x3fff) AM_RAM AM_SHARE("ram")
 	AM_RANGE(0xc000, 0xc0ff) AM_RAM AM_SHARE("pcg")
@@ -365,10 +367,10 @@ QUICKLOAD_LOAD_MEMBER( jr100_state,jr100)
 	return image_init_result::PASS;
 }
 
-static MACHINE_CONFIG_START( jr100 )
+MACHINE_CONFIG_START(jr100_state::jr100)
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu",M6802, XTAL_14_31818MHz / 4) // clock devided internaly by 4
+	MCFG_CPU_ADD("maincpu",M6802, XTAL(14'318'181) / 4) // clock devided internaly by 4
 	MCFG_CPU_PROGRAM_MAP(jr100_mem)
 
 	/* video hardware */
@@ -383,7 +385,7 @@ static MACHINE_CONFIG_START( jr100 )
 	MCFG_GFXDECODE_ADD("gfxdecode", "palette", jr100)
 	MCFG_PALETTE_ADD_MONOCHROME("palette")
 
-	MCFG_DEVICE_ADD("via", VIA6522, XTAL_14_31818MHz / 16)
+	MCFG_DEVICE_ADD("via", VIA6522, XTAL(14'318'181) / 16)
 	MCFG_VIA6522_READPB_HANDLER(READ8(jr100_state,jr100_via_read_b))
 	MCFG_VIA6522_WRITEPA_HANDLER(WRITE8(jr100_state,jr100_via_write_a))
 	MCFG_VIA6522_WRITEPB_HANDLER(WRITE8(jr100_state,jr100_via_write_b))
@@ -401,7 +403,7 @@ static MACHINE_CONFIG_START( jr100 )
 	MCFG_CASSETTE_ADD( "cassette" )
 	MCFG_CASSETTE_DEFAULT_STATE(CASSETTE_STOPPED | CASSETTE_SPEAKER_ENABLED | CASSETTE_MOTOR_ENABLED)
 
-	MCFG_TIMER_DRIVER_ADD_PERIODIC("sound_tick", jr100_state, sound_tick, attotime::from_hz(XTAL_14_31818MHz / 16))
+	MCFG_TIMER_DRIVER_ADD_PERIODIC("sound_tick", jr100_state, sound_tick, attotime::from_hz(XTAL(14'318'181) / 16))
 
 	/* quickload */
 	MCFG_QUICKLOAD_ADD("quickload", jr100_state, jr100, "prg", 2)

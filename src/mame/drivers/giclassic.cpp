@@ -80,6 +80,8 @@ public:
 	DECLARE_WRITE16_MEMBER(control_w);
 	DECLARE_READ16_MEMBER(vrom_r);
 
+	void giclassic(machine_config &config);
+	void satellite_main(address_map &map);
 private:
 	uint8_t m_control;
 };
@@ -141,10 +143,10 @@ READ16_MEMBER(giclassic_state::vrom_r)
 	return m_k056832->piratesh_rom_r(space, offset);
 }
 
-static ADDRESS_MAP_START( satellite_main, AS_PROGRAM, 16, giclassic_state )
+ADDRESS_MAP_START(giclassic_state::satellite_main)
 	AM_RANGE(0x000000, 0x07ffff) AM_ROM AM_REGION("maincpu", 0)
 	AM_RANGE(0x100000, 0x103fff) AM_RAM
-	AM_RANGE(0x200000, 0x200fff) AM_RAM_DEVWRITE("palette", palette_device, write) AM_SHARE("palette")
+	AM_RANGE(0x200000, 0x200fff) AM_RAM_DEVWRITE("palette", palette_device, write16) AM_SHARE("palette")
 	AM_RANGE(0x800000, 0x801fff) AM_RAM AM_DEVREADWRITE("k056832", k056832_device, ram_word_r, ram_word_w)
 	AM_RANGE(0x900000, 0x90003f) AM_DEVREADWRITE("k056832", k056832_device, word_r, word_w)
 	AM_RANGE(0xb00000, 0xb01fff) AM_READ(vrom_r)
@@ -196,6 +198,8 @@ public:
 	DECLARE_WRITE16_MEMBER(control_w);
 	DECLARE_READ16_MEMBER(control_r);
 
+	void giclassvr(machine_config &config);
+	void server_main(address_map &map);
 private:
 	uint16 m_control;
 };
@@ -260,11 +264,11 @@ uint32_t giclassicsvr_state::screen_update_giclassicsvr(screen_device &screen, b
 	return 0;
 }
 
-static ADDRESS_MAP_START( server_main, AS_PROGRAM, 16, giclassicsvr_state )
+ADDRESS_MAP_START(giclassicsvr_state::server_main)
 	AM_RANGE(0x000000, 0x07ffff) AM_ROM AM_REGION("maincpu", 0)
 	AM_RANGE(0x080000, 0x08ffff) AM_RAM
 	AM_RANGE(0x090000, 0x093fff) AM_RAM
-	AM_RANGE(0x100000, 0x107fff) AM_RAM AM_RAM_DEVWRITE("palette", palette_device, write) AM_SHARE("palette")
+	AM_RANGE(0x100000, 0x107fff) AM_RAM AM_RAM_DEVWRITE("palette", palette_device, write16) AM_SHARE("palette")
 	AM_RANGE(0x180000, 0x183fff) AM_RAM
 	AM_RANGE(0x280000, 0x281fff) AM_RAM AM_DEVREADWRITE("k056832", k056832_device, ram_word_r, ram_word_w)
 	AM_RANGE(0x300000, 0x300007) AM_DEVWRITE("k055673", k055673_device, k053246_word_w) // SPRITES
@@ -288,10 +292,10 @@ void giclassicsvr_state::machine_reset()
 {
 }
 
-static MACHINE_CONFIG_START( giclassic )
+MACHINE_CONFIG_START(giclassic_state::giclassic)
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", M68000, XTAL_20MHz / 2) // PCB is marked "68000 12 MHz", but only visible osc is 20 MHz
+	MCFG_CPU_ADD("maincpu", M68000, XTAL(20'000'000) / 2) // PCB is marked "68000 12 MHz", but only visible osc is 20 MHz
 	MCFG_CPU_PROGRAM_MAP(satellite_main)
 	MCFG_CPU_VBLANK_INT_DRIVER("screen", giclassic_state, giclassic_interrupt)
 
@@ -314,10 +318,10 @@ static MACHINE_CONFIG_START( giclassic )
 	MCFG_K056832_PALETTE("palette")
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_START( giclassvr )
+MACHINE_CONFIG_START(giclassicsvr_state::giclassvr)
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", M68000, XTAL_16MHz) // unknown speed
+	MCFG_CPU_ADD("maincpu", M68000, XTAL(16'000'000)) // unknown speed
 	MCFG_CPU_PROGRAM_MAP(server_main)
 	MCFG_CPU_VBLANK_INT_DRIVER("screen", giclassicsvr_state, giclassicsvr_interrupt)
 
@@ -344,10 +348,10 @@ static MACHINE_CONFIG_START( giclassvr )
 	MCFG_K055673_CONFIG("gfx2", K055673_LAYOUT_PS, -60, 24)
 	MCFG_K055673_PALETTE("palette")
 
-	MCFG_DEVICE_ADD("k053252a", K053252, XTAL_32MHz/4)
+	MCFG_DEVICE_ADD("k053252a", K053252, XTAL(32'000'000)/4)
 	MCFG_K053252_OFFSETS(40, 16) // TODO
 
-	MCFG_DEVICE_ADD("k053252b", K053252, XTAL_32MHz/4)
+	MCFG_DEVICE_ADD("k053252b", K053252, XTAL(32'000'000)/4)
 	MCFG_K053252_OFFSETS(40, 16) // TODO
 MACHINE_CONFIG_END
 

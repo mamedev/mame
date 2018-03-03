@@ -1919,7 +1919,14 @@ void validity_checker::validate_devices()
 		m_current_device = &device;
 
 		// validate auto-finders
-		device.findit(true);
+		device.findit(true, true);
+		device.findit(false, true);
+
+		// validate callbacks
+		for (auto &cb : device.input_callbacks())
+			cb->validity_check(*this);
+		for (auto &cb : device.output_callbacks())
+			cb->validity_check(*this);
 
 		// validate the device tag
 		validate_tag(device.basetag());
@@ -1949,10 +1956,10 @@ void validity_checker::validate_devices()
 
 				const char *const def_bios = option.second->default_bios();
 				if (def_bios)
-					device_t::static_set_default_bios_tag(*card, def_bios);
-				machine_config_constructor const additions = option.second->machine_config();
+					card->set_default_bios_tag(def_bios);
+				auto additions = option.second->machine_config();
 				if (additions)
-					(*additions)(*m_current_config, card, card);
+					additions(card);
 
 				for (device_slot_interface &subslot : slot_interface_iterator(*card))
 				{
@@ -1964,10 +1971,10 @@ void validity_checker::validate_devices()
 							device_t *const sub_card = m_current_config->device_add(&subslot.device(), suboption->name(), suboption->devtype(), suboption->clock());
 							const char *const sub_bios = suboption->default_bios();
 							if (sub_bios)
-								device_t::static_set_default_bios_tag(*sub_card, sub_bios);
-							machine_config_constructor const sub_additions = suboption->machine_config();
+								sub_card->set_default_bios_tag(sub_bios);
+							auto sub_additions = suboption->machine_config();
 							if (sub_additions)
-								(*sub_additions)(*m_current_config, sub_card, sub_card);
+								sub_additions(sub_card);
 						}
 					}
 				}
@@ -1979,7 +1986,8 @@ void validity_checker::validate_devices()
 				for (device_t &card_dev : device_iterator(*card))
 				{
 					m_current_device = &card_dev;
-					card_dev.findit(true);
+					card_dev.findit(true, true);
+					card_dev.findit(false, true);
 					card_dev.validity_check(*this);
 					m_current_device = nullptr;
 				}

@@ -103,14 +103,14 @@ To verify against original HW:
  *
  *************************************/
 
-static ADDRESS_MAP_START( divebomb_fgcpu_map, AS_PROGRAM, 8, divebomb_state )
+ADDRESS_MAP_START(divebomb_state::divebomb_fgcpu_map)
 	AM_RANGE(0x0000, 0x7fff) AM_ROM
 	AM_RANGE(0xc000, 0xc7ff) AM_RAM_WRITE(fgram_w) AM_SHARE("fgram")
 	AM_RANGE(0xe000, 0xffff) AM_RAM
 ADDRESS_MAP_END
 
 
-static ADDRESS_MAP_START( divebomb_fgcpu_iomap, AS_IO, 8, divebomb_state )
+ADDRESS_MAP_START(divebomb_state::divebomb_fgcpu_iomap)
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	AM_RANGE(0x00, 0x00) AM_DEVWRITE("sn0", sn76489_device, write)
 	AM_RANGE(0x01, 0x01) AM_DEVWRITE("sn1", sn76489_device, write)
@@ -182,7 +182,7 @@ READ8_MEMBER(divebomb_state::fgcpu_comm_flags_r)
  *
  *************************************/
 
-static ADDRESS_MAP_START( divebomb_spritecpu_map, AS_PROGRAM, 8, divebomb_state )
+ADDRESS_MAP_START(divebomb_state::divebomb_spritecpu_map)
 	AM_RANGE(0x0000, 0x7fff) AM_ROM
 	AM_RANGE(0xc000, 0xc7ff) AM_RAM AM_SHARE("spriteram")
 	AM_RANGE(0xc800, 0xdfff) AM_WRITENOP
@@ -190,7 +190,7 @@ static ADDRESS_MAP_START( divebomb_spritecpu_map, AS_PROGRAM, 8, divebomb_state 
 ADDRESS_MAP_END
 
 
-static ADDRESS_MAP_START( divebomb_spritecpu_iomap, AS_IO, 8, divebomb_state )
+ADDRESS_MAP_START(divebomb_state::divebomb_spritecpu_iomap)
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	AM_RANGE(0x00, 0x00) AM_WRITE(spritecpu_port00_w)
 	AM_RANGE(0x80, 0x80) AM_READWRITE(spritecpu_comm_r, spritecpu_comm_w)
@@ -226,7 +226,7 @@ WRITE8_MEMBER(divebomb_state::spritecpu_port00_w)
  *
  *************************************/
 
-static ADDRESS_MAP_START( divebomb_rozcpu_map, AS_PROGRAM, 8, divebomb_state )
+ADDRESS_MAP_START(divebomb_state::divebomb_rozcpu_map)
 	AM_RANGE(0x0000, 0x7fff) AM_ROM
 	AM_RANGE(0x8000, 0xbfff) AM_ROMBANK("bank1")
 	AM_RANGE(0xc000, 0xc7ff) AM_RAM AM_DEVREADWRITE("k051316_1", k051316_device, read, write)
@@ -235,7 +235,7 @@ static ADDRESS_MAP_START( divebomb_rozcpu_map, AS_PROGRAM, 8, divebomb_state )
 ADDRESS_MAP_END
 
 
-static ADDRESS_MAP_START( divebomb_rozcpu_iomap, AS_IO, 8, divebomb_state )
+ADDRESS_MAP_START(divebomb_state::divebomb_rozcpu_iomap)
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	AM_RANGE(0x00, 0x00) AM_WRITE(rozcpu_bank_w)
 	AM_RANGE(0x10, 0x10) AM_WRITE(rozcpu_wrap2_enable_w)
@@ -251,7 +251,7 @@ ADDRESS_MAP_END
 
 WRITE8_MEMBER(divebomb_state::rozcpu_bank_w)
 {
-	uint32_t bank = BITSWAP8(data, 4, 5, 6, 7, 3, 2, 1, 0) >> 4;
+	uint32_t bank = bitswap<8>(data, 4, 5, 6, 7, 3, 2, 1, 0) >> 4;
 	m_bank1->set_entry(bank);
 
 	if (data & 0x0f)
@@ -445,7 +445,7 @@ GFXDECODE_END
  *
  *************************************/
 
-static MACHINE_CONFIG_START( divebomb )
+MACHINE_CONFIG_START(divebomb_state::divebomb)
 
 	MCFG_CPU_ADD("fgcpu", Z80,XTAL1/4) // ?
 	MCFG_CPU_PROGRAM_MAP(divebomb_fgcpu_map)

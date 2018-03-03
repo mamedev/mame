@@ -89,4 +89,10 @@ public:
 	void draw_sprites( bitmap_ind16 &bmp, const rectangle &clip, uint8_t *ram, int pri );
 
 	INTERRUPT_GEN_MEMBER(bwp3_interrupt);
+	void bwing(machine_config &config);
+	void bank_map(address_map &map);
+	void bwp1_map(address_map &map);
+	void bwp2_map(address_map &map);
+	void bwp3_io_map(address_map &map);
+	void bwp3_map(address_map &map);
 };

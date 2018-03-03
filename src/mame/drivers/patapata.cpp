@@ -31,8 +31,8 @@ maybe close to jalmah.cpp?
 class patapata_state : public driver_device
 {
 public:
-	patapata_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag),
+	patapata_state(const machine_config &mconfig, device_type type, const char *tag) :
+		driver_device(mconfig, type, tag),
 		m_bg_videoram(*this, "bg_videoram"),
 		m_fg_videoram(*this, "fg_videoram"),
 		m_vregs(*this, "videoregs"),
@@ -40,6 +40,9 @@ public:
 		m_gfxdecode(*this, "gfxdecode")
 	{ }
 
+	void patapata(machine_config &config);
+
+protected:
 	DECLARE_WRITE16_MEMBER(bg_videoram_w);
 	DECLARE_WRITE16_MEMBER(fg_videoram_w);
 	DECLARE_WRITE8_MEMBER(flipscreen_w);
@@ -48,7 +51,7 @@ public:
 
 	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 
-protected:
+	void main_map(address_map &map);
 	virtual void video_start() override;
 
 private:
@@ -179,7 +182,7 @@ also
 
 */
 
-static ADDRESS_MAP_START( main_map, AS_PROGRAM, 16, patapata_state )
+ADDRESS_MAP_START(patapata_state::main_map)
 	AM_RANGE(0x000000, 0x07ffff) AM_ROM
 
 	AM_RANGE(0x100000, 0x100001) AM_READ_PORT("IN0")
@@ -188,7 +191,7 @@ static ADDRESS_MAP_START( main_map, AS_PROGRAM, 16, patapata_state )
 	AM_RANGE(0x10000a, 0x10000b) AM_READ_PORT("DSW2")
 	AM_RANGE(0x100014, 0x100015) AM_WRITE8(flipscreen_w, 0x00ff)
 	AM_RANGE(0x110000, 0x1103ff) AM_RAM AM_SHARE("videoregs")
-	AM_RANGE(0x120000, 0x1205ff) AM_RAM_DEVWRITE("palette", palette_device, write) AM_SHARE("palette")
+	AM_RANGE(0x120000, 0x1205ff) AM_RAM_DEVWRITE("palette", palette_device, write16) AM_SHARE("palette")
 	AM_RANGE(0x130000, 0x13ffff) AM_RAM_WRITE(fg_videoram_w) AM_SHARE("fg_videoram")
 	AM_RANGE(0x140000, 0x14ffff) AM_RAM_WRITE(bg_videoram_w) AM_SHARE("bg_videoram")
 	AM_RANGE(0x150000, 0x150001) AM_DEVREADWRITE8("oki1", okim6295_device, read, write, 0x00ff)
@@ -280,9 +283,9 @@ TIMER_DEVICE_CALLBACK_MEMBER(patapata_state::scanline)
 	if (param==128) m_maincpu->set_input_line(1, HOLD_LINE);
 }
 
-static MACHINE_CONFIG_START( patapata )
+MACHINE_CONFIG_START(patapata_state::patapata)
 
-	MCFG_CPU_ADD("maincpu", M68000, XTAL_16MHz) // 16 MHz XTAL, 16 MHz CPU
+	MCFG_CPU_ADD("maincpu", M68000, 16_MHz_XTAL) // 16 MHz XTAL, 16 MHz CPU
 	MCFG_CPU_PROGRAM_MAP(main_map)
 	MCFG_CPU_VBLANK_INT_DRIVER("screen", patapata_state,  irq4_line_hold) // 1 + 4 valid? (4 main VBL)
 	MCFG_TIMER_DRIVER_ADD_SCANLINE("scantimer", patapata_state, scanline, "screen", 0, 1)
@@ -302,10 +305,10 @@ static MACHINE_CONFIG_START( patapata )
 
 	MCFG_SPEAKER_STANDARD_MONO("mono")
 
-	MCFG_OKIM6295_ADD("oki1", XTAL_16MHz / 4, PIN7_LOW) // not verified
+	MCFG_OKIM6295_ADD("oki1", 16_MHz_XTAL / 4, PIN7_LOW) // not verified
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.40)
 
-	MCFG_OKIM6295_ADD("oki2", XTAL_16MHz / 4, PIN7_LOW) // not verified
+	MCFG_OKIM6295_ADD("oki2", 16_MHz_XTAL / 4, PIN7_LOW) // not verified
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.40)
 
 	MCFG_DEVICE_ADD("nmk112", NMK112, 0) // or 212? difficult to read (maybe 212 is 2* 112?)

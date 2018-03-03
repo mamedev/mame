@@ -79,4 +79,15 @@ public:
 	required_device<gfxdecode_device> m_gfxdecode;
 	required_device<palette_device> m_palette;
 	required_device<generic_latch_8_device> m_soundlatch;
+	void kingofb(machine_config &config);
+	void ringking(machine_config &config);
+	void kingobox_map(address_map &map);
+	void kingobox_sound_io_map(address_map &map);
+	void kingobox_sound_map(address_map &map);
+	void kingobox_sprite_map(address_map &map);
+	void kingobox_video_map(address_map &map);
+	void ringking_map(address_map &map);
+	void ringking_sound_io_map(address_map &map);
+	void ringking_sprite_map(address_map &map);
+	void ringking_video_map(address_map &map);
 };

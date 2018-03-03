@@ -78,4 +78,13 @@ public:
 	void draw_sprites_region(bitmap_ind16 &bitmap, const rectangle &cliprect, int start_offset, int end_offset );
 	void draw_starfield( bitmap_ind16 &bitmap );
 	void draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprect);
+	void sidearms(machine_config &config);
+	void turtship(machine_config &config);
+	void whizz(machine_config &config);
+	void sidearms_map(address_map &map);
+	void sidearms_sound_map(address_map &map);
+	void turtship_map(address_map &map);
+	void whizz_io_map(address_map &map);
+	void whizz_map(address_map &map);
+	void whizz_sound_map(address_map &map);
 };

@@ -65,6 +65,8 @@ public:
 	DECLARE_WRITE_LINE_MEMBER( ptm_o3_callback );
 	DECLARE_WRITE8_MEMBER(baud_rate_w);
 
+	void poly(machine_config &config);
+	void poly_mem(address_map &map);
 protected:
 	virtual void machine_reset() override;
 
@@ -80,7 +82,7 @@ private:
 };
 
 
-static ADDRESS_MAP_START(poly_mem, AS_PROGRAM, 8, poly_state)
+ADDRESS_MAP_START(poly_state::poly_mem)
 	ADDRESS_MAP_UNMAP_HIGH
 	AM_RANGE(0x0000,0x9fff) AM_RAM
 	AM_RANGE(0xa000,0xcfff) AM_ROM
@@ -150,9 +152,9 @@ WRITE8_MEMBER(poly_state::baud_rate_w)
 	m_acia_clock->set_clock_scale((selector <= 5) ? 1.0 / (1 << selector) : 0.0);
 }
 
-static MACHINE_CONFIG_START( poly )
+MACHINE_CONFIG_START(poly_state::poly)
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", M6809E, XTAL_12_0576MHz / 3)
+	MCFG_CPU_ADD("maincpu", MC6809, XTAL(12'057'600) / 3) // nominally 4 MHz
 	MCFG_CPU_PROGRAM_MAP(poly_mem)
 
 	/* video hardware */
@@ -169,7 +171,7 @@ static MACHINE_CONFIG_START( poly )
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
 
 	/* Devices */
-	MCFG_DEVICE_ADD("saa5050", SAA5050, XTAL_12_0576MHz / 2)
+	MCFG_DEVICE_ADD("saa5050", SAA5050, XTAL(12'057'600) / 2)
 	MCFG_SAA5050_D_CALLBACK(READ8(poly_state, videoram_r))
 	MCFG_SAA5050_SCREEN_SIZE(40, 24, 40)
 
@@ -183,10 +185,10 @@ static MACHINE_CONFIG_START( poly )
 	MCFG_PIA_IRQA_HANDLER(INPUTLINE("maincpu", M6809_IRQ_LINE))
 	MCFG_PIA_IRQB_HANDLER(INPUTLINE("maincpu", M6809_IRQ_LINE))
 
-	MCFG_DEVICE_ADD("ptm", PTM6840, XTAL_12_0576MHz / 3)
+	MCFG_DEVICE_ADD("ptm", PTM6840, XTAL(12'057'600) / 3)
 	MCFG_PTM6840_EXTERNAL_CLOCKS(0, 0, 0)
-	MCFG_PTM6840_OUT1_CB(WRITELINE(poly_state, ptm_o2_callback))
-	MCFG_PTM6840_OUT2_CB(WRITELINE(poly_state, ptm_o3_callback))
+	MCFG_PTM6840_O2_CB(WRITELINE(poly_state, ptm_o2_callback))
+	MCFG_PTM6840_O3_CB(WRITELINE(poly_state, ptm_o3_callback))
 	MCFG_PTM6840_IRQ_CB(INPUTLINE("maincpu", M6809_IRQ_LINE))
 
 	MCFG_DEVICE_ADD("acia", ACIA6850, 0)

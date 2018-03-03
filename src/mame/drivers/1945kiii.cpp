@@ -50,7 +50,7 @@ Notes:
 #include "screen.h"
 #include "speaker.h"
 
-#define MASTER_CLOCK    XTAL_16MHz
+#define MASTER_CLOCK    XTAL(16'000'000)
 
 
 class k3_state : public driver_device
@@ -91,6 +91,11 @@ public:
 	required_device<cpu_device> m_maincpu;
 	required_device<gfxdecode_device> m_gfxdecode;
 	required_device<palette_device> m_palette;
+	void flagrall(machine_config &config);
+	void k3(machine_config &config);
+	void flagrall_map(address_map &map);
+	void k3_base_map(address_map &map);
+	void k3_map(address_map &map);
 };
 
 
@@ -183,13 +188,13 @@ WRITE16_MEMBER(k3_state::flagrall_soundbanks_w)
 }
 
 
-static ADDRESS_MAP_START( k3_base_map, AS_PROGRAM, 16, k3_state )
+ADDRESS_MAP_START(k3_state::k3_base_map)
 	AM_RANGE(0x0009ce, 0x0009cf) AM_WRITENOP    // k3 - bug in code? (clean up log)
 	AM_RANGE(0x0009d2, 0x0009d3) AM_WRITENOP    // l3 - bug in code? (clean up log)
 
 	AM_RANGE(0x000000, 0x0fffff) AM_ROM // ROM
 	AM_RANGE(0x100000, 0x10ffff) AM_RAM // Main Ram
-	AM_RANGE(0x200000, 0x200fff) AM_RAM_DEVWRITE("palette", palette_device, write) AM_SHARE("palette")
+	AM_RANGE(0x200000, 0x200fff) AM_RAM_DEVWRITE("palette", palette_device, write16) AM_SHARE("palette")
 	AM_RANGE(0x240000, 0x240fff) AM_RAM AM_SHARE("spritera1")
 	AM_RANGE(0x280000, 0x280fff) AM_RAM AM_SHARE("spritera2")
 	AM_RANGE(0x2c0000, 0x2c07ff) AM_RAM_WRITE(k3_bgram_w) AM_SHARE("bgram")
@@ -201,7 +206,7 @@ static ADDRESS_MAP_START( k3_base_map, AS_PROGRAM, 16, k3_state )
 	AM_RANGE(0x480000, 0x480001) AM_READ_PORT("DSW")
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( k3_map, AS_PROGRAM, 16, k3_state )
+ADDRESS_MAP_START(k3_state::k3_map)
 	AM_IMPORT_FROM( k3_base_map )
 
 	AM_RANGE(0x3c0000, 0x3c0001) AM_WRITE(k3_soundbanks_w)
@@ -212,7 +217,7 @@ static ADDRESS_MAP_START( k3_map, AS_PROGRAM, 16, k3_state )
 ADDRESS_MAP_END
 
 
-static ADDRESS_MAP_START( flagrall_map, AS_PROGRAM, 16, k3_state )
+ADDRESS_MAP_START(k3_state::flagrall_map)
 	AM_IMPORT_FROM( k3_base_map )
 
 	AM_RANGE(0x3c0000, 0x3c0001) AM_WRITE(flagrall_soundbanks_w)
@@ -367,7 +372,7 @@ void k3_state::machine_start()
 {
 }
 
-static MACHINE_CONFIG_START( flagrall )
+MACHINE_CONFIG_START(k3_state::flagrall)
 
 	MCFG_CPU_ADD("maincpu", M68000, MASTER_CLOCK ) // ?
 	MCFG_CPU_PROGRAM_MAP(flagrall_map)
@@ -393,7 +398,8 @@ static MACHINE_CONFIG_START( flagrall )
 MACHINE_CONFIG_END
 
 
-static MACHINE_CONFIG_DERIVED( k3, flagrall )
+MACHINE_CONFIG_START(k3_state::k3)
+	flagrall(config);
 
 	MCFG_CPU_MODIFY("maincpu")
 	MCFG_CPU_PROGRAM_MAP(k3_map)

@@ -105,6 +105,7 @@ private:
 		SDA5708_DATA_COMMAND   = 0x00
 	};
 
+	output_finder<8, 7, 5> m_dots;
 	uint8_t m_serial;
 	uint8_t m_load;
 	uint8_t m_reset;

@@ -157,7 +157,7 @@ WRITE32_MEMBER(silkroad_state::silk_coin_counter_w)
 	}
 }
 
-static ADDRESS_MAP_START( cpu_map, AS_PROGRAM, 32, silkroad_state )
+ADDRESS_MAP_START(silkroad_state::cpu_map)
 	AM_RANGE(0x000000, 0x1fffff) AM_ROM
 	AM_RANGE(0x40c000, 0x40cfff) AM_RAM AM_SHARE("sprram") // sprites
 	AM_RANGE(0x600000, 0x603fff) AM_RAM_WRITE(paletteram32_xRRRRRGGGGGBBBBB_dword_w) AM_SHARE("paletteram") // palette
@@ -273,10 +273,10 @@ static GFXDECODE_START( silkroad )
 	GFXDECODE_ENTRY( "gfx1", 0, tiles16x16x6_layout,  0x0000, 256 )
 GFXDECODE_END
 
-static MACHINE_CONFIG_START( silkroad )
+MACHINE_CONFIG_START(silkroad_state::silkroad)
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", M68EC020, XTAL_32MHz/2) /* 16MHz */
+	MCFG_CPU_ADD("maincpu", M68EC020, XTAL(32'000'000)/2) /* 16MHz */
 	MCFG_CPU_PROGRAM_MAP(cpu_map)
 	MCFG_CPU_VBLANK_INT_DRIVER("screen", silkroad_state,  irq4_line_hold)
 
@@ -296,15 +296,15 @@ static MACHINE_CONFIG_START( silkroad )
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
 
-	MCFG_YM2151_ADD("ymsnd", XTAL_3_579545MHz)
+	MCFG_YM2151_ADD("ymsnd", XTAL(3'579'545))
 	MCFG_SOUND_ROUTE(0, "lspeaker", 1.0)
 	MCFG_SOUND_ROUTE(1, "rspeaker", 1.0)
 
-	MCFG_OKIM6295_ADD("oki1", XTAL_32MHz/32, PIN7_HIGH) // clock frequency & pin 7 not verified (was 1056000)
+	MCFG_OKIM6295_ADD("oki1", XTAL(32'000'000)/32, PIN7_HIGH) // clock frequency & pin 7 not verified (was 1056000)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "lspeaker", 0.45)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", 0.45)
 
-	MCFG_OKIM6295_ADD("oki2", XTAL_32MHz/16, PIN7_HIGH) // clock frequency & pin 7 not verified (was 2112000)
+	MCFG_OKIM6295_ADD("oki2", XTAL(32'000'000)/16, PIN7_HIGH) // clock frequency & pin 7 not verified (was 2112000)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "lspeaker", 0.45)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", 0.45)
 MACHINE_CONFIG_END

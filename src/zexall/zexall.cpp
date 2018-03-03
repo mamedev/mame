@@ -30,6 +30,7 @@ public:
 	DECLARE_WRITE8_MEMBER( output_req_w );
 	DECLARE_WRITE8_MEMBER( output_data_w );
 
+	void z80_mem(address_map &map);
 private:
 	required_device<cpu_device> m_maincpu;
 	required_shared_ptr<uint8_t> m_main_ram;
@@ -40,6 +41,7 @@ private:
 	std::string terminate_string;
 
 	virtual void machine_reset() override;
+	void zexall(machine_config &config);
 };
 
 
@@ -118,11 +120,11 @@ WRITE8_MEMBER( zexall_state::output_data_w )
  Address Maps
 ******************************************************************************/
 
-static ADDRESS_MAP_START(z80_mem, AS_PROGRAM, 8, zexall_state)
+ADDRESS_MAP_START(zexall_state::z80_mem)
+	AM_RANGE(0x0000, 0xffff) AM_RAM AM_SHARE("main_ram")
 	AM_RANGE(0xfffd, 0xfffd) AM_READWRITE(output_ack_r, output_ack_w)
 	AM_RANGE(0xfffe, 0xfffe) AM_READWRITE(output_req_r, output_req_w)
 	AM_RANGE(0xffff, 0xffff) AM_READWRITE(output_data_r, output_data_w)
-	AM_RANGE(0x0000, 0xffff) AM_RAM AM_SHARE("main_ram")
 ADDRESS_MAP_END
 
 
@@ -138,9 +140,9 @@ INPUT_PORTS_END
  Machine Drivers
 ******************************************************************************/
 
-static MACHINE_CONFIG_START( zexall )
+MACHINE_CONFIG_START(zexall_state::zexall)
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", Z80, XTAL_3_579545MHz)
+	MCFG_CPU_ADD("maincpu", Z80, XTAL(3'579'545))
 	MCFG_CPU_PROGRAM_MAP(z80_mem)
 MACHINE_CONFIG_END
 

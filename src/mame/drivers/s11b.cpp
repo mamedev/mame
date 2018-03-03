@@ -32,7 +32,7 @@
 #include "s11b.lh"
 
 
-static ADDRESS_MAP_START( s11b_main_map, AS_PROGRAM, 8, s11b_state )
+ADDRESS_MAP_START(s11b_state::s11b_main_map)
 	AM_RANGE(0x0000, 0x0fff) AM_RAM AM_SHARE("nvram")
 	AM_RANGE(0x2100, 0x2103) AM_MIRROR(0x00fc) AM_DEVREADWRITE("pia21", pia6821_device, read, write) // sound+solenoids
 	AM_RANGE(0x2200, 0x2200) AM_MIRROR(0x01ff) AM_WRITE(sol3_w) // solenoids
@@ -44,7 +44,7 @@ static ADDRESS_MAP_START( s11b_main_map, AS_PROGRAM, 8, s11b_state )
 	AM_RANGE(0x4000, 0xffff) AM_ROM
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( s11b_audio_map, AS_PROGRAM, 8, s11b_state )
+ADDRESS_MAP_START(s11b_state::s11b_audio_map)
 	AM_RANGE(0x0000, 0x07ff) AM_MIRROR(0x0800) AM_RAM
 	AM_RANGE(0x1000, 0x1fff) AM_WRITE(bank_w)
 	AM_RANGE(0x2000, 0x2003) AM_MIRROR(0x0ffc) AM_DEVREADWRITE("pias", pia6821_device, read, write)
@@ -52,7 +52,7 @@ static ADDRESS_MAP_START( s11b_audio_map, AS_PROGRAM, 8, s11b_state )
 	AM_RANGE(0xc000, 0xffff) AM_ROMBANK("bank1")
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( s11b_bg_map, AS_PROGRAM, 8, s11b_state )
+ADDRESS_MAP_START(s11b_state::s11b_bg_map)
 	AM_RANGE(0x0000, 0x07ff) AM_RAM
 	AM_RANGE(0x2000, 0x2001) AM_MIRROR(0x1ffe) AM_DEVREADWRITE("ym2151", ym2151_device, read, write)
 	AM_RANGE(0x4000, 0x4003) AM_MIRROR(0x1ffc) AM_DEVREADWRITE("pia40", pia6821_device, read, write)
@@ -177,9 +177,9 @@ WRITE8_MEMBER( s11b_state::dig1_w )
 	if((seg & 0x70000) == 0x30000)
 	{
 		if(m_invert)
-			output().set_digit_value(get_strobe()+16, BITSWAP16(~seg, 7, 15, 12, 10, 8, 14, 13, 9, 11, 6, 5, 4, 3, 2, 1, 0));
+			output().set_digit_value(get_strobe()+16, bitswap<16>(~seg, 7, 15, 12, 10, 8, 14, 13, 9, 11, 6, 5, 4, 3, 2, 1, 0));
 		else
-			output().set_digit_value(get_strobe()+16, BITSWAP16(seg, 7, 15, 12, 10, 8, 14, 13, 9, 11, 6, 5, 4, 3, 2, 1, 0));
+			output().set_digit_value(get_strobe()+16, bitswap<16>(seg, 7, 15, 12, 10, 8, 14, 13, 9, 11, 6, 5, 4, 3, 2, 1, 0));
 		seg |= 0x40000;
 	}
 	set_segment2(seg);
@@ -193,9 +193,9 @@ WRITE8_MEMBER( s11b_state::pia2c_pa_w )
 	if((seg & 0x70000) == 0x30000)
 	{
 		if(m_invert)
-			output().set_digit_value(get_strobe(), BITSWAP16(~seg, 7, 15, 12, 10, 8, 14, 13, 9, 11, 6, 5, 4, 3, 2, 1, 0));
+			output().set_digit_value(get_strobe(), bitswap<16>(~seg, 7, 15, 12, 10, 8, 14, 13, 9, 11, 6, 5, 4, 3, 2, 1, 0));
 		else
-			output().set_digit_value(get_strobe(), BITSWAP16(seg, 7, 15, 12, 10, 8, 14, 13, 9, 11, 6, 5, 4, 3, 2, 1, 0));
+			output().set_digit_value(get_strobe(), bitswap<16>(seg, 7, 15, 12, 10, 8, 14, 13, 9, 11, 6, 5, 4, 3, 2, 1, 0));
 		seg |= 0x40000;
 	}
 	set_segment1(seg);
@@ -209,9 +209,9 @@ WRITE8_MEMBER( s11b_state::pia2c_pb_w )
 	if((seg & 0x70000) == 0x30000)
 	{
 		if(m_invert)
-			output().set_digit_value(get_strobe(), BITSWAP16(~seg, 7, 15, 12, 10, 8, 14, 13, 9, 11, 6, 5, 4, 3, 2, 1, 0));
+			output().set_digit_value(get_strobe(), bitswap<16>(~seg, 7, 15, 12, 10, 8, 14, 13, 9, 11, 6, 5, 4, 3, 2, 1, 0));
 		else
-			output().set_digit_value(get_strobe(), BITSWAP16(seg, 7, 15, 12, 10, 8, 14, 13, 9, 11, 6, 5, 4, 3, 2, 1, 0));
+			output().set_digit_value(get_strobe(), bitswap<16>(seg, 7, 15, 12, 10, 8, 14, 13, 9, 11, 6, 5, 4, 3, 2, 1, 0));
 		seg |= 0x40000;
 	}
 	set_segment1(seg);
@@ -225,9 +225,9 @@ WRITE8_MEMBER( s11b_state::pia34_pa_w )
 	if((seg & 0x70000) == 0x30000)
 	{
 		if(m_invert)
-			output().set_digit_value(get_strobe()+16, BITSWAP16(~seg, 7, 15, 12, 10, 8, 14, 13, 9, 11, 6, 5, 4, 3, 2, 1, 0));
+			output().set_digit_value(get_strobe()+16, bitswap<16>(~seg, 7, 15, 12, 10, 8, 14, 13, 9, 11, 6, 5, 4, 3, 2, 1, 0));
 		else
-			output().set_digit_value(get_strobe()+16, BITSWAP16(seg, 7, 15, 12, 10, 8, 14, 13, 9, 11, 6, 5, 4, 3, 2, 1, 0));
+			output().set_digit_value(get_strobe()+16, bitswap<16>(seg, 7, 15, 12, 10, 8, 14, 13, 9, 11, 6, 5, 4, 3, 2, 1, 0));
 		seg |= 0x40000;
 	}
 	set_segment2(seg);
@@ -245,9 +245,9 @@ DRIVER_INIT_MEMBER( s11b_state, s11b_invert )
 	m_invert = true;
 }
 
-static MACHINE_CONFIG_START( s11b )
+MACHINE_CONFIG_START(s11b_state::s11b)
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", M6808, XTAL_4MHz)
+	MCFG_CPU_ADD("maincpu", M6808, XTAL(4'000'000))
 	MCFG_CPU_PROGRAM_MAP(s11b_main_map)
 	MCFG_MACHINE_RESET_OVERRIDE(s11b_state, s11b)
 
@@ -255,7 +255,7 @@ static MACHINE_CONFIG_START( s11b )
 	MCFG_DEFAULT_LAYOUT(layout_s11b)
 
 	/* Sound */
-	MCFG_FRAGMENT_ADD( genpin_audio )
+	genpin_audio(config);
 
 	/* Devices */
 	MCFG_DEVICE_ADD("pia21", PIA6821, 0)
@@ -306,7 +306,7 @@ static MACHINE_CONFIG_START( s11b )
 	MCFG_NVRAM_ADD_1FILL("nvram")
 
 	/* Add the soundcard */
-	MCFG_CPU_ADD("audiocpu", M6802, XTAL_4MHz)
+	MCFG_CPU_ADD("audiocpu", M6802, XTAL(4'000'000))
 	MCFG_CPU_PROGRAM_MAP(s11b_audio_map)
 
 	MCFG_SPEAKER_STANDARD_MONO("speaker")
@@ -329,7 +329,7 @@ static MACHINE_CONFIG_START( s11b )
 	MCFG_PIA_IRQB_HANDLER(INPUTLINE("audiocpu", M6802_IRQ_LINE))
 
 	/* Add the background music card */
-	MCFG_CPU_ADD("bgcpu", M6809E, XTAL_8MHz) // MC68B09E (note: schematics show this as 8mhz/2, but games crash very quickly with that speed?)
+	MCFG_CPU_ADD("bgcpu", MC6809E, XTAL(8'000'000) / 4) // MC68B09E
 	MCFG_CPU_PROGRAM_MAP(s11b_bg_map)
 	MCFG_QUANTUM_TIME(attotime::from_hz(50))
 

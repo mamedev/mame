@@ -2147,7 +2147,7 @@ WRITE32_MEMBER(cps3_state::cps3_colourram_w)
 
 
 /* there are more unknown writes, but you get the idea */
-static ADDRESS_MAP_START( cps3_map, AS_PROGRAM, 32, cps3_state )
+ADDRESS_MAP_START(cps3_state::cps3_map)
 	AM_RANGE(0x00000000, 0x0007ffff) AM_ROM AM_REGION("bios", 0) // Bios ROM
 	AM_RANGE(0x02000000, 0x0207ffff) AM_RAM AM_SHARE("mainram") // Main RAM
 
@@ -2213,7 +2213,7 @@ static ADDRESS_MAP_START( cps3_map, AS_PROGRAM, 32, cps3_state )
 	AM_RANGE(0xc0000000, 0xc00003ff) AM_RAM_WRITE(cps3_0xc0000000_ram_w ) AM_SHARE("0xc0000000_ram") /* Executes code from here */
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( decrypted_opcodes_map, AS_OPCODES, 32, cps3_state )
+ADDRESS_MAP_START(cps3_state::decrypted_opcodes_map)
 	AM_RANGE(0x00000000, 0x0007ffff) AM_ROM AM_REGION("bios", 0) // Bios ROM
 	AM_RANGE(0x06000000, 0x06ffffff) AM_ROM AM_SHARE("decrypted_gamerom")
 	AM_RANGE(0xc0000000, 0xc00003ff) AM_ROM AM_SHARE("0xc0000000_ram_decrypted")
@@ -2456,21 +2456,21 @@ SH2_DMA_KLUDGE_CB(cps3_state::dma_callback)
 }
 
 
-static MACHINE_CONFIG_START( simm1_64mbit )
+MACHINE_CONFIG_START(cps3_state::simm1_64mbit)
 	MCFG_FUJITSU_29F016A_ADD("simm1.0")
 	MCFG_FUJITSU_29F016A_ADD("simm1.1")
 	MCFG_FUJITSU_29F016A_ADD("simm1.2")
 	MCFG_FUJITSU_29F016A_ADD("simm1.3")
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_START( simm2_64mbit )
+MACHINE_CONFIG_START(cps3_state::simm2_64mbit)
 	MCFG_FUJITSU_29F016A_ADD("simm2.0")
 	MCFG_FUJITSU_29F016A_ADD("simm2.1")
 	MCFG_FUJITSU_29F016A_ADD("simm2.2")
 	MCFG_FUJITSU_29F016A_ADD("simm2.3")
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_START( simm3_128mbit )
+MACHINE_CONFIG_START(cps3_state::simm3_128mbit)
 	MCFG_FUJITSU_29F016A_ADD("simm3.0")
 	MCFG_FUJITSU_29F016A_ADD("simm3.1")
 	MCFG_FUJITSU_29F016A_ADD("simm3.2")
@@ -2481,7 +2481,7 @@ static MACHINE_CONFIG_START( simm3_128mbit )
 	MCFG_FUJITSU_29F016A_ADD("simm3.7")
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_START( simm4_128mbit )
+MACHINE_CONFIG_START(cps3_state::simm4_128mbit)
 	MCFG_FUJITSU_29F016A_ADD("simm4.0")
 	MCFG_FUJITSU_29F016A_ADD("simm4.1")
 	MCFG_FUJITSU_29F016A_ADD("simm4.2")
@@ -2492,7 +2492,7 @@ static MACHINE_CONFIG_START( simm4_128mbit )
 	MCFG_FUJITSU_29F016A_ADD("simm4.7")
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_START( simm5_128mbit )
+MACHINE_CONFIG_START(cps3_state::simm5_128mbit)
 	MCFG_FUJITSU_29F016A_ADD("simm5.0")
 	MCFG_FUJITSU_29F016A_ADD("simm5.1")
 	MCFG_FUJITSU_29F016A_ADD("simm5.2")
@@ -2503,12 +2503,12 @@ static MACHINE_CONFIG_START( simm5_128mbit )
 	MCFG_FUJITSU_29F016A_ADD("simm5.7")
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_START( simm5_32mbit )
+MACHINE_CONFIG_START(cps3_state::simm5_32mbit)
 	MCFG_FUJITSU_29F016A_ADD("simm5.0")
 	MCFG_FUJITSU_29F016A_ADD("simm5.1")
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_START( simm6_128mbit )
+MACHINE_CONFIG_START(cps3_state::simm6_128mbit)
 	MCFG_FUJITSU_29F016A_ADD("simm6.0")
 	MCFG_FUJITSU_29F016A_ADD("simm6.1")
 	MCFG_FUJITSU_29F016A_ADD("simm6.2")
@@ -2519,11 +2519,11 @@ static MACHINE_CONFIG_START( simm6_128mbit )
 	MCFG_FUJITSU_29F016A_ADD("simm6.7")
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_START( cps3 )
+MACHINE_CONFIG_START(cps3_state::cps3)
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", SH2, 6250000*4) // external clock is 6.25 Mhz, it sets the internal multiplier to 4x (this should probably be handled in the core..)
 	MCFG_CPU_PROGRAM_MAP(cps3_map)
-	MCFG_CPU_DECRYPTED_OPCODES_MAP(decrypted_opcodes_map)
+	MCFG_CPU_OPCODES_MAP(decrypted_opcodes_map)
 	MCFG_CPU_VBLANK_INT_DRIVER("screen", cps3_state,  cps3_vbl_interrupt)
 	MCFG_CPU_PERIODIC_INT_DRIVER(cps3_state, cps3_other_interrupt, 80) /* ?source? */
 	MCFG_SH2_DMA_KLUDGE_CB(cps3_state, dma_callback)
@@ -2536,7 +2536,7 @@ static MACHINE_CONFIG_START( cps3 )
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
-	MCFG_SCREEN_RAW_PARAMS(XTAL_60MHz/8, 486, 0, 384, 259, 0, 224)
+	MCFG_SCREEN_RAW_PARAMS(XTAL(60'000'000)/8, 486, 0, 384, 259, 0, 224)
 	MCFG_SCREEN_UPDATE_DRIVER(cps3_state, screen_update_cps3)
 /*
     Measured clocks:
@@ -2564,51 +2564,57 @@ MACHINE_CONFIG_END
 
 
 /* individual configs for each machine, depending on the SIMMs installed */
-MACHINE_CONFIG_DERIVED( redearth, cps3 )
-	MCFG_FRAGMENT_ADD(simm1_64mbit)
-	MCFG_FRAGMENT_ADD(simm3_128mbit)
-	MCFG_FRAGMENT_ADD(simm4_128mbit)
-	MCFG_FRAGMENT_ADD(simm5_32mbit)
+MACHINE_CONFIG_START(cps3_state::redearth)
+	cps3(config);
+	simm1_64mbit(config);
+	simm3_128mbit(config);
+	simm4_128mbit(config);
+	simm5_32mbit(config);
 MACHINE_CONFIG_END
 
-MACHINE_CONFIG_DERIVED( sfiii, cps3 )
-	MCFG_FRAGMENT_ADD(simm1_64mbit)
-	MCFG_FRAGMENT_ADD(simm3_128mbit)
-	MCFG_FRAGMENT_ADD(simm4_128mbit)
-	MCFG_FRAGMENT_ADD(simm5_32mbit)
+MACHINE_CONFIG_START(cps3_state::sfiii)
+	cps3(config);
+	simm1_64mbit(config);
+	simm3_128mbit(config);
+	simm4_128mbit(config);
+	simm5_32mbit(config);
 MACHINE_CONFIG_END
 
-MACHINE_CONFIG_DERIVED( sfiii2, cps3 )
-	MCFG_FRAGMENT_ADD(simm1_64mbit)
-	MCFG_FRAGMENT_ADD(simm2_64mbit)
-	MCFG_FRAGMENT_ADD(simm3_128mbit)
-	MCFG_FRAGMENT_ADD(simm4_128mbit)
-	MCFG_FRAGMENT_ADD(simm5_128mbit)
+MACHINE_CONFIG_START(cps3_state::sfiii2)
+	cps3(config);
+	simm1_64mbit(config);
+	simm2_64mbit(config);
+	simm3_128mbit(config);
+	simm4_128mbit(config);
+	simm5_128mbit(config);
 MACHINE_CONFIG_END
 
-MACHINE_CONFIG_DERIVED( jojo, cps3 )
-	MCFG_FRAGMENT_ADD(simm1_64mbit)
-	MCFG_FRAGMENT_ADD(simm2_64mbit)
-	MCFG_FRAGMENT_ADD(simm3_128mbit)
-	MCFG_FRAGMENT_ADD(simm4_128mbit)
-	MCFG_FRAGMENT_ADD(simm5_32mbit)
+MACHINE_CONFIG_START(cps3_state::jojo)
+	cps3(config);
+	simm1_64mbit(config);
+	simm2_64mbit(config);
+	simm3_128mbit(config);
+	simm4_128mbit(config);
+	simm5_32mbit(config);
 MACHINE_CONFIG_END
 
-MACHINE_CONFIG_DERIVED( sfiii3, cps3 )
-	MCFG_FRAGMENT_ADD(simm1_64mbit)
-	MCFG_FRAGMENT_ADD(simm2_64mbit)
-	MCFG_FRAGMENT_ADD(simm3_128mbit)
-	MCFG_FRAGMENT_ADD(simm4_128mbit)
-	MCFG_FRAGMENT_ADD(simm5_128mbit)
-	MCFG_FRAGMENT_ADD(simm6_128mbit)
+MACHINE_CONFIG_START(cps3_state::sfiii3)
+	cps3(config);
+	simm1_64mbit(config);
+	simm2_64mbit(config);
+	simm3_128mbit(config);
+	simm4_128mbit(config);
+	simm5_128mbit(config);
+	simm6_128mbit(config);
 MACHINE_CONFIG_END
 
-MACHINE_CONFIG_DERIVED( jojoba, cps3 )
-	MCFG_FRAGMENT_ADD(simm1_64mbit)
-	MCFG_FRAGMENT_ADD(simm2_64mbit)
-	MCFG_FRAGMENT_ADD(simm3_128mbit)
-	MCFG_FRAGMENT_ADD(simm4_128mbit)
-	MCFG_FRAGMENT_ADD(simm5_128mbit)
+MACHINE_CONFIG_START(cps3_state::jojoba)
+	cps3(config);
+	simm1_64mbit(config);
+	simm2_64mbit(config);
+	simm3_128mbit(config);
+	simm4_128mbit(config);
+	simm5_128mbit(config);
 MACHINE_CONFIG_END
 
 

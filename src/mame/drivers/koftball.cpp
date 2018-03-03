@@ -73,6 +73,9 @@ public:
 	virtual void video_start() override;
 	uint32_t screen_update_koftball(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	TIMER_DEVICE_CALLBACK_MEMBER(bmc_interrupt);
+	void koftball(machine_config &config);
+	void koftball_mem(address_map &map);
+	void ramdac_map(address_map &map);
 };
 
 
@@ -125,7 +128,7 @@ READ16_MEMBER(koftball_state::prot_r)
 		case 0x8000: return 0x0f0f;
 	}
 
-	logerror("unk prot r %x %x\n",m_prot_data,  space.device().safe_pcbase());
+	logerror("unk prot r %x %x\n",m_prot_data,  m_maincpu->pcbase());
 	return machine().rand();
 }
 
@@ -146,7 +149,7 @@ WRITE16_MEMBER(koftball_state::bmc_2_videoram_w)
 	m_tilemap_2->mark_tile_dirty(offset);
 }
 
-static ADDRESS_MAP_START( koftball_mem, AS_PROGRAM, 16, koftball_state )
+ADDRESS_MAP_START(koftball_state::koftball_mem)
 	AM_RANGE(0x000000, 0x01ffff) AM_ROM
 	AM_RANGE(0x220000, 0x22ffff) AM_RAM AM_SHARE("main_ram")
 
@@ -173,7 +176,7 @@ static ADDRESS_MAP_START( koftball_mem, AS_PROGRAM, 16, koftball_state )
 	AM_RANGE(0x360000, 0x360001) AM_WRITE(prot_w)
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( ramdac_map, 0, 8, koftball_state )
+ADDRESS_MAP_START(koftball_state::ramdac_map)
 	AM_RANGE(0x000, 0x3ff) AM_DEVREADWRITE("ramdac",ramdac_device,ramdac_pal_r,ramdac_rgb666_w)
 ADDRESS_MAP_END
 
@@ -229,8 +232,8 @@ static GFXDECODE_START( koftball )
 GFXDECODE_END
 
 
-static MACHINE_CONFIG_START( koftball )
-	MCFG_CPU_ADD("maincpu", M68000, XTAL_21_4772MHz / 2)
+MACHINE_CONFIG_START(koftball_state::koftball)
+	MCFG_CPU_ADD("maincpu", M68000, XTAL(21'477'272) / 2)
 	MCFG_CPU_PROGRAM_MAP(koftball_mem)
 	MCFG_TIMER_DRIVER_ADD_SCANLINE("scantimer", koftball_state, bmc_interrupt, "screen", 0, 1)
 
@@ -249,7 +252,7 @@ static MACHINE_CONFIG_START( koftball )
 
 	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
 
-	MCFG_SOUND_ADD("ymsnd", YM2413, XTAL_3_579545MHz)  // guessed chip type, clock not verified
+	MCFG_SOUND_ADD("ymsnd", YM2413, XTAL(3'579'545))  // guessed chip type, clock not verified
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "lspeaker", 0.50)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", 0.50)
 

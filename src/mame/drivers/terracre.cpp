@@ -231,7 +231,7 @@ MACHINE_START_MEMBER(terracre_state,amazon)
 	save_item(NAME(m_mAmazonProtReg));
 }
 
-static ADDRESS_MAP_START( terracre_map, AS_PROGRAM, 16, terracre_state )
+ADDRESS_MAP_START(terracre_state::terracre_map)
 	AM_RANGE(0x000000, 0x01ffff) AM_ROM
 	AM_RANGE(0x020000, 0x0201ff) AM_RAM AM_SHARE("spriteram")
 	AM_RANGE(0x020200, 0x021fff) AM_RAM
@@ -250,7 +250,7 @@ static ADDRESS_MAP_START( terracre_map, AS_PROGRAM, 16, terracre_state )
 	AM_RANGE(0x028000, 0x0287ff) AM_RAM_WRITE(amazon_foreground_w) AM_SHARE("fg_videoram")
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( amazon_base_map, AS_PROGRAM, 16, terracre_state )
+ADDRESS_MAP_START(terracre_state::amazon_base_map)
 	AM_RANGE(0x000000, 0x01ffff) AM_ROM
 	AM_RANGE(0x040000, 0x0401ff) AM_RAM AM_SHARE("spriteram")
 	AM_RANGE(0x040200, 0x040fff) AM_RAM
@@ -269,17 +269,17 @@ static ADDRESS_MAP_START( amazon_base_map, AS_PROGRAM, 16, terracre_state )
 	AM_RANGE(0x070000, 0x070003) AM_NOP // protection (nop for bootlegs)
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( amazon_1412m2_map, AS_PROGRAM, 16, terracre_state)
-	AM_RANGE(0x070000, 0x070003) AM_READWRITE(amazon_protection_r, amazon_protection_w)
+ADDRESS_MAP_START(terracre_state::amazon_1412m2_map)
 	AM_IMPORT_FROM( amazon_base_map )
+	AM_RANGE(0x070000, 0x070003) AM_READWRITE(amazon_protection_r, amazon_protection_w)
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( sound_map, AS_PROGRAM, 8, terracre_state )
+ADDRESS_MAP_START(terracre_state::sound_map)
 	AM_RANGE(0x0000, 0xbfff) AM_ROM
 	AM_RANGE(0xc000, 0xcfff) AM_RAM
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( sound_3526_io_map, AS_IO, 8, terracre_state )
+ADDRESS_MAP_START(terracre_state::sound_3526_io_map)
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	AM_RANGE(0x00, 0x01) AM_DEVWRITE("ymsnd", ym3526_device, write)
 	AM_RANGE(0x02, 0x02) AM_DEVWRITE("dac1", dac_byte_interface, write)
@@ -288,7 +288,7 @@ static ADDRESS_MAP_START( sound_3526_io_map, AS_IO, 8, terracre_state )
 	AM_RANGE(0x06, 0x06) AM_DEVREAD("soundlatch", generic_latch_8_device, read)
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( sound_2203_io_map, AS_IO, 8, terracre_state )
+ADDRESS_MAP_START(terracre_state::sound_2203_io_map)
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	AM_RANGE(0x00, 0x01) AM_DEVWRITE("ym1", ym2203_device, write)
 	AM_RANGE(0x02, 0x02) AM_DEVWRITE("dac1", dac_byte_interface, write)
@@ -573,15 +573,15 @@ static GFXDECODE_START( terracre )
 GFXDECODE_END
 
 
-static MACHINE_CONFIG_START( ym3526 )
-	MCFG_CPU_ADD("maincpu", M68000, XTAL_16MHz/2)   // 8mhz
+MACHINE_CONFIG_START(terracre_state::ym3526)
+	MCFG_CPU_ADD("maincpu", M68000, XTAL(16'000'000)/2)   // 8mhz
 	MCFG_CPU_PROGRAM_MAP(terracre_map)
 	MCFG_CPU_VBLANK_INT_DRIVER("screen", terracre_state,  irq1_line_hold)
 
-	MCFG_CPU_ADD("audiocpu", Z80, XTAL_16MHz/4)     // 4.0mhz when compared to sound recordings, should be derived from XTAL_22MHz? how?
+	MCFG_CPU_ADD("audiocpu", Z80, XTAL(16'000'000)/4)     // 4.0mhz when compared to sound recordings, should be derived from XTAL(22'000'000)? how?
 	MCFG_CPU_PROGRAM_MAP(sound_map)
 	MCFG_CPU_IO_MAP(sound_3526_io_map)
-	MCFG_CPU_PERIODIC_INT_DRIVER(terracre_state, irq0_line_hold,  XTAL_16MHz/4/512) // ?
+	MCFG_CPU_PERIODIC_INT_DRIVER(terracre_state, irq0_line_hold,  XTAL(16'000'000)/4/512) // ?
 
 	MCFG_BUFFERED_SPRITERAM16_ADD("spriteram")
 
@@ -603,7 +603,7 @@ static MACHINE_CONFIG_START( ym3526 )
 
 	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
 
-	MCFG_SOUND_ADD("ymsnd", YM3526, XTAL_16MHz/4)
+	MCFG_SOUND_ADD("ymsnd", YM3526, XTAL(16'000'000)/4)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 1.0)
 
 	MCFG_SOUND_ADD("dac1", DAC_8BIT_R2R, 0) MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 0.5) // unknown DAC
@@ -613,27 +613,30 @@ static MACHINE_CONFIG_START( ym3526 )
 	MCFG_SOUND_ROUTE_EX(0, "dac2", 1.0, DAC_VREF_POS_INPUT) MCFG_SOUND_ROUTE_EX(0, "dac2", -1.0, DAC_VREF_NEG_INPUT)
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_DERIVED( ym2203, ym3526 )
+MACHINE_CONFIG_START(terracre_state::ym2203)
+	ym3526(config);
 	MCFG_CPU_MODIFY("audiocpu")
 	MCFG_CPU_IO_MAP(sound_2203_io_map)
 
 	MCFG_DEVICE_REMOVE("ymsnd")
 
-	MCFG_SOUND_ADD("ym1", YM2203, XTAL_16MHz/4)
+	MCFG_SOUND_ADD("ym1", YM2203, XTAL(16'000'000)/4)
 	MCFG_SOUND_ROUTE(0, "speaker", 0.2)
 	MCFG_SOUND_ROUTE(1, "speaker", 0.2)
 	MCFG_SOUND_ROUTE(2, "speaker", 0.2)
 	MCFG_SOUND_ROUTE(3, "speaker", 0.4)
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_DERIVED( amazon_base, ym3526 )
+MACHINE_CONFIG_START(terracre_state::amazon_base)
+	ym3526(config);
 	MCFG_CPU_MODIFY("maincpu")
 	MCFG_CPU_PROGRAM_MAP(amazon_base_map)
 
 	MCFG_MACHINE_START_OVERRIDE(terracre_state,amazon)
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_DERIVED( amazon_1412m2, amazon_base )
+MACHINE_CONFIG_START(terracre_state::amazon_1412m2)
+	amazon_base(config);
 	MCFG_CPU_MODIFY("maincpu")
 	MCFG_CPU_PROGRAM_MAP(amazon_1412m2_map)
 

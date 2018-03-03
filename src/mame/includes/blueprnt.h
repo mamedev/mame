@@ -56,4 +56,10 @@ public:
 	DECLARE_PALETTE_INIT(blueprnt);
 	uint32_t screen_update_blueprnt(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	void draw_sprites( bitmap_ind16 &bitmap, const rectangle &cliprect );
+	void blueprnt(machine_config &config);
+	void grasspin(machine_config &config);
+	void blueprnt_map(address_map &map);
+	void grasspin_map(address_map &map);
+	void sound_io(address_map &map);
+	void sound_map(address_map &map);
 };

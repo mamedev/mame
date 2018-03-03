@@ -45,37 +45,52 @@ public:
 		, m_displatch(*this, "displatch%u", 1)
 		, m_rs232(*this, "rs232")
 		, m_cass(*this, "cassette")
+		, m_x(*this, "X%u", 0U)
+		, m_digit(*this, "digit%u", 1U)
 	{ }
+
+	DECLARE_WRITE_LINE_MEMBER(reset_key_w);
+	DECLARE_WRITE_LINE_MEMBER(segment_test_w);
+	void et3400(machine_config &config);
+
+protected:
+	virtual void machine_start() override;
 
 	DECLARE_READ8_MEMBER(keypad_r);
 	DECLARE_WRITE8_MEMBER(display_w);
-	template<int digit> DECLARE_WRITE8_MEMBER(led_w);
+	template <int Digit> DECLARE_WRITE8_MEMBER(led_w);
 	DECLARE_READ8_MEMBER(pia_ar);
 	DECLARE_WRITE8_MEMBER(pia_aw);
 	DECLARE_READ8_MEMBER(pia_br);
 	DECLARE_WRITE8_MEMBER(pia_bw);
-	DECLARE_WRITE_LINE_MEMBER(reset_key_w);
-	DECLARE_WRITE_LINE_MEMBER(segment_test_w);
+
+	void mem_map(address_map &map);
+
 private:
 	required_device<cpu_device> m_maincpu;
 	required_device<pia6821_device> m_pia;
 	required_device_array<ls259_device, 6> m_displatch;
 	required_device<rs232_port_device> m_rs232;
 	required_device<cassette_image_device> m_cass;
+	required_ioport_array<3> m_x;
+	output_finder<6> m_digit;
 };
 
+
+
+void et3400_state::machine_start()
+{
+	m_digit.resolve();
+}
 
 
 READ8_MEMBER(et3400_state::keypad_r)
 {
 	uint8_t data = 0xff;
 
-	if (~offset & 4)
-		data &= ioport("X2")->read();
-	if (~offset & 2)
-		data &= ioport("X1")->read();
-	if (~offset & 1)
-		data &= ioport("X0")->read();
+	if (~offset & 4) data &= m_x[2]->read();
+	if (~offset & 2) data &= m_x[1]->read();
+	if (~offset & 1) data &= m_x[0]->read();
 
 	return data;
 }
@@ -88,12 +103,11 @@ WRITE8_MEMBER(et3400_state::display_w)
 		m_displatch[digit - 1]->write_bit(offset & 7, !BIT(data, 0));
 }
 
-template<int digit>
+template <int Digit>
 WRITE8_MEMBER(et3400_state::led_w)
 {
-/* This computer sets each segment, one at a time. */
-	uint8_t segdata = BITSWAP8(~data, 7, 0, 1, 2, 3, 4, 5, 6);
-	output().set_digit_value(digit, segdata);
+	// This computer sets each segment, one at a time.
+	m_digit[Digit - 1] = bitswap<8>(~data, 7, 0, 1, 2, 3, 4, 5, 6);
 }
 
 // d1,2,3 = Baud rate
@@ -123,7 +137,7 @@ WRITE8_MEMBER(et3400_state::pia_bw)
 }
 
 
-static ADDRESS_MAP_START(mem_map, AS_PROGRAM, 8, et3400_state)
+ADDRESS_MAP_START(et3400_state::mem_map)
 	ADDRESS_MAP_UNMAP_HIGH
 	AM_RANGE( 0x0000, 0x0fff ) AM_RAM
 	AM_RANGE( 0x1000, 0x1003 ) AM_MIRROR(0x03fc) AM_DEVREADWRITE("pia", pia6821_device, read, write)
@@ -152,28 +166,28 @@ WRITE_LINE_MEMBER(et3400_state::segment_test_w)
 /* Input ports */
 static INPUT_PORTS_START( et3400 )
 	PORT_START("X0")
-	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_NAME("D DO") PORT_CODE(KEYCODE_D) PORT_CHAR('D')
-	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_NAME("A AUTO") PORT_CODE(KEYCODE_A) PORT_CHAR('A')
-	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_NAME("7 RTI") PORT_CODE(KEYCODE_7) PORT_CHAR('7')
-	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_NAME("4 INDEX") PORT_CODE(KEYCODE_4) PORT_CHAR('4')
-	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_NAME("1 ACCA") PORT_CODE(KEYCODE_1) PORT_CHAR('1')
-	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_NAME("0") PORT_CODE(KEYCODE_0) PORT_CHAR('0')
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_KEYPAD ) PORT_NAME("D DO")    PORT_CODE(KEYCODE_D) PORT_CHAR('D')
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_KEYPAD ) PORT_NAME("A AUTO")  PORT_CODE(KEYCODE_A) PORT_CHAR('A')
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_KEYPAD ) PORT_NAME("7 RTI")   PORT_CODE(KEYCODE_7) PORT_CHAR('7')
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_KEYPAD ) PORT_NAME("4 INDEX") PORT_CODE(KEYCODE_4) PORT_CHAR('4')
+	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_KEYPAD ) PORT_NAME("1 ACCA")  PORT_CODE(KEYCODE_1) PORT_CHAR('1')
+	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_KEYPAD ) PORT_NAME("0")       PORT_CODE(KEYCODE_0) PORT_CHAR('0')
 	PORT_BIT( 0xc0, 0xc0, IPT_UNUSED )
 
 	PORT_START("X1")
-	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_NAME("E EXAM") PORT_CODE(KEYCODE_E) PORT_CHAR('E')
-	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_NAME("B BACK") PORT_CODE(KEYCODE_B) PORT_CHAR('B')
-	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_NAME("8 SS") PORT_CODE(KEYCODE_8) PORT_CHAR('8')
-	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_NAME("5 CC") PORT_CODE(KEYCODE_5) PORT_CHAR('5')
-	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_NAME("2 ACCB") PORT_CODE(KEYCODE_2) PORT_CHAR('2')
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_KEYPAD ) PORT_NAME("E EXAM")  PORT_CODE(KEYCODE_E) PORT_CHAR('E')
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_KEYPAD ) PORT_NAME("B BACK")  PORT_CODE(KEYCODE_B) PORT_CHAR('B')
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_KEYPAD ) PORT_NAME("8 SS")    PORT_CODE(KEYCODE_8) PORT_CHAR('8')
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_KEYPAD ) PORT_NAME("5 CC")    PORT_CODE(KEYCODE_5) PORT_CHAR('5')
+	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_KEYPAD ) PORT_NAME("2 ACCB")  PORT_CODE(KEYCODE_2) PORT_CHAR('2')
 	PORT_BIT( 0xe0, 0xe0, IPT_UNUSED )
 
 	PORT_START("X2")
-	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_NAME("F FWD") PORT_CODE(KEYCODE_F) PORT_CHAR('F')
-	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_NAME("C CHAN") PORT_CODE(KEYCODE_C) PORT_CHAR('C')
-	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_NAME("9 BR") PORT_CODE(KEYCODE_9) PORT_CHAR('9')
-	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_NAME("6 SP") PORT_CODE(KEYCODE_6) PORT_CHAR('6')
-	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_NAME("3 PC") PORT_CODE(KEYCODE_3) PORT_CHAR('3')
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_KEYPAD ) PORT_NAME("F FWD")   PORT_CODE(KEYCODE_F) PORT_CHAR('F')
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_KEYPAD ) PORT_NAME("C CHAN")  PORT_CODE(KEYCODE_C) PORT_CHAR('C')
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_KEYPAD ) PORT_NAME("9 BR")    PORT_CODE(KEYCODE_9) PORT_CHAR('9')
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_KEYPAD ) PORT_NAME("6 SP")    PORT_CODE(KEYCODE_6) PORT_CHAR('6')
+	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_KEYPAD ) PORT_NAME("3 PC")    PORT_CODE(KEYCODE_3) PORT_CHAR('3')
 	PORT_BIT( 0xe0, 0xe0, IPT_UNUSED )
 
 	PORT_START("BAUD")
@@ -187,7 +201,7 @@ static INPUT_PORTS_START( et3400 )
 	PORT_DIPSETTING(    0x02, "9600" )
 
 	PORT_START("RESET") // RESET is directly next to 0, but electrically separate from key matrix
-	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_NAME("RESET") PORT_CODE(KEYCODE_STOP) PORT_WRITE_LINE_DEVICE_MEMBER(DEVICE_SELF, et3400_state, reset_key_w)
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_KEYPAD ) PORT_NAME("RESET") PORT_CODE(KEYCODE_STOP) PORT_WRITE_LINE_DEVICE_MEMBER(DEVICE_SELF, et3400_state, reset_key_w)
 
 	PORT_START("TEST") // No input mechanism for "Segment Test" defined other than shorting pins together
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_OTHER ) PORT_NAME("Segment Test") PORT_WRITE_LINE_DEVICE_MEMBER(DEVICE_SELF, et3400_state, segment_test_w)
@@ -203,9 +217,9 @@ static DEVICE_INPUT_DEFAULTS_START( terminal )
 	DEVICE_INPUT_DEFAULTS( "RS232_STOPBITS", 0xff, RS232_STOPBITS_2 )
 DEVICE_INPUT_DEFAULTS_END
 
-static MACHINE_CONFIG_START( et3400 )
+MACHINE_CONFIG_START(et3400_state::et3400)
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", M6800, XTAL_4MHz / 4 ) // 1MHz with memory i/o accessory, or 500khz without it
+	MCFG_CPU_ADD("maincpu", M6800, XTAL(4'000'000) / 4 ) // 1MHz with memory i/o accessory, or 500khz without it
 	MCFG_CPU_PROGRAM_MAP(mem_map)
 
 	/* video hardware */

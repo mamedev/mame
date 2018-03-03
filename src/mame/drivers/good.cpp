@@ -67,6 +67,8 @@ public:
 	uint32_t screen_update_good(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	required_device<cpu_device> m_maincpu;
 	required_device<gfxdecode_device> m_gfxdecode;
+	void good(machine_config &config);
+	void good_map(address_map &map);
 };
 
 
@@ -112,7 +114,7 @@ uint32_t good_state::screen_update_good(screen_device &screen, bitmap_ind16 &bit
 	return 0;
 }
 
-static ADDRESS_MAP_START( good_map, AS_PROGRAM, 16, good_state )
+ADDRESS_MAP_START(good_state::good_map)
 	AM_RANGE(0x000000, 0x01ffff) AM_ROM
 
 	//AM_RANGE(0x270000, 0x270007) AM_RAM // scroll?
@@ -122,7 +124,7 @@ static ADDRESS_MAP_START( good_map, AS_PROGRAM, 16, good_state )
 	AM_RANGE(0x280002, 0x280003) AM_READ_PORT("IN1")
 	AM_RANGE(0x280004, 0x280005) AM_READ_PORT("IN2")
 
-	AM_RANGE(0x800000, 0x8007ff) AM_RAM_DEVWRITE("palette", palette_device, write) AM_SHARE("palette")
+	AM_RANGE(0x800000, 0x8007ff) AM_RAM_DEVWRITE("palette", palette_device, write16) AM_SHARE("palette")
 
 	AM_RANGE(0x820000, 0x820fff) AM_RAM_WRITE(fg_tilemapram_w) AM_SHARE("fg_tilemapram")
 	AM_RANGE(0x822000, 0x822fff) AM_RAM_WRITE(bg_tilemapram_w) AM_SHARE("bg_tilemapram")
@@ -284,7 +286,7 @@ static GFXDECODE_START( good )
 GFXDECODE_END
 
 
-static MACHINE_CONFIG_START( good )
+MACHINE_CONFIG_START(good_state::good)
 
 	MCFG_CPU_ADD("maincpu", M68000, 16000000 /2)
 	MCFG_CPU_PROGRAM_MAP(good_map)

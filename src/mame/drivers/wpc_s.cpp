@@ -55,6 +55,8 @@ public:
 	DECLARE_WRITE_LINE_MEMBER(scanline_irq);
 	TIMER_DEVICE_CALLBACK_MEMBER(zc_timer);
 
+	void wpc_s(machine_config &config);
+	void wpc_s_map(address_map &map);
 protected:
 	// devices
 	required_device<cpu_device> maincpu;
@@ -98,7 +100,7 @@ private:
 	uint16_t rtc_base_day;
 };
 
-static ADDRESS_MAP_START( wpc_s_map, AS_PROGRAM, 8, wpc_s_state )
+ADDRESS_MAP_START(wpc_s_state::wpc_s_map)
 	AM_RANGE(0x0000, 0x1fff) AM_RAM AM_SHARE("mainram")
 	AM_RANGE(0x3000, 0x31ff) AM_RAMBANK("dmd0")
 	AM_RANGE(0x3200, 0x33ff) AM_RAMBANK("dmd2")
@@ -1967,11 +1969,11 @@ static INPUT_PORTS_START( tfs )
 	PORT_BIT(0x80, IP_ACTIVE_LOW, IPT_OTHER) PORT_NAME("UL Flipper Button")
 INPUT_PORTS_END
 
-static MACHINE_CONFIG_START( wpc_s )
+MACHINE_CONFIG_START(wpc_s_state::wpc_s)
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", M6809, XTAL_8MHz/4)
+	MCFG_CPU_ADD("maincpu", MC6809E, XTAL(8'000'000)/4)
 	MCFG_CPU_PROGRAM_MAP(wpc_s_map)
-	MCFG_CPU_PERIODIC_INT_DRIVER(wpc_s_state, irq0_line_assert, XTAL_8MHz/8192.0)
+	MCFG_CPU_PERIODIC_INT_DRIVER(wpc_s_state, irq0_line_assert, XTAL(8'000'000)/8192.0)
 	MCFG_TIMER_DRIVER_ADD_PERIODIC("zero_crossing", wpc_s_state, zc_timer, attotime::from_hz(120)) // Mains power zero crossing
 
 	MCFG_WPC_SHIFT_ADD("shift")

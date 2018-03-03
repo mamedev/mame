@@ -166,7 +166,7 @@
 #include "speaker.h"
 
 
-#define MASTER_CLOCK        XTAL_10MHz
+#define MASTER_CLOCK        XTAL(10'000'000)
 
 
 
@@ -251,7 +251,7 @@ WRITE8_MEMBER(kangaroo_state::kangaroo_coin_counter_w)
  *
  *************************************/
 
-static ADDRESS_MAP_START( main_map, AS_PROGRAM, 8, kangaroo_state )
+ADDRESS_MAP_START(kangaroo_state::main_map)
 	AM_RANGE(0x0000, 0x5fff) AM_ROM
 	AM_RANGE(0x8000, 0xbfff) AM_WRITE(kangaroo_videoram_w)
 	AM_RANGE(0xc000, 0xdfff) AM_ROMBANK("bank1")
@@ -271,7 +271,7 @@ ADDRESS_MAP_END
  *
  *************************************/
 
-static ADDRESS_MAP_START( sound_map, AS_PROGRAM, 8, kangaroo_state )
+ADDRESS_MAP_START(kangaroo_state::sound_map)
 	AM_RANGE(0x0000, 0x0fff) AM_ROM
 	AM_RANGE(0x4000, 0x43ff) AM_MIRROR(0x0c00) AM_RAM
 	AM_RANGE(0x6000, 0x6000) AM_MIRROR(0x0fff) AM_DEVREAD("soundlatch", generic_latch_8_device, read)
@@ -281,7 +281,7 @@ ADDRESS_MAP_END
 
 
 /* yes, this is identical */
-static ADDRESS_MAP_START( sound_portmap, AS_IO, 8, kangaroo_state )
+ADDRESS_MAP_START(kangaroo_state::sound_portmap)
 	AM_RANGE(0x0000, 0x0fff) AM_ROM
 	AM_RANGE(0x4000, 0x43ff) AM_MIRROR(0x0c00) AM_RAM
 	AM_RANGE(0x6000, 0x6000) AM_MIRROR(0x0fff) AM_DEVREAD("soundlatch", generic_latch_8_device, read)
@@ -426,7 +426,7 @@ INPUT_PORTS_END
  *
  *************************************/
 
-static MACHINE_CONFIG_START( nomcu )
+MACHINE_CONFIG_START(kangaroo_state::nomcu)
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", Z80, MASTER_CLOCK/4)
@@ -457,7 +457,8 @@ static MACHINE_CONFIG_START( nomcu )
 MACHINE_CONFIG_END
 
 
-static MACHINE_CONFIG_DERIVED( mcu, nomcu )
+MACHINE_CONFIG_START(kangaroo_state::mcu)
+	nomcu(config);
 
 	MCFG_MACHINE_START_OVERRIDE(kangaroo_state,kangaroo_mcu)
 

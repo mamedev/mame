@@ -206,7 +206,7 @@ WRITE32_MEMBER(fuuki32_state::vregs_w)
 	}
 }
 
-static ADDRESS_MAP_START( fuuki32_map, AS_PROGRAM, 32, fuuki32_state )
+ADDRESS_MAP_START(fuuki32_state::fuuki32_map)
 	AM_RANGE(0x000000, 0x1fffff) AM_ROM                                                                     // ROM
 	AM_RANGE(0x400000, 0x40ffff) AM_RAM                                                                     // Work RAM
 	AM_RANGE(0x410000, 0x41ffff) AM_RAM                                                                     // Work RAM (used by asurabus)
@@ -217,7 +217,7 @@ static ADDRESS_MAP_START( fuuki32_map, AS_PROGRAM, 32, fuuki32_state )
 	AM_RANGE(0x506000, 0x507fff) AM_RAM_WRITE(vram_3_w) AM_SHARE("vram.3")  // Tilemap bg2
 	AM_RANGE(0x508000, 0x517fff) AM_RAM                                                                     // More tilemap, or linescroll? Seems to be empty all of the time
 	AM_RANGE(0x600000, 0x601fff) AM_RAM AM_DEVREADWRITE16("fuukivid", fuukivid_device, fuuki_sprram_r, fuuki_sprram_w, 0xffffffff) // Sprites
-	AM_RANGE(0x700000, 0x703fff) AM_RAM_DEVWRITE("palette",  palette_device, write) AM_SHARE("palette") // Palette
+	AM_RANGE(0x700000, 0x703fff) AM_RAM_DEVWRITE("palette",  palette_device, write32) AM_SHARE("palette") // Palette
 
 	AM_RANGE(0x800000, 0x800003) AM_READ_PORT("800000") AM_WRITENOP                                         // Coin
 	AM_RANGE(0x810000, 0x810003) AM_READ_PORT("810000") AM_WRITENOP                                         // Player Inputs
@@ -259,14 +259,14 @@ WRITE8_MEMBER(fuuki32_state::snd_ymf278b_w)
 	machine().device<ymf278b_device>("ymf1")->write(space, offset, data);
 }
 
-static ADDRESS_MAP_START( fuuki32_sound_map, AS_PROGRAM, 8, fuuki32_state )
+ADDRESS_MAP_START(fuuki32_state::fuuki32_sound_map)
 	AM_RANGE(0x0000, 0x5fff) AM_ROM                             // ROM
 	AM_RANGE(0x6000, 0x6fff) AM_RAM                             // RAM
 	AM_RANGE(0x7ff0, 0x7fff) AM_READWRITE(snd_z80_r, snd_z80_w)
 	AM_RANGE(0x8000, 0xffff) AM_ROMBANK("bank1")                // ROM
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( fuuki32_sound_io_map, AS_IO, 8, fuuki32_state )
+ADDRESS_MAP_START(fuuki32_state::fuuki32_sound_io_map)
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	AM_RANGE(0x00, 0x00) AM_WRITE(sound_bw_w)
 	AM_RANGE(0x30, 0x30) AM_WRITENOP // leftover/unused nmi handler related
@@ -546,7 +546,7 @@ void fuuki32_state::machine_reset()
 }
 
 
-static MACHINE_CONFIG_START(fuuki32)
+MACHINE_CONFIG_START(fuuki32_state::fuuki32)
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", M68EC020, CPU_CLOCK) /* 20MHz verified */

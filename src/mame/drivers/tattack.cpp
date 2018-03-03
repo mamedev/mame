@@ -77,6 +77,8 @@ public:
 	DECLARE_PALETTE_INIT(tattack);
 
 	uint32_t screen_update_tattack(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	void tattack(machine_config &config);
+	void tattack_map(address_map &map);
 protected:
 	virtual void video_start() override;
 private:
@@ -262,7 +264,7 @@ WRITE8_MEMBER(tattack_state::sound_w)
 	}
 }
 
-static ADDRESS_MAP_START( tattack_map, AS_PROGRAM, 8, tattack_state )
+ADDRESS_MAP_START(tattack_state::tattack_map)
 	AM_RANGE(0x0000, 0x0fff) AM_ROM
 	AM_RANGE(0x4000, 0x4000) AM_READ_PORT("AN_PADDLE") // $315, checks again with same memory, loops if different (?)
 	AM_RANGE(0x5000, 0x53ff) AM_RAM AM_SHARE("videoram")
@@ -397,7 +399,7 @@ static const char *const tattack_sample_names[] =
 	nullptr
 };
 
-static MACHINE_CONFIG_START( tattack )
+MACHINE_CONFIG_START(tattack_state::tattack)
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", Z80, 8000000 / 2)   /* 4 MHz ? */

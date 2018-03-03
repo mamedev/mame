@@ -29,7 +29,7 @@ std::string mn10200_disassembler::i16str(int16_t v)
 }
 
 std::string mn10200_disassembler::i24str(u32 v)
-{	
+{
 	if(!(v & 0x800000))
 		return util::string_format("$%x", v & 0xffffff);
 	else

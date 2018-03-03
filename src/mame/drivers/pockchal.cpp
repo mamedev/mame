@@ -48,6 +48,8 @@ public:
 	required_device<generic_slot_device> m_cart;
 	uint32_t  m_rom_size;
 	DECLARE_DEVICE_IMAGE_LOAD_MEMBER(pockchalv1_cart);
+	void pockchalv1(machine_config &config);
+	void pockchalv1_map(address_map &map);
 };
 
 
@@ -69,7 +71,7 @@ uint32_t pockchalv1_state::screen_update_pockchalv1(screen_device &screen, bitma
 }
 
 
-static ADDRESS_MAP_START( pockchalv1_map, AS_PROGRAM, 8, pockchalv1_state )
+ADDRESS_MAP_START(pockchalv1_state::pockchalv1_map)
 	AM_RANGE(0xc000, 0xffff) AM_RAM
 ADDRESS_MAP_END
 
@@ -91,7 +93,7 @@ void pockchalv1_state::machine_reset()
 }
 
 
-static MACHINE_CONFIG_START( pockchalv1 )
+MACHINE_CONFIG_START(pockchalv1_state::pockchalv1)
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", TMP90845,8000000)         /* ? MHz */

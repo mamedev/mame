@@ -267,6 +267,17 @@ public:
 
 	TIMER_DEVICE_CALLBACK_MEMBER(sun3_timer);
 
+	void sun3(machine_config &config);
+	void sun3e(machine_config &config);
+	void sun3_60(machine_config &config);
+	void sun3200(machine_config &config);
+	void sun3_50(machine_config &config);
+	void sun3_mem(address_map &map);
+	void vmetype0space_map(address_map &map);
+	void vmetype0space_novram_map(address_map &map);
+	void vmetype1space_map(address_map &map);
+	void vmetype2space_map(address_map &map);
+	void vmetype3space_map(address_map &map);
 private:
 	uint32_t *m_rom_ptr, *m_ram_ptr;
 	uint8_t *m_idprom_ptr;
@@ -308,7 +319,7 @@ READ32_MEMBER( sun3_state::ram_r )
 
 	if (!m_bInBusErr)
 	{
-		//printf("ram_r: bus error on timeout, access to invalid addr %08x, PC=%x\n", offset<<2, m_maincpu->pc);
+		//printf("ram_r: bus error on timeout, access to invalid addr %08x, PC=%x\n", offset<<2, m_maincpu->pc());
 		//fflush(stdout);
 		m_buserr = BE_TIMEOUT;
 		m_maincpu->set_input_line(M68K_LINE_BUSERROR, ASSERT_LINE);
@@ -381,7 +392,7 @@ WRITE32_MEMBER( sun3_state::ram_w )
 
 	if (!m_bInBusErr)
 	{
-		//printf("ram_w: bus error on timeout, access to invalid addr %08x, PC=%x\n", offset<<2, m_maincpu->pc);
+		//printf("ram_w: bus error on timeout, access to invalid addr %08x, PC=%x\n", offset<<2, m_maincpu->pc());
 		fflush(stdout);
 		m_buserr = BE_TIMEOUT;
 		m_maincpu->set_input_line(M68K_LINE_BUSERROR, ASSERT_LINE);
@@ -393,7 +404,7 @@ READ32_MEMBER( sun3_state::tl_mmu_r )
 {
 	uint8_t fc = m_maincpu->get_fc();
 
-	if ((fc == 3) && !machine().side_effect_disabled())
+	if ((fc == 3) && !machine().side_effects_disabled())
 	{
 		int page;
 
@@ -432,22 +443,22 @@ READ32_MEMBER( sun3_state::tl_mmu_r )
 				return 0;
 
 			case 8: // cache tags
-				//printf("sun3: read cache tags @ %x, PC = %x\n", offset, m_maincpu->pc);
+				//printf("sun3: read cache tags @ %x, PC = %x\n", offset, m_maincpu->pc());
 				return m_cache_tags[(offset & 0x3fff) >> 2];
 
 			case 9: // cache data
-				//printf("sun3: read cache data @ %x, PC = %x\n", offset, m_maincpu->pc);
+				//printf("sun3: read cache data @ %x, PC = %x\n", offset, m_maincpu->pc());
 				return m_cache_data[(offset & 0x3fff)];
 
 			case 10: // flush cache
 				return 0xffffffff;
 
 			case 11: // block copy
-				printf("sun3: read block copy @ %x, PC = %x\n", offset, m_maincpu->pc);
+				printf("sun3: read block copy @ %x, PC = %x\n", offset, m_maincpu->pc());
 				return 0xffffffff;
 
 			case 15: // UART bypass
-				//printf("sun3: read UART bypass @ %x, PC = %x, mask = %08x\n", offset, m_maincpu->pc, mem_mask);
+				//printf("sun3: read UART bypass @ %x, PC = %x, mask = %08x\n", offset, m_maincpu->pc(), mem_mask);
 				return 0xffffffff;
 		}
 	}
@@ -459,7 +470,7 @@ READ32_MEMBER( sun3_state::tl_mmu_r )
 	}
 
 	// debugger hack
-	if (machine().side_effect_disabled() && (offset >= (0xfef0000>>2)) && (offset <= (0xfefffff>>2)))
+	if (machine().side_effects_disabled() && (offset >= (0xfef0000>>2)) && (offset <= (0xfefffff>>2)))
 	{
 		return m_rom_ptr[offset & 0x3fff];
 	}
@@ -488,7 +499,7 @@ READ32_MEMBER( sun3_state::tl_mmu_r )
 
 		//printf("pmeg %d, entry %d = %08x, virt %08x => tmp %08x\n", pmeg, entry, m_pagemap[entry], offset << 2, tmp);
 
-	//  if (!machine().side_effect_disabled())
+	//  if (!machine().side_effects_disabled())
 		//printf("sun3: Translated addr: %08x, type %d (page %d page entry %08x, orig virt %08x, FC %d)\n", tmp << 2, (m_pagemap[entry] >> 26) & 3, entry, m_pagemap[entry], offset<<2, fc);
 
 		switch ((m_pagemap[entry] >> 26) & 3)
@@ -513,7 +524,7 @@ READ32_MEMBER( sun3_state::tl_mmu_r )
 	}
 	else
 	{
-//      if (!machine().side_effect_disabled()) printf("sun3: pagemap entry not valid! (PC=%x)\n", m_maincpu->pc);
+//      if (!machine().side_effects_disabled()) printf("sun3: pagemap entry not valid! (PC=%x)\n", m_maincpu->pc());
 		m_maincpu->set_input_line(M68K_LINE_BUSERROR, ASSERT_LINE);
 		m_maincpu->set_input_line(M68K_LINE_BUSERROR, CLEAR_LINE);
 		m_buserr = BE_INVALID;
@@ -521,7 +532,7 @@ READ32_MEMBER( sun3_state::tl_mmu_r )
 		return 0xffffffff;
 	}
 
-	if (!machine().side_effect_disabled()) logerror("sun3: Unmapped read @ %08x (FC %d, mask %08x, PC=%x, seg %x)\n", offset<<2, fc, mem_mask, m_maincpu->pc, offset>>15);
+	if (!machine().side_effects_disabled()) logerror("sun3: Unmapped read @ %08x (FC %d, mask %08x, PC=%x, seg %x)\n", offset<<2, fc, mem_mask, m_maincpu->pc(), offset>>15);
 
 	return 0xffffffff;
 }
@@ -530,7 +541,7 @@ WRITE32_MEMBER( sun3_state::tl_mmu_w )
 {
 	uint8_t fc = m_maincpu->get_fc();
 
-	//printf("sun3: Write %08x (FC %d, mask %08x, PC=%x) to %08x\n", data, fc, mem_mask, m_maincpu->pc, offset<<1);
+	//printf("sun3: Write %08x (FC %d, mask %08x, PC=%x) to %08x\n", data, fc, mem_mask, m_maincpu->pc(), offset<<1);
 
 	if (fc == 3)    // control space
 	{
@@ -549,11 +560,11 @@ WRITE32_MEMBER( sun3_state::tl_mmu_w )
 				//printf("sun3: Write %04x to page map at %x (entry %d), ", data, offset<<2, page);
 				COMBINE_DATA(&m_pagemap[page]);
 
-				//printf("entry now %08x (adr %08x  PC=%x mask %x)\n", m_pagemap[page], (m_pagemap[page] & 0xfffff) << 13, m_maincpu->pc, mem_mask);
+				//printf("entry now %08x (adr %08x  PC=%x mask %x)\n", m_pagemap[page], (m_pagemap[page] & 0xfffff) << 13, m_maincpu->pc(), mem_mask);
 				return;
 
 			case 2: // segment map
-				//printf("sun3: Write %02x to segment map at %x (entry %d, user ctx %d PC=%x mask %x)\n", (data>>24) & 0xff, offset<<2, (offset & ~0x3c000000)>>15, m_context & 7, m_maincpu->pc, mem_mask);
+				//printf("sun3: Write %02x to segment map at %x (entry %d, user ctx %d PC=%x mask %x)\n", (data>>24) & 0xff, offset<<2, (offset & ~0x3c000000)>>15, m_context & 7, m_maincpu->pc(), mem_mask);
 				m_segmap[m_context & 7][(offset >> 15) & 0x7ff] = (data>>24) & 0xff;
 				//printf("segment map[%d][%d] now %x\n", m_context & 7, (offset & ~0x3c000000) >> 15, m_segmap[m_context & 7][(offset & ~0x3c000000) >> 15] = (data>>24) & 0xff);
 				return;
@@ -564,7 +575,7 @@ WRITE32_MEMBER( sun3_state::tl_mmu_w )
 				return;
 
 			case 4: // enable reg
-				//printf("sun3: Write %x to enable, PC=%x\n", data, m_maincpu->pc);
+				//printf("sun3: Write %x to enable, PC=%x\n", data, m_maincpu->pc());
 				COMBINE_DATA(&m_enable);
 				return;
 
@@ -578,7 +589,7 @@ WRITE32_MEMBER( sun3_state::tl_mmu_w )
 			case 7: // diagnostic reg
 				m_diag = data >> 24;
 				#if 0
-				printf("sun3: CPU LEDs to %02x (PC=%x) => ", ((data>>24) & 0xff) ^ 0xff, m_maincpu->pc);
+				printf("sun3: CPU LEDs to %02x (PC=%x) => ", ((data>>24) & 0xff) ^ 0xff, m_maincpu->pc());
 				for (int i = 0; i < 8; i++)
 				{
 					if (m_diag & (1<<i))
@@ -595,12 +606,12 @@ WRITE32_MEMBER( sun3_state::tl_mmu_w )
 				return;
 
 			case 8: // cache tags
-				//printf("sun3: %08x to cache tags @ %x, PC = %x, mask = %08x\n", data, offset, m_maincpu->pc, mem_mask);
+				//printf("sun3: %08x to cache tags @ %x, PC = %x, mask = %08x\n", data, offset, m_maincpu->pc(), mem_mask);
 				m_cache_tags[(offset & 0x3fff) >> 2] = data;
 				return;
 
 			case 9: // cache data
-				//printf("sun3: %08x to cache data @ %x, PC = %x, mask = %08x\n", data, offset, m_maincpu->pc, mem_mask);
+				//printf("sun3: %08x to cache data @ %x, PC = %x, mask = %08x\n", data, offset, m_maincpu->pc(), mem_mask);
 				m_cache_data[(offset & 0x3fff)] = data;
 				return;
 
@@ -608,11 +619,11 @@ WRITE32_MEMBER( sun3_state::tl_mmu_w )
 				return;
 
 			case 11: // block copy
-				printf("sun3: %08x to block copy @ %x, PC = %x\n", data, offset, m_maincpu->pc);
+				printf("sun3: %08x to block copy @ %x, PC = %x\n", data, offset, m_maincpu->pc());
 				return;
 
 			case 15: // UART bypass
-				//printf("sun3: %08x to UART bypass @ %x, PC = %x\n", data, offset, m_maincpu->pc);
+				//printf("sun3: %08x to UART bypass @ %x, PC = %x\n", data, offset, m_maincpu->pc());
 				return;
 			}
 	}
@@ -626,7 +637,7 @@ WRITE32_MEMBER( sun3_state::tl_mmu_w )
 		if ((!(m_pagemap[entry] & PM_WRITEMASK)) ||
 			((m_pagemap[entry] & PM_SYSMASK) && (fc < M68K_FC_SUPERVISOR_DATA)))
 		{
-			//printf("sun3: write protect MMU error (PC=%x)\n", m_maincpu->pc);
+			//printf("sun3: write protect MMU error (PC=%x)\n", m_maincpu->pc());
 			m_buserr = BE_PROTERR;
 			m_maincpu->set_input_line(M68K_LINE_BUSERROR, ASSERT_LINE);
 			m_maincpu->set_input_line(M68K_LINE_BUSERROR, CLEAR_LINE);
@@ -639,7 +650,7 @@ WRITE32_MEMBER( sun3_state::tl_mmu_w )
 		uint32_t tmp = (m_pagemap[entry] & 0x7ffff) << 11;
 		tmp |= (offset & 0x7ff);
 
-		//if (!machine().side_effect_disabled()) printf("sun3: Translated addr: %08x, type %d (page entry %08x, orig virt %08x)\n", tmp << 2, (m_pagemap[entry] >> 26) & 3, m_pagemap[entry], offset<<2);
+		//if (!machine().side_effects_disabled()) printf("sun3: Translated addr: %08x, type %d (page entry %08x, orig virt %08x)\n", tmp << 2, (m_pagemap[entry] >> 26) & 3, m_pagemap[entry], offset<<2);
 
 		switch ((m_pagemap[entry] >> 26) & 3)
 		{
@@ -663,7 +674,7 @@ WRITE32_MEMBER( sun3_state::tl_mmu_w )
 	}
 	else
 	{
-		//if (!machine().side_effect_disabled()) printf("sun3: pagemap entry not valid!\n");
+		//if (!machine().side_effects_disabled()) printf("sun3: pagemap entry not valid!\n");
 		m_buserr = BE_INVALID;
 		m_maincpu->set_input_line(M68K_LINE_BUSERROR, ASSERT_LINE);
 		m_maincpu->set_input_line(M68K_LINE_BUSERROR, CLEAR_LINE);
@@ -671,7 +682,7 @@ WRITE32_MEMBER( sun3_state::tl_mmu_w )
 		return;
 	}
 
-	logerror("sun3: Unmapped write %04x (FC %d, mask %04x, PC=%x) to %08x\n", data, fc, mem_mask, m_maincpu->pc, offset<<2);
+	logerror("sun3: Unmapped write %04x (FC %d, mask %04x, PC=%x) to %08x\n", data, fc, mem_mask, m_maincpu->pc(), offset<<2);
 }
 
 READ32_MEMBER(sun3_state::parity_r)
@@ -708,24 +719,24 @@ WRITE32_MEMBER(sun3_state::parity_w)
 	}
 }
 
-static ADDRESS_MAP_START(sun3_mem, AS_PROGRAM, 32, sun3_state)
+ADDRESS_MAP_START(sun3_state::sun3_mem)
 	AM_RANGE(0x00000000, 0xffffffff) AM_READWRITE( tl_mmu_r, tl_mmu_w )
 ADDRESS_MAP_END
 
 // type 0 device space
-static ADDRESS_MAP_START(vmetype0space_map, AS_PROGRAM, 32, sun3_state)
+ADDRESS_MAP_START(sun3_state::vmetype0space_map)
 	AM_RANGE(0x00000000, 0x08ffffff) AM_READWRITE(ram_r, ram_w)
 	AM_RANGE(0xfe400000, 0xfe41ffff) AM_RAM // not sure what's going on here (3/110)
 	AM_RANGE(0xff000000, 0xff03ffff) AM_RAM AM_SHARE("bw2_vram")
 ADDRESS_MAP_END
 
 // type 0 without VRAM (3/50)
-static ADDRESS_MAP_START(vmetype0space_novram_map, AS_PROGRAM, 32, sun3_state)
+ADDRESS_MAP_START(sun3_state::vmetype0space_novram_map)
 	AM_RANGE(0x00000000, 0x08ffffff) AM_READWRITE(ram_r, ram_w)
 ADDRESS_MAP_END
 
 // type 1 device space
-static ADDRESS_MAP_START(vmetype1space_map, AS_PROGRAM, 32, sun3_state)
+ADDRESS_MAP_START(sun3_state::vmetype1space_map)
 	AM_RANGE(0x00000000, 0x0000000f) AM_DEVREADWRITE8(SCC1_TAG, z80scc_device, ba_cd_inv_r, ba_cd_inv_w, 0xff00ff00)
 	AM_RANGE(0x00020000, 0x0002000f) AM_DEVREADWRITE8(SCC2_TAG, z80scc_device, ba_cd_inv_r, ba_cd_inv_w, 0xff00ff00)
 	AM_RANGE(0x00040000, 0x000407ff) AM_RAM AM_SHARE("nvram")   // type 2816 parallel EEPROM
@@ -737,11 +748,11 @@ static ADDRESS_MAP_START(vmetype1space_map, AS_PROGRAM, 32, sun3_state)
 ADDRESS_MAP_END
 
 // type 2 device space
-static ADDRESS_MAP_START(vmetype2space_map, AS_PROGRAM, 32, sun3_state)
+ADDRESS_MAP_START(sun3_state::vmetype2space_map)
 ADDRESS_MAP_END
 
 // type 3 device space
-static ADDRESS_MAP_START(vmetype3space_map, AS_PROGRAM, 32, sun3_state)
+ADDRESS_MAP_START(sun3_state::vmetype3space_map)
 ADDRESS_MAP_END
 
 READ32_MEMBER(sun3_state::irqctrl_r)
@@ -783,7 +794,7 @@ WRITE32_MEMBER(sun3_state::irqctrl_w)
 
 READ8_MEMBER(sun3_state::rtc7170_r)
 {
-	//printf("read 7170 @ %x, PC=%x\n", offset, m_maincpu->pc);
+	//printf("read 7170 @ %x, PC=%x\n", offset, m_maincpu->pc());
 
 	return 0xff;
 }
@@ -803,7 +814,7 @@ WRITE8_MEMBER(sun3_state::rtc7170_w)
 
 READ32_MEMBER(sun3_state::ecc_r)
 {
-	//printf("read ECC @ %x, PC=%x\n", offset, m_maincpu->pc);
+	//printf("read ECC @ %x, PC=%x\n", offset, m_maincpu->pc());
 	// fefc34a
 	int mbram = (m_ram_size / (1024*1024));
 	int beoff = (mbram / 32) * 0x10;
@@ -951,7 +962,7 @@ void sun3_state::machine_reset()
 }
 
 // The base Sun 3004 CPU board
-static MACHINE_CONFIG_START( sun3 )
+MACHINE_CONFIG_START(sun3_state::sun3)
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", M68020, 16670000)
 	MCFG_CPU_PROGRAM_MAP(sun3_mem)
@@ -999,13 +1010,13 @@ static MACHINE_CONFIG_START( sun3 )
 
 	MCFG_TIMER_DRIVER_ADD_PERIODIC("timer", sun3_state, sun3_timer, attotime::from_hz(100))
 
-	MCFG_SCC8530_ADD(SCC1_TAG, XTAL_4_9152MHz, 0, 0, 0, 0)
+	MCFG_SCC8530_ADD(SCC1_TAG, XTAL(4'915'200), 0, 0, 0, 0)
 	MCFG_Z80SCC_OUT_TXDA_CB(DEVWRITELINE(KEYBOARD_TAG, sun_keyboard_port_device, write_txd))
 
 	MCFG_SUNKBD_PORT_ADD(KEYBOARD_TAG, default_sun_keyboard_devices, "type3hle")
 	MCFG_SUNKBD_RXD_HANDLER(DEVWRITELINE(SCC1_TAG, z80scc_device, rxa_w))
 
-	MCFG_SCC8530_ADD(SCC2_TAG, XTAL_4_9152MHz, 0, 0, 0, 0)
+	MCFG_SCC8530_ADD(SCC2_TAG, XTAL(4'915'200), 0, 0, 0, 0)
 	MCFG_Z80SCC_OUT_TXDA_CB(DEVWRITELINE(RS232A_TAG, rs232_port_device, write_txd))
 	MCFG_Z80SCC_OUT_TXDB_CB(DEVWRITELINE(RS232B_TAG, rs232_port_device, write_txd))
 
@@ -1021,7 +1032,8 @@ static MACHINE_CONFIG_START( sun3 )
 MACHINE_CONFIG_END
 
 // Sun 3/60
-static MACHINE_CONFIG_DERIVED( sun3_60, sun3 )
+MACHINE_CONFIG_START(sun3_state::sun3_60)
+	sun3(config);
 	MCFG_CPU_REPLACE("maincpu", M68020, 20000000)
 	MCFG_CPU_PROGRAM_MAP(sun3_mem)
 
@@ -1033,13 +1045,15 @@ static MACHINE_CONFIG_DERIVED( sun3_60, sun3 )
 MACHINE_CONFIG_END
 
 // Sun 3/E
-static MACHINE_CONFIG_DERIVED( sun3e, sun3 )
+MACHINE_CONFIG_START(sun3_state::sun3e)
+	sun3(config);
 	MCFG_CPU_REPLACE("maincpu", M68020, 20000000)
 	MCFG_CPU_PROGRAM_MAP(sun3_mem)
 MACHINE_CONFIG_END
 
 // 3/260 and 3/280 (the Sun 3200 board)
-static MACHINE_CONFIG_DERIVED( sun3200, sun3 )
+MACHINE_CONFIG_START(sun3_state::sun3200)
+	sun3(config);
 	MCFG_CPU_REPLACE("maincpu", M68020, 25000000)
 	MCFG_CPU_PROGRAM_MAP(sun3_mem)
 
@@ -1054,7 +1068,7 @@ static MACHINE_CONFIG_DERIVED( sun3200, sun3 )
 	MCFG_RAM_EXTRA_OPTIONS("64M,96M,128M")
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_START( sun3_50 )
+MACHINE_CONFIG_START(sun3_state::sun3_50)
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", M68020, 15700000)
 	MCFG_CPU_PROGRAM_MAP(sun3_mem)
@@ -1101,13 +1115,13 @@ static MACHINE_CONFIG_START( sun3_50 )
 	MCFG_ADDRESS_MAP_BANK_DATA_WIDTH(32)
 	MCFG_ADDRESS_MAP_BANK_STRIDE(0x80000000)
 
-	MCFG_SCC8530_ADD(SCC1_TAG, XTAL_4_9152MHz, 0, 0, 0, 0)
+	MCFG_SCC8530_ADD(SCC1_TAG, XTAL(4'915'200), 0, 0, 0, 0)
 	MCFG_Z80SCC_OUT_TXDA_CB(DEVWRITELINE(KEYBOARD_TAG, sun_keyboard_port_device, write_txd))
 
 	MCFG_SUNKBD_PORT_ADD(KEYBOARD_TAG, default_sun_keyboard_devices, "type3hle")
 	MCFG_SUNKBD_RXD_HANDLER(DEVWRITELINE(SCC1_TAG, z80scc_device, rxa_w))
 
-	MCFG_SCC8530_ADD(SCC2_TAG, XTAL_4_9152MHz, 0, 0, 0, 0)
+	MCFG_SCC8530_ADD(SCC2_TAG, XTAL(4'915'200), 0, 0, 0, 0)
 	MCFG_Z80SCC_OUT_TXDA_CB(DEVWRITELINE(RS232A_TAG, rs232_port_device, write_txd))
 	MCFG_Z80SCC_OUT_TXDB_CB(DEVWRITELINE(RS232B_TAG, rs232_port_device, write_txd))
 

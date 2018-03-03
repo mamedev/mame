@@ -93,4 +93,10 @@ public:
 	DECLARE_MACHINE_RESET(common);
 	uint32_t screen_update_bking(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	DECLARE_WRITE_LINE_MEMBER(screen_vblank_bking);
+	void bking(machine_config &config);
+	void bking3(machine_config &config);
+	void bking3_io_map(address_map &map);
+	void bking_audio_map(address_map &map);
+	void bking_io_map(address_map &map);
+	void bking_map(address_map &map);
 };

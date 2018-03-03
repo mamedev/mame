@@ -148,7 +148,7 @@ MCU simulation TODO:
 			return 0x45;
 
 		default:
-			logerror("CPU#0 read from MCU pc=%4x, mcu_val=%2x\n", space.device().safe_pc(), m_mcu_val);
+			logerror("CPU#0 read from MCU pc=%4x, mcu_val=%2x\n", m_maincpu->pc(), m_mcu_val);
 			return m_mcu_val;
 	}
 #endif
@@ -169,15 +169,15 @@ WRITE8_MEMBER(msisaac_state::msisaac_mcu_w)
 	m_bmcu->buggychl_mcu_w(offset,data);
 #else
 	//if(data != 0x0a && data != 0x42 && data != 0x02)
-	//  popmessage("PC = %04x %02x", space.device().safe_pc(), data);
+	//  popmessage("PC = %04x %02x", m_maincpu->pc(), data);
 	m_mcu_val = data;
 #endif
 }
 
-static ADDRESS_MAP_START( msisaac_map, AS_PROGRAM, 8, msisaac_state )
+ADDRESS_MAP_START(msisaac_state::msisaac_map)
 	AM_RANGE(0x0000, 0xdfff) AM_ROM
 	AM_RANGE(0xe000, 0xe7ff) AM_RAM
-	AM_RANGE(0xe800, 0xefff) AM_RAM_DEVWRITE("palette", palette_device, write) AM_SHARE("palette")
+	AM_RANGE(0xe800, 0xefff) AM_RAM_DEVWRITE("palette", palette_device, write8) AM_SHARE("palette")
 	AM_RANGE(0xf000, 0xf000) AM_WRITE(msisaac_bg2_textbank_w)
 	AM_RANGE(0xf001, 0xf001) AM_WRITENOP                    //???
 	AM_RANGE(0xf002, 0xf002) AM_WRITENOP                    //???
@@ -240,7 +240,7 @@ WRITE8_MEMBER(msisaac_state::sound_control_1_w)
 	//popmessage("SND1 0=%2x 1=%2x", m_snd_ctrl0, m_snd_ctrl1);
 }
 
-static ADDRESS_MAP_START( msisaac_sound_map, AS_PROGRAM, 8, msisaac_state )
+ADDRESS_MAP_START(msisaac_state::msisaac_sound_map)
 	AM_RANGE(0x0000, 0x3fff) AM_ROM
 	AM_RANGE(0x4000, 0x47ff) AM_RAM
 	AM_RANGE(0x8000, 0x8001) AM_DEVWRITE("ay1", ay8910_device, address_data_w)
@@ -444,7 +444,7 @@ void msisaac_state::machine_reset()
 #endif
 }
 
-static MACHINE_CONFIG_START( msisaac )
+MACHINE_CONFIG_START(msisaac_state::msisaac)
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", Z80, 4000000)

@@ -58,7 +58,7 @@ ROM_END
 //  device_add_mconfig - add device configuration
 //-------------------------------------------------
 
-MACHINE_CONFIG_MEMBER( p1_hdc_device::device_add_mconfig )
+MACHINE_CONFIG_START(p1_hdc_device::device_add_mconfig)
 	MCFG_DEVICE_ADD(KM1809VG7_TAG, WD2010, 5000000) // XXX clock?
 	MCFG_WD2010_IN_DRDY_CB(VCC)
 	MCFG_WD2010_IN_INDEX_CB(VCC)

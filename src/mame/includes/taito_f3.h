@@ -1,5 +1,6 @@
 // license:BSD-3-Clause
 // copyright-holders:Bryan McPhail
+#include "audio/taito_en.h"
 #include "machine/watchdog.h"
 #include "sound/okim6295.h"
 #include "screen.h"
@@ -58,6 +59,7 @@ public:
 		: driver_device(mconfig, type, tag),
 		m_maincpu(*this, "maincpu"),
 		m_audiocpu(*this, "taito_en:audiocpu"),
+		m_taito_en(*this, "taito_en"),
 		m_watchdog(*this, "watchdog"),
 		m_oki(*this, "oki"),
 		m_gfxdecode(*this, "gfxdecode"),
@@ -73,6 +75,7 @@ public:
 
 	required_device<cpu_device> m_maincpu;
 	optional_device<cpu_device> m_audiocpu;
+	optional_device<taito_en_device> m_taito_en;
 	optional_device<watchdog_timer_device> m_watchdog;
 	optional_device<okim6295_device> m_oki;
 	required_device<gfxdecode_device> m_gfxdecode;
@@ -120,7 +123,6 @@ public:
 	uint16_t *m_f3_pf_data_6;
 	uint16_t *m_f3_pf_data_7;
 	uint16_t *m_f3_pf_data_8;
-	int m_f3_skip_this_frame;
 	int m_sprite_lag;
 	uint8_t m_sprite_pri_usage;
 	bitmap_ind8 m_pri_alp_bitmap;
@@ -315,6 +317,15 @@ public:
 	DECLARE_WRITE_LINE_MEMBER(screen_vblank_f3);
 	INTERRUPT_GEN_MEMBER(f3_interrupt2);
 
+	void f3_eeprom(machine_config &config);
+	void f3(machine_config &config);
+	void f3_224a(machine_config &config);
+	void bubsympb(machine_config &config);
+	void f3_224b(machine_config &config);
+	void f3_224c(machine_config &config);
+	void f3_224b_eeprom(machine_config &config);
+	void bubsympb_map(address_map &map);
+	void f3_map(address_map &map);
 protected:
 	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr) override;
 	virtual void device_post_load(void) override;

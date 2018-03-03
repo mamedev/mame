@@ -479,22 +479,31 @@ bool d88_format::load(io_generic *io, uint32_t form_factor, floppy_image *image)
 	uint32_t track_pos[164];
 	io_generic_read(io, track_pos, 32, 164*4);
 
+	uint64_t file_size = io_generic_size(io);
+
 	for(int track=0; track < track_count; track++)
 		for(int head=0; head < head_count; head++) {
 			int pos = little_endianize_int32(track_pos[track * head_count + head]);
 			if(!pos)
 				continue;
-
 			desc_pc_sector sects[256];
 			uint8_t sect_data[65536];
 			int sdatapos = 0;
 			int sector_count = 1;
 			for(int i=0; i<sector_count; i++) {
+
+				if (pos + 16 > file_size)
+					return true;
+
 				uint8_t hs[16];
 				io_generic_read(io, hs, pos, 16);
 				pos += 16;
 
 				uint16_t size = little_endianize_int16(*(uint16_t *)(hs+14));
+
+				if(pos + size > file_size)
+					return true;
+
 				if(i == 0) {
 					sector_count = little_endianize_int16(*(uint16_t *)(hs+4));
 					// Support broken vfman converter
@@ -508,7 +517,7 @@ bool d88_format::load(io_generic *io, uint32_t form_factor, floppy_image *image)
 				sects[i].size        = hs[3];
 				sects[i].actual_size = size;
 				sects[i].deleted     = hs[7] != 0;
-				sects[i].bad_crc     = false;
+				sects[i].bad_crc     = hs[8] == 0xb0;  // according to hxc
 
 				if(size) {
 					sects[i].data    = sect_data + sdatapos;

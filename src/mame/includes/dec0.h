@@ -76,8 +76,11 @@ public:
 	DECLARE_READ16_MEMBER(midres_controls_r);
 	DECLARE_READ8_MEMBER(hippodrm_prot_r);
 	DECLARE_WRITE8_MEMBER(hippodrm_prot_w);
-	DECLARE_READ8_MEMBER(dec0_mcu_port_r);
-	DECLARE_WRITE8_MEMBER(dec0_mcu_port_w);
+	DECLARE_READ8_MEMBER(dec0_mcu_port0_r);
+	DECLARE_WRITE8_MEMBER(dec0_mcu_port0_w);
+	DECLARE_WRITE8_MEMBER(dec0_mcu_port1_w);
+	DECLARE_WRITE8_MEMBER(dec0_mcu_port2_w);
+	DECLARE_WRITE8_MEMBER(dec0_mcu_port3_w);
 	DECLARE_READ16_MEMBER(hippodrm_68000_share_r);
 	DECLARE_WRITE16_MEMBER(hippodrm_68000_share_w);
 	DECLARE_WRITE16_MEMBER(sprite_mirror_w);
@@ -117,6 +120,32 @@ public:
 	void dec0_i8751_write(int data);
 	void dec0_i8751_reset();
 	void h6280_decrypt(const char *cputag);
+	void dec0_base(machine_config &config);
+	void dec0(machine_config &config);
+	void dec1(machine_config &config);
+	void midres(machine_config &config);
+	void birdtry(machine_config &config);
+	void baddudes(machine_config &config);
+	void midresbj(machine_config &config);
+	void slyspy(machine_config &config);
+	void hbarrel(machine_config &config);
+	void midresb(machine_config &config);
+	void ffantasybl(machine_config &config);
+	void drgninjab(machine_config &config);
+	void robocop(machine_config &config);
+	void robocopb(machine_config &config);
+	void hippodrm(machine_config &config);
+	void dec0_map(address_map &map);
+	void dec0_s_map(address_map &map);
+	void hippodrm_sub_map(address_map &map);
+	void midres_map(address_map &map);
+	void midres_s_map(address_map &map);
+	void midresb_map(address_map &map);
+	void robocop_sub_map(address_map &map);
+	void slyspy_map(address_map &map);
+	void slyspy_protection_map(address_map &map);
+	void slyspy_s_map(address_map &map);
+	void slyspy_sound_protection_map(address_map &map);
 };
 
 
@@ -158,4 +187,10 @@ public:
 
 	uint32_t screen_update_automat(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	uint32_t screen_update_secretab(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	void secretab(machine_config &config);
+	void automat(machine_config &config);
+	void automat_map(address_map &map);
+	void automat_s_map(address_map &map);
+	void secretab_map(address_map &map);
+	void secretab_s_map(address_map &map);
 };

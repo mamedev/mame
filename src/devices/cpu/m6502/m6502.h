@@ -15,7 +15,7 @@
 	downcast<m6502_device *>(device)->disable_direct();
 
 #define MCFG_M6502_SYNC_CALLBACK(_cb) \
-	devcb = &m6502_device::set_sync_callback(*device, DEVCB_##_cb);
+	devcb = &downcast<m6502_device &>(*device).set_sync_callback(DEVCB_##_cb);
 
 class m6502_device : public cpu_device {
 public:
@@ -31,7 +31,7 @@ public:
 	bool get_sync() const { return sync; }
 	void disable_direct() { direct_disabled = true; }
 
-	template<class _Object> static devcb_base &set_sync_callback(device_t &device, _Object object) { return downcast<m6502_device &>(device).sync_w.set_callback(object); }
+	template<class Object> devcb_base &set_sync_callback(Object &&cb) { return sync_w.set_callback(std::forward<Object>(cb)); }
 
 	devcb_write_line sync_w;
 
@@ -123,7 +123,7 @@ protected:
 	uint8_t   IR;                     /* Prefetched instruction register */
 	int     inst_state_base;        /* Current instruction bank */
 
-	memory_interface *mintf;
+	std::unique_ptr<memory_interface> mintf;
 	int inst_state, inst_substate;
 	int icount;
 	bool nmi_state, irq_state, apu_irq_state, v_state;
@@ -140,6 +140,8 @@ protected:
 	void prefetch_noirq();
 	void set_nz(uint8_t v);
 
+	u32 XPC;
+	virtual offs_t pc_to_external(u16 pc); // For paged PCs
 	virtual void do_exec_full();
 	virtual void do_exec_partial();
 

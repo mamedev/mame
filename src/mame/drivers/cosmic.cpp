@@ -376,7 +376,7 @@ WRITE8_MEMBER(cosmic_state::flip_screen_w)
 }
 
 
-static ADDRESS_MAP_START( panic_map, AS_PROGRAM, 8, cosmic_state )
+ADDRESS_MAP_START(cosmic_state::panic_map)
 	AM_RANGE(0x0000, 0x3fff) AM_ROM
 	AM_RANGE(0x4000, 0x5fff) AM_RAM AM_SHARE("videoram")
 	AM_RANGE(0x6000, 0x601f) AM_WRITEONLY AM_SHARE("spriteram")
@@ -391,7 +391,7 @@ static ADDRESS_MAP_START( panic_map, AS_PROGRAM, 8, cosmic_state )
 ADDRESS_MAP_END
 
 
-static ADDRESS_MAP_START( cosmica_map, AS_PROGRAM, 8, cosmic_state )
+ADDRESS_MAP_START(cosmic_state::cosmica_map)
 	AM_RANGE(0x0000, 0x3fff) AM_ROM
 	AM_RANGE(0x4000, 0x5fff) AM_RAM AM_SHARE("videoram")
 	AM_RANGE(0x6000, 0x601f) AM_WRITEONLY AM_SHARE("spriteram")
@@ -405,12 +405,12 @@ static ADDRESS_MAP_START( cosmica_map, AS_PROGRAM, 8, cosmic_state )
 ADDRESS_MAP_END
 
 
-static ADDRESS_MAP_START( cosmicg_map, AS_PROGRAM, 8, cosmic_state )
+ADDRESS_MAP_START(cosmic_state::cosmicg_map)
 	AM_RANGE(0x0000, 0x1fff) AM_ROM
 	AM_RANGE(0x2000, 0x3fff) AM_RAM AM_SHARE("videoram")
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( cosmicg_io_map, AS_IO, 8, cosmic_state )
+ADDRESS_MAP_START(cosmic_state::cosmicg_io_map)
 	AM_RANGE(0x00, 0x00) AM_READ(cosmicg_port_0_r)
 	AM_RANGE(0x01, 0x01) AM_READ_PORT("IN1")
 	AM_RANGE(0x00, 0x15) AM_WRITE(cosmicg_output_w)
@@ -418,7 +418,7 @@ static ADDRESS_MAP_START( cosmicg_io_map, AS_IO, 8, cosmic_state )
 ADDRESS_MAP_END
 
 
-static ADDRESS_MAP_START( magspot_map, AS_PROGRAM, 8, cosmic_state )
+ADDRESS_MAP_START(cosmic_state::magspot_map)
 	AM_RANGE(0x0000, 0x2fff) AM_ROM
 	AM_RANGE(0x3800, 0x3807) AM_READ(magspot_coinage_dip_r)
 	AM_RANGE(0x4000, 0x401f) AM_WRITEONLY AM_SHARE("spriteram")
@@ -1000,7 +1000,7 @@ MACHINE_RESET_MEMBER(cosmic_state,cosmicg)
 	m_maincpu->set_input_line(INT_9980A_RESET, CLEAR_LINE);
 }
 
-static MACHINE_CONFIG_START( cosmic )
+MACHINE_CONFIG_START(cosmic_state::cosmic)
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", Z80,Z80_MASTER_CLOCK/6) /* 1.8026 MHz */
@@ -1028,7 +1028,8 @@ TIMER_DEVICE_CALLBACK_MEMBER(cosmic_state::panic_scanline)
 }
 
 
-static MACHINE_CONFIG_DERIVED( panic, cosmic )
+MACHINE_CONFIG_START(cosmic_state::panic)
+	cosmic(config);
 
 	/* basic machine hardware */
 	MCFG_CPU_MODIFY("maincpu")
@@ -1058,7 +1059,8 @@ static MACHINE_CONFIG_DERIVED( panic, cosmic )
 MACHINE_CONFIG_END
 
 
-static MACHINE_CONFIG_DERIVED( cosmica, cosmic )
+MACHINE_CONFIG_START(cosmic_state::cosmica)
+	cosmic(config);
 
 	/* basic machine hardware */
 	MCFG_CPU_MODIFY("maincpu")
@@ -1082,7 +1084,7 @@ static MACHINE_CONFIG_DERIVED( cosmica, cosmic )
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 0.25)
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_START( cosmicg )
+MACHINE_CONFIG_START(cosmic_state::cosmicg)
 
 	/* basic machine hardware */
 	MCFG_TMS99xx_ADD("maincpu", TMS9980A, COSMICG_MASTER_CLOCK/8, cosmicg_map, cosmicg_io_map)
@@ -1120,7 +1122,8 @@ static MACHINE_CONFIG_START( cosmicg )
 MACHINE_CONFIG_END
 
 
-static MACHINE_CONFIG_DERIVED( magspot, cosmic )
+MACHINE_CONFIG_START(cosmic_state::magspot)
+	cosmic(config);
 
 	/* basic machine hardware */
 	MCFG_CPU_REPLACE("maincpu", Z80, Z80_MASTER_CLOCK/4) /* 2.704 MHz, verified via schematics */
@@ -1144,7 +1147,8 @@ static MACHINE_CONFIG_DERIVED( magspot, cosmic )
 MACHINE_CONFIG_END
 
 
-static MACHINE_CONFIG_DERIVED( devzone, magspot )
+MACHINE_CONFIG_START(cosmic_state::devzone)
+	magspot(config);
 
 	/* basic machine hardware */
 
@@ -1154,7 +1158,8 @@ static MACHINE_CONFIG_DERIVED( devzone, magspot )
 MACHINE_CONFIG_END
 
 
-static MACHINE_CONFIG_DERIVED( nomnlnd, cosmic )
+MACHINE_CONFIG_START(cosmic_state::nomnlnd)
+	cosmic(config);
 
 	/* basic machine hardware */
 	MCFG_CPU_MODIFY("maincpu")

@@ -326,7 +326,7 @@ void generic_terminal_device::kbd_put(u8 data)
     VIDEO HARDWARE
 ***************************************************************************/
 
-MACHINE_CONFIG_MEMBER( generic_terminal_device::device_add_mconfig )
+MACHINE_CONFIG_START(generic_terminal_device::device_add_mconfig)
 	MCFG_SCREEN_ADD(TERMINAL_SCREEN_TAG, RASTER)
 	MCFG_SCREEN_REFRESH_RATE(50)
 	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500)) /* not accurate */

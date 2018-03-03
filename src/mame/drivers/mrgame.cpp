@@ -85,6 +85,13 @@ public:
 	required_shared_ptr<uint8_t> m_p_videoram;
 	required_shared_ptr<uint8_t> m_p_objectram;
 	required_device<gfxdecode_device> m_gfxdecode;
+	void mrgame(machine_config &config);
+	void audio1_io(address_map &map);
+	void audio1_map(address_map &map);
+	void audio2_io(address_map &map);
+	void audio2_map(address_map &map);
+	void main_map(address_map &map);
+	void video_map(address_map &map);
 private:
 	bool m_ack1;
 	bool m_ack2;
@@ -109,7 +116,7 @@ private:
 };
 
 
-static ADDRESS_MAP_START( main_map, AS_PROGRAM, 16, mrgame_state )
+ADDRESS_MAP_START(mrgame_state::main_map)
 	AM_RANGE(0x000000, 0x00ffff) AM_ROM AM_REGION("roms", 0)
 	AM_RANGE(0x020000, 0x02ffff) AM_RAM AM_SHARE("nvram")
 	AM_RANGE(0x030000, 0x030001) AM_READ8(rsw_r, 0xff) //RSW ACK
@@ -122,7 +129,7 @@ static ADDRESS_MAP_START( main_map, AS_PROGRAM, 16, mrgame_state )
 	AM_RANGE(0x03000e, 0x03000f) AM_WRITENOP //EXT ADD - lamp/sol data
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( video_map, AS_PROGRAM, 8, mrgame_state )
+ADDRESS_MAP_START(mrgame_state::video_map)
 	AM_RANGE(0x0000, 0x3fff) AM_ROM AM_REGION("video", 0)
 	AM_RANGE(0x4000, 0x47ff) AM_RAM
 	AM_RANGE(0x4800, 0x4bff) AM_MIRROR(0x0400) AM_RAM AM_SHARE("videoram")
@@ -132,12 +139,12 @@ static ADDRESS_MAP_START( video_map, AS_PROGRAM, 8, mrgame_state )
 	AM_RANGE(0x8100, 0x8103) AM_MIRROR(0x7efc) AM_DEVREADWRITE("ppi", i8255_device, read, write)
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( audio1_map, AS_PROGRAM, 8, mrgame_state )
+ADDRESS_MAP_START(mrgame_state::audio1_map)
 	AM_RANGE(0x0000, 0x7fff) AM_ROM AM_REGION("audio1", 0)
 	AM_RANGE(0xfc00, 0xffff) AM_RAM
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( audio1_io, AS_IO, 8, mrgame_state )
+ADDRESS_MAP_START(mrgame_state::audio1_io)
 	ADDRESS_MAP_GLOBAL_MASK(3)
 	AM_RANGE(0x0000, 0x0000) AM_DEVWRITE("dacvol", dac_byte_interface, write) //DA1
 	AM_RANGE(0x0001, 0x0001) AM_READ(sound_r) //IN1
@@ -145,12 +152,12 @@ static ADDRESS_MAP_START( audio1_io, AS_IO, 8, mrgame_state )
 	AM_RANGE(0x0003, 0x0003) AM_WRITENOP //SGS pass data to M114
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( audio2_map, AS_PROGRAM, 8, mrgame_state )
+ADDRESS_MAP_START(mrgame_state::audio2_map)
 	AM_RANGE(0x0000, 0x7fff) AM_ROM AM_REGION("audio2", 0)
 	AM_RANGE(0xfc00, 0xffff) AM_RAM
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( audio2_io, AS_IO, 8, mrgame_state )
+ADDRESS_MAP_START(mrgame_state::audio2_io)
 	ADDRESS_MAP_GLOBAL_MASK(7)
 	AM_RANGE(0x0000, 0x0000) AM_DEVWRITE("ldac", dac_byte_interface, write) //DA2
 	AM_RANGE(0x0001, 0x0001) AM_READ(sound_r) //IN2
@@ -460,18 +467,18 @@ uint32_t mrgame_state::screen_update_mrgame(screen_device &screen, bitmap_ind16 
 	return 0;
 }
 
-static MACHINE_CONFIG_START( mrgame )
+MACHINE_CONFIG_START(mrgame_state::mrgame)
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", M68000, XTAL_6MHz)
+	MCFG_CPU_ADD("maincpu", M68000, XTAL(6'000'000))
 	MCFG_CPU_PROGRAM_MAP(main_map)
 	MCFG_CPU_PERIODIC_INT_DRIVER(mrgame_state, irq1_line_hold, 183)
-	MCFG_CPU_ADD("videocpu", Z80, XTAL_18_432MHz/6)
+	MCFG_CPU_ADD("videocpu", Z80, XTAL(18'432'000)/6)
 	MCFG_CPU_PROGRAM_MAP(video_map)
 	MCFG_CPU_VBLANK_INT_DRIVER("screen", mrgame_state, nmi_line_pulse)
-	MCFG_CPU_ADD("audiocpu1", Z80, XTAL_4MHz)
+	MCFG_CPU_ADD("audiocpu1", Z80, XTAL(4'000'000))
 	MCFG_CPU_PROGRAM_MAP(audio1_map)
 	MCFG_CPU_IO_MAP(audio1_io)
-	MCFG_CPU_ADD("audiocpu2", Z80, XTAL_4MHz)
+	MCFG_CPU_ADD("audiocpu2", Z80, XTAL(4'000'000))
 	MCFG_CPU_PROGRAM_MAP(audio2_map)
 	MCFG_CPU_IO_MAP(audio2_io)
 

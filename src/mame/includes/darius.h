@@ -130,4 +130,10 @@ public:
 	void update_psg1( int port );
 	void update_da(  );
 	DECLARE_WRITE_LINE_MEMBER(darius_adpcm_int);
+	void darius(machine_config &config);
+	void darius_cpub_map(address_map &map);
+	void darius_map(address_map &map);
+	void darius_sound2_io_map(address_map &map);
+	void darius_sound2_map(address_map &map);
+	void darius_sound_map(address_map &map);
 };

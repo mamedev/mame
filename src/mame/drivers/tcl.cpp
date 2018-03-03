@@ -59,6 +59,8 @@ public:
 	virtual void video_start() override;
 	uint32_t screen_update_tcl(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	required_device<cpu_device> m_maincpu;
+	void tcl(machine_config &config);
+	void tcl_map(address_map &map);
 };
 
 
@@ -70,7 +72,7 @@ uint32_t tcl_state::screen_update_tcl(screen_device &screen, bitmap_ind16 &bitma
 	return 0;
 }
 
-static ADDRESS_MAP_START( tcl_map, AS_PROGRAM, 8, tcl_state )
+ADDRESS_MAP_START(tcl_state::tcl_map)
 	AM_RANGE(0x0000, 0x7fff) AM_ROM  /* bfff ? */
 ADDRESS_MAP_END
 
@@ -111,7 +113,7 @@ static GFXDECODE_START( tcl )
 	GFXDECODE_ENTRY( "gfx2", 0, charlayout2,  128, 4 )
 GFXDECODE_END
 
-static MACHINE_CONFIG_START( tcl )
+MACHINE_CONFIG_START(tcl_state::tcl)
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", Z80,12000000/4)
@@ -166,7 +168,7 @@ ROM_START( tcl )
 	ROM_LOAD( "tcl_pr3.9e",    0x200, 0x100, CRC(50ec383b) SHA1(ae95b92bd3946b40134bcdc22708d5c6b0f4c23e) )
 ROM_END
 
-#define ROL(x,n) (BITSWAP8((x),(7+8-n)&7,(6+8-n)&7,(5+8-n)&7,(4+8-n)&7,(3+8-n)&7,(2+8-n)&7,(1+8-n)&7,(0+8-n)&7))
+#define ROL(x,n) (bitswap<8>((x),(7+8-n)&7,(6+8-n)&7,(5+8-n)&7,(4+8-n)&7,(3+8-n)&7,(2+8-n)&7,(1+8-n)&7,(0+8-n)&7))
 
 #define WRITEDEST( n ) \
 		dest[idx]=n;    \

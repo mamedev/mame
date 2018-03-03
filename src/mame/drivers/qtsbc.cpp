@@ -52,6 +52,9 @@ public:
 
 	DECLARE_READ8_MEMBER( qtsbc_43_r );
 
+	void qtsbc(machine_config &config);
+	void io_map(address_map &map);
+	void mem_map(address_map &map);
 private:
 	virtual void machine_reset() override;
 	required_device<cpu_device> m_maincpu;
@@ -64,12 +67,12 @@ READ8_MEMBER( qtsbc_state::qtsbc_43_r )
 	return 0; // this controls where the new ram program gets built at. 0 = 0xE000.
 }
 
-static ADDRESS_MAP_START( mem_map, AS_PROGRAM, 8, qtsbc_state )
+ADDRESS_MAP_START(qtsbc_state::mem_map)
 	ADDRESS_MAP_UNMAP_HIGH
 	AM_RANGE(0x0000, 0xffff) AM_RAM AM_SHARE("ram") AM_REGION("maincpu", 0)
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( io_map, AS_IO, 8, qtsbc_state )
+ADDRESS_MAP_START(qtsbc_state::io_map)
 	ADDRESS_MAP_UNMAP_HIGH
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	AM_RANGE(0x00, 0x03) AM_DEVREADWRITE("pit", pit8253_device, read, write)
@@ -98,15 +101,15 @@ static DEVICE_INPUT_DEFAULTS_START( terminal )
 	DEVICE_INPUT_DEFAULTS( "RS232_STOPBITS", 0xff, RS232_STOPBITS_1 )
 DEVICE_INPUT_DEFAULTS_END
 
-static MACHINE_CONFIG_START( qtsbc )
+MACHINE_CONFIG_START(qtsbc_state::qtsbc)
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu",Z80, XTAL_4MHz) // Mostek MK3880
+	MCFG_CPU_ADD("maincpu",Z80, XTAL(4'000'000)) // Mostek MK3880
 	MCFG_CPU_PROGRAM_MAP(mem_map)
 	MCFG_CPU_IO_MAP(io_map)
 
 	/* video hardware */
 	MCFG_DEVICE_ADD("pit", PIT8253, 0) // U9
-	MCFG_PIT8253_CLK0(XTAL_4MHz / 2) /* Timer 0: baud rate gen for 8251 */
+	MCFG_PIT8253_CLK0(XTAL(4'000'000) / 2) /* Timer 0: baud rate gen for 8251 */
 	MCFG_PIT8253_OUT0_HANDLER(DEVWRITELINE("uart", i8251_device, write_txc))
 	MCFG_DEVCB_CHAIN_OUTPUT(DEVWRITELINE("uart", i8251_device, write_rxc))
 

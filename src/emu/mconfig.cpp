@@ -68,15 +68,15 @@ machine_config::machine_config(const game_driver &gamedrv, emu_options &options)
 
 				char const *const default_bios = option->default_bios();
 				if (default_bios != nullptr)
-					device_t::static_set_default_bios_tag(*new_dev, default_bios);
+					new_dev->set_default_bios_tag(default_bios);
 
-				machine_config_constructor additions = option->machine_config();
-				if (additions != nullptr)
-					(*additions)(*this, new_dev, new_dev);
+				auto additions = option->machine_config();
+				if (additions)
+					additions(new_dev);
 
 				input_device_default const *const input_device_defaults = option->input_device_defaults();
 				if (input_device_defaults)
-					device_t::static_set_input_default(*new_dev, input_device_defaults);
+					new_dev->set_input_default(input_device_defaults);
 			}
 			else
 				throw emu_fatalerror("Unknown slot option '%s' in slot '%s'", selval, owner.tag()+1);
@@ -159,6 +159,13 @@ device_t *machine_config::device_add(device_t *owner, const char *tag, device_ty
 	}
 }
 
+device_t *machine_config::device_add(device_t *owner, const char *tag, device_type type, const XTAL &clock)
+{
+	std::string msg = std::string("Instantiating device ") + tag;
+	clock.validate(msg);
+	return device_add(owner, tag, type, clock.value());
+}
+
 
 //-------------------------------------------------
 //  device_replace - configuration helper to
@@ -189,6 +196,14 @@ device_t *machine_config::device_replace(device_t *owner, const char *tag, devic
 		new_device->add_machine_configuration(*this);
 		return new_device;
 	}
+}
+
+
+device_t *machine_config::device_replace(device_t *owner, const char *tag, device_type type, const XTAL &clock)
+{
+	std::string msg = std::string("Replacing device ") + tag;
+	clock.validate(msg);
+	return device_replace(owner, tag, type, clock.value());
 }
 
 

@@ -39,6 +39,9 @@ public:
 	DECLARE_READ8_MEMBER(status_r);
 	DECLARE_WRITE8_MEMBER(control_w);
 
+	void imsai(machine_config &config);
+	void imsai_io(address_map &map);
+	void imsai_mem(address_map &map);
 private:
 	uint8_t m_term_data;
 	virtual void machine_reset() override;
@@ -48,7 +51,7 @@ private:
 };
 
 
-static ADDRESS_MAP_START(imsai_mem, AS_PROGRAM, 8, imsai_state)
+ADDRESS_MAP_START(imsai_state::imsai_mem)
 	ADDRESS_MAP_UNMAP_HIGH
 	AM_RANGE(0x0000, 0x07ff) AM_ROM AM_REGION("prom", 0)
 	AM_RANGE(0xd000, 0xd0ff) AM_RAM
@@ -56,7 +59,7 @@ static ADDRESS_MAP_START(imsai_mem, AS_PROGRAM, 8, imsai_state)
 	AM_RANGE(0xd800, 0xdfff) AM_ROM AM_REGION("prom", 0)
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START(imsai_io, AS_IO, 8, imsai_state)
+ADDRESS_MAP_START(imsai_state::imsai_io)
 	ADDRESS_MAP_UNMAP_HIGH
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	AM_RANGE(0x02, 0x02) AM_READ(keyin_r) AM_DEVWRITE("terminal", generic_terminal_device, write)
@@ -100,9 +103,9 @@ void imsai_state::machine_reset()
 	m_term_data = 0;
 }
 
-static MACHINE_CONFIG_START( imsai )
+MACHINE_CONFIG_START(imsai_state::imsai)
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu",I8085A, XTAL_6MHz)
+	MCFG_CPU_ADD("maincpu",I8085A, XTAL(6'000'000))
 	MCFG_CPU_PROGRAM_MAP(imsai_mem)
 	MCFG_CPU_IO_MAP(imsai_io)
 
@@ -114,11 +117,11 @@ static MACHINE_CONFIG_START( imsai )
 	MCFG_DEVICE_ADD("uart", I8251, 0)
 
 	MCFG_DEVICE_ADD("pit", PIT8253, 0)
-	MCFG_PIT8253_CLK0(XTAL_6MHz / 3) /* Timer 0: baud rate gen for 8251 */
+	MCFG_PIT8253_CLK0(XTAL(6'000'000) / 3) /* Timer 0: baud rate gen for 8251 */
 	MCFG_PIT8253_OUT0_HANDLER(DEVWRITELINE("uart", i8251_device, write_txc))
 	MCFG_DEVCB_CHAIN_OUTPUT(DEVWRITELINE("uart", i8251_device, write_rxc))
-	MCFG_PIT8253_CLK1(XTAL_6MHz / 3) /* Timer 1: user */
-	MCFG_PIT8253_CLK2(XTAL_6MHz / 3) /* Timer 2: user */
+	MCFG_PIT8253_CLK1(XTAL(6'000'000) / 3) /* Timer 1: user */
+	MCFG_PIT8253_CLK2(XTAL(6'000'000) / 3) /* Timer 2: user */
 MACHINE_CONFIG_END
 
 /* ROM definition */

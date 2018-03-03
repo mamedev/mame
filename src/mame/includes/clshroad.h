@@ -55,4 +55,8 @@ public:
 
 	INTERRUPT_GEN_MEMBER(vblank_irq);
 	INTERRUPT_GEN_MEMBER(sound_timer_irq);
+	void firebatl(machine_config &config);
+	void clshroad(machine_config &config);
+	void clshroad_map(address_map &map);
+	void clshroad_sound_map(address_map &map);
 };

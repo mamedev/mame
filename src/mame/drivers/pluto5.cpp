@@ -195,6 +195,8 @@ public:
 	DECLARE_READ32_MEMBER(pluto5_mem_r);
 	DECLARE_WRITE32_MEMBER(pluto5_mem_w);
 
+	void pluto5(machine_config &config);
+	void pluto5_map(address_map &map);
 protected:
 
 	// devices
@@ -206,7 +208,7 @@ public:
 
 READ32_MEMBER(pluto5_state::pluto5_mem_r)
 {
-	int pc = space.device().safe_pc();
+	int pc = m_maincpu->pc();
 	int cs = m_maincpu->get_cs(offset * 4);
 
 	switch ( cs )
@@ -224,7 +226,7 @@ READ32_MEMBER(pluto5_state::pluto5_mem_r)
 
 WRITE32_MEMBER(pluto5_state::pluto5_mem_w)
 {
-	int pc = space.device().safe_pc();
+	int pc = m_maincpu->pc();
 	int cs = m_maincpu->get_cs(offset * 4);
 
 	switch ( cs )
@@ -237,7 +239,7 @@ WRITE32_MEMBER(pluto5_state::pluto5_mem_w)
 }
 
 
-static ADDRESS_MAP_START( pluto5_map, AS_PROGRAM, 32, pluto5_state )
+ADDRESS_MAP_START(pluto5_state::pluto5_map)
 	AM_RANGE(0x00000000, 0xffffffff) AM_READWRITE(pluto5_mem_r, pluto5_mem_w)
 ADDRESS_MAP_END
 
@@ -251,7 +253,7 @@ void pluto5_state::machine_start()
 
 }
 
-static MACHINE_CONFIG_START( pluto5 )
+MACHINE_CONFIG_START(pluto5_state::pluto5)
 	MCFG_CPU_ADD("maincpu", M68340, 16000000)
 	MCFG_CPU_PROGRAM_MAP(pluto5_map)
 

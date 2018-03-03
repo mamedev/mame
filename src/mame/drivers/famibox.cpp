@@ -119,6 +119,8 @@ public:
 	void famicombox_bankswitch(uint8_t bank);
 	void famicombox_reset();
 	void ppu_irq(int *ppu_regs);
+	void famibox(machine_config &config);
+	void famibox_map(address_map &map);
 };
 
 /******************************************************
@@ -374,7 +376,7 @@ WRITE8_MEMBER(famibox_state::famibox_system_w)
 *******************************************************/
 
 
-static ADDRESS_MAP_START( famibox_map, AS_PROGRAM, 8, famibox_state )
+ADDRESS_MAP_START(famibox_state::famibox_map)
 	AM_RANGE(0x0000, 0x1fff) AM_RAM
 	AM_RANGE(0x2000, 0x3fff) AM_DEVREADWRITE("ppu", ppu2c0x_device, read, write)
 	AM_RANGE(0x4014, 0x4014) AM_WRITE(sprite_dma_w)
@@ -544,7 +546,7 @@ void famibox_state::machine_start()
 	m_coins = 0;
 }
 
-static MACHINE_CONFIG_START( famibox )
+MACHINE_CONFIG_START(famibox_state::famibox)
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", N2A03, NTSC_APU_CLOCK)
 	MCFG_CPU_PROGRAM_MAP(famibox_map)

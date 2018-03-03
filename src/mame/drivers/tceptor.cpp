@@ -145,7 +145,7 @@ READ8_MEMBER(tceptor_state::input1_r)
 
 /*******************************************************************/
 
-static ADDRESS_MAP_START( m6809_map, AS_PROGRAM, 8, tceptor_state )
+ADDRESS_MAP_START(tceptor_state::m6809_map)
 	AM_RANGE(0x0000, 0x17ff) AM_RAM
 	AM_RANGE(0x1800, 0x1bff) AM_RAM_WRITE(tceptor_tile_ram_w) AM_SHARE("tile_ram")
 	AM_RANGE(0x1c00, 0x1fff) AM_RAM_WRITE(tceptor_tile_attr_w) AM_SHARE("tile_attr")
@@ -165,7 +165,7 @@ static ADDRESS_MAP_START( m6809_map, AS_PROGRAM, 8, tceptor_state )
 ADDRESS_MAP_END
 
 
-static ADDRESS_MAP_START( m6502_a_map, AS_PROGRAM, 8, tceptor_state )
+ADDRESS_MAP_START(tceptor_state::m6502_a_map)
 	AM_RANGE(0x0000, 0x00ff) AM_RAM AM_SHARE("share2")
 	AM_RANGE(0x0100, 0x01ff) AM_RAM
 	AM_RANGE(0x0200, 0x02ff) AM_RAM
@@ -177,7 +177,7 @@ static ADDRESS_MAP_START( m6502_a_map, AS_PROGRAM, 8, tceptor_state )
 ADDRESS_MAP_END
 
 
-static ADDRESS_MAP_START( m6502_b_map, AS_PROGRAM, 8, tceptor_state )
+ADDRESS_MAP_START(tceptor_state::m6502_b_map)
 	AM_RANGE(0x0000, 0x00ff) AM_RAM AM_SHARE("share2")
 	AM_RANGE(0x0100, 0x01ff) AM_RAM
 	AM_RANGE(0x4000, 0x4000) AM_DEVWRITE("dac", dac_byte_interface, write)
@@ -186,7 +186,7 @@ static ADDRESS_MAP_START( m6502_b_map, AS_PROGRAM, 8, tceptor_state )
 ADDRESS_MAP_END
 
 
-static ADDRESS_MAP_START( m68k_map, AS_PROGRAM, 16, tceptor_state )
+ADDRESS_MAP_START(tceptor_state::m68k_map)
 	AM_RANGE(0x000000, 0x00ffff) AM_ROM         // M68K ERROR 1
 	AM_RANGE(0x100000, 0x10ffff) AM_ROM         // not sure
 	AM_RANGE(0x200000, 0x203fff) AM_RAM         // M68K ERROR 0
@@ -198,7 +198,7 @@ static ADDRESS_MAP_START( m68k_map, AS_PROGRAM, 16, tceptor_state )
 ADDRESS_MAP_END
 
 
-static ADDRESS_MAP_START( mcu_map, AS_PROGRAM, 8, tceptor_state )
+ADDRESS_MAP_START(tceptor_state::mcu_map)
 	AM_RANGE(0x0000, 0x001f) AM_DEVREADWRITE("mcu", hd63701_cpu_device, m6801_io_r, m6801_io_w)
 	AM_RANGE(0x0080, 0x00ff) AM_RAM
 	AM_RANGE(0x1000, 0x13ff) AM_DEVREADWRITE("namco", namco_cus30_device, namcos1_cus30_r, namcos1_cus30_w)
@@ -218,7 +218,7 @@ static ADDRESS_MAP_START( mcu_map, AS_PROGRAM, 8, tceptor_state )
 ADDRESS_MAP_END
 
 
-static ADDRESS_MAP_START( mcu_io_map, AS_IO, 8, tceptor_state )
+ADDRESS_MAP_START(tceptor_state::mcu_io_map)
 	ADDRESS_MAP_UNMAP_HIGH
 	AM_RANGE(M6801_PORT1, M6801_PORT1) AM_WRITENOP
 	AM_RANGE(M6801_PORT2, M6801_PORT2) AM_WRITENOP
@@ -339,24 +339,24 @@ void tceptor_state::machine_reset()
 
 /*******************************************************************/
 
-static MACHINE_CONFIG_START( tceptor )
+MACHINE_CONFIG_START(tceptor_state::tceptor)
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", M6809, XTAL_49_152MHz/32)
+	MCFG_CPU_ADD("maincpu", M6809, XTAL(49'152'000)/32)
 	MCFG_CPU_PROGRAM_MAP(m6809_map)
 	MCFG_CPU_VBLANK_INT_DRIVER("screen", tceptor_state, m6809_vb_interrupt)
 
-	MCFG_CPU_ADD("audiocpu", M65C02, XTAL_49_152MHz/24)
+	MCFG_CPU_ADD("audiocpu", M65C02, XTAL(49'152'000)/24)
 	MCFG_CPU_PROGRAM_MAP(m6502_a_map)
 
-	MCFG_CPU_ADD("audio2", M65C02, XTAL_49_152MHz/24)
+	MCFG_CPU_ADD("audio2", M65C02, XTAL(49'152'000)/24)
 	MCFG_CPU_PROGRAM_MAP(m6502_b_map)
 
-	MCFG_CPU_ADD("sub", M68000, XTAL_49_152MHz/4)
+	MCFG_CPU_ADD("sub", M68000, XTAL(49'152'000)/4)
 	MCFG_CPU_PROGRAM_MAP(m68k_map)
 	MCFG_CPU_VBLANK_INT_DRIVER("screen", tceptor_state, m68k_vb_interrupt)
 
-	MCFG_CPU_ADD("mcu", HD63701, XTAL_49_152MHz/8) // or compatible 6808 with extra instructions
+	MCFG_CPU_ADD("mcu", HD63701, XTAL(49'152'000)/8) // or compatible 6808 with extra instructions
 	MCFG_CPU_PROGRAM_MAP(mcu_map)
 	MCFG_CPU_IO_MAP(mcu_io_map)
 	MCFG_CPU_VBLANK_INT_DRIVER("screen", tceptor_state, mcu_vb_interrupt)
@@ -386,11 +386,11 @@ static MACHINE_CONFIG_START( tceptor )
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
 
-	MCFG_YM2151_ADD("ymsnd", XTAL_14_31818MHz/4)
+	MCFG_YM2151_ADD("ymsnd", XTAL(14'318'181)/4)
 	MCFG_SOUND_ROUTE(0, "lspeaker", 1.0)
 	MCFG_SOUND_ROUTE(1, "rspeaker", 1.0)
 
-	MCFG_SOUND_ADD("namco", NAMCO_CUS30, XTAL_49_152MHz/2048)
+	MCFG_SOUND_ADD("namco", NAMCO_CUS30, XTAL(49'152'000)/2048)
 	MCFG_NAMCO_AUDIO_VOICES(8)
 	MCFG_NAMCO_AUDIO_STEREO(1)
 	MCFG_SOUND_ROUTE(0, "lspeaker", 0.40)

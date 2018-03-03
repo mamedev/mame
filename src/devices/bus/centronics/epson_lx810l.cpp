@@ -95,7 +95,7 @@ const tiny_rom_entry *epson_ap2000_device::device_rom_region() const
 //  ADDRESS_MAP( lx810l_mem )
 //-------------------------------------------------
 
-static ADDRESS_MAP_START( lx810l_mem, AS_PROGRAM, 8, epson_lx810l_device )
+ADDRESS_MAP_START(epson_lx810l_device::lx810l_mem)
 	AM_RANGE(0x0000, 0x7fff) AM_ROM /* 32k firmware */
 	AM_RANGE(0x8000, 0x9fff) AM_RAM /* 8k external RAM */
 	AM_RANGE(0xa000, 0xbfff) AM_READWRITE(fakemem_r, fakemem_w) /* fake memory, write one, set all */
@@ -108,9 +108,9 @@ ADDRESS_MAP_END
 //  device_add_mconfig - add device configuration
 //-------------------------------------------------
 
-MACHINE_CONFIG_MEMBER( epson_lx810l_device::device_add_mconfig )
+MACHINE_CONFIG_START(epson_lx810l_device::device_add_mconfig)
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", UPD7810, XTAL_14_7456MHz)
+	MCFG_CPU_ADD("maincpu", UPD7810, XTAL(14'745'600))
 	MCFG_CPU_PROGRAM_MAP(lx810l_mem)
 	MCFG_UPD7810_PORTA_READ_CB(READ8(epson_lx810l_device, porta_r))
 	MCFG_UPD7810_PORTA_WRITE_CB(WRITE8(epson_lx810l_device, porta_w))

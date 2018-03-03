@@ -70,6 +70,35 @@ public:
 	// video updates
 	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 
+	void sound_board_2203(machine_config &config);
+	void sound_board_2203x2(machine_config &config);
+	void sound_board_2151(machine_config &config);
+	void shared_base(machine_config &config);
+	void hangon_base(machine_config &config);
+	void sharrier_base(machine_config &config);
+	void enduror_base(machine_config &config);
+	void endurord_base(machine_config &config);
+	void endurob2(machine_config &config);
+	void shangupb(machine_config &config);
+	void enduror(machine_config &config);
+	void shangonro(machine_config &config);
+	void enduror1d(machine_config &config);
+	void endurord(machine_config &config);
+	void sharrier(machine_config &config);
+	void endurobl(machine_config &config);
+	void enduror1(machine_config &config);
+	void hangon(machine_config &config);
+	void decrypted_opcodes_map(address_map &map);
+	void fd1094_decrypted_opcodes_map(address_map &map);
+	void hangon_map(address_map &map);
+	void mcu_io_map(address_map &map);
+	void sharrier_map(address_map &map);
+	void sound_map_2151(address_map &map);
+	void sound_map_2203(address_map &map);
+	void sound_portmap_2151(address_map &map);
+	void sound_portmap_2203(address_map &map);
+	void sound_portmap_2203x2(address_map &map);
+	void sub_map(address_map &map);
 protected:
 	// internal types
 	typedef delegate<void ()> i8751_sim_delegate;

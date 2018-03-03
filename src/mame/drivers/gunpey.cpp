@@ -267,6 +267,9 @@ public:
 	uint32_t get_stream_bits(int bits);
 
 	int write_dest_byte(uint8_t usedata);
+	void gunpey(machine_config &config);
+	void io_map(address_map &map);
+	void mem_map(address_map &map);
 	//uint16_t main_m_vram[0x800][0x800];
 };
 
@@ -1292,14 +1295,14 @@ WRITE16_MEMBER(gunpey_state::vregs_addr_w)
 
 /***************************************************************************************/
 
-static ADDRESS_MAP_START( mem_map, AS_PROGRAM, 16, gunpey_state )
+ADDRESS_MAP_START(gunpey_state::mem_map)
 	AM_RANGE(0x00000, 0x0ffff) AM_RAM AM_SHARE("wram")
 //  AM_RANGE(0x50000, 0x500ff) AM_RAM
 //  AM_RANGE(0x50100, 0x502ff) AM_NOP
 	AM_RANGE(0x80000, 0xfffff) AM_ROM
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( io_map, AS_IO, 16, gunpey_state )
+ADDRESS_MAP_START(gunpey_state::io_map)
 	AM_RANGE(0x7f40, 0x7f45) AM_READ8(inputs_r,0xffff)
 
 	AM_RANGE(0x7f48, 0x7f49) AM_WRITE8(output_w,0x00ff)
@@ -1439,7 +1442,7 @@ GFXDECODE_END
 
 
 /***************************************************************************************/
-static MACHINE_CONFIG_START( gunpey )
+MACHINE_CONFIG_START(gunpey_state::gunpey)
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", V30, 57242400 / 4)
@@ -1458,11 +1461,11 @@ static MACHINE_CONFIG_START( gunpey )
 
 	MCFG_SPEAKER_STANDARD_STEREO("lspeaker","rspeaker")
 
-	MCFG_OKIM6295_ADD("oki", XTAL_16_9344MHz / 8, PIN7_LOW)
+	MCFG_OKIM6295_ADD("oki", XTAL(16'934'400) / 8, PIN7_LOW)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "lspeaker", 0.25)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", 0.25)
 
-	MCFG_SOUND_ADD("ymz", YMZ280B, XTAL_16_9344MHz)
+	MCFG_SOUND_ADD("ymz", YMZ280B, XTAL(16'934'400))
 	MCFG_SOUND_ROUTE(0, "lspeaker", 0.25)
 	MCFG_SOUND_ROUTE(1, "rspeaker", 0.25)
 MACHINE_CONFIG_END

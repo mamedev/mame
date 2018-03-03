@@ -8,8 +8,8 @@
  *
  ****************************************************************************/
 
-#ifndef APPLE3_H_
-#define APPLE3_H_
+#ifndef MAME_INCLUDES_APPLE3_H
+#define MAME_INCLUDES_APPLE3_H
 
 #include "cpu/m6502/m6502.h"
 #include "includes/apple2.h"
@@ -133,6 +133,8 @@ public:
 	uint32_t m_flags;
 	int m_enable_mask;
 
+	void apple3(machine_config &config);
+	void apple3_map(address_map &map);
 private:
 	int m_acia_irq;
 	uint8_t m_via_0_a;
@@ -168,4 +170,4 @@ private:
 	int m_smoothscr;
 };
 
-#endif /* APPLE3_H_ */
+#endif // MAME_INCLUDES_APPLE3_H

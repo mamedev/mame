@@ -34,9 +34,7 @@ DEFINE_DEVICE_TYPE_NS(A500_KBD_GB, bus::amiga::keyboard, a500_kbd_gb_device, "a5
 
 namespace bus { namespace amiga { namespace keyboard {
 
-namespace {
-
-ADDRESS_MAP_START( mpu6500_map, AS_PROGRAM, 8, a500_kbd_device )
+ADDRESS_MAP_START(a500_kbd_device::mpu6500_map)
 	ADDRESS_MAP_GLOBAL_MASK(0xfff)
 	AM_RANGE(0x000, 0x03f) AM_RAM
 	AM_RANGE(0x080, 0x080) AM_READWRITE(port_a_r, port_a_w)
@@ -52,6 +50,8 @@ ADDRESS_MAP_START( mpu6500_map, AS_PROGRAM, 8, a500_kbd_device )
 	AM_RANGE(0x090, 0x0ff) AM_NOP
 	AM_RANGE(0x800, 0xfff) AM_ROM AM_REGION("ic1", 0)
 ADDRESS_MAP_END
+
+namespace {
 
 //-------------------------------------------------
 //  rom_region - device-specific ROM region
@@ -136,8 +136,8 @@ INPUT_PORTS_END
 //-------------------------------------------------
 
 
-MACHINE_CONFIG_MEMBER(a500_kbd_device::device_add_mconfig)
-	MCFG_CPU_ADD("ic1", M6502, XTAL_3MHz / 2)
+MACHINE_CONFIG_START(a500_kbd_device::device_add_mconfig)
+	MCFG_CPU_ADD("ic1", M6502, XTAL(3'000'000) / 2)
 	MCFG_CPU_PROGRAM_MAP(mpu6500_map)
 MACHINE_CONFIG_END
 
@@ -279,7 +279,7 @@ void a500_kbd_device::device_reset()
 	m_counter = 0xffff; // not initialized by hardware
 	m_control = 0x00;
 
-	m_timer->adjust(attotime::zero, 0, attotime::from_hz(XTAL_3MHz / 2));
+	m_timer->adjust(attotime::zero, 0, attotime::from_hz(XTAL(3'000'000) / 2));
 	m_watchdog->adjust(attotime::from_msec(54));
 }
 
@@ -442,7 +442,7 @@ WRITE8_MEMBER( a500_kbd_device::latch_w )
 
 READ8_MEMBER( a500_kbd_device::counter_r )
 {
-	if (!machine().side_effect_disabled())
+	if (!machine().side_effects_disabled())
 	{
 		m_control &= ~COUNTER_OVERFLOW;
 		update_irqs();

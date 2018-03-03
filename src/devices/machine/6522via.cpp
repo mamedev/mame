@@ -4,9 +4,6 @@
 
     Rockwell 6522 VIA interface and emulation
 
-    This function emulates the functionality of up to 8 6522
-    versatile interface adapters.
-
     This is based on the M6821 emulation in MAME.
 
     To do:
@@ -150,7 +147,7 @@ uint16_t via6522_device::get_counter1_value()
 // device type definition
 DEFINE_DEVICE_TYPE(VIA6522, via6522_device, "via6522", "6522 VIA")
 
-DEVICE_ADDRESS_MAP_START( map, 8, via6522_device )
+ADDRESS_MAP_START(via6522_device::map)
 	AM_RANGE(0x00, 0x0f) AM_READWRITE(read, write)
 ADDRESS_MAP_END
 
@@ -210,12 +207,6 @@ void via6522_device::device_start()
 	m_ca2_timer = timer_alloc(TIMER_CA2);
 	m_shift_timer = timer_alloc(TIMER_SHIFT);
 	m_shift_irq_timer = timer_alloc(TIMER_SHIFT_IRQ);
-
-	/* Default clock is from CPU1 */
-	if (clock() == 0)
-	{
-		set_unscaled_clock(machine().firstcpu->clock());
-	}
 
 	/* save state register */
 	save_item(NAME(m_in_a));
@@ -546,7 +537,7 @@ void via6522_device::output_pb()
 READ8_MEMBER( via6522_device::read )
 {
 	int val = 0;
-	if (machine().side_effect_disabled())
+	if (machine().side_effects_disabled())
 		return 0;
 
 	offset &= 0xf;

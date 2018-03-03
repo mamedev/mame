@@ -99,6 +99,9 @@ public:
 	DECLARE_WRITE8_MEMBER(mycom_rtc_w);
 	MC6845_UPDATE_ROW(crtc_update_row);
 
+	void mycom(machine_config &config);
+	void mycom_io(address_map &map);
+	void mycom_map(address_map &map);
 private:
 	uint8_t m_0a;
 	uint16_t m_i_videoram;
@@ -213,14 +216,14 @@ WRITE8_MEMBER( mycom_state::vram_data_w )
 	m_p_videoram[m_i_videoram] = data;
 }
 
-static ADDRESS_MAP_START(mycom_map, AS_PROGRAM, 8, mycom_state)
+ADDRESS_MAP_START(mycom_state::mycom_map)
 	ADDRESS_MAP_UNMAP_HIGH
 	AM_RANGE(0x0000, 0x0fff) AM_RAMBANK("boot")
 	AM_RANGE(0x1000, 0xbfff) AM_RAM
 	AM_RANGE(0xc000, 0xffff) AM_READWRITE(mycom_upper_r,mycom_upper_w)
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START(mycom_io, AS_IO, 8, mycom_state)
+ADDRESS_MAP_START(mycom_state::mycom_io)
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	AM_RANGE(0x00, 0x00) AM_WRITE(mycom_00_w)
 	AM_RANGE(0x01, 0x01) AM_READWRITE(vram_data_r,vram_data_w)
@@ -497,9 +500,9 @@ DRIVER_INIT_MEMBER(mycom_state,mycom)
 	membank("boot")->configure_entries(0, 2, &RAM[0x0000], 0x10000);
 }
 
-static MACHINE_CONFIG_START( mycom )
+MACHINE_CONFIG_START(mycom_state::mycom)
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu",Z80, XTAL_10MHz / 4)
+	MCFG_CPU_ADD("maincpu",Z80, XTAL(10'000'000) / 4)
 	MCFG_CPU_PROGRAM_MAP(mycom_map)
 	MCFG_CPU_IO_MAP(mycom_io)
 
@@ -540,13 +543,13 @@ static MACHINE_CONFIG_START( mycom )
 	MCFG_SOUND_WAVE_ADD(WAVE_TAG, "cassette")
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.05)
 
-	MCFG_SOUND_ADD("sn1", SN76489, XTAL_10MHz / 4)
+	MCFG_SOUND_ADD("sn1", SN76489, XTAL(10'000'000) / 4)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.50)
 
 	/* Devices */
-	MCFG_MSM5832_ADD("rtc", XTAL_32_768kHz)
+	MCFG_MSM5832_ADD("rtc", XTAL(32'768))
 	MCFG_CASSETTE_ADD( "cassette" )
-	MCFG_FD1771_ADD("fdc", XTAL_16MHz / 16)
+	MCFG_FD1771_ADD("fdc", XTAL(16'000'000) / 16)
 	MCFG_FLOPPY_DRIVE_ADD("fdc:0", mycom_floppies, "525sd", floppy_image_device::default_floppy_formats)
 	MCFG_FLOPPY_DRIVE_SOUND(true)
 	MCFG_FLOPPY_DRIVE_ADD("fdc:1", mycom_floppies, "525sd", floppy_image_device::default_floppy_formats)

@@ -6,8 +6,8 @@
  *
  ****************************************************************************/
 
-#ifndef TX0_H_
-#define TX0_H_
+#ifndef MAME_INCLUDES_TX0_H
+#define MAME_INCLUDES_TX0_H
 
 #include "video/crt.h"
 #include "cpu/pdp1/tx0.h"
@@ -201,6 +201,10 @@ public:
 	DECLARE_WRITE_LINE_MEMBER(tx0_io_reset_callback);
 	void magtape_callback();
 
+	void tx0_64kw(machine_config &config);
+	void tx0_8kw(machine_config &config);
+	void tx0_64kw_map(address_map &map);
+	void tx0_8kw_map(address_map &map);
 private:
 	required_device<gfxdecode_device> m_gfxdecode;
 	required_device<palette_device> m_palette;
@@ -325,4 +329,4 @@ enum
 };
 
 
-#endif /* TX0_H_ */
+#endif // MAME_INCLUDES_TX0_H

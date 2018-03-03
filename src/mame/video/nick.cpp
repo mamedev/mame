@@ -76,11 +76,11 @@
 DEFINE_DEVICE_TYPE(NICK, nick_device, "nick", "NICK")
 
 
-DEVICE_ADDRESS_MAP_START( vram_map, 8, nick_device )
+ADDRESS_MAP_START(nick_device::vram_map)
 	AM_RANGE(0x0000, 0xffff) AM_READWRITE(vram_r, vram_w)
 ADDRESS_MAP_END
 
-DEVICE_ADDRESS_MAP_START( vio_map, 8, nick_device )
+ADDRESS_MAP_START(nick_device::vio_map)
 	AM_RANGE(0x00, 0x00) AM_WRITE(fixbias_w)
 	AM_RANGE(0x01, 0x01) AM_WRITE(border_w)
 	AM_RANGE(0x02, 0x02) AM_WRITE(lpl_w)
@@ -88,7 +88,7 @@ DEVICE_ADDRESS_MAP_START( vio_map, 8, nick_device )
 ADDRESS_MAP_END
 
 
-static ADDRESS_MAP_START( nick_map, 0, 8, nick_device )
+ADDRESS_MAP_START(nick_device::nick_map)
 	AM_RANGE(0x0000, 0xffff) AM_RAM
 ADDRESS_MAP_END
 
@@ -106,7 +106,7 @@ nick_device::nick_device(const machine_config &mconfig, const char *tag, device_
 	: device_t(mconfig, NICK, tag, owner, clock),
 		device_memory_interface(mconfig, *this),
 		device_video_interface(mconfig, *this),
-		m_space_config("vram", ENDIANNESS_LITTLE, 8, 16, 0, *ADDRESS_MAP_NAME(nick_map)),
+		m_space_config("vram", ENDIANNESS_LITTLE, 8, 16, 0, address_map_constructor(FUNC(nick_device::nick_map), this)),
 		m_write_virq(*this),
 		m_scanline_count(0),
 		m_FIXBIAS(0),
@@ -127,7 +127,7 @@ nick_device::nick_device(const machine_config &mconfig, const char *tag, device_
 
 void nick_device::device_start()
 {
-	m_screen->register_screen_bitmap(m_bitmap);
+	screen().register_screen_bitmap(m_bitmap);
 	calc_visible_clocks(ENTERPRISE_SCREEN_WIDTH);
 
 	// initialize palette
@@ -138,7 +138,7 @@ void nick_device::device_start()
 
 	// allocate timers
 	m_timer_scanline = timer_alloc();
-	m_timer_scanline->adjust(m_screen->time_until_pos(0, 0), 0, m_screen->scan_period());
+	m_timer_scanline->adjust(screen().time_until_pos(0, 0), 0, screen().scan_period());
 
 	// state saving
 	save_item(NAME(m_scanline_count));
@@ -184,7 +184,7 @@ void nick_device::device_reset()
 
 void nick_device::device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr)
 {
-	int scanline = m_screen->vpos();
+	int scanline = screen().vpos();
 
 	if (scanline < ENTERPRISE_SCREEN_HEIGHT)
 	{
@@ -1012,7 +1012,7 @@ void nick_device::do_line()
 
 	if (m_virq && !(m_LPT.MB & NICK_MB_VIRQ))
 	{
-		m_timer_scanline->adjust(m_screen->time_until_pos(0, 0), 0, m_screen->scan_period());
+		m_timer_scanline->adjust(screen().time_until_pos(0, 0), 0, screen().scan_period());
 	}
 
 	m_virq = (m_LPT.MB & NICK_MB_VIRQ) ? 1 : 0;

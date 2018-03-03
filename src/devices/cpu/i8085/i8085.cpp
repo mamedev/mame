@@ -331,10 +331,17 @@ void i8085a_cpu_device::device_start()
 		state_add(I8085_BC,     "BC",     m_BC.w.l);
 		state_add(I8085_DE,     "DE",     m_DE.w.l);
 		state_add(I8085_HL,     "HL",     m_HL.w.l);
-		state_add(I8085_STATUS, "STATUS", m_status);
-		state_add(I8085_SOD,    "SOD",    m_sod_state).mask(0x1);
-		state_add(I8085_SID,    "SID",    m_ietemp).mask(0x1).callimport().callexport();
-		state_add(I8085_INTE,   "INTE",   m_ietemp).mask(0x1).callimport().callexport();
+		if (is_8080())
+		{
+			state_add(I8085_STATUS, "STATUS", m_status);
+			state_add(I8085_INTE,   "INTE",   m_ietemp).mask(0x1).callimport().callexport();
+		}
+		if (is_8085())
+		{
+			state_add(I8085_IM,     "IM",     m_im);
+			state_add(I8085_SOD,    "SOD",    m_sod_state).mask(0x1);
+			state_add(I8085_SID,    "SID",    m_ietemp).mask(0x1).callimport().callexport();
+		}
 	}
 
 	m_program = &space(AS_PROGRAM);

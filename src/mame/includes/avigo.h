@@ -111,6 +111,10 @@ public:
 	TIMER_DEVICE_CALLBACK_MEMBER(avigo_1hz_timer);
 
 	DECLARE_QUICKLOAD_LOAD_MEMBER( avigo);
+	void avigo(machine_config &config);
+	void avigo_banked_map(address_map &map);
+	void avigo_io(address_map &map);
+	void avigo_mem(address_map &map);
 };
 
 #endif // MAME_INCLUDES_AVIGO_H

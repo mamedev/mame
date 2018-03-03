@@ -21,6 +21,12 @@ public:
 	m_maincpu(*this, "maincpu")
 	{ }
 
+	void jvh2(machine_config &config);
+	void jvh(machine_config &config);
+	void escape_io(address_map &map);
+	void jvh_map(address_map &map);
+	void jvh_sub_map(address_map &map);
+	void movmastr_io(address_map &map);
 protected:
 
 	// devices
@@ -34,12 +40,12 @@ public:
 
 
 
-static ADDRESS_MAP_START( jvh_map, AS_PROGRAM, 8, jvh_state )
+ADDRESS_MAP_START(jvh_state::jvh_map)
 	AM_RANGE(0x0000, 0x3bff) AM_ROM
 	AM_RANGE(0x3c00, 0x3cff) AM_RAM
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( escape_io, AS_IO, 8, jvh_state )
+ADDRESS_MAP_START(jvh_state::escape_io)
 	//AM_RANGE(0x01, 0x02) AM_READ(sw1_r)
 	//AM_RANGE(0x03, 0x05) AM_READ(dip_r)
 	//AM_RANGE(0x06, 0x07) AM_READ(sw6_r)
@@ -64,7 +70,7 @@ static ADDRESS_MAP_START( escape_io, AS_IO, 8, jvh_state )
 	//AM_RANGE(0x75, 0x7f) AM_WRITE(sol_w)
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( movmastr_io, AS_IO, 8, jvh_state )
+ADDRESS_MAP_START(jvh_state::movmastr_io)
 	//AM_RANGE(0x01, 0x02) AM_READ(sw1_r)
 	//AM_RANGE(0x03, 0x05) AM_READ(dip_r)
 	//AM_RANGE(0x08, 0x09) AM_READ(sw6_r)
@@ -92,7 +98,7 @@ static ADDRESS_MAP_START( movmastr_io, AS_IO, 8, jvh_state )
 	//AM_RANGE(0x75, 0x7f) AM_WRITE(sol_w)
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( jvh_sub_map, AS_PROGRAM, 8, jvh_state )
+ADDRESS_MAP_START(jvh_state::jvh_sub_map)
 	AM_RANGE(0x0000, 0x007f) AM_RAM
 	AM_RANGE(0x0080, 0x008f) AM_DEVREADWRITE("via", via6522_device, read, write)
 	AM_RANGE(0xc000, 0xdfff) AM_MIRROR(0x2000) AM_ROM
@@ -109,25 +115,25 @@ DRIVER_INIT_MEMBER(jvh_state,jvh)
 {
 }
 
-static MACHINE_CONFIG_START( jvh )
+MACHINE_CONFIG_START(jvh_state::jvh)
 	// CPU TMS9980A; no line connections
 	MCFG_TMS99xx_ADD("maincpu", TMS9980A, 1000000, jvh_map, escape_io)
 
-	MCFG_CPU_ADD("soundcpu", M6802, XTAL_4MHz)
+	MCFG_CPU_ADD("soundcpu", M6802, XTAL(4'000'000))
 	MCFG_CPU_PROGRAM_MAP(jvh_sub_map)
 
-	MCFG_DEVICE_ADD("via", VIA6522, XTAL_4MHz / 4) // MC6802 E clock
+	MCFG_DEVICE_ADD("via", VIA6522, XTAL(4'000'000) / 4) // MC6802 E clock
 	MCFG_VIA6522_IRQ_HANDLER(INPUTLINE("soundcpu", M6802_IRQ_LINE))
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_START( jvh2 )
+MACHINE_CONFIG_START(jvh_state::jvh2)
 	// CPU TMS9980At; no line connections
 	MCFG_TMS99xx_ADD("maincpu", TMS9980A, 1000000, jvh_map, movmastr_io)
 
-	MCFG_CPU_ADD("soundcpu", M6802, XTAL_4MHz)
+	MCFG_CPU_ADD("soundcpu", M6802, XTAL(4'000'000))
 	MCFG_CPU_PROGRAM_MAP(jvh_sub_map)
 
-	MCFG_DEVICE_ADD("via", VIA6522, XTAL_4MHz / 4)
+	MCFG_DEVICE_ADD("via", VIA6522, XTAL(4'000'000) / 4)
 	MCFG_VIA6522_IRQ_HANDLER(INPUTLINE("soundcpu", M6802_IRQ_LINE))
 MACHINE_CONFIG_END
 

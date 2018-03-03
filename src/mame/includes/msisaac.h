@@ -94,4 +94,7 @@ public:
 	uint32_t screen_update_msisaac(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	TIMER_CALLBACK_MEMBER(nmi_callback);
 	void draw_sprites( bitmap_ind16 &bitmap, const rectangle &cliprect );
+	void msisaac(machine_config &config);
+	void msisaac_map(address_map &map);
+	void msisaac_sound_map(address_map &map);
 };

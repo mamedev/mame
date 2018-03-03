@@ -39,7 +39,7 @@ lev 7 : 0x7c : 0000 05be - xxx
 
 /* some regions might be too large */
 
-static ADDRESS_MAP_START( bigstrkb_map, AS_PROGRAM, 16, bigstrkb_state )
+ADDRESS_MAP_START(bigstrkb_state::bigstrkb_map)
 	AM_RANGE(0x000000, 0x07ffff) AM_ROM
 //  AM_RANGE(0x0c0000, 0x0cffff) AM_READWRITE_LEGACY(megasys1_vregs_C_r, megasys1_vregs_C_w) AM_SHARE("megasys1_vregs")
 
@@ -58,7 +58,7 @@ static ADDRESS_MAP_START( bigstrkb_map, AS_PROGRAM, 16, bigstrkb_state )
 	AM_RANGE(0x0ec000, 0x0effff) AM_RAM_WRITE(videoram_w) AM_SHARE("videoram")
 
 	AM_RANGE(0x0f0000, 0x0f7fff) AM_RAM
-	AM_RANGE(0x0f8000, 0x0f87ff) AM_RAM_DEVWRITE("palette", palette_device, write) AM_SHARE("palette")
+	AM_RANGE(0x0f8000, 0x0f87ff) AM_RAM_DEVWRITE("palette", palette_device, write16) AM_SHARE("palette")
 	AM_RANGE(0x0f8800, 0x0fffff) AM_RAM
 
 	AM_RANGE(0x1f0000, 0x1f7fff) AM_RAM
@@ -199,7 +199,7 @@ GFXDECODE_END
 
 /* Machine Driver */
 
-static MACHINE_CONFIG_START( bigstrkb )
+MACHINE_CONFIG_START(bigstrkb_state::bigstrkb)
 
 	MCFG_CPU_ADD("maincpu", M68000, 12000000)
 	MCFG_CPU_PROGRAM_MAP(bigstrkb_map)

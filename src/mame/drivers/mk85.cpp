@@ -37,10 +37,12 @@ public:
 	virtual void video_start() override;
 	uint32_t screen_update_mk85(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	required_device<cpu_device> m_maincpu;
+	void mk85(machine_config &config);
+	void mk85_mem(address_map &map);
 };
 
 
-static ADDRESS_MAP_START(mk85_mem, AS_PROGRAM, 16, mk85_state)
+ADDRESS_MAP_START(mk85_state::mk85_mem)
 	ADDRESS_MAP_UNMAP_HIGH
 	AM_RANGE( 0x0000, 0x3fff ) AM_ROM AM_MIRROR(0x4000)
 	AM_RANGE( 0x8000, 0xffff ) AM_RAM
@@ -64,9 +66,9 @@ uint32_t mk85_state::screen_update_mk85(screen_device &screen, bitmap_ind16 &bit
 	return 0;
 }
 
-static MACHINE_CONFIG_START( mk85 )
+MACHINE_CONFIG_START(mk85_state::mk85)
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", K1801VM2, XTAL_4MHz)
+	MCFG_CPU_ADD("maincpu", K1801VM2, XTAL(4'000'000))
 	MCFG_T11_INITIAL_MODE(0)
 	MCFG_CPU_PROGRAM_MAP(mk85_mem)
 

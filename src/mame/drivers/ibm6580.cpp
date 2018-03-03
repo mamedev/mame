@@ -182,6 +182,9 @@ public:
 
 	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 
+	void ibm6580(machine_config &config);
+	void ibm6580_io(address_map &map);
+	void ibm6580_mem(address_map &map);
 private:
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
@@ -677,14 +680,14 @@ READ8_MEMBER(ibm6580_state::floppy_r)
 }
 
 
-static ADDRESS_MAP_START(ibm6580_mem, AS_PROGRAM, 16, ibm6580_state)
+ADDRESS_MAP_START(ibm6580_state::ibm6580_mem)
 	ADDRESS_MAP_UNMAP_HIGH
 	AM_RANGE(0x90000, 0x90001) AM_WRITE(unk_latch_w)
 	AM_RANGE(0xef000, 0xeffff) AM_RAM AM_SHARE("videoram")  // 66-line vram starts at 0xec000
 	AM_RANGE(0xfc000, 0xfffff) AM_ROM AM_REGION("user1", 0)
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START(ibm6580_io, AS_IO, 16, ibm6580_state)
+ADDRESS_MAP_START(ibm6580_state::ibm6580_io)
 	ADDRESS_MAP_UNMAP_HIGH
 	AM_RANGE(0x0000, 0x0007) AM_DEVREADWRITE8("pic8259", pic8259_device, read, write, 0x00ff)
 	AM_RANGE(0x0008, 0x000f) AM_WRITE (pic_latch_w)
@@ -874,8 +877,8 @@ static SLOT_INTERFACE_START( dw_floppies )
 	SLOT_INTERFACE( "8sssd", IBM_6360 )
 SLOT_INTERFACE_END
 
-static MACHINE_CONFIG_START( ibm6580 )
-	MCFG_CPU_ADD("maincpu", I8086, XTAL_14_7456MHz/3)
+MACHINE_CONFIG_START(ibm6580_state::ibm6580)
+	MCFG_CPU_ADD("maincpu", I8086, XTAL(14'745'600)/3)
 	MCFG_CPU_PROGRAM_MAP(ibm6580_mem)
 	MCFG_CPU_IO_MAP(ibm6580_io)
 	MCFG_CPU_IRQ_ACKNOWLEDGE_DEVICE("pic8259", pic8259_device, inta_cb)
@@ -885,7 +888,7 @@ static MACHINE_CONFIG_START( ibm6580 )
 	MCFG_RAM_EXTRA_OPTIONS("160K,192K,224K,256K,320K,384K")
 
 	MCFG_SCREEN_ADD("screen", RASTER)
-	MCFG_SCREEN_RAW_PARAMS(XTAL_25MHz/2, 833, 0, 640, 428, 0, 400)
+	MCFG_SCREEN_RAW_PARAMS(XTAL(25'000'000)/2, 833, 0, 640, 428, 0, 400)
 	MCFG_SCREEN_UPDATE_DRIVER(ibm6580_state, screen_update)
 	MCFG_SCREEN_PALETTE("palette")
 	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE(ibm6580_state, vblank_w))
@@ -911,7 +914,7 @@ static MACHINE_CONFIG_START( ibm6580 )
 	MCFG_DW_KEYBOARD_OUT_STROBE_HANDLER(WRITELINE(ibm6580_state, kb_strobe_w))
 	MCFG_DEVCB_CHAIN_OUTPUT(DEVWRITELINE("ppi8255", i8255_device, pc4_w))
 
-	MCFG_DEVICE_ADD("dma8257", I8257, XTAL_14_7456MHz/3)
+	MCFG_DEVICE_ADD("dma8257", I8257, XTAL(14'745'600)/3)
 	MCFG_I8257_OUT_HRQ_CB(WRITELINE(ibm6580_state, hrq_w))
 	MCFG_I8257_OUT_TC_CB(DEVWRITELINE(UPD765_TAG, upd765a_device, tc_line_w))
 	MCFG_I8257_IN_MEMR_CB(READ8(ibm6580_state, memory_read_byte))

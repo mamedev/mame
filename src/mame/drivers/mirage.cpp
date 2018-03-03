@@ -92,6 +92,8 @@ public:
 	virtual void video_start() override;
 	uint32_t screen_update_mirage(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 	DECO16IC_BANK_CB_MEMBER(bank_callback);
+	void mirage(machine_config &config);
+	void mirage_map(address_map &map);
 };
 
 void miragemj_state::video_start()
@@ -105,6 +107,7 @@ uint32_t miragemj_state::screen_update_mirage(screen_device &screen, bitmap_rgb3
 	uint16_t flip = m_deco_tilegen1->pf_control_r(space, 0, 0xffff);
 
 	flip_screen_set(BIT(flip, 7));
+	m_sprgen->set_flip_screen(BIT(flip, 7));
 
 	m_sprgen->draw_sprites(bitmap, cliprect, m_spriteram->buffer(), 0x400);
 
@@ -155,7 +158,7 @@ WRITE16_MEMBER(miragemj_state::okim0_rombank_w)
 	m_oki_bgm->set_rom_bank(data & 0x7);
 }
 
-static ADDRESS_MAP_START( mirage_map, AS_PROGRAM, 16, miragemj_state )
+ADDRESS_MAP_START(miragemj_state::mirage_map)
 	AM_RANGE(0x000000, 0x07ffff) AM_ROM
 	/* tilemaps */
 	AM_RANGE(0x100000, 0x101fff) AM_DEVREADWRITE("tilegen1", deco16ic_device, pf1_data_r, pf1_data_w) // 0x100000 - 0x101fff tested
@@ -164,7 +167,7 @@ static ADDRESS_MAP_START( mirage_map, AS_PROGRAM, 16, miragemj_state )
 	AM_RANGE(0x110000, 0x110bff) AM_RAM AM_SHARE("pf1_rowscroll")
 	AM_RANGE(0x112000, 0x112bff) AM_RAM AM_SHARE("pf2_rowscroll")
 	AM_RANGE(0x120000, 0x1207ff) AM_RAM AM_SHARE("spriteram")
-	AM_RANGE(0x130000, 0x1307ff) AM_RAM_DEVWRITE("palette", palette_device, write) AM_SHARE("palette")
+	AM_RANGE(0x130000, 0x1307ff) AM_RAM_DEVWRITE("palette", palette_device, write16) AM_SHARE("palette")
 	AM_RANGE(0x140000, 0x14000f) AM_DEVREADWRITE8("oki_sfx", okim6295_device, read, write, 0x00ff)
 	AM_RANGE(0x150000, 0x15000f) AM_DEVREADWRITE8("oki_bgm", okim6295_device, read, write, 0x00ff)
 	AM_RANGE(0x160000, 0x160001) AM_WRITENOP
@@ -284,7 +287,7 @@ void miragemj_state::machine_reset()
 	m_mux_data = 0;
 }
 
-static MACHINE_CONFIG_START( mirage )
+MACHINE_CONFIG_START(miragemj_state::mirage)
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", M68000, 28000000/2)
@@ -311,7 +314,8 @@ static MACHINE_CONFIG_START( mirage )
 
 	MCFG_DEVICE_ADD("tilegen1", DECO16IC, 0)
 	MCFG_DECO16IC_SPLIT(0)
-	MCFG_DECO16IC_WIDTH12(1)
+	MCFG_DECO16IC_PF1_SIZE(DECO_64x32)
+	MCFG_DECO16IC_PF2_SIZE(DECO_64x32)
 	MCFG_DECO16IC_PF1_TRANS_MASK(0x0f)
 	MCFG_DECO16IC_PF2_TRANS_MASK(0x0f)
 	MCFG_DECO16IC_PF1_COL_BANK(0x00)

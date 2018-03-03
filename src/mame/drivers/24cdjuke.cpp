@@ -86,6 +86,9 @@ public:
 
 	DECLARE_READ8_MEMBER(unknown_r) { return machine().rand(); }
 
+	void midcoin24cdjuke(machine_config &config);
+	void midcoin24cdjuke_io(address_map &map);
+	void midcoin24cdjuke_map(address_map &map);
 private:
 	uint8_t m_kb_col;
 };
@@ -116,19 +119,19 @@ WRITE8_MEMBER(midcoin24cdjuke_state::digit_w)
 {
 	uint16_t char_data = m_charset[((data & 0x60) << 1) | (data & 0x1f)];
 
-	char_data = BITSWAP16(char_data, 13,11,9,15,14,10,12,8,7,6,5,4,3,2,1,0);
+	char_data = bitswap<16>(char_data, 13,11,9,15,14,10,12,8,7,6,5,4,3,2,1,0);
 
 	output().set_digit_value(offset, char_data ^ 0xffff);
 }
 
 
-static ADDRESS_MAP_START( midcoin24cdjuke_map, AS_PROGRAM, 8, midcoin24cdjuke_state )
+ADDRESS_MAP_START(midcoin24cdjuke_state::midcoin24cdjuke_map)
 	AM_RANGE(0x0000, 0x3fff) AM_ROM
 	AM_RANGE(0x7800, 0x780f) AM_WRITE(digit_w)
 	AM_RANGE(0x8000, 0xffff) AM_RAM
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( midcoin24cdjuke_io, AS_IO, 8, midcoin24cdjuke_state )
+ADDRESS_MAP_START(midcoin24cdjuke_state::midcoin24cdjuke_io)
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	AM_RANGE(0x00, 0x03) AM_DEVREADWRITE("ic31", i8255_device, read, write)
 	AM_RANGE(0x04, 0x07) AM_DEVREADWRITE("ic11", i8255_device, read, write)
@@ -273,7 +276,7 @@ void midcoin24cdjuke_state::machine_reset()
 }
 
 
-static MACHINE_CONFIG_START( midcoin24cdjuke )
+MACHINE_CONFIG_START(midcoin24cdjuke_state::midcoin24cdjuke)
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", Z80,6000000)         /* ? MHz */
 	MCFG_CPU_PROGRAM_MAP(midcoin24cdjuke_map)

@@ -90,6 +90,9 @@ public:
 	virtual void video_start() override;
 	uint32_t screen_update_diverboy(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	void draw_sprites(  bitmap_ind16 &bitmap, const rectangle &cliprect );
+	void diverboy(machine_config &config);
+	void diverboy_map(address_map &map);
+	void snd_map(address_map &map);
 };
 
 
@@ -158,12 +161,12 @@ WRITE8_MEMBER(diverboy_state::okibank_w)
 
 
 
-static ADDRESS_MAP_START( diverboy_map, AS_PROGRAM, 16, diverboy_state )
+ADDRESS_MAP_START(diverboy_state::diverboy_map)
 	AM_RANGE(0x000000, 0x03ffff) AM_ROM
 	AM_RANGE(0x040000, 0x04ffff) AM_RAM
 	AM_RANGE(0x080000, 0x083fff) AM_RAM AM_SHARE("spriteram")
 	AM_RANGE(0x100000, 0x100001) AM_WRITE(soundcmd_w)
-	AM_RANGE(0x140000, 0x1407ff) AM_DEVWRITE("palette", palette_device, write) AM_SHARE("palette")
+	AM_RANGE(0x140000, 0x1407ff) AM_DEVWRITE("palette", palette_device, write16) AM_SHARE("palette")
 	AM_RANGE(0x180000, 0x180001) AM_READ_PORT("P1_P2")
 	AM_RANGE(0x180002, 0x180003) AM_READ_PORT("DSW")
 	AM_RANGE(0x180008, 0x180009) AM_READ_PORT("COINS")
@@ -175,7 +178,7 @@ static ADDRESS_MAP_START( diverboy_map, AS_PROGRAM, 16, diverboy_state )
 //  AM_RANGE(0x340002, 0x340003) AM_WRITENOP
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( snd_map, AS_PROGRAM, 8, diverboy_state )
+ADDRESS_MAP_START(diverboy_state::snd_map)
 	AM_RANGE(0x0000, 0x7fff) AM_ROM
 	AM_RANGE(0x8000, 0x87ff) AM_RAM
 	AM_RANGE(0x9000, 0x9000) AM_WRITE(okibank_w)
@@ -265,7 +268,7 @@ void diverboy_state::machine_start()
 {
 }
 
-static MACHINE_CONFIG_START( diverboy )
+MACHINE_CONFIG_START(diverboy_state::diverboy)
 
 	MCFG_CPU_ADD("maincpu", M68000, 12000000) /* guess */
 	MCFG_CPU_PROGRAM_MAP(diverboy_map)

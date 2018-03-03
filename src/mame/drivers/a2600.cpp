@@ -12,91 +12,14 @@ TODO:
 
 // the new RIOT does not work with the SuperCharger
 // for example "mame64 a2600 scharger -cass offifrog" fails to load after playing the tape
-#define USE_NEW_RIOT 0
-
 
 #include "emu.h"
 
-#include "cpu/m6502/m6507.h"
-#include "sound/tiaintf.h"
-#include "video/tia.h"
-#include "bus/vcs/vcs_slot.h"
-#include "bus/vcs/rom.h"
-#include "bus/vcs/dpc.h"
-#include "bus/vcs/harmony_melody.h"
-#include "bus/vcs/scharger.h"
-#include "bus/vcs/compumat.h"
-#include "bus/vcs_ctrl/ctrl.h"
+#include "includes/a2600.h"
+
 #include "screen.h"
 #include "softlist.h"
 #include "speaker.h"
-
-
-#if USE_NEW_RIOT
-#include "machine/mos6530n.h"
-#else
-#include "machine/6532riot.h"
-#endif
-
-
-#define CONTROL1_TAG    "joyport1"
-#define CONTROL2_TAG    "joyport2"
-
-
-
-class a2600_state : public driver_device
-{
-public:
-	a2600_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag),
-		m_riot_ram(*this, "riot_ram"),
-		m_joy1(*this, CONTROL1_TAG),
-		m_joy2(*this, CONTROL2_TAG) ,
-		m_cart(*this, "cartslot"),
-		m_tia(*this, "tia_video"),
-		m_maincpu(*this, "maincpu"),
-		m_screen(*this, "screen"),
-		m_swb(*this, "SWB"),
-		m_riot(*this,"riot")
-	{ }
-
-	required_shared_ptr<uint8_t> m_riot_ram;
-	uint16_t m_current_screen_height;
-
-	DECLARE_MACHINE_START(a2600);
-	DECLARE_WRITE8_MEMBER(switch_A_w);
-	DECLARE_READ8_MEMBER(switch_A_r);
-	DECLARE_WRITE8_MEMBER(switch_B_w);
-	DECLARE_WRITE_LINE_MEMBER(irq_callback);
-	DECLARE_READ8_MEMBER(riot_input_port_8_r);
-	DECLARE_READ16_MEMBER(a2600_read_input_port);
-	DECLARE_READ8_MEMBER(a2600_get_databus_contents);
-	DECLARE_WRITE16_MEMBER(a2600_tia_vsync_callback);
-	DECLARE_WRITE16_MEMBER(a2600_tia_vsync_callback_pal);
-	DECLARE_WRITE8_MEMBER(cart_over_tia_w);
-	// investigate how the carts mapped here (Mapper JVP) interact with the RIOT device
-	DECLARE_READ8_MEMBER(cart_over_riot_r);
-	DECLARE_WRITE8_MEMBER(cart_over_riot_w);
-	DECLARE_READ8_MEMBER(cart_over_all_r);
-	DECLARE_WRITE8_MEMBER(cart_over_all_w);
-
-protected:
-	required_device<vcs_control_port_device> m_joy1;
-	required_device<vcs_control_port_device> m_joy2;
-	required_device<vcs_cart_slot_device> m_cart;
-	required_device<tia_video_device> m_tia;
-
-	required_device<m6507_device> m_maincpu;
-	required_device<screen_device> m_screen;
-	required_ioport m_swb;
-#if USE_NEW_RIOT
-	required_device<mos6532_t> m_riot;
-#else
-	required_device<riot6532_device> m_riot;
-#endif
-
-};
-
 
 
 #define MASTER_CLOCK_NTSC   3579545
@@ -106,7 +29,7 @@ protected:
 static const uint16_t supported_screen_heights[4] = { 262, 312, 328, 342 };
 
 
-static ADDRESS_MAP_START(a2600_mem, AS_PROGRAM, 8, a2600_state ) // 6507 has 13-bit address space, 0x0000 - 0x1fff
+ADDRESS_MAP_START(a2600_base_state::a2600_mem) // 6507 has 13-bit address space, 0x0000 - 0x1fff
 	AM_RANGE(0x0000, 0x007f) AM_MIRROR(0x0f00) AM_DEVREADWRITE("tia_video", tia_video_device, read, write)
 	AM_RANGE(0x0080, 0x00ff) AM_MIRROR(0x0d00) AM_RAM AM_SHARE("riot_ram")
 #if USE_NEW_RIOT
@@ -120,7 +43,7 @@ ADDRESS_MAP_END
 
 READ8_MEMBER(a2600_state::cart_over_all_r)
 {
-	if (!machine().side_effect_disabled())
+	if (!machine().side_effects_disabled())
 		m_cart->write_bank(space, offset, 0);
 
 	int masked_offset = offset &~ 0x0d00;
@@ -190,7 +113,7 @@ WRITE8_MEMBER(a2600_state::cart_over_all_w)
 	/* 0x300 - 0x3ff already masked out */
 }
 
-WRITE8_MEMBER(a2600_state::switch_A_w)
+WRITE8_MEMBER(a2600_base_state::switch_A_w)
 {
 	/* Left controller port */
 	m_joy1->joy_w( data >> 4 );
@@ -206,54 +129,54 @@ WRITE8_MEMBER(a2600_state::switch_A_w)
 //  }
 }
 
-READ8_MEMBER(a2600_state::switch_A_r)
+READ8_MEMBER(a2600_base_state::switch_A_r)
 {
 	uint8_t val = 0;
 
-	/* Left controller port PINs 1-4 ( 4321 ) */
-	val |= ( m_joy1->joy_r() & 0x0F ) << 4;
+	// Left controller port PINs 1-4 ( 4321 )
+	val |= (m_joy1->joy_r() & 0x0f) << 4;
 
-	/* Right controller port PINs 1-4 ( 4321 ) */
-	val |= m_joy2->joy_r() & 0x0F;
+	// Right controller port PINs 1-4 ( 4321 )
+	val |= m_joy2->joy_r() & 0x0f;
 
 	return val;
 }
 
-WRITE8_MEMBER(a2600_state::switch_B_w)
+WRITE8_MEMBER(a2600_base_state::switch_B_w)
 {
 }
 
-WRITE_LINE_MEMBER(a2600_state::irq_callback)
+WRITE_LINE_MEMBER(a2600_base_state::irq_callback)
 {
 }
 
-READ8_MEMBER(a2600_state::riot_input_port_8_r)
+READ8_MEMBER(a2600_base_state::riot_input_port_8_r)
 {
 	return m_swb->read();
 }
 
 
-READ16_MEMBER(a2600_state::a2600_read_input_port)
+READ16_MEMBER(a2600_base_state::a2600_read_input_port)
 {
-	switch( offset )
+	switch (offset)
 	{
-	case 0: /* Left controller port PIN 5 */
+	case 0: // Left controller port PIN 5
 		return m_joy1->pot_x_r();
 
-	case 1: /* Left controller port PIN 9 */
+	case 1: // Left controller port PIN 9
 		return m_joy1->pot_y_r();
 
-	case 2: /* Right controller port PIN 5 */
+	case 2: // Right controller port PIN 5
 		return m_joy2->pot_x_r();
 
-	case 3: /* Right controller port PIN 9 */
+	case 3: // Right controller port PIN 9
 		return m_joy2->pot_y_r();
 
-	case 4: /* Left controller port PIN 6 */
-		return ( m_joy1->joy_r() & 0x20 ) ? 0xff : 0x7f;
+	case 4: // Left controller port PIN 6
+		return (m_joy1->joy_r() & 0x20) ? 0xff : 0x7f;
 
-	case 5: /* Right controller port PIN 6 */
-		return ( m_joy2->joy_r() & 0x20 ) ? 0xff : 0x7f;
+	case 5: // Right controller port PIN 6
+		return (m_joy2->joy_r() & 0x20) ? 0xff : 0x7f;
 	}
 	return 0xff;
 }
@@ -267,7 +190,7 @@ READ16_MEMBER(a2600_state::a2600_read_input_port)
    Q-Bert's Qubes (NTSC,F6) at 0x1594
    Berzerk at 0xF093.
 */
-READ8_MEMBER(a2600_state::a2600_get_databus_contents)
+READ8_MEMBER(a2600_base_state::a2600_get_databus_contents)
 {
 	uint16_t  last_address, prev_address;
 	uint8_t   last_byte, prev_byte;
@@ -305,7 +228,7 @@ static const rectangle visarea[4] = {
 };
 #endif
 
-WRITE16_MEMBER(a2600_state::a2600_tia_vsync_callback)
+WRITE16_MEMBER(a2600_base_state::a2600_tia_vsync_callback)
 {
 	int i;
 
@@ -322,7 +245,7 @@ WRITE16_MEMBER(a2600_state::a2600_tia_vsync_callback)
 	}
 }
 
-WRITE16_MEMBER(a2600_state::a2600_tia_vsync_callback_pal)
+WRITE16_MEMBER(a2600_base_state::a2600_tia_vsync_callback_pal)
 {
 	int i;
 
@@ -342,7 +265,7 @@ WRITE16_MEMBER(a2600_state::a2600_tia_vsync_callback_pal)
 // TODO: is this the correct behavior for the real hardware?!?
 READ8_MEMBER(a2600_state::cart_over_riot_r)
 {
-	if (!machine().side_effect_disabled())
+	if (!machine().side_effects_disabled())
 		m_cart->write_bank(space, offset, 0);
 	return m_riot_ram[0x20 + offset];
 }
@@ -361,76 +284,81 @@ WRITE8_MEMBER(a2600_state::cart_over_tia_w)
 	m_tia->write(space, offset, data);
 }
 
-MACHINE_START_MEMBER(a2600_state,a2600)
+void a2600_base_state::machine_start()
 {
 	m_current_screen_height = m_screen->height();
 	memset(m_riot_ram, 0x00, 0x80);
 
+	save_item(NAME(m_current_screen_height));
+}
+
+void a2600_state::machine_start()
+{
+	a2600_base_state::machine_start();
+
 	switch (m_cart->get_cart_type())
 	{
-		case A26_2K:
-		case A26_4K:
-		case A26_F4:
-		case A26_F8:
-		case A26_F8SW:
-		case A26_FA:
-		case A26_E0:
-		case A26_E7:
-		case A26_CV:
-		case A26_DC:
-		case A26_FV:
-		case A26_8IN1:
-			m_maincpu->space(AS_PROGRAM).install_readwrite_handler(0x1000, 0x1fff, read8_delegate(FUNC(vcs_cart_slot_device::read_rom),(vcs_cart_slot_device*)m_cart), write8_delegate(FUNC(vcs_cart_slot_device::write_bank),(vcs_cart_slot_device*)m_cart));
-			break;
-		case A26_F6:
-		case A26_DPC:
-			m_maincpu->space(AS_PROGRAM).install_readwrite_handler(0x1000, 0x1fff, read8_delegate(FUNC(vcs_cart_slot_device::read_rom),(vcs_cart_slot_device*)m_cart), write8_delegate(FUNC(vcs_cart_slot_device::write_bank),(vcs_cart_slot_device*)m_cart));
-			break;
-		case A26_FE:
-			m_maincpu->space(AS_PROGRAM).install_readwrite_handler(0x1000, 0x1fff, read8_delegate(FUNC(vcs_cart_slot_device::read_rom),(vcs_cart_slot_device*)m_cart), write8_delegate(FUNC(vcs_cart_slot_device::write_ram),(vcs_cart_slot_device*)m_cart));
-			m_maincpu->space(AS_PROGRAM).install_read_handler(0x01fe, 0x01ff, read8_delegate(FUNC(vcs_cart_slot_device::read_bank),(vcs_cart_slot_device*)m_cart));
-			m_maincpu->space(AS_PROGRAM).install_write_handler(0x01fe, 0x01fe, write8_delegate(FUNC(vcs_cart_slot_device::write_bank),(vcs_cart_slot_device*)m_cart));
-			break;
-		case A26_3E:
-			m_maincpu->space(AS_PROGRAM).install_readwrite_handler(0x1000, 0x1fff, read8_delegate(FUNC(vcs_cart_slot_device::read_rom),(vcs_cart_slot_device*)m_cart), write8_delegate(FUNC(vcs_cart_slot_device::write_ram),(vcs_cart_slot_device*)m_cart));
-			m_maincpu->space(AS_PROGRAM).install_write_handler(0x00, 0x3f, write8_delegate(FUNC(a2600_state::cart_over_tia_w), this));
-			break;
-		case A26_3F:
-			m_maincpu->space(AS_PROGRAM).install_read_handler(0x1000, 0x1fff, read8_delegate(FUNC(vcs_cart_slot_device::read_rom),(vcs_cart_slot_device*)m_cart));
-			m_maincpu->space(AS_PROGRAM).install_write_handler(0x00, 0x3f, write8_delegate(FUNC(a2600_state::cart_over_tia_w), this));
-			break;
-		case A26_UA:
-			m_maincpu->space(AS_PROGRAM).install_read_handler(0x1000, 0x1fff, read8_delegate(FUNC(vcs_cart_slot_device::read_rom),(vcs_cart_slot_device*)m_cart));
-			m_maincpu->space(AS_PROGRAM).install_readwrite_handler(0x200, 0x27f, read8_delegate(FUNC(vcs_cart_slot_device::read_bank),(vcs_cart_slot_device*)m_cart), write8_delegate(FUNC(vcs_cart_slot_device::write_bank),(vcs_cart_slot_device*)m_cart));
-			break;
-		case A26_JVP:
-			m_maincpu->space(AS_PROGRAM).install_readwrite_handler(0x1000, 0x1fff, read8_delegate(FUNC(vcs_cart_slot_device::read_rom),(vcs_cart_slot_device*)m_cart), write8_delegate(FUNC(vcs_cart_slot_device::write_bank),(vcs_cart_slot_device*)m_cart));
-			// to verify the actual behavior...
-			m_maincpu->space(AS_PROGRAM).install_readwrite_handler(0xfa0, 0xfc0, read8_delegate(FUNC(a2600_state::cart_over_riot_r), this), write8_delegate(FUNC(a2600_state::cart_over_riot_w), this));
-			break;
-		case A26_4IN1:
-		case A26_32IN1:
-			m_maincpu->space(AS_PROGRAM).install_read_handler(0x1000, 0x1fff, read8_delegate(FUNC(vcs_cart_slot_device::read_rom),(vcs_cart_slot_device*)m_cart));
-			break;
-		case A26_SS:
-			m_maincpu->space(AS_PROGRAM).install_read_handler(0x1000, 0x1fff, read8_delegate(FUNC(vcs_cart_slot_device::read_rom),(vcs_cart_slot_device*)m_cart));
-			break;
-		case A26_CM:
-			m_maincpu->space(AS_PROGRAM).install_read_handler(0x1000, 0x1fff, read8_delegate(FUNC(vcs_cart_slot_device::read_rom),(vcs_cart_slot_device*)m_cart));
-			break;
-		case A26_X07:
-			m_maincpu->space(AS_PROGRAM).install_readwrite_handler(0x1000, 0x1fff, read8_delegate(FUNC(vcs_cart_slot_device::read_rom),(vcs_cart_slot_device*)m_cart), write8_delegate(FUNC(vcs_cart_slot_device::write_bank),(vcs_cart_slot_device*)m_cart));
-			m_maincpu->space(AS_PROGRAM).install_readwrite_handler(0x0000, 0x0fff, read8_delegate(FUNC(a2600_state::cart_over_all_r), this), write8_delegate(FUNC(a2600_state::cart_over_all_w), this));
-			break;
-		case A26_HARMONY:
-			m_maincpu->space(AS_PROGRAM).install_readwrite_handler(0x1000, 0x1fff, read8_delegate(FUNC(vcs_cart_slot_device::read_rom),(vcs_cart_slot_device*)m_cart), write8_delegate(FUNC(vcs_cart_slot_device::write_bank),(vcs_cart_slot_device*)m_cart));
-			break;
+	case A26_2K:
+	case A26_4K:
+	case A26_F4:
+	case A26_F8:
+	case A26_F8SW:
+	case A26_FA:
+	case A26_E0:
+	case A26_E7:
+	case A26_CV:
+	case A26_DC:
+	case A26_FV:
+	case A26_8IN1:
+		m_maincpu->space(AS_PROGRAM).install_readwrite_handler(0x1000, 0x1fff, read8_delegate(FUNC(vcs_cart_slot_device::read_rom),(vcs_cart_slot_device*)m_cart), write8_delegate(FUNC(vcs_cart_slot_device::write_bank),(vcs_cart_slot_device*)m_cart));
+		break;
+	case A26_F6:
+	case A26_DPC:
+		m_maincpu->space(AS_PROGRAM).install_readwrite_handler(0x1000, 0x1fff, read8_delegate(FUNC(vcs_cart_slot_device::read_rom),(vcs_cart_slot_device*)m_cart), write8_delegate(FUNC(vcs_cart_slot_device::write_bank),(vcs_cart_slot_device*)m_cart));
+		break;
+	case A26_FE:
+		m_maincpu->space(AS_PROGRAM).install_readwrite_handler(0x1000, 0x1fff, read8_delegate(FUNC(vcs_cart_slot_device::read_rom),(vcs_cart_slot_device*)m_cart), write8_delegate(FUNC(vcs_cart_slot_device::write_ram),(vcs_cart_slot_device*)m_cart));
+		m_maincpu->space(AS_PROGRAM).install_read_handler(0x01fe, 0x01ff, read8_delegate(FUNC(vcs_cart_slot_device::read_bank),(vcs_cart_slot_device*)m_cart));
+		m_maincpu->space(AS_PROGRAM).install_write_handler(0x01fe, 0x01fe, write8_delegate(FUNC(vcs_cart_slot_device::write_bank),(vcs_cart_slot_device*)m_cart));
+		break;
+	case A26_3E:
+		m_maincpu->space(AS_PROGRAM).install_readwrite_handler(0x1000, 0x1fff, read8_delegate(FUNC(vcs_cart_slot_device::read_rom),(vcs_cart_slot_device*)m_cart), write8_delegate(FUNC(vcs_cart_slot_device::write_ram),(vcs_cart_slot_device*)m_cart));
+		m_maincpu->space(AS_PROGRAM).install_write_handler(0x00, 0x3f, write8_delegate(FUNC(a2600_state::cart_over_tia_w), this));
+		break;
+	case A26_3F:
+		m_maincpu->space(AS_PROGRAM).install_read_handler(0x1000, 0x1fff, read8_delegate(FUNC(vcs_cart_slot_device::read_rom),(vcs_cart_slot_device*)m_cart));
+		m_maincpu->space(AS_PROGRAM).install_write_handler(0x00, 0x3f, write8_delegate(FUNC(a2600_state::cart_over_tia_w), this));
+		break;
+	case A26_UA:
+		m_maincpu->space(AS_PROGRAM).install_read_handler(0x1000, 0x1fff, read8_delegate(FUNC(vcs_cart_slot_device::read_rom),(vcs_cart_slot_device*)m_cart));
+		m_maincpu->space(AS_PROGRAM).install_readwrite_handler(0x200, 0x27f, read8_delegate(FUNC(vcs_cart_slot_device::read_bank),(vcs_cart_slot_device*)m_cart), write8_delegate(FUNC(vcs_cart_slot_device::write_bank),(vcs_cart_slot_device*)m_cart));
+		break;
+	case A26_JVP:
+		m_maincpu->space(AS_PROGRAM).install_readwrite_handler(0x1000, 0x1fff, read8_delegate(FUNC(vcs_cart_slot_device::read_rom),(vcs_cart_slot_device*)m_cart), write8_delegate(FUNC(vcs_cart_slot_device::write_bank),(vcs_cart_slot_device*)m_cart));
+		// to verify the actual behavior...
+		m_maincpu->space(AS_PROGRAM).install_readwrite_handler(0xfa0, 0xfc0, read8_delegate(FUNC(a2600_state::cart_over_riot_r), this), write8_delegate(FUNC(a2600_state::cart_over_riot_w), this));
+		break;
+	case A26_4IN1:
+	case A26_32IN1:
+		m_maincpu->space(AS_PROGRAM).install_read_handler(0x1000, 0x1fff, read8_delegate(FUNC(vcs_cart_slot_device::read_rom),(vcs_cart_slot_device*)m_cart));
+		break;
+	case A26_SS:
+		m_maincpu->space(AS_PROGRAM).install_read_handler(0x1000, 0x1fff, read8_delegate(FUNC(vcs_cart_slot_device::read_rom),(vcs_cart_slot_device*)m_cart));
+		break;
+	case A26_CM:
+		m_maincpu->space(AS_PROGRAM).install_read_handler(0x1000, 0x1fff, read8_delegate(FUNC(vcs_cart_slot_device::read_rom),(vcs_cart_slot_device*)m_cart));
+		break;
+	case A26_X07:
+		m_maincpu->space(AS_PROGRAM).install_readwrite_handler(0x1000, 0x1fff, read8_delegate(FUNC(vcs_cart_slot_device::read_rom),(vcs_cart_slot_device*)m_cart), write8_delegate(FUNC(vcs_cart_slot_device::write_bank),(vcs_cart_slot_device*)m_cart));
+		m_maincpu->space(AS_PROGRAM).install_readwrite_handler(0x0000, 0x0fff, read8_delegate(FUNC(a2600_state::cart_over_all_r), this), write8_delegate(FUNC(a2600_state::cart_over_all_w), this));
+		break;
+	case A26_HARMONY:
+		m_maincpu->space(AS_PROGRAM).install_readwrite_handler(0x1000, 0x1fff, read8_delegate(FUNC(vcs_cart_slot_device::read_rom),(vcs_cart_slot_device*)m_cart), write8_delegate(FUNC(vcs_cart_slot_device::write_bank),(vcs_cart_slot_device*)m_cart));
+		break;
 	}
 
-	/* Banks may have changed, reset the cpu so it uses the correct reset vector */
+	// Banks may have changed, reset the cpu so it uses the correct reset vector
 	m_maincpu->reset();
-
-	save_item(NAME(m_current_screen_height));
 }
 
 
@@ -438,18 +366,21 @@ MACHINE_START_MEMBER(a2600_state,a2600)
 // try to detect 2600 controller setup. returns 32bits with left/right controller info
 unsigned a2600_state::long detect_2600controllers()
 {
-#define JOYS 0x001
-#define PADD 0x002
-#define KEYP 0x004
-#define LGUN 0x008
-#define INDY 0x010
-#define BOOS 0x020
-#define KVID 0x040
-#define CMTE 0x080
-#define MLNK 0x100
-#define AMSE 0x200
-#define CX22 0x400
-#define CX80 0x800
+	enum
+	{
+		JOYS = 0x001,
+		PADD = 0x002,
+		KEYP = 0x004,
+		LGUN = 0x008,
+		INDY = 0x010,
+		BOOS = 0x020,
+		KVID = 0x040,
+		CMTE = 0x080,
+		MLNK = 0x100,
+		AMSE = 0x200,
+		CX22 = 0x400,
+		CX80 = 0x800
+	};
 
 	unsigned int left,right;
 	int i,j,foundkeypad = 0;
@@ -562,7 +493,7 @@ static SLOT_INTERFACE_START(a2600_cart)
 	SLOT_INTERFACE_INTERNAL("a26_harmony",   A26_ROM_HARMONY)
 SLOT_INTERFACE_END
 
-static MACHINE_CONFIG_START(a2600_cartslot)
+MACHINE_CONFIG_START(a2600_state::a2600_cartslot)
 	MCFG_VCS_CARTRIDGE_ADD("cartslot", a2600_cart, nullptr)
 
 	/* software lists */
@@ -570,13 +501,11 @@ static MACHINE_CONFIG_START(a2600_cartslot)
 	MCFG_SOFTWARE_LIST_ADD("cass_list","a2600_cass")
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_START( a2600 )
+MACHINE_CONFIG_START(a2600_state::a2600)
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", M6507, MASTER_CLOCK_NTSC / 3)
 	MCFG_M6502_DISABLE_DIRECT()
 	MCFG_CPU_PROGRAM_MAP(a2600_mem)
-
-	MCFG_MACHINE_START_OVERRIDE(a2600_state,a2600)
 
 	/* video hardware */
 	MCFG_DEVICE_ADD("tia_video", TIA_NTSC_VIDEO, 0)
@@ -614,18 +543,16 @@ static MACHINE_CONFIG_START( a2600 )
 	MCFG_VCS_CONTROL_PORT_ADD(CONTROL1_TAG, vcs_control_port_devices, "joy")
 	MCFG_VCS_CONTROL_PORT_ADD(CONTROL2_TAG, vcs_control_port_devices, nullptr)
 
-	MCFG_FRAGMENT_ADD(a2600_cartslot)
+	a2600_cartslot(config);
 	MCFG_SOFTWARE_LIST_FILTER("cart_list", "NTSC")
 MACHINE_CONFIG_END
 
 
-static MACHINE_CONFIG_START( a2600p )
+MACHINE_CONFIG_START(a2600_state::a2600p)
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", M6507, MASTER_CLOCK_PAL / 3)
 	MCFG_CPU_PROGRAM_MAP(a2600_mem)
 	MCFG_M6502_DISABLE_DIRECT()
-
-	MCFG_MACHINE_START_OVERRIDE(a2600_state,a2600)
 
 	/* video hardware */
 	MCFG_DEVICE_ADD("tia_video", TIA_PAL_VIDEO, 0)
@@ -664,7 +591,7 @@ static MACHINE_CONFIG_START( a2600p )
 	MCFG_VCS_CONTROL_PORT_ADD(CONTROL1_TAG, vcs_control_port_devices, "joy")
 	MCFG_VCS_CONTROL_PORT_ADD(CONTROL2_TAG, vcs_control_port_devices, nullptr)
 
-	MCFG_FRAGMENT_ADD(a2600_cartslot)
+	a2600_cartslot(config);
 	MCFG_SOFTWARE_LIST_FILTER("cart_list", "PAL")
 MACHINE_CONFIG_END
 

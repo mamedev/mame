@@ -184,6 +184,13 @@ public:
 	DECLARE_WRITE_LINE_MEMBER(ay3600_data_ready_w);
 	DECLARE_WRITE_LINE_MEMBER(ay3600_ako_w);
 
+	void apple2_common(machine_config &config);
+	void apple2jp(machine_config &config);
+	void apple2(machine_config &config);
+	void space84(machine_config &config);
+	void apple2p(machine_config &config);
+	void apple2_map(address_map &map);
+	void inhbank_map(address_map &map);
 private:
 	int m_speaker_state;
 	int m_cassette_state;
@@ -557,7 +564,7 @@ READ8_MEMBER(napple2_state::keyb_strobe_r)
 {
 	// reads any key down, clears strobe
 	uint8_t rv = m_transchar | (m_anykeydown ? 0x80 : 0x00);
-	if (!machine().side_effect_disabled())
+	if (!machine().side_effects_disabled())
 		m_strobe = 0;
 	return rv;
 }
@@ -570,7 +577,7 @@ WRITE8_MEMBER(napple2_state::keyb_strobe_w)
 
 READ8_MEMBER(napple2_state::cassette_toggle_r)
 {
-	if (!machine().side_effect_disabled())
+	if (!machine().side_effects_disabled())
 		cassette_toggle_w(space, offset, 0);
 	return read_floatingbus();
 }
@@ -583,7 +590,7 @@ WRITE8_MEMBER(napple2_state::cassette_toggle_w)
 
 READ8_MEMBER(napple2_state::speaker_toggle_r)
 {
-	if (!machine().side_effect_disabled())
+	if (!machine().side_effects_disabled())
 		speaker_toggle_w(space, offset, 0);
 	return read_floatingbus();
 }
@@ -596,7 +603,7 @@ WRITE8_MEMBER(napple2_state::speaker_toggle_w)
 
 READ8_MEMBER(napple2_state::utility_strobe_r)
 {
-	if (!machine().side_effect_disabled())
+	if (!machine().side_effects_disabled())
 		utility_strobe_w(space, offset, 0);
 	return read_floatingbus();
 }
@@ -608,7 +615,7 @@ WRITE8_MEMBER(napple2_state::utility_strobe_w)
 
 READ8_MEMBER(napple2_state::switches_r)
 {
-	if (!machine().side_effect_disabled())
+	if (!machine().side_effects_disabled())
 		m_softlatch->write_bit((offset & 0x0e) >> 1, offset & 0x01);
 	return read_floatingbus();
 }
@@ -636,16 +643,16 @@ READ8_MEMBER(napple2_state::flags_r)
 		return (m_joybuttons->read() & 0x40) ? 0x80 : 0;
 
 	case 4:  // joy 1 X axis
-		return (space.machine().time().as_double() < m_joystick_x1_time) ? 0x80 : 0;
+		return (machine().time().as_double() < m_joystick_x1_time) ? 0x80 : 0;
 
 	case 5:  // joy 1 Y axis
-		return (space.machine().time().as_double() < m_joystick_y1_time) ? 0x80 : 0;
+		return (machine().time().as_double() < m_joystick_y1_time) ? 0x80 : 0;
 
 	case 6: // joy 2 X axis
-		return (space.machine().time().as_double() < m_joystick_x2_time) ? 0x80 : 0;
+		return (machine().time().as_double() < m_joystick_x2_time) ? 0x80 : 0;
 
 	case 7: // joy 2 Y axis
-		return (space.machine().time().as_double() < m_joystick_y2_time) ? 0x80 : 0;
+		return (machine().time().as_double() < m_joystick_y2_time) ? 0x80 : 0;
 	}
 
 	// this is never reached
@@ -654,7 +661,7 @@ READ8_MEMBER(napple2_state::flags_r)
 
 READ8_MEMBER(napple2_state::controller_strobe_r)
 {
-	if (!machine().side_effect_disabled())
+	if (!machine().side_effects_disabled())
 		controller_strobe_w(space, offset, 0);
 	return read_floatingbus();
 }
@@ -669,7 +676,7 @@ WRITE8_MEMBER(napple2_state::controller_strobe_w)
 
 READ8_MEMBER(napple2_state::c080_r)
 {
-	if(!machine().side_effect_disabled())
+	if(!machine().side_effects_disabled())
 	{
 		int slot;
 
@@ -678,7 +685,7 @@ READ8_MEMBER(napple2_state::c080_r)
 
 		if (m_slotdevice[slot] != nullptr)
 		{
-			return m_slotdevice[slot]->read_c0nx(space, offset % 0x10);
+			return m_slotdevice[slot]->read_c0nx(offset % 0x10);
 		}
 	}
 
@@ -694,7 +701,7 @@ WRITE8_MEMBER(napple2_state::c080_w)
 
 	if (m_slotdevice[slot] != nullptr)
 	{
-		m_slotdevice[slot]->write_c0nx(space, offset % 0x10, data);
+		m_slotdevice[slot]->write_c0nx(offset % 0x10, data);
 	}
 }
 
@@ -706,12 +713,12 @@ READ8_MEMBER(napple2_state::c100_r)
 
 	if (m_slotdevice[slotnum] != nullptr)
 	{
-		if ((m_slotdevice[slotnum]->take_c800()) && (!machine().side_effect_disabled()))
+		if ((m_slotdevice[slotnum]->take_c800()) && (!machine().side_effects_disabled()))
 		{
 			m_cnxx_slot = slotnum;
 		}
 
-		return m_slotdevice[slotnum]->read_cnxx(space, offset&0xff);
+		return m_slotdevice[slotnum]->read_cnxx(offset&0xff);
 	}
 
 	return read_floatingbus();
@@ -725,12 +732,12 @@ WRITE8_MEMBER(napple2_state::c100_w)
 
 	if (m_slotdevice[slotnum] != nullptr)
 	{
-		if ((m_slotdevice[slotnum]->take_c800()) && (!machine().side_effect_disabled()))
+		if ((m_slotdevice[slotnum]->take_c800()) && (!machine().side_effects_disabled()))
 		{
 			m_cnxx_slot = slotnum;
 		}
 
-		m_slotdevice[slotnum]->write_cnxx(space, offset&0xff, data);
+		m_slotdevice[slotnum]->write_cnxx(offset&0xff, data);
 	}
 }
 
@@ -738,7 +745,7 @@ READ8_MEMBER(napple2_state::c800_r)
 {
 	if (offset == 0x7ff)
 	{
-		if (!machine().side_effect_disabled())
+		if (!machine().side_effects_disabled())
 		{
 			m_cnxx_slot = -1;
 		}
@@ -748,7 +755,7 @@ READ8_MEMBER(napple2_state::c800_r)
 
 	if ((m_cnxx_slot != -1) && (m_slotdevice[m_cnxx_slot] != nullptr))
 	{
-		return m_slotdevice[m_cnxx_slot]->read_c800(space, offset&0xfff);
+		return m_slotdevice[m_cnxx_slot]->read_c800(offset&0xfff);
 	}
 
 	return read_floatingbus();
@@ -758,7 +765,7 @@ WRITE8_MEMBER(napple2_state::c800_w)
 {
 	if (offset == 0x7ff)
 	{
-		if (!machine().side_effect_disabled())
+		if (!machine().side_effects_disabled())
 		{
 			m_cnxx_slot = -1;
 		}
@@ -768,7 +775,7 @@ WRITE8_MEMBER(napple2_state::c800_w)
 
 	if ((m_cnxx_slot != -1) && (m_slotdevice[m_cnxx_slot] != nullptr))
 	{
-		m_slotdevice[m_cnxx_slot]->write_c800(space, offset&0xfff, data);
+		m_slotdevice[m_cnxx_slot]->write_c800(offset&0xfff, data);
 	}
 }
 
@@ -776,7 +783,7 @@ READ8_MEMBER(napple2_state::inh_r)
 {
 	if (m_inh_slot != -1)
 	{
-		return m_slotdevice[m_inh_slot]->read_inh_rom(space, offset + 0xd000);
+		return m_slotdevice[m_inh_slot]->read_inh_rom(offset + 0xd000);
 	}
 
 	assert(0);  // hitting inh_r with invalid m_inh_slot should not be possible
@@ -787,7 +794,7 @@ WRITE8_MEMBER(napple2_state::inh_w)
 {
 	if (m_inh_slot != -1)
 	{
-		m_slotdevice[m_inh_slot]->write_inh_rom(space, offset + 0xd000, data);
+		m_slotdevice[m_inh_slot]->write_inh_rom(offset + 0xd000, data);
 	}
 }
 
@@ -943,7 +950,7 @@ WRITE8_MEMBER(napple2_state::ram_w)
 	}
 }
 
-static ADDRESS_MAP_START( apple2_map, AS_PROGRAM, 8, napple2_state )
+ADDRESS_MAP_START(napple2_state::apple2_map)
 	AM_RANGE(0x0000, 0xbfff) AM_READWRITE(ram_r, ram_w)
 	AM_RANGE(0xc000, 0xc000) AM_MIRROR(0xf) AM_READ(keyb_data_r) AM_WRITENOP
 	AM_RANGE(0xc010, 0xc010) AM_MIRROR(0xf) AM_READWRITE(keyb_strobe_r, keyb_strobe_w)
@@ -959,7 +966,7 @@ static ADDRESS_MAP_START( apple2_map, AS_PROGRAM, 8, napple2_state )
 	AM_RANGE(0xd000, 0xffff) AM_DEVICE(A2_UPPERBANK_TAG, address_map_bank_device, amap8)
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( inhbank_map, AS_PROGRAM, 8, napple2_state )
+ADDRESS_MAP_START(napple2_state::inhbank_map)
 	AM_RANGE(0x0000, 0x2fff) AM_ROM AM_REGION("maincpu", 0x1000) AM_WRITE(inh_w)
 	AM_RANGE(0x3000, 0x5fff) AM_READWRITE(inh_r, inh_w)
 ADDRESS_MAP_END
@@ -1353,14 +1360,14 @@ static SLOT_INTERFACE_START(apple2_cards)
 //  SLOT_INTERFACE("magicmusician", A2BUS_MAGICMUSICIAN)    /* Magic Musician Card */
 SLOT_INTERFACE_END
 
-static MACHINE_CONFIG_START( apple2_common )
+MACHINE_CONFIG_START(napple2_state::apple2_common)
 	/* basic machine hardware */
 	MCFG_CPU_ADD(A2_CPU_TAG, M6502, 1021800)     /* close to actual CPU frequency of 1.020484 MHz */
 	MCFG_CPU_PROGRAM_MAP(apple2_map)
 	MCFG_TIMER_DRIVER_ADD_SCANLINE("scantimer", napple2_state, apple2_interrupt, "screen", 0, 1)
 	MCFG_QUANTUM_TIME(attotime::from_hz(60))
 
-	MCFG_DEVICE_ADD(A2_VIDEO_TAG, APPLE2_VIDEO, XTAL_14_31818MHz)
+	MCFG_DEVICE_ADD(A2_VIDEO_TAG, APPLE2_VIDEO, XTAL(14'318'181))
 
 	MCFG_SCREEN_ADD("screen", RASTER)
 	MCFG_SCREEN_RAW_PARAMS(1021800*14, (65*7)*2, 0, (40*7)*2, 262, 0, 192)
@@ -1435,7 +1442,8 @@ static MACHINE_CONFIG_START( apple2_common )
 	MCFG_CASSETTE_INTERFACE("apple2_cass")
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_DERIVED( apple2, apple2_common )
+MACHINE_CONFIG_START(napple2_state::apple2)
+	apple2_common(config);
 	/* internal ram */
 	MCFG_RAM_ADD(RAM_TAG)
 	MCFG_RAM_DEFAULT_SIZE("48K")
@@ -1443,7 +1451,8 @@ static MACHINE_CONFIG_DERIVED( apple2, apple2_common )
 	MCFG_RAM_DEFAULT_VALUE(0x00)
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_DERIVED( apple2p, apple2_common )
+MACHINE_CONFIG_START(napple2_state::apple2p)
+	apple2_common(config);
 	/* internal ram */
 	MCFG_RAM_ADD(RAM_TAG)
 	MCFG_RAM_DEFAULT_SIZE("48K")
@@ -1451,16 +1460,19 @@ static MACHINE_CONFIG_DERIVED( apple2p, apple2_common )
 	MCFG_RAM_DEFAULT_VALUE(0x00)
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_DERIVED( space84, apple2p )
+MACHINE_CONFIG_START(napple2_state::space84)
+	apple2p(config);
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_DERIVED( apple2jp, apple2p )
+MACHINE_CONFIG_START(napple2_state::apple2jp)
+	apple2p(config);
 	MCFG_SCREEN_MODIFY("screen")
 	MCFG_SCREEN_UPDATE_DRIVER(napple2_state, screen_update_jp)
 MACHINE_CONFIG_END
 
 #if 0
-static MACHINE_CONFIG_DERIVED( laba2p, apple2p )
+static MACHINE_CONFIG_START( laba2p )
+	apple2p(config);
 	MCFG_MACHINE_START_OVERRIDE(napple2_state,laba2p)
 
 	MCFG_A2BUS_SLOT_REMOVE("sl0")

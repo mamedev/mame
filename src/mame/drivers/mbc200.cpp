@@ -82,6 +82,11 @@ public:
 	MC6845_UPDATE_ROW(update_row);
 	required_device<palette_device> m_palette;
 
+	void mbc200(machine_config &config);
+	void mbc200_io(address_map &map);
+	void mbc200_mem(address_map &map);
+	void mbc200_sub_io(address_map &map);
+	void mbc200_sub_mem(address_map &map);
 private:
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
@@ -99,7 +104,7 @@ private:
 };
 
 
-static ADDRESS_MAP_START(mbc200_mem, AS_PROGRAM, 8, mbc200_state)
+ADDRESS_MAP_START(mbc200_state::mbc200_mem)
 	ADDRESS_MAP_UNMAP_HIGH
 	AM_RANGE( 0x0000, 0x0fff ) AM_RAM AM_REGION("maincpu", 0)
 	AM_RANGE( 0x1000, 0xffff ) AM_RAM
@@ -138,7 +143,7 @@ WRITE8_MEMBER( mbc200_state::pm_portb_w )
 	m_beep->set_state(BIT(data, 1)); // key-click
 }
 
-static ADDRESS_MAP_START( mbc200_io , AS_IO, 8, mbc200_state)
+ADDRESS_MAP_START(mbc200_state::mbc200_io)
 	ADDRESS_MAP_UNMAP_HIGH
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	//AM_RANGE(0xe0, 0xe0) AM_DEVREADWRITE("uart1", i8251_device, data_r, data_w)
@@ -152,7 +157,7 @@ ADDRESS_MAP_END
 
 
 
-static ADDRESS_MAP_START(mbc200_sub_mem, AS_PROGRAM, 8, mbc200_state)
+ADDRESS_MAP_START(mbc200_state::mbc200_sub_mem)
 	ADDRESS_MAP_UNMAP_HIGH
 	AM_RANGE( 0x0000, 0x2fff ) AM_ROM
 	AM_RANGE( 0x3000, 0x7fff ) AM_RAM
@@ -168,7 +173,7 @@ READ8_MEMBER(mbc200_state::p2_porta_r)
 	return tmp;
 }
 
-static ADDRESS_MAP_START( mbc200_sub_io , AS_IO, 8, mbc200_state)
+ADDRESS_MAP_START(mbc200_state::mbc200_sub_io)
 	ADDRESS_MAP_UNMAP_HIGH
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	AM_RANGE(0x70, 0x73) AM_DEVREADWRITE("ppi_1", i8255_device, read, write)
@@ -290,13 +295,13 @@ static GFXDECODE_START( mbc200 )
 GFXDECODE_END
 
 
-static MACHINE_CONFIG_START( mbc200 )
+MACHINE_CONFIG_START(mbc200_state::mbc200)
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu",Z80, XTAL_8MHz/2) // NEC D780C-1
+	MCFG_CPU_ADD("maincpu",Z80, XTAL(8'000'000)/2) // NEC D780C-1
 	MCFG_CPU_PROGRAM_MAP(mbc200_mem)
 	MCFG_CPU_IO_MAP(mbc200_io)
 
-	MCFG_CPU_ADD("subcpu",Z80, XTAL_8MHz/2) // NEC D780C-1
+	MCFG_CPU_ADD("subcpu",Z80, XTAL(8'000'000)/2) // NEC D780C-1
 	MCFG_CPU_PROGRAM_MAP(mbc200_sub_mem)
 	MCFG_CPU_IO_MAP(mbc200_sub_io)
 
@@ -310,7 +315,7 @@ static MACHINE_CONFIG_START( mbc200 )
 	MCFG_GFXDECODE_ADD("gfxdecode", "palette", mbc200)
 	MCFG_PALETTE_ADD_MONOCHROME("palette")
 
-	MCFG_MC6845_ADD("crtc", H46505, "screen", XTAL_8MHz / 4) // HD46505SP
+	MCFG_MC6845_ADD("crtc", H46505, "screen", XTAL(8'000'000) / 4) // HD46505SP
 	MCFG_MC6845_SHOW_BORDER_AREA(false)
 	MCFG_MC6845_CHAR_WIDTH(8)
 	MCFG_MC6845_UPDATE_ROW_CB(mbc200_state, update_row)
@@ -336,7 +341,7 @@ static MACHINE_CONFIG_START( mbc200 )
 
 	MCFG_DEVICE_ADD("uart2", I8251, 0) // INS8251A
 
-	MCFG_MB8876_ADD("fdc", XTAL_8MHz / 8) // guess
+	MCFG_MB8876_ADD("fdc", XTAL(8'000'000) / 8) // guess
 	MCFG_FLOPPY_DRIVE_ADD("fdc:0", mbc200_floppies, "qd", floppy_image_device::default_floppy_formats)
 	MCFG_FLOPPY_DRIVE_SOUND(true)
 	MCFG_FLOPPY_DRIVE_ADD("fdc:1", mbc200_floppies, "qd", floppy_image_device::default_floppy_formats)

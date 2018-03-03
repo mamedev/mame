@@ -88,6 +88,9 @@ public:
 	DECLARE_READ8_MEMBER(kbd_get);
 	void kbd_put(u8 data);
 
+	void ms6102(machine_config &config);
+	void ms6102_io(address_map &map);
+	void ms6102_mem(address_map &map);
 private:
 	bool m_kbd_ready;
 	uint8_t m_kbd_data;
@@ -106,14 +109,14 @@ private:
 	required_region_ptr<u8> m_p_chargen;
 };
 
-static ADDRESS_MAP_START(ms6102_mem, AS_PROGRAM, 8, ms6102_state)
+ADDRESS_MAP_START(ms6102_state::ms6102_mem)
 	ADDRESS_MAP_UNMAP_HIGH
 	AM_RANGE (0x0000, 0x2fff) AM_ROM
 	AM_RANGE (0x3800, 0x3bff) AM_RAM AM_SHARE("nvram")
 	AM_RANGE (0xc000, 0xffff) AM_RAM AM_SHARE("videoram")
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START(ms6102_io, AS_IO, 8, ms6102_state)
+ADDRESS_MAP_START(ms6102_state::ms6102_io)
 	ADDRESS_MAP_UNMAP_HIGH
 	AM_RANGE (0x00, 0x00) AM_DEVREADWRITE("i8251", i8251_device, data_r, data_w)
 	AM_RANGE (0x01, 0x01) AM_DEVREADWRITE("i8251", i8251_device, status_r, control_w)
@@ -247,8 +250,8 @@ DRIVER_INIT_MEMBER( ms6102_state, ms6102 )
 }
 
 
-static MACHINE_CONFIG_START( ms6102 )
-	MCFG_CPU_ADD("maincpu", I8080, XTAL_18_432MHz / 9)
+MACHINE_CONFIG_START(ms6102_state::ms6102)
+	MCFG_CPU_ADD("maincpu", I8080, XTAL(18'432'000) / 9)
 	MCFG_CPU_PROGRAM_MAP(ms6102_mem)
 	MCFG_CPU_IO_MAP(ms6102_io)
 	MCFG_I8085A_INTE(DEVWRITELINE("i8214", i8214_device, inte_w))
@@ -256,7 +259,7 @@ static MACHINE_CONFIG_START( ms6102 )
 
 	MCFG_NVRAM_ADD_0FILL("nvram")
 
-	MCFG_DEVICE_ADD("i8214", I8214, XTAL_18_432MHz / 9)
+	MCFG_DEVICE_ADD("i8214", I8214, XTAL(18'432'000) / 9)
 	MCFG_I8214_INT_CALLBACK(INPUTLINE("maincpu", I8085_INTR_LINE))
 
 	/* video hardware */
@@ -268,12 +271,12 @@ static MACHINE_CONFIG_START( ms6102 )
 	MCFG_GFXDECODE_ADD("gfxdecode", "palette", ms6102)
 	MCFG_PALETTE_ADD_MONOCHROME_HIGHLIGHT("palette")
 
-	MCFG_DEVICE_ADD("dma8257", I8257, XTAL_18_432MHz / 9)
+	MCFG_DEVICE_ADD("dma8257", I8257, XTAL(18'432'000) / 9)
 	MCFG_I8257_OUT_HRQ_CB(WRITELINE(ms6102_state, hrq_w))
 	MCFG_I8257_IN_MEMR_CB(READ8(ms6102_state, memory_read_byte))
 	MCFG_I8257_OUT_IOW_2_CB(DEVWRITE8("i8275", i8275_device, dack_w))
 
-	MCFG_DEVICE_ADD("i8275", I8275, XTAL_16_4MHz / 8) // XXX
+	MCFG_DEVICE_ADD("i8275", I8275, XTAL(16'400'000) / 8) // XXX
 	MCFG_I8275_CHARACTER_WIDTH(8)
 	MCFG_I8275_DRAW_CHARACTER_CALLBACK_OWNER(ms6102_state, display_pixels)
 	MCFG_I8275_DRQ_CALLBACK(DEVWRITELINE("dma8257", i8257_device, dreq2_w))
@@ -294,9 +297,9 @@ static MACHINE_CONFIG_START( ms6102 )
 	MCFG_RS232_RXD_HANDLER(DEVWRITELINE("i8251", i8251_device, write_rxd))
 
 	MCFG_DEVICE_ADD("pit8253", PIT8253, 0)
-	MCFG_PIT8253_CLK0(XTAL_16_4MHz / 9)
+	MCFG_PIT8253_CLK0(XTAL(16'400'000) / 9)
 	MCFG_PIT8253_OUT0_HANDLER(DEVWRITELINE("i8251", i8251_device, write_txc))
-	MCFG_PIT8253_CLK1(XTAL_16_4MHz / 9)
+	MCFG_PIT8253_CLK1(XTAL(16'400'000) / 9)
 	MCFG_PIT8253_OUT1_HANDLER(DEVWRITELINE("i8251", i8251_device, write_rxc))
 MACHINE_CONFIG_END
 

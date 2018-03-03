@@ -24,7 +24,7 @@ DEFINE_DEVICE_TYPE(BBC_TUBE_80286, bbc_tube_80286_device, "bbc_tube_80286", "Aco
 //  ADDRESS_MAP( tube_80286_mem )
 //-------------------------------------------------
 
-static ADDRESS_MAP_START(tube_80286_mem, AS_PROGRAM, 16, bbc_tube_80286_device)
+ADDRESS_MAP_START(bbc_tube_80286_device::tube_80286_mem)
 	ADDRESS_MAP_GLOBAL_MASK(0xfffff)
 	AM_RANGE(0x00000, 0xbffff) AM_RAM AM_SHARE("ram")
 	AM_RANGE(0xc0000, 0xc3fff) AM_ROM AM_REGION("bootstrap", 0) AM_MIRROR(0x3c000)
@@ -34,7 +34,7 @@ ADDRESS_MAP_END
 //  ADDRESS_MAP( tube_80286_io )
 //-------------------------------------------------
 
-static ADDRESS_MAP_START(tube_80286_io, AS_IO, 16, bbc_tube_80286_device)
+ADDRESS_MAP_START(bbc_tube_80286_device::tube_80286_io)
 	ADDRESS_MAP_UNMAP_HIGH
 	AM_RANGE(0x50, 0x51) AM_READ8(disable_boot_rom, 0x00ff)
 	AM_RANGE(0x60, 0x61) AM_WRITE8(irq_latch_w, 0x00ff)
@@ -55,8 +55,8 @@ ROM_END
 //  device_add_mconfig - add device configuration
 //-------------------------------------------------
 
-MACHINE_CONFIG_MEMBER(bbc_tube_80286_device::device_add_mconfig)
-	MCFG_CPU_ADD("i80286", I80286, XTAL_12MHz / 2)
+MACHINE_CONFIG_START(bbc_tube_80286_device::device_add_mconfig)
+	MCFG_CPU_ADD("i80286", I80286, XTAL(12'000'000) / 2)
 	MCFG_CPU_PROGRAM_MAP(tube_80286_mem)
 	MCFG_CPU_IO_MAP(tube_80286_io)
 	MCFG_CPU_IRQ_ACKNOWLEDGE_DEVICE(DEVICE_SELF, bbc_tube_80286_device, irq_callback)

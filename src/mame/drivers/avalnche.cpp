@@ -39,7 +39,7 @@
 
 #include "avalnche.lh"
 
-#define MASTER_CLOCK XTAL_12_096MHz
+#define MASTER_CLOCK XTAL(12'096'000)
 
 
 /*************************************
@@ -112,7 +112,7 @@ WRITE_LINE_MEMBER(avalnche_state::start_lamp_w)
 	output().set_led_value(2, state);
 }
 
-static ADDRESS_MAP_START( main_map, AS_PROGRAM, 8, avalnche_state )
+ADDRESS_MAP_START(avalnche_state::main_map)
 	ADDRESS_MAP_GLOBAL_MASK(0x7fff)
 	AM_RANGE(0x0000, 0x1fff) AM_RAM AM_SHARE("videoram")
 	AM_RANGE(0x2000, 0x2000) AM_MIRROR(0x0ffc) AM_READ_PORT("IN0")
@@ -125,7 +125,7 @@ static ADDRESS_MAP_START( main_map, AS_PROGRAM, 8, avalnche_state )
 	AM_RANGE(0x6000, 0x7fff) AM_ROM
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( catch_map, AS_PROGRAM, 8, avalnche_state )
+ADDRESS_MAP_START(avalnche_state::catch_map)
 	ADDRESS_MAP_GLOBAL_MASK(0x7fff)
 	AM_RANGE(0x0000, 0x1fff) AM_RAM AM_SHARE("videoram")
 	AM_RANGE(0x2000, 0x2000) AM_MIRROR(0x0ffc) AM_READ_PORT("IN0")
@@ -230,7 +230,7 @@ void avalnche_state::machine_start()
 	save_item(NAME(m_avalance_video_inverted));
 }
 
-static MACHINE_CONFIG_START( avalnche_base )
+MACHINE_CONFIG_START(avalnche_state::avalnche_base)
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", M6502,MASTER_CLOCK/16)     /* clock input is the "2H" signal divided by two */
@@ -255,19 +255,21 @@ static MACHINE_CONFIG_START( avalnche_base )
 	MCFG_SCREEN_UPDATE_DRIVER(avalnche_state, screen_update_avalnche)
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_DERIVED( avalnche, avalnche_base)
+MACHINE_CONFIG_START(avalnche_state::avalnche)
+	avalnche_base(config);
 	/* sound hardware */
-	MCFG_FRAGMENT_ADD(avalnche_sound)
+	avalnche_sound(config);
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_DERIVED( catch, avalnche_base )
+MACHINE_CONFIG_START(avalnche_state::acatch)
+	avalnche_base(config);
 
 	/* basic machine hardware */
 	MCFG_CPU_MODIFY("maincpu")
 	MCFG_CPU_PROGRAM_MAP(catch_map)
 
 	/* sound hardware... */
-	MCFG_FRAGMENT_ADD(catch_sound)
+	acatch_sound(config);
 MACHINE_CONFIG_END
 
 
@@ -317,4 +319,4 @@ ROM_END
 
 GAMEL( 1978, avalnche, 0,        avalnche, avalnche, avalnche_state, 0, ROT0, "Atari",            "Avalanche", MACHINE_SUPPORTS_SAVE, layout_avalnche )
 GAMEL( 1978, cascade,  avalnche, avalnche, cascade,  avalnche_state, 0, ROT0, "bootleg? (Sidam)", "Cascade", MACHINE_SUPPORTS_SAVE, layout_avalnche )
-GAME ( 1977, catchp,   0,        catch,    catch,    avalnche_state, 0, ROT0, "Atari",            "Catch (prototype)", MACHINE_SUPPORTS_SAVE | MACHINE_NO_SOUND ) // pre-production board, evolved into Avalanche
+GAME ( 1977, catchp,   0,        acatch,   catch,    avalnche_state, 0, ROT0, "Atari",            "Catch (prototype)", MACHINE_SUPPORTS_SAVE | MACHINE_NO_SOUND ) // pre-production board, evolved into Avalanche

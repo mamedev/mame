@@ -89,7 +89,7 @@ TIMER_DEVICE_CALLBACK_MEMBER(pingpong_state::merlinmm_interrupt)
 	}
 }
 
-static ADDRESS_MAP_START( pingpong_map, AS_PROGRAM, 8, pingpong_state )
+ADDRESS_MAP_START(pingpong_state::pingpong_map)
 	AM_RANGE(0x0000, 0x7fff) AM_ROM
 	AM_RANGE(0x8000, 0x83ff) AM_RAM_WRITE(pingpong_colorram_w) AM_SHARE("colorram")
 	AM_RANGE(0x8400, 0x87ff) AM_RAM_WRITE(pingpong_videoram_w) AM_SHARE("videoram")
@@ -106,7 +106,7 @@ static ADDRESS_MAP_START( pingpong_map, AS_PROGRAM, 8, pingpong_state )
 	AM_RANGE(0xa600, 0xa600) AM_DEVWRITE("watchdog", watchdog_timer_device, reset_w)
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( merlinmm_map, AS_PROGRAM, 8, pingpong_state )
+ADDRESS_MAP_START(pingpong_state::merlinmm_map)
 	AM_RANGE(0x0000, 0x3fff) AM_ROM
 	AM_RANGE(0x5000, 0x53ff) AM_RAM AM_SHARE("nvram")
 	AM_RANGE(0x5400, 0x57ff) AM_RAM
@@ -446,7 +446,7 @@ static GFXDECODE_START( pingpong )
 GFXDECODE_END
 
 
-static MACHINE_CONFIG_START( pingpong )
+MACHINE_CONFIG_START(pingpong_state::pingpong)
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu",Z80,18432000/6)      /* 3.072 MHz (probably) */
@@ -476,7 +476,8 @@ static MACHINE_CONFIG_START( pingpong )
 MACHINE_CONFIG_END
 
 /* too fast! */
-static MACHINE_CONFIG_DERIVED( merlinmm, pingpong )
+MACHINE_CONFIG_START(pingpong_state::merlinmm)
+	pingpong(config);
 	MCFG_CPU_MODIFY("maincpu")
 	MCFG_CPU_PROGRAM_MAP(merlinmm_map)
 	MCFG_TIMER_MODIFY("scantimer")
@@ -568,7 +569,7 @@ DRIVER_INIT_MEMBER(pingpong_state,merlinmm)
 
 	/* decrypt program code */
 	for( i = 0; i < 0x4000; i++ )
-		ROM[i] = BITSWAP8(ROM[i],0,1,2,3,4,5,6,7);
+		ROM[i] = bitswap<8>(ROM[i],0,1,2,3,4,5,6,7);
 }
 
 DRIVER_INIT_MEMBER(pingpong_state,cashquiz)
@@ -579,12 +580,12 @@ DRIVER_INIT_MEMBER(pingpong_state,cashquiz)
 	/* decrypt program code */
 	ROM = memregion("maincpu")->base();
 	for( i = 0; i < 0x4000; i++ )
-		ROM[i] = BITSWAP8(ROM[i],0,1,2,3,4,5,6,7);
+		ROM[i] = bitswap<8>(ROM[i],0,1,2,3,4,5,6,7);
 
 	/* decrypt questions */
 	ROM = memregion("user1")->base();
 	for( i = 0; i < 0x40000; i++ )
-		ROM[i] = BITSWAP8(ROM[i],0,1,2,3,4,5,6,7);
+		ROM[i] = bitswap<8>(ROM[i],0,1,2,3,4,5,6,7);
 
 	/* questions banking handlers */
 	m_maincpu->space(AS_PROGRAM).install_write_handler(0x4000, 0x4000, write8_delegate(FUNC(pingpong_state::cashquiz_question_bank_high_w),this));

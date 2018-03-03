@@ -259,7 +259,7 @@ WRITE8_MEMBER(svision_state::tvlink_w)
 	}
 }
 
-static ADDRESS_MAP_START( svision_mem , AS_PROGRAM, 8, svision_state )
+ADDRESS_MAP_START(svision_state::svision_mem)
 	AM_RANGE(0x0000, 0x1fff) AM_RAM
 	AM_RANGE(0x2000, 0x3fff) AM_READWRITE(svision_r, svision_w) AM_SHARE("reg")
 	AM_RANGE(0x4000, 0x5fff) AM_RAM AM_SHARE("videoram")
@@ -268,7 +268,7 @@ static ADDRESS_MAP_START( svision_mem , AS_PROGRAM, 8, svision_state )
 	AM_RANGE(0xc000, 0xffff) AM_ROMBANK("bank2")
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( tvlink_mem , AS_PROGRAM, 8, svision_state )
+ADDRESS_MAP_START(svision_state::tvlink_mem)
 	AM_RANGE(0x0000, 0x1fff) AM_RAM
 	AM_RANGE(0x2000, 0x3fff) AM_READWRITE(tvlink_r, tvlink_w) AM_SHARE("reg")
 	AM_RANGE(0x4000, 0x5fff) AM_RAM AM_SHARE("videoram")
@@ -512,7 +512,7 @@ MACHINE_RESET_MEMBER(svision_state,tvlink)
 	m_tvlink.palette[3] = MAKE24_RGB32(svisionp_palette[(PALETTE_START+3)*3+0], svisionp_palette[(PALETTE_START+3)*3+1], svisionp_palette[(PALETTE_START+3)*3+2]);
 }
 
-static MACHINE_CONFIG_START( svision )
+MACHINE_CONFIG_START(svision_state::svision)
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", M65C02, 4000000)        /* ? stz used! speed? */
 	MCFG_CPU_PROGRAM_MAP(svision_mem)
@@ -548,11 +548,13 @@ static MACHINE_CONFIG_START( svision )
 	MCFG_SOFTWARE_LIST_ADD("cart_list", "svision")
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_DERIVED( svisions, svision )
+MACHINE_CONFIG_START(svision_state::svisions)
+	svision(config);
 	MCFG_TIMER_DRIVER_ADD_PERIODIC("pet_timer", svision_state, svision_pet_timer_dev, attotime::from_seconds(8))
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_DERIVED( svisionp, svision )
+MACHINE_CONFIG_START(svision_state::svisionp)
+	svision(config);
 	MCFG_CPU_MODIFY("maincpu")
 	MCFG_CPU_CLOCK(4430000)
 	MCFG_SCREEN_MODIFY("screen")
@@ -561,7 +563,8 @@ static MACHINE_CONFIG_DERIVED( svisionp, svision )
 	MCFG_PALETTE_INIT_OWNER(svision_state, svisionp)
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_DERIVED( svisionn, svision )
+MACHINE_CONFIG_START(svision_state::svisionn)
+	svision(config);
 	MCFG_CPU_MODIFY("maincpu")
 	MCFG_CPU_CLOCK(3560000/*?*/)
 	MCFG_SCREEN_MODIFY("screen")
@@ -570,7 +573,8 @@ static MACHINE_CONFIG_DERIVED( svisionn, svision )
 	MCFG_PALETTE_INIT_OWNER(svision_state, svisionn)
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_DERIVED( tvlinkp, svisionp )
+MACHINE_CONFIG_START(svision_state::tvlinkp)
+	svisionp(config);
 	MCFG_CPU_MODIFY("maincpu")
 	MCFG_CPU_PROGRAM_MAP(tvlink_mem)
 

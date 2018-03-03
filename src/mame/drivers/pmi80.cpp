@@ -49,6 +49,9 @@ public:
 	DECLARE_READ8_MEMBER(keyboard_r);
 	DECLARE_WRITE8_MEMBER(keyboard_w);
 	DECLARE_WRITE8_MEMBER(leds_w);
+	void pmi80(machine_config &config);
+	void pmi80_io(address_map &map);
+	void pmi80_mem(address_map &map);
 private:
 	uint8_t m_keyrow;
 	bool m_ledready;
@@ -79,13 +82,13 @@ WRITE8_MEMBER( pmi80_state::leds_w )
 	}
 }
 
-static ADDRESS_MAP_START(pmi80_mem, AS_PROGRAM, 8, pmi80_state)
+ADDRESS_MAP_START(pmi80_state::pmi80_mem)
 	ADDRESS_MAP_UNMAP_HIGH
 	AM_RANGE( 0x0000, 0x03ff ) AM_ROM
 	AM_RANGE( 0x0400, 0x1fff ) AM_RAM
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START(pmi80_io, AS_IO, 8, pmi80_state)
+ADDRESS_MAP_START(pmi80_state::pmi80_io)
 	ADDRESS_MAP_UNMAP_HIGH
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	AM_RANGE(0xf8, 0xf8) AM_WRITE(leds_w)
@@ -152,9 +155,9 @@ void pmi80_state::machine_reset()
 }
 
 
-static MACHINE_CONFIG_START( pmi80 )
+MACHINE_CONFIG_START(pmi80_state::pmi80)
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu",I8080, XTAL_1MHz)
+	MCFG_CPU_ADD("maincpu",I8080, XTAL(1'000'000))
 	MCFG_CPU_PROGRAM_MAP(pmi80_mem)
 	MCFG_CPU_IO_MAP(pmi80_io)
 

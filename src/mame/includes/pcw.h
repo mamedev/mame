@@ -6,8 +6,8 @@
  *
  ****************************************************************************/
 
-#ifndef PCW_H_
-#define PCW_H_
+#ifndef MAME_INCLUDES_PCW_H
+#define MAME_INCLUDES_PCW_H
 
 #include "machine/upd765.h"
 #include "machine/ram.h"
@@ -139,6 +139,13 @@ public:
 	void pcw_update_mem(int block, int data);
 	int pcw_get_sys_status();
 	void pcw_printer_fire_pins(uint16_t pins);
+	void pcw(machine_config &config);
+	void pcw8256(machine_config &config);
+	void pcw8512(machine_config &config);
+	void pcw9512(machine_config &config);
+	void pcw9512_io(address_map &map);
+	void pcw_io(address_map &map);
+	void pcw_map(address_map &map);
 };
 
-#endif /* PCW_H_ */
+#endif // MAME_INCLUDES_PCW_H

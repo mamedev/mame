@@ -67,4 +67,10 @@ public:
 	INTERRUPT_GEN_MEMBER(pbaction_interrupt);
 	INTERRUPT_GEN_MEMBER(vblank_irq);
 	void draw_sprites( bitmap_ind16 &bitmap, const rectangle &cliprect );
+	void pbaction(machine_config &config);
+	void pbactionx(machine_config &config);
+	void decrypted_opcodes_map(address_map &map);
+	void pbaction_map(address_map &map);
+	void pbaction_sound_io_map(address_map &map);
+	void pbaction_sound_map(address_map &map);
 };

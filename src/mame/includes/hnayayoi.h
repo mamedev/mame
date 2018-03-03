@@ -50,4 +50,12 @@ public:
 	DECLARE_WRITE_LINE_MEMBER(irqhandler);
 	required_device<cpu_device> m_maincpu;
 	required_device<msm5205_device> m_msm;
+	void untoucha(machine_config &config);
+	void hnayayoi(machine_config &config);
+	void hnfubuki(machine_config &config);
+	void hnayayoi_io_map(address_map &map);
+	void hnayayoi_map(address_map &map);
+	void hnfubuki_map(address_map &map);
+	void untoucha_io_map(address_map &map);
+	void untoucha_map(address_map &map);
 };

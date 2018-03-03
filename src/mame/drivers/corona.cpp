@@ -312,10 +312,10 @@
 #include "luckyrlt.lh"
 
 
-#define WC81_MAIN_XTAL      XTAL_24MHz        /* Main crystal for Winners Circle 28*28 pins PCB's */
-#define WC82_MAIN_XTAL      XTAL_18_432MHz    /* Main crystal for Winners Circle 18*22 pins PCB's */
-#define RE_MAIN_XTAL        XTAL_16MHz        /* Main for roulette boards */
-#define VIDEO_XTAL          XTAL_20MHz        /* Video circuitry crystal (all) */
+#define WC81_MAIN_XTAL      XTAL(24'000'000)        /* Main crystal for Winners Circle 28*28 pins PCB's */
+#define WC82_MAIN_XTAL      XTAL(18'432'000)    /* Main crystal for Winners Circle 18*22 pins PCB's */
+#define RE_MAIN_XTAL        XTAL(16'000'000)        /* Main for roulette boards */
+#define VIDEO_XTAL          XTAL(20'000'000)        /* Video circuitry crystal (all) */
 #define AY_CLK1             1000000           /* AY-3-8912 clock for WC81 (28*28 PCB), measured */
 #define AY_CLK2             2000000           /* AY-3-8910 clock for 81b & 82 (18*22 PCB), guessed */
 #define VIDEOBUF_SIZE       512*512
@@ -360,6 +360,27 @@ public:
 	required_device<cpu_device> m_soundcpu;
 	required_device<screen_device> m_screen;
 	required_device<generic_latch_8_device> m_soundlatch;
+	void winner81(machine_config &config);
+	void winner82(machine_config &config);
+	void rcirulet(machine_config &config);
+	void luckyrlt(machine_config &config);
+	void re800(machine_config &config);
+	void luckyrlt_cpu_io_map(address_map &map);
+	void luckyrlt_map(address_map &map);
+	void luckyrlt_sound_cpu_io_map(address_map &map);
+	void luckyrlt_sound_map(address_map &map);
+	void re800_cpu_io_map(address_map &map);
+	void re800_map(address_map &map);
+	void re800_sound_cpu_io_map(address_map &map);
+	void re800_sound_map(address_map &map);
+	void winner81_cpu_io_map(address_map &map);
+	void winner81_map(address_map &map);
+	void winner81_sound_cpu_io_map(address_map &map);
+	void winner81_sound_map(address_map &map);
+	void winner82_cpu_io_map(address_map &map);
+	void winner82_map(address_map &map);
+	void winner82_sound_cpu_io_map(address_map &map);
+	void winner82_sound_map(address_map &map);
 };
 
 
@@ -606,13 +627,13 @@ WRITE8_MEMBER(corona_state::wc_meters_w)
 
 */
 
-static ADDRESS_MAP_START( winner81_map, AS_PROGRAM, 8, corona_state )
+ADDRESS_MAP_START(corona_state::winner81_map)
 	AM_RANGE(0x0000, 0x3fff) AM_ROM
 	AM_RANGE(0x8000, 0x8fff) AM_RAM AM_SHARE("nvram")
 	AM_RANGE(0xb800, 0xb8ff) AM_RAM // copied from 8000 (0x10 bytes, repeated)
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( winner81_cpu_io_map, AS_IO, 8, corona_state )
+ADDRESS_MAP_START(corona_state::winner81_cpu_io_map)
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	AM_RANGE(0x70, 0x70) AM_WRITE(blitter_x_w)
 	AM_RANGE(0x71, 0x71) AM_WRITE(blitter_unk_w)
@@ -634,12 +655,12 @@ static ADDRESS_MAP_START( winner81_cpu_io_map, AS_IO, 8, corona_state )
 	AM_RANGE(0xef, 0xef) AM_WRITE(wc_meters_w)  /* meters: coin1 = bit0, coin2 = bit1, coinout = bit2 */
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START(  winner81_sound_map, AS_PROGRAM, 8, corona_state )
+ADDRESS_MAP_START(corona_state::winner81_sound_map)
 	AM_RANGE(0x0000, 0x0fff) AM_ROM
 	AM_RANGE(0x8000, 0x83ff) AM_RAM
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START(  winner81_sound_cpu_io_map, AS_IO, 8, corona_state )
+ADDRESS_MAP_START(corona_state::winner81_sound_cpu_io_map)
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	AM_RANGE(0x00, 0x00) AM_READ(sound_latch_r)
 	AM_RANGE(0x00, 0x01) AM_DEVWRITE("aysnd", ay8910_device, address_data_w)
@@ -663,13 +684,13 @@ ADDRESS_MAP_END
          FE ---> Sound Latch (writes 01, 02 and 03 during attract)...
 */
 
-static ADDRESS_MAP_START( winner82_map, AS_PROGRAM, 8, corona_state )
+ADDRESS_MAP_START(corona_state::winner82_map)
 	AM_RANGE(0x0000, 0x3fff) AM_ROM
 	AM_RANGE(0x4000, 0x4fff) AM_RAM AM_SHARE("nvram")
 	AM_RANGE(0x8000, 0x80ff) AM_RAM
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( winner82_cpu_io_map, AS_IO, 8, corona_state )
+ADDRESS_MAP_START(corona_state::winner82_cpu_io_map)
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	AM_RANGE(0xf0, 0xf0) AM_WRITE(blitter_x_w)
 	AM_RANGE(0xf1, 0xf1) AM_WRITE(blitter_y_w)
@@ -688,12 +709,12 @@ static ADDRESS_MAP_START( winner82_cpu_io_map, AS_IO, 8, corona_state )
 	AM_RANGE(0xff, 0xff) AM_READ_PORT("DSW2")   /* no idea */
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( winner82_sound_map, AS_PROGRAM, 8, corona_state )
+ADDRESS_MAP_START(corona_state::winner82_sound_map)
 	AM_RANGE(0x0000, 0x0fff) AM_ROM
 	AM_RANGE(0x1000, 0x13ff) AM_RAM
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( winner82_sound_cpu_io_map, AS_IO, 8, corona_state )
+ADDRESS_MAP_START(corona_state::winner82_sound_cpu_io_map)
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	AM_RANGE(0x00, 0x00) AM_READ(sound_latch_r)
 	AM_RANGE(0x00, 0x01) AM_DEVWRITE("aysnd", ay8910_device, address_data_w)
@@ -727,13 +748,13 @@ ADDRESS_MAP_END
 
 */
 
-static ADDRESS_MAP_START( re800_map, AS_PROGRAM, 8, corona_state )
+ADDRESS_MAP_START(corona_state::re800_map)
 	AM_RANGE(0x0000, 0x3fff) AM_ROM
 	AM_RANGE(0x4000, 0x47ff) AM_RAM
 	AM_RANGE(0x8000, 0x87ff) AM_RAM AM_SHARE("nvram") //801a comm?
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( re800_cpu_io_map, AS_IO, 8, corona_state )
+ADDRESS_MAP_START(corona_state::re800_cpu_io_map)
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	AM_RANGE(0xf0, 0xf0) AM_WRITE(blitter_x_w)
 	AM_RANGE(0xf1, 0xf1) AM_WRITE(blitter_y_w)
@@ -749,12 +770,12 @@ static ADDRESS_MAP_START( re800_cpu_io_map, AS_IO, 8, corona_state )
 	AM_RANGE(0xff, 0xff) AM_WRITE(ball_w)
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( re800_sound_map, AS_PROGRAM, 8, corona_state )
+ADDRESS_MAP_START(corona_state::re800_sound_map)
 	AM_RANGE(0x0000, 0x0fff) AM_ROM
 	AM_RANGE(0x8000, 0x83ff) AM_RAM
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( re800_sound_cpu_io_map, AS_IO, 8, corona_state )
+ADDRESS_MAP_START(corona_state::re800_sound_cpu_io_map)
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	AM_RANGE(0x00, 0x00) AM_READ(sound_latch_r)
 	AM_RANGE(0x00, 0x01) AM_DEVWRITE("aysnd", ay8910_device, address_data_w)
@@ -787,12 +808,12 @@ ADDRESS_MAP_END
 
 */
 
-static ADDRESS_MAP_START( luckyrlt_map, AS_PROGRAM, 8, corona_state )
+ADDRESS_MAP_START(corona_state::luckyrlt_map)
 	AM_RANGE(0x0000, 0x7fff) AM_ROM
 	AM_RANGE(0x8000, 0x8fff) AM_RAM AM_SHARE("nvram")
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( luckyrlt_cpu_io_map, AS_IO, 8, corona_state )
+ADDRESS_MAP_START(corona_state::luckyrlt_cpu_io_map)
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	AM_RANGE(0xf0, 0xf0) AM_WRITE(blitter_x_w)
 	AM_RANGE(0xf1, 0xf1) AM_WRITE(blitter_y_w)
@@ -809,12 +830,12 @@ static ADDRESS_MAP_START( luckyrlt_cpu_io_map, AS_IO, 8, corona_state )
 	AM_RANGE(0xfe, 0xfe) AM_WRITE(sound_latch_w)
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( luckyrlt_sound_map, AS_PROGRAM, 8, corona_state )
+ADDRESS_MAP_START(corona_state::luckyrlt_sound_map)
 	AM_RANGE(0x0000, 0x0fff) AM_ROM
 	AM_RANGE(0x1000, 0x13ff) AM_RAM
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( luckyrlt_sound_cpu_io_map, AS_IO, 8, corona_state )
+ADDRESS_MAP_START(corona_state::luckyrlt_sound_cpu_io_map)
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	AM_RANGE(0x00, 0x00) AM_READ(sound_latch_r)
 	AM_RANGE(0x00, 0x01) AM_DEVWRITE("aysnd", ay8910_device, address_data_w)
@@ -1343,7 +1364,7 @@ INPUT_PORTS_END
 *             Machine Drivers              *
 *******************************************/
 
-static MACHINE_CONFIG_START( winner81 )
+MACHINE_CONFIG_START(corona_state::winner81)
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", Z80, WC81_MAIN_XTAL/8)  /* measured */
 	MCFG_CPU_PROGRAM_MAP(winner81_map)
@@ -1378,7 +1399,7 @@ static MACHINE_CONFIG_START( winner81 )
 MACHINE_CONFIG_END
 
 
-static MACHINE_CONFIG_START( winner82 )
+MACHINE_CONFIG_START(corona_state::winner82)
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", Z80, WC82_MAIN_XTAL/8)  /* measured */
 	MCFG_CPU_PROGRAM_MAP(winner82_map)
@@ -1412,7 +1433,7 @@ static MACHINE_CONFIG_START( winner82 )
 MACHINE_CONFIG_END
 
 
-static MACHINE_CONFIG_START( re800 )
+MACHINE_CONFIG_START(corona_state::re800)
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", Z80, RE_MAIN_XTAL/8)    /* measured 2MHz */
 	MCFG_CPU_PROGRAM_MAP(re800_map)
@@ -1447,7 +1468,7 @@ static MACHINE_CONFIG_START( re800 )
 MACHINE_CONFIG_END
 
 
-static MACHINE_CONFIG_START( rcirulet )
+MACHINE_CONFIG_START(corona_state::rcirulet)
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", Z80, RE_MAIN_XTAL/8)    /* measured 2MHz */
 	MCFG_CPU_PROGRAM_MAP(re800_map)
@@ -1481,7 +1502,7 @@ static MACHINE_CONFIG_START( rcirulet )
 MACHINE_CONFIG_END
 
 
-static MACHINE_CONFIG_START( luckyrlt )
+MACHINE_CONFIG_START(corona_state::luckyrlt)
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", Z80, RE_MAIN_XTAL/8)    /* measured 2MHz */
 	MCFG_CPU_PROGRAM_MAP(luckyrlt_map)

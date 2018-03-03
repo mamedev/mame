@@ -77,7 +77,7 @@ const tiny_rom_entry *adam_fdc_device::device_rom_region() const
 //  ADDRESS_MAP( fdc6801_mem )
 //-------------------------------------------------
 
-static ADDRESS_MAP_START( adam_fdc_mem, AS_PROGRAM, 8, adam_fdc_device )
+ADDRESS_MAP_START(adam_fdc_device::adam_fdc_mem)
 	AM_RANGE(0x0000, 0x001f) AM_DEVREADWRITE(M6801_TAG, m6801_cpu_device, m6801_io_r, m6801_io_w)
 	AM_RANGE(0x0080, 0x00ff) AM_RAM
 	AM_RANGE(0x0400, 0x07ff) AM_RAM AM_WRITEONLY AM_SHARE("ram")
@@ -99,7 +99,7 @@ ADDRESS_MAP_END
 //  ADDRESS_MAP( fdc6801_io )
 //-------------------------------------------------
 
-static ADDRESS_MAP_START( adam_fdc_io, AS_IO, 8, adam_fdc_device )
+ADDRESS_MAP_START(adam_fdc_device::adam_fdc_io)
 	AM_RANGE(M6801_PORT1, M6801_PORT1) AM_READWRITE(p1_r, p1_w)
 	AM_RANGE(M6801_PORT2, M6801_PORT2) AM_READWRITE(p2_r, p2_w)
 	AM_RANGE(M6801_PORT3, M6801_PORT3)
@@ -124,12 +124,12 @@ SLOT_INTERFACE_END
 //  device_add_mconfig - add device configuration
 //-------------------------------------------------
 
-MACHINE_CONFIG_MEMBER( adam_fdc_device::device_add_mconfig )
-	MCFG_CPU_ADD(M6801_TAG, M6801, XTAL_4MHz)
+MACHINE_CONFIG_START(adam_fdc_device::device_add_mconfig)
+	MCFG_CPU_ADD(M6801_TAG, M6801, XTAL(4'000'000))
 	MCFG_CPU_PROGRAM_MAP(adam_fdc_mem)
 	MCFG_CPU_IO_MAP(adam_fdc_io)
 
-	MCFG_WD2793_ADD(WD2793_TAG, XTAL_4MHz/4)
+	MCFG_WD2793_ADD(WD2793_TAG, XTAL(4'000'000)/4)
 	MCFG_WD_FDC_INTRQ_CALLBACK(INPUTLINE(M6801_TAG, INPUT_LINE_NMI))
 
 	MCFG_FLOPPY_DRIVE_ADD(WD2793_TAG":0", adam_fdc_floppies, "525ssdd", adam_fdc_device::floppy_formats)

@@ -13,15 +13,15 @@
     - inputs for i4300;
     - hyprduel.cpp uses scanline attribute which crawls to unusable state
       with current video routines here;
- 	- CRT Controller, also understand why it needs so many writes before actual parameters;
-	- Wrong color bars in service mode (e.g. balcube, toride2g). They use solid color tiles (80xx), 
-	  but the right palette is not at 00-ff.
-	  Related to the unknown table in the RAM mapped just before the palette?
-	  Update: the colors should have a common bank of 0xb (so 0x8bxx), it's unknown why the values 
-	  diverges, the blitter is responsible of that upload fwiw;
-    - Some gfx problems in ladykill, 3kokushi, puzzli, gakusai, seem related to how we handle 
-	  windows, wrapping, read-modify-write areas;
-	- puzzli: emulate hblank irq and fix video routines here (water effect not emulated?);
+    - CRT Controller, also understand why it needs so many writes before actual parameters;
+    - Wrong color bars in service mode (e.g. balcube, toride2g). They use solid color tiles (80xx),
+      but the right palette is not at 00-ff.
+      Related to the unknown table in the RAM mapped just before the palette?
+      Update: the colors should have a common bank of 0xb (so 0x8bxx), it's unknown why the values
+      diverges, the blitter is responsible of that upload fwiw;
+    - Some gfx problems in ladykill, 3kokushi, puzzli, gakusai, seem related to how we handle
+      windows, wrapping, read-modify-write areas;
+    - puzzli: emulate hblank irq and fix video routines here (water effect not emulated?);
 
 ============================================================================
 
@@ -66,7 +66,7 @@
 #include "emu.h"
 #include "imagetek_i4100.h"
 
-
+#include <algorithm>
 
 //**************************************************************************
 //  GLOBAL VARIABLES
@@ -77,13 +77,13 @@ DEFINE_DEVICE_TYPE(I4100, imagetek_i4100_device, "i4100", "Imagetek I4100 052 VD
 DEFINE_DEVICE_TYPE(I4220, imagetek_i4220_device, "i4220", "Imagetek I4220 071 VDP")
 DEFINE_DEVICE_TYPE(I4300, imagetek_i4300_device, "i4300", "Imagetek I4300 095 VDP")
 
-DEVICE_ADDRESS_MAP_START( map, 16, imagetek_i4100_device)
+ADDRESS_MAP_START(imagetek_i4100_device::map)
 	AM_RANGE(0x00000, 0x1ffff) AM_READWRITE(vram_0_r, vram_0_w) AM_SHARE("vram_0")
 	AM_RANGE(0x20000, 0x3ffff) AM_READWRITE(vram_1_r, vram_1_w) AM_SHARE("vram_1")
 	AM_RANGE(0x40000, 0x5ffff) AM_READWRITE(vram_2_r, vram_2_w) AM_SHARE("vram_2")
 	AM_RANGE(0x60000, 0x6ffff) AM_READ(gfxrom_r)
 	AM_RANGE(0x70000, 0x71fff) AM_READWRITE(scratchram_r, scratchram_w) AM_SHARE("scratchram") // unknown, maybe palette
-	AM_RANGE(0x72000, 0x73fff) AM_DEVREADWRITE("palette", palette_device, read, write) AM_SHARE("palette")
+	AM_RANGE(0x72000, 0x73fff) AM_DEVREADWRITE("palette", palette_device, read16, write16) AM_SHARE("palette")
 	AM_RANGE(0x74000, 0x74fff) AM_READWRITE(spriteram_r, spriteram_w) AM_SHARE("spriteram")
 	AM_RANGE(0x75000, 0x75fff) AM_READWRITE(rmw_vram_0_r, rmw_vram_0_w)
 	AM_RANGE(0x76000, 0x76fff) AM_READWRITE(rmw_vram_1_r, rmw_vram_1_w)
@@ -112,13 +112,13 @@ DEVICE_ADDRESS_MAP_START( map, 16, imagetek_i4100_device)
 ADDRESS_MAP_END
 
 // same as above but with moved video registers (now at 0x797**)
-DEVICE_ADDRESS_MAP_START( v2_map, 16, imagetek_i4220_device)
+ADDRESS_MAP_START(imagetek_i4220_device::v2_map)
 	AM_RANGE(0x00000, 0x1ffff) AM_READWRITE(vram_0_r, vram_0_w) AM_SHARE("vram_0")
 	AM_RANGE(0x20000, 0x3ffff) AM_READWRITE(vram_1_r, vram_1_w) AM_SHARE("vram_1")
 	AM_RANGE(0x40000, 0x5ffff) AM_READWRITE(vram_2_r, vram_2_w) AM_SHARE("vram_2")
 	AM_RANGE(0x60000, 0x6ffff) AM_READ(gfxrom_r)
 	AM_RANGE(0x70000, 0x71fff) AM_READWRITE(scratchram_r, scratchram_w) AM_SHARE("scratchram") // unknown, maybe palette
-	AM_RANGE(0x72000, 0x73fff) AM_DEVREADWRITE("palette", palette_device, read, write) AM_SHARE("palette")
+	AM_RANGE(0x72000, 0x73fff) AM_DEVREADWRITE("palette", palette_device, read16, write16) AM_SHARE("palette")
 	AM_RANGE(0x74000, 0x74fff) AM_READWRITE(spriteram_r, spriteram_w) AM_SHARE("spriteram")
 	AM_RANGE(0x75000, 0x75fff) AM_READWRITE(rmw_vram_0_r, rmw_vram_0_w)
 	AM_RANGE(0x76000, 0x76fff) AM_READWRITE(rmw_vram_1_r, rmw_vram_1_w)
@@ -157,13 +157,13 @@ DEVICE_ADDRESS_MAP_START( v2_map, 16, imagetek_i4220_device)
 ADDRESS_MAP_END
 
 // more changes around, namely the screen offsets being reversed here
-DEVICE_ADDRESS_MAP_START( v3_map, 16, imagetek_i4300_device)
+ADDRESS_MAP_START(imagetek_i4300_device::v3_map)
 	AM_RANGE(0x00000, 0x1ffff) AM_READWRITE(vram_0_r, vram_0_w) AM_SHARE("vram_0")
 	AM_RANGE(0x20000, 0x3ffff) AM_READWRITE(vram_1_r, vram_1_w) AM_SHARE("vram_1")
 	AM_RANGE(0x40000, 0x5ffff) AM_READWRITE(vram_2_r, vram_2_w) AM_SHARE("vram_2")
 	AM_RANGE(0x60000, 0x6ffff) AM_READ(gfxrom_r)
 	AM_RANGE(0x70000, 0x71fff) AM_READWRITE(scratchram_r, scratchram_w) AM_SHARE("scratchram") // unknown, maybe palette
-	AM_RANGE(0x72000, 0x73fff) AM_DEVREADWRITE("palette", palette_device, read, write) AM_SHARE("palette")
+	AM_RANGE(0x72000, 0x73fff) AM_DEVREADWRITE("palette", palette_device, read16, write16) AM_SHARE("palette")
 	AM_RANGE(0x74000, 0x74fff) AM_READWRITE(spriteram_r, spriteram_w) AM_SHARE("spriteram")
 	AM_RANGE(0x75000, 0x75fff) AM_READWRITE(rmw_vram_0_r, rmw_vram_0_w)
 	AM_RANGE(0x76000, 0x76fff) AM_READWRITE(rmw_vram_1_r, rmw_vram_1_w)
@@ -246,37 +246,10 @@ imagetek_i4300_device::imagetek_i4300_device(const machine_config &mconfig, cons
 //  configuration addiitons
 //-------------------------------------------------
 
-MACHINE_CONFIG_MEMBER(imagetek_i4100_device::device_add_mconfig)
+MACHINE_CONFIG_START(imagetek_i4100_device::device_add_mconfig)
 	MCFG_PALETTE_ADD("palette", 0x1000)
 	MCFG_PALETTE_FORMAT(GGGGGRRRRRBBBBBx)
 MACHINE_CONFIG_END
-
-
-//-------------------------------------------------
-//  static_set_gfxdecode_tag: Set the tag of the
-//  gfx decoder
-//-------------------------------------------------
-
-void imagetek_i4100_device::static_set_gfxdecode_tag(device_t &device, const char *tag)
-{
-	downcast<imagetek_i4100_device &>(device).m_gfxdecode.set_tag(tag);
-}
-
-
-void imagetek_i4100_device::static_set_tmap_xoffsets(device_t &device, int x1, int x2, int x3)
-{
-	downcast<imagetek_i4100_device &>(device).m_tilemap_scrolldx[0] = x1;
-	downcast<imagetek_i4100_device &>(device).m_tilemap_scrolldx[1] = x2;
-	downcast<imagetek_i4100_device &>(device).m_tilemap_scrolldx[2] = x3;
-}
-
-
-void imagetek_i4100_device::static_set_tmap_yoffsets(device_t &device, int y1, int y2, int y3)
-{
-	downcast<imagetek_i4100_device &>(device).m_tilemap_scrolldy[0] = y1;
-	downcast<imagetek_i4100_device &>(device).m_tilemap_scrolldy[1] = y2;
-	downcast<imagetek_i4100_device &>(device).m_tilemap_scrolldy[2] = y3;
-}
 
 
 //-------------------------------------------------
@@ -369,7 +342,7 @@ WRITE16_MEMBER(imagetek_i4100_device::vram_0_w){ COMBINE_DATA(&m_vram_0[offset])
 WRITE16_MEMBER(imagetek_i4100_device::vram_1_w){ COMBINE_DATA(&m_vram_1[offset]); }
 WRITE16_MEMBER(imagetek_i4100_device::vram_2_w){ COMBINE_DATA(&m_vram_2[offset]); }
 
-/* This game uses almost only the blitter to write to the tilemaps.
+/* Some game uses almost only the blitter to write to the tilemaps.
    The CPU can only access a "window" of 512x256 pixels in the upper
    left corner of the big tilemap */
 // TODO: Puzzlet, Sankokushi & Lady Killer contradicts with aformentioned description (more like RMW?)
@@ -623,7 +596,7 @@ void imagetek_i4100_device::blt_write( address_space &space, const int tmap, con
 		case 2: vram_1_w(space, offs, data, mask);    break;
 		case 3: vram_2_w(space, offs, data, mask);    break;
 	}
-//  logerror("%s : Blitter %X] %04X <- %04X & %04X\n", space.machine().describe_context(), tmap, offs, data, mask);
+//  logerror("%s : Blitter %X] %04X <- %04X & %04X\n", machine().describe_context(), tmap, offs, data, mask);
 }
 
 /***************************************************************************
@@ -689,7 +662,7 @@ WRITE16_MEMBER( imagetek_i4100_device::blitter_w )
 		int shift   = (dst_offs & 0x80) ? 0 : 8;
 		uint16_t mask = (dst_offs & 0x80) ? 0x00ff : 0xff00;
 
-//      logerror("CPU #0 PC %06X : Blitter regs %08X, %08X, %08X\n", space.device().safe_pc(), tmap, src_offs, dst_offs);
+//      logerror("%s Blitter regs %08X, %08X, %08X\n", machine().describe_context(), tmap, src_offs, dst_offs);
 
 		dst_offs >>= 7 + 1;
 		switch (tmap)
@@ -699,7 +672,7 @@ WRITE16_MEMBER( imagetek_i4100_device::blitter_w )
 			case 3:
 				break;
 			default:
-				logerror("CPU #0 PC %06X : Blitter unknown destination: %08X\n", space.device().safe_pc(), tmap);
+				logerror("%s Blitter unknown destination: %08X\n", machine().describe_context(), tmap);
 				return;
 		}
 
@@ -709,7 +682,7 @@ WRITE16_MEMBER( imagetek_i4100_device::blitter_w )
 
 			src_offs %= m_gfxrom_size;
 			b1 = m_gfxrom[src_offs];
-//          logerror("CPU #0 PC %06X : Blitter opcode %02X at %06X\n", space.device().safe_pc(), b1, src_offs);
+//          logerror("%s Blitter opcode %02X at %06X\n", machine().describe_context(), b1, src_offs);
 			src_offs++;
 
 			count = ((~b1) & 0x3f) + 1;
@@ -785,7 +758,7 @@ WRITE16_MEMBER( imagetek_i4100_device::blitter_w )
 				break;
 
 			default:
-				//logerror("CPU #0 PC %06X : Blitter unknown opcode %02X at %06X\n",space.device().safe_pc(),b1,src_offs-1);
+				//logerror("%s Blitter unknown opcode %02X at %06X\n",machine().describe_context(),b1,src_offs-1);
 				return;
 			}
 
@@ -1069,7 +1042,7 @@ void imagetek_i4100_device::draw_tilemap( screen_device &screen, bitmap_ind16 &b
 {
 	int y;
 
-	bitmap_ind8 &priority_bitmap = m_screen->priority();
+	bitmap_ind8 &priority_bitmap = screen.priority();
 
 	int width  = big ? 4096 : 2048;
 	int height = big ? 4096 : 2048;
@@ -1079,11 +1052,38 @@ void imagetek_i4100_device::draw_tilemap( screen_device &screen, bitmap_ind16 &b
 
 	int windowwidth  = width >> 2;
 	int windowheight = height >> 3;
+	
+	int dx = m_tilemap_scrolldx[layer] * (m_screen_flip ? 1 : -1);
+	int dy = m_tilemap_scrolldy[layer] * (m_screen_flip ? 1 : -1);
 
-	sx += m_tilemap_scrolldx[layer] * (m_screen_flip ? 1 : -1);
-	sy += m_tilemap_scrolldy[layer] * (m_screen_flip ? 1 : -1);
+	sx += dx;
+	sy += dy;
 
-	for (y = 0; y < scrheight; y++)
+	int min_x, max_x, min_y, max_y;
+	
+	if (dx != 0)
+	{
+		min_x = 0;
+		max_x = scrwidth-1;
+	}
+	else
+	{
+		min_x = cliprect.min_x;
+		max_x = cliprect.max_x;
+	}
+
+	if (dy != 0)
+	{
+		min_y = 0;
+		max_y = scrheight-1;
+	}
+	else
+	{
+		min_y = cliprect.min_y;
+		max_y = cliprect.max_y;
+	}
+	
+	for (y = min_y; y <= max_y; y++)
 	{
 		int scrolly = (sy+y-wy)&(windowheight-1);
 		int x;
@@ -1097,7 +1097,7 @@ void imagetek_i4100_device::draw_tilemap( screen_device &screen, bitmap_ind16 &b
 			dst = &bitmap.pix16(y);
 			priority_baseaddr = &priority_bitmap.pix8(y);
 
-			for (x = 0; x < scrwidth; x++)
+			for (x = min_x; x <= max_x; x++)
 			{
 				int scrollx = (sx+x-wx)&(windowwidth-1);
 				int srccol = (wx+scrollx)&(width-1);
@@ -1121,7 +1121,7 @@ void imagetek_i4100_device::draw_tilemap( screen_device &screen, bitmap_ind16 &b
 			dst = &bitmap.pix16(scrheight-y-1);
 			priority_baseaddr = &priority_bitmap.pix8(scrheight-y-1);
 
-			for (x = 0; x < scrwidth; x++)
+			for (x = min_x; x <= max_x; x++)
 			{
 				int scrollx = (sx+x-wx)&(windowwidth-1);
 				int srccol = (wx+scrollx)&(width-1);

@@ -120,6 +120,13 @@ public:
 	void zerotrgt_draw_sprites( bitmap_ind16 &bitmap, const rectangle &cliprect );
 	void cntsteer_draw_sprites( bitmap_ind16 &bitmap, const rectangle &cliprect );
 	void zerotrgt_rearrange_gfx( int romsize, int romarea );
+	void cntsteer(machine_config &config);
+	void zerotrgt(machine_config &config);
+	void cntsteer_cpu1_map(address_map &map);
+	void cntsteer_cpu2_map(address_map &map);
+	void gekitsui_cpu1_map(address_map &map);
+	void gekitsui_cpu2_map(address_map &map);
+	void sound_map(address_map &map);
 };
 
 
@@ -488,7 +495,7 @@ WRITE8_MEMBER(cntsteer_state::cntsteer_background_w)
 /* checks area 0x2000-0x2fff with this address config. */
 READ8_MEMBER(cntsteer_state::cntsteer_background_mirror_r)
 {
-	return m_videoram2[BITSWAP16(offset,15,14,13,12,5,4,3,2,1,0,11,10,9,8,7,6)];
+	return m_videoram2[bitswap<16>(offset,15,14,13,12,5,4,3,2,1,0,11,10,9,8,7,6)];
 }
 
 /*************************************
@@ -511,7 +518,7 @@ WRITE8_MEMBER(cntsteer_state::cntsteer_sound_w)
 WRITE8_MEMBER(cntsteer_state::zerotrgt_ctrl_w)
 {
 	/*TODO: check this.*/
-	logerror("CTRL: %04x: %04x: %04x\n", space.device().safe_pc(), offset, data);
+	logerror("CTRL: %04x: %04x: %04x\n", m_maincpu->pc(), offset, data);
 //  if (offset == 0) m_subcpu->set_input_line(INPUT_LINE_RESET, ASSERT_LINE);
 
 	// Wrong - bits 0 & 1 used on this
@@ -572,7 +579,7 @@ READ8_MEMBER(cntsteer_state::cntsteer_adx_r)
 
 /***************************************************************************/
 
-static ADDRESS_MAP_START( gekitsui_cpu1_map, AS_PROGRAM, 8, cntsteer_state )
+ADDRESS_MAP_START(cntsteer_state::gekitsui_cpu1_map)
 	AM_RANGE(0x0000, 0x0fff) AM_RAM AM_SHARE("share1")
 	AM_RANGE(0x1000, 0x11ff) AM_RAM AM_SHARE("spriteram")
 	AM_RANGE(0x1200, 0x1fff) AM_RAM
@@ -582,7 +589,7 @@ static ADDRESS_MAP_START( gekitsui_cpu1_map, AS_PROGRAM, 8, cntsteer_state )
 	AM_RANGE(0x8000, 0xffff) AM_ROM
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( gekitsui_cpu2_map, AS_PROGRAM, 8, cntsteer_state )
+ADDRESS_MAP_START(cntsteer_state::gekitsui_cpu2_map)
 	AM_RANGE(0x0000, 0x0fff) AM_RAM AM_SHARE("share1")
 	AM_RANGE(0x1000, 0x1fff) AM_RAM_WRITE(cntsteer_background_w) AM_SHARE("videoram2")
 	AM_RANGE(0x3000, 0x3000) AM_READ_PORT("DSW0")
@@ -595,7 +602,7 @@ static ADDRESS_MAP_START( gekitsui_cpu2_map, AS_PROGRAM, 8, cntsteer_state )
 	AM_RANGE(0x4000, 0xffff) AM_ROM
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( cntsteer_cpu1_map, AS_PROGRAM, 8, cntsteer_state )
+ADDRESS_MAP_START(cntsteer_state::cntsteer_cpu1_map)
 	AM_RANGE(0x0000, 0x0fff) AM_RAM AM_SHARE("share1")
 	AM_RANGE(0x1000, 0x11ff) AM_RAM AM_SHARE("spriteram")
 	AM_RANGE(0x2000, 0x23ff) AM_RAM_WRITE(cntsteer_foreground_vram_w) AM_SHARE("videoram")
@@ -605,7 +612,7 @@ static ADDRESS_MAP_START( cntsteer_cpu1_map, AS_PROGRAM, 8, cntsteer_state )
 	AM_RANGE(0x8000, 0xffff) AM_ROM
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( cntsteer_cpu2_map, AS_PROGRAM, 8, cntsteer_state )
+ADDRESS_MAP_START(cntsteer_state::cntsteer_cpu2_map)
 	AM_RANGE(0x0000, 0x0fff) AM_RAM AM_SHARE("share1")
 	AM_RANGE(0x1000, 0x1fff) AM_RAM_WRITE(cntsteer_background_w) AM_SHARE("videoram2")
 	AM_RANGE(0x2000, 0x2fff) AM_READWRITE(cntsteer_background_mirror_r,cntsteer_background_w)
@@ -645,7 +652,7 @@ INTERRUPT_GEN_MEMBER(cntsteer_state::sound_interrupt)
 		device.execute().set_input_line(INPUT_LINE_NMI, PULSE_LINE);
 }
 
-static ADDRESS_MAP_START( sound_map, AS_PROGRAM, 8, cntsteer_state )
+ADDRESS_MAP_START(cntsteer_state::sound_map)
 	AM_RANGE(0x0000, 0x01ff) AM_RAM
 //  AM_RANGE(0x1000, 0x1000) AM_WRITE(nmiack_w)
 	AM_RANGE(0x2000, 0x2000) AM_DEVWRITE("ay1", ay8910_device, data_w)
@@ -904,14 +911,14 @@ MACHINE_RESET_MEMBER(cntsteer_state,cntsteer)
 	MACHINE_RESET_CALL_MEMBER(zerotrgt);
 }
 
-static MACHINE_CONFIG_START( cntsteer )
+MACHINE_CONFIG_START(cntsteer_state::cntsteer)
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", M6809, 2000000)      /* ? */
+	MCFG_CPU_ADD("maincpu", MC6809E, 2000000)      /* MC68B09E */
 	MCFG_CPU_PROGRAM_MAP(cntsteer_cpu1_map)
 	MCFG_CPU_VBLANK_INT_DRIVER("screen", cntsteer_state,  nmi_line_pulse) /* ? */
 
-	MCFG_CPU_ADD("subcpu", M6809, 2000000)       /* ? */
+	MCFG_CPU_ADD("subcpu", MC6809E, 2000000)       /* MC68B09E */
 	MCFG_CPU_PROGRAM_MAP(cntsteer_cpu2_map)
 //  MCFG_DEVICE_DISABLE()
 	MCFG_CPU_VBLANK_INT_DRIVER("screen", cntsteer_state,  subcpu_vblank_irq) /* ? */
@@ -958,14 +965,14 @@ static MACHINE_CONFIG_START( cntsteer )
 	MCFG_SOUND_ROUTE_EX(0, "dac", 1.0, DAC_VREF_POS_INPUT) MCFG_SOUND_ROUTE_EX(0, "dac", -1.0, DAC_VREF_NEG_INPUT)
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_START( zerotrgt )
+MACHINE_CONFIG_START(cntsteer_state::zerotrgt)
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", M6809, 2000000)      /* ? */
+	MCFG_CPU_ADD("maincpu", MC6809E, 2000000)      /* ? */
 	MCFG_CPU_PROGRAM_MAP(gekitsui_cpu1_map)
 	MCFG_CPU_VBLANK_INT_DRIVER("screen", cntsteer_state,  nmi_line_pulse) /* ? */
 
-	MCFG_CPU_ADD("subcpu", M6809, 2000000)       /* ? */
+	MCFG_CPU_ADD("subcpu", MC6809E, 2000000)       /* ? */
 	MCFG_CPU_PROGRAM_MAP(gekitsui_cpu2_map)
 	MCFG_CPU_VBLANK_INT_DRIVER("screen", cntsteer_state,  nmi_line_pulse) /* ? */
 

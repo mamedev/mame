@@ -23,7 +23,7 @@
 	MCFG_DEVICE_ADD(_tag, DS1315, 0)
 
 #define MCFG_DS1315_BACKING_HANDLER(_devcb) \
-	devcb = &ds1315_device::set_backing_handler(*device, DEVCB_##_devcb);
+	devcb = &downcast<ds1315_device &>(*device).set_backing_handler(DEVCB_##_devcb);
 
 /***************************************************************************
     MACROS
@@ -46,8 +46,7 @@ public:
 	bool chip_enable();
 	void chip_reset();
 
-	template <class Object> static devcb_base &set_backing_handler(device_t &device, Object &&cb)
-	{ return downcast<ds1315_device &>(device).m_backing_read.set_callback(std::forward<Object>(cb)); }
+	template <class Object> devcb_base &set_backing_handler(Object &&cb) { return m_backing_read.set_callback(std::forward<Object>(cb)); }
 
 protected:
 	// device-level overrides

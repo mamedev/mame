@@ -56,7 +56,7 @@ Stephh's notes (based on the games M68000 code and some tests) :
 #include "speaker.h"
 
 
-static ADDRESS_MAP_START( quizpani_map, AS_PROGRAM, 16, quizpani_state )
+ADDRESS_MAP_START(quizpani_state::quizpani_map)
 	AM_RANGE(0x000000, 0x07ffff) AM_ROM
 	AM_RANGE(0x100000, 0x100001) AM_READ_PORT("SYSTEM")
 	AM_RANGE(0x100002, 0x100003) AM_READ_PORT("P1_P2")
@@ -67,7 +67,7 @@ static ADDRESS_MAP_START( quizpani_map, AS_PROGRAM, 16, quizpani_state )
 	AM_RANGE(0x100018, 0x100019) AM_WRITE(tilesbank_w)
 	AM_RANGE(0x104000, 0x104001) AM_DEVREADWRITE8("oki", okim6295_device, read, write, 0x00ff)
 	AM_RANGE(0x104020, 0x104027) AM_DEVWRITE8("nmk112", nmk112_device, okibank_w, 0x00ff)
-	AM_RANGE(0x108000, 0x1083ff) AM_RAM_DEVWRITE("palette", palette_device, write) AM_SHARE("palette")
+	AM_RANGE(0x108000, 0x1083ff) AM_RAM_DEVWRITE("palette", palette_device, write16) AM_SHARE("palette")
 	AM_RANGE(0x108400, 0x1085ff) AM_WRITENOP
 	AM_RANGE(0x10c000, 0x10c007) AM_RAM AM_SHARE("scrollreg")
 	AM_RANGE(0x10c008, 0x10c403) AM_WRITENOP
@@ -193,7 +193,7 @@ static GFXDECODE_START( quizpani )
 GFXDECODE_END
 
 
-static MACHINE_CONFIG_START( quizpani )
+MACHINE_CONFIG_START(quizpani_state::quizpani)
 	MCFG_CPU_ADD("maincpu", M68000, 10000000)
 	MCFG_CPU_PROGRAM_MAP(quizpani_map)
 	MCFG_CPU_VBLANK_INT_DRIVER("screen", quizpani_state,  irq4_line_hold)

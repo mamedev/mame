@@ -72,8 +72,8 @@ DISCRETE_SOUND_END
 //  device_add_mconfig - add device configuration
 //-------------------------------------------------
 
-MACHINE_CONFIG_MEMBER( v1050_keyboard_device::device_add_mconfig )
-	MCFG_CPU_ADD(I8049_TAG, I8049, XTAL_4_608MHz)
+MACHINE_CONFIG_START(v1050_keyboard_device::device_add_mconfig)
+	MCFG_CPU_ADD(I8049_TAG, I8049, XTAL(4'608'000))
 	MCFG_MCS48_PORT_P1_IN_CB(READ8(v1050_keyboard_device, kb_p1_r))
 	MCFG_MCS48_PORT_P1_OUT_CB(WRITE8(v1050_keyboard_device, kb_p1_w))
 	MCFG_MCS48_PORT_P2_OUT_CB(WRITE8(v1050_keyboard_device, kb_p2_w))

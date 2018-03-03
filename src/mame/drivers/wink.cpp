@@ -62,6 +62,11 @@ public:
 	uint32_t screen_update_wink(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 
 	INTERRUPT_GEN_MEMBER(wink_sound);
+	void wink(machine_config &config);
+	void wink_io(address_map &map);
+	void wink_map(address_map &map);
+	void wink_sound_io(address_map &map);
+	void wink_sound_map(address_map &map);
 };
 
 
@@ -132,7 +137,7 @@ WRITE8_MEMBER(wink_state::sound_irq_w)
 	//machine().scheduler().synchronize();
 }
 
-static ADDRESS_MAP_START( wink_map, AS_PROGRAM, 8, wink_state )
+ADDRESS_MAP_START(wink_state::wink_map)
 	AM_RANGE(0x0000, 0x7fff) AM_ROM
 	AM_RANGE(0x8000, 0x87ff) AM_RAM
 	AM_RANGE(0x9000, 0x97ff) AM_RAM AM_SHARE("nvram")
@@ -165,9 +170,9 @@ WRITE8_MEMBER(wink_state::prot_w)
 	//take a9-a15 and stuff them in a variable for later use.
 }
 
-static ADDRESS_MAP_START( wink_io, AS_IO, 8, wink_state )
+ADDRESS_MAP_START(wink_state::wink_io)
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
-	AM_RANGE(0x00, 0x1f) AM_RAM_DEVWRITE("palette", palette_device, write) AM_SHARE("palette") //0x10-0x1f is likely to be something else
+	AM_RANGE(0x00, 0x1f) AM_RAM_DEVWRITE("palette", palette_device, write8) AM_SHARE("palette") //0x10-0x1f is likely to be something else
 //  AM_RANGE(0x20, 0x20) AM_WRITENOP                //??? seems unused..
 	AM_RANGE(0x21, 0x21) AM_WRITE(player_mux_w)     //??? no mux on the pcb.
 	AM_RANGE(0x22, 0x22) AM_WRITE(tile_banking_w)
@@ -188,13 +193,13 @@ static ADDRESS_MAP_START( wink_io, AS_IO, 8, wink_state )
 	AM_RANGE(0xe0, 0xff) AM_READ(prot_r)        //load math unit from buffer & lower address-bus
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( wink_sound_map, AS_PROGRAM, 8, wink_state )
+ADDRESS_MAP_START(wink_state::wink_sound_map)
 	AM_RANGE(0x0000, 0x1fff) AM_ROM
 	AM_RANGE(0x4000, 0x43ff) AM_RAM
 	AM_RANGE(0x8000, 0x8000) AM_DEVREAD("soundlatch", generic_latch_8_device, read)
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( wink_sound_io, AS_IO, 8, wink_state )
+ADDRESS_MAP_START(wink_state::wink_sound_io)
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	AM_RANGE(0x00, 0x00) AM_DEVREADWRITE("aysnd", ay8910_device, data_r, data_w)
 	AM_RANGE(0x80, 0x80) AM_DEVWRITE("aysnd", ay8910_device, address_w)
@@ -354,7 +359,7 @@ void wink_state::machine_reset()
 	m_sound_flag = 0;
 }
 
-static MACHINE_CONFIG_START( wink )
+MACHINE_CONFIG_START(wink_state::wink)
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", Z80, 12000000 / 4)
 	MCFG_CPU_PROGRAM_MAP(wink_map)
@@ -437,19 +442,19 @@ DRIVER_INIT_MEMBER(wink_state,wink)
 	memcpy(&buffer[0],ROM,0x8000);
 
 	for (i = 0x0000; i <= 0x1fff; i++)
-		ROM[i] = buffer[BITSWAP16(i,15,14,13, 11,12, 7, 9, 8,10, 6, 4, 5, 1, 2, 3, 0)];
+		ROM[i] = buffer[bitswap<16>(i,15,14,13, 11,12, 7, 9, 8,10, 6, 4, 5, 1, 2, 3, 0)];
 
 	for (i = 0x2000; i <= 0x3fff; i++)
-		ROM[i] = buffer[BITSWAP16(i,15,14,13, 10, 7,12, 9, 8,11, 6, 3, 1, 5, 2, 4, 0)];
+		ROM[i] = buffer[bitswap<16>(i,15,14,13, 10, 7,12, 9, 8,11, 6, 3, 1, 5, 2, 4, 0)];
 
 	for (i = 0x4000; i <= 0x5fff; i++)
-		ROM[i] = buffer[BITSWAP16(i,15,14,13,  7,10,11, 9, 8,12, 6, 1, 3, 4, 2, 5, 0)];
+		ROM[i] = buffer[bitswap<16>(i,15,14,13,  7,10,11, 9, 8,12, 6, 1, 3, 4, 2, 5, 0)];
 
 	for (i = 0x6000; i <= 0x7fff; i++)
-		ROM[i] = buffer[BITSWAP16(i,15,14,13, 11,12, 7, 9, 8,10, 6, 4, 5, 1, 2, 3, 0)];
+		ROM[i] = buffer[bitswap<16>(i,15,14,13, 11,12, 7, 9, 8,10, 6, 4, 5, 1, 2, 3, 0)];
 
 	for (i = 0; i < 0x8000; i++)
-		ROM[i] += BITSWAP8(i & 0xff, 7,5,3,1,6,4,2,0);
+		ROM[i] += bitswap<8>(i & 0xff, 7,5,3,1,6,4,2,0);
 }
 
 GAME( 1985, wink,  0,    wink, wink, wink_state, wink, ROT0, "Midcoin", "Wink (set 1)", MACHINE_IMPERFECT_SOUND | MACHINE_UNEMULATED_PROTECTION | MACHINE_SUPPORTS_SAVE )

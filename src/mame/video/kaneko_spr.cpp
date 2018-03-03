@@ -63,21 +63,11 @@ kaneko16_sprite_device::kaneko16_sprite_device(
 	m_priority.sprite[3] = 8;   // above all
 }
 
-//-------------------------------------------------
-//  static_set_gfxdecode_tag: Set the tag of the
-//  gfx decoder
-//-------------------------------------------------
-
-void kaneko16_sprite_device::static_set_gfxdecode_tag(device_t &device, const char *tag)
-{
-	downcast<kaneko16_sprite_device &>(device).m_gfxdecode.set_tag(tag);
-}
-
 void kaneko16_sprite_device::device_start()
 {
 	m_first_sprite = std::make_unique<struct kan_tempsprite[]>(0x400);
 	m_sprites_regs = make_unique_clear<uint16_t[]>(0x20/2);
-	m_screen->register_screen_bitmap(m_sprites_bitmap);
+	screen().register_screen_bitmap(m_sprites_bitmap);
 
 	save_item(NAME(m_sprite_flipx));
 	save_item(NAME(m_sprite_flipy));
@@ -93,32 +83,6 @@ void kaneko16_sprite_device::device_reset()
 	m_sprite_flipx = 0;
 	m_sprite_flipy = 0;
 }
-
-void kaneko16_sprite_device::set_priorities(device_t &device, int pri0, int pri1, int pri2, int pri3)
-{
-	kaneko16_sprite_device &dev = downcast<kaneko16_sprite_device &>(device);
-
-	dev.m_priority.sprite[0] = pri0;
-	dev.m_priority.sprite[1] = pri1;
-	dev.m_priority.sprite[2] = pri2;
-	dev.m_priority.sprite[3] = pri3;
-}
-
-
-void kaneko16_sprite_device::set_fliptype(device_t &device, int fliptype)
-{
-	kaneko16_sprite_device &dev = downcast<kaneko16_sprite_device &>(device);
-	dev.m_sprite_fliptype = fliptype;
-
-}
-
-void kaneko16_sprite_device::set_offsets(device_t &device, int xoffs, int yoffs)
-{
-	kaneko16_sprite_device &dev = downcast<kaneko16_sprite_device &>(device);
-	dev.m_sprite_xoffs = xoffs;
-	dev.m_sprite_yoffs = yoffs;
-}
-
 
 /***************************************************************************
 
@@ -215,12 +179,12 @@ int kaneko16_sprite_device::kaneko16_parse_sprite_type012(int i, struct kan_temp
 	if (m_sprite_flipy)
 	{
 		s->yoffs        -=      m_sprites_regs[0x2/2];
-		s->yoffs        -=      m_screen->visible_area().min_y<<6;
+		s->yoffs        -=      screen().visible_area().min_y<<6;
 	}
 	else
 	{
 		s->yoffs        -=      m_sprites_regs[0x2/2];
-		s->yoffs        +=      m_screen->visible_area().min_y<<6;
+		s->yoffs        +=      screen().visible_area().min_y<<6;
 	}
 
 	return                  ( (attr & 0x2000) ? USE_LATCHED_XY    : 0 ) |
@@ -353,7 +317,7 @@ void kaneko16_sprite_device::kaneko16_draw_sprites(_BitmapClass &bitmap, const r
 	   in a temp buffer, then draw the buffer's contents from last
 	   to first. */
 
-	int max =   (m_screen->width() > 0x100) ? (0x200<<6) : (0x100<<6);
+	int max =   (screen().width() > 0x100) ? (0x200<<6) : (0x100<<6);
 
 	int i = 0;
 	struct kan_tempsprite *s = m_first_sprite.get();
@@ -563,7 +527,7 @@ WRITE16_MEMBER(kaneko16_sprite_device::kaneko16_sprites_regs_w)
 			break;
 	}
 
-//  logerror("CPU #0 PC %06X : Warning, sprites reg %04X <- %04X\n",space.device().safe_pc(),offset*2,data);
+//  logerror("%s : Warning, sprites reg %04X <- %04X\n",m_maincpu->pc(),offset*2,data);
 }
 
 

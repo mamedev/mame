@@ -37,6 +37,9 @@ public:
 	I8275_DRAW_CHARACTER_MEMBER( crtc_display_pixels );
 	uint8_t m_term_data;
 	virtual void machine_reset() override;
+	void ipds(machine_config &config);
+	void ipds_io(address_map &map);
+	void ipds_mem(address_map &map);
 };
 
 READ8_MEMBER( ipds_state::ipds_b0_r )
@@ -60,13 +63,13 @@ WRITE8_MEMBER( ipds_state::ipds_b1_w )
 {
 }
 
-static ADDRESS_MAP_START(ipds_mem, AS_PROGRAM, 8, ipds_state)
+ADDRESS_MAP_START(ipds_state::ipds_mem)
 	ADDRESS_MAP_UNMAP_HIGH
 	AM_RANGE(0x0000, 0x07ff) AM_ROM
 	AM_RANGE(0x0800, 0xffff) AM_RAM
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( ipds_io, AS_IO, 8, ipds_state)
+ADDRESS_MAP_START(ipds_state::ipds_io)
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	ADDRESS_MAP_UNMAP_HIGH
 	AM_RANGE(0xb0, 0xb0) AM_READ(ipds_b0_r)
@@ -126,9 +129,9 @@ void ipds_state::kbd_put(u8 data)
 	m_term_data = data;
 }
 
-static MACHINE_CONFIG_START( ipds )
+MACHINE_CONFIG_START(ipds_state::ipds)
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu",I8085A, XTAL_19_6608MHz / 4)
+	MCFG_CPU_ADD("maincpu",I8085A, XTAL(19'660'800) / 4)
 	MCFG_CPU_PROGRAM_MAP(ipds_mem)
 	MCFG_CPU_IO_MAP(ipds_io)
 
@@ -142,7 +145,7 @@ static MACHINE_CONFIG_START( ipds )
 	MCFG_GFXDECODE_ADD("gfxdecode", "palette", ipds)
 	MCFG_PALETTE_ADD_MONOCHROME("palette")
 
-	MCFG_DEVICE_ADD("i8275", I8275, XTAL_19_6608MHz / 4)
+	MCFG_DEVICE_ADD("i8275", I8275, XTAL(19'660'800) / 4)
 	MCFG_I8275_CHARACTER_WIDTH(6)
 	MCFG_I8275_DRAW_CHARACTER_CALLBACK_OWNER(ipds_state, crtc_display_pixels)
 

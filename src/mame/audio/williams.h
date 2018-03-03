@@ -48,6 +48,7 @@ public:
 	DECLARE_WRITE8_MEMBER(cvsd_digit_clock_clear_w);
 	DECLARE_WRITE8_MEMBER(cvsd_clock_set_w);
 
+	void williams_cvsd_map(address_map &map);
 protected:
 	// device-level overrides
 	virtual void device_add_mconfig(machine_config &config) override;
@@ -57,7 +58,7 @@ protected:
 
 private:
 	// devices
-	required_device<m6809e_device> m_cpu;
+	required_device<mc6809e_device> m_cpu;
 	required_device<pia6821_device> m_pia;
 	required_device<hc55516_device> m_hc55516;
 
@@ -95,6 +96,8 @@ public:
 	DECLARE_WRITE8_MEMBER(cvsd_digit_clock_clear_w);
 	DECLARE_WRITE8_MEMBER(cvsd_clock_set_w);
 
+	void williams_narc_master_map(address_map &map);
+	void williams_narc_slave_map(address_map &map);
 protected:
 	// device-level overrides
 	virtual void device_add_mconfig(machine_config &config) override;
@@ -112,8 +115,8 @@ private:
 	};
 
 	// devices
-	required_device<m6809e_device> m_cpu0;
-	required_device<m6809e_device> m_cpu1;
+	required_device<mc6809e_device> m_cpu0;
+	required_device<mc6809e_device> m_cpu1;
 	required_device<hc55516_device> m_hc55516;
 
 	// internal state
@@ -145,6 +148,8 @@ public:
 	DECLARE_READ8_MEMBER(command_r);
 	DECLARE_WRITE8_MEMBER(talkback_w);
 
+	void williams_adpcm_map(address_map &map);
+	void williams_adpcm_oki_map(address_map &map);
 protected:
 	// timer IDs
 	enum
@@ -161,7 +166,7 @@ protected:
 
 private:
 	// devices
-	required_device<m6809e_device> m_cpu;
+	required_device<mc6809e_device> m_cpu;
 
 	// internal state
 	uint8_t m_latch;

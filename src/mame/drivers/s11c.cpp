@@ -14,7 +14,7 @@
 #include "s11c.lh"
 
 
-static ADDRESS_MAP_START( s11c_main_map, AS_PROGRAM, 8, s11c_state )
+ADDRESS_MAP_START(s11c_state::s11c_main_map)
 	AM_RANGE(0x0000, 0x0fff) AM_RAM AM_SHARE("nvram")
 	AM_RANGE(0x2100, 0x2103) AM_MIRROR(0x00fc) AM_DEVREADWRITE("pia21", pia6821_device, read, write) // sound+solenoids
 	AM_RANGE(0x2200, 0x2200) AM_MIRROR(0x01ff) AM_WRITE(sol3_w) // solenoids
@@ -150,9 +150,9 @@ DRIVER_INIT_MEMBER(s11c_state,s11c)
 	timer->adjust(attotime::from_ticks(S11_IRQ_CYCLES,E_CLOCK),1);
 }
 
-static MACHINE_CONFIG_START( s11c )
+MACHINE_CONFIG_START(s11c_state::s11c)
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", M6808, XTAL_4MHz)
+	MCFG_CPU_ADD("maincpu", M6808, XTAL(4'000'000))
 	MCFG_CPU_PROGRAM_MAP(s11c_main_map)
 	MCFG_MACHINE_RESET_OVERRIDE(s11c_state, s11c)
 
@@ -160,7 +160,7 @@ static MACHINE_CONFIG_START( s11c )
 	MCFG_DEFAULT_LAYOUT(layout_s11c)
 
 	/* Sound */
-	MCFG_FRAGMENT_ADD( genpin_audio )
+	genpin_audio(config);
 
 	/* Devices */
 	MCFG_DEVICE_ADD("pia21", PIA6821, 0)

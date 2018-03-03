@@ -78,7 +78,7 @@
 #include "formats/vt_cas.h"
 
 
-static ADDRESS_MAP_START(vtech2_mem, AS_PROGRAM, 8, vtech2_state )
+ADDRESS_MAP_START(vtech2_state::vtech2_mem)
 	ADDRESS_MAP_UNMAP_HIGH
 	AM_RANGE(0x0000, 0x3fff) AM_RAMBANK("bank1")
 	AM_RANGE(0x4000, 0x7fff) AM_RAMBANK("bank2")
@@ -86,7 +86,7 @@ static ADDRESS_MAP_START(vtech2_mem, AS_PROGRAM, 8, vtech2_state )
 	AM_RANGE(0xc000, 0xffff) AM_RAMBANK("bank4")
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START(vtech2_io, AS_IO, 8, vtech2_state )
+ADDRESS_MAP_START(vtech2_state::vtech2_io)
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	AM_RANGE(0x10, 0x1f) AM_READWRITE(laser_fdc_r, laser_fdc_w)
 	AM_RANGE(0x40, 0x43) AM_WRITE(laser_bank_select_w)
@@ -413,7 +413,7 @@ static const floppy_interface vtech2_floppy_interface =
 	nullptr
 };
 
-static MACHINE_CONFIG_START( laser350 )
+MACHINE_CONFIG_START(vtech2_state::laser350)
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", Z80, 3694700)        /* 3.694700 MHz */
 	MCFG_CPU_PROGRAM_MAP(vtech2_mem)
@@ -455,12 +455,14 @@ static MACHINE_CONFIG_START( laser350 )
 MACHINE_CONFIG_END
 
 
-static MACHINE_CONFIG_DERIVED( laser500, laser350 )
+MACHINE_CONFIG_START(vtech2_state::laser500)
+	laser350(config);
 	MCFG_MACHINE_RESET_OVERRIDE(vtech2_state, laser500 )
 MACHINE_CONFIG_END
 
 
-static MACHINE_CONFIG_DERIVED( laser700, laser350 )
+MACHINE_CONFIG_START(vtech2_state::laser700)
+	laser350(config);
 	MCFG_MACHINE_RESET_OVERRIDE(vtech2_state, laser700 )
 
 	/* Second 5.25" floppy drive */

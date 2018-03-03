@@ -33,9 +33,10 @@
 #include "bus/interpro/keyboard/keyboard.h"
 
 #include "formats/pc_dsk.h"
+#include "softlist.h"
 
 #define INTERPRO_CPU_TAG           "cpu"
-#define INTERPRO_MMU_TAG           "mmu"
+#define INTERPRO_MMU_TAG           "cammu"
 #define INTERPRO_MCGA_TAG          "mcga"
 #define INTERPRO_SGA_TAG           "sga"
 #define INTERPRO_FDC_TAG           "fdc"
@@ -53,6 +54,7 @@
 #define INTERPRO_ETH_TAG           "eth"
 #define INTERPRO_IOGA_TAG          "ioga"
 
+#define INTERPRO_NODEID_TAG        "nodeid"
 #define INTERPRO_IDPROM_TAG        "idprom"
 #define INTERPRO_EPROM_TAG         "eprom"
 #define INTERPRO_FLASH_TAG         "flash"
@@ -69,14 +71,13 @@ public:
 		, m_mcga(*this, INTERPRO_MCGA_TAG)
 		, m_sga(*this, INTERPRO_SGA_TAG)
 		, m_fdc(*this, INTERPRO_FDC_TAG)
-		, m_arbga(*this, INTERPRO_ARBGA_TAG)
 		, m_scc1(*this, INTERPRO_SCC1_TAG)
 		, m_scc2(*this, INTERPRO_SCC2_TAG)
 		, m_rtc(*this, INTERPRO_RTC_TAG)
 		, m_scsibus(*this, INTERPRO_SCSI_TAG)
-		, m_scsi(*this, INTERPRO_SCSI_DEVICE_TAG)
 		, m_eth(*this, INTERPRO_ETH_TAG)
 		, m_ioga(*this, INTERPRO_IOGA_TAG)
+		, m_led(*this, "digit0")
 	{
 	}
 
@@ -86,12 +87,10 @@ public:
 	required_device<interpro_mcga_device> m_mcga;
 	required_device<interpro_sga_device> m_sga;
 	required_device<upd765_family_device> m_fdc;
-	required_device<interpro_arbga_device> m_arbga;
 	required_device<z80scc_device> m_scc1;
 	required_device<z80scc_device> m_scc2;
 	required_device<mc146818_device> m_rtc;
 	required_device<nscsi_bus_device> m_scsibus;
-	required_device<ncr53c90a_device> m_scsi;
 	required_device<i82586_base_device> m_eth;
 	required_device<interpro_ioga_device> m_ioga;
 
@@ -134,7 +133,7 @@ public:
 		CTRL1_ETHRMOD    = 0x0040, // 0 = sytem configured for remote modems
 		CTRL1_FIFOACTIVE = 0x0080  // 0 = plotter fifos reset
 	};
-	DECLARE_READ16_MEMBER(sreg_ctrl1_r) const { return m_sreg_ctrl1; }
+	DECLARE_READ16_MEMBER(sreg_ctrl1_r) { return m_sreg_ctrl1; }
 	DECLARE_WRITE16_MEMBER(sreg_ctrl1_w);
 
 	enum sreg_ctrl2_mask
@@ -149,21 +148,28 @@ public:
 
 		CTRL2_MASK      = 0x004d
 	};
-	DECLARE_READ16_MEMBER(sreg_ctrl2_r) const { return m_sreg_ctrl2; }
+	DECLARE_READ16_MEMBER(sreg_ctrl2_r) { return m_sreg_ctrl2; }
 	virtual DECLARE_WRITE16_MEMBER(sreg_ctrl2_w);
-	DECLARE_READ16_MEMBER(sreg_ctrl3_r) const { return m_sreg_ctrl3; }
+	DECLARE_READ16_MEMBER(sreg_ctrl3_r) { return m_sreg_ctrl3; }
 	DECLARE_WRITE16_MEMBER(sreg_ctrl3_w) { m_sreg_ctrl3 = data; }
 
 	DECLARE_READ8_MEMBER(nodeid_r);
 
-	DECLARE_READ32_MEMBER(unmapped_r);
-	DECLARE_WRITE32_MEMBER(unmapped_w);
-
 	DECLARE_FLOPPY_FORMATS(floppy_formats);
+
+	void ioga(machine_config &config);
+	void interpro_scc1(machine_config &config);
+	void interpro_scc2(machine_config &config);
+	void interpro(machine_config &config);
+	static void interpro_scsi_adapter(device_t *device);
+	void interpro_boot_map(address_map &map);
+	void interpro_common_map(address_map &map);
 
 protected:
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
+
+	output_finder<> m_led;
 
 	u16 m_sreg_error;
 	u16 m_sreg_status;
@@ -181,15 +187,22 @@ public:
 		: interpro_state(mconfig, type, tag)
 		, m_d_cammu(*this, INTERPRO_MMU_TAG "_d")
 		, m_i_cammu(*this, INTERPRO_MMU_TAG "_i")
+		, m_scsi(*this, INTERPRO_SCSI_DEVICE_TAG)
 	{
 	}
-
-	DECLARE_DRIVER_INIT(turquoise);
 
 	DECLARE_WRITE8_MEMBER(sreg_error_w) { m_sreg_error = data; }
 
 	required_device<cammu_c3_device> m_d_cammu;
 	required_device<cammu_c3_device> m_i_cammu;
+	required_device<ncr53c90a_device> m_scsi;
+
+	void turquoise(machine_config &config);
+	void ip2000(machine_config &config);
+	void interpro_82586_map(address_map &map);
+	void turquoise_base_map(address_map &map);
+	void turquoise_main_map(address_map &map);
+	void turquoise_io_map(address_map &map);
 };
 
 class sapphire_state : public interpro_state
@@ -198,19 +211,32 @@ public:
 	sapphire_state(const machine_config &mconfig, device_type type, const char *tag)
 		: interpro_state(mconfig, type, tag)
 		, m_mmu(*this, INTERPRO_MMU_TAG)
+		, m_scsi(*this, INTERPRO_SCSI_DEVICE_TAG)
+		, m_arbga(*this, INTERPRO_ARBGA_TAG)
 		, m_flash_lo(*this, INTERPRO_FLASH_TAG "_lo")
 		, m_flash_hi(*this, INTERPRO_FLASH_TAG "_hi")
 	{
 	}
 
-	DECLARE_DRIVER_INIT(sapphire);
-
 	virtual DECLARE_WRITE16_MEMBER(sreg_ctrl2_w) override;
+	DECLARE_READ32_MEMBER(unmapped_r);
+	DECLARE_WRITE32_MEMBER(unmapped_w);
 
 	required_device<cammu_c4_device> m_mmu;
-
+	required_device<ncr53c94_device> m_scsi;
+	required_device<interpro_arbga_device> m_arbga;
 	required_device<intel_28f010_device> m_flash_lo;
 	required_device<intel_28f010_device> m_flash_hi;
+
+	void sapphire(machine_config &config);
+	void ip2500(machine_config &config);
+	void ip2400(machine_config &config);
+	void ip2800(machine_config &config);
+	void ip2700(machine_config &config);
+	void interpro_82596_map(address_map &map);
+	void sapphire_base_map(address_map &map);
+	void sapphire_main_map(address_map &map);
+	void sapphire_io_map(address_map &map);
 };
 
 #endif // MAME_INCLUDES_INTERPRO_H

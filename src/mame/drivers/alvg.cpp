@@ -12,6 +12,8 @@ public:
 			m_maincpu(*this, "maincpu")
 	{ }
 
+	void alvg(machine_config &config);
+	void alvg_map(address_map &map);
 protected:
 
 	// devices
@@ -24,7 +26,7 @@ public:
 };
 
 
-static ADDRESS_MAP_START( alvg_map, AS_PROGRAM, 8, alvg_state )
+ADDRESS_MAP_START(alvg_state::alvg_map)
 	AM_RANGE(0x0000, 0xffff) AM_NOP
 	AM_RANGE(0x0000, 0x3fff) AM_RAM
 	AM_RANGE(0x4000, 0xffff) AM_ROM
@@ -41,7 +43,7 @@ DRIVER_INIT_MEMBER(alvg_state,alvg)
 {
 }
 
-static MACHINE_CONFIG_START( alvg )
+MACHINE_CONFIG_START(alvg_state::alvg)
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", M65C02, 2000000)
 	MCFG_CPU_PROGRAM_MAP(alvg_map)

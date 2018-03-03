@@ -33,6 +33,11 @@ public:
 
 	required_device<cpu_device> m_maincpu;
 	required_device<cpu_device> m_audiocpu;
+	void westdrm(machine_config &config);
+	void main_map(address_map &map);
+	void main_portmap(address_map &map);
+	void sound_map(address_map &map);
+	void sound_portmap(address_map &map);
 };
 
 
@@ -44,23 +49,23 @@ public:
 
 /* Memory maps */
 
-static ADDRESS_MAP_START( main_map, AS_PROGRAM, 8, segacoin_state )
+ADDRESS_MAP_START(segacoin_state::main_map)
 	AM_RANGE(0x0000, 0x7fff) AM_ROM
 	AM_RANGE(0xe000, 0xffff) AM_RAM
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( main_portmap, AS_IO, 8, segacoin_state )
+ADDRESS_MAP_START(segacoin_state::main_portmap)
 	ADDRESS_MAP_UNMAP_HIGH
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
 ADDRESS_MAP_END
 
 
-static ADDRESS_MAP_START( sound_map, AS_PROGRAM, 8, segacoin_state )
+ADDRESS_MAP_START(segacoin_state::sound_map)
 	AM_RANGE(0x0000, 0x7fff) AM_ROM
 	AM_RANGE(0xe000, 0xffff) AM_RAM
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( sound_portmap, AS_IO, 8, segacoin_state )
+ADDRESS_MAP_START(segacoin_state::sound_portmap)
 	ADDRESS_MAP_UNMAP_HIGH
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
 ADDRESS_MAP_END
@@ -104,7 +109,7 @@ INPUT_PORTS_END
 
 ***************************************************************************/
 
-static MACHINE_CONFIG_START( westdrm )
+MACHINE_CONFIG_START(segacoin_state::westdrm)
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", Z80, 8000000) // clock frequency unknown

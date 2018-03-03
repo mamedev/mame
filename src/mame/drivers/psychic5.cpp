@@ -435,7 +435,7 @@ WRITE8_MEMBER(psychic5_state::bombsa_flipscreen_w)
 
 ***************************************************************************/
 
-static ADDRESS_MAP_START( psychic5_main_map, AS_PROGRAM, 8, psychic5_state )
+ADDRESS_MAP_START(psychic5_state::psychic5_main_map)
 	AM_RANGE(0x0000, 0x7fff) AM_ROM
 	AM_RANGE(0x8000, 0xbfff) AM_ROMBANK("mainbank")
 	AM_RANGE(0xc000, 0xdfff) AM_DEVICE("vrambank", address_map_bank_device, amap8)
@@ -452,7 +452,7 @@ static ADDRESS_MAP_START( psychic5_main_map, AS_PROGRAM, 8, psychic5_state )
 ADDRESS_MAP_END
 
 
-static ADDRESS_MAP_START( psychic5_vrambank_map, AS_PROGRAM, 8, psychic5_state )
+ADDRESS_MAP_START(psychic5_state::psychic5_vrambank_map)
 	AM_RANGE(0x0000, 0x0fff) AM_RAM_WRITE(bg_videoram_w) AM_SHARE("bg_videoram")
 	AM_RANGE(0x1000, 0x1fff) AM_RAM
 
@@ -473,52 +473,52 @@ static ADDRESS_MAP_START( psychic5_vrambank_map, AS_PROGRAM, 8, psychic5_state )
 ADDRESS_MAP_END
 
 
-static ADDRESS_MAP_START( psychic5_sound_map, AS_PROGRAM, 8, psychic5_state )
+ADDRESS_MAP_START(psychic5_state::psychic5_sound_map)
 	AM_RANGE(0x0000, 0x7fff) AM_ROM
 	AM_RANGE(0xc000, 0xc7ff) AM_RAM
 	AM_RANGE(0xe000, 0xe000) AM_DEVREAD("soundlatch", generic_latch_8_device, read)
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( psychic5_soundport_map, AS_IO, 8, psychic5_state )
+ADDRESS_MAP_START(psychic5_state::psychic5_soundport_map)
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	AM_RANGE(0x00, 0x01) AM_DEVWRITE("ym1", ym2203_device, write)
 	AM_RANGE(0x80, 0x81) AM_DEVWRITE("ym2", ym2203_device, write)
 ADDRESS_MAP_END
 
 
-static ADDRESS_MAP_START( bombsa_main_map, AS_PROGRAM, 8, psychic5_state )
+ADDRESS_MAP_START(psychic5_state::bombsa_main_map)
 	AM_RANGE(0x0000, 0x7fff) AM_ROM
 	AM_RANGE(0x8000, 0xbfff) AM_ROMBANK("mainbank")
 	AM_RANGE(0xc000, 0xcfff) AM_RAM
 
 	/* ports look like the other games */
+	AM_RANGE(0xd000, 0xd1ff) AM_RAM
 	AM_RANGE(0xd000, 0xd000) AM_DEVWRITE("soundlatch", generic_latch_8_device, write) // confirmed
 	AM_RANGE(0xd001, 0xd001) AM_WRITE(bombsa_flipscreen_w)
 	AM_RANGE(0xd002, 0xd002) AM_READWRITE(bankselect_r, bombsa_bankselect_w)
 	AM_RANGE(0xd003, 0xd003) AM_READWRITE(vram_page_select_r, vram_page_select_w)
 	AM_RANGE(0xd005, 0xd005) AM_WRITE(bombsa_unknown_w) // ?
 
-	AM_RANGE(0xd000, 0xd1ff) AM_RAM
 	AM_RANGE(0xd200, 0xd7ff) AM_RAM AM_SHARE("spriteram")
 	AM_RANGE(0xd800, 0xdfff) AM_RAM
 
 	AM_RANGE(0xe000, 0xffff) AM_DEVICE("vrambank", address_map_bank_device, amap8)
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( bombsa_sound_map, AS_PROGRAM, 8, psychic5_state )
+ADDRESS_MAP_START(psychic5_state::bombsa_sound_map)
 	AM_RANGE(0x0000, 0xbfff) AM_ROM
 	AM_RANGE(0xc000, 0xc7ff) AM_RAM
 	AM_RANGE(0xe000, 0xe000) AM_DEVREAD("soundlatch", generic_latch_8_device, read)
 	AM_RANGE(0xf000, 0xf000) AM_WRITEONLY                               // Is this a confirm of some sort?
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( bombsa_soundport_map, AS_IO, 8, psychic5_state )
+ADDRESS_MAP_START(psychic5_state::bombsa_soundport_map)
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	AM_RANGE(0x00, 0x01) AM_DEVREADWRITE("ym1", ym2203_device, read, write)
 	AM_RANGE(0x80, 0x81) AM_DEVREADWRITE("ym2", ym2203_device, read, write)
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( bombsa_vrambank_map, AS_PROGRAM, 8, psychic5_state )
+ADDRESS_MAP_START(psychic5_state::bombsa_vrambank_map)
 	AM_RANGE(0x0000, 0x1fff) AM_RAM_WRITE(bg_videoram_w) AM_SHARE("bg_videoram")
 
 	AM_RANGE(0x2000, 0x2000) AM_READ_PORT("SYSTEM")
@@ -712,10 +712,10 @@ static GFXDECODE_START( bombsa )
 GFXDECODE_END
 
 
-static MACHINE_CONFIG_START( psychic5 )
+MACHINE_CONFIG_START(psychic5_state::psychic5)
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", Z80, XTAL_12MHz/2)
+	MCFG_CPU_ADD("maincpu", Z80, XTAL(12'000'000)/2)
 	MCFG_CPU_PROGRAM_MAP(psychic5_main_map)
 	MCFG_TIMER_DRIVER_ADD_SCANLINE("scantimer", psychic5_state, scanline, "screen", 0, 1)
 
@@ -726,7 +726,7 @@ static MACHINE_CONFIG_START( psychic5 )
 	MCFG_ADDRESS_MAP_BANK_ADDR_WIDTH(14)
 	MCFG_ADDRESS_MAP_BANK_STRIDE(0x2000)
 
-	MCFG_CPU_ADD("audiocpu", Z80, XTAL_5MHz)
+	MCFG_CPU_ADD("audiocpu", Z80, XTAL(5'000'000))
 	MCFG_CPU_PROGRAM_MAP(psychic5_sound_map)
 	MCFG_CPU_IO_MAP(psychic5_soundport_map)
 
@@ -736,7 +736,7 @@ static MACHINE_CONFIG_START( psychic5 )
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
-	MCFG_SCREEN_RAW_PARAMS(XTAL_12MHz/2,394, 0, 256, 282, 16, 240) // was 53.8 Hz before, assume same as Bombs Away
+	MCFG_SCREEN_RAW_PARAMS(XTAL(12'000'000)/2,394, 0, 256, 282, 16, 240) // was 53.8 Hz before, assume same as Bombs Away
 	MCFG_SCREEN_UPDATE_DRIVER(psychic5_state, screen_update_psychic5)
 
 	MCFG_GFXDECODE_ADD("gfxdecode", "palette", psychic5)
@@ -752,24 +752,24 @@ static MACHINE_CONFIG_START( psychic5 )
 
 	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
 
-	MCFG_SOUND_ADD("ym1", YM2203, XTAL_12MHz/8)
+	MCFG_SOUND_ADD("ym1", YM2203, XTAL(12'000'000)/8)
 	MCFG_YM2203_IRQ_HANDLER(INPUTLINE("audiocpu", 0))
 	MCFG_SOUND_ROUTE(0, "mono", 0.15)
 	MCFG_SOUND_ROUTE(1, "mono", 0.15)
 	MCFG_SOUND_ROUTE(2, "mono", 0.15)
 	MCFG_SOUND_ROUTE(3, "mono", 0.50)
 
-	MCFG_SOUND_ADD("ym2", YM2203, XTAL_12MHz/8)
+	MCFG_SOUND_ADD("ym2", YM2203, XTAL(12'000'000)/8)
 	MCFG_SOUND_ROUTE(0, "mono", 0.15)
 	MCFG_SOUND_ROUTE(1, "mono", 0.15)
 	MCFG_SOUND_ROUTE(2, "mono", 0.15)
 	MCFG_SOUND_ROUTE(3, "mono", 0.50)
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_START( bombsa )
+MACHINE_CONFIG_START(psychic5_state::bombsa)
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", Z80, XTAL_12MHz/2 ) /* 6 MHz */
+	MCFG_CPU_ADD("maincpu", Z80, XTAL(12'000'000)/2 ) /* 6 MHz */
 	MCFG_CPU_PROGRAM_MAP(bombsa_main_map)
 	MCFG_TIMER_DRIVER_ADD_SCANLINE("scantimer", psychic5_state, scanline, "screen", 0, 1)
 
@@ -780,7 +780,7 @@ static MACHINE_CONFIG_START( bombsa )
 	MCFG_ADDRESS_MAP_BANK_ADDR_WIDTH(14)
 	MCFG_ADDRESS_MAP_BANK_STRIDE(0x2000)
 
-	MCFG_CPU_ADD("audiocpu", Z80, XTAL_5MHz )
+	MCFG_CPU_ADD("audiocpu", Z80, XTAL(5'000'000) )
 	MCFG_CPU_PROGRAM_MAP(bombsa_sound_map)
 	MCFG_CPU_IO_MAP(bombsa_soundport_map)
 
@@ -790,7 +790,7 @@ static MACHINE_CONFIG_START( bombsa )
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
-	MCFG_SCREEN_RAW_PARAMS(XTAL_12MHz/2,394, 0, 256, 282, 16, 240) /* Guru says : VSync - 54Hz . HSync - 15.25kHz */
+	MCFG_SCREEN_RAW_PARAMS(XTAL(12'000'000)/2,394, 0, 256, 282, 16, 240) /* Guru says : VSync - 54Hz . HSync - 15.25kHz */
 	MCFG_SCREEN_UPDATE_DRIVER(psychic5_state, screen_update_bombsa)
 
 	MCFG_GFXDECODE_ADD("gfxdecode", "palette", bombsa)
@@ -804,14 +804,14 @@ static MACHINE_CONFIG_START( bombsa )
 
 	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
 
-	MCFG_SOUND_ADD("ym1", YM2203, XTAL_12MHz/8)
+	MCFG_SOUND_ADD("ym1", YM2203, XTAL(12'000'000)/8)
 	MCFG_YM2203_IRQ_HANDLER(INPUTLINE("audiocpu", 0))
 	MCFG_SOUND_ROUTE(0, "mono", 0.30)
 	MCFG_SOUND_ROUTE(1, "mono", 0.30)
 	MCFG_SOUND_ROUTE(2, "mono", 0.30)
 	MCFG_SOUND_ROUTE(3, "mono", 1.0)
 
-	MCFG_SOUND_ADD("ym2", YM2203, XTAL_12MHz/8)
+	MCFG_SOUND_ADD("ym2", YM2203, XTAL(12'000'000)/8)
 	MCFG_SOUND_ROUTE(0, "mono", 0.30)
 	MCFG_SOUND_ROUTE(1, "mono", 0.30)
 	MCFG_SOUND_ROUTE(2, "mono", 0.30)

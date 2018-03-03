@@ -173,6 +173,12 @@ public:
 
 	int m_user_pa2;
 	int m_user_pb;
+	void pal(machine_config &config);
+	void ntsc(machine_config &config);
+	void pet64(machine_config &config);
+	void c64_mem(address_map &map);
+	void vic_colorram_map(address_map &map);
+	void vic_videoram_map(address_map &map);
 };
 
 
@@ -185,6 +191,9 @@ public:
 
 	DECLARE_READ8_MEMBER( cpu_r );
 	DECLARE_WRITE8_MEMBER( cpu_w );
+	void ntsc_sx(machine_config &config);
+	void ntsc_dx(machine_config &config);
+	void pal_sx(machine_config &config);
 };
 
 
@@ -194,6 +203,8 @@ public:
 	c64c_state(const machine_config &mconfig, device_type type, const char *tag)
 		: c64_state(mconfig, type, tag)
 	{ }
+	void pal_c(machine_config &config);
+	void ntsc_c(machine_config &config);
 };
 
 
@@ -209,6 +220,7 @@ public:
 
 	DECLARE_READ8_MEMBER( cia1_pa_r );
 	DECLARE_READ8_MEMBER( cia1_pb_r );
+	void pal_gs(machine_config &config);
 };
 
 
@@ -524,7 +536,7 @@ READ8_MEMBER( c64_state::vic_colorram_r )
 //  ADDRESS_MAP( c64_mem )
 //-------------------------------------------------
 
-static ADDRESS_MAP_START( c64_mem, AS_PROGRAM, 8, c64_state )
+ADDRESS_MAP_START(c64_state::c64_mem)
 	AM_RANGE(0x0000, 0xffff) AM_READWRITE(read, write)
 ADDRESS_MAP_END
 
@@ -533,7 +545,7 @@ ADDRESS_MAP_END
 //  ADDRESS_MAP( vic_videoram_map )
 //-------------------------------------------------
 
-static ADDRESS_MAP_START( vic_videoram_map, 0, 8, c64_state )
+ADDRESS_MAP_START(c64_state::vic_videoram_map)
 	AM_RANGE(0x0000, 0x3fff) AM_READ(vic_videoram_r)
 ADDRESS_MAP_END
 
@@ -542,7 +554,7 @@ ADDRESS_MAP_END
 //  ADDRESS_MAP( vic_colorram_map )
 //-------------------------------------------------
 
-static ADDRESS_MAP_START( vic_colorram_map, 1, 8, c64_state )
+ADDRESS_MAP_START(c64_state::vic_colorram_map)
 	AM_RANGE(0x000, 0x3ff) AM_READ(vic_colorram_r)
 ADDRESS_MAP_END
 
@@ -1311,9 +1323,9 @@ void c64_state::machine_reset()
 //  MACHINE_CONFIG( ntsc )
 //-------------------------------------------------
 
-static MACHINE_CONFIG_START( ntsc )
+MACHINE_CONFIG_START(c64_state::ntsc)
 	// basic hardware
-	MCFG_CPU_ADD(M6510_TAG, M6510, XTAL_14_31818MHz/14)
+	MCFG_CPU_ADD(M6510_TAG, M6510, XTAL(14'318'181)/14)
 	MCFG_CPU_PROGRAM_MAP(c64_mem)
 	MCFG_M6502_DISABLE_DIRECT() // address decoding is 100% dynamic, no RAM/ROM banks
 	MCFG_M6510_PORT_CALLBACKS(READ8(c64_state, cpu_r), WRITE8(c64_state, cpu_w))
@@ -1321,7 +1333,7 @@ static MACHINE_CONFIG_START( ntsc )
 	MCFG_QUANTUM_PERFECT_CPU(M6510_TAG)
 
 	// video hardware
-	MCFG_DEVICE_ADD(MOS6567_TAG, MOS6567, XTAL_14_31818MHz/14)
+	MCFG_DEVICE_ADD(MOS6567_TAG, MOS6567, XTAL(14'318'181)/14)
 	MCFG_MOS6566_CPU(M6510_TAG)
 	MCFG_MOS6566_IRQ_CALLBACK(WRITELINE(c64_state, vic_irq_w))
 	MCFG_VIDEO_SET_SCREEN(SCREEN_TAG)
@@ -1335,14 +1347,14 @@ static MACHINE_CONFIG_START( ntsc )
 
 	// sound hardware
 	MCFG_SPEAKER_STANDARD_MONO("mono")
-	MCFG_SOUND_ADD(MOS6581_TAG, MOS6581, XTAL_14_31818MHz/14)
+	MCFG_SOUND_ADD(MOS6581_TAG, MOS6581, XTAL(14'318'181)/14)
 	MCFG_MOS6581_POTX_CALLBACK(READ8(c64_state, sid_potx_r))
 	MCFG_MOS6581_POTY_CALLBACK(READ8(c64_state, sid_poty_r))
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.00)
 
 	// devices
 	MCFG_PLS100_ADD(PLA_TAG)
-	MCFG_DEVICE_ADD(MOS6526_1_TAG, MOS6526, XTAL_14_31818MHz/14)
+	MCFG_DEVICE_ADD(MOS6526_1_TAG, MOS6526, XTAL(14'318'181)/14)
 	MCFG_MOS6526_TOD(60)
 	MCFG_MOS6526_IRQ_CALLBACK(WRITELINE(c64_state, cia1_irq_w))
 	MCFG_MOS6526_CNT_CALLBACK(DEVWRITELINE(PET_USER_PORT_TAG, pet_user_port_device, write_4))
@@ -1350,7 +1362,7 @@ static MACHINE_CONFIG_START( ntsc )
 	MCFG_MOS6526_PA_INPUT_CALLBACK(READ8(c64_state, cia1_pa_r))
 	MCFG_MOS6526_PB_INPUT_CALLBACK(READ8(c64_state, cia1_pb_r))
 	MCFG_MOS6526_PB_OUTPUT_CALLBACK(WRITE8(c64_state, cia1_pb_w))
-	MCFG_DEVICE_ADD(MOS6526_2_TAG, MOS6526, XTAL_14_31818MHz/14)
+	MCFG_DEVICE_ADD(MOS6526_2_TAG, MOS6526, XTAL(14'318'181)/14)
 	MCFG_MOS6526_TOD(60)
 	MCFG_MOS6526_IRQ_CALLBACK(WRITELINE(c64_state, cia2_irq_w))
 	MCFG_MOS6526_CNT_CALLBACK(DEVWRITELINE(PET_USER_PORT_TAG, pet_user_port_device, write_6))
@@ -1367,7 +1379,7 @@ static MACHINE_CONFIG_START( ntsc )
 	MCFG_VCS_CONTROL_PORT_ADD(CONTROL1_TAG, vcs_control_port_devices, nullptr)
 	MCFG_VCS_CONTROL_PORT_TRIGGER_CALLBACK(DEVWRITELINE(MOS6567_TAG, mos6567_device, lp_w))
 	MCFG_VCS_CONTROL_PORT_ADD(CONTROL2_TAG, vcs_control_port_devices, "joy")
-	MCFG_C64_EXPANSION_SLOT_ADD(C64_EXPANSION_SLOT_TAG, XTAL_14_31818MHz/14, c64_expansion_cards, nullptr)
+	MCFG_C64_EXPANSION_SLOT_ADD(C64_EXPANSION_SLOT_TAG, XTAL(14'318'181)/14, c64_expansion_cards, nullptr)
 	MCFG_C64_EXPANSION_SLOT_IRQ_CALLBACK(WRITELINE(c64_state, exp_irq_w))
 	MCFG_C64_EXPANSION_SLOT_NMI_CALLBACK(WRITELINE(c64_state, exp_nmi_w))
 	MCFG_C64_EXPANSION_SLOT_RESET_CALLBACK(WRITELINE(c64_state, exp_reset_w))
@@ -1415,7 +1427,8 @@ MACHINE_CONFIG_END
 //  MACHINE_CONFIG( pet64 )
 //-------------------------------------------------
 
-static MACHINE_CONFIG_DERIVED( pet64, ntsc )
+MACHINE_CONFIG_START(c64_state::pet64)
+	ntsc(config);
 	// TODO monochrome green palette
 MACHINE_CONFIG_END
 
@@ -1424,8 +1437,8 @@ MACHINE_CONFIG_END
 //  MACHINE_CONFIG( ntsc_sx )
 //-------------------------------------------------
 
-static MACHINE_CONFIG_START( ntsc_sx )
-	MCFG_FRAGMENT_ADD(ntsc)
+MACHINE_CONFIG_START(sx64_state::ntsc_sx)
+	ntsc(config);
 
 	// basic hardware
 	MCFG_CPU_MODIFY(M6510_TAG)
@@ -1442,8 +1455,8 @@ MACHINE_CONFIG_END
 //  MACHINE_CONFIG( ntsc_dx )
 //-------------------------------------------------
 
-static MACHINE_CONFIG_START( ntsc_dx )
-	MCFG_FRAGMENT_ADD(ntsc_sx)
+MACHINE_CONFIG_START(sx64_state::ntsc_dx)
+	ntsc_sx(config);
 
 	// devices
 	MCFG_DEVICE_MODIFY("iec9")
@@ -1455,8 +1468,9 @@ MACHINE_CONFIG_END
 //  MACHINE_CONFIG( ntsc_c )
 //-------------------------------------------------
 
-static MACHINE_CONFIG_DERIVED( ntsc_c, ntsc )
-	MCFG_SOUND_REPLACE(MOS6581_TAG, MOS8580, XTAL_14_31818MHz/14)
+MACHINE_CONFIG_START(c64c_state::ntsc_c)
+	ntsc(config);
+	MCFG_SOUND_REPLACE(MOS6581_TAG, MOS8580, XTAL(14'318'181)/14)
 	MCFG_MOS6581_POTX_CALLBACK(READ8(c64_state, sid_potx_r))
 	MCFG_MOS6581_POTY_CALLBACK(READ8(c64_state, sid_poty_r))
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.00)
@@ -1467,9 +1481,9 @@ MACHINE_CONFIG_END
 //  MACHINE_CONFIG( pal )
 //-------------------------------------------------
 
-static MACHINE_CONFIG_START( pal )
+MACHINE_CONFIG_START(c64_state::pal)
 	// basic hardware
-	MCFG_CPU_ADD(M6510_TAG, M6510, XTAL_17_734472MHz/18)
+	MCFG_CPU_ADD(M6510_TAG, M6510, XTAL(17'734'472)/18)
 	MCFG_CPU_PROGRAM_MAP(c64_mem)
 	MCFG_M6502_DISABLE_DIRECT() // address decoding is 100% dynamic, no RAM/ROM banks
 	MCFG_M6510_PORT_CALLBACKS(READ8(c64_state, cpu_r), WRITE8(c64_state, cpu_w))
@@ -1477,7 +1491,7 @@ static MACHINE_CONFIG_START( pal )
 	MCFG_QUANTUM_PERFECT_CPU(M6510_TAG)
 
 	// video hardware
-	MCFG_DEVICE_ADD(MOS6569_TAG, MOS6569, XTAL_17_734472MHz/18)
+	MCFG_DEVICE_ADD(MOS6569_TAG, MOS6569, XTAL(17'734'472)/18)
 	MCFG_MOS6566_CPU(M6510_TAG)
 	MCFG_MOS6566_IRQ_CALLBACK(WRITELINE(c64_state, vic_irq_w))
 	MCFG_VIDEO_SET_SCREEN(SCREEN_TAG)
@@ -1491,14 +1505,14 @@ static MACHINE_CONFIG_START( pal )
 
 	// sound hardware
 	MCFG_SPEAKER_STANDARD_MONO("mono")
-	MCFG_SOUND_ADD(MOS6581_TAG, MOS6581, XTAL_17_734472MHz/18)
+	MCFG_SOUND_ADD(MOS6581_TAG, MOS6581, XTAL(17'734'472)/18)
 	MCFG_MOS6581_POTX_CALLBACK(READ8(c64_state, sid_potx_r))
 	MCFG_MOS6581_POTY_CALLBACK(READ8(c64_state, sid_poty_r))
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.00)
 
 	// devices
 	MCFG_PLS100_ADD(PLA_TAG)
-	MCFG_DEVICE_ADD(MOS6526_1_TAG, MOS6526, XTAL_17_734472MHz/18)
+	MCFG_DEVICE_ADD(MOS6526_1_TAG, MOS6526, XTAL(17'734'472)/18)
 	MCFG_MOS6526_TOD(50)
 	MCFG_MOS6526_IRQ_CALLBACK(WRITELINE(c64_state, cia1_irq_w))
 	MCFG_MOS6526_CNT_CALLBACK(DEVWRITELINE(PET_USER_PORT_TAG, pet_user_port_device, write_4))
@@ -1507,7 +1521,7 @@ static MACHINE_CONFIG_START( pal )
 	MCFG_MOS6526_PA_OUTPUT_CALLBACK(WRITE8(c64_state, cia1_pa_w))
 	MCFG_MOS6526_PB_INPUT_CALLBACK(READ8(c64_state, cia1_pb_r))
 	MCFG_MOS6526_PB_OUTPUT_CALLBACK(WRITE8(c64_state, cia1_pb_w))
-	MCFG_DEVICE_ADD(MOS6526_2_TAG, MOS6526, XTAL_17_734472MHz/18)
+	MCFG_DEVICE_ADD(MOS6526_2_TAG, MOS6526, XTAL(17'734'472)/18)
 	MCFG_MOS6526_TOD(50)
 	MCFG_MOS6526_IRQ_CALLBACK(WRITELINE(c64_state, cia2_irq_w))
 	MCFG_MOS6526_CNT_CALLBACK(DEVWRITELINE(PET_USER_PORT_TAG, pet_user_port_device, write_6))
@@ -1524,7 +1538,7 @@ static MACHINE_CONFIG_START( pal )
 	MCFG_VCS_CONTROL_PORT_ADD(CONTROL1_TAG, vcs_control_port_devices, nullptr)
 	MCFG_VCS_CONTROL_PORT_TRIGGER_CALLBACK(DEVWRITELINE(MOS6569_TAG, mos6569_device, lp_w))
 	MCFG_VCS_CONTROL_PORT_ADD(CONTROL2_TAG, vcs_control_port_devices, "joy")
-	MCFG_C64_EXPANSION_SLOT_ADD(C64_EXPANSION_SLOT_TAG, XTAL_17_734472MHz/18, c64_expansion_cards, nullptr)
+	MCFG_C64_EXPANSION_SLOT_ADD(C64_EXPANSION_SLOT_TAG, XTAL(17'734'472)/18, c64_expansion_cards, nullptr)
 	MCFG_C64_EXPANSION_SLOT_IRQ_CALLBACK(WRITELINE(c64_state, exp_irq_w))
 	MCFG_C64_EXPANSION_SLOT_NMI_CALLBACK(WRITELINE(c64_state, exp_nmi_w))
 	MCFG_C64_EXPANSION_SLOT_RESET_CALLBACK(WRITELINE(c64_state, exp_reset_w))
@@ -1572,8 +1586,8 @@ MACHINE_CONFIG_END
 //  MACHINE_CONFIG( pal_sx )
 //-------------------------------------------------
 
-static MACHINE_CONFIG_START( pal_sx )
-	MCFG_FRAGMENT_ADD(pal)
+MACHINE_CONFIG_START(sx64_state::pal_sx)
+	pal(config);
 
 	// basic hardware
 	MCFG_CPU_MODIFY(M6510_TAG)
@@ -1590,8 +1604,9 @@ MACHINE_CONFIG_END
 //  MACHINE_CONFIG( pal_c )
 //-------------------------------------------------
 
-static MACHINE_CONFIG_DERIVED( pal_c, pal )
-	MCFG_SOUND_REPLACE(MOS6581_TAG, MOS8580, XTAL_17_734472MHz/18)
+MACHINE_CONFIG_START(c64c_state::pal_c)
+	pal(config);
+	MCFG_SOUND_REPLACE(MOS6581_TAG, MOS8580, XTAL(17'734'472)/18)
 	MCFG_MOS6581_POTX_CALLBACK(READ8(c64_state, sid_potx_r))
 	MCFG_MOS6581_POTY_CALLBACK(READ8(c64_state, sid_poty_r))
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.00)
@@ -1602,9 +1617,9 @@ MACHINE_CONFIG_END
 //  MACHINE_CONFIG( pal_gs )
 //-------------------------------------------------
 
-static MACHINE_CONFIG_START( pal_gs )
+MACHINE_CONFIG_START(c64gs_state::pal_gs)
 	// basic hardware
-	MCFG_CPU_ADD(M6510_TAG, M6510, XTAL_17_734472MHz/18)
+	MCFG_CPU_ADD(M6510_TAG, M6510, XTAL(17'734'472)/18)
 	MCFG_CPU_PROGRAM_MAP(c64_mem)
 	MCFG_M6502_DISABLE_DIRECT() // address decoding is 100% dynamic, no RAM/ROM banks
 	MCFG_M6510_PORT_CALLBACKS(READ8(c64gs_state, cpu_r), WRITE8(c64gs_state, cpu_w))
@@ -1612,7 +1627,7 @@ static MACHINE_CONFIG_START( pal_gs )
 	MCFG_QUANTUM_PERFECT_CPU(M6510_TAG)
 
 	// video hardware
-	MCFG_DEVICE_ADD(MOS6569_TAG, MOS8565, XTAL_17_734472MHz/18)
+	MCFG_DEVICE_ADD(MOS6569_TAG, MOS8565, XTAL(17'734'472)/18)
 	MCFG_MOS6566_CPU(M6510_TAG)
 	MCFG_MOS6566_IRQ_CALLBACK(WRITELINE(c64_state, vic_irq_w))
 	MCFG_VIDEO_SET_SCREEN(SCREEN_TAG)
@@ -1626,14 +1641,14 @@ static MACHINE_CONFIG_START( pal_gs )
 
 	// sound hardware
 	MCFG_SPEAKER_STANDARD_MONO("mono")
-	MCFG_SOUND_ADD(MOS6581_TAG, MOS8580, XTAL_17_734472MHz/18)
+	MCFG_SOUND_ADD(MOS6581_TAG, MOS8580, XTAL(17'734'472)/18)
 	MCFG_MOS6581_POTX_CALLBACK(READ8(c64_state, sid_potx_r))
 	MCFG_MOS6581_POTY_CALLBACK(READ8(c64_state, sid_poty_r))
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.00)
 
 	// devices
 	MCFG_PLS100_ADD(PLA_TAG)
-	MCFG_DEVICE_ADD(MOS6526_1_TAG, MOS6526, XTAL_17_734472MHz/18)
+	MCFG_DEVICE_ADD(MOS6526_1_TAG, MOS6526, XTAL(17'734'472)/18)
 	MCFG_MOS6526_TOD(50)
 	MCFG_MOS6526_IRQ_CALLBACK(WRITELINE(c64_state, cia1_irq_w))
 	MCFG_MOS6526_CNT_CALLBACK(DEVWRITELINE(PET_USER_PORT_TAG, pet_user_port_device, write_4))
@@ -1642,7 +1657,7 @@ static MACHINE_CONFIG_START( pal_gs )
 	MCFG_MOS6526_PA_OUTPUT_CALLBACK(WRITE8(c64_state, cia1_pa_w))
 	MCFG_MOS6526_PB_INPUT_CALLBACK(READ8(c64gs_state, cia1_pb_r))
 	MCFG_MOS6526_PB_OUTPUT_CALLBACK(WRITE8(c64_state, cia1_pb_w))
-	MCFG_DEVICE_ADD(MOS6526_2_TAG, MOS6526, XTAL_17_734472MHz/18)
+	MCFG_DEVICE_ADD(MOS6526_2_TAG, MOS6526, XTAL(17'734'472)/18)
 	MCFG_MOS6526_TOD(50)
 	MCFG_MOS6526_IRQ_CALLBACK(WRITELINE(c64_state, cia2_irq_w))
 	MCFG_MOS6526_CNT_CALLBACK(DEVWRITELINE(PET_USER_PORT_TAG, pet_user_port_device, write_6))
@@ -1658,7 +1673,7 @@ static MACHINE_CONFIG_START( pal_gs )
 	MCFG_VCS_CONTROL_PORT_ADD(CONTROL1_TAG, vcs_control_port_devices, nullptr)
 	MCFG_VCS_CONTROL_PORT_TRIGGER_CALLBACK(DEVWRITELINE(MOS6569_TAG, mos6569_device, lp_w))
 	MCFG_VCS_CONTROL_PORT_ADD(CONTROL2_TAG, vcs_control_port_devices, "joy")
-	MCFG_C64_EXPANSION_SLOT_ADD(C64_EXPANSION_SLOT_TAG, XTAL_17_734472MHz/18, c64_expansion_cards, nullptr)
+	MCFG_C64_EXPANSION_SLOT_ADD(C64_EXPANSION_SLOT_TAG, XTAL(17'734'472)/18, c64_expansion_cards, nullptr)
 	MCFG_C64_EXPANSION_SLOT_IRQ_CALLBACK(WRITELINE(c64_state, exp_irq_w))
 	MCFG_C64_EXPANSION_SLOT_NMI_CALLBACK(WRITELINE(c64_state, exp_nmi_w))
 	MCFG_C64_EXPANSION_SLOT_RESET_CALLBACK(WRITELINE(c64_state, exp_reset_w))

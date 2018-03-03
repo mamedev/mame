@@ -101,6 +101,8 @@ public:
 	DECLARE_WRITE8_MEMBER( term_w );
 	void kbd_put(u8 data);
 
+	void d6809(machine_config &config);
+	void mem_map(address_map &map);
 private:
 	uint8_t m_term_data;
 	virtual void machine_reset() override;
@@ -121,7 +123,7 @@ WRITE8_MEMBER( d6809_state::term_w )
 		m_terminal->write(space, 0, data);
 }
 
-static ADDRESS_MAP_START( mem_map, AS_PROGRAM, 8, d6809_state )
+ADDRESS_MAP_START(d6809_state::mem_map)
 	ADDRESS_MAP_UNMAP_HIGH
 	// 00-FF is for various devices.
 	AM_RANGE(0x0000, 0x0003) AM_DEVREADWRITE("acia1", mos6551_device, read, write)
@@ -147,13 +149,13 @@ void d6809_state::machine_reset()
 }
 
 
-static MACHINE_CONFIG_START( d6809 )
+MACHINE_CONFIG_START(d6809_state::d6809)
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", M6809, XTAL_14_7456MHz / 8) // MC68B09EP
+	MCFG_CPU_ADD("maincpu", MC6809E, XTAL(14'745'600) / 8) // MC68B09EP
 	MCFG_CPU_PROGRAM_MAP(mem_map)
 
-	MCFG_DEVICE_ADD("acia1", MOS6551, XTAL_14_7456MHz / 8) // uses Q clock
-	MCFG_DEVICE_ADD("acia2", MOS6551, XTAL_14_7456MHz / 8) // uses Q clock
+	MCFG_DEVICE_ADD("acia1", MOS6551, XTAL(14'745'600) / 8) // uses Q clock
+	MCFG_DEVICE_ADD("acia2", MOS6551, XTAL(14'745'600) / 8) // uses Q clock
 
 	/* video hardware */
 	MCFG_DEVICE_ADD("terminal", GENERIC_TERMINAL, 0)

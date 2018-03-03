@@ -44,4 +44,7 @@ public:
 	void draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprect);
 
 	TIMER_DEVICE_CALLBACK_MEMBER(interrupt);
+	void srumbler(machine_config &config);
+	void srumbler_map(address_map &map);
+	void srumbler_sound_map(address_map &map);
 };

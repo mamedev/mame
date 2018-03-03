@@ -39,7 +39,7 @@ TODO:
 #include "speaker.h"
 
 
-#define MASTER_CLOCK XTAL_18_432MHz
+#define MASTER_CLOCK XTAL(18'432'000)
 
 class superwng_state : public driver_device
 {
@@ -97,6 +97,9 @@ public:
 	uint32_t screen_update_superwng(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	INTERRUPT_GEN_MEMBER(superwng_nmi_interrupt);
 	INTERRUPT_GEN_MEMBER(superwng_sound_nmi_assert);
+	void superwng(machine_config &config);
+	void superwng_map(address_map &map);
+	void superwng_sound_map(address_map &map);
 };
 
 WRITE8_MEMBER(superwng_state::superwng_unk_a187_w)
@@ -317,7 +320,7 @@ WRITE8_MEMBER(superwng_state::superwng_hopper_w)
 {
 }
 
-static ADDRESS_MAP_START( superwng_map, AS_PROGRAM, 8, superwng_state )
+ADDRESS_MAP_START(superwng_state::superwng_map)
 	AM_RANGE(0x0000, 0x3fff) AM_ROM
 	AM_RANGE(0x4000, 0x6fff) AM_ROMBANK("bank1")
 	AM_RANGE(0x7000, 0x7fff) AM_RAM
@@ -342,7 +345,7 @@ static ADDRESS_MAP_START( superwng_map, AS_PROGRAM, 8, superwng_state )
 	AM_RANGE(0xa187, 0xa187) AM_WRITE(superwng_unk_a187_w) // unknown, always(?) 0
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( superwng_sound_map, AS_PROGRAM, 8, superwng_state )
+ADDRESS_MAP_START(superwng_state::superwng_sound_map)
 	AM_RANGE(0x0000, 0x1fff) AM_ROM
 	AM_RANGE(0x2000, 0x23ff) AM_RAM
 	AM_RANGE(0x3000, 0x3000) AM_WRITE(superwng_sound_nmi_clear_w)
@@ -470,7 +473,7 @@ void superwng_state::machine_reset()
 	m_nmi_enable = 0;
 }
 
-static MACHINE_CONFIG_START( superwng )
+MACHINE_CONFIG_START(superwng_state::superwng)
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", Z80, MASTER_CLOCK/4)

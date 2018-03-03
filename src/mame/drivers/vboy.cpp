@@ -62,7 +62,7 @@
 	m_font[((woffs) + 0x4000)] = dat;     /* normal */ \
 	m_font[((woffs) + 0x8000) ^ 7] = dat; /* flip y */ \
 	m_font[((woffs) + 0xc000) ^ 7] = dat; /* flip y */ \
-	dat = BITSWAP16(dat,1,0,3,2,5,4,7,6,9,8,11,10,13,12,15,14);  \
+	dat = bitswap<16>(dat,1,0,3,2,5,4,7,6,9,8,11,10,13,12,15,14);  \
 	m_font[((woffs) + 0x10000)] = dat;     /* flip x */ \
 	m_font[((woffs) + 0x14000)] = dat;     /* flip x */ \
 	m_font[((woffs) + 0x18000) ^ 7] = dat; /* flip x+y */ \
@@ -225,6 +225,9 @@ public:
 	TIMER_DEVICE_CALLBACK_MEMBER(timer_main_tick);
 	TIMER_DEVICE_CALLBACK_MEMBER(timer_pad_tick);
 	TIMER_DEVICE_CALLBACK_MEMBER(vboy_scanlineL);
+	void vboy(machine_config &config);
+	void vboy_io(address_map &map);
+	void vboy_mem(address_map &map);
 };
 
 
@@ -1091,7 +1094,7 @@ WRITE8_MEMBER( vboy_state::rfb0_w ) { m_r_frame_0[offset] = data; }
 WRITE8_MEMBER( vboy_state::rfb1_w ) { m_r_frame_1[offset] = data; }
 
 
-static ADDRESS_MAP_START( vboy_mem, AS_PROGRAM, 32, vboy_state )
+ADDRESS_MAP_START(vboy_state::vboy_mem)
 	ADDRESS_MAP_GLOBAL_MASK(0x07ffffff)
 	AM_RANGE( 0x00000000, 0x00005fff ) AM_READWRITE8(lfb0_r, lfb0_w,0xffffffff) // L frame buffer 0
 	AM_RANGE( 0x00006000, 0x00007fff ) AM_READWRITE16(font0_r, font0_w, 0xffffffff) // Font 0-511
@@ -1120,7 +1123,7 @@ static ADDRESS_MAP_START( vboy_mem, AS_PROGRAM, 32, vboy_state )
 //  AM_RANGE( 0x07000000, 0x071fffff ) AM_MIRROR(0x0e00000) AM_DEVREAD("cartslot", vboy_cart_slot_device, read_cart) /* ROM */
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( vboy_io, AS_IO, 32, vboy_state )
+ADDRESS_MAP_START(vboy_state::vboy_io)
 	ADDRESS_MAP_GLOBAL_MASK(0x07ffffff)
 	AM_RANGE( 0x00000000, 0x00005fff ) AM_RAM AM_SHARE("l_frame_0") // L frame buffer 0
 	AM_RANGE( 0x00006000, 0x00007fff ) AM_READWRITE16(font0_r, font0_w, 0xffffffff) // Font 0-511
@@ -1346,10 +1349,10 @@ static SLOT_INTERFACE_START(vboy_cart)
 	SLOT_INTERFACE_INTERNAL("vb_eeprom", VBOY_ROM_EEPROM)
 SLOT_INTERFACE_END
 
-static MACHINE_CONFIG_START( vboy )
+MACHINE_CONFIG_START(vboy_state::vboy)
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD( "maincpu", V810, XTAL_20MHz )
+	MCFG_CPU_ADD( "maincpu", V810, XTAL(20'000'000) )
 	MCFG_CPU_PROGRAM_MAP(vboy_mem)
 	MCFG_CPU_IO_MAP(vboy_io)
 	MCFG_TIMER_DRIVER_ADD_SCANLINE("scantimer_l", vboy_state, vboy_scanlineL, "3dleft", 0, 1)
@@ -1368,13 +1371,13 @@ static MACHINE_CONFIG_START( vboy )
 
 	/* Left screen */
 	MCFG_SCREEN_ADD("3dleft", RASTER)
-	MCFG_SCREEN_RAW_PARAMS(XTAL_20MHz/2,757,0,384,264,0,224)
+	MCFG_SCREEN_RAW_PARAMS(XTAL(20'000'000)/2,757,0,384,264,0,224)
 	MCFG_SCREEN_UPDATE_DRIVER(vboy_state, screen_update_vboy_left)
 	MCFG_SCREEN_PALETTE("palette")
 
 	/* Right screen */
 	MCFG_SCREEN_ADD("3dright", RASTER)
-	MCFG_SCREEN_RAW_PARAMS(XTAL_20MHz/2,757,0,384,264,0,224)
+	MCFG_SCREEN_RAW_PARAMS(XTAL(20'000'000)/2,757,0,384,264,0,224)
 	MCFG_SCREEN_UPDATE_DRIVER(vboy_state, screen_update_vboy_right)
 	MCFG_SCREEN_PALETTE("palette")
 

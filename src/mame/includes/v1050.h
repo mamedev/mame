@@ -152,6 +152,11 @@ public:
 
 	MC6845_UPDATE_ROW(crtc_update_row);
 
+	void v1050(machine_config &config);
+	void v1050_video(machine_config &config);
+	void v1050_crt_mem(address_map &map);
+	void v1050_io(address_map &map);
+	void v1050_mem(address_map &map);
 protected:
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
@@ -226,9 +231,5 @@ private:
 	int m_centronics_busy;
 	int m_centronics_perror;
 };
-
-//----------- defined in video/v1050.c -----------
-
-MACHINE_CONFIG_EXTERN( v1050_video );
 
 #endif // MAME_INCLUDES_V1050_H

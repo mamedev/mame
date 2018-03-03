@@ -52,7 +52,7 @@ WRITE_LINE_MEMBER(hyperspt_state::irq_mask_w)
 		m_maincpu->set_input_line(0, CLEAR_LINE);
 }
 
-static ADDRESS_MAP_START( common_map, AS_PROGRAM, 8, hyperspt_state )
+ADDRESS_MAP_START(hyperspt_state::common_map)
 	AM_RANGE(0x1000, 0x10bf) AM_RAM AM_SHARE("spriteram")
 	AM_RANGE(0x10c0, 0x10ff) AM_RAM AM_SHARE("scroll")  /* Scroll amount */
 	AM_RANGE(0x1400, 0x1400) AM_DEVWRITE("watchdog", watchdog_timer_device, reset_w)
@@ -68,19 +68,19 @@ static ADDRESS_MAP_START( common_map, AS_PROGRAM, 8, hyperspt_state )
 	AM_RANGE(0x4000, 0xffff) AM_ROM
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( hyperspt_map, AS_PROGRAM, 8, hyperspt_state )
+ADDRESS_MAP_START(hyperspt_state::hyperspt_map)
 	AM_IMPORT_FROM(common_map)
 	AM_RANGE(0x1681, 0x1681) AM_READ_PORT("P1_P2")
 	AM_RANGE(0x1682, 0x1682) AM_READ_PORT("P3_P4")
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( roadf_map, AS_PROGRAM, 8, hyperspt_state )
+ADDRESS_MAP_START(hyperspt_state::roadf_map)
 	AM_IMPORT_FROM(common_map)
 	AM_RANGE(0x1681, 0x1681) AM_READ_PORT("P1")
 	AM_RANGE(0x1682, 0x1682) AM_READ_PORT("P2")
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( common_sound_map, AS_PROGRAM, 8, hyperspt_state )
+ADDRESS_MAP_START(hyperspt_state::common_sound_map)
 	AM_RANGE(0x0000, 0x3fff) AM_ROM
 	AM_RANGE(0x4000, 0x4fff) AM_RAM
 	AM_RANGE(0x6000, 0x6000) AM_DEVREAD("soundlatch", generic_latch_8_device, read)
@@ -90,19 +90,19 @@ static ADDRESS_MAP_START( common_sound_map, AS_PROGRAM, 8, hyperspt_state )
 	AM_RANGE(0xe002, 0xe002) AM_WRITE(konami_SN76496_w)  /* This address triggers the SN chip to read the data port. */
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( hyperspt_sound_map, AS_PROGRAM, 8, hyperspt_state )
+ADDRESS_MAP_START(hyperspt_state::hyperspt_sound_map)
 	AM_IMPORT_FROM(common_sound_map)
 	AM_RANGE(0xa000, 0xa000) AM_DEVWRITE("vlm", vlm5030_device, data_w) /* speech data */
 	AM_RANGE(0xc000, 0xdfff) AM_DEVWRITE("trackfld_audio", trackfld_audio_device, hyperspt_sound_w)      /* speech and output control */
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( roadf_sound_map, AS_PROGRAM, 8, hyperspt_state )
+ADDRESS_MAP_START(hyperspt_state::roadf_sound_map)
 	AM_IMPORT_FROM(common_sound_map)
 	AM_RANGE(0xa000, 0xa000) AM_NOP // No VLM
 	AM_RANGE(0xc000, 0xdfff) AM_NOP // No VLM
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( soundb_map, AS_PROGRAM, 8, hyperspt_state )
+ADDRESS_MAP_START(hyperspt_state::soundb_map)
 	AM_IMPORT_FROM(common_sound_map)
 	AM_RANGE(0xa000, 0xa000) AM_NOP // No VLM
 	AM_RANGE(0xc000, 0xdfff) AM_DEVWRITE("hyprolyb_adpcm", hyprolyb_adpcm_device, write)   /* speech and output control */
@@ -288,14 +288,14 @@ INTERRUPT_GEN_MEMBER(hyperspt_state::vblank_irq)
 		device.execute().set_input_line(0, ASSERT_LINE);
 }
 
-static MACHINE_CONFIG_START( hyperspt )
+MACHINE_CONFIG_START(hyperspt_state::hyperspt)
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", KONAMI1, XTAL_18_432MHz/12)   /* verified on pcb */
+	MCFG_CPU_ADD("maincpu", KONAMI1, XTAL(18'432'000)/12)   /* verified on pcb */
 	MCFG_CPU_PROGRAM_MAP(hyperspt_map)
 	MCFG_CPU_VBLANK_INT_DRIVER("screen", hyperspt_state,  vblank_irq)
 
-	MCFG_CPU_ADD("audiocpu", Z80,XTAL_14_31818MHz/4) /* verified on pcb */
+	MCFG_CPU_ADD("audiocpu", Z80,XTAL(14'318'181)/4) /* verified on pcb */
 	MCFG_CPU_PROGRAM_MAP(hyperspt_sound_map)
 
 	MCFG_DEVICE_ADD("mainlatch", LS259, 0) // F2
@@ -336,25 +336,59 @@ static MACHINE_CONFIG_START( hyperspt )
 	MCFG_DEVICE_ADD("vref", VOLTAGE_REGULATOR, 0) MCFG_VOLTAGE_REGULATOR_OUTPUT(5.0)
 	MCFG_SOUND_ROUTE_EX(0, "dac", 1.0, DAC_VREF_POS_INPUT) MCFG_SOUND_ROUTE_EX(0, "dac", -1.0, DAC_VREF_NEG_INPUT)
 
-	MCFG_SOUND_ADD("snsnd", SN76496, XTAL_14_31818MHz/8) /* verified on pcb */
+	MCFG_SOUND_ADD("snsnd", SN76496, XTAL(14'318'181)/8) /* verified on pcb */
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 1.0)
 
-	MCFG_SOUND_ADD("vlm", VLM5030, XTAL_3_579545MHz) /* verified on pcb */
+	MCFG_SOUND_ADD("vlm", VLM5030, XTAL(3'579'545)) /* verified on pcb */
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 1.0)
 MACHINE_CONFIG_END
 
+ADDRESS_MAP_START(hyperspt_state::hyprolyb_adpcm_map)
+	AM_RANGE(0x0000, 0x007f) AM_RAM
+	AM_RANGE(0x1000, 0x1000) AM_DEVREAD("hyprolyb_adpcm", hyprolyb_adpcm_device, data_r)
+	AM_RANGE(0x1001, 0x1001) AM_DEVREAD("hyprolyb_adpcm", hyprolyb_adpcm_device, ready_r)
+	AM_RANGE(0x1002, 0x1002) AM_DEVWRITE("hyprolyb_adpcm", hyprolyb_adpcm_device, msm_data_w)
+	AM_RANGE(0x1003, 0x1003) AM_DEVREAD("hyprolyb_adpcm", hyprolyb_adpcm_device, msm_vck_r)
+		// on init:
+		//    $1003 = $00
+		//    $1002 = $FF
+		//    $1003 = $34
+		//    $1001 = $36
+		//    $1002 = $80
+		// loops while ($1003) & 0x80 == 0
+		// 1002 = ADPCM data written (low 4 bits)
+		//
+		// $1003 & $80 (in) = 5205 DRQ
+		// $1002 & $0f (out) = 5205 data
+		// $1001 & $80 (in) = sound latch request
+		// $1000 (in) = sound latch data
+	AM_RANGE(0x8000, 0xffff) AM_ROM
+ADDRESS_MAP_END
 
-static MACHINE_CONFIG_DERIVED( hypersptb, hyperspt )
+
+MACHINE_CONFIG_START(hyperspt_state::hypersptb)
+	hyperspt(config);
 	MCFG_DEVICE_REMOVE("vlm")
 
 	MCFG_CPU_MODIFY("audiocpu")
 	MCFG_CPU_PROGRAM_MAP(soundb_map)
 
-	MCFG_FRAGMENT_ADD(hyprolyb_adpcm)
+	MCFG_CPU_ADD("adpcm", M6802, XTAL(14'318'181)/8)    /* unknown clock */
+	MCFG_CPU_PROGRAM_MAP(hyprolyb_adpcm_map)
+
+	MCFG_GENERIC_LATCH_8_ADD("soundlatch2")
+
+	MCFG_SOUND_ADD("hyprolyb_adpcm", HYPROLYB_ADPCM, 0)
+
+	MCFG_SOUND_ADD("msm", MSM5205, 384000)
+	MCFG_MSM5205_VCLK_CB(DEVWRITELINE("hyprolyb_adpcm", hyprolyb_adpcm_device, vck_callback)) /* VCK function */
+	MCFG_MSM5205_PRESCALER_SELECTOR(S96_4B)      /* 4 kHz */
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 0.5)
 MACHINE_CONFIG_END
 
 
-static MACHINE_CONFIG_DERIVED( roadf, hyperspt )
+MACHINE_CONFIG_START(hyperspt_state::roadf)
+	hyperspt(config);
 
 	MCFG_CPU_MODIFY("maincpu")
 	MCFG_CPU_PROGRAM_MAP(roadf_map)

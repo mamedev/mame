@@ -741,7 +741,7 @@ void bbc_state::bbcb_IC32_initialise(bbc_state *state)
 void bbc_state::MC146818_set(address_space &space)
 {
 	//logerror ("146181 WR=%d DS=%d AS=%d CE=%d \n",m_MC146818_WR,m_MC146818_DS,m_MC146818_AS,m_MC146818_CE);
-	//mc146818_device *rtc = space.machine().device<mc146818_device>("rtc");
+	//mc146818_device *rtc = machine().device<mc146818_device>("rtc");
 
 	// if chip enabled
 	if (m_MC146818_CE)

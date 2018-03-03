@@ -63,6 +63,17 @@ public:
 	DECLARE_WRITE8_MEMBER(mondial2_input_mux_w);
 	TIMER_DEVICE_CALLBACK_MEMBER(refresh_leds);
 
+	void smondial(machine_config &config);
+	void mondial2(machine_config &config);
+	void smondial2(machine_config &config);
+	void montec(machine_config &config);
+	void monteciv(machine_config &config);
+	void megaiv(machine_config &config);
+	void megaiv_mem(address_map &map);
+	void mondial2_mem(address_map &map);
+	void montec_mem(address_map &map);
+	void smondial2_mem(address_map &map);
+	void smondial_mem(address_map &map);
 protected:
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
@@ -162,8 +173,8 @@ WRITE8_MEMBER(mephisto_montec_state::montec_lcd_clk_w)
 
 	if (m_display.shift == 8)
 	{
-		if (m_lcd_mux & 0x01)   output().set_digit_value(0 + m_display.pos, BITSWAP8(m_display.data, 0,3,2,7,6,5,4,1));
-		if (m_lcd_mux & 0x02)   output().set_digit_value(4 + m_display.pos, BITSWAP8(m_display.data, 0,3,2,7,6,5,4,1));
+		if (m_lcd_mux & 0x01)   output().set_digit_value(0 + m_display.pos, bitswap<8>(m_display.data, 0,3,2,7,6,5,4,1));
+		if (m_lcd_mux & 0x02)   output().set_digit_value(4 + m_display.pos, bitswap<8>(m_display.data, 0,3,2,7,6,5,4,1));
 
 		m_display.shift = 0;
 		m_display.pos = (m_display.pos + 1) & 3;
@@ -234,7 +245,7 @@ READ8_MEMBER(mephisto_montec_state::megaiv_input_r)
 }
 
 
-static ADDRESS_MAP_START(montec_mem , AS_PROGRAM, 8, mephisto_montec_state )
+ADDRESS_MAP_START(mephisto_montec_state::montec_mem)
 	AM_RANGE( 0x0000, 0x1fff ) AM_RAM AM_SHARE("nvram")
 	AM_RANGE( 0x2400, 0x2400 ) AM_READ(montec_input_r)
 	AM_RANGE( 0x2800, 0x2800 ) AM_DEVWRITE("board", mephisto_board_device, mux_w)
@@ -250,7 +261,7 @@ static ADDRESS_MAP_START(montec_mem , AS_PROGRAM, 8, mephisto_montec_state )
 	AM_RANGE( 0x8000, 0xffff ) AM_ROM
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START(megaiv_mem , AS_PROGRAM, 8, mephisto_montec_state )
+ADDRESS_MAP_START(mephisto_montec_state::megaiv_mem)
 	AM_RANGE( 0x0000, 0x1fff ) AM_RAM AM_SHARE("nvram")
 	AM_RANGE( 0x2400, 0x2400 ) AM_WRITE(megaiv_led_w)
 	AM_RANGE( 0x2800, 0x2800 ) AM_DEVWRITE("board", mephisto_board_device, mux_w)
@@ -264,7 +275,7 @@ static ADDRESS_MAP_START(megaiv_mem , AS_PROGRAM, 8, mephisto_montec_state )
 ADDRESS_MAP_END
 
 
-static ADDRESS_MAP_START(smondial2_mem , AS_PROGRAM, 8, mephisto_montec_state )
+ADDRESS_MAP_START(mephisto_montec_state::smondial2_mem)
 	AM_IMPORT_FROM(megaiv_mem)
 	AM_RANGE( 0x4000, 0x7fff ) AM_DEVREAD("cartslot", generic_slot_device, read_rom)
 ADDRESS_MAP_END
@@ -297,7 +308,7 @@ WRITE8_MEMBER(mephisto_montec_state::smondial_led_data_w)
 	m_beeper->set_state(BIT(m_leds_mux, 7));
 }
 
-static ADDRESS_MAP_START(smondial_mem , AS_PROGRAM, 8, mephisto_montec_state )
+ADDRESS_MAP_START(mephisto_montec_state::smondial_mem)
 	AM_RANGE( 0x0000, 0x1fff ) AM_RAM AM_SHARE("nvram")
 	AM_RANGE( 0x4000, 0x4007 ) AM_READ(megaiv_input_r)
 	AM_RANGE( 0x6400, 0x6407 ) AM_WRITE(smondial_led_data_w)
@@ -328,7 +339,7 @@ WRITE8_MEMBER(mephisto_montec_state::mondial2_input_mux_w)
 }
 
 
-static ADDRESS_MAP_START(mondial2_mem , AS_PROGRAM, 8, mephisto_montec_state )
+ADDRESS_MAP_START(mephisto_montec_state::mondial2_mem)
 	AM_RANGE( 0x0000, 0x07ff ) AM_RAM AM_SHARE("nvram")
 	AM_RANGE( 0x2000, 0x2000 ) AM_WRITE(mondial2_input_mux_w)
 	AM_RANGE( 0x2800, 0x2800 ) AM_DEVWRITE("board", mephisto_board_device, mux_w)
@@ -434,10 +445,10 @@ static INPUT_PORTS_START( smondial2 )
 	PORT_BIT(0x80, IP_ACTIVE_LOW, IPT_KEYPAD)        PORT_NAME("Clear")    PORT_CODE(KEYCODE_BACKSPACE)
 INPUT_PORTS_END
 
-static MACHINE_CONFIG_START( montec )
-	MCFG_CPU_ADD("maincpu", M65C02, XTAL_4MHz)
+MACHINE_CONFIG_START(mephisto_montec_state::montec)
+	MCFG_CPU_ADD("maincpu", M65C02, XTAL(4'000'000))
 	MCFG_CPU_PROGRAM_MAP( montec_mem )
-	MCFG_CPU_PERIODIC_INT_DRIVER(mephisto_montec_state, nmi_line_assert, (double)XTAL_4MHz / (1 << 13))
+	MCFG_CPU_PERIODIC_INT_DRIVER(mephisto_montec_state, nmi_line_assert, XTAL(4'000'000) / (1 << 13))
 
 	MCFG_NVRAM_ADD_0FILL("nvram")
 
@@ -450,16 +461,18 @@ static MACHINE_CONFIG_START( montec )
 	MCFG_DEFAULT_LAYOUT(layout_mephisto_montec)
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_DERIVED( monteciv, montec )
+MACHINE_CONFIG_START(mephisto_montec_state::monteciv)
+	montec(config);
 	MCFG_CPU_MODIFY("maincpu")
-	MCFG_CPU_CLOCK( XTAL_8MHz )
+	MCFG_CPU_CLOCK( XTAL(8'000'000) )
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_DERIVED( megaiv, montec )
+MACHINE_CONFIG_START(mephisto_montec_state::megaiv)
+	montec(config);
 	MCFG_CPU_MODIFY("maincpu")
-	MCFG_CPU_CLOCK( XTAL_4_9152MHz )
+	MCFG_CPU_CLOCK( XTAL(4'915'200) )
 	MCFG_CPU_PROGRAM_MAP(megaiv_mem)
-	MCFG_CPU_PERIODIC_INT_DRIVER(mephisto_montec_state, nmi_line_pulse, (double)XTAL_4_9152MHz / (1 << 13))
+	MCFG_CPU_PERIODIC_INT_DRIVER(mephisto_montec_state, nmi_line_pulse, XTAL(4'915'200) / (1 << 13))
 
 	MCFG_DEVICE_REMOVE("board")
 	MCFG_MEPHISTO_BUTTONS_BOARD_ADD("board")
@@ -467,24 +480,27 @@ static MACHINE_CONFIG_DERIVED( megaiv, montec )
 	MCFG_DEFAULT_LAYOUT(layout_mephisto_megaiv)
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_DERIVED( mondial2, megaiv )
+MACHINE_CONFIG_START(mephisto_montec_state::mondial2)
+	megaiv(config);
 	MCFG_CPU_MODIFY("maincpu")
-	MCFG_CPU_CLOCK( XTAL_2MHz )
+	MCFG_CPU_CLOCK( XTAL(2'000'000) )
 	MCFG_CPU_PROGRAM_MAP(mondial2_mem)
-	MCFG_CPU_PERIODIC_INT_DRIVER(mephisto_montec_state, nmi_line_pulse, (double)XTAL_2MHz / (1 << 12))
+	MCFG_CPU_PERIODIC_INT_DRIVER(mephisto_montec_state, nmi_line_pulse, XTAL(2'000'000) / (1 << 12))
 
 	MCFG_TIMER_DRIVER_ADD_PERIODIC("refresh_leds", mephisto_montec_state, refresh_leds, attotime::from_hz(10))
 	MCFG_DEFAULT_LAYOUT(layout_mephisto_mondial2)
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_DERIVED( smondial, megaiv )
+MACHINE_CONFIG_START(mephisto_montec_state::smondial)
+	megaiv(config);
 	MCFG_CPU_MODIFY("maincpu")
-	MCFG_CPU_CLOCK( XTAL_4MHz )
+	MCFG_CPU_CLOCK( XTAL(4'000'000) )
 	MCFG_CPU_PROGRAM_MAP(smondial_mem)
-	MCFG_CPU_PERIODIC_INT_DRIVER(mephisto_montec_state, nmi_line_pulse, (double)XTAL_4MHz / (1 << 13))
+	MCFG_CPU_PERIODIC_INT_DRIVER(mephisto_montec_state, nmi_line_pulse, XTAL(4'000'000) / (1 << 13))
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_DERIVED( smondial2, smondial )
+MACHINE_CONFIG_START(mephisto_montec_state::smondial2)
+	smondial(config);
 	MCFG_CPU_MODIFY("maincpu")
 	MCFG_CPU_PROGRAM_MAP(smondial2_mem)
 

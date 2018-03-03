@@ -99,4 +99,16 @@ public:
 	uint32_t screen_update_rumba(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	void flstory_draw_sprites( bitmap_ind16 &bitmap, const rectangle &cliprect, int pri );
 	void victnine_draw_sprites( bitmap_ind16 &bitmap, const rectangle &cliprect );
+	void flstory(machine_config &config);
+	void rumba(machine_config &config);
+	void onna34ro(machine_config &config);
+	void victnine(machine_config &config);
+	void onna34ro_mcu(machine_config &config);
+	void base_map(address_map &map);
+	void flstory_map(address_map &map);
+	void onna34ro_map(address_map &map);
+	void onna34ro_mcu_map(address_map &map);
+	void rumba_map(address_map &map);
+	void sound_map(address_map &map);
+	void victnine_map(address_map &map);
 };

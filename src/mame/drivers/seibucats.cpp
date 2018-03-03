@@ -84,8 +84,8 @@
 #include "speaker.h"
 
 // TBD, assume same as Seibu SPI
-#define MAIN_CLOCK   (XTAL_50MHz/2)
-#define PIXEL_CLOCK  (XTAL_28_63636MHz/4)
+#define MAIN_CLOCK   (XTAL(50'000'000)/2)
+#define PIXEL_CLOCK  (XTAL(28'636'363)/4)
 
 #define SPI_HTOTAL   (448)
 #define SPI_HBEND    (0)
@@ -116,6 +116,8 @@ public:
 	DECLARE_WRITE16_MEMBER(aux_rtc_w);
 	DECLARE_DRIVER_INIT(seibucats);
 
+	void seibucats(machine_config &config);
+	void seibucats_map(address_map &map);
 protected:
 	// driver_device overrides
 	virtual void machine_start() override;
@@ -161,8 +163,10 @@ WRITE16_MEMBER(seibucats_state::aux_rtc_w)
 {
 }
 
-static ADDRESS_MAP_START( seibucats_map, AS_PROGRAM, 32, seibucats_state )
+ADDRESS_MAP_START(seibucats_state::seibucats_map)
 	// TODO: map devices
+	AM_RANGE(0x00000000, 0x0003ffff) AM_RAM AM_SHARE("mainram")
+
 	AM_RANGE(0x00000010, 0x00000013) AM_READ8(spi_status_r, 0x000000ff)
 	AM_RANGE(0x00000400, 0x00000403) AM_WRITE16(input_select_w, 0x0000ffff)
 	AM_RANGE(0x00000404, 0x00000407) AM_WRITE16(output_latch_w, 0x0000ffff)
@@ -173,7 +177,6 @@ static ADDRESS_MAP_START( seibucats_map, AS_PROGRAM, 32, seibucats_state )
 
 	AM_RANGE(0x00000600, 0x00000607) AM_READ16(input_mux_r, 0x0000ffff)
 
-	AM_RANGE(0x00000000, 0x0003ffff) AM_RAM AM_SHARE("mainram")
 	AM_RANGE(0x00200000, 0x003fffff) AM_ROM AM_REGION("ipl", 0) AM_WRITENOP // emjjoshi attempts to write there?
 	// following are likely to be Seibu CATS specific
 	AM_RANGE(0x01200000, 0x01200007) AM_DEVREADWRITE8("ymz", ymz280b_device, read, write, 0x000000ff)
@@ -290,7 +293,7 @@ IRQ_CALLBACK_MEMBER(seibucats_state::spi_irq_callback)
 }
 #endif
 
-static MACHINE_CONFIG_START( seibucats )
+MACHINE_CONFIG_START(seibucats_state::seibucats)
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu",I386, MAIN_CLOCK)
@@ -300,7 +303,7 @@ static MACHINE_CONFIG_START( seibucats )
 
 	MCFG_EEPROM_SERIAL_93C46_ADD("eeprom")
 
-	//MCFG_JRC6355E_ADD("rtc", XTAL_32_768kHz)
+	//MCFG_JRC6355E_ADD("rtc", XTAL(32'768))
 
 	MCFG_DEVICE_ADD("usart1", I8251, 0)
 	MCFG_DEVICE_ADD("usart2", I8251, 0)
@@ -320,7 +323,7 @@ static MACHINE_CONFIG_START( seibucats )
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
 
-	MCFG_SOUND_ADD("ymz", YMZ280B, XTAL_16_384MHz)
+	MCFG_SOUND_ADD("ymz", YMZ280B, XTAL(16'384'000))
 	MCFG_SOUND_ROUTE(0, "lspeaker", 1.0)
 	MCFG_SOUND_ROUTE(1, "rspeaker", 1.0)
 MACHINE_CONFIG_END

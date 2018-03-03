@@ -277,10 +277,10 @@
 #define IRQ_DEBUG       (0)
 #define IRQ_LOG(x) do { if (IRQ_DEBUG) printf x; } while (0)
 
-#define MASTER_CLOCK XTAL_4MHz
+#define MASTER_CLOCK XTAL(4'000'000)
 /* TODO: clocks of this */
-#define PIXEL_CLOCK_15KHz XTAL_14_31818MHz
-#define PIXEL_CLOCK_24KHz XTAL_21_4772MHz
+#define PIXEL_CLOCK_15KHz XTAL(14'318'181)
+#define PIXEL_CLOCK_24KHz XTAL(21'477'272)
 
 #define I8214_TAG       "i8214"
 #define UPD1990A_TAG    "upd1990a"
@@ -472,6 +472,14 @@ public:
 
 	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	DECLARE_PALETTE_INIT(pc8801);
+	void pc8801mc(machine_config &config);
+	void pc8801fh(machine_config &config);
+	void pc8801(machine_config &config);
+	void pc8801ma(machine_config &config);
+	void pc8801_io(address_map &map);
+	void pc8801_mem(address_map &map);
+	void pc8801fdc_io(address_map &map);
+	void pc8801fdc_mem(address_map &map);
 protected:
 
 	virtual void video_start() override;
@@ -1067,7 +1075,7 @@ READ8_MEMBER(pc8801_state::pc8801_mem_r)
 
 		if(m_misc_ctrl & 0x40)
 		{
-			if(!machine().side_effect_disabled())
+			if(!machine().side_effects_disabled())
 				m_vram_sel = 3;
 
 			if(m_alu_ctrl2 & 0x80)
@@ -1129,7 +1137,7 @@ WRITE8_MEMBER(pc8801_state::pc8801_mem_w)
 	{
 		if(m_misc_ctrl & 0x40)
 		{
-			if(!machine().side_effect_disabled())
+			if(!machine().side_effects_disabled())
 				m_vram_sel = 3;
 
 			if(m_alu_ctrl2 & 0x80)
@@ -1156,7 +1164,7 @@ WRITE8_MEMBER(pc8801_state::pc8801_mem_w)
 	}
 }
 
-static ADDRESS_MAP_START( pc8801_mem, AS_PROGRAM, 8, pc8801_state )
+ADDRESS_MAP_START(pc8801_state::pc8801_mem)
 	AM_RANGE(0x0000, 0xffff) AM_READWRITE(pc8801_mem_r,pc8801_mem_w)
 ADDRESS_MAP_END
 
@@ -1757,7 +1765,7 @@ WRITE8_MEMBER(pc8801_state::pc8801_unk_w)
 	printf("Write port 0x33\n");
 }
 
-static ADDRESS_MAP_START( pc8801_io, AS_IO, 8, pc8801_state )
+ADDRESS_MAP_START(pc8801_state::pc8801_io)
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	ADDRESS_MAP_UNMAP_HIGH
 	AM_RANGE(0x00, 0x00) AM_READ_PORT("KEY0")
@@ -1860,7 +1868,7 @@ WRITE8_MEMBER(pc8801_state::fdc_8255_c_w)
 	m_i8255_1_pc = data;
 }
 
-static ADDRESS_MAP_START( pc8801fdc_mem, AS_PROGRAM, 8, pc8801_state )
+ADDRESS_MAP_START(pc8801_state::pc8801fdc_mem)
 	AM_RANGE(0x0000, 0x1fff) AM_ROM
 	AM_RANGE(0x4000, 0x7fff) AM_RAM
 ADDRESS_MAP_END
@@ -1903,7 +1911,7 @@ WRITE8_MEMBER(pc8801_state::fdc_drive_mode_w)
 	machine().device<upd765a_device>("upd765")->set_rate(data & 0x20 ? 500000 : 250000);
 }
 
-static ADDRESS_MAP_START( pc8801fdc_io, AS_IO, 8, pc8801_state )
+ADDRESS_MAP_START(pc8801_state::pc8801fdc_io)
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	AM_RANGE(0xf0, 0xf0) AM_WRITE(fdc_irq_vector_w) // Interrupt Opcode Port
 	AM_RANGE(0xf4, 0xf4) AM_WRITE(fdc_drive_mode_w) // Drive mode, 2d, 2dd, 2hd
@@ -2501,8 +2509,8 @@ MACHINE_RESET_MEMBER(pc8801_state,pc8801_clock_speed)
 	m_has_clock_speed = 1;
 	m_clock_setting = ioport("CFG")->read() & 0x80;
 
-	m_maincpu->set_unscaled_clock(m_clock_setting ?  XTAL_4MHz : XTAL_8MHz);
-	m_fdccpu->set_unscaled_clock(m_clock_setting ?  XTAL_4MHz : XTAL_8MHz); // correct?
+	m_maincpu->set_unscaled_clock(m_clock_setting ?  XTAL(4'000'000) : XTAL(8'000'000));
+	m_fdccpu->set_unscaled_clock(m_clock_setting ?  XTAL(4'000'000) : XTAL(8'000'000)); // correct?
 	m_baudrate_val = 0;
 }
 
@@ -2566,7 +2574,7 @@ WRITE_LINE_MEMBER( pc8801_state::rxrdy_w )
 	// ...
 }
 
-static MACHINE_CONFIG_START( pc8801 )
+MACHINE_CONFIG_START(pc8801_state::pc8801)
 	/* main CPU */
 	MCFG_CPU_ADD("maincpu", Z80, MASTER_CLOCK)        /* 4 MHz */
 	MCFG_CPU_PROGRAM_MAP(pc8801_mem)
@@ -2600,7 +2608,7 @@ static MACHINE_CONFIG_START( pc8801 )
 	#ifdef USE_PROPER_I8214
 	MCFG_I8214_ADD(I8214_TAG, MASTER_CLOCK, pic_intf)
 	#endif
-	MCFG_UPD1990A_ADD(UPD1990A_TAG, XTAL_32_768kHz, NOOP, NOOP)
+	MCFG_UPD1990A_ADD(UPD1990A_TAG, XTAL(32'768), NOOP, NOOP)
 	//MCFG_CENTRONICS_ADD("centronics", centronics_devices, "printer")
 	MCFG_CASSETTE_ADD("cassette")
 	MCFG_CASSETTE_DEFAULT_STATE(CASSETTE_STOPPED | CASSETTE_MOTOR_ENABLED | CASSETTE_SPEAKER_MUTED)
@@ -2647,15 +2655,18 @@ static MACHINE_CONFIG_START( pc8801 )
 	MCFG_TIMER_DRIVER_ADD_PERIODIC("rtc_timer", pc8801_state, pc8801_rtc_irq, attotime::from_hz(600))
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_DERIVED( pc8801fh, pc8801 )
+MACHINE_CONFIG_START(pc8801_state::pc8801fh)
+	pc8801(config);
 	MCFG_MACHINE_RESET_OVERRIDE(pc8801_state, pc8801_clock_speed )
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_DERIVED( pc8801ma, pc8801 )
+MACHINE_CONFIG_START(pc8801_state::pc8801ma)
+	pc8801(config);
 	MCFG_MACHINE_RESET_OVERRIDE(pc8801_state, pc8801_dic )
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_DERIVED( pc8801mc, pc8801 )
+MACHINE_CONFIG_START(pc8801_state::pc8801mc)
+	pc8801(config);
 	MCFG_MACHINE_RESET_OVERRIDE(pc8801_state, pc8801_cdrom )
 MACHINE_CONFIG_END
 

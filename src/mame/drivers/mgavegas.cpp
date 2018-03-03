@@ -43,7 +43,7 @@ Ver. 2.2 should exist
 /****************************
 *    Clock defines          *
 ****************************/
-#define MAIN_XTAL XTAL_8MHz
+#define MAIN_XTAL XTAL(8'000'000)
 #define CPU_CLK MAIN_XTAL/2
 #define AY_CLK  CPU_CLK/2
 #define MSM_CLK   384000
@@ -143,6 +143,8 @@ public:
 	TIMER_DEVICE_CALLBACK_MEMBER(int_0);
 
 
+	void mgavegas(machine_config &config);
+	void mgavegas_map(address_map &map);
 protected:
 
 	// devices
@@ -357,7 +359,6 @@ WRITE8_MEMBER(mgavegas_state::csoki_w)
 
 WRITE8_MEMBER(mgavegas_state::cso1_w)
 {
-	int hopper_data = 0x00;
 	if (LOG_CSO1)
 		logerror("write to CSO1 data = %02X\n",data);
 
@@ -372,8 +373,7 @@ WRITE8_MEMBER(mgavegas_state::cso1_w)
 
 	update_custom();
 
-	hopper_data=(m_hop&0x01)<<7;
-	m_ticket->write(machine().dummy_space(), 0, hopper_data);
+	m_ticket->motor_w(m_hop);
 }
 
 WRITE8_MEMBER(mgavegas_state::cso2_w)
@@ -422,7 +422,7 @@ READ8_MEMBER(mgavegas_state::ay8910_b_r)
 * Memory Map Information *
 *************************/
 
-static ADDRESS_MAP_START( mgavegas_map, AS_PROGRAM, 8, mgavegas_state )
+ADDRESS_MAP_START(mgavegas_state::mgavegas_map)
 	AM_RANGE(0x0000, 0x7fff) AM_ROM
 	AM_RANGE(0x8000, 0x9fff) AM_RAM AM_SHARE("nvram")
 	AM_RANGE(0xa000, 0xa003) AM_READWRITE(r_a0,w_a0)            // AY-3-8910
@@ -588,7 +588,7 @@ DRIVER_INIT_MEMBER(mgavegas_state,mgavegas133)
 *************************/
 
 
-static MACHINE_CONFIG_START( mgavegas )
+MACHINE_CONFIG_START(mgavegas_state::mgavegas)
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", Z80, CPU_CLK)
 	MCFG_CPU_PROGRAM_MAP(mgavegas_map)

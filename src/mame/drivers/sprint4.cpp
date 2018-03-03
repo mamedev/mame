@@ -237,7 +237,7 @@ WRITE8_MEMBER(sprint4_state::attract_w)
 }
 
 
-static ADDRESS_MAP_START( sprint4_cpu_map, AS_PROGRAM, 8, sprint4_state )
+ADDRESS_MAP_START(sprint4_state::sprint4_cpu_map)
 
 	ADDRESS_MAP_GLOBAL_MASK(0x3fff)
 
@@ -398,7 +398,7 @@ static GFXDECODE_START( sprint4 )
 GFXDECODE_END
 
 
-static MACHINE_CONFIG_START( sprint4 )
+MACHINE_CONFIG_START(sprint4_state::sprint4)
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", M6502, PIXEL_CLOCK / 8)

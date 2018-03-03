@@ -29,7 +29,7 @@
 
 WRITE16_MEMBER(midyunit_state::midyunit_cmos_w)
 {
-	logerror("%08x:CMOS Write @ %05X\n", space.device().safe_pc(), offset);
+	logerror("%08x:CMOS Write @ %05X\n", m_maincpu->pc(), offset);
 	COMBINE_DATA(&m_cmos_ram[offset + m_cmos_page]);
 }
 
@@ -51,7 +51,7 @@ WRITE16_MEMBER(midyunit_state::midyunit_cmos_enable_w)
 {
 	m_cmos_w_enable = (~data >> 9) & 1;
 
-	logerror("%08x:Protection write = %04X\n", space.device().safe_pc(), data);
+	logerror("%08x:Protection write = %04X\n", m_maincpu->pc(), data);
 
 	/* only go down this path if we have a data structure */
 	if (m_prot_data)
@@ -69,7 +69,7 @@ WRITE16_MEMBER(midyunit_state::midyunit_cmos_enable_w)
 		{
 			if (data == 0x500)
 			{
-				m_prot_result = space.read_word(0x8521c80) << 4;
+				m_prot_result = space.read_word(0x10a4390) << 4;
 				logerror("  desired result = %04X\n", m_prot_result);
 			}
 		}
@@ -100,7 +100,7 @@ WRITE16_MEMBER(midyunit_state::midyunit_cmos_enable_w)
 READ16_MEMBER(midyunit_state::midyunit_protection_r)
 {
 	/* return the most recently clocked value */
-	logerror("%08X:Protection read = %04X\n", space.device().safe_pc(), m_prot_result);
+	logerror("%08X:Protection read = %04X\n", m_maincpu->pc(), m_prot_result);
 	return m_prot_result;
 }
 
@@ -569,7 +569,7 @@ WRITE16_MEMBER(midyunit_state::midyunit_sound_w)
 	/* check for out-of-bounds accesses */
 	if (offset)
 	{
-		logerror("%08X:Unexpected write to sound (hi) = %04X\n", space.device().safe_pc(), data);
+		logerror("%08X:Unexpected write to sound (hi) = %04X\n", m_maincpu->pc(), data);
 		return;
 	}
 

@@ -123,6 +123,9 @@ public:
 	uint32_t screen_update_ddayjlc(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	INTERRUPT_GEN_MEMBER(ddayjlc_interrupt);
 	INTERRUPT_GEN_MEMBER(ddayjlc_snd_interrupt);
+	void ddayjlc(machine_config &config);
+	void main_cpu(address_map &map);
+	void sound_cpu(address_map &map);
 };
 
 
@@ -263,7 +266,7 @@ WRITE8_MEMBER(ddayjlc_state::i8257_LMSR_w)
 	}
 }
 
-static ADDRESS_MAP_START( main_cpu, AS_PROGRAM, 8, ddayjlc_state )
+ADDRESS_MAP_START(ddayjlc_state::main_cpu)
 	AM_RANGE(0x0000, 0x7fff) AM_ROM
 	AM_RANGE(0x8000, 0x8fff) AM_RAM AM_SHARE("mainram")
 	AM_RANGE(0x9000, 0x93ff) AM_RAM AM_SHARE("spriteram")
@@ -289,7 +292,7 @@ static ADDRESS_MAP_START( main_cpu, AS_PROGRAM, 8, ddayjlc_state )
 ADDRESS_MAP_END
 
 
-static ADDRESS_MAP_START( sound_cpu, AS_PROGRAM, 8, ddayjlc_state )
+ADDRESS_MAP_START(ddayjlc_state::sound_cpu)
 	AM_RANGE(0x0000, 0x1fff) AM_ROM
 	AM_RANGE(0x2000, 0x23ff) AM_RAM
 	AM_RANGE(0x3000, 0x3000) AM_DEVREADWRITE("ay1", ay8910_device, data_r, data_w)
@@ -510,7 +513,7 @@ PALETTE_INIT_MEMBER(ddayjlc_state, ddayjlc)
 	}
 }
 
-static MACHINE_CONFIG_START( ddayjlc )
+MACHINE_CONFIG_START(ddayjlc_state::ddayjlc)
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", Z80,12000000/3)

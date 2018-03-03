@@ -68,6 +68,10 @@ public:
 	required_device<eeprom_serial_93cxx_device> m_eeprom;
 	required_device<screen_device> m_screen;
 	required_device<palette_device> m_palette;
+	void sshooter(machine_config &config);
+	void policetr(machine_config &config);
+	void policetr_map(address_map &map);
+	void sshooter_map(address_map &map);
 protected:
 	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr) override;
 };

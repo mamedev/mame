@@ -102,6 +102,10 @@ public:
 	DECLARE_READ8_MEMBER(dsw_r);
 	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 
+	void dunhuang(machine_config &config);
+	void dunhuang_io_map(address_map &map);
+	void dunhuang_map(address_map &map);
+	void ramdac_map(address_map &map);
 protected:
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
@@ -295,7 +299,7 @@ WRITE8_MEMBER(dunhuang_state::clear_y_w)
 WRITE8_MEMBER(dunhuang_state::horiz_clear_w)
 {
 	int i;
-//  logerror("%06x: horiz clear, y = %02x, data = %02d\n", space.device().safe_pc(), m_clear_y,data);
+//  logerror("%06x: horiz clear, y = %02x, data = %02d\n", m_maincpu->pc(), m_clear_y,data);
 	for (i = 0; i < 0x40; i++)
 	{
 		int addr = m_clear_y * 0x40 + i;
@@ -311,7 +315,7 @@ WRITE8_MEMBER(dunhuang_state::horiz_clear_w)
 WRITE8_MEMBER(dunhuang_state::vert_clear_w)
 {
 	int i;
-//  logerror("%06x: vert clear, x = %02x, y = %02x, data = %02x\n", space.device().safe_pc(), m_pos_x,m_pos_y,data);
+//  logerror("%06x: vert clear, x = %02x, y = %02x, data = %02x\n", m_maincpu->pc(), m_pos_x,m_pos_y,data);
 	for (i = 0; i < 0x08; i++)
 	{
 		int addr = (m_pos_x & 0x3f) + (i & 0x07) * 0x40;
@@ -369,7 +373,7 @@ WRITE8_MEMBER(dunhuang_state::block_h_w)
 	int i,j, addr;
 	uint8_t *tile_addr;
 
-//  logerror("%06x: block dst %x, src %x, xy %x %x, wh %x %x, clr %x\n", space.device().safe_pc(), m_block_dest, (m_block_addr_hi << 8) + m_block_addr_lo, m_block_x,m_block_y,m_block_w+1,m_block_h+1,m_block_c);
+//  logerror("%06x: block dst %x, src %x, xy %x %x, wh %x %x, clr %x\n", m_maincpu->pc(), m_block_dest, (m_block_addr_hi << 8) + m_block_addr_lo, m_block_x,m_block_y,m_block_w+1,m_block_h+1,m_block_c);
 
 	m_block_h = data;
 
@@ -408,7 +412,7 @@ WRITE8_MEMBER(dunhuang_state::block_h_w)
 			break;
 
 		default:
-			popmessage("%06x: block dst=%x", space.device().safe_pc(), m_block_dest);
+			popmessage("%06x: block dst=%x", m_maincpu->pc(), m_block_dest);
 	}
 }
 
@@ -424,7 +428,7 @@ WRITE8_MEMBER(dunhuang_state::layers_w)
                                 Memory Maps
 ***************************************************************************/
 
-static ADDRESS_MAP_START( dunhuang_map, AS_PROGRAM, 8, dunhuang_state )
+ADDRESS_MAP_START(dunhuang_state::dunhuang_map)
 	AM_RANGE( 0x0000, 0x5fff ) AM_ROM
 	AM_RANGE( 0x6000, 0x7fff ) AM_RAM
 	AM_RANGE( 0x8000, 0xffff ) AM_ROMBANK( "mainbank" )
@@ -479,7 +483,7 @@ WRITE8_MEMBER(dunhuang_state::rombank_w)
 }
 
 
-static ADDRESS_MAP_START( dunhuang_io_map, AS_IO, 8, dunhuang_state )
+ADDRESS_MAP_START(dunhuang_state::dunhuang_io_map)
 	AM_RANGE( 0x0000, 0x0000 ) AM_WRITE(pos_x_w )
 	AM_RANGE( 0x0001, 0x0001 ) AM_WRITE(pos_y_w )
 	AM_RANGE( 0x0002, 0x0004 ) AM_WRITE(tile_w )
@@ -523,7 +527,7 @@ static ADDRESS_MAP_START( dunhuang_io_map, AS_IO, 8, dunhuang_state )
 	AM_RANGE( 0x0098, 0x0098 ) AM_DEVWRITE("ay8910", ay8910_device, address_w )
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( ramdac_map, 0, 8, dunhuang_state )
+ADDRESS_MAP_START(dunhuang_state::ramdac_map)
 	AM_RANGE(0x000, 0x3ff) AM_DEVREADWRITE("ramdac", ramdac_device, ramdac_pal_r, ramdac_rgb666_w)
 ADDRESS_MAP_END
 
@@ -796,7 +800,7 @@ void dunhuang_state::machine_reset()
 }
 
 
-static MACHINE_CONFIG_START( dunhuang )
+MACHINE_CONFIG_START(dunhuang_state::dunhuang)
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", Z80,12000000/2)

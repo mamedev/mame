@@ -40,7 +40,7 @@ DEFINE_DEVICE_TYPE(QSOUND, qsound_device, "qsound", "Q-Sound")
 // chip decapped by siliconpr0n clearly shows 3x as much ROM as that, a total
 // of 12288 words of internal ROM.
 // The older DSP16 non-a part has 2048 words of ROM.
-static ADDRESS_MAP_START( dsp16_program_map, AS_PROGRAM, 16, qsound_device )
+ADDRESS_MAP_START(qsound_device::dsp16_program_map)
 	AM_RANGE(0x0000, 0x2fff) AM_ROM
 ADDRESS_MAP_END
 
@@ -50,7 +50,7 @@ ADDRESS_MAP_END
 // As originally released, the DSP16A had 1024 words of internal RAM,
 // but this was expanded to 2048 words in the DL-1425 decap.
 // The older DSP16 non-a part has 512 words of RAM.
-static ADDRESS_MAP_START( dsp16_data_map, AS_DATA, 16, qsound_device )
+ADDRESS_MAP_START(qsound_device::dsp16_data_map)
 	ADDRESS_MAP_UNMAP_HIGH
 	AM_RANGE(0x0000, 0x07ff) AM_RAM
 ADDRESS_MAP_END
@@ -74,8 +74,8 @@ ROM_END
 qsound_device::qsound_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
 	: device_t(mconfig, QSOUND, tag, owner, clock),
 		device_sound_interface(mconfig, *this),
+		device_rom_interface(mconfig, *this, 24),
 		m_cpu(*this, "qsound"),
-		m_sample_rom(*this, DEVICE_SELF),
 		m_data(0),
 		m_stream(nullptr)
 {
@@ -97,11 +97,21 @@ const tiny_rom_entry *qsound_device::device_rom_region() const
 //  device_add_mconfig - add device configuration
 //-------------------------------------------------
 
-MACHINE_CONFIG_MEMBER( qsound_device::device_add_mconfig )
-	MCFG_CPU_ADD("qsound", DSP16, QSOUND_CLOCK)
+MACHINE_CONFIG_START(qsound_device::device_add_mconfig)
+	MCFG_CPU_ADD("qsound", DSP16, DERIVED_CLOCK(1, 1))
 	MCFG_CPU_PROGRAM_MAP(dsp16_program_map)
 	MCFG_CPU_DATA_MAP(dsp16_data_map)
 MACHINE_CONFIG_END
+
+
+//-------------------------------------------------
+//  rom_bank_updated - the rom bank has changed
+//-------------------------------------------------
+
+void qsound_device::rom_bank_updated()
+{
+	m_stream->update();
+}
 
 
 //-------------------------------------------------

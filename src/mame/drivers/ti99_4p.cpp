@@ -184,6 +184,9 @@ public:
 
 	DECLARE_WRITE_LINE_MEMBER(video_interrupt_in);
 
+	void ti99_4p_60hz(machine_config &config);
+	void cru_map(address_map &map);
+	void memmap(address_map &map);
 private:
 	void    datamux_clock_in(int clock);
 
@@ -281,16 +284,16 @@ enum
 	ROM6UBASE = 0xe000
 };
 
-static ADDRESS_MAP_START(memmap, AS_PROGRAM, 16, ti99_4p_state)
+ADDRESS_MAP_START(ti99_4p_state::memmap)
 	AM_RANGE(0x0000, 0xffff) AM_READWRITE( memread, memwrite ) AM_SETOFFSET( setoffset )
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START(cru_map, AS_IO, 8, ti99_4p_state)
-	AM_RANGE(0x0000, 0x003f) AM_DEVREAD(TI_TMS9901_TAG, tms9901_device, read)
+ADDRESS_MAP_START(ti99_4p_state::cru_map)
 	AM_RANGE(0x0000, 0x01ff) AM_READ( cruread )
+	AM_RANGE(0x0000, 0x003f) AM_DEVREAD(TI_TMS9901_TAG, tms9901_device, read)
 
-	AM_RANGE(0x0000, 0x01ff) AM_DEVWRITE(TI_TMS9901_TAG, tms9901_device, write)
 	AM_RANGE(0x0000, 0x0fff) AM_WRITE( cruwrite )
+	AM_RANGE(0x0000, 0x01ff) AM_DEVWRITE(TI_TMS9901_TAG, tms9901_device, write)
 ADDRESS_MAP_END
 
 /*
@@ -455,7 +458,7 @@ READ16_MEMBER( ti99_4p_state::memread )
 	int addr_off8k = m_addr_buf & 0x1fff;
 
 	// If we use the debugger, decode the address now (normally done in setaddress)
-	if (machine().side_effect_disabled())
+	if (machine().side_effects_disabled())
 	{
 		m_addr_buf = offset << 1;
 		m_decode = decode_address(m_addr_buf);
@@ -498,7 +501,7 @@ READ16_MEMBER( ti99_4p_state::memread )
 		break;
 
 	case SGCPU_PEB:
-		if (machine().side_effect_disabled()) return debugger_read(space, offset);
+		if (machine().side_effects_disabled()) return debugger_read(space, offset);
 		// The byte from the odd address has already been read into the latch
 		// Reading the even address now
 		m_peribox->readz(space, m_addr_buf, &hbyte);
@@ -516,7 +519,7 @@ WRITE16_MEMBER( ti99_4p_state::memwrite )
 	int address = 0;
 
 	// If we use the debugger, decode the address now (normally done in setaddress)
-	if (machine().side_effect_disabled())
+	if (machine().side_effects_disabled())
 	{
 		m_addr_buf = offset << 1;
 		m_decode = decode_address(m_addr_buf);
@@ -560,7 +563,7 @@ WRITE16_MEMBER( ti99_4p_state::memwrite )
 		break;
 
 	case SGCPU_PEB:
-		if (machine().side_effect_disabled()) { debugger_write(space, offset, data); return; }
+		if (machine().side_effects_disabled()) { debugger_write(space, offset, data); return; }
 
 		// Writing the even address now (addr)
 		// The databus multiplexer puts the even value into the latch and outputs the odd value now.
@@ -989,7 +992,7 @@ MACHINE_RESET_MEMBER(ti99_4p_state,ti99_4p)
 /*
     Machine description.
 */
-static MACHINE_CONFIG_START( ti99_4p_60hz )
+MACHINE_CONFIG_START(ti99_4p_state::ti99_4p_60hz)
 	/* basic machine hardware */
 	/* TMS9900 CPU @ 3.0 MHz */
 	MCFG_TMS99xx_ADD("maincpu", TMS9900, 3000000, memmap, cru_map)

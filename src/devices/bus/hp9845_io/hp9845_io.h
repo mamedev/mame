@@ -19,13 +19,13 @@
 	MCFG_DEVICE_SLOT_INTERFACE(hp9845_io_slot_devices, nullptr, false)
 
 #define MCFG_HP9845_IO_IRQ_CB(_devcb) \
-	devcb = &hp9845_io_slot_device::set_irq_cb_func(*device , DEVCB_##_devcb);
+	devcb = &downcast<hp9845_io_slot_device &>(*device).set_irq_cb_func(DEVCB_##_devcb);
 
 #define MCFG_HP9845_IO_STS_CB(_devcb) \
-	devcb = &hp9845_io_slot_device::set_sts_cb_func(*device , DEVCB_##_devcb);
+	devcb = &downcast<hp9845_io_slot_device &>(*device).set_sts_cb_func(DEVCB_##_devcb);
 
 #define MCFG_HP9845_IO_FLG_CB(_devcb) \
-	devcb = &hp9845_io_slot_device::set_flg_cb_func(*device , DEVCB_##_devcb);
+	devcb = &downcast<hp9845_io_slot_device &>(*device).set_flg_cb_func(DEVCB_##_devcb);
 
 #define HP9845_IO_FIRST_SC  1   // Lowest SC used by I/O cards
 
@@ -57,9 +57,9 @@ public:
 	virtual void device_start() override;
 
 	// Callback setups
-	template <class Object> static devcb_base &set_irq_cb_func(device_t &device, Object &&cb) { return downcast<hp9845_io_slot_device &>(device).m_irq_cb_func.set_callback(std::forward<Object>(cb)); }
-	template <class Object> static devcb_base &set_sts_cb_func(device_t &device, Object &&cb) { return downcast<hp9845_io_slot_device &>(device).m_sts_cb_func.set_callback(std::forward<Object>(cb)); }
-	template <class Object> static devcb_base &set_flg_cb_func(device_t &device, Object &&cb) { return downcast<hp9845_io_slot_device &>(device).m_flg_cb_func.set_callback(std::forward<Object>(cb)); }
+	template <class Object> devcb_base &set_irq_cb_func(Object &&cb) { return m_irq_cb_func.set_callback(std::forward<Object>(cb)); }
+	template <class Object> devcb_base &set_sts_cb_func(Object &&cb) { return m_sts_cb_func.set_callback(std::forward<Object>(cb)); }
+	template <class Object> devcb_base &set_flg_cb_func(Object &&cb) { return m_flg_cb_func.set_callback(std::forward<Object>(cb)); }
 
 	// irq/sts/flg signal handlers
 	void irq_w(uint8_t sc , int state);

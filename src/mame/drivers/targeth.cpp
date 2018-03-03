@@ -138,11 +138,11 @@ READ8_MEMBER(targeth_state::shareram_r)
 }
 
 
-static ADDRESS_MAP_START( mcu_hostmem_map, 0, 8, targeth_state )
+ADDRESS_MAP_START(targeth_state::mcu_hostmem_map)
 	AM_RANGE(0x8000, 0xffff) AM_READWRITE(shareram_r, shareram_w) // confirmed that 0x8000 - 0xffff is a window into 68k shared RAM
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( main_map, AS_PROGRAM, 16, targeth_state )
+ADDRESS_MAP_START(targeth_state::main_map)
 	AM_RANGE(0x000000, 0x0fffff) AM_ROM
 	AM_RANGE(0x100000, 0x103fff) AM_RAM_WRITE(vram_w) AM_SHARE("videoram")  /* Video RAM */
 	AM_RANGE(0x108000, 0x108007) AM_WRITEONLY AM_SHARE("vregs") /* Video Registers */
@@ -152,7 +152,7 @@ static ADDRESS_MAP_START( main_map, AS_PROGRAM, 16, targeth_state )
 	AM_RANGE(0x108006, 0x108007) AM_READ_PORT("GUNY2")
 	AM_RANGE(0x108000, 0x108007) AM_WRITEONLY AM_SHARE("vregs") /* Video Registers */
 	AM_RANGE(0x10800c, 0x10800d) AM_WRITENOP                    /* CLR Video INT */
-	AM_RANGE(0x200000, 0x2007ff) AM_RAM_DEVWRITE("palette", palette_device, write) AM_SHARE("palette")    /* Palette */
+	AM_RANGE(0x200000, 0x2007ff) AM_RAM_DEVWRITE("palette", palette_device, write16) AM_SHARE("palette")    /* Palette */
 	AM_RANGE(0x440000, 0x440fff) AM_RAM AM_SHARE("spriteram")   /* Sprite RAM */
 	AM_RANGE(0x700000, 0x700001) AM_READ_PORT("DSW2")
 	AM_RANGE(0x700002, 0x700003) AM_READ_PORT("DSW1")
@@ -167,7 +167,7 @@ static ADDRESS_MAP_START( main_map, AS_PROGRAM, 16, targeth_state )
 ADDRESS_MAP_END
 
 
-static ADDRESS_MAP_START( oki_map, 0, 8, targeth_state )
+ADDRESS_MAP_START(targeth_state::oki_map)
 	AM_RANGE(0x00000, 0x2ffff) AM_ROM
 	AM_RANGE(0x30000, 0x3ffff) AM_ROMBANK("okibank")
 ADDRESS_MAP_END
@@ -268,14 +268,14 @@ static INPUT_PORTS_START( targeth )
 INPUT_PORTS_END
 
 
-static MACHINE_CONFIG_START( targeth )
+MACHINE_CONFIG_START(targeth_state::targeth)
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", M68000, XTAL_24MHz/2)          /* 12 MHz */
+	MCFG_CPU_ADD("maincpu", M68000, XTAL(24'000'000)/2)          /* 12 MHz */
 	MCFG_CPU_PROGRAM_MAP(main_map)
 	MCFG_CPU_VBLANK_INT_DRIVER("screen", targeth_state, irq2_line_hold)
 
-	MCFG_DEVICE_ADD("gaelco_ds5002fp", GAELCO_DS5002FP, XTAL_24MHz / 2)
+	MCFG_DEVICE_ADD("gaelco_ds5002fp", GAELCO_DS5002FP, XTAL(24'000'000) / 2)
 	MCFG_DEVICE_ADDRESS_MAP(0, mcu_hostmem_map)
 
 	MCFG_DEVICE_ADD("outlatch", LS259, 0)
@@ -298,7 +298,7 @@ static MACHINE_CONFIG_START( targeth )
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
 
-	MCFG_OKIM6295_ADD("oki", XTAL_1MHz, PIN7_HIGH) // 1MHz resonator - pin 7 not verified
+	MCFG_OKIM6295_ADD("oki", XTAL(1'000'000), PIN7_HIGH) // 1MHz resonator - pin 7 not verified
 	MCFG_DEVICE_ADDRESS_MAP(0, oki_map)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 MACHINE_CONFIG_END

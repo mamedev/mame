@@ -79,6 +79,9 @@ public:
 	DECLARE_WRITE16_MEMBER(comms_w);
 	DECLARE_WRITE16_MEMBER(data_bank_w);
 	DECLARE_WRITE16_MEMBER(upd_w);
+	void gambl186(machine_config &config);
+	void gambl186_io(address_map &map);
+	void gambl186_map(address_map &map);
 };
 
 void gambl186_state::machine_start()
@@ -357,14 +360,14 @@ WRITE16_MEMBER(gambl186_state::upd_w)
 //  m_upd7759->start_w(1);
 }
 
-static ADDRESS_MAP_START( gambl186_map, AS_PROGRAM, 16, gambl186_state )
+ADDRESS_MAP_START(gambl186_state::gambl186_map)
 	AM_RANGE(0x00000, 0x0ffff) AM_RAM AM_SHARE("nvram")
 	AM_RANGE(0x40000, 0x7ffff) AM_ROMBANK("data_bank")
 	AM_RANGE(0xa0000, 0xbffff) AM_DEVREADWRITE8("vga", cirrus_gd5428_device, mem_r, mem_w, 0xffff)
 	AM_RANGE(0xc0000, 0xfffff) AM_ROM AM_REGION("ipl",0)
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( gambl186_io, AS_IO, 16, gambl186_state )
+ADDRESS_MAP_START(gambl186_state::gambl186_io)
 	AM_RANGE(0x03b0, 0x03bf) AM_DEVREADWRITE8("vga", cirrus_gd5428_device, port_03b0_r, port_03b0_w, 0xffff)
 	AM_RANGE(0x03c0, 0x03cf) AM_DEVREADWRITE8("vga", cirrus_gd5428_device, port_03c0_r, port_03c0_w, 0xffff)
 	AM_RANGE(0x03d0, 0x03df) AM_DEVREADWRITE8("vga", cirrus_gd5428_device, port_03d0_r, port_03d0_w, 0xffff)
@@ -465,14 +468,19 @@ INPUT_PORTS_END
 
 
 
-static MACHINE_CONFIG_START( gambl186 )
-	MCFG_CPU_ADD("maincpu", I80186, XTAL_40MHz)
+MACHINE_CONFIG_START(gambl186_state::gambl186)
+	MCFG_CPU_ADD("maincpu", I80186, XTAL(40'000'000))
 	MCFG_CPU_PROGRAM_MAP(gambl186_map)
 	MCFG_CPU_IO_MAP(gambl186_io)
 
 	MCFG_NVRAM_ADD_0FILL("nvram")
 
-	MCFG_FRAGMENT_ADD( pcvideo_cirrus_gd5428 )
+	MCFG_SCREEN_ADD("screen", RASTER)
+	MCFG_SCREEN_RAW_PARAMS(XTAL(25'174'800),900,0,640,526,0,480)
+	MCFG_SCREEN_UPDATE_DEVICE("vga", cirrus_gd5428_device, screen_update)
+
+	MCFG_PALETTE_ADD("palette", 0x100)
+	MCFG_DEVICE_ADD("vga", CIRRUS_GD5428, 0)
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")

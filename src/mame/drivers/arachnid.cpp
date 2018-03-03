@@ -109,6 +109,8 @@ public:
 	DECLARE_WRITE_LINE_MEMBER(ptm_o1_callback);
 
 	uint8_t read_keyboard(int pa);
+	void arachnid(machine_config &config);
+	void arachnid_map(address_map &map);
 };
 
 /***************************************************************************
@@ -119,7 +121,7 @@ public:
     ADDRESS_MAP( arachnid_map )
 -------------------------------------------------*/
 
-static ADDRESS_MAP_START( arachnid_map, AS_PROGRAM, 8, arachnid_state )
+ADDRESS_MAP_START(arachnid_state::arachnid_map)
 	AM_RANGE(0x0000, 0x1fff) AM_RAM
 	AM_RANGE(0x2000, 0x2007) AM_DEVREADWRITE(PTM6840_TAG, ptm6840_device, read, write)
 	AM_RANGE(0x4004, 0x4007) AM_DEVREADWRITE(PIA6821_U4_TAG, pia6821_device, read, write)
@@ -417,9 +419,9 @@ void arachnid_state::machine_start()
     MACHINE_CONFIG_START( arachnid )
 -------------------------------------------------*/
 
-static MACHINE_CONFIG_START( arachnid )
+MACHINE_CONFIG_START(arachnid_state::arachnid)
 	// basic machine hardware
-	MCFG_CPU_ADD(M6809_TAG, M6809, XTAL_1MHz)
+	MCFG_CPU_ADD(M6809_TAG, M6809, XTAL(1'000'000))
 	MCFG_CPU_PROGRAM_MAP(arachnid_map)
 
 	// devices
@@ -440,7 +442,7 @@ static MACHINE_CONFIG_START( arachnid )
 	MCFG_PIA_CB2_HANDLER(WRITELINE(arachnid_state, pia_u17_pcb_w))
 
 	// video hardware
-	MCFG_DEVICE_ADD( TMS9118_TAG, TMS9118, XTAL_10_738635MHz / 2 )
+	MCFG_DEVICE_ADD( TMS9118_TAG, TMS9118, XTAL(10'738'635) / 2 )
 	MCFG_TMS9928A_VRAM_SIZE(0x4000)
 	MCFG_TMS9928A_OUT_INT_LINE_CB(INPUTLINE(M6809_TAG, INPUT_LINE_IRQ0))
 	MCFG_TMS9928A_SCREEN_ADD_NTSC( SCREEN_TAG )
@@ -451,9 +453,9 @@ static MACHINE_CONFIG_START( arachnid )
 	MCFG_SOUND_ADD("speaker", SPEAKER_SOUND, 0)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 
-	MCFG_DEVICE_ADD(PTM6840_TAG, PTM6840, XTAL_8MHz / 4)
+	MCFG_DEVICE_ADD(PTM6840_TAG, PTM6840, XTAL(8'000'000) / 4)
 	MCFG_PTM6840_EXTERNAL_CLOCKS(0, 0, 0)
-	MCFG_PTM6840_OUT0_CB(WRITELINE(arachnid_state, ptm_o1_callback))
+	MCFG_PTM6840_O1_CB(WRITELINE(arachnid_state, ptm_o1_callback))
 MACHINE_CONFIG_END
 
 /***************************************************************************

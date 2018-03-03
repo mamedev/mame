@@ -68,4 +68,7 @@ public:
 	TIMER_DEVICE_CALLBACK_MEMBER(bladestl_scanline);
 	K007342_CALLBACK_MEMBER(bladestl_tile_callback);
 	K007420_CALLBACK_MEMBER(bladestl_sprite_callback);
+	void bladestl(machine_config &config);
+	void main_map(address_map &map);
+	void sound_map(address_map &map);
 };

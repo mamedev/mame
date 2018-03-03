@@ -37,6 +37,8 @@ public:
 	TIMER_DEVICE_CALLBACK_MEMBER(irq_timer);
 	uint32_t screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 
+	void stratos(machine_config &config);
+	void stratos_mem(address_map &map);
 private:
 	std::unique_ptr<uint8_t[]> nvram_data;
 	uint8_t control, led_latch_control;
@@ -328,7 +330,7 @@ WRITE8_MEMBER(stratos_state::lcd_w)
 	}
 }
 
-static ADDRESS_MAP_START( stratos_mem, AS_PROGRAM, 8, stratos_state )
+ADDRESS_MAP_START(stratos_state::stratos_mem)
 	AM_RANGE(0x0000, 0x1fff) AM_RAM
 	AM_RANGE(0x2000, 0x2000) AM_WRITE(p2000_w)
 	AM_RANGE(0x2200, 0x2200) AM_READWRITE(p2200_r, p2200_w)
@@ -343,7 +345,7 @@ ADDRESS_MAP_END
 static INPUT_PORTS_START( stratos )
 INPUT_PORTS_END
 
-static MACHINE_CONFIG_START( stratos )
+MACHINE_CONFIG_START(stratos_state::stratos)
 	MCFG_CPU_ADD("maincpu", M65C02, 5670000)
 	MCFG_CPU_PROGRAM_MAP(stratos_mem)
 

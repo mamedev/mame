@@ -89,6 +89,8 @@ public:
 	DECLARE_WRITE8_MEMBER(ch2001_speaker_on_w);
 	DECLARE_WRITE8_MEMBER(ch2001_leds_w);
 	DECLARE_READ8_MEMBER(ch2001_input_r);
+	void ch2001_map(address_map &map);
+	void ch2001(machine_config &config);
 
 protected:
 	virtual void machine_start() override;
@@ -266,7 +268,7 @@ READ8_MEMBER(cxgz80_state::ch2001_input_r)
 
 // Chess 2001
 
-static ADDRESS_MAP_START( ch2001_map, AS_PROGRAM, 8, cxgz80_state )
+ADDRESS_MAP_START(cxgz80_state::ch2001_map)
 	AM_RANGE(0x0000, 0x3fff) AM_ROM
 	AM_RANGE(0x4000, 0x47ff) AM_MIRROR(0x3800) AM_RAM
 	AM_RANGE(0x8000, 0x8000) AM_MIRROR(0x3fff) AM_READWRITE(ch2001_input_r, ch2001_leds_w)
@@ -392,10 +394,10 @@ INPUT_PORTS_END
     Machine Drivers
 ******************************************************************************/
 
-static MACHINE_CONFIG_START( ch2001 )
+MACHINE_CONFIG_START(cxgz80_state::ch2001)
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", Z80, XTAL_8MHz/2)
+	MCFG_CPU_ADD("maincpu", Z80, 8_MHz_XTAL/2)
 	MCFG_CPU_PROGRAM_MAP(ch2001_map)
 	MCFG_TIMER_DRIVER_ADD_PERIODIC("irq_on", cxgz80_state, irq_on, attotime::from_hz(484)) // theoretical frequency from 555 timer (22nF, 100K+33K, 1K2), measurement was 568Hz
 	MCFG_TIMER_START_DELAY(attotime::from_hz(484) - attotime::from_nsec(18300)) // active for 18.3us

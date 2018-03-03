@@ -653,7 +653,7 @@
 #include "speaker.h"
 
 
-#define MASTER_CLOCK    XTAL_10MHz
+#define MASTER_CLOCK    XTAL(10'000'000)
 #define CPU_CLOCK   (MASTER_CLOCK/16)
 #define UART_CLOCK  (MASTER_CLOCK/16)
 #define SND_CLOCK   (MASTER_CLOCK/8)
@@ -822,7 +822,7 @@ WRITE8_MEMBER(calomega_state::lamps_905_w)
 *             Memory map information             *
 *************************************************/
 
-static ADDRESS_MAP_START( sys903_map, AS_PROGRAM, 8, calomega_state )
+ADDRESS_MAP_START(calomega_state::sys903_map)
 	ADDRESS_MAP_GLOBAL_MASK(0x3fff)
 	AM_RANGE(0x0000, 0x07ff) AM_RAM AM_SHARE("nvram")
 	AM_RANGE(0x0840, 0x0841) AM_DEVWRITE("ay8912", ay8910_device, address_data_w)
@@ -836,7 +836,7 @@ static ADDRESS_MAP_START( sys903_map, AS_PROGRAM, 8, calomega_state )
 	AM_RANGE(0x1800, 0x3fff) AM_ROM
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( s903mod_map, AS_PROGRAM, 8, calomega_state )
+ADDRESS_MAP_START(calomega_state::s903mod_map)
 	ADDRESS_MAP_GLOBAL_MASK(0x3fff)
 	AM_RANGE(0x0000, 0x07ff) AM_RAM AM_SHARE("nvram")
 	AM_RANGE(0x0840, 0x0841) AM_DEVWRITE("ay8912", ay8910_device, address_data_w)
@@ -849,7 +849,7 @@ static ADDRESS_MAP_START( s903mod_map, AS_PROGRAM, 8, calomega_state )
 	AM_RANGE(0x1800, 0x3fff) AM_ROM
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( sys905_map, AS_PROGRAM, 8, calomega_state )
+ADDRESS_MAP_START(calomega_state::sys905_map)
 	ADDRESS_MAP_GLOBAL_MASK(0x7fff)
 	AM_RANGE(0x0000, 0x07ff) AM_RAM AM_SHARE("nvram")
 	AM_RANGE(0x1040, 0x1041) AM_DEVWRITE("ay8912", ay8910_device, address_data_w)
@@ -862,7 +862,7 @@ static ADDRESS_MAP_START( sys905_map, AS_PROGRAM, 8, calomega_state )
 	AM_RANGE(0x2800, 0x7fff) AM_ROM
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( sys906_map, AS_PROGRAM, 8, calomega_state )
+ADDRESS_MAP_START(calomega_state::sys906_map)
 	AM_RANGE(0x0000, 0x07ff) AM_RAM AM_SHARE("nvram")
 	AM_RANGE(0x280c, 0x280f) AM_DEVREADWRITE("pia0", pia6821_device, read, write)
 	AM_RANGE(0x2824, 0x2827) AM_DEVREADWRITE("pia1", pia6821_device, read, write)
@@ -2567,7 +2567,7 @@ WRITE_LINE_MEMBER(calomega_state::write_acia_clock)
 *                Machine Drivers                 *
 *************************************************/
 
-static MACHINE_CONFIG_START( sys903 )
+MACHINE_CONFIG_START(calomega_state::sys903)
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", M6502, CPU_CLOCK)   /* confirmed */
 	MCFG_CPU_PROGRAM_MAP(sys903_map)
@@ -2616,7 +2616,8 @@ static MACHINE_CONFIG_START( sys903 )
 MACHINE_CONFIG_END
 
 
-static MACHINE_CONFIG_DERIVED( s903mod, sys903 )
+MACHINE_CONFIG_START(calomega_state::s903mod)
+	sys903(config);
 
 	/* basic machine hardware */
 
@@ -2633,7 +2634,8 @@ static MACHINE_CONFIG_DERIVED( s903mod, sys903 )
 MACHINE_CONFIG_END
 
 
-static MACHINE_CONFIG_DERIVED( sys905, sys903 )
+MACHINE_CONFIG_START(calomega_state::sys905)
+	sys903(config);
 
 	/* basic machine hardware */
 
@@ -2657,7 +2659,8 @@ static MACHINE_CONFIG_DERIVED( sys905, sys903 )
 MACHINE_CONFIG_END
 
 
-static MACHINE_CONFIG_DERIVED( sys906, sys903 )
+MACHINE_CONFIG_START(calomega_state::sys906)
+	sys903(config);
 
 	/* basic machine hardware */
 
@@ -3684,11 +3687,11 @@ DRIVER_INIT_MEMBER(calomega_state,comg080)
 *                  Game Drivers                  *
 *************************************************/
 
-/*    YEAR  NAME      PARENT    MACHINE   INPUT     INIT      ROT    COMPANY                                  FULLNAME                                                    FLAGS   */
+/*    YEAR  NAME      PARENT    MACHINE   INPUT     STATE           INIT     ROT    COMPANY                                  FULLNAME                                                    FLAGS   */
 GAME( 1981, comg074,  0,        sys903,   comg074,  calomega_state, sys903,  ROT0, "Cal Omega Inc.",                        "Cal Omega - Game 7.4 (Gaming Poker, W.Export)",             MACHINE_SUPPORTS_SAVE )
 GAME( 1981, comg076,  0,        sys903,   comg076,  calomega_state, sys903,  ROT0, "Cal Omega Inc.",                        "Cal Omega - Game 7.6 (Arcade Poker)",                       MACHINE_SUPPORTS_SAVE )
 GAME( 1981, comg079,  0,        sys903,   comg076,  calomega_state, sys903,  ROT0, "Cal Omega Inc.",                        "Cal Omega - Game 7.9 (Arcade Poker)",                       MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE )    /* bad dump */
-GAME( 1981, comg080,  0,        sys903,   arcadebj, calomega_state, comg080, ROT0, "Cal Omega Inc.",                        "Cal Omega - Game 8.0 (Arcade Black Jack)",                  MACHINE_SUPPORTS_SAVE )                       /* bad dump */
+GAME( 1981, comg080,  0,        sys903,   arcadebj, calomega_state, comg080, ROT0, "Cal Omega Inc.",                        "Cal Omega - Game 8.0 (Arcade Black Jack)",                  MACHINE_SUPPORTS_SAVE )                          /* bad dump */
 GAME( 1981, comg094,  0,        sys903,   stand903, calomega_state, sys903,  ROT0, "Cal Omega Inc.",                        "Cal Omega - Game 9.4 (Keno)",                               MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE )
 GAME( 1982, comg107,  0,        sys903,   stand903, calomega_state, sys903,  ROT0, "Cal Omega Inc.",                        "Cal Omega - Game 10.7c (Big Game)",                         MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE )
 GAME( 1982, comg123,  0,        sys903,   stand903, calomega_state, sys903,  ROT0, "Cal Omega Inc.",                        "Cal Omega - Game 12.3 (Ticket Poker)",                      MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE )    /* bad dump */

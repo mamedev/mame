@@ -137,6 +137,14 @@ public:
 	required_device<screen_device> m_screen;
 	required_device<generic_latch_8_device> m_soundlatch;
 
+	void hotchase(machine_config &config);
+	void wecleman(machine_config &config);
+	void hotchase_map(address_map &map);
+	void hotchase_sound_map(address_map &map);
+	void hotchase_sub_map(address_map &map);
+	void wecleman_map(address_map &map);
+	void wecleman_sound_map(address_map &map);
+	void wecleman_sub_map(address_map &map);
 private:
 	struct sprite_t
 	{

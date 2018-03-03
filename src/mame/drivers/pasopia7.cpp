@@ -88,6 +88,11 @@ public:
 	DECLARE_PALETTE_INIT(p7_lcd);
 	uint32_t screen_update_pasopia7(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 
+	void p7_base(machine_config &config);
+	void p7_lcd(machine_config &config);
+	void p7_raster(machine_config &config);
+	void pasopia7_io(address_map &map);
+	void pasopia7_mem(address_map &map);
 private:
 	uint8_t m_vram_sel;
 	uint8_t m_mio_sel;
@@ -136,7 +141,7 @@ private:
 	required_ioport_array<12> m_keyboard;
 };
 
-#define VDP_CLOCK XTAL_3_579545MHz/4
+#define VDP_CLOCK XTAL(3'579'545)/4
 #define LCD_CLOCK VDP_CLOCK/10
 
 // needed to scan the keyboard, as the pio emulation doesn't do it.
@@ -693,7 +698,7 @@ WRITE8_MEMBER( pasopia7_state::pasopia7_io_w )
 	}
 }
 
-static ADDRESS_MAP_START(pasopia7_mem, AS_PROGRAM, 8, pasopia7_state)
+ADDRESS_MAP_START(pasopia7_state::pasopia7_mem)
 	ADDRESS_MAP_UNMAP_HIGH
 	AM_RANGE( 0x0000, 0x7fff ) AM_WRITE( ram_bank_w )
 	AM_RANGE( 0x0000, 0x3fff ) AM_ROMBANK("bank1")
@@ -702,7 +707,7 @@ static ADDRESS_MAP_START(pasopia7_mem, AS_PROGRAM, 8, pasopia7_state)
 	AM_RANGE( 0xc000, 0xffff ) AM_RAMBANK("bank4")
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START(pasopia7_io, AS_IO, 8, pasopia7_state)
+ADDRESS_MAP_START(pasopia7_state::pasopia7_io)
 	ADDRESS_MAP_UNMAP_HIGH
 	AM_RANGE( 0x0000, 0xffff) AM_READWRITE( pasopia7_io_r, pasopia7_io_w )
 ADDRESS_MAP_END
@@ -908,9 +913,9 @@ static SLOT_INTERFACE_START( pasopia7_floppies )
 	SLOT_INTERFACE( "525hd", FLOPPY_525_HD )
 SLOT_INTERFACE_END
 
-static MACHINE_CONFIG_START( p7_base )
+MACHINE_CONFIG_START(pasopia7_state::p7_base)
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu",Z80, XTAL_4MHz)
+	MCFG_CPU_ADD("maincpu",Z80, XTAL(4'000'000))
 	MCFG_CPU_PROGRAM_MAP(pasopia7_mem)
 	MCFG_CPU_IO_MAP(pasopia7_io)
 	MCFG_Z80_DAISY_CHAIN(p7_daisy)
@@ -926,13 +931,13 @@ static MACHINE_CONFIG_START( p7_base )
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
 
 	/* Devices */
-	MCFG_DEVICE_ADD("z80ctc", Z80CTC, XTAL_4MHz)
+	MCFG_DEVICE_ADD("z80ctc", Z80CTC, XTAL(4'000'000))
 	MCFG_Z80CTC_INTR_CB(INPUTLINE("maincpu", INPUT_LINE_IRQ0))
 	MCFG_Z80CTC_ZC0_CB(DEVWRITELINE("z80ctc", z80ctc_device, trg1))
 	MCFG_Z80CTC_ZC1_CB(DEVWRITELINE("z80ctc", z80ctc_device, trg2)) // beep interface
 	MCFG_Z80CTC_ZC2_CB(DEVWRITELINE("z80ctc", z80ctc_device, trg3))
 
-	MCFG_DEVICE_ADD("z80pio", Z80PIO, XTAL_4MHz)
+	MCFG_DEVICE_ADD("z80pio", Z80PIO, XTAL(4'000'000))
 	MCFG_Z80PIO_OUT_INT_CB(INPUTLINE("maincpu", INPUT_LINE_IRQ0))
 	MCFG_Z80PIO_OUT_PA_CB(WRITE8(pasopia7_state, mux_w))
 	MCFG_Z80PIO_IN_PB_CB(READ8(pasopia7_state, keyb_r))
@@ -959,7 +964,8 @@ static MACHINE_CONFIG_START( p7_base )
 	MCFG_FLOPPY_DRIVE_ADD("fdc:1", pasopia7_floppies, "525hd", floppy_image_device::default_floppy_formats)
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_DERIVED( p7_raster, p7_base )
+MACHINE_CONFIG_START(pasopia7_state::p7_raster)
+	p7_base(config);
 	MCFG_SCREEN_ADD("screen", RASTER)
 	MCFG_SCREEN_REFRESH_RATE(60)
 	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500)) /* not accurate */
@@ -978,7 +984,8 @@ static MACHINE_CONFIG_DERIVED( p7_raster, p7_base )
 MACHINE_CONFIG_END
 
 
-static MACHINE_CONFIG_DERIVED( p7_lcd, p7_base )
+MACHINE_CONFIG_START(pasopia7_state::p7_lcd)
+	p7_base(config);
 	MCFG_SCREEN_ADD("screen", LCD)
 	MCFG_SCREEN_REFRESH_RATE(60)
 	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500)) /* not accurate */

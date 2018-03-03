@@ -52,6 +52,8 @@ public:
 	required_device<gfxdecode_device> m_gfxdecode;
 	required_device<palette_device> m_palette;
 	required_device<screen_device> m_screen;
+	void apexc(machine_config &config);
+	void apexc_mem_map(address_map &map);
 };
 
 void apexc_state::machine_start()
@@ -112,7 +114,7 @@ image_init_result apexc_cylinder_image_device::call_load()
 	/* load RAM contents */
 	m_writable = !is_readonly();
 
-	fread( machine().root_device().memregion("maincpu")->base(), 0x1000);
+	fread( machine().root_device().memshare("maincpu")->ptr(), 0x1000);
 #ifdef LSB_FIRST
 	{   /* fix endianness */
 		uint32_t *RAM = (uint32_t *)(machine().root_device().memregion("maincpu")->base());
@@ -842,29 +844,20 @@ static GFXDECODE_START( apexc )
 GFXDECODE_END
 
 
-static ADDRESS_MAP_START(apexc_mem_map, AS_PROGRAM, 32, apexc_state )
-#if 0
-	AM_RANGE(0x0000, 0x03ff) AM_RAM /* 1024 32-bit words (expandable to 8192) */
-	AM_RANGE(0x0400, 0x1fff) AM_NOP
-#else
-	AM_RANGE(0x0000, 0x0fff) AM_RAM AM_REGION("maincpu", 0x0000)
+ADDRESS_MAP_START(apexc_state::apexc_mem_map)
+	AM_RANGE(0x0000, 0x0fff) AM_RAM AM_SHARE("maincpu")
 	AM_RANGE(0x1000, 0x7fff) AM_NOP
-#endif
-ADDRESS_MAP_END
-
-static ADDRESS_MAP_START(apexc_io_map, AS_IO, 8, apexc_state )
-	AM_RANGE(0x00, 0x00) AM_READ(tape_read)
-	AM_RANGE(0x00, 0x00) AM_WRITE(tape_write)
 ADDRESS_MAP_END
 
 
-static MACHINE_CONFIG_START( apexc )
+MACHINE_CONFIG_START(apexc_state::apexc)
 
 	/* basic machine hardware */
 	/* APEXC CPU @ 2.0 kHz (memory word clock frequency) */
 	MCFG_CPU_ADD("maincpu", APEXC, 2000)
 	MCFG_CPU_PROGRAM_MAP(apexc_mem_map)
-	MCFG_CPU_IO_MAP(apexc_io_map)
+	MCFG_APEXC_TAPE_READ_CB(READ8(apexc_state, tape_read))
+	MCFG_APEXC_TAPE_PUNCH_CB(WRITE8(apexc_state, tape_write))
 	/* dummy interrupt: handles the control panel */
 	MCFG_CPU_VBLANK_INT_DRIVER("screen", apexc_state,  apexc_interrupt)
 
@@ -890,8 +883,7 @@ MACHINE_CONFIG_END
 
 ROM_START(apexc)
 	/*CPU memory space*/
-	ROM_REGION32_BE(0x10000, "maincpu", ROMREGION_ERASEFF)
-		/* Note this computer has no ROM... */
+	/* Note this computer has no ROM... */
 
 	ROM_REGION(apexcfontdata_size, "chargen", ROMREGION_ERASEFF)
 		/* space filled with our font */

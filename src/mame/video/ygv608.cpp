@@ -248,7 +248,7 @@ GFXDECODE_END
  ***************************************/
 
  // we use decimals here to match documentation
-static ADDRESS_MAP_START( regs_map, AS_IO, 8, ygv608_device )
+ADDRESS_MAP_START(ygv608_device::regs_map)
 
 	// address pointers
 	AM_RANGE( 0,  0) AM_READWRITE(pattern_name_table_y_r,pattern_name_table_y_w)
@@ -296,7 +296,7 @@ ADDRESS_MAP_END
  *
  ***************************************/
 
-DEVICE_ADDRESS_MAP_START( port_map, 8, ygv608_device )
+ADDRESS_MAP_START(ygv608_device::port_map)
 	AM_RANGE(0x00, 0x00) AM_READWRITE(pattern_name_table_r,pattern_name_table_w)
 	AM_RANGE(0x01, 0x01) AM_READWRITE(sprite_data_r,sprite_data_w)
 	AM_RANGE(0x02, 0x02) AM_READWRITE(scroll_data_r,scroll_data_w)
@@ -316,7 +316,7 @@ ygv608_device::ygv608_device( const machine_config &mconfig, const char *tag, de
 	: device_t(mconfig, YGV608, tag, owner, clock),
 	  device_gfx_interface(mconfig, *this, GFXDECODE_NAME(ygv608)),
 	  device_memory_interface(mconfig, *this),
-	  m_io_space_config("io", ENDIANNESS_BIG, 8, 6, 0, *ADDRESS_MAP_NAME(regs_map)),
+	  m_io_space_config("io", ENDIANNESS_BIG, 8, 6, 0, address_map_constructor(FUNC(ygv608_device::regs_map), this)),
 	  m_vblank_handler(*this),
 	  m_raster_handler(*this)
 {
@@ -1030,6 +1030,26 @@ inline void ygv608_device::draw_layer_roz(screen_device &screen, bitmap_ind16 &b
 		source_tilemap->draw(screen, bitmap, cliprect, 0, 0 );
 }
 
+void ygv608_device::ygv608_draw_mosaic(bitmap_ind16 &bitmap, const rectangle &cliprect, int n)
+{
+	int x, y, mask;
+
+	if (n <= 0)
+	{
+		return;
+	}
+
+	// mask to drop the lowest n-bits
+	mask = ~((1 << n) - 1);
+
+	for (y = cliprect.min_y; y <= cliprect.max_y; y++)
+	{
+		for (x = cliprect.min_x; x <= cliprect.max_x; x++)
+		{
+			bitmap.pix16(y, x) = bitmap.pix16(y & mask, x & mask);
+		}
+	}
+}
 
 uint32_t ygv608_device::update_screen(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
@@ -1083,7 +1103,7 @@ uint32_t ygv608_device::update_screen(screen_device &screen, bitmap_ind16 &bitma
 			m_tilemap_A = m_tilemap_A_cache_16[index];
 		m_tilemap_A->mark_all_dirty();
 
-		m_tilemap_A->set_transparent_pen(0);
+		m_tilemap_A->set_transparent_pen(m_border_color);
 
 		if (m_h_div_size == 0) {
 			m_tilemap_A->set_scroll_cols(m_page_x);
@@ -1175,6 +1195,8 @@ uint32_t ygv608_device::update_screen(screen_device &screen, bitmap_ind16 &bitma
 	else
 	{
 		draw_layer_roz(screen, m_work_bitmap, finalclip, m_tilemap_B);
+		if(m_mosaic_bplane > 0)
+			ygv608_draw_mosaic(m_work_bitmap, finalclip, m_mosaic_bplane);
 
 		if(m_planeB_trans_enable == true)
 			copybitmap_trans( bitmap, m_work_bitmap, 0, 0, 0, 0, finalclip, 0);
@@ -1192,6 +1214,8 @@ uint32_t ygv608_device::update_screen(screen_device &screen, bitmap_ind16 &bitma
 		draw_sprites(bitmap, finalclip);
 
 	draw_layer_roz(screen, m_work_bitmap, finalclip, m_tilemap_A);
+	if(m_mosaic_aplane > 0)
+		ygv608_draw_mosaic(m_work_bitmap, finalclip, m_mosaic_aplane);
 
 	if(m_planeA_trans_enable == true)
 		copybitmap_trans( bitmap, m_work_bitmap, 0, 0, 0, 0, finalclip, 0);
@@ -1236,7 +1260,7 @@ READ8_MEMBER( ygv608_device::pattern_name_table_r )
 {
 	int pn = 0;
 
-	switch (p0_state_r)
+	switch (p0_state)
 	{
 		case 0:
 			/* Are we reading from plane B? */
@@ -1259,7 +1283,7 @@ READ8_MEMBER( ygv608_device::pattern_name_table_r )
 			"mode = %d, pgs = %d (%dx%d)\n"
 			"pattern_name_base_r = %d\n"
 			"pnx = %d, pny = %d, pny_shift = %d, bits16 = %d\n",
-			p0_state_r,
+			p0_state,
 			pn, m_md, m_page_size,
 			m_page_x, m_page_y,
 			pattern_name_base_r,
@@ -1268,14 +1292,14 @@ READ8_MEMBER( ygv608_device::pattern_name_table_r )
 		pn = 0;
 	}
 
-	p0_state_r++;
+	p0_state++;
 	if (m_md == MD_2PLANE_8BIT )
-		p0_state_r++;
+		p0_state++;
 
-	if (p0_state_r == 2)
+	if (p0_state == 2)
 	{
 		pattern_name_autoinc_check();
-		p0_state_r = 0;
+		p0_state = 0;
 		pattern_name_base_r = 0;
 	}
 
@@ -1374,7 +1398,7 @@ WRITE8_MEMBER(ygv608_device::pattern_name_table_w)
 {
 	int pn = 0;
 
-	switch (p0_state_w)
+	switch (p0_state)
 	{
 		case 0:
 			/* Are we reading from plane B? */
@@ -1393,11 +1417,11 @@ WRITE8_MEMBER(ygv608_device::pattern_name_table_w)
 
 	if (pn > 4095)
 	{
-		logerror( "attempt (%d) to read pattern name %d\n"
+		logerror( "attempt (%d) to write pattern name %d\n"
 			"mode = %d, pgs = %d (%dx%d)\n"
 			"pattern_name_base_w = %d\n"
 			"pnx = %d, pny = %d, pny_shift = %d, bits16 = %d\n",
-			p0_state_w,
+			p0_state,
 			pn, m_md, m_page_size,
 			m_page_x, m_page_y,
 			pattern_name_base_w,
@@ -1408,14 +1432,14 @@ WRITE8_MEMBER(ygv608_device::pattern_name_table_w)
 
 	m_pattern_name_table[pn] = data;
 
-	p0_state_w++;
+	p0_state++;
 	if (m_md == MD_2PLANE_8BIT )
-		p0_state_w++;
+		p0_state++;
 
-	if (p0_state_w == 2)
+	if (p0_state == 2)
 	{
 		pattern_name_autoinc_check();
-		p0_state_w = 0;
+		p0_state = 0;
 		pattern_name_base_w = 0;
 	}
 }
@@ -1806,8 +1830,7 @@ WRITE8_MEMBER( ygv608_device::screen_ctrl_7_w )
 	m_na8_mask = ((m_flip == true) ? 0x03 : 0x0f );
 
 	// changing mode resets the pattern name table states (Mappy Arrange)
-	p0_state_w = 0;
-	p0_state_r = 0;
+	p0_state = 0;
 	pattern_mode_setup();
 // TODO: add dot clock into CRTC
 //  screen_configure();
@@ -1941,8 +1964,8 @@ WRITE8_MEMBER( ygv608_device::screen_ctrl_10_w )
 	// check mosaic
 	m_mosaic_bplane = (data & 0xc) >> 2;
 	m_mosaic_aplane = data & 3;
-	if(m_mosaic_aplane || m_mosaic_bplane)
-		popmessage("Mosaic effect %02x %02x",m_mosaic_aplane,m_mosaic_bplane);
+//  if(m_mosaic_aplane || m_mosaic_bplane)
+//      popmessage("Mosaic effect %02x %02x",m_mosaic_aplane,m_mosaic_bplane);
 }
 
 // R#11R - screen control 11

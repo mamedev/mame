@@ -71,6 +71,8 @@ public:
 	int m_noise_data;
 	DECLARE_WRITE8_MEMBER(dambustr_noise_enable_w);
 	DECLARE_DRIVER_INIT(dambustr);
+	void dambustr(machine_config &config);
+	void dambustr_map(address_map &map);
 };
 
 
@@ -85,7 +87,7 @@ WRITE8_MEMBER(dambustr_state::dambustr_noise_enable_w)
 }
 
 
-static ADDRESS_MAP_START( dambustr_map, AS_PROGRAM, 8, dambustr_state )
+ADDRESS_MAP_START(dambustr_state::dambustr_map)
 	AM_RANGE(0x0000, 0x7fff) AM_ROM
 
 	AM_RANGE(0x8000, 0x8000) AM_WRITE(dambustr_bg_color_w)
@@ -220,7 +222,7 @@ DRIVER_INIT_MEMBER(dambustr_state,dambustr)
 
 	// Bit swap addresses
 	for(i=0; i<4096*4; i++) {
-		rom[i] = usr[BITSWAP16(i,15,14,13,12, 4,10,9,8,7,6,5,3,11,2,1,0)];
+		rom[i] = usr[bitswap<16>(i,15,14,13,12, 4,10,9,8,7,6,5,3,11,2,1,0)];
 	};
 
 	// Swap program ROMs
@@ -233,9 +235,9 @@ DRIVER_INIT_MEMBER(dambustr_state,dambustr)
 
 	// Bit swap in $1000-$1fff and $4000-$5fff
 	for(i=0; i<0x1000; i++) {
-		rom[0x1000+i] = BITSWAP8(rom[0x1000+i],7,6,5,1,3,2,4,0);
-		rom[0x4000+i] = BITSWAP8(rom[0x4000+i],7,6,5,1,3,2,4,0);
-		rom[0x5000+i] = BITSWAP8(rom[0x5000+i],7,6,5,1,3,2,4,0);
+		rom[0x1000+i] = bitswap<8>(rom[0x1000+i],7,6,5,1,3,2,4,0);
+		rom[0x4000+i] = bitswap<8>(rom[0x4000+i],7,6,5,1,3,2,4,0);
+		rom[0x5000+i] = bitswap<8>(rom[0x5000+i],7,6,5,1,3,2,4,0);
 	};
 
 	// Swap graphics ROMs
@@ -251,7 +253,7 @@ DRIVER_INIT_MEMBER(dambustr_state,dambustr)
 
 
 
-static MACHINE_CONFIG_START( dambustr )
+MACHINE_CONFIG_START(dambustr_state::dambustr)
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", Z80, 18432000/6)    /* 3.072 MHz */
 	MCFG_CPU_PROGRAM_MAP(dambustr_map)
@@ -285,7 +287,7 @@ static MACHINE_CONFIG_START( dambustr )
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("speaker")
 
-	MCFG_FRAGMENT_ADD(galaxian_audio)
+	galaxian_audio(config);
 MACHINE_CONFIG_END
 
 

@@ -36,8 +36,8 @@
 class sms_state : public driver_device
 {
 public:
-	sms_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag),
+	sms_state(const machine_config &mconfig, device_type type, const char *tag) :
+		driver_device(mconfig, type, tag),
 		m_maincpu(*this, "maincpu"),
 		m_vdp(*this, "sms_vdp"),
 		m_main_scr(*this, "screen"),
@@ -55,6 +55,7 @@ public:
 		m_port_scope(*this, "SEGASCOPE"),
 		m_port_scope_binocular(*this, "SSCOPE_BINOCULAR"),
 		m_port_persist(*this, "PERSISTENCE"),
+		m_led_pwr(*this, "led_pwr"),
 		m_region_maincpu(*this, "maincpu"),
 		m_mainram(nullptr),
 		m_is_gamegear(0),
@@ -66,7 +67,8 @@ public:
 		m_has_bios_2000(0),
 		m_has_bios_full(0),
 		m_has_jpn_sms_cart_slot(0),
-		m_store_cart_selection_data(0) { }
+		m_store_cart_selection_data(0)
+	{ }
 
 	// devices
 	required_device<cpu_device> m_maincpu;
@@ -87,6 +89,8 @@ public:
 	optional_ioport m_port_scope;
 	optional_ioport m_port_scope_binocular;
 	optional_ioport m_port_persist;
+
+	output_finder<> m_led_pwr;
 
 	required_memory_region m_region_maincpu;
 	address_space *m_space;
@@ -225,6 +229,31 @@ public:
 	void screen_gg_sms_mode_scaling(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 	DECLARE_WRITE_LINE_MEMBER(screen_vblank_sms1);
 
+	void sms_base(machine_config &config);
+	void sms_ntsc_base(machine_config &config);
+	void sms_pal_base(machine_config &config);
+	void sms_paln_base(machine_config &config);
+	void sms_br_base(machine_config &config);
+	void sms3_br(machine_config &config);
+	void sg1000m3(machine_config &config);
+	void smsj(machine_config &config);
+	void sms1_paln(machine_config &config);
+	void sms1_ntsc(machine_config &config);
+	void gamegear(machine_config &config);
+	void sms3_paln(machine_config &config);
+	void sms1_pal(machine_config &config);
+	void sms2_pal(machine_config &config);
+	void sms2_kr(machine_config &config);
+	void sms1_br(machine_config &config);
+	void sms2_ntsc(machine_config &config);
+	void sms1_kr(machine_config &config);
+	void gg_io(address_map &map);
+	void sg1000m3_io(address_map &map);
+	void sms1_mem(address_map &map);
+	void sms_io(address_map &map);
+	void sms_mem(address_map &map);
+	void smsj_io(address_map &map);
+	void smskr_io(address_map &map);
 protected:
 	uint8_t read_bus(address_space &space, unsigned int bank, uint16_t base_addr, uint16_t offset);
 	void setup_bios();
@@ -238,9 +267,9 @@ protected:
 class smssdisp_state : public sms_state
 {
 public:
-	smssdisp_state(const machine_config &mconfig, device_type type, const char *tag)
-	: sms_state(mconfig, type, tag),
-	m_control_cpu(*this, "control")
+	smssdisp_state(const machine_config &mconfig, device_type type, const char *tag) :
+		sms_state(mconfig, type, tag),
+		m_control_cpu(*this, "control")
 	{ }
 
 	required_device<cpu_device> m_control_cpu;
@@ -253,6 +282,8 @@ public:
 	DECLARE_READ8_MEMBER(store_cart_peek);
 
 	DECLARE_WRITE_LINE_MEMBER(sms_store_int_callback);
+	void sms_sdisp(machine_config &config);
+	void sms_store_mem(address_map &map);
 };
 
 

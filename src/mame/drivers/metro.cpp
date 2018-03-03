@@ -68,7 +68,7 @@ no PCB number but all look identical to each other.
 To Do:
 
 -   For video related issues @see devices/video/imagetek_i4100.cpp
--   Most games, in service mode, seem to require that you press start1&2 *exactly at once*
+-   Most games in service mode, seem to require that you press start1&2 *exactly at once*
     in order to advance to the next screen (e.g. holding 1 then pressing 2 doesn't work).
 -   Coin lockout
 -   Interrupt timing needs figuring out properly, having it incorrect
@@ -76,6 +76,7 @@ To Do:
     title screen, GunMaster title screen.  Changing it can cause
     excessive slowdown in said games however.
 -   vmetal: ES8712 actually controls a M6585 and an unknown logic selector chip.
+-   split these games into different files, check PCB markings.
 
 Notes:
 
@@ -115,11 +116,11 @@ READ16_MEMBER(metro_state::metro_irq_cause_r)
 	/* interrupt cause, used by
 
 	int[0] vblank
-	int[1] hblank (bangball for faster intermission skip, 
-	               puzzli for gameplay water effect, 
-				   blzntrnd title screen scroll (enabled all the time then?),
-				   unused/empty in balcube, daitoride, karatour,
-				   unchecked mouja & other i4300 games )
+	int[1] hblank (bangball for faster intermission skip,
+	               puzzli for gameplay water effect,
+	               blzntrnd title screen scroll (enabled all the time then?),
+	               unused/empty in balcube, daitoride, karatour,
+	               unchecked mouja & other i4300 games )
 	int[2] blitter
 	int[3] ?            KARATOUR
 	int[4] ?
@@ -179,7 +180,7 @@ IRQ_CALLBACK_MEMBER(metro_state::metro_irq_callback)
 
 WRITE16_MEMBER(metro_state::metro_irq_cause_w)
 {
-	//if (data & ~0x15) logerror("CPU #0 PC %06X : unknown bits of irqcause written: %04X\n", space.device().safe_pc(), data);
+	//if (data & ~0x15) logerror("CPU #0 PC %06X : unknown bits of irqcause written: %04X\n", m_maincpu->pc(), data);
 
 	if (ACCESSING_BITS_0_7)
 	{
@@ -291,7 +292,7 @@ WRITE16_MEMBER(metro_state::metro_soundlatch_w)
 	{
 		m_soundlatch->write(space, 0, data & 0xff);
 		m_audiocpu->set_input_line(INPUT_LINE_NMI, PULSE_LINE);
-		space.device().execute().spin_until_interrupt();
+		m_maincpu->spin_until_interrupt();
 		m_busy_sndcpu = 1;
 	}
 }
@@ -460,7 +461,7 @@ WRITE16_MEMBER(metro_state::metro_coin_lockout_1word_w)
 		machine().bookkeeping().coin_counter_w(0, data & 1);
 		machine().bookkeeping().coin_counter_w(1, data & 2);
 	}
-	if (data & ~3)  logerror("CPU #0 PC %06X : unknown bits of coin lockout written: %04X\n", space.device().safe_pc(), data);
+	if (data & ~3)  logerror("CPU #0 PC %06X : unknown bits of coin lockout written: %04X\n", m_maincpu->pc(), data);
 }
 
 // value written doesn't matter, also each counted coin gets reported after one full second.
@@ -470,7 +471,7 @@ WRITE16_MEMBER(metro_state::metro_coin_lockout_4words_w)
 	machine().bookkeeping().coin_counter_w((offset >> 1) & 1, offset & 1);
 //  machine().bookkeeping().coin_lockout_w((offset >> 1) & 1, offset & 1);
 
-	if (data & ~1)  logerror("CPU #0 PC %06X : unknown bits of coin lockout written: %04X\n", space.device().safe_pc(), data);
+	if (data & ~1)  logerror("CPU #0 PC %06X : unknown bits of coin lockout written: %04X\n", m_maincpu->pc(), data);
 }
 
 WRITE_LINE_MEMBER(metro_state::vdp_blit_end_w)
@@ -494,7 +495,7 @@ WRITE_LINE_MEMBER(metro_state::vdp_blit_end_w)
 */
 
 
-static ADDRESS_MAP_START( metro_sound_map, AS_PROGRAM, 8, metro_state )
+ADDRESS_MAP_START(metro_state::metro_sound_map)
 	AM_RANGE(0x0000, 0x3fff) AM_ROM         /* External ROM */
 	AM_RANGE(0x4000, 0x7fff) AM_ROMBANK("bank1")    /* External ROM (Banked) */
 	AM_RANGE(0x8000, 0x87ff) AM_RAM         /* External RAM */
@@ -503,7 +504,7 @@ ADDRESS_MAP_END
 /*****************/
 
 
-static ADDRESS_MAP_START( ymf278_map, 0, 8, metro_state )
+ADDRESS_MAP_START(metro_state::ymf278_map)
 	AM_RANGE(0x000000, 0x27ffff) AM_ROM
 ADDRESS_MAP_END
 
@@ -539,12 +540,12 @@ READ16_MEMBER(metro_state::balcube_dsw_r)
 		case 0x17FFE:   return BIT(dsw2, 6) ? 0x40 : 0;
 		case 0x0FFFE:   return BIT(dsw2, 7) ? 0x40 : 0;
 	}
-	logerror("CPU #0 PC %06X : unknown dsw address read: %04X\n", space.device().safe_pc(), offset);
+	logerror("CPU #0 PC %06X : unknown dsw address read: %04X\n", m_maincpu->pc(), offset);
 	return 0xffff;
 }
 
 
-static ADDRESS_MAP_START( balcube_map, AS_PROGRAM, 16, metro_state )
+ADDRESS_MAP_START(metro_state::balcube_map)
 	AM_RANGE(0x000000, 0x07ffff) AM_ROM                                             // ROM
 	AM_RANGE(0x300000, 0x300001) AM_DEVREAD8("ymf", ymf278b_device, read, 0x00ff)   // Sound
 	AM_RANGE(0x300000, 0x30000b) AM_DEVWRITE8("ymf", ymf278b_device, write, 0x00ff) // Sound
@@ -565,7 +566,7 @@ ADDRESS_MAP_END
 ***************************************************************************/
 
 
-static ADDRESS_MAP_START( daitoa_map, AS_PROGRAM, 16, metro_state )
+ADDRESS_MAP_START(metro_state::daitoa_map)
 	AM_RANGE(0x000000, 0x07ffff) AM_ROM                                             // ROM
 	AM_RANGE(0x100000, 0x17ffff) AM_DEVICE("vdp2", imagetek_i4220_device, v2_map )
 	AM_RANGE(0x1788a2, 0x1788a3) AM_READWRITE(metro_irq_cause_r, metro_irq_cause_w) // IRQ Cause / IRQ Acknowledge
@@ -585,7 +586,7 @@ ADDRESS_MAP_END
                                 Bang Bang Ball
 ***************************************************************************/
 
-static ADDRESS_MAP_START( bangball_map, AS_PROGRAM, 16, metro_state )
+ADDRESS_MAP_START(metro_state::bangball_map)
 	AM_RANGE(0x000000, 0x07ffff) AM_ROM                                             // ROM
 	AM_RANGE(0xb00000, 0xb00001) AM_DEVREAD8("ymf", ymf278b_device, read, 0x00ff)   // Sound
 	AM_RANGE(0xb00000, 0xb0000b) AM_DEVWRITE8("ymf", ymf278b_device, write, 0x00ff) // Sound
@@ -605,7 +606,7 @@ ADDRESS_MAP_END
                                 Battle Bubble
 ***************************************************************************/
 
-static ADDRESS_MAP_START( batlbubl_map, AS_PROGRAM, 16, metro_state )
+ADDRESS_MAP_START(metro_state::batlbubl_map)
 	AM_RANGE(0x000000, 0x0fffff) AM_ROM                                             // ROM
 	AM_RANGE(0x100000, 0x17ffff) AM_DEVICE("vdp2", imagetek_i4220_device, v2_map)
 	AM_RANGE(0x1788a2, 0x1788a3) AM_READWRITE(metro_irq_cause_r,metro_irq_cause_w)  // IRQ Cause / IRQ Acknowledge
@@ -626,7 +627,7 @@ ADDRESS_MAP_END
                              Mouse Shooter GoGo
 ***************************************************************************/
 
-static ADDRESS_MAP_START( msgogo_map, AS_PROGRAM, 16, metro_state )
+ADDRESS_MAP_START(metro_state::msgogo_map)
 	AM_RANGE(0x000000, 0x07ffff) AM_ROM                                             // ROM
 	AM_RANGE(0x100000, 0x17ffff) AM_DEVICE("vdp2", imagetek_i4220_device, v2_map)
 	AM_RANGE(0x1788a2, 0x1788a3) AM_READWRITE(metro_irq_cause_r,metro_irq_cause_w)  // IRQ Cause / IRQ Acknowledge
@@ -645,7 +646,7 @@ ADDRESS_MAP_END
                                 Daitoride
 ***************************************************************************/
 
-static ADDRESS_MAP_START( daitorid_map, AS_PROGRAM, 16, metro_state )
+ADDRESS_MAP_START(metro_state::daitorid_map)
 	AM_RANGE(0x000000, 0x03ffff) AM_ROM                                             // ROM
 	AM_RANGE(0x400000, 0x47ffff) AM_DEVICE("vdp2", imagetek_i4220_device, v2_map)
 	AM_RANGE(0x4788a2, 0x4788a3) AM_READWRITE(metro_irq_cause_r, metro_irq_cause_w) // IRQ Cause / IRQ Acknowledge
@@ -664,7 +665,7 @@ ADDRESS_MAP_END
                                 Dharma Doujou
 ***************************************************************************/
 
-static ADDRESS_MAP_START( dharma_map, AS_PROGRAM, 16, metro_state )
+ADDRESS_MAP_START(metro_state::dharma_map)
 	AM_RANGE(0x000000, 0x03ffff) AM_ROM                                             // ROM
 	AM_RANGE(0x400000, 0x40ffff) AM_RAM AM_MIRROR(0x0f0000)                         // RAM (mirrored)
 	AM_RANGE(0x800000, 0x87ffff) AM_DEVICE("vdp2", imagetek_i4220_device, v2_map)
@@ -683,7 +684,7 @@ ADDRESS_MAP_END
                                 Karate Tournament
 ***************************************************************************/
 
-static ADDRESS_MAP_START( karatour_map, AS_PROGRAM, 16, metro_state )
+ADDRESS_MAP_START(metro_state::karatour_map)
 	AM_RANGE(0x000000, 0x07ffff) AM_ROM                                             // ROM
 	AM_RANGE(0x400000, 0x400001) AM_READWRITE(metro_soundstatus_r, metro_soundstatus_w) // From Sound CPU
 	AM_RANGE(0x400002, 0x400003) AM_READ_PORT("IN0")                                // Inputs
@@ -706,7 +707,7 @@ ADDRESS_MAP_END
 
 /* same limited tilemap access as karatour */
 
-static ADDRESS_MAP_START( kokushi_map, AS_PROGRAM, 16, metro_state )
+ADDRESS_MAP_START(metro_state::kokushi_map)
 	AM_RANGE(0x000000, 0x07ffff) AM_ROM                                             // ROM
 	AM_RANGE(0x700000, 0x70ffff) AM_RAM AM_MIRROR(0x0f0000)                         // RAM (mirrored)
 	AM_RANGE(0x800000, 0x87ffff) AM_DEVICE("vdp2", imagetek_i4220_device, v2_map)
@@ -724,7 +725,7 @@ ADDRESS_MAP_END
                                 Last Fortress
 ***************************************************************************/
 
-static ADDRESS_MAP_START( lastfort_map, AS_PROGRAM, 16, metro_state )
+ADDRESS_MAP_START(metro_state::lastfort_map)
 	AM_RANGE(0x000000, 0x03ffff) AM_ROM                                             // ROM
 	AM_RANGE(0x400000, 0x40ffff) AM_RAM AM_MIRROR(0x0f0000)                         // RAM (mirrored)
 	AM_RANGE(0x800000, 0x87ffff) AM_DEVICE("vdp", imagetek_i4100_device, map)
@@ -744,7 +745,7 @@ ADDRESS_MAP_END
 /* the German version is halfway between lastfort and ladykill (karatour) memory maps */
 
 /* todo: clean up input reads etc. */
-static ADDRESS_MAP_START( lastforg_map, AS_PROGRAM, 16, metro_state )
+ADDRESS_MAP_START(metro_state::lastforg_map)
 	AM_RANGE(0x000000, 0x03ffff) AM_ROM                                             // ROM
 	AM_RANGE(0x400000, 0x400001) AM_READWRITE(metro_soundstatus_r, metro_soundstatus_w) // From / To Sound CPU
 	AM_RANGE(0x400002, 0x400003) AM_READ_PORT("IN0")                                // Inputs
@@ -813,7 +814,7 @@ WRITE8_MEMBER(metro_state::gakusai_eeprom_w)
 	m_eeprom->clk_write(BIT(data, 1) ? ASSERT_LINE : CLEAR_LINE );
 }
 
-static ADDRESS_MAP_START( gakusai_map, AS_PROGRAM, 16, metro_state )
+ADDRESS_MAP_START(metro_state::gakusai_map)
 	AM_RANGE(0x000000, 0x07ffff) AM_ROM                                             // ROM
 	AM_RANGE(0x200000, 0x27ffff) AM_DEVICE("vdp3", imagetek_i4300_device, v3_map )
 	AM_RANGE(0x278810, 0x27881f) AM_WRITEONLY AM_SHARE("irq_levels")                // IRQ Levels
@@ -838,7 +839,7 @@ ADDRESS_MAP_END
                                 Mahjong Gakuensai 2
 ***************************************************************************/
 
-static ADDRESS_MAP_START( gakusai2_map, AS_PROGRAM, 16, metro_state )
+ADDRESS_MAP_START(metro_state::gakusai2_map)
 	AM_RANGE(0x000000, 0x07ffff) AM_ROM                                             // ROM
 	AM_RANGE(0x600000, 0x67ffff) AM_DEVICE("vdp3", imagetek_i4300_device, v3_map)
 	AM_RANGE(0x678810, 0x67881f) AM_WRITEONLY AM_SHARE("irq_levels")                // IRQ Levels
@@ -888,7 +889,7 @@ WRITE8_MEMBER(metro_state::dokyusp_eeprom_reset_w)
 	m_eeprom->cs_write(BIT(data, 0) ? ASSERT_LINE : CLEAR_LINE);
 }
 
-static ADDRESS_MAP_START( dokyusp_map, AS_PROGRAM, 16, metro_state )
+ADDRESS_MAP_START(metro_state::dokyusp_map)
 	AM_RANGE(0x000000, 0x03ffff) AM_ROM                                             // ROM
 	AM_RANGE(0x200000, 0x27ffff) AM_DEVICE("vdp3", imagetek_i4300_device, v3_map)
 	AM_RANGE(0x278810, 0x27881f) AM_WRITEONLY AM_SHARE("irq_levels")                // IRQ Levels
@@ -913,7 +914,7 @@ ADDRESS_MAP_END
                             Mahjong Doukyuusei
 ***************************************************************************/
 
-static ADDRESS_MAP_START( dokyusei_map, AS_PROGRAM, 16, metro_state )
+ADDRESS_MAP_START(metro_state::dokyusei_map)
 	AM_RANGE(0x000000, 0x03ffff) AM_ROM                                             // ROM
 	AM_RANGE(0x400000, 0x47ffff) AM_DEVICE("vdp3", imagetek_i4300_device, v3_map)
 	AM_RANGE(0x478810, 0x47881f) AM_WRITEONLY AM_SHARE("irq_levels")                // IRQ Levels
@@ -940,7 +941,7 @@ ADDRESS_MAP_END
                                 Pang Pom's
 ***************************************************************************/
 
-static ADDRESS_MAP_START( pangpoms_map, AS_PROGRAM, 16, metro_state )
+ADDRESS_MAP_START(metro_state::pangpoms_map)
 	AM_RANGE(0x000000, 0x03ffff) AM_ROM                                             // ROM
 	AM_RANGE(0x400000, 0x47ffff) AM_DEVICE("vdp", imagetek_i4100_device, map)
 	AM_RANGE(0x4788a2, 0x4788a3) AM_READWRITE(metro_irq_cause_r,metro_irq_cause_w)  // IRQ Cause / IRQ Acknowledge
@@ -962,7 +963,7 @@ ADDRESS_MAP_END
                                 Poitto!
 ***************************************************************************/
 
-static ADDRESS_MAP_START( poitto_map, AS_PROGRAM, 16, metro_state )
+ADDRESS_MAP_START(metro_state::poitto_map)
 	AM_RANGE(0x000000, 0x03ffff) AM_ROM                                             // ROM
 	AM_RANGE(0x400000, 0x40ffff) AM_RAM AM_MIRROR(0x0f0000)                         // RAM (mirrored)
 	AM_RANGE(0x800000, 0x800001) AM_READ_PORT("IN0") AM_WRITE(metro_soundstatus_w)  // To Sound CPU
@@ -981,7 +982,7 @@ ADDRESS_MAP_END
                                 Sky Alert
 ***************************************************************************/
 
-static ADDRESS_MAP_START( skyalert_map, AS_PROGRAM, 16, metro_state )
+ADDRESS_MAP_START(metro_state::skyalert_map)
 	AM_RANGE(0x000000, 0x03ffff) AM_ROM                                             // ROM
 	AM_RANGE(0x400000, 0x400001) AM_READWRITE(metro_soundstatus_r,metro_soundstatus_w)  // From / To Sound CPU
 	AM_RANGE(0x400002, 0x400003) AM_READNOP AM_WRITE(metro_coin_lockout_1word_w)    // Coin Lockout
@@ -1003,7 +1004,7 @@ ADDRESS_MAP_END
                                 Pururun
 ***************************************************************************/
 
-static ADDRESS_MAP_START( pururun_map, AS_PROGRAM, 16, metro_state )
+ADDRESS_MAP_START(metro_state::pururun_map)
 	AM_RANGE(0x000000, 0x07ffff) AM_ROM                                             // ROM
 	AM_RANGE(0x400000, 0x400001) AM_READ_PORT("IN0") AM_WRITE(metro_soundstatus_w)  // To Sound CPU
 	AM_RANGE(0x400002, 0x400003) AM_READ_PORT("IN1")                                //
@@ -1022,7 +1023,7 @@ ADDRESS_MAP_END
                             Toride II Adauchi Gaiden
 ***************************************************************************/
 
-static ADDRESS_MAP_START( toride2g_map, AS_PROGRAM, 16, metro_state )
+ADDRESS_MAP_START(metro_state::toride2g_map)
 	AM_RANGE(0x000000, 0x07ffff) AM_ROM                                             // ROM
 	AM_RANGE(0x400000, 0x40ffff) AM_RAM AM_MIRROR(0x0f0000)                         // RAM (mirrored)
 	AM_RANGE(0x800000, 0x800001) AM_READ_PORT("IN0") AM_WRITE(metro_soundstatus_w)  // Watchdog (R)? / To Sound CPU (W)
@@ -1056,20 +1057,20 @@ WRITE8_MEMBER(metro_state::blzntrnd_sh_bankswitch_w)
 	membank("bank1")->set_base(&RAM[bankaddress]);
 }
 
-static ADDRESS_MAP_START( blzntrnd_sound_map, AS_PROGRAM, 8, metro_state )
+ADDRESS_MAP_START(metro_state::blzntrnd_sound_map)
 	AM_RANGE(0x0000, 0x7fff) AM_ROM
 	AM_RANGE(0x8000, 0xbfff) AM_ROMBANK("bank1")
 	AM_RANGE(0xe000, 0xffff) AM_RAM
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( blzntrnd_sound_io_map, AS_IO, 8, metro_state )
+ADDRESS_MAP_START(metro_state::blzntrnd_sound_io_map)
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	AM_RANGE(0x00, 0x00) AM_WRITE(blzntrnd_sh_bankswitch_w)
 	AM_RANGE(0x40, 0x40) AM_DEVREAD("soundlatch", generic_latch_8_device, read) AM_WRITENOP
 	AM_RANGE(0x80, 0x83) AM_DEVREADWRITE("ymsnd", ym2610_device, read, write)
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( blzntrnd_map, AS_PROGRAM, 16, metro_state )
+ADDRESS_MAP_START(metro_state::blzntrnd_map)
 	AM_RANGE(0x000000, 0x1fffff) AM_ROM                                             // ROM
 	AM_RANGE(0x200000, 0x27ffff) AM_DEVICE("vdp2", imagetek_i4220_device, v2_map)
 	AM_RANGE(0x2788a2, 0x2788a3) AM_READWRITE(metro_irq_cause_r,metro_irq_cause_w)  // IRQ Cause / IRQ Acknowledge
@@ -1097,7 +1098,7 @@ WRITE8_MEMBER(metro_state::mouja_sound_rombank_w)
 	membank("okibank")->set_entry((data >> 3) & 0x07);
 }
 
-static ADDRESS_MAP_START( mouja_map, AS_PROGRAM, 16, metro_state )
+ADDRESS_MAP_START(metro_state::mouja_map)
 	AM_RANGE(0x000000, 0x07ffff) AM_ROM                                             // ROM
 	AM_RANGE(0x400000, 0x47ffff) AM_DEVICE("vdp3", imagetek_i4300_device, v3_map)
 	AM_RANGE(0x478810, 0x47881f) AM_WRITEONLY AM_SHARE("irq_levels")                // IRQ Levels
@@ -1116,7 +1117,7 @@ static ADDRESS_MAP_START( mouja_map, AS_PROGRAM, 16, metro_state )
 	AM_RANGE(0xf00000, 0xf0ffff) AM_RAM AM_MIRROR(0x0f0000)                         // RAM (mirrored)
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( mouja_okimap, 0, 8, metro_state )
+ADDRESS_MAP_START(metro_state::mouja_okimap)
 	AM_RANGE(0x00000, 0x1ffff) AM_ROM
 	AM_RANGE(0x20000, 0x3ffff) AM_ROMBANK("okibank")
 ADDRESS_MAP_END
@@ -1213,7 +1214,7 @@ WRITE16_MEMBER(metro_state::puzzlet_irq_enable_w)
 
 
 // H8/3007 CPU
-static ADDRESS_MAP_START( puzzlet_map, AS_PROGRAM, 16, metro_state )
+ADDRESS_MAP_START(metro_state::puzzlet_map)
 	AM_RANGE(0x000000, 0x1fffff) AM_ROM
 	AM_RANGE(0x430000, 0x433fff) AM_RAM
 	AM_RANGE(0x470000, 0x47dfff) AM_RAM
@@ -1222,9 +1223,9 @@ static ADDRESS_MAP_START( puzzlet_map, AS_PROGRAM, 16, metro_state )
 	AM_RANGE(0x580000, 0x580003) AM_DEVWRITE8("ymsnd", ym2413_device, write, 0xff00)
 
 	// TODO: !!! i4300 !!!
+	AM_RANGE(0x700000, 0x77ffff) AM_DEVICE("vdp2", imagetek_i4220_device, v2_map)
 	AM_RANGE(0x7788a2, 0x7788a3) AM_WRITE(metro_irq_cause_w)                            // IRQ Cause
 	AM_RANGE(0x7788a4, 0x7788a5) AM_WRITE(puzzlet_irq_enable_w) AM_SHARE("irq_enable")  // IRQ Enable
-	AM_RANGE(0x700000, 0x77ffff) AM_DEVICE("vdp2", imagetek_i4220_device, v2_map)
 
 	AM_RANGE(0x7f2000, 0x7f3fff) AM_RAM
 
@@ -1241,7 +1242,7 @@ WRITE16_MEMBER(metro_state::puzzlet_portb_w)
 //  popmessage("PORTB %02x", data);
 }
 
-static ADDRESS_MAP_START( puzzlet_io_map, AS_IO, 16, metro_state )
+ADDRESS_MAP_START(metro_state::puzzlet_io_map)
 	AM_RANGE(h8_device::PORT_7,   h8_device::PORT_7) AM_READ_PORT("IN2")
 	AM_RANGE(h8_device::PORT_B,   h8_device::PORT_B) AM_READ_PORT("DSW0") AM_WRITE(puzzlet_portb_w)
 ADDRESS_MAP_END
@@ -1284,7 +1285,7 @@ WRITE_LINE_MEMBER(metro_state::vmetal_es8712_irq)
 		m_maincpu->set_input_line(3, state);
 }
 
-static ADDRESS_MAP_START( vmetal_map, AS_PROGRAM, 16, metro_state )
+ADDRESS_MAP_START(metro_state::vmetal_map)
 	AM_RANGE(0x000000, 0x0fffff) AM_ROM                                             // ROM
 	AM_RANGE(0x100000, 0x17ffff) AM_DEVICE("vdp2", imagetek_i4220_device, v2_map)
 	AM_RANGE(0x1788a2, 0x1788a3) AM_READWRITE(metro_irq_cause_r, metro_irq_cause_w) // IRQ Cause / IRQ Acknowledge
@@ -1892,8 +1893,8 @@ static INPUT_PORTS_START( daitorid )
 	COINS_SOUND
 
 	PORT_START("IN1") // $c00002
-	JOY_LSB(1, BUTTON1, UNKNOWN, UNKNOWN, UNKNOWN)      // BUTTON2 and BUTTON3 in "test mode" only
-	JOY_MSB(2, BUTTON1, UNKNOWN, UNKNOWN, UNKNOWN)      // BUTTON2 and BUTTON3 in "test mode" only
+	JOY_LSB(1, BUTTON1, BUTTON2, UNKNOWN, UNKNOWN)      // BUTTON3 in "test mode" only
+	JOY_MSB(2, BUTTON1, BUTTON2, UNKNOWN, UNKNOWN)      // BUTTON3 in "test mode" only
 
 	PORT_START("DSW0") // $c00004
 	COINAGE_SERVICE_LOC(SW1)
@@ -2657,7 +2658,7 @@ INPUT_PORTS_END
                                 Sankokushi
 ***************************************************************************/
 
-static INPUT_PORTS_START( 3kokushi )
+static INPUT_PORTS_START( sankokushi )
 	PORT_START("IN0") //$c00000
 	COINS_SOUND
 
@@ -3037,8 +3038,8 @@ void metro_state::machine_start()
 	save_item(NAME(m_gakusai_oki_bank_hi));
 }
 
-static MACHINE_CONFIG_START( i4100_config )
-	MCFG_DEVICE_ADD("vdp", I4100, XTAL_26_666MHz)
+MACHINE_CONFIG_START(metro_state::i4100_config)
+	MCFG_DEVICE_ADD("vdp", I4100, XTAL(26'666'000))
 	MCFG_I4100_GFXDECODE("gfxdecode")
 	MCFG_I4100_BLITTER_END_CALLBACK(WRITELINE(metro_state,vdp_blit_end_w))
 
@@ -3053,8 +3054,8 @@ static MACHINE_CONFIG_START( i4100_config )
 	MCFG_GFXDECODE_ADD("gfxdecode", ":vdp:palette", i4100)
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_START( i4220_config )
-	MCFG_DEVICE_ADD("vdp2", I4220, XTAL_26_666MHz)
+MACHINE_CONFIG_START(metro_state::i4220_config)
+	MCFG_DEVICE_ADD("vdp2", I4220, XTAL(26'666'000))
 	MCFG_I4100_GFXDECODE("gfxdecode")
 	MCFG_I4100_BLITTER_END_CALLBACK(WRITELINE(metro_state,vdp_blit_end_w))
 
@@ -3069,8 +3070,8 @@ static MACHINE_CONFIG_START( i4220_config )
 	MCFG_GFXDECODE_ADD("gfxdecode", ":vdp2:palette", i4220)
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_START( i4300_config )
-	MCFG_DEVICE_ADD("vdp3", I4300, XTAL_26_666MHz)
+MACHINE_CONFIG_START(metro_state::i4300_config)
+	MCFG_DEVICE_ADD("vdp3", I4300, XTAL(26'666'000))
 	MCFG_I4100_GFXDECODE("gfxdecode")
 	MCFG_I4100_BLITTER_END_CALLBACK(WRITELINE(metro_state,vdp_blit_end_w))
 
@@ -3086,40 +3087,40 @@ static MACHINE_CONFIG_START( i4300_config )
 MACHINE_CONFIG_END
 
 // TODO: these comes from the CRTC inside the i4100
-static MACHINE_CONFIG_START( i4100_config_360x224 )
-	MCFG_FRAGMENT_ADD( i4100_config )
+MACHINE_CONFIG_START(metro_state::i4100_config_360x224)
+	i4100_config(config);
 
 	MCFG_DEVICE_MODIFY("screen")
 	MCFG_SCREEN_SIZE(360, 224)
 	MCFG_SCREEN_VISIBLE_AREA(0, 360-1, 0, 224-1)
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_START( i4220_config_320x240 )
-	MCFG_FRAGMENT_ADD( i4220_config )
+MACHINE_CONFIG_START(metro_state::i4220_config_320x240)
+	i4220_config(config);
 
 	MCFG_DEVICE_MODIFY("screen")
 	MCFG_SCREEN_SIZE(320, 240)
 	MCFG_SCREEN_VISIBLE_AREA(0, 320-1, 0, 240-1)
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_START( i4220_config_304x224 )
-	MCFG_FRAGMENT_ADD( i4220_config )
+MACHINE_CONFIG_START(metro_state::i4220_config_304x224)
+	i4220_config(config);
 
 	MCFG_DEVICE_MODIFY("screen")
 	MCFG_SCREEN_SIZE(320, 240)
 	MCFG_SCREEN_VISIBLE_AREA(0, 304-1, 0, 224-1)
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_START( i4300_config_384x224 )
-	MCFG_FRAGMENT_ADD( i4300_config )
+MACHINE_CONFIG_START(metro_state::i4300_config_384x224)
+	i4300_config(config);
 
 	MCFG_DEVICE_MODIFY("screen")
 	MCFG_SCREEN_SIZE(384, 240)
 	MCFG_SCREEN_VISIBLE_AREA(0, 384-1, 0, 224-1)
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_START( i4300_config_320x240 )
-	MCFG_FRAGMENT_ADD( i4300_config )
+MACHINE_CONFIG_START(metro_state::i4300_config_320x240)
+	i4300_config(config);
 
 	MCFG_DEVICE_MODIFY("screen")
 	MCFG_SCREEN_SIZE(384, 240)
@@ -3127,16 +3128,16 @@ static MACHINE_CONFIG_START( i4300_config_320x240 )
 MACHINE_CONFIG_END
 
 
-static MACHINE_CONFIG_START( msgogo )
+MACHINE_CONFIG_START(metro_state::msgogo)
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", M68000, XTAL_16MHz)
+	MCFG_CPU_ADD("maincpu", M68000, XTAL(16'000'000))
 	MCFG_CPU_PROGRAM_MAP(msgogo_map)
 	MCFG_CPU_VBLANK_INT_DRIVER("screen", metro_state,  metro_vblank_interrupt) // timing is off, shaking sprites in intro
 	MCFG_CPU_PERIODIC_INT_DRIVER(metro_state, metro_periodic_interrupt,  60) // ?
 
 	/* video hardware */
-	MCFG_FRAGMENT_ADD( i4220_config )
+	i4220_config(config);
 	MCFG_DEVICE_MODIFY("vdp2")
 	MCFG_I4100_TILEMAP_XOFFSETS(-2,-2,-2)
 
@@ -3149,21 +3150,24 @@ static MACHINE_CONFIG_START( msgogo )
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_DERIVED( balcube, msgogo )
+MACHINE_CONFIG_START(metro_state::balcube)
+	msgogo(config);
 	MCFG_CPU_MODIFY("maincpu")
 	MCFG_CPU_PROGRAM_MAP(balcube_map)
 	MCFG_CPU_VBLANK_INT_DRIVER("screen", metro_state,  metro_vblank_interrupt)
 	MCFG_CPU_PERIODIC_INT_DRIVER(metro_state, metro_periodic_interrupt,  8*60) // ?
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_DERIVED( daitoa, msgogo )
+MACHINE_CONFIG_START(metro_state::daitoa)
+	msgogo(config);
 	MCFG_CPU_MODIFY("maincpu")
 	MCFG_CPU_PROGRAM_MAP(daitoa_map)
 	MCFG_CPU_VBLANK_INT_DRIVER("screen", metro_state,  metro_vblank_interrupt)
 	MCFG_CPU_PERIODIC_INT_DRIVER(metro_state, metro_periodic_interrupt,  8*60) // ?
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_DERIVED( bangball, msgogo )
+MACHINE_CONFIG_START(metro_state::bangball)
+	msgogo(config);
 	MCFG_CPU_MODIFY("maincpu")
 	MCFG_CPU_PROGRAM_MAP(bangball_map)
 	MCFG_CPU_VBLANK_INT_REMOVE()
@@ -3175,7 +3179,8 @@ static MACHINE_CONFIG_DERIVED( bangball, msgogo )
 	MCFG_SCREEN_REFRESH_RATE(60)
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_DERIVED( batlbubl, msgogo )
+MACHINE_CONFIG_START(metro_state::batlbubl)
+	msgogo(config);
 	MCFG_CPU_MODIFY("maincpu")
 	MCFG_CPU_PROGRAM_MAP(batlbubl_map)
 	MCFG_CPU_VBLANK_INT_REMOVE()
@@ -3188,8 +3193,8 @@ static MACHINE_CONFIG_DERIVED( batlbubl, msgogo )
 MACHINE_CONFIG_END
 
 
-static MACHINE_CONFIG_START( metro_upd7810_sound )
-	MCFG_CPU_ADD("audiocpu", UPD7810, XTAL_24MHz/2)
+MACHINE_CONFIG_START(metro_state::metro_upd7810_sound)
+	MCFG_CPU_ADD("audiocpu", UPD7810, XTAL(24'000'000)/2)
 	MCFG_UPD7810_RXD(READLINE(metro_state, metro_rxd_r))
 	MCFG_CPU_PROGRAM_MAP(metro_sound_map)
 	MCFG_UPD7810_PORTA_READ_CB(READ8(metro_state, metro_porta_r))
@@ -3198,8 +3203,8 @@ static MACHINE_CONFIG_START( metro_upd7810_sound )
 	MCFG_UPD7810_PORTC_WRITE_CB(WRITE8(metro_state, metro_sound_rombank_w))
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_START( daitorid_upd7810_sound )
-	MCFG_CPU_ADD("audiocpu", UPD7810, XTAL_12MHz)
+MACHINE_CONFIG_START(metro_state::daitorid_upd7810_sound)
+	MCFG_CPU_ADD("audiocpu", UPD7810, XTAL(12'000'000))
 	MCFG_UPD7810_RXD(READLINE(metro_state, metro_rxd_r))
 	MCFG_CPU_PROGRAM_MAP(metro_sound_map)
 	MCFG_UPD7810_PORTA_READ_CB(READ8(metro_state, metro_porta_r))
@@ -3209,18 +3214,18 @@ static MACHINE_CONFIG_START( daitorid_upd7810_sound )
 MACHINE_CONFIG_END
 
 
-static MACHINE_CONFIG_START( daitorid )
+MACHINE_CONFIG_START(metro_state::daitorid)
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", M68000, XTAL_32MHz/2)
+	MCFG_CPU_ADD("maincpu", M68000, XTAL(32'000'000)/2)
 	MCFG_CPU_PROGRAM_MAP(daitorid_map)
 	MCFG_CPU_VBLANK_INT_DRIVER("screen", metro_state,  metro_vblank_interrupt)
 	MCFG_CPU_PERIODIC_INT_DRIVER(metro_state, metro_periodic_interrupt,  8*60) // ?
 
-	MCFG_FRAGMENT_ADD(daitorid_upd7810_sound)
+	daitorid_upd7810_sound(config);
 
 	/* video hardware */
-	MCFG_FRAGMENT_ADD( i4220_config )
+	i4220_config(config);
 	MCFG_DEVICE_MODIFY("vdp2")
 	MCFG_I4100_TILEMAP_XOFFSETS(-2,-2,-2)
 
@@ -3229,7 +3234,7 @@ static MACHINE_CONFIG_START( daitorid )
 
 	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
 
-	MCFG_YM2151_ADD("ymsnd", XTAL_3_579545MHz)
+	MCFG_YM2151_ADD("ymsnd", XTAL(3'579'545))
 	MCFG_YM2151_IRQ_HANDLER(INPUTLINE("audiocpu", UPD7810_INTF2))
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.80)
 
@@ -3237,143 +3242,154 @@ static MACHINE_CONFIG_START( daitorid )
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.40)
 MACHINE_CONFIG_END
 
+MACHINE_CONFIG_START(metro_state::puzzli)
+	daitorid(config);
+	
+	MCFG_CPU_MODIFY("maincpu")
+	MCFG_CPU_VBLANK_INT_REMOVE()
+	MCFG_CPU_PERIODIC_INT_REMOVE()
+	MCFG_TIMER_DRIVER_ADD_SCANLINE("scantimer", metro_state, bangball_scanline, "screen", 0, 1)
 
-static MACHINE_CONFIG_START( dharma )
+	MCFG_DEVICE_MODIFY("screen")
+	MCFG_SCREEN_VIDEO_ATTRIBUTES(VIDEO_UPDATE_SCANLINE)
+MACHINE_CONFIG_END
+
+MACHINE_CONFIG_START(metro_state::dharma)
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", M68000, XTAL_24MHz/2)
+	MCFG_CPU_ADD("maincpu", M68000, XTAL(24'000'000)/2)
 	MCFG_CPU_PROGRAM_MAP(dharma_map)
 	MCFG_CPU_VBLANK_INT_DRIVER("screen", metro_state,  metro_vblank_interrupt)
 	MCFG_CPU_PERIODIC_INT_DRIVER(metro_state, metro_periodic_interrupt,  8*60) // ?
 
-	MCFG_FRAGMENT_ADD(metro_upd7810_sound)
+	metro_upd7810_sound(config);
 
 	/* video hardware */
-	MCFG_FRAGMENT_ADD(i4220_config)
+	i4220_config(config);
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
 
 	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
 
-	MCFG_OKIM6295_ADD("oki", XTAL_24MHz/20, PIN7_HIGH) // sample rate =  M6295 clock / 132
+	MCFG_OKIM6295_ADD("oki", XTAL(24'000'000)/20, PIN7_HIGH) // sample rate =  M6295 clock / 132
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.10)
 
-	MCFG_SOUND_ADD("ymsnd", YM2413, XTAL_3_579545MHz)
+	MCFG_SOUND_ADD("ymsnd", YM2413, XTAL(3'579'545))
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.90)
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_START( karatour )
+MACHINE_CONFIG_START(metro_state::karatour)
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", M68000, XTAL_24MHz/2)
+	MCFG_CPU_ADD("maincpu", M68000, XTAL(24'000'000)/2)
 	MCFG_CPU_PROGRAM_MAP(karatour_map)
 	MCFG_CPU_VBLANK_INT_DRIVER("screen", metro_state,  karatour_interrupt)
 	MCFG_CPU_PERIODIC_INT_DRIVER(metro_state, metro_periodic_interrupt,  8*60) // ?
 
-	MCFG_FRAGMENT_ADD(metro_upd7810_sound)
+	metro_upd7810_sound(config);
 
 	/* video hardware */
-	MCFG_FRAGMENT_ADD(i4100_config)
+	i4100_config(config);
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
 
 	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
 
-	MCFG_OKIM6295_ADD("oki", XTAL_24MHz/20, PIN7_HIGH) // was /128.. so pin 7 not verified
+	MCFG_OKIM6295_ADD("oki", XTAL(24'000'000)/20, PIN7_HIGH) // was /128.. so pin 7 not verified
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.10)
 
-	MCFG_SOUND_ADD("ymsnd", YM2413, XTAL_3_579545MHz)
+	MCFG_SOUND_ADD("ymsnd", YM2413, XTAL(3'579'545))
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.90)
 MACHINE_CONFIG_END
 
 
-static MACHINE_CONFIG_START( 3kokushi )
+MACHINE_CONFIG_START(metro_state::sankokushi)
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", M68000, XTAL_24MHz/2)
+	MCFG_CPU_ADD("maincpu", M68000, XTAL(24'000'000)/2)
 	MCFG_CPU_PROGRAM_MAP(kokushi_map)
 	MCFG_CPU_VBLANK_INT_DRIVER("screen", metro_state,  karatour_interrupt)
 	MCFG_CPU_PERIODIC_INT_DRIVER(metro_state, metro_periodic_interrupt,  8*60) // ?
 
-	MCFG_FRAGMENT_ADD(metro_upd7810_sound)
+	metro_upd7810_sound(config);
 
 	/* video hardware */
-	MCFG_FRAGMENT_ADD( i4220_config_320x240 )
+	i4220_config_320x240(config);
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
 
 	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
 
-	MCFG_OKIM6295_ADD("oki", XTAL_24MHz/20, PIN7_HIGH) // was /128.. so pin 7 not verified
+	MCFG_OKIM6295_ADD("oki", XTAL(24'000'000)/20, PIN7_HIGH) // was /128.. so pin 7 not verified
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.10)
 
-	MCFG_SOUND_ADD("ymsnd", YM2413, XTAL_3_579545MHz)
+	MCFG_SOUND_ADD("ymsnd", YM2413, XTAL(3'579'545))
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.90)
 MACHINE_CONFIG_END
 
 
-static MACHINE_CONFIG_START( lastfort )
+MACHINE_CONFIG_START(metro_state::lastfort)
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", M68000, XTAL_24MHz/2)
+	MCFG_CPU_ADD("maincpu", M68000, XTAL(24'000'000)/2)
 	MCFG_CPU_PROGRAM_MAP(lastfort_map)
 	MCFG_CPU_VBLANK_INT_DRIVER("screen", metro_state,  metro_vblank_interrupt)
 	MCFG_CPU_PERIODIC_INT_DRIVER(metro_state, metro_periodic_interrupt,  8*60) // ?
 
-	MCFG_FRAGMENT_ADD(metro_upd7810_sound)
+	metro_upd7810_sound(config);
 
 	/* video hardware */
-	MCFG_FRAGMENT_ADD( i4100_config_360x224 )
+	i4100_config_360x224(config);
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
 
 	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
 
-	MCFG_OKIM6295_ADD("oki", XTAL_24MHz/20, PIN7_LOW) // sample rate =  M6295 clock / 165
+	MCFG_OKIM6295_ADD("oki", XTAL(24'000'000)/20, PIN7_LOW) // sample rate =  M6295 clock / 165
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.10)
 
-	MCFG_SOUND_ADD("ymsnd", YM2413, XTAL_3_579545MHz)
+	MCFG_SOUND_ADD("ymsnd", YM2413, XTAL(3'579'545))
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.90)
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_START( lastforg )
+MACHINE_CONFIG_START(metro_state::lastforg)
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", M68000, XTAL_24MHz/2)
+	MCFG_CPU_ADD("maincpu", M68000, XTAL(24'000'000)/2)
 	MCFG_CPU_PROGRAM_MAP(lastforg_map)
 	MCFG_CPU_VBLANK_INT_DRIVER("screen", metro_state,  karatour_interrupt)
 	MCFG_CPU_PERIODIC_INT_DRIVER(metro_state, metro_periodic_interrupt,  8*60) // ?
 
-	MCFG_FRAGMENT_ADD(metro_upd7810_sound)
+	metro_upd7810_sound(config);
 
-	MCFG_FRAGMENT_ADD( i4100_config_360x224 )
+	i4100_config_360x224(config);
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
 
 	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
 
-	MCFG_OKIM6295_ADD("oki", XTAL_24MHz/20, PIN7_HIGH) // was /128.. so pin 7 not verified
+	MCFG_OKIM6295_ADD("oki", XTAL(24'000'000)/20, PIN7_HIGH) // was /128.. so pin 7 not verified
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.10)
 
-	MCFG_SOUND_ADD("ymsnd", YM2413, XTAL_3_579545MHz)
+	MCFG_SOUND_ADD("ymsnd", YM2413, XTAL(3'579'545))
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.90)
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_START( dokyusei )
+MACHINE_CONFIG_START(metro_state::dokyusei)
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", M68000, XTAL_16MHz)
+	MCFG_CPU_ADD("maincpu", M68000, XTAL(16'000'000))
 	MCFG_CPU_PROGRAM_MAP(dokyusei_map)
 	MCFG_CPU_VBLANK_INT_DRIVER("screen", metro_state,  metro_vblank_interrupt)
 	MCFG_CPU_IRQ_ACKNOWLEDGE_DRIVER(metro_state,metro_irq_callback)
 
 	/* video hardware */
-	MCFG_FRAGMENT_ADD( i4300_config )
+	i4300_config(config);
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
@@ -3381,14 +3397,14 @@ static MACHINE_CONFIG_START( dokyusei )
 	MCFG_OKIM6295_ADD("oki", 1056000, PIN7_HIGH) // clock frequency & pin 7 not verified
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
 
-	MCFG_SOUND_ADD("ymsnd", YM2413, XTAL_3_579545MHz)
+	MCFG_SOUND_ADD("ymsnd", YM2413, XTAL(3'579'545))
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.90)
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_START( dokyusp )
+MACHINE_CONFIG_START(metro_state::dokyusp)
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", M68000, XTAL_32MHz/2)
+	MCFG_CPU_ADD("maincpu", M68000, XTAL(32'000'000)/2)
 	MCFG_CPU_PROGRAM_MAP(dokyusp_map)
 	MCFG_CPU_VBLANK_INT_DRIVER("screen", metro_state,  metro_vblank_interrupt)
 	MCFG_CPU_IRQ_ACKNOWLEDGE_DRIVER(metro_state,metro_irq_callback)
@@ -3398,7 +3414,7 @@ static MACHINE_CONFIG_START( dokyusp )
 	MCFG_WATCHDOG_ADD("watchdog")
 
 	/* video hardware */
-	MCFG_FRAGMENT_ADD( i4300_config_384x224 )
+	i4300_config_384x224(config);
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
@@ -3406,12 +3422,12 @@ static MACHINE_CONFIG_START( dokyusp )
 	MCFG_OKIM6295_ADD("oki", 2112000, PIN7_HIGH) // clock frequency & pin 7 not verified
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
 
-	MCFG_SOUND_ADD("ymsnd", YM2413, XTAL_3_579545MHz)
+	MCFG_SOUND_ADD("ymsnd", YM2413, XTAL(3'579'545))
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.90)
 MACHINE_CONFIG_END
 
 
-static MACHINE_CONFIG_START( gakusai )
+MACHINE_CONFIG_START(metro_state::gakusai)
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", M68000, 16000000) /* 26.6660MHz/2?, OSCs listed are 26.6660MHz & 3.579545MHz */
@@ -3424,7 +3440,7 @@ static MACHINE_CONFIG_START( gakusai )
 	MCFG_WATCHDOG_ADD("watchdog")
 
 	/* video hardware */
-	MCFG_FRAGMENT_ADD( i4300_config_320x240 )
+	i4300_config_320x240(config);
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
@@ -3432,12 +3448,12 @@ static MACHINE_CONFIG_START( gakusai )
 	MCFG_OKIM6295_ADD("oki", 2112000, PIN7_HIGH) // clock frequency & pin 7 not verified
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
 
-	MCFG_SOUND_ADD("ymsnd", YM2413, XTAL_3_579545MHz)
+	MCFG_SOUND_ADD("ymsnd", YM2413, XTAL(3'579'545))
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 2.00)
 MACHINE_CONFIG_END
 
 
-static MACHINE_CONFIG_START( gakusai2 )
+MACHINE_CONFIG_START(metro_state::gakusai2)
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", M68000, 16000000) /* 26.6660MHz/2?, OSCs listed are 26.6660MHz & 3.579545MHz */
@@ -3450,7 +3466,7 @@ static MACHINE_CONFIG_START( gakusai2 )
 	MCFG_WATCHDOG_ADD("watchdog")
 
 	/* video hardware */
-	MCFG_FRAGMENT_ADD( i4300_config_320x240 )
+	i4300_config_320x240(config);
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
@@ -3458,101 +3474,101 @@ static MACHINE_CONFIG_START( gakusai2 )
 	MCFG_OKIM6295_ADD("oki", 2112000, PIN7_HIGH) // clock frequency & pin 7 not verified
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
 
-	MCFG_SOUND_ADD("ymsnd", YM2413, XTAL_3_579545MHz)
+	MCFG_SOUND_ADD("ymsnd", YM2413, XTAL(3'579'545))
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 2.00)
 MACHINE_CONFIG_END
 
 
-static MACHINE_CONFIG_START( pangpoms )
+MACHINE_CONFIG_START(metro_state::pangpoms)
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", M68000, XTAL_24MHz/2)
+	MCFG_CPU_ADD("maincpu", M68000, XTAL(24'000'000)/2)
 	MCFG_CPU_PROGRAM_MAP(pangpoms_map)
 	MCFG_CPU_VBLANK_INT_DRIVER("screen", metro_state,  metro_vblank_interrupt)
 	MCFG_CPU_PERIODIC_INT_DRIVER(metro_state, metro_periodic_interrupt,  8*60) // ?
 
-	MCFG_FRAGMENT_ADD(metro_upd7810_sound)
+	metro_upd7810_sound(config);
 
 	/* video hardware */
-	MCFG_FRAGMENT_ADD( i4100_config_360x224 )
+	i4100_config_360x224(config);
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
 
 	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
 
-	MCFG_OKIM6295_ADD("oki", XTAL_24MHz/20, PIN7_HIGH) // was /128.. so pin 7 not verified
+	MCFG_OKIM6295_ADD("oki", XTAL(24'000'000)/20, PIN7_HIGH) // was /128.. so pin 7 not verified
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.10)
 
-	MCFG_SOUND_ADD("ymsnd", YM2413, XTAL_3_579545MHz)
+	MCFG_SOUND_ADD("ymsnd", YM2413, XTAL(3'579'545))
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.90)
 MACHINE_CONFIG_END
 
 
-static MACHINE_CONFIG_START( poitto )
+MACHINE_CONFIG_START(metro_state::poitto)
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", M68000, XTAL_24MHz/2)
+	MCFG_CPU_ADD("maincpu", M68000, XTAL(24'000'000)/2)
 	MCFG_CPU_PROGRAM_MAP(poitto_map)
 	MCFG_CPU_VBLANK_INT_DRIVER("screen", metro_state,  metro_vblank_interrupt)
 	MCFG_CPU_PERIODIC_INT_DRIVER(metro_state, metro_periodic_interrupt,  8*60) // ?
 
-	MCFG_FRAGMENT_ADD(metro_upd7810_sound)
+	metro_upd7810_sound(config);
 
 	/* video hardware */
-	MCFG_FRAGMENT_ADD( i4100_config_360x224 )
+	i4100_config_360x224(config);
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
 
 	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
 
-	MCFG_OKIM6295_ADD("oki", XTAL_24MHz/20, PIN7_HIGH) // was /128.. so pin 7 not verified
+	MCFG_OKIM6295_ADD("oki", XTAL(24'000'000)/20, PIN7_HIGH) // was /128.. so pin 7 not verified
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.10)
 
-	MCFG_SOUND_ADD("ymsnd", YM2413, XTAL_3_579545MHz)
+	MCFG_SOUND_ADD("ymsnd", YM2413, XTAL(3'579'545))
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.90)
 MACHINE_CONFIG_END
 
 
-static MACHINE_CONFIG_START( pururun )
+MACHINE_CONFIG_START(metro_state::pururun)
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", M68000, XTAL_24MHz/2)       /* Not confirmed */
+	MCFG_CPU_ADD("maincpu", M68000, XTAL(24'000'000)/2)       /* Not confirmed */
 	MCFG_CPU_PROGRAM_MAP(pururun_map)
 	MCFG_CPU_VBLANK_INT_DRIVER("screen", metro_state,  metro_vblank_interrupt)
 	MCFG_CPU_PERIODIC_INT_DRIVER(metro_state, metro_periodic_interrupt,  8*60) // ?
 
-	MCFG_FRAGMENT_ADD(daitorid_upd7810_sound)
+	daitorid_upd7810_sound(config);
 
 	/* video hardware */
-	MCFG_FRAGMENT_ADD( i4220_config )
+	i4220_config(config);
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
 
 	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
 
-	MCFG_YM2151_ADD("ymsnd", XTAL_3_579545MHz)  /* Confirmed match to reference video */
+	MCFG_YM2151_ADD("ymsnd", XTAL(3'579'545))  /* Confirmed match to reference video */
 	MCFG_YM2151_IRQ_HANDLER(INPUTLINE("audiocpu", UPD7810_INTF2))
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.80)
 
-	MCFG_OKIM6295_ADD("oki", XTAL_3_579545MHz/3, PIN7_HIGH) // sample rate =  M6295 clock / 132
+	MCFG_OKIM6295_ADD("oki", XTAL(3'579'545)/3, PIN7_HIGH) // sample rate =  M6295 clock / 132
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.40)
 MACHINE_CONFIG_END
 
 
-static MACHINE_CONFIG_START( skyalert )
+MACHINE_CONFIG_START(metro_state::skyalert)
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", M68000, XTAL_24MHz/2)
+	MCFG_CPU_ADD("maincpu", M68000, XTAL(24'000'000)/2)
 	MCFG_CPU_PROGRAM_MAP(skyalert_map)
 	MCFG_CPU_VBLANK_INT_DRIVER("screen", metro_state,  metro_vblank_interrupt)
 	MCFG_CPU_PERIODIC_INT_DRIVER(metro_state, metro_periodic_interrupt,  8*60) // ?
 
-	MCFG_FRAGMENT_ADD(metro_upd7810_sound)
+	metro_upd7810_sound(config);
 
-	MCFG_FRAGMENT_ADD(i4100_config_360x224)
+	i4100_config_360x224(config);
 
 
 	/* sound hardware */
@@ -3560,44 +3576,44 @@ static MACHINE_CONFIG_START( skyalert )
 
 	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
 
-	MCFG_OKIM6295_ADD("oki", XTAL_24MHz/20, PIN7_LOW) // sample rate =  M6295 clock / 165
+	MCFG_OKIM6295_ADD("oki", XTAL(24'000'000)/20, PIN7_LOW) // sample rate =  M6295 clock / 165
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.10)
 
-	MCFG_SOUND_ADD("ymsnd", YM2413, XTAL_3_579545MHz)
+	MCFG_SOUND_ADD("ymsnd", YM2413, XTAL(3'579'545))
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.90)
 MACHINE_CONFIG_END
 
 
-static MACHINE_CONFIG_START( toride2g )
+MACHINE_CONFIG_START(metro_state::toride2g)
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", M68000, XTAL_24MHz/2)
+	MCFG_CPU_ADD("maincpu", M68000, XTAL(24'000'000)/2)
 	MCFG_CPU_PROGRAM_MAP(toride2g_map)
 	MCFG_CPU_VBLANK_INT_DRIVER("screen", metro_state,  metro_vblank_interrupt)
 	MCFG_CPU_PERIODIC_INT_DRIVER(metro_state, metro_periodic_interrupt,  8*60) // ?
 
-	MCFG_FRAGMENT_ADD(metro_upd7810_sound)
+	metro_upd7810_sound(config);
 
 	/* video hardware */
-	MCFG_FRAGMENT_ADD( i4220_config )
+	i4220_config(config);
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
 
 	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
 
-	MCFG_OKIM6295_ADD("oki", XTAL_24MHz/20, PIN7_HIGH) // clock frequency & pin 7 not verified
+	MCFG_OKIM6295_ADD("oki", XTAL(24'000'000)/20, PIN7_HIGH) // clock frequency & pin 7 not verified
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.10)
 
-	MCFG_SOUND_ADD("ymsnd", YM2413, XTAL_3_579545MHz)
+	MCFG_SOUND_ADD("ymsnd", YM2413, XTAL(3'579'545))
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.90)
 MACHINE_CONFIG_END
 
 
-static MACHINE_CONFIG_START( mouja )
+MACHINE_CONFIG_START(metro_state::mouja)
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", M68000, XTAL_16MHz)
+	MCFG_CPU_ADD("maincpu", M68000, XTAL(16'000'000))
 	MCFG_CPU_PROGRAM_MAP(mouja_map)
 	MCFG_CPU_VBLANK_INT_DRIVER("screen", metro_state,  metro_vblank_interrupt)
 	MCFG_CPU_IRQ_ACKNOWLEDGE_DRIVER(metro_state,metro_irq_callback)
@@ -3605,29 +3621,29 @@ static MACHINE_CONFIG_START( mouja )
 	MCFG_WATCHDOG_ADD("watchdog")
 
 	/* video hardware */
-	MCFG_FRAGMENT_ADD( i4300_config )
+	i4300_config(config);
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
-	MCFG_OKIM6295_ADD("oki", XTAL_16MHz/1024*132, PIN7_HIGH) // clock frequency & pin 7 not verified
+	MCFG_OKIM6295_ADD("oki", XTAL(16'000'000)/1024*132, PIN7_HIGH) // clock frequency & pin 7 not verified
 	MCFG_DEVICE_ADDRESS_MAP(0, mouja_okimap)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
 
-	MCFG_SOUND_ADD("ymsnd", YM2413, XTAL_3_579545MHz)
+	MCFG_SOUND_ADD("ymsnd", YM2413, XTAL(3'579'545))
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.00)
 MACHINE_CONFIG_END
 
 
-static MACHINE_CONFIG_START( vmetal )
+MACHINE_CONFIG_START(metro_state::vmetal)
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", M68000, XTAL_16MHz)
+	MCFG_CPU_ADD("maincpu", M68000, XTAL(16'000'000))
 	MCFG_CPU_PROGRAM_MAP(vmetal_map)
 	MCFG_CPU_VBLANK_INT_DRIVER("screen", metro_state,  metro_vblank_interrupt)
 	MCFG_CPU_PERIODIC_INT_DRIVER(metro_state, metro_periodic_interrupt,  8*60) // ?
 
 	/* video hardware */
-	MCFG_FRAGMENT_ADD( i4220_config_304x224 )
+	i4220_config_304x224(config);
 
 	MCFG_DEVICE_MODIFY("vdp2")
 	MCFG_I4100_TILEMAP_XOFFSETS(-16,-16,-16)
@@ -3636,7 +3652,7 @@ static MACHINE_CONFIG_START( vmetal )
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
 
-	MCFG_OKIM6295_ADD("oki", XTAL_1MHz, PIN7_HIGH)
+	MCFG_OKIM6295_ADD("oki", XTAL(1'000'000), PIN7_HIGH)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
 
 	MCFG_ES8712_ADD("essnd", 12000)
@@ -3647,20 +3663,20 @@ static MACHINE_CONFIG_START( vmetal )
 MACHINE_CONFIG_END
 
 
-static MACHINE_CONFIG_START( blzntrnd )
+MACHINE_CONFIG_START(metro_state::blzntrnd)
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", M68000, XTAL_16MHz)
+	MCFG_CPU_ADD("maincpu", M68000, XTAL(16'000'000))
 	MCFG_CPU_PROGRAM_MAP(blzntrnd_map)
 	MCFG_CPU_VBLANK_INT_DRIVER("screen", metro_state,  karatour_interrupt)
 	MCFG_CPU_PERIODIC_INT_DRIVER(metro_state, metro_periodic_interrupt,  8*60) // ?
 
-	MCFG_CPU_ADD("audiocpu", Z80, XTAL_16MHz/2)
+	MCFG_CPU_ADD("audiocpu", Z80, XTAL(16'000'000)/2)
 	MCFG_CPU_PROGRAM_MAP(blzntrnd_sound_map)
 	MCFG_CPU_IO_MAP(blzntrnd_sound_io_map)
 
 	/* video hardware */
-	MCFG_DEVICE_ADD("vdp2", I4220, XTAL_26_666MHz)
+	MCFG_DEVICE_ADD("vdp2", I4220, XTAL(26'666'000))
 	MCFG_I4100_GFXDECODE("gfxdecode")
 	MCFG_I4100_BLITTER_END_CALLBACK(WRITELINE(metro_state,vdp_blit_end_w))
 
@@ -3684,14 +3700,15 @@ static MACHINE_CONFIG_START( blzntrnd )
 
 	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
 
-	MCFG_SOUND_ADD("ymsnd", YM2610, XTAL_16MHz/2)
+	MCFG_SOUND_ADD("ymsnd", YM2610, XTAL(16'000'000)/2)
 	MCFG_YM2610_IRQ_HANDLER(INPUTLINE("audiocpu", 0))
 	MCFG_SOUND_ROUTE(0, "mono", 0.25)
 	MCFG_SOUND_ROUTE(1, "mono", 1.0)
 	MCFG_SOUND_ROUTE(2, "mono", 1.0)
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_DERIVED( gstrik2, blzntrnd )
+MACHINE_CONFIG_START(metro_state::gstrik2)
+	blzntrnd(config);
 	MCFG_GFXDECODE_MODIFY("gfxdecode", gstrik2)
 	MCFG_VIDEO_START_OVERRIDE(metro_state,gstrik2)
 
@@ -3703,10 +3720,10 @@ static MACHINE_CONFIG_DERIVED( gstrik2, blzntrnd )
 MACHINE_CONFIG_END
 
 
-static MACHINE_CONFIG_START( puzzlet )
+MACHINE_CONFIG_START(metro_state::puzzlet)
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", H83007, XTAL_20MHz) // H8/3007 - Hitachi HD6413007F20 CPU. Clock 20MHz
+	MCFG_CPU_ADD("maincpu", H83007, XTAL(20'000'000)) // H8/3007 - Hitachi HD6413007F20 CPU. Clock 20MHz
 	MCFG_CPU_PROGRAM_MAP(puzzlet_map)
 	MCFG_CPU_IO_MAP(puzzlet_io_map)
 	MCFG_CPU_VBLANK_INT_DRIVER("screen", metro_state,  puzzlet_interrupt)
@@ -3720,15 +3737,15 @@ static MACHINE_CONFIG_START( puzzlet )
 
 	/* video hardware */
 	// TODO: looks like game is running in i4220 compatibilty mode, $778000 seems to be an id for the chip?
-	MCFG_FRAGMENT_ADD( i4220_config )
+	i4220_config(config);
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
 
-	MCFG_OKIM6295_ADD("oki", XTAL_20MHz/5, PIN7_LOW)
+	MCFG_OKIM6295_ADD("oki", XTAL(20'000'000)/5, PIN7_LOW)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
 
-	MCFG_SOUND_ADD("ymsnd", YM2413, XTAL_20MHz/5)
+	MCFG_SOUND_ADD("ymsnd", YM2413, XTAL(20'000'000)/5)
 	MCFG_SOUND_ROUTE(0, "mono", 0.90)
 MACHINE_CONFIG_END
 
@@ -5535,7 +5552,7 @@ DRIVER_INIT_MEMBER(metro_state,balcube)
 
 	for (unsigned i = 0; i < len; i+=2)
 	{
-		ROM[i]  = BITSWAP8(ROM[i],0,1,2,3,4,5,6,7);
+		ROM[i]  = bitswap<8>(ROM[i],0,1,2,3,4,5,6,7);
 	}
 
 	metro_common();
@@ -5552,11 +5569,11 @@ DRIVER_INIT_MEMBER(metro_state,dharmak)
 	{
 		uint8_t dat;
 		dat = src[i + 1];
-		dat = BITSWAP8(dat, 7,3,2,4, 5,6,1,0);
+		dat = bitswap<8>(dat, 7,3,2,4, 5,6,1,0);
 		src[i + 1] = dat;
 
 		dat = src[i + 3];
-		dat = BITSWAP8(dat, 7,2,5,4, 3,6,1,0);
+		dat = bitswap<8>(dat, 7,2,5,4, 3,6,1,0);
 		src[i + 3] = dat;
 	}
 
@@ -5618,44 +5635,58 @@ DRIVER_INIT_MEMBER(metro_state,lastfortg)
 
 ***************************************************************************/
 
-GAME( 1992, karatour,  0,        karatour, karatour, metro_state, karatour, ROT0,   "Mitchell",                                        "The Karate Tournament",                  MACHINE_SUPPORTS_SAVE )
-GAME( 1992, karatourj, karatour, karatour, karatour, metro_state, karatour, ROT0,   "Mitchell",                                        "The Karate Tournament (Japan)",          MACHINE_SUPPORTS_SAVE )
-GAME( 1992, pangpoms,  0,        pangpoms, pangpoms, metro_state, metro,    ROT0,   "Metro",                                           "Pang Pom's",                             MACHINE_SUPPORTS_SAVE )
-GAME( 1992, pangpomsm, pangpoms, pangpoms, pangpoms, metro_state, metro,    ROT0,   "Metro (Mitchell license)",                        "Pang Pom's (Mitchell)",                  MACHINE_SUPPORTS_SAVE )
-GAME( 1992, skyalert,  0,        skyalert, skyalert, metro_state, metro,    ROT270, "Metro",                                           "Sky Alert",                              MACHINE_SUPPORTS_SAVE )
-GAME( 1993, ladykill,  0,        karatour, ladykill, metro_state, karatour, ROT90,  "Yanyaka (Mitchell license)",                      "Lady Killer",                            MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE )
-GAME( 1993, moegonta,  ladykill, karatour, moegonta, metro_state, karatour, ROT90,  "Yanyaka",                                         "Moeyo Gonta!! (Japan)",                  MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE )
-GAME( 1993, poitto,    0,        poitto,   poitto,   metro_state, metro,    ROT0,   "Metro / Able Corp.",                              "Poitto!",                                MACHINE_SUPPORTS_SAVE )
-GAME( 1994, blzntrnd,  0,        blzntrnd, blzntrnd, metro_state, blzntrnd, ROT0,   "Human Amusement",                                 "Blazing Tornado",                        MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE | MACHINE_NO_COCKTAIL )
-GAME( 1994, dharma,    0,        dharma,   dharma,   metro_state, dharmak,  ROT0,   "Metro",                                           "Dharma Doujou",                          MACHINE_SUPPORTS_SAVE )
-GAME( 1994, dharmaj,   dharma,   dharma,   dharma,   metro_state, metro,    ROT0,   "Metro",                                           "Dharma Doujou (Japan)",                  MACHINE_SUPPORTS_SAVE )
-GAME( 1994, dharmak,   dharma,   dharma,   dharma,   metro_state, dharmak,  ROT0,   "Metro",                                           "Dharma Doujou (Korea)",                  MACHINE_SUPPORTS_SAVE )
-GAME( 1994, lastfort,  0,        lastfort, lastfort, metro_state, metro,    ROT0,   "Metro",                                           "Last Fortress - Toride (Japan)",                 MACHINE_SUPPORTS_SAVE )
-GAME( 1994, lastforte, lastfort, lastfort, lastfero, metro_state, metro,    ROT0,   "Metro",                                           "Last Fortress - Toride (China, Rev C)", MACHINE_SUPPORTS_SAVE )
-GAME( 1994, lastfortea,lastfort, lastfort, lastfero, metro_state, metro,    ROT0,   "Metro",                                           "Last Fortress - Toride (China, Rev A)", MACHINE_SUPPORTS_SAVE )
-GAME( 1994, lastfortk, lastfort, lastfort, lastfero, metro_state, metro,    ROT0,   "Metro",                                           "Last Fortress - Toride (Korea)",         MACHINE_SUPPORTS_SAVE )
-GAME( 1994, lastfortg, lastfort, lastforg, ladykill, metro_state, lastfortg,ROT0,   "Metro",                                           "Last Fortress - Toride (Germany)",        MACHINE_SUPPORTS_SAVE )
-GAME( 1994, toride2g,  0,        toride2g, toride2g, metro_state, metro,    ROT0,   "Metro",                                           "Toride II Adauchi Gaiden",               MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE )
-GAME( 1994, toride2gg, toride2g, toride2g, toride2g, metro_state, metro,    ROT0,   "Metro",                                           "Toride II Adauchi Gaiden (German)",      MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE )
-GAME( 1994, toride2gk, toride2g, toride2g, toride2g, metro_state, metro,    ROT0,   "Metro",                                           "Toride II Bok Su Oi Jeon Adauchi Gaiden (Korea)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE )
-GAME( 1994, toride2j,  toride2g, toride2g, toride2g, metro_state, metro,    ROT0,   "Metro",                                           "Toride II (Japan)",                      MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE )
-GAME( 1994, gunmast,   0,        pururun,  gunmast,  metro_state, daitorid, ROT0,   "Metro",                                           "Gun Master",                             MACHINE_SUPPORTS_SAVE )
-GAME( 1995, daitorid,  0,        daitorid, daitorid, metro_state, daitorid, ROT0,   "Metro",                                           "Daitoride",                              MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE )
-GAME( 1996, daitorida, daitorid, daitoa,   daitorid, metro_state, balcube,  ROT0,   "Metro",                                           "Daitoride (YMF278B version)",            MACHINE_SUPPORTS_SAVE )
-GAME( 1995, dokyusei,  0,        dokyusei, dokyusei, metro_state, gakusai,  ROT0,   "Make Software / Elf / Media Trading",             "Mahjong Doukyuusei",                     MACHINE_SUPPORTS_SAVE )
-GAME( 1995, dokyusp,   0,        dokyusp,  gakusai,  metro_state, gakusai,  ROT0,   "Make Software / Elf / Media Trading",             "Mahjong Doukyuusei Special",             MACHINE_SUPPORTS_SAVE )
-GAME( 1995, msgogo,    0,        msgogo,   msgogo,   metro_state, balcube,  ROT0,   "Metro",                                           "Mouse Shooter GoGo",                     MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE )
-GAME( 1995, pururun,   0,        pururun,  pururun,  metro_state, daitorid, ROT0,   "Metro / Banpresto",                               "Pururun",                                MACHINE_SUPPORTS_SAVE )
-GAME( 1995, puzzli,    0,        daitorid, puzzli,   metro_state, daitorid, ROT0,   "Metro / Banpresto",                               "Puzzli",                                 MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE )
-GAME( 1996, 3kokushi,  0,        3kokushi, 3kokushi, metro_state, karatour, ROT0,   "Mitchell",                                        "Sankokushi (Japan)",                     MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE )
-GAME( 1996, balcube,   0,        balcube,  balcube,  metro_state, balcube,  ROT0,   "Metro",                                           "Bal Cube",                               MACHINE_SUPPORTS_SAVE )
-GAME( 1996, bangball,  0,        bangball, bangball, metro_state, balcube,  ROT0,   "Banpresto / Kunihiko Tashiro+Goodhouse",          "Bang Bang Ball (v1.05)",                 MACHINE_SUPPORTS_SAVE )
-GAME( 1996, gstrik2,   0,        gstrik2,  gstrik2,  metro_state, blzntrnd, ROT0,   "Human Amusement",                                 "Grand Striker 2 (Europe and Oceania)",   MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE | MACHINE_NO_COCKTAIL )
-GAME( 1996, gstrik2j,  gstrik2,  gstrik2,  gstrik2,  metro_state, blzntrnd, ROT0,   "Human Amusement",                                 "Grand Striker 2 (Japan)",                MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE | MACHINE_NO_COCKTAIL ) // priority between rounds
-GAME( 1999, batlbubl,  bangball, batlbubl, batlbubl, metro_state, balcube,  ROT0,   "Banpresto (Limenko license?)",                    "Battle Bubble (v2.00)",                  MACHINE_SUPPORTS_SAVE ) // or bootleg?
-GAME( 1996, mouja,     0,        mouja,    mouja,    metro_state, mouja,    ROT0,   "Etona",                                           "Mouja (Japan)",                          MACHINE_SUPPORTS_SAVE )
-GAME( 1997, gakusai,   0,        gakusai,  gakusai,  metro_state, gakusai,  ROT0,   "MakeSoft",                                        "Mahjong Gakuensai (Japan)",              MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE )
-GAME( 1998, gakusai2,  0,        gakusai2, gakusai,  metro_state, gakusai,  ROT0,   "MakeSoft",                                        "Mahjong Gakuensai 2 (Japan)",            MACHINE_SUPPORTS_SAVE )
-GAME( 2000, puzzlet,   0,        puzzlet,  puzzlet,  metro_state, puzzlet,  ROT0,   "Unies Corporation",                               "Puzzlet (Japan)",                        MACHINE_NOT_WORKING | MACHINE_NO_SOUND | MACHINE_SUPPORTS_SAVE )
-GAME( 1995, vmetal,    0,        vmetal,   vmetal,   metro_state, vmetal,   ROT90,  "Excellent System",                                "Varia Metal",                            MACHINE_SUPPORTS_SAVE )
-GAME( 1995, vmetaln,   vmetal,   vmetal,   vmetal,   metro_state, vmetal,   ROT90,  "Excellent System (New Ways Trading Co. license)", "Varia Metal (New Ways Trading Co.)",     MACHINE_SUPPORTS_SAVE )
+// VG420 / VG460
+GAME( 1992, karatour,  0,        karatour,  karatour,  metro_state, karatour, ROT0,   "Mitchell",                                        "The Karate Tournament", MACHINE_SUPPORTS_SAVE )
+GAME( 1992, karatourj, karatour, karatour,  karatour,  metro_state, karatour, ROT0,   "Mitchell",                                        "The Karate Tournament (Japan)", MACHINE_SUPPORTS_SAVE )
+GAME( 1992, pangpoms,  0,        pangpoms,  pangpoms,  metro_state, metro,    ROT0,   "Metro",                                           "Pang Pom's", MACHINE_SUPPORTS_SAVE )
+GAME( 1992, pangpomsm, pangpoms, pangpoms,  pangpoms,  metro_state, metro,    ROT0,   "Metro (Mitchell license)",                        "Pang Pom's (Mitchell)", MACHINE_SUPPORTS_SAVE )
+GAME( 1992, skyalert,  0,        skyalert,  skyalert,  metro_state, metro,    ROT270, "Metro",                                           "Sky Alert", MACHINE_SUPPORTS_SAVE )
+GAME( 1993, ladykill,  0,        karatour,  ladykill,   metro_state, karatour, ROT90,  "Yanyaka (Mitchell license)",                      "Lady Killer", MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE )
+GAME( 1993, moegonta,  ladykill, karatour,  moegonta,   metro_state, karatour, ROT90,  "Yanyaka",                                         "Moeyo Gonta!! (Japan)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE )
+GAME( 1994, lastfort,  0,        lastfort,  lastfort,   metro_state, metro,    ROT0,   "Metro",                                           "Last Fortress - Toride (Japan)", MACHINE_SUPPORTS_SAVE )
+GAME( 1994, lastforte, lastfort, lastfort,  lastfero,   metro_state, metro,    ROT0,   "Metro",                                           "Last Fortress - Toride (China, Rev C)", MACHINE_SUPPORTS_SAVE )
+GAME( 1994, lastfortea,lastfort, lastfort,  lastfero,   metro_state, metro,    ROT0,   "Metro",                                           "Last Fortress - Toride (China, Rev A)", MACHINE_SUPPORTS_SAVE )
+GAME( 1994, lastfortk, lastfort, lastfort,  lastfero,   metro_state, metro,    ROT0,   "Metro",                                           "Last Fortress - Toride (Korea)", MACHINE_SUPPORTS_SAVE )
+GAME( 1994, lastfortg, lastfort, lastforg,  ladykill,   metro_state, lastfortg,ROT0,   "Metro",                                           "Last Fortress - Toride (Germany)", MACHINE_SUPPORTS_SAVE )
+
+// MTR5260 / MTR527
+GAME( 1993, poitto,    0,        poitto,    poitto,     metro_state, metro,    ROT0,   "Metro / Able Corp.",                              "Poitto!", MACHINE_SUPPORTS_SAVE )
+GAME( 1994, dharma,    0,        dharma,    dharma,     metro_state, dharmak,  ROT0,   "Metro",                                           "Dharma Doujou", MACHINE_SUPPORTS_SAVE )
+GAME( 1994, dharmaj,   dharma,   dharma,    dharma,     metro_state, metro,    ROT0,   "Metro",                                           "Dharma Doujou (Japan)", MACHINE_SUPPORTS_SAVE )
+GAME( 1994, dharmak,   dharma,   dharma,    dharma,     metro_state, dharmak,  ROT0,   "Metro",                                           "Dharma Doujou (Korea)", MACHINE_SUPPORTS_SAVE )
+GAME( 1994, toride2g,  0,        toride2g,  toride2g,   metro_state, metro,    ROT0,   "Metro",                                           "Toride II Adauchi Gaiden", MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE )
+GAME( 1994, toride2gg, toride2g, toride2g,  toride2g,   metro_state, metro,    ROT0,   "Metro",                                           "Toride II Adauchi Gaiden (German)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE )
+GAME( 1994, toride2gk, toride2g, toride2g,  toride2g,   metro_state, metro,    ROT0,   "Metro",                                           "Toride II Bok Su Oi Jeon Adauchi Gaiden (Korea)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE )
+GAME( 1994, toride2j,  toride2g, toride2g,  toride2g,   metro_state, metro,    ROT0,   "Metro",                                           "Toride II (Japan)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE )
+GAME( 1994, gunmast,   0,        pururun,   gunmast,    metro_state, daitorid, ROT0,   "Metro",                                           "Gun Master", MACHINE_SUPPORTS_SAVE )
+GAME( 1995, daitorid,  0,        daitorid,  daitorid,   metro_state, daitorid, ROT0,   "Metro",                                           "Daitoride", MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE )
+GAME( 1995, pururun,   0,        pururun,   pururun,    metro_state, daitorid, ROT0,   "Metro / Banpresto",                               "Pururun", MACHINE_SUPPORTS_SAVE )
+GAME( 1995, puzzli,    0,        puzzli,    puzzli,     metro_state, daitorid, ROT0,   "Metro / Banpresto",                               "Puzzli",      MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE )
+GAME( 1996, 3kokushi,  0,        sankokushi,sankokushi, metro_state, karatour, ROT0,   "Mitchell",                                        "Sankokushi (Japan)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE )
+
+// ? with additional gfx data scramble (probably MTR5260 based)
+GAME( 1995, msgogo,    0,        msgogo,    msgogo,     metro_state, balcube,  ROT0,   "Metro",                                           "Mouse Shooter GoGo", MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE )
+GAME( 1996, daitorida, daitorid, daitoa,    daitorid,   metro_state, balcube,  ROT0,   "Metro",                                           "Daitoride (YMF278B version)", MACHINE_SUPPORTS_SAVE )
+GAME( 1996, balcube,   0,        balcube,   balcube,    metro_state, balcube,  ROT0,   "Metro",                                           "Bal Cube", MACHINE_SUPPORTS_SAVE )
+GAME( 1996, bangball,  0,        bangball,  bangball,   metro_state, balcube,  ROT0,   "Banpresto / Kunihiko Tashiro+Goodhouse",          "Bang Bang Ball (v1.05)", MACHINE_SUPPORTS_SAVE )
+GAME( 1999, batlbubl,  bangball, batlbubl,  batlbubl,   metro_state, balcube,  ROT0,   "Banpresto (Limenko license?)",                    "Battle Bubble (v2.00)", MACHINE_SUPPORTS_SAVE ) // or bootleg?
+
+// VG330 / VG340 / VG410
+GAME( 1995, dokyusei,  0,        dokyusei,  dokyusei,   metro_state, gakusai,  ROT0,   "Make Software / Elf / Media Trading",             "Mahjong Doukyuusei", MACHINE_SUPPORTS_SAVE )
+GAME( 1995, dokyusp,   0,        dokyusp,   gakusai,    metro_state, gakusai,  ROT0,   "Make Software / Elf / Media Trading",             "Mahjong Doukyuusei Special", MACHINE_SUPPORTS_SAVE )
+GAME( 1996, mouja,     0,        mouja,     mouja,      metro_state, mouja,    ROT0,   "Etona",                                           "Mouja (Japan)", MACHINE_SUPPORTS_SAVE )
+GAME( 1997, gakusai,   0,        gakusai,   gakusai,    metro_state, gakusai,  ROT0,   "MakeSoft",                                        "Mahjong Gakuensai (Japan)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE )
+GAME( 1998, gakusai2,  0,        gakusai2,  gakusai,    metro_state, gakusai,  ROT0,   "MakeSoft",                                        "Mahjong Gakuensai 2 (Japan)", MACHINE_SUPPORTS_SAVE )
+
+// HUM-002 / HUM-003
+GAME( 1994, blzntrnd,  0,        blzntrnd,  blzntrnd,   metro_state, blzntrnd, ROT0,   "Human Amusement",                                 "Blazing Tornado", MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE | MACHINE_NO_COCKTAIL )
+GAME( 1996, gstrik2,   0,        gstrik2,   gstrik2,    metro_state, blzntrnd, ROT0,   "Human Amusement",                                 "Grand Striker 2 (Europe and Oceania)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE | MACHINE_NO_COCKTAIL )
+GAME( 1996, gstrik2j,  gstrik2,  gstrik2,   gstrik2,    metro_state, blzntrnd, ROT0,   "Human Amusement",                                 "Grand Striker 2 (Japan)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE | MACHINE_NO_COCKTAIL ) // priority between rounds
+
+// ES-9309B-B 
+GAME( 1995, vmetal,    0,        vmetal,    vmetal,     metro_state, vmetal,   ROT90,  "Excellent System",                                "Varia Metal", MACHINE_SUPPORTS_SAVE )
+GAME( 1995, vmetaln,   vmetal,   vmetal,    vmetal,     metro_state, vmetal,   ROT90,  "Excellent System (New Ways Trading Co. license)", "Varia Metal (New Ways Trading Co.)", MACHINE_SUPPORTS_SAVE )
+
+// VG2200
+GAME( 2000, puzzlet,   0,        puzzlet,   puzzlet,    metro_state, puzzlet,  ROT0,   "Unies Corporation",                               "Puzzlet (Japan)", MACHINE_NOT_WORKING | MACHINE_NO_SOUND | MACHINE_SUPPORTS_SAVE )
+

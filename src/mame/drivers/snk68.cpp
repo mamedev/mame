@@ -104,7 +104,7 @@ WRITE8_MEMBER(snk68_state::sound_w)
 
 /*******************************************************************************/
 
-static ADDRESS_MAP_START( pow_map, AS_PROGRAM, 16, snk68_state )
+ADDRESS_MAP_START(snk68_state::pow_map)
 	AM_RANGE(0x000000, 0x03ffff) AM_ROM
 	AM_RANGE(0x040000, 0x043fff) AM_RAM
 	AM_RANGE(0x080000, 0x080001) AM_READ(control_1_r)
@@ -118,10 +118,10 @@ static ADDRESS_MAP_START( pow_map, AS_PROGRAM, 16, snk68_state )
 //  AM_RANGE(0x0f0008, 0x0f0009) AM_WRITENOP    /* ?? */
 	AM_RANGE(0x100000, 0x100fff) AM_READWRITE(pow_fg_videoram_r, pow_fg_videoram_w) AM_MIRROR(0x1000) AM_SHARE("pow_fg_videoram")   // 8-bit
 	AM_RANGE(0x200000, 0x207fff) AM_DEVREADWRITE("sprites", snk68_spr_device, spriteram_r, spriteram_w) AM_SHARE("spriteram")   // only partially populated
-	AM_RANGE(0x400000, 0x400fff) AM_RAM_DEVWRITE("palette", palette_device, write) AM_SHARE("palette")
+	AM_RANGE(0x400000, 0x400fff) AM_RAM_DEVWRITE("palette", palette_device, write16) AM_SHARE("palette")
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( searchar_map, AS_PROGRAM, 16, snk68_state )
+ADDRESS_MAP_START(snk68_state::searchar_map)
 	AM_RANGE(0x000000, 0x03ffff) AM_ROM
 	AM_RANGE(0x040000, 0x043fff) AM_RAM
 	AM_RANGE(0x080000, 0x080005) AM_READ(protcontrols_r) /* Player 1 & 2 */
@@ -140,12 +140,12 @@ static ADDRESS_MAP_START( searchar_map, AS_PROGRAM, 16, snk68_state )
 	AM_RANGE(0x100000, 0x107fff) AM_DEVREADWRITE("sprites", snk68_spr_device, spriteram_r, spriteram_w) AM_SHARE("spriteram")   // only partially populated
 	AM_RANGE(0x200000, 0x200fff) AM_RAM_WRITE(searchar_fg_videoram_w) AM_MIRROR(0x1000) AM_SHARE("pow_fg_videoram") /* Mirror is used by Ikari 3 */
 	AM_RANGE(0x300000, 0x33ffff) AM_ROM AM_REGION("user1", 0) /* Extra code bank */
-	AM_RANGE(0x400000, 0x400fff) AM_RAM_DEVWRITE("palette", palette_device, write) AM_SHARE("palette")
+	AM_RANGE(0x400000, 0x400fff) AM_RAM_DEVWRITE("palette", palette_device, write16) AM_SHARE("palette")
 ADDRESS_MAP_END
 
 /******************************************************************************/
 
-static ADDRESS_MAP_START( sound_map, AS_PROGRAM, 8, snk68_state )
+ADDRESS_MAP_START(snk68_state::sound_map)
 	AM_RANGE(0x0000, 0xefff) AM_ROM
 	AM_RANGE(0xf000, 0xf7ff) AM_RAM
 	AM_RANGE(0xf800, 0xf800) AM_DEVREAD("soundlatch", generic_latch_8_device, read) AM_DEVWRITE("soundlatch2", generic_latch_8_device, write)
@@ -163,7 +163,7 @@ WRITE8_MEMBER(snk68_state::D7759_upd_reset_w)
 	m_upd7759->reset_w(data & 0x80);
 }
 
-static ADDRESS_MAP_START( sound_io_map, AS_IO, 8, snk68_state )
+ADDRESS_MAP_START(snk68_state::sound_io_map)
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	AM_RANGE(0x00, 0x00) AM_DEVREADWRITE("ymsnd", ym3812_device, status_port_r, control_port_w)
 	AM_RANGE(0x20, 0x20) AM_DEVWRITE("ymsnd", ym3812_device, write_port_w)
@@ -588,14 +588,14 @@ void snk68_state::tile_callback_notpow(int &tile, int& fx, int& fy, int& region)
 	region = 1;
 }
 
-static MACHINE_CONFIG_START( pow )
+MACHINE_CONFIG_START(snk68_state::pow)
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", M68000, XTAL_18MHz/2) /* verified on pcb */
+	MCFG_CPU_ADD("maincpu", M68000, XTAL(18'000'000)/2) /* verified on pcb */
 	MCFG_CPU_PROGRAM_MAP(pow_map)
 	MCFG_CPU_VBLANK_INT_DRIVER("screen", snk68_state,  irq1_line_hold)
 
-	MCFG_CPU_ADD("soundcpu", Z80, XTAL_8MHz/2) /* verified on pcb */
+	MCFG_CPU_ADD("soundcpu", Z80, XTAL(8'000'000)/2) /* verified on pcb */
 	MCFG_CPU_PROGRAM_MAP(sound_map)
 	MCFG_CPU_IO_MAP(sound_io_map)
 
@@ -604,7 +604,7 @@ static MACHINE_CONFIG_START( pow )
 	// the screen parameters are guessed but should be accurate. They
 	// give a theoretical refresh rate of 59.1856Hz while the measured
 	// rate on a SAR board is 59.16Hz.
-	MCFG_SCREEN_RAW_PARAMS(XTAL_24MHz/4, 384, 0, 256, 264, 16, 240)
+	MCFG_SCREEN_RAW_PARAMS(XTAL(24'000'000)/4, 384, 0, 256, 264, 16, 240)
 	MCFG_SCREEN_UPDATE_DRIVER(snk68_state, screen_update)
 	MCFG_SCREEN_PALETTE("palette")
 
@@ -622,7 +622,7 @@ static MACHINE_CONFIG_START( pow )
 	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
 	MCFG_GENERIC_LATCH_8_ADD("soundlatch2")
 
-	MCFG_SOUND_ADD("ymsnd", YM3812, XTAL_8MHz/2) /* verified on pcb  */
+	MCFG_SOUND_ADD("ymsnd", YM3812, XTAL(8'000'000)/2) /* verified on pcb  */
 	MCFG_YM3812_IRQ_HANDLER(INPUTLINE("soundcpu", 0))
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 
@@ -630,12 +630,14 @@ static MACHINE_CONFIG_START( pow )
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_DERIVED( streetsm, pow )
+MACHINE_CONFIG_START(snk68_state::streetsm)
+	pow(config);
 	MCFG_DEVICE_MODIFY("sprites")
 	MCFG_SNK68_SPR_SET_TILE_INDIRECT( snk68_state, tile_callback_notpow )
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_DERIVED( searchar, streetsm )
+MACHINE_CONFIG_START(snk68_state::searchar)
+	streetsm(config);
 
 	MCFG_CPU_MODIFY("maincpu")
 	MCFG_CPU_PROGRAM_MAP(searchar_map)

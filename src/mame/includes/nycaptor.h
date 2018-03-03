@@ -94,4 +94,15 @@ public:
 	uint32_t screen_update_nycaptor(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	int nycaptor_spot(  );
 	void draw_sprites( bitmap_ind16 &bitmap, const rectangle &cliprect, int pri );
+	void nycaptor(machine_config &config);
+	void cyclshtg(machine_config &config);
+	void bronx(machine_config &config);
+	void bronx_master_map(address_map &map);
+	void bronx_slave_io_map(address_map &map);
+	void bronx_slave_map(address_map &map);
+	void cyclshtg_master_map(address_map &map);
+	void cyclshtg_slave_map(address_map &map);
+	void nycaptor_master_map(address_map &map);
+	void nycaptor_slave_map(address_map &map);
+	void sound_map(address_map &map);
 };

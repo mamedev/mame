@@ -468,6 +468,67 @@ public:
 	required_ioport m_analog3;
 	optional_ioport m_pads;
 
+	void gtfrk10mb(machine_config &config);
+	void ddr(machine_config &config);
+	void pnchmn(machine_config &config);
+	void gtrfrk7m(machine_config &config);
+	void ddr3m(machine_config &config);
+	void hyperbbc(machine_config &config);
+	void pnchmn2(machine_config &config);
+	void ddrsolo(machine_config &config);
+	void ddr3mp(machine_config &config);
+	void dsftkd(machine_config &config);
+	void dsfdcta(machine_config &config);
+	void mamboagga(machine_config &config);
+	void gunmania(machine_config &config);
+	void hypbbc2p(machine_config &config);
+	void gtrfrk2m(machine_config &config);
+	void gtrfrk5m(machine_config &config);
+	void ddrs2k(machine_config &config);
+	void salarymc(machine_config &config);
+	void ddr2ml(machine_config &config);
+	void konami573(machine_config &config);
+	void drmn2m(machine_config &config);
+	void gtrfrk3m(machine_config &config);
+	void mamboagg(machine_config &config);
+	void gtrfrks(machine_config &config);
+	void gchgchmp(machine_config &config);
+	void ddr5m(machine_config &config);
+	void drmn4m(machine_config &config);
+	void fbaitbc(machine_config &config);
+	void ddr4ms(machine_config &config);
+	void dsfdr(machine_config &config);
+	void konami573x(machine_config &config);
+	void ddrusa(machine_config &config);
+	void dsem(machine_config &config);
+	void dmx(machine_config &config);
+	void drmn(machine_config &config);
+	void k573d(machine_config &config);
+	void k573a(machine_config &config);
+	void pccard1_16mb(machine_config &config);
+	void pccard1_32mb(machine_config &config);
+	void pccard2_32mb(machine_config &config);
+	void pccard2_64mb(machine_config &config);
+	void cassx(machine_config &config);
+	void cassxi(machine_config &config);
+	void cassy(machine_config &config);
+	void cassyi(machine_config &config);
+	void cassyyi(machine_config &config);
+	void casszi(machine_config &config);
+	void cassxzi(machine_config &config);
+
+	static void punchmania_cassette_install(device_t *device);
+	static void salarymc_cassette_install(device_t *device);
+	static void hyperbbc_cassette_install(device_t *device);
+	static void hyprbbc2_cassette_install(device_t *device);
+	static void hypbbc2p_cassette_install(device_t *device);
+	static void cr589_config(device_t *device);
+	void fbaitbc_map(address_map &map);
+	void flashbank_map(address_map &map);
+	void gunmania_map(address_map &map);
+	void konami573_map(address_map &map);
+	void konami573a_map(address_map &map);
+	void konami573d_map(address_map &map);
 protected:
 	virtual void driver_start() override;
 
@@ -552,7 +613,7 @@ void ATTR_PRINTF( 3,4 )  ksys573_state::verboselog( int n_level, const char *s_f
 	}
 }
 
-static ADDRESS_MAP_START( konami573_map, AS_PROGRAM, 32, ksys573_state )
+ADDRESS_MAP_START(ksys573_state::konami573_map)
 	AM_RANGE( 0x1f000000, 0x1f3fffff ) AM_DEVICE16( "flashbank", address_map_bank_device, amap16, 0xffffffff )
 	AM_RANGE( 0x1f400000, 0x1f400003 ) AM_READ_PORT( "IN0" ) AM_WRITE_PORT( "OUT0" )
 	AM_RANGE( 0x1f400004, 0x1f400007 ) AM_READ_PORT( "IN1" )
@@ -568,7 +629,7 @@ static ADDRESS_MAP_START( konami573_map, AS_PROGRAM, 32, ksys573_state )
 	AM_RANGE( 0x1f6a0000, 0x1f6a0003 ) AM_READWRITE16( security_r, security_w, 0x0000ffff )
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( flashbank_map, AS_PROGRAM, 16, ksys573_state )
+ADDRESS_MAP_START(ksys573_state::flashbank_map)
 	AM_RANGE( 0x0000000, 0x03fffff ) AM_DEVREADWRITE8( "29f016a.31m", intelfsh8_device, read, write, 0x00ff )
 	AM_RANGE( 0x0000000, 0x03fffff ) AM_DEVREADWRITE8( "29f016a.27m", intelfsh8_device, read, write, 0xff00 )
 	AM_RANGE( 0x0400000, 0x07fffff ) AM_DEVREADWRITE8( "29f016a.31l", intelfsh8_device, read, write, 0x00ff )
@@ -581,22 +642,22 @@ static ADDRESS_MAP_START( flashbank_map, AS_PROGRAM, 16, ksys573_state )
 	AM_RANGE( 0x8000000, 0xbffffff ) AM_DEVREADWRITE( "pccard2", pccard_slot_device, read_memory, write_memory )
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( konami573d_map, AS_PROGRAM, 32, ksys573_state )
+ADDRESS_MAP_START(ksys573_state::konami573d_map)
 	AM_IMPORT_FROM( konami573_map )
 	AM_RANGE( 0x1f640000, 0x1f6400ff ) AM_DEVICE16( "k573dio", k573dio_device, amap, 0xffffffff )
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( konami573a_map, AS_PROGRAM, 32, ksys573_state )
+ADDRESS_MAP_START(ksys573_state::konami573a_map)
 	AM_IMPORT_FROM( konami573_map )
 	AM_RANGE( 0x1f640000, 0x1f6400ff ) AM_READWRITE16( gx700pwbf_io_r, gx700pwbf_io_w, 0xffffffff )
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( fbaitbc_map, AS_PROGRAM, 32, ksys573_state )
+ADDRESS_MAP_START(ksys573_state::fbaitbc_map)
 	AM_IMPORT_FROM( konami573_map )
 	AM_RANGE( 0x1f640000, 0x1f6400ff ) AM_READWRITE16( ge765pwbba_r, ge765pwbba_w, 0xffffffff )
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( gunmania_map, AS_PROGRAM, 32, ksys573_state )
+ADDRESS_MAP_START(ksys573_state::gunmania_map)
 	AM_IMPORT_FROM( konami573_map )
 	AM_RANGE( 0x1f640000, 0x1f6400ff ) AM_READWRITE16( gunmania_r, gunmania_w, 0xffffffff )
 ADDRESS_MAP_END
@@ -625,19 +686,17 @@ TIMER_CALLBACK_MEMBER( ksys573_state::atapi_xfer_end )
 
 	m_atapi_timer->adjust( attotime::never );
 
-	address_space &space = m_maincpu->space( AS_PROGRAM );
-
 	for( int i = 0; i < m_atapi_xfersize; i++ )
 	{
-		uint32_t d = m_ata->read_cs0( space, (uint32_t) 0, (uint32_t) 0xffff ) << 0;
-		d |= m_ata->read_cs0( space, (uint32_t) 0, (uint32_t) 0xffff ) << 16;
+		uint32_t d = m_ata->read_cs0(0) << 0;
+		d |= m_ata->read_cs0(0) << 16;
 
 		m_p_n_psxram[ m_atapi_xferbase / 4 ] = d;
 		m_atapi_xferbase += 4;
 	}
 
 	/// HACK: konami80s only works if you dma more data than requested
-	if( ( m_ata->read_cs1( space, (uint32_t) 6, (uint32_t) 0xffff ) & 8 ) != 0 )
+	if( ( m_ata->read_cs1(6) & 8 ) != 0 )
 	{
 		m_atapi_timer->adjust( m_maincpu->cycles_to_attotime( ( ATAPI_CYCLES_PER_SECTOR * ( m_atapi_xfersize / 64 ) ) ) );
 	}
@@ -1496,12 +1555,14 @@ WRITE_LINE_MEMBER( ksys573_state::salarymc_lamp_clk )
 	m_salarymc_lamp_clk = state;
 }
 
-static MACHINE_CONFIG_START( salarymc_cassette_install )
-	MCFG_DEVICE_MODIFY( DEVICE_SELF )
+void ksys573_state::salarymc_cassette_install(device_t *device)
+{
+	devcb_base *devcb;
+	(void)devcb;
 	MCFG_KONAMI573_CASSETTE_Y_D5_HANDLER( DEVWRITELINE( ":", ksys573_state, salarymc_lamp_clk ) )
 	MCFG_KONAMI573_CASSETTE_Y_D6_HANDLER( DEVWRITELINE( ":", ksys573_state, salarymc_lamp_rst ) )
 	MCFG_KONAMI573_CASSETTE_Y_D7_HANDLER( DEVWRITELINE( ":", ksys573_state, salarymc_lamp_d ) )
-MACHINE_CONFIG_END
+}
 
 DRIVER_INIT_MEMBER( ksys573_state, salarymc )
 {
@@ -1577,8 +1638,10 @@ WRITE_LINE_MEMBER( ksys573_state::hyperbbc_lamp_strobe3 )
 	m_hyperbbc_lamp_strobe3 = state;
 }
 
-static MACHINE_CONFIG_START( hyperbbc_cassette_install )
-	MCFG_DEVICE_MODIFY( DEVICE_SELF )
+void ksys573_state::hyperbbc_cassette_install(device_t *device)
+{
+	devcb_base *devcb;
+	(void)devcb;
 	MCFG_KONAMI573_CASSETTE_Y_D0_HANDLER( DEVWRITELINE( ":", ksys573_state, hyperbbc_lamp_strobe3 ) ) // line shared with x76f100 sda
 	MCFG_KONAMI573_CASSETTE_Y_D1_HANDLER( DEVWRITELINE( ":", ksys573_state, hyperbbc_lamp_strobe2 ) ) // line shared with x76f100 scl
 	MCFG_KONAMI573_CASSETTE_Y_D3_HANDLER( DEVWRITELINE( ":", ksys573_state, hyperbbc_lamp_strobe1 ) ) // line shared with x76f100 rst
@@ -1586,16 +1649,18 @@ static MACHINE_CONFIG_START( hyperbbc_cassette_install )
 	MCFG_KONAMI573_CASSETTE_Y_D5_HANDLER( DEVWRITELINE( ":", ksys573_state, hyperbbc_lamp_blue ) )
 	MCFG_KONAMI573_CASSETTE_Y_D6_HANDLER( DEVWRITELINE( ":", ksys573_state, hyperbbc_lamp_red ) )
 	MCFG_KONAMI573_CASSETTE_Y_D7_HANDLER( DEVWRITELINE( ":", ksys573_state, hyperbbc_lamp_start ) )
-MACHINE_CONFIG_END
+}
 
-static MACHINE_CONFIG_START( hypbbc2p_cassette_install )
-	MCFG_DEVICE_MODIFY( DEVICE_SELF )
+void ksys573_state::hypbbc2p_cassette_install(device_t *device)
+{
+	devcb_base *devcb;
+	(void)devcb;
 	MCFG_KONAMI573_CASSETTE_Y_D0_HANDLER( DEVWRITELINE( ":", ksys573_state, hyperbbc_lamp_strobe2 ) ) // line shared with x76f100 sda
 	MCFG_KONAMI573_CASSETTE_Y_D3_HANDLER( DEVWRITELINE( ":", ksys573_state, hyperbbc_lamp_strobe1 ) ) // line shared with x76f100 rst
 	MCFG_KONAMI573_CASSETTE_Y_D4_HANDLER( DEVWRITELINE( ":", ksys573_state, hyperbbc_lamp_green ) )
 	MCFG_KONAMI573_CASSETTE_Y_D5_HANDLER( DEVWRITELINE( ":", ksys573_state, hyperbbc_lamp_blue ) )
 	MCFG_KONAMI573_CASSETTE_Y_D6_HANDLER( DEVWRITELINE( ":", ksys573_state, hyperbbc_lamp_red ) )
-MACHINE_CONFIG_END
+}
 
 DRIVER_INIT_MEMBER( ksys573_state, hyperbbc )
 {
@@ -1701,11 +1766,12 @@ ADC083X_INPUT_CB(konami573_cassette_xi_device::punchmania_inputs_callback)
 }
 
 
-static MACHINE_CONFIG_START( punchmania_cassette_install )
-	MCFG_DEVICE_MODIFY( "adc0838" )
-	MCFG_ADC083X_INPUT_CB( konami573_cassette_xi_device, punchmania_inputs_callback )
-MACHINE_CONFIG_END
-
+void ksys573_state::punchmania_cassette_install(device_t *device)
+{
+	auto game = downcast<konami573_cassette_xi_device *>(device);
+	auto adc0838 = device->subdevice<adc083x_device>("adc0838");
+	adc0838->set_input_callback(adc083x_device::input_delegate(FUNC(konami573_cassette_xi_device::punchmania_inputs_callback), game));
+}
 
 int pad_light[ 6 ];
 
@@ -1992,22 +2058,23 @@ ADC083X_INPUT_CB(ksys573_state::analogue_inputs_callback)
 	return 0;
 }
 
-static MACHINE_CONFIG_START( cr589_config )
-	MCFG_DEVICE_MODIFY( "cdda" )
+void ksys573_state::cr589_config(device_t *device)
+{
+	device = device->subdevice("cdda");
 	MCFG_SOUND_ROUTE( 0, "^^^^lspeaker", 1.0 )
 	MCFG_SOUND_ROUTE( 1, "^^^^rspeaker", 1.0 )
-MACHINE_CONFIG_END
+}
 
-static MACHINE_CONFIG_START( konami573 )
+MACHINE_CONFIG_START(ksys573_state::konami573)
 	/* basic machine hardware */
-	MCFG_CPU_ADD( "maincpu", CXD8530CQ, XTAL_67_7376MHz )
+	MCFG_CPU_ADD( "maincpu", CXD8530CQ, XTAL(67'737'600) )
 	MCFG_CPU_PROGRAM_MAP( konami573_map )
 
 	MCFG_RAM_MODIFY( "maincpu:ram" )
 	MCFG_RAM_DEFAULT_SIZE( "4M" )
 
-	MCFG_PSX_DMA_CHANNEL_READ( "maincpu", 5, psxdma_device::read_delegate(&ksys573_state::cdrom_dma_read, (ksys573_state *) owner ) )
-	MCFG_PSX_DMA_CHANNEL_WRITE( "maincpu", 5, psxdma_device::write_delegate(&ksys573_state::cdrom_dma_write, (ksys573_state *) owner ) )
+	MCFG_PSX_DMA_CHANNEL_READ( "maincpu", 5, psxdma_device::read_delegate(&ksys573_state::cdrom_dma_read, this ) )
+	MCFG_PSX_DMA_CHANNEL_WRITE( "maincpu", 5, psxdma_device::write_delegate(&ksys573_state::cdrom_dma_write, this ) )
 
 	MCFG_MACHINE_RESET_OVERRIDE( ksys573_state, konami573 )
 
@@ -2044,13 +2111,13 @@ static MACHINE_CONFIG_START( konami573 )
 	MCFG_ADDRESS_MAP_BANK_STRIDE( 0x400000 )
 
 	/* video hardware */
-	MCFG_PSXGPU_ADD( "maincpu", "gpu", CXD8561Q, 0x200000, XTAL_53_693175MHz )
-	MCFG_PSXGPU_VBLANK_CALLBACK(vblank_state_delegate(&ksys573_state::sys573_vblank, (ksys573_state *) owner ))
+	MCFG_PSXGPU_ADD( "maincpu", "gpu", CXD8561Q, 0x200000, XTAL(53'693'175) )
+	MCFG_PSXGPU_VBLANK_CALLBACK(vblank_state_delegate(&ksys573_state::sys573_vblank, this ))
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_STEREO( "lspeaker", "rspeaker" )
 
-	MCFG_SPU_ADD( "spu", XTAL_67_7376MHz/2 )
+	MCFG_SPU_ADD( "spu", XTAL(67'737'600)/2 )
 	MCFG_SOUND_ROUTE( 0, "lspeaker", 1.0 )
 	MCFG_SOUND_ROUTE( 1, "rspeaker", 1.0 )
 
@@ -2061,37 +2128,39 @@ static MACHINE_CONFIG_START( konami573 )
 MACHINE_CONFIG_END
 
 // Variants with additional digital sound board
-static MACHINE_CONFIG_DERIVED( k573d, konami573 )
+MACHINE_CONFIG_START(ksys573_state::k573d)
+	konami573(config);
 	MCFG_CPU_MODIFY( "maincpu" )
 	MCFG_CPU_PROGRAM_MAP( konami573d_map )
-	MCFG_KONAMI_573_DIGITAL_IO_BOARD_ADD( "k573dio", XTAL_19_6608MHz )
+	MCFG_KONAMI_573_DIGITAL_IO_BOARD_ADD( "k573dio", XTAL(19'660'800) )
 MACHINE_CONFIG_END
 
 // Variants with additional analogue i/o board
-static MACHINE_CONFIG_DERIVED( k573a, konami573 )
+MACHINE_CONFIG_START(ksys573_state::k573a)
+	konami573(config);
 	MCFG_CPU_MODIFY( "maincpu" )
 	MCFG_CPU_PROGRAM_MAP( konami573a_map )
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_START( pccard1_16mb )
+MACHINE_CONFIG_START(ksys573_state::pccard1_16mb)
 	MCFG_DEVICE_MODIFY( "pccard1" )
 	MCFG_SLOT_OPTION_ADD( "16mb", LINEAR_FLASH_PCCARD_16MB )
 	MCFG_SLOT_DEFAULT_OPTION( "16mb" )
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_START( pccard1_32mb )
+MACHINE_CONFIG_START(ksys573_state::pccard1_32mb)
 	MCFG_DEVICE_MODIFY( "pccard1" )
 	MCFG_SLOT_OPTION_ADD( "32mb", LINEAR_FLASH_PCCARD_32MB )
 	MCFG_SLOT_DEFAULT_OPTION( "32mb" )
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_START( pccard2_32mb )
+MACHINE_CONFIG_START(ksys573_state::pccard2_32mb)
 	MCFG_DEVICE_MODIFY( "pccard2" )
 	MCFG_SLOT_OPTION_ADD( "32mb", LINEAR_FLASH_PCCARD_32MB )
 	MCFG_SLOT_DEFAULT_OPTION( "32mb" )
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_START( pccard2_64mb )
+MACHINE_CONFIG_START(ksys573_state::pccard2_64mb)
 	MCFG_DEVICE_MODIFY( "pccard2" )
 	MCFG_SLOT_OPTION_ADD( "64mb", LINEAR_FLASH_PCCARD_64MB )
 	MCFG_SLOT_DEFAULT_OPTION( "64mb" )
@@ -2108,44 +2177,44 @@ MACHINE_CONFIG_END
 //
 // Up to two carts can be used
 
-static MACHINE_CONFIG_START( cassx )
+MACHINE_CONFIG_START(ksys573_state::cassx)
 	MCFG_DEVICE_MODIFY( "cassette" )
 	MCFG_SLOT_OPTION_ADD( "game", KONAMI573_CASSETTE_X )
 	MCFG_SLOT_DEFAULT_OPTION( "game" )
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_START( cassxi )
+MACHINE_CONFIG_START(ksys573_state::cassxi)
 	MCFG_DEVICE_MODIFY( "cassette" )
 	MCFG_SLOT_OPTION_ADD( "game", KONAMI573_CASSETTE_XI )
 	MCFG_SLOT_DEFAULT_OPTION( "game" )
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_START( cassy )
+MACHINE_CONFIG_START(ksys573_state::cassy)
 	MCFG_DEVICE_MODIFY( "cassette" )
 	MCFG_SLOT_OPTION_ADD( "game", KONAMI573_CASSETTE_Y )
 	MCFG_SLOT_DEFAULT_OPTION( "game" )
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_START( cassyi )
+MACHINE_CONFIG_START(ksys573_state::cassyi)
 	MCFG_DEVICE_MODIFY( "cassette" )
 	MCFG_SLOT_OPTION_ADD( "game", KONAMI573_CASSETTE_YI )
 	MCFG_SLOT_DEFAULT_OPTION( "game" )
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_START( cassyyi )
+MACHINE_CONFIG_START(ksys573_state::cassyyi)
 	MCFG_DEVICE_MODIFY( "cassette" )
 	MCFG_SLOT_OPTION_ADD( "game", KONAMI573_CASSETTE_YI )
 	MCFG_SLOT_OPTION_ADD( "install", KONAMI573_CASSETTE_YI )
 	MCFG_SLOT_DEFAULT_OPTION( "game" )
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_START( casszi )
+MACHINE_CONFIG_START(ksys573_state::casszi)
 	MCFG_DEVICE_MODIFY( "cassette" )
 	MCFG_SLOT_OPTION_ADD( "game", KONAMI573_CASSETTE_ZI )
 	MCFG_SLOT_DEFAULT_OPTION( "game" )
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_START( cassxzi )
+MACHINE_CONFIG_START(ksys573_state::cassxzi)
 	MCFG_DEVICE_MODIFY( "cassette" )
 	MCFG_SLOT_OPTION_ADD( "game", KONAMI573_CASSETTE_ZI )
 	MCFG_SLOT_OPTION_ADD( "install", KONAMI573_CASSETTE_XI )
@@ -2154,229 +2223,263 @@ MACHINE_CONFIG_END
 
 // Dance Dance Revolution
 
-static MACHINE_CONFIG_DERIVED( ddr, k573a )
-	MCFG_FRAGMENT_ADD( cassx )
+MACHINE_CONFIG_START(ksys573_state::ddr)
+	k573a(config);
+	cassx(config);
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_DERIVED( ddr2ml, k573a )
+MACHINE_CONFIG_START(ksys573_state::ddr2ml)
+	k573a(config);
 	MCFG_DEVICE_ADD( "k573mcr", KONAMI_573_MEMORY_CARD_READER, 0 )
 
-	MCFG_FRAGMENT_ADD( pccard1_16mb )
-	MCFG_FRAGMENT_ADD( cassx )
+	pccard1_16mb(config);
+	cassx(config);
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_DERIVED( ddr3m, k573d )
+MACHINE_CONFIG_START(ksys573_state::ddr3m)
+	k573d(config);
 	MCFG_DEVICE_MODIFY( "k573dio" )
 	MCFG_KONAMI_573_DIGITAL_IO_BOARD_OUTPUT_CALLBACK( WRITE8( ksys573_state, ddr_output_callback ) )
 
-	MCFG_FRAGMENT_ADD( pccard2_32mb )
-	MCFG_FRAGMENT_ADD( cassyyi )
+	pccard2_32mb(config);
+	cassyyi(config);
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_DERIVED( ddr3mp, k573d )
+MACHINE_CONFIG_START(ksys573_state::ddr3mp)
+	k573d(config);
 	MCFG_DEVICE_MODIFY( "k573dio" )
 	MCFG_KONAMI_573_DIGITAL_IO_BOARD_OUTPUT_CALLBACK( WRITE8( ksys573_state, ddr_output_callback ) )
 
-	MCFG_FRAGMENT_ADD( pccard2_32mb )
-	MCFG_FRAGMENT_ADD( cassxzi )
+	pccard2_32mb(config);
+	cassxzi(config);
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_DERIVED( ddrusa, k573d )
+MACHINE_CONFIG_START(ksys573_state::ddrusa)
+	k573d(config);
 	MCFG_DEVICE_MODIFY( "k573dio" )
 	MCFG_KONAMI_573_DIGITAL_IO_BOARD_OUTPUT_CALLBACK( WRITE8( ksys573_state, ddr_output_callback ) )
 
-	MCFG_FRAGMENT_ADD( casszi )
+	casszi(config);
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_DERIVED( ddr5m, k573d )
+MACHINE_CONFIG_START(ksys573_state::ddr5m)
+	k573d(config);
 	MCFG_DEVICE_MODIFY( "k573dio" )
 	MCFG_KONAMI_573_DIGITAL_IO_BOARD_OUTPUT_CALLBACK( WRITE8( ksys573_state, ddr_output_callback ) )
 
-	MCFG_FRAGMENT_ADD( pccard2_32mb )
-	MCFG_FRAGMENT_ADD( casszi )
+	pccard2_32mb(config);
+	casszi(config);
 MACHINE_CONFIG_END
 
 // Dancing Stage
 
-static MACHINE_CONFIG_DERIVED( dsfdcta, k573a )
-	MCFG_FRAGMENT_ADD( pccard2_32mb )
-	MCFG_FRAGMENT_ADD( cassyyi )
+MACHINE_CONFIG_START(ksys573_state::dsfdcta)
+	k573a(config);
+	pccard2_32mb(config);
+	cassyyi(config);
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_DERIVED( dsftkd, k573a )
-	MCFG_FRAGMENT_ADD( cassyi )
+MACHINE_CONFIG_START(ksys573_state::dsftkd)
+	k573a(config);
+	cassyi(config);
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_DERIVED( dsfdr, k573d )
+MACHINE_CONFIG_START(ksys573_state::dsfdr)
+	k573d(config);
 	MCFG_DEVICE_MODIFY( "k573dio" )
 	MCFG_KONAMI_573_DIGITAL_IO_BOARD_OUTPUT_CALLBACK( WRITE8( ksys573_state, ddr_output_callback ) )
 
-	MCFG_FRAGMENT_ADD( cassxzi )
+	cassxzi(config);
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_DERIVED( dsem, k573d )
+MACHINE_CONFIG_START(ksys573_state::dsem)
+	k573d(config);
 	MCFG_DEVICE_MODIFY( "k573dio" )
 	MCFG_KONAMI_573_DIGITAL_IO_BOARD_OUTPUT_CALLBACK( WRITE8( ksys573_state, ddr_output_callback ) )
 
-	MCFG_FRAGMENT_ADD( cassxi )
+	cassxi(config);
 MACHINE_CONFIG_END
 
 // Dance Dance Revolution Solo
 
-static MACHINE_CONFIG_DERIVED( ddrsolo, k573d )
+MACHINE_CONFIG_START(ksys573_state::ddrsolo)
+	k573d(config);
 	MCFG_DEVICE_MODIFY( "k573dio" )
 	MCFG_KONAMI_573_DIGITAL_IO_BOARD_OUTPUT_CALLBACK( WRITE8( ksys573_state, ddrsolo_output_callback ) )
 
-	MCFG_FRAGMENT_ADD( cassyi )
+	cassyi(config);
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_DERIVED( ddrs2k, k573d )
+MACHINE_CONFIG_START(ksys573_state::ddrs2k)
+	k573d(config);
 	MCFG_DEVICE_MODIFY( "k573dio" )
 	MCFG_KONAMI_573_DIGITAL_IO_BOARD_OUTPUT_CALLBACK( WRITE8( ksys573_state, ddrsolo_output_callback ) )
 
-	MCFG_FRAGMENT_ADD( cassyyi )
+	cassyyi(config);
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_DERIVED( ddr4ms, k573d )
+MACHINE_CONFIG_START(ksys573_state::ddr4ms)
+	k573d(config);
 	MCFG_DEVICE_MODIFY( "k573dio" )
 	MCFG_KONAMI_573_DIGITAL_IO_BOARD_OUTPUT_CALLBACK( WRITE8( ksys573_state, ddrsolo_output_callback ) )
 
-	MCFG_FRAGMENT_ADD( pccard2_32mb )
-	MCFG_FRAGMENT_ADD( cassxzi )
+	pccard2_32mb(config);
+	cassxzi(config);
 MACHINE_CONFIG_END
 
 // DrumMania
 
-static MACHINE_CONFIG_DERIVED( drmn, k573a )
-	MCFG_FRAGMENT_ADD( cassx )
+MACHINE_CONFIG_START(ksys573_state::drmn)
+	k573a(config);
+	cassx(config);
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_DERIVED( drmn2m, k573d )
+MACHINE_CONFIG_START(ksys573_state::drmn2m)
+	k573d(config);
 	MCFG_DEVICE_MODIFY( "k573dio" )
 	MCFG_KONAMI_573_DIGITAL_IO_BOARD_OUTPUT_CALLBACK( WRITE8( ksys573_state, drmn_output_callback ) )
 
-	MCFG_FRAGMENT_ADD( cassxzi )
+	cassxzi(config);
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_DERIVED( drmn4m, k573d )
+MACHINE_CONFIG_START(ksys573_state::drmn4m)
+	k573d(config);
 	MCFG_DEVICE_MODIFY( "k573dio" )
 	MCFG_KONAMI_573_DIGITAL_IO_BOARD_OUTPUT_CALLBACK( WRITE8( ksys573_state, drmn_output_callback ) )
 
-	MCFG_FRAGMENT_ADD( casszi )
+	casszi(config);
 
 	MCFG_DEVICE_ADD( "k573msu", KONAMI_573_MULTI_SESSION_UNIT, 0 )
 MACHINE_CONFIG_END
 
 // Guitar Freaks
 
-static MACHINE_CONFIG_DERIVED( gtrfrks, k573a )
-	MCFG_FRAGMENT_ADD( cassx )
+MACHINE_CONFIG_START(ksys573_state::gtrfrks)
+	k573a(config);
+	cassx(config);
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_DERIVED( gtrfrk2m, k573a )
-	MCFG_FRAGMENT_ADD( cassyi )
-	MCFG_FRAGMENT_ADD( pccard1_32mb ) // HACK: The installation tries to check and erase 32mb but only flashes 16mb.
+MACHINE_CONFIG_START(ksys573_state::gtrfrk2m)
+	k573a(config);
+	cassyi(config);
+	pccard1_32mb(config); // HACK: The installation tries to check and erase 32mb but only flashes 16mb.
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_DERIVED( gtrfrk3m, k573d )
-	MCFG_FRAGMENT_ADD( cassxzi )
-	MCFG_FRAGMENT_ADD( pccard1_16mb )
+MACHINE_CONFIG_START(ksys573_state::gtrfrk3m)
+	k573d(config);
+	cassxzi(config);
+	pccard1_16mb(config);
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_DERIVED( gtrfrk5m, k573d )
-	MCFG_FRAGMENT_ADD( casszi )
-	MCFG_FRAGMENT_ADD( pccard1_32mb )
+MACHINE_CONFIG_START(ksys573_state::gtrfrk5m)
+	k573d(config);
+	casszi(config);
+	pccard1_32mb(config);
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_DERIVED( gtrfrk7m, k573d )
-	MCFG_FRAGMENT_ADD( casszi )
-	MCFG_FRAGMENT_ADD( pccard1_32mb )
+MACHINE_CONFIG_START(ksys573_state::gtrfrk7m)
+	k573d(config);
+	casszi(config);
+	pccard1_32mb(config);
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_DERIVED( gtfrk10mb, gtrfrk7m )
+MACHINE_CONFIG_START(ksys573_state::gtfrk10mb)
+	gtrfrk7m(config);
 	MCFG_DEVICE_ADD( "k573npu", KONAMI_573_NETWORK_PCB_UNIT, 0 )
 MACHINE_CONFIG_END
 
 // Miscellaneous
 
-static MACHINE_CONFIG_DERIVED( konami573x, konami573 )
-	MCFG_FRAGMENT_ADD( cassx )
+MACHINE_CONFIG_START(ksys573_state::konami573x)
+	konami573(config);
+	cassx(config);
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_DERIVED( fbaitbc, konami573 )
+MACHINE_CONFIG_START(ksys573_state::fbaitbc)
+	konami573(config);
 	MCFG_CPU_MODIFY( "maincpu" )
 	MCFG_CPU_PROGRAM_MAP( fbaitbc_map )
 
 	MCFG_DEVICE_ADD("upd4701", UPD4701A, 0)
 	MCFG_UPD4701_PORTY("uPD4701_y")
 
-	MCFG_FRAGMENT_ADD( cassx )
+	cassx(config);
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_DERIVED( hyperbbc, konami573 )
-	MCFG_FRAGMENT_ADD( cassy ) // The game doesn't check the security chip
+MACHINE_CONFIG_START(ksys573_state::hyperbbc)
+	konami573(config);
+	cassy(config); // The game doesn't check the security chip
 
 	MCFG_DEVICE_MODIFY( "cassette" )
 	MCFG_DEVICE_CARD_MACHINE_CONFIG( "game", hyperbbc_cassette_install )
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_DERIVED( hypbbc2p, konami573 )
-	MCFG_FRAGMENT_ADD( cassy )
+MACHINE_CONFIG_START(ksys573_state::hypbbc2p)
+	konami573(config);
+	cassy(config);
 
 	MCFG_DEVICE_MODIFY( "cassette" )
 	MCFG_DEVICE_CARD_MACHINE_CONFIG( "game", hypbbc2p_cassette_install )
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_DERIVED( salarymc, konami573 )
-	MCFG_FRAGMENT_ADD( cassyi )
+MACHINE_CONFIG_START(ksys573_state::salarymc)
+	konami573(config);
+	cassyi(config);
 
 	MCFG_DEVICE_MODIFY( "cassette" )
 	MCFG_DEVICE_CARD_MACHINE_CONFIG( "game", salarymc_cassette_install )
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_DERIVED( gchgchmp, konami573 )
-	MCFG_FRAGMENT_ADD( pccard1_16mb )
-	MCFG_FRAGMENT_ADD( cassx )
+MACHINE_CONFIG_START(ksys573_state::gchgchmp)
+	konami573(config);
+	pccard1_16mb(config);
+	cassx(config);
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_DERIVED( pnchmn, konami573 )
+MACHINE_CONFIG_START(ksys573_state::pnchmn)
+	konami573(config);
 	MCFG_CPU_MODIFY( "maincpu" )
 	MCFG_CPU_PROGRAM_MAP( konami573a_map )
 
-	MCFG_FRAGMENT_ADD( cassxi )
-	MCFG_FRAGMENT_ADD( pccard1_32mb )
+	cassxi(config);
+	pccard1_32mb(config);
 
 	MCFG_DEVICE_MODIFY( "cassette" )
 	MCFG_DEVICE_CARD_MACHINE_CONFIG( "game", punchmania_cassette_install )
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_DERIVED( pnchmn2, pnchmn )
-	MCFG_FRAGMENT_ADD( pccard2_64mb )
+MACHINE_CONFIG_START(ksys573_state::pnchmn2)
+	pnchmn(config);
+	pccard2_64mb(config);
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_DERIVED( gunmania, konami573 )
+MACHINE_CONFIG_START(ksys573_state::gunmania)
+	konami573(config);
 	MCFG_CPU_MODIFY( "maincpu" )
 	MCFG_CPU_PROGRAM_MAP( gunmania_map )
 
 	MCFG_DS2401_ADD( "gunmania_id" )
-	MCFG_FRAGMENT_ADD( pccard2_32mb )
+	pccard2_32mb(config);
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_DERIVED( dmx, k573d )
+MACHINE_CONFIG_START(ksys573_state::dmx)
+	k573d(config);
 	MCFG_DEVICE_MODIFY( "k573dio" )
 	MCFG_KONAMI_573_DIGITAL_IO_BOARD_OUTPUT_CALLBACK( WRITE8( ksys573_state, dmx_output_callback ) )
 
-	MCFG_FRAGMENT_ADD( casszi )
+	casszi(config);
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_DERIVED( mamboagg, k573d )
+MACHINE_CONFIG_START(ksys573_state::mamboagg)
+	k573d(config);
 	MCFG_DEVICE_MODIFY( "k573dio" )
 	MCFG_KONAMI_573_DIGITAL_IO_BOARD_OUTPUT_CALLBACK( WRITE8( ksys573_state, mamboagg_output_callback ) )
 
-	MCFG_FRAGMENT_ADD( casszi )
+	casszi(config);
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_DERIVED( mamboagga, mamboagg )
+MACHINE_CONFIG_START(ksys573_state::mamboagga)
+	mamboagg(config);
 	MCFG_DEVICE_ADD( "k573npu", KONAMI_573_NETWORK_PCB_UNIT, 0 )
 MACHINE_CONFIG_END
 
@@ -2733,14 +2836,20 @@ static INPUT_PORTS_START( hyperbbc )
 	PORT_INCLUDE( konami573 )
 
 	PORT_MODIFY( "IN2" )
-	PORT_BIT( 0x00000100, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_PLAYER( 3 )
-	PORT_BIT( 0x00000200, IP_ACTIVE_LOW, IPT_BUTTON3 ) PORT_PLAYER( 3 )
+	PORT_BIT( 0x00000100, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_PLAYER( 3 ) PORT_NAME( "3P Red" )
+	PORT_BIT( 0x00000200, IP_ACTIVE_LOW, IPT_BUTTON3 ) PORT_PLAYER( 3 ) PORT_NAME( "3P Blue" )
 	PORT_BIT( 0x00000400, IP_ACTIVE_LOW, IPT_START3 )
-	PORT_BIT( 0x00000800, IP_ACTIVE_LOW, IPT_BUTTON2 ) PORT_PLAYER( 3 )
+	PORT_BIT( 0x00000800, IP_ACTIVE_LOW, IPT_BUTTON2 ) PORT_PLAYER( 3 ) PORT_NAME( "3P Green" )
+	PORT_BIT( 0x00001000, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_PLAYER( 1 ) PORT_NAME( "1P Red" )
+	PORT_BIT( 0x00002000, IP_ACTIVE_LOW, IPT_BUTTON2 ) PORT_PLAYER( 1 ) PORT_NAME( "1P Green" )
+	PORT_BIT( 0x00004000, IP_ACTIVE_LOW, IPT_BUTTON3 ) PORT_PLAYER( 1 ) PORT_NAME( "1P Blue" )
 	PORT_BIT( 0x00000001, IP_ACTIVE_LOW, IPT_UNKNOWN )
 	PORT_BIT( 0x00000002, IP_ACTIVE_LOW, IPT_UNKNOWN )
 	PORT_BIT( 0x00000004, IP_ACTIVE_LOW, IPT_UNKNOWN )
 	PORT_BIT( 0x00000008, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x00000010, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_PLAYER( 2 ) PORT_NAME( "2P Red" )
+	PORT_BIT( 0x00000020, IP_ACTIVE_LOW, IPT_BUTTON2 ) PORT_PLAYER( 2 ) PORT_NAME( "2P Green" )
+	PORT_BIT( 0x00000040, IP_ACTIVE_LOW, IPT_BUTTON3 ) PORT_PLAYER( 2 ) PORT_NAME( "2P Blue" )
 
 	PORT_MODIFY( "IN3" )
 	PORT_BIT( 0x00000100, IP_ACTIVE_LOW, IPT_UNKNOWN )
@@ -2757,6 +2866,28 @@ static INPUT_PORTS_START( hypbbc2p )
 	PORT_MODIFY( "IN2" )
 	PORT_BIT( 0x00000400, IP_ACTIVE_LOW, IPT_START2 ) /* P1 UP */
 	PORT_BIT( 0x00000080, IP_ACTIVE_LOW, IPT_UNUSED ) /* P2 START */
+	PORT_BIT( 0x00001000, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_PLAYER( 1 ) PORT_NAME( "1P Red" )
+	PORT_BIT( 0x00002000, IP_ACTIVE_LOW, IPT_BUTTON2 ) PORT_PLAYER( 1 ) PORT_NAME( "1P Green" )
+	PORT_BIT( 0x00004000, IP_ACTIVE_LOW, IPT_BUTTON3 ) PORT_PLAYER( 1 ) PORT_NAME( "1P Blue" )
+	PORT_BIT( 0x00000100, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_PLAYER( 2 ) PORT_NAME( "2P Red" )
+	PORT_BIT( 0x00000200, IP_ACTIVE_LOW, IPT_BUTTON3 ) PORT_PLAYER( 2 ) PORT_NAME( "2P Blue" )
+	PORT_BIT( 0x00000800, IP_ACTIVE_LOW, IPT_BUTTON2 ) PORT_PLAYER( 2 ) PORT_NAME( "2P Green" )
+	PORT_BIT( 0x00000001, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x00000002, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x00000004, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x00000008, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x00000010, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x00000020, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x00000040, IP_ACTIVE_LOW, IPT_UNKNOWN )
+
+
+	PORT_MODIFY( "IN3" )
+	PORT_BIT( 0x00000100, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x00000200, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x00000800, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x01000000, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x02000000, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x08000000, IP_ACTIVE_LOW, IPT_UNKNOWN )
 INPUT_PORTS_END
 
 static INPUT_PORTS_START( mamboagg )

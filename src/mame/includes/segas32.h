@@ -183,9 +183,10 @@ public:
 	uint32_t multi32_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect, int index);
 	void update_irq_state();
 	void signal_v60_irq(int which);
-	void int_control_w(address_space &space, int offset, uint8_t data);
+	void int_control_w(int offset, uint8_t data);
 	void update_sound_irq_state();
 	void segas32_common_init();
+	void multi32_common_init();
 	void radm_sw1_output( int which, uint16_t data );
 	void radm_sw2_output( int which, uint16_t data );
 	void radr_sw2_output( int which, uint16_t data );
@@ -239,6 +240,21 @@ public:
 	void init_jleague(void);
 	void init_titlef(void);
 
+	void ga2_main_map(address_map &map);
+	void multi32_6player_map(address_map &map);
+	void multi32_map(address_map &map);
+	void multi32_sound_map(address_map &map);
+	void multi32_sound_portmap(address_map &map);
+	void multipcm_map(address_map &map);
+	void system32_4player_map(address_map &map);
+	void system32_analog_map(address_map &map);
+	void system32_cd_map(address_map &map);
+	void system32_map(address_map &map);
+	void system32_sound_map(address_map &map);
+	void system32_sound_portmap(address_map &map);
+	void upd7725_data_map(address_map &map);
+	void upd7725_prg_map(address_map &map);
+	void v25_map(address_map &map);
 protected:
 	segas32_state(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock);
 
@@ -275,6 +291,7 @@ class segas32_trackball_state : public segas32_state
 public:
 	segas32_trackball_state(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
+	void system32_trackball_map(address_map &map);
 protected:
 	virtual void device_add_mconfig(machine_config &config) override;
 	virtual void device_start() override;
@@ -331,6 +348,7 @@ public:
 	DECLARE_WRITE_LINE_MEMBER(scsi_irq_w);
 	DECLARE_WRITE_LINE_MEMBER(scsi_drq_w);
 
+	static void cdrom_config(device_t *device);
 protected:
 	virtual void device_add_mconfig(machine_config &config) override;
 	virtual void device_start() override;
@@ -359,6 +377,7 @@ public:
 	ioport_value in3_analog_read();
 	DECLARE_WRITE8_MEMBER(analog_bank_w);
 
+	void multi32_analog_map(address_map &map);
 protected:
 	virtual void device_add_mconfig(machine_config &config) override;
 	virtual void device_start() override;

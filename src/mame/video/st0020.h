@@ -11,9 +11,9 @@ class st0020_device : public device_t, public device_gfx_interface
 public:
 	st0020_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
-	// static configuration
-	static void static_set_is_st0032(device_t &device, int is_st0032);
-	static void static_set_is_jclub2(device_t &device, int is_jclub2);
+	// configuration
+	void set_is_st0032(int is_st0032) { m_is_st0032 = is_st0032; }
+	void set_is_jclub2(int is_jclub2) { m_is_jclub2 = is_jclub2; }
 
 	void update_screen(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect, bool update_visible_area);
 
@@ -76,5 +76,11 @@ DECLARE_DEVICE_TYPE(ST0020_SPRITES, st0020_device)
 
 #define MCFG_ST0020_SPRITES_PALETTE(_palette_tag) \
 	MCFG_GFX_PALETTE(_palette_tag)
+
+#define MCFG_ST0020_IS_ST0032(_st0032) \
+	downcast<st0020_device &>(*device).set_is_st0032(_st0032);
+
+#define MCFG_ST0020_IS_JCLUB2(_jclub2) \
+	downcast<st0020_device &>(*device).set_is_jclub2(_jclub2);
 
 #endif // MAME_VIDEO_ST0020_H

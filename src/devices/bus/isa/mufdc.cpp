@@ -44,7 +44,7 @@ SLOT_INTERFACE_END
 //  device_add_mconfig - add device configuration
 //-------------------------------------------------
 
-MACHINE_CONFIG_MEMBER( mufdc_device::device_add_mconfig )
+MACHINE_CONFIG_START(mufdc_device::device_add_mconfig)
 	MCFG_MCS3201_ADD("fdc")
 	MCFG_MCS3201_INPUT_HANDLER(READ8(mufdc_device, fdc_input_r))
 	MCFG_UPD765_INTRQ_CALLBACK(WRITELINE(mufdc_device, fdc_irq_w))

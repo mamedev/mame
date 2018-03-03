@@ -206,7 +206,7 @@ WRITE_LINE_MEMBER(thepit_state::nmi_mask_w)
 }
 
 
-static ADDRESS_MAP_START( thepit_main_map, AS_PROGRAM, 8, thepit_state )
+ADDRESS_MAP_START(thepit_state::thepit_main_map)
 	AM_RANGE(0x0000, 0x4fff) AM_ROM
 	AM_RANGE(0x8000, 0x87ff) AM_RAM
 	AM_RANGE(0x8800, 0x8bff) AM_MIRROR(0x0400) AM_RAM_WRITE(colorram_w) AM_SHARE("colorram")
@@ -221,7 +221,7 @@ static ADDRESS_MAP_START( thepit_main_map, AS_PROGRAM, 8, thepit_state )
 	AM_RANGE(0xb800, 0xb800) AM_DEVREAD("watchdog", watchdog_timer_device, reset_r) AM_DEVWRITE("soundlatch", generic_latch_8_device, write)
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( desertdan_main_map, AS_PROGRAM, 8, thepit_state )
+ADDRESS_MAP_START(thepit_state::desertdan_main_map)
 	AM_RANGE(0x0000, 0x7fff) AM_ROM
 	AM_RANGE(0x8000, 0x87ff) AM_RAM
 	AM_RANGE(0x8800, 0x8bff) AM_MIRROR(0x0400) AM_RAM_WRITE(colorram_w) AM_SHARE("colorram")
@@ -236,7 +236,7 @@ static ADDRESS_MAP_START( desertdan_main_map, AS_PROGRAM, 8, thepit_state )
 	AM_RANGE(0xb800, 0xb800) AM_DEVREAD("watchdog", watchdog_timer_device, reset_r) AM_DEVWRITE("soundlatch", generic_latch_8_device, write)
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( intrepid_main_map, AS_PROGRAM, 8, thepit_state )
+ADDRESS_MAP_START(thepit_state::intrepid_main_map)
 	AM_RANGE(0x0000, 0x7fff) AM_ROM
 	AM_RANGE(0x8000, 0x87ff) AM_RAM
 	AM_RANGE(0x8c00, 0x8fff) AM_READ(intrepid_colorram_mirror_r) AM_WRITE(colorram_w) /* mirror for intrepi2 */
@@ -253,13 +253,13 @@ static ADDRESS_MAP_START( intrepid_main_map, AS_PROGRAM, 8, thepit_state )
 ADDRESS_MAP_END
 
 
-static ADDRESS_MAP_START( audio_map, AS_PROGRAM, 8, thepit_state )
+ADDRESS_MAP_START(thepit_state::audio_map)
 	AM_RANGE(0x0000, 0x1fff) AM_ROM
 	AM_RANGE(0x3800, 0x3bff) AM_RAM
 ADDRESS_MAP_END
 
 
-static ADDRESS_MAP_START( audio_io_map, AS_IO, 8, thepit_state )
+ADDRESS_MAP_START(thepit_state::audio_io_map)
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	AM_RANGE(0x00, 0x00) AM_DEVWRITE("soundlatch", generic_latch_8_device, clear_w)
 	AM_RANGE(0x8c, 0x8d) AM_DEVWRITE("ay2", ay8910_device, address_data_w)
@@ -475,6 +475,16 @@ static INPUT_PORTS_START( intrepid )
 	/* Since the real inputs are multiplexed, we used this fake port
 	   to read the 2nd player controls when the screen is flipped */
 	PORT_INCLUDE(in2_fake)
+INPUT_PORTS_END
+
+
+static INPUT_PORTS_START( intrepidb )
+	PORT_INCLUDE(intrepid)
+
+	PORT_MODIFY("DSW")
+	PORT_DIPNAME( 0x20, 0x00, DEF_STR( Lives ) )        PORT_DIPLOCATION("SW1:!6")
+	PORT_DIPSETTING(    0x20, "2" )
+	PORT_DIPSETTING(    0x00, "3" )
 INPUT_PORTS_END
 
 
@@ -701,7 +711,7 @@ INTERRUPT_GEN_MEMBER(thepit_state::vblank_irq)
 		device.execute().set_input_line(INPUT_LINE_NMI, ASSERT_LINE);
 }
 
-static MACHINE_CONFIG_START( thepit )
+MACHINE_CONFIG_START(thepit_state::thepit)
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", Z80, PIXEL_CLOCK/2)     /* 3.072 MHz */
@@ -745,12 +755,14 @@ static MACHINE_CONFIG_START( thepit )
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_DERIVED( fitter, thepit )
+MACHINE_CONFIG_START(thepit_state::fitter)
+	thepit(config);
 	MCFG_DEVICE_MODIFY("mainlatch") // IC42
 	MCFG_ADDRESSABLE_LATCH_Q2_OUT_CB(WRITELINE(thepit_state, coin_lockout_w))
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_DERIVED( desertdn, fitter )
+MACHINE_CONFIG_START(thepit_state::desertdn)
+	fitter(config);
 
 	/* basic machine hardware */
 	MCFG_CPU_MODIFY("maincpu")
@@ -763,7 +775,8 @@ static MACHINE_CONFIG_DERIVED( desertdn, fitter )
 	MCFG_GFXDECODE_MODIFY("gfxdecode", intrepid)
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_DERIVED( intrepid, fitter )
+MACHINE_CONFIG_START(thepit_state::intrepid)
+	fitter(config);
 
 	/* basic machine hardware */
 	MCFG_CPU_MODIFY("maincpu")
@@ -777,7 +790,8 @@ static MACHINE_CONFIG_DERIVED( intrepid, fitter )
 MACHINE_CONFIG_END
 
 
-static MACHINE_CONFIG_DERIVED( suprmous, intrepid )
+MACHINE_CONFIG_START(thepit_state::suprmous)
+	intrepid(config);
 
 	/* basic machine hardware */
 
@@ -1318,9 +1332,9 @@ GAME( 1982, desertdn,   0,        desertdn, desertdn, thepit_state, 0,     ROT0,
 
 GAME( 1983, intrepid,   0,        intrepid, intrepid, thepit_state, 0,     ROT90, "Nova Games Ltd.",                             "Intrepid (set 1)", MACHINE_SUPPORTS_SAVE )
 GAME( 1983, intrepid2,  intrepid, intrepid, intrepid, thepit_state, 0,     ROT90, "Nova Games Ltd.",                             "Intrepid (set 2)", MACHINE_SUPPORTS_SAVE )
-GAME( 1984, intrepidb,  intrepid, intrepid, intrepid, thepit_state, 0,     ROT90, "bootleg (Elsys)",                             "Intrepid (Elsys bootleg, set 1)", MACHINE_SUPPORTS_SAVE )
-GAME( 1984, intrepidb3, intrepid, intrepid, intrepid, thepit_state, 0,     ROT90, "bootleg (Elsys)",                             "Intrepid (Elsys bootleg, set 2)", MACHINE_SUPPORTS_SAVE )
-GAME( 1984, intrepidb2, intrepid, intrepid, intrepid, thepit_state, 0,     ROT90, "bootleg (Loris)",                             "Intrepid (Loris bootleg)", MACHINE_SUPPORTS_SAVE )
+GAME( 1984, intrepidb,  intrepid, intrepid, intrepidb,thepit_state, 0,     ROT90, "bootleg (Elsys)",                             "Intrepid (Elsys bootleg, set 1)", MACHINE_SUPPORTS_SAVE )
+GAME( 1984, intrepidb3, intrepid, intrepid, intrepidb,thepit_state, 0,     ROT90, "bootleg (Elsys)",                             "Intrepid (Elsys bootleg, set 2)", MACHINE_SUPPORTS_SAVE )
+GAME( 1984, intrepidb2, intrepid, intrepid, intrepidb,thepit_state, 0,     ROT90, "bootleg (Loris)",                             "Intrepid (Loris bootleg)", MACHINE_SUPPORTS_SAVE )
 
 GAME( 1984, zaryavos,   0,        intrepid, intrepid, thepit_state, 0,     ROT90, "Nova Games of Canada",                        "Zarya Vostoka", MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE )
 

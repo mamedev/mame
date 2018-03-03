@@ -6,8 +6,8 @@
  *
  ****************************************************************************/
 
-#ifndef PMD85_H_
-#define PMD85_H_
+#ifndef MAME_INCLUDES_PMD85_H
+#define MAME_INCLUDES_PMD85_H
 
 #include "machine/i8251.h"
 #include "machine/pit8253.h"
@@ -108,6 +108,21 @@ public:
 	DECLARE_WRITE8_MEMBER(pmd85_ppi_3_portc_w);
 	DECLARE_INPUT_CHANGED_MEMBER(pmd85_reset);
 
+	void pmd85(machine_config &config);
+	void pmd851(machine_config &config);
+	void pmd853(machine_config &config);
+	void pmd852a(machine_config &config);
+	void alfa(machine_config &config);
+	void c2717(machine_config &config);
+	void mato(machine_config &config);
+	void alfa_mem(address_map &map);
+	void c2717_mem(address_map &map);
+	void mato_io_map(address_map &map);
+	void mato_mem(address_map &map);
+	void pmd852a_mem(address_map &map);
+	void pmd853_mem(address_map &map);
+	void pmd85_io_map(address_map &map);
+	void pmd85_mem(address_map &map);
 protected:
 	required_device<cpu_device> m_maincpu;
 	required_device<ram_device> m_ram;
@@ -152,4 +167,4 @@ protected:
 };
 
 
-#endif /* PMD85_H_ */
+#endif // MAME_INCLUDES_PMD85_H

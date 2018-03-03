@@ -347,7 +347,7 @@ WRITE8_MEMBER(galpani2_state::galpani2_oki2_bank_w)
 }
 
 
-static ADDRESS_MAP_START( galpani2_mem1, AS_PROGRAM, 16, galpani2_state )
+ADDRESS_MAP_START(galpani2_state::galpani2_mem1)
 	AM_RANGE(0x000000, 0x0fffff) AM_ROM                                             // ROM
 	AM_RANGE(0x100000, 0x10ffff) AM_RAM AM_SHARE("ram")     // Work RAM
 	AM_RANGE(0x110000, 0x11000f) AM_RAM                                             // ? corrupted? stack dumper on POST failure, pc+sr on gp2se
@@ -356,11 +356,11 @@ static ADDRESS_MAP_START( galpani2_mem1, AS_PROGRAM, 16, galpani2_state )
 	AM_RANGE(0x304000, 0x30401f) AM_DEVREADWRITE("kan_spr", kaneko16_sprite_device, kaneko16_sprites_regs_r, kaneko16_sprites_regs_w)
 //  AM_RANGE(0x308000, 0x308001) AM_WRITENOP                                        // ? 0 at startup
 //  AM_RANGE(0x30c000, 0x30c001) AM_WRITENOP                                        // ? hblank effect ?
-	AM_RANGE(0x310000, 0x3101ff) AM_RAM_DEVWRITE("bg8palette", palette_device, write) AM_SHARE("bg8palette")    // ?
+	AM_RANGE(0x310000, 0x3101ff) AM_RAM_DEVWRITE("bg8palette", palette_device, write16) AM_SHARE("bg8palette")    // ?
 	AM_RANGE(0x314000, 0x314001) AM_WRITENOP                                        // ? flip backgrounds ?
 	AM_RANGE(0x318000, 0x318001) AM_READWRITE(galpani2_eeprom_r, galpani2_eeprom_w) // EEPROM
 	AM_RANGE(0x380000, 0x387fff) AM_RAM                                             // Palette?
-	AM_RANGE(0x388000, 0x38ffff) AM_RAM_DEVWRITE("palette", palette_device, write) AM_SHARE("palette")   // Palette
+	AM_RANGE(0x388000, 0x38ffff) AM_RAM_DEVWRITE("palette", palette_device, write16) AM_SHARE("palette")   // Palette
 //  AM_RANGE(0x390000, 0x3901ff) AM_WRITENOP                                        // ? at startup of service mode
 
 	AM_RANGE(0x400000, 0x43ffff) AM_RAM AM_SHARE("bg8.0")    // Background 0
@@ -415,7 +415,7 @@ WRITE16_MEMBER(galpani2_state::subdatabank_select_w)
 }
 
 
-static ADDRESS_MAP_START( galpani2_mem2, AS_PROGRAM, 16, galpani2_state )
+ADDRESS_MAP_START(galpani2_state::galpani2_mem2)
 	AM_RANGE(0x000000, 0x03ffff) AM_ROM                                                             // ROM
 	AM_RANGE(0x100000, 0x13ffff) AM_RAM AM_SHARE("ram2")                                        // Work RAM
 	AM_RANGE(0x400000, 0x5fffff) AM_RAM AM_SHARE("bg15")  // bg15
@@ -619,15 +619,15 @@ TIMER_DEVICE_CALLBACK_MEMBER(galpani2_state::galpani2_interrupt2)
 		m_subcpu->set_input_line(3, HOLD_LINE);
 }
 
-static MACHINE_CONFIG_START( galpani2 )
+MACHINE_CONFIG_START(galpani2_state::galpani2)
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", M68000, XTAL_27MHz/2)       /* Confirmed on galpani2i PCB */
+	MCFG_CPU_ADD("maincpu", M68000, XTAL(27'000'000)/2)       /* Confirmed on galpani2i PCB */
 	MCFG_CPU_PROGRAM_MAP(galpani2_mem1)
 	MCFG_TIMER_DRIVER_ADD_SCANLINE("m_scantimer", galpani2_state, galpani2_interrupt1, "screen", 0, 1)
 	//MCFG_QUANTUM_PERFECT_CPU("maincpu")
 
-	MCFG_CPU_ADD("sub", M68000, XTAL_27MHz/2)           /* Confirmed on galpani2i PCB */
+	MCFG_CPU_ADD("sub", M68000, XTAL(27'000'000)/2)           /* Confirmed on galpani2i PCB */
 	MCFG_CPU_PROGRAM_MAP(galpani2_mem2)
 	MCFG_TIMER_DRIVER_ADD_SCANLINE("s_scantimer", galpani2_state, galpani2_interrupt2, "screen", 0, 1)
 
@@ -653,17 +653,17 @@ static MACHINE_CONFIG_START( galpani2 )
 	MCFG_PALETTE_INIT_OWNER(galpani2_state,galpani2)
 
 	MCFG_DEVICE_ADD_KC002_SPRITES
-	kaneko16_sprite_device::set_offsets(*device, 0x10000 - 0x16c0 + 0xc00, 0);
+	MCFG_KANEKO16_SPRITE_OFFSETS(0x10000 - 0x16c0 + 0xc00, 0)
 	MCFG_KANEKO16_SPRITE_GFXDECODE("gfxdecode")
 
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
 
-	MCFG_OKIM6295_ADD("oki1", XTAL_20MHz/10, PIN7_HIGH)    /* Confirmed on galpani2i PCB */
+	MCFG_OKIM6295_ADD("oki1", XTAL(20'000'000)/10, PIN7_HIGH)    /* Confirmed on galpani2i PCB */
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "lspeaker", 1.0)
 
-	MCFG_OKIM6295_ADD("oki2", XTAL_20MHz/10, PIN7_HIGH)    /* Confirmed on galpani2i PCB */
+	MCFG_OKIM6295_ADD("oki2", XTAL(20'000'000)/10, PIN7_HIGH)    /* Confirmed on galpani2i PCB */
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", 1.0)
 MACHINE_CONFIG_END
 

@@ -21,7 +21,7 @@ public:
 	// construction/destruction
 	ygv608_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
-	DECLARE_ADDRESS_MAP(port_map, 8);
+	void port_map(address_map &map);
 
 	// ports section
 	DECLARE_READ8_MEMBER(pattern_name_table_r);
@@ -88,15 +88,16 @@ public:
 	uint32_t update_screen(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 
 
-	template <class Object> static devcb_base &static_set_vblank_callback(device_t &device, Object &&cb)
+	template <class Object> devcb_base &set_vblank_callback(Object &&cb)
 	{
-		return downcast<ygv608_device &>(device).m_vblank_handler.set_callback(std::forward<Object>(cb));
+		return m_vblank_handler.set_callback(std::forward<Object>(cb));
 	}
-	template <class Object> static devcb_base &static_set_raster_callback(device_t &device, Object &&cb)
+	template <class Object> devcb_base &set_raster_callback(Object &&cb)
 	{
-		return downcast<ygv608_device &>(device).m_raster_handler.set_callback(std::forward<Object>(cb));
+		return m_raster_handler.set_callback(std::forward<Object>(cb));
 	}
 
+	void regs_map(address_map &map);
 protected:
 	// device-level overrides
 	virtual void device_start() override;
@@ -127,6 +128,7 @@ private:
 	void register_state_save();
 	void draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprect);
 	void draw_layer_roz(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect, tilemap_t *source_tilemap);
+	void ygv608_draw_mosaic(bitmap_ind16 &bitmap, const rectangle &cliprect, int n);
 
 	uint8_t m_namcond1_gfxbank;
 
@@ -175,8 +177,9 @@ private:
 	uint8_t m_tilemap_resize; // tilemap requires resize
 
 	/* These were statically allocated in the r/w routines */
-	int p0_state_r,m_color_state_r;
-	int p0_state_w,m_color_state_w;
+	int m_color_state_r;
+	int m_color_state_w;
+	int p0_state;
 	int pattern_name_base_r,pattern_name_base_w;     /* pattern name table base address */
 
 	// === new variable handling starts here ===
@@ -318,10 +321,10 @@ DECLARE_DEVICE_TYPE(YGV608, ygv608_device)
 	MCFG_GFX_PALETTE(_palette_tag)
 
 #define MCFG_YGV608_VBLANK_HANDLER( _intcallb ) \
-	devcb = &ygv608_device::static_set_vblank_callback( *device, DEVCB_##_intcallb );
+	devcb = &downcast<ygv608_device &>(*device).set_vblank_callback(DEVCB_##_intcallb);
 
 #define MCFG_YGV608_RASTER_HANDLER( _intcallb ) \
-	devcb = &ygv608_device::static_set_raster_callback( *device, DEVCB_##_intcallb );
+	devcb = &downcast<ygv608_device &>(*device).set_raster_callback(DEVCB_##_intcallb);
 
 
 #endif

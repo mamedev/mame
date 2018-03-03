@@ -59,6 +59,8 @@ public:
 		, m_maincpu(*this, "maincpu")
 	{ }
 
+	void ax80(machine_config &config);
+	void ax80_map(address_map &map);
 private:
 	virtual void machine_reset() override;
 	required_device<upd7810_device> m_maincpu;
@@ -68,7 +70,7 @@ void ax80_state::machine_reset()
 {
 }
 
-static ADDRESS_MAP_START( ax80_map, AS_PROGRAM, 8, ax80_state )
+ADDRESS_MAP_START(ax80_state::ax80_map)
 	AM_RANGE(0x0000, 0x0fff) AM_ROM AM_REGION("maincpu", 0) // internal ROM
 	AM_RANGE(0x1000, 0x1003) AM_MIRROR(0x000c) AM_DEVREADWRITE(PIT0_TAG, pit8253_device, read, write) // IC20
 	AM_RANGE(0x1010, 0x1013) AM_MIRROR(0x000c) AM_DEVREADWRITE(PIT1_TAG, pit8253_device, read, write) // IC21
@@ -87,8 +89,8 @@ static ADDRESS_MAP_START( ax80_map, AS_PROGRAM, 8, ax80_state )
 	AM_RANGE(0xc000, 0xc7ff) AM_MIRROR(0x3800) AM_RAM
 ADDRESS_MAP_END
 
-static MACHINE_CONFIG_START( ax80 )
-	MCFG_CPU_ADD("maincpu", UPD7810, XTAL_12MHz)
+MACHINE_CONFIG_START(ax80_state::ax80)
+	MCFG_CPU_ADD("maincpu", UPD7810, XTAL(12'000'000))
 	MCFG_CPU_PROGRAM_MAP(ax80_map)
 	//MCFG_CPU_IO_MAP(ax80_io)
 

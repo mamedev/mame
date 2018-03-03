@@ -9,7 +9,7 @@ Skeleton driver for AT&T 630 MTG terminal.
 #include "emu.h"
 #include "cpu/m68000/m68000.h"
 #include "machine/mc68681.h"
-
+#include "screen.h"
 
 class att630_state : public driver_device
 {
@@ -19,11 +19,20 @@ public:
 		, m_maincpu(*this, "maincpu")
 	{ }
 
+	u32 screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
+
+	void att630(machine_config &config);
+	void mem_map(address_map &map);
 private:
 	required_device<cpu_device> m_maincpu;
 };
 
-static ADDRESS_MAP_START( mem_map, AS_PROGRAM, 16, att630_state )
+u32 att630_state::screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
+{
+	return 0;
+}
+
+ADDRESS_MAP_START(att630_state::mem_map)
 	AM_RANGE(0x000000, 0x03ffff) AM_ROM AM_REGION("maincpu", 0)
 	AM_RANGE(0x200000, 0x20001f) AM_DEVREADWRITE8("duart1", scn2681_device, read, write, 0x00ff)
 	AM_RANGE(0x200020, 0x20003f) AM_DEVREADWRITE8("duart2", scn2681_device, read, write, 0x00ff)
@@ -36,13 +45,17 @@ ADDRESS_MAP_END
 static INPUT_PORTS_START( att630 )
 INPUT_PORTS_END
 
-static MACHINE_CONFIG_START( att630 )
-	MCFG_CPU_ADD("maincpu", M68000, XTAL_40MHz / 4) // clock not confirmed
+MACHINE_CONFIG_START(att630_state::att630)
+	MCFG_CPU_ADD("maincpu", M68000, XTAL(40'000'000) / 4) // clock not confirmed
 	MCFG_CPU_PROGRAM_MAP(mem_map)
 
-	MCFG_DEVICE_ADD("duart1", SCN2681, XTAL_3_6864MHz)
+	MCFG_SCREEN_ADD("screen", RASTER)
+	MCFG_SCREEN_RAW_PARAMS(XTAL(87'183'360), 1376, 0, 1024, 1056, 0, 1024)
+	MCFG_SCREEN_UPDATE_DRIVER(att630_state, screen_update)
 
-	MCFG_DEVICE_ADD("duart2", SCN2681, XTAL_3_6864MHz)
+	MCFG_DEVICE_ADD("duart1", SCN2681, XTAL(3'686'400))
+
+	MCFG_DEVICE_ADD("duart2", SCN2681, XTAL(3'686'400))
 MACHINE_CONFIG_END
 
 

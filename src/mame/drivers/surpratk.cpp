@@ -29,7 +29,7 @@ INTERRUPT_GEN_MEMBER(surpratk_state::surpratk_interrupt)
 WRITE8_MEMBER(surpratk_state::surpratk_videobank_w)
 {
 	if (data & 0xf8)
-		logerror("%04x: videobank = %02x\n",space.device().safe_pc(),data);
+		logerror("%04x: videobank = %02x\n",m_maincpu->pc(),data);
 
 	/* bit 0 = select 053245 at 0000-07ff */
 	/* bit 1 = select palette at 0000-07ff */
@@ -43,7 +43,7 @@ WRITE8_MEMBER(surpratk_state::surpratk_videobank_w)
 WRITE8_MEMBER(surpratk_state::surpratk_5fc0_w)
 {
 	if ((data & 0xf4) != 0x10)
-		logerror("%04x: 3fc0 = %02x\n",space.device().safe_pc(),data);
+		logerror("%04x: 3fc0 = %02x\n",m_maincpu->pc(),data);
 
 	/* bit 0/1 = coin counters */
 	machine().bookkeeping().coin_counter_w(0, data & 0x01);
@@ -58,10 +58,11 @@ WRITE8_MEMBER(surpratk_state::surpratk_5fc0_w)
 
 /********************************************/
 
-static ADDRESS_MAP_START( surpratk_map, AS_PROGRAM, 8, surpratk_state )
+ADDRESS_MAP_START(surpratk_state::surpratk_map)
 	AM_RANGE(0x0000, 0x07ff) AM_DEVICE("bank0000", address_map_bank_device, amap8)
 	AM_RANGE(0x0800, 0x1fff) AM_RAM
 	AM_RANGE(0x2000, 0x3fff) AM_ROMBANK("bank1")                    /* banked ROM */
+	AM_RANGE(0x4000, 0x7fff) AM_DEVREADWRITE("k052109", k052109_device, read, write)
 	AM_RANGE(0x5f8c, 0x5f8c) AM_READ_PORT("P1")
 	AM_RANGE(0x5f8d, 0x5f8d) AM_READ_PORT("P2")
 	AM_RANGE(0x5f8e, 0x5f8e) AM_READ_PORT("DSW3")
@@ -72,14 +73,13 @@ static ADDRESS_MAP_START( surpratk_map, AS_PROGRAM, 8, surpratk_state )
 	AM_RANGE(0x5fc0, 0x5fc0) AM_DEVREAD("watchdog", watchdog_timer_device, reset_r) AM_WRITE(surpratk_5fc0_w)
 	AM_RANGE(0x5fd0, 0x5fd1) AM_DEVWRITE("ymsnd", ym2151_device, write)
 	AM_RANGE(0x5fc4, 0x5fc4) AM_WRITE(surpratk_videobank_w)
-	AM_RANGE(0x4000, 0x7fff) AM_DEVREADWRITE("k052109", k052109_device, read, write)
 	AM_RANGE(0x8000, 0xffff) AM_ROM AM_REGION("maincpu", 0x38000)
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( bank0000_map, AS_PROGRAM, 8, surpratk_state )
+ADDRESS_MAP_START(surpratk_state::bank0000_map)
 	AM_RANGE(0x0000, 0x07ff) AM_RAM
 	AM_RANGE(0x0800, 0x0fff) AM_DEVREADWRITE("k053244", k05324x_device, k053245_r, k053245_w)
-	AM_RANGE(0x1000, 0x1fff) AM_RAM_DEVWRITE("palette", palette_device, write) AM_SHARE("palette")
+	AM_RANGE(0x1000, 0x1fff) AM_RAM_DEVWRITE("palette", palette_device, write8) AM_SHARE("palette")
 ADDRESS_MAP_END
 
 
@@ -166,10 +166,10 @@ WRITE8_MEMBER( surpratk_state::banking_callback )
 	membank("bank1")->set_entry(data & 0x1f);
 }
 
-static MACHINE_CONFIG_START( surpratk )
+MACHINE_CONFIG_START(surpratk_state::surpratk)
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", KONAMI, XTAL_24MHz/2/4) /* 053248, the clock input is 12MHz, and internal CPU divider of 4 */
+	MCFG_CPU_ADD("maincpu", KONAMI, XTAL(24'000'000)/2/4) /* 053248, the clock input is 12MHz, and internal CPU divider of 4 */
 	MCFG_CPU_PROGRAM_MAP(surpratk_map)
 	MCFG_CPU_VBLANK_INT_DRIVER("screen", surpratk_state,  surpratk_interrupt)
 	MCFG_KONAMICPU_LINE_CB(WRITE8(surpratk_state, banking_callback))
@@ -188,7 +188,7 @@ static MACHINE_CONFIG_START( surpratk )
 	MCFG_SCREEN_REFRESH_RATE(60)
 	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
 	MCFG_SCREEN_SIZE(64*8, 32*8)
-	MCFG_SCREEN_VISIBLE_AREA(14*8, (64-14)*8-1, 2*8, 30*8-1 )
+	MCFG_SCREEN_VISIBLE_AREA(12*8, (64-12)*8-1, 2*8, 30*8-1 )
 	MCFG_SCREEN_UPDATE_DRIVER(surpratk_state, screen_update_surpratk)
 	MCFG_SCREEN_PALETTE("palette")
 
@@ -210,7 +210,7 @@ static MACHINE_CONFIG_START( surpratk )
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
 
-	MCFG_YM2151_ADD("ymsnd", XTAL_3_579545MHz)
+	MCFG_YM2151_ADD("ymsnd", XTAL(3'579'545))
 	MCFG_YM2151_IRQ_HANDLER(INPUTLINE("maincpu", KONAMI_FIRQ_LINE))
 	MCFG_SOUND_ROUTE(0, "lspeaker", 1.0)
 	MCFG_SOUND_ROUTE(1, "rspeaker", 1.0)

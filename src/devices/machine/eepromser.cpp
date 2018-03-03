@@ -178,40 +178,6 @@ eeprom_serial_base_device::eeprom_serial_base_device(const machine_config &mconf
 
 
 //-------------------------------------------------
-//  static_set_address_bits - configuration helper
-//  to set the number of address bits in the
-//  serial commands
-//-------------------------------------------------
-
-void eeprom_serial_base_device::static_set_address_bits(device_t &device, int addrbits)
-{
-	downcast<eeprom_serial_base_device &>(device).m_command_address_bits = addrbits;
-}
-
-
-//-------------------------------------------------
-//  static_enable_streaming - configuration helper
-//  to enable streaming data
-//-------------------------------------------------
-
-void eeprom_serial_base_device::static_enable_streaming(device_t &device)
-{
-	downcast<eeprom_serial_base_device &>(device).m_streaming_enabled = true;
-}
-
-
-//-----------------------------------------------------------------
-//  static_enable_output_on_falling_clock - configuration helper
-//  to enable updating the output on the falling edge of the clock
-//-----------------------------------------------------------------
-
-void eeprom_serial_base_device::static_enable_output_on_falling_clock(device_t &device)
-{
-	downcast<eeprom_serial_base_device &>(device).m_output_on_falling_clock_enabled = true;
-}
-
-
-//-------------------------------------------------
 //  device_start - device-specific startup
 //-------------------------------------------------
 
@@ -1007,9 +973,9 @@ void eeprom_serial_x24c44_device::handle_event(eeprom_event event)
 				if (bit_index % m_data_bits == 0 && (bit_index == 0 || m_streaming_enabled)){
 					m_shift_register=m_ram_data[m_address];
 
-					//m_shift_register=BITSWAP16(m_shift_register,0,1,2,3,4,5,6,7,8,9,10,11,12,13,14,15);
-					//m_shift_register=BITSWAP16(m_shift_register,7,6,5,4,3,2,1,0,15,14,13,12,11,10,9,8);
-					m_shift_register= BITSWAP16(m_shift_register,8,9,10,11,12,13,14,15,0,1,2,3,4,5,6,7);
+					//m_shift_register=bitswap<16>(m_shift_register,0,1,2,3,4,5,6,7,8,9,10,11,12,13,14,15);
+					//m_shift_register=bitswap<16>(m_shift_register,7,6,5,4,3,2,1,0,15,14,13,12,11,10,9,8);
+					m_shift_register= bitswap<16>(m_shift_register,8,9,10,11,12,13,14,15,0,1,2,3,4,5,6,7);
 
 					m_shift_register=m_shift_register<<16;
 
@@ -1046,9 +1012,9 @@ void eeprom_serial_x24c44_device::handle_event(eeprom_event event)
 				m_shift_register = (m_shift_register << 1) | m_di_state;
 				if (++m_bits_accum == m_data_bits)
 				{
-					//m_shift_register=BITSWAP16(m_shift_register, 0, 1, 2, 3, 4, 5,6,7, 8, 9,10,11,12,13,14,15);
-					//m_shift_register=BITSWAP16(m_shift_register, 7, 6, 5, 4, 3, 2,1,0,15,14,13,12,11,10, 9, 8);
-					m_shift_register=BITSWAP16(m_shift_register,8,9,10,11,12,13,14,15,0,1,2,3,4,5,6,7);
+					//m_shift_register=bitswap<16>(m_shift_register, 0, 1, 2, 3, 4, 5,6,7, 8, 9,10,11,12,13,14,15);
+					//m_shift_register=bitswap<16>(m_shift_register, 7, 6, 5, 4, 3, 2,1,0,15,14,13,12,11,10, 9, 8);
+					m_shift_register=bitswap<16>(m_shift_register,8,9,10,11,12,13,14,15,0,1,2,3,4,5,6,7);
 					m_ram_data[m_address]=m_shift_register;
 
 					LOG1("write to RAM addr=%02X data=%04X\n",m_address,m_shift_register);
@@ -1160,8 +1126,8 @@ WRITE_LINE_MEMBER(eeprom_serial_x24c44_device::di_write) { base_di_write(state);
 eeprom_serial_##_lowercase##_##_bits##bit_device::eeprom_serial_##_lowercase##_##_bits##bit_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) \
 	: eeprom_serial_##_baseclass##_device(mconfig, EEPROM_SERIAL_##_uppercase##_##_bits##BIT, tag, owner) \
 { \
-	static_set_size(*this, _cells, _bits); \
-	static_set_address_bits(*this, _addrbits); \
+	set_size(_cells, _bits); \
+	set_address_bits(_addrbits); \
 } \
 DEFINE_DEVICE_TYPE(EEPROM_SERIAL_##_uppercase##_##_bits##BIT, eeprom_serial_##_lowercase##_##_bits##bit_device, #_lowercase "_" #_bits, "Serial EEPROM " #_uppercase " (" #_cells "x" #_bits ")")
 

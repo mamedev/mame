@@ -339,7 +339,7 @@ private:
 	void out_AM_DirectAddress(unsigned addr, int opsize, std::ostream &stream);
 	void out_AM_DirectAddressIndexed(unsigned addr, int rx, int opsize, std::ostream &stream);
 	void out_AM_DirectAddressDeferred(unsigned addr, int opsize, std::ostream &stream);
-	void out_AM_DirectAddressDeferredIndexed(unsigned addr, int rx, int opsize, std::ostream &stream);	
+	void out_AM_DirectAddressDeferredIndexed(unsigned addr, int rx, int opsize, std::ostream &stream);
 	void out_AM_Immediate(unsigned value, int opsize, std::ostream &stream);
 	u32 decode_AM(unsigned ipc, offs_t pc, int m, int opsize, const data_buffer &opcodes, std::ostream &stream);
 	u32 decode_F1(const char *opnm, int opsize1, int opsize2, unsigned ipc, offs_t pc, const data_buffer &opcodes, std::ostream &stream);

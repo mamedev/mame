@@ -78,6 +78,13 @@ public:
 	void request_world_data(  );
 	void request_goalin_data(  );
 	void rbisland_cchip_init( int version );
+	void jumping(machine_config &config);
+	void rbisland(machine_config &config);
+	void jumpingi(machine_config &config);
+	void jumping_map(address_map &map);
+	void jumping_sound_map(address_map &map);
+	void rbisland_map(address_map &map);
+	void rbisland_sound_map(address_map &map);
 };
 
 

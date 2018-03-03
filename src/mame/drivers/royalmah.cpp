@@ -220,6 +220,63 @@ public:
 
 	INTERRUPT_GEN_MEMBER(suzume_irq);
 
+	void mjdiplob(machine_config &config);
+	void tahjong(machine_config &config);
+	void tontonb(machine_config &config);
+	void mjderngr(machine_config &config);
+	void mjyarou(machine_config &config);
+	void janoh(machine_config &config);
+	void mjtensin(machine_config &config);
+	void mjvegasa(machine_config &config);
+	void jansou(machine_config &config);
+	void cafetime(machine_config &config);
+	void seljan(machine_config &config);
+	void majs101b(machine_config &config);
+	void dondenmj(machine_config &config);
+	void daisyari(machine_config &config);
+	void mjdejavu(machine_config &config);
+	void mjapinky(machine_config &config);
+	void royalmah(machine_config &config);
+	void mjifb(machine_config &config);
+	void janptr96(machine_config &config);
+	void ippatsu(machine_config &config);
+	void suzume(machine_config &config);
+	void mjclub(machine_config &config);
+	void makaijan(machine_config &config);
+	void janyoup2(machine_config &config);
+	void cafetime_map(address_map &map);
+	void daisyari_iomap(address_map &map);
+	void dondenmj_iomap(address_map &map);
+	void ippatsu_iomap(address_map &map);
+	void janoh_map(address_map &map);
+	void janoh_sub_iomap(address_map &map);
+	void janoh_sub_map(address_map &map);
+	void janptr96_iomap(address_map &map);
+	void janptr96_map(address_map &map);
+	void jansou_map(address_map &map);
+	void jansou_sub_iomap(address_map &map);
+	void jansou_sub_map(address_map &map);
+	void janyoup2_iomap(address_map &map);
+	void majs101b_iomap(address_map &map);
+	void makaijan_iomap(address_map &map);
+	void mjapinky_iomap(address_map &map);
+	void mjapinky_map(address_map &map);
+	void mjclub_iomap(address_map &map);
+	void mjdejavu_map(address_map &map);
+	void mjderngr_iomap(address_map &map);
+	void mjdiplob_iomap(address_map &map);
+	void mjifb_map(address_map &map);
+	void mjtensin_map(address_map &map);
+	void mjvegasa_map(address_map &map);
+	void mjyarou_iomap(address_map &map);
+	void royalmah_iomap(address_map &map);
+	void royalmah_map(address_map &map);
+	void seljan_iomap(address_map &map);
+	void seljan_map(address_map &map);
+	void suzume_iomap(address_map &map);
+	void tahjong_iomap(address_map &map);
+	void tahjong_map(address_map &map);
+	void tontonb_iomap(address_map &map);
 protected:
 	virtual void machine_start() override;
 
@@ -312,9 +369,9 @@ PALETTE_INIT_MEMBER(royalmah_state,mjderngr)
 		uint16_t data = (prom[i] << 8) | prom[i + 0x200];
 
 		/* the bits are in reverse order */
-		uint8_t r = BITSWAP8((data >>  0) & 0x1f,7,6,5,0,1,2,3,4 );
-		uint8_t g = BITSWAP8((data >>  5) & 0x1f,7,6,5,0,1,2,3,4 );
-		uint8_t b = BITSWAP8((data >> 10) & 0x1f,7,6,5,0,1,2,3,4 );
+		uint8_t r = bitswap<8>((data >>  0) & 0x1f,7,6,5,0,1,2,3,4 );
+		uint8_t g = bitswap<8>((data >>  5) & 0x1f,7,6,5,0,1,2,3,4 );
+		uint8_t b = bitswap<8>((data >> 10) & 0x1f,7,6,5,0,1,2,3,4 );
 
 		palette.set_pen_color(i, pal5bit(r), pal5bit(g), pal5bit(b));
 	}
@@ -449,7 +506,7 @@ WRITE8_MEMBER(royalmah_state::suzume_bank_w)
 {
 	m_suzume_bank = data;
 
-	logerror("%04x: bank %02x\n",space.device().safe_pc(),data);
+	logerror("%04x: bank %02x\n",m_maincpu->pc(),data);
 
 	/* bits 6, 4 and 3 used for something input related? */
 
@@ -480,7 +537,7 @@ READ8_MEMBER(royalmah_state::mjapinky_dsw_r)
 
 WRITE8_MEMBER(royalmah_state::tontonb_bank_w)
 {
-	logerror("%04x: bank %02x\n",space.device().safe_pc(),data);
+	logerror("%04x: bank %02x\n",m_maincpu->pc(),data);
 
 	if (data == 0) return;  // tontonb fix?
 
@@ -491,7 +548,7 @@ WRITE8_MEMBER(royalmah_state::tontonb_bank_w)
 /* bits 5 and 6 seem to affect which Dip Switch to read in 'majs101b' */
 WRITE8_MEMBER(royalmah_state::dynax_bank_w)
 {
-//logerror("%04x: bank %02x\n",space.device().safe_pc(),data);
+//logerror("%04x: bank %02x\n",m_maincpu->pc(),data);
 
 	m_dsw_select = data & 0x60;
 
@@ -549,23 +606,23 @@ WRITE8_MEMBER(royalmah_state::mjclub_bank_w)
 }
 
 
-static ADDRESS_MAP_START( royalmah_map, AS_PROGRAM, 8, royalmah_state )
+ADDRESS_MAP_START(royalmah_state::royalmah_map)
 	AM_RANGE( 0x0000, 0x6fff ) AM_ROM AM_WRITENOP
 	AM_RANGE( 0x7000, 0x7fff ) AM_RAM AM_SHARE("nvram")
 	AM_RANGE( 0x8000, 0xffff ) AM_ROMBANK( "mainbank" )    // banked ROMs not present in royalmah
 	AM_RANGE( 0x8000, 0xffff ) AM_WRITEONLY AM_SHARE("videoram")
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( mjapinky_map, AS_PROGRAM, 8, royalmah_state )
+ADDRESS_MAP_START(royalmah_state::mjapinky_map)
 	AM_RANGE( 0x0000, 0x6fff ) AM_ROM AM_WRITENOP
 	AM_RANGE( 0x7000, 0x77ff ) AM_RAM AM_SHARE("nvram")
 	AM_RANGE( 0x7800, 0x7fff ) AM_RAM
-	AM_RANGE( 0x8000, 0x8000 ) AM_READ(mjapinky_dsw_r )
 	AM_RANGE( 0x8000, 0xffff ) AM_ROMBANK( "mainbank" )
 	AM_RANGE( 0x8000, 0xffff ) AM_WRITEONLY AM_SHARE("videoram")
+	AM_RANGE( 0x8000, 0x8000 ) AM_READ(mjapinky_dsw_r )
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( tahjong_map, AS_PROGRAM, 8, royalmah_state )
+ADDRESS_MAP_START(royalmah_state::tahjong_map)
 	AM_RANGE( 0x0000, 0x3fff ) AM_ROM AM_WRITENOP
 	AM_RANGE( 0x4000, 0x6fff ) AM_ROMBANK("mainbank")
 	AM_RANGE( 0x7000, 0x7fff ) AM_RAM AM_SHARE("nvram")
@@ -575,7 +632,7 @@ ADDRESS_MAP_END
 
 
 
-static ADDRESS_MAP_START( royalmah_iomap, AS_IO, 8, royalmah_state )
+ADDRESS_MAP_START(royalmah_state::royalmah_iomap)
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	AM_RANGE( 0x01, 0x01 ) AM_DEVREAD("aysnd", ay8910_device, data_r)
 	AM_RANGE( 0x02, 0x03 ) AM_DEVWRITE("aysnd", ay8910_device, data_address_w)
@@ -583,7 +640,7 @@ static ADDRESS_MAP_START( royalmah_iomap, AS_IO, 8, royalmah_state )
 	AM_RANGE( 0x11, 0x11 ) AM_READ_PORT("SYSTEM") AM_WRITE(input_port_select_w )
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( ippatsu_iomap, AS_IO, 8, royalmah_state )
+ADDRESS_MAP_START(royalmah_state::ippatsu_iomap)
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	AM_RANGE( 0x01, 0x01 ) AM_DEVREAD("aysnd", ay8910_device, data_r)
 	AM_RANGE( 0x02, 0x03 ) AM_DEVWRITE("aysnd", ay8910_device, data_address_w)
@@ -593,18 +650,18 @@ static ADDRESS_MAP_START( ippatsu_iomap, AS_IO, 8, royalmah_state )
 	AM_RANGE( 0x13, 0x13 ) AM_READ_PORT("DSW3")
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( janyoup2_iomap, AS_IO, 8, royalmah_state )
+ADDRESS_MAP_START(royalmah_state::janyoup2_iomap)
 	AM_IMPORT_FROM( ippatsu_iomap )
 	AM_RANGE(0x20, 0x20) AM_DEVWRITE("crtc", mc6845_device, address_w)
 	AM_RANGE(0x21, 0x21) AM_DEVWRITE("crtc", mc6845_device, register_w)
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( seljan_map, AS_PROGRAM, 8, royalmah_state )
+ADDRESS_MAP_START(royalmah_state::seljan_map)
 	AM_RANGE( 0x0000, 0x8fff ) AM_ROM AM_WRITENOP
 	AM_RANGE( 0xe000, 0xefff ) AM_RAM AM_SHARE("nvram")
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( seljan_iomap, AS_IO, 8, royalmah_state )
+ADDRESS_MAP_START(royalmah_state::seljan_iomap)
 	AM_RANGE( 0x0001, 0x0001 ) AM_MIRROR(0x7f00) AM_DEVREAD("aysnd", ay8910_device, data_r)
 	AM_RANGE( 0x0002, 0x0003 ) AM_MIRROR(0x7f00) AM_DEVWRITE("aysnd", ay8910_device, data_address_w)
 	AM_RANGE( 0x0010, 0x0010 ) AM_MIRROR(0x7f00) AM_READ_PORT("DSW1") AM_WRITE(royalmah_palbank_w )
@@ -616,7 +673,7 @@ static ADDRESS_MAP_START( seljan_iomap, AS_IO, 8, royalmah_state )
 	AM_RANGE( 0x7e00, 0xffff ) AM_RAM AM_SHARE("videoram")
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( tahjong_iomap, AS_IO, 8, royalmah_state )
+ADDRESS_MAP_START(royalmah_state::tahjong_iomap)
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	AM_RANGE( 0x01, 0x01 ) AM_DEVREAD("aysnd", ay8910_device, data_r)
 	AM_RANGE( 0x02, 0x03 ) AM_DEVWRITE("aysnd", ay8910_device, data_address_w)
@@ -626,7 +683,7 @@ static ADDRESS_MAP_START( tahjong_iomap, AS_IO, 8, royalmah_state )
 	AM_RANGE( 0x13, 0x13 ) AM_READ_PORT("DSW2")
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( suzume_iomap, AS_IO, 8, royalmah_state )
+ADDRESS_MAP_START(royalmah_state::suzume_iomap)
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	AM_RANGE( 0x01, 0x01 ) AM_DEVREAD("aysnd", ay8910_device, data_r)
 	AM_RANGE( 0x02, 0x03 ) AM_DEVWRITE("aysnd", ay8910_device, data_address_w)
@@ -636,7 +693,7 @@ static ADDRESS_MAP_START( suzume_iomap, AS_IO, 8, royalmah_state )
 	AM_RANGE( 0x81, 0x81 ) AM_WRITE(suzume_bank_w )
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( mjyarou_iomap, AS_IO, 8, royalmah_state )
+ADDRESS_MAP_START(royalmah_state::mjyarou_iomap)
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	AM_RANGE( 0x01, 0x01 ) AM_DEVREAD("aysnd", ay8910_device, data_r)
 	AM_RANGE( 0x02, 0x03 ) AM_DEVWRITE("aysnd", ay8910_device, data_address_w)
@@ -645,7 +702,7 @@ static ADDRESS_MAP_START( mjyarou_iomap, AS_IO, 8, royalmah_state )
 	AM_RANGE( 0x12, 0x12 ) AM_READ_PORT("DSW2")
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( dondenmj_iomap, AS_IO, 8, royalmah_state )
+ADDRESS_MAP_START(royalmah_state::dondenmj_iomap)
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	AM_RANGE( 0x01, 0x01 ) AM_DEVREAD("aysnd", ay8910_device, data_r)
 	AM_RANGE( 0x02, 0x03 ) AM_DEVWRITE("aysnd", ay8910_device, data_address_w)
@@ -656,7 +713,7 @@ static ADDRESS_MAP_START( dondenmj_iomap, AS_IO, 8, royalmah_state )
 	AM_RANGE( 0x87, 0x87 ) AM_WRITE(dynax_bank_w )
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( makaijan_iomap, AS_IO, 8, royalmah_state )
+ADDRESS_MAP_START(royalmah_state::makaijan_iomap)
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	AM_RANGE( 0x01, 0x01 ) AM_DEVREAD("aysnd", ay8910_device, data_r)
 	AM_RANGE( 0x02, 0x03 ) AM_DEVWRITE("aysnd", ay8910_device, data_address_w)
@@ -667,7 +724,7 @@ static ADDRESS_MAP_START( makaijan_iomap, AS_IO, 8, royalmah_state )
 	AM_RANGE( 0x86, 0x86 ) AM_WRITE(dynax_bank_w )
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( daisyari_iomap, AS_IO, 8, royalmah_state )
+ADDRESS_MAP_START(royalmah_state::daisyari_iomap)
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	AM_RANGE( 0x01, 0x01 ) AM_DEVREAD("aysnd", ay8910_device, data_r)
 	AM_RANGE( 0x02, 0x03 ) AM_DEVWRITE("aysnd", ay8910_device, data_address_w)
@@ -676,7 +733,7 @@ static ADDRESS_MAP_START( daisyari_iomap, AS_IO, 8, royalmah_state )
 	AM_RANGE( 0xc0, 0xc0 ) AM_READWRITE(daisyari_dsw_r, daisyari_bank_w )
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( mjclub_iomap, AS_IO, 8, royalmah_state )
+ADDRESS_MAP_START(royalmah_state::mjclub_iomap)
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	AM_RANGE( 0x00, 0x00 ) AM_READWRITE(mjclub_dsw_r, mjclub_bank_w )
 	AM_RANGE( 0x01, 0x01 ) AM_DEVREAD("aysnd", ay8910_device, data_r)
@@ -685,7 +742,7 @@ static ADDRESS_MAP_START( mjclub_iomap, AS_IO, 8, royalmah_state )
 	AM_RANGE( 0x11, 0x11 ) AM_READ_PORT("SYSTEM") AM_WRITE(input_port_select_w )
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( mjdiplob_iomap, AS_IO, 8, royalmah_state )
+ADDRESS_MAP_START(royalmah_state::mjdiplob_iomap)
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	AM_RANGE( 0x01, 0x01 ) AM_DEVREAD("aysnd", ay8910_device, data_r)
 	AM_RANGE( 0x02, 0x03 ) AM_DEVWRITE("aysnd", ay8910_device, data_address_w)
@@ -696,7 +753,7 @@ static ADDRESS_MAP_START( mjdiplob_iomap, AS_IO, 8, royalmah_state )
 	AM_RANGE( 0x63, 0x63 ) AM_READ_PORT("DSW3") // DSW3
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( tontonb_iomap, AS_IO, 8, royalmah_state )
+ADDRESS_MAP_START(royalmah_state::tontonb_iomap)
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	AM_RANGE( 0x01, 0x01 ) AM_DEVREAD("aysnd", ay8910_device, data_r)
 	AM_RANGE( 0x02, 0x03 ) AM_DEVWRITE("aysnd", ay8910_device, data_address_w)
@@ -707,7 +764,7 @@ static ADDRESS_MAP_START( tontonb_iomap, AS_IO, 8, royalmah_state )
 	AM_RANGE( 0x47, 0x47 ) AM_READ_PORT("DSW3") // DSW3
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( majs101b_iomap, AS_IO, 8, royalmah_state )
+ADDRESS_MAP_START(royalmah_state::majs101b_iomap)
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	AM_RANGE( 0x01, 0x01 ) AM_DEVREAD("aysnd", ay8910_device, data_r)
 	AM_RANGE( 0x02, 0x03 ) AM_DEVWRITE("aysnd", ay8910_device, data_address_w)
@@ -716,7 +773,7 @@ static ADDRESS_MAP_START( majs101b_iomap, AS_IO, 8, royalmah_state )
 	AM_RANGE( 0x00, 0x00 ) AM_READWRITE(majs101b_dsw_r, dynax_bank_w )
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( mjderngr_iomap, AS_IO, 8, royalmah_state )
+ADDRESS_MAP_START(royalmah_state::mjderngr_iomap)
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	AM_RANGE( 0x01, 0x01 ) AM_DEVREAD("aysnd", ay8910_device, data_r)
 	AM_RANGE( 0x02, 0x03 ) AM_DEVWRITE("aysnd", ay8910_device, data_address_w)
@@ -729,7 +786,7 @@ static ADDRESS_MAP_START( mjderngr_iomap, AS_IO, 8, royalmah_state )
 	AM_RANGE( 0x60, 0x60 ) AM_WRITE(mjderngr_palbank_w )
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( mjapinky_iomap, AS_IO, 8, royalmah_state )
+ADDRESS_MAP_START(royalmah_state::mjapinky_iomap)
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	AM_RANGE( 0x00, 0x00 ) AM_WRITE(mjapinky_bank_w )
 	AM_RANGE( 0x01, 0x01 ) AM_DEVREAD("aysnd", ay8910_device, data_r)
@@ -739,7 +796,7 @@ static ADDRESS_MAP_START( mjapinky_iomap, AS_IO, 8, royalmah_state )
 	AM_RANGE( 0x11, 0x11 ) AM_READ_PORT("SYSTEM") AM_WRITE(input_port_select_w )
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( janoh_map, AS_PROGRAM, 8, royalmah_state )
+ADDRESS_MAP_START(royalmah_state::janoh_map)
 	AM_RANGE( 0x0000, 0x6fff ) AM_ROM AM_WRITENOP
 	AM_RANGE( 0x7000, 0x7fff ) AM_RAM AM_SHARE("nvram")
 	AM_RANGE( 0x8000, 0xffff ) AM_WRITEONLY AM_SHARE("videoram")
@@ -749,7 +806,7 @@ ADDRESS_MAP_END
 /* this CPU makes little sense - what is it for? why so many addresses accessed?
   -- it puts a value in shared ram to allow the main CPU to boot, then.. ?
 */
-static ADDRESS_MAP_START( janoh_sub_map, AS_PROGRAM, 8, royalmah_state )
+ADDRESS_MAP_START(royalmah_state::janoh_sub_map)
 	AM_RANGE( 0x0000, 0x3fff ) AM_ROM
 	AM_RANGE( 0x4100, 0x413f ) AM_RAM
 	AM_RANGE( 0x6000, 0x607f ) AM_RAM
@@ -758,7 +815,7 @@ static ADDRESS_MAP_START( janoh_sub_map, AS_PROGRAM, 8, royalmah_state )
 	AM_RANGE( 0xf000, 0xffff ) AM_RAM AM_SHARE("nvram")
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( janoh_sub_iomap, AS_IO, 8, royalmah_state )
+ADDRESS_MAP_START(royalmah_state::janoh_sub_iomap)
 ADDRESS_MAP_END
 
 /****************************************************************************
@@ -843,7 +900,7 @@ WRITE8_MEMBER(royalmah_state::jansou_sound_w)
 	m_audiocpu->set_input_line(INPUT_LINE_NMI, PULSE_LINE);
 }
 
-static ADDRESS_MAP_START( jansou_map, AS_PROGRAM, 8, royalmah_state )
+ADDRESS_MAP_START(royalmah_state::jansou_map)
 	AM_RANGE( 0x0000, 0x3fff ) AM_ROM AM_WRITENOP
 
 	AM_RANGE( 0x6000, 0x600f ) AM_WRITE(jansou_colortable_w)
@@ -861,12 +918,12 @@ static ADDRESS_MAP_START( jansou_map, AS_PROGRAM, 8, royalmah_state )
 	AM_RANGE( 0x8000, 0xffff ) AM_WRITEONLY AM_SHARE("videoram")
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( jansou_sub_map, AS_PROGRAM, 8, royalmah_state )
+ADDRESS_MAP_START(royalmah_state::jansou_sub_map)
 	AM_RANGE( 0x0000, 0xffff ) AM_ROM AM_WRITENOP // tries to write to the stack at irq generation
 ADDRESS_MAP_END
 
 
-static ADDRESS_MAP_START( jansou_sub_iomap, AS_IO, 8, royalmah_state )
+ADDRESS_MAP_START(royalmah_state::jansou_sub_iomap)
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	AM_RANGE(0x00, 0x00) AM_DEVREAD("soundlatch", generic_latch_8_device, read) AM_DEVWRITE("dac", dac_byte_interface, write)
 ADDRESS_MAP_END
@@ -876,7 +933,7 @@ ADDRESS_MAP_END
                                 Janputer '96
 ****************************************************************************/
 
-static ADDRESS_MAP_START( janptr96_map, AS_PROGRAM, 8, royalmah_state )
+ADDRESS_MAP_START(royalmah_state::janptr96_map)
 	AM_RANGE( 0x0000, 0x5fff ) AM_ROM
 	AM_RANGE( 0x6000, 0x6fff ) AM_RAMBANK("bank3") AM_SHARE("nvram")    // nvram
 	AM_RANGE( 0x7000, 0x7fff ) AM_RAMBANK("rambank")  // banked nvram
@@ -924,7 +981,7 @@ WRITE8_MEMBER(royalmah_state::janptr96_coin_counter_w)
 	machine().bookkeeping().coin_counter_w(1,data & 1);  // out
 }
 
-static ADDRESS_MAP_START( janptr96_iomap, AS_IO, 8, royalmah_state )
+ADDRESS_MAP_START(royalmah_state::janptr96_iomap)
 	AM_RANGE( 0x00, 0x00 ) AM_MIRROR(0xff00) AM_WRITE(janptr96_rombank_w )    // BANK ROM Select
 	AM_RANGE( 0x20, 0x20 ) AM_MIRROR(0xff00) AM_READWRITE(janptr96_unknown_r, janptr96_rambank_w )
 	AM_RANGE( 0x50, 0x50 ) AM_MIRROR(0xff00) AM_WRITE(mjderngr_palbank_w )
@@ -963,7 +1020,7 @@ READ8_MEMBER(royalmah_state::mjifb_rom_io_r)
 		case 0x9011:    return ioport("SYSTEM")->read();
 	}
 
-	logerror("%04X: unmapped input read at %04X\n", space.device().safe_pc(), offset);
+	logerror("%04X: unmapped input read at %04X\n", m_maincpu->pc(), offset);
 	return 0xff;
 }
 
@@ -991,7 +1048,7 @@ WRITE8_MEMBER(royalmah_state::mjifb_rom_io_w)
 			return;
 	}
 
-	logerror("%04X: unmapped input write at %04X = %02X\n", space.device().safe_pc(), offset,data);
+	logerror("%04X: unmapped input write at %04X = %02X\n", m_maincpu->pc(), offset,data);
 }
 
 WRITE8_MEMBER(royalmah_state::mjifb_videoram_w)
@@ -999,7 +1056,7 @@ WRITE8_MEMBER(royalmah_state::mjifb_videoram_w)
 	m_videoram[offset + 0x4000] = data;
 }
 
-static ADDRESS_MAP_START( mjifb_map, AS_PROGRAM, 8, royalmah_state )
+ADDRESS_MAP_START(royalmah_state::mjifb_map)
 	AM_RANGE( 0x0000, 0x6fff ) AM_ROM
 	AM_RANGE( 0x7000, 0x7fff ) AM_RAM AM_SHARE("nvram")
 	AM_RANGE( 0x8000, 0xbfff ) AM_READWRITE(mjifb_rom_io_r, mjifb_rom_io_w) AM_SHARE("videoram")
@@ -1061,7 +1118,7 @@ READ8_MEMBER(royalmah_state::mjdejavu_rom_io_r)
 		case 0x9011:    return ioport("SYSTEM")->read();
 	}
 
-	logerror("%04X: unmapped input read at %04X\n", space.device().safe_pc(), offset);
+	logerror("%04X: unmapped input read at %04X\n", m_maincpu->pc(), offset);
 	return 0xff;
 }
 
@@ -1086,10 +1143,10 @@ WRITE8_MEMBER(royalmah_state::mjdejavu_rom_io_w)
 			return;
 	}
 
-	logerror("%04X: unmapped input write at %04X = %02X\n", space.device().safe_pc(), offset,data);
+	logerror("%04X: unmapped input write at %04X = %02X\n", m_maincpu->pc(), offset,data);
 }
 
-static ADDRESS_MAP_START( mjdejavu_map, AS_PROGRAM, 8, royalmah_state )
+ADDRESS_MAP_START(royalmah_state::mjdejavu_map)
 	AM_RANGE( 0x0000, 0x6fff ) AM_ROM
 	AM_RANGE( 0x7000, 0x7fff ) AM_RAM AM_SHARE("nvram")
 	AM_RANGE( 0x8000, 0xbfff ) AM_READWRITE(mjdejavu_rom_io_r, mjdejavu_rom_io_w) AM_SHARE("videoram")
@@ -1121,7 +1178,7 @@ WRITE8_MEMBER(royalmah_state::mjtensin_6ff3_w)
 	mjtensin_update_rombank();
 }
 
-static ADDRESS_MAP_START( mjtensin_map, AS_PROGRAM, 8, royalmah_state )
+ADDRESS_MAP_START(royalmah_state::mjtensin_map)
 	AM_RANGE( 0x0000, 0x5fff ) AM_ROM
 	AM_RANGE( 0x6000, 0x6fbf ) AM_RAM
 	AM_RANGE( 0x6fc1, 0x6fc1 ) AM_DEVREAD("aysnd", ay8910_device, data_r)
@@ -1171,7 +1228,7 @@ READ8_MEMBER(royalmah_state::cafetime_dsw_r)
 		case 0x03: return ioport("DSW4")->read();
 		case 0x04: return ioport("DSWTOP")->read();
 	}
-	logerror("%04X: unmapped dsw read %02X\n", space.device().safe_pc(), m_dsw_select);
+	logerror("%04X: unmapped dsw read %02X\n", m_maincpu->pc(), m_dsw_select);
 	return 0xff;
 }
 
@@ -1184,7 +1241,7 @@ WRITE8_MEMBER(royalmah_state::cafetime_7fe3_w)
 //  popmessage("%02x",data);
 }
 
-static ADDRESS_MAP_START( cafetime_map, AS_PROGRAM, 8, royalmah_state )
+ADDRESS_MAP_START(royalmah_state::cafetime_map)
 	AM_RANGE( 0x0000, 0x5fff ) AM_ROM
 	AM_RANGE( 0x6000, 0x7eff ) AM_RAM AM_SHARE("nvram")
 	AM_RANGE( 0x7fc1, 0x7fc1 ) AM_DEVREAD("aysnd", ay8910_device, data_r)
@@ -1232,7 +1289,7 @@ READ8_MEMBER(royalmah_state::mjvegasa_rom_io_r)
 		return m_rtc->read(space, offset & 0xf);
 	}
 
-	logerror("%04X: unmapped IO read at %04X\n", space.device().safe_pc(), offset);
+	logerror("%04X: unmapped IO read at %04X\n", m_maincpu->pc(), offset);
 	return 0xff;
 }
 
@@ -1252,7 +1309,7 @@ WRITE8_MEMBER(royalmah_state::mjvegasa_rom_io_w)
 		return;
 	}
 
-	logerror("%04X: unmapped IO write at %04X = %02X\n", space.device().safe_pc(), offset,data);
+	logerror("%04X: unmapped IO write at %04X = %02X\n", m_maincpu->pc(), offset,data);
 }
 
 WRITE8_MEMBER(royalmah_state::mjvegasa_coin_counter_w)
@@ -1274,7 +1331,7 @@ READ8_MEMBER(royalmah_state::mjvegasa_12500_r)
 	return 0xff;
 }
 
-static ADDRESS_MAP_START( mjvegasa_map, AS_PROGRAM, 8, royalmah_state )
+ADDRESS_MAP_START(royalmah_state::mjvegasa_map)
 
 	AM_RANGE( 0x00000, 0x05fff ) AM_ROM
 	AM_RANGE( 0x06000, 0x07fff ) AM_RAM AM_SHARE("nvram")
@@ -3378,7 +3435,7 @@ static INPUT_PORTS_START( mjvegasa )
 INPUT_PORTS_END
 
 
-static MACHINE_CONFIG_START( royalmah )
+MACHINE_CONFIG_START(royalmah_state::royalmah)
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", Z80, 18432000/6)        /* 3.072 MHz */
@@ -3410,7 +3467,8 @@ static MACHINE_CONFIG_START( royalmah )
 MACHINE_CONFIG_END
 
 
-static MACHINE_CONFIG_DERIVED( janoh, royalmah )
+MACHINE_CONFIG_START(royalmah_state::janoh)
+	royalmah(config);
 	MCFG_CPU_MODIFY("maincpu")
 	MCFG_CPU_CLOCK(8000000/2)   /* 4 MHz ? */
 	MCFG_CPU_PROGRAM_MAP(janoh_map)
@@ -3421,7 +3479,8 @@ static MACHINE_CONFIG_DERIVED( janoh, royalmah )
 	MCFG_CPU_VBLANK_INT_DRIVER("screen", royalmah_state,  irq0_line_hold)
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_DERIVED( jansou, royalmah )
+MACHINE_CONFIG_START(royalmah_state::jansou)
+	royalmah(config);
 
 	MCFG_CPU_MODIFY("maincpu")
 	MCFG_CPU_PROGRAM_MAP(jansou_map)
@@ -3439,58 +3498,67 @@ static MACHINE_CONFIG_DERIVED( jansou, royalmah )
 	MCFG_SOUND_ROUTE_EX(0, "dac", 1.0, DAC_VREF_POS_INPUT) MCFG_SOUND_ROUTE_EX(0, "dac", -1.0, DAC_VREF_NEG_INPUT)
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_DERIVED( dondenmj, royalmah )
+MACHINE_CONFIG_START(royalmah_state::dondenmj)
+	royalmah(config);
 	MCFG_CPU_MODIFY("maincpu")
 	MCFG_CPU_CLOCK(8000000/2)   /* 4 MHz ? */
 	MCFG_CPU_IO_MAP(dondenmj_iomap)
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_DERIVED( tahjong, royalmah )
+MACHINE_CONFIG_START(royalmah_state::tahjong)
+	royalmah(config);
 	MCFG_CPU_MODIFY("maincpu")
 	MCFG_CPU_CLOCK(8000000/2)   /* 4 MHz ? */
 	MCFG_CPU_PROGRAM_MAP(tahjong_map)
 	MCFG_CPU_IO_MAP(tahjong_iomap)
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_DERIVED( makaijan, royalmah )
+MACHINE_CONFIG_START(royalmah_state::makaijan)
+	royalmah(config);
 	MCFG_CPU_MODIFY("maincpu")
 	MCFG_CPU_CLOCK(8000000/2)   /* 4 MHz ? */
 	MCFG_CPU_IO_MAP(makaijan_iomap)
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_DERIVED( daisyari, royalmah )
+MACHINE_CONFIG_START(royalmah_state::daisyari)
+	royalmah(config);
 	MCFG_CPU_MODIFY("maincpu")
 	MCFG_CPU_CLOCK(8000000/2)   /* 4 MHz ? */
 	MCFG_CPU_IO_MAP(daisyari_iomap)
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_DERIVED( mjclub, royalmah )
+MACHINE_CONFIG_START(royalmah_state::mjclub)
+	royalmah(config);
 	MCFG_CPU_MODIFY("maincpu")
 	MCFG_CPU_CLOCK(8000000/2)   /* 4 MHz ? */
 	MCFG_CPU_IO_MAP(mjclub_iomap)
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_DERIVED( mjyarou, royalmah )
+MACHINE_CONFIG_START(royalmah_state::mjyarou)
+	royalmah(config);
 	MCFG_CPU_MODIFY("maincpu")
 	MCFG_CPU_IO_MAP(mjyarou_iomap)
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_DERIVED( ippatsu, dondenmj )
+MACHINE_CONFIG_START(royalmah_state::ippatsu)
+	dondenmj(config);
 	MCFG_CPU_MODIFY("maincpu")
 	MCFG_CPU_IO_MAP(ippatsu_iomap)
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_DERIVED( janyoup2, ippatsu )
+MACHINE_CONFIG_START(royalmah_state::janyoup2)
+	ippatsu(config);
 	MCFG_CPU_MODIFY("maincpu")
-	MCFG_CPU_CLOCK(XTAL_18_432MHz/4) // unknown divider
+	MCFG_CPU_CLOCK(XTAL(18'432'000)/4) // unknown divider
 	MCFG_CPU_IO_MAP(janyoup2_iomap)
 
-	MCFG_MC6845_ADD("crtc", H46505, "screen", XTAL_18_432MHz/12) // unknown divider
+	MCFG_MC6845_ADD("crtc", H46505, "screen", XTAL(18'432'000)/12) // unknown divider
 	MCFG_MC6845_SHOW_BORDER_AREA(false)
 	MCFG_MC6845_CHAR_WIDTH(4)
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_DERIVED( seljan, janyoup2 )
+MACHINE_CONFIG_START(royalmah_state::seljan)
+	janyoup2(config);
 	MCFG_CPU_MODIFY("maincpu")
 	MCFG_CPU_PROGRAM_MAP(seljan_map)
 	MCFG_CPU_IO_MAP(seljan_iomap)
@@ -3502,34 +3570,40 @@ INTERRUPT_GEN_MEMBER(royalmah_state::suzume_irq)
 		device.execute().set_input_line(INPUT_LINE_NMI, PULSE_LINE);
 }
 
-static MACHINE_CONFIG_DERIVED( suzume, dondenmj )
+MACHINE_CONFIG_START(royalmah_state::suzume)
+	dondenmj(config);
 	MCFG_CPU_MODIFY("maincpu")
 	MCFG_CPU_IO_MAP(suzume_iomap)
 	MCFG_CPU_VBLANK_INT_DRIVER("screen", royalmah_state,  suzume_irq)
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_DERIVED( tontonb, dondenmj )
+MACHINE_CONFIG_START(royalmah_state::tontonb)
+	dondenmj(config);
 	MCFG_CPU_MODIFY("maincpu")
 	MCFG_CPU_IO_MAP(tontonb_iomap)
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_DERIVED( mjdiplob, dondenmj )
+MACHINE_CONFIG_START(royalmah_state::mjdiplob)
+	dondenmj(config);
 	MCFG_CPU_MODIFY("maincpu")
 	MCFG_CPU_IO_MAP(mjdiplob_iomap)
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_DERIVED( majs101b, dondenmj )
+MACHINE_CONFIG_START(royalmah_state::majs101b)
+	dondenmj(config);
 	MCFG_CPU_MODIFY("maincpu")
 	MCFG_CPU_IO_MAP(majs101b_iomap)
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_DERIVED( mjapinky, dondenmj )
+MACHINE_CONFIG_START(royalmah_state::mjapinky)
+	dondenmj(config);
 	MCFG_CPU_MODIFY("maincpu")
 	MCFG_CPU_PROGRAM_MAP(mjapinky_map)
 	MCFG_CPU_IO_MAP(mjapinky_iomap)
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_DERIVED( mjderngr, dondenmj )
+MACHINE_CONFIG_START(royalmah_state::mjderngr)
+	dondenmj(config);
 	MCFG_CPU_MODIFY("maincpu")
 	MCFG_CPU_IO_MAP(mjderngr_iomap)
 
@@ -3539,10 +3613,11 @@ static MACHINE_CONFIG_DERIVED( mjderngr, dondenmj )
 	MCFG_PALETTE_INIT_OWNER(royalmah_state,mjderngr)
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_DERIVED( janptr96, mjderngr )
+MACHINE_CONFIG_START(royalmah_state::janptr96)
+	mjderngr(config);
 	MCFG_DEVICE_REMOVE("maincpu")
 
-	MCFG_CPU_ADD("maincpu", TMPZ84C015, XTAL_16MHz/2)    /* 8 MHz? */
+	MCFG_CPU_ADD("maincpu", TMPZ84C015, XTAL(16'000'000)/2)    /* 8 MHz? */
 	MCFG_CPU_PROGRAM_MAP(janptr96_map)
 	MCFG_CPU_IO_MAP(janptr96_iomap)
 	MCFG_TMPZ84C015_IN_PA_CB(READ8(royalmah_state, janptr96_dsw_r))
@@ -3554,12 +3629,13 @@ static MACHINE_CONFIG_DERIVED( janptr96, mjderngr )
 	MCFG_SCREEN_VBLANK_CALLBACK(DEVWRITELINE("maincpu", tmpz84c015_device, trg0)) MCFG_DEVCB_INVERT
 
 	/* devices */
-	MCFG_DEVICE_ADD("rtc", MSM6242, XTAL_32_768kHz)
+	MCFG_DEVICE_ADD("rtc", MSM6242, XTAL(32'768))
 	MCFG_MSM6242_OUT_INT_HANDLER(DEVWRITELINE("maincpu", tmpz84c015_device, trg1)) MCFG_DEVCB_INVERT
 MACHINE_CONFIG_END
 
 
-static MACHINE_CONFIG_DERIVED( mjifb, mjderngr )
+MACHINE_CONFIG_START(royalmah_state::mjifb)
+	mjderngr(config);
 	MCFG_CPU_REPLACE("maincpu",TMP90841, 8000000)   /* ? */
 	MCFG_CPU_PROGRAM_MAP(mjifb_map)
 	MCFG_TLCS90_PORT_P3_READ_CB(READ8(royalmah_state, mjifb_p3_r))
@@ -3577,7 +3653,8 @@ static MACHINE_CONFIG_DERIVED( mjifb, mjderngr )
 MACHINE_CONFIG_END
 
 
-static MACHINE_CONFIG_DERIVED( mjdejavu, mjderngr )
+MACHINE_CONFIG_START(royalmah_state::mjdejavu)
+	mjderngr(config);
 	MCFG_CPU_REPLACE("maincpu",TMP90841, 8000000)   /* ? */
 	MCFG_CPU_PROGRAM_MAP(mjdejavu_map)
 	MCFG_TLCS90_PORT_P3_READ_CB(READ8(royalmah_state, mjifb_p3_r))
@@ -3595,7 +3672,8 @@ static MACHINE_CONFIG_DERIVED( mjdejavu, mjderngr )
 MACHINE_CONFIG_END
 
 
-static MACHINE_CONFIG_DERIVED( mjtensin, mjderngr )
+MACHINE_CONFIG_START(royalmah_state::mjtensin)
+	mjderngr(config);
 	MCFG_CPU_REPLACE("maincpu",TMP90841, 12000000)  /* ? */
 	MCFG_CPU_PROGRAM_MAP(mjtensin_map)
 	MCFG_TLCS90_PORT_P3_READ_CB(READ8(royalmah_state, mjtensin_p3_r))
@@ -3606,11 +3684,12 @@ static MACHINE_CONFIG_DERIVED( mjtensin, mjderngr )
 	MCFG_SCREEN_VBLANK_CALLBACK(INPUTLINE("maincpu", INPUT_LINE_IRQ0))
 
 	/* devices */
-	MCFG_DEVICE_ADD("rtc", MSM6242, XTAL_32_768kHz)
+	MCFG_DEVICE_ADD("rtc", MSM6242, XTAL(32'768))
 	MCFG_MSM6242_OUT_INT_HANDLER(INPUTLINE("maincpu", INPUT_LINE_IRQ1))
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_DERIVED( cafetime, mjderngr )
+MACHINE_CONFIG_START(royalmah_state::cafetime)
+	mjderngr(config);
 	MCFG_CPU_REPLACE("maincpu",TMP90841, 12000000)  /* ? */
 	MCFG_CPU_PROGRAM_MAP(cafetime_map)
 	MCFG_TLCS90_PORT_P3_WRITE_CB(WRITE8(royalmah_state, cafetime_p3_w))
@@ -3621,12 +3700,13 @@ static MACHINE_CONFIG_DERIVED( cafetime, mjderngr )
 	MCFG_SCREEN_VBLANK_CALLBACK(INPUTLINE("maincpu", INPUT_LINE_IRQ0))
 
 	/* devices */
-	MCFG_DEVICE_ADD("rtc", MSM6242, XTAL_32_768kHz)
+	MCFG_DEVICE_ADD("rtc", MSM6242, XTAL(32'768))
 	MCFG_MSM6242_OUT_INT_HANDLER(INPUTLINE("maincpu", INPUT_LINE_IRQ1))
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_DERIVED( mjvegasa, mjderngr )
-	MCFG_CPU_REPLACE("maincpu",TMP90841, XTAL_8MHz) /* ? */
+MACHINE_CONFIG_START(royalmah_state::mjvegasa)
+	mjderngr(config);
+	MCFG_CPU_REPLACE("maincpu",TMP90841, XTAL(8'000'000)) /* ? */
 	MCFG_CPU_PROGRAM_MAP(mjvegasa_map)
 	MCFG_TLCS90_PORT_P3_READ_CB(READ8(royalmah_state, mjtensin_p3_r))
 	MCFG_TLCS90_PORT_P3_WRITE_CB(WRITE8(royalmah_state, mjvegasa_p3_w))
@@ -3637,7 +3717,7 @@ static MACHINE_CONFIG_DERIVED( mjvegasa, mjderngr )
 	MCFG_SCREEN_VBLANK_CALLBACK(INPUTLINE("maincpu", INPUT_LINE_IRQ0))
 
 	/* devices */
-	MCFG_DEVICE_ADD("rtc", MSM6242, XTAL_32_768kHz)
+	MCFG_DEVICE_ADD("rtc", MSM6242, XTAL(32'768))
 	MCFG_MSM6242_OUT_INT_HANDLER(INPUTLINE("maincpu", INPUT_LINE_IRQ1))
 MACHINE_CONFIG_END
 

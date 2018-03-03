@@ -233,6 +233,9 @@ public:
 	void supracan_suprnova_draw_roz(bitmap_ind16 &bitmap, const rectangle &cliprect, tilemap_t *tmap, uint32_t startx, uint32_t starty, int incxx, int incxy, int incyx, int incyy, int wraparound/*, int columnscroll, uint32_t* scrollram*/, int transmask);
 	required_device<gfxdecode_device> m_gfxdecode;
 	required_device<palette_device> m_palette;
+	void supracan(machine_config &config);
+	void supracan_mem(address_map &map);
+	void supracan_sound_mem(address_map &map);
 };
 
 
@@ -1093,7 +1096,7 @@ WRITE16_MEMBER( supracan_state::supracan_pram_w )
 // swap address around so that 64x64 tile can be decoded as 8x8 tiles..
 void supracan_state::write_swapped_byte( int offset, uint8_t byte )
 {
-	int swapped_offset = BITSWAP32(offset, 31,30,29,28,27,26,25,24,23,22,21,20,19,18,17,16,15,14,13,12,11,10,9,8,7,2,1,0,6,5,4,3);
+	int swapped_offset = bitswap<32>(offset, 31,30,29,28,27,26,25,24,23,22,21,20,19,18,17,16,15,14,13,12,11,10,9,8,7,2,1,0,6,5,4,3);
 
 	m_vram_addr_swapped[swapped_offset] = byte;
 }
@@ -1115,19 +1118,19 @@ WRITE16_MEMBER( supracan_state::vram_w )
 
 }
 
-static ADDRESS_MAP_START( supracan_mem, AS_PROGRAM, 16, supracan_state )
+ADDRESS_MAP_START(supracan_state::supracan_mem)
 	//AM_RANGE( 0x000000, 0x3fffff )        // mapped by the cartslot
+	AM_RANGE( 0xe80000, 0xe8ffff ) AM_READWRITE(_68k_soundram_r, _68k_soundram_w)
 	AM_RANGE( 0xe80200, 0xe80201 ) AM_READ_PORT("P1")
 	AM_RANGE( 0xe80202, 0xe80203 ) AM_READ_PORT("P2")
 	AM_RANGE( 0xe80208, 0xe80209 ) AM_READ_PORT("P3")
 	AM_RANGE( 0xe8020c, 0xe8020d ) AM_READ_PORT("P4")
-	AM_RANGE( 0xe80000, 0xe8ffff ) AM_READWRITE(_68k_soundram_r, _68k_soundram_w)
 	AM_RANGE( 0xe90000, 0xe9001f ) AM_READWRITE(sound_r, sound_w)
 	AM_RANGE( 0xe90020, 0xe9002f ) AM_WRITE(dma_channel0_w)
 	AM_RANGE( 0xe90030, 0xe9003f ) AM_WRITE(dma_channel1_w)
 
 	AM_RANGE( 0xf00000, 0xf001ff ) AM_READWRITE(video_r, video_w)
-	AM_RANGE( 0xf00200, 0xf003ff ) AM_RAM_DEVWRITE("palette", palette_device, write) AM_SHARE("palette")
+	AM_RANGE( 0xf00200, 0xf003ff ) AM_RAM_DEVWRITE("palette", palette_device, write16) AM_SHARE("palette")
 	AM_RANGE( 0xf40000, 0xf5ffff ) AM_RAM_WRITE(vram_w) AM_SHARE("vram")
 	AM_RANGE( 0xfc0000, 0xfcffff ) AM_MIRROR(0x30000) AM_RAM /* System work ram */
 ADDRESS_MAP_END
@@ -1145,8 +1148,8 @@ READ8_MEMBER( supracan_state::_6502_soundmem_r )
 
 		case 0x410: // Sound IRQ enable
 			data = m_sound_irq_enable_reg;
-			if(!machine().side_effect_disabled()) verboselog(m_hack_68k_to_6502_access ? "maincpu" : "soundcpu", 0, "supracan_soundreg_r: IRQ enable: %04x\n", data);
-			if(!machine().side_effect_disabled())
+			if(!machine().side_effects_disabled()) verboselog(m_hack_68k_to_6502_access ? "maincpu" : "soundcpu", 0, "supracan_soundreg_r: IRQ enable: %04x\n", data);
+			if(!machine().side_effects_disabled())
 			{
 				if(m_sound_irq_enable_reg & m_sound_irq_source_reg)
 				{
@@ -1161,17 +1164,17 @@ READ8_MEMBER( supracan_state::_6502_soundmem_r )
 		case 0x411: // Sound IRQ source
 			data = m_sound_irq_source_reg;
 			m_sound_irq_source_reg = 0;
-			if(!machine().side_effect_disabled()) verboselog(m_hack_68k_to_6502_access ? "maincpu" : "soundcpu", 3, "supracan_soundreg_r: IRQ source: %04x\n", data);
-			if(!machine().side_effect_disabled())
+			if(!machine().side_effects_disabled()) verboselog(m_hack_68k_to_6502_access ? "maincpu" : "soundcpu", 3, "supracan_soundreg_r: IRQ source: %04x\n", data);
+			if(!machine().side_effects_disabled())
 			{
 				m_soundcpu->set_input_line(0, CLEAR_LINE);
 			}
 			break;
 		case 0x420:
-			if(!machine().side_effect_disabled()) verboselog(m_hack_68k_to_6502_access ? "maincpu" : "soundcpu", 3, "supracan_soundreg_r: Sound hardware status? (not yet implemented): %02x\n", 0);
+			if(!machine().side_effects_disabled()) verboselog(m_hack_68k_to_6502_access ? "maincpu" : "soundcpu", 3, "supracan_soundreg_r: Sound hardware status? (not yet implemented): %02x\n", 0);
 			break;
 		case 0x422:
-			if(!machine().side_effect_disabled()) verboselog(m_hack_68k_to_6502_access ? "maincpu" : "soundcpu", 3, "supracan_soundreg_r: Sound hardware data? (not yet implemented): %02x\n", 0);
+			if(!machine().side_effects_disabled()) verboselog(m_hack_68k_to_6502_access ? "maincpu" : "soundcpu", 3, "supracan_soundreg_r: Sound hardware data? (not yet implemented): %02x\n", 0);
 			break;
 		case 0x404:
 		case 0x405:
@@ -1182,7 +1185,7 @@ READ8_MEMBER( supracan_state::_6502_soundmem_r )
 		default:
 			if(offset >= 0x300 && offset < 0x500)
 			{
-				if(!machine().side_effect_disabled()) verboselog(m_hack_68k_to_6502_access ? "maincpu" : "soundcpu", 0, "supracan_soundreg_r: Unknown register %04x\n", offset);
+				if(!machine().side_effects_disabled()) verboselog(m_hack_68k_to_6502_access ? "maincpu" : "soundcpu", 0, "supracan_soundreg_r: Unknown register %04x\n", offset);
 			}
 			break;
 	}
@@ -1226,7 +1229,7 @@ WRITE8_MEMBER( supracan_state::_6502_soundmem_w )
 	}
 }
 
-static ADDRESS_MAP_START( supracan_sound_mem, AS_PROGRAM, 8, supracan_state )
+ADDRESS_MAP_START(supracan_state::supracan_sound_mem)
 	AM_RANGE(0x0000, 0xffff) AM_READWRITE(_6502_soundmem_r, _6502_soundmem_w) AM_SHARE("soundram")
 ADDRESS_MAP_END
 
@@ -1464,7 +1467,7 @@ READ16_MEMBER( supracan_state::video_r )
 	switch(offset)
 	{
 		case 0x00/2: // Video IRQ flags
-			if(!machine().side_effect_disabled())
+			if(!machine().side_effects_disabled())
 			{
 				//verboselog("maincpu", 0, "read video IRQ flags (%04x)\n", data);
 				m_maincpu->set_input_line(7, CLEAR_LINE);
@@ -1476,16 +1479,16 @@ READ16_MEMBER( supracan_state::video_r )
 			//data = 0;
 			break;
 		case 0x100/2:
-			if(!machine().side_effect_disabled()) verboselog("maincpu", 0, "read tilemap_flags[0] (%04x)\n", data);
+			if(!machine().side_effects_disabled()) verboselog("maincpu", 0, "read tilemap_flags[0] (%04x)\n", data);
 			break;
 		case 0x106/2:
-			if(!machine().side_effect_disabled()) verboselog("maincpu", 0, "read tilemap_scrolly[0] (%04x)\n", data);
+			if(!machine().side_effects_disabled()) verboselog("maincpu", 0, "read tilemap_scrolly[0] (%04x)\n", data);
 			break;
 		case 0x120/2:
-			if(!machine().side_effect_disabled()) verboselog("maincpu", 0, "read tilemap_flags[1] (%04x)\n", data);
+			if(!machine().side_effects_disabled()) verboselog("maincpu", 0, "read tilemap_flags[1] (%04x)\n", data);
 			break;
 		default:
-			if(!machine().side_effect_disabled()) verboselog("maincpu", 0, "video_r: Unknown register: %08x (%04x & %04x)\n", 0xf00000 + (offset << 1), data, mem_mask);
+			if(!machine().side_effects_disabled()) verboselog("maincpu", 0, "video_r: Unknown register: %08x (%04x & %04x)\n", 0xf00000 + (offset << 1), data, mem_mask);
 			break;
 	}
 
@@ -1884,13 +1887,13 @@ INTERRUPT_GEN_MEMBER(supracan_state::supracan_sound_irq)
 	}
 }
 
-static MACHINE_CONFIG_START( supracan )
+MACHINE_CONFIG_START(supracan_state::supracan)
 
-	MCFG_CPU_ADD( "maincpu", M68000, XTAL_10_738635MHz )        /* Correct frequency unknown */
+	MCFG_CPU_ADD( "maincpu", M68000, XTAL(10'738'635) )        /* Correct frequency unknown */
 	MCFG_CPU_PROGRAM_MAP( supracan_mem )
 	MCFG_CPU_VBLANK_INT_DRIVER("screen", supracan_state,  supracan_irq)
 
-	MCFG_CPU_ADD( "soundcpu", M6502, XTAL_3_579545MHz )     /* TODO: Verify actual clock */
+	MCFG_CPU_ADD( "soundcpu", M6502, XTAL(3'579'545) )     /* TODO: Verify actual clock */
 	MCFG_CPU_PROGRAM_MAP( supracan_sound_mem )
 	MCFG_CPU_VBLANK_INT_DRIVER("screen", supracan_state,  supracan_sound_irq)
 
@@ -1900,7 +1903,7 @@ static MACHINE_CONFIG_START( supracan )
 #endif
 
 	MCFG_SCREEN_ADD( "screen", RASTER )
-	MCFG_SCREEN_RAW_PARAMS(XTAL_10_738635MHz/2, 348, 0, 256, 256, 0, 240 )  /* No idea if this is correct */
+	MCFG_SCREEN_RAW_PARAMS(XTAL(10'738'635)/2, 348, 0, 256, 256, 0, 240 )  /* No idea if this is correct */
 	MCFG_SCREEN_UPDATE_DRIVER(supracan_state, screen_update_supracan)
 	MCFG_SCREEN_PALETTE("palette")
 

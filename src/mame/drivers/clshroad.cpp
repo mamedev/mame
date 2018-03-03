@@ -36,7 +36,7 @@ TODO:
 #include "speaker.h"
 
 /* unknown divider, assume /5 */
-#define MAIN_CLOCK XTAL_18_432MHz/5
+#define MAIN_CLOCK XTAL(18'432'000)/5
 
 void clshroad_state::machine_reset()
 {
@@ -70,7 +70,7 @@ WRITE_LINE_MEMBER(clshroad_state::sound_irq_mask_w)
 }
 
 
-static ADDRESS_MAP_START( clshroad_map, AS_PROGRAM, 8, clshroad_state )
+ADDRESS_MAP_START(clshroad_state::clshroad_map)
 	AM_RANGE(0x0000, 0x7fff) AM_ROM
 	AM_RANGE(0x8000, 0x95ff) AM_RAM
 	AM_RANGE(0x9600, 0x97ff) AM_RAM AM_SHARE("share1")
@@ -83,7 +83,7 @@ static ADDRESS_MAP_START( clshroad_map, AS_PROGRAM, 8, clshroad_state )
 	AM_RANGE(0xc000, 0xc7ff) AM_RAM_WRITE(vram_0_w) AM_SHARE("vram_0") // Layer 0
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( clshroad_sound_map, AS_PROGRAM, 8, clshroad_state )
+ADDRESS_MAP_START(clshroad_state::clshroad_sound_map)
 	AM_RANGE(0x0000, 0x1fff) AM_ROM
 	AM_RANGE(0x4000, 0x7fff) AM_DEVWRITE("custom", wiping_sound_device, sound_w)
 	AM_RANGE(0x9600, 0x97ff) AM_RAM AM_SHARE("share1")
@@ -270,7 +270,7 @@ INTERRUPT_GEN_MEMBER(clshroad_state::sound_timer_irq)
 		device.execute().set_input_line(0, HOLD_LINE);
 }
 
-static MACHINE_CONFIG_START( firebatl )
+MACHINE_CONFIG_START(clshroad_state::firebatl)
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", Z80, MAIN_CLOCK)   /* ? */
@@ -310,7 +310,7 @@ static MACHINE_CONFIG_START( firebatl )
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_START( clshroad )
+MACHINE_CONFIG_START(clshroad_state::clshroad)
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", Z80, MAIN_CLOCK)  /* ? real speed unknown. 3MHz is too low and causes problems */

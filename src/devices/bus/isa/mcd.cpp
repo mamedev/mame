@@ -5,7 +5,7 @@
 #include "mcd.h"
 #include "coreutil.h"
 
-DEVICE_ADDRESS_MAP_START(map, 16, mcd_isa_device)
+ADDRESS_MAP_START(mcd_isa_device::map)
 	AM_RANGE(0x0, 0x1) AM_READWRITE8(data_r, cmd_w, 0x00ff)
 	AM_RANGE(0x0, 0x1) AM_READWRITE8(flag_r, reset_w, 0xff00)
 ADDRESS_MAP_END
@@ -51,7 +51,7 @@ void mcd_isa_device::device_start()
 	cdrom_image_device::device_start();
 	set_isa_device();
 	m_isa->set_dma_channel(5, this, false);
-	m_isa->install_device(0x0310, 0x0311, *this, &mcd_isa_device::map, 16);
+	m_isa->install_device(0x0310, 0x0311, *this, &mcd_isa_device::map);
 }
 
 //-------------------------------------------------

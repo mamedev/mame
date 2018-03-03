@@ -53,11 +53,13 @@ public:
 
 	virtual void video_start() override;
 	uint32_t screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
+	void st17xx(machine_config &config);
+	void cpu_map(address_map &map);
 };
 
 /* Memory Maps */
 
-static ADDRESS_MAP_START( cpu_map, AS_PROGRAM, 32, st17xx_state )
+ADDRESS_MAP_START(st17xx_state::cpu_map)
 	AM_RANGE(0x00000000, 0x000fffff) AM_ROM
 ADDRESS_MAP_END
 
@@ -85,7 +87,7 @@ void st17xx_state::machine_start()
 
 /* Machine Driver */
 
-static MACHINE_CONFIG_START( st17xx )
+MACHINE_CONFIG_START(st17xx_state::st17xx)
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", ARM7, 50000000) /* speed unknown */
 	MCFG_CPU_PROGRAM_MAP(cpu_map)

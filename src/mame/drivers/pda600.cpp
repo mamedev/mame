@@ -78,10 +78,13 @@ public:
 	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 
 	uint8_t *     m_video_ram;
+	void pda600(machine_config &config);
+	void pda600_io(address_map &map);
+	void pda600_mem(address_map &map);
 };
 
 
-static ADDRESS_MAP_START(pda600_mem, AS_PROGRAM, 8, pda600_state)
+ADDRESS_MAP_START(pda600_state::pda600_mem)
 	ADDRESS_MAP_UNMAP_HIGH
 	AM_RANGE(0x00000, 0x1ffff) AM_ROM
 	//AM_RANGE(0x20000, 0x9ffff) AM_RAM // PCMCIA Card
@@ -89,7 +92,7 @@ static ADDRESS_MAP_START(pda600_mem, AS_PROGRAM, 8, pda600_state)
 	AM_RANGE(0xe0000, 0xfffff) AM_RAM   AM_REGION("mainram", 0)     AM_SHARE("nvram")
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START(pda600_io, AS_IO, 8, pda600_state)
+ADDRESS_MAP_START(pda600_state::pda600_io)
 	ADDRESS_MAP_UNMAP_HIGH
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	AM_RANGE(0x00, 0x3f) AM_NOP /* Z180 internal registers */
@@ -196,9 +199,9 @@ static GFXDECODE_START( pda600 )
 GFXDECODE_END
 
 
-static MACHINE_CONFIG_START( pda600 )
+MACHINE_CONFIG_START(pda600_state::pda600)
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu",Z180, XTAL_14_31818MHz)
+	MCFG_CPU_ADD("maincpu",Z180, XTAL(14'318'181))
 	MCFG_CPU_PROGRAM_MAP(pda600_mem)
 	MCFG_CPU_IO_MAP(pda600_io)
 
@@ -218,7 +221,7 @@ static MACHINE_CONFIG_START( pda600 )
 	// NVRAM needs to be filled with random data to fail the checksum and be initialized correctly
 	MCFG_NVRAM_ADD_RANDOM_FILL("nvram")
 
-	MCFG_DEVICE_ADD("rtc", HD64610, XTAL_32_768kHz)
+	MCFG_DEVICE_ADD("rtc", HD64610, XTAL(32'768))
 MACHINE_CONFIG_END
 
 /* ROM definition */

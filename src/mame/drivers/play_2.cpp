@@ -79,6 +79,11 @@ public:
 	DECLARE_READ8_MEMBER(sound_in_r);
 	DECLARE_DRIVER_INIT(zira);
 
+	void play_2(machine_config &config);
+	void zira(machine_config &config);
+	void play_2_io(address_map &map);
+	void play_2_map(address_map &map);
+	void zira_sound_map(address_map &map);
 private:
 	uint16_t m_clockcnt;
 	uint16_t m_resetcnt;
@@ -98,12 +103,12 @@ private:
 };
 
 
-static ADDRESS_MAP_START( play_2_map, AS_PROGRAM, 8, play_2_state )
+ADDRESS_MAP_START(play_2_state::play_2_map)
 	AM_RANGE(0x0000, 0x1fff) AM_ROM AM_REGION("roms", 0)
 	AM_RANGE(0x2000, 0x20ff) AM_RAM AM_SHARE("nvram") // pair of 5101, battery-backed
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( play_2_io, AS_IO, 8, play_2_state )
+ADDRESS_MAP_START(play_2_state::play_2_io)
 	AM_RANGE(0x01, 0x01) AM_WRITE(port01_w) // digits
 	AM_RANGE(0x02, 0x02) AM_WRITE(port02_w)
 	AM_RANGE(0x03, 0x03) AM_DEVWRITE("1863", cdp1863_device, str_w)
@@ -113,7 +118,7 @@ static ADDRESS_MAP_START( play_2_io, AS_IO, 8, play_2_state )
 	AM_RANGE(0x07, 0x07) AM_WRITE(port07_w)
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( zira_sound_map, AS_PROGRAM, 8, play_2_state )
+ADDRESS_MAP_START(play_2_state::zira_sound_map)
 	AM_RANGE(0x000, 0x3ff) AM_ROMBANK("bank1")
 ADDRESS_MAP_END
 
@@ -351,9 +356,9 @@ WRITE8_MEMBER( play_2_state::psg_w )
 }
 
 // **************** Machine *****************************
-static MACHINE_CONFIG_START( play_2 )
+MACHINE_CONFIG_START(play_2_state::play_2)
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", CDP1802, XTAL_2_95MHz)
+	MCFG_CPU_ADD("maincpu", CDP1802, XTAL(2'950'000))
 	MCFG_CPU_PROGRAM_MAP(play_2_map)
 	MCFG_CPU_IO_MAP(play_2_io)
 	MCFG_COSMAC_WAIT_CALLBACK(VCC)
@@ -367,7 +372,7 @@ static MACHINE_CONFIG_START( play_2 )
 	/* Video */
 	MCFG_DEFAULT_LAYOUT(layout_play_2)
 
-	MCFG_DEVICE_ADD("tpb_clock", CLOCK, XTAL_2_95MHz / 8) // TPB line from CPU
+	MCFG_DEVICE_ADD("tpb_clock", CLOCK, XTAL(2'950'000) / 8) // TPB line from CPU
 	MCFG_CLOCK_SIGNAL_HANDLER(WRITELINE(play_2_state, clock_w))
 
 	MCFG_DEVICE_ADD("xpoint", CLOCK, 60) // crossing-point detector
@@ -383,15 +388,16 @@ static MACHINE_CONFIG_START( play_2 )
 	MCFG_7474_COMP_OUTPUT_CB(DEVWRITELINE("maincpu", cosmac_device, int_w)) MCFG_DEVCB_INVERT // int is reversed in mame
 
 	/* Sound */
-	MCFG_FRAGMENT_ADD( genpin_audio )
+	genpin_audio(config);
 
 	MCFG_SPEAKER_STANDARD_MONO("mono")
-	MCFG_CDP1863_ADD("1863", 0, XTAL_2_95MHz / 8)
+	MCFG_CDP1863_ADD("1863", 0, XTAL(2'950'000) / 8)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.00)
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_DERIVED( zira, play_2 )
-	MCFG_CPU_ADD("cop402", COP402, XTAL_2MHz)
+MACHINE_CONFIG_START(play_2_state::zira)
+	play_2(config);
+	MCFG_CPU_ADD("cop402", COP402, XTAL(2'000'000))
 	MCFG_CPU_PROGRAM_MAP(zira_sound_map)
 	MCFG_COP400_CONFIG( COP400_CKI_DIVISOR_16, COP400_CKO_OSCILLATOR_OUTPUT, false )
 	MCFG_COP400_WRITE_D_CB(WRITE8(play_2_state, sound_d_w))
@@ -400,7 +406,7 @@ static MACHINE_CONFIG_DERIVED( zira, play_2 )
 	MCFG_COP400_WRITE_L_CB(WRITE8(play_2_state, psg_w))
 	MCFG_COP400_READ_IN_CB(READ8(play_2_state, sound_in_r))
 
-	MCFG_SOUND_ADD("aysnd1", AY8910, XTAL_2MHz)
+	MCFG_SOUND_ADD("aysnd1", AY8910, XTAL(2'000'000))
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.00)
 MACHINE_CONFIG_END
 
@@ -474,8 +480,8 @@ ROM_START(zira)
 	ROM_LOAD("zira_u8.bin",  0x0000, 0x0800, CRC(53f8bf17) SHA1(5eb74f27bc65374a85dd44bbc8f6142488c226a2))
 	ROM_LOAD("zira_u9.bin",  0x0800, 0x0800, CRC(d50a2419) SHA1(81b157f579a433389506817b1b6e02afaa2cf0d5))
 
-	ROM_REGION(0x800, "cop402", 0) // according to the schematic this is a 2716 with a size of 0x800
-	ROM_LOAD("zira.snd",     0x0000, 0x0400, CRC(c8a54854) SHA1(6c0367dcb2a11f0478c44b4e2115c1cb1e8052f3))
+	ROM_REGION(0x800, "cop402", 0) // according to the schematic this is a 2716 with a size of 0x800; according to PinMAME it contains the same code twice
+	ROM_LOAD("zira.snd",     0x0000, 0x0800, CRC(008cb743) SHA1(8e9677f08189638d669b265bb6943275a08ec8b4))
 ROM_END
 
 /*-------------------------------------------------------------------

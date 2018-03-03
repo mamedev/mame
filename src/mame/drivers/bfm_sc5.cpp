@@ -80,7 +80,7 @@ WRITE8_MEMBER( bfm_sc5_state::sc5_mux2_w )
 }
 
 
-static ADDRESS_MAP_START( sc5_map, AS_PROGRAM, 32, bfm_sc5_state )
+ADDRESS_MAP_START(bfm_sc5_state::sc5_map)
 	// ROM (max size?)
 	AM_RANGE(0x00000000, 0x002fffff) AM_ROM
 	// ?
@@ -209,7 +209,7 @@ WRITE8_MEMBER(bfm_sc5_state::bfm_sc5_duart_output_w)
 	logerror("bfm_sc5_duart_output_w\n");
 }
 
-MACHINE_CONFIG_START( bfm_sc5 )
+MACHINE_CONFIG_START(bfm_sc5_state::bfm_sc5)
 	MCFG_CPU_ADD("maincpu", MCF5206E, 40000000) /* MCF5206eFT */
 	MCFG_CPU_PROGRAM_MAP(sc5_map)
 	MCFG_MCF5206E_PERIPHERAL_ADD("maincpu_onboard")

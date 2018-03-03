@@ -60,4 +60,8 @@ public:
 	INTERRUPT_GEN_MEMBER(vblank_irq);
 	TIMER_CALLBACK_MEMBER(soundlatch_callback);
 	TIMER_CALLBACK_MEMBER(soundirqline_callback);
+	void tankbust(machine_config &config);
+	void main_map(address_map &map);
+	void map_cpu2(address_map &map);
+	void port_map_cpu2(address_map &map);
 };

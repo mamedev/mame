@@ -27,5 +27,8 @@ public:
 	DECLARE_WRITE64_MEMBER(sp_bank_w);
 	uint16_t m_sp_bank;
 
+	void segasp(machine_config &config);
+	void onchip_port(address_map &map);
+	void segasp_map(address_map &map);
 protected:
 };

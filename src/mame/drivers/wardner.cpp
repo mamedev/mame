@@ -152,6 +152,14 @@ public:
 	DECLARE_WRITE8_MEMBER(wardner_bank_w);
 	DECLARE_DRIVER_INIT(wardner);
 
+	void wardner(machine_config &config);
+	void DSP_io_map(address_map &map);
+	void DSP_program_map(address_map &map);
+	void main_bank_map(address_map &map);
+	void main_io_map(address_map &map);
+	void main_program_map(address_map &map);
+	void sound_io_map(address_map &map);
+	void sound_program_map(address_map &map);
 protected:
 	virtual void driver_start() override;
 	virtual void machine_reset() override;
@@ -165,18 +173,18 @@ WRITE8_MEMBER(wardner_state::wardner_bank_w)
 	m_membank->set_bank(data & 7);
 }
 
-static ADDRESS_MAP_START( main_program_map, AS_PROGRAM, 8, wardner_state )
+ADDRESS_MAP_START(wardner_state::main_program_map)
 	AM_RANGE(0x0000, 0x6fff) AM_ROM
 	AM_RANGE(0x7000, 0x7fff) AM_RAM
 	AM_RANGE(0x8000, 0x8fff) AM_WRITE(wardner_sprite_w)                     // AM_SHARE("spriteram8")
-	AM_RANGE(0xa000, 0xafff) AM_DEVWRITE("palette", palette_device, write)  // AM_SHARE("palette")
+	AM_RANGE(0xa000, 0xafff) AM_DEVWRITE("palette", palette_device, write8)  // AM_SHARE("palette")
 	AM_RANGE(0xc000, 0xc7ff) AM_WRITEONLY AM_SHARE("sharedram")
 	AM_RANGE(0x8000, 0xffff) AM_DEVREAD("membank", address_map_bank_device, read8)
 ADDRESS_MAP_END
 
 // Overlapped RAM/Banked ROM
 // Can't use AM_RANGE(0x00000, 0x3ffff) for ROM because the shared pointers get messed up somehow
-static ADDRESS_MAP_START( main_bank_map, AS_PROGRAM, 8, wardner_state )
+ADDRESS_MAP_START(wardner_state::main_bank_map)
 	AM_RANGE(0x00000, 0x00fff) AM_READ(wardner_sprite_r) AM_SHARE("spriteram8")
 	AM_RANGE(0x01000, 0x01fff) AM_ROM AM_REGION("maincpu", 0x1000)
 	AM_RANGE(0x02000, 0x02fff) AM_READONLY AM_SHARE("palette")
@@ -185,7 +193,7 @@ static ADDRESS_MAP_START( main_bank_map, AS_PROGRAM, 8, wardner_state )
 	AM_RANGE(0x04800, 0x3ffff) AM_ROM AM_REGION("maincpu", 0x4800)
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( main_io_map, AS_IO, 8, wardner_state )
+ADDRESS_MAP_START(wardner_state::main_io_map)
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	AM_RANGE(0x00, 0x00) AM_DEVWRITE("crtc", mc6845_device, address_w)
 	AM_RANGE(0x02, 0x02) AM_DEVWRITE("crtc", mc6845_device, register_w)
@@ -210,14 +218,14 @@ ADDRESS_MAP_END
 
 /***************************** Z80 Sound Memory Map *************************/
 
-static ADDRESS_MAP_START( sound_program_map, AS_PROGRAM, 8, wardner_state )
+ADDRESS_MAP_START(wardner_state::sound_program_map)
 	AM_RANGE(0x0000, 0x7fff) AM_ROM
 	AM_RANGE(0x8000, 0x807f) AM_RAM
 	AM_RANGE(0xc000, 0xc7ff) AM_RAM AM_SHARE("sharedram")
 	AM_RANGE(0xc800, 0xcfff) AM_RAM
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( sound_io_map, AS_IO, 8, wardner_state )
+ADDRESS_MAP_START(wardner_state::sound_io_map)
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	AM_RANGE(0x00, 0x01) AM_DEVREADWRITE("ymsnd", ym3812_device, read, write)
 ADDRESS_MAP_END
@@ -225,13 +233,13 @@ ADDRESS_MAP_END
 
 /***************************** TMS32010 Memory Map **************************/
 
-static ADDRESS_MAP_START( DSP_program_map, AS_PROGRAM, 16, wardner_state )
+ADDRESS_MAP_START(wardner_state::DSP_program_map)
 	AM_RANGE(0x000, 0x5ff) AM_ROM
 ADDRESS_MAP_END
 
 	/* $000 - 08F  TMS32010 Internal Data RAM in Data Address Space */
 
-static ADDRESS_MAP_START( DSP_io_map, AS_IO, 16, wardner_state )
+ADDRESS_MAP_START(wardner_state::DSP_io_map)
 	AM_RANGE(0x00, 0x00) AM_WRITE(wardner_dsp_addrsel_w)
 	AM_RANGE(0x01, 0x01) AM_READWRITE(wardner_dsp_r, wardner_dsp_w)
 	AM_RANGE(0x03, 0x03) AM_WRITE(twincobr_dsp_bio_w)
@@ -360,10 +368,10 @@ void wardner_state::machine_reset()
 	m_membank->set_bank(0);
 }
 
-static MACHINE_CONFIG_START( wardner )
+MACHINE_CONFIG_START(wardner_state::wardner)
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", Z80, XTAL_24MHz/4)      /* 6MHz */
+	MCFG_CPU_ADD("maincpu", Z80, XTAL(24'000'000)/4)      /* 6MHz */
 	MCFG_CPU_PROGRAM_MAP(main_program_map)
 	MCFG_CPU_IO_MAP(main_io_map)
 	MCFG_CPU_VBLANK_INT_DRIVER("screen", wardner_state,  wardner_interrupt)
@@ -375,11 +383,11 @@ static MACHINE_CONFIG_START( wardner )
 	MCFG_ADDRESS_MAP_BANK_ADDR_WIDTH(18)
 	MCFG_ADDRESS_MAP_BANK_STRIDE(0x8000)
 
-	MCFG_CPU_ADD("audiocpu", Z80, XTAL_14MHz/4)     /* 3.5MHz */
+	MCFG_CPU_ADD("audiocpu", Z80, XTAL(14'000'000)/4)     /* 3.5MHz */
 	MCFG_CPU_PROGRAM_MAP(sound_program_map)
 	MCFG_CPU_IO_MAP(sound_io_map)
 
-	MCFG_CPU_ADD("dsp", TMS32010, XTAL_14MHz)       /* 14MHz Crystal CLKin */
+	MCFG_CPU_ADD("dsp", TMS32010, XTAL(14'000'000))       /* 14MHz Crystal CLKin */
 	MCFG_CPU_PROGRAM_MAP(DSP_program_map)
 	/* Data Map is internal to the CPU */
 	MCFG_CPU_IO_MAP(DSP_io_map)
@@ -402,7 +410,7 @@ static MACHINE_CONFIG_START( wardner )
 	MCFG_ADDRESSABLE_LATCH_Q7_OUT_CB(WRITELINE(wardner_state, coin_lockout_2_w))
 
 	/* video hardware */
-	MCFG_MC6845_ADD("crtc", HD6845, "screen", XTAL_14MHz/4) /* 3.5MHz measured on CLKin */
+	MCFG_MC6845_ADD("crtc", HD6845, "screen", XTAL(14'000'000)/4) /* 3.5MHz measured on CLKin */
 	MCFG_MC6845_SHOW_BORDER_AREA(false)
 	MCFG_MC6845_CHAR_WIDTH(2)
 
@@ -412,7 +420,7 @@ static MACHINE_CONFIG_START( wardner )
 
 	MCFG_SCREEN_ADD("screen", RASTER)
 	MCFG_SCREEN_VIDEO_ATTRIBUTES(VIDEO_UPDATE_BEFORE_VBLANK)
-	MCFG_SCREEN_RAW_PARAMS(XTAL_14MHz/2, 446, 0, 320, 286, 0, 240)
+	MCFG_SCREEN_RAW_PARAMS(XTAL(14'000'000)/2, 446, 0, 320, 286, 0, 240)
 	MCFG_SCREEN_UPDATE_DRIVER(wardner_state, screen_update_toaplan0)
 	MCFG_SCREEN_VBLANK_CALLBACK(DEVWRITELINE("spriteram8", buffered_spriteram8_device, vblank_copy_rising))
 	MCFG_SCREEN_PALETTE("palette")
@@ -426,7 +434,7 @@ static MACHINE_CONFIG_START( wardner )
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
 
-	MCFG_SOUND_ADD("ymsnd", YM3812, XTAL_14MHz/4)
+	MCFG_SOUND_ADD("ymsnd", YM3812, XTAL(14'000'000)/4)
 	MCFG_YM3812_IRQ_HANDLER(INPUTLINE("audiocpu", 0))
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 MACHINE_CONFIG_END

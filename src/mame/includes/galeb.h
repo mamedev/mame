@@ -6,8 +6,8 @@
  *
  ****************************************************************************/
 
-#ifndef GALEB_H_
-#define GALEB_H_
+#ifndef MAME_INCLUDES_GALEB_H
+#define MAME_INCLUDES_GALEB_H
 
 #include "sound/dac.h"
 
@@ -40,6 +40,8 @@ public:
 	required_ioport_array<8> m_keyboard;
 	required_device<dac_1bit_device> m_dac;
 
+	void galeb(machine_config &config);
+	void galeb_mem(address_map &map);
 protected:
 	virtual void machine_start() override;
 
@@ -51,4 +53,4 @@ private:
 
 extern const gfx_layout galeb_charlayout;
 
-#endif /* GALEB_H_ */
+#endif // MAME_INCLUDES_GALEB_H

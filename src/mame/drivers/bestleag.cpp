@@ -72,6 +72,9 @@ public:
 	uint32_t screen_update_bestleag(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	uint32_t screen_update_bestleaw(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	void draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprect);
+	void bestleag(machine_config &config);
+	void bestleaw(machine_config &config);
+	void bestleag_map(address_map &map);
 };
 
 
@@ -247,14 +250,14 @@ WRITE16_MEMBER(bestleag_state::oki_bank_w)
 
 /* Memory Map */
 
-static ADDRESS_MAP_START( bestleag_map, AS_PROGRAM, 16, bestleag_state )
+ADDRESS_MAP_START(bestleag_state::bestleag_map)
 	AM_RANGE(0x000000, 0x03ffff) AM_ROM
 	AM_RANGE(0x0d2000, 0x0d3fff) AM_NOP // left over from the original game (only read / written in memory test)
 	AM_RANGE(0x0e0000, 0x0e3fff) AM_RAM_WRITE(bgram_w) AM_SHARE("bgram")
 	AM_RANGE(0x0e8000, 0x0ebfff) AM_RAM_WRITE(fgram_w) AM_SHARE("fgram")
 	AM_RANGE(0x0f0000, 0x0f3fff) AM_RAM_WRITE(txram_w) AM_SHARE("txram")
 	AM_RANGE(0x0f8000, 0x0f800b) AM_RAM AM_SHARE("vregs")
-	AM_RANGE(0x100000, 0x100fff) AM_RAM_DEVWRITE("palette", palette_device, write) AM_SHARE("palette")
+	AM_RANGE(0x100000, 0x100fff) AM_RAM_DEVWRITE("palette", palette_device, write16) AM_SHARE("palette")
 	AM_RANGE(0x200000, 0x200fff) AM_RAM AM_SHARE("spriteram")
 	AM_RANGE(0x300010, 0x300011) AM_READ_PORT("SYSTEM")
 	AM_RANGE(0x300012, 0x300013) AM_READ_PORT("P1")
@@ -375,7 +378,7 @@ static GFXDECODE_START( bestleag )
 	GFXDECODE_ENTRY( "gfx2", 0, bestleag_char16layout,   0x300, 16 )
 GFXDECODE_END
 
-static MACHINE_CONFIG_START( bestleag )
+MACHINE_CONFIG_START(bestleag_state::bestleag)
 	MCFG_CPU_ADD("maincpu", M68000, 12000000)
 	MCFG_CPU_PROGRAM_MAP(bestleag_map)
 	MCFG_CPU_VBLANK_INT_DRIVER("screen", bestleag_state,  irq6_line_hold)
@@ -399,7 +402,8 @@ static MACHINE_CONFIG_START( bestleag )
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", 1.00)
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_DERIVED( bestleaw, bestleag )
+MACHINE_CONFIG_START(bestleag_state::bestleaw)
+	bestleag(config);
 	MCFG_SCREEN_MODIFY("screen")
 	MCFG_SCREEN_UPDATE_DRIVER(bestleag_state, screen_update_bestleaw)
 MACHINE_CONFIG_END

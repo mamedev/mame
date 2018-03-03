@@ -62,6 +62,9 @@ public:
 	required_device<mc6845_device>m_crtc;
 	required_device<gfxdecode_device> m_gfxdecode;
 	required_device<palette_device> m_palette;
+	void fp6000(machine_config &config);
+	void fp6000_io(address_map &map);
+	void fp6000_map(address_map &map);
 };
 
 void fp6000_state::video_start()
@@ -173,7 +176,7 @@ WRITE8_MEMBER(fp6000_state::fp6000_6845_data_w)
 	m_crtc->register_w(space, offset, data);
 }
 
-static ADDRESS_MAP_START(fp6000_map, AS_PROGRAM, 16, fp6000_state )
+ADDRESS_MAP_START(fp6000_state::fp6000_map)
 	ADDRESS_MAP_UNMAP_HIGH
 	AM_RANGE(0x00000,0xbffff) AM_RAM
 	AM_RANGE(0xc0000,0xdffff) AM_RAM AM_SHARE("gvram")//gvram
@@ -223,7 +226,7 @@ READ16_MEMBER(fp6000_state::pit_r)
 	return machine().rand();
 }
 
-static ADDRESS_MAP_START(fp6000_io, AS_IO, 16, fp6000_state )
+ADDRESS_MAP_START(fp6000_state::fp6000_io)
 	ADDRESS_MAP_UNMAP_HIGH
 	AM_RANGE(0x08, 0x09) AM_READ(ex_board_r) // BIOS of some sort ...
 	AM_RANGE(0x0a, 0x0b) AM_READ_PORT("DSW") // installed RAM id?
@@ -289,7 +292,7 @@ void fp6000_state::machine_reset()
 {
 }
 
-static MACHINE_CONFIG_START( fp6000 )
+MACHINE_CONFIG_START(fp6000_state::fp6000)
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", I8086, 16000000/2)
 	MCFG_CPU_PROGRAM_MAP(fp6000_map)

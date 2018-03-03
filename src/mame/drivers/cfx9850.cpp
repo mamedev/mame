@@ -55,6 +55,8 @@ public:
 	DECLARE_PALETTE_INIT(cfx9850);
 	u32 screen_update_cfx9850(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 
+	void cfx9850(machine_config &config);
+	void cfx9850(address_map &map);
 protected:
 	required_ioport_array<12> m_ko_port;
 	required_device<cpu_device> m_maincpu;
@@ -66,7 +68,7 @@ private:
 };
 
 
-static ADDRESS_MAP_START(cfx9850, AS_PROGRAM, 8, cfx9850_state)
+ADDRESS_MAP_START(cfx9850_state::cfx9850)
 	AM_RANGE( 0x000000, 0x007fff ) AM_ROM
 	AM_RANGE( 0x080000, 0x0807ff ) AM_RAM AM_SHARE("video_ram")
 //  AM_RANGE( 0x100000, 0x10ffff ) // some memory mapped i/o???
@@ -279,7 +281,7 @@ u32 cfx9850_state::screen_update_cfx9850(screen_device &screen, bitmap_ind16 &bi
 }
 
 
-static MACHINE_CONFIG_START(cfx9850)
+MACHINE_CONFIG_START(cfx9850_state::cfx9850)
 	MCFG_CPU_ADD("maincpu", HCD62121, 4300000)    /* X1 - 4.3 MHz */
 	MCFG_CPU_PROGRAM_MAP(cfx9850)
 	MCFG_HCD62121_KOL_CB(WRITE8(cfx9850_state, kol_w))

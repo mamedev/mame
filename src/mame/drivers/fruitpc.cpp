@@ -43,6 +43,10 @@ public:
 
 	DECLARE_READ8_MEMBER(fruit_inp_r);
 	DECLARE_WRITE8_MEMBER(dma8237_1_dack_w);
+	static void fruitpc_sb_conf(device_t *device);
+	void fruitpc(machine_config &config);
+	void fruitpc_io(address_map &map);
+	void fruitpc_map(address_map &map);
 };
 
 READ8_MEMBER(fruitpc_state::fruit_inp_r)
@@ -61,7 +65,7 @@ READ8_MEMBER(fruitpc_state::fruit_inp_r)
 	return 0;
 }
 
-static ADDRESS_MAP_START( fruitpc_map, AS_PROGRAM, 32, fruitpc_state )
+ADDRESS_MAP_START(fruitpc_state::fruitpc_map)
 	AM_RANGE(0x00000000, 0x0009ffff) AM_RAM
 	AM_RANGE(0x000a0000, 0x000bffff) AM_DEVREADWRITE8("vga", vga_device, mem_r, mem_w, 0xffffffff) // VGA VRAM
 	AM_RANGE(0x000c0000, 0x000dffff) AM_ROM AM_REGION("bios", 0)
@@ -71,7 +75,7 @@ static ADDRESS_MAP_START( fruitpc_map, AS_PROGRAM, 32, fruitpc_state )
 	AM_RANGE(0xfffe0000, 0xffffffff) AM_ROM AM_REGION("bios", 0)    /* System BIOS */
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( fruitpc_io, AS_IO, 32, fruitpc_state )
+ADDRESS_MAP_START(fruitpc_state::fruitpc_io)
 	AM_IMPORT_FROM(pcat32_io_common)
 	AM_RANGE(0x01f0, 0x01f7) AM_DEVREADWRITE16("ide", ide_controller_device, read_cs0, write_cs0, 0xffffffff)
 	AM_RANGE(0x0310, 0x0313) AM_READ8(fruit_inp_r, 0xffffffff)
@@ -117,24 +121,25 @@ static DEVICE_INPUT_DEFAULTS_START( fruitpc_sb_def )
 	DEVICE_INPUT_DEFAULTS("CONFIG", 0x03, 0x01)
 DEVICE_INPUT_DEFAULTS_END
 
-static MACHINE_CONFIG_START( fruitpc_sb_conf )
-	MCFG_DEVICE_MODIFY("pc_joy")
+void fruitpc_state::fruitpc_sb_conf(device_t *device)
+{
+	device = device->subdevice("pc_joy");
 	MCFG_DEVICE_SLOT_INTERFACE(pc_joysticks, nullptr, true) // remove joystick
-MACHINE_CONFIG_END
+}
 
-static MACHINE_CONFIG_START( fruitpc )
+MACHINE_CONFIG_START(fruitpc_state::fruitpc)
 	MCFG_CPU_ADD("maincpu", I486, 66000000) // ST STPCD0166BTC3 66 MHz 486 CPU
 	MCFG_CPU_PROGRAM_MAP(fruitpc_map)
 	MCFG_CPU_IO_MAP(fruitpc_io)
 	MCFG_CPU_IRQ_ACKNOWLEDGE_DEVICE("pic8259_1", pic8259_device, inta_cb)
 
-	MCFG_FRAGMENT_ADD( pcat_common )
+	pcat_common(config);
 
 	MCFG_IDE_CONTROLLER_ADD("ide", ata_devices, "hdd", nullptr, true)
 	MCFG_ATA_INTERFACE_IRQ_HANDLER(DEVWRITELINE("pic8259_2", pic8259_device, ir6_w))
 
 	/* video hardware */
-	MCFG_FRAGMENT_ADD( pcvideo_vga )
+	pcvideo_vga(config);
 
 	MCFG_DEVICE_MODIFY("dma8237_1")
 	MCFG_I8237_OUT_IOW_1_CB(WRITE8(fruitpc_state, dma8237_1_dack_w))

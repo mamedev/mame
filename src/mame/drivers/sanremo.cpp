@@ -101,7 +101,7 @@
 #include "sanremo.lh"
 
 
-#define MASTER_CLOCK    XTAL_18MHz
+#define MASTER_CLOCK    XTAL(18'000'000)
 
 #define CPU_CLOCK       MASTER_CLOCK/3
 #define SND_CLOCK       MASTER_CLOCK/12
@@ -131,6 +131,9 @@ public:
 	uint32_t screen_update_sanremo(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	required_device<cpu_device> m_maincpu;
 	required_device<gfxdecode_device> m_gfxdecode;
+	void sanremo(machine_config &config);
+	void sanremo_map(address_map &map);
+	void sanremo_portmap(address_map &map);
 };
 
 
@@ -221,13 +224,13 @@ WRITE8_MEMBER(sanremo_state::banksel_w)
 *           Memory map information           *
 *********************************************/
 
-static ADDRESS_MAP_START( sanremo_map, AS_PROGRAM, 8, sanremo_state )
+ADDRESS_MAP_START(sanremo_state::sanremo_map)
 	AM_RANGE(0x0000, 0x7fff) AM_ROM
 	AM_RANGE(0x8000, 0x87ff) AM_RAM_WRITE(sanremo_videoram_w) AM_SHARE("videoram")  // 2x 76C28 (1x accessed directly, latched bank written to other like subsino etc.)
 	AM_RANGE(0xc000, 0xc7ff) AM_RAM AM_SHARE("nvram")                               // battery backed UM6116
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( sanremo_portmap, AS_IO, 8, sanremo_state )
+ADDRESS_MAP_START(sanremo_state::sanremo_portmap)
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	AM_RANGE(0x01, 0x01) AM_READ_PORT("IN0")
 	AM_RANGE(0x02, 0x02) AM_READ_PORT("IN1")
@@ -342,7 +345,7 @@ GFXDECODE_END
 *              Machine Drivers               *
 *********************************************/
 
-static MACHINE_CONFIG_START( sanremo )
+MACHINE_CONFIG_START(sanremo_state::sanremo)
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", Z80, CPU_CLOCK)

@@ -68,6 +68,9 @@ public:
 	DECLARE_INPUT_CHANGED_MEMBER(self_test);
 	TIMER_DEVICE_CALLBACK_MEMBER(timer_x);
 	TIMER_DEVICE_CALLBACK_MEMBER(u11_timer);
+	void st_mp201(machine_config &config);
+	void st_mp200(machine_config &config);
+	void st_mp200_map(address_map &map);
 private:
 	uint8_t m_u10a;
 	uint8_t m_u10b;
@@ -101,7 +104,7 @@ private:
 };
 
 
-static ADDRESS_MAP_START( st_mp200_map, AS_PROGRAM, 8, st_mp200_state )
+ADDRESS_MAP_START(st_mp200_state::st_mp200_map)
 	//ADDRESS_MAP_GLOBAL_MASK(0x7fff)
 	AM_RANGE(0x0000, 0x007f) AM_RAM // internal to the cpu
 	AM_RANGE(0x0088, 0x008b) AM_DEVREADWRITE("pia_u10", pia6821_device, read, write)
@@ -567,7 +570,7 @@ TIMER_DEVICE_CALLBACK_MEMBER( st_mp200_state::u11_timer )
 	m_pia_u11->ca1_w(m_u11_timer);
 }
 
-static MACHINE_CONFIG_START( st_mp200 )
+MACHINE_CONFIG_START(st_mp200_state::st_mp200)
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", M6800, 1000000) // no xtal, just 2 chips forming a random oscillator
 	MCFG_CPU_PROGRAM_MAP(st_mp200_map)
@@ -578,7 +581,7 @@ static MACHINE_CONFIG_START( st_mp200 )
 	MCFG_DEFAULT_LAYOUT(layout_st_mp200)
 
 	/* Sound */
-	MCFG_FRAGMENT_ADD( genpin_audio )
+	genpin_audio(config);
 
 	/* Devices */
 	MCFG_DEVICE_ADD("pia_u10", PIA6821, 0)
@@ -603,7 +606,8 @@ static MACHINE_CONFIG_START( st_mp200 )
 	MCFG_TIMER_DRIVER_ADD_PERIODIC("timer_d", st_mp200_state, u11_timer, attotime::from_hz(634)) // 555 timer*2
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_DERIVED( st_mp201, st_mp200 )
+MACHINE_CONFIG_START(st_mp200_state::st_mp201)
+	st_mp200(config);
 	MCFG_SPEAKER_STANDARD_MONO("mono")
 	MCFG_SOUND_ADD("speech", S14001A, S14001_CLOCK)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.00)

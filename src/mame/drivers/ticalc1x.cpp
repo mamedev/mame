@@ -71,6 +71,7 @@ public:
 	DECLARE_WRITE16_MEMBER(write_o);
 	DECLARE_WRITE16_MEMBER(write_r);
 	DECLARE_READ8_MEMBER(read_k);
+	void cmulti8(machine_config &config);
 };
 
 // handlers
@@ -98,7 +99,7 @@ WRITE16_MEMBER(cmulti8_state::write_r)
 WRITE16_MEMBER(cmulti8_state::write_o)
 {
 	// O0-O7: digit segments
-	m_o = BITSWAP8(data,0,4,5,6,7,1,2,3);
+	m_o = bitswap<8>(data,0,4,5,6,7,1,2,3);
 	prepare_display();
 }
 
@@ -184,7 +185,7 @@ static INPUT_PORTS_START( cmulti8 )
 	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_UNUSED )
 INPUT_PORTS_END
 
-static MACHINE_CONFIG_START( cmulti8 )
+MACHINE_CONFIG_START(cmulti8_state::cmulti8)
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", TMS1070, 250000) // approximation - RC osc. R=56K, C=68pf
@@ -225,6 +226,7 @@ public:
 	DECLARE_WRITE16_MEMBER(write_o);
 	DECLARE_WRITE16_MEMBER(write_r);
 	DECLARE_READ8_MEMBER(read_k);
+	void tisr16(machine_config &config);
 };
 
 // handlers
@@ -400,7 +402,7 @@ static INPUT_PORTS_START( tisr16ii )
 	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_9) PORT_CODE(KEYCODE_9_PAD) PORT_NAME("9")
 INPUT_PORTS_END
 
-static MACHINE_CONFIG_START( tisr16 )
+MACHINE_CONFIG_START(tisr16_state::tisr16)
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", TMS1000, 300000) // approximation - RC osc. R=43K, C=68pf (note: tisr16ii MCU RC osc. is different: R=30K, C=100pf, same freq)
@@ -453,6 +455,8 @@ public:
 	DECLARE_WRITE16_MEMBER(write_o);
 	DECLARE_WRITE16_MEMBER(write_r);
 	DECLARE_READ8_MEMBER(read_k);
+	void ti1270(machine_config &config);
+	void ti1250(machine_config &config);
 };
 
 // handlers
@@ -538,7 +542,7 @@ static INPUT_PORTS_START( ti1270 )
 	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_MINUS) PORT_NAME("+/-")
 INPUT_PORTS_END
 
-static MACHINE_CONFIG_START( ti1250 )
+MACHINE_CONFIG_START(ti1250_state::ti1250)
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", TMS0950, 200000) // approximation - RC osc. R=68K, C=68pf
@@ -552,7 +556,8 @@ static MACHINE_CONFIG_START( ti1250 )
 	/* no sound! */
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_DERIVED( ti1270, ti1250 )
+MACHINE_CONFIG_START(ti1250_state::ti1270)
+	ti1250(config);
 
 	/* basic machine hardware */
 	MCFG_CPU_REPLACE("maincpu", TMS0970, 250000) // approximation
@@ -586,6 +591,7 @@ public:
 	DECLARE_WRITE16_MEMBER(write_o);
 	DECLARE_WRITE16_MEMBER(write_r);
 	DECLARE_READ8_MEMBER(read_k);
+	void ti25503(machine_config &config);
 };
 
 // handlers
@@ -664,7 +670,7 @@ static INPUT_PORTS_START( ti25503 )
 	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_X) PORT_NAME("1/x")
 INPUT_PORTS_END
 
-static MACHINE_CONFIG_START( ti25503 )
+MACHINE_CONFIG_START(ti25503_state::ti25503)
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", TMS1000, 250000) // approximation
@@ -703,6 +709,7 @@ public:
 	DECLARE_WRITE16_MEMBER(write_o);
 	DECLARE_WRITE16_MEMBER(write_r);
 	DECLARE_READ8_MEMBER(read_k);
+	void ti1000(machine_config &config);
 };
 
 // handlers
@@ -719,7 +726,7 @@ WRITE16_MEMBER(ti1000_state::write_o)
 	// O0-O3,O5(?): input mux
 	// O0-O7: digit segments
 	m_inp_mux = (data & 0xf) | (data >> 1 & 0x10);
-	m_o = BITSWAP8(data,7,4,3,2,1,0,6,5);
+	m_o = bitswap<8>(data,7,4,3,2,1,0,6,5);
 }
 
 READ8_MEMBER(ti1000_state::read_k)
@@ -764,7 +771,7 @@ static INPUT_PORTS_START( ti1000 )
 	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_ENTER) PORT_CODE(KEYCODE_ENTER_PAD) PORT_NAME("=")
 INPUT_PORTS_END
 
-static MACHINE_CONFIG_START( ti1000 )
+MACHINE_CONFIG_START(ti1000_state::ti1000)
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", TMS1990, 250000) // approximation
@@ -800,6 +807,7 @@ public:
 	virtual DECLARE_WRITE16_MEMBER(write_o);
 	virtual DECLARE_WRITE16_MEMBER(write_r);
 	virtual DECLARE_READ8_MEMBER(read_k);
+	void wizatron(machine_config &config);
 };
 
 // handlers
@@ -864,7 +872,7 @@ static INPUT_PORTS_START( wizatron )
 	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_SLASH_PAD) PORT_NAME(UTF8_DIVIDE)
 INPUT_PORTS_END
 
-static MACHINE_CONFIG_START( wizatron )
+MACHINE_CONFIG_START(wizatron_state::wizatron)
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", TMS0970, 250000) // approximation
@@ -902,6 +910,7 @@ public:
 
 	virtual DECLARE_WRITE16_MEMBER(write_o) override;
 	virtual DECLARE_READ8_MEMBER(read_k) override;
+	void lilprof(machine_config &config);
 };
 
 // handlers
@@ -938,7 +947,7 @@ static INPUT_PORTS_START( lilprof )
 	PORT_CONFSETTING(    0x08, "4" )
 INPUT_PORTS_END
 
-static MACHINE_CONFIG_START( lilprof )
+MACHINE_CONFIG_START(lilprof_state::lilprof)
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", TMS0970, 250000) // approximation
@@ -977,6 +986,7 @@ public:
 	DECLARE_WRITE16_MEMBER(write_o);
 	DECLARE_WRITE16_MEMBER(write_r);
 	DECLARE_READ8_MEMBER(read_k);
+	void lilprof78(machine_config &config);
 };
 
 // handlers
@@ -984,7 +994,7 @@ public:
 WRITE16_MEMBER(lilprof78_state::write_r)
 {
 	// update leds state
-	u8 seg = BITSWAP8(m_o,7,4,3,2,1,0,6,5) & 0x7f;
+	u8 seg = bitswap<8>(m_o,7,4,3,2,1,0,6,5) & 0x7f;
 	u16 r = (data & 7) | (data << 1 & 0x1f0);
 	set_display_segmask(0x1ff, 0x7f);
 	display_matrix(7, 9, seg, r, false);
@@ -993,7 +1003,7 @@ WRITE16_MEMBER(lilprof78_state::write_r)
 	m_display_state[3] = (r != 0 && m_o & 0x80) ? 0x41 : 0;
 
 	// 6th digit is a custom 7seg for math symbols (see wizatron_state write_r)
-	m_display_state[6] = BITSWAP8(m_display_state[6],7,6,1,4,2,3,5,0);
+	m_display_state[6] = bitswap<8>(m_display_state[6],7,6,1,4,2,3,5,0);
 	display_update();
 }
 
@@ -1048,7 +1058,7 @@ static INPUT_PORTS_START( lilprof78 )
 	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_PLUS_PAD) PORT_NAME("+")
 INPUT_PORTS_END
 
-static MACHINE_CONFIG_START( lilprof78 )
+MACHINE_CONFIG_START(lilprof78_state::lilprof78)
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", TMS1990, 250000) // approximation
@@ -1085,6 +1095,7 @@ public:
 	virtual DECLARE_WRITE16_MEMBER(write_o);
 	virtual DECLARE_WRITE16_MEMBER(write_r);
 	virtual DECLARE_READ8_MEMBER(read_k);
+	void dataman(machine_config &config);
 };
 
 // handlers
@@ -1108,7 +1119,7 @@ WRITE16_MEMBER(dataman_state::write_r)
 WRITE16_MEMBER(dataman_state::write_o)
 {
 	// O0-O6: digit segments A-G
-	m_o = BITSWAP8(data,7,1,6,5,4,3,2,0) & 0x7f;
+	m_o = bitswap<8>(data,7,1,6,5,4,3,2,0) & 0x7f;
 	prepare_display();
 }
 
@@ -1160,7 +1171,7 @@ static INPUT_PORTS_START( dataman )
 	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_E) PORT_NAME("Electro Flash")
 INPUT_PORTS_END
 
-static MACHINE_CONFIG_START( dataman )
+MACHINE_CONFIG_START(dataman_state::dataman)
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", TMS1980, 300000) // patent says 300kHz
@@ -1197,6 +1208,7 @@ public:
 	{ }
 
 	virtual DECLARE_WRITE16_MEMBER(write_r) override;
+	void mathmarv(machine_config &config);
 };
 
 // handlers
@@ -1227,7 +1239,7 @@ static INPUT_PORTS_START( mathmarv )
 	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_F) PORT_NAME("Flash")
 INPUT_PORTS_END
 
-static MACHINE_CONFIG_START( mathmarv )
+MACHINE_CONFIG_START(mathmarv_state::mathmarv)
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", TMS1980, 300000) // assume same as dataman
@@ -1280,6 +1292,7 @@ public:
 	DECLARE_WRITE16_MEMBER(write_o);
 	DECLARE_WRITE16_MEMBER(write_r);
 	DECLARE_READ8_MEMBER(read_k);
+	void ti30(machine_config &config);
 };
 
 // handlers
@@ -1297,7 +1310,7 @@ WRITE16_MEMBER(ti30_state::write_o)
 	// O0-O2,O4-O7: input mux
 	// O0-O7: digit segments
 	m_inp_mux = (data & 7) | (data >> 1 & 0x78);
-	m_o = BITSWAP8(data,7,5,2,1,4,0,6,3);
+	m_o = bitswap<8>(data,7,5,2,1,4,0,6,3);
 }
 
 READ8_MEMBER(ti30_state::read_k)
@@ -1487,7 +1500,7 @@ static INPUT_PORTS_START( tibusan )
 	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_PGDN) PORT_NAME("Off") PORT_CHANGED_MEMBER(DEVICE_SELF, hh_tms1k_state, power_button, (void *)false)
 INPUT_PORTS_END
 
-static MACHINE_CONFIG_START( ti30 )
+MACHINE_CONFIG_START(ti30_state::ti30)
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", TMS0980, 400000) // guessed

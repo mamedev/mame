@@ -143,6 +143,10 @@ public:
 	void draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprect);
 	uint32_t screen_update_stuntair(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	DECLARE_PALETTE_INIT(stuntair);
+	void stuntair(machine_config &config);
+	void stuntair_map(address_map &map);
+	void stuntair_sound_map(address_map &map);
+	void stuntair_sound_portmap(address_map &map);
 };
 
 
@@ -316,7 +320,7 @@ WRITE8_MEMBER(stuntair_state::stuntair_sound_w)
 }
 
 // main Z80
-static ADDRESS_MAP_START( stuntair_map, AS_PROGRAM, 8, stuntair_state )
+ADDRESS_MAP_START(stuntair_state::stuntair_map)
 	AM_RANGE(0x0000, 0x9fff) AM_ROM
 	AM_RANGE(0xc000, 0xc7ff) AM_RAM AM_SHARE("nvram")
 	AM_RANGE(0xc800, 0xcbff) AM_RAM_WRITE(stuntair_bgattrram_w) AM_SHARE("bgattrram")
@@ -333,12 +337,12 @@ static ADDRESS_MAP_START( stuntair_map, AS_PROGRAM, 8, stuntair_state )
 ADDRESS_MAP_END
 
 // sound Z80
-static ADDRESS_MAP_START( stuntair_sound_map, AS_PROGRAM, 8, stuntair_state )
+ADDRESS_MAP_START(stuntair_state::stuntair_sound_map)
 	AM_RANGE(0x0000, 0x1fff) AM_ROM
 	AM_RANGE(0x4000, 0x43ff) AM_RAM
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( stuntair_sound_portmap, AS_IO, 8, stuntair_state )
+ADDRESS_MAP_START(stuntair_state::stuntair_sound_portmap)
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	AM_RANGE(0x03, 0x03) AM_DEVWRITE("ay2", ay8910_device, address_w)
 	AM_RANGE(0x07, 0x07) AM_DEVWRITE("ay2", ay8910_device, data_w)
@@ -506,14 +510,14 @@ void stuntair_state::machine_reset()
 {
 }
 
-static MACHINE_CONFIG_START( stuntair )
+MACHINE_CONFIG_START(stuntair_state::stuntair)
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", Z80,  XTAL_18_432MHz/6)         /* 3 MHz? */
+	MCFG_CPU_ADD("maincpu", Z80,  XTAL(18'432'000)/6)         /* 3 MHz? */
 	MCFG_CPU_PROGRAM_MAP(stuntair_map)
 	MCFG_CPU_VBLANK_INT_DRIVER("screen", stuntair_state, stuntair_irq)
 
-	MCFG_CPU_ADD("audiocpu", Z80,  XTAL_18_432MHz/6)         /* 3 MHz? */
+	MCFG_CPU_ADD("audiocpu", Z80,  XTAL(18'432'000)/6)         /* 3 MHz? */
 	MCFG_CPU_PROGRAM_MAP(stuntair_sound_map)
 	MCFG_CPU_IO_MAP(stuntair_sound_portmap)
 	MCFG_CPU_PERIODIC_INT_DRIVER(stuntair_state, irq0_line_hold, 420) // drives music tempo, timing is approximate based on PCB audio recording.. and where is irq ack?
@@ -551,12 +555,12 @@ static MACHINE_CONFIG_START( stuntair )
 
 	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
 
-	MCFG_SOUND_ADD("ay1", AY8910, XTAL_18_432MHz/12)
+	MCFG_SOUND_ADD("ay1", AY8910, XTAL(18'432'000)/12)
 	MCFG_AY8910_PORT_A_READ_CB(DEVREAD8("soundlatch", generic_latch_8_device, read))
 	MCFG_AY8910_PORT_B_WRITE_CB(WRITE8(stuntair_state, ay8910_portb_w))
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
 
-	MCFG_SOUND_ADD("ay2", AY8910, XTAL_18_432MHz/12)
+	MCFG_SOUND_ADD("ay2", AY8910, XTAL(18'432'000)/12)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
 MACHINE_CONFIG_END
 

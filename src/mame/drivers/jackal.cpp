@@ -162,7 +162,7 @@ WRITE8_MEMBER(jackal_state::jackal_spriteram_w)
  *
  *************************************/
 
-static ADDRESS_MAP_START( master_map, AS_PROGRAM, 8, jackal_state )
+ADDRESS_MAP_START(jackal_state::master_map)
 	AM_RANGE(0x0000, 0x0003) AM_RAM AM_SHARE("videoctrl")   // scroll + other things
 	AM_RANGE(0x0004, 0x0004) AM_WRITE(jackal_flipscreen_w)
 	AM_RANGE(0x0010, 0x0010) AM_READ_PORT("DSW1")
@@ -181,7 +181,7 @@ static ADDRESS_MAP_START( master_map, AS_PROGRAM, 8, jackal_state )
 	AM_RANGE(0xc000, 0xffff) AM_ROM
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( slave_map, AS_PROGRAM, 8, jackal_state )
+ADDRESS_MAP_START(jackal_state::slave_map)
 	AM_RANGE(0x2000, 0x2001) AM_DEVREADWRITE("ymsnd", ym2151_device, read, write)
 	AM_RANGE(0x4000, 0x43ff) AM_RAM_DEVWRITE("palette", palette_device, write_indirect) AM_SHARE("palette")  // self test only checks 0x4000-0x423f, 007327 should actually go up to 4fff
 	AM_RANGE(0x6000, 0x605f) AM_RAM                     // SOUND RAM (Self test check 0x6000-605f, 0x7c00-0x7fff)
@@ -355,14 +355,14 @@ void jackal_state::machine_reset()
 	m_irq_enable = 0;
 }
 
-static MACHINE_CONFIG_START( jackal )
+MACHINE_CONFIG_START(jackal_state::jackal)
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("master", M6809, MASTER_CLOCK/12) // verified on pcb
+	MCFG_CPU_ADD("master", MC6809E, MASTER_CLOCK/12) // verified on pcb
 	MCFG_CPU_PROGRAM_MAP(master_map)
 	MCFG_CPU_VBLANK_INT_DRIVER("screen", jackal_state,  jackal_interrupt)
 
-	MCFG_CPU_ADD("slave", M6809, MASTER_CLOCK/12) // verified on pcb
+	MCFG_CPU_ADD("slave", MC6809E, MASTER_CLOCK/12) // verified on pcb
 	MCFG_CPU_PROGRAM_MAP(slave_map)
 
 	MCFG_QUANTUM_TIME(attotime::from_hz(6000))

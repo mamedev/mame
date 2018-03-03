@@ -33,7 +33,7 @@ ROM_END
 //  device_add_mconfig - add device configuration
 //-------------------------------------------------
 
-MACHINE_CONFIG_MEMBER( a1bus_cffa_device::device_add_mconfig )
+MACHINE_CONFIG_START(a1bus_cffa_device::device_add_mconfig)
 	MCFG_ATA_INTERFACE_ADD(CFFA_ATA_TAG, ata_devices, "hdd", nullptr, false)
 MACHINE_CONFIG_END
 
@@ -100,7 +100,7 @@ READ8_MEMBER(a1bus_cffa_device::cffa_r)
 			break;
 
 		case 0x8:
-			m_lastdata = m_ata->read_cs0(space, (offset & 0xf) - 8, 0xff);
+			m_lastdata = m_ata->read_cs0((offset & 0xf) - 8, 0xff);
 			return m_lastdata & 0x00ff;
 
 		case 0x9:
@@ -110,7 +110,7 @@ READ8_MEMBER(a1bus_cffa_device::cffa_r)
 		case 0xd:
 		case 0xe:
 		case 0xf:
-			return m_ata->read_cs0(space, (offset & 0xf) - 8, 0xff);
+			return m_ata->read_cs0((offset & 0xf) - 8, 0xff);
 	}
 
 	return 0xff;
@@ -135,7 +135,7 @@ WRITE8_MEMBER(a1bus_cffa_device::cffa_w)
 
 
 		case 0x8:
-			m_ata->write_cs0(space, (offset & 0xf) - 8, data, 0xff);
+			m_ata->write_cs0((offset & 0xf) - 8, data, 0xff);
 			break;
 
 		case 0x9:
@@ -145,7 +145,7 @@ WRITE8_MEMBER(a1bus_cffa_device::cffa_w)
 		case 0xd:
 		case 0xe:
 		case 0xf:
-			m_ata->write_cs0(space, (offset & 0xf) - 8, data, 0xff);
+			m_ata->write_cs0((offset & 0xf) - 8, data, 0xff);
 			break;
 
 	}

@@ -2,8 +2,8 @@
 // copyright-holders:Curt Coder
 #pragma once
 
-#ifndef __TMC600__
-#define __TMC600__
+#ifndef MAME_INCLUDES_TMC600_H
+#define MAME_INCLUDES_TMC600_H
 
 #include "cpu/cosmac/cosmac.h"
 #include "imagedev/cassette.h"
@@ -85,10 +85,11 @@ public:
 	TIMER_DEVICE_CALLBACK_MEMBER(blink_tick);
 	CDP1869_CHAR_RAM_READ_MEMBER(tmc600_char_ram_r);
 	CDP1869_PCB_READ_MEMBER(tmc600_pcb_r);
+	void tmc600(machine_config &config);
+	void tmc600_video(machine_config &config);
+	void cdp1869_page_ram(address_map &map);
+	void tmc600_io_map(address_map &map);
+	void tmc600_map(address_map &map);
 };
-
-// ---------- defined in video/tmc600.c ----------
-
-MACHINE_CONFIG_EXTERN( tmc600_video );
 
 #endif

@@ -72,4 +72,7 @@ public:
 	void draw_sprites( bitmap_ind16 &bitmap, const rectangle &cliprect, int pri );
 	DECLARE_WRITE_LINE_MEMBER(irqhandler);
 	DECLARE_WRITE_LINE_MEMBER(goal92_adpcm_int);
+	void goal92(machine_config &config);
+	void goal92_map(address_map &map);
+	void sound_cpu(address_map &map);
 };

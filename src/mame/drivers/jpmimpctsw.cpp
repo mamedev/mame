@@ -71,7 +71,6 @@
 
 
 
-MACHINE_CONFIG_EXTERN( impctawp );
 INPUT_PORTS_EXTERN( tbirds );
 
 

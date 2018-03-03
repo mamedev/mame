@@ -58,7 +58,7 @@ INTERRUPT_GEN_MEMBER(vulgus_state::vblank_irq)
 	device.execute().set_input_line_and_vector(0, HOLD_LINE, 0xd7); /* RST 10h - vblank */
 }
 
-static ADDRESS_MAP_START( main_map, AS_PROGRAM, 8, vulgus_state )
+ADDRESS_MAP_START(vulgus_state::main_map)
 	AM_RANGE(0x0000, 0x9fff) AM_ROM
 	AM_RANGE(0xc000, 0xc000) AM_READ_PORT("SYSTEM")
 	AM_RANGE(0xc001, 0xc001) AM_READ_PORT("P1")
@@ -77,7 +77,7 @@ static ADDRESS_MAP_START( main_map, AS_PROGRAM, 8, vulgus_state )
 	AM_RANGE(0xe000, 0xefff) AM_RAM
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( sound_map, AS_PROGRAM, 8, vulgus_state )
+ADDRESS_MAP_START(vulgus_state::sound_map)
 	AM_RANGE(0x0000, 0x1fff) AM_ROM
 	AM_RANGE(0x4000, 0x47ff) AM_RAM
 	AM_RANGE(0x6000, 0x6000) AM_DEVREAD("soundlatch", generic_latch_8_device, read)
@@ -214,14 +214,14 @@ GFXDECODE_END
 
 
 
-static MACHINE_CONFIG_START( vulgus )
+MACHINE_CONFIG_START(vulgus_state::vulgus)
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", Z80, XTAL_12MHz/4)  /* 3 MHz */
+	MCFG_CPU_ADD("maincpu", Z80, XTAL(12'000'000)/4)  /* 3 MHz */
 	MCFG_CPU_PROGRAM_MAP(main_map)
 	MCFG_CPU_VBLANK_INT_DRIVER("screen", vulgus_state, vblank_irq)
 
-	MCFG_CPU_ADD("audiocpu", Z80, XTAL_12MHz/4) /* 3 MHz */
+	MCFG_CPU_ADD("audiocpu", Z80, XTAL(12'000'000)/4) /* 3 MHz */
 	MCFG_CPU_PROGRAM_MAP(sound_map)
 	MCFG_CPU_PERIODIC_INT_DRIVER(vulgus_state, irq0_line_hold, 8*60)
 
@@ -245,10 +245,10 @@ static MACHINE_CONFIG_START( vulgus )
 
 	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
 
-	MCFG_SOUND_ADD("ay1", AY8910, XTAL_12MHz/8) /* 1.5 MHz */
+	MCFG_SOUND_ADD("ay1", AY8910, XTAL(12'000'000)/8) /* 1.5 MHz */
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
 
-	MCFG_SOUND_ADD("ay2", AY8910, XTAL_12MHz/8) /* 1.5 MHz */
+	MCFG_SOUND_ADD("ay2", AY8910, XTAL(12'000'000)/8) /* 1.5 MHz */
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
 MACHINE_CONFIG_END
 

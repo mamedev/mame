@@ -54,7 +54,6 @@ private:
 
 
 // device type definition
-extern const device_type C64_GEOCABLE;
 DECLARE_DEVICE_TYPE(C64_GEOCABLE, c64_geocable_device)
 
 

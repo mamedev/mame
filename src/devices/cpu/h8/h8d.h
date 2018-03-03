@@ -95,7 +95,7 @@ protected:
 
 	const disasm_entry *table;
 
-	static const disasm_entry disasm_entries[];	
+	static const disasm_entry disasm_entries[];
 };
 
 #endif

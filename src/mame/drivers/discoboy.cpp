@@ -107,6 +107,11 @@ public:
 	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	void draw_sprites( bitmap_ind16 &bitmap, const rectangle &cliprect );
 	DECLARE_WRITE_LINE_MEMBER(yunsung8_adpcm_int);
+	void discoboy(machine_config &config);
+	void discoboy_map(address_map &map);
+	void io_map(address_map &map);
+	void rambank1_map(address_map &map);
+	void sound_map(address_map &map);
 };
 
 void discoboy_state::draw_sprites( bitmap_ind16 &bitmap, const rectangle &cliprect )
@@ -268,7 +273,7 @@ WRITE8_MEMBER(discoboy_state::rambank2_w)
 		printf("unk rb2_w\n");
 }
 
-static ADDRESS_MAP_START( discoboy_map, AS_PROGRAM, 8, discoboy_state )
+ADDRESS_MAP_START(discoboy_state::discoboy_map)
 	AM_RANGE(0x0000, 0x7fff) AM_ROM
 	AM_RANGE(0x8000, 0xbfff) AM_ROMBANK("mainbank")
 	AM_RANGE(0xc000, 0xc7ff) AM_DEVICE("rambank1", address_map_bank_device, amap8)
@@ -278,7 +283,7 @@ static ADDRESS_MAP_START( discoboy_map, AS_PROGRAM, 8, discoboy_state )
 	AM_RANGE(0xf000, 0xffff) AM_RAM
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( rambank1_map, AS_PROGRAM, 8, discoboy_state )
+ADDRESS_MAP_START(discoboy_state::rambank1_map)
 	AM_RANGE(0x0000, 0x07ff) AM_RAM AM_SHARE("ram_1")
 	AM_RANGE(0x0800, 0x0fff) AM_RAM AM_SHARE("ram_2")
 ADDRESS_MAP_END
@@ -289,7 +294,7 @@ READ8_MEMBER(discoboy_state::port_06_r)
 	return 0x00;
 }
 
-static ADDRESS_MAP_START( io_map, AS_IO, 8, discoboy_state )
+ADDRESS_MAP_START(discoboy_state::io_map)
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	AM_RANGE(0x00, 0x00) AM_READ_PORT("DSWA") AM_WRITE(port_00_w)
 	AM_RANGE(0x01, 0x01) AM_READ_PORT("SYSTEM") AM_WRITE(port_01_w)
@@ -313,7 +318,7 @@ WRITE8_MEMBER(discoboy_state::yunsung8_sound_bankswitch_w)
 		logerror("%s: Bank %02X\n", machine().describe_context(), data);
 }
 
-static ADDRESS_MAP_START( sound_map, AS_PROGRAM, 8, discoboy_state )
+ADDRESS_MAP_START(discoboy_state::sound_map)
 	AM_RANGE(0x0000, 0x7fff) AM_ROM
 	AM_RANGE(0x8000, 0xbfff) AM_ROMBANK("sndbank")
 	AM_RANGE(0xe000, 0xe000) AM_WRITE(yunsung8_sound_bankswitch_w)
@@ -443,15 +448,15 @@ WRITE_LINE_MEMBER(discoboy_state::yunsung8_adpcm_int)
 	m_audiocpu->set_input_line(INPUT_LINE_NMI, m_toggle);
 }
 
-static MACHINE_CONFIG_START( discoboy )
+MACHINE_CONFIG_START(discoboy_state::discoboy)
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", Z80, XTAL_12MHz/2)  /* 6 MHz? */
+	MCFG_CPU_ADD("maincpu", Z80, XTAL(12'000'000)/2)  /* 6 MHz? */
 	MCFG_CPU_PROGRAM_MAP(discoboy_map)
 	MCFG_CPU_IO_MAP(io_map)
 	MCFG_CPU_VBLANK_INT_DRIVER("screen", discoboy_state,  irq0_line_hold)
 
-	MCFG_CPU_ADD("audiocpu", Z80, XTAL_10MHz/2) /* 5 MHz? */
+	MCFG_CPU_ADD("audiocpu", Z80, XTAL(10'000'000)/2) /* 5 MHz? */
 	MCFG_CPU_PROGRAM_MAP(sound_map)
 
 	MCFG_DEVICE_ADD("rambank1", ADDRESS_MAP_BANK, 0)
@@ -480,14 +485,14 @@ static MACHINE_CONFIG_START( discoboy )
 	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
 	MCFG_GENERIC_LATCH_DATA_PENDING_CB(INPUTLINE("audiocpu", 0))
 
-	MCFG_SOUND_ADD("ymsnd", YM3812, XTAL_10MHz/4)   /* 2.5 MHz? */
+	MCFG_SOUND_ADD("ymsnd", YM3812, XTAL(10'000'000)/4)   /* 2.5 MHz? */
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "lspeaker", 0.6)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", 0.6)
 
 	MCFG_DEVICE_ADD("adpcm_select", LS157, 0)
 	MCFG_74157_OUT_CB(DEVWRITE8("msm", msm5205_device, data_w))
 
-	MCFG_SOUND_ADD("msm", MSM5205, XTAL_400kHz)
+	MCFG_SOUND_ADD("msm", MSM5205, XTAL(400'000))
 	MCFG_MSM5205_VCLK_CB(WRITELINE(discoboy_state, yunsung8_adpcm_int)) /* interrupt function */
 	MCFG_MSM5205_PRESCALER_SELECTOR(S96_4B)      /* 4KHz, 4 Bits */
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "lspeaker", 0.80)

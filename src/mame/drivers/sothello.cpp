@@ -30,7 +30,7 @@
 |                                                                                 |
 +---------------------------------------------------------------------------------+
 
-CPU  : Z80A(x2) 68B09
+CPU  : Z80A(x2) HD68B09P
 Sound: YM2203?(surface scratched) + M5205
 OSC  : 8.0000MHz(X1)   21.477 MHz(X2)   384kHz(X3)
 
@@ -73,6 +73,12 @@ public:
 	DECLARE_WRITE8_MEMBER(msm_cfg_w);
 	DECLARE_WRITE_LINE_MEMBER(adpcm_int);
 
+	void sothello(machine_config &config);
+	void maincpu_io_map(address_map &map);
+	void maincpu_mem_map(address_map &map);
+	void soundcpu_io_map(address_map &map);
+	void soundcpu_mem_map(address_map &map);
+	void subcpu_mem_map(address_map &map);
 protected:
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
@@ -97,12 +103,7 @@ private:
 
 #define VDP_MEM             0x40000
 
-#define MAIN_CLOCK          (XTAL_21_4772MHz)
-#define MAINCPU_CLOCK       (XTAL_21_4772MHz/6)
-#define SOUNDCPU_CLOCK      (XTAL_21_4772MHz/6)
-#define YM_CLOCK            (XTAL_21_4772MHz/12)
-#define MSM_CLOCK           (XTAL_384kHz)
-#define SUBCPU_CLOCK        (XTAL_8MHz/4)
+
 
 
 /* main Z80 */
@@ -165,14 +166,14 @@ READ8_MEMBER(sothello_state::soundcpu_status_r)
 	return m_soundcpu_busy;
 }
 
-static ADDRESS_MAP_START( maincpu_mem_map, AS_PROGRAM, 8, sothello_state )
+ADDRESS_MAP_START(sothello_state::maincpu_mem_map)
 	AM_RANGE(0x0000, 0x7fff) AM_ROM AM_REGION("maincpu", 0)
 	AM_RANGE(0x8000, 0xbfff) AM_ROMBANK("mainbank")
 	AM_RANGE(0xc000, 0xc7ff) AM_RAM AM_MIRROR(0x1800) AM_SHARE("mainsub")
 	AM_RANGE(0xe000, 0xffff) AM_RAM
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( maincpu_io_map, AS_IO, 8, sothello_state )
+ADDRESS_MAP_START(sothello_state::maincpu_io_map)
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	AM_RANGE( 0x00, 0x0f) AM_READ_PORT("INPUT1")
 	AM_RANGE( 0x10, 0x1f) AM_READ_PORT("INPUT2")
@@ -198,7 +199,7 @@ WRITE8_MEMBER(sothello_state::msm_cfg_w)
      bit 2 = S2    1
      bit 3 = S1    2
 */
-	m_msm->playmode_w(BITSWAP8((data>>1), 7,6,5,4,3,0,1,2));
+	m_msm->playmode_w(bitswap<8>((data>>1), 7,6,5,4,3,0,1,2));
 	m_msm->reset_w(data & 1);
 }
 
@@ -222,12 +223,12 @@ WRITE8_MEMBER(sothello_state::soundcpu_int_clear_w)
 	m_soundcpu->set_input_line(0, CLEAR_LINE);
 }
 
-static ADDRESS_MAP_START( soundcpu_mem_map, AS_PROGRAM, 8, sothello_state )
+ADDRESS_MAP_START(sothello_state::soundcpu_mem_map)
 	AM_RANGE(0x0000, 0xdfff) AM_ROM AM_REGION("soundcpu", 0)
 	AM_RANGE(0xf800, 0xffff) AM_RAM
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( soundcpu_io_map, AS_IO, 8, sothello_state )
+ADDRESS_MAP_START(sothello_state::soundcpu_io_map)
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	AM_RANGE(0x00, 0x00) AM_DEVREAD("soundlatch", generic_latch_8_device, read)
 	AM_RANGE(0x01, 0x01) AM_WRITE(msm_data_w)
@@ -262,7 +263,7 @@ READ8_MEMBER(sothello_state::subcpu_status_r)
 	return 0;
 }
 
-static ADDRESS_MAP_START( subcpu_mem_map, AS_PROGRAM, 8, sothello_state )
+ADDRESS_MAP_START(sothello_state::subcpu_mem_map)
 	AM_RANGE(0x0000, 0x1fff) AM_READWRITE(subcpu_status_r, subcpu_status_w)
 	AM_RANGE(0x2000, 0x77ff) AM_RAM
 	AM_RANGE(0x7800, 0x7fff) AM_RAM AM_SHARE("mainsub")  /* upper 0x800 of 6264 is shared with main cpu */
@@ -349,33 +350,33 @@ void sothello_state::machine_reset()
 	m_msm_data = 0;
 }
 
-static MACHINE_CONFIG_START( sothello )
+MACHINE_CONFIG_START(sothello_state::sothello)
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", Z80, MAINCPU_CLOCK)
+	MCFG_CPU_ADD("maincpu", Z80, XTAL(21'477'272) / 6)
 	MCFG_CPU_PROGRAM_MAP(maincpu_mem_map)
 	MCFG_CPU_IO_MAP(maincpu_io_map)
 
-	MCFG_CPU_ADD("soundcpu", Z80, SOUNDCPU_CLOCK)
+	MCFG_CPU_ADD("soundcpu", Z80, XTAL(21'477'272) / 6)
 	MCFG_CPU_PROGRAM_MAP(soundcpu_mem_map)
 	MCFG_CPU_IO_MAP(soundcpu_io_map)
 
-	MCFG_CPU_ADD("subcpu", M6809, SUBCPU_CLOCK)
+	MCFG_CPU_ADD("subcpu", MC6809, XTAL(8'000'000)) // divided by 4 internally
 	MCFG_CPU_PROGRAM_MAP(subcpu_mem_map)
 
 	MCFG_QUANTUM_TIME(attotime::from_hz(600))
 
 	/* video hardware */
-	MCFG_V9938_ADD("v9938", "screen", VDP_MEM, MAIN_CLOCK)
+	MCFG_V9938_ADD("v9938", "screen", VDP_MEM, XTAL(21'477'272))
 	MCFG_V99X8_INTERRUPT_CALLBACK(INPUTLINE("maincpu", 0))
-	MCFG_V99X8_SCREEN_ADD_NTSC("screen", "v9938", MAIN_CLOCK)
+	MCFG_V99X8_SCREEN_ADD_NTSC("screen", "v9938", XTAL(21'477'272))
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
 
 	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
 
-	MCFG_SOUND_ADD("ymsnd", YM2203, YM_CLOCK)
+	MCFG_SOUND_ADD("ymsnd", YM2203, XTAL(21'477'272) / 12)
 	MCFG_YM2203_IRQ_HANDLER(INPUTLINE("subcpu", 0))
 	MCFG_AY8910_PORT_A_READ_CB(IOPORT("DSWA"))
 	MCFG_AY8910_PORT_B_READ_CB(IOPORT("DSWB"))
@@ -386,7 +387,7 @@ static MACHINE_CONFIG_START( sothello )
 
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.30)
 
-	MCFG_SOUND_ADD("msm", MSM5205, MSM_CLOCK)
+	MCFG_SOUND_ADD("msm", MSM5205, XTAL(384'000))
 	MCFG_MSM5205_VCLK_CB(WRITELINE(sothello_state, adpcm_int))      /* interrupt function */
 	MCFG_MSM5205_PRESCALER_SELECTOR(S48_4B)  /* changed on the fly */
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)

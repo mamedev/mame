@@ -120,7 +120,7 @@ WRITE_LINE_MEMBER(canyon_state::led2_w)
  *
  *************************************/
 
-static ADDRESS_MAP_START( main_map, AS_PROGRAM, 8, canyon_state )
+ADDRESS_MAP_START(canyon_state::main_map)
 	ADDRESS_MAP_GLOBAL_MASK(0x3fff)
 	AM_RANGE(0x0000, 0x00ff) AM_MIRROR(0x100) AM_RAM
 	AM_RANGE(0x0400, 0x0401) AM_WRITE(canyon_motor_w)
@@ -247,10 +247,10 @@ GFXDECODE_END
  *
  *************************************/
 
-static MACHINE_CONFIG_START( canyon )
+MACHINE_CONFIG_START(canyon_state::canyon)
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", M6502, XTAL_12_096MHz / 16)
+	MCFG_CPU_ADD("maincpu", M6502, XTAL(12'096'000) / 16)
 	MCFG_CPU_PROGRAM_MAP(main_map)
 	MCFG_CPU_VBLANK_INT_DRIVER("screen", canyon_state,  nmi_line_pulse)
 

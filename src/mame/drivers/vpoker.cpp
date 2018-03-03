@@ -124,6 +124,8 @@ public:
 	required_device<cpu_device> m_maincpu;
 	required_device<gfxdecode_device> m_gfxdecode;
 	required_device<palette_device> m_palette;
+	void vpoker(machine_config &config);
+	void main_map(address_map &map);
 };
 
 
@@ -180,7 +182,7 @@ WRITE8_MEMBER(vpoker_state::blitter_w)
 	}
 }
 
-static ADDRESS_MAP_START( main_map, AS_PROGRAM, 8, vpoker_state )
+ADDRESS_MAP_START(vpoker_state::main_map)
 	ADDRESS_MAP_GLOBAL_MASK(0x3fff)
 	AM_RANGE(0x0000, 0x01ff) AM_RAM     /* vpoker has 0x100, 5acespkr has 0x200 */
 	AM_RANGE(0x0400, 0x0407) AM_DEVREADWRITE("6840ptm", ptm6840_device, read, write)
@@ -627,10 +629,10 @@ WRITE_LINE_MEMBER(vpoker_state::ptm_irq)
 	m_maincpu->set_input_line(M6809_IRQ_LINE, state ? ASSERT_LINE : CLEAR_LINE);
 }
 
-static MACHINE_CONFIG_START( vpoker )
+MACHINE_CONFIG_START(vpoker_state::vpoker)
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu",M6809,XTAL_4MHz)
+	MCFG_CPU_ADD("maincpu",M6809,XTAL(4'000'000))
 	MCFG_CPU_PROGRAM_MAP(main_map)
 	MCFG_CPU_VBLANK_INT_DRIVER("screen", vpoker_state, irq0_line_hold) //irq0 valid too
 
@@ -649,7 +651,7 @@ static MACHINE_CONFIG_START( vpoker )
 	MCFG_PALETTE_ADD_3BIT_GBR("palette")
 
 	/* 6840 PTM */
-	MCFG_DEVICE_ADD("6840ptm", PTM6840, XTAL_4MHz)
+	MCFG_DEVICE_ADD("6840ptm", PTM6840, XTAL(4'000'000))
 	MCFG_PTM6840_EXTERNAL_CLOCKS(0, 0, 0)
 	MCFG_PTM6840_IRQ_CB(WRITELINE(vpoker_state, ptm_irq))
 

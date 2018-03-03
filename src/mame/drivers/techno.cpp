@@ -47,6 +47,8 @@ public:
 	DECLARE_WRITE16_MEMBER(sol2_w);
 	DECLARE_WRITE16_MEMBER(sound_w);
 
+	void techno(machine_config &config);
+	void techno_map(address_map &map);
 private:
 	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr) override;
 	virtual void machine_start() override;
@@ -65,7 +67,7 @@ private:
 };
 
 
-static ADDRESS_MAP_START( techno_map, AS_PROGRAM, 16, techno_state )
+ADDRESS_MAP_START(techno_state::techno_map)
 	ADDRESS_MAP_GLOBAL_MASK(0x1ffff)
 	AM_RANGE(0x00000, 0x03fff) AM_ROM
 	AM_RANGE(0x04000, 0x04fff) AM_RAM AM_SHARE("nvram") // battery backed-up
@@ -90,12 +92,12 @@ ADDRESS_MAP_END
 
 WRITE16_MEMBER( techno_state::disp1_w )
 {
-	output().set_digit_value(m_digit, BITSWAP16(data, 12, 10, 8, 14, 13, 9, 11, 15, 7, 6, 5, 4, 3, 2, 1, 0));
+	output().set_digit_value(m_digit, bitswap<16>(data, 12, 10, 8, 14, 13, 9, 11, 15, 7, 6, 5, 4, 3, 2, 1, 0));
 }
 
 WRITE16_MEMBER( techno_state::disp2_w )
 {
-	output().set_digit_value(m_digit+30, BITSWAP16(data, 12, 10, 8, 14, 13, 9, 11, 15, 7, 6, 5, 4, 3, 2, 1, 0));
+	output().set_digit_value(m_digit+30, bitswap<16>(data, 12, 10, 8, 14, 13, 9, 11, 15, 7, 6, 5, 4, 3, 2, 1, 0));
 }
 
 WRITE16_MEMBER( techno_state::sound_w )
@@ -256,7 +258,7 @@ void techno_state::device_timer(emu_timer &timer, device_timer_id id, int param,
 	else if (id == IRQ_SET_TIMER)
 	{
 		m_maincpu->set_input_line_and_vector(M68K_IRQ_1, ASSERT_LINE, m_vector);
-		m_irq_advance_timer->adjust(attotime::from_hz(XTAL_8MHz / 32));
+		m_irq_advance_timer->adjust(attotime::from_hz(XTAL(8'000'000) / 32));
 	}
 }
 
@@ -271,18 +273,18 @@ void techno_state::machine_reset()
 	m_vector = 0x88;
 	m_digit = 0;
 
-	attotime freq = attotime::from_hz(XTAL_8MHz / 256); // 31250Hz
+	attotime freq = attotime::from_hz(XTAL(8'000'000) / 256); // 31250Hz
 	m_irq_set_timer->adjust(freq, 0, freq);
 	m_maincpu->set_input_line(M68K_IRQ_1, CLEAR_LINE);
 }
 
-static MACHINE_CONFIG_START( techno )
+MACHINE_CONFIG_START(techno_state::techno)
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", M68000, XTAL_8MHz)
+	MCFG_CPU_ADD("maincpu", M68000, XTAL(8'000'000))
 	MCFG_CPU_PROGRAM_MAP(techno_map)
 	MCFG_NVRAM_ADD_0FILL("nvram")
 
-	//MCFG_CPU_ADD("cpu2", TMS7000, XTAL_4MHz)
+	//MCFG_CPU_ADD("cpu2", TMS7000, XTAL(4'000'000))
 	//MCFG_CPU_PROGRAM_MAP(techno_sub_map)
 
 	/* Video */

@@ -548,7 +548,7 @@ void raiden2cop_device::LEGACY_execute_c480(int offset, uint16_t data)
 */
 void raiden2cop_device::LEGACY_execute_d104(int offset, uint16_t data)
 {
-	uint16_t *ROM = (uint16_t *)m_host_space->machine().root_device().memregion("maincpu")->base();
+	uint16_t *ROM = (uint16_t *)machine().root_device().memregion("maincpu")->base();
 	uint32_t rom_addr = (m_cop_rom_addr_hi << 16 | m_cop_rom_addr_lo);
 	uint16_t rom_data = ROM[rom_addr / 2];
 

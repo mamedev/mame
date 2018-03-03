@@ -54,4 +54,11 @@ public:
 	required_device<cpu_device> m_maincpu;
 	required_device<gfxdecode_device> m_gfxdecode;
 	required_device<palette_device> m_palette;
+	void gundealr(machine_config &config);
+	void gundealrbl(machine_config &config);
+	void yamyam(machine_config &config);
+	void base_map(address_map &map);
+	void gundealr_main_map(address_map &map);
+	void main_portmap(address_map &map);
+	void yamyam_main_map(address_map &map);
 };

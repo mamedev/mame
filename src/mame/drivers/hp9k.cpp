@@ -166,6 +166,8 @@ public:
 	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 
 	required_device<gfxdecode_device> m_gfxdecode;
+	void hp9k(machine_config &config);
+	void hp9k_mem(address_map &map);
 };
 
 //
@@ -304,7 +306,7 @@ WRITE16_MEMBER(hp9k_state::buserror_w)
 	m_maincpu->set_input_line(M68K_LINE_BUSERROR, CLEAR_LINE);
 }
 
-static ADDRESS_MAP_START(hp9k_mem, AS_PROGRAM, 16, hp9k_state)
+ADDRESS_MAP_START(hp9k_state::hp9k_mem)
 	ADDRESS_MAP_UNMAP_HIGH
 	AM_RANGE(0x000000, 0x000909) AM_ROM AM_REGION("bootrom",0)
 	AM_RANGE(0x00090a, 0x00090d) AM_READWRITE(leds_r,leds_w)
@@ -392,9 +394,9 @@ WRITE8_MEMBER( hp9k_state::kbd_put )
 }
 
 
-static MACHINE_CONFIG_START( hp9k )
+MACHINE_CONFIG_START(hp9k_state::hp9k)
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu",M68000, XTAL_8MHz)
+	MCFG_CPU_ADD("maincpu",M68000, XTAL(8'000'000))
 	MCFG_CPU_PROGRAM_MAP(hp9k_mem)
 
 	/* video hardware */
@@ -410,7 +412,7 @@ static MACHINE_CONFIG_START( hp9k )
 	MCFG_GFXDECODE_ADD("gfxdecode", "palette", hp9k)
 	MCFG_PALETTE_ADD_MONOCHROME("palette")
 
-	MCFG_MC6845_ADD("mc6845", MC6845, "screen", XTAL_16MHz / 16)
+	MCFG_MC6845_ADD("mc6845", MC6845, "screen", XTAL(16'000'000) / 16)
 	MCFG_MC6845_SHOW_BORDER_AREA(false)
 	MCFG_MC6845_CHAR_WIDTH(8)
 MACHINE_CONFIG_END

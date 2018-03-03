@@ -24,17 +24,20 @@ public:
 		m_maincpu(*this, "maincpu") { }
 
 	required_device<cpu_device> m_maincpu;
+	void extrema(machine_config &config);
+	void extrema_map(address_map &map);
+	void extrema_portmap(address_map &map);
 };
 
 
 
 
-static ADDRESS_MAP_START( extrema_map, AS_PROGRAM, 8, extrema_state )
+ADDRESS_MAP_START(extrema_state::extrema_map)
 	AM_RANGE(0x0000, 0x7fff) AM_ROM
 ADDRESS_MAP_END
 
 
-static ADDRESS_MAP_START( extrema_portmap, AS_IO, 8, extrema_state )
+ADDRESS_MAP_START(extrema_state::extrema_portmap)
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
 ADDRESS_MAP_END
 
@@ -43,7 +46,7 @@ static INPUT_PORTS_START( extrema )
 INPUT_PORTS_END
 
 
-static MACHINE_CONFIG_START( extrema )
+MACHINE_CONFIG_START(extrema_state::extrema)
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", Z80, 6000000)
 	MCFG_CPU_PROGRAM_MAP(extrema_map)

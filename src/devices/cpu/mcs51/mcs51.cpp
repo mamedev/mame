@@ -242,20 +242,20 @@ DEFINE_DEVICE_TYPE(DS5002FP, ds5002fp_device, "ds5002fp", "DS5002FP")
     ADDRESS MAPS
 ***************************************************************************/
 
-static ADDRESS_MAP_START(program_12bit, AS_PROGRAM, 8, mcs51_cpu_device)
+ADDRESS_MAP_START(mcs51_cpu_device::program_12bit)
 	AM_RANGE(0x00, 0x0fff) AM_ROM
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START(program_13bit, AS_PROGRAM, 8, mcs51_cpu_device)
+ADDRESS_MAP_START(mcs51_cpu_device::program_13bit)
 	AM_RANGE(0x00, 0x1fff) AM_ROM
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START(data_7bit, AS_DATA, 8, mcs51_cpu_device)
+ADDRESS_MAP_START(mcs51_cpu_device::data_7bit)
 	AM_RANGE(0x0000, 0x007f) AM_RAM AM_SHARE("scratchpad")
 	AM_RANGE(0x0100, 0x01ff) AM_RAM AM_SHARE("sfr_ram") /* SFR */
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START(data_8bit, AS_DATA, 8, mcs51_cpu_device)
+ADDRESS_MAP_START(mcs51_cpu_device::data_8bit)
 	AM_RANGE(0x0000, 0x00ff) AM_RAM AM_SHARE("scratchpad")
 	AM_RANGE(0x0100, 0x01ff) AM_RAM AM_SHARE("sfr_ram") /* SFR */
 ADDRESS_MAP_END
@@ -265,16 +265,18 @@ ADDRESS_MAP_END
 mcs51_cpu_device::mcs51_cpu_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock, int program_width, int data_width, uint8_t features)
 	: cpu_device(mconfig, type, tag, owner, clock)
 	, m_program_config("program", ENDIANNESS_LITTLE, 8, 16, 0,
-			(program_width == 12) ? ADDRESS_MAP_NAME(program_12bit) : (program_width == 13) ? ADDRESS_MAP_NAME(program_13bit) : nullptr)
+					   (program_width == 12) ? address_map_constructor(FUNC(mcs51_cpu_device::program_12bit), this) : (program_width == 13) ? address_map_constructor(FUNC(mcs51_cpu_device::program_13bit), this) : address_map_constructor())
 	, m_data_config("data", ENDIANNESS_LITTLE, 8, 9, 0,
-			 (data_width == 7) ? ADDRESS_MAP_NAME(data_7bit) : (data_width == 8) ? ADDRESS_MAP_NAME(data_8bit) : nullptr )
-	, m_io_config("io", ENDIANNESS_LITTLE, 8, 18, 0)
+					(data_width == 7) ? address_map_constructor(FUNC(mcs51_cpu_device::data_7bit), this) : (data_width == 8) ? address_map_constructor(FUNC(mcs51_cpu_device::data_8bit), this) : address_map_constructor())
+	, m_io_config("io", ENDIANNESS_LITTLE, 8, (features & FEATURE_DS5002FP) ? 17 : 16, 0)
 	, m_pc(0)
 	, m_features(features)
 	, m_ram_mask( (data_width == 8) ? 0xFF : 0x7F )
 	, m_num_interrupts(5)
 	, m_sfr_ram(*this, "sfr_ram")
 	, m_scratchpad(*this, "scratchpad")
+	, m_port_in_cb{{*this}, {*this}, {*this}, {*this}}
+	, m_port_out_cb{{*this}, {*this}, {*this}, {*this}}
 	, m_serial_tx_cb(*this)
 	, m_serial_rx_cb(*this)
 	, m_rtemp(0)
@@ -426,10 +428,6 @@ void mcs51_cpu_device::iram_iwrite(offs_t a, uint8_t d) { if (a <= m_ram_mask) m
 /* Read/Write a bit from Bit Addressable Memory */
 #define BIT_R(a)        bit_address_r(a)
 #define BIT_W(a,v)      bit_address_w(a, v)
-
-/* Input/Output a byte from given I/O port */
-#define IN(port)        ((uint8_t)m_io->read_byte(port))
-#define OUT(port,value) m_io->write_byte(port,value)
 
 
 /***************************************************************************
@@ -2027,10 +2025,10 @@ void mcs51_cpu_device::sfr_write(size_t offset, uint8_t data)
 
 	switch (offset)
 	{
-		case ADDR_P0:   OUT(MCS51_PORT_P0,data);            break;
-		case ADDR_P1:   OUT(MCS51_PORT_P1,data);            break;
-		case ADDR_P2:   OUT(MCS51_PORT_P2,data);            break;
-		case ADDR_P3:   OUT(MCS51_PORT_P3,data);            break;
+		case ADDR_P0:   m_port_out_cb[0](data);             break;
+		case ADDR_P1:   m_port_out_cb[1](data);             break;
+		case ADDR_P2:   m_port_out_cb[2](data);             break;
+		case ADDR_P3:   m_port_out_cb[3](data);             break;
 		case ADDR_SBUF: serial_transmit(data);         break;
 		case ADDR_PSW:  SET_PARITY();                       break;
 		case ADDR_ACC:  SET_PARITY();                       break;
@@ -2067,10 +2065,10 @@ uint8_t mcs51_cpu_device::sfr_read(size_t offset)
 	{
 		/* Read/Write/Modify operations read the port latch ! */
 		/* Move to memory map */
-		case ADDR_P0:   return RWM ? P0 : (P0 | m_forced_inputs[0]) & IN(MCS51_PORT_P0);
-		case ADDR_P1:   return RWM ? P1 : (P1 | m_forced_inputs[1]) & IN(MCS51_PORT_P1);
-		case ADDR_P2:   return RWM ? P2 : (P2 | m_forced_inputs[2]) & IN(MCS51_PORT_P2);
-		case ADDR_P3:   return RWM ? P3 : (P3 | m_forced_inputs[3]) & IN(MCS51_PORT_P3);
+		case ADDR_P0:   return RWM ? P0 : (P0 | m_forced_inputs[0]) & m_port_in_cb[0]();
+		case ADDR_P1:   return RWM ? P1 : (P1 | m_forced_inputs[1]) & m_port_in_cb[1]();
+		case ADDR_P2:   return RWM ? P2 : (P2 | m_forced_inputs[2]) & m_port_in_cb[2]();
+		case ADDR_P3:   return RWM ? P3 : (P3 | m_forced_inputs[3]) & m_port_in_cb[3]();
 
 		case ADDR_PSW:
 		case ADDR_ACC:
@@ -2106,6 +2104,11 @@ void mcs51_cpu_device::device_start()
 	m_data = &space(AS_DATA);
 	m_io = &space(AS_IO);
 
+	for (auto &cb : m_port_in_cb)
+		cb.resolve_safe(0xff);
+	for (auto &cb : m_port_out_cb)
+		cb.resolve_safe();
+
 	m_serial_rx_cb.resolve_safe(0);
 	m_serial_tx_cb.resolve_safe();
 
@@ -2138,73 +2141,29 @@ void mcs51_cpu_device::device_start()
 	state_add( MCS51_PSW, "PSW", PSW).formatstr("%02X");
 	state_add( MCS51_ACC, "A", ACC).formatstr("%02X");
 	state_add( MCS51_B,   "B", B).formatstr("%02X");
-	state_add( MCS51_DPH, "DPH", DPH).formatstr("%02X");
-	state_add( MCS51_DPL, "DPL", DPL).formatstr("%02X");
+	state_add<uint16_t>( MCS51_DPTR, "DPTR", [this](){ return DPTR; }, [this](uint16_t dp){ SET_DPTR(dp); }).formatstr("%04X");
+	state_add( MCS51_DPH, "DPH", DPH).noshow();
+	state_add( MCS51_DPL, "DPL", DPL).noshow();
 	state_add( MCS51_IE,  "IE", IE).formatstr("%02X");
-	state_add( MCS51_R0,  "R0", m_rtemp).callimport().callexport().formatstr("%02X");
-	state_add( MCS51_R1,  "R1", m_rtemp).callimport().callexport().formatstr("%02X");
-	state_add( MCS51_R2,  "R2", m_rtemp).callimport().callexport().formatstr("%02X");
-	state_add( MCS51_R3,  "R3", m_rtemp).callimport().callexport().formatstr("%02X");
-	state_add( MCS51_R4,  "R4", m_rtemp).callimport().callexport().formatstr("%02X");
-	state_add( MCS51_R5,  "R5", m_rtemp).callimport().callexport().formatstr("%02X");
-	state_add( MCS51_R6,  "R6", m_rtemp).callimport().callexport().formatstr("%02X");
-	state_add( MCS51_R7,  "R7", m_rtemp).callimport().callexport().formatstr("%02X");
-	state_add( MCS51_RB,  "RB", m_rtemp).mask(0x03).callimport().callexport().formatstr("%02X");
+	state_add<uint8_t>( MCS51_P0,  "P0", [this](){ return P0; }, [this](uint8_t p){ SET_P0(p); }).formatstr("%02X");
+	state_add<uint8_t>( MCS51_P1,  "P1", [this](){ return P1; }, [this](uint8_t p){ SET_P1(p); }).formatstr("%02X");
+	state_add<uint8_t>( MCS51_P2,  "P2", [this](){ return P2; }, [this](uint8_t p){ SET_P2(p); }).formatstr("%02X");
+	state_add<uint8_t>( MCS51_P3,  "P3", [this](){ return P3; }, [this](uint8_t p){ SET_P3(p); }).formatstr("%02X");
+	state_add<uint8_t>( MCS51_R0,  "R0", [this](){ return R_REG(0); }, [this](uint8_t r){ SET_REG(0, r); }).formatstr("%02X");
+	state_add<uint8_t>( MCS51_R1,  "R1", [this](){ return R_REG(1); }, [this](uint8_t r){ SET_REG(1, r); }).formatstr("%02X");
+	state_add<uint8_t>( MCS51_R2,  "R2", [this](){ return R_REG(2); }, [this](uint8_t r){ SET_REG(2, r); }).formatstr("%02X");
+	state_add<uint8_t>( MCS51_R3,  "R3", [this](){ return R_REG(3); }, [this](uint8_t r){ SET_REG(3, r); }).formatstr("%02X");
+	state_add<uint8_t>( MCS51_R4,  "R4", [this](){ return R_REG(4); }, [this](uint8_t r){ SET_REG(4, r); }).formatstr("%02X");
+	state_add<uint8_t>( MCS51_R5,  "R5", [this](){ return R_REG(5); }, [this](uint8_t r){ SET_REG(5, r); }).formatstr("%02X");
+	state_add<uint8_t>( MCS51_R6,  "R6", [this](){ return R_REG(6); }, [this](uint8_t r){ SET_REG(6, r); }).formatstr("%02X");
+	state_add<uint8_t>( MCS51_R7,  "R7", [this](){ return R_REG(7); }, [this](uint8_t r){ SET_REG(7, r); }).formatstr("%02X");
+	state_add<uint8_t>( MCS51_RB,  "RB", [this](){ return (PSW & 0x18)>>3; }, [this](uint8_t rb){ SET_RS(rb); }).mask(0x03).formatstr("%02X");
 
 	state_add( STATE_GENPC, "GENPC", m_pc ).noshow();
 	state_add( STATE_GENPCBASE, "CURPC", m_pc ).noshow();
 	state_add( STATE_GENFLAGS, "GENFLAGS", m_rtemp).formatstr("%8s").noshow();
 
 	m_icountptr = &m_icount;
-}
-
-
-void mcs51_cpu_device::state_import(const device_state_entry &entry)
-{
-	switch (entry.index())
-	{
-		case MCS51_R0:
-		case MCS51_R1:
-		case MCS51_R2:
-		case MCS51_R3:
-		case MCS51_R4:
-		case MCS51_R5:
-		case MCS51_R6:
-		case MCS51_R7:
-			SET_REG( entry.index() - MCS51_R0, m_rtemp );
-			break;
-
-		case MCS51_RB:
-			SET_RS( m_rtemp );
-			break;
-
-		default:
-			fatalerror("CPU_IMPORT_STATE(mcs48) called for unexpected value\n");
-	}
-}
-
-void mcs51_cpu_device::state_export(const device_state_entry &entry)
-{
-	switch (entry.index())
-	{
-		case MCS51_R0:
-		case MCS51_R1:
-		case MCS51_R2:
-		case MCS51_R3:
-		case MCS51_R4:
-		case MCS51_R5:
-		case MCS51_R6:
-		case MCS51_R7:
-			m_rtemp = R_REG(entry.index() - MCS51_R0);
-			break;
-
-		case MCS51_RB:
-			m_rtemp = ((PSW & 0x18)>>3);
-			break;
-
-		default:
-			fatalerror("CPU_EXPORT_STATE(mcs51) called for unexpected value\n");
-	}
 }
 
 void mcs51_cpu_device::state_string_export(const device_state_entry &entry, std::string &str) const

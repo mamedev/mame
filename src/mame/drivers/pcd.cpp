@@ -80,6 +80,11 @@ public:
 	DECLARE_WRITE_LINE_MEMBER(write_scsi_msg);
 	DECLARE_WRITE_LINE_MEMBER(write_scsi_req);
 
+	void pcx(machine_config &config);
+	void pcd(machine_config &config);
+	void pcd_io(address_map &map);
+	void pcd_map(address_map &map);
+	void pcx_io(address_map &map);
 protected:
 	// driver_device overrides
 	virtual void machine_start() override;
@@ -163,7 +168,7 @@ WRITE_LINE_MEMBER( pcd_state::i186_timer1_w )
 
 READ8_MEMBER( pcd_state::nmi_io_r )
 {
-	if(machine().side_effect_disabled())
+	if(machine().side_effects_disabled())
 		return 0;
 	logerror("%s: unmapped %s %04x\n", machine().describe_context(), space.name(), offset);
 	m_stat |= 0xfd;
@@ -173,7 +178,7 @@ READ8_MEMBER( pcd_state::nmi_io_r )
 
 WRITE8_MEMBER( pcd_state::nmi_io_w )
 {
-	if(machine().side_effect_disabled())
+	if(machine().side_effects_disabled())
 		return;
 	logerror("%s: unmapped %s %04x\n", machine().describe_context(), space.name(), offset);
 	m_stat |= 0xfd;
@@ -395,7 +400,7 @@ WRITE16_MEMBER(pcd_state::mem_w)
 			reg = m_mmu.regs[((offset >> 10) & 0xff) | ((m_mmu.ctl & 0x18) << 5)];
 		else
 			reg = m_mmu.regs[((offset >> 10) & 0x7f) | ((m_mmu.ctl & 0x1c) << 5)];
-		if(!reg && !machine().side_effect_disabled())
+		if(!reg && !machine().side_effects_disabled())
 		{
 			offset <<= 1;
 			logerror("%s: Null mmu entry %06x\n", machine().describe_context(), offset);
@@ -417,7 +422,7 @@ READ16_MEMBER(pcd_state::mem_r)
 			reg = m_mmu.regs[((offset >> 10) & 0xff) | ((m_mmu.ctl & 0x18) << 5)];
 		else
 			reg = m_mmu.regs[((offset >> 10) & 0x7f) | ((m_mmu.ctl & 0x1c) << 5)];
-		if(!reg && !machine().side_effect_disabled())
+		if(!reg && !machine().side_effects_disabled())
 		{
 			offset <<= 1;
 			logerror("%s: Null mmu entry %06x\n", machine().describe_context(), offset);
@@ -432,13 +437,13 @@ READ16_MEMBER(pcd_state::mem_r)
 //  ADDRESS MAPS
 //**************************************************************************
 
-static ADDRESS_MAP_START( pcd_map, AS_PROGRAM, 16, pcd_state )
+ADDRESS_MAP_START(pcd_state::pcd_map)
+	AM_RANGE(0x00000, 0xfffff) AM_READWRITE8(nmi_io_r, nmi_io_w, 0xffff)
 	AM_RANGE(0x00000, 0x7ffff) AM_READWRITE(mem_r, mem_w)
 	AM_RANGE(0xfc000, 0xfffff) AM_ROM AM_REGION("bios", 0)
-	AM_RANGE(0x00000, 0xfffff) AM_READWRITE8(nmi_io_r, nmi_io_w, 0xffff)
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( pcd_io, AS_IO, 16, pcd_state )
+ADDRESS_MAP_START(pcd_state::pcd_io)
 	ADDRESS_MAP_UNMAP_HIGH
 	AM_RANGE(0x0000, 0xefff) AM_READWRITE8(nmi_io_r, nmi_io_w, 0xffff)
 	AM_RANGE(0xf000, 0xf7ff) AM_RAM AM_SHARE("nvram")
@@ -459,11 +464,11 @@ static ADDRESS_MAP_START( pcd_io, AS_IO, 16, pcd_state )
 	AM_RANGE(0xfb02, 0xffff) AM_READWRITE8(nmi_io_r, nmi_io_w, 0xffff)
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( pcx_io, AS_IO, 16, pcd_state )
+ADDRESS_MAP_START(pcd_state::pcx_io)
 	ADDRESS_MAP_UNMAP_HIGH
+	AM_IMPORT_FROM(pcd_io)
 	AM_RANGE(0x8000, 0x8fff) AM_READWRITE(mmu_r, mmu_w)
 	AM_RANGE(0xfb00, 0xfb01) AM_READWRITE8(nmi_io_r, nmi_io_w, 0xff00)
-	AM_IMPORT_FROM(pcd_io)
 ADDRESS_MAP_END
 
 //**************************************************************************
@@ -487,14 +492,14 @@ static INPUT_PORTS_START(pcx)
 	PORT_CONFSETTING(0x02, "SINIX 1.2")
 INPUT_PORTS_END
 
-static MACHINE_CONFIG_START( pcd )
-	MCFG_CPU_ADD("maincpu", I80186, XTAL_16MHz)
+MACHINE_CONFIG_START(pcd_state::pcd)
+	MCFG_CPU_ADD("maincpu", I80186, XTAL(16'000'000))
 	MCFG_CPU_PROGRAM_MAP(pcd_map)
 	MCFG_CPU_IO_MAP(pcd_io)
 	MCFG_80186_TMROUT1_HANDLER(WRITELINE(pcd_state, i186_timer1_w))
 	MCFG_80186_IRQ_SLAVE_ACK(READ8(pcd_state, irq_callback))
 
-	MCFG_TIMER_DRIVER_ADD_PERIODIC("timer0_tick", pcd_state, timer0_tick, attotime::from_hz(XTAL_16MHz / 24)) // adjusted to pass post
+	MCFG_TIMER_DRIVER_ADD_PERIODIC("timer0_tick", pcd_state, timer0_tick, attotime::from_hz(XTAL(16'000'000) / 24)) // adjusted to pass post
 
 	MCFG_DEVICE_ADD("pic1", PIC8259, 0)
 	MCFG_PIC8259_OUT_INT_CB(DEVWRITELINE("maincpu", i80186_cpu_device, int0_w))
@@ -511,7 +516,7 @@ static MACHINE_CONFIG_START( pcd )
 	MCFG_NVRAM_ADD_1FILL("nvram")
 
 	// floppy disk controller
-	MCFG_WD2793_ADD("fdc", XTAL_16MHz / 8)
+	MCFG_WD2793_ADD("fdc", XTAL(16'000'000) / 8)
 	MCFG_WD_FDC_INTRQ_CALLBACK(DEVWRITELINE("pic1", pic8259_device, ir6_w))
 	MCFG_WD_FDC_DRQ_CALLBACK(DEVWRITELINE("maincpu", i80186_cpu_device, drq1_w))
 	MCFG_WD_FDC_ENMF_CALLBACK(GND)
@@ -521,15 +526,15 @@ static MACHINE_CONFIG_START( pcd )
 	MCFG_FLOPPY_DRIVE_ADD("fdc:1", pcd_floppies, "55f", pcd_state::floppy_formats)
 
 	// usart
-	MCFG_DEVICE_ADD("usart1", MC2661, XTAL_4_9152MHz)
+	MCFG_DEVICE_ADD("usart1", MC2661, XTAL(4'915'200))
 	MCFG_MC2661_RXRDY_HANDLER(DEVWRITELINE("pic1", pic8259_device, ir3_w))
 	MCFG_MC2661_TXRDY_HANDLER(DEVWRITELINE("pic1", pic8259_device, ir3_w))
 	MCFG_MC2661_TXD_HANDLER(DEVWRITELINE("rs232_1", rs232_port_device, write_txd))
-	MCFG_DEVICE_ADD("usart2", MC2661, XTAL_4_9152MHz)
+	MCFG_DEVICE_ADD("usart2", MC2661, XTAL(4'915'200))
 	MCFG_MC2661_RXRDY_HANDLER(DEVWRITELINE("pic1", pic8259_device, ir2_w))
 	//MCFG_MC2661_TXRDY_HANDLER(DEVWRITELINE("pic1", pic8259_device, ir2_w)) // this gets stuck high causing the keyboard to not work
 	MCFG_MC2661_TXD_HANDLER(DEVWRITELINE("keyboard", pcd_keyboard_device, t0_w))
-	MCFG_DEVICE_ADD("usart3", MC2661, XTAL_4_9152MHz)
+	MCFG_DEVICE_ADD("usart3", MC2661, XTAL(4'915'200))
 	MCFG_MC2661_RXRDY_HANDLER(DEVWRITELINE("pic1", pic8259_device, ir4_w))
 	MCFG_MC2661_TXRDY_HANDLER(DEVWRITELINE("pic1", pic8259_device, ir4_w))
 	MCFG_MC2661_TXD_HANDLER(DEVWRITELINE("rs232_2", rs232_port_device, write_txd))
@@ -545,7 +550,7 @@ static MACHINE_CONFIG_START( pcd )
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
 
 	// rtc
-	MCFG_MC146818_ADD("rtc", XTAL_32_768kHz)
+	MCFG_MC146818_ADD("rtc", XTAL(32'768))
 	MCFG_MC146818_IRQ_HANDLER(DEVWRITELINE("pic1", pic8259_device, ir7_w))
 	MCFG_MC146818_BINARY(true)
 	MCFG_MC146818_BINARY_YEAR(true)
@@ -568,7 +573,8 @@ static MACHINE_CONFIG_START( pcd )
 	MCFG_SCSIDEV_ADD("scsi:1", "harddisk", OMTI5100, SCSI_ID_0)
 MACHINE_CONFIG_END
 
-MACHINE_CONFIG_DERIVED(pcx, pcd)
+MACHINE_CONFIG_START(pcd_state::pcx)
+	pcd(config);
 	MCFG_CPU_MODIFY("maincpu")
 	MCFG_CPU_IO_MAP(pcx_io)
 

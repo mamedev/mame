@@ -40,17 +40,8 @@ public:
 	DECLARE_WRITE_LINE_MEMBER( write_bit );
 	DECLARE_WRITE_LINE_MEMBER( set_cs_line );
 	DECLARE_WRITE_LINE_MEMBER( set_clock_line );
-	DECLARE_WRITE16_MEMBER(vreg_120_w);
-	DECLARE_WRITE16_MEMBER(vreg_121_w);
-	DECLARE_WRITE16_MEMBER(vreg_122_w);
-	DECLARE_WRITE16_MEMBER(vreg_123_w);
-	DECLARE_WRITE16_MEMBER(vreg_124_w);
-	DECLARE_WRITE16_MEMBER(vreg_125_w);
-	DECLARE_WRITE16_MEMBER(vreg_126_w);
-	DECLARE_WRITE16_MEMBER(vreg_127_w);
 
 	uint32_t screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
-	virtual const tiny_rom_entry *device_rom_region() const override;
 
 protected:
 	enum m50458_state_t
@@ -64,6 +55,24 @@ protected:
 	virtual void device_start() override;
 	virtual void device_reset() override;
 	virtual space_config_vector memory_space_config() const override;
+	virtual const tiny_rom_entry *device_rom_region() const override;
+
+private:
+	inline uint16_t read_word(offs_t address);
+	inline void write_word(offs_t address, uint16_t data);
+
+	DECLARE_WRITE16_MEMBER(vreg_120_w);
+	DECLARE_WRITE16_MEMBER(vreg_121_w);
+	DECLARE_WRITE16_MEMBER(vreg_122_w);
+	DECLARE_WRITE16_MEMBER(vreg_123_w);
+	DECLARE_WRITE16_MEMBER(vreg_124_w);
+	DECLARE_WRITE16_MEMBER(vreg_125_w);
+	DECLARE_WRITE16_MEMBER(vreg_126_w);
+	DECLARE_WRITE16_MEMBER(vreg_127_w);
+
+	void m50458_vram(address_map &map);
+
+	const address_space_config      m_space_config;
 
 	int m_latch;
 	int m_reset_line;
@@ -73,7 +82,6 @@ protected:
 	uint16_t m_osd_addr;
 	std::unique_ptr<uint8_t[]> m_shadow_gfx;
 
-	uint8_t m_bg_pen;
 	uint8_t m_phase;
 	uint8_t m_scrf,m_scrr;
 	uint8_t m_space;
@@ -82,12 +90,6 @@ protected:
 	uint8_t m_blink;
 
 	m50458_state_t m_osd_state;
-
-private:
-	inline uint16_t read_word(offs_t address);
-	inline void write_word(offs_t address, uint16_t data);
-
-	const address_space_config      m_space_config;
 };
 
 

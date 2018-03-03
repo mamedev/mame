@@ -244,7 +244,7 @@ WRITE8_MEMBER(djboy_state::cpu2_bankswitch_w)
 
 /******************************************************************************/
 
-static ADDRESS_MAP_START( cpu0_am, AS_PROGRAM, 8, djboy_state )
+ADDRESS_MAP_START(djboy_state::cpu0_am)
 	AM_RANGE(0x0000, 0x7fff) AM_ROM
 	AM_RANGE(0x8000, 0xafff) AM_ROMBANK("bank4")
 	AM_RANGE(0xb000, 0xbfff) AM_DEVREADWRITE("pandora", kaneko_pandora_device, spriteram_r, spriteram_w)
@@ -254,14 +254,14 @@ static ADDRESS_MAP_START( cpu0_am, AS_PROGRAM, 8, djboy_state )
 	AM_RANGE(0xf800, 0xffff) AM_RAM
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( cpu0_port_am, AS_IO, 8, djboy_state )
+ADDRESS_MAP_START(djboy_state::cpu0_port_am)
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	AM_RANGE(0x00, 0x00) AM_WRITE(cpu0_bankswitch_w)
 ADDRESS_MAP_END
 
 /******************************************************************************/
 
-static ADDRESS_MAP_START( cpu1_am, AS_PROGRAM, 8, djboy_state )
+ADDRESS_MAP_START(djboy_state::cpu1_am)
 	AM_RANGE(0x0000, 0x7fff) AM_ROM
 	AM_RANGE(0x8000, 0xbfff) AM_ROMBANK("bank2")
 	AM_RANGE(0xc000, 0xcfff) AM_RAM_WRITE(djboy_videoram_w) AM_SHARE("videoram")
@@ -270,7 +270,7 @@ static ADDRESS_MAP_START( cpu1_am, AS_PROGRAM, 8, djboy_state )
 	AM_RANGE(0xe000, 0xffff) AM_RAM AM_SHARE("share1")
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( cpu1_port_am, AS_IO, 8, djboy_state )
+ADDRESS_MAP_START(djboy_state::cpu1_port_am)
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	AM_RANGE(0x00, 0x00) AM_WRITE(cpu1_bankswitch_w)
 	AM_RANGE(0x02, 0x02) AM_WRITE(trigger_nmi_on_sound_cpu2)
@@ -284,13 +284,13 @@ ADDRESS_MAP_END
 
 /******************************************************************************/
 
-static ADDRESS_MAP_START( cpu2_am, AS_PROGRAM, 8, djboy_state )
+ADDRESS_MAP_START(djboy_state::cpu2_am)
 	AM_RANGE(0x0000, 0x7fff) AM_ROM
 	AM_RANGE(0x8000, 0xbfff) AM_ROMBANK("bank3")
 	AM_RANGE(0xc000, 0xdfff) AM_RAM
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( cpu2_port_am, AS_IO, 8, djboy_state )
+ADDRESS_MAP_START(djboy_state::cpu2_port_am)
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	AM_RANGE(0x00, 0x00) AM_WRITE(cpu2_bankswitch_w)
 	AM_RANGE(0x02, 0x03) AM_DEVREADWRITE("ymsnd", ym2203_device, read, write)
@@ -378,13 +378,6 @@ WRITE8_MEMBER(djboy_state::beast_p3_w)
 	m_cpu1->set_input_line(INPUT_LINE_RESET, data & 2 ? CLEAR_LINE : ASSERT_LINE);
 }
 /* Program/data maps are defined in the 8051 core */
-
-static ADDRESS_MAP_START( djboy_mcu_io_map, AS_IO, 8, djboy_state )
-	AM_RANGE(MCS51_PORT_P0, MCS51_PORT_P0) AM_READWRITE(beast_p0_r, beast_p0_w)
-	AM_RANGE(MCS51_PORT_P1, MCS51_PORT_P1) AM_READWRITE(beast_p1_r, beast_p1_w)
-	AM_RANGE(MCS51_PORT_P2, MCS51_PORT_P2) AM_READWRITE(beast_p2_r, beast_p2_w)
-	AM_RANGE(MCS51_PORT_P3, MCS51_PORT_P3) AM_READWRITE(beast_p3_r, beast_p3_w)
-ADDRESS_MAP_END
 
 /******************************************************************************/
 
@@ -547,7 +540,7 @@ void djboy_state::machine_reset()
 	m_z80_to_beast_full = 0;
 }
 
-static MACHINE_CONFIG_START( djboy )
+MACHINE_CONFIG_START(djboy_state::djboy)
 
 	MCFG_CPU_ADD("maincpu", Z80, 6000000)
 	MCFG_CPU_PROGRAM_MAP(cpu0_am)
@@ -565,7 +558,14 @@ static MACHINE_CONFIG_START( djboy )
 	MCFG_CPU_VBLANK_INT_DRIVER("screen", djboy_state,  irq0_line_hold)
 
 	MCFG_CPU_ADD("beast", I80C51, 6000000)
-	MCFG_CPU_IO_MAP(djboy_mcu_io_map)
+	MCFG_MCS51_PORT_P0_IN_CB(READ8(djboy_state, beast_p0_r))
+	MCFG_MCS51_PORT_P0_OUT_CB(WRITE8(djboy_state, beast_p0_w))
+	MCFG_MCS51_PORT_P1_IN_CB(READ8(djboy_state, beast_p1_r))
+	MCFG_MCS51_PORT_P1_OUT_CB(WRITE8(djboy_state, beast_p1_w))
+	MCFG_MCS51_PORT_P2_IN_CB(READ8(djboy_state, beast_p2_r))
+	MCFG_MCS51_PORT_P2_OUT_CB(WRITE8(djboy_state, beast_p2_w))
+	MCFG_MCS51_PORT_P3_IN_CB(READ8(djboy_state, beast_p3_r))
+	MCFG_MCS51_PORT_P3_OUT_CB(WRITE8(djboy_state, beast_p3_w))
 
 	MCFG_QUANTUM_TIME(attotime::from_hz(6000))
 

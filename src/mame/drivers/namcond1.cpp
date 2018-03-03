@@ -196,7 +196,7 @@ Some logic, resistors/caps/transistors, some connectors etc.
 
 /*************************************************************/
 
-static ADDRESS_MAP_START( namcond1_map, AS_PROGRAM, 16, namcond1_state )
+ADDRESS_MAP_START(namcond1_state::namcond1_map)
 	AM_RANGE(0x000000, 0x0fffff) AM_ROM
 	AM_RANGE(0x400000, 0x40ffff) AM_RAM AM_SHARE("shared_ram")
 	AM_RANGE(0x800000, 0x80000f) AM_DEVICE8("ygv608", ygv608_device, port_map, 0xff00)
@@ -204,7 +204,7 @@ static ADDRESS_MAP_START( namcond1_map, AS_PROGRAM, 16, namcond1_state )
 	AM_RANGE(0xc3ff00, 0xc3ffff) AM_READWRITE(cuskey_r,cuskey_w)
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( abcheck_map, AS_PROGRAM, 16, namcond1_state )
+ADDRESS_MAP_START(namcond1_state::abcheck_map)
 	AM_RANGE(0x000000, 0x0fffff) AM_ROM
 	AM_RANGE(0x400000, 0x40ffff) AM_RAM AM_SHARE("shared_ram")
 	AM_RANGE(0x600000, 0x607fff) AM_RAM AM_SHARE("zpr1")
@@ -298,7 +298,7 @@ WRITE16_MEMBER(namcond1_state::mcu_pa_write)
 }
 
 /* H8/3002 MCU stuff */
-static ADDRESS_MAP_START( nd1h8rwmap, AS_PROGRAM, 16, namcond1_state )
+ADDRESS_MAP_START(namcond1_state::nd1h8rwmap)
 	AM_RANGE(0x000000, 0x07ffff) AM_ROM
 	AM_RANGE(0x200000, 0x20ffff) AM_RAM AM_SHARE("shared_ram")
 	AM_RANGE(0xa00000, 0xa07fff) AM_DEVREADWRITE("c352", c352_device, read, write)
@@ -311,7 +311,7 @@ static ADDRESS_MAP_START( nd1h8rwmap, AS_PROGRAM, 16, namcond1_state )
 	AM_RANGE(0xffff1e, 0xffff1f) AM_NOP     // ^
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( nd1h8iomap, AS_IO, 16, namcond1_state )
+ADDRESS_MAP_START(namcond1_state::nd1h8iomap)
 	AM_RANGE(h8_device::PORT_7, h8_device::PORT_7) AM_READ(mcu_p7_read )
 	AM_RANGE(h8_device::PORT_A, h8_device::PORT_A) AM_READWRITE(mcu_pa_read, mcu_pa_write )
 	AM_RANGE(h8_device::ADC_0,  h8_device::ADC_3)  AM_NOP // MCU reads these, but the games have no analog controls
@@ -343,14 +343,14 @@ WRITE_LINE_MEMBER( namcond1_state::raster_irq_w )
 	m_maincpu->set_input_line(2, state ? ASSERT_LINE : CLEAR_LINE);
 }
 
-static MACHINE_CONFIG_START( namcond1 )
+MACHINE_CONFIG_START(namcond1_state::namcond1)
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", M68000, XTAL_49_152MHz/4)
+	MCFG_CPU_ADD("maincpu", M68000, XTAL(49'152'000)/4)
 	MCFG_CPU_PROGRAM_MAP(namcond1_map)
 //  MCFG_CPU_VBLANK_INT_DRIVER("screen", namcond1_state,  irq1_line_hold)
 
-	MCFG_CPU_ADD("mcu", H83002, XTAL_49_152MHz/3 )
+	MCFG_CPU_ADD("mcu", H83002, XTAL(49'152'000)/3 )
 	MCFG_CPU_PROGRAM_MAP( nd1h8rwmap)
 	MCFG_CPU_IO_MAP( nd1h8iomap)
 	MCFG_CPU_VBLANK_INT_DRIVER("screen", namcond1_state,  mcu_interrupt)
@@ -369,7 +369,7 @@ static MACHINE_CONFIG_START( namcond1 )
 	H 804 108 576 48 32
 	V 261 26 224 3 0
 	*/
-	MCFG_SCREEN_RAW_PARAMS( XTAL_49_152MHz/8, 804/2, 108/2, (108+576)/2, 261, 26, 26+224)
+	MCFG_SCREEN_RAW_PARAMS( XTAL(49'152'000)/8, 804/2, 108/2, (108+576)/2, 261, 26, 26+224)
 	MCFG_SCREEN_UPDATE_DEVICE("ygv608", ygv608_device, update_screen)
 	MCFG_SCREEN_PALETTE("palette")
 
@@ -378,7 +378,7 @@ static MACHINE_CONFIG_START( namcond1 )
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
 
-	MCFG_C352_ADD("c352", XTAL_49_152MHz/2, 288)
+	MCFG_C352_ADD("c352", XTAL(49'152'000)/2, 288)
 	MCFG_SOUND_ROUTE(0, "lspeaker", 1.00)
 	MCFG_SOUND_ROUTE(1, "rspeaker", 1.00)
 	//MCFG_SOUND_ROUTE(2, "lspeaker", 1.00) // Second DAC not present.
@@ -389,8 +389,9 @@ static MACHINE_CONFIG_START( namcond1 )
 
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_DERIVED( abcheck, namcond1 )
-	MCFG_CPU_REPLACE("maincpu", M68000, XTAL_49_152MHz/4)
+MACHINE_CONFIG_START(namcond1_state::abcheck)
+	namcond1(config);
+	MCFG_CPU_REPLACE("maincpu", M68000, XTAL(49'152'000)/4)
 	MCFG_CPU_PROGRAM_MAP(abcheck_map)
 //  MCFG_CPU_VBLANK_INT_DRIVER("screen", namcond1_state,  irq1_line_hold)
 

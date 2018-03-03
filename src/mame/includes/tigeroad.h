@@ -60,6 +60,16 @@ public:
 	required_device<tigeroad_spr_device> m_spritegen;
 	required_device<generic_latch_8_device> m_soundlatch;
 
+	void toramich(machine_config &config);
+	void tigeroad(machine_config &config);
+	void f1dream_comad(machine_config &config);
+	void comad_sound_io_map(address_map &map);
+	void comad_sound_map(address_map &map);
+	void main_map(address_map &map);
+	void sample_map(address_map &map);
+	void sample_port_map(address_map &map);
+	void sound_map(address_map &map);
+	void sound_port_map(address_map &map);
 protected:
 	/* misc */
 	bool m_has_coinlock;
@@ -90,6 +100,10 @@ public:
 	DECLARE_WRITE8_MEMBER(mcu_pb_w);
 	DECLARE_WRITE8_MEMBER(mcu_pc_w);
 
+	void pushman(machine_config &config);
+	void bballs(machine_config &config);
+	void bballs_map(address_map &map);
+	void pushman_map(address_map &map);
 protected:
 	virtual void machine_start() override;
 

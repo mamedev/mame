@@ -227,6 +227,11 @@ public:
 
 	int m_centronics_busy;
 	DECLARE_WRITE_LINE_MEMBER(write_centronics_busy);
+	void pyuutajr(machine_config &config);
+	void tutor(machine_config &config);
+	void pyuutajr_mem(address_map &map);
+	void tutor_io(address_map &map);
+	void tutor_memmap(address_map &map);
 };
 
 
@@ -267,6 +272,7 @@ void tutor_state::machine_reset()
 
 	// Enable auto wait states by lowering READY during reset
 	m_maincpu->ready_line(CLEAR_LINE);
+	m_maincpu->reset_line(ASSERT_LINE);
 }
 
 /*
@@ -544,7 +550,7 @@ WRITE8_MEMBER( tutor_state::test_w )
 }
 #endif
 
-static ADDRESS_MAP_START(tutor_memmap, AS_PROGRAM, 8, tutor_state)
+ADDRESS_MAP_START(tutor_state::tutor_memmap)
 	AM_RANGE(0x0000, 0x3fff) AM_ROM
 	AM_RANGE(0x4000, 0x7fff) AM_ROMBANK("bank1") AM_WRITENOP
 	AM_RANGE(0x8000, 0xbfff) AM_ROMBANK("bank2") AM_WRITENOP
@@ -560,7 +566,7 @@ static ADDRESS_MAP_START(tutor_memmap, AS_PROGRAM, 8, tutor_state)
 	AM_RANGE(0xf000, 0xffff) AM_READ(tutor_highmem_r) AM_WRITENOP /*free for expansion (and internal processor RAM)*/
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START(pyuutajr_mem, AS_PROGRAM, 8, tutor_state)
+ADDRESS_MAP_START(tutor_state::pyuutajr_mem)
 	AM_RANGE(0x0000, 0x3fff) AM_ROM
 	AM_RANGE(0x4000, 0x7fff) AM_ROMBANK("bank1") AM_WRITENOP
 	AM_RANGE(0x8000, 0xbfff) AM_ROMBANK("bank2") AM_WRITENOP
@@ -588,7 +594,7 @@ ADDRESS_MAP_END
     >ed00(r): tape input
 */
 
-static ADDRESS_MAP_START(tutor_io, AS_IO, 8, tutor_state)
+ADDRESS_MAP_START(tutor_state::tutor_io)
 	AM_RANGE(0xec0, 0xec7) AM_READ(key_r)               /*keyboard interface*/
 	AM_RANGE(0xed0, 0xed0) AM_READ(tutor_cassette_r)        /*cassette interface*/
 ADDRESS_MAP_END
@@ -732,14 +738,14 @@ static INPUT_PORTS_START(pyuutajr)
 		PORT_BIT(0xff, IP_ACTIVE_HIGH, IPT_UNUSED)
 INPUT_PORTS_END
 
-static MACHINE_CONFIG_START( tutor )
+MACHINE_CONFIG_START(tutor_state::tutor)
 	// basic machine hardware
 	// TMS9995 CPU @ 10.7 MHz
 	// No lines connected yet
-	MCFG_TMS99xx_ADD("maincpu", TMS9995, XTAL_10_738635MHz, tutor_memmap, tutor_io)
+	MCFG_TMS99xx_ADD("maincpu", TMS9995, XTAL(10'738'635), tutor_memmap, tutor_io)
 
 	/* video hardware */
-	MCFG_DEVICE_ADD( "tms9928a", TMS9928A, XTAL_10_738635MHz / 2 )
+	MCFG_DEVICE_ADD( "tms9928a", TMS9928A, XTAL(10'738'635) / 2 )
 	MCFG_TMS9928A_VRAM_SIZE(0x4000)
 	MCFG_TMS9928A_SCREEN_ADD_NTSC( "screen" )
 	MCFG_SCREEN_UPDATE_DEVICE( "tms9928a", tms9928a_device, screen_update )
@@ -767,7 +773,8 @@ static MACHINE_CONFIG_START( tutor )
 	MCFG_SOFTWARE_LIST_ADD("cart_list","tutor")
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_DERIVED( pyuutajr, tutor )
+MACHINE_CONFIG_START(tutor_state::pyuutajr)
+	tutor(config);
 	MCFG_CPU_MODIFY("maincpu")
 	MCFG_CPU_PROGRAM_MAP(pyuutajr_mem)
 	//MCFG_DEVICE_REMOVE("centronics")

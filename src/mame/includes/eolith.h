@@ -56,6 +56,12 @@ public:
 
 	uint32_t screen_update_eolith(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 
+	void ironfort(machine_config &config);
+	void eolith50(machine_config &config);
+	void eolith45(machine_config &config);
+	void eolith_map(address_map &map);
+	void sound_io_map(address_map &map);
+	void sound_prg_map(address_map &map);
 protected:
 	// shared with eolith16.cpp, vegaeo.cpp
 	optional_ioport m_eepromoutport;

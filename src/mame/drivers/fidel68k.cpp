@@ -11,7 +11,6 @@
     such as Arena(in editmode).
 
     TODO:
-    - fex68km3 addressmap RAM mirror? PCB has 2*32K RAM, emulated has 16K+64K
     - USART is not emulated
     - V9(68030 @ 32MHz) is faster than V10(68040 @ 25MHz) but it should be the other
       way around, culprit is unemulated cache?
@@ -29,7 +28,7 @@ PCB label 510-1129A01
 PCB has edge connector for module, but no external slot
 
 There's room for 2 SIMMs at U22 and U23. Unpopulated in Excel 68000, used for
-128KB hashtable RAM in Mach II. Mach III has wire mods to U8/U9(2*32KB).
+128KB hashtable RAM in Mach II. Mach III has wire mods to U8/U9(2*8KB + 2*32KB piggybacked).
 
 I/O is via TTL, overall very similar to EAG.
 
@@ -45,6 +44,13 @@ PCB label 510.1134A02
 
 ROM address/data lines are scrambled, presumed for easy placement on PCB and not
 for obfuscation. I/O is nearly the same as Designer Display on 6502 hardware.
+
+Designer Mach IV Master 2325 (model 6129)
+-----------------------------------------
+32KB(4*P5164-70) + 512KB(TC518512PL-80) RAM, 64KB ROM(TMS 27C512-120JL)
+MC68EC020RP25 CPU, 20MHz XTAL
+PCB label 510.1149A01
+It has a green "Shift" led instead of red, and ROM is not scrambled.
 
 
 ******************************************************************************
@@ -176,12 +182,12 @@ B0000x-xxxxxx: see V7, -800000
 #include "cpu/m68000/m68000.h"
 #include "machine/ram.h"
 #include "machine/nvram.h"
-#include "machine/timer.h"
 #include "sound/volt_reg.h"
 #include "speaker.h"
 
 // internal artwork
-#include "fidel_desdis_68k.lh" // clickable
+#include "fidel_desdis_68kg.lh" // clickable
+#include "fidel_desdis_68kr.lh" // clickable
 #include "fidel_ex_68k.lh" // clickable
 #include "fidel_eag_68k.lh" // clickable
 
@@ -201,12 +207,22 @@ public:
 
 	// Excel 68000
 	DECLARE_WRITE8_MEMBER(fex68k_mux_w);
+	void fex68k_map(address_map &map);
+	void fex68km2_map(address_map &map);
+	void fex68km3_map(address_map &map);
+	void fex68k(machine_config &config);
+	void fex68km2(machine_config &config);
+	void fex68km3(machine_config &config);
 
 	// Designer Master
-	DECLARE_WRITE8_MEMBER(fdes2265_control_w);
-	DECLARE_READ8_MEMBER(fdes2265_input_r);
-	DECLARE_WRITE8_MEMBER(fdes2265_lcd_w);
+	DECLARE_WRITE8_MEMBER(fdes68k_control_w);
+	DECLARE_READ8_MEMBER(fdes68k_input_r);
+	DECLARE_WRITE8_MEMBER(fdes68k_lcd_w);
 	DECLARE_DRIVER_INIT(fdes2265);
+	void fdes2265_map(address_map &map);
+	void fdes2325_map(address_map &map);
+	void fdes2265(machine_config &config);
+	void fdes2325(machine_config &config);
 
 	// EAG(6114/6117)
 	DECLARE_DRIVER_INIT(eag);
@@ -216,6 +232,14 @@ public:
 	DECLARE_WRITE8_MEMBER(eag_7seg_w);
 	DECLARE_WRITE8_MEMBER(eag_mux_w);
 	DECLARE_READ8_MEMBER(eag_input2_r);
+	void eag_map(address_map &map);
+	void eagv7_map(address_map &map);
+	void eagv11_map(address_map &map);
+	void eag(machine_config &config);
+	void eagv7(machine_config &config);
+	void eagv9(machine_config &config);
+	void eagv10(machine_config &config);
+	void eagv11(machine_config &config);
 };
 
 
@@ -242,7 +266,7 @@ WRITE8_MEMBER(fidel68k_state::fex68k_mux_w)
     Designer Master
 ******************************************************************************/
 
-WRITE8_MEMBER(fidel68k_state::fdes2265_control_w)
+WRITE8_MEMBER(fidel68k_state::fdes68k_control_w)
 {
 	u8 q3_old = m_led_select & 8;
 
@@ -273,16 +297,16 @@ WRITE8_MEMBER(fidel68k_state::fdes2265_control_w)
 	display_update();
 }
 
-READ8_MEMBER(fidel68k_state::fdes2265_input_r)
+READ8_MEMBER(fidel68k_state::fdes68k_input_r)
 {
 	// a1-a3,d7(d15): multiplexed inputs (active low)
 	return (read_inputs(9) >> offset & 1) ? 0 : 0x80;
 }
 
-WRITE8_MEMBER(fidel68k_state::fdes2265_lcd_w)
+WRITE8_MEMBER(fidel68k_state::fdes68k_lcd_w)
 {
 	// a1-a3,d0-d3: 4*74259 to lcd digit segments
-	u32 mask = BITSWAP8(1 << offset,3,7,6,0,1,2,4,5);
+	u32 mask = bitswap<8>(1 << offset,3,7,6,0,1,2,4,5);
 	for (int i = 0; i < 4; i++)
 	{
 		m_7seg_data = (m_7seg_data & ~mask) | ((data >> i & 1) ? mask : 0);
@@ -293,17 +317,17 @@ WRITE8_MEMBER(fidel68k_state::fdes2265_lcd_w)
 DRIVER_INIT_MEMBER(fidel68k_state, fdes2265)
 {
 	u16 *rom = (u16*)memregion("maincpu")->base();
-	unsigned const len = memregion("maincpu")->bytes() / 2;
+	const u32 len = memregion("maincpu")->bytes() / 2;
 
 	// descramble data lines
 	for (int i = 0; i < len; i++)
-		rom[i] = BITSWAP16(rom[i], 15,14,8,13,9,12,10,11, 3,4,5,7,6,0,1,2);
+		rom[i] = bitswap<16>(rom[i], 15,14,8,13,9,12,10,11, 3,4,5,7,6,0,1,2);
 
 	// descramble address lines
 	std::vector<u16> buf(len);
 	memcpy(&buf[0], rom, len*2);
 	for (int i = 0; i < len; i++)
-		rom[i] = buf[BITSWAP24(i, 23,22,21,20,19,18,17,16, 15,14,13,12,11,8,10,9, 7,6,5,4,3,2,1,0)];
+		rom[i] = buf[bitswap<24>(i, 23,22,21,20,19,18,17,16, 15,14,13,12,11,8,10,9, 7,6,5,4,3,2,1,0)];
 }
 
 
@@ -318,7 +342,7 @@ void fidel68k_state::eag_prepare_display()
 {
 	// Excel 68000: 4*7seg leds, 8*8 chessboard leds
 	// EAG: 8*7seg leds(2 panels), (8+1)*8 chessboard leds
-	u8 seg_data = BITSWAP8(m_7seg_data,0,1,3,2,7,5,6,4);
+	u8 seg_data = bitswap<8>(m_7seg_data,0,1,3,2,7,5,6,4);
 	set_display_segmask(0x1ff, 0x7f);
 	display_matrix(16, 9, m_led_data << 8 | seg_data, m_inp_mux);
 }
@@ -368,7 +392,7 @@ WRITE8_MEMBER(fidel68k_state::eag_mux_w)
 
 // Excel 68000
 
-static ADDRESS_MAP_START( fex68k_map, AS_PROGRAM, 16, fidel68k_state )
+ADDRESS_MAP_START(fidel68k_state::fex68k_map)
 	AM_RANGE(0x000000, 0x00ffff) AM_ROM
 	AM_RANGE(0x000000, 0x00000f) AM_MIRROR(0x00fff0) AM_WRITE8(eag_leds_w, 0x00ff)
 	AM_RANGE(0x000000, 0x00000f) AM_MIRROR(0x00fff0) AM_WRITE8(eag_7seg_w, 0xff00)
@@ -377,27 +401,37 @@ static ADDRESS_MAP_START( fex68k_map, AS_PROGRAM, 16, fidel68k_state )
 	AM_RANGE(0x140000, 0x14000f) AM_MIRROR(0x03fff0) AM_WRITE8(fex68k_mux_w, 0x00ff)
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( fex68km2_map, AS_PROGRAM, 16, fidel68k_state )
-	AM_RANGE(0x200000, 0x21ffff) AM_RAM
+ADDRESS_MAP_START(fidel68k_state::fex68km2_map)
 	AM_IMPORT_FROM( fex68k_map )
+	AM_RANGE(0x200000, 0x21ffff) AM_RAM
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( fex68km3_map, AS_PROGRAM, 16, fidel68k_state )
-	AM_RANGE(0x200000, 0x20ffff) AM_RAM
+ADDRESS_MAP_START(fidel68k_state::fex68km3_map)
 	AM_IMPORT_FROM( fex68k_map )
+	AM_RANGE(0x200000, 0x20ffff) AM_RAM
 ADDRESS_MAP_END
 
 
 // Designer Master
 
-static ADDRESS_MAP_START( fdes2265_map, AS_PROGRAM, 16, fidel68k_state )
+ADDRESS_MAP_START(fidel68k_state::fdes2265_map)
 	ADDRESS_MAP_UNMAP_HIGH
 	AM_RANGE(0x000000, 0x00ffff) AM_ROM
-	AM_RANGE(0x000000, 0x00000f) AM_WRITE8(fdes2265_lcd_w, 0x00ff)
+	AM_RANGE(0x000000, 0x00000f) AM_WRITE8(fdes68k_lcd_w, 0x00ff)
 	AM_RANGE(0x044000, 0x047fff) AM_RAM
 	AM_RANGE(0x100000, 0x10ffff) AM_RAM
-	AM_RANGE(0x140000, 0x14000f) AM_READ8(fdes2265_input_r, 0xff00)
-	AM_RANGE(0x140000, 0x14000f) AM_WRITE8(fdes2265_control_w, 0x00ff)
+	AM_RANGE(0x140000, 0x14000f) AM_READ8(fdes68k_input_r, 0xff00)
+	AM_RANGE(0x140000, 0x14000f) AM_WRITE8(fdes68k_control_w, 0x00ff)
+ADDRESS_MAP_END
+
+ADDRESS_MAP_START(fidel68k_state::fdes2325_map)
+	ADDRESS_MAP_UNMAP_HIGH
+	AM_RANGE(0x000000, 0x00ffff) AM_ROM
+	AM_RANGE(0x100000, 0x10000f) AM_WRITE8(fdes68k_lcd_w, 0x00ff00ff)
+	AM_RANGE(0x140000, 0x14000f) AM_WRITE8(fdes68k_control_w, 0x00ff00ff)
+	AM_RANGE(0x180000, 0x18000f) AM_READ8(fdes68k_input_r, 0xff00ff00)
+	AM_RANGE(0x300000, 0x37ffff) AM_RAM
+	AM_RANGE(0x500000, 0x507fff) AM_RAM
 ADDRESS_MAP_END
 
 
@@ -409,11 +443,11 @@ DRIVER_INIT_MEMBER(fidel68k_state, eag)
 	m_maincpu->space(AS_PROGRAM).install_ram(0x200000, 0x200000 + m_ram->size() - 1, m_ram->pointer());
 }
 
-static ADDRESS_MAP_START( eag_map, AS_PROGRAM, 16, fidel68k_state )
+ADDRESS_MAP_START(fidel68k_state::eag_map)
 	AM_RANGE(0x000000, 0x01ffff) AM_ROM
 	AM_RANGE(0x104000, 0x107fff) AM_RAM
-	AM_RANGE(0x300000, 0x30000f) AM_MIRROR(0x000010) AM_READWRITE8(eag_input1_r, eag_leds_w, 0x00ff)
 	AM_RANGE(0x300000, 0x30000f) AM_MIRROR(0x000010) AM_WRITE8(eag_7seg_w, 0xff00) AM_READNOP
+	AM_RANGE(0x300000, 0x30000f) AM_MIRROR(0x000010) AM_READWRITE8(eag_input1_r, eag_leds_w, 0x00ff)
 	AM_RANGE(0x400000, 0x407fff) AM_READ8(cartridge_r, 0xff00)
 	AM_RANGE(0x400000, 0x400001) AM_WRITE8(eag_mux_w, 0x00ff)
 	AM_RANGE(0x400002, 0x400007) AM_WRITENOP // ?
@@ -421,12 +455,12 @@ static ADDRESS_MAP_START( eag_map, AS_PROGRAM, 16, fidel68k_state )
 	AM_RANGE(0x700002, 0x700003) AM_READ8(eag_input2_r, 0x00ff)
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( eagv7_map, AS_PROGRAM, 32, fidel68k_state )
+ADDRESS_MAP_START(fidel68k_state::eagv7_map)
 	AM_RANGE(0x000000, 0x01ffff) AM_ROM
 	AM_RANGE(0x104000, 0x107fff) AM_RAM
 	AM_RANGE(0x200000, 0x2fffff) AM_RAM
-	AM_RANGE(0x300000, 0x30000f) AM_MIRROR(0x000010) AM_READWRITE8(eag_input1_r, eag_leds_w, 0x00ff00ff)
 	AM_RANGE(0x300000, 0x30000f) AM_MIRROR(0x000010) AM_WRITE8(eag_7seg_w, 0xff00ff00) AM_READNOP
+	AM_RANGE(0x300000, 0x30000f) AM_MIRROR(0x000010) AM_READWRITE8(eag_input1_r, eag_leds_w, 0x00ff00ff)
 	AM_RANGE(0x400000, 0x407fff) AM_READ8(cartridge_r, 0xff00ff00)
 	AM_RANGE(0x400000, 0x400003) AM_WRITE8(eag_mux_w, 0x00ff0000)
 	AM_RANGE(0x400004, 0x400007) AM_WRITENOP // ?
@@ -435,11 +469,11 @@ static ADDRESS_MAP_START( eagv7_map, AS_PROGRAM, 32, fidel68k_state )
 	AM_RANGE(0x800000, 0x807fff) AM_RAM
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( eagv11_map, AS_PROGRAM, 32, fidel68k_state )
+ADDRESS_MAP_START(fidel68k_state::eagv11_map)
 	AM_RANGE(0x00000000, 0x0001ffff) AM_ROM
 	AM_RANGE(0x00200000, 0x003fffff) AM_RAM
-	AM_RANGE(0x00b00000, 0x00b0000f) AM_MIRROR(0x00000010) AM_READWRITE8(eag_input1_r, eag_leds_w, 0x00ff00ff)
 	AM_RANGE(0x00b00000, 0x00b0000f) AM_MIRROR(0x00000010) AM_WRITE8(eag_7seg_w, 0xff00ff00) AM_READNOP
+	AM_RANGE(0x00b00000, 0x00b0000f) AM_MIRROR(0x00000010) AM_READWRITE8(eag_input1_r, eag_leds_w, 0x00ff00ff)
 	AM_RANGE(0x00c00000, 0x00c07fff) AM_READ8(cartridge_r, 0xff00ff00)
 	AM_RANGE(0x00c00000, 0x00c00003) AM_WRITE8(eag_mux_w, 0x00ff0000)
 	AM_RANGE(0x00c00004, 0x00c00007) AM_WRITENOP // ?
@@ -469,7 +503,7 @@ static INPUT_PORTS_START( fex68k )
 INPUT_PORTS_END
 
 
-static INPUT_PORTS_START( fdes )
+static INPUT_PORTS_START( fdes68k )
 	PORT_INCLUDE( fidel_cb_buttons )
 
 	PORT_START("IN.8")
@@ -513,10 +547,10 @@ INPUT_PORTS_END
     Machine Drivers
 ******************************************************************************/
 
-static MACHINE_CONFIG_START( fex68k )
+MACHINE_CONFIG_START(fidel68k_state::fex68k)
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", M68000, XTAL_12MHz) // HD68HC000P12
+	MCFG_CPU_ADD("maincpu", M68000, 12_MHz_XTAL) // HD68HC000P12
 	MCFG_CPU_PROGRAM_MAP(fex68k_map)
 	MCFG_TIMER_DRIVER_ADD_PERIODIC("irq_on", fidel68k_state, irq_on, attotime::from_hz(618)) // theoretical frequency from 556 timer (22nF, 91K + 20K POT @ 14.8K, 0.1K), measurement was 580Hz
 	MCFG_TIMER_START_DELAY(attotime::from_hz(618) - attotime::from_nsec(1525)) // active for 1.525us
@@ -532,32 +566,34 @@ static MACHINE_CONFIG_START( fex68k )
 	MCFG_SOUND_ROUTE_EX(0, "dac", 1.0, DAC_VREF_POS_INPUT)
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_DERIVED( fex68km2, fex68k )
+MACHINE_CONFIG_START(fidel68k_state::fex68km2)
+	fex68k(config);
 
 	/* basic machine hardware */
 	MCFG_CPU_MODIFY("maincpu")
 	MCFG_CPU_PROGRAM_MAP(fex68km2_map)
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_DERIVED( fex68km3, fex68k )
+MACHINE_CONFIG_START(fidel68k_state::fex68km3)
+	fex68k(config);
 
 	/* basic machine hardware */
 	MCFG_CPU_MODIFY("maincpu")
-	MCFG_DEVICE_CLOCK(XTAL_16MHz) // factory overclock
+	MCFG_DEVICE_CLOCK(16_MHz_XTAL) // factory overclock
 	MCFG_CPU_PROGRAM_MAP(fex68km3_map)
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_START( fdes2265 )
+MACHINE_CONFIG_START(fidel68k_state::fdes2265)
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", M68000, XTAL_16MHz) // MC68HC000P12F
+	MCFG_CPU_ADD("maincpu", M68000, 16_MHz_XTAL) // MC68HC000P12F
 	MCFG_CPU_PROGRAM_MAP(fdes2265_map)
 	MCFG_TIMER_DRIVER_ADD_PERIODIC("irq_on", fidel68k_state, irq_on, attotime::from_hz(597)) // from 555 timer, measured
 	MCFG_TIMER_START_DELAY(attotime::from_hz(597) - attotime::from_nsec(6000)) // active for 6us
 	MCFG_TIMER_DRIVER_ADD_PERIODIC("irq_off", fidel68k_state, irq_off, attotime::from_hz(597))
 
 	MCFG_TIMER_DRIVER_ADD_PERIODIC("display_decay", fidelbase_state, display_decay_tick, attotime::from_msec(1))
-	MCFG_DEFAULT_LAYOUT(layout_fidel_desdis_68k)
+	MCFG_DEFAULT_LAYOUT(layout_fidel_desdis_68kr)
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("speaker")
@@ -566,14 +602,24 @@ static MACHINE_CONFIG_START( fdes2265 )
 	MCFG_SOUND_ROUTE_EX(0, "dac", 1.0, DAC_VREF_POS_INPUT)
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_START( eag )
+MACHINE_CONFIG_START(fidel68k_state::fdes2325)
+	fdes2265(config);
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", M68000, XTAL_16MHz)
+	MCFG_CPU_REPLACE("maincpu", M68EC020, 20_MHz_XTAL) // MC68EC020RP25
+	MCFG_CPU_PROGRAM_MAP(fdes2325_map)
+
+	MCFG_DEFAULT_LAYOUT(layout_fidel_desdis_68kg)
+MACHINE_CONFIG_END
+
+MACHINE_CONFIG_START(fidel68k_state::eag)
+
+	/* basic machine hardware */
+	MCFG_CPU_ADD("maincpu", M68000, 16_MHz_XTAL)
 	MCFG_CPU_PROGRAM_MAP(eag_map)
-	MCFG_TIMER_DRIVER_ADD_PERIODIC("irq_on", fidel68k_state, irq_on, attotime::from_hz(XTAL_4_9152MHz/0x2000)) // 600Hz
-	MCFG_TIMER_START_DELAY(attotime::from_hz(XTAL_4_9152MHz/0x2000) - attotime::from_nsec(8250)) // active for 8.25us
-	MCFG_TIMER_DRIVER_ADD_PERIODIC("irq_off", fidel68k_state, irq_off, attotime::from_hz(XTAL_4_9152MHz/0x2000))
+	MCFG_TIMER_DRIVER_ADD_PERIODIC("irq_on", fidel68k_state, irq_on, attotime::from_hz(4.9152_MHz_XTAL/0x2000)) // 600Hz
+	MCFG_TIMER_START_DELAY(attotime::from_hz(4.9152_MHz_XTAL/0x2000) - attotime::from_nsec(8250)) // active for 8.25us
+	MCFG_TIMER_DRIVER_ADD_PERIODIC("irq_off", fidel68k_state, irq_off, attotime::from_hz(4.9152_MHz_XTAL/0x2000))
 
 	MCFG_NVRAM_ADD_1FILL("nvram")
 
@@ -597,33 +643,37 @@ static MACHINE_CONFIG_START( eag )
 	MCFG_SOFTWARE_LIST_ADD("cart_list", "fidel_scc")
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_DERIVED( eagv7, eag )
+MACHINE_CONFIG_START(fidel68k_state::eagv7)
+	eag(config);
 
 	/* basic machine hardware */
-	MCFG_CPU_REPLACE("maincpu", M68020, XTAL_20MHz)
+	MCFG_CPU_REPLACE("maincpu", M68020, 20_MHz_XTAL)
 	MCFG_CPU_PROGRAM_MAP(eagv7_map)
 
 	MCFG_RAM_REMOVE("ram")
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_DERIVED( eagv9, eagv7 )
+MACHINE_CONFIG_START(fidel68k_state::eagv9)
+	eagv7(config);
 
 	/* basic machine hardware */
-	MCFG_CPU_REPLACE("maincpu", M68030, XTAL_32MHz)
+	MCFG_CPU_REPLACE("maincpu", M68030, 32_MHz_XTAL)
 	MCFG_CPU_PROGRAM_MAP(eagv7_map)
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_DERIVED( eagv10, eagv7 )
+MACHINE_CONFIG_START(fidel68k_state::eagv10)
+	eagv7(config);
 
 	/* basic machine hardware */
-	MCFG_CPU_REPLACE("maincpu", M68040, XTAL_25MHz)
+	MCFG_CPU_REPLACE("maincpu", M68040, 25_MHz_XTAL)
 	MCFG_CPU_PROGRAM_MAP(eagv11_map)
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_DERIVED( eagv11, eagv7 )
+MACHINE_CONFIG_START(fidel68k_state::eagv11)
+	eagv7(config);
 
 	/* basic machine hardware */
-	MCFG_CPU_REPLACE("maincpu", M68EC040, XTAL_36MHz*2*2) // wrong! should be M68EC060 @ 72MHz
+	MCFG_CPU_REPLACE("maincpu", M68EC040, 36_MHz_XTAL*2*2) // wrong! should be M68EC060 @ 72MHz
 	MCFG_CPU_PROGRAM_MAP(eagv11_map)
 
 	MCFG_CPU_PERIODIC_INT_DRIVER(fidel68k_state, irq2_line_hold, 600)
@@ -660,6 +710,14 @@ ROM_START( fdes2265 ) // model 6113, PCB label 510.1134A02
 	ROM_REGION16_BE( 0x10000, "maincpu", 0 )
 	ROM_LOAD16_BYTE("13e_red.ic11",  0x00000, 0x08000, CRC(15a35628) SHA1(8213862e129951c6943a80f73cd0b63a31bb1357) ) // 27c256
 	ROM_LOAD16_BYTE("13o_blue.ic10", 0x00001, 0x08000, CRC(81ce7ab2) SHA1(f01a70bcf2fbfe66c7a77d3c4437d897e5cc682d) ) // "
+ROM_END
+
+ROM_START( fdes2325 ) // model 6129, PCB label 510.1149A01
+	ROM_REGION( 0x10000, "maincpu", 0 )
+	ROM_LOAD("61_29_white.ic10", 0x00000, 0x10000, CRC(f74157e1) SHA1(87f3f2d584e292f81593e053240d022cc477834d) ) // 27c512
+
+	ROM_REGION( 0x100, "pals", 0 )
+	ROM_LOAD("101-1097a01.ic19", 0x000, 0x100, NO_DUMP ) // PALCE16V8Q-25PC
 ROM_END
 
 
@@ -715,17 +773,18 @@ ROM_END
     Drivers
 ******************************************************************************/
 
-//    YEAR  NAME      PARENT  CMP MACHINE   INPUT   STATE           INIT      COMPANY, FULLNAME, FLAGS
-CONS( 1987, fex68k,   0,       0, fex68k,   fex68k, fidel68k_state, 0,        "Fidelity Electronics", "Excel 68000", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK | MACHINE_IMPERFECT_CONTROLS )
-CONS( 1988, fex68km2, fex68k,  0, fex68km2, fex68k, fidel68k_state, 0,        "Fidelity Electronics", "Excel 68000 Mach II (rev. C+)", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK | MACHINE_IMPERFECT_CONTROLS )
-CONS( 1988, fex68km3, fex68k,  0, fex68km3, fex68k, fidel68k_state, 0,        "Fidelity Electronics", "Excel 68000 Mach III", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK | MACHINE_IMPERFECT_CONTROLS )
+//    YEAR  NAME      PARENT   CMP MACHINE   INPUT    STATE           INIT      COMPANY, FULLNAME, FLAGS
+CONS( 1987, fex68k,   0,        0, fex68k,   fex68k,  fidel68k_state, 0,        "Fidelity Electronics", "Excel 68000", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK | MACHINE_IMPERFECT_CONTROLS )
+CONS( 1988, fex68km2, fex68k,   0, fex68km2, fex68k,  fidel68k_state, 0,        "Fidelity Electronics", "Excel 68000 Mach II (rev. C+)", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK | MACHINE_IMPERFECT_CONTROLS )
+CONS( 1988, fex68km3, fex68k,   0, fex68km3, fex68k,  fidel68k_state, 0,        "Fidelity Electronics", "Excel 68000 Mach III Master", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK | MACHINE_IMPERFECT_CONTROLS )
 
-CONS( 1989, fdes2265, 0,       0, fdes2265, fdes,   fidel68k_state, fdes2265, "Fidelity Electronics", "Designer Mach III Master 2265", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK | MACHINE_IMPERFECT_CONTROLS )
+CONS( 1989, fdes2265, 0,        0, fdes2265, fdes68k, fidel68k_state, fdes2265, "Fidelity Electronics", "Designer Mach III Master 2265", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK | MACHINE_IMPERFECT_CONTROLS )
+CONS( 1991, fdes2325, fdes2265, 0, fdes2325, fdes68k, fidel68k_state, 0,        "Fidelity Electronics", "Designer Mach IV Master 2325", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK | MACHINE_IMPERFECT_CONTROLS )
 
-CONS( 1989, feagv2,   0,       0, eag,      eag,    fidel68k_state, eag,      "Fidelity Electronics", "Elite Avant Garde (model 6114-2/3/4, set 1)", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK | MACHINE_IMPERFECT_CONTROLS )
-CONS( 1989, feagv2a,  feagv2,  0, eag,      eag,    fidel68k_state, eag,      "Fidelity Electronics", "Elite Avant Garde (model 6114-2/3/4, set 2)", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK | MACHINE_IMPERFECT_CONTROLS )
-CONS( 1990, feagv7,   feagv2,  0, eagv7,    eag,    fidel68k_state, 0,        "Fidelity Electronics", "Elite Avant Garde (model 6117-7, set 1)", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK | MACHINE_IMPERFECT_CONTROLS )
-CONS( 1990, feagv7a,  feagv2,  0, eagv7,    eag,    fidel68k_state, 0,        "Fidelity Electronics", "Elite Avant Garde (model 6117-7, set 2)", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK | MACHINE_IMPERFECT_CONTROLS )
-CONS( 1990, feagv9,   feagv2,  0, eagv9,    eag,    fidel68k_state, 0,        "Fidelity Electronics", "Elite Avant Garde (model 6117-9)", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK | MACHINE_IMPERFECT_CONTROLS )
-CONS( 1990, feagv10,  feagv2,  0, eagv10,   eag,    fidel68k_state, 0,        "Fidelity Electronics", "Elite Avant Garde (model 6117-10)", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK | MACHINE_IMPERFECT_CONTROLS | MACHINE_IMPERFECT_TIMING )
-CONS( 2002, feagv11,  feagv2,  0, eagv11,   eag,    fidel68k_state, 0,        "hack (Wilfried Bucke)", "Elite Avant Garde (model 6117-11)", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK | MACHINE_IMPERFECT_CONTROLS | MACHINE_IMPERFECT_TIMING )
+CONS( 1989, feagv2,   0,        0, eag,      eag,     fidel68k_state, eag,      "Fidelity Electronics", "Elite Avant Garde (model 6114-2/3/4, set 1)", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK | MACHINE_IMPERFECT_CONTROLS )
+CONS( 1989, feagv2a,  feagv2,   0, eag,      eag,     fidel68k_state, eag,      "Fidelity Electronics", "Elite Avant Garde (model 6114-2/3/4, set 2)", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK | MACHINE_IMPERFECT_CONTROLS )
+CONS( 1990, feagv7,   feagv2,   0, eagv7,    eag,     fidel68k_state, 0,        "Fidelity Electronics", "Elite Avant Garde (model 6117-7, set 1)", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK | MACHINE_IMPERFECT_CONTROLS )
+CONS( 1990, feagv7a,  feagv2,   0, eagv7,    eag,     fidel68k_state, 0,        "Fidelity Electronics", "Elite Avant Garde (model 6117-7, set 2)", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK | MACHINE_IMPERFECT_CONTROLS )
+CONS( 1990, feagv9,   feagv2,   0, eagv9,    eag,     fidel68k_state, 0,        "Fidelity Electronics", "Elite Avant Garde (model 6117-9)", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK | MACHINE_IMPERFECT_CONTROLS )
+CONS( 1990, feagv10,  feagv2,   0, eagv10,   eag,     fidel68k_state, 0,        "Fidelity Electronics", "Elite Avant Garde (model 6117-10)", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK | MACHINE_IMPERFECT_CONTROLS | MACHINE_IMPERFECT_TIMING )
+CONS( 2002, feagv11,  feagv2,   0, eagv11,   eag,     fidel68k_state, 0,        "hack (Wilfried Bucke)", "Elite Avant Garde (model 6117-11)", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK | MACHINE_IMPERFECT_CONTROLS | MACHINE_IMPERFECT_TIMING )

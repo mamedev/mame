@@ -84,7 +84,7 @@ WRITE8_MEMBER(gundealr_state::yamyam_bankswitch_w)
 
 
 
-static ADDRESS_MAP_START( base_map, AS_PROGRAM, 8, gundealr_state )
+ADDRESS_MAP_START(gundealr_state::base_map)
 	AM_RANGE(0x0000, 0x7fff) AM_ROM
 	AM_RANGE(0x8000, 0xbfff) AM_ROMBANK("bank1")
 	AM_RANGE(0xc000, 0xc000) AM_READ_PORT("DSW0")
@@ -99,20 +99,20 @@ static ADDRESS_MAP_START( base_map, AS_PROGRAM, 8, gundealr_state )
 	AM_RANGE(0xe000, 0xffff) AM_RAM AM_SHARE("rambase")
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( gundealr_main_map, AS_PROGRAM, 8, gundealr_state )
+ADDRESS_MAP_START(gundealr_state::gundealr_main_map)
 	AM_IMPORT_FROM(base_map)
 	AM_RANGE(0xc014, 0xc014) AM_WRITE(gundealr_flipscreen_w)
 	AM_RANGE(0xc020, 0xc023) AM_WRITE(gundealr_fg_scroll_w)
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( yamyam_main_map, AS_PROGRAM, 8, gundealr_state )
+ADDRESS_MAP_START(gundealr_state::yamyam_main_map)
 	AM_IMPORT_FROM(base_map)
 	AM_RANGE(0xc010, 0xc013) AM_WRITE(yamyam_fg_scroll_w)
 	AM_RANGE(0xc014, 0xc014) AM_WRITE(yamyam_flipscreen_w)
 	AM_RANGE(0xc015, 0xc015) AM_WRITENOP // Bit 7 = MCU reset?
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( main_portmap, AS_IO, 8, gundealr_state )
+ADDRESS_MAP_START(gundealr_state::main_portmap)
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	AM_RANGE(0x00, 0x01) AM_DEVREADWRITE("ymsnd", ym2203_device, read, write)
 ADDRESS_MAP_END
@@ -424,10 +424,10 @@ TIMER_DEVICE_CALLBACK_MEMBER(gundealr_state::gundealr_scanline)
 		m_maincpu->set_input_line_and_vector(0, HOLD_LINE,0xcf); /* RST 10h */
 }
 
-static MACHINE_CONFIG_START( gundealr )
+MACHINE_CONFIG_START(gundealr_state::gundealr)
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", Z80, XTAL_12MHz/2)   /* 6 MHz verified for Yam! Yam!? */
+	MCFG_CPU_ADD("maincpu", Z80, XTAL(12'000'000)/2)   /* 6 MHz verified for Yam! Yam!? */
 	MCFG_CPU_PROGRAM_MAP(gundealr_main_map)
 	MCFG_CPU_IO_MAP(main_portmap)
 	MCFG_TIMER_DRIVER_ADD_SCANLINE("scantimer", gundealr_state, gundealr_scanline, "screen", 0, 1)
@@ -449,7 +449,7 @@ static MACHINE_CONFIG_START( gundealr )
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
 
-	MCFG_SOUND_ADD("ymsnd", YM2203, XTAL_12MHz/8) /* 1.5Mhz verified for Yam! Yam!? */
+	MCFG_SOUND_ADD("ymsnd", YM2203, XTAL(12'000'000)/8) /* 1.5Mhz verified for Yam! Yam!? */
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
 MACHINE_CONFIG_END
 
@@ -517,14 +517,16 @@ TIMER_DEVICE_CALLBACK_MEMBER(gundealr_state::yamyam_mcu_sim)
 	m_rambase[0x006] = ioport("IN0")->read();
 }
 
-static MACHINE_CONFIG_DERIVED( yamyam, gundealr )
+MACHINE_CONFIG_START(gundealr_state::yamyam)
+	gundealr(config);
 	MCFG_CPU_MODIFY("maincpu")
 	MCFG_CPU_PROGRAM_MAP(yamyam_main_map)
 
 	MCFG_TIMER_DRIVER_ADD_PERIODIC("mcusim", gundealr_state, yamyam_mcu_sim, attotime::from_hz(6000000/60)) /* 6mhz confirmed */
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_DERIVED( gundealrbl, yamyam )
+MACHINE_CONFIG_START(gundealr_state::gundealrbl)
+	yamyam(config);
 	MCFG_DEVICE_REMOVE("mcusim")
 MACHINE_CONFIG_END
 

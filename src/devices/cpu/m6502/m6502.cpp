@@ -33,9 +33,9 @@ m6502_device::m6502_device(const machine_config &mconfig, device_type type, cons
 void m6502_device::device_start()
 {
 	if(direct_disabled)
-		mintf = new mi_default_nd;
+		mintf = std::make_unique<mi_default_nd>();
 	else
-		mintf = new mi_default_normal;
+		mintf = std::make_unique<mi_default_normal>();
 
 	init();
 }
@@ -50,8 +50,10 @@ void m6502_device::init()
 
 	sync_w.resolve_safe();
 
-	state_add(STATE_GENPC,     "GENPC",     NPC).noshow();
-	state_add(STATE_GENPCBASE, "CURPC",     PPC).noshow();
+	XPC = 0;
+
+	state_add(STATE_GENPC,     "GENPC",     XPC).callexport().noshow();
+	state_add(STATE_GENPCBASE, "CURPC",     XPC).callexport().noshow();
 	state_add(STATE_GENSP,     "GENSP",     SP).noshow();
 	state_add(STATE_GENFLAGS,  "GENFLAGS",  P).callimport().formatstr("%6s").noshow();
 	state_add(M6502_PC,        "PC",        NPC).callimport();
@@ -64,6 +66,7 @@ void m6502_device::init()
 
 	save_item(NAME(PC));
 	save_item(NAME(NPC));
+	save_item(NAME(PPC));
 	save_item(NAME(A));
 	save_item(NAME(X));
 	save_item(NAME(Y));
@@ -372,6 +375,11 @@ uint8_t m6502_device::do_asr(uint8_t v)
 	return v;
 }
 
+offs_t m6502_device::pc_to_external(u16 pc)
+{
+	return pc;
+}
+
 void m6502_device::execute_run()
 {
 	if(inst_substate)
@@ -382,7 +390,7 @@ void m6502_device::execute_run()
 			PPC = NPC;
 			inst_state = IR | inst_state_base;
 			if(machine().debug_flags & DEBUG_FLAG_ENABLED)
-				debugger_instruction_hook(this, NPC);
+				debugger_instruction_hook(this, pc_to_external(NPC));
 		}
 		do_exec_full();
 	}
@@ -436,6 +444,10 @@ void m6502_device::state_import(const device_state_entry &entry)
 
 void m6502_device::state_export(const device_state_entry &entry)
 {
+	switch(entry.index()) {
+	case STATE_GENPC:     XPC = pc_to_external(PPC); break;
+	case STATE_GENPCBASE: XPC = pc_to_external(NPC); break;
+	}
 }
 
 void m6502_device::state_string_export(const device_state_entry &entry, std::string &str) const

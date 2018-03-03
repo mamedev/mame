@@ -124,6 +124,9 @@ public:
 	required_device<okim6295_device> m_oki1;
 	required_device<okim6295_device> m_oki2;
 	required_device<palette_device> m_palette;
+	void pasha2(machine_config &config);
+	void pasha2_io(address_map &map);
+	void pasha2_map(address_map &map);
 };
 
 
@@ -230,7 +233,7 @@ WRITE16_MEMBER(pasha2_state::pasha2_lamps_w)
 	machine().output().set_value("lamp_p3_b", BIT(data, 10));
 }
 
-static ADDRESS_MAP_START( pasha2_map, AS_PROGRAM, 16, pasha2_state )
+ADDRESS_MAP_START(pasha2_state::pasha2_map)
 	AM_RANGE(0x00000000, 0x001fffff) AM_RAM AM_SHARE("wram")
 	AM_RANGE(0x40000000, 0x4001ffff) AM_RAM_WRITE(bitmap_0_w)
 	AM_RANGE(0x40020000, 0x4003ffff) AM_RAM_WRITE(bitmap_1_w)
@@ -246,7 +249,7 @@ static ADDRESS_MAP_START( pasha2_map, AS_PROGRAM, 16, pasha2_state )
 	AM_RANGE(0xfff80000, 0xffffffff) AM_ROM AM_REGION("user1",0)
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( pasha2_io, AS_IO, 16, pasha2_state )
+ADDRESS_MAP_START(pasha2_state::pasha2_io)
 	AM_RANGE(0x08, 0x0b) AM_READNOP //sound status?
 	AM_RANGE(0x18, 0x1b) AM_READNOP //sound status?
 	AM_RANGE(0x20, 0x23) AM_WRITE(pasha2_lamps_w)
@@ -412,7 +415,7 @@ void pasha2_state::machine_reset()
 	m_vbuffer = 0;
 }
 
-static MACHINE_CONFIG_START( pasha2 )
+MACHINE_CONFIG_START(pasha2_state::pasha2)
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", E116XT, 20000000*4)     /* 4x internal multiplier */
@@ -473,8 +476,8 @@ ROM_END
 
 READ16_MEMBER(pasha2_state::pasha2_speedup_r)
 {
-	if(space.device().safe_pc() == 0x8302)
-		space.device().execute().spin_until_interrupt();
+	if(m_maincpu->pc() == 0x8302)
+		m_maincpu->spin_until_interrupt();
 
 	return m_wram[(0x95744 / 2) + offset];
 }

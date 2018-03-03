@@ -27,7 +27,7 @@
 #include "sound/volt_reg.h"
 #include "speaker.h"
 
-#define CCHASM_68K_CLOCK (XTAL_8MHz)
+#define CCHASM_68K_CLOCK (XTAL(8'000'000))
 
 /*************************************
  *
@@ -35,7 +35,7 @@
  *
  *************************************/
 
-static ADDRESS_MAP_START( memmap, AS_PROGRAM, 16, cchasm_state )
+ADDRESS_MAP_START(cchasm_state::memmap)
 	AM_RANGE(0x000000, 0x00ffff) AM_ROM
 	AM_RANGE(0x040000, 0x04000f) AM_DEVREADWRITE8("6840ptm", ptm6840_device, read, write, 0xff)
 	AM_RANGE(0x050000, 0x050001) AM_WRITE(refresh_control_w)
@@ -51,7 +51,7 @@ ADDRESS_MAP_END
  *
  *************************************/
 
-static ADDRESS_MAP_START( sound_memmap, AS_PROGRAM, 8, cchasm_state )
+ADDRESS_MAP_START(cchasm_state::sound_memmap)
 	AM_RANGE(0x0000, 0x0fff) AM_ROM
 	AM_RANGE(0x4000, 0x43ff) AM_RAM
 	AM_RANGE(0x5000, 0x53ff) AM_RAM
@@ -66,7 +66,7 @@ static ADDRESS_MAP_START( sound_memmap, AS_PROGRAM, 8, cchasm_state )
 	AM_RANGE(0x7041, 0x7041) AM_NOP // TODO
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( sound_portmap, AS_IO, 8, cchasm_state )
+ADDRESS_MAP_START(cchasm_state::sound_portmap)
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	AM_RANGE(0x00, 0x03) AM_DEVREADWRITE("ctc", z80ctc_device, read, write)
 ADDRESS_MAP_END
@@ -144,7 +144,7 @@ static const z80_daisy_config daisy_chain[] =
  *
  *************************************/
 
-static MACHINE_CONFIG_START( cchasm )
+MACHINE_CONFIG_START(cchasm_state::cchasm)
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", M68000, CCHASM_68K_CLOCK)    /* 8 MHz (from schematics) */
@@ -192,7 +192,7 @@ static MACHINE_CONFIG_START( cchasm )
 
 	/* 6840 PTM */
 	MCFG_DEVICE_ADD("6840ptm", PTM6840, CCHASM_68K_CLOCK/10)
-	MCFG_PTM6840_EXTERNAL_CLOCKS(0, CCHASM_68K_CLOCK / 10, 0)
+	MCFG_PTM6840_EXTERNAL_CLOCKS(0, (CCHASM_68K_CLOCK / 10).value(), 0)
 	MCFG_PTM6840_IRQ_CB(INPUTLINE("maincpu", 4))
 MACHINE_CONFIG_END
 

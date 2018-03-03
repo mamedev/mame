@@ -76,6 +76,8 @@ public:
 		: driver_device(mconfig, type, tag)
 		{ }
 
+		void aim65_40(machine_config &config);
+		void aim65_40_mem(address_map &map);
 	// devices
 	//device_t *m_via0;
 	//device_t *m_via1;
@@ -89,7 +91,7 @@ private:
     ADDRESS MAPS
 ***************************************************************************/
 
-static ADDRESS_MAP_START( aim65_40_mem, AS_PROGRAM, 8, aim65_40_state )
+ADDRESS_MAP_START(aim65_40_state::aim65_40_mem)
 	AM_RANGE(0x0000, 0x3fff) AM_RAM
 	AM_RANGE(0xa000, 0xcfff) AM_ROM AM_REGION("roms", 0)
 	AM_RANGE(0xf000, 0xff7f) AM_ROM AM_REGION("roms", 0x3000)
@@ -111,7 +113,7 @@ INPUT_PORTS_END
     MACHINE DRIVERS
 ***************************************************************************/
 
-static MACHINE_CONFIG_START( aim65_40 )
+MACHINE_CONFIG_START(aim65_40_state::aim65_40)
 	/* basic machine hardware */
 	MCFG_CPU_ADD(M6502_TAG, M6502, 1000000)
 	MCFG_CPU_PROGRAM_MAP(aim65_40_mem)
@@ -122,11 +124,11 @@ static MACHINE_CONFIG_START( aim65_40 )
 	/* sound hardware */
 
 	/* devices */
-	MCFG_DEVICE_ADD(M6522_0_TAG, VIA6522, 0)
-	MCFG_DEVICE_ADD(M6522_1_TAG, VIA6522, 0)
-	MCFG_DEVICE_ADD(M6522_2_TAG, VIA6522, 0)
+	MCFG_DEVICE_ADD(M6522_0_TAG, VIA6522, 1000000)
+	MCFG_DEVICE_ADD(M6522_1_TAG, VIA6522, 1000000)
+	MCFG_DEVICE_ADD(M6522_2_TAG, VIA6522, 1000000)
 	MCFG_DEVICE_ADD(M6551_TAG, MOS6551, 0)
-	MCFG_MOS6551_XTAL(XTAL_1_8432MHz)
+	MCFG_MOS6551_XTAL(XTAL(1'843'200))
 	MCFG_MOS6551_TXD_HANDLER(DEVWRITELINE("rs232", rs232_port_device, write_txd))
 	MCFG_MOS6551_RTS_HANDLER(DEVWRITELINE("rs232", rs232_port_device, write_rts))
 	MCFG_MOS6551_DTR_HANDLER(DEVWRITELINE("rs232", rs232_port_device, write_dtr))

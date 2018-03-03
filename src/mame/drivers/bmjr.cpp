@@ -47,6 +47,8 @@ public:
 	DECLARE_DRIVER_INIT(bmjr);
 	u32 screen_update_bmjr(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 
+	void bmjr(machine_config &config);
+	void bmjr_mem(address_map &map);
 private:
 	bool m_tape_switch;
 	u8 m_xor_display;
@@ -162,7 +164,7 @@ WRITE8_MEMBER( bmjr_state::xor_display_w )
 	m_xor_display = data;
 }
 
-static ADDRESS_MAP_START(bmjr_mem, AS_PROGRAM, 8, bmjr_state)
+ADDRESS_MAP_START(bmjr_state::bmjr_mem)
 	ADDRESS_MAP_UNMAP_HIGH
 	//0x0100, 0x03ff basic vram
 	//0x0900, 0x20ff vram, modes 0x40 / 0xc0
@@ -333,9 +335,9 @@ void bmjr_state::machine_reset()
 	m_cass->change_state(CASSETTE_MOTOR_DISABLED,CASSETTE_MASK_MOTOR);
 }
 
-static MACHINE_CONFIG_START( bmjr )
+MACHINE_CONFIG_START(bmjr_state::bmjr)
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu",M6800, XTAL_4MHz/4) //unknown clock / divider
+	MCFG_CPU_ADD("maincpu",M6800, XTAL(4'000'000)/4) //unknown clock / divider
 	MCFG_CPU_PROGRAM_MAP(bmjr_mem)
 	MCFG_CPU_VBLANK_INT_DRIVER("screen", bmjr_state,  irq0_line_hold)
 

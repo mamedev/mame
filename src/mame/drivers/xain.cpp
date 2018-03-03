@@ -147,7 +147,7 @@ Updates by Bryan McPhail, 12/12/2004:
 #include "speaker.h"
 
 
-#define MASTER_CLOCK        XTAL_12MHz
+#define MASTER_CLOCK        XTAL(12'000'000)
 #define CPU_CLOCK           MASTER_CLOCK / 8
 #define MCU_CLOCK           MASTER_CLOCK / 4
 #define PIXEL_CLOCK         MASTER_CLOCK / 2
@@ -282,7 +282,7 @@ READ8_MEMBER(xain_state::mcu_comm_reset_r)
 }
 
 
-static ADDRESS_MAP_START( bootleg_map, AS_PROGRAM, 8, xain_state )
+ADDRESS_MAP_START(xain_state::bootleg_map)
 	AM_RANGE(0x0000, 0x1fff) AM_RAM AM_SHARE("share1")
 	AM_RANGE(0x2000, 0x27ff) AM_RAM_WRITE(charram_w) AM_SHARE("charram")
 	AM_RANGE(0x2800, 0x2fff) AM_RAM_WRITE(bgram1_w) AM_SHARE("bgram1")
@@ -301,20 +301,20 @@ static ADDRESS_MAP_START( bootleg_map, AS_PROGRAM, 8, xain_state )
 	AM_RANGE(0x3a09, 0x3a0c) AM_WRITE(main_irq_w)
 	AM_RANGE(0x3a0d, 0x3a0d) AM_WRITE(flipscreen_w)
 	AM_RANGE(0x3a0f, 0x3a0f) AM_WRITE(cpuA_bankswitch_w)
-	AM_RANGE(0x3c00, 0x3dff) AM_DEVWRITE("palette", palette_device, write) AM_SHARE("palette")
-	AM_RANGE(0x3e00, 0x3fff) AM_DEVWRITE("palette", palette_device, write_ext) AM_SHARE("palette_ext")
+	AM_RANGE(0x3c00, 0x3dff) AM_DEVWRITE("palette", palette_device, write8) AM_SHARE("palette")
+	AM_RANGE(0x3e00, 0x3fff) AM_DEVWRITE("palette", palette_device, write8_ext) AM_SHARE("palette_ext")
 	AM_RANGE(0x4000, 0x7fff) AM_ROMBANK("bank1")
 	AM_RANGE(0x8000, 0xffff) AM_ROM
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( main_map, AS_PROGRAM, 8, xain_state )
+ADDRESS_MAP_START(xain_state::main_map)
 	AM_IMPORT_FROM(bootleg_map)
 	AM_RANGE(0x3a04, 0x3a04) AM_DEVREAD("mcu", taito68705_mcu_device, data_r)
 	AM_RANGE(0x3a06, 0x3a06) AM_READ(mcu_comm_reset_r)
 	AM_RANGE(0x3a0e, 0x3a0e) AM_DEVWRITE("mcu", taito68705_mcu_device, data_w)
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( cpu_map_B, AS_PROGRAM, 8, xain_state )
+ADDRESS_MAP_START(xain_state::cpu_map_B)
 	AM_RANGE(0x0000, 0x1fff) AM_RAM AM_SHARE("share1")
 	AM_RANGE(0x2000, 0x2000) AM_WRITE(irqA_assert_w)
 	AM_RANGE(0x2800, 0x2800) AM_WRITE(irqB_clear_w)
@@ -323,7 +323,7 @@ static ADDRESS_MAP_START( cpu_map_B, AS_PROGRAM, 8, xain_state )
 	AM_RANGE(0x8000, 0xffff) AM_ROM
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( sound_map, AS_PROGRAM, 8, xain_state )
+ADDRESS_MAP_START(xain_state::sound_map)
 	AM_RANGE(0x0000, 0x07ff) AM_RAM
 	AM_RANGE(0x1000, 0x1000) AM_DEVREAD("soundlatch", generic_latch_8_device, read)
 	AM_RANGE(0x2800, 0x2801) AM_DEVWRITE("ym1", ym2203_device, write)
@@ -448,17 +448,17 @@ void xain_state::machine_start()
 	save_item(NAME(m_vblank));
 }
 
-static MACHINE_CONFIG_START( xsleena )
+MACHINE_CONFIG_START(xain_state::xsleena)
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", M6809, CPU_CLOCK)
+	MCFG_CPU_ADD("maincpu", MC6809E, CPU_CLOCK) // 68B09E
 	MCFG_CPU_PROGRAM_MAP(main_map)
 	MCFG_TIMER_DRIVER_ADD_SCANLINE("scantimer", xain_state, scanline, "screen", 0, 1)
 
-	MCFG_CPU_ADD("sub", M6809, CPU_CLOCK)
+	MCFG_CPU_ADD("sub", MC6809E, CPU_CLOCK) // 68B09E
 	MCFG_CPU_PROGRAM_MAP(cpu_map_B)
 
-	MCFG_CPU_ADD("audiocpu", M6809, CPU_CLOCK)
+	MCFG_CPU_ADD("audiocpu", MC6809, PIXEL_CLOCK) // 68A09
 	MCFG_CPU_PROGRAM_MAP(sound_map)
 
 	MCFG_DEVICE_ADD("mcu", TAITO68705_MCU, MCU_CLOCK)
@@ -496,7 +496,8 @@ static MACHINE_CONFIG_START( xsleena )
 MACHINE_CONFIG_END
 
 
-static MACHINE_CONFIG_DERIVED( xsleenab, xsleena )
+MACHINE_CONFIG_START(xain_state::xsleenab)
+	xsleena(config);
 	MCFG_CPU_MODIFY("maincpu")
 	MCFG_CPU_PROGRAM_MAP(bootleg_map)
 

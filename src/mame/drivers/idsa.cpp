@@ -63,6 +63,10 @@ public:
 	DECLARE_WRITE8_MEMBER(ay2_a_w);
 	DECLARE_WRITE8_MEMBER(ay2_b_w);
 
+	void bsktbllp(machine_config &config);
+	void idsa(machine_config &config);
+	void maincpu_io_map(address_map &map);
+	void maincpu_map(address_map &map);
 private:
 	virtual void machine_reset() override;
 
@@ -73,13 +77,13 @@ private:
 	optional_device_array<i8255_device, 2> m_ppi;
 };
 
-static ADDRESS_MAP_START( maincpu_map, AS_PROGRAM, 8, idsa_state )
+ADDRESS_MAP_START(idsa_state::maincpu_map)
 	ADDRESS_MAP_UNMAP_HIGH
 	AM_RANGE(0x0000, 0x7fff) AM_ROM
 	AM_RANGE(0x8000, 0x87ff) AM_RAM
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( maincpu_io_map, AS_IO, 8, idsa_state )
+ADDRESS_MAP_START(idsa_state::maincpu_io_map)
 	ADDRESS_MAP_UNMAP_HIGH
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	AM_RANGE(0x00, 0x0f) AM_READ_PORT("X0")
@@ -324,20 +328,20 @@ void idsa_state::machine_reset()
 	m_irqcnt = 0;
 }
 
-static MACHINE_CONFIG_START( idsa )
+MACHINE_CONFIG_START(idsa_state::idsa)
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", Z80, XTAL_8MHz / 2)
+	MCFG_CPU_ADD("maincpu", Z80, XTAL(8'000'000) / 2)
 	MCFG_CPU_PROGRAM_MAP(maincpu_map)
 	MCFG_CPU_IO_MAP(maincpu_io_map)
 
-	MCFG_DEVICE_ADD("irqclk", CLOCK, XTAL_8MHz / 4 )
+	MCFG_DEVICE_ADD("irqclk", CLOCK, XTAL(8'000'000) / 4 )
 	MCFG_CLOCK_SIGNAL_HANDLER(WRITELINE(idsa_state, clock_w))
 
 	/* video hardware */
 	//MCFG_DEFAULT_LAYOUT()
 
 	/* sound hardware */
-	MCFG_FRAGMENT_ADD( genpin_audio )
+	genpin_audio(config);
 	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
 	MCFG_SOUND_ADD("speech", SP0256, 3120000) // unknown variant
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "lspeaker", 1.5)
@@ -353,7 +357,8 @@ static MACHINE_CONFIG_START( idsa )
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", 0.75)
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_DERIVED( bsktbllp, idsa )
+MACHINE_CONFIG_START(idsa_state::bsktbllp)
+	idsa(config);
 	MCFG_DEVICE_MODIFY("aysnd1")
 	MCFG_AY8910_PORT_A_WRITE_CB(WRITE8(idsa_state, ppi_control_w))
 	MCFG_AY8910_PORT_B_WRITE_CB(WRITE8(idsa_state, ppi_data_w))

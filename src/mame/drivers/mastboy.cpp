@@ -494,6 +494,9 @@ public:
 	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 
 	INTERRUPT_GEN_MEMBER(interrupt);
+	void mastboy(machine_config &config);
+	void mastboy_io_map(address_map &map);
+	void mastboy_map(address_map &map);
 };
 
 
@@ -659,7 +662,7 @@ INTERRUPT_GEN_MEMBER(mastboy_state::interrupt)
 
 /* Memory Maps */
 
-static ADDRESS_MAP_START( mastboy_map, AS_PROGRAM, 8, mastboy_state )
+ADDRESS_MAP_START(mastboy_state::mastboy_map)
 	AM_RANGE(0x0000, 0x3fff) AM_ROM // Internal ROM
 	AM_RANGE(0x4000, 0x7fff) AM_ROM // External ROM
 
@@ -697,7 +700,7 @@ READ8_MEMBER(mastboy_state::nmi_read)
 	return 0x00;
 }
 
-static ADDRESS_MAP_START( mastboy_io_map, AS_IO, 8, mastboy_state )
+ADDRESS_MAP_START(mastboy_state::mastboy_io_map)
 	AM_RANGE(0x38, 0x38) AM_READ(port_38_read)
 	AM_RANGE(0x39, 0x39) AM_READ(nmi_read)
 ADDRESS_MAP_END
@@ -840,7 +843,7 @@ void mastboy_state::machine_reset()
 
 
 
-static MACHINE_CONFIG_START( mastboy )
+MACHINE_CONFIG_START(mastboy_state::mastboy)
 	MCFG_CPU_ADD("maincpu", Z180, 12000000/2)   /* HD647180X0CP6-1M1R */
 	MCFG_CPU_PROGRAM_MAP(mastboy_map)
 	MCFG_CPU_IO_MAP(mastboy_io_map)

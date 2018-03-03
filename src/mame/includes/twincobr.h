@@ -124,4 +124,13 @@ public:
 	required_device<gfxdecode_device> m_gfxdecode;
 	required_device<screen_device> m_screen;
 	required_device<palette_device> m_palette;
+	void twincobr(machine_config &config);
+	void fsharkbt(machine_config &config);
+	void fshark(machine_config &config);
+	void DSP_io_map(address_map &map);
+	void DSP_program_map(address_map &map);
+	void fsharkbt_i8741_io_map(address_map &map);
+	void main_program_map(address_map &map);
+	void sound_io_map(address_map &map);
+	void sound_program_map(address_map &map);
 };

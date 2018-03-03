@@ -58,4 +58,7 @@ public:
 	required_device<cpu_device> m_maincpu;
 	required_device<cpu_device> m_mcu;
 	required_device<palette_device> m_palette;
+	void arabian(machine_config &config);
+	void main_io_map(address_map &map);
+	void main_map(address_map &map);
 };

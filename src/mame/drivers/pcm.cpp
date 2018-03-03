@@ -88,6 +88,9 @@ public:
 	DECLARE_WRITE8_MEMBER( pcm_85_w );
 	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 
+	void pcm(machine_config &config);
+	void pcm_io(address_map &map);
+	void pcm_mem(address_map &map);
 private:
 	bool m_cone;
 	uint8_t m_85;
@@ -157,14 +160,14 @@ WRITE8_MEMBER( pcm_state::pcm_85_w )
 
 
 
-static ADDRESS_MAP_START(pcm_mem, AS_PROGRAM, 8, pcm_state)
+ADDRESS_MAP_START(pcm_state::pcm_mem)
 	ADDRESS_MAP_UNMAP_HIGH
 	AM_RANGE( 0x0000, 0x1fff ) AM_ROM  // ROM
 	AM_RANGE( 0x2000, 0xf7ff ) AM_RAM  // RAM
 	AM_RANGE( 0xf800, 0xffff ) AM_RAM AM_SHARE("videoram") // Video RAM
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START(pcm_io, AS_IO, 8, pcm_state)
+ADDRESS_MAP_START(pcm_state::pcm_io)
 	ADDRESS_MAP_UNMAP_HIGH
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	AM_RANGE(0x80, 0x83) AM_DEVREADWRITE("ctc_s", z80ctc_device, read, write) // system CTC
@@ -248,9 +251,9 @@ static GFXDECODE_START( pcm )
 	GFXDECODE_ENTRY( "chargen", 0x0000, pcm_charlayout, 0, 1 )
 GFXDECODE_END
 
-static MACHINE_CONFIG_START( pcm )
+MACHINE_CONFIG_START(pcm_state::pcm)
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu",Z80, XTAL_10MHz /4)
+	MCFG_CPU_ADD("maincpu",Z80, XTAL(10'000'000) /4)
 	MCFG_CPU_PROGRAM_MAP(pcm_mem)
 	MCFG_CPU_IO_MAP(pcm_io)
 	MCFG_Z80_DAISY_CHAIN(pcm_daisy_chain)
@@ -278,21 +281,21 @@ static MACHINE_CONFIG_START( pcm )
 	MCFG_K7659_KEYBOARD_ADD()
 	MCFG_CASSETTE_ADD("cassette")
 
-	MCFG_DEVICE_ADD("pio_u", Z80PIO, XTAL_10MHz/4)
+	MCFG_DEVICE_ADD("pio_u", Z80PIO, XTAL(10'000'000)/4)
 	MCFG_Z80PIO_OUT_INT_CB(INPUTLINE("maincpu", INPUT_LINE_IRQ0))
 
-	MCFG_DEVICE_ADD("pio_s", Z80PIO, XTAL_10MHz/4)
+	MCFG_DEVICE_ADD("pio_s", Z80PIO, XTAL(10'000'000)/4)
 	MCFG_Z80PIO_OUT_INT_CB(INPUTLINE("maincpu", INPUT_LINE_IRQ0))
 	MCFG_Z80PIO_IN_PA_CB(DEVREAD8(K7659_KEYBOARD_TAG, k7659_keyboard_device, read))
 	MCFG_Z80PIO_IN_PB_CB(READ8(pcm_state, pcm_85_r))
 	MCFG_Z80PIO_OUT_PB_CB(WRITE8(pcm_state, pcm_85_w))
 
-	MCFG_DEVICE_ADD("sio", Z80SIO, XTAL_10MHz /4)
+	MCFG_DEVICE_ADD("sio", Z80SIO, XTAL(10'000'000) /4)
 
-	MCFG_DEVICE_ADD("ctc_u", Z80CTC, XTAL_10MHz /4)
+	MCFG_DEVICE_ADD("ctc_u", Z80CTC, XTAL(10'000'000) /4)
 	MCFG_Z80CTC_INTR_CB(INPUTLINE("maincpu", INPUT_LINE_IRQ0))
 
-	MCFG_DEVICE_ADD("ctc_s", Z80CTC, XTAL_10MHz /4)
+	MCFG_DEVICE_ADD("ctc_s", Z80CTC, XTAL(10'000'000) /4)
 	MCFG_Z80CTC_INTR_CB(INPUTLINE("maincpu", INPUT_LINE_IRQ0))
 	MCFG_Z80CTC_ZC0_CB(DEVWRITELINE("sio", z80sio_device, rxca_w))
 	MCFG_DEVCB_CHAIN_OUTPUT(DEVWRITELINE("sio", z80sio_device, rxca_w))

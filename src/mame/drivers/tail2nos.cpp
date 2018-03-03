@@ -35,7 +35,7 @@ WRITE8_MEMBER(tail2nos_state::sound_bankswitch_w)
 	membank("bank3")->set_entry(data & 0x01);
 }
 
-static ADDRESS_MAP_START( main_map, AS_PROGRAM, 16, tail2nos_state )
+ADDRESS_MAP_START(tail2nos_state::main_map)
 	AM_RANGE(0x000000, 0x03ffff) AM_ROM
 	AM_RANGE(0x200000, 0x27ffff) AM_ROM AM_REGION("user1", 0)    /* extra ROM */
 	AM_RANGE(0x2c0000, 0x2dffff) AM_ROM AM_REGION("user2", 0)
@@ -46,7 +46,7 @@ static ADDRESS_MAP_START( main_map, AS_PROGRAM, 16, tail2nos_state )
 	AM_RANGE(0xffc000, 0xffc2ff) AM_RAM AM_SHARE("spriteram")
 	AM_RANGE(0xffc300, 0xffcfff) AM_RAM
 	AM_RANGE(0xffd000, 0xffdfff) AM_RAM_WRITE(tail2nos_txvideoram_w) AM_SHARE("txvideoram")
-	AM_RANGE(0xffe000, 0xffefff) AM_RAM_DEVWRITE("palette", palette_device, write) AM_SHARE("palette")
+	AM_RANGE(0xffe000, 0xffefff) AM_RAM_DEVWRITE("palette", palette_device, write16) AM_SHARE("palette")
 	AM_RANGE(0xfff000, 0xfff001) AM_READ_PORT("IN0") AM_WRITE8(tail2nos_gfxbank_w, 0x00ff)
 	AM_RANGE(0xfff002, 0xfff003) AM_READ_PORT("IN1")
 	AM_RANGE(0xfff004, 0xfff005) AM_READ_PORT("DSW")
@@ -55,13 +55,13 @@ static ADDRESS_MAP_START( main_map, AS_PROGRAM, 16, tail2nos_state )
 	AM_RANGE(0xfff030, 0xfff033) AM_DEVREADWRITE8("acia", acia6850_device, read, write, 0x00ff)
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( sound_map, AS_PROGRAM, 8, tail2nos_state )
+ADDRESS_MAP_START(tail2nos_state::sound_map)
 	AM_RANGE(0x0000, 0x77ff) AM_ROM
 	AM_RANGE(0x7800, 0x7fff) AM_RAM
 	AM_RANGE(0x8000, 0xffff) AM_ROMBANK("bank3")
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( sound_port_map, AS_IO, 8, tail2nos_state )
+ADDRESS_MAP_START(tail2nos_state::sound_port_map)
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	AM_RANGE(0x07, 0x07) AM_DEVREADWRITE("soundlatch", generic_latch_8_device, read, acknowledge_w)
 	AM_RANGE(0x08, 0x0b) AM_DEVWRITE("ymsnd", ym2608_device, write)
@@ -228,14 +228,14 @@ void tail2nos_state::machine_reset()
 {
 }
 
-static MACHINE_CONFIG_START( tail2nos )
+MACHINE_CONFIG_START(tail2nos_state::tail2nos)
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", M68000,XTAL_20MHz/2)    /* verified on pcb */
+	MCFG_CPU_ADD("maincpu", M68000,XTAL(20'000'000)/2)    /* verified on pcb */
 	MCFG_CPU_PROGRAM_MAP(main_map)
 	MCFG_CPU_VBLANK_INT_DRIVER("screen", tail2nos_state,  irq6_line_hold)
 
-	MCFG_CPU_ADD("audiocpu", Z80,XTAL_20MHz/4)  /* verified on pcb */
+	MCFG_CPU_ADD("audiocpu", Z80,XTAL(20'000'000)/4)  /* verified on pcb */
 	MCFG_CPU_PROGRAM_MAP(sound_map)
 	MCFG_CPU_IO_MAP(sound_port_map)
 								/* IRQs are triggered by the YM2608 */
@@ -265,7 +265,7 @@ static MACHINE_CONFIG_START( tail2nos )
 	MCFG_K051316_WRAP(1)
 	MCFG_K051316_CB(tail2nos_state, zoom_callback)
 
-	MCFG_DEVICE_ADD("gga", VSYSTEM_GGA, XTAL_14_31818MHz / 2) // divider not verified
+	MCFG_DEVICE_ADD("gga", VSYSTEM_GGA, XTAL(14'318'181) / 2) // divider not verified
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
@@ -274,7 +274,7 @@ static MACHINE_CONFIG_START( tail2nos )
 	MCFG_GENERIC_LATCH_DATA_PENDING_CB(INPUTLINE("audiocpu", INPUT_LINE_NMI))
 	MCFG_GENERIC_LATCH_SEPARATE_ACKNOWLEDGE(true)
 
-	MCFG_SOUND_ADD("ymsnd", YM2608, XTAL_8MHz)  /* verified on pcb */
+	MCFG_SOUND_ADD("ymsnd", YM2608, XTAL(8'000'000))  /* verified on pcb */
 	MCFG_YM2608_IRQ_HANDLER(INPUTLINE("audiocpu", 0))
 	MCFG_AY8910_PORT_B_WRITE_CB(WRITE8(tail2nos_state, sound_bankswitch_w))
 	MCFG_SOUND_ROUTE(0, "lspeaker",  0.25)

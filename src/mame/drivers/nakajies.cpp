@@ -341,6 +341,12 @@ public:
 	DECLARE_PALETTE_INIT(nakajies);
 	DECLARE_INPUT_CHANGED_MEMBER(trigger_irq);
 	TIMER_DEVICE_CALLBACK_MEMBER(kb_timer);
+	void nakajies210(machine_config &config);
+	void nakajies220(machine_config &config);
+	void nakajies250(machine_config &config);
+	void dator3k(machine_config &config);
+	void nakajies_io_map(address_map &map);
+	void nakajies_map(address_map &map);
 };
 
 
@@ -392,7 +398,7 @@ WRITE8_MEMBER( nakajies_state::bank6_w ) { bank_w( 6, offset, data ); }
 WRITE8_MEMBER( nakajies_state::bank7_w ) { bank_w( 7, offset, data ); }
 
 
-static ADDRESS_MAP_START( nakajies_map, AS_PROGRAM, 8, nakajies_state )
+ADDRESS_MAP_START(nakajies_state::nakajies_map)
 	AM_RANGE( 0x00000, 0x1ffff ) AM_READ_BANK( "bank0" ) AM_WRITE( bank0_w )
 	AM_RANGE( 0x20000, 0x3ffff ) AM_READ_BANK( "bank1" ) AM_WRITE( bank1_w )
 	AM_RANGE( 0x40000, 0x5ffff ) AM_READ_BANK( "bank2" ) AM_WRITE( bank2_w )
@@ -495,7 +501,7 @@ READ8_MEMBER( nakajies_state::keyboard_r )
 }
 
 
-static ADDRESS_MAP_START( nakajies_io_map, AS_IO, 8, nakajies_state )
+ADDRESS_MAP_START(nakajies_state::nakajies_io_map)
 	AM_RANGE( 0x0000, 0x0000 ) AM_WRITE( lcd_memory_start_w )
 	AM_RANGE( 0x0010, 0x0017 ) AM_WRITE( banking_w )
 	AM_RANGE( 0x0060, 0x0060 ) AM_READWRITE( irq_enable_r, irq_enable_w )
@@ -737,7 +743,7 @@ static GFXDECODE_START( drwrt400 )
 	GFXDECODE_ENTRY( "bios", 0x580b6, nakajies_charlayout, 0, 1 )
 GFXDECODE_END
 
-static MACHINE_CONFIG_START( nakajies210 )
+MACHINE_CONFIG_START(nakajies_state::nakajies210)
 	MCFG_CPU_ADD( "v20hl", V20, X301 / 2 )
 	MCFG_CPU_PROGRAM_MAP( nakajies_map)
 	MCFG_CPU_IO_MAP( nakajies_io_map)
@@ -760,20 +766,23 @@ static MACHINE_CONFIG_START( nakajies210 )
 	MCFG_SOUND_ROUTE( ALL_OUTPUTS, "mono", 1.00 )
 
 	/* rtc */
-	MCFG_DEVICE_ADD("rtc", RP5C01, XTAL_32_768kHz)
+	MCFG_DEVICE_ADD("rtc", RP5C01, XTAL(32'768))
 
 	MCFG_TIMER_DRIVER_ADD_PERIODIC("kb_timer", nakajies_state, kb_timer, attotime::from_hz(250))
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_DERIVED( dator3k, nakajies210 )
+MACHINE_CONFIG_START(nakajies_state::dator3k)
+	nakajies210(config);
 	MCFG_GFXDECODE_MODIFY("gfxdecode", dator3k)
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_DERIVED( nakajies220, nakajies210 )
+MACHINE_CONFIG_START(nakajies_state::nakajies220)
+	nakajies210(config);
 	MCFG_GFXDECODE_MODIFY("gfxdecode", drwrt400)
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_DERIVED( nakajies250, nakajies210 )
+MACHINE_CONFIG_START(nakajies_state::nakajies250)
+	nakajies210(config);
 	MCFG_SCREEN_MODIFY( "screen" )
 	MCFG_SCREEN_SIZE( 80 * 6, 16 * 8 )
 	MCFG_SCREEN_VISIBLE_AREA( 0, 6 * 80 - 1, 0, 16 * 8 - 1 )

@@ -80,6 +80,10 @@ public:
 	DECLARE_QUICKLOAD_LOAD_MEMBER(cd2650);
 	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 
+	void cd2650(machine_config &config);
+	void cd2650_data(address_map &map);
+	void cd2650_io(address_map &map);
+	void cd2650_mem(address_map &map);
 private:
 	uint8_t m_term_data;
 	virtual void machine_reset() override;
@@ -113,18 +117,18 @@ READ8_MEMBER(cd2650_state::keyin_r)
 	return ret;
 }
 
-static ADDRESS_MAP_START(cd2650_mem, AS_PROGRAM, 8, cd2650_state)
+ADDRESS_MAP_START(cd2650_state::cd2650_mem)
 	ADDRESS_MAP_UNMAP_HIGH
 	AM_RANGE(0x0000, 0x0fff) AM_ROM AM_REGION("roms", 0)
 	AM_RANGE(0x1000, 0x7fff) AM_RAM AM_SHARE("videoram")
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( cd2650_io, AS_IO, 8, cd2650_state)
+ADDRESS_MAP_START(cd2650_state::cd2650_io)
 	ADDRESS_MAP_UNMAP_HIGH
 	//AM_RANGE(0x80, 0x84) disk i/o
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( cd2650_data, AS_DATA, 8, cd2650_state)
+ADDRESS_MAP_START(cd2650_state::cd2650_data)
 	AM_RANGE(S2650_DATA_PORT,S2650_DATA_PORT) AM_READ(keyin_r) AM_DEVWRITE("outlatch", f9334_device, write_nibble_d3)
 ADDRESS_MAP_END
 
@@ -167,7 +171,7 @@ uint32_t cd2650_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap
 
 					chr = m_p_videoram[mem] & 0x3f;
 
-					gfx = m_p_chargen[(BITSWAP8(chr,7,6,2,1,0,3,4,5)<<3) | ra];
+					gfx = m_p_chargen[(bitswap<8>(chr,7,6,2,1,0,3,4,5)<<3) | ra];
 				}
 
 				/* Display a scanline of a character */
@@ -278,9 +282,9 @@ QUICKLOAD_LOAD_MEMBER( cd2650_state, cd2650 )
 	return result;
 }
 
-static MACHINE_CONFIG_START( cd2650 )
+MACHINE_CONFIG_START(cd2650_state::cd2650)
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", S2650, XTAL_14_192640MHz / 12) // 1.182720MHz according to RE schematic
+	MCFG_CPU_ADD("maincpu", S2650, XTAL(14'192'640) / 12) // 1.182720MHz according to RE schematic
 	MCFG_CPU_PROGRAM_MAP(cd2650_mem)
 	MCFG_CPU_IO_MAP(cd2650_io)
 	MCFG_CPU_DATA_MAP(cd2650_data)
@@ -297,7 +301,7 @@ static MACHINE_CONFIG_START( cd2650 )
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
-	MCFG_SCREEN_RAW_PARAMS(XTAL_14_192640MHz, 112 * CHARACTER_WIDTH, 0, 80 * CHARACTER_WIDTH, 22 * CHARACTER_LINES, 0, 16 * CHARACTER_LINES)
+	MCFG_SCREEN_RAW_PARAMS(XTAL(14'192'640), 112 * CHARACTER_WIDTH, 0, 80 * CHARACTER_WIDTH, 22 * CHARACTER_LINES, 0, 16 * CHARACTER_LINES)
 	MCFG_SCREEN_UPDATE_DRIVER(cd2650_state, screen_update)
 	MCFG_SCREEN_PALETTE("palette")
 

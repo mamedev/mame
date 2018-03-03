@@ -241,7 +241,7 @@ void decocass_state::draw_special_priority(bitmap_ind16 &bitmap, bitmap_ind8 &pr
 	if ((crossing == 0 || BIT(m_mode_set, 6)) && !BIT(m_mode_set, 5))
 		return;
 
-	int color = (BITSWAP8(m_color_center_bot, 0, 1, 7, 2, 3, 4, 5, 6) & 0x27) | 0x08;
+	int color = (bitswap<8>(m_color_center_bot, 0, 1, 7, 2, 3, 4, 5, 6) & 0x27) | 0x08;
 
 	int sy = 64 - m_part_v_shift + 1;
 	if (sy < 0)
@@ -524,10 +524,9 @@ void decocass_state::draw_sprites(bitmap_ind16 &bitmap, bitmap_ind8 &priority, c
 						int sprite_y_adjust, int sprite_y_adjust_flip_screen,
 						uint8_t *sprite_ram, int interleave)
 {
-	int i,offs;
-
 	/* Draw the sprites */
-	for (i = 0, offs = 0; i < 8; i++, offs += 4 * interleave)
+	int offs = 28 * interleave;
+	for (int i = 0; i < 8; i++, offs -= 4 * interleave)
 	{
 		int sx, sy, flipx, flipy;
 

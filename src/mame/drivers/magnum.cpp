@@ -29,6 +29,9 @@ public:
 	DECLARE_WRITE8_MEMBER(beep_w);
 	u32 screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 
+	void magnum(machine_config &config);
+	void magnum_io(address_map &map);
+	void magnum_map(address_map &map);
 protected:
 	virtual void machine_reset() override;
 	virtual void machine_start() override;
@@ -129,12 +132,12 @@ WRITE8_MEMBER(magnum_state::beep_w)
 	m_beep->set_state(BIT(data, 0));
 }
 
-static ADDRESS_MAP_START( magnum_map, AS_PROGRAM, 16, magnum_state )
+ADDRESS_MAP_START(magnum_state::magnum_map)
 	AM_RANGE(0x00000, 0x3ffff) AM_RAM // fixed 256k for now
 	AM_RANGE(0xe0000, 0xfffff) AM_ROM AM_REGION("bios", 0)
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( magnum_io, AS_IO, 16, magnum_state )
+ADDRESS_MAP_START(magnum_state::magnum_io)
 	ADDRESS_MAP_UNMAP_HIGH
 	//AM_RANGE(0x000a, 0x000b) cdp1854 1
 	//AM_RANGE(0x000e, 0x000f) cpd1854 2
@@ -143,12 +146,12 @@ static ADDRESS_MAP_START( magnum_io, AS_IO, 16, magnum_state )
 	AM_RANGE(0x0080, 0x008f) AM_DEVREADWRITE8("rtc", cdp1879_device, read, write, 0x00ff)
 ADDRESS_MAP_END
 
-static MACHINE_CONFIG_START( magnum )
-	MCFG_CPU_ADD("maincpu", I80186, XTAL_12MHz / 2)
+MACHINE_CONFIG_START(magnum_state::magnum)
+	MCFG_CPU_ADD("maincpu", I80186, XTAL(12'000'000) / 2)
 	MCFG_CPU_PROGRAM_MAP(magnum_map)
 	MCFG_CPU_IO_MAP(magnum_io)
 
-	MCFG_DEVICE_ADD("rtc", CDP1879, XTAL_32_768kHz)
+	MCFG_DEVICE_ADD("rtc", CDP1879, XTAL(32'768))
 
 	MCFG_SCREEN_ADD("screen", LCD)
 	MCFG_SCREEN_UPDATE_DRIVER(magnum_state, screen_update)

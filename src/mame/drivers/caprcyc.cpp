@@ -28,6 +28,8 @@ public:
 	{ }
 
 	required_device<cpu_device> m_maincpu;
+	void caprcyc(machine_config &config);
+	void caprcyc_map(address_map &map);
 };
 
 
@@ -37,7 +39,7 @@ public:
 
 ***************************************************************************/
 
-static ADDRESS_MAP_START( caprcyc_map, AS_PROGRAM, 32, caprcyc_state ) // TODO...
+ADDRESS_MAP_START(caprcyc_state::caprcyc_map) // TODO...
 	AM_RANGE(0x00000000, 0x0003ffff) AM_ROM
 ADDRESS_MAP_END
 
@@ -60,7 +62,7 @@ INPUT_PORTS_END
 
 ***************************************************************************/
 
-static MACHINE_CONFIG_START( caprcyc )
+MACHINE_CONFIG_START(caprcyc_state::caprcyc)
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", VR4300BE, 100000000) // cpu configuration is unknown

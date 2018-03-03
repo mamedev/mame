@@ -27,6 +27,8 @@ public:
 	DECLARE_READ8_MEMBER(mem_r);
 	DECLARE_WRITE8_MEMBER(mem_w);
 
+	void cchip_map(address_map &map);
+	void cchip_ram_bank(address_map &map);
 protected:
 	virtual void device_add_mconfig(machine_config &config) override;
 	virtual void device_start() override;

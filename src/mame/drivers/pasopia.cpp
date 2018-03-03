@@ -53,6 +53,9 @@ public:
 	DECLARE_DRIVER_INIT(pasopia);
 	TIMER_CALLBACK_MEMBER(pio_timer);
 
+	void pasopia(machine_config &config);
+	void pasopia_io(address_map &map);
+	void pasopia_map(address_map &map);
 private:
 	uint8_t m_hblank;
 	uint16_t m_vram_addr;
@@ -119,13 +122,13 @@ WRITE8_MEMBER( pasopia_state::pasopia_ctrl_w )
 	membank("bank1")->set_entry(m_ram_bank);
 }
 
-static ADDRESS_MAP_START(pasopia_map, AS_PROGRAM, 8, pasopia_state)
+ADDRESS_MAP_START(pasopia_state::pasopia_map)
 	AM_RANGE(0x0000,0x7fff) AM_READ_BANK("bank1") AM_WRITE_BANK("bank2")
 	AM_RANGE(0x8000,0xffff) AM_RAM
 ADDRESS_MAP_END
 
 
-static ADDRESS_MAP_START(pasopia_io, AS_IO, 8, pasopia_state)
+ADDRESS_MAP_START(pasopia_state::pasopia_io)
 	ADDRESS_MAP_UNMAP_HIGH
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	AM_RANGE(0x00,0x03) AM_DEVREADWRITE("ppi8255_0", i8255_device, read, write)
@@ -277,7 +280,7 @@ We preset all banks here, so that bankswitching will incur no speed penalty.
 	m_pio_timer->adjust(attotime::from_hz(50), 0, attotime::from_hz(50));
 }
 
-static MACHINE_CONFIG_START( pasopia )
+MACHINE_CONFIG_START(pasopia_state::pasopia)
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", Z80, 4000000)
 	MCFG_CPU_PROGRAM_MAP(pasopia_map)
@@ -295,7 +298,7 @@ static MACHINE_CONFIG_START( pasopia )
 	MCFG_PALETTE_ADD("palette", 8)
 
 	/* Devices */
-	MCFG_MC6845_ADD("crtc", H46505, "screen", XTAL_4MHz/4)   /* unknown clock, hand tuned to get ~60 fps */
+	MCFG_MC6845_ADD("crtc", H46505, "screen", XTAL(4'000'000)/4)   /* unknown clock, hand tuned to get ~60 fps */
 	MCFG_MC6845_SHOW_BORDER_AREA(false)
 	MCFG_MC6845_CHAR_WIDTH(8)
 	MCFG_MC6845_UPDATE_ROW_CB(pasopia_state, crtc_update_row)
@@ -313,13 +316,13 @@ static MACHINE_CONFIG_START( pasopia )
 	MCFG_DEVICE_ADD("ppi8255_2", I8255A, 0)
 	MCFG_I8255_IN_PORTC_CB(READ8(pasopia_state, rombank_r))
 
-	MCFG_DEVICE_ADD("z80ctc", Z80CTC, XTAL_4MHz)
+	MCFG_DEVICE_ADD("z80ctc", Z80CTC, XTAL(4'000'000))
 	MCFG_Z80CTC_INTR_CB(INPUTLINE("maincpu", INPUT_LINE_IRQ0))
 	MCFG_Z80CTC_ZC0_CB(DEVWRITELINE("z80ctc", z80ctc_device, trg1))
 	MCFG_Z80CTC_ZC1_CB(DEVWRITELINE("z80ctc", z80ctc_device, trg2))
 	MCFG_Z80CTC_ZC2_CB(DEVWRITELINE("z80ctc", z80ctc_device, trg3))
 
-	MCFG_DEVICE_ADD("z80pio", Z80PIO, XTAL_4MHz)
+	MCFG_DEVICE_ADD("z80pio", Z80PIO, XTAL(4'000'000))
 	MCFG_Z80PIO_OUT_INT_CB(INPUTLINE("maincpu", INPUT_LINE_IRQ0))
 	MCFG_Z80PIO_OUT_PA_CB(WRITE8(pasopia_state, mux_w))
 	MCFG_Z80PIO_IN_PB_CB(READ8(pasopia_state, keyb_r))

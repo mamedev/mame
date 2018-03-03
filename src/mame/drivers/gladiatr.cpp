@@ -141,7 +141,7 @@ Address          Dir Data     Name      Description
 --------111-----   W xxxxxxxx ADCS      command to 6809
 
 
-Third CPU (6809)
+Third CPU (HD6809)
 ----------------
 
 Address          Dir Data     Name      Description
@@ -299,7 +299,7 @@ READ8_MEMBER(gladiatr_state::cctl_p2_r)
 
 READ8_MEMBER(gladiatr_state::ucpu_p2_r)
 {
-	return BITSWAP8(m_dsw1->read(), 0,1,2,3,4,5,6,7);
+	return bitswap<8>(m_dsw1->read(), 0,1,2,3,4,5,6,7);
 }
 
 WRITE8_MEMBER(gladiatr_state::ccpu_p2_w)
@@ -356,7 +356,7 @@ WRITE8_MEMBER(gladiatr_state::csnd_p1_w)
 
 READ8_MEMBER(gladiatr_state::csnd_p2_r)
 {
-	return BITSWAP8(m_dsw2->read(), 2,3,4,5,6,7,1,0);
+	return bitswap<8>(m_dsw2->read(), 2,3,4,5,6,7,1,0);
 }
 
 
@@ -619,7 +619,7 @@ MACHINE_RESET_MEMBER(ppking_state, ppking)
 	m_mcu[0].state = 0;
 }
 
-static ADDRESS_MAP_START( ppking_cpu1_map, AS_PROGRAM, 8, ppking_state )
+ADDRESS_MAP_START(ppking_state::ppking_cpu1_map)
 	AM_RANGE(0x0000, 0xbfff) AM_ROM
 	AM_RANGE(0xc000, 0xcbff) AM_RAM AM_SHARE("spriteram")
 	AM_RANGE(0xcc00, 0xcfff) AM_WRITE(ppking_video_registers_w)
@@ -631,13 +631,13 @@ static ADDRESS_MAP_START( ppking_cpu1_map, AS_PROGRAM, 8, ppking_state )
 ADDRESS_MAP_END
 
 
-static ADDRESS_MAP_START( ppking_cpu3_map, AS_PROGRAM, 8, ppking_state )
+ADDRESS_MAP_START(ppking_state::ppking_cpu3_map)
 	AM_RANGE(0x1000, 0x1fff) AM_WRITE(ppking_adpcm_w)
 	AM_RANGE(0x2000, 0x2fff) AM_READ(adpcm_command_r)
 	AM_RANGE(0x8000, 0xffff) AM_ROM AM_WRITENOP
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( ppking_cpu1_io, AS_IO, 8, ppking_state )
+ADDRESS_MAP_START(ppking_state::ppking_cpu1_io)
 //  ADDRESS_MAP_GLOBAL_MASK(0xff)
 	AM_RANGE(0xc000, 0xc007) AM_DEVWRITE("mainlatch", ls259_device, write_d0)
 //  AM_RANGE(0xc004, 0xc004) AM_NOP // WRITE(ppking_irq_patch_w)
@@ -646,7 +646,7 @@ static ADDRESS_MAP_START( ppking_cpu1_io, AS_IO, 8, ppking_state )
 	AM_RANGE(0xc0c0, 0xc0c1) AM_READ(ppking_qxcomu_r) AM_WRITE(ppking_qxcomu_w)
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( ppking_cpu2_io, AS_IO, 8, ppking_state )
+ADDRESS_MAP_START(ppking_state::ppking_cpu2_io)
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	AM_RANGE(0x00, 0x01) AM_DEVREADWRITE("ymsnd", ym2203_device, read, write)
 	AM_RANGE(0x20, 0x21) AM_READ(ppking_qx1_r) AM_WRITE(ppking_qx1_w)
@@ -658,7 +658,7 @@ ADDRESS_MAP_END
 
 
 
-static ADDRESS_MAP_START( gladiatr_cpu1_map, AS_PROGRAM, 8, gladiatr_state )
+ADDRESS_MAP_START(gladiatr_state::gladiatr_cpu1_map)
 	AM_RANGE(0x0000, 0x5fff) AM_ROM
 	AM_RANGE(0x6000, 0xbfff) AM_ROMBANK("bank1")
 	AM_RANGE(0xc000, 0xcbff) AM_RAM AM_SHARE("spriteram")
@@ -670,26 +670,26 @@ static ADDRESS_MAP_START( gladiatr_cpu1_map, AS_PROGRAM, 8, gladiatr_state )
 	AM_RANGE(0xf000, 0xf7ff) AM_RAM AM_SHARE("nvram") /* battery backed RAM */
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( cpu2_map, AS_PROGRAM, 8, gladiatr_state )
+ADDRESS_MAP_START(gladiatr_state_base::cpu2_map)
 	AM_RANGE(0x0000, 0x7fff) AM_ROM
 	AM_RANGE(0x8000, 0x83ff) AM_RAM
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( gladiatr_cpu3_map, AS_PROGRAM, 8, gladiatr_state )
+ADDRESS_MAP_START(gladiatr_state::gladiatr_cpu3_map)
 	AM_RANGE(0x1000, 0x1fff) AM_WRITE(gladiator_adpcm_w)
 	AM_RANGE(0x2000, 0x2fff) AM_READ(adpcm_command_r)
 	AM_RANGE(0x4000, 0xffff) AM_ROMBANK("bank2") AM_WRITENOP
 ADDRESS_MAP_END
 
 
-static ADDRESS_MAP_START( gladiatr_cpu1_io, AS_IO, 8, gladiatr_state )
-	AM_RANGE(0xc004, 0xc004) AM_WRITE(gladiatr_irq_patch_w) /* !!! patch to 2nd CPU IRQ !!! */
+ADDRESS_MAP_START(gladiatr_state::gladiatr_cpu1_io)
 	AM_RANGE(0xc000, 0xc007) AM_DEVWRITE("mainlatch", ls259_device, write_d0)
+	AM_RANGE(0xc004, 0xc004) AM_WRITE(gladiatr_irq_patch_w) /* !!! patch to 2nd CPU IRQ !!! */
 	AM_RANGE(0xc09e, 0xc09f) AM_DEVREADWRITE("ucpu", upi41_cpu_device, upi41_master_r, upi41_master_w)
 	AM_RANGE(0xc0bf, 0xc0bf) AM_NOP // watchdog_reset_w doesn't work
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( gladiatr_cpu2_io, AS_IO, 8, gladiatr_state )
+ADDRESS_MAP_START(gladiatr_state::gladiatr_cpu2_io)
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	AM_RANGE(0x00, 0x01) AM_DEVREADWRITE("ymsnd", ym2203_device, read, write)
 	AM_RANGE(0x20, 0x21) AM_DEVREADWRITE("csnd", upi41_cpu_device, upi41_master_r, upi41_master_w)
@@ -933,20 +933,20 @@ GFXDECODE_END
 
 
 
-static MACHINE_CONFIG_START( ppking )
+MACHINE_CONFIG_START(ppking_state::ppking)
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", Z80, XTAL_12MHz/2) /* verified on pcb */
+	MCFG_CPU_ADD("maincpu", Z80, 12_MHz_XTAL/2) /* verified on pcb */
 	MCFG_CPU_PROGRAM_MAP(ppking_cpu1_map)
 	MCFG_CPU_IO_MAP(ppking_cpu1_io)
 	MCFG_CPU_VBLANK_INT_DRIVER("screen", ppking_state,  irq0_line_hold)
 
-	MCFG_CPU_ADD("sub", Z80, XTAL_12MHz/4) /* verified on pcb */
+	MCFG_CPU_ADD("sub", Z80, 12_MHz_XTAL/4) /* verified on pcb */
 	MCFG_CPU_PROGRAM_MAP(cpu2_map)
 	MCFG_CPU_IO_MAP(ppking_cpu2_io)
 	MCFG_CPU_PERIODIC_INT_DRIVER(ppking_state,  irq0_line_assert, 60)
 
-	MCFG_CPU_ADD("audiocpu", M6809, XTAL_12MHz/16) /* verified on pcb */
+	MCFG_CPU_ADD("audiocpu", MC6809, 12_MHz_XTAL/4) /* verified on pcb */
 	MCFG_CPU_PROGRAM_MAP(ppking_cpu3_map)
 
 	MCFG_QUANTUM_TIME(attotime::from_hz(6000))
@@ -969,7 +969,7 @@ static MACHINE_CONFIG_START( ppking )
 //  MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
 //  MCFG_SCREEN_SIZE(32*8, 32*8)
 //  MCFG_SCREEN_VISIBLE_AREA(0*8, 32*8-1, 2*8, 30*8-1)
-	MCFG_SCREEN_RAW_PARAMS(XTAL_12MHz/2,384,0,256,264,16,240) // assume same as Arkanoid
+	MCFG_SCREEN_RAW_PARAMS(12_MHz_XTAL/2,384,0,256,264,16,240) // assume same as Arkanoid
 	MCFG_SCREEN_UPDATE_DRIVER(ppking_state, screen_update_ppking)
 	MCFG_SCREEN_PALETTE("palette")
 
@@ -984,7 +984,7 @@ static MACHINE_CONFIG_START( ppking )
 	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
 	MCFG_GENERIC_LATCH_8_ADD("soundlatch2")
 
-	MCFG_SOUND_ADD("ymsnd", YM2203, XTAL_12MHz/8) /* verified on pcb */
+	MCFG_SOUND_ADD("ymsnd", YM2203, 12_MHz_XTAL/8) /* verified on pcb */
 	MCFG_YM2203_IRQ_HANDLER(WRITELINE(gladiatr_state_base, ym_irq))
 	MCFG_AY8910_PORT_A_READ_CB(READ8(ppking_state, ppking_f1_r))
 	MCFG_AY8910_PORT_B_READ_CB(IOPORT("DSW3")) /* port B read */
@@ -993,24 +993,24 @@ static MACHINE_CONFIG_START( ppking )
 	MCFG_SOUND_ROUTE(2, "mono", 0.60)
 	MCFG_SOUND_ROUTE(3, "mono", 0.50)
 
-	MCFG_SOUND_ADD("msm", MSM5205, XTAL_455kHz) /* verified on pcb */
+	MCFG_SOUND_ADD("msm", MSM5205, 455_kHz_XTAL) /* verified on pcb */
 	MCFG_MSM5205_PRESCALER_SELECTOR(SEX_4B)  /* vclk input mode    */
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.60)
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_START( gladiatr )
+MACHINE_CONFIG_START(gladiatr_state::gladiatr)
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", Z80, XTAL_12MHz/2) /* verified on pcb */
+	MCFG_CPU_ADD("maincpu", Z80, 12_MHz_XTAL/2) /* verified on pcb */
 	MCFG_CPU_PROGRAM_MAP(gladiatr_cpu1_map)
 	MCFG_CPU_IO_MAP(gladiatr_cpu1_io)
 	MCFG_CPU_VBLANK_INT_DRIVER("screen", gladiatr_state,  irq0_line_hold)
 
-	MCFG_CPU_ADD("sub", Z80, XTAL_12MHz/4) /* verified on pcb */
+	MCFG_CPU_ADD("sub", Z80, 12_MHz_XTAL/4) /* verified on pcb */
 	MCFG_CPU_PROGRAM_MAP(cpu2_map)
 	MCFG_CPU_IO_MAP(gladiatr_cpu2_io)
 
-	MCFG_CPU_ADD("audiocpu", M6809, XTAL_12MHz/16) /* verified on pcb */
+	MCFG_CPU_ADD("audiocpu", MC6809, 12_MHz_XTAL/4) /* verified on pcb */
 	MCFG_CPU_PROGRAM_MAP(gladiatr_cpu3_map)
 
 	MCFG_MACHINE_RESET_OVERRIDE(gladiatr_state,gladiator)
@@ -1023,27 +1023,27 @@ static MACHINE_CONFIG_START( gladiatr )
 	MCFG_ADDRESSABLE_LATCH_Q4_OUT_CB(INPUTLINE("sub", INPUT_LINE_RESET)) // shadowed by aforementioned hack
 	MCFG_ADDRESSABLE_LATCH_Q7_OUT_CB(WRITELINE(gladiatr_state, flipscreen_w))
 
-	MCFG_DEVICE_ADD("cctl", I8741, XTAL_12MHz/2) /* verified on pcb */
+	MCFG_DEVICE_ADD("cctl", I8741, 12_MHz_XTAL/2) /* verified on pcb */
 	MCFG_MCS48_PORT_T0_IN_CB(IOPORT("COINS")) MCFG_DEVCB_RSHIFT(3)
 	MCFG_MCS48_PORT_T1_IN_CB(IOPORT("COINS")) MCFG_DEVCB_RSHIFT(2)
 	MCFG_MCS48_PORT_P1_IN_CB(READ8(gladiatr_state, cctl_p1_r))
 	MCFG_MCS48_PORT_P2_IN_CB(READ8(gladiatr_state, cctl_p2_r))
 
-	MCFG_DEVICE_ADD("ccpu", I8741, XTAL_12MHz/2) /* verified on pcb */
+	MCFG_DEVICE_ADD("ccpu", I8741, 12_MHz_XTAL/2) /* verified on pcb */
 	MCFG_MCS48_PORT_P1_IN_CB(IOPORT("IN0"))
 	MCFG_MCS48_PORT_P2_IN_CB(IOPORT("IN1"))
 	MCFG_MCS48_PORT_P2_OUT_CB(WRITE8(gladiatr_state, ccpu_p2_w))
 	MCFG_MCS48_PORT_T0_IN_CB(IOPORT("COINS")) MCFG_DEVCB_RSHIFT(1)
 	MCFG_MCS48_PORT_T1_IN_CB(IOPORT("COINS")) MCFG_DEVCB_RSHIFT(0)
 
-	MCFG_DEVICE_ADD("ucpu", I8741, XTAL_12MHz/2) /* verified on pcb */
+	MCFG_DEVICE_ADD("ucpu", I8741, 12_MHz_XTAL/2) /* verified on pcb */
 	MCFG_MCS48_PORT_P1_IN_CB(READ8(gladiatr_state, ucpu_p1_r))
 	MCFG_MCS48_PORT_P1_OUT_CB(WRITE8(gladiatr_state, ucpu_p1_w))
 	MCFG_MCS48_PORT_P2_IN_CB(READ8(gladiatr_state, ucpu_p2_r))
 	MCFG_MCS48_PORT_T0_IN_CB(READLINE(gladiatr_state, tclk_r))
 	MCFG_MCS48_PORT_T1_IN_CB(READLINE(gladiatr_state, ucpu_t1_r))
 
-	MCFG_DEVICE_ADD("csnd", I8741, XTAL_12MHz/2) /* verified on pcb */
+	MCFG_DEVICE_ADD("csnd", I8741, 12_MHz_XTAL/2) /* verified on pcb */
 	MCFG_MCS48_PORT_P1_IN_CB(READ8(gladiatr_state, csnd_p1_r))
 	MCFG_MCS48_PORT_P1_OUT_CB(WRITE8(gladiatr_state, csnd_p1_w))
 	MCFG_MCS48_PORT_P2_IN_CB(READ8(gladiatr_state, csnd_p2_r))
@@ -1053,7 +1053,7 @@ static MACHINE_CONFIG_START( gladiatr )
 	/* lazy way to make polled serial between MCUs work */
 	MCFG_QUANTUM_PERFECT_CPU("ucpu")
 
-	MCFG_CLOCK_ADD("tclk", XTAL_12MHz/8/128/2) /* verified on pcb */
+	MCFG_CLOCK_ADD("tclk", 12_MHz_XTAL/8/128/2) /* verified on pcb */
 	MCFG_CLOCK_SIGNAL_HANDLER(WRITELINE(gladiatr_state, tclk_w));
 
 	/* video hardware */
@@ -1075,7 +1075,7 @@ static MACHINE_CONFIG_START( gladiatr )
 
 	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
 
-	MCFG_SOUND_ADD("ymsnd", YM2203, XTAL_12MHz/8) /* verified on pcb */
+	MCFG_SOUND_ADD("ymsnd", YM2203, 12_MHz_XTAL/8) /* verified on pcb */
 	MCFG_YM2203_IRQ_HANDLER(WRITELINE(gladiatr_state_base, ym_irq))
 	MCFG_AY8910_PORT_B_READ_CB(IOPORT("DSW3")) /* port B read */
 	MCFG_AY8910_PORT_A_WRITE_CB(WRITE8(gladiatr_state, gladiator_int_control_w)) /* port A write */
@@ -1084,7 +1084,7 @@ static MACHINE_CONFIG_START( gladiatr )
 	MCFG_SOUND_ROUTE(2, "mono", 0.60)
 	MCFG_SOUND_ROUTE(3, "mono", 0.50)
 
-	MCFG_SOUND_ADD("msm", MSM5205, XTAL_455kHz) /* verified on pcb */
+	MCFG_SOUND_ADD("msm", MSM5205, 455_kHz_XTAL) /* verified on pcb */
 	MCFG_MSM5205_PRESCALER_SELECTOR(SEX_4B)  /* vclk input mode    */
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.60)
 

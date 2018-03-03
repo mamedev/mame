@@ -51,7 +51,7 @@ static INPUT_PORTS_START(cpc_symbiface2)
 INPUT_PORTS_END
 
 // device machine config
-MACHINE_CONFIG_MEMBER( cpc_symbiface2_device::device_add_mconfig )
+MACHINE_CONFIG_START(cpc_symbiface2_device::device_add_mconfig)
 	MCFG_ATA_INTERFACE_ADD("ide", ata_devices, "hdd", nullptr, false)
 	MCFG_DS12885_ADD("rtc")
 	MCFG_NVRAM_ADD_1FILL("nvram")
@@ -135,27 +135,27 @@ READ8_MEMBER(cpc_symbiface2_device::ide_cs0_r)
 		else
 		{
 			m_iohigh = true;
-			m_ide_data = m_ide->read_cs0(space,offset);
+			m_ide_data = m_ide->read_cs0(offset);
 			return m_ide_data & 0xff;
 		}
 	}
 	else
-		return m_ide->read_cs0(space,offset);
+		return m_ide->read_cs0(offset);
 }
 
 WRITE8_MEMBER(cpc_symbiface2_device::ide_cs0_w)
 {
-	m_ide->write_cs0(space,offset,data);
+	m_ide->write_cs0(offset, data);
 }
 
 READ8_MEMBER(cpc_symbiface2_device::ide_cs1_r)
 {
-	return m_ide->read_cs1(space,offset);
+	return m_ide->read_cs1(offset);
 }
 
 WRITE8_MEMBER(cpc_symbiface2_device::ide_cs1_w)
 {
-	m_ide->write_cs1(space,offset,data);
+	m_ide->write_cs1(offset, data);
 }
 
 // RTC (Dallas DS1287A)

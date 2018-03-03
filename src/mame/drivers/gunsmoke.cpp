@@ -105,7 +105,7 @@ READ8_MEMBER(gunsmoke_state::gunsmoke_protection_r)
 
 /* Memory Maps */
 
-static ADDRESS_MAP_START( gunsmoke_map, AS_PROGRAM, 8, gunsmoke_state )
+ADDRESS_MAP_START(gunsmoke_state::gunsmoke_map)
 	AM_RANGE(0x0000, 0x7fff) AM_ROM
 	AM_RANGE(0x8000, 0xbfff) AM_ROMBANK("bank1")
 	AM_RANGE(0xc000, 0xc000) AM_READ_PORT("SYSTEM")
@@ -126,7 +126,7 @@ static ADDRESS_MAP_START( gunsmoke_map, AS_PROGRAM, 8, gunsmoke_state )
 	AM_RANGE(0xf000, 0xffff) AM_RAM AM_SHARE("spriteram")
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( sound_map, AS_PROGRAM, 8, gunsmoke_state )
+ADDRESS_MAP_START(gunsmoke_state::sound_map)
 	AM_RANGE(0x0000, 0x7fff) AM_ROM
 	AM_RANGE(0xc000, 0xc7ff) AM_RAM
 	AM_RANGE(0xc800, 0xc800) AM_DEVREAD("soundlatch", generic_latch_8_device, read)
@@ -299,7 +299,7 @@ void gunsmoke_state::machine_reset()
 	m_sprite3bank = 0;
 }
 
-static MACHINE_CONFIG_START( gunsmoke )
+MACHINE_CONFIG_START(gunsmoke_state::gunsmoke)
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", Z80, 4000000)   // 4 MHz

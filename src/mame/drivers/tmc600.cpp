@@ -121,14 +121,14 @@ WRITE8_MEMBER( tmc600_state::printer_w )
 
 /* Memory Maps */
 
-static ADDRESS_MAP_START( tmc600_map, AS_PROGRAM, 8, tmc600_state )
+ADDRESS_MAP_START(tmc600_state::tmc600_map)
 	AM_RANGE(0x0000, 0x5fff) AM_ROM
 	AM_RANGE(0x6000, 0x7fff) AM_RAM
 	AM_RANGE(0xf400, 0xf7ff) AM_DEVICE(CDP1869_TAG, cdp1869_device, char_map)
 	AM_RANGE(0xf800, 0xffff) AM_DEVICE(CDP1869_TAG, cdp1869_device, page_map)
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( tmc600_io_map, AS_IO, 8, tmc600_state )
+ADDRESS_MAP_START(tmc600_state::tmc600_io_map)
 	AM_RANGE(0x03, 0x03) AM_DEVWRITE(CDP1852_KB_TAG, cdp1852_device, write)
 	AM_RANGE(0x04, 0x04) AM_DEVWRITE(CDP1852_TMC700_TAG, cdp1852_device, write)
 	AM_RANGE(0x05, 0x05) AM_READWRITE(rtc_r, vismac_data_w)
@@ -251,9 +251,9 @@ WRITE8_MEMBER( tmc600_state::sc_w )
 
 /* Machine Drivers */
 
-static MACHINE_CONFIG_START( tmc600 )
+MACHINE_CONFIG_START(tmc600_state::tmc600)
 	// CPU
-	MCFG_CPU_ADD(CDP1802_TAG, CDP1802, XTAL_3_57MHz)
+	MCFG_CPU_ADD(CDP1802_TAG, CDP1802, XTAL(3'570'000))
 	MCFG_CPU_PROGRAM_MAP(tmc600_map)
 	MCFG_CPU_IO_MAP(tmc600_io_map)
 	MCFG_COSMAC_WAIT_CALLBACK(VCC)
@@ -263,10 +263,10 @@ static MACHINE_CONFIG_START( tmc600 )
 	MCFG_COSMAC_SC_CALLBACK(WRITE8(tmc600_state, sc_w))
 
 	// sound and video hardware
-	MCFG_FRAGMENT_ADD(tmc600_video)
+	tmc600_video(config);
 
 	// keyboard output latch
-	MCFG_DEVICE_ADD(CDP1852_KB_TAG, CDP1852, XTAL_3_57MHz/8) // clock is CDP1802 TPB
+	MCFG_DEVICE_ADD(CDP1852_KB_TAG, CDP1852, XTAL(3'570'000)/8) // clock is CDP1802 TPB
 	MCFG_CDP1852_MODE_CALLBACK(VCC)
 
 	// address bus demux for expansion bus
@@ -274,7 +274,7 @@ static MACHINE_CONFIG_START( tmc600 )
 	MCFG_CDP1852_MODE_CALLBACK(GND)
 
 	// printer output latch
-	MCFG_DEVICE_ADD(CDP1852_TMC700_TAG, CDP1852, XTAL_3_57MHz/8) // clock is CDP1802 TPB
+	MCFG_DEVICE_ADD(CDP1852_TMC700_TAG, CDP1852, XTAL(3'570'000)/8) // clock is CDP1802 TPB
 	MCFG_CDP1852_MODE_CALLBACK(VCC)
 	MCFG_CDP1852_DO_CALLBACK(WRITE8(tmc600_state, printer_w))
 

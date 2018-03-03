@@ -45,9 +45,9 @@ void m65ce02_device::init()
 void m65ce02_device::device_start()
 {
 	if(direct_disabled)
-		mintf = new mi_default_nd;
+		mintf = std::make_unique<mi_default_nd>();
 	else
-		mintf = new mi_default_normal;
+		mintf = std::make_unique<mi_default_normal>();
 
 	init();
 }
@@ -70,10 +70,6 @@ void m65ce02_device::state_import(const device_state_entry &entry)
 		B <<= 8;
 		break;
 	}
-}
-
-void m65ce02_device::state_export(const device_state_entry &entry)
-{
 }
 
 void m65ce02_device::state_string_export(const device_state_entry &entry, std::string &str) const

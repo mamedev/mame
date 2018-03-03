@@ -165,7 +165,7 @@ READ8_MEMBER(laserbat_state_base::rrowx_r)
 
 */
 
-static ADDRESS_MAP_START( laserbat_map, AS_PROGRAM, 8, laserbat_state_base )
+ADDRESS_MAP_START(laserbat_state_base::laserbat_map)
 	ADDRESS_MAP_UNMAP_HIGH
 
 	AM_RANGE(0x0000, 0x13ff) AM_ROM
@@ -183,7 +183,7 @@ static ADDRESS_MAP_START( laserbat_map, AS_PROGRAM, 8, laserbat_state_base )
 	AM_RANGE(0x1c00, 0x1fff) AM_MIRROR(0x6000) AM_RAM
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( laserbat_io_map, AS_IO, 8, laserbat_state_base )
+ADDRESS_MAP_START(laserbat_state_base::laserbat_io_map)
 	AM_RANGE(0x00, 0x00) AM_READ(rhsc_r)    AM_WRITE(cnt_eff_w)
 	AM_RANGE(0x01, 0x01) /* RBALL */        AM_WRITE(cnt_nav_w)
 	AM_RANGE(0x02, 0x02) AM_READ(rrowx_r)   AM_WRITE(csound1_w)
@@ -461,10 +461,10 @@ void laserbat_state_base::device_timer(emu_timer &timer, device_timer_id id, int
 }
 
 
-static MACHINE_CONFIG_START( laserbat_base )
+MACHINE_CONFIG_START(laserbat_state_base::laserbat_base)
 
 	// basic machine hardware
-	MCFG_CPU_ADD("maincpu", S2650, XTAL_14_31818MHz/4)
+	MCFG_CPU_ADD("maincpu", S2650, XTAL(14'318'181)/4)
 	MCFG_CPU_PROGRAM_MAP(laserbat_map)
 	MCFG_CPU_IO_MAP(laserbat_io_map)
 	MCFG_CPU_VBLANK_INT_DRIVER("screen", laserbat_state_base, laserbat_interrupt)
@@ -472,21 +472,21 @@ static MACHINE_CONFIG_START( laserbat_base )
 
 	// video hardware
 	MCFG_SCREEN_ADD("screen", RASTER)
-	MCFG_SCREEN_RAW_PARAMS(XTAL_14_31818MHz, 227*4, 43*4-1, 227*4-1, 312, 8, 255)
+	MCFG_SCREEN_RAW_PARAMS(XTAL(14'318'181), 227*4, 43*4-1, 227*4-1, 312, 8, 255)
 	MCFG_SCREEN_UPDATE_DRIVER(laserbat_state_base, screen_update_laserbat)
 	MCFG_SCREEN_PALETTE("palette")
 
 	MCFG_PLS100_ADD("gfxmix")
 
-	MCFG_DEVICE_ADD("pvi1", S2636, XTAL_14_31818MHz/3)
+	MCFG_DEVICE_ADD("pvi1", S2636, XTAL(14'318'181)/3)
 	MCFG_S2636_OFFSETS(-8, -16)
 	MCFG_S2636_DIVIDER(3)
 
-	MCFG_DEVICE_ADD("pvi2", S2636, XTAL_14_31818MHz/3)
+	MCFG_DEVICE_ADD("pvi2", S2636, XTAL(14'318'181)/3)
 	MCFG_S2636_OFFSETS(-8, -16)
 	MCFG_S2636_DIVIDER(3)
 
-	MCFG_DEVICE_ADD("pvi3", S2636, XTAL_14_31818MHz/3)
+	MCFG_DEVICE_ADD("pvi3", S2636, XTAL(14'318'181)/3)
 	MCFG_S2636_OFFSETS(-8, -16)
 	MCFG_S2636_DIVIDER(3)
 
@@ -494,7 +494,8 @@ static MACHINE_CONFIG_START( laserbat_base )
 
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_DERIVED( laserbat, laserbat_base )
+MACHINE_CONFIG_START(laserbat_state::laserbat)
+	laserbat_base(config);
 
 	// video hardware
 	MCFG_PALETTE_ADD("palette", 256)
@@ -518,15 +519,16 @@ static MACHINE_CONFIG_DERIVED( laserbat, laserbat_base )
 	MCFG_SN76477_ENVELOPE_PARAMS(0, 1)              // GND, Vreg
 	MCFG_SN76477_ENABLE(0)                          // AB SOUND
 
-	MCFG_TMS3615_ADD("synth_low", XTAL_4MHz/16/2) // from the other one's /2 clock output
+	MCFG_TMS3615_ADD("synth_low", 4_MHz_XTAL/16/2) // from the other one's /2 clock output
 	MCFG_SOUND_ROUTE(tms3615_device::FOOTAGE_8, "speaker", 1.0)
 
-	MCFG_TMS3615_ADD("synth_high", XTAL_4MHz/16) // 4MHz divided down with a 74LS161
+	MCFG_TMS3615_ADD("synth_high", 4_MHz_XTAL/16) // 4MHz divided down with a 74LS161
 	MCFG_SOUND_ROUTE(tms3615_device::FOOTAGE_8, "speaker", 1.0)
 
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_DERIVED( catnmous, laserbat_base )
+MACHINE_CONFIG_START(catnmous_state::catnmous)
+	laserbat_base(config);
 
 	// video hardware
 	MCFG_PALETTE_ADD("palette", 256)

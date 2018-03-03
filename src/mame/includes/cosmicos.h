@@ -135,6 +135,9 @@ public:
 	DECLARE_DRIVER_INIT(cosmicos);
 	TIMER_DEVICE_CALLBACK_MEMBER(digit_tick);
 	TIMER_DEVICE_CALLBACK_MEMBER(int_tick);
+	void cosmicos(machine_config &config);
+	void cosmicos_io(address_map &map);
+	void cosmicos_mem(address_map &map);
 };
 
 #endif // MAME_INCLUDES_COSMICOS_H

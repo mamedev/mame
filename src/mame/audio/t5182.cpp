@@ -149,7 +149,7 @@ rom.
 #include "emu.h"
 #include "t5182.h"
 
-#define T5182_CLOCK     XTAL_14_31818MHz/4
+#define T5182_CLOCK     XTAL(14'318'181)/4
 
 DEFINE_DEVICE_TYPE(T5182, t5182_device, "t5182", "T5182 MCU")
 
@@ -335,7 +335,7 @@ ioport_constructor t5182_device::device_input_ports() const
 	//  90XX reset
 	//  A0XX
 	// rest unused
-ADDRESS_MAP_START( t5182_map, AS_PROGRAM, 8, t5182_device )
+ADDRESS_MAP_START(t5182_device::t5182_map)
 	AM_RANGE(0x0000, 0x1fff) AM_ROM AM_REGION("cpu", 0) // internal ROM
 	AM_RANGE(0x2000, 0x27ff) AM_RAM AM_MIRROR(0x1800) // internal RAM
 	AM_RANGE(0x4000, 0x40ff) AM_RAM AM_MIRROR(0x3F00) AM_SHARE("sharedram") // 2016 with four 74ls245s, one each for main and t5182 address and data. pins 23, 22, 20, 19, 18 are all tied low so only 256 bytes are usable
@@ -353,7 +353,7 @@ ADDRESS_MAP_END
 	// 30 R  coin inputs (bits 0 and 1, active high)
 	// 40  W external ROM banking? (the only 0 bit enables a ROM)
 	// 50  W test mode status flags (bit 0 = ROM test fail, bit 1 = RAM test fail, bit 2 = YM2151 IRQ not received)
-ADDRESS_MAP_START( t5182_io, AS_IO, 8, t5182_device )
+ADDRESS_MAP_START(t5182_device::t5182_io)
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	AM_RANGE(0x00, 0x01) AM_DEVREADWRITE(":ymsnd", ym2151_device, read, write)
 	AM_RANGE(0x10, 0x10) AM_WRITE(sharedram_semaphore_snd_acquire_w)
@@ -369,7 +369,7 @@ ADDRESS_MAP_END
 // device_add_mconfig - add device configuration
 //-------------------------------------------------
 
-MACHINE_CONFIG_MEMBER( t5182_device::device_add_mconfig )
+MACHINE_CONFIG_START(t5182_device::device_add_mconfig)
 	MCFG_CPU_ADD("t5182_z80", Z80, T5182_CLOCK)
 	MCFG_CPU_PROGRAM_MAP(t5182_map)
 	MCFG_CPU_IO_MAP(t5182_io)

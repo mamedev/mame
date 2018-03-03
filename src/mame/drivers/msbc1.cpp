@@ -65,12 +65,14 @@ public:
 		, m_maincpu(*this, MC68000R12_TAG)
 	{ }
 
+	void msbc1(machine_config &config);
+	void msbc1_mem(address_map &map);
 private:
 	virtual void machine_reset() override;
 	required_device<cpu_device> m_maincpu;
 };
 
-static ADDRESS_MAP_START( msbc1_mem, AS_PROGRAM, 16, msbc1_state )
+ADDRESS_MAP_START(msbc1_state::msbc1_mem)
 	ADDRESS_MAP_UNMAP_HIGH
 	AM_RANGE(0x000000, 0x03ffff) AM_RAM
 	AM_RANGE(0xf80000, 0xf87fff) AM_ROM AM_REGION(MC68000R12_TAG, 0)
@@ -90,9 +92,9 @@ void msbc1_state::machine_reset()
 	m_maincpu->reset();
 }
 
-static MACHINE_CONFIG_START( msbc1 )
+MACHINE_CONFIG_START(msbc1_state::msbc1)
 	/* basic machine hardware */
-	MCFG_CPU_ADD(MC68000R12_TAG, M68000, XTAL_12_5MHz)
+	MCFG_CPU_ADD(MC68000R12_TAG, M68000, XTAL(12'500'000))
 	MCFG_CPU_PROGRAM_MAP(msbc1_mem)
 MACHINE_CONFIG_END
 

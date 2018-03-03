@@ -87,7 +87,7 @@ READ8_MEMBER(seicross_state::portB_r)
 
 WRITE8_MEMBER(seicross_state::portB_w)
 {
-	//logerror("PC %04x: 8910 port B = %02x\n", space.device().safe_pc(), data);
+	//logerror("PC %04x: 8910 port B = %02x\n", m_maincpu->pc(), data);
 	/* bit 0 is IRQ enable */
 	m_irq_mask = data & 1;
 
@@ -110,7 +110,7 @@ WRITE8_MEMBER(seicross_state::dac_w)
 	m_dac->write(data >> 4);
 }
 
-static ADDRESS_MAP_START( main_map, AS_PROGRAM, 8, seicross_state )
+ADDRESS_MAP_START(seicross_state::main_map)
 	AM_RANGE(0x0000, 0x77ff) AM_ROM
 	AM_RANGE(0x7800, 0x7fff) AM_RAM AM_SHARE("share1")
 	AM_RANGE(0x8820, 0x887f) AM_RAM AM_SHARE("spriteram")
@@ -124,14 +124,14 @@ static ADDRESS_MAP_START( main_map, AS_PROGRAM, 8, seicross_state )
 	AM_RANGE(0xb800, 0xb800) AM_DEVREAD("watchdog", watchdog_timer_device, reset_r)
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( main_portmap, AS_IO, 8, seicross_state )
+ADDRESS_MAP_START(seicross_state::main_portmap)
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	AM_RANGE(0x00, 0x01) AM_MIRROR(0x08) AM_DEVWRITE("aysnd", ay8910_device, address_data_w)
 	AM_RANGE(0x04, 0x04) AM_MIRROR(0x08) AM_DEVREAD("aysnd", ay8910_device, data_r)
 ADDRESS_MAP_END
 
 
-static ADDRESS_MAP_START( mcu_nvram_map, AS_PROGRAM, 8, seicross_state )
+ADDRESS_MAP_START(seicross_state::mcu_nvram_map)
 	AM_RANGE(0x0000, 0x007f) AM_RAM
 	AM_RANGE(0x1000, 0x10ff) AM_RAM AM_SHARE("nvram")
 	AM_RANGE(0x2000, 0x2000) AM_WRITE(dac_w)
@@ -139,7 +139,7 @@ static ADDRESS_MAP_START( mcu_nvram_map, AS_PROGRAM, 8, seicross_state )
 	AM_RANGE(0xf800, 0xffff) AM_RAM AM_SHARE("share1")
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( mcu_no_nvram_map, AS_PROGRAM, 8, seicross_state )
+ADDRESS_MAP_START(seicross_state::mcu_no_nvram_map)
 	AM_RANGE(0x0000, 0x007f) AM_RAM
 	AM_RANGE(0x1003, 0x1003) AM_READ_PORT("DSW1")       /* DSW1 */
 	AM_RANGE(0x1005, 0x1005) AM_READ_PORT("DSW2")       /* DSW2 */
@@ -149,7 +149,7 @@ static ADDRESS_MAP_START( mcu_no_nvram_map, AS_PROGRAM, 8, seicross_state )
 	AM_RANGE(0xf800, 0xffff) AM_RAM AM_SHARE("share1")
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( decrypted_opcodes_map, AS_OPCODES, 8, seicross_state )
+ADDRESS_MAP_START(seicross_state::decrypted_opcodes_map)
 	AM_RANGE(0x8000, 0xf7ff) AM_ROM AM_SHARE("decrypted_opcodes")
 	AM_RANGE(0xf800, 0xffff) AM_RAM AM_SHARE("share1")
 ADDRESS_MAP_END
@@ -390,15 +390,15 @@ INTERRUPT_GEN_MEMBER(seicross_state::vblank_irq)
 }
 
 
-static MACHINE_CONFIG_START( no_nvram )
+MACHINE_CONFIG_START(seicross_state::no_nvram)
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", Z80, XTAL_18_432MHz / 6)   /* D780C, 3.072 MHz? */
+	MCFG_CPU_ADD("maincpu", Z80, XTAL(18'432'000) / 6)   /* D780C, 3.072 MHz? */
 	MCFG_CPU_PROGRAM_MAP(main_map)
 	MCFG_CPU_IO_MAP(main_portmap)
 	MCFG_CPU_VBLANK_INT_DRIVER("screen", seicross_state,  vblank_irq)
 
-	MCFG_CPU_ADD("mcu", NSC8105, XTAL_18_432MHz / 6)   /* ??? */
+	MCFG_CPU_ADD("mcu", NSC8105, XTAL(18'432'000) / 6)   /* ??? */
 	MCFG_CPU_PROGRAM_MAP(mcu_no_nvram_map)
 
 	MCFG_QUANTUM_TIME(attotime::from_hz(1200))  /* 20 CPU slices per frame - an high value to ensure proper */
@@ -422,7 +422,7 @@ static MACHINE_CONFIG_START( no_nvram )
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("speaker")
 
-	MCFG_SOUND_ADD("aysnd", AY8910, XTAL_18_432MHz / 12)
+	MCFG_SOUND_ADD("aysnd", AY8910, XTAL(18'432'000) / 12)
 	MCFG_AY8910_PORT_B_READ_CB(READ8(seicross_state, portB_r))
 	MCFG_AY8910_PORT_B_WRITE_CB(WRITE8(seicross_state, portB_w))
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 0.25)
@@ -433,7 +433,8 @@ static MACHINE_CONFIG_START( no_nvram )
 MACHINE_CONFIG_END
 
 
-static MACHINE_CONFIG_DERIVED( nvram, no_nvram )
+MACHINE_CONFIG_START(seicross_state::nvram)
+	no_nvram(config);
 
 	/* basic machine hardware */
 	MCFG_CPU_MODIFY("mcu")
@@ -442,9 +443,10 @@ static MACHINE_CONFIG_DERIVED( nvram, no_nvram )
 	MCFG_NVRAM_ADD_CUSTOM_DRIVER("nvram", seicross_state, nvram_init)
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_DERIVED( friskytb, nvram )
+MACHINE_CONFIG_START(seicross_state::friskytb)
+	nvram(config);
 	MCFG_CPU_MODIFY("mcu")
-	MCFG_CPU_DECRYPTED_OPCODES_MAP(decrypted_opcodes_map)
+	MCFG_CPU_OPCODES_MAP(decrypted_opcodes_map)
 MACHINE_CONFIG_END
 
 
@@ -628,7 +630,7 @@ DRIVER_INIT_MEMBER(seicross_state,friskytb)
 	// this code is in ROM 6.3h, maps to MCU at dxxx
 	for (int i = 0; i < 0x7800; i++)
 	{
-		m_decrypted_opcodes[i] = BITSWAP8(ROM[i], 6, 7, 5, 4, 3, 2, 0, 1);
+		m_decrypted_opcodes[i] = bitswap<8>(ROM[i], 6, 7, 5, 4, 3, 2, 0, 1);
 	}
 }
 

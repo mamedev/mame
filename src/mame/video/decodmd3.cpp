@@ -122,7 +122,7 @@ MC6845_UPDATE_ROW( decodmd_type3_device::crtc_update_row )
 	}
 }
 
-static ADDRESS_MAP_START( decodmd3_map, AS_PROGRAM, 16, decodmd_type3_device )
+ADDRESS_MAP_START(decodmd_type3_device::decodmd3_map)
 	AM_RANGE(0x00000000, 0x000fffff) AM_ROMBANK("dmdrom")
 	AM_RANGE(0x00800000, 0x0080ffff) AM_RAMBANK("dmdram")
 	AM_RANGE(0x00c00010, 0x00c00011) AM_READWRITE(crtc_status_r,crtc_address_w)
@@ -130,16 +130,16 @@ static ADDRESS_MAP_START( decodmd3_map, AS_PROGRAM, 16, decodmd_type3_device )
 	AM_RANGE(0x00c00020, 0x00c00021) AM_READWRITE(latch_r,status_w)
 ADDRESS_MAP_END
 
-MACHINE_CONFIG_MEMBER( decodmd_type3_device::device_add_mconfig )
+MACHINE_CONFIG_START(decodmd_type3_device::device_add_mconfig)
 	/* basic machine hardware */
-	MCFG_CPU_ADD("dmdcpu", M68000, XTAL_12MHz)
+	MCFG_CPU_ADD("dmdcpu", M68000, XTAL(12'000'000))
 	MCFG_CPU_PROGRAM_MAP(decodmd3_map)
 
 	MCFG_QUANTUM_TIME(attotime::from_hz(60))
 
 	MCFG_TIMER_DRIVER_ADD_PERIODIC("irq_timer", decodmd_type3_device, dmd_irq, attotime::from_hz(150))
 
-	MCFG_MC6845_ADD("dmd6845", MC6845, nullptr, XTAL_12MHz / 4)  // TODO: confirm clock speed
+	MCFG_MC6845_ADD("dmd6845", MC6845, nullptr, XTAL(12'000'000) / 4)  // TODO: confirm clock speed
 	MCFG_MC6845_SHOW_BORDER_AREA(false)
 	MCFG_MC6845_CHAR_WIDTH(16)
 	MCFG_MC6845_UPDATE_ROW_CB(decodmd_type3_device, crtc_update_row)
@@ -182,10 +182,4 @@ void decodmd_type3_device::device_reset()
 	m_rambank->set_entry(0);
 	m_rombank->configure_entry(0, &ROM[0]);
 	m_rombank->set_entry(0);
-}
-
-void decodmd_type3_device::static_set_gfxregion(device_t &device, const char *tag)
-{
-	decodmd_type3_device &cpuboard = downcast<decodmd_type3_device &>(device);
-	cpuboard.m_gfxtag = tag;
 }

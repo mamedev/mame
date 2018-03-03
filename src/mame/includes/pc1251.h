@@ -8,8 +8,8 @@
  *
  ****************************************************************************/
 
-#ifndef PC1251_H_
-#define PC1251_H_
+#ifndef MAME_INCLUDES_PC1251_H
+#define MAME_INCLUDES_PC1251_H
 
 #include "pocketc.h"
 #include "cpu/sc61860/sc61860.h"
@@ -55,8 +55,18 @@ public:
 	required_device<gfxdecode_device> m_gfxdecode;
 	required_device<palette_device> m_palette;
 
+	void pc1261(machine_config &config);
+	void pc1260(machine_config &config);
+	void pc1255(machine_config &config);
+	void pc1251(machine_config &config);
+	void pc1250(machine_config &config);
+	void pc1250_mem(address_map &map);
+	void pc1251_mem(address_map &map);
+	void pc1255_mem(address_map &map);
+	void pc1260_mem(address_map &map);
+	void pc1261_mem(address_map &map);
 protected:
 	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr) override;
 };
 
-#endif /* PC1251_H_ */
+#endif // MAME_INCLUDES_PC1251_H

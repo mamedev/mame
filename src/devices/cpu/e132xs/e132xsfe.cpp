@@ -12,11 +12,11 @@
 #include "e132xsfe.h"
 #include "32xsdefs.h"
 
-#define FE_FP ((m_cpu->m_global_regs[1] & 0xfe000000) >> 25)
-#define FE_FL (m_cpu->m_fl_lut[((m_cpu->m_global_regs[1] >> 21) & 0xf)])
-#define DST_CODE                ((op & 0xf0) >> 4)
-#define SRC_CODE                (op & 0x0f)
-#define SR_CODE                 (1 << 1)
+#define FE_FP ((m_cpu->m_core->global_regs[1] & 0xfe000000) >> 25)
+#define FE_FL (m_cpu->m_core->fl_lut[((m_cpu->m_core->global_regs[1] >> 21) & 0xf)])
+#define FE_DST_CODE ((op & 0xf0) >> 4)
+#define FE_SRC_CODE (op & 0x0f)
+#define SR_CODE     (1 << 1)
 
 /***************************************************************************
     INSTRUCTION PARSERS
@@ -46,17 +46,17 @@ inline uint32_t e132xs_frontend::imm_length(opcode_desc &desc, uint16_t op)
 
 inline uint16_t e132xs_frontend::read_word(opcode_desc &desc)
 {
-	return m_cpu->m_direct->read_word(desc.physpc, m_cpu->m_opcodexor);
+	return m_cpu->m_direct->read_word(desc.physpc, m_cpu->m_core->opcodexor);
 }
 
 inline uint16_t e132xs_frontend::read_imm1(opcode_desc &desc)
 {
-	return m_cpu->m_direct->read_word(desc.physpc + 2, m_cpu->m_opcodexor);
+	return m_cpu->m_direct->read_word(desc.physpc + 2, m_cpu->m_core->opcodexor);
 }
 
 inline uint16_t e132xs_frontend::read_imm2(opcode_desc &desc)
 {
-	return m_cpu->m_direct->read_word(desc.physpc + 4, m_cpu->m_opcodexor);
+	return m_cpu->m_direct->read_word(desc.physpc + 4, m_cpu->m_core->opcodexor);
 }
 
 inline uint32_t e132xs_frontend::read_ldstxx_imm(opcode_desc &desc)
@@ -95,10 +95,13 @@ inline uint32_t e132xs_frontend::read_limm(opcode_desc &desc, uint16_t op)
 		case 0:
 			return 16;
 		case 1:
+			desc.length = 6;
 			return (read_imm1(desc) << 16) | read_imm2(desc);
 		case 2:
+			desc.length = 4;
 			return read_imm1(desc);
 		case 3:
+			desc.length = 4;
 			return 0xffff0000 | read_imm1(desc);
 		default:
 			return immediate_values[nybble];
@@ -165,21 +168,21 @@ bool e132xs_frontend::describe(opcode_desc &desc, const opcode_desc *prev)
 
 	/* most instructions are 2 bytes and a single cycle */
 	desc.length = 2;
-	desc.cycles = m_cpu->m_clock_cycles_1;
+	desc.delayslots = 0;
 
 	const uint32_t fp = FE_FP;
-	const uint32_t gdst_code = DST_CODE;
+	const uint32_t gdst_code = FE_DST_CODE;
 	const uint32_t gdstf_code = gdst_code + 1;
-	const uint32_t gsrc_code = SRC_CODE;
+	const uint32_t gsrc_code = FE_SRC_CODE;
 	const uint32_t gsrcf_code = gsrc_code + 1;
 	const uint32_t ldst_code = (gdst_code + fp) & 0x1f;
 	const uint32_t ldstf_code = (gdstf_code + fp) & 0x1f;
 	const uint32_t lsrc_code = (gsrc_code + fp) & 0x1f;
 	const uint32_t lsrcf_code = (gsrcf_code + fp) & 0x1f;
-	const uint32_t ldst_group = 1 + (((DST_CODE + fp) & 0x20) >> 5);
-	const uint32_t ldstf_group = 1 + (((DST_CODE + fp + 1) & 0x20) >> 5);
-	const uint32_t lsrc_group = 1 + (((SRC_CODE + fp) & 0x20) >> 5);
-	const uint32_t lsrcf_group = 1 + ((SRC_CODE + fp + 1) >> 5);
+	const uint32_t ldst_group = 1 + (((FE_DST_CODE + fp) & 0x20) >> 5);
+	const uint32_t ldstf_group = 1 + (((FE_DST_CODE + fp + 1) & 0x20) >> 5);
+	const uint32_t lsrc_group = 1 + (((FE_SRC_CODE + fp) & 0x20) >> 5);
+	const uint32_t lsrcf_group = 1 + ((FE_SRC_CODE + fp + 1) >> 5);
 
 	switch (op >> 8)
 	{
@@ -218,10 +221,6 @@ bool e132xs_frontend::describe(opcode_desc &desc, const opcode_desc *prev)
 				desc.targetpc = BRANCH_TARGET_DYNAMIC;
 				desc.flags |= OPFLAG_IS_UNCONDITIONAL_BRANCH | OPFLAG_END_SEQUENCE | OPFLAG_CAN_CAUSE_EXCEPTION;
 			}
-			else
-			{
-				desc.cycles = m_cpu->m_clock_cycles_2;
-			}
 			desc.regout[0] |= SR_CODE;
 			break;
 		case 0x05: // movd global,local
@@ -237,10 +236,6 @@ bool e132xs_frontend::describe(opcode_desc &desc, const opcode_desc *prev)
 				desc.targetpc = BRANCH_TARGET_DYNAMIC;
 				desc.flags |= OPFLAG_IS_UNCONDITIONAL_BRANCH | OPFLAG_END_SEQUENCE | OPFLAG_CAN_CAUSE_EXCEPTION;
 			}
-			else
-			{
-				desc.cycles = m_cpu->m_clock_cycles_2;
-			}
 			desc.regout[0] |= SR_CODE;
 			break;
 		case 0x06: // movd local,global
@@ -250,7 +245,6 @@ bool e132xs_frontend::describe(opcode_desc &desc, const opcode_desc *prev)
 			desc.regout[ldst_group] |= 1 << ldst_code;
 			desc.regout[ldstf_group] |= 1 << ldstf_code;
 			desc.regout[0] |= SR_CODE;
-			desc.cycles = m_cpu->m_clock_cycles_2;
 			break;
 		case 0x07: // movd local,local
 			desc.regin[0] |= SR_CODE;
@@ -259,7 +253,6 @@ bool e132xs_frontend::describe(opcode_desc &desc, const opcode_desc *prev)
 			desc.regout[ldst_group] |= 1 << ldst_code;
 			desc.regout[ldstf_group] |= 1 << ldstf_code;
 			desc.regout[0] |= SR_CODE;
-			desc.cycles = m_cpu->m_clock_cycles_2;
 			break;
 		case 0x08: // divu global,global
 		case 0x0c: // divs global,global
@@ -270,7 +263,6 @@ bool e132xs_frontend::describe(opcode_desc &desc, const opcode_desc *prev)
 			desc.regout[0] |= 1 << gdst_code;
 			desc.regout[0] |= 1 << gdstf_code;
 			desc.regout[0] |= SR_CODE;
-			desc.cycles = 36 << m_cpu->m_clck_scale;
 			break;
 		case 0x09: // divu global,local
 		case 0x0d: // divs global,local
@@ -282,7 +274,6 @@ bool e132xs_frontend::describe(opcode_desc &desc, const opcode_desc *prev)
 			desc.regout[0] |= 1 << gdst_code;
 			desc.regout[0] |= 1 << gdstf_code;
 			desc.regout[0] |= SR_CODE;
-			desc.cycles = 36 << m_cpu->m_clck_scale;
 			break;
 		case 0x0a: // divu local,global
 		case 0x0e: // divs local,global
@@ -294,7 +285,6 @@ bool e132xs_frontend::describe(opcode_desc &desc, const opcode_desc *prev)
 			desc.regout[ldst_group] |= 1 << ldst_code;
 			desc.regout[ldstf_group] |= 1 << ldstf_code;
 			desc.regout[0] |= SR_CODE;
-			desc.cycles = 36 << m_cpu->m_clck_scale;
 			break;
 		case 0x0b: // divu local,local
 		case 0x0f: // divs local,local
@@ -306,7 +296,6 @@ bool e132xs_frontend::describe(opcode_desc &desc, const opcode_desc *prev)
 			desc.regout[ldst_group] |= 1 << ldst_code;
 			desc.regout[ldstf_group] |= 1 << ldstf_code;
 			desc.regout[0] |= SR_CODE;
-			desc.cycles = 36 << m_cpu->m_clck_scale;
 			break;
 		case 0x10: // xm global,global
 			desc.flags |= OPFLAG_CAN_CAUSE_EXCEPTION;
@@ -431,6 +420,15 @@ bool e132xs_frontend::describe(opcode_desc &desc, const opcode_desc *prev)
 			desc.regout[0] |= 1 << gdst_code;
 			desc.regout[0] |= SR_CODE;
 			desc.flags |= OPFLAG_CAN_CAUSE_EXCEPTION;
+			if (gdst_code == PC_REGISTER)
+			{
+				desc.targetpc = BRANCH_TARGET_DYNAMIC;
+				desc.flags |= OPFLAG_IS_UNCONDITIONAL_BRANCH | OPFLAG_END_SEQUENCE;
+			}
+			else if (gdst_code == 5) // TPR_REGISTER & 0xf
+			{
+				desc.flags |= OPFLAG_END_SEQUENCE;
+			}
 			break;
 		case 0x25: // mov global,local
 			desc.regin[0] |= SR_CODE;
@@ -438,6 +436,15 @@ bool e132xs_frontend::describe(opcode_desc &desc, const opcode_desc *prev)
 			desc.regout[0] |= 1 << gdst_code;
 			desc.regout[0] |= SR_CODE;
 			desc.flags |= OPFLAG_CAN_CAUSE_EXCEPTION;
+			if (gdst_code == PC_REGISTER)
+			{
+				desc.targetpc = BRANCH_TARGET_DYNAMIC;
+				desc.flags |= OPFLAG_IS_UNCONDITIONAL_BRANCH | OPFLAG_END_SEQUENCE;
+			}
+			else if (gdst_code == 5) // TPR_REGISTER & 0xf
+			{
+				desc.flags |= OPFLAG_END_SEQUENCE;
+			}
 			break;
 		case 0x26: // mov local,global
 			desc.regin[0] |= SR_CODE;
@@ -461,6 +468,11 @@ bool e132xs_frontend::describe(opcode_desc &desc, const opcode_desc *prev)
 			desc.regout[0] |= 1 << gdst_code;
 			desc.regout[0] |= SR_CODE;
 			if (op & 0x04) desc.flags |= OPFLAG_CAN_CAUSE_EXCEPTION; // adds, subs
+			if (gdst_code == PC_REGISTER)
+			{
+				desc.targetpc = BRANCH_TARGET_DYNAMIC;
+				desc.flags |= OPFLAG_IS_UNCONDITIONAL_BRANCH | OPFLAG_END_SEQUENCE;
+			}
 			break;
 		case 0x29: // add global,local
 		case 0x2d: // adds global,local
@@ -472,6 +484,11 @@ bool e132xs_frontend::describe(opcode_desc &desc, const opcode_desc *prev)
 			desc.regout[0] |= 1 << gdst_code;
 			desc.regout[0] |= SR_CODE;
 			if (op & 0x04) desc.flags |= OPFLAG_CAN_CAUSE_EXCEPTION; // adds, subs
+			if (gdst_code == PC_REGISTER)
+			{
+				desc.targetpc = BRANCH_TARGET_DYNAMIC;
+				desc.flags |= OPFLAG_IS_UNCONDITIONAL_BRANCH | OPFLAG_END_SEQUENCE;
+			}
 			break;
 		case 0x2a: // add local,global
 		case 0x2e: // adds local,global
@@ -503,6 +520,11 @@ bool e132xs_frontend::describe(opcode_desc &desc, const opcode_desc *prev)
 			desc.regin[0] |= 1 << gdst_code;
 			desc.regout[0] |= 1 << gdst_code;
 			desc.regout[0] |= SR_CODE;
+			if (gdst_code == PC_REGISTER)
+			{
+				desc.targetpc = BRANCH_TARGET_DYNAMIC;
+				desc.flags |= OPFLAG_IS_UNCONDITIONAL_BRANCH | OPFLAG_END_SEQUENCE;
+			}
 			break;
 		case 0x35: // andn global,local
 		case 0x39: // or global,local
@@ -513,6 +535,11 @@ bool e132xs_frontend::describe(opcode_desc &desc, const opcode_desc *prev)
 			desc.regin[0] |= 1 << gdst_code;
 			desc.regout[0] |= 1 << gdst_code;
 			desc.regout[0] |= SR_CODE;
+			if (gdst_code == PC_REGISTER)
+			{
+				desc.targetpc = BRANCH_TARGET_DYNAMIC;
+				desc.flags |= OPFLAG_IS_UNCONDITIONAL_BRANCH | OPFLAG_END_SEQUENCE;
+			}
 			break;
 		case 0x36: // andn local,global
 		case 0x3a: // or local,global
@@ -541,6 +568,11 @@ bool e132xs_frontend::describe(opcode_desc &desc, const opcode_desc *prev)
 			desc.regin[0] |= 1 << gdst_code;
 			desc.regout[0] |= 1 << gdst_code;
 			desc.regout[0] |= SR_CODE;
+			if (gdst_code == PC_REGISTER)
+			{
+				desc.targetpc = BRANCH_TARGET_DYNAMIC;
+				desc.flags |= OPFLAG_IS_UNCONDITIONAL_BRANCH | OPFLAG_END_SEQUENCE;
+			}
 			break;
 		case 0x41: // subc global,local
 		case 0x51: // addc global,local
@@ -549,6 +581,11 @@ bool e132xs_frontend::describe(opcode_desc &desc, const opcode_desc *prev)
 			desc.regin[0] |= 1 << gdst_code;
 			desc.regout[0] |= 1 << gdst_code;
 			desc.regout[0] |= SR_CODE;
+			if (gdst_code == PC_REGISTER)
+			{
+				desc.targetpc = BRANCH_TARGET_DYNAMIC;
+				desc.flags |= OPFLAG_IS_UNCONDITIONAL_BRANCH | OPFLAG_END_SEQUENCE;
+			}
 			break;
 		case 0x42: // subc local,global
 		case 0x52: // addc local,global
@@ -571,6 +608,11 @@ bool e132xs_frontend::describe(opcode_desc &desc, const opcode_desc *prev)
 			desc.regin[0] |= 1 << gsrc_code;
 			desc.regout[0] |= 1 << gdst_code;
 			desc.regout[0] |= SR_CODE;
+			if (gdst_code == PC_REGISTER)
+			{
+				desc.targetpc = BRANCH_TARGET_DYNAMIC;
+				desc.flags |= OPFLAG_IS_UNCONDITIONAL_BRANCH | OPFLAG_END_SEQUENCE;
+			}
 			break;
 		case 0x45: // not global,local
 		case 0x59: // neg global,local
@@ -578,6 +620,11 @@ bool e132xs_frontend::describe(opcode_desc &desc, const opcode_desc *prev)
 			desc.regin[lsrc_group] |= 1 << lsrc_code;
 			desc.regout[0] |= 1 << gdst_code;
 			desc.regout[0] |= SR_CODE;
+			if (gdst_code == PC_REGISTER)
+			{
+				desc.targetpc = BRANCH_TARGET_DYNAMIC;
+				desc.flags |= OPFLAG_IS_UNCONDITIONAL_BRANCH | OPFLAG_END_SEQUENCE;
+			}
 			break;
 		case 0x46: // not local,global
 		case 0x5a: // neg local,global
@@ -598,6 +645,11 @@ bool e132xs_frontend::describe(opcode_desc &desc, const opcode_desc *prev)
 			desc.regout[0] |= 1 << gdst_code;
 			desc.regout[0] |= SR_CODE;
 			desc.flags |= OPFLAG_CAN_CAUSE_EXCEPTION;
+			if (gdst_code == PC_REGISTER)
+			{
+				desc.targetpc = BRANCH_TARGET_DYNAMIC;
+				desc.flags |= OPFLAG_IS_UNCONDITIONAL_BRANCH | OPFLAG_END_SEQUENCE;
+			}
 			break;
 		case 0x5d: // negs global,local
 			desc.regin[0] |= SR_CODE;
@@ -605,6 +657,11 @@ bool e132xs_frontend::describe(opcode_desc &desc, const opcode_desc *prev)
 			desc.regout[0] |= 1 << gdst_code;
 			desc.regout[0] |= SR_CODE;
 			desc.flags |= OPFLAG_CAN_CAUSE_EXCEPTION;
+			if (gdst_code == PC_REGISTER)
+			{
+				desc.targetpc = BRANCH_TARGET_DYNAMIC;
+				desc.flags |= OPFLAG_IS_UNCONDITIONAL_BRANCH | OPFLAG_END_SEQUENCE;
+			}
 			break;
 		case 0x5e: // negs local,global
 			desc.regin[0] |= SR_CODE;
@@ -655,6 +712,10 @@ bool e132xs_frontend::describe(opcode_desc &desc, const opcode_desc *prev)
 				desc.targetpc = op & 0xf;
 				desc.flags |= OPFLAG_IS_UNCONDITIONAL_BRANCH | OPFLAG_END_SEQUENCE;
 			}
+			else if (gdst_code == 5) // TPR_REGISTER & 0xf
+			{
+				desc.flags |= OPFLAG_END_SEQUENCE;
+			}
 			break;
 		case 0x65: // movi global,limm
 			desc.regin[0] |= SR_CODE;
@@ -667,6 +728,10 @@ bool e132xs_frontend::describe(opcode_desc &desc, const opcode_desc *prev)
 			{
 				desc.targetpc = read_limm(desc, op);
 				desc.flags |= OPFLAG_IS_UNCONDITIONAL_BRANCH | OPFLAG_END_SEQUENCE;
+			}
+			else if (gdst_code == 5) // TPR_REGISTER & 0xf
+			{
+				desc.flags |= OPFLAG_END_SEQUENCE;
 			}
 			break;
 		case 0x66: // movi local,simm
@@ -703,7 +768,7 @@ bool e132xs_frontend::describe(opcode_desc &desc, const opcode_desc *prev)
 			if (op & 0x04) desc.flags |= OPFLAG_CAN_CAUSE_EXCEPTION; // addsi
 			if (gdst_code == PC_REGISTER)
 			{
-				desc.targetpc = BRANCH_TARGET_DYNAMIC;
+				desc.targetpc = desc.pc + desc.length + read_limm(desc, op);
 				desc.flags |= OPFLAG_IS_UNCONDITIONAL_BRANCH | OPFLAG_END_SEQUENCE;
 			}
 			break;
@@ -775,7 +840,6 @@ bool e132xs_frontend::describe(opcode_desc &desc, const opcode_desc *prev)
 			desc.regout[ldst_group] |= 1 << ldst_code;
 			desc.regout[ldstf_group] |= 1 << ldstf_code;
 			desc.regout[0] |= SR_CODE;
-			desc.cycles = m_cpu->m_clock_cycles_2;
 			break;
 		case 0x82: // shrd
 		case 0x86: // sard
@@ -785,7 +849,6 @@ bool e132xs_frontend::describe(opcode_desc &desc, const opcode_desc *prev)
 			desc.regout[ldst_group] |= 1 << ldst_code;
 			desc.regout[ldstf_group] |= 1 << ldstf_code;
 			desc.regout[0] |= SR_CODE;
-			desc.cycles = m_cpu->m_clock_cycles_2;
 			break;
 		case 0x83: // shr
 		case 0x87: // sar
@@ -810,7 +873,7 @@ bool e132xs_frontend::describe(opcode_desc &desc, const opcode_desc *prev)
 
 			desc.regin[0] |= 1 << gdst_code;
 			desc.regout[0] |= 1 << gsrc_code;
-			if ((imm1 & 0x3000) == 3 && (extra_s & 2)) desc.regout[0] |= 1 << gsrcf_code;
+			if ((imm1 & 0x3000) == 0x3000 && (extra_s & 2)) desc.regout[0] |= 1 << gsrcf_code;
 
 			desc.length = (imm1 & 0x8000) ? 6 : 4;
 			desc.flags |= OPFLAG_READS_MEMORY;
@@ -829,7 +892,7 @@ bool e132xs_frontend::describe(opcode_desc &desc, const opcode_desc *prev)
 			desc.regin[0] |= SR_CODE;
 			desc.regin[0] |= 1 << gdst_code;
 			desc.regout[lsrc_group] |= 1 << lsrc_code;
-			if ((imm1 & 0x3000) == 3 && (extra_s & 2)) desc.regout[lsrcf_group] |= 1 << lsrcf_code;
+			if ((imm1 & 0x3000) == 0x3000 && (extra_s & 2)) desc.regout[lsrcf_group] |= 1 << lsrcf_code;
 
 			desc.length = (imm1 & 0x8000) ? 6 : 4;
 			desc.flags |= OPFLAG_READS_MEMORY;
@@ -848,7 +911,7 @@ bool e132xs_frontend::describe(opcode_desc &desc, const opcode_desc *prev)
 			desc.regin[0] |= SR_CODE;
 			desc.regin[ldst_group] |= 1 << ldst_code;
 			desc.regout[0] |= 1 << gsrc_code;
-			if ((imm1 & 0x3000) == 3 && (extra_s & 2)) desc.regout[0] |= 1 << gsrcf_code;
+			if ((imm1 & 0x3000) == 0x3000 && (extra_s & 2)) desc.regout[0] |= 1 << gsrcf_code;
 
 			desc.length = (imm1 & 0x8000) ? 6 : 4;
 			desc.flags |= OPFLAG_READS_MEMORY;
@@ -862,7 +925,7 @@ bool e132xs_frontend::describe(opcode_desc &desc, const opcode_desc *prev)
 			desc.regin[0] |= SR_CODE;
 			desc.regin[ldst_group] |= 1 << ldst_code;
 			desc.regout[lsrc_group] |= 1 << lsrc_code;
-			if ((imm1 & 0x3000) == 3 && (extra_s & 2)) desc.regout[lsrcf_group] |= 1 << lsrcf_code;
+			if ((imm1 & 0x3000) == 0x3000 && (extra_s & 2)) desc.regout[lsrcf_group] |= 1 << lsrcf_code;
 
 			desc.length = (imm1 & 0x8000) ? 6 : 4;
 			desc.flags |= OPFLAG_READS_MEMORY;
@@ -876,7 +939,7 @@ bool e132xs_frontend::describe(opcode_desc &desc, const opcode_desc *prev)
 			desc.regin[0] |= 1 << gdst_code;
 			desc.regout[0] |= 1 << gdst_code;
 			desc.regout[0] |= 1 << gsrc_code;
-			if ((imm1 & 0x3000) == 3 && (extra_s & 2)) desc.regout[0] |= 1 << gsrcf_code;
+			if ((imm1 & 0x3000) == 0x3000 && (extra_s & 2)) desc.regout[0] |= 1 << gsrcf_code;
 
 			desc.length = (imm1 & 0x8000) ? 6 : 4;
 			desc.flags |= OPFLAG_READS_MEMORY;
@@ -896,7 +959,7 @@ bool e132xs_frontend::describe(opcode_desc &desc, const opcode_desc *prev)
 			desc.regin[0] |= 1 << gdst_code;
 			desc.regout[0] |= 1 << gdst_code;
 			desc.regout[lsrc_group] |= 1 << lsrc_code;
-			if ((imm1 & 0x3000) == 3 && (extra_s & 2)) desc.regout[lsrcf_group] |= 1 << lsrcf_code;
+			if ((imm1 & 0x3000) == 0x3000 && (extra_s & 2)) desc.regout[lsrcf_group] |= 1 << lsrcf_code;
 
 			desc.length = (imm1 & 0x8000) ? 6 : 4;
 			desc.flags |= OPFLAG_READS_MEMORY;
@@ -916,7 +979,7 @@ bool e132xs_frontend::describe(opcode_desc &desc, const opcode_desc *prev)
 			desc.regin[ldst_group] |= 1 << ldst_code;
 			desc.regout[ldst_group] |= 1 << ldst_code;
 			desc.regout[0] |= 1 << gsrc_code;
-			if ((imm1 & 0x3000) == 3 && (extra_s & 2)) desc.regout[0] |= 1 << gsrcf_code;
+			if ((imm1 & 0x3000) == 0x3000 && (extra_s & 2)) desc.regout[0] |= 1 << gsrcf_code;
 
 			desc.length = (imm1 & 0x8000) ? 6 : 4;
 			desc.flags |= OPFLAG_READS_MEMORY;
@@ -931,7 +994,7 @@ bool e132xs_frontend::describe(opcode_desc &desc, const opcode_desc *prev)
 			desc.regin[ldst_group] |= 1 << ldst_code;
 			desc.regout[ldst_group] |= 1 << ldst_code;
 			desc.regout[lsrc_group] |= 1 << lsrc_code;
-			if ((imm1 & 0x3000) == 3 && (extra_s & 2)) desc.regout[lsrcf_group] |= 1 << lsrcf_code;
+			if ((imm1 & 0x3000) == 0x3000 && (extra_s & 2)) desc.regout[lsrcf_group] |= 1 << lsrcf_code;
 
 			desc.length = (imm1 & 0x8000) ? 6 : 4;
 			desc.flags |= OPFLAG_READS_MEMORY;
@@ -944,7 +1007,7 @@ bool e132xs_frontend::describe(opcode_desc &desc, const opcode_desc *prev)
 
 			desc.regin[0] |= 1 << gdst_code;
 			desc.regin[0] |= 1 << gsrc_code;
-			if ((imm1 & 0x3000) == 3 && (extra_s & 2)) desc.regin[0] |= 1 << gsrcf_code;
+			if ((imm1 & 0x3000) == 0x3000 && (extra_s & 2)) desc.regin[0] |= 1 << gsrcf_code;
 
 			desc.length = (imm1 & 0x8000) ? 6 : 4;
 			desc.flags |= OPFLAG_WRITES_MEMORY;
@@ -958,7 +1021,7 @@ bool e132xs_frontend::describe(opcode_desc &desc, const opcode_desc *prev)
 			desc.regin[0] |= SR_CODE;
 			desc.regin[0] |= 1 << gdst_code;
 			desc.regin[lsrc_group] |= 1 << lsrc_code;
-			if ((imm1 & 0x3000) == 3 && (extra_s & 2)) desc.regin[lsrcf_group] |= 1 << lsrcf_code;
+			if ((imm1 & 0x3000) == 0x3000 && (extra_s & 2)) desc.regin[lsrcf_group] |= 1 << lsrcf_code;
 
 			desc.length = (imm1 & 0x8000) ? 6 : 4;
 			desc.flags |= OPFLAG_WRITES_MEMORY;
@@ -972,7 +1035,7 @@ bool e132xs_frontend::describe(opcode_desc &desc, const opcode_desc *prev)
 			desc.regin[0] |= SR_CODE;
 			desc.regin[ldst_group] |= 1 << ldst_code;
 			desc.regin[0] |= 1 << gsrc_code;
-			if ((imm1 & 0x3000) == 3 && (extra_s & 2)) desc.regin[0] |= 1 << gsrcf_code;
+			if ((imm1 & 0x3000) == 0x3000 && (extra_s & 2)) desc.regin[0] |= 1 << gsrcf_code;
 
 			desc.length = (imm1 & 0x8000) ? 6 : 4;
 			desc.flags |= OPFLAG_WRITES_MEMORY;
@@ -986,7 +1049,7 @@ bool e132xs_frontend::describe(opcode_desc &desc, const opcode_desc *prev)
 			desc.regin[0] |= SR_CODE;
 			desc.regin[ldst_group] |= 1 << ldst_code;
 			desc.regin[lsrc_group] |= 1 << lsrc_code;
-			if ((imm1 & 0x3000) == 3 && (extra_s & 2)) desc.regin[lsrcf_group] |= 1 << lsrcf_code;
+			if ((imm1 & 0x3000) == 0x3000 && (extra_s & 2)) desc.regin[lsrcf_group] |= 1 << lsrcf_code;
 
 			desc.length = (imm1 & 0x8000) ? 6 : 4;
 			desc.flags |= OPFLAG_WRITES_MEMORY;
@@ -999,7 +1062,7 @@ bool e132xs_frontend::describe(opcode_desc &desc, const opcode_desc *prev)
 
 			desc.regin[0] |= 1 << gdst_code;
 			desc.regin[0] |= 1 << gsrc_code;
-			if ((imm1 & 0x3000) == 3 && (extra_s & 2)) desc.regin[0] |= 1 << gsrcf_code;
+			if ((imm1 & 0x3000) == 0x3000 && (extra_s & 2)) desc.regin[0] |= 1 << gsrcf_code;
 			desc.regout[0] |= 1 << gdst_code;
 
 			desc.length = (imm1 & 0x8000) ? 6 : 4;
@@ -1014,7 +1077,7 @@ bool e132xs_frontend::describe(opcode_desc &desc, const opcode_desc *prev)
 			desc.regin[0] |= SR_CODE;
 			desc.regin[0] |= 1 << gdst_code;
 			desc.regin[lsrc_group] |= 1 << lsrc_code;
-			if ((imm1 & 0x3000) == 3 && (extra_s & 2)) desc.regin[lsrcf_group] |= 1 << lsrcf_code;
+			if ((imm1 & 0x3000) == 0x3000 && (extra_s & 2)) desc.regin[lsrcf_group] |= 1 << lsrcf_code;
 			desc.regout[0] |= 1 << gdst_code;
 
 			desc.length = (imm1 & 0x8000) ? 6 : 4;
@@ -1029,7 +1092,7 @@ bool e132xs_frontend::describe(opcode_desc &desc, const opcode_desc *prev)
 			desc.regin[0] |= SR_CODE;
 			desc.regin[ldst_group] |= 1 << ldst_code;
 			desc.regin[0] |= 1 << gsrc_code;
-			if ((imm1 & 0x3000) == 3 && (extra_s & 2)) desc.regin[0] |= 1 << gsrcf_code;
+			if ((imm1 & 0x3000) == 0x3000 && (extra_s & 2)) desc.regin[0] |= 1 << gsrcf_code;
 			desc.regout[ldst_group] |= 1 << ldst_code;
 
 			desc.length = (imm1 & 0x8000) ? 6 : 4;
@@ -1044,7 +1107,7 @@ bool e132xs_frontend::describe(opcode_desc &desc, const opcode_desc *prev)
 			desc.regin[0] |= SR_CODE;
 			desc.regin[ldst_group] |= 1 << ldst_code;
 			desc.regin[lsrc_group] |= 1 << lsrc_code;
-			if ((imm1 & 0x3000) == 3 && (extra_s & 2)) desc.regin[lsrcf_group] |= 1 << lsrcf_code;
+			if ((imm1 & 0x3000) == 0x3000 && (extra_s & 2)) desc.regin[lsrcf_group] |= 1 << lsrcf_code;
 			desc.regout[ldst_group] |= 1 << ldst_code;
 
 			desc.length = (imm1 & 0x8000) ? 6 : 4;
@@ -1081,7 +1144,6 @@ bool e132xs_frontend::describe(opcode_desc &desc, const opcode_desc *prev)
 			desc.regout[0] |= 1 << gdst_code;
 			desc.regout[0] |= 1 << gdstf_code;
 			desc.regout[0] |= SR_CODE;
-			desc.cycles = m_cpu->m_clock_cycles_4;
 			break;
 		case 0xb1: // mulu global,local
 		case 0xb5: // muls global,local
@@ -1090,7 +1152,6 @@ bool e132xs_frontend::describe(opcode_desc &desc, const opcode_desc *prev)
 			desc.regout[0] |= 1 << gdst_code;
 			desc.regout[0] |= 1 << gdstf_code;
 			desc.regout[0] |= SR_CODE;
-			desc.cycles = m_cpu->m_clock_cycles_4;
 			break;
 		case 0xb2: // mulu local,global
 		case 0xb6: // muls local,global
@@ -1099,7 +1160,6 @@ bool e132xs_frontend::describe(opcode_desc &desc, const opcode_desc *prev)
 			desc.regout[ldst_group] |= 1 << ldst_code;
 			desc.regout[ldstf_group] |= 1 << ldstf_code;
 			desc.regout[0] |= SR_CODE;
-			desc.cycles = m_cpu->m_clock_cycles_4;
 			break;
 		case 0xb3: // mulu local,local
 		case 0xb7: // muls local,local
@@ -1108,7 +1168,6 @@ bool e132xs_frontend::describe(opcode_desc &desc, const opcode_desc *prev)
 			desc.regout[ldst_group] |= 1 << ldst_code;
 			desc.regout[ldstf_group] |= 1 << ldstf_code;
 			desc.regout[0] |= SR_CODE;
-			desc.cycles = m_cpu->m_clock_cycles_4;
 			break;
 		case 0xb8: // set global (lo n)
 		case 0xb9: // set global (hi n)
@@ -1124,28 +1183,24 @@ bool e132xs_frontend::describe(opcode_desc &desc, const opcode_desc *prev)
 			desc.regin[0] |= 1 << gdst_code;
 			desc.regout[0] |= 1 << gdst_code;
 			desc.regout[0] |= SR_CODE;
-			desc.cycles = 3 << m_cpu->m_clck_scale;
 			break;
 		case 0xbd: // muls global,local
 			desc.regin[lsrc_group] |= 1 << lsrc_code;
 			desc.regin[0] |= 1 << gdst_code;
 			desc.regout[0] |= 1 << gdst_code;
 			desc.regout[0] |= SR_CODE;
-			desc.cycles = 3 << m_cpu->m_clck_scale;
 			break;
 		case 0xbe: // muls local,global
 			desc.regin[0] |= 1 << gsrc_code;
 			desc.regin[ldst_group] |= 1 << ldst_code;
 			desc.regout[ldst_group] |= 1 << ldst_code;
 			desc.regout[0] |= SR_CODE;
-			desc.cycles = 3 << m_cpu->m_clck_scale;
 			break;
 		case 0xbf: // mulu local,local
 			desc.regin[lsrc_group] |= 1 << lsrc_code;
 			desc.regin[ldst_group] |= 1 << ldst_code;
 			desc.regout[ldst_group] |= 1 << ldst_code;
 			desc.regout[0] |= SR_CODE;
-			desc.cycles = 3 << m_cpu->m_clck_scale;
 			break;
 		case 0xc0: case 0xc1: case 0xc2: case 0xc3: // software
 		case 0xc4: case 0xc5: case 0xc6: case 0xc7: // software
@@ -1165,6 +1220,7 @@ bool e132xs_frontend::describe(opcode_desc &desc, const opcode_desc *prev)
 
 			desc.regout[0] |= SR_CODE;
 
+			desc.targetpc = BRANCH_TARGET_DYNAMIC;
 			desc.flags |= OPFLAG_IS_UNCONDITIONAL_BRANCH | OPFLAG_END_SEQUENCE;
 			break;
 		}
@@ -1174,6 +1230,7 @@ bool e132xs_frontend::describe(opcode_desc &desc, const opcode_desc *prev)
 			desc.regin[lsrc_group] |= 1 << lsrc_code;
 			desc.regin[ldst_group] |= 1 << ldst_code;
 			desc.regout[0] |= (3 << 14); // global regs 14, 15
+			desc.length = 4;
 			break;
 		case 0xcf: // do
 			return false;
@@ -1248,12 +1305,14 @@ bool e132xs_frontend::describe(opcode_desc &desc, const opcode_desc *prev)
 		case 0xe0: case 0xe1: case 0xe2: case 0xe3: // dbv, dbnv, dbe, dbne - could be 4 bytes (pcrel)
 		case 0xe4: case 0xe5: case 0xe6: case 0xe7: // dbc, dbnc, dbse, dbht - could be 4 bytes (pcrel)
 		case 0xe8: case 0xe9: case 0xea: case 0xeb: // dbn, dbnn, dblt, dbgt - could be 4 bytes (pcrel)
+			decode_pcrel(desc, op);
 			desc.regin[0] |= SR_CODE;
 			desc.targetpc = BRANCH_TARGET_DYNAMIC;
-			desc.flags |= OPFLAG_IS_CONDITIONAL_BRANCH;
+			desc.flags |= OPFLAG_IS_CONDITIONAL_BRANCH | OPFLAG_END_SEQUENCE;
 			desc.delayslots = 1;
 			break;
 		case 0xec: // dbr - could be 4 bytes (pcrel)
+			decode_pcrel(desc, op);
 			desc.targetpc = BRANCH_TARGET_DYNAMIC;
 			desc.flags |= OPFLAG_IS_UNCONDITIONAL_BRANCH | OPFLAG_END_SEQUENCE;
 			desc.delayslots = 1;
@@ -1290,9 +1349,12 @@ bool e132xs_frontend::describe(opcode_desc &desc, const opcode_desc *prev)
 			desc.flags |= OPFLAG_IS_CONDITIONAL_BRANCH;
 			break;
 		case 0xfc: // br
-			desc.targetpc = (desc.pc + 2) + decode_pcrel(desc, op);
+		{
+			int32_t offset = decode_pcrel(desc, op);
+			desc.targetpc = (desc.pc + desc.length) + offset;
 			desc.flags |= OPFLAG_IS_UNCONDITIONAL_BRANCH | OPFLAG_END_SEQUENCE;
 			break;
+		}
 		case 0xfd: case 0xfe: case 0xff: // trap
 			desc.regin[0] |= SR_CODE;
 			desc.targetpc = BRANCH_TARGET_DYNAMIC;

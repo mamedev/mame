@@ -38,7 +38,7 @@ Bugs
 ***************************************************************************/
 
 /* Note: RAM is mapped dynamically in machine/aim65.c */
-static ADDRESS_MAP_START( aim65_mem, AS_PROGRAM, 8, aim65_state )
+ADDRESS_MAP_START(aim65_state::aim65_mem)
 	AM_RANGE( 0x1000, 0x3fff ) AM_NOP /* User available expansions */
 	AM_RANGE( 0x4000, 0x7fff ) AM_ROM /* 4 ROM sockets in 16K PROM/ROM module */
 	AM_RANGE( 0x8000, 0x9fff ) AM_NOP /* User available expansions */
@@ -176,7 +176,7 @@ image_init_result aim65_state::load_cart(device_image_interface &image, generic_
 }
 
 
-static MACHINE_CONFIG_START( aim65 )
+MACHINE_CONFIG_START(aim65_state::aim65)
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", M6502, AIM65_CLOCK) /* 1 MHz */
 	MCFG_CPU_PROGRAM_MAP(aim65_mem)
@@ -206,7 +206,7 @@ static MACHINE_CONFIG_START( aim65 )
 	MCFG_MOS6530n_IN_PB_CB(READ8(aim65_state, aim65_riot_b_r))
 	MCFG_MOS6530n_IRQ_CB(INPUTLINE("maincpu", M6502_IRQ_LINE))
 
-	MCFG_DEVICE_ADD("via6522_0", VIA6522, 0)
+	MCFG_DEVICE_ADD("via6522_0", VIA6522, AIM65_CLOCK)
 	MCFG_VIA6522_READPB_HANDLER(READ8(aim65_state, aim65_pb_r))
 	// in CA1 printer ready?
 	MCFG_VIA6522_WRITEPB_HANDLER(WRITE8(aim65_state, aim65_pb_w))
@@ -215,7 +215,7 @@ static MACHINE_CONFIG_START( aim65 )
 	// out CB2 turn printer on
 	MCFG_VIA6522_IRQ_HANDLER(INPUTLINE("maincpu", M6502_IRQ_LINE))
 
-	MCFG_DEVICE_ADD("via6522_1", VIA6522, 0)
+	MCFG_DEVICE_ADD("via6522_1", VIA6522, AIM65_CLOCK)
 	MCFG_VIA6522_IRQ_HANDLER(INPUTLINE("maincpu", M6502_IRQ_LINE))
 
 	MCFG_DEVICE_ADD("pia6821", PIA6821, 0)

@@ -522,20 +522,9 @@ public:
 
 	DECLARE_WRITE_LINE_MEMBER( holda_line );
 
-	template<class _Object> static devcb_base &set_ready_wr_callback(device_t &device, _Object object)
-	{
-		return downcast<mainboard8_device &>(device).m_ready.set_callback(object);
-	}
-
-	template<class _Object> static devcb_base &set_reset_wr_callback(device_t &device, _Object object)
-	{
-		return downcast<mainboard8_device &>(device).m_console_reset.set_callback(object);
-	}
-
-	template<class _Object> static devcb_base &set_hold_wr_callback(device_t &device, _Object object)
-	{
-		return downcast<mainboard8_device &>(device).m_hold_line.set_callback(object);
-	}
+	template<class Object> devcb_base &set_ready_wr_callback(Object &&cb) { return m_ready.set_callback(std::forward<Object>(cb)); }
+	template<class Object> devcb_base &set_reset_wr_callback(Object &&cb) { return m_console_reset.set_callback(std::forward<Object>(cb)); }
+	template<class Object> devcb_base &set_hold_wr_callback(Object &&cb) { return m_hold_line.set_callback(std::forward<Object>(cb)); }
 
 	void set_paddress(int address);
 
@@ -649,16 +638,16 @@ private:
 } } } // end namespace bus::ti99::internal
 
 #define MCFG_MAINBOARD8_READY_CALLBACK(_write) \
-	devcb = &bus::ti99::internal::mainboard8_device::set_ready_wr_callback(*device, DEVCB_##_write);
+	devcb = &downcast<bus::ti99::internal::mainboard8_device &>(*device).set_ready_wr_callback(DEVCB_##_write);
 
 #define MCFG_MAINBOARD8_RESET_CALLBACK(_write) \
-	devcb = &bus::ti99::internal::mainboard8_device::set_reset_wr_callback(*device, DEVCB_##_write);
+	devcb = &downcast<bus::ti99::internal::mainboard8_device &>(*device).set_reset_wr_callback(DEVCB_##_write);
 
 #define MCFG_MAINBOARD8_HOLD_CALLBACK(_write) \
-	devcb = &bus::ti99::internal::mainboard8_device::set_hold_wr_callback(*device, DEVCB_##_write);
+	devcb = &downcast<bus::ti99::internal::mainboard8_device &>(*device).set_hold_wr_callback(DEVCB_##_write);
 
 #define MCFG_OSO_INT_CALLBACK(_int) \
-	devcb = &bus::ti99::internal::oso_device::set_int_callback(*device, DEVCB##_int);
+	devcb = &downcast<bus::ti99::internal::oso_device &>(*device).set_int_callback(DEVCB##_int);
 
 DECLARE_DEVICE_TYPE_NS(TI99_MAINBOARD8, bus::ti99::internal, mainboard8_device)
 DECLARE_DEVICE_TYPE_NS(TI99_VAQUERRO, bus::ti99::internal, vaquerro_device)

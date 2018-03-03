@@ -57,18 +57,18 @@
 DEFINE_DEVICE_TYPE(ABC1600_MAC, abc1600_mac_device, "abc1600mac", "ABC 1600 MAC")
 
 
-DEVICE_ADDRESS_MAP_START( map, 8, abc1600_mac_device )
+ADDRESS_MAP_START(abc1600_mac_device::map)
 	AM_RANGE(0x00000, 0xfffff) AM_READWRITE(read, write)
 ADDRESS_MAP_END
 
 
-static ADDRESS_MAP_START( program_map, AS_PROGRAM, 8, abc1600_mac_device )
+ADDRESS_MAP_START(abc1600_mac_device::program_map)
 ADDRESS_MAP_END
 
 
-MACHINE_CONFIG_MEMBER( abc1600_mac_device::device_add_mconfig )
+MACHINE_CONFIG_START(abc1600_mac_device::device_add_mconfig)
 	MCFG_WATCHDOG_ADD("watchdog")
-	MCFG_WATCHDOG_TIME_INIT(attotime::from_msec(1600)) // XTAL_64MHz/8/10/20000/8/8
+	MCFG_WATCHDOG_TIME_INIT(attotime::from_msec(1600)) // XTAL(64'000'000)/8/10/20000/8/8
 MACHINE_CONFIG_END
 
 
@@ -107,7 +107,7 @@ const tiny_rom_entry *abc1600_mac_device::device_rom_region() const
 abc1600_mac_device::abc1600_mac_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
 	device_t(mconfig, ABC1600_MAC, tag, owner, clock),
 	device_memory_interface(mconfig, *this),
-	m_space_config("program", ENDIANNESS_LITTLE, 8, 22, 0, *ADDRESS_MAP_NAME(program_map)),
+	m_space_config("program", ENDIANNESS_LITTLE, 8, 22, 0, address_map_constructor(FUNC(abc1600_mac_device::program_map), this)),
 	m_rom(*this, "boot"),
 	m_segment_ram(*this, "segment_ram"),
 	m_page_ram(*this, "page_ram"),

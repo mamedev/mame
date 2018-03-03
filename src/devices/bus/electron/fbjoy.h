@@ -33,12 +33,11 @@ public:
 	// optional information overrides
 	virtual ioport_constructor device_input_ports() const override;
 
-	DECLARE_READ8_MEMBER(joystick_r);
+	virtual uint8_t expbus_r(address_space &space, offs_t offset, uint8_t data) override;
 
 protected:
 	// device-level overrides
 	virtual void device_start() override;
-	virtual void device_reset() override;
 
 private:
 	required_ioport m_joy;

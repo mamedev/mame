@@ -86,6 +86,9 @@ public:
 
 	u32 screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 
+	void uts20(machine_config &config);
+	void io_map(address_map &map);
+	void mem_map(address_map &map);
 protected:
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
@@ -113,7 +116,7 @@ private:
 
 READ8_MEMBER( univac_state::ram_r )
 {
-	if (BIT(m_p_parity[offset >> 3], offset & 0x07) && !machine().side_effect_disabled())
+	if (BIT(m_p_parity[offset >> 3], offset & 0x07) && !machine().side_effects_disabled())
 	{
 		LOGPARITY("parity check failed offset = %04X\n", offset);
 		m_maincpu->set_input_line(INPUT_LINE_NMI, PULSE_LINE);
@@ -185,14 +188,14 @@ WRITE8_MEMBER( univac_state::porte6_w )
 }
 
 
-static ADDRESS_MAP_START( mem_map, AS_PROGRAM, 8, univac_state )
+ADDRESS_MAP_START(univac_state::mem_map)
 	ADDRESS_MAP_UNMAP_HIGH
 	AM_RANGE( 0x0000, 0x4fff ) AM_ROM AM_REGION("roms", 0)
 	AM_RANGE( 0x8000, 0xbfff ) AM_READWRITE(bank_r, bank_w)
 	AM_RANGE( 0xc000, 0xffff ) AM_RAM_WRITE(ram_w) AM_SHARE("videoram")
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( io_map, AS_IO, 8, univac_state )
+ADDRESS_MAP_START(univac_state::io_map)
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	ADDRESS_MAP_UNMAP_HIGH
 	AM_RANGE(0x00, 0x03) AM_DEVREADWRITE("uart", z80sio_device, cd_ba_r, cd_ba_w)
@@ -306,9 +309,9 @@ static const z80_daisy_config daisy_chain[] =
 	{ nullptr }
 };
 
-static MACHINE_CONFIG_START( uts20 )
+MACHINE_CONFIG_START(univac_state::uts20)
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", Z80, XTAL_4MHz) // unknown clock
+	MCFG_CPU_ADD("maincpu", Z80, XTAL(4'000'000)) // unknown clock
 	MCFG_CPU_PROGRAM_MAP(mem_map)
 	MCFG_CPU_IO_MAP(io_map)
 	MCFG_Z80_DAISY_CHAIN(daisy_chain)
@@ -332,13 +335,13 @@ static MACHINE_CONFIG_START( uts20 )
 	MCFG_DEVCB_CHAIN_OUTPUT(DEVWRITELINE("ctc", z80ctc_device, trg2))
 	MCFG_DEVCB_CHAIN_OUTPUT(DEVWRITELINE("ctc", z80ctc_device, trg3))
 
-	MCFG_DEVICE_ADD("ctc", Z80CTC, XTAL_4MHz)
+	MCFG_DEVICE_ADD("ctc", Z80CTC, XTAL(4'000'000))
 	MCFG_Z80CTC_INTR_CB(INPUTLINE("maincpu", INPUT_LINE_IRQ0))
 	MCFG_Z80CTC_ZC1_CB(DEVWRITELINE("uart", z80sio_device, txca_w))
 	MCFG_DEVCB_CHAIN_OUTPUT(DEVWRITELINE("uart", z80sio_device, rxca_w))
 	MCFG_Z80CTC_ZC2_CB(DEVWRITELINE("uart", z80sio_device, rxtxcb_w))
 
-	MCFG_DEVICE_ADD("uart", Z80SIO, XTAL_4MHz)
+	MCFG_DEVICE_ADD("uart", Z80SIO, XTAL(4'000'000))
 	MCFG_Z80SIO_OUT_INT_CB(INPUTLINE("maincpu", INPUT_LINE_IRQ0))
 	MCFG_Z80SIO_OUT_TXDA_CB(DEVWRITELINE("uart", z80sio_device, rxa_w)) // FIXME: hacked in permanent loopback to pass test
 	MCFG_Z80SIO_OUT_TXDB_CB(DEVWRITELINE("uart", z80sio_device, rxb_w)) // FIXME: hacked in permanent loopback to pass test

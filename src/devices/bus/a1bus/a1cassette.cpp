@@ -36,7 +36,7 @@ ROM_END
 
 /* sound output */
 
-MACHINE_CONFIG_MEMBER( a1bus_cassette_device::device_add_mconfig )
+MACHINE_CONFIG_START(a1bus_cassette_device::device_add_mconfig)
 	MCFG_CASSETTE_ADD("cassette")
 	MCFG_CASSETTE_DEFAULT_STATE(CASSETTE_STOPPED)
 	MCFG_CASSETTE_INTERFACE("apple1_cass")

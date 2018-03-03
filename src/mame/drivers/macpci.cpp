@@ -60,7 +60,7 @@ READ64_MEMBER( macpci_state::unk2_r )
 	return 0;
 }
 
-static ADDRESS_MAP_START(pippin_mem, AS_PROGRAM, 64, macpci_state)
+ADDRESS_MAP_START(macpci_state::pippin_mem)
 	AM_RANGE(0x00000000, 0x005fffff) AM_RAM
 
 	/* writes at 0x0*c01000 the string "Mr. Kesh" and wants it to be read back, true color VRAMs perhaps? */
@@ -89,7 +89,7 @@ uint32_t macpci_state::screen_update_pippin(screen_device &screen, bitmap_ind16 
 	return 0;
 }
 
-static MACHINE_CONFIG_START( pippin )
+MACHINE_CONFIG_START(macpci_state::pippin)
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", PPC603, 66000000)
 	MCFG_CPU_PROGRAM_MAP(pippin_mem)

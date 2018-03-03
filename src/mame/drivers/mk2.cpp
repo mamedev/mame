@@ -80,11 +80,13 @@ public:
 	uint8_t m_led[5];
 	virtual void machine_start() override;
 	TIMER_DEVICE_CALLBACK_MEMBER(update_leds);
+	void mk2(machine_config &config);
+	void mk2_mem(address_map &map);
 };
 
 
 // only lower 12 address bits on bus!
-static ADDRESS_MAP_START(mk2_mem , AS_PROGRAM, 8, mk2_state)
+ADDRESS_MAP_START(mk2_state::mk2_mem)
 	AM_RANGE( 0x0000, 0x01ff) AM_RAM // 2 2111, should be mirrored
 	AM_RANGE( 0x0b00, 0x0b0f) AM_DEVREADWRITE("miot", mos6530_device, read, write)
 	AM_RANGE( 0x0b80, 0x0bbf) AM_RAM // rriot ram
@@ -187,7 +189,7 @@ WRITE8_MEMBER( mk2_state::mk2_write_b )
 }
 
 
-static MACHINE_CONFIG_START( mk2 )
+MACHINE_CONFIG_START(mk2_state::mk2)
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", M6504, 1000000)
 	MCFG_CPU_PROGRAM_MAP(mk2_mem)
@@ -224,6 +226,6 @@ ROM_END
 ***************************************************************************/
 
 
-//    YEAR  NAME    PARENT  COMPAT  MACHINE  INPUT  CLASS      INIT  COMPANY  FULLNAME                FLAGS
-CONS( 1979, ccmk2,  0,      0,      mk2,     mk2,   mk2_state, 0,    "Novag", "Chess Champion MK II", 0 )
+//    YEAR  NAME    PARENT  COMPAT  MACHINE  INPUT  CLASS      INIT  COMPANY  FULLNAME                 FLAGS
+CONS( 1979, ccmk2,  0,      0,      mk2,     mk2,   mk2_state, 0,    "Novag", "Chess Champion: MK II", 0 )
 // second design sold (same computer/program?)

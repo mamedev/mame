@@ -241,7 +241,7 @@ WRITE16_MEMBER( atarisy2_state::videoram_w )
 
 	/* alpharam? */
 	if (offs < 0x0c00)
-		m_alpha_tilemap->write(space, offs, data, mem_mask);
+		m_alpha_tilemap->write16(space, offs, data, mem_mask);
 
 	/* spriteram? */
 	else if (offs < 0x1000)
@@ -254,7 +254,7 @@ WRITE16_MEMBER( atarisy2_state::videoram_w )
 
 	/* playfieldram? */
 	else if (offs >= 0x2000)
-		m_playfield_tilemap->write(space, offs - 0x2000, data, mem_mask);
+		m_playfield_tilemap->write16(space, offs - 0x2000, data, mem_mask);
 
 	/* generic case */
 	else

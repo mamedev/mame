@@ -78,6 +78,9 @@ public:
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
 	void intel82439tx_init();
+	void xtom3d(machine_config &config);
+	void xtom3d_io(address_map &map);
+	void xtom3d_map(address_map &map);
 };
 
 // Intel 82439TX System Controller (MTXC)
@@ -343,7 +346,7 @@ WRITE32_MEMBER(xtom3d_state::bios_ram_w)
 	}
 }
 
-static ADDRESS_MAP_START(xtom3d_map, AS_PROGRAM, 32, xtom3d_state)
+ADDRESS_MAP_START(xtom3d_state::xtom3d_map)
 	AM_RANGE(0x00000000, 0x0009ffff) AM_RAM
 	AM_RANGE(0x000a0000, 0x000bffff) AM_DEVREADWRITE8("vga", vga_device, mem_r, mem_w, 0xffffffff)
 	AM_RANGE(0x000c0000, 0x000c3fff) AM_ROMBANK("video_bank1") AM_WRITE(isa_ram1_w)
@@ -357,7 +360,7 @@ static ADDRESS_MAP_START(xtom3d_map, AS_PROGRAM, 32, xtom3d_state)
 	AM_RANGE(0xfffe0000, 0xffffffff) AM_ROM AM_REGION("bios", 0)    /* System BIOS */
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START(xtom3d_io, AS_IO, 32, xtom3d_state)
+ADDRESS_MAP_START(xtom3d_state::xtom3d_io)
 	AM_IMPORT_FROM(pcat32_io_common)
 
 	AM_RANGE(0x00e8, 0x00ef) AM_NOP
@@ -394,21 +397,21 @@ void xtom3d_state::machine_reset()
 	membank("video_bank2")->set_base(memregion("video_bios")->base() + 0x4000);
 }
 
-static MACHINE_CONFIG_START( xtom3d )
+MACHINE_CONFIG_START(xtom3d_state::xtom3d)
 	MCFG_CPU_ADD("maincpu", PENTIUM2, 450000000/16)  // actually Pentium II 450
 	MCFG_CPU_PROGRAM_MAP(xtom3d_map)
 	MCFG_CPU_IO_MAP(xtom3d_io)
 	MCFG_CPU_IRQ_ACKNOWLEDGE_DEVICE("pic8259_1", pic8259_device, inta_cb)
 
 
-	MCFG_FRAGMENT_ADD( pcat_common )
+	pcat_common(config);
 
 	MCFG_PCI_BUS_LEGACY_ADD("pcibus", 0)
 	MCFG_PCI_BUS_LEGACY_DEVICE(0, nullptr, intel82439tx_pci_r, intel82439tx_pci_w)
 	MCFG_PCI_BUS_LEGACY_DEVICE(7, nullptr, intel82371ab_pci_r, intel82371ab_pci_w)
 
 	/* video hardware */
-	MCFG_FRAGMENT_ADD( pcvideo_vga )
+	pcvideo_vga(config);
 MACHINE_CONFIG_END
 
 

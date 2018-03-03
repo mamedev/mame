@@ -86,7 +86,7 @@ void xyonix_state::handle_coins(int coin)
 
 READ8_MEMBER(xyonix_state::io_r)
 {
-	int regPC = space.device().safe_pc();
+	int regPC = m_maincpu->pc();
 
 	if (regPC == 0x27ba)
 		return 0x88;
@@ -137,19 +137,19 @@ READ8_MEMBER(xyonix_state::io_r)
 
 WRITE8_MEMBER(xyonix_state::io_w)
 {
-	//logerror ("xyonix_port_e0_w %02x - PC = %04x\n", data, space.device().safe_pc());
+	//logerror ("xyonix_port_e0_w %02x - PC = %04x\n", data, m_maincpu->pc());
 	m_e0_data = data;
 }
 
 /* Mem / Port Maps ***********************************************************/
 
-static ADDRESS_MAP_START( main_map, AS_PROGRAM, 8, xyonix_state )
+ADDRESS_MAP_START(xyonix_state::main_map)
 	AM_RANGE(0x0000, 0xbfff) AM_ROM
 	AM_RANGE(0xc000, 0xdfff) AM_RAM
 	AM_RANGE(0xe000, 0xffff) AM_RAM_WRITE(vidram_w) AM_SHARE("vidram")
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( port_map, AS_IO, 8, xyonix_state )
+ADDRESS_MAP_START(xyonix_state::port_map)
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	AM_RANGE(0x20, 0x20) AM_READNOP AM_DEVWRITE("sn1", sn76496_device, write)   /* SN76496 ready signal */
 	AM_RANGE(0x21, 0x21) AM_READNOP AM_DEVWRITE("sn2", sn76496_device, write)
@@ -224,7 +224,7 @@ GFXDECODE_END
 
 /* MACHINE driver *************************************************************/
 
-static MACHINE_CONFIG_START( xyonix )
+MACHINE_CONFIG_START(xyonix_state::xyonix)
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", Z80,16000000 / 4)        /* 4 MHz ? */

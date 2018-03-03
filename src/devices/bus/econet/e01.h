@@ -31,23 +31,6 @@ public:
 	// construction/destruction
 	econet_e01_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
-	DECLARE_READ8_MEMBER( read );
-	DECLARE_WRITE8_MEMBER( write );
-	DECLARE_READ8_MEMBER( ram_select_r );
-	DECLARE_WRITE8_MEMBER( floppy_w );
-	DECLARE_READ8_MEMBER( network_irq_disable_r );
-	DECLARE_WRITE8_MEMBER( network_irq_disable_w );
-	DECLARE_READ8_MEMBER( network_irq_enable_r );
-	DECLARE_WRITE8_MEMBER( network_irq_enable_w );
-	DECLARE_READ8_MEMBER( hdc_data_r );
-	DECLARE_WRITE8_MEMBER( hdc_data_w );
-	DECLARE_WRITE8_MEMBER( hdc_select_w );
-	DECLARE_WRITE8_MEMBER( hdc_irq_enable_w );
-	DECLARE_READ8_MEMBER( rtc_address_r );
-	DECLARE_WRITE8_MEMBER( rtc_address_w );
-	DECLARE_READ8_MEMBER( rtc_data_r );
-	DECLARE_WRITE8_MEMBER( rtc_data_w );
-
 protected:
 	enum
 	{
@@ -81,6 +64,22 @@ private:
 	DECLARE_WRITE_LINE_MEMBER( fdc_drq_w );
 	DECLARE_WRITE_LINE_MEMBER( scsi_bsy_w );
 	DECLARE_WRITE_LINE_MEMBER( scsi_req_w );
+	DECLARE_READ8_MEMBER( read );
+	DECLARE_WRITE8_MEMBER( write );
+	DECLARE_READ8_MEMBER( ram_select_r );
+	DECLARE_WRITE8_MEMBER( floppy_w );
+	DECLARE_READ8_MEMBER( network_irq_disable_r );
+	DECLARE_WRITE8_MEMBER( network_irq_disable_w );
+	DECLARE_READ8_MEMBER( network_irq_enable_r );
+	DECLARE_WRITE8_MEMBER( network_irq_enable_w );
+	DECLARE_READ8_MEMBER( hdc_data_r );
+	DECLARE_WRITE8_MEMBER( hdc_data_w );
+	DECLARE_WRITE8_MEMBER( hdc_select_w );
+	DECLARE_WRITE8_MEMBER( hdc_irq_enable_w );
+	DECLARE_READ8_MEMBER( rtc_address_r );
+	DECLARE_WRITE8_MEMBER( rtc_address_w );
+	DECLARE_READ8_MEMBER( rtc_data_r );
+	DECLARE_WRITE8_MEMBER( rtc_data_w );
 
 	DECLARE_FLOPPY_FORMATS(floppy_formats_afs);
 
@@ -101,6 +100,8 @@ private:
 	inline void update_interrupts();
 	inline void network_irq_enable(int enabled);
 	inline void hdc_irq_enable(int enabled);
+
+	void e01_mem(address_map &map);
 
 	// interrupt state
 	int m_adlc_ie;

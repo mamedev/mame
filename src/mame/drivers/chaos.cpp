@@ -51,6 +51,10 @@ public:
 	DECLARE_READ8_MEMBER(port90_r);
 	DECLARE_READ8_MEMBER(port91_r);
 	void kbd_put(u8 data);
+	void chaos(machine_config &config);
+	void data_map(address_map &map);
+	void io_map(address_map &map);
+	void mem_map(address_map &map);
 private:
 	uint8_t m_term_data;
 	virtual void machine_reset() override;
@@ -60,12 +64,12 @@ private:
 };
 
 
-static ADDRESS_MAP_START( mem_map, AS_PROGRAM, 8, chaos_state )
+ADDRESS_MAP_START(chaos_state::mem_map)
 	ADDRESS_MAP_UNMAP_HIGH
 	AM_RANGE(0x0000, 0x7fff) AM_RAM AM_SHARE("ram")
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( io_map, AS_IO, 8, chaos_state )
+ADDRESS_MAP_START(chaos_state::io_map)
 	ADDRESS_MAP_UNMAP_HIGH
 	AM_RANGE(0x1e, 0x1e) AM_READ(port1e_r)
 	AM_RANGE(0x1f, 0x1f) AM_READWRITE(port90_r, port1f_w)
@@ -74,7 +78,7 @@ static ADDRESS_MAP_START( io_map, AS_IO, 8, chaos_state )
 	AM_RANGE(0x92, 0x92) AM_DEVWRITE("terminal", generic_terminal_device, write)
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( data_map, AS_DATA, 8, chaos_state )
+ADDRESS_MAP_START(chaos_state::data_map)
 	AM_RANGE(S2650_DATA_PORT, S2650_DATA_PORT) AM_NOP // stops error log filling up while using debug
 ADDRESS_MAP_END
 
@@ -141,9 +145,9 @@ void chaos_state::machine_reset()
 	memcpy(m_p_ram+0x7000, ROM+0x3000, 0x1000);
 }
 
-static MACHINE_CONFIG_START( chaos )
+MACHINE_CONFIG_START(chaos_state::chaos)
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", S2650, XTAL_1MHz)
+	MCFG_CPU_ADD("maincpu", S2650, XTAL(1'000'000))
 	MCFG_CPU_PROGRAM_MAP(mem_map)
 	MCFG_CPU_IO_MAP(io_map)
 	MCFG_CPU_DATA_MAP(data_map)

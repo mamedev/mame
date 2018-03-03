@@ -78,7 +78,7 @@
 #include "speaker.h"
 
 
-#define MASTER_CLOCK        XTAL_14_31818MHz
+#define MASTER_CLOCK        XTAL(14'318'181)
 
 
 /*************************************
@@ -87,13 +87,13 @@
  *
  *************************************/
 
-void arcadecl_state::update_interrupts()
+void sparkz_state::update_interrupts()
 {
 	m_maincpu->set_input_line(4, m_scanline_int_state ? ASSERT_LINE : CLEAR_LINE);
 }
 
 
-void arcadecl_state::scanline_update(screen_device &screen, int scanline)
+void sparkz_state::scanline_update(screen_device &screen, int scanline)
 {
 	/* generate 32V signals */
 	if ((scanline & 32) == 0)
@@ -108,7 +108,7 @@ void arcadecl_state::scanline_update(screen_device &screen, int scanline)
  *
  *************************************/
 
-MACHINE_RESET_MEMBER(arcadecl_state,arcadecl)
+void sparkz_state::machine_reset()
 {
 	atarigen_state::machine_reset();
 	scanline_timer_reset(*m_screen, 32);
@@ -122,7 +122,7 @@ MACHINE_RESET_MEMBER(arcadecl_state,arcadecl)
  *
  *************************************/
 
-WRITE16_MEMBER(arcadecl_state::latch_w)
+WRITE16_MEMBER(sparkz_state::latch_w)
 {
 	/* bit layout in this register:
 
@@ -146,10 +146,10 @@ WRITE16_MEMBER(arcadecl_state::latch_w)
  *
  *************************************/
 
-static ADDRESS_MAP_START( main_map, AS_PROGRAM, 16, arcadecl_state )
+ADDRESS_MAP_START(sparkz_state::main_map)
 	AM_RANGE(0x000000, 0x0fffff) AM_ROM
 	AM_RANGE(0x200000, 0x21ffff) AM_RAM AM_SHARE("bitmap")
-	AM_RANGE(0x3c0000, 0x3c07ff) AM_DEVREADWRITE8("palette", palette_device, read, write, 0xff00) AM_SHARE("palette")
+	AM_RANGE(0x3c0000, 0x3c07ff) AM_DEVREADWRITE8("palette", palette_device, read8, write8, 0xff00) AM_SHARE("palette")
 	AM_RANGE(0x3e0000, 0x3e07ff) AM_RAM AM_SHARE("mob")
 	AM_RANGE(0x3e0800, 0x3effbf) AM_RAM
 	AM_RANGE(0x3effc0, 0x3effff) AM_RAM AM_SHARE("mob:slip")
@@ -162,7 +162,7 @@ static ADDRESS_MAP_START( main_map, AS_PROGRAM, 16, arcadecl_state )
 	AM_RANGE(0x640024, 0x640025) AM_READ_PORT("TRACKX1")
 	AM_RANGE(0x640026, 0x640027) AM_READ_PORT("TRACKY1")
 	AM_RANGE(0x640040, 0x64004f) AM_WRITE(latch_w)
-	AM_RANGE(0x640060, 0x64006f) AM_DEVWRITE("eeprom", eeprom_parallel_28xx_device, unlock_write)
+	AM_RANGE(0x640060, 0x64006f) AM_DEVWRITE("eeprom", eeprom_parallel_28xx_device, unlock_write16)
 	AM_RANGE(0x641000, 0x641fff) AM_DEVREADWRITE8("eeprom", eeprom_parallel_28xx_device, read, write, 0x00ff)
 	AM_RANGE(0x642000, 0x642001) AM_DEVREADWRITE8("oki", okim6295_device, read, write, 0xff00)
 	AM_RANGE(0x646000, 0x646fff) AM_WRITE(scanline_int_ack_w)
@@ -318,14 +318,12 @@ GFXDECODE_END
  *
  *************************************/
 
-static MACHINE_CONFIG_START( arcadecl )
+MACHINE_CONFIG_START(sparkz_state::sparkz)
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", M68000, MASTER_CLOCK)
 	MCFG_CPU_PROGRAM_MAP(main_map)
-	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", atarigen_state, video_int_gen)
-
-	MCFG_MACHINE_RESET_OVERRIDE(arcadecl_state,arcadecl)
+	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", sparkz_state, video_int_gen)
 
 	MCFG_EEPROM_2804_ADD("eeprom")
 	MCFG_EEPROM_28XX_LOCK_AFTER_WRITE(true)
@@ -338,18 +336,13 @@ static MACHINE_CONFIG_START( arcadecl )
 	MCFG_PALETTE_FORMAT(IRRRRRGGGGGBBBBB)
 	MCFG_PALETTE_MEMBITS(8)
 
-	MCFG_ATARI_MOTION_OBJECTS_ADD("mob", "screen", arcadecl_state::s_mob_config)
-	MCFG_ATARI_MOTION_OBJECTS_GFXDECODE("gfxdecode")
-
 	MCFG_SCREEN_ADD("screen", RASTER)
 	MCFG_SCREEN_VIDEO_ATTRIBUTES(VIDEO_UPDATE_BEFORE_VBLANK)
 	/* note: these parameters are from published specs, not derived */
 	/* the board uses an SOS-2 chip to generate video signals */
 	MCFG_SCREEN_RAW_PARAMS(MASTER_CLOCK/2, 456, 0+12, 336+12, 262, 0, 240)
-	MCFG_SCREEN_UPDATE_DRIVER(arcadecl_state, screen_update_arcadecl)
+	MCFG_SCREEN_UPDATE_DRIVER(sparkz_state, screen_update)
 	MCFG_SCREEN_PALETTE("palette")
-
-	MCFG_VIDEO_START_OVERRIDE(arcadecl_state,arcadecl)
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
@@ -358,8 +351,11 @@ static MACHINE_CONFIG_START( arcadecl )
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_DERIVED( sparkz, arcadecl )
-	MCFG_DEVICE_REMOVE("mob")
+MACHINE_CONFIG_START(arcadecl_state::arcadecl)
+	sparkz(config);
+
+	MCFG_ATARI_MOTION_OBJECTS_ADD("mob", "screen", arcadecl_state::s_mob_config)
+	MCFG_ATARI_MOTION_OBJECTS_GFXDECODE("gfxdecode")
 MACHINE_CONFIG_END
 
 
@@ -404,4 +400,4 @@ ROM_END
  *************************************/
 
 GAME( 1992, arcadecl, 0, arcadecl, arcadecl, arcadecl_state, 0, ROT0, "Atari Games", "Arcade Classics (prototype)", MACHINE_SUPPORTS_SAVE )
-GAME( 1992, sparkz,   0, sparkz,   sparkz,   arcadecl_state, 0, ROT0, "Atari Games", "Sparkz (prototype)",          MACHINE_SUPPORTS_SAVE )
+GAME( 1992, sparkz,   0, sparkz,   sparkz,   sparkz_state,   0, ROT0, "Atari Games", "Sparkz (prototype)",          MACHINE_SUPPORTS_SAVE )

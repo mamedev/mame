@@ -6,8 +6,8 @@
  *
  ****************************************************************************/
 
-#ifndef TI89_H_
-#define TI89_H_
+#ifndef MAME_INCLUDES_TI89_H
+#define MAME_INCLUDES_TI89_H
 
 #include "machine/intelfsh.h"
 #include "machine/timer.h"
@@ -85,6 +85,16 @@ public:
 	DECLARE_PALETTE_INIT(ti68k);
 	DECLARE_INPUT_CHANGED_MEMBER(ti68k_on_key);
 	TIMER_DEVICE_CALLBACK_MEMBER(ti68k_timer_callback);
+	void v200(machine_config &config);
+	void ti92(machine_config &config);
+	void ti89(machine_config &config);
+	void ti92p(machine_config &config);
+	void ti89t(machine_config &config);
+	void ti89_mem(address_map &map);
+	void ti89t_mem(address_map &map);
+	void ti92_mem(address_map &map);
+	void ti92p_mem(address_map &map);
+	void v200_mem(address_map &map);
 };
 
-#endif // TI89_H_
+#endif // MAME_INCLUDES_TI89_H

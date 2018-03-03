@@ -45,9 +45,9 @@ void m6510_device::device_start()
 	write_port.resolve_safe();
 
 	if(direct_disabled)
-		mintf = new mi_6510_nd(this);
+		mintf = std::make_unique<mi_6510_nd>(this);
 	else
-		mintf = new mi_6510_normal(this);
+		mintf = std::make_unique<mi_6510_normal>(this);
 
 	init();
 

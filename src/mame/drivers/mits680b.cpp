@@ -37,6 +37,8 @@ public:
 
 	DECLARE_READ8_MEMBER(status_check_r);
 
+	void mits680b(machine_config &config);
+	void mem_map(address_map &map);
 private:
 	required_device<cpu_device> m_maincpu;
 };
@@ -47,7 +49,7 @@ READ8_MEMBER( mits680b_state::status_check_r )
 }
 
 
-static ADDRESS_MAP_START(mem_map, AS_PROGRAM, 8, mits680b_state)
+ADDRESS_MAP_START(mits680b_state::mem_map)
 	ADDRESS_MAP_UNMAP_HIGH
 	AM_RANGE(0x0000, 0x03ff) AM_RAM // 1024 bytes RAM
 	AM_RANGE(0xf000, 0xf001) AM_DEVREADWRITE("acia", acia6850_device, read, write)
@@ -60,9 +62,9 @@ static INPUT_PORTS_START( mits680b )
 INPUT_PORTS_END
 
 
-static MACHINE_CONFIG_START( mits680b )
+MACHINE_CONFIG_START(mits680b_state::mits680b)
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", M6800, XTAL_1MHz / 2)
+	MCFG_CPU_ADD("maincpu", M6800, XTAL(1'000'000) / 2)
 	MCFG_CPU_PROGRAM_MAP(mem_map)
 
 	MCFG_DEVICE_ADD("uart_clock", CLOCK, 153600)

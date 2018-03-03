@@ -299,6 +299,7 @@ void tumbleb_state::tumbleb_draw_common(screen_device &screen, bitmap_ind16 &bit
 	else
 		m_pf1_alt_tilemap->draw(screen, bitmap, cliprect, 0, 0);
 
+	m_sprgen->set_flip_screen(flip_screen() != 0);
 	m_sprgen->draw_sprites(bitmap, cliprect, m_spriteram, m_spriteram.bytes()/2);
 }
 
@@ -425,7 +426,6 @@ uint32_t tumbleb_state::screen_update_sdfight(screen_device &screen, bitmap_ind1
 
 	tumbleb_draw_common(screen, bitmap, cliprect, offs2, -16, offs, 0);
 
-	m_sprgen->draw_sprites(bitmap, cliprect, m_spriteram, m_spriteram.bytes()/2);
 	return 0;
 }
 

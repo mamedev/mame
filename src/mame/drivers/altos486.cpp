@@ -24,10 +24,9 @@ public:
 		m_rom(*this, "bios")
 	{ }
 
-	required_device<i80186_cpu_device> m_maincpu;
-	required_shared_ptr<uint16_t> m_ram;
-	required_memory_region m_rom;
+	void altos486(machine_config &config);
 
+protected:
 	DECLARE_READ8_MEMBER(read_rmx_ack);
 
 	DECLARE_READ16_MEMBER(mmu_ram_r);
@@ -36,9 +35,18 @@ public:
 	DECLARE_WRITE16_MEMBER(mmu_io_w);
 	DECLARE_FLOPPY_FORMATS(floppy_formats);
 
+	void altos486_io(address_map &map);
+	void altos486_mem(address_map &map);
+	void altos486_z80_io(address_map &map);
+	void altos486_z80_mem(address_map &map);
+
+private:
+	required_device<i80186_cpu_device> m_maincpu;
+	required_shared_ptr<uint16_t> m_ram;
+	required_memory_region m_rom;
+
 	bool m_sys_mode;
 	uint8_t m_prot[256];
-	uint16_t m_viol[16];
 };
 
 READ8_MEMBER(altos486_state::read_rmx_ack)
@@ -97,35 +105,35 @@ static SLOT_INTERFACE_START( altos486_floppies )
 	SLOT_INTERFACE( "525qd", FLOPPY_525_QD )
 SLOT_INTERFACE_END
 
-static ADDRESS_MAP_START(altos486_mem, AS_PROGRAM, 16, altos486_state)
+ADDRESS_MAP_START(altos486_state::altos486_mem)
 	ADDRESS_MAP_UNMAP_HIGH
 	AM_RANGE(0x00000, 0xfffff) AM_READWRITE(mmu_ram_r, mmu_ram_w) AM_SHARE("main_ram")
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START(altos486_io, AS_IO, 16, altos486_state)
+ADDRESS_MAP_START(altos486_state::altos486_io)
 	AM_RANGE(0x0000, 0xffff) AM_READWRITE(mmu_io_r, mmu_io_w)
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START(altos486_z80_mem, AS_PROGRAM, 8, altos486_state)
+ADDRESS_MAP_START(altos486_state::altos486_z80_mem)
 	ADDRESS_MAP_UNMAP_HIGH
 	AM_RANGE(0x0000, 0x0fff) AM_ROM AM_REGION("iocpu", 0)
 	AM_RANGE(0x2000, 0x27ff) AM_RAM
 	//AM_RANGE(0x8000, 0xffff) AM_READWRITE(z80_shared_r, z80_shared_w)
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START(altos486_z80_io, AS_IO, 8, altos486_state)
+ADDRESS_MAP_START(altos486_state::altos486_z80_io)
 	//AM_RANGE(0x00, 0x03) AM_DEVREADWRITE("sio0", z80sio0_device, read, write)
 	//AM_RANGE(0x04, 0x07) AM_DEVREADWRITE("sio1", z80sio0_device, read, write)
 	//AM_RANGE(0x08, 0x0b) AM_DEVREADWRITE("sio2", z80sio0_device, read, write)
 ADDRESS_MAP_END
 
-static MACHINE_CONFIG_START( altos486 )
-	MCFG_CPU_ADD("maincpu", I80186, XTAL_8MHz)
+MACHINE_CONFIG_START(altos486_state::altos486)
+	MCFG_CPU_ADD("maincpu", I80186, XTAL(8'000'000))
 	MCFG_CPU_PROGRAM_MAP(altos486_mem)
 	MCFG_CPU_IO_MAP(altos486_io)
 	MCFG_CPU_IRQ_ACKNOWLEDGE_DEVICE("pic8259", pic8259_device, inta_cb) // yes, really
 
-	MCFG_CPU_ADD("iocpu", Z80, XTAL_8MHz / 2)
+	MCFG_CPU_ADD("iocpu", Z80, XTAL(8'000'000) / 2)
 	MCFG_CPU_PROGRAM_MAP(altos486_z80_mem)
 	MCFG_CPU_IO_MAP(altos486_z80_io)
 
@@ -164,7 +172,7 @@ static MACHINE_CONFIG_START( altos486 )
 	MCFG_Z80DART_OUT_RTSA_CB(DEVWRITELINE("rs232_lp", rs232_port_device, write_rts))
 	//MCFG_Z80DART_OUT_INT_CB(WRITELINE(altos486_state, sio_interrupt))
 
-	MCFG_DEVICE_ADD("i8274", I8274, XTAL_16MHz/4)
+	MCFG_DEVICE_ADD("i8274", I8274, XTAL(16'000'000)/4)
 	MCFG_Z80DART_OUT_TXDA_CB(DEVWRITELINE("rs422_wn", rs232_port_device, write_txd))
 	MCFG_Z80DART_OUT_DTRA_CB(DEVWRITELINE("rs422_wn", rs232_port_device, write_dtr))
 	MCFG_Z80DART_OUT_RTSA_CB(DEVWRITELINE("rs422_wn", rs232_port_device, write_rts))
@@ -202,13 +210,13 @@ static MACHINE_CONFIG_START( altos486 )
 	MCFG_RS232_CTS_HANDLER(DEVWRITELINE("i8274", z80dart_device, ctsa_w))
 
 	MCFG_DEVICE_ADD("pit0", PIT8253, 0)
-	MCFG_PIT8253_CLK0(XTAL_22_1184MHz/18)
-	MCFG_PIT8253_CLK1(XTAL_22_1184MHz/144)
-	MCFG_PIT8253_CLK2(XTAL_22_1184MHz/18)
+	MCFG_PIT8253_CLK0(XTAL(22'118'400)/18)
+	MCFG_PIT8253_CLK1(XTAL(22'118'400)/144)
+	MCFG_PIT8253_CLK2(XTAL(22'118'400)/18)
 	MCFG_DEVICE_ADD("pit1", PIT8253, 0)
-	MCFG_PIT8253_CLK0(XTAL_22_1184MHz/18)
-	MCFG_PIT8253_CLK1(XTAL_22_1184MHz/144)
-	MCFG_PIT8253_CLK2(XTAL_22_1184MHz/18)
+	MCFG_PIT8253_CLK0(XTAL(22'118'400)/18)
+	MCFG_PIT8253_CLK1(XTAL(22'118'400)/144)
+	MCFG_PIT8253_CLK2(XTAL(22'118'400)/18)
 MACHINE_CONFIG_END
 
 

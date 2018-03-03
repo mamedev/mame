@@ -165,6 +165,9 @@ public:
 	DECLARE_WRITE8_MEMBER(irl_w);
 	DECLARE_WRITE8_MEMBER(halt_w);
 
+	void hp85(machine_config &config);
+	void cpu_mem_map(address_map &map);
+	void rombank_mem_map(address_map &map);
 protected:
 	required_device<capricorn_cpu_device> m_cpu;
 	required_device<screen_device> m_screen;
@@ -1296,7 +1299,7 @@ static INPUT_PORTS_START(hp85)
 
 INPUT_PORTS_END
 
-static ADDRESS_MAP_START(cpu_mem_map , AS_PROGRAM , 8 , hp85_state)
+ADDRESS_MAP_START(hp85_state::cpu_mem_map)
 	ADDRESS_MAP_UNMAP_HIGH
 	AM_RANGE(0x0000 , 0x5fff) AM_ROM
 	AM_RANGE(0x6000 , 0x7fff) AM_DEVICE("rombank" , address_map_bank_device , amap8)
@@ -1317,13 +1320,13 @@ static ADDRESS_MAP_START(cpu_mem_map , AS_PROGRAM , 8 , hp85_state)
 	AM_RANGE(0xff40 , 0xff40) AM_READWRITE(intrsc_r , intrsc_w)
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START(rombank_mem_map , AS_PROGRAM , 8 , hp85_state)
+ADDRESS_MAP_START(hp85_state::rombank_mem_map)
 	ADDRESS_MAP_UNMAP_HIGH
 	// ROM in bank 0 is always present (it's part of system ROMs)
 	AM_RANGE(0x0000 , 0x1fff) AM_ROM
 ADDRESS_MAP_END
 
-static MACHINE_CONFIG_START(hp85)
+MACHINE_CONFIG_START(hp85_state::hp85)
 	MCFG_CPU_ADD("cpu" , HP_CAPRICORN , MASTER_CLOCK / 16)
 	MCFG_CPU_PROGRAM_MAP(cpu_mem_map)
 	MCFG_CPU_IRQ_ACKNOWLEDGE_DRIVER(hp85_state , irq_callback)

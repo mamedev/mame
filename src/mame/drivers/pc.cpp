@@ -371,33 +371,64 @@ public:
 	DECLARE_INPUT_CHANGED_MEMBER(pc_turbo_callback);
 
 	double m_turbo_off_speed;
+
+	static void cfg_dual_720K(device_t *device);
+	static void cfg_single_360K(device_t *device);
+	static void cfg_single_720K(device_t *device);
+
+	void ataripc1(machine_config &config);
+	void ncrpc4i(machine_config &config);
+	void kaypro16(machine_config &config);
+	void epc(machine_config &config);
+	void m15(machine_config &config);
+	void bondwell(machine_config &config);
+	void siemens(machine_config &config);
+	void iskr3104(machine_config &config);
+	void poisk2(machine_config &config);
+	void dgone(machine_config &config);
+	void pccga(machine_config &config);
+	void mk88(machine_config &config);
+	void eppc(machine_config &config);
+	void olytext30(machine_config &config);
+	void laser_xt3(machine_config &config);
+	void zenith(machine_config &config);
+	void eagle1600(machine_config &config);
+	void laser_turbo_xt(machine_config &config);
+	void ibm5550(machine_config &config);
+	void epc_io(address_map &map);
+	void ibm5550_io(address_map &map);
+	void pc16_io(address_map &map);
+	void pc16_map(address_map &map);
+	void pc8_io(address_map &map);
+	void pc8_map(address_map &map);
+	void zenith_map(address_map &map);
 };
 
-static ADDRESS_MAP_START( pc8_map, AS_PROGRAM, 8, pc_state )
+ADDRESS_MAP_START(pc_state::pc8_map)
 	ADDRESS_MAP_UNMAP_HIGH
 	AM_RANGE(0xf0000, 0xfffff) AM_ROM AM_REGION("bios", 0)
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( zenith_map, AS_PROGRAM, 8, pc_state )
+ADDRESS_MAP_START(pc_state::zenith_map)
 	ADDRESS_MAP_UNMAP_HIGH
 	AM_RANGE(0xf0000, 0xf7fff) AM_RAM
 	AM_RANGE(0xf8000, 0xfffff) AM_ROM AM_REGION("bios", 0x8000)
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( pc16_map, AS_PROGRAM, 16, pc_state )
+ADDRESS_MAP_START(pc_state::pc16_map)
 	ADDRESS_MAP_UNMAP_HIGH
 	AM_RANGE(0xf0000, 0xfffff) AM_ROM AM_REGION("bios", 0)
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START(pc8_io, AS_IO, 8, pc_state )
+ADDRESS_MAP_START(pc_state::pc8_io)
 	ADDRESS_MAP_UNMAP_HIGH
 	AM_RANGE(0x0000, 0x00ff) AM_DEVICE("mb", ibm5160_mb_device, map)
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START(pc16_io, AS_IO, 16, pc_state )
+ADDRESS_MAP_START(pc_state::pc16_io)
 	ADDRESS_MAP_UNMAP_HIGH
-	AM_RANGE(0x0070, 0x007f) AM_RAM // needed for Poisk-2
 	AM_RANGE(0x0000, 0x00ff) AM_DEVICE8("mb", ibm5160_mb_device, map, 0xffff)
+	AM_RANGE(0x0070, 0x007f) AM_RAM // needed for Poisk-2
 ADDRESS_MAP_END
 
 READ8_MEMBER(pc_state::unk_r)
@@ -405,17 +436,17 @@ READ8_MEMBER(pc_state::unk_r)
 	return 0;
 }
 
-static ADDRESS_MAP_START(ibm5550_io, AS_IO, 16, pc_state )
+ADDRESS_MAP_START(pc_state::ibm5550_io)
 	ADDRESS_MAP_UNMAP_HIGH
-	AM_RANGE(0x00a0, 0x00a1) AM_READ8(unk_r, 0x00ff )
 	AM_RANGE(0x0000, 0x00ff) AM_DEVICE8("mb", ibm5160_mb_device, map, 0xffff)
+	AM_RANGE(0x00a0, 0x00a1) AM_READ8(unk_r, 0x00ff )
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START(epc_io, AS_IO, 8, pc_state)
+ADDRESS_MAP_START(pc_state::epc_io)
 	ADDRESS_MAP_UNMAP_HIGH
+	AM_RANGE(0x0000, 0x00ff) AM_DEVICE("mb", ibm5160_mb_device, map)
 	AM_RANGE(0x0070, 0x0070) AM_DEVREADWRITE("i8251", i8251_device, data_r, data_w)
 	AM_RANGE(0x0071, 0x0071) AM_DEVREADWRITE("i8251", i8251_device, status_r, control_w)
-	AM_RANGE(0x0000, 0x00ff) AM_DEVICE("mb", ibm5160_mb_device, map)
 ADDRESS_MAP_END
 
 INPUT_CHANGED_MEMBER(pc_state::pc_turbo_callback)
@@ -479,7 +510,7 @@ DEVICE_INPUT_DEFAULTS_END
 	MCFG_CPU_IRQ_ACKNOWLEDGE_DEVICE("mb:pic8259", pic8259_device, inta_cb)
 
 
-static MACHINE_CONFIG_START( pccga )
+MACHINE_CONFIG_START(pc_state::pccga)
 	/* basic machine hardware */
 	MCFG_CPU_PC(pc8, pc8, I8088, 4772720)   /* 4,77 MHz */
 
@@ -503,36 +534,36 @@ static MACHINE_CONFIG_START( pccga )
 	MCFG_SOFTWARE_LIST_ADD("disk_list","ibm5150")
 MACHINE_CONFIG_END
 
+void pc_state::cfg_dual_720K(device_t *device)
+{
+	dynamic_cast<device_slot_interface &>(*device->subdevice("fdc:0")).set_default_option("35dd");
+	dynamic_cast<device_slot_interface &>(*device->subdevice("fdc:1")).set_default_option("35dd");
+}
 
-static MACHINE_CONFIG_START( cfg_dual_720K )
-	MCFG_DEVICE_MODIFY("fdc:0")
-	MCFG_SLOT_DEFAULT_OPTION("35dd")
-	MCFG_DEVICE_MODIFY("fdc:1")
-	MCFG_SLOT_DEFAULT_OPTION("35dd")
-MACHINE_CONFIG_END
+void pc_state::cfg_single_360K(device_t *device)
+{
+	dynamic_cast<device_slot_interface &>(*device->subdevice("fdc:0")).set_default_option("525dd");
+	dynamic_cast<device_slot_interface &>(*device->subdevice("fdc:0")).set_fixed(true);
+	dynamic_cast<device_slot_interface &>(*device->subdevice("fdc:1")).set_default_option("");
+}
 
-static MACHINE_CONFIG_START( cfg_single_360K )
-	MCFG_DEVICE_MODIFY("fdc:0")
-	MCFG_SLOT_DEFAULT_OPTION("525dd")
-	MCFG_SLOT_FIXED(true)
-	MCFG_DEVICE_REMOVE("fdc:1")
-MACHINE_CONFIG_END
-
-static MACHINE_CONFIG_START( cfg_single_720K )
-	MCFG_DEVICE_MODIFY("fdc:0")
-	MCFG_SLOT_DEFAULT_OPTION("35dd")
-	MCFG_SLOT_FIXED(true)
-	MCFG_DEVICE_REMOVE("fdc:1")
-MACHINE_CONFIG_END
+void pc_state::cfg_single_720K(device_t *device)
+{
+	dynamic_cast<device_slot_interface &>(*device->subdevice("fdc:0")).set_default_option("35dd");
+	dynamic_cast<device_slot_interface &>(*device->subdevice("fdc:0")).set_fixed(true);
+	dynamic_cast<device_slot_interface &>(*device->subdevice("fdc:1")).set_default_option("");
+}
 
 //Data General One
-static MACHINE_CONFIG_DERIVED( dgone, pccga )
+MACHINE_CONFIG_START(pc_state::dgone)
+	pccga(config);
 	MCFG_DEVICE_MODIFY("isa2")
 	MCFG_SLOT_OPTION_MACHINE_CONFIG("fdc_xt", cfg_dual_720K)
 MACHINE_CONFIG_END
 
 // Ericsson Information System
-static MACHINE_CONFIG_DERIVED( epc, pccga )
+MACHINE_CONFIG_START(pc_state::epc)
+	pccga(config);
 	MCFG_DEVICE_REMOVE("maincpu")
 	MCFG_CPU_PC(pc8, epc, I8088, 4772720)
 	MCFG_DEVICE_MODIFY("isa1")
@@ -540,7 +571,8 @@ static MACHINE_CONFIG_DERIVED( epc, pccga )
 	MCFG_DEVICE_ADD("i8251", I8251, 0) // clock?
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_DERIVED( eppc, pccga )
+MACHINE_CONFIG_START(pc_state::eppc)
+	pccga(config);
 MACHINE_CONFIG_END
 
 // Bondwell BW230
@@ -553,7 +585,8 @@ static INPUT_PORTS_START( bondwell )
 	PORT_DIPSETTING(    0x02, "On (12 MHz)" )
 INPUT_PORTS_END
 
-static MACHINE_CONFIG_DERIVED(bondwell, pccga)
+MACHINE_CONFIG_START(pc_state::bondwell)
+	pccga(config);
 	MCFG_DEVICE_REMOVE("maincpu")
 	MCFG_CPU_PC(pc8, pc8, I8088, 4772720) // turbo?
 MACHINE_CONFIG_END
@@ -564,7 +597,7 @@ static DEVICE_INPUT_DEFAULTS_START( iskr3104 )
 	DEVICE_INPUT_DEFAULTS("DSW0", 0x30, 0x00)
 DEVICE_INPUT_DEFAULTS_END
 
-static MACHINE_CONFIG_START( iskr3104 )
+MACHINE_CONFIG_START(pc_state::iskr3104)
 	/* basic machine hardware */
 	MCFG_CPU_PC(pc16, pc16, I8086, 4772720)
 
@@ -588,7 +621,7 @@ MACHINE_CONFIG_END
 
 
 //Poisk-2
-static MACHINE_CONFIG_START( poisk2 )
+MACHINE_CONFIG_START(pc_state::poisk2)
 	/* basic machine hardware */
 	MCFG_CPU_PC(pc16, pc16, I8086, 4772720)
 
@@ -610,16 +643,17 @@ MACHINE_CONFIG_END
 
 
 //MK-88
-static MACHINE_CONFIG_DERIVED(mk88, poisk2)
+MACHINE_CONFIG_START(pc_state::mk88)
+	poisk2(config);
 	MCFG_DEVICE_MODIFY("isa1")
 	MCFG_SLOT_DEFAULT_OPTION("cga_ec1841")
 MACHINE_CONFIG_END
 
 
 // Zenith SuperSport
-static MACHINE_CONFIG_START( zenith )
+MACHINE_CONFIG_START(pc_state::zenith)
 	/* basic machine hardware */
-	MCFG_CPU_PC(zenith, pc8, I8088, XTAL_14_31818MHz/3) /* 4,77 MHz */
+	MCFG_CPU_PC(zenith, pc8, I8088, XTAL(14'318'181)/3) /* 4,77 MHz */
 
 	MCFG_IBM5150_MOTHERBOARD_ADD("mb", "maincpu")
 	MCFG_DEVICE_INPUT_DEFAULTS(pccga)
@@ -643,7 +677,8 @@ MACHINE_CONFIG_END
 
 
 //NCR PC4i
-static MACHINE_CONFIG_DERIVED ( ncrpc4i, pccga )
+MACHINE_CONFIG_START(pc_state::ncrpc4i)
+	pccga(config);
 	//MCFG_DEVICE_MODIFY("mb:isa")
 	MCFG_ISA8_SLOT_ADD("mb:isa", "isa6", pc_isa8_cards, nullptr, false)
 	MCFG_ISA8_SLOT_ADD("mb:isa", "isa7", pc_isa8_cards, nullptr, false)
@@ -659,9 +694,9 @@ static DEVICE_INPUT_DEFAULTS_START( siemens )
 	DEVICE_INPUT_DEFAULTS("DSW0", 0x30, 0x30)
 DEVICE_INPUT_DEFAULTS_END
 
-static MACHINE_CONFIG_START( siemens )
+MACHINE_CONFIG_START(pc_state::siemens)
 	/* basic machine hardware */
-	MCFG_CPU_PC(pc8, pc8, I8088, XTAL_14_31818MHz/3) /* 4,77 MHz */
+	MCFG_CPU_PC(pc8, pc8, I8088, XTAL(14'318'181)/3) /* 4,77 MHz */
 
 	MCFG_IBM5150_MOTHERBOARD_ADD("mb", "maincpu")
 	MCFG_DEVICE_INPUT_DEFAULTS(siemens)
@@ -684,7 +719,7 @@ MACHINE_CONFIG_END
 
 
 // IBM 5550
-static MACHINE_CONFIG_START( ibm5550 )
+MACHINE_CONFIG_START(pc_state::ibm5550)
 	/* basic machine hardware */
 	MCFG_CPU_PC(pc16, ibm5550, I8086, 8000000)
 
@@ -711,7 +746,8 @@ static DEVICE_INPUT_DEFAULTS_START( m15 )
 	DEVICE_INPUT_DEFAULTS("DSW0", 0x01, 0x00)
 DEVICE_INPUT_DEFAULTS_END
 
-static MACHINE_CONFIG_DERIVED(m15, pccga)
+MACHINE_CONFIG_START(pc_state::m15)
+	pccga(config);
 	MCFG_DEVICE_MODIFY("mb")
 	MCFG_DEVICE_INPUT_DEFAULTS(m15)
 	MCFG_DEVICE_MODIFY("isa2")
@@ -723,7 +759,8 @@ MACHINE_CONFIG_END
 
 
 // Atari PC1
-static MACHINE_CONFIG_DERIVED(ataripc1, pccga)
+MACHINE_CONFIG_START(pc_state::ataripc1)
+	pccga(config);
 	MCFG_DEVICE_MODIFY("isa1")
 	MCFG_SLOT_DEFAULT_OPTION("ega")
 	MCFG_DEVICE_MODIFY("isa2")
@@ -731,15 +768,16 @@ static MACHINE_CONFIG_DERIVED(ataripc1, pccga)
 MACHINE_CONFIG_END
 
 //Eagle 1600
-static MACHINE_CONFIG_DERIVED(eagle1600, pccga)
+MACHINE_CONFIG_START(pc_state::eagle1600)
+	pccga(config);
 	MCFG_DEVICE_REMOVE("maincpu")
 	MCFG_CPU_PC(pc16, pc16, I8086, 8000000)
 MACHINE_CONFIG_END
 
 
 //Laser XT/3
-static MACHINE_CONFIG_START( laser_xt3 )
-	MCFG_CPU_PC(pc8, pc8, I8088, XTAL_14_31818MHz/3) /* 4,77 MHz */
+MACHINE_CONFIG_START(pc_state::laser_xt3)
+	MCFG_CPU_PC(pc8, pc8, I8088, XTAL(14'318'181)/3) /* 4,77 MHz */
 
 	MCFG_IBM5160_MOTHERBOARD_ADD("mb","maincpu")
 	MCFG_DEVICE_INPUT_DEFAULTS(pccga)
@@ -767,8 +805,8 @@ MACHINE_CONFIG_END
 
 
 //Laser Turbo XT
-static MACHINE_CONFIG_START( laser_turbo_xt )
-	MCFG_CPU_PC(pc8, pc8, I8088, XTAL_14_31818MHz/3) /* 4,77 MHz */
+MACHINE_CONFIG_START(pc_state::laser_turbo_xt)
+	MCFG_CPU_PC(pc8, pc8, I8088, XTAL(14'318'181)/3) /* 4,77 MHz */
 
 	MCFG_IBM5160_MOTHERBOARD_ADD("mb","maincpu")
 	MCFG_DEVICE_INPUT_DEFAULTS(pccga)
@@ -795,9 +833,10 @@ static MACHINE_CONFIG_START( laser_turbo_xt )
 MACHINE_CONFIG_END
 
 //Olytext 30
-static MACHINE_CONFIG_DERIVED(olytext30, pccga)
+MACHINE_CONFIG_START(pc_state::olytext30)
+	pccga(config);
 	MCFG_DEVICE_REMOVE("maincpu")
-	MCFG_CPU_PC(pc8, pc8, V20, XTAL_14_31818MHz/3) /* 4,77 MHz */
+	MCFG_CPU_PC(pc8, pc8, V20, XTAL(14'318'181)/3) /* 4,77 MHz */
 	MCFG_DEVICE_MODIFY("isa2")
 	MCFG_SLOT_OPTION_MACHINE_CONFIG("fdc_xt", cfg_single_720K)
 	MCFG_DEVICE_MODIFY("isa3")
@@ -809,7 +848,8 @@ static MACHINE_CONFIG_DERIVED(olytext30, pccga)
 MACHINE_CONFIG_END
 
 // Kaypro 16
-static MACHINE_CONFIG_DERIVED(kaypro16, pccga)
+MACHINE_CONFIG_START(pc_state::kaypro16)
+	pccga(config);
 	MCFG_DEVICE_MODIFY("isa1")
 	MCFG_SLOT_FIXED(true)
 	MCFG_DEVICE_MODIFY("isa2")

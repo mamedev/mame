@@ -196,9 +196,9 @@
 #include "speaker.h"
 
 
-#define MAIN_CLOCK           XTAL_16MHz
-#define SEC_CLOCK            XTAL_8MHz
-#define HCGA_CLOCK           XTAL_14_31818MHz
+#define MAIN_CLOCK           XTAL(16'000'000)
+#define SEC_CLOCK            XTAL(8'000'000)
+#define HCGA_CLOCK           XTAL(14'318'181)
 
 #define PRG_CPU_CLOCK        MAIN_CLOCK /2      /* 8 MHz. (measured) */
 #define SND_CPU_CLOCK        SEC_CLOCK /2       /* 4 MHz. (measured) */
@@ -233,6 +233,11 @@ public:
 	virtual void machine_reset() override;
 	required_device<cpu_device> m_maincpu;
 
+	void _4enlinea(machine_config &config);
+	void audio_map(address_map &map);
+	void audio_portmap(address_map &map);
+	void main_map(address_map &map);
+	void main_portmap(address_map &map);
 };
 
 
@@ -345,7 +350,7 @@ READ8_MEMBER(_4enlinea_state::serial_r)
 *      Memory Map Information      *
 ***********************************/
 
-static ADDRESS_MAP_START( main_map, AS_PROGRAM, 8, _4enlinea_state )
+ADDRESS_MAP_START(_4enlinea_state::main_map)
 	AM_RANGE(0x0000, 0x7fff) AM_ROM
 //  AM_RANGE(0x8000, 0xbfff) AM_RAM // CGA VRAM
 	AM_RANGE(0xc000, 0xdfff) AM_RAM
@@ -353,7 +358,7 @@ static ADDRESS_MAP_START( main_map, AS_PROGRAM, 8, _4enlinea_state )
 	AM_RANGE(0xe000, 0xe001) AM_READ(serial_r)
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( main_portmap, AS_IO, 8, _4enlinea_state )
+ADDRESS_MAP_START(_4enlinea_state::main_portmap)
 	ADDRESS_MAP_GLOBAL_MASK(0x3ff)
 
 //  AM_RANGE(0x3d4, 0x3df) CGA regs
@@ -383,7 +388,7 @@ READ8_MEMBER(_4enlinea_state::hack_r)
 	return machine().rand();
 }
 
-static ADDRESS_MAP_START( audio_map, AS_PROGRAM, 8, _4enlinea_state )
+ADDRESS_MAP_START(_4enlinea_state::audio_map)
 	AM_RANGE(0x0000, 0x7fff) AM_ROM
 	AM_RANGE(0xf800, 0xfbff) AM_RAM
 	AM_RANGE(0xfc24, 0xfc24) AM_READ(hack_r)
@@ -395,7 +400,7 @@ static ADDRESS_MAP_START( audio_map, AS_PROGRAM, 8, _4enlinea_state )
 ADDRESS_MAP_END
 
 
-static ADDRESS_MAP_START( audio_portmap, AS_IO, 8, _4enlinea_state )
+ADDRESS_MAP_START(_4enlinea_state::audio_portmap)
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
 ADDRESS_MAP_END
 
@@ -489,7 +494,7 @@ INTERRUPT_GEN_MEMBER(_4enlinea_state::_4enlinea_audio_irq)
 	device.execute().set_input_line(0, HOLD_LINE);
 }
 
-static MACHINE_CONFIG_START( 4enlinea )
+MACHINE_CONFIG_START(_4enlinea_state::_4enlinea)
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", Z80, PRG_CPU_CLOCK)
@@ -549,5 +554,5 @@ ROM_END
 *           Game Drivers           *
 ***********************************/
 
-/*    YEAR  NAME       PARENT   MACHINE   INPUT     STATE            INIT   ROT   COMPANY       FULLNAME           FLAGS  */
-GAME( 1991, 4enlinea,  0,       4enlinea, 4enlinea, _4enlinea_state, 0,     ROT0, "Compumatic", "Cuatro en Linea", MACHINE_NOT_WORKING )
+/*    YEAR  NAME       PARENT   MACHINE    INPUT     STATE            INIT   ROT   COMPANY       FULLNAME           FLAGS  */
+GAME( 1991, 4enlinea,  0,       _4enlinea, 4enlinea, _4enlinea_state, 0,     ROT0, "Compumatic", "Cuatro en Linea", MACHINE_NOT_WORKING )

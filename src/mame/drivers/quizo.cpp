@@ -53,6 +53,9 @@ public:
 	DECLARE_PALETTE_INIT(quizo);
 
 	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	void quizo(machine_config &config);
+	void memmap(address_map &map);
+	void portmap(address_map &map);
 };
 
 
@@ -135,14 +138,14 @@ WRITE8_MEMBER(quizo_state::port60_w)
 {
 	if(data>9)
 	{
-		logerror("ROMBANK %x @ %x\n", data, space.device().safe_pc());
+		logerror("ROMBANK %x @ %x\n", data, m_maincpu->pc());
 		data=0;
 	}
 	m_port60=data;
 	membank("bank1")->set_entry(rombankLookup[data]);
 }
 
-static ADDRESS_MAP_START( memmap, AS_PROGRAM, 8, quizo_state )
+ADDRESS_MAP_START(quizo_state::memmap)
 	AM_RANGE(0x0000, 0x3fff) AM_ROM
 	AM_RANGE(0x4000, 0x47ff) AM_RAM
 	AM_RANGE(0x8000, 0xbfff) AM_ROMBANK("bank1")
@@ -150,7 +153,7 @@ static ADDRESS_MAP_START( memmap, AS_PROGRAM, 8, quizo_state )
 
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( portmap, AS_IO, 8, quizo_state )
+ADDRESS_MAP_START(quizo_state::portmap)
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	AM_RANGE(0x00, 0x00) AM_READ_PORT("IN0")
 	AM_RANGE(0x10, 0x10) AM_READ_PORT("IN1")
@@ -210,7 +213,7 @@ static INPUT_PORTS_START( quizo )
 	PORT_DIPSETTING(    0x80, DEF_STR( On ) )
 INPUT_PORTS_END
 
-static MACHINE_CONFIG_START( quizo )
+MACHINE_CONFIG_START(quizo_state::quizo)
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", Z80,XTAL1/2)
 	MCFG_CPU_PROGRAM_MAP(memmap)

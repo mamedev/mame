@@ -110,7 +110,7 @@ SETADDRESS_DBIN_MEMBER( myarc_hfdc_device::setaddress_dbin )
 {
 	// Do not allow setaddress for the debugger. It will mess up the
 	// setaddress/memory access pairs when the CPU enters wait states.
-	if (machine().side_effect_disabled()) return;
+	if (machine().side_effects_disabled()) return;
 
 	// Selection login in the PAL and some circuits on the board
 
@@ -202,7 +202,7 @@ void myarc_hfdc_device::debug_write(offs_t offset, uint8_t data)
 */
 READ8Z_MEMBER(myarc_hfdc_device::readz)
 {
-	if (machine().side_effect_disabled())
+	if (machine().side_effects_disabled())
 	{
 		debug_read(offset, value);
 		return;
@@ -281,7 +281,7 @@ READ8Z_MEMBER(myarc_hfdc_device::readz)
 */
 WRITE8_MEMBER( myarc_hfdc_device::write )
 {
-	if (machine().side_effect_disabled())
+	if (machine().side_effects_disabled())
 	{
 		debug_write(offset, data);
 		return;
@@ -1071,7 +1071,7 @@ ROM_START( ti99_hfdc )
 ROM_END
 
 
-MACHINE_CONFIG_MEMBER( myarc_hfdc_device::device_add_mconfig )
+MACHINE_CONFIG_START(myarc_hfdc_device::device_add_mconfig)
 	MCFG_DEVICE_ADD(FDC_TAG, HDC9234, 0)
 	MCFG_HDC92X4_INTRQ_CALLBACK(WRITELINE(myarc_hfdc_device, intrq_w))
 	MCFG_HDC92X4_DIP_CALLBACK(WRITELINE(myarc_hfdc_device, dip_w))

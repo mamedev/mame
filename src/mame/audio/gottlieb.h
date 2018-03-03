@@ -30,7 +30,7 @@ DECLARE_DEVICE_TYPE(GOTTLIEB_SOUND_REV2,        gottlieb_sound_r2_device)
 //**************************************************************************
 
 #define MCFG_GOTTLIEB_ENABLE_COBRAM3_MODS() \
-	gottlieb_sound_r2_device::static_enable_cobram3_mods(*device);
+	downcast<gottlieb_sound_r2_device &>(*device).enable_cobram3_mods();
 
 
 //**************************************************************************
@@ -52,6 +52,7 @@ public:
 	// internal communications
 	DECLARE_INPUT_CHANGED_MEMBER(audio_nmi);
 
+	void gottlieb_sound_r0_map(address_map &map);
 protected:
 	// device-level overrides
 	virtual void device_add_mconfig(machine_config &config) override;
@@ -85,6 +86,7 @@ public:
 	DECLARE_WRITE8_MEMBER( speech_clock_dac_w );
 	DECLARE_WRITE_LINE_MEMBER( votrax_request );
 
+	void gottlieb_sound_r1_map(address_map &map);
 protected:
 	gottlieb_sound_r1_device(
 			const machine_config &mconfig,
@@ -135,8 +137,8 @@ public:
 	// construction/destruction
 	gottlieb_sound_r2_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
-	// static configuration helpers
-	static void static_enable_cobram3_mods(device_t &device);
+	// configuration helpers
+	void enable_cobram3_mods() { m_cobram3_mod = true; }
 
 	// read/write
 	DECLARE_WRITE8_MEMBER( write );
@@ -151,6 +153,8 @@ public:
 	DECLARE_WRITE8_MEMBER( sp0250_latch_w );
 	DECLARE_WRITE8_MEMBER( psg_latch_w );
 
+	void gottlieb_sound_r2_map(address_map &map);
+	void gottlieb_speech_r2_map(address_map &map);
 protected:
 	// device-level overrides
 	virtual void device_add_mconfig(machine_config &config) override;

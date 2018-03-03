@@ -42,7 +42,7 @@ WRITE8_MEMBER(bking_state::bking_sndnmi_enable_w)
 
 WRITE8_MEMBER(bking_state::bking_soundlatch_w)
 {
-	m_soundlatch->write(space, offset, BITSWAP8(data, 0, 1, 2, 3, 4, 5, 6, 7));
+	m_soundlatch->write(space, offset, bitswap<8>(data, 0, 1, 2, 3, 4, 5, 6, 7));
 }
 
 WRITE8_MEMBER(bking_state::bking3_addr_l_w)
@@ -81,13 +81,13 @@ READ8_MEMBER(bking_state::bking3_mcu_status_r)
 		((CLEAR_LINE != m_bmcu->mcu_semaphore_r()) ? 0x02 : 0x00);
 }
 
-static ADDRESS_MAP_START( bking_map, AS_PROGRAM, 8, bking_state )
+ADDRESS_MAP_START(bking_state::bking_map)
 	AM_RANGE(0x0000, 0x7fff) AM_ROM
 	AM_RANGE(0x8000, 0x83ff) AM_RAM
 	AM_RANGE(0x9000, 0x97ff) AM_RAM_WRITE(bking_playfield_w) AM_SHARE("playfield_ram")
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( bking_io_map, AS_IO, 8, bking_state )
+ADDRESS_MAP_START(bking_state::bking_io_map)
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	AM_RANGE(0x00, 0x00) AM_READ_PORT("IN0") AM_WRITE(bking_xld1_w)
 	AM_RANGE(0x01, 0x01) AM_READ_PORT("IN1") AM_WRITE(bking_yld1_w)
@@ -106,7 +106,7 @@ static ADDRESS_MAP_START( bking_io_map, AS_IO, 8, bking_state )
 	AM_RANGE(0x07, 0x1f) AM_READ(bking_pos_r)
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( bking3_io_map, AS_IO, 8, bking_state )
+ADDRESS_MAP_START(bking_state::bking3_io_map)
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	AM_RANGE(0x00, 0x00) AM_READ_PORT("IN0") AM_WRITE(bking_xld1_w)
 	AM_RANGE(0x01, 0x01) AM_READ_PORT("IN1") AM_WRITE(bking_yld1_w)
@@ -130,7 +130,7 @@ static ADDRESS_MAP_START( bking3_io_map, AS_IO, 8, bking_state )
 	AM_RANGE(0x8f, 0x8f) AM_WRITE(bking3_addr_l_w)
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( bking_audio_map, AS_PROGRAM, 8, bking_state )
+ADDRESS_MAP_START(bking_state::bking_audio_map)
 	AM_RANGE(0x0000, 0x1fff) AM_ROM
 	AM_RANGE(0x2000, 0x2fff) AM_ROM //only bking3
 	AM_RANGE(0x4000, 0x43ff) AM_RAM
@@ -385,15 +385,15 @@ MACHINE_RESET_MEMBER(bking_state,bking3)
 	m_addr_l = 0;
 }
 
-static MACHINE_CONFIG_START( bking )
+MACHINE_CONFIG_START(bking_state::bking)
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("main_cpu", Z80, XTAL_12MHz/4) /* 3 MHz */
+	MCFG_CPU_ADD("main_cpu", Z80, XTAL(12'000'000)/4) /* 3 MHz */
 	MCFG_CPU_PROGRAM_MAP(bking_map)
 	MCFG_CPU_IO_MAP(bking_io_map)
 	MCFG_CPU_VBLANK_INT_DRIVER("screen", bking_state,  irq0_line_hold)
 
-	MCFG_CPU_ADD("audiocpu", Z80, XTAL_6MHz/2)  /* 3 MHz */
+	MCFG_CPU_ADD("audiocpu", Z80, XTAL(6'000'000)/2)  /* 3 MHz */
 	MCFG_CPU_PROGRAM_MAP(bking_audio_map)
 	/* interrupts (from Jungle King hardware, might be wrong): */
 	/* - no interrupts synced with vblank */
@@ -426,10 +426,10 @@ static MACHINE_CONFIG_START( bking )
 	MCFG_INPUT_MERGER_ALL_HIGH("soundnmi")
 	MCFG_INPUT_MERGER_OUTPUT_HANDLER(INPUTLINE("audiocpu", INPUT_LINE_NMI))
 
-	MCFG_SOUND_ADD("ay1", AY8910, XTAL_6MHz/4)
+	MCFG_SOUND_ADD("ay1", AY8910, XTAL(6'000'000)/4)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 0.25)
 
-	MCFG_SOUND_ADD("ay2", AY8910, XTAL_6MHz/4)
+	MCFG_SOUND_ADD("ay2", AY8910, XTAL(6'000'000)/4)
 	MCFG_AY8910_PORT_A_WRITE_CB(DEVWRITE8("dac", dac_byte_interface, write))
 	MCFG_AY8910_PORT_B_WRITE_CB(WRITE8(bking_state, port_b_w))
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 0.25)
@@ -439,13 +439,14 @@ static MACHINE_CONFIG_START( bking )
 	MCFG_SOUND_ROUTE_EX(0, "dac", 1.0, DAC_VREF_POS_INPUT) MCFG_SOUND_ROUTE_EX(0, "dac", -1.0, DAC_VREF_NEG_INPUT)
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_DERIVED( bking3, bking )
+MACHINE_CONFIG_START(bking_state::bking3)
+	bking(config);
 
 	/* basic machine hardware */
 	MCFG_CPU_MODIFY("main_cpu")
 	MCFG_CPU_IO_MAP(bking3_io_map)
 
-	MCFG_DEVICE_ADD("bmcu", TAITO68705_MCU, XTAL_3MHz)      /* xtal is 3MHz, divided by 4 internally */
+	MCFG_DEVICE_ADD("bmcu", TAITO68705_MCU, XTAL(3'000'000))      /* xtal is 3MHz, divided by 4 internally */
 
 	MCFG_MACHINE_START_OVERRIDE(bking_state,bking3)
 	MCFG_MACHINE_RESET_OVERRIDE(bking_state,bking3)

@@ -54,12 +54,12 @@ WRITE8_MEMBER(speedbal_state::coincounter_w)
 	/* unknown: (data & 0x10) and (data & 4) */
 }
 
-static ADDRESS_MAP_START( main_cpu_map, AS_PROGRAM, 8, speedbal_state )
+ADDRESS_MAP_START(speedbal_state::main_cpu_map)
 	AM_RANGE(0x0000, 0xdbff) AM_ROM
 	AM_RANGE(0xdc00, 0xdfff) AM_RAM AM_SHARE("share1") // shared with SOUND
 	AM_RANGE(0xe000, 0xe1ff) AM_RAM_WRITE(background_videoram_w) AM_SHARE("bg_videoram")
 	AM_RANGE(0xe800, 0xefff) AM_RAM_WRITE(foreground_videoram_w) AM_SHARE("fg_videoram")
-	AM_RANGE(0xf000, 0xf5ff) AM_RAM_DEVWRITE("palette", palette_device, write) AM_SHARE("palette")
+	AM_RANGE(0xf000, 0xf5ff) AM_RAM_DEVWRITE("palette", palette_device, write8) AM_SHARE("palette")
 	AM_RANGE(0xf600, 0xfeff) AM_RAM
 	AM_RANGE(0xff00, 0xffff) AM_RAM AM_SHARE("spriteram")
 ADDRESS_MAP_END
@@ -69,7 +69,7 @@ WRITE8_MEMBER(speedbal_state::maincpu_50_w)
 	//logerror("%s: maincpu_50_w %02x\n", this->machine().describe_context(), data);
 }
 
-static ADDRESS_MAP_START( main_cpu_io_map, AS_IO, 8, speedbal_state )
+ADDRESS_MAP_START(speedbal_state::main_cpu_io_map)
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	AM_RANGE(0x00, 0x00) AM_READ_PORT("DSW2")
 	AM_RANGE(0x10, 0x10) AM_READ_PORT("DSW1")
@@ -79,7 +79,7 @@ static ADDRESS_MAP_START( main_cpu_io_map, AS_IO, 8, speedbal_state )
 	AM_RANGE(0x50, 0x50) AM_WRITE(maincpu_50_w)
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( sound_cpu_map, AS_PROGRAM, 8, speedbal_state )
+ADDRESS_MAP_START(speedbal_state::sound_cpu_map)
 	AM_RANGE(0x0000, 0x7fff) AM_ROM
 	AM_RANGE(0xd800, 0xdbff) AM_RAM
 	AM_RANGE(0xdc00, 0xdfff) AM_RAM AM_SHARE("share1") // shared with MAIN CPU
@@ -117,7 +117,7 @@ WRITE8_MEMBER(speedbal_state::leds_shift_bit)
 
 
 
-static ADDRESS_MAP_START( sound_cpu_io_map, AS_IO, 8, speedbal_state )
+ADDRESS_MAP_START(speedbal_state::sound_cpu_io_map)
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	AM_RANGE(0x00, 0x01) AM_DEVREADWRITE("ymsnd", ym3812_device, read, write)
 	AM_RANGE(0x40, 0x40) AM_WRITE(leds_output_block)
@@ -258,15 +258,15 @@ GFXDECODE_END
 
 
 
-static MACHINE_CONFIG_START( speedbal )
+MACHINE_CONFIG_START(speedbal_state::speedbal)
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", Z80, XTAL_4MHz) // 4 MHz
+	MCFG_CPU_ADD("maincpu", Z80, XTAL(4'000'000)) // 4 MHz
 	MCFG_CPU_PROGRAM_MAP(main_cpu_map)
 	MCFG_CPU_IO_MAP(main_cpu_io_map)
 	MCFG_CPU_VBLANK_INT_DRIVER("screen", speedbal_state,  irq0_line_hold)
 
-	MCFG_CPU_ADD("audiocpu", Z80, XTAL_4MHz) // 4 MHz
+	MCFG_CPU_ADD("audiocpu", Z80, XTAL(4'000'000)) // 4 MHz
 	MCFG_CPU_PROGRAM_MAP(sound_cpu_map)
 	MCFG_CPU_IO_MAP(sound_cpu_io_map)
 	MCFG_CPU_PERIODIC_INT_DRIVER(speedbal_state, irq0_line_hold, 1000/2) // approximate?
@@ -288,7 +288,7 @@ static MACHINE_CONFIG_START( speedbal )
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
 
-	MCFG_SOUND_ADD("ymsnd", YM3812, XTAL_4MHz) // 4 MHz(?)
+	MCFG_SOUND_ADD("ymsnd", YM3812, XTAL(4'000'000)) // 4 MHz(?)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 MACHINE_CONFIG_END
 
@@ -301,7 +301,7 @@ DRIVER_INIT_MEMBER(speedbal_state,speedbal)
 
 	for (int i=0;i<0x200;i++)
 	{
-		int j = BITSWAP16(i, 15,14,13,12,11,10,9,8,0,1,2,3,4,5,6,7);
+		int j = bitswap<16>(i, 15,14,13,12,11,10,9,8,0,1,2,3,4,5,6,7);
 		memcpy(&temp[i*128], rom+j*128, 128);
 	}
 
@@ -380,7 +380,7 @@ DRIVER_INIT_MEMBER(speedbal_state,musicbal)
 		int bswIdx = xorMask & 3;                           // ... and the bitswap
 
 		// only bits #0, #1, #2 & #7 are affected
-		rom[i] = BITSWAP8(rom[i], swapTable[bswIdx][3], 6,5,4,3, swapTable[bswIdx][2], swapTable[bswIdx][1], swapTable[bswIdx][0]) ^ xorTable[addIdx];
+		rom[i] = bitswap<8>(rom[i], swapTable[bswIdx][3], 6,5,4,3, swapTable[bswIdx][2], swapTable[bswIdx][1], swapTable[bswIdx][0]) ^ xorTable[addIdx];
 	}
 
 	DRIVER_INIT_CALL(speedbal);

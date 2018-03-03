@@ -184,6 +184,35 @@ public:
 	DECLARE_WRITE16_MEMBER(grom_bank16_w);
 	DECLARE_WRITE16_MEMBER(display_page16_w);
 
+	void itech8_sound_ym2203(machine_config &config);
+	void itech8_sound_ym2608b(machine_config &config);
+	void itech8_sound_ym3812(machine_config &config);
+	void itech8_sound_ym3812_external(machine_config &config);
+	void itech8_core_lo(machine_config &config);
+	void itech8_core_hi(machine_config &config);
+	void grmatch(machine_config &config);
+	void rimrockn(machine_config &config);
+	void gtg2(machine_config &config);
+	void slikshot_lo(machine_config &config);
+	void slikshot_lo_noz80(machine_config &config);
+	void ninclown(machine_config &config);
+	void sstrike(machine_config &config);
+	void stratab_hi(machine_config &config);
+	void hstennis_lo(machine_config &config);
+	void wfortune(machine_config &config);
+	void stratab_lo(machine_config &config);
+	void slikshot_hi(machine_config &config);
+	void hstennis_hi(machine_config &config);
+	void gtg2_map(address_map &map);
+	void ninclown_map(address_map &map);
+	void slikz80_io_map(address_map &map);
+	void slikz80_mem_map(address_map &map);
+	void sound2203_map(address_map &map);
+	void sound2608b_map(address_map &map);
+	void sound3812_external_map(address_map &map);
+	void sound3812_map(address_map &map);
+	void tmshi_map(address_map &map);
+	void tmslo_map(address_map &map);
 protected:
 	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr) override;
 };

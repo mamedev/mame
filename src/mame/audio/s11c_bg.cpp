@@ -26,7 +26,7 @@ s11c_bg_device::s11c_bg_device(const machine_config &mconfig, const char *tag, d
 {
 }
 
-static ADDRESS_MAP_START( s11c_bg_map, AS_PROGRAM, 8, s11c_bg_device )
+ADDRESS_MAP_START(s11c_bg_device::s11c_bg_map)
 	AM_RANGE(0x0000, 0x07ff) AM_RAM
 	AM_RANGE(0x2000, 0x2001) AM_MIRROR(0x1ffe) AM_DEVREADWRITE("ym2151", ym2151_device, read, write)
 	AM_RANGE(0x4000, 0x4003) AM_MIRROR(0x1ffc) AM_DEVREADWRITE("pia40", pia6821_device, read, write)
@@ -56,12 +56,12 @@ void s11c_bg_device::data_w(uint8_t data)
 	m_pia40->portb_w(data);
 }
 
-MACHINE_CONFIG_MEMBER( s11c_bg_device::device_add_mconfig )
-	MCFG_CPU_ADD("bgcpu", M6809E, XTAL_8MHz) // MC68B09E (note: schematics show this as 8mhz/2, but games crash very quickly with that speed?)
+MACHINE_CONFIG_START(s11c_bg_device::device_add_mconfig)
+	MCFG_CPU_ADD("bgcpu", MC6809E, XTAL(8'000'000) / 4) // MC68B09E
 	MCFG_CPU_PROGRAM_MAP(s11c_bg_map)
 	MCFG_QUANTUM_TIME(attotime::from_hz(50))
 
-	MCFG_YM2151_ADD("ym2151", 3580000)
+	MCFG_YM2151_ADD("ym2151", XTAL(3'579'545)) // "3.58 MHz" on schematics and parts list
 	MCFG_YM2151_IRQ_HANDLER(WRITELINE(s11c_bg_device, ym2151_irq_w))
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, DEVICE_SELF_OWNER, 0.25)
 
@@ -95,12 +95,6 @@ void s11c_bg_device::device_reset()
 	m_cpubank->set_entry(0);
 	// reset the CPU again, so that the CPU are starting with the right vectors (otherwise sound may die on reset)
 	m_cpu->set_input_line(INPUT_LINE_RESET,PULSE_LINE);
-}
-
-void s11c_bg_device::static_set_romregion(device_t &device, const char *tag)
-{
-	s11c_bg_device &cpuboard = downcast<s11c_bg_device &>(device);
-	cpuboard.m_regiontag = tag;
 }
 
 WRITE_LINE_MEMBER( s11c_bg_device::ym2151_irq_w)

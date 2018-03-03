@@ -180,7 +180,7 @@ WRITE8_MEMBER(argus_state::bankselect_w)
 
 ***************************************************************************/
 
-static ADDRESS_MAP_START( argus_map, AS_PROGRAM, 8, argus_state )
+ADDRESS_MAP_START(argus_state::argus_map)
 	AM_RANGE(0x0000, 0x7fff) AM_ROM
 	AM_RANGE(0x8000, 0xbfff) AM_ROMBANK("mainbank")
 	AM_RANGE(0xc000, 0xc000) AM_READ_PORT("SYSTEM")
@@ -204,7 +204,7 @@ static ADDRESS_MAP_START( argus_map, AS_PROGRAM, 8, argus_state )
 	AM_RANGE(0xf800, 0xffff) AM_RAM
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( valtric_map, AS_PROGRAM, 8, argus_state )
+ADDRESS_MAP_START(argus_state::valtric_map)
 	AM_RANGE(0x0000, 0x7fff) AM_ROM
 	AM_RANGE(0x8000, 0xbfff) AM_ROMBANK("mainbank")
 	AM_RANGE(0xc000, 0xc000) AM_READ_PORT("SYSTEM")
@@ -228,7 +228,7 @@ static ADDRESS_MAP_START( valtric_map, AS_PROGRAM, 8, argus_state )
 	AM_RANGE(0xf800, 0xffff) AM_RAM
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( butasan_map, AS_PROGRAM, 8, argus_state )
+ADDRESS_MAP_START(argus_state::butasan_map)
 	AM_RANGE(0x0000, 0x7fff) AM_ROM
 	AM_RANGE(0x8000, 0xbfff) AM_ROMBANK("mainbank")
 	AM_RANGE(0xc000, 0xc000) AM_READ_PORT("SYSTEM")
@@ -255,26 +255,26 @@ static ADDRESS_MAP_START( butasan_map, AS_PROGRAM, 8, argus_state )
 	AM_RANGE(0xf680, 0xffff) AM_RAM
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( sound_map_a, AS_PROGRAM, 8, argus_state )
+ADDRESS_MAP_START(argus_state::sound_map_a)
 	AM_RANGE(0x0000, 0x7fff) AM_ROM
 	AM_RANGE(0x8000, 0x87ff) AM_RAM
 	AM_RANGE(0xc000, 0xc000) AM_DEVREAD("soundlatch", generic_latch_8_device, read)
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( sound_map_b, AS_PROGRAM, 8, argus_state )
+ADDRESS_MAP_START(argus_state::sound_map_b)
 	AM_RANGE(0x0000, 0xbfff) AM_ROM
 	AM_RANGE(0xc000, 0xc7ff) AM_RAM
 	AM_RANGE(0xe000, 0xe000) AM_DEVREAD("soundlatch", generic_latch_8_device, read)
 ADDRESS_MAP_END
 
 #if 0
-static ADDRESS_MAP_START( sound_portmap_1, AS_IO, 8, argus_state )
+ADDRESS_MAP_START(argus_state::sound_portmap_1)
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	AM_RANGE(0x00, 0x01) AM_DEVREADWRITE("ym1", ym2203_device, read, write)
 ADDRESS_MAP_END
 #endif
 
-static ADDRESS_MAP_START( sound_portmap_2, AS_IO, 8, argus_state )
+ADDRESS_MAP_START(argus_state::sound_portmap_2)
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	AM_RANGE(0x00, 0x01) AM_DEVREADWRITE("ym1", ym2203_device, read, write)
 	AM_RANGE(0x80, 0x81) AM_DEVREADWRITE("ym2", ym2203_device, read, write)
@@ -530,7 +530,7 @@ static GFXDECODE_START( butasan )
 GFXDECODE_END
 
 
-static MACHINE_CONFIG_START( argus )
+MACHINE_CONFIG_START(argus_state::argus)
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", Z80, 5000000)           /* 4 MHz */
@@ -578,7 +578,7 @@ static MACHINE_CONFIG_START( argus )
 	MCFG_SOUND_ROUTE(3, "mono", 0.50)
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_START( valtric )
+MACHINE_CONFIG_START(argus_state::valtric)
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", Z80, 5000000)           /* 5 MHz */
@@ -626,7 +626,7 @@ static MACHINE_CONFIG_START( valtric )
 	MCFG_SOUND_ROUTE(3, "mono", 0.50)
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_START( butasan )
+MACHINE_CONFIG_START(argus_state::butasan)
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", Z80, 5000000)           /* 5 MHz */
@@ -737,6 +737,9 @@ ROM_START( valtric )
 
 	ROM_REGION( 0x08000, "gfx3", 0 )    /* Text */
 	ROM_LOAD( "vt_07.bin",    0x00000, 0x08000, CRC(d5f9bfb9) SHA1(6b3f11f9b8f76c0144a109f1506d8cbb01876237) )
+
+	ROM_REGION (0x100, "proms", 0)
+	ROM_LOAD( "82s129", 0x000, 0x100, NO_DUMP ) // located on the top board
 ROM_END
 
 ROM_START( butasan ) /* English "subtitle" of Butasan for Japanese region.  Original Jaleco PCB */

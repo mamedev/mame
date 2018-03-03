@@ -84,12 +84,9 @@ protected:
 	void update_video_squelch() { set_video_squelch((m_i8049_port1 & 0x20) != 0); }
 	virtual void update_audio_squelch() { set_audio_squelch((m_i8049_port1 & 0x40) || !(m_pia.portb & 0x01), (m_i8049_port1 & 0x40) || !(m_pia.portb & 0x02)); }
 
-public:
+	// internal read/write handlers
 	DECLARE_READ8_MEMBER( i8049_pia_r );
 	DECLARE_WRITE8_MEMBER( i8049_pia_w );
-
-protected:
-	// internal read/write handlers
 	DECLARE_READ8_MEMBER( i8049_bus_r );
 	DECLARE_WRITE8_MEMBER( i8049_port1_w );
 	DECLARE_WRITE8_MEMBER( i8049_port2_w );
@@ -131,6 +128,9 @@ protected:
 	bool                m_vsync;                // live VSYNC state
 	uint8_t               m_i8049_port1;          // 8049 port 1 state
 	uint8_t               m_i8049_port2;          // 8049 port 2 state
+
+private:
+	void pr8210_portmap(address_map &map);
 };
 
 
@@ -172,14 +172,14 @@ protected:
 	virtual bool override_control() const override { return m_controlthis; }
 	virtual void update_audio_squelch() override { set_audio_squelch(m_audio_squelch, m_audio_squelch); }
 
-public:
-	DECLARE_READ8_MEMBER( i8748_data_r );
-
 private:
 	// internal read/write handlers
+	DECLARE_READ8_MEMBER( i8748_data_r );
 	DECLARE_READ8_MEMBER( i8748_port2_r );
 	DECLARE_WRITE8_MEMBER( i8748_port2_w );
 	DECLARE_READ_LINE_MEMBER( i8748_t0_r );
+
+	void simutrek_portmap(address_map &map);
 
 	// internal state
 	required_device<i8748_device> m_i8748_cpu;

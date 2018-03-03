@@ -67,6 +67,8 @@ public:
 			m_maincpu(*this, "maincpu")
 	{ }
 
+	void globalvr(machine_config &config);
+	void globalvr_map(address_map &map);
 protected:
 
 	// devices
@@ -75,7 +77,7 @@ protected:
 
 
 
-static ADDRESS_MAP_START( globalvr_map, AS_PROGRAM, 32, globalvr_state )
+ADDRESS_MAP_START(globalvr_state::globalvr_map)
 	AM_RANGE(0x00000000, 0xffffff) AM_RAM
 ADDRESS_MAP_END
 
@@ -84,7 +86,7 @@ static INPUT_PORTS_START( globalvr )
 INPUT_PORTS_END
 
 
-static MACHINE_CONFIG_START( globalvr )
+MACHINE_CONFIG_START(globalvr_state::globalvr)
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", PENTIUM, 100000000)      /* ? MHz */
 	MCFG_CPU_PROGRAM_MAP(globalvr_map)

@@ -37,7 +37,7 @@ void fastfred_state::machine_start()
 // to change if a different ROM set ever surfaces.
 READ8_MEMBER(fastfred_state::fastfred_custom_io_r)
 {
-	switch (space.device().safe_pc())
+	switch (m_maincpu->pc())
 	{
 	case 0x03c0: return 0x9d;
 	case 0x03e6: return 0x9f;
@@ -63,13 +63,13 @@ READ8_MEMBER(fastfred_state::fastfred_custom_io_r)
 	case 0x7b58: return 0x20;
 	}
 
-	logerror("Uncaught custom I/O read %04X at %04X\n", 0xc800+offset, space.device().safe_pc());
+	logerror("Uncaught custom I/O read %04X at %04X\n", 0xc800+offset, m_maincpu->pc());
 	return 0x00;
 }
 
 READ8_MEMBER(fastfred_state::flyboy_custom1_io_r)
 {
-	switch (space.device().safe_pc())
+	switch (m_maincpu->pc())
 	{
 		case 0x049d: return 0xad;   /* compare */
 		case 0x04b9:            /* compare with 0x9e ??? When ??? */
@@ -90,13 +90,13 @@ READ8_MEMBER(fastfred_state::flyboy_custom1_io_r)
 		return 0x00;
 	}
 
-	logerror("Uncaught custom I/O read %04X at %04X\n", 0xc085+offset, space.device().safe_pc());
+	logerror("Uncaught custom I/O read %04X at %04X\n", 0xc085+offset, m_maincpu->pc());
 	return 0x00;
 }
 
 READ8_MEMBER(fastfred_state::flyboy_custom2_io_r)
 {
-	switch (space.device().safe_pc())
+	switch (m_maincpu->pc())
 	{
 		case 0x0395: return 0xf7;   /* $C900 compare         */
 		case 0x03f5:            /* $c8fd                 */
@@ -114,7 +114,7 @@ READ8_MEMBER(fastfred_state::flyboy_custom2_io_r)
 		return 0x00;
 	}
 
-	logerror("Uncaught custom I/O read %04X at %04X\n", 0xc8fb+offset, space.device().safe_pc());
+	logerror("Uncaught custom I/O read %04X at %04X\n", 0xc8fb+offset, m_maincpu->pc());
 	return 0x00;
 }
 
@@ -187,7 +187,7 @@ WRITE8_MEMBER(fastfred_state::sound_nmi_mask_w)
 	m_sound_nmi_mask = data & 1;
 }
 
-static ADDRESS_MAP_START( fastfred_map, AS_PROGRAM, 8, fastfred_state )
+ADDRESS_MAP_START(fastfred_state::fastfred_map)
 	AM_RANGE(0x0000, 0xbfff) AM_ROM
 	AM_RANGE(0xc000, 0xc7ff) AM_RAM
 	AM_RANGE(0xd000, 0xd3ff) AM_MIRROR(0x400) AM_RAM_WRITE(fastfred_videoram_w) AM_SHARE("videoram")
@@ -196,13 +196,13 @@ static ADDRESS_MAP_START( fastfred_map, AS_PROGRAM, 8, fastfred_state )
 	AM_RANGE(0xd860, 0xdbff) AM_RAM // Unused, but initialized
 	AM_RANGE(0xe000, 0xe000) AM_READ_PORT("BUTTONS") AM_WRITEONLY AM_SHARE("bgcolor")
 	AM_RANGE(0xe800, 0xe800) AM_READ_PORT("JOYS")
-	AM_RANGE(0xf000, 0xf000) AM_READ_PORT("DSW") AM_WRITENOP
 	AM_RANGE(0xf000, 0xf007) AM_MIRROR(0x07f8) AM_DEVWRITE("outlatch", ls259_device, write_d0)
+	AM_RANGE(0xf000, 0xf000) AM_READ_PORT("DSW") AM_WRITENOP
 	AM_RANGE(0xf800, 0xf800) AM_DEVREAD("watchdog", watchdog_timer_device, reset_r) AM_DEVWRITE("soundlatch", generic_latch_8_device, write)
 ADDRESS_MAP_END
 
 
-static ADDRESS_MAP_START( jumpcoas_map, AS_PROGRAM, 8, fastfred_state )
+ADDRESS_MAP_START(fastfred_state::jumpcoas_map)
 	AM_RANGE(0x0000, 0x7fff) AM_ROM
 	AM_RANGE(0xc000, 0xc7ff) AM_RAM
 	AM_RANGE(0xd000, 0xd03f) AM_RAM_WRITE(fastfred_attributes_w) AM_SHARE("attributesram")
@@ -220,7 +220,7 @@ static ADDRESS_MAP_START( jumpcoas_map, AS_PROGRAM, 8, fastfred_state )
 ADDRESS_MAP_END
 
 
-static ADDRESS_MAP_START( imago_map, AS_PROGRAM, 8, fastfred_state )
+ADDRESS_MAP_START(fastfred_state::imago_map)
 	AM_RANGE(0x0000, 0x0fff) AM_ROM
 	AM_RANGE(0x1000, 0x1fff) AM_READ(imago_sprites_offset_r)
 	AM_RANGE(0x2000, 0x6fff) AM_ROM
@@ -241,7 +241,7 @@ static ADDRESS_MAP_START( imago_map, AS_PROGRAM, 8, fastfred_state )
 	AM_RANGE(0xf800, 0xf800) AM_READNOP AM_DEVWRITE("soundlatch", generic_latch_8_device, write)
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( sound_map, AS_PROGRAM, 8, fastfred_state )
+ADDRESS_MAP_START(fastfred_state::sound_map)
 	AM_RANGE(0x0000, 0x1fff) AM_ROM
 	AM_RANGE(0x2000, 0x23ff) AM_RAM
 	AM_RANGE(0x3000, 0x3000) AM_DEVREAD("soundlatch", generic_latch_8_device, read) AM_WRITE(sound_nmi_mask_w)
@@ -626,14 +626,14 @@ INTERRUPT_GEN_MEMBER(fastfred_state::sound_timer_irq)
 		device.execute().set_input_line(INPUT_LINE_NMI, PULSE_LINE);
 }
 
-static MACHINE_CONFIG_START( fastfred )
+MACHINE_CONFIG_START(fastfred_state::fastfred)
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", Z80, XTAL_12_432MHz/4)   /* 3.108 MHz; xtal from pcb pics, divider not verified */
+	MCFG_CPU_ADD("maincpu", Z80, XTAL(12'432'000)/4)   /* 3.108 MHz; xtal from pcb pics, divider not verified */
 	MCFG_CPU_PROGRAM_MAP(fastfred_map)
 	MCFG_CPU_VBLANK_INT_DRIVER("screen", fastfred_state,  vblank_irq)
 
-	MCFG_CPU_ADD("audiocpu", Z80, XTAL_12_432MHz/8)  /* 1.554 MHz; xtal from pcb pics, divider not verified */
+	MCFG_CPU_ADD("audiocpu", Z80, XTAL(12'432'000)/8)  /* 1.554 MHz; xtal from pcb pics, divider not verified */
 	MCFG_CPU_PROGRAM_MAP(sound_map)
 	MCFG_CPU_PERIODIC_INT_DRIVER(fastfred_state, sound_timer_irq, 4*60)
 
@@ -669,14 +669,15 @@ static MACHINE_CONFIG_START( fastfred )
 
 	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
 
-	MCFG_SOUND_ADD("ay8910.1", AY8910, XTAL_12_432MHz/8) /* 1.554 MHz; xtal from pcb pics, divider not verified */
+	MCFG_SOUND_ADD("ay8910.1", AY8910, XTAL(12'432'000)/8) /* 1.554 MHz; xtal from pcb pics, divider not verified */
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
 
-	MCFG_SOUND_ADD("ay8910.2", AY8910, XTAL_12_432MHz/8) /* 1.554 MHz; xtal from pcb pics, divider not verified */
+	MCFG_SOUND_ADD("ay8910.2", AY8910, XTAL(12'432'000)/8) /* 1.554 MHz; xtal from pcb pics, divider not verified */
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_DERIVED( jumpcoas, fastfred )
+MACHINE_CONFIG_START(fastfred_state::jumpcoas)
+	fastfred(config);
 
 	/* basic machine hardware */
 	MCFG_CPU_MODIFY("maincpu")
@@ -692,7 +693,8 @@ static MACHINE_CONFIG_DERIVED( jumpcoas, fastfred )
 	MCFG_DEVICE_REMOVE("ay8910.2")
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_DERIVED( imago, fastfred )
+MACHINE_CONFIG_START(fastfred_state::imago)
+	fastfred(config);
 
 	/* basic machine hardware */
 	MCFG_CPU_MODIFY("maincpu")

@@ -101,6 +101,8 @@ public:
 	required_device<cpu_device> m_maincpu;
 	required_device<gfxdecode_device> m_gfxdecode;
 	required_device<palette_device> m_palette;
+	void fresh(machine_config &config);
+	void fresh_map(address_map &map);
 };
 
 
@@ -167,7 +169,7 @@ uint32_t fresh_state::screen_update_fresh(screen_device &screen, bitmap_ind16 &b
 }
 
 
-static ADDRESS_MAP_START( fresh_map, AS_PROGRAM, 16, fresh_state )
+ADDRESS_MAP_START(fresh_state::fresh_map)
 	AM_RANGE(0x000000, 0x03ffff) AM_ROM
 
 	AM_RANGE(0xc00000, 0xc0ffff) AM_RAM_WRITE(fresh_bg_2_videoram_w) AM_SHARE("bg_videoram_2")
@@ -190,8 +192,8 @@ static ADDRESS_MAP_START( fresh_map, AS_PROGRAM, 16, fresh_state )
 
 
 	// written together
-	AM_RANGE(0xc40000, 0xc417ff) AM_RAM_DEVWRITE("palette", palette_device, write) AM_SHARE("palette")
-	AM_RANGE(0xc50000, 0xc517ff) AM_RAM_DEVWRITE("palette", palette_device, write_ext) AM_SHARE("palette_ext")
+	AM_RANGE(0xc40000, 0xc417ff) AM_RAM_DEVWRITE("palette", palette_device, write16) AM_SHARE("palette")
+	AM_RANGE(0xc50000, 0xc517ff) AM_RAM_DEVWRITE("palette", palette_device, write16_ext) AM_SHARE("palette_ext")
 
 	AM_RANGE(0xd00000, 0xd00001) AM_DEVWRITE8("ymsnd", ym2413_device, register_port_w, 0x00ff)
 	AM_RANGE(0xd10000, 0xd10001) AM_DEVWRITE8("ymsnd", ym2413_device, data_port_w, 0x00ff)
@@ -590,7 +592,7 @@ TIMER_DEVICE_CALLBACK_MEMBER(fresh_state::fake_scanline)
 }
 
 
-static MACHINE_CONFIG_START( fresh )
+MACHINE_CONFIG_START(fresh_state::fresh)
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", M68000, 24000000/2 )

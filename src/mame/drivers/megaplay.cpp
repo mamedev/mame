@@ -88,6 +88,9 @@ public:
 	DECLARE_MACHINE_RESET(megaplay);
 	uint32_t screen_update_megplay(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 
+	void megaplay(machine_config &config);
+	void megaplay_bios_io_map(address_map &map);
+	void megaplay_bios_map(address_map &map);
 private:
 
 	uint32_t m_bios_mode;  // determines whether ROM banks or Game data is to read from 0x8000-0xffff
@@ -577,14 +580,14 @@ WRITE8_MEMBER(mplay_state::game_w)
 		m_bios_mode = MP_GAME;
 		m_readpos = 1;
 //      popmessage("Game bank selected: 0x%03x", m_game_banksel);
-		logerror("BIOS [0x%04x]: 68K address space bank selected: 0x%03x\n", space.device().safe_pcbase(), m_game_banksel);
+		logerror("BIOS [0x%04x]: 68K address space bank selected: 0x%03x\n", m_bioscpu->pcbase(), m_game_banksel);
 	}
 
 	m_bios_bank_addr = ((m_bios_bank_addr >> 1) | (data << 23)) & 0xff8000;
 	logerror("BIOS bank addr = %X\n", m_bios_bank_addr);
 }
 
-static ADDRESS_MAP_START( megaplay_bios_map, AS_PROGRAM, 8, mplay_state )
+ADDRESS_MAP_START(mplay_state::megaplay_bios_map)
 	AM_RANGE(0x0000, 0x3fff) AM_ROM
 	AM_RANGE(0x4000, 0x4fff) AM_RAM
 	AM_RANGE(0x5000, 0x5fff) AM_RAM
@@ -592,7 +595,6 @@ static ADDRESS_MAP_START( megaplay_bios_map, AS_PROGRAM, 8, mplay_state )
 	AM_RANGE(0x6200, 0x6207) AM_DEVREADWRITE("io1", cxd1095_device, read, write)
 	AM_RANGE(0x6400, 0x6407) AM_DEVREADWRITE("io2", cxd1095_device, read, write)
 	AM_RANGE(0x6600, 0x6600) AM_READWRITE(bios_6600_r, bios_6600_w)
-	AM_RANGE(0x6001, 0x67ff) AM_WRITEONLY
 	AM_RANGE(0x6800, 0x77ff) AM_RAM AM_SHARE("ic3_ram")
 	AM_RANGE(0x8000, 0xffff) AM_READWRITE(bank_r, bank_w)
 ADDRESS_MAP_END
@@ -608,7 +610,7 @@ READ8_MEMBER(mplay_state::vdp1_count_r)
 		return m_vdp1->vcount_read(prg, offset);
 }
 
-static ADDRESS_MAP_START( megaplay_bios_io_map, AS_IO, 8, mplay_state )
+ADDRESS_MAP_START(mplay_state::megaplay_bios_io_map)
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	AM_RANGE(0x7f, 0x7f) AM_DEVWRITE("sn2", sn76496_device, write)
 
@@ -657,9 +659,9 @@ MACHINE_RESET_MEMBER(mplay_state,megaplay)
 	MACHINE_RESET_CALL_MEMBER(megadriv);
 }
 
-static MACHINE_CONFIG_START( megaplay )
+MACHINE_CONFIG_START(mplay_state::megaplay)
 	/* basic machine hardware */
-	MCFG_FRAGMENT_ADD(md_ntsc)
+	md_ntsc(config);
 
 	/* The Megaplay has an extra BIOS cpu which drives an SMS VDP
 	   which includes an SN76496 for sound */
@@ -691,7 +693,7 @@ static MACHINE_CONFIG_START( megaplay )
 
 	/* New update functions to handle the extra layer */
 	MCFG_SCREEN_MODIFY("megadriv")
-	MCFG_SCREEN_RAW_PARAMS(XTAL_10_738635MHz/2, \
+	MCFG_SCREEN_RAW_PARAMS(XTAL(10'738'635)/2, \
 			sega315_5124_device::WIDTH, sega315_5124_device::LBORDER_START + sega315_5124_device::LBORDER_WIDTH, sega315_5124_device::LBORDER_START + sega315_5124_device::LBORDER_WIDTH + 256, \
 			sega315_5124_device::HEIGHT_NTSC, sega315_5124_device::TBORDER_START + sega315_5124_device::NTSC_224_TBORDER_HEIGHT, sega315_5124_device::TBORDER_START + sega315_5124_device::NTSC_224_TBORDER_HEIGHT + 224)
 	MCFG_SCREEN_UPDATE_DRIVER(mplay_state, screen_update_megplay)

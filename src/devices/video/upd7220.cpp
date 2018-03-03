@@ -149,7 +149,7 @@ DEFINE_DEVICE_TYPE(UPD7220, upd7220_device, "upd7220", "NEC uPD7220")
 
 
 // default address map
-static ADDRESS_MAP_START( upd7220_vram, 0, 16, upd7220_device )
+ADDRESS_MAP_START(upd7220_device::upd7220_vram)
 	AM_RANGE(0x00000, 0x3ffff) AM_RAM
 ADDRESS_MAP_END
 
@@ -338,7 +338,7 @@ inline void upd7220_device::update_vsync_timer(int state)
 {
 	int next_y = state ? m_vs : 0;
 
-	attotime duration = m_screen->time_until_pos(next_y, 0);
+	attotime duration = screen().time_until_pos(next_y, 0);
 
 	m_vsync_timer->adjust(duration, !state);
 }
@@ -350,12 +350,12 @@ inline void upd7220_device::update_vsync_timer(int state)
 
 inline void upd7220_device::update_hsync_timer(int state)
 {
-	int y = m_screen->vpos();
+	int y = screen().vpos();
 
 	int next_x = state ? m_hs : 0;
 	int next_y = state ? y : ((y + 1) % m_al);
 
-	attotime duration = m_screen->time_until_pos(next_y, next_x);
+	attotime duration = screen().time_until_pos(next_y, next_x);
 
 	m_hsync_timer->adjust(duration, !state);
 }
@@ -367,12 +367,12 @@ inline void upd7220_device::update_hsync_timer(int state)
 
 inline void upd7220_device::update_blank_timer(int state)
 {
-	int y = m_screen->vpos();
+	int y = screen().vpos();
 
 	int next_x = state ? (m_hs + m_hbp) : (m_hs + m_hbp + (m_aw << 3));
 	int next_y = state ? ((y + 1) % (m_vs + m_vbp + m_al + m_vfp - 1)) : y;
 
-	attotime duration = m_screen->time_until_pos(next_y, next_x);
+	attotime duration = screen().time_until_pos(next_y, next_x);
 
 	m_hsync_timer->adjust(duration, !state);
 }
@@ -421,7 +421,7 @@ inline void upd7220_device::recompute_parameters()
 
 	if (m_m)
 	{
-		m_screen->configure(horiz_pix_total, vert_pix_total, visarea, refresh);
+		screen().configure(horiz_pix_total, vert_pix_total, visarea, refresh);
 
 		update_hsync_timer(0);
 		update_vsync_timer(0);
@@ -649,7 +649,7 @@ upd7220_device::upd7220_device(const machine_config &mconfig, const char *tag, d
 	m_disp(0),
 	m_gchr(0),
 	m_bitmap_mod(0),
-	m_space_config("videoram", ENDIANNESS_LITTLE, 16, 18, 0, nullptr, *ADDRESS_MAP_NAME(upd7220_vram))
+	m_space_config("videoram", ENDIANNESS_LITTLE, 16, 18, 0, address_map_constructor(), address_map_constructor(FUNC(upd7220_device::upd7220_vram), this))
 {
 	for (int i = 0; i < 16; i++)
 	{

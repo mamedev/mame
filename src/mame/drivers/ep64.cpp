@@ -217,6 +217,13 @@ public:
 
 	DECLARE_WRITE_LINE_MEMBER(write_centronics_busy);
 	int m_centronics_busy;
+	void ep128(machine_config &config);
+	void ep64(machine_config &config);
+	void dave_128k_mem(address_map &map);
+	void dave_64k_mem(address_map &map);
+	void dave_io(address_map &map);
+	void ep64_io(address_map &map);
+	void ep64_mem(address_map &map);
 };
 
 
@@ -356,7 +363,7 @@ WRITE8_MEMBER( ep64_state::wr2_w )
 //  ADDRESS_MAP( ep64_mem )
 //-------------------------------------------------
 
-static ADDRESS_MAP_START( ep64_mem, AS_PROGRAM, 8, ep64_state )
+ADDRESS_MAP_START(ep64_state::ep64_mem)
 	AM_RANGE(0x0000, 0xffff) AM_DEVICE(DAVE_TAG, dave_device, z80_program_map)
 ADDRESS_MAP_END
 
@@ -365,7 +372,7 @@ ADDRESS_MAP_END
 //  ADDRESS_MAP( ep64_io )
 //-------------------------------------------------
 
-static ADDRESS_MAP_START( ep64_io, AS_IO, 8, ep64_state )
+ADDRESS_MAP_START(ep64_state::ep64_io)
 	AM_RANGE(0x0000, 0xffff) AM_DEVICE(DAVE_TAG, dave_device, z80_io_map)
 ADDRESS_MAP_END
 
@@ -374,7 +381,7 @@ ADDRESS_MAP_END
 //  ADDRESS_MAP( dave_64k_mem )
 //-------------------------------------------------
 
-static ADDRESS_MAP_START( dave_64k_mem, AS_PROGRAM, 8, ep64_state )
+ADDRESS_MAP_START(ep64_state::dave_64k_mem)
 	AM_RANGE(0x000000, 0x007fff) AM_ROM AM_REGION(Z80_TAG, 0)
 	//AM_RANGE(0x010000, 0x01ffff)      // mapped by the cartslot
 	AM_RANGE(0x3f0000, 0x3fffff) AM_DEVICE(NICK_TAG, nick_device, vram_map)
@@ -385,7 +392,7 @@ ADDRESS_MAP_END
 //  ADDRESS_MAP( dave_128k_mem )
 //-------------------------------------------------
 
-static ADDRESS_MAP_START( dave_128k_mem, AS_PROGRAM, 8, ep64_state )
+ADDRESS_MAP_START(ep64_state::dave_128k_mem)
 	AM_IMPORT_FROM(dave_64k_mem)
 	AM_RANGE(0x3e0000, 0x3effff) AM_RAM
 ADDRESS_MAP_END
@@ -395,7 +402,7 @@ ADDRESS_MAP_END
 //  ADDRESS_MAP( dave_io )
 //-------------------------------------------------
 
-static ADDRESS_MAP_START( dave_io, AS_IO, 8, ep64_state )
+ADDRESS_MAP_START(ep64_state::dave_io)
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	AM_RANGE(0x80, 0x8f) AM_DEVICE(NICK_TAG, nick_device, vio_map)
 	AM_RANGE(0xb5, 0xb5) AM_READWRITE(rd0_r, wr0_w)
@@ -556,18 +563,18 @@ void ep64_state::machine_reset()
 //  MACHINE_CONFIG( ep64 )
 //-------------------------------------------------
 
-static MACHINE_CONFIG_START( ep64 )
+MACHINE_CONFIG_START(ep64_state::ep64)
 	// basic machine hardware
-	MCFG_CPU_ADD(Z80_TAG, Z80, XTAL_8MHz/2)
+	MCFG_CPU_ADD(Z80_TAG, Z80, XTAL(8'000'000)/2)
 	MCFG_CPU_PROGRAM_MAP(ep64_mem)
 	MCFG_CPU_IO_MAP(ep64_io)
 
 	// video hardware
-	MCFG_NICK_ADD(NICK_TAG, SCREEN_TAG, XTAL_8MHz)
+	MCFG_NICK_ADD(NICK_TAG, SCREEN_TAG, XTAL(8'000'000))
 	MCFG_NICK_VIRQ_CALLBACK(DEVWRITELINE(DAVE_TAG, dave_device, int1_w))
 
 	// sound hardware
-	MCFG_DAVE_ADD(DAVE_TAG, XTAL_8MHz, dave_64k_mem, dave_io)
+	MCFG_DAVE_ADD(DAVE_TAG, XTAL(8'000'000), dave_64k_mem, dave_io)
 	MCFG_DAVE_IRQ_CALLBACK(INPUTLINE(Z80_TAG, INPUT_LINE_IRQ0))
 
 	// devices
@@ -611,7 +618,8 @@ MACHINE_CONFIG_END
 //  MACHINE_CONFIG( ep128 )
 //-------------------------------------------------
 
-static MACHINE_CONFIG_DERIVED( ep128, ep64 )
+MACHINE_CONFIG_START(ep64_state::ep128)
+	ep64(config);
 	MCFG_DEVICE_MODIFY(DAVE_TAG)
 	MCFG_DEVICE_ADDRESS_MAP(AS_PROGRAM, dave_128k_mem)
 

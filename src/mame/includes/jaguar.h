@@ -21,9 +21,9 @@
 #endif
 
 /* CoJag and Jaguar have completely different XTALs, pixel clock in Jaguar is the same as the GPU one */
-#define COJAG_PIXEL_CLOCK       XTAL_14_31818MHz
-#define JAGUAR_CLOCK            XTAL_25_590906MHz // NTSC
-// XTAL_25_593900MHz PAL, TODO
+#define COJAG_PIXEL_CLOCK       XTAL(14'318'181)
+#define JAGUAR_CLOCK            XTAL(25'590'906) // NTSC
+// XTAL(25'593'900) PAL, TODO
 
 class jaguar_state : public driver_device
 {
@@ -249,6 +249,21 @@ public:
 	IRQ_CALLBACK_MEMBER(jaguar_irq_callback);
 	DECLARE_DEVICE_IMAGE_LOAD_MEMBER( jaguar_cart );
 	DECLARE_QUICKLOAD_LOAD_MEMBER( jaguar );
+	void cojagr3k_rom(machine_config &config);
+	void jaguarcd(machine_config &config);
+	void jaguar(machine_config &config);
+	void cojag68k(machine_config &config);
+	void cojagr3k(machine_config &config);
+	void dsp_map(address_map &map);
+	void gpu_map(address_map &map);
+	void jag_dsp_map(address_map &map);
+	void jag_gpu_map(address_map &map);
+	void jagcd_dsp_map(address_map &map);
+	void jagcd_gpu_map(address_map &map);
+	void jaguar_map(address_map &map);
+	void jaguarcd_map(address_map &map);
+	void m68020_map(address_map &map);
+	void r3000_map(address_map &map);
 protected:
 	// timer IDs
 	enum

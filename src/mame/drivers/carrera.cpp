@@ -46,7 +46,7 @@ TODO:
 
 */
 
-#define MASTER_CLOCK    XTAL_22_1184MHz
+#define MASTER_CLOCK    XTAL(22'118'400)
 
 #include "emu.h"
 #include "cpu/z80/z80.h"
@@ -73,10 +73,13 @@ public:
 	required_device<cpu_device> m_maincpu;
 	required_device<gfxdecode_device> m_gfxdecode;
 	required_device<palette_device> m_palette;
+	void carrera(machine_config &config);
+	void carrera_map(address_map &map);
+	void io_map(address_map &map);
 };
 
 
-static ADDRESS_MAP_START( carrera_map, AS_PROGRAM, 8, carrera_state )
+ADDRESS_MAP_START(carrera_state::carrera_map)
 	AM_RANGE(0x0000, 0x4fff) AM_ROM
 	AM_RANGE(0xe000, 0xe7ff) AM_RAM
 	AM_RANGE(0xe800, 0xe800) AM_DEVWRITE("crtc", mc6845_device, address_w)
@@ -84,7 +87,7 @@ static ADDRESS_MAP_START( carrera_map, AS_PROGRAM, 8, carrera_state )
 	AM_RANGE(0xf000, 0xffff) AM_RAM AM_SHARE("tileram")
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( io_map, AS_IO, 8, carrera_state )
+ADDRESS_MAP_START(carrera_state::io_map)
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	AM_RANGE(0x00, 0x00) AM_READ_PORT("IN0")
 	AM_RANGE(0x01, 0x01) AM_READ_PORT("IN1")
@@ -308,7 +311,7 @@ PALETTE_INIT_MEMBER(carrera_state, carrera)
 }
 
 
-static MACHINE_CONFIG_START( carrera )
+MACHINE_CONFIG_START(carrera_state::carrera)
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", Z80, MASTER_CLOCK / 6)
 	MCFG_CPU_PROGRAM_MAP(carrera_map)

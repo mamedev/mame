@@ -199,7 +199,7 @@
 #include "video/mc6845.h"
 #include "screen.h"
 
-#define MASTER_CLOCK    XTAL_6MHz              /* confirmed */
+#define MASTER_CLOCK    XTAL(6'000'000)              /* confirmed */
 #define CPU_CLOCK      (MASTER_CLOCK / 2)      /* guess */
 #define CRTC_CLOCK     (MASTER_CLOCK / 8)      /* guess */
 
@@ -230,6 +230,9 @@ public:
 	INTERRUPT_GEN_MEMBER(jubileep_interrupt);
 	required_device<cpu_device> m_maincpu;
 	required_device<gfxdecode_device> m_gfxdecode;
+	void jubileep(machine_config &config);
+	void jubileep_cru_map(address_map &map);
+	void jubileep_map(address_map &map);
 };
 
 
@@ -293,7 +296,7 @@ INTERRUPT_GEN_MEMBER(jubilee_state::jubileep_interrupt)
 * Memory Map Information *
 *************************/
 
-static ADDRESS_MAP_START( jubileep_map, AS_PROGRAM, 8, jubilee_state )
+ADDRESS_MAP_START(jubilee_state::jubileep_map)
 	ADDRESS_MAP_GLOBAL_MASK(0x3fff)
 	AM_RANGE(0x0000, 0x2fff) AM_ROM
 
@@ -565,7 +568,7 @@ READ8_MEMBER(jubilee_state::mux_port_r)
 }
 
 
-static ADDRESS_MAP_START( jubileep_cru_map, AS_IO, 8, jubilee_state )
+ADDRESS_MAP_START(jubilee_state::jubileep_cru_map)
 	AM_RANGE(0x00c8, 0x00c8) AM_READ(mux_port_r)    /* multiplexed input port */
 	AM_RANGE(0x0000, 0x07ff) AM_WRITE(unk_w)
 ADDRESS_MAP_END
@@ -656,7 +659,7 @@ GFXDECODE_END
 *    Machine Drivers     *
 *************************/
 
-static MACHINE_CONFIG_START( jubileep )
+MACHINE_CONFIG_START(jubilee_state::jubileep)
 
 	// Main CPU TMS9980A, no line connections.
 	MCFG_TMS99xx_ADD("maincpu", TMS9980A, CPU_CLOCK, jubileep_map, jubileep_cru_map)

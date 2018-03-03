@@ -62,7 +62,7 @@ WRITE8_MEMBER(comquest_state::comquest_write)
 }
 #endif
 
-static ADDRESS_MAP_START( comquest_mem , AS_PROGRAM, 8, comquest_state )
+ADDRESS_MAP_START(comquest_state::comquest_mem)
 //  { 0x0000, 0x7fff, SMH_BANK(1) },
 	AM_RANGE(0x0000, 0xfff) AM_ROM
 ADDRESS_MAP_END
@@ -212,7 +212,7 @@ void comquest_state::machine_reset()
 }
 
 
-static MACHINE_CONFIG_START( comquest )
+MACHINE_CONFIG_START(comquest_state::comquest)
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", M6805, 4000000)     /* 4000000? */
 	/*MCFG_CPU_ADD("maincpu", HD63705, 4000000)    instruction set looks like m6805/m6808 */

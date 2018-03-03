@@ -73,4 +73,7 @@ public:
 	required_device<cpu_device> m_maincpu;
 	required_device<gfxdecode_device> m_gfxdecode;
 	required_device<palette_device> m_palette;
+	void circusc(machine_config &config);
+	void circusc_map(address_map &map);
+	void sound_map(address_map &map);
 };

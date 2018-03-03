@@ -62,12 +62,12 @@ correctly.
 ***************************************************************************/
 
 /* 12mhz OSC */
-#define MASTER_CLOCK      (XTAL_12MHz)
+#define MASTER_CLOCK      (XTAL(12'000'000))
 #define MAIN_CPU_CLOCK      (MASTER_CLOCK/3)
 #define SOUND_CPU_CLOCK     (MASTER_CLOCK/4)
 #define AUDIO_CLOCK     (MASTER_CLOCK/8)
 /* 20mhz OSC - both Z80s are 4 MHz */
-#define MASTER_CLOCK_1942P     (XTAL_20MHz)
+#define MASTER_CLOCK_1942P     (XTAL(20'000'000))
 #define MAIN_CPU_CLOCK_1942P      (MASTER_CLOCK_1942P/5)
 #define SOUND_CPU_CLOCK_1942P     (MASTER_CLOCK_1942P/5)
 #define AUDIO_CLOCK_1942P     (MASTER_CLOCK_1942P/16)
@@ -180,7 +180,7 @@ TIMER_DEVICE_CALLBACK_MEMBER(_1942_state::c1942_scanline)
 
 
 
-static ADDRESS_MAP_START( c1942_map, AS_PROGRAM, 8, _1942_state )
+ADDRESS_MAP_START(_1942_state::c1942_map)
 	AM_RANGE(0x0000, 0x7fff) AM_ROM
 	AM_RANGE(0x8000, 0xbfff) AM_ROMBANK("bank1")
 	AM_RANGE(0xc000, 0xc000) AM_READ_PORT("SYSTEM")
@@ -215,7 +215,7 @@ WRITE8_MEMBER(_1942_state::c1942p_palette_w)
 	m_palette->set_indirect_color(offset, rgb_t(r<<5,g<<5,b<<6));
 }
 
-static ADDRESS_MAP_START( c1942p_map, AS_PROGRAM, 8, _1942_state )
+ADDRESS_MAP_START(_1942_state::c1942p_map)
 	AM_RANGE(0x0000, 0x7fff) AM_ROM
 	AM_RANGE(0x8000, 0xbfff) AM_ROMBANK("bank1")
 
@@ -244,13 +244,13 @@ static ADDRESS_MAP_START( c1942p_map, AS_PROGRAM, 8, _1942_state )
 ADDRESS_MAP_END
 
 
-static ADDRESS_MAP_START(c1942p_sound_map, AS_PROGRAM, 8, _1942_state )
+ADDRESS_MAP_START(_1942_state::c1942p_sound_map)
 	AM_RANGE(0x0000, 0x3fff) AM_ROM
 	AM_RANGE(0x4000, 0x47ff) AM_RAM
 	AM_RANGE(0xc000, 0xc000) AM_DEVREAD("soundlatch", generic_latch_8_device, read)
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( c1942p_sound_io, AS_IO, 8, _1942_state )
+ADDRESS_MAP_START(_1942_state::c1942p_sound_io)
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	AM_RANGE(0x0000, 0x0000) AM_WRITENOP
 	AM_RANGE(0x0014, 0x0015) AM_DEVWRITE("ay1", ay8910_device, address_data_w)
@@ -259,7 +259,7 @@ ADDRESS_MAP_END
 
 
 
-static ADDRESS_MAP_START( sound_map, AS_PROGRAM, 8, _1942_state )
+ADDRESS_MAP_START(_1942_state::sound_map)
 	AM_RANGE(0x0000, 0x3fff) AM_ROM
 	AM_RANGE(0x4000, 0x47ff) AM_RAM
 	AM_RANGE(0x6000, 0x6000) AM_DEVREAD("soundlatch", generic_latch_8_device, read)
@@ -554,7 +554,7 @@ void _1942_state::machine_reset()
 	m_scroll[1] = 0;
 }
 
-static MACHINE_CONFIG_START( 1942 )
+MACHINE_CONFIG_START(_1942_state::_1942)
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", Z80, MAIN_CPU_CLOCK)    /* 4 MHz ??? */
@@ -622,7 +622,7 @@ static MACHINE_CONFIG_START( 1942 )
 MACHINE_CONFIG_END
 
 
-static MACHINE_CONFIG_START( 1942p )
+MACHINE_CONFIG_START(_1942_state::_1942p)
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", Z80, MAIN_CPU_CLOCK_1942P)    /* 4 MHz - verified on PCB */
@@ -953,10 +953,10 @@ DRIVER_INIT_MEMBER(_1942_state,1942)
 }
 
 
-GAME( 1984, 1942,     0,    1942, 1942, _1942_state, 1942, ROT270, "Capcom", "1942 (Revision B)", MACHINE_SUPPORTS_SAVE )
-GAME( 1984, 1942a,    1942, 1942, 1942, _1942_state, 1942, ROT270, "Capcom", "1942 (Revision A)", MACHINE_SUPPORTS_SAVE )
-GAME( 1984, 1942abl,  1942, 1942, 1942, _1942_state, 1942, ROT270, "bootleg", "1942 (Revision A, bootleg)", MACHINE_SUPPORTS_SAVE ) // data is the same as 1942a set, different rom format
-GAME( 1991, 1942h,    1942, 1942, 1942, _1942_state, 1942, ROT270, "hack (Two Bit Score)", "Supercharger 1942", MACHINE_SUPPORTS_SAVE )
-GAME( 1984, 1942b,    1942, 1942, 1942, _1942_state, 1942, ROT270, "Capcom", "1942 (First Version)", MACHINE_SUPPORTS_SAVE )
-GAME( 1985, 1942w,    1942, 1942, 1942, _1942_state, 1942, ROT270, "Capcom (Williams Electronics license)", "1942 (Williams Electronics license)", MACHINE_SUPPORTS_SAVE ) /* Based on 1942 (Revision B) */
-GAME( 1984, 1942p,    1942, 1942p,1942p,_1942_state, 1942, ROT270, "bootleg", "1942 (Tecfri PCB, bootleg?)", MACHINE_SUPPORTS_SAVE )
+GAME( 1984, 1942,     0,    _1942, 1942, _1942_state, 1942, ROT270, "Capcom", "1942 (Revision B)", MACHINE_SUPPORTS_SAVE )
+GAME( 1984, 1942a,    1942, _1942, 1942, _1942_state, 1942, ROT270, "Capcom", "1942 (Revision A)", MACHINE_SUPPORTS_SAVE )
+GAME( 1984, 1942abl,  1942, _1942, 1942, _1942_state, 1942, ROT270, "bootleg", "1942 (Revision A, bootleg)", MACHINE_SUPPORTS_SAVE ) // data is the same as 1942a set, different rom format
+GAME( 1991, 1942h,    1942, _1942, 1942, _1942_state, 1942, ROT270, "hack (Two Bit Score)", "Supercharger 1942", MACHINE_SUPPORTS_SAVE )
+GAME( 1984, 1942b,    1942, _1942, 1942, _1942_state, 1942, ROT270, "Capcom", "1942 (First Version)", MACHINE_SUPPORTS_SAVE )
+GAME( 1985, 1942w,    1942, _1942, 1942, _1942_state, 1942, ROT270, "Capcom (Williams Electronics license)", "1942 (Williams Electronics license)", MACHINE_SUPPORTS_SAVE ) /* Based on 1942 (Revision B) */
+GAME( 1984, 1942p,    1942, _1942p,1942p,_1942_state, 1942, ROT270, "bootleg", "1942 (Tecfri PCB, bootleg?)", MACHINE_SUPPORTS_SAVE )

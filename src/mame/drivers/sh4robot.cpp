@@ -41,12 +41,15 @@ public:
 	, m_maincpu(*this, "maincpu")
 	{ }
 
+	void sh4robot(machine_config &config);
+	void io_map(address_map &map);
+	void mem_map(address_map &map);
 private:
 	required_device<cpu_device> m_maincpu;
 };
 
 
-static ADDRESS_MAP_START( mem_map, AS_PROGRAM, 64, sh4robot_state )
+ADDRESS_MAP_START(sh4robot_state::mem_map)
 	ADDRESS_MAP_UNMAP_HIGH
 	AM_RANGE(0x00000000, 0x00000fff) AM_ROM
 	AM_RANGE(0x08000000, 0x08ffffff) AM_RAM // SDRAM 1
@@ -54,14 +57,14 @@ static ADDRESS_MAP_START( mem_map, AS_PROGRAM, 64, sh4robot_state )
 	AM_RANGE(0xa0000000, 0xa0000fff) AM_ROM AM_REGION("maincpu", 0)
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( io_map, AS_IO, 64, sh4robot_state )
+ADDRESS_MAP_START(sh4robot_state::io_map)
 	ADDRESS_MAP_UNMAP_HIGH
 ADDRESS_MAP_END
 
 static INPUT_PORTS_START( sh4robot )
 INPUT_PORTS_END
 
-static MACHINE_CONFIG_START( sh4robot )
+MACHINE_CONFIG_START(sh4robot_state::sh4robot)
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", SH4LE, 200000000) // SH7750
 	MCFG_SH4_MD0(1)

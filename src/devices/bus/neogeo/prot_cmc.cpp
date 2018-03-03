@@ -689,15 +689,15 @@ int cmc_prot_device::m1_address_scramble(int address, uint16_t key)
 	int block = (address >> 16) & 7;
 	int aux = address & 0xffff;
 
-	aux ^= BITSWAP16(key,12,0,2,4,8,15,7,13,10,1,3,6,11,9,14,5);
-	aux = BITSWAP16(aux,
+	aux ^= bitswap<16>(key,12,0,2,4,8,15,7,13,10,1,3,6,11,9,14,5);
+	aux = bitswap<16>(aux,
 		p1[block][15], p1[block][14], p1[block][13], p1[block][12],
 		p1[block][11], p1[block][10], p1[block][9], p1[block][8],
 		p1[block][7], p1[block][6], p1[block][5], p1[block][4],
 		p1[block][3], p1[block][2], p1[block][1], p1[block][0]);
 	aux ^= m1_address_0_7_xor[(aux >> 8) & 0xff];
 	aux ^= m1_address_8_15_xor[aux & 0xff] << 8;
-	aux = BITSWAP16(aux, 7,15,14,6,5,13,12,4,11,3,10,2,9,1,8,0);
+	aux = bitswap<16>(aux, 7,15,14,6,5,13,12,4,11,3,10,2,9,1,8,0);
 
 	return (block << 16) | aux;
 }

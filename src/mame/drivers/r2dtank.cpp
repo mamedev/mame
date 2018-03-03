@@ -92,6 +92,9 @@ public:
 	required_device<cpu_device> m_audiocpu;
 	required_device<generic_latch_8_device> m_soundlatch;
 	required_device<generic_latch_8_device> m_soundlatch2;
+	void r2dtank(machine_config &config);
+	void r2dtank_audio_map(address_map &map);
+	void r2dtank_main_map(address_map &map);
 };
 
 
@@ -134,7 +137,7 @@ READ8_MEMBER(r2dtank_state::audio_command_r)
 {
 	uint8_t ret = m_soundlatch->read(space, 0);
 
-if (LOG_AUDIO_COMM) logerror("%08X  CPU#1  Audio Command Read: %x\n", space.device().safe_pc(), ret);
+if (LOG_AUDIO_COMM) logerror("%08X  CPU#1  Audio Command Read: %x\n", m_audiocpu->pc(), ret);
 
 	return ret;
 }
@@ -145,14 +148,14 @@ WRITE8_MEMBER(r2dtank_state::audio_command_w)
 	m_soundlatch->write(space, 0, ~data);
 	m_audiocpu->set_input_line(M6802_IRQ_LINE, HOLD_LINE);
 
-if (LOG_AUDIO_COMM) logerror("%08X   CPU#0  Audio Command Write: %x\n", space.device().safe_pc(), data^0xff);
+if (LOG_AUDIO_COMM) logerror("%08X   CPU#0  Audio Command Write: %x\n", m_maincpu->pc(), data^0xff);
 }
 
 
 READ8_MEMBER(r2dtank_state::audio_answer_r)
 {
 	uint8_t ret = m_soundlatch2->read(space, 0);
-if (LOG_AUDIO_COMM) logerror("%08X  CPU#0  Audio Answer Read: %x\n", space.device().safe_pc(), ret);
+if (LOG_AUDIO_COMM) logerror("%08X  CPU#0  Audio Answer Read: %x\n", m_maincpu->pc(), ret);
 
 	return ret;
 }
@@ -161,13 +164,13 @@ if (LOG_AUDIO_COMM) logerror("%08X  CPU#0  Audio Answer Read: %x\n", space.devic
 WRITE8_MEMBER(r2dtank_state::audio_answer_w)
 {
 	/* HACK - prevents lock-up, but causes game to end some in-between sreens prematurely */
-	if (space.device().safe_pc() == 0xfb12)
+	if (m_audiocpu->pc() == 0xfb12)
 		data = 0x00;
 
 	m_soundlatch2->write(space, 0, data);
 	m_maincpu->set_input_line(M6809_IRQ_LINE, HOLD_LINE);
 
-if (LOG_AUDIO_COMM) logerror("%08X  CPU#1  Audio Answer Write: %x\n", space.device().safe_pc(), data);
+if (LOG_AUDIO_COMM) logerror("%08X  CPU#1  Audio Answer Write: %x\n", m_audiocpu->pc(), data);
 }
 
 
@@ -323,7 +326,7 @@ WRITE8_MEMBER(r2dtank_state::pia_comp_w)
 }
 
 
-static ADDRESS_MAP_START( r2dtank_main_map, AS_PROGRAM, 8, r2dtank_state )
+ADDRESS_MAP_START(r2dtank_state::r2dtank_main_map)
 	AM_RANGE(0x0000, 0x1fff) AM_RAM AM_SHARE("videoram")
 	AM_RANGE(0x2000, 0x3fff) AM_RAM
 	AM_RANGE(0x4000, 0x5fff) AM_RAM AM_SHARE("colorram")
@@ -337,7 +340,7 @@ static ADDRESS_MAP_START( r2dtank_main_map, AS_PROGRAM, 8, r2dtank_state )
 ADDRESS_MAP_END
 
 
-static ADDRESS_MAP_START( r2dtank_audio_map, AS_PROGRAM, 8, r2dtank_state )
+ADDRESS_MAP_START(r2dtank_state::r2dtank_audio_map)
 	AM_RANGE(0x0000, 0x007f) AM_RAM     /* internal RAM */
 	AM_RANGE(0xd000, 0xd003) AM_DEVREADWRITE("pia_audio", pia6821_device, read, write)
 	AM_RANGE(0xf000, 0xf000) AM_READWRITE(audio_command_r, audio_answer_w)
@@ -435,7 +438,7 @@ INPUT_PORTS_END
  *
  *************************************/
 
-static MACHINE_CONFIG_START( r2dtank )
+MACHINE_CONFIG_START(r2dtank_state::r2dtank)
 	MCFG_CPU_ADD("maincpu", M6809,3000000)       /* ?? too fast ? */
 	MCFG_CPU_PROGRAM_MAP(r2dtank_main_map)
 

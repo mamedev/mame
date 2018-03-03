@@ -69,12 +69,26 @@ spectrum_expansion_slot_device::~spectrum_expansion_slot_device()
 
 
 //-------------------------------------------------
+//  device_validity_check - device-specific checks
+//-------------------------------------------------
+
+void spectrum_expansion_slot_device::device_validity_check(validity_checker &valid) const
+{
+	device_t *const card(get_card_device());
+	if (card && !dynamic_cast<device_spectrum_expansion_interface *>(card))
+		osd_printf_error("Card device %s (%s) does not implement device_spectrum_expansion_interface\n", card->tag(), card->name());
+}
+
+//-------------------------------------------------
 //  device_start - device-specific startup
 //-------------------------------------------------
 
 void spectrum_expansion_slot_device::device_start()
 {
-	m_card = dynamic_cast<device_spectrum_expansion_interface *>(get_card_device());
+	device_t *const card_device(get_card_device());
+	m_card = dynamic_cast<device_spectrum_expansion_interface *>(card_device);
+	if (card_device && !m_card)
+		throw emu_fatalerror("spectrum_expansion_slot_device: card device %s (%s) does not implement device_spectrum_expansion_interface\n", card_device->tag(), card_device->name());
 
 	// resolve callbacks
 	m_irq_handler.resolve_safe();
@@ -87,10 +101,6 @@ void spectrum_expansion_slot_device::device_start()
 
 void spectrum_expansion_slot_device::device_reset()
 {
-	if (get_card_device())
-	{
-		get_card_device()->reset();
-	}
 }
 
 //-------------------------------------------------

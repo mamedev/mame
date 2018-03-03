@@ -26,17 +26,20 @@ public:
 //      , m_maincpu(*this, "maincpu")
 	{ }
 
+void vectrix(machine_config &config);
+void io_map(address_map &map);
+void mem_map(address_map &map);
 private:
 //  required_device<cpu_device> m_maincpu;
 };
 
-static ADDRESS_MAP_START( mem_map, AS_PROGRAM, 8, vectrix_state )
+ADDRESS_MAP_START(vectrix_state::mem_map)
 	AM_RANGE(0x00000,0x07fff) AM_RAM
 	AM_RANGE(0x0c000,0x0ffff) AM_ROM AM_REGION("roms", 0)
 	AM_RANGE(0xfc000,0xfffff) AM_ROM AM_REGION("roms", 0)
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( io_map, AS_PROGRAM, 8, vectrix_state )
+ADDRESS_MAP_START(vectrix_state::io_map)
 	AM_RANGE(0x3000, 0x3000) AM_DEVREADWRITE("uart1", i8251_device, data_r, data_w)
 	AM_RANGE(0x3001, 0x3001) AM_DEVREADWRITE("uart1", i8251_device, status_r, control_w)
 ADDRESS_MAP_END
@@ -44,8 +47,8 @@ ADDRESS_MAP_END
 static INPUT_PORTS_START( vectrix )
 INPUT_PORTS_END
 
-static MACHINE_CONFIG_START( vectrix )
-	MCFG_CPU_ADD("maincpu", I8088, XTAL_14_31818MHz/3)  // no idea of clock
+MACHINE_CONFIG_START(vectrix_state::vectrix)
+	MCFG_CPU_ADD("maincpu", I8088, XTAL(14'318'181)/3)  // no idea of clock
 	MCFG_CPU_PROGRAM_MAP(mem_map)
 	MCFG_CPU_IO_MAP(io_map)
 

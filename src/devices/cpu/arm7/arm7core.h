@@ -470,11 +470,6 @@ enum
 	COND_NV               /*  0           never                   */
 };
 
-#define LSL(v, s) ((v) << (s))
-#define LSR(v, s) ((v) >> (s))
-#define ROL(v, s) (LSL((v), (s)) | (LSR((v), 32u - (s))))
-#define ROR(v, s) (LSR((v), (s)) | (LSL((v), 32u - (s))))
-
 /* Convenience Macros */
 #define R15                     m_r[eR15]
 #define SPSR                    17                     // SPSR is always the 18th register in our 0 based array sRegisterTable[][18]

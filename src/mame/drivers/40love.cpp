@@ -226,48 +226,11 @@ Notes - Has jumper setting for 122HZ or 61HZ)
 
 #include "cpu/m6805/m6805.h"
 #include "cpu/z80/z80.h"
+#include "machine/input_merger.h"
 #include "sound/dac.h"
 #include "sound/volt_reg.h"
 #include "screen.h"
 #include "speaker.h"
-
-
-void fortyl_state::device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr)
-{
-	switch(id)
-	{
-	case TIMER_NMI_CALLBACK:
-		if (m_sound_nmi_enable)
-			m_audiocpu->set_input_line(INPUT_LINE_NMI, PULSE_LINE);
-		else
-			m_pending_nmi = 1;
-		break;
-	default:
-			assert_always(false, "Unknown id in fortyl_state::device_timer");
-	}
-}
-
-WRITE8_MEMBER(fortyl_state::sound_command_w)
-{
-	m_soundlatch->write(space, 0, data);
-	synchronize(TIMER_NMI_CALLBACK, data);
-}
-
-WRITE8_MEMBER(fortyl_state::nmi_disable_w)
-{
-	m_sound_nmi_enable = 0;
-}
-
-WRITE8_MEMBER(fortyl_state::nmi_enable_w)
-{
-	m_sound_nmi_enable = 1;
-	if (m_pending_nmi)
-	{
-		m_audiocpu->set_input_line(INPUT_LINE_NMI, PULSE_LINE);
-		m_pending_nmi = 0;
-	}
-}
-
 
 
 #if 0
@@ -379,33 +342,22 @@ DRIVER_INIT_MEMBER(fortyl_state,40love)
 
 /***************************************************************************/
 
-READ8_MEMBER(fortyl_state::from_snd_r)
-{
-	m_snd_flag = 0;
-	return m_snd_data;
-}
-
 READ8_MEMBER(fortyl_state::snd_flag_r)
 {
-	return m_snd_flag | 0xfd;
-}
-
-WRITE8_MEMBER(fortyl_state::to_main_w)
-{
-	m_snd_data = data;
-	m_snd_flag = 2;
+	return (m_soundlatch2->pending_r() ? 2 : 0) | 0xfd;
 }
 
 /***************************************************************************/
 
-static ADDRESS_MAP_START( 40love_map, AS_PROGRAM, 8, fortyl_state )
+ADDRESS_MAP_START(fortyl_state::_40love_map)
 	AM_RANGE(0x0000, 0x7fff) AM_ROM
 	AM_RANGE(0x8000, 0x87ff) AM_RAM /* M5517P on main board */
 	AM_RANGE(0x8800, 0x8800) AM_DEVREADWRITE("bmcu", taito68705_mcu_device, data_r, data_w)
 	AM_RANGE(0x8801, 0x8801) AM_READWRITE(fortyl_mcu_status_r, pix1_mcu_w)      //pixel layer related
 	AM_RANGE(0x8802, 0x8802) AM_WRITE(bank_select_w)
 	AM_RANGE(0x8803, 0x8803) AM_READWRITE(pix2_r, pix2_w)       //pixel layer related
-	AM_RANGE(0x8804, 0x8804) AM_READWRITE(from_snd_r, sound_command_w)
+	AM_RANGE(0x8804, 0x8804) AM_DEVREAD("soundlatch2", generic_latch_8_device, read)
+	AM_RANGE(0x8804, 0x8804) AM_DEVWRITE("soundlatch", generic_latch_8_device, write)
 	AM_RANGE(0x8805, 0x8805) AM_READ(snd_flag_r) AM_WRITENOP /*sound_reset*/ //????
 	AM_RANGE(0x8807, 0x8807) AM_READNOP /* unknown */
 	AM_RANGE(0x8808, 0x8808) AM_READ_PORT("DSW3")
@@ -424,7 +376,7 @@ static ADDRESS_MAP_START( 40love_map, AS_PROGRAM, 8, fortyl_state )
 	AM_RANGE(0xc000, 0xffff) AM_READWRITE(fortyl_pixram_r, fortyl_pixram_w) /* banked pixel layer */
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( undoukai_map, AS_PROGRAM, 8, fortyl_state )
+ADDRESS_MAP_START(fortyl_state::undoukai_map)
 	AM_RANGE(0x0000, 0x7fff) AM_ROM
 	AM_RANGE(0x8000, 0x9fff) AM_ROMBANK("bank1")
 	AM_RANGE(0xa000, 0xa7ff) AM_RAM AM_SHARE("mcu_ram") /* M5517P on main board */
@@ -432,7 +384,8 @@ static ADDRESS_MAP_START( undoukai_map, AS_PROGRAM, 8, fortyl_state )
 	AM_RANGE(0xa801, 0xa801) AM_READWRITE(fortyl_mcu_status_r, pix1_w)        //pixel layer related
 	AM_RANGE(0xa802, 0xa802) AM_WRITE(bank_select_w)
 	AM_RANGE(0xa803, 0xa803) AM_READWRITE(pix2_r, pix2_w)       //pixel layer related
-	AM_RANGE(0xa804, 0xa804) AM_READWRITE(from_snd_r, sound_command_w)
+	AM_RANGE(0xa804, 0xa804) AM_DEVREAD("soundlatch2", generic_latch_8_device, read)
+	AM_RANGE(0xa804, 0xa804) AM_DEVWRITE("soundlatch", generic_latch_8_device, write)
 	AM_RANGE(0xa805, 0xa805) AM_READ(snd_flag_r) AM_WRITENOP /*sound_reset*/    //????
 	AM_RANGE(0xa807, 0xa807) AM_READNOP AM_WRITENOP /* unknown */
 	AM_RANGE(0xa808, 0xa808) AM_READ_PORT("DSW3")
@@ -491,16 +444,18 @@ WRITE8_MEMBER(fortyl_state::sound_control_3_w)/* unknown */
 //  popmessage("SND3 0=%02x 1=%02x 2=%02x 3=%02x", m_snd_ctrl0, m_snd_ctrl1, m_snd_ctrl2, m_snd_ctrl3);
 }
 
-static ADDRESS_MAP_START( sound_map, AS_PROGRAM, 8, fortyl_state )
+ADDRESS_MAP_START(fortyl_state::sound_map)
 	AM_RANGE(0x0000, 0xbfff) AM_ROM
 	AM_RANGE(0xc000, 0xc7ff) AM_RAM
 	AM_RANGE(0xc800, 0xc801) AM_DEVWRITE("aysnd", ay8910_device, address_data_w)
 	AM_RANGE(0xca00, 0xca0d) AM_DEVWRITE("msm", msm5232_device, write)
 	AM_RANGE(0xcc00, 0xcc00) AM_WRITE(sound_control_0_w)
 	AM_RANGE(0xce00, 0xce00) AM_WRITE(sound_control_1_w)
-	AM_RANGE(0xd800, 0xd800) AM_DEVREAD("soundlatch", generic_latch_8_device, read) AM_WRITE(to_main_w)
-	AM_RANGE(0xda00, 0xda00) AM_READNOP AM_WRITE(nmi_enable_w) /* unknown read */
-	AM_RANGE(0xdc00, 0xdc00) AM_WRITE(nmi_disable_w)
+	AM_RANGE(0xd800, 0xd800) AM_DEVREAD("soundlatch", generic_latch_8_device, read)
+	AM_RANGE(0xd800, 0xd800) AM_DEVWRITE("soundlatch2", generic_latch_8_device, write)
+	AM_RANGE(0xda00, 0xda00) AM_READNOP // unknown read
+	AM_RANGE(0xda00, 0xda00) AM_DEVWRITE("soundnmi", input_merger_device, in_set<1>) // enable NMI
+	AM_RANGE(0xdc00, 0xdc00) AM_DEVWRITE("soundnmi", input_merger_device, in_clear<1>) // disable NMI
 	AM_RANGE(0xde00, 0xde00) AM_READNOP AM_DEVWRITE("dac", dac_byte_interface, write)       /* signed 8-bit DAC - unknown read */
 	AM_RANGE(0xe000, 0xefff) AM_ROM /* space for diagnostics ROM */
 ADDRESS_MAP_END
@@ -714,10 +669,6 @@ MACHINE_START_MEMBER(fortyl_state,40love)
 	save_item(NAME(m_color_bank));
 	save_item(NAME(m_screen_disable));
 	/* sound */
-	save_item(NAME(m_sound_nmi_enable));
-	save_item(NAME(m_pending_nmi));
-	save_item(NAME(m_snd_data));
-	save_item(NAME(m_snd_flag));
 	save_item(NAME(m_vol_ctrl));
 	save_item(NAME(m_snd_ctrl0));
 	save_item(NAME(m_snd_ctrl1));
@@ -737,10 +688,6 @@ MACHINE_RESET_MEMBER(fortyl_state,common)
 	m_color_bank = false;
 
 	/* sound */
-	m_sound_nmi_enable = 0;
-	m_pending_nmi = 0;
-	m_snd_data = 0;
-	m_snd_flag = 0;
 	m_snd_ctrl0 = 0;
 	m_snd_ctrl1 = 0;
 	m_snd_ctrl2 = 0;
@@ -752,16 +699,24 @@ MACHINE_RESET_MEMBER(fortyl_state,40love)
 	MACHINE_RESET_CALL_MEMBER(common);
 }
 
-static MACHINE_CONFIG_START( 40love )
+MACHINE_CONFIG_START(fortyl_state::_40love)
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu",Z80,8000000/2) /* OK */
-	MCFG_CPU_PROGRAM_MAP(40love_map)
+	MCFG_CPU_PROGRAM_MAP(_40love_map)
 	MCFG_CPU_VBLANK_INT_DRIVER("screen", fortyl_state,  irq0_line_hold)
 
 	MCFG_CPU_ADD("audiocpu",Z80,8000000/2) /* OK */
 	MCFG_CPU_PROGRAM_MAP(sound_map)
 	MCFG_CPU_PERIODIC_INT_DRIVER(fortyl_state, irq0_line_hold, 2*60)    /* source/number of IRQs is unknown */
+
+	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
+	MCFG_GENERIC_LATCH_DATA_PENDING_CB(DEVWRITELINE("soundnmi", input_merger_device, in_w<0>))
+
+	MCFG_GENERIC_LATCH_8_ADD("soundlatch2")
+
+	MCFG_INPUT_MERGER_ALL_HIGH("soundnmi")
+	MCFG_INPUT_MERGER_OUTPUT_HANDLER(INPUTLINE("audiocpu", INPUT_LINE_NMI))
 
 	MCFG_DEVICE_ADD("bmcu", TAITO68705_MCU, 18432000/6) /* OK */
 
@@ -784,7 +739,6 @@ static MACHINE_CONFIG_START( 40love )
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("speaker")
 
-	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
 	MCFG_TA7630_ADD("ta7630")
 
 	MCFG_SOUND_ADD("aysnd", AY8910, 2000000)
@@ -811,7 +765,7 @@ static MACHINE_CONFIG_START( 40love )
 	MCFG_SOUND_ROUTE_EX(0, "dac", 1.0, DAC_VREF_POS_INPUT) MCFG_SOUND_ROUTE_EX(0, "dac", -1.0, DAC_VREF_NEG_INPUT)
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_START( undoukai )
+MACHINE_CONFIG_START(fortyl_state::undoukai)
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu",Z80,8000000/2)
@@ -821,6 +775,14 @@ static MACHINE_CONFIG_START( undoukai )
 	MCFG_CPU_ADD("audiocpu",Z80,8000000/2)
 	MCFG_CPU_PROGRAM_MAP(sound_map)
 	MCFG_CPU_PERIODIC_INT_DRIVER(fortyl_state, irq0_line_hold, 2*60)    /* source/number of IRQs is unknown */
+
+	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
+	MCFG_GENERIC_LATCH_DATA_PENDING_CB(DEVWRITELINE("soundnmi", input_merger_device, in_w<0>))
+
+	MCFG_GENERIC_LATCH_8_ADD("soundlatch2")
+
+	MCFG_INPUT_MERGER_ALL_HIGH("soundnmi")
+	MCFG_INPUT_MERGER_OUTPUT_HANDLER(INPUTLINE("audiocpu", INPUT_LINE_NMI))
 
 	MCFG_DEVICE_ADD("bmcu", TAITO68705_MCU, 18432000/6)
 
@@ -843,7 +805,6 @@ static MACHINE_CONFIG_START( undoukai )
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("speaker")
 
-	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
 	MCFG_TA7630_ADD("ta7630")
 
 	MCFG_SOUND_ADD("aysnd", AY8910, 2000000)
@@ -1022,7 +983,7 @@ ROM_START( undoukai )
 	ROM_LOAD( "a17-18.23v", 0x0c00, 0x0400, CRC(3023a1da) SHA1(08ce4c6e99d04b358d66f0588852311d07183619) )  /* ??? */
 ROM_END
 
-GAME( 1984, 40love,   0,        40love,   40love,   fortyl_state, 40love,   ROT0, "Taito Corporation", "Forty-Love (World)",           MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_GRAPHICS )
-GAME( 1984, 40lovej,  40love,   40love,   40love,   fortyl_state, 40love,   ROT0, "Taito Corporation", "Forty-Love (Japan)",           MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_GRAPHICS ) // several ROMs needs double checking
+GAME( 1984, 40love,   0,        _40love,  40love,   fortyl_state, 40love,   ROT0, "Taito Corporation", "Forty-Love (World)",           MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_GRAPHICS )
+GAME( 1984, 40lovej,  40love,   _40love,  40love,   fortyl_state, 40love,   ROT0, "Taito Corporation", "Forty-Love (Japan)",           MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_GRAPHICS ) // several ROMs needs double checking
 GAME( 1984, fieldday, 0,        undoukai, undoukai, fortyl_state, undoukai, ROT0, "Taito Corporation", "Field Day",            MACHINE_SUPPORTS_SAVE )
 GAME( 1984, undoukai, fieldday, undoukai, undoukai, fortyl_state, undoukai, ROT0, "Taito Corporation", "The Undoukai (Japan)", MACHINE_SUPPORTS_SAVE )

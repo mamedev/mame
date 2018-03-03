@@ -81,6 +81,10 @@ public:
 
 	DECLARE_WRITE8_MEMBER(okibank_w);
 
+	void supduck(machine_config &config);
+	void main_map(address_map &map);
+	void oki_map(address_map &map);
+	void sound_map(address_map &map);
 protected:
 
 	// driver_device overrides
@@ -242,7 +246,7 @@ WRITE16_MEMBER(supduck_state::supduck_scroll_w)
 
 
 
-static ADDRESS_MAP_START( main_map, AS_PROGRAM, 16, supduck_state )
+ADDRESS_MAP_START(supduck_state::main_map)
 	AM_RANGE(0x000000, 0x03ffff) AM_ROM AM_WRITENOP
 	AM_RANGE(0xfe0000, 0xfe1fff) AM_RAM AM_SHARE("spriteram")
 
@@ -256,11 +260,11 @@ static ADDRESS_MAP_START( main_map, AS_PROGRAM, 16, supduck_state )
 	AM_RANGE(0xfec000, 0xfecfff) AM_RAM_WRITE(text_videoram_w) AM_SHARE("textvideoram")
 	AM_RANGE(0xff0000, 0xff3fff) AM_RAM_WRITE(back_videoram_w) AM_SHARE("backvideoram")
 	AM_RANGE(0xff4000, 0xff7fff) AM_RAM_WRITE(fore_videoram_w) AM_SHARE("forevideoram")
-	AM_RANGE(0xff8000, 0xff87ff) AM_RAM_DEVWRITE("palette", palette_device, write) AM_SHARE("palette")
+	AM_RANGE(0xff8000, 0xff87ff) AM_RAM_DEVWRITE("palette", palette_device, write16) AM_SHARE("palette")
 	AM_RANGE(0xffc000, 0xffffff) AM_RAM /* working RAM */
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( sound_map, AS_PROGRAM, 8, supduck_state )
+ADDRESS_MAP_START(supduck_state::sound_map)
 	AM_RANGE(0x0000, 0x7fff) AM_ROM
 	AM_RANGE(0x8000, 0x87ff) AM_RAM
 	AM_RANGE(0x9000, 0x9000) AM_WRITE(okibank_w)
@@ -268,7 +272,7 @@ static ADDRESS_MAP_START( sound_map, AS_PROGRAM, 8, supduck_state )
 	AM_RANGE(0xa000, 0xa000) AM_DEVREAD("soundlatch", generic_latch_8_device, read)
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( oki_map, 0, 8, supduck_state )
+ADDRESS_MAP_START(supduck_state::oki_map)
 	AM_RANGE(0x00000, 0x1ffff) AM_ROM
 	AM_RANGE(0x20000, 0x3ffff) AM_ROMBANK("okibank")
 ADDRESS_MAP_END
@@ -433,14 +437,14 @@ void supduck_state::machine_reset()
 }
 
 
-static MACHINE_CONFIG_START( supduck )
+MACHINE_CONFIG_START(supduck_state::supduck)
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", M68000, XTAL_8MHz) /* Verified on PCB */
+	MCFG_CPU_ADD("maincpu", M68000, XTAL(8'000'000)) /* Verified on PCB */
 	MCFG_CPU_PROGRAM_MAP(main_map)
 	MCFG_CPU_VBLANK_INT_DRIVER("screen", supduck_state,  irq2_line_hold) // 2 & 4?
 
-	MCFG_CPU_ADD("audiocpu", Z80, XTAL_8MHz/4) /* 2MHz - verified on PCB */
+	MCFG_CPU_ADD("audiocpu", Z80, XTAL(8'000'000)/4) /* 2MHz - verified on PCB */
 	MCFG_CPU_PROGRAM_MAP(sound_map)
 
 	/* video hardware */
@@ -467,7 +471,7 @@ static MACHINE_CONFIG_START( supduck )
 
 	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
 
-	MCFG_OKIM6295_ADD("oki", XTAL_8MHz/8, PIN7_HIGH) // 1MHz - Verified on PCB, pin 7 not verified
+	MCFG_OKIM6295_ADD("oki", XTAL(8'000'000)/8, PIN7_HIGH) // 1MHz - Verified on PCB, pin 7 not verified
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 	MCFG_DEVICE_ADDRESS_MAP(0, oki_map)
 

@@ -85,6 +85,8 @@ public:
 	virtual void machine_reset() override;
 	virtual void video_start() override;
 	uint32_t screen_update_mole(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	void mole(machine_config &config);
+	void mole_map(address_map &map);
 };
 
 
@@ -171,7 +173,7 @@ READ8_MEMBER(mole_state::mole_protection_r)
 	{
 	case 0x08: return 0xb0; /* random mole placement */
 	case 0x26:
-		if (space.device().safe_pc() == 0x53d5)
+		if (m_maincpu->pc() == 0x53d5)
 		{
 			return 0x06; /* bonus round */
 		}
@@ -199,7 +201,7 @@ READ8_MEMBER(mole_state::mole_protection_r)
  *
  *************************************/
 
-static ADDRESS_MAP_START( mole_map, AS_PROGRAM, 8, mole_state )
+ADDRESS_MAP_START(mole_state::mole_map)
 	AM_RANGE(0x0000, 0x03ff) AM_RAM
 	AM_RANGE(0x0800, 0x08ff) AM_READ(mole_protection_r)
 	AM_RANGE(0x0800, 0x0800) AM_WRITENOP // ???
@@ -317,7 +319,7 @@ void mole_state::machine_reset()
 	m_tile_bank = 0;
 }
 
-static MACHINE_CONFIG_START( mole )
+MACHINE_CONFIG_START(mole_state::mole)
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", M6502, 4000000) // ???

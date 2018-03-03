@@ -680,11 +680,11 @@ DEFINE_DEVICE_TYPE(MOS6561,            mos6561_device,            "mos6561",    
 DEFINE_DEVICE_TYPE(MOS656X_ATTACK_UFO, mos656x_attack_ufo_device, "mos656x_attack_ufo", "MOS 656X VIC (Attack UFO)")
 
 // default address maps
-static ADDRESS_MAP_START( mos6560_videoram_map, 0, 8, mos6560_device )
+ADDRESS_MAP_START(mos6560_device::mos6560_videoram_map)
 	AM_RANGE(0x0000, 0x3fff) AM_RAM
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( mos6560_colorram_map, 1, 8, mos6560_device )
+ADDRESS_MAP_START(mos6560_device::mos6560_colorram_map)
 	AM_RANGE(0x000, 0x3ff) AM_RAM
 ADDRESS_MAP_END
 
@@ -694,8 +694,8 @@ mos6560_device::mos6560_device(const machine_config &mconfig, device_type type, 
 		device_sound_interface(mconfig, *this),
 		device_video_interface(mconfig, *this),
 		m_variant(variant),
-		m_videoram_space_config("videoram", ENDIANNESS_LITTLE, 8, 14, 0, nullptr, *ADDRESS_MAP_NAME(mos6560_videoram_map)),
-		m_colorram_space_config("colorram", ENDIANNESS_LITTLE, 8, 10, 0, nullptr, *ADDRESS_MAP_NAME(mos6560_colorram_map)),
+		m_videoram_space_config("videoram", ENDIANNESS_LITTLE, 8, 14, 0, address_map_constructor(), address_map_constructor(FUNC(mos6560_device::mos6560_videoram_map), this)),
+		m_colorram_space_config("colorram", ENDIANNESS_LITTLE, 8, 10, 0, address_map_constructor(), address_map_constructor(FUNC(mos6560_device::mos6560_colorram_map), this)),
 		m_read_potx(*this),
 		m_read_poty(*this)
 {
@@ -737,7 +737,7 @@ device_memory_interface::space_config_vector mos6560_device::memory_space_config
 
 void mos6560_device::device_start()
 {
-	m_screen->register_screen_bitmap(m_bitmap);
+	screen().register_screen_bitmap(m_bitmap);
 
 	// resolve callbacks
 	m_read_potx.resolve_safe(0xff);
@@ -769,7 +769,7 @@ void mos6560_device::device_start()
 
 	// allocate timers
 	m_line_timer = timer_alloc(TIMER_LINE);
-	m_line_timer->adjust(m_screen->scan_period(), 0, m_screen->scan_period());
+	m_line_timer->adjust(screen().scan_period(), 0, screen().scan_period());
 
 	// initialize sound
 	sound_start();

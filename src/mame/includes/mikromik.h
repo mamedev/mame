@@ -2,8 +2,8 @@
 // copyright-holders:Curt Coder
 #pragma once
 
-#ifndef __MIKROMIKKO__
-#define __MIKROMIKKO__
+#ifndef MAME_INCLUDES_MIKROMIKKO_H
+#define MAME_INCLUDES_MIKROMIKKO_H
 
 #include "bus/rs232/rs232.h"
 #include "cpu/i8085/i8085.h"
@@ -126,12 +126,12 @@ public:
 	I8275_DRAW_CHARACTER_MEMBER( crtc_display_pixels );
 	UPD7220_DISPLAY_PIXELS_MEMBER( hgdc_display_pixels );
 	DECLARE_PALETTE_INIT( mm1 );
+	void mm1(machine_config &config);
+	void mm1m6(machine_config &config);
+	void mm1m6_video(machine_config &config);
+	void mm1m7(machine_config &config);
+	void mm1_map(address_map &map);
+	void mm1_upd7220_map(address_map &map);
 };
-
-
-//----------- defined in video/mikromik.c -----------
-
-MACHINE_CONFIG_EXTERN( mm1m6_video );
-
 
 #endif

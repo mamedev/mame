@@ -78,7 +78,7 @@
 #include "machine/nvram.h"
 #include "screen.h"
 
-#define MASTER_CLOCK    XTAL_8MHz   /* guess */
+#define MASTER_CLOCK    XTAL(8'000'000)   /* guess */
 
 
 class jokrwild_state : public driver_device
@@ -106,6 +106,8 @@ public:
 	uint32_t screen_update_jokrwild(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	required_device<cpu_device> m_maincpu;
 	required_device<gfxdecode_device> m_gfxdecode;
+	void jokrwild(machine_config &config);
+	void jokrwild_map(address_map &map);
 };
 
 
@@ -162,10 +164,10 @@ PALETTE_INIT_MEMBER(jokrwild_state, jokrwild)
 
 READ8_MEMBER(jokrwild_state::rng_r)
 {
-	if(space.device().safe_pc() == 0xab32)
+	if(m_maincpu->pc() == 0xab32)
 		return (offset == 0) ? 0x9e : 0x27;
 
-	if(space.device().safe_pc() == 0xab3a)
+	if(m_maincpu->pc() == 0xab3a)
 		return (offset == 2) ? 0x49 : 0x92;
 
 	return machine().rand() & 0xff;
@@ -176,7 +178,7 @@ READ8_MEMBER(jokrwild_state::rng_r)
 * Memory Map Information *
 *************************/
 
-static ADDRESS_MAP_START( jokrwild_map, AS_PROGRAM, 8, jokrwild_state )
+ADDRESS_MAP_START(jokrwild_state::jokrwild_map)
 	AM_RANGE(0x0000, 0x03ff) AM_RAM_WRITE(jokrwild_videoram_w) AM_SHARE("videoram")
 	AM_RANGE(0x0400, 0x07ff) AM_RAM //FIXME: backup RAM
 	AM_RANGE(0x2000, 0x23ff) AM_RAM_WRITE(jokrwild_colorram_w) AM_SHARE("colorram")
@@ -402,7 +404,7 @@ WRITE8_MEMBER(jokrwild_state::testb_w)
 *    Machine Drivers     *
 *************************/
 
-static MACHINE_CONFIG_START( jokrwild )
+MACHINE_CONFIG_START(jokrwild_state::jokrwild)
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", M6809, MASTER_CLOCK/2)  /* guess */

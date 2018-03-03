@@ -126,6 +126,8 @@ public:
 	TIMER_CALLBACK_MEMBER(ready_end_cb);
 	TIMER_CALLBACK_MEMBER(keyboard_strobe_cb);
 
+	void apple1(machine_config &config);
+	void apple1_map(address_map &map);
 private:
 	uint8_t *m_ram_ptr, *m_char_ptr;
 	int m_ram_size, m_char_size;
@@ -425,7 +427,7 @@ WRITE8_MEMBER(apple1_state::ram_w)
 	}
 }
 
-static ADDRESS_MAP_START( apple1_map, AS_PROGRAM, 8, apple1_state )
+ADDRESS_MAP_START(apple1_state::apple1_map)
 	AM_RANGE(0x0000, 0xbfff) AM_READWRITE(ram_r, ram_w)
 	AM_RANGE(0xd010, 0xd013) AM_MIRROR(0x0fec) AM_DEVREADWRITE(A1_PIA_TAG, pia6821_device, read, write)
 	AM_RANGE(0xe000, 0xefff) AM_RAM AM_SHARE(A1_BASICRAM_TAG)
@@ -585,13 +587,13 @@ static SLOT_INTERFACE_START(apple1_cards)
 	SLOT_INTERFACE("cffa", A1BUS_CFFA)
 SLOT_INTERFACE_END
 
-static MACHINE_CONFIG_START( apple1 )
+MACHINE_CONFIG_START(apple1_state::apple1)
 	MCFG_CPU_ADD(A1_CPU_TAG, M6502, 960000)        // effective CPU speed
 	MCFG_CPU_PROGRAM_MAP(apple1_map)
 
 	// video timings are identical to the Apple II, unsurprisingly
 	MCFG_SCREEN_ADD("screen", RASTER)
-	MCFG_SCREEN_RAW_PARAMS(XTAL_14_31818MHz, (65*7)*2, 0, (40*7)*2, 262, 0, 192)
+	MCFG_SCREEN_RAW_PARAMS(XTAL(14'318'181), (65*7)*2, 0, (40*7)*2, 262, 0, 192)
 	MCFG_SCREEN_UPDATE_DRIVER(apple1_state, screen_update)
 	MCFG_SCREEN_PALETTE("palette")
 

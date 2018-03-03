@@ -26,7 +26,7 @@
 #include "screen.h"
 #include "speaker.h"
 
-#define MAIN_CLOCK XTAL_24MHz
+#define MAIN_CLOCK XTAL(24'000'000)
 
 class kontest_state : public driver_device
 {
@@ -52,6 +52,9 @@ public:
 	// member functions
 	DECLARE_WRITE8_MEMBER(control_w);
 
+	void kontest(machine_config &config);
+	void kontest_io(address_map &map);
+	void kontest_map(address_map &map);
 protected:
 	// driver_device overrides
 	virtual void machine_start() override;
@@ -165,12 +168,12 @@ WRITE8_MEMBER(kontest_state::control_w)
 	m_maincpu->set_input_line(0, CLEAR_LINE);
 }
 
-static ADDRESS_MAP_START( kontest_map, AS_PROGRAM, 8, kontest_state )
+ADDRESS_MAP_START(kontest_state::kontest_map)
 	AM_RANGE(0x0000, 0x7fff) AM_ROM
 	AM_RANGE(0xe000, 0xffff) AM_RAM AM_SHARE("ram")
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( kontest_io, AS_IO, 8, kontest_state )
+ADDRESS_MAP_START(kontest_state::kontest_io)
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	AM_RANGE(0x00, 0x00) AM_DEVWRITE("sn1", sn76489a_device, write)
 	AM_RANGE(0x04, 0x04) AM_DEVWRITE("sn2", sn76489a_device, write)
@@ -247,7 +250,7 @@ void kontest_state::machine_reset()
 	m_control = 0;
 }
 
-static MACHINE_CONFIG_START( kontest )
+MACHINE_CONFIG_START(kontest_state::kontest)
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", Z80,MAIN_CLOCK/8)

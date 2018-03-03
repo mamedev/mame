@@ -39,56 +39,27 @@
 #define INT_SET             0x100
 #define INT_CLEAR           0x200
 
-/* ULA context */
-
-struct ULA
-{
-	uint8_t interrupt_status;
-	uint8_t interrupt_control;
-	uint8_t rompage;
-	uint16_t screen_start;
-	uint16_t screen_base;
-	int screen_size;
-	uint16_t screen_addr;
-	uint8_t *vram;
-	int current_pal[16];
-	int communication_mode;
-	int screen_mode;
-	int shiftlock_mode;
-	int capslock_mode;
-//  int scanline;
-	/* tape reading related */
-	uint32_t tape_value;
-	int tape_steps;
-	int bit_count;
-	int high_tone_set;
-	int start_bit;
-	int stop_bit;
-	int tape_running;
-	uint8_t tape_byte;
-};
-
 class accomm_state : public driver_device
 {
 public:
-	accomm_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag),
-			m_maincpu(*this, "maincpu"),
-			m_beeper(*this, "beeper"),
-			m_ram(*this, RAM_TAG),
-			m_via(*this, "via6522"),
-			m_acia(*this, "acia"),
-			m_acia_clock(*this, "acia_clock"),
-			m_adlc(*this, "mc6854"),
-			m_vram(*this, "vram"),
-			m_keybd1(*this, "LINE1.%u", 0),
-			m_keybd2(*this, "LINE2.%u", 0),
-			m_ch00rom_enabled(true)
+	accomm_state(const machine_config &mconfig, device_type type, const char *tag) :
+		driver_device(mconfig, type, tag),
+		m_maincpu(*this, "maincpu"),
+		m_beeper(*this, "beeper"),
+		m_ram(*this, RAM_TAG),
+		m_via(*this, "via6522"),
+		m_acia(*this, "acia"),
+		m_acia_clock(*this, "acia_clock"),
+		m_adlc(*this, "mc6854"),
+		m_vram(*this, "vram"),
+		m_keybd1(*this, "LINE1.%u", 0),
+		m_keybd2(*this, "LINE2.%u", 0),
+		m_ch00rom_enabled(true)
 	{ }
 
-	virtual void machine_reset() override;
-	virtual void machine_start() override;
+	void accomm(machine_config &config);
 
+protected:
 	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 
 	DECLARE_WRITE8_MEMBER(ch00switch_w);
@@ -104,7 +75,10 @@ public:
 	DECLARE_PALETTE_INIT(accomm);
 	INTERRUPT_GEN_MEMBER(vbl_int);
 
-protected:
+	virtual void machine_reset() override;
+	virtual void machine_start() override;
+	void main_map(address_map &map);
+
 	// devices
 	required_device<g65816_device> m_maincpu;
 	required_device<beep_device> m_beeper;
@@ -125,6 +99,37 @@ protected:
 
 private:
 	bool m_ch00rom_enabled;
+
+	/* ULA context */
+
+	struct ULA
+	{
+		uint8_t interrupt_status;
+		uint8_t interrupt_control;
+		uint8_t rompage;
+		uint16_t screen_start;
+		uint16_t screen_base;
+		int screen_size;
+		uint16_t screen_addr;
+		uint8_t *vram;
+		int current_pal[16];
+		int communication_mode;
+		int screen_mode;
+		int shiftlock_mode;
+		int capslock_mode;
+		//  int scanline;
+		/* tape reading related */
+		uint32_t tape_value;
+		int tape_steps;
+		int bit_count;
+		int high_tone_set;
+		int start_bit;
+		int stop_bit;
+		int tape_running;
+		uint8_t tape_byte;
+	};
+
+
 	ULA m_ula;
 	int m_map4[256];
 	int m_map16[256];
@@ -215,7 +220,7 @@ void accomm_state::video_start()
 
 WRITE8_MEMBER(accomm_state::ch00switch_w)
 {
-	if (!machine().side_effect_disabled())
+	if (!machine().side_effects_disabled())
 		m_ch00rom_enabled = false;
 }
 
@@ -630,7 +635,7 @@ WRITE_LINE_MEMBER(accomm_state::econet_clk_w)
 	m_adlc->txc_w(state);
 }
 
-static ADDRESS_MAP_START( main_map, AS_PROGRAM, 8, accomm_state )
+ADDRESS_MAP_START(accomm_state::main_map)
 	AM_RANGE(0x000000, 0x1fffff) AM_READWRITE(ram_r, ram_w)                                       /* System RAM */
 	AM_RANGE(0x200000, 0x3fffff) AM_NOP                                                           /* External expansion RAM */
 	AM_RANGE(0x400000, 0x400000) AM_NOP                                                           /* MODEM */
@@ -825,8 +830,8 @@ static INPUT_PORTS_START( accomm )
 	PORT_BIT(0x08, IP_ACTIVE_HIGH, IPT_UNUSED)
 INPUT_PORTS_END
 
-static MACHINE_CONFIG_START( accomm )
-	MCFG_CPU_ADD("maincpu", G65816, XTAL_16MHz / 8)
+MACHINE_CONFIG_START(accomm_state::accomm)
+	MCFG_CPU_ADD("maincpu", G65816, 16_MHz_XTAL / 8)
 	MCFG_CPU_PROGRAM_MAP(main_map)
 	MCFG_CPU_VBLANK_INT_DRIVER("screen", accomm_state, vbl_int)
 
@@ -858,7 +863,7 @@ static MACHINE_CONFIG_START( accomm )
 	/* rtc pcf8573 */
 
 	/* via */
-	MCFG_DEVICE_ADD("via6522", VIA6522, XTAL_16MHz / 16)
+	MCFG_DEVICE_ADD("via6522", VIA6522, XTAL(16'000'000) / 16)
 	MCFG_VIA6522_WRITEPA_HANDLER(DEVWRITE8("cent_data_out", output_latch_device, write))
 	MCFG_VIA6522_CA2_HANDLER(DEVWRITELINE("centronics", centronics_device, write_strobe))
 
@@ -873,7 +878,7 @@ static MACHINE_CONFIG_START( accomm )
 	MCFG_RS232_DCD_HANDLER(DEVWRITELINE("acia", acia6850_device, write_dcd))
 	MCFG_RS232_CTS_HANDLER(DEVWRITELINE("acia", acia6850_device, write_cts))
 
-	MCFG_DEVICE_ADD("acia_clock", CLOCK, XTAL_16MHz / 13)
+	MCFG_DEVICE_ADD("acia_clock", CLOCK, XTAL(16'000'000) / 13)
 	MCFG_CLOCK_SIGNAL_HANDLER(WRITELINE(accomm_state, write_acia_clock))
 
 	/* econet */

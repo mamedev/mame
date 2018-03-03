@@ -7,11 +7,10 @@
 
 /*
    Hardware:
-CPU:     2 x M6809, optional M6802 (what for?)
+CPU:     2 x 6809E, optional MC6802 which may replace second 6809E
     INT: IRQ on CPU 0, FIRQ on CPU 1
-IO:      DMA (Direct Memory Access/Address)
-         2x PIA 6821
-         1x VIS 6522
+IO:      2x PIA 6821
+         1x VIA 6522
 DISPLAY: 5x6 digit 7 or 16 segment display
 SOUND:   basically the same as Bally's Squalk & Talk -61 board but missing AY8912 synth chip
 */
@@ -31,24 +30,28 @@ public:
 		: genpin_class(mconfig, type, tag)
 		, m_maincpu(*this, "maincpu") { }
 
+		void barni(machine_config &config);
+		void audiocpu_map(address_map &map);
+		void maincpu_map(address_map &map);
+		void subcpu_map(address_map &map);
 private:
 	required_device<cpu_device> m_maincpu;
 };
 
-static ADDRESS_MAP_START( maincpu_map, AS_PROGRAM, 8, barni_state )
+ADDRESS_MAP_START(barni_state::maincpu_map)
 	ADDRESS_MAP_UNMAP_HIGH
 	AM_RANGE(0x0000, 0x00ff) AM_RAM
 	AM_RANGE(0xa100, 0xa7ff) AM_RAM
 	AM_RANGE(0xc000, 0xffff) AM_ROM
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( subcpu_map, AS_PROGRAM, 8, barni_state )
+ADDRESS_MAP_START(barni_state::subcpu_map)
 	ADDRESS_MAP_UNMAP_HIGH
 	AM_RANGE(0x0000, 0x03ff) AM_RAM
 	AM_RANGE(0xe000, 0xffff) AM_ROM
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( audiocpu_map, AS_PROGRAM, 8, barni_state )
+ADDRESS_MAP_START(barni_state::audiocpu_map)
 	AM_RANGE(0x0000, 0x007f) AM_RAM
 	AM_RANGE(0xc000, 0xffff) AM_ROM
 ADDRESS_MAP_END
@@ -56,15 +59,15 @@ ADDRESS_MAP_END
 static INPUT_PORTS_START( barni )
 INPUT_PORTS_END
 
-static MACHINE_CONFIG_START( barni )
+MACHINE_CONFIG_START(barni_state::barni)
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", M6809, 2000000)
+	MCFG_CPU_ADD("maincpu", MC6809E, XTAL(4'000'000) / 4)
 	MCFG_CPU_PROGRAM_MAP(maincpu_map)
 
-	MCFG_CPU_ADD("subcpu", M6809, 2000000)
+	MCFG_CPU_ADD("subcpu", MC6809E, XTAL(4'000'000) / 4)
 	MCFG_CPU_PROGRAM_MAP(subcpu_map)
 
-	MCFG_CPU_ADD("audiocpu", M6802, 2000000)
+	MCFG_CPU_ADD("audiocpu", M6802, 4000000) // uses own XTAL, but what is the value?
 	MCFG_CPU_PROGRAM_MAP(audiocpu_map)
 
 	/* video hardware */
@@ -76,7 +79,7 @@ static MACHINE_CONFIG_START( barni )
 	/* sound hardware */
 	//tmms5220
 	//dac
-	MCFG_FRAGMENT_ADD( genpin_audio )
+	genpin_audio(config);
 MACHINE_CONFIG_END
 
 

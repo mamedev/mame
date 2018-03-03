@@ -54,20 +54,22 @@ public:
 			m_maincpu(*this, "maincpu")
 	{ }
 
+	void belatra(machine_config &config);
+	void belatra_map(address_map &map);
 protected:
 
 	// devices
 	required_device<cpu_device> m_maincpu;
 };
 
-static ADDRESS_MAP_START( belatra_map, AS_PROGRAM, 32, belatra_state )
+ADDRESS_MAP_START(belatra_state::belatra_map)
 	AM_RANGE(0x00000000, 0x003fffff) AM_ROM
 ADDRESS_MAP_END
 
 static INPUT_PORTS_START( belatra )
 INPUT_PORTS_END
 
-static MACHINE_CONFIG_START( belatra )
+MACHINE_CONFIG_START(belatra_state::belatra)
 	MCFG_CPU_ADD("maincpu", ARM7, 54000000) // guess...
 	MCFG_CPU_PROGRAM_MAP(belatra_map)
 

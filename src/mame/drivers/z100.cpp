@@ -219,6 +219,9 @@ public:
 	virtual void video_start() override;
 	uint32_t screen_update_z100(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	DECLARE_INPUT_CHANGED_MEMBER(key_stroke);
+	void z100(machine_config &config);
+	void z100_io(address_map &map);
+	void z100_mem(address_map &map);
 };
 
 #define mc6845_h_char_total     (m_crtc_vreg[0])
@@ -305,7 +308,7 @@ WRITE8_MEMBER( z100_state::z100_vram_w )
 	}
 }
 
-static ADDRESS_MAP_START(z100_mem, AS_PROGRAM, 8, z100_state)
+ADDRESS_MAP_START(z100_state::z100_mem)
 	ADDRESS_MAP_UNMAP_HIGH
 	AM_RANGE(0x00000,0x3ffff) AM_RAM // 128*2 KB RAM
 //  AM_RANGE(0xb0000,0xbffff) AM_ROM // expansion ROM
@@ -381,7 +384,7 @@ WRITE8_MEMBER( z100_state::floppy_motor_w )
 		m_floppy->mon_w(!BIT(data, 1));
 }
 
-static ADDRESS_MAP_START(z100_io, AS_IO, 8, z100_state)
+ADDRESS_MAP_START(z100_state::z100_io)
 	ADDRESS_MAP_UNMAP_HIGH
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
 //  AM_RANGE (0x00, 0x3f) reserved for non-ZDS vendors
@@ -616,9 +619,9 @@ WRITE8_MEMBER( z100_state::video_pia_A_w )
 	*/
 
 	m_vram_enable = ((data & 0x80) >> 7) ^ 1;
-	m_gbank = BITSWAP8(((data & 0x70) >> 4) ^ 0x7,7,6,5,4,3,1,0,2);
+	m_gbank = bitswap<8>(((data & 0x70) >> 4) ^ 0x7,7,6,5,4,3,1,0,2);
 	m_flash = ((data & 8) >> 3) ^ 1;
-	m_display_mask = BITSWAP8((data & 7) ^ 7,7,6,5,4,3,1,0,2);
+	m_display_mask = bitswap<8>((data & 7) ^ 7,7,6,5,4,3,1,0,2);
 }
 
 WRITE8_MEMBER( z100_state::video_pia_B_w )
@@ -665,9 +668,9 @@ static SLOT_INTERFACE_START( z100_floppies )
 	SLOT_INTERFACE("dd", FLOPPY_525_DD)
 SLOT_INTERFACE_END
 
-static MACHINE_CONFIG_START( z100 )
+MACHINE_CONFIG_START(z100_state::z100)
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu",I8088, XTAL_14_31818MHz/3)
+	MCFG_CPU_ADD("maincpu",I8088, XTAL(14'318'181)/3)
 	MCFG_CPU_PROGRAM_MAP(z100_mem)
 	MCFG_CPU_IO_MAP(z100_io)
 	MCFG_CPU_IRQ_ACKNOWLEDGE_DEVICE("pic8259_master", pic8259_device, inta_cb)
@@ -684,7 +687,7 @@ static MACHINE_CONFIG_START( z100 )
 	MCFG_PALETTE_ADD("palette", 8)
 
 	/* devices */
-	MCFG_MC6845_ADD("crtc", MC6845, "screen", XTAL_14_31818MHz/8)    /* unknown clock, hand tuned to get ~50/~60 fps */
+	MCFG_MC6845_ADD("crtc", MC6845, "screen", XTAL(14'318'181)/8)    /* unknown clock, hand tuned to get ~50/~60 fps */
 	MCFG_MC6845_SHOW_BORDER_AREA(false)
 	MCFG_MC6845_CHAR_WIDTH(8)
 
@@ -705,7 +708,7 @@ static MACHINE_CONFIG_START( z100 )
 
 	MCFG_DEVICE_ADD("pia1", PIA6821, 0)
 
-	MCFG_FD1797_ADD("z207_fdc", XTAL_1MHz)
+	MCFG_FD1797_ADD("z207_fdc", XTAL(1'000'000))
 
 	MCFG_FLOPPY_DRIVE_ADD("z207_fdc:0", z100_floppies, "dd", floppy_image_device::default_floppy_formats)
 	MCFG_FLOPPY_DRIVE_ADD("z207_fdc:1", z100_floppies, "dd", floppy_image_device::default_floppy_formats)

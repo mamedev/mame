@@ -27,11 +27,11 @@ ToDo:
 #include "screen.h"
 
 
-class gts3a_state : public driver_device
+class gts3a_state : public genpin_class
 {
 public:
 	gts3a_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag)
+		: genpin_class(mconfig, type, tag)
 		, m_palette(*this, "palette")
 		, m_maincpu(*this, "maincpu")
 		, m_dmdcpu(*this, "dmdcpu")
@@ -52,6 +52,9 @@ public:
 	MC6845_UPDATE_ROW(crtc_update_row);
 	DECLARE_PALETTE_INIT(gts3a);
 	required_device<palette_device> m_palette;
+	void gts3a(machine_config &config);
+	void gts3a_dmd_map(address_map &map);
+	void gts3a_map(address_map &map);
 private:
 	bool m_dispclk;
 	bool m_lampclk;
@@ -69,7 +72,7 @@ private:
 };
 
 
-static ADDRESS_MAP_START( gts3a_map, AS_PROGRAM, 8, gts3a_state )
+ADDRESS_MAP_START(gts3a_state::gts3a_map)
 	AM_RANGE(0x0000, 0x1fff) AM_RAM AM_SHARE("nvram")
 	AM_RANGE(0x2000, 0x200f) AM_DEVREADWRITE("u4", via6522_device, read, write)
 	AM_RANGE(0x2010, 0x201f) AM_DEVREADWRITE("u5", via6522_device, read, write)
@@ -77,7 +80,7 @@ static ADDRESS_MAP_START( gts3a_map, AS_PROGRAM, 8, gts3a_state )
 	AM_RANGE(0x4000, 0xffff) AM_ROM
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( gts3a_dmd_map, AS_PROGRAM, 8, gts3a_state )
+ADDRESS_MAP_START(gts3a_state::gts3a_dmd_map)
 	AM_RANGE(0x0000, 0x1fff) AM_RAM
 	AM_RANGE(0x2000, 0x2000) AM_DEVREAD("crtc", mc6845_device, status_r)
 	AM_RANGE(0x2001, 0x2001) AM_DEVREAD("crtc", mc6845_device, register_r)
@@ -232,7 +235,7 @@ WRITE8_MEMBER( gts3a_state::segbank_w )
 	uint32_t seg1,seg2;
 	m_segment[offset] = data;
 	seg1 = m_segment[offset&2] | (m_segment[offset|1] << 8);
-	seg2 = BITSWAP32(seg1,16,16,16,16,16,16,16,16,16,16,16,16,16,16,15,14,9,7,13,11,10,6,8,12,5,4,3,3,2,1,0,0);
+	seg2 = bitswap<32>(seg1,16,16,16,16,16,16,16,16,16,16,16,16,16,16,15,14,9,7,13,11,10,6,8,12,5,4,3,3,2,1,0,0);
 	output().set_digit_value(m_digit+(BIT(offset, 1) ? 0 : 20), seg2);
 }
 
@@ -330,13 +333,13 @@ MC6845_UPDATE_ROW( gts3a_state::crtc_update_row )
 	}
 }
 
-static MACHINE_CONFIG_START( gts3a )
+MACHINE_CONFIG_START(gts3a_state::gts3a)
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", M65C02, XTAL_4MHz / 2)
+	MCFG_CPU_ADD("maincpu", M65C02, XTAL(4'000'000) / 2)
 	MCFG_CPU_PROGRAM_MAP(gts3a_map)
-	MCFG_NVRAM_ADD_0FILL("nvram")
+	MCFG_NVRAM_ADD_0FILL("nvram") // 6116LP + DS1210
 
-	MCFG_CPU_ADD("dmdcpu", M65C02, XTAL_3_579545MHz / 2)
+	MCFG_CPU_ADD("dmdcpu", M65C02, XTAL(3'579'545) / 2)
 	MCFG_CPU_PROGRAM_MAP(gts3a_dmd_map)
 
 	/* Video */
@@ -349,15 +352,15 @@ static MACHINE_CONFIG_START( gts3a )
 	MCFG_PALETTE_ADD( "palette", 2 )
 	MCFG_PALETTE_INIT_OWNER(gts3a_state, gts3a)
 
-	MCFG_MC6845_ADD("crtc", MC6845, "screen", XTAL_3_579545MHz / 2)
+	MCFG_MC6845_ADD("crtc", MC6845, "screen", XTAL(3'579'545) / 2)
 	MCFG_MC6845_SHOW_BORDER_AREA(false)
 	MCFG_MC6845_CHAR_WIDTH(8)
 	MCFG_MC6845_UPDATE_ROW_CB(gts3a_state, crtc_update_row)
 
 	/* Sound */
-	MCFG_FRAGMENT_ADD( genpin_audio )
+	genpin_audio(config);
 
-	MCFG_DEVICE_ADD("u4", VIA6522, 0)
+	MCFG_DEVICE_ADD("u4", VIA6522, XTAL(4'000'000) / 2)
 	MCFG_VIA6522_IRQ_HANDLER(INPUTLINE("maincpu", M65C02_IRQ_LINE))
 	MCFG_VIA6522_READPA_HANDLER(READ8(gts3a_state, u4a_r))
 	MCFG_VIA6522_READPB_HANDLER(READ8(gts3a_state, u4b_r))
@@ -365,7 +368,7 @@ static MACHINE_CONFIG_START( gts3a )
 	//MCFG_VIA6522_CA2_HANDLER(WRITELINE(gts3a_state, u4ca2_w))
 	MCFG_VIA6522_CB2_HANDLER(WRITELINE(gts3a_state, nmi_w))
 
-	MCFG_DEVICE_ADD("u5", VIA6522, 0)
+	MCFG_DEVICE_ADD("u5", VIA6522, XTAL(4'000'000) / 2)
 	MCFG_VIA6522_IRQ_HANDLER(INPUTLINE("maincpu", M65C02_IRQ_LINE))
 	//MCFG_VIA6522_READPA_HANDLER(READ8(gts3a_state, u5a_r))
 	//MCFG_VIA6522_READPB_HANDLER(READ8(gts3a_state, u5b_r))

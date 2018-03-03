@@ -31,7 +31,7 @@
 #include "cardline.lh"
 
 
-#define MASTER_CLOCK XTAL_12MHz
+#define MASTER_CLOCK XTAL(12'000'000)
 
 class cardline_state : public driver_device
 {
@@ -75,6 +75,9 @@ public:
 	required_device<gfxdecode_device> m_gfxdecode;
 	required_device<palette_device> m_palette;
 	required_device<screen_device> m_screen;
+	void cardline(machine_config &config);
+	void mem_io(address_map &map);
+	void mem_prg(address_map &map);
 };
 
 void cardline_state::machine_start()
@@ -209,11 +212,11 @@ WRITE8_MEMBER(cardline_state::lamps_w)
 	output().set_lamp_value(7,(data >> 7) & 1);
 }
 
-static ADDRESS_MAP_START( mem_prg, AS_PROGRAM, 8, cardline_state )
+ADDRESS_MAP_START(cardline_state::mem_prg)
 	AM_RANGE(0x0000, 0xffff) AM_ROM
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( mem_io, AS_IO, 8, cardline_state )
+ADDRESS_MAP_START(cardline_state::mem_io)
 	AM_RANGE(0x0000, 0x1fff) AM_RAM
 	AM_RANGE(0x2003, 0x2003) AM_READ_PORT("IN0")
 	AM_RANGE(0x2005, 0x2005) AM_READ_PORT("IN1")
@@ -230,8 +233,6 @@ static ADDRESS_MAP_START( mem_io, AS_IO, 8, cardline_state )
 	AM_RANGE(0x3003, 0x3003) AM_WRITE(a3003_w)
 	AM_RANGE(0xc000, 0xdfff) AM_WRITE(vram_w) AM_SHARE("videoram")
 	AM_RANGE(0xe000, 0xffff) AM_WRITE(attr_w) AM_SHARE("colorram")
-	/* Ports */
-	AM_RANGE(MCS51_PORT_P1, MCS51_PORT_P1) AM_READWRITE(hsync_r, video_w)
 ADDRESS_MAP_END
 
 
@@ -313,13 +314,15 @@ PALETTE_INIT_MEMBER(cardline_state, cardline)
 	}
 }
 
-static MACHINE_CONFIG_START( cardline )
+MACHINE_CONFIG_START(cardline_state::cardline)
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", I80C32, MASTER_CLOCK)
 	MCFG_MCS51_PORT1_CONFIG(0x10)
 	MCFG_CPU_PROGRAM_MAP(mem_prg)
 	MCFG_CPU_IO_MAP(mem_io)
+	MCFG_MCS51_PORT_P1_IN_CB(READ8(cardline_state, hsync_r))
+	MCFG_MCS51_PORT_P1_OUT_CB(WRITE8(cardline_state, video_w))
 	//MCFG_CPU_VBLANK_INT_DRIVER("screen", cardline_state,  irq1_line_hold)
 
 	/* video hardware */

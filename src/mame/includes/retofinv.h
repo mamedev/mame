@@ -48,6 +48,14 @@ public:
 	INTERRUPT_GEN_MEMBER(main_vblank_irq);
 	INTERRUPT_GEN_MEMBER(sub_vblank_irq);
 
+	void retofinvb1_nomcu(machine_config &config);
+	void retofinvb_nomcu(machine_config &config);
+	void retofinv(machine_config &config);
+	void retofinvb1(machine_config &config);
+	void bootleg_map(address_map &map);
+	void main_map(address_map &map);
+	void sound_map(address_map &map);
+	void sub_map(address_map &map);
 protected:
 	virtual void machine_start() override;
 	virtual void video_start() override;

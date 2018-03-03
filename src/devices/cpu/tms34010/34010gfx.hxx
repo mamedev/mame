@@ -27,7 +27,7 @@ void tms340x0_device::line(uint16_t op)
 
 		m_st |= STBIT_P;
 		TEMP() = (op & 0x80) ? 1 : 0;  /* boundary value depends on the algorithm */
-		LOGGFX(("%08X(%3d):LINE (%d,%d)-(%d,%d)\n", m_pc, m_screen->vpos(), DADDR_X(), DADDR_Y(), DADDR_X() + DYDX_X(), DADDR_Y() + DYDX_Y()));
+		LOGGFX(("%08X(%3d):LINE (%d,%d)-(%d,%d)\n", m_pc, screen().vpos(), DADDR_X(), DADDR_Y(), DADDR_X() + DYDX_X(), DADDR_Y() + DYDX_Y()));
 	}
 
 	if (COUNT() > 0)
@@ -207,10 +207,10 @@ int tms340x0_device::compute_pixblt_b_cycles(int left_partials, int right_partia
 /* Shift register handling */
 void tms340x0_device::memory_w(address_space &space, offs_t offset,uint16_t data)
 {
-	logerror("memory_w %08x %04x\n", offset << 3, data);
+	//logerror("memory_w %08x %04x\n", offset << 3, data);
 	if((offset << 3) == 0x02005010 && data == 0x0000) {
 		machine().debug_break();
-		//		abort();
+		//      abort();
 	}
 	space.write_word(offset, data);
 }
@@ -222,7 +222,7 @@ uint16_t tms340x0_device::memory_r(address_space &space, offs_t offset)
 
 void tms340x0_device::shiftreg_w(address_space &space, offs_t offset,uint16_t data)
 {
-	logerror("shiftreg_w %08x %04x\n", offset << 3, data);
+	//logerror("shiftreg_w %08x %04x\n", offset << 3, data);
 	if (!m_from_shiftreg_cb.isnull())
 		m_from_shiftreg_cb(space, offset, &m_shiftreg[0]);
 	else
@@ -835,7 +835,7 @@ void tms340x0_device::pixblt_b_l(uint16_t op)
 	int trans = (IOREG(REG_CONTROL) & 0x20) >> 5;
 	int rop = (IOREG(REG_CONTROL) >> 10) & 0x1f;
 	int ix = trans | (rop << 1) | (psize << 6);
-	if (!P_FLAG()) LOGGFX(("%08X(%3d):PIXBLT B,L (%dx%d) depth=%d\n", m_pc, m_screen->vpos(), DYDX_X(), DYDX_Y(), IOREG(REG_PSIZE) ? IOREG(REG_PSIZE) : 32));
+	if (!P_FLAG()) LOGGFX(("%08X(%3d):PIXBLT B,L (%dx%d) depth=%d\n", m_pc, screen().vpos(), DYDX_X(), DYDX_Y(), IOREG(REG_PSIZE) ? IOREG(REG_PSIZE) : 32));
 	m_pixel_op = s_pixel_op_table[rop];
 	m_pixel_op_timing = s_pixel_op_timing_table[rop];
 	(this->*s_pixblt_b_op_table[ix])(1);
@@ -847,7 +847,7 @@ void tms340x0_device::pixblt_b_xy(uint16_t op)
 	int trans = (IOREG(REG_CONTROL) & 0x20) >> 5;
 	int rop = (IOREG(REG_CONTROL) >> 10) & 0x1f;
 	int ix = trans | (rop << 1) | (psize << 6);
-	if (!P_FLAG()) LOGGFX(("%08X(%3d):PIXBLT B,XY (%d,%d) (%dx%d) depth=%d\n", m_pc, m_screen->vpos(), DADDR_X(), DADDR_Y(), DYDX_X(), DYDX_Y(), IOREG(REG_PSIZE) ? IOREG(REG_PSIZE) : 32));
+	if (!P_FLAG()) LOGGFX(("%08X(%3d):PIXBLT B,XY (%d,%d) (%dx%d) depth=%d\n", m_pc, screen().vpos(), DADDR_X(), DADDR_Y(), DYDX_X(), DYDX_Y(), IOREG(REG_PSIZE) ? IOREG(REG_PSIZE) : 32));
 	m_pixel_op = s_pixel_op_table[rop];
 	m_pixel_op_timing = s_pixel_op_timing_table[rop];
 	(this->*s_pixblt_b_op_table[ix])(0);
@@ -860,7 +860,7 @@ void tms340x0_device::pixblt_l_l(uint16_t op)
 	int rop = (IOREG(REG_CONTROL) >> 10) & 0x1f;
 	int pbh = (IOREG(REG_CONTROL) >> 8) & 1;
 	int ix = trans | (rop << 1) | (psize << 6);
-	if (!P_FLAG()) LOGGFX(("%08X(%3d):PIXBLT L,L (%dx%d) depth=%d\n", m_pc, m_screen->vpos(), DYDX_X(), DYDX_Y(), IOREG(REG_PSIZE) ? IOREG(REG_PSIZE) : 32));
+	if (!P_FLAG()) LOGGFX(("%08X(%3d):PIXBLT L,L (%dx%d) depth=%d\n", m_pc, screen().vpos(), DYDX_X(), DYDX_Y(), IOREG(REG_PSIZE) ? IOREG(REG_PSIZE) : 32));
 	m_pixel_op = s_pixel_op_table[rop];
 	m_pixel_op_timing = s_pixel_op_timing_table[rop];
 	if (!pbh)
@@ -876,7 +876,7 @@ void tms340x0_device::pixblt_l_xy(uint16_t op)
 	int rop = (IOREG(REG_CONTROL) >> 10) & 0x1f;
 	int pbh = (IOREG(REG_CONTROL) >> 8) & 1;
 	int ix = trans | (rop << 1) | (psize << 6);
-	if (!P_FLAG()) LOGGFX(("%08X(%3d):PIXBLT L,XY (%d,%d) (%dx%d) depth=%d\n", m_pc, m_screen->vpos(), DADDR_X(), DADDR_Y(), DYDX_X(), DYDX_Y(), IOREG(REG_PSIZE) ? IOREG(REG_PSIZE) : 32));
+	if (!P_FLAG()) LOGGFX(("%08X(%3d):PIXBLT L,XY (%d,%d) (%dx%d) depth=%d\n", m_pc, screen().vpos(), DADDR_X(), DADDR_Y(), DYDX_X(), DYDX_Y(), IOREG(REG_PSIZE) ? IOREG(REG_PSIZE) : 32));
 	m_pixel_op = s_pixel_op_table[rop];
 	m_pixel_op_timing = s_pixel_op_timing_table[rop];
 	if (!pbh)
@@ -892,7 +892,7 @@ void tms340x0_device::pixblt_xy_l(uint16_t op)
 	int rop = (IOREG(REG_CONTROL) >> 10) & 0x1f;
 	int pbh = (IOREG(REG_CONTROL) >> 8) & 1;
 	int ix = trans | (rop << 1) | (psize << 6);
-	if (!P_FLAG()) LOGGFX(("%08X(%3d):PIXBLT XY,L (%dx%d) depth=%d\n", m_pc, m_screen->vpos(), DYDX_X(), DYDX_Y(), IOREG(REG_PSIZE) ? IOREG(REG_PSIZE) : 32));
+	if (!P_FLAG()) LOGGFX(("%08X(%3d):PIXBLT XY,L (%dx%d) depth=%d\n", m_pc, screen().vpos(), DYDX_X(), DYDX_Y(), IOREG(REG_PSIZE) ? IOREG(REG_PSIZE) : 32));
 	m_pixel_op = s_pixel_op_table[rop];
 	m_pixel_op_timing = s_pixel_op_timing_table[rop];
 	if (!pbh)
@@ -908,7 +908,7 @@ void tms340x0_device::pixblt_xy_xy(uint16_t op)
 	int rop = (IOREG(REG_CONTROL) >> 10) & 0x1f;
 	int pbh = (IOREG(REG_CONTROL) >> 8) & 1;
 	int ix = trans | (rop << 1) | (psize << 6);
-	if (!P_FLAG()) LOGGFX(("%08X(%3d):PIXBLT XY,XY (%dx%d) depth=%d\n", m_pc, m_screen->vpos(), DYDX_X(), DYDX_Y(), IOREG(REG_PSIZE) ? IOREG(REG_PSIZE) : 32));
+	if (!P_FLAG()) LOGGFX(("%08X(%3d):PIXBLT XY,XY (%dx%d) depth=%d\n", m_pc, screen().vpos(), DYDX_X(), DYDX_Y(), IOREG(REG_PSIZE) ? IOREG(REG_PSIZE) : 32));
 	m_pixel_op = s_pixel_op_table[rop];
 	m_pixel_op_timing = s_pixel_op_timing_table[rop];
 	if (!pbh)
@@ -923,7 +923,7 @@ void tms340x0_device::fill_l(uint16_t op)
 	int trans = (IOREG(REG_CONTROL) & 0x20) >> 5;
 	int rop = (IOREG(REG_CONTROL) >> 10) & 0x1f;
 	int ix = trans | (rop << 1) | (psize << 6);
-	if (!P_FLAG()) LOGGFX(("%08X(%3d):FILL L (%dx%d) depth=%d\n", m_pc, m_screen->vpos(), DYDX_X(), DYDX_Y(), IOREG(REG_PSIZE) ? IOREG(REG_PSIZE) : 32));
+	if (!P_FLAG()) LOGGFX(("%08X(%3d):FILL L (%dx%d) depth=%d\n", m_pc, screen().vpos(), DYDX_X(), DYDX_Y(), IOREG(REG_PSIZE) ? IOREG(REG_PSIZE) : 32));
 	m_pixel_op = s_pixel_op_table[rop];
 	m_pixel_op_timing = s_pixel_op_timing_table[rop];
 	(this->*s_fill_op_table[ix])(1);
@@ -935,7 +935,7 @@ void tms340x0_device::fill_xy(uint16_t op)
 	int trans = (IOREG(REG_CONTROL) & 0x20) >> 5;
 	int rop = (IOREG(REG_CONTROL) >> 10) & 0x1f;
 	int ix = trans | (rop << 1) | (psize << 6);
-	if (!P_FLAG()) LOGGFX(("%08X(%3d):FILL XY (%d,%d) (%dx%d) depth=%d\n", m_pc, m_screen->vpos(), DADDR_X(), DADDR_Y(), DYDX_X(), DYDX_Y(), IOREG(REG_PSIZE) ? IOREG(REG_PSIZE) : 32));
+	if (!P_FLAG()) LOGGFX(("%08X(%3d):FILL XY (%d,%d) (%dx%d) depth=%d\n", m_pc, screen().vpos(), DADDR_X(), DADDR_Y(), DYDX_X(), DYDX_Y(), IOREG(REG_PSIZE) ? IOREG(REG_PSIZE) : 32));
 	m_pixel_op = s_pixel_op_table[rop];
 	m_pixel_op_timing = s_pixel_op_timing_table[rop];
 	(this->*s_fill_op_table[ix])(0);

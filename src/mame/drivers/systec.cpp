@@ -48,17 +48,20 @@ public:
 		, m_maincpu(*this, "maincpu")
 	{ }
 
+	void systec(machine_config &config);
+	void systec_io(address_map &map);
+	void systec_mem(address_map &map);
 private:
 	virtual void machine_reset() override;
 	required_device<cpu_device> m_maincpu;
 };
 
-static ADDRESS_MAP_START(systec_mem, AS_PROGRAM, 8, systec_state)
+ADDRESS_MAP_START(systec_state::systec_mem)
 	ADDRESS_MAP_UNMAP_HIGH
 	AM_RANGE(0x0000, 0xffff) AM_RAM AM_REGION("maincpu", 0)
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START(systec_io, AS_IO, 8, systec_state)
+ADDRESS_MAP_START(systec_state::systec_io)
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	AM_RANGE(0x68, 0x6b) // fdc?
 	AM_RANGE(0x6c, 0x6c) // motor control?
@@ -77,9 +80,9 @@ void systec_state::machine_reset()
 }
 
 
-static MACHINE_CONFIG_START( systec )
+MACHINE_CONFIG_START(systec_state::systec)
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", Z80, XTAL_16MHz / 4)
+	MCFG_CPU_ADD("maincpu", Z80, XTAL(16'000'000) / 4)
 	MCFG_CPU_PROGRAM_MAP(systec_mem)
 	MCFG_CPU_IO_MAP(systec_io)
 
@@ -88,7 +91,7 @@ static MACHINE_CONFIG_START( systec )
 	MCFG_DEVCB_CHAIN_OUTPUT(DEVWRITELINE("sio", z80sio_device, rxca_w))
 
 	/* Devices */
-	MCFG_DEVICE_ADD("sio", Z80SIO, XTAL_4MHz)
+	MCFG_DEVICE_ADD("sio", Z80SIO, XTAL(4'000'000))
 	//MCFG_Z80SIO_OUT_INT_CB(INPUTLINE("maincpu", INPUT_LINE_IRQ0))  // no evidence of a daisy chain because IM2 is not set
 	MCFG_Z80SIO_OUT_TXDA_CB(DEVWRITELINE("rs232", rs232_port_device, write_txd))
 	MCFG_Z80SIO_OUT_DTRA_CB(DEVWRITELINE("rs232", rs232_port_device, write_dtr))

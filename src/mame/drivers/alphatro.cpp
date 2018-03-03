@@ -45,7 +45,7 @@
 #include "softlist.h"
 #include "speaker.h"
 
-#define MAIN_CLOCK XTAL_4MHz
+#define MAIN_CLOCK XTAL(4'000'000)
 
 
 class alphatro_state : public driver_device
@@ -105,6 +105,12 @@ public:
 	DECLARE_DEVICE_IMAGE_LOAD_MEMBER(cart_load) { return load_cart(image, m_cart); }
 	DECLARE_FLOPPY_FORMATS( floppy_formats );
 
+	void alphatro(machine_config &config);
+	void alphatro_io(address_map &map);
+	void alphatro_map(address_map &map);
+	void cartbank_map(address_map &map);
+	void monbank_map(address_map &map);
+	void rombank_map(address_map &map);
 private:
 	uint8_t *m_ram_ptr;
 	required_device<ram_device> m_ram;
@@ -382,7 +388,7 @@ INPUT_CHANGED_MEMBER( alphatro_state::alphatro_break )
 	m_maincpu->set_input_line(INPUT_LINE_IRQ0, HOLD_LINE);
 }
 
-static ADDRESS_MAP_START( alphatro_map, AS_PROGRAM, 8, alphatro_state )
+ADDRESS_MAP_START(alphatro_state::alphatro_map)
 	AM_RANGE(0x0000, 0x5fff) AM_DEVICE("lowbank", address_map_bank_device, amap8)
 	AM_RANGE(0x6000, 0x9fff) AM_READWRITE(ram6000_r, ram6000_w)
 	AM_RANGE(0xa000, 0xdfff) AM_DEVICE("cartbank", address_map_bank_device, amap8)
@@ -391,23 +397,23 @@ static ADDRESS_MAP_START( alphatro_map, AS_PROGRAM, 8, alphatro_state )
 
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( rombank_map, AS_PROGRAM, 8, alphatro_state )
+ADDRESS_MAP_START(alphatro_state::rombank_map)
 	AM_RANGE(0x0000, 0x5fff) AM_ROM AM_REGION("roms", 0x0000) AM_WRITE(ram0000_w)
 	AM_RANGE(0x6000, 0xbfff) AM_READWRITE(ram0000_r, ram0000_w)
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( cartbank_map, AS_PROGRAM, 8, alphatro_state )
+ADDRESS_MAP_START(alphatro_state::cartbank_map)
 	AM_RANGE(0x0000, 0x3fff) AM_DEVREAD("cartslot", generic_slot_device, read_rom) AM_WRITE(rama000_w)
 	AM_RANGE(0x4000, 0x7fff) AM_READWRITE(rama000_r, rama000_w)
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( monbank_map, AS_PROGRAM, 8, alphatro_state )
+ADDRESS_MAP_START(alphatro_state::monbank_map)
 	AM_RANGE(0x0000, 0x0fff) AM_RAM AM_SHARE("videoram")
 	AM_RANGE(0x1000, 0x1fff) AM_ROM AM_REGION("roms", 0x8000)
 	AM_RANGE(0x2000, 0x2fff) AM_ROM AM_REGION("roms", 0x9000)
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( alphatro_io, AS_IO, 8, alphatro_state )
+ADDRESS_MAP_START(alphatro_state::alphatro_io)
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	ADDRESS_MAP_UNMAP_HIGH
 	AM_RANGE(0x10, 0x10) AM_READWRITE(port10_r, port10_w)
@@ -686,7 +692,7 @@ static SLOT_INTERFACE_START( alphatro_floppies )
 	SLOT_INTERFACE( "525dd", FLOPPY_525_DD )
 SLOT_INTERFACE_END
 
-static MACHINE_CONFIG_START( alphatro )
+MACHINE_CONFIG_START(alphatro_state::alphatro)
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu",Z80,MAIN_CLOCK)
 	MCFG_CPU_PROGRAM_MAP(alphatro_map)
@@ -726,7 +732,7 @@ static MACHINE_CONFIG_START( alphatro )
 	MCFG_I8257_OUT_IOW_2_CB(DEVWRITE8("fdc", upd765a_device, mdma_w))
 	MCFG_I8257_OUT_TC_CB(DEVWRITELINE("fdc", upd765a_device, tc_line_w))
 
-	MCFG_MC6845_ADD("crtc", MC6845, "screen", XTAL_12_288MHz / 8) // clk unknown
+	MCFG_MC6845_ADD("crtc", MC6845, "screen", XTAL(12'288'000) / 8) // clk unknown
 	MCFG_MC6845_SHOW_BORDER_AREA(false)
 	MCFG_MC6845_CHAR_WIDTH(8)
 	MCFG_MC6845_UPDATE_ROW_CB(alphatro_state, crtc_update_row)

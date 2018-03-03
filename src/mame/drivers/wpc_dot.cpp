@@ -9,7 +9,7 @@
 #include "speaker.h"
 
 
-static ADDRESS_MAP_START( wpc_dot_map, AS_PROGRAM, 8, wpc_dot_state )
+ADDRESS_MAP_START(wpc_dot_state::wpc_dot_map)
 	AM_RANGE(0x0000, 0x2fff) AM_READWRITE(ram_r,ram_w)
 	AM_RANGE(0x3000, 0x31ff) AM_RAMBANK("dmdbank1")
 	AM_RANGE(0x3200, 0x33ff) AM_RAMBANK("dmdbank2")
@@ -301,7 +301,7 @@ uint32_t wpc_dot_state::screen_update(screen_device &screen, bitmap_rgb32 &bitma
 	return 0;
 }
 
-static MACHINE_CONFIG_START( wpc_dot )
+MACHINE_CONFIG_START(wpc_dot_state::wpc_dot)
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", M6809, 2000000)
 	MCFG_CPU_PROGRAM_MAP(wpc_dot_map)

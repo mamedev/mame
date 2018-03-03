@@ -159,7 +159,7 @@ WRITE_LINE_MEMBER(changela_state::coin_counter_2_w)
 }
 
 
-static ADDRESS_MAP_START( changela_map, AS_PROGRAM, 8, changela_state )
+ADDRESS_MAP_START(changela_state::changela_map)
 	AM_RANGE(0x0000, 0x7fff) AM_ROM
 	AM_RANGE(0x8000, 0x83ff) AM_RAM AM_SHARE("spriteram") /* OBJ0 RAM */
 	AM_RANGE(0x9000, 0x97ff) AM_RAM AM_SHARE("videoram")    /* OBJ1 RAM */
@@ -415,7 +415,7 @@ void changela_state::machine_reset()
 	m_dir_31 = 0;
 }
 
-static MACHINE_CONFIG_START( changela )
+MACHINE_CONFIG_START(changela_state::changela)
 
 	MCFG_CPU_ADD("maincpu", Z80,5000000)
 	MCFG_CPU_PROGRAM_MAP(changela_map)

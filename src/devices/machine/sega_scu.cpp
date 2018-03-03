@@ -116,7 +116,7 @@ DEFINE_DEVICE_TYPE(SEGA_SCU, sega_scu_device, "sega_scu", "Sega System Control U
 //AM_RANGE(0x0010, 0x0013) DMA enable
 //AM_RANGE(0x0014, 0x0017) DMA start factor
 
-DEVICE_ADDRESS_MAP_START( regs_map, 32, sega_scu_device )
+ADDRESS_MAP_START(sega_scu_device::regs_map)
 	AM_RANGE(0x0000, 0x0017) AM_READWRITE(dma_lv0_r,dma_lv0_w)
 	AM_RANGE(0x0020, 0x0037) AM_READWRITE(dma_lv1_r,dma_lv1_w)
 	AM_RANGE(0x0040, 0x0057) AM_READWRITE(dma_lv2_r,dma_lv2_w)
@@ -150,13 +150,6 @@ sega_scu_device::sega_scu_device(const machine_config &mconfig, const char *tag,
 {
 }
 
-void sega_scu_device::static_set_hostcpu(device_t &device, const char *cputag)
-{
-	sega_scu_device &dev = downcast<sega_scu_device &>(device);
-	dev.m_hostcpu_tag = cputag;
-}
-
-
 //-------------------------------------------------
 //  add_device_mconfig - device-specific machine
 //  configuration addiitons
@@ -183,8 +176,8 @@ WRITE16_MEMBER(sega_scu_device::scudsp_dma_w)
 	m_hostspace->write_word(addr, data,mem_mask);
 }
 
-MACHINE_CONFIG_MEMBER(sega_scu_device::device_add_mconfig)
-	MCFG_CPU_ADD("scudsp", SCUDSP, XTAL_57_2727MHz/4) // 14 MHz
+MACHINE_CONFIG_START(sega_scu_device::device_add_mconfig)
+	MCFG_CPU_ADD("scudsp", SCUDSP, XTAL(57'272'727)/4) // 14 MHz
 	MCFG_SCUDSP_OUT_IRQ_CB(DEVWRITELINE(DEVICE_SELF, sega_scu_device, scudsp_end_w))
 	MCFG_SCUDSP_IN_DMA_CB(READ16(sega_scu_device, scudsp_dma_r))
 	MCFG_SCUDSP_OUT_DMA_CB(WRITE16(sega_scu_device, scudsp_dma_w))

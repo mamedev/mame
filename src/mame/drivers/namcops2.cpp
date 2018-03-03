@@ -886,6 +886,9 @@ public:
 
 	uint32_t screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 
+	void system246(machine_config &config);
+	void system256(machine_config &config);
+	void ps2_map(address_map &map);
 protected:
 
 	// devices
@@ -905,7 +908,7 @@ uint32_t namcops2_state::screen_update(screen_device &screen, bitmap_rgb32 &bitm
 	return 0;
 }
 
-static ADDRESS_MAP_START(ps2_map, AS_PROGRAM, 32, namcops2_state)
+ADDRESS_MAP_START(namcops2_state::ps2_map)
 	AM_RANGE(0x00000000, 0x01ffffff) AM_RAM // 32 MB RAM in consumer PS2s, do these have more?
 	AM_RANGE(0x1fc00000, 0x1fdfffff) AM_ROM AM_REGION("bios", 0)
 ADDRESS_MAP_END
@@ -913,7 +916,7 @@ ADDRESS_MAP_END
 static INPUT_PORTS_START( system246 )
 INPUT_PORTS_END
 
-static MACHINE_CONFIG_START( system246 )
+MACHINE_CONFIG_START(namcops2_state::system246)
 	MCFG_CPU_ADD("maincpu", R5000LE, 294000000) // actually R5900 @ 294 MHz
 	MCFG_MIPS3_ICACHE_SIZE(16384)
 	MCFG_MIPS3_DCACHE_SIZE(16384)
@@ -929,7 +932,8 @@ static MACHINE_CONFIG_START( system246 )
 	MCFG_PALETTE_ADD("palette", 65536)
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_DERIVED( system256, system246 )
+MACHINE_CONFIG_START(namcops2_state::system256)
+	system246(config);
 MACHINE_CONFIG_END
 
 #define SYSTEM246_BIOS  \

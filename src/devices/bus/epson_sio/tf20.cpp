@@ -15,8 +15,8 @@
 #include "emu.h"
 #include "tf20.h"
 
-#define XTAL_CR1    XTAL_8MHz
-#define XTAL_CR2    XTAL_4_9152MHz
+#define XTAL_CR1    XTAL(8'000'000)
+#define XTAL_CR2    XTAL(4'915'200)
 
 
 //**************************************************************************
@@ -29,12 +29,12 @@ DEFINE_DEVICE_TYPE(EPSON_TF20, epson_tf20_device, "epson_tf20", "EPSON TF-20 Dua
 //  address maps
 //-------------------------------------------------
 
-static ADDRESS_MAP_START( cpu_mem, AS_PROGRAM, 8, epson_tf20_device )
+ADDRESS_MAP_START(epson_tf20_device::cpu_mem)
 	AM_RANGE(0x0000, 0x7fff) AM_RAMBANK("bank1")
 	AM_RANGE(0x8000, 0xffff) AM_RAMBANK("bank2")
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( cpu_io, AS_IO, 8, epson_tf20_device )
+ADDRESS_MAP_START(epson_tf20_device::cpu_io)
 	ADDRESS_MAP_UNMAP_HIGH
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	AM_RANGE(0xf0, 0xf3) AM_DEVREADWRITE("3a", upd7201_device, ba_cd_r, ba_cd_w)
@@ -83,7 +83,7 @@ static SLOT_INTERFACE_START( tf20_floppies )
 	SLOT_INTERFACE( "sd320", EPSON_SD_320 )
 SLOT_INTERFACE_END
 
-MACHINE_CONFIG_MEMBER( epson_tf20_device::device_add_mconfig )
+MACHINE_CONFIG_START(epson_tf20_device::device_add_mconfig)
 	MCFG_CPU_ADD("19b", Z80, XTAL_CR1 / 2) /* uPD780C */
 	MCFG_CPU_PROGRAM_MAP(cpu_mem)
 	MCFG_CPU_IO_MAP(cpu_io)
@@ -231,7 +231,7 @@ READ8_MEMBER( epson_tf20_device::rom_disable_r )
 
 READ8_MEMBER( epson_tf20_device::upd765_tc_r )
 {
-	logerror("%s: upd765_tc_r\n", space.machine().describe_context());
+	logerror("%s: upd765_tc_r\n", machine().describe_context());
 
 	// toggle tc on read
 	m_fdc->tc_w(true);
@@ -242,7 +242,7 @@ READ8_MEMBER( epson_tf20_device::upd765_tc_r )
 
 WRITE8_MEMBER( epson_tf20_device::fdc_control_w )
 {
-	logerror("%s: tf20_fdc_control_w(%02x)\n", space.machine().describe_context(), data);
+	logerror("%s: tf20_fdc_control_w(%02x)\n", machine().describe_context(), data);
 
 	// bit 0, motor on signal
 	m_fd0->mon_w(!BIT(data, 0));

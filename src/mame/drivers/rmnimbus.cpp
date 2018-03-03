@@ -36,7 +36,7 @@ static SLOT_INTERFACE_START(keyboard)
 	SLOT_INTERFACE("rmnkbd", RMNIMBUS_KEYBOARD)
 SLOT_INTERFACE_END
 
-static ADDRESS_MAP_START(nimbus_mem, AS_PROGRAM, 16, rmnimbus_state )
+ADDRESS_MAP_START(rmnimbus_state::nimbus_mem)
 	AM_RANGE( 0x00000, 0x1FFFF ) AM_RAMBANK(RAM_BANK00_TAG)
 	AM_RANGE( 0x20000, 0x3FFFF ) AM_RAMBANK(RAM_BANK01_TAG)
 	AM_RANGE( 0x40000, 0x5FFFF ) AM_RAMBANK(RAM_BANK02_TAG)
@@ -48,7 +48,7 @@ static ADDRESS_MAP_START(nimbus_mem, AS_PROGRAM, 16, rmnimbus_state )
 	AM_RANGE( 0xF0000, 0xFFFFF ) AM_ROM AM_REGION(MAINCPU_TAG, 0x0f0000)
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START(nimbus_io, AS_IO, 16, rmnimbus_state )
+ADDRESS_MAP_START(rmnimbus_state::nimbus_io)
 	AM_RANGE( 0x0000, 0x0031) AM_READWRITE(nimbus_video_io_r, nimbus_video_io_w)
 	AM_RANGE( 0x0080, 0x0081) AM_READWRITE8(nimbus_mcu_r, nimbus_mcu_w, 0x00FF)
 	AM_RANGE( 0x0092, 0x0093) AM_READWRITE8(nimbus_iou_r, nimbus_iou_w, 0x00FF)
@@ -89,18 +89,17 @@ static INPUT_PORTS_START( nimbus )
 
 INPUT_PORTS_END
 
-static ADDRESS_MAP_START(nimbus_iocpu_mem, AS_PROGRAM, 8, rmnimbus_state )
+ADDRESS_MAP_START(rmnimbus_state::nimbus_iocpu_mem)
 	ADDRESS_MAP_UNMAP_HIGH
 	AM_RANGE(0x0000, 0x1fff) AM_ROM
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( nimbus_iocpu_io , AS_IO, 8, rmnimbus_state )
+ADDRESS_MAP_START(rmnimbus_state::nimbus_iocpu_io)
 	ADDRESS_MAP_UNMAP_HIGH
 	AM_RANGE(0x00000, 0x000FF) AM_READWRITE(nimbus_pc8031_iou_r, nimbus_pc8031_iou_w)
-	AM_RANGE(0x20000, 0x20004) AM_READWRITE(nimbus_pc8031_port_r, nimbus_pc8031_port_w)
 ADDRESS_MAP_END
 
-static MACHINE_CONFIG_START( nimbus )
+MACHINE_CONFIG_START(rmnimbus_state::nimbus)
 	/* basic machine hardware */
 	MCFG_CPU_ADD(MAINCPU_TAG, I80186, 16000000) // the cpu is a 10Mhz part but the serial clocks are wrong unless it runs at 8Mhz
 	MCFG_CPU_PROGRAM_MAP(nimbus_mem)
@@ -112,10 +111,14 @@ static MACHINE_CONFIG_START( nimbus )
 	MCFG_CPU_ADD(IOCPU_TAG, I8031, 11059200)
 	MCFG_CPU_PROGRAM_MAP(nimbus_iocpu_mem)
 	MCFG_CPU_IO_MAP(nimbus_iocpu_io)
+	MCFG_MCS51_PORT_P1_IN_CB(READ8(rmnimbus_state, nimbus_pc8031_port1_r))
+	MCFG_MCS51_PORT_P1_OUT_CB(WRITE8(rmnimbus_state, nimbus_pc8031_port1_w))
+	MCFG_MCS51_PORT_P3_IN_CB(READ8(rmnimbus_state, nimbus_pc8031_port3_r))
+	MCFG_MCS51_PORT_P3_OUT_CB(WRITE8(rmnimbus_state, nimbus_pc8031_port3_w))
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
-	MCFG_SCREEN_RAW_PARAMS( XTAL_4_433619MHz*2,650,0,640,260,0,250)
+	MCFG_SCREEN_RAW_PARAMS( XTAL(4'433'619)*2,650,0,640,260,0,250)
 	MCFG_SCREEN_UPDATE_DRIVER(rmnimbus_state, screen_update_nimbus)
 	//MCFG_SCREEN_VIDEO_ATTRIBUTES(VIDEO_UPDATE_SCANLINE)
 	MCFG_SCREEN_PALETTE("palette")

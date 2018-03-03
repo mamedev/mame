@@ -65,6 +65,9 @@ public:
 
 	void sdwx_gfx_decrypt();
 	void pgm_create_dummy_internal_arm_region();
+	void igs_majhong(machine_config &config);
+	void amazonia(machine_config &config);
+	void igs_majhong_map(address_map &map);
 };
 
 
@@ -88,7 +91,7 @@ WRITE32_MEMBER(igs_m027_state::igs_cg_videoram_w)
 {
 	COMBINE_DATA(&m_igs_cg_videoram[offset]);
 	//if(data!=0)
-	logerror("PC(%08X) CG @%x = %x!\n",space.device().safe_pc(),offset ,m_igs_cg_videoram[offset]);
+	logerror("PC(%08X) CG @%x = %x!\n",m_maincpu->pc(),offset ,m_igs_cg_videoram[offset]);
 
 	/*
 	ROM:08020520                 DCW 0x3E                                           ddd1        y
@@ -140,25 +143,13 @@ uint32_t igs_m027_state::screen_update_igs_majhong(screen_device &screen, bitmap
 
 ***************************************************************************/
 
-static ADDRESS_MAP_START( igs_majhong_map, AS_PROGRAM, 32, igs_m027_state )
+ADDRESS_MAP_START(igs_m027_state::igs_majhong_map)
 	AM_RANGE(0x00000000, 0x00003fff) AM_ROM /* Internal ROM */
 	AM_RANGE(0x08000000, 0x0807ffff) AM_ROM AM_REGION("user1", 0)/* Game ROM */
 	AM_RANGE(0x10000000, 0x100003ff) AM_RAM AM_SHARE("igs_mainram")// main ram for asic?
 	AM_RANGE(0x18000000, 0x18007fff) AM_RAM
 
-
-	AM_RANGE(0x38000000, 0x38007FFF) AM_DEVREADWRITE8("igs017_igs031", igs017_igs031_device, read,write, 0xffffffff) // guess based on below
-
-#if 0
-	AM_RANGE(0x38001000, 0x380017ff) AM_RAM_WRITE(igs_cg_videoram_w) AM_SHARE("igs_cg_videoram")        //0x200 * 1   CG PALETTE?
-	AM_RANGE(0x38001800, 0x38001fff) AM_RAM_DEVWRITE("palette", palette_device, write) AM_SHARE("palette")        //0x200 * 1
-
-	AM_RANGE(0x38004000, 0x38005FFF) AM_RAM_WRITE(igs_tx_videoram_w) AM_SHARE("igs_tx_videoram") /* Text Layer */
-	AM_RANGE(0x38006000, 0x38007FFF) AM_RAM_WRITE(igs_bg_videoram_w) AM_SHARE("igs_bg_videoram") /* CG Layer */
-
-
-	AM_RANGE(0x38002010, 0x38002017) AM_RAM     //??????????????
-#endif
+	AM_RANGE(0x38000000, 0x38007fff) AM_DEVREADWRITE8("igs017_igs031", igs017_igs031_device, read,write, 0xffffffff) // guess based on below
 
 	AM_RANGE(0x38009000, 0x38009003) AM_RAM     //??????????????  oki 6295
 
@@ -212,7 +203,7 @@ void igs_m027_state::sdwx_gfx_decrypt()
 	std::vector<uint8_t> result_data(rom_size);
 
 	for (i=0; i<rom_size; i++)
-		result_data[i] = src[BITSWAP24(i, 23,22,21,20,19,18,17,16,15,14,13,12,11,8,7,6,10,9,5,4,3,2,1,0)];
+		result_data[i] = src[bitswap<24>(i, 23,22,21,20,19,18,17,16,15,14,13,12,11,8,7,6,10,9,5,4,3,2,1,0)];
 
 	for (i=0; i<rom_size; i+=0x200)
 	{
@@ -333,7 +324,7 @@ INTERRUPT_GEN_MEMBER(igs_m027_state::igs_majhong_interrupt)
 }
 
 
-static MACHINE_CONFIG_START( igs_majhong )
+MACHINE_CONFIG_START(igs_m027_state::igs_majhong)
 	MCFG_CPU_ADD("maincpu",ARM7, 20000000)
 
 	MCFG_CPU_PROGRAM_MAP(igs_majhong_map)
@@ -367,7 +358,7 @@ MACHINE_CONFIG_END
 
 
 
-static MACHINE_CONFIG_START( amazonia )
+MACHINE_CONFIG_START(igs_m027_state::amazonia)
 	MCFG_CPU_ADD("maincpu",ARM7, 20000000)
 
 	MCFG_CPU_PROGRAM_MAP(igs_majhong_map)

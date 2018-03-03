@@ -474,7 +474,7 @@ INPUT_PORTS_START( horizon )
 
 INPUT_PORTS_END
 
-MACHINE_CONFIG_MEMBER( horizon_ramdisk_device::device_add_mconfig )
+MACHINE_CONFIG_START(horizon_ramdisk_device::device_add_mconfig)
 	MCFG_RAM_ADD(NVRAMREGION)
 	MCFG_RAM_DEFAULT_SIZE("16M")
 

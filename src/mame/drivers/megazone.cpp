@@ -143,7 +143,7 @@ WRITE_LINE_MEMBER(megazone_state::irq_mask_w)
 }
 
 
-static ADDRESS_MAP_START( megazone_map, AS_PROGRAM, 8, megazone_state )
+ADDRESS_MAP_START(megazone_state::megazone_map)
 	AM_RANGE(0x0000, 0x0007) AM_DEVWRITE("mainlatch", ls259_device, write_d0)
 	AM_RANGE(0x0800, 0x0800) AM_DEVWRITE("watchdog", watchdog_timer_device, reset_w)
 	AM_RANGE(0x1000, 0x1000) AM_WRITEONLY AM_SHARE("scrolly")
@@ -157,7 +157,7 @@ static ADDRESS_MAP_START( megazone_map, AS_PROGRAM, 8, megazone_state )
 	AM_RANGE(0x4000, 0xffff) AM_ROM     /* 4000->5FFF is a debug rom */
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( megazone_sound_map, AS_PROGRAM, 8, megazone_state )
+ADDRESS_MAP_START(megazone_state::megazone_sound_map)
 	AM_RANGE(0x0000, 0x1fff) AM_ROM
 	AM_RANGE(0x2000, 0x2000) AM_WRITE(megazone_i8039_irq_w) /* START line. Interrupts 8039 */
 	AM_RANGE(0x4000, 0x4000) AM_DEVWRITE("soundlatch", generic_latch_8_device, write)            /* CODE  line. Command Interrupts 8039 */
@@ -172,18 +172,18 @@ static ADDRESS_MAP_START( megazone_sound_map, AS_PROGRAM, 8, megazone_state )
 	AM_RANGE(0xe000, 0xe7ff) AM_RAM AM_SHARE("share1")
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( megazone_sound_io_map, AS_IO, 8, megazone_state )
+ADDRESS_MAP_START(megazone_state::megazone_sound_io_map)
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	AM_RANGE(0x00, 0x00) AM_DEVWRITE("aysnd", ay8910_device, address_w)
 	AM_RANGE(0x00, 0x02) AM_DEVREAD("aysnd", ay8910_device, data_r)
 	AM_RANGE(0x02, 0x02) AM_DEVWRITE("aysnd", ay8910_device, data_w)
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( megazone_i8039_map, AS_PROGRAM, 8, megazone_state )
+ADDRESS_MAP_START(megazone_state::megazone_i8039_map)
 	AM_RANGE(0x0000, 0x0fff) AM_ROM
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( megazone_i8039_io_map, AS_IO, 8, megazone_state )
+ADDRESS_MAP_START(megazone_state::megazone_i8039_io_map)
 	AM_RANGE(0x00, 0xff) AM_DEVREAD("soundlatch", generic_latch_8_device, read)
 ADDRESS_MAP_END
 
@@ -289,19 +289,19 @@ INTERRUPT_GEN_MEMBER(megazone_state::vblank_irq)
 }
 
 
-static MACHINE_CONFIG_START( megazone )
+MACHINE_CONFIG_START(megazone_state::megazone)
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", KONAMI1, XTAL_18_432MHz/9)        /* 2.048 MHz */
+	MCFG_CPU_ADD("maincpu", KONAMI1, XTAL(18'432'000)/9)        /* 2.048 MHz */
 	MCFG_CPU_PROGRAM_MAP(megazone_map)
 	MCFG_CPU_VBLANK_INT_DRIVER("screen", megazone_state,  vblank_irq)
 
-	MCFG_CPU_ADD("audiocpu", Z80, XTAL_18_432MHz/6)     /* Z80 Clock is derived from the H1 signal */
+	MCFG_CPU_ADD("audiocpu", Z80, XTAL(18'432'000)/6)     /* Z80 Clock is derived from the H1 signal */
 	MCFG_CPU_PROGRAM_MAP(megazone_sound_map)
 	MCFG_CPU_IO_MAP(megazone_sound_io_map)
 	MCFG_CPU_VBLANK_INT_DRIVER("screen", megazone_state,  irq0_line_hold)
 
-	MCFG_CPU_ADD("daccpu", I8039, XTAL_14_31818MHz/2)    /* 7.15909MHz */
+	MCFG_CPU_ADD("daccpu", I8039, XTAL(14'318'181)/2)    /* 7.15909MHz */
 	MCFG_CPU_PROGRAM_MAP(megazone_i8039_map)
 	MCFG_CPU_IO_MAP(megazone_i8039_io_map)
 	MCFG_MCS48_PORT_P1_OUT_CB(DEVWRITE8("dac", dac_byte_interface, write))
@@ -336,7 +336,7 @@ static MACHINE_CONFIG_START( megazone )
 
 	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
 
-	MCFG_SOUND_ADD("aysnd", AY8910, XTAL_14_31818MHz/8)
+	MCFG_SOUND_ADD("aysnd", AY8910, XTAL(14'318'181)/8)
 	MCFG_AY8910_PORT_A_READ_CB(READ8(megazone_state, megazone_port_a_r))
 	MCFG_AY8910_PORT_B_WRITE_CB(WRITE8(megazone_state, megazone_port_b_w))
 	MCFG_SOUND_ROUTE(0, "filter.0.0", 0.30)

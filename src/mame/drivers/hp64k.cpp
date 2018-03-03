@@ -232,6 +232,9 @@ public:
 	TIMER_DEVICE_CALLBACK_MEMBER(hp64k_beeper_off);
 
 	DECLARE_WRITE_LINE_MEMBER(hp64k_baud_clk_w);
+	void hp64k(machine_config &config);
+	void cpu_io_map(address_map &map);
+	void cpu_mem_map(address_map &map);
 private:
 	required_device<hp_5061_3011_cpu_device> m_cpu;
 	required_device<i8275_device> m_crtc;
@@ -313,14 +316,14 @@ private:
 	bool m_rts_state;
 };
 
-static ADDRESS_MAP_START(cpu_mem_map , AS_PROGRAM , 16 , hp64k_state)
+ADDRESS_MAP_START(hp64k_state::cpu_mem_map)
 	AM_RANGE(0x0000 , 0x3fff) AM_ROM
 	AM_RANGE(0x4000 , 0x7fff) AM_READWRITE(hp64k_slot_r , hp64k_slot_w)
 	AM_RANGE(0x8000 , 0x8001) AM_WRITE(hp64k_crtc_w)
 	AM_RANGE(0x8002 , 0xffff) AM_RAM
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START(cpu_io_map , AS_IO , 16 , hp64k_state)
+ADDRESS_MAP_START(hp64k_state::cpu_io_map)
 	// PA = 0, IC = [0..3]
 	// Keyboard input
 	AM_RANGE(HP_MAKE_IOADDR(0 , 0) , HP_MAKE_IOADDR(0 , 3))   AM_READ(hp64k_kb_r)
@@ -1333,7 +1336,7 @@ static SLOT_INTERFACE_START(hp64k_floppies)
 	SLOT_INTERFACE("525dd" , FLOPPY_525_DD)
 SLOT_INTERFACE_END
 
-static MACHINE_CONFIG_START(hp64k)
+MACHINE_CONFIG_START(hp64k_state::hp64k)
 	MCFG_CPU_ADD("cpu" , HP_5061_3011 , 6250000)
 	MCFG_CPU_PROGRAM_MAP(cpu_mem_map)
 	MCFG_CPU_IO_MAP(cpu_io_map)
@@ -1360,7 +1363,7 @@ static MACHINE_CONFIG_START(hp64k)
 	MCFG_SCREEN_SIZE(720 , 390)
 	MCFG_PALETTE_ADD_MONOCHROME_HIGHLIGHT("palette")
 
-	MCFG_FD1791_ADD("fdc" , XTAL_4MHz / 4)
+	MCFG_FD1791_ADD("fdc" , XTAL(4'000'000) / 4)
 	MCFG_WD_FDC_FORCE_READY
 	MCFG_WD_FDC_INTRQ_CALLBACK(WRITELINE(hp64k_state , hp64k_flp_intrq_w))
 	MCFG_WD_FDC_DRQ_CALLBACK(WRITELINE(hp64k_state , hp64k_flp_drq_w))
@@ -1392,7 +1395,7 @@ static MACHINE_CONFIG_START(hp64k)
 
 	MCFG_TIMER_DRIVER_ADD("beep_timer" , hp64k_state , hp64k_beeper_off);
 
-	MCFG_DEVICE_ADD("baud_rate" , COM8116 , XTAL_5_0688MHz)
+	MCFG_DEVICE_ADD("baud_rate" , COM8116 , XTAL(5'068'800))
 	MCFG_COM8116_FR_HANDLER(WRITELINE(hp64k_state , hp64k_baud_clk_w));
 
 	MCFG_DEVICE_ADD("uart" , I8251 , 0)

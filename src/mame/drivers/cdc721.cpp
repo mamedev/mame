@@ -30,6 +30,9 @@ public:
 	DECLARE_PALETTE_INIT(cdc721);
 //  DECLARE_WRITE8_MEMBER(port70_w) { membank("bankr0")->set_entry(BIT(data, 3)); }
 
+void cdc721(machine_config &config);
+void io_map(address_map &map);
+void mem_map(address_map &map);
 private:
 	u8 m_flashcnt;
 	virtual void machine_reset() override;
@@ -38,14 +41,14 @@ private:
 	required_shared_ptr<u8> m_p_videoram;
 };
 
-static ADDRESS_MAP_START( mem_map, AS_PROGRAM, 8, cdc721_state )
+ADDRESS_MAP_START(cdc721_state::mem_map)
 	AM_RANGE(0x0000, 0x4fff) AM_ROM AM_REGION("maincpu", 0x10000)
 //  AM_RANGE(0x0000, 0x4fff) AM_READ_BANK("bankr0") AM_WRITE_BANK("bankw0")
 	AM_RANGE(0x8000, 0xe10f) AM_RAM
 	AM_RANGE(0xe110, 0xffff) AM_RAM AM_SHARE("videoram")
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( io_map, AS_IO, 8, cdc721_state )
+ADDRESS_MAP_START(cdc721_state::io_map)
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	AM_RANGE(0x10, 0x1f) AM_DEVREADWRITE("crtc", tms9927_device, read, write)
 //  AM_RANGE(0x70, 0x70) AM_WRITE(port70_w)
@@ -140,7 +143,7 @@ uint32_t cdc721_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap
 	return 0;
 }
 
-static MACHINE_CONFIG_START( cdc721 )
+MACHINE_CONFIG_START(cdc721_state::cdc721)
 	// basic machine hardware
 	MCFG_CPU_ADD("maincpu", Z80, 4000000)
 	MCFG_CPU_PROGRAM_MAP(mem_map)
@@ -158,7 +161,7 @@ static MACHINE_CONFIG_START( cdc721 )
 	MCFG_PALETTE_INIT_OWNER(cdc721_state, cdc721)
 	MCFG_GFXDECODE_ADD("gfxdecode", "palette", cdc721)
 
-	MCFG_DEVICE_ADD("crtc", TMS9927, 2000000) // clock guess
+	MCFG_DEVICE_ADD("crtc", TMS9927, 2000000 / 8) // clock guess
 	MCFG_TMS9927_CHAR_WIDTH(8)
 MACHINE_CONFIG_END
 

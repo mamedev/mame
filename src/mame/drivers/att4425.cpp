@@ -48,8 +48,11 @@ public:
 		, m_p_videoram(*this, "videoram")
 		, m_p_chargen(*this, "chargen")
 		, m_screen(*this, SCREEN_TAG)
-		{ }
+	{ }
 
+	void att4425(machine_config &config);
+
+protected:
 	DECLARE_WRITE8_MEMBER(port10_w);
 	DECLARE_WRITE8_MEMBER(port14_w);
 	DECLARE_READ8_MEMBER(port14_r);
@@ -60,10 +63,12 @@ public:
 
 	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 
-private:
 	virtual void machine_start() override;
 	virtual void video_start() override;
+	void att4425_io(address_map &map);
+	void att4425_mem(address_map &map);
 
+private:
 	required_device<z80_device> m_maincpu;
 	required_device<i8251_device> m_i8251;
 	required_device<z80sio_device> m_sio;
@@ -96,12 +101,12 @@ READ8_MEMBER(att4425_state::port15_r)
 	return 0;
 }
 
-static ADDRESS_MAP_START( att4425_mem, AS_PROGRAM, 8, att4425_state )
+ADDRESS_MAP_START(att4425_state::att4425_mem)
 	AM_RANGE(0x0000, 0x7fff) AM_ROM AM_REGION(Z80_TAG, 0)
 	AM_RANGE(0x8000, 0xffff) AM_RAM AM_SHARE("videoram") // c000..f7af?
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( att4425_io, AS_IO, 8, att4425_state )
+ADDRESS_MAP_START(att4425_state::att4425_io)
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	AM_RANGE(0x00, 0x00) AM_DEVREADWRITE(I8251_TAG, i8251_device, data_r, data_w)
 	AM_RANGE(0x01, 0x01) AM_DEVREADWRITE(I8251_TAG, i8251_device, status_r, control_w)
@@ -231,9 +236,9 @@ static const z80_daisy_config att4425_daisy_chain[] =
 	{ nullptr }
 };
 
-static MACHINE_CONFIG_START( att4425 )
+MACHINE_CONFIG_START(att4425_state::att4425)
 	/* basic machine hardware */
-	MCFG_CPU_ADD(Z80_TAG, Z80, XTAL_32MHz/8) // XXX
+	MCFG_CPU_ADD(Z80_TAG, Z80, XTAL(32'000'000)/8) // XXX
 	MCFG_CPU_PROGRAM_MAP(att4425_mem)
 	MCFG_CPU_IO_MAP(att4425_io)
 	MCFG_Z80_DAISY_CHAIN(att4425_daisy_chain)
@@ -250,7 +255,7 @@ static MACHINE_CONFIG_START( att4425 )
 	MCFG_PALETTE_ADD_MONOCHROME_HIGHLIGHT("palette")
 
 	// ch.3 -- timer?
-	MCFG_DEVICE_ADD(Z80CTC_TAG, Z80CTC, XTAL_32MHz) // XXX
+	MCFG_DEVICE_ADD(Z80CTC_TAG, Z80CTC, XTAL(32'000'000)) // XXX
 	MCFG_Z80CTC_INTR_CB(INPUTLINE(Z80_TAG, INPUT_LINE_IRQ0))
 #ifdef notdef
 	MCFG_Z80CTC_ZC0_CB(DEVWRITELINE(Z80SIO_TAG, z80sio_device, rxca_w))

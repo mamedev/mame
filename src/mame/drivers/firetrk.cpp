@@ -14,7 +14,7 @@
 
 #include "superbug.lh"
 
-#define MASTER_CLOCK (XTAL_12_096MHz)
+static constexpr XTAL MASTER_CLOCK = 12.096_MHz_XTAL;
 
 
 void firetrk_state::set_service_mode(int enable)
@@ -295,7 +295,7 @@ WRITE8_MEMBER(firetrk_state::crash_reset_w)
 }
 
 
-static ADDRESS_MAP_START( firetrk_map, AS_PROGRAM, 8, firetrk_state )
+ADDRESS_MAP_START(firetrk_state::firetrk_map)
 	ADDRESS_MAP_GLOBAL_MASK(0x3fff)
 	AM_RANGE(0x0000, 0x00ff) AM_MIRROR(0x0700) AM_RAM AM_SHARE("alpha_num_ram")
 	AM_RANGE(0x0800, 0x08ff) AM_MIRROR(0x0700) AM_RAM AM_SHARE("playfield_ram")
@@ -321,7 +321,7 @@ static ADDRESS_MAP_START( firetrk_map, AS_PROGRAM, 8, firetrk_state )
 ADDRESS_MAP_END
 
 
-static ADDRESS_MAP_START( superbug_map, AS_PROGRAM, 8, firetrk_state )
+ADDRESS_MAP_START(firetrk_state::superbug_map)
 	ADDRESS_MAP_GLOBAL_MASK(0x1fff)
 	AM_RANGE(0x0000, 0x00ff) AM_RAM
 	AM_RANGE(0x0100, 0x0100) AM_MIRROR(0x001f) AM_WRITEONLY AM_SHARE("scroll_y")
@@ -345,7 +345,7 @@ static ADDRESS_MAP_START( superbug_map, AS_PROGRAM, 8, firetrk_state )
 ADDRESS_MAP_END
 
 
-static ADDRESS_MAP_START( montecar_map, AS_PROGRAM, 8, firetrk_state )
+ADDRESS_MAP_START(firetrk_state::montecar_map)
 	ADDRESS_MAP_GLOBAL_MASK(0x3fff)
 	AM_RANGE(0x0000, 0x00ff) AM_MIRROR(0x0700) AM_RAM AM_SHARE("alpha_num_ram")
 	AM_RANGE(0x0800, 0x08ff) AM_MIRROR(0x0700) AM_RAM AM_SHARE("playfield_ram")
@@ -850,7 +850,7 @@ static GFXDECODE_START( montecar )
 GFXDECODE_END
 
 
-static MACHINE_CONFIG_START( firetrk )
+MACHINE_CONFIG_START(firetrk_state::firetrk)
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", M6800, MASTER_CLOCK/12) /* 750Khz during service mode */
@@ -881,7 +881,8 @@ static MACHINE_CONFIG_START( firetrk )
 MACHINE_CONFIG_END
 
 
-static MACHINE_CONFIG_DERIVED( superbug, firetrk )
+MACHINE_CONFIG_START(firetrk_state::superbug)
+	firetrk(config);
 
 	/* basic machine hardware */
 	MCFG_CPU_MODIFY("maincpu")
@@ -905,7 +906,8 @@ static MACHINE_CONFIG_DERIVED( superbug, firetrk )
 MACHINE_CONFIG_END
 
 
-static MACHINE_CONFIG_DERIVED( montecar, firetrk )
+MACHINE_CONFIG_START(firetrk_state::montecar)
+	firetrk(config);
 
 	/* basic machine hardware */
 	MCFG_CPU_MODIFY("maincpu")

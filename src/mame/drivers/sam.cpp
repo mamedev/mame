@@ -10,9 +10,11 @@ public:
 	sam_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag) { }
 
+		void sam(machine_config &config);
+		void sam_map(address_map &map);
 };
 
-static ADDRESS_MAP_START( sam_map, AS_PROGRAM, 32, sam_state)
+ADDRESS_MAP_START(sam_state::sam_map)
 	AM_RANGE(0x00000000, 0x000fffff) AM_ROM AM_REGION("boot",0)
 	AM_RANGE(0x00300000, 0x003fffff) AM_RAM
 ADDRESS_MAP_END
@@ -20,8 +22,8 @@ ADDRESS_MAP_END
 static INPUT_PORTS_START( sam )
 INPUT_PORTS_END
 
-static MACHINE_CONFIG_START( sam )
-	MCFG_CPU_ADD("maincpu", ARM7, XTAL_40MHz) // AT91R40008
+MACHINE_CONFIG_START(sam_state::sam)
+	MCFG_CPU_ADD("maincpu", ARM7, XTAL(40'000'000)) // AT91R40008
 	MCFG_CPU_PROGRAM_MAP(sam_map)
 MACHINE_CONFIG_END
 

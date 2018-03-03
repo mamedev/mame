@@ -131,11 +131,21 @@ void mc6845_device::call_on_update_address(int strobe)
 
 WRITE8_MEMBER( mc6845_device::address_w )
 {
+	address_w(data);
+}
+
+void mc6845_device::address_w(uint8_t data)
+{
 	m_register_address_latch = data & 0x1f;
 }
 
 
 READ8_MEMBER( mc6845_device::status_r )
+{
+	return status_r();
+}
+
+uint8_t mc6845_device::status_r()
 {
 	uint8_t ret = 0;
 
@@ -180,6 +190,11 @@ void mc6845_device::transparent_update()
 
 READ8_MEMBER( mc6845_device::register_r )
 {
+	return register_r();
+}
+
+uint8_t mc6845_device::register_r()
+{
 	uint8_t ret = 0;
 
 	switch (m_register_address_latch)
@@ -201,6 +216,11 @@ READ8_MEMBER( mc6845_device::register_r )
 
 
 WRITE8_MEMBER( mc6845_device::register_w )
+{
+	register_w(data);
+}
+
+void mc6845_device::register_w(uint8_t data)
 {
 	LOG("%s:M6845 reg 0x%02x = 0x%02x\n", machine().describe_context(), m_register_address_latch, data);
 
@@ -563,8 +583,8 @@ void mc6845_device::recompute_parameters(bool postload)
 			LOG("M6845 config screen: HTOTAL: %d  VTOTAL: %d  MAX_X: %d  MAX_Y: %d  HSYNC: %d-%d  VSYNC: %d-%d  Freq: %ffps\n",
 								horiz_pix_total, vert_pix_total, max_visible_x, max_visible_y, hsync_on_pos, hsync_off_pos - 1, vsync_on_pos, vsync_off_pos - 1, 1 / ATTOSECONDS_TO_DOUBLE(refresh));
 
-			if ( m_screen != nullptr )
-				m_screen->configure(horiz_pix_total, vert_pix_total, visarea, refresh);
+			if (has_screen())
+				screen().configure(horiz_pix_total, vert_pix_total, visarea, refresh);
 
 			if(!m_reconfigure_cb.isnull())
 				m_reconfigure_cb(horiz_pix_total, vert_pix_total, visarea, refresh);
@@ -734,8 +754,8 @@ void mc6845_device::handle_line_timer()
 			/* also update the cursor state now */
 			update_cursor_state();
 
-			if (m_screen != nullptr)
-				m_screen->reset_origin();
+			if (has_screen())
+				screen().reset_origin();
 		}
 		else
 		{
@@ -1418,7 +1438,7 @@ device_memory_interface::space_config_vector mos8563_device::memory_space_config
 }
 
 // default address maps
-static ADDRESS_MAP_START( mos8563_videoram_map, 0, 8, mos8563_device )
+ADDRESS_MAP_START(mos8563_device::mos8563_videoram_map)
 	AM_RANGE(0x0000, 0xffff) AM_RAM
 ADDRESS_MAP_END
 
@@ -1485,7 +1505,7 @@ ams40489_device::ams40489_device(const machine_config &mconfig, const char *tag,
 mos8563_device::mos8563_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock)
 	: mc6845_device(mconfig, type, tag, owner, clock),
 		device_memory_interface(mconfig, *this),
-		m_videoram_space_config("videoram", ENDIANNESS_LITTLE, 8, 16, 0, nullptr, *ADDRESS_MAP_NAME(mos8563_videoram_map)),
+		m_videoram_space_config("videoram", ENDIANNESS_LITTLE, 8, 16, 0, address_map_constructor(), address_map_constructor(FUNC(mos8563_device::mos8563_videoram_map), this)),
 		m_palette(*this, "palette")
 {
 	set_clock_scale(1.0/8);
@@ -1504,7 +1524,7 @@ mos8568_device::mos8568_device(const machine_config &mconfig, const char *tag, d
 }
 
 
-MACHINE_CONFIG_MEMBER(mos8563_device::device_add_mconfig)
+MACHINE_CONFIG_START(mos8563_device::device_add_mconfig)
 	MCFG_PALETTE_ADD("palette", 16)
 	MCFG_PALETTE_INIT_OWNER(mos8563_device, mos8563)
 MACHINE_CONFIG_END

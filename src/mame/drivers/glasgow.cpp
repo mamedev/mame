@@ -59,8 +59,13 @@ public:
 		, m_maincpu(*this, "maincpu")
 		, m_beep(*this, "beeper")
 		, m_keyboard(*this, "LINE.%u", 0)
-		{ }
+	{ }
 
+	void glasgow(machine_config &config);
+	void amsterd(machine_config &config);
+	void dallas32(machine_config &config);
+
+protected:
 	DECLARE_WRITE16_MEMBER(glasgow_lcd_w);
 	DECLARE_WRITE16_MEMBER(glasgow_lcd_flag_w);
 	DECLARE_READ16_MEMBER(glasgow_keys_r);
@@ -88,6 +93,10 @@ public:
 	DECLARE_MACHINE_START(glasgow);
 	DECLARE_MACHINE_RESET(glasgow);
 
+	void amsterd_mem(address_map &map);
+	void dallas32_mem(address_map &map);
+	void glasgow_mem(address_map &map);
+
 private:
 	uint8_t m_lcd_shift_counter;
 	uint8_t m_led7;
@@ -111,15 +120,15 @@ private:
 	required_ioport_array<8> m_keyboard;
 };
 
-typedef struct
-	{
+struct BOARD_FIELD // FIXME: global structure
+{
 	uint8_t field;
 	uint8_t piece;
-	} BOARD_FIELD;
+};
 
-BOARD_FIELD l_board[8][8];
+BOARD_FIELD l_board[8][8]; // FIXME: mutable global state
 
-	/* starts at bottom left corner */
+/* starts at bottom left corner */
 const BOARD_FIELD l_start_board[8][8] =
 {
 	{ {7,10}, {6,8}, {5,9}, {4,11}, {3,12}, {2,9}, {1,8}, {0,10} },
@@ -541,7 +550,7 @@ MACHINE_RESET_MEMBER( glasgow_state, glasgow )
 }
 
 
-static ADDRESS_MAP_START(glasgow_mem, AS_PROGRAM, 16, glasgow_state)
+ADDRESS_MAP_START(glasgow_state::glasgow_mem)
 	ADDRESS_MAP_GLOBAL_MASK(0x1FFFF)
 	AM_RANGE(0x000000, 0x00ffff) AM_ROM
 	AM_RANGE(0x010000, 0x010001) AM_WRITE( glasgow_lcd_w )
@@ -552,7 +561,7 @@ static ADDRESS_MAP_START(glasgow_mem, AS_PROGRAM, 16, glasgow_state)
 	AM_RANGE(0x01c000, 0x01ffff) AM_RAM // 16KB
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START(amsterd_mem, AS_PROGRAM, 16, glasgow_state)
+ADDRESS_MAP_START(glasgow_state::amsterd_mem)
 	// ADDRESS_MAP_GLOBAL_MASK(0x7FFFF)
 	AM_RANGE(0x000000, 0x00ffff) AM_ROM
 	AM_RANGE(0x800002, 0x800003) AM_WRITE( write_lcd )
@@ -565,7 +574,7 @@ static ADDRESS_MAP_START(amsterd_mem, AS_PROGRAM, 16, glasgow_state)
 	AM_RANGE(0xffc000, 0xffffff) AM_RAM // 16KB
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START(dallas32_mem, AS_PROGRAM, 32, glasgow_state)
+ADDRESS_MAP_START(glasgow_state::dallas32_mem)
 	// ADDRESS_MAP_GLOBAL_MASK(0x1FFFF)
 	AM_RANGE(0x000000, 0x00ffff) AM_ROM
 	AM_RANGE(0x010000, 0x01ffff) AM_RAM // 64KB
@@ -705,7 +714,7 @@ static INPUT_PORTS_START( old_keyboard )   //Glasgow,Dallas
 INPUT_PORTS_END
 
 
-static MACHINE_CONFIG_START( glasgow )
+MACHINE_CONFIG_START(glasgow_state::glasgow)
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", M68000, 12000000)
 	MCFG_CPU_PROGRAM_MAP(glasgow_mem)
@@ -722,17 +731,21 @@ static MACHINE_CONFIG_START( glasgow )
 	MCFG_TIMER_DRIVER_ADD_PERIODIC("nmi_timer", glasgow_state, update_nmi, attotime::from_hz(50))
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_DERIVED( amsterd, glasgow )
+MACHINE_CONFIG_START(glasgow_state::amsterd)
+	glasgow(config);
+
 	/* basic machine hardware */
 	MCFG_CPU_MODIFY("maincpu")
 	MCFG_CPU_PROGRAM_MAP(amsterd_mem)
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_DERIVED( dallas32, glasgow )
+MACHINE_CONFIG_START(glasgow_state::dallas32)
+	glasgow(config);
+
 	/* basic machine hardware */
 	MCFG_CPU_REPLACE("maincpu", M68020, 14000000)
 	MCFG_CPU_PROGRAM_MAP(dallas32_mem)
-	MCFG_MACHINE_START_OVERRIDE(glasgow_state, dallas32 )
+	MCFG_MACHINE_START_OVERRIDE(glasgow_state, dallas32)
 
 	MCFG_DEVICE_REMOVE("nmi_timer")
 	MCFG_TIMER_DRIVER_ADD_PERIODIC("nmi_timer", glasgow_state, update_nmi32, attotime::from_hz(50))

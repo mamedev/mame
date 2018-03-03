@@ -117,8 +117,8 @@
 #include "speaker.h"
 
 
-#define MASTER_CLOCK        XTAL_16MHz
-#define VIDEO_CLOCK         XTAL_13_333MHz
+#define MASTER_CLOCK        XTAL(16'000'000)
+#define VIDEO_CLOCK         XTAL(13'333'000)
 
 
 /*************************************
@@ -202,13 +202,13 @@ WRITE8_MEMBER(rpunch_state::upd_data_w)
  *
  *************************************/
 
-static ADDRESS_MAP_START( main_map, AS_PROGRAM, 16, rpunch_state )
+ADDRESS_MAP_START(rpunch_state::main_map)
 	ADDRESS_MAP_GLOBAL_MASK(0xfffff)
 	AM_RANGE(0x000000, 0x03ffff) AM_ROM
 	AM_RANGE(0x040000, 0x04ffff) AM_RAM AM_SHARE("bitmapram")
 	AM_RANGE(0x060000, 0x060fff) AM_RAM AM_SHARE("spriteram")
 	AM_RANGE(0x080000, 0x083fff) AM_RAM_WRITE(rpunch_videoram_w) AM_SHARE("videoram")
-	AM_RANGE(0x0a0000, 0x0a07ff) AM_RAM_DEVWRITE("palette", palette_device, write) AM_SHARE("palette")
+	AM_RANGE(0x0a0000, 0x0a07ff) AM_RAM_DEVWRITE("palette", palette_device, write16) AM_SHARE("palette")
 	AM_RANGE(0x0c0000, 0x0c0007) AM_WRITE(rpunch_scrollreg_w)
 	AM_RANGE(0x0c0008, 0x0c0009) AM_SELECT(0x20) AM_WRITE8(rpunch_gga_w, 0x00ff)
 	AM_RANGE(0x0c000c, 0x0c000d) AM_WRITE(rpunch_videoreg_w)
@@ -229,7 +229,7 @@ ADDRESS_MAP_END
  *
  *************************************/
 
-static ADDRESS_MAP_START( sound_map, AS_PROGRAM, 8, rpunch_state )
+ADDRESS_MAP_START(rpunch_state::sound_map)
 	AM_RANGE(0x0000, 0xefff) AM_ROM
 	AM_RANGE(0xf000, 0xf001) AM_DEVREADWRITE("ymsnd", ym2151_device, read, write)
 	AM_RANGE(0xf200, 0xf200) AM_DEVREAD("soundlatch", generic_latch_8_device, read)
@@ -455,7 +455,7 @@ GFXDECODE_END
  *
  *************************************/
 
-static MACHINE_CONFIG_START( rpunch )
+MACHINE_CONFIG_START(rpunch_state::rpunch)
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", M68000, MASTER_CLOCK/2)
@@ -499,13 +499,14 @@ static MACHINE_CONFIG_START( rpunch )
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_DERIVED( svolley, rpunch )
+MACHINE_CONFIG_START(rpunch_state::svolley)
+	rpunch(config);
 	MCFG_VIDEO_START_OVERRIDE(rpunch_state,svolley)
 MACHINE_CONFIG_END
 
 
 // c+p of above for now, bootleg hw, things need verifying
-static MACHINE_CONFIG_START( svolleybl )
+MACHINE_CONFIG_START(rpunch_state::svolleybl)
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", M68000, MASTER_CLOCK/2)

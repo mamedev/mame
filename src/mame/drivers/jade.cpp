@@ -33,18 +33,21 @@ public:
 		, m_maincpu(*this, "maincpu")
 	{ }
 
+	void jade(machine_config &config);
+	void io_map(address_map &map);
+	void mem_map(address_map &map);
 private:
 	required_device<cpu_device> m_maincpu;
 };
 
 
-static ADDRESS_MAP_START(mem_map, AS_PROGRAM, 8, jade_state)
+ADDRESS_MAP_START(jade_state::mem_map)
 	ADDRESS_MAP_UNMAP_HIGH
 	AM_RANGE(0x0000, 0x07ff) AM_ROM AM_REGION("roms", 0)
 	AM_RANGE(0x0800, 0xffff) AM_RAM
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START(io_map, AS_IO, 8, jade_state)
+ADDRESS_MAP_START(jade_state::io_map)
 	ADDRESS_MAP_UNMAP_HIGH
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	AM_RANGE(0x28, 0x2b) AM_DEVREADWRITE("ctc2", z80ctc_device, read, write)
@@ -57,23 +60,23 @@ static INPUT_PORTS_START( jade )
 INPUT_PORTS_END
 
 
-static MACHINE_CONFIG_START( jade )
+MACHINE_CONFIG_START(jade_state::jade)
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu",Z80, XTAL_4MHz)
+	MCFG_CPU_ADD("maincpu",Z80, XTAL(4'000'000))
 	MCFG_CPU_PROGRAM_MAP(mem_map)
 	MCFG_CPU_IO_MAP(io_map)
 
-	MCFG_DEVICE_ADD("ctc1", Z80CTC, XTAL_4MHz)
+	MCFG_DEVICE_ADD("ctc1", Z80CTC, XTAL(4'000'000))
 
-	MCFG_DEVICE_ADD("ctc2", Z80CTC, XTAL_4MHz)
+	MCFG_DEVICE_ADD("ctc2", Z80CTC, XTAL(4'000'000))
 	MCFG_Z80CTC_ZC0_CB(DEVWRITELINE("sio", z80sio_device, rxca_w))
 	MCFG_DEVCB_CHAIN_OUTPUT(DEVWRITELINE("sio", z80sio_device, txca_w))
 
-	MCFG_DEVICE_ADD("trg0", CLOCK, XTAL_4MHz / 2)
+	MCFG_DEVICE_ADD("trg0", CLOCK, XTAL(4'000'000) / 2)
 	MCFG_CLOCK_SIGNAL_HANDLER(DEVWRITELINE("ctc2", z80ctc_device, trg0))
 
 	/* Devices */
-	MCFG_DEVICE_ADD("sio", Z80SIO, XTAL_4MHz)
+	MCFG_DEVICE_ADD("sio", Z80SIO, XTAL(4'000'000))
 	//MCFG_Z80SIO_OUT_INT_CB(INPUTLINE("maincpu", INPUT_LINE_IRQ0))  // no evidence of a daisy chain because IM2 is not set
 	MCFG_Z80SIO_OUT_TXDA_CB(DEVWRITELINE("rs232", rs232_port_device, write_txd))
 	MCFG_Z80SIO_OUT_DTRA_CB(DEVWRITELINE("rs232", rs232_port_device, write_dtr))

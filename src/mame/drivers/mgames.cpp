@@ -212,7 +212,7 @@
 
 **********************************************************************************/
 
-#define MASTER_CLOCK    XTAL_18MHz
+#define MASTER_CLOCK    XTAL(18'000'000)
 
 #include "emu.h"
 #include "cpu/z80/z80.h"
@@ -250,6 +250,8 @@ public:
 	required_device<cpu_device> m_maincpu;
 	required_device<gfxdecode_device> m_gfxdecode;
 	required_device<palette_device> m_palette;
+	void mgames(machine_config &config);
+	void main_map(address_map &map);
 };
 
 
@@ -522,7 +524,7 @@ WRITE8_MEMBER(mgames_state::outport7_w)
 
 */
 
-static ADDRESS_MAP_START( main_map, AS_PROGRAM, 8, mgames_state )
+ADDRESS_MAP_START(mgames_state::main_map)
 	AM_RANGE(0x0000, 0x2fff) AM_ROM
 //  AM_RANGE(0x0158, 0x0158) AM_WRITE (muxed_w)
 	AM_RANGE(0x3800, 0x38ff) AM_RAM AM_SHARE("nvram")   /* NVRAM = 2x SCM5101E */
@@ -632,7 +634,7 @@ static GFXDECODE_START( mgames )
 GFXDECODE_END
 
 
-static MACHINE_CONFIG_START( mgames )
+MACHINE_CONFIG_START(mgames_state::mgames)
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", Z80,MASTER_CLOCK/6)      /* 3 MHz? */
 	MCFG_CPU_PROGRAM_MAP(main_map)

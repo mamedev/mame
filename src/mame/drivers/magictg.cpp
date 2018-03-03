@@ -226,6 +226,11 @@ public:
 
 	void zr36120_reset();
 
+	void magictg(machine_config &config);
+	void adsp_data_map(address_map &map);
+	void adsp_io_map(address_map &map);
+	void adsp_program_map(address_map &map);
+	void magictg_map(address_map &map);
 protected:
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
@@ -351,7 +356,7 @@ static void voodoo_0_pci_w(device_t *busdevice, device_t *device, int function, 
 #if defined(USE_TWO_3DFX)
 static uint32_t voodoo_1_pci_r(device_t *busdevice, device_t *device, int function, int reg, uint32_t mem_mask)
 {
-	magictg_state* state = space.machine().driver_data<magictg_state>();
+	magictg_state* state = machine().driver_data<magictg_state>();
 	uint32_t val = 0;
 
 	switch (reg)
@@ -373,7 +378,7 @@ static uint32_t voodoo_1_pci_r(device_t *busdevice, device_t *device, int functi
 
 static void voodoo_1_pci_w(device_t *busdevice, device_t *device, int function, int reg, uint32_t data, uint32_t mem_mask)
 {
-	magictg_state* state = space.machine().driver_data<magictg_state>();
+	magictg_state* state = machine().driver_data<magictg_state>();
 
 	switch (reg)
 	{
@@ -490,7 +495,7 @@ READ32_MEMBER( magictg_state::zr36120_r )
 	else
 	{
 		/* Post office */
-		res = 0;//mame_rand(space.machine);//m_zr36120.as_regs[0x48/4];
+		res = 0;//mame_rand(machine);//m_zr36120.as_regs[0x48/4];
 	}
 	osd_printf_debug("PINKEYE_R[%x]\n", offset);
 	return res;
@@ -728,7 +733,7 @@ WRITE32_MEMBER( magictg_state::adsp_idma_addr_w )
 READ32_MEMBER( magictg_state::adsp_status_r )
 {
 	// ADSP_IACK = Bit 2
-	return (0 << 2) | (space.machine().rand() & 1);
+	return (0 << 2) | (machine().rand() & 1);
 }
 
 READ16_MEMBER( magictg_state::adsp_control_r )
@@ -741,7 +746,7 @@ READ16_MEMBER( magictg_state::adsp_control_r )
 			res = m_adsp_regs.bdma_word_count;
 			break;
 		case 0x5:
-			res = space.machine().rand() & 0xff;
+			res = machine().rand() & 0xff;
 			break;
 		default:
 			osd_printf_debug("Unhandled register: %x\n", 0x3fe0 + offset);
@@ -836,7 +841,7 @@ WRITE16_MEMBER( magictg_state::adsp_control_w )
  *
  *************************************/
 
-static ADDRESS_MAP_START( magictg_map, AS_PROGRAM, 32, magictg_state )
+ADDRESS_MAP_START(magictg_state::magictg_map)
 	AM_RANGE(0x00000000, 0x007fffff) AM_RAM // 8MB RAM
 	AM_RANGE(0x00800000, 0x0081003f) AM_RAM // ?
 	AM_RANGE(0x0a000000, 0x0affffff) AM_DEVREADWRITE("voodoo_0", voodoo_device, voodoo_r, voodoo_w)
@@ -863,19 +868,19 @@ ADDRESS_MAP_END
  *
  *************************************/
 
-static ADDRESS_MAP_START( adsp_program_map, AS_PROGRAM, 32, magictg_state )
+ADDRESS_MAP_START(magictg_state::adsp_program_map)
 	ADDRESS_MAP_UNMAP_HIGH
 	AM_RANGE(0x0000, 0x3fff) AM_RAM AM_SHARE("adsp_pram")
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( adsp_data_map, AS_DATA, 16, magictg_state )
+ADDRESS_MAP_START(magictg_state::adsp_data_map)
 	ADDRESS_MAP_UNMAP_HIGH
 //  AM_RANGE(0x0000, 0x03ff) AM_RAMBANK("databank")
 	AM_RANGE(0x0400, 0x3fdf) AM_RAM
 	AM_RANGE(0x3fe0, 0x3fff) AM_READWRITE(adsp_control_r, adsp_control_w)
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( adsp_io_map, AS_IO, 16, magictg_state )
+ADDRESS_MAP_START(magictg_state::adsp_io_map)
 	ADDRESS_MAP_UNMAP_HIGH
 ADDRESS_MAP_END
 
@@ -897,7 +902,7 @@ INPUT_PORTS_END
  *
  *************************************/
 
-static MACHINE_CONFIG_START( magictg )
+MACHINE_CONFIG_START(magictg_state::magictg)
 	MCFG_CPU_ADD("mips", R5000BE, 150000000) /* TODO: CPU type and clock are unknown */
 	//MCFG_MIPS3_ICACHE_SIZE(16384) /* TODO: Unknown */
 	//MCFG_MIPS3_DCACHE_SIZE(16384) /* TODO: Unknown */

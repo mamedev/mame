@@ -18,10 +18,10 @@
 #define MPC105_MEMORYBANK_COUNT     8
 
 #define MCFG_MPC105_CPU( _tag ) \
-	mpc105_device::static_set_cpu(*device, _tag);
+	downcast<mpc105_device &>(*device).set_cpu(_tag);
 
 #define MCFG_MPC105_BANK_BASE_DEFAULT( bank_base_default ) \
-	mpc105_device::static_set_bank_base_default(*device, bank_base_default);
+	downcast<mpc105_device &>(*device).set_bank_base_default(bank_base_default);
 
 // ======================> mpc105_device
 
@@ -32,8 +32,8 @@ public:
 	// construction/destruction
 	mpc105_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
-	static void static_set_cpu(device_t &device, const char *tag) { dynamic_cast<mpc105_device &>(device).m_cpu_tag = tag; }
-	static void static_set_bank_base_default(device_t &device, int bank_base_default) { dynamic_cast<mpc105_device &>(device).m_bank_base_default = bank_base_default; }
+	void set_cpu(const char *tag) { m_cpu_tag = tag; }
+	void set_bank_base_default(int bank_base_default) { m_bank_base_default = bank_base_default; }
 
 	virtual uint32_t pci_read(pci_bus_device *pcibus, int function, int offset, uint32_t mem_mask) override;
 	virtual void pci_write(pci_bus_device *pcibus, int function, int offset, uint32_t data, uint32_t mem_mask) override;

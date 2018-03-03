@@ -64,7 +64,7 @@ DRIVER_INIT_MEMBER(nbmj8891_state,gionbana)
 	   the checksum. */
 	for (i = 0;i < 0x20000;i++)
 	{
-		prot[i] = BITSWAP8(prot[i],2,7,3,5,0,6,4,1);
+		prot[i] = bitswap<8>(prot[i],2,7,3,5,0,6,4,1);
 	}
 }
 
@@ -81,7 +81,7 @@ DRIVER_INIT_MEMBER(nbmj8891_state,omotesnd)
 	   the checksum. */
 	for (i = 0;i < 0x20000;i++)
 	{
-		prot[i] = BITSWAP8(prot[i],2,7,3,5,0,6,4,1);
+		prot[i] = bitswap<8>(prot[i],2,7,3,5,0,6,4,1);
 	}
 #endif
 
@@ -114,7 +114,7 @@ DRIVER_INIT_MEMBER(nbmj8891_state,telmahjn)
 	   the checksum. */
 	for (i = 0;i < 0x20000;i++)
 	{
-		prot[i] = BITSWAP8(prot[i + 0x20000],7,0,4,1,5,2,6,3);
+		prot[i] = bitswap<8>(prot[i + 0x20000],7,0,4,1,5,2,6,3);
 	}
 }
 
@@ -130,7 +130,7 @@ DRIVER_INIT_MEMBER(nbmj8891_state,mgmen89)
 	   the checksum. */
 	for (i = 0;i < 0x20000;i++)
 	{
-		prot[i] = BITSWAP8(prot[i],5,6,1,0,7,3,2,4);
+		prot[i] = bitswap<8>(prot[i],5,6,1,0,7,3,2,4);
 	}
 }
 
@@ -150,7 +150,7 @@ DRIVER_INIT_MEMBER(nbmj8891_state,mjfocus)
 	   the checksum. */
 	for (i = 0;i < 0x20000;i++)
 	{
-		prot[i] = BITSWAP8(prot[i + 0x20000],7,0,4,1,5,2,6,3);
+		prot[i] = bitswap<8>(prot[i + 0x20000],7,0,4,1,5,2,6,3);
 	}
 }
 
@@ -190,7 +190,7 @@ DRIVER_INIT_MEMBER(nbmj8891_state,mjnanpas)
 	   the checksum. */
 	for (i = 0;i < 0x20000;i++)
 	{
-		prot[i] = BITSWAP8(prot[i + 0x20000],0,5,2,3,6,7,1,4);
+		prot[i] = bitswap<8>(prot[i + 0x20000],0,5,2,3,6,7,1,4);
 	}
 #endif
 }
@@ -207,7 +207,7 @@ DRIVER_INIT_MEMBER(nbmj8891_state,pairsnb)
 	   the checksum. */
 	for (i = 0;i < 0x20000;i++)
 	{
-		prot[i] = BITSWAP8(prot[i],5,6,1,0,7,3,2,4);
+		prot[i] = bitswap<8>(prot[i],5,6,1,0,7,3,2,4);
 	}
 }
 
@@ -223,86 +223,86 @@ DRIVER_INIT_MEMBER(nbmj8891_state,pairsten)
 	   the checksum. */
 	for (i = 0;i < 0x20000;i++)
 	{
-		prot[i] = BITSWAP8(prot[i + 0x20000],5,6,0,4,3,7,1,2);
+		prot[i] = bitswap<8>(prot[i + 0x20000],5,6,0,4,3,7,1,2);
 	}
 }
 
-static ADDRESS_MAP_START( gionbana_map, AS_PROGRAM, 8, nbmj8891_state )
+ADDRESS_MAP_START(nbmj8891_state::gionbana_map)
 	AM_RANGE(0x0000, 0xefff) AM_ROM
 	AM_RANGE(0xf000, 0xf00f) AM_READWRITE(clut_r, clut_w)
 	AM_RANGE(0xf400, 0xf5ff) AM_READWRITE(palette_type1_r, palette_type1_w)
 	AM_RANGE(0xf800, 0xffff) AM_RAM AM_SHARE("nvram")
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( mgion_map, AS_PROGRAM, 8, nbmj8891_state )
+ADDRESS_MAP_START(nbmj8891_state::mgion_map)
 	AM_RANGE(0x0000, 0xefff) AM_ROM
 	AM_RANGE(0xf000, 0xf1ff) AM_READWRITE(palette_type1_r, palette_type1_w)
 	AM_RANGE(0xf400, 0xf40f) AM_READWRITE(clut_r, clut_w)
 	AM_RANGE(0xf800, 0xffff) AM_RAM AM_SHARE("nvram")
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( omotesnd_map, AS_PROGRAM, 8, nbmj8891_state )
+ADDRESS_MAP_START(nbmj8891_state::omotesnd_map)
 	AM_RANGE(0x0000, 0xefff) AM_ROM
 	AM_RANGE(0xf400, 0xf5ff) AM_READWRITE(palette_type1_r, palette_type1_w)
 	AM_RANGE(0xf800, 0xffff) AM_RAM AM_SHARE("nvram")
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( hanamomo_map, AS_PROGRAM, 8, nbmj8891_state )
+ADDRESS_MAP_START(nbmj8891_state::hanamomo_map)
 	AM_RANGE(0x0000, 0xefff) AM_ROM
 	AM_RANGE(0xf000, 0xf1ff) AM_READWRITE(palette_type1_r, palette_type1_w)
 	AM_RANGE(0xf400, 0xf40f) AM_READWRITE(clut_r, clut_w)
 	AM_RANGE(0xf800, 0xffff) AM_RAM
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( scandalm_map, AS_PROGRAM, 8, nbmj8891_state )
+ADDRESS_MAP_START(nbmj8891_state::scandalm_map)
 	AM_RANGE(0x0000, 0xefff) AM_ROM
 	AM_RANGE(0xf400, 0xf5ff) AM_READWRITE(palette_type1_r, palette_type1_w)
 	AM_RANGE(0xf800, 0xffff) AM_RAM AM_SHARE("nvram")
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( club90s_map, AS_PROGRAM, 8, nbmj8891_state )
+ADDRESS_MAP_START(nbmj8891_state::club90s_map)
 	AM_RANGE(0x0000, 0xefff) AM_ROM
 	AM_RANGE(0xf000, 0xf7ff) AM_RAM
 	AM_RANGE(0xf800, 0xf80f) AM_READWRITE(clut_r, clut_w)
 	AM_RANGE(0xfc00, 0xfdff) AM_READWRITE(palette_type1_r, palette_type1_w)
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( lovehous_map, AS_PROGRAM, 8, nbmj8891_state )
+ADDRESS_MAP_START(nbmj8891_state::lovehous_map)
 	AM_RANGE(0x0000, 0xefff) AM_ROM
 	AM_RANGE(0xf000, 0xf00f) AM_READWRITE(clut_r, clut_w)
 	AM_RANGE(0xf400, 0xf5ff) AM_READWRITE(palette_type2_r, palette_type2_w)
 	AM_RANGE(0xf800, 0xffff) AM_RAM AM_SHARE("nvram")
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( maiko_map, AS_PROGRAM, 8, nbmj8891_state )
+ADDRESS_MAP_START(nbmj8891_state::maiko_map)
 	AM_RANGE(0x0000, 0xefff) AM_ROM
 	AM_RANGE(0xf000, 0xf1ff) AM_READWRITE(palette_type2_r, palette_type2_w)
 	AM_RANGE(0xf400, 0xf40f) AM_READWRITE(clut_r, clut_w)
 	AM_RANGE(0xf800, 0xffff) AM_RAM
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( hnxmasev_map, AS_PROGRAM, 8, nbmj8891_state )
+ADDRESS_MAP_START(nbmj8891_state::hnxmasev_map)
 	AM_RANGE(0x0000, 0xefff) AM_ROM
 	AM_RANGE(0xf200, 0xf3ff) AM_READWRITE(palette_type2_r, palette_type2_w)
 	AM_RANGE(0xf700, 0xf70f) AM_READWRITE(clut_r, clut_w)
 	AM_RANGE(0xf800, 0xffff) AM_RAM
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( hnageman_map, AS_PROGRAM, 8, nbmj8891_state )
+ADDRESS_MAP_START(nbmj8891_state::hnageman_map)
 	AM_RANGE(0x0000, 0xefff) AM_ROM
 	AM_RANGE(0xf000, 0xf00f) AM_READWRITE(clut_r, clut_w)
 	AM_RANGE(0xf400, 0xf5ff) AM_READWRITE(palette_type2_r, palette_type2_w)
 	AM_RANGE(0xf800, 0xffff) AM_RAM
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( mmaiko_map, AS_PROGRAM, 8, nbmj8891_state )
+ADDRESS_MAP_START(nbmj8891_state::mmaiko_map)
 	AM_RANGE(0x0000, 0xefff) AM_ROM
 	AM_RANGE(0xf000, 0xf1ff) AM_READWRITE(palette_type2_r, palette_type2_w)
 	AM_RANGE(0xf400, 0xf40f) AM_READWRITE(clut_r, clut_w)
 	AM_RANGE(0xf800, 0xffff) AM_RAM AM_SHARE("nvram")
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( hanaoji_map, AS_PROGRAM, 8, nbmj8891_state )
+ADDRESS_MAP_START(nbmj8891_state::hanaoji_map)
 	AM_RANGE(0x0000, 0xefff) AM_ROM
 	AM_RANGE(0xf200, 0xf3ff) AM_READWRITE(palette_type2_r, palette_type2_w)
 	AM_RANGE(0xf700, 0xf70f) AM_READWRITE(clut_r, clut_w)
@@ -314,7 +314,7 @@ READ8_MEMBER(nbmj8891_state::taiwanmb_unk_r)
 	return 0x00;                                                    // MCU or 1413M3 STATUS?
 }
 
-static ADDRESS_MAP_START( taiwanmb_map, AS_PROGRAM, 8, nbmj8891_state )
+ADDRESS_MAP_START(nbmj8891_state::taiwanmb_map)
 	AM_RANGE(0x0000, 0x7fff) AM_ROM
 	AM_RANGE(0xec00, 0xedff) AM_READWRITE(palette_type3_r, palette_type3_w)
 	AM_RANGE(0xf800, 0xfeff) AM_RAM AM_SHARE("nvram")
@@ -336,7 +336,7 @@ static ADDRESS_MAP_START( taiwanmb_map, AS_PROGRAM, 8, nbmj8891_state )
 ADDRESS_MAP_END
 
 
-static ADDRESS_MAP_START( gionbana_io_map, AS_IO, 8, nbmj8891_state )
+ADDRESS_MAP_START(nbmj8891_state::gionbana_io_map)
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	AM_RANGE(0x00, 0x7f) AM_DEVREAD("nb1413m3", nb1413m3_device, sndrom_r)
 	AM_RANGE(0x00, 0x00) AM_DEVWRITE("nb1413m3", nb1413m3_device, nmi_clock_w)
@@ -355,7 +355,7 @@ static ADDRESS_MAP_START( gionbana_io_map, AS_IO, 8, nbmj8891_state )
 	AM_RANGE(0xf1, 0xf1) AM_DEVREAD("nb1413m3", nb1413m3_device, dipsw2_r)
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( mgion_io_map, AS_IO, 8, nbmj8891_state )
+ADDRESS_MAP_START(nbmj8891_state::mgion_io_map)
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	AM_RANGE(0x00, 0x7f) AM_DEVREAD("nb1413m3", nb1413m3_device, sndrom_r)
 	AM_RANGE(0x00, 0x00) AM_DEVWRITE("nb1413m3", nb1413m3_device, nmi_clock_w)
@@ -374,7 +374,7 @@ static ADDRESS_MAP_START( mgion_io_map, AS_IO, 8, nbmj8891_state )
 	AM_RANGE(0xf1, 0xf1) AM_DEVREAD("nb1413m3", nb1413m3_device, dipsw2_r)
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( omotesnd_io_map, AS_IO, 8, nbmj8891_state )
+ADDRESS_MAP_START(nbmj8891_state::omotesnd_io_map)
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	AM_RANGE(0x00, 0x7f) AM_DEVREAD("nb1413m3", nb1413m3_device, sndrom_r)
 	AM_RANGE(0x00, 0x07) AM_WRITE(blitter_w)
@@ -396,7 +396,7 @@ static ADDRESS_MAP_START( omotesnd_io_map, AS_IO, 8, nbmj8891_state )
 	AM_RANGE(0xf1, 0xf1) AM_DEVREAD("nb1413m3", nb1413m3_device, dipsw2_r)
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( hanamomo_io_map, AS_IO, 8, nbmj8891_state )
+ADDRESS_MAP_START(nbmj8891_state::hanamomo_io_map)
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	AM_RANGE(0x00, 0x7f) AM_DEVREAD("nb1413m3", nb1413m3_device, sndrom_r)
 	AM_RANGE(0x00, 0x00) AM_DEVWRITE("nb1413m3", nb1413m3_device, nmi_clock_w)
@@ -415,7 +415,7 @@ static ADDRESS_MAP_START( hanamomo_io_map, AS_IO, 8, nbmj8891_state )
 	AM_RANGE(0xf1, 0xf1) AM_DEVREAD("nb1413m3", nb1413m3_device, dipsw2_r)
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( msjiken_io_map, AS_IO, 8, nbmj8891_state )
+ADDRESS_MAP_START(nbmj8891_state::msjiken_io_map)
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	AM_RANGE(0x00, 0x7f) AM_DEVREAD("nb1413m3", nb1413m3_device, sndrom_r)
 	AM_RANGE(0x00, 0x00) AM_DEVWRITE("nb1413m3", nb1413m3_device, nmi_clock_w)
@@ -434,7 +434,7 @@ static ADDRESS_MAP_START( msjiken_io_map, AS_IO, 8, nbmj8891_state )
 	AM_RANGE(0xf1, 0xf1) AM_DEVREAD("nb1413m3", nb1413m3_device, dipsw2_r)
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( scandal_io_map, AS_IO, 8, nbmj8891_state )
+ADDRESS_MAP_START(nbmj8891_state::scandal_io_map)
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	AM_RANGE(0x00, 0x7f) AM_DEVREAD("nb1413m3", nb1413m3_device, sndrom_r)
 	AM_RANGE(0x40, 0x4f) AM_WRITE(clut_w)
@@ -453,7 +453,7 @@ static ADDRESS_MAP_START( scandal_io_map, AS_IO, 8, nbmj8891_state )
 	AM_RANGE(0xf1, 0xf1) AM_DEVREAD("nb1413m3", nb1413m3_device, dipsw2_r)
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( scandalm_io_map, AS_IO, 8, nbmj8891_state )
+ADDRESS_MAP_START(nbmj8891_state::scandalm_io_map)
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	AM_RANGE(0x00, 0x7f) AM_DEVREAD("nb1413m3", nb1413m3_device, sndrom_r)
 	AM_RANGE(0x00, 0x07) AM_WRITE(blitter_w)
@@ -473,7 +473,7 @@ static ADDRESS_MAP_START( scandalm_io_map, AS_IO, 8, nbmj8891_state )
 	AM_RANGE(0xf1, 0xf1) AM_DEVREAD("nb1413m3", nb1413m3_device, dipsw2_r)
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( bananadr_io_map, AS_IO, 8, nbmj8891_state )
+ADDRESS_MAP_START(nbmj8891_state::bananadr_io_map)
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	AM_RANGE(0x00, 0x7f) AM_DEVREAD("nb1413m3", nb1413m3_device, sndrom_r)
 	AM_RANGE(0x00, 0x07) AM_WRITE(blitter_w)
@@ -493,7 +493,7 @@ static ADDRESS_MAP_START( bananadr_io_map, AS_IO, 8, nbmj8891_state )
 	AM_RANGE(0xf1, 0xf1) AM_DEVREAD("nb1413m3", nb1413m3_device, dipsw2_r)
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( lovehous_io_map, AS_IO, 8, nbmj8891_state )
+ADDRESS_MAP_START(nbmj8891_state::lovehous_io_map)
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	AM_RANGE(0x00, 0x7f) AM_DEVREAD("nb1413m3", nb1413m3_device, sndrom_r)
 	AM_RANGE(0x00, 0x00) AM_DEVWRITE("nb1413m3", nb1413m3_device, nmi_clock_w)
@@ -512,7 +512,7 @@ static ADDRESS_MAP_START( lovehous_io_map, AS_IO, 8, nbmj8891_state )
 	AM_RANGE(0xf1, 0xf1) AM_DEVREAD("nb1413m3", nb1413m3_device, dipsw2_r)
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( maiko_io_map, AS_IO, 8, nbmj8891_state )
+ADDRESS_MAP_START(nbmj8891_state::maiko_io_map)
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	AM_RANGE(0x00, 0x7f) AM_DEVREAD("nb1413m3", nb1413m3_device, sndrom_r)
 	AM_RANGE(0x00, 0x00) AM_DEVWRITE("nb1413m3", nb1413m3_device, nmi_clock_w)
@@ -531,7 +531,7 @@ static ADDRESS_MAP_START( maiko_io_map, AS_IO, 8, nbmj8891_state )
 	AM_RANGE(0xf1, 0xf1) AM_DEVREAD("nb1413m3", nb1413m3_device, dipsw2_r)
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( taiwanmb_io_map, AS_IO, 8, nbmj8891_state )
+ADDRESS_MAP_START(nbmj8891_state::taiwanmb_io_map)
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	AM_RANGE(0x00, 0x7f) AM_DEVREAD("nb1413m3", nb1413m3_device, sndrom_r)
 	AM_RANGE(0x81, 0x81) AM_DEVREAD("fmsnd", ay8910_device, data_r)
@@ -2176,7 +2176,7 @@ static INPUT_PORTS_START( taiwanmb )
 INPUT_PORTS_END
 
 
-static MACHINE_CONFIG_START( gionbana )
+MACHINE_CONFIG_START(nbmj8891_state::gionbana)
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", Z80, 20000000/4)    /* 5.00 MHz ? */
@@ -2210,7 +2210,8 @@ static MACHINE_CONFIG_START( gionbana )
 	MCFG_SOUND_ROUTE_EX(0, "dac", 1.0, DAC_VREF_POS_INPUT) MCFG_SOUND_ROUTE_EX(0, "dac", -1.0, DAC_VREF_NEG_INPUT)
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_DERIVED( mgion, gionbana )
+MACHINE_CONFIG_START(nbmj8891_state::mgion)
+	gionbana(config);
 
 	/* basic machine hardware */
 	MCFG_CPU_MODIFY("maincpu")
@@ -2223,7 +2224,8 @@ static MACHINE_CONFIG_DERIVED( mgion, gionbana )
 	MCFG_NVRAM_ADD_0FILL("nvram")
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_DERIVED( omotesnd, gionbana )
+MACHINE_CONFIG_START(nbmj8891_state::omotesnd)
+	gionbana(config);
 
 	/* basic machine hardware */
 	MCFG_CPU_MODIFY("maincpu")
@@ -2242,14 +2244,16 @@ static MACHINE_CONFIG_DERIVED( omotesnd, gionbana )
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 0.35)
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_DERIVED( abunai, gionbana )
+MACHINE_CONFIG_START(nbmj8891_state::abunai)
+	gionbana(config);
 
 	MCFG_DEVICE_MODIFY("nb1413m3")
 	MCFG_NB1413M3_TYPE( NB1413M3_ABUNAI )
 MACHINE_CONFIG_END
 
 /* NBMJDRV2 */
-static MACHINE_CONFIG_DERIVED( mjcamerb, gionbana )
+MACHINE_CONFIG_START(nbmj8891_state::mjcamerb)
+	gionbana(config);
 
 	/* basic machine hardware */
 	MCFG_CPU_MODIFY("maincpu")
@@ -2266,7 +2270,8 @@ static MACHINE_CONFIG_DERIVED( mjcamerb, gionbana )
 	MCFG_VIDEO_START_OVERRIDE(nbmj8891_state,_1layer)
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_DERIVED( mmcamera, gionbana )
+MACHINE_CONFIG_START(nbmj8891_state::mmcamera)
+	gionbana(config);
 
 	/* basic machine hardware */
 	MCFG_CPU_MODIFY("maincpu")
@@ -2283,7 +2288,8 @@ static MACHINE_CONFIG_DERIVED( mmcamera, gionbana )
 	MCFG_VIDEO_START_OVERRIDE(nbmj8891_state,_1layer)
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_DERIVED( hanamomo, gionbana )
+MACHINE_CONFIG_START(nbmj8891_state::hanamomo)
+	gionbana(config);
 
 	/* basic machine hardware */
 	MCFG_CPU_MODIFY("maincpu")
@@ -2299,7 +2305,8 @@ static MACHINE_CONFIG_DERIVED( hanamomo, gionbana )
 	MCFG_VIDEO_START_OVERRIDE(nbmj8891_state,_1layer)
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_DERIVED( msjiken, hanamomo )
+MACHINE_CONFIG_START(nbmj8891_state::msjiken)
+	hanamomo(config);
 
 	/* basic machine hardware */
 	MCFG_CPU_MODIFY("maincpu")
@@ -2311,7 +2318,8 @@ static MACHINE_CONFIG_DERIVED( msjiken, hanamomo )
 MACHINE_CONFIG_END
 
 /* NBMJDRV3 */
-static MACHINE_CONFIG_DERIVED( telmahjn, gionbana )
+MACHINE_CONFIG_START(nbmj8891_state::telmahjn)
+	gionbana(config);
 
 	MCFG_DEVICE_MODIFY("nb1413m3")
 	MCFG_NB1413M3_TYPE( NB1413M3_TELMAHJN )
@@ -2320,7 +2328,8 @@ static MACHINE_CONFIG_DERIVED( telmahjn, gionbana )
 	MCFG_VIDEO_START_OVERRIDE(nbmj8891_state,_1layer)
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_DERIVED( mgmen89, telmahjn )
+MACHINE_CONFIG_START(nbmj8891_state::mgmen89)
+	telmahjn(config);
 
 	MCFG_DEVICE_MODIFY("nb1413m3")
 	MCFG_NB1413M3_TYPE( NB1413M3_MGMEN89 )
@@ -2328,7 +2337,8 @@ static MACHINE_CONFIG_DERIVED( mgmen89, telmahjn )
 MACHINE_CONFIG_END
 
 /* NBMJDRV4 */
-static MACHINE_CONFIG_DERIVED( mjfocus, gionbana )
+MACHINE_CONFIG_START(nbmj8891_state::mjfocus)
+	gionbana(config);
 
 	/* basic machine hardware */
 
@@ -2339,20 +2349,23 @@ static MACHINE_CONFIG_DERIVED( mjfocus, gionbana )
 	MCFG_VIDEO_START_OVERRIDE(nbmj8891_state,_1layer)
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_DERIVED( pairsnb, gionbana )
+MACHINE_CONFIG_START(nbmj8891_state::pairsnb)
+	gionbana(config);
 
 	MCFG_DEVICE_MODIFY("nb1413m3")
 	MCFG_NB1413M3_TYPE( NB1413M3_PAIRSNB )
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_DERIVED( pairsten, gionbana )
+MACHINE_CONFIG_START(nbmj8891_state::pairsten)
+	gionbana(config);
 
 	MCFG_DEVICE_MODIFY("nb1413m3")
 	MCFG_NB1413M3_TYPE( NB1413M3_PAIRSTEN )
 MACHINE_CONFIG_END
 
 /* NBMJDRV5 */
-static MACHINE_CONFIG_DERIVED( mjnanpas, gionbana )
+MACHINE_CONFIG_START(nbmj8891_state::mjnanpas)
+	gionbana(config);
 
 	/* basic machine hardware */
 	MCFG_CPU_MODIFY("maincpu")
@@ -2362,7 +2375,8 @@ static MACHINE_CONFIG_DERIVED( mjnanpas, gionbana )
 	MCFG_NB1413M3_TYPE( NB1413M3_MJNANPAS )
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_DERIVED( maiko, mjnanpas )
+MACHINE_CONFIG_START(nbmj8891_state::maiko)
+	mjnanpas(config);
 
 	/* basic machine hardware */
 	MCFG_CPU_MODIFY("maincpu")
@@ -2373,7 +2387,8 @@ static MACHINE_CONFIG_DERIVED( maiko, mjnanpas )
 	MCFG_NB1413M3_TYPE( NB1413M3_MAIKO )
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_DERIVED( mmaiko, maiko )
+MACHINE_CONFIG_START(nbmj8891_state::mmaiko)
+	maiko(config);
 
 	/* basic machine hardware */
 	MCFG_CPU_MODIFY("maincpu")
@@ -2385,7 +2400,8 @@ static MACHINE_CONFIG_DERIVED( mmaiko, maiko )
 	MCFG_NVRAM_ADD_0FILL("nvram")
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_DERIVED( lovehous, mjnanpas )
+MACHINE_CONFIG_START(nbmj8891_state::lovehous)
+	mjnanpas(config);
 
 	/* basic machine hardware */
 	MCFG_CPU_MODIFY("maincpu")
@@ -2398,7 +2414,8 @@ static MACHINE_CONFIG_DERIVED( lovehous, mjnanpas )
 	MCFG_NVRAM_ADD_0FILL("nvram")
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_DERIVED( hanaoji, maiko )
+MACHINE_CONFIG_START(nbmj8891_state::hanaoji)
+	maiko(config);
 
 	/* basic machine hardware */
 	MCFG_CPU_MODIFY("maincpu")
@@ -2410,7 +2427,8 @@ static MACHINE_CONFIG_DERIVED( hanaoji, maiko )
 	MCFG_NVRAM_ADD_0FILL("nvram")
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_DERIVED( hnxmasev, maiko )
+MACHINE_CONFIG_START(nbmj8891_state::hnxmasev)
+	maiko(config);
 
 	/* basic machine hardware */
 	MCFG_CPU_MODIFY("maincpu")
@@ -2418,7 +2436,8 @@ static MACHINE_CONFIG_DERIVED( hnxmasev, maiko )
 	MCFG_CPU_IO_MAP(maiko_io_map)
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_DERIVED( hnageman, maiko )
+MACHINE_CONFIG_START(nbmj8891_state::hnageman)
+	maiko(config);
 
 	/* basic machine hardware */
 	MCFG_CPU_MODIFY("maincpu")
@@ -2426,7 +2445,8 @@ static MACHINE_CONFIG_DERIVED( hnageman, maiko )
 	MCFG_CPU_IO_MAP(maiko_io_map)
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_DERIVED( scandal, hanamomo )
+MACHINE_CONFIG_START(nbmj8891_state::scandal)
+	hanamomo(config);
 
 	/* basic machine hardware */
 	MCFG_CPU_MODIFY("maincpu")
@@ -2437,7 +2457,8 @@ static MACHINE_CONFIG_DERIVED( scandal, hanamomo )
 	MCFG_NB1413M3_TYPE( NB1413M3_SCANDAL )
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_DERIVED( bananadr, mjnanpas )
+MACHINE_CONFIG_START(nbmj8891_state::bananadr)
+	mjnanpas(config);
 
 	/* basic machine hardware */
 	MCFG_CPU_MODIFY("maincpu")
@@ -2450,26 +2471,30 @@ static MACHINE_CONFIG_DERIVED( bananadr, mjnanpas )
 	MCFG_NVRAM_ADD_0FILL("nvram")
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_DERIVED( club90s, mjnanpas )
+MACHINE_CONFIG_START(nbmj8891_state::club90s)
+	mjnanpas(config);
 
 	MCFG_DEVICE_MODIFY("nb1413m3")
 	MCFG_NB1413M3_TYPE( NB1413M3_CLUB90S )
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_DERIVED( mladyhtr, mjnanpas )
+MACHINE_CONFIG_START(nbmj8891_state::mladyhtr)
+	mjnanpas(config);
 
 	MCFG_DEVICE_MODIFY("nb1413m3")
 	MCFG_NB1413M3_TYPE( NB1413M3_MLADYHTR )
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_DERIVED( chinmoku, mjnanpas )
+MACHINE_CONFIG_START(nbmj8891_state::chinmoku)
+	mjnanpas(config);
 
 	MCFG_DEVICE_MODIFY("nb1413m3")
 	MCFG_NB1413M3_TYPE( NB1413M3_CHINMOKU )
 MACHINE_CONFIG_END
 
 /* NBMJDRV6 */
-static MACHINE_CONFIG_DERIVED( mjfocusm, gionbana )
+MACHINE_CONFIG_START(nbmj8891_state::mjfocusm)
+	gionbana(config);
 
 	/* basic machine hardware */
 	MCFG_CPU_MODIFY("maincpu")
@@ -2493,13 +2518,15 @@ static MACHINE_CONFIG_DERIVED( mjfocusm, gionbana )
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 0.7)
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_DERIVED( scandalm, mjfocusm )
+MACHINE_CONFIG_START(nbmj8891_state::scandalm)
+	mjfocusm(config);
 
 	MCFG_DEVICE_MODIFY("nb1413m3")
 	MCFG_NB1413M3_TYPE( NB1413M3_SCANDALM )
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_DERIVED( taiwanmb, gionbana )
+MACHINE_CONFIG_START(nbmj8891_state::taiwanmb)
+	gionbana(config);
 
 	/* basic machine hardware */
 	MCFG_CPU_MODIFY("maincpu")

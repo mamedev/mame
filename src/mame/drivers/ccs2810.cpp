@@ -103,6 +103,11 @@ public:
 	DECLARE_WRITE8_MEMBER(port34_w);
 	DECLARE_WRITE8_MEMBER(port40_w);
 
+	void ccs2810(machine_config &config);
+	void ccs2422(machine_config &config);
+	void ccs2422_io(address_map &map);
+	void ccs2810_io(address_map &map);
+	void ccs2810_mem(address_map &map);
 private:
 	required_device<cpu_device> m_maincpu;
 	required_device<ram_device> m_ram;
@@ -142,11 +147,11 @@ READ8_MEMBER(ccs_state::memory_read)
 		result = m_rom[offset & 0x7ff];
 
 		// wait state forced for 4 MHz operation
-		if (!machine().side_effect_disabled())
+		if (!machine().side_effects_disabled())
 			m_maincpu->adjust_icount(-1);
 	}
 
-	if (!machine().side_effect_disabled())
+	if (!machine().side_effects_disabled())
 		m_power_on_status |= m_power_on_status >> 1;
 
 	return result;
@@ -173,20 +178,20 @@ WRITE8_MEMBER(ccs_state::io_write)
 		m_ins8250->ins8250_w(space, offset & 7, data);
 }
 
-static ADDRESS_MAP_START(ccs2810_mem, AS_PROGRAM, 8, ccs_state)
+ADDRESS_MAP_START(ccs_state::ccs2810_mem)
 	AM_RANGE(0x0000, 0xffff) AM_READWRITE(memory_read, memory_write)
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START(ccs2810_io, AS_IO, 8, ccs_state)
+ADDRESS_MAP_START(ccs_state::ccs2810_io)
 	AM_RANGE(0x0000, 0xffff) AM_READWRITE(io_read, io_write)
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START(ccs2422_io, AS_IO, 8, ccs_state)
+ADDRESS_MAP_START(ccs_state::ccs2422_io)
+	AM_RANGE(0x0000, 0xffff) AM_READWRITE(io_read, io_write)
 	AM_RANGE(0x04, 0x04) AM_MIRROR(0xff00) AM_READWRITE(port04_r,port04_w)
 	AM_RANGE(0x30, 0x33) AM_MIRROR(0xff00) AM_DEVREADWRITE("fdc", mb8877_device, read, write)
 	AM_RANGE(0x34, 0x34) AM_MIRROR(0xff00) AM_READWRITE(port34_r,port34_w)
 	AM_RANGE(0x40, 0x40) AM_MIRROR(0xff00) AM_WRITE(port40_w)
-	AM_RANGE(0x0000, 0xffff) AM_READWRITE(io_read, io_write)
 ADDRESS_MAP_END
 
 /* Input ports */
@@ -894,9 +899,9 @@ SLOT_INTERFACE_END
 
 	//SLOT_INTERFACE( "525dd", FLOPPY_525_DD )
 
-static MACHINE_CONFIG_START( ccs2810 )
+MACHINE_CONFIG_START(ccs_state::ccs2810)
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", Z80, XTAL_16MHz / 4)
+	MCFG_CPU_ADD("maincpu", Z80, XTAL(16'000'000) / 4)
 	MCFG_CPU_PROGRAM_MAP(ccs2810_mem)
 	MCFG_CPU_IO_MAP(ccs2810_io)
 
@@ -904,7 +909,7 @@ static MACHINE_CONFIG_START( ccs2810 )
 	MCFG_RAM_DEFAULT_SIZE("64K")
 
 	/* Devices */
-	MCFG_DEVICE_ADD("ins8250", INS8250, XTAL_1_8432MHz)
+	MCFG_DEVICE_ADD("ins8250", INS8250, XTAL(1'843'200))
 	MCFG_INS8250_OUT_TX_CB(DEVWRITELINE("rs232", rs232_port_device, write_txd))
 	MCFG_INS8250_OUT_DTR_CB(DEVWRITELINE("rs232", rs232_port_device, write_dtr))
 	MCFG_INS8250_OUT_RTS_CB(DEVWRITELINE("rs232", rs232_port_device, write_rts))
@@ -918,9 +923,9 @@ static MACHINE_CONFIG_START( ccs2810 )
 	MCFG_RS232_CTS_HANDLER(DEVWRITELINE("ins8250", ins8250_device, cts_w))
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_START( ccs2422 )
+MACHINE_CONFIG_START(ccs_state::ccs2422)
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", Z80, XTAL_16MHz / 4)
+	MCFG_CPU_ADD("maincpu", Z80, XTAL(16'000'000) / 4)
 	MCFG_CPU_PROGRAM_MAP(ccs2810_mem)
 	MCFG_CPU_IO_MAP(ccs2422_io)
 
@@ -928,7 +933,7 @@ static MACHINE_CONFIG_START( ccs2422 )
 	MCFG_RAM_DEFAULT_SIZE("64K")
 
 	/* Devices */
-	MCFG_DEVICE_ADD("ins8250", INS8250, XTAL_1_8432MHz)
+	MCFG_DEVICE_ADD("ins8250", INS8250, XTAL(1'843'200))
 	MCFG_INS8250_OUT_TX_CB(DEVWRITELINE("rs232", rs232_port_device, write_txd))
 	MCFG_INS8250_OUT_DTR_CB(DEVWRITELINE("rs232", rs232_port_device, write_dtr))
 	MCFG_INS8250_OUT_RTS_CB(DEVWRITELINE("rs232", rs232_port_device, write_rts))
@@ -941,7 +946,7 @@ static MACHINE_CONFIG_START( ccs2422 )
 	MCFG_RS232_DSR_HANDLER(DEVWRITELINE("ins8250", ins8250_device, dsr_w))
 	MCFG_RS232_CTS_HANDLER(DEVWRITELINE("ins8250", ins8250_device, cts_w))
 
-	MCFG_MB8877_ADD("fdc", XTAL_16MHz / 8) // UB1793 or MB8877
+	MCFG_MB8877_ADD("fdc", XTAL(16'000'000) / 8) // UB1793 or MB8877
 	MCFG_FLOPPY_DRIVE_ADD("fdc:0", ccs_floppies, "8sssd", floppy_image_device::default_floppy_formats)
 	MCFG_FLOPPY_DRIVE_SOUND(true)
 MACHINE_CONFIG_END

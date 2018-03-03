@@ -23,45 +23,45 @@ enum
 
 
 #define MCFG_V25_CONFIG(_table) \
-	v25_common_device::set_decryption_table(*device, _table);
+	downcast<v25_common_device &>(*device).set_decryption_table(_table);
 
 
 #define MCFG_V25_PORT_PT_READ_CB(_devcb) \
-	devcb = &v25_common_device::set_pt_in_cb(*device, DEVCB_##_devcb);
+	devcb = &downcast<v25_common_device &>(*device).set_pt_in_cb(DEVCB_##_devcb);
 
 #define MCFG_V25_PORT_P0_READ_CB(_devcb) \
-	devcb = &v25_common_device::set_p0_in_cb(*device, DEVCB_##_devcb);
+	devcb = &downcast<v25_common_device &>(*device).set_p0_in_cb(DEVCB_##_devcb);
 
 #define MCFG_V25_PORT_P1_READ_CB(_devcb) \
-	devcb = &v25_common_device::set_p1_in_cb(*device, DEVCB_##_devcb);
+	devcb = &downcast<v25_common_device &>(*device).set_p1_in_cb(DEVCB_##_devcb);
 
 #define MCFG_V25_PORT_P2_READ_CB(_devcb) \
-	devcb = &v25_common_device::set_p2_in_cb(*device, DEVCB_##_devcb);
+	devcb = &downcast<v25_common_device &>(*device).set_p2_in_cb(DEVCB_##_devcb);
 
 
 #define MCFG_V25_PORT_P0_WRITE_CB(_devcb) \
-	devcb = &v25_common_device::set_p0_out_cb(*device, DEVCB_##_devcb);
+	devcb = &downcast<v25_common_device &>(*device).set_p0_out_cb(DEVCB_##_devcb);
 
 #define MCFG_V25_PORT_P1_WRITE_CB(_devcb) \
-	devcb = &v25_common_device::set_p1_out_cb(*device, DEVCB_##_devcb);
+	devcb = &downcast<v25_common_device &>(*device).set_p1_out_cb(DEVCB_##_devcb);
 
 #define MCFG_V25_PORT_P2_WRITE_CB(_devcb) \
-	devcb = &v25_common_device::set_p2_out_cb(*device, DEVCB_##_devcb);
+	devcb = &downcast<v25_common_device &>(*device).set_p2_out_cb(DEVCB_##_devcb);
 
 class v25_common_device : public cpu_device
 {
 public:
-	// static configuration helpers
-	static void set_decryption_table(device_t &device, const uint8_t *decryption_table) { downcast<v25_common_device &>(device).m_v25v35_decryptiontable = decryption_table; }
+	// configuration helpers
+	void set_decryption_table(const uint8_t *decryption_table) { m_v25v35_decryptiontable = decryption_table; }
 
-	template <class Object> static devcb_base & set_pt_in_cb(device_t &device, Object &&cb) { return downcast<v25_common_device &>(device).m_pt_in.set_callback(std::forward<Object>(cb)); }
-	template <class Object> static devcb_base & set_p0_in_cb(device_t &device, Object &&cb) { return downcast<v25_common_device &>(device).m_p0_in.set_callback(std::forward<Object>(cb)); }
-	template <class Object> static devcb_base & set_p1_in_cb(device_t &device, Object &&cb) { return downcast<v25_common_device &>(device).m_p1_in.set_callback(std::forward<Object>(cb)); }
-	template <class Object> static devcb_base & set_p2_in_cb(device_t &device, Object &&cb) { return downcast<v25_common_device &>(device).m_p2_in.set_callback(std::forward<Object>(cb)); }
+	template <class Object> devcb_base &set_pt_in_cb(Object &&cb) { return m_pt_in.set_callback(std::forward<Object>(cb)); }
+	template <class Object> devcb_base &set_p0_in_cb(Object &&cb) { return m_p0_in.set_callback(std::forward<Object>(cb)); }
+	template <class Object> devcb_base &set_p1_in_cb(Object &&cb) { return m_p1_in.set_callback(std::forward<Object>(cb)); }
+	template <class Object> devcb_base &set_p2_in_cb(Object &&cb) { return m_p2_in.set_callback(std::forward<Object>(cb)); }
 
-	template <class Object> static devcb_base & set_p0_out_cb(device_t &device, Object &&cb) { return downcast<v25_common_device &>(device).m_p0_out.set_callback(std::forward<Object>(cb)); }
-	template <class Object> static devcb_base & set_p1_out_cb(device_t &device, Object &&cb) { return downcast<v25_common_device &>(device).m_p1_out.set_callback(std::forward<Object>(cb)); }
-	template <class Object> static devcb_base & set_p2_out_cb(device_t &device, Object &&cb) { return downcast<v25_common_device &>(device).m_p2_out.set_callback(std::forward<Object>(cb)); }
+	template <class Object> devcb_base &set_p0_out_cb(Object &&cb) { return m_p0_out.set_callback(std::forward<Object>(cb)); }
+	template <class Object> devcb_base &set_p1_out_cb(Object &&cb) { return m_p1_out.set_callback(std::forward<Object>(cb)); }
+	template <class Object> devcb_base &set_p2_out_cb(Object &&cb) { return m_p2_out.set_callback(std::forward<Object>(cb)); }
 
 	TIMER_CALLBACK_MEMBER(v25_timer_callback);
 

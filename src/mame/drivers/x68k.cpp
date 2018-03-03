@@ -829,7 +829,7 @@ WRITE16_MEMBER(x68k_state::x68k_sysport_w)
 		COMBINE_DATA(&m_sysport.sram_writeprotect);
 		break;
 	default:
-//      logerror("SYS: [%08x] Wrote %04x to invalid or unimplemented system port %04x\n",space.device().safe_pc(),data,offset);
+//      logerror("SYS: [%08x] Wrote %04x to invalid or unimplemented system port %04x\n",m_maincpu->pc(),data,offset);
 		break;
 	}
 }
@@ -968,7 +968,6 @@ void x68k_state::set_bus_error(uint32_t address, bool write, uint16_t mem_mask)
 		address++;
 	m_bus_error = true;
 	m_maincpu->set_buserror_details(address, write, m_maincpu->get_fc());
-	m_maincpu->mmu_tmp_buserror_address = address; // Hack for x68030
 	m_maincpu->set_input_line(M68K_LINE_BUSERROR, ASSERT_LINE);
 	m_maincpu->set_input_line(M68K_LINE_BUSERROR, CLEAR_LINE);
 	m_bus_error_timer->adjust(m_maincpu->cycles_to_attotime(16)); // let rmw cycles complete
@@ -979,7 +978,7 @@ READ16_MEMBER(x68k_state::x68k_rom0_r)
 {
 	/* this location contains the address of some expansion device ROM, if no ROM exists,
 	   then access causes a bus error */
-	if((m_options->read() & 0x02) && !machine().side_effect_disabled())
+	if((m_options->read() & 0x02) && !machine().side_effects_disabled())
 		set_bus_error((offset << 1) + 0xbffffc, 0, mem_mask);
 	return 0xff;
 }
@@ -988,7 +987,7 @@ WRITE16_MEMBER(x68k_state::x68k_rom0_w)
 {
 	/* this location contains the address of some expansion device ROM, if no ROM exists,
 	   then access causes a bus error */
-	if((m_options->read() & 0x02) && !machine().side_effect_disabled())
+	if((m_options->read() & 0x02) && !machine().side_effects_disabled())
 		set_bus_error((offset << 1) + 0xbffffc, 1, mem_mask);
 }
 
@@ -996,7 +995,7 @@ READ16_MEMBER(x68k_state::x68k_emptyram_r)
 {
 	/* this location is unused RAM, access here causes a bus error
 	   Often a method for detecting amount of installed RAM, is to read or write at 1MB intervals, until a bus error occurs */
-	if((m_options->read() & 0x02) && !machine().side_effect_disabled())
+	if((m_options->read() & 0x02) && !machine().side_effects_disabled())
 		set_bus_error((offset << 1), 0, mem_mask);
 	return 0xff;
 }
@@ -1005,14 +1004,14 @@ WRITE16_MEMBER(x68k_state::x68k_emptyram_w)
 {
 	/* this location is unused RAM, access here causes a bus error
 	   Often a method for detecting amount of installed RAM, is to read or write at 1MB intervals, until a bus error occurs */
-	if((m_options->read() & 0x02) && !machine().side_effect_disabled())
+	if((m_options->read() & 0x02) && !machine().side_effects_disabled())
 		set_bus_error((offset << 1), 1, mem_mask);
 }
 
 READ16_MEMBER(x68k_state::x68k_exp_r)
 {
 	/* These are expansion devices, if not present, they cause a bus error */
-	if((m_options->read() & 0x02) && !machine().side_effect_disabled())
+	if((m_options->read() & 0x02) && !machine().side_effects_disabled())
 		set_bus_error((offset << 1) + 0xeafa00, 0, mem_mask);
 	return 0xff;
 }
@@ -1020,7 +1019,7 @@ READ16_MEMBER(x68k_state::x68k_exp_r)
 WRITE16_MEMBER(x68k_state::x68k_exp_w)
 {
 	/* These are expansion devices, if not present, they cause a bus error */
-	if((m_options->read() & 0x02) && !machine().side_effect_disabled())
+	if((m_options->read() & 0x02) && !machine().side_effects_disabled())
 		set_bus_error((offset << 1) + 0xeafa00, 1, mem_mask);
 }
 
@@ -1135,14 +1134,14 @@ WRITE_LINE_MEMBER(x68k_state::x68k_scsi_drq)
 	// TODO
 }
 
-static ADDRESS_MAP_START(x68k_map, AS_PROGRAM, 16, x68k_state )
+ADDRESS_MAP_START(x68k_state::x68k_map)
 	AM_RANGE(0x000000, 0xbffffb) AM_READWRITE(x68k_emptyram_r, x68k_emptyram_w)
 	AM_RANGE(0xbffffc, 0xbfffff) AM_READWRITE(x68k_rom0_r, x68k_rom0_w)
 	AM_RANGE(0xc00000, 0xdfffff) AM_READWRITE(x68k_gvram_r, x68k_gvram_w)
 	AM_RANGE(0xe00000, 0xe7ffff) AM_READWRITE(x68k_tvram_r, x68k_tvram_w)
 	AM_RANGE(0xe80000, 0xe81fff) AM_READWRITE(x68k_crtc_r, x68k_crtc_w)
-	AM_RANGE(0xe82000, 0xe821ff) AM_DEVREADWRITE("gfxpalette", palette_device, read, write) AM_SHARE("gfxpalette")
-	AM_RANGE(0xe82200, 0xe823ff) AM_DEVREADWRITE("pcgpalette", palette_device, read, write) AM_SHARE("pcgpalette")
+	AM_RANGE(0xe82000, 0xe821ff) AM_DEVREADWRITE("gfxpalette", palette_device, read16, write16) AM_SHARE("gfxpalette")
+	AM_RANGE(0xe82200, 0xe823ff) AM_DEVREADWRITE("pcgpalette", palette_device, read16, write16) AM_SHARE("pcgpalette")
 	AM_RANGE(0xe82400, 0xe83fff) AM_READWRITE(x68k_vid_r, x68k_vid_w)
 	AM_RANGE(0xe84000, 0xe85fff) AM_DEVREADWRITE("hd63450", hd63450_device, read, write)
 	AM_RANGE(0xe86000, 0xe87fff) AM_READWRITE(x68k_areaset_r, x68k_areaset_w)
@@ -1173,14 +1172,14 @@ static ADDRESS_MAP_START(x68k_map, AS_PROGRAM, 16, x68k_state )
 	AM_RANGE(0xfe0000, 0xffffff) AM_ROM
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START(x68kxvi_map, AS_PROGRAM, 16, x68k_state )
+ADDRESS_MAP_START(x68k_state::x68kxvi_map)
 	AM_RANGE(0x000000, 0xbffffb) AM_READWRITE(x68k_emptyram_r, x68k_emptyram_w)
 	AM_RANGE(0xbffffc, 0xbfffff) AM_READWRITE(x68k_rom0_r, x68k_rom0_w)
 	AM_RANGE(0xc00000, 0xdfffff) AM_READWRITE(x68k_gvram_r, x68k_gvram_w)
 	AM_RANGE(0xe00000, 0xe7ffff) AM_READWRITE(x68k_tvram_r, x68k_tvram_w)
 	AM_RANGE(0xe80000, 0xe81fff) AM_READWRITE(x68k_crtc_r, x68k_crtc_w)
-	AM_RANGE(0xe82000, 0xe821ff) AM_DEVREADWRITE("gfxpalette", palette_device, read, write) AM_SHARE("gfxpalette")
-	AM_RANGE(0xe82200, 0xe823ff) AM_DEVREADWRITE("pcgpalette", palette_device, read, write) AM_SHARE("pcgpalette")
+	AM_RANGE(0xe82000, 0xe821ff) AM_DEVREADWRITE("gfxpalette", palette_device, read16, write16) AM_SHARE("gfxpalette")
+	AM_RANGE(0xe82200, 0xe823ff) AM_DEVREADWRITE("pcgpalette", palette_device, read16, write16) AM_SHARE("pcgpalette")
 	AM_RANGE(0xe82400, 0xe83fff) AM_READWRITE(x68k_vid_r, x68k_vid_w)
 	AM_RANGE(0xe84000, 0xe85fff) AM_DEVREADWRITE("hd63450", hd63450_device, read, write)
 	AM_RANGE(0xe86000, 0xe87fff) AM_READWRITE(x68k_areaset_r, x68k_areaset_w)
@@ -1212,15 +1211,15 @@ static ADDRESS_MAP_START(x68kxvi_map, AS_PROGRAM, 16, x68k_state )
 	AM_RANGE(0xfe0000, 0xffffff) AM_ROM
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START(x68030_map, AS_PROGRAM, 32, x68k_state )
+ADDRESS_MAP_START(x68k_state::x68030_map)
 	ADDRESS_MAP_GLOBAL_MASK(0x00ffffff)  // Still only has 24-bit address space
 	AM_RANGE(0x000000, 0xbffffb) AM_READWRITE16(x68k_emptyram_r, x68k_emptyram_w,0xffffffff)
 	AM_RANGE(0xbffffc, 0xbfffff) AM_READWRITE16(x68k_rom0_r, x68k_rom0_w,0xffffffff)
 	AM_RANGE(0xc00000, 0xdfffff) AM_READWRITE16(x68k_gvram_r, x68k_gvram_w, 0xffffffff)
 	AM_RANGE(0xe00000, 0xe7ffff) AM_READWRITE16(x68k_tvram_r, x68k_tvram_w, 0xffffffff)
 	AM_RANGE(0xe80000, 0xe81fff) AM_READWRITE16(x68k_crtc_r, x68k_crtc_w,0xffffffff)
-	AM_RANGE(0xe82000, 0xe821ff) AM_DEVREADWRITE("gfxpalette", palette_device, read, write) AM_SHARE("gfxpalette")
-	AM_RANGE(0xe82200, 0xe823ff) AM_DEVREADWRITE("pcgpalette", palette_device, read, write) AM_SHARE("pcgpalette")
+	AM_RANGE(0xe82000, 0xe821ff) AM_DEVREADWRITE("gfxpalette", palette_device, read32, write32) AM_SHARE("gfxpalette")
+	AM_RANGE(0xe82200, 0xe823ff) AM_DEVREADWRITE("pcgpalette", palette_device, read32, write32) AM_SHARE("pcgpalette")
 	AM_RANGE(0xe82400, 0xe83fff) AM_READWRITE16(x68k_vid_r, x68k_vid_w,0xffffffff)
 	AM_RANGE(0xe84000, 0xe85fff) AM_DEVREADWRITE16("hd63450", hd63450_device, read, write, 0xffffffff)
 	AM_RANGE(0xe86000, 0xe87fff) AM_READWRITE16(x68k_areaset_r, x68k_areaset_w,0xffffffff)
@@ -1645,7 +1644,7 @@ static SLOT_INTERFACE_START(keyboard)
 	SLOT_INTERFACE("x68k", X68K_KEYBOARD)
 SLOT_INTERFACE_END
 
-static MACHINE_CONFIG_START( x68000 )
+MACHINE_CONFIG_START(x68k_state::x68000)
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", M68000, 10000000)  /* 10 MHz */
 	MCFG_CPU_PROGRAM_MAP(x68k_map)
@@ -1685,7 +1684,7 @@ static MACHINE_CONFIG_START( x68000 )
 
 	MCFG_DEVICE_ADD("scc", SCC8530, 5000000)
 
-	MCFG_DEVICE_ADD(RP5C15_TAG, RP5C15, XTAL_32_768kHz)
+	MCFG_DEVICE_ADD(RP5C15_TAG, RP5C15, XTAL(32'768))
 	MCFG_RP5C15_OUT_ALARM_CB(DEVWRITELINE(MC68901_TAG, mc68901_device, i0_w))
 
 	/* video hardware */
@@ -1747,7 +1746,8 @@ static MACHINE_CONFIG_START( x68000 )
 	MCFG_X68KHDC_ADD( "x68k_hdc" )
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_DERIVED( x68ksupr, x68000 )
+MACHINE_CONFIG_START(x68k_state::x68ksupr)
+	x68000(config);
 	MCFG_DEVICE_REMOVE("x68k_hdc")
 
 	MCFG_CPU_MODIFY("maincpu")
@@ -1768,12 +1768,14 @@ static MACHINE_CONFIG_DERIVED( x68ksupr, x68000 )
 	MCFG_MB89352A_DRQ_CB(WRITELINE(x68k_state, x68k_scsi_drq))
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_DERIVED( x68kxvi, x68ksupr )
+MACHINE_CONFIG_START(x68k_state::x68kxvi)
+	x68ksupr(config);
 	MCFG_CPU_MODIFY("maincpu")
 	MCFG_CPU_CLOCK(16000000)  /* 16 MHz */
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_DERIVED( x68030, x68ksupr )
+MACHINE_CONFIG_START(x68k_state::x68030)
+	x68ksupr(config);
 	MCFG_CPU_REPLACE("maincpu", M68030, 25000000)  /* 25 MHz 68EC030 */
 	MCFG_CPU_PROGRAM_MAP(x68030_map)
 	MCFG_CPU_IRQ_ACKNOWLEDGE_DRIVER(x68k_state,x68k_int_ack)

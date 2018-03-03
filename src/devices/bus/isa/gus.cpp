@@ -1250,7 +1250,7 @@ INPUT_PORTS_END
 //  device_add_mconfig - add device configuration
 //-------------------------------------------------
 
-MACHINE_CONFIG_MEMBER( isa16_gus_device::device_add_mconfig )
+MACHINE_CONFIG_START(isa16_gus_device::device_add_mconfig)
 	MCFG_SPEAKER_STANDARD_STEREO("lspeaker","rspeaker")
 	MCFG_SOUND_ADD("gf1",GGF1,GF1_CLOCK)
 	MCFG_SOUND_ROUTE(0,"lspeaker",0.50)

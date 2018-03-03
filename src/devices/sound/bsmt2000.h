@@ -25,7 +25,7 @@
 #define MCFG_BSMT2000_REPLACE(_tag, _clock) \
 	MCFG_DEVICE_REPLACE(_tag, BSMT2000, _clock)
 #define MCFG_BSMT2000_READY_CALLBACK(_class, _method) \
-	bsmt2000_device::static_set_ready_callback(*device, bsmt2000_device::ready_callback(&_class::_method, #_class "::" #_method, nullptr, (_class *)nullptr));
+	downcast<bsmt2000_device &>(*device).set_ready_callback(bsmt2000_device::ready_callback(&_class::_method, #_class "::" #_method, nullptr, (_class *)nullptr));
 
 
 //**************************************************************************
@@ -46,13 +46,15 @@ public:
 	bsmt2000_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
 	// inline configuration helpers
-	static void static_set_ready_callback(device_t &device, ready_callback &&callback);
+	template <typename Object> void set_ready_callback(Object &&cb) { m_ready_callback = std::forward<Object>(cb); }
 
 	// public interface
 	uint16_t read_status();
 	void write_reg(uint16_t data);
 	void write_data(uint16_t data);
 
+	void tms_io_map(address_map &map);
+	void tms_program_map(address_map &map);
 protected:
 	// device-level overrides
 	virtual const tiny_rom_entry *device_rom_region() const override;

@@ -35,6 +35,9 @@ public:
 	DECLARE_WRITE8_MEMBER(polgar_led_w);
 	DECLARE_READ8_MEMBER(polgar_keys_r);
 
+	void polgar10(machine_config &config);
+	void polgar(machine_config &config);
+	void polgar_mem(address_map &map);
 protected:
 	optional_ioport m_keys;
 };
@@ -56,6 +59,9 @@ public:
 	DECLARE_READ8_MEMBER(latch1_r);
 	DECLARE_READ32_MEMBER(disable_boot_rom_r);
 
+	void mrisc(machine_config &config);
+	void mrisc_arm_mem(address_map &map);
+	void mrisc_mem(address_map &map);
 protected:
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
@@ -85,6 +91,8 @@ public:
 	DECLARE_WRITE8_MEMBER(milano_led_w);
 	DECLARE_WRITE8_MEMBER(milano_io_w);
 
+	void milano(machine_config &config);
+	void milano_mem(address_map &map);
 protected:
 	virtual void machine_reset() override;
 	virtual void machine_start() override;
@@ -112,6 +120,8 @@ public:
 	TIMER_DEVICE_CALLBACK_MEMBER(nmi_on)  { m_maincpu->set_input_line(M6502_NMI_LINE, ASSERT_LINE); }
 	TIMER_DEVICE_CALLBACK_MEMBER(nmi_off) { m_maincpu->set_input_line(M6502_NMI_LINE, CLEAR_LINE);  }
 
+	void modena(machine_config &config);
+	void modena_mem(address_map &map);
 protected:
 	virtual void machine_reset() override;
 	virtual void machine_start() override;
@@ -139,6 +149,8 @@ public:
 	DECLARE_WRITE8_MEMBER(academy_led_w);
 	DECLARE_READ8_MEMBER(academy_input_r);
 
+	void academy(machine_config &config);
+	void academy_mem(address_map &map);
 protected:
 	virtual void machine_reset() override;
 
@@ -158,7 +170,7 @@ WRITE8_MEMBER(mephisto_polgar_state::polgar_led_w)
 	output().set_led_value(100 + offset, BIT(data, 7));
 }
 
-static ADDRESS_MAP_START(polgar_mem, AS_PROGRAM, 8, mephisto_polgar_state)
+ADDRESS_MAP_START(mephisto_polgar_state::polgar_mem)
 	AM_RANGE( 0x0000, 0x1fff ) AM_RAM AM_SHARE("nvram")
 	AM_RANGE( 0x2000, 0x2000 ) AM_DEVWRITE("display", mephisto_display_modul_device, latch_w)
 	AM_RANGE( 0x2004, 0x2004 ) AM_DEVWRITE("display", mephisto_display_modul_device, io_w)
@@ -185,6 +197,9 @@ WRITE8_MEMBER(mephisto_risc_state::latch1_w)
 {
 	m_com_latch1 = data;
 	m_subcpu->set_input_line(ARM_FIRQ_LINE, ASSERT_LINE);
+	m_subcpu->set_input_line(INPUT_LINE_RESET, (data & 0x02) ? ASSERT_LINE : CLEAR_LINE);
+	if (data & 0x02)
+		m_subcpu->space(AS_PROGRAM).install_rom(0x00000000, 0x0000007f, memregion("arm_bootstrap")->base());
 }
 
 
@@ -221,7 +236,7 @@ TIMER_CALLBACK_MEMBER(mephisto_risc_state::disable_boot_rom)
 	remove_boot_rom();
 }
 
-static ADDRESS_MAP_START(mrisc_mem, AS_PROGRAM, 8, mephisto_risc_state)
+ADDRESS_MAP_START(mephisto_risc_state::mrisc_mem)
 	ADDRESS_MAP_UNMAP_HIGH
 	AM_RANGE( 0x0000, 0x1fff ) AM_RAM AM_SHARE("nvram")
 	AM_RANGE( 0x2000, 0x2000 ) AM_DEVWRITE("display", mephisto_display_modul_device, latch_w)
@@ -239,7 +254,7 @@ static ADDRESS_MAP_START(mrisc_mem, AS_PROGRAM, 8, mephisto_risc_state)
 ADDRESS_MAP_END
 
 
-static ADDRESS_MAP_START(mrisc_arm_mem, AS_PROGRAM, 32, mephisto_risc_state)
+ADDRESS_MAP_START(mephisto_risc_state::mrisc_arm_mem)
 	AM_RANGE( 0x00000000, 0x000fffff )  AM_RAM
 	AM_RANGE( 0x00400000, 0x007fffff )  AM_READWRITE8(latch1_r, latch0_w, 0x000000ff)
 	AM_RANGE( 0x01800000, 0x01800003 )  AM_READ(disable_boot_rom_r)
@@ -274,7 +289,7 @@ WRITE8_MEMBER(mephisto_milano_state::milano_io_w)
 	m_display->io_w(space, offset, data & 0x0f);
 }
 
-static ADDRESS_MAP_START(milano_mem, AS_PROGRAM, 8, mephisto_milano_state)
+ADDRESS_MAP_START(mephisto_milano_state::milano_mem)
 	AM_RANGE( 0x0000, 0x1fbf ) AM_RAM AM_SHARE("nvram")
 
 	AM_RANGE( 0x1fc0, 0x1fc0 ) AM_DEVWRITE("display", mephisto_display_modul_device, latch_w)
@@ -323,7 +338,7 @@ WRITE8_MEMBER(mephisto_modena_state::modena_digits_w)
 	m_digits_idx = (m_digits_idx + 1) & 3;
 }
 
-static ADDRESS_MAP_START(modena_mem, AS_PROGRAM, 8, mephisto_modena_state)
+ADDRESS_MAP_START(mephisto_modena_state::modena_mem)
 	AM_RANGE( 0x0000, 0x1fff ) AM_RAM AM_SHARE("nvram")
 	AM_RANGE( 0x4000, 0x4000 ) AM_WRITE(modena_digits_w)
 	AM_RANGE( 0x5000, 0x5000 ) AM_WRITE(modena_led_w)
@@ -370,7 +385,7 @@ READ8_MEMBER(mephisto_academy_state::academy_input_r)
 	return data ^ 0xff;
 }
 
-static ADDRESS_MAP_START(academy_mem, AS_PROGRAM, 8, mephisto_academy_state )
+ADDRESS_MAP_START(mephisto_academy_state::academy_mem)
 	AM_RANGE( 0x0000, 0x1fff ) AM_RAM AM_SHARE("nvram")
 	AM_RANGE( 0x2400, 0x2400 ) AM_READ(academy_input_r)
 	AM_RANGE( 0x2800, 0x2800 ) AM_DEVWRITE("board", mephisto_board_device, mux_w)
@@ -457,10 +472,10 @@ void mephisto_academy_state::machine_reset()
 	m_enable_nmi = true;
 }
 
-static MACHINE_CONFIG_START( polgar )
-	MCFG_CPU_ADD("maincpu", M65C02, XTAL_4_9152MHz)
+MACHINE_CONFIG_START(mephisto_polgar_state::polgar)
+	MCFG_CPU_ADD("maincpu", M65C02, XTAL(4'915'200))
 	MCFG_CPU_PROGRAM_MAP(polgar_mem)
-	MCFG_CPU_PERIODIC_INT_DRIVER(mephisto_polgar_state, nmi_line_pulse, XTAL_4_9152MHz / (1 << 13))
+	MCFG_CPU_PERIODIC_INT_DRIVER(mephisto_polgar_state, nmi_line_pulse, XTAL(4'915'200) / (1 << 13))
 
 	MCFG_NVRAM_ADD_0FILL("nvram")
 
@@ -469,17 +484,18 @@ static MACHINE_CONFIG_START( polgar )
 	MCFG_DEFAULT_LAYOUT(layout_mephisto_lcd)
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_DERIVED( polgar10, polgar )
+MACHINE_CONFIG_START(mephisto_polgar_state::polgar10)
+	polgar(config);
 	MCFG_CPU_MODIFY("maincpu")
-	MCFG_CPU_CLOCK( XTAL_10MHz )
+	MCFG_CPU_CLOCK( XTAL(10'000'000) )
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_START( mrisc )
-	MCFG_CPU_ADD("maincpu", M65C02, XTAL_10MHz / 4)     // G65SC02
+MACHINE_CONFIG_START(mephisto_risc_state::mrisc)
+	MCFG_CPU_ADD("maincpu", M65C02, XTAL(10'000'000) / 4)     // G65SC02
 	MCFG_CPU_PROGRAM_MAP(mrisc_mem)
-	MCFG_CPU_PERIODIC_INT_DRIVER(mephisto_risc_state, irq0_line_hold, (double)XTAL_10MHz / (1 << 14))
+	MCFG_CPU_PERIODIC_INT_DRIVER(mephisto_risc_state, irq0_line_hold, XTAL(10'000'000) / (1 << 14))
 
-	MCFG_CPU_ADD("subcpu", ARM, XTAL_14MHz)             // VY86C010
+	MCFG_CPU_ADD("subcpu", ARM, XTAL(14'000'000))             // VY86C010
 	MCFG_CPU_PROGRAM_MAP(mrisc_arm_mem)
 	MCFG_ARM_COPRO(VL86C020)
 
@@ -495,7 +511,8 @@ static MACHINE_CONFIG_START( mrisc )
 	MCFG_DEFAULT_LAYOUT(layout_mephisto_lcd)
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_DERIVED( milano, polgar )
+MACHINE_CONFIG_START(mephisto_milano_state::milano)
+	polgar(config);
 	MCFG_CPU_MODIFY("maincpu")
 	MCFG_CPU_PROGRAM_MAP(milano_mem)
 
@@ -505,23 +522,28 @@ static MACHINE_CONFIG_DERIVED( milano, polgar )
 	MCFG_DEFAULT_LAYOUT(layout_mephisto_milano)
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_DERIVED( academy, polgar )
+MACHINE_CONFIG_START(mephisto_academy_state::academy)
+	polgar(config);
 	MCFG_CPU_MODIFY("maincpu")
 	MCFG_CPU_PROGRAM_MAP(academy_mem)
 
 	MCFG_DEFAULT_LAYOUT(layout_mephisto_academy)
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_DERIVED( modena, milano )
+MACHINE_CONFIG_START(mephisto_modena_state::modena)
+	polgar(config);
 	MCFG_CPU_MODIFY("maincpu")          // W65C02SP
-	MCFG_CPU_CLOCK(XTAL_4_194304Mhz)
+	MCFG_CPU_CLOCK(XTAL(4'194'304))
 	MCFG_CPU_PROGRAM_MAP(modena_mem)
 	MCFG_CPU_PERIODIC_INT_REMOVE()
-	MCFG_TIMER_DRIVER_ADD_PERIODIC("nmi_on", mephisto_modena_state, nmi_on, attotime::from_hz((double)XTAL_4_194304Mhz / (1 << 13)))
-	MCFG_TIMER_START_DELAY(attotime::from_hz((double)XTAL_4_194304Mhz / (1 << 13)) - attotime::from_usec(975))  // active for 975us
-	MCFG_TIMER_DRIVER_ADD_PERIODIC("nmi_off", mephisto_modena_state, nmi_off, attotime::from_hz((double)XTAL_4_194304Mhz / (1 << 13)))
+	MCFG_TIMER_DRIVER_ADD_PERIODIC("nmi_on", mephisto_modena_state, nmi_on, attotime::from_hz(XTAL(4'194'304) / (1 << 13)))
+	MCFG_TIMER_START_DELAY(attotime::from_hz(XTAL(4'194'304) / (1 << 13)) - attotime::from_usec(975))  // active for 975us
+	MCFG_TIMER_DRIVER_ADD_PERIODIC("nmi_off", mephisto_modena_state, nmi_off, attotime::from_hz(XTAL(4'194'304) / (1 << 13)))
 
+	MCFG_DEVICE_REMOVE("board")
 	MCFG_DEVICE_REMOVE("display")
+	MCFG_MEPHISTO_BUTTONS_BOARD_ADD("board")
+	MCFG_MEPHISTO_BOARD_DISABLE_LEDS(true)
 	MCFG_DEFAULT_LAYOUT(layout_mephisto_modena)
 
 	/* sound hardware */

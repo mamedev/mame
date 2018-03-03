@@ -19,7 +19,7 @@
 
 DEFINE_DEVICE_TYPE(VTECH_FLOPPY_CONTROLLER, vtech_floppy_controller_device, "vtech_fdc", "Laser/VZ Floppy Disk Controller")
 
-DEVICE_ADDRESS_MAP_START(map, 8, vtech_floppy_controller_device)
+ADDRESS_MAP_START(vtech_floppy_controller_device::map)
 	AM_RANGE(0, 0) AM_WRITE(latch_w)
 	AM_RANGE(1, 1) AM_READ(shifter_r)
 	AM_RANGE(2, 2) AM_READ(rd_r)
@@ -48,7 +48,7 @@ static SLOT_INTERFACE_START( laser_floppies )
 	SLOT_INTERFACE("525", FLOPPY_525_SSSD)
 SLOT_INTERFACE_END
 
-MACHINE_CONFIG_MEMBER( vtech_floppy_controller_device::device_add_mconfig )
+MACHINE_CONFIG_START(vtech_floppy_controller_device::device_add_mconfig)
 	MCFG_MEMEXP_SLOT_ADD("mem")
 	MCFG_FLOPPY_DRIVE_ADD("0", laser_floppies, "525", floppy_image_device::default_floppy_formats)
 	MCFG_FLOPPY_DRIVE_ADD("1", laser_floppies, "525", floppy_image_device::default_floppy_formats)

@@ -166,6 +166,12 @@ public:
 	DECLARE_VIDEO_START(gal3);
 	uint32_t screen_update_gal3(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 	void update_palette(  );
+	void gal3(machine_config &config);
+	void cpu_mst_map(address_map &map);
+	void cpu_slv_map(address_map &map);
+	void psn_b1_cpu_map(address_map &map);
+	void rs_cpu_map(address_map &map);
+	void sound_cpu_map(address_map &map);
 };
 
 
@@ -331,7 +337,7 @@ WRITE32_MEMBER(gal3_state::rso_w)
 }
 
 
-static ADDRESS_MAP_START( cpu_mst_map, AS_PROGRAM, 32, gal3_state )
+ADDRESS_MAP_START(gal3_state::cpu_mst_map)
 	AM_RANGE(0x00000000, 0x001fffff) AM_ROM
 	AM_RANGE(0x20000000, 0x20001fff) AM_RAM AM_SHARE("nvmem")   //NVRAM
 /// AM_RANGE(0x40000000, 0x4000ffff) AM_WRITE() //
@@ -348,7 +354,7 @@ static ADDRESS_MAP_START( cpu_mst_map, AS_PROGRAM, 32, gal3_state )
 	AM_RANGE(0xf2800000, 0xf2800fff) AM_READWRITE(rso_r, rso_w) //RSO PCB
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( cpu_slv_map, AS_PROGRAM, 32, gal3_state )
+ADDRESS_MAP_START(gal3_state::cpu_slv_map)
 	AM_RANGE(0x00000000, 0x0007ffff) AM_ROM
 /// AM_RANGE(0x40000000, 0x4000ffff) AM_WRITE() //
 	AM_RANGE(0x44000000, 0x44000003) AM_READ_PORT("DSW_CPU_slv" )
@@ -377,7 +383,7 @@ static ADDRESS_MAP_START( cpu_slv_map, AS_PROGRAM, 32, gal3_state )
 	AM_RANGE(0xf2760000, 0xf2760003) AM_RAM //AM_READWRITE(namcos21_video_enable_r,namcos21_video_enable_w)
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( rs_cpu_map, AS_PROGRAM, 16, gal3_state )
+ADDRESS_MAP_START(gal3_state::rs_cpu_map)
 	AM_RANGE(0x000000, 0x03ffff) AM_ROM
 	AM_RANGE(0x100000, 0x10ffff) AM_RAM //64K working RAM
 
@@ -441,7 +447,7 @@ static ADDRESS_MAP_START( rs_cpu_map, AS_PROGRAM, 16, gal3_state )
 /// AM_RANGE(0xc44000, 0xffffff) AM_RAM /////////////
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( sound_cpu_map, AS_PROGRAM, 16, gal3_state )
+ADDRESS_MAP_START(gal3_state::sound_cpu_map)
 	AM_RANGE(0x000000, 0x07ffff) AM_ROM
 	AM_RANGE(0x080000, 0x08ffff) AM_RAM
 /// AM_RANGE(0x0c0000, 0x0cffff) AM_RAM //00, 20, 30, 40, 50
@@ -457,7 +463,7 @@ static ADDRESS_MAP_START( sound_cpu_map, AS_PROGRAM, 16, gal3_state )
 /// AM_RANGE(0x090000, 0xffffff) AM_RAM
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( psn_b1_cpu_map, AS_PROGRAM, 16, gal3_state )
+ADDRESS_MAP_START(gal3_state::psn_b1_cpu_map)
 	AM_RANGE(0x000000, 0x03ffff) AM_ROM
 	AM_RANGE(0x040000, 0xffffff) AM_RAM
 ADDRESS_MAP_END
@@ -593,7 +599,7 @@ static GFXDECODE_START( namcos21 )
 	GFXDECODE_ENTRY( "obj_board1", 0x000000, tile_layout,  0x000, 0x20 )
 GFXDECODE_END
 
-static MACHINE_CONFIG_START( gal3 )
+MACHINE_CONFIG_START(gal3_state::gal3)
 	MCFG_CPU_ADD("maincpu", M68020, 49152000/2)
 	MCFG_CPU_PROGRAM_MAP(cpu_mst_map)
 	MCFG_CPU_VBLANK_INT_DRIVER("lscreen", gal3_state,  irq1_line_hold)

@@ -68,4 +68,8 @@ public:
 	uint32_t screen_update_kncljoe(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	INTERRUPT_GEN_MEMBER(sound_nmi);
 	void draw_sprites( bitmap_ind16 &bitmap, const rectangle &cliprect );
+	void kncljoe(machine_config &config);
+	void main_map(address_map &map);
+	void sound_map(address_map &map);
+	void sound_portmap(address_map &map);
 };

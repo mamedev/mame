@@ -52,12 +52,16 @@ public:
 		: driver_device(mconfig, type, tag)
 		, m_maincpu(*this, "maincpu")
 		, m_keyboard(*this, "X%u", 0)
-		{ }
+	{ }
 
 	DECLARE_WRITE8_MEMBER(scanlines_w);
 	DECLARE_WRITE8_MEMBER(digit_w);
 	DECLARE_READ8_MEMBER(kbd_r);
 
+	void sdk85(machine_config &config);
+
+	void sdk85_io(address_map &map);
+	void sdk85_mem(address_map &map);
 protected:
 	virtual void machine_reset() override;
 
@@ -73,7 +77,7 @@ void sdk85_state::machine_reset()
 	m_maincpu->reset();
 }
 
-static ADDRESS_MAP_START(sdk85_mem, AS_PROGRAM, 8, sdk85_state)
+ADDRESS_MAP_START(sdk85_state::sdk85_mem)
 	ADDRESS_MAP_UNMAP_HIGH
 	AM_RANGE(0x0000, 0x07ff) AM_DEVREAD("romio", i8355_device, memory_r)
 	AM_RANGE(0x0800, 0x0fff) AM_DEVREAD("expromio", i8355_device, memory_r)
@@ -83,7 +87,7 @@ static ADDRESS_MAP_START(sdk85_mem, AS_PROGRAM, 8, sdk85_state)
 	AM_RANGE(0x2800, 0x28ff) AM_MIRROR(0x0700) AM_DEVREADWRITE("expramio", i8155_device, memory_r, memory_w)
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START(sdk85_io, AS_IO, 8, sdk85_state)
+ADDRESS_MAP_START(sdk85_state::sdk85_io)
 	ADDRESS_MAP_UNMAP_HIGH
 	AM_RANGE(0x00, 0x03) AM_MIRROR(0x04) AM_DEVREADWRITE("romio", i8355_device, io_r, io_w)
 	AM_RANGE(0x08, 0x0b) AM_MIRROR(0x04) AM_DEVREADWRITE("expromio", i8355_device, io_r, io_w)
@@ -132,7 +136,7 @@ WRITE8_MEMBER( sdk85_state::scanlines_w )
 WRITE8_MEMBER( sdk85_state::digit_w )
 {
 	if (m_digit < 6)
-		output().set_digit_value(m_digit, BITSWAP8(data, 3, 2, 1, 0, 7, 6, 5, 4)^0xff);
+		output().set_digit_value(m_digit, bitswap<8>(data, 3, 2, 1, 0, 7, 6, 5, 4)^0xff);
 }
 
 READ8_MEMBER( sdk85_state::kbd_r )
@@ -141,26 +145,26 @@ READ8_MEMBER( sdk85_state::kbd_r )
 	return data;
 }
 
-static MACHINE_CONFIG_START( sdk85 )
+MACHINE_CONFIG_START(sdk85_state::sdk85)
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", I8085A, XTAL_6_144MHz)
+	MCFG_CPU_ADD("maincpu", I8085A, 6.144_MHz_XTAL)
 	MCFG_CPU_PROGRAM_MAP(sdk85_mem)
 	MCFG_CPU_IO_MAP(sdk85_io)
 
-	MCFG_DEVICE_ADD("romio", I8355, XTAL_6_144MHz / 2) // Monitor ROM (A14)
+	MCFG_DEVICE_ADD("romio", I8355, 6.144_MHz_XTAL / 2) // Monitor ROM (A14)
 
-	MCFG_DEVICE_ADD("expromio", I8355, XTAL_6_144MHz / 2) // Expansion ROM (A15)
+	MCFG_DEVICE_ADD("expromio", I8355, 6.144_MHz_XTAL / 2) // Expansion ROM (A15)
 
-	MCFG_DEVICE_ADD("ramio", I8155, XTAL_6_144MHz / 2) // Basic RAM (A16)
+	MCFG_DEVICE_ADD("ramio", I8155, 6.144_MHz_XTAL / 2) // Basic RAM (A16)
 	MCFG_I8155_OUT_TIMEROUT_CB(INPUTLINE("maincpu", I8085_TRAP_LINE))
 
-	MCFG_DEVICE_ADD("expramio", I8155, XTAL_6_144MHz / 2) // Expansion RAM (A17)
+	MCFG_DEVICE_ADD("expramio", I8155, 6.144_MHz_XTAL / 2) // Expansion RAM (A17)
 
 	/* video hardware */
 	MCFG_DEFAULT_LAYOUT(layout_sdk85)
 
 	/* Devices */
-	MCFG_DEVICE_ADD("kdc", I8279, XTAL_6_144MHz / 2) // Keyboard/Display Controller (A13)
+	MCFG_DEVICE_ADD("kdc", I8279, 6.144_MHz_XTAL / 2) // Keyboard/Display Controller (A13)
 	MCFG_I8279_OUT_IRQ_CB(INPUTLINE("maincpu", I8085_RST55_LINE))   // irq
 	MCFG_I8279_OUT_SL_CB(WRITE8(sdk85_state, scanlines_w))          // scan SL lines
 	MCFG_I8279_OUT_DISP_CB(WRITE8(sdk85_state, digit_w))            // display A&B

@@ -206,6 +206,9 @@ debugger_commands::debugger_commands(running_machine& machine, debugger_cpu& cpu
 	m_console.register_command("stateload", CMDFLAG_NONE, 0, 1, 1, std::bind(&debugger_commands::execute_stateload, this, _1, _2));
 	m_console.register_command("sl",        CMDFLAG_NONE, 0, 1, 1, std::bind(&debugger_commands::execute_stateload, this, _1, _2));
 
+	m_console.register_command("rewind",    CMDFLAG_NONE, 0, 0, 0, std::bind(&debugger_commands::execute_rewind, this, _1, _2));
+	m_console.register_command("rw",        CMDFLAG_NONE, 0, 0, 0, std::bind(&debugger_commands::execute_rewind, this, _1, _2));
+
 	m_console.register_command("save",      CMDFLAG_NONE, AS_PROGRAM, 3, 4, std::bind(&debugger_commands::execute_save, this, _1, _2));
 	m_console.register_command("saved",     CMDFLAG_NONE, AS_DATA, 3, 4, std::bind(&debugger_commands::execute_save, this, _1, _2));
 	m_console.register_command("savei",     CMDFLAG_NONE, AS_IO, 3, 4, std::bind(&debugger_commands::execute_save, this, _1, _2));
@@ -1627,13 +1630,32 @@ void debugger_commands::execute_stateload(int ref, const std::vector<std::string
 	const std::string &filename(params[0]);
 	m_machine.immediate_load(filename.c_str());
 
-	// Clear all PC & memory tracks
+	// clear all PC & memory tracks
 	for (device_t &device : device_iterator(m_machine.root_device()))
 	{
 		device.debug()->track_pc_data_clear();
 		device.debug()->track_mem_data_clear();
 	}
 	m_console.printf("State load attempted.  Please refer to window message popup for results.\n");
+}
+
+
+/*-------------------------------------------------
+    execute_rewind - execute the rewind command
+-------------------------------------------------*/
+
+void debugger_commands::execute_rewind(int ref, const std::vector<std::string> &params)
+{
+	bool success = m_machine.rewind_step();
+	if (success)
+		// clear all PC & memory tracks
+		for (device_t &device : device_iterator(m_machine.root_device()))
+		{
+			device.debug()->track_pc_data_clear();
+			device.debug()->track_mem_data_clear();
+		}
+	else
+		m_console.printf("Rewind error occured.  See error.log for details.\n");
 }
 
 
@@ -1669,7 +1691,7 @@ void debugger_commands::execute_save(int ref, const std::vector<std::string> &pa
 	}
 
 	/* now write the data out */
-	auto dis = space->machine().disable_side_effect();
+	auto dis = space->device().machine().disable_side_effects();
 	switch (space->addr_shift())
 	{
 	case -3:
@@ -1895,7 +1917,7 @@ void debugger_commands::execute_dump(int ref, const std::vector<std::string> &pa
 	else if(shift < 0)
 		width >>= -shift;
 
-	auto dis = space->machine().disable_side_effect();
+	auto dis = space->device().machine().disable_side_effects();
 	bool be = space->endianness() == ENDIANNESS_BIG;
 
 	for (offs_t i = offset; i <= endoffset; i += rowsize)
@@ -1943,7 +1965,7 @@ void debugger_commands::execute_dump(int ref, const std::vector<std::string> &pa
 		if (ascii)
 		{
 			util::stream_format(output, "  ");
-			for (u64 j = 0; j < rowsize && (i + j) <= endoffset; j++)
+			for (u64 j = 0; j < rowsize && (i + j) <= endoffset; j += width)
 			{
 				offs_t curaddr = i + j;
 				if (space->device().memory().translate(space->spacenum(), TRANSLATE_READ_DEBUG, curaddr))
@@ -1965,7 +1987,7 @@ void debugger_commands::execute_dump(int ref, const std::vector<std::string> &pa
 						break;
 					}
 					for (unsigned int b = 0; b != width; b++) {
-						u8 byte = data >> (8 * (be ? (width-i-b) : b));
+						u8 byte = data >> (8 * (be ? (width-1-b) : b));
 						util::stream_format(output, "%c", (byte >= 32 && byte < 127) ? byte : '.');
 					}
 				}
@@ -2756,7 +2778,7 @@ void debugger_commands::execute_history(int ref, const std::vector<std::string> 
 	}
 
 	debug_disasm_buffer buffer(space->device());
-	
+
 	for (int index = 0; index < (int) count; index++)
 	{
 		offs_t pc = debug->history_pc(-index);

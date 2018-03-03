@@ -84,8 +84,8 @@
 #include "network.h"
 #include "ui/uimain.h"
 #include <time.h>
-#include "rapidjson/include/rapidjson/writer.h"
-#include "rapidjson/include/rapidjson/stringbuffer.h"
+#include <rapidjson/writer.h>
+#include <rapidjson/stringbuffer.h>
 
 #if defined(EMSCRIPTEN)
 #include <emscripten.h>
@@ -107,9 +107,8 @@ osd_interface &running_machine::osd() const
 //-------------------------------------------------
 
 running_machine::running_machine(const machine_config &_config, machine_manager &manager)
-	: firstcpu(nullptr),
-		primary_screen(nullptr),
-		m_side_effect_disabled(0),
+	: primary_screen(nullptr),
+		m_side_effects_disabled(0),
 		debug_flags(0),
 		m_config(_config),
 		m_system(_config.gamedrv()),
@@ -145,12 +144,6 @@ running_machine::running_machine(const machine_config &_config, machine_manager 
 		device.set_machine(*this);
 
 	// find devices
-	for (device_t &device : iter)
-		if (dynamic_cast<cpu_device *>(&device) != nullptr)
-		{
-			firstcpu = downcast<cpu_device *>(&device);
-			break;
-		}
 	primary_screen = screen_device_iterator(root_device()).first();
 
 	// fetch core options
@@ -230,6 +223,10 @@ void running_machine::start()
 	// initialize the streams engine before the sound devices start
 	m_sound = std::make_unique<sound_manager>(*this);
 
+	// resolve objects that can be used by memory maps
+	for (device_t &device : device_iterator(root_device()))
+		device.resolve_pre_map();
+
 	// configure the address spaces, load ROMs (which needs
 	// width/endianess of the spaces), then populate memory (which
 	// needs rom bases), and finally initialize CPUs (which needs
@@ -257,6 +254,10 @@ void running_machine::start()
 	m_render->resolve_tags();
 
 	manager().create_custom(*this);
+
+	// resolve objects that are created by memory maps
+	for (device_t &device : device_iterator(root_device()))
+		device.resolve_post_map();
 
 	// register callbacks for the devices, then start them
 	add_notifier(MACHINE_NOTIFY_RESET, machine_notify_delegate(&running_machine::reset_all_devices, this));
@@ -372,7 +373,8 @@ int running_machine::run(bool quiet)
 
 		// save the NVRAM and configuration
 		sound().ui_mute(true);
-		nvram_save();
+		if (options().nvram_save())
+			nvram_save();
 		m_configuration->save_settings();
 	}
 	catch (emu_fatalerror &fatal)
@@ -683,6 +685,39 @@ void running_machine::immediate_load(const char *filename)
 
 
 //-------------------------------------------------
+//  rewind_capture - capture and append a new
+//  state to the rewind list
+//-------------------------------------------------
+
+bool running_machine::rewind_capture()
+{
+	return m_save.rewind()->capture();
+}
+
+
+//-------------------------------------------------
+//  rewind_step - a single step back through
+//  rewind states
+//-------------------------------------------------
+
+bool running_machine::rewind_step()
+{
+	return m_save.rewind()->step();
+}
+
+
+//-------------------------------------------------
+//  rewind_invalidate - mark all the future rewind
+//  states as invalid
+//-------------------------------------------------
+
+void running_machine::rewind_invalidate()
+{
+	m_save.rewind()->invalidate();
+}
+
+
+//-------------------------------------------------
 //  pause - pause the system
 //-------------------------------------------------
 
@@ -721,7 +756,10 @@ void running_machine::resume()
 void running_machine::toggle_pause()
 {
 	if (paused())
+	{
+		rewind_invalidate();
 		resume();
+	}
 	else
 		pause();
 }
@@ -921,6 +959,9 @@ void running_machine::handle_saveload()
 				if (saverr != STATERR_NONE && m_saveload_schedule == saveload_schedule::SAVE)
 					file.remove_on_close();
 			}
+			else if (openflags == OPEN_FLAG_READ && filerr == osd_file::error::NOT_FOUND)
+				// attempt to load a non-existent savestate, report empty slot
+				popmessage("Error: No savestate file to load.", opname);
 			else
 				popmessage("Error: Failed to open file for %s operation.", opname);
 		}
@@ -974,10 +1015,6 @@ void running_machine::logfile_callback(const char *buffer)
 
 void running_machine::start_all_devices()
 {
-	// resolve objects first to avoid messy start order dependencies
-	for (device_t &device : device_iterator(root_device()))
-		device.resolve_objects();
-
 	m_dummy_space.start();
 
 	// iterate through the devices
@@ -1244,6 +1281,7 @@ system_time::system_time(time_t t)
 
 void system_time::set(time_t t)
 {
+	// FIXME: this crashes if localtime or gmtime returns nullptr
 	time = t;
 	local_time.set(*localtime(&t));
 	utc_time.set(*gmtime(&t));
@@ -1284,7 +1322,7 @@ WRITE8_MEMBER(dummy_space_device::write)
 	throw emu_fatalerror("Attempted to write to generic address space (offs %X = %02X)\n", offset, data);
 }
 
-static ADDRESS_MAP_START(dummy, 0, 8, dummy_space_device)
+ADDRESS_MAP_START(dummy_space_device::dummy)
 	AM_RANGE(0x00000000, 0xffffffff) AM_READWRITE(read, write)
 ADDRESS_MAP_END
 
@@ -1293,7 +1331,7 @@ DEFINE_DEVICE_TYPE(DUMMY_SPACE, dummy_space_device, "dummy_space", "Dummy Space"
 dummy_space_device::dummy_space_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock) :
 	device_t(mconfig, DUMMY_SPACE, tag, owner, clock),
 	device_memory_interface(mconfig, *this),
-	m_space_config("dummy", ENDIANNESS_LITTLE, 8, 32, 0, nullptr, *ADDRESS_MAP_NAME(dummy))
+	m_space_config("dummy", ENDIANNESS_LITTLE, 8, 32, 0, address_map_constructor(), address_map_constructor(FUNC(dummy_space_device::dummy), this))
 {
 }
 

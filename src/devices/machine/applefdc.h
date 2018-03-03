@@ -59,7 +59,7 @@ class applefdc_base_device : public device_t
 {
 public:
 	// configuration helpers
-	static void static_set_config(device_t &device, const applefdc_interface *intrf) { downcast<applefdc_base_device &>(device).m_interface = intrf; }
+	void set_config(const applefdc_interface *intrf) { m_interface = intrf; }
 
 	// read/write handlers
 	virtual uint8_t read(uint8_t offset);
@@ -147,7 +147,7 @@ public:
 ***************************************************************************/
 
 #define MCFG_APPLEFDC_CONFIG(_intrf) \
-	applefdc_base_device::static_set_config(*device, &(_intrf));
+	downcast<applefdc_base_device &>(*device).set_config(&(_intrf));
 
 #define MCFG_APPLEFDC_ADD(_tag, _intrf) \
 	MCFG_DEVICE_ADD(_tag, APPLEFDC, 0) \

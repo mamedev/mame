@@ -54,7 +54,7 @@
 //  ADDRESS_MAP( coco_mem )
 //-------------------------------------------------
 
-static ADDRESS_MAP_START( coco_mem, AS_PROGRAM, 8, coco_state )
+ADDRESS_MAP_START(coco_state::coco_mem)
 ADDRESS_MAP_END
 
 
@@ -352,6 +352,7 @@ INPUT_PORTS_END
 SLOT_INTERFACE_START( coco_cart )
 	SLOT_INTERFACE("fdc", COCO_FDC)
 	SLOT_INTERFACE("fdcv11", COCO_FDC_V11)
+	SLOT_INTERFACE("cc2hdb1", COCO2_HDB1)
 	SLOT_INTERFACE("cc3hdb1", COCO3_HDB1)
 	SLOT_INTERFACE("cp450_fdc", CP450_FDC)
 	SLOT_INTERFACE("cd6809_fdc", CD6809_FDC)
@@ -377,7 +378,7 @@ SLOT_INTERFACE_END
 //  MACHINE_CONFIG_START( coco_sound )
 //-------------------------------------------------
 
-MACHINE_CONFIG_START( coco_sound )
+MACHINE_CONFIG_START(coco_state::coco_sound)
 	MCFG_SPEAKER_STANDARD_MONO("speaker")
 
 	// 6-bit D/A: R10-15 = 10K, 20K, 40.2K, 80.6K, 162K, 324K (according to parts list); output also controls joysticks
@@ -398,12 +399,12 @@ MACHINE_CONFIG_END
 //  MACHINE_CONFIG ( coco_floating )
 //-------------------------------------------------
 
-static ADDRESS_MAP_START(coco_floating_map, AS_PROGRAM, 8, coco_state)
+ADDRESS_MAP_START(coco_state::coco_floating_map)
 	AM_RANGE(0x0000, 0xFFFF) AM_READ(floating_bus_read)
 ADDRESS_MAP_END
 
 
-MACHINE_CONFIG_START( coco_floating )
+MACHINE_CONFIG_START(coco_state::coco_floating)
 	MCFG_DEVICE_ADD(FLOATING_TAG, ADDRESS_MAP_BANK, 0)
 	MCFG_DEVICE_PROGRAM_MAP(coco_floating_map)
 	MCFG_ADDRESS_MAP_BANK_ENDIANNESS(ENDIANNESS_BIG)
@@ -428,12 +429,12 @@ DEVICE_INPUT_DEFAULTS_END
 //  MACHINE_CONFIG
 //-------------------------------------------------
 
-static MACHINE_CONFIG_START( coco )
+MACHINE_CONFIG_START(coco12_state::coco)
 	MCFG_DEVICE_MODIFY(":")
-	MCFG_DEVICE_CLOCK(XTAL_3_579545MHz)
+	MCFG_DEVICE_CLOCK(XTAL(14'318'181) / 16)
 
 	// basic machine hardware
-	MCFG_CPU_ADD(MAINCPU_TAG, M6809E, DERIVED_CLOCK(1, 1))
+	MCFG_CPU_ADD(MAINCPU_TAG, MC6809E, DERIVED_CLOCK(1, 1))
 	MCFG_CPU_PROGRAM_MAP(coco_mem)
 	MCFG_CPU_DISASSEMBLE_OVERRIDE(coco_state, dasm_override)
 
@@ -456,7 +457,7 @@ static MACHINE_CONFIG_START( coco )
 	MCFG_PIA_IRQA_HANDLER(WRITELINE(coco_state, pia1_firq_a))
 	MCFG_PIA_IRQB_HANDLER(WRITELINE(coco_state, pia1_firq_b))
 
-	MCFG_SAM6883_ADD(SAM_TAG, XTAL_3_579545MHz, MAINCPU_TAG, AS_PROGRAM)
+	MCFG_SAM6883_ADD(SAM_TAG, XTAL(14'318'181), MAINCPU_TAG, AS_PROGRAM)
 	MCFG_SAM6883_RES_CALLBACK(READ8(coco12_state, sam_read))
 
 	// Becker Port device
@@ -478,13 +479,13 @@ static MACHINE_CONFIG_START( coco )
 	// video hardware
 	MCFG_SCREEN_MC6847_NTSC_ADD(SCREEN_TAG, VDG_TAG)
 
-	MCFG_DEVICE_ADD(VDG_TAG, MC6847_NTSC, XTAL_3_579545MHz)
+	MCFG_DEVICE_ADD(VDG_TAG, MC6847_NTSC, XTAL(14'318'181) / 4) // VClk output from MC6883
 	MCFG_MC6847_HSYNC_CALLBACK(WRITELINE(coco12_state, horizontal_sync))
 	MCFG_MC6847_FSYNC_CALLBACK(WRITELINE(coco12_state, field_sync))
 	MCFG_MC6847_INPUT_CALLBACK(DEVREAD8(SAM_TAG, sam6883_device, display_read))
 
 	// sound hardware
-	MCFG_FRAGMENT_ADD( coco_sound )
+	coco_sound(config);
 
 	// internal ram
 	MCFG_RAM_ADD(RAM_TAG)
@@ -492,7 +493,7 @@ static MACHINE_CONFIG_START( coco )
 	MCFG_RAM_EXTRA_OPTIONS("4K,16K,32K")
 
 	// floating space
-	MCFG_FRAGMENT_ADD( coco_floating )
+	coco_floating(config);
 
 	// software lists
 	MCFG_SOFTWARE_LIST_ADD("coco_cart_list", "coco_cart")
@@ -500,7 +501,8 @@ static MACHINE_CONFIG_START( coco )
 	MCFG_SOFTWARE_LIST_COMPATIBLE_ADD("dragon_cart_list", "dragon_cart")
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_DERIVED( cocoe, coco )
+MACHINE_CONFIG_START(coco12_state::cocoe)
+	coco(config);
 	MCFG_COCO_CARTRIDGE_REMOVE(CARTRIDGE_TAG)
 	MCFG_COCO_CARTRIDGE_ADD(CARTRIDGE_TAG, coco_cart, "fdc")
 	MCFG_COCO_CARTRIDGE_CART_CB(WRITELINE(coco_state, cart_w))
@@ -510,7 +512,8 @@ static MACHINE_CONFIG_DERIVED( cocoe, coco )
 	MCFG_COCO_VHD_ADD(VHD1_TAG)
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_DERIVED( coco2, coco )
+MACHINE_CONFIG_START(coco12_state::coco2)
+	coco(config);
 	MCFG_COCO_CARTRIDGE_REMOVE(CARTRIDGE_TAG)
 	MCFG_COCO_CARTRIDGE_ADD(CARTRIDGE_TAG, coco_cart, "fdcv11")
 	MCFG_COCO_CARTRIDGE_CART_CB(WRITELINE(coco_state, cart_w))
@@ -520,15 +523,17 @@ static MACHINE_CONFIG_DERIVED( coco2, coco )
 	MCFG_COCO_VHD_ADD(VHD1_TAG)
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_DERIVED( coco2b, coco2 )
+MACHINE_CONFIG_START(coco12_state::coco2b)
+	coco2(config);
 	MCFG_DEVICE_REMOVE(VDG_TAG)
-	MCFG_DEVICE_ADD(VDG_TAG, MC6847T1_NTSC, XTAL_3_579545MHz)
+	MCFG_DEVICE_ADD(VDG_TAG, MC6847T1_NTSC, XTAL(14'318'181) / 4)
 	MCFG_MC6847_HSYNC_CALLBACK(WRITELINE(coco12_state, horizontal_sync))
 	MCFG_MC6847_FSYNC_CALLBACK(WRITELINE(coco12_state, field_sync))
 	MCFG_MC6847_INPUT_CALLBACK(DEVREAD8(SAM_TAG, sam6883_device, display_read))
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_DERIVED( cp400, coco )
+MACHINE_CONFIG_START(coco12_state::cp400)
+	coco(config);
 	MCFG_COCO_CARTRIDGE_REMOVE(CARTRIDGE_TAG)
 	MCFG_COCO_CARTRIDGE_ADD(CARTRIDGE_TAG, coco_cart, "cp450_fdc")
 	MCFG_COCO_CARTRIDGE_CART_CB(WRITELINE(coco_state, cart_w))
@@ -536,7 +541,8 @@ static MACHINE_CONFIG_DERIVED( cp400, coco )
 	MCFG_COCO_CARTRIDGE_HALT_CB(INPUTLINE(MAINCPU_TAG, INPUT_LINE_HALT))
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_DERIVED( t4426, coco2 )
+MACHINE_CONFIG_START(coco12_state::t4426)
+	coco2(config);
 	MCFG_COCO_CARTRIDGE_REMOVE(CARTRIDGE_TAG)
 	MCFG_COCO_CARTRIDGE_ADD(CARTRIDGE_TAG, t4426_cart, "t4426")
 	MCFG_COCO_CARTRIDGE_CART_CB(WRITELINE(coco_state, cart_w))
@@ -545,7 +551,8 @@ static MACHINE_CONFIG_DERIVED( t4426, coco2 )
 	MCFG_SLOT_FIXED(true) // This cart is fixed so no way to change it
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_DERIVED( cd6809, coco )
+MACHINE_CONFIG_START(coco12_state::cd6809)
+	coco(config);
 	MCFG_COCO_CARTRIDGE_REMOVE(CARTRIDGE_TAG)
 	MCFG_COCO_CARTRIDGE_ADD(CARTRIDGE_TAG, coco_cart, "cd6809_fdc")
 	MCFG_COCO_CARTRIDGE_CART_CB(WRITELINE(coco_state, cart_w))

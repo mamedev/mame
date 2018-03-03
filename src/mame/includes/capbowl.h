@@ -78,6 +78,11 @@ public:
 	uint32_t screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 	inline rgb_t pen_for_pixel( uint8_t const *src, uint8_t pix );
 
+	void bowlrama(machine_config &config);
+	void capbowl(machine_config &config);
+	void bowlrama_map(address_map &map);
+	void capbowl_map(address_map &map);
+	void sound_map(address_map &map);
 protected:
 	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr) override;
 };

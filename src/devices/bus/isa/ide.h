@@ -21,11 +21,7 @@ public:
 	// construction/destruction
 	isa16_ide_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
-	bool is_primary() { return m_is_primary; }
-	DECLARE_ADDRESS_MAP(map, 16);
-	DECLARE_ADDRESS_MAP(alt_map, 8);
-	READ8_MEMBER(ide16_alt_r);
-	WRITE8_MEMBER(ide16_alt_w);
+	static void cdrom_headphones(device_t *device);
 
 protected:
 	// device-level overrides
@@ -38,6 +34,12 @@ protected:
 
 private:
 	DECLARE_WRITE_LINE_MEMBER(ide_interrupt);
+	READ8_MEMBER(ide16_alt_r);
+	WRITE8_MEMBER(ide16_alt_w);
+	bool is_primary() { return m_is_primary; }
+
+	void map(address_map &map);
+	void alt_map(address_map &map);
 
 	// internal state
 	bool m_is_primary;

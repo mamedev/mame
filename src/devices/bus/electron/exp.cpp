@@ -87,9 +87,31 @@ void electron_expansion_slot_device::device_start()
 
 void electron_expansion_slot_device::device_reset()
 {
-	if (get_card_device())
+}
+
+//-------------------------------------------------
+//  expbus_r - expansion data read
+//-------------------------------------------------
+
+uint8_t electron_expansion_slot_device::expbus_r(address_space &space, offs_t offset, uint8_t data)
+{
+	if (m_card != nullptr)
 	{
-		get_card_device()->reset();
+		data = m_card->expbus_r(space, offset, data);
+	}
+
+	return data;
+}
+
+//-------------------------------------------------
+//  expbus_w - expansion data write
+//-------------------------------------------------
+
+void electron_expansion_slot_device::expbus_w(address_space &space, offs_t offset, uint8_t data)
+{
+	if (m_card != nullptr)
+	{
+		m_card->expbus_w(space, offset, data);
 	}
 }
 
@@ -106,22 +128,21 @@ void electron_expansion_slot_device::device_reset()
 #include "plus1.h"
 #include "plus3.h"
 #include "pwrjoy.h"
-//#include "rombox.h"
-//#include "romboxp.h"
+#include "rombox.h"
+#include "romboxp.h"
 #include "m2105.h"
 //#include "voxbox.h"
 
 
 SLOT_INTERFACE_START( electron_expansion_devices )
-	//SLOT_INTERFACE("ap1", ELECTRON_AP1)
 	SLOT_INTERFACE("fbjoy", ELECTRON_FBJOY)
 	//SLOT_INTERFACE("fbprint", ELECTRON_FBPRINT)
 	//SLOT_INTERFACE("jafamode7", ELECTRON_JAFAMODE7)
 	SLOT_INTERFACE("plus1", ELECTRON_PLUS1)
 	SLOT_INTERFACE("plus3", ELECTRON_PLUS3)
 	SLOT_INTERFACE("pwrjoy", ELECTRON_PWRJOY)
-	//SLOT_INTERFACE("rombox", ELECTRON_ROMBOX)
-	//SLOT_INTERFACE("romboxp", ELECTRON_ROMBOXP)
+	SLOT_INTERFACE("rombox", ELECTRON_ROMBOX)
+	SLOT_INTERFACE("romboxp", ELECTRON_ROMBOXP)
 	SLOT_INTERFACE("m2105", ELECTRON_M2105)
 	//SLOT_INTERFACE("voxbox", ELECTRON_VOXBOX)
 SLOT_INTERFACE_END

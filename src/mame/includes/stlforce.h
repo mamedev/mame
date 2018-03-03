@@ -65,4 +65,8 @@ public:
 	virtual void video_start() override;
 	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	void draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprect );
+	void stlforce(machine_config &config);
+	void twinbrat(machine_config &config);
+	void stlforce_map(address_map &map);
+	void twinbrat_oki_map(address_map &map);
 };

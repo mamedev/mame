@@ -4,9 +4,6 @@
 #include "machine/seibucop/seibucop.h"
 #include "video/seibu_crtc.h"
 
-ADDRESS_MAP_EXTERN(raiden2_sound_map, 8);
-ADDRESS_MAP_EXTERN(zeroteam_sound_map, 8);
-
 class raiden2_state : public driver_device
 {
 public:
@@ -153,6 +150,17 @@ public:
 	bitmap_ind16 tile_buffer, sprite_buffer;
 	optional_device<raiden2cop_device> m_raiden2cop;
 
+	void raidendx(machine_config &config);
+	void xsedae(machine_config &config);
+	void zeroteam(machine_config &config);
+	void raiden2(machine_config &config);
+	void raiden2_cop_mem(address_map &map);
+	void raiden2_mem(address_map &map);
+	void raiden2_sound_map(address_map &map);
+	void raidendx_mem(address_map &map);
+	void xsedae_mem(address_map &map);
+	void zeroteam_mem(address_map &map);
+	void zeroteam_sound_map(address_map &map);
 protected:
 	virtual void machine_start() override;
 };

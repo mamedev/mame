@@ -135,11 +135,14 @@ Notes:
 
 #include "cpu/m68000/m68000.h"
 #include "cpu/z80/z80.h"
+#include "machine/gen_latch.h"
 #include "machine/watchdog.h"
 #include "sound/2203intf.h"
 #include "sound/okim6295.h"
 #include "sound/ym2151.h"
 #include "speaker.h"
+
+#include <algorithm>
 
 
 WRITE16_MEMBER(gaiden_state::irq_ack_w)
@@ -152,33 +155,26 @@ WRITE8_MEMBER(gaiden_state::drgnbowl_irq_ack_w)
 	m_maincpu->set_input_line(5, CLEAR_LINE);
 }
 
-WRITE16_MEMBER(gaiden_state::gaiden_sound_command_w)
-{
-	// Ninja Gaiden writes only to the lower byte; Tecmo Knight and Strato Fighter write to the upper byte instead.
-	// It's not clear which 8 data lines are actually used, but byte smearing is almost certainly involved.
-	m_soundlatch->write(space, 0, data & 0xff);
-}
-
 
 
 /* Wild Fang / Tecmo Knight has a simple protection. It writes codes to 0x07a804, */
 /* and reads the answer from 0x07a007. The returned values contain the address of */
 /* a function to jump to. */
 
+static const int wildfang_jumppoints[] =
+{
+	0x0c0c,0x0cac,0x0d42,0x0da2,0x0eea,0x112e,0x1300,0x13fa,
+	0x159a,0x1630,0x109a,0x1700,0x1750,0x1806,0x18d6,0x1a44,
+	0x1b52
+};
+
 WRITE16_MEMBER(gaiden_state::wildfang_protection_w)
 {
 	if (ACCESSING_BITS_8_15)
 	{
-		static const int jumppoints[] =
-		{
-			0x0c0c,0x0cac,0x0d42,0x0da2,0x0eea,0x112e,0x1300,0x13fa,
-			0x159a,0x1630,0x109a,0x1700,0x1750,0x1806,0x18d6,0x1a44,
-			0x1b52
-		};
-
 		data >>= 8;
 
-//      logerror("PC %06x: prot = %02x\n",space.device().safe_pc(),data);
+//      logerror("PC %06x: prot = %02x\n",m_maincpu->pc(),data);
 
 		switch (data & 0xf0)
 		{
@@ -191,7 +187,7 @@ WRITE16_MEMBER(gaiden_state::wildfang_protection_w)
 				break;
 			case 0x20:  /* low 4 bits of jump code */
 				m_jumpcode |= data & 0x0f;
-				if (m_jumpcode >= ARRAY_LENGTH(jumppoints))
+				if (m_jumpcode >= ARRAY_LENGTH(wildfang_jumppoints))
 				{
 					logerror("unknown jumpcode %02x\n", m_jumpcode);
 					m_jumpcode = 0;
@@ -199,16 +195,16 @@ WRITE16_MEMBER(gaiden_state::wildfang_protection_w)
 				m_prot = 0x20;
 				break;
 			case 0x30:  /* ask for bits 12-15 of function address */
-				m_prot = 0x40 | ((jumppoints[m_jumpcode] >> 12) & 0x0f);
+				m_prot = 0x40 | ((m_jumppoints[m_jumpcode] >> 12) & 0x0f);
 				break;
 			case 0x40:  /* ask for bits 8-11 of function address */
-				m_prot = 0x50 | ((jumppoints[m_jumpcode] >> 8) & 0x0f);
+				m_prot = 0x50 | ((m_jumppoints[m_jumpcode] >> 8) & 0x0f);
 				break;
 			case 0x50:  /* ask for bits 4-7 of function address */
-				m_prot = 0x60 | ((jumppoints[m_jumpcode] >> 4) & 0x0f);
+				m_prot = 0x60 | ((m_jumppoints[m_jumpcode] >> 4) & 0x0f);
 				break;
 			case 0x60:  /* ask for bits 0-3 of function address */
-				m_prot = 0x70 | ((jumppoints[m_jumpcode] >> 0) & 0x0f);
+				m_prot = 0x70 | ((m_jumppoints[m_jumpcode] >> 0) & 0x0f);
 				break;
 		}
 	}
@@ -216,7 +212,7 @@ WRITE16_MEMBER(gaiden_state::wildfang_protection_w)
 
 READ16_MEMBER(gaiden_state::wildfang_protection_r)
 {
-//  logerror("PC %06x: read prot %02x\n", space.device().safe_pc(), m_prot);
+//  logerror("PC %06x: read prot %02x\n", m_maincpu->pc(), m_prot);
 	return m_prot;
 }
 
@@ -266,7 +262,7 @@ same commands as some of the above
 */
 
 /* these are used during startup */
-static const int jumppoints_00[0x100] =
+static const int raiga_jumppoints_00[0x100] =
 {
 	0x6669,    -1,    -1,    -1,    -1,    -1,    -1,    -1,
 		-1,    -1,    -1,    -1,    -1,    -1,0x4a46,    -1,
@@ -279,7 +275,7 @@ static const int jumppoints_00[0x100] =
 };
 
 /* these are used the rest of the time */
-static const int jumppoints_other[0x100] =
+static const int raiga_jumppoints_other[0x100] =
 {
 	0x5457,0x494e,0x5f4b,0x4149,0x5345,0x525f,0x4d49,0x5941,
 	0x5241,0x5349,0x4d4f,0x4a49,    -1,    -1,    -1,    -1,
@@ -291,7 +287,7 @@ static const int jumppoints_other[0x100] =
 		-1,    -1,    -1,    -1,    -1,    -1,    -1,    -1
 };
 
-MACHINE_RESET_MEMBER(gaiden_state,raiga)
+void gaiden_state::machine_reset()
 {
 	m_prot = 0;
 	m_jumpcode = 0;
@@ -309,7 +305,13 @@ MACHINE_RESET_MEMBER(gaiden_state,raiga)
 	m_spr_offset_y = 0;
 }
 
-MACHINE_START_MEMBER(gaiden_state,raiga)
+MACHINE_RESET_MEMBER(gaiden_state,raiga)
+{
+	gaiden_state::machine_reset();
+	m_jumppoints = raiga_jumppoints_00;
+}
+
+void gaiden_state::machine_start()
 {
 	save_item(NAME(m_prot));
 	save_item(NAME(m_jumpcode));
@@ -333,7 +335,7 @@ WRITE16_MEMBER(gaiden_state::raiga_protection_w)
 	{
 		data >>= 8;
 
-//      logerror("PC %06x: prot = %02x\n", space.device().safe_pc(), data);
+//      logerror("PC %06x: prot = %02x\n", m_maincpu->pc(), data);
 
 		switch (data & 0xf0)
 		{
@@ -348,12 +350,12 @@ WRITE16_MEMBER(gaiden_state::raiga_protection_w)
 				m_jumpcode |= data & 0x0f;
 				logerror("requested protection jumpcode %02x\n", m_jumpcode);
 //              m_jumpcode = 0;
-				if (m_raiga_jumppoints[m_jumpcode] == -2)
+				if (m_jumppoints[m_jumpcode] == -2)
 				{
-					m_raiga_jumppoints = jumppoints_other;
+					m_jumppoints = raiga_jumppoints_other;
 				}
 
-				if (m_raiga_jumppoints[m_jumpcode] == -1)
+				if (m_jumppoints[m_jumpcode] == -1)
 				{
 					logerror("unknown jumpcode %02x\n", m_jumpcode);
 					popmessage("unknown jumpcode %02x", m_jumpcode);
@@ -362,16 +364,16 @@ WRITE16_MEMBER(gaiden_state::raiga_protection_w)
 				m_prot = 0x20;
 				break;
 			case 0x30:  /* ask for bits 12-15 of function address */
-				m_prot = 0x40 | ((m_raiga_jumppoints[m_jumpcode] >> 12) & 0x0f);
+				m_prot = 0x40 | ((m_jumppoints[m_jumpcode] >> 12) & 0x0f);
 				break;
 			case 0x40:  /* ask for bits 8-11 of function address */
-				m_prot = 0x50 | ((m_raiga_jumppoints[m_jumpcode] >> 8) & 0x0f);
+				m_prot = 0x50 | ((m_jumppoints[m_jumpcode] >> 8) & 0x0f);
 				break;
 			case 0x50:  /* ask for bits 4-7 of function address */
-				m_prot = 0x60 | ((m_raiga_jumppoints[m_jumpcode] >> 4) & 0x0f);
+				m_prot = 0x60 | ((m_jumppoints[m_jumpcode] >> 4) & 0x0f);
 				break;
 			case 0x60:  /* ask for bits 0-3 of function address */
-				m_prot = 0x70 | ((m_raiga_jumppoints[m_jumpcode] >> 0) & 0x0f);
+				m_prot = 0x70 | ((m_jumppoints[m_jumpcode] >> 0) & 0x0f);
 				break;
 		}
 	}
@@ -379,18 +381,18 @@ WRITE16_MEMBER(gaiden_state::raiga_protection_w)
 
 READ16_MEMBER(gaiden_state::raiga_protection_r)
 {
-//  logerror("PC %06x: read prot %02x\n", space.device().safe_pc(), m_prot);
+//  logerror("PC %06x: read prot %02x\n", m_maincpu->pc(), m_prot);
 	return m_prot;
 }
 
-static ADDRESS_MAP_START( gaiden_map, AS_PROGRAM, 16, gaiden_state )
+ADDRESS_MAP_START(gaiden_state::gaiden_map)
 	AM_RANGE(0x000000, 0x03ffff) AM_ROM
 	AM_RANGE(0x060000, 0x063fff) AM_RAM
-	AM_RANGE(0x070000, 0x070fff) AM_RAM_WRITE(gaiden_videoram_w) AM_SHARE("videoram")
-	AM_RANGE(0x072000, 0x073fff) AM_RAM_WRITE(gaiden_videoram2_w) AM_SHARE("videoram2")
-	AM_RANGE(0x074000, 0x075fff) AM_RAM_WRITE(gaiden_videoram3_w) AM_SHARE("videoram3")
+	AM_RANGE(0x070000, 0x070fff) AM_RAM_WRITE(tx_videoram_w) AM_SHARE("videoram1")
+	AM_RANGE(0x072000, 0x073fff) AM_RAM_WRITE(fg_videoram_w) AM_SHARE("videoram2")
+	AM_RANGE(0x074000, 0x075fff) AM_RAM_WRITE(bg_videoram_w) AM_SHARE("videoram3")
 	AM_RANGE(0x076000, 0x077fff) AM_RAM AM_SHARE("spriteram")
-	AM_RANGE(0x078000, 0x079fff) AM_RAM_DEVWRITE("palette", palette_device, write) AM_SHARE("palette")
+	AM_RANGE(0x078000, 0x079fff) AM_RAM_DEVWRITE("palette", palette_device, write16) AM_SHARE("palette")
 	AM_RANGE(0x07a000, 0x07a001) AM_READ_PORT("SYSTEM")
 	AM_RANGE(0x07a002, 0x07a003) AM_READ_PORT("P1_P2") AM_WRITE(gaiden_sproffsety_w)
 	AM_RANGE(0x07a004, 0x07a005) AM_READ_PORT("DSW")
@@ -404,19 +406,33 @@ static ADDRESS_MAP_START( gaiden_map, AS_PROGRAM, 16, gaiden_state )
 	AM_RANGE(0x07a308, 0x07a309) AM_WRITE(gaiden_bgoffsety_w)
 	AM_RANGE(0x07a30c, 0x07a30d) AM_WRITE(gaiden_bgscrollx_w)
 	AM_RANGE(0x07a800, 0x07a801) AM_DEVWRITE("watchdog", watchdog_timer_device, reset16_w)
-	AM_RANGE(0x07a802, 0x07a803) AM_WRITE(gaiden_sound_command_w)
+	// Ninja Gaiden writes only to the lower byte; Tecmo Knight and Strato Fighter write to the upper byte instead.
+	// It's not clear which 8 data lines are actually connected, but byte smearing is almost certainly involved.
+	AM_RANGE(0x07a802, 0x07a803) AM_DEVWRITE8("soundlatch", generic_latch_8_device, write, 0x00ff).cswidth(16)
 	AM_RANGE(0x07a806, 0x07a807) AM_WRITE(irq_ack_w)
 	AM_RANGE(0x07a808, 0x07a809) AM_WRITE(gaiden_flip_w)
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( drgnbowl_map, AS_PROGRAM, 16, gaiden_state )
+ADDRESS_MAP_START(gaiden_state::wildfang_map)
+	AM_IMPORT_FROM(gaiden_map)
+	AM_RANGE(0x07a006, 0x07a007) AM_READ(wildfang_protection_r)
+	AM_RANGE(0x07a804, 0x07a805) AM_WRITE(wildfang_protection_w)
+ADDRESS_MAP_END
+
+ADDRESS_MAP_START(gaiden_state::raiga_map)
+	AM_IMPORT_FROM(gaiden_map)
+	AM_RANGE(0x07a006, 0x07a007) AM_READ(raiga_protection_r)
+	AM_RANGE(0x07a804, 0x07a805) AM_WRITE(raiga_protection_w)
+ADDRESS_MAP_END
+
+ADDRESS_MAP_START(gaiden_state::drgnbowl_map)
 	AM_RANGE(0x000000, 0x03ffff) AM_ROM
 	AM_RANGE(0x060000, 0x063fff) AM_RAM
-	AM_RANGE(0x070000, 0x070fff) AM_RAM_WRITE(gaiden_videoram_w) AM_SHARE("videoram")
-	AM_RANGE(0x072000, 0x073fff) AM_RAM_WRITE(gaiden_videoram2_w) AM_SHARE("videoram2")
-	AM_RANGE(0x074000, 0x075fff) AM_RAM_WRITE(gaiden_videoram3_w) AM_SHARE("videoram3")
+	AM_RANGE(0x070000, 0x070fff) AM_RAM_WRITE(tx_videoram_w) AM_SHARE("videoram1")
+	AM_RANGE(0x072000, 0x073fff) AM_RAM_WRITE(fg_videoram_w) AM_SHARE("videoram2")
+	AM_RANGE(0x074000, 0x075fff) AM_RAM_WRITE(bg_videoram_w) AM_SHARE("videoram3")
 	AM_RANGE(0x076000, 0x077fff) AM_RAM AM_SHARE("spriteram")
-	AM_RANGE(0x078000, 0x079fff) AM_RAM_DEVWRITE("palette", palette_device, write) AM_SHARE("palette")
+	AM_RANGE(0x078000, 0x079fff) AM_RAM_DEVWRITE("palette", palette_device, write16) AM_SHARE("palette")
 	AM_RANGE(0x07a000, 0x07a001) AM_READ_PORT("SYSTEM")
 	AM_RANGE(0x07a002, 0x07a003) AM_READ_PORT("P1_P2")
 	AM_RANGE(0x07a004, 0x07a005) AM_READ_PORT("DSW")
@@ -428,7 +444,7 @@ static ADDRESS_MAP_START( drgnbowl_map, AS_PROGRAM, 16, gaiden_state )
 	AM_RANGE(0x07f006, 0x07f007) AM_WRITE(gaiden_fgscrollx_w)
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( sound_map, AS_PROGRAM, 8, gaiden_state )
+ADDRESS_MAP_START(gaiden_state::sound_map)
 	AM_RANGE(0x0000, 0xdfff) AM_ROM
 	AM_RANGE(0xe000, 0xefff) AM_ROM /* raiga only */
 	AM_RANGE(0xf000, 0xf7ff) AM_RAM
@@ -439,12 +455,12 @@ static ADDRESS_MAP_START( sound_map, AS_PROGRAM, 8, gaiden_state )
 	AM_RANGE(0xfc20, 0xfc20) AM_DEVREAD("soundlatch", generic_latch_8_device, read)
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( drgnbowl_sound_map, AS_PROGRAM, 8, gaiden_state )
+ADDRESS_MAP_START(gaiden_state::drgnbowl_sound_map)
 	AM_RANGE(0x0000, 0xf7ff) AM_ROM
 	AM_RANGE(0xf800, 0xffff) AM_RAM
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( drgnbowl_sound_port_map, AS_IO, 8, gaiden_state )
+ADDRESS_MAP_START(gaiden_state::drgnbowl_sound_port_map)
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	AM_RANGE(0x00, 0x01) AM_DEVREADWRITE("ymsnd", ym2151_device, read, write)
 	AM_RANGE(0x80, 0x80) AM_DEVREADWRITE("oki", okim6295_device, read, write)
@@ -671,15 +687,8 @@ static const gfx_layout spritelayout =
 static GFXDECODE_START( gaiden )
 	GFXDECODE_ENTRY( "gfx1", 0, tilelayout,        0x100, 16 )  /* tiles 8x8  */
 	GFXDECODE_ENTRY( "gfx2", 0, tile2layout,       0x000, 0x1000 )  /* tiles 16x16 */
-	GFXDECODE_ENTRY( "gfx3", 0, tile2layout,       0x000, 0x1000 )  /* tiles 16x16 */
-	GFXDECODE_ENTRY( "gfx4", 0, spritelayout,      0x000, 0x1000 )  /* sprites 8x8 */
-GFXDECODE_END
-
-static GFXDECODE_START( raiga )
-	GFXDECODE_ENTRY( "gfx1", 0, tilelayout,        0x100, 16 )  /* tiles 8x8  */
-	GFXDECODE_ENTRY( "gfx2", 0, tile2layout,       0x000, 0x1000 )  /* tiles 16x16 */
-	GFXDECODE_ENTRY( "gfx3", 0, tile2layout,       0x000, 0x1000 ) /* tiles 16x16 (only colors 0x00-x0f and 0x80-0x8f are used) */
-	GFXDECODE_ENTRY( "gfx4", 0, spritelayout,      0x000, 0x1000 ) /* sprites 8x8 (only colors 0x00-x0f and 0x80-0x8f are used) */
+	GFXDECODE_ENTRY( "gfx3", 0, tile2layout,       0x000, 0x1000 ) /* tiles 16x16 (only colors 0x00-0x0f and 0x80-0x8f are used) */
+	GFXDECODE_ENTRY( "gfx4", 0, spritelayout,      0x000, 0x1000 ) /* sprites 8x8 (only colors 0x00-0x0f and 0x80-0x8f are used) */
 GFXDECODE_END
 
 static const gfx_layout mastninj_tile2layout =
@@ -741,7 +750,7 @@ static GFXDECODE_START( drgnbowl )
 GFXDECODE_END
 
 
-static MACHINE_CONFIG_START( shadoww )
+MACHINE_CONFIG_START(gaiden_state::shadoww)
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", M68000, 18432000/2) /* 9.216 MHz */
@@ -751,9 +760,6 @@ static MACHINE_CONFIG_START( shadoww )
 	MCFG_CPU_ADD("audiocpu", Z80, 4000000)  /* 4 MHz */
 	MCFG_CPU_PROGRAM_MAP(sound_map)
 								/* IRQs are triggered by the YM2203 */
-
-	MCFG_MACHINE_START_OVERRIDE(gaiden_state,raiga)
-	MCFG_MACHINE_RESET_OVERRIDE(gaiden_state,raiga)
 
 	MCFG_WATCHDOG_ADD("watchdog")
 
@@ -805,16 +811,23 @@ static MACHINE_CONFIG_START( shadoww )
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.20)
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_DERIVED( raiga, shadoww )
-
-	MCFG_SCREEN_MODIFY("screen")
-	MCFG_SCREEN_UPDATE_DRIVER(gaiden_state, screen_update_raiga)
-
-	MCFG_VIDEO_START_OVERRIDE(gaiden_state,raiga)
-	MCFG_GFXDECODE_MODIFY("gfxdecode", raiga)
+MACHINE_CONFIG_START(gaiden_state::wildfang)
+	shadoww(config);
+	MCFG_CPU_MODIFY("maincpu")
+	MCFG_CPU_PROGRAM_MAP(wildfang_map)
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_START( drgnbowl )
+MACHINE_CONFIG_START(gaiden_state::raiga)
+	shadoww(config);
+	MCFG_CPU_MODIFY("maincpu")
+	MCFG_CPU_PROGRAM_MAP(raiga_map)
+
+	MCFG_MACHINE_RESET_OVERRIDE(gaiden_state,raiga)
+
+	MCFG_VIDEO_START_OVERRIDE(gaiden_state,raiga)
+MACHINE_CONFIG_END
+
+MACHINE_CONFIG_START(gaiden_state::drgnbowl)
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", M68000, 20000000/2) /* 10 MHz */
@@ -824,9 +837,6 @@ static MACHINE_CONFIG_START( drgnbowl )
 	MCFG_CPU_ADD("audiocpu", Z80, 12000000/2)   /* 6 MHz */
 	MCFG_CPU_PROGRAM_MAP(drgnbowl_sound_map)
 	MCFG_CPU_IO_MAP(drgnbowl_sound_port_map)
-
-	MCFG_MACHINE_START_OVERRIDE(gaiden_state,raiga)
-	MCFG_MACHINE_RESET_OVERRIDE(gaiden_state,raiga)
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
@@ -904,7 +914,7 @@ Others
 2x      8x2 switches DIP
 */
 
-static ADDRESS_MAP_START( mastninj_sound_map, AS_PROGRAM, 8, gaiden_state )
+ADDRESS_MAP_START(gaiden_state::mastninj_sound_map)
 	AM_RANGE(0x0000, 0x7fff) AM_ROM
 	AM_RANGE(0x8000, 0xbfff) AM_ROMBANK("adpcm_bank")
 	AM_RANGE(0xc400, 0xc401) AM_DEVREADWRITE("ym1", ym2203_device, read, write)
@@ -936,7 +946,7 @@ WRITE8_MEMBER(gaiden_state::adpcm_bankswitch_w)
 
 MACHINE_START_MEMBER(gaiden_state,mastninj)
 {
-	MACHINE_START_CALL_MEMBER(raiga);
+	gaiden_state::machine_start();
 
 	m_adpcm_bank->configure_entries(0, 8, memregion("audiocpu")->base(), 0x4000);
 	m_adpcm_bank->set_entry(0);
@@ -945,14 +955,14 @@ MACHINE_START_MEMBER(gaiden_state,mastninj)
 	save_item(NAME(m_adpcm_toggle));
 }
 
-static ADDRESS_MAP_START( mastninj_map, AS_PROGRAM, 16, gaiden_state )
+ADDRESS_MAP_START(gaiden_state::mastninj_map)
 	AM_RANGE(0x000000, 0x03ffff) AM_ROM
 	AM_RANGE(0x060000, 0x063fff) AM_RAM
-	AM_RANGE(0x070000, 0x070fff) AM_RAM_WRITE(gaiden_videoram_w) AM_SHARE("videoram")
-	AM_RANGE(0x072000, 0x073fff) AM_RAM_WRITE(gaiden_videoram2_w) AM_SHARE("videoram2")
-	AM_RANGE(0x074000, 0x075fff) AM_RAM_WRITE(gaiden_videoram3_w) AM_SHARE("videoram3")
+	AM_RANGE(0x070000, 0x070fff) AM_RAM_WRITE(tx_videoram_w) AM_SHARE("videoram1")
+	AM_RANGE(0x072000, 0x073fff) AM_RAM_WRITE(fg_videoram_w) AM_SHARE("videoram2")
+	AM_RANGE(0x074000, 0x075fff) AM_RAM_WRITE(bg_videoram_w) AM_SHARE("videoram3")
 	AM_RANGE(0x076000, 0x077fff) AM_RAM AM_SHARE("spriteram")
-	AM_RANGE(0x078000, 0x079fff) AM_RAM_DEVWRITE("palette", palette_device, write) AM_SHARE("palette")
+	AM_RANGE(0x078000, 0x079fff) AM_RAM_DEVWRITE("palette", palette_device, write16) AM_SHARE("palette")
 //  AM_RANGE(0x078800, 0x079fff) AM_RAM
 	AM_RANGE(0x07a000, 0x07a001) AM_READ_PORT("SYSTEM")
 	AM_RANGE(0x07a002, 0x07a003) AM_READ_PORT("P1_P2")
@@ -970,7 +980,7 @@ static ADDRESS_MAP_START( mastninj_map, AS_PROGRAM, 16, gaiden_state )
 	AM_RANGE(0x07e000, 0x07e001) AM_WRITE8(drgnbowl_irq_ack_w, 0xff00)
 ADDRESS_MAP_END
 
-static MACHINE_CONFIG_START( mastninj )
+MACHINE_CONFIG_START(gaiden_state::mastninj)
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", M68000, 10000000)   /* 10 MHz? */
@@ -981,7 +991,6 @@ static MACHINE_CONFIG_START( mastninj )
 	MCFG_CPU_PROGRAM_MAP(mastninj_sound_map)
 
 	MCFG_MACHINE_START_OVERRIDE(gaiden_state,mastninj)
-	MCFG_MACHINE_RESET_OVERRIDE(gaiden_state,raiga)
 
 	MCFG_WATCHDOG_ADD("watchdog")
 
@@ -1579,33 +1588,23 @@ ROM_END
 
 DRIVER_INIT_MEMBER(gaiden_state,shadoww)
 {
+	m_jumppoints = wildfang_jumppoints;
 	/* sprite size Y = sprite size X */
 	m_sprite_sizey = 0;
-	m_raiga_jumppoints = jumppoints_00;
 }
 
 DRIVER_INIT_MEMBER(gaiden_state,wildfang)
 {
+	m_jumppoints = wildfang_jumppoints;
 	/* sprite size Y = sprite size X */
 	m_sprite_sizey = 0;
-	m_raiga_jumppoints = jumppoints_00;
-
-	m_prot = 0;
-	m_jumpcode = 0;
-	m_maincpu->space(AS_PROGRAM).install_read_handler(0x07a006, 0x07a007, read16_delegate(FUNC(gaiden_state::wildfang_protection_r),this));
-	m_maincpu->space(AS_PROGRAM).install_write_handler(0x07a804, 0x07a805, write16_delegate(FUNC(gaiden_state::wildfang_protection_w),this));
 }
 
 DRIVER_INIT_MEMBER(gaiden_state,raiga)
 {
+	m_jumppoints = raiga_jumppoints_00;
 	/* sprite size Y independent from sprite size X */
 	m_sprite_sizey = 2;
-	m_raiga_jumppoints = jumppoints_00;
-
-	m_prot = 0;
-	m_jumpcode = 0;
-	m_maincpu->space(AS_PROGRAM).install_read_handler(0x07a006, 0x07a007, read16_delegate(FUNC(gaiden_state::raiga_protection_r),this));
-	m_maincpu->space(AS_PROGRAM).install_write_handler(0x07a804, 0x07a805, write16_delegate(FUNC(gaiden_state::raiga_protection_w),this));
 }
 
 void gaiden_state::descramble_drgnbowl(int descramble_cpu)
@@ -1618,10 +1617,10 @@ void gaiden_state::descramble_drgnbowl(int descramble_cpu)
 	{
 		std::vector<uint8_t> buffer(size);
 
-		memcpy(&buffer[0], ROM, size);
+		std::copy(&ROM[0], &ROM[size], buffer.begin());
 		for( i = 0; i < size; i++ )
 		{
-			ROM[i] = buffer[BITSWAP24(i,23,22,21,20,
+			ROM[i] = buffer[bitswap<24>(i,23,22,21,20,
 										19,18,17,15,
 								16,14,13,12,
 								11,10, 9, 8,
@@ -1635,10 +1634,10 @@ void gaiden_state::descramble_drgnbowl(int descramble_cpu)
 	{
 		std::vector<uint8_t> buffer(size);
 
-		memcpy(&buffer[0],ROM,size);
+		std::copy(&ROM[0], &ROM[size], buffer.begin());
 		for( i = 0; i < size; i++ )
 		{
-			ROM[i] = buffer[BITSWAP24(i,23,22,21,20,
+			ROM[i] = buffer[bitswap<24>(i,23,22,21,20,
 										19,18,16,17,
 										15,14,13, 4,
 											3,12,11,10,
@@ -1650,15 +1649,13 @@ void gaiden_state::descramble_drgnbowl(int descramble_cpu)
 
 DRIVER_INIT_MEMBER(gaiden_state,drgnbowl)
 {
-	m_raiga_jumppoints = jumppoints_00;
-
+	m_jumppoints = wildfang_jumppoints;
 	descramble_drgnbowl(1);
 }
 
 DRIVER_INIT_MEMBER(gaiden_state,drgnbowla)
 {
-	m_raiga_jumppoints = jumppoints_00;
-
+	m_jumppoints = wildfang_jumppoints;
 	descramble_drgnbowl(0);
 }
 
@@ -1672,7 +1669,7 @@ void gaiden_state::descramble_mastninj_gfx(uint8_t* src)
 		int i;
 		for (i = 0;i < len; i++)
 		{
-			buffer[i] = src[BITSWAP24(i,
+			buffer[i] = src[bitswap<24>(i,
 			23,22,21,20,
 			19,18,17,16,
 			15,5,14,13,12,
@@ -1680,7 +1677,7 @@ void gaiden_state::descramble_mastninj_gfx(uint8_t* src)
 			7,6,4,
 			3,2,1,0)];
 		}
-		memcpy(src, &buffer[0], len);
+		std::copy(buffer.begin(), buffer.end(), &src[0]);
 	}
 
 	{
@@ -1688,7 +1685,7 @@ void gaiden_state::descramble_mastninj_gfx(uint8_t* src)
 		int i;
 		for (i = 0; i < len; i++)
 		{
-			buffer[i] = src[BITSWAP24(i,
+			buffer[i] = src[bitswap<24>(i,
 			23,22,21,20,
 			19,18,17,16,
 			15,6,14,13,12,
@@ -1696,7 +1693,7 @@ void gaiden_state::descramble_mastninj_gfx(uint8_t* src)
 			7,5,4,
 			3,2,1,0)];
 		}
-		memcpy(src, &buffer[0], len);
+		std::copy(buffer.begin(), buffer.end(), &src[0]);
 	}
 }
 
@@ -1718,9 +1715,9 @@ GAME( 1989, mastninj,  shadoww,  mastninj, common,   gaiden_state, mastninj, ROT
 GAME( 1992, drgnbowl,  0,        drgnbowl, drgnbowl, gaiden_state, drgnbowl, ROT0,   "Nics",    "Dragon Bowl (set 1, encrypted program)",   MACHINE_SUPPORTS_SAVE ) // Dragon Bowl is based on Ninja Gaiden code
 GAME( 1992, drgnbowla, drgnbowl, drgnbowl, drgnbowl, gaiden_state, drgnbowla,ROT0,   "Nics",    "Dragon Bowl (set 2, unencrypted program)", MACHINE_SUPPORTS_SAVE )
 
-GAME( 1989, wildfang,  0,        shadoww,  wildfang, gaiden_state, wildfang, ROT0,   "Tecmo",   "Wild Fang / Tecmo Knight", MACHINE_SUPPORTS_SAVE )
-GAME( 1989, wildfangs, wildfang, shadoww,  tknight,  gaiden_state, wildfang, ROT0,   "Tecmo",   "Wild Fang",                MACHINE_SUPPORTS_SAVE )
-GAME( 1989, tknight,   wildfang, shadoww,  tknight,  gaiden_state, wildfang, ROT0,   "Tecmo",   "Tecmo Knight",             MACHINE_SUPPORTS_SAVE )
+GAME( 1989, wildfang,  0,        wildfang, wildfang, gaiden_state, wildfang, ROT0,   "Tecmo",   "Wild Fang / Tecmo Knight", MACHINE_SUPPORTS_SAVE )
+GAME( 1989, wildfangs, wildfang, wildfang, tknight,  gaiden_state, wildfang, ROT0,   "Tecmo",   "Wild Fang",                MACHINE_SUPPORTS_SAVE )
+GAME( 1989, tknight,   wildfang, wildfang, tknight,  gaiden_state, wildfang, ROT0,   "Tecmo",   "Tecmo Knight",             MACHINE_SUPPORTS_SAVE )
 
 GAME( 1991, stratof,   0,        raiga,    raiga,    gaiden_state, raiga,    ROT0,   "Tecmo",   "Raiga - Strato Fighter (US)",    MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE )
 GAME( 1991, raiga,     stratof,  raiga,    raiga,    gaiden_state, raiga,    ROT0,   "Tecmo",   "Raiga - Strato Fighter (Japan)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE )

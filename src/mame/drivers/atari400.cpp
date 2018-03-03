@@ -300,6 +300,26 @@ public:
 	TIMER_DEVICE_CALLBACK_MEMBER(a800xl_interrupt);
 	TIMER_DEVICE_CALLBACK_MEMBER(a5200_interrupt);
 
+	void atari_common_nodac(machine_config &config);
+	void atari_common(machine_config &config);
+	void a800pal(machine_config &config);
+	void a400pal(machine_config &config);
+	void a5200(machine_config &config);
+	void a800(machine_config &config);
+	void a1200xl(machine_config &config);
+	void a800xlpal(machine_config &config);
+	void a130xe(machine_config &config);
+	void a800xl(machine_config &config);
+	void a600xl(machine_config &config);
+	void xegs(machine_config &config);
+	void a400(machine_config &config);
+	void a1200xl_mem(address_map &map);
+	void a130xe_mem(address_map &map);
+	void a400_mem(address_map &map);
+	void a5200_mem(address_map &map);
+	void a600xl_mem(address_map &map);
+	void a800xl_mem(address_map &map);
+	void xegs_mem(address_map &map);
 protected:
 	//required_device<cpu_device> m_maincpu;    // maincpu is already contained in atari_common_state
 	required_device<ram_device> m_ram;
@@ -538,7 +558,7 @@ WRITE8_MEMBER(a400_state::xegs_low_w)
  **************************************************************/
 
 
-static ADDRESS_MAP_START(a400_mem, AS_PROGRAM, 8, a400_state)
+ADDRESS_MAP_START(a400_state::a400_mem)
 	AM_RANGE(0x0000, 0xbfff) AM_NOP // RAM installed at runtime
 	AM_RANGE(0xc000, 0xcfff) AM_ROM
 	AM_RANGE(0xd000, 0xd0ff) AM_DEVREADWRITE("gtia", gtia_device, read, write)
@@ -551,7 +571,7 @@ static ADDRESS_MAP_START(a400_mem, AS_PROGRAM, 8, a400_state)
 ADDRESS_MAP_END
 
 
-static ADDRESS_MAP_START(a600xl_mem, AS_PROGRAM, 8, a400_state)
+ADDRESS_MAP_START(a400_state::a600xl_mem)
 	AM_RANGE(0x0000, 0x3fff) AM_RAM
 	AM_RANGE(0x5000, 0x57ff) AM_READ(a600xl_low_r)    // self test or NOP
 	AM_RANGE(0xa000, 0xbfff) AM_ROM // BASIC
@@ -566,7 +586,7 @@ static ADDRESS_MAP_START(a600xl_mem, AS_PROGRAM, 8, a400_state)
 ADDRESS_MAP_END
 
 
-static ADDRESS_MAP_START(a1200xl_mem, AS_PROGRAM, 8, a400_state)
+ADDRESS_MAP_START(a400_state::a1200xl_mem)
 	AM_RANGE(0x0000, 0xcfff) AM_READWRITE(a1200xl_low_r, xegs_low_w)
 	AM_RANGE(0xd000, 0xd0ff) AM_DEVREADWRITE("gtia", gtia_device, read, write)
 	AM_RANGE(0xd100, 0xd1ff) AM_NOP
@@ -578,7 +598,7 @@ static ADDRESS_MAP_START(a1200xl_mem, AS_PROGRAM, 8, a400_state)
 ADDRESS_MAP_END
 
 
-static ADDRESS_MAP_START(a800xl_mem, AS_PROGRAM, 8, a400_state)
+ADDRESS_MAP_START(a400_state::a800xl_mem)
 	AM_RANGE(0x0000, 0xcfff) AM_READWRITE(a800xl_low_r, a800xl_low_w)
 	AM_RANGE(0xd000, 0xd0ff) AM_DEVREADWRITE("gtia", gtia_device, read, write)
 	AM_RANGE(0xd100, 0xd1ff) AM_NOP
@@ -590,7 +610,7 @@ static ADDRESS_MAP_START(a800xl_mem, AS_PROGRAM, 8, a400_state)
 ADDRESS_MAP_END
 
 
-static ADDRESS_MAP_START(a130xe_mem, AS_PROGRAM, 8, a400_state)
+ADDRESS_MAP_START(a400_state::a130xe_mem)
 	AM_RANGE(0x0000, 0xcfff) AM_READWRITE(a130xe_low_r, a800xl_low_w)
 	AM_RANGE(0xd000, 0xd0ff) AM_DEVREADWRITE("gtia", gtia_device, read, write)
 	AM_RANGE(0xd100, 0xd1ff) AM_NOP
@@ -602,7 +622,7 @@ static ADDRESS_MAP_START(a130xe_mem, AS_PROGRAM, 8, a400_state)
 ADDRESS_MAP_END
 
 
-static ADDRESS_MAP_START(xegs_mem, AS_PROGRAM, 8, a400_state)
+ADDRESS_MAP_START(a400_state::xegs_mem)
 	AM_RANGE(0x0000, 0xcfff) AM_READWRITE(xegs_low_r, xegs_low_w)
 	AM_RANGE(0xd000, 0xd0ff) AM_DEVREADWRITE("gtia", gtia_device, read, write)
 	AM_RANGE(0xd100, 0xd1ff) AM_NOP
@@ -614,7 +634,7 @@ static ADDRESS_MAP_START(xegs_mem, AS_PROGRAM, 8, a400_state)
 ADDRESS_MAP_END
 
 
-static ADDRESS_MAP_START(a5200_mem, AS_PROGRAM, 8, a400_state)
+ADDRESS_MAP_START(a400_state::a5200_mem)
 	AM_RANGE(0x0000, 0x3fff) AM_RAM
 	AM_RANGE(0x4000, 0xbfff) AM_NOP // ROM installed at machine start
 	AM_RANGE(0xc000, 0xcfff) AM_DEVREADWRITE("gtia", gtia_device, read, write)
@@ -2078,7 +2098,7 @@ WRITE8_MEMBER(a400_state::a800xl_pia_pb_w)
  **************************************************************/
 
 
-static MACHINE_CONFIG_START( atari_common_nodac )
+MACHINE_CONFIG_START(a400_state::atari_common_nodac)
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", M6502, pokey_device::FREQ_17_EXACT)
 
@@ -2117,13 +2137,14 @@ static MACHINE_CONFIG_START( atari_common_nodac )
 	MCFG_POKEY_POT7_R_CB(IOPORT("analog_7"))
 	MCFG_POKEY_SERIN_R_CB(DEVREAD8("fdc", atari_fdc_device, serin_r))
 	MCFG_POKEY_SEROUT_W_CB(DEVWRITE8("fdc", atari_fdc_device, serout_w))
-	MCFG_POKEY_KEYBOARD_CB(atari_common_state, a800_keyboard)
-	MCFG_POKEY_INTERRUPT_CB(atari_common_state, interrupt_cb)
+	MCFG_POKEY_KEYBOARD_CB(a400_state, a800_keyboard)
+	MCFG_POKEY_INTERRUPT_CB(a400_state, interrupt_cb)
 
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 1.0)
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_DERIVED( atari_common, atari_common_nodac )
+MACHINE_CONFIG_START(a400_state::atari_common)
+	atari_common_nodac(config);
 	MCFG_SOUND_ADD("dac", DAC_1BIT, 0) MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 0.03)
 	MCFG_DEVICE_ADD("vref", VOLTAGE_REGULATOR, 0) MCFG_VOLTAGE_REGULATOR_OUTPUT(5.0)
 	MCFG_SOUND_ROUTE_EX(0, "dac", 1.0, DAC_VREF_POS_INPUT)
@@ -2152,7 +2173,8 @@ MACHINE_CONFIG_END
 
 
 // memory map A400 + NTSC screen
-static MACHINE_CONFIG_DERIVED( a400, atari_common )
+MACHINE_CONFIG_START(a400_state::a400)
+	atari_common(config);
 
 	MCFG_CPU_MODIFY( "maincpu" )
 	MCFG_CPU_PROGRAM_MAP(a400_mem)
@@ -2167,7 +2189,8 @@ MACHINE_CONFIG_END
 
 
 // memory map A400 + PAL screen
-static MACHINE_CONFIG_DERIVED( a400pal, atari_common )
+MACHINE_CONFIG_START(a400_state::a400pal)
+	atari_common(config);
 
 	MCFG_CPU_MODIFY( "maincpu" )
 	MCFG_CPU_PROGRAM_MAP(a400_mem)
@@ -2182,7 +2205,8 @@ MACHINE_CONFIG_END
 
 
 // memory map A800 + NTSC screen + Right cartslot
-static MACHINE_CONFIG_DERIVED( a800, atari_common )
+MACHINE_CONFIG_START(a400_state::a800)
+	atari_common(config);
 
 	MCFG_CPU_MODIFY( "maincpu" )
 	MCFG_CPU_PROGRAM_MAP(a400_mem)
@@ -2199,7 +2223,8 @@ MACHINE_CONFIG_END
 
 
 // memory map A800 + PAL screen + Right cartslot
-static MACHINE_CONFIG_DERIVED( a800pal, atari_common )
+MACHINE_CONFIG_START(a400_state::a800pal)
+	atari_common(config);
 
 	MCFG_CPU_MODIFY( "maincpu" )
 	MCFG_CPU_PROGRAM_MAP(a400_mem)
@@ -2216,7 +2241,8 @@ MACHINE_CONFIG_END
 
 
 // memory map A600XL (same as 800XL but less RAM) + NTSC screen + MMU via PIA portB
-static MACHINE_CONFIG_DERIVED( a600xl, atari_common )
+MACHINE_CONFIG_START(a400_state::a600xl)
+	atari_common(config);
 
 	MCFG_CPU_MODIFY( "maincpu" )
 	MCFG_CPU_PROGRAM_MAP(a600xl_mem)
@@ -2237,7 +2263,8 @@ MACHINE_CONFIG_END
 
 
 // memory map A800XL + NTSC screen + MMU via PIA portB
-static MACHINE_CONFIG_DERIVED( a800xl, atari_common )
+MACHINE_CONFIG_START(a400_state::a800xl)
+	atari_common(config);
 
 	MCFG_CPU_MODIFY( "maincpu" )
 	MCFG_CPU_PROGRAM_MAP(a800xl_mem)
@@ -2258,7 +2285,8 @@ MACHINE_CONFIG_END
 
 
 // memory map A800XL + PAL screen + MMU via PIA portB
-static MACHINE_CONFIG_DERIVED( a800xlpal, a800xl )
+MACHINE_CONFIG_START(a400_state::a800xlpal)
+	a800xl(config);
 
 	MCFG_CPU_MODIFY( "maincpu" )
 	MCFG_CPU_CLOCK( 1773000 )
@@ -2273,7 +2301,8 @@ MACHINE_CONFIG_END
 
 
 // memory map A1200XL+ MMU via PIA portB
-static MACHINE_CONFIG_DERIVED( a1200xl, a800xl )
+MACHINE_CONFIG_START(a400_state::a1200xl)
+	a800xl(config);
 
 	MCFG_CPU_MODIFY( "maincpu" )
 	MCFG_CPU_PROGRAM_MAP(a1200xl_mem)
@@ -2284,7 +2313,8 @@ MACHINE_CONFIG_END
 
 
 // memory map A130XE (extra RAM only partially emulated)
-static MACHINE_CONFIG_DERIVED( a130xe, a800xl )
+MACHINE_CONFIG_START(a400_state::a130xe)
+	a800xl(config);
 
 	MCFG_CPU_MODIFY( "maincpu" )
 	MCFG_CPU_PROGRAM_MAP(a130xe_mem)
@@ -2295,7 +2325,8 @@ MACHINE_CONFIG_END
 
 
 // memory map XEGS, only XEGS bankswitch supported
-static MACHINE_CONFIG_DERIVED( xegs, a800xl )
+MACHINE_CONFIG_START(a400_state::xegs)
+	a800xl(config);
 
 	MCFG_CPU_MODIFY( "maincpu" )
 	MCFG_CPU_PROGRAM_MAP(xegs_mem)
@@ -2308,7 +2339,8 @@ MACHINE_CONFIG_END
 
 
 // memory map A5200, different ports, less RAM
-static MACHINE_CONFIG_DERIVED( a5200, atari_common_nodac )
+MACHINE_CONFIG_START(a400_state::a5200)
+	atari_common_nodac(config);
 
 	MCFG_CPU_MODIFY( "maincpu" )
 	MCFG_CPU_PROGRAM_MAP(a5200_mem)
@@ -2318,8 +2350,8 @@ static MACHINE_CONFIG_DERIVED( a5200, atari_common_nodac )
 	MCFG_SOUND_MODIFY("pokey")
 	MCFG_POKEY_SERIN_R_CB(NOOP)
 	MCFG_POKEY_SEROUT_W_CB(NOOP)
-	MCFG_POKEY_KEYBOARD_CB(atari_common_state, a5200_keypads)
-	MCFG_POKEY_INTERRUPT_CB(atari_common_state, interrupt_cb)
+	MCFG_POKEY_KEYBOARD_CB(a400_state, a5200_keypads)
+	MCFG_POKEY_INTERRUPT_CB(a400_state, interrupt_cb)
 
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 1.0)
 

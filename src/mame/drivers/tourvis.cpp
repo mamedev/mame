@@ -14,125 +14,7 @@
     By now, six known BIOS versions, U4-52 (dumped from a board with-subboard PCB),
     U4-55 (dumped from an integrated PCB) and U4-60 (dumped from a board with-subboard PCB).
 
-    Known games (followed by game ID, some are duplicate):
-
-    1943 Kai (65)
-    Adventure Island (64)
-    Aero Blaster (32)
-    After Burner II (46)
-    Alice in Wonderland (61)
-    Ankoku Densetsu (Legendary Axe II) (33)
-    Armed-F (?)
-    Ballistix (186)
-    Barunba (39)
-    Batman (30)
-    Be Ball (93)
-  * Blodia
-    Bomberman (71)
-    Bomberman 93 (204)
-    Bull Fight (185)
-    Burning Angels (49)
-    Cadash (203)
-    Chozetsurinjin Beraboh Man (Super Foolish Man) (27)
-    Chuka Taisen (37)
-    Columns (90)
-    Coryoon (43)
-  * Cross Wiber
-    Cyber Core (13)
-    Daisempuu (3)
-    Dead Moon (?)
-    Devil Crash (47)
-    Die Hard (73)
-    Dodge Ball (194)
-    Doraemon Meikyuu Daisakusen (20)
-    Doreamon - Nobita's Dorabian Night (Doraemon II, 43)
-    Down Load (43)
-    Dragon Egg! (98)
-    Dragon Saber (65)
-    Dragon Spirit (?)
-    Drop Rock Hora Hora (12)
-    Dungeon Explorer (209)
-  * F1 Triple Battle
-    Fighting Run (195)
-    Final Blaster (29)
-    Final Lap Twin (79)
-    Final Match Tennis (62)
-    Formation Soccer (1)
-    Gomola Speed (27)
-    Gradius (187)
-    Gunhed (148)
-    Hana Taka Daka (Super Long Nose Goblin) (6)
-  * Hatris
-    Hit The Ice (97)
-    Image Fight (99)
-    Jackie Chan (54)
-    Jinmu Densho (19)
-    Kato & Ken (42)
-    Kiki Kaikai (120)
-    Knight Rider Special (193)
-    Legend Of Hero Tomna (56)
-    Makyo Densetsu - The Legendary Axe (40)
-    Mashin Eiyuden Wataru (27)
-    Mesopotamia (197)
-    Mizubaku Daibouken Liquid Kids (10) (marketed as "Parasol Stars II")
-    Mr. Heli (23)
-    Ninja Ryukenden (10)
-    Operation Wolf (26)
-    Ordyne (94)
-    Out Run (38)
-    Override (53)
-    Pac-Land (16)
-  * Paranoia (18)
-  * PC Genjin
-    PC Genjin 2 (84)
-    PC Denjin Punkic Cyborg (201)
-    Power Drift (200)
-    Power Eleven (83)
-  * Power Golf
-    Power League IV (?)
-    Power Sports (199)
-    Power Tennis (183)
-    Pro Yakyuu World Stadium '91 (192)
-    Psycho Chaser (14)
-    Puzzle Boy (57)
-    Puzznic (69)
-    R-Type II (61)
-  * Rabio Lepus Special
-    Raiden (111)
-    Rastan Saga II (33, possibly incorrect riser)
-    Saigo no Nindou (44)
-    Salamander (184)
-    Shinobi (5)
-    Side Arms (2)
-    Skweek (89)
-    Sokoban World (66)
-    Soldier Blade (23)
-    Son Son II (80)
-    Special Criminal Investigation (58)
-    Spin Pair (50)
-    Super Star Soldier (42)
-    Super Volley ball (9)
-    Tatsujin (31)
-    Terra Cresta II (27)
-    The NewZealand Story (11)
-    Thunder Blade (34)
-  * Tiger Road
-  * Titan
-    Toilet Kids (196)
-    Toy Shop Boys (51)
-    Tricky (42)
-  * TV Sports
-    USA Pro Basketball (?)
-    Veigues (40)
-    Vigilante (8)
-    Volfied (68)
-    W-Ring (21)
-    Winning Shot (28)
-    World Jockey (202)
-    Xevious (?)
-
-    Rumored games:
-  * Parasol Stars - often been mentioned, but still not confirmed, for Tourvision. For now it's been added from its NEC PC-Engine dump, which it would be likely identical.
+    Known games list can be found in hash/pce_tourvision.xml.
 
 * Denotes Not Dumped
 
@@ -323,11 +205,17 @@ public:
 	DECLARE_WRITE8_MEMBER(tourvision_i8155_b_w);
 	DECLARE_WRITE8_MEMBER(tourvision_i8155_c_w);
 	DECLARE_WRITE_LINE_MEMBER(tourvision_timer_out);
+
+	DECLARE_DEVICE_IMAGE_LOAD_MEMBER(tourvision_cart);
+
+	void tourvision(machine_config &config);
+	void pce_io(address_map &map);
+	void pce_mem(address_map &map);
+	void tourvision_8085_map(address_map &map);
+private:
 	required_device<cpu_device> m_subcpu;
 	required_device<generic_slot_device> m_cart;
 	uint32_t  m_rom_size;
-
-	DECLARE_DEVICE_IMAGE_LOAD_MEMBER(tourvision_cart);
 };
 
 DEVICE_IMAGE_LOAD_MEMBER( tourvision_state, tourvision_cart )
@@ -445,7 +333,7 @@ static INPUT_PORTS_START( tourvision )
 	PORT_BIT( 0xf0, IP_ACTIVE_HIGH, IPT_SPECIAL ) // games slot status in bits 3 to 7
 INPUT_PORTS_END
 
-static ADDRESS_MAP_START( pce_mem , AS_PROGRAM, 8, tourvision_state )
+ADDRESS_MAP_START(tourvision_state::pce_mem)
 	AM_RANGE( 0x000000, 0x0FFFFF) AM_ROM
 	AM_RANGE( 0x1F0000, 0x1F1FFF) AM_RAM AM_MIRROR(0x6000)
 	AM_RANGE( 0x1FE000, 0x1FE3FF) AM_DEVREADWRITE( "huc6270", huc6270_device, read, write )
@@ -456,7 +344,7 @@ static ADDRESS_MAP_START( pce_mem , AS_PROGRAM, 8, tourvision_state )
 	AM_RANGE( 0x1FF400, 0x1FF7FF) AM_DEVREADWRITE("maincpu", h6280_device, irq_status_r, irq_status_w )
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( pce_io , AS_IO, 8, tourvision_state )
+ADDRESS_MAP_START(tourvision_state::pce_io)
 	AM_RANGE( 0x00, 0x03) AM_DEVREADWRITE( "huc6270", huc6270_device, read, write )
 ADDRESS_MAP_END
 
@@ -465,7 +353,7 @@ WRITE8_MEMBER(tourvision_state::tourvision_8085_d000_w)
 	//logerror( "D000 (8085) write %02x\n", data );
 }
 
-static ADDRESS_MAP_START(tourvision_8085_map, AS_PROGRAM, 8, tourvision_state )
+ADDRESS_MAP_START(tourvision_state::tourvision_8085_map)
 	AM_RANGE(0x0000, 0x7fff) AM_ROM
 	AM_RANGE(0x8000, 0x80ff) AM_DEVREADWRITE("i8155", i8155_device, memory_r, memory_w)
 	AM_RANGE(0x8100, 0x8107) AM_DEVREADWRITE("i8155", i8155_device, io_r, io_w)
@@ -501,7 +389,7 @@ WRITE_LINE_MEMBER(tourvision_state::tourvision_timer_out)
 }
 
 
-static MACHINE_CONFIG_START( tourvision )
+MACHINE_CONFIG_START(tourvision_state::tourvision)
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", H6280, PCE_MAIN_CLOCK/3)
 	MCFG_CPU_PROGRAM_MAP(pce_mem)
@@ -573,4 +461,4 @@ ROM_START(tourvis)
 ROM_END
 
 
-GAME( 19??, tourvis,  0,       tourvision, tourvision, tourvision_state, pce_common, ROT0, "bootleg (Tourvision)",                                      "Tourvision PCE bootleg", MACHINE_IS_BIOS_ROOT | MACHINE_NOT_WORKING )
+GAME( 19??, tourvis, 0, tourvision, tourvision, tourvision_state, pce_common, ROT0, "bootleg (Tourvision)", "Tourvision PCE bootleg", MACHINE_IS_BIOS_ROOT | MACHINE_NOT_WORKING )

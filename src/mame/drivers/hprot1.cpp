@@ -72,11 +72,16 @@ public:
 		, m_lcdc(*this, "hd44780")
 	{ }
 
-	//DECLARE_WRITE8_MEMBER(henry_io_w);
-	DECLARE_READ8_MEMBER(henry_io_r);
+	DECLARE_WRITE8_MEMBER(henry_p1_w);
+	DECLARE_WRITE8_MEMBER(henry_p3_w);
 	DECLARE_DRIVER_INIT(hprot1);
 	DECLARE_PALETTE_INIT(hprot1);
 	HD44780_PIXEL_UPDATE(hprot1_pixel_update);
+	void hprotr8a(machine_config &config);
+	void hprot2r6(machine_config &config);
+	void hprot1(machine_config &config);
+	void i80c31_io(address_map &map);
+	void i80c31_prg(address_map &map);
 private:
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
@@ -86,7 +91,7 @@ private:
 
 #define LOG_IO_PORTS 0
 
-static ADDRESS_MAP_START(i80c31_prg, AS_PROGRAM, 8, hprot1_state)
+ADDRESS_MAP_START(hprot1_state::i80c31_prg)
 	AM_RANGE(0x0000, 0xffff) AM_ROM
 ADDRESS_MAP_END
 
@@ -100,7 +105,7 @@ DRIVER_INIT_MEMBER( hprot1_state, hprot1 )
 		bitswapped_ROM[i] = ROM[i];
 
 	for(i=0x0000;i<0x10000;i++)
-		ROM[BITSWAP16(i, 15, 14, 13, 12, 11, 10, 9, 8, 3, 2, 1, 0, 4, 5, 6, 7)] = bitswapped_ROM[i];
+		ROM[bitswap<16>(i, 15, 14, 13, 12, 11, 10, 9, 8, 3, 2, 1, 0, 4, 5, 6, 7)] = bitswapped_ROM[i];
 }
 
 //A4 = display RS
@@ -121,7 +126,7 @@ DRIVER_INIT_MEMBER( hprot1_state, hprot1 )
 
 //P1.4 => WhatchDog Input (after timeout resets CPU)
 
-static ADDRESS_MAP_START(i80c31_io, AS_IO, 8, hprot1_state)
+ADDRESS_MAP_START(hprot1_state::i80c31_io)
 	AM_RANGE(0x0000,0x7fff) AM_RAM
 /*TODO: verify the mirror mask value for the HD44780 device */
 	AM_RANGE(0xc000,0xc000) AM_MIRROR(0x13cf) AM_DEVWRITE("hd44780", hd44780_device, control_write)
@@ -130,9 +135,6 @@ static ADDRESS_MAP_START(i80c31_io, AS_IO, 8, hprot1_state)
 	AM_RANGE(0xc030,0xc030) AM_MIRROR(0x13cf) AM_DEVREAD("hd44780", hd44780_device, data_read)
 /*TODO: attach the watchdog/brownout reset device:
     AM_RANGE(0xe000,0xe0??) AM_MIRROR(?) AM_DEVREAD("adm965an", adm965an_device, data_read) */
-
-	//AM_RANGE(MCS51_PORT_P0, MCS51_PORT_P3) AM_READWRITE(henry_io_r, henry_io_w)
-	AM_RANGE(MCS51_PORT_P0, MCS51_PORT_P3) AM_READ(henry_io_r)
 ADDRESS_MAP_END
 
 static INPUT_PORTS_START( hprot1 )
@@ -191,80 +193,17 @@ void hprot1_state::machine_reset()
 {
 }
 
-READ8_MEMBER(hprot1_state::henry_io_r)
+WRITE8_MEMBER(hprot1_state::henry_p1_w)
 {
-	switch (offset)
-	{
-		case 0x01:
-		{
-			uint8_t value = ioport("inputs")->read();
-#if LOG_IO_PORTS
-			printf("value:%02X\n", value);
-#endif
-			return value;
-		}
-		default:
-#if LOG_IO_PORTS
-			printf("Unhandled I/O Read at offset 0x%02X (return 0)\n", offset);
-#endif
-			return 0;
-	}
+	if (LOG_IO_PORTS && data != 0xFF && data != 0xEF)
+		logerror("Write to P1: %02X\n", data);
 }
 
-/*
-WRITE8_MEMBER(hprot1_state::henry_io_w)
+WRITE8_MEMBER(hprot1_state::henry_p3_w)
 {
-    static uint8_t p0=0, p1=0, p2=0, p3=0;
-    switch (offset)
-    {
-        case 0x00:
-        {
-            if (data != p0)
-            {
-                p0=data;
-#if LOG_IO_PORTS
-                printf("Write to P0: %02X\n", data);
-#endif
-            }
-            break;
-        }
-        case 0x01:
-        {
-            if (data != p1)
-            {
-                p1=data;
-                if (data != 0xFF && data != 0xEF)
-#if LOG_IO_PORTS
-                printf("Write to P1: %02X\n", data);
-#endif
-            }
-            break;
-        }
-        case 0x02:
-        {
-            if (data != p2)
-            {
-                p2=data;
-#if LOG_IO_PORTS
-                printf("Write to P2: %02X\n", data);
-#endif
-            }
-            break;
-        }
-        case 0x03:
-        {
-            if (data != p3)
-            {
-                p3=data;
-#if LOG_IO_PORTS
-                printf("Write to P3: %02X\n", data);
-#endif
-            }
-            break;
-        }
-    }
+	if (LOG_IO_PORTS)
+		logerror("Write to P3: %02X\n", data);
 }
-*/
 
 PALETTE_INIT_MEMBER(hprot1_state, hprot1)
 {
@@ -300,11 +239,14 @@ HD44780_PIXEL_UPDATE(hprot1_state::hprot1_pixel_update)
 	}
 }
 
-static MACHINE_CONFIG_START( hprot1 )
+MACHINE_CONFIG_START(hprot1_state::hprot1)
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", I80C31, XTAL_10MHz)
+	MCFG_CPU_ADD("maincpu", I80C31, XTAL(10'000'000))
 	MCFG_CPU_PROGRAM_MAP(i80c31_prg)
 	MCFG_CPU_IO_MAP(i80c31_io)
+	MCFG_MCS51_PORT_P1_IN_CB(IOPORT("inputs"))
+	MCFG_MCS51_PORT_P1_OUT_CB(WRITE8(hprot1_state, henry_p1_w))
+	MCFG_MCS51_PORT_P3_OUT_CB(WRITE8(hprot1_state, henry_p3_w))
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", LCD)
@@ -329,7 +271,8 @@ static MACHINE_CONFIG_START( hprot1 )
 	/* TODO: emulate the ADM695AN chip (watchdog/brownout reset)*/
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_DERIVED( hprotr8a, hprot1 )
+MACHINE_CONFIG_START(hprot1_state::hprotr8a)
+	hprot1(config);
 	MCFG_CPU_REPLACE("maincpu", I80C31, 11059200) // value of X1 cristal on the PCB
 	MCFG_CPU_PROGRAM_MAP(i80c31_prg)
 	MCFG_CPU_IO_MAP(i80c31_io)
@@ -345,7 +288,8 @@ static MACHINE_CONFIG_DERIVED( hprotr8a, hprot1 )
 	/* TODO: add an I2C interface (the board has GND/VCC/SDA/SCL pins available in a connector) */
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_DERIVED( hprot2r6, hprot1 )
+MACHINE_CONFIG_START(hprot1_state::hprot2r6)
+	hprot1(config);
 	MCFG_CPU_REPLACE("maincpu", I80C31, 11059200) // value of X1 cristal on the PCB
 	MCFG_CPU_PROGRAM_MAP(i80c31_prg)
 	MCFG_CPU_IO_MAP(i80c31_io)

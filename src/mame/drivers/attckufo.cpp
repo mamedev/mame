@@ -32,6 +32,10 @@ public:
 	DECLARE_READ8_MEMBER( vic_videoram_r );
 	DECLARE_READ8_MEMBER( vic_colorram_r );
 
+	void attckufo(machine_config &config);
+	void cpu_map(address_map &map);
+	void vic_colorram_map(address_map &map);
+	void vic_videoram_map(address_map &map);
 private:
 	required_device<cpu_device> m_maincpu;
 };
@@ -41,7 +45,7 @@ private:
 //  ADDRESS MAPS
 //**************************************************************************
 
-static ADDRESS_MAP_START( cpu_map, AS_PROGRAM, 8, attckufo_state )
+ADDRESS_MAP_START(attckufo_state::cpu_map)
 	ADDRESS_MAP_GLOBAL_MASK(0x3fff)
 	AM_RANGE(0x0000, 0x0fff) AM_RAM
 	AM_RANGE(0x1000, 0x100f) AM_DEVREADWRITE("mos6560", mos6560_device, read, write)
@@ -50,11 +54,11 @@ static ADDRESS_MAP_START( cpu_map, AS_PROGRAM, 8, attckufo_state )
 	AM_RANGE(0x2000, 0x3fff) AM_ROM AM_REGION("maincpu", 0)
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( vic_videoram_map, 0, 8, attckufo_state )
+ADDRESS_MAP_START(attckufo_state::vic_videoram_map)
 	AM_RANGE(0x0000, 0x3fff) AM_READ(vic_videoram_r)
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( vic_colorram_map, 1, 8, attckufo_state )
+ADDRESS_MAP_START(attckufo_state::vic_colorram_map)
 	AM_RANGE(0x000, 0x3ff) AM_READ(vic_colorram_r)
 ADDRESS_MAP_END
 
@@ -110,8 +114,8 @@ READ8_MEMBER(attckufo_state::vic_colorram_r)
 //  MACHINE DEFINTIONS
 //**************************************************************************
 
-static MACHINE_CONFIG_START( attckufo )
-	MCFG_CPU_ADD("maincpu", M6502, XTAL_14_31818MHz / 14)
+MACHINE_CONFIG_START(attckufo_state::attckufo)
+	MCFG_CPU_ADD("maincpu", M6502, XTAL(14'318'181) / 14)
 	MCFG_CPU_PROGRAM_MAP(cpu_map)
 
 	MCFG_DEVICE_ADD("pia", PIA6821, 0)
@@ -119,7 +123,7 @@ static MACHINE_CONFIG_START( attckufo )
 	MCFG_PIA_READPB_HANDLER(IOPORT("INPUT"))
 
 	MCFG_SPEAKER_STANDARD_MONO("mono")
-	MCFG_MOS656X_ATTACK_UFO_ADD("mos6560", "screen", XTAL_14_31818MHz / 14, vic_videoram_map, vic_colorram_map)
+	MCFG_MOS656X_ATTACK_UFO_ADD("mos6560", "screen", XTAL(14'318'181) / 14, vic_videoram_map, vic_colorram_map)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
 MACHINE_CONFIG_END
 

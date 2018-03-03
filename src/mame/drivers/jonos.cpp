@@ -37,6 +37,8 @@ public:
 	u32 screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	void kbd_put(u8 data);
 
+	void jonos(machine_config &config);
+	void jonos_mem(address_map &map);
 private:
 	u8 m_framecnt;
 	u8 m_term_data;
@@ -50,7 +52,7 @@ private:
 
 
 
-static ADDRESS_MAP_START(jonos_mem, AS_PROGRAM, 8, jonos_state)
+ADDRESS_MAP_START(jonos_state::jonos_mem)
 	ADDRESS_MAP_UNMAP_HIGH
 	AM_RANGE(0x0000, 0x0fff) AM_ROM AM_REGION("roms", 0)
 	AM_RANGE(0x1800, 0x27ff) AM_RAM AM_SHARE("videoram")
@@ -169,9 +171,9 @@ static GFXDECODE_START( jonos )
 GFXDECODE_END
 
 
-static MACHINE_CONFIG_START( jonos )
+MACHINE_CONFIG_START(jonos_state::jonos)
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", I8085A, XTAL_16MHz / 4)
+	MCFG_CPU_ADD("maincpu", I8085A, XTAL(16'000'000) / 4)
 	MCFG_CPU_PROGRAM_MAP(jonos_mem)
 
 	/* video hardware */

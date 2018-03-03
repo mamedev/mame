@@ -96,4 +96,12 @@ public:
 	void rallyx_draw_bullets( bitmap_ind16 &bitmap, const rectangle &cliprect, bool transpen );
 	void jungler_draw_bullets( bitmap_ind16 &bitmap, const rectangle &cliprect, bool transpen );
 	void locomotn_draw_bullets( bitmap_ind16 &bitmap, const rectangle &cliprect, bool transpen );
+	void commsega(machine_config &config);
+	void locomotn(machine_config &config);
+	void tactcian(machine_config &config);
+	void rallyx(machine_config &config);
+	void jungler(machine_config &config);
+	void io_map(address_map &map);
+	void jungler_map(address_map &map);
+	void rallyx_map(address_map &map);
 };

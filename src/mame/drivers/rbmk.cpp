@@ -1,7 +1,7 @@
 // license:BSD-3-Clause
 // copyright-holders:Tomasz Slanina, David Haywood
 /*
-Real Battle Mahjong King by 'Game Men System Co. Ltd.'
+实战麻将王 (Shízhàn Májiàng Wáng) by 'Game Men System Co. Ltd.'
 
 PCB Layout
 ----------
@@ -78,18 +78,8 @@ public:
 		m_gfxdecode(*this, "gfxdecode"),
 		m_palette(*this, "palette")  { }
 
-	DECLARE_READ16_MEMBER(unk_r);
-	DECLARE_READ16_MEMBER(dip_mux_r);
-	DECLARE_WRITE16_MEMBER(dip_mux_w);
-	DECLARE_WRITE16_MEMBER(unk_w);
-	DECLARE_WRITE16_MEMBER(tilebank_w);
-	DECLARE_READ8_MEMBER(mcu_io_r);
-	DECLARE_WRITE8_MEMBER(mcu_io_w);
-	DECLARE_WRITE8_MEMBER(mcu_io_mux_w);
-	DECLARE_WRITE16_MEMBER(eeprom_w);
-
-	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
-	INTERRUPT_GEN_MEMBER(mcu_irq);
+	void rbmk(machine_config &config);
+	void rbspm(machine_config &config);
 
 protected:
 	virtual void video_start() override;
@@ -107,6 +97,24 @@ private:
 	uint16_t m_tilebank;
 	uint8_t m_mux_data;
 	uint16_t m_dip_mux;
+
+	void mcu_io(address_map &map);
+	void mcu_mem(address_map &map);
+	void rbmk_mem(address_map &map);
+	void rbspm_mem(address_map &map);
+
+	DECLARE_READ16_MEMBER(unk_r);
+	DECLARE_READ16_MEMBER(dip_mux_r);
+	DECLARE_WRITE16_MEMBER(dip_mux_w);
+	DECLARE_WRITE16_MEMBER(unk_w);
+	DECLARE_WRITE16_MEMBER(tilebank_w);
+	DECLARE_READ8_MEMBER(mcu_io_r);
+	DECLARE_WRITE8_MEMBER(mcu_io_w);
+	DECLARE_WRITE8_MEMBER(mcu_io_mux_w);
+	DECLARE_WRITE16_MEMBER(eeprom_w);
+
+	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	INTERRUPT_GEN_MEMBER(mcu_irq);
 };
 
 
@@ -158,13 +166,13 @@ WRITE16_MEMBER(rbmk_state::eeprom_w)
 }
 
 
-static ADDRESS_MAP_START( rbmk_mem, AS_PROGRAM, 16, rbmk_state )
+ADDRESS_MAP_START(rbmk_state::rbmk_mem)
 	AM_RANGE(0x000000, 0x07ffff) AM_ROM AM_WRITENOP
 	AM_RANGE(0x100000, 0x10ffff) AM_RAM
 	AM_RANGE(0x500000, 0x50ffff) AM_RAM
 	AM_RANGE(0x940000, 0x940fff) AM_RAM AM_SHARE("vidram2")
 	AM_RANGE(0x980300, 0x983fff) AM_RAM // 0x2048  words ???, byte access
-	AM_RANGE(0x900000, 0x900fff) AM_RAM_DEVWRITE("palette", palette_device, write) AM_SHARE("palette")
+	AM_RANGE(0x900000, 0x900fff) AM_RAM_DEVWRITE("palette", palette_device, write16) AM_SHARE("palette")
 	AM_RANGE(0x9c0000, 0x9c0fff) AM_RAM AM_SHARE("vidram")
 	AM_RANGE(0xb00000, 0xb00001) AM_WRITE(eeprom_w)
 	AM_RANGE(0xc00000, 0xc00001) AM_READWRITE(dip_mux_r, dip_mux_w)
@@ -175,7 +183,7 @@ static ADDRESS_MAP_START( rbmk_mem, AS_PROGRAM, 16, rbmk_state )
 	AM_RANGE(0xc28000, 0xc28001) AM_WRITE(unk_w)
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( rbspm_mem, AS_PROGRAM, 16, rbmk_state )
+ADDRESS_MAP_START(rbmk_state::rbspm_mem)
 	AM_RANGE(0x000000, 0x07ffff) AM_ROM
 	AM_RANGE(0x200000, 0x200001) AM_WRITE(eeprom_w) // wrong
 	AM_RANGE(0x300000, 0x300001) AM_READWRITE(dip_mux_r, dip_mux_w)
@@ -185,13 +193,13 @@ static ADDRESS_MAP_START( rbspm_mem, AS_PROGRAM, 16, rbmk_state )
 	AM_RANGE(0x320000, 0x320001) AM_READ_PORT("IN3")
 	AM_RANGE(0x328000, 0x328001) AM_WRITE(unk_w)
 	AM_RANGE(0x500000, 0x50ffff) AM_RAM
-	AM_RANGE(0x900000, 0x900fff) AM_RAM_DEVWRITE("palette", palette_device, write) AM_SHARE("palette") // if removed fails gfx test?
+	AM_RANGE(0x900000, 0x900fff) AM_RAM_DEVWRITE("palette", palette_device, write16) AM_SHARE("palette") // if removed fails gfx test?
 	AM_RANGE(0x940000, 0x940fff) AM_RAM AM_SHARE("vidram2") // if removed fails palette test?
 	AM_RANGE(0x980300, 0x983fff) AM_RAM // 0x2048  words ???, byte access, u25 and u26 according to test mode
 	AM_RANGE(0x9c0000, 0x9c0fff) AM_RAM AM_SHARE("vidram")
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( mcu_mem, AS_PROGRAM, 8, rbmk_state )
+ADDRESS_MAP_START(rbmk_state::mcu_mem)
 //  AM_RANGE(0x0000, 0x0fff) AM_ROM
 ADDRESS_MAP_END
 
@@ -230,10 +238,8 @@ WRITE8_MEMBER(rbmk_state::mcu_io_mux_w)
 	m_mux_data = ~data;
 }
 
-static ADDRESS_MAP_START( mcu_io, AS_IO, 8, rbmk_state )
+ADDRESS_MAP_START(rbmk_state::mcu_io)
 	AM_RANGE(0x0ff00, 0x0ffff) AM_READWRITE(mcu_io_r, mcu_io_w )
-
-	AM_RANGE(MCS51_PORT_P3, MCS51_PORT_P3) AM_WRITE(mcu_io_mux_w )
 ADDRESS_MAP_END
 
 static INPUT_PORTS_START( rbmk )
@@ -556,7 +562,7 @@ INTERRUPT_GEN_MEMBER(rbmk_state::mcu_irq)
 	m_mcu->set_input_line(INPUT_LINE_NMI, PULSE_LINE);
 }
 
-static MACHINE_CONFIG_START( rbmk )
+MACHINE_CONFIG_START(rbmk_state::rbmk)
 	MCFG_CPU_ADD("maincpu", M68000, 22000000 /2)
 	MCFG_CPU_PROGRAM_MAP(rbmk_mem)
 	MCFG_CPU_VBLANK_INT_DRIVER("screen", rbmk_state,  irq1_line_hold)
@@ -564,6 +570,7 @@ static MACHINE_CONFIG_START( rbmk )
 	MCFG_CPU_ADD("mcu", AT89C4051, 22000000 / 4) // frequency isn't right
 	MCFG_CPU_PROGRAM_MAP(mcu_mem)
 	MCFG_CPU_IO_MAP(mcu_io)
+	MCFG_MCS51_PORT_P3_OUT_CB(WRITE8(rbmk_state, mcu_io_mux_w))
 	MCFG_CPU_VBLANK_INT_DRIVER("screen", rbmk_state,  mcu_irq)
 
 	MCFG_GFXDECODE_ADD("gfxdecode", "palette", rbmk)
@@ -593,16 +600,18 @@ static MACHINE_CONFIG_START( rbmk )
 	MCFG_SOUND_ROUTE(1, "rspeaker", 0.60)
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_DERIVED( rbspm, rbmk )
+MACHINE_CONFIG_START(rbmk_state::rbspm)
+	rbmk(config);
 	MCFG_CPU_MODIFY("maincpu")
 	MCFG_CPU_PROGRAM_MAP(rbspm_mem)
 
 	MCFG_CPU_MODIFY("mcu")
 	MCFG_DEVICE_DISABLE() // until decapped
 
-	// PIC16F84 if decapped
+	// PIC16F84 but no CPU core available
 MACHINE_CONFIG_END
 
+// 实战麻将王 (Shízhàn Májiàng Wáng)
 ROM_START( rbmk )
 	ROM_REGION( 0x80000, "maincpu", 0 ) /* 68000 Code */
 	ROM_LOAD( "p1.u64", 0x00000, 0x80000, CRC(83b3c505) SHA1(b943d7312dacdf46d4a55f9dc3cf92e291c40ce7) )
@@ -627,6 +636,7 @@ ROM_START( rbmk )
 ROM_END
 
 /*
+实战頂凰麻雀 (Shízhàn Dǐng Huáng Máquè)
 Gameplay videos:
 http://youtu.be/pPk-6N1wXoE
 http://youtu.be/VGbrR7GfDck
@@ -637,10 +647,11 @@ ROM_START( rbspm )
 	ROM_LOAD( "MJ-DFMJ-P1.bin", 0x00000, 0x80000, CRC(8f81f154) SHA1(50a9a373dec96b0265907f053d068d636bdabd61) )
 
 	ROM_REGION( 0x1000, "mcu", 0 ) /* protected MCU */
-	ROM_LOAD( "89c51.bin", 0x0, 0x1000, NO_DUMP ) // reads as all 0xff
+	ROM_LOAD( "89c51.bin", 0x0000, 0x1000, NO_DUMP ) // reads as all 0xff
 
-	ROM_REGION( 0x1000, "pic", 0 ) /* pic was populated on this board */
-	ROM_LOAD( "pic16f84.bin", 0x0, 0x1000, NO_DUMP )
+	ROM_REGION( 0x880, "pic", 0 ) /* pic was populated on this board */
+	ROM_LOAD( "c016_pic16f84_code.bin", 0x000, 0x800, CRC(1eb5cd2b) SHA1(9e747235e39eaea337f9325fa55fbfec1c03168d) )
+	ROM_LOAD( "c016_pic16f84_data.bin", 0x800, 0x080, CRC(ee882e11) SHA1(aa5852a95a89b17270bb6f315dfa036f9f8155cf) )
 
 	ROM_REGION( 0x20000, "user1", 0 ) /* ??? mcu data / code */
 	ROM_LOAD( "MJ-DFMJ-2.2-XX.bin", 0x00000, 0x20000,  CRC(58a9eea2) SHA1(1a251e9b049bc8dafbc0728b3d876fdd5a1c8dd9) )
@@ -658,5 +669,5 @@ ROM_START( rbspm )
 	ROM_LOAD16_WORD_SWAP( "93c46.u51", 0x00, 0x080, NO_DUMP )
 ROM_END
 
-GAME( 1998, rbmk, 0, rbmk, rbmk, rbmk_state, 0, ROT0,  "GMS", "Real Battle Mahjong King (Version 8.8)", MACHINE_NOT_WORKING )
-GAME( 1998, rbspm, 0, rbspm, rbspm, rbmk_state, 0, ROT0,  "GMS", "Real Battle Super Phoenix Mahjong (Version 4.1)", MACHINE_NOT_WORKING )
+GAME( 1998, rbmk,  0, rbmk,  rbmk,  rbmk_state, 0, ROT0,  "GMS", "Shizhan Majiang Wang (Version 8.8)", MACHINE_NOT_WORKING )
+GAME( 1998, rbspm, 0, rbspm, rbspm, rbmk_state, 0, ROT0,  "GMS", "Shizhan Ding Huang Maque (Version 4.1)", MACHINE_NOT_WORKING )

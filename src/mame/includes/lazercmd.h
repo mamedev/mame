@@ -77,4 +77,11 @@ public:
 	TIMER_DEVICE_CALLBACK_MEMBER(bbonk_timer);
 	int vert_scale(int data);
 	void plot_pattern( bitmap_ind16 &bitmap, int x, int y );
+	void bbonk(machine_config &config);
+	void medlanes(machine_config &config);
+	void lazercmd(machine_config &config);
+	void bbonk_map(address_map &map);
+	void lazercmd_map(address_map &map);
+	void lazercmd_portmap(address_map &map);
+	void medlanes_map(address_map &map);
 };

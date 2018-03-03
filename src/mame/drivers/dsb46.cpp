@@ -49,16 +49,19 @@ public:
 	DECLARE_DRIVER_INIT(dsb46);
 	DECLARE_MACHINE_RESET(dsb46);
 
+	void dsb46(machine_config &config);
+	void dsb46_io(address_map &map);
+	void dsb46_mem(address_map &map);
 private:
 	required_device<cpu_device> m_maincpu;
 };
 
-static ADDRESS_MAP_START( dsb46_mem, AS_PROGRAM, 8, dsb46_state )
+ADDRESS_MAP_START(dsb46_state::dsb46_mem)
 	AM_RANGE(0x0000, 0x07ff) AM_READ_BANK("read") AM_WRITE_BANK("write")
 	AM_RANGE(0x0800, 0xffff) AM_RAM
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( dsb46_io, AS_IO, 8, dsb46_state )
+ADDRESS_MAP_START(dsb46_state::dsb46_io)
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	ADDRESS_MAP_UNMAP_HIGH
 	AM_RANGE(0x00, 0x03) AM_DEVREADWRITE("sio", z80sio_device, ba_cd_r, ba_cd_w)
@@ -102,9 +105,9 @@ static const z80_daisy_config daisy_chain[] =
 };
 
 
-static MACHINE_CONFIG_START( dsb46 )
+MACHINE_CONFIG_START(dsb46_state::dsb46)
 	// basic machine hardware
-	MCFG_CPU_ADD("maincpu", Z80, XTAL_24MHz / 6)
+	MCFG_CPU_ADD("maincpu", Z80, XTAL(24'000'000) / 6)
 	MCFG_CPU_PROGRAM_MAP(dsb46_mem)
 	MCFG_CPU_IO_MAP(dsb46_io)
 	MCFG_Z80_DAISY_CHAIN(daisy_chain)
@@ -112,12 +115,12 @@ static MACHINE_CONFIG_START( dsb46 )
 	MCFG_MACHINE_RESET_OVERRIDE(dsb46_state, dsb46)
 
 	/* video hardware */
-	MCFG_DEVICE_ADD("ctc_clock", CLOCK, XTAL_1_8432MHz)
+	MCFG_DEVICE_ADD("ctc_clock", CLOCK, XTAL(1'843'200))
 	MCFG_CLOCK_SIGNAL_HANDLER(DEVWRITELINE("ctc1", z80ctc_device, trg0))
 	MCFG_DEVCB_CHAIN_OUTPUT(DEVWRITELINE("ctc1", z80ctc_device, trg2))
 
 	/* Devices */
-	MCFG_DEVICE_ADD("sio", Z80SIO, XTAL_24MHz / 6)
+	MCFG_DEVICE_ADD("sio", Z80SIO, XTAL(24'000'000) / 6)
 	MCFG_Z80SIO_OUT_INT_CB(INPUTLINE("maincpu", INPUT_LINE_IRQ0))
 	MCFG_Z80SIO_OUT_TXDA_CB(DEVWRITELINE("rs232", rs232_port_device, write_txd))
 	MCFG_Z80SIO_OUT_DTRA_CB(DEVWRITELINE("rs232", rs232_port_device, write_dtr))
@@ -127,7 +130,7 @@ static MACHINE_CONFIG_START( dsb46 )
 	MCFG_RS232_RXD_HANDLER(DEVWRITELINE("sio", z80sio_device, rxa_w))
 	MCFG_RS232_CTS_HANDLER(DEVWRITELINE("sio", z80sio_device, ctsa_w))
 
-	MCFG_DEVICE_ADD("ctc1", Z80CTC, XTAL_24MHz / 6)
+	MCFG_DEVICE_ADD("ctc1", Z80CTC, XTAL(24'000'000) / 6)
 	MCFG_Z80CTC_INTR_CB(INPUTLINE("maincpu", INPUT_LINE_IRQ0))
 	MCFG_Z80CTC_ZC0_CB(DEVWRITELINE("sio", z80sio_device, rxca_w))
 	MCFG_DEVCB_CHAIN_OUTPUT(DEVWRITELINE("sio", z80sio_device, txca_w))

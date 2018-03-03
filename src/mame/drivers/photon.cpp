@@ -48,6 +48,9 @@ public:
 	void set_bank(uint8_t data);
 
 	required_device<speaker_sound_device> m_speaker;
+	void photon(machine_config &config);
+	void pk8000_io(address_map &map);
+	void pk8000_mem(address_map &map);
 };
 
 
@@ -125,7 +128,7 @@ WRITE8_MEMBER(photon_state::_80_portc_w)
 	m_speaker->level_w(BIT(data,7));
 }
 
-static ADDRESS_MAP_START(pk8000_mem, AS_PROGRAM, 8, photon_state )
+ADDRESS_MAP_START(photon_state::pk8000_mem)
 	ADDRESS_MAP_UNMAP_HIGH
 	AM_RANGE( 0x0000, 0x3fff ) AM_READ_BANK("bank1") AM_WRITE_BANK("bank5")
 	AM_RANGE( 0x4000, 0x7fff ) AM_READ_BANK("bank2") AM_WRITE_BANK("bank6")
@@ -133,7 +136,7 @@ static ADDRESS_MAP_START(pk8000_mem, AS_PROGRAM, 8, photon_state )
 	AM_RANGE( 0xc000, 0xffff ) AM_READ_BANK("bank4") AM_WRITE_BANK("bank8")
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( pk8000_io , AS_IO, 8, photon_state )
+ADDRESS_MAP_START(photon_state::pk8000_io)
 	ADDRESS_MAP_UNMAP_HIGH
 	AM_RANGE(0x80, 0x83) AM_DEVREADWRITE("ppi8255_1", i8255_device, read, write)
 	AM_RANGE(0x84, 0x87) AM_DEVREADWRITE("ppi8255_2", i8255_device, read, write)
@@ -195,7 +198,7 @@ uint32_t photon_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap
 	return video_update(screen, bitmap, cliprect, memregion("maincpu")->base());
 }
 
-static MACHINE_CONFIG_START( photon )
+MACHINE_CONFIG_START(photon_state::photon)
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu",I8080, 1780000)

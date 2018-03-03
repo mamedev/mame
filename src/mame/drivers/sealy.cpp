@@ -52,6 +52,8 @@ public:
 	// screen updates
 	DECLARE_PALETTE_INIT(sealy);
 	uint32_t screen_update_sealy(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
+	void sealy(machine_config &config);
+	void sealy_map(address_map &map);
 };
 
 
@@ -68,7 +70,7 @@ uint32_t sealy_state::screen_update_sealy(screen_device &screen, bitmap_rgb32 &b
 }
 
 
-static ADDRESS_MAP_START( sealy_map, AS_PROGRAM, 16, sealy_state )
+ADDRESS_MAP_START(sealy_state::sealy_map)
 	AM_RANGE(0x00000, 0x3ffff) AM_ROM
 ADDRESS_MAP_END
 
@@ -95,7 +97,7 @@ static GFXDECODE_START( sealy )
 GFXDECODE_END
 
 
-static MACHINE_CONFIG_START( sealy )
+MACHINE_CONFIG_START(sealy_state::sealy)
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", H83044, MAIN_CLOCK) /* wrong CPU, but we have not a M16C core ATM */

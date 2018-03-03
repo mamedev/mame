@@ -92,6 +92,12 @@ public:
 
 	inline void generic_decode(const char *tag, int bit7, int bit6, int bit5, int bit4, int bit3, int bit2, int bit1, int bit0);
 
+	void arcadia(machine_config &config);
+	void argh(machine_config &config);
+	void a500_mem(address_map &map);
+	void arcadia_map(address_map &map);
+	void argh_map(address_map &map);
+	void overlay_512kb_map(address_map &map);
 protected:
 	virtual void machine_reset() override;
 
@@ -190,13 +196,13 @@ void arcadia_amiga_state::machine_reset()
  *
  *************************************/
 
-static ADDRESS_MAP_START( overlay_512kb_map, AS_PROGRAM, 16, arcadia_amiga_state )
+ADDRESS_MAP_START(arcadia_amiga_state::overlay_512kb_map)
 	ADDRESS_MAP_UNMAP_HIGH
 	AM_RANGE(0x000000, 0x07ffff) AM_MIRROR(0x180000) AM_RAM AM_SHARE("chip_ram")
 	AM_RANGE(0x200000, 0x27ffff) AM_ROM AM_REGION("kickstart", 0)
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( a500_mem, AS_PROGRAM, 16, arcadia_amiga_state )
+ADDRESS_MAP_START(arcadia_amiga_state::a500_mem)
 	ADDRESS_MAP_UNMAP_HIGH
 	AM_RANGE(0x000000, 0x1fffff) AM_DEVICE("overlay", address_map_bank_device, amap16)
 	AM_RANGE(0xa00000, 0xbfffff) AM_READWRITE(cia_r, cia_w)
@@ -209,7 +215,7 @@ static ADDRESS_MAP_START( a500_mem, AS_PROGRAM, 16, arcadia_amiga_state )
 	AM_RANGE(0xf80000, 0xffffff) AM_ROM AM_REGION("kickstart", 0)
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( arcadia_map, AS_PROGRAM, 16, arcadia_amiga_state )
+ADDRESS_MAP_START(arcadia_amiga_state::arcadia_map)
 	AM_IMPORT_FROM(a500_mem)
 	AM_RANGE(0x800000, 0x97ffff) AM_ROMBANK("bank2") AM_REGION("user3", 0)
 	AM_RANGE(0x980000, 0x9fbfff) AM_ROM AM_REGION("user2", 0)
@@ -218,7 +224,7 @@ static ADDRESS_MAP_START( arcadia_map, AS_PROGRAM, 16, arcadia_amiga_state )
 	AM_RANGE(0xf00000, 0xf7ffff) AM_ROM AM_REGION("user2", 0)
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( argh_map, AS_PROGRAM, 16, arcadia_amiga_state )
+ADDRESS_MAP_START(arcadia_amiga_state::argh_map)
 	AM_IMPORT_FROM(a500_mem)
 	AM_RANGE(0x800000, 0x97ffff) AM_ROMBANK("bank2") AM_REGION("user3", 0)
 //  AM_RANGE(0x980000, 0x9fefff) AM_ROM AM_REGION("user3", 0)
@@ -288,7 +294,7 @@ INPUT_PORTS_END
  *
  *************************************/
 
-static MACHINE_CONFIG_START( arcadia )
+MACHINE_CONFIG_START(arcadia_amiga_state::arcadia)
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", M68000, amiga_state::CLK_7M_NTSC)
@@ -304,7 +310,7 @@ static MACHINE_CONFIG_START( arcadia )
 	MCFG_NVRAM_ADD_0FILL("nvram")
 
 	/* video hardware */
-	MCFG_FRAGMENT_ADD(ntsc_video)
+	ntsc_video(config);
 
 	MCFG_PALETTE_ADD("palette", 4096)
 	MCFG_PALETTE_INIT_OWNER(arcadia_amiga_state,amiga)
@@ -335,9 +341,14 @@ static MACHINE_CONFIG_START( arcadia )
 	/* fdc */
 	MCFG_DEVICE_ADD("fdc", AMIGA_FDC, amiga_state::CLK_7M_NTSC)
 	MCFG_AMIGA_FDC_INDEX_CALLBACK(DEVWRITELINE("cia_1", mos8520_device, flag_w))
+	MCFG_AMIGA_FDC_READ_DMA_CALLBACK(READ16(amiga_state, chip_ram_r))
+	MCFG_AMIGA_FDC_WRITE_DMA_CALLBACK(WRITE16(amiga_state, chip_ram_w))
+	MCFG_AMIGA_FDC_DSKBLK_CALLBACK(WRITELINE(amiga_state, fdc_dskblk_w))
+	MCFG_AMIGA_FDC_DSKSYN_CALLBACK(WRITELINE(amiga_state, fdc_dsksyn_w))
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_DERIVED( argh, arcadia )
+MACHINE_CONFIG_START(arcadia_amiga_state::argh)
+	arcadia(config);
 
 	/* basic machine hardware */
 	MCFG_CPU_MODIFY("maincpu")
@@ -896,7 +907,7 @@ void arcadia_amiga_state::generic_decode(const char *tag, int bit7, int bit6, in
 
 	/* only the low byte of ROMs are encrypted in these games */
 	for (i = 0; i < 0x20000/2; i++)
-		rom[i] = BITSWAP16(rom[i], 15,14,13,12,11,10,9,8, bit7,bit6,bit5,bit4,bit3,bit2,bit1,bit0);
+		rom[i] = bitswap<16>(rom[i], 15,14,13,12,11,10,9,8, bit7,bit6,bit5,bit4,bit3,bit2,bit1,bit0);
 
 	#if 0
 	{

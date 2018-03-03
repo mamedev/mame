@@ -2,8 +2,8 @@
 // copyright-holders:Curt Coder
 #pragma once
 
-#ifndef __ABC800__
-#define __ABC800__
+#ifndef MAME_INCLUDES_ABC800_H
+#define MAME_INCLUDES_ABC800_H
 
 #include "bus/abcbus/abcbus.h"
 #include "bus/rs232/rs232.h"
@@ -25,8 +25,8 @@
 //  MACROS / CONSTANTS
 //**************************************************************************
 
-#define ABC800_X01  XTAL_12MHz
-#define ABC806_X02  XTAL_32_768kHz
+#define ABC800_X01  XTAL(12'000'000)
+#define ABC806_X02  XTAL(32'768)
 
 #define ABC802_AT0  0x01
 #define ABC802_AT1  0x02
@@ -150,6 +150,9 @@ public:
 	// timers
 	emu_timer *m_ctc_timer;
 	emu_timer *m_cassette_timer;
+	void abc800c_io(address_map &map);
+	void abc800m_io(address_map &map);
+	void abc800m_mem(address_map &map);
 };
 
 
@@ -176,6 +179,8 @@ public:
 	void hr_update(bitmap_rgb32 &bitmap, const rectangle &cliprect);
 
 	MC6845_UPDATE_ROW( abc800m_update_row );
+	void abc800m(machine_config &config);
+	void abc800m_video(machine_config &config);
 };
 
 
@@ -202,6 +207,9 @@ public:
 
 	DECLARE_READ8_MEMBER( char_ram_r );
 	DECLARE_PALETTE_INIT( abc800c );
+	void abc800c(machine_config &config);
+	void abc800c_video(machine_config &config);
+	void abc800c_mem(address_map &map);
 };
 
 
@@ -244,6 +252,11 @@ public:
 	int m_flshclk_ctr;          // flash clock counter
 	int m_flshclk;              // flash clock
 	int m_80_40_mux;            // 40/80 column mode
+
+	void abc802(machine_config &config);
+	void abc802_video(machine_config &config);
+	void abc802_io(address_map &map);
+	void abc802_mem(address_map &map);
 };
 
 
@@ -316,6 +329,11 @@ public:
 	uint32_t m_vsync_shift;       // vertical sync shift register
 	int m_vsync;                // vertical sync
 	int m_d_vsync;              // delayed vertical sync
+
+	void abc806(machine_config &config);
+	void abc806_video(machine_config &config);
+	void abc806_io(address_map &map);
+	void abc806_mem(address_map &map);
 };
 
 #endif

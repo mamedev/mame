@@ -98,7 +98,7 @@ Notes:
 #include "speaker.h"
 
 
-#define PIXEL_CLOCK         (XTAL_18_432MHz/3)
+#define PIXEL_CLOCK         (XTAL(18'432'000)/3)
 
 #define HTOTAL              (396)
 #define HBEND               (0)
@@ -147,7 +147,7 @@ WRITE8_MEMBER( zodiack_state::control_w )
 }
 
 
-static ADDRESS_MAP_START( main_map, AS_PROGRAM, 8, zodiack_state )
+ADDRESS_MAP_START(zodiack_state::main_map)
 	AM_RANGE(0x0000, 0x4fff) AM_ROM
 	AM_RANGE(0x5800, 0x5fff) AM_RAM
 	AM_RANGE(0x6081, 0x6081) AM_READ_PORT("DSW0") AM_WRITE(control_w)
@@ -167,14 +167,14 @@ static ADDRESS_MAP_START( main_map, AS_PROGRAM, 8, zodiack_state )
 	AM_RANGE(0xc000, 0xcfff) AM_ROM
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( sound_map, AS_PROGRAM, 8, zodiack_state )
+ADDRESS_MAP_START(zodiack_state::sound_map)
 	AM_RANGE(0x0000, 0x1fff) AM_ROM
 	AM_RANGE(0x2000, 0x23ff) AM_RAM
 	AM_RANGE(0x4000, 0x4000) AM_WRITE(sound_nmi_enable_w)
 	AM_RANGE(0x6000, 0x6000) AM_DEVREADWRITE("soundlatch", generic_latch_8_device, read, write)
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( io_map, AS_IO, 8, zodiack_state  )
+ADDRESS_MAP_START(zodiack_state::io_map)
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	AM_RANGE(0x00, 0x01) AM_DEVWRITE("aysnd", ay8910_device, address_data_w)
 ADDRESS_MAP_END
@@ -563,15 +563,15 @@ void zodiack_state::machine_reset()
 }
 
 
-static MACHINE_CONFIG_START( zodiack )
+MACHINE_CONFIG_START(zodiack_state::zodiack)
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", Z80, XTAL_18_432MHz/6)
+	MCFG_CPU_ADD("maincpu", Z80, XTAL(18'432'000)/6)
 	MCFG_CPU_PROGRAM_MAP(main_map)
 	MCFG_CPU_VBLANK_INT_DRIVER("screen", zodiack_state, zodiack_main_nmi_gen)
 	MCFG_CPU_PERIODIC_INT_DRIVER(zodiack_state, irq0_line_hold, 1*60) // sound related - unknown source, timing is guessed
 
-	MCFG_CPU_ADD("audiocpu", Z80, XTAL_18_432MHz/6)
+	MCFG_CPU_ADD("audiocpu", Z80, XTAL(18'432'000)/6)
 	MCFG_CPU_PROGRAM_MAP(sound_map)
 	MCFG_CPU_IO_MAP(io_map)
 	MCFG_CPU_PERIODIC_INT_DRIVER(zodiack_state, zodiack_sound_nmi_gen, 8*60) // sound tempo - unknown source, timing is guessed
@@ -594,7 +594,7 @@ static MACHINE_CONFIG_START( zodiack )
 
 	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
 
-	MCFG_SOUND_ADD("aysnd", AY8910, XTAL_18_432MHz/12)
+	MCFG_SOUND_ADD("aysnd", AY8910, XTAL(18'432'000)/12)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
 MACHINE_CONFIG_END
 

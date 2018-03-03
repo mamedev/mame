@@ -26,14 +26,14 @@ DEFINE_DEVICE_TYPE(BSMT2000, bsmt2000_device, "bsmt2000", "BSMT2000")
 //**************************************************************************
 
 // program map for the DSP (points to internal ROM)
-static ADDRESS_MAP_START(tms_program_map, AS_PROGRAM, 16, bsmt2000_device)
+ADDRESS_MAP_START(bsmt2000_device::tms_program_map)
 	ADDRESS_MAP_UNMAP_HIGH
 	AM_RANGE(0x000, 0xfff) AM_ROM
 ADDRESS_MAP_END
 
 
 // I/O map for the DSP
-static ADDRESS_MAP_START(tms_io_map, AS_IO, 16, bsmt2000_device)
+ADDRESS_MAP_START(bsmt2000_device::tms_io_map)
 	AM_RANGE(0, 0) AM_READWRITE(tms_register_r, tms_rom_addr_w)
 	AM_RANGE(1, 1) AM_READWRITE(tms_data_r, tms_rom_bank_w)
 	AM_RANGE(2, 2) AM_READ(tms_rom_r)
@@ -78,18 +78,6 @@ bsmt2000_device::bsmt2000_device(const machine_config &mconfig, const char *tag,
 
 
 //-------------------------------------------------
-//  static_set_ready_callback - configuration
-//  helper to set the ready callback
-//-------------------------------------------------
-
-void bsmt2000_device::static_set_ready_callback(device_t &device, ready_callback &&callback)
-{
-	bsmt2000_device &bsmt = downcast<bsmt2000_device &>(device);
-	bsmt.m_ready_callback = std::move(callback);
-}
-
-
-//-------------------------------------------------
 //  rom_region - return a pointer to the device's
 //  internal ROM region
 //-------------------------------------------------
@@ -104,7 +92,7 @@ const tiny_rom_entry *bsmt2000_device::device_rom_region() const
 //  device_add_mconfig - add device configuration
 //-------------------------------------------------
 
-MACHINE_CONFIG_MEMBER( bsmt2000_device::device_add_mconfig )
+MACHINE_CONFIG_START(bsmt2000_device::device_add_mconfig)
 	MCFG_CPU_ADD("bsmt2000", TMS32015, DERIVED_CLOCK(1,1))
 	MCFG_CPU_PROGRAM_MAP(tms_program_map)
 	// data map is internal to the CPU

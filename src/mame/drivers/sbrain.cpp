@@ -90,6 +90,11 @@ public:
 	u32 screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	TIMER_DEVICE_CALLBACK_MEMBER(kbd_scan);
 
+	void sbrain(machine_config &config);
+	void sbrain_io(address_map &map);
+	void sbrain_mem(address_map &map);
+	void sbrain_subio(address_map &map);
+	void sbrain_submem(address_map &map);
 private:
 	bool m_busak;
 	u8 m_keydown;
@@ -118,7 +123,7 @@ private:
 	required_ioport_array<10> m_keyboard;
 };
 
-static ADDRESS_MAP_START( sbrain_mem, AS_PROGRAM, 8, sbrain_state )
+ADDRESS_MAP_START(sbrain_state::sbrain_mem)
 	AM_RANGE( 0x0000, 0x3fff ) AM_READ_BANK("bankr0") AM_WRITE_BANK("bankw0")
 	AM_RANGE( 0x4000, 0x7fff ) AM_RAM
 	AM_RANGE( 0x8000, 0xbfff ) AM_RAMBANK("bank2")
@@ -126,7 +131,7 @@ static ADDRESS_MAP_START( sbrain_mem, AS_PROGRAM, 8, sbrain_state )
 	AM_RANGE( 0xf800, 0xffff ) AM_RAM AM_SHARE("videoram")
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( sbrain_io, AS_IO, 8, sbrain_state )
+ADDRESS_MAP_START(sbrain_state::sbrain_io)
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	AM_RANGE(0x40, 0x40) AM_MIRROR(6) AM_DEVREADWRITE("uart0", i8251_device, data_r, data_w)
 	AM_RANGE(0x41, 0x41) AM_MIRROR(6) AM_DEVREADWRITE("uart0", i8251_device, status_r, control_w)
@@ -138,12 +143,12 @@ static ADDRESS_MAP_START( sbrain_io, AS_IO, 8, sbrain_state )
 	AM_RANGE(0x68, 0x6b) AM_MIRROR(4) AM_DEVREADWRITE("ppi", i8255_device, read, write)
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( sbrain_submem, AS_PROGRAM, 8, sbrain_state )
+ADDRESS_MAP_START(sbrain_state::sbrain_submem)
 	AM_RANGE( 0x0000, 0x07ff ) AM_ROM
 	AM_RANGE( 0x8800, 0x8bff ) AM_RAM AM_REGION("subcpu", 0x8800)
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( sbrain_subio, AS_IO, 8, sbrain_state )
+ADDRESS_MAP_START(sbrain_state::sbrain_subio)
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	AM_RANGE(0x08, 0x0b) AM_DEVREADWRITE("fdc", fd1791_device, read, write)
 	AM_RANGE(0x10, 0x10) AM_READWRITE(port10_r,port10_w)
@@ -526,14 +531,14 @@ u32 sbrain_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap, con
 	return 0;
 }
 
-static MACHINE_CONFIG_START( sbrain )
+MACHINE_CONFIG_START(sbrain_state::sbrain)
 	// basic machine hardware
-	MCFG_CPU_ADD("maincpu", Z80, XTAL_16MHz / 4)
+	MCFG_CPU_ADD("maincpu", Z80, XTAL(16'000'000) / 4)
 	MCFG_CPU_PROGRAM_MAP(sbrain_mem)
 	MCFG_CPU_IO_MAP(sbrain_io)
 	MCFG_CPU_VBLANK_INT_DRIVER("screen", sbrain_state, irq0_line_hold)
 
-	MCFG_CPU_ADD("subcpu", Z80, XTAL_16MHz / 4)
+	MCFG_CPU_ADD("subcpu", Z80, XTAL(16'000'000) / 4)
 	MCFG_CPU_PROGRAM_MAP(sbrain_submem)
 	MCFG_CPU_IO_MAP(sbrain_subio)
 
@@ -568,13 +573,13 @@ static MACHINE_CONFIG_START( sbrain )
 
 	MCFG_DEVICE_ADD("uart1", I8251, 0)
 
-	MCFG_DEVICE_ADD("brg", COM8116, XTAL_5_0688MHz) // BR1941L
+	MCFG_DEVICE_ADD("brg", COM8116, XTAL(5'068'800)) // BR1941L
 	MCFG_COM8116_FR_HANDLER(DEVWRITELINE("uart0", i8251_device, write_txc))
 	MCFG_DEVCB_CHAIN_OUTPUT(DEVWRITELINE("uart0", i8251_device, write_rxc))
 	MCFG_COM8116_FT_HANDLER(DEVWRITELINE("uart1", i8251_device, write_txc))
 	MCFG_DEVCB_CHAIN_OUTPUT(DEVWRITELINE("uart1", i8251_device, write_rxc))
 
-	MCFG_FD1791_ADD("fdc", XTAL_16MHz / 16)
+	MCFG_FD1791_ADD("fdc", XTAL(16'000'000) / 16)
 	MCFG_FLOPPY_DRIVE_ADD("fdc:0", sbrain_floppies, "525dd", floppy_image_device::default_floppy_formats)
 	MCFG_FLOPPY_DRIVE_SOUND(true)
 	MCFG_FLOPPY_DRIVE_ADD("fdc:1", sbrain_floppies, "525dd", floppy_image_device::default_floppy_formats)

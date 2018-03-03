@@ -43,17 +43,17 @@ void at_mb_device::device_reset()
 void at_mb_device::device_start()
 {
 	if(!strncmp(m_maincpu->shortname(), "i80286", 6))
-		i80286_cpu_device::static_set_a20_callback(*m_maincpu, i80286_cpu_device::a20_cb(&at_mb_device::a20_286, this));
+		downcast<i80286_cpu_device *>(m_maincpu.target())->set_a20_callback(i80286_cpu_device::a20_cb(&at_mb_device::a20_286, this));
 }
 
-MACHINE_CONFIG_START( at_softlists )
+MACHINE_CONFIG_START(at_mb_device::at_softlists)
 	/* software lists */
 	MCFG_SOFTWARE_LIST_ADD("pc_disk_list","ibm5150")
 	MCFG_SOFTWARE_LIST_ADD("at_disk_list","ibm5170")
 	MCFG_SOFTWARE_LIST_ADD("at_cdrom_list","ibm5170_cdrom")
 MACHINE_CONFIG_END
 
-MACHINE_CONFIG_MEMBER( at_mb_device::device_add_mconfig )
+MACHINE_CONFIG_START(at_mb_device::device_add_mconfig)
 	MCFG_DEVICE_ADD("pit8254", PIT8254, 0)
 	MCFG_PIT8253_CLK0(4772720/4) /* heartbeat IRQ */
 	MCFG_PIT8253_OUT0_HANDLER(DEVWRITELINE("pic8259_master", pic8259_device, ir0_w))
@@ -61,7 +61,7 @@ MACHINE_CONFIG_MEMBER( at_mb_device::device_add_mconfig )
 	MCFG_PIT8253_CLK2(4772720/4) /* pio port c pin 4, and speaker polling enough */
 	MCFG_PIT8253_OUT2_HANDLER(WRITELINE(at_mb_device, pit8254_out2_changed))
 
-	MCFG_DEVICE_ADD( "dma8237_1", AM9517A, XTAL_14_31818MHz/3 )
+	MCFG_DEVICE_ADD( "dma8237_1", AM9517A, XTAL(14'318'181)/3 )
 	MCFG_I8237_OUT_HREQ_CB(DEVWRITELINE("dma8237_2", am9517a_device, dreq0_w))
 	MCFG_I8237_OUT_EOP_CB(WRITELINE(at_mb_device, dma8237_out_eop))
 	MCFG_I8237_IN_MEMR_CB(READ8(at_mb_device, dma_read_byte))
@@ -78,7 +78,7 @@ MACHINE_CONFIG_MEMBER( at_mb_device::device_add_mconfig )
 	MCFG_I8237_OUT_DACK_1_CB(WRITELINE(at_mb_device, dack1_w))
 	MCFG_I8237_OUT_DACK_2_CB(WRITELINE(at_mb_device, dack2_w))
 	MCFG_I8237_OUT_DACK_3_CB(WRITELINE(at_mb_device, dack3_w))
-	MCFG_DEVICE_ADD( "dma8237_2", AM9517A, XTAL_14_31818MHz/3 )
+	MCFG_DEVICE_ADD( "dma8237_2", AM9517A, XTAL(14'318'181)/3 )
 	MCFG_I8237_OUT_HREQ_CB(WRITELINE(at_mb_device, dma_hrq_changed))
 	MCFG_I8237_IN_MEMR_CB(READ8(at_mb_device, dma_read_word))
 	MCFG_I8237_OUT_MEMW_CB(WRITE8(at_mb_device, dma_write_word))
@@ -123,7 +123,7 @@ MACHINE_CONFIG_MEMBER( at_mb_device::device_add_mconfig )
 	MCFG_ISA_OUT_DRQ6_CB(DEVWRITELINE("dma8237_2", am9517a_device, dreq2_w))
 	MCFG_ISA_OUT_DRQ7_CB(DEVWRITELINE("dma8237_2", am9517a_device, dreq3_w))
 
-	MCFG_MC146818_ADD( "rtc", XTAL_32_768kHz )
+	MCFG_MC146818_ADD( "rtc", XTAL(32'768) )
 	MCFG_MC146818_IRQ_HANDLER(DEVWRITELINE("pic8259_slave", pic8259_device, ir0_w)) MCFG_DEVCB_INVERT
 	MCFG_MC146818_CENTURY_INDEX(0x32)
 
@@ -132,7 +132,7 @@ MACHINE_CONFIG_MEMBER( at_mb_device::device_add_mconfig )
 	MCFG_SOUND_ADD("speaker", SPEAKER_SOUND, 0)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
 
-	MCFG_DEVICE_ADD("keybc", AT_KEYBOARD_CONTROLLER, XTAL_12MHz)
+	MCFG_DEVICE_ADD("keybc", AT_KEYBOARD_CONTROLLER, XTAL(12'000'000))
 	MCFG_AT_KEYBOARD_CONTROLLER_SYSTEM_RESET_CB(INPUTLINE(":maincpu", INPUT_LINE_RESET))
 	MCFG_AT_KEYBOARD_CONTROLLER_GATE_A20_CB(INPUTLINE(":maincpu", INPUT_LINE_A20))
 	MCFG_AT_KEYBOARD_CONTROLLER_INPUT_BUFFER_FULL_CB(DEVWRITELINE("pic8259_master", pic8259_device, ir1_w))
@@ -144,17 +144,17 @@ MACHINE_CONFIG_MEMBER( at_mb_device::device_add_mconfig )
 MACHINE_CONFIG_END
 
 
-DEVICE_ADDRESS_MAP_START( map, 16, at_mb_device )
-	AM_RANGE(0x0000, 0x001f) AM_DEVREADWRITE8("dma8237_1", am9517a_device, read, write, 0xffff)
-	AM_RANGE(0x0020, 0x003f) AM_DEVREADWRITE8("pic8259_master", pic8259_device, read, write, 0xffff)
-	AM_RANGE(0x0040, 0x005f) AM_DEVREADWRITE8("pit8254", pit8254_device, read, write, 0xffff)
+ADDRESS_MAP_START(at_mb_device::map)
+	AM_RANGE(0x0000, 0x001f) AM_DEVREADWRITE8("dma8237_1", am9517a_device, read, write, 0xffffffff)
+	AM_RANGE(0x0020, 0x003f) AM_DEVREADWRITE8("pic8259_master", pic8259_device, read, write, 0xffffffff)
+	AM_RANGE(0x0040, 0x005f) AM_DEVREADWRITE8("pit8254", pit8254_device, read, write, 0xffffffff)
 	AM_RANGE(0x0060, 0x0061) AM_READWRITE8(portb_r, portb_w, 0xff00)
 	AM_RANGE(0x0060, 0x0061) AM_DEVREADWRITE8("keybc", at_keyboard_controller_device, data_r, data_w, 0x00ff)
 	AM_RANGE(0x0064, 0x0065) AM_DEVREADWRITE8("keybc", at_keyboard_controller_device, status_r, command_w, 0x00ff)
-	AM_RANGE(0x0070, 0x007f) AM_DEVREAD8("rtc", mc146818_device, read, 0xffff) AM_WRITE8(write_rtc , 0xffff)
-	AM_RANGE(0x0080, 0x009f) AM_READWRITE8(page8_r, page8_w, 0xffff)
-	AM_RANGE(0x00a0, 0x00bf) AM_DEVREADWRITE8("pic8259_slave", pic8259_device, read, write, 0xffff)
-	AM_RANGE(0x00c0, 0x00df) AM_DEVREADWRITE8("dma8237_2", am9517a_device, read, write, 0x00ff)
+	AM_RANGE(0x0070, 0x007f) AM_DEVREAD8("rtc", mc146818_device, read, 0xffffffff) AM_WRITE8(write_rtc, 0xffffffff)
+	AM_RANGE(0x0080, 0x009f) AM_READWRITE8(page8_r, page8_w, 0xffffffff)
+	AM_RANGE(0x00a0, 0x00bf) AM_DEVREADWRITE8("pic8259_slave", pic8259_device, read, write, 0xffffffff)
+	AM_RANGE(0x00c0, 0x00df) AM_DEVREADWRITE8("dma8237_2", am9517a_device, read, write, 0x00ff00ff)
 ADDRESS_MAP_END
 
 /*************************************************************

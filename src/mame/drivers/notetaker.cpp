@@ -223,6 +223,9 @@ public:
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
 
+	void notetakr(machine_config &config);
+	void notetaker_iocpu_io(address_map &map);
+	void notetaker_iocpu_mem(address_map &map);
 protected:
 	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr) override;
 };
@@ -255,7 +258,7 @@ TIMER_CALLBACK_MEMBER(notetaker_state::timer_fifoclk)
 	}
 	m_outfifo_tail_ptr&=0xF;
 	m_dac->write(data);
-	m_FIFO_timer->adjust(attotime::from_hz(((XTAL_960kHz/10)/4)/((m_FrSel0<<3)+(m_FrSel1<<2)+(m_FrSel2<<1)+1)));
+	m_FIFO_timer->adjust(attotime::from_hz(((XTAL(960'000)/10)/4)/((m_FrSel0<<3)+(m_FrSel1<<2)+(m_FrSel2<<1)+1)));
 }
 
 uint32_t notetaker_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
@@ -316,8 +319,8 @@ READ16_MEMBER( notetaker_state::ReadOPStatus_r ) // 74ls368 hex inverter at #l7 
 	data |= (m_outfifo_count >= 1) ? 0 : 0x08; // m_FIFOOutRdy is true if the fifo has at least 1 word in it, false otherwise
 	data |= (m_outfifo_count < 16) ? 0 : 0x04; // m_FIFOInRdy is true if the fifo has less than 16 words in it, false otherwise
 	// note /SWE is permanently enabled, so we don't enable it here for HD6402 reading
-	data |= m_kbduart->get_output_pin(AY31015_DAV ) ? 0 : 0x02; // DR - pin 19
-	data |= m_kbduart->get_output_pin(AY31015_TBMT) ? 0 : 0x01; // TBRE - pin 22
+	data |= m_kbduart->dav_r( ) ? 0 : 0x02; // DR - pin 19
+	data |= m_kbduart->tbmt_r() ? 0 : 0x01; // TBRE - pin 22
 #ifdef DEBUG_READOPSTATUS
 	logerror("ReadOPStatus read, returning %04x\n", data);
 #endif
@@ -331,25 +334,25 @@ WRITE16_MEMBER( notetaker_state::LoadKeyData_w )
 
 WRITE16_MEMBER( notetaker_state::LoadKeyCtlReg_w )
 {
-	m_kbduart->set_input_pin(AY31015_CS, 0);
-	m_kbduart->set_input_pin(AY31015_NP,  BIT(data, 4)); // PI - pin 35
-	m_kbduart->set_input_pin(AY31015_TSB, BIT(data, 3)); // SBS - pin 36
-	m_kbduart->set_input_pin(AY31015_NB2, BIT(data, 2)); // CLS2 - pin 37
-	m_kbduart->set_input_pin(AY31015_NB1, BIT(data, 1)); // CLS1 - pin 38
-	m_kbduart->set_input_pin(AY31015_EPS, BIT(data, 0)); // EPE - pin 39
-	m_kbduart->set_input_pin(AY31015_CS, 1);
+	m_kbduart->write_cs(0);
+	m_kbduart->write_np(BIT(data, 4)); // PI - pin 35
+	m_kbduart->write_tsb(BIT(data, 3)); // SBS - pin 36
+	m_kbduart->write_nb2(BIT(data, 2)); // CLS2 - pin 37
+	m_kbduart->write_nb1(BIT(data, 1)); // CLS1 - pin 38
+	m_kbduart->write_eps(BIT(data, 0)); // EPE - pin 39
+	m_kbduart->write_cs(1);
 }
 
 WRITE16_MEMBER( notetaker_state::KeyDataReset_w )
 {
-	m_kbduart->set_input_pin(AY31015_RDAV, 0); // DDR - pin 18
-	m_kbduart->set_input_pin(AY31015_RDAV, 1); // ''
+	m_kbduart->write_rdav(0); // DDR - pin 18
+	m_kbduart->write_rdav(1); // ''
 }
 
 WRITE16_MEMBER( notetaker_state::KeyChipReset_w )
 {
-	m_kbduart->set_input_pin(AY31015_XR, 0); // MR - pin 21
-	m_kbduart->set_input_pin(AY31015_XR, 1); // ''
+	m_kbduart->write_xr(0); // MR - pin 21
+	m_kbduart->write_xr(1); // ''
 }
 
 /* FIFO (DAC) Stuff and ADC stuff */
@@ -363,8 +366,8 @@ WRITE16_MEMBER(notetaker_state::FIFOReg_w)
 	m_FrSel2 = (data&0x0400)?1:0;
 	m_TabletXOn = (data&0x0200)?1:0;
 	m_TabletYOn = (data&0x0100)?1:0;
-	m_FIFO_timer->adjust(attotime::from_hz(((XTAL_960kHz/10)/4)/((m_FrSel0<<3)+(m_FrSel1<<2)+(m_FrSel2<<1)+1)));
-	logerror("Write to 0x60 FIFOReg_w of %04x; fifo timer set to %d hz\n", data, (((XTAL_960kHz/10)/4)/((m_FrSel0<<3)+(m_FrSel1<<2)+(m_FrSel2<<1)+1)));
+	m_FIFO_timer->adjust(attotime::from_hz(((XTAL(960'000)/10)/4)/((m_FrSel0<<3)+(m_FrSel1<<2)+(m_FrSel2<<1)+1)));
+	logerror("Write to 0x60 FIFOReg_w of %04x; fifo timer set to %d hz\n", data, (((XTAL(960'000)/10)/4).value()/((m_FrSel0<<3)+(m_FrSel1<<2)+(m_FrSel2<<1)+1)));
 }
 
 WRITE16_MEMBER(notetaker_state::FIFOBus_w)
@@ -454,8 +457,8 @@ READ16_MEMBER( notetaker_state::ReadEIAStatus_r ) // 74ls368 hex inverter at #f1
 {
 	uint16_t data = 0xFFFC;
 	// note /SWE is permanently enabled, so we don't enable it here for HD6402 reading
-	data |= m_eiauart->get_output_pin(AY31015_DAV ) ? 0 : 0x02; // DR - pin 19
-	data |= m_eiauart->get_output_pin(AY31015_TBMT) ? 0 : 0x01; // TBRE - pin 22
+	data |= m_eiauart->dav_r( ) ? 0 : 0x02; // DR - pin 19
+	data |= m_eiauart->tbmt_r() ? 0 : 0x01; // TBRE - pin 22
 	return data;
 }
 
@@ -466,25 +469,25 @@ WRITE16_MEMBER( notetaker_state::LoadEIAData_w )
 
 WRITE16_MEMBER( notetaker_state::LoadEIACtlReg_w )
 {
-	m_eiauart->set_input_pin(AY31015_CS, 0);
-	m_eiauart->set_input_pin(AY31015_NP,  BIT(data, 4)); // PI - pin 35
-	m_eiauart->set_input_pin(AY31015_TSB, BIT(data, 3)); // SBS - pin 36
-	m_eiauart->set_input_pin(AY31015_NB2, BIT(data, 2)); // CLS2 - pin 37
-	m_eiauart->set_input_pin(AY31015_NB1, BIT(data, 1)); // CLS1 - pin 38
-	m_eiauart->set_input_pin(AY31015_EPS, BIT(data, 0)); // EPE - pin 39
-	m_eiauart->set_input_pin(AY31015_CS, 1);
+	m_eiauart->write_cs(0);
+	m_eiauart->write_np(BIT(data, 4)); // PI - pin 35
+	m_eiauart->write_tsb(BIT(data, 3)); // SBS - pin 36
+	m_eiauart->write_nb2(BIT(data, 2)); // CLS2 - pin 37
+	m_eiauart->write_nb1(BIT(data, 1)); // CLS1 - pin 38
+	m_eiauart->write_eps(BIT(data, 0)); // EPE - pin 39
+	m_eiauart->write_cs(1);
 }
 
 WRITE16_MEMBER( notetaker_state::EIADataReset_w )
 {
-	m_eiauart->set_input_pin(AY31015_RDAV, 0); // DDR - pin 18
-	m_eiauart->set_input_pin(AY31015_RDAV, 1); // ''
+	m_eiauart->write_rdav(0); // DDR - pin 18
+	m_eiauart->write_rdav(1); // ''
 }
 
 WRITE16_MEMBER( notetaker_state::EIAChipReset_w )
 {
-	m_eiauart->set_input_pin(AY31015_XR, 0); // MR - pin 21
-	m_eiauart->set_input_pin(AY31015_XR, 1); // ''
+	m_eiauart->write_xr(0); // MR - pin 21
+	m_eiauart->write_xr(1); // ''
 }
 
 
@@ -546,7 +549,7 @@ BootSeqDone is 1, DisableROM is 0,       mem map is 0x00000-0x00fff reading is t
 BootSeqDone is 1, DisableROM is 1,       mem map is entirely RAM or open bus for both reading and writing.
 */
 
-static ADDRESS_MAP_START(notetaker_iocpu_mem, AS_PROGRAM, 16, notetaker_state)
+ADDRESS_MAP_START(notetaker_state::notetaker_iocpu_mem)
 	/*
 	AM_RANGE(0x00000, 0x00fff) AM_ROM AM_REGION("iocpu", 0xff000) // rom is here if either BootSeqDone OR DisableROM are zero. the 1.5 source code and the schematics implies writes here are ignored while rom is enabled; if disablerom is 1 this goes to mainram
 	AM_RANGE(0x01000, 0x3ffff) AM_RAM AM_REGION("mainram", 0) // 256k of ram (less 4k), shared between both processors. rom goes here if bootseqdone is 0
@@ -594,7 +597,7 @@ x   x   x   x    0   x   x   x    x   x   x   1    1   0   1   x    1   1   1   
 x   x   x   x    0   x   x   x    x   x   x   1    1   1   0   x    x   x   x   .       R   SelADCHi
 x   x   x   x    0   x   x   x    x   x   x   1    1   1   1   x    x   x   x   .       W   CRTSwitch
 */
-static ADDRESS_MAP_START(notetaker_iocpu_io, AS_IO, 16, notetaker_state)
+ADDRESS_MAP_START(notetaker_state::notetaker_iocpu_io)
 	ADDRESS_MAP_UNMAP_HIGH
 	AM_RANGE(0x00, 0x03) AM_MIRROR(0x7E1C) AM_DEVREADWRITE8("iopic8259", pic8259_device, read, write, 0x00ff)
 	AM_RANGE(0x20, 0x21) AM_MIRROR(0x7E1E) AM_WRITE(IPConReg_w) // I/O processor (rom mapping, etc) control register
@@ -754,9 +757,9 @@ void notetaker_state::machine_start()
 	// FDC: /DDEN is tied permanently LOW so MFM mode is ALWAYS ON
 	m_fdc->dden_w(0);
 	// Keyboard UART: /SWE is tied permanently LOW
-	m_kbduart->set_input_pin(AY31015_SWE, 0); // status word outputs are permanently enabled (pin 16 SFD(SWE) tied low, active)
+	m_kbduart->write_swe(0); // status word outputs are permanently enabled (pin 16 SFD(SWE) tied low, active)
 	// EIA UART: /SWE is tied permanently LOW
-	m_eiauart->set_input_pin(AY31015_SWE, 0); // status word outputs are permanently enabled (pin 16 SFD(SWE) tied low, active)
+	m_eiauart->write_swe(0); // status word outputs are permanently enabled (pin 16 SFD(SWE) tied low, active)
 	// savestate stuff
 	// TODO: add me!
 }
@@ -772,11 +775,11 @@ void notetaker_state::machine_reset()
 void notetaker_state::ip_reset()
 {
 	// reset the Keyboard UART
-	m_kbduart->set_input_pin(AY31015_XR, 0); // MR - pin 21
-	m_kbduart->set_input_pin(AY31015_XR, 1); // ''
+	m_kbduart->write_xr(0); // MR - pin 21
+	m_kbduart->write_xr(1); // ''
 	// reset the EIA UART
-	m_eiauart->set_input_pin(AY31015_XR, 0); // MR - pin 21
-	m_eiauart->set_input_pin(AY31015_XR, 1); // ''
+	m_eiauart->write_xr(0); // MR - pin 21
+	m_eiauart->write_xr(1); // ''
 	// reset the IPConReg latch at #f1
 	m_BootSeqDone = 0;
 	m_ProcLock = 0;
@@ -799,7 +802,7 @@ void notetaker_state::ip_reset()
 	m_SHConA = 0;
 	m_SetSH = 0;
 	// handle consequences of above
-	m_FIFO_timer->adjust(attotime::from_hz(((XTAL_960kHz/10)/4)/((m_FrSel0<<3)+(m_FrSel1<<2)+(m_FrSel2<<1)+1))); // See below
+	m_FIFO_timer->adjust(attotime::from_hz(((XTAL(960'000)/10)/4)/((m_FrSel0<<3)+(m_FrSel1<<2)+(m_FrSel2<<1)+1))); // See below
 	/* FIFO timer is clocked by 960khz divided by 10 (74ls162 decade counter),
 	   divided by 4 (mc14568B with divider 1 pins set to 4), divided by
 	   1,3,5,7,9,11,13,15 (or 0,2,4,6,8,10,12,14?) */
@@ -843,10 +846,10 @@ void notetaker_state::ep_reset()
 static INPUT_PORTS_START( notetakr )
 INPUT_PORTS_END
 
-static MACHINE_CONFIG_START( notetakr )
+MACHINE_CONFIG_START(notetaker_state::notetakr)
 	/* basic machine hardware */
 	/* IO CPU: 8086@8MHz */
-	MCFG_CPU_ADD("iocpu", I8086, XTAL_24MHz/3) /* iD8086-2 @ E4A; 24Mhz crystal divided down to 8Mhz by i8284 clock generator */
+	MCFG_CPU_ADD("iocpu", I8086, XTAL(24'000'000)/3) /* iD8086-2 @ E4A; 24Mhz crystal divided down to 8Mhz by i8284 clock generator */
 	MCFG_CPU_PROGRAM_MAP(notetaker_iocpu_mem)
 	MCFG_CPU_IO_MAP(notetaker_iocpu_io)
 	MCFG_CPU_IRQ_ACKNOWLEDGE_DEVICE("iopic8259", pic8259_device, inta_cb)
@@ -855,7 +858,7 @@ static MACHINE_CONFIG_START( notetakr )
 	MCFG_PIC8259_OUT_INT_CB(INPUTLINE("iocpu", 0))
 
 	/* Emulator CPU: 8086@5MHz */
-	/*MCFG_CPU_ADD("emulatorcpu", I8086, XTAL_15MHz/3)
+	/*MCFG_CPU_ADD("emulatorcpu", I8086, XTAL(15'000'000)/3)
 	MCFG_CPU_PROGRAM_MAP(notetaker_emulatorcpu_mem)
 	MCFG_CPU_IO_MAP(notetaker_emulatorcpu_io)
 	MCFG_CPU_IRQ_ACKNOWLEDGE_DEVICE("emulatorpic8259", pic8259_device, inta_cb)
@@ -876,7 +879,7 @@ static MACHINE_CONFIG_START( notetakr )
 	MCFG_PALETTE_ADD_MONOCHROME("palette")
 
 	/* Devices */
-	MCFG_DEVICE_ADD( "crt5027", CRT5027, (XTAL_36MHz/4)/8) // See below
+	MCFG_DEVICE_ADD( "crt5027", CRT5027, (XTAL(36'000'000)/4)/8) // See below
 	/* the clock for the crt5027 is configurable rate; 36MHz xtal divided by 1*,
 	   2, 3, 4, 5, 6, 7, or 8 (* because this is a 74s163 this setting probably
 	   means divide by 1; documentation at
@@ -892,15 +895,15 @@ static MACHINE_CONFIG_START( notetakr )
 	MCFG_VIDEO_SET_SCREEN("screen")
 
 	MCFG_DEVICE_ADD( "kbduart", AY31015, 0 ) // HD6402, == AY-3-1015D
-	MCFG_AY31015_RX_CLOCK(XTAL_960kHz) // hard-wired to 960KHz xtal #f11 (60000 baud, 16 clocks per baud)
-	MCFG_AY31015_TX_CLOCK(XTAL_960kHz) // hard-wired to 960KHz xtal #f11 (60000 baud, 16 clocks per baud)
+	MCFG_AY31015_RX_CLOCK(XTAL(960'000)) // hard-wired to 960KHz xtal #f11 (60000 baud, 16 clocks per baud)
+	MCFG_AY31015_TX_CLOCK(XTAL(960'000)) // hard-wired to 960KHz xtal #f11 (60000 baud, 16 clocks per baud)
 
 	MCFG_DEVICE_ADD( "eiauart", AY31015, 0 ) // HD6402, == AY-3-1015D
-	MCFG_AY31015_RX_CLOCK(((XTAL_960kHz/10)/4)/5) // hard-wired through an mc14568b divider set to divide by 4, the result set to divide by 5; this resulting 4800hz signal being 300 baud (16 clocks per baud)
-	MCFG_AY31015_TX_CLOCK(((XTAL_960kHz/10)/4)/5) // hard-wired through an mc14568b divider set to divide by 4, the result set to divide by 5; this resulting 4800hz signal being 300 baud (16 clocks per baud)
+	MCFG_AY31015_RX_CLOCK(((XTAL(960'000)/10)/4)/5) // hard-wired through an mc14568b divider set to divide by 4, the result set to divide by 5; this resulting 4800hz signal being 300 baud (16 clocks per baud)
+	MCFG_AY31015_TX_CLOCK(((XTAL(960'000)/10)/4)/5) // hard-wired through an mc14568b divider set to divide by 4, the result set to divide by 5; this resulting 4800hz signal being 300 baud (16 clocks per baud)
 
 	/* Floppy */
-	MCFG_FD1791_ADD("wd1791", (((XTAL_24MHz/3)/2)/2)) // 2mhz, from 24mhz ip clock divided by 6 via 8284, an additional 2 by LS161 at #e1 on display/floppy board
+	MCFG_FD1791_ADD("wd1791", (((XTAL(24'000'000)/3)/2)/2)) // 2mhz, from 24mhz ip clock divided by 6 via 8284, an additional 2 by LS161 at #e1 on display/floppy board
 	MCFG_FLOPPY_DRIVE_ADD("wd1791:0", notetaker_floppies, "525dd", floppy_image_device::default_floppy_formats)
 
 	/* sound hardware */
@@ -922,16 +925,16 @@ DRIVER_INIT_MEMBER(notetaker_state,notetakr)
 	uint16_t *temppointer;
 	uint16_t wordtemp;
 	uint16_t addrtemp;
-		// leave the src pointer alone, since we've only used a 0x1000 long address space
-		romdst += 0x7f800; // set the dest pointer to 0xff000 (>>1 because 16 bits data)
-		for (int i = 0; i < 0x800; i++)
-		{
-			wordtemp = BITSWAP16(*romsrc, 0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15); // data bus is completely reversed
-			addrtemp = BITSWAP16(i, 11, 12, 13, 14, 15, 0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10); // address bus is completely reversed; 11-15 should always be zero
-			temppointer = romdst+(addrtemp&0x7FF);
-			*temppointer = wordtemp;
-			romsrc++;
-		}
+	// leave the src pointer alone, since we've only used a 0x1000 long address space
+	romdst += 0x7f800; // set the dest pointer to 0xff000 (>>1 because 16 bits data)
+	for (int i = 0; i < 0x800; i++)
+	{
+		wordtemp = bitswap<16>(*romsrc, 0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15); // data bus is completely reversed
+		addrtemp = bitswap<11>(i, 0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10); // address bus is completely reversed; 11-15 should always be zero
+		temppointer = romdst+(addrtemp&0x7FF);
+		*temppointer = wordtemp;
+		romsrc++;
+	}
 }
 
 /* ROM definition */

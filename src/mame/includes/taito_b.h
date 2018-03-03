@@ -87,6 +87,44 @@ public:
 	INTERRUPT_GEN_MEMBER(sbm_interrupt);
 	INTERRUPT_GEN_MEMBER(realpunc_interrupt);
 
+	void spacedx(machine_config &config);
+	void rambo3(machine_config &config);
+	void hitice(machine_config &config);
+	void ashura(machine_config &config);
+	void silentd(machine_config &config);
+	void tetrista(machine_config &config);
+	void spacedxo(machine_config &config);
+	void rambo3p(machine_config &config);
+	void rastsag2(machine_config &config);
+	void qzshowby(machine_config &config);
+	void sbm(machine_config &config);
+	void tetrist(machine_config &config);
+	void pbobble(machine_config &config);
+	void masterw(machine_config &config);
+	void ryujin(machine_config &config);
+	void viofight(machine_config &config);
+	void crimec(machine_config &config);
+	void selfeena(machine_config &config);
+	void crimec_map(address_map &map);
+	void hitice_map(address_map &map);
+	void masterw_map(address_map &map);
+	void masterw_sound_map(address_map &map);
+	void pbobble_map(address_map &map);
+	void qzshowby_map(address_map &map);
+	void rambo3_map(address_map &map);
+	void rastsag2_map(address_map &map);
+	void realpunc_hd63484_map(address_map &map);
+	void realpunc_map(address_map &map);
+	void sbm_map(address_map &map);
+	void selfeena_map(address_map &map);
+	void silentd_map(address_map &map);
+	void sound_map(address_map &map);
+	void spacedx_map(address_map &map);
+	void spacedxo_map(address_map &map);
+	void tetrist_map(address_map &map);
+	void tetrista_map(address_map &map);
+	void viofight_map(address_map &map);
+	void viofight_sound_map(address_map &map);
 protected:
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
@@ -138,4 +176,5 @@ class taitob_c_state : public taitob_state
 public:
 	using taitob_state::taitob_state;
 	static constexpr feature_type unemulated_features() { return feature::CAMERA; }
+	void realpunc(machine_config &config);
 };

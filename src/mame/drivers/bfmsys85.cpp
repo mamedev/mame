@@ -134,9 +134,11 @@ public:
 	required_device<stepper_device> m_reel3;
 	required_device<acia6850_device> m_acia6850_0;
 	required_device<meters_device> m_meters;
+	void bfmsys85(machine_config &config);
+	void memmap(address_map &map);
 };
 
-#define MASTER_CLOCK    (XTAL_4MHz)
+#define MASTER_CLOCK    (XTAL(4'000'000))
 
 ///////////////////////////////////////////////////////////////////////////
 // Serial Communications (Where does this go?) ////////////////////////////
@@ -354,7 +356,7 @@ void bfmsys85_state::machine_start()
 
 // memory map for bellfruit system85 board ////////////////////////////////
 
-static ADDRESS_MAP_START( memmap, AS_PROGRAM, 8, bfmsys85_state )
+ADDRESS_MAP_START(bfmsys85_state::memmap)
 
 	AM_RANGE(0x0000, 0x1fff) AM_RAM AM_SHARE("nvram") //8k RAM
 	AM_RANGE(0x2000, 0x21FF) AM_WRITE(reel34_w)         // reel 3+4 latch
@@ -385,7 +387,7 @@ ADDRESS_MAP_END
 
 // machine driver for system85 board //////////////////////////////////////
 
-static MACHINE_CONFIG_START( bfmsys85 )
+MACHINE_CONFIG_START(bfmsys85_state::bfmsys85)
 	MCFG_CPU_ADD("maincpu", M6809, MASTER_CLOCK/4)          // 6809 CPU at 1 Mhz
 	MCFG_CPU_PROGRAM_MAP(memmap)                        // setup read and write memorymap
 	MCFG_CPU_PERIODIC_INT_DRIVER(bfmsys85_state, timer_irq,  1000)              // generate 1000 IRQ's per second

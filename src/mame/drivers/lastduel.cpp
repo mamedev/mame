@@ -141,7 +141,7 @@ WRITE16_MEMBER(lastduel_state::lastduel_sound_w)
 
 /******************************************************************************/
 
-static ADDRESS_MAP_START( lastduel_map, AS_PROGRAM, 16, lastduel_state )
+ADDRESS_MAP_START(lastduel_state::lastduel_map)
 	AM_RANGE(0x000000, 0x05ffff) AM_ROM
 	AM_RANGE(0xfc0000, 0xfc0003) AM_WRITENOP /* Written rarely */
 	AM_RANGE(0xfc0800, 0xfc0fff) AM_RAM AM_SHARE("spriteram")
@@ -157,7 +157,7 @@ static ADDRESS_MAP_START( lastduel_map, AS_PROGRAM, 16, lastduel_state )
 	AM_RANGE(0xfe0000, 0xffffff) AM_RAM
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( madgear_map, AS_PROGRAM, 16, lastduel_state )
+ADDRESS_MAP_START(lastduel_state::madgear_map)
 	AM_RANGE(0x000000, 0x07ffff) AM_ROM
 	AM_RANGE(0xfc1800, 0xfc1fff) AM_RAM AM_SHARE("spriteram")
 	AM_RANGE(0xfc4000, 0xfc4001) AM_READ_PORT("DSW1") AM_WRITE(lastduel_flip_w)
@@ -174,7 +174,7 @@ ADDRESS_MAP_END
 
 /******************************************************************************/
 
-static ADDRESS_MAP_START( sound_map, AS_PROGRAM, 8, lastduel_state )
+ADDRESS_MAP_START(lastduel_state::sound_map)
 	AM_RANGE(0x0000, 0xdfff) AM_ROM
 	AM_RANGE(0xe000, 0xe7ff) AM_RAM
 	AM_RANGE(0xe800, 0xe801) AM_DEVREADWRITE("ym1", ym2203_device, read, write)
@@ -187,7 +187,7 @@ WRITE8_MEMBER(lastduel_state::mg_bankswitch_w)
 	membank("bank1")->set_entry(data & 0x01);
 }
 
-static ADDRESS_MAP_START( madgear_sound_map, AS_PROGRAM, 8, lastduel_state )
+ADDRESS_MAP_START(lastduel_state::madgear_sound_map)
 	AM_RANGE(0x0000, 0x7fff) AM_ROM
 	AM_RANGE(0x8000, 0xcfff) AM_ROMBANK("bank1")
 	AM_RANGE(0xd000, 0xd7ff) AM_RAM
@@ -483,7 +483,7 @@ void lastduel_state::machine_reset()
 		m_scroll[i] = 0;
 }
 
-static MACHINE_CONFIG_START( lastduel )
+MACHINE_CONFIG_START(lastduel_state::lastduel)
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", M68000, 10000000) // Unconfirmed - could be 8MHz
@@ -491,7 +491,7 @@ static MACHINE_CONFIG_START( lastduel )
 	MCFG_CPU_VBLANK_INT_DRIVER("screen", lastduel_state, irq2_line_hold)
 	MCFG_TIMER_DRIVER_ADD_PERIODIC("timer_irq", lastduel_state, lastduel_timer_cb, attotime::from_hz(120))
 
-	MCFG_CPU_ADD("audiocpu", Z80, XTAL_3_579545MHz)
+	MCFG_CPU_ADD("audiocpu", Z80, XTAL(3'579'545))
 	MCFG_CPU_PROGRAM_MAP(sound_map)
 
 	MCFG_MACHINE_START_OVERRIDE(lastduel_state,lastduel)
@@ -519,24 +519,24 @@ static MACHINE_CONFIG_START( lastduel )
 
 	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
 
-	MCFG_SOUND_ADD("ym1", YM2203, XTAL_3_579545MHz)
+	MCFG_SOUND_ADD("ym1", YM2203, XTAL(3'579'545))
 	MCFG_YM2203_IRQ_HANDLER(INPUTLINE("audiocpu", 0))
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.40)
 
-	MCFG_SOUND_ADD("ym2", YM2203, XTAL_3_579545MHz)
+	MCFG_SOUND_ADD("ym2", YM2203, XTAL(3'579'545))
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.40)
 MACHINE_CONFIG_END
 
 
-static MACHINE_CONFIG_START( madgear )
+MACHINE_CONFIG_START(lastduel_state::madgear)
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", M68000, XTAL_10MHz)
+	MCFG_CPU_ADD("maincpu", M68000, XTAL(10'000'000))
 	MCFG_CPU_PROGRAM_MAP(madgear_map)
 	MCFG_CPU_VBLANK_INT_DRIVER("screen", lastduel_state, irq5_line_hold)
 	MCFG_TIMER_DRIVER_ADD_PERIODIC("timer_irq", lastduel_state, madgear_timer_cb, attotime::from_hz(120))
 
-	MCFG_CPU_ADD("audiocpu", Z80, XTAL_3_579545MHz)
+	MCFG_CPU_ADD("audiocpu", Z80, XTAL(3'579'545))
 	MCFG_CPU_PROGRAM_MAP(madgear_sound_map)
 
 	MCFG_MACHINE_START_OVERRIDE(lastduel_state,madgear)
@@ -564,14 +564,14 @@ static MACHINE_CONFIG_START( madgear )
 
 	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
 
-	MCFG_SOUND_ADD("ym1", YM2203, XTAL_3_579545MHz)
+	MCFG_SOUND_ADD("ym1", YM2203, XTAL(3'579'545))
 	MCFG_YM2203_IRQ_HANDLER(INPUTLINE("audiocpu", 0))
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.40)
 
-	MCFG_SOUND_ADD("ym2", YM2203, XTAL_3_579545MHz)
+	MCFG_SOUND_ADD("ym2", YM2203, XTAL(3'579'545))
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.40)
 
-	MCFG_OKIM6295_ADD("oki", XTAL_10MHz/10, PIN7_HIGH)
+	MCFG_OKIM6295_ADD("oki", XTAL(10'000'000)/10, PIN7_HIGH)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.98)
 MACHINE_CONFIG_END
 

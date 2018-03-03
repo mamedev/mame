@@ -14,12 +14,12 @@
     FM-7         | 1982-11 | M68B09 @ 2MHz  |  M68B09   |    64K (main) + 48K (VRAM)    |
     FM-NEW7      | 1984-05 | M68B09 @ 2MHz  |  M68B09   |    64K (main) + 48K (VRAM)    |
     FM-77        | 1984-05 | M68B09 @ 2MHz  |  M68B09E  |  64/256K (main) + 48K (VRAM)  |
-    FM-77AV      | 1985-10 | M68B09E @ 2MHz |  M68B09   | 128/192K (main) + 96K (VRAM)  |
-    FM-77AV20    | 1986-10 | M68B09E @ 2MHz |  M68B09   | 128/192K (main) + 96K (VRAM)  |
-    FM-77AV40    | 1986-10 | M68B09E @ 2MHz |  M68B09   | 192/448K (main) + 144K (VRAM) |
-    FM-77AV20EX  | 1987-11 | M68B09E @ 2MHz |  M68B09   | 128/192K (main) + 96K (VRAM)  |
-    FM-77AV40EX  | 1987-11 | M68B09E @ 2MHz |  M68B09   | 192/448K (main) + 144K (VRAM) |
-    FM-77AV40SX  | 1988-11 | M68B09E @ 2MHz |  M68B09   | 192/448K (main) + 144K (VRAM) |
+    FM-77AV      | 1985-10 | M68B09E @ 2MHz |  M68B09E  | 128/192K (main) + 96K (VRAM)  |
+    FM-77AV20    | 1986-10 | M68B09E @ 2MHz |  M68B09E  | 128/192K (main) + 96K (VRAM)  |
+    FM-77AV40    | 1986-10 | M68B09E @ 2MHz |  M68B09E  | 192/448K (main) + 144K (VRAM) |
+    FM-77AV20EX  | 1987-11 | M68B09E @ 2MHz |  M68B09E  | 128/192K (main) + 96K (VRAM)  |
+    FM-77AV40EX  | 1987-11 | M68B09E @ 2MHz |  M68B09E  | 192/448K (main) + 144K (VRAM) |
+    FM-77AV40SX  | 1988-11 | M68B09E @ 2MHz |  M68B09E  | 192/448K (main) + 144K (VRAM) |
 
     Note: FM-77AV dumps probably come from a FM-77AV40SX. Shall we confirm that both computers
     used the same BIOS components?
@@ -374,7 +374,7 @@ READ8_MEMBER(fm7_state::fm7_fd04_r)
  */
 READ8_MEMBER(fm7_state::fm7_rom_en_r)
 {
-	if(!machine().side_effect_disabled())
+	if(!machine().side_effects_disabled())
 	{
 		uint8_t* RAM = memregion("maincpu")->base();
 
@@ -1430,7 +1430,7 @@ WRITE_LINE_MEMBER(fm7_state::fm77av_fmirq)
    FFF0 - FFFF: Interrupt vector table
 */
 // The FM-7 has only 64kB RAM, so we'll worry about banking when we do the later models
-static ADDRESS_MAP_START( fm7_mem, AS_PROGRAM, 8, fm7_state )
+ADDRESS_MAP_START(fm7_state::fm7_mem)
 	AM_RANGE(0x0000,0x7fff) AM_RAM
 	AM_RANGE(0x8000,0xfbff) AM_READ_BANK("bank1") AM_WRITE_BANK("bank2") // also F-BASIC ROM, when enabled
 	AM_RANGE(0xfc00,0xfc7f) AM_RAM
@@ -1458,7 +1458,7 @@ static ADDRESS_MAP_START( fm7_mem, AS_PROGRAM, 8, fm7_state )
 	AM_RANGE(0xfff0,0xffff) AM_READWRITE(vector_r,vector_w)
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( fm8_mem, AS_PROGRAM, 8, fm7_state )
+ADDRESS_MAP_START(fm7_state::fm8_mem)
 	AM_RANGE(0x0000,0x7fff) AM_RAM
 	AM_RANGE(0x8000,0xfbff) AM_READ_BANK("bank1") AM_WRITE_BANK("bank2") // also F-BASIC ROM, when enabled
 	AM_RANGE(0xfc00,0xfc7f) AM_RAM
@@ -1495,7 +1495,7 @@ ADDRESS_MAP_END
    FFF0 - FFFF: Interrupt vector table
 */
 
-static ADDRESS_MAP_START( fm7_sub_mem, AS_PROGRAM, 8, fm7_state )
+ADDRESS_MAP_START(fm7_state::fm7_sub_mem)
 	AM_RANGE(0x0000,0xbfff) AM_READWRITE(fm7_vram_r,fm7_vram_w) // VRAM
 	AM_RANGE(0xc000,0xcfff) AM_RAM // Console RAM
 	AM_RANGE(0xd000,0xd37f) AM_RAM // Work RAM
@@ -1512,7 +1512,7 @@ static ADDRESS_MAP_START( fm7_sub_mem, AS_PROGRAM, 8, fm7_state )
 	AM_RANGE(0xd800,0xffff) AM_ROM
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( fm11_mem, AS_PROGRAM, 8, fm7_state )
+ADDRESS_MAP_START(fm7_state::fm11_mem)
 	AM_RANGE(0x0000,0x0fff) AM_DEVREADWRITE("av_bank1", address_map_bank_device, read8, write8)
 	AM_RANGE(0x1000,0x1fff) AM_DEVREADWRITE("av_bank2", address_map_bank_device, read8, write8)
 	AM_RANGE(0x2000,0x2fff) AM_DEVREADWRITE("av_bank3", address_map_bank_device, read8, write8)
@@ -1563,7 +1563,7 @@ static ADDRESS_MAP_START( fm11_mem, AS_PROGRAM, 8, fm7_state )
 ADDRESS_MAP_END
 
 // Much of this is guesswork at the moment
-static ADDRESS_MAP_START( fm11_sub_mem, AS_PROGRAM, 8, fm7_state )
+ADDRESS_MAP_START(fm7_state::fm11_sub_mem)
 	AM_RANGE(0x0000,0x7fff) AM_READWRITE(fm7_vram_r,fm7_vram_w) // VRAM
 	AM_RANGE(0x8000,0x8fff) AM_RAM // Console RAM(?)
 	AM_RANGE(0x9000,0x9f7f) AM_RAM // Work RAM(?)
@@ -1575,13 +1575,13 @@ static ADDRESS_MAP_START( fm11_sub_mem, AS_PROGRAM, 8, fm7_state )
 	AM_RANGE(0xc000,0xffff) AM_ROM // sybsystem ROM
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( fm11_x86_mem, AS_PROGRAM, 8, fm7_state )
+ADDRESS_MAP_START(fm7_state::fm11_x86_mem)
 	ADDRESS_MAP_UNMAP_HIGH
 	AM_RANGE(0x00000,0xfefff) AM_RAM
 	AM_RANGE(0xff000,0xfffff) AM_ROM
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( fm11_x86_io, AS_IO, 8, fm7_state )
+ADDRESS_MAP_START(fm7_state::fm11_x86_io)
 	AM_RANGE(0xfd00,0xfd01) AM_READWRITE(fm7_keyboard_r,fm7_cassette_printer_w)
 	AM_RANGE(0xfd02,0xfd02) AM_READWRITE(fm7_cassette_printer_r,fm7_irq_mask_w)  // IRQ mask
 	AM_RANGE(0xfd03,0xfd03) AM_READWRITE(fm7_irq_cause_r,fm7_beeper_w)  // IRQ flags
@@ -1598,12 +1598,12 @@ static ADDRESS_MAP_START( fm11_x86_io, AS_IO, 8, fm7_state )
 	AM_RANGE(0xfd40,0xfdff) AM_READ(fm7_unknown_r)
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( fm16_mem, AS_PROGRAM, 16, fm7_state )
+ADDRESS_MAP_START(fm7_state::fm16_mem)
 	AM_RANGE(0x00000,0xfbfff) AM_RAM
 	AM_RANGE(0xfc000,0xfffff) AM_ROM // IPL
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( fm16_io, AS_IO, 16, fm7_state )
+ADDRESS_MAP_START(fm7_state::fm16_io)
 	AM_RANGE(0xfd00,0xfd01) AM_READWRITE8(fm7_keyboard_r,fm7_cassette_printer_w,0xffff)
 	AM_RANGE(0xfd02,0xfd03) AM_READWRITE8(fm7_cassette_printer_r,fm7_irq_mask_w,0x00ff)  // IRQ mask
 	AM_RANGE(0xfd02,0xfd03) AM_READWRITE8(fm7_irq_cause_r,fm7_beeper_w,0xff00)  // IRQ flags
@@ -1620,12 +1620,12 @@ static ADDRESS_MAP_START( fm16_io, AS_IO, 16, fm7_state )
 //  AM_RANGE(0xfd40,0xfdff) AM_READ8(fm7_unknown_r,0xffff)
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( fm16_sub_mem, AS_PROGRAM, 8, fm7_state )
+ADDRESS_MAP_START(fm7_state::fm16_sub_mem)
 	AM_RANGE(0x0000,0xafff) AM_READWRITE(fm7_vram_r,fm7_vram_w) // VRAM
 	AM_RANGE(0xb000,0xffff) AM_ROM // subsystem ROM
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( fm77av_mem, AS_PROGRAM, 8, fm7_state )
+ADDRESS_MAP_START(fm7_state::fm77av_mem)
 	AM_RANGE(0x0000,0x0fff) AM_DEVREADWRITE("av_bank1", address_map_bank_device, read8, write8)
 	AM_RANGE(0x1000,0x1fff) AM_DEVREADWRITE("av_bank2", address_map_bank_device, read8, write8)
 	AM_RANGE(0x2000,0x2fff) AM_DEVREADWRITE("av_bank3", address_map_bank_device, read8, write8)
@@ -1680,7 +1680,7 @@ static ADDRESS_MAP_START( fm77av_mem, AS_PROGRAM, 8, fm7_state )
 	AM_RANGE(0xfff0,0xffff) AM_READWRITE(vector_r,vector_w)
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( fm77av_sub_mem, AS_PROGRAM, 8, fm7_state )
+ADDRESS_MAP_START(fm7_state::fm77av_sub_mem)
 	AM_RANGE(0x0000,0xbfff) AM_READWRITE(fm7_vram_r,fm7_vram_w) // VRAM
 	AM_RANGE(0xc000,0xcfff) AM_RAM AM_REGION("maincpu",0x1c000) // Console RAM
 	AM_RANGE(0xd000,0xd37f) AM_RAM AM_REGION("maincpu",0x1d000) // Work RAM
@@ -1702,7 +1702,7 @@ static ADDRESS_MAP_START( fm77av_sub_mem, AS_PROGRAM, 8, fm7_state )
 	AM_RANGE(0xe000,0xffff) AM_ROMBANK("bank21")
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( fm7_banked_mem, AS_PROGRAM, 8, fm7_state)
+ADDRESS_MAP_START(fm7_state::fm7_banked_mem)
 	// Extended RAM
 	AM_RANGE(0x00000,0x0ffff) AM_RAM AM_REGION("maincpu",0x00000)
 
@@ -2055,20 +2055,20 @@ MCFG_ADDRESS_MAP_BANK_DATA_WIDTH(8) \
 MCFG_ADDRESS_MAP_BANK_STRIDE(0x1000)
 
 
-static MACHINE_CONFIG_START( fm7 )
+MACHINE_CONFIG_START(fm7_state::fm7)
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", M6809, XTAL_2MHz)
+	MCFG_CPU_ADD("maincpu", MC6809, XTAL(16'128'000) / 2)
 	MCFG_CPU_PROGRAM_MAP(fm7_mem)
 	MCFG_CPU_IRQ_ACKNOWLEDGE_DRIVER(fm7_state,fm7_irq_ack)
 	MCFG_QUANTUM_PERFECT_CPU("maincpu")
 
-	MCFG_CPU_ADD("sub", M6809, XTAL_2MHz)
+	MCFG_CPU_ADD("sub", MC6809, XTAL(16'128'000) / 2)
 	MCFG_CPU_PROGRAM_MAP(fm7_sub_mem)
 	MCFG_CPU_IRQ_ACKNOWLEDGE_DRIVER(fm7_state,fm7_sub_irq_ack)
 	MCFG_QUANTUM_PERFECT_CPU("sub")
 
 	MCFG_SPEAKER_STANDARD_MONO("mono")
-	MCFG_SOUND_ADD("psg", AY8910, XTAL_4_9152MHz / 4)
+	MCFG_SOUND_ADD("psg", AY8910, XTAL(4'915'200) / 4)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS,"mono", 1.00)
 	MCFG_SOUND_ADD("beeper", BEEP, 1200)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS,"mono", 0.50)
@@ -2079,10 +2079,7 @@ static MACHINE_CONFIG_START( fm7 )
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
-	MCFG_SCREEN_REFRESH_RATE(60)
-	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500)) /* not accurate */
-	MCFG_SCREEN_SIZE(640, 200)
-	MCFG_SCREEN_VISIBLE_AREA(0, 640-1, 0, 200-1)
+	MCFG_SCREEN_RAW_PARAMS(XTAL(16'128'000), 1024, 0, 640, 262, 0, 200) // H = 15.75 KHz, V = 60.1145 Hz
 	MCFG_SCREEN_UPDATE_DRIVER(fm7_state, screen_update_fm7)
 
 	MCFG_PALETTE_ADD_3BIT_BRG("palette")
@@ -2094,7 +2091,7 @@ static MACHINE_CONFIG_START( fm7 )
 
 	MCFG_SOFTWARE_LIST_ADD("cass_list","fm7_cass")
 
-	MCFG_MB8877_ADD("fdc", XTAL_8MHz / 8)
+	MCFG_MB8877_ADD("fdc", XTAL(8'000'000) / 8)
 	MCFG_WD_FDC_INTRQ_CALLBACK(WRITELINE(fm7_state, fm7_fdc_intrq_w))
 	MCFG_WD_FDC_DRQ_CALLBACK(WRITELINE(fm7_state, fm7_fdc_drq_w))
 
@@ -2113,14 +2110,14 @@ static MACHINE_CONFIG_START( fm7 )
 	MCFG_CENTRONICS_OUTPUT_LATCH_ADD("cent_data_out", "centronics")
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_START( fm8 )
+MACHINE_CONFIG_START(fm7_state::fm8)
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", M6809, 1200000)  // 1.2MHz 68A09
+	MCFG_CPU_ADD("maincpu", MC6809, XTAL(4'915'200))  // 1.2MHz 68A09
 	MCFG_CPU_PROGRAM_MAP(fm8_mem)
 	MCFG_CPU_IRQ_ACKNOWLEDGE_DRIVER(fm7_state,fm7_irq_ack)
 	MCFG_QUANTUM_PERFECT_CPU("maincpu")
 
-	MCFG_CPU_ADD("sub", M6809, XTAL_1MHz)
+	MCFG_CPU_ADD("sub", MC6809, XTAL(16'128'000) / 2)
 	MCFG_CPU_PROGRAM_MAP(fm7_sub_mem)
 	MCFG_CPU_IRQ_ACKNOWLEDGE_DRIVER(fm7_state,fm7_sub_irq_ack)
 	MCFG_QUANTUM_PERFECT_CPU("sub")
@@ -2135,10 +2132,7 @@ static MACHINE_CONFIG_START( fm8 )
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
-	MCFG_SCREEN_REFRESH_RATE(60)
-	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500)) /* not accurate */
-	MCFG_SCREEN_SIZE(640, 200)
-	MCFG_SCREEN_VISIBLE_AREA(0, 640-1, 0, 200-1)
+	MCFG_SCREEN_RAW_PARAMS(XTAL(16'128'000), 1024, 0, 640, 262, 0, 200)
 	MCFG_SCREEN_UPDATE_DRIVER(fm7_state, screen_update_fm7)
 
 	MCFG_PALETTE_ADD_3BIT_BRG("palette")
@@ -2148,7 +2142,7 @@ static MACHINE_CONFIG_START( fm8 )
 	MCFG_CASSETTE_DEFAULT_STATE(CASSETTE_STOPPED | CASSETTE_MOTOR_DISABLED | CASSETTE_SPEAKER_ENABLED)
 	MCFG_CASSETTE_INTERFACE("fm7_cass")
 
-	MCFG_MB8877_ADD("fdc", XTAL_8MHz / 8)
+	MCFG_MB8877_ADD("fdc", XTAL(8'000'000) / 8)
 	MCFG_WD_FDC_INTRQ_CALLBACK(WRITELINE(fm7_state, fm7_fdc_intrq_w))
 	MCFG_WD_FDC_DRQ_CALLBACK(WRITELINE(fm7_state, fm7_fdc_drq_w))
 
@@ -2164,20 +2158,20 @@ static MACHINE_CONFIG_START( fm8 )
 	MCFG_CENTRONICS_OUTPUT_LATCH_ADD("cent_data_out", "centronics")
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_START( fm77av )
+MACHINE_CONFIG_START(fm7_state::fm77av)
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", M6809, XTAL_2MHz)  // actually MB68B09E, but the 6809E core runs too slowly
+	MCFG_CPU_ADD("maincpu", MC6809E, XTAL(16'128'000) / 8)
 	MCFG_CPU_PROGRAM_MAP(fm77av_mem)
 	MCFG_CPU_IRQ_ACKNOWLEDGE_DRIVER(fm7_state,fm7_irq_ack)
 	MCFG_QUANTUM_PERFECT_CPU("maincpu")
 
-	MCFG_CPU_ADD("sub", M6809, XTAL_2MHz)
+	MCFG_CPU_ADD("sub", MC6809E, XTAL(16'128'000) / 8)
 	MCFG_CPU_PROGRAM_MAP(fm77av_sub_mem)
 	MCFG_CPU_IRQ_ACKNOWLEDGE_DRIVER(fm7_state,fm7_sub_irq_ack)
 	MCFG_QUANTUM_PERFECT_CPU("sub")
 
 	MCFG_SPEAKER_STANDARD_MONO("mono")
-	MCFG_SOUND_ADD("ym", YM2203, XTAL_4_9152MHz / 4)
+	MCFG_SOUND_ADD("ym", YM2203, XTAL(4'915'200) / 4)
 	MCFG_YM2203_IRQ_HANDLER(WRITELINE(fm7_state, fm77av_fmirq))
 	MCFG_AY8910_PORT_A_READ_CB(READ8(fm7_state, fm77av_joy_1_r))
 	MCFG_AY8910_PORT_B_READ_CB(READ8(fm7_state, fm77av_joy_2_r))
@@ -2208,10 +2202,7 @@ static MACHINE_CONFIG_START( fm77av )
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
-	MCFG_SCREEN_REFRESH_RATE(60)
-	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500)) /* not accurate */
-	MCFG_SCREEN_SIZE(640, 200)
-	MCFG_SCREEN_VISIBLE_AREA(0, 640-1, 0, 200-1)
+	MCFG_SCREEN_RAW_PARAMS(XTAL(16'128'000), 1024, 0, 640, 262, 0, 200)
 	MCFG_SCREEN_UPDATE_DRIVER(fm7_state, screen_update_fm7)
 
 	MCFG_PALETTE_ADD_3BIT_BRG("palette")
@@ -2224,7 +2215,7 @@ static MACHINE_CONFIG_START( fm77av )
 
 	MCFG_SOFTWARE_LIST_COMPATIBLE_ADD("cass_list", "fm7_cass")
 
-	MCFG_MB8877_ADD("fdc", XTAL_8MHz / 8)
+	MCFG_MB8877_ADD("fdc", XTAL(8'000'000) / 8)
 	MCFG_WD_FDC_INTRQ_CALLBACK(WRITELINE(fm7_state, fm7_fdc_intrq_w))
 	MCFG_WD_FDC_DRQ_CALLBACK(WRITELINE(fm7_state, fm7_fdc_drq_w))
 
@@ -2243,19 +2234,19 @@ static MACHINE_CONFIG_START( fm77av )
 	MCFG_CENTRONICS_OUTPUT_LATCH_ADD("cent_data_out", "centronics")
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_START( fm11 )
+MACHINE_CONFIG_START(fm7_state::fm11)
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", M6809, XTAL_2MHz)  // 2MHz 68B09E
+	MCFG_CPU_ADD("maincpu", MC6809E, 2000000)  // 2MHz 68B09E
 	MCFG_CPU_PROGRAM_MAP(fm11_mem)
 	MCFG_CPU_IRQ_ACKNOWLEDGE_DRIVER(fm7_state,fm7_irq_ack)
 	MCFG_QUANTUM_PERFECT_CPU("maincpu")
 
-	MCFG_CPU_ADD("sub", M6809, XTAL_2MHz)  // 2MHz 68B09
+	MCFG_CPU_ADD("sub", MC6809, 8000000)  // 2MHz 68B09
 	MCFG_CPU_PROGRAM_MAP(fm11_sub_mem)
 	MCFG_CPU_IRQ_ACKNOWLEDGE_DRIVER(fm7_state,fm7_sub_irq_ack)
 	MCFG_QUANTUM_PERFECT_CPU("sub")
 
-	MCFG_CPU_ADD("x86", I8088, XTAL_8MHz)  // 8MHz i8088
+	MCFG_CPU_ADD("x86", I8088, 8000000)  // 8MHz i8088
 	MCFG_CPU_PROGRAM_MAP(fm11_x86_mem)
 	MCFG_CPU_IO_MAP(fm11_x86_io)
 
@@ -2286,10 +2277,7 @@ static MACHINE_CONFIG_START( fm11 )
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
-	MCFG_SCREEN_REFRESH_RATE(60)
-	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500)) /* not accurate */
-	MCFG_SCREEN_SIZE(640, 200)
-	MCFG_SCREEN_VISIBLE_AREA(0, 640-1, 0, 200-1)
+	MCFG_SCREEN_RAW_PARAMS(16128000, 1024, 0, 640, 262, 0, 200)
 	MCFG_SCREEN_UPDATE_DRIVER(fm7_state, screen_update_fm7)
 
 	MCFG_PALETTE_ADD_3BIT_BRG("palette")
@@ -2299,7 +2287,7 @@ static MACHINE_CONFIG_START( fm11 )
 	MCFG_CASSETTE_DEFAULT_STATE(CASSETTE_STOPPED | CASSETTE_MOTOR_DISABLED | CASSETTE_SPEAKER_ENABLED)
 	MCFG_CASSETTE_INTERFACE("fm7_cass")
 
-	MCFG_MB8877_ADD("fdc", XTAL_8MHz / 8)
+	MCFG_MB8877_ADD("fdc", XTAL(8'000'000) / 8)
 	MCFG_WD_FDC_INTRQ_CALLBACK(WRITELINE(fm7_state, fm7_fdc_intrq_w))
 	MCFG_WD_FDC_DRQ_CALLBACK(WRITELINE(fm7_state, fm7_fdc_drq_w))
 
@@ -2315,14 +2303,14 @@ static MACHINE_CONFIG_START( fm11 )
 	MCFG_CENTRONICS_OUTPUT_LATCH_ADD("cent_data_out", "centronics")
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_START( fm16beta )
+MACHINE_CONFIG_START(fm7_state::fm16beta)
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", I8086, XTAL_8MHz)  // 8MHz i8086
+	MCFG_CPU_ADD("maincpu", I8086, 8000000)  // 8MHz i8086
 	MCFG_CPU_PROGRAM_MAP(fm16_mem)
 	MCFG_CPU_IO_MAP(fm16_io)
 	MCFG_QUANTUM_PERFECT_CPU("maincpu")
 
-	MCFG_CPU_ADD("sub", M6809, XTAL_2MHz)
+	MCFG_CPU_ADD("sub", MC6809, 8000000)
 	MCFG_CPU_IRQ_ACKNOWLEDGE_DRIVER(fm7_state,fm7_sub_irq_ack)
 	MCFG_CPU_PROGRAM_MAP(fm16_sub_mem)
 	MCFG_QUANTUM_PERFECT_CPU("sub")
@@ -2337,10 +2325,7 @@ static MACHINE_CONFIG_START( fm16beta )
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
-	MCFG_SCREEN_REFRESH_RATE(60)
-	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500)) /* not accurate */
-	MCFG_SCREEN_SIZE(640, 200)
-	MCFG_SCREEN_VISIBLE_AREA(0, 640-1, 0, 200-1)
+	MCFG_SCREEN_RAW_PARAMS(16128000, 1024, 0, 640, 262, 0, 200)
 	MCFG_SCREEN_UPDATE_DRIVER(fm7_state, screen_update_fm7)
 
 	MCFG_PALETTE_ADD_3BIT_BRG("palette")
@@ -2350,7 +2335,7 @@ static MACHINE_CONFIG_START( fm16beta )
 	MCFG_CASSETTE_DEFAULT_STATE(CASSETTE_STOPPED | CASSETTE_MOTOR_DISABLED | CASSETTE_SPEAKER_ENABLED)
 	MCFG_CASSETTE_INTERFACE("fm7_cass")
 
-	MCFG_MB8877_ADD("fdc", XTAL_8MHz / 8)
+	MCFG_MB8877_ADD("fdc", XTAL(8'000'000) / 8)
 	MCFG_WD_FDC_INTRQ_CALLBACK(WRITELINE(fm7_state, fm7_fdc_intrq_w))
 	MCFG_WD_FDC_DRQ_CALLBACK(WRITELINE(fm7_state, fm7_fdc_drq_w))
 
