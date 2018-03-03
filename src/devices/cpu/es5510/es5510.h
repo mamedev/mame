@@ -14,10 +14,9 @@
 
 class es5510_device : public cpu_device {
 public:
-	// TODO : Not verified
+	// TODO : Not verified, Most of games are using 128KB DRAM.
 	static constexpr uint32_t DRAM_SIZE = (1<<20);
 	static constexpr uint32_t DRAM_MASK = (DRAM_SIZE-1);
-	static constexpr feature_type imperfect_features() { return feature::SOUND; }
 
 	es5510_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
