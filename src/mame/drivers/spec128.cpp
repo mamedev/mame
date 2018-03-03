@@ -228,7 +228,7 @@ void spectrum_state::spectrum_128_update_memory()
 
 READ8_MEMBER( spectrum_state::spectrum_128_ula_r )
 {
-	int vpos = machine().first_screen()->vpos();
+	int vpos = m_screen->vpos();
 
 	return vpos<193 ? m_screen_location[0x1800|(vpos&0xf8)<<2]:0xff;
 }

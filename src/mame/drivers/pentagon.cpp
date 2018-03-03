@@ -242,10 +242,10 @@ VIDEO_START_MEMBER(pentagon_state,pentagon)
 
 	m_previous_border_x = 0;
 	m_previous_border_y = 0;
-	machine().first_screen()->register_screen_bitmap(m_border_bitmap);
+	m_screen->register_screen_bitmap(m_border_bitmap);
 	m_previous_screen_x = 0;
 	m_previous_screen_y = 0;
-	machine().first_screen()->register_screen_bitmap(m_screen_bitmap);
+	m_screen->register_screen_bitmap(m_screen_bitmap);
 
 	m_screen_location = m_ram->pointer() + (5 << 14);
 }
