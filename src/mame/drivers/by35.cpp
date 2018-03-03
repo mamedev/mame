@@ -143,6 +143,7 @@ protected:
 	DECLARE_READ_LINE_MEMBER(u11_cb1_r);
 	DECLARE_WRITE_LINE_MEMBER(u11_ca2_w);
 	DECLARE_WRITE_LINE_MEMBER(u11_cb2_w);
+	virtual void machine_start() override;
 	virtual void machine_reset() override;
 	TIMER_DEVICE_CALLBACK_MEMBER(timer_z_freq);
 	TIMER_DEVICE_CALLBACK_MEMBER(timer_z_pulse);
@@ -1009,6 +1010,14 @@ by35_state::solenoid_feature_data const playboy_state::s_solenoid_features_playb
 /*19*/  { 0xff, 0xff, 0xff,  0x00 }
 };
 
+
+void by35_state::machine_start()
+{
+	genpin_class::machine_start();
+
+	m_lamps.resolve();
+	m_solenoids.resolve();
+}
 
 void by35_state::machine_reset()
 {
