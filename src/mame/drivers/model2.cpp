@@ -1436,9 +1436,9 @@ ADDRESS_MAP_START(model2_state::model2_base_mem)
 	AM_RANGE(0x00f00000, 0x00f0000f) AM_READWRITE(timers_r, timers_w)
 
 	AM_RANGE(0x01000000, 0x0100ffff) AM_DEVREADWRITE16("tile", segas24_tile_device, tile_r, tile_w,0xffffffff) AM_MIRROR(0x110000)
-	AM_RANGE(0x01020000, 0x01020003) AM_WRITENOP AM_MIRROR(0x100000)        // Unknown, always 0
-	AM_RANGE(0x01040000, 0x01040003) AM_WRITENOP AM_MIRROR(0x100000)        // Horizontal synchronization register
-	AM_RANGE(0x01060000, 0x01060003) AM_WRITENOP AM_MIRROR(0x100000)        // Vertical synchronization register
+	AM_RANGE(0x01020000, 0x01020003) AM_WRITENOP AM_MIRROR(0x100000)        // ABSEL, always 0
+	AM_RANGE(0x01040000, 0x01040003) AM_DEVWRITE16("tile", segas24_tile_device, xhout_w, 0x0000ffff) AM_MIRROR(0x100000) // Horizontal synchronization register
+	AM_RANGE(0x01060000, 0x01060003) AM_DEVWRITE16("tile", segas24_tile_device, xvout_w, 0x0000ffff) AM_MIRROR(0x100000) // Vertical synchronization register
 	AM_RANGE(0x01070000, 0x01070003) AM_WRITENOP AM_MIRROR(0x100000)        // Video synchronization switch
 	AM_RANGE(0x01080000, 0x010fffff) AM_DEVREADWRITE16("tile", segas24_tile_device, char_r, char_w,0xffffffff) AM_MIRROR(0x100000)
 
@@ -2256,7 +2256,9 @@ MACHINE_CONFIG_END
 MACHINE_CONFIG_START(model2_state::model2_screen)
 	MCFG_S24TILE_DEVICE_ADD("tile", 0x3fff)
 	MCFG_S24TILE_DEVICE_PALETTE("palette")
-
+	MCFG_S24TILE_XHOUT_CALLBACK(WRITE16(model2_state, horizontal_sync_w))
+	MCFG_S24TILE_XVOUT_CALLBACK(WRITE16(model2_state, vertical_sync_w))
+	
 	MCFG_SCREEN_ADD("screen", RASTER)
 	MCFG_SCREEN_VIDEO_ATTRIBUTES(VIDEO_UPDATE_AFTER_VBLANK)
 	// TODO: from System 24, might not be accurate for Model 2
