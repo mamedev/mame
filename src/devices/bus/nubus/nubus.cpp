@@ -273,38 +273,52 @@ void device_nubus_card_interface::static_set_nubus_tag(device_t &device, const c
 	nubus_card.m_nubus_slottag = slottag;
 }
 
-void device_nubus_card_interface::set_nubus_device()
+void device_nubus_card_interface::interface_pre_start()
 {
-	if (!strncmp(m_nubus_slottag, "pds030", 6))
+	if (!m_nubus)
 	{
-		m_slot = 0x9;   // '030 PDS slots phantom slot as NuBus slots $9, $A, and $B
-	}
-	else if (!strncmp(m_nubus_slottag, "lcpds", 6))
-	{
-		m_slot = 0xe;   // LC PDS slots phantom slot as NuBus slot $E
-	}
-	else
-	{
-		// extract the slot number from the last digit of the slot tag
-		int tlen = strlen(m_nubus_slottag);
-
-		if (m_nubus_slottag[tlen-1] == '9')
+		if (!strncmp(m_nubus_slottag, "pds030", 6))
 		{
-			m_slot = (m_nubus_slottag[tlen-1] - '9') + 9;
+			m_slot = 0x9;   // '030 PDS slots phantom slot as NuBus slots $9, $A, and $B
+		}
+		else if (!strncmp(m_nubus_slottag, "lcpds", 6))
+		{
+			m_slot = 0xe;   // LC PDS slots phantom slot as NuBus slot $E
 		}
 		else
 		{
-			m_slot = (m_nubus_slottag[tlen-1] - 'a') + 0xa;
+			// extract the slot number from the last digit of the slot tag
+			int tlen = strlen(m_nubus_slottag);
+
+			if (m_nubus_slottag[tlen-1] == '9')
+			{
+				m_slot = (m_nubus_slottag[tlen-1] - '9') + 9;
+			}
+			else
+			{
+				m_slot = (m_nubus_slottag[tlen-1] - 'a') + 0xa;
+			}
 		}
-	}
 
-	if (m_slot < 9 || m_slot > 0xe)
-	{
-		fatalerror("Slot %x out of range for Apple NuBus\n", m_slot);
-	}
+		if (m_slot < 9 || m_slot > 0xe)
+		{
+			fatalerror("Slot %x out of range for Apple NuBus\n", m_slot);
+		}
 
-	m_nubus = dynamic_cast<nubus_device *>(device().machine().device(m_nubus_tag));
-	m_nubus->add_nubus_card(this);
+		device_t *const bus = device().machine().device(m_nubus_tag);
+		if (!bus)
+		{
+			fatalerror("Can't find NuBus device %s\n", m_nubus_tag);
+		}
+
+		m_nubus = dynamic_cast<nubus_device *>(bus);
+		if (!m_nubus)
+		{
+			fatalerror("Device %s (%s) is not an instance of nubus_device\n", bus->tag(), bus->name());
+		}
+
+		nubus().add_nubus_card(this);
+	}
 }
 
 void device_nubus_card_interface::install_bank(offs_t start, offs_t end, const char *tag, uint8_t *data)
@@ -316,7 +330,7 @@ void device_nubus_card_interface::install_bank(offs_t start, offs_t end, const c
 	strcat(bank, "_");
 	strcat(bank, m_nubus_slottag);
 
-	m_nubus->install_bank(start, end, bank, data);
+	nubus().install_bank(start, end, bank, data);
 }
 
 void device_nubus_card_interface::install_declaration_rom(device_t *dev, const char *romregion, bool mirror_all_mb, bool reverse_rom)
@@ -464,12 +478,12 @@ void device_nubus_card_interface::install_declaration_rom(device_t *dev, const c
 	{
 		uint32_t off = 0;
 		while(off < 0x1000000) {
-			m_nubus->install_bank(addr + off, addr+off+romlen-1, bankname, &m_declaration_rom[0]);
+			nubus().install_bank(addr + off, addr+off+romlen-1, bankname, &m_declaration_rom[0]);
 			off += romlen;
 		}
 	}
 	else
 	{
-		m_nubus->install_bank(addr, addr+romlen-1, bankname, &m_declaration_rom[0]);
+		nubus().install_bank(addr, addr+romlen-1, bankname, &m_declaration_rom[0]);
 	}
 }

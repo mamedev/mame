@@ -161,21 +161,24 @@ public:
 	uint32_t get_slotspace() { return 0xf0000000 | (m_slot<<24); }
 	uint32_t get_super_slotspace() { return m_slot<<28; }
 
-	void raise_slot_irq() { m_nubus->set_irq_line(m_slot, ASSERT_LINE); }
-	void lower_slot_irq() { m_nubus->set_irq_line(m_slot, CLEAR_LINE); }
+	void raise_slot_irq() { nubus().set_irq_line(m_slot, ASSERT_LINE); }
+	void lower_slot_irq() { nubus().set_irq_line(m_slot, CLEAR_LINE); }
 
 	// inline configuration
 	static void static_set_nubus_tag(device_t &device, const char *tag, const char *slottag);
 
 protected:
 	device_nubus_card_interface(const machine_config &mconfig, device_t &device);
+	virtual void interface_pre_start() override;
 
+	int slotno() const { assert(m_nubus); return m_slot; }
+	nubus_device &nubus() { assert(m_nubus); return *m_nubus; }
+
+private:
 	nubus_device  *m_nubus;
 	const char *m_nubus_tag, *m_nubus_slottag;
 	int m_slot;
 	std::vector<uint8_t> m_declaration_rom;
-
-private:
 	device_nubus_card_interface *m_next;
 };
 
