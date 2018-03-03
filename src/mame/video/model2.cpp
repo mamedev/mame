@@ -157,7 +157,7 @@ static inline void vector_cross3( poly_vertex *dst, poly_vertex *v0, poly_vertex
 }
 
 /* 1.8.23 float to 4.12 float converter, courtesy of Aaron Giles */
-static uint16_t float_to_zval( float floatval )
+inline uint16_t model2_state::float_to_zval( float floatval )
 {
 	int32_t fpint = f2u(floatval);
 	int32_t exponent = ((fpint >> 23) & 0xff) - 127;
@@ -327,7 +327,7 @@ READ32_MEMBER(model2_state::polygon_count_r)
  *  Hardware 3D Rasterizer Processing
  *
  *******************************************/
-
+ 
 void model2_state::model2_3d_process_quad( raster_state *raster, uint32_t attr )
 {
 	quad_m2     object;
@@ -438,20 +438,24 @@ void model2_state::model2_3d_process_quad( raster_state *raster, uint32_t attr )
 	/* set the object's z value */
 	zvalue = raster->triangle_z;
 
-	/* see if we need to recompute min/max z */
-	if ( (attr >> 10) & 3 )
+	/* set the object's z value */
+	switch((attr >> 10) & 3)
 	{
-		if ( (attr >> 10) & 1 ) /* min value */
-		{
+		case 0: // old value
+			zvalue = raster->triangle_z;
+			break;
+		case 1: // min z
 			zvalue = min_z;
-		}
-		else if ( (attr >> 10) & 2 ) /* max value */
-		{
+			break;
+		case 2: // max z
 			zvalue = max_z;
-		}
-
-		raster->triangle_z = zvalue;
+			break;
+		case 3: // error
+			zvalue = 0.0f;
+			break;
 	}
+
+	raster->triangle_z = zvalue;
 
 	if ( cull == 0 )
 	{
@@ -672,23 +676,24 @@ void model2_state::model2_3d_process_triangle( raster_state *raster, uint32_t at
 		cull = 1;
 
 	/* set the object's z value */
-	zvalue = raster->triangle_z;
-
-	/* see if we need to recompute min/max z */
-	if ( (attr >> 10) & 3 )
+	switch((attr >> 10) & 3)
 	{
-		if ( (attr >> 10) & 1 ) /* min value */
-		{
+		case 0: // old value
+			zvalue = raster->triangle_z;
+			break;
+		case 1: // min z
 			zvalue = min_z;
-		}
-		else if ( (attr >> 10) & 2 ) /* max value */
-		{
+			break;
+		case 2: // max z
 			zvalue = max_z;
-		}
-
-		raster->triangle_z = zvalue;
+			break;
+		case 3: // error
+			zvalue = 0.0f;
+			break;
 	}
 
+	raster->triangle_z = zvalue;
+	
 	/* if we're not culling, do z-clip and add to out triangle list */
 	if ( cull == 0 )
 	{
@@ -1160,7 +1165,7 @@ void model2_state::model2_3d_push( raster_state *raster, uint32_t input )
 			raster->center_sel = ( input >> 6 ) & 3;
 
 			/* reset the triangle z value */
-			raster->triangle_z = 0;
+			raster->triangle_z = 0.0f;
 		}
 	}
 }

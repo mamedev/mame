@@ -318,6 +318,8 @@ private:
 
 	// inliners
 	inline void model2_3d_project( triangle *tri );
+	inline uint16_t float_to_zval( float floatval );
+
 };
 
 /*****************************
