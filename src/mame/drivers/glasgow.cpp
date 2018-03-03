@@ -59,8 +59,13 @@ public:
 		, m_maincpu(*this, "maincpu")
 		, m_beep(*this, "beeper")
 		, m_keyboard(*this, "LINE.%u", 0)
-		{ }
+	{ }
 
+	void glasgow(machine_config &config);
+	void amsterd(machine_config &config);
+	void dallas32(machine_config &config);
+
+protected:
 	DECLARE_WRITE16_MEMBER(glasgow_lcd_w);
 	DECLARE_WRITE16_MEMBER(glasgow_lcd_flag_w);
 	DECLARE_READ16_MEMBER(glasgow_keys_r);
@@ -88,12 +93,10 @@ public:
 	DECLARE_MACHINE_START(glasgow);
 	DECLARE_MACHINE_RESET(glasgow);
 
-	void glasgow(machine_config &config);
-	void dallas32(machine_config &config);
-	void amsterd(machine_config &config);
 	void amsterd_mem(address_map &map);
 	void dallas32_mem(address_map &map);
 	void glasgow_mem(address_map &map);
+
 private:
 	uint8_t m_lcd_shift_counter;
 	uint8_t m_led7;
@@ -117,15 +120,15 @@ private:
 	required_ioport_array<8> m_keyboard;
 };
 
-typedef struct
-	{
+struct BOARD_FIELD // FIXME: global structure
+{
 	uint8_t field;
 	uint8_t piece;
-	} BOARD_FIELD;
+};
 
-BOARD_FIELD l_board[8][8];
+BOARD_FIELD l_board[8][8]; // FIXME: mutable global state
 
-	/* starts at bottom left corner */
+/* starts at bottom left corner */
 const BOARD_FIELD l_start_board[8][8] =
 {
 	{ {7,10}, {6,8}, {5,9}, {4,11}, {3,12}, {2,9}, {1,8}, {0,10} },
@@ -730,6 +733,7 @@ MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(glasgow_state::amsterd)
 	glasgow(config);
+
 	/* basic machine hardware */
 	MCFG_CPU_MODIFY("maincpu")
 	MCFG_CPU_PROGRAM_MAP(amsterd_mem)
@@ -737,10 +741,11 @@ MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(glasgow_state::dallas32)
 	glasgow(config);
+
 	/* basic machine hardware */
 	MCFG_CPU_REPLACE("maincpu", M68020, 14000000)
 	MCFG_CPU_PROGRAM_MAP(dallas32_mem)
-	MCFG_MACHINE_START_OVERRIDE(glasgow_state, dallas32 )
+	MCFG_MACHINE_START_OVERRIDE(glasgow_state, dallas32)
 
 	MCFG_DEVICE_REMOVE("nmi_timer")
 	MCFG_TIMER_DRIVER_ADD_PERIODIC("nmi_timer", glasgow_state, update_nmi32, attotime::from_hz(50))
