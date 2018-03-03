@@ -426,7 +426,6 @@ void mcatadv_state::machine_start()
 	m_soundbank->configure_entries(0, max, memregion("soundcpu")->base(), 0x4000);
 	m_soundbank->set_entry(1);
 
-
 	save_item(NAME(m_palette_bank));
 }
 
@@ -461,18 +460,18 @@ MACHINE_CONFIG_START(mcatadv_state::mcatadv)
 
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
+	MCFG_SPEAKER_STANDARD_MONO("mono")
 
 	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
 	MCFG_GENERIC_LATCH_DATA_PENDING_CB(INPUTLINE("audiocpu", INPUT_LINE_NMI))
+
 	MCFG_GENERIC_LATCH_8_ADD("soundlatch2")
 
 	MCFG_SOUND_ADD("ymsnd", YM2610, XTAL(16'000'000)/2) /* verified on pcb */
 	MCFG_YM2610_IRQ_HANDLER(INPUTLINE("soundcpu", 0))
-	MCFG_SOUND_ROUTE(0, "lspeaker",  0.32)
-	MCFG_SOUND_ROUTE(0, "rspeaker", 0.32)
-	MCFG_SOUND_ROUTE(1, "lspeaker",  0.5)
-	MCFG_SOUND_ROUTE(2, "rspeaker", 0.5)
+	MCFG_SOUND_ROUTE(0, "mono", 0.32)
+	MCFG_SOUND_ROUTE(1, "mono", 0.5)
+	MCFG_SOUND_ROUTE(2, "mono", 0.5)
 MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(mcatadv_state::nost)
@@ -482,14 +481,11 @@ MACHINE_CONFIG_START(mcatadv_state::nost)
 	MCFG_CPU_PROGRAM_MAP(nost_sound_map)
 	MCFG_CPU_IO_MAP(nost_sound_io_map)
 
-	MCFG_DEVICE_REMOVE("lspeaker")
-	MCFG_DEVICE_REMOVE("rspeaker")
-	MCFG_SPEAKER_STANDARD_MONO("mono")
 	MCFG_SOUND_REPLACE("ymsnd", YM2610, XTAL(16'000'000)/2) /* verified on pcb */
-		MCFG_YM2610_IRQ_HANDLER(INPUTLINE("soundcpu", 0))
-		MCFG_SOUND_ROUTE(0, "mono", 0.2)
-		MCFG_SOUND_ROUTE(1, "mono", 0.5)
-		MCFG_SOUND_ROUTE(2, "mono", 0.5)
+	MCFG_YM2610_IRQ_HANDLER(INPUTLINE("soundcpu", 0))
+	MCFG_SOUND_ROUTE(0, "mono", 0.2)
+	MCFG_SOUND_ROUTE(1, "mono", 0.5)
+	MCFG_SOUND_ROUTE(2, "mono", 0.5)
 MACHINE_CONFIG_END
 
 

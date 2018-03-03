@@ -114,7 +114,6 @@ void mcatadv_state::draw_sprites( screen_device &screen, bitmap_ind16 &bitmap, c
 						{
 							int pridata = priline[drawxpos];
 
-
 							if (!(pridata & 0x10)) // if we haven't already drawn a sprite pixel here (sprite masking)
 							{
 								pix = m_sprdata[(offset / 2)&sprmask];
@@ -133,7 +132,6 @@ void mcatadv_state::draw_sprites( screen_device &screen, bitmap_ind16 &bitmap, c
 
 							}
 						}
-
 						offset++;
 					}
 				}
