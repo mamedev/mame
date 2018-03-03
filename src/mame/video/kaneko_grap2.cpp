@@ -48,7 +48,7 @@ MACHINE_CONFIG_END
 void kaneko_grap2_device::device_start()
 {
 	m_framebuffer = make_unique_clear<uint16_t[]>(0x80000/2);
-	m_framebuffer_palette = make_unique_clear<uint16_t[]>(0x101);
+	m_framebuffer_palette = make_unique_clear<uint16_t[]>(0x101); // 0x00-0xff is internal palette, 0x100 is background colour
 	m_framebuffer_unk1 = make_unique_clear<uint16_t[]>(0x400/2);
 	m_framebuffer_unk2 = make_unique_clear<uint16_t[]>(0x400/2);
 
