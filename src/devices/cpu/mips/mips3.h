@@ -238,13 +238,13 @@ struct compiler_state
 #define MIPS3_MAX_TLB_ENTRIES       48
 
 #define MCFG_MIPS3_ICACHE_SIZE(_size) \
-	mips3_device::set_icache_size(*device, _size);
+	downcast<mips3_device &>(*device).set_icache_size(_size);
 
 #define MCFG_MIPS3_DCACHE_SIZE(_size) \
-	mips3_device::set_dcache_size(*device, _size);
+	downcast<mips3_device &>(*device).set_dcache_size(_size);
 
 #define MCFG_MIPS3_SYSTEM_CLOCK(_clock) \
-	mips3_device::set_system_clock(*device, _clock);
+	downcast<mips3_device &>(*device).set_system_clock(_clock);
 
 
 class mips3_frontend;
@@ -277,9 +277,9 @@ public:
 	// construction/destruction
 	mips3_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock, mips3_flavor flavor, endianness_t endiannes);
 
-	static void set_icache_size(device_t &device, size_t icache_size) { downcast<mips3_device &>(device).c_icache_size = icache_size; }
-	static void set_dcache_size(device_t &device, size_t dcache_size) { downcast<mips3_device &>(device).c_dcache_size = dcache_size; }
-	static void set_system_clock(device_t &device, uint32_t system_clock) { downcast<mips3_device &>(device).c_system_clock = system_clock; }
+	void set_icache_size(size_t icache_size) { c_icache_size = icache_size; }
+	void set_dcache_size(size_t dcache_size) { c_dcache_size = dcache_size; }
+	void set_system_clock(uint32_t system_clock) { c_system_clock = system_clock; }
 
 	TIMER_CALLBACK_MEMBER(compare_int_callback);
 

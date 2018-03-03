@@ -496,12 +496,6 @@ ioport_constructor ibm5160_mb_device::device_input_ports() const
 }
 
 
-void ibm5160_mb_device::static_set_cputag(device_t &device, const char *tag)
-{
-	ibm5160_mb_device &board = downcast<ibm5160_mb_device &>(device);
-	board.m_maincpu.set_tag(tag);
-}
-
 //**************************************************************************
 //  LIVE DEVICE
 //**************************************************************************

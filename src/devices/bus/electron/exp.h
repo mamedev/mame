@@ -111,10 +111,10 @@ AC RETURNS (pins 3,4) - adaptor. A total of 6W may be drawn from these lines as 
 	MCFG_ELECTRON_EXPANSION_SLOT_NMI_HANDLER(DEVWRITELINE(DEVICE_SELF_OWNER, electron_expansion_slot_device, nmi_w))
 
 #define MCFG_ELECTRON_EXPANSION_SLOT_IRQ_HANDLER(_devcb) \
-	devcb = &electron_expansion_slot_device::set_irq_handler(*device, DEVCB_##_devcb);
+	devcb = &downcast<electron_expansion_slot_device &>(*device).set_irq_handler(DEVCB_##_devcb);
 
 #define MCFG_ELECTRON_EXPANSION_SLOT_NMI_HANDLER(_devcb) \
-	devcb = &electron_expansion_slot_device::set_nmi_handler(*device, DEVCB_##_devcb);
+	devcb = &downcast<electron_expansion_slot_device &>(*device).set_nmi_handler(DEVCB_##_devcb);
 
 
 //**************************************************************************
@@ -133,11 +133,8 @@ public:
 	virtual ~electron_expansion_slot_device();
 
 	// callbacks
-	template <class Object> static devcb_base &set_irq_handler(device_t &device, Object &&cb)
-	{ return downcast<electron_expansion_slot_device &>(device).m_irq_handler.set_callback(std::forward<Object>(cb)); }
-
-	template <class Object> static devcb_base &set_nmi_handler(device_t &device, Object &&cb)
-	{ return downcast<electron_expansion_slot_device &>(device).m_nmi_handler.set_callback(std::forward<Object>(cb)); }
+	template <class Object> devcb_base &set_irq_handler(Object &&cb) { return m_irq_handler.set_callback(std::forward<Object>(cb)); }
+	template <class Object> devcb_base &set_nmi_handler(Object &&cb) { return m_nmi_handler.set_callback(std::forward<Object>(cb)); }
 
 	uint8_t expbus_r(address_space &space, offs_t offset, uint8_t data);
 	void expbus_w(address_space &space, offs_t offset, uint8_t data);

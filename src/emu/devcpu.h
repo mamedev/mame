@@ -45,7 +45,7 @@
 
 // recompilation parameters
 #define MCFG_CPU_FORCE_NO_DRC() \
-	cpu_device::static_set_force_no_drc(*device, true);
+	dynamic_cast<cpu_device &>(*device).set_force_no_drc(true);
 
 
 
@@ -63,7 +63,7 @@ class cpu_device :  public device_t,
 {
 public:
 	// configuration helpers
-	static void static_set_force_no_drc(device_t &device, bool value);
+	void set_force_no_drc(bool value) { m_force_no_drc = value; }
 	bool allow_drc() const;
 
 protected:

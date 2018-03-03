@@ -23,10 +23,10 @@
 
 
 #define MCFG_CCPU_EXTERNAL_FUNC(_devcb) \
-	ccpu_cpu_device::set_external_func(*device, DEVCB_##_devcb);
+	downcast<ccpu_cpu_device &>(*device).set_external_func(DEVCB_##_devcb);
 
 #define MCFG_CCPU_VECTOR_FUNC(d) \
-	ccpu_cpu_device::set_vector_func(*device, d);
+	downcast<ccpu_cpu_device &>(*device).set_vector_func(d);
 
 
 class ccpu_cpu_device : public cpu_device
@@ -53,9 +53,9 @@ public:
 	// construction/destruction
 	ccpu_cpu_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
-	// static configuration helpers
-	template <class Object> static devcb_base &set_external_func(device_t &device, Object &&cb) { return downcast<ccpu_cpu_device &>(device).m_external_input.set_callback(std::forward<Object>(cb)); }
-	static void set_vector_func(device_t &device, vector_delegate callback) { downcast<ccpu_cpu_device &>(device).m_vector_callback = callback; }
+	// configuration helpers
+	template <class Object> devcb_base &set_external_func(Object &&cb) { return m_external_input.set_callback(std::forward<Object>(cb)); }
+	template <typename Object> void set_vector_func(Object &&cb) { m_vector_callback = std::forward<Object>(cb); }
 
 	DECLARE_READ8_MEMBER( read_jmi );
 	void wdt_timer_trigger();

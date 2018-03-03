@@ -7,19 +7,19 @@
 
 
 #define MCFG_LR35902_TIMER_CB(_devcb) \
-	devcb = &lr35902_cpu_device::set_timer_cb(*device, DEVCB_##_devcb);
+	devcb = &downcast<lr35902_cpu_device &>(*device).set_timer_cb(DEVCB_##_devcb);
 
 // The first release of this CPU has a bug where the programcounter
 // is not incremented properly after an interrupt after the halt opcode.
 // This was fixed in a newer revision.
 #define MCFG_LR35902_HALT_BUG \
-	lr35902_cpu_device::set_halt_bug(*device);
+	downcast<lr35902_cpu_device &>(*device).set_halt_bug(true);
 
 // The GameBoy has a bug where OAM data gets corrupted if you inc/dec
 // a 16-bit register in the $fe** region.
 // note: oldval is in hiword, newval is in loword
 #define MCFG_LR35902_INCDEC16_CB(_devcb) \
-	devcb = &lr35902_cpu_device::set_incdec16_cb(*device, DEVCB_##_devcb);
+	devcb = &downcast<lr35902_cpu_device &>(*device).set_incdec16_cb(DEVCB_##_devcb);
 
 
 enum
@@ -39,10 +39,10 @@ public:
 	// construction/destruction
 	lr35902_cpu_device(const machine_config &mconfig, const char *_tag, device_t *_owner, uint32_t _clock);
 
-	// static configuration helpers
-	template<class _Object> static devcb_base &set_timer_cb(device_t &device, _Object object) { return downcast<lr35902_cpu_device &>(device).m_timer_func.set_callback(object); }
-	template<class _Object> static devcb_base &set_incdec16_cb(device_t &device, _Object object) { return downcast<lr35902_cpu_device &>(device).m_incdec16_func.set_callback(object); }
-	static void set_halt_bug(device_t &device) { downcast<lr35902_cpu_device &>(device).m_has_halt_bug = true; }
+	// configuration helpers
+	template<class Object> devcb_base &set_timer_cb(Object &&cb) { return m_timer_func.set_callback(std::forward<Object>(cb)); }
+	template<class Object> devcb_base &set_incdec16_cb(Object &&cb) { return m_incdec16_func.set_callback(std::forward<Object>(cb)); }
+	void set_halt_bug(bool has_halt_bug) { m_has_halt_bug = has_halt_bug; }
 
 	uint8_t get_speed();
 	void set_speed(uint8_t speed_request);

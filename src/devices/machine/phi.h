@@ -13,41 +13,41 @@
 
 // Set read and write callbacks to access DIO bus on IEEE-488
 #define MCFG_PHI_DIO_READWRITE_CB(_read , _write)   \
-	phi_device::set_dio_read_cb(*device , DEVCB_##_read);               \
-	phi_device::set_dio_write_cb(*device , DEVCB_##_write);
+	downcast<phi_device &>(*device).set_dio_read_cb(DEVCB_##_read);               \
+	downcast<phi_device &>(*device).set_dio_write_cb(DEVCB_##_write);
 
 // Set write callbacks to access uniline signals on IEEE-488
 #define MCFG_PHI_EOI_WRITE_CB(_write)   \
-	phi_device::set_488_signal_write_cb(*device , phi_device::PHI_488_EOI , DEVCB_##_write);
+	downcast<phi_device &>(*device).set_488_signal_write_cb(phi_device::PHI_488_EOI , DEVCB_##_write);
 
 #define MCFG_PHI_DAV_WRITE_CB(_write)   \
-	phi_device::set_488_signal_write_cb(*device , phi_device::PHI_488_DAV , DEVCB_##_write);
+	downcast<phi_device &>(*device).set_488_signal_write_cb(phi_device::PHI_488_DAV , DEVCB_##_write);
 
 #define MCFG_PHI_NRFD_WRITE_CB(_write)  \
-	phi_device::set_488_signal_write_cb(*device , phi_device::PHI_488_NRFD , DEVCB_##_write);
+	downcast<phi_device &>(*device).set_488_signal_write_cb(phi_device::PHI_488_NRFD , DEVCB_##_write);
 
 #define MCFG_PHI_NDAC_WRITE_CB(_write)  \
-	phi_device::set_488_signal_write_cb(*device , phi_device::PHI_488_NDAC , DEVCB_##_write);
+	downcast<phi_device &>(*device).set_488_signal_write_cb(phi_device::PHI_488_NDAC , DEVCB_##_write);
 
 #define MCFG_PHI_IFC_WRITE_CB(_write)   \
-	phi_device::set_488_signal_write_cb(*device , phi_device::PHI_488_IFC , DEVCB_##_write);
+	downcast<phi_device &>(*device).set_488_signal_write_cb(phi_device::PHI_488_IFC , DEVCB_##_write);
 
 #define MCFG_PHI_SRQ_WRITE_CB(_write)   \
-	phi_device::set_488_signal_write_cb(*device , phi_device::PHI_488_SRQ , DEVCB_##_write);
+	downcast<phi_device &>(*device).set_488_signal_write_cb(phi_device::PHI_488_SRQ , DEVCB_##_write);
 
 #define MCFG_PHI_ATN_WRITE_CB(_write)   \
-	phi_device::set_488_signal_write_cb(*device , phi_device::PHI_488_ATN , DEVCB_##_write);
+	downcast<phi_device &>(*device).set_488_signal_write_cb(phi_device::PHI_488_ATN , DEVCB_##_write);
 
 #define MCFG_PHI_REN_WRITE_CB(_write)   \
-	phi_device::set_488_signal_write_cb(*device , phi_device::PHI_488_REN , DEVCB_##_write);
+	downcast<phi_device &>(*device).set_488_signal_write_cb(phi_device::PHI_488_REN , DEVCB_##_write);
 
 // Set write callback for INT signal
 #define MCFG_PHI_INT_WRITE_CB(_write)           \
-	phi_device::set_int_write_cb(*device , DEVCB_##_write);
+	downcast<phi_device &>(*device).set_int_write_cb(DEVCB_##_write);
 
 // Set write callback for DMARQ signal
 #define MCFG_PHI_DMARQ_WRITE_CB(_write)         \
-	phi_device::set_dmarq_write_cb(*device , DEVCB_##_write);
+	downcast<phi_device &>(*device).set_dmarq_write_cb(DEVCB_##_write);
 
 class phi_device : public device_t
 {
@@ -68,20 +68,11 @@ public:
 		PHI_488_SIGNAL_COUNT
 	};
 
-	template<class _Object> static devcb_base& set_dio_read_cb(device_t &device , _Object object)
-	{ return downcast<phi_device&>(device).m_dio_read_func.set_callback(object); }
-
-	template<class _Object> static devcb_base& set_dio_write_cb(device_t &device , _Object object)
-	{ return downcast<phi_device&>(device).m_dio_write_func.set_callback(object); }
-
-	template<class _Object> static devcb_base& set_488_signal_write_cb(device_t &device , phi_488_signal_t signal , _Object object)
-	{ return downcast<phi_device&>(device).m_signal_wr_fns[ signal ].set_callback(object); }
-
-	template<class _Object> static devcb_base& set_int_write_cb(device_t &device , _Object object)
-	{ return downcast<phi_device&>(device).m_int_write_func.set_callback(object); }
-
-	template<class _Object> static devcb_base& set_dmarq_write_cb(device_t &device , _Object object)
-	{ return downcast<phi_device&>(device).m_dmarq_write_func.set_callback(object); }
+	template<class Object> devcb_base& set_dio_read_cb(Object &&cb) { return m_dio_read_func.set_callback(std::forward<Object>(cb)); }
+	template<class Object> devcb_base& set_dio_write_cb(Object &&cb) { return m_dio_write_func.set_callback(std::forward<Object>(cb)); }
+	template<class Object> devcb_base& set_488_signal_write_cb(phi_488_signal_t signal , Object &&cb) { return m_signal_wr_fns[ signal ].set_callback(std::forward<Object>(cb)); }
+	template<class Object> devcb_base& set_int_write_cb(Object &&cb) { return m_int_write_func.set_callback(std::forward<Object>(cb)); }
+	template<class Object> devcb_base& set_dmarq_write_cb(Object &&cb) { return m_dmarq_write_func.set_callback(std::forward<Object>(cb)); }
 
 	DECLARE_WRITE_LINE_MEMBER(eoi_w);
 	DECLARE_WRITE_LINE_MEMBER(dav_w);

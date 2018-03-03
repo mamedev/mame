@@ -16,19 +16,19 @@
 #include "machine/nscsi_bus.h"
 
 #define MCFG_NCR5380N_IRQ_HANDLER(_devcb) \
-	devcb = &ncr5380n_device::set_irq_handler(*device, DEVCB_##_devcb);
+	devcb = &downcast<ncr5380n_device &>(*device).set_irq_handler(DEVCB_##_devcb);
 
 #define MCFG_NCR5380N_DRQ_HANDLER(_devcb) \
-	devcb = &ncr5380n_device::set_drq_handler(*device, DEVCB_##_devcb);
+	devcb = &downcast<ncr5380n_device &>(*device).set_drq_handler(DEVCB_##_devcb);
 
 class ncr5380n_device : public nscsi_device
 {
 public:
 	ncr5380n_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
-	// static configuration helpers
-	template <class Object> static devcb_base &set_irq_handler(device_t &device, Object &&cb) { return downcast<ncr5380n_device &>(device).m_irq_handler.set_callback(std::forward<Object>(cb)); }
-	template <class Object> static devcb_base &set_drq_handler(device_t &device, Object &&cb) { return downcast<ncr5380n_device &>(device).m_drq_handler.set_callback(std::forward<Object>(cb)); }
+	// configuration helpers
+	template <class Object> devcb_base &set_irq_handler(Object &&cb) { return m_irq_handler.set_callback(std::forward<Object>(cb)); }
+	template <class Object> devcb_base &set_drq_handler(Object &&cb) { return m_drq_handler.set_callback(std::forward<Object>(cb)); }
 
 	DECLARE_READ8_MEMBER(read);
 	DECLARE_WRITE8_MEMBER(write);

@@ -29,7 +29,7 @@ DECLARE_DEVICE_TYPE(SPEAKER, speaker_device)
 // add/remove speakers
 #define MCFG_SPEAKER_ADD(_tag, _x, _y, _z) \
 	MCFG_DEVICE_ADD(_tag, SPEAKER, 0) \
-	speaker_device::static_set_position(*device, _x, _y, _z);
+	downcast<speaker_device &>(*device).set_position(_x, _y, _z);
 #define MCFG_SPEAKER_STANDARD_MONO(_tag) \
 	MCFG_SPEAKER_ADD(_tag, 0.0, 0.0, 1.0)
 
@@ -53,7 +53,7 @@ public:
 	virtual ~speaker_device();
 
 	// inline configuration helpers
-	static void static_set_position(device_t &device, double x, double y, double z);
+	void set_position(double x, double y, double z) { m_x = x; m_y = y; m_z = z; }
 
 	// internally for use by the sound system
 	void mix(s32 *leftmix, s32 *rightmix, int &samples_this_update, bool suppress);

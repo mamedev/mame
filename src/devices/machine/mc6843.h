@@ -16,14 +16,14 @@
 #include "imagedev/flopdrv.h"
 
 #define MCFG_MC6843_IRQ_CALLBACK(_write) \
-	devcb = &mc6843_device::set_irq_wr_callback(*device, DEVCB_##_write);
+	devcb = &downcast<mc6843_device &>(*device).set_irq_wr_callback(DEVCB_##_write);
 
 class mc6843_device : public device_t
 {
 public:
 	mc6843_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
-	template <class Object> static devcb_base &set_irq_wr_callback(device_t &device, Object &&cb) { return downcast<mc6843_device &>(device).m_write_irq.set_callback(std::forward<Object>(cb)); }
+	template <class Object> devcb_base &set_irq_wr_callback(Object &&cb) { return m_write_irq.set_callback(std::forward<Object>(cb)); }
 
 	DECLARE_READ8_MEMBER(read);
 	DECLARE_WRITE8_MEMBER(write);

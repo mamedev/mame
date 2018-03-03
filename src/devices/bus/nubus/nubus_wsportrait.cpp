@@ -76,7 +76,7 @@ nubus_wsportrait_device::nubus_wsportrait_device(const machine_config &mconfig, 
 	m_vram32(nullptr), m_mode(0), m_vbl_disable(0), m_toggle(0), m_count(0), m_clutoffs(0), m_timer(nullptr),
 	m_assembled_tag(util::string_format("%s:%s", tag, WSPORTRAIT_SCREEN_NAME))
 {
-	static_set_screen(*this, m_assembled_tag.c_str());
+	this->set_screen(m_assembled_tag.c_str());
 }
 
 //-------------------------------------------------

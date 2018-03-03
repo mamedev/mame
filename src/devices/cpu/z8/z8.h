@@ -13,46 +13,44 @@
 
 
 #define MCFG_Z8_PORT_P0_READ_CB(_devcb) \
-	devcb = &z8_device::set_input_cb(*device, 0, DEVCB_##_devcb);
+	devcb = &downcast<z8_device &>(*device).set_input_cb(0, DEVCB_##_devcb);
 
 #define MCFG_Z8_PORT_P1_READ_CB(_devcb) \
-	devcb = &z8_device::set_input_cb(*device, 1, DEVCB_##_devcb);
+	devcb = &downcast<z8_device &>(*device).set_input_cb(1, DEVCB_##_devcb);
 
 #define MCFG_Z8_PORT_P2_READ_CB(_devcb) \
-	devcb = &z8_device::set_input_cb(*device, 2, DEVCB_##_devcb);
+	devcb = &downcast<z8_device &>(*device).set_input_cb(2, DEVCB_##_devcb);
 
 #define MCFG_Z8_PORT_P3_READ_CB(_devcb) \
-	devcb = &z8_device::set_input_cb(*device, 3, DEVCB_##_devcb);
+	devcb = &downcast<z8_device &>(*device).set_input_cb(3, DEVCB_##_devcb);
 
 
 #define MCFG_Z8_PORT_P0_WRITE_CB(_devcb) \
-	devcb = &z8_device::set_output_cb(*device, 0, DEVCB_##_devcb);
+	devcb = &downcast<z8_device &>(*device).set_output_cb(0, DEVCB_##_devcb);
 
 #define MCFG_Z8_PORT_P1_WRITE_CB(_devcb) \
-	devcb = &z8_device::set_output_cb(*device, 1, DEVCB_##_devcb);
+	devcb = &downcast<z8_device &>(*device).set_output_cb(1, DEVCB_##_devcb);
 
 #define MCFG_Z8_PORT_P2_WRITE_CB(_devcb) \
-	devcb = &z8_device::set_output_cb(*device, 2, DEVCB_##_devcb);
+	devcb = &downcast<z8_device &>(*device).set_output_cb(2, DEVCB_##_devcb);
 
 #define MCFG_Z8_PORT_P3_WRITE_CB(_devcb) \
-	devcb = &z8_device::set_output_cb(*device, 3, DEVCB_##_devcb);
+	devcb = &downcast<z8_device &>(*device).set_output_cb(3, DEVCB_##_devcb);
 
 
 class z8_device : public cpu_device
 {
 public:
-	// static configuration
-	template<class Object>
-	static devcb_base &set_input_cb(device_t &device, int port, Object &&object)
+	// configuration
+	template<class Object> devcb_base &set_input_cb(int port, Object &&object)
 	{
 		assert(port >= 0 && port < 4);
-		return downcast<z8_device &>(device).m_input_cb[port].set_callback(std::forward<Object>(object));
+		return m_input_cb[port].set_callback(std::forward<Object>(object));
 	}
-	template<class Object>
-	static devcb_base &set_output_cb(device_t &device, int port, Object &&object)
+	template<class Object> devcb_base &set_output_cb(int port, Object &&object)
 	{
 		assert(port >= 0 && port < 4);
-		return downcast<z8_device &>(device).m_output_cb[port].set_callback(std::forward<Object>(object));
+		return m_output_cb[port].set_callback(std::forward<Object>(object));
 	}
 
 protected:

@@ -167,13 +167,6 @@ kcexp_slot_device::kcexp_slot_device(const machine_config &mconfig, device_type 
 {
 }
 
-void kcexp_slot_device::static_set_next_slot(device_t &device, const char *next_slot_tag)
-{
-	kcexp_slot_device &kc_slot = dynamic_cast<kcexp_slot_device &>(device);
-
-	kc_slot.m_next_slot_tag = next_slot_tag;
-}
-
 //-------------------------------------------------
 //  kcexp_slot_device - destructor
 //-------------------------------------------------

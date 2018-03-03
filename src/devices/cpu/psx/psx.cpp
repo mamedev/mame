@@ -3381,11 +3381,6 @@ void psxcpu_device::setcp3cr( int reg, uint32_t value )
 {
 }
 
-psxcpu_device *psxcpu_device::getcpu( device_t &device, const char *cputag )
-{
-	return downcast<psxcpu_device *>( device.subdevice( cputag ) );
-}
-
 READ32_MEMBER( psxcpu_device::gpu_r )
 {
 	return m_gpu_read_handler( space, offset, mem_mask );

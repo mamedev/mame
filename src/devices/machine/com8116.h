@@ -34,13 +34,13 @@
 ///*************************************************************************
 
 #define MCFG_COM8116_FX4_HANDLER(_devcb) \
-	devcb = &com8116_device::set_fx4_handler(*device, DEVCB_##_devcb);
+	devcb = &downcast<com8116_device &>(*device).set_fx4_handler(DEVCB_##_devcb);
 
 #define MCFG_COM8116_FR_HANDLER(_devcb) \
-	devcb = &com8116_device::set_fr_handler(*device, DEVCB_##_devcb);
+	devcb = &downcast<com8116_device &>(*device).set_fr_handler(DEVCB_##_devcb);
 
 #define MCFG_COM8116_FT_HANDLER(_devcb) \
-	devcb = &com8116_device::set_ft_handler(*device, DEVCB_##_devcb);
+	devcb = &downcast<com8116_device &>(*device).set_ft_handler(DEVCB_##_devcb);
 
 
 ///*************************************************************************
@@ -55,9 +55,9 @@ public:
 	// construction/destruction
 	com8116_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
-	template <class Object> static devcb_base &set_fx4_handler(device_t &device, Object &&cb) { return downcast<com8116_device &>(device).m_fx4_handler.set_callback(std::forward<Object>(cb)); }
-	template <class Object> static devcb_base &set_fr_handler(device_t &device, Object &&cb) { return downcast<com8116_device &>(device).m_fr_handler.set_callback(std::forward<Object>(cb)); }
-	template <class Object> static devcb_base &set_ft_handler(device_t &device, Object &&cb) { return downcast<com8116_device &>(device).m_ft_handler.set_callback(std::forward<Object>(cb)); }
+	template <class Object> devcb_base &set_fx4_handler(Object &&cb) { return m_fx4_handler.set_callback(std::forward<Object>(cb)); }
+	template <class Object> devcb_base &set_fr_handler(Object &&cb) { return m_fr_handler.set_callback(std::forward<Object>(cb)); }
+	template <class Object> devcb_base &set_ft_handler(Object &&cb) { return m_ft_handler.set_callback(std::forward<Object>(cb)); }
 
 	void str_w(uint8_t data);
 	DECLARE_WRITE8_MEMBER( str_w );

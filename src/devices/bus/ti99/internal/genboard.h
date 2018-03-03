@@ -63,7 +63,7 @@ public:
 	DECLARE_WRITE_LINE_MEMBER( clock_control );
 	uint8_t get_recent_key();
 
-	template <class Object> static devcb_base &static_set_int_callback(device_t &device, Object &&cb) { return downcast<geneve_keyboard_device &>(device).m_interrupt.set_callback(std::forward<Object>(cb)); }
+	template <class Object> devcb_base &set_int_callback(Object &&cb) { return m_interrupt.set_callback(std::forward<Object>(cb)); }
 
 protected:
 	void               device_start() override;
@@ -109,7 +109,7 @@ private:
 };
 
 #define MCFG_GENEVE_KBINT_HANDLER( _intcallb ) \
-	devcb = &bus::ti99::internal::geneve_keyboard_device::static_set_int_callback( *device, DEVCB_##_intcallb );
+	devcb = &downcast<bus::ti99::internal::geneve_keyboard_device &>(*device).set_int_callback(DEVCB_##_intcallb);
 
 /*****************************************************************************/
 
@@ -138,7 +138,7 @@ public:
 	DECLARE_WRITE_LINE_MEMBER( pfm_select_msb );
 	DECLARE_WRITE_LINE_MEMBER( pfm_output_enable );
 
-	template <class Object> static devcb_base &static_set_ready_callback(device_t &device, Object &&cb) { return downcast<geneve_mapper_device &>(device).m_ready.set_callback(std::forward<Object>(cb)); }
+	template <class Object> devcb_base &set_ready_callback(Object &&cb) { return m_ready.set_callback(std::forward<Object>(cb)); }
 
 protected:
 	void    device_start() override;
@@ -222,7 +222,7 @@ private:
 };
 
 #define MCFG_GENEVE_READY_HANDLER( _intcallb ) \
-	devcb = &bus::ti99::internal::geneve_mapper_device::static_set_ready_callback( *device, DEVCB_##_intcallb );
+	devcb = &downcast<bus::ti99::internal::geneve_mapper_device &>(*device).set_ready_callback(DEVCB_##_intcallb);
 
 } } } // end namespace bus::ti99::internal
 

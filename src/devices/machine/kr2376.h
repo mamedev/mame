@@ -36,7 +36,7 @@
 
 
 #define MCFG_KR2376_STROBE_CALLBACK(_write) \
-	devcb = &kr2376_device::set_strobe_wr_callback(*device, DEVCB_##_write);
+	devcb = &downcast<kr2376_device &>(*device).set_strobe_wr_callback(DEVCB_##_write);
 
 class kr2376_device : public device_t
 {
@@ -58,7 +58,7 @@ public:
 
 	kr2376_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
-	template <class Object> static devcb_base &set_strobe_wr_callback(device_t &device, Object &&cb) { return downcast<kr2376_device &>(device).m_write_strobe.set_callback(std::forward<Object>(cb)); }
+	template <class Object> devcb_base &set_strobe_wr_callback(Object &&cb) { return m_write_strobe.set_callback(std::forward<Object>(cb)); }
 
 	/* keyboard data */
 	DECLARE_READ8_MEMBER( data_r );

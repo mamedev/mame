@@ -35,22 +35,22 @@
 ***************************************************************************/
 
 #define MCFG_PIT8253_CLK0(_clk) \
-	pit8253_device::set_clk0(*device, _clk);
+	downcast<pit8253_device &>(*device).set_clk0(_clk);
 
 #define MCFG_PIT8253_CLK1(_clk) \
-	pit8253_device::set_clk1(*device, _clk);
+	downcast<pit8253_device &>(*device).set_clk1(_clk);
 
 #define MCFG_PIT8253_CLK2(_clk) \
-	pit8253_device::set_clk2(*device, _clk);
+	downcast<pit8253_device &>(*device).set_clk2(_clk);
 
 #define MCFG_PIT8253_OUT0_HANDLER(_devcb) \
-	devcb = &pit8253_device::set_out0_handler(*device, DEVCB_##_devcb);
+	devcb = &downcast<pit8253_device &>(*device).set_out0_handler(DEVCB_##_devcb);
 
 #define MCFG_PIT8253_OUT1_HANDLER(_devcb) \
-	devcb = &pit8253_device::set_out1_handler(*device, DEVCB_##_devcb);
+	devcb = &downcast<pit8253_device &>(*device).set_out1_handler(DEVCB_##_devcb);
 
 #define MCFG_PIT8253_OUT2_HANDLER(_devcb) \
-	devcb = &pit8253_device::set_out2_handler(*device, DEVCB_##_devcb);
+	devcb = &downcast<pit8253_device &>(*device).set_out2_handler(DEVCB_##_devcb);
 
 
 class pit8253_device : public device_t
@@ -58,16 +58,16 @@ class pit8253_device : public device_t
 public:
 	pit8253_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
-	// static configuration helpers
-	static void set_clk0(device_t &device, double clk0) { downcast<pit8253_device &>(device).m_clk0 = clk0; }
-	static void set_clk1(device_t &device, double clk1) { downcast<pit8253_device &>(device).m_clk1 = clk1; }
-	static void set_clk2(device_t &device, double clk2) { downcast<pit8253_device &>(device).m_clk2 = clk2; }
-	static void set_clk0(device_t &device, const XTAL &xtal) { set_clk0(device, xtal.dvalue()); }
-	static void set_clk1(device_t &device, const XTAL &xtal) { set_clk1(device, xtal.dvalue()); }
-	static void set_clk2(device_t &device, const XTAL &xtal) { set_clk2(device, xtal.dvalue()); }
-	template <class Object> static devcb_base &set_out0_handler(device_t &device, Object &&cb) { return downcast<pit8253_device &>(device).m_out0_handler.set_callback(std::forward<Object>(cb)); }
-	template <class Object> static devcb_base &set_out1_handler(device_t &device, Object &&cb) { return downcast<pit8253_device &>(device).m_out1_handler.set_callback(std::forward<Object>(cb)); }
-	template <class Object> static devcb_base &set_out2_handler(device_t &device, Object &&cb) { return downcast<pit8253_device &>(device).m_out2_handler.set_callback(std::forward<Object>(cb)); }
+	// configuration helpers
+	void set_clk0(double clk0) { m_clk0 = clk0; }
+	void set_clk1(double clk1) { m_clk1 = clk1; }
+	void set_clk2(double clk2) { m_clk2 = clk2; }
+	void set_clk0(const XTAL &xtal) { set_clk0(xtal.dvalue()); }
+	void set_clk1(const XTAL &xtal) { set_clk1(xtal.dvalue()); }
+	void set_clk2(const XTAL &xtal) { set_clk2(xtal.dvalue()); }
+	template <class Object> devcb_base &set_out0_handler(Object &&cb) { return m_out0_handler.set_callback(std::forward<Object>(cb)); }
+	template <class Object> devcb_base &set_out1_handler(Object &&cb) { return m_out1_handler.set_callback(std::forward<Object>(cb)); }
+	template <class Object> devcb_base &set_out2_handler(Object &&cb) { return m_out2_handler.set_callback(std::forward<Object>(cb)); }
 
 	DECLARE_READ8_MEMBER(read);
 	DECLARE_WRITE8_MEMBER(write);

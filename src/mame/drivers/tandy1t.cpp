@@ -623,15 +623,15 @@ static const gfx_layout t1000_charlayout =
 
 void tandy1000_state::cfg_fdc_35(device_t *device)
 {
-	device_slot_interface::static_set_default_option(*device->subdevice("fdc:0"), "35dd");
-	device_slot_interface::static_set_fixed(*device->subdevice("fdc:0"), true);
-	device_slot_interface::static_set_default_option(*device->subdevice("fdc:1"), "");
+	dynamic_cast<device_slot_interface &>(*device->subdevice("fdc:0")).set_default_option("35dd");
+	dynamic_cast<device_slot_interface &>(*device->subdevice("fdc:0")).set_fixed(true);
+	dynamic_cast<device_slot_interface &>(*device->subdevice("fdc:1")).set_default_option("");
 }
 
 void tandy1000_state::cfg_fdc_525(device_t *device)
 {
-	device_slot_interface::static_set_fixed(*device->subdevice("fdc:0"), true);
-	device_slot_interface::static_set_default_option(*device->subdevice("fdc:1"), "");
+	dynamic_cast<device_slot_interface &>(*device->subdevice("fdc:0")).set_fixed(true);
+	dynamic_cast<device_slot_interface &>(*device->subdevice("fdc:1")).set_default_option("");
 }
 
 static GFXDECODE_START( t1000 )
@@ -640,7 +640,7 @@ GFXDECODE_END
 
 MACHINE_CONFIG_START(tandy1000_state::tandy1000_common)
 	MCFG_DEVICE_ADD("mb", T1000_MOTHERBOARD, 0)
-	t1000_mb_device::static_set_cputag(*device, "^maincpu");
+	downcast<t1000_mb_device &>(*device).set_cputag("^maincpu");
 
 	/* video hardware */
 	MCFG_PCVIDEO_T1000_ADD("pcvideo_t1000")

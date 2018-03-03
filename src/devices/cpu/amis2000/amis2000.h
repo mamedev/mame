@@ -14,43 +14,43 @@
 
 // generic input pins (4 bits each)
 #define MCFG_AMI_S2000_READ_K_CB(_devcb) \
-	devcb = &amis2000_base_device::set_read_k_callback(*device, DEVCB_##_devcb);
+	devcb = &downcast<amis2000_base_device &>(*device).set_read_k_callback(DEVCB_##_devcb);
 
 #define MCFG_AMI_S2000_READ_I_CB(_devcb) \
-	devcb = &amis2000_base_device::set_read_i_callback(*device, DEVCB_##_devcb);
+	devcb = &downcast<amis2000_base_device &>(*device).set_read_i_callback(DEVCB_##_devcb);
 
 // 8-bit external databus coupled as input/output pins
 #define MCFG_AMI_S2000_READ_D_CB(_devcb) \
-	devcb = &amis2000_base_device::set_read_d_callback(*device, DEVCB_##_devcb);
+	devcb = &downcast<amis2000_base_device &>(*device).set_read_d_callback(DEVCB_##_devcb);
 
 #define MCFG_AMI_S2000_WRITE_D_CB(_devcb) \
-	devcb = &amis2000_base_device::set_write_d_callback(*device, DEVCB_##_devcb);
+	devcb = &downcast<amis2000_base_device &>(*device).set_write_d_callback(DEVCB_##_devcb);
 
 // 13-bit external address bus coupled as output pins
 #define MCFG_AMI_S2000_WRITE_A_CB(_devcb) \
-	devcb = &amis2000_base_device::set_write_a_callback(*device, DEVCB_##_devcb);
+	devcb = &downcast<amis2000_base_device &>(*device).set_write_a_callback(DEVCB_##_devcb);
 
 // F_out pin (only for S2152)
 #define MCFG_AMI_S2152_FOUT_CB(_devcb) \
-	devcb = &amis2000_base_device::set_write_f_callback(*device, DEVCB_##_devcb);
+	devcb = &downcast<amis2000_base_device &>(*device).set_write_f_callback(DEVCB_##_devcb);
 
 // S2000 has a hardcoded 7seg table, that (unlike S2200) is officially
 // uncustomizable, but wildfire proves to be an exception to that rule.
 #define MCFG_AMI_S2000_7SEG_DECODER(_ptr) \
-	amis2000_base_device::set_7seg_table(*device, _ptr);
+	downcast<amis2000_base_device &>(*device).set_7seg_table(_ptr);
 
 
 class amis2000_base_device : public cpu_device
 {
 public:
-	// static configuration helpers
-	template <class Object> static devcb_base &set_read_k_callback(device_t &device, Object &&cb) { return downcast<amis2000_base_device &>(device).m_read_k.set_callback(std::forward<Object>(cb)); }
-	template <class Object> static devcb_base &set_read_i_callback(device_t &device, Object &&cb) { return downcast<amis2000_base_device &>(device).m_read_i.set_callback(std::forward<Object>(cb)); }
-	template <class Object> static devcb_base &set_read_d_callback(device_t &device, Object &&cb) { return downcast<amis2000_base_device &>(device).m_read_d.set_callback(std::forward<Object>(cb)); }
-	template <class Object> static devcb_base &set_write_d_callback(device_t &device, Object &&cb) { return downcast<amis2000_base_device &>(device).m_write_d.set_callback(std::forward<Object>(cb)); }
-	template <class Object> static devcb_base &set_write_a_callback(device_t &device, Object &&cb) { return downcast<amis2000_base_device &>(device).m_write_a.set_callback(std::forward<Object>(cb)); }
-	template <class Object> static devcb_base &set_write_f_callback(device_t &device, Object &&cb) { return downcast<amis2000_base_device &>(device).m_write_f.set_callback(std::forward<Object>(cb)); }
-	static void set_7seg_table(device_t &device, const u8 *ptr) { downcast<amis2000_base_device &>(device).m_7seg_table = ptr; }
+	// configuration helpers
+	template <class Object> devcb_base &set_read_k_callback(Object &&cb) { return m_read_k.set_callback(std::forward<Object>(cb)); }
+	template <class Object> devcb_base &set_read_i_callback(Object &&cb) { return m_read_i.set_callback(std::forward<Object>(cb)); }
+	template <class Object> devcb_base &set_read_d_callback(Object &&cb) { return m_read_d.set_callback(std::forward<Object>(cb)); }
+	template <class Object> devcb_base &set_write_d_callback(Object &&cb) { return m_write_d.set_callback(std::forward<Object>(cb)); }
+	template <class Object> devcb_base &set_write_a_callback(Object &&cb) { return m_write_a.set_callback(std::forward<Object>(cb)); }
+	template <class Object> devcb_base &set_write_f_callback(Object &&cb) { return m_write_f.set_callback(std::forward<Object>(cb)); }
+	void set_7seg_table(const u8 *ptr) { m_7seg_table = ptr; }
 
 	void data_64x4(address_map &map);
 	void data_80x4(address_map &map);

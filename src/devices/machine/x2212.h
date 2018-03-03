@@ -25,14 +25,14 @@
 // to fire on power-down, effectively creating an "auto-save" functionality
 #define MCFG_X2212_ADD_AUTOSAVE(_tag) \
 	MCFG_DEVICE_ADD(_tag, X2212, 0) \
-	x2212_device::static_set_auto_save(*device);
+	downcast<x2212_device &>(*device).set_auto_save(true);
 
 #define MCFG_X2210_ADD(_tag) \
 	MCFG_DEVICE_ADD(_tag, X2210, 0)
 
 #define MCFG_X2210_ADD_AUTOSAVE(_tag) \
 	MCFG_DEVICE_ADD(_tag, X2210, 0) \
-	x2212_device::static_set_auto_save(*device);
+	downcast<x2212_device &>(*device).set_auto_save(true);
 
 
 //**************************************************************************
@@ -51,7 +51,7 @@ public:
 	x2212_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
 	// inline configuration helpers
-	static void static_set_auto_save(device_t &device);
+	void set_auto_save(bool auto_save) { m_auto_save = auto_save; }
 
 	// I/O operations
 	DECLARE_READ8_MEMBER( read );

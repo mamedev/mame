@@ -63,16 +63,16 @@
 	MCFG_DEVICE_ADD(_tag, TC8566AF, 0)
 
 #define MCFG_MCS3201_INPUT_HANDLER(_devcb) \
-	devcb = &mcs3201_device::set_input_handler(*device, DEVCB_##_devcb);
+	devcb = &downcast<mcs3201_device &>(*device).set_input_handler(DEVCB_##_devcb);
 
 #define MCFG_UPD765_INTRQ_CALLBACK(_write) \
-	devcb = &upd765_family_device::set_intrq_wr_callback(*device, DEVCB_##_write);
+	devcb = &downcast<upd765_family_device &>(*device).set_intrq_wr_callback(DEVCB_##_write);
 
 #define MCFG_UPD765_DRQ_CALLBACK(_write) \
-	devcb = &upd765_family_device::set_drq_wr_callback(*device, DEVCB_##_write);
+	devcb = &downcast<upd765_family_device &>(*device).set_drq_wr_callback(DEVCB_##_write);
 
 #define MCFG_UPD765_HDL_CALLBACK(_write) \
-	devcb = &upd765_family_device::set_hdl_wr_callback(*device, DEVCB_##_write);
+	devcb = &downcast<upd765_family_device &>(*device).set_hdl_wr_callback(DEVCB_##_write);
 
 /* Interface required for PC ISA wrapping */
 class pc_fdc_interface : public device_t {
@@ -101,9 +101,9 @@ class upd765_family_device : public pc_fdc_interface {
 public:
 	enum { MODE_AT, MODE_PS2, MODE_M30 };
 
-	template <class Object> static devcb_base &set_intrq_wr_callback(device_t &device, Object &&cb) { return downcast<upd765_family_device &>(device).intrq_cb.set_callback(std::forward<Object>(cb)); }
-	template <class Object> static devcb_base &set_drq_wr_callback(device_t &device, Object &&cb) { return downcast<upd765_family_device &>(device).drq_cb.set_callback(std::forward<Object>(cb)); }
-	template <class Object> static devcb_base &set_hdl_wr_callback(device_t &device, Object &&cb) { return downcast<upd765_family_device &>(device).hdl_cb.set_callback(std::forward<Object>(cb)); }
+	template <class Object> devcb_base &set_intrq_wr_callback(Object &&cb) { return intrq_cb.set_callback(std::forward<Object>(cb)); }
+	template <class Object> devcb_base &set_drq_wr_callback(Object &&cb) { return drq_cb.set_callback(std::forward<Object>(cb)); }
+	template <class Object> devcb_base &set_hdl_wr_callback(Object &&cb) { return hdl_cb.set_callback(std::forward<Object>(cb)); }
 
 	virtual void map(address_map &map) override = 0;
 
@@ -534,8 +534,8 @@ class mcs3201_device : public upd765_family_device {
 public:
 	mcs3201_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
-	// static configuration helpers
-	template <class Object> static devcb_base &set_input_handler(device_t &device, Object &&cb) { return downcast<mcs3201_device &>(device).m_input_handler.set_callback(std::forward<Object>(cb)); }
+	// configuration helpers
+	template <class Object> devcb_base &set_input_handler(Object &&cb) { return m_input_handler.set_callback(std::forward<Object>(cb)); }
 
 	virtual void map(address_map &map) override;
 	DECLARE_READ8_MEMBER( input_r );

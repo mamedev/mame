@@ -196,30 +196,6 @@ cs4031_device::cs4031_device(const machine_config &mconfig, const char *tag, dev
 {
 }
 
-void cs4031_device::static_set_cputag(device_t &device, const char *tag)
-{
-	cs4031_device &cs4031 = downcast<cs4031_device &>(device);
-	cs4031.m_cputag = tag;
-}
-
-void cs4031_device::static_set_isatag(device_t &device, const char *tag)
-{
-	cs4031_device &cs4031 = downcast<cs4031_device &>(device);
-	cs4031.m_isatag = tag;
-}
-
-void cs4031_device::static_set_biostag(device_t &device, const char *tag)
-{
-	cs4031_device &cs4031 = downcast<cs4031_device &>(device);
-	cs4031.m_biostag = tag;
-}
-
-void cs4031_device::static_set_keybctag(device_t &device, const char *tag)
-{
-	cs4031_device &cs4031 = downcast<cs4031_device &>(device);
-	cs4031.m_keybctag = tag;
-}
-
 //-------------------------------------------------
 //  device_start - device-specific startup
 //-------------------------------------------------

@@ -43,40 +43,40 @@
 //**************************************************************************
 
 #define MCFG_PIT68230_PA_INPUT_CB(_devcb) \
-	devcb = &pit68230_device::set_pa_in_callback (*device, DEVCB_##_devcb);
+	devcb = &downcast<pit68230_device &>(*device).set_pa_in_callback(DEVCB_##_devcb);
 
 #define MCFG_PIT68230_PA_OUTPUT_CB(_devcb) \
-	devcb = &pit68230_device::set_pa_out_callback (*device, DEVCB_##_devcb);
+	devcb = &downcast<pit68230_device &>(*device).set_pa_out_callback(DEVCB_##_devcb);
 
 #define MCFG_PIT68230_PB_INPUT_CB(_devcb) \
-	devcb = &pit68230_device::set_pb_in_callback (*device, DEVCB_##_devcb);
+	devcb = &downcast<pit68230_device &>(*device).set_pb_in_callback(DEVCB_##_devcb);
 
 #define MCFG_PIT68230_PB_OUTPUT_CB(_devcb) \
-	devcb = &pit68230_device::set_pb_out_callback (*device, DEVCB_##_devcb);
+	devcb = &downcast<pit68230_device &>(*device).set_pb_out_callback(DEVCB_##_devcb);
 
 #define MCFG_PIT68230_PC_INPUT_CB(_devcb) \
-	devcb = &pit68230_device::set_pc_in_callback (*device, DEVCB_##_devcb);
+	devcb = &downcast<pit68230_device &>(*device).set_pc_in_callback(DEVCB_##_devcb);
 
 #define MCFG_PIT68230_PC_OUTPUT_CB(_devcb) \
-	devcb = &pit68230_device::set_pc_out_callback (*device, DEVCB_##_devcb);
+	devcb = &downcast<pit68230_device &>(*device).set_pc_out_callback(DEVCB_##_devcb);
 
 #define MCFG_PIT68230_H1_CB(_devcb) \
-	devcb = &pit68230_device::set_h1_out_callback (*device, DEVCB_##_devcb);
+	devcb = &downcast<pit68230_device &>(*device).set_h1_out_callback(DEVCB_##_devcb);
 
 #define MCFG_PIT68230_H2_CB(_devcb) \
-	devcb = &pit68230_device::set_h2_out_callback (*device, DEVCB_##_devcb);
+	devcb = &downcast<pit68230_device &>(*device).set_h2_out_callback(DEVCB_##_devcb);
 
 #define MCFG_PIT68230_H3_CB(_devcb) \
-	devcb = &pit68230_device::set_h3_out_callback (*device, DEVCB_##_devcb);
+	devcb = &downcast<pit68230_device &>(*device).set_h3_out_callback(DEVCB_##_devcb);
 
 #define MCFG_PIT68230_H4_CB(_devcb) \
-	devcb = &pit68230_device::set_h4_out_callback (*device, DEVCB_##_devcb);
+	devcb = &downcast<pit68230_device &>(*device).set_h4_out_callback(DEVCB_##_devcb);
 
 #define MCFG_PIT68230_TIMER_IRQ_CB(_devcb) \
-	devcb = &pit68230_device::set_tirq_out_callback(*device, DEVCB_##_devcb);
+	devcb = &downcast<pit68230_device &>(*device).set_tirq_out_callback(DEVCB_##_devcb);
 
 #define MCFG_PIT68230_PORT_IRQ_CB(_devcb) \
-	devcb = &pit68230_device::set_pirq_out_callback(*device, DEVCB_##_devcb);
+	devcb = &downcast<pit68230_device &>(*device).set_pirq_out_callback(DEVCB_##_devcb);
 
 /*-----------------------------------------------------------------------
  * Registers                RS1-RS5   R/W Description
@@ -114,18 +114,18 @@ public:
 	// construction/destruction
 	pit68230_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
-	template <class Object> static devcb_base &set_pa_in_callback (device_t &device, Object &&cb){ return downcast<pit68230_device &>(device).m_pa_in_cb.set_callback (std::forward<Object>(cb)); }
-	template <class Object> static devcb_base &set_pa_out_callback (device_t &device, Object &&cb){ return downcast<pit68230_device &>(device).m_pa_out_cb.set_callback (std::forward<Object>(cb)); }
-	template <class Object> static devcb_base &set_pb_in_callback (device_t &device, Object &&cb){ return downcast<pit68230_device &>(device).m_pb_in_cb.set_callback (std::forward<Object>(cb)); }
-	template <class Object> static devcb_base &set_pb_out_callback (device_t &device, Object &&cb){ return downcast<pit68230_device &>(device).m_pb_out_cb.set_callback (std::forward<Object>(cb)); }
-	template <class Object> static devcb_base &set_pc_in_callback (device_t &device, Object &&cb){ return downcast<pit68230_device &>(device).m_pc_in_cb.set_callback (std::forward<Object>(cb)); }
-	template <class Object> static devcb_base &set_pc_out_callback (device_t &device, Object &&cb){ return downcast<pit68230_device &>(device).m_pc_out_cb.set_callback (std::forward<Object>(cb)); }
-	template <class Object> static devcb_base &set_h1_out_callback (device_t &device, Object &&cb){ return downcast<pit68230_device &>(device).m_h1_out_cb.set_callback (std::forward<Object>(cb)); }
-	template <class Object> static devcb_base &set_h2_out_callback (device_t &device, Object &&cb){ return downcast<pit68230_device &>(device).m_h2_out_cb.set_callback (std::forward<Object>(cb)); }
-	template <class Object> static devcb_base &set_h3_out_callback (device_t &device, Object &&cb){ return downcast<pit68230_device &>(device).m_h3_out_cb.set_callback (std::forward<Object>(cb)); }
-	template <class Object> static devcb_base &set_h4_out_callback (device_t &device, Object &&cb){ return downcast<pit68230_device &>(device).m_h4_out_cb.set_callback (std::forward<Object>(cb)); }
-	template <class Object> static devcb_base &set_tirq_out_callback (device_t &device, Object &&cb){ return downcast<pit68230_device &>(device).m_tirq_out_cb.set_callback (std::forward<Object>(cb)); }
-	template <class Object> static devcb_base &set_pirq_out_callback (device_t &device, Object &&cb){ return downcast<pit68230_device &>(device).m_pirq_out_cb.set_callback (std::forward<Object>(cb)); }
+	template <class Object> devcb_base &set_pa_in_callback(Object &&cb){ return m_pa_in_cb.set_callback (std::forward<Object>(cb)); }
+	template <class Object> devcb_base &set_pa_out_callback(Object &&cb){ return m_pa_out_cb.set_callback (std::forward<Object>(cb)); }
+	template <class Object> devcb_base &set_pb_in_callback(Object &&cb){ return m_pb_in_cb.set_callback (std::forward<Object>(cb)); }
+	template <class Object> devcb_base &set_pb_out_callback(Object &&cb){ return m_pb_out_cb.set_callback (std::forward<Object>(cb)); }
+	template <class Object> devcb_base &set_pc_in_callback(Object &&cb){ return m_pc_in_cb.set_callback (std::forward<Object>(cb)); }
+	template <class Object> devcb_base &set_pc_out_callback(Object &&cb){ return m_pc_out_cb.set_callback (std::forward<Object>(cb)); }
+	template <class Object> devcb_base &set_h1_out_callback(Object &&cb){ return m_h1_out_cb.set_callback (std::forward<Object>(cb)); }
+	template <class Object> devcb_base &set_h2_out_callback(Object &&cb){ return m_h2_out_cb.set_callback (std::forward<Object>(cb)); }
+	template <class Object> devcb_base &set_h3_out_callback(Object &&cb){ return m_h3_out_cb.set_callback (std::forward<Object>(cb)); }
+	template <class Object> devcb_base &set_h4_out_callback(Object &&cb){ return m_h4_out_cb.set_callback (std::forward<Object>(cb)); }
+	template <class Object> devcb_base &set_tirq_out_callback(Object &&cb){ return m_tirq_out_cb.set_callback (std::forward<Object>(cb)); }
+	template <class Object> devcb_base &set_pirq_out_callback(Object &&cb){ return m_pirq_out_cb.set_callback (std::forward<Object>(cb)); }
 
 	DECLARE_WRITE8_MEMBER (write);
 	DECLARE_READ8_MEMBER (read);

@@ -92,7 +92,7 @@ nubus_specpdq_device::nubus_specpdq_device(const machine_config &mconfig, device
 	m_width(0), m_height(0), m_patofsx(0), m_patofsy(0), m_vram_addr(0), m_vram_src(0),
 	m_palette(*this, "palette")
 {
-	static_set_screen(*this, m_assembled_tag.c_str());
+	this->set_screen(m_assembled_tag.c_str());
 }
 
 //-------------------------------------------------

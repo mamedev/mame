@@ -45,14 +45,14 @@ enum
 //**************************************************************************
 
 #define MCFG_LC8670_SET_CLOCK_SOURCES(_sub_clock, _rc_clock, _cf_clock) \
-	lc8670_cpu_device::static_set_cpu_clock(*device, lc8670_cpu_device::clock_source::SUB, _sub_clock); \
-	lc8670_cpu_device::static_set_cpu_clock(*device, lc8670_cpu_device::clock_source::RC, _rc_clock); \
-	lc8670_cpu_device::static_set_cpu_clock(*device, lc8670_cpu_device::clock_source::CF, _cf_clock);
+	downcast<lc8670_cpu_device &>(*device).set_cpu_clock(lc8670_cpu_device::clock_source::SUB, _sub_clock); \
+	downcast<lc8670_cpu_device &>(*device).set_cpu_clock(lc8670_cpu_device::clock_source::RC, _rc_clock); \
+	downcast<lc8670_cpu_device &>(*device).set_cpu_clock(lc8670_cpu_device::clock_source::CF, _cf_clock);
 #define MCFG_LC8670_BANKSWITCH_CB(_devcb) \
-	devcb = &lc8670_cpu_device::static_set_bankswitch_cb(*device, DEVCB_##_devcb);
+	devcb = &downcast<lc8670_cpu_device &>(*device).set_bankswitch_cb(DEVCB_##_devcb);
 
 #define MCFG_LC8670_LCD_UPDATE_CB(_cb) \
-	lc8670_cpu_device::static_set_lcd_update_cb(*device, _cb);
+	downcast<lc8670_cpu_device &>(*device).set_lcd_update_cb(_cb);
 
 
 // ======================> lc8670_cpu_device
@@ -83,11 +83,11 @@ public:
 	DECLARE_READ8_MEMBER(xram_r);
 	DECLARE_WRITE8_MEMBER(xram_w);
 
-	// static configuration helpers
-	static void static_set_cpu_clock(device_t &device, clock_source source, uint32_t clock) { downcast<lc8670_cpu_device &>(device).m_clocks[unsigned(source)] = clock; }
-	static void static_set_cpu_clock(device_t &device, clock_source source, const XTAL &clock) { static_set_cpu_clock(device, source, clock.value()); }
-	static void static_set_lcd_update_cb(device_t &device, lcd_update cb) { downcast<lc8670_cpu_device &>(device).m_lcd_update_func = cb; }
-	template <class Object> static devcb_base & static_set_bankswitch_cb(device_t &device, Object &&cb) { return downcast<lc8670_cpu_device &>(device).m_bankswitch_func.set_callback(std::forward<Object>(cb)); }
+	// configuration helpers
+	void set_cpu_clock(clock_source source, uint32_t clock) { m_clocks[unsigned(source)] = clock; }
+	void set_cpu_clock(clock_source source, const XTAL &clock) { set_cpu_clock(source, clock.value()); }
+	template <typename Object> void set_lcd_update_cb(Object &&cb) { m_lcd_update_func = std::forward<Object>(cb); }
+	template <class Object> devcb_base &set_bankswitch_cb(Object &&cb) { return m_bankswitch_func.set_callback(std::forward<Object>(cb)); }
 
 	void lc8670_internal_map(address_map &map);
 protected:

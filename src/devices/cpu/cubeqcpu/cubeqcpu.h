@@ -18,16 +18,16 @@
 
 
 #define MCFG_CQUESTSND_CONFIG(_dac_w, _sound_tag) \
-	cquestsnd_cpu_device::set_dac_w(*device, DEVCB_##_dac_w); \
-	cquestsnd_cpu_device::set_sound_region(*device, _sound_tag);
+	downcast<cquestsnd_cpu_device &>(*device).set_dac_w(DEVCB_##_dac_w); \
+	downcast<cquestsnd_cpu_device &>(*device).set_sound_region(_sound_tag);
 
 
 #define MCFG_CQUESTROT_CONFIG(_linedata_w) \
-	cquestrot_cpu_device::set_linedata_w(*device, DEVCB_##_linedata_w );
+	downcast<cquestrot_cpu_device &>(*device).set_linedata_w(DEVCB_##_linedata_w );
 
 
 #define MCFG_CQUESTLIN_CONFIG(_linedata_r) \
-	cquestlin_cpu_device::set_linedata_r(*device, DEVCB_##_linedata_r );
+	downcast<cquestlin_cpu_device &>(*device).set_linedata_r(DEVCB_##_linedata_r );
 
 
 /***************************************************************************
@@ -40,9 +40,9 @@ public:
 	// construction/destruction
 	cquestsnd_cpu_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
-	// static configuration helpers
-	template <class Object> static devcb_base &set_dac_w(device_t &device, Object &&cb) { return downcast<cquestsnd_cpu_device &>(device).m_dac_w.set_callback(std::forward<Object>(cb)); }
-	static void set_sound_region(device_t &device, const char *tag) { downcast<cquestsnd_cpu_device &>(device).m_sound_region_tag = tag; }
+	// configuration helpers
+	template <class Object> devcb_base &set_dac_w(Object &&cb) { return m_dac_w.set_callback(std::forward<Object>(cb)); }
+	void set_sound_region(const char *tag) { m_sound_region_tag = tag; }
 
 	DECLARE_WRITE16_MEMBER(sndram_w);
 	DECLARE_READ16_MEMBER(sndram_r);
@@ -131,8 +131,8 @@ public:
 	// construction/destruction
 	cquestrot_cpu_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
-	// static configuration helpers
-	template <class Object> static devcb_base &set_linedata_w(device_t &device, Object &&cb) { return downcast<cquestrot_cpu_device &>(device).m_linedata_w.set_callback(std::forward<Object>(cb)); }
+	// configuration helpers
+	template <class Object> devcb_base &set_linedata_w(Object &&cb) { return m_linedata_w.set_callback(std::forward<Object>(cb)); }
 
 	DECLARE_READ16_MEMBER(linedata_r);
 	DECLARE_WRITE16_MEMBER(rotram_w);
@@ -243,8 +243,8 @@ public:
 	// construction/destruction
 	cquestlin_cpu_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
-	// static configuration helpers
-	template <class Object> static devcb_base &set_linedata_r(device_t &device, Object &&cb) { return downcast<cquestlin_cpu_device &>(device).m_linedata_r.set_callback(std::forward<Object>(cb)); }
+	// configuration helpers
+	template <class Object> devcb_base &set_linedata_r(Object &&cb) { return m_linedata_r.set_callback(std::forward<Object>(cb)); }
 
 	DECLARE_WRITE16_MEMBER( linedata_w );
 	void cubeqcpu_swap_line_banks();

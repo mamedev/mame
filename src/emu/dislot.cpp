@@ -50,46 +50,32 @@ device_slot_option::device_slot_option(const char *name, const device_type &devt
 
 
 // -------------------------------------------------
-// static_option_reset
+// option_add
 // -------------------------------------------------
 
-void device_slot_interface::static_option_reset(device_t &device)
+void device_slot_interface::option_add(const char *name, const device_type &devtype)
 {
-	device_slot_interface &intf = dynamic_cast<device_slot_interface &>(device);
+	device_slot_option *slot_option = option(name);
 
-	intf.m_options.clear();
+	if (slot_option != nullptr)
+		throw emu_fatalerror("slot '%s' duplicate option '%s'\n", device().tag(), name);
+	if (m_options.count(name) != 0) throw tag_add_exception(name);
+	m_options.emplace(std::make_pair(name, std::make_unique<device_slot_option>(name, devtype)));
 }
 
 
 // -------------------------------------------------
-// static_option_add
+// option
 // -------------------------------------------------
 
-void device_slot_interface::static_option_add(device_t &device, const char *name, const device_type &devtype)
+device_slot_option *device_slot_interface::config_option(const char *name)
 {
-	device_slot_interface &intf = dynamic_cast<device_slot_interface &>(device);
-	device_slot_option *option = intf.option(name);
+	device_slot_option *slot_option = option(name);
 
-	if (option != nullptr)
-		throw emu_fatalerror("slot '%s' duplicate option '%s'\n", device.tag(), name);
-	if (intf.m_options.count(name) != 0) throw tag_add_exception(name);
-	intf.m_options.emplace(std::make_pair(name, std::make_unique<device_slot_option>(name, devtype)));
-}
+	if (slot_option == nullptr)
+		throw emu_fatalerror("slot '%s' has no option '%s'\n", device().tag(), name);
 
-
-// -------------------------------------------------
-// static_option
-// -------------------------------------------------
-
-device_slot_option *device_slot_interface::static_option(device_t &device, const char *name)
-{
-	device_slot_interface &intf = dynamic_cast<device_slot_interface &>(device);
-	device_slot_option *option = intf.option(name);
-
-	if (option == nullptr)
-		throw emu_fatalerror("slot '%s' has no option '%s'\n", device.tag(), name);
-
-	return option;
+	return slot_option;
 }
 
 

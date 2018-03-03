@@ -82,10 +82,10 @@ private:
 };
 
 #define MCFG_PSX_CONTROLLER_PORTS_DSR_HANDLER(_devcb) \
-	devcb = &psxcontrollerports_device::set_dsr_handler(*device, DEVCB_##_devcb);
+	devcb = &downcast<psxcontrollerports_device &>(*device).set_dsr_handler(DEVCB_##_devcb);
 
 #define MCFG_PSX_CONTROLLER_PORTS_RXD_HANDLER(_devcb) \
-	devcb = &psxcontrollerports_device::set_rxd_handler(*device, DEVCB_##_devcb);
+	devcb = &downcast<psxcontrollerports_device &>(*device).set_rxd_handler(DEVCB_##_devcb);
 
 class psxcontrollerports_device : public device_t
 {
@@ -94,8 +94,8 @@ public:
 
 	void ack();
 
-	template <class Object> static devcb_base &set_dsr_handler(device_t &device, Object &&cb) { return downcast<psxcontrollerports_device &>(device).m_dsr_handler.set_callback(std::forward<Object>(cb)); }
-	template <class Object> static devcb_base &set_rxd_handler(device_t &device, Object &&cb) { return downcast<psxcontrollerports_device &>(device).m_rxd_handler.set_callback(std::forward<Object>(cb)); }
+	template <class Object> devcb_base &set_dsr_handler(Object &&cb) { return m_dsr_handler.set_callback(std::forward<Object>(cb)); }
+	template <class Object> devcb_base &set_rxd_handler(Object &&cb) { return m_rxd_handler.set_callback(std::forward<Object>(cb)); }
 
 	DECLARE_WRITE_LINE_MEMBER(write_sck);
 	DECLARE_WRITE_LINE_MEMBER(write_dtr);

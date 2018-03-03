@@ -15,16 +15,16 @@ DECLARE_DEVICE_TYPE(MSX_SLOT_MUSIC, msx_slot_music_device)
 
 #define MCFG_MSX_SLOT_MUSIC_ADD(_tag, _startpage, _numpages, _region, _offset, _ym2413_tag) \
 	MCFG_MSX_INTERNAL_SLOT_ADD(_tag, MSX_SLOT_MUSIC, _startpage, _numpages) \
-	msx_slot_rom_device::set_rom_start(*device, "^" _region, _offset); \
-	msx_slot_music_device::set_ym2413_tag(*device, _ym2413_tag);
+	downcast<msx_slot_rom_device &>(*device).set_rom_start("^" _region, _offset); \
+	downcast<msx_slot_music_device &>(*device).set_ym2413_tag(_ym2413_tag);
 
 class msx_slot_music_device : public msx_slot_rom_device
 {
 public:
 	msx_slot_music_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
-	// static configuration helpers
-	static void set_ym2413_tag(device_t &device, const char *tag) { dynamic_cast<msx_slot_music_device &>(device).m_ym2413_tag = tag; }
+	// configuration helpers
+	void set_ym2413_tag(const char *tag) { m_ym2413_tag = tag; }
 
 	virtual DECLARE_READ8_MEMBER(read) override;
 

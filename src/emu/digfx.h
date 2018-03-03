@@ -128,10 +128,10 @@ const gfx_layout name = { width, height, RGN_FRAC(1,1), 8, { GFX_RAW }, { 0 }, {
 //**************************************************************************
 
 #define MCFG_GFX_PALETTE(_palette_tag) \
-	device_gfx_interface::static_set_palette(*device, _palette_tag);
+	dynamic_cast<device_gfx_interface &>(*device).set_palette(_palette_tag);
 
 #define MCFG_GFX_INFO(_info) \
-	device_gfx_interface::static_set_info(*device, GFXDECODE_NAME(_info));
+	dynamic_cast<device_gfx_interface &>(*device).set_info(GFXDECODE_NAME(_info));
 
 
 
@@ -191,9 +191,9 @@ public:
 						const gfx_decode_entry *gfxinfo = nullptr, const char *palette_tag = nullptr);
 	virtual ~device_gfx_interface();
 
-	// static configuration
-	static void static_set_info(device_t &device, const gfx_decode_entry *gfxinfo);
-	static void static_set_palette(device_t &device, const char *tag);
+	// configuration
+	void set_info(const gfx_decode_entry *gfxinfo) { m_gfxdecodeinfo = gfxinfo; }
+	void set_palette(const char *tag) { m_palette_tag = tag; m_palette_is_sibling = true; }
 
 	void set_palette_disable(bool disable);
 

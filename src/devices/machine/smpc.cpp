@@ -226,22 +226,6 @@ smpc_hle_device::smpc_hle_device(const machine_config &mconfig, const char *tag,
 	m_has_ctrl_ports = false;
 }
 
-// method setters
-void smpc_hle_device::static_set_region_code(device_t &device, uint8_t rgn)
-{
-	smpc_hle_device &dev = downcast<smpc_hle_device &>(device);
-	dev.m_region_code = rgn;
-}
-
-void smpc_hle_device::static_set_control_port_tags(device_t &device, const char *tag1, const char *tag2)
-{
-	smpc_hle_device &dev = downcast<smpc_hle_device &>(device);
-	dev.m_ctrl1_tag = tag1;
-	dev.m_ctrl2_tag = tag2;
-	// TODO: checking against nullptr still returns a device!?
-	dev.m_has_ctrl_ports = true;
-}
-
 //-------------------------------------------------
 //  device_add_mconfig - device-specific machine
 //  configuration addiitons
