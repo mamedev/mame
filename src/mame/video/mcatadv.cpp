@@ -14,6 +14,8 @@ ToDo: Fix Sprites & Rowscroll/Select for Cocktail
 #include "includes/mcatadv.h"
 #include "screen.h"
 
+#include <algorithm>
+
 template<int Chip>
 TILE_GET_INFO_MEMBER(mcatadv_state::get_mcatadv_tile_info)
 {
@@ -249,12 +251,12 @@ void mcatadv_state::video_start()
 	m_tilemap[1]->set_transparent_pen(0);
 
 	m_spriteram_old = make_unique_clear<uint16_t[]>(m_spriteram.bytes() / 2);
-	m_vidregs_old = std::make_unique<uint16_t[]>((0x0f + 1) / 2);
+	m_vidregs_old = std::make_unique<uint16_t[]>(m_vidregs.bytes() / 2);
 
 	m_palette_bank[0] = m_palette_bank[1] = 0;
 
 	save_pointer(NAME(m_spriteram_old.get()), m_spriteram.bytes() / 2);
-	save_pointer(NAME(m_vidregs_old.get()), (0x0f + 1) / 2);
+	save_pointer(NAME(m_vidregs_old.get()), m_vidregs.bytes() / 2);
 }
 
 WRITE_LINE_MEMBER(mcatadv_state::screen_vblank_mcatadv)
@@ -262,7 +264,7 @@ WRITE_LINE_MEMBER(mcatadv_state::screen_vblank_mcatadv)
 	// rising edge
 	if (state)
 	{
-		memcpy(m_spriteram_old.get(), m_spriteram, m_spriteram.bytes());
-		memcpy(m_vidregs_old.get(), m_vidregs, 0xf);
+		std::copy(&m_spriteram[0], &m_spriteram[m_spriteram.bytes() / 2], &m_spriteram_old[0]);
+		std::copy(&m_vidregs[0], &m_vidregs[m_vidregs.bytes() / 2], &m_vidregs_old[0]);
 	}
 }
