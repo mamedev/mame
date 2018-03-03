@@ -255,7 +255,6 @@ vis_vga_device::vis_vga_device(const machine_config &mconfig, const char *tag, d
 	device_isa16_card_interface(mconfig, *this),
 	m_screen_tag(subtag("screen"))
 {
-	m_palette.set_tag("palette");
 	set_screen(m_screen_tag.c_str());
 }
 
@@ -263,7 +262,6 @@ MACHINE_CONFIG_START(vis_vga_device::device_add_mconfig)
 	MCFG_SCREEN_ADD("screen", RASTER)
 	MCFG_SCREEN_RAW_PARAMS(XTAL(25'174'800),900,0,640,526,0,480)
 	MCFG_SCREEN_UPDATE_DEVICE(DEVICE_SELF, vis_vga_device, screen_update)
-	MCFG_PALETTE_ADD("palette", 0x100)
 MACHINE_CONFIG_END
 
 void vis_vga_device::recompute_params()
@@ -378,8 +376,6 @@ void vis_vga_device::vga_vh_yuv8(bitmap_rgb32 &bitmap, const rectangle &cliprect
 
 void vis_vga_device::device_start()
 {
-	if(!m_palette->started())
-		throw device_missing_dependencies();
 	set_isa_device();
 	m_isa->install_device(0x03b0, 0x03df, read8_delegate(FUNC(vis_vga_device::vga_r), this), write8_delegate(FUNC(vis_vga_device::vga_w), this));
 	m_isa->install_memory(0x0a0000, 0x0bffff, read8_delegate(FUNC(vis_vga_device::visvgamem_r), this), write8_delegate(FUNC(vis_vga_device::visvgamem_w), this));

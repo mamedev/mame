@@ -133,7 +133,7 @@ DEFINE_DEVICE_TYPE(MACH8,      mach8_device,      "mach8",      "Mach8")
 vga_device::vga_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock)
 	: device_t(mconfig, type, tag, owner, clock)
 	, device_video_interface(mconfig, *this)
-	, m_palette(*this, "^palette")
+	, device_palette_interface(mconfig, *this)
 {
 }
 
@@ -244,7 +244,7 @@ void vga_device::device_start()
 
 	int i;
 	for (i = 0; i < 0x100; i++)
-		m_palette->set_pen_color(i, 0, 0, 0);
+		set_pen_color(i, 0, 0, 0);
 
 	// Avoid an infinite loop when displaying.  0 is not possible anyway.
 	vga.crtc.maximum_scan_line = 1;
@@ -612,7 +612,7 @@ void vga_device::vga_vh_vga(bitmap_rgb32 &bitmap, const rectangle &cliprect)
 					{
 						if(!screen().visible_area().contains(c+xi-(pel_shift), line + yi))
 							continue;
-						bitmapline[c+xi-(pel_shift)] = m_palette->pen(vga.memory[(pos & 0xffff)+((xi >> 1)*0x10000)]);
+						bitmapline[c+xi-(pel_shift)] = pen(vga.memory[(pos & 0xffff)+((xi >> 1)*0x10000)]);
 					}
 				}
 			}
@@ -639,7 +639,7 @@ void vga_device::vga_vh_vga(bitmap_rgb32 &bitmap, const rectangle &cliprect)
 					{
 						if(!screen().visible_area().contains(c+xi-(pel_shift), line + yi))
 							continue;
-						bitmapline[c+xi-pel_shift] = m_palette->pen(vga.memory[(pos+(xi >> 1)) & 0xffff]);
+						bitmapline[c+xi-pel_shift] = pen(vga.memory[(pos+(xi >> 1)) & 0xffff]);
 					}
 				}
 			}
@@ -759,7 +759,7 @@ void svga_device::svga_vh_rgb8(bitmap_rgb32 &bitmap, const rectangle &cliprect)
 					{
 						if(!screen().visible_area().contains(c+xi, line + yi))
 							continue;
-						bitmapline[c+xi] = m_palette->pen(vga.memory[(pos+(xi))]);
+						bitmapline[c+xi] = pen(vga.memory[(pos+(xi))]);
 					}
 				}
 			}
@@ -948,7 +948,7 @@ uint8_t vga_device::pc_vga_choosevideomode()
 			for (i=0; i<256;i++)
 			{
 				/* TODO: color shifters? */
-				m_palette->set_pen_color(i, (vga.dac.color[3*(i & vga.dac.mask)] & 0x3f) << 2,
+				set_pen_color(i, (vga.dac.color[3*(i & vga.dac.mask)] & 0x3f) << 2,
 										(vga.dac.color[3*(i & vga.dac.mask) + 1] & 0x3f) << 2,
 										(vga.dac.color[3*(i & vga.dac.mask) + 2] & 0x3f) << 2);
 			}
@@ -959,7 +959,7 @@ uint8_t vga_device::pc_vga_choosevideomode()
 		{
 			for (i=0; i<16;i++)
 			{
-				vga.pens[i] = m_palette->pen((vga.attribute.data[i]&0x0f)
+				vga.pens[i] = pen((vga.attribute.data[i]&0x0f)
 											|((vga.attribute.data[0x14]&0xf)<<4));
 			}
 		}
@@ -967,7 +967,7 @@ uint8_t vga_device::pc_vga_choosevideomode()
 		{
 			for (i=0; i<16;i++)
 			{
-				vga.pens[i]=m_palette->pen((vga.attribute.data[i]&0x3f)
+				vga.pens[i] = pen((vga.attribute.data[i]&0x3f)
 											|((vga.attribute.data[0x14]&0xc)<<4));
 			}
 		}
@@ -1009,7 +1009,7 @@ uint8_t svga_device::pc_vga_choosevideomode()
 			for (i=0; i<256;i++)
 			{
 				/* TODO: color shifters? */
-				m_palette->set_pen_color(i, (vga.dac.color[3*(i & vga.dac.mask)] & 0x3f) << 2,
+				set_pen_color(i, (vga.dac.color[3*(i & vga.dac.mask)] & 0x3f) << 2,
 										(vga.dac.color[3*(i & vga.dac.mask) + 1] & 0x3f) << 2,
 										(vga.dac.color[3*(i & vga.dac.mask) + 2] & 0x3f) << 2);
 			}
@@ -1020,7 +1020,7 @@ uint8_t svga_device::pc_vga_choosevideomode()
 		{
 			for (i=0; i<16;i++)
 			{
-				vga.pens[i] = m_palette->pen((vga.attribute.data[i]&0x0f)
+				vga.pens[i] = pen((vga.attribute.data[i]&0x0f)
 											|((vga.attribute.data[0x14]&0xf)<<4));
 			}
 		}
@@ -1028,7 +1028,7 @@ uint8_t svga_device::pc_vga_choosevideomode()
 		{
 			for (i=0; i<16;i++)
 			{
-				vga.pens[i]=m_palette->pen((vga.attribute.data[i]&0x3f)
+				vga.pens[i] = pen((vga.attribute.data[i]&0x3f)
 											|((vga.attribute.data[0x14]&0xc)<<4));
 			}
 		}
@@ -1100,7 +1100,7 @@ uint32_t vga_device::screen_update(screen_device &screen, bitmap_rgb32 &bitmap, 
 	uint8_t cur_mode = pc_vga_choosevideomode();
 	switch(cur_mode)
 	{
-		case SCREEN_OFF:   bitmap.fill  (m_palette->black_pen(), cliprect);break;
+		case SCREEN_OFF:   bitmap.fill  (black_pen(), cliprect);break;
 		case TEXT_MODE:    vga_vh_text  (bitmap, cliprect); break;
 		case VGA_MODE:     vga_vh_vga   (bitmap, cliprect); break;
 		case EGA_MODE:     vga_vh_ega   (bitmap, cliprect); break;
@@ -1117,7 +1117,7 @@ uint32_t svga_device::screen_update(screen_device &screen, bitmap_rgb32 &bitmap,
 
 	switch(cur_mode)
 	{
-		case SCREEN_OFF:   bitmap.fill  (m_palette->black_pen(), cliprect);break;
+		case SCREEN_OFF:   bitmap.fill  (black_pen(), cliprect);break;
 		case TEXT_MODE:    vga_vh_text  (bitmap, cliprect); break;
 		case VGA_MODE:     vga_vh_vga   (bitmap, cliprect); break;
 		case EGA_MODE:     vga_vh_ega   (bitmap, cliprect); break;
@@ -1184,8 +1184,8 @@ uint32_t s3_vga_device::screen_update(screen_device &screen, bitmap_rgb32 &bitma
 		}
 		else /* TODO: other modes */
 		{
-			bg_col = m_palette->pen(s3.cursor_bg[0]);
-			fg_col = m_palette->pen(s3.cursor_fg[0]);
+			bg_col = pen(s3.cursor_bg[0]);
+			fg_col = pen(s3.cursor_fg[0]);
 		}
 
 		//popmessage("%08x %08x",(s3.cursor_bg[0])|(s3.cursor_bg[1]<<8)|(s3.cursor_bg[2]<<16)|(s3.cursor_bg[3]<<24)

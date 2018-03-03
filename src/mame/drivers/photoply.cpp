@@ -305,7 +305,7 @@ MACHINE_CONFIG_START(photoply_state::photoply)
 
 	pcat_common(config);
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", photoply )
+	MCFG_GFXDECODE_ADD("gfxdecode", "vga", photoply )
 
 	MCFG_IDE_CONTROLLER_32_ADD("ide", ata_devices, "hdd", nullptr, true)
 	MCFG_ATA_INTERFACE_IRQ_HANDLER(DEVWRITELINE("pic8259_2", pic8259_device, ir6_w))
@@ -320,7 +320,6 @@ MACHINE_CONFIG_START(photoply_state::photoply)
 	MCFG_SCREEN_RAW_PARAMS(XTAL(25'174'800),900,0,640,526,0,480)
 	MCFG_SCREEN_UPDATE_DEVICE("vga", cirrus_gd5446_device, screen_update)
 
-	MCFG_PALETTE_ADD("palette", 0x100)
 	MCFG_DEVICE_ADD("vga", CIRRUS_GD5446, 0)
 	MCFG_VIDEO_SET_SCREEN("screen")
 
