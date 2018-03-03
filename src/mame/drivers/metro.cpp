@@ -1032,7 +1032,7 @@ ADDRESS_MAP_END
 
 WRITE8_MEMBER(metro_state::blzntrnd_sh_bankswitch_w)
 {
-	m_audiobank->set_entry(data & 0x03);
+	m_audiobank->set_entry(data & 0x07);
 }
 
 ADDRESS_MAP_START(metro_state::blzntrnd_sound_map)
@@ -3636,9 +3636,9 @@ MACHINE_CONFIG_START(metro_state::vmetal)
 	MCFG_ES8712_MSM_WRITE_CALLBACK(DEVWRITE8("msm", msm6585_device, data_w))
 	MCFG_ES8712_MSM_TAG("msm")
 
-	MCFG_SOUND_ADD("msm", MSM6585, 640_kHz_XTAL) /* Not verified, from docs */
+	MCFG_SOUND_ADD("msm", MSM6585, 640_kHz_XTAL) /* Not verified, value from docs */
 	MCFG_MSM6585_VCK_CALLBACK(DEVWRITELINE("essnd", es8712_device, msm_int))
-	MCFG_MSM6585_PRESCALER_SELECTOR(S40)         /* Not verified, from docs */
+	MCFG_MSM6585_PRESCALER_SELECTOR(S40)         /* Not verified, value from docs */
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 MACHINE_CONFIG_END
 
@@ -3986,7 +3986,7 @@ Notes:
              HSync: 15.11kHz
 
 TODO:
-	HUM-002-A-(B) PCB set is seen but not dumped. it's blazing tornado conversion?
+	HUM-002-A-(B) PCB set is also exists, but not dumped. it's blazing tornado conversion?
 */
 
 
@@ -5544,7 +5544,7 @@ DRIVER_INIT_MEMBER(metro_state,blzntrnd)
 	metro_common();
 	m_irq_line = 1;
 
-	m_audiobank->configure_entries(0, 4, memregion("audiocpu")->base() + 0x10000, 0x4000);
+	m_audiobank->configure_entries(0, 8, memregion("audiocpu")->base(), 0x4000);
 	m_karatour_irq_timer = timer_alloc(TIMER_KARATOUR_IRQ);
 }
 

@@ -89,7 +89,6 @@ NOTE: Mask roms from Power Flipper Pinball Shooting have not been dumped, but as
 #include "speaker.h"
 
 
-
 /***********************************************************
                       INTERRUPTS
 ***********************************************************/
@@ -296,10 +295,10 @@ static const gfx_layout charlayout =
 	16,16,  /* 16*16 characters */
 	RGN_FRAC(1,1),
 	4,  /* 4 bits per pixel */
-	{ 0, 1, 2, 3 },
-	{ 2*4, 3*4, 0*4, 1*4, 6*4, 7*4, 4*4, 5*4, 2*4+32, 3*4+32, 0*4+32, 1*4+32, 6*4+32, 7*4+32, 4*4+32, 5*4+32 },
-	{ 0*64, 1*64, 2*64, 3*64, 4*64, 5*64, 6*64, 7*64, 8*64, 9*64, 10*64, 11*64, 12*64, 13*64, 14*64, 15*64 },
-	128*8   /* every sprite takes 128 consecutive bytes */
+	{ STEP4(0,1) },
+	{ STEP16(0,4) },
+	{ STEP16(0,4*16) },
+	16*16*4   /* every sprite takes 128 consecutive bytes */
 };
 
 static const gfx_layout char_8x8_layout =
@@ -307,10 +306,10 @@ static const gfx_layout char_8x8_layout =
 	8,8,    /* 8*8 characters */
 	RGN_FRAC(1,1),
 	4,  /* 4 bits per pixel */
-	{ 0, 1, 2, 3 },
-	{ 2*4, 3*4, 0*4, 1*4, 6*4, 7*4, 4*4, 5*4 },
-	{ 0*32, 1*32, 2*32, 3*32, 4*32, 5*32, 6*32, 7*32 },
-	32*8    /* every sprite takes 32 consecutive bytes */
+	{ STEP4(0,1) },
+	{ STEP8(0,4) },
+	{ STEP8(0,4*8) },
+	8*8*4    /* every sprite takes 32 consecutive bytes */
 };
 
 static const gfx_layout tilelayout =
@@ -320,15 +319,15 @@ static const gfx_layout tilelayout =
 	4,  /* 4 bits per pixel */
 //  { 16, 48, 0, 32 },
 	{ 48, 16, 32, 0 },
-	{ 8, 9, 10, 11, 12, 13, 14, 15, 0, 1, 2, 3, 4, 5, 6, 7 },
-	{ 0*64, 1*64, 2*64, 3*64, 4*64, 5*64, 6*64, 7*64, 8*64, 9*64, 10*64, 11*64, 12*64, 13*64, 14*64, 15*64 },
-	128*8   /* every sprite takes 128 consecutive bytes */
+	{ STEP16(0,1) },
+	{ STEP16(0,16*4) },
+	16*16*4   /* every sprite takes 128 consecutive bytes */
 };
 
 static GFXDECODE_START( gcpinbal )
-	GFXDECODE_ENTRY( "gfx3", 0, tilelayout,       0, 256 )  /* sprites & playfield */
-	GFXDECODE_ENTRY( "gfx1", 0, charlayout,       0, 256 )  /* sprites & playfield */
-	GFXDECODE_ENTRY( "gfx2", 0, char_8x8_layout,  0, 256 )  /* sprites & playfield */
+	GFXDECODE_ENTRY( "sprite", 0, tilelayout,       0, 256 )  /* sprites & playfield */
+	GFXDECODE_ENTRY( "bg0", 0, charlayout,       0, 256 )  /* sprites & playfield */
+	GFXDECODE_ENTRY( "fg0", 0, char_8x8_layout,  0, 256 )  /* sprites & playfield */
 GFXDECODE_END
 
 
@@ -418,15 +417,15 @@ ROM_START( pwrflip ) /* Updated version of Grand Cross Pinball or semi-sequel? *
 	ROM_LOAD16_WORD_SWAP( "p.f.u45",       0x100000, 0x80000, CRC(6ad1a457) SHA1(8746c38efa05e3318e9b1a371470d149803fb6bb) )
 	ROM_LOAD16_WORD_SWAP( "p.f.u46",       0x180000, 0x80000, CRC(e0f3a1b4) SHA1(761dddf374a92c1a1e4a211ead215d5be461a082) )
 
-	ROM_REGION( 0x200000, "gfx1", 0 )  /* BG0 (16 x 16) */
-	ROM_LOAD( "u1",      0x000000, 0x100000, CRC(afa459bb) SHA1(7a7c64bcb80d71b8cf3fdd3209ef109997b6417c) ) /* 23C8000 MASK ROMs */
-	ROM_LOAD( "u6",      0x100000, 0x100000, CRC(c3f024e5) SHA1(d197e2b715b154fc64ff9a61f8c6df111d6fd446) )
+	ROM_REGION( 0x200000, "bg0", 0 )  /* BG0 (16 x 16) */
+	ROM_LOAD16_WORD_SWAP( "u1",      0x000000, 0x100000, CRC(afa459bb) SHA1(7a7c64bcb80d71b8cf3fdd3209ef109997b6417c) ) /* 23C8000 MASK ROMs */
+	ROM_LOAD16_WORD_SWAP( "u6",      0x100000, 0x100000, CRC(c3f024e5) SHA1(d197e2b715b154fc64ff9a61f8c6df111d6fd446) )
 
-	ROM_REGION( 0x020000, "gfx2", 0 )  /* FG0 (8 x 8) */
-	ROM_LOAD( "p.f.u10",   0x000000, 0x020000, CRC(50e34549) SHA1(ca1808513ff3feb8bcd34d9aafd7b374e4244732) )
+	ROM_REGION( 0x020000, "fg0", 0 )  /* FG0 (8 x 8) */
+	ROM_LOAD16_WORD_SWAP( "p.f.u10",   0x000000, 0x020000, CRC(50e34549) SHA1(ca1808513ff3feb8bcd34d9aafd7b374e4244732) )
 
-	ROM_REGION( 0x200000, "gfx3", 0 )  /* Sprites (16 x 16) */
-	ROM_LOAD( "u13",     0x000000, 0x200000, CRC(62f3952f) SHA1(7dc9ccb753d46b6aaa791bcbf6e18e6d872f6b79) ) /* 23C16000 MASK ROM */
+	ROM_REGION( 0x200000, "sprite", 0 )  /* Sprites (16 x 16) */
+	ROM_LOAD16_WORD_SWAP( "u13",     0x000000, 0x200000, CRC(62f3952f) SHA1(7dc9ccb753d46b6aaa791bcbf6e18e6d872f6b79) ) /* 23C16000 MASK ROM */
 
 	ROM_REGION( 0x080000, "oki", 0 )   /* M6295 acc to Raine */
 	ROM_LOAD( "u55",   0x000000, 0x080000, CRC(b3063351) SHA1(825e63e8a824d67d235178897528e5b0b41e4485) ) /* OKI M534001B MASK ROM */
@@ -442,15 +441,15 @@ ROM_START( gcpinbal )
 	ROM_LOAD16_WORD_SWAP( "3_excellent.u45",  0x100000, 0x80000, CRC(0511ad56) SHA1(e0602ece514126ce719ebc9de6649ebe907be904) )
 	ROM_LOAD16_WORD_SWAP( "4_excellent.u46",  0x180000, 0x80000, CRC(e0f3a1b4) SHA1(761dddf374a92c1a1e4a211ead215d5be461a082) )
 
-	ROM_REGION( 0x200000, "gfx1", 0 )  /* BG0 (16 x 16) */
-	ROM_LOAD( "u1",      0x000000, 0x100000, CRC(afa459bb) SHA1(7a7c64bcb80d71b8cf3fdd3209ef109997b6417c) ) /* 23C8000 MASK ROMs */
-	ROM_LOAD( "u6",      0x100000, 0x100000, CRC(c3f024e5) SHA1(d197e2b715b154fc64ff9a61f8c6df111d6fd446) )
+	ROM_REGION( 0x200000, "bg0", 0 )  /* BG0 (16 x 16) */
+	ROM_LOAD16_WORD_SWAP( "u1",      0x000000, 0x100000, CRC(afa459bb) SHA1(7a7c64bcb80d71b8cf3fdd3209ef109997b6417c) ) /* 23C8000 MASK ROMs */
+	ROM_LOAD16_WORD_SWAP( "u6",      0x100000, 0x100000, CRC(c3f024e5) SHA1(d197e2b715b154fc64ff9a61f8c6df111d6fd446) )
 
-	ROM_REGION( 0x020000, "gfx2", 0 )  /* FG0 (8 x 8) */
-	ROM_LOAD( "1_excellent.u10",   0x000000, 0x020000, CRC(79321550) SHA1(61f1b772ed8cf95bfee9df8394b0c3ff727e8702) )
+	ROM_REGION( 0x020000, "fg0", 0 )  /* FG0 (8 x 8) */
+	ROM_LOAD16_WORD_SWAP( "1_excellent.u10",   0x000000, 0x020000, CRC(79321550) SHA1(61f1b772ed8cf95bfee9df8394b0c3ff727e8702) )
 
-	ROM_REGION( 0x200000, "gfx3", 0 )  /* Sprites (16 x 16) */
-	ROM_LOAD( "u13",     0x000000, 0x200000, CRC(62f3952f) SHA1(7dc9ccb753d46b6aaa791bcbf6e18e6d872f6b79) ) /* 23C16000 MASK ROM */
+	ROM_REGION( 0x200000, "sprite", 0 )  /* Sprites (16 x 16) */
+	ROM_LOAD16_WORD_SWAP( "u13",     0x000000, 0x200000, CRC(62f3952f) SHA1(7dc9ccb753d46b6aaa791bcbf6e18e6d872f6b79) ) /* 23C16000 MASK ROM */
 
 	ROM_REGION( 0x080000, "oki", 0 )   /* M6295 acc to Raine */
 	ROM_LOAD( "u55",   0x000000, 0x080000, CRC(b3063351) SHA1(825e63e8a824d67d235178897528e5b0b41e4485) ) /* OKI M534001B MASK ROM */

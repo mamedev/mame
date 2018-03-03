@@ -554,7 +554,7 @@ MACHINE_CONFIG_START(lastbank_state::lastbank)
 	MCFG_ES8712_MSM_WRITE_CALLBACK(DEVWRITE8("msm", msm6585_device, data_w))
 	MCFG_ES8712_MSM_TAG("msm")
 
-	MCFG_SOUND_ADD("msm", MSM6585, 640_kHz_XTAL) /* Not verified */
+	MCFG_SOUND_ADD("msm", MSM6585, 640_kHz_XTAL) /* Not verified, It's actually MSM6585? */
 	MCFG_MSM6585_VCK_CALLBACK(DEVWRITELINE("essnd", es8712_device, msm_int))
 	MCFG_MSM6585_PRESCALER_SELECTOR(S40)         /* Not verified */
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
