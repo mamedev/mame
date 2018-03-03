@@ -62,7 +62,7 @@ public:
 
 	required_device<cpu_device> m_maincpu;
 	optional_device<es5510_device> m_esp;
-	optional_device<esq_5506_5510_pump_device> m_pump;
+	optional_device<esq_5505_5510_pump_device> m_pump;
 	required_device<esq2x40_sq1_device> m_sq1vfd;
 	
 	virtual void machine_start() override;
@@ -122,7 +122,7 @@ MACHINE_CONFIG_START(esqasr_state::asr)
 
 	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
 	
-	MCFG_SOUND_ADD("pump", ESQ_5506_5510_PUMP, XTAL(16'000'000) / (16 * 32))
+	MCFG_SOUND_ADD("pump", ESQ_5505_5510_PUMP, XTAL(16'000'000) / (16 * 32))
 	MCFG_SOUND_ROUTE(0, "lspeaker", 1.0)
 	MCFG_SOUND_ROUTE(1, "rspeaker", 1.0)
 	
@@ -155,7 +155,7 @@ MACHINE_CONFIG_START(esqasr_state::asrx)
 
 	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
 	
-	MCFG_SOUND_ADD("pump", ESQ_5506_5510_PUMP, XTAL(16'000'000) / (16 * 32)) // Actually ES5511
+	MCFG_SOUND_ADD("pump", ESQ_5505_5510_PUMP, XTAL(16'000'000) / (16 * 32)) // Actually ES5511
 	MCFG_SOUND_ROUTE(0, "lspeaker", 1.0)
 	MCFG_SOUND_ROUTE(1, "rspeaker", 1.0)
 	

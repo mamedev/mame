@@ -116,7 +116,7 @@ public:
 
 	required_device<m68ec020_device> m_maincpu;
 	required_device<es5510_device> m_esp;
-	required_device<esq_5506_5510_pump_device> m_pump;
+	required_device<esq_5505_5510_pump_device> m_pump;
 	required_device<scn2681_device> m_duart;
 	required_device<esqpanel2x16_sq1_device> m_sq1panel;
 	required_device<midi_port_device> m_mdout;
@@ -238,7 +238,7 @@ MACHINE_CONFIG_START(esqkt_state::kt)
 
 	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
 
-	MCFG_SOUND_ADD("pump", ESQ_5506_5510_PUMP, XTAL(16'000'000) / (16 * 32))
+	MCFG_SOUND_ADD("pump", ESQ_5505_5510_PUMP, XTAL(16'000'000) / (16 * 32))
 	MCFG_SOUND_ROUTE(0, "lspeaker", 1.0)
 	MCFG_SOUND_ROUTE(1, "rspeaker", 1.0)
 	

@@ -78,7 +78,7 @@ protected:
 
 	// timer callback overrides
 	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr) override;
-	
+
 private:
 	// internal state:
 	// sound stream
