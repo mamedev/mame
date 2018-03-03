@@ -72,7 +72,7 @@ nubus_xceedmc30_device::nubus_xceedmc30_device(const machine_config &mconfig, de
 	m_vram32(nullptr), m_mode(0), m_vbl_disable(0), m_toggle(0), m_count(0), m_clutoffs(0), m_timer(nullptr),
 	m_assembled_tag(util::string_format("%s:%s", tag, XCEEDMC30_SCREEN_NAME))
 {
-	this->set_screen(m_assembled_tag.c_str());
+	set_screen(m_assembled_tag.c_str());
 }
 
 //-------------------------------------------------

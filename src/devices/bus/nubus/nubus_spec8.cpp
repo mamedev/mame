@@ -78,7 +78,7 @@ nubus_spec8s3_device::nubus_spec8s3_device(const machine_config &mconfig, device
 	m_assembled_tag(util::string_format("%s:%s", tag, SPEC8S3_SCREEN_NAME)),
 	m_vbl_pending(false), m_parameter(0)
 {
-	this->set_screen(m_assembled_tag.c_str());
+	set_screen(m_assembled_tag.c_str());
 }
 
 //-------------------------------------------------
