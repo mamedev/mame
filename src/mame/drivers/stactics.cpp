@@ -332,11 +332,11 @@ MACHINE_CONFIG_START(stactics_state::stactics)
 	MCFG_ADDRESSABLE_LATCH_Q7_OUT_CB(NOOP) // SOUND ON
 
 	MCFG_DEVICE_ADD("lamplatch", LS259, 0) // 96
-	MCFG_ADDRESSABLE_LATCH_Q0_OUT_CB(WRITELINE(stactics_state, base_5_lamp_w))
-	MCFG_ADDRESSABLE_LATCH_Q1_OUT_CB(WRITELINE(stactics_state, base_4_lamp_w))
-	MCFG_ADDRESSABLE_LATCH_Q2_OUT_CB(WRITELINE(stactics_state, base_3_lamp_w))
-	MCFG_ADDRESSABLE_LATCH_Q3_OUT_CB(WRITELINE(stactics_state, base_2_lamp_w))
-	MCFG_ADDRESSABLE_LATCH_Q4_OUT_CB(WRITELINE(stactics_state, base_1_lamp_w))
+	MCFG_ADDRESSABLE_LATCH_Q0_OUT_CB(WRITELINE(stactics_state, base_lamp_w<4>))
+	MCFG_ADDRESSABLE_LATCH_Q1_OUT_CB(WRITELINE(stactics_state, base_lamp_w<3>))
+	MCFG_ADDRESSABLE_LATCH_Q2_OUT_CB(WRITELINE(stactics_state, base_lamp_w<2>))
+	MCFG_ADDRESSABLE_LATCH_Q3_OUT_CB(WRITELINE(stactics_state, base_lamp_w<1>))
+	MCFG_ADDRESSABLE_LATCH_Q4_OUT_CB(WRITELINE(stactics_state, base_lamp_w<0>))
 	MCFG_ADDRESSABLE_LATCH_Q5_OUT_CB(WRITELINE(stactics_state, start_lamp_w))
 	MCFG_ADDRESSABLE_LATCH_Q6_OUT_CB(WRITELINE(stactics_state, barrier_lamp_w))
 
