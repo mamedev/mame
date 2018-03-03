@@ -118,7 +118,6 @@ public:
 
 	uint32_t screen_update_galpani3(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 	TIMER_DEVICE_CALLBACK_MEMBER(galpani3_vblank);
-	int gp3_is_alpha_pen(int pen);
 	void galpani3(machine_config &config);
 	void galpani3_map(address_map &map);
 };
@@ -149,11 +148,11 @@ TIMER_DEVICE_CALLBACK_MEMBER(galpani3_state::galpani3_vblank)// 2, 3, 5 ?
 
 void galpani3_state::video_start()
 {
-	m_spriteram32 = std::make_unique<uint32_t[]>(0x4000/4);
-	m_spc_regs = std::make_unique<uint32_t[]>(0x40/4);
-
 	/* so we can use video/sknsspr.c */
 	m_spritegen->skns_sprite_kludge(0,0);
+	
+	m_spriteram32 = make_unique_clear<uint32_t[]>(0x4000/4);
+	m_spc_regs = make_unique_clear<uint32_t[]>(0x40/4);
 
 	save_item(NAME(m_priority_buffer_scrollx));
 	save_item(NAME(m_priority_buffer_scrolly));
@@ -161,190 +160,147 @@ void galpani3_state::video_start()
 	save_pointer(NAME(m_spc_regs.get()), 0x40/4);
 }
 
-
-
-int galpani3_state::gp3_is_alpha_pen(int pen)
-{
-	uint16_t dat = 0;
-
-	if (pen<0x4000)
-	{
-		dat = m_paletteram[pen];
-	}
-	else if (pen<0x4100)
-	{
-		dat = m_grap2[0]->m_framebuffer_palette[pen&0xff];
-	}
-	else if (pen<0x4200)
-	{
-		dat = m_grap2[1]->m_framebuffer_palette[pen&0xff];
-	}
-	else if (pen<0x4300)
-	{
-		dat = m_grap2[2]->m_framebuffer_palette[pen&0xff];
-	}
-	else if (pen<0x4301)
-	{
-		dat = m_grap2[0]->m_framebuffer_bgcol;
-	}
-	else if (pen<0x4302)
-	{
-		dat = m_grap2[1]->m_framebuffer_bgcol;
-	}
-	else if (pen<0x4303)
-	{
-		dat = m_grap2[2]->m_framebuffer_bgcol;
+#define SPRITE_DRAW_PIXEL(_pri)                                    \
+	if (((sprdat & 0xc000) == _pri) && ((sprdat & 0xff) != 0))     \
+	{                                                              \
+		dst[drawx] = paldata[sprdat & 0x3fff];                     \
 	}
 
-	if (dat&0x8000) return 1;
-	else return 0;
-}
-
+// Switchable brightness value in highest bit of palette
+// TODO : m_framebuffer_bright1 is alpha-blended?
+#define FB_DRAW_PIXEL(_chip, _pixel)                                                              \
+	int alpha = 0xff;                                                                             \
+	uint32_t pal = m_grap2[_chip]->pen_r(_pixel);                                                 \
+	if (m_grap2[_chip]->m_framebuffer_palette[_pixel] & 0x8000)                                   \
+	{                                                                                             \
+		alpha = (m_grap2[_chip]->m_framebuffer_bright2 & 0xff);                                   \
+	}                                                                                             \
+	else                                                                                          \
+	{                                                                                             \
+		alpha = (m_grap2[_chip]->m_framebuffer_bright1 & 0xff);                                   \
+	}                                                                                             \
+	if (alpha)                                                                                    \
+	{                                                                                             \
+		if (alpha == 0xff)                                                                        \
+			dst[drawx] = pal;                                                                     \
+		else                                                                                      \
+			dst[drawx] = alpha_blend_r32(dst[drawx], pal, alpha);                                 \
+	}
 
 uint32_t galpani3_state::screen_update_galpani3(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
 {
-	int x,y;
-	uint16_t* src1;
-	uint32_t* dst;
-	uint16_t pixdata1;
 	const pen_t *paldata = m_palette->pens();
+	
+	bitmap.fill(0, cliprect);
+	
+	m_sprite_bitmap.fill(0x0000, cliprect);
 
-	bitmap.fill(0x0000, cliprect);
+	m_spritegen->skns_draw_sprites(m_sprite_bitmap, cliprect, m_spriteram32.get(), 0x4000, m_spc_regs.get() );
 
 //  popmessage("%02x %02x", m_grap2[0]->m_framebuffer_bright2, m_grap2[1]->m_framebuffer_bright2);
 
-
-
 	{
 		int drawy, drawx;
-		for (drawy=0;drawy<512;drawy++)
+		for (drawy=cliprect.min_y;drawy<=cliprect.max_y;drawy++)
 		{
+			uint16_t* sprline  = &m_sprite_bitmap.pix16(drawy);
 			uint16_t* srcline1 = m_grap2[0]->m_framebuffer.get() + ((drawy+m_grap2[0]->m_framebuffer_scrolly+11)&0x1ff) * 0x200;
 			uint16_t* srcline2 = m_grap2[1]->m_framebuffer.get() + ((drawy+m_grap2[1]->m_framebuffer_scrolly+11)&0x1ff) * 0x200;
 			uint16_t* srcline3 = m_grap2[2]->m_framebuffer.get() + ((drawy+m_grap2[2]->m_framebuffer_scrolly+11)&0x1ff) * 0x200;
 
-			uint16_t*  priline  = m_priority_buffer + ((drawy+m_priority_buffer_scrolly+11)&0x1ff) * 0x200;
+			uint16_t* priline  = m_priority_buffer + ((drawy+m_priority_buffer_scrolly+11)&0x1ff) * 0x200;
+			
+			uint32_t* dst = &bitmap.pix32(drawy & 0x3ff);
 
-			for (drawx=0;drawx<512;drawx++)
+			for (drawx=cliprect.min_x;drawx<=cliprect.max_x;drawx++)
 			{
+				int sproffs  = drawx & 0x3ff;
 				int srcoffs1 = (drawx+m_grap2[0]->m_framebuffer_scrollx+67)&0x1ff;
 				int srcoffs2 = (drawx+m_grap2[1]->m_framebuffer_scrollx+67)&0x1ff;
 				int srcoffs3 = (drawx+m_grap2[2]->m_framebuffer_scrollx+67)&0x1ff;
 
 				int prioffs  = (drawx+m_priority_buffer_scrollx+66)&0x1ff;
 
-				uint8_t dat1 = srcline1[srcoffs1];
-				uint8_t dat2 = srcline2[srcoffs2];
-				uint8_t dat3 = srcline3[srcoffs3];
+				uint16_t sprdat = sprline[sproffs];
+				uint8_t  dat1 = srcline1[srcoffs1];
+				uint8_t  dat2 = srcline2[srcoffs2];
+				uint8_t  dat3 = srcline3[srcoffs3];
 
-				uint8_t pridat = priline[prioffs];
+				uint8_t  pridat = priline[prioffs];
 
-				uint32_t* dst = &bitmap.pix32(drawy, drawx);
-
-
-
-				// this is all wrong
+				// TODO : Verify priorities, blendings from real PCB.
 				if (pridat==0x0f) // relates to the area you've drawn over
 				{
+					SPRITE_DRAW_PIXEL(0x0000);
+					if (m_grap2[2]->m_framebuffer_enable)
+					{
+						FB_DRAW_PIXEL(2, dat3);
+					}
+					SPRITE_DRAW_PIXEL(0x4000);
 					if (dat1 && m_grap2[0]->m_framebuffer_enable)
 					{
-						dst[0] = paldata[dat1+0x4000];
+						FB_DRAW_PIXEL(0, dat1);
 					}
-
+					SPRITE_DRAW_PIXEL(0x8000);
 					if (dat2 && m_grap2[1]->m_framebuffer_enable)
 					{
-						dst[0] = paldata[dat2+0x4100];
+						FB_DRAW_PIXEL(1, dat2);
 					}
-
+					SPRITE_DRAW_PIXEL(0xc000);
 				}
 				else if (pridat==0xcf) // the girl
 				{
-					dst[0] = paldata[0x4300];
+					SPRITE_DRAW_PIXEL(0x0000);
+					FB_DRAW_PIXEL(0, 0x100);
+					SPRITE_DRAW_PIXEL(0x4000);
+					if (m_grap2[1]->m_framebuffer_enable)
+					{
+						FB_DRAW_PIXEL(1, 0x100);
+					}
+					SPRITE_DRAW_PIXEL(0x8000);
+					if (dat3 && m_grap2[2]->m_framebuffer_enable)
+					{
+						FB_DRAW_PIXEL(2, dat3);
+					}
+					SPRITE_DRAW_PIXEL(0xc000);
 				}
 				else
 				{
-					/* this isn't right, but the registers have something to do with
-					   alpha / mixing, and bit 0x8000 of the palette is DEFINITELY alpha
-					   enable -- see fading in intro */
-					if (dat1 && m_grap2[0]->m_framebuffer_enable)
+					SPRITE_DRAW_PIXEL(0x0000);
+					if (m_grap2[0]->m_framebuffer_enable) // TODO : Opaque drawing 1st framebuffer in real PCB?
 					{
-						uint16_t pen = dat1+0x4000;
-						uint32_t pal = paldata[pen];
-
-						if (gp3_is_alpha_pen(pen))
-						{
-							int r,g,b;
-							r = (pal & 0x00ff0000)>>16;
-							g = (pal & 0x0000ff00)>>8;
-							b = (pal & 0x000000ff)>>0;
-
-							r = (r * m_grap2[0]->m_framebuffer_bright2) / 0xff;
-							g = (g * m_grap2[0]->m_framebuffer_bright2) / 0xff;
-							b = (b * m_grap2[0]->m_framebuffer_bright2) / 0xff;
-
-							pal = (r & 0x000000ff)<<16;
-							pal |=(g & 0x000000ff)<<8;
-							pal |=(b & 0x000000ff)<<0;
-
-							dst[0] = pal;
-						}
-						else
-						{
-							dst[0] = pal;
-						}
+						FB_DRAW_PIXEL(0, dat1);
 					}
-
+					SPRITE_DRAW_PIXEL(0x4000);
 					if (dat2 && m_grap2[1]->m_framebuffer_enable)
 					{
-						uint16_t pen = dat2+0x4100;
-						uint32_t pal = paldata[pen];
-
-						if (gp3_is_alpha_pen(pen))
-						{
-							int r,g,b;
-							r = (pal & 0x00ff0000)>>16;
-							g = (pal & 0x0000ff00)>>8;
-							b = (pal & 0x000000ff)>>0;
-
-							r = (r * m_grap2[1]->m_framebuffer_bright2) / 0xff;
-							g = (g * m_grap2[1]->m_framebuffer_bright2) / 0xff;
-							b = (b * m_grap2[1]->m_framebuffer_bright2) / 0xff;
-
-							pal = (r & 0x000000ff)<<16;
-							pal |=(g & 0x000000ff)<<8;
-							pal |=(b & 0x000000ff)<<0;
-
-							dst[0] |= pal;
-						}
-						else
-						{
-							dst[0] = pal;
-						}
+						FB_DRAW_PIXEL(1, dat2);
 					}
-
+					SPRITE_DRAW_PIXEL(0x8000);
 					if (dat3 && m_grap2[2]->m_framebuffer_enable)
 					{
-						dst[0] = paldata[dat3+0x4200];
+						FB_DRAW_PIXEL(2, dat3);
 					}
+					SPRITE_DRAW_PIXEL(0xc000);
 				}
 
 				/*
 				else if (pridat==0x2f) // area outside of the girl
 				{
-				    //dst[0] = machine().rand()&0x3fff;
+				    //dst[drawx] = machine().rand()&0x3fff;
 				}
 
 				else if (pridat==0x00) // the initial line / box that gets drawn
 				{
-				    //dst[0] = machine().rand()&0x3fff;
+				    //dst[drawx] = machine().rand()&0x3fff;
 				}
 				else if (pridat==0x30) // during the 'gals boxes' on the intro
 				{
-				    //dst[0] = machine().rand()&0x3fff;
+				    //dst[drawx] = machine().rand()&0x3fff;
 				}
 				else if (pridat==0x0c) // 'nice' at end of level
 				{
-				    //dst[0] = machine().rand()&0x3fff;
+				    //dst[drawx] = machine().rand()&0x3fff;
 				}
 				else
 				{
@@ -354,32 +310,6 @@ uint32_t galpani3_state::screen_update_galpani3(screen_device &screen, bitmap_rg
 			}
 		}
 	}
-
-
-	m_sprite_bitmap.fill(0x0000, cliprect);
-
-	m_spritegen->skns_draw_sprites(m_sprite_bitmap, cliprect, m_spriteram32.get(), 0x4000, m_spc_regs.get() );
-
-	// ignoring priority bits for now..
-	for (y=0;y<240;y++)
-	{
-		src1 = &m_sprite_bitmap.pix16(y);
-		dst =  &bitmap.pix32(y);
-
-		for (x=0;x<320;x++)
-		{
-			pixdata1 = src1[x];
-
-			if (pixdata1 & 0x3fff)
-			{
-				dst[x] = paldata[(pixdata1 & 0x3fff)];
-			}
-		}
-	}
-
-
-
-
 	return 0;
 }
 
@@ -460,11 +390,6 @@ WRITE16_MEMBER(galpani3_state::galpani3_priority_buffer_scrolly_w)
 }
 
 
-
-
-
-
-
 ADDRESS_MAP_START(galpani3_state::galpani3_map)
 	AM_RANGE(0x000000, 0x17ffff) AM_ROM
 
@@ -481,10 +406,10 @@ ADDRESS_MAP_START(galpani3_state::galpani3_map)
 	AM_RANGE(0x680000, 0x680001) AM_DEVWRITE( "toybox", kaneko_toybox_device, mcu_com2_w)
 	AM_RANGE(0x700000, 0x700001) AM_DEVWRITE( "toybox", kaneko_toybox_device, mcu_com3_w)
 	AM_RANGE(0x780000, 0x780001) AM_DEVREAD( "toybox", kaneko_toybox_device, mcu_status_r)
-
-	GRAP2_AREA( 0x800000, "grap2_0" )
-	GRAP2_AREA( 0xa00000, "grap2_1" )
-	GRAP2_AREA( 0xc00000, "grap2_2" )
+	
+	AM_RANGE(0x800000, 0x9fffff) AM_DEVICE( "grap2_0", kaneko_grap2_device, grap2_map)
+	AM_RANGE(0xa00000, 0xbfffff) AM_DEVICE( "grap2_1", kaneko_grap2_device, grap2_map)
+	AM_RANGE(0xc00000, 0xdfffff) AM_DEVICE( "grap2_2", kaneko_grap2_device, grap2_map)
 
 	// ?? priority / alpha buffer?
 	AM_RANGE(0xe00000, 0xe7ffff) AM_RAM AM_SHARE("priority_buffer") // area [J] - A area ? odd bytes only, initialized 00..ff,00..ff,..., then cleared
@@ -522,23 +447,19 @@ MACHINE_CONFIG_START(galpani3_state::galpani3)
 
 	MCFG_DEVICE_ADD("toybox", KANEKO_TOYBOX, 0)
 
-	MCFG_PALETTE_ADD("palette", 0x4303)
+	MCFG_PALETTE_ADD("palette", 0x4000)
 	MCFG_PALETTE_FORMAT(xGGGGGRRRRRBBBBB)
 
 	MCFG_DEVICE_ADD("spritegen", SKNS_SPRITE, 0)
 
 	MCFG_DEVICE_ADD("grap2_0", KANEKO_GRAP2, 0)
-	MCFG_KANEKO_GRAP2_CHIPNUM(0)
-	MCFG_KANEKO_GRAP2_PALETTE("palette")
+	MCFG_DEVICE_ROM("rlebg")
 
 	MCFG_DEVICE_ADD("grap2_1", KANEKO_GRAP2, 0)
-	MCFG_KANEKO_GRAP2_CHIPNUM(1)
-	MCFG_KANEKO_GRAP2_PALETTE("palette")
+	MCFG_DEVICE_ROM("rlebg")
 
 	MCFG_DEVICE_ADD("grap2_2", KANEKO_GRAP2, 0)
-	MCFG_KANEKO_GRAP2_CHIPNUM(2)
-	MCFG_KANEKO_GRAP2_PALETTE("palette")
-
+	MCFG_DEVICE_ROM("rlebg")
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
@@ -557,7 +478,7 @@ ROM_START( galpani3 ) /* All game text in English */
 	ROM_REGION( 0x200000, "spritegen", 0 ) /* Sprites - RLE encoded */
 	ROM_LOAD( "gp320000.1", 0x000000, 0x200000, CRC(a0112827) SHA1(0a6c78d71b75a1d78215aab3104176aa1769b14f) )
 
-	ROM_REGION( 0x1000000, "gfx2", 0 ) /* Backgrounds - RLE encoded */
+	ROM_REGION( 0x1000000, "rlebg", 0 ) /* Backgrounds - RLE encoded */
 	ROM_LOAD( "gp340000.123", 0x000000, 0x200000, CRC(a58a26b1) SHA1(832d70cce1b4f04fa50fc221962ff6cc4287cb92) )        // 19950414GROMACap
 	ROM_LOAD( "gp340100.122", 0x200000, 0x200000, CRC(746fe4a8) SHA1(a5126ae9e83d556277d31b166296a708c311a902) )        // 19950414GROMBCap
 	ROM_LOAD( "gp340200.121", 0x400000, 0x200000, CRC(e9bc15c8) SHA1(2c6a10e768709d1937d9206970553f4101ce9016) )        // 19950414GROMCCap
@@ -581,7 +502,7 @@ ROM_START( galpani3hk )
 	ROM_REGION( 0x200000, "spritegen", 0 ) /* Sprites - RLE encoded */
 	ROM_LOAD( "gp320000.1", 0x000000, 0x200000, CRC(a0112827) SHA1(0a6c78d71b75a1d78215aab3104176aa1769b14f) )
 
-	ROM_REGION( 0x1000000, "gfx2", 0 ) /* Backgrounds - RLE encoded */
+	ROM_REGION( 0x1000000, "rlebg", 0 ) /* Backgrounds - RLE encoded */
 	ROM_LOAD( "gp340000.123", 0x000000, 0x200000, CRC(a58a26b1) SHA1(832d70cce1b4f04fa50fc221962ff6cc4287cb92) )        // 19950414GROMACap
 	ROM_LOAD( "gp340100.122", 0x200000, 0x200000, CRC(746fe4a8) SHA1(a5126ae9e83d556277d31b166296a708c311a902) )        // 19950414GROMBCap
 	ROM_LOAD( "gp340200.121", 0x400000, 0x200000, CRC(e9bc15c8) SHA1(2c6a10e768709d1937d9206970553f4101ce9016) )        // 19950414GROMCCap
@@ -605,7 +526,7 @@ ROM_START( galpani3j ) /* Some game text in Japanese, but no "For use in Japan" 
 	ROM_REGION( 0x200000, "spritegen", 0 ) /* Sprites - RLE encoded */
 	ROM_LOAD( "gp320000.1", 0x000000, 0x200000, CRC(a0112827) SHA1(0a6c78d71b75a1d78215aab3104176aa1769b14f) )
 
-	ROM_REGION( 0x1000000, "gfx2", 0 ) /* Backgrounds - RLE encoded */
+	ROM_REGION( 0x1000000, "rlebg", 0 ) /* Backgrounds - RLE encoded */
 	ROM_LOAD( "gp340000.123", 0x000000, 0x200000, CRC(a58a26b1) SHA1(832d70cce1b4f04fa50fc221962ff6cc4287cb92) )        // 19950414GROMACap
 	ROM_LOAD( "gp340100.122", 0x200000, 0x200000, CRC(746fe4a8) SHA1(a5126ae9e83d556277d31b166296a708c311a902) )        // 19950414GROMBCap
 	ROM_LOAD( "gp340200.121", 0x400000, 0x200000, CRC(e9bc15c8) SHA1(2c6a10e768709d1937d9206970553f4101ce9016) )        // 19950414GROMCCap
@@ -629,7 +550,7 @@ ROM_START( galpani3k ) /* Some game text in Korean, but no "For use in Korea" ty
 	ROM_REGION( 0x200000, "spritegen", 0 ) /* Sprites - RLE encoded */
 	ROM_LOAD( "gp320000.1", 0x000000, 0x200000, CRC(a0112827) SHA1(0a6c78d71b75a1d78215aab3104176aa1769b14f) )
 
-	ROM_REGION( 0x1000000, "gfx2", 0 ) /* Backgrounds - RLE encoded */
+	ROM_REGION( 0x1000000, "rlebg", 0 ) /* Backgrounds - RLE encoded */
 	ROM_LOAD( "gp340000.123", 0x000000, 0x200000, CRC(a58a26b1) SHA1(832d70cce1b4f04fa50fc221962ff6cc4287cb92) )        // 19950414GROMACap
 	ROM_LOAD( "gp340100.122", 0x200000, 0x200000, CRC(746fe4a8) SHA1(a5126ae9e83d556277d31b166296a708c311a902) )        // 19950414GROMBCap
 	ROM_LOAD( "gp340200.121", 0x400000, 0x200000, CRC(e9bc15c8) SHA1(2c6a10e768709d1937d9206970553f4101ce9016) )        // 19950414GROMCCap
@@ -644,8 +565,6 @@ ROM_START( galpani3k ) /* Some game text in Korean, but no "For use in Korea" ty
 	ROM_REGION( 0x20000, "mcudata", 0 ) /* MCU Code? */
 	ROM_LOAD16_WORD_SWAP( "g3d0x0.134", 0x000000, 0x020000, CRC(4ace10f9) SHA1(d19e4540d535ce10d23cb0844be03a3239b3402e) )
 ROM_END
-
-
 
 
 GAME( 1995, galpani3,  0,        galpani3, galpani3, galpani3_state, 0, ROT90, "Kaneko", "Gals Panic 3 (Euro)",      MACHINE_IMPERFECT_GRAPHICS | MACHINE_NO_COCKTAIL | MACHINE_SUPPORTS_SAVE )

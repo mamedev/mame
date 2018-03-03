@@ -10,7 +10,7 @@
 	MCFG_DEVICE_SLOT_INTERFACE(slot_intf, def_slot, false)
 
 #define MCFG_INTERPRO_KEYBOARD_RXD_HANDLER(cb) \
-	devcb = &interpro_keyboard_port_device::set_rxd_handler(*device, DEVCB_##cb);
+	devcb = &downcast<interpro_keyboard_port_device &>(*device).set_rxd_handler(DEVCB_##cb);
 
 class device_interpro_keyboard_port_interface;
 
@@ -23,7 +23,7 @@ public:
 	virtual ~interpro_keyboard_port_device();
 
 	// static configuration helpers
-	template <class Object> static devcb_base &set_rxd_handler(device_t &device, Object &&cb) { return downcast<interpro_keyboard_port_device &>(device).m_rxd_handler.set_callback(std::forward<Object>(cb)); }
+	template <class Object> devcb_base &set_rxd_handler(Object &&cb) { return m_rxd_handler.set_callback(std::forward<Object>(cb)); }
 
 	DECLARE_WRITE_LINE_MEMBER(write_txd);
 

@@ -50,10 +50,10 @@ public:
 	cassette_image_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 	virtual ~cassette_image_device();
 
-	static void static_set_formats(device_t &device, const struct CassetteFormat*  const *formats) { downcast<cassette_image_device &>(device).m_formats = formats; }
-	static void static_set_create_opts(device_t &device, const struct CassetteOptions  *create_opts) { downcast<cassette_image_device &>(device).m_create_opts = create_opts; }
-	static void static_set_default_state(device_t &device, cassette_state default_state) { downcast<cassette_image_device &>(device).m_default_state = default_state; }
-	static void static_set_interface(device_t &device, const char *_interface) { downcast<cassette_image_device &>(device).m_interface = _interface; }
+	void set_formats(const struct CassetteFormat*  const *formats) { m_formats = formats; }
+	void set_create_opts(const struct CassetteOptions  *create_opts) { m_create_opts = create_opts; }
+	void set_default_state(cassette_state default_state) { m_default_state = default_state; }
+	void set_interface(const char *interface) { m_interface = interface; }
 
 	// image-level overrides
 	virtual image_init_result call_load() override;
@@ -132,15 +132,15 @@ typedef device_type_iterator<cassette_image_device> cassette_device_iterator;
 	MCFG_DEVICE_MODIFY(_tag)
 
 #define MCFG_CASSETTE_FORMATS(_formats) \
-	cassette_image_device::static_set_formats(*device, _formats);
+	downcast<cassette_image_device &>(*device).set_formats(_formats);
 
 #define MCFG_CASSETTE_CREATE_OPTS(_create_opts) \
-	cassette_image_device::static_set_create_opts(*device, _create_opts);
+	downcast<cassette_image_device &>(*device).set_create_opts(_create_opts);
 
 #define MCFG_CASSETTE_DEFAULT_STATE(_state) \
-	cassette_image_device::static_set_default_state(*device, (cassette_state) (_state));
+	downcast<cassette_image_device &>(*device).set_default_state((cassette_state) (_state));
 
 #define MCFG_CASSETTE_INTERFACE(_interface) \
-	cassette_image_device::static_set_interface(*device, _interface);
+	downcast<cassette_image_device &>(*device).set_interface(_interface);
 
 #endif // MAME_DEVICES_IMAGEDEV_CASSETTE_H

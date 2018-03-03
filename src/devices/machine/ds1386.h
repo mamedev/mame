@@ -60,13 +60,13 @@
 // handlers
 
 #define MCFG_DS1386_INTA_HANDLER(_devcb) \
-	devcb = &ds1386_device::set_inta_cb(*device, DEVCB_##_devcb);
+	devcb = &downcast<ds1386_device &>(*device).set_inta_cb(DEVCB_##_devcb);
 
 #define MCFG_DS1386_INTB_HANDLER(_devcb) \
-	devcb = &ds1386_device::set_inta_cb(*device, DEVCB_##_devcb);
+	devcb = &downcast<ds1386_device &>(*device).set_inta_cb(DEVCB_##_devcb);
 
 #define MCFG_DS1386_SQW_HANDLER(_devcb) \
-	devcb = &ds1386_device::set_sqw_cb(*device, DEVCB_##_devcb);
+	devcb = &downcast<ds1386_device &>(*device).set_sqw_cb(DEVCB_##_devcb);
 
 // devices
 
@@ -87,9 +87,9 @@ public:
 	DECLARE_WRITE_LINE_MEMBER( oe_w );
 	DECLARE_WRITE_LINE_MEMBER( we_w );
 
-	template <class Object> static devcb_base &set_inta_cb(device_t &device, Object &&cb) { return downcast<ds1386_device &>(device).m_inta_cb.set_callback(std::forward<Object>(cb)); }
-	template <class Object> static devcb_base &set_intb_cb(device_t &device, Object &&cb) { return downcast<ds1386_device &>(device).m_intb_cb.set_callback(std::forward<Object>(cb)); }
-	template <class Object> static devcb_base &set_sqw_cb(device_t &device, Object &&cb) { return downcast<ds1386_device &>(device).m_sqw_cb.set_callback(std::forward<Object>(cb)); }
+	template <class Object> devcb_base &set_inta_cb(Object &&cb) { return m_inta_cb.set_callback(std::forward<Object>(cb)); }
+	template <class Object> devcb_base &set_intb_cb(Object &&cb) { return m_intb_cb.set_callback(std::forward<Object>(cb)); }
+	template <class Object> devcb_base &set_sqw_cb(Object &&cb) { return m_sqw_cb.set_callback(std::forward<Object>(cb)); }
 
 protected:
 	enum

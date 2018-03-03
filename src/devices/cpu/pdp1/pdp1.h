@@ -83,7 +83,7 @@ public:
 	// construction/destruction
 	pdp1_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
-	static void static_set_reset_param(device_t &device, const pdp1_reset_param_t *param) { downcast<pdp1_device &>(device).m_reset_param = param; }
+	void set_reset_param(const pdp1_reset_param_t *param) { m_reset_param = param; }
 
 	void pulse_start_clear();
 	void io_complete() { m_ios = 1; }
@@ -200,7 +200,7 @@ DECLARE_DEVICE_TYPE(PDP1, pdp1_device)
 
 
 #define MCFG_PDP1_RESET_PARAM(_param) \
-	pdp1_device::static_set_reset_param(*device, &(_param));
+	downcast<pdp1_device &>(*device).set_reset_param(&(_param));
 
 
 #endif // MAME_CPU_PDP1_PDP1_H

@@ -68,24 +68,6 @@ cs8221_device::cs8221_device(const machine_config &mconfig, const char *tag, dev
 {
 }
 
-void cs8221_device::static_set_cputag(device_t &device, const char *tag)
-{
-	cs8221_device &cs8221 = downcast<cs8221_device &>(device);
-	cs8221.m_cputag = tag;
-}
-
-void cs8221_device::static_set_isatag(device_t &device, const char *tag)
-{
-	cs8221_device &cs8221 = downcast<cs8221_device &>(device);
-	cs8221.m_isatag = tag;
-}
-
-void cs8221_device::static_set_biostag(device_t &device, const char *tag)
-{
-	cs8221_device &cs8221 = downcast<cs8221_device &>(device);
-	cs8221.m_biostag = tag;
-}
-
 //-------------------------------------------------
 //  device_start - device-specific startup
 //-------------------------------------------------

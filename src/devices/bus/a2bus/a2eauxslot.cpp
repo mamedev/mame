@@ -38,13 +38,6 @@ a2eauxslot_slot_device::a2eauxslot_slot_device(const machine_config &mconfig, de
 {
 }
 
-void a2eauxslot_slot_device::static_set_a2eauxslot_slot(device_t &device, const char *tag, const char *slottag)
-{
-	a2eauxslot_slot_device &a2eauxslot_card = dynamic_cast<a2eauxslot_slot_device &>(device);
-	a2eauxslot_card.m_a2eauxslot_tag = tag;
-	a2eauxslot_card.m_a2eauxslot_slottag = slottag;
-}
-
 //-------------------------------------------------
 //  device_start - device-specific startup
 //-------------------------------------------------
@@ -53,7 +46,7 @@ void a2eauxslot_slot_device::device_start()
 {
 	device_a2eauxslot_card_interface *dev = dynamic_cast<device_a2eauxslot_card_interface *>(get_card_device());
 
-	if (dev) device_a2eauxslot_card_interface::static_set_a2eauxslot_tag(*dev, m_a2eauxslot_tag, m_a2eauxslot_slottag);
+	if (dev) dev->set_a2eauxslot_tag(m_a2eauxslot_tag, m_a2eauxslot_slottag);
 }
 
 //**************************************************************************
@@ -61,12 +54,6 @@ void a2eauxslot_slot_device::device_start()
 //**************************************************************************
 
 DEFINE_DEVICE_TYPE(A2EAUXSLOT, a2eauxslot_device, "a2eauxslot", "Apple IIe AUX Bus")
-
-void a2eauxslot_device::static_set_cputag(device_t &device, const char *tag)
-{
-	a2eauxslot_device &a2eauxslot = downcast<a2eauxslot_device &>(device);
-	a2eauxslot.m_cputag = tag;
-}
 
 //**************************************************************************
 //  LIVE DEVICE
@@ -165,13 +152,6 @@ device_a2eauxslot_card_interface::device_a2eauxslot_card_interface(const machine
 
 device_a2eauxslot_card_interface::~device_a2eauxslot_card_interface()
 {
-}
-
-void device_a2eauxslot_card_interface::static_set_a2eauxslot_tag(device_t &device, const char *tag, const char *slottag)
-{
-	device_a2eauxslot_card_interface &a2eauxslot_card = dynamic_cast<device_a2eauxslot_card_interface &>(device);
-	a2eauxslot_card.m_a2eauxslot_tag = tag;
-	a2eauxslot_card.m_a2eauxslot_slottag = slottag;
 }
 
 void device_a2eauxslot_card_interface::set_a2eauxslot_device()

@@ -86,12 +86,12 @@ public:
 	iq151cart_slot_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 	virtual ~iq151cart_slot_device();
 
-	template <class Object> static devcb_base &set_out_irq0_callback(device_t &device, Object &&cb) { return downcast<iq151cart_slot_device &>(device).m_out_irq0_cb.set_callback(std::forward<Object>(cb)); }
-	template <class Object> static devcb_base &set_out_irq1_callback(device_t &device, Object &&cb) { return downcast<iq151cart_slot_device &>(device).m_out_irq1_cb.set_callback(std::forward<Object>(cb)); }
-	template <class Object> static devcb_base &set_out_irq2_callback(device_t &device, Object &&cb) { return downcast<iq151cart_slot_device &>(device).m_out_irq2_cb.set_callback(std::forward<Object>(cb)); }
-	template <class Object> static devcb_base &set_out_irq3_callback(device_t &device, Object &&cb) { return downcast<iq151cart_slot_device &>(device).m_out_irq3_cb.set_callback(std::forward<Object>(cb)); }
-	template <class Object> static devcb_base &set_out_irq4_callback(device_t &device, Object &&cb) { return downcast<iq151cart_slot_device &>(device).m_out_irq4_cb.set_callback(std::forward<Object>(cb)); }
-	template <class Object> static devcb_base &set_out_drq_callback(device_t &device, Object &&cb) { return downcast<iq151cart_slot_device &>(device).m_out_drq_cb.set_callback(std::forward<Object>(cb)); }
+	template <class Object> devcb_base &set_out_irq0_callback(Object &&cb) { return m_out_irq0_cb.set_callback(std::forward<Object>(cb)); }
+	template <class Object> devcb_base &set_out_irq1_callback(Object &&cb) { return m_out_irq1_cb.set_callback(std::forward<Object>(cb)); }
+	template <class Object> devcb_base &set_out_irq2_callback(Object &&cb) { return m_out_irq2_cb.set_callback(std::forward<Object>(cb)); }
+	template <class Object> devcb_base &set_out_irq3_callback(Object &&cb) { return m_out_irq3_cb.set_callback(std::forward<Object>(cb)); }
+	template <class Object> devcb_base &set_out_irq4_callback(Object &&cb) { return m_out_irq4_cb.set_callback(std::forward<Object>(cb)); }
+	template <class Object> devcb_base &set_out_drq_callback(Object &&cb) { return m_out_drq_cb.set_callback(std::forward<Object>(cb)); }
 
 	// device-level overrides
 	virtual void device_start() override;
@@ -139,21 +139,21 @@ DECLARE_DEVICE_TYPE(IQ151CART_SLOT, iq151cart_slot_device)
 ***************************************************************************/
 
 #define MCFG_IQ151CART_SLOT_OUT_IRQ0_CB(_devcb) \
-	devcb = &iq151cart_slot_device::set_out_irq0_callback(*device, DEVCB_##_devcb);
+	devcb = &downcast<iq151cart_slot_device &>(*device).set_out_irq0_callback(DEVCB_##_devcb);
 
 #define MCFG_IQ151CART_SLOT_OUT_IRQ1_CB(_devcb) \
-	devcb = &iq151cart_slot_device::set_out_irq1_callback(*device, DEVCB_##_devcb);
+	devcb = &downcast<iq151cart_slot_device &>(*device).set_out_irq1_callback(DEVCB_##_devcb);
 
 #define MCFG_IQ151CART_SLOT_OUT_IRQ2_CB(_devcb) \
-	devcb = &iq151cart_slot_device::set_out_irq2_callback(*device, DEVCB_##_devcb);
+	devcb = &downcast<iq151cart_slot_device &>(*device).set_out_irq2_callback(DEVCB_##_devcb);
 
 #define MCFG_IQ151CART_SLOT_OUT_IRQ3_CB(_devcb) \
-	devcb = &iq151cart_slot_device::set_out_irq3_callback(*device, DEVCB_##_devcb);
+	devcb = &downcast<iq151cart_slot_device &>(*device).set_out_irq3_callback(DEVCB_##_devcb);
 
 #define MCFG_IQ151CART_SLOT_OUT_IRQ4_CB(_devcb) \
-	devcb = &iq151cart_slot_device::set_out_irq4_callback(*device, DEVCB_##_devcb);
+	devcb = &downcast<iq151cart_slot_device &>(*device).set_out_irq4_callback(DEVCB_##_devcb);
 
 #define MCFG_IQ151CART_SLOT_OUT_DRQ_CB(_devcb) \
-	devcb = &iq151cart_slot_device::set_out_drq_callback(*device, DEVCB_##_devcb);
+	devcb = &downcast<iq151cart_slot_device &>(*device).set_out_drq_callback(DEVCB_##_devcb);
 
 #endif // MAME_BUS_IQ151_IQ151_H

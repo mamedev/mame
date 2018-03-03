@@ -46,22 +46,22 @@
 #define MCFG_CR511B_ADD(_tag) \
 	MCFG_DEVICE_ADD(_tag, CR511B, 0)
 #define MCFG_CR511B_STCH_HANDLER(_devcb) \
-	devcb = &cr511b_device::set_stch_handler(*device, DEVCB_##_devcb);
+	devcb = &downcast<cr511b_device &>(*device).set_stch_handler(DEVCB_##_devcb);
 
 #define MCFG_CR511B_STEN_HANDLER(_devcb) \
-	devcb = &cr511b_device::set_sten_handler(*device, DEVCB_##_devcb);
+	devcb = &downcast<cr511b_device &>(*device).set_sten_handler(DEVCB_##_devcb);
 
 #define MCFG_CR511B_DRQ_HANDLER(_devcb) \
-	devcb = &cr511b_device::set_drq_handler(*device, DEVCB_##_devcb);
+	devcb = &downcast<cr511b_device &>(*device).set_drq_handler(DEVCB_##_devcb);
 
 #define MCFG_CR511B_DTEN_HANDLER(_devcb) \
-	devcb = &cr511b_device::set_dten_handler(*device, DEVCB_##_devcb);
+	devcb = &downcast<cr511b_device &>(*device).set_dten_handler(DEVCB_##_devcb);
 
 #define MCFG_CR511B_SCOR_HANDLER(_devcb) \
-	devcb = &cr511b_device::set_scor_handler(*device, DEVCB_##_devcb);
+	devcb = &downcast<cr511b_device &>(*device).set_scor_handler(DEVCB_##_devcb);
 
 #define MCFG_CR511B_XAEN_HANDLER(_devcb) \
-	devcb = &cr511b_device::set_xaen_handler(*device, DEVCB_##_devcb);
+	devcb = &downcast<cr511b_device &>(*device).set_xaen_handler(DEVCB_##_devcb);
 
 
 //**************************************************************************
@@ -77,23 +77,12 @@ public:
 	cr511b_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
 	// callbacks
-	template <class Object> static devcb_base &set_stch_handler(device_t &device, Object &&cb)
-	{ return downcast<cr511b_device &>(device).m_stch_handler.set_callback(std::forward<Object>(cb)); }
-
-	template <class Object> static devcb_base &set_sten_handler(device_t &device, Object &&cb)
-	{ return downcast<cr511b_device &>(device).m_sten_handler.set_callback(std::forward<Object>(cb)); }
-
-	template <class Object> static devcb_base &set_drq_handler(device_t &device, Object &&cb)
-	{ return downcast<cr511b_device &>(device).m_drq_handler.set_callback(std::forward<Object>(cb)); }
-
-	template <class Object> static devcb_base &set_dten_handler(device_t &device, Object &&cb)
-	{ return downcast<cr511b_device &>(device).m_dten_handler.set_callback(std::forward<Object>(cb)); }
-
-	template <class Object> static devcb_base &set_scor_handler(device_t &device, Object &&cb)
-	{ return downcast<cr511b_device &>(device).m_scor_handler.set_callback(std::forward<Object>(cb)); }
-
-	template <class Object> static devcb_base &set_xaen_handler(device_t &device, Object &&cb)
-	{ return downcast<cr511b_device &>(device).m_xaen_handler.set_callback(std::forward<Object>(cb)); }
+	template <class Object> devcb_base &set_stch_handler(Object &&cb) { return m_stch_handler.set_callback(std::forward<Object>(cb)); }
+	template <class Object> devcb_base &set_sten_handler(Object &&cb) { return m_sten_handler.set_callback(std::forward<Object>(cb)); }
+	template <class Object> devcb_base &set_drq_handler(Object &&cb) { return m_drq_handler.set_callback(std::forward<Object>(cb)); }
+	template <class Object> devcb_base &set_dten_handler(Object &&cb) { return m_dten_handler.set_callback(std::forward<Object>(cb)); }
+	template <class Object> devcb_base &set_scor_handler(Object &&cb) { return m_scor_handler.set_callback(std::forward<Object>(cb)); }
+	template <class Object> devcb_base &set_xaen_handler(Object &&cb) { return m_xaen_handler.set_callback(std::forward<Object>(cb)); }
 
 	DECLARE_READ8_MEMBER( read );
 	DECLARE_WRITE8_MEMBER ( write );

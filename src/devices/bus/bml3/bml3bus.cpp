@@ -70,13 +70,6 @@ bml3bus_slot_device::bml3bus_slot_device(const machine_config &mconfig, device_t
 {
 }
 
-void bml3bus_slot_device::static_set_bml3bus_slot(device_t &device, const char *tag, const char *slottag)
-{
-	bml3bus_slot_device &bml3bus_card = dynamic_cast<bml3bus_slot_device &>(device);
-	bml3bus_card.m_bml3bus_tag = tag;
-	bml3bus_card.m_bml3bus_slottag = slottag;
-}
-
 //-------------------------------------------------
 //  device_start - device-specific startup
 //-------------------------------------------------
@@ -85,7 +78,7 @@ void bml3bus_slot_device::device_start()
 {
 	device_bml3bus_card_interface *dev = dynamic_cast<device_bml3bus_card_interface *>(get_card_device());
 
-	if (dev) device_bml3bus_card_interface::static_set_bml3bus_tag(*dev, m_bml3bus_tag, m_bml3bus_slottag);
+	if (dev) dev->set_bml3bus_tag(m_bml3bus_tag, m_bml3bus_slottag);
 }
 
 //**************************************************************************
@@ -93,12 +86,6 @@ void bml3bus_slot_device::device_start()
 //**************************************************************************
 
 DEFINE_DEVICE_TYPE(BML3BUS, bml3bus_device, "bml3bus", "Hitachi MB-6890 Bus")
-
-void bml3bus_device::static_set_cputag(device_t &device, const char *tag)
-{
-	bml3bus_device &bml3bus = downcast<bml3bus_device &>(device);
-	bml3bus.m_maincpu.set_tag(tag);
-}
 
 //**************************************************************************
 //  LIVE DEVICE
@@ -210,13 +197,6 @@ device_bml3bus_card_interface::device_bml3bus_card_interface(const machine_confi
 
 device_bml3bus_card_interface::~device_bml3bus_card_interface()
 {
-}
-
-void device_bml3bus_card_interface::static_set_bml3bus_tag(device_t &device, const char *tag, const char *slottag)
-{
-	device_bml3bus_card_interface &bml3bus_card = dynamic_cast<device_bml3bus_card_interface &>(device);
-	bml3bus_card.m_bml3bus_tag = tag;
-	bml3bus_card.m_bml3bus_slottag = slottag;
 }
 
 void device_bml3bus_card_interface::set_bml3bus_device()

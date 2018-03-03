@@ -22,18 +22,18 @@
 	downcast<pci9050_device *>(device)->set_map(id, address_map_constructor(&map, #map, this), this);
 
 #define MCFG_PCI9050_USER_INPUT_CALLBACK(_write) \
-	devcb = &pci9050_device::set_user_input_callback(*device, DEVCB_##_write);
+	devcb = &downcast<pci9050_device &>(*device).set_user_input_callback(DEVCB_##_write);
 
 #define MCFG_PCI9050_USER_OUTPUT_CALLBACK(_read) \
-	devcb = &pci9050_device::set_user_output_callback(*device, DEVCB_##_read);
+	devcb = &downcast<pci9050_device &>(*device).set_user_output_callback(DEVCB_##_read);
 
 class pci9050_device : public pci_device
 {
 public:
 	pci9050_device(const machine_config &mconfig, const char *tag, device_t *device, uint32_t clock);
 
-	template <class Object> static devcb_base &set_user_input_callback(device_t &device, Object &&cb) { return downcast<pci9050_device &>(device).m_user_input_handler.set_callback(std::forward<Object>(cb)); }
-	template <class Object> static devcb_base &set_user_output_callback(device_t &device, Object &&cb) { return downcast<pci9050_device &>(device).m_user_output_handler.set_callback(std::forward<Object>(cb)); }
+	template <class Object> devcb_base &set_user_input_callback(Object &&cb) { return m_user_input_handler.set_callback(std::forward<Object>(cb)); }
+	template <class Object> devcb_base &set_user_output_callback(Object &&cb) { return m_user_output_handler.set_callback(std::forward<Object>(cb)); }
 
 	void set_map(int id, const address_map_constructor &map, device_t *device);
 

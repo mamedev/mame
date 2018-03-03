@@ -111,10 +111,10 @@
 #define MCFG_NASBUS_SLOT_ADD(_tag, _slot_intf, _def_slot) \
 	MCFG_DEVICE_ADD(_tag, NASBUS_SLOT, 0) \
 	MCFG_DEVICE_SLOT_INTERFACE(_slot_intf, _def_slot, false) \
-	nasbus_slot_device::set_nasbus_slot(*device, this, NASBUS_TAG);
+	downcast<nasbus_slot_device &>(*device).set_nasbus_slot(this, NASBUS_TAG);
 
 #define MCFG_NASBUS_RAM_DISABLE_HANDLER(_devcb) \
-	devcb = &nasbus_device::set_ram_disable_handler(*device, DEVCB_##_devcb);
+	devcb = &downcast<nasbus_device &>(*device).set_ram_disable_handler(DEVCB_##_devcb);
 
 
 //**************************************************************************
@@ -132,7 +132,7 @@ public:
 	// construction/destruction
 	nasbus_slot_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 	// inline configuration
-	static void set_nasbus_slot(device_t &device, device_t *owner, const char *nasbus_tag);
+	void set_nasbus_slot(device_t *owner, const char *nasbus_tag) { m_owner = owner; m_nasbus_tag = nasbus_tag; }
 
 protected:
 	nasbus_slot_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock);
@@ -157,8 +157,7 @@ public:
 	nasbus_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 	virtual ~nasbus_device();
 
-	template <class Object> static devcb_base &set_ram_disable_handler(device_t &device, Object &&cb)
-	{ return downcast<nasbus_device &>(device).m_ram_disable_handler.set_callback(std::forward<Object>(cb)); }
+	template <class Object> devcb_base &set_ram_disable_handler(Object &&cb) { return m_ram_disable_handler.set_callback(std::forward<Object>(cb)); }
 
 	void add_card(device_nasbus_card_interface *card);
 

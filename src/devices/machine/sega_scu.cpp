@@ -150,13 +150,6 @@ sega_scu_device::sega_scu_device(const machine_config &mconfig, const char *tag,
 {
 }
 
-void sega_scu_device::static_set_hostcpu(device_t &device, const char *cputag)
-{
-	sega_scu_device &dev = downcast<sega_scu_device &>(device);
-	dev.m_hostcpu_tag = cputag;
-}
-
-
 //-------------------------------------------------
 //  add_device_mconfig - device-specific machine
 //  configuration addiitons

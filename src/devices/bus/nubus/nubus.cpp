@@ -38,13 +38,6 @@ nubus_slot_device::nubus_slot_device(const machine_config &mconfig, device_type 
 {
 }
 
-void nubus_slot_device::static_set_nubus_slot(device_t &device, const char *tag, const char *slottag)
-{
-	nubus_slot_device &nubus_card = dynamic_cast<nubus_slot_device &>(device);
-	nubus_card.m_nubus_tag = tag;
-	nubus_card.m_nubus_slottag = slottag;
-}
-
 //-------------------------------------------------
 //  device_start - device-specific startup
 //-------------------------------------------------
@@ -53,7 +46,7 @@ void nubus_slot_device::device_start()
 {
 	device_nubus_card_interface *dev = dynamic_cast<device_nubus_card_interface *>(get_card_device());
 
-	if (dev) device_nubus_card_interface::static_set_nubus_tag(*dev, m_nubus_tag, m_nubus_slottag);
+	if (dev) dev->set_nubus_tag(m_nubus_tag, m_nubus_slottag);
 }
 
 //**************************************************************************
@@ -61,12 +54,6 @@ void nubus_slot_device::device_start()
 //**************************************************************************
 
 DEFINE_DEVICE_TYPE(NUBUS, nubus_device, "nubus", "NuBus")
-
-void nubus_device::static_set_cputag(device_t &device, const char *tag)
-{
-	nubus_device &nubus = downcast<nubus_device &>(device);
-	nubus.m_cputag = tag;
-}
 
 //**************************************************************************
 //  LIVE DEVICE
@@ -264,13 +251,6 @@ device_nubus_card_interface::device_nubus_card_interface(const machine_config &m
 
 device_nubus_card_interface::~device_nubus_card_interface()
 {
-}
-
-void device_nubus_card_interface::static_set_nubus_tag(device_t &device, const char *tag, const char *slottag)
-{
-	device_nubus_card_interface &nubus_card = dynamic_cast<device_nubus_card_interface &>(device);
-	nubus_card.m_nubus_tag = tag;
-	nubus_card.m_nubus_slottag = slottag;
 }
 
 void device_nubus_card_interface::interface_pre_start()

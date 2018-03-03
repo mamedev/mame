@@ -16,15 +16,15 @@
 
 // max 8 4-bit R ports
 #define MCFG_HMCS40_READ_R_CB(R, _devcb) \
-	devcb = &hmcs40_cpu_device::set_read_r##R##_callback(*device, DEVCB_##_devcb);
+	devcb = &downcast<hmcs40_cpu_device &>(*device).set_read_r##R##_callback(DEVCB_##_devcb);
 #define MCFG_HMCS40_WRITE_R_CB(R, _devcb) \
-	devcb = &hmcs40_cpu_device::set_write_r##R##_callback(*device, DEVCB_##_devcb);
+	devcb = &downcast<hmcs40_cpu_device &>(*device).set_write_r##R##_callback(DEVCB_##_devcb);
 
 // 16-bit discrete
 #define MCFG_HMCS40_READ_D_CB(_devcb) \
-	devcb = &hmcs40_cpu_device::set_read_d_callback(*device, DEVCB_##_devcb);
+	devcb = &downcast<hmcs40_cpu_device &>(*device).set_read_d_callback(DEVCB_##_devcb);
 #define MCFG_HMCS40_WRITE_D_CB(_devcb) \
-	devcb = &hmcs40_cpu_device::set_write_d_callback(*device, DEVCB_##_devcb);
+	devcb = &downcast<hmcs40_cpu_device &>(*device).set_write_d_callback(DEVCB_##_devcb);
 
 enum
 {
@@ -105,27 +105,27 @@ public:
 		PORT_R7X
 	};
 
-	// static configuration helpers
-	template <class Object> static devcb_base &set_read_r0_callback(device_t &device, Object &&cb) { return downcast<hmcs40_cpu_device &>(device).m_read_r0.set_callback(std::forward<Object>(cb)); }
-	template <class Object> static devcb_base &set_read_r1_callback(device_t &device, Object &&cb) { return downcast<hmcs40_cpu_device &>(device).m_read_r1.set_callback(std::forward<Object>(cb)); }
-	template <class Object> static devcb_base &set_read_r2_callback(device_t &device, Object &&cb) { return downcast<hmcs40_cpu_device &>(device).m_read_r2.set_callback(std::forward<Object>(cb)); }
-	template <class Object> static devcb_base &set_read_r3_callback(device_t &device, Object &&cb) { return downcast<hmcs40_cpu_device &>(device).m_read_r3.set_callback(std::forward<Object>(cb)); }
-	template <class Object> static devcb_base &set_read_r4_callback(device_t &device, Object &&cb) { return downcast<hmcs40_cpu_device &>(device).m_read_r4.set_callback(std::forward<Object>(cb)); }
-	template <class Object> static devcb_base &set_read_r5_callback(device_t &device, Object &&cb) { return downcast<hmcs40_cpu_device &>(device).m_read_r5.set_callback(std::forward<Object>(cb)); }
-	template <class Object> static devcb_base &set_read_r6_callback(device_t &device, Object &&cb) { return downcast<hmcs40_cpu_device &>(device).m_read_r6.set_callback(std::forward<Object>(cb)); }
-	template <class Object> static devcb_base &set_read_r7_callback(device_t &device, Object &&cb) { return downcast<hmcs40_cpu_device &>(device).m_read_r7.set_callback(std::forward<Object>(cb)); }
+	// configuration helpers
+	template <class Object> devcb_base &set_read_r0_callback(Object &&cb) { return m_read_r0.set_callback(std::forward<Object>(cb)); }
+	template <class Object> devcb_base &set_read_r1_callback(Object &&cb) { return m_read_r1.set_callback(std::forward<Object>(cb)); }
+	template <class Object> devcb_base &set_read_r2_callback(Object &&cb) { return m_read_r2.set_callback(std::forward<Object>(cb)); }
+	template <class Object> devcb_base &set_read_r3_callback(Object &&cb) { return m_read_r3.set_callback(std::forward<Object>(cb)); }
+	template <class Object> devcb_base &set_read_r4_callback(Object &&cb) { return m_read_r4.set_callback(std::forward<Object>(cb)); }
+	template <class Object> devcb_base &set_read_r5_callback(Object &&cb) { return m_read_r5.set_callback(std::forward<Object>(cb)); }
+	template <class Object> devcb_base &set_read_r6_callback(Object &&cb) { return m_read_r6.set_callback(std::forward<Object>(cb)); }
+	template <class Object> devcb_base &set_read_r7_callback(Object &&cb) { return m_read_r7.set_callback(std::forward<Object>(cb)); }
 
-	template <class Object> static devcb_base &set_write_r0_callback(device_t &device, Object &&cb) { return downcast<hmcs40_cpu_device &>(device).m_write_r0.set_callback(std::forward<Object>(cb)); }
-	template <class Object> static devcb_base &set_write_r1_callback(device_t &device, Object &&cb) { return downcast<hmcs40_cpu_device &>(device).m_write_r1.set_callback(std::forward<Object>(cb)); }
-	template <class Object> static devcb_base &set_write_r2_callback(device_t &device, Object &&cb) { return downcast<hmcs40_cpu_device &>(device).m_write_r2.set_callback(std::forward<Object>(cb)); }
-	template <class Object> static devcb_base &set_write_r3_callback(device_t &device, Object &&cb) { return downcast<hmcs40_cpu_device &>(device).m_write_r3.set_callback(std::forward<Object>(cb)); }
-	template <class Object> static devcb_base &set_write_r4_callback(device_t &device, Object &&cb) { return downcast<hmcs40_cpu_device &>(device).m_write_r4.set_callback(std::forward<Object>(cb)); }
-	template <class Object> static devcb_base &set_write_r5_callback(device_t &device, Object &&cb) { return downcast<hmcs40_cpu_device &>(device).m_write_r5.set_callback(std::forward<Object>(cb)); }
-	template <class Object> static devcb_base &set_write_r6_callback(device_t &device, Object &&cb) { return downcast<hmcs40_cpu_device &>(device).m_write_r6.set_callback(std::forward<Object>(cb)); }
-	template <class Object> static devcb_base &set_write_r7_callback(device_t &device, Object &&cb) { return downcast<hmcs40_cpu_device &>(device).m_write_r7.set_callback(std::forward<Object>(cb)); }
+	template <class Object> devcb_base &set_write_r0_callback(Object &&cb) { return m_write_r0.set_callback(std::forward<Object>(cb)); }
+	template <class Object> devcb_base &set_write_r1_callback(Object &&cb) { return m_write_r1.set_callback(std::forward<Object>(cb)); }
+	template <class Object> devcb_base &set_write_r2_callback(Object &&cb) { return m_write_r2.set_callback(std::forward<Object>(cb)); }
+	template <class Object> devcb_base &set_write_r3_callback(Object &&cb) { return m_write_r3.set_callback(std::forward<Object>(cb)); }
+	template <class Object> devcb_base &set_write_r4_callback(Object &&cb) { return m_write_r4.set_callback(std::forward<Object>(cb)); }
+	template <class Object> devcb_base &set_write_r5_callback(Object &&cb) { return m_write_r5.set_callback(std::forward<Object>(cb)); }
+	template <class Object> devcb_base &set_write_r6_callback(Object &&cb) { return m_write_r6.set_callback(std::forward<Object>(cb)); }
+	template <class Object> devcb_base &set_write_r7_callback(Object &&cb) { return m_write_r7.set_callback(std::forward<Object>(cb)); }
 
-	template <class Object> static devcb_base &set_read_d_callback(device_t &device, Object &&cb) { return downcast<hmcs40_cpu_device &>(device).m_read_d.set_callback(std::forward<Object>(cb)); }
-	template <class Object> static devcb_base &set_write_d_callback(device_t &device, Object &&cb) { return downcast<hmcs40_cpu_device &>(device).m_write_d.set_callback(std::forward<Object>(cb)); }
+	template <class Object> devcb_base &set_read_d_callback(Object &&cb) { return m_read_d.set_callback(std::forward<Object>(cb)); }
+	template <class Object> devcb_base &set_write_d_callback(Object &&cb) { return m_write_d.set_callback(std::forward<Object>(cb)); }
 
 protected:
 	enum

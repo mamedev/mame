@@ -39,19 +39,19 @@
 
 
 #define MCFG_TIKI100_BUS_IRQ_CALLBACK(_write) \
-	devcb = &tiki100_bus_device::set_irq_wr_callback(*device, DEVCB_##_write);
+	devcb = &downcast<tiki100_bus_device &>(*device).set_irq_wr_callback(DEVCB_##_write);
 
 #define MCFG_TIKI100_BUS_NMI_CALLBACK(_write) \
-	devcb = &tiki100_bus_device::set_nmi_wr_callback(*device, DEVCB_##_write);
+	devcb = &downcast<tiki100_bus_device &>(*device).set_nmi_wr_callback(DEVCB_##_write);
 
 #define MCFG_TIKI100_BUS_BUSRQ_CALLBACK(_write) \
-	devcb = &tiki100_bus_device::set_busrq_wr_callback(*device, DEVCB_##_write);
+	devcb = &downcast<tiki100_bus_device &>(*device).set_busrq_wr_callback(DEVCB_##_write);
 
 #define MCFG_TIKI100_BUS_IN_MREQ_CALLBACK(_read) \
-	devcb = &tiki100_bus_device::set_mrq_rd_callback(*device, DEVCB_##_read);
+	devcb = &downcast<tiki100_bus_device &>(*device).set_mrq_rd_callback(DEVCB_##_read);
 
 #define MCFG_TIKI100_BUS_OUT_MREQ_CALLBACK(_write) \
-	devcb = &tiki100_bus_device::set_mrq_wr_callback(*device, DEVCB_##_write);
+	devcb = &downcast<tiki100_bus_device &>(*device).set_mrq_wr_callback(DEVCB_##_write);
 
 
 
@@ -142,11 +142,11 @@ public:
 	tiki100_bus_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 	~tiki100_bus_device() { m_device_list.detach_all(); }
 
-	template <class Object> static devcb_base &set_irq_wr_callback(device_t &device, Object &&cb) { return downcast<tiki100_bus_device &>(device).m_irq_cb.set_callback(std::forward<Object>(cb)); }
-	template <class Object> static devcb_base &set_nmi_wr_callback(device_t &device, Object &&cb) { return downcast<tiki100_bus_device &>(device).m_nmi_cb.set_callback(std::forward<Object>(cb)); }
-	template <class Object> static devcb_base &set_busrq_wr_callback(device_t &device, Object &&cb) { return downcast<tiki100_bus_device &>(device).m_busrq_cb.set_callback(std::forward<Object>(cb)); }
-	template <class Object> static devcb_base &set_mrq_rd_callback(device_t &device, Object &&cb) { return downcast<tiki100_bus_device &>(device).m_in_mrq_cb.set_callback(std::forward<Object>(cb)); }
-	template <class Object> static devcb_base &set_mrq_wr_callback(device_t &device, Object &&cb) { return downcast<tiki100_bus_device &>(device).m_out_mrq_cb.set_callback(std::forward<Object>(cb)); }
+	template <class Object> devcb_base &set_irq_wr_callback(Object &&cb) { return m_irq_cb.set_callback(std::forward<Object>(cb)); }
+	template <class Object> devcb_base &set_nmi_wr_callback(Object &&cb) { return m_nmi_cb.set_callback(std::forward<Object>(cb)); }
+	template <class Object> devcb_base &set_busrq_wr_callback(Object &&cb) { return m_busrq_cb.set_callback(std::forward<Object>(cb)); }
+	template <class Object> devcb_base &set_mrq_rd_callback(Object &&cb) { return m_in_mrq_cb.set_callback(std::forward<Object>(cb)); }
+	template <class Object> devcb_base &set_mrq_wr_callback(Object &&cb) { return m_out_mrq_cb.set_callback(std::forward<Object>(cb)); }
 
 	void add_card(device_tiki100bus_card_interface *card);
 

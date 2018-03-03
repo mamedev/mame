@@ -57,13 +57,13 @@
 
 
 #define MCFG_VIP_EXPANSION_SLOT_INT_CALLBACK(_write) \
-	devcb = &vip_expansion_slot_device::set_int_wr_callback(*device, DEVCB_##_write);
+	devcb = &downcast<vip_expansion_slot_device &>(*device).set_int_wr_callback(DEVCB_##_write);
 
 #define MCFG_VIP_EXPANSION_SLOT_DMA_OUT_CALLBACK(_write) \
-	devcb = &vip_expansion_slot_device::set_dma_out_wr_callback(*device, DEVCB_##_write);
+	devcb = &downcast<vip_expansion_slot_device &>(*device).set_dma_out_wr_callback(DEVCB_##_write);
 
 #define MCFG_VIP_EXPANSION_SLOT_DMA_IN_CALLBACK(_write) \
-	devcb = &vip_expansion_slot_device::set_dma_in_wr_callback(*device, DEVCB_##_write);
+	devcb = &downcast<vip_expansion_slot_device &>(*device).set_dma_in_wr_callback(DEVCB_##_write);
 
 
 
@@ -82,9 +82,9 @@ public:
 	// construction/destruction
 	vip_expansion_slot_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
-	template <class Object> static devcb_base &set_int_wr_callback(device_t &device, Object &&cb) { return downcast<vip_expansion_slot_device &>(device).m_write_int.set_callback(std::forward<Object>(cb)); }
-	template <class Object> static devcb_base &set_dma_out_wr_callback(device_t &device, Object &&cb) { return downcast<vip_expansion_slot_device &>(device).m_write_dma_out.set_callback(std::forward<Object>(cb)); }
-	template <class Object> static devcb_base &set_dma_in_wr_callback(device_t &device, Object &&cb) { return downcast<vip_expansion_slot_device &>(device).m_write_dma_in.set_callback(std::forward<Object>(cb)); }
+	template <class Object> devcb_base &set_int_wr_callback(Object &&cb) { return m_write_int.set_callback(std::forward<Object>(cb)); }
+	template <class Object> devcb_base &set_dma_out_wr_callback(Object &&cb) { return m_write_dma_out.set_callback(std::forward<Object>(cb)); }
+	template <class Object> devcb_base &set_dma_in_wr_callback(Object &&cb) { return m_write_dma_in.set_callback(std::forward<Object>(cb)); }
 
 	// computer interface
 	uint8_t program_r(address_space &space, offs_t offset, int cs, int cdef, int *minh);

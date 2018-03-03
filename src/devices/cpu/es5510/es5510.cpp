@@ -1,11 +1,15 @@
 // license:BSD-3-Clause
 // copyright-holders:Christian Brunschen
-/***************************************************************************
+/***************************************************************************************
  *
  *   es5510.c - Ensoniq ES5510 (ESP) emulation
  *   by Christian Brunschen
  *
- ***************************************************************************/
+ *   TODO
+ *      ridingf, ringrage and clones: Exception after logo is displayed (MT #06894)
+ *      DRAM Size isn't verified, differs per machines?
+ *
+ ***************************************************************************************/
 
 #include "emu.h"
 #include "es5510.h"
@@ -15,7 +19,7 @@
 #include "debugger.h"
 
 #include <cstdio>
-
+#include <algorithm>
 
 static constexpr int32_t MIN_24 = -(1 << 23);
 static constexpr int32_t MAX_24 = (1 << 23) - 1;
@@ -126,52 +130,48 @@ inline static int32_t asl(int32_t value, int shift, uint8_t &flags) {
 	return saturate(result, flags, signBefore != 0);
 }
 
+// Initialize ESP to mostly zeroed, configured for 64k samples of delay line memory, running (not halted)
 es5510_device::es5510_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
 	: cpu_device(mconfig, ES5510, tag, owner, clock)
+	, icount(0)
+	, halt_asserted(false)
+	, pc(0)
+	, state(STATE_HALTED)
+	, gpr(nullptr)
+	, ser0r(0)
+	, ser0l(0)
+	, ser1r(0)
+	, ser1l(0)
+	, ser2r(0)
+	, ser2l(0)
+	, ser3r(0)
+	, ser3l(0)
+	, machl(0)
+	, dil(0)
+	, memsiz(0x00ffffff)
+	, memmask(0x00000000)
+	, memincrement(0x01000000)
+	, memshift(24)
+	, dlength(0)
+	, abase(0)
+	, bbase(0)
+	, dbase(0)
+	, sigreg(1)
+	, mulshift(1)
+	, ccr(0)
+	, cmr(0)
+	, dol_count(0)
+	, instr(nullptr)
+	, dram(nullptr)
+	, dol_latch(0)
+	, dil_latch(0)
+	, dadr_latch(0)
+	, gpr_latch(0)
+	, instr_latch(0)
+	, ram_sel(0)
+	, host_control(0)
 {
-	// Initialize ESP to mostly zeroed, configured for 64k samples of delay line memory, running (not halted)
-	halt_asserted = false;
-	icount = 0;
-	pc = 0;
-	state = STATE_HALTED;
-	memset(gpr, 0, 0xc0 * sizeof(gpr[0]));
-	ser0r = 0;
-	ser0l = 0;
-	ser1r = 0;
-	ser1l = 0;
-	ser2r = 0;
-	ser2l = 0;
-	ser3r = 0;
-	ser3l = 0;
-	machl = 0;
-	dil   = 0;
-	memsiz       = 0x00ffffff;
-	memmask      = 0x00000000;
-	memincrement = 0x01000000;
-	memshift     = 24;
-	dlength      = 0;
-	abase        = 0;
-	bbase        = 0;
-	dbase        = 0;
-	sigreg       = 1;
-	mulshift     = 1;
-	ccr = 0;
-	cmr = 0;
 	dol[0] = dol[1] = 0;
-	dol_count = 0;
-
-	memset(instr, 0, 160 * sizeof(instr[0]));
-	memset(dram, 0, (1<<20) * sizeof(dram[0]));
-
-	dol_latch = 0;
-	dil_latch = 0;
-	dadr_latch = 0;
-	gpr_latch = 0;
-	instr_latch = 0;
-	ram_sel = 0;
-	host_control = 0;
-
-	pc = 0;
 	memset(&alu, 0, sizeof(alu));
 	memset(&mulacc, 0, sizeof(mulacc));
 }
@@ -439,11 +439,11 @@ WRITE8_MEMBER(es5510_device::host_w)
 		dadr_latch = (dadr_latch&0x00ffff) | ((data&0xff)<<16);
 		if (ram_sel)
 		{
-			dil_latch = dram[dadr_latch] << 8;
+			dil_latch = dram_r(dadr_latch) << 8;
 		}
 		else
 		{
-			dram[dadr_latch] = dol_latch >> 8;
+			dram_w(dadr_latch, dol_latch >> 8);
 		}
 		break;
 
@@ -550,16 +550,87 @@ void es5510_device::ser_w(int offset, int16_t data)
 }
 
 void es5510_device::device_start() {
+	gpr = std::make_unique<int32_t[]>(0xc0);     // 24 bits, right justified
+	instr = std::make_unique<uint64_t[]>(160);    // 48 bits, right justified
+	dram = std::make_unique<int16_t[]>(DRAM_SIZE);   // there are up to 20 address bits (at least 16 expected), left justified within the 24 bits of a gpr or dadr; we preallocate all of it.
 	m_icountptr = &icount;
 	state_add(STATE_GENPC,"GENPC", pc).noshow();
 	state_add(STATE_GENPCBASE, "CURPC", pc).noshow();
+	
+	save_item(NAME(icount));
+	save_item(NAME(halt_asserted));
+	save_item(NAME(pc));
+	save_item(NAME(ser0r));
+	save_item(NAME(ser0l));
+	save_item(NAME(ser1r));
+	save_item(NAME(ser1l));
+	save_item(NAME(ser2r));
+	save_item(NAME(ser2l));
+	save_item(NAME(ser3r));
+	save_item(NAME(ser3l));
+	save_item(NAME(machl));
+	save_item(NAME(mac_overflow));
+	save_item(NAME(dil));
+	save_item(NAME(memsiz));
+	save_item(NAME(memmask));
+	save_item(NAME(memincrement));
+	save_item(NAME(memshift));
+	save_item(NAME(dlength));
+	save_item(NAME(abase));
+	save_item(NAME(bbase));
+	save_item(NAME(dbase));
+	save_item(NAME(sigreg));
+	save_item(NAME(mulshift));
+	save_item(NAME(ccr));
+	save_item(NAME(cmr));
+	save_item(NAME(dol));
+	save_item(NAME(dol_count));
+
+	save_pointer(NAME(gpr.get()), 0xc0);
+	save_pointer(NAME(instr.get()), 160);
+	save_pointer(NAME(dram.get()), DRAM_SIZE);
+	
+	save_item(NAME(dol_latch));
+	save_item(NAME(dil_latch));
+	save_item(NAME(dadr_latch));
+	save_item(NAME(gpr_latch));
+	save_item(NAME(instr_latch));
+	save_item(NAME(ram_sel));
+	save_item(NAME(host_control));
+
+	save_item(NAME(alu.aReg));
+	save_item(NAME(alu.bReg));
+	save_item(NAME(alu.op));
+	save_item(NAME(alu.aValue));
+	save_item(NAME(alu.bValue));
+	save_item(NAME(alu.result));
+	save_item(NAME(alu.update_ccr));
+	save_item(NAME(alu.write_result));
+
+	save_item(NAME(mulacc.cReg));
+	save_item(NAME(mulacc.dReg));
+	save_item(NAME(mulacc.accumulate));
+	save_item(NAME(mulacc.cValue));
+	save_item(NAME(mulacc.dValue));
+	save_item(NAME(mulacc.product));
+	save_item(NAME(mulacc.result));
+	save_item(NAME(mulacc.write_result));
+
+	save_item(NAME(ram.address));
+	save_item(NAME(ram.io));
+
+	save_item(NAME(ram_p.address));
+	save_item(NAME(ram_p.io));
+
+	save_item(NAME(ram_pp.address));
+	save_item(NAME(ram_pp.io));
 }
 
 void es5510_device::device_reset() {
 	pc = 0x00;
-	memset(gpr, 0, sizeof(*gpr) * 0xc0);
-	memset(instr, 0, sizeof(*instr) * 0xa0);
-	memset(dram, 0, sizeof(*dram) * (1<<20));
+	std::fill(&gpr[0], &gpr[0xc0], 0);
+	std::fill(&instr[0], &instr[160], 0);
+	std::fill(&dram[0], &dram[DRAM_SIZE], 0);
 	state = STATE_RUNNING;
 	dil_latch = dol_latch = dadr_latch = gpr_latch = 0;
 	instr_latch = uint64_t(0);
@@ -724,7 +795,7 @@ void es5510_device::execute_run() {
 				if (ram_pp.io) { // read from I/O and store into DIL
 					dil = 0; // read_io(ram_pp.address);;
 				} else { // read from DRAM and store into DIL
-					dil = dram[ram_pp.address] << 8;
+					dil = dram_r(ram_pp.address) << 8;
 					LOG_EXEC(("  . RAM: read %x (%d) from address %x\n", dil, dil, ram_pp.address));
 				}
 			}
@@ -897,7 +968,7 @@ void es5510_device::execute_run() {
 					if (ram_p.io) {
 						// write_io(ram_p.io, dol[0]);
 					} else {
-						dram[ram_p.address] = dol[0] >> 8;
+						dram_w(ram_p.address, dol[0] >> 8);
 						LOG_EXEC(("  . RAM: writing %x (%d) [of %x (%d)] to address %x\n", dol[0]&0xffff00, SX(dol[0]&0xffff00), dol[0], SX(dol[0]), ram_p.address));
 					}
 				}

@@ -65,7 +65,7 @@ enum
 ***************************************************************************/
 
 #define MCFG_JAGUAR_IRQ_HANDLER(_devcb) \
-	devcb = &jaguar_cpu_device::set_int_func(*device, DEVCB_##_devcb);
+	devcb = &downcast<jaguar_cpu_device &>(*device).set_int_func(DEVCB_##_devcb);
 
 
 /***************************************************************************
@@ -95,8 +95,8 @@ public:
 	// construction/destruction
 	~jaguar_cpu_device();
 
-	// static configuration helpers
-	template <class Object> static devcb_base &set_int_func(device_t &device, Object &&cb) { return downcast<jaguar_cpu_device &>(device).m_cpu_interrupt.set_callback(std::forward<Object>(cb)); }
+	// configuration helpers
+	template <class Object> devcb_base &set_int_func(Object &&cb) { return m_cpu_interrupt.set_callback(std::forward<Object>(cb)); }
 
 	virtual DECLARE_WRITE32_MEMBER(ctrl_w) = 0;
 	virtual DECLARE_READ32_MEMBER(ctrl_r) = 0;

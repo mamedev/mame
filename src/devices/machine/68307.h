@@ -12,17 +12,17 @@
 
 /* trampolines so we can specify the 68681 serial configuration when adding the CPU  */
 #define MCFG_MC68307_SERIAL_A_TX_CALLBACK(_cb) \
-	devcb = &m68307_cpu_device::set_a_tx_cb(*device, DEVCB_##_cb);
+	devcb = &downcast<m68307_cpu_device &>(*device).set_a_tx_cb(DEVCB_##_cb);
 
 #define MCFG_MC68307_SERIAL_B_TX_CALLBACK(_cb) \
-	devcb = &m68307_cpu_device::set_b_tx_cb(*device, DEVCB_##_cb);
+	devcb = &downcast<m68307_cpu_device &>(*device).set_b_tx_cb(DEVCB_##_cb);
 
 // deprecated: use ipX_w() instead
 #define MCFG_MC68307_SERIAL_INPORT_CALLBACK(_cb) \
-	devcb = &m68307_cpu_device::set_inport_cb(*device, DEVCB_##_cb);
+	devcb = &downcast<m68307_cpu_device &>(*device).set_inport_cb(DEVCB_##_cb);
 
 #define MCFG_MC68307_SERIAL_OUTPORT_CALLBACK(_cb) \
-	devcb = &m68307_cpu_device::set_outport_cb(*device, DEVCB_##_cb);
+	devcb = &downcast<m68307_cpu_device &>(*device).set_outport_cb(DEVCB_##_cb);
 
 
 class m68307_cpu_device : public m68000_device
@@ -36,11 +36,11 @@ public:
 	m68307_cpu_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
 	/* trampolines so we can specify the 68681 serial configuration when adding the CPU  */
-	template <class Object> static devcb_base &set_irq_cb(device_t &device, Object &&cb) { return downcast<m68307_cpu_device &>(device).m_write_irq.set_callback(std::forward<Object>(cb)); }
-	template <class Object> static devcb_base &set_a_tx_cb(device_t &device, Object &&cb) { return downcast<m68307_cpu_device &>(device).m_write_a_tx.set_callback(std::forward<Object>(cb)); }
-	template <class Object> static devcb_base &set_b_tx_cb(device_t &device, Object &&cb) { return downcast<m68307_cpu_device &>(device).m_write_b_tx.set_callback(std::forward<Object>(cb)); }
-	template <class Object> static devcb_base &set_inport_cb(device_t &device, Object &&cb) { return downcast<m68307_cpu_device &>(device).m_read_inport.set_callback(std::forward<Object>(cb)); }
-	template <class Object> static devcb_base &set_outport_cb(device_t &device, Object &&cb) { return downcast<m68307_cpu_device &>(device).m_write_outport.set_callback(std::forward<Object>(cb)); }
+	template <class Object> devcb_base &set_irq_cb(Object &&cb) { return m_write_irq.set_callback(std::forward<Object>(cb)); }
+	template <class Object> devcb_base &set_a_tx_cb(Object &&cb) { return m_write_a_tx.set_callback(std::forward<Object>(cb)); }
+	template <class Object> devcb_base &set_b_tx_cb(Object &&cb) { return m_write_b_tx.set_callback(std::forward<Object>(cb)); }
+	template <class Object> devcb_base &set_inport_cb(Object &&cb) { return m_read_inport.set_callback(std::forward<Object>(cb)); }
+	template <class Object> devcb_base &set_outport_cb(Object &&cb) { return m_write_outport.set_callback(std::forward<Object>(cb)); }
 
 	/* callbacks for internal ports */
 	void set_port_callbacks(porta_read_delegate &&porta_r, porta_write_delegate &&porta_w, portb_read_delegate &&portb_r, portb_write_delegate &&portb_w);

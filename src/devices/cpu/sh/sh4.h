@@ -157,38 +157,38 @@ typedef void (*sh4_ftcsr_callback)(uint32_t);
 
 
 #define MCFG_SH4_MD0(_md0) \
-	sh34_base_device::set_md0(*device, _md0);
+	downcast<sh34_base_device &>(*device).set_md0(_md0);
 
 #define MCFG_SH4_MD1(_md1) \
-	sh34_base_device::set_md1(*device, _md1);
+	downcast<sh34_base_device &>(*device).set_md1(_md1);
 
 #define MCFG_SH4_MD2(_md2) \
-	sh34_base_device::set_md2(*device, _md2);
+	downcast<sh34_base_device &>(*device).set_md2(_md2);
 
 #define MCFG_SH4_MD3(_md3) \
-	sh34_base_device::set_md3(*device, _md3);
+	downcast<sh34_base_device &>(*device).set_md3(_md3);
 
 #define MCFG_SH4_MD4(_md4) \
-	sh34_base_device::set_md4(*device, _md4);
+	downcast<sh34_base_device &>(*device).set_md4(_md4);
 
 #define MCFG_SH4_MD5(_md5) \
-	sh34_base_device::set_md5(*device, _md5);
+	downcast<sh34_base_device &>(*device).set_md5(_md5);
 
 #define MCFG_SH4_MD6(_md6) \
-	sh34_base_device::set_md6(*device, _md6);
+	downcast<sh34_base_device &>(*device).set_md6(_md6);
 
 #define MCFG_SH4_MD7(_md7) \
-	sh34_base_device::set_md7(*device, _md7);
+	downcast<sh34_base_device &>(*device).set_md7(_md7);
 
 #define MCFG_SH4_MD8(_md8) \
-	sh34_base_device::set_md8(*device, _md8);
+	downcast<sh34_base_device &>(*device).set_md8(_md8);
 
 #define MCFG_SH4_CLOCK(_clock) \
-	sh34_base_device::set_sh4_clock(*device, _clock);
+	downcast<sh34_base_device &>(*device).set_sh4_clock(_clock);
 
 
 #define MCFG_MMU_HACK_TYPE(_hacktype) \
-	sh34_base_device::set_mmu_hacktype(*device, _hacktype);
+	downcast<sh34_base_device &>(*device).set_mmu_hacktype(_hacktype);
 
 class sh4_frontend;
 class sh4be_frontend;
@@ -197,19 +197,19 @@ class sh34_base_device : public sh_common_execution
 {
 public:
 
-	static void set_md0(device_t &device, int md0) { downcast<sh34_base_device &>(device).c_md0 = md0; }
-	static void set_md1(device_t &device, int md0) { downcast<sh34_base_device &>(device).c_md1 = md0; }
-	static void set_md2(device_t &device, int md0) { downcast<sh34_base_device &>(device).c_md2 = md0; }
-	static void set_md3(device_t &device, int md0) { downcast<sh34_base_device &>(device).c_md3 = md0; }
-	static void set_md4(device_t &device, int md0) { downcast<sh34_base_device &>(device).c_md4 = md0; }
-	static void set_md5(device_t &device, int md0) { downcast<sh34_base_device &>(device).c_md5 = md0; }
-	static void set_md6(device_t &device, int md0) { downcast<sh34_base_device &>(device).c_md6 = md0; }
-	static void set_md7(device_t &device, int md0) { downcast<sh34_base_device &>(device).c_md7 = md0; }
-	static void set_md8(device_t &device, int md0) { downcast<sh34_base_device &>(device).c_md8 = md0; }
-	static void set_sh4_clock(device_t &device, int clock) { downcast<sh34_base_device &>(device).c_clock = clock; }
-	static void set_sh4_clock(device_t &device, const XTAL &xtal) { set_sh4_clock(device, xtal.value()); }
+	void set_md0(int md0) { c_md0 = md0; }
+	void set_md1(int md0) { c_md1 = md0; }
+	void set_md2(int md0) { c_md2 = md0; }
+	void set_md3(int md0) { c_md3 = md0; }
+	void set_md4(int md0) { c_md4 = md0; }
+	void set_md5(int md0) { c_md5 = md0; }
+	void set_md6(int md0) { c_md6 = md0; }
+	void set_md7(int md0) { c_md7 = md0; }
+	void set_md8(int md0) { c_md8 = md0; }
+	void set_sh4_clock(int clock) { c_clock = clock; }
+	void set_sh4_clock(const XTAL &xtal) { set_sh4_clock(xtal.value()); }
 
-	static void set_mmu_hacktype(device_t &device, int hacktype) { downcast<sh34_base_device &>(device).m_mmuhack = hacktype; }
+	void set_mmu_hacktype(int hacktype) { m_mmuhack = hacktype; }
 
 	TIMER_CALLBACK_MEMBER( sh4_refresh_timer_callback );
 	TIMER_CALLBACK_MEMBER( sh4_rtc_timer_callback );

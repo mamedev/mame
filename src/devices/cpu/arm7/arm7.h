@@ -34,7 +34,7 @@
 #define ARM7_MAX_HOTSPOTS      16
 
 #define MCFG_ARM_HIGH_VECTORS() \
-	arm7_cpu_device::set_high_vectors(*device);
+	downcast<arm7_cpu_device &>(*device).set_high_vectors();
 
 
 /***************************************************************************
@@ -57,11 +57,7 @@ public:
 	// construction/destruction
 	arm7_cpu_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
-	static void set_high_vectors(device_t &device)
-	{
-		arm7_cpu_device &dev = downcast<arm7_cpu_device &>(device);
-		dev.m_vectorbase = 0xffff0000;
-	}
+	void set_high_vectors() { m_vectorbase = 0xffff0000; }
 
 protected:
 	enum

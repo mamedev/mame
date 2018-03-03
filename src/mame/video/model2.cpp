@@ -2584,6 +2584,11 @@ void model2_state::geo_parse( void )
 		/* if it's a jump opcode, do the jump */
 		if ( opcode & 0x80000000 )
 		{
+			// TODO: daytona with master network enabled hardlocks by trying a jump with 0xffff0080 as opcode
+			//       bad timings for geo_parse?
+			if(opcode & 0x078000000 )
+				return;
+			
 			/* get the address */
 			address = (opcode & 0x1FFFF) / 4;
 

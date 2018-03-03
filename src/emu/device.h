@@ -42,9 +42,9 @@
 
 // configure devices
 #define MCFG_DEVICE_CLOCK(_clock) \
-	device_t::static_set_clock(*device, _clock);
+	device->set_clock(_clock);
 #define MCFG_DEVICE_INPUT_DEFAULTS(_config) \
-	device_t::static_set_input_default(*device, DEVICE_INPUT_DEFAULTS_NAME(_config));
+	device->set_input_default(DEVICE_INPUT_DEFAULTS_NAME(_config));
 
 #define DECLARE_READ_LINE_MEMBER(name)      int  name()
 #define READ_LINE_MEMBER(name)              int  name()
@@ -462,8 +462,8 @@ public:
 	// interface helpers
 	interface_list &interfaces() { return m_interfaces; }
 	const interface_list &interfaces() const { return m_interfaces; }
-	template<class _DeviceClass> bool interface(_DeviceClass *&intf) { intf = dynamic_cast<_DeviceClass *>(this); return (intf != nullptr); }
-	template<class _DeviceClass> bool interface(_DeviceClass *&intf) const { intf = dynamic_cast<const _DeviceClass *>(this); return (intf != nullptr); }
+	template<class DeviceClass> bool interface(DeviceClass *&intf) { intf = dynamic_cast<DeviceClass *>(this); return (intf != nullptr); }
+	template<class DeviceClass> bool interface(DeviceClass *&intf) const { intf = dynamic_cast<const DeviceClass *>(this); return (intf != nullptr); }
 
 	// specialized helpers for common core interfaces
 	bool interface(device_execute_interface *&intf) { intf = m_interfaces.m_execute; return (intf != nullptr); }
@@ -491,16 +491,16 @@ public:
 	ioport_port *ioport(const char *tag) const;
 	device_t *subdevice(const char *tag) const;
 	device_t *siblingdevice(const char *tag) const;
-	template<class _DeviceClass> inline _DeviceClass *subdevice(const char *tag) const { return downcast<_DeviceClass *>(subdevice(tag)); }
-	template<class _DeviceClass> inline _DeviceClass *siblingdevice(const char *tag) const { return downcast<_DeviceClass *>(siblingdevice(tag)); }
+	template<class DeviceClass> inline DeviceClass *subdevice(const char *tag) const { return downcast<DeviceClass *>(subdevice(tag)); }
+	template<class DeviceClass> inline DeviceClass *siblingdevice(const char *tag) const { return downcast<DeviceClass *>(siblingdevice(tag)); }
 	std::string parameter(const char *tag) const;
 
 	// configuration helpers
 	void add_machine_configuration(machine_config &config) { device_add_mconfig(config); }
-	static void static_set_clock(device_t &device, u32 clock);
-	static void static_set_clock(device_t &device, const XTAL &xtal) { static_set_clock(device, xtal.value()); }
-	static void static_set_input_default(device_t &device, const input_device_default *config) { device.m_input_defaults = config; }
-	static void static_set_default_bios_tag(device_t &device, const char *tag) { device.m_default_bios_tag = tag; }
+	void set_clock(u32 clock);
+	void set_clock(const XTAL &xtal) { set_clock(xtal.value()); }
+	void set_input_default(const input_device_default *config) { m_input_defaults = config; }
+	void set_default_bios_tag(const char *tag) { m_default_bios_tag = tag; }
 
 	// state helpers
 	void config_complete();
@@ -526,10 +526,10 @@ public:
 	void timer_expired(emu_timer &timer, device_timer_id id, int param, void *ptr) { device_timer(timer, id, param, ptr); }
 
 	// state saving interfaces
-	template<typename _ItemType>
-	void ATTR_COLD save_item(_ItemType &value, const char *valname, int index = 0) { assert(m_save != nullptr); m_save->save_item(this, name(), tag(), index, value, valname); }
-	template<typename _ItemType>
-	void ATTR_COLD save_pointer(_ItemType *value, const char *valname, u32 count, int index = 0) { assert(m_save != nullptr); m_save->save_pointer(this, name(), tag(), index, value, valname, count); }
+	template<typename ItemType>
+	void ATTR_COLD save_item(ItemType &value, const char *valname, int index = 0) { assert(m_save != nullptr); m_save->save_item(this, name(), tag(), index, value, valname); }
+	template<typename ItemType>
+	void ATTR_COLD save_pointer(ItemType *value, const char *valname, u32 count, int index = 0) { assert(m_save != nullptr); m_save->save_pointer(this, name(), tag(), index, value, valname, count); }
 
 	// debugging
 	device_debug *debug() const { return m_debug.get(); }
@@ -903,7 +903,7 @@ private:
 
 // helper class to find devices with a given interface in the device hierarchy
 // also works for finding devices derived from a given subclass
-template<class _InterfaceClass>
+template<class InterfaceClass>
 class device_interface_iterator
 {
 public:
@@ -919,8 +919,8 @@ public:
 		}
 
 		// getters returning specified interface type
-		_InterfaceClass *current() const { return m_interface; }
-		_InterfaceClass &operator*() const { assert(m_interface != nullptr); return *m_interface; }
+		InterfaceClass *current() const { return m_interface; }
+		InterfaceClass &operator*() const { assert(m_interface != nullptr); return *m_interface; }
 
 		// search for devices with the specified interface
 		const auto_iterator &operator++() { advance(); find_interface(); return *this; }
@@ -939,7 +939,7 @@ private:
 		}
 
 		// private state
-		_InterfaceClass *m_interface;
+		InterfaceClass *m_interface;
 	};
 
 public:
@@ -952,13 +952,13 @@ public:
 	auto_iterator end() const { return auto_iterator(nullptr, 0, m_maxdepth); }
 
 	// return first item
-	_InterfaceClass *first() const { return begin().current(); }
+	InterfaceClass *first() const { return begin().current(); }
 
 	// return the number of items available
 	int count() const
 	{
 		int result = 0;
-		for (_InterfaceClass &item : *this)
+		for (InterfaceClass &item : *this)
 		{
 			(void)&item;
 			result++;
@@ -967,10 +967,10 @@ public:
 	}
 
 	// return the index of a given item in the virtual list
-	int indexof(_InterfaceClass &intrf) const
+	int indexof(InterfaceClass &intrf) const
 	{
 		int index = 0;
-		for (_InterfaceClass &item : *this)
+		for (InterfaceClass &item : *this)
 		{
 			if (&item == &intrf)
 				return index;
@@ -981,9 +981,9 @@ public:
 	}
 
 	// return the indexed item in the list
-	_InterfaceClass *byindex(int index) const
+	InterfaceClass *byindex(int index) const
 	{
-		for (_InterfaceClass &item : *this)
+		for (InterfaceClass &item : *this)
 			if (index-- == 0)
 				return &item;
 		return nullptr;

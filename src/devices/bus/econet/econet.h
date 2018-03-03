@@ -32,14 +32,14 @@
 #define MCFG_ECONET_SLOT_ADD(_tag, _num, _slot_intf, _def_slot) \
 	MCFG_DEVICE_ADD(_tag, ECONET_SLOT, 0) \
 	MCFG_DEVICE_SLOT_INTERFACE(_slot_intf, _def_slot, false) \
-	econet_slot_device::static_set_slot(*device, _num);
+	downcast<econet_slot_device &>(*device).set_slot(_num);
 
 
 #define MCFG_ECONET_CLK_CALLBACK(_write) \
-	devcb = &econet_device::set_clk_wr_callback(*device, DEVCB_##_write);
+	devcb = &downcast<econet_device &>(*device).set_clk_wr_callback(DEVCB_##_write);
 
 #define MCFG_ECONET_DATA_CALLBACK(_write) \
-	devcb = &econet_device::set_data_wr_callback(*device, DEVCB_##_write);
+	devcb = &downcast<econet_device &>(*device).set_data_wr_callback(DEVCB_##_write);
 
 
 
@@ -57,8 +57,8 @@ public:
 	// construction/destruction
 	econet_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
-	template <class Object> static devcb_base &set_clk_wr_callback(device_t &device, Object &&cb) { return downcast<econet_device &>(device).m_write_clk.set_callback(std::forward<Object>(cb)); }
-	template <class Object> static devcb_base &set_data_wr_callback(device_t &device, Object &&cb) { return downcast<econet_device &>(device).m_write_data.set_callback(std::forward<Object>(cb)); }
+	template <class Object> devcb_base &set_clk_wr_callback(Object &&cb) { return m_write_clk.set_callback(std::forward<Object>(cb)); }
+	template <class Object> devcb_base &set_data_wr_callback(Object &&cb) { return m_write_data.set_callback(std::forward<Object>(cb)); }
 
 	void add_device(device_t *target, int address);
 
@@ -121,7 +121,7 @@ public:
 	virtual void device_start() override;
 
 	// inline configuration
-	static void static_set_slot(device_t &device, int address);
+	void set_slot(int address) { m_address = address; }
 
 private:
 	// configuration

@@ -1956,7 +1956,7 @@ void validity_checker::validate_devices()
 
 				const char *const def_bios = option.second->default_bios();
 				if (def_bios)
-					device_t::static_set_default_bios_tag(*card, def_bios);
+					card->set_default_bios_tag(def_bios);
 				auto additions = option.second->machine_config();
 				if (additions)
 					additions(card);
@@ -1971,7 +1971,7 @@ void validity_checker::validate_devices()
 							device_t *const sub_card = m_current_config->device_add(&subslot.device(), suboption->name(), suboption->devtype(), suboption->clock());
 							const char *const sub_bios = suboption->default_bios();
 							if (sub_bios)
-								device_t::static_set_default_bios_tag(*sub_card, sub_bios);
+								sub_card->set_default_bios_tag(sub_bios);
 							auto sub_additions = suboption->machine_config();
 							if (sub_additions)
 								sub_additions(sub_card);

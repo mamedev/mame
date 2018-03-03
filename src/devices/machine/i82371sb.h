@@ -31,13 +31,13 @@
 	MCFG_PCI_DEVICE_ADD(_tag, I82371SB_ISA, 0x80867000, 0x03, 0x060100, 0x00000000)
 
 #define MCFG_I82371SB_BOOT_STATE_HOOK(_devcb) \
-	devcb = &i82371sb_isa_device::set_boot_state_hook(*device, DEVCB_##_devcb);
+	devcb = &downcast<i82371sb_isa_device &>(*device).set_boot_state_hook(DEVCB_##_devcb);
 
 class i82371sb_isa_device : public pci_device {
 public:
 	i82371sb_isa_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
-	template <class Object> static devcb_base &set_boot_state_hook(device_t &device, Object &&cb) { return downcast<i82371sb_isa_device &>(device).m_boot_state_hook.set_callback(std::forward<Object>(cb)); }
+	template <class Object> devcb_base &set_boot_state_hook(Object &&cb) { return m_boot_state_hook.set_callback(std::forward<Object>(cb)); }
 
 protected:
 	virtual void device_start() override;

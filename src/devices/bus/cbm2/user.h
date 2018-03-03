@@ -48,16 +48,16 @@
 
 
 #define MCFG_CBM2_USER_PORT_IRQ_CALLBACK(_write) \
-	devcb = &cbm2_user_port_device::set_irq_wr_callback(*device, DEVCB_##_write);
+	devcb = &downcast<cbm2_user_port_device &>(*device).set_irq_wr_callback(DEVCB_##_write);
 
 #define MCFG_CBM2_USER_PORT_SP_CALLBACK(_write) \
-	devcb = &cbm2_user_port_device::set_sp_wr_callback(*device, DEVCB_##_write);
+	devcb = &downcast<cbm2_user_port_device &>(*device).set_sp_wr_callback(DEVCB_##_write);
 
 #define MCFG_CBM2_USER_PORT_CNT_CALLBACK(_write) \
-	devcb = &cbm2_user_port_device::set_cnt_wr_callback(*device, DEVCB_##_write);
+	devcb = &downcast<cbm2_user_port_device &>(*device).set_cnt_wr_callback(DEVCB_##_write);
 
 #define MCFG_CBM2_USER_PORT_FLAG_CALLBACK(_write) \
-	devcb = &cbm2_user_port_device::set_flag_wr_callback(*device, DEVCB_##_write);
+	devcb = &downcast<cbm2_user_port_device &>(*device).set_flag_wr_callback(DEVCB_##_write);
 
 
 
@@ -105,10 +105,10 @@ public:
 	// construction/destruction
 	cbm2_user_port_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
-	template <class Object> static devcb_base &set_irq_wr_callback(device_t &device, Object &&cb) { return downcast<cbm2_user_port_device &>(device).m_write_irq.set_callback(std::forward<Object>(cb)); }
-	template <class Object> static devcb_base &set_sp_wr_callback(device_t &device, Object &&cb) { return downcast<cbm2_user_port_device &>(device).m_write_sp.set_callback(std::forward<Object>(cb)); }
-	template <class Object> static devcb_base &set_cnt_wr_callback(device_t &device, Object &&cb) { return downcast<cbm2_user_port_device &>(device).m_write_cnt.set_callback(std::forward<Object>(cb)); }
-	template <class Object> static devcb_base &set_flag_wr_callback(device_t &device, Object &&cb) { return downcast<cbm2_user_port_device &>(device).m_write_flag.set_callback(std::forward<Object>(cb)); }
+	template <class Object> devcb_base &set_irq_wr_callback(Object &&cb) { return m_write_irq.set_callback(std::forward<Object>(cb)); }
+	template <class Object> devcb_base &set_sp_wr_callback(Object &&cb) { return m_write_sp.set_callback(std::forward<Object>(cb)); }
+	template <class Object> devcb_base &set_cnt_wr_callback(Object &&cb) { return m_write_cnt.set_callback(std::forward<Object>(cb)); }
+	template <class Object> devcb_base &set_flag_wr_callback(Object &&cb) { return m_write_flag.set_callback(std::forward<Object>(cb)); }
 
 	// computer interface
 	DECLARE_READ8_MEMBER( d1_r ) { uint8_t data = 0xff; if (m_card != nullptr) data = m_card->cbm2_d1_r(space, offset); return data; }

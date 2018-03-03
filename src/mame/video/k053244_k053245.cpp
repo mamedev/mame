@@ -101,10 +101,10 @@ void k05324x_device::set_bpp(int bpp)
 	switch(bpp)
 	{
 		case 4:
-			device_gfx_interface::static_set_info(*this, gfxinfo);
+			set_info(gfxinfo);
 			break;
 		case 6:
-			device_gfx_interface::static_set_info(*this, gfxinfo_6bpp);
+			set_info(gfxinfo_6bpp);
 			break;
 		default:
 			fatalerror("Unsupported bpp\n");

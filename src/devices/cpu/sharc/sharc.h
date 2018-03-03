@@ -74,7 +74,7 @@
 
 
 #define MCFG_SHARC_BOOT_MODE(boot_mode) \
-	adsp21062_device::set_boot_mode(*device, adsp21062_device::boot_mode);
+	downcast<adsp21062_device &>(*device).set_boot_mode(adsp21062_device::boot_mode);
 
 class sharc_frontend;
 
@@ -95,8 +95,8 @@ public:
 	// construction/destruction
 	adsp21062_device(const machine_config &mconfig, const char *_tag, device_t *_owner, uint32_t _clock);
 
-	// static configuration helpers
-	static void set_boot_mode(device_t &device, const sharc_boot_mode boot_mode) { downcast<adsp21062_device &>(device).m_boot_mode = boot_mode; }
+	// configuration helpers
+	void set_boot_mode(const sharc_boot_mode boot_mode) { m_boot_mode = boot_mode; }
 
 	void set_flag_input(int flag_num, int state);
 	void external_iop_write(uint32_t address, uint32_t data);

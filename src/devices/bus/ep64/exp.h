@@ -68,16 +68,16 @@
 	MCFG_DEVICE_SLOT_INTERFACE(ep64_expansion_bus_cards, _def_slot, false)
 
 #define MCFG_EP64_EXPANSION_BUS_SLOT_DAVE(_tag) \
-	ep64_expansion_bus_slot_device::static_set_dave_tag(*device, "^" _tag);
+	downcast<ep64_expansion_bus_slot_device &>(*device).set_dave_tag("^" _tag);
 
 #define MCFG_EP64_EXPANSION_BUS_SLOT_IRQ_CALLBACK(_write) \
-	devcb = &ep64_expansion_bus_slot_device::set_irq_wr_callback(*device, DEVCB_##_write);
+	devcb = &downcast<ep64_expansion_bus_slot_device &>(*device).set_irq_wr_callback(DEVCB_##_write);
 
 #define MCFG_EP64_EXPANSION_BUS_SLOT_NMI_CALLBACK(_write) \
-	devcb = &ep64_expansion_bus_slot_device::set_nmi_wr_callback(*device, DEVCB_##_write);
+	devcb = &downcast<ep64_expansion_bus_slot_device &>(*device).set_nmi_wr_callback(DEVCB_##_write);
 
 #define MCFG_EP64_EXPANSION_BUS_SLOT_WAIT_CALLBACK(_write) \
-	devcb = &ep64_expansion_bus_slot_device::set_wait_wr_callback(*device, DEVCB_##_write);
+	devcb = &downcast<ep64_expansion_bus_slot_device &>(*device).set_wait_wr_callback(DEVCB_##_write);
 
 
 
@@ -98,10 +98,10 @@ public:
 	// construction/destruction
 	ep64_expansion_bus_slot_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
-	static void static_set_dave_tag(device_t &device, const char* tag) { downcast<ep64_expansion_bus_slot_device &>(device).m_dave.set_tag(tag); }
-	template <class Object> static devcb_base &set_irq_wr_callback(device_t &device, Object &&cb) { return downcast<ep64_expansion_bus_slot_device &>(device).m_write_irq.set_callback(std::forward<Object>(cb)); }
-	template <class Object> static devcb_base &set_nmi_wr_callback(device_t &device, Object &&cb) { return downcast<ep64_expansion_bus_slot_device &>(device).m_write_nmi.set_callback(std::forward<Object>(cb)); }
-	template <class Object> static devcb_base &set_wait_wr_callback(device_t &device, Object &&cb) { return downcast<ep64_expansion_bus_slot_device &>(device).m_write_wait.set_callback(std::forward<Object>(cb)); }
+	void set_dave_tag(const char* tag) { m_dave.set_tag(tag); }
+	template <class Object> devcb_base &set_irq_wr_callback(Object &&cb) { return m_write_irq.set_callback(std::forward<Object>(cb)); }
+	template <class Object> devcb_base &set_nmi_wr_callback(Object &&cb) { return m_write_nmi.set_callback(std::forward<Object>(cb)); }
+	template <class Object> devcb_base &set_wait_wr_callback(Object &&cb) { return m_write_wait.set_callback(std::forward<Object>(cb)); }
 
 	DECLARE_WRITE_LINE_MEMBER( irq_w ) { m_write_irq(state); }
 	DECLARE_WRITE_LINE_MEMBER( nmi_w ) { m_write_nmi(state); }

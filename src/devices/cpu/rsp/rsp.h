@@ -84,19 +84,19 @@ enum
 #define RSPDRC_STRICT_VERIFY    0x0001          /* verify all instructions */
 
 #define MCFG_RSP_DP_REG_R_CB(_devcb) \
-	devcb = &rsp_device::static_set_dp_reg_r_callback(*device, DEVCB_##_devcb);
+	devcb = &downcast<rsp_device &>(*device).set_dp_reg_r_callback(DEVCB_##_devcb);
 
 #define MCFG_RSP_DP_REG_W_CB(_devcb) \
-	devcb = &rsp_device::static_set_dp_reg_w_callback(*device, DEVCB_##_devcb);
+	devcb = &downcast<rsp_device &>(*device).set_dp_reg_w_callback(DEVCB_##_devcb);
 
 #define MCFG_RSP_SP_REG_R_CB(_devcb) \
-	devcb = &rsp_device::static_set_sp_reg_r_callback(*device, DEVCB_##_devcb);
+	devcb = &downcast<rsp_device &>(*device).set_sp_reg_r_callback(DEVCB_##_devcb);
 
 #define MCFG_RSP_SP_REG_W_CB(_devcb) \
-	devcb = &rsp_device::static_set_sp_reg_w_callback(*device, DEVCB_##_devcb);
+	devcb = &downcast<rsp_device &>(*device).set_sp_reg_w_callback(DEVCB_##_devcb);
 
 #define MCFG_RSP_SP_SET_STATUS_CB(_devcb) \
-	devcb = &rsp_device::static_set_status_callback(*device, DEVCB_##_devcb);
+	devcb = &downcast<rsp_device &>(*device).set_status_callback(DEVCB_##_devcb);
 
 
 class rsp_frontend;
@@ -113,11 +113,11 @@ public:
 	rsp_device(const machine_config &mconfig, const char *_tag, device_t *_owner, uint32_t _clock);
 
 	void resolve_cb();
-	template <class Object> static devcb_base &static_set_dp_reg_r_callback(device_t &device, Object &&cb) { return downcast<rsp_device &>(device).m_dp_reg_r_func.set_callback(std::forward<Object>(cb)); }
-	template <class Object> static devcb_base &static_set_dp_reg_w_callback(device_t &device, Object &&cb) { return downcast<rsp_device &>(device).m_dp_reg_w_func.set_callback(std::forward<Object>(cb)); }
-	template <class Object> static devcb_base &static_set_sp_reg_r_callback(device_t &device, Object &&cb) { return downcast<rsp_device &>(device).m_sp_reg_r_func.set_callback(std::forward<Object>(cb)); }
-	template <class Object> static devcb_base &static_set_sp_reg_w_callback(device_t &device, Object &&cb) { return downcast<rsp_device &>(device).m_sp_reg_w_func.set_callback(std::forward<Object>(cb)); }
-	template <class Object> static devcb_base &static_set_status_callback(device_t &device, Object &&cb) { return downcast<rsp_device &>(device).m_sp_set_status_func.set_callback(std::forward<Object>(cb)); }
+	template <class Object> devcb_base &set_dp_reg_r_callback(Object &&cb) { return m_dp_reg_r_func.set_callback(std::forward<Object>(cb)); }
+	template <class Object> devcb_base &set_dp_reg_w_callback(Object &&cb) { return m_dp_reg_w_func.set_callback(std::forward<Object>(cb)); }
+	template <class Object> devcb_base &set_sp_reg_r_callback(Object &&cb) { return m_sp_reg_r_func.set_callback(std::forward<Object>(cb)); }
+	template <class Object> devcb_base &set_sp_reg_w_callback(Object &&cb) { return m_sp_reg_w_func.set_callback(std::forward<Object>(cb)); }
+	template <class Object> devcb_base &set_status_callback(Object &&cb) { return m_sp_set_status_func.set_callback(std::forward<Object>(cb)); }
 
 	void rspdrc_flush_drc_cache();
 	void rspdrc_set_options(uint32_t options);

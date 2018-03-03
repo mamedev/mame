@@ -20,49 +20,49 @@
 #define S3C2440_TAG "s3c2440"
 
 #define MCFG_S3C2440_PALETTE(_palette_tag) \
-	s3c2440_device::static_set_palette_tag(*device, "^" _palette_tag);
+	downcast<s3c2440_device &>(*device).set_palette_tag("^" _palette_tag);
 
 #define MCFG_S3C2440_CORE_PIN_R_CB(_devcb) \
-	devcb = &s3c2440_device::set_core_pin_r_callback(*device, DEVCB_##_devcb);
+	devcb = &downcast<s3c2440_device &>(*device).set_core_pin_r_callback(DEVCB_##_devcb);
 
 #define MCFG_S3C2440_CORE_PIN_W_CB(_devcb) \
-	devcb = &s3c2440_device::set_core_pin_w_callback(*device, DEVCB_##_devcb);
+	devcb = &downcast<s3c2440_device &>(*device).set_core_pin_w_callback(DEVCB_##_devcb);
 
 #define MCFG_S3C2440_GPIO_PORT_R_CB(_devcb) \
-	devcb = &s3c2440_device::set_gpio_port_r_callback(*device, DEVCB_##_devcb);
+	devcb = &downcast<s3c2440_device &>(*device).set_gpio_port_r_callback(DEVCB_##_devcb);
 
 #define MCFG_S3C2440_GPIO_PORT_W_CB(_devcb) \
-	devcb = &s3c2440_device::set_gpio_port_w_callback(*device, DEVCB_##_devcb);
+	devcb = &downcast<s3c2440_device &>(*device).set_gpio_port_w_callback(DEVCB_##_devcb);
 
 #define MCFG_S3C2440_I2C_SCL_W_CB(_devcb) \
-	devcb = &s3c2440_device::set_i2c_scl_w_callback(*device, DEVCB_##_devcb);
+	devcb = &downcast<s3c2440_device &>(*device).set_i2c_scl_w_callback(DEVCB_##_devcb);
 
 #define MCFG_S3C2440_I2C_SDA_R_CB(_devcb) \
-	devcb = &s3c2440_device::set_i2c_sda_r_callback(*device, DEVCB_##_devcb);
+	devcb = &downcast<s3c2440_device &>(*device).set_i2c_sda_r_callback(DEVCB_##_devcb);
 
 #define MCFG_S3C2440_I2C_SDA_W_CB(_devcb) \
-	devcb = &s3c2440_device::set_i2c_sda_w_callback(*device, DEVCB_##_devcb);
+	devcb = &downcast<s3c2440_device &>(*device).set_i2c_sda_w_callback(DEVCB_##_devcb);
 
 #define MCFG_S3C2440_ADC_DATA_R_CB(_devcb) \
-	devcb = &s3c2440_device::set_adc_data_r_callback(*device, DEVCB_##_devcb);
+	devcb = &downcast<s3c2440_device &>(*device).set_adc_data_r_callback(DEVCB_##_devcb);
 
 #define MCFG_S3C2440_I2S_DATA_W_CB(_devcb) \
-	devcb = &s3c2440_device::set_i2s_data_w_callback(*device, DEVCB_##_devcb);
+	devcb = &downcast<s3c2440_device &>(*device).set_i2s_data_w_callback(DEVCB_##_devcb);
 
 #define MCFG_S3C2440_NAND_COMMAND_W_CB(_devcb) \
-	devcb = &s3c2440_device::set_nand_command_w_callback(*device, DEVCB_##_devcb);
+	devcb = &downcast<s3c2440_device &>(*device).set_nand_command_w_callback(DEVCB_##_devcb);
 
 #define MCFG_S3C2440_NAND_ADDRESS_W_CB(_devcb) \
-	devcb = &s3c2440_device::set_nand_address_w_callback(*device, DEVCB_##_devcb);
+	devcb = &downcast<s3c2440_device &>(*device).set_nand_address_w_callback(DEVCB_##_devcb);
 
 #define MCFG_S3C2440_NAND_DATA_R_CB(_devcb) \
-	devcb = &s3c2440_device::set_nand_data_r_callback(*device, DEVCB_##_devcb);
+	devcb = &downcast<s3c2440_device &>(*device).set_nand_data_r_callback(DEVCB_##_devcb);
 
 #define MCFG_S3C2440_NAND_DATA_W_CB(_devcb) \
-	devcb = &s3c2440_device::set_nand_data_w_callback(*device, DEVCB_##_devcb);
+	devcb = &downcast<s3c2440_device &>(*device).set_nand_data_w_callback(DEVCB_##_devcb);
 
 #define MCFG_S3C2440_LCD_FLAGS(_flags) \
-	s3c2440_device::set_lcd_flags(*device, _flags);
+	downcast<s3c2440_device &>(*device).set_lcd_flags(_flags);
 
 enum
 {
@@ -204,22 +204,22 @@ public:
 	s3c2440_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 	~s3c2440_device();
 
-	// static configuration
-	static void static_set_palette_tag(device_t &device, const char *tag);
-	template <class Object> static devcb_base &set_core_pin_r_callback(device_t &device, Object &&cb) { return downcast<s3c2440_device &>(device).m_pin_r_cb.set_callback(std::forward<Object>(cb)); }
-	template <class Object> static devcb_base &set_core_pin_w_callback(device_t &device, Object &&cb) { return downcast<s3c2440_device &>(device).m_pin_w_cb.set_callback(std::forward<Object>(cb)); }
-	template <class Object> static devcb_base &set_gpio_port_r_callback(device_t &device, Object &&cb) { return downcast<s3c2440_device &>(device).m_port_r_cb.set_callback(std::forward<Object>(cb)); }
-	template <class Object> static devcb_base &set_gpio_port_w_callback(device_t &device, Object &&cb) { return downcast<s3c2440_device &>(device).m_port_w_cb.set_callback(std::forward<Object>(cb)); }
-	template <class Object> static devcb_base &set_i2c_scl_w_callback(device_t &device, Object &&cb) { return downcast<s3c2440_device &>(device).m_scl_w_cb.set_callback(std::forward<Object>(cb)); }
-	template <class Object> static devcb_base &set_i2c_sda_r_callback(device_t &device, Object &&cb) { return downcast<s3c2440_device &>(device).m_sda_r_cb.set_callback(std::forward<Object>(cb)); }
-	template <class Object> static devcb_base &set_i2c_sda_w_callback(device_t &device, Object &&cb) { return downcast<s3c2440_device &>(device).m_sda_w_cb.set_callback(std::forward<Object>(cb)); }
-	template <class Object> static devcb_base &set_adc_data_r_callback(device_t &device, Object &&cb) { return downcast<s3c2440_device &>(device).m_data_r_cb.set_callback(std::forward<Object>(cb)); }
-	template <class Object> static devcb_base &set_i2s_data_w_callback(device_t &device, Object &&cb) { return downcast<s3c2440_device &>(device).m_data_w_cb.set_callback(std::forward<Object>(cb)); }
-	template <class Object> static devcb_base &set_nand_command_w_callback(device_t &device, Object &&cb) { return downcast<s3c2440_device &>(device).m_command_w_cb.set_callback(std::forward<Object>(cb)); }
-	template <class Object> static devcb_base &set_nand_address_w_callback(device_t &device, Object &&cb) { return downcast<s3c2440_device &>(device).m_address_w_cb.set_callback(std::forward<Object>(cb)); }
-	template <class Object> static devcb_base &set_nand_data_r_callback(device_t &device, Object &&cb) { return downcast<s3c2440_device &>(device).m_nand_data_r_cb.set_callback(std::forward<Object>(cb)); }
-	template <class Object> static devcb_base &set_nand_data_w_callback(device_t &device, Object &&cb) { return downcast<s3c2440_device &>(device).m_nand_data_w_cb.set_callback(std::forward<Object>(cb)); }
-	static void set_lcd_flags(device_t &device, int flags) { downcast<s3c2440_device &>(device).m_flags = flags; }
+	// configuration
+	void set_palette_tag(const char *tag) { m_palette.set_tag(tag); }
+	template <class Object> devcb_base &set_core_pin_r_callback(Object &&cb) { return m_pin_r_cb.set_callback(std::forward<Object>(cb)); }
+	template <class Object> devcb_base &set_core_pin_w_callback(Object &&cb) { return m_pin_w_cb.set_callback(std::forward<Object>(cb)); }
+	template <class Object> devcb_base &set_gpio_port_r_callback(Object &&cb) { return m_port_r_cb.set_callback(std::forward<Object>(cb)); }
+	template <class Object> devcb_base &set_gpio_port_w_callback(Object &&cb) { return m_port_w_cb.set_callback(std::forward<Object>(cb)); }
+	template <class Object> devcb_base &set_i2c_scl_w_callback(Object &&cb) { return m_scl_w_cb.set_callback(std::forward<Object>(cb)); }
+	template <class Object> devcb_base &set_i2c_sda_r_callback(Object &&cb) { return m_sda_r_cb.set_callback(std::forward<Object>(cb)); }
+	template <class Object> devcb_base &set_i2c_sda_w_callback(Object &&cb) { return m_sda_w_cb.set_callback(std::forward<Object>(cb)); }
+	template <class Object> devcb_base &set_adc_data_r_callback(Object &&cb) { return m_data_r_cb.set_callback(std::forward<Object>(cb)); }
+	template <class Object> devcb_base &set_i2s_data_w_callback(Object &&cb) { return m_data_w_cb.set_callback(std::forward<Object>(cb)); }
+	template <class Object> devcb_base &set_nand_command_w_callback(Object &&cb) { return m_command_w_cb.set_callback(std::forward<Object>(cb)); }
+	template <class Object> devcb_base &set_nand_address_w_callback(Object &&cb) { return m_address_w_cb.set_callback(std::forward<Object>(cb)); }
+	template <class Object> devcb_base &set_nand_data_r_callback(Object &&cb) { return m_nand_data_r_cb.set_callback(std::forward<Object>(cb)); }
+	template <class Object> devcb_base &set_nand_data_w_callback(Object &&cb) { return m_nand_data_w_cb.set_callback(std::forward<Object>(cb)); }
+	void set_lcd_flags(int flags) { m_flags = flags; }
 
 	DECLARE_WRITE_LINE_MEMBER( frnb_w );
 

@@ -150,7 +150,7 @@ class running_machine
 	friend class sound_manager;
 	friend class memory_manager;
 
-	typedef std::function<void(const char*)> logerror_callback;
+	typedef std::function<void (const char*)> logerror_callback;
 
 	// must be at top of member variables
 	resource_pool           m_respool;              // pool of resources for this machine
@@ -189,7 +189,7 @@ public:
 	debug_view_manager &debug_view() const { assert(m_debug_view != nullptr); return *m_debug_view; }
 	debugger_manager &debugger() const { assert(m_debugger != nullptr); return *m_debugger; }
 	driver_device *driver_data() const { return &downcast<driver_device &>(root_device()); }
-	template<class _DriverClass> _DriverClass *driver_data() const { return &downcast<_DriverClass &>(root_device()); }
+	template <class DriverClass> DriverClass *driver_data() const { return &downcast<DriverClass &>(root_device()); }
 	machine_phase phase() const { return m_current_phase; }
 	bool paused() const { return m_paused || (m_current_phase != machine_phase::RUNNING); }
 	bool exit_pending() const { return m_exit_pending; }
@@ -197,7 +197,7 @@ public:
 	const char *basename() const { return m_basename.c_str(); }
 	int sample_rate() const { return m_sample_rate; }
 	bool save_or_load_pending() const { return !m_saveload_pending_file.empty(); }
-	screen_device *first_screen() const { return primary_screen; }
+	[[deprecated("don't rely on this, use an object finder instead")]] screen_device *first_screen() const { return primary_screen; }
 
 	// RAII-based side effect disable
 	// NOP-ed when passed false, to make it more easily conditional
@@ -212,7 +212,7 @@ public:
 
 	// fetch items by name
 	inline device_t *device(const char *tag) const { return root_device().subdevice(tag); }
-	template<class _DeviceClass> inline _DeviceClass *device(const char *tag) { return downcast<_DeviceClass *>(device(tag)); }
+	template <class DeviceClass> inline DeviceClass *device(const char *tag) { return downcast<DeviceClass *>(device(tag)); }
 
 	// immediate operations
 	int run(bool quiet);

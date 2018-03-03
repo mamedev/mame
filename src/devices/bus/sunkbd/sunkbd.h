@@ -12,7 +12,7 @@
 	MCFG_DEVICE_SLOT_INTERFACE(slot_intf, def_slot, false)
 
 #define MCFG_SUNKBD_RXD_HANDLER(cb) \
-	devcb = &sun_keyboard_port_device::set_rxd_handler(*device, DEVCB_##cb);
+	devcb = &downcast<sun_keyboard_port_device &>(*device).set_rxd_handler(DEVCB_##cb);
 
 
 class device_sun_keyboard_port_interface;
@@ -27,7 +27,7 @@ public:
 	virtual ~sun_keyboard_port_device();
 
 	// static configuration helpers
-	template <class Object> static devcb_base &set_rxd_handler(device_t &device, Object &&cb) { return downcast<sun_keyboard_port_device &>(device).m_rxd_handler.set_callback(std::forward<Object>(cb)); }
+	template <class Object> devcb_base &set_rxd_handler(Object &&cb) { return m_rxd_handler.set_callback(std::forward<Object>(cb)); }
 
 	DECLARE_WRITE_LINE_MEMBER( write_txd );
 

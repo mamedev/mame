@@ -39,40 +39,6 @@ device_sound_interface::~device_sound_interface()
 
 
 //-------------------------------------------------
-//  static_add_route - configuration helper to add
-//  a new route to the device
-//-------------------------------------------------
-
-void device_sound_interface::static_add_route(device_t &device, u32 output, const char *target, double gain, u32 input, u32 mixoutput)
-{
-	// find our sound interface
-	device_sound_interface *sound;
-	if (!device.interface(sound))
-		throw emu_fatalerror("MCFG_SOUND_ROUTE called on device '%s' with no sound interface", device.tag());
-
-	// append a new route to the list
-	sound->m_route_list.push_back(std::make_unique<sound_route>(output, input, gain, target, mixoutput));
-}
-
-
-//-------------------------------------------------
-//  static_reset_routes - configuration helper to
-//  reset all existing routes to the device
-//-------------------------------------------------
-
-void device_sound_interface::static_reset_routes(device_t &device)
-{
-	// find our sound interface
-	device_sound_interface *sound;
-	if (!device.interface(sound))
-		throw emu_fatalerror("MCFG_SOUND_ROUTES_RESET called on device '%s' with no sound interface", device.tag());
-
-	// reset the routine list
-	sound->m_route_list.clear();
-}
-
-
-//-------------------------------------------------
 //  stream_alloc - allocate a stream implicitly
 //  associated with this device
 //-------------------------------------------------

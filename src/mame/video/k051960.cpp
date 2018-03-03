@@ -150,15 +150,15 @@ void k051960_device::set_plane_order(int order)
 	switch (order)
 	{
 		case K051960_PLANEORDER_BASE:
-			device_gfx_interface::static_set_info(*this, gfxinfo);
+			set_info(gfxinfo);
 			break;
 
 		case K051960_PLANEORDER_MIA:
-			device_gfx_interface::static_set_info(*this, gfxinfo_reverse);
+			set_info(gfxinfo_reverse);
 			break;
 
 		case K051960_PLANEORDER_GRADIUS3:
-			device_gfx_interface::static_set_info(*this, gfxinfo_gradius3);
+			set_info(gfxinfo_gradius3);
 			break;
 
 		default:

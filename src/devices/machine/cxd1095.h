@@ -49,26 +49,26 @@
 //**************************************************************************
 
 #define MCFG_CXD1095_IN_PORTA_CB(_devcb) \
-	devcb = &cxd1095_device::set_input_cb(*device, 0, DEVCB_##_devcb);
+	devcb = &downcast<cxd1095_device &>(*device).set_input_cb(0, DEVCB_##_devcb);
 #define MCFG_CXD1095_IN_PORTB_CB(_devcb) \
-	devcb = &cxd1095_device::set_input_cb(*device, 1, DEVCB_##_devcb);
+	devcb = &downcast<cxd1095_device &>(*device).set_input_cb(1, DEVCB_##_devcb);
 #define MCFG_CXD1095_IN_PORTC_CB(_devcb) \
-	devcb = &cxd1095_device::set_input_cb(*device, 2, DEVCB_##_devcb);
+	devcb = &downcast<cxd1095_device &>(*device).set_input_cb(2, DEVCB_##_devcb);
 #define MCFG_CXD1095_IN_PORTD_CB(_devcb) \
-	devcb = &cxd1095_device::set_input_cb(*device, 3, DEVCB_##_devcb);
+	devcb = &downcast<cxd1095_device &>(*device).set_input_cb(3, DEVCB_##_devcb);
 #define MCFG_CXD1095_IN_PORTE_CB(_devcb) \
-	devcb = &cxd1095_device::set_input_cb(*device, 4, DEVCB_##_devcb);
+	devcb = &downcast<cxd1095_device &>(*device).set_input_cb(4, DEVCB_##_devcb);
 
 #define MCFG_CXD1095_OUT_PORTA_CB(_devcb) \
-	devcb = &cxd1095_device::set_output_cb(*device, 0, DEVCB_##_devcb);
+	devcb = &downcast<cxd1095_device &>(*device).set_output_cb(0, DEVCB_##_devcb);
 #define MCFG_CXD1095_OUT_PORTB_CB(_devcb) \
-	devcb = &cxd1095_device::set_output_cb(*device, 1, DEVCB_##_devcb);
+	devcb = &downcast<cxd1095_device &>(*device).set_output_cb(1, DEVCB_##_devcb);
 #define MCFG_CXD1095_OUT_PORTC_CB(_devcb) \
-	devcb = &cxd1095_device::set_output_cb(*device, 2, DEVCB_##_devcb);
+	devcb = &downcast<cxd1095_device &>(*device).set_output_cb(2, DEVCB_##_devcb);
 #define MCFG_CXD1095_OUT_PORTD_CB(_devcb) \
-	devcb = &cxd1095_device::set_output_cb(*device, 3, DEVCB_##_devcb);
+	devcb = &downcast<cxd1095_device &>(*device).set_output_cb(3, DEVCB_##_devcb);
 #define MCFG_CXD1095_OUT_PORTE_CB(_devcb) \
-	devcb = &cxd1095_device::set_output_cb(*device, 4, DEVCB_##_devcb);
+	devcb = &downcast<cxd1095_device &>(*device).set_output_cb(4, DEVCB_##_devcb);
 
 //**************************************************************************
 //  TYPE DEFINITIONS
@@ -82,19 +82,9 @@ public:
 	// construction/destruction
 	cxd1095_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock);
 
-	// static configuration
-	template <class Object>
-	static devcb_base &set_input_cb(device_t &device, int p, Object &&obj)
-	{
-		assert(p >= 0 && p < 5);
-		return downcast<cxd1095_device &>(device).m_input_cb[p].set_callback(std::forward<Object>(obj));
-	}
-	template <class Object>
-	static devcb_base &set_output_cb(device_t &device, int p, Object &&obj)
-	{
-		assert(p >= 0 && p < 5);
-		return downcast<cxd1095_device &>(device).m_output_cb[p].set_callback(std::forward<Object>(obj));
-	}
+	// configuration
+	template <class Object> devcb_base &set_input_cb(int p, Object &&cb) { assert(p >= 0 && p < 5); return m_input_cb[p].set_callback(std::forward<Object>(cb)); }
+	template <class Object> devcb_base &set_output_cb(int p, Object &&cb) { assert(p >= 0 && p < 5); return m_output_cb[p].set_callback(std::forward<Object>(cb)); }
 
 	// memory handlers
 	DECLARE_READ8_MEMBER(read);

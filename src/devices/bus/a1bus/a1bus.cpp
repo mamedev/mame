@@ -36,13 +36,6 @@ a1bus_slot_device::a1bus_slot_device(const machine_config &mconfig, device_type 
 {
 }
 
-void a1bus_slot_device::static_set_a1bus_slot(device_t &device, const char *tag, const char *slottag)
-{
-	a1bus_slot_device &a1bus_card = dynamic_cast<a1bus_slot_device &>(device);
-	a1bus_card.m_a1bus_tag = tag;
-	a1bus_card.m_a1bus_slottag = slottag;
-}
-
 //-------------------------------------------------
 //  device_start - device-specific startup
 //-------------------------------------------------
@@ -51,7 +44,7 @@ void a1bus_slot_device::device_start()
 {
 	device_a1bus_card_interface *dev = dynamic_cast<device_a1bus_card_interface *>(get_card_device());
 
-	if (dev) device_a1bus_card_interface::static_set_a1bus_tag(*dev, m_a1bus_tag, m_a1bus_slottag);
+	if (dev) dev->set_a1bus_tag(m_a1bus_tag, m_a1bus_slottag);
 }
 
 //**************************************************************************
@@ -59,12 +52,6 @@ void a1bus_slot_device::device_start()
 //**************************************************************************
 
 DEFINE_DEVICE_TYPE(A1BUS, a1bus_device, "a1bus", "Apple I Bus")
-
-void a1bus_device::static_set_cputag(device_t &device, const char *tag)
-{
-	a1bus_device &a1bus = downcast<a1bus_device &>(device);
-	a1bus.m_cputag = tag;
-}
 
 //**************************************************************************
 //  LIVE DEVICE
@@ -181,12 +168,6 @@ device_a1bus_card_interface::~device_a1bus_card_interface()
 {
 }
 
-void device_a1bus_card_interface::static_set_a1bus_tag(device_t &device, const char *tag, const char *slottag)
-{
-	device_a1bus_card_interface &a1bus_card = dynamic_cast<device_a1bus_card_interface &>(device);
-	a1bus_card.m_a1bus_tag = tag;
-	a1bus_card.m_a1bus_slottag = slottag;
-}
 
 void device_a1bus_card_interface::set_a1bus_device()
 {

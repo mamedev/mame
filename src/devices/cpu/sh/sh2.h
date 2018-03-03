@@ -46,16 +46,16 @@
 #define SH2_FTCSR_READ_CB(name)  void name(uint32_t data)
 
 #define MCFG_SH2_IS_SLAVE(_slave) \
-	sh2_device::set_is_slave(*device, _slave);
+	downcast<sh2_device &>(*device).set_is_slave(_slave);
 
 #define MCFG_SH2_DMA_KLUDGE_CB(_class, _method) \
-	sh2_device::set_dma_kludge_callback(*device, sh2_device::dma_kludge_delegate(&_class::_method, #_class "::" #_method, this));
+	downcast<sh2_device &>(*device).set_dma_kludge_callback(sh2_device::dma_kludge_delegate(&_class::_method, #_class "::" #_method, this));
 
 #define MCFG_SH2_FIFO_DATA_AVAIL_CB(_class, _method) \
-	sh2_device::set_dma_fifo_data_available_callback(*device, sh2_device::dma_fifo_data_available_delegate(&_class::_method, #_class "::" #_method, this));
+	downcast<sh2_device &>(*device).set_dma_fifo_data_available_callback(sh2_device::dma_fifo_data_available_delegate(&_class::_method, #_class "::" #_method, this));
 
 #define MCFG_SH2_FTCSR_READ_CB(_class, _method) \
-	sh2_device::set_ftcsr_read_callback(*device, sh2_device::ftcsr_read_delegate(&_class::_method, #_class "::" #_method, this));
+	downcast<sh2_device &>(*device).set_ftcsr_read_callback(sh2_device::ftcsr_read_delegate(&_class::_method, #_class "::" #_method, this));
 
 
 class sh2_frontend;
@@ -72,10 +72,10 @@ public:
 	// construction/destruction
 	sh2_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
-	static void set_is_slave(device_t &device, int slave) { downcast<sh2_device &>(device).m_is_slave = slave; }
-	static void set_dma_kludge_callback(device_t &device, dma_kludge_delegate callback) { downcast<sh2_device &>(device).m_dma_kludge_cb = callback; }
-	static void set_dma_fifo_data_available_callback(device_t &device, dma_fifo_data_available_delegate callback) { downcast<sh2_device &>(device).m_dma_fifo_data_available_cb = callback; }
-	static void set_ftcsr_read_callback(device_t &device, ftcsr_read_delegate callback) { downcast<sh2_device &>(device).m_ftcsr_read_cb = callback; }
+	void set_is_slave(int slave) { m_is_slave = slave; }
+	template <typename Object> void set_dma_kludge_callback(Object &&cb) { m_dma_kludge_cb = std::forward<Object>(cb); }
+	template <typename Object> void set_dma_fifo_data_available_callback(Object &&cb) { m_dma_fifo_data_available_cb = std::forward<Object>(cb); }
+	template <typename Object> void set_ftcsr_read_callback(Object &&cb) { m_ftcsr_read_cb = std::forward<Object>(cb); }
 
 	DECLARE_WRITE32_MEMBER( sh7604_w );
 	DECLARE_READ32_MEMBER( sh7604_r );

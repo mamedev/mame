@@ -63,14 +63,14 @@ enum
 
 
 #define MCFG_SATURN_CONFIG(_out, _in, _reset, _config, _unconfig, _id, _crc, _rsi) \
-	saturn_device::set_out_func(*device, DEVCB_##_out); \
-	saturn_device::set_in_func(*device, DEVCB_##_in); \
-	saturn_device::set_reset_func(*device, DEVCB_##_reset); \
-	saturn_device::set_config_func(*device, DEVCB_##_config); \
-	saturn_device::set_unconfig_func(*device, DEVCB_##_unconfig); \
-	saturn_device::set_id_func(*device, DEVCB_##_id); \
-	saturn_device::set_crc_func(*device, DEVCB_##_crc); \
-	saturn_device::set_rsi_func(*device, DEVCB_##_rsi);
+	downcast<saturn_device &>(*device).set_out_func(DEVCB_##_out); \
+	downcast<saturn_device &>(*device).set_in_func(DEVCB_##_in); \
+	downcast<saturn_device &>(*device).set_reset_func(DEVCB_##_reset); \
+	downcast<saturn_device &>(*device).set_config_func(DEVCB_##_config); \
+	downcast<saturn_device &>(*device).set_unconfig_func(DEVCB_##_unconfig); \
+	downcast<saturn_device &>(*device).set_id_func(DEVCB_##_id); \
+	downcast<saturn_device &>(*device).set_crc_func(DEVCB_##_crc); \
+	downcast<saturn_device &>(*device).set_rsi_func(DEVCB_##_rsi);
 
 
 class saturn_device : public cpu_device, public saturn_disassembler::config
@@ -79,15 +79,15 @@ public:
 	// construction/destruction
 	saturn_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
-	// static configuration helpers
-	template <class Object> static devcb_base &set_out_func(device_t &device, Object &&cb) { return downcast<saturn_device &>(device).m_out_func.set_callback(std::forward<Object>(cb)); }
-	template <class Object> static devcb_base &set_in_func(device_t &device, Object &&cb) { return downcast<saturn_device &>(device).m_in_func.set_callback(std::forward<Object>(cb)); }
-	template <class Object> static devcb_base &set_reset_func(device_t &device, Object &&cb) { return downcast<saturn_device &>(device).m_reset_func.set_callback(std::forward<Object>(cb)); }
-	template <class Object> static devcb_base &set_config_func(device_t &device, Object &&cb) { return downcast<saturn_device &>(device).m_config_func.set_callback(std::forward<Object>(cb)); }
-	template <class Object> static devcb_base &set_unconfig_func(device_t &device, Object &&cb) { return downcast<saturn_device &>(device).m_unconfig_func.set_callback(std::forward<Object>(cb)); }
-	template <class Object> static devcb_base &set_id_func(device_t &device, Object &&cb) { return downcast<saturn_device &>(device).m_id_func.set_callback(std::forward<Object>(cb)); }
-	template <class Object> static devcb_base &set_crc_func(device_t &device, Object &&cb) { return downcast<saturn_device &>(device).m_crc_func.set_callback(std::forward<Object>(cb)); }
-	template <class Object> static devcb_base &set_rsi_func(device_t &device, Object &&cb) { return downcast<saturn_device &>(device).m_rsi_func.set_callback(std::forward<Object>(cb)); }
+	// configuration helpers
+	template <class Object> devcb_base &set_out_func(Object &&cb) { return m_out_func.set_callback(std::forward<Object>(cb)); }
+	template <class Object> devcb_base &set_in_func(Object &&cb) { return m_in_func.set_callback(std::forward<Object>(cb)); }
+	template <class Object> devcb_base &set_reset_func(Object &&cb) { return m_reset_func.set_callback(std::forward<Object>(cb)); }
+	template <class Object> devcb_base &set_config_func(Object &&cb) { return m_config_func.set_callback(std::forward<Object>(cb)); }
+	template <class Object> devcb_base &set_unconfig_func(Object &&cb) { return m_unconfig_func.set_callback(std::forward<Object>(cb)); }
+	template <class Object> devcb_base &set_id_func(Object &&cb) { return m_id_func.set_callback(std::forward<Object>(cb)); }
+	template <class Object> devcb_base &set_crc_func(Object &&cb) { return m_crc_func.set_callback(std::forward<Object>(cb)); }
+	template <class Object> devcb_base &set_rsi_func(Object &&cb) { return m_rsi_func.set_callback(std::forward<Object>(cb)); }
 
 protected:
 	// device-level overrides

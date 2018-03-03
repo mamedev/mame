@@ -28,9 +28,9 @@ public:
 	harddisk_image_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 	virtual ~harddisk_image_device();
 
-	static void static_set_device_load(device_t &device, device_image_load_delegate callback) { downcast<harddisk_image_device &>(device).m_device_image_load = callback; }
-	static void static_set_device_unload(device_t &device, device_image_func_delegate callback) { downcast<harddisk_image_device &>(device).m_device_image_unload = callback; }
-	static void static_set_interface(device_t &device, const char *_interface) { downcast<harddisk_image_device &>(device).m_interface = _interface; }
+	template <typename Object> void set_device_load(Object &&cb) { m_device_image_load = std::forward<Object>(cb); }
+	template <typename Object> void set_device_unload(Object &&cb) { m_device_image_unload = std::forward<Object>(cb); }
+	void set_interface(const char *interface) { m_interface = interface; }
 
 	// image-level overrides
 	virtual image_init_result call_load() override;
@@ -84,12 +84,12 @@ DECLARE_DEVICE_TYPE(HARDDISK, harddisk_image_device)
 	MCFG_DEVICE_ADD(_tag, HARDDISK, 0)
 
 #define MCFG_HARDDISK_LOAD(_class,_method)                                \
-	harddisk_image_device::static_set_device_load(*device, device_image_load_delegate(&DEVICE_IMAGE_LOAD_NAME(_class,_method), this));
+	downcast<harddisk_image_device &>(*device).set_device_load(device_image_load_delegate(&DEVICE_IMAGE_LOAD_NAME(_class,_method), this));
 
 #define MCFG_HARDDISK_UNLOAD(_class,_method)                            \
-	harddisk_image_device::static_set_device_unload(*device, device_image_func_delegate(&DEVICE_IMAGE_UNLOAD_NAME(_class,_method), this));
+	downcast<harddisk_image_device &>(*device).set_device_unload(device_image_func_delegate(&DEVICE_IMAGE_UNLOAD_NAME(_class,_method), this));
 
 #define MCFG_HARDDISK_INTERFACE(_interface)                         \
-	harddisk_image_device::static_set_interface(*device, _interface);
+	downcast<harddisk_image_device &>(*device).set_interface(_interface);
 
 #endif // MAME_DEVICES_IMAGEDEV_HARDDRIV_H

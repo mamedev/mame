@@ -25,35 +25,33 @@ DECLARE_DEVICE_TYPE(M68705U3, m68705u3_device)
 // ======================> m68705_device
 
 #define MCFG_M68705_PORTA_R_CB(obj) \
-	devcb = &m68705_device::set_port_cb_r<0>(*device, DEVCB_##obj);
+	devcb = &downcast<m68705_device &>(*device).set_port_cb_r<0>(DEVCB_##obj);
 
 #define MCFG_M68705_PORTB_R_CB(obj) \
-	devcb = &m68705_device::set_port_cb_r<1>(*device, DEVCB_##obj);
+	devcb = &downcast<m68705_device &>(*device).set_port_cb_r<1>(DEVCB_##obj);
 
 #define MCFG_M68705_PORTC_R_CB(obj) \
-	devcb = &m68705_device::set_port_cb_r<2>(*device, DEVCB_##obj);
+	devcb = &downcast<m68705_device &>(*device).set_port_cb_r<2>(DEVCB_##obj);
 
 #define MCFG_M68705_PORTD_R_CB(obj) \
-	devcb = &m68705_device::set_port_cb_r<3>(*device, DEVCB_##obj);
+	devcb = &downcast<m68705_device &>(*device).set_port_cb_r<3>(DEVCB_##obj);
 
 #define MCFG_M68705_PORTA_W_CB(obj) \
-	devcb = &m68705_device::set_port_cb_w<0>(*device, DEVCB_##obj);
+	devcb = &downcast<m68705_device &>(*device).set_port_cb_w<0>(DEVCB_##obj);
 
 #define MCFG_M68705_PORTB_W_CB(obj) \
-	devcb = &m68705_device::set_port_cb_w<1>(*device, DEVCB_##obj);
+	devcb = &downcast<m68705_device &>(*device).set_port_cb_w<1>(DEVCB_##obj);
 
 #define MCFG_M68705_PORTC_W_CB(obj) \
-	devcb = &m68705_device::set_port_cb_w<2>(*device, DEVCB_##obj);
+	devcb = &downcast<m68705_device &>(*device).set_port_cb_w<2>(DEVCB_##obj);
 
 
 class m68705_device : public m6805_base_device, public device_nvram_interface
 {
 public:
-	// static configuration helpers
-	template<std::size_t N, typename Object> static devcb_base &set_port_cb_r(device_t &device, Object &&obj)
-	{ return downcast<m68705_device &>(device).m_port_cb_r[N].set_callback(std::forward<Object>(obj)); }
-	template<std::size_t N, typename Object> static devcb_base &set_port_cb_w(device_t &device, Object &&obj)
-	{ return downcast<m68705_device &>(device).m_port_cb_w[N].set_callback(std::forward<Object>(obj)); }
+	// configuration helpers
+	template<std::size_t N, typename Object> devcb_base &set_port_cb_r(Object &&obj) { return m_port_cb_r[N].set_callback(std::forward<Object>(obj)); }
+	template<std::size_t N, typename Object> devcb_base &set_port_cb_w(Object &&obj) { return m_port_cb_w[N].set_callback(std::forward<Object>(obj)); }
 
 protected:
 	// state index constants

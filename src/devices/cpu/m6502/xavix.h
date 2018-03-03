@@ -13,7 +13,7 @@
 #include "m6502.h"
 
 #define MCFG_XAVIX_VECTOR_CALLBACK(_class, _method) \
-	xavix_device::set_vector_callback(*device, xavix_device::xavix_interrupt_vector_delegate(&_class::_method, #_class "::" #_method, this));
+	downcast<xavix_device &>(*device).set_vector_callback(xavix_device::xavix_interrupt_vector_delegate(&_class::_method, #_class "::" #_method, this));
 
 class xavix_device : public m6502_device {
 public:
@@ -33,7 +33,7 @@ public:
 
 	typedef device_delegate<uint8_t (int which, int half)> xavix_interrupt_vector_delegate;
 
-	static void set_vector_callback(device_t &device, xavix_interrupt_vector_delegate &&cb) { downcast<xavix_device &>(device).m_vector_callback = std::move(cb); }
+	template <typename Object> void set_vector_callback(Object &&cb) { m_vector_callback = std::forward<Object>(cb); }
 
 
 #undef O
