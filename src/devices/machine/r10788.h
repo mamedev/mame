@@ -27,7 +27,7 @@
 
 /* Set the writer used to update a display digit */
 #define MCFG_R10788_UPDATE(devcb) \
-	downcast<r10788_device &>(*device).set_update(DEVCB_##devcb);
+		downcast<r10788_device &>(*device).set_update(DEVCB_##devcb);
 
 class r10788_device : public device_t
 {

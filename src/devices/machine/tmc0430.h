@@ -109,8 +109,8 @@ private:
 };
 
 #define MCFG_GROM_ADD(_tag, _ident, _region, _offset, _ready)    \
-	MCFG_DEVICE_ADD(_tag, TMC0430, 0)  \
-	downcast<tmc0430_device &>(*device).set_region_and_ident(_region, _offset, _ident); \
-	downcast<tmc0430_device &>(*device).set_ready_wr_callback(DEVCB_##_ready);
+		MCFG_DEVICE_ADD(_tag, TMC0430, 0)  \
+		downcast<tmc0430_device &>(*device).set_region_and_ident(_region, _offset, _ident); \
+		downcast<tmc0430_device &>(*device).set_ready_wr_callback(DEVCB_##_ready);
 
 #endif // MAME_MACHINE_TMC0430_H

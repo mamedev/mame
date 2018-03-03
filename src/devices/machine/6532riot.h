@@ -46,11 +46,11 @@ public:
 	// construction/destruction
 	riot6532_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
-	template<class _Object> devcb_base &set_in_pa_callback(_Object object) { return m_in_pa_cb.set_callback(object); }
-	template<class _Object> devcb_base &set_out_pa_callback(_Object object) { return m_out_pa_cb.set_callback(object); }
-	template<class _Object> devcb_base &set_in_pb_callback(_Object object) { return m_in_pb_cb.set_callback(object); }
-	template<class _Object> devcb_base &set_out_pb_callback(_Object object) { return m_out_pb_cb.set_callback(object); }
-	template<class _Object> devcb_base &set_irq_callback(_Object object) { return m_irq_cb.set_callback(object); }
+	template <class Object> devcb_base &set_in_pa_callback(Object &&cb) { return m_in_pa_cb.set_callback(std::forward<Object>(cb)); }
+	template <class Object> devcb_base &set_out_pa_callback(Object &&cb) { return m_out_pa_cb.set_callback(std::forward<Object>(cb)); }
+	template <class Object> devcb_base &set_in_pb_callback(Object &&cb) { return m_in_pb_cb.set_callback(std::forward<Object>(cb)); }
+	template <class Object> devcb_base &set_out_pb_callback(Object &&cb) { return m_out_pb_cb.set_callback(std::forward<Object>(cb)); }
+	template <class Object> devcb_base &set_irq_callback(Object &&cb) { return m_irq_cb.set_callback(std::forward<Object>(cb)); }
 
 	DECLARE_READ8_MEMBER( read );
 	DECLARE_WRITE8_MEMBER( write );

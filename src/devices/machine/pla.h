@@ -19,16 +19,16 @@
 ///*************************************************************************
 
 #define MCFG_PLA_ADD(tag, inputs, outputs, terms) \
-	MCFG_DEVICE_ADD((tag), PLA, 0) \
-	downcast<pla_device &>(*device).set_num_inputs((inputs)); \
-	downcast<pla_device &>(*device).set_num_outputs((outputs)); \
-	downcast<pla_device &>(*device).set_num_terms((terms));
+		MCFG_DEVICE_ADD((tag), PLA, 0) \
+		downcast<pla_device &>(*device).set_num_inputs((inputs)); \
+		downcast<pla_device &>(*device).set_num_outputs((outputs)); \
+		downcast<pla_device &>(*device).set_num_terms((terms));
 
 #define MCFG_PLA_INPUTMASK(mask) \
-	downcast<pla_device &>(*device).set_inputmask((mask));
+		downcast<pla_device &>(*device).set_inputmask((mask));
 
 #define MCFG_PLA_FILEFORMAT(format) \
-	downcast<pla_device &>(*device).set_format((pla_device::FMT::format));
+		downcast<pla_device &>(*device).set_format((pla_device::FMT::format));
 
 
 // macros for known (and used) devices
