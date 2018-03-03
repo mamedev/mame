@@ -3,7 +3,7 @@
 #ifndef MAME_INCLUDES_MAYGAY1B_H
 #define MAME_INCLUDES_MAYGAY1B_H
 
-#pragma ocne
+#pragma once
 
 
 #define VERBOSE 0
