@@ -655,7 +655,6 @@ WRITE8_MEMBER(wecleman_state::hotchase_sound_control_w)
 {
 //  int reg[8];
 
-
 //  reg[offset] = data;
 
 	switch (offset)
@@ -671,7 +670,7 @@ WRITE8_MEMBER(wecleman_state::hotchase_sound_control_w)
 		case 0x3:
 		case 0x4:
 		case 0x5:
-			m_k007232[(offset >> 1)]->set_volume( offset&1,  (data&0x0f) * 0x08, (data>>4) * 0x08 );
+			m_k007232[offset >> 1]->set_volume( offset&1,  (data&0x0f) * 0x08, (data>>4) * 0x08 );
 			break;
 
 		case 0x06:  /* Bankswitch for chips 0 & 1 */
