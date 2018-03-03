@@ -362,7 +362,7 @@ ROM_START(photoply2k4)
 
 	DISK_REGION( "ide:0:hdd:image" )
 //  CYLS:1023,HEADS:64,SECS:63,BPS:512.
-	DISK_IMAGE( "pp2004", 0, SHA1(2376a4eb6efc2c9f40edae8d45ade7d3d7f6bf53) )
+	DISK_IMAGE( "pp2004", 0, SHA1(a3f8861cf91cf7e7446ec931f812e774ada20802) )
 ROM_END
 
 
