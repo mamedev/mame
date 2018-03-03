@@ -819,7 +819,7 @@ void model2_renderer::model2_3d_render(triangle *tri, const rectangle &cliprect)
 	renderer = (tri->texheader[0] >> 13) & 7;
 
 	/* calculate and clip to viewport */
-	rectangle vp(tri->viewport[0] - 8, tri->viewport[2] - 8, (384-tri->viewport[3])+90, (384-tri->viewport[1])+90);
+	rectangle vp(tri->viewport[0] + m_xoffs, tri->viewport[2] + m_xoffs, (384-tri->viewport[3]) + m_yoffs, (384-tri->viewport[1]) + m_yoffs);
 	// TODO: this seems to be more accurate but it breaks in some cases
 	//rectangle vp(tri->viewport[0] - 8, tri->viewport[2] - tri->viewport[0], tri->viewport[1] - 90, tri->viewport[3] - tri->viewport[1]);
 	vp &= cliprect;
@@ -899,6 +899,20 @@ void model2_renderer::model2_3d_render(triangle *tri, const rectangle &cliprect)
     (8,90)                          (504,90)
 */
 
+WRITE16_MEMBER(model2_state::horizontal_sync_w)
+{
+	m_crtc_xoffset = 84 + (int16_t)data;
+//	printf("H %04x %d %d\n",data,(int16_t)data,m_crtc_xoffset);	
+	m_poly->set_xoffset(m_crtc_xoffset);
+}
+
+WRITE16_MEMBER(model2_state::vertical_sync_w)
+{
+	m_crtc_yoffset = 130 + (int16_t)data;
+//	printf("V %04x %d %d\n",data,(int16_t)data,m_crtc_yoffset);
+	m_poly->set_yoffset(m_crtc_yoffset);
+}
+
 /* 3D Rasterizer projection: projects a triangle into screen coordinates */
 inline void model2_state::model2_3d_project( triangle *tri )
 {
@@ -907,8 +921,8 @@ inline void model2_state::model2_3d_project( triangle *tri )
 	for( i = 0; i < 3; i++ )
 	{
 		/* project the vertices */
-		tri->v[i].x = -8 + tri->center[0] + (tri->v[i].x / (1.0f+tri->v[i].pz));
-		tri->v[i].y = ((384 - tri->center[1])+90) - (tri->v[i].y / (1.0f+tri->v[i].pz));
+		tri->v[i].x = m_crtc_xoffset + tri->center[0] + (tri->v[i].x / (1.0f+tri->v[i].pz));
+		tri->v[i].y = ((384 - tri->center[1])+m_crtc_yoffset) - (tri->v[i].y / (1.0f+tri->v[i].pz));
 	}
 }
 

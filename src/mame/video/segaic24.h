@@ -20,10 +20,16 @@
 #define MCFG_S24MIXER_DEVICE_ADD(_tag) \
 	MCFG_DEVICE_ADD(_tag, S24MIXER, 0)
 
-
 #define MCFG_S24TILE_DEVICE_PALETTE(_palette_tag) \
 	MCFG_GFX_PALETTE(_palette_tag)
 
+#define MCFG_S24TILE_XHOUT_CALLBACK(_write) \
+	devcb = &downcast<segas24_tile_device &>(*device).set_xhout_write_callback(DEVCB_##_write);
+
+#define MCFG_S24TILE_XVOUT_CALLBACK(_write) \
+	devcb = &downcast<segas24_tile_device &>(*device).set_xvout_write_callback(DEVCB_##_write);
+
+	
 class segas24_tile_device : public device_t, public device_gfx_interface
 {
 	friend class segas24_tile_config;
@@ -38,10 +44,15 @@ public:
 	DECLARE_WRITE16_MEMBER(tile_w);
 	DECLARE_READ16_MEMBER(char_r);
 	DECLARE_WRITE16_MEMBER(char_w);
+	DECLARE_WRITE16_MEMBER(xhout_w);
+	DECLARE_WRITE16_MEMBER(xvout_w);
 
 	void draw(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect, int layer, int pri, int flags);
 	void draw(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect, int layer, int pri, int flags);
 
+	template <class Object> devcb_base &set_xhout_write_callback(Object &&cb) { return m_xhout_write_cb.set_callback(std::forward<Object>(cb)); }
+	template <class Object> devcb_base &set_xvout_write_callback(Object &&cb) { return m_xvout_write_cb.set_callback(std::forward<Object>(cb)); }
+	
 protected:
 	virtual void device_start() override;
 
@@ -71,6 +82,9 @@ private:
 
 	template<class _BitmapClass>
 	void draw_common(screen_device &screen, _BitmapClass &bitmap, const rectangle &cliprect, int layer, int pri, int flags);
+	
+	devcb_write16 m_xhout_write_cb;
+	devcb_write16 m_xvout_write_cb;
 };
 
 class segas24_sprite_device : public device_t
