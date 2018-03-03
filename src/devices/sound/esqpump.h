@@ -20,7 +20,6 @@ public:
 
 	esq_5505_5510_pump_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
-	void set_otis(es5505_device *otis) { m_otis = otis; }
 	void set_esp(es5510_device *esp) { m_esp = esp; }
 	void set_esp_halted(bool esp_halted) {
 		m_esp_halted = esp_halted;
@@ -69,8 +68,6 @@ public:
 	}
 
 protected:
-	esq_5505_5510_pump_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock);
-
 	// device-level overrides
 	virtual void device_start() override;
 	virtual void device_stop() override;
@@ -82,6 +79,7 @@ protected:
 	// timer callback overrides
 	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr) override;
 	
+private:
 	// internal state:
 	// sound stream
 	sound_stream *m_stream;
@@ -112,28 +110,11 @@ protected:
 #endif
 
 #if !PUMP_FAKE_ESP_PROCESSING && PUMP_REPLACE_ESP_PROGRAM
-	int16_t e[0x4000];
+	std::unique_ptr<int16_t[]> e;
 	int ei;
 #endif
-private:
-	// OTIS sound generator
-	es5505_device *m_otis;
-};
-
-class esq_5506_5510_pump_device : public esq_5505_5510_pump_device
-{
-public:
-	esq_5506_5510_pump_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
-
-	void set_otto(es5506_device *otto) { m_otto = otto; }
-protected:
-
-private:
-	// OTTO sound generator
-	es5506_device *m_otto;
 };
 
 DECLARE_DEVICE_TYPE(ESQ_5505_5510_PUMP, esq_5505_5510_pump_device)
-DECLARE_DEVICE_TYPE(ESQ_5506_5510_PUMP, esq_5506_5510_pump_device)
 
 #endif // MAME_SOUND_ESQPUMP_H

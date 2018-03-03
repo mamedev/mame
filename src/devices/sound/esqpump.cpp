@@ -11,27 +11,17 @@
 #include "emu.h"
 #include "sound/esqpump.h"
 
-DEFINE_DEVICE_TYPE(ESQ_5505_5510_PUMP, esq_5505_5510_pump_device, "esq_5505_5510_pump", "Ensoniq 5505 to 5510 interface")
-DEFINE_DEVICE_TYPE(ESQ_5506_5510_PUMP, esq_5506_5510_pump_device, "esq_5506_5510_pump", "Ensoniq 5506 to 5510 interface")
+DEFINE_DEVICE_TYPE(ESQ_5505_5510_PUMP, esq_5505_5510_pump_device, "esq_5505_5510_pump", "Ensoniq 5505/5506 to 5510 interface")
 
 esq_5505_5510_pump_device::esq_5505_5510_pump_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-	: esq_5505_5510_pump_device(mconfig, ESQ_5505_5510_PUMP, tag, owner, clock)
-	, m_otis(nullptr)
-{
-}
-
-esq_5505_5510_pump_device::esq_5505_5510_pump_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock)
-	: device_t(mconfig, type, tag, owner, clock)
+	: device_t(mconfig, ESQ_5505_5510_PUMP, tag, owner, clock)
 	, device_sound_interface(mconfig, *this)
 	, m_stream(nullptr), m_timer(nullptr), m_esp(nullptr)
 	, m_esp_halted(true), ticks_spent_processing(0), samples_processed(0)
 {
-}
-
-esq_5506_5510_pump_device::esq_5506_5510_pump_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-	: esq_5505_5510_pump_device(mconfig, ESQ_5506_5510_PUMP, tag, owner, clock)
-	, m_otto(nullptr)
-{
+#if !PUMP_FAKE_ESP_PROCESSING && PUMP_REPLACE_ESP_PROGRAM
+	e = nullptr;
+#endif
 }
 
 void esq_5505_5510_pump_device::device_start()
@@ -57,7 +47,7 @@ void esq_5505_5510_pump_device::device_start()
 #endif
 
 #if !PUMP_FAKE_ESP_PROCESSING && PUMP_REPLACE_ESP_PROGRAM
-	memset(e, 0, 0x4000 * sizeof(e[0]));
+	e = make_unique_clear<int16_t[]>(0x4000);
 	ei = 0;
 #endif
 }

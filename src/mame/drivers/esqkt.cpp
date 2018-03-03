@@ -107,7 +107,6 @@ public:
 	esqkt_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag)
 		, m_maincpu(*this, "maincpu")
-		, m_otto(*this, "ensoniq%u", 1)
 		, m_esp(*this, "esp")
 		, m_pump(*this, "pump")
 		, m_duart(*this, "duart")
@@ -116,7 +115,6 @@ public:
 	{ }
 
 	required_device<m68ec020_device> m_maincpu;
-	required_device_array<es5506_device, 2> m_otto;
 	required_device<es5510_device> m_esp;
 	required_device<esq_5506_5510_pump_device> m_pump;
 	required_device<scn2681_device> m_duart;
@@ -144,8 +142,7 @@ public:
 
 void esqkt_state::machine_start()
 {
-	// tell the pump about the OTTO & ESP chips
-	m_pump->set_otto(m_otto[0]);
+	// tell the pump about the ESP chips
 	m_pump->set_esp(m_esp);
 }
 

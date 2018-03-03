@@ -55,14 +55,12 @@ public:
 	esqasr_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag)
 		, m_maincpu(*this, "maincpu")
-		, m_otto(*this, "ensoniq")
 		, m_esp(*this, "esp")
 		, m_pump(*this, "pump")
 		, m_sq1vfd(*this, "sq1vfd")
 	{ }
 
 	required_device<cpu_device> m_maincpu;
-	required_device<es5506_device> m_otto;
 	optional_device<es5510_device> m_esp;
 	optional_device<esq_5506_5510_pump_device> m_pump;
 	required_device<esq2x40_sq1_device> m_sq1vfd;
@@ -83,8 +81,7 @@ void esqasr_state::machine_start()
 {
 	if (m_pump.found())
 	{
-		// tell the pump about the OTTO & ESP chips
-		m_pump->set_otto(m_otto);
+		// tell the pump about the ESP chips
 		if (m_esp.found())
 			m_pump->set_esp(m_esp);
 	}
@@ -157,6 +154,11 @@ MACHINE_CONFIG_START(esqasr_state::asrx)
 	MCFG_ESQ2X40_SQ1_ADD("sq1vfd")
 
 	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
+	
+	MCFG_SOUND_ADD("pump", ESQ_5506_5510_PUMP, XTAL(16'000'000) / (16 * 32)) // Actually ES5511
+	MCFG_SOUND_ROUTE(0, "lspeaker", 1.0)
+	MCFG_SOUND_ROUTE(1, "rspeaker", 1.0)
+	
 	MCFG_SOUND_ADD("ensoniq", ES5506, XTAL(16'000'000))
 	MCFG_ES5506_REGION0("waverom")  /* Bank 0 */
 	MCFG_ES5506_REGION1("waverom2") /* Bank 1 */
@@ -165,8 +167,14 @@ MACHINE_CONFIG_START(esqasr_state::asrx)
 	MCFG_ES5506_CHANNELS(1)          /* channels */
 	MCFG_ES5506_IRQ_CB(WRITELINE(esqasr_state, esq5506_otto_irq)) /* irq */
 	MCFG_ES5506_READ_PORT_CB(READ16(esqasr_state, esq5506_read_adc))
-	MCFG_SOUND_ROUTE(0, "lspeaker", 2.0)
-	MCFG_SOUND_ROUTE(1, "rspeaker", 2.0)
+	MCFG_SOUND_ROUTE_EX(0, "pump", 1.0, 0)
+	MCFG_SOUND_ROUTE_EX(1, "pump", 1.0, 1)
+	MCFG_SOUND_ROUTE_EX(2, "pump", 1.0, 2)
+	MCFG_SOUND_ROUTE_EX(3, "pump", 1.0, 3)
+	MCFG_SOUND_ROUTE_EX(4, "pump", 1.0, 4)
+	MCFG_SOUND_ROUTE_EX(5, "pump", 1.0, 5)
+	MCFG_SOUND_ROUTE_EX(6, "pump", 1.0, 6)
+	MCFG_SOUND_ROUTE_EX(7, "pump", 1.0, 7)
 MACHINE_CONFIG_END
 
 static INPUT_PORTS_START( asr )

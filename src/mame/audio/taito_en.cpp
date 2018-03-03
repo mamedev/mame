@@ -42,7 +42,7 @@ taito_en_device::taito_en_device(const machine_config &mconfig, const char *tag,
 
 void taito_en_device::device_start()
 {
-	m_pump->set_otis(m_ensoniq);
+	// tell the pump about the ESP chips
 	m_pump->set_esp(m_esp);
 	uint8_t *ROM = m_osrom->base();
 	uint32_t max = (m_osrom->bytes() - 0x100000) / 0x20000;
