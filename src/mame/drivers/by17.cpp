@@ -545,9 +545,7 @@ WRITE_LINE_MEMBER( by17_state::u10_ca2_w )
 #if 0                   // Display Blanking - Out of sync with video redraw rate and causes flicker so it's disabled
 	if (state == 0)
 	{
-		int digit;
-
-		for (digit=0; digit<8; digit++)
+		for (int digit=0; digit<8; digit++)
 		{
 			m_digits[0][digit] = 0
 			m_digits[1][digit] = 0
@@ -734,8 +732,7 @@ WRITE8_MEMBER( by17_state::u11_b_w )
 		}
 		else                        // Rest output - all momentary solenoids are off
 		{
-			for (int i=0; i<15; i++)
-				m_solenoids[i] = false;
+			std::fill_n(std::begin(m_solenoids), 15, false);
 		}
 	}
 

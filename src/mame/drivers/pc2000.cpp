@@ -76,7 +76,7 @@ protected:
 	optional_memory_bank m_bank2;
 
 private:
-	required_ioport_array<8> m_rows[2];
+	optional_ioport_array<8> m_rows[2];
 
 	uint8_t m_mux_data;
 	uint8_t m_beep_state;
@@ -145,15 +145,15 @@ protected:
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
 
-	DECLARE_READ8_MEMBER( kb_r );
-	DECLARE_READ8_MEMBER( lcdc_data_r );
-	DECLARE_WRITE8_MEMBER( lcdc_data_w );
-	DECLARE_READ8_MEMBER( lcdc_control_r );
-	DECLARE_WRITE8_MEMBER( lcdc_control_w );
+	DECLARE_READ8_MEMBER(kb_r);
+	DECLARE_READ8_MEMBER(lcdc_data_r);
+	DECLARE_WRITE8_MEMBER(lcdc_data_w);
+	DECLARE_READ8_MEMBER(lcdc_control_r);
+	DECLARE_WRITE8_MEMBER(lcdc_control_w);
 	HD44780_PIXEL_UPDATE(pc1000_pixel_update);
 
-	void pc1000_io(address_map &map);
 	void pc1000_mem(address_map &map);
+	void pc1000_io(address_map &map);
 };
 
 
@@ -359,7 +359,7 @@ READ8_MEMBER( pc1000_state::kb_r )
 READ8_MEMBER( pc1000_state::lcdc_data_r )
 {
 	//logerror("lcdc data r\n");
-	return m_lcdc->data_read(space, 0)>>4;
+	return m_lcdc->data_read(space, 0) >> 4;
 }
 
 WRITE8_MEMBER( pc1000_state::lcdc_data_w )
@@ -367,13 +367,13 @@ WRITE8_MEMBER( pc1000_state::lcdc_data_w )
 	//popmessage("%s", (char*)m_maincpu->space(AS_PROGRAM).get_read_ptr(0x4290));
 
 	//logerror("lcdc data w %x\n", data);
-	m_lcdc->data_write(space, 0, data<<4);
+	m_lcdc->data_write(space, 0, data << 4);
 }
 
 READ8_MEMBER( pc1000_state::lcdc_control_r )
 {
 	//logerror("lcdc control r\n");
-	return m_lcdc->control_read(space, 0)>>4;
+	return m_lcdc->control_read(space, 0) >> 4;
 }
 
 WRITE8_MEMBER( pc1000_state::lcdc_control_w )
@@ -384,13 +384,13 @@ WRITE8_MEMBER( pc1000_state::lcdc_control_w )
 
 HD44780_PIXEL_UPDATE(pc1000_state::pc1000_pixel_update)
 {
-	uint8_t layout[] = { 0x00, 0x4f, 0x4e, 0x4d, 0x4c, 0x4b, 0x4a, 0x49, 0x48, 0x47, 0x40, 0x3f, 0x3e, 0x3d, 0x3c, 0x3b, 0x3a, 0x39, 0x38, 0x37 };
-	//uint8_t layout[] = { 0x00, 0x01, 0x02, 0x03, 0x04, 0x05, 0x06, 0x07, 0x08, 0x09, 0x40, 0x41, 0x42, 0x43, 0x44, 0x45, 0x46, 0x47, 0x48, 0x49 };
+	constexpr static uint8_t layout[] = { 0x00, 0x4f, 0x4e, 0x4d, 0x4c, 0x4b, 0x4a, 0x49, 0x48, 0x47, 0x40, 0x3f, 0x3e, 0x3d, 0x3c, 0x3b, 0x3a, 0x39, 0x38, 0x37 };
+	//constexpr static uint8_t layout[] = { 0x00, 0x01, 0x02, 0x03, 0x04, 0x05, 0x06, 0x07, 0x08, 0x09, 0x40, 0x41, 0x42, 0x43, 0x44, 0x45, 0x46, 0x47, 0x48, 0x49 };
 
-	for(int i=0; i<20; i++)
+	for (int i=0; i<20; i++)
 		if (pos == layout[i])
 		{
-			bitmap.pix16(line*9 + y, i*6 + x) = state;
+			bitmap.pix16((line * 9) + y, (i * 6) + x) = state;
 			break;
 		}
 }

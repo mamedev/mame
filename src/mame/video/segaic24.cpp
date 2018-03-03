@@ -28,6 +28,8 @@ segas24_tile_device::segas24_tile_device(const machine_config &mconfig, const ch
 	: device_t(mconfig, S24TILE, tag, owner, clock)
 	, device_gfx_interface(mconfig, *this)
 	, char_gfx_index(0)
+	, m_xhout_write_cb(*this)
+	, m_xvout_write_cb(*this)
 {
 }
 
@@ -76,7 +78,9 @@ void segas24_tile_device::device_start()
 
 	char_ram = std::make_unique<uint16_t[]>(0x80000/2);
 	tile_ram = std::make_unique<uint16_t[]>(0x10000/2);
-
+	m_xhout_write_cb.resolve_safe();
+	m_xvout_write_cb.resolve_safe();
+	
 	tile_layer[0] = &machine().tilemap().create(*this, tilemap_get_info_delegate(FUNC(segas24_tile_device::tile_info_0s),this), TILEMAP_SCAN_ROWS,  8, 8, 64, 64);
 	tile_layer[1] = &machine().tilemap().create(*this, tilemap_get_info_delegate(FUNC(segas24_tile_device::tile_info_0w),this), TILEMAP_SCAN_ROWS,  8, 8, 64, 64);
 	tile_layer[2] = &machine().tilemap().create(*this, tilemap_get_info_delegate(FUNC(segas24_tile_device::tile_info_1s),this), TILEMAP_SCAN_ROWS,  8, 8, 64, 64);
@@ -547,6 +551,16 @@ WRITE16_MEMBER(segas24_tile_device::char_w)
 	COMBINE_DATA(char_ram.get() + offset);
 	if(old != char_ram[offset])
 		gfx(char_gfx_index)->mark_dirty(offset / 16);
+}
+
+WRITE16_MEMBER(segas24_tile_device::xhout_w)
+{
+	m_xhout_write_cb(data);
+}
+
+WRITE16_MEMBER(segas24_tile_device::xvout_w)
+{
+	m_xvout_write_cb(data);
 }
 
 segas24_sprite_device::segas24_sprite_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
