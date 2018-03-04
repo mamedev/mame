@@ -109,7 +109,7 @@ Sound
     1xES8712
 
     Mapped @0x8010-0x8016
-    Had to patch es8712.c to start playing on 0x8016 write and to prevent continuous looping.
+    Had to patch es8712.cpp to start playing on 0x8016 write and to prevent continuous looping.
     There's a test on bit1 at offset 0 (0x8010), so this may be a "read status" kind of port.
 
 
@@ -235,7 +235,7 @@ TODO :
 #define MAIN_CLOCK        XTAL(12'000'000)
 #define CPU_CLOCK         MAIN_CLOCK / 4
 #define YM2203_CLOCK      MAIN_CLOCK / 4
-#define MSM5205_CLOCK     384_kHz_XTAL
+#define MSM5202_CLOCK     384_kHz_XTAL
 
 #define HOPPER_PULSE      50          // time between hopper pulses in milliseconds (not right for attendant pay)
 
@@ -820,7 +820,7 @@ MACHINE_CONFIG_START(witch_state::witch)
 	MCFG_ES8712_MSM_WRITE_CALLBACK(DEVWRITE8("msm", msm5205_device, data_w))
 	MCFG_ES8712_MSM_TAG("msm")
 
-	MCFG_SOUND_ADD("msm", MSM5205, MSM5205_CLOCK)
+	MCFG_SOUND_ADD("msm", MSM5205, MSM5202_CLOCK)   /* actually MSM5202 */
 	MCFG_MSM6585_VCK_CALLBACK(DEVWRITELINE("essnd", es8712_device, msm_int))
 	MCFG_MSM6585_PRESCALER_SELECTOR(S48_4B)         /* 8 kHz */
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
