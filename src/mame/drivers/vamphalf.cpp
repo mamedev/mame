@@ -63,6 +63,7 @@ TODO:
 #include "cpu/e132xs/e132xs.h"
 #include "cpu/mcs51/mcs51.h"
 #include "machine/eepromser.h"
+#include "machine/gen_latch.h"
 #include "machine/nvram.h"
 #include "sound/okim6295.h"
 #include "sound/qs1000.h"
@@ -75,26 +76,29 @@ class vamphalf_state : public driver_device
 {
 public:
 	vamphalf_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag),
-			m_maincpu(*this, "maincpu"),
-			m_qs1000(*this, "qs1000"),
-			m_eeprom(*this, "eeprom"),
-			m_gfxdecode(*this, "gfxdecode"),
-			m_palette(*this, "palette"),
-			m_tiles(*this,"tiles"),
-			m_wram(*this,"wram"),
-			m_tiles32(*this,"tiles32"),
-			m_wram32(*this,"wram32"),
-			m_okiregion(*this, "oki%u", 1),
-			m_okibank(*this,"okibank") {
-			m_has_extra_gfx = 0;
-		}
+		: driver_device(mconfig, type, tag)
+		, m_maincpu(*this, "maincpu")
+		, m_qs1000(*this, "qs1000")
+		, m_eeprom(*this, "eeprom")
+		, m_gfxdecode(*this, "gfxdecode")
+		, m_palette(*this, "palette")
+		, m_soundlatch(*this, "soundlatch")
+		, m_tiles(*this,"tiles")
+		, m_wram(*this,"wram")
+		, m_tiles32(*this,"tiles32")
+		, m_wram32(*this,"wram32")
+		, m_okiregion(*this, "oki%u", 1)
+		, m_okibank(*this,"okibank")
+	{
+		m_has_extra_gfx = 0;
+	}
 
 	required_device<cpu_device> m_maincpu;
 	optional_device<qs1000_device> m_qs1000;
 	required_device<eeprom_serial_93cxx_device> m_eeprom;
 	required_device<gfxdecode_device> m_gfxdecode;
 	required_device<palette_device> m_palette;
+	optional_device<generic_latch_8_device> m_soundlatch;
 
 	optional_shared_ptr<uint16_t> m_tiles;
 	optional_shared_ptr<uint16_t> m_wram;
@@ -115,7 +119,6 @@ public:
 	int m_semicom_prot_which;
 	uint16_t m_finalgdr_backupram_bank;
 	std::unique_ptr<uint8_t[]> m_finalgdr_backupram;
-	uint8_t m_qs1000_data;
 
 	DECLARE_WRITE16_MEMBER(flipscreen_w);
 	DECLARE_WRITE32_MEMBER(flipscreen32_w);
@@ -170,9 +173,6 @@ public:
 	DECLARE_WRITE32_MEMBER(aoh_oki_bank_w);
 	DECLARE_WRITE16_MEMBER(boonggab_oki_bank_w);
 	DECLARE_WRITE16_MEMBER(mrkicker_oki_bank_w);
-	DECLARE_WRITE32_MEMBER(wyvernwg_snd_w);
-	DECLARE_WRITE16_MEMBER(misncrft_snd_w);
-	DECLARE_READ8_MEMBER(qs1000_p1_r);
 	DECLARE_WRITE8_MEMBER(qs1000_p3_w);
 
 	virtual void video_start() override;
@@ -433,30 +433,10 @@ WRITE16_MEMBER(vamphalf_state::boonggab_lamps_w)
 }
 
 
-
-WRITE32_MEMBER( vamphalf_state::wyvernwg_snd_w )
-{
-	m_qs1000_data = data & 0xff;
-	m_qs1000->set_irq(ASSERT_LINE);
-	machine().scheduler().boost_interleave(attotime::zero, attotime::from_usec(100));
-}
-
-WRITE16_MEMBER( vamphalf_state::misncrft_snd_w )
-{
-	m_qs1000_data = data & 0xff;
-	m_qs1000->set_irq(ASSERT_LINE);
-	machine().scheduler().boost_interleave(attotime::zero, attotime::from_usec(100));
-}
-
-READ8_MEMBER( vamphalf_state::qs1000_p1_r )
-{
-	return m_qs1000_data;
-}
-
 WRITE8_MEMBER( vamphalf_state::qs1000_p3_w )
 {
 	if (!BIT(data, 5))
-		m_qs1000->set_irq(CLEAR_LINE);
+		m_soundlatch->acknowledge_w(space, 0, !BIT(data, 5));
 
 	membank("qs1000:data")->set_entry(data & 7);
 }
@@ -466,21 +446,21 @@ ADDRESS_MAP_START(vamphalf_state::common_map)
 	AM_RANGE(0x00000000, 0x001fffff) AM_RAM AM_SHARE("wram")
 	AM_RANGE(0x40000000, 0x4003ffff) AM_RAM AM_SHARE("tiles")
 	AM_RANGE(0x80000000, 0x8000ffff) AM_RAM_DEVWRITE("palette", palette_device, write16) AM_SHARE("palette")
-	AM_RANGE(0xfff00000, 0xffffffff) AM_ROM AM_REGION("user1",0)
+	AM_RANGE(0xfff00000, 0xffffffff) AM_ROM AM_REGION("maincpu",0)
 ADDRESS_MAP_END
 
 ADDRESS_MAP_START(vamphalf_state::common_32bit_map)
 	AM_RANGE(0x00000000, 0x001fffff) AM_RAM AM_SHARE("wram32")
 	AM_RANGE(0x40000000, 0x4003ffff) AM_RAM AM_SHARE("tiles32")
 	AM_RANGE(0x80000000, 0x8000ffff) AM_RAM_DEVWRITE("palette", palette_device, write32) AM_SHARE("palette")
-	AM_RANGE(0xfff00000, 0xffffffff) AM_ROM AM_REGION("user1",0)
+	AM_RANGE(0xfff00000, 0xffffffff) AM_ROM AM_REGION("maincpu",0)
 ADDRESS_MAP_END
 
 ADDRESS_MAP_START(vamphalf_state::yorijori_32bit_map)
 	AM_RANGE(0x00000000, 0x001fffff) AM_RAM AM_SHARE("wram32")
 	AM_RANGE(0x40000000, 0x4003ffff) AM_RAM AM_SHARE("tiles32")
 	AM_RANGE(0x80000000, 0x8000ffff) AM_RAM_DEVWRITE("palette", palette_device, write32) AM_SHARE("palette")
-	AM_RANGE(0xffe00000, 0xffffffff) AM_ROM AM_REGION("user1",0)
+	AM_RANGE(0xffe00000, 0xffffffff) AM_ROM AM_REGION("maincpu",0)
 ADDRESS_MAP_END
 
 ADDRESS_MAP_START(vamphalf_state::vamphalf_io)
@@ -500,7 +480,7 @@ ADDRESS_MAP_START(vamphalf_state::misncrft_io)
 	AM_RANGE(0x200, 0x203) AM_READ_PORT("P1_P2")
 	AM_RANGE(0x240, 0x243) AM_READ_PORT("SYSTEM")
 	AM_RANGE(0x3c0, 0x3c3) AM_WRITE(eeprom_w)
-	AM_RANGE(0x400, 0x403) AM_WRITE(misncrft_snd_w)
+	AM_RANGE(0x400, 0x403) AM_DEVWRITE8("soundlatch", generic_latch_8_device, write, 0x00ff).cswidth(16)
 	AM_RANGE(0x580, 0x583) AM_READ(eeprom_r)
 ADDRESS_MAP_END
 
@@ -537,7 +517,7 @@ ADDRESS_MAP_START(vamphalf_state::wyvernwg_io)
 	AM_RANGE(0x2000, 0x2003) AM_WRITE(flipscreen32_w)
 	AM_RANGE(0x2800, 0x2803) AM_READ_PORT("P1_P2")
 	AM_RANGE(0x3000, 0x3003) AM_READ_PORT("SYSTEM")
-	AM_RANGE(0x5400, 0x5403) AM_WRITE(wyvernwg_snd_w)
+	AM_RANGE(0x5400, 0x5403) AM_DEVWRITE8("soundlatch", generic_latch_8_device, write, 0x000000ff).cswidth(32)
 	AM_RANGE(0x7000, 0x7003) AM_WRITE(eeprom32_w)
 	AM_RANGE(0x7c00, 0x7c03) AM_READ(eeprom32_r)
 ADDRESS_MAP_END
@@ -605,13 +585,13 @@ ADDRESS_MAP_START(vamphalf_state::aoh_map)
 	AM_RANGE(0x80000000, 0x8000ffff) AM_RAM_DEVWRITE("palette", palette_device, write32) AM_SHARE("palette")
 	AM_RANGE(0x80210000, 0x80210003) AM_READ_PORT("SYSTEM")
 	AM_RANGE(0x80220000, 0x80220003) AM_READ_PORT("P1_P2")
-	AM_RANGE(0xffc00000, 0xffffffff) AM_ROM AM_REGION("user1",0)
+	AM_RANGE(0xffc00000, 0xffffffff) AM_ROM AM_REGION("maincpu",0)
 ADDRESS_MAP_END
 
 ADDRESS_MAP_START(vamphalf_state::aoh_io)
 	AM_RANGE(0x0480, 0x0483) AM_WRITE(eeprom32_w)
 	AM_RANGE(0x0620, 0x0623) AM_DEVREADWRITE8("oki2", okim6295_device, read, write, 0x0000ff00)
-	AM_RANGE(0x0660, 0x0663) AM_DEVREADWRITE8("oki_1", okim6295_device, read, write, 0x0000ff00)
+	AM_RANGE(0x0660, 0x0663) AM_DEVREADWRITE8("oki1", okim6295_device, read, write, 0x0000ff00)
 	AM_RANGE(0x0640, 0x0647) AM_DEVREADWRITE8("ymsnd", ym2151_device, read, write, 0x0000ff00)
 	AM_RANGE(0x0680, 0x0683) AM_WRITE(aoh_oki_bank_w)
 ADDRESS_MAP_END
@@ -1094,10 +1074,14 @@ MACHINE_CONFIG_END
 MACHINE_CONFIG_START(vamphalf_state::sound_qs1000)
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
+	
+	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
+	MCFG_GENERIC_LATCH_DATA_PENDING_CB(DEVWRITELINE("qs1000", qs1000_device, set_irq))
+	MCFG_GENERIC_LATCH_SEPARATE_ACKNOWLEDGE(true)
 
 	MCFG_SOUND_ADD("qs1000", QS1000, XTAL(24'000'000))
 	MCFG_QS1000_EXTERNAL_ROM(true)
-	MCFG_QS1000_IN_P1_CB(READ8(vamphalf_state, qs1000_p1_r))
+	MCFG_QS1000_IN_P1_CB(DEVREAD8("soundlatch", generic_latch_8_device, read))
 	MCFG_QS1000_OUT_P3_CB(WRITE8(vamphalf_state, qs1000_p3_w))
 	MCFG_SOUND_ROUTE(0, "lspeaker", 1.0)
 	MCFG_SOUND_ROUTE(1, "rspeaker", 1.0)
@@ -1228,7 +1212,7 @@ MACHINE_CONFIG_START(vamphalf_state::aoh)
 	MCFG_SOUND_ROUTE(0, "lspeaker", 1.0)
 	MCFG_SOUND_ROUTE(1, "rspeaker", 1.0)
 
-	MCFG_OKIM6295_ADD("oki_1", XTAL(32'000'000)/8, PIN7_HIGH) /* 4MHz */
+	MCFG_OKIM6295_ADD("oki1", XTAL(32'000'000)/8, PIN7_HIGH) /* 4MHz */
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "lspeaker", 1.0)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", 1.0)
 
@@ -1332,7 +1316,7 @@ B1 B2 B3: Push buttons for SERV, RESET, TEST
 */
 
 ROM_START( vamphalf )
-	ROM_REGION16_BE( 0x100000, "user1", ROMREGION_ERASE00 ) /* Hyperstone CPU Code */
+	ROM_REGION16_BE( 0x100000, "maincpu", ROMREGION_ERASE00 ) /* Hyperstone CPU Code */
 	/* 0 - 0x80000 empty */
 	ROM_LOAD( "prg.rom1", 0x80000, 0x80000, CRC(9b1fc6c5) SHA1(acf10a50d2119ac893b6cbd494911982a9352350) ) /* at 0x16554: Europe Version 1.1.0908 */
 
@@ -1347,7 +1331,7 @@ ROM_START( vamphalf )
 ROM_END
 
 ROM_START( vamphalfr1 )
-	ROM_REGION16_BE( 0x100000, "user1", ROMREGION_ERASE00 ) /* Hyperstone CPU Code */
+	ROM_REGION16_BE( 0x100000, "maincpu", ROMREGION_ERASE00 ) /* Hyperstone CPU Code */
 	/* 0 - 0x80000 empty */
 	ROM_LOAD( "ws1-01201.rom1", 0x80000, 0x80000, CRC(afa75c19) SHA1(5dac104d1b3c026b6fce4d1f9126c048ebb557ef) ) /* at 0x162B8: Europe Version 1.0.0903 */
 
@@ -1361,7 +1345,7 @@ ROM_END
 
 
 ROM_START( vamphalfk )
-	ROM_REGION16_BE( 0x100000, "user1", ROMREGION_ERASE00 ) /* Hyperstone CPU Code */
+	ROM_REGION16_BE( 0x100000, "maincpu", ROMREGION_ERASE00 ) /* Hyperstone CPU Code */
 	/* 0 - 0x80000 empty */
 	ROM_LOAD( "prom1", 0x80000, 0x80000, CRC(f05e8e96) SHA1(c860e65c811cbda2dc70300437430fb4239d3e2d) ) /* at 0x1653C: Korean Version 1.1.0908 */
 
@@ -1420,7 +1404,7 @@ Notes:
 */
 
 ROM_START( suplup ) /* version 4.0 / 990518 - also has 'Puzzle Bang Bang' title but it can't be selected */
-	ROM_REGION16_BE( 0x100000, "user1", ROMREGION_ERASE00 ) /* Hyperstone CPU Code */
+	ROM_REGION16_BE( 0x100000, "maincpu", ROMREGION_ERASE00 ) /* Hyperstone CPU Code */
 	ROM_LOAD( "suplup-rom1.bin", 0x00000, 0x80000, CRC(61fb2dbe) SHA1(21cb8f571b2479de6779b877b656d1ffe5b3516f) )
 	ROM_LOAD( "suplup-rom2.bin", 0x80000, 0x80000, CRC(0c176c57) SHA1(f103a1afc528c01cbc18639273ab797fb9afacb1) )
 
@@ -1438,7 +1422,7 @@ ROM_START( suplup ) /* version 4.0 / 990518 - also has 'Puzzle Bang Bang' title 
 ROM_END
 
 ROM_START( luplup ) /* version 3.0 / 990128 */
-	ROM_REGION16_BE( 0x100000, "user1", ROMREGION_ERASE00 ) /* Hyperstone CPU Code */
+	ROM_REGION16_BE( 0x100000, "maincpu", ROMREGION_ERASE00 ) /* Hyperstone CPU Code */
 	ROM_LOAD( "luplup-rom1.v30", 0x00000, 0x80000, CRC(9ea67f87) SHA1(73d16c056a8d64743181069a01559a43fee529a3) )
 	ROM_LOAD( "luplup-rom2.v30", 0x80000, 0x80000, CRC(99840155) SHA1(e208f8731c06b634e84fb73e04f6cdbb8b504b94) )
 
@@ -1457,7 +1441,7 @@ ROM_END
 
 
 ROM_START( luplup29 ) /* version 2.9 / 990108 */
-	ROM_REGION16_BE( 0x100000, "user1", ROMREGION_ERASE00 ) /* Hyperstone CPU Code */
+	ROM_REGION16_BE( 0x100000, "maincpu", ROMREGION_ERASE00 ) /* Hyperstone CPU Code */
 	ROM_LOAD( "luplup-rom1.v29", 0x00000, 0x80000, CRC(36a8b8c1) SHA1(fed3eb2d83adc1b071a12ce5d49d4cab0ca20cc7) )
 	ROM_LOAD( "luplup-rom2.v29", 0x80000, 0x80000, CRC(50dac70f) SHA1(0e313114a988cb633a89508fda17eb09023827a2) )
 
@@ -1473,7 +1457,7 @@ ROM_END
 
 
 ROM_START( puzlbang ) /* version 2.9 / 990108 - Korea only, cannot select title, language and limited selection of background choices, EI: censored  */
-	ROM_REGION16_BE( 0x100000, "user1", ROMREGION_ERASE00 ) /* Hyperstone CPU Code */
+	ROM_REGION16_BE( 0x100000, "maincpu", ROMREGION_ERASE00 ) /* Hyperstone CPU Code */
 	ROM_LOAD( "pbb-rom1.v29", 0x00000, 0x80000, CRC(eb829586) SHA1(1f8a6af7c51c715724f5a242f4e22f7f6fb1f0ee) )
 	ROM_LOAD( "pbb-rom2.v29", 0x80000, 0x80000, CRC(fb84c793) SHA1(a2d27caecdae457d12b48d88d19ce417f69507c6) )
 
@@ -1489,7 +1473,7 @@ ROM_END
 
 
 ROM_START( puzlbanga ) /* version 2.8 / 990106 - Korea only, cannot select title, language or change background selection, EI: censored */
-	ROM_REGION16_BE( 0x100000, "user1", ROMREGION_ERASE00 ) /* Hyperstone CPU Code */
+	ROM_REGION16_BE( 0x100000, "maincpu", ROMREGION_ERASE00 ) /* Hyperstone CPU Code */
 	ROM_LOAD( "pbb-rom1.v28", 0x00000, 0x80000, CRC(fd21c5ff) SHA1(bc6314bbb2495c140788025153c893d5fd00bdc1) )
 	ROM_LOAD( "pbb-rom2.v28", 0x80000, 0x80000, CRC(490ecaeb) SHA1(2b0f25e3d681ddf95b3c65754900c046b5b50b09) )
 
@@ -1560,7 +1544,7 @@ Measured Clocks:
 */
 
 ROM_START( jmpbreak ) /* Released February 1999 */
-	ROM_REGION16_BE( 0x100000, "user1", ROMREGION_ERASE00 ) /* Hyperstone CPU Code */
+	ROM_REGION16_BE( 0x100000, "maincpu", ROMREGION_ERASE00 ) /* Hyperstone CPU Code */
 	ROM_LOAD( "rom1.bin", 0x00000, 0x80000, CRC(7e237f7d) SHA1(042e672be34644311eefc7b998bcdf6a9ea2c28a) )
 	ROM_LOAD( "rom2.bin", 0x80000, 0x80000, CRC(c722f7be) SHA1(d8b3c6b5fd0942147e0a61169c3eb6334a3b5a40) )
 
@@ -1575,7 +1559,7 @@ ROM_START( jmpbreak ) /* Released February 1999 */
 ROM_END
 
 ROM_START( poosho ) /* Released November 1999 - Updated sequel to Jumping Break for Korean market */
-	ROM_REGION16_BE( 0x100000, "user1", ROMREGION_ERASE00 ) /* Hyperstone CPU Code */
+	ROM_REGION16_BE( 0x100000, "maincpu", ROMREGION_ERASE00 ) /* Hyperstone CPU Code */
 	ROM_LOAD( "rom1.bin", 0x00000, 0x80000, CRC(2072c120) SHA1(cf066cd277840fdbb7a854a052a80b2fbb582278) )
 	ROM_LOAD( "rom2.bin", 0x80000, 0x80000, CRC(80e70d7a) SHA1(cdafce4bfe7370978414a12aaf482e07a1c89ff8) )
 
@@ -1643,7 +1627,7 @@ ROMs:
 */
 
 ROM_START( mrdig )
-	ROM_REGION16_BE( 0x100000, "user1", ROMREGION_ERASE00 ) /* Hyperstone CPU Code */
+	ROM_REGION16_BE( 0x100000, "maincpu", ROMREGION_ERASE00 ) /* Hyperstone CPU Code */
 	ROM_LOAD( "rom1.bin", 0x00000, 0x80000, CRC(5b960320) SHA1(adf5499a39987041fc93e409bdb5fd07dacec4f9) )
 	ROM_LOAD( "rom2.bin", 0x80000, 0x80000, CRC(75d48b64) SHA1(c9c492fb9cabafcf0bc05f44bf80ee6df3c21a1b) )
 
@@ -1690,7 +1674,7 @@ F-E1-16-008
 */
 
 ROM_START( coolmini )
-	ROM_REGION16_BE( 0x100000, "user1", ROMREGION_ERASE00 ) /* Hyperstone CPU Code */
+	ROM_REGION16_BE( 0x100000, "maincpu", ROMREGION_ERASE00 ) /* Hyperstone CPU Code */
 	ROM_LOAD( "cm-rom1.040", 0x00000, 0x80000, CRC(9688fa98) SHA1(d5ebeb1407980072f689c3b3a5161263c7082e9a) )
 	ROM_LOAD( "cm-rom2.040", 0x80000, 0x80000, CRC(9d588fef) SHA1(7b6b0ba074c7fa0aecda2b55f411557b015522b6) )
 
@@ -1709,7 +1693,7 @@ ROM_START( coolmini )
 ROM_END
 
 ROM_START( coolminii )
-	ROM_REGION16_BE( 0x100000, "user1", ROMREGION_ERASE00 ) /* Hyperstone CPU Code */
+	ROM_REGION16_BE( 0x100000, "maincpu", ROMREGION_ERASE00 ) /* Hyperstone CPU Code */
 	ROM_LOAD( "cm-rom1.040", 0x00000, 0x80000, CRC(aa94bb86) SHA1(f1d75bf54b75f234cc872779c5b1ff6679778841) )
 	ROM_LOAD( "cm-rom2.040", 0x80000, 0x80000, CRC(be7d02c8) SHA1(4897f3c890dd66f94d7a29f7a73c59857e4af218) )
 
@@ -1781,7 +1765,7 @@ ROMs:
 */
 
 ROM_START( dquizgo2 )
-	ROM_REGION16_BE( 0x100000, "user1", ROMREGION_ERASE00 ) /* Hyperstone CPU Code */
+	ROM_REGION16_BE( 0x100000, "maincpu", ROMREGION_ERASE00 ) /* Hyperstone CPU Code */
 	ROM_LOAD( "rom1",         0x00000, 0x080000, CRC(81eef038) SHA1(9c925d1ef261ea85069925ccd1a5aeb939f55d5a) )
 	ROM_LOAD( "rom2",         0x80000, 0x080000, CRC(e8789d8a) SHA1(1ee26c26cc7024c5df9d0da630b326021ece9f41) )
 
@@ -1853,7 +1837,7 @@ ROMs:
 */
 
 ROM_START( dtfamily )
-	ROM_REGION16_BE( 0x100000, "user1", ROMREGION_ERASE00 ) /* Hyperstone CPU Code */
+	ROM_REGION16_BE( 0x100000, "maincpu", ROMREGION_ERASE00 ) /* Hyperstone CPU Code */
 	ROM_LOAD( "rom1",         0x00000, 0x080000, CRC(738636d2) SHA1(ba7906df99764ee7e1f505c319d364c64c605ff0) )
 	ROM_LOAD( "rom2",         0x80000, 0x080000, CRC(0953f5e4) SHA1(ee8b3c4f9c9301c9815747eab5435e006ec84ca1) )
 
@@ -1927,7 +1911,7 @@ ROMs:
 */
 
 ROM_START( toyland )
-	ROM_REGION16_BE( 0x100000, "user1", ROMREGION_ERASE00 ) /* Hyperstone CPU Code */
+	ROM_REGION16_BE( 0x100000, "maincpu", ROMREGION_ERASE00 ) /* Hyperstone CPU Code */
 	/* ROM1 empty */
 	ROM_LOAD( "rom2.bin",         0x80000, 0x080000, CRC(e3455002) SHA1(5ad7884f82fb125d70829accec02f238e7d9593c) )
 
@@ -2006,7 +1990,7 @@ ROM1 & ROM2 are both ST 27c4000D
 */
 
 ROM_START( wivernwg )
-	ROM_REGION32_BE( 0x100000, "user1", ROMREGION_ERASE00 ) /* Hyperstone CPU Code */
+	ROM_REGION32_BE( 0x100000, "maincpu", ROMREGION_ERASE00 ) /* Hyperstone CPU Code */
 	ROM_LOAD( "rom1", 0x000000, 0x080000, CRC(83eb9a36) SHA1(d9c3b2facf42c137abc2923bbaeae300964ca4a0) ) /* ST 27C4000D with no labels */
 	ROM_LOAD( "rom2", 0x080000, 0x080000, CRC(5d657055) SHA1(21baa81b80f28aec4a6be9eaf69709958bf2a129) )
 
@@ -2032,7 +2016,7 @@ ROM_START( wivernwg )
 ROM_END
 
 ROM_START( wyvernwg )
-	ROM_REGION32_BE( 0x100000, "user1", ROMREGION_ERASE00 ) /* Hyperstone CPU Code */
+	ROM_REGION32_BE( 0x100000, "maincpu", ROMREGION_ERASE00 ) /* Hyperstone CPU Code */
 	ROM_LOAD( "rom1.bin", 0x000000, 0x080000, CRC(66bf3a5c) SHA1(037d5e7a6ef6f5b4ac08a9c811498c668a9d2522) ) /* ST 27c4000D with no labels */
 	ROM_LOAD( "rom2.bin", 0x080000, 0x080000, CRC(fd9b5911) SHA1(a01e8c6e5a9009024af385268ba3ba90e1ebec50) )
 
@@ -2058,7 +2042,7 @@ ROM_START( wyvernwg )
 ROM_END
 
 ROM_START( wyvernwga )
-	ROM_REGION32_BE( 0x100000, "user1", ROMREGION_ERASE00 ) /* Hyperstone CPU Code */
+	ROM_REGION32_BE( 0x100000, "maincpu", ROMREGION_ERASE00 ) /* Hyperstone CPU Code */
 	ROM_LOAD( "rom1.rom", 0x000000, 0x080000, CRC(586881fd) SHA1(d335bbd91def8fa4935eb2375c9b00471a1f40eb) ) /* ST 27c4000D with no labels */
 	ROM_LOAD( "rom2.rom", 0x080000, 0x080000, CRC(938049ec) SHA1(cc10944c99ceb388dd4aafc93377c40540861d14) )
 
@@ -2130,7 +2114,7 @@ Notes:
 */
 
 ROM_START( misncrft ) /* Version 2.7 */
-	ROM_REGION16_BE( 0x100000, "user1", ROMREGION_ERASE00 ) /* Hyperstone CPU Code */
+	ROM_REGION16_BE( 0x100000, "maincpu", ROMREGION_ERASE00 ) /* Hyperstone CPU Code */
 	/* 0 - 0x80000 empty */
 	ROM_LOAD( "prg-rom2.bin", 0x80000, 0x80000, CRC(04d22da6) SHA1(1c5be430000a31f21204fb756fadf2523a546b8b) )
 
@@ -2155,7 +2139,7 @@ ROM_START( misncrft ) /* Version 2.7 */
 ROM_END
 
 ROM_START( misncrfta ) /* Version 2.4 */
-	ROM_REGION16_BE( 0x100000, "user1", ROMREGION_ERASE00 ) /* Hyperstone CPU Code */
+	ROM_REGION16_BE( 0x100000, "maincpu", ROMREGION_ERASE00 ) /* Hyperstone CPU Code */
 	/* 0 - 0x80000 empty */
 	ROM_LOAD( "prg-rom2.bin", 0x80000, 0x80000, CRC(059ae8c1) SHA1(2c72fcf560166cb17cd8ad665beae302832d551c) ) // sldh
 
@@ -2254,7 +2238,7 @@ ROMs:
 */
 
 ROM_START( yorijori )
-	ROM_REGION32_BE( 0x200000, "user1", ROMREGION_ERASE00 ) /* Hyperstone CPU Code */
+	ROM_REGION32_BE( 0x200000, "maincpu", ROMREGION_ERASE00 ) /* Hyperstone CPU Code */
 	ROM_LOAD( "prg1", 0x000000, 0x200000, CRC(0e04eb40) SHA1(0cec9dc91aaf9cf7c459c7baac200cf0fcfddc18) )
 
 	ROM_REGION( 0x080000, "qs1000:cpu", 0 ) /* QDSP (8052) Code */
@@ -2323,7 +2307,7 @@ VR1 is the volume adjust pot
 */
 
 ROM_START( finalgdr ) /* version 2.20.5915, Korea only */
-	ROM_REGION32_BE( 0x100000, "user1", ROMREGION_ERASE00 ) /* Hyperstone CPU Code */
+	ROM_REGION32_BE( 0x100000, "maincpu", ROMREGION_ERASE00 ) /* Hyperstone CPU Code */
 	/* rom0 empty */
 	ROM_LOAD( "rom1", 0x080000, 0x080000, CRC(45815931) SHA1(80ba7a366994e40a1f520ea18fad82e6b068b279) )
 
@@ -2431,7 +2415,7 @@ ROMs:
 */
 
 ROM_START( mrkickera )
-	ROM_REGION32_BE( 0x100000, "user1", ROMREGION_ERASE00 ) /* Hyperstone CPU Code */
+	ROM_REGION32_BE( 0x100000, "maincpu", ROMREGION_ERASE00 ) /* Hyperstone CPU Code */
 	/* rom0 empty */
 	ROM_LOAD( "2-semicom.rom1", 0x080000, 0x080000, CRC(d3da29ca) SHA1(b843c650096a1c6d50f99e354ec0c93eb4406c5b) ) /* SEMICOM-003b PCB */
 
@@ -2451,7 +2435,7 @@ ROM_START( mrkickera )
 ROM_END
 
 ROM_START( mrkicker )
-	ROM_REGION16_BE( 0x100000, "user1", ROMREGION_ERASE00 ) /* Hyperstone CPU Code */
+	ROM_REGION16_BE( 0x100000, "maincpu", ROMREGION_ERASE00 ) /* Hyperstone CPU Code */
 	/* rom1 empty */
 	ROM_LOAD( "3-semicom.rom2", 0x080000, 0x080000, CRC(3f7fa08b) SHA1(dbffd44d8387e6ed1a4b5ec85ccf64d69a108d88) ) /* F-E1-16-010 PCB */
 
@@ -2516,7 +2500,7 @@ Notes:
 */
 
 ROM_START( aoh )
-	ROM_REGION32_BE( 0x400000, "user1", ROMREGION_ERASE00 ) /* Hyperstone CPU Code */
+	ROM_REGION32_BE( 0x400000, "maincpu", ROMREGION_ERASE00 ) /* Hyperstone CPU Code */
 	ROM_LOAD16_WORD_SWAP( "rom1", 0x000000, 0x200000, CRC(2e55ff55) SHA1(b2b7605b87ee609dfbc7c21dfae0ef8d847019f0) )
 	ROM_LOAD16_WORD_SWAP( "rom2", 0x200000, 0x200000, CRC(50f8a409) SHA1(a8171b7cf59dd01de1e512ab21607b4f330f40b8) )
 
@@ -2530,7 +2514,7 @@ ROM_START( aoh )
 	ROM_LOAD32_WORD( "g08", 0x3000002, 0x800000, CRC(1fd08aa0) SHA1(376a91220cd6e63418b04d590b232bb1079a40c7) )
 	ROM_LOAD32_WORD( "g12", 0x3000000, 0x800000, CRC(e437b35f) SHA1(411d2926d619fba057476864f0e580f608830522) )
 
-	ROM_REGION( 0x40000, "oki_1", 0 ) /* Oki Samples */
+	ROM_REGION( 0x40000, "oki1", 0 ) /* Oki Samples */
 	ROM_LOAD( "rom3", 0x00000, 0x40000, CRC(db8cb455) SHA1(6723b4018208d554bd1bf1e0640b72d2f4f47302) )
 
 	/* $00000-$20000 stays the same in all sound banks, */
@@ -2547,7 +2531,7 @@ Taff System, 2001
 */
 
 ROM_START( boonggab )
-	ROM_REGION16_BE( 0x100000, "user1", ROMREGION_ERASE00 ) /* Hyperstone CPU Code */
+	ROM_REGION16_BE( 0x100000, "maincpu", ROMREGION_ERASE00 ) /* Hyperstone CPU Code */
 	/* rom2 empty */
 	/* rom3 empty */
 	ROM_LOAD( "2.rom0",       0x80000, 0x80000, CRC(3395541b) SHA1(4e822a52d6070bde232285e7ad8fbe74594bbf28) )
@@ -2971,8 +2955,6 @@ DRIVER_INIT_MEMBER(vamphalf_state,misncrft)
 	// Configure the QS1000 ROM banking. Care must be taken not to overlap the 256b internal RAM
 	machine().device("qs1000:cpu")->memory().space(AS_IO).install_read_bank(0x0100, 0xffff, "data");
 	membank("qs1000:data")->configure_entries(0, 16, memregion("qs1000:cpu")->base()+0x100, 0x8000-0x100);
-
-	save_item(NAME(m_qs1000_data));
 }
 
 DRIVER_INIT_MEMBER(vamphalf_state,coolmini)
@@ -3049,7 +3031,6 @@ DRIVER_INIT_MEMBER(vamphalf_state,wyvernwg)
 	machine().device("qs1000:cpu")->memory().space(AS_IO).install_read_bank(0x0100, 0xffff, "data");
 	membank("qs1000:data")->configure_entries(0, 16, memregion("qs1000:cpu")->base()+0x100, 0x8000-0x100);
 
-	save_item(NAME(m_qs1000_data));
 	save_item(NAME(m_semicom_prot_idx));
 	save_item(NAME(m_semicom_prot_which));
 }
@@ -3065,7 +3046,7 @@ DRIVER_INIT_MEMBER(vamphalf_state,yorijori)
 	m_semicom_prot_data[0] = 2;
 	m_semicom_prot_data[1] = 1;
 
-//  uint8_t *romx = (uint8_t *)memregion("user1")->base();
+//  uint8_t *romx = (uint8_t *)memregion("maincpu")->base();
 	// prevent code dying after a trap 33 by patching it out, why?
 //  romx[BYTE4_XOR_BE(0x8ff0)] = 3;
 //  romx[BYTE4_XOR_BE(0x8ff1)] = 0;
@@ -3073,8 +3054,6 @@ DRIVER_INIT_MEMBER(vamphalf_state,yorijori)
 	// Configure the QS1000 ROM banking. Care must be taken not to overlap the 256b internal RAM
 	machine().device("qs1000:cpu")->memory().space(AS_IO).install_read_bank(0x0100, 0xffff, "data");
 	membank("qs1000:data")->configure_entries(0, 16, memregion("qs1000:cpu")->base()+0x100, 0x8000-0x100);
-
-	save_item(NAME(m_qs1000_data));
 }
 
 DRIVER_INIT_MEMBER(vamphalf_state,finalgdr)
