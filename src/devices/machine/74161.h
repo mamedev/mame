@@ -59,22 +59,22 @@
 
 
 #define MCFG_7416x_QA_CB(_devcb) \
-	devcb = &ttl7416x_device::set_qa_cb(*device, DEVCB_##_devcb);
+	devcb = &downcast<ttl7416x_device &>(*device).set_qa_cb(DEVCB_##_devcb);
 
 #define MCFG_7416x_QB_CB(_devcb) \
-	devcb = &ttl7416x_device::set_qb_cb(*device, DEVCB_##_devcb);
+	devcb = &downcast<ttl7416x_device &>(*device).set_qb_cb(DEVCB_##_devcb);
 
 #define MCFG_7416x_QC_CB(_devcb) \
-	devcb = &ttl7416x_device::set_qc_cb(*device, DEVCB_##_devcb);
+	devcb = &downcast<ttl7416x_device &>(*device).set_qc_cb(DEVCB_##_devcb);
 
 #define MCFG_7416x_QD_CB(_devcb) \
-	devcb = &ttl7416x_device::set_qd_cb(*device, DEVCB_##_devcb);
+	devcb = &downcast<ttl7416x_device &>(*device).set_qd_cb(DEVCB_##_devcb);
 
 #define MCFG_7416x_OUTPUT_CB(_devcb) \
-	devcb = &ttl7416x_device::set_output_cb(*device, DEVCB_##_devcb);
+	devcb = &downcast<ttl7416x_device &>(*device).set_output_cb(DEVCB_##_devcb);
 
 #define MCFG_7416x_TC_CB(_devcb) \
-	devcb = &ttl7416x_device::set_tc_cb(*device, DEVCB_##_devcb);
+	devcb = &downcast<ttl7416x_device &>(*device).set_tc_cb(DEVCB_##_devcb);
 
 #define MCFG_74160_ADD(_tag) \
 	MCFG_DEVICE_ADD(_tag, TTL74160, 0)
@@ -92,12 +92,12 @@ class ttl7416x_device : public device_t
 {
 public:
 	// static configuration helpers
-	template <class Object> static devcb_base &set_qa_cb(device_t &device, Object &&cb) { return downcast<ttl7416x_device &>(device).m_qa_func.set_callback(std::forward<Object>(cb)); }
-	template <class Object> static devcb_base &set_qb_cb(device_t &device, Object &&cb) { return downcast<ttl7416x_device &>(device).m_qb_func.set_callback(std::forward<Object>(cb)); }
-	template <class Object> static devcb_base &set_qc_cb(device_t &device, Object &&cb) { return downcast<ttl7416x_device &>(device).m_qc_func.set_callback(std::forward<Object>(cb)); }
-	template <class Object> static devcb_base &set_qd_cb(device_t &device, Object &&cb) { return downcast<ttl7416x_device &>(device).m_qd_func.set_callback(std::forward<Object>(cb)); }
-	template <class Object> static devcb_base &set_output_cb(device_t &device, Object &&cb) { return downcast<ttl7416x_device &>(device).m_output_func.set_callback(std::forward<Object>(cb)); }
-	template <class Object> static devcb_base &set_tc_cb(device_t &device, Object &&cb) { return downcast<ttl7416x_device &>(device).m_tc_func.set_callback(std::forward<Object>(cb)); }
+	template <class Object> devcb_base &set_qa_cb(Object &&cb) { return m_qa_func.set_callback(std::forward<Object>(cb)); }
+	template <class Object> devcb_base &set_qb_cb(Object &&cb) { return m_qb_func.set_callback(std::forward<Object>(cb)); }
+	template <class Object> devcb_base &set_qc_cb(Object &&cb) { return m_qc_func.set_callback(std::forward<Object>(cb)); }
+	template <class Object> devcb_base &set_qd_cb(Object &&cb) { return m_qd_func.set_callback(std::forward<Object>(cb)); }
+	template <class Object> devcb_base &set_output_cb(Object &&cb) { return m_output_func.set_callback(std::forward<Object>(cb)); }
+	template <class Object> devcb_base &set_tc_cb(Object &&cb) { return m_tc_func.set_callback(std::forward<Object>(cb)); }
 
 	// public interfaces
 	DECLARE_WRITE_LINE_MEMBER( clear_w );

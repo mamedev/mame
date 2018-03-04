@@ -424,7 +424,7 @@ READ8_MEMBER(spectrum_state::spectrum_port_fe_r)
 
 READ8_MEMBER(spectrum_state::spectrum_port_ula_r)
 {
-	int vpos = machine().first_screen()->vpos();
+	int vpos = m_screen->vpos();
 
 	return vpos<193 ? m_video_ram[(vpos&0xf8)<<2]:0xff;
 }
@@ -643,13 +643,24 @@ GFXDECODE_END
 
 void spectrum_state::device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr)
 {
-	m_maincpu->set_input_line(0, CLEAR_LINE);
+	switch (id)
+	{
+	case TIMER_IRQ_OFF:
+		m_maincpu->set_input_line(0, CLEAR_LINE);
+		break;
+	case TIMER_SCANLINE:
+		timer_set(m_maincpu->cycles_to_attotime(m_CyclesPerLine), TIMER_SCANLINE);
+		spectrum_UpdateScreenBitmap();
+		break;
+	default:
+		assert_always(false, "Unknown id in spectrum_state::device_timer");
+	}
 }
 
 INTERRUPT_GEN_MEMBER(spectrum_state::spec_interrupt)
 {
 	m_maincpu->set_input_line(0, HOLD_LINE);
-	timer_set(attotime::from_ticks(32, m_maincpu->clock()), 0, 0);
+	timer_set(attotime::from_ticks(32, m_maincpu->clock()), TIMER_IRQ_OFF, 0);
 }
 
 MACHINE_CONFIG_START(spectrum_state::spectrum_common)

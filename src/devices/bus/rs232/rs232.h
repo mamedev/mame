@@ -11,25 +11,25 @@
 	MCFG_DEVICE_SLOT_INTERFACE(_slot_intf, _def_slot, false)
 
 #define MCFG_RS232_RXD_HANDLER(_devcb) \
-	devcb = &rs232_port_device::set_rxd_handler(*device, DEVCB_##_devcb);
+	devcb = &downcast<rs232_port_device &>(*device).set_rxd_handler(DEVCB_##_devcb);
 
 #define MCFG_RS232_DCD_HANDLER(_devcb) \
-	devcb = &rs232_port_device::set_dcd_handler(*device, DEVCB_##_devcb);
+	devcb = &downcast<rs232_port_device &>(*device).set_dcd_handler(DEVCB_##_devcb);
 
 #define MCFG_RS232_DSR_HANDLER(_devcb) \
-	devcb = &rs232_port_device::set_dsr_handler(*device, DEVCB_##_devcb);
+	devcb = &downcast<rs232_port_device &>(*device).set_dsr_handler(DEVCB_##_devcb);
 
 #define MCFG_RS232_RI_HANDLER(_devcb) \
-	devcb = &rs232_port_device::set_ri_handler(*device, DEVCB_##_devcb);
+	devcb = &downcast<rs232_port_device &>(*device).set_ri_handler(DEVCB_##_devcb);
 
 #define MCFG_RS232_CTS_HANDLER(_devcb) \
-	devcb = &rs232_port_device::set_cts_handler(*device, DEVCB_##_devcb);
+	devcb = &downcast<rs232_port_device &>(*device).set_cts_handler(DEVCB_##_devcb);
 
 #define MCFG_RS232_RXC_HANDLER(_devcb) \
-	devcb = &rs232_port_device::set_rxc_handler(*device, DEVCB_##_devcb);
+	devcb = &downcast<rs232_port_device &>(*device).set_rxc_handler(DEVCB_##_devcb);
 
 #define MCFG_RS232_TXC_HANDLER(_devcb) \
-	devcb = &rs232_port_device::set_txc_handler(*device, DEVCB_##_devcb);
+	devcb = &downcast<rs232_port_device &>(*device).set_txc_handler(DEVCB_##_devcb);
 
 #define RS232_BAUD_110 (0x00)
 #define RS232_BAUD_150 (0x01)
@@ -126,13 +126,13 @@ public:
 	virtual ~rs232_port_device();
 
 	// static configuration helpers
-	template <class Object> static devcb_base &set_rxd_handler(device_t &device, Object &&cb) { return downcast<rs232_port_device &>(device).m_rxd_handler.set_callback(std::forward<Object>(cb)); }
-	template <class Object> static devcb_base &set_dcd_handler(device_t &device, Object &&cb) { return downcast<rs232_port_device &>(device).m_dcd_handler.set_callback(std::forward<Object>(cb)); }
-	template <class Object> static devcb_base &set_dsr_handler(device_t &device, Object &&cb) { return downcast<rs232_port_device &>(device).m_dsr_handler.set_callback(std::forward<Object>(cb)); }
-	template <class Object> static devcb_base &set_ri_handler(device_t &device, Object &&cb) { return downcast<rs232_port_device &>(device).m_ri_handler.set_callback(std::forward<Object>(cb)); }
-	template <class Object> static devcb_base &set_cts_handler(device_t &device, Object &&cb) { return downcast<rs232_port_device &>(device).m_cts_handler.set_callback(std::forward<Object>(cb)); }
-	template <class Object> static devcb_base &set_rxc_handler(device_t &device, Object &&cb) { return downcast<rs232_port_device &>(device).m_rxc_handler.set_callback(std::forward<Object>(cb)); }
-	template <class Object> static devcb_base &set_txc_handler(device_t &device, Object &&cb) { return downcast<rs232_port_device &>(device).m_txc_handler.set_callback(std::forward<Object>(cb)); }
+	template <class Object> devcb_base &set_rxd_handler(Object &&cb) { return m_rxd_handler.set_callback(std::forward<Object>(cb)); }
+	template <class Object> devcb_base &set_dcd_handler(Object &&cb) { return m_dcd_handler.set_callback(std::forward<Object>(cb)); }
+	template <class Object> devcb_base &set_dsr_handler(Object &&cb) { return m_dsr_handler.set_callback(std::forward<Object>(cb)); }
+	template <class Object> devcb_base &set_ri_handler(Object &&cb) { return m_ri_handler.set_callback(std::forward<Object>(cb)); }
+	template <class Object> devcb_base &set_cts_handler(Object &&cb) { return m_cts_handler.set_callback(std::forward<Object>(cb)); }
+	template <class Object> devcb_base &set_rxc_handler(Object &&cb) { return m_rxc_handler.set_callback(std::forward<Object>(cb)); }
+	template <class Object> devcb_base &set_txc_handler(Object &&cb) { return m_txc_handler.set_callback(std::forward<Object>(cb)); }
 
 	DECLARE_WRITE_LINE_MEMBER( write_txd );
 	DECLARE_WRITE_LINE_MEMBER( write_dtr );
@@ -150,6 +150,7 @@ public:
 protected:
 	rs232_port_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock);
 
+	virtual void device_resolve_objects() override;
 	virtual void device_start() override;
 	virtual void device_config_complete() override;
 

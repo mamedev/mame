@@ -191,9 +191,9 @@ k052109_device::k052109_device(const machine_config &mconfig, const char *tag, d
 void k052109_device::set_ram(bool ram)
 {
 	if (ram)
-		device_gfx_interface::static_set_info(*this, gfxinfo_ram);
+		set_info(gfxinfo_ram);
 	else
-		device_gfx_interface::static_set_info(*this, gfxinfo);
+		set_info(gfxinfo);
 }
 
 

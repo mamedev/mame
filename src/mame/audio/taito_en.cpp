@@ -6,7 +6,9 @@
 
     TODO:
 
-    * ES5510 ESP emulation is not perfect, Verify ES5505 Output Channels
+    * ES5510 ESP emulation is not perfect
+    * ES5510 Input Clock and ES5505 Output channels are same in other PCBs?
+      (Currently these are verified from Gun Buster schematics)
     * Where does the MB8421 go? Taito F3 (and Super Chase) have 2 of them on
       the sound area, Taito JC has one.
 
@@ -21,16 +23,16 @@
 DEFINE_DEVICE_TYPE(TAITO_EN, taito_en_device, "taito_en", "Taito Ensoniq Sound System")
 
 taito_en_device::taito_en_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-	: device_t(mconfig, TAITO_EN, tag, owner, clock),
-	m_audiocpu(*this, "audiocpu"),
-	m_ensoniq(*this, "ensoniq"),
-	m_esp(*this, "esp"),
-	m_pump(*this, "pump"),
-	m_duart68681(*this, "duart68681"),
-	m_mb87078(*this, "mb87078"),
-	m_osram(*this, "osram"),
-	m_osrom(*this, "audiocpu"),
-	m_cpubank(*this, "cpubank%u", 1)
+	: device_t(mconfig, TAITO_EN, tag, owner, clock)
+	, m_audiocpu(*this, "audiocpu")
+	, m_ensoniq(*this, "ensoniq")
+	, m_esp(*this, "esp")
+	, m_pump(*this, "pump")
+	, m_duart68681(*this, "duart68681")
+	, m_mb87078(*this, "mb87078")
+	, m_osram(*this, "osram")
+	, m_osrom(*this, "audiocpu")
+	, m_cpubank(*this, "cpubank%u", 1)
 {
 }
 
@@ -40,12 +42,14 @@ taito_en_device::taito_en_device(const machine_config &mconfig, const char *tag,
 
 void taito_en_device::device_start()
 {
-	m_pump->set_otis(m_ensoniq);
+	// tell the pump about the ESP chips
 	m_pump->set_esp(m_esp);
 	uint8_t *ROM = m_osrom->base();
 	uint32_t max = (m_osrom->bytes() - 0x100000) / 0x20000;
 	for (int i = 0; i < 3; i++)
 		m_cpubank[i]->configure_entries(0, max, &ROM[0x100000], 0x20000);
+
+	m_bankmask = (memregion(":ensoniq.0")->bytes()/0x200000)-1;
 }
 
 
@@ -77,10 +81,8 @@ void taito_en_device::device_reset()
 
 WRITE16_MEMBER( taito_en_device::en_es5505_bank_w )
 {
-	uint32_t max_banks_this_game = (memregion(":ensoniq.0")->bytes()/0x200000)-1;
-
 	/* mask out unused bits */
-	data &= max_banks_this_game;
+	data &= m_bankmask;
 	m_ensoniq->voice_bank_w(offset,data<<20);
 }
 
@@ -199,7 +201,7 @@ MACHINE_CONFIG_START(taito_en_device::device_add_mconfig)
 	MCFG_CPU_ADD("audiocpu", M68000, XTAL(30'476'100) / 2)
 	MCFG_CPU_PROGRAM_MAP(en_sound_map)
 
-	MCFG_CPU_ADD("esp", ES5510, XTAL(10'000'000)) // ES5510 Clock is unverified
+	MCFG_CPU_ADD("esp", ES5510, XTAL(10'000'000)) // from Gun Buster schematics
 	MCFG_DEVICE_DISABLE()
 
 	MCFG_DEVICE_ADD("duart68681", MC68681, XTAL(16'000'000) / 4)
@@ -213,15 +215,16 @@ MACHINE_CONFIG_START(taito_en_device::device_add_mconfig)
 	MCFG_DEVICE_ADD("dpram", MB8421, 0) // host accesses this from the other side
 
 	/* sound hardware */
+	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
+
 	MCFG_SOUND_ADD("pump", ESQ_5505_5510_PUMP, XTAL(30'476'100) / (2 * 16 * 32))
 	MCFG_SOUND_ROUTE(0, "lspeaker", 1.0)
 	MCFG_SOUND_ROUTE(1, "rspeaker", 1.0)
 
-	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
 	MCFG_SOUND_ADD("ensoniq", ES5505, XTAL(30'476'100) / 2)
 	MCFG_ES5505_REGION0("ensoniq.0")
 	MCFG_ES5505_REGION1("ensoniq.0")
-	MCFG_ES5506_CHANNELS(4) // TODO : Verify output channels
+	MCFG_ES5505_CHANNELS(4)
 	MCFG_SOUND_ROUTE_EX(0, "pump", 1.0, 0)
 	MCFG_SOUND_ROUTE_EX(1, "pump", 1.0, 1)
 	MCFG_SOUND_ROUTE_EX(2, "pump", 1.0, 2)

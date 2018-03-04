@@ -39,42 +39,6 @@ ds2404_device::ds2404_device(const machine_config &mconfig, const char *tag, dev
 
 
 //-------------------------------------------------
-//  static_set_ref_year - configuration helper
-//  to set the reference year
-//-------------------------------------------------
-
-void ds2404_device::static_set_ref_year(device_t &device, uint32_t year)
-{
-	ds2404_device &ds2404 = downcast<ds2404_device &>(device);
-	ds2404.m_ref_year = year;
-}
-
-
-//-------------------------------------------------
-//  static_set_ref_month - configuration helper
-//  to set the reference month
-//-------------------------------------------------
-
-void ds2404_device::static_set_ref_month(device_t &device, uint8_t month)
-{
-	ds2404_device &ds2404 = downcast<ds2404_device &>(device);
-	ds2404.m_ref_month = month;
-}
-
-
-//-------------------------------------------------
-//  static_set_ref_day - configuration helper
-//  to set the reference day
-//-------------------------------------------------
-
-void ds2404_device::static_set_ref_day(device_t &device, uint8_t day)
-{
-	ds2404_device &ds2404 = downcast<ds2404_device &>(device);
-	ds2404.m_ref_day = day;
-}
-
-
-//-------------------------------------------------
 //  device_start - device-specific startup
 //-------------------------------------------------
 

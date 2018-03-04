@@ -18,7 +18,7 @@
 #define MAME_EMU_DIROM_H
 
 #define MCFG_DEVICE_ROM(_rom_tag) \
-	device_rom_interface::static_set_device_rom_tag(*device, _rom_tag);
+	dynamic_cast<device_rom_interface &>(*device).set_device_rom_tag(_rom_tag);
 
 class device_rom_interface : public device_memory_interface
 {
@@ -26,7 +26,7 @@ public:
 	device_rom_interface(const machine_config &mconfig, device_t &device, u8 addrwidth, endianness_t endian = ENDIANNESS_LITTLE, u8 datawidth = 8);
 	virtual ~device_rom_interface();
 
-	static void static_set_device_rom_tag(device_t &device, const char *tag);
+	void set_device_rom_tag(const char *tag) { m_rom_tag = tag; }
 
 	inline u8 read_byte(offs_t byteaddress) { return m_rom_direct->read_byte(byteaddress); }
 	inline u16 read_word(offs_t byteaddress) { return m_rom_direct->read_word(byteaddress); }

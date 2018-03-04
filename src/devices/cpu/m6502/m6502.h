@@ -15,7 +15,7 @@
 	downcast<m6502_device *>(device)->disable_direct();
 
 #define MCFG_M6502_SYNC_CALLBACK(_cb) \
-	devcb = &m6502_device::set_sync_callback(*device, DEVCB_##_cb);
+	devcb = &downcast<m6502_device &>(*device).set_sync_callback(DEVCB_##_cb);
 
 class m6502_device : public cpu_device {
 public:
@@ -31,7 +31,7 @@ public:
 	bool get_sync() const { return sync; }
 	void disable_direct() { direct_disabled = true; }
 
-	template<class _Object> static devcb_base &set_sync_callback(device_t &device, _Object object) { return downcast<m6502_device &>(device).sync_w.set_callback(object); }
+	template<class Object> devcb_base &set_sync_callback(Object &&cb) { return sync_w.set_callback(std::forward<Object>(cb)); }
 
 	devcb_write_line sync_w;
 

@@ -1,5 +1,5 @@
 // license:BSD-3-Clause
-// copyright-holders:Quench
+// copyright-holders:Quench, David Graves, R. Belmont
 /* An interface for the ES8712 ADPCM chip */
 
 #ifndef MAME_SOUND_ES8712_H

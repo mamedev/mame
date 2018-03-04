@@ -266,7 +266,7 @@ private:
 	required_device<cpu_device> m_maincpu;
 	required_device_array<stepper_device, 4> m_reels;
 	required_device<meters_device> m_meters;
-	optional_device<roc10937_device> m_vfd;
+	optional_device<rocvfd_device> m_vfd;
 	output_finder<8> m_triac;
 	output_finder<8> m_digit;
 	output_finder<8 * 8> m_lamp;

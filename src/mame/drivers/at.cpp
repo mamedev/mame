@@ -392,14 +392,14 @@ MACHINE_START_MEMBER(at_state,vrom_fix)
 
 void at_state::cfg_single_1200K(device_t *device)
 {
-	device_slot_interface::static_set_default_option(*device->subdevice("fdc:0"), "525hd");
-	device_slot_interface::static_set_default_option(*device->subdevice("fdc:1"), "");
+	dynamic_cast<device_slot_interface &>(*device->subdevice("fdc:0")).set_default_option("525hd");
+	dynamic_cast<device_slot_interface &>(*device->subdevice("fdc:1")).set_default_option("");
 }
 
 void at_state::cfg_single_360K(device_t *device)
 {
-	device_slot_interface::static_set_default_option(*device->subdevice("fdc:0"), "525dd");
-	device_slot_interface::static_set_default_option(*device->subdevice("fdc:1"), "");
+	dynamic_cast<device_slot_interface &>(*device->subdevice("fdc:0")).set_default_option("525dd");
+	dynamic_cast<device_slot_interface &>(*device->subdevice("fdc:1")).set_default_option("");
 }
 
 static SLOT_INTERFACE_START( pci_devices )

@@ -17,10 +17,10 @@ DECLARE_DEVICE_TYPE(I8088, i8088_cpu_device)
 
 
 #define MCFG_I8086_LOCK_HANDLER(_write) \
-	devcb = &i8086_common_cpu_device::set_lock_handler(*device, DEVCB_##_write);
+	devcb = &downcast<i8086_common_cpu_device &>(*device).set_lock_handler(DEVCB_##_write);
 
 #define MCFG_I8086_IF_HANDLER(_write) \
-	devcb = &i8086_cpu_device::set_if_handler(*device, DEVCB_##_write);
+	devcb = &downcast<i8086_cpu_device &>(*device).set_if_handler(DEVCB_##_write);
 
 #define MCFG_I8086_STACK_MAP(map) \
 	MCFG_DEVICE_ADDRESS_MAP(i8086_cpu_device::AS_STACK, map)
@@ -32,10 +32,10 @@ DECLARE_DEVICE_TYPE(I8088, i8088_cpu_device)
 	MCFG_DEVICE_ADDRESS_MAP(i8086_cpu_device::AS_EXTRA, map)
 
 #define MCFG_I8086_ESC_OPCODE_HANDLER(_write) \
-	devcb = &i8086_cpu_device::set_esc_opcode_handler(*device, DEVCB_##_write);
+	devcb = &downcast<i8086_cpu_device &>(*device).set_esc_opcode_handler(DEVCB_##_write);
 
 #define MCFG_I8086_ESC_DATA_HANDLER(_write) \
-	devcb = &i8086_cpu_device::set_esc_data_handler(*device, DEVCB_##_write);
+	devcb = &downcast<i8086_cpu_device &>(*device).set_esc_data_handler(DEVCB_##_write);
 
 enum
 {
@@ -49,8 +49,7 @@ enum
 class i8086_common_cpu_device : public cpu_device, public i386_disassembler::config
 {
 public:
-	template <class Object> static devcb_base &set_lock_handler(device_t &device, Object &&cb)
-	{ return downcast<i8086_common_cpu_device &>(device).m_lock_handler.set_callback(std::forward<Object>(cb)); }
+	template <class Object> devcb_base &set_lock_handler(Object &&cb) { return m_lock_handler.set_callback(std::forward<Object>(cb)); }
 
 protected:
 	enum
@@ -367,14 +366,9 @@ public:
 
 	// device_memory_interface overrides
 	virtual space_config_vector memory_space_config() const override;
-	template <class Object> static devcb_base &set_if_handler(device_t &device, Object &&cb)
-	{ return downcast<i8086_cpu_device &>(device).m_out_if_func.set_callback(std::forward<Object>(cb)); }
-
-	template <class Object> static devcb_base &set_esc_opcode_handler(device_t &device, Object &&cb)
-	{ return downcast<i8086_cpu_device &>(device).m_esc_opcode_handler.set_callback(std::forward<Object>(cb)); }
-
-	template <class Object> static devcb_base &set_esc_data_handler(device_t &device, Object &&cb)
-	{ return downcast<i8086_cpu_device &>(device).m_esc_data_handler.set_callback(std::forward<Object>(cb)); }
+	template <class Object> devcb_base &set_if_handler(Object &&cb) { return m_out_if_func.set_callback(std::forward<Object>(cb)); }
+	template <class Object> devcb_base &set_esc_opcode_handler(Object &&cb) { return m_esc_opcode_handler.set_callback(std::forward<Object>(cb)); }
+	template <class Object> devcb_base &set_esc_data_handler(Object &&cb) { return m_esc_data_handler.set_callback(std::forward<Object>(cb)); }
 
 protected:
 	i8086_cpu_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock, int data_bus_size);

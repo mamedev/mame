@@ -560,6 +560,11 @@ private:
 	required_shared_ptr<uint64_t> m_workram;
 	required_region_ptr<uint8_t> m_ds2430_rom;
 	required_ioport_array<8> m_io_ports;
+
+	uint32_t mpc8240_pci_r(int function, int reg, uint32_t mem_mask);
+	void mpc8240_pci_w(int function, int reg, uint32_t data, uint32_t mem_mask);
+	uint32_t voodoo3_pci_r(int function, int reg, uint32_t mem_mask);
+	void voodoo3_pci_w(int function, int reg, uint32_t data, uint32_t mem_mask);
 };
 
 uint32_t viper_state::screen_update_viper(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
@@ -612,9 +617,8 @@ static inline void write64be_with_32le_device_handler(write32_delegate handler, 
 
 /*****************************************************************************/
 
-static uint32_t mpc8240_pci_r(device_t *busdevice, device_t *device, int function, int reg, uint32_t mem_mask)
+uint32_t viper_state::mpc8240_pci_r(int function, int reg, uint32_t mem_mask)
 {
-	viper_state *state = busdevice->machine().driver_data<viper_state>();
 	#ifdef VIPER_DEBUG_LOG
 //  printf("MPC8240: PCI read %d, %02X, %08X\n", function, reg, mem_mask);
 	#endif
@@ -622,16 +626,15 @@ static uint32_t mpc8240_pci_r(device_t *busdevice, device_t *device, int functio
 	switch (reg)
 	{
 	}
-	return state->m_mpc8240_regs[reg/4];
+	return m_mpc8240_regs[reg/4];
 }
 
-static void mpc8240_pci_w(device_t *busdevice, device_t *device, int function, int reg, uint32_t data, uint32_t mem_mask)
+void viper_state::mpc8240_pci_w(int function, int reg, uint32_t data, uint32_t mem_mask)
 {
-	viper_state *state = busdevice->machine().driver_data<viper_state>();
 	#ifdef VIPER_DEBUG_LOG
 //  printf("MPC8240: PCI write %d, %02X, %08X, %08X\n", function, reg, data, mem_mask);
 	#endif
-	COMBINE_DATA(state->m_mpc8240_regs + (reg/4));
+	COMBINE_DATA(&m_mpc8240_regs[reg/4]);
 }
 
 
@@ -1609,10 +1612,8 @@ WRITE64_MEMBER(viper_state::ata_w)
 	}
 }
 
-static uint32_t voodoo3_pci_r(device_t *busdevice, device_t *device, int function, int reg, uint32_t mem_mask)
+uint32_t viper_state::voodoo3_pci_r(int function, int reg, uint32_t mem_mask)
 {
-	viper_state *state = device->machine().driver_data<viper_state>();
-
 	switch (reg)
 	{
 		case 0x00:      // PCI Vendor ID (0x121a = 3dfx), Device ID (0x0005 = Voodoo 3)
@@ -1625,52 +1626,50 @@ static uint32_t voodoo3_pci_r(device_t *busdevice, device_t *device, int functio
 		}
 		case 0x10:      // memBaseAddr0
 		{
-			return state->m_voodoo3_pci_reg[0x10/4];
+			return m_voodoo3_pci_reg[0x10/4];
 		}
 		case 0x14:      // memBaseAddr1
 		{
-			return state->m_voodoo3_pci_reg[0x14/4];
+			return m_voodoo3_pci_reg[0x14/4];
 		}
 		case 0x18:      // memBaseAddr1
 		{
-			return state->m_voodoo3_pci_reg[0x18/4];
+			return m_voodoo3_pci_reg[0x18/4];
 		}
 		case 0x40:      // fabId
 		{
-			return state->m_voodoo3_pci_reg[0x40/4];
+			return m_voodoo3_pci_reg[0x40/4];
 		}
 		case 0x50:      // cfgScratch
 		{
-			return state->m_voodoo3_pci_reg[0x50/4];
+			return m_voodoo3_pci_reg[0x50/4];
 		}
 
 		default:
-			fatalerror("voodoo3_pci_r: %08X at %08X\n", reg, device->machine().device("maincpu")->safe_pc());
+			fatalerror("voodoo3_pci_r: %08X at %08X\n", reg, m_maincpu->pc());
 	}
 }
 
-static void voodoo3_pci_w(device_t *busdevice, device_t *device, int function, int reg, uint32_t data, uint32_t mem_mask)
+void viper_state::voodoo3_pci_w(int function, int reg, uint32_t data, uint32_t mem_mask)
 {
-	viper_state *state = device->machine().driver_data<viper_state>();
-
 //  printf("voodoo3_pci_w: %08X, %08X\n", reg, data);
 
 	switch (reg)
 	{
 		case 0x04:      // Command register
 		{
-			state->m_voodoo3_pci_reg[0x04/4] = data;
+			m_voodoo3_pci_reg[0x04/4] = data;
 			break;
 		}
 		case 0x10:      // memBaseAddr0
 		{
 			if (data == 0xffffffff)
 			{
-				state->m_voodoo3_pci_reg[0x10/4] = 0xfe000000;
+				m_voodoo3_pci_reg[0x10/4] = 0xfe000000;
 			}
 			else
 			{
-				state->m_voodoo3_pci_reg[0x10/4] = data;
+				m_voodoo3_pci_reg[0x10/4] = data;
 			}
 			break;
 		}
@@ -1678,11 +1677,11 @@ static void voodoo3_pci_w(device_t *busdevice, device_t *device, int function, i
 		{
 			if (data == 0xffffffff)
 			{
-				state->m_voodoo3_pci_reg[0x14/4] = 0xfe000008;
+				m_voodoo3_pci_reg[0x14/4] = 0xfe000008;
 			}
 			else
 			{
-				state->m_voodoo3_pci_reg[0x14/4] = data;
+				m_voodoo3_pci_reg[0x14/4] = data;
 			}
 			break;
 		}
@@ -1690,11 +1689,11 @@ static void voodoo3_pci_w(device_t *busdevice, device_t *device, int function, i
 		{
 			if (data == 0xffffffff)
 			{
-				state->m_voodoo3_pci_reg[0x18/4] = 0xffffff01;
+				m_voodoo3_pci_reg[0x18/4] = 0xffffff01;
 			}
 			else
 			{
-				state->m_voodoo3_pci_reg[0x18/4] = data;
+				m_voodoo3_pci_reg[0x18/4] = data;
 			}
 			break;
 		}
@@ -1704,17 +1703,17 @@ static void voodoo3_pci_w(device_t *busdevice, device_t *device, int function, i
 		}
 		case 0x40:      // fabId
 		{
-			state->m_voodoo3_pci_reg[0x40/4] = data;
+			m_voodoo3_pci_reg[0x40/4] = data;
 			break;
 		}
 		case 0x50:      // cfgScratch
 		{
-			state->m_voodoo3_pci_reg[0x50/4] = data;
+			m_voodoo3_pci_reg[0x50/4] = data;
 			break;
 		}
 
 		default:
-			fatalerror("voodoo3_pci_w: %08X, %08X at %08X\n", data, reg, device->machine().device("maincpu")->safe_pc());
+			fatalerror("voodoo3_pci_w: %08X, %08X at %08X\n", data, reg, m_maincpu->pc());
 	}
 }
 
@@ -2381,8 +2380,8 @@ MACHINE_CONFIG_START(viper_state::viper)
 	MCFG_CPU_VBLANK_INT_DRIVER("screen", viper_state, viper_vblank)
 
 	MCFG_PCI_BUS_LEGACY_ADD("pcibus", 0)
-	MCFG_PCI_BUS_LEGACY_DEVICE(0, "mpc8240", mpc8240_pci_r, mpc8240_pci_w)
-	MCFG_PCI_BUS_LEGACY_DEVICE(12, "voodoo", voodoo3_pci_r, voodoo3_pci_w)
+	MCFG_PCI_BUS_LEGACY_DEVICE(0, DEVICE_SELF, viper_state, mpc8240_pci_r, mpc8240_pci_w)
+	MCFG_PCI_BUS_LEGACY_DEVICE(12, DEVICE_SELF, viper_state, voodoo3_pci_r, voodoo3_pci_w)
 
 	MCFG_ATA_INTERFACE_ADD("ata", ata_devices, "hdd", nullptr, true)
 

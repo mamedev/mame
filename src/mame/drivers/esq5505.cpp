@@ -170,21 +170,19 @@ class esq5505_state : public driver_device
 {
 public:
 	esq5505_state(const machine_config &mconfig, device_type type, const char *tag)
-	: driver_device(mconfig, type, tag),
-		m_maincpu(*this, "maincpu"),
-		m_duart(*this, "duart"),
-		m_otis(*this, "otis"),
-		m_esp(*this, "esp"),
-		m_pump(*this, "pump"),
-		m_fdc(*this, "wd1772"),
-		m_panel(*this, "panel"),
-		m_dmac(*this, "mc68450"),
-		m_mdout(*this, "mdout")
+		: driver_device(mconfig, type, tag)
+		, m_maincpu(*this, "maincpu")
+		, m_duart(*this, "duart")
+		, m_esp(*this, "esp")
+		, m_pump(*this, "pump")
+		, m_fdc(*this, "wd1772")
+		, m_panel(*this, "panel")
+		, m_dmac(*this, "mc68450")
+		, m_mdout(*this, "mdout")
 	{ }
 
 	required_device<m68000_device> m_maincpu;
 	required_device<mc68681_device> m_duart;
-	required_device<es5505_device> m_otis;
 	required_device<es5510_device> m_esp;
 	required_device<esq_5505_5510_pump_device> m_pump;
 	optional_device<wd1772_device> m_fdc;
@@ -273,8 +271,7 @@ IRQ_CALLBACK_MEMBER(esq5505_state::maincpu_irq_acknowledge_callback)
 void esq5505_state::machine_start()
 {
 	driver_device::machine_start();
-	// tell the pump about the OTIS & ESP chips
-	m_pump->set_otis(m_otis);
+	// tell the pump about the ESP chips
 	m_pump->set_esp(m_esp);
 
 	m_rom = (uint16_t *)(void *)memregion("osrom")->base();

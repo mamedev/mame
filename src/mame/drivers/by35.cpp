@@ -123,6 +123,7 @@ protected:
 		, m_io_x3(*this, "X3")
 		, m_io_x4(*this, "X4")
 		, m_lamps(*this, "lamp%u", 0U)
+		, m_digits(*this, "digit%u%u", 1U, 1U)
 		, m_solenoids(*this, "solenoid%u", 0U)
 	{ }
 
@@ -143,6 +144,7 @@ protected:
 	DECLARE_READ_LINE_MEMBER(u11_cb1_r);
 	DECLARE_WRITE_LINE_MEMBER(u11_ca2_w);
 	DECLARE_WRITE_LINE_MEMBER(u11_cb2_w);
+	virtual void machine_start() override;
 	virtual void machine_reset() override;
 	TIMER_DEVICE_CALLBACK_MEMBER(timer_z_freq);
 	TIMER_DEVICE_CALLBACK_MEMBER(timer_z_pulse);
@@ -166,7 +168,6 @@ private:
 	bool m_u11_ca1;
 	bool m_u11_cb2;
 	bool m_7d;
-	uint8_t m_digit;
 	uint8_t m_segment[6];
 	uint8_t m_lamp_decode;
 	solenoid_feature_data const &m_solenoid_features;
@@ -186,6 +187,7 @@ private:
 	required_ioport m_io_x3;
 	required_ioport m_io_x4;
 	output_finder<15 * 4> m_lamps;
+	output_finder<5, 8> m_digits;
 	output_finder<20> m_solenoids;
 };
 
@@ -584,15 +586,13 @@ WRITE_LINE_MEMBER( by35_state::u10_ca2_w )
 #if 0                   // Display Blanking - Out of sync with video redraw rate and causes flicker so it's disabled
 	if (state == 0)
 	{
-		int digit;
-
-		for (digit=1; digit<=8; digit++)
+		for (int digit=0; digit<8; digit++)
 		{
-			output().set_digit_value(10+digit, 0);
-			output().set_digit_value(20+digit, 0);
-			output().set_digit_value(30+digit, 0);
-			output().set_digit_value(40+digit, 0);
-			output().set_digit_value(50+digit, 0);
+			m_digits[0][digit] = 0
+			m_digits[1][digit] = 0
+			m_digits[2][digit] = 0
+			m_digits[3][digit] = 0
+			m_digits[4][digit] = 0
 		}
 	}
 #endif
@@ -740,35 +740,34 @@ WRITE8_MEMBER( by35_state::u11_a_w )
 	}
 
 
-	m_digit = 0;
+	uint8_t digit = 0;
 
 	if (BIT(data, 7))
-		m_digit = 1;
+		digit = 1;
 	else if (BIT(data, 6))
-		m_digit = 2;
+		digit = 2;
 	else if (BIT(data, 5))
-		m_digit = 3;
+		digit = 3;
 	else if (BIT(data, 4))
-		m_digit = 4;
+		digit = 4;
 	else if (BIT(data, 3))
-		m_digit = 5;
+		digit = 5;
 	else if (BIT(data, 2))
-		m_digit = 6;
+		digit = 6;
 	else if (BIT(data, 2) && BIT(data, 3))   // Aftermarket 7th digit strobe for 6 digit games
-		m_digit = 7;
+		digit = 7;
 	else if (BIT(data, 1) && m_7d)
-		m_digit = 7;
+		digit = 7;
 
-	if ((m_u10_ca2==0) && m_digit)
+	if ((m_u10_ca2==0) && digit)
 	{
-		static const uint8_t patterns[16] = { 0x3f,0x06,0x5b,0x4f,0x66,0x6d,0x7d,0x07,0x7f,0x6f,0,0,0,0,0,0 }; // MC14543 - BCD to 7 Segment Display Decoder
+		static constexpr uint8_t patterns[16] = { 0x3f,0x06,0x5b,0x4f,0x66,0x6d,0x7d,0x07,0x7f,0x6f,0,0,0,0,0,0 }; // MC14543 - BCD to 7 Segment Display Decoder
 
-		output().set_digit_value(10+m_digit, patterns[m_segment[1]]);
-		output().set_digit_value(20+m_digit, patterns[m_segment[2]]);
-		output().set_digit_value(30+m_digit, patterns[m_segment[3]]);
-		output().set_digit_value(40+m_digit, patterns[m_segment[4]]);
-		output().set_digit_value(50+m_digit, patterns[m_segment[5]]);
-
+		m_digits[0][digit - 1] = patterns[m_segment[1]];
+		m_digits[1][digit - 1] = patterns[m_segment[2]];
+		m_digits[2][digit - 1] = patterns[m_segment[3]];
+		m_digits[3][digit - 1] = patterns[m_segment[4]];
+		m_digits[4][digit - 1] = patterns[m_segment[5]];
 	}
 
 	m_u11a = data;
@@ -785,7 +784,7 @@ WRITE8_MEMBER( by35_state::u11_b_w )
 					m_samples->start(m_solenoid_features[(data & 0x0f)][0], m_solenoid_features[(data & 0x0f)][1]);
 			}
 
-			output().set_indexed_value( "solenoid", (data & 0x0f), true);
+			m_solenoids[data & 0x0f] = true;
 
 			if (m_solenoid_features[(data & 0x0f)][3])  // Reset/release relevant switch after firing Solenoid
 				m_io_hold_x[(m_solenoid_features[(data & 0x0f)][2])] &= (m_solenoid_features[(data & 0x0f)][3]);
@@ -876,11 +875,7 @@ TIMER_DEVICE_CALLBACK_MEMBER( by35_state::timer_z_freq )
 
 	/*** Zero Crossing - power to all Lamp SCRs is cut off and reset ***/
 
-	for (int i=0; i<60; i++)
-	{
-		output().set_indexed_value( "lamp", i, 0 );
-	}
-
+	std::fill(std::begin(m_lamps), std::end(m_lamps), 0);
 }
 TIMER_DEVICE_CALLBACK_MEMBER( by35_state::timer_z_pulse )
 {
@@ -1009,6 +1004,15 @@ by35_state::solenoid_feature_data const playboy_state::s_solenoid_features_playb
 /*19*/  { 0xff, 0xff, 0xff,  0x00 }
 };
 
+
+void by35_state::machine_start()
+{
+	genpin_class::machine_start();
+
+	m_lamps.resolve();
+	m_digits.resolve();
+	m_solenoids.resolve();
+}
 
 void by35_state::machine_reset()
 {

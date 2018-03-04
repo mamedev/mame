@@ -27,10 +27,8 @@ DEFINE_DEVICE_TYPE(CXD8654Q,  cxd8654q_device,  "cxd8654q",  "CXD8654Q GPU")
 
 psxgpu_device::psxgpu_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock)
 	: device_t(mconfig, type, tag, owner, clock)
+	, device_video_interface(mconfig, *this)
 	, m_vblank_handler(*this)
-#if PSXGPU_DEBUG_VIEWER
-	, m_screen(*this, "screen")
-#endif
 {
 }
 
@@ -38,7 +36,7 @@ void psxgpu_device::device_start()
 {
 	m_vblank_handler.resolve_safe();
 
-	if( m_type == CXD8538Q )
+	if (type() == CXD8538Q)
 	{
 		psx_gpu_init( 1 );
 	}
@@ -120,8 +118,8 @@ static inline void ATTR_PRINTF(3,4) verboselog( device_t& device, int n_level, c
 
 void psxgpu_device::DebugMeshInit()
 {
-	int width = m_screen->width();
-	int height = m_screen->height();
+	int width = screen().width();
+	int height = screen().height();
 
 	m_debug.b_mesh = 0;
 	m_debug.b_texture = 0;
@@ -136,8 +134,8 @@ void psxgpu_device::DebugMesh( int n_coordx, int n_coordy )
 {
 	int n_coord;
 	int n_colour;
-	int width = m_screen->width();
-	int height = m_screen->height();
+	int width = screen().width();
+	int height = screen().height();
 
 	n_coordx += m_n_displaystartx;
 	n_coordy += n_displaystarty;
@@ -334,8 +332,8 @@ int psxgpu_device::DebugTextureDisplay( bitmap_ind16 &bitmap )
 
 	if( m_debug.b_texture )
 	{
-		int width = m_screen->width();
-		int height = m_screen->height();
+		int width = screen().width();
+		int height = screen().height();
 
 		for( n_y = 0; n_y < height; n_y++ )
 		{
@@ -363,7 +361,7 @@ int psxgpu_device::DebugTextureDisplay( bitmap_ind16 &bitmap )
 				}
 				p_n_interleave[ n_x ] = p_p_vram[ n_yi ][ n_xi ];
 			}
-			draw_scanline16( bitmap, 0, n_y, width, p_n_interleave, m_screen->palette().pens() );
+			draw_scanline16( bitmap, 0, n_y, width, p_n_interleave, screen().palette().pens() );
 		}
 	}
 	return m_debug.b_texture;
@@ -445,7 +443,7 @@ void psxgpu_device::updatevisiblearea()
 #endif
 
 	visarea.set(0, n_screenwidth - 1, 0, n_screenheight - 1);
-	machine().first_screen()->configure(n_screenwidth, n_screenheight, visarea, HZ_TO_ATTOSECONDS(refresh));
+	screen().configure(n_screenwidth, n_screenheight, visarea, HZ_TO_ATTOSECONDS(refresh));
 }
 
 void psxgpu_device::psx_gpu_init( int n_gputype )

@@ -126,7 +126,7 @@ public:
 	virtual void machine_reset() override;
 	INTERRUPT_GEN_MEMBER(timer_irq);
 	int b85_find_project_string( );
-	optional_device<roc10937_device> m_vfd;
+	optional_device<rocvfd_device> m_vfd;
 	required_device<cpu_device> m_maincpu;
 	required_device<stepper_device> m_reel0;
 	required_device<stepper_device> m_reel1;

@@ -165,7 +165,7 @@ enum
 ***************************************************************************/
 
 #define MCFG_PPC_BUS_FREQUENCY(_frequency) \
-	ppc_device::set_bus_frequency(*device, _frequency);
+	downcast<ppc_device &>(*device).set_bus_frequency(_frequency);
 
 
 class ppc_frontend;
@@ -213,8 +213,8 @@ protected:
 	ppc_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock, int address_bits, int data_bits, powerpc_flavor flavor, uint32_t cap, uint32_t tb_divisor, address_map_constructor internal_map);
 
 public:
-	static void set_bus_frequency(device_t &device, uint32_t bus_frequency) { downcast<ppc_device &>(device).c_bus_frequency = bus_frequency; }
-	static void set_bus_frequency(device_t &device, const XTAL &xtal) { set_bus_frequency(device, xtal.value()); }
+	void set_bus_frequency(uint32_t bus_frequency) { c_bus_frequency = bus_frequency; }
+	void set_bus_frequency(const XTAL &xtal) { set_bus_frequency(xtal.value()); }
 
 	void ppc_set_dcstore_callback(write32_delegate callback);
 

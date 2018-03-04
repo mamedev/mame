@@ -284,23 +284,23 @@ void stactics_state::draw_background(bitmap_ind16 &bitmap, const rectangle &clip
  *************************************/
 
 /* from 7448 datasheet */
-static const int to_7seg[0x10] =
+static constexpr int to_7seg[0x10] =
 {
 	0x3f, 0x06, 0x5b, 0x4f, 0x66, 0x6d, 0x7c, 0x07,
 	0x7f, 0x67, 0x58, 0x4c, 0x62, 0x69, 0x78, 0x00
 };
 
 
-void stactics_state::set_indicator_leds(int data, const char *output_name, int base_index)
+template <unsigned N> void stactics_state::set_indicator_leds(unsigned offset, output_finder<N> &outputs, int base_index)
 {
 	/* decode the data */
-	data = to_7seg[~data & 0x0f];
+	int const data = to_7seg[~m_display_buffer[offset] & 0x0f];
 
 	/* set the 4 LEDs */
-	output().set_indexed_value(output_name, base_index + 0, (data >> 2) & 0x01);
-	output().set_indexed_value(output_name, base_index + 1, (data >> 6) & 0x01);
-	output().set_indexed_value(output_name, base_index + 2, (data >> 5) & 0x01);
-	output().set_indexed_value(output_name, base_index + 3, (data >> 4) & 0x01);
+	outputs[base_index + 0] = BIT(data, 2);
+	outputs[base_index + 1] = BIT(data, 6);
+	outputs[base_index + 2] = BIT(data, 5);
+	outputs[base_index + 3] = BIT(data, 4);
 }
 
 
@@ -317,36 +317,6 @@ WRITE_LINE_MEMBER(stactics_state::start_lamp_w)
 }
 
 
-WRITE_LINE_MEMBER(stactics_state::base_1_lamp_w)
-{
-	machine().output().set_indexed_value("base_lamp", 0, state);
-}
-
-
-WRITE_LINE_MEMBER(stactics_state::base_2_lamp_w)
-{
-	machine().output().set_indexed_value("base_lamp", 1, state);
-}
-
-
-WRITE_LINE_MEMBER(stactics_state::base_3_lamp_w)
-{
-	machine().output().set_indexed_value("base_lamp", 2, state);
-}
-
-
-WRITE_LINE_MEMBER(stactics_state::base_4_lamp_w)
-{
-	machine().output().set_indexed_value("base_lamp", 3, state);
-}
-
-
-WRITE_LINE_MEMBER(stactics_state::base_5_lamp_w)
-{
-	machine().output().set_indexed_value("base_lamp", 4, state);
-}
-
-
 void stactics_state::update_artwork()
 {
 	int i;
@@ -355,12 +325,12 @@ void stactics_state::update_artwork()
 	/* laser beam - loop for each LED */
 	for (i = 0; i < 0x40; i++)
 	{
-		offs_t beam_data_offs = ((i & 0x08) << 7) | ((i & 0x30) << 4) | m_beam_state;
-		uint8_t beam_data = beam_region[beam_data_offs];
-		int on = (beam_data >> (i & 0x07)) & 0x01;
+		offs_t const beam_data_offs = ((i & 0x08) << 7) | ((i & 0x30) << 4) | m_beam_state;
+		uint8_t const beam_data = beam_region[beam_data_offs];
+		int const on = BIT(beam_data, i & 0x07);
 
-		output().set_indexed_value("beam_led_left", i, on);
-		output().set_indexed_value("beam_led_right", i, on);
+		m_beam_leds_left[i] = on;
+		m_beam_leds_right[i] = on;
 	}
 
 	/* sight LED */
@@ -368,22 +338,22 @@ void stactics_state::update_artwork()
 
 	/* score display */
 	for (i = 0x01; i < 0x07; i++)
-		output().set_digit_value(i - 1, to_7seg[~m_display_buffer[i] & 0x0f]);
+		m_score_digits[i - 1] = to_7seg[~m_display_buffer[i] & 0x0f];
 
 	/* credits indicator */
-	set_indicator_leds(m_display_buffer[0x07], "credit_led", 0x00);
-	set_indicator_leds(m_display_buffer[0x08], "credit_led", 0x04);
+	set_indicator_leds(0x07, m_credit_leds, 0x00);
+	set_indicator_leds(0x08, m_credit_leds, 0x04);
 
 	/* barriers indicator */
-	set_indicator_leds(m_display_buffer[0x09], "barrier_led", 0x00);
-	set_indicator_leds(m_display_buffer[0x0a], "barrier_led", 0x04);
-	set_indicator_leds(m_display_buffer[0x0b], "barrier_led", 0x08);
+	set_indicator_leds(0x09, m_barrier_leds, 0x00);
+	set_indicator_leds(0x0a, m_barrier_leds, 0x04);
+	set_indicator_leds(0x0b, m_barrier_leds, 0x08);
 
 	/* rounds indicator */
-	set_indicator_leds(m_display_buffer[0x0c], "round_led", 0x00);
-	set_indicator_leds(m_display_buffer[0x0d], "round_led", 0x04);
-	set_indicator_leds(m_display_buffer[0x0e], "round_led", 0x08);
-	set_indicator_leds(m_display_buffer[0x0f], "round_led", 0x0c);
+	set_indicator_leds(0x0c, m_round_leds, 0x00);
+	set_indicator_leds(0x0d, m_round_leds, 0x04);
+	set_indicator_leds(0x0e, m_round_leds, 0x08);
+	set_indicator_leds(0x0f, m_round_leds, 0x0c);
 }
 
 
@@ -396,6 +366,14 @@ void stactics_state::update_artwork()
 
 void stactics_state::video_start()
 {
+	m_base_lamps.resolve();
+	m_beam_leds_left.resolve();
+	m_beam_leds_right.resolve();
+	m_score_digits.resolve();
+	m_credit_leds.resolve();
+	m_barrier_leds.resolve();
+	m_round_leds.resolve();
+
 	m_y_scroll_d = 0;
 	m_y_scroll_e = 0;
 	m_y_scroll_f = 0;

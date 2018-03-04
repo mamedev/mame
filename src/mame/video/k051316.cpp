@@ -121,19 +121,19 @@ void k051316_device::set_bpp(int bpp)
 	switch(bpp)
 	{
 		case 4:
-			device_gfx_interface::static_set_info(*this, gfxinfo);
+			set_info(gfxinfo);
 			m_pixels_per_byte = 2;
 			break;
 		case 7:
-			device_gfx_interface::static_set_info(*this, gfxinfo7);
+			set_info(gfxinfo7);
 			m_pixels_per_byte = 1;
 			break;
 		case 8:
-			device_gfx_interface::static_set_info(*this, gfxinfo8);
+			set_info(gfxinfo8);
 			m_pixels_per_byte = 1;
 			break;
 		case -4:
-			device_gfx_interface::static_set_info(*this, gfxinfo4_ram);
+			set_info(gfxinfo4_ram);
 			m_pixels_per_byte = 2;
 			break;
 		default:

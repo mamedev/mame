@@ -45,70 +45,43 @@ eeprom_base_device::eeprom_base_device(const machine_config &mconfig, device_typ
 
 
 //-------------------------------------------------
-//  static_set_default_data - configuration helpers
+//  set_default_data - configuration helpers
 //  to set the default data
 //-------------------------------------------------
 
-void eeprom_base_device::static_set_size(device_t &device, int cells, int cellbits)
+void eeprom_base_device::set_size(int cells, int cellbits)
 {
-	eeprom_base_device &eeprom = downcast<eeprom_base_device &>(device);
-	eeprom.m_cells = cells;
-	eeprom.m_data_bits = cellbits;
+	m_cells = cells;
+	m_data_bits = cellbits;
 
 	// compute address bits (validation checks verify cells was an even power of 2)
 	cells--;
-	eeprom.m_address_bits = 0;
+	m_address_bits = 0;
 	while (cells != 0)
 	{
 		cells >>= 1;
-		eeprom.m_address_bits++;
+		m_address_bits++;
 	}
 }
 
 
 //-------------------------------------------------
-//  static_set_default_data - configuration helpers
+//  set_default_data - configuration helpers
 //  to set the default data
 //-------------------------------------------------
 
-void eeprom_base_device::static_set_default_data(device_t &device, const uint8_t *data, uint32_t size)
+void eeprom_base_device::set_default_data(const uint8_t *data, uint32_t size)
 {
-	eeprom_base_device &eeprom = downcast<eeprom_base_device &>(device);
-	assert(eeprom.m_data_bits == 8);
-	eeprom.m_default_data = data;
-	eeprom.m_default_data_size = size;
+	assert(m_data_bits == 8);
+	m_default_data = data;
+	m_default_data_size = size;
 }
 
-void eeprom_base_device::static_set_default_data(device_t &device, const uint16_t *data, uint32_t size)
+void eeprom_base_device::set_default_data(const uint16_t *data, uint32_t size)
 {
-	eeprom_base_device &eeprom = downcast<eeprom_base_device &>(device);
-	assert(eeprom.m_data_bits == 16);
-	eeprom.m_default_data = data;
-	eeprom.m_default_data_size = size / 2;
-}
-
-
-//-------------------------------------------------
-//  static_set_default_value - configuration helper
-//  to set the default value
-//-------------------------------------------------
-
-void eeprom_base_device::static_set_default_value(device_t &device, uint32_t value)
-{
-	eeprom_base_device &eeprom = downcast<eeprom_base_device &>(device);
-	eeprom.m_default_value = value;
-	eeprom.m_default_value_set = true;
-}
-
-
-//-------------------------------------------------
-//  static_set_timing - configuration helper
-//  to set timing constants for various operations
-//-------------------------------------------------
-
-void eeprom_base_device::static_set_timing(device_t &device, timing_type type, const attotime &duration)
-{
-	downcast<eeprom_base_device &>(device).m_operation_time[type] = duration;
+	assert(m_data_bits == 16);
+	m_default_data = data;
+	m_default_data_size = size / 2;
 }
 
 

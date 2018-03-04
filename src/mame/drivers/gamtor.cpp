@@ -89,8 +89,8 @@ MACHINE_CONFIG_START(gaminator_state::gaminator)
 	MCFG_SCREEN_RAW_PARAMS(XTAL(25'174'800),900,0,640,526,0,480)
 	MCFG_SCREEN_UPDATE_DEVICE("vga", gamtor_vga_device, screen_update)
 
-	MCFG_PALETTE_ADD("palette", 0x100)
 	MCFG_DEVICE_ADD("vga", GAMTOR_VGA, 0)
+	MCFG_VIDEO_SET_SCREEN("screen")
 
 	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
 	/* unknown sound */

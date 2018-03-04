@@ -64,19 +64,6 @@ z80_daisy_chain_interface::~z80_daisy_chain_interface()
 
 
 //-------------------------------------------------
-//  static_set_daisy_config - configuration helper
-//  to set up the daisy chain
-//-------------------------------------------------
-void z80_daisy_chain_interface::static_set_daisy_config(device_t &device, const z80_daisy_config *config)
-{
-	z80_daisy_chain_interface *daisyintf;
-	if (!device.interface(daisyintf))
-		throw emu_fatalerror("MCFG_Z80_DAISY_CHAIN called on device '%s' with no daisy chain interface", device.tag());
-	daisyintf->m_daisy_config = config;
-}
-
-
-//-------------------------------------------------
 //  interface_post_start - work to be done after
 //  actually starting a device
 //-------------------------------------------------

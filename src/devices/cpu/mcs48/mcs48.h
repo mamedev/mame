@@ -69,33 +69,33 @@ enum
 
 
 #define MCFG_MCS48_PORT_P1_IN_CB(_devcb) \
-	devcb = &mcs48_cpu_device::set_port_in_cb(*device, 0, DEVCB_##_devcb);
+	devcb = &downcast<mcs48_cpu_device &>(*device).set_port_in_cb(0, DEVCB_##_devcb);
 #define MCFG_MCS48_PORT_P1_OUT_CB(_devcb) \
-	devcb = &mcs48_cpu_device::set_port_out_cb(*device, 0, DEVCB_##_devcb);
+	devcb = &downcast<mcs48_cpu_device &>(*device).set_port_out_cb(0, DEVCB_##_devcb);
 
 #define MCFG_MCS48_PORT_P2_IN_CB(_devcb) \
-	devcb = &mcs48_cpu_device::set_port_in_cb(*device, 1, DEVCB_##_devcb);
+	devcb = &downcast<mcs48_cpu_device &>(*device).set_port_in_cb(1, DEVCB_##_devcb);
 #define MCFG_MCS48_PORT_P2_OUT_CB(_devcb) \
-	devcb = &mcs48_cpu_device::set_port_out_cb(*device, 1, DEVCB_##_devcb);
+	devcb = &downcast<mcs48_cpu_device &>(*device).set_port_out_cb(1, DEVCB_##_devcb);
 
 #define MCFG_MCS48_PORT_T0_IN_CB(_devcb) \
-	devcb = &mcs48_cpu_device::set_test_in_cb(*device, 0, DEVCB_##_devcb);
+	devcb = &downcast<mcs48_cpu_device &>(*device).set_test_in_cb(0, DEVCB_##_devcb);
 #define MCFG_MCS48_PORT_T0_CLK_DEVICE(_tag) \
-	mcs48_cpu_device::set_t0_clk_cb(*device, clock_update_delegate(FUNC(device_t::set_unscaled_clock), _tag, (device_t *)nullptr));
+	downcast<mcs48_cpu_device &>(*device).set_t0_clk_cb(clock_update_delegate(FUNC(device_t::set_unscaled_clock), _tag, (device_t *)nullptr));
 #define MCFG_MCS48_PORT_T0_CLK_CUSTOM(_class, _func) \
-	mcs48_cpu_device::set_t0_clk_cb(*device, clock_update_delegate(&_class::_func, #_class "::" _func, owner));
+	downcast<mcs48_cpu_device &>(*device).set_t0_clk_cb(clock_update_delegate(&_class::_func, #_class "::" _func, owner));
 
 #define MCFG_MCS48_PORT_T1_IN_CB(_devcb) \
-	devcb = &mcs48_cpu_device::set_test_in_cb(*device, 1, DEVCB_##_devcb);
+	devcb = &downcast<mcs48_cpu_device &>(*device).set_test_in_cb(1, DEVCB_##_devcb);
 
 #define MCFG_MCS48_PORT_BUS_IN_CB(_devcb) \
-	devcb = &mcs48_cpu_device::set_bus_in_cb(*device, DEVCB_##_devcb);
+	devcb = &downcast<mcs48_cpu_device &>(*device).set_bus_in_cb(DEVCB_##_devcb);
 #define MCFG_MCS48_PORT_BUS_OUT_CB(_devcb) \
-	devcb = &mcs48_cpu_device::set_bus_out_cb(*device, DEVCB_##_devcb);
+	devcb = &downcast<mcs48_cpu_device &>(*device).set_bus_out_cb(DEVCB_##_devcb);
 
 // PROG line to 8243 expander
 #define MCFG_MCS48_PORT_PROG_OUT_CB(_devcb) \
-	devcb = &mcs48_cpu_device::set_prog_out_cb(*device, DEVCB_##_devcb);
+	devcb = &downcast<mcs48_cpu_device &>(*device).set_prog_out_cb(DEVCB_##_devcb);
 
 
 /***************************************************************************
@@ -141,14 +141,14 @@ public:
 		EXPANDER_OP_AND = 3
 	};
 
-	// static configuration
-	template <class Object> static devcb_base &set_port_in_cb(device_t &device, int n, Object &&cb) { return downcast<mcs48_cpu_device &>(device).m_port_in_cb[n].set_callback(std::forward<Object>(cb)); }
-	template <class Object> static devcb_base &set_port_out_cb(device_t &device, int n, Object &&cb) { return downcast<mcs48_cpu_device &>(device).m_port_out_cb[n].set_callback(std::forward<Object>(cb)); }
-	template <class Object> static devcb_base &set_bus_in_cb(device_t &device, Object &&cb) { return downcast<mcs48_cpu_device &>(device).m_bus_in_cb.set_callback(std::forward<Object>(cb)); }
-	template <class Object> static devcb_base &set_bus_out_cb(device_t &device, Object &&cb) { return downcast<mcs48_cpu_device &>(device).m_bus_out_cb.set_callback(std::forward<Object>(cb)); }
-	template <class Object> static devcb_base &set_test_in_cb(device_t &device, int n, Object &&cb) { return downcast<mcs48_cpu_device &>(device).m_test_in_cb[n].set_callback(std::forward<Object>(cb)); }
-	static void set_t0_clk_cb(device_t &device, clock_update_delegate &&func) { downcast<mcs48_cpu_device &>(device).m_t0_clk_func = std::move(func); }
-	template <class Object> static devcb_base &set_prog_out_cb(device_t &device, Object &&cb) { return downcast<mcs48_cpu_device &>(device).m_prog_out_cb.set_callback(std::forward<Object>(cb)); }
+	// configuration
+	template <class Object> devcb_base &set_port_in_cb(int n, Object &&cb) { return m_port_in_cb[n].set_callback(std::forward<Object>(cb)); }
+	template <class Object> devcb_base &set_port_out_cb(int n, Object &&cb) { return m_port_out_cb[n].set_callback(std::forward<Object>(cb)); }
+	template <class Object> devcb_base &set_bus_in_cb(Object &&cb) { return m_bus_in_cb.set_callback(std::forward<Object>(cb)); }
+	template <class Object> devcb_base &set_bus_out_cb(Object &&cb) { return m_bus_out_cb.set_callback(std::forward<Object>(cb)); }
+	template <class Object> devcb_base &set_test_in_cb(int n, Object &&cb) { return m_test_in_cb[n].set_callback(std::forward<Object>(cb)); }
+	template <typename Object> void set_t0_clk_cb(Object &&cb) { m_t0_clk_func = std::forward<Object>(cb); }
+	template <class Object> devcb_base &set_prog_out_cb(Object &&cb) { return m_prog_out_cb.set_callback(std::forward<Object>(cb)); }
 
 	DECLARE_READ8_MEMBER(p1_r);
 	DECLARE_READ8_MEMBER(p2_r);

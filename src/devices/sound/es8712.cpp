@@ -1,5 +1,5 @@
 // license:BSD-3-Clause
-// copyright-holders:Quench
+// copyright-holders:Quench, David Graves, R. Belmont
 /**********************************************************************************************
  *
  *  ES8712 Sound Controller chip for MSM5205/6585 and 74157-type TTL pair
@@ -10,6 +10,7 @@
  *
  *  Current implementation is based from :
  *  gcpinbal.cpp, by David Graves & R. Belmont.
+ *  splitted by cam900
  * 
  *  It seems that the ES8712 is actually a programmable counter which can stream
  *  ADPCM samples when hooked up to a ROM and a M5205 or M6585 (whose VCK signal
@@ -57,7 +58,7 @@ es8712_device::es8712_device(const machine_config &mconfig, const char *tag, dev
 //-------------------------------------------------
 
 MACHINE_CONFIG_START(es8712_device::device_add_mconfig)
-	MCFG_DEVICE_ADD("adpcm_select", HCT157, 0) // gcpinbal case, differs per games?
+	MCFG_DEVICE_ADD("adpcm_select", HCT157, 0) // TODO : gcpinbal case, differs per games?
 	MCFG_74157_OUT_CB(WRITE8(es8712_device, msm_w))
 MACHINE_CONFIG_END
 

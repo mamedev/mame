@@ -37,24 +37,24 @@
 //**************************************************************************
 
 #define MCFG_ADDRESSABLE_LATCH_Q0_OUT_CB(_devcb) \
-	devcb = &addressable_latch_device::set_q_out_cb<0>(*device, DEVCB_##_devcb);
+	devcb = &downcast<addressable_latch_device &>(*device).set_q_out_cb<0>(DEVCB_##_devcb);
 #define MCFG_ADDRESSABLE_LATCH_Q1_OUT_CB(_devcb) \
-	devcb = &addressable_latch_device::set_q_out_cb<1>(*device, DEVCB_##_devcb);
+	devcb = &downcast<addressable_latch_device &>(*device).set_q_out_cb<1>(DEVCB_##_devcb);
 #define MCFG_ADDRESSABLE_LATCH_Q2_OUT_CB(_devcb) \
-	devcb = &addressable_latch_device::set_q_out_cb<2>(*device, DEVCB_##_devcb);
+	devcb = &downcast<addressable_latch_device &>(*device).set_q_out_cb<2>(DEVCB_##_devcb);
 #define MCFG_ADDRESSABLE_LATCH_Q3_OUT_CB(_devcb) \
-	devcb = &addressable_latch_device::set_q_out_cb<3>(*device, DEVCB_##_devcb);
+	devcb = &downcast<addressable_latch_device &>(*device).set_q_out_cb<3>(DEVCB_##_devcb);
 #define MCFG_ADDRESSABLE_LATCH_Q4_OUT_CB(_devcb) \
-	devcb = &addressable_latch_device::set_q_out_cb<4>(*device, DEVCB_##_devcb);
+	devcb = &downcast<addressable_latch_device &>(*device).set_q_out_cb<4>(DEVCB_##_devcb);
 #define MCFG_ADDRESSABLE_LATCH_Q5_OUT_CB(_devcb) \
-	devcb = &addressable_latch_device::set_q_out_cb<5>(*device, DEVCB_##_devcb);
+	devcb = &downcast<addressable_latch_device &>(*device).set_q_out_cb<5>(DEVCB_##_devcb);
 #define MCFG_ADDRESSABLE_LATCH_Q6_OUT_CB(_devcb) \
-	devcb = &addressable_latch_device::set_q_out_cb<6>(*device, DEVCB_##_devcb);
+	devcb = &downcast<addressable_latch_device &>(*device).set_q_out_cb<6>(DEVCB_##_devcb);
 #define MCFG_ADDRESSABLE_LATCH_Q7_OUT_CB(_devcb) \
-	devcb = &addressable_latch_device::set_q_out_cb<7>(*device, DEVCB_##_devcb);
+	devcb = &downcast<addressable_latch_device &>(*device).set_q_out_cb<7>(DEVCB_##_devcb);
 
 #define MCFG_ADDRESSABLE_LATCH_PARALLEL_OUT_CB(_devcb) \
-	devcb = &addressable_latch_device::set_parallel_out_cb(*device, DEVCB_##_devcb);
+	devcb = &downcast<addressable_latch_device &>(*device).set_parallel_out_cb(DEVCB_##_devcb);
 
 //**************************************************************************
 //  TYPE DEFINITIONS
@@ -66,8 +66,8 @@ class addressable_latch_device : public device_t
 {
 public:
 	// static configuration
-	template<unsigned Bit, class Object> static devcb_base &set_q_out_cb(device_t &device, Object &&cb) { return downcast<addressable_latch_device &>(device).m_q_out_cb[Bit].set_callback(std::forward<Object>(cb)); }
-	template<class Object> static devcb_base &set_parallel_out_cb(device_t &device, Object &&cb) { return downcast<addressable_latch_device &>(device).m_parallel_out_cb.set_callback(std::forward<Object>(cb)); }
+	template<unsigned Bit, class Object> devcb_base &set_q_out_cb(Object &&cb) { return m_q_out_cb[Bit].set_callback(std::forward<Object>(cb)); }
+	template<class Object> devcb_base &set_parallel_out_cb(Object &&cb) { return m_parallel_out_cb.set_callback(std::forward<Object>(cb)); }
 
 	// data write handlers
 	void write_bit(offs_t offset, bool d);

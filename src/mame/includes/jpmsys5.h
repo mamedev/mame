@@ -80,7 +80,6 @@ private:
 	int m_lamp_strobe;
 	int m_mpxclk;
 	int m_muxram[255];
-	int m_alpha_clock;
 	int m_chop;
 	uint8_t m_a0_data_out;
 	uint8_t m_a1_data_out;

@@ -244,9 +244,9 @@ ADDRESS_MAP_END
 
 void tosh1000_state::cfg_fdc_35(device_t *device)
 {
-	device_slot_interface::static_set_default_option(*device->subdevice("fdc:0"), "35dd");
-	device_slot_interface::static_set_fixed(*device->subdevice("fdc:0"), true);
-	device_slot_interface::static_set_default_option(*device->subdevice("fdc:1"), "");
+	dynamic_cast<device_slot_interface &>(*device->subdevice("fdc:0")).set_default_option("35dd");
+	dynamic_cast<device_slot_interface &>(*device->subdevice("fdc:0")).set_fixed(true);
+	dynamic_cast<device_slot_interface &>(*device->subdevice("fdc:1")).set_default_option("");
 }
 
 MACHINE_CONFIG_START(tosh1000_state::tosh1000)

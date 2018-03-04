@@ -51,12 +51,12 @@ public:
 	kcexp_slot_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 	virtual ~kcexp_slot_device();
 
-	template <class Object> static devcb_base &set_out_irq_callback(device_t &device, Object &&cb) { return downcast<kcexp_slot_device &>(device).m_out_irq_cb.set_callback(std::forward<Object>(cb)); }
-	template <class Object> static devcb_base &set_out_nmi_callback(device_t &device, Object &&cb) { return downcast<kcexp_slot_device &>(device).m_out_nmi_cb.set_callback(std::forward<Object>(cb)); }
-	template <class Object> static devcb_base &set_out_halt_callback(device_t &device, Object &&cb) { return downcast<kcexp_slot_device &>(device).m_out_halt_cb.set_callback(std::forward<Object>(cb)); }
+	template <class Object> devcb_base &set_out_irq_callback(Object &&cb) { return m_out_irq_cb.set_callback(std::forward<Object>(cb)); }
+	template <class Object> devcb_base &set_out_nmi_callback(Object &&cb) { return m_out_nmi_cb.set_callback(std::forward<Object>(cb)); }
+	template <class Object> devcb_base &set_out_halt_callback(Object &&cb) { return m_out_halt_cb.set_callback(std::forward<Object>(cb)); }
 
 	// inline configuration
-	static void static_set_next_slot(device_t &device, const char *next_module_tag);
+	void set_next_slot(const char *next_module_tag) { m_next_slot_tag = next_module_tag; }
 
 	// reading and writing
 	virtual uint8_t module_id_r();
@@ -121,29 +121,29 @@ DECLARE_DEVICE_TYPE(KCCART_SLOT, kccart_slot_device)
 ***************************************************************************/
 
 #define MCFG_KCEXP_SLOT_OUT_IRQ_CB(_devcb) \
-	devcb = &kcexp_slot_device::set_out_irq_callback(*device, DEVCB_##_devcb);
+	devcb = &downcast<kcexp_slot_device &>(*device).set_out_irq_callback(DEVCB_##_devcb);
 
 #define MCFG_KCEXP_SLOT_OUT_NMI_CB(_devcb) \
-	devcb = &kcexp_slot_device::set_out_nmi_callback(*device, DEVCB_##_devcb);
+	devcb = &downcast<kcexp_slot_device &>(*device).set_out_nmi_callback(DEVCB_##_devcb);
 
 #define MCFG_KCEXP_SLOT_OUT_HALT_CB(_devcb) \
-	devcb = &kcexp_slot_device::set_out_halt_callback(*device, DEVCB_##_devcb);
+	devcb = &downcast<kcexp_slot_device &>(*device).set_out_halt_callback(DEVCB_##_devcb);
 
 #define MCFG_KCEXP_SLOT_NEXT_SLOT(_next_slot_tag) \
-	kcexp_slot_device::static_set_next_slot(*device, _next_slot_tag);
+	downcast<kcexp_slot_device &>(*device).set_next_slot(_next_slot_tag);
 
 
 #define MCFG_KCCART_SLOT_OUT_IRQ_CB(_devcb) \
-	devcb = &kccart_slot_device::set_out_irq_callback(*device, DEVCB_##_devcb);
+	devcb = &downcast<kccart_slot_device &>(*device).set_out_irq_callback(DEVCB_##_devcb);
 
 #define MCFG_KCCART_SLOT_OUT_NMI_CB(_devcb) \
-	devcb = &kccart_slot_device::set_out_nmi_callback(*device, DEVCB_##_devcb);
+	devcb = &downcast<kccart_slot_device &>(*device).set_out_nmi_callback(DEVCB_##_devcb);
 
 #define MCFG_KCCART_SLOT_OUT_HALT_CB(_devcb) \
-	devcb = &kccart_slot_device::set_out_halt_callback(*device, DEVCB_##_devcb);
+	devcb = &downcast<kccart_slot_device &>(*device).set_out_halt_callback(DEVCB_##_devcb);
 
 #define MCFG_KCCART_SLOT_NEXT_SLOT(_next_slot_tag) \
-	kccart_slot_device::static_set_next_slot(*device, _next_slot_tag);
+	downcast<kccart_slot_device &>(*device).set_next_slot(_next_slot_tag);
 
 // #define MCFG_KC85_EXPANSION_ADD(_tag,_next_slot_tag,_config,_slot_intf,_def_slot)
 //  MCFG_DEVICE_ADD(_tag, KCEXP_SLOT, 0)

@@ -38,10 +38,10 @@ public:
 	DECLARE_WRITE8_MEMBER(set_gromlines); // Combined GROM select lines
 	DECLARE_WRITE_LINE_MEMBER(gclock_in);
 
-	static void set_mask(device_t &device, int mask) { downcast<gromport_device &>(device).m_mask = mask; }
+	void set_mask(int mask) { m_mask = mask; }
 
-	template <class Object> static devcb_base &static_set_ready_callback(device_t &device, Object &&cb)  { return downcast<gromport_device &>(device).m_console_ready.set_callback(std::forward<Object>(cb)); }
-	template <class Object> static devcb_base &static_set_reset_callback(device_t &device, Object &&cb) { return downcast<gromport_device &>(device).m_console_reset.set_callback(std::forward<Object>(cb)); }
+	template <class Object> devcb_base &set_ready_callback(Object &&cb)  { return m_console_ready.set_callback(std::forward<Object>(cb)); }
+	template <class Object> devcb_base &set_reset_callback(Object &&cb) { return m_console_reset.set_callback(std::forward<Object>(cb)); }
 
 	void    cartridge_inserted();
 	bool    is_grom_idle();
@@ -97,19 +97,19 @@ SLOT_INTERFACE_EXTERN(gromport8);
 
 #define MCFG_GROMPORT4_ADD( _tag )   \
 	MCFG_DEVICE_ADD(_tag, TI99_GROMPORT, 0) \
-	bus::ti99::gromport::gromport_device::set_mask(*device, 0x1fff); \
+	downcast<bus::ti99::gromport::gromport_device &>(*device).set_mask(0x1fff); \
 	MCFG_DEVICE_SLOT_INTERFACE(gromport4, "single", false)
 
 #define MCFG_GROMPORT8_ADD( _tag )   \
 	MCFG_DEVICE_ADD(_tag, TI99_GROMPORT, 0) \
-	bus::ti99::gromport::gromport_device::set_mask(*device, 0x3fff); \
+	downcast<bus::ti99::gromport::gromport_device &>(*device).set_mask(0x3fff); \
 	MCFG_DEVICE_SLOT_INTERFACE(gromport8, "single", false)
 
 #define MCFG_GROMPORT_READY_HANDLER( _ready ) \
-	devcb = &bus::ti99::gromport::gromport_device::static_set_ready_callback( *device, DEVCB_##_ready );
+	devcb = &downcast<bus::ti99::gromport::gromport_device &>(*device).set_ready_callback(DEVCB_##_ready);
 
 #define MCFG_GROMPORT_RESET_HANDLER( _reset ) \
-	devcb = &bus::ti99::gromport::gromport_device::static_set_reset_callback( *device, DEVCB_##_reset );
+	devcb = &downcast<bus::ti99::gromport::gromport_device &>(*device).set_reset_callback(DEVCB_##_reset);
 
 DECLARE_DEVICE_TYPE_NS(TI99_GROMPORT, bus::ti99::gromport, gromport_device)
 

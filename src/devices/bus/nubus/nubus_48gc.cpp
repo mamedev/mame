@@ -79,7 +79,7 @@ jmfb_device::jmfb_device(const machine_config &mconfig, device_type type, const 
 	m_is824(is824),
 	m_assembled_tag(util::string_format("%s:%s", tag, GC48_SCREEN_NAME))
 {
-	static_set_screen(*this, m_assembled_tag.c_str());
+	set_screen(m_assembled_tag.c_str());
 }
 
 nubus_48gc_device::nubus_48gc_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
@@ -100,8 +100,6 @@ void jmfb_device::device_start()
 {
 	uint32_t slotspace;
 
-	// set_nubus_device makes m_slot valid
-	set_nubus_device();
 	install_declaration_rom(this, GC48_ROM_REGION);
 
 	slotspace = get_slotspace();
@@ -111,7 +109,7 @@ void jmfb_device::device_start()
 	m_vram.resize(VRAM_SIZE);
 	install_bank(slotspace, slotspace+VRAM_SIZE-1, "bank_48gc", &m_vram[0]);
 
-	m_nubus->install_device(slotspace+0x200000, slotspace+0x2003ff, read32_delegate(FUNC(jmfb_device::mac_48gc_r), this), write32_delegate(FUNC(jmfb_device::mac_48gc_w), this));
+	nubus().install_device(slotspace+0x200000, slotspace+0x2003ff, read32_delegate(FUNC(jmfb_device::mac_48gc_r), this), write32_delegate(FUNC(jmfb_device::mac_48gc_w), this));
 
 	m_timer = timer_alloc(0, nullptr);
 	m_screen = nullptr;    // can we look this up now?

@@ -101,6 +101,9 @@ public:
 	void mediagx_io(address_map &map);
 	void mediagx_map(address_map &map);
 	void ramdac_map(address_map &map);
+
+	uint32_t cx5510_pci_r(int function, int reg, uint32_t mem_mask);
+	void cx5510_pci_w(int function, int reg, uint32_t data, uint32_t mem_mask);
 };
 
 // Display controller registers
@@ -453,25 +456,21 @@ WRITE32_MEMBER(pinball2k_state::parallel_port_w)
 {
 }
 
-static uint32_t cx5510_pci_r(device_t *busdevice, device_t *device, int function, int reg, uint32_t mem_mask)
+uint32_t pinball2k_state::cx5510_pci_r(int function, int reg, uint32_t mem_mask)
 {
-	pinball2k_state *state = busdevice->machine().driver_data<pinball2k_state>();
-
 	//osd_printf_debug("CX5510: PCI read %d, %02X, %08X\n", function, reg, mem_mask);
 	switch (reg)
 	{
 		case 0:     return 0x00001078;
 	}
 
-	return state->m_cx5510_regs[reg/4];
+	return m_cx5510_regs[reg/4];
 }
 
-static void cx5510_pci_w(device_t *busdevice, device_t *device, int function, int reg, uint32_t data, uint32_t mem_mask)
+void pinball2k_state::cx5510_pci_w(int function, int reg, uint32_t data, uint32_t mem_mask)
 {
-	pinball2k_state *state = busdevice->machine().driver_data<pinball2k_state>();
-
 	//osd_printf_debug("CX5510: PCI write %d, %02X, %08X, %08X\n", function, reg, data, mem_mask);
-	COMBINE_DATA(state->m_cx5510_regs + (reg/4));
+	COMBINE_DATA(&m_cx5510_regs[reg/4]);
 }
 
 /*****************************************************************************/
@@ -606,7 +605,7 @@ MACHINE_CONFIG_START(pinball2k_state::mediagx)
 	pcat_common(config);
 
 	MCFG_PCI_BUS_LEGACY_ADD("pcibus", 0)
-	MCFG_PCI_BUS_LEGACY_DEVICE(18, nullptr, cx5510_pci_r, cx5510_pci_w)
+	MCFG_PCI_BUS_LEGACY_DEVICE(18, DEVICE_SELF, pinball2k_state, cx5510_pci_r, cx5510_pci_w)
 
 	MCFG_IDE_CONTROLLER_ADD("ide", ata_devices, "hdd", nullptr, true)
 	MCFG_ATA_INTERFACE_IRQ_HANDLER(DEVWRITELINE("pic8259_2", pic8259_device, ir6_w))

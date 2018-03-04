@@ -180,7 +180,9 @@ public:
 	DECLARE_READ32_MEMBER(model2_serial_r);
 	DECLARE_WRITE32_MEMBER(model2o_serial_w);
 	DECLARE_WRITE32_MEMBER(model2_serial_w);
-
+	DECLARE_WRITE16_MEMBER(horizontal_sync_w);
+	DECLARE_WRITE16_MEMBER(vertical_sync_w);
+	
 	void raster_init(memory_region *texture_rom);
 	void geo_init(memory_region *polygon_rom);
 	DECLARE_READ32_MEMBER(render_mode_r);
@@ -276,7 +278,8 @@ private:
 
 	bool m_render_unk;
 	bool m_render_mode;
-	
+	int16 m_crtc_xoffset, m_crtc_yoffset;
+
 	uint32_t *geo_process_command( geo_state *geo, uint32_t opcode, uint32_t *input, bool *end_code );
 	// geo commands
 	uint32_t *geo_nop( geo_state *geo, uint32_t opcode, uint32_t *input );
@@ -315,6 +318,7 @@ private:
 
 	// inliners
 	inline void model2_3d_project( triangle *tri );
+	inline uint16_t float_to_zval( float floatval );
 
 };
 
@@ -489,12 +493,16 @@ public:
 		m_renderfuncs[5] = &model2_renderer::model2_3d_render_5;
 		m_renderfuncs[6] = &model2_renderer::model2_3d_render_6;
 		m_renderfuncs[7] = &model2_renderer::model2_3d_render_7;
+		m_xoffs = 90;
+		m_yoffs = -8;
 	}
 
 	bitmap_rgb32& destmap() { return m_destmap; }
 
 	void model2_3d_render(triangle *tri, const rectangle &cliprect);
-
+	void set_xoffset(int16 xoffs) { m_xoffs = xoffs; }
+	void set_yoffset(int16 yoffs) { m_yoffs = yoffs; }
+	
 	/* checker = 0, textured = 0, transparent = 0 */
 	#define MODEL2_FUNC 0
 	#define MODEL2_FUNC_NAME    model2_3d_render_0
@@ -556,6 +564,7 @@ public:
 private:
 	model2_state& m_state;
 	bitmap_rgb32 m_destmap;
+	int16_t m_xoffs,m_yoffs;
 };
 
 typedef model2_renderer::vertex_t poly_vertex;

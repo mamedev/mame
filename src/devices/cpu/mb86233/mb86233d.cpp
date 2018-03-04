@@ -91,8 +91,12 @@ std::string mb86233_disassembler::condition(unsigned int cond, bool invert)
 		case 0x00: util::stream_format(stream, "zrd"); return stream.str();
 		case 0x01: util::stream_format(stream, "ged"); return stream.str();
 		case 0x02: util::stream_format(stream, "led"); return stream.str();
+		case 0x0a: util::stream_format(stream, "gpio0"); return stream.str();
+		case 0x0b: util::stream_format(stream, "gpio1"); return stream.str();
+		case 0x0c: util::stream_format(stream, "gpio2"); return stream.str();
 		case 0x10: util::stream_format(stream, "zc0"); return stream.str();
 		case 0x11: util::stream_format(stream, "zc1"); return stream.str();
+		case 0x12: util::stream_format(stream, "gpio3"); return stream.str();
 		case 0x16: util::stream_format(stream, "alw"); return stream.str();
 	}
 
@@ -238,8 +242,12 @@ offs_t mb86233_disassembler::disassemble(std::ostream &stream, offs_t pc, const 
 			util::stream_format(stream, "%s : ", alu0_func(alu) );
 
 		switch(op) {
+		case 0:
+			util::stream_format(stream, "lab %s, %s (io)", memory(r1, false), memory(r2, true));
+			break;
+
 		case 3:
-			util::stream_format(stream, "lab %s (e), %s", memory(r1, false), memory(r2, true));
+			util::stream_format(stream, "lab %s, %s", memory(r1, false), memory(r2, true));
 			break;
 
 		case 4:
@@ -282,11 +290,11 @@ offs_t mb86233_disassembler::disassemble(std::ostream &stream, offs_t pc, const 
 			break;
 
 		case 3:
-			util::stream_format(stream, "mov %s (e), %s", memory(r1, false), memory(r2, true));
+			util::stream_format(stream, "mov %s, %s (e)", memory(r1, false), memory(r2, true));
 			break;
 
 		case 4:
-			util::stream_format(stream, "mov %s, %s (e)", memory(r1, false), memory(r2, true));
+			util::stream_format(stream, "mov %s (e), %s", memory(r1, false), memory(r2, true));
 			break;
 
 		case 5:
@@ -296,7 +304,7 @@ offs_t mb86233_disassembler::disassemble(std::ostream &stream, offs_t pc, const 
 		case 7: {
 			switch(r2 >> 6) {
 			case 0:
-				util::stream_format(stream, "mov %s, %s (e)", regs(r2 & 0x3f), memory(r1, true));
+				util::stream_format(stream, "mov %s, %s", regs(r2 & 0x3f), memory(r1, true));
 				break;
 
 			case 1:
@@ -304,11 +312,11 @@ offs_t mb86233_disassembler::disassemble(std::ostream &stream, offs_t pc, const 
 				break;
 
 			case 2:
-				util::stream_format(stream, "mov %s, %s", memory(r1, false), regs(r2 & 0x3f));
+				util::stream_format(stream, "mov %s (e), %s", memory(r1, false), regs(r2 & 0x3f));
 				break;
 
 			case 3:
-				util::stream_format(stream, "mov %s (e), %s", memory(r1, false), regs(r2 & 0x3f));
+				util::stream_format(stream, "mov %s, %s", memory(r1, false), regs(r2 & 0x3f));
 				break;
 
 			case 4:

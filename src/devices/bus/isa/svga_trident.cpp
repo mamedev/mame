@@ -35,9 +35,8 @@ MACHINE_CONFIG_START(isa16_svga_tgui9680_device::device_add_mconfig)
 	MCFG_SCREEN_RAW_PARAMS(XTAL(25'174'800),900,0,640,526,0,480)
 	MCFG_SCREEN_UPDATE_DEVICE("vga", trident_vga_device, screen_update)
 
-	MCFG_PALETTE_ADD("palette", 0x100)
-
 	MCFG_DEVICE_ADD("vga", TRIDENT_VGA, 0)
+	MCFG_VIDEO_SET_SCREEN("screen")
 MACHINE_CONFIG_END
 
 //-------------------------------------------------

@@ -38,6 +38,7 @@ public:
 	DECLARE_READ8_MEMBER(beta_enable_r);
 	DECLARE_READ8_MEMBER(beta_disable_r);
 	DECLARE_MACHINE_RESET(pentagon);
+	DECLARE_VIDEO_START(pentagon);
 	INTERRUPT_GEN_MEMBER(pentagon_interrupt);
 	TIMER_CALLBACK_MEMBER(irq_on);
 	TIMER_CALLBACK_MEMBER(irq_off);
@@ -233,6 +234,22 @@ MACHINE_RESET_MEMBER(pentagon_state,pentagon)
 	pentagon_update_memory();
 }
 
+VIDEO_START_MEMBER(pentagon_state,pentagon)
+{
+	m_frame_invert_count = 16;
+	m_frame_number = 0;
+	m_flash_invert = 0;
+
+	m_previous_border_x = 0;
+	m_previous_border_y = 0;
+	m_screen->register_screen_bitmap(m_border_bitmap);
+	m_previous_screen_x = 0;
+	m_previous_screen_y = 0;
+	m_screen->register_screen_bitmap(m_screen_bitmap);
+
+	m_screen_location = m_ram->pointer() + (5 << 14);
+}
+
 /* F4 Character Displayer */
 static const gfx_layout spectrum_charlayout =
 {
@@ -266,6 +283,7 @@ MACHINE_CONFIG_START(pentagon_state::pentagon)
 	MCFG_SCREEN_MODIFY("screen")
 	//MCFG_SCREEN_RAW_PARAMS(XTAL(14'000'000) / 2, 448, 0, 352,  320, 0, 304)
 	MCFG_SCREEN_RAW_PARAMS(XTAL(14'000'000) / 2, 448, 0, 352,  320, 0, 287)
+	MCFG_VIDEO_START_OVERRIDE(pentagon_state, pentagon )
 
 	MCFG_BETA_DISK_ADD(BETA_DISK_TAG)
 	MCFG_GFXDECODE_MODIFY("gfxdecode", pentagon)

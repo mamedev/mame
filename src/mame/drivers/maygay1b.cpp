@@ -221,13 +221,10 @@ WRITE8_MEMBER(maygay1b_state::m1_pia_porta_w)
 
 WRITE8_MEMBER(maygay1b_state::m1_pia_portb_w)
 {
-	int i;
-	for (i=0; i<8; i++)
+	for (int i = 0; i < 8; i++)
 	{
-		if ( data & (1 << i) )
-		{
-			output().set_indexed_value("triac", i, data & (1 << i));
-		}
+		if (BIT(data, i))
+			m_triacs[i] = 1;
 	}
 }
 
@@ -350,32 +347,35 @@ INPUT_PORTS_END
 
 void maygay1b_state::machine_start()
 {
+	m_lamps.resolve();
+	m_triacs.resolve();
 }
+
 WRITE8_MEMBER(maygay1b_state::reel12_w)
 {
-	m_reel0->update( data     & 0x0F);
-	m_reel1->update((data>>4) & 0x0F);
+	m_reels[0]->update( data     & 0x0F);
+	m_reels[1]->update((data>>4) & 0x0F);
 
-	awp_draw_reel(machine(),"reel1", *m_reel0);
-	awp_draw_reel(machine(),"reel2", *m_reel1);
+	awp_draw_reel(machine(),"reel1", *m_reels[0]);
+	awp_draw_reel(machine(),"reel2", *m_reels[1]);
 }
 
 WRITE8_MEMBER(maygay1b_state::reel34_w)
 {
-	m_reel2->update( data     & 0x0F);
-	m_reel3->update((data>>4) & 0x0F);
+	m_reels[2]->update( data     & 0x0F);
+	m_reels[3]->update((data>>4) & 0x0F);
 
-	awp_draw_reel(machine(),"reel3", *m_reel2);
-	awp_draw_reel(machine(),"reel4", *m_reel3);
+	awp_draw_reel(machine(),"reel3", *m_reels[2]);
+	awp_draw_reel(machine(),"reel4", *m_reels[3]);
 }
 
 WRITE8_MEMBER(maygay1b_state::reel56_w)
 {
-	m_reel4->update( data     & 0x0F);
-	m_reel5->update((data>>4) & 0x0F);
+	m_reels[4]->update( data     & 0x0F);
+	m_reels[5]->update((data>>4) & 0x0F);
 
-	awp_draw_reel(machine(),"reel5", *m_reel4);
-	awp_draw_reel(machine(),"reel6", *m_reel5);
+	awp_draw_reel(machine(),"reel5", *m_reels[4]);
+	awp_draw_reel(machine(),"reel6", *m_reels[5]);
 }
 
 READ8_MEMBER(maygay1b_state::m1_duart_r)
@@ -628,9 +628,7 @@ WRITE8_MEMBER( maygay1b_state::lamp_data_w )
 		// As a consequence, the lamp column data can change before the input strobe without
 		// causing the relevant lamps to black out.
 		for (int i = 0; i < 8; i++)
-		{
-			output().set_lamp_value((8*m_lamp_strobe)+i, ((data  & (1 << (i^4))) !=0));
-		}
+			m_lamps[((m_lamp_strobe << 3) & 0x78) | i] = BIT(data, i ^ 4);
 
 		m_old_lamp_strobe = m_lamp_strobe;
 	}
@@ -657,9 +655,7 @@ WRITE8_MEMBER( maygay1b_state::lamp_data_2_w )
 		// As a consequence, the lamp column data can change before the input strobe without
 		// causing the relevant lamps to black out.
 		for (int i = 0; i < 8; i++)
-		{
-			output().set_lamp_value((8*m_lamp_strobe2)+i+128, ((data  & (1 << (i^4))) !=0));
-		}
+			m_lamps[((m_lamp_strobe2 << 3) & 0x78) | i | 0x80] = BIT(data, i ^ 4);
 
 		m_old_lamp_strobe2 = m_lamp_strobe2;
 	}
@@ -825,17 +821,17 @@ MACHINE_CONFIG_START(maygay1b_state::maygay_m1)
 #endif
 
 	MCFG_STARPOINT_48STEP_ADD("reel0")
-	MCFG_STEPPER_OPTIC_CALLBACK(WRITELINE(maygay1b_state, reel0_optic_cb))
+	MCFG_STEPPER_OPTIC_CALLBACK(WRITELINE(maygay1b_state, reel_optic_cb<0>))
 	MCFG_STARPOINT_48STEP_ADD("reel1")
-	MCFG_STEPPER_OPTIC_CALLBACK(WRITELINE(maygay1b_state, reel1_optic_cb))
+	MCFG_STEPPER_OPTIC_CALLBACK(WRITELINE(maygay1b_state, reel_optic_cb<1>))
 	MCFG_STARPOINT_48STEP_ADD("reel2")
-	MCFG_STEPPER_OPTIC_CALLBACK(WRITELINE(maygay1b_state, reel2_optic_cb))
+	MCFG_STEPPER_OPTIC_CALLBACK(WRITELINE(maygay1b_state, reel_optic_cb<2>))
 	MCFG_STARPOINT_48STEP_ADD("reel3")
-	MCFG_STEPPER_OPTIC_CALLBACK(WRITELINE(maygay1b_state, reel3_optic_cb))
+	MCFG_STEPPER_OPTIC_CALLBACK(WRITELINE(maygay1b_state, reel_optic_cb<3>))
 	MCFG_STARPOINT_48STEP_ADD("reel4")
-	MCFG_STEPPER_OPTIC_CALLBACK(WRITELINE(maygay1b_state, reel4_optic_cb))
+	MCFG_STEPPER_OPTIC_CALLBACK(WRITELINE(maygay1b_state, reel_optic_cb<4>))
 	MCFG_STARPOINT_48STEP_ADD("reel5")
-	MCFG_STEPPER_OPTIC_CALLBACK(WRITELINE(maygay1b_state, reel5_optic_cb))
+	MCFG_STEPPER_OPTIC_CALLBACK(WRITELINE(maygay1b_state, reel_optic_cb<5>))
 
 	MCFG_DEVICE_ADD("meters", METERS, 0)
 	MCFG_METERS_NUMBER(8)

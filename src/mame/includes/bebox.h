@@ -127,12 +127,12 @@ public:
 	void bebox_slave_mem(address_map &map);
 protected:
 	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr) override;
+
+#ifdef UNUSED_LEGACY_CODE
+	uint32_t scsi53c810_pci_read(int function, int offset, uint32_t mem_mask);
+	void scsi53c810_pci_write(int function, int offset, uint32_t data, uint32_t mem_mask);
+#endif
 };
 
-
-/*----------- defined in machine/bebox.c -----------*/
-
-uint32_t scsi53c810_pci_read(device_t *busdevice, device_t *device, int function, int offset, uint32_t mem_mask);
-void scsi53c810_pci_write(device_t *busdevice, device_t *device, int function, int offset, uint32_t data, uint32_t mem_mask);
 
 #endif // MAME_INCLUDES_BEBOX_H

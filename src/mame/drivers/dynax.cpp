@@ -288,9 +288,9 @@ void dynax_state::hnoridur_palette_update(offs_t offset)
 {
 	int x = (m_palette_ram[256 * m_palbank + offset] << 8) + m_palette_ram[256 * m_palbank + offset + 16 * 256];
 	/* The bits are in reverse order! */
-	int r = bitswap<8>((x >>  0) & 0x1f, 7, 6, 5, 0, 1, 2, 3, 4);
-	int g = bitswap<8>((x >>  5) & 0x1f, 7, 6, 5, 0, 1, 2, 3, 4);
-	int b = bitswap<8>((x >> 10) & 0x1f, 7, 6, 5, 0, 1, 2, 3, 4);
+	int r = bitswap<5>((x >>  0) & 0x1f, 0, 1, 2, 3, 4);
+	int g = bitswap<5>((x >>  5) & 0x1f, 0, 1, 2, 3, 4);
+	int b = bitswap<5>((x >> 10) & 0x1f, 0, 1, 2, 3, 4);
 	m_palette->set_pen_color(256 * m_palbank + offset, pal5bit(r), pal5bit(g), pal5bit(b));
 }
 

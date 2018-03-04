@@ -121,19 +121,19 @@ enum
 	psxcpu_device::getcpu( *this, cputag )->subdevice<psxdma_device>("dma")->install_write_handler( channel, handler );
 
 #define MCFG_PSX_GPU_READ_HANDLER(_devcb) \
-	devcb = &psxcpu_device::set_gpu_read_handler(*device, DEVCB_##_devcb);
+	devcb = &downcast<psxcpu_device &>(*device).set_gpu_read_handler(DEVCB_##_devcb);
 #define MCFG_PSX_GPU_WRITE_HANDLER(_devcb) \
-	devcb = &psxcpu_device::set_gpu_write_handler(*device, DEVCB_##_devcb);
+	devcb = &downcast<psxcpu_device &>(*device).set_gpu_write_handler(DEVCB_##_devcb);
 
 #define MCFG_PSX_SPU_READ_HANDLER(_devcb) \
-	devcb = &psxcpu_device::set_spu_read_handler(*device, DEVCB_##_devcb);
+	devcb = &downcast<psxcpu_device &>(*device).set_spu_read_handler(DEVCB_##_devcb);
 #define MCFG_PSX_SPU_WRITE_HANDLER(_devcb) \
-	devcb = &psxcpu_device::set_spu_write_handler(*device, DEVCB_##_devcb);
+	devcb = &downcast<psxcpu_device &>(*device).set_spu_write_handler(DEVCB_##_devcb);
 
 #define MCFG_PSX_CD_READ_HANDLER(_devcb) \
-	devcb = &psxcpu_device::set_cd_read_handler(*device, DEVCB_##_devcb);
+	devcb = &downcast<psxcpu_device &>(*device).set_cd_read_handler(DEVCB_##_devcb);
 #define MCFG_PSX_CD_WRITE_HANDLER(_devcb) \
-	devcb = &psxcpu_device::set_cd_write_handler(*device, DEVCB_##_devcb);
+	devcb = &downcast<psxcpu_device &>(*device).set_cd_write_handler(DEVCB_##_devcb);
 #define MCFG_PSX_DISABLE_ROM_BERR \
 	downcast<psxcpu_device *>(device)->set_disable_rom_berr(true);
 
@@ -146,13 +146,13 @@ enum
 class psxcpu_device : public cpu_device, psxcpu_disassembler::config
 {
 public:
-	// static configuration helpers
-	template <class Object> static devcb_base &set_gpu_read_handler(device_t &device, Object &&cb) { return downcast<psxcpu_device &>(device).m_gpu_read_handler.set_callback(std::forward<Object>(cb)); }
-	template <class Object> static devcb_base &set_gpu_write_handler(device_t &device, Object &&cb) { return downcast<psxcpu_device &>(device).m_gpu_write_handler.set_callback(std::forward<Object>(cb)); }
-	template <class Object> static devcb_base &set_spu_read_handler(device_t &device, Object &&cb) { return downcast<psxcpu_device &>(device).m_spu_read_handler.set_callback(std::forward<Object>(cb)); }
-	template <class Object> static devcb_base &set_spu_write_handler(device_t &device, Object &&cb) { return downcast<psxcpu_device &>(device).m_spu_write_handler.set_callback(std::forward<Object>(cb)); }
-	template <class Object> static devcb_base &set_cd_read_handler(device_t &device, Object &&cb) { return downcast<psxcpu_device &>(device).m_cd_read_handler.set_callback(std::forward<Object>(cb)); }
-	template <class Object> static devcb_base &set_cd_write_handler(device_t &device, Object &&cb) { return downcast<psxcpu_device &>(device).m_cd_write_handler.set_callback(std::forward<Object>(cb)); }
+	// configuration helpers
+	template <class Object> devcb_base &set_gpu_read_handler(Object &&cb) { return m_gpu_read_handler.set_callback(std::forward<Object>(cb)); }
+	template <class Object> devcb_base &set_gpu_write_handler(Object &&cb) { return m_gpu_write_handler.set_callback(std::forward<Object>(cb)); }
+	template <class Object> devcb_base &set_spu_read_handler(Object &&cb) { return m_spu_read_handler.set_callback(std::forward<Object>(cb)); }
+	template <class Object> devcb_base &set_spu_write_handler(Object &&cb) { return m_spu_write_handler.set_callback(std::forward<Object>(cb)); }
+	template <class Object> devcb_base &set_cd_read_handler(Object &&cb) { return m_cd_read_handler.set_callback(std::forward<Object>(cb)); }
+	template <class Object> devcb_base &set_cd_write_handler(Object &&cb) { return m_cd_write_handler.set_callback(std::forward<Object>(cb)); }
 
 	// public interfaces
 	DECLARE_WRITE32_MEMBER( berr_w );
@@ -187,7 +187,7 @@ public:
 	DECLARE_WRITE32_MEMBER( com_delay_w );
 	DECLARE_READ32_MEMBER( com_delay_r );
 
-	static psxcpu_device *getcpu( device_t &device, const char *cputag );
+	static psxcpu_device *getcpu( device_t &device, const char *cputag ) { return downcast<psxcpu_device *>( device.subdevice( cputag ) ); }
 	void set_disable_rom_berr(bool mode);
 
 	void psxcpu_internal_map(address_map &map);

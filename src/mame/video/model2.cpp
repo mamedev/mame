@@ -157,7 +157,7 @@ static inline void vector_cross3( poly_vertex *dst, poly_vertex *v0, poly_vertex
 }
 
 /* 1.8.23 float to 4.12 float converter, courtesy of Aaron Giles */
-static uint16_t float_to_zval( float floatval )
+inline uint16_t model2_state::float_to_zval( float floatval )
 {
 	int32_t fpint = f2u(floatval);
 	int32_t exponent = ((fpint >> 23) & 0xff) - 127;
@@ -249,7 +249,7 @@ static int32_t clip_polygon(poly_vertex *v, int32_t num_vertices, plane *cp, pol
 
 struct raster_state
 {
-	uint32_t              mode;               /* bit 0 = Test Mode, bit 2 = Switch 60Hz(1)/30Hz(0) operation */
+//	uint32_t              mode;               /* bit 0 = Test Mode, bit 2 = Switch 60Hz(1)/30Hz(0) operation */
 	uint16_t *            texture_rom;        /* Texture ROM pointer */
 	uint32_t              texture_rom_mask;   /* Texture ROM mask */
 	int16_t               viewport[4];        /* View port (startx,starty,endx,endy) */
@@ -284,6 +284,23 @@ void model2_state::raster_init( memory_region *texture_rom )
 
 	m_raster->texture_rom = (uint16_t *)texture_rom->base();
 	m_raster->texture_rom_mask = (texture_rom->bytes() / 2) - 1;
+
+	save_item(NAME(m_raster->min_z));
+	save_item(NAME(m_raster->max_z));
+//	save_item(NAME(m_raster->tri_list));
+	save_item(NAME(m_raster->tri_list_index));
+	save_item(NAME(m_raster->command_buffer));
+	save_item(NAME(m_raster->command_index));
+	save_item(NAME(m_raster->cur_command));
+	save_item(NAME(m_raster->master_z_clip));
+	save_item(NAME(m_raster->triangle_z));
+	save_item(NAME(m_raster->z_adjust));
+	save_item(NAME(m_raster->reverse));
+	save_item(NAME(m_raster->viewport));
+	save_item(NAME(m_raster->center));
+	save_item(NAME(m_raster->center_sel));
+	save_item(NAME(m_raster->texture_ram));	
+	save_item(NAME(m_raster->log_ram));
 }
 
 /*******************************************
@@ -310,7 +327,7 @@ READ32_MEMBER(model2_state::polygon_count_r)
  *  Hardware 3D Rasterizer Processing
  *
  *******************************************/
-
+ 
 void model2_state::model2_3d_process_quad( raster_state *raster, uint32_t attr )
 {
 	quad_m2     object;
@@ -421,20 +438,24 @@ void model2_state::model2_3d_process_quad( raster_state *raster, uint32_t attr )
 	/* set the object's z value */
 	zvalue = raster->triangle_z;
 
-	/* see if we need to recompute min/max z */
-	if ( (attr >> 10) & 3 )
+	/* set the object's z value */
+	switch((attr >> 10) & 3)
 	{
-		if ( (attr >> 10) & 1 ) /* min value */
-		{
+		case 0: // old value
+			zvalue = raster->triangle_z;
+			break;
+		case 1: // min z
 			zvalue = min_z;
-		}
-		else if ( (attr >> 10) & 2 ) /* max value */
-		{
+			break;
+		case 2: // max z
 			zvalue = max_z;
-		}
-
-		raster->triangle_z = zvalue;
+			break;
+		case 3: // error
+			zvalue = 0.0f;
+			break;
 	}
+
+	raster->triangle_z = zvalue;
 
 	if ( cull == 0 )
 	{
@@ -655,23 +676,24 @@ void model2_state::model2_3d_process_triangle( raster_state *raster, uint32_t at
 		cull = 1;
 
 	/* set the object's z value */
-	zvalue = raster->triangle_z;
-
-	/* see if we need to recompute min/max z */
-	if ( (attr >> 10) & 3 )
+	switch((attr >> 10) & 3)
 	{
-		if ( (attr >> 10) & 1 ) /* min value */
-		{
+		case 0: // old value
+			zvalue = raster->triangle_z;
+			break;
+		case 1: // min z
 			zvalue = min_z;
-		}
-		else if ( (attr >> 10) & 2 ) /* max value */
-		{
+			break;
+		case 2: // max z
 			zvalue = max_z;
-		}
-
-		raster->triangle_z = zvalue;
+			break;
+		case 3: // error
+			zvalue = 0.0f;
+			break;
 	}
 
+	raster->triangle_z = zvalue;
+	
 	/* if we're not culling, do z-clip and add to out triangle list */
 	if ( cull == 0 )
 	{
@@ -802,7 +824,7 @@ void model2_renderer::model2_3d_render(triangle *tri, const rectangle &cliprect)
 	renderer = (tri->texheader[0] >> 13) & 7;
 
 	/* calculate and clip to viewport */
-	rectangle vp(tri->viewport[0] - 8, tri->viewport[2] - 8, (384-tri->viewport[3])+90, (384-tri->viewport[1])+90);
+	rectangle vp(tri->viewport[0] + m_xoffs, tri->viewport[2] + m_xoffs, (384-tri->viewport[3]) + m_yoffs, (384-tri->viewport[1]) + m_yoffs);
 	// TODO: this seems to be more accurate but it breaks in some cases
 	//rectangle vp(tri->viewport[0] - 8, tri->viewport[2] - tri->viewport[0], tri->viewport[1] - 90, tri->viewport[3] - tri->viewport[1]);
 	vp &= cliprect;
@@ -882,6 +904,20 @@ void model2_renderer::model2_3d_render(triangle *tri, const rectangle &cliprect)
     (8,90)                          (504,90)
 */
 
+WRITE16_MEMBER(model2_state::horizontal_sync_w)
+{
+	m_crtc_xoffset = 84 + (int16_t)data;
+//	printf("H %04x %d %d\n",data,(int16_t)data,m_crtc_xoffset);	
+	m_poly->set_xoffset(m_crtc_xoffset);
+}
+
+WRITE16_MEMBER(model2_state::vertical_sync_w)
+{
+	m_crtc_yoffset = 130 + (int16_t)data;
+//	printf("V %04x %d %d\n",data,(int16_t)data,m_crtc_yoffset);
+	m_poly->set_yoffset(m_crtc_yoffset);
+}
+
 /* 3D Rasterizer projection: projects a triangle into screen coordinates */
 inline void model2_state::model2_3d_project( triangle *tri )
 {
@@ -890,8 +926,8 @@ inline void model2_state::model2_3d_project( triangle *tri )
 	for( i = 0; i < 3; i++ )
 	{
 		/* project the vertices */
-		tri->v[i].x = -8 + tri->center[0] + (tri->v[i].x / (1.0f+tri->v[i].pz));
-		tri->v[i].y = ((384 - tri->center[1])+90) - (tri->v[i].y / (1.0f+tri->v[i].pz));
+		tri->v[i].x = m_crtc_xoffset + tri->center[0] + (tri->v[i].x / (1.0f+tri->v[i].pz));
+		tri->v[i].y = ((384 - tri->center[1])+m_crtc_yoffset) - (tri->v[i].y / (1.0f+tri->v[i].pz));
 	}
 }
 
@@ -1129,7 +1165,7 @@ void model2_state::model2_3d_push( raster_state *raster, uint32_t input )
 			raster->center_sel = ( input >> 6 ) & 3;
 
 			/* reset the triangle z value */
-			raster->triangle_z = 0;
+			raster->triangle_z = 0.0f;
 		}
 	}
 }
@@ -1176,6 +1212,13 @@ void model2_state::geo_init(memory_region *polygon_rom)
 	m_geo->raster = m_raster;
 	m_geo->polygon_rom = (uint32_t *)polygon_rom->base();
 	m_geo->polygon_rom_mask = (polygon_rom->bytes() / 4) - 1;
+	
+	save_item(NAME(m_geo->mode));
+	save_item(NAME(m_geo->matrix));
+	save_item(NAME(m_geo->lod));
+	save_item(NAME(m_geo->coef_table));
+	save_item(NAME(m_geo->polygon_ram0));
+	save_item(NAME(m_geo->polygon_ram1));
 }
 
 /*******************************************
@@ -2546,6 +2589,11 @@ void model2_state::geo_parse( void )
 		/* if it's a jump opcode, do the jump */
 		if ( opcode & 0x80000000 )
 		{
+			// TODO: daytona with master network enabled hardlocks by trying a jump with 0xffff0080 as opcode
+			//       bad timings for geo_parse?
+			if(opcode & 0x078000000 )
+				return;
+			
 			/* get the address */
 			address = (opcode & 0x1FFFF) / 4;
 

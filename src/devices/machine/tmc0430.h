@@ -33,7 +33,7 @@ class tmc0430_device : public device_t
 public:
 	tmc0430_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
-	template <class Object> static devcb_base &set_ready_wr_callback(device_t &device, Object &&cb) { return downcast<tmc0430_device &>(device).m_gromready.set_callback(std::forward<Object>(cb)); }
+	template <class Object> devcb_base &set_ready_wr_callback(Object &&cb) { return m_gromready.set_callback(std::forward<Object>(cb)); }
 
 	DECLARE_READ8Z_MEMBER(readz);
 	DECLARE_WRITE8_MEMBER(write);
@@ -46,11 +46,11 @@ public:
 
 	DECLARE_WRITE8_MEMBER( set_lines );
 
-	static void set_region_and_ident(device_t &device, const char *regionname, int offset, int ident)
+	void set_region_and_ident(const char *regionname, int offset, int ident)
 	{
-		downcast<tmc0430_device &>(device).m_regionname = regionname;
-		downcast<tmc0430_device &>(device).m_offset = offset;
-		downcast<tmc0430_device &>(device).m_ident = ident<<13;
+		m_regionname = regionname;
+		m_offset = offset;
+		m_ident = ident<<13;
 	}
 
 	int debug_get_address();
@@ -110,7 +110,7 @@ private:
 
 #define MCFG_GROM_ADD(_tag, _ident, _region, _offset, _ready)    \
 		MCFG_DEVICE_ADD(_tag, TMC0430, 0)  \
-		tmc0430_device::set_region_and_ident(*device, _region, _offset, _ident); \
-		tmc0430_device::set_ready_wr_callback(*device, DEVCB_##_ready);
+		downcast<tmc0430_device &>(*device).set_region_and_ident(_region, _offset, _ident); \
+		downcast<tmc0430_device &>(*device).set_ready_wr_callback(DEVCB_##_ready);
 
 #endif // MAME_MACHINE_TMC0430_H

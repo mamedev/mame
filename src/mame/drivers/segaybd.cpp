@@ -60,6 +60,7 @@ MB89372 - Uses 3 serial data transfer protocols: ASYNC, COP & BOP. Has a built
 #include "includes/segaybd.h"
 #include "includes/segaipt.h"
 
+#include "machine/gen_latch.h"
 #include "machine/mb8421.h"
 #include "machine/msm6253.h"
 #include "machine/nvram.h"
@@ -146,34 +147,6 @@ WRITE8_MEMBER(segaybd_state::output2_w)
 	// D7 = /MUTE
 	// D6-D0 = FLT31-25
 	machine().sound().system_enable(data & 0x80);
-}
-
-
-//-------------------------------------------------
-//  sound_data_w - handle writes to sound control
-//  port
-//-------------------------------------------------
-
-WRITE16_MEMBER(segaybd_state::sound_data_w)
-{
-	if (ACCESSING_BITS_0_7)
-		synchronize(TID_SOUND_WRITE, data & 0xff);
-}
-
-
-
-//**************************************************************************
-//  SOUND Z80 CPU READ/WRITE CALLBACKS
-//**************************************************************************
-
-//-------------------------------------------------
-//  sound_data_r - read latched sound data
-//-------------------------------------------------
-
-READ8_MEMBER(segaybd_state::sound_data_r)
-{
-	m_soundcpu->set_input_line(INPUT_LINE_NMI, CLEAR_LINE);
-	return m_soundlatch->read(space, 0);
 }
 
 
@@ -287,12 +260,6 @@ void segaybd_state::device_timer(emu_timer &timer, device_timer_id id, int param
 			#endif
 			}
 			break;
-
-		case TID_SOUND_WRITE:
-			m_soundlatch->write(m_soundcpu->space(AS_PROGRAM), 0, param);
-			m_soundcpu->set_input_line(INPUT_LINE_NMI, ASSERT_LINE);
-			break;
-
 	}
 }
 
@@ -621,7 +588,7 @@ ADDRESS_MAP_START(segaybd_state::main_map)
 	ADDRESS_MAP_GLOBAL_MASK(0x1fffff)
 	AM_RANGE(0x000000, 0x07ffff) AM_ROM
 	AM_RANGE(0x080000, 0x080007) AM_MIRROR(0x001ff8) AM_DEVREADWRITE("multiplier_main", sega_315_5248_multiplier_device, read, write)
-	AM_RANGE(0x082000, 0x083fff) AM_WRITE(sound_data_w)
+	AM_RANGE(0x082000, 0x082001) AM_MIRROR(0x001ffe) AM_DEVWRITE8("soundlatch", generic_latch_8_device, write, 0x00ff)
 	AM_RANGE(0x084000, 0x08401f) AM_MIRROR(0x001fe0) AM_DEVREADWRITE("divider_main", sega_315_5249_divider_device, read, write)
 //  AM_RANGE(0x086000, 0x087fff) /DEA0
 	AM_RANGE(0x0c0000, 0x0cffff) AM_RAM AM_SHARE("shareram")
@@ -677,7 +644,7 @@ ADDRESS_MAP_START(segaybd_state::sound_portmap)
 	ADDRESS_MAP_UNMAP_HIGH
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	AM_RANGE(0x00, 0x01) AM_MIRROR(0x3e) AM_DEVREADWRITE("ymsnd", ym2151_device, read, write)
-	AM_RANGE(0x40, 0x40) AM_MIRROR(0x3f) AM_READ(sound_data_r)
+	AM_RANGE(0x40, 0x40) AM_MIRROR(0x3f) AM_DEVREAD("soundlatch", generic_latch_8_device, read)
 ADDRESS_MAP_END
 
 
@@ -1368,6 +1335,7 @@ MACHINE_CONFIG_START(segaybd_state::yboard)
 	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
 
 	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
+	MCFG_GENERIC_LATCH_DATA_PENDING_CB(INPUTLINE("soundcpu", INPUT_LINE_NMI))
 
 	MCFG_YM2151_ADD("ymsnd", SOUND_CLOCK/8)
 	MCFG_YM2151_IRQ_HANDLER(INPUTLINE("soundcpu", 0))

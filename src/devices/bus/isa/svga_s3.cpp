@@ -45,9 +45,8 @@ MACHINE_CONFIG_START(isa16_svga_s3_device::device_add_mconfig)
 	MCFG_SCREEN_RAW_PARAMS(XTAL(25'174'800),900,0,640,526,0,480)
 	MCFG_SCREEN_UPDATE_DEVICE("vga", s3_vga_device, screen_update)
 
-	MCFG_PALETTE_ADD("palette", 0x100)
-
 	MCFG_DEVICE_ADD("vga", S3_VGA, 0)
+	MCFG_VIDEO_SET_SCREEN("screen")
 MACHINE_CONFIG_END
 
 //-------------------------------------------------
@@ -152,9 +151,8 @@ MACHINE_CONFIG_START(isa16_s3virge_device::device_add_mconfig)
 	MCFG_SCREEN_RAW_PARAMS(XTAL(25'174'800),900,0,640,526,0,480)
 	MCFG_SCREEN_UPDATE_DEVICE("vga", s3virge_vga_device, screen_update)
 
-	MCFG_PALETTE_ADD("palette", 0x100)
-
 	MCFG_DEVICE_ADD("vga", S3VIRGE, 0)
+	MCFG_VIDEO_SET_SCREEN("screen")
 MACHINE_CONFIG_END
 
 //-------------------------------------------------
@@ -234,9 +232,8 @@ MACHINE_CONFIG_START(isa16_s3virgedx_device::device_add_mconfig)
 	MCFG_SCREEN_RAW_PARAMS(XTAL(25'174'800),900,0,640,526,0,480)
 	MCFG_SCREEN_UPDATE_DEVICE("vga", s3virgedx_vga_device, screen_update)
 
-	MCFG_PALETTE_ADD("palette", 0x100)
-
 	MCFG_DEVICE_ADD("vga", S3VIRGEDX, 0)
+	MCFG_VIDEO_SET_SCREEN("screen")
 MACHINE_CONFIG_END
 
 //-------------------------------------------------
@@ -317,9 +314,8 @@ MACHINE_CONFIG_START(isa16_stealth3d2kpro_device::device_add_mconfig)
 	MCFG_SCREEN_RAW_PARAMS(XTAL(25'174'800),900,0,640,526,0,480)
 	MCFG_SCREEN_UPDATE_DEVICE("vga", s3virgedx_rev1_vga_device, screen_update)
 
-	MCFG_PALETTE_ADD("palette", 0x100)
-
 	MCFG_DEVICE_ADD("vga", S3VIRGEDX1, 0)
+	MCFG_VIDEO_SET_SCREEN("screen")
 MACHINE_CONFIG_END
 
 //-------------------------------------------------

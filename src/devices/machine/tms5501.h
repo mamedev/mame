@@ -42,16 +42,16 @@
 //**************************************************************************
 
 #define MCFG_TMS5501_IRQ_CALLBACK(_write) \
-	devcb = &tms5501_device::set_irq_wr_callback(*device, DEVCB_##_write);
+	devcb = &downcast<tms5501_device &>(*device).set_irq_wr_callback(DEVCB_##_write);
 
 #define MCFG_TMS5501_XMT_CALLBACK(_write) \
-	devcb = &tms5501_device::set_xmt_wr_callback(*device, DEVCB_##_write);
+	devcb = &downcast<tms5501_device &>(*device).set_xmt_wr_callback(DEVCB_##_write);
 
 #define MCFG_TMS5501_XI_CALLBACK(_read) \
-	devcb = &tms5501_device::set_xi_rd_callback(*device, DEVCB_##_read);
+	devcb = &downcast<tms5501_device &>(*device).set_xi_rd_callback(DEVCB_##_read);
 
 #define MCFG_TMS5501_XO_CALLBACK(_write) \
-	devcb = &tms5501_device::set_xo_wr_callback(*device, DEVCB_##_write);
+	devcb = &downcast<tms5501_device &>(*device).set_xo_wr_callback(DEVCB_##_write);
 
 
 
@@ -68,10 +68,10 @@ public:
 	// construction/destruction
 	tms5501_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
-	template <class Object> static devcb_base &set_irq_wr_callback(device_t &device, Object &&cb) { return downcast<tms5501_device &>(device).m_write_irq.set_callback(std::forward<Object>(cb)); }
-	template <class Object> static devcb_base &set_xmt_wr_callback(device_t &device, Object &&cb) { return downcast<tms5501_device &>(device).m_write_xmt.set_callback(std::forward<Object>(cb)); }
-	template <class Object> static devcb_base &set_xi_rd_callback(device_t &device, Object &&cb) { return downcast<tms5501_device &>(device).m_read_xi.set_callback(std::forward<Object>(cb)); }
-	template <class Object> static devcb_base &set_xo_wr_callback(device_t &device, Object &&cb) { return downcast<tms5501_device &>(device).m_write_xo.set_callback(std::forward<Object>(cb)); }
+	template <class Object> devcb_base &set_irq_wr_callback(Object &&cb) { return m_write_irq.set_callback(std::forward<Object>(cb)); }
+	template <class Object> devcb_base &set_xmt_wr_callback(Object &&cb) { return m_write_xmt.set_callback(std::forward<Object>(cb)); }
+	template <class Object> devcb_base &set_xi_rd_callback(Object &&cb) { return m_read_xi.set_callback(std::forward<Object>(cb)); }
+	template <class Object> devcb_base &set_xo_wr_callback(Object &&cb) { return m_write_xo.set_callback(std::forward<Object>(cb)); }
 
 	DECLARE_WRITE_LINE_MEMBER( rcv_w );
 

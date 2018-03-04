@@ -670,8 +670,8 @@ MACHINE_CONFIG_START(nascom_state::nascom)
 	MCFG_DEVICE_ADD( "hd6402", AY31015, 0 )
 	MCFG_AY31015_TX_CLOCK(( XTAL(16'000'000) / 16 ) / 256)
 	MCFG_AY31015_RX_CLOCK(( XTAL(16'000'000) / 16 ) / 256)
-	MCFG_AY51013_READ_SI_CB(READLINE(nascom_state, nascom1_hd6402_si))
-	MCFG_AY51013_WRITE_SO_CB(WRITELINE(nascom_state, nascom1_hd6402_so))
+	MCFG_AY31015_READ_SI_CB(READLINE(nascom_state, nascom1_hd6402_si))
+	MCFG_AY31015_WRITE_SO_CB(WRITELINE(nascom_state, nascom1_hd6402_so))
 
 	// cassette is connected to the uart
 	MCFG_CASSETTE_ADD("cassette")

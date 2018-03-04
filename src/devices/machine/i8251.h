@@ -19,25 +19,25 @@
 //**************************************************************************
 
 #define MCFG_I8251_TXD_HANDLER(_devcb) \
-	devcb = &i8251_device::set_txd_handler(*device, DEVCB_##_devcb);
+	devcb = &downcast<i8251_device &>(*device).set_txd_handler(DEVCB_##_devcb);
 
 #define MCFG_I8251_DTR_HANDLER(_devcb) \
-	devcb = &i8251_device::set_dtr_handler(*device, DEVCB_##_devcb);
+	devcb = &downcast<i8251_device &>(*device).set_dtr_handler(DEVCB_##_devcb);
 
 #define MCFG_I8251_RTS_HANDLER(_devcb) \
-	devcb = &i8251_device::set_rts_handler(*device, DEVCB_##_devcb);
+	devcb = &downcast<i8251_device &>(*device).set_rts_handler(DEVCB_##_devcb);
 
 #define MCFG_I8251_RXRDY_HANDLER(_devcb) \
-	devcb = &i8251_device::set_rxrdy_handler(*device, DEVCB_##_devcb);
+	devcb = &downcast<i8251_device &>(*device).set_rxrdy_handler(DEVCB_##_devcb);
 
 #define MCFG_I8251_TXRDY_HANDLER(_devcb) \
-	devcb = &i8251_device::set_txrdy_handler(*device, DEVCB_##_devcb);
+	devcb = &downcast<i8251_device &>(*device).set_txrdy_handler(DEVCB_##_devcb);
 
 #define MCFG_I8251_TXEMPTY_HANDLER(_devcb) \
-	devcb = &i8251_device::set_txempty_handler(*device, DEVCB_##_devcb);
+	devcb = &downcast<i8251_device &>(*device).set_txempty_handler(DEVCB_##_devcb);
 
 #define MCFG_I8251_SYNDET_HANDLER(_devcb) \
-	devcb = &i8251_device::set_syndet_handler(*device, DEVCB_##_devcb);
+	devcb = &downcast<i8251_device &>(*device).set_syndet_handler(DEVCB_##_devcb);
 
 class i8251_device :  public device_t,
 	public device_serial_interface
@@ -46,14 +46,14 @@ public:
 	// construction/destruction
 	i8251_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
-	// static configuration helpers
-	template <class Object> static devcb_base &set_txd_handler(device_t &device, Object &&cb) { return downcast<i8251_device &>(device).m_txd_handler.set_callback(std::forward<Object>(cb)); }
-	template <class Object> static devcb_base &set_dtr_handler(device_t &device, Object &&cb) { return downcast<i8251_device &>(device).m_dtr_handler.set_callback(std::forward<Object>(cb)); }
-	template <class Object> static devcb_base &set_rts_handler(device_t &device, Object &&cb) { return downcast<i8251_device &>(device).m_rts_handler.set_callback(std::forward<Object>(cb)); }
-	template <class Object> static devcb_base &set_rxrdy_handler(device_t &device, Object &&cb) { return downcast<i8251_device &>(device).m_rxrdy_handler.set_callback(std::forward<Object>(cb)); }
-	template <class Object> static devcb_base &set_txrdy_handler(device_t &device, Object &&cb) { return downcast<i8251_device &>(device).m_txrdy_handler.set_callback(std::forward<Object>(cb)); }
-	template <class Object> static devcb_base &set_txempty_handler(device_t &device, Object &&cb) { return downcast<i8251_device &>(device).m_txempty_handler.set_callback(std::forward<Object>(cb)); }
-	template <class Object> static devcb_base &set_syndet_handler(device_t &device, Object &&cb) { return downcast<i8251_device &>(device).m_syndet_handler.set_callback(std::forward<Object>(cb)); }
+	// configuration helpers
+	template <class Object> devcb_base &set_txd_handler(Object &&cb) { return m_txd_handler.set_callback(std::forward<Object>(cb)); }
+	template <class Object> devcb_base &set_dtr_handler(Object &&cb) { return m_dtr_handler.set_callback(std::forward<Object>(cb)); }
+	template <class Object> devcb_base &set_rts_handler(Object &&cb) { return m_rts_handler.set_callback(std::forward<Object>(cb)); }
+	template <class Object> devcb_base &set_rxrdy_handler(Object &&cb) { return m_rxrdy_handler.set_callback(std::forward<Object>(cb)); }
+	template <class Object> devcb_base &set_txrdy_handler(Object &&cb) { return m_txrdy_handler.set_callback(std::forward<Object>(cb)); }
+	template <class Object> devcb_base &set_txempty_handler(Object &&cb) { return m_txempty_handler.set_callback(std::forward<Object>(cb)); }
+	template <class Object> devcb_base &set_syndet_handler(Object &&cb) { return m_syndet_handler.set_callback(std::forward<Object>(cb)); }
 
 	DECLARE_READ8_MEMBER(data_r);
 	DECLARE_WRITE8_MEMBER(data_w);

@@ -136,17 +136,24 @@
 class sigmab52_state : public driver_device
 {
 public:
-	sigmab52_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag),
+	sigmab52_state(const machine_config &mconfig, device_type type, const char *tag) :
+		driver_device(mconfig, type, tag),
 		m_maincpu(*this, "maincpu"),
 		m_audiocpu(*this, "audiocpu"),
 		m_6840ptm_2(*this, "6840ptm_2"),
 		m_palette(*this, "palette"),
 		m_bank1(*this, "bank1"),
 		m_prom(*this, "proms"),
-		m_in0(*this, "IN0")
+		m_in0(*this, "IN0"),
+		m_lamps(*this, "lamp%u", 0U),
+		m_towerlamps(*this, "towerlamp%u", 0U)
 	{ }
 
+	DECLARE_INPUT_CHANGED_MEMBER(coin_drop_start);
+	DECLARE_DRIVER_INIT(jwildb52);
+	void jwildb52(machine_config &config);
+
+protected:
 	DECLARE_READ8_MEMBER(unk_f700_r);
 	DECLARE_READ8_MEMBER(unk_f760_r);
 	DECLARE_READ8_MEMBER(in0_r);
@@ -159,28 +166,30 @@ public:
 	DECLARE_WRITE8_MEMBER(lamps2_w);
 	DECLARE_WRITE8_MEMBER(tower_lamps_w);
 	DECLARE_WRITE8_MEMBER(coin_enable_w);
-	DECLARE_DRIVER_INIT(jwildb52);
-	DECLARE_INPUT_CHANGED_MEMBER(coin_drop_start);
 	DECLARE_WRITE_LINE_MEMBER(ptm2_irq);
 	void audiocpu_irq_update();
+
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
 
-	required_device<cpu_device> m_maincpu;
-	required_device<cpu_device> m_audiocpu;
-	required_device<ptm6840_device> m_6840ptm_2;
-	required_device<palette_device> m_palette;
-	required_memory_bank m_bank1;
-	required_region_ptr<uint8_t> m_prom;
-	required_ioport m_in0;
-
-	uint64_t      m_coin_start_cycles;
-	uint64_t      m_hopper_start_cycles;
-	int         m_audiocpu_cmd_irq;
-	void jwildb52(machine_config &config);
 	void jwildb52_hd63484_map(address_map &map);
 	void jwildb52_map(address_map &map);
 	void sound_prog_map(address_map &map);
+
+private:
+	required_device<cpu_device>     m_maincpu;
+	required_device<cpu_device>     m_audiocpu;
+	required_device<ptm6840_device> m_6840ptm_2;
+	required_device<palette_device> m_palette;
+	required_memory_bank            m_bank1;
+	required_region_ptr<uint8_t>    m_prom;
+	required_ioport                 m_in0;
+	output_finder<10>               m_lamps;
+	output_finder<2>                m_towerlamps;
+
+	uint64_t    m_coin_start_cycles;
+	uint64_t    m_hopper_start_cycles;
+	int         m_audiocpu_cmd_irq;
 };
 
 
@@ -261,17 +270,17 @@ WRITE8_MEMBER(sigmab52_state::hopper_w)
 
 WRITE8_MEMBER(sigmab52_state::lamps1_w)
 {
-	output().set_lamp_value(offset, data & 1);
+	m_lamps[offset] = data & 1;
 }
 
 WRITE8_MEMBER(sigmab52_state::lamps2_w)
 {
-	output().set_lamp_value(6 + offset, data & 1);
+	m_lamps[6 + offset] = data & 1;
 }
 
 WRITE8_MEMBER(sigmab52_state::tower_lamps_w)
 {
-	output().set_indexed_value("towerlamp", offset, data & 1);
+	m_towerlamps[offset] = data & 1;
 }
 
 WRITE8_MEMBER(sigmab52_state::coin_enable_w)
@@ -562,6 +571,8 @@ INPUT_PORTS_END
 void sigmab52_state::machine_start()
 {
 	m_bank1->configure_entries(0, 2, memregion("maincpu")->base(), 0x4000);
+	m_lamps.resolve();
+	m_towerlamps.resolve();
 }
 
 void sigmab52_state::machine_reset()

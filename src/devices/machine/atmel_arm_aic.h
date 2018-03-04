@@ -12,7 +12,7 @@ DECLARE_DEVICE_TYPE(ARM_AIC, arm_aic_device)
 	MCFG_DEVICE_ADD(_tag, ARM_AIC, 0)
 
 #define MCFG_IRQ_LINE_CB(_devcb) \
-	devcb = &arm_aic_device::set_line_callback(*device, DEVCB_##_devcb);
+	devcb = &downcast<arm_aic_device &>(*device).set_line_callback(DEVCB_##_devcb);
 
 class arm_aic_device : public device_t
 {
@@ -25,7 +25,7 @@ public:
 	}
 
 	// configuration
-	template <class Object> static devcb_base &set_line_callback(device_t &device, Object &&cb) { return downcast<arm_aic_device &>(device).m_irq_out.set_callback(std::forward<Object>(cb)); }
+	template <class Object> devcb_base &set_line_callback(Object &&cb) { return m_irq_out.set_callback(std::forward<Object>(cb)); }
 
 	void regs_map(address_map &map);
 

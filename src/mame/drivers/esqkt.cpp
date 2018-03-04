@@ -96,6 +96,7 @@
 #include "cpu/m68000/m68000.h"
 #include "machine/mc68681.h"
 #include "sound/es5506.h"
+#include "sound/esqpump.h"
 
 #include "speaker.h"
 
@@ -107,6 +108,7 @@ public:
 		: driver_device(mconfig, type, tag)
 		, m_maincpu(*this, "maincpu")
 		, m_esp(*this, "esp")
+		, m_pump(*this, "pump")
 		, m_duart(*this, "duart")
 		, m_sq1panel(*this, "sq1panel")
 		, m_mdout(*this, "mdout")
@@ -114,10 +116,12 @@ public:
 
 	required_device<m68ec020_device> m_maincpu;
 	required_device<es5510_device> m_esp;
+	required_device<esq_5505_5510_pump_device> m_pump;
 	required_device<scn2681_device> m_duart;
 	required_device<esqpanel2x16_sq1_device> m_sq1panel;
 	required_device<midi_port_device> m_mdout;
-
+	
+	virtual void machine_start() override;
 	virtual void machine_reset() override;
 
 	DECLARE_WRITE_LINE_MEMBER(duart_irq_handler);
@@ -136,6 +140,12 @@ public:
 	void kt_map(address_map &map);
 };
 
+void esqkt_state::machine_start()
+{
+	// tell the pump about the ESP chips
+	m_pump->set_esp(m_esp);
+}
+
 void esqkt_state::machine_reset()
 {
 	m_bCalibSecondByte = false;
@@ -143,7 +153,7 @@ void esqkt_state::machine_reset()
 
 ADDRESS_MAP_START(esqkt_state::kt_map)
 	AM_RANGE(0x000000, 0x07ffff) AM_ROM AM_REGION("osrom", 0)
-	AM_RANGE(0x200000, 0x20003f) AM_DEVREADWRITE8("ensoniq", es5506_device, read, write, 0xffffffff)
+	AM_RANGE(0x200000, 0x20003f) AM_DEVREADWRITE8("ensoniq1", es5506_device, read, write, 0xffffffff)
 	AM_RANGE(0x240000, 0x24003f) AM_DEVREADWRITE8("ensoniq2", es5506_device, read, write, 0xffffffff)
 	AM_RANGE(0x280000, 0x2801ff) AM_DEVREADWRITE8("esp", es5510_device, host_r, host_w, 0xffffffff)
 	AM_RANGE(0x300000, 0x30001f) AM_DEVREADWRITE8("duart", scn2681_device, read, write, 0xffffffff)
@@ -227,24 +237,43 @@ MACHINE_CONFIG_START(esqkt_state::kt)
 	MCFG_MIDI_PORT_ADD("mdout", midiout_slot, "midiout")
 
 	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
-	MCFG_SOUND_ADD("ensoniq", ES5506, XTAL(16'000'000))
+
+	MCFG_SOUND_ADD("pump", ESQ_5505_5510_PUMP, XTAL(16'000'000) / (16 * 32))
+	MCFG_SOUND_ROUTE(0, "lspeaker", 1.0)
+	MCFG_SOUND_ROUTE(1, "rspeaker", 1.0)
+	
+	MCFG_SOUND_ADD("ensoniq1", ES5506, XTAL(16'000'000))
 	MCFG_ES5506_REGION0("waverom")  /* Bank 0 */
 	MCFG_ES5506_REGION1("waverom2") /* Bank 1 */
 	MCFG_ES5506_REGION2("waverom3") /* Bank 0 */
 	MCFG_ES5506_REGION3("waverom4") /* Bank 1 */
-	MCFG_ES5506_CHANNELS(1)          /* channels */
+	MCFG_ES5506_CHANNELS(4)          /* channels */
 	MCFG_ES5506_IRQ_CB(WRITELINE(esqkt_state, esq5506_otto_irq)) /* irq */
 	MCFG_ES5506_READ_PORT_CB(READ16(esqkt_state, esq5506_read_adc))
-	MCFG_SOUND_ROUTE(0, "lspeaker", 0.5)
-	MCFG_SOUND_ROUTE(1, "rspeaker", 0.5)
+	MCFG_SOUND_ROUTE_EX(0, "pump", 1.0, 0)
+	MCFG_SOUND_ROUTE_EX(1, "pump", 1.0, 1)
+	MCFG_SOUND_ROUTE_EX(2, "pump", 1.0, 2)
+	MCFG_SOUND_ROUTE_EX(3, "pump", 1.0, 3)
+	MCFG_SOUND_ROUTE_EX(4, "pump", 1.0, 4)
+	MCFG_SOUND_ROUTE_EX(5, "pump", 1.0, 5)
+	MCFG_SOUND_ROUTE_EX(6, "pump", 1.0, 6)
+	MCFG_SOUND_ROUTE_EX(7, "pump", 1.0, 7)
+
 	MCFG_SOUND_ADD("ensoniq2", ES5506, XTAL(16'000'000))
 	MCFG_ES5506_REGION0("waverom")  /* Bank 0 */
 	MCFG_ES5506_REGION1("waverom2") /* Bank 1 */
 	MCFG_ES5506_REGION2("waverom3") /* Bank 0 */
 	MCFG_ES5506_REGION3("waverom4") /* Bank 1 */
-	MCFG_ES5506_CHANNELS(1)          /* channels */
-	MCFG_SOUND_ROUTE(0, "lspeaker", 0.5)
-	MCFG_SOUND_ROUTE(1, "rspeaker", 0.5)
+	MCFG_ES5506_CHANNELS(4)          /* channels */
+	MCFG_SOUND_ROUTE_EX(0, "pump", 1.0, 0)
+	MCFG_SOUND_ROUTE_EX(1, "pump", 1.0, 1)
+	MCFG_SOUND_ROUTE_EX(2, "pump", 1.0, 2)
+	MCFG_SOUND_ROUTE_EX(3, "pump", 1.0, 3)
+	MCFG_SOUND_ROUTE_EX(4, "pump", 1.0, 4)
+	MCFG_SOUND_ROUTE_EX(5, "pump", 1.0, 5)
+	MCFG_SOUND_ROUTE_EX(6, "pump", 1.0, 6)
+	MCFG_SOUND_ROUTE_EX(7, "pump", 1.0, 7)
+
 MACHINE_CONFIG_END
 
 static INPUT_PORTS_START( kt )

@@ -799,13 +799,13 @@ MACHINE_CONFIG_START(sat_console_state::saturn)
 	MCFG_CPU_PROGRAM_MAP(sound_mem)
 
 	MCFG_SEGA_SCU_ADD("scu")
-	sega_scu_device::static_set_hostcpu(*device, "maincpu");
+	downcast<sega_scu_device &>(*device).set_hostcpu("maincpu");
 
 //  SH-1
 
 //  SMPC MCU, running at 4 MHz (+ custom RTC device that runs at 32.768 KHz)
 	MCFG_SMPC_HLE_ADD("smpc", XTAL(4'000'000))
-	smpc_hle_device::static_set_control_port_tags(*device, "ctrl1", "ctrl2");
+	downcast<smpc_hle_device &>(*device).set_control_port_tags("ctrl1", "ctrl2");
 	MCFG_SMPC_HLE_PDR1_IN_CB(READ8(sat_console_state, saturn_pdr1_direct_r))
 	MCFG_SMPC_HLE_PDR2_IN_CB(READ8(sat_console_state, saturn_pdr2_direct_r))
 	MCFG_SMPC_HLE_PDR1_OUT_CB(WRITE8(sat_console_state, saturn_pdr1_direct_w))
@@ -873,7 +873,7 @@ MACHINE_CONFIG_START(sat_console_state::saturnus)
 	MCFG_SOFTWARE_LIST_ADD("cart_list","sat_cart")
 
 	MCFG_DEVICE_MODIFY("smpc")
-	smpc_hle_device::static_set_region_code(*device, 4);
+	downcast<smpc_hle_device &>(*device).set_region_code(4);
 
 MACHINE_CONFIG_END
 
@@ -888,7 +888,7 @@ MACHINE_CONFIG_START(sat_console_state::saturneu)
 	MCFG_SOFTWARE_LIST_ADD("cart_list","sat_cart")
 
 	MCFG_DEVICE_MODIFY("smpc")
-	smpc_hle_device::static_set_region_code(*device, 12);
+	downcast<smpc_hle_device &>(*device).set_region_code(12);
 MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(sat_console_state::saturnjp)
@@ -902,7 +902,7 @@ MACHINE_CONFIG_START(sat_console_state::saturnjp)
 	MCFG_SOFTWARE_LIST_ADD("cart_list","sat_cart")
 
 	MCFG_DEVICE_MODIFY("smpc")
-	smpc_hle_device::static_set_region_code(*device, 1);
+	downcast<smpc_hle_device &>(*device).set_region_code(1);
 MACHINE_CONFIG_END
 
 

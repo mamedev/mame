@@ -16,29 +16,29 @@
 
 // read-only on 70x0
 #define MCFG_TMS7000_IN_PORTA_CB(_devcb) \
-	devcb = &tms7000_device::set_port_read_cb(*device, 0, DEVCB_##_devcb);
+	devcb = &downcast<tms7000_device &>(*device).set_port_read_cb(0, DEVCB_##_devcb);
 #define MCFG_TMS7000_OUT_PORTA_CB(_devcb) \
-	devcb = &tms7000_device::set_port_write_cb(*device, 0, DEVCB_##_devcb);
+	devcb = &downcast<tms7000_device &>(*device).set_port_write_cb(0, DEVCB_##_devcb);
 
 // write-only
 #define MCFG_TMS7000_OUT_PORTB_CB(_devcb) \
-	devcb = &tms7000_device::set_port_write_cb(*device, 1, DEVCB_##_devcb);
+	devcb = &downcast<tms7000_device &>(*device).set_port_write_cb(1, DEVCB_##_devcb);
 
 #define MCFG_TMS7000_IN_PORTC_CB(_devcb) \
-	devcb = &tms7000_device::set_port_read_cb(*device, 2, DEVCB_##_devcb);
+	devcb = &downcast<tms7000_device &>(*device).set_port_read_cb(2, DEVCB_##_devcb);
 #define MCFG_TMS7000_OUT_PORTC_CB(_devcb) \
-	devcb = &tms7000_device::set_port_write_cb(*device, 2, DEVCB_##_devcb);
+	devcb = &downcast<tms7000_device &>(*device).set_port_write_cb(2, DEVCB_##_devcb);
 
 #define MCFG_TMS7000_IN_PORTD_CB(_devcb) \
-	devcb = &tms7000_device::set_port_read_cb(*device, 3, DEVCB_##_devcb);
+	devcb = &downcast<tms7000_device &>(*device).set_port_read_cb(3, DEVCB_##_devcb);
 #define MCFG_TMS7000_OUT_PORTD_CB(_devcb) \
-	devcb = &tms7000_device::set_port_write_cb(*device, 3, DEVCB_##_devcb);
+	devcb = &downcast<tms7000_device &>(*device).set_port_write_cb(3, DEVCB_##_devcb);
 
 // TMS70C46 only
 #define MCFG_TMS7000_IN_PORTE_CB(_devcb) \
-	devcb = &tms7000_device::set_port_read_cb(*device, 4, DEVCB_##_devcb);
+	devcb = &downcast<tms7000_device &>(*device).set_port_read_cb(4, DEVCB_##_devcb);
 #define MCFG_TMS7000_OUT_PORTE_CB(_devcb) \
-	devcb = &tms7000_device::set_port_write_cb(*device, 4, DEVCB_##_devcb);
+	devcb = &downcast<tms7000_device &>(*device).set_port_write_cb(4, DEVCB_##_devcb);
 
 
 enum { TMS7000_PC=1, TMS7000_SP, TMS7000_ST };
@@ -57,11 +57,9 @@ public:
 	// construction/destruction
 	tms7000_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
-	// static configuration
-	template<class Object>
-	static devcb_base &set_port_read_cb(device_t &device, int p, Object &&object) { return downcast<tms7000_device &>(device).m_port_in_cb[p].set_callback(std::move(object)); }
-	template<class Object>
-	static devcb_base &set_port_write_cb(device_t &device, int p, Object &&object) { return downcast<tms7000_device &>(device).m_port_out_cb[p].set_callback(std::move(object)); }
+	//  configuration
+	template<class Object> devcb_base &set_port_read_cb(int p, Object &&cb) { return m_port_in_cb[p].set_callback(std::forward<Object>(cb)); }
+	template<class Object> devcb_base &set_port_write_cb(int p, Object &&cb) { return m_port_out_cb[p].set_callback(std::forward<Object>(cb)); }
 
 	DECLARE_READ8_MEMBER(tms7000_unmapped_rf_r) { if (!machine().side_effects_disabled()) logerror("'%s' (%04X): unmapped_rf_r @ $%04x\n", tag(), m_pc, offset + 0x80); return 0; };
 	DECLARE_WRITE8_MEMBER(tms7000_unmapped_rf_w) { logerror("'%s' (%04X): unmapped_rf_w @ $%04x = $%02x\n", tag(), m_pc, offset + 0x80, data); };

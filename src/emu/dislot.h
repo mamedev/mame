@@ -31,31 +31,31 @@
 //**************************************************************************
 
 #define MCFG_SLOT_FIXED(_fixed) \
-	device_slot_interface::static_set_fixed(*device, _fixed);
+	dynamic_cast<device_slot_interface &>(*device).set_fixed(_fixed);
 
 #define MCFG_SLOT_DEFAULT_OPTION(_option) \
-	device_slot_interface::static_set_default_option(*device, _option);
+	dynamic_cast<device_slot_interface &>(*device).set_default_option(_option);
 
 #define MCFG_SLOT_OPTION_RESET \
-	device_slot_interface::static_option_reset(*device);
+	dynamic_cast<device_slot_interface &>(*device).option_reset();
 
 #define MCFG_SLOT_OPTION_ADD(_option, _devtype) \
-	device_slot_interface::static_option_add(*device, _option, _devtype);
+	dynamic_cast<device_slot_interface &>(*device).option_add(_option, _devtype);
 
 #define MCFG_SLOT_OPTION_SELECTABLE(_option, _selectable) \
-	device_slot_interface::static_set_option_selectable(*device, _option, _selectable);
+	dynamic_cast<device_slot_interface &>(*device).set_option_selectable(_option, _selectable);
 
 #define MCFG_SLOT_OPTION_DEFAULT_BIOS(_option, _default_bios) \
-	device_slot_interface::static_set_option_default_bios(*device, _option, _default_bios);
+	dynamic_cast<device_slot_interface &>(*device).set_option_default_bios(_option, _default_bios);
 
 #define MCFG_SLOT_OPTION_MACHINE_CONFIG(_option, _machine_config_name) \
-	device_slot_interface::static_set_option_machine_config(*device, _option, _machine_config_name);
+	dynamic_cast<device_slot_interface &>(*device).set_option_machine_config(_option, _machine_config_name);
 
 #define MCFG_SLOT_OPTION_DEVICE_INPUT_DEFAULTS(_option, _dev_inp_def) \
-	device_slot_interface::static_set_option_device_input_defaults(*device, _option, DEVICE_INPUT_DEFAULTS_NAME(_dev_inp_def));
+	dynamic_cast<device_slot_interface &>(*device).set_option_device_input_defaults(_option, DEVICE_INPUT_DEFAULTS_NAME(_dev_inp_def));
 
 #define MCFG_SLOT_OPTION_CLOCK(_option, _clock) \
-	device_slot_interface::static_set_option_clock(*device, _option, _clock);
+	dynamic_cast<device_slot_interface &>(*device).set_option_clock(_option, _clock);
 
 
 //**************************************************************************
@@ -128,15 +128,15 @@ public:
 	device_slot_interface(const machine_config &mconfig, device_t &device);
 	virtual ~device_slot_interface();
 
-	static void static_set_fixed(device_t &device, bool fixed) { dynamic_cast<device_slot_interface &>(device).m_fixed = fixed; }
-	static void static_set_default_option(device_t &device, const char *option) { dynamic_cast<device_slot_interface &>(device).m_default_option = option; }
-	static void static_option_reset(device_t &device);
-	static void static_option_add(device_t &device, const char *option, const device_type &devtype);
-	static void static_set_option_selectable(device_t &device, const char *option, bool selectable){ static_option(device, option)->m_selectable = selectable; }
-	static void static_set_option_default_bios(device_t &device, const char *option, const char *default_bios) { static_option(device, option)->m_default_bios = default_bios; }
-	static void static_set_option_machine_config(device_t &device, const char *option, std::function<void (device_t *)> machine_config) { static_option(device, option)->m_machine_config = machine_config; }
-	static void static_set_option_device_input_defaults(device_t &device, const char *option, const input_device_default *default_input) { static_option(device, option)->m_input_device_defaults = default_input; }
-	static void static_set_option_clock(device_t &device, const char *option, u32 default_clock) { static_option(device, option)->m_clock = default_clock; }
+	void set_fixed(bool fixed) { m_fixed = fixed; }
+	void set_default_option(const char *option) { m_default_option = option; }
+	void option_reset() { m_options.clear(); }
+	void option_add(const char *option, const device_type &devtype);
+	void set_option_selectable(const char *option, bool selectable){ config_option(option)->m_selectable = selectable; }
+	void set_option_default_bios(const char *option, const char *default_bios) { config_option(option)->m_default_bios = default_bios; }
+	void set_option_machine_config(const char *option, std::function<void (device_t *)> machine_config) { config_option(option)->m_machine_config = machine_config; }
+	void set_option_device_input_defaults(const char *option, const input_device_default *default_input) { config_option(option)->m_input_device_defaults = default_input; }
+	void set_option_clock(const char *option, u32 default_clock) { config_option(option)->m_clock = default_clock; }
 	bool fixed() const { return m_fixed; }
 	bool has_selectable_options() const;
 	const char *default_option() const { return m_default_option; }
@@ -154,7 +154,7 @@ private:
 	bool m_fixed;
 	device_t *m_card_device;
 
-	static device_slot_option *static_option(device_t &device, const char *option);
+	device_slot_option *config_option(const char *option);
 };
 
 // iterator

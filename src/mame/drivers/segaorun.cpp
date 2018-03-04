@@ -472,28 +472,6 @@ void segaorun_state::memory_mapper(sega_315_5195_mapper_device &mapper, uint8_t 
 }
 
 
-//-------------------------------------------------
-//  mapper_sound_r - callback when the sound I/O
-//  port on the memory mapper is read
-//-------------------------------------------------
-
-READ8_MEMBER(segaorun_state::mapper_sound_r)
-{
-	return 0;
-}
-
-
-//-------------------------------------------------
-//  mapper_sound_w - callback when the sound I/O
-//  port on the memory mapper is written
-//-------------------------------------------------
-
-WRITE8_MEMBER(segaorun_state::mapper_sound_w)
-{
-	synchronize(TID_SOUND_WRITE, data);
-}
-
-
 
 //**************************************************************************
 //  MAIN CPU READ/WRITE HANDLERS
@@ -540,23 +518,6 @@ WRITE16_MEMBER( segaorun_state::nop_w )
 
 
 //**************************************************************************
-//  Z80 SOUND CPU READ/WRITE HANDLERS
-//**************************************************************************
-
-//-------------------------------------------------
-//  sound_data_r - handle sound board reads from
-//  the sound latch
-//-------------------------------------------------
-
-READ8_MEMBER( segaorun_state::sound_data_r )
-{
-	m_soundcpu->set_input_line(INPUT_LINE_NMI, CLEAR_LINE);
-	return m_soundlatch->read(space, 0);
-}
-
-
-
-//**************************************************************************
 //  DRIVER OVERRIDES
 //**************************************************************************
 
@@ -587,11 +548,6 @@ void segaorun_state::device_timer(emu_timer &timer, device_timer_id id, int para
 {
 	switch (id)
 	{
-		case TID_SOUND_WRITE:
-			m_soundlatch->write(m_soundcpu->space(AS_PROGRAM), 0, param);
-			m_soundcpu->set_input_line(INPUT_LINE_NMI, ASSERT_LINE);
-			break;
-
 		case TID_IRQ2_GEN:
 			// set the IRQ2 line
 			m_irq2_state = 1;
@@ -930,7 +886,7 @@ ADDRESS_MAP_START(segaorun_state::sound_portmap)
 	ADDRESS_MAP_UNMAP_HIGH
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	AM_RANGE(0x00, 0x01) AM_MIRROR(0x3e) AM_DEVREADWRITE("ymsnd", ym2151_device, read, write)
-	AM_RANGE(0x40, 0x40) AM_MIRROR(0x3f) AM_READ(sound_data_r)
+	AM_RANGE(0x40, 0x40) AM_MIRROR(0x3f) AM_DEVREAD("mapper", sega_315_5195_mapper_device, pread)
 ADDRESS_MAP_END
 
 
@@ -1209,8 +1165,7 @@ MACHINE_CONFIG_START(segaorun_state::outrun_base)
 	MCFG_I8255_OUT_PORTC_CB(WRITE8(segaorun_state, video_control_w))
 
 	MCFG_SEGA_315_5195_MAPPER_ADD("mapper", "maincpu", segaorun_state, memory_mapper)
-	MCFG_SEGA_315_5195_SOUND_READ_CALLBACK(READ8(segaorun_state, mapper_sound_r))
-	MCFG_SEGA_315_5195_SOUND_WRITE_CALLBACK(WRITE8(segaorun_state, mapper_sound_w))
+	MCFG_SEGA_315_5195_PBF_CALLBACK(INPUTLINE("soundcpu", INPUT_LINE_NMI))
 
 	// video hardware
 	MCFG_GFXDECODE_ADD("gfxdecode", "palette", segaorun)
@@ -1227,8 +1182,6 @@ MACHINE_CONFIG_START(segaorun_state::outrun_base)
 
 	// sound hardware
 	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
-
-	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
 
 	MCFG_YM2151_ADD("ymsnd", SOUND_CLOCK/4)
 	MCFG_SOUND_ROUTE(0, "lspeaker", 0.43)

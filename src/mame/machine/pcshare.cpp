@@ -145,8 +145,8 @@ MACHINE_CONFIG_START(pcat_base_state::pcvideo_vga)
 	MCFG_SCREEN_RAW_PARAMS(XTAL(25'174'800),900,0,640,526,0,480)
 	MCFG_SCREEN_UPDATE_DEVICE("vga", vga_device, screen_update)
 
-	MCFG_PALETTE_ADD("palette", 0x100)
 	MCFG_DEVICE_ADD("vga", VGA, 0)
+	MCFG_VIDEO_SET_SCREEN("screen")
 MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(pcat_base_state::pcvideo_trident_vga)
@@ -154,8 +154,8 @@ MACHINE_CONFIG_START(pcat_base_state::pcvideo_trident_vga)
 	MCFG_SCREEN_RAW_PARAMS(XTAL(25'174'800),900,0,640,526,0,480)
 	MCFG_SCREEN_UPDATE_DEVICE("vga", trident_vga_device, screen_update)
 
-	MCFG_PALETTE_ADD("palette", 0x100)
 	MCFG_DEVICE_ADD("vga", TRIDENT_VGA, 0)
+	MCFG_VIDEO_SET_SCREEN("screen")
 MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(pcat_base_state::pcvideo_s3_vga)
@@ -163,8 +163,8 @@ MACHINE_CONFIG_START(pcat_base_state::pcvideo_s3_vga)
 	MCFG_SCREEN_RAW_PARAMS(XTAL(25'174'800),900,0,640,526,0,480)
 	MCFG_SCREEN_UPDATE_DEVICE("vga", s3_vga_device, screen_update)
 
-	MCFG_PALETTE_ADD("palette", 0x100)
 	MCFG_DEVICE_ADD("vga", S3_VGA, 0)
+	MCFG_VIDEO_SET_SCREEN("screen")
 MACHINE_CONFIG_END
 
 
@@ -173,8 +173,8 @@ MACHINE_CONFIG_START(pcat_base_state::pcvideo_cirrus_gd5428)
 	MCFG_SCREEN_RAW_PARAMS(XTAL(25'174'800),900,0,640,526,0,480)
 	MCFG_SCREEN_UPDATE_DEVICE("vga", cirrus_gd5428_device, screen_update)
 
-	MCFG_PALETTE_ADD("palette", 0x100)
 	MCFG_DEVICE_ADD("vga", CIRRUS_GD5428, 0)
+	MCFG_VIDEO_SET_SCREEN("screen")
 MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(pcat_base_state::pcvideo_cirrus_gd5430)
@@ -182,8 +182,8 @@ MACHINE_CONFIG_START(pcat_base_state::pcvideo_cirrus_gd5430)
 	MCFG_SCREEN_RAW_PARAMS(XTAL(25'174'800),900,0,640,526,0,480)
 	MCFG_SCREEN_UPDATE_DEVICE("vga", cirrus_gd5430_device, screen_update)
 
-	MCFG_PALETTE_ADD("palette", 0x100)
 	MCFG_DEVICE_ADD("vga", CIRRUS_GD5430, 0)
+	MCFG_VIDEO_SET_SCREEN("screen")
 MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(pcat_base_state::pcat_common)

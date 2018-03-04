@@ -479,8 +479,8 @@ MACHINE_CONFIG_START(gambl186_state::gambl186)
 	MCFG_SCREEN_RAW_PARAMS(XTAL(25'174'800),900,0,640,526,0,480)
 	MCFG_SCREEN_UPDATE_DEVICE("vga", cirrus_gd5428_device, screen_update)
 
-	MCFG_PALETTE_ADD("palette", 0x100)
 	MCFG_DEVICE_ADD("vga", CIRRUS_GD5428, 0)
+	MCFG_VIDEO_SET_SCREEN("screen")
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")

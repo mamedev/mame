@@ -713,7 +713,25 @@ TIMER_DEVICE_CALLBACK_MEMBER(segas32_state::signal_v60_irq_callback)
 }
 
 
-void segas32_state::int_control_w(int offset, uint8_t data)
+READ8_MEMBER(segas32_state::int_control_r)
+{
+	switch (offset)
+	{
+		case 8:
+			/* fix me - should return timer count down value */
+			break;
+
+		case 10:
+			/* fix me - should return timer count down value */
+			break;
+	}
+
+	/* return all F's for everything except timer values */
+	return 0xff;
+}
+
+
+WRITE8_MEMBER(segas32_state::int_control_w)
 {
 	int duration;
 
@@ -771,60 +789,6 @@ void segas32_state::int_control_w(int offset, uint8_t data)
 			signal_sound_irq(SOUND_IRQ_V60);
 			break;
 	}
-}
-
-
-READ16_MEMBER(segas32_state::interrupt_control_16_r)
-{
-	switch (offset)
-	{
-		case 8/2:
-			/* fix me - should return timer count down value */
-			break;
-
-		case 10/2:
-			/* fix me - should return timer count down value */
-			break;
-	}
-
-	/* return all F's for everything except timer values */
-	return 0xffff;
-}
-
-
-WRITE16_MEMBER(segas32_state::interrupt_control_16_w)
-{
-	if (ACCESSING_BITS_0_7)
-		int_control_w(offset*2+0, data);
-	if (ACCESSING_BITS_8_15)
-		int_control_w(offset*2+1, data >> 8);
-}
-
-
-READ32_MEMBER(segas32_state::interrupt_control_32_r)
-{
-	switch (offset)
-	{
-		case 8/4:
-			/* fix me - should return timer count down value */
-			break;
-	}
-
-	/* return all F's for everything except timer values */
-	return 0xffffffff;
-}
-
-
-WRITE32_MEMBER(segas32_state::interrupt_control_32_w)
-{
-	if (ACCESSING_BITS_0_7)
-		int_control_w(offset*4+0, data);
-	if (ACCESSING_BITS_8_15)
-		int_control_w(offset*4+1, data >> 8);
-	if (ACCESSING_BITS_16_23)
-		int_control_w(offset*4+2, data >> 16);
-	if (ACCESSING_BITS_24_31)
-		int_control_w(offset*4+3, data >> 24);
 }
 
 
@@ -918,24 +882,14 @@ WRITE_LINE_MEMBER(segas32_state::display_enable_1_w)
  *
  *************************************/
 
-WRITE16_MEMBER(segas32_state::random_number_16_w)
+WRITE16_MEMBER(segas32_state::random_number_w)
 {
 //  osd_printf_debug("%06X:random_seed_w(%04X) = %04X & %04X\n", m_maincpu->pc(), offset*2, data, mem_mask);
 }
 
-READ16_MEMBER(segas32_state::random_number_16_r)
+READ16_MEMBER(segas32_state::random_number_r)
 {
 	return machine().rand();
-}
-
-WRITE32_MEMBER(segas32_state::random_number_32_w)
-{
-//  osd_printf_debug("%06X:random_seed_w(%04X) = %04X & %04X\n", m_maincpu->pc(), offset*2, data, mem_mask);
-}
-
-READ32_MEMBER(segas32_state::random_number_32_r)
-{
-	return machine().rand() ^ (machine().rand() << 16);
 }
 
 
@@ -946,38 +900,15 @@ READ32_MEMBER(segas32_state::random_number_32_r)
  *
  *************************************/
 
-READ16_MEMBER(segas32_state::shared_ram_16_r)
+READ8_MEMBER(segas32_state::shared_ram_r)
 {
-	return m_z80_shared_ram[offset*2+0] | (m_z80_shared_ram[offset*2+1] << 8);
+	return m_z80_shared_ram[offset];
 }
 
 
-WRITE16_MEMBER(segas32_state::shared_ram_16_w)
+WRITE8_MEMBER(segas32_state::shared_ram_w)
 {
-	if (ACCESSING_BITS_0_7)
-		m_z80_shared_ram[offset*2+0] = data;
-	if (ACCESSING_BITS_8_15)
-		m_z80_shared_ram[offset*2+1] = data >> 8;
-}
-
-
-READ32_MEMBER(segas32_state::shared_ram_32_r)
-{
-	return m_z80_shared_ram[offset*4+0] | (m_z80_shared_ram[offset*4+1] << 8) |
-			(m_z80_shared_ram[offset*4+2] << 16) | (m_z80_shared_ram[offset*4+3] << 24);
-}
-
-
-WRITE32_MEMBER(segas32_state::shared_ram_32_w)
-{
-	if (ACCESSING_BITS_0_7)
-		m_z80_shared_ram[offset*4+0] = data;
-	if (ACCESSING_BITS_8_15)
-		m_z80_shared_ram[offset*4+1] = data >> 8;
-	if (ACCESSING_BITS_16_23)
-		m_z80_shared_ram[offset*4+2] = data >> 16;
-	if (ACCESSING_BITS_24_31)
-		m_z80_shared_ram[offset*4+3] = data >> 24;
+	m_z80_shared_ram[offset] = data;
 }
 
 
@@ -1125,17 +1056,17 @@ ADDRESS_MAP_START(segas32_state::system32_map)
 	AM_RANGE(0x200000, 0x20ffff) AM_MIRROR(0x0f0000) AM_RAM AM_SHARE("workram")
 	AM_RANGE(0x300000, 0x31ffff) AM_MIRROR(0x0e0000) AM_READWRITE(system32_videoram_r, system32_videoram_w) AM_SHARE("videoram")
 	AM_RANGE(0x400000, 0x41ffff) AM_MIRROR(0x0e0000) AM_READWRITE(system32_spriteram_r, system32_spriteram_w) AM_SHARE("spriteram")
-	AM_RANGE(0x500000, 0x50000f) AM_MIRROR(0x0ffff0) AM_READWRITE(system32_sprite_control_r, system32_sprite_control_w)
+	AM_RANGE(0x500000, 0x50000f) AM_MIRROR(0x0ffff0) AM_READWRITE8(sprite_control_r, sprite_control_w, 0x00ff)
 	AM_RANGE(0x600000, 0x60ffff) AM_MIRROR(0x0e0000) AM_READWRITE(system32_paletteram_r, system32_paletteram_w) AM_SHARE("paletteram.0")
 	AM_RANGE(0x610000, 0x61007f) AM_MIRROR(0x0eff80) AM_READWRITE(system32_mixer_r, system32_mixer_w)
-	AM_RANGE(0x700000, 0x701fff) AM_MIRROR(0x0fe000) AM_READWRITE(shared_ram_16_r, shared_ram_16_w)
+	AM_RANGE(0x700000, 0x701fff) AM_MIRROR(0x0fe000) AM_READWRITE8(shared_ram_r, shared_ram_w, 0xffff)
 	AM_RANGE(0x800000, 0x800fff) AM_DEVREADWRITE8("s32comm", s32comm_device, share_r, share_w, 0x00ff)
 	AM_RANGE(0x801000, 0x801001) AM_DEVREADWRITE8("s32comm", s32comm_device, cn_r, cn_w, 0x00ff)
 	AM_RANGE(0x801002, 0x801003) AM_DEVREADWRITE8("s32comm", s32comm_device, fg_r, fg_w, 0x00ff)
 	AM_RANGE(0xc00000, 0xc0001f) AM_MIRROR(0x0fff80) AM_DEVREADWRITE8("io_chip", sega_315_5296_device, read, write, 0x00ff)
 	// 0xc00040-0xc0007f - I/O expansion area
-	AM_RANGE(0xd00000, 0xd0000f) AM_MIRROR(0x07fff0) AM_READWRITE(interrupt_control_16_r, interrupt_control_16_w)
-	AM_RANGE(0xd80000, 0xdfffff) AM_READWRITE(random_number_16_r, random_number_16_w)
+	AM_RANGE(0xd00000, 0xd0000f) AM_MIRROR(0x07fff0) AM_READWRITE8(int_control_r, int_control_w, 0xffff)
+	AM_RANGE(0xd80000, 0xdfffff) AM_READWRITE(random_number_r, random_number_w)
 	AM_RANGE(0xf00000, 0xffffff) AM_ROM AM_REGION("maincpu", 0)
 ADDRESS_MAP_END
 
@@ -1145,14 +1076,14 @@ ADDRESS_MAP_START(segas32_state::multi32_map)
 	ADDRESS_MAP_GLOBAL_MASK(0xffffff)
 	AM_RANGE(0x000000, 0x1fffff) AM_ROM
 	AM_RANGE(0x200000, 0x21ffff) AM_MIRROR(0x0e0000) AM_RAM
-	AM_RANGE(0x300000, 0x31ffff) AM_MIRROR(0x0e0000) AM_READWRITE(multi32_videoram_r, multi32_videoram_w) AM_SHARE("videoram")
+	AM_RANGE(0x300000, 0x31ffff) AM_MIRROR(0x0e0000) AM_READWRITE16(system32_videoram_r, system32_videoram_w, 0xffffffff) AM_SHARE("videoram")
 	AM_RANGE(0x400000, 0x41ffff) AM_MIRROR(0x0e0000) AM_READWRITE(multi32_spriteram_r, multi32_spriteram_w) AM_SHARE("spriteram")
-	AM_RANGE(0x500000, 0x50000f) AM_MIRROR(0x0ffff0) AM_READWRITE(multi32_sprite_control_r, multi32_sprite_control_w)
+	AM_RANGE(0x500000, 0x50000f) AM_MIRROR(0x0ffff0) AM_READWRITE8(sprite_control_r, sprite_control_w, 0x00ff00ff)
 	AM_RANGE(0x600000, 0x60ffff) AM_MIRROR(0x060000) AM_READWRITE(multi32_paletteram_0_r, multi32_paletteram_0_w) AM_SHARE("paletteram.0")
 	AM_RANGE(0x610000, 0x61007f) AM_MIRROR(0x06ff80) AM_WRITE(multi32_mixer_0_w)
 	AM_RANGE(0x680000, 0x68ffff) AM_MIRROR(0x060000) AM_READWRITE(multi32_paletteram_1_r, multi32_paletteram_1_w) AM_SHARE("paletteram.1")
 	AM_RANGE(0x690000, 0x69007f) AM_MIRROR(0x06ff80) AM_WRITE(multi32_mixer_1_w)
-	AM_RANGE(0x700000, 0x701fff) AM_MIRROR(0x0fe000) AM_READWRITE(shared_ram_32_r, shared_ram_32_w)
+	AM_RANGE(0x700000, 0x701fff) AM_MIRROR(0x0fe000) AM_READWRITE8(shared_ram_r, shared_ram_w, 0xffffffff)
 	AM_RANGE(0x800000, 0x800fff) AM_DEVREADWRITE8("s32comm", s32comm_device, share_r, share_w, 0x00ff00ff)
 	AM_RANGE(0x801000, 0x801003) AM_DEVREADWRITE8("s32comm", s32comm_device, cn_r, cn_w, 0x000000ff)
 	AM_RANGE(0x801000, 0x801003) AM_DEVREADWRITE8("s32comm", s32comm_device, fg_r, fg_w, 0x00ff0000)
@@ -1160,8 +1091,8 @@ ADDRESS_MAP_START(segas32_state::multi32_map)
 	// 0xc00040-0xc0007f - I/O expansion area 0
 	AM_RANGE(0xc80000, 0xc8001f) AM_MIRROR(0x07ff80) AM_DEVREADWRITE8("io_chip_1", sega_315_5296_device, read, write, 0x00ff00ff)
 	// 0xc80040-0xc8007f - I/O expansion area 1
-	AM_RANGE(0xd00000, 0xd0000f) AM_MIRROR(0x07fff0) AM_READWRITE(interrupt_control_32_r, interrupt_control_32_w)
-	AM_RANGE(0xd80000, 0xdfffff) AM_READWRITE(random_number_32_r, random_number_32_w)
+	AM_RANGE(0xd00000, 0xd0000f) AM_MIRROR(0x07fff0) AM_READWRITE8(int_control_r, int_control_w, 0xffffffff)
+	AM_RANGE(0xd80000, 0xdfffff) AM_READWRITE16(random_number_r, random_number_w, 0xffffffff)
 	AM_RANGE(0xf00000, 0xffffff) AM_ROM AM_REGION("maincpu", 0)
 ADDRESS_MAP_END
 

@@ -33,30 +33,30 @@
 
 
 #define MCFG_MCS51_PORT_P0_IN_CB(_devcb) \
-	devcb = &mcs51_cpu_device::set_port_in_cb(*device, 0, DEVCB_##_devcb);
+	devcb = &downcast<mcs51_cpu_device &>(*device).set_port_in_cb(0, DEVCB_##_devcb);
 #define MCFG_MCS51_PORT_P0_OUT_CB(_devcb) \
-	devcb = &mcs51_cpu_device::set_port_out_cb(*device, 0, DEVCB_##_devcb);
+	devcb = &downcast<mcs51_cpu_device &>(*device).set_port_out_cb(0, DEVCB_##_devcb);
 
 #define MCFG_MCS51_PORT_P1_IN_CB(_devcb) \
-	devcb = &mcs51_cpu_device::set_port_in_cb(*device, 1, DEVCB_##_devcb);
+	devcb = &downcast<mcs51_cpu_device &>(*device).set_port_in_cb(1, DEVCB_##_devcb);
 #define MCFG_MCS51_PORT_P1_OUT_CB(_devcb) \
-	devcb = &mcs51_cpu_device::set_port_out_cb(*device, 1, DEVCB_##_devcb);
+	devcb = &downcast<mcs51_cpu_device &>(*device).set_port_out_cb(1, DEVCB_##_devcb);
 
 #define MCFG_MCS51_PORT_P2_IN_CB(_devcb) \
-	devcb = &mcs51_cpu_device::set_port_in_cb(*device, 2, DEVCB_##_devcb);
+	devcb = &downcast<mcs51_cpu_device &>(*device).set_port_in_cb(2, DEVCB_##_devcb);
 #define MCFG_MCS51_PORT_P2_OUT_CB(_devcb) \
-	devcb = &mcs51_cpu_device::set_port_out_cb(*device, 2, DEVCB_##_devcb);
+	devcb = &downcast<mcs51_cpu_device &>(*device).set_port_out_cb(2, DEVCB_##_devcb);
 
 #define MCFG_MCS51_PORT_P3_IN_CB(_devcb) \
-	devcb = &mcs51_cpu_device::set_port_in_cb(*device, 3, DEVCB_##_devcb);
+	devcb = &downcast<mcs51_cpu_device &>(*device).set_port_in_cb(3, DEVCB_##_devcb);
 #define MCFG_MCS51_PORT_P3_OUT_CB(_devcb) \
-	devcb = &mcs51_cpu_device::set_port_out_cb(*device, 3, DEVCB_##_devcb);
+	devcb = &downcast<mcs51_cpu_device &>(*device).set_port_out_cb(3, DEVCB_##_devcb);
 
 #define MCFG_MCS51_SERIAL_RX_CB(_devcb) \
-	devcb = &mcs51_cpu_device::set_serial_rx_cb(*device, DEVCB_##_devcb);
+	devcb = &downcast<mcs51_cpu_device &>(*device).set_serial_rx_cb(DEVCB_##_devcb);
 
 #define MCFG_MCS51_SERIAL_TX_CB(_devcb) \
-	devcb = &mcs51_cpu_device::set_serial_tx_cb(*device, DEVCB_##_devcb);
+	devcb = &downcast<mcs51_cpu_device &>(*device).set_serial_tx_cb(DEVCB_##_devcb);
 
 
 enum
@@ -84,21 +84,21 @@ enum
  */
 
 #define MCFG_MCS51_PORT1_CONFIG(_forced_inputs) \
-	mcs51_cpu_device::set_port_forced_input(*device, 1, _forced_inputs);
+	downcast<mcs51_cpu_device &>(*device).set_port_forced_input(1, _forced_inputs);
 #define MCFG_MCS51_PORT2_CONFIG(_forced_inputs) \
-	mcs51_cpu_device::set_port_forced_input(*device, 2, _forced_inputs);
+	downcast<mcs51_cpu_device &>(*device).set_port_forced_input(2, _forced_inputs);
 #define MCFG_MCS51_PORT3_CONFIG(_forced_inputs) \
-	mcs51_cpu_device::set_port_forced_input(*device, 3, _forced_inputs);
+	downcast<mcs51_cpu_device &>(*device).set_port_forced_input(3, _forced_inputs);
 
 class mcs51_cpu_device : public cpu_device
 {
 public:
 	// configuration helpers
-	template<class Object> static devcb_base &set_port_in_cb(device_t &device, int n, Object &&cb) { return downcast<mcs51_cpu_device &>(device).m_port_in_cb[n].set_callback(std::forward<Object>(cb)); }
-	template<class Object> static devcb_base &set_port_out_cb(device_t &device, int n, Object &&cb) { return downcast<mcs51_cpu_device &>(device).m_port_out_cb[n].set_callback(std::forward<Object>(cb)); }
-	static void set_port_forced_input(device_t &device, uint8_t port, uint8_t forced_input) { downcast<mcs51_cpu_device &>(device).m_forced_inputs[port] = forced_input; }
-	template<class Object> static devcb_base &set_serial_rx_cb(device_t &device, Object &&cb) { return downcast<mcs51_cpu_device &>(device).m_serial_rx_cb.set_callback(std::forward<Object>(cb)); }
-	template<class Object> static devcb_base &set_serial_tx_cb(device_t &device, Object &&cb) { return downcast<mcs51_cpu_device &>(device).m_serial_tx_cb.set_callback(std::forward<Object>(cb)); }
+	template<class Object> devcb_base &set_port_in_cb(int n, Object &&cb) { return m_port_in_cb[n].set_callback(std::forward<Object>(cb)); }
+	template<class Object> devcb_base &set_port_out_cb(int n, Object &&cb) { return m_port_out_cb[n].set_callback(std::forward<Object>(cb)); }
+	void set_port_forced_input(uint8_t port, uint8_t forced_input) { m_forced_inputs[port] = forced_input; }
+	template<class Object> devcb_base &set_serial_rx_cb(Object &&cb) { return m_serial_rx_cb.set_callback(std::forward<Object>(cb)); }
+	template<class Object> devcb_base &set_serial_tx_cb(Object &&cb) { return m_serial_tx_cb.set_callback(std::forward<Object>(cb)); }
 
 	void data_7bit(address_map &map);
 	void data_8bit(address_map &map);
@@ -527,9 +527,9 @@ public:
 	// construction/destruction
 	ds5002fp_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
-	static void set_mcon(device_t &device, uint8_t mcon) { downcast<ds5002fp_device &>(device).m_ds5002fp.mcon = mcon; }
-	static void set_rpctl(device_t &device, uint8_t rpctl) { downcast<ds5002fp_device &>(device).m_ds5002fp.rpctl = rpctl; }
-	static void set_crc(device_t &device, uint8_t crc) { downcast<ds5002fp_device &>(device).m_ds5002fp.crc = crc; }
+	void set_mcon(uint8_t mcon) { m_ds5002fp.mcon = mcon; }
+	void set_rpctl(uint8_t rpctl) { m_ds5002fp.rpctl = rpctl; }
+	void set_crc(uint8_t crc) { m_ds5002fp.crc = crc; }
 
 	// device_nvram_interface overrides
 	virtual void nvram_default() override;

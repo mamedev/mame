@@ -62,11 +62,11 @@ public:
 	dmvcart_slot_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 	virtual ~dmvcart_slot_device();
 
-	template <class Object> static devcb_base &set_prog_read_callback(device_t &device, Object &&cb) { return downcast<dmvcart_slot_device &>(device).m_prog_read_cb.set_callback(std::forward<Object>(cb)); }
-	template <class Object> static devcb_base &set_prog_write_callback(device_t &device, Object &&cb) { return downcast<dmvcart_slot_device &>(device).m_prog_write_cb.set_callback(std::forward<Object>(cb)); }
-	template <class Object> static devcb_base &set_out_int_callback(device_t &device, Object &&cb) { return downcast<dmvcart_slot_device &>(device).m_out_int_cb.set_callback(std::forward<Object>(cb)); }
-	template <class Object> static devcb_base &set_out_irq_callback(device_t &device, Object &&cb) { return downcast<dmvcart_slot_device &>(device).m_out_irq_cb.set_callback(std::forward<Object>(cb)); }
-	template <class Object> static devcb_base &set_out_thold_callback(device_t &device, Object &&cb) { return downcast<dmvcart_slot_device &>(device).m_out_thold_cb.set_callback(std::forward<Object>(cb)); }
+	template <class Object> devcb_base &set_prog_read_callback(Object &&cb) { return m_prog_read_cb.set_callback(std::forward<Object>(cb)); }
+	template <class Object> devcb_base &set_prog_write_callback(Object &&cb) { return m_prog_write_cb.set_callback(std::forward<Object>(cb)); }
+	template <class Object> devcb_base &set_out_int_callback(Object &&cb) { return m_out_int_cb.set_callback(std::forward<Object>(cb)); }
+	template <class Object> devcb_base &set_out_irq_callback(Object &&cb) { return m_out_irq_cb.set_callback(std::forward<Object>(cb)); }
+	template <class Object> devcb_base &set_out_thold_callback(Object &&cb) { return m_out_thold_cb.set_callback(std::forward<Object>(cb)); }
 
 	// device-level overrides
 	virtual void device_start() override;
@@ -111,16 +111,16 @@ DECLARE_DEVICE_TYPE(DMVCART_SLOT, dmvcart_slot_device)
 ***************************************************************************/
 
 #define MCFG_DMVCART_SLOT_PROGRAM_READWRITE_CB(_read_devcb, _write_devcb) \
-	devcb = &dmvcart_slot_device::set_prog_read_callback(*device, DEVCB_##_read_devcb); \
-	devcb = &dmvcart_slot_device::set_prog_write_callback(*device, DEVCB_##_write_devcb);
+	devcb = &downcast<dmvcart_slot_device &>(*device).set_prog_read_callback(DEVCB_##_read_devcb); \
+	devcb = &downcast<dmvcart_slot_device &>(*device).set_prog_write_callback(DEVCB_##_write_devcb);
 
 #define MCFG_DMVCART_SLOT_OUT_INT_CB(_devcb) \
-	devcb = &dmvcart_slot_device::set_out_int_callback(*device, DEVCB_##_devcb);
+	devcb = &downcast<dmvcart_slot_device &>(*device).set_out_int_callback(DEVCB_##_devcb);
 
 #define MCFG_DMVCART_SLOT_OUT_IRQ_CB(_devcb) \
-	devcb = &dmvcart_slot_device::set_out_irq_callback(*device, DEVCB_##_devcb);
+	devcb = &downcast<dmvcart_slot_device &>(*device).set_out_irq_callback(DEVCB_##_devcb);
 
 #define MCFG_DMVCART_SLOT_OUT_THOLD_CB(_devcb) \
-	devcb = &dmvcart_slot_device::set_out_thold_callback(*device, DEVCB_##_devcb);
+	devcb = &downcast<dmvcart_slot_device &>(*device).set_out_thold_callback(DEVCB_##_devcb);
 
 #endif // MAME_BUS_DMV_DMVBUS_H

@@ -36,10 +36,10 @@
 	MCFG_DEVICE_ADD(_tag, M48T37, 0)
 
 #define MCFG_M48T37_RESET_HANDLER(_devcb) \
-	devcb = &timekeeper_device::set_reset_handler(*device, DEVCB_##_devcb);
+	devcb = &downcast<timekeeper_device &>(*device).set_reset_handler(DEVCB_##_devcb);
 
 #define MCFG_M48T37_IRQ_HANDLER(_devcb) \
-	devcb = &timekeeper_device::set_irq_handler(*device, DEVCB_##_devcb);
+	devcb = &downcast<timekeeper_device &>(*device).set_irq_handler(DEVCB_##_devcb);
 
 #define MCFG_M48T58_ADD(_tag) \
 	MCFG_DEVICE_ADD(_tag, M48T58, 0)
@@ -65,8 +65,8 @@ public:
 	DECLARE_WRITE8_MEMBER( write );
 	DECLARE_READ8_MEMBER( read );
 	DECLARE_WRITE8_MEMBER(watchdog_write);
-	template <class Object> static devcb_base &set_reset_handler(device_t &device, Object &&cb) { return downcast<timekeeper_device &>(device).m_reset_cb.set_callback(std::forward<Object>(cb)); }
-	template <class Object> static devcb_base &set_irq_handler(device_t &device, Object &&cb) { return downcast<timekeeper_device &>(device).m_irq_cb.set_callback(std::forward<Object>(cb)); }
+	template <class Object> devcb_base &set_reset_handler(Object &&cb) { return m_reset_cb.set_callback(std::forward<Object>(cb)); }
+	template <class Object> devcb_base &set_irq_handler(Object &&cb) { return m_irq_cb.set_callback(std::forward<Object>(cb)); }
 
 protected:
 	// construction/destruction

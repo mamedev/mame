@@ -56,7 +56,7 @@ public:
 	nes_control_port_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 	virtual ~nes_control_port_device();
 
-	static void set_brightpixel_callback(device_t &device, nesctrl_brightpixel_delegate callback) { downcast<nes_control_port_device &>(device).m_brightpixel_cb = callback; }
+	template <typename Object> void set_brightpixel_callback(Object &&cb) { m_brightpixel_cb = std::forward<Object>(cb); }
 
 	uint8_t read_bit0();
 	uint8_t read_bit34();
@@ -90,7 +90,7 @@ DECLARE_DEVICE_TYPE(NES_CONTROL_PORT, nes_control_port_device)
 	MCFG_DEVICE_SLOT_INTERFACE(_slot_intf, _def_slot, false)
 
 #define MCFG_NESCTRL_BRIGHTPIXEL_CB(_class, _method) \
-	nes_control_port_device::set_brightpixel_callback(*device, nesctrl_brightpixel_delegate(&_class::_method, #_class "::" #_method, this));
+	downcast<nes_control_port_device &>(*device).set_brightpixel_callback(nesctrl_brightpixel_delegate(&_class::_method, #_class "::" #_method, this));
 
 
 SLOT_INTERFACE_EXTERN( nes_control_port1_devices );

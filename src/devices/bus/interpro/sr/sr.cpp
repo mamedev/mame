@@ -280,7 +280,7 @@ void sr_slot_device::device_start()
 	device_sr_card_interface *dev = dynamic_cast<device_sr_card_interface *>(get_card_device());
 
 	if (dev)
-		device_sr_card_interface::static_set_sr_tag(*dev, m_sr_tag, m_sr_slot_tag);
+		dev->set_sr_tag(m_sr_tag, m_sr_slot_tag);
 }
 
 DEFINE_DEVICE_TYPE(SR, sr_device, "sr", "InterPro SR bus")
@@ -336,14 +336,6 @@ device_sr_card_interface::device_sr_card_interface(const machine_config &mconfig
 
 device_sr_card_interface::~device_sr_card_interface()
 {
-}
-
-void device_sr_card_interface::static_set_sr_tag(device_t &device, const char *tag, const char *slot_tag)
-{
-	device_sr_card_interface &sr_card = dynamic_cast<device_sr_card_interface &>(device);
-
-	sr_card.m_sr_tag = tag;
-	sr_card.m_sr_slot_tag = slot_tag;
 }
 
 void device_sr_card_interface::set_sr_device()

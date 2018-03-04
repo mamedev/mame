@@ -369,8 +369,8 @@ MACHINE_CONFIG_START(pntnpuzl_state::pntnpuzl)
 	MCFG_SCREEN_RAW_PARAMS(XTAL(25'174'800),900,0,640,526,0,480)
 	MCFG_SCREEN_UPDATE_DEVICE("vga", vga_device, screen_update)
 
-	MCFG_PALETTE_ADD("palette", 0x100)
 	MCFG_DEVICE_ADD("vga", VGA, 0)
+	MCFG_VIDEO_SET_SCREEN("screen")
 MACHINE_CONFIG_END
 
 ROM_START( pntnpuzl )

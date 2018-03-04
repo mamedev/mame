@@ -572,7 +572,7 @@ WRITE32_MEMBER( next_state::scsictrl_w )
 		scsictrl = data >> 24;
 		if(scsictrl & 0x02)
 			scsi->reset();
-		device_t::static_set_clock(*scsi, scsi_clocks[scsictrl >> 6]);
+		scsi->set_clock(scsi_clocks[scsictrl >> 6]);
 
 		logerror("SCSIctrl %dMHz int=%s dma=%s dmadir=%s%s%s dest=%s (%08x)\n",
 				scsi_clocks[scsictrl >> 6]/1000000,

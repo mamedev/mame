@@ -44,13 +44,13 @@ DECLARE_DEVICE_TYPE(TMP95C061, tmp95c061_device)
 DECLARE_DEVICE_TYPE(TMP95C063, tmp95c063_device)
 
 
-#define MCFG_TLCS900H_AM8_16( am8_16 ) tlcs900h_device::set_am8_16( *device, am8_16 );
+#define MCFG_TLCS900H_AM8_16( am8_16 ) downcast<tlcs900h_device &>(*device).set_am8_16(am8_16 );
 
 class tlcs900h_device : public cpu_device
 {
 public:
-	// static configuration helpers
-	static void set_am8_16(device_t &device, int am8_16) { downcast<tlcs900h_device &>(device).m_am8_16 = am8_16; }
+	// configuration helpers
+	void set_am8_16(int am8_16) { m_am8_16 = am8_16; }
 
 protected:
 	// construction/destruction
@@ -229,420 +229,420 @@ protected:
 	uint32_t div16( uint32_t a, uint16_t b );
 	uint16_t divs8( int16_t a, int8_t b );
 	uint32_t divs16( int32_t a, int16_t b );
-	void _ADCBMI();
-	void _ADCBMR();
-	void _ADCBRI();
-	void _ADCBRM();
-	void _ADCBRR();
-	void _ADCWMI();
-	void _ADCWMR();
-	void _ADCWRI();
-	void _ADCWRM();
-	void _ADCWRR();
-	void _ADCLMR();
-	void _ADCLRI();
-	void _ADCLRM();
-	void _ADCLRR();
-	void _ADDBMI();
-	void _ADDBMR();
-	void _ADDBRI();
-	void _ADDBRM();
-	void _ADDBRR();
-	void _ADDWMI();
-	void _ADDWMR();
-	void _ADDWRI();
-	void _ADDWRM();
-	void _ADDWRR();
-	void _ADDLMR();
-	void _ADDLRI();
-	void _ADDLRM();
-	void _ADDLRR();
-	void _ANDBMI();
-	void _ANDBMR();
-	void _ANDBRI();
-	void _ANDBRM();
-	void _ANDBRR();
-	void _ANDWMI();
-	void _ANDWMR();
-	void _ANDWRI();
-	void _ANDWRM();
-	void _ANDWRR();
-	void _ANDLMR();
-	void _ANDLRI();
-	void _ANDLRM();
-	void _ANDLRR();
-	void _ANDCFBIM();
-	void _ANDCFBIR();
-	void _ANDCFBRM();
-	void _ANDCFBRR();
-	void _ANDCFWIR();
-	void _ANDCFWRR();
-	void _BITBIM();
-	void _BITBIR();
-	void _BITWIR();
-	void _BS1BRR();
-	void _BS1FRR();
-	void _CALLI();
-	void _CALLM();
-	void _CALR();
-	void _CCF();
-	void _CHGBIM();
-	void _CHGBIR();
-	void _CHGWIR();
-	void _CPBMI();
-	void _CPBMR();
-	void _CPBRI();
-	void _CPBRM();
-	void _CPBRR();
-	void _CPWMI();
-	void _CPWMR();
-	void _CPWRI();
-	void _CPWRM();
-	void _CPWRR();
-	void _CPLMR();
-	void _CPLRI();
-	void _CPLRM();
-	void _CPLRR();
-	void _CPD();
-	void _CPDR();
-	void _CPDW();
-	void _CPDRW();
-	void _CPI();
-	void _CPIR();
-	void _CPIW();
-	void _CPIRW();
-	void _CPLBR();
-	void _CPLWR();
-	void _DAABR();
-	void _DB();
-	void _DECBIM();
-	void _DECBIR();
-	void _DECWIM();
-	void _DECWIR();
-	void _DECLIR();
-	void _DECF();
-	void _DIVBRI();
-	void _DIVBRM();
-	void _DIVBRR();
-	void _DIVWRI();
-	void _DIVWRM();
-	void _DIVWRR();
-	void _DIVSBRI();
-	void _DIVSBRM();
-	void _DIVSBRR();
-	void _DIVSWRI();
-	void _DIVSWRM();
-	void _DIVSWRR();
-	void _DJNZB();
-	void _DJNZW();
-	void _EI();
-	void _EXBMR();
-	void _EXBRR();
-	void _EXWMR();
-	void _EXWRR();
-	void _EXTSWR();
-	void _EXTSLR();
-	void _EXTZWR();
-	void _EXTZLR();
-	void _HALT();
-	void _INCBIM();
-	void _INCBIR();
-	void _INCWIM();
-	void _INCWIR();
-	void _INCLIR();
-	void _INCF();
-	void _JPI();
-	void _JPM();
-	void _JR();
-	void _JRL();
-	void _LDBMI();
-	void _LDBMM();
-	void _LDBMR();
-	void _LDBRI();
-	void _LDBRM();
-	void _LDBRR();
-	void _LDWMI();
-	void _LDWMM();
-	void _LDWMR();
-	void _LDWRI();
-	void _LDWRM();
-	void _LDWRR();
-	void _LDLRI();
-	void _LDLRM();
-	void _LDLRR();
-	void _LDLMR();
-	void _LDAW();
-	void _LDAL();
-	void _LDCBRR();
-	void _LDCWRR();
-	void _LDCLRR();
-	void _LDCFBIM();
-	void _LDCFBIR();
-	void _LDCFBRM();
-	void _LDCFBRR();
-	void _LDCFWIR();
-	void _LDCFWRR();
-	void _LDD();
-	void _LDDR();
-	void _LDDRW();
-	void _LDDW();
-	void _LDF();
-	void _LDI();
-	void _LDIR();
-	void _LDIRW();
-	void _LDIW();
-	void _LDX();
-	void _LINK();
-	void _MAX();
-	void _MDEC1();
-	void _MDEC2();
-	void _MDEC4();
-	void _MINC1();
-	void _MINC2();
-	void _MINC4();
-	void _MIRRW();
-	void _MULBRI();
-	void _MULBRM();
-	void _MULBRR();
-	void _MULWRI();
-	void _MULWRM();
-	void _MULWRR();
-	void _MULAR();
-	void _MULSBRI();
-	void _MULSBRM();
-	void _MULSBRR();
-	void _MULSWRI();
-	void _MULSWRM();
-	void _MULSWRR();
-	void _NEGBR();
-	void _NEGWR();
-	void _NOP();
-	void _NORMAL();
-	void _ORBMI();
-	void _ORBMR();
-	void _ORBRI();
-	void _ORBRM();
-	void _ORBRR();
-	void _ORWMI();
-	void _ORWMR();
-	void _ORWRI();
-	void _ORWRM();
-	void _ORWRR();
-	void _ORLMR();
-	void _ORLRI();
-	void _ORLRM();
-	void _ORLRR();
-	void _ORCFBIM();
-	void _ORCFBIR();
-	void _ORCFBRM();
-	void _ORCFBRR();
-	void _ORCFWIR();
-	void _ORCFWRR();
-	void _PAAWR();
-	void _PAALR();
-	void _POPBM();
-	void _POPBR();
-	void _POPWM();
-	void _POPWR();
-	void _POPWSR();
-	void _POPLR();
-	void _PUSHBI();
-	void _PUSHBM();
-	void _PUSHBR();
-	void _PUSHWI();
-	void _PUSHWM();
-	void _PUSHWR();
-	void _PUSHLR();
-	void _RCF();
-	void _RESBIM();
-	void _RESBIR();
-	void _RESWIR();
-	void _RET();
-	void _RETCC();
-	void _RETD();
-	void _RETI();
-	void _RLBM();
-	void _RLWM();
-	void _RLBIR();
-	void _RLBRR();
-	void _RLWIR();
-	void _RLWRR();
-	void _RLLIR();
-	void _RLLRR();
-	void _RLCBM();
-	void _RLCWM();
-	void _RLCBIR();
-	void _RLCBRR();
-	void _RLCWIR();
-	void _RLCWRR();
-	void _RLCLIR();
-	void _RLCLRR();
-	void _RLDRM();
-	void _RRBM();
-	void _RRWM();
-	void _RRBIR();
-	void _RRBRR();
-	void _RRWIR();
-	void _RRWRR();
-	void _RRLIR();
-	void _RRLRR();
-	void _RRCBM();
-	void _RRCWM();
-	void _RRCBIR();
-	void _RRCBRR();
-	void _RRCWIR();
-	void _RRCWRR();
-	void _RRCLIR();
-	void _RRCLRR();
-	void _RRDRM();
-	void _SBCBMI();
-	void _SBCBMR();
-	void _SBCBRI();
-	void _SBCBRM();
-	void _SBCBRR();
-	void _SBCWMI();
-	void _SBCWMR();
-	void _SBCWRI();
-	void _SBCWRM();
-	void _SBCWRR();
-	void _SBCLMR();
-	void _SBCLRI();
-	void _SBCLRM();
-	void _SBCLRR();
-	void _SCCBR();
-	void _SCCWR();
-	void _SCF();
-	void _SETBIM();
-	void _SETBIR();
-	void _SETWIR();
-	void _SLABM();
-	void _SLAWM();
-	void _SLABIR();
-	void _SLABRR();
-	void _SLAWIR();
-	void _SLAWRR();
-	void _SLALIR();
-	void _SLALRR();
-	void _SLLBM();
-	void _SLLWM();
-	void _SLLBIR();
-	void _SLLBRR();
-	void _SLLWIR();
-	void _SLLWRR();
-	void _SLLLIR();
-	void _SLLLRR();
-	void _SRABM();
-	void _SRAWM();
-	void _SRABIR();
-	void _SRABRR();
-	void _SRAWIR();
-	void _SRAWRR();
-	void _SRALIR();
-	void _SRALRR();
-	void _SRLBM();
-	void _SRLWM();
-	void _SRLBIR();
-	void _SRLBRR();
-	void _SRLWIR();
-	void _SRLWRR();
-	void _SRLLIR();
-	void _SRLLRR();
-	void _STCFBIM();
-	void _STCFBIR();
-	void _STCFBRM();
-	void _STCFBRR();
-	void _STCFWIR();
-	void _STCFWRR();
-	void _SUBBMI();
-	void _SUBBMR();
-	void _SUBBRI();
-	void _SUBBRM();
-	void _SUBBRR();
-	void _SUBWMI();
-	void _SUBWMR();
-	void _SUBWRI();
-	void _SUBWRM();
-	void _SUBWRR();
-	void _SUBLMR();
-	void _SUBLRI();
-	void _SUBLRM();
-	void _SUBLRR();
-	void _SWI();
-	void _TSETBIM();
-	void _TSETBIR();
-	void _TSETWIR();
-	void _UNLK();
-	void _XORBMI();
-	void _XORBMR();
-	void _XORBRI();
-	void _XORBRM();
-	void _XORBRR();
-	void _XORWMI();
-	void _XORWMR();
-	void _XORWRI();
-	void _XORWRM();
-	void _XORWRR();
-	void _XORLMR();
-	void _XORLRI();
-	void _XORLRM();
-	void _XORLRR();
-	void _XORCFBIM();
-	void _XORCFBIR();
-	void _XORCFBRM();
-	void _XORCFBRR();
-	void _XORCFWIR();
-	void _XORCFWRR();
-	void _ZCF();
+	void op_ADCBMI();
+	void op_ADCBMR();
+	void op_ADCBRI();
+	void op_ADCBRM();
+	void op_ADCBRR();
+	void op_ADCWMI();
+	void op_ADCWMR();
+	void op_ADCWRI();
+	void op_ADCWRM();
+	void op_ADCWRR();
+	void op_ADCLMR();
+	void op_ADCLRI();
+	void op_ADCLRM();
+	void op_ADCLRR();
+	void op_ADDBMI();
+	void op_ADDBMR();
+	void op_ADDBRI();
+	void op_ADDBRM();
+	void op_ADDBRR();
+	void op_ADDWMI();
+	void op_ADDWMR();
+	void op_ADDWRI();
+	void op_ADDWRM();
+	void op_ADDWRR();
+	void op_ADDLMR();
+	void op_ADDLRI();
+	void op_ADDLRM();
+	void op_ADDLRR();
+	void op_ANDBMI();
+	void op_ANDBMR();
+	void op_ANDBRI();
+	void op_ANDBRM();
+	void op_ANDBRR();
+	void op_ANDWMI();
+	void op_ANDWMR();
+	void op_ANDWRI();
+	void op_ANDWRM();
+	void op_ANDWRR();
+	void op_ANDLMR();
+	void op_ANDLRI();
+	void op_ANDLRM();
+	void op_ANDLRR();
+	void op_ANDCFBIM();
+	void op_ANDCFBIR();
+	void op_ANDCFBRM();
+	void op_ANDCFBRR();
+	void op_ANDCFWIR();
+	void op_ANDCFWRR();
+	void op_BITBIM();
+	void op_BITBIR();
+	void op_BITWIR();
+	void op_BS1BRR();
+	void op_BS1FRR();
+	void op_CALLI();
+	void op_CALLM();
+	void op_CALR();
+	void op_CCF();
+	void op_CHGBIM();
+	void op_CHGBIR();
+	void op_CHGWIR();
+	void op_CPBMI();
+	void op_CPBMR();
+	void op_CPBRI();
+	void op_CPBRM();
+	void op_CPBRR();
+	void op_CPWMI();
+	void op_CPWMR();
+	void op_CPWRI();
+	void op_CPWRM();
+	void op_CPWRR();
+	void op_CPLMR();
+	void op_CPLRI();
+	void op_CPLRM();
+	void op_CPLRR();
+	void op_CPD();
+	void op_CPDR();
+	void op_CPDW();
+	void op_CPDRW();
+	void op_CPI();
+	void op_CPIR();
+	void op_CPIW();
+	void op_CPIRW();
+	void op_CPLBR();
+	void op_CPLWR();
+	void op_DAABR();
+	void op_DB();
+	void op_DECBIM();
+	void op_DECBIR();
+	void op_DECWIM();
+	void op_DECWIR();
+	void op_DECLIR();
+	void op_DECF();
+	void op_DIVBRI();
+	void op_DIVBRM();
+	void op_DIVBRR();
+	void op_DIVWRI();
+	void op_DIVWRM();
+	void op_DIVWRR();
+	void op_DIVSBRI();
+	void op_DIVSBRM();
+	void op_DIVSBRR();
+	void op_DIVSWRI();
+	void op_DIVSWRM();
+	void op_DIVSWRR();
+	void op_DJNZB();
+	void op_DJNZW();
+	void op_EI();
+	void op_EXBMR();
+	void op_EXBRR();
+	void op_EXWMR();
+	void op_EXWRR();
+	void op_EXTSWR();
+	void op_EXTSLR();
+	void op_EXTZWR();
+	void op_EXTZLR();
+	void op_HALT();
+	void op_INCBIM();
+	void op_INCBIR();
+	void op_INCWIM();
+	void op_INCWIR();
+	void op_INCLIR();
+	void op_INCF();
+	void op_JPI();
+	void op_JPM();
+	void op_JR();
+	void op_JRL();
+	void op_LDBMI();
+	void op_LDBMM();
+	void op_LDBMR();
+	void op_LDBRI();
+	void op_LDBRM();
+	void op_LDBRR();
+	void op_LDWMI();
+	void op_LDWMM();
+	void op_LDWMR();
+	void op_LDWRI();
+	void op_LDWRM();
+	void op_LDWRR();
+	void op_LDLRI();
+	void op_LDLRM();
+	void op_LDLRR();
+	void op_LDLMR();
+	void op_LDAW();
+	void op_LDAL();
+	void op_LDCBRR();
+	void op_LDCWRR();
+	void op_LDCLRR();
+	void op_LDCFBIM();
+	void op_LDCFBIR();
+	void op_LDCFBRM();
+	void op_LDCFBRR();
+	void op_LDCFWIR();
+	void op_LDCFWRR();
+	void op_LDD();
+	void op_LDDR();
+	void op_LDDRW();
+	void op_LDDW();
+	void op_LDF();
+	void op_LDI();
+	void op_LDIR();
+	void op_LDIRW();
+	void op_LDIW();
+	void op_LDX();
+	void op_LINK();
+	void op_MAX();
+	void op_MDEC1();
+	void op_MDEC2();
+	void op_MDEC4();
+	void op_MINC1();
+	void op_MINC2();
+	void op_MINC4();
+	void op_MIRRW();
+	void op_MULBRI();
+	void op_MULBRM();
+	void op_MULBRR();
+	void op_MULWRI();
+	void op_MULWRM();
+	void op_MULWRR();
+	void op_MULAR();
+	void op_MULSBRI();
+	void op_MULSBRM();
+	void op_MULSBRR();
+	void op_MULSWRI();
+	void op_MULSWRM();
+	void op_MULSWRR();
+	void op_NEGBR();
+	void op_NEGWR();
+	void op_NOP();
+	void op_NORMAL();
+	void op_ORBMI();
+	void op_ORBMR();
+	void op_ORBRI();
+	void op_ORBRM();
+	void op_ORBRR();
+	void op_ORWMI();
+	void op_ORWMR();
+	void op_ORWRI();
+	void op_ORWRM();
+	void op_ORWRR();
+	void op_ORLMR();
+	void op_ORLRI();
+	void op_ORLRM();
+	void op_ORLRR();
+	void op_ORCFBIM();
+	void op_ORCFBIR();
+	void op_ORCFBRM();
+	void op_ORCFBRR();
+	void op_ORCFWIR();
+	void op_ORCFWRR();
+	void op_PAAWR();
+	void op_PAALR();
+	void op_POPBM();
+	void op_POPBR();
+	void op_POPWM();
+	void op_POPWR();
+	void op_POPWSR();
+	void op_POPLR();
+	void op_PUSHBI();
+	void op_PUSHBM();
+	void op_PUSHBR();
+	void op_PUSHWI();
+	void op_PUSHWM();
+	void op_PUSHWR();
+	void op_PUSHLR();
+	void op_RCF();
+	void op_RESBIM();
+	void op_RESBIR();
+	void op_RESWIR();
+	void op_RET();
+	void op_RETCC();
+	void op_RETD();
+	void op_RETI();
+	void op_RLBM();
+	void op_RLWM();
+	void op_RLBIR();
+	void op_RLBRR();
+	void op_RLWIR();
+	void op_RLWRR();
+	void op_RLLIR();
+	void op_RLLRR();
+	void op_RLCBM();
+	void op_RLCWM();
+	void op_RLCBIR();
+	void op_RLCBRR();
+	void op_RLCWIR();
+	void op_RLCWRR();
+	void op_RLCLIR();
+	void op_RLCLRR();
+	void op_RLDRM();
+	void op_RRBM();
+	void op_RRWM();
+	void op_RRBIR();
+	void op_RRBRR();
+	void op_RRWIR();
+	void op_RRWRR();
+	void op_RRLIR();
+	void op_RRLRR();
+	void op_RRCBM();
+	void op_RRCWM();
+	void op_RRCBIR();
+	void op_RRCBRR();
+	void op_RRCWIR();
+	void op_RRCWRR();
+	void op_RRCLIR();
+	void op_RRCLRR();
+	void op_RRDRM();
+	void op_SBCBMI();
+	void op_SBCBMR();
+	void op_SBCBRI();
+	void op_SBCBRM();
+	void op_SBCBRR();
+	void op_SBCWMI();
+	void op_SBCWMR();
+	void op_SBCWRI();
+	void op_SBCWRM();
+	void op_SBCWRR();
+	void op_SBCLMR();
+	void op_SBCLRI();
+	void op_SBCLRM();
+	void op_SBCLRR();
+	void op_SCCBR();
+	void op_SCCWR();
+	void op_SCF();
+	void op_SETBIM();
+	void op_SETBIR();
+	void op_SETWIR();
+	void op_SLABM();
+	void op_SLAWM();
+	void op_SLABIR();
+	void op_SLABRR();
+	void op_SLAWIR();
+	void op_SLAWRR();
+	void op_SLALIR();
+	void op_SLALRR();
+	void op_SLLBM();
+	void op_SLLWM();
+	void op_SLLBIR();
+	void op_SLLBRR();
+	void op_SLLWIR();
+	void op_SLLWRR();
+	void op_SLLLIR();
+	void op_SLLLRR();
+	void op_SRABM();
+	void op_SRAWM();
+	void op_SRABIR();
+	void op_SRABRR();
+	void op_SRAWIR();
+	void op_SRAWRR();
+	void op_SRALIR();
+	void op_SRALRR();
+	void op_SRLBM();
+	void op_SRLWM();
+	void op_SRLBIR();
+	void op_SRLBRR();
+	void op_SRLWIR();
+	void op_SRLWRR();
+	void op_SRLLIR();
+	void op_SRLLRR();
+	void op_STCFBIM();
+	void op_STCFBIR();
+	void op_STCFBRM();
+	void op_STCFBRR();
+	void op_STCFWIR();
+	void op_STCFWRR();
+	void op_SUBBMI();
+	void op_SUBBMR();
+	void op_SUBBRI();
+	void op_SUBBRM();
+	void op_SUBBRR();
+	void op_SUBWMI();
+	void op_SUBWMR();
+	void op_SUBWRI();
+	void op_SUBWRM();
+	void op_SUBWRR();
+	void op_SUBLMR();
+	void op_SUBLRI();
+	void op_SUBLRM();
+	void op_SUBLRR();
+	void op_SWI();
+	void op_TSETBIM();
+	void op_TSETBIR();
+	void op_TSETWIR();
+	void op_UNLK();
+	void op_XORBMI();
+	void op_XORBMR();
+	void op_XORBRI();
+	void op_XORBRM();
+	void op_XORBRR();
+	void op_XORWMI();
+	void op_XORWMR();
+	void op_XORWRI();
+	void op_XORWRM();
+	void op_XORWRR();
+	void op_XORLMR();
+	void op_XORLRI();
+	void op_XORLRM();
+	void op_XORLRR();
+	void op_XORCFBIM();
+	void op_XORCFBIR();
+	void op_XORCFBRM();
+	void op_XORCFBRR();
+	void op_XORCFWIR();
+	void op_XORCFWRR();
+	void op_ZCF();
 	void prepare_operands(const tlcs900inst *inst);
-	void _80();
-	void _88();
-	void _90();
-	void _98();
-	void _A0();
-	void _A8();
-	void _B0();
-	void _B8();
-	void _C0();
+	void op_80();
+	void op_88();
+	void op_90();
+	void op_98();
+	void op_A0();
+	void op_A8();
+	void op_B0();
+	void op_B8();
+	void op_C0();
 	void oC8();
-	void _D0();
+	void op_D0();
 	void oD8();
-	void _E0();
-	void _E8();
-	void _F0();
+	void op_E0();
+	void op_E8();
+	void op_F0();
 };
 
 #define MCFG_TMP95C061_PORT1_READ( _port_read ) \
-	devcb = &tmp95c061_device::set_port1_read( *device, DEVCB_##_port_read );
+	devcb = &downcast<tmp95c061_device &>(*device).set_port1_read(DEVCB_##_port_read);
 #define MCFG_TMP95C061_PORT1_WRITE( _port_write ) \
-	devcb = &tmp95c061_device::set_port1_write( *device, DEVCB_##_port_write );
+	devcb = &downcast<tmp95c061_device &>(*device).set_port1_write(DEVCB_##_port_write);
 #define MCFG_TMP95C061_PORT2_WRITE( _port_write ) \
-	devcb = &tmp95c061_device::set_port2_write( *device, DEVCB_##_port_write );
+	devcb = &downcast<tmp95c061_device &>(*device).set_port2_write(DEVCB_##_port_write);
 #define MCFG_TMP95C061_PORT5_READ( _port_read ) \
-	devcb = &tmp95c061_device::set_port5_read( *device, DEVCB_##_port_read );
+	devcb = &downcast<tmp95c061_device &>(*device).set_port5_read(DEVCB_##_port_read);
 #define MCFG_TMP95C061_PORT5_WRITE( _port_write ) \
-	devcb = &tmp95c061_device::set_port5_write( *device, DEVCB_##_port_write );
+	devcb = &downcast<tmp95c061_device &>(*device).set_port5_write(DEVCB_##_port_write);
 #define MCFG_TMP95C061_PORT6_READ( _port_read ) \
-	devcb = &tmp95c061_device::set_port6_read( *device, DEVCB_##_port_read );
+	devcb = &downcast<tmp95c061_device &>(*device).set_port6_read(DEVCB_##_port_read);
 #define MCFG_TMP95C061_PORT6_WRITE( _port_write ) \
-	devcb = &tmp95c061_device::set_port6_write( *device, DEVCB_##_port_write );
+	devcb = &downcast<tmp95c061_device &>(*device).set_port6_write(DEVCB_##_port_write);
 #define MCFG_TMP95C061_PORT7_READ( _port_read ) \
-	devcb = &tmp95c061_device::set_port7_read( *device, DEVCB_##_port_read );
+	devcb = &downcast<tmp95c061_device &>(*device).set_port7_read(DEVCB_##_port_read);
 #define MCFG_TMP95C061_PORT7_WRITE( _port_write ) \
-	devcb = &tmp95c061_device::set_port7_write( *device, DEVCB_##_port_write );
+	devcb = &downcast<tmp95c061_device &>(*device).set_port7_write(DEVCB_##_port_write);
 #define MCFG_TMP95C061_PORT8_READ( _port_read ) \
-	devcb = &tmp95c061_device::set_port8_read( *device, DEVCB_##_port_read );
+	devcb = &downcast<tmp95c061_device &>(*device).set_port8_read(DEVCB_##_port_read);
 #define MCFG_TMP95C061_PORT8_WRITE( _port_write ) \
-	devcb = &mp95c061_device::set_port8_write( *device, DEVCB_##_port_write );
+	devcb = &downcast<mp95c061_device &>(*device).set_port8_write(DEVCB_##_port_write);
 #define MCFG_TMP95C061_PORT9_READ( _port_read ) \
-	devcb = &tmp95c061_device::set_port9_read( *device, DEVCB_##_port_read );
+	devcb = &downcast<tmp95c061_device &>(*device).set_port9_read(DEVCB_##_port_read);
 #define MCFG_TMP95C061_PORTA_READ( _port_read ) \
-	devcb = &tmp95c061_device::set_porta_read( *device, DEVCB_##_port_read );
+	devcb = &downcast<tmp95c061_device &>(*device).set_porta_read(DEVCB_##_port_read);
 #define MCFG_TMP95C061_PORTA_WRITE( _port_write ) \
-	devcb = &tmp95c061_device::set_porta_write( *device, DEVCB_##_port_write );
+	devcb = &downcast<tmp95c061_device &>(*device).set_porta_write(DEVCB_##_port_write);
 #define MCFG_TMP95C061_PORTB_READ( _port_read ) \
-	devcb = &tmp95c061_device::set_portb_read( *device, DEVCB_##_port_read );
+	devcb = &downcast<tmp95c061_device &>(*device).set_portb_read(DEVCB_##_port_read);
 #define MCFG_TMP95C061_PORTB_WRITE( _port_write ) \
-	devcb = &tmp95c061_device::set_portb_write( *device, DEVCB_##_port_write );
+	devcb = &downcast<tmp95c061_device &>(*device).set_portb_write(DEVCB_##_port_write);
 
 class tmp95c061_device : public tlcs900h_device
 {
@@ -650,22 +650,22 @@ public:
 	// construction/destruction
 	tmp95c061_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
-	// static configuration helpers
-	template <class Object> static devcb_base &set_port1_read(device_t &device, Object &&cb) { return downcast<tmp95c061_device &>(device).m_port1_read.set_callback(std::forward<Object>(cb)); }
-	template <class Object> static devcb_base &set_port1_write(device_t &device, Object &&cb) { return downcast<tmp95c061_device &>(device).m_port1_write.set_callback(std::forward<Object>(cb)); }
-	template <class Object> static devcb_base &set_port2_write(device_t &device, Object &&cb) { return downcast<tmp95c061_device &>(device).m_port2_write.set_callback(std::forward<Object>(cb)); }
-	template <class Object> static devcb_base &set_port5_read(device_t &device, Object &&cb) { return downcast<tmp95c061_device &>(device).m_port5_read.set_callback(std::forward<Object>(cb)); }
-	template <class Object> static devcb_base &set_port5_write(device_t &device, Object &&cb) { return downcast<tmp95c061_device &>(device).m_port5_write.set_callback(std::forward<Object>(cb)); }
-	template <class Object> static devcb_base &set_port6_write(device_t &device, Object &&cb) { return downcast<tmp95c061_device &>(device).m_port6_write.set_callback(std::forward<Object>(cb)); }
-	template <class Object> static devcb_base &set_port7_read(device_t &device, Object &&cb) { return downcast<tmp95c061_device &>(device).m_port7_read.set_callback(std::forward<Object>(cb)); }
-	template <class Object> static devcb_base &set_port7_write(device_t &device, Object &&cb) { return downcast<tmp95c061_device &>(device).m_port7_write.set_callback(std::forward<Object>(cb)); }
-	template <class Object> static devcb_base &set_port8_read(device_t &device, Object &&cb) { return downcast<tmp95c061_device &>(device).m_port8_read.set_callback(std::forward<Object>(cb)); }
-	template <class Object> static devcb_base &set_port8_write(device_t &device, Object &&cb) { return downcast<tmp95c061_device &>(device).m_port8_write.set_callback(std::forward<Object>(cb)); }
-	template <class Object> static devcb_base &set_port9_read(device_t &device, Object &&cb) { return downcast<tmp95c061_device &>(device).m_port9_read.set_callback(std::forward<Object>(cb)); }
-	template <class Object> static devcb_base &set_porta_read(device_t &device, Object &&cb) { return downcast<tmp95c061_device &>(device).m_porta_read.set_callback(std::forward<Object>(cb)); }
-	template <class Object> static devcb_base &set_porta_write(device_t &device, Object &&cb) { return downcast<tmp95c061_device &>(device).m_porta_write.set_callback(std::forward<Object>(cb)); }
-	template <class Object> static devcb_base &set_portb_read(device_t &device, Object &&cb) { return downcast<tmp95c061_device &>(device).m_portb_read.set_callback(std::forward<Object>(cb)); }
-	template <class Object> static devcb_base &set_portb_write(device_t &device, Object &&cb) { return downcast<tmp95c061_device &>(device).m_portb_write.set_callback(std::forward<Object>(cb)); }
+	// configuration helpers
+	template <class Object> devcb_base &set_port1_read(Object &&cb) { return m_port1_read.set_callback(std::forward<Object>(cb)); }
+	template <class Object> devcb_base &set_port1_write(Object &&cb) { return m_port1_write.set_callback(std::forward<Object>(cb)); }
+	template <class Object> devcb_base &set_port2_write(Object &&cb) { return m_port2_write.set_callback(std::forward<Object>(cb)); }
+	template <class Object> devcb_base &set_port5_read(Object &&cb) { return m_port5_read.set_callback(std::forward<Object>(cb)); }
+	template <class Object> devcb_base &set_port5_write(Object &&cb) { return m_port5_write.set_callback(std::forward<Object>(cb)); }
+	template <class Object> devcb_base &set_port6_write(Object &&cb) { return m_port6_write.set_callback(std::forward<Object>(cb)); }
+	template <class Object> devcb_base &set_port7_read(Object &&cb) { return m_port7_read.set_callback(std::forward<Object>(cb)); }
+	template <class Object> devcb_base &set_port7_write(Object &&cb) { return m_port7_write.set_callback(std::forward<Object>(cb)); }
+	template <class Object> devcb_base &set_port8_read(Object &&cb) { return m_port8_read.set_callback(std::forward<Object>(cb)); }
+	template <class Object> devcb_base &set_port8_write(Object &&cb) { return m_port8_write.set_callback(std::forward<Object>(cb)); }
+	template <class Object> devcb_base &set_port9_read(Object &&cb) { return m_port9_read.set_callback(std::forward<Object>(cb)); }
+	template <class Object> devcb_base &set_porta_read(Object &&cb) { return m_porta_read.set_callback(std::forward<Object>(cb)); }
+	template <class Object> devcb_base &set_porta_write(Object &&cb) { return m_porta_write.set_callback(std::forward<Object>(cb)); }
+	template <class Object> devcb_base &set_portb_read(Object &&cb) { return m_portb_read.set_callback(std::forward<Object>(cb)); }
+	template <class Object> devcb_base &set_portb_write(Object &&cb) { return m_portb_write.set_callback(std::forward<Object>(cb)); }
 
 	DECLARE_READ8_MEMBER( internal_r );
 	DECLARE_WRITE8_MEMBER( internal_w );
@@ -727,44 +727,44 @@ private:
 };
 
 
-#define MCFG_TMP95C063_PORT0_READ( _port_read ) tmp95c063_device::set_port0_read( *device, DEVCB_##_port_read );
-#define MCFG_TMP95C063_PORT0_WRITE( _port_write ) tmp95c063_device::set_port0_write( *device, DEVCB_##_port_write );
-#define MCFG_TMP95C063_PORT1_READ( _port_read ) tmp95c063_device::set_port1_read( *device, DEVCB_##_port_read );
-#define MCFG_TMP95C063_PORT1_WRITE( _port_write ) tmp95c063_device::set_port1_write( *device, DEVCB_##_port_write );
-#define MCFG_TMP95C063_PORT2_READ( _port_read ) tmp95c063_device::set_port2_read( *device, DEVCB_##_port_read );
-#define MCFG_TMP95C063_PORT2_WRITE( _port_write ) tmp95c063_device::set_port2_write( *device, DEVCB_##_port_write );
-#define MCFG_TMP95C063_PORT3_READ( _port_read ) tmp95c063_device::set_port3_read( *device, DEVCB_##_port_read );
-#define MCFG_TMP95C063_PORT3_WRITE( _port_write ) tmp95c063_device::set_port3_write( *device, DEVCB_##_port_write );
-#define MCFG_TMP95C063_PORT4_READ( _port_read ) tmp95c063_device::set_port4_read( *device, DEVCB_##_port_read );
-#define MCFG_TMP95C063_PORT4_WRITE( _port_write ) tmp95c063_device::set_port4_write( *device, DEVCB_##_port_write );
-#define MCFG_TMP95C063_PORT5_READ( _port_read ) tmp95c063_device::set_port5_read( *device, DEVCB_##_port_read );
-#define MCFG_TMP95C063_PORT5_WRITE( _port_write ) tmp95c063_device::set_port5_write( *device, DEVCB_##_port_write );
-#define MCFG_TMP95C063_PORT6_READ( _port_read ) tmp95c063_device::set_port6_read( *device, DEVCB_##_port_read );
-#define MCFG_TMP95C063_PORT6_WRITE( _port_write ) tmp95c063_device::set_port6_write( *device, DEVCB_##_port_write );
-#define MCFG_TMP95C063_PORT7_READ( _port_read ) tmp95c063_device::set_port7_read( *device, DEVCB_##_port_read );
-#define MCFG_TMP95C063_PORT7_WRITE( _port_write ) tmp95c063_device::set_port7_write( *device, DEVCB_##_port_write );
-#define MCFG_TMP95C063_PORT8_READ( _port_read ) tmp95c063_device::set_port8_read( *device, DEVCB_##_port_read );
-#define MCFG_TMP95C063_PORT8_WRITE( _port_write ) tmp95c063_device::set_port8_write( *device, DEVCB_##_port_write );
-#define MCFG_TMP95C063_PORT9_READ( _port_read ) tmp95c063_device::set_port9_read( *device, DEVCB_##_port_read );
-#define MCFG_TMP95C063_PORT9_WRITE( _port_write ) tmp95c063_device::set_port9_write( *device, DEVCB_##_port_write );
-#define MCFG_TMP95C063_PORTA_READ( _port_read ) tmp95c063_device::set_porta_read( *device, DEVCB_##_port_read );
-#define MCFG_TMP95C063_PORTA_WRITE( _port_write ) tmp95c063_device::set_porta_write( *device, DEVCB_##_port_write );
-#define MCFG_TMP95C063_PORTB_READ( _port_read ) tmp95c063_device::set_portb_read( *device, DEVCB_##_port_read );
-#define MCFG_TMP95C063_PORTB_WRITE( _port_write ) tmp95c063_device::set_portb_write( *device, DEVCB_##_port_write );
-#define MCFG_TMP95C063_PORTC_READ( _port_read ) tmp95c063_device::set_portc_read( *device, DEVCB_##_port_read );
-#define MCFG_TMP95C063_PORTC_WRITE( _port_write ) tmp95c063_device::set_portc_write( *device, DEVCB_##_port_write );
-#define MCFG_TMP95C063_PORTD_READ( _port_read ) tmp95c063_device::set_portd_read( *device, DEVCB_##_port_read );
-#define MCFG_TMP95C063_PORTD_WRITE( _port_write ) tmp95c063_device::set_portd_write( *device, DEVCB_##_port_write );
-#define MCFG_TMP95C063_PORTE_READ( _port_read ) tmp95c063_device::set_porte_read( *device, DEVCB_##_port_read );
-#define MCFG_TMP95C063_PORTE_WRITE( _port_write ) tmp95c063_device::set_porte_write( *device, DEVCB_##_port_write );
-#define MCFG_TMP95C063_AN0_READ( _port_read ) tmp95c063_device::set_an0_read( *device, DEVCB_##_port_read );
-#define MCFG_TMP95C063_AN1_READ( _port_read ) tmp95c063_device::set_an1_read( *device, DEVCB_##_port_read );
-#define MCFG_TMP95C063_AN2_READ( _port_read ) tmp95c063_device::set_an2_read( *device, DEVCB_##_port_read );
-#define MCFG_TMP95C063_AN3_READ( _port_read ) tmp95c063_device::set_an3_read( *device, DEVCB_##_port_read );
-#define MCFG_TMP95C063_AN4_READ( _port_read ) tmp95c063_device::set_an4_read( *device, DEVCB_##_port_read );
-#define MCFG_TMP95C063_AN5_READ( _port_read ) tmp95c063_device::set_an5_read( *device, DEVCB_##_port_read );
-#define MCFG_TMP95C063_AN6_READ( _port_read ) tmp95c063_device::set_an6_read( *device, DEVCB_##_port_read );
-#define MCFG_TMP95C063_AN7_READ( _port_read ) tmp95c063_device::set_an7_read( *device, DEVCB_##_port_read );
+#define MCFG_TMP95C063_PORT0_READ( _port_read ) devcb = &downcast<tmp95c063_device &>(*device).set_port0_read(DEVCB_##_port_read);
+#define MCFG_TMP95C063_PORT0_WRITE( _port_write ) devcb = &downcast<tmp95c063_device &>(*device).set_port0_write(DEVCB_##_port_write);
+#define MCFG_TMP95C063_PORT1_READ( _port_read ) devcb = &downcast<tmp95c063_device &>(*device).set_port1_read(DEVCB_##_port_read);
+#define MCFG_TMP95C063_PORT1_WRITE( _port_write ) devcb = &downcast<tmp95c063_device &>(*device).set_port1_write(DEVCB_##_port_write);
+#define MCFG_TMP95C063_PORT2_READ( _port_read ) devcb = &downcast<tmp95c063_device &>(*device).set_port2_read(DEVCB_##_port_read);
+#define MCFG_TMP95C063_PORT2_WRITE( _port_write ) devcb = &downcast<tmp95c063_device &>(*device).set_port2_write(DEVCB_##_port_write);
+#define MCFG_TMP95C063_PORT3_READ( _port_read ) devcb = &downcast<tmp95c063_device &>(*device).set_port3_read(DEVCB_##_port_read);
+#define MCFG_TMP95C063_PORT3_WRITE( _port_write ) devcb = &downcast<tmp95c063_device &>(*device).set_port3_write(DEVCB_##_port_write);
+#define MCFG_TMP95C063_PORT4_READ( _port_read ) devcb = &downcast<tmp95c063_device &>(*device).set_port4_read(DEVCB_##_port_read);
+#define MCFG_TMP95C063_PORT4_WRITE( _port_write ) devcb = &downcast<tmp95c063_device &>(*device).set_port4_write(DEVCB_##_port_write);
+#define MCFG_TMP95C063_PORT5_READ( _port_read ) devcb = &downcast<tmp95c063_device &>(*device).set_port5_read(DEVCB_##_port_read);
+#define MCFG_TMP95C063_PORT5_WRITE( _port_write ) devcb = &downcast<tmp95c063_device &>(*device).set_port5_write(DEVCB_##_port_write);
+#define MCFG_TMP95C063_PORT6_READ( _port_read ) devcb = &downcast<tmp95c063_device &>(*device).set_port6_read(DEVCB_##_port_read);
+#define MCFG_TMP95C063_PORT6_WRITE( _port_write ) devcb = &downcast<tmp95c063_device &>(*device).set_port6_write(DEVCB_##_port_write);
+#define MCFG_TMP95C063_PORT7_READ( _port_read ) devcb = &downcast<tmp95c063_device &>(*device).set_port7_read(DEVCB_##_port_read);
+#define MCFG_TMP95C063_PORT7_WRITE( _port_write ) devcb = &downcast<tmp95c063_device &>(*device).set_port7_write(DEVCB_##_port_write);
+#define MCFG_TMP95C063_PORT8_READ( _port_read ) devcb = &downcast<tmp95c063_device &>(*device).set_port8_read(DEVCB_##_port_read);
+#define MCFG_TMP95C063_PORT8_WRITE( _port_write ) devcb = &downcast<tmp95c063_device &>(*device).set_port8_write(DEVCB_##_port_write);
+#define MCFG_TMP95C063_PORT9_READ( _port_read ) devcb = &downcast<tmp95c063_device &>(*device).set_port9_read(DEVCB_##_port_read);
+#define MCFG_TMP95C063_PORT9_WRITE( _port_write ) devcb = &downcast<tmp95c063_device &>(*device).set_port9_write(DEVCB_##_port_write);
+#define MCFG_TMP95C063_PORTA_READ( _port_read ) devcb = &downcast<tmp95c063_device &>(*device).set_porta_read(DEVCB_##_port_read);
+#define MCFG_TMP95C063_PORTA_WRITE( _port_write ) devcb = &downcast<tmp95c063_device &>(*device).set_porta_write(DEVCB_##_port_write);
+#define MCFG_TMP95C063_PORTB_READ( _port_read ) devcb = &downcast<tmp95c063_device &>(*device).set_portb_read(DEVCB_##_port_read);
+#define MCFG_TMP95C063_PORTB_WRITE( _port_write ) devcb = &downcast<tmp95c063_device &>(*device).set_portb_write(DEVCB_##_port_write);
+#define MCFG_TMP95C063_PORTC_READ( _port_read ) devcb = &downcast<tmp95c063_device &>(*device).set_portc_read(DEVCB_##_port_read);
+#define MCFG_TMP95C063_PORTC_WRITE( _port_write ) devcb = &downcast<tmp95c063_device &>(*device).set_portc_write(DEVCB_##_port_write);
+#define MCFG_TMP95C063_PORTD_READ( _port_read ) devcb = &downcast<tmp95c063_device &>(*device).set_portd_read(DEVCB_##_port_read);
+#define MCFG_TMP95C063_PORTD_WRITE( _port_write ) devcb = &downcast<tmp95c063_device &>(*device).set_portd_write(DEVCB_##_port_write);
+#define MCFG_TMP95C063_PORTE_READ( _port_read ) devcb = &downcast<tmp95c063_device &>(*device).set_porte_read(DEVCB_##_port_read);
+#define MCFG_TMP95C063_PORTE_WRITE( _port_write ) devcb = &downcast<tmp95c063_device &>(*device).set_porte_write(DEVCB_##_port_write);
+#define MCFG_TMP95C063_AN0_READ( _port_read ) devcb = &downcast<tmp95c063_device &>(*device).set_an0_read(DEVCB_##_port_read);
+#define MCFG_TMP95C063_AN1_READ( _port_read ) devcb = &downcast<tmp95c063_device &>(*device).set_an1_read(DEVCB_##_port_read);
+#define MCFG_TMP95C063_AN2_READ( _port_read ) devcb = &downcast<tmp95c063_device &>(*device).set_an2_read(DEVCB_##_port_read);
+#define MCFG_TMP95C063_AN3_READ( _port_read ) devcb = &downcast<tmp95c063_device &>(*device).set_an3_read(DEVCB_##_port_read);
+#define MCFG_TMP95C063_AN4_READ( _port_read ) devcb = &downcast<tmp95c063_device &>(*device).set_an4_read(DEVCB_##_port_read);
+#define MCFG_TMP95C063_AN5_READ( _port_read ) devcb = &downcast<tmp95c063_device &>(*device).set_an5_read(DEVCB_##_port_read);
+#define MCFG_TMP95C063_AN6_READ( _port_read ) devcb = &downcast<tmp95c063_device &>(*device).set_an6_read(DEVCB_##_port_read);
+#define MCFG_TMP95C063_AN7_READ( _port_read ) devcb = &downcast<tmp95c063_device &>(*device).set_an7_read(DEVCB_##_port_read);
 
 class tmp95c063_device : public tlcs900h_device
 {
@@ -775,37 +775,37 @@ public:
 	DECLARE_READ8_MEMBER( internal_r );
 	DECLARE_WRITE8_MEMBER( internal_w );
 
-	// static configuration helpers
-	template <class Object> static devcb_base &set_port1_read(device_t &device, Object &&cb) { return downcast<tmp95c063_device &>(device).m_port1_read.set_callback(std::forward<Object>(cb)); }
-	template <class Object> static devcb_base &set_port1_write(device_t &device, Object &&cb) { return downcast<tmp95c063_device &>(device).m_port1_write.set_callback(std::forward<Object>(cb)); }
-	template <class Object> static devcb_base &set_port2_write(device_t &device, Object &&cb) { return downcast<tmp95c063_device &>(device).m_port2_write.set_callback(std::forward<Object>(cb)); }
-	template <class Object> static devcb_base &set_port5_read(device_t &device, Object &&cb) { return downcast<tmp95c063_device &>(device).m_port5_read.set_callback(std::forward<Object>(cb)); }
-	template <class Object> static devcb_base &set_port5_write(device_t &device, Object &&cb) { return downcast<tmp95c063_device &>(device).m_port5_write.set_callback(std::forward<Object>(cb)); }
-	template <class Object> static devcb_base &set_port6_read(device_t &device, Object &&cb) { return downcast<tmp95c063_device &>(device).m_port6_read.set_callback(std::forward<Object>(cb)); }
-	template <class Object> static devcb_base &set_port6_write(device_t &device, Object &&cb) { return downcast<tmp95c063_device &>(device).m_port6_write.set_callback(std::forward<Object>(cb)); }
-	template <class Object> static devcb_base &set_port7_read(device_t &device, Object &&cb) { return downcast<tmp95c063_device &>(device).m_port7_read.set_callback(std::forward<Object>(cb)); }
-	template <class Object> static devcb_base &set_port7_write(device_t &device, Object &&cb) { return downcast<tmp95c063_device &>(device).m_port7_write.set_callback(std::forward<Object>(cb)); }
-	template <class Object> static devcb_base &set_port8_read(device_t &device, Object &&cb) { return downcast<tmp95c063_device &>(device).m_port8_read.set_callback(std::forward<Object>(cb)); }
-	template <class Object> static devcb_base &set_port8_write(device_t &device, Object &&cb) { return downcast<tmp95c063_device &>(device).m_port8_write.set_callback(std::forward<Object>(cb)); }
-	template <class Object> static devcb_base &set_port9_read(device_t &device, Object &&cb) { return downcast<tmp95c063_device &>(device).m_port9_read.set_callback(std::forward<Object>(cb)); }
-	template <class Object> static devcb_base &set_port9_write(device_t &device, Object &&cb) { return downcast<tmp95c063_device &>(device).m_port9_write.set_callback(std::forward<Object>(cb)); }
-	template <class Object> static devcb_base &set_porta_read(device_t &device, Object &&cb) { return downcast<tmp95c063_device &>(device).m_porta_read.set_callback(std::forward<Object>(cb)); }
-	template <class Object> static devcb_base &set_porta_write(device_t &device, Object &&cb) { return downcast<tmp95c063_device &>(device).m_porta_write.set_callback(std::forward<Object>(cb)); }
-	template <class Object> static devcb_base &set_portb_read(device_t &device, Object &&cb) { return downcast<tmp95c063_device &>(device).m_portb_read.set_callback(std::forward<Object>(cb)); }
-	template <class Object> static devcb_base &set_portb_write(device_t &device, Object &&cb) { return downcast<tmp95c063_device &>(device).m_portb_write.set_callback(std::forward<Object>(cb)); }
-	template <class Object> static devcb_base &set_portc_read(device_t &device, Object &&cb) { return downcast<tmp95c063_device &>(device).m_portc_read.set_callback(std::forward<Object>(cb)); }
-	template <class Object> static devcb_base &set_portd_read(device_t &device, Object &&cb) { return downcast<tmp95c063_device &>(device).m_portd_read.set_callback(std::forward<Object>(cb)); }
-	template <class Object> static devcb_base &set_portd_write(device_t &device, Object &&cb) { return downcast<tmp95c063_device &>(device).m_portd_write.set_callback(std::forward<Object>(cb)); }
-	template <class Object> static devcb_base &set_porte_read(device_t &device, Object &&cb) { return downcast<tmp95c063_device &>(device).m_porte_read.set_callback(std::forward<Object>(cb)); }
-	template <class Object> static devcb_base &set_porte_write(device_t &device, Object &&cb) { return downcast<tmp95c063_device &>(device).m_porte_write.set_callback(std::forward<Object>(cb)); }
-	template <class Object> static devcb_base &set_an0_read(device_t &device, Object &&cb) { return downcast<tmp95c063_device &>(device).m_an0_read.set_callback(std::forward<Object>(cb)); }
-	template <class Object> static devcb_base &set_an1_read(device_t &device, Object &&cb) { return downcast<tmp95c063_device &>(device).m_an1_read.set_callback(std::forward<Object>(cb)); }
-	template <class Object> static devcb_base &set_an2_read(device_t &device, Object &&cb) { return downcast<tmp95c063_device &>(device).m_an2_read.set_callback(std::forward<Object>(cb)); }
-	template <class Object> static devcb_base &set_an3_read(device_t &device, Object &&cb) { return downcast<tmp95c063_device &>(device).m_an3_read.set_callback(std::forward<Object>(cb)); }
-	template <class Object> static devcb_base &set_an4_read(device_t &device, Object &&cb) { return downcast<tmp95c063_device &>(device).m_an4_read.set_callback(std::forward<Object>(cb)); }
-	template <class Object> static devcb_base &set_an5_read(device_t &device, Object &&cb) { return downcast<tmp95c063_device &>(device).m_an5_read.set_callback(std::forward<Object>(cb)); }
-	template <class Object> static devcb_base &set_an6_read(device_t &device, Object &&cb) { return downcast<tmp95c063_device &>(device).m_an6_read.set_callback(std::forward<Object>(cb)); }
-	template <class Object> static devcb_base &set_an7_read(device_t &device, Object &&cb) { return downcast<tmp95c063_device &>(device).m_an7_read.set_callback(std::forward<Object>(cb)); }
+	// configuration helpers
+	template <class Object> devcb_base &set_port1_read(Object &&cb) { return m_port1_read.set_callback(std::forward<Object>(cb)); }
+	template <class Object> devcb_base &set_port1_write(Object &&cb) { return m_port1_write.set_callback(std::forward<Object>(cb)); }
+	template <class Object> devcb_base &set_port2_write(Object &&cb) { return m_port2_write.set_callback(std::forward<Object>(cb)); }
+	template <class Object> devcb_base &set_port5_read(Object &&cb) { return m_port5_read.set_callback(std::forward<Object>(cb)); }
+	template <class Object> devcb_base &set_port5_write(Object &&cb) { return m_port5_write.set_callback(std::forward<Object>(cb)); }
+	template <class Object> devcb_base &set_port6_read(Object &&cb) { return m_port6_read.set_callback(std::forward<Object>(cb)); }
+	template <class Object> devcb_base &set_port6_write(Object &&cb) { return m_port6_write.set_callback(std::forward<Object>(cb)); }
+	template <class Object> devcb_base &set_port7_read(Object &&cb) { return m_port7_read.set_callback(std::forward<Object>(cb)); }
+	template <class Object> devcb_base &set_port7_write(Object &&cb) { return m_port7_write.set_callback(std::forward<Object>(cb)); }
+	template <class Object> devcb_base &set_port8_read(Object &&cb) { return m_port8_read.set_callback(std::forward<Object>(cb)); }
+	template <class Object> devcb_base &set_port8_write(Object &&cb) { return m_port8_write.set_callback(std::forward<Object>(cb)); }
+	template <class Object> devcb_base &set_port9_read(Object &&cb) { return m_port9_read.set_callback(std::forward<Object>(cb)); }
+	template <class Object> devcb_base &set_port9_write(Object &&cb) { return m_port9_write.set_callback(std::forward<Object>(cb)); }
+	template <class Object> devcb_base &set_porta_read(Object &&cb) { return m_porta_read.set_callback(std::forward<Object>(cb)); }
+	template <class Object> devcb_base &set_porta_write(Object &&cb) { return m_porta_write.set_callback(std::forward<Object>(cb)); }
+	template <class Object> devcb_base &set_portb_read(Object &&cb) { return m_portb_read.set_callback(std::forward<Object>(cb)); }
+	template <class Object> devcb_base &set_portb_write(Object &&cb) { return m_portb_write.set_callback(std::forward<Object>(cb)); }
+	template <class Object> devcb_base &set_portc_read(Object &&cb) { return m_portc_read.set_callback(std::forward<Object>(cb)); }
+	template <class Object> devcb_base &set_portd_read(Object &&cb) { return m_portd_read.set_callback(std::forward<Object>(cb)); }
+	template <class Object> devcb_base &set_portd_write(Object &&cb) { return m_portd_write.set_callback(std::forward<Object>(cb)); }
+	template <class Object> devcb_base &set_porte_read(Object &&cb) { return m_porte_read.set_callback(std::forward<Object>(cb)); }
+	template <class Object> devcb_base &set_porte_write(Object &&cb) { return m_porte_write.set_callback(std::forward<Object>(cb)); }
+	template <class Object> devcb_base &set_an0_read(Object &&cb) { return m_an0_read.set_callback(std::forward<Object>(cb)); }
+	template <class Object> devcb_base &set_an1_read(Object &&cb) { return m_an1_read.set_callback(std::forward<Object>(cb)); }
+	template <class Object> devcb_base &set_an2_read(Object &&cb) { return m_an2_read.set_callback(std::forward<Object>(cb)); }
+	template <class Object> devcb_base &set_an3_read(Object &&cb) { return m_an3_read.set_callback(std::forward<Object>(cb)); }
+	template <class Object> devcb_base &set_an4_read(Object &&cb) { return m_an4_read.set_callback(std::forward<Object>(cb)); }
+	template <class Object> devcb_base &set_an5_read(Object &&cb) { return m_an5_read.set_callback(std::forward<Object>(cb)); }
+	template <class Object> devcb_base &set_an6_read(Object &&cb) { return m_an6_read.set_callback(std::forward<Object>(cb)); }
+	template <class Object> devcb_base &set_an7_read(Object &&cb) { return m_an7_read.set_callback(std::forward<Object>(cb)); }
 
 	void tmp95c063_mem16(address_map &map);
 	void tmp95c063_mem8(address_map &map);

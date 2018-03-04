@@ -239,6 +239,7 @@ private:
 	rgb_t yuv_to_rgb(int y, int u, int v) const;
 	virtual uint32_t screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect) override;
 
+	std::string m_screen_tag;
 	int m_extcnt;
 	uint8_t m_extreg;
 	uint8_t m_interlace;
@@ -251,17 +252,16 @@ DEFINE_DEVICE_TYPE(VIS_VGA, vis_vga_device, "vis_vga", "vis_vga")
 
 vis_vga_device::vis_vga_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
 	: svga_device(mconfig, VIS_VGA, tag, owner, clock),
-	device_isa16_card_interface(mconfig, *this)
+	device_isa16_card_interface(mconfig, *this),
+	m_screen_tag(subtag("screen"))
 {
-	m_palette.set_tag("palette");
-	m_screen.set_tag("screen");
+	set_screen(m_screen_tag.c_str());
 }
 
 MACHINE_CONFIG_START(vis_vga_device::device_add_mconfig)
 	MCFG_SCREEN_ADD("screen", RASTER)
 	MCFG_SCREEN_RAW_PARAMS(XTAL(25'174'800),900,0,640,526,0,480)
 	MCFG_SCREEN_UPDATE_DEVICE(DEVICE_SELF, vis_vga_device, screen_update)
-	MCFG_PALETTE_ADD("palette", 0x100)
 MACHINE_CONFIG_END
 
 void vis_vga_device::recompute_params()
@@ -287,9 +287,9 @@ void vis_vga_device::recompute_params()
 	pixel_clock = xtal.value() / (((vga.sequencer.data[1]&8) >> 3) + 1);
 
 	refresh  = HZ_TO_ATTOSECONDS(pixel_clock) * (hblank_period) * vblank_period;
-	machine().first_screen()->configure((hblank_period), (vblank_period), visarea, refresh );
+	screen().configure((hblank_period), (vblank_period), visarea, refresh );
 	//popmessage("%d %d\n",vga.crtc.horz_total * 8,vga.crtc.vert_total);
-	m_vblank_timer->adjust( machine().first_screen()->time_until_pos((vga.crtc.vert_blank_start + vga.crtc.vert_blank_end)) );
+	m_vblank_timer->adjust( screen().time_until_pos((vga.crtc.vert_blank_start + vga.crtc.vert_blank_end)) );
 }
 
 rgb_t vis_vga_device::yuv_to_rgb(int y, int u, int v) const
@@ -327,7 +327,7 @@ void vis_vga_device::vga_vh_yuv8(bitmap_rgb32 &bitmap, const rectangle &cliprect
 
 				for(int xi=0;xi<8;xi+=4)
 				{
-					if(!m_screen->visible_area().contains(col+xi, line + yi))
+					if(!screen().visible_area().contains(col+xi, line + yi))
 						continue;
 					uint8_t a = vga.memory[pos + xi], b = vga.memory[pos + xi + 1];
 					uint8_t c = vga.memory[pos + xi + 2], d = vga.memory[pos + xi + 3];
@@ -376,8 +376,6 @@ void vis_vga_device::vga_vh_yuv8(bitmap_rgb32 &bitmap, const rectangle &cliprect
 
 void vis_vga_device::device_start()
 {
-	if(!m_palette->started())
-		throw device_missing_dependencies();
 	set_isa_device();
 	m_isa->install_device(0x03b0, 0x03df, read8_delegate(FUNC(vis_vga_device::vga_r), this), write8_delegate(FUNC(vis_vga_device::vga_w), this));
 	m_isa->install_memory(0x0a0000, 0x0bffff, read8_delegate(FUNC(vis_vga_device::visvgamem_r), this), write8_delegate(FUNC(vis_vga_device::visvgamem_w), this));

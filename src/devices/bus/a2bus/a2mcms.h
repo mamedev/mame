@@ -33,7 +33,7 @@ public:
 
 	void set_bus_device(a2bus_mcms1_device *pDev) { m_pBusDevice = pDev; }
 
-	template<class _Object> static devcb_base &set_irq_cb(device_t &device, _Object wr) { return downcast<mcms_device &>(device).m_write_irq.set_callback(wr); }
+	template<class Object> devcb_base &set_irq_cb(Object &&wr) { return m_write_irq.set_callback(std::forward<Object>(wr)); }
 	devcb_write_line m_write_irq;
 
 protected:

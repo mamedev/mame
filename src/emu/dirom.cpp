@@ -14,15 +14,6 @@ device_rom_interface::~device_rom_interface()
 {
 }
 
-void device_rom_interface::static_set_device_rom_tag(device_t &device, const char *tag)
-{
-	device_rom_interface *romintf;
-	if (!device.interface(romintf))
-		throw emu_fatalerror("MCFG_DEVICE_ROM called on device '%s' with no ROM interface\n", device.tag());
-
-	romintf->m_rom_tag = tag;
-}
-
 device_memory_interface::space_config_vector device_rom_interface::memory_space_config() const
 {
 	return space_config_vector {

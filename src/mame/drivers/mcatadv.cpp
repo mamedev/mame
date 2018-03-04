@@ -142,18 +142,13 @@ Stephh's notes (based on the games M68000 code and some tests) :
 
 #include "cpu/m68000/m68000.h"
 #include "cpu/z80/z80.h"
+#include "machine/gen_latch.h"
 #include "sound/2610intf.h"
 #include "screen.h"
 #include "speaker.h"
 
 
 /*** Main CPU ***/
-
-WRITE16_MEMBER(mcatadv_state::mcat_soundlatch_w)
-{
-	m_soundlatch->write(space, 0, data);
-	m_soundcpu->set_input_line(INPUT_LINE_NMI, PULSE_LINE);
-}
 
 #if 0 // mcat only.. install read handler?
 WRITE16_MEMBER(mcatadv_state::mcat_coin_w)
@@ -174,6 +169,13 @@ READ16_MEMBER(mcatadv_state::mcat_wd_r)
 	return 0xc00;
 }
 
+template<int Chip>
+WRITE16_MEMBER(mcatadv_state::vram_w)
+{
+	COMBINE_DATA(&m_vram[Chip][offset]);
+	m_tilemap[Chip]->mark_tile_dirty(offset / 2);
+}
+
 
 ADDRESS_MAP_START(mcatadv_state::mcatadv_map)
 	AM_RANGE(0x000000, 0x0fffff) AM_ROM
@@ -184,8 +186,8 @@ ADDRESS_MAP_START(mcatadv_state::mcatadv_map)
 	AM_RANGE(0x200000, 0x200005) AM_RAM AM_SHARE("scroll1")
 	AM_RANGE(0x300000, 0x300005) AM_RAM AM_SHARE("scroll2")
 
-	AM_RANGE(0x400000, 0x401fff) AM_RAM_WRITE(mcatadv_videoram1_w) AM_SHARE("videoram1") // Tilemap 0
-	AM_RANGE(0x500000, 0x501fff) AM_RAM_WRITE(mcatadv_videoram2_w) AM_SHARE("videoram2") // Tilemap 1
+	AM_RANGE(0x400000, 0x401fff) AM_RAM_WRITE(vram_w<0>) AM_SHARE("vram_1") // Tilemap 0
+	AM_RANGE(0x500000, 0x501fff) AM_RAM_WRITE(vram_w<1>) AM_SHARE("vram_2") // Tilemap 1
 
 	AM_RANGE(0x600000, 0x601fff) AM_RAM_DEVWRITE("palette", palette_device, write16) AM_SHARE("palette")
 	AM_RANGE(0x602000, 0x602fff) AM_RAM // Bigger than needs to be?
@@ -204,20 +206,20 @@ ADDRESS_MAP_START(mcatadv_state::mcatadv_map)
 	AM_RANGE(0xb00018, 0xb00019) AM_DEVWRITE("watchdog", watchdog_timer_device, reset16_w) // NOST Only
 	AM_RANGE(0xb0001e, 0xb0001f) AM_READ(mcat_wd_r) // MCAT Only
 	AM_RANGE(0xc00000, 0xc00001) AM_DEVREAD8("soundlatch2", generic_latch_8_device, read, 0x00ff)
-	AM_RANGE(0xc00000, 0xc00001) AM_WRITE(mcat_soundlatch_w)
+	AM_RANGE(0xc00000, 0xc00001) AM_DEVWRITE8("soundlatch", generic_latch_8_device, write, 0x00ff).cswidth(16)
 ADDRESS_MAP_END
 
 /*** Sound ***/
 
 WRITE8_MEMBER(mcatadv_state::mcatadv_sound_bw_w)
 {
-	membank("bank1")->set_entry(data);
+	m_soundbank->set_entry(data);
 }
 
 
 ADDRESS_MAP_START(mcatadv_state::mcatadv_sound_map)
 	AM_RANGE(0x0000, 0x3fff) AM_ROM                     // ROM
-	AM_RANGE(0x4000, 0xbfff) AM_ROMBANK("bank1")                // ROM
+	AM_RANGE(0x4000, 0xbfff) AM_ROMBANK("soundbank")                // ROM
 	AM_RANGE(0xc000, 0xdfff) AM_RAM                     // RAM
 	AM_RANGE(0xe000, 0xe003) AM_DEVREADWRITE("ymsnd", ym2610_device, read, write)
 	AM_RANGE(0xf000, 0xf000) AM_WRITE(mcatadv_sound_bw_w)
@@ -231,7 +233,7 @@ ADDRESS_MAP_END
 
 ADDRESS_MAP_START(mcatadv_state::nost_sound_map)
 	AM_RANGE(0x0000, 0x7fff) AM_ROM                     // ROM
-	AM_RANGE(0x8000, 0xbfff) AM_ROMBANK("bank1")                // ROM
+	AM_RANGE(0x8000, 0xbfff) AM_ROMBANK("soundbank")                // ROM
 	AM_RANGE(0xc000, 0xdfff) AM_RAM                     // RAM
 ADDRESS_MAP_END
 
@@ -400,33 +402,31 @@ INPUT_PORTS_END
 
 /*** GFX Decode ***/
 
-static const gfx_layout mcatadv_tiles16x16x4_layout =
+static const gfx_layout layout_16x16x4 =
 {
 	16,16,
 	RGN_FRAC(1,1),
 	4,
 	{ STEP4(0,1) },
-	{ STEP8(0,4), STEP8(32*8,4) },
-	{ STEP8(0,32), STEP8(64*8,32) },
-	128*8
+	{ STEP8(0,4), STEP8(4*8*8,4) },
+	{ STEP8(0,4*8), STEP8(4*8*8*2,4*8) },
+	16*16*4
 };
 
 static GFXDECODE_START( mcatadv )
-	GFXDECODE_ENTRY( "gfx2", 0, mcatadv_tiles16x16x4_layout, 0, 0x200 )
-	GFXDECODE_ENTRY( "gfx3", 0, mcatadv_tiles16x16x4_layout, 0, 0x200 )
+	GFXDECODE_ENTRY( "bg0", 0, layout_16x16x4, 0, 0x200 )
+	GFXDECODE_ENTRY( "bg1", 0, layout_16x16x4, 0, 0x200 )
 GFXDECODE_END
 
 
 void mcatadv_state::machine_start()
 {
-	uint8_t *ROM = memregion("soundcpu")->base();
+	uint32_t max = memregion("soundcpu")->bytes()/0x4000;
 
-	membank("bank1")->configure_entries(0, 8, &ROM[0x10000], 0x4000);
-	membank("bank1")->set_entry(1);
+	m_soundbank->configure_entries(0, max, memregion("soundcpu")->base(), 0x4000);
+	m_soundbank->set_entry(1);
 
-
-	save_item(NAME(m_palette_bank1));
-	save_item(NAME(m_palette_bank2));
+	save_item(NAME(m_palette_bank));
 }
 
 MACHINE_CONFIG_START(mcatadv_state::mcatadv)
@@ -460,17 +460,18 @@ MACHINE_CONFIG_START(mcatadv_state::mcatadv)
 
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
+	MCFG_SPEAKER_STANDARD_MONO("mono")
 
 	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
+	MCFG_GENERIC_LATCH_DATA_PENDING_CB(INPUTLINE("soundcpu", INPUT_LINE_NMI))
+
 	MCFG_GENERIC_LATCH_8_ADD("soundlatch2")
 
 	MCFG_SOUND_ADD("ymsnd", YM2610, XTAL(16'000'000)/2) /* verified on pcb */
 	MCFG_YM2610_IRQ_HANDLER(INPUTLINE("soundcpu", 0))
-	MCFG_SOUND_ROUTE(0, "lspeaker",  0.32)
-	MCFG_SOUND_ROUTE(0, "rspeaker", 0.32)
-	MCFG_SOUND_ROUTE(1, "lspeaker",  0.5)
-	MCFG_SOUND_ROUTE(2, "rspeaker", 0.5)
+	MCFG_SOUND_ROUTE(0, "mono", 0.32)
+	MCFG_SOUND_ROUTE(1, "mono", 0.5)
+	MCFG_SOUND_ROUTE(2, "mono", 0.5)
 MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(mcatadv_state::nost)
@@ -480,14 +481,11 @@ MACHINE_CONFIG_START(mcatadv_state::nost)
 	MCFG_CPU_PROGRAM_MAP(nost_sound_map)
 	MCFG_CPU_IO_MAP(nost_sound_io_map)
 
-	MCFG_DEVICE_REMOVE("lspeaker")
-	MCFG_DEVICE_REMOVE("rspeaker")
-	MCFG_SPEAKER_STANDARD_MONO("mono")
 	MCFG_SOUND_REPLACE("ymsnd", YM2610, XTAL(16'000'000)/2) /* verified on pcb */
-		MCFG_YM2610_IRQ_HANDLER(INPUTLINE("soundcpu", 0))
-		MCFG_SOUND_ROUTE(0, "mono", 0.2)
-		MCFG_SOUND_ROUTE(1, "mono", 0.5)
-		MCFG_SOUND_ROUTE(2, "mono", 0.5)
+	MCFG_YM2610_IRQ_HANDLER(INPUTLINE("soundcpu", 0))
+	MCFG_SOUND_ROUTE(0, "mono", 0.2)
+	MCFG_SOUND_ROUTE(1, "mono", 0.5)
+	MCFG_SOUND_ROUTE(2, "mono", 0.5)
 MACHINE_CONFIG_END
 
 
@@ -496,11 +494,10 @@ ROM_START( mcatadv )
 	ROM_LOAD16_BYTE( "mca-u30e", 0x00000, 0x80000, CRC(c62fbb65) SHA1(39a30a165d4811141db8687a4849626bef8e778e) )
 	ROM_LOAD16_BYTE( "mca-u29e", 0x00001, 0x80000, CRC(cf21227c) SHA1(4012811ebfe3c709ab49946f8138bc4bad881ef7) )
 
-	ROM_REGION( 0x030000, "soundcpu", 0 ) /* Z80-A */
+	ROM_REGION( 0x020000, "soundcpu", 0 ) /* Z80-A */
 	ROM_LOAD( "u9.bin", 0x00000, 0x20000, CRC(fda05171) SHA1(2c69292573ec35034572fa824c0cae2839d23919) )
-	ROM_RELOAD( 0x10000, 0x20000 )
 
-	ROM_REGION( 0x800000, "gfx1", ROMREGION_ERASEFF ) /* Sprites */
+	ROM_REGION( 0x800000, "sprdata", ROMREGION_ERASEFF ) /* Sprites */
 	ROM_LOAD16_BYTE( "mca-u82.bin", 0x000000, 0x100000, CRC(5f01d746) SHA1(11b241456e15299912ee365eedb8f9d5e5ca875d) )
 	ROM_LOAD16_BYTE( "mca-u83.bin", 0x000001, 0x100000, CRC(4e1be5a6) SHA1(cb19aad42dba54d6a4a33859f27254c2a3271e8c) )
 	ROM_LOAD16_BYTE( "mca-u84.bin", 0x200000, 0x080000, CRC(df202790) SHA1(f6ae54e799af195860ed0ab3c85138cf2f10efa6) )
@@ -508,15 +505,15 @@ ROM_START( mcatadv )
 	ROM_LOAD16_BYTE( "mca-u86e",    0x400000, 0x080000, CRC(017bf1da) SHA1(f6446a7219275c0eff62129f59fdfa3a6a3e06c8) )
 	ROM_LOAD16_BYTE( "mca-u87e",    0x400001, 0x080000, CRC(bc9dc9b9) SHA1(f525c9f994d5107752aa4d3a499ee376ec75f42b) )
 
-	ROM_REGION( 0x080000, "gfx2", 0 ) /* BG0 */
+	ROM_REGION( 0x080000, "bg0", 0 ) /* BG0 */
 	ROM_LOAD( "mca-u58.bin", 0x000000, 0x080000, CRC(3a8186e2) SHA1(129c220d72608a8839f779ce1a6cfec8646dbf23) )
 
-	ROM_REGION( 0x280000, "gfx3", 0 ) /* BG1 */
+	ROM_REGION( 0x280000, "bg1", 0 ) /* BG1 */
 	ROM_LOAD( "mca-u60.bin", 0x000000, 0x100000, CRC(c8942614) SHA1(244fccb9abbb04e33839dd2cd0e2de430819a18c) )
 	ROM_LOAD( "mca-u61.bin", 0x100000, 0x100000, CRC(51af66c9) SHA1(1055cf78ea286f02003b0d1bf08c2d7829b36f90) )
 	ROM_LOAD( "mca-u100",    0x200000, 0x080000, CRC(b273f1b0) SHA1(39318fe2aaf2792b85426ec6791b3360ac964de3) )
 
-	ROM_REGION( 0x80000, "ymsnd", 0 ) /* Samples - ADPCM or Delta-T? */
+	ROM_REGION( 0x80000, "ymsnd", 0 ) /* Samples */
 	ROM_LOAD( "mca-u53.bin", 0x00000, 0x80000, CRC(64c76e05) SHA1(379cef5e0cba78d0e886c9cede41985850a3afb7) )
 ROM_END
 
@@ -525,11 +522,10 @@ ROM_START( mcatadvj )
 	ROM_LOAD16_BYTE( "u30.bin", 0x00000, 0x80000, CRC(05762f42) SHA1(3675fb606bf9d7be9462324e68263f4a6c2fea1c) )
 	ROM_LOAD16_BYTE( "u29.bin", 0x00001, 0x80000, CRC(4c59d648) SHA1(2ab77ea254f2c11fc016078cedcab2fffbe5ee1b) )
 
-	ROM_REGION( 0x030000, "soundcpu", 0 ) /* Z80-A */
+	ROM_REGION( 0x020000, "soundcpu", 0 ) /* Z80-A */
 	ROM_LOAD( "u9.bin", 0x00000, 0x20000, CRC(fda05171) SHA1(2c69292573ec35034572fa824c0cae2839d23919) )
-	ROM_RELOAD( 0x10000, 0x20000 )
 
-	ROM_REGION( 0x800000, "gfx1", ROMREGION_ERASEFF ) /* Sprites */
+	ROM_REGION( 0x800000, "sprdata", ROMREGION_ERASEFF ) /* Sprites */
 	ROM_LOAD16_BYTE( "mca-u82.bin", 0x000000, 0x100000, CRC(5f01d746) SHA1(11b241456e15299912ee365eedb8f9d5e5ca875d) )
 	ROM_LOAD16_BYTE( "mca-u83.bin", 0x000001, 0x100000, CRC(4e1be5a6) SHA1(cb19aad42dba54d6a4a33859f27254c2a3271e8c) )
 	ROM_LOAD16_BYTE( "mca-u84.bin", 0x200000, 0x080000, CRC(df202790) SHA1(f6ae54e799af195860ed0ab3c85138cf2f10efa6) )
@@ -537,15 +533,15 @@ ROM_START( mcatadvj )
 	ROM_LOAD16_BYTE( "u86.bin",     0x400000, 0x080000, CRC(2d3725ed) SHA1(8b4c0f280eb901113d842848ffc26371be7b6067) )
 	ROM_LOAD16_BYTE( "u87.bin",     0x400001, 0x080000, CRC(4ddefe08) SHA1(5ade0a694d73f4f3891c1ab7757e37a88afcbf54) )
 
-	ROM_REGION( 0x080000, "gfx2", 0 ) /* BG0 */
+	ROM_REGION( 0x080000, "bg0", 0 ) /* BG0 */
 	ROM_LOAD( "mca-u58.bin", 0x000000, 0x080000, CRC(3a8186e2) SHA1(129c220d72608a8839f779ce1a6cfec8646dbf23) )
 
-	ROM_REGION( 0x280000, "gfx3", 0 ) /* BG1 */
+	ROM_REGION( 0x280000, "bg1", 0 ) /* BG1 */
 	ROM_LOAD( "mca-u60.bin", 0x000000, 0x100000, CRC(c8942614) SHA1(244fccb9abbb04e33839dd2cd0e2de430819a18c) )
 	ROM_LOAD( "mca-u61.bin", 0x100000, 0x100000, CRC(51af66c9) SHA1(1055cf78ea286f02003b0d1bf08c2d7829b36f90) )
 	ROM_LOAD( "u100.bin",    0x200000, 0x080000, CRC(e2c311da) SHA1(cc3217484524de94704869eaa9ce1b90393039d8) )
 
-	ROM_REGION( 0x80000, "ymsnd", 0 ) /* Samples - ADPCM or Delta-T? */
+	ROM_REGION( 0x80000, "ymsnd", 0 ) /* Samples */
 	ROM_LOAD( "mca-u53.bin", 0x00000, 0x80000, CRC(64c76e05) SHA1(379cef5e0cba78d0e886c9cede41985850a3afb7) )
 ROM_END
 
@@ -554,11 +550,10 @@ ROM_START( catt )
 	ROM_LOAD16_BYTE( "catt-u30.bin",  0x00000, 0x80000, CRC(8c921e1e) SHA1(2fdaa9b743e1731f3cfe9d8334f1b759cf46855d) )
 	ROM_LOAD16_BYTE( "catt-u29.bin",  0x00001, 0x80000, CRC(e725af6d) SHA1(78c08fa5744a6a953e13c0ff39736ccd4875fb72) )
 
-	ROM_REGION( 0x030000, "soundcpu", 0 ) /* Z80-A */
+	ROM_REGION( 0x020000, "soundcpu", 0 ) /* Z80-A */
 	ROM_LOAD( "u9.bin", 0x00000, 0x20000, CRC(fda05171) SHA1(2c69292573ec35034572fa824c0cae2839d23919) )
-	ROM_RELOAD( 0x10000, 0x20000 )
 
-	ROM_REGION( 0x800000, "gfx1", ROMREGION_ERASEFF ) /* Sprites */
+	ROM_REGION( 0x800000, "sprdata", ROMREGION_ERASEFF ) /* Sprites */
 	ROM_LOAD16_BYTE( "mca-u82.bin", 0x000000, 0x100000, CRC(5f01d746) SHA1(11b241456e15299912ee365eedb8f9d5e5ca875d) )
 	ROM_LOAD16_BYTE( "mca-u83.bin", 0x000001, 0x100000, CRC(4e1be5a6) SHA1(cb19aad42dba54d6a4a33859f27254c2a3271e8c) )
 	ROM_LOAD16_BYTE( "u84.bin",     0x200000, 0x100000, CRC(843fd624) SHA1(2e16d8a909fe9447da37a87428bff0734af59a00) )
@@ -566,15 +561,15 @@ ROM_START( catt )
 	ROM_LOAD16_BYTE( "mca-u86e",    0x400000, 0x080000, CRC(017bf1da) SHA1(f6446a7219275c0eff62129f59fdfa3a6a3e06c8) )
 	ROM_LOAD16_BYTE( "mca-u87e",    0x400001, 0x080000, CRC(bc9dc9b9) SHA1(f525c9f994d5107752aa4d3a499ee376ec75f42b) )
 
-	ROM_REGION( 0x100000, "gfx2", 0 ) /* BG0 */
+	ROM_REGION( 0x100000, "bg0", 0 ) /* BG0 */
 	ROM_LOAD( "u58.bin",     0x00000, 0x100000, CRC(73c9343a) SHA1(9efdddbad6244c1ed267bd954563ab43a1017c96) )
 
-	ROM_REGION( 0x280000, "gfx3", 0 ) /* BG1 */
+	ROM_REGION( 0x280000, "bg1", 0 ) /* BG1 */
 	ROM_LOAD( "mca-u60.bin", 0x000000, 0x100000, CRC(c8942614) SHA1(244fccb9abbb04e33839dd2cd0e2de430819a18c) )
 	ROM_LOAD( "mca-u61.bin", 0x100000, 0x100000, CRC(51af66c9) SHA1(1055cf78ea286f02003b0d1bf08c2d7829b36f90) )
 	ROM_LOAD( "mca-u100",    0x200000, 0x080000, CRC(b273f1b0) SHA1(39318fe2aaf2792b85426ec6791b3360ac964de3) )
 
-	ROM_REGION( 0x100000, "ymsnd", 0 ) /* Samples - ADPCM or Delta-T? */
+	ROM_REGION( 0x100000, "ymsnd", 0 ) /* Samples */
 	ROM_LOAD( "u53.bin",     0x00000, 0x100000, CRC(99f2a624) SHA1(799e8e40e8bdcc8fa4cd763a366cc32473038a49) )
 
 	ROM_REGION( 0x0400, "plds", 0 )
@@ -587,11 +582,10 @@ ROM_START( nost )
 	ROM_LOAD16_BYTE( "nos-pe-u.bin", 0x00000, 0x80000, CRC(4b080149) SHA1(e1dbbe5bf554c7c5731cc3079850f257417e3caa) )
 	ROM_LOAD16_BYTE( "nos-po-u.bin", 0x00001, 0x80000, CRC(9e3cd6d9) SHA1(db5351ff9a05f602eceae62c0051c16ae0e4ead9) )
 
-	ROM_REGION( 0x050000, "soundcpu", 0 ) /* Z80-A */
+	ROM_REGION( 0x040000, "soundcpu", 0 ) /* Z80-A */
 	ROM_LOAD( "nos-ps.u9", 0x00000, 0x40000, CRC(832551e9) SHA1(86fc481b1849f378c88593594129197c69ea1359) )
-	ROM_RELOAD( 0x10000, 0x40000 )
 
-	ROM_REGION( 0x800000, "gfx1", ROMREGION_ERASEFF ) /* Sprites */
+	ROM_REGION( 0x800000, "sprdata", ROMREGION_ERASEFF ) /* Sprites */
 	ROM_LOAD16_BYTE( "nos-se-0.u82", 0x000000, 0x100000, CRC(9d99108d) SHA1(466540989d7b1b7f6dc7acbae74f6a8201973d45) )
 	ROM_LOAD16_BYTE( "nos-so-0.u83", 0x000001, 0x100000, CRC(7df0fc7e) SHA1(2e064cb5367b2839d736d339c4f1a44785b4eedf) )
 	ROM_LOAD16_BYTE( "nos-se-1.u84", 0x200000, 0x100000, CRC(aad07607) SHA1(89c51a9cb6b8d8ed3a357f5d8ac8399ff1c7ad46) )
@@ -599,15 +593,15 @@ ROM_START( nost )
 	ROM_LOAD16_BYTE( "nos-se-2.u86", 0x400000, 0x080000, CRC(d99e6005) SHA1(49aae72111334ff5cd0fd86500882f559ff921f9) )
 	ROM_LOAD16_BYTE( "nos-so-2.u87", 0x400001, 0x080000, CRC(f60e8ef3) SHA1(4f7472b5a465e6cc6a5df520ebfe6a544739dd28) )
 
-	ROM_REGION( 0x180000, "gfx2", 0 ) /* BG0 */
+	ROM_REGION( 0x180000, "bg0", 0 ) /* BG0 */
 	ROM_LOAD( "nos-b0-0.u58", 0x000000, 0x100000, CRC(0214b0f2) SHA1(678fa3dc739323bda6d7bbb1c7a573c976d69356) )
 	ROM_LOAD( "nos-b0-1.u59", 0x100000, 0x080000, CRC(3f8b6b34) SHA1(94c48614782ce6405965bcf6029e3bcc24a6d84f) )
 
-	ROM_REGION( 0x180000, "gfx3", 0 ) /* BG1 */
+	ROM_REGION( 0x180000, "bg1", 0 ) /* BG1 */
 	ROM_LOAD( "nos-b1-0.u60", 0x000000, 0x100000, CRC(ba6fd0c7) SHA1(516d6e0c4dc6fb12ec9f30877ea1c582e7440a19) )
 	ROM_LOAD( "nos-b1-1.u61", 0x100000, 0x080000, CRC(dabd8009) SHA1(1862645b8d6216c3ec2b8dbf74816b8e29dea14f) )
 
-	ROM_REGION( 0x100000, "ymsnd", 0 ) /* Samples - ADPCM or Delta-T? */
+	ROM_REGION( 0x100000, "ymsnd", 0 ) /* Samples */
 	ROM_LOAD( "nossn-00.u53", 0x00000, 0x100000, CRC(3bd1bcbc) SHA1(1bcad43792e985402db4eca122676c2c555f3313) )
 ROM_END
 
@@ -616,11 +610,10 @@ ROM_START( nostj )
 	ROM_LOAD16_BYTE( "nos-pe-j.u30", 0x00000, 0x80000, CRC(4b080149) SHA1(e1dbbe5bf554c7c5731cc3079850f257417e3caa) )
 	ROM_LOAD16_BYTE( "nos-po-j.u29", 0x00001, 0x80000, CRC(7fe241de) SHA1(aa4ffd81cb73efc59690c2038ae9375021a775a4) )
 
-	ROM_REGION( 0x050000, "soundcpu", 0 ) /* Z80-A */
+	ROM_REGION( 0x040000, "soundcpu", 0 ) /* Z80-A */
 	ROM_LOAD( "nos-ps.u9", 0x00000, 0x40000, CRC(832551e9) SHA1(86fc481b1849f378c88593594129197c69ea1359) )
-	ROM_RELOAD( 0x10000, 0x40000 )
 
-	ROM_REGION( 0x800000, "gfx1", ROMREGION_ERASEFF ) /* Sprites */
+	ROM_REGION( 0x800000, "sprdata", ROMREGION_ERASEFF ) /* Sprites */
 	ROM_LOAD16_BYTE( "nos-se-0.u82", 0x000000, 0x100000, CRC(9d99108d) SHA1(466540989d7b1b7f6dc7acbae74f6a8201973d45) )
 	ROM_LOAD16_BYTE( "nos-so-0.u83", 0x000001, 0x100000, CRC(7df0fc7e) SHA1(2e064cb5367b2839d736d339c4f1a44785b4eedf) )
 	ROM_LOAD16_BYTE( "nos-se-1.u84", 0x200000, 0x100000, CRC(aad07607) SHA1(89c51a9cb6b8d8ed3a357f5d8ac8399ff1c7ad46) )
@@ -628,15 +621,15 @@ ROM_START( nostj )
 	ROM_LOAD16_BYTE( "nos-se-2.u86", 0x400000, 0x080000, CRC(d99e6005) SHA1(49aae72111334ff5cd0fd86500882f559ff921f9) )
 	ROM_LOAD16_BYTE( "nos-so-2.u87", 0x400001, 0x080000, CRC(f60e8ef3) SHA1(4f7472b5a465e6cc6a5df520ebfe6a544739dd28) )
 
-	ROM_REGION( 0x180000, "gfx2", 0 ) /* BG0 */
+	ROM_REGION( 0x180000, "bg0", 0 ) /* BG0 */
 	ROM_LOAD( "nos-b0-0.u58", 0x000000, 0x100000, CRC(0214b0f2) SHA1(678fa3dc739323bda6d7bbb1c7a573c976d69356) )
 	ROM_LOAD( "nos-b0-1.u59", 0x100000, 0x080000, CRC(3f8b6b34) SHA1(94c48614782ce6405965bcf6029e3bcc24a6d84f) )
 
-	ROM_REGION( 0x180000, "gfx3", 0 ) /* BG1 */
+	ROM_REGION( 0x180000, "bg1", 0 ) /* BG1 */
 	ROM_LOAD( "nos-b1-0.u60", 0x000000, 0x100000, CRC(ba6fd0c7) SHA1(516d6e0c4dc6fb12ec9f30877ea1c582e7440a19) )
 	ROM_LOAD( "nos-b1-1.u61", 0x100000, 0x080000, CRC(dabd8009) SHA1(1862645b8d6216c3ec2b8dbf74816b8e29dea14f) )
 
-	ROM_REGION( 0x100000, "ymsnd", 0 ) /* Samples - ADPCM or Delta-T? */
+	ROM_REGION( 0x100000, "ymsnd", 0 ) /* Samples */
 	ROM_LOAD( "nossn-00.u53", 0x00000, 0x100000, CRC(3bd1bcbc) SHA1(1bcad43792e985402db4eca122676c2c555f3313) )
 ROM_END
 
@@ -645,11 +638,10 @@ ROM_START( nostk )
 	ROM_LOAD16_BYTE( "nos-pe-t.u30", 0x00000, 0x80000, CRC(bee5fbc8) SHA1(a8361fa004bb31471f973ece51a9a87b9f3438ab) )
 	ROM_LOAD16_BYTE( "nos-po-t.u29", 0x00001, 0x80000, CRC(f4736331) SHA1(7a6db2db1a4dbf105c22e15deff6f6032e04609c) )
 
-	ROM_REGION( 0x050000, "soundcpu", 0 ) /* Z80-A */
+	ROM_REGION( 0x040000, "soundcpu", 0 ) /* Z80-A */
 	ROM_LOAD( "nos-ps.u9", 0x00000, 0x40000, CRC(832551e9) SHA1(86fc481b1849f378c88593594129197c69ea1359) )
-	ROM_RELOAD( 0x10000, 0x40000 )
 
-	ROM_REGION( 0x800000, "gfx1", ROMREGION_ERASEFF ) /* Sprites */
+	ROM_REGION( 0x800000, "sprdata", ROMREGION_ERASEFF ) /* Sprites */
 	ROM_LOAD16_BYTE( "nos-se-0.u82", 0x000000, 0x100000, CRC(9d99108d) SHA1(466540989d7b1b7f6dc7acbae74f6a8201973d45) )
 	ROM_LOAD16_BYTE( "nos-so-0.u83", 0x000001, 0x100000, CRC(7df0fc7e) SHA1(2e064cb5367b2839d736d339c4f1a44785b4eedf) )
 	ROM_LOAD16_BYTE( "nos-se-1.u84", 0x200000, 0x100000, CRC(aad07607) SHA1(89c51a9cb6b8d8ed3a357f5d8ac8399ff1c7ad46) )
@@ -657,15 +649,15 @@ ROM_START( nostk )
 	ROM_LOAD16_BYTE( "nos-se-2.u86", 0x400000, 0x080000, CRC(d99e6005) SHA1(49aae72111334ff5cd0fd86500882f559ff921f9) )
 	ROM_LOAD16_BYTE( "nos-so-2.u87", 0x400001, 0x080000, CRC(f60e8ef3) SHA1(4f7472b5a465e6cc6a5df520ebfe6a544739dd28) )
 
-	ROM_REGION( 0x180000, "gfx2", 0 ) /* BG0 */
+	ROM_REGION( 0x180000, "bg0", 0 ) /* BG0 */
 	ROM_LOAD( "nos-b0-0.u58", 0x000000, 0x100000, CRC(0214b0f2) SHA1(678fa3dc739323bda6d7bbb1c7a573c976d69356) )
 	ROM_LOAD( "nos-b0-1.u59", 0x100000, 0x080000, CRC(3f8b6b34) SHA1(94c48614782ce6405965bcf6029e3bcc24a6d84f) )
 
-	ROM_REGION( 0x180000, "gfx3", 0 ) /* BG1 */
+	ROM_REGION( 0x180000, "bg1", 0 ) /* BG1 */
 	ROM_LOAD( "nos-b1-0.u60", 0x000000, 0x100000, CRC(ba6fd0c7) SHA1(516d6e0c4dc6fb12ec9f30877ea1c582e7440a19) )
 	ROM_LOAD( "nos-b1-1.u61", 0x100000, 0x080000, CRC(dabd8009) SHA1(1862645b8d6216c3ec2b8dbf74816b8e29dea14f) )
 
-	ROM_REGION( 0x100000, "ymsnd", 0 ) /* Samples - ADPCM or Delta-T? */
+	ROM_REGION( 0x100000, "ymsnd", 0 ) /* Samples */
 	ROM_LOAD( "nossn-00.u53", 0x00000, 0x100000, CRC(3bd1bcbc) SHA1(1bcad43792e985402db4eca122676c2c555f3313) )
 ROM_END
 

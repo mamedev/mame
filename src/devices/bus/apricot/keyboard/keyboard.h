@@ -43,7 +43,7 @@
 	MCFG_DEVICE_SLOT_INTERFACE(apricot_keyboard_devices, _def_slot, false)
 
 #define MCFG_APRICOT_KEYBOARD_IN_HANDLER(_devcb) \
-	devcb = &apricot_keyboard_bus_device::set_in_handler(*device, DEVCB_##_devcb);
+	devcb = &downcast<apricot_keyboard_bus_device &>(*device).set_in_handler(DEVCB_##_devcb);
 
 
 //**************************************************************************
@@ -62,8 +62,7 @@ public:
 	virtual ~apricot_keyboard_bus_device();
 
 	// callbacks
-	template <class Object> static devcb_base &set_in_handler(device_t &device, Object &&cb)
-	{ return downcast<apricot_keyboard_bus_device &>(device).m_in_handler.set_callback(std::forward<Object>(cb)); }
+	template <class Object> devcb_base &set_in_handler(Object &&cb) { return m_in_handler.set_callback(std::forward<Object>(cb)); }
 
 	// called from keyboard
 	DECLARE_WRITE_LINE_MEMBER( in_w ) { m_in_handler(state); }

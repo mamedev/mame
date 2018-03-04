@@ -7,10 +7,10 @@
 #pragma once
 
 #define MCFG_APEXC_TAPE_READ_CB(_devcb) \
-	devcb = &apexc_cpu_device::set_tape_read_cb(*device, DEVCB_##_devcb);
+	devcb = &downcast<apexc_cpu_device &>(*device).set_tape_read_cb(DEVCB_##_devcb);
 
 #define MCFG_APEXC_TAPE_PUNCH_CB(_devcb) \
-	devcb = &apexc_cpu_device::set_tape_punch_cb(*device, DEVCB_##_devcb);
+	devcb = &downcast<apexc_cpu_device &>(*device).set_tape_punch_cb(DEVCB_##_devcb);
 
 enum
 {
@@ -28,17 +28,9 @@ public:
 	// construction/destruction
 	apexc_cpu_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
-	// static configuration
-	template<class Object>
-	static devcb_base &set_tape_read_cb(device_t &device, Object &&object)
-	{
-		return downcast<apexc_cpu_device &>(device).m_tape_read_cb.set_callback(std::forward<Object>(object));
-	}
-	template<class Object>
-	static devcb_base &set_tape_punch_cb(device_t &device, Object &&object)
-	{
-		return downcast<apexc_cpu_device &>(device).m_tape_punch_cb.set_callback(std::forward<Object>(object));
-	}
+	// configuration
+	template<class Object> devcb_base &set_tape_read_cb(Object &&object) { return m_tape_read_cb.set_callback(std::forward<Object>(object)); }
+	template<class Object> devcb_base &set_tape_punch_cb(Object &&object) { return m_tape_punch_cb.set_callback(std::forward<Object>(object)); }
 
 protected:
 	// device-level overrides
