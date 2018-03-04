@@ -31,6 +31,12 @@ public:
 	virtual void ieee488_atn(int state) override;
 	virtual void ieee488_ren(int state) override;
 
+	// Timers
+	enum {
+		TMR_ID_POLL,
+		TMR_ID_HEARTBEAT
+	};
+
 protected:
 	virtual void device_start() override;
 	virtual void device_reset() override;
@@ -103,6 +109,9 @@ private:
 	void update_state(uint8_t new_signals);
 	void send_update(char type , uint8_t data);
 	static bool a2hex(char c , uint8_t& out);
+	static bool is_msg_type(char c);
+	static bool is_terminator(char c);
+	static bool is_space(char c);
 	char recv_update(uint8_t& data);
 	bool is_local_atn_active() const;
 	void update_ah_fsm();

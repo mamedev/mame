@@ -17,13 +17,17 @@
       and viceversa, the two buses form a single logical bus.
 
     Protocol exchanges messages that are composed of a single uppercase
-    letter, a colon, a byte value expressed as 2 hex digits and a whitspace
+    letter, a colon, a byte value expressed as 2 hex digits and a terminator
     character.
+    Valid terminator characters are ',' or ';' or whitespace. Extra
+    whitespace before and after the message is ignored.
     The letter encodes the type of the message and the byte has different
     meaning according to type of message. Not all message types carry
     a meaningful byte value (but for uniformity the byte is always sent).
     Example of a message: "D:55 " (byte with 0x55 value exchanged on the
     bus without EOI being asserted).
+    Example of a sequence of messages: D:AA,D:55,E:00 or
+    D:AA\nD:55\nE:00.
 
     The following table summarizes the various message types, the directions
     wrt the remotizer in which they are meaningful, whether the byte
@@ -142,6 +146,10 @@
     - Implement handling of incoming Q msgs (needed when parallel poll
       is being performed by a remote controller)
     - Enhancement: implement a msg for accurate time synchronization
+    - Enhancement: implement some form of sliding window acknowledgement
+      for cases when sender has to know how many bytes have been
+      processed by the receiver. The HP "Amigo" protocol I used for
+      my experiments has no such need.
 
 *********************************************************************/
 
@@ -149,7 +157,7 @@
 #include "remote488.h"
 
 // Debugging
-#define VERBOSE 0
+#define VERBOSE 1
 #include "logmacro.h"
 
 // Bit manipulation
@@ -193,12 +201,6 @@ constexpr char MSG_ECHO_REPLY    = 'K'; // I:   Heartbeat msg: echo reply
 constexpr unsigned POLL_PERIOD_US   = 20;   // Poll period (µs)
 constexpr unsigned HEARTBEAT_MS     = 500;  // Heartbeat ping period (ms)
 constexpr unsigned MAX_MISSED_HB    = 3;    // Missed heartbeats to declare the connection dead
-
-// Timers
-enum {
-	TMR_ID_POLL,
-	TMR_ID_HEARTBEAT
-};
 
 // device type definition
 DEFINE_DEVICE_TYPE(REMOTE488, remote488_device, "remote488", "IEEE-488 Remotizer")
@@ -485,12 +487,10 @@ void remote488_device::update_state(uint8_t new_signals)
 
 void remote488_device::send_update(char type , uint8_t data)
 {
-	std::ostringstream buff;
-	util::stream_format(buff , "%c:%02x\n" , type , data);
-	LOG("%.6f %s" , machine().time().as_double() , buff.str().c_str());
-	std::string out{buff.str()};
-	for (auto c : out) {
-			m_stream->output(c);
+	std::string buff = util::string_format("%c:%02x\n" , type , data);
+	LOG("%.6f %s" , machine().time().as_double() , buff);
+	for (char c : buff) {
+		m_stream->output(c);
 	}
 }
 
@@ -510,6 +510,33 @@ bool remote488_device::a2hex(char c , uint8_t& out)
 	}
 }
 
+bool remote488_device::is_msg_type(char c)
+{
+	// Recognize type of input messages
+	return c == MSG_SIGNAL_CLEAR ||
+		c == MSG_SIGNAL_SET ||
+		c == MSG_DATA_BYTE ||
+		c == MSG_END_BYTE ||
+		c == MSG_PP_DATA ||
+		c == MSG_ECHO_REPLY;
+}
+
+bool remote488_device::is_terminator(char c)
+{
+	// Match message terminator characters
+	return c == ',' ||
+		c == ';';
+}
+
+bool remote488_device::is_space(char c)
+{
+	// Match whitespace characters
+	return c == ' ' ||
+		c == '\t' ||
+		c == '\r' ||
+		c == '\n';
+}
+
 char remote488_device::recv_update(uint8_t& data)
 {
 	char c;
@@ -517,12 +544,13 @@ char remote488_device::recv_update(uint8_t& data)
 
 	// Do not iterate too much..
 	for (i = 0; i < 8 && m_stream->input(&c , 1); i++) {
+		int prev_state = m_rx_state;
 		switch (m_rx_state) {
 		case REM_RX_WAIT_CH:
-			if (isalnum(c)) {
+			if (is_msg_type(c)) {
 				m_rx_ch = c;
 				m_rx_state = REM_RX_WAIT_COLON;
-			} else if (!isspace(c)) {
+			} else if (!is_space(c)) {
 				m_rx_state = REM_RX_WAIT_WS;
 			}
 			break;
@@ -556,8 +584,9 @@ char remote488_device::recv_update(uint8_t& data)
 			break;
 
 		case REM_RX_WAIT_SEP:
-			if (isspace(c)) {
+			if (is_terminator(c) || is_space(c)) {
 				m_rx_state = REM_RX_WAIT_CH;
+				LOG("PARSE %02x %d->%d\n" , c , prev_state , m_rx_state);
 				data = m_rx_data;
 				return m_rx_ch;
 			} else {
@@ -566,7 +595,7 @@ char remote488_device::recv_update(uint8_t& data)
 			break;
 
 		case REM_RX_WAIT_WS:
-			if (isspace(c)) {
+			if (is_terminator(c) || is_space(c)) {
 				m_rx_state = REM_RX_WAIT_CH;
 			}
 			break;
@@ -575,6 +604,7 @@ char remote488_device::recv_update(uint8_t& data)
 			m_rx_state = REM_RX_WAIT_CH;
 			break;
 		}
+		LOG("PARSE %02x %d->%d\n" , c , prev_state , m_rx_state);
 	}
 	return 0;
 }
