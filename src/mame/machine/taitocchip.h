@@ -15,16 +15,16 @@ DECLARE_DEVICE_TYPE(TAITO_CCHIP, taito_cchip_device)
 	MCFG_DEVICE_ADD(_tag, TAITO_CCHIP, _clock)
 
 #define MCFG_CCHIP_IN_PORTA_CB(_devcb) \
-	devcb = &taito_cchip_device::set_in_pa_callback(*device, DEVCB_##_devcb);
+	devcb = &downcast<taito_cchip_device &>(*device).set_in_pa_callback(DEVCB_##_devcb);
 
 #define MCFG_CCHIP_IN_PORTB_CB(_devcb) \
-	devcb = &taito_cchip_device::set_in_pb_callback(*device, DEVCB_##_devcb);
+	devcb = &downcast<taito_cchip_device &>(*device).set_in_pb_callback(DEVCB_##_devcb);
 
 #define MCFG_CCHIP_IN_PORTC_CB(_devcb) \
-	devcb = &taito_cchip_device::set_in_pc_callback(*device, DEVCB_##_devcb);
+	devcb = &downcast<taito_cchip_device &>(*device).set_in_pc_callback(DEVCB_##_devcb);
 
 #define MCFG_CCHIP_IN_PORTAD_CB(_devcb) \
-	devcb = &taito_cchip_device::set_in_ad_callback(*device, DEVCB_##_devcb);
+	devcb = &downcast<taito_cchip_device &>(*device).set_in_ad_callback(DEVCB_##_devcb);
 
 
 class taito_cchip_device :  public device_t
@@ -33,10 +33,10 @@ public:
 	// construction/destruction
 	taito_cchip_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
-	template <class Object> static devcb_base &set_in_pa_callback(device_t &device, Object &&cb)  { return downcast<taito_cchip_device &>(device).m_in_pa_cb.set_callback(std::forward<Object>(cb)); }
-	template <class Object> static devcb_base &set_in_pb_callback(device_t &device, Object &&cb)  { return downcast<taito_cchip_device &>(device).m_in_pb_cb.set_callback(std::forward<Object>(cb)); }
-	template <class Object> static devcb_base &set_in_pc_callback(device_t &device, Object &&cb)  { return downcast<taito_cchip_device &>(device).m_in_pc_cb.set_callback(std::forward<Object>(cb)); }
-	template <class Object> static devcb_base &set_in_ad_callback(device_t &device, Object &&cb)  { return downcast<taito_cchip_device &>(device).m_in_ad_cb.set_callback(std::forward<Object>(cb)); }
+	template <class Object> devcb_base &set_in_pa_callback(Object &&cb)  { return m_in_pa_cb.set_callback(std::forward<Object>(cb)); }
+	template <class Object> devcb_base &set_in_pb_callback(Object &&cb)  { return m_in_pb_cb.set_callback(std::forward<Object>(cb)); }
+	template <class Object> devcb_base &set_in_pc_callback(Object &&cb)  { return m_in_pc_cb.set_callback(std::forward<Object>(cb)); }
+	template <class Object> devcb_base &set_in_ad_callback(Object &&cb)  { return m_in_ad_cb.set_callback(std::forward<Object>(cb)); }
 
 	// can be accessed externally
 	DECLARE_READ8_MEMBER(asic_r);
