@@ -262,16 +262,20 @@ void qs1000_device::device_start()
 //-------------------------------------------------
 //  serial_in - send data to the chip
 //-------------------------------------------------
-WRITE_LINE_MEMBER(qs1000_device::serial_in)
+void qs1000_device::serial_in(uint8_t data)
 {
-	machine().scheduler().synchronize(timer_expired_delegate(FUNC(qs1000_device::serial_w), this), data);
+	m_serial_data_in = data;
+
+	// Signal to the CPU that data is available
+	m_cpu->set_input_line(MCS51_RX_LINE, ASSERT_LINE);
+	m_cpu->set_input_line(MCS51_RX_LINE, CLEAR_LINE);
 }
 
 
 //-------------------------------------------------
 //  set_irq - interrupt the internal CPU
 //-------------------------------------------------
-WRITE_LINE_MEMBER(qs1000_device::set_irq)
+void qs1000_device::set_irq(int state)
 {
 	// Signal to the CPU that data is available
 	m_cpu->set_input_line(MCS51_INT1_LINE, state ? ASSERT_LINE : CLEAR_LINE);
@@ -285,19 +289,6 @@ WRITE_LINE_MEMBER(qs1000_device::set_irq)
 READ8_MEMBER(qs1000_device::data_to_i8052)
 {
 	return m_serial_data_in;
-}
-
-
-//-------------------------------------------------
-//  serial_w - write serial data to the chip
-//-------------------------------------------------
-TIMER_CALLBACK_MEMBER(qs1000_device::serial_w)
-{
-	m_serial_data_in = param;
-
-	// Signal to the CPU that data is available
-	m_cpu->set_input_line(MCS51_RX_LINE, ASSERT_LINE);
-	m_cpu->set_input_line(MCS51_RX_LINE, CLEAR_LINE);
 }
 
 
