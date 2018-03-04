@@ -438,6 +438,7 @@ void hp9845_base_state::setup_ram_block(unsigned block , unsigned offset)
 
 void hp9845_base_state::machine_start()
 {
+	m_softkeys.resolve();
 	m_screen->register_screen_bitmap(m_bitmap);
 
 	// setup RAM dynamically for -ramsize
