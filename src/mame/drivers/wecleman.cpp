@@ -17,6 +17,7 @@ WEC Le Mans 24:
 Hot Chase:
 - Sound BGMs are regressed (hiccups badly);
 - Samples pitch is too low, for instance game over speech;
+- Bodysonic speaker outputs aren't implemented
 Common Issues:
 - Too many hacks with protection/blitter/colors.
   Additionally, there's a bug report that claims that current arrangement is broken for later levels in WEC Le Mans.
@@ -267,6 +268,7 @@ TODO:
 #include "cpu/m68000/m68000.h"
 #include "cpu/m6809/m6809.h"
 #include "cpu/z80/z80.h"
+#include "machine/gen_latch.h"
 #include "sound/ym2151.h"
 #include "speaker.h"
 
@@ -346,7 +348,7 @@ WRITE16_MEMBER(wecleman_state::irqctrl_w)
 		// Bit 2 : SOUND-ON: send a interrupt to sound CPU, 0 -> 1 transition
 		if ( (m_irqctrl & 4) && (!(data & 4)) )
 		{
-			if(m_sound_hw_type == 0) // wec le mans
+			if(m_sound_hw_type == WECLEMAN_ID) // wec le mans
 				m_audiocpu->set_input_line(0, HOLD_LINE);
 			else // hot chase
 			{
@@ -519,7 +521,7 @@ ADDRESS_MAP_START(wecleman_state::wecleman_map)
 	AM_RANGE(0x110000, 0x110fff) AM_RAM_WRITE(wecleman_paletteram16_SSSSBBBBGGGGRRRR_word_w) AM_SHARE("paletteram")
 	AM_RANGE(0x124000, 0x127fff) AM_RAM AM_SHARE("share1")  // Shared with main CPU
 	AM_RANGE(0x130000, 0x130fff) AM_RAM AM_SHARE("spriteram")   // Sprites
-	AM_RANGE(0x140000, 0x140001) AM_WRITE(wecleman_soundlatch_w)    // To sound CPU
+	AM_RANGE(0x140000, 0x140001) AM_DEVWRITE8("soundlatch", generic_latch_8_device, write, 0x00ff)    // To sound CPU
 	AM_RANGE(0x140002, 0x140003) AM_WRITE(selected_ip_w)    // Selects accelerator / wheel / ..
 	AM_RANGE(0x140004, 0x140005) AM_WRITE(irqctrl_w)    // Main CPU controls the other CPUs
 	AM_RANGE(0x140006, 0x140007) AM_WRITENOP    // Watchdog reset
@@ -551,7 +553,7 @@ ADDRESS_MAP_START(wecleman_state::hotchase_map)
 	AM_RANGE(0x110000, 0x111fff) AM_RAM_WRITE(hotchase_paletteram16_SBGRBBBBGGGGRRRR_word_w) AM_SHARE("paletteram")
 	AM_RANGE(0x120000, 0x123fff) AM_RAM AM_SHARE("share1")                  // Shared with sub CPU
 	AM_RANGE(0x130000, 0x130fff) AM_RAM AM_SHARE("spriteram")   // Sprites
-	AM_RANGE(0x140000, 0x140001) AM_WRITE(hotchase_soundlatch_w)    // To sound CPU
+	AM_RANGE(0x140000, 0x140001) AM_DEVWRITE8("soundlatch", generic_latch_8_device, write, 0x00ff)    // To sound CPU
 	AM_RANGE(0x140002, 0x140003) AM_WRITE(selected_ip_w)    // Selects accelerator / wheel /
 	AM_RANGE(0x140004, 0x140005) AM_WRITE(irqctrl_w)    // Main CPU controls the other CPUs
 	AM_RANGE(0x140006, 0x140007) AM_READNOP // Watchdog reset
@@ -593,15 +595,6 @@ ADDRESS_MAP_END
                     WEC Le Mans 24 Sound CPU Handlers
 ***************************************************************************/
 
-/* 140001.b */
-WRITE16_MEMBER(wecleman_state::wecleman_soundlatch_w)
-{
-	if (ACCESSING_BITS_0_7)
-	{
-		m_soundlatch->write(space, 0, data & 0xFF);
-	}
-}
-
 /* Protection - an external multiplier connected to the sound CPU */
 READ8_MEMBER(wecleman_state::multiply_r)
 {
@@ -631,13 +624,13 @@ WRITE8_MEMBER(wecleman_state::multiply_w)
 
 WRITE8_MEMBER(wecleman_state::wecleman_volume_callback)
 {
-	m_k007232->set_volume(0, (data >> 4) * 0x11, 0);
-	m_k007232->set_volume(1, 0, (data & 0x0f) * 0x11);
+	m_k007232[0]->set_volume(0, (data >> 4) * 0x11, 0);
+	m_k007232[0]->set_volume(1, 0, (data & 0x0f) * 0x11);
 }
 
 WRITE8_MEMBER(wecleman_state::wecleman_K00723216_bank_w)
 {
-	m_k007232->set_bank(0, ~data&1 );  //* (wecleman062gre)
+	m_k007232[0]->set_bank(0, ~data&1 );  //* (wecleman062gre)
 }
 
 ADDRESS_MAP_START(wecleman_state::wecleman_sound_map)
@@ -648,7 +641,7 @@ ADDRESS_MAP_START(wecleman_state::wecleman_sound_map)
 	AM_RANGE(0x9000, 0x9001) AM_WRITE(multiply_w)   // 007452: Protection
 	AM_RANGE(0x9006, 0x9006) AM_WRITENOP            // 007452: ?
 	AM_RANGE(0xa000, 0xa000) AM_DEVREAD("soundlatch", generic_latch_8_device, read) // From main CPU
-	AM_RANGE(0xb000, 0xb00d) AM_DEVREADWRITE("k007232", k007232_device, read, write) // K007232 (Reading offset 5/b triggers the sample)
+	AM_RANGE(0xb000, 0xb00d) AM_DEVREADWRITE("k007232_1", k007232_device, read, write) // K007232 (Reading offset 5/b triggers the sample)
 	AM_RANGE(0xc000, 0xc001) AM_DEVREADWRITE("ymsnd", ym2151_device, read, write)
 	AM_RANGE(0xf000, 0xf000) AM_WRITE(wecleman_K00723216_bank_w)    // Samples banking
 ADDRESS_MAP_END
@@ -658,19 +651,9 @@ ADDRESS_MAP_END
                         Hot Chase Sound CPU Handlers
 ***************************************************************************/
 
-/* 140001.b */
-WRITE16_MEMBER(wecleman_state::hotchase_soundlatch_w)
-{
-	if (ACCESSING_BITS_0_7)
-	{
-		m_soundlatch->write(space, 0, data & 0xFF);
-	}
-}
-
 WRITE8_MEMBER(wecleman_state::hotchase_sound_control_w)
 {
 //  int reg[8];
-
 
 //  reg[offset] = data;
 
@@ -683,15 +666,11 @@ WRITE8_MEMBER(wecleman_state::hotchase_sound_control_w)
 		    */
 		case 0x0:
 		case 0x1:
-			m_k007232_1->set_volume( offset&1,  (data&0x0f) * 0x08, (data>>4) * 0x08 );
-			break;
 		case 0x2:
 		case 0x3:
-			m_k007232_2->set_volume( offset&1,  (data&0x0f) * 0x08, (data>>4) * 0x08 );
-			break;
 		case 0x4:
 		case 0x5:
-			m_k007232_3->set_volume( offset&1,  (data&0x0f) * 0x08, (data>>4) * 0x08 );
+			m_k007232[offset >> 1]->set_volume( offset&1,  (data&0x0f) * 0x08, (data>>4) * 0x08 );
 			break;
 
 		case 0x06:  /* Bankswitch for chips 0 & 1 */
@@ -703,8 +682,8 @@ WRITE8_MEMBER(wecleman_state::hotchase_sound_control_w)
 			// bit 6: chip 2 - ch0 ?
 			// bit 7: chip 2 - ch1 ?
 
-			m_k007232_1->set_bank( bank0_a, bank0_b );
-			m_k007232_2->set_bank( bank1_a, bank1_b );
+			m_k007232[0]->set_bank( bank0_a, bank0_b );
+			m_k007232[1]->set_bank( bank1_a, bank1_b );
 		}
 		break;
 
@@ -713,7 +692,7 @@ WRITE8_MEMBER(wecleman_state::hotchase_sound_control_w)
 			int bank2_a = (data >> 0) & 7;
 			int bank2_b = (data >> 3) & 7;
 
-			m_k007232_3->set_bank( bank2_a, bank2_b );
+			m_k007232[2]->set_bank( bank2_a, bank2_b );
 		}
 		break;
 	}
@@ -726,41 +705,23 @@ WRITE8_MEMBER(wecleman_state::hotchase_sound_hs_w)
 
 /* Read and write handlers for one K007232 chip:
    even and odd register are mapped swapped */
-READ8_MEMBER(wecleman_state::hotchase_1_k007232_r)
+template<int Chip>
+READ8_MEMBER(wecleman_state::hotchase_k007232_r)
 {
-	return m_k007232_1->read(space, offset ^ 1);
+	return m_k007232[Chip]->read(space, offset ^ 1);
 }
 
-WRITE8_MEMBER(wecleman_state::hotchase_1_k007232_w)
+template<int Chip>
+WRITE8_MEMBER(wecleman_state::hotchase_k007232_w)
 {
-	m_k007232_1->write(space, offset ^ 1, data);
-}
-
-READ8_MEMBER(wecleman_state::hotchase_2_k007232_r)
-{
-	return m_k007232_2->read(space, offset ^ 1);
-}
-
-WRITE8_MEMBER(wecleman_state::hotchase_2_k007232_w)
-{
-	m_k007232_2->write(space, offset ^ 1, data);
-}
-
-READ8_MEMBER(wecleman_state::hotchase_3_k007232_r)
-{
-	return m_k007232_3->read(space, offset ^ 1);
-}
-
-WRITE8_MEMBER(wecleman_state::hotchase_3_k007232_w)
-{
-	m_k007232_3->write(space, offset ^ 1, data);
+	m_k007232[Chip]->write(space, offset ^ 1, data);
 }
 
 ADDRESS_MAP_START(wecleman_state::hotchase_sound_map)
 	AM_RANGE(0x0000, 0x07ff) AM_RAM
-	AM_RANGE(0x1000, 0x100d) AM_READWRITE(hotchase_1_k007232_r, hotchase_1_k007232_w)   // 3 x K007232
-	AM_RANGE(0x2000, 0x200d) AM_READWRITE(hotchase_2_k007232_r, hotchase_2_k007232_w)
-	AM_RANGE(0x3000, 0x300d) AM_READWRITE(hotchase_3_k007232_r, hotchase_3_k007232_w)
+	AM_RANGE(0x1000, 0x100d) AM_READWRITE(hotchase_k007232_r<0>, hotchase_k007232_w<0>)   // 3 x K007232
+	AM_RANGE(0x2000, 0x200d) AM_READWRITE(hotchase_k007232_r<1>, hotchase_k007232_w<1>)
+	AM_RANGE(0x3000, 0x300d) AM_READWRITE(hotchase_k007232_r<2>, hotchase_k007232_w<2>)
 	AM_RANGE(0x4000, 0x4007) AM_WRITE(hotchase_sound_control_w) // Sound volume, banking, etc.
 	AM_RANGE(0x5000, 0x5000) AM_WRITENOP   // 0 at start of IRQ service, 1 at end (irq mask?)
 	AM_RANGE(0x6000, 0x6000) AM_DEVREAD("soundlatch", generic_latch_8_device, read) // From main CPU (Read on IRQ)
@@ -1001,9 +962,9 @@ static const gfx_layout wecleman_road_layout =
 };
 
 static GFXDECODE_START( wecleman )
-	// "gfx1" holds sprite, which are not decoded here
-	GFXDECODE_ENTRY( "gfx2", 0, wecleman_bg_layout,   0, 2048/8 )   // [0] bg + fg + txt
-	GFXDECODE_ENTRY( "gfx3", 0, wecleman_road_layout, 0, 2048/8 )   // [1] road
+	// "sprites" holds sprite, which are not decoded here
+	GFXDECODE_ENTRY( "layers", 0, wecleman_bg_layout,   0, 2048/8 )   // [0] bg + fg + txt
+	GFXDECODE_ENTRY( "road",   0, wecleman_road_layout, 0, 2048/8 )   // [1] road
 GFXDECODE_END
 
 
@@ -1035,9 +996,8 @@ static const gfx_layout hotchase_road_layout =
 };
 
 static GFXDECODE_START( hotchase )
-	// "gfx1" holds sprite, which are not decoded here
-	// "gfx2" and 3 are for the 051316
-	GFXDECODE_ENTRY( "gfx4", 0, hotchase_road_layout, 0x70*16, 16 ) // road
+	// "sprites" holds sprite, which are not decoded here
+	GFXDECODE_ENTRY( "road", 0, hotchase_road_layout, 0x70*16, 16 ) // road
 GFXDECODE_END
 
 
@@ -1067,7 +1027,7 @@ TIMER_DEVICE_CALLBACK_MEMBER(wecleman_state::hotchase_scanline)
 
 MACHINE_RESET_MEMBER(wecleman_state,wecleman)
 {
-	m_k007232->set_bank( 0, 1 );
+	m_k007232[0]->set_bank( 0, 1 );
 }
 
 MACHINE_CONFIG_START(wecleman_state::wecleman)
@@ -1103,18 +1063,18 @@ MACHINE_CONFIG_START(wecleman_state::wecleman)
 	MCFG_VIDEO_START_OVERRIDE(wecleman_state,wecleman)
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_MONO("mono")
+	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
 
 	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
 
 	MCFG_YM2151_ADD("ymsnd", 3579545)
-	MCFG_SOUND_ROUTE(0, "mono", 0.85)
-	MCFG_SOUND_ROUTE(1, "mono", 0.85)
+	MCFG_SOUND_ROUTE(0, "lspeaker", 0.85)
+	MCFG_SOUND_ROUTE(1, "rspeaker", 0.85)
 
-	MCFG_SOUND_ADD("k007232", K007232, 3579545)
+	MCFG_SOUND_ADD("k007232_1", K007232, 3579545)
 	MCFG_K007232_PORT_WRITE_HANDLER(WRITE8(wecleman_state, wecleman_volume_callback))
-	MCFG_SOUND_ROUTE(0, "mono", 0.20)
-	MCFG_SOUND_ROUTE(1, "mono", 0.20)
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "lspeaker", 0.20)
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", 0.20)
 MACHINE_CONFIG_END
 
 
@@ -1185,24 +1145,24 @@ MACHINE_CONFIG_START(wecleman_state::hotchase)
 	MCFG_K051316_CB(wecleman_state, hotchase_zoom_callback_2)
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_MONO("mono")
+	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
 
 	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
 
 	MCFG_SOUND_ADD("k007232_1", K007232, 3579545)
 	// SLEV not used, volume control is elsewhere
-	MCFG_SOUND_ROUTE(0, "mono", 0.20)
-	MCFG_SOUND_ROUTE(1, "mono", 0.20)
+	MCFG_SOUND_ROUTE(0, "lspeaker", 0.20)
+	MCFG_SOUND_ROUTE(1, "rspeaker", 0.20)
 
 	MCFG_SOUND_ADD("k007232_2", K007232, 3579545)
 	// SLEV not used, volume control is elsewhere
-	MCFG_SOUND_ROUTE(0, "mono", 0.20)
-	MCFG_SOUND_ROUTE(1, "mono", 0.20)
+	MCFG_SOUND_ROUTE(0, "lspeaker", 0.20)
+	MCFG_SOUND_ROUTE(1, "rspeaker", 0.20)
 
 	MCFG_SOUND_ADD("k007232_3", K007232, 3579545)
 	// SLEV not used, volume control is elsewhere
-	MCFG_SOUND_ROUTE(0, "mono", 0.20)
-	MCFG_SOUND_ROUTE(1, "mono", 0.20)
+	MCFG_SOUND_ROUTE(0, "lspeaker", 0.20)
+	MCFG_SOUND_ROUTE(1, "rspeaker", 0.20)
 MACHINE_CONFIG_END
 
 
@@ -1224,7 +1184,7 @@ ROM_START( wecleman )
 	ROM_REGION( 0x10000, "audiocpu", 0 )    /* Sound CPU Code */
 	ROM_LOAD( "602a01.6d",  0x00000, 0x08000, CRC(deafe5f1) SHA1(4cfbe2841233b1222c22160af7287b7a7821c3a0) )
 
-	ROM_REGION( 0x200000 * 2, "gfx1", 0 )   /* x2, do not dispose, zooming sprites */
+	ROM_REGION( 0x200000 * 2, "sprites", 0 )   /* x2, do not dispose, zooming sprites */
 	ROM_LOAD( "602a25.12e", 0x000000, 0x20000, CRC(0eacf1f9) SHA1(b4dcd457e68175ffee3da4aff23a241fe33eb500) )
 	ROM_LOAD( "602a26.14e", 0x020000, 0x20000, CRC(2182edaf) SHA1(5ae4223a76b3c0be8f66458707f2e6f63fba0b13) )
 	ROM_LOAD( "602a27.15e", 0x040000, 0x20000, CRC(b22f08e9) SHA1(1ba99bc4e00e206507e9bfafc989208d6ae6f8a3) )
@@ -1242,16 +1202,16 @@ ROM_START( wecleman )
 	ROM_LOAD( "602a15.9c",  0x1c0000, 0x20000, CRC(0d493c9f) SHA1(02690a1963cadd469bd67cb362384923916900a1) )
 	ROM_LOAD( "602a16.10c", 0x1e0000, 0x20000, CRC(b08770b3) SHA1(41871e9261d08fd372b7deb72d939973fb694b54) )
 
-	ROM_REGION( 0x18000, "gfx2", 0 )
+	ROM_REGION( 0x18000, "layers", 0 )
 	ROM_LOAD( "602a31.26g", 0x000000, 0x08000, CRC(01fa40dd) SHA1(2b8aa97f5116f39ae6a8e46f109853d70e370884) )   // layers
 	ROM_LOAD( "602a30.24g", 0x008000, 0x08000, CRC(be5c4138) SHA1(7aee2ee17ef3e37399a60d9b019cfa733acbf07b) )
 	ROM_LOAD( "602a29.23g", 0x010000, 0x08000, CRC(f1a8d33e) SHA1(ed6531f2fd4ad6835a879e9a5600387d8cad6d17) )
 
-	ROM_REGION( 0x0c000, "gfx3", 0 )    /* road */
+	ROM_REGION( 0x0c000, "road", 0 )    /* road */
 	ROM_LOAD( "602a04.11e", 0x000000, 0x08000, CRC(ade9f359) SHA1(58db6be6217ed697827015e50e99e58602042a4c) )
 	ROM_LOAD( "602a05.13e", 0x008000, 0x04000, CRC(f22b7f2b) SHA1(857389c57552c4e2237cb599f4c68c381430475e) )   // may also exist as 32KB with one half empty
 
-	ROM_REGION( 0x40000, "k007232", 0 )  /* Samples (Channel A 0x20000=Channel B) */
+	ROM_REGION( 0x40000, "k007232_1", 0 )  /* Samples (Channel A 0x20000=Channel B) */
 	ROM_LOAD( "602a03.10a", 0x00000, 0x20000, CRC(31392b01) SHA1(0424747bc2015c9c93afd20e6a23083c0dcc4fb7) )
 	ROM_LOAD( "602a02.8a",  0x20000, 0x20000, CRC(e2be10ae) SHA1(109c31bf7252c83a062d259143cd8299681db778) )
 
@@ -1274,7 +1234,7 @@ ROM_START( weclemana )
 	ROM_REGION( 0x10000, "audiocpu", 0 )    /* Sound CPU Code */
 	ROM_LOAD( "602a01.6d",  0x00000, 0x08000, CRC(deafe5f1) SHA1(4cfbe2841233b1222c22160af7287b7a7821c3a0) )
 
-	ROM_REGION( 0x200000 * 2, "gfx1", 0 )   /* x2, do not dispose, zooming sprites */
+	ROM_REGION( 0x200000 * 2, "sprites", 0 )   /* x2, do not dispose, zooming sprites */
 	ROM_LOAD( "602a25.12e", 0x000000, 0x20000, CRC(0eacf1f9) SHA1(b4dcd457e68175ffee3da4aff23a241fe33eb500) )
 	ROM_LOAD( "602a26.14e", 0x020000, 0x20000, CRC(2182edaf) SHA1(5ae4223a76b3c0be8f66458707f2e6f63fba0b13) )
 	ROM_LOAD( "602a27.15e", 0x040000, 0x20000, CRC(b22f08e9) SHA1(1ba99bc4e00e206507e9bfafc989208d6ae6f8a3) )
@@ -1292,16 +1252,16 @@ ROM_START( weclemana )
 	ROM_LOAD( "602a15.9c",  0x1c0000, 0x20000, CRC(0d493c9f) SHA1(02690a1963cadd469bd67cb362384923916900a1) )
 	ROM_LOAD( "602a16.10c", 0x1e0000, 0x20000, CRC(b08770b3) SHA1(41871e9261d08fd372b7deb72d939973fb694b54) )
 
-	ROM_REGION( 0x18000, "gfx2", 0 )
+	ROM_REGION( 0x18000, "layers", 0 )
 	ROM_LOAD( "602a31.26g", 0x000000, 0x08000, CRC(01fa40dd) SHA1(2b8aa97f5116f39ae6a8e46f109853d70e370884) )   // layers
 	ROM_LOAD( "602a30.24g", 0x008000, 0x08000, CRC(be5c4138) SHA1(7aee2ee17ef3e37399a60d9b019cfa733acbf07b) )
 	ROM_LOAD( "602a29.23g", 0x010000, 0x08000, CRC(f1a8d33e) SHA1(ed6531f2fd4ad6835a879e9a5600387d8cad6d17) )
 
-	ROM_REGION( 0x0c000, "gfx3", 0 )    /* road */
+	ROM_REGION( 0x0c000, "road", 0 )    /* road */
 	ROM_LOAD( "602a04.11e", 0x000000, 0x08000, CRC(ade9f359) SHA1(58db6be6217ed697827015e50e99e58602042a4c) )
 	ROM_LOAD( "602a05.13e", 0x008000, 0x04000, CRC(f22b7f2b) SHA1(857389c57552c4e2237cb599f4c68c381430475e) )   // may also exist as 32KB with one half empty
 
-	ROM_REGION( 0x40000, "k007232", 0 )  /* Samples (Channel A 0x20000=Channel B) */
+	ROM_REGION( 0x40000, "k007232_1", 0 )  /* Samples (Channel A 0x20000=Channel B) */
 	ROM_LOAD( "602a03.10a", 0x00000, 0x20000, CRC(31392b01) SHA1(0424747bc2015c9c93afd20e6a23083c0dcc4fb7) )
 	ROM_LOAD( "602a02.8a",  0x20000, 0x20000, CRC(e2be10ae) SHA1(109c31bf7252c83a062d259143cd8299681db778) )
 
@@ -1326,7 +1286,7 @@ ROM_START( weclemanb )
 	ROM_REGION( 0x10000, "audiocpu", 0 )    /* Sound CPU Code */
 	ROM_LOAD( "602a01.6d",  0x00000, 0x08000, CRC(deafe5f1) SHA1(4cfbe2841233b1222c22160af7287b7a7821c3a0) )
 
-	ROM_REGION( 0x200000 * 2, "gfx1", 0 )   /* x2, do not dispose, zooming sprites */
+	ROM_REGION( 0x200000 * 2, "sprites", 0 )   /* x2, do not dispose, zooming sprites */
 	ROM_LOAD( "602a25.12e", 0x000000, 0x20000, CRC(0eacf1f9) SHA1(b4dcd457e68175ffee3da4aff23a241fe33eb500) )
 	ROM_LOAD( "602a26.14e", 0x020000, 0x20000, CRC(2182edaf) SHA1(5ae4223a76b3c0be8f66458707f2e6f63fba0b13) )
 	ROM_LOAD( "602a27.15e", 0x040000, 0x20000, CRC(b22f08e9) SHA1(1ba99bc4e00e206507e9bfafc989208d6ae6f8a3) )
@@ -1344,16 +1304,16 @@ ROM_START( weclemanb )
 	ROM_LOAD( "602a15.9c",  0x1c0000, 0x20000, CRC(0d493c9f) SHA1(02690a1963cadd469bd67cb362384923916900a1) )
 	ROM_LOAD( "602a16.10c", 0x1e0000, 0x20000, CRC(b08770b3) SHA1(41871e9261d08fd372b7deb72d939973fb694b54) )
 
-	ROM_REGION( 0x18000, "gfx2", 0 )
+	ROM_REGION( 0x18000, "layers", 0 )
 	ROM_LOAD( "602a31.26g", 0x000000, 0x08000, CRC(01fa40dd) SHA1(2b8aa97f5116f39ae6a8e46f109853d70e370884) )   // layers
 	ROM_LOAD( "602a30.24g", 0x008000, 0x08000, CRC(be5c4138) SHA1(7aee2ee17ef3e37399a60d9b019cfa733acbf07b) )
 	ROM_LOAD( "602a29.23g", 0x010000, 0x08000, CRC(f1a8d33e) SHA1(ed6531f2fd4ad6835a879e9a5600387d8cad6d17) )
 
-	ROM_REGION( 0x0c000, "gfx3", 0 )    /* road */
+	ROM_REGION( 0x0c000, "road", 0 )    /* road */
 	ROM_LOAD( "602a04.11e", 0x000000, 0x08000, CRC(ade9f359) SHA1(58db6be6217ed697827015e50e99e58602042a4c) )
 	ROM_LOAD( "602a05.13e", 0x008000, 0x04000, CRC(f22b7f2b) SHA1(857389c57552c4e2237cb599f4c68c381430475e) )   // may also exist as 32KB with one half empty
 
-	ROM_REGION( 0x40000, "k007232", 0 )  /* Samples (Channel A 0x20000=Channel B) */
+	ROM_REGION( 0x40000, "k007232_1", 0 )  /* Samples (Channel A 0x20000=Channel B) */
 	ROM_LOAD( "602a03.10a", 0x00000, 0x20000, CRC(31392b01) SHA1(0424747bc2015c9c93afd20e6a23083c0dcc4fb7) )
 	ROM_LOAD( "602a02.8a",  0x20000, 0x20000, CRC(e2be10ae) SHA1(109c31bf7252c83a062d259143cd8299681db778) )
 
@@ -1363,11 +1323,9 @@ ROM_END
 
 void wecleman_state::wecleman_unpack_sprites()
 {
-	const char *region       = "gfx1";  // sprites
-
-	const uint32_t len = memregion(region)->bytes();
-	uint8_t *src     = memregion(region)->base() + len / 2 - 1;
-	uint8_t *dst     = memregion(region)->base() + len - 1;
+	const uint32_t len = m_sprite_region.length();  // sprites
+	uint8_t *src     = m_sprite_region + len / 2 - 1;
+	uint8_t *dst     = m_sprite_region + len - 1;
 
 	while(dst > src)
 	{
@@ -1406,8 +1364,8 @@ DRIVER_INIT_MEMBER(wecleman_state,wecleman)
 	    I hope you'll appreciate this effort!  */
 
 	/* let's swap even and odd *pixels* of the sprites */
-	RAM = memregion("gfx1")->base();
-	len = memregion("gfx1")->bytes();
+	RAM = m_sprite_region;
+	len = m_sprite_region.length();
 	for (i = 0; i < len; i ++)
 	{
 		/* TODO: could be wrong, colors have to be fixed.       */
@@ -1416,22 +1374,22 @@ DRIVER_INIT_MEMBER(wecleman_state,wecleman)
 		RAM[i] = ::bitswap<8>(RAM[i],7,0,1,2,3,4,5,6);
 	}
 
-	bitswap(memregion("gfx1")->base(), memregion("gfx1")->bytes(),
+	bitswap(m_sprite_region, m_sprite_region.length(),
 			0,1,20,19,18,17,14,9,16,6,4,7,8,15,10,11,13,5,12,3,2);
 
 	/* Now we can unpack each nibble of the sprites into a pixel (one byte) */
 	wecleman_unpack_sprites();
 
 	/* Bg & Fg & Txt */
-	bitswap(memregion("gfx2")->base(), memregion("gfx2")->bytes(),
+	bitswap(memregion("layers")->base(), memregion("layers")->bytes(),
 			20,19,18,17,16,15,12,7,14,4,2,5,6,13,8,9,11,3,10,1,0);
 
 	/* Road */
-	bitswap(memregion("gfx3")->base(), memregion("gfx3")->bytes(),
+	bitswap(memregion("road")->base(), memregion("road")->bytes(),
 			20,19,18,17,16,15,14,7,12,4,2,5,6,13,8,9,11,3,10,1,0);
 
 	m_spr_color_offs = 0x40;
-	m_sound_hw_type = 0;
+	m_sound_hw_type = WECLEMAN_ID;
 }
 
 
@@ -1453,7 +1411,7 @@ ROM_START( hotchase )
 	ROM_REGION( 0x10000, "audiocpu", 0 )    /* Sound Code */
 	ROM_LOAD( "763f01", 0x8000, 0x8000, CRC(4fddd061) SHA1(ff0aa18605612f6102107a6be1f93ae4c5edc84f) )
 
-	ROM_REGION( 0x300000 * 2, "gfx1", 0 )   /* x2, do not dispose, zooming sprites */
+	ROM_REGION( 0x300000 * 2, "sprites", 0 )   /* x2, do not dispose, zooming sprites */
 	ROM_LOAD16_WORD_SWAP( "763e17", 0x000000, 0x080000, CRC(8db4e0aa) SHA1(376cb3cae110998f2f9df7e6cdd35c06732fea69) )
 	ROM_LOAD16_WORD_SWAP( "763e20", 0x080000, 0x080000, CRC(a22c6fce) SHA1(174fb9c1706c092947bcce386831acd33a237046) )
 	ROM_LOAD16_WORD_SWAP( "763e18", 0x100000, 0x080000, CRC(50920d01) SHA1(313c7ecbd154b3f4c96f25c29a7734a9b3facea4) )
@@ -1469,7 +1427,7 @@ ROM_START( hotchase )
 	ROM_LOAD( "763a13", 0x000000, 0x008000, CRC(8bed8e0d) SHA1(ccff330abc23fe499e76c16cab5783c3daf155dd) )
 	ROM_CONTINUE( 0x000000, 0x008000 )
 
-	ROM_REGION( 0x20000, "gfx4", 0 )    /* road */
+	ROM_REGION( 0x20000, "road", 0 )    /* road */
 	ROM_LOAD( "763e15", 0x000000, 0x020000, CRC(7110aa43) SHA1(639dc002cc1580f0530bb5bb17f574e2258d5954) )
 
 	ROM_REGION( 0x40000, "k007232_1", 0 ) /* Samples, 2 banks */
@@ -1557,7 +1515,7 @@ ROM_START( hotchasea )
 	ROM_REGION( 0x10000, "audiocpu", 0 )    /* Sound Code */
 	ROM_LOAD( "763p01.r10", 0x8000, 0x8000, CRC(15dbca7b) SHA1(ac0c965b72a8579a3b60dbadfb942248d2cff2d8) )
 
-	ROM_REGION( 0x300000 * 2, "gfx1", 0 )   /* x2, do not dispose, zooming sprites */
+	ROM_REGION( 0x300000 * 2, "sprites", 0 )   /* x2, do not dispose, zooming sprites */
 	ROM_LOAD16_BYTE( "763e17a", 0x000000, 0x010000, CRC(8542d7d7) SHA1(a7c8aa7d8e0cabdc5269eb7adff944aaa0f819b6) )
 	ROM_LOAD16_BYTE( "763e17e", 0x000001, 0x010000, CRC(4b4d919c) SHA1(0364eb74da8db7238888274d12011de876662d5a) )
 	ROM_LOAD16_BYTE( "763e17b", 0x020000, 0x010000, CRC(ba9d7e72) SHA1(3af618087dcc66552ffabaf655f97b20e597122c) )
@@ -1615,7 +1573,7 @@ ROM_START( hotchasea )
 	ROM_LOAD( "763a13", 0x000000, 0x008000, CRC(8bed8e0d) SHA1(ccff330abc23fe499e76c16cab5783c3daf155dd) )
 	ROM_CONTINUE( 0x000000, 0x008000 )
 
-	ROM_REGION( 0x20000, "gfx4", 0 )    /* road */
+	ROM_REGION( 0x20000, "road", 0 )    /* road */
 	ROM_LOAD( "763a15", 0x000000, 0x020000, CRC(7110aa43) SHA1(639dc002cc1580f0530bb5bb17f574e2258d5954) )
 
 	ROM_REGION( 0x40000, "k007232_1", 0 ) /* Samples, 2 banks */
@@ -1658,7 +1616,7 @@ void wecleman_state::hotchase_sprite_decode( int num16_banks, int bank_size )
 	uint8_t *base;
 	int i;
 
-	base = memregion("gfx1")->base(); // sprites
+	base = m_sprite_region; // sprites
 	std::vector<uint8_t> temp( bank_size );
 
 	for( i = num16_banks; i >0; i-- ){
@@ -1709,7 +1667,7 @@ DRIVER_INIT_MEMBER(wecleman_state,hotchase)
 	hotchase_sprite_decode(3,0x80000*2);  // num banks, bank len
 
 	m_spr_color_offs = 0;
-	m_sound_hw_type = 1;
+	m_sound_hw_type = HOTCHASE_ID;
 }
 
 
