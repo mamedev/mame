@@ -69,8 +69,6 @@ public:
 
 	// memory mapping
 	void memory_mapper(sega_315_5195_mapper_device &mapper, uint8_t index);
-	DECLARE_READ8_MEMBER(mapper_sound_r);
-	DECLARE_WRITE8_MEMBER(mapper_sound_w);
 
 	// main CPU read/write handlers
 	DECLARE_WRITE16_MEMBER( rom_5704_bank_w );
@@ -169,6 +167,8 @@ public:
 	void sound_decrypted_opcodes_map(address_map &map);
 	void sound_map(address_map &map);
 	void sound_portmap(address_map &map);
+	void bootleg_sound_map(address_map &map);
+	void bootleg_sound_portmap(address_map &map);
 	void system16b_bootleg_map(address_map &map);
 	void system16b_map(address_map &map);
 	void system16c_map(address_map &map);

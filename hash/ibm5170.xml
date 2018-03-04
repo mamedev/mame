@@ -5375,6 +5375,28 @@
 		</part>
 	</software>
 
+	<software name="hrencyc">
+		<!-- Dumped via Kryoflux, first track shows as modified on all disks -->
+		<description>Home Repair Encyclopedia</description>
+		<year>1995</year>
+		<publisher>Books That Work</publisher>
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size = "1474560">
+				<rom name="hrencyc_1.img" size="1474560" crc="8512464f" sha1="625a7c3c569aa4ce01e8386fde42c341d4e44c95" offset="0" status="baddump"/>
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_3_5">
+			<dataarea name="flop" size = "1474560">
+				<rom name="hrencyc_2.img" size="1474560" crc="abd95d17" sha1="c344f76b787fb46bfde06318ab2e4db6a5010152" offset="0" status="baddump"/>
+			</dataarea>
+		</part>
+		<part name="flop3" interface="floppy_3_5">
+			<dataarea name="flop" size = "1474560">
+				<rom name="hrencyc_3.img" size="1474560" crc="2b0b5241" sha1="ab64dd723273198e104e81a5195da6c26a565f98" offset="0" status="baddump"/>
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="l123r3">
 		<description>Lotus 1-2-3 Release 3 (5.25")</description>
 		<year>1989</year>
@@ -5878,6 +5900,18 @@
 		<part name="flop2" interface="floppy_3_5">
 			<dataarea name="flop" size = "1474560">
 				<rom name="prodigy disk2.img" size="1474560" crc="99c0c50a" sha1="6842d1cd7c3c6f94a04cd104e79e1a0ebde8d8b4" offset="0"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="apg_svga">
+		<description>Programming Examples for Advanced Programmer's Guide to SuperVGAs</description>
+		<year>1990</year>
+		<publisher>Brady</publisher>
+		<info name="isbn" value="0130104558" />
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size = "1228800">
+				<rom name="Brady Programming Examples for Advanced Programmer's Guide to SuperVGAs.img" size="1228800" crc="3964178f" sha1="b4f1132c2b9e3eefa44436d896095c80d6454e79" offset="0"/>
 			</dataarea>
 		</part>
 	</software>
@@ -7048,6 +7082,103 @@
 		<part name="flop2" interface="floppy_3_5">
 			<dataarea name="flop" size = "1474560">
 				<rom name="Alien Carnage [Apogee Software] [1994] [3.5HD] [Disk 2 of 2].img" size="1474560" crc="aeedf7b3" sha1="e9042334af6f6724a199560e71cc8f4e7b45969f" offset="0"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<!-- hangs at Sierra logo -->
+	<software name="alienleg" supported="no">
+		<description>Alien Legacy (v1.00)</description>
+		<year>1994</year>
+		<publisher>Sierra</publisher>
+		<info name="version" value="1.00" />
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size = "1474560">
+				<rom name="Alien Legacy (USA) (Disk 1).img" size="1474560" crc="f7f16180" sha1="61f1a9c36a756fe67344699e9a5a3880f07b5da5" offset="0"/>
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_3_5">
+			<dataarea name="flop" size = "1474560">
+				<rom name="Alien Legacy (USA) (Disk 2).img" size="1474560" crc="542fa624" sha1="b09684af9ff178677ecfb352041ed4f9fdd0ee42" offset="0"/>
+			</dataarea>
+		</part>
+		<part name="flop3" interface="floppy_3_5">
+			<dataarea name="flop" size = "1474560">
+				<rom name="Alien Legacy (USA) (Disk 3).img" size="1474560" crc="fd3d1f2c" sha1="6fb671829d2cb8255325438cb479f63ca39c08d8" offset="0"/>
+			</dataarea>
+		</part>
+		<part name="flop4" interface="floppy_3_5">
+			<dataarea name="flop" size = "1474560">
+				<rom name="Alien Legacy (USA) (Disk 4).img" size="1474560" crc="ef83eecf" sha1="ad23c8dbc75fdda672e5b94c00ff09969c549919" offset="0"/>
+			</dataarea>
+		</part>
+		<part name="flop5" interface="floppy_3_5">
+			<dataarea name="flop" size = "1474560">
+				<rom name="Alien Legacy (USA) (Disk 5).img" size="1474560" crc="91d6629c" sha1="c40c0d9e6435a7616b4eb9ee891694e779cdc869" offset="0"/>
+			</dataarea>
+		</part>
+		<part name="flop6" interface="floppy_3_5">
+			<dataarea name="flop" size = "1474560">
+				<rom name="Alien Legacy (USA) (Disk 6).img" size="1474560" crc="bc2335da" sha1="a7e8fe69bd3f9ffde3a3471b9796b5122562d115" offset="0"/>
+			</dataarea>
+		</part>
+		<part name="flop7" interface="floppy_3_5">
+			<dataarea name="flop" size = "1474560">
+				<rom name="Alien Legacy (USA) (Disk 7).img" size="1474560" crc="3e3556ee" sha1="dbbfecc253cd1b08744087d60a9a032975b544a2" offset="0"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="aitd">
+		<description>Alone in the Dark</description>
+		<year>1992</year>
+		<publisher>I·Motion</publisher>
+		<info name="developer" value="Infogrames" />
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size = "1474560">
+				<rom name="Alone in the Dark (USA) (Disk 1).img" size="1474560" crc="ea0d31a1" sha1="12f9ff44d2757d224298d3e487d14e5400133fc7" offset="0"/>
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_3_5">
+			<dataarea name="flop" size = "1474560">
+				<rom name="Alone in the Dark (USA) (Disk 2).img" size="1474560" crc="250c2cf3" sha1="56b848ba68989b7707cbddf620cdaf6af200b2c3" offset="0"/>
+			</dataarea>
+		</part>
+		<part name="flop3" interface="floppy_3_5">
+			<dataarea name="flop" size = "1474560">
+				<rom name="Alone in the Dark (USA) (Disk 3).img" size="1474560" crc="ade720aa" sha1="09f16ba74abc4583f7613fade79112769323e878" offset="0"/>
+			</dataarea>
+		</part>
+		<part name="flop4" interface="floppy_3_5">
+			<dataarea name="flop" size = "1474560">
+				<rom name="Alone in the Dark (USA) (Disk 4).img" size="1474560" crc="81ce60c6" sha1="97b5c9415280075823eb1e78312256d64bc2d14c" offset="0"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="aitdfr" cloneof="aitd">
+		<description>Alone in the Dark (French)</description>
+		<year>1992</year>
+		<publisher>I·Motion</publisher>
+		<info name="developer" value="Infogrames" />
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size = "1474560">
+				<rom name="Alone in the Dark (France) (Disk 1).img" size="1474560" crc="86b5e021" sha1="7a4cf2a406a62ed547719c1c7313483f7c2a45e7" offset="0"/>
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_3_5">
+			<dataarea name="flop" size = "1474560">
+				<rom name="Alone in the Dark (France) (Disk 2).img" size="1474560" crc="73299a22" sha1="5ba67b0013c1ba82087703c09b8b914a7913dcbf" offset="0"/>
+			</dataarea>
+		</part>
+		<part name="flop3" interface="floppy_3_5">
+			<dataarea name="flop" size = "1474560">
+				<rom name="Alone in the Dark (France) (Disk 3).img" size="1474560" crc="52f20223" sha1="ec639153e99da5083e729657fe54b9cd4068a229" offset="0"/>
+			</dataarea>
+		</part>
+		<part name="flop4" interface="floppy_3_5">
+			<dataarea name="flop" size = "1474560">
+				<rom name="Alone in the Dark (France) (Disk 4).img" size="1474560" crc="8cd64cf1" sha1="1502555ba7fedabceb7e8fd859b77689c08bd214" offset="0"/>
 			</dataarea>
 		</part>
 	</software>
@@ -9346,6 +9477,24 @@
 		<part name="flop6" interface="floppy_5_25">
 			<dataarea name="flop" size = "1228800">
 				<rom name="Monkey Island 2 - LeChuck's Revenge (World) (5.25'') (Disk 6).img" size="1228800" crc="00b5dfb9" sha1="c4dd7be4f0f1da5c7aa59bd9dabebea13d95c812" offset="0"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="mnstbash">
+		<description>Monster Bash!</description>
+		<year>1993</year>
+		<publisher>Apogee Software</publisher>
+		<info name="developer" value="Apogee Software" />
+		<info name="version" value="2.1" />
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size = "1474560">
+				<rom name="Monster Bash [Apogee Software] [1993] [3.5HD] [Disk 1 of 2].img" size="1474560" crc="39251a8d" sha1="26c55beba9c189d623d9cf10c8e7bda5a256087d" offset="0"/>
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_3_5">
+			<dataarea name="flop" size = "1474560">
+				<rom name="Monster Bash [Apogee Software] [1993] [3.5HD] [Disk 2 of 2].img" size="1474560" crc="a0a74726" sha1="939a65b36dc258a4d7746701f6eed4f74eeef709" offset="0"/>
 			</dataarea>
 		</part>
 	</software>

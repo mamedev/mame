@@ -967,33 +967,12 @@ void segas16b_state::memory_mapper(sega_315_5195_mapper_device &mapper, uint8_t 
 }
 
 
-//-------------------------------------------------
-//  mapper_sound_r - sound port read from the
-//  memory mapper chip
-//-------------------------------------------------
-
-READ8_MEMBER(segas16b_state::mapper_sound_r)
-{
-	return 0;
-}
-
-
-//-------------------------------------------------
-//  mapper_sound_w - sound port write from the
-//  memory mapper chip
-//-------------------------------------------------
-
-WRITE8_MEMBER(segas16b_state::mapper_sound_w)
-{
-	if (m_soundlatch != nullptr)
-		m_soundlatch->write(space, 0, data);
-	if (m_soundcpu != nullptr)
-		m_soundcpu->set_input_line(0, HOLD_LINE);
-}
-
 WRITE16_MEMBER( segas16b_state::sound_w16 )
 {
-	mapper_sound_w(space, 0, data & 0xff);
+	if (m_soundlatch != nullptr)
+		m_soundlatch->write(space, 0, data & 0xff);
+	if (m_soundcpu != nullptr)
+		m_soundcpu->set_input_line(0, HOLD_LINE);
 }
 
 //**************************************************************************
@@ -1761,6 +1740,7 @@ ADDRESS_MAP_START(segas16b_state::map_fpointbla)
 	AM_RANGE(0x443002, 0x443003) AM_READ_PORT("SERVICE")
 	AM_RANGE(0x840000, 0x840fff) AM_RAM_WRITE(paletteram_w) AM_SHARE("paletteram")
 	AM_RANGE(0x843018, 0x843019) AM_READ_PORT("DSW1")
+	AM_RANGE(0xfe0004, 0xfe0005) AM_DEVWRITE8("soundlatch", generic_latch_8_device, write, 0x00ff)
 	AM_RANGE(0xfe000c, 0xfe000d) AM_READ_PORT("P1")
 	AM_RANGE(0xffc000, 0xffffff) AM_RAM AM_SHARE("workram")
 ADDRESS_MAP_END
@@ -1793,7 +1773,7 @@ ADDRESS_MAP_START(segas16b_state::lockonph_map)
 	AM_RANGE(0xC42000, 0xC42001) AM_READ_PORT("DSW1")
 	AM_RANGE(0xC42002, 0xC42003) AM_READ_PORT("DSW2")
 
-	AM_RANGE(0x777706, 0x777707) AM_WRITE(sound_w16) // AM_DEVWRITE8("soundlatch", generic_latch_8_device, write, 0xff00)
+	AM_RANGE(0x777706, 0x777707) AM_DEVWRITE8("soundlatch", generic_latch_8_device, write, 0x00ff)
 
 	AM_RANGE(0xff0000, 0xffffff) AM_RAM AM_SHARE("workram")
 ADDRESS_MAP_END
@@ -1807,7 +1787,7 @@ ADDRESS_MAP_START(segas16b_state::fpointbl_map)
 	AM_RANGE(0x410000, 0x410fff) AM_DEVREADWRITE("segaic16vid", segaic16_video_device, textram_r, textram_w) AM_SHARE("textram")
 	AM_RANGE(0x440000, 0x440fff) AM_RAM AM_SHARE("sprites")
 
-	AM_RANGE(0x600006, 0x600007) AM_WRITE(sound_w16)
+	AM_RANGE(0x600006, 0x600007) AM_DEVWRITE8("soundlatch", generic_latch_8_device, write, 0x00ff)
 	AM_RANGE(0x601000, 0x601001) AM_READ_PORT("SERVICE")
 	AM_RANGE(0x601002, 0x601003) AM_READ_PORT("P1")
 	AM_RANGE(0x601004, 0x601005) AM_READ_PORT("P2")
@@ -1852,7 +1832,7 @@ ADDRESS_MAP_START(segas16b_state::sound_map)
 	ADDRESS_MAP_UNMAP_HIGH
 	AM_RANGE(0x0000, 0x7fff) AM_ROM
 	AM_RANGE(0x8000, 0xdfff) AM_ROMBANK("soundbank")
-	AM_RANGE(0xe800, 0xe800) AM_DEVREAD("soundlatch", generic_latch_8_device, read)
+	AM_RANGE(0xe800, 0xe800) AM_DEVREAD("mapper", sega_315_5195_mapper_device, pread)
 	AM_RANGE(0xf800, 0xffff) AM_RAM
 ADDRESS_MAP_END
 
@@ -1863,6 +1843,23 @@ ADDRESS_MAP_START(segas16b_state::sound_decrypted_opcodes_map)
 ADDRESS_MAP_END
 
 ADDRESS_MAP_START(segas16b_state::sound_portmap)
+	ADDRESS_MAP_UNMAP_HIGH
+	ADDRESS_MAP_GLOBAL_MASK(0xff)
+	AM_RANGE(0x00, 0x01) AM_MIRROR(0x3e) AM_DEVREADWRITE("ym2151", ym2151_device, read, write)
+	AM_RANGE(0x40, 0x40) AM_MIRROR(0x3f) AM_WRITE(upd7759_control_w)
+	AM_RANGE(0x80, 0x80) AM_MIRROR(0x3f) AM_READ(upd7759_status_r) AM_DEVWRITE("upd", upd7759_device, port_w)
+	AM_RANGE(0xc0, 0xc0) AM_MIRROR(0x3f) AM_DEVREAD("mapper", sega_315_5195_mapper_device, pread)
+ADDRESS_MAP_END
+
+ADDRESS_MAP_START(segas16b_state::bootleg_sound_map)
+	ADDRESS_MAP_UNMAP_HIGH
+	AM_RANGE(0x0000, 0x7fff) AM_ROM
+	AM_RANGE(0x8000, 0xdfff) AM_ROMBANK("soundbank")
+	AM_RANGE(0xe800, 0xe800) AM_DEVREAD("soundlatch", generic_latch_8_device, read)
+	AM_RANGE(0xf800, 0xffff) AM_RAM
+ADDRESS_MAP_END
+
+ADDRESS_MAP_START(segas16b_state::bootleg_sound_portmap)
 	ADDRESS_MAP_UNMAP_HIGH
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	AM_RANGE(0x00, 0x01) AM_MIRROR(0x3e) AM_DEVREADWRITE("ym2151", ym2151_device, read, write)
@@ -1901,7 +1898,8 @@ WRITE8_MEMBER(segas16b_state::spin_68k_w)
 
 ADDRESS_MAP_START(segas16b_state::mcu_io_map)
 	ADDRESS_MAP_UNMAP_HIGH
-	AM_RANGE(0x0000, 0x001f) AM_MIRROR(0xff00) AM_DEVREADWRITE("mapper", sega_315_5195_mapper_device, read, write)
+	ADDRESS_MAP_GLOBAL_MASK(0xff)
+	AM_RANGE(0x00, 0x1f) AM_DEVREADWRITE("mapper", sega_315_5195_mapper_device, read, write)
 ADDRESS_MAP_END
 
 
@@ -3713,8 +3711,7 @@ MACHINE_CONFIG_START(segas16b_state::system16b)
 	MCFG_NVRAM_ADD_0FILL("nvram")
 
 	MCFG_SEGA_315_5195_MAPPER_ADD("mapper", "maincpu", segas16b_state, memory_mapper)
-	MCFG_SEGA_315_5195_SOUND_READ_CALLBACK(READ8(segas16b_state, mapper_sound_r))
-	MCFG_SEGA_315_5195_SOUND_WRITE_CALLBACK(WRITE8(segas16b_state, mapper_sound_w))
+	MCFG_SEGA_315_5195_PBF_CALLBACK(INPUTLINE("soundcpu", 0))
 
 	// video hardware
 	MCFG_GFXDECODE_ADD("gfxdecode", "palette", segas16b)
@@ -3731,8 +3728,6 @@ MACHINE_CONFIG_START(segas16b_state::system16b)
 
 	// sound hardware
 	MCFG_SPEAKER_STANDARD_MONO("mono")
-
-	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
 
 	MCFG_YM2151_ADD("ym2151", MASTER_CLOCK_8MHz/2)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.43)
@@ -3827,6 +3822,12 @@ MACHINE_CONFIG_START(segas16b_state::system16b_split)
 	MCFG_CPU_OPCODES_MAP(decrypted_opcodes_map_x)
 
 	MCFG_DEVICE_REMOVE("mapper")
+
+	MCFG_CPU_MODIFY("soundcpu")
+	MCFG_CPU_PROGRAM_MAP(bootleg_sound_map)
+	MCFG_CPU_IO_MAP(bootleg_sound_portmap)
+
+	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
 MACHINE_CONFIG_END
 
 void segas16b_state::tilemap_16b_fpointbl_fill_latch(int i, uint16_t* latched_pageselect, uint16_t* latched_yscroll, uint16_t* latched_xscroll, uint16_t* textram)
@@ -3867,6 +3868,10 @@ MACHINE_CONFIG_START(segas16b_state::fpointbl)
 
 	MCFG_CPU_MODIFY("soundcpu")
 	MCFG_CPU_PROGRAM_MAP(fpointbl_sound_map)
+	MCFG_CPU_IO_MAP(bootleg_sound_portmap)
+
+	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
+	MCFG_GENERIC_LATCH_DATA_PENDING_CB(INPUTLINE("soundcpu", 0))
 
 	MCFG_BOOTLEG_SYS16B_SPRITES_ADD("sprites")
 	MCFG_BOOTLEG_SYS16B_SPRITES_XORIGIN(75) // these align the pieces with the playfield
@@ -3884,7 +3889,7 @@ MACHINE_CONFIG_START(segas16b_state::fpointbla)
 	MCFG_CPU_OPCODES_MAP(decrypted_opcodes_map_fpointbla)
 
 	MCFG_CPU_MODIFY("soundcpu")
-	MCFG_CPU_PROGRAM_MAP(sound_map)
+	MCFG_CPU_PROGRAM_MAP(bootleg_sound_map)
 
 	MCFG_DEVICE_MODIFY("sprites")
 	MCFG_BOOTLEG_SYS16B_SPRITES_XORIGIN(60) // these align the pieces with the playfield
@@ -3904,8 +3909,6 @@ MACHINE_CONFIG_START(segas16b_state::lockonph)
 
 	MCFG_NVRAM_ADD_0FILL("nvram")
 
-//  MCFG_SEGA_315_5195_MAPPER_ADD("mapper", "maincpu", segas16b_state, memory_mapper, mapper_sound_r, mapper_sound_w)
-
 	// video hardware
 	MCFG_GFXDECODE_ADD("gfxdecode", "palette", lockonph)
 	MCFG_PALETTE_ADD("palette", 0x2000*4)
@@ -3923,6 +3926,7 @@ MACHINE_CONFIG_START(segas16b_state::lockonph)
 	MCFG_SPEAKER_STANDARD_MONO("mono")
 
 	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
+	MCFG_GENERIC_LATCH_DATA_PENDING_CB(INPUTLINE("soundcpu", 0))
 
 	MCFG_YM2151_ADD("ymsnd", XTAL(16'000'000)/4) // ??
 //  MCFG_YM2151_IRQ_HANDLER(INPUTLINE("soundcpu", 0)) // does set up the timer, but end up with no sound?
@@ -3948,8 +3952,10 @@ MACHINE_CONFIG_START(segas16b_state::atomicp) // 10MHz CPU Clock verified
 	MCFG_DEVICE_REMOVE("soundcpu")
 	MCFG_DEVICE_REMOVE("sprites")
 
+	MCFG_DEVICE_MODIFY("mapper")
+	MCFG_SEGA_315_5195_PBF_CALLBACK(NOOP)
+
 	// sound hardware
-	MCFG_DEVICE_REMOVE("soundlatch")
 	MCFG_DEVICE_REMOVE("ym2151")
 	MCFG_SOUND_ADD("ym2413", YM2413, XTAL(20'000'000)/4) // 20MHz OSC divided by 4 (verified)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
@@ -9303,7 +9309,7 @@ GAME( 1987, sdibl6,      sdi,      system16b_split,           sdi,      segas16b
 // bootlegs with modified hardware
 GAME( 1989, fpointbl,    fpoint,    fpointbl,    fpointbl, segas16b_state,  generic_bootleg,   ROT0,   "bootleg (Datsu)", "Flash Point (World, bootleg)", 0 )
 GAME( 1989, fpointbj,    fpoint,    fpointbl,    fpointbl, segas16b_state,  generic_bootleg,   ROT0,   "bootleg (Datsu)", "Flash Point (Japan, bootleg set 1)", 0 )
-GAME( 1989, fpointbla,   fpoint,    fpointbla,   fpointbl, segas16b_state,  fpointbla,         ROT0,   "bootleg",         "Flash Point (Japan, bootleg set 2)", MACHINE_NOT_WORKING | MACHINE_NO_SOUND )
+GAME( 1989, fpointbla,   fpoint,    fpointbla,   fpointbl, segas16b_state,  fpointbla,         ROT0,   "bootleg",         "Flash Point (Japan, bootleg set 2)", MACHINE_NOT_WORKING )
 
 
 
@@ -9745,6 +9751,11 @@ MACHINE_CONFIG_START(isgsm_state::isgsm)
 	MCFG_CPU_PROGRAM_MAP(isgsm_map)
 	MCFG_CPU_VBLANK_INT_DRIVER("screen", isgsm_state, irq4_line_hold)
 
+	MCFG_CPU_MODIFY("soundcpu")
+	MCFG_CPU_PROGRAM_MAP(bootleg_sound_map)
+	MCFG_CPU_IO_MAP(bootleg_sound_portmap)
+
+	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
 MACHINE_CONFIG_END
 
 DRIVER_INIT_MEMBER(isgsm_state,isgsm)
