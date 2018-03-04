@@ -97,8 +97,6 @@ public:
 	DECLARE_READ8_MEMBER(crtc_r);
 	DECLARE_WRITE8_MEMBER(crtc_w);
 	DECLARE_READ8_MEMBER(uart_status_r);
-	DECLARE_READ8_MEMBER(uart_data_r);
-	DECLARE_WRITE8_MEMBER(uart_data_w);
 	DECLARE_READ8_MEMBER(keyboard_r);
 	DECLARE_WRITE8_MEMBER(output_40c);
 
@@ -212,19 +210,6 @@ READ8_MEMBER(tv912_state::uart_status_r)
 	status |= m_option->read();
 	m_uart->write_swe(1);
 	return status;
-}
-
-READ8_MEMBER(tv912_state::uart_data_r)
-{
-	m_uart->write_rdav(0);
-	u8 data = m_uart->get_received_data();
-	m_uart->write_rdav(1);
-	return data;
-}
-
-WRITE8_MEMBER(tv912_state::uart_data_w)
-{
-	m_uart->set_transmit_data(data);
 }
 
 WRITE8_MEMBER(tv912_state::output_40c)
@@ -378,9 +363,9 @@ ADDRESS_MAP_END
 ADDRESS_MAP_START(tv912_state::bank_map)
 	AM_RANGE(0x000, 0x0ff) AM_MIRROR(0x300) AM_RAM
 	AM_RANGE(0x400, 0x403) AM_MIRROR(0x3c0) AM_SELECT(0x030) AM_READWRITE(crtc_r, crtc_w)
-	AM_RANGE(0x404, 0x404) AM_MIRROR(0x3f3) AM_READ(uart_data_r)
+	AM_RANGE(0x404, 0x404) AM_MIRROR(0x3f3) AM_DEVREAD("uart", ay51013_device, receive)
 	AM_RANGE(0x408, 0x40b) AM_MIRROR(0x3f0) AM_READ(uart_status_r)
-	AM_RANGE(0x408, 0x408) AM_MIRROR(0x3f3) AM_WRITE(uart_data_w)
+	AM_RANGE(0x408, 0x408) AM_MIRROR(0x3f3) AM_DEVWRITE("uart", ay51013_device, transmit)
 	AM_RANGE(0x40c, 0x40f) AM_MIRROR(0x3f0) AM_READ(keyboard_r)
 	AM_RANGE(0x40c, 0x40c) AM_MIRROR(0x3f3) AM_WRITE(output_40c)
 	AM_RANGE(0x800, 0xfff) AM_RAMBANK("dispram")
@@ -911,6 +896,7 @@ MACHINE_CONFIG_START(tv912_state::tv912)
 	MCFG_DEVICE_ADD("uart", AY51013, 0)
 	MCFG_AY51013_READ_SI_CB(DEVREADLINE("rs232", rs232_port_device, rxd_r))
 	MCFG_AY51013_WRITE_SO_CB(DEVWRITELINE("rs232", rs232_port_device, write_txd))
+	MCFG_AY51013_AUTO_RDAV(true)
 
 	MCFG_RS232_PORT_ADD("rs232", default_rs232_devices, "loopback")
 

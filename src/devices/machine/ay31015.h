@@ -24,6 +24,7 @@ public:
 	void set_tx_clock(const XTAL &xtal) { set_tx_clock(xtal.dvalue()); }
 	void set_rx_clock(double rx_clock) { m_rx_clock = rx_clock; }
 	void set_rx_clock(const XTAL &xtal) { set_rx_clock(xtal.dvalue()); }
+	void set_auto_rdav(bool auto_rdav) { m_auto_rdav = auto_rdav; }
 	template <class Object> devcb_base &set_read_si_callback(Object &&cb) { return m_read_si_cb.set_callback(std::forward<Object>(cb)); }
 	template <class Object> devcb_base &set_write_so_callback(Object &&cb) { return m_write_so_cb.set_callback(std::forward<Object>(cb)); }
 	template <class Object> devcb_base &set_write_pe_callback(Object &&cb) { return m_write_pe_cb.set_callback(std::forward<Object>(cb)); }
@@ -69,6 +70,9 @@ public:
 	/* Set the transmitter buffer */
 	/* The data to transmit is set on DB1-DB8 (pins 26-33) */
 	void set_transmit_data( uint8_t data );
+
+	DECLARE_READ8_MEMBER(receive);
+	DECLARE_WRITE8_MEMBER(transmit);
 
 	void rx_process();
 	void tx_process();
@@ -168,6 +172,8 @@ protected:
 	devcb_write_line m_write_dav_cb;        // DAV - pin 19 - This will be called whenever the DAV pin may have changed. Optional
 	devcb_write_line m_write_tbmt_cb;       // TBMT - pin 22 - This will be called whenever the TBMT pin may have changed. Optional
 	devcb_write_line m_write_eoc_cb;        // EOC - pin 24 - This will be called whenever the EOC pin may have changed. Optional
+
+	bool m_auto_rdav;                       // true if RDAV (pin 18) is tied to RDE (pin 4)
 };
 
 class ay51013_device : public ay31015_device
@@ -197,6 +203,9 @@ DECLARE_DEVICE_TYPE(AY51013, ay51013_device)   // For AY-3-1014, AY-5-1013 and A
 
 #define MCFG_AY31015_RX_CLOCK(_rxclk) \
 	downcast<ay31015_device &>(*device).set_rx_clock(_rxclk);
+
+#define MCFG_AY31015_AUTO_RDAV(_auto_rdav) \
+	downcast<ay31015_device &>(*device).set_auto_rdav(_auto_rdav);
 
 #define MCFG_AY31015_READ_SI_CB(_devcb) \
 	devcb = &downcast<ay31015_device &>(*device).set_read_si_callback(DEVCB_##_devcb);
@@ -228,6 +237,9 @@ DECLARE_DEVICE_TYPE(AY51013, ay51013_device)   // For AY-3-1014, AY-5-1013 and A
 
 #define MCFG_AY51013_RX_CLOCK(_rxclk) \
 	downcast<ay51013_device &>(*device).set_rx_clock(_rxclk);
+
+#define MCFG_AY51013_AUTO_RDAV(_auto_rdav) \
+	downcast<ay51013_device &>(*device).set_auto_rdav(_auto_rdav);
 
 #define MCFG_AY51013_READ_SI_CB(_devcb) \
 	devcb = &downcast<ay51013_device &>(*device).set_read_si_callback(DEVCB_##_devcb);
