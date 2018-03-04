@@ -98,7 +98,6 @@ public:
 	DECLARE_READ16_MEMBER(darkedge_protection_r);
 	DECLARE_WRITE16_MEMBER(dbzvrvs_protection_w);
 	DECLARE_READ16_MEMBER(dbzvrvs_protection_r);
-	DECLARE_READ16_MEMBER(arf_wakeup_protection_r);
 	DECLARE_WRITE16_MEMBER(jleague_protection_w);
 	DECLARE_READ16_MEMBER(arescue_dsp_r);
 	DECLARE_WRITE16_MEMBER(arescue_dsp_w);
@@ -112,10 +111,8 @@ public:
 	DECLARE_WRITE16_MEMBER(system32_videoram_w);
 	DECLARE_READ32_MEMBER(multi32_videoram_r);
 	DECLARE_WRITE32_MEMBER(multi32_videoram_w);
-	DECLARE_READ16_MEMBER(system32_sprite_control_r);
-	DECLARE_WRITE16_MEMBER(system32_sprite_control_w);
-	DECLARE_READ32_MEMBER(multi32_sprite_control_r);
-	DECLARE_WRITE32_MEMBER(multi32_sprite_control_w);
+	DECLARE_READ8_MEMBER(sprite_control_r);
+	DECLARE_WRITE8_MEMBER(sprite_control_w);
 	DECLARE_READ16_MEMBER(system32_spriteram_r);
 	DECLARE_WRITE16_MEMBER(system32_spriteram_w);
 	DECLARE_READ32_MEMBER(multi32_spriteram_r);
