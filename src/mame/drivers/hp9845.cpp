@@ -410,27 +410,22 @@ INPUT_PORTS_END
 //  hp9845_base_state
 // *******************
 hp9845_base_state::hp9845_base_state(const machine_config &mconfig, device_type type, const char *tag) :
-			  driver_device(mconfig, type, tag),
-			  m_lpu(*this , "lpu"),
-			  m_ppu(*this , "ppu"),
-			  m_screen(*this , "screen"),
-			  m_palette(*this , "palette"),
-			  m_gv_timer(*this , "gv_timer"),
-			  m_io_key0(*this , "KEY0"),
-			  m_io_key1(*this , "KEY1"),
-			  m_io_key2(*this , "KEY2"),
-			  m_io_key3(*this , "KEY3"),
-			  m_io_shiftlock(*this, "SHIFTLOCK"),
-			  m_t14(*this , "t14"),
-			  m_t15(*this , "t15"),
-			  m_beeper(*this , "beeper"),
-			  m_beep_timer(*this , "beep_timer"),
-			  m_io_slot0(*this , "slot0"),
-			  m_io_slot1(*this , "slot1"),
-			  m_io_slot2(*this , "slot2"),
-			  m_io_slot3(*this , "slot3"),
-			  m_ram(*this , RAM_TAG),
-			  m_chargen(*this , "chargen")
+	driver_device(mconfig, type, tag),
+	m_lpu(*this, "lpu"),
+	m_ppu(*this, "ppu"),
+	m_screen(*this, "screen"),
+	m_palette(*this, "palette"),
+	m_gv_timer(*this, "gv_timer"),
+	m_io_key(*this, "KEY%u", 0U),
+	m_io_shiftlock(*this, "SHIFTLOCK"),
+	m_t14(*this, "t14"),
+	m_t15(*this, "t15"),
+	m_beeper(*this, "beeper"),
+	m_beep_timer(*this, "beep_timer"),
+	m_io_slot(*this, "slot%u", 0U),
+	m_ram(*this, RAM_TAG),
+	m_softkeys(*this, "Softkey%u", 0U),
+	m_chargen(*this, "chargen")
 {
 }
 
@@ -443,7 +438,8 @@ void hp9845_base_state::setup_ram_block(unsigned block , unsigned offset)
 
 void hp9845_base_state::machine_start()
 {
-	machine().first_screen()->register_screen_bitmap(m_bitmap);
+	m_softkeys.resolve();
+	m_screen->register_screen_bitmap(m_bitmap);
 
 	// setup RAM dynamically for -ramsize
 	// 0K..64K
@@ -487,22 +483,11 @@ void hp9845_base_state::machine_reset()
 	int sc;
 	read16_delegate rhandler;
 	write16_delegate whandler;
-	if ((sc = m_io_slot0->get_rw_handlers(rhandler , whandler)) >= 0) {
-		logerror("Install R/W handlers for slot 0 @ SC = %d\n" , sc);
-		m_ppu->space(AS_IO).install_readwrite_handler(sc * 4 , sc * 4 + 3 , rhandler , whandler);
-	}
-	if ((sc = m_io_slot1->get_rw_handlers(rhandler , whandler)) >= 0) {
-		logerror("Install R/W handlers for slot 1 @ SC = %d\n" , sc);
-		m_ppu->space(AS_IO).install_readwrite_handler(sc * 4 , sc * 4 + 3 , rhandler , whandler);
-	}
-	if ((sc = m_io_slot2->get_rw_handlers(rhandler , whandler)) >= 0) {
-		logerror("Install R/W handlers for slot 2 @ SC = %d\n" , sc);
-		m_ppu->space(AS_IO).install_readwrite_handler(sc * 4 , sc * 4 + 3 , rhandler , whandler);
-	}
-	if ((sc = m_io_slot3->get_rw_handlers(rhandler , whandler)) >= 0) {
-		logerror("Install R/W handlers for slot 3 @ SC = %d\n" , sc);
-		m_ppu->space(AS_IO).install_readwrite_handler(sc * 4 , sc * 4 + 3 , rhandler , whandler);
-	}
+	for (unsigned i = 0; 4 > i; ++i)
+		if ((sc = m_io_slot[i]->get_rw_handlers(rhandler , whandler)) >= 0) {
+			logerror("Install R/W handlers for slot %u @ SC = %d\n", i, sc);
+			m_ppu->space(AS_IO).install_readwrite_handler(sc * 4 , sc * 4 + 3 , rhandler , whandler);
+		}
 
 	// Some sensible defaults
 	m_video_load_mar = false;
@@ -638,12 +623,12 @@ void hp9845_base_state::flg_w(uint8_t sc , int state)
 	}
 }
 
-void hp9845_base_state::kb_scan_ioport(ioport_value pressed , ioport_port *port , unsigned idx_base , int& max_seq_len , unsigned& max_seq_idx)
+void hp9845_base_state::kb_scan_ioport(ioport_value pressed , ioport_port &port , unsigned idx_base , int& max_seq_len , unsigned& max_seq_idx)
 {
 	while (pressed) {
 		unsigned bit_no = 31 - count_leading_zeros(pressed);
 		ioport_value mask = BIT_MASK(bit_no);
-		int seq_len = port->field(mask)->seq().length();
+		int seq_len = port.field(mask)->seq().length();
 		if (seq_len > max_seq_len) {
 			max_seq_len = seq_len;
 			max_seq_idx = bit_no + idx_base;
@@ -654,11 +639,11 @@ void hp9845_base_state::kb_scan_ioport(ioport_value pressed , ioport_port *port 
 
 TIMER_DEVICE_CALLBACK_MEMBER(hp9845_base_state::kb_scan)
 {
-		ioport_value input[ 4 ];
-		input[ 0 ] = m_io_key0->read();
-		input[ 1 ] = m_io_key1->read();
-		input[ 2 ] = m_io_key2->read();
-		input[ 3 ] = m_io_key3->read();
+		ioport_value input[ 4 ]{
+				m_io_key[0]->read(),
+				m_io_key[1]->read(),
+				m_io_key[2]->read(),
+				m_io_key[3]->read() };
 
 		// Shift lock
 		ioport_value shiftlock = m_io_shiftlock->read();
@@ -703,10 +688,8 @@ TIMER_DEVICE_CALLBACK_MEMBER(hp9845_base_state::kb_scan)
 
 		int max_seq_len = 0;
 		unsigned max_seq_idx = 0;
-		kb_scan_ioport(input[ 0 ] & ~m_kb_state[ 0 ] , m_io_key0 , 0 , max_seq_len , max_seq_idx);
-		kb_scan_ioport(input[ 1 ] & ~m_kb_state[ 1 ] , m_io_key1 , 32 , max_seq_len , max_seq_idx);
-		kb_scan_ioport(input[ 2 ] & ~m_kb_state[ 2 ] , m_io_key2 , 64 , max_seq_len , max_seq_idx);
-		kb_scan_ioport(input[ 3 ] & ~m_kb_state[ 3 ] , m_io_key3 , 96 , max_seq_len , max_seq_idx);
+		for (unsigned i = 0; 4 > i; ++i)
+			kb_scan_ioport(input[i] & ~m_kb_state[i] , *m_io_key[i] , i << 5 , max_seq_len , max_seq_idx);
 		// TODO: handle repeat key
 		// TODO: handle ctrl+stop
 
@@ -827,14 +810,14 @@ INPUT_CHANGED_MEMBER(hp9845_base_state::togglekey_changed)
 		break;
 	case 1: // Prt all
 		{
-			bool state = BIT(m_io_key0->read(), 1);
+			bool state = BIT(m_io_key[0]->read(), 1);
 			popmessage("PRT ALL %s", state ? "ON" : "OFF");
 			output().set_value("prt_all_led" , state);
 		}
 		break;
 	case 2: // Auto st
 		{
-			bool state = BIT(m_io_key0->read(), 17);
+			bool state = BIT(m_io_key[0]->read(), 17);
 			popmessage("AUTO ST %s", state ? "ON" : "OFF");
 			output().set_value("auto_st_led" , state);
 		}
@@ -1404,7 +1387,7 @@ protected:
 	void update_line_pattern();
 	void pattern_fill(uint16_t x0 , uint16_t y0 , uint16_t x1 , uint16_t y1 , unsigned fill_idx);
 	static uint16_t get_gv_mem_addr(unsigned x , unsigned y);
-	virtual void update_graphic_bits(void) = 0;
+	virtual void update_graphic_bits() = 0;
 	static int get_wrapped_scanline(unsigned scanline);
 	void render_lp_cursor(unsigned video_scanline , unsigned pen_idx);
 
@@ -1415,7 +1398,7 @@ protected:
 	void compute_lp_data();
 	void lp_scanline_update(unsigned video_scanline);
 
-	virtual void update_gcursor(void) = 0;
+	virtual void update_gcursor() = 0;
 
 	bool m_alpha_sel;
 	bool m_gv_sk_en;
@@ -1613,7 +1596,7 @@ INPUT_CHANGED_MEMBER(hp9845ct_base_state::softkey_changed)
 	uint8_t softkey_data = m_io_softkeys->read();
 	unsigned softkey;
 	for (softkey = 0; softkey < 8; softkey++) {
-		output().set_indexed_value("Softkey" , softkey , !BIT(softkey_data , 7 - softkey));
+		m_softkeys[softkey] = !BIT(softkey_data , 7 - softkey);
 	}
 	for (softkey = 0; softkey < 8 && BIT(softkey_data , 7 - softkey); softkey++) {
 	}
@@ -2099,7 +2082,7 @@ protected:
 	virtual void advance_gv_fsm(bool ds , bool trigger) override;
 	virtual void update_graphic_bits() override;
 
-	virtual void update_gcursor(void) override;
+	virtual void update_gcursor() override;
 
 	// Palette indexes
 	static constexpr unsigned pen_graphic(unsigned rgb) { return rgb; }
@@ -2799,7 +2782,7 @@ void hp9845c_state::update_graphic_bits()
 	m_ppu->dmar_w(dmar);
 }
 
-void hp9845c_state::update_gcursor(void)
+void hp9845c_state::update_gcursor()
 {
 	m_gv_cursor_color = ~m_gv_lyc & 0x7;
 	m_gv_cursor_y = (~m_gv_lyc >> 6) & 0x1ff;
@@ -2836,7 +2819,7 @@ protected:
 	virtual void advance_gv_fsm(bool ds , bool trigger) override;
 	virtual void update_graphic_bits() override;
 
-	virtual void update_gcursor(void) override;
+	virtual void update_gcursor() override;
 
 	std::vector<uint16_t> m_graphic_mem;
 
@@ -3644,7 +3627,7 @@ void hp9845t_state::update_graphic_bits()
 	m_ppu->dmar_w(dmar);
 }
 
-void hp9845t_state::update_gcursor(void)
+void hp9845t_state::update_gcursor()
 {
 	m_gv_cursor_fs = (m_gv_lyc & 0x3) == 0;
 	m_gv_cursor_gc = !BIT(m_gv_lyc , 1);
